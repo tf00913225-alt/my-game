@@ -1,0 +1,38 @@
+V121_SPLIT 檢查報告
+
+母版：V120
+拆檔目的：只做外部化，不改遊戲機制。
+
+靜態檢查：
+- 原始實際 CSS 區塊：27
+- 拆出 CSS 檔案：27
+- CSS 原始載入順序：完全保留
+- CSS parser：0 錯誤
+- 原始實際 JavaScript 區塊：21
+- 拆出 JavaScript 檔案：21
+- JavaScript 原始執行順序：完全保留
+- Node.js --check：21 / 21 通過
+- 原始 DOM ID：242
+- 拆檔後 DOM ID：242
+- ID 集合：完全一致
+- 重複 DOM ID：0
+- Base64/data:image 殘留：0
+- 外部圖片資產：57 個
+- 未被引用圖片：0
+- 本地資源路徑檢查：0 缺檔
+
+大小：
+- V120 單檔：約 15.14 MB
+- V121_SPLIT 全部檔案：約 11.13 MB
+- index.html：約 74 KB
+- Base64 膨脹已移除，圖片改為獨立檔案。
+
+架構保護：
+- 沒有把 21 個 script 強制合成單一 game.js。
+- 原因：V120 有多個歷史 runtime/migration 區塊；合併會改變錯誤邊界與 top-level let/const 初始化時機。
+- V121_SPLIT 先保持每個 script 為獨立 classic script，避免因拆檔而改變舊系統執行語意。
+
+執行環境驗證：
+- 已做桌面 Chromium 的重組/解析 smoke test，函式與 V120 行為基線一致。
+- 容器環境禁止直接導覽 localhost/file URL，因此無法在此做真正「外部檔案 URL 載入」的 Chromium 導覽測試。
+- Android Chrome 實機仍需使用者驗證；這點不能用程式檢查冒充實機驗證。

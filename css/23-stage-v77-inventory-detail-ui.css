@@ -1,0 +1,101 @@
+
+/*
+ * V81 cleanup：V77 的虛擬 translateY 捲動維持停用。
+ * 這裡只保留仍在使用的 HP/SP 與角色詳細資訊 UI；
+ * 背包不再保留第二套 virtual-scroll CSS 來源。
+ */
+
+/* HP / SP 常駐資訊：只留一條小資訊帶 */
+#game-stage #inventoryPage .inventory-stats-panel{
+    margin:6px 0 8px !important;
+    padding:7px 10px !important;
+    min-height:0 !important;
+}
+#game-stage #inventoryPage .inventory-stats-title{
+    display:none !important;
+}
+#game-stage #inventoryPage .inventory-detailed-stats{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+}
+#game-stage #inventoryPage .inventory-stat-primary{
+    display:flex !important;
+    justify-content:space-between !important;
+    align-items:center !important;
+    min-height:34px !important;
+    padding:5px 10px !important;
+    font-size:15px !important;
+    border:1px solid rgba(138,106,58,.65) !important;
+    border-radius:8px !important;
+    background:rgba(0,0,0,.22) !important;
+}
+
+/* 立繪框右上角放大鏡 */
+#game-stage #inventoryPage .inventory-portrait-frame{
+    position:relative !important;
+}
+#game-stage #inventoryPage .inventory-character-detail-button{
+    position:absolute !important;
+    top:10px !important;
+    right:10px !important;
+    width:46px !important;
+    height:46px !important;
+    min-width:46px !important;
+    min-height:46px !important;
+    padding:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    z-index:8 !important;
+    border:2px solid #8a6a3a !important;
+    border-radius:50% !important;
+    background:linear-gradient(180deg,#2b2115,#100c08) !important;
+    color:#ffe27a !important;
+    font-size:22px !important;
+    box-shadow:0 0 8px rgba(240,180,41,.22) !important;
+}
+
+/* 詳細資訊 modal 必須高於角色 modal */
+.inventory-character-detail-modal{
+    z-index:9000 !important;
+}
+.inventory-character-detail-box{
+    width:min(88vw,520px) !important;
+    max-width:520px !important;
+    max-height:82dvh !important;
+    overflow-y:auto !important;
+}
+.inventory-character-detail-grid{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+    width:100% !important;
+    margin:12px 0 16px !important;
+}
+.inventory-character-detail-row{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    padding:9px 10px !important;
+    border:1px solid rgba(138,106,58,.55) !important;
+    border-radius:8px !important;
+    background:rgba(0,0,0,.24) !important;
+    font-size:14px !important;
+}
+
+.inventory-character-detail-note{
+    margin-top:8px;
+    padding:8px 9px;
+    border:1px solid rgba(180,138,65,.55);
+    border-radius:7px;
+    background:rgba(18,14,10,.72);
+    color:#cfc3ad;
+    font-size:11px;
+    line-height:1.45;
+}
+
+.inventory-character-detail-row b{
+    color:#ffe27a !important;
+}

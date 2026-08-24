@@ -1,0 +1,28 @@
+
+/* V51
+   Restore the classic white outline ONLY for combat result text:
+   damage / HP changes / MISS / critical-style floating results.
+   Skill cast names remain stroke-free.
+*/
+#game-stage .battle-damage,
+#game-stage .battle-damage-number,
+#game-stage .damage-number,
+#game-stage .damage-text,
+#game-stage .combat-damage,
+#game-stage .combat-result,
+#game-stage .combat-result-text,
+#game-stage .battle-miss,
+#game-stage .miss-text,
+#game-stage .battle-heal,
+#game-stage .heal-number,
+#game-stage .hp-change,
+#game-stage .hp-change-number{
+    -webkit-text-stroke:3px #ffffff !important;
+    text-stroke:3px #ffffff !important;
+}
+
+/* Explicitly keep skill names without white stroke. */
+#game-stage .skill-name-badge{
+    -webkit-text-stroke:0 !important;
+    text-stroke:0 !important;
+}

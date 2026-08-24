@@ -1,0 +1,20 @@
+
+/* V48
+   - Skill cast name: card-like size.
+   - Remove ALL white outline/stroke from skill cast names.
+*/
+#game-stage #game-overlay-layer .skill-name-badge{
+    font-size:72px !important;
+    width:420px !important;
+    min-width:420px !important;
+    max-width:none !important;
+    overflow:visible !important;
+    white-space:nowrap !important;
+    text-align:center !important;
+    font-weight:900 !important;
+    line-height:1 !important;
+    -webkit-text-stroke:0 !important;
+    text-shadow:
+        0 4px 5px rgba(0,0,0,1),
+        0 0 10px rgba(0,0,0,.95) !important;
+}

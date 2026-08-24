@@ -1,0 +1,36 @@
+
+/* V60/V97 training popup safety.
+   V97 root cause: transformed stage + fixed large base64 background +
+   animated box-shadow forced Samsung Browser compositor tile repaints.
+   The training background is now page-local absolute, background-image
+   no longer transitions, and this modal uses a static glow. */
+#game-stage #trainingZoneModal .home-feature-modal-box{
+    width:94% !important;
+    max-width:400px !important;
+    /* V97：固定 legacy stage 幾何；同時關閉這個視窗的連續
+       box-shadow呼吸動畫，避免它在2.571倍transform裡觸發
+       Samsung Browser GPU tile反覆重繪而出現大片黑色閃塊。 */
+    max-height:640px !important;
+    overflow-y:auto !important;
+    padding:18px !important;
+    box-sizing:border-box !important;
+    animation:none !important;
+    border-color:#f0b429 !important;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(240,180,41,.08),
+        0 0 10px rgba(240,180,41,.35) !important;
+}
+#game-stage #trainingZoneModal .home-feature-modal-title{
+    font-size:22px !important;
+    margin-bottom:12px !important;
+}
+#game-stage #trainingZoneModal #trainingZoneModalBody{
+    font-size:16px !important;
+    line-height:1.9 !important;
+}
+#game-stage #trainingZoneModal .home-feature-buy-btn{
+    font-size:16px !important;
+    min-height:46px !important;
+    padding:10px 12px !important;
+}

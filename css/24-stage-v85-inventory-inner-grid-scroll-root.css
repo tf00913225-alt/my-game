@@ -1,0 +1,133 @@
+
+/* =========================================================
+   V85 — FIXED INVENTORY SHELL + INNER 102-SLOT SCROLL OWNER
+
+   Direct inventory page architecture:
+   - #bottomNav stays outside .content and fixed at the shell bottom.
+   - .content is NOT scrollable on inventory.
+   - #inventoryPage and .inventory-classic-shell fill the available area.
+   - Character switch / equipment / category tabs stay fixed.
+   - .inventory-grid-scroll is the ONLY vertical scroll owner.
+   - Each category renders exactly 102 visible slots; no pagination.
+========================================================= */
+
+#game-stage > #app > #game-content #bottomNav{
+    position:absolute !important;
+    left:0 !important;
+    right:auto !important;
+    bottom:0 !important;
+    top:auto !important;
+    width:420px !important;
+    max-width:none !important;
+    height:84px !important;
+    margin:0 !important;
+    transform:none !important;
+    z-index:200 !important;
+}
+
+html.inventory-scroll-active,
+body.inventory-scroll-active,
+#game-viewport.inventory-scroll-active,
+#game-stage.inventory-scroll-active{
+    touch-action:pan-y !important;
+}
+
+#game-stage #app.on-inventory-page .content{
+    bottom:84px !important;
+    overflow:hidden !important;
+    touch-action:pan-y !important;
+    padding:0 !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:hidden !important;
+    touch-action:pan-y !important;
+    transform:none !important;
+    will-change:auto !important;
+    padding:8px 0 !important;
+    box-sizing:border-box !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-classic-shell{
+    height:100% !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:8px !important;
+    overflow:hidden !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-character-panel{
+    flex:0 0 auto !important;
+    min-height:0 !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-character-stage{
+    height:240px !important;
+    min-height:240px !important;
+    max-height:240px !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-equipment-icon{
+    font-size:clamp(15px,2.8vw,25px) !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-right-panel{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    padding:8px 10px 10px !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-wallet-bar{
+    flex:0 0 auto !important;
+    min-height:28px !important;
+    margin:0 6px 5px !important;
+    padding:4px 9px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    border:1px solid rgba(138,106,58,.65) !important;
+    border-radius:7px !important;
+    background:linear-gradient(180deg,rgba(36,28,18,.78),rgba(10,8,5,.88)) !important;
+    box-sizing:border-box !important;
+}
+#game-stage #app.on-inventory-page #inventoryPage .inventory-wallet-label{
+    color:#b9aa91 !important;
+    font-size:12px !important;
+    font-weight:700 !important;
+}
+#game-stage #app.on-inventory-page #inventoryPage .inventory-wallet-value{
+    color:#ffe27a !important;
+    font-size:14px !important;
+    font-weight:900 !important;
+    font-variant-numeric:tabular-nums !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-category-tabs{
+    flex:0 0 auto !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-grid-scroll{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    padding:0 1px 8px !important;
+    scrollbar-gutter:stable !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-grid-classic{
+    width:100% !important;
+    margin:0 !important;
+    align-content:start !important;
+}

@@ -1,0 +1,73 @@
+
+/* ============================================================
+   V40 — SOURCE-LEVEL FIX
+   Baseline: V39.
+
+   ROOT CAUSES FOUND:
+   A) Battle background:
+      V39 read #mapPage / #trainingPage background-image.
+      Those containers have NO background-image. The real patrol
+      image is #mapPageBgLayer, a child layer.
+      Therefore V39 received "none" and battle remained black.
+      We now copy the actual #mapPageBgLayer background.
+
+   B) Cast skill badge:
+      .skill-name-badge lives in the native 1080×1920 overlay,
+      while the character cards live in the legacy 420×746.666
+      surface that is enlarged 1080/420 = 2.571428...
+      Therefore 124px native was NOT equivalent to a 124px
+      legacy card. A character card is ~319 native px wide.
+============================================================ */
+
+/* --- A. Actual battle background layer --- */
+#game-stage > #app > #game-content #battlePage{
+    position:relative !important;
+    background:transparent !important;
+    isolation:isolate !important;
+    /* V96：後段 V40 不得再把整個戰鬥頁改回 scroll owner。 */
+    overflow:hidden !important;
+}
+
+#game-stage > #app > #game-content #battlePage > .battle-bg-shared{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    z-index:0 !important;
+    pointer-events:none !important;
+    background-size:cover !important;
+    background-position:center top !important;
+    background-repeat:no-repeat !important;
+}
+
+#game-stage > #app > #game-content #battlePage > .battle-wrap{
+    position:relative !important;
+    z-index:1 !important;
+}
+
+#game-stage > #app > #game-content #battlePage > #battleTurnIndicator,
+#game-stage > #app > #game-content #battlePage > #battleInfo{
+    position:relative !important;
+    z-index:2 !important;
+}
+
+/* --- B. Native overlay badge must match the legacy card's
+       actual 1080-space width (124 × 1080/420 ≈ 318.86). --- */
+#game-stage > #game-overlay-layer .skill-name-badge{
+    font-size:56px !important;
+    font-weight:900 !important;
+    line-height:1.05 !important;
+    width:319px !important;
+    min-width:319px !important;
+    max-width:319px !important;
+    box-sizing:border-box !important;
+    text-align:center !important;
+    padding:2px 8px !important;
+    white-space:nowrap !important;
+    overflow:visible !important;
+    -webkit-text-stroke:0 !important;
+    text-shadow:
+        0 2px 2px rgba(0,0,0,.8),
+        0 0 3px rgba(0,0,0,.8) !important;
+}

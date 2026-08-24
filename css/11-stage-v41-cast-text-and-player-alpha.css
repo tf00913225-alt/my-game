@@ -1,0 +1,32 @@
+
+/* V41:
+   - Cast skill name is intentionally oversized per user request.
+   - Player card has no black baked background; the source image is now
+     a transparent PNG.
+*/
+#game-stage > #game-overlay-layer .skill-name-badge{
+    font-size:72px !important;
+    width:420px !important;
+    min-width:420px !important;
+    max-width:none !important;
+    overflow:visible !important;
+    white-space:nowrap !important;
+    text-align:center !important;
+    font-weight:900 !important;
+    line-height:1 !important;
+    -webkit-text-stroke:0 !important;
+    text-shadow:
+        0 3px 3px rgba(0,0,0,.9),
+        0 0 5px rgba(0,0,0,.9) !important;
+}
+
+/* The image itself is now transparent. Also remove the card's own
+   black fallback background so no rectangle is painted behind it. */
+#game-stage > #app > #game-content #battlePage #battlePlayerCard0{
+    background-color:transparent !important;
+    background-repeat:no-repeat !important;
+    background-position:center top !important;
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+}

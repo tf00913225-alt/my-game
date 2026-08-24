@@ -1,0 +1,2823 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>戰鬥完整版 V121 SPLIT</title>
+
+<link rel="preconnect"href="https://fonts.googleapis.com">
+<link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap"rel="stylesheet">
+
+<link rel="stylesheet" href="css/00-main.css">
+
+<link id="stage-v8-map-page-fix" rel="stylesheet" href="css/01-stage-v8-map-page-fix.css">
+
+</style>
+
+<link id="stage-v3-layout-fix" rel="stylesheet" href="css/02-stage-v3-layout-fix.css">
+
+
+<link id="stage-v4-viewport-lock" rel="stylesheet" href="css/03-stage-v4-viewport-lock.css">
+
+
+<!-- V12: Automatic browser Fullscreen API is intentionally disabled.
+     Game viewport/scaling remains unchanged. -->
+
+
+<link id="v119-ally-target-style" rel="stylesheet" href="css/04-v119-ally-target-style.css">
+
+</head>
+
+<body>
+<div id="game-viewport">
+<div id="game-stage">
+<div id="game-overlay-layer" aria-hidden="true"></div>
+<div id="app">
+
+<div
+    id="expToast"
+    class="exp-toast"
+></div>
+
+<div
+    id="levelUpToast"
+    class="level-up-toast"
+></div>
+
+<div
+    id="autosaveIndicator"
+    class="autosave-indicator"
+>
+     已自動存檔
+</div>
+
+<!-- =====================================================
+     創建角色
+===================================================== -->
+
+<div id="creationPage">
+
+    <div class="creation-title">
+         創建角色
+    </div>
+
+    <div class="creation-subtitle">
+        建立你的第一名冒險者
+    </div>
+
+    <div class="creation-card">
+
+        <div class="creation-label">
+            🆔 玩家 ID
+        </div>
+
+        <input
+            id="creationId"
+            class="creation-input"
+            maxlength="16"
+            placeholder="輸入你的角色 ID"
+        >
+
+    </div>
+
+    <div class="creation-card">
+
+        <div class="creation-label">
+             選擇元素
+        </div>
+
+        <div class="element-grid">
+
+            <button
+                id="elementFire"
+                class="element-option selected"
+                onclick="selectElement('fire')"
+            >
+                <div class="element-icon"></div>
+                <div class="element-name">火</div>
+            </button>
+
+            <button
+                id="elementWind"
+                class="element-option"
+                onclick="selectElement('wind')"
+            >
+                <div class="element-icon"></div>
+                <div class="element-name">風</div>
+            </button>
+
+            <button
+                id="elementEarth"
+                class="element-option"
+                onclick="selectElement('earth')"
+            >
+                <div class="element-icon"></div>
+                <div class="element-name">土</div>
+            </button>
+
+            <button
+                id="elementWater"
+                class="element-option"
+                onclick="selectElement('water')"
+            >
+                <div class="element-icon"></div>
+                <div class="element-name">水</div>
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="creation-card">
+
+        <div class="creation-label">
+             初始能力配點
+        </div>
+
+        <div class="creation-stat">
+            <span>攻擊</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('attack',-1)"
+                >−</button>
+
+                <b id="creationAttack">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('attack',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>體質</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('vitality',-1)"
+                >−</button>
+
+                <b id="creationVitality">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('vitality',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>能量</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('energy',-1)"
+                >−</button>
+
+                <b id="creationEnergy">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('energy',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>智力</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('intelligence',-1)"
+                >−</button>
+
+                <b id="creationIntelligence">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('intelligence',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>精神</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('spirit',-1)"
+                >−</button>
+
+                <b id="creationSpirit">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('spirit',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>敏捷</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('agility',-1)"
+                >−</button>
+
+                <b id="creationAgility">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd('agility',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-points">
+            剩餘配點：
+            <b id="creationPoints">10</b>
+        </div>
+
+        <div class="stat-explanation">
+
+            <div class="stat-explanation-title">
+                 能力值說明
+            </div>
+
+            <div>
+                 <b>攻擊</b>：影響物理攻擊、物理爆擊機率與物理爆擊傷害。
+            </div>
+
+            <div>
+                 <b>體質</b>：影響 HP 與防禦。
+                每1點體質增加50 HP、15防禦值。
+            </div>
+
+            <div>
+                 <b>能量</b>：影響 SP。
+                每1點能量增加15 SP。
+            </div>
+
+            <div>
+                 <b>智力</b>：影響法術攻擊、回復技能、異常狀態命中率、法術爆擊機率與法術爆擊傷害；每1點智力額外增加1.25點HP治療量、0.5點SP治療量（施放者本人不回復SP）。
+            </div>
+
+            <div>
+                 <b>精神</b>：影響異常狀態抗性、命中與抗暴；每1點精神=+0.3個百分點異常抗性、+2命中、+0.1%抗暴（抗暴上限25%）。+2命中約使最終命中機率增加0.6個百分點。
+            </div>
+
+            <div>
+                 <b>敏捷</b>：影響出手速度與閃避；每1點敏捷=+1速度、+2閃避，+2閃避約使敵方最終命中機率降低0.6個百分點。
+            </div>
+
+        </div>
+
+    </div>
+
+    <button
+        class="creation-start"
+        onclick="createCharacter()"
+    >
+        開始冒險
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     第二角色創建（Lv.10解鎖）
+===================================================== -->
+
+<div
+    id="secondCharacterModal"
+    class="modal"
+>
+
+<div
+    class="modal-box"
+    style="
+        max-height:88%;
+        overflow-y:auto;
+        text-align:left;
+    "
+>
+
+    <h2 style="text-align:center;">
+         創建第二名角色
+    </h2>
+
+    <div
+        style="
+            text-align:center;
+            color:#b3a58c;
+            font-size:12px;
+            margin-bottom:12px;
+        "
+    >
+        屬性可以跟第一名角色重複，不用擔心。
+    </div>
+
+    <div class="creation-card">
+
+        <div class="creation-label">
+            🆔 角色 ID
+        </div>
+
+        <input
+            id="creation2Id"
+            class="creation-input"
+            maxlength="16"
+            placeholder="輸入第二名角色的 ID"
+        >
+
+    </div>
+
+    <div class="creation-card">
+
+        <div class="creation-label">
+             選擇元素
+        </div>
+
+        <div class="element-grid">
+
+            <button
+                id="element2Fire"
+                class="element-option selected"
+                onclick="selectElement2('fire')"
+            >
+                <div class="element-icon"></div>
+                <div class="element-name">火</div>
+            </button>
+
+            <button
+                id="element2Wind"
+                class="element-option"
+                onclick="selectElement2('wind')"
+            >
+                <div class="element-icon"></div>
+                <div class="element-name">風</div>
+            </button>
+
+            <button
+                id="element2Earth"
+                class="element-option"
+                onclick="selectElement2('earth')"
+            >
+                <div class="element-icon"></div>
+                <div class="element-name">土</div>
+            </button>
+
+            <button
+                id="element2Water"
+                class="element-option"
+                onclick="selectElement2('water')"
+            >
+                <div class="element-icon"></div>
+                <div class="element-name">水</div>
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="creation-card">
+
+        <div class="creation-label">
+             初始能力配點
+        </div>
+
+        <div class="creation-stat">
+            <span>攻擊</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('attack',-1)"
+                >−</button>
+
+                <b id="creation2Attack">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('attack',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>體質</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('vitality',-1)"
+                >−</button>
+
+                <b id="creation2Vitality">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('vitality',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>能量</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('energy',-1)"
+                >−</button>
+
+                <b id="creation2Energy">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('energy',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>智力</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('intelligence',-1)"
+                >−</button>
+
+                <b id="creation2Intelligence">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('intelligence',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>精神</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('spirit',-1)"
+                >−</button>
+
+                <b id="creation2Spirit">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('spirit',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-stat">
+            <span>敏捷</span>
+
+            <div class="creation-stat-right">
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('agility',-1)"
+                >−</button>
+
+                <b id="creation2Agility">0</b>
+
+                <button
+                    class="creation-stat-button"
+                    onclick="creationAdd2('agility',1)"
+                >+</button>
+            </div>
+        </div>
+
+        <div class="creation-points">
+            剩餘配點：
+            <b id="creation2Points">10</b>
+        </div>
+
+    </div>
+
+    <button
+        class="creation-start"
+        onclick="createSecondCharacter()"
+    >
+        創建角色
+    </button>
+
+    <button
+        class="creation-start"
+        style="
+            background:#2e2822;
+            margin-top:8px;
+        "
+        onclick="closeSecondCharacterModal()"
+    >
+        取消
+    </button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     遊戲介面
+===================================================== -->
+
+<div id="gameInterface">
+
+<div
+    id="gameHeaderBar"
+    class="header"
+>
+
+    <div
+        id="playerName"
+        class="player-name"
+    >
+         冒險者
+    </div>
+
+    <div
+        id="playerHeaderInfo"
+        class="player-info"
+    >
+
+        Lv.
+        <span id="playerLevel">1</span>
+
+        ｜<span id="elementText">火</span>
+
+        ｜
+        <span id="headerHP">100</span>
+
+        ｜
+        <span id="headerSP">50</span>
+
+    </div>
+
+    <!--
+        ★ 修正（依照使用者要求，改成顯示
+        地圖名稱＋等級範圍，不再顯示單一
+        怪物的即時資訊——那份資訊現在改成
+        獨立的「怪物清單框」，見下面
+        #mapMonsterListBox，列出這個地圖
+        全部怪物種類的名稱/等級/敏捷）：
+    -->
+
+    <div
+        id="mapHeaderZoneName"
+        class="player-name"
+        style="display:none;"
+    >
+         地圖名稱
+    </div>
+
+    <div
+        id="mapHeaderMonsterInfo"
+        class="player-info"
+        style="display:none;"
+    >
+        <span id="mapHeaderLevelRange">--</span>
+
+    </div>
+
+</div>
+
+
+<div class="content">
+
+<!-- =====================================================
+     主城
+===================================================== -->
+
+<div
+    id="homePage"
+    class="page active"
+>
+
+<!--
+    ★ 修正（依照使用者回報，改用
+    position:fixed取代不可靠的
+    background-attachment:fixed）：
+-->
+
+<div class="home-bg-fixed-layer"></div>
+
+<h2>主城</h2>
+
+<!-- V92：開發測試快捷鍵。正式版上線前可整塊移除。 -->
+<div class="home-test-tools" id="homeTestTools">
+    <button type="button" class="home-test-button" id="testGoldMillionButton" onclick="grantTestGoldMillion()">
+        金幣 <b>+100萬</b>
+    </button>
+    <button type="button" class="home-test-button" id="testExpTenMillionButton" onclick="grantTestExpTenMillion()">
+        經驗池 <b>+1000萬</b>
+    </button>
+</div>
+
+<!--
+    ★ 新增（依照使用者要求）：
+    主城純文字選單，沒有任何方塊/邊框，
+    標楷體、白字黑框，點文字用JS
+    openHomeFeature()跳出對應的彈出視窗。
+-->
+
+<!--
+    ★ 修正（依照使用者要求，主城金幣訊息
+    全部拿掉）：原本這裡的金幣顯示區塊
+    整個移除。金幣數值本身還是繼續正常
+    累加/存檔，只是不再顯示在主城畫面上，
+    商店裡買東西的畫面還是看得到金幣。
+-->
+
+<!--
+    ★ 修正（依照使用者要求，改成參考圖那種
+    方塊卡片版面）：
+    每張卡片：上方是空的方形圖示區塊
+    （.home-card-icon，裡面故意留空，
+    使用者會自己準備icon圖片，之後只要用
+    id指定background-image就能放進去，
+    不用再動這裡的HTML結構），下方緊貼著
+    （沒有間距）一條深紅底金字的標籤列。
+    onclick沿用原本一模一樣的
+    openHomeFeature(...)呼叫，功能完全
+    不變，只是外觀從純文字改成卡片。
+-->
+
+<div class="home-card-grid">
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('rest')"
+    >
+        <div
+            id="homeIconRest"
+            class="home-card-icon"
+            style="background-color:#000;background-image:url(assets/ui/home-rest.png);"
+        ></div>
+        <div class="home-card-label">
+            休息
+        </div>
+    </div>
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('shop')"
+    >
+        <div
+            id="homeIconShop"
+            class="home-card-icon"
+            style="background-image:url(assets/ui/home-shop.png);"
+        ></div>
+        <div class="home-card-label">
+            商店
+        </div>
+    </div>
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('character')"
+    >
+        <div
+            id="homeIconCharacter"
+            class="home-card-icon"
+            style="background-image:url(assets/ui/home-character.png);"
+        ></div>
+        <div class="home-card-label">
+            角色
+        </div>
+    </div>
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('offlineExp')"
+    >
+        <div
+            id="homeIconOfflineExp"
+            class="home-card-icon"
+            style="background-image:url(assets/ui/home-offline-exp.png);"
+        ></div>
+        <div class="home-card-label">
+            離線經驗
+        </div>
+    </div>
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('quest')"
+    >
+        <div
+            id="homeIconQuest"
+            class="home-card-icon"
+            style="background-color:#000;background-image:url(assets/ui/home-quest.png);"
+        ></div>
+        <div class="home-card-label">
+            任務
+        </div>
+    </div>
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('bestiary')"
+    >
+        <div
+            id="homeIconBestiary"
+            class="home-card-icon"
+            style="background-image:url(assets/ui/home-bestiary.png);"
+        ></div>
+        <div class="home-card-label">
+            圖鑑
+        </div>
+    </div>
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('achievement')"
+    >
+        <div
+            id="homeIconAchievement"
+            class="home-card-icon"
+            style="background-color:#000;background-image:url(assets/ui/home-achievement.png);"
+        ></div>
+        <div class="home-card-label">
+            成就
+        </div>
+    </div>
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('announcement')"
+    >
+        <div
+            id="homeIconAnnouncement"
+            class="home-card-icon"
+            style="background-image:url(assets/ui/home-announcement.png);"
+        ></div>
+        <div class="home-card-label">
+            公告
+        </div>
+    </div>
+
+    <!--
+        ★ 新增（依照使用者要求，「任務下方
+        新增合成、公告下面新增系統」）：
+        4欄網格裡，任務在第2列第1欄，公告
+        在第2列第4欄，這兩張新卡片刻意放在
+        「正下方」（第3列第1欄／第3列第4欄），
+        中間第2/3欄先留空（用不會顯示任何
+        內容、純粹佔位置的空白格子），維持
+        版面對齊，之後如果還有更多新功能，
+        可以直接把空格換成真的卡片。
+
+        「合成」「系統」目前都還沒有實際
+        功能，先做出跟其他卡片一致的視覺
+        入口，點下去openHomeFeature()還沒有
+        對應的處理分支，之後要接功能時，
+        照著其他分支的寫法加一段就好。
+    -->
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('synthesis')"
+    >
+        <div
+            id="homeIconSynthesis"
+            class="home-card-icon"
+            style="background-color:#000;background-image:url(assets/ui/home-synthesis.png);"
+        ></div>
+        <div class="home-card-label">
+            合成
+        </div>
+    </div>
+
+    <div class="home-card"style="visibility:hidden;"></div>
+    <div class="home-card"style="visibility:hidden;"></div>
+
+    <div
+        class="home-card"
+        onclick="openHomeFeature('system')"
+    >
+        <div
+            id="homeIconSystem"
+            class="home-card-icon"
+            style="background-color:#000;background-image:url(assets/ui/home-system.png);"
+        ></div>
+        <div class="home-card-label">
+            系統
+        </div>
+    </div>
+
+</div>
+
+<div
+    id="homeRestCard"
+    class="card"
+    style="display:none;"
+>
+
+    <b>主城休息</b>
+
+    <div style="margin-top:6px;font-size:12px;color:#b3a58c;">
+        回主城休息可以免費把 HP、SP 補滿。
+        （藥水用完了、或懶得用藥水的時候可以靠這個回滿。）
+    </div>
+
+    <button
+        id="restButton"
+        class="main-button"
+        style="margin-top:8px;"
+        onclick="restAtHome()"
+    >
+         休息（回滿 HP／SP）
+    </button>
+
+</div>
+
+<div
+    class="card"
+    style="display:none;border:1px dashed #d4941f;"
+>
+
+    <b>測試工具</b>
+
+    <div style="margin-top:6px;font-size:12px;color:#b3a58c;">
+        方便測試技能效果用，正式版上線前會拿掉這張卡片。
+    </div>
+
+    <button
+        class="main-button"
+        style="margin-top:8px;"
+        onclick="grantTestSkillPoints()"
+    >
+         技能點 +999
+    </button>
+
+    <button
+        class="main-button"
+        style="margin-top:8px;"
+        onclick="grantTestExp()"
+    >
+         經驗池 +100000
+    </button>
+
+</div>
+
+<!--
+    ★ 修正（依照使用者要求，「主頁有創建
+    第二名角色的元素方框，拿掉」）：
+    原本這裡有一張「達到10級可以創建第二
+    角色」的提示卡片，整個移除。
+    updateSecondCharacterBanner()這個函式
+    本身已經有安全防呆（找不到元素就直接
+    return），移除這裡不會造成任何錯誤。
+    創建第二角色的入口還是保留在「角色」
+    彈出視窗裡（未解鎖的頭像格，點下去一樣
+    能開啟創建視窗），只是不再有這張主城
+    首頁的橫幅提示。
+-->
+
+<div
+    id="homeExpPoolCard"
+    class="exp-pool-panel"
+    style="display:none;"
+>
+
+    <div class="exp-pool-hero">
+        <div class="exp-pool-kicker">SHARED EXPERIENCE</div>
+        <div class="exp-pool-title">共用經驗池</div>
+        <div class="exp-pool-total">
+            <span id="sharedExpValue" class="exp-pool-value">0</span>
+            <span class="exp-pool-unit">EXP</span>
+        </div>
+        <div class="exp-pool-caption">
+            戰鬥與離線獲得的經驗會集中於此，再由你分配給指定角色升級。
+        </div>
+    </div>
+
+    <div class="exp-pool-section-head">
+        <span>角色分配</span>
+        <small>每次分配剛好升 1 級</small>
+    </div>
+
+    <div id="expDistributeList" class="exp-pool-character-list"></div>
+
+</div>
+
+</div>
+
+<div
+    id="trainingPage"
+    class="page"
+>
+
+<!--
+    ★ 修正（依照使用者回報，改用
+    position:fixed取代不可靠的
+    background-attachment:fixed）：
+-->
+
+<div
+    id="trainingPageBgLayer"
+    class="training-bg-fixed-layer"
+></div>
+
+<!-- ★ 修正（依照使用者要求）：標題「🗺️ 練功區」整個拿掉，不再顯示。 -->
+
+<!--
+    ★ 修正（依照使用者要求，練功區改成
+    純文字列表）：
+    原本8張卡片（標題/等級/說明/按鈕）
+    整個拿掉，改成純文字、靠左對齊的
+    地區清單，一行一個地區。點文字才會
+    跳出資訊框（怪物清單+進入/返回按鈕），
+    同時把trainingPage的背景換成該地區
+    的美術圖——圖片目前是空的，使用者
+    之後會補上，這裡先把程式碼結構寫好
+    （見下面zoneBackgroundImages這個
+    物件跟applyTrainingZoneBackground()），
+    之後只要把base64或圖片網址填進對應
+    的欄位就會生效，不用改任何其他地方。
+
+    未解鎖的地區用.locked這個class調暗、
+    文字最後帶等級需求，點下去一樣會跳出
+    資訊框（可以先看看有哪些怪物），
+    但資訊框裡的「進入」按鈕會換成
+    「尚未解鎖」的提示文字，不能真的
+    進去。
+-->
+
+<div class="training-zone-list">
+
+    <div
+        class="training-zone-item"
+        onclick="openTrainingZoneInfo('forest')"
+    >
+        新手森林　Lv.1～10
+    </div>
+
+    <div
+        class="training-zone-item"
+        id="trainingZoneItem_desert"
+        onclick="openTrainingZoneInfo('desert')"
+    >
+        荒漠地帶　Lv.11～20
+    </div>
+
+    <div
+        class="training-zone-item"
+        id="trainingZoneItem_ice"
+        onclick="openTrainingZoneInfo('ice')"
+    >
+        冰霜山脈　Lv.21～30
+    </div>
+
+    <div
+        class="training-zone-item"
+        id="trainingZoneItem_zone4"
+        onclick="openTrainingZoneInfo('zone4')"
+    >
+        熔岩深淵　Lv.31～40
+    </div>
+
+    <div
+        class="training-zone-item"
+        id="trainingZoneItem_zone5"
+        onclick="openTrainingZoneInfo('zone5')"
+    >
+        巨獸荒原　Lv.41～50
+    </div>
+
+    <div
+        class="training-zone-item"
+        id="trainingZoneItem_zone6"
+        onclick="openTrainingZoneInfo('zone6')"
+    >
+        修羅戰場　Lv.51～60
+    </div>
+
+    <div
+        class="training-zone-item"
+        id="trainingZoneItem_zone7"
+        onclick="openTrainingZoneInfo('zone7')"
+    >
+        魔君祭壇　Lv.61～70
+    </div>
+
+    <div
+        class="training-zone-item"
+        id="trainingZoneItem_zone8"
+        onclick="openTrainingZoneInfo('zone8')"
+    >
+        龍獄深淵　Lv.71～80
+    </div>
+
+    <div
+        class="training-zone-item"
+        id="trainingZoneItem_zone9"
+        onclick="openTrainingZoneInfo('zone9')"
+    >
+        虛空盡頭　Lv.81～90
+    </div>
+
+    <div
+        class="training-zone-item"
+        id="trainingZoneItem_zone10"
+        onclick="openTrainingZoneInfo('zone10')"
+    >
+        終焉之境　Lv.91～100
+    </div>
+
+</div>
+
+<!--
+    ★ 新增：地區資訊彈窗，跟主城那批
+    功能共用同一套.home-feature-modal
+    樣式（全螢幕深色遮罩+置中方塊），
+    不用另外設計一套新樣式。內容由
+    openTrainingZoneInfo()動態產生。
+-->
+
+<div
+    id="trainingZoneModal"
+    class="home-feature-modal"
+>
+
+<div class="home-feature-modal-box">
+
+<div class="home-feature-modal-title">
+    <span id="trainingZoneModalTitle">
+        地區資訊
+    </span>
+
+    <button
+        class="home-feature-close-btn"
+        onclick="closeTrainingZoneInfo()"
+    >
+        返回
+    </button>
+</div>
+
+<div id="trainingZoneModalBody"></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     副本
+===================================================== -->
+
+<div
+    id="dungeonPage"
+    class="page"
+>
+
+<h2>副本</h2>
+
+<div style="display:flex;gap:6px;margin:8px 10px;">
+
+    <button
+        id="dungeonTabBtnDaily"
+        class="home-feature-buy-btn"
+        style="flex:1;padding:8px 4px;font-size:13px;"
+        onclick="switchDungeonTab('daily')"
+    >
+        日常副本
+    </button>
+
+    <button
+        id="dungeonTabBtnAbyss"
+        class="home-feature-buy-btn"
+        style="flex:1;padding:8px 4px;font-size:13px;"
+        onclick="switchDungeonTab('abyss')"
+    >
+        深淵副本
+    </button>
+
+</div>
+
+<div
+    id="dungeonTabContent"
+    style="margin:0 10px;min-height:300px;"
+></div>
+
+</div>
+
+
+<!-- =====================================================
+     BOSS
+===================================================== -->
+
+<div
+    id="bossPage"
+    class="page"
+>
+
+<h2>BOSS</h2>
+
+<div style="display:flex;gap:6px;margin:8px 10px;">
+
+    <button
+        id="bossTabBtnPersonal"
+        class="home-feature-buy-btn"
+        style="flex:1;padding:8px 4px;font-size:13px;"
+        onclick="switchBossTab('personal')"
+    >
+        個人BOSS
+    </button>
+
+    <button
+        id="bossTabBtnHell"
+        class="home-feature-buy-btn"
+        style="flex:1;padding:8px 4px;font-size:13px;"
+        onclick="switchBossTab('hell')"
+    >
+        地獄BOSS
+    </button>
+
+</div>
+
+<div
+    id="bossTabContent"
+    style="margin:0 10px;min-height:300px;"
+></div>
+
+</div>
+
+
+<!-- =====================================================
+     地圖
+===================================================== -->
+
+<div
+    id="mapPage"
+    class="page"
+>
+
+<!--
+    ★ 新增（依照使用者回報，改用
+    position:fixed取代不可靠的
+    background-attachment:fixed）：
+    這層專門負責顯示固定背景，
+    applyMapZoneBackground()會對這個
+    元素設定background-image，不再直接
+    設定#mapPage本身。
+-->
+
+<div
+    id="mapPageBgLayer"
+    class="map-bg-fixed-layer"
+></div>
+
+<!--
+    ★ 新增（依照使用者要求，「巡怪頁面
+    左上角新增小小的兩個快捷按鈕，一個是
+    自動戰鬥快捷開啟/停止、一個是巡怪中
+    的開啟/停止」）：
+    跟下面覆蓋層的大按鈕（mapAutoBattleButton/
+    autoPatrolButton）呼叫同一個toggle
+    函式（toggleAutoBattle()/
+    toggleAutoPatrol()），狀態完全共用，
+    三個地方（戰鬥頁面/地圖覆蓋層/這裡）
+    永遠同步——不用另外寫一套獨立的開關
+    邏輯，單純是「同一個開關，多一個入口」。
+
+    固定在左上角、小尺寸，不佔用地圖畫面
+    視野，方便玩家不用滑到最下面就能快速
+    開關。
+-->
+
+<div class="map-quick-toggle-row">
+
+    <button
+        id="quickAutoBattleToggle"
+        class="map-quick-toggle-btn"
+        onclick="toggleAutoBattle()"
+        aria-label="自動戰鬥"
+    >
+        <img class="icon-off" src="assets/battle/auto-battle-off.png" alt="自動戰鬥（關閉）">
+        <img class="icon-on" src="assets/battle/auto-battle-on.png" alt="自動戰鬥（開啟中）">
+    </button>
+
+    <button
+        id="quickAutoPatrolToggle"
+        class="map-quick-toggle-btn"
+        onclick="toggleAutoPatrol()"
+        aria-label="自動巡怪"
+    >
+        <img class="icon-off" src="assets/battle/auto-patrol-off.png" alt="自動巡怪（關閉）">
+        <img class="icon-on" src="assets/battle/auto-patrol-on.png" alt="自動巡怪（開啟中）">
+    </button>
+
+</div>
+
+<!-- V115：返回移至巡怪畫面右上角，從下方導覽列移除。 -->
+<button
+    id="mapPageReturnFloat"
+    class="map-page-return-float"
+    onclick="leaveMap()"
+    aria-label="返回"
+>
+    <img src="assets/ui/map-return.png" alt="" aria-hidden="true">
+    <span class="nav-sr-only">返回</span>
+</button>
+
+
+<!--
+    ★ 修正（依照使用者要求，「橘色部分
+    可以拿掉了」）：
+    怪物清單框（原本id="mapMonsterListBox"，
+    列出地圖怪物名稱/等級/敏捷的那個
+    小框）整個移除，不再顯示。共用的
+    getZoneMonsterListHTML()函式還留著
+    （練功區的地圖資訊彈窗還在用），
+    只是不再有地方把結果塞進地圖頁面。
+-->
+
+<!--
+    ★ 新增（依照使用者要求）：
+    巡怪走路動畫用的角色圖示。固定用
+    left/top（百分比）+ CSS transition做
+    移動動畫，不用JS一格一格算座標，
+    平常（還沒按下自動巡怪）靜止置中、
+    顯示正面圖；按下自動巡怪後由
+    startPatrolCharacterWalking()接手，
+    定期換新的隨機座標，往上走換背面圖、
+    往下走換正面圖；即將進入戰鬥前
+    （runAutoPatrolCheck()找到怪物那一刻）
+    改播放兩張打架特效圖各0.5秒，
+    詳細邏輯都在JS那邊
+    （searchKeyword: 巡怪走路動畫）。
+-->
+
+<div
+    id="patrolCharacterWrap"
+    style="
+        position:absolute;
+        left:50%;
+        top:50%;
+        transform:translate(-50%,-50%);
+        transition:
+            left 1.8s ease-in-out,
+            top 1.8s ease-in-out;
+        z-index:50;
+        text-align:center;
+        pointer-events:none;
+    "
+>
+
+<div
+    id="patrolCharacterLabel"
+    style="
+        display:none;
+        background:rgba(0,0,0,.6);
+        color:#f0b429;
+        font-size:11px;
+        font-weight:bold;
+        padding:2px 8px;
+        border-radius:10px;
+        margin-bottom:4px;
+        white-space:nowrap;
+    "
+>
+     巡怪中
+</div>
+
+<img
+    id="patrolCharacterImg"
+    src="assets/characters/patrol-character.png"
+    style="
+        width:70px;
+        display:block;
+        margin:0 auto;
+        filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));
+        transition:width .2s ease;
+    "
+>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     戰鬥
+===================================================== -->
+
+<div
+    id="battlePage"
+    class="page"
+>
+
+<button
+    id="battleElementBoxButton"
+    class="battle-element-box-button"
+    aria-label="元素匣／自動戰鬥設定"
+    title="元素匣／自動戰鬥設定"
+>
+    <img draggable="false" src="assets/battle/element-box.png" alt="元素匣">
+</button>
+
+<div class="battle-wrap">
+
+<div class="battle-title">
+     戰鬥
+</div>
+
+<div
+    id="battleMonsterArea"
+    class="battle-monsters"
+></div>
+
+<!--
+    ★ 新增（依照使用者要求）：
+    這個spacer負責吸收畫面剩餘空間，
+    讓下面「回合倒數框→戰鬥指令框→
+    人物卡牌」緊緊貼在一起、貼齊人物卡牌，
+    同時怪物卡片區本身維持固定/自然高度，
+    不會有兩排怪物卡片被壓縮、跟回合倒數框
+    重疊的風險。
+-->
+
+<div class="battle-monster-gap-filler"></div>
+
+<!--
+    ★ 修正（依照使用者要求，重新設計）：
+    之前一直想辦法把戰鬥紀錄硬撐大去填滿
+    剩餘空間，試了很多輪都沒有穩定成功。
+    這次換個方向：把「第X回合／倒數／目標」
+    這個資訊區塊獨立搬出battle-middle，
+    變成跟怪物卡片區、按鈕區同一層級的
+    區塊，並且改成「有多少剩餘空間就自動
+    長多大」——這樣不管螢幕剩下多少空間，
+    這裡都會自然撐滿，不會再需要用JS去
+    量測、猜測、硬補高度，從根本上避開
+    這幾輪一直卡住的問題。
+-->
+
+<div
+    id="turnTargetRow"
+    class="turn-target-row"
+>
+
+    <div class="turn-number">
+        第
+        <span id="turnNumber">1</span>
+        回合
+    </div>
+
+    <div
+        id="timer"
+        class="timer"
+    >
+        20
+    </div>
+
+    <!-- V99：目標文字不再顯示在回合倒數框內。元素保留給既有 JS 安全更新。 -->
+    <div
+        id="battleTarget"
+        class="battle-target-inline"
+        aria-hidden="true"
+    >
+        目標：尚未選擇
+    </div>
+
+</div>
+
+<div class="battle-middle">
+
+<!--
+    ★ 修正（依照使用者要求，改成相反邏輯）：
+    戰鬥紀錄原本是獨立在按鈕區「外面」的一塊，
+    現在要讓它在結算階段能夠蓋住整個
+    按鈕/技能快捷列/自動戰鬥面板區域，
+    所以把它搬進battleActionRegion「裡面」，
+    這樣兩者才共用同一個position:relative父層，
+    展開時才能用position:absolute精準蓋住
+    這整塊區域，而不是隨便抓一個位置硬蓋。
+-->
+
+<!--
+    ★ 新增（依照使用者指正修正）：
+    這個包住「名字框+按鈕+技能快捷列+
+    自動戰鬥面板」的容器需要position:relative，
+    這樣底下的設定展開面板才能用
+    position:absolute蓋住這整塊區域，
+    達到「覆蓋現有版面」而不是「往下多長出一塊
+    要滑動才看得到」的效果。
+
+    ★ 修正（真的抓到一個bug）：
+    這個容器原本被我誤放進了下面那個
+    display:flex的列容器「裡面」，
+    導致名字框跟按鈕這兩個原本該左右並排的
+    flex子元件，變成被困在一個
+    沒有flex屬性的普通區塊裡，
+    版面直接整個垮掉、擠成一團。
+    現在改成從外面整個包住那個flex列容器，
+    不再插在它跟子元件中間。
+-->
+
+<div
+    id="battleActionRegion"
+    style="
+        position:relative;
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+    "
+>
+
+<!--
+    ★ 修正（依照使用者要求重新設計）：
+    原本左側直書「角色名字窄條」拿掉，
+    改成把「技能」變成跟其他4個按鈕
+    大小一樣的第5個按鈕，一起放進
+    mainBattleMenu這個格狀選單裡。
+
+    這一整排（mainBattleMenu）需要
+    position:relative，這樣底下的
+    skillQuickBar技能格才能用
+    position:absolute精準蓋住
+    「就是這一排按鈕」，而不是蓋住
+    其他不相干的區域。
+-->
+
+<div
+    id="battleCommandRow"
+    style="
+        display:flex;
+        gap:5px;
+        flex:0 0 66px;
+        position:relative;
+    "
+>
+
+<div
+    id="mainBattleMenu"
+    class="battle-menu"
+    style="flex:1;"
+>
+
+<!--
+    ★ 修正（依照使用者要求重新排版）：
+    技能按鈕移到最左邊，並且用grid-row:span 2
+    貫穿兩排，高度等於「普通攻擊」+「物品」
+    疊起來的高度。其餘4顆按鈕（普通攻擊/防禦/
+    物品/逃脫）維持原本DOM順序不變，
+    CSS Grid的自動排版邏輯會自己把它們
+    往右邊排進剩下的4格，
+    不需要额外指定它們的位置。
+-->
+
+<button
+    class="menu-button skill"
+    style="grid-row:span 2;"
+    onclick="toggleSkillQuickBar()"
+ aria-label="技能" title="技能"><span aria-hidden="true">技能</span></button>
+
+<button
+    class="menu-button"
+    onclick="prepareAction('normal')"
+ aria-label="普通攻擊" title="普通攻擊"><span aria-hidden="true">普通攻擊</span></button>
+
+<button
+    class="menu-button defend"
+    onclick="useDefend()"
+ aria-label="防禦" title="防禦"><span aria-hidden="true">防禦</span></button>
+
+<button
+    class="menu-button item"
+    onclick="openItemMenu()"
+ aria-label="背包" title="背包"><span aria-hidden="true">背包</span></button>
+
+<button
+    class="menu-button run"
+    onclick="attemptEscape()"
+ aria-label="逃脫" title="逃脫"><span aria-hidden="true">逃脫</span></button>
+
+</div>
+
+<!--
+    ★ 修正（依照使用者要求，改成非常駐顯示）：
+    技能格不再常駐畫面上，預設是隱藏的
+    （CSS裡.skill-quick-bar預設display:none），
+    只有按上面那顆「✨ 技能」按鈕
+    （toggleSkillQuickBar()）才會出現，
+    出現時用position:absolute蓋住
+    現在這一整排戰鬥指令按鈕，
+    不會額外多佔用版面空間。
+    右上角加一顆小小的✕，方便不想選技能時
+    直接關閉，不用一定要再點一次技能鈕。
+-->
+
+<div
+    id="skillQuickBar"
+    class="skill-quick-bar"
+>
+
+<button
+    class="skill-quick-close"
+    onclick="toggleSkillQuickBar()"
+    aria-label="返回戰鬥指令"
+>
+    返回
+</button>
+
+<div
+    id="skillQuickBarGrid"
+    class="skill-quick-grid"
+></div>
+
+</div>
+
+</div>
+
+<div
+    id="battleTargetPrompt"
+    class="battle-target-prompt"
+    aria-live="polite"
+>
+    <div class="battle-target-prompt-copy">
+        <div
+            id="battleTargetPromptAction"
+            class="battle-target-prompt-action"
+        >
+            選擇 [普通攻擊]
+        </div>
+        <div class="battle-target-prompt-hint">
+            選擇目標
+        </div>
+    </div>
+    <button
+        class="battle-target-back"
+        onclick="returnFromBattleTargetSelection()"
+        aria-label="返回重新選擇戰鬥技能"
+    >
+        返回
+    </button>
+</div>
+
+<div
+    id="skillMenu"
+    class="sub-menu"
+></div>
+
+<div
+    id="itemMenu"
+    class="battle-item-menu"
+    aria-label="戰鬥背包"
+>
+    <div class="battle-item-menu-header">
+        <div class="battle-item-tabs" role="tablist" aria-label="戰鬥背包分類">
+            <button
+                id="battleItemPotionTab"
+                class="battle-item-tab active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                onclick="setBattleItemCategory('potion')"
+            >補品</button>
+            <button
+                id="battleItemTalismanTab"
+                class="battle-item-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                onclick="setBattleItemCategory('talisman')"
+            >符咒</button>
+        </div>
+        <button
+            class="battle-item-close"
+            type="button"
+            onclick="closeMenus()"
+            aria-label="返回戰鬥指令"
+        >返回</button>
+    </div>
+
+    <div
+        id="battlePotionList"
+        class="battle-item-list"
+        role="tabpanel"
+    ></div>
+</div>
+
+<!--
+    ★ battleActionRegion 收尾（按鈕+技能格部分）。
+    自動戰鬥面板已經移到戰鬥紀錄下方，
+    不再放在這裡。
+-->
+
+</div>
+
+</div>
+
+<div
+    id="battlePlayerRow"
+    class="battle-player-row"
+></div>
+
+<!--
+    ★ 新增（依照使用者要求重新設計）：
+    戰鬥資訊這次改成單純的固定區塊，
+    放在角色卡片下方，永遠佔固定的一格空間，
+    不再有任何展開/收合、絕對定位、
+    z-index疊放順序的花招——
+    上次那一整套機關就是問題的根源，
+    這次故意做得很陽春：就是一個
+    普通的、永遠在文件流裡的方塊，
+    不會影響上面任何東西的位置，
+    自己這塊也不會被任何東西影響。
+-->
+
+<!--
+    ★ 新增（依照使用者要求）：
+    「戰鬥資訊」框上方加一個固定顯示目前
+    回合數的小標籤，不會隨著戰鬥紀錄捲動
+    被沖掉——跟turnTargetRow那個計時器/
+    目標不一樣，那個只在手動操作時才顯示，
+    這個不管自動/手動戰鬥都會顯示，單純
+    讓玩家隨時看得到「現在打到第幾輪」。
+-->
+
+<div class="battle-info-header-row">
+
+
+<div id="battleTurnIndicator">
+    第 1 回合
+</div>
+
+</div>
+
+<div
+    id="battleInfo"
+    class="battle-info"
+></div>
+
+<!-- V96：底部固定自動戰鬥列已移除。
+     戰鬥頁改由上方「元素匣」icon開啟同一套設定。 -->
+
+<div
+    id="autoBattleSettingsPanel"
+    class="auto-settings-expanded auto-premium-panel"
+    style="display:none;"
+>
+
+<div class="auto-premium-status">
+    <div class="auto-premium-status-copy">
+        <span class="auto-panel-kicker">AUTO COMBAT</span>
+        <strong id="autoBattleLabel">自動戰鬥</strong>
+        <small>依照下方條件自動選擇行動與補品</small>
+    </div>
+    <button
+        id="autoBattleButton"
+        class="auto-battle-button auto-premium-toggle"
+        onclick="toggleAutoBattle()"
+    >
+        ▶ 啟動
+    </button>
+</div>
+
+<div class="auto-settings-grid">
+
+    <div class="auto-setting-card">
+        <span class="auto-setting-emblem">角</span>
+        <div class="auto-setting-meta">
+            <span>控制對象</span>
+            <strong>設定角色</strong>
+        </div>
+        <div class="auto-setting-control">
+            <select
+                id="autoSettingsCharacterSelect"
+                onchange="switchAutoSettingsCharacter()"
+            >
+                <option
+                    id="autoSettingsCharOption0"
+                    value="0"
+                >角色1</option>
+                <option
+                    id="autoSettingsCharOption1"
+                    value="1"
+                >角色2</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="auto-setting-card">
+        <span class="auto-setting-emblem">式</span>
+        <div class="auto-setting-meta">
+            <span>主要策略</span>
+            <strong>自動行動</strong>
+        </div>
+        <div class="auto-setting-control">
+            <select id="autoSettingsActionSelect">
+                <option value="normal">普通攻擊</option>
+                <option value="defend">防禦</option>
+            </select>
+        </div>
+    </div>
+
+</div>
+
+<div class="auto-threshold-grid">
+    <div class="auto-threshold-card hp">
+        <div class="auto-threshold-head">
+            <span class="auto-threshold-emblem">HP</span>
+            <div>
+                <strong>生命補給</strong>
+                <small>低於門檻時使用補品</small>
+            </div>
+        </div>
+        <select id="autoSettingsHP">
+            <option value="25">25%</option>
+            <option value="50" selected>50%</option>
+            <option value="75">75%</option>
+            <option value="90">90%</option>
+            <option value="100">100%</option>
+        </select>
+    </div>
+
+    <div class="auto-threshold-card sp">
+        <div class="auto-threshold-head">
+            <span class="auto-threshold-emblem">SP</span>
+            <div>
+                <strong>能量補給</strong>
+                <small>低於門檻時使用補品</small>
+            </div>
+        </div>
+        <select id="autoSettingsSP">
+            <option value="25" selected>25%</option>
+            <option value="50">50%</option>
+            <option value="75">75%</option>
+            <option value="90">90%</option>
+            <option value="100">100%</option>
+        </select>
+    </div>
+</div>
+
+<label class="auto-return-card" for="autoSettingsReturnCity">
+    <span class="auto-return-emblem">城</span>
+    <span class="auto-return-copy">
+        <strong>補品耗盡時返回主城</strong>
+        <small>無可用 HP／SP 補品時自動結束巡練</small>
+    </span>
+    <span class="auto-toggle-shell">
+        <input
+            id="autoSettingsReturnCity"
+            type="checkbox"
+        >
+        <span class="auto-toggle-track">
+            <span class="auto-toggle-knob"></span>
+        </span>
+    </span>
+</label>
+
+<div class="auto-settings-actions">
+    <button
+        class="main-button auto-save-btn"
+        onclick="confirmAutoBattleSettings()"
+    >
+        確定套用
+    </button>
+
+    <button
+        class="main-button auto-cancel-btn"
+        onclick="closeAutoBattleSettings()"
+    >
+        返回
+    </button>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     狀態
+===================================================== -->
+
+<div
+    id="statusPage"
+    class="page"
+>
+
+<h2 id="statusPageTitle">點數分配</h2>
+
+<div
+    id="statusCharacterSwitchCard"
+    class="card"
+    style="display:none;"
+>
+
+    <div
+        style="
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+        "
+    >
+
+        <button
+            class="character-arrow"
+            onclick="changeStatusCharacter(-1)"
+        >◀</button>
+
+        <div
+            id="statusCharacterName"
+            class="character-name-box"
+        >
+            角色
+        </div>
+
+        <button
+            class="character-arrow"
+            onclick="changeStatusCharacter(1)"
+        >▶</button>
+
+    </div>
+
+</div>
+
+<div class="card status-card">
+
+<div class="status-preview-bars">
+
+    <div class="status-preview-bar-row">
+        <div class="status-preview-bar-label">
+            <span>HP</span>
+            <span id="statusPreviewHpText">0／0</span>
+        </div>
+        <div class="status-preview-bar-track">
+            <div
+                id="statusPreviewHpFill"
+                class="status-preview-bar-fill hp"
+                style="width:0%;"
+            ></div>
+        </div>
+    </div>
+
+    <div class="status-preview-bar-row">
+        <div class="status-preview-bar-label">
+            <span>SP</span>
+            <span id="statusPreviewSpText">0／0</span>
+        </div>
+        <div class="status-preview-bar-track">
+            <div
+                id="statusPreviewSpFill"
+                class="status-preview-bar-fill sp"
+                style="width:0%;"
+            ></div>
+        </div>
+    </div>
+
+</div>
+
+<div class="status-formula-hint">
+    （基本能力+裝備＝總和）
+</div>
+
+<div class="status-row">
+    <span>攻擊</span>
+    <button
+        id="statusBtnAttackMinus"
+        class="status-btn"
+    >-</button>
+    <b id="statusAttack" class="status-number">0</b>
+    <button
+        id="statusBtnAttackPlus"
+        class="status-btn"
+    >+</button>
+</div>
+
+
+<div class="status-row">
+    <span>智力</span>
+    <button
+        id="statusBtnIntelligenceMinus"
+        class="status-btn"
+    >-</button>
+    <b id="statusIntelligence" class="status-number">0</b>
+    <button
+        id="statusBtnIntelligencePlus"
+        class="status-btn"
+    >+</button>
+</div>
+
+
+<div class="status-row">
+    <span>體質</span>
+    <button
+        id="statusBtnVitalityMinus"
+        class="status-btn"
+    >-</button>
+    <b id="statusVitality" class="status-number">0</b>
+    <button
+        id="statusBtnVitalityPlus"
+        class="status-btn"
+    >+</button>
+</div>
+
+
+<div class="status-row">
+    <span>能量</span>
+    <button
+        id="statusBtnEnergyMinus"
+        class="status-btn"
+    >-</button>
+    <b id="statusEnergy" class="status-number">0</b>
+    <button
+        id="statusBtnEnergyPlus"
+        class="status-btn"
+    >+</button>
+</div>
+
+
+<div class="status-row">
+    <span>精神</span>
+    <button
+        id="statusBtnSpiritMinus"
+        class="status-btn"
+    >-</button>
+    <b id="statusSpirit" class="status-number">0</b>
+    <button
+        id="statusBtnSpiritPlus"
+        class="status-btn"
+    >+</button>
+</div>
+
+
+<div class="status-row">
+    <span>敏捷</span>
+    <button
+        id="statusBtnAgilityMinus"
+        class="status-btn"
+    >-</button>
+    <b id="statusAgility" class="status-number">0</b>
+    <button
+        id="statusBtnAgilityPlus"
+        class="status-btn"
+    >+</button>
+</div>
+
+<hr>
+
+<div class="status-points-line">
+    可用屬性點：
+    <b id="attributePoints">0</b>
+</div>
+
+<button
+    id="confirmStatusButton"
+    class="status-confirm"
+    onclick="confirmStatus()"
+    disabled
+>
+    確認加點
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     技能
+===================================================== -->
+
+<div
+    id="skillPage"
+    class="page"
+>
+
+<h2>技能配裝</h2>
+
+<div
+    id="skillCharacterSwitchCard"
+    class="card"
+>
+
+<b>目前角色</b>
+
+<div
+    style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:8px;
+        margin-top:8px;
+    "
+>
+
+    <button
+        class="character-arrow"
+        onclick="changeSkillCharacterArrow(-1)"
+    >◀</button>
+
+    <div
+        id="skillCharacterNameBox"
+        class="character-name-box"
+    >
+         火法師
+    </div>
+
+    <button
+        class="character-arrow"
+        onclick="changeSkillCharacterArrow(1)"
+    >▶</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<b>戰鬥技能欄</b>
+
+<div
+    id="skillLoadout"
+    class="skill-loadout-row"
+></div>
+
+</div>
+
+<div class="card">
+
+ 技能點：
+<b id="skillPoints">0</b>
+
+</div>
+
+<!--
+    ★ 修正（依照使用者要求，「不用特別再做
+    一個已學會技能的框了，拿掉，現在技能
+    就是用一排一排呈現，沒學習的就顯示
+    未學習就好」）：
+    原本「已學會技能」「可學習技能」是
+    兩個各自帶標題的卡片、兩個獨立清單，
+    合併成一個容器、一份清單，這個角色
+    元素底下全部技能（不管學過沒學過）
+    都在裡面依序列出，每一列自己決定
+    要顯示「學習」「升級」「已滿級」
+    哪一種狀態，不用再分兩區塊。
+-->
+
+<div
+    id="allSkillsList"
+    class="skill-loadout-list"
+></div>
+
+</div>
+
+
+<!-- =====================================================
+     背包
+===================================================== -->
+
+<div
+    id="inventoryPage"
+    class="page inventory-page-classic"
+>
+
+<div class="inventory-classic-shell">
+
+    <button
+        type="button"
+        id="mapInventoryOverlayClose"
+        class="map-inventory-overlay-close"
+        onclick="closeMapInventoryOverlay()"
+        aria-label="關閉背包"
+    >關閉</button>
+
+    <!-- 上方：角色切換 + 立繪 + 六部位裝備 -->
+    <section class="inventory-character-panel">
+
+        <div class="inventory-character-switch" id="inventoryCharacterTabs"></div>
+
+        <div class="inventory-character-stage">
+
+            <div class="inventory-portrait-frame" id="inventoryPortraitFrame">
+                <button
+                    type="button"
+                    id="inventoryCharacterDetailButton"
+                    class="inventory-character-detail-button"
+                    aria-label="查看角色詳細資訊"
+                    onclick="openInventoryCharacterDetail()"
+                >🔍</button>
+
+                <div class="inventory-portrait-placeholder">
+                    角色立繪
+                </div>
+            </div>
+
+            <div id="equipmentGrid" class="inventory-equipment-grid"></div>
+
+        </div>
+
+    </section>
+
+    <!-- 下方：四大分類固定，只有102格物品區可上下捲動 -->
+    <section class="inventory-right-panel">
+
+        <div class="inventory-wallet-bar" aria-label="目前持有金幣">
+            <span class="inventory-wallet-label">金幣</span>
+            <b id="inventoryGoldValue" class="inventory-wallet-value">0</b>
+        </div>
+
+        <div
+            class="inventory-category-tabs"
+            id="inventoryCategoryTabs"
+            role="tablist"
+            aria-label="背包分類"
+        >
+            <div class="inventory-category-tab" role="tab" tabindex="0" data-filter="equipment" onclick="setInventoryFilter('equipment')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setInventoryFilter('equipment');}">裝備</div>
+            <div class="inventory-category-tab" role="tab" tabindex="0" data-filter="item" onclick="setInventoryFilter('item')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setInventoryFilter('item');}">物品</div>
+            <div class="inventory-category-tab" role="tab" tabindex="0" data-filter="material" onclick="setInventoryFilter('material')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setInventoryFilter('material');}">材料</div>
+            <div class="inventory-category-tab" role="tab" tabindex="0" data-filter="function" onclick="setInventoryFilter('function')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setInventoryFilter('function');}">功能</div>
+        </div>
+
+        <div class="inventory-grid-scroll" id="inventoryGridScroll">
+            <div id="inventoryGrid" class="inventory-grid inventory-grid-classic"></div>
+        </div>
+
+    </section>
+
+</div>
+
+</div>
+
+<!-- =====================================================
+     戰鬥資訊／自動戰鬥（巡邏頁面覆蓋層）
+===================================================== -->
+
+<!--
+    ★ 新增（依照使用者要求）：
+    戰鬥結束回到地圖（巡邏頁面）之後，
+    這裡會另外顯示一份戰鬥資訊／自動戰鬥
+    面板，讓玩家可以回頭查看上一場戰鬥的
+    紀錄，不用真的還在戰鬥畫面才看得到。
+
+    刻意做成「獨立的一份」，不是把battlePage
+    裡原本那份搬過來——battlePage裡的版面
+    已經是調過很多輪的flex版面，直接搬動
+    風險太高，容易牽一髮動全身。這裡另外
+    做一份簡單、固定定位的版本，專門給
+    「戰鬥已經結束、回到地圖」這個情境用，
+    兩份的內容由addBattleLog()/clearBattleLog()
+    同步寫入，畫面上一定會顯示一樣的東西。
+
+    預設隱藏，只有showPage()判斷目前是
+    地圖頁面時才會顯示（見showPage()裡的
+    對應邏輯），戰鬥頁面本身有自己原本
+    那份，不會顯示這裡這份，避免同時出現
+    兩份戰鬥資訊。
+
+    定位：自動戰鬥面板貼齊導覽列（70px）
+    正上方，戰鬥資訊框貼在自動戰鬥面板
+    正上方——用flex-direction:column-reverse
+    讓「寫在HTML後面的自動戰鬥面板」自然
+    貼底，「寫在前面的戰鬥資訊框」自然疊
+    在它上面，不用額外算兩者各自的高度
+    再手動組出absolute座標。
+-->
+
+<!--
+    ★ 修正（依照使用者要求，「把下面兩個
+    元素拿掉」）：
+    原本這裡有兩塊「自動戰鬥」／「自動巡怪」
+    大面板（各帶啟動/設定按鈕），跟左上角
+    的快捷圖示鈕（quickAutoBattleToggle／
+    quickAutoPatrolToggle，見#mapPageBgLayer
+    下方那個.map-quick-toggle-row）功能完全
+    重複，兩份「開/關」入口同時存在反而
+    佔位置、不好看，這裡整塊拿掉。
+
+    開/關功能還在——左上角快捷圖示鈕就是
+    唯一入口，一樣呼叫toggleAutoBattle()／
+    toggleAutoPatrol()。原本「設定」按鈕
+    （開自動戰鬥設定視窗）也還在——下方
+    地圖頁面導覽列（#mapPageNav）最右邊
+    的「自動戰鬥」那顆本來就會開同一個
+    設定視窗，不會因為這裡拿掉而少了入口。
+
+    拿掉這塊之後，mapBattleOverlay底下只剩
+    mapBattleInfo這一個子元素，column-reverse
+    排版會讓它自然貼齊容器底部（原本兩塊
+    面板的位置），不用額外調整。
+-->
+
+<div
+    id="mapBattleOverlay"
+    style="
+        display:none;
+        position:fixed;
+        left:0;
+        right:0;
+        bottom:70px;
+        z-index:190;
+        flex-direction:column-reverse;
+        gap:6px;
+        padding:0 6px 6px;
+        pointer-events:none;
+    "
+>
+
+<div
+    id="mapBattleInfo"
+    class="battle-info"
+    style="
+        pointer-events:auto;
+        flex:0 0 96px;
+        margin:0;
+    "
+></div>
+
+</div>
+
+<!-- =====================================================
+     導覽
+===================================================== -->
+
+
+
+</div>
+
+<!-- =====================================================
+     V82：主導覽列移出 .content
+     .content 是各頁內容／背包的捲動容器；主導覽列必須是它的兄弟元素，
+     才不會跟著背包 scrollTop 移動。
+===================================================== -->
+<div id="bottomNav" class="bottom-nav">
+
+<button
+    id="inventoryNav"
+    class="nav-button nav-art-button-wrap"
+    onclick="showPage('inventory')"
+    aria-label="背包"
+>
+<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">背包</span>
+</button>
+
+<button
+    id="trainingNav"
+    class="nav-button nav-art-button-wrap"
+    onclick="showPage('training')"
+    aria-label="野怪區"
+>
+<img class="nav-art-button" src="assets/ui/nav-training.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">野怪區</span>
+</button>
+
+<button
+    id="homeNav"
+    class="nav-button active nav-art-button-wrap"
+    onclick="showPage('home')"
+    aria-label="主城"
+>
+<img class="nav-art-button" src="assets/ui/nav-home.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">主城</span>
+</button>
+
+<button
+    id="dungeonNav"
+    class="nav-button nav-art-button-wrap"
+    onclick="showPage('dungeon')"
+    aria-label="副本"
+>
+<img class="nav-art-button" src="assets/ui/nav-dungeon.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">副本</span>
+</button>
+
+<button
+    id="bossNav"
+    class="nav-button nav-art-button-wrap"
+    onclick="showPage('boss')"
+    aria-label="BOSS"
+>
+<img class="nav-art-button" src="assets/ui/nav-boss.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">BOSS</span>
+</button>
+
+</div>
+
+<!--
+    ★ 新增（依照使用者要求）：
+    進入練功區/巡怪地圖頁面時，底部導覽列
+    換成專屬的3個按鈕（角色/任務/返回），
+    跟主城那套5個按鈕的導覽列是兩個獨立的
+    元素，用CSS依照#app身上的class互相
+    切換顯示，不會同時出現。
+
+    「角色」「任務」直接呼叫跟主城完全
+    相同的openHomeFeature()彈出視窗
+    （不會離開地圖頁面本身，彈窗蓋在
+    地圖畫面上面）；「返回」呼叫既有的
+    leaveMap()，回到練功區地區清單。
+-->
+
+<div
+    id="mapPageNav"
+    class="bottom-nav map-page-nav"
+>
+
+<button
+    class="nav-button nav-art-button-wrap"
+    onclick="openHomeFeature('character')"
+    aria-label="角色"
+>
+<img class="nav-art-button" src="assets/ui/nav-character.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">角色</span>
+</button>
+
+<button
+    class="nav-button nav-art-button-wrap"
+    onclick="openMapInventoryOverlay()"
+    aria-label="背包"
+>
+<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">背包</span>
+</button>
+
+<button
+    class="nav-button nav-art-button-wrap"
+    onclick="openHomeFeature('quest')"
+    aria-label="任務"
+>
+<img class="nav-art-button" src="assets/ui/nav-quest.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">任務</span>
+</button>
+
+<button
+    class="nav-button nav-art-button-wrap"
+    onclick="openHomeFeature('autoBattleSettings')"
+    aria-label="元素匣／自動戰鬥設定"
+>
+<img class="nav-art-button" src="assets/ui/nav-element-box.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">元素匣／自動戰鬥設定</span>
+</button>
+
+</div>
+
+<!--
+   ★ 修正（真的抓到「角色/任務按鈕沒反應」
+   的原因）：
+   這個彈出視窗原本寫在#homePage的HTML
+   區塊「裡面」，.page這個class規則是
+   「不是目前所在頁面就display:none」，
+   一旦離開主城切到地圖頁面，#homePage
+   整個被隱藏，連帶裡面的這個彈出視窗
+   元素也被一起藏起來——不管JS怎麼幫它
+   加上「顯示」的class都沒用，因為父層
+   本身就是display:none。
+
+   搬到這裡（跟#mapPageNav同一層，
+   不屬於任何.page，不會被頁面切換
+   影響），不管在哪個頁面呼叫
+   openHomeFeature()，這個彈出視窗
+   都能正常顯示。
+-->
+
+<!--
+    ★ 新增：主城六個新功能共用的彈出視窗，
+    內容由openHomeFeature()動態填入。
+-->
+
+<div
+    id="homeFeatureModal"
+    class="home-feature-modal"
+>
+
+<div class="home-feature-modal-box">
+
+<div class="home-feature-modal-title">
+    <span id="homeFeatureModalTitle">
+        標題
+    </span>
+
+    <div style="display:flex;gap:6px;">
+
+    <!--
+        ★ 新增（依照使用者要求，「返回框框
+        旁邊多一個？按鈕，跳出屬性說明」）：
+        預設隱藏，只有切到「能力值」分頁時
+        （switchCharacterTab("status")）才
+        顯示，其他分頁/一般彈出視窗（商店、
+        任務……）不會出現這顆按鈕，避免
+        跟情境無關的地方也冒出一個問號。
+    -->
+
+    <button
+        id="statusHelpButton"
+        class="home-feature-close-btn"
+        style="display:none;"
+        onclick="showStatusHelp()"
+    >
+        ？
+    </button>
+
+    <button
+        class="home-feature-close-btn"
+        onclick="closeHomeFeature()"
+    >
+        返回
+    </button>
+
+    </div>
+</div>
+
+<div id="homeFeatureModalBody"></div>
+
+</div>
+
+</div>
+
+
+
+<!-- V77：背包角色詳細資訊 -->
+<div
+    id="inventoryCharacterDetailModal"
+    class="item-modal inventory-character-detail-modal"
+>
+    <div class="item-modal-box inventory-character-detail-box">
+
+        <div
+            id="inventoryCharacterDetailName"
+            class="item-modal-name"
+        >
+            角色詳細資訊
+        </div>
+
+        <div
+            id="inventoryCharacterDetailStats"
+            class="inventory-character-detail-grid"
+        ></div>
+
+        <button
+            class="close-item-button"
+            onclick="closeInventoryCharacterDetail()"
+        >
+            關閉
+        </button>
+
+    </div>
+</div>
+
+<!-- =====================================================
+     物品詳細
+===================================================== -->
+
+<div
+    id="itemModal"
+    class="item-modal"
+>
+
+<div class="item-modal-box">
+
+<div
+    id="itemModalIcon"
+    class="item-modal-icon"
+>
+    
+</div>
+
+<div
+    id="itemModalName"
+    class="item-modal-name"
+>
+    裝備
+</div>
+
+<div
+    id="itemModalStats"
+    class="item-stat-list"
+></div>
+
+<div class="item-modal-buttons">
+
+<button
+    id="itemEquipButton"
+    class="item-modal-button equip-button"
+    onclick="equipSelectedItem()"
+>
+    穿戴
+</button>
+
+<button
+    class="item-modal-button sell-button"
+    onclick="sellSelectedItem()"
+>
+    售出
+</button>
+
+</div>
+
+<button
+    class="close-item-button"
+    onclick="closeItemModal()"
+>
+    關閉
+</button>
+
+</div>
+
+</div>
+
+
+<!--
+    ★ 新增（依照使用者要求，「文字太多
+    塞不下，就精簡顯示，後面用……詳細
+    讓玩家點擊跳出完整介紹」）：
+    技能詳細資訊彈窗，跟物品詳細彈窗
+    共用同一套.item-modal樣式，內容由
+    showSkillDetail()動態填入。
+-->
+
+<div
+    id="skillDetailModal"
+    class="item-modal"
+>
+
+<div class="item-modal-box">
+
+<div
+    id="skillDetailIcon"
+    class="item-modal-icon"
+>
+    
+</div>
+
+<div
+    id="skillDetailName"
+    class="item-modal-name"
+>
+    技能名稱
+</div>
+
+<div
+    id="skillDetailStats"
+    class="item-stat-list"
+></div>
+
+<button
+    class="close-item-button"
+    onclick="closeSkillDetail()"
+>
+    關閉
+</button>
+
+</div>
+
+</div>
+
+
+<!--
+    ★ 新增（依照使用者要求，「返回框框
+    旁邊多一個？按鈕，跳出屬性說明」）：
+    能力值分頁的六項屬性說明彈窗，一樣
+    沿用.item-modal樣式，內容固定寫死
+    在HTML裡（不像技能詳細那樣需要動態
+    查資料庫），showStatusHelp()只負責
+    開關。
+-->
+
+<div
+    id="statusHelpModal"
+    class="item-modal"
+>
+
+<div class="item-modal-box">
+
+<div class="item-modal-name">
+    屬性說明
+</div>
+
+<div
+    class="item-stat-list"
+    style="text-align:left;line-height:1.9;"
+>
+    <b>智力</b>　影響法術攻擊、回復技能、異常狀態命中率、法術爆擊機率與法術爆擊傷害；每1點智力額外增加1.25點HP治療量、0.5點SP治療量（施放者本人不回復SP）
+    <br>
+    <b>攻擊</b>　影響物理攻擊、物理爆擊機率與物理爆擊傷害
+    <br>
+    <b>體質</b>　提升HP最大值與防禦
+    <br>
+    <b>能量</b>　提升SP最大值
+    <br>
+    <b>精神</b>　影響異常狀態抗性、命中與抗暴；每1點精神=+0.3個百分點異常抗性、+2命中、+0.1%抗暴（上限25%）。異常抗性會直接降低敵方異常狀態命中率；+2命中約使最終命中機率增加0.6個百分點
+    <br>
+    <b>敏捷</b>　影響出手速度與閃避；每1點敏捷=+1速度、+2閃避，+2閃避約使敵方最終命中機率降低0.6個百分點
+    <br><br>
+    <span style="color:#b3a58c;">
+        （長按可快速加點）
+    </span>
+</div>
+
+<button
+    class="close-item-button"
+    onclick="closeStatusHelp()"
+>
+    關閉
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     升級
+===================================================== -->
+
+<div
+    id="levelModal"
+    class="modal"
+>
+
+<div class="modal-box">
+
+<h2>升級！</h2>
+
+<div id="levelText"></div>
+
+<br>
+
+<button
+    class="main-button"
+    onclick="closeLevelModal()"
+>
+    確定
+</button>
+
+</div>
+
+</div>
+
+
+<script src="js/00-main.js"></script>
+
+</div>
+</div>
+</div>
+<!-- V86: inventory-grid-scroll is now recognized by the existing V8 touch lock as the sole inventory scroll owner. -->
+<script id="stage-v8-touch-lock" src="js/01-stage-v8-touch-lock.js"></script>
+
+
+<script id="stage-v9-native-coordinate-api" src="js/02-stage-v9-native-coordinate-api.js"></script>
+
+
+<link id="stage-v10-battle-log-scroll-fix" rel="stylesheet" href="css/05-stage-v10-battle-log-scroll-fix.css">
+
+
+<script id="stage-v10-battle-log-scroll-runtime" src="js/03-stage-v10-battle-log-scroll-runtime.js"></script>
+
+
+<link id="stage-v11-native-bottom-nav" rel="stylesheet" href="css/06-stage-v11-native-bottom-nav.css">
+
+
+<script id="stage-v11-native-bottom-nav-runtime" src="js/04-stage-v11-native-bottom-nav-runtime.js"></script>
+
+
+<link id="stage-v13-native-map-nav" rel="stylesheet" href="css/07-stage-v13-native-map-nav.css">
+
+
+<script id="stage-v13-native-map-nav-runtime" src="js/05-stage-v13-native-map-nav-runtime.js"></script>
+
+
+<link id="stage-v14-character-scroll-fix" rel="stylesheet" href="css/08-stage-v14-character-scroll-fix.css">
+<link id="stage-v15-native-character-shell" rel="stylesheet" href="css/09-stage-v15-native-character-shell.css">
+
+
+<script id="stage-v39-battle-map-background-runtime" src="js/06-stage-v39-battle-map-background-runtime.js"></script>
+
+
+<link id="stage-v40-root-battle-background-and-cast-size" rel="stylesheet" href="css/10-stage-v40-root-battle-background-and-cast-size.css">
+
+
+<script id="stage-v40-root-battle-background-runtime" src="js/07-stage-v40-root-battle-background-runtime.js"></script>
+
+
+<link id="stage-v41-cast-text-and-player-alpha" rel="stylesheet" href="css/11-stage-v41-cast-text-and-player-alpha.css">
+
+
+<script id="stage-v41-runtime" src="js/08-stage-v41-runtime.js"></script>
+
+
+<link id="stage-v45-battle-black-overlay-skill-text" rel="stylesheet" href="css/12-stage-v45-battle-black-overlay-skill-text.css">
+
+
+<script id="stage-v45-runtime" src="js/09-stage-v45-runtime.js"></script>
+
+
+<link id="stage-v46-battle-frame-and-giant-skill-text" rel="stylesheet" href="css/13-stage-v46-battle-frame-and-giant-skill-text.css">
+
+
+<script id="stage-v46-runtime" src="js/10-stage-v46-runtime.js"></script>
+
+
+<link id="stage-v47-root-cause-skill-size" rel="stylesheet" href="css/14-stage-v47-root-cause-skill-size.css">
+
+
+<script id="stage-v47-runtime" src="js/11-stage-v47-runtime.js"></script>
+
+
+<link id="stage-v48-skill-text-final" rel="stylesheet" href="css/15-stage-v48-skill-text-final.css">
+
+
+<script id="stage-v48-runtime" src="js/12-stage-v48-runtime.js"></script>
+
+
+<link id="stage-v49-remove-all-skill-white-strokes" rel="stylesheet" href="css/16-stage-v49-remove-all-skill-white-strokes.css">
+
+
+<script id="stage-v49-runtime" src="js/13-stage-v49-runtime.js"></script>
+
+
+<link id="stage-v50-remove-battle-right-edge" rel="stylesheet" href="css/17-stage-v50-remove-battle-right-edge.css">
+
+
+<script id="stage-v50-runtime" src="js/14-stage-v50-runtime.js"></script>
+
+
+<link id="stage-v51-combat-result-white-stroke" rel="stylesheet" href="css/18-stage-v51-combat-result-white-stroke.css">
+
+
+<script id="stage-v51-runtime" src="js/15-stage-v51-runtime.js"></script>
+
+
+<link id="stage-v54-main-city-moderate-native-scale" rel="stylesheet" href="css/19-stage-v54-main-city-moderate-native-scale.css">
+
+
+<script id="stage-v54-main-city-runtime" src="js/16-stage-v54-main-city-runtime.js"></script>
+
+
+<link id="stage-v60-training-only-safety" rel="stylesheet" href="css/20-stage-v60-training-only-safety.css">
+
+
+<script id="stage-v60-training-render-guard" src="js/17-stage-v60-training-render-guard.js"></script>
+
+
+<link id="stage-v64-character-touch-action-bridge" rel="stylesheet" href="css/21-stage-v64-character-touch-action-bridge.css">
+
+<script id="stage-v64-character-touch-action-runtime" src="js/18-stage-v64-character-touch-action-runtime.js"></script>
+<link id="stage-v78-character-inventory-core" rel="stylesheet" href="css/22-stage-v78-character-inventory-core.css">
+
+
+
+
+
+<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js"></script>
+
+
+
+
+
+<link id="stage-v77-inventory-detail-ui" rel="stylesheet" href="css/23-stage-v77-inventory-detail-ui.css">
+
+
+<link id="stage-v85-inventory-inner-grid-scroll-root" rel="stylesheet" href="css/24-stage-v85-inventory-inner-grid-scroll-root.css">
+
+
+
+
+<link id="stage-v90-quest-interface-core" rel="stylesheet" href="css/25-stage-v90-quest-interface-core.css">
+
+<!-- =========================================================
+     V87 — INVENTORY CATEGORY CAPACITY 102
+     - Core inventorySlots: 102
+     - Each of the four category tabs renders 102 slots
+     - Full-inventory guard: 102
+     - Scroll architecture unchanged from V86
+========================================================= -->
+
+<!-- V91: unified six-potion inventory/shop/battle system. -->
+
+<!-- V95: manual battle interaction UI overhaul.
+     No damage/SP/initiative/skill formulas changed. -->
+
+<script src="js/20-anonymous-20.js"></script>
+
+
+<link id="v110-auto-settings-premium" rel="stylesheet" href="css/26-v110-auto-settings-premium.css">
+</body>
+</html>

@@ -1,0 +1,80 @@
+
+/* =====================================================
+   V3 FIX — ALL LEGACY UI MUST STAY INSIDE THE 420×746.6667
+   DESIGN SURFACE, WHICH IS THEN SCALED TO 1080×1920.
+   This specifically fixes bottom navigation escaping/clipping
+   outside the scaled game surface.
+===================================================== */
+#game-stage > #app > #game-content{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    margin:0 !important;
+    padding:0 !important;
+    transform:scale(2.571428571428571) !important;
+    transform-origin:top left !important;
+    overflow:hidden !important;
+}
+
+/* Main navigation: never use viewport centering inside the stage. */
+#game-stage > #app > #game-content .bottom-nav,
+#game-stage > #app > #game-content #mapPageNav{
+    position:absolute !important;
+    left:0 !important;
+    right:auto !important;
+    bottom:0 !important;
+    width:420px !important;
+    max-width:none !important;
+    height:70px !important;
+    margin:0 !important;
+    transform:none !important;
+    box-sizing:border-box !important;
+}
+
+/* Full-screen overlays must use the virtual design surface,
+   not the real browser viewport. */
+#game-stage > #app > #game-content .home-bg-fixed-layer,
+#game-stage > #app > #game-content .map-bg-fixed-layer,
+#game-stage > #app > #game-content .training-bg-fixed-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:420px !important;
+    height:746.6666667px !important;
+}
+
+#game-stage > #app > #game-content .home-feature-modal,
+#game-stage > #app > #game-content .item-modal,
+#game-stage > #app > #game-content .modal,
+#game-stage > #app > #game-content .popup-overlay{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:420px !important;
+    height:746.6666667px !important;
+}
+
+#game-stage > #app > #game-content #mapBattleOverlay{
+    position:absolute !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:70px !important;
+    width:420px !important;
+    box-sizing:border-box !important;
+}
+
+/* Any direct full-width bottom-fixed element created by existing
+   game code is constrained to the legacy surface. */
+#game-stage > #app > #game-content > div[style*="position:fixed"][style*="bottom:0"]{
+    position:absolute !important;
+    left:0 !important;
+    right:auto !important;
+    bottom:0 !important;
+    width:420px !important;
+}

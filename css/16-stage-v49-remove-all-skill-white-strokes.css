@@ -1,0 +1,10 @@
+
+/* V49: skill cast names have NO white outline/stroke. */
+#game-stage .skill-name-badge,
+#game-stage #game-overlay-layer .skill-name-badge,
+.skill-name-badge{
+    -webkit-text-stroke:0 !important;
+    text-stroke:0 !important;
+    border:none !important;
+    outline:none !important;
+}

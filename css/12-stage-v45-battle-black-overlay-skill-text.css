@@ -1,0 +1,52 @@
+
+/* V45 — black translucent battle background + larger skill cast text.
+   Baseline reset: V41.
+*/
+
+/* Darken ONLY the actual battle map image. No pseudo overlay, no extra
+   element, and no change to battlePage dimensions. */
+#game-stage > #app > #game-content #battlePage > .battle-bg-shared{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    z-index:0 !important;
+    pointer-events:none !important;
+    background-size:cover !important;
+    background-position:center top !important;
+    background-repeat:no-repeat !important;
+}
+
+/* Explicitly remove every previous veil approach. */
+#game-stage > #app > #game-content #battlePage::before,
+#game-stage > #app > #game-content #battlePage::after,
+#game-stage > #app > #game-content #battlePage > .battle-bg-shared::before,
+#game-stage > #app > #game-content #battlePage > .battle-bg-shared::after{
+    content:none !important;
+    display:none !important;
+}
+
+/* Keep the foreground above the map. */
+#game-stage > #app > #game-content #battlePage > .battle-wrap{
+    position:relative !important;
+    z-index:1 !important;
+    opacity:1 !important;
+}
+
+/* Bigger, more dramatic cast skill name. */
+#game-stage > #game-overlay-layer .skill-name-badge{
+    font-size:106px !important;
+    width:620px !important;
+    min-width:620px !important;
+    max-width:none !important;
+    overflow:visible !important;
+    white-space:nowrap !important;
+    text-align:center !important;
+    font-weight:900 !important;
+    line-height:1 !important;
+    -webkit-text-stroke:0 !important;
+    text-shadow:
+        0 4px 5px rgba(0,0,0,.98),
+        0 0 9px rgba(0,0,0,.95) !important;
+}

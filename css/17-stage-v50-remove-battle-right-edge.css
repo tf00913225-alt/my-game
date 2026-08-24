@@ -1,0 +1,40 @@
+
+/* V50 ROOT-CAUSE FIX
+   The visible right-side line came from the battle background layer being
+   hard-coded to the old Legacy size (420px x 746.67px) inside the
+   1080x1920 Native stage.
+
+   Do NOT create another overlay. The background itself must fill the
+   battle viewport. */
+
+/* The battle background fills the complete battle area. */
+#game-stage > #app > #game-content #battlePage > .battle-bg-shared{
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    background-size:cover !important;
+    background-position:center top !important;
+    background-repeat:no-repeat !important;
+    pointer-events:none !important;
+}
+
+/* The battle viewport itself cannot expose horizontal overflow. */
+#game-stage > #app > #game-content #battlePage{
+    overflow:hidden !important;
+    border-right:0 !important;
+    outline-right:0 !important;
+    box-shadow:none !important;
+}
+
+/* Guard against a 1px scrollbar/overflow strip at the native edge. */
+#game-stage,
+#game-stage > #app,
+#game-stage > #app > #game-content{
+    overflow-x:hidden !important;
+}

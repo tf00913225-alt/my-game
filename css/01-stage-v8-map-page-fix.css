@@ -1,0 +1,48 @@
+
+/* =====================================================
+   V8 — MAP / TRAINING GAMEPLAY PAGE FIX
+   - Remove the legacy 34px compact header band.
+   - Make the map page occupy the complete legacy design surface.
+   - Prevent page-level vertical overflow.
+   - Keep internal map coordinates and gameplay logic unchanged.
+===================================================== */
+
+#game-stage > #app > #game-content #mapPage,
+#game-stage > #app > #game-content #trainingPage{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+}
+
+/* The background layer belongs to the map/training surface,
+   not to the real browser viewport. */
+#game-stage > #app > #game-content .training-bg-fixed-layer,
+#game-stage > #app > #game-content .map-bg-fixed-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    margin:0 !important;
+}
+
+/* Map navigation remains anchored to the bottom of the virtual surface. */
+#game-stage > #app > #game-content #mapPageNav{
+    bottom:0 !important;
+}
+
+/* Never allow the map/training page itself to become the scrolling layer. */
+#game-stage > #app > #game-content #mapPage,
+#game-stage > #app > #game-content #trainingPage{
+    overscroll-behavior:none !important;
+    touch-action:none !important;
+}

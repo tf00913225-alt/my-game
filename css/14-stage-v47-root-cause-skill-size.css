@@ -1,0 +1,21 @@
+
+/* V47 ROOT-CAUSE FIX
+   The skill badge is dynamically created with inline !important.
+   CSS-only overrides were therefore losing to the creation/enforcement
+   code. The source code is now 150px, and this CSS is a final guard. */
+
+#game-stage #game-overlay-layer .skill-name-badge{
+    font-size:150px !important;
+    width:900px !important;
+    min-width:900px !important;
+    max-width:none !important;
+    overflow:visible !important;
+    white-space:nowrap !important;
+    text-align:center !important;
+    font-weight:900 !important;
+    line-height:.9 !important;
+    -webkit-text-stroke:0 !important;
+    text-shadow:
+        0 6px 7px rgba(0,0,0,1),
+        0 0 14px rgba(0,0,0,1) !important;
+}

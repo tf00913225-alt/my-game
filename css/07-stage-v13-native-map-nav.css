@@ -1,0 +1,27 @@
+
+/* ============================================================
+   V13 — NATIVE MIGRATION: MAP / TRAINING BOTTOM NAV
+
+   V11 migrated the main bottom navigation.
+   V13 gives the map/training navigation the same native 1080×1920
+   coordinate standard. Existing visual appearance and handlers
+   are preserved.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-map-nav-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-map-nav-layer .native-map-nav{
+    position:absolute !important;
+    left:0 !important;
+    bottom:0 !important;
+    width:1080px !important;
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+}

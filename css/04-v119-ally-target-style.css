@@ -1,0 +1,14 @@
+
+/* V119：我方單體技能選人，只在目標選擇階段顯示，不改原玩家卡尺寸/排版。 */
+#game-stage > #app > #game-content #battlePage .battle-player.ally-targetable{
+    cursor:pointer;
+    outline:3px solid rgba(224,186,92,.95);
+    outline-offset:2px;
+    box-shadow:0 0 12px rgba(224,186,92,.75);
+}
+#game-stage > #app > #game-content #battlePage .battle-player.ally-targetable:active{
+    transform:scale(.98);
+}
+#game-stage > #app > #game-content #battlePage .battle-player.ally-target{
+    outline:3px solid rgba(255,225,126,1);
+}

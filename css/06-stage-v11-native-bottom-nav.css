@@ -1,0 +1,37 @@
+
+/* ============================================================
+   V11 — FIRST REAL NATIVE UI MIGRATION: BOTTOM NAVIGATION
+
+   The existing bottom navigation is visually preserved.
+   Its final placement is now expressed in the native 1080×1920
+   coordinate system, rather than being tied to browser viewport
+   positioning.
+
+   Legacy gameplay remains untouched.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-bottom-nav-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-bottom-nav-layer .native-bottom-nav{
+    position:absolute !important;
+
+    /* Legacy 420px design translated to native 1080px space */
+    left:0 !important;
+    bottom:0 !important;
+
+    width:1080px !important;
+
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+
+    display:flex !important;
+    justify-content:center !important;
+    align-items:flex-end !important;
+}

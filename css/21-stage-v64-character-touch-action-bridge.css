@@ -1,0 +1,15 @@
+
+/*
+ V64 ROOT-CAUSE FIX:
+ The game viewport intentionally locks touch-action:none on html/body/#game-viewport.
+ That ancestor lock wins over a descendant scroll container on Android WebView, so
+ #characterTabContent could have overflow-y:scroll and still never receive native scrolling.
+ Only while the character modal is open do we relax the ancestor gesture policy to pan-y.
+ The existing V8 touch-lock still blocks page dragging everywhere that is not an allowed scroller.
+*/
+html.character-scroll-active,
+body.character-scroll-active,
+#game-viewport.character-scroll-active,
+#game-stage.character-scroll-active{
+    touch-action:pan-y !important;
+}

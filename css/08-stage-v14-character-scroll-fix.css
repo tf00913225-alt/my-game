@@ -1,0 +1,48 @@
+
+/* ============================================================
+   V14 — CHARACTER / SKILL / STATUS / AUTO-BATTLE SCROLL FIX
+
+   These are intentional internal scroll areas. The game surface itself
+   remains locked against page dragging.
+============================================================ */
+
+#characterTabContent{
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior:contain !important;
+    touch-action:pan-y !important;
+    min-height:0 !important;
+    box-sizing:border-box !important;
+}
+
+#characterTabContent > #statusPage,
+#characterTabContent > #skillPage,
+#characterTabContent > #inventoryPage{
+    min-height:0 !important;
+    overflow:visible !important;
+}
+
+#homeFeatureModal .home-feature-modal-box{
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior:contain !important;
+    touch-action:pan-y !important;
+}
+
+#homeFeatureModal .auto-settings-expanded{
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior:contain !important;
+    touch-action:pan-y !important;
+    max-height:70dvh;
+}
+
+/* When the status/skill pages are borrowed into the character modal,
+   their old full-page layout must not create a second competing scroll. */
+#characterTabContent #statusPage,
+#characterTabContent #skillPage,
+#characterTabContent #inventoryPage{
+    height:auto !important;
+    max-height:none !important;
+}

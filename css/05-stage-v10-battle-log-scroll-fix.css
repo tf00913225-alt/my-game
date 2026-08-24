@@ -1,0 +1,33 @@
+
+/* ============================================================
+   V10 — BATTLE INFORMATION PANEL SCROLL FIX
+
+   The game itself must remain non-scrollable, but the battle
+   information/log panel is an intentional internal scroller.
+   Its scroll must be independent of the game viewport.
+============================================================ */
+
+/* Common selectors used by the battle information/log area. */
+#game-stage .battle-log,
+#game-stage .battle-info,
+#game-stage .battle-info-box,
+#game-stage .battle-log-box,
+#game-stage .battle-log-container,
+#game-stage .combat-log,
+#game-stage .combat-log-box,
+#game-stage .battle-text,
+#game-stage .battle-message-list{
+    overscroll-behavior:contain !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch !important;
+}
+
+/* Any element that is already a vertical scroller keeps native scrolling. */
+#game-stage [data-battle-log-scroll],
+#game-stage .battle-log-scrollable{
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior:contain !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch !important;
+}

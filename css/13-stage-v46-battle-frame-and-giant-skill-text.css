@@ -1,0 +1,35 @@
+
+/* V46 — darker battle background, restore character-card frame,
+   and make skill cast text dramatically larger. */
+
+/* Restore the player character card's visual outer frame.
+   Do not restore the old baked black image background. */
+#game-stage > #app > #game-content #battlePage .battle-player{
+    border:2px solid #b99249 !important;
+    outline:none !important;
+    box-shadow:
+        0 0 0 1px rgba(0,0,0,.82),
+        0 0 6px rgba(185,146,73,.36) !important;
+}
+
+/* Keep the transparent character image itself transparent. */
+#game-stage > #app > #game-content #battlePage #battlePlayerCard0{
+    background-color:transparent !important;
+}
+
+/* GIANT skill cast name. Deliberately allowed to exceed the card. */
+#game-stage #game-overlay-layer .skill-name-badge{
+    font-size:132px !important;
+    width:760px !important;
+    min-width:760px !important;
+    max-width:none !important;
+    overflow:visible !important;
+    white-space:nowrap !important;
+    text-align:center !important;
+    font-weight:900 !important;
+    line-height:.95 !important;
+    -webkit-text-stroke:0 !important;
+    text-shadow:
+        0 5px 6px rgba(0,0,0,1),
+        0 0 12px rgba(0,0,0,1) !important;
+}
