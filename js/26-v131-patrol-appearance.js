@@ -21,6 +21,35 @@
         earth:{front:[0,2],back:[1,2]}
     };
 
+    /*
+       ★ 男角 Q 版（新增）：目前上傳素材只有正面（沒有背面），
+       所以只用一張 2x2 sprite（火/水/風/土 各一格），
+       front/back 都指向同一格，移動方向不影響顯示。
+       缺這組資料時（尚未載入或載入失敗）就自動退回
+       只用女角那組 sprite，不影響既有行為。
+    */
+    const maleChunks=Array.isArray(window.V131_PATROL_SPRITE_MALE_CHUNKS)
+        ? window.V131_PATROL_SPRITE_MALE_CHUNKS
+        : [];
+    const maleSpriteReady=maleChunks.length>=9 && maleChunks.every(chunk=>!!chunk);
+    const maleSpriteUrl=maleSpriteReady
+        ? "data:image/webp;base64,"+maleChunks.join("")
+        : null;
+    const maleSpriteCells={
+        fire:[0,0],
+        water:[1,0],
+        wind:[0,1],
+        earth:[1,1]
+    };
+
+    function isMaleCharacter(character){
+        return !!(character && character.gender==="male");
+    }
+
+    function maleBackgroundPosition(cell){
+        return (cell[0]===0?"0%":"100%")+" "+(cell[1]===0?"0%":"100%");
+    }
+
     let selectedIndex=Number(localStorage.getItem(STORAGE_KEY));
     if(!Number.isInteger(selectedIndex)){ selectedIndex=0; }
 
@@ -72,16 +101,26 @@
         const character=getCharacter(index);
         if(!character){ return; }
         const element=getElementKey(character);
-        const cell=spriteCells[element][facingBack ? "back" : "front"];
 
         img.src=TRANSPARENT_PIXEL;
         img.classList.add("v131-patrol-q-art");
         img.style.setProperty("width","70px","important");
         img.style.setProperty("height","105px","important");
-        img.style.setProperty("background-image",'url("'+spriteUrl+'")',"important");
-        img.style.setProperty("background-size","300% 300%","important");
-        img.style.setProperty("background-position",backgroundPosition(cell),"important");
         img.style.setProperty("background-repeat","no-repeat","important");
+
+        if(maleSpriteUrl && isMaleCharacter(character)){
+            const cell=maleSpriteCells[element];
+            img.style.setProperty("background-image",'url("'+maleSpriteUrl+'")',"important");
+            img.style.setProperty("background-size","200% 200%","important");
+            img.style.setProperty("background-position",maleBackgroundPosition(cell),"important");
+        }
+        else{
+            const cell=spriteCells[element][facingBack ? "back" : "front"];
+            img.style.setProperty("background-image",'url("'+spriteUrl+'")',"important");
+            img.style.setProperty("background-size","300% 300%","important");
+            img.style.setProperty("background-position",backgroundPosition(cell),"important");
+        }
+
         img.alt=(character.id||("角色"+(index+1)))+"巡怪形象";
         img.dataset.v131PatrolCharacter=String(index);
         img.dataset.v131Facing=facingBack ? "back" : "front";
