@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>戰鬥完整版 V121 SPLIT</title>
+<title>戰鬥完整版 V123 SPLIT</title>
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
@@ -26,6 +26,7 @@
 
 
 <link id="v119-ally-target-style" rel="stylesheet" href="css/04-v119-ally-target-style.css">
+<link id="v123-character-creation-premium" rel="stylesheet" href="css/27-v123-character-creation-premium.css">
 
 </head>
 
@@ -53,243 +54,278 @@
 </div>
 
 <!-- =====================================================
-     創建角色
+     V123 創建角色 — 高級角色選擇介面
+     - 保留既有 ID / 元素 / 六能力配點機制
+     - 新增男女立繪切換、元素定位、技能系譜預覽
+     - #creationPage 本身仍是唯一捲動 owner
 ===================================================== -->
 
-<div id="creationPage">
+<div id="creationPage" class="creation-page-scroll" data-element="fire" data-gender="female">
 
-    <div class="creation-title">
-         創建角色
-    </div>
+    <div class="creation-premium-shell">
 
-    <div class="creation-subtitle">
-        建立你的第一名冒險者
-    </div>
+        <header class="creation-premium-header">
+            <div class="creation-header-ornament" aria-hidden="true">◆</div>
+            <div class="creation-title">創建角色</div>
+            <div class="creation-subtitle">選擇你的元素之道，建立第一名冒險者</div>
+        </header>
 
-    <div class="creation-card">
+        <section class="creation-showcase" aria-label="角色預覽">
 
-        <div class="creation-label">
-            🆔 玩家 ID
-        </div>
+            <div class="creation-portrait-panel">
+                <div class="creation-portrait-aura" aria-hidden="true"></div>
+                <img
+                    id="creationPortrait"
+                    class="creation-portrait-image"
+                    src="assets/characters/female_fire.jpg"
+                    alt="火元素女性角色立繪"
+                    draggable="false"
+                >
+                <div class="creation-portrait-shade" aria-hidden="true"></div>
+                <div class="creation-portrait-caption">
+                    <span id="creationPortraitElement">火元素</span>
+                    <b id="creationPortraitGender">女俠</b>
+                </div>
+            </div>
 
-        <input
-            id="creationId"
-            class="creation-input"
-            maxlength="16"
-            placeholder="輸入你的角色 ID"
-        >
+            <div class="creation-choice-panel">
 
-    </div>
+                <div class="creation-section-kicker">性別</div>
+                <div class="creation-gender-grid" role="group" aria-label="選擇性別">
+                    <button
+                        id="creationGenderFemale"
+                        class="creation-gender-option selected"
+                        type="button"
+                        onclick="selectCreationGender('female')"
+                    >
+                        <span class="creation-gender-symbol">♀</span>
+                        <span>女</span>
+                    </button>
+                    <button
+                        id="creationGenderMale"
+                        class="creation-gender-option"
+                        type="button"
+                        onclick="selectCreationGender('male')"
+                    >
+                        <span class="creation-gender-symbol">♂</span>
+                        <span>男</span>
+                    </button>
+                </div>
 
-    <div class="creation-card">
+                <div class="creation-section-kicker creation-element-kicker">元素</div>
+                <div class="element-grid creation-element-grid" role="group" aria-label="選擇元素">
 
-        <div class="creation-label">
-             選擇元素
-        </div>
+                    <button
+                        id="elementFire"
+                        class="element-option selected"
+                        data-element="fire"
+                        type="button"
+                        onclick="selectElement('fire')"
+                    >
+                        <span class="creation-element-glyph">火</span>
+                        <span class="element-name">烈焰</span>
+                    </button>
 
-        <div class="element-grid">
+                    <button
+                        id="elementWater"
+                        class="element-option"
+                        data-element="water"
+                        type="button"
+                        onclick="selectElement('water')"
+                    >
+                        <span class="creation-element-glyph">水</span>
+                        <span class="element-name">寒水</span>
+                    </button>
 
-            <button
-                id="elementFire"
-                class="element-option selected"
-                onclick="selectElement('fire')"
+                    <button
+                        id="elementWind"
+                        class="element-option"
+                        data-element="wind"
+                        type="button"
+                        onclick="selectElement('wind')"
+                    >
+                        <span class="creation-element-glyph">風</span>
+                        <span class="element-name">疾風</span>
+                    </button>
+
+                    <button
+                        id="elementEarth"
+                        class="element-option"
+                        data-element="earth"
+                        type="button"
+                        onclick="selectElement('earth')"
+                    >
+                        <span class="creation-element-glyph">土</span>
+                        <span class="element-name">厚土</span>
+                    </button>
+
+                </div>
+
+                <div class="creation-role-card">
+                    <div class="creation-role-title-row">
+                        <span id="creationElementBadge" class="creation-element-badge">火</span>
+                        <div>
+                            <div id="creationElementTitle" class="creation-role-title">烈焰之道</div>
+                            <div id="creationElementRole" class="creation-role-subtitle">爆發輸出 · 爆擊 · 燃燒</div>
+                        </div>
+                    </div>
+                    <div id="creationElementDescription" class="creation-role-description">
+                        以高爆發、爆擊與燃燒持續傷害壓制敵人，物理與法術兩條路線都偏向主動進攻。
+                    </div>
+                    <div id="creationElementTags" class="creation-role-tags"></div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="creation-card creation-identity-card">
+            <div class="creation-card-heading">
+                <span class="creation-card-index">01</span>
+                <div>
+                    <div class="creation-label">玩家 ID</div>
+                    <div class="creation-card-caption">這會成為你的角色名稱</div>
+                </div>
+            </div>
+            <input
+                id="creationId"
+                class="creation-input"
+                maxlength="16"
+                placeholder="輸入 2～16 個字元"
+                autocomplete="off"
             >
-                <div class="element-icon"></div>
-                <div class="element-name">火</div>
-            </button>
+        </section>
 
-            <button
-                id="elementWind"
-                class="element-option"
-                onclick="selectElement('wind')"
-            >
-                <div class="element-icon"></div>
-                <div class="element-name">風</div>
-            </button>
+        <section class="creation-card creation-skill-preview-card">
+            <div class="creation-card-heading creation-preview-heading">
+                <span class="creation-card-index">02</span>
+                <div>
+                    <div class="creation-label">元素技能預覽</div>
+                    <div class="creation-card-caption">顯示目前遊戲中此元素的正式技能系譜</div>
+                </div>
+            </div>
 
-            <button
-                id="elementEarth"
-                class="element-option"
-                onclick="selectElement('earth')"
-            >
-                <div class="element-icon"></div>
-                <div class="element-name">土</div>
-            </button>
+            <div class="creation-skill-lane">
+                <div class="creation-skill-lane-label">物理</div>
+                <div id="creationPhysicalSkills" class="creation-skill-chips"></div>
+            </div>
 
-            <button
-                id="elementWater"
-                class="element-option"
-                onclick="selectElement('water')"
-            >
-                <div class="element-icon"></div>
-                <div class="element-name">水</div>
-            </button>
+            <div class="creation-skill-lane">
+                <div class="creation-skill-lane-label">法術</div>
+                <div id="creationMagicSkills" class="creation-skill-chips"></div>
+            </div>
 
-        </div>
+            <div class="creation-skill-lane creation-skill-lane-special">
+                <div class="creation-skill-lane-label">特色</div>
+                <div id="creationSpecialSkills" class="creation-skill-chips"></div>
+            </div>
+        </section>
+
+        <section class="creation-card creation-stats-card">
+
+            <div class="creation-card-heading">
+                <span class="creation-card-index">03</span>
+                <div>
+                    <div class="creation-label">初始能力配點</div>
+                    <div class="creation-card-caption">六項能力共用 10 點，自由分配</div>
+                </div>
+                <div class="creation-points-badge">
+                    剩餘 <b id="creationPoints">10</b>
+                </div>
+            </div>
+
+            <div class="creation-stat-grid">
+
+                <div class="creation-stat" data-stat="attack">
+                    <div class="creation-stat-copy">
+                        <b>攻擊</b><small>物攻／物理爆擊</small>
+                    </div>
+                    <div class="creation-stat-right">
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('attack',-1)">−</button>
+                        <b id="creationAttack">0</b>
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('attack',1)">+</button>
+                    </div>
+                </div>
+
+                <div class="creation-stat" data-stat="vitality">
+                    <div class="creation-stat-copy">
+                        <b>體質</b><small>HP／防禦</small>
+                    </div>
+                    <div class="creation-stat-right">
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('vitality',-1)">−</button>
+                        <b id="creationVitality">0</b>
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('vitality',1)">+</button>
+                    </div>
+                </div>
+
+                <div class="creation-stat" data-stat="energy">
+                    <div class="creation-stat-copy">
+                        <b>能量</b><small>SP 上限</small>
+                    </div>
+                    <div class="creation-stat-right">
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('energy',-1)">−</button>
+                        <b id="creationEnergy">0</b>
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('energy',1)">+</button>
+                    </div>
+                </div>
+
+                <div class="creation-stat" data-stat="intelligence">
+                    <div class="creation-stat-copy">
+                        <b>智力</b><small>法攻／回復／法術爆擊</small>
+                    </div>
+                    <div class="creation-stat-right">
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('intelligence',-1)">−</button>
+                        <b id="creationIntelligence">0</b>
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('intelligence',1)">+</button>
+                    </div>
+                </div>
+
+                <div class="creation-stat" data-stat="spirit">
+                    <div class="creation-stat-copy">
+                        <b>精神</b><small>抗性／命中／抗暴</small>
+                    </div>
+                    <div class="creation-stat-right">
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('spirit',-1)">−</button>
+                        <b id="creationSpirit">0</b>
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('spirit',1)">+</button>
+                    </div>
+                </div>
+
+                <div class="creation-stat" data-stat="agility">
+                    <div class="creation-stat-copy">
+                        <b>敏捷</b><small>速度／閃避</small>
+                    </div>
+                    <div class="creation-stat-right">
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('agility',-1)">−</button>
+                        <b id="creationAgility">0</b>
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('agility',1)">+</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <details class="stat-explanation creation-stat-details">
+                <summary>查看完整能力值說明</summary>
+                <div class="creation-stat-details-body">
+                    <div><b>攻擊</b>：影響物理攻擊、物理爆擊機率與物理爆擊傷害。</div>
+                    <div><b>體質</b>：影響 HP 與防禦；每1點體質增加50 HP、15防禦值。</div>
+                    <div><b>能量</b>：影響 SP；每1點能量增加15 SP。</div>
+                    <div><b>智力</b>：影響法術攻擊、回復技能、異常狀態命中率、法術爆擊機率與法術爆擊傷害；每1點智力額外增加1.25點HP治療量、0.5點SP治療量（施放者本人不回復SP）。</div>
+                    <div><b>精神</b>：影響異常狀態抗性、命中與抗暴；每1點精神=+0.3個百分點異常抗性、+2命中、+0.1%抗暴（抗暴上限25%）。+2命中約使最終命中機率增加0.6個百分點。</div>
+                    <div><b>敏捷</b>：影響出手速度與閃避；每1點敏捷=+1速度、+2閃避，+2閃避約使敵方最終命中機率降低0.6個百分點。</div>
+                </div>
+            </details>
+
+        </section>
+
+        <button class="creation-start" type="button" onclick="createCharacter()">
+            <span>開始冒險</span>
+            <small>ENTER THE WORLD</small>
+        </button>
+
+        <div class="creation-bottom-space" aria-hidden="true"></div>
 
     </div>
-
-    <div class="creation-card">
-
-        <div class="creation-label">
-             初始能力配點
-        </div>
-
-        <div class="creation-stat">
-            <span>攻擊</span>
-
-            <div class="creation-stat-right">
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('attack',-1)"
-                >−</button>
-
-                <b id="creationAttack">0</b>
-
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('attack',1)"
-                >+</button>
-            </div>
-        </div>
-
-        <div class="creation-stat">
-            <span>體質</span>
-
-            <div class="creation-stat-right">
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('vitality',-1)"
-                >−</button>
-
-                <b id="creationVitality">0</b>
-
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('vitality',1)"
-                >+</button>
-            </div>
-        </div>
-
-        <div class="creation-stat">
-            <span>能量</span>
-
-            <div class="creation-stat-right">
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('energy',-1)"
-                >−</button>
-
-                <b id="creationEnergy">0</b>
-
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('energy',1)"
-                >+</button>
-            </div>
-        </div>
-
-        <div class="creation-stat">
-            <span>智力</span>
-
-            <div class="creation-stat-right">
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('intelligence',-1)"
-                >−</button>
-
-                <b id="creationIntelligence">0</b>
-
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('intelligence',1)"
-                >+</button>
-            </div>
-        </div>
-
-        <div class="creation-stat">
-            <span>精神</span>
-
-            <div class="creation-stat-right">
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('spirit',-1)"
-                >−</button>
-
-                <b id="creationSpirit">0</b>
-
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('spirit',1)"
-                >+</button>
-            </div>
-        </div>
-
-        <div class="creation-stat">
-            <span>敏捷</span>
-
-            <div class="creation-stat-right">
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('agility',-1)"
-                >−</button>
-
-                <b id="creationAgility">0</b>
-
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd('agility',1)"
-                >+</button>
-            </div>
-        </div>
-
-        <div class="creation-points">
-            剩餘配點：
-            <b id="creationPoints">10</b>
-        </div>
-
-        <div class="stat-explanation">
-
-            <div class="stat-explanation-title">
-                 能力值說明
-            </div>
-
-            <div>
-                 <b>攻擊</b>：影響物理攻擊、物理爆擊機率與物理爆擊傷害。
-            </div>
-
-            <div>
-                 <b>體質</b>：影響 HP 與防禦。
-                每1點體質增加50 HP、15防禦值。
-            </div>
-
-            <div>
-                 <b>能量</b>：影響 SP。
-                每1點能量增加15 SP。
-            </div>
-
-            <div>
-                 <b>智力</b>：影響法術攻擊、回復技能、異常狀態命中率、法術爆擊機率與法術爆擊傷害；每1點智力額外增加1.25點HP治療量、0.5點SP治療量（施放者本人不回復SP）。
-            </div>
-
-            <div>
-                 <b>精神</b>：影響異常狀態抗性、命中與抗暴；每1點精神=+0.3個百分點異常抗性、+2命中、+0.1%抗暴（抗暴上限25%）。+2命中約使最終命中機率增加0.6個百分點。
-            </div>
-
-            <div>
-                 <b>敏捷</b>：影響出手速度與閃避；每1點敏捷=+1速度、+2閃避，+2閃避約使敵方最終命中機率降低0.6個百分點。
-            </div>
-
-        </div>
-
-    </div>
-
-    <button
-        class="creation-start"
-        onclick="createCharacter()"
-    >
-        開始冒險
-    </button>
 
 </div>
 
@@ -2816,6 +2852,7 @@
      No damage/SP/initiative/skill formulas changed. -->
 
 <script src="js/20-anonymous-20.js"></script>
+<script id="v123-character-creation-runtime" src="js/21-v123-character-creation-runtime.js"></script>
 
 
 <link id="v110-auto-settings-premium" rel="stylesheet" href="css/26-v110-auto-settings-premium.css">

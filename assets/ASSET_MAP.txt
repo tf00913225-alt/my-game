@@ -1,4 +1,4 @@
-V121_SPLIT 資產對照表
+V123_SPLIT 資產對照表
 來源：V120 單檔內嵌圖片
 同一份圖片資料若重複出現，只保留一個實體檔。
 
@@ -61,3 +61,13 @@ raw-js-const PATROL_CHAR_FRONT_B64 -> assets/characters/patrol-character.png (84
 raw-js-const PATROL_CHAR_BACK_B64 -> assets/characters/patrol-back.png (93200 bytes) sha256=34194f7c4aec4ef9c539b649ab18adc8b61bb00ecaab9f9a68e2190bf706f9d3
 raw-js-const PATROL_FIGHT1_B64 -> assets/battle/patrol-fight-1.png (83638 bytes) sha256=786205befce6a36a9c7129723c0bb8c9333409ada1b5b3933ff8cdce5cb70c8d
 raw-js-const PATROL_FIGHT2_B64 -> assets/battle/patrol-fight-2.png (98147 bytes) sha256=be1efc209f05d80d70d5629aa285de9d8e1a296c341084a7311aea8e18fc878a
+
+V123 使用者上傳角色立繪：
+uploaded-character -> assets/characters/female_fire.jpg (403118 bytes) sha256=9a41e0297625d302da2a5d9e9c91c743070b230ac5bd8a5888f49bb5c81f344f
+uploaded-character -> assets/characters/female_water.jpg (394670 bytes) sha256=2ceb1951563382e5771d6b98e65c1abe7a350e86570075fd92fad3def1eea959
+uploaded-character -> assets/characters/female_wind.jpg (358942 bytes) sha256=b15d1101d71dc26d599612b0cbcd0a6f2c53933067b7d2ec086ff3b48e364bdc
+uploaded-character -> assets/characters/female_earth.jpg (410671 bytes) sha256=5cc107183ac37587b6e98639408879786c78ac40252412e5978a9eb5f29e52ab
+uploaded-character -> assets/characters/male_fire.jpg (458923 bytes) sha256=75a038dfa1e397be9f46b4a8588c6f9b99ef0a2fade7ddb32a030bd9cb7c5033
+uploaded-character -> assets/characters/male_water.jpg (468717 bytes) sha256=cad4913dcc623548ce0eafb4a62c5e2dd5b87420d041bc40b4d2dba205b08e7a
+uploaded-character -> assets/characters/male_wind.jpg (459914 bytes) sha256=aabd352bf01bf93772730b22dfe701c355cab7817a3d1271455d0c4a3f204c6e
+uploaded-character -> assets/characters/male_earth.jpg (494141 bytes) sha256=081b81014dd8f80172bd9cfda7f02547e78a52304f1a3a62029a8eade7732c33
