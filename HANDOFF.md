@@ -30,7 +30,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-25，main @ `70cf718`）
+## 目前狀態（截至 2026-08-25，main @ `75eb979`）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -123,9 +123,15 @@ Node.js 版playwright套件需要自己`npm install playwright`一次，
 5. **一定要驗證 byte-for-byte 還原**（decode 所有 chunk、組回二進位、跟原始檔案比對
    hash）再提交，這是這個專案唯一能保證「切檔沒切壞資料」的方法。
 
-現有範例：`js/v131-patrol-sprite-0.js` ~ `5.js`（女角 Q 版，3x3 grid，
-每格對應一個元素的正/背面）、`js/v131-patrol-sprite-male-0.js` ~ `8.js`
-（男角 Q 版，2x2 grid，目前只有正面）。
+現有範例：`js/v131-patrol-sprite-0.js` ~ `9.js`（女角 Q 版，3x3 grid，
+每格對應一個元素的正/背面，2026-08-25第二輪用更高畫質來源重建過，
+chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
+（男角 Q 版，4x2 grid，正背面皆有）。
+
+**換掉chunk內容但檔名／數量不變時，記得把 `js/20-anonymous-20.js` 裡
+對應的 `?v=131x` query string 版本號往後遞增**（例如`131a`→`131e`），
+不然使用者瀏覽器可能還快取著舊版base64內容，看起來像是「換圖沒生效」。
+如果chunk數量本身變多／變少，`sources`陣列也要同步增減對應的檔案清單。
 
 ### 4. 角色系統：`player`／`player2`／`player3`
 
@@ -141,6 +147,55 @@ Node.js 版playwright套件需要自己`npm install playwright`一次，
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-25 — 第二輪修復 7 項回報問題（PR #6，已合併）
+
+延續上一輪的7項修復，使用者再次實際操作後回報7個新問題，全部用 Playwright +
+headless Chromium 逐一驗證後修復：
+
+1. **形象切換按鈕圖片畫質太差** — 使用者這次提供的不是角色素材，而是一張專屬的
+   「形象切換」功能徽章圖（固定圖案，跟角色/元素無關）。`js/26-v131-patrol-appearance.js`
+   的 `updateSwitchIcon()` 改成套用這張靜態高畫質圖（存成
+   `assets/ui/patrol-appearance-switch-icon.png`），不再動態套用「目前選中角色」
+   裁切出來的低解析度sprite小圖。上一輪「已知限制」裡提到的畫質問題已解決。
+2. **技能正確名稱** — 用像素比對找出真正的根因：`js/00-main.js` 的
+   `elementSkillIconMap` 裡 `dustStorm`（真實名稱「地牛猛襲」）跟 `rockWall`
+   （真實名稱「岩石壁壘」）兩個技能的icon檔案內容被對調了（這個bug在更早一輪就存在，
+   不是這次才introduce的，只是這次使用者提供的兩張標籤參考圖才讓它被抓出來）。
+   直接對調 `assets/skills/earth-dust-storm.jpg` 跟 `earth-rock-wall.jpg`
+   兩個檔案的內容（不用改 `elementSkillIconMap`，key跟檔名本來就是對的，
+   錯的是檔案內容本身）。同時使用者重新提供「萬象土盾」的專用圖，補回
+   `earth-shield.jpg`（上一輪拿掉後的已知限制，這次解決）。
+3. **重新上傳高畫質Q版女生立繪** — 使用者提供8張新的火/水/風/土（各正/背面）
+   高解析度立繪（1024x1536，比例剛好等於sprite cell的56:84），整組重新組成
+   3x3 sprite sheet（`/tmp/new_female_sheet.png`→webp），改用10個base64 chunk
+   （原本6個chunk放不下，`js/v131-patrol-sprite-0.js`~`9.js`），並在
+   `js/20-anonymous-20.js` 的 `sources` 陣列補上新的4個chunk檔案、
+   把版本query string從`?v=131a`改成`?v=131e`避免瀏覽器快取舊sprite。
+   已驗證新sprite視覺品質明顯提升。
+4. **全技能預覽文字太小** — 上一輪已經加大過一次（13.5/14.5/15px），使用者反映
+   還是太小，這次大幅加大到17/19/20px（`css/31-v131-fix-batch.css`）。
+5. **全技能預覽按鈕位置** — 原本跟「技能配裝」標題並排在技能頁面內部，使用者
+   要求移到「返回」按鈕正下方。改法：把共用彈窗header（`.home-feature-modal-title`
+   右側原本只有？/返回兩顆按鈕的區塊）從單排改成兩排的flex column，新增
+   `id="skillPreviewHeaderButton"`放在第二排，預設隱藏，`switchCharacterTab()`
+   切到`"skill"`分頁時才顯示（跟`statusHelpButton`同一套邏輯），技能頁面內部
+   原本那顆按鈕直接移除，不留重複按鈕。
+6. **自動戰鬥設定頁面無法捲動** — 這次的根因跟上一輪`characterTabContent`那個
+   bug不一樣：捲動機制本身其實沒壞（程式化`scrollTop`賦值、模擬觸控滑動都能
+   捲到底），真正原因是`.home-feature-modal.dock-bottom{padding-bottom:172px}`
+   （原本是為了貼齊戰鬥中的戰鬥資訊框設計的）不管是不是真的在戰鬥中都套用，
+   加上`.home-feature-modal-box`自己`max-height:80dvh`的硬上限，兩者疊加導致
+   非戰鬥中開啟這個設定頁時可用高度被過度壓縮。`js/00-main.js`裡開啟這個彈窗
+   的地方改成：`padding-bottom`跟`max-height`都依`battleActive`動態設定
+   （戰鬥中維持172px/80dvh，非戰鬥中降到24px/96dvh）。已驗證：一般420x900
+   viewport下可用高度剛好等於內容高度（完全不用捲）；就算故意縮到390x660
+   這種比任何真實手機都短的極端viewport，剩餘的一點點內容也能透過捲動
+   （程式化與真實觸控滑動皆測試過）完整看到。
+7. **技能升級沒有防呆/成功提示** — 上一輪只幫`learnSkill`加了`confirm()`/
+   `alert()`包裝，`upgradeSkill`當時沒有同步處理。`js/25-v131-fix-batch.js`
+   補上結構相同的`upgradeSkill`包裝，已驗證確認對話框跟成功提示都正常
+   跳出，技能等級也確實從1升到2。
 
 ### 2026-08-25 — 修復 7 項回報問題（用實機瀏覽器測試逐一驗證）
 
@@ -267,13 +322,10 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - [x] ~~男角 Q 版巡怪立繪缺背面圖~~ 2026-08-25 已補上，見上方記錄
 - [x] ~~土系技能 `stoneSlash`、`earthEX` 沒有icon~~ 2026-08-25 已補上
       （分別用使用者標籤確認的圖 + 新提供的EX專用圖）
-- [ ] 土系技能 `earthShield`（萬象土盾）目前沒有icon——原本用的那張圖
-      被證實其實是 `sandWind` 的，拿掉之後這格暫時空白，等有合適的圖再補
-- [ ] 形象切換按鈕（`v131PatrolAppearanceSwitch`）的畫質受限於巡怪
-      sprite sheet本身只有56x84px，放大顯示到76px按鈕上還是會有點模糊，
-      這不是bug、是素材解析度先天限制。如果要真的改善，需要另外提供
-      一組解析度更高（例如150x225以上）的專用素材給這個按鈕用，跟
-      地圖上70x105px顯示的巡怪立繪分開處理。
+- [x] ~~土系技能 `earthShield`（萬象土盾）沒有icon~~ 2026-08-25第二輪已補上
+      （使用者重新提供專用圖，見上方記錄）
+- [x] ~~形象切換按鈕畫質差~~ 2026-08-25第二輪已解決：改用使用者提供的專用
+      靜態徽章圖，不再依賴56x84的低解析度角色sprite裁切
 - [ ] V131 這整批修正都只做過「語法檢查 + 程式邏輯追蹤驗證」，**沒有在真實瀏覽器
       （尤其 Android Chrome 實機）上操作驗證過**。如果使用者回報某個功能「看起來沒生效」，
       優先確認是不是瀏覽器快取問題，其次才懷疑程式邏輯本身。
