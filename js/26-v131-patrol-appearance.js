@@ -167,7 +167,6 @@
         if(sheetImage){
             const cropped=cropCellDataUrl(sheetImage,cell[0],cell[1]);
             img.src=cropped;
-            updateSwitchIcon(cropped);
         }
 
         img.alt=(character.id||("角色"+(index+1)))+"巡怪形象";
@@ -177,29 +176,24 @@
 
     /*
        ★ 修正（依照使用者要求，「形象切換按鈕圖片畫質太差、
-       按鈕太小」）：
-       原本形象切換按鈕的icon是寫死套用女角sprite的
-       固定一格（不管玩家目前選的是誰），而且是拿
-       background-image+background-position硬摳
-       一小塊出來顯示，跟主要巡怪立繪原本踩到的白色
-       方塊是同一種寫法（只是span沒有img那個bug，
-       沒有整個裁到看不到而已）。
-       這裡改成：每次套用巡怪立繪時，直接把「剛剛裁切好
-       這一格」的裁切結果（跟主要立繪同一張圖）也套到
-       按鈕icon上，永遠顯示「目前真正選中的角色」，
-       不再寫死女角。畫質仍然受限於原始sprite本身的
-       解析度（56x84，是為了控制檔案大小刻意壓縮的），
-       放大顯示能改善的有限，如果需要更清晰的按鈕icon，
-       需要另外提供一組解析度更高的素材專門給這個按鈕用。
+       按鈕太小」，這次再依照使用者要求「有形象切換icon，
+       幫我換上去」）：
+       原本按鈕icon是拿目前選中角色sprite裁切出來的一小格
+       （56x84低解析度來源），放大後仍然模糊。使用者改為
+       提供一張專屬的「形象切換」功能徽章圖（固定圖案，
+       不隨角色改變），改用這張高畫質靜態圖當按鈕icon，
+       不再每次套用巡怪立繪時動態更換icon內容。
     */
-    function updateSwitchIcon(croppedDataUrl){
+    const SWITCH_BUTTON_ICON_URL="assets/ui/patrol-appearance-switch-icon.png";
+
+    function updateSwitchIcon(){
         const icon=document.querySelector(
             "#v131PatrolAppearanceSwitchWrap .v131-switch-icon-sprite"
         );
         if(!icon){ return; }
-        icon.style.backgroundImage='url("'+croppedDataUrl+'")';
+        icon.style.backgroundImage='url("'+SWITCH_BUTTON_ICON_URL+'")';
         icon.style.backgroundSize="cover";
-        icon.style.backgroundPosition="center 20%";
+        icon.style.backgroundPosition="center center";
     }
 
     function refreshChoicePanel(){
@@ -275,6 +269,7 @@
         wrap.appendChild(panel);
         page.appendChild(wrap);
         refreshChoicePanel();
+        updateSwitchIcon();
     }
 
     if(typeof resetPatrolCharacterToIdle==="function"){

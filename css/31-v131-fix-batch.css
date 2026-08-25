@@ -388,17 +388,22 @@
     font-size:15px !important;
 }
 
+/*
+   ★ 修正（依照使用者要求，「全技能預覽文字太小了」，
+   這是第二次加大：上一輪13.5/14.5/15px使用者反映
+   仍然太小，這次大幅加大到17/19/20px）。
+*/
 #game-stage #allElementSkillPreviewModal .skill-preview-card span{
-    font-size:13.5px !important;
+    font-size:17px !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card p{
-    font-size:14.5px !important;
+    font-size:19px !important;
     line-height:1.6 !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card strong{
-    font-size:15px !important;
+    font-size:20px !important;
 }
 
 #game-stage .stat-explanation{

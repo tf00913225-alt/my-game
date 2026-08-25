@@ -157,12 +157,16 @@
 
     function loadScripts(){
         const sources=[
-            "js/v131-patrol-sprite-0.js?v=131a",
-            "js/v131-patrol-sprite-1.js?v=131a",
-            "js/v131-patrol-sprite-2.js?v=131a",
-            "js/v131-patrol-sprite-3.js?v=131a",
-            "js/v131-patrol-sprite-4.js?v=131a",
-            "js/v131-patrol-sprite-5.js?v=131a",
+            "js/v131-patrol-sprite-0.js?v=131e",
+            "js/v131-patrol-sprite-1.js?v=131e",
+            "js/v131-patrol-sprite-2.js?v=131e",
+            "js/v131-patrol-sprite-3.js?v=131e",
+            "js/v131-patrol-sprite-4.js?v=131e",
+            "js/v131-patrol-sprite-5.js?v=131e",
+            "js/v131-patrol-sprite-6.js?v=131e",
+            "js/v131-patrol-sprite-7.js?v=131e",
+            "js/v131-patrol-sprite-8.js?v=131e",
+            "js/v131-patrol-sprite-9.js?v=131e",
             "js/v131-patrol-sprite-male-0.js?v=131c",
             "js/v131-patrol-sprite-male-1.js?v=131c",
             "js/v131-patrol-sprite-male-2.js?v=131c",
