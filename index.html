@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>戰鬥完整版 V127 SPLIT</title>
+<title>戰鬥完整版 V128 SPLIT</title>
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
@@ -24,7 +24,7 @@
 
 
 <link id="v119-ally-target-style" rel="stylesheet" href="css/04-v119-ally-target-style.css">
-<link id="v126-character-creation-native" rel="stylesheet" href="css/29-v125-character-creation-native.css?v=126">
+<link id="v128-character-creation-native" rel="stylesheet" href="css/29-v125-character-creation-native.css?v=128">
 
 </head>
 
@@ -52,12 +52,12 @@
 </div>
 
 <!-- =====================================================
-     V126 創建角色 — Native 1080 × 1920 介面
+     V128 創建角色 — Native 1080 × 1920 固定兩頁介面
      - 保留既有 ID / 元素 / 六能力配點機制
-     - 新增男女立繪切換、元素定位、技能系譜預覽
+     - 男女立繪切換、元素定位、兩頁式能力配點
      - 實際修改 width / height / font-size / padding / gap
      - 不使用 420 → 1080 transform scale
-     - #creationPage 遷移至 native overlay，仍是唯一捲動 owner
+     - #creationPage 固定於 native overlay，禁止頁面捲動與縮放
 ===================================================== -->
 
 <div id="creationPage" class="creation-page-scroll" data-element="fire" data-gender="female">
@@ -68,7 +68,14 @@
             <div class="creation-header-ornament" aria-hidden="true">◆</div>
             <div class="creation-title">創建角色</div>
             <div class="creation-subtitle">選擇你的元素之道，建立第一名冒險者</div>
+            <div class="creation-step-progress" aria-label="創角進度">
+                <span class="is-active" data-creation-step-indicator="1">01 選擇角色</span>
+                <i aria-hidden="true"></i>
+                <span data-creation-step-indicator="2">02 能力配點</span>
+            </div>
         </header>
+
+        <div id="creationStepOne" class="creation-step creation-step-one is-active" data-creation-step="1">
 
         <section class="creation-showcase" aria-label="角色預覽">
 
@@ -196,35 +203,19 @@
             >
         </section>
 
-        <section class="creation-card creation-skill-preview-card">
-            <div class="creation-card-heading creation-preview-heading">
-                <span class="creation-card-index">02</span>
-                <div>
-                    <div class="creation-label">元素技能預覽</div>
-                    <div class="creation-card-caption">顯示目前遊戲中此元素的正式技能系譜</div>
-                </div>
-            </div>
+        <button class="creation-next" type="button" onclick="setCreationStep(2)">
+            <span>下一步：能力配點</span>
+            <small>STEP 2 OF 2</small>
+        </button>
 
-            <div class="creation-skill-lane">
-                <div class="creation-skill-lane-label">物理</div>
-                <div id="creationPhysicalSkills" class="creation-skill-chips"></div>
-            </div>
+        </div>
 
-            <div class="creation-skill-lane">
-                <div class="creation-skill-lane-label">法術</div>
-                <div id="creationMagicSkills" class="creation-skill-chips"></div>
-            </div>
-
-            <div class="creation-skill-lane creation-skill-lane-special">
-                <div class="creation-skill-lane-label">特色</div>
-                <div id="creationSpecialSkills" class="creation-skill-chips"></div>
-            </div>
-        </section>
+        <div id="creationStepTwo" class="creation-step creation-step-two" data-creation-step="2" hidden>
 
         <section class="creation-card creation-stats-card">
 
             <div class="creation-card-heading">
-                <span class="creation-card-index">03</span>
+                <span class="creation-card-index">02</span>
                 <div>
                     <div class="creation-label">初始能力配點</div>
                     <div class="creation-card-caption">六項能力共用 10 點，自由分配</div>
@@ -318,20 +309,26 @@
 
         </section>
 
-        <button class="creation-start" type="button" onclick="createCharacter()">
-            <span>開始冒險</span>
-            <small>ENTER THE WORLD</small>
-        </button>
+        <div class="creation-action-row">
+            <button class="creation-back" type="button" onclick="setCreationStep(1)">
+                <span>上一步</span>
+                <small>BACK</small>
+            </button>
+            <button class="creation-start" type="button" onclick="createCharacter()">
+                <span>開始冒險</span>
+                <small>ENTER THE WORLD</small>
+            </button>
+        </div>
 
-        <div class="creation-bottom-space" aria-hidden="true"></div>
+        </div>
 
     </div>
 
 </div>
 
-<!-- V126: move the still-hidden creation page into the native layer before
+<!-- V128: move the still-hidden creation page into the native layer before
      the legacy 420px wrapper is built or the browser can paint its portrait. -->
-<script id="v126-character-creation-bootstrap" src="js/23-v125-character-creation-bootstrap.js?v=126"></script>
+<script id="v128-character-creation-bootstrap" src="js/23-v125-character-creation-bootstrap.js?v=128"></script>
 
 
 <!-- =====================================================
@@ -2856,7 +2853,7 @@
      No damage/SP/initiative/skill formulas changed. -->
 
 <script src="js/20-anonymous-20.js"></script>
-<script id="v126-character-creation-native-runtime" src="js/24-v125-character-creation-native-runtime.js?v=126"></script>
+<script id="v128-character-creation-native-runtime" src="js/24-v125-character-creation-native-runtime.js?v=128"></script>
 
 
 <link id="v110-auto-settings-premium" rel="stylesheet" href="css/26-v110-auto-settings-premium.css">

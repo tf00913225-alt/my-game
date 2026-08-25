@@ -1,10 +1,10 @@
 /* =====================================================
-   V126 — PRE-PAINT NATIVE CREATION BOOTSTRAP
+   V128 — PRE-PAINT FIXED NATIVE CREATION BOOTSTRAP
    The creation page starts inside #app for legacy HTML
    compatibility. Move it while it is still visibility:hidden,
    before js/00-main.js builds the 420px legacy wrapper.
-   This prevents Samsung Browser from compositing one portrait
-   across both the legacy and native transformed layers.
+   This prevents the legacy layer from painting and locks Chrome's
+   document gestures before the main runtime is ready.
 ===================================================== */
 (function bootstrapNativeCreationPage(){
     "use strict";
@@ -28,11 +28,23 @@
     if(stage){
         stage.classList.add("creation-native-active");
     }
+
+    [
+        document.documentElement,
+        document.body,
+        document.getElementById("game-viewport"),
+        stage,
+        overlay
+    ].forEach(function(node){
+        if(node){
+            node.classList.add("creation-fixed-active");
+        }
+    });
     if(app){
         app.inert=true;
         app.setAttribute("aria-hidden","true");
     }
 
-    page.dataset.nativePrepaint="v126-isolated";
+    page.dataset.nativePrepaint="v128-fixed-two-step";
     overlay.removeAttribute("aria-hidden");
 })();

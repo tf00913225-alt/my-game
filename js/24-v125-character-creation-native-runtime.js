@@ -1,11 +1,11 @@
 /* =====================================================
-   V126 — NATIVE 1080 × 1920 CHARACTER CREATION RUNTIME
-   - Uses the V126 pre-paint native bootstrap; reparenting is only a fallback
+   V128 — FIXED TWO-STEP 1080 × 1920 CHARACTER CREATION RUNTIME
+   - Uses the V128 pre-paint native bootstrap; reparenting is only a fallback
    - Uses real native component dimensions, never migration scale
    - Gender / portrait switching
-   - Element positioning + live skill preview from skillDatabase
-   - Android Chrome creation-page native scroll mode
-   - Tappable skill chips with a native skill-detail dialog
+   - Element positioning with larger element descriptions
+   - Fixed Android Chrome canvas with no page scroll or pinch zoom
+   - Two-step creation flow; ability allocation lives on page two
    Existing combat/stat/skill formulas are not changed.
 ===================================================== */
 (function(){
@@ -58,6 +58,7 @@
     };
 
     let selectedGender="female";
+    let selectedCreationStep=1;
 
     function byId(id){
         return document.getElementById(id);
@@ -101,7 +102,8 @@
             byId("game-overlay-layer")
         ].forEach(function(node){
             if(node){
-                node.classList.toggle("creation-scroll-active",!!active);
+                node.classList.remove("creation-scroll-active");
+                node.classList.toggle("creation-fixed-active",!!active);
             }
         });
 
@@ -120,6 +122,10 @@
                 app.removeAttribute("aria-hidden");
             }
         }
+
+        if(active){
+            window.scrollTo(0,0);
+        }
     }
 
     function syncCreationTouchMode(){
@@ -127,6 +133,58 @@
         const visible=!!page && window.getComputedStyle(page).display!=="none";
         setCreationTouchMode(visible);
     }
+
+    function installCreationGestureLock(){
+        const page=byId("creationPage");
+        if(!page || page.dataset.gestureLockReady==="true"){
+            return;
+        }
+
+        ["touchmove","gesturestart","gesturechange","gestureend"].forEach(function(eventName){
+            page.addEventListener(eventName,function(event){
+                event.preventDefault();
+            },{passive:false});
+        });
+
+        page.dataset.gestureLockReady="true";
+    }
+
+    function applyCreationStep(step){
+        const page=byId("creationPage");
+        const normalized=Number(step)===2?2:1;
+        selectedCreationStep=normalized;
+
+        document.querySelectorAll("#creationPage [data-creation-step]").forEach(function(panel){
+            const active=Number(panel.dataset.creationStep)===normalized;
+            panel.classList.toggle("is-active",active);
+            panel.hidden=!active;
+            panel.setAttribute("aria-hidden",active?"false":"true");
+        });
+
+        document.querySelectorAll("#creationPage [data-creation-step-indicator]").forEach(function(indicator){
+            const active=Number(indicator.dataset.creationStepIndicator)===normalized;
+            indicator.classList.toggle("is-active",active);
+            if(active){
+                indicator.setAttribute("aria-current","step");
+            }else{
+                indicator.removeAttribute("aria-current");
+            }
+        });
+
+        if(page){
+            page.dataset.step=String(normalized);
+            page.scrollTop=0;
+        }
+
+        if(document.activeElement && typeof document.activeElement.blur==="function"){
+            document.activeElement.blur();
+        }
+        window.scrollTo(0,0);
+    }
+
+    window.setCreationStep=function(step){
+        applyCreationStep(step);
+    };
 
     function orderedSkills(element,category){
         if(typeof skillDatabase==="undefined"){
@@ -615,9 +673,6 @@
             });
         }
 
-        renderSkillChips("creationPhysicalSkills",orderedSkills(chosen,"physical"));
-        renderSkillChips("creationMagicSkills",orderedSkills(chosen,"magic"));
-        renderSkillChips("creationSpecialSkills",specialSkills(chosen));
     }
 
     window.selectCreationGender=function(gender){
@@ -675,6 +730,8 @@
                 return originalShowCreation.apply(this,arguments);
             }finally{
                 setCreationTouchMode(true);
+                installCreationGestureLock();
+                applyCreationStep(1);
                 renderCreationShowcase(
                     (typeof selectedCreationElement!=="undefined" && META[selectedCreationElement])
                     ? selectedCreationElement
@@ -702,7 +759,8 @@
     })();
 
     migrateCreationPageToNativeLayer();
-    ensureCreationSkillDetailModal();
+    installCreationGestureLock();
+    applyCreationStep(1);
     window.selectCreationGender(selectedGender);
     renderCreationShowcase(initialElement);
     syncCreationTouchMode();
@@ -723,7 +781,9 @@
             shellPadding:shellStyle?shellStyle.padding:null,
             migration:page.dataset.nativeMigration||null,
             prepaint:page.dataset.nativePrepaint||null,
-            skillDetailReady:!!byId("creationSkillDetailModal")
+            fixedMode:document.documentElement.classList.contains("creation-fixed-active"),
+            step:selectedCreationStep,
+            skillPreviewPresent:!!byId("creationPhysicalSkills")
         };
     };
 
@@ -731,4 +791,3 @@
        A second sync after current call stack covers loadGame() timing safely. */
     window.setTimeout(syncCreationTouchMode,0);
 })();
-

@@ -1,9 +1,9 @@
 /* =====================================================
-   V126 — TRUE NATIVE 1080 × 1920 CHARACTER CREATION
+   V128 — TRUE NATIVE 1080 × 1920 TWO-STEP CHARACTER CREATION
    Every component uses native design dimensions.
    No 420 → 1080 migration transform is used.
    Existing stat formulas / element mechanics are untouched.
-   V126 isolates the legacy app from Samsung Browser's paint tree.
+   The creation page is fixed, non-scrollable and non-zoomable in Chrome.
 ===================================================== */
 
 /* Root isolation: while creation is visible, the legacy city, pages and
@@ -16,15 +16,33 @@
     display:none !important;
 }
 
-/* Root-cause Android Chrome scroll bridge.
-   #game-viewport intentionally uses touch-action:none globally.
-   Creation page is the only scroll owner while it is visible. */
-html.creation-scroll-active,
-body.creation-scroll-active,
-#game-viewport.creation-scroll-active,
-#game-stage.creation-scroll-active,
-#game-overlay-layer.creation-scroll-active{
-    touch-action:pan-y !important;
+/* Fixed creation mode: the document and the native creation canvas cannot
+   pan, overscroll, double-tap zoom or pinch-zoom. */
+html.creation-fixed-active{
+    width:100% !important;
+    height:100% !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+    touch-action:none !important;
+}
+
+body.creation-fixed-active{
+    position:fixed !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+    touch-action:none !important;
+}
+
+#game-viewport.creation-fixed-active,
+#game-stage.creation-fixed-active,
+#game-overlay-layer.creation-fixed-active{
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+    touch-action:none !important;
 }
 
 #creationPage.creation-page-scroll:not(.native-creation-page){
@@ -46,11 +64,10 @@ body.creation-scroll-active,
     max-height:none !important;
     margin:0 !important;
     box-sizing:border-box !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    overscroll-behavior-y:contain;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
     -webkit-overflow-scrolling:auto;
-    touch-action:pan-y !important;
+    touch-action:none !important;
     pointer-events:auto !important;
     transform:none !important;
     transform-origin:top left !important;
@@ -73,10 +90,14 @@ body.creation-scroll-active,
 
 #creationPage .creation-premium-shell{
     position:relative;
+    display:flex;
+    flex-direction:column;
     width:1080px;
-    min-height:100%;
-    padding:41.143px 36px 61.714px;
+    height:1920px;
+    min-height:1920px;
+    padding:28px 36px 32px;
     box-sizing:border-box;
+    overflow:hidden;
 }
 
 #creationPage .creation-premium-shell::before{
@@ -93,9 +114,10 @@ body.creation-scroll-active,
 }
 
 #creationPage .creation-premium-header{
+    flex:0 0 auto;
     position:relative;
     text-align:center;
-    padding:20.571px 0 36px;
+    padding:10px 0 24px;
 }
 
 #creationPage .creation-header-ornament{
@@ -120,10 +142,52 @@ body.creation-scroll-active,
 }
 
 #creationPage .creation-subtitle{
-    margin:18px 0 0;
-    font-size:25.714px;
+    margin:12px 0 0;
+    font-size:28px;
     letter-spacing:2.571px;
     color:#aa987d;
+}
+
+#creationPage .creation-step-progress{
+    display:grid;
+    grid-template-columns:auto 110px auto;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    margin-top:20px;
+    color:#786c5c;
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:2px;
+}
+
+#creationPage .creation-step-progress i{
+    display:block;
+    width:110px;
+    height:3px;
+    background:rgba(201,151,70,.28);
+}
+
+#creationPage .creation-step-progress span.is-active{
+    color:var(--creation-accent-light,#efc371);
+}
+
+#creationPage .creation-step{
+    position:relative;
+    z-index:1;
+    display:none;
+    flex:1 1 auto;
+    min-height:0;
+    overflow:hidden;
+}
+
+#creationPage .creation-step.is-active{
+    display:flex;
+    flex-direction:column;
+}
+
+#creationPage .creation-step[hidden]{
+    display:none !important;
 }
 
 #creationPage .creation-showcase{
@@ -131,8 +195,10 @@ body.creation-scroll-active,
     z-index:1;
     display:grid;
     grid-template-columns:46% 54%;
-    min-height:714.857px;
-    margin-bottom:28.286px;
+    flex:0 0 820px;
+    height:820px;
+    min-height:820px;
+    margin-bottom:24px;
     overflow:hidden;
     border:2.571px solid rgba(198,146,68,.58);
     border-radius:41.143px;
@@ -171,7 +237,7 @@ body.creation-scroll-active,
 #creationPage .creation-portrait-panel{
     position:relative;
     min-width:0;
-    min-height:714.857px;
+    min-height:820px;
     overflow:hidden;
     background:#030303;
     border-right:2.571px solid rgba(211,157,73,.28);
@@ -379,23 +445,23 @@ body.creation-scroll-active,
 #creationPage .creation-role-title{
     color:#fff2d8;
     font-family:"Noto Serif TC",serif;
-    font-size:30.857px;
+    font-size:38px;
     font-weight:900;
 }
 
 #creationPage .creation-role-subtitle{
-    margin-top:5.143px;
+    margin-top:7px;
     color:var(--creation-accent-light,#e7b85e);
-    font-size:20.571px;
+    font-size:25px;
     font-weight:700;
     letter-spacing:0.771px;
 }
 
 #creationPage .creation-role-description{
-    margin-top:18px;
+    margin-top:20px;
     color:#b9aa93;
-    font-size:20.571px;
-    line-height:1.55;
+    font-size:26px;
+    line-height:1.6;
 }
 
 #creationPage .creation-role-tags{
@@ -411,13 +477,13 @@ body.creation-scroll-active,
     border:2.571px solid rgba(255,255,255,.08);
     background:rgba(255,255,255,.035);
     color:#d7c8b0;
-    font-size:18px;
+    font-size:21px;
 }
 
 #creationPage .creation-card{
     position:relative;
     z-index:1;
-    margin:0 0 25.714px;
+    margin:0 0 22px;
     padding:33.429px;
     border:2.571px solid rgba(129,96,55,.62);
     border-radius:36px;
@@ -426,6 +492,10 @@ body.creation-scroll-active,
     box-shadow:
         inset 0 2.571px 0 rgba(255,255,255,.025),
         0 18px 48.857px rgba(0,0,0,.18);
+}
+
+#creationPage .creation-identity-card{
+    flex:0 0 auto;
 }
 
 #creationPage .creation-card-heading{
@@ -480,6 +550,62 @@ body.creation-scroll-active,
 #creationPage .creation-input:focus{
     border-color:#e4a840;
     box-shadow:0 0 0 5.143px rgba(228,168,64,.10),inset 0 0 36px rgba(0,0,0,.25);
+}
+
+#creationPage .creation-next,
+#creationPage .creation-back{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    height:132px;
+    padding:0 24px;
+    box-sizing:border-box;
+    border:2.571px solid #d99c37;
+    border-radius:30px;
+    font-family:inherit;
+    cursor:pointer;
+    touch-action:none;
+    -webkit-tap-highlight-color:transparent;
+}
+
+#creationPage .creation-next{
+    width:100%;
+    margin-top:auto;
+    background:linear-gradient(180deg,#4c3518,#2b1c0d 55%,#1a1109);
+    color:#fff0ce;
+    box-shadow:inset 0 2.571px 0 rgba(255,236,184,.18),0 18px 46px rgba(0,0,0,.28);
+}
+
+#creationPage .creation-back{
+    width:100%;
+    background:linear-gradient(180deg,#29241d,#17130f);
+    color:#d8c8ae;
+    border-color:#745934;
+}
+
+#creationPage .creation-next span,
+#creationPage .creation-back span{
+    font-family:"Noto Serif TC",serif;
+    font-size:34px;
+    font-weight:900;
+    letter-spacing:4px;
+}
+
+#creationPage .creation-next small,
+#creationPage .creation-back small{
+    margin-top:6px;
+    color:#af9364;
+    font-family:"Cinzel",serif;
+    font-size:16px;
+    letter-spacing:4px;
+}
+
+#creationPage .creation-next:active,
+#creationPage .creation-back:active{
+    filter:brightness(.84);
 }
 
 #creationPage .creation-preview-heading{
@@ -538,6 +664,17 @@ body.creation-scroll-active,
     background:#0d0b08;
     color:#a99576;
     font-size:20.571px;
+}
+
+#creationPage .creation-step-two{
+    padding-top:34px;
+    box-sizing:border-box;
+}
+
+#creationPage .creation-stats-card{
+    position:static;
+    flex:0 0 auto;
+    margin-bottom:24px;
 }
 
 #creationPage .creation-points-badge b{
@@ -650,6 +787,28 @@ body.creation-scroll-active,
     content:"－";
 }
 
+#creationPage .creation-stat-details[open]{
+    position:absolute;
+    z-index:30;
+    left:0;
+    right:0;
+    top:20px;
+    bottom:176px;
+    margin:0;
+    padding:20px;
+    box-sizing:border-box;
+    overflow:hidden;
+    border-color:rgba(225,168,68,.55);
+    background:linear-gradient(155deg,#21192a 0%,#0d0a12 58%,#070609 100%);
+    box-shadow:0 30px 100px rgba(0,0,0,.66);
+}
+
+#creationPage .creation-stat-details[open] .creation-stat-details-body{
+    padding:12px 25px 24px;
+    font-size:23px;
+    line-height:1.55;
+}
+
 #creationPage .creation-stat-details-body{
     padding:0 25.714px 23.143px;
     color:#aa9b87;
@@ -673,7 +832,7 @@ body.creation-scroll-active,
     align-items:center;
     justify-content:center;
     width:100%;
-    height:141.429px;
+    height:132px;
     border:2.571px solid #e1a541;
     border-radius:30.857px;
     background:
@@ -684,6 +843,13 @@ body.creation-scroll-active,
         inset 0 -25.714px 46.286px rgba(0,0,0,.18),
         0 18px 46.286px rgba(0,0,0,.28),
         0 0 41.143px rgba(218,157,55,.12);
+}
+
+#creationPage .creation-action-row{
+    display:grid;
+    grid-template-columns:330px minmax(0,1fr);
+    gap:22px;
+    margin-top:auto;
 }
 
 #creationPage .creation-start span{
@@ -706,7 +872,7 @@ body.creation-scroll-active,
 }
 
 #creationPage .creation-bottom-space{
-    height:20.571px;
+    display:none;
 }
 
 /* Element themes */
