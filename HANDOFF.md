@@ -70,6 +70,32 @@ V131 的所有 override（`finishPlayerAction`、`getSkillTargets`、`learnSkill
 把新檔案排在 `js/26-v131-patrol-appearance.js` **之前**，不然 `js/26` 執行時
 還讀不到新的 chunk 資料。
 
+### 1.5 有辦法的話，一定要實際跑起來測試，不要只靠讀程式碼判斷
+
+2026-08-25 這一輪修了 7 個回報的 bug（技能欄/經驗池無法捲動、巡怪立繪變白色空白方塊、
+技能icon配錯、學習升級框太大、文字太小、形象切換按鈕太小畫質差），全部都是「讀程式碼
+看起來沒問題，但實際渲染出來是錯的」——例如：
+
+- 捲動失效的根本原因是 `js/19-stage-v78-character-inventory-runtime.js` 用
+  `getBoundingClientRect()` 量出來的螢幕座標，除以一個「這個彈窗其實根本沒有在用」
+  的 `#game-stage` 縮放係數，把可用高度誤算成快3倍大——這種bug光看程式碼邏輯完全
+  看不出問題（公式本身沒有語法錯誤，數學上也「看起來合理」），只有實際量測
+  `clientHeight` vs `getBoundingClientRect().height` 才發現兩者其實是1:1，
+  不需要換算。
+- 巡怪空白方塊是 Chromium 的一個渲染怪癖：`<img>` 只要 `src` 是一張能成功解碼的圖片
+  （就算是1x1透明GIF），疊加的CSS `background-image` 大部分區域就會被畫成白色，
+  這完全沒辦法從程式碼邏輯推論出來，只能實際渲染出來看、然後用最小重現案例
+  （同樣的CSS套在`<div>`上 vs 套在`<img>`上比較）才能鎖定問題。
+
+**環境裡已經有 Chromium + Playwright 可以用**（`/opt/pw-browsers/chromium-1194/`，
+Node.js 版playwright套件需要自己`npm install playwright`一次，
+用`PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`避免它重新下載瀏覽器）。用
+`python3 -m http.server` 把整個專案資料夾serve起來，配合Playwright寫小腳本
+（開頁面→跑完創角流程→操作到出問題的頁面→screenshot / 讀computed style /
+讀scrollTop等），是目前這個專案唯一可靠的驗證方式。**純讀程式碼、純推理
+「這樣應該會動」是不夠的**，尤其是這種疊了30幾層CSS/JS override、彼此互相
+用`!important`蓋來蓋去的架構，光用眼睛看很容易漏掉真正生效的是哪一條規則。
+
 ### 2. 大部分核心遊戲邏輯在 `js/00-main.js`（很大，約 750KB）
 
 角色/戰鬥/技能/裝備/存檔等系統的本體都在這裡，函式名稱直接沿用（`getMainCharacterStats`、
@@ -115,6 +141,43 @@ V131 的所有 override（`finishPlayerAction`、`getSkillTargets`、`learnSkill
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-25 — 修復 7 項回報問題（用實機瀏覽器測試逐一驗證）
+
+使用者實際在手機/截圖上回報的 7 個問題，這次全部用本機 Playwright + headless
+Chromium 架設測試環境，實際操作到出問題的畫面、量測 computed style / DOM
+結構，而不是只憑讀程式碼判斷，逐一根因排查後修復：
+
+1. **技能欄／經驗池頁面無法捲動** — 根因見上方「系統架構重點」第1.5節，
+   `js/19-stage-v78-character-inventory-runtime.js` 的 `applyNow()` 改成直接用
+   `body.clientHeight` 設定 `#characterTabContent` 高度，不再用
+   `getBoundingClientRect()` 除以一個不適用的縮放係數。已驗證捲動可以
+   到底（`scrollTop+clientHeight>=scrollHeight`）。
+2. **巡怪 Q 版立繪變白色空白方塊** — 根因是 Chromium 的 `<img src=非空>` +
+   CSS `background-image` 疊圖渲染 bug（跟 object-fit、素材都無關，已用
+   最小重現案例確認）。`js/26-v131-patrol-appearance.js` 改用 canvas
+   （`drawImage`+`toDataURL`）把sprite sheet裡需要的那一格實際「裁」成
+   獨立圖片再設定 `img.src`，不再疊CSS背景。這個bug其實從最早的女角版本
+   就存在，這次順便一起修掉，不是只修男角。
+3. **技能圖示配錯** — 使用者提供帶名稱標籤的參考圖，用像素比對（不是肉眼）
+   抓出5個實際配錯/遺漏的技能圖示並修正，細節見 `js/00-main.js` 裡
+   `elementSkillIconMap` 上方的註解。`earthShield` 因為它原本用的圖被證實
+   其實是 `sandWind` 的，這次拿掉了、暫時沒有圖。
+4. **技能物理/法術標籤沒顯示、學習升級框太大** — 根因是
+   `js/25-v131-fix-batch.js` 的 `decorateSkillRows()` 跟 `css/31` 的按鈕
+   縮小規則，原本鎖定的是 `.learned-skill`/`.learnable-skill` 這兩個
+   **目前版本技能頁根本不存在的 class**（真正的是 `.skill-row` /
+   `.skill-action-card`），從PR#1那次開始就沒真的生效過。已改成正確的
+   selector，技能icon的id（`skillIcon_xxx`）現在也拿來當作抓skillId的
+   主要依據，比原本猜onclick字串可靠。
+5. **技能預覽/能力值/技能列表文字太小** — 原本只在 `#characterTabContent`
+   這個祖層設font-size，但底下 `.status-row`、`.skill-row-desc`、
+   `.skill-preview-card` 這些元素各自都有自己的font-size，繼承鏈在那裡
+   就斷了。改成直接對這些真正決定畫面文字大小的class加大，沒有動任何
+   寬高。
+6. **形象切換按鈕太小、畫質差** — 按鈕從58px放大到76px；icon改成即時顯示
+   「目前真正選中的角色」裁切出來的圖（原本是寫死套用女角），畫質受限於
+   sprite sheet本身56x84的解析度，這部分沒有從根本解決，見下方已知限制。
 
 ### 2026-08-25 — 男角 Q 版巡怪背面 + 土系技能 icon
 
@@ -202,9 +265,15 @@ V131 的所有 override（`finishPlayerAction`、`getSkillTargets`、`learnSkill
 ## 已知限制 / 待辦事項
 
 - [x] ~~男角 Q 版巡怪立繪缺背面圖~~ 2026-08-25 已補上，見上方記錄
-- [ ] 土系技能 `stoneSlash`（土石斬）、`earthEX`（土元素EX，被動）
-      還沒有技能icon，`earthEX` 需要類似 `fire-ex.jpg` 那種圖上寫著
-      「EX」字樣的專用icon
+- [x] ~~土系技能 `stoneSlash`、`earthEX` 沒有icon~~ 2026-08-25 已補上
+      （分別用使用者標籤確認的圖 + 新提供的EX專用圖）
+- [ ] 土系技能 `earthShield`（萬象土盾）目前沒有icon——原本用的那張圖
+      被證實其實是 `sandWind` 的，拿掉之後這格暫時空白，等有合適的圖再補
+- [ ] 形象切換按鈕（`v131PatrolAppearanceSwitch`）的畫質受限於巡怪
+      sprite sheet本身只有56x84px，放大顯示到76px按鈕上還是會有點模糊，
+      這不是bug、是素材解析度先天限制。如果要真的改善，需要另外提供
+      一組解析度更高（例如150x225以上）的專用素材給這個按鈕用，跟
+      地圖上70x105px顯示的巡怪立繪分開處理。
 - [ ] V131 這整批修正都只做過「語法檢查 + 程式邏輯追蹤驗證」，**沒有在真實瀏覽器
       （尤其 Android Chrome 實機）上操作驗證過**。如果使用者回報某個功能「看起來沒生效」，
       優先確認是不是瀏覽器快取問題，其次才懷疑程式邏輯本身。
