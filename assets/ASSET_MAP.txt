@@ -25,7 +25,7 @@ data-uri #19 -> assets/ui/map-return.png (204251 bytes) sha256=7b04bd8526ecc09a1
 data-uri #20 -> assets/characters/patrol-character.png (84667 bytes) sha256=ed88f45910005d1ad98311b72e2fc49b83cf4f1faab3380fbb1f3f8e0d0a50d5
 data-uri #21 -> assets/battle/element-box.png (3419086 bytes) sha256=fea079821cbfabc07db207eabb3ff69612ffdb53c051caea5fe4b8eacfb0ee55
 data-uri #22 -> assets/ui/nav-backpack.png (441285 bytes) sha256=b844fbc20b91b5236e5e1f41790a34d7c05f2f9190801af5e5f9fdfcc509edf4
-data-uri #23 -> assets/ui/nav-training.png (242997 bytes) sha256=c56f7002c8cdf7f9a83ba78eb7c52b2abd242b8e4ab6f2afd242db17e1bf58ca
+data-uri #23 -> assets/ui/nav-training.png (596911 bytes) sha256=bab070173ea1a453b36c8504f7efe5e9d5bffb18c5d9cb1554dd63ba2059d011 [V130 使用者重新上傳]
 data-uri #24 -> assets/ui/nav-home.png (257573 bytes) sha256=692c58ebc556ddbad934425d30fedcf1b2b64efdea2110b8e4c8ac13a0a4032b
 data-uri #25 -> assets/ui/nav-dungeon.png (163301 bytes) sha256=2cbc2354ffc57e48e5bd81ccf195bda06c0a363ade0f06bf51a26c973145661f
 data-uri #26 -> assets/ui/nav-boss.png (220860 bytes) sha256=fc2901eceb74bac70bdd9a441f9eee41481ff44e6b194990c0d588822aea19a8
@@ -63,11 +63,11 @@ raw-js-const PATROL_FIGHT1_B64 -> assets/battle/patrol-fight-1.png (83638 bytes)
 raw-js-const PATROL_FIGHT2_B64 -> assets/battle/patrol-fight-2.png (98147 bytes) sha256=be1efc209f05d80d70d5629aa285de9d8e1a296c341084a7311aea8e18fc878a
 
 V123 使用者上傳角色立繪：
-uploaded-character -> assets/characters/female_fire.jpg (403118 bytes) sha256=9a41e0297625d302da2a5d9e9c91c743070b230ac5bd8a5888f49bb5c81f344f
-uploaded-character -> assets/characters/female_water.jpg (394670 bytes) sha256=2ceb1951563382e5771d6b98e65c1abe7a350e86570075fd92fad3def1eea959
-uploaded-character -> assets/characters/female_wind.jpg (358942 bytes) sha256=b15d1101d71dc26d599612b0cbcd0a6f2c53933067b7d2ec086ff3b48e364bdc
-uploaded-character -> assets/characters/female_earth.jpg (410671 bytes) sha256=5cc107183ac37587b6e98639408879786c78ac40252412e5978a9eb5f29e52ab
-uploaded-character -> assets/characters/male_fire.jpg (458923 bytes) sha256=75a038dfa1e397be9f46b4a8588c6f9b99ef0a2fade7ddb32a030bd9cb7c5033
-uploaded-character -> assets/characters/male_water.jpg (468717 bytes) sha256=cad4913dcc623548ce0eafb4a62c5e2dd5b87420d041bc40b4d2dba205b08e7a
-uploaded-character -> assets/characters/male_wind.jpg (459914 bytes) sha256=aabd352bf01bf93772730b22dfe701c355cab7817a3d1271455d0c4a3f204c6e
-uploaded-character -> assets/characters/male_earth.jpg (494141 bytes) sha256=081b81014dd8f80172bd9cfda7f02547e78a52304f1a3a62029a8eade7732c33
+uploaded-character -> assets/characters/female_fire.jpg (506412 bytes) sha256=9bf0580e1c04975f2607c7f36a1a5d1a4f1a3eb91d7afc654ba5294f26b4d827 [V130]
+uploaded-character -> assets/characters/female_water.jpg (497357 bytes) sha256=d1a903b2cbd6093c3e6f1d98781436365fce2997c127da512121ee7d030bed9d [V130]
+uploaded-character -> assets/characters/female_wind.jpg (414943 bytes) sha256=6600198db5695574ac2c709fdbc897ba730576d7928c66deaa3250a4dbd4c05c [V130]
+uploaded-character -> assets/characters/female_earth.jpg (454737 bytes) sha256=263cdadc095c30f4055a4855e27504ca6f5605c1bf9f982a5e7459fd4447f91d [V130]
+uploaded-character -> assets/characters/male_fire.jpg (549452 bytes) sha256=a269c72a396d6ddb7115bf6f0120d1b0ada847e861654b93044d87f1d0019832 [V130]
+uploaded-character -> assets/characters/male_water.jpg (568385 bytes) sha256=31696971afefa6f715d453c7391593831c71f72868b70e07beb82a2b69e2d25e [V130]
+uploaded-character -> assets/characters/male_wind.jpg (486566 bytes) sha256=6f512795734637240b2c4b50a5a65e5926fa6b3a4af2c61ded2168e2f667145d [V130]
+uploaded-character -> assets/characters/male_earth.jpg (479971 bytes) sha256=3fc06609e5398cfb755caf9c6c136d7e9fdf6c45d5c1be8d399f03ab8ccfee0c [V130]

@@ -272,6 +272,8 @@ window.eventToGamePoint = getGamePointFromEvent;
 const SAVE_KEY =
     "battle_full_version_save_v5";
 
+let deleteAllCharactersInProgress=false;
+
 
 const START_ATTRIBUTE_POINTS = 10;
 
@@ -362,6 +364,14 @@ function getElementIconHTML(elementKey){
 
 let selectedCreationElement =
     "fire";
+
+
+/*
+   V130：三個角色共用同一套創角畫面。
+   1=第一角色、2=第二角色、3=第三角色。
+   第二／三角色不再維護另一份縮小版 modal。
+*/
+let creationTargetSlot=1;
 
 
 /* =====================================================
@@ -2145,21 +2155,21 @@ function hasActiveBuff(
    因為裝備欄是用角色id存的，不是元素）。
 */
 
-function getPlayer2BattleStats(){
+function getAdditionalCharacterBattleStats(character,characterKey){
 
-    if(!player2){ return null; }
+    if(!character || !characterKey){ return null; }
 
-    const bonus=getEquipmentBonus("player2");
+    const bonus=getEquipmentBonus(characterKey);
 
-    const effectiveAttackPoints=getEffectivePlayerAbilityPoints(player2,bonus,"attack");
-    const effectiveVitality=getEffectivePlayerAbilityPoints(player2,bonus,"vitality");
-    const effectiveEnergy=getEffectivePlayerAbilityPoints(player2,bonus,"energy");
-    const effectiveIntelligence=getEffectivePlayerAbilityPoints(player2,bonus,"intelligence");
-    const effectiveSpirit=getEffectivePlayerAbilityPoints(player2,bonus,"spirit");
-    const effectiveAgility=getEffectivePlayerAbilityPoints(player2,bonus,"agility");
+    const effectiveAttackPoints=getEffectivePlayerAbilityPoints(character,bonus,"attack");
+    const effectiveVitality=getEffectivePlayerAbilityPoints(character,bonus,"vitality");
+    const effectiveEnergy=getEffectivePlayerAbilityPoints(character,bonus,"energy");
+    const effectiveIntelligence=getEffectivePlayerAbilityPoints(character,bonus,"intelligence");
+    const effectiveSpirit=getEffectivePlayerAbilityPoints(character,bonus,"spirit");
+    const effectiveAgility=getEffectivePlayerAbilityPoints(character,bonus,"agility");
 
-    const windEXLevel=getSkillLevel("player2","windEX");
-    const earthEXLevel=getSkillLevel("player2","earthEX");
+    const windEXLevel=getSkillLevel(characterKey,"windEX");
+    const earthEXLevel=getSkillLevel(characterKey,"earthEX");
 
     const evasionPassivePercent=windEXLevel>0
         ? (skillDatabase.windEX.evasionBonusPercent||0)
@@ -2168,9 +2178,9 @@ function getPlayer2BattleStats(){
         ? (skillDatabase.earthEX.defenseBonusPercent||0)
         : 0;
 
-    const evasionBuffPercent=getActiveBuffPercent(player2,"dodgeSkill");
-    const defenseBuffPercent=getActiveBuffPercent(player2,"rockWall");
-    const defenseDownPercent=getPlayerDefenseDownPercent(player2);
+    const evasionBuffPercent=getActiveBuffPercent(character,"dodgeSkill");
+    const defenseBuffPercent=getActiveBuffPercent(character,"rockWall");
+    const defenseDownPercent=getPlayerDefenseDownPercent(character);
 
     const rawDefense=(
         10+
@@ -2185,14 +2195,14 @@ function getPlayer2BattleStats(){
     return {
         maxHP:
             100+
-            (player2.vitality+(Number(bonus.vitality)||0))*50+
-            player2.bonusHP+
+            (character.vitality+(Number(bonus.vitality)||0))*50+
+            (Number(character.bonusHP)||0)+
             (Number(bonus.maxHP)||0),
 
         maxSP:
             50+
-            (player2.energy+(Number(bonus.energy)||0))*15+
-            player2.bonusSP+
+            (character.energy+(Number(bonus.energy)||0))*15+
+            (Number(character.bonusSP)||0)+
             (Number(bonus.maxSP)||0),
 
         attack:
@@ -2225,6 +2235,24 @@ function getPlayer2BattleStats(){
         agility:effectiveAgility
     };
 
+}
+
+
+function getPlayer2BattleStats(){
+    return getAdditionalCharacterBattleStats(player2,"player2");
+}
+
+
+function getPlayer3BattleStats(){
+    return getAdditionalCharacterBattleStats(player3,"player3");
+}
+
+
+function getPartyBattleStats(index){
+    if(index===0){ return getMainCharacterStats(); }
+    if(index===1){ return getPlayer2BattleStats(); }
+    if(index===2){ return getPlayer3BattleStats(); }
+    return null;
 }
 
 
@@ -2394,14 +2422,14 @@ const skillDatabase = {
     stormFlurry:{
         id:"stormFlurry", tier:2, name:"暴風亂擊", element:"wind", category:"physical", targetType:"tri",
         learnCost:10, maxLevel:5, baseDamage:28, damagePerLevel:7, spCost:20,
-        description:"對同一橫排左、中、右最多3名目標各造成28點基礎傷害；50%機率降低所有能力值2回合，降低10%/12%/15%/20%/30%。",
-        statDownChance:50, statDownByLevel:[10,12,15,20,30], statDownDuration:2, requires:["stormFist"]
+        description:"對同一橫排左、中、右最多3名目標各造成28點基礎傷害；50%機率降低目標造成的傷害1回合，降低15%/18%/21%/25%/30%。",
+        damageDownChance:50, damageDownByLevel:[15,18,21,25,30], damageDownDuration:1, requires:["stormFist"]
     },
     windCrossSlash:{
         id:"windCrossSlash", tier:3, name:"風旋十字斬", element:"wind", category:"physical", targetType:"single",
         learnCost:15, maxLevel:5, baseDamage:90, damagePerLevel:12, spCost:39,
-        description:"對單體造成90點基礎傷害；65%機率降低所有能力值2回合，降低10%/12%/15%/20%/30%。",
-        statDownChance:65, statDownByLevel:[10,12,15,20,30], statDownDuration:2, requires:["stormFlurry"]
+        description:"對單體造成90點基礎傷害；65%機率降低目標造成的傷害1回合，降低15%/20%/25%/30%/35%。",
+        damageDownChance:65, damageDownByLevel:[15,20,25,30,35], damageDownDuration:1, requires:["stormFlurry"]
     },
     dizzyFist:{
         id:"dizzyFist", tier:4, name:"暈眩猛擊", element:"wind", category:"physical", targetType:"single",
@@ -3658,6 +3686,12 @@ let timer=20;
 
 let timerId=null;
 
+/* Every declare/resolve step owns one deterministic advance timer. */
+let battleAdvanceTimeoutId=null;
+let battleAdvanceScheduled=false;
+const BATTLE_DECLARE_ADVANCE_MS=90;
+const BATTLE_RESOLVE_ADVANCE_MS=520;
+
 let monsterMoveId=null;
 
 let respawnId=null;
@@ -3869,6 +3903,22 @@ const autoConfig2 = {
 };
 
 
+/* 第三角色使用獨立的自動戰鬥／戰後補給設定。 */
+const autoConfig3 = {
+
+    enabled:false,
+
+    skill:"normal",
+
+    hp:50,
+
+    sp:25,
+
+    returnToCityWhenEmpty:false
+
+};
+
+
 /* V111：HP／SP 自動補給門檻統一為 25／50／75／90／100%。
    舊存檔可能仍保存 20、30、40、60、70、80 等值；
    讀到舊值時取最接近的新門檻，避免下拉選單出現空白。 */
@@ -3921,14 +3971,15 @@ let statusCharacterIndex=0;
 
 function getStatusCharacterObject(){
 
-    return (
-        statusCharacterIndex===1 &&
-        player2
-    )
-    ?
-    player2
-    :
-    player;
+    if(statusCharacterIndex===2 && player3){
+        return player3;
+    }
+
+    if(statusCharacterIndex===1 && player2){
+        return player2;
+    }
+
+    return player;
 
 }
 
@@ -3947,6 +3998,64 @@ let selectedInventorySlot =
 
 function $(id){
     return document.getElementById(id);
+}
+
+
+/* =====================================================
+   V130 — 三角色共用索引／戰鬥資料
+===================================================== */
+
+function getPartyCharacterByIndex(index){
+    if(index===0){ return player; }
+    if(index===1){ return player2; }
+    if(index===2){ return player3; }
+    return null;
+}
+
+
+function getPartyCharacterKey(index){
+    if(index===0){ return "fire"; }
+    if(index===1){ return "player2"; }
+    if(index===2){ return "player3"; }
+    return null;
+}
+
+
+function getPartyAutoConfig(index){
+    if(index===1){ return autoConfig2; }
+    if(index===2){ return autoConfig3; }
+    return autoConfig;
+}
+
+
+function getPartyCharacterIndex(character){
+    if(character===player){ return 0; }
+    if(character===player2){ return 1; }
+    if(character===player3){ return 2; }
+    return -1;
+}
+
+
+function getExistingPartyIndexes(){
+    return [0,1,2].filter(index=>!!getPartyCharacterByIndex(index));
+}
+
+
+function getCharacterArtworkPath(character){
+    if(!character){ return ""; }
+
+    const gender=character.gender==="male" ? "male" : "female";
+    const element=elementDatabase[character.element]
+        ? character.element
+        : "fire";
+
+    return "assets/characters/"+gender+"_"+element+".jpg";
+}
+
+
+function getCharacterDisplayNameByIndex(index){
+    const character=getPartyCharacterByIndex(index);
+    return character ? (character.id||("角色"+(index+1))) : ("角色"+(index+1));
 }
 
 
@@ -5049,7 +5158,245 @@ function updateCreationUI2(){
 }
 
 
+function isThirdCharacterUnlocked(){
+    return !!(
+        player2 &&
+        player.level>=50 &&
+        player2.level>=50
+    );
+}
+
+
+function updateCreationScreenContext(){
+    const subtitle=$("creationContextSubtitle");
+    const submitLabel=$("creationSubmitLabel");
+    const cancelButton=$("creationCancelButton");
+
+    const ordinal=
+        creationTargetSlot===3
+        ? "第三名"
+        : creationTargetSlot===2
+        ? "第二名"
+        : "第一名";
+
+    if(subtitle){
+        subtitle.textContent=
+            "選擇你的元素之道，建立"+ordinal+"冒險者";
+    }
+
+    if(submitLabel){
+        submitLabel.textContent=
+            creationTargetSlot===1
+            ? "開始冒險"
+            : "完成創建";
+    }
+
+    if(cancelButton){
+        cancelButton.hidden=creationTargetSlot===1;
+    }
+}
+
+
+function resetSharedCreationForm(){
+    selectedCreationElement="fire";
+    creationPoints=START_ATTRIBUTE_POINTS;
+
+    Object.keys(creationStats).forEach(stat=>{
+        creationStats[stat]=0;
+    });
+
+    const idInput=$("creationId");
+    if(idInput){ idInput.value=""; }
+
+    selectElement("fire");
+
+    if(typeof selectCreationGender==="function"){
+        selectCreationGender("female");
+    }
+
+    if(typeof setCreationStep==="function"){
+        setCreationStep(1);
+    }
+
+    updateCreationUI();
+    updateCreationScreenContext();
+}
+
+
+function openCharacterCreation(slotNumber){
+    const slot=Number(slotNumber);
+
+    if(battleActive || ![2,3].includes(slot)){
+        return;
+    }
+
+    if(slot===2){
+        if(player2){ return; }
+        if(player.level<10){
+            alert("第一角色達到 Lv.10 後才能建立第二角色。");
+            return;
+        }
+    }
+
+    if(slot===3){
+        if(player3){ return; }
+        if(!isThirdCharacterUnlocked()){
+            alert("第一、第二角色都達到 Lv.50 後才能建立第三角色。");
+            return;
+        }
+    }
+
+    closeHomeFeature();
+    creationTargetSlot=slot;
+    resetSharedCreationForm();
+    showCreation();
+}
+
+
+function cancelAdditionalCharacterCreation(){
+    if(creationTargetSlot===1){
+        return;
+    }
+
+    creationTargetSlot=1;
+    $("creationPage").style.display="none";
+    $("gameInterface").style.display="block";
+    updateCreationScreenContext();
+
+    if(typeof window.syncCreationTouchMode==="function"){
+        window.syncCreationTouchMode();
+    }
+
+    showPage("home");
+    openHomeFeature("character");
+}
+
+
+function buildAdditionalCharacter(id,element,gender){
+    const character={
+        id:id,
+        element:element,
+        gender:gender==="male" ? "male" : "female",
+        level:1,
+        exp:0,
+        expNext:100,
+        attack:creationStats.attack,
+        vitality:creationStats.vitality,
+        energy:creationStats.energy,
+        intelligence:creationStats.intelligence,
+        spirit:creationStats.spirit,
+        agility:creationStats.agility,
+        bonusHP:0,
+        bonusSP:0,
+        attributePoints:creationPoints,
+        skillPoints:0,
+        hp:100+creationStats.vitality*50,
+        sp:50+creationStats.energy*15,
+        activeBuffs:[],
+        statusEffects:[],
+        isDefending:false
+    };
+
+    return character;
+}
+
+
+function registerAdditionalCharacter(slotNumber,character){
+    const characterKey=slotNumber===3 ? "player3" : "player2";
+    const existing=characters.find(entry=>entry.id===characterKey);
+
+    if(existing){
+        existing.name=character.id;
+    }
+    else{
+        characters.push({id:characterKey,name:character.id});
+    }
+
+    characterEquipment[characterKey]={
+        head:null,
+        hand:null,
+        shoulder:null,
+        armor:null,
+        shoes:null,
+        ring:null
+    };
+
+    characterSkillLoadouts[characterKey]={
+        name:character.id,
+        skillLevels:{},
+        equippedSkills:[]
+    };
+}
+
+
+function createAdditionalCharacter(slotNumber){
+    const id=$("creationId").value.trim();
+
+    if(!id){
+        alert("請先輸入角色 ID。");
+        return;
+    }
+
+    if(id.length<2){
+        alert("ID至少需要2個字元。");
+        return;
+    }
+
+    const duplicated=getCharacters().some(character=>character.id===id);
+    if(duplicated){
+        alert("角色 ID 不能與現有角色重複。");
+        return;
+    }
+
+    Object.keys(creationStats).forEach(stat=>{
+        creationStats[stat]=Math.max(0,Number(creationStats[stat])||0);
+    });
+
+    const page=$("creationPage");
+    const gender=page && page.dataset.gender==="male" ? "male" : "female";
+    const character=buildAdditionalCharacter(
+        id,
+        selectedCreationElement,
+        gender
+    );
+
+    if(slotNumber===3){
+        player3=character;
+    }
+    else{
+        player2=character;
+    }
+
+    registerAdditionalCharacter(slotNumber,character);
+
+    $("creationPage").style.display="none";
+    $("gameInterface").style.display="block";
+
+    const createdSlot=slotNumber;
+    creationTargetSlot=1;
+    updateCreationScreenContext();
+
+    updateUI();
+    renderInventory();
+    renderSkillLoadout();
+    saveGame();
+
+    if(typeof window.syncCreationTouchMode==="function"){
+        window.syncCreationTouchMode();
+    }
+
+    showPage("home");
+    openHomeFeature("character");
+    selectCharacterForTabs(createdSlot-1);
+
+    alert("「"+character.id+"」創建完成！");
+}
+
+
 function openSecondCharacterModal(){
+
+    openCharacterCreation(2);
+    return;
 
     if(
         battleActive ||
@@ -5348,6 +5695,11 @@ function createSecondCharacter(){
 
 function createCharacter(){
 
+    if(creationTargetSlot===2 || creationTargetSlot===3){
+        createAdditionalCharacter(creationTargetSlot);
+        return;
+    }
+
     const id =
         $("creationId")
         .value
@@ -5506,6 +5858,10 @@ function createCharacter(){
 
 function saveGame(){
 
+    if(deleteAllCharactersInProgress){
+        return;
+    }
+
     try{
 
         normalizeInventoryStacks();
@@ -5602,6 +5958,9 @@ function saveGame(){
 
             autoConfig2:
                 autoConfig2,
+
+            autoConfig3:
+                autoConfig3,
 
             inventoryItems:
                 inventoryItems
@@ -6038,11 +6397,23 @@ function loadGame(){
         }
 
 
+        if(data.autoConfig3){
+
+            Object.assign(
+                autoConfig3,
+                data.autoConfig3
+            );
+
+        }
+
+
         /* V111：舊存檔門檻遷移到 25／50／75／90／100%。 */
         autoConfig.hp=normalizeAutoBattleThreshold(autoConfig.hp,50);
         autoConfig.sp=normalizeAutoBattleThreshold(autoConfig.sp,25);
         autoConfig2.hp=normalizeAutoBattleThreshold(autoConfig2.hp,50);
         autoConfig2.sp=normalizeAutoBattleThreshold(autoConfig2.sp,25);
+        autoConfig3.hp=normalizeAutoBattleThreshold(autoConfig3.hp,50);
+        autoConfig3.sp=normalizeAutoBattleThreshold(autoConfig3.sp,25);
 
 
         /*
@@ -6434,6 +6805,8 @@ function showCreation(){
 
     updateCreationUI();
 
+    updateCreationScreenContext();
+
 }
 
 
@@ -6451,6 +6824,12 @@ function resetGame(){
         return;
     }
 
+    deleteAllCharactersInProgress=true;
+
+    if(autosaveIntervalId){
+        clearInterval(autosaveIntervalId);
+        autosaveIntervalId=null;
+    }
 
     localStorage.removeItem(
         SAVE_KEY
@@ -6464,6 +6843,11 @@ function resetGame(){
         "battle_full_version_save_v3"
     );
 
+    creationTargetSlot=1;
+
+    if(typeof window.allowGameNavigation==="function"){
+        window.allowGameNavigation();
+    }
 
     location.reload();
 
@@ -9124,6 +9508,12 @@ function startBattle(triggerIndex){
 
     clearInterval(timerId);
 
+    if(battleAdvanceTimeoutId){
+        clearTimeout(battleAdvanceTimeoutId);
+        battleAdvanceTimeoutId=null;
+    }
+    battleAdvanceScheduled=false;
+
 
     /*
        ★ 新增（依照使用者回報）：
@@ -9201,12 +9591,13 @@ function startBattle(triggerIndex){
             getPlayer2BattleStats();
 
 
-        player2.hp=
-            stats2.maxHP;
+        player2.hp=Number.isFinite(Number(player2.hp))
+            ? Math.max(0,Math.min(stats2.maxHP,Number(player2.hp)))
+            : stats2.maxHP;
 
-
-        player2.sp=
-            stats2.maxSP;
+        player2.sp=Number.isFinite(Number(player2.sp))
+            ? Math.max(0,Math.min(stats2.maxSP,Number(player2.sp)))
+            : stats2.maxSP;
 
 
         player2.activeBuffs=[];
@@ -9214,6 +9605,23 @@ function startBattle(triggerIndex){
         player2.statusEffects=[];
 
         player2.isDefending=false;
+
+    }
+
+    if(player3){
+
+        const stats3=
+            getPartyBattleStats(2);
+
+        player3.hp=Number.isFinite(Number(player3.hp))
+            ? Math.max(0,Math.min(stats3.maxHP,Number(player3.hp)))
+            : stats3.maxHP;
+        player3.sp=Number.isFinite(Number(player3.sp))
+            ? Math.max(0,Math.min(stats3.maxSP,Number(player3.sp)))
+            : stats3.maxSP;
+        player3.activeBuffs=[];
+        player3.statusEffects=[];
+        player3.isDefending=false;
 
     }
 
@@ -9437,32 +9845,6 @@ function startTurn(token){
 
 
     /*
-       ★ 除錯用（依照使用者回報，追蹤
-       「連續跳兩回合」是不是還有沒堵到的
-       路徑）：印出這次呼叫的呼叫者是誰、
-       呼叫當下的turn數值。等這次真的抓到
-       之後可以拿掉。
-    */
-
-    const startTurnCallerLine=
-        (
-            (new Error()).stack||
-            ""
-        )
-        .split("\n")[2]
-        ||
-        "（抓不到呼叫堆疊）";
-
-
-    addBattleLog(
-        "startTurn被呼叫，turn="+
-        turn+
-        "，呼叫者："+
-        startTurnCallerLine.trim()
-    );
-
-
-    /*
        ★ 新增（依照使用者要求）：
        每個大回合開始的時候，在戰鬥紀錄
        加一行「第X回合，開始！」，
@@ -9586,25 +9968,10 @@ function startTurn(token){
 */
 
 function getLivingParty(){
-
-    const party=[
-        player
-    ];
-
-
-    if(
-        player2 &&
-        player2.hp>0
-    ){
-
-        party.push(
-            player2
-        );
-
-    }
-
-
-    return party;
+    return getExistingPartyIndexes().filter(index=>{
+        const character=getPartyCharacterByIndex(index);
+        return character && character.hp>0;
+    });
 
 }
 
@@ -9674,14 +10041,15 @@ function beginCharacterTurn(token){
        就不再等新的輸入，直接進入結算階段。
     */
 
-    const declarationParty=
-        getLivingParty();
+    while(activeBattleCharacterIndex<3){
+        const candidate=getPartyCharacterByIndex(activeBattleCharacterIndex);
+        if(candidate && candidate.hp>0){
+            break;
+        }
+        activeBattleCharacterIndex++;
+    }
 
-
-    if(
-        activeBattleCharacterIndex>=
-        declarationParty.length
-    ){
+    if(activeBattleCharacterIndex>=3){
 
         startResolutionPhase(
             token
@@ -9723,12 +10091,7 @@ function beginCharacterTurn(token){
     */
 
     const currentActingCharacter=
-
-        activeBattleCharacterIndex===1
-        ?
-        player2
-        :
-        player;
+        getPartyCharacterByIndex(activeBattleCharacterIndex);
 
 
     if(currentActingCharacter){
@@ -9750,18 +10113,10 @@ function beginCharacterTurn(token){
     updateTimer();
 
 
-    const isPlayer2Turn=
-
-        activeBattleCharacterIndex===1;
-
-
     const autoOn=
-
-        isPlayer2Turn
-        ?
-        autoConfig2.enabled
-        :
-        autoBattle;
+        activeBattleCharacterIndex===0
+        ? autoBattle
+        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
 
     /*
@@ -9878,32 +10233,10 @@ function beginCharacterTurn(token){
 
             try{
 
-                if(isPlayer2Turn){
-
-                    /*
-                       ★ 修正：
-                       player2AutoAction()現在自己
-                       會呼叫finishPlayerAction()
-                       （因為它內部有好幾條不同分支，
-                       各自要在正確的時機推進），
-                       這裡不能再額外呼叫一次，
-                       不然會變成同一個行動
-                       被結束兩次，角色索引錯亂、
-                       直接跳過下一位。
-                    */
-
-                    player2AutoAction(
-                        token
-                    );
-
-                }
-                else{
-
-                    autoAction(
-                        token
-                    );
-
-                }
+                autoActionForCharacter(
+                    activeBattleCharacterIndex,
+                    token
+                );
 
             }
             catch(error){
@@ -9962,13 +10295,10 @@ function populateSkillQuickBar(){
         return;
     }
 
-    const isPlayer2Turn=
-        activeBattleCharacterIndex===1;
-
     const autoOn=
-        isPlayer2Turn
-        ? autoConfig2.enabled
-        : autoBattle;
+        activeBattleCharacterIndex===0
+        ? autoBattle
+        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
     if(
         !battleActive ||
@@ -9979,14 +10309,10 @@ function populateSkillQuickBar(){
     }
 
     const activeCharacterId=
-        isPlayer2Turn
-        ? "player2"
-        : "fire";
+        getPartyCharacterKey(activeBattleCharacterIndex);
 
     const activeCharacterObj=
-        isPlayer2Turn
-        ? player2
-        : player;
+        getPartyCharacterByIndex(activeBattleCharacterIndex);
 
     const character=
         characterSkillLoadouts[
@@ -10281,17 +10607,14 @@ function clearBattleTargetSelectionMode(){
    不再寫死只對角色一號自己生效。全體技能仍直接宣告，不多一步選擇。
 ===================================================== */
 function getBattleCharacterByIndex(index){
-    if(index===0){ return player; }
-    if(index===1){ return player2; }
-    return null;
+    return getPartyCharacterByIndex(index);
 }
 
 function isValidAllyTargetForSkill(skill,character,index){
     if(!skill || !character){ return false; }
 
     if(skill.targetType==="deadAlly"){
-        /* 主角死亡會立即戰敗，目前能復活的場上對象是其他隊友。 */
-        return index!==0 && character.hp<=0;
+        return character.hp<=0;
     }
 
     return character.hp>0;
@@ -10313,7 +10636,7 @@ function setBattleAllyTargetSelectionMode(actionType){
         if(card){ card.classList.remove("targetable","target"); }
     });
 
-    [0,1].forEach(index=>{
+    [0,1,2].forEach(index=>{
         const character=getBattleCharacterByIndex(index);
         const card=$("battlePlayerCard"+index);
         if(card){
@@ -10405,7 +10728,7 @@ function returnFromBattleTargetSelection(){
 
 function clearActiveCharacterHighlight(){
 
-    [0,1].forEach(i=>{
+    [0,1,2].forEach(i=>{
         const card=$("battlePlayerCard"+i);
         if(card){
             card.classList.remove(
@@ -10420,7 +10743,7 @@ function updateActiveCharacterHighlight(){
 
     for(
         let i=0;
-        i<2;
+        i<3;
         i++
     ){
 
@@ -10562,27 +10885,13 @@ function prepareAction(type){
        用對應角色的技能點/SP/自動狀態來判斷。
     */
 
-    const isPlayer2Turn=
-
-        activeBattleCharacterIndex===1;
-
-
     const activeCharacter=
-
-        isPlayer2Turn
-        ?
-        player2
-        :
-        player;
-
+        getPartyCharacterByIndex(activeBattleCharacterIndex);
 
     const autoOn=
-
-        isPlayer2Turn
-        ?
-        autoConfig2.enabled
-        :
-        autoBattle;
+        activeBattleCharacterIndex===0
+        ? autoBattle
+        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
 
     if(
@@ -10650,9 +10959,9 @@ function prepareAction(type){
             skill.category==="revive"
         ){
 
-            if(isPlayer2Turn){
+            if(activeBattleCharacterIndex!==0){
                 addBattleLog(
-                    "第二角色目前還不支援手動施放這個技能。"
+                    "追加角色目前僅支援手動施放攻擊技能。"
                 );
                 return;
             }
@@ -10660,7 +10969,7 @@ function prepareAction(type){
             /* 單體我方技能先選角色；全體技能維持直接宣告。 */
             if(skill.targetType==="ally" || skill.targetType==="deadAlly"){
 
-                const hasValidTarget=[0,1].some(index=>
+                const hasValidTarget=[0,1,2].some(index=>
                     isValidAllyTargetForSkill(
                         skill,
                         getBattleCharacterByIndex(index),
@@ -10769,18 +11078,10 @@ function selectBattleTarget(index){
        用對應角色的自動開關來判斷。
     */
 
-    const isPlayer2Turn=
-
-        activeBattleCharacterIndex===1;
-
-
     const autoOn=
-
-        isPlayer2Turn
-        ?
-        autoConfig2.enabled
-        :
-        autoBattle;
+        activeBattleCharacterIndex===0
+        ? autoBattle
+        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
 
     if(
@@ -11405,38 +11706,16 @@ function buildInitiativeQueue(){
 
     const list=[];
 
-
-    list.push({
-
-        type:"player",
-
-        characterIndex:0,
-
-        agility:
-            getMainCharacterStats()
-            .agility
-
-    });
-
-
-    if(
-        player2 &&
-        player2.hp>0
-    ){
+    getExistingPartyIndexes().forEach(characterIndex=>{
+        const character=getPartyCharacterByIndex(characterIndex);
+        if(!character || character.hp<=0){ return; }
 
         list.push({
-
             type:"player",
-
-            characterIndex:1,
-
-            agility:
-                getPlayer2BattleStats()
-                .agility
-
+            characterIndex:characterIndex,
+            agility:getPartyBattleStats(characterIndex).agility
         });
-
-    }
+    });
 
 
     currentBattleMonsters.forEach(
@@ -11605,7 +11884,7 @@ function startResolutionPhase(token){
        這樣防禦一定會在任何怪物出手之前就已經生效。
     */
 
-    [0,1].forEach(
+    [0,1,2].forEach(
         characterIndex=>{
 
             const queued=
@@ -11823,12 +12102,7 @@ function processNextCombatant(token){
         */
 
         const character=
-
-            entry.characterIndex===1
-            ?
-            player2
-            :
-            player;
+            getPartyCharacterByIndex(entry.characterIndex);
 
 
         if(
@@ -11855,9 +12129,7 @@ function processNextCombatant(token){
                 "被冰封，無法行動。"
             );
 
-            setTimeout(()=>{
-                finishPlayerAction();
-            },700);
+            finishPlayerAction();
 
             return;
         }
@@ -11869,9 +12141,7 @@ function processNextCombatant(token){
                 "被石化，無法行動。"
             );
 
-            setTimeout(()=>{
-                finishPlayerAction();
-            },700);
+            finishPlayerAction();
 
             return;
         }
@@ -11945,9 +12215,8 @@ function resolveQueuedPlayerAction(characterIndex,token){
     }
 
 
-    const isPlayer2=
-
-        characterIndex===1;
+    const isAdditionalCharacter=
+        characterIndex>0;
 
 
     /*
@@ -12081,33 +12350,25 @@ function resolveQueuedPlayerAction(characterIndex,token){
     }
 
 
-    if(isPlayer2){
+    if(isAdditionalCharacter){
 
         try{
 
             if(queued.action==="normal"){
 
-                player2NormalAttack(
+                secondaryCharacterNormalAttack(
+                    characterIndex,
                     queued.target
                 );
-
-
-                updateUI();
-
-                finishPlayerAction();
 
             }
             else{
 
-                castPlayer2Skill(
+                castSecondaryCharacterSkill(
+                    characterIndex,
                     queued.action,
                     queued.target
                 );
-
-
-                updateUI();
-
-                finishPlayerAction();
 
             }
 
@@ -13471,46 +13732,6 @@ function applySkillDebuffEffects(
 
 
     if(
-        skill.damageDownChance &&
-        skill.damageDownByLevel
-    ){
-
-        const hit=
-            rollStatusEffectHit(
-                skill.damageDownChance,
-                casterLevel,
-                targetCharacter.level,
-                casterIntelligence,
-                targetFinalSpirit,
-                false,
-                "regular",
-                getPlayerStatusResistBonus(targetCharacter)
-            );
-
-
-        if(hit){
-
-            applyMonsterDebuff(
-                targetCharacter,
-                "damageDown",
-                skill.damageDownDuration||1,
-                skill.damageDownByLevel[
-                    level-1
-                ]
-            );
-
-
-            addBattleLog(
-                targetName+
-                "造成的傷害降低了！"
-            );
-
-        }
-
-    }
-
-
-    if(
         skill.defenseDownChance &&
         skill.defenseDownByLevel
     ){
@@ -13669,17 +13890,11 @@ function applySkillDebuffEffects(
    這樣裝備面板顯示的精神、異常抗性，與實戰完全一致。
 */
 function getFinalBattleSpiritForPlayerTarget(targetCharacter,targetIndex){
-    if(targetIndex===0 || targetCharacter===player){
-        const stats=getMainCharacterStats();
-        return stats ? stats.spirit : (targetCharacter.spirit||0);
-    }
-
-    if(targetIndex===1 || targetCharacter===player2){
-        const stats=getPlayer2BattleStats();
-        return stats ? stats.spirit : (targetCharacter.spirit||0);
-    }
-
-    return Number(targetCharacter&&targetCharacter.spirit)||0;
+    const index=getPartyCharacterIndex(targetCharacter)>=0
+        ? getPartyCharacterIndex(targetCharacter)
+        : targetIndex;
+    const stats=getPartyBattleStats(index);
+    return stats ? stats.spirit : (Number(targetCharacter&&targetCharacter.spirit)||0);
 }
 
 
@@ -13787,6 +14002,46 @@ function applySkillDebuffEffectsToPlayer(
             addBattleLog(
                 targetName+
                 "的全屬性降低了！"
+            );
+
+        }
+
+    }
+
+
+    if(
+        skill.damageDownChance &&
+        skill.damageDownByLevel
+    ){
+
+        const hit=
+            rollStatusEffectHit(
+                skill.damageDownChance,
+                casterLevel,
+                targetCharacter.level,
+                casterIntelligence,
+                targetFinalSpirit,
+                false,
+                "regular",
+                getPlayerStatusResistBonus(targetCharacter)
+            );
+
+
+        if(hit){
+
+            applyMonsterDebuff(
+                targetCharacter,
+                "damageDown",
+                skill.damageDownDuration||1,
+                skill.damageDownByLevel[
+                    level-1
+                ]
+            );
+
+
+            addBattleLog(
+                targetName+
+                "造成的傷害降低了！"
             );
 
         }
@@ -14236,10 +14491,10 @@ function tickStatusEffects(){
        loseBattle()，避免跟主流程重複觸發）。
     */
 
-    [
-        {character:player, index:0},
-        {character:player2, index:1}
-    ].forEach(
+    getExistingPartyIndexes().map(index=>({
+        character:getPartyCharacterByIndex(index),
+        index:index
+    })).forEach(
         entry=>{
 
             const character=
@@ -14332,12 +14587,7 @@ function tickStatusEffects(){
 
 
                         const targetStats=
-
-                            charIndex===0
-                            ?
-                            getMainCharacterStats()
-                            :
-                            getPlayer2BattleStats();
+                            getPartyBattleStats(charIndex);
 
 
                         let burnDamage=
@@ -14470,24 +14720,17 @@ function calculateAntiCritPercent(spiritPoints){
 }
 
 function getCriticalStatPoints(character,category){
+    const partyIndex=getPartyCharacterIndex(character);
+    const partyStats=partyIndex>=0
+        ? getPartyBattleStats(partyIndex)
+        : null;
+
     if(category==="magic"){
-        if(character===player){
-            return getMainCharacterStats().intelligence||0;
-        }
-        if(character===player2){
-            const stats2=getPlayer2BattleStats();
-            return stats2 ? (stats2.intelligence||0) : 0;
-        }
+        if(partyStats){ return partyStats.intelligence||0; }
         return (character&&character.intelligence)||0;
     }
 
-    if(character===player){
-        return getMainCharacterStats().attackPoints||0;
-    }
-    if(character===player2){
-        const stats2=getPlayer2BattleStats();
-        return stats2 ? (stats2.attackPoints||0) : 0;
-    }
+    if(partyStats){ return partyStats.attackPoints||partyStats.attack||0; }
 
     return (character&&character.attack)||0;
 }
@@ -15653,7 +15896,9 @@ function castHealSkill(skillId,targetIndex){
         return;
     }
 
-    const resolvedTargetIndex=(targetIndex===1 && player2) ? 1 : 0;
+    const resolvedTargetIndex=getBattleCharacterByIndex(targetIndex)
+        ? Number(targetIndex)
+        : 0;
     const targetCharacter=getBattleCharacterByIndex(resolvedTargetIndex);
 
     if(!targetCharacter || targetCharacter.hp<=0){
@@ -15674,9 +15919,7 @@ function castHealSkill(skillId,targetIndex){
     setTimeout(()=>{ showPlayerSpPopup(skill.spCost); },500);
 
     const casterStats=getMainCharacterStats();
-    const targetStats=resolvedTargetIndex===1
-        ? getPlayer2BattleStats()
-        : getMainCharacterStats();
+    const targetStats=getPartyBattleStats(resolvedTargetIndex);
 
     const exSkill=skillDatabase.waterEX;
     const exLevel=getSkillLevel("fire","waterEX");
@@ -15782,34 +16025,10 @@ function castHealSkill(skillId,targetIndex){
 */
 
 function getRevivableAllySlots(){
-
-    const slots=[];
-
-
-    if(player2){
-
-        slots.push({
-            character:player2,
-            characterIndex:1
-        });
-
-    }
-
-
-    /*
-       ★ 之後player3上場戰鬥時，在這裡
-       比照player2加一段：
-       if(player3){
-           slots.push({
-               character:player3,
-               characterIndex:2
-           });
-       }
-       player4同理，characterIndex遞增。
-    */
-
-
-    return slots;
+    return getExistingPartyIndexes().map(characterIndex=>({
+        character:getPartyCharacterByIndex(characterIndex),
+        characterIndex:characterIndex
+    }));
 
 }
 
@@ -15874,9 +16093,7 @@ function castReviveSkill(skillId,targetIndex){
         : 1;
 
     const revivePercent=skill.reviveHealPercentByLevel[level-1];
-    const targetStats=targetIndexResolved===1
-        ? getPlayer2BattleStats()
-        : getMainCharacterStats();
+    const targetStats=getPartyBattleStats(targetIndexResolved);
 
     const reviveHP=Math.max(
         1,
@@ -16415,6 +16632,14 @@ function finishPlayerAction(){
         return;
     }
 
+    /* A single action may reach this helper through animation and fallback
+       paths. Only the first call is allowed to advance the queue. */
+    if(battleAdvanceScheduled){
+        return;
+    }
+
+    battleAdvanceScheduled=true;
+
 
     const token=
         battleToken;
@@ -16454,7 +16679,10 @@ function finishPlayerAction(){
            直接進下一位、幾乎感覺不到停頓。
         */
 
-        setTimeout(()=>{
+        battleAdvanceTimeoutId=setTimeout(()=>{
+
+            battleAdvanceTimeoutId=null;
+            battleAdvanceScheduled=false;
 
             if(
                 !battleActive ||
@@ -16468,7 +16696,7 @@ function finishPlayerAction(){
                 token
             );
 
-        },120);
+        },BATTLE_DECLARE_ADVANCE_MS);
 
         return;
 
@@ -16487,7 +16715,10 @@ function finishPlayerAction(){
        但整體節奏會俐落不少。
     */
 
-    setTimeout(()=>{
+    battleAdvanceTimeoutId=setTimeout(()=>{
+
+        battleAdvanceTimeoutId=null;
+        battleAdvanceScheduled=false;
 
         if(
             !battleActive ||
@@ -16527,27 +16758,12 @@ function finishPlayerAction(){
                 "），嘗試強制繼續。"
             );
 
-
             initiativeIndex++;
-
-            setTimeout(()=>{
-
-                if(
-                    battleActive &&
-                    token===battleToken
-                ){
-
-                    processNextCombatant(
-                        token
-                    );
-
-                }
-
-            },500);
+            processNextCombatant(token);
 
         }
 
-    },700);
+    },BATTLE_RESOLVE_ADVANCE_MS);
 
 }
 
@@ -16613,11 +16829,7 @@ function processSingleMonsterAttack(monsterIndex,token){
         );
 
 
-        setTimeout(()=>{
-
-            finishPlayerAction();
-
-        },1000);
+        finishPlayerAction();
 
         return;
 
@@ -16641,11 +16853,7 @@ function processSingleMonsterAttack(monsterIndex,token){
         );
 
 
-        setTimeout(()=>{
-
-            finishPlayerAction();
-
-        },1000);
+        finishPlayerAction();
 
         return;
 
@@ -16867,17 +17075,13 @@ function processSingleMonsterAttack(monsterIndex,token){
 
     const isRangeSkill=["tri","row","all"].includes(skillTargetType);
 
-    const livingTargets=[
-        {character:player,stats:getMainCharacterStats(),index:0}
-    ];
-
-    if(player2 && player2.hp>0){
-        livingTargets.push({
-            character:player2,
-            stats:getPlayer2BattleStats(),
-            index:1
-        });
-    }
+    const livingTargets=getExistingPartyIndexes()
+        .map(index=>({
+            character:getPartyCharacterByIndex(index),
+            stats:getPartyBattleStats(index),
+            index:index
+        }))
+        .filter(entry=>entry.character && entry.character.hp>0);
 
     /* 隱身只阻止單體／普通攻擊選中；範圍技能仍會波及。 */
     const selectableSingleTargets=livingTargets.filter(
@@ -16887,7 +17091,7 @@ function processSingleMonsterAttack(monsterIndex,token){
     if(!isRangeSkill && selectableSingleTargets.length===0){
         addBattleLog(monster.name+"找不到可被單體攻擊選中的目標。");
         updateUI();
-        setTimeout(()=>{ finishPlayerAction(); },700);
+        finishPlayerAction();
         return;
     }
 
@@ -16995,20 +17199,11 @@ function processSingleMonsterAttack(monsterIndex,token){
         baseAttackStatRaw*(1-offensiveStatDown/100);
 
 
-    let playerDefeated=
-        false;
-
-
     let monsterLifestealDamage=0;
 
 
     attackTargets.forEach(
         targetEntry=>{
-
-            if(playerDefeated){
-                return;
-            }
-
 
             const targetCharacter=
                 targetEntry.character;
@@ -17055,13 +17250,7 @@ function processSingleMonsterAttack(monsterIndex,token){
                         "攻擊"
                     )+
                     ""+
-                    (
-                        targetIndex===1
-                        ?
-                        player2.id
-                        :
-                        (player.id||"你")
-                    )+
+                    (targetCharacter.id||"你")+
                     "，沒有命中！"
 
                 );
@@ -17154,13 +17343,7 @@ function processSingleMonsterAttack(monsterIndex,token){
 
                 addBattleLog(
                     ""+
-                    (
-                        targetIndex===1
-                        ?
-                        player2.id
-                        :
-                        (player.id||"你")
-                    )+
+                    (targetCharacter.id||"你")+
                     "的結界完全格擋了這次攻擊！"
                 );
 
@@ -17303,13 +17486,7 @@ function processSingleMonsterAttack(monsterIndex,token){
                     "攻擊"
                 )+
                 ""+
-                (
-                    targetIndex===1
-                    ?
-                    player2.id
-                    :
-                    (player.id||"你")
-                )+
+                (targetCharacter.id||"你")+
                 (
                     monsterCrit
                     ?
@@ -17330,17 +17507,6 @@ function processSingleMonsterAttack(monsterIndex,token){
                 "。"
 
             );
-
-
-            if(
-                targetIndex===0 &&
-                targetCharacter.hp<=0
-            ){
-
-                playerDefeated=
-                    true;
-
-            }
 
 
             /*
@@ -17415,26 +17581,7 @@ function processSingleMonsterAttack(monsterIndex,token){
     updateUI();
 
 
-    if(player.hp<=0){
-
-        loseBattle();
-
-        return;
-
-    }
-
-
-    /*
-       ★ 修正（依照使用者要求，加快節奏）：
-       怪物攻擊命中之後的等待時間，
-       從1400ms調快到1000ms。
-    */
-
-    setTimeout(()=>{
-
-        finishPlayerAction();
-
-    },1000);
+    finishPlayerAction();
 
 }
 
@@ -17450,7 +17597,12 @@ function checkBattleEnd(){
     }
 
 
-    if(player.hp<=0){
+    const partyDefeated=getExistingPartyIndexes().every(index=>{
+        const character=getPartyCharacterByIndex(index);
+        return !character || character.hp<=0;
+    });
+
+    if(partyDefeated){
 
         loseBattle();
 
@@ -17482,6 +17634,57 @@ function checkBattleEnd(){
 }
 
 
+function applyPostBattleAutoRecovery(){
+
+    getExistingPartyIndexes().forEach(characterIndex=>{
+
+        const character=getPartyCharacterByIndex(characterIndex);
+        const config=getPartyAutoConfig(characterIndex);
+        const stats=getPartyBattleStats(characterIndex);
+
+        if(!character || character.hp<=0 || !config.enabled || !stats){
+            return;
+        }
+
+        ["hp","sp"].forEach(resource=>{
+
+            const maxValue=resource==="hp" ? stats.maxHP : stats.maxSP;
+            const currentValue=resource==="hp" ? character.hp : character.sp;
+            const threshold=normalizeAutoBattleThreshold(config[resource],resource==="hp" ? 50 : 25);
+
+            if(maxValue<=0 || currentValue>=maxValue || currentValue/maxValue*100>threshold){
+                return;
+            }
+
+            const potionId=getAutoPotionId(resource);
+            const definition=getPotionDefinition(potionId);
+
+            if(!definition || !consumePotionFromInventory(potionId,1)){
+                return;
+            }
+
+            const planned=definition.recoveryPercent>=100
+                ? maxValue-currentValue
+                : Math.max(1,Math.round(maxValue*definition.recoveryPercent/100));
+            const recovered=Math.max(0,Math.min(maxValue-currentValue,planned));
+
+            if(resource==="hp"){
+                character.hp=Math.min(maxValue,character.hp+recovered);
+            }else{
+                character.sp=Math.min(maxValue,character.sp+recovered);
+            }
+
+            addBattleLog(
+                "戰鬥結束後，"+(character.id||"角色")+
+                "自動使用"+definition.name+"，恢復"+recovered+" "+resource.toUpperCase()+"。"
+            );
+        });
+    });
+
+    rebuildInventorySlots();
+}
+
+
 function winBattle(){
 
     if(!battleActive){
@@ -17501,6 +17704,12 @@ function winBattle(){
     clearInterval(timerId);
 
     timerId=null;
+
+    if(battleAdvanceTimeoutId){
+        clearTimeout(battleAdvanceTimeoutId);
+        battleAdvanceTimeoutId=null;
+    }
+    battleAdvanceScheduled=false;
 
 
     battleToken++;
@@ -17584,6 +17793,8 @@ function winBattle(){
         expGain+
         "EXP，已存入經驗池。"
     );
+
+    applyPostBattleAutoRecovery();
 
 
     /*
@@ -17704,6 +17915,10 @@ function checkAutoReturnToCity(){
         (
             player2 &&
             autoConfig2.returnToCityWhenEmpty
+        ) ||
+        (
+            player3 &&
+            autoConfig3.returnToCityWhenEmpty
         );
 
 
@@ -17753,6 +17968,12 @@ function loseBattle(){
     clearInterval(timerId);
 
     timerId=null;
+
+    if(battleAdvanceTimeoutId){
+        clearTimeout(battleAdvanceTimeoutId);
+        battleAdvanceTimeoutId=null;
+    }
+    battleAdvanceScheduled=false;
 
 
     battleToken++;
@@ -17815,6 +18036,14 @@ function loseBattle(){
 
     }
 
+    if(player3){
+
+        const stats3=getPartyBattleStats(2);
+        player3.hp=stats3.maxHP;
+        player3.sp=stats3.maxSP;
+
+    }
+
 
     setTimeout(()=>{
 
@@ -17847,18 +18076,10 @@ function attemptEscape(){
        不然自動角色行動中途還能被逃脫按鈕打斷）。
     */
 
-    const isPlayer2Turn=
-
-        activeBattleCharacterIndex===1;
-
-
     const autoOn=
-
-        isPlayer2Turn
-        ?
-        autoConfig2.enabled
-        :
-        autoBattle;
+        activeBattleCharacterIndex===0
+        ? autoBattle
+        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
 
     if(
@@ -17952,6 +18173,8 @@ function resolveEscapeAttempt(characterIndex){
         );
 
 
+    const escapingCharacter=getPartyCharacterByIndex(characterIndex)||player;
+
     const chance =
         Math.max(
             10,
@@ -17959,7 +18182,7 @@ function resolveEscapeAttempt(characterIndex){
                 95,
                 50+
                 (
-                    player.level-
+                    escapingCharacter.level-
                     highestLevel
                 )*5
             )
@@ -18004,11 +18227,7 @@ function resolveEscapeAttempt(characterIndex){
         );
 
 
-        setTimeout(()=>{
-
-            finishPlayerAction();
-
-        },1300);
+        finishPlayerAction();
 
     }
 
@@ -18029,18 +18248,10 @@ function openSkillMenu(){
        決定要顯示誰的技能欄、誰的SP。
     */
 
-    const isPlayer2Turn=
-
-        activeBattleCharacterIndex===1;
-
-
     const autoOn=
-
-        isPlayer2Turn
-        ?
-        autoConfig2.enabled
-        :
-        autoBattle;
+        activeBattleCharacterIndex===0
+        ? autoBattle
+        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
 
     if(
@@ -18052,21 +18263,10 @@ function openSkillMenu(){
 
 
     const activeCharacterId=
-
-        isPlayer2Turn
-        ?
-        "player2"
-        :
-        "fire";
-
+        getPartyCharacterKey(activeBattleCharacterIndex);
 
     const activeCharacterObj=
-
-        isPlayer2Turn
-        ?
-        player2
-        :
-        player;
+        getPartyCharacterByIndex(activeBattleCharacterIndex);
 
 
     const character =
@@ -18418,19 +18618,8 @@ function closeMenus(){
 */
 
 function setDefendingState(characterIndex){
-
-    const isPlayer2Turn=
-
-        characterIndex===1;
-
-
     const activeCharacter=
-
-        isPlayer2Turn
-        ?
-        player2
-        :
-        player;
+        getPartyCharacterByIndex(characterIndex);
 
 
     if(!activeCharacter){
@@ -18472,28 +18661,13 @@ function applyDefendEffect(characterIndex){
 
 
 function useDefend(){
-
-    const isPlayer2Turn=
-
-        activeBattleCharacterIndex===1;
-
-
     const autoOn=
-
-        isPlayer2Turn
-        ?
-        autoConfig2.enabled
-        :
-        autoBattle;
-
+        activeBattleCharacterIndex===0
+        ? autoBattle
+        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
     const activeCharacter=
-
-        isPlayer2Turn
-        ?
-        player2
-        :
-        player;
+        getPartyCharacterByIndex(activeBattleCharacterIndex);
 
 
     if(
@@ -18574,13 +18748,10 @@ function usePotion(potionId){
         return;
     }
 
-    const isPlayer2Turn=
-        activeBattleCharacterIndex===1;
-
     const autoOn=
-        isPlayer2Turn
-        ? autoConfig2.enabled
-        : autoBattle;
+        activeBattleCharacterIndex===0
+        ? autoBattle
+        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
     if(
         !battleActive ||
@@ -18591,9 +18762,7 @@ function usePotion(potionId){
     }
 
     const activeCharacter=
-        isPlayer2Turn
-        ? player2
-        : player;
+        getPartyCharacterByIndex(activeBattleCharacterIndex);
 
     if(
         !activeCharacter ||
@@ -18612,9 +18781,7 @@ function usePotion(potionId){
     }
 
     const stats=
-        isPlayer2Turn
-        ? getPlayer2BattleStats()
-        : getMainCharacterStats();
+        getPartyBattleStats(activeBattleCharacterIndex);
 
     if(
         definition.resource==="hp" &&
@@ -18658,13 +18825,8 @@ function applyPotionEffect(potionId,characterIndex){
         return;
     }
 
-    const isPlayer2Turn=
-        characterIndex===1;
-
     const activeCharacter=
-        isPlayer2Turn
-        ? player2
-        : player;
+        getPartyCharacterByIndex(characterIndex);
 
     if(!activeCharacter){
         finishPlayerAction();
@@ -18672,9 +18834,7 @@ function applyPotionEffect(potionId,characterIndex){
     }
 
     const stats=
-        isPlayer2Turn
-        ? getPlayer2BattleStats()
-        : getMainCharacterStats();
+        getPartyBattleStats(characterIndex);
 
     const maxValue=
         definition.resource==="hp"
@@ -18750,7 +18910,7 @@ function applyPotionEffect(potionId,characterIndex){
         showPlayerHit(
             recovered,
             "heal",
-            isPlayer2Turn ? 1 : 0,
+            characterIndex,
             true
         );
     }else{
@@ -18762,17 +18922,13 @@ function applyPotionEffect(potionId,characterIndex){
         showPlayerHit(
             recovered,
             "sp",
-            isPlayer2Turn ? 1 : 0,
+            characterIndex,
             true
         );
     }
 
     addBattleLog(
-        (
-            isPlayer2Turn
-            ? player2.id
-            : (player.id||"你")
-        )+
+        (activeCharacter.id||"你")+
         "使用"+
         definition.name+
         "，恢復"+
@@ -18875,6 +19031,13 @@ function toggleAutoBattle(){
     if(player2){
 
         autoConfig2.enabled=
+            autoBattle;
+
+    }
+
+    if(player3){
+
+        autoConfig3.enabled=
             autoBattle;
 
     }
@@ -19023,11 +19186,6 @@ function toggleAutoBattle(){
         const expectedCharacterIndex=
             activeBattleCharacterIndex;
 
-        const expectedIsPlayer2=
-
-            expectedCharacterIndex===1;
-
-
         setTimeout(()=>{
 
             if(
@@ -19045,20 +19203,10 @@ function toggleAutoBattle(){
 
             try{
 
-                if(expectedIsPlayer2){
-
-                    player2AutoAction(
-                        expectedToken
-                    );
-
-                }
-                else{
-
-                    autoAction(
-                        expectedToken
-                    );
-
-                }
+                autoActionForCharacter(
+                    expectedCharacterIndex,
+                    expectedToken
+                );
 
             }
             catch(error){
@@ -19633,12 +19781,7 @@ function saveAutoSettingsFormToCharacter(characterIndex){
 
 
     const targetConfig=
-
-        characterIndex===1
-        ?
-        autoConfig2
-        :
-        autoConfig;
+        getPartyAutoConfig(Number(characterIndex));
 
 
     if(actionSelect){
@@ -19736,28 +19879,19 @@ function switchAutoSettingsCharacter(skipSave){
     }
 
 
-    const isPlayer2=
+    let requestedIndex=
+        Number(characterSelect.value);
 
-        characterSelect.value==="1";
-
-
-    if(
-        isPlayer2 &&
-        !player2
-    ){
+    if(!getPartyCharacterByIndex(requestedIndex)){
 
         characterSelect.value="0";
+        requestedIndex=0;
 
     }
 
 
     const targetConfig=
-
-        characterSelect.value==="1"
-        ?
-        autoConfig2
-        :
-        autoConfig;
+        getPartyAutoConfig(requestedIndex);
 
 
     targetConfig.hp=normalizeAutoBattleThreshold(targetConfig.hp,50);
@@ -19765,12 +19899,7 @@ function switchAutoSettingsCharacter(skipSave){
 
 
     const characterId=
-
-        characterSelect.value==="1"
-        ?
-        "player2"
-        :
-        "fire";
+        getPartyCharacterKey(requestedIndex);
 
 
     const loadout=
@@ -19886,12 +20015,7 @@ function switchAutoSettingsCharacter(skipSave){
     */
 
     autoSettingsCurrentCharacter=
-
-        characterSelect.value==="1"
-        ?
-        1
-        :
-        0;
+        requestedIndex;
 
 }
 
@@ -19915,11 +20039,7 @@ function confirmAutoBattleSettings(){
     */
 
     saveAutoSettingsFormToCharacter(
-        characterSelect.value==="1"
-        ?
-        1
-        :
-        0
+        Number(characterSelect.value)
     );
 
 
@@ -19934,7 +20054,7 @@ function confirmAutoBattleSettings(){
         populateAutoSkillOptions2();
 
     }
-    else{
+    else if(characterSelect.value==="0"){
 
         populateAutoSkillOptions();
 
@@ -19954,7 +20074,74 @@ function confirmAutoBattleSettings(){
 }
 
 
+/* Automatic combat only declares combat actions. HP/SP recovery is handled
+   once after victory by applyPostBattleAutoRecovery(). */
+function autoActionForCharacter(characterIndex,token){
+
+    const character=getPartyCharacterByIndex(characterIndex);
+    const config=getPartyAutoConfig(characterIndex);
+    const autoOn=characterIndex===0 ? autoBattle : config.enabled;
+
+    if(
+        !battleActive ||
+        !character ||
+        character.hp<=0 ||
+        !autoOn ||
+        token!==battleToken
+    ){
+        return;
+    }
+
+    if(config.skill==="defend"){
+        queuedPlayerActions[characterIndex]={action:"defend",target:null};
+        updateUI();
+        finishPlayerAction();
+        return;
+    }
+
+    const aliveInBattle=currentBattleMonsters.filter(
+        index=>monsters[index] && monsters[index].alive
+    );
+
+    if(aliveInBattle.length===0){
+        checkBattleEnd();
+        return;
+    }
+
+    const skill=skillDatabase[config.skill];
+    const spreads=skill && ["tri","row","column","all"].includes(skill.targetType);
+    const target=spreads
+        ? aliveInBattle[Math.floor((aliveInBattle.length-1)/2)]
+        : aliveInBattle[0];
+
+    let action=config.skill||"normal";
+    const skillKey=getPartyCharacterKey(characterIndex);
+
+    if(
+        action!=="normal" &&
+        (
+            !skill ||
+            getSkillLevel(skillKey,action)<=0 ||
+            character.sp<(skill.spCost!==undefined ? skill.spCost : (skill.cost||0)) ||
+            ["buff","passive","heal","revive"].includes(skill.category)
+        )
+    ){
+        action="normal";
+    }
+
+    queuedPlayerActions[characterIndex]={
+        action:action,
+        target:target
+    };
+
+    updateUI();
+    finishPlayerAction();
+}
+
+
 function autoAction(token){
+
+    return autoActionForCharacter(0,token);
 
     if(
         !battleActive ||
@@ -20256,6 +20443,8 @@ function autoAction(token){
 
 function player2AutoAction(token){
 
+    return autoActionForCharacter(1,token);
+
     if(
         !battleActive ||
         !player2 ||
@@ -20492,6 +20681,272 @@ function player2AutoAction(token){
 
     finishPlayerAction();
 
+}
+
+
+function player3AutoAction(token){
+    return autoActionForCharacter(2,token);
+}
+
+
+function secondaryCharacterNormalAttack(characterIndex,index){
+
+    const character=getPartyCharacterByIndex(characterIndex);
+    const stats=getPartyBattleStats(characterIndex);
+
+    index=findAliveTargetIndex(index);
+
+    if(!character || !stats || index===null){
+        finishPlayerAction();
+        return;
+    }
+
+    selectedMonster=index;
+    const monster=monsters[index];
+
+    lungePlayerCard(characterIndex);
+    showSkillNameBadge("普通攻擊","normal",characterIndex);
+
+    const hit=rollHitChance(
+        stats.accuracy,
+        getMonsterEvasion(monster),
+        getMonsterDebuffValue(character,"stun")
+    );
+
+    if(!hit){
+        showMissEffect(false,index,"MISS");
+        addBattleLog((character.id||"隊友")+"普通攻擊"+monster.name+"，沒有命中！");
+        updateUI();
+        finishPlayerAction();
+        return;
+    }
+
+    let damage=calculateDamage(
+        stats.attack,
+        getMonsterEffectiveDefense(monster),
+        character.level,
+        monster.level,
+        character.element,
+        monster.element
+    );
+
+    damage=Math.floor(damage*getElementDamagePassiveMultiplier(character));
+
+    const critResult=rollCritical(
+        character,
+        "physical",
+        getMonsterEffectiveAntiCrit(monster)
+    );
+
+    damage=Math.floor(damage*critResult.multiplier);
+    damage=applyOutgoingDamageReduction(damage,character);
+    monster.hp=Math.max(0,monster.hp-damage);
+
+    showMonsterHit(index,damage,"hp",critResult.isCrit);
+    addBattleLog(
+        (character.id||"隊友")+"普通攻擊"+monster.name+
+        (critResult.isCrit ? "（爆擊！）" : "")+
+        "，造成"+damage+"傷害。"
+    );
+
+    if(monster.hp<=0){ killMonster(index); }
+
+    updateUI();
+    finishPlayerAction();
+}
+
+
+function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
+
+    const character=getPartyCharacterByIndex(characterIndex);
+    const characterKey=getPartyCharacterKey(characterIndex);
+    const stats=getPartyBattleStats(characterIndex);
+    const skill=skillDatabase[skillId];
+
+    if(!character || !stats || !skill){
+        finishPlayerAction();
+        return;
+    }
+
+    const level=getSkillLevel(characterKey,skillId);
+    const spCost=skill.spCost!==undefined ? skill.spCost : (skill.cost||0);
+
+    if(level<=0 || character.sp<spCost){
+        addBattleLog(
+            level<=0
+            ? (character.id+"尚未學習"+skill.name+"。")
+            : (character.id+"SP不足，無法使用"+skill.name+"。")
+        );
+        finishPlayerAction();
+        return;
+    }
+
+    character.sp-=spCost;
+    lungePlayerCard(characterIndex);
+    showSkillNameBadge(skill.name,skill.element,characterIndex);
+    setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
+
+    const statBonus=skill.category==="magic" ? stats.magicAttack : stats.attack;
+    const baseDamage=getSkillDamageAtLevel(skill,level);
+    const exSkill=skillDatabase[skill.element+"EX"];
+    const exLevel=getSkillLevel(characterKey,skill.element+"EX");
+    const passiveMultiplier=(exSkill && exLevel>0 && exSkill.damageBonusPercent)
+        ? 1+exSkill.damageBonusPercent/100
+        : 1;
+
+    if(!skill.baseDamage){
+        const resolvedIndex=findAliveTargetIndex(centerIndex);
+
+        if(resolvedIndex!==null && skill.freezeChance){
+            const monster=monsters[resolvedIndex];
+            const freezeHit=rollStatusEffectHit(
+                skill.freezeChance,
+                character.level,
+                monster.level,
+                stats.intelligence,
+                getMonsterEffectiveSpiritPoints(monster),
+                true,
+                getMonsterRank(monster)
+            );
+
+            if(freezeHit){
+                applyFreezeEffect(monster,skill.freezeDuration);
+                addBattleLog(monster.name+"被冰封了！");
+            }else{
+                showMissEffect(false,resolvedIndex,"抵抗");
+                addBattleLog(skill.name+"對"+monster.name+"沒有生效（抵抗）。");
+            }
+        }
+
+        updateUI();
+        finishPlayerAction();
+        return;
+    }
+
+    centerIndex=findAliveTargetIndex(centerIndex);
+
+    if(centerIndex===null){
+        finishPlayerAction();
+        return;
+    }
+
+    const targets=getSkillTargets(centerIndex,skill.targetType);
+
+    if(skillId==="fireRocket"){
+        playFireRocketAnimation(
+            "battlePlayerCard"+characterIndex,
+            targets.map(index=>"battleMonster"+index)
+        );
+    }
+
+    let totalLifesteal=0;
+
+    targets.forEach(index=>{
+        const monster=monsters[index];
+        if(!monster || !monster.alive){ return; }
+
+        if(skill.id==="iceSpin"){
+            playIceSpinProjectile(characterIndex,index);
+        }
+
+        const hit=rollHitChance(
+            stats.accuracy,
+            getMonsterEvasion(monster),
+            getMonsterDebuffValue(character,"stun")
+        );
+
+        if(!hit){
+            showMissEffect(false,index,"MISS");
+            addBattleLog(skill.name+"對"+monster.name+"，沒有命中！");
+            return;
+        }
+
+        let damage=calculateSkillDamage(
+            baseDamage,
+            statBonus,
+            monster,
+            character.level,
+            character.element
+        );
+
+        damage=Math.floor(damage*passiveMultiplier);
+        damage=Math.floor(damage*getPhysicalSkillRankBonusMultiplier(skill,monster));
+
+        const critResult=rollCritical(
+            character,
+            skill.category,
+            getMonsterEffectiveAntiCrit(monster)
+        );
+
+        damage=Math.floor(damage*critResult.multiplier);
+        damage=applyOutgoingDamageReduction(damage,character);
+        monster.hp=Math.max(0,monster.hp-damage);
+
+        showMonsterHit(index,damage,"hp",critResult.isCrit);
+        addBattleLog(
+            (character.id||"隊友")+"施放"+skill.name+"命中"+monster.name+
+            (critResult.isCrit ? "（爆擊！）" : "")+
+            "，造成"+damage+"傷害。"
+        );
+
+        if(skill.burnChance && rollStatusEffectHit(
+            skill.burnChance,character.level,monster.level,
+            stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
+        )){
+            applyBurnEffect(monster,skill.burnDuration,skill.burnPercentByLevel[level-1]);
+            addBattleLog(monster.name+"陷入燃燒狀態！");
+        }
+
+        if(skill.freezeChance && rollStatusEffectHit(
+            skill.freezeChance,character.level,monster.level,
+            stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+            true,getMonsterRank(monster)
+        )){
+            applyFreezeEffect(monster,skill.freezeDuration);
+            addBattleLog(monster.name+"被冰封了！");
+        }
+
+        applySkillDebuffEffects(
+            skill,level,monster,index,character.level,stats.intelligence
+        );
+
+        if(skill.lifestealPercentByLevel){ totalLifesteal+=damage; }
+        if(monster.hp<=0){ killMonster(index); }
+    });
+
+    if(skill.lifestealPercentByLevel && totalLifesteal>0){
+        const amount=Math.floor(
+            totalLifesteal*skill.lifestealPercentByLevel[level-1]/100
+        );
+        character.hp=Math.min(stats.maxHP,character.hp+amount);
+        character.sp=Math.min(stats.maxSP,character.sp+amount);
+        showPlayerHit(amount,"heal",characterIndex,true);
+        addBattleLog((character.id||"隊友")+"吸收傷害並回復HP與SP。");
+    }
+
+    if(skill.selfShieldByLevel){
+        character.activeBuffs=(character.activeBuffs||[]).filter(b=>b.type!=="shield");
+        character.activeBuffs.push({
+            type:"shield",
+            turnsLeft:skill.shieldDuration||2,
+            remaining:skill.selfShieldByLevel[level-1]
+        });
+    }
+
+    if(skill.allyShieldByLevel){
+        const amount=skill.allyShieldByLevel[level-1];
+        getActivePlayerCharacters().forEach(target=>{
+            target.activeBuffs=(target.activeBuffs||[]).filter(b=>b.type!=="shield");
+            target.activeBuffs.push({
+                type:"shield",
+                turnsLeft:skill.shieldDuration||2,
+                remaining:amount
+            });
+        });
+    }
+
+    updateUI();
+    finishPlayerAction();
 }
 
 
@@ -22011,55 +22466,23 @@ function renderPlayers(){
        避免兩張卡的血條/狀態圖示id互相打架。
     */
 
-    const party = [
-
-        {
-            character:player,
-
-            id:
-                player.id||
-                "主角",
-
-            icon:
-                elementDatabase[
-                    player.element
-                ].icon,
-
-            level:
-                player.level
-        }
-
-    ];
+    const party=getExistingPartyIndexes().map(characterIndex=>{
+        const character=getPartyCharacterByIndex(characterIndex);
+        return {
+            character:character,
+            characterIndex:characterIndex,
+            id:character.id||("角色"+(characterIndex+1)),
+            icon:elementDatabase[character.element]
+                ? elementDatabase[character.element].icon
+                : "",
+            level:character.level
+        };
+    });
 
 
-    if(player2){
+    party.forEach(entry=>{
 
-        party.push({
-
-            character:player2,
-
-            id:player2.id,
-
-            icon:
-                elementDatabase[
-                    player2.element
-                ]
-                ?
-                elementDatabase[
-                    player2.element
-                ].icon
-                :
-                "",
-
-            level:
-                player2.level
-
-        });
-
-    }
-
-
-    party.forEach((entry,index)=>{
+        const index=entry.characterIndex;
 
         const box =
             document.createElement(
@@ -22074,6 +22497,9 @@ function renderPlayers(){
         box.id=
             "battlePlayerCard"+
             index;
+
+        box.style.backgroundImage=
+            "url('"+getCharacterArtworkPath(entry.character)+"')";
 
 
         box.innerHTML =
@@ -22170,20 +22596,12 @@ function updatePlayerStatusBadges(){
        （存在的話）各自的buff圖示。
     */
 
-    updateSingleCharacterStatusBadge(
-        0,
-        player
-    );
-
-
-    if(player2){
-
+    getExistingPartyIndexes().forEach(index=>{
         updateSingleCharacterStatusBadge(
-            1,
-            player2
+            index,
+            getPartyCharacterByIndex(index)
         );
-
-    }
+    });
 
 }
 
@@ -22237,22 +22655,13 @@ function updateBattlePlayerBars(){
        不會抓錯。
     */
 
-    updateSingleCharacterBars(
-        0,
-        player,
-        getMainCharacterStats()
-    );
-
-
-    if(player2){
-
+    getExistingPartyIndexes().forEach(index=>{
         updateSingleCharacterBars(
-            1,
-            player2,
-            getPlayer2BattleStats()
+            index,
+            getPartyCharacterByIndex(index),
+            getPartyBattleStats(index)
         );
-
-    }
+    });
 
 }
 
@@ -24050,32 +24459,13 @@ function showLevelUpToast(characterName,level){
 */
 
 function refreshCharacterAvatarLevels(){
-
-    const level0El=
-        $("characterAvatarLevel0");
-
-    if(level0El){
-
-        level0El.textContent=
-            "Lv."+
-            player.level;
-
-    }
-
-
-    const level1El=
-        $("characterAvatarLevel1");
-
-    if(
-        level1El &&
-        player2
-    ){
-
-        level1El.textContent=
-            "Lv."+
-            player2.level;
-
-    }
+    getExistingPartyIndexes().forEach(index=>{
+        const levelEl=$("characterAvatarLevel"+index);
+        const character=getPartyCharacterByIndex(index);
+        if(levelEl && character){
+            levelEl.textContent="Lv."+character.level;
+        }
+    });
 
 }
 
@@ -24621,6 +25011,17 @@ function openHomeFeature(type){
 
             }
 
+            const option2=
+                $("autoSettingsCharOption2");
+
+            if(option2){
+                option2.textContent=
+                    player3
+                    ? player3.id
+                    : "角色3（尚未創建）";
+                option2.disabled=!player3;
+            }
+
 
             characterSelect.value="0";
 
@@ -24883,10 +25284,10 @@ function closeHomeFeature(){
 
 function selectCharacterForTabs(targetIndex){
 
-    if(
-        targetIndex===1 &&
-        !player2
-    ){
+    const targetCharacter=
+        getPartyCharacterByIndex(targetIndex);
+
+    if(!targetCharacter){
         return;
     }
 
@@ -24915,12 +25316,7 @@ function selectCharacterForTabs(targetIndex){
 
 
     currentSkillCharacter=
-
-        targetIndex===0
-        ?
-        "fire"
-        :
-        "player2";
+        getPartyCharacterKey(targetIndex);
 
     renderSkillLoadout();
 
@@ -24931,7 +25327,7 @@ function selectCharacterForTabs(targetIndex){
        目前選的是哪一個角色。
     */
 
-    [0,1].forEach(
+    [0,1,2].forEach(
         i=>{
 
             const avatarEl=
@@ -25140,11 +25536,24 @@ function renderShopContent(){
                 </div>
                 <div class="shop-potion-name">${shopItem.name}</div>
                 <div class="shop-potion-effect">${effectText}</div>
-                <button
-                    class="home-feature-buy-btn shop-potion-buy"
-                    ${disabled ? "disabled" : ""}
-                    onclick="buyShopItem('${shopItem.id}')"
-                >${buttonText}</button>
+                <div class="shop-potion-purchase-row">
+                    <label for="shopQuantity-${shopItem.id}">數量</label>
+                    <input
+                        id="shopQuantity-${shopItem.id}"
+                        class="shop-potion-quantity"
+                        type="number"
+                        inputmode="numeric"
+                        min="1"
+                        max="9999"
+                        step="1"
+                        value="1"
+                    >
+                    <button
+                        class="home-feature-buy-btn shop-potion-buy"
+                        ${disabled ? "disabled" : ""}
+                        onclick="buyShopItem('${shopItem.id}',document.getElementById('shopQuantity-${shopItem.id}').value)"
+                    >${buttonText}</button>
+                </div>
             </div>
         `;
     }).join("");
@@ -25158,7 +25567,7 @@ function renderShopContent(){
 }
 
 
-function buyShopItem(itemId){
+function buyShopItem(itemId,requestedQuantity){
 
     const shopItem=getPotionDefinition(itemId);
 
@@ -25171,17 +25580,24 @@ function buyShopItem(itemId){
         return;
     }
 
-    if(gold<shopItem.price){
-        alert("金幣不夠。");
+    const quantity=Math.max(
+        1,
+        Math.min(9999,Math.floor(Number(requestedQuantity)||1))
+    );
+
+    const totalPrice=shopItem.price*quantity;
+
+    if(gold<totalPrice){
+        alert("金幣不夠，本次需要 "+totalPrice.toLocaleString("zh-TW")+" 金幣。");
         return;
     }
 
-    if(!addPotionToInventory(itemId,1)){
+    if(!addPotionToInventory(itemId,quantity)){
         alert("背包已滿，或該藥水已沒有可用的堆疊空間。");
         return;
     }
 
-    gold=gold-shopItem.price;
+    gold=gold-totalPrice;
 
     rebuildInventorySlots();
     updateGoldDisplay();
@@ -25224,7 +25640,8 @@ function renderCharacterShowcaseContent(){
 
     const slots=[
         player,
-        player2
+        player2,
+        player3
     ];
 
 
@@ -25238,16 +25655,6 @@ function renderCharacterShowcaseContent(){
         (character,slotIndex)=>{
 
             if(character){
-
-                const element=
-
-                    elementDatabase[
-                        character.element
-                    ]
-                    ||
-                    elementDatabase.fire;
-
-
                 html+=
 
                     '<div style="width:86px;text-align:center;'+
@@ -25258,12 +25665,11 @@ function renderCharacterShowcaseContent(){
                     '<div id="characterAvatar'+
                     slotIndex+
                     '" style="width:56px;height:56px;margin:0 auto;'+
-                    'border-radius:50%;background:linear-gradient(160deg,#241c12,#15100a);'+
+                    'border-radius:50%;background-color:#15100a;background-image:url(\''+
+                    getCharacterArtworkPath(character)+
+                    '\');background-size:cover;background-position:center 18%;'+
                     'border:2px solid #f0b429;display:flex;align-items:center;'+
                     'justify-content:center;font-size:18px;transition:opacity .15s;">'+
-                    getElementIconHTML(
-                        character.element
-                    )+
                     "</div>"+
 
                     '<div style="font-size:11px;font-weight:bold;margin-top:2px;'+
@@ -25306,8 +25712,14 @@ function renderCharacterShowcaseContent(){
             else{
 
                 const eligible=
+                    slotIndex===1
+                    ? player.level>=10
+                    : isThirdCharacterUnlocked();
 
-                    player.level>=10;
+                const unlockText=
+                    slotIndex===1
+                    ? "Lv.10解鎖"
+                    : "前兩名皆 Lv.50";
 
 
                 html+=
@@ -25319,7 +25731,7 @@ function renderCharacterShowcaseContent(){
                     (
                         eligible
                         ?
-                        "closeHomeFeature();openSecondCharacterModal();"
+                        "closeHomeFeature();openCharacterCreation("+(slotIndex+1)+");"
                         :
                         ""
                     )+
@@ -25343,7 +25755,7 @@ function renderCharacterShowcaseContent(){
                         ?
                         "點擊創建"
                         :
-                        "Lv.10解鎖"
+                        unlockText
                     )+
                     "</div>"+
 
@@ -26660,8 +27072,8 @@ function renderSystemContent(){
                 '<button class="home-feature-buy-btn" onclick="saveGame();alert(\'已完成手動存檔。\')">立即存檔</button>'+
             '</div>'+
             '<div class="system-panel-row danger">'+
-                '<div><strong>重新開始</strong><small>刪除本機角色與進度，重新建立角色。</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="resetGame()">刪除存檔</button>'+
+                '<div><strong>刪除角色</strong><small>刪除全部角色與遊戲進度，返回初始創角頁面。</small></div>'+
+                '<button class="home-feature-buy-btn" onclick="resetGame()">刪除角色</button>'+
             '</div>'+
         '</div>'
     );
@@ -26682,14 +27094,13 @@ function restAtHome(){
     }
 
 
-    const stats =
-        getMainCharacterStats();
+    const needsRest=getExistingPartyIndexes().some(index=>{
+        const character=getPartyCharacterByIndex(index);
+        const stats=getPartyBattleStats(index);
+        return character.hp<stats.maxHP || character.sp<stats.maxSP;
+    });
 
-
-    if(
-        player.hp>=stats.maxHP &&
-        player.sp>=stats.maxSP
-    ){
+    if(!needsRest){
 
         alert(
             "HP、SP 已經是滿的了。"
@@ -26700,12 +27111,12 @@ function restAtHome(){
     }
 
 
-    player.hp =
-        stats.maxHP;
-
-
-    player.sp =
-        stats.maxSP;
+    getExistingPartyIndexes().forEach(index=>{
+        const character=getPartyCharacterByIndex(index);
+        const stats=getPartyBattleStats(index);
+        character.hp=stats.maxHP;
+        character.sp=stats.maxSP;
+    });
 
 
     updateUI();
@@ -26817,6 +27228,19 @@ function grantTestSkillPoints(){
 
     }
 
+    if(player3){
+
+        player3.skillPoints+=999;
+
+        message+=
+            "\n「"+
+            player3.id+
+            "」目前共有"+
+            player3.skillPoints+
+            "點。";
+
+    }
+
 
     updateUI();
 
@@ -26885,6 +27309,19 @@ function distributeExpToPlayer2(){
 
     distributeExpToCharacter(
         player2
+    );
+
+}
+
+
+function distributeExpToPlayer3(){
+
+    if(!player3){
+        return;
+    }
+
+    distributeExpToCharacter(
+        player3
     );
 
 }
@@ -27118,6 +27555,52 @@ function renderExpDistributeList(){
     }
 
 
+    if(player3){
+
+        const player3Row=
+            document.createElement(
+                "div"
+            );
+
+        const needed3=
+            Math.max(
+                0,
+                player3.expNext-
+                player3.exp
+            );
+
+        player3Row.innerHTML=
+            `
+            <button
+                id="distributePlayer3Button"
+                class="exp-distribute-button"
+            >
+                <span class="exp-character-icon">◆</span>
+                <span class="exp-character-copy">
+                    <strong>${player3.id}</strong>
+                    <small>Lv.${player3.level} → Lv.${player3.level+1}</small>
+                </span>
+                <span class="exp-character-cost">
+                    <b>${needed3.toLocaleString("zh-TW")}</b>
+                    <small>EXP</small>
+                </span>
+            </button>
+            `;
+
+        container.appendChild(
+            player3Row
+        );
+
+        $("distributePlayer3Button").disabled=
+            sharedExp<needed3 ||
+            battleActive;
+
+        $("distributePlayer3Button").onclick=
+            distributeExpToPlayer3;
+
+    }
+
+
     /*
        ★ 修正：
        水戰士／風弓手這兩個鎖定佔位按鈕
@@ -27144,18 +27627,20 @@ function renderExpDistributeList(){
 
 function changeStatusCharacter(direction){
 
-    if(!player2){
+    const indexes=getExistingPartyIndexes();
+
+    if(indexes.length<2){
         return;
     }
 
+    const currentPosition=Math.max(
+        0,
+        indexes.indexOf(statusCharacterIndex)
+    );
 
-    statusCharacterIndex=
-
-        statusCharacterIndex===0
-        ?
-        1
-        :
-        0;
+    statusCharacterIndex=indexes[
+        (currentPosition+direction+indexes.length)%indexes.length
+    ];
 
 
     Object.keys(
@@ -27239,11 +27724,11 @@ function attachLongPress(el,fn){
                     repeatInterval=
                         setInterval(
                             fn,
-                            120
+                            55
                         );
 
                 },
-                500
+                250
             );
 
     }
@@ -27512,11 +27997,9 @@ function updateStatusPreview(){
 
     const equipmentBonus =
         getEquipmentBonus(
-            targetCharacter===player2
-            ?
-            "player2"
-            :
-            player.element
+            getPartyCharacterKey(
+                getPartyCharacterIndex(targetCharacter)
+            )
         );
 
 
@@ -27657,7 +28140,7 @@ function updateStatusPreview(){
 
         switchCard.style.display=
 
-            player2
+            getExistingPartyIndexes().length>1
             ?
             "block"
             :
@@ -27669,25 +28152,9 @@ function updateStatusPreview(){
     if(nameBox){
 
         nameBox.textContent=
-
-            targetCharacter===player2
-            ?
-            (
-                ""+
-                player2.id+
-                "Lv."+
-                player2.level
-            )
-            :
-            (
-                ""+
-                (
-                    player.id||
-                    "冒險者"
-                )+
-                "Lv."+
-                player.level
-            );
+            (targetCharacter.id||"冒險者")+
+            " Lv."+
+            targetCharacter.level;
 
     }
 
@@ -27755,6 +28222,134 @@ function confirmStatus(){
    技能
 ===================================================== */
 
+const SKILL_PREVIEW_ELEMENTS=["fire","water","wind","earth"];
+
+function getSkillPreviewSummary(skill){
+
+    const scopes={
+        single:"攻擊單一敵人",
+        tri:"攻擊相鄰的一排敵人",
+        row:"攻擊一整排敵人",
+        column:"攻擊同一直列敵人",
+        all:"攻擊敵方全體",
+        ally:"支援一名友方",
+        allyAll:"支援我方全體",
+        deadAlly:"復活一名倒下的友方",
+        none:"被動生效"
+    };
+
+    const effects=[];
+
+    if(skill.category==="physical"){
+        effects.push("造成物理傷害");
+    }
+    if(skill.category==="magic"){
+        effects.push("造成法術傷害");
+    }
+    if(skill.burnChance){ effects.push("可能附加燃燒"); }
+    if(skill.freezeChance){ effects.push("可能使目標冰封"); }
+    if(skill.stunChance){ effects.push("可能使目標暈眩並降低命中"); }
+    if(skill.agilityDownChance){ effects.push("可能降低目標敏捷"); }
+    if(skill.damageDownChance){ effects.push("可能降低目標造成的傷害"); }
+    if(skill.defenseDownChance){ effects.push("可能降低目標防禦"); }
+    if(skill.statDownChance){ effects.push("可能降低目標多項能力"); }
+    if(skill.lifestealPercentByLevel){ effects.push("可吸收傷害回復自身"); }
+    if(skill.selfShieldByLevel){ effects.push("為自己建立護盾"); }
+    if(skill.allyShieldByLevel){ effects.push("為我方建立護盾"); }
+
+    if(skill.category==="heal"){
+        effects.push("回復友方生命與能量");
+    }
+    if(skill.category==="revive"){
+        effects.push("讓倒下的友方重新參戰");
+    }
+    if(skill.category==="passive"){
+        effects.push("永久強化該元素的戰鬥特色");
+    }
+
+    const namedEffects={
+        rage:"提升我方爆擊能力",
+        dodgeSkill:"提升我方閃躲能力",
+        stealthSkill:"讓友方進入隱身",
+        dinghaishenzhen:"提升我方異常狀態抗性",
+        rockWall:"提升我方防禦能力",
+        earthShield:"賦予友方反傷效果",
+        barrier:"為友方建立傷害結界"
+    };
+
+    if(namedEffects[skill.id]){
+        effects.push(namedEffects[skill.id]);
+    }
+
+    return [
+        scopes[skill.targetType]||"特殊效果",
+        ...effects
+    ].filter(Boolean).join("；")+"。";
+
+}
+
+function renderAllElementSkillPreview(element){
+
+    const body=$("skillPreviewBody");
+    const tabs=$("skillPreviewTabs");
+
+    if(!body || !tabs){ return; }
+
+    const selected=SKILL_PREVIEW_ELEMENTS.includes(element)
+        ? element
+        : "fire";
+
+    tabs.innerHTML=SKILL_PREVIEW_ELEMENTS.map(key=>{
+        const data=elementDatabase[key];
+        return '<button type="button" class="'+
+            (key===selected ? "active" : "")+
+            '" onclick="renderAllElementSkillPreview(\''+key+'\')">'+
+            data.name+'屬性</button>';
+    }).join("");
+
+    const categoryNames={
+        physical:"物理",
+        magic:"法術",
+        buff:"增益",
+        heal:"回復",
+        revive:"復活",
+        passive:"被動"
+    };
+
+    const skills=Object.values(skillDatabase).filter(
+        skill=>skill.element===selected
+    );
+
+    body.innerHTML=skills.map(skill=>
+        '<article class="skill-preview-card">'+
+            '<div><strong>'+skill.name+'</strong><span>'+
+            (categoryNames[skill.category]||"特殊")+'</span></div>'+
+            '<p>'+getSkillPreviewSummary(skill)+'</p>'+
+        '</article>'
+    ).join("");
+
+    body.scrollTop=0;
+}
+
+function openAllElementSkillPreview(){
+
+    const modal=$("allElementSkillPreviewModal");
+    if(!modal){ return; }
+
+    renderAllElementSkillPreview("fire");
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden","false");
+}
+
+function closeAllElementSkillPreview(){
+
+    const modal=$("allElementSkillPreviewModal");
+    if(!modal){ return; }
+
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden","true");
+}
+
 function changeSkillCharacterArrow(direction){
 
     /*
@@ -27768,21 +28363,22 @@ function changeSkillCharacterArrow(direction){
        以為水/風也能正常用。
     */
 
-    if(
-        currentSkillCharacter==="fire"&&
-        player2
-    ){
+    const keys=getExistingPartyIndexes().map(
+        index=>getPartyCharacterKey(index)
+    );
 
-        currentSkillCharacter=
-            "player2";
-
+    if(keys.length<2){
+        return;
     }
-    else{
 
-        currentSkillCharacter=
-            "fire";
+    const currentPosition=Math.max(
+        0,
+        keys.indexOf(currentSkillCharacter)
+    );
 
-    }
+    currentSkillCharacter=keys[
+        (currentPosition+direction+keys.length)%keys.length
+    ];
 
 
     renderSkillLoadout();
@@ -27814,6 +28410,13 @@ function getSkillCharacterObject(characterId){
         return player2;
     }
 
+    if(
+        characterId==="player3"&&
+        player3
+    ){
+        return player3;
+    }
+
 
     return null;
 
@@ -27837,32 +28440,20 @@ function renderSkillLoadout(){
 
     if(nameBox){
 
-        if(
-            currentSkillCharacter==="player2"&&
-            player2
-        ){
+        const selectedIndex=
+            currentSkillCharacter==="player3"
+            ? 2
+            : currentSkillCharacter==="player2"
+            ? 1
+            : 0;
 
-            nameBox.textContent=
+        const selectedCharacter=
+            getPartyCharacterByIndex(selectedIndex)||player;
 
-                ""+
-                player2.id+
-                "Lv."+
-                player2.level;
-
-        }
-        else{
-
-            nameBox.textContent=
-
-                ""+
-                (
-                    player.id||
-                    "火法師"
-                )+
-                "Lv."+
-                player.level;
-
-        }
+        nameBox.textContent=
+            (selectedCharacter.id||"角色"+(selectedIndex+1))+
+            " Lv."+
+            selectedCharacter.level;
 
     }
 
@@ -29009,9 +29600,9 @@ function getBackpackCharacter(index){
 }
 
 function getBackpackEquipmentKey(index){
-    if(index===0) return "fire";
-    const c=getBackpackCharacter(index);
-    return c ? c.id : null;
+    return getBackpackCharacter(index)
+        ? getPartyCharacterKey(index)
+        : null;
 }
 
 function getInventoryEquipmentSlot(itemType){
@@ -29081,13 +29672,13 @@ function selectInventoryCharacter(index){
 }
 
 function syncCharacterTabsFromInventory(index){
-    if(index===0 || index===1){
+    if(index===0 || index===1 || index===2){
         if(typeof selectCharacterForTabs === "function" &&
-           ((index===0) || player2)){
+           getPartyCharacterByIndex(index)){
             // 避免 selectCharacterForTabs 再次觸發 renderInventory 形成遞迴。
             statusCharacterIndex=index;
             inventoryCharacterIndex=index;
-            currentSkillCharacter=index===0 ? "fire" : "player2";
+            currentSkillCharacter=getPartyCharacterKey(index);
         }
     }
 }
@@ -31020,12 +31611,13 @@ function clearBattleLog(){
 
 function updateActionHudVisibility(){
 
+    const activeAuto=
+        activeBattleCharacterIndex===0
+        ? autoBattle
+        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
+
     const shouldHide=
-
-        autoBattle ||
-
-        battlePhase===
-        "resolve";
+        activeAuto || battlePhase==="resolve";
 
 
     /*
@@ -32197,19 +32789,10 @@ function startAutoSave(){
                     "declare"
                 ){
 
-                    const isPlayer2Turn=
-
-                        activeBattleCharacterIndex
-                        ===1;
-
-
                     const autoOn=
-
-                        isPlayer2Turn
-                        ?
-                        autoConfig2.enabled
-                        :
-                        autoBattle;
+                        activeBattleCharacterIndex===0
+                        ? autoBattle
+                        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
 
                     if(!autoOn){
@@ -32280,6 +32863,47 @@ catch(error){
     );
 
 }
+
+
+/* Mobile hardware/browser Back guard. The first Back press asks for
+   confirmation; confirming performs the real navigation, cancelling keeps
+   the player in the game. */
+(function installMobileBackConfirmation(){
+
+    let allowingExit=false;
+
+    window.allowGameNavigation=()=>{
+        allowingExit=true;
+    };
+
+    try{
+        history.pushState({rpgExitGuard:true},"",location.href);
+    }
+    catch(error){
+        console.warn("無法建立返回防呆紀錄：",error);
+    }
+
+    window.addEventListener("popstate",()=>{
+        if(allowingExit){ return; }
+
+        const confirmed=confirm("確定要離開遊戲嗎？目前進度會先自動存檔。");
+
+        if(confirmed){
+            allowingExit=true;
+            saveGame();
+            history.back();
+        }else{
+            history.pushState({rpgExitGuard:true},"",location.href);
+        }
+    });
+
+    window.addEventListener("beforeunload",event=>{
+        if(allowingExit){ return; }
+        event.preventDefault();
+        event.returnValue="";
+    });
+
+})();
 
 
 /*
@@ -32518,4 +33142,3 @@ catch(error){
     );
 
 }
-

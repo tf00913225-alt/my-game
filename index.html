@@ -67,7 +67,7 @@
         <header class="creation-premium-header">
             <div class="creation-header-ornament" aria-hidden="true">◆</div>
             <div class="creation-title">創建角色</div>
-            <div class="creation-subtitle">選擇你的元素之道，建立第一名冒險者</div>
+            <div id="creationContextSubtitle" class="creation-subtitle">選擇你的元素之道，建立第一名冒險者</div>
             <div class="creation-step-progress" aria-label="創角進度">
                 <span class="is-active" data-creation-step-indicator="1">01 選擇角色</span>
                 <i aria-hidden="true"></i>
@@ -314,9 +314,19 @@
                 <span>上一步</span>
                 <small>BACK</small>
             </button>
-            <button class="creation-start" type="button" onclick="createCharacter()">
-                <span>開始冒險</span>
+            <button id="creationSubmitButton" class="creation-start" type="button" onclick="createCharacter()">
+                <span id="creationSubmitLabel">開始冒險</span>
                 <small>ENTER THE WORLD</small>
+            </button>
+            <button
+                id="creationCancelButton"
+                class="creation-back creation-cancel-additional"
+                type="button"
+                onclick="cancelAdditionalCharacterCreation()"
+                hidden
+            >
+                <span>取消創建</span>
+                <small>RETURN</small>
             </button>
         </div>
 
@@ -1722,7 +1732,7 @@
     <div class="auto-premium-status-copy">
         <span class="auto-panel-kicker">AUTO COMBAT</span>
         <strong id="autoBattleLabel">自動戰鬥</strong>
-        <small>依照下方條件自動選擇行動與補品</small>
+        <small>戰鬥中選擇行動，戰鬥結束後檢查補品</small>
     </div>
     <button
         id="autoBattleButton"
@@ -1754,6 +1764,10 @@
                     id="autoSettingsCharOption1"
                     value="1"
                 >角色2</option>
+                <option
+                    id="autoSettingsCharOption2"
+                    value="2"
+                >角色3</option>
             </select>
         </div>
     </div>
@@ -1780,7 +1794,7 @@
             <span class="auto-threshold-emblem">HP</span>
             <div>
                 <strong>生命補給</strong>
-                <small>低於門檻時使用補品</small>
+                <small>戰鬥結束後低於門檻時使用補品</small>
             </div>
         </div>
         <select id="autoSettingsHP">
@@ -1797,7 +1811,7 @@
             <span class="auto-threshold-emblem">SP</span>
             <div>
                 <strong>能量補給</strong>
-                <small>低於門檻時使用補品</small>
+                <small>戰鬥結束後低於門檻時使用補品</small>
             </div>
         </div>
         <select id="autoSettingsSP">
@@ -2048,7 +2062,14 @@
     class="page"
 >
 
-<h2>技能配裝</h2>
+<div class="skill-page-heading">
+    <h2>技能配裝</h2>
+    <button
+        type="button"
+        class="skill-preview-open-button"
+        onclick="openAllElementSkillPreview()"
+    >全屬性技能預覽</button>
+</div>
 
 <div
     id="skillCharacterSwitchCard"
@@ -2683,6 +2704,23 @@
 </div>
 
 
+<!-- V130：四元素技能功能預覽 -->
+<div
+    id="allElementSkillPreviewModal"
+    class="skill-preview-modal"
+    aria-hidden="true"
+>
+    <div class="skill-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="skillPreviewTitle">
+        <div class="skill-preview-heading">
+            <h2 id="skillPreviewTitle">全屬性技能預覽</h2>
+            <button type="button" onclick="closeAllElementSkillPreview()">返回</button>
+        </div>
+        <div id="skillPreviewTabs" class="skill-preview-tabs"></div>
+        <div id="skillPreviewBody" class="skill-preview-body"></div>
+    </div>
+</div>
+
+
 <!-- =====================================================
      升級
 ===================================================== -->
@@ -2712,7 +2750,7 @@
 </div>
 
 
-<script src="js/00-main.js?v=127"></script>
+<script src="js/00-main.js?v=130"></script>
 
 </div>
 </div>
@@ -2858,5 +2896,6 @@
 
 
 <link id="v110-auto-settings-premium" rel="stylesheet" href="css/26-v110-auto-settings-premium.css">
+<link id="v130-requested-updates" rel="stylesheet" href="css/30-v130-requested-updates.css?v=130">
 </body>
 </html>

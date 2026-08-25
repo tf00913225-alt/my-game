@@ -728,7 +728,13 @@
         const originalCreateCharacter=window.createCharacter;
         window.createCharacter=function(){
             try{
-                if(typeof player!=="undefined"){
+                if(
+                    typeof player!=="undefined" &&
+                    (
+                        typeof creationTargetSlot==="undefined" ||
+                        creationTargetSlot===1
+                    )
+                ){
                     player.gender=selectedGender;
                 }
             }catch(error){}
@@ -805,6 +811,10 @@
             skillPreviewPresent:!!byId("creationPhysicalSkills")
         };
     };
+
+    /* 第二／三角色共用創角頁時，取消或完成後也要能主動解除
+       Android 的固定創角手勢模式。 */
+    window.syncCreationTouchMode=syncCreationTouchMode;
 
     /* No MutationObserver / extra touch listeners.
        A second sync after current call stack covers loadGame() timing safely. */

@@ -1,0 +1,227 @@
+/* V130 — Requested character, skill, shop and battle refinements. */
+
+/* Character skill tab: this is the single native scroll owner. */
+#game-stage #homeFeatureModal #characterTabContent{
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    min-height:0 !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent > #skillPage{
+    display:block !important;
+    position:static !important;
+    height:max-content !important;
+    min-height:max-content !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding-bottom:220px !important;
+    touch-action:pan-y !important;
+}
+
+#game-stage #homeFeatureModal #allSkillsList{
+    overflow:visible !important;
+    padding-bottom:80px !important;
+}
+
+/* All battle portraits now use the selected character's inline artwork. */
+#game-stage > #app > #game-content #battlePage .battle-player{
+    flex:1 1 0 !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:116px !important;
+    background-color:transparent !important;
+    background-repeat:no-repeat !important;
+    background-size:cover !important;
+    background-position:center 18% !important;
+    justify-content:flex-end !important;
+    padding-bottom:2px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player .battle-player-icon{
+    display:none !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player .battle-player-id,
+#game-stage > #app > #game-content #battlePage .battle-player .battle-player-status{
+    text-shadow:0 1px 3px rgba(0,0,0,.98),0 0 5px #000 !important;
+}
+
+/* Fallen monsters stay readable because revival can return them to battle. */
+#game-stage > #app > #game-content #battlePage .battle-monster.dead{
+    opacity:.34 !important;
+}
+
+.shop-potion-purchase-row{
+    display:grid;
+    grid-template-columns:auto 70px minmax(0,1fr);
+    align-items:center;
+    gap:7px;
+    margin-top:8px;
+}
+
+.shop-potion-purchase-row label{
+    color:#b3a58c;
+    font-size:12px;
+}
+
+.shop-potion-quantity{
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    padding:8px 6px;
+    border:1px solid #8a6a3a;
+    border-radius:6px;
+    background:#17120d;
+    color:#f7e8c1;
+    text-align:center;
+    font:inherit;
+}
+
+.shop-potion-purchase-row .shop-potion-buy{
+    width:100%;
+    margin:0;
+}
+
+.skill-page-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+}
+
+.skill-page-heading h2{
+    margin:0;
+}
+
+.skill-preview-open-button{
+    flex:0 0 auto;
+    padding:8px 10px;
+    border:1px solid #c8953d;
+    border-radius:7px;
+    background:linear-gradient(180deg,#3b2a17,#21160d);
+    color:#f6d58a;
+    font-weight:800;
+}
+
+.skill-preview-modal{
+    position:absolute;
+    inset:0;
+    z-index:600;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    box-sizing:border-box;
+    background:rgba(0,0,0,.82);
+}
+
+.skill-preview-modal.show{
+    display:flex;
+}
+
+.skill-preview-dialog{
+    width:min(92%,760px);
+    max-height:88%;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border:2px solid #a77a35;
+    border-radius:12px;
+    background:linear-gradient(180deg,#22190f,#100d0a);
+    box-shadow:0 14px 40px rgba(0,0,0,.75);
+}
+
+.skill-preview-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:13px 14px;
+    border-bottom:1px solid #6f5228;
+}
+
+.skill-preview-heading h2{
+    margin:0;
+    color:#f4d690;
+    font-size:20px;
+}
+
+.skill-preview-heading button,
+.skill-preview-tabs button{
+    border:1px solid #8a6a3a;
+    border-radius:6px;
+    padding:8px 10px;
+    background:#21180f;
+    color:#e8d4aa;
+    font-weight:800;
+}
+
+.skill-preview-tabs{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:5px;
+    padding:9px;
+}
+
+.skill-preview-tabs button.active{
+    border-color:#f0b429;
+    background:#5a3512;
+    color:#fff0ba;
+}
+
+.skill-preview-body{
+    min-height:0;
+    overflow-y:auto;
+    touch-action:pan-y;
+    -webkit-overflow-scrolling:touch;
+    padding:0 10px 22px;
+}
+
+.skill-preview-card{
+    margin:7px 0;
+    padding:10px;
+    border:1px solid #594424;
+    border-radius:8px;
+    background:rgba(255,255,255,.035);
+}
+
+.skill-preview-card > div{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+}
+
+.skill-preview-card strong{
+    color:#f1cf82;
+}
+
+.skill-preview-card span{
+    color:#9f9178;
+    font-size:12px;
+}
+
+.skill-preview-card p{
+    margin:6px 0 0;
+    color:#ded5c5;
+    font-size:13px;
+    line-height:1.55;
+}
+
+.creation-cancel-additional[hidden]{
+    display:none !important;
+}
+
+@media (max-width:520px){
+    .shop-potion-purchase-row{
+        grid-template-columns:auto 62px minmax(0,1fr);
+    }
+
+    .skill-preview-tabs button{
+        padding:8px 2px;
+        font-size:12px;
+    }
+}
