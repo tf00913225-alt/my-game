@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>戰鬥完整版 V124 SPLIT</title>
+<title>戰鬥完整版 V125 SPLIT</title>
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
@@ -12,8 +12,6 @@
 <link rel="stylesheet" href="css/00-main.css">
 
 <link id="stage-v8-map-page-fix" rel="stylesheet" href="css/01-stage-v8-map-page-fix.css">
-
-</style>
 
 <link id="stage-v3-layout-fix" rel="stylesheet" href="css/02-stage-v3-layout-fix.css">
 
@@ -26,7 +24,7 @@
 
 
 <link id="v119-ally-target-style" rel="stylesheet" href="css/04-v119-ally-target-style.css">
-<link id="v124-character-creation-native" rel="stylesheet" href="css/28-v124-character-creation-native.css">
+<link id="v125-character-creation-native" rel="stylesheet" href="css/29-v125-character-creation-native.css">
 
 </head>
 
@@ -54,7 +52,7 @@
 </div>
 
 <!-- =====================================================
-     V124 創建角色 — Native 1080 × 1920 介面
+     V125 創建角色 — Native 1080 × 1920 介面
      - 保留既有 ID / 元素 / 六能力配點機制
      - 新增男女立繪切換、元素定位、技能系譜預覽
      - 實際修改 width / height / font-size / padding / gap
@@ -330,6 +328,10 @@
     </div>
 
 </div>
+
+<!-- V125: move the still-hidden creation page into the native layer before
+     the legacy 420px wrapper is built or the browser can paint its portrait. -->
+<script id="v125-character-creation-bootstrap" src="js/23-v125-character-creation-bootstrap.js"></script>
 
 
 <!-- =====================================================
@@ -2854,7 +2856,7 @@
      No damage/SP/initiative/skill formulas changed. -->
 
 <script src="js/20-anonymous-20.js"></script>
-<script id="v124-character-creation-native-runtime" src="js/22-v124-character-creation-native-runtime.js"></script>
+<script id="v125-character-creation-native-runtime" src="js/24-v125-character-creation-native-runtime.js"></script>
 
 
 <link id="v110-auto-settings-premium" rel="stylesheet" href="css/26-v110-auto-settings-premium.css">
