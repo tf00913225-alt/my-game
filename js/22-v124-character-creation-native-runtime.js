@@ -1,5 +1,7 @@
 /* =====================================================
-   V123 — CHARACTER CREATION RUNTIME
+   V124 — NATIVE 1080 × 1920 CHARACTER CREATION RUNTIME
+   - Reparents the creation page into the native overlay layer
+   - Uses real native component dimensions, never migration scale
    - Gender / portrait switching
    - Element positioning + live skill preview from skillDatabase
    - Android Chrome creation-page native scroll mode
@@ -60,12 +62,42 @@
         return document.getElementById(id);
     }
 
+    function migrateCreationPageToNativeLayer(){
+        const page=byId("creationPage");
+        const overlay=byId("game-overlay-layer");
+        if(!page || !overlay){return null;}
+
+        if(page.parentElement!==overlay){
+            overlay.appendChild(page);
+        }
+
+        page.classList.add("native-creation-page","game-native-ui");
+        page.dataset.nativeWidth="1080";
+        page.dataset.nativeHeight="1920";
+        page.dataset.nativeMigration="actual-dimensions";
+
+        [
+            "left","top","right","bottom","width","height",
+            "min-width","min-height","max-width","max-height",
+            "margin","transform","transform-origin"
+        ].forEach(function(property){
+            page.style.removeProperty(property);
+        });
+
+        /* This layer contains interactive native UI, so it cannot stay
+           hidden from accessibility APIs. Pointer ownership remains on
+           #creationPage; the overlay itself still uses pointer-events:none. */
+        overlay.removeAttribute("aria-hidden");
+        return page;
+    }
+
     function setCreationTouchMode(active){
         [
             document.documentElement,
             document.body,
             byId("game-viewport"),
-            byId("game-stage")
+            byId("game-stage"),
+            byId("game-overlay-layer")
         ].forEach(function(node){
             if(node){
                 node.classList.toggle("creation-scroll-active",!!active);
@@ -74,7 +106,7 @@
     }
 
     function syncCreationTouchMode(){
-        const page=byId("creationPage");
+        const page=migrateCreationPageToNativeLayer();
         const visible=!!page && window.getComputedStyle(page).display!=="none";
         setCreationTouchMode(visible);
     }
@@ -211,6 +243,7 @@
     if(typeof window.showCreation==="function"){
         const originalShowCreation=window.showCreation;
         window.showCreation=function(){
+            migrateCreationPageToNativeLayer();
             const result=originalShowCreation.apply(this,arguments);
             setCreationTouchMode(true);
             renderCreationShowcase(
@@ -239,9 +272,28 @@
         }
     })();
 
+    migrateCreationPageToNativeLayer();
     window.selectCreationGender(selectedGender);
     renderCreationShowcase(initialElement);
     syncCreationTouchMode();
+
+    window.getCreationNativeLayoutDiagnostics=function(){
+        const page=migrateCreationPageToNativeLayer();
+        const shell=page && page.querySelector(".creation-premium-shell");
+        if(!page){return null;}
+        const pageStyle=window.getComputedStyle(page);
+        const shellStyle=shell?window.getComputedStyle(shell):null;
+        return {
+            parentId:page.parentElement?page.parentElement.id:null,
+            nativeWidth:pageStyle.width,
+            nativeHeight:pageStyle.height,
+            transform:pageStyle.transform,
+            overflowY:pageStyle.overflowY,
+            pointerEvents:pageStyle.pointerEvents,
+            shellPadding:shellStyle?shellStyle.padding:null,
+            migration:page.dataset.nativeMigration||null
+        };
+    };
 
     /* No MutationObserver / extra touch listeners.
        A second sync after current call stack covers loadGame() timing safely. */
