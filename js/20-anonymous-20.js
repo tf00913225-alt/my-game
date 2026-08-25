@@ -117,3 +117,29 @@
         bind();
     }
 })();
+
+/* V131 loader — keeps the split project stable without reopening index.html. */
+(function loadV131FixBatch(){
+    function load(){
+        if(!document.getElementById("v131-fix-batch-style")){
+            const link=document.createElement("link");
+            link.id="v131-fix-batch-style";
+            link.rel="stylesheet";
+            link.href="css/31-v131-fix-batch.css?v=131";
+            document.head.appendChild(link);
+        }
+
+        if(!document.getElementById("v131-fix-batch-runtime")){
+            const script=document.createElement("script");
+            script.id="v131-fix-batch-runtime";
+            script.src="js/25-v131-fix-batch.js?v=131";
+            document.body.appendChild(script);
+        }
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
