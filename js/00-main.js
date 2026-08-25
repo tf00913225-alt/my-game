@@ -3347,7 +3347,62 @@ const elementSkillIconMap = {
            這次剛好用上
     */
 
-    iceArrowRain:"assets/skills/water-ice-arrow-rain.jpg"
+    iceArrowRain:"assets/skills/water-ice-arrow-rain.jpg",
+
+    /*
+       ★ 新增（依照使用者要求，土系技能icon）：
+       這次使用者上傳了15張圖，其中4張是男角Q版巡怪背面立繪
+       （不是技能icon，另外處理），剩下11張是技能icon候選。
+       土系總共12個技能，逐張比對名稱/技能描述後配對：
+
+       petrifyFist（石盾拳，物理，造成傷害+全體護盾）
+         → 拳頭出擊、身後有岩石護盾光環的畫面，
+           對應「盾」+「拳」兩個字
+       stoneBreakSky（石破天驚，物理，單體大傷害+護盾）
+         → 巨大岩石裂開、光芒炸開的畫面，
+           對應「石破天驚」的震撼感
+       earthquakeCrush（地裂重拳，物理，三人傷害+自身護盾）
+         → 岩層裂開、金光四射的畫面，對應「地裂」
+       stoneThrow（落石術，法術，三人傷害+降防）
+         → 巨石從天而降的畫面，直接對應「落石」
+       sandWind（滾石術，法術，橫排傷害+降防）
+         → 巨石滾動、拖出光跡的畫面，對應「滾石」
+       flyingSandStrike（飛沙瞬擊，法術，全體傷害+機率石化）
+         → 金色沙塵/能量漩渦畫面，對應「飛沙」
+       dustStorm（地牛猛襲，法術，全體傷害+降防）
+         → 岩石巨牛衝鋒的畫面，直接對應「地牛」
+       earthShield（萬象土盾，增益，單體反傷護盾）
+         → 火水風土四元素環繞中央土屬性圓盤的畫面，
+           對應「萬象」（各種現象/元素匯聚）
+       rockWall（岩石壁壘，增益，全體防禦提升）
+         → 一整排岩石尖塔並列的畫面，直接對應「壁壘」
+       barrier（結界，增益，單體完全防護）
+         → 發光的魔法陣圓頂結界畫面，直接對應「結界」
+
+       以下2個技能這次沒有信心足夠的圖可以配對，先不放（保持
+       elementSkillIconMap沒有這個key，getSkillIconBackgroundImage()
+       會自動安全降級成空字串，UI不會報錯，只是那格icon框維持空白）：
+       stoneSlash（土石斬，入門單體物理技能，上傳的圖沒有
+         明顯「斬擊」動作的畫面，硬配容易配錯）
+       earthEX（土元素EX，被動）：fire-ex.jpg／water-ex.jpg
+         都是圖片本身直接寫著「EX」字樣的專用icon，這次上傳的
+         11張圖沒有同款式的，等之後補上再放。
+
+       另外有1張圖（岩石尖塔+光環，較抽象、跟其他候選圖區分度低）
+       這次也沒有用上，保留在原始上傳紀錄裡，之後如果新增技能
+       或想換掉某個配對可以再用。
+    */
+
+    petrifyFist:"assets/skills/earth-petrify-fist.jpg",
+    stoneBreakSky:"assets/skills/earth-stone-break-sky.jpg",
+    earthquakeCrush:"assets/skills/earth-earthquake-crush.jpg",
+    stoneThrow:"assets/skills/earth-stone-throw.jpg",
+    sandWind:"assets/skills/earth-sand-wind.jpg",
+    flyingSandStrike:"assets/skills/earth-flying-sand-strike.jpg",
+    dustStorm:"assets/skills/earth-dust-storm.jpg",
+    earthShield:"assets/skills/earth-shield.jpg",
+    rockWall:"assets/skills/earth-rock-wall.jpg",
+    barrier:"assets/skills/earth-barrier.jpg"
 };
 
 /*

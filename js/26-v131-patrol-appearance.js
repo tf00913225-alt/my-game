@@ -22,32 +22,35 @@
     };
 
     /*
-       ★ 男角 Q 版（新增）：目前上傳素材只有正面（沒有背面），
-       所以只用一張 2x2 sprite（火/水/風/土 各一格），
-       front/back 都指向同一格，移動方向不影響顯示。
+       ★ 男角 Q 版（新增，2026-08-25 補上背面後更新）：
+       4 欄（火/水/風/土）× 2 列（正面/背面）的 sprite，
+       跟女角那組一樣支援移動方向切換正背面。
        缺這組資料時（尚未載入或載入失敗）就自動退回
        只用女角那組 sprite，不影響既有行為。
     */
     const maleChunks=Array.isArray(window.V131_PATROL_SPRITE_MALE_CHUNKS)
         ? window.V131_PATROL_SPRITE_MALE_CHUNKS
         : [];
-    const maleSpriteReady=maleChunks.length>=9 && maleChunks.every(chunk=>!!chunk);
+    const maleSpriteReady=maleChunks.length>=18 && maleChunks.every(chunk=>!!chunk);
     const maleSpriteUrl=maleSpriteReady
         ? "data:image/webp;base64,"+maleChunks.join("")
         : null;
     const maleSpriteCells={
-        fire:[0,0],
-        water:[1,0],
-        wind:[0,1],
-        earth:[1,1]
+        fire:{front:[0,0],back:[0,1]},
+        water:{front:[1,0],back:[1,1]},
+        wind:{front:[2,0],back:[2,1]},
+        earth:{front:[3,0],back:[3,1]}
     };
+    const MALE_SPRITE_COLS=4;
 
     function isMaleCharacter(character){
         return !!(character && character.gender==="male");
     }
 
     function maleBackgroundPosition(cell){
-        return (cell[0]===0?"0%":"100%")+" "+(cell[1]===0?"0%":"100%");
+        const col=cell[0];
+        const row=cell[1];
+        return (col*(100/(MALE_SPRITE_COLS-1)))+"% "+(row===0?"0%":"100%");
     }
 
     let selectedIndex=Number(localStorage.getItem(STORAGE_KEY));
@@ -109,9 +112,9 @@
         img.style.setProperty("background-repeat","no-repeat","important");
 
         if(maleSpriteUrl && isMaleCharacter(character)){
-            const cell=maleSpriteCells[element];
+            const cell=maleSpriteCells[element][facingBack ? "back" : "front"];
             img.style.setProperty("background-image",'url("'+maleSpriteUrl+'")',"important");
-            img.style.setProperty("background-size","200% 200%","important");
+            img.style.setProperty("background-size",(MALE_SPRITE_COLS*100)+"% 200%","important");
             img.style.setProperty("background-position",maleBackgroundPosition(cell),"important");
         }
         else{
