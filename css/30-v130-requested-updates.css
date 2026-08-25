@@ -97,16 +97,6 @@
     margin:0;
 }
 
-.skill-preview-open-button{
-    flex:0 0 auto;
-    padding:8px 10px;
-    border:1px solid #c8953d;
-    border-radius:7px;
-    background:linear-gradient(180deg,#3b2a17,#21160d);
-    color:#f6d58a;
-    font-weight:800;
-}
-
 .skill-preview-modal{
     position:absolute;
     inset:0;

@@ -289,6 +289,37 @@
     }
 
     /*
+       ★ 修正（依照使用者要求，「技能升級時沒有跳出防呆訊息，
+       只有學習時有跳出來」）：
+       已學過但還沒滿級的技能，畫面上按的其實是upgradeSkill()，
+       不是learnSkill()——上面那段只包了learnSkill，
+       upgradeSkill完全沒被攔到，所以升級的時候
+       不會有確認/成功提示。這裡用同一套邏輯
+       （確認→執行→比對等級有沒有真的變化→跳成功提示）
+       再包一次upgradeSkill。
+    */
+    if(typeof upgradeSkill==="function"){
+        const originalUpgradeSkill=upgradeSkill;
+        upgradeSkill=function(skillId){
+            const skill=skillDatabase[skillId];
+            const loadout=characterSkillLoadouts[currentSkillCharacter];
+            if(!skill || !loadout){
+                return originalUpgradeSkill.apply(this,arguments);
+            }
+            const before=Math.max(0,Number(loadout.skillLevels[skillId])||0);
+            if(!window.confirm("確定要升級「"+skill.name+"」嗎？")){
+                return;
+            }
+            const result=originalUpgradeSkill.apply(this,arguments);
+            const after=Math.max(0,Number(loadout.skillLevels[skillId])||0);
+            if(after>before){
+                window.alert("「"+skill.name+"」升級成功！目前 Lv."+after+"。");
+            }
+            return result;
+        };
+    }
+
+    /*
        ★ 修正：
        原本用 onclick="learnSkill(...)" 這種字串正則去猜
        這一列是哪個技能，但實際的技能列（.skill-row）

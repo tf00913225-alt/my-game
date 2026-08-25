@@ -3397,12 +3397,8 @@ const elementSkillIconMap = {
            fire-ex.jpg／water-ex.jpg同款式。
 
        ★ earthShield（萬象土盾，增益，單體反傷護盾）
-       這次唯一沒有圖的技能：原本配對這格的「四元素環繞
-       中央土盤」那張圖，使用者標籤證實其實是sandWind要用的，
-       被抽走後earthShield暫時沒有圖可用，先不放（保持
-       elementSkillIconMap沒有這個key，getSkillIconBackgroundImage()
-       會自動安全降級成空字串，UI不會報錯，只是那格icon框
-       維持空白），等之後有合適的圖再補。
+       使用者重新提供並標明「萬象土盾」專用圖（金色土盾正面
+       特寫），補回這個key。
     */
 
     petrifyFist:"assets/skills/earth-petrify-fist.jpg",
@@ -3415,7 +3411,8 @@ const elementSkillIconMap = {
     rockWall:"assets/skills/earth-rock-wall.jpg",
     barrier:"assets/skills/earth-barrier.jpg",
     stoneSlash:"assets/skills/earth-stone-slash.jpg",
-    earthEX:"assets/skills/earth-ex.jpg"
+    earthEX:"assets/skills/earth-ex.jpg",
+    earthShield:"assets/skills/earth-shield.jpg"
 };
 
 /*
@@ -25039,6 +25036,54 @@ function openHomeFeature(type){
         );
 
 
+        /*
+           ★ 修正（依照使用者要求，「自動戰鬥設定頁面
+           沒辦法捲動，或者把整個框放大」）：
+           上面的172px padding-bottom是為了「貼齊戰鬥
+           資訊框上緣」算出來的，但這個設定視窗不是只有
+           在戰鬥中才會打開（主城、地圖上的元素匣按鈕
+           平常也能開），不在戰鬥中的時候畫面下方根本
+           沒有戰鬥資訊框，這172px的留白純粹是浪費空間、
+           把視窗往上擠，導致內容被壓縮、看起來要一直捲
+           才看得完。改成只有真的在戰鬥中（battleActive）
+           才保留172px，其餘情況只留一點點安全距離，
+           把多出來的空間還給視窗本身。
+        */
+
+        modal.style.setProperty(
+            "padding-bottom",
+            battleActive ? "172px" : "24px",
+            "important"
+        );
+
+
+        /*
+           ★ 修正（同一個問題的另一半）：
+           光把padding-bottom讓出來還不夠——視窗本身
+           （.home-feature-modal-box）還有一條寫死的
+           max-height:80dvh，不管外面讓出多少空間，
+           視窗自己最高就是卡在螢幕的80%，不在戰鬥中時
+           其實可以再放寬，讓使用者不用捲那麼多下
+           （甚至常見情況下可以整頁看完不用捲）。
+        */
+
+        const settingsBox=
+            modal.querySelector(
+                ".home-feature-modal-box"
+            );
+
+
+        if(settingsBox){
+
+            settingsBox.style.setProperty(
+                "max-height",
+                battleActive ? "80dvh" : "96dvh",
+                "important"
+            );
+
+        }
+
+
         const characterSelect=
             $("autoSettingsCharacterSelect");
 
@@ -25444,6 +25489,32 @@ function switchCharacterTab(tabName){
         helpBtn.style.display=
 
             tabName==="status"
+            ?
+            "inline-block"
+            :
+            "none";
+
+    }
+
+
+    /*
+       ★ 新增（依照使用者要求，「全技能預覽
+       文字按鈕，應該放在技能頁面的返回
+       下面」）：
+       跟statusHelpButton同一套邏輯，只有
+       切到「技能」分頁才顯示，其他分頁
+       自動隱藏。
+    */
+
+    const skillPreviewBtn=
+        $("skillPreviewHeaderButton");
+
+
+    if(skillPreviewBtn){
+
+        skillPreviewBtn.style.display=
+
+            tabName==="skill"
             ?
             "inline-block"
             :
