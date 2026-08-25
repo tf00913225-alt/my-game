@@ -1,6 +1,6 @@
 /* =====================================================
-   V125 — NATIVE 1080 × 1920 CHARACTER CREATION RUNTIME
-   - Uses the V125 pre-paint native bootstrap; reparenting is only a fallback
+   V126 — NATIVE 1080 × 1920 CHARACTER CREATION RUNTIME
+   - Uses the V126 pre-paint native bootstrap; reparenting is only a fallback
    - Uses real native component dimensions, never migration scale
    - Gender / portrait switching
    - Element positioning + live skill preview from skillDatabase
@@ -104,6 +104,22 @@
                 node.classList.toggle("creation-scroll-active",!!active);
             }
         });
+
+        const stage=byId("game-stage");
+        const app=byId("app");
+
+        if(stage){
+            stage.classList.toggle("creation-native-active",!!active);
+        }
+
+        if(app){
+            app.inert=!!active;
+            if(active){
+                app.setAttribute("aria-hidden","true");
+            }else{
+                app.removeAttribute("aria-hidden");
+            }
+        }
     }
 
     function syncCreationTouchMode(){
@@ -642,10 +658,12 @@
                     player.gender=selectedGender;
                 }
             }catch(error){}
-            const result=originalCreateCharacter.apply(this,arguments);
-            /* 驗證失敗時創角頁仍會顯示，不能提前關掉手機垂直滑動。 */
-            syncCreationTouchMode();
-            return result;
+            try{
+                return originalCreateCharacter.apply(this,arguments);
+            }finally{
+                /* 驗證失敗時創角頁仍會顯示，不能提前關掉手機垂直滑動。 */
+                syncCreationTouchMode();
+            }
         };
     }
 
@@ -653,14 +671,16 @@
         const originalShowCreation=window.showCreation;
         window.showCreation=function(){
             migrateCreationPageToNativeLayer();
-            const result=originalShowCreation.apply(this,arguments);
-            setCreationTouchMode(true);
-            renderCreationShowcase(
-                (typeof selectedCreationElement!=="undefined" && META[selectedCreationElement])
-                ? selectedCreationElement
-                : "fire"
-            );
-            return result;
+            try{
+                return originalShowCreation.apply(this,arguments);
+            }finally{
+                setCreationTouchMode(true);
+                renderCreationShowcase(
+                    (typeof selectedCreationElement!=="undefined" && META[selectedCreationElement])
+                    ? selectedCreationElement
+                    : "fire"
+                );
+            }
         };
     }
 
@@ -711,5 +731,4 @@
        A second sync after current call stack covers loadGame() timing safely. */
     window.setTimeout(syncCreationTouchMode,0);
 })();
-
 

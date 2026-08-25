@@ -1,9 +1,20 @@
 /* =====================================================
-   V125 — TRUE NATIVE 1080 × 1920 CHARACTER CREATION
+   V126 — TRUE NATIVE 1080 × 1920 CHARACTER CREATION
    Every component uses native design dimensions.
    No 420 → 1080 migration transform is used.
-   Existing stat formulas / element mechanics are untouched.\n   V125 adds pre-paint portrait stability and tappable skill details.
+   Existing stat formulas / element mechanics are untouched.
+   V126 isolates the legacy app from Samsung Browser's paint tree.
 ===================================================== */
+
+/* Root isolation: while creation is visible, the legacy city, pages and
+   navigation do not participate in layout painting or hit testing. */
+#game-stage.creation-native-active > #app{
+    display:none !important;
+}
+
+#game-stage.creation-native-active > #game-overlay-layer > :not(#creationPage):not(#creationSkillDetailModal){
+    display:none !important;
+}
 
 /* Root-cause Android Chrome scroll bridge.
    #game-viewport intentionally uses touch-action:none globally.
@@ -26,7 +37,7 @@ body.creation-scroll-active,
     top:0 !important;
     right:auto !important;
     bottom:auto !important;
-    z-index:2147483600 !important;
+    z-index:10 !important;
     width:1080px !important;
     height:1920px !important;
     min-width:1080px !important;
@@ -38,17 +49,17 @@ body.creation-scroll-active,
     overflow-y:auto !important;
     overflow-x:hidden !important;
     overscroll-behavior-y:contain;
-    -webkit-overflow-scrolling:touch;
+    -webkit-overflow-scrolling:auto;
     touch-action:pan-y !important;
     pointer-events:auto !important;
     transform:none !important;
     transform-origin:top left !important;
     padding:0 !important;
     scrollbar-width:none;
-    isolation:isolate;
     -webkit-text-size-adjust:100%;
     text-size-adjust:100%;
-    background:
+    background-color:#050407;
+    background-image:
         radial-gradient(circle at 50% -10%, rgba(177,128,47,.24), transparent 34%),
         radial-gradient(circle at 12% 24%, rgba(91,57,131,.18), transparent 38%),
         linear-gradient(180deg,#171123 0%,#0c0912 42%,#050407 100%);
@@ -746,11 +757,11 @@ body.creation-scroll-active,
 }
 
 /* Samsung Browser paint stability:
-   keep the portrait in one native paint island and avoid a filtered
-   compositor layer inside the scaled, scrollable game stage. */
+   avoid nested paint containment/compositor islands inside the scaled,
+   scrollable stage. The legacy app is removed from paint separately. */
 #creationPage .creation-showcase,
 #creationPage .creation-portrait-panel{
-    contain:paint;
+    contain:none;
 }
 
 #creationPage .creation-portrait-aura{
@@ -760,8 +771,8 @@ body.creation-scroll-active,
 #creationPage .creation-portrait-image{
     display:block;
     image-rendering:auto;
-    -webkit-backface-visibility:hidden;
-    backface-visibility:hidden;
+    -webkit-backface-visibility:visible;
+    backface-visibility:visible;
 }
 
 
@@ -804,7 +815,7 @@ body.creation-scroll-active,
     position:absolute;
     left:0;
     top:0;
-    z-index:2147483646;
+    z-index:20;
     display:none;
     align-items:center;
     justify-content:center;
