@@ -1,5 +1,5 @@
 /* =====================================================
-   V128 — TRUE NATIVE 1080 × 1920 TWO-STEP CHARACTER CREATION
+   V129 — TRUE NATIVE 1080 × 1920 TWO-STEP CHARACTER CREATION
    Every component uses native design dimensions.
    No 420 → 1080 migration transform is used.
    Existing stat formulas / element mechanics are untouched.
@@ -822,6 +822,89 @@ body.creation-fixed-active{
 
 #creationPage .creation-stat-details-body b{
     color:#ead9bd;
+}
+
+/* =====================================================
+   V129 — STEP TWO TYPOGRAPHY AND READING RHYTHM
+===================================================== */
+#creationPage .creation-stats-card .creation-label{
+    font-size:36px;
+    line-height:1.25;
+}
+
+#creationPage .creation-stats-card .creation-card-caption{
+    margin-top:7px;
+    font-size:24px;
+    line-height:1.4;
+}
+
+#creationPage .creation-points-badge{
+    font-size:24px;
+}
+
+#creationPage .creation-points-badge b{
+    font-size:38px;
+}
+
+#creationPage .creation-stat-grid{
+    gap:18px;
+}
+
+#creationPage .creation-stat{
+    min-height:144px;
+    padding:20px 20px 20px 25px;
+}
+
+#creationPage .creation-stat-copy{
+    flex:1 1 auto;
+    padding-right:12px;
+}
+
+#creationPage .creation-stat-copy b{
+    font-size:32px;
+    line-height:1.25;
+}
+
+#creationPage .creation-stat-copy small{
+    margin-top:7px;
+    overflow:visible;
+    font-size:22px;
+    line-height:1.3;
+    white-space:normal;
+    text-overflow:clip;
+}
+
+#creationPage .creation-stat-right{
+    gap:12px;
+}
+
+#creationPage .creation-stat-right > b{
+    min-width:42px;
+    font-size:35px;
+}
+
+#creationPage .creation-stat-button{
+    width:72px;
+    height:72px;
+    border-radius:20px;
+    font-size:40px;
+    line-height:67px;
+}
+
+#creationPage .creation-stat-details summary{
+    padding:27px 29px;
+    font-size:28px;
+    line-height:1.4;
+}
+
+#creationPage .creation-stat-details[open] .creation-stat-details-body{
+    padding:16px 29px 28px;
+    font-size:29px;
+    line-height:1.65;
+}
+
+#creationPage .creation-stat-details-body > div + div{
+    margin-top:16px;
 }
 
 #creationPage .creation-start{
