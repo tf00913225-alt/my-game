@@ -94,18 +94,29 @@
     }
 
     function setCreationTouchMode(active){
-        [
+        const fixedNodes=[
             document.documentElement,
             document.body,
             byId("game-viewport"),
             byId("game-stage"),
             byId("game-overlay-layer")
-        ].forEach(function(node){
+        ];
+
+        fixedNodes.forEach(function(node){
             if(node){
                 node.classList.remove("creation-scroll-active");
                 node.classList.toggle("creation-fixed-active",!!active);
             }
         });
+
+        if(active){
+            fixedNodes.concat(byId("creationPage")).forEach(function(node){
+                if(node){
+                    node.scrollTop=0;
+                    node.scrollLeft=0;
+                }
+            });
+        }
 
         const stage=byId("game-stage");
         const app=byId("app");
@@ -140,7 +151,7 @@
             return;
         }
 
-        ["touchmove","gesturestart","gesturechange","gestureend"].forEach(function(eventName){
+        ["touchmove","wheel","gesturestart","gesturechange","gestureend"].forEach(function(eventName){
             page.addEventListener(eventName,function(event){
                 event.preventDefault();
             },{passive:false});
@@ -175,6 +186,14 @@
             page.dataset.step=String(normalized);
             page.scrollTop=0;
         }
+
+        ["game-viewport","game-stage","game-overlay-layer"].forEach(function(id){
+            const node=byId(id);
+            if(node){
+                node.scrollTop=0;
+                node.scrollLeft=0;
+            }
+        });
 
         if(document.activeElement && typeof document.activeElement.blur==="function"){
             document.activeElement.blur();

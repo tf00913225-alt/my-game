@@ -21,7 +21,7 @@
 html.creation-fixed-active{
     width:100% !important;
     height:100% !important;
-    overflow:hidden !important;
+    overflow:clip !important;
     overscroll-behavior:none !important;
     touch-action:none !important;
 }
@@ -32,7 +32,7 @@ body.creation-fixed-active{
     width:100% !important;
     height:100% !important;
     margin:0 !important;
-    overflow:hidden !important;
+    overflow:clip !important;
     overscroll-behavior:none !important;
     touch-action:none !important;
 }
@@ -40,7 +40,7 @@ body.creation-fixed-active{
 #game-viewport.creation-fixed-active,
 #game-stage.creation-fixed-active,
 #game-overlay-layer.creation-fixed-active{
-    overflow:hidden !important;
+    overflow:clip !important;
     overscroll-behavior:none !important;
     touch-action:none !important;
 }
@@ -64,7 +64,7 @@ body.creation-fixed-active{
     max-height:none !important;
     margin:0 !important;
     box-sizing:border-box !important;
-    overflow:hidden !important;
+    overflow:clip !important;
     overscroll-behavior:none !important;
     -webkit-overflow-scrolling:auto;
     touch-action:none !important;
@@ -97,7 +97,7 @@ body.creation-fixed-active{
     min-height:1920px;
     padding:28px 36px 32px;
     box-sizing:border-box;
-    overflow:hidden;
+    overflow:clip;
 }
 
 #creationPage .creation-premium-shell::before{
@@ -178,7 +178,7 @@ body.creation-fixed-active{
     display:none;
     flex:1 1 auto;
     min-height:0;
-    overflow:hidden;
+    overflow:clip;
 }
 
 #creationPage .creation-step.is-active{
