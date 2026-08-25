@@ -1,0 +1,356 @@
+/* V131 — targeted gameplay/UI fixes for request batch 17. */
+
+#game-stage #battleMonsterArea.v131-formation{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:flex-start !important;
+    gap:5px !important;
+    width:100% !important;
+    overflow:visible !important;
+}
+
+#game-stage #battleMonsterArea .v131-monster-row{
+    display:flex;
+    flex:0 0 auto;
+    align-items:flex-start;
+    justify-content:center;
+    gap:3px;
+    width:100%;
+    min-width:0;
+}
+
+#game-stage #battleMonsterArea .v131-monster-row .battle-monster{
+    flex:0 0 76px !important;
+    width:76px !important;
+    max-width:76px !important;
+    min-width:0 !important;
+}
+
+#game-stage #battlePage button,
+#game-stage #battlePage button img,
+#game-stage #trainingPage button img,
+#game-stage #mapPage button img,
+#game-stage .battle-action-icon,
+#game-stage .training-zone-icon{
+    background-color:transparent !important;
+}
+
+#game-stage #battlePage .battle-player{
+    border:2px solid #d8aa36 !important;
+    box-shadow:0 0 0 1px rgba(255,226,122,.18),0 4px 12px rgba(0,0,0,.42) !important;
+}
+
+#game-stage #homeFeatureModal .home-feature-modal-box.wide{
+    height:94% !important;
+    max-height:94% !important;
+    overflow:hidden !important;
+    display:flex !important;
+    flex-direction:column !important;
+}
+
+#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent{
+    flex:1 1 auto !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    padding-bottom:110px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent > #skillPage{
+    display:block !important;
+    position:static !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding-bottom:240px !important;
+    touch-action:pan-y !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent > #skillPage .content,
+#game-stage #homeFeatureModal #allSkillsList,
+#game-stage #homeFeatureModal .skill-loadout-list{
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+}
+
+#game-stage #allSkillsList .learned-skill button,
+#game-stage #allSkillsList .learnable-skill button{
+    flex:0 0 auto !important;
+    width:auto !important;
+    min-width:max-content !important;
+    min-height:0 !important;
+    height:auto !important;
+    padding:4px 7px !important;
+    font-size:12px !important;
+    line-height:1.2 !important;
+}
+
+.v131-skill-kind{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:max-content;
+    margin:2px 4px 2px 0;
+    padding:2px 5px;
+    border:1px solid #826536;
+    border-radius:999px;
+    font-size:10px;
+    line-height:1.1;
+    font-weight:800;
+    color:#eadfc8;
+    background:#17120d;
+}
+
+.v131-skill-kind.physical{ border-color:#b77c43; }
+.v131-skill-kind.magic{ border-color:#647fc8; }
+
+#game-stage #game-overlay-layer #allElementSkillPreviewModal,
+#game-stage #allElementSkillPreviewModal{
+    position:absolute !important;
+    inset:0 !important;
+    z-index:9800 !important;
+    pointer-events:auto !important;
+    align-items:center !important;
+    justify-content:center !important;
+    overflow:hidden !important;
+    touch-action:pan-y !important;
+}
+
+#game-stage #allElementSkillPreviewModal .skill-preview-dialog{
+    width:94% !important;
+    height:min(92%,1680px) !important;
+    max-height:92% !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+}
+
+#game-stage #allElementSkillPreviewModal .skill-preview-body{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    height:0 !important;
+    max-height:none !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    padding-bottom:90px !important;
+}
+
+#game-stage #inventoryPortraitFrame{
+    overflow:hidden;
+}
+
+#game-stage #inventoryPortraitFrame .v131-inventory-portrait{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 18%;
+    display:block;
+    z-index:0;
+}
+
+#game-stage #inventoryPortraitFrame #inventoryCharacterDetailButton{
+    position:relative;
+    z-index:2;
+}
+
+.v131-unlock-ready{ position:relative !important; }
+
+.v131-unlock-dot{
+    position:absolute;
+    right:2px;
+    top:-3px;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#ff2b2b;
+    border:2px solid #2b0a06;
+    box-shadow:0 0 8px rgba(255,43,43,.9);
+    animation:v131RedDotPulse 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes v131RedDotPulse{
+    from{ transform:scale(.9); opacity:.78; }
+    to{ transform:scale(1.18); opacity:1; }
+}
+
+#game-stage #expDistributeList{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.v131-exp-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:4px 8px;
+    align-items:center;
+    padding:9px 10px;
+    border:1px solid #6f5228;
+    border-radius:8px;
+    background:#17120d;
+}
+
+.v131-exp-name{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:15px;
+    font-weight:800;
+    color:#f3dfb2;
+}
+
+.v131-exp-level{
+    font-size:13px;
+    color:#b7a98e;
+    text-align:right;
+}
+
+.v131-exp-level.preview,
+.v131-preview-level{
+    color:#ffdf69 !important;
+    font-weight:900;
+}
+
+.v131-exp-preview-btn{
+    grid-column:1 / -1;
+    width:100%;
+    padding:7px 8px;
+    border:1px solid #8a6a3a;
+    border-radius:6px;
+    background:linear-gradient(180deg,#3b2a17,#21160d);
+    color:#f4d690;
+    font-size:13px;
+    font-weight:800;
+}
+
+.v131-exp-preview-summary{
+    text-align:right;
+    color:#cfbd98;
+    font-size:12px;
+    padding:3px 2px;
+}
+
+.v131-exp-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.v131-exp-actions button{
+    padding:9px 8px;
+    border:1px solid #a77a35;
+    border-radius:7px;
+    font-weight:900;
+}
+
+.v131-exp-confirm{
+    background:linear-gradient(180deg,#6a3517,#3f190d);
+    color:#ffe7a1;
+}
+
+.v131-exp-back{
+    background:#21180f;
+    color:#d8c8aa;
+}
+
+.v131-exp-actions button:disabled,
+.v131-exp-preview-btn:disabled{
+    opacity:.35 !important;
+    filter:grayscale(.65);
+    pointer-events:none;
+}
+
+#game-stage #autoBattleSettingsPanel.v131-element-box-panel .auto-cancel-btn{
+    display:none !important;
+}
+
+#game-stage #autoBattleSettingsPanel.v131-element-box-panel .auto-save-btn{
+    width:100% !important;
+}
+
+.v131-element-box-stats{
+    display:grid;
+    gap:6px;
+    margin:10px 0 8px;
+    padding:10px;
+    border:1px solid #6f5228;
+    border-radius:9px;
+    background:#0d0b08;
+}
+
+.v131-element-box-title{
+    color:#f0c866;
+    font-size:14px;
+    font-weight:900;
+    margin-bottom:2px;
+}
+
+.v131-element-box-stats > div:not(.v131-element-box-title){
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    font-size:12px;
+    color:#b9aa8c;
+}
+
+.v131-element-box-stats strong{
+    color:#f0dfb7;
+    font-size:13px;
+    text-align:right;
+}
+
+.v131-element-box-stats .remaining{
+    margin-top:2px;
+    padding-top:7px;
+    border-top:1px solid rgba(240,180,41,.22);
+}
+
+.v131-element-box-stats .remaining strong{ color:#ffdf69; }
+
+#game-stage #characterTabContent,
+#game-stage #homeExpPoolCard,
+#game-stage #statusPage,
+#game-stage #skillPage{
+    font-size:14px;
+}
+
+#game-stage #characterTabContent p,
+#game-stage #characterTabContent small,
+#game-stage #characterTabContent .description,
+#game-stage #homeExpPoolCard .exp-pool-caption{
+    font-size:12.5px !important;
+    line-height:1.55 !important;
+}
+
+#game-stage #homeFeatureModal.v131-shop-open .home-feature-modal-box,
+#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody,
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface{
+    background:#050505 !important;
+    background-image:none !important;
+}
+
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-card{
+    background:linear-gradient(160deg,#17130e,#080706) !important;
+}

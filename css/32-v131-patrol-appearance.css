@@ -1,0 +1,83 @@
+/* V131 — 巡怪形象切換與透明 Q 版 sprite。 */
+#game-stage #mapPage #v131PatrolAppearanceSwitchWrap{
+    position:absolute;
+    right:12px;
+    top:92px;
+    z-index:96;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+    pointer-events:auto;
+}
+#game-stage #mapPage #v131PatrolAppearanceSwitch{
+    width:58px;
+    height:58px;
+    padding:0;
+    border:0;
+    border-radius:50%;
+    background:transparent;
+    box-shadow:none;
+    overflow:hidden;
+}
+#game-stage #mapPage .v131-switch-icon-viewport{
+    position:relative;
+    display:block;
+    width:58px;
+    height:58px;
+    overflow:hidden;
+    border-radius:50%;
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,.72));
+}
+#game-stage #mapPage .v131-switch-icon-sprite{
+    position:absolute;
+    left:0;
+    top:-14.5px;
+    width:58px;
+    height:87px;
+    display:block;
+    background-image:var(--v131-patrol-sprite);
+    background-size:300% 300%;
+    background-position:100% 100%;
+    background-repeat:no-repeat;
+}
+#game-stage #mapPage #v131PatrolAppearancePanel{
+    display:none;
+    min-width:118px;
+    max-width:180px;
+    padding:5px;
+    border:1px solid #8a6a3a;
+    border-radius:8px;
+    background:rgba(12,9,6,.94);
+    box-shadow:0 6px 18px rgba(0,0,0,.65);
+}
+#game-stage #mapPage #v131PatrolAppearancePanel.show{
+    display:grid;
+    gap:4px;
+}
+#game-stage #mapPage .v131-patrol-choice{
+    width:100%;
+    min-height:30px;
+    padding:5px 8px;
+    border:1px solid #66502d;
+    border-radius:6px;
+    background:linear-gradient(180deg,#2c2115,#161009);
+    color:#f2e3bf;
+    font-size:12px;
+    font-weight:800;
+    text-align:left;
+}
+#game-stage #mapPage .v131-patrol-choice.active{
+    border-color:#f0b429;
+    color:#fff1b8;
+    box-shadow:0 0 0 1px rgba(240,180,41,.25) inset;
+}
+#game-stage #mapPage #patrolCharacterImg.v131-patrol-q-art{
+    width:70px !important;
+    height:105px !important;
+    display:block !important;
+    margin:0 auto !important;
+    object-fit:contain !important;
+    background-color:transparent !important;
+    filter:drop-shadow(0 4px 5px rgba(0,0,0,.6));
+}
