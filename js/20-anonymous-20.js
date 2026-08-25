@@ -163,7 +163,16 @@
             "js/v131-patrol-sprite-3.js?v=131a",
             "js/v131-patrol-sprite-4.js?v=131a",
             "js/v131-patrol-sprite-5.js?v=131a",
-            "js/26-v131-patrol-appearance.js?v=131a"
+            "js/v131-patrol-sprite-male-0.js?v=131b",
+            "js/v131-patrol-sprite-male-1.js?v=131b",
+            "js/v131-patrol-sprite-male-2.js?v=131b",
+            "js/v131-patrol-sprite-male-3.js?v=131b",
+            "js/v131-patrol-sprite-male-4.js?v=131b",
+            "js/v131-patrol-sprite-male-5.js?v=131b",
+            "js/v131-patrol-sprite-male-6.js?v=131b",
+            "js/v131-patrol-sprite-male-7.js?v=131b",
+            "js/v131-patrol-sprite-male-8.js?v=131b",
+            "js/26-v131-patrol-appearance.js?v=131b"
         ];
 
         function next(index){
