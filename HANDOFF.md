@@ -116,6 +116,31 @@ V131 的所有 override（`finishPlayerAction`、`getSkillTargets`、`learnSkill
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-08-25 — 男角 Q 版巡怪背面 + 土系技能 icon
+
+- **男角 Q 版巡怪背面**：使用者補上了火/水/風/土四元素的男角背面立繪。
+  把原本只有正面的 2x2 sprite（`js/v131-patrol-sprite-male-0.js`~`8.js`，共9個chunk）
+  換成 4 欄（元素）× 2 列（正/背面）的 4x2 sprite（改名沿用同樣的檔名，
+  現在是 `js/v131-patrol-sprite-male-0.js`~`17.js`，共18個chunk），
+  已驗證 byte-for-byte 還原正確。`js/26-v131-patrol-appearance.js` 的
+  `maleSpriteCells` 改成跟女角一樣的 `{element:{front:[...],back:[...]}}`
+  結構，`applyPatrolArt()` 對男角也會依 `facingBack` 切換正背面了
+  （不再固定顯示正面，這個限制已經解除）。
+- **土系技能 icon**：使用者上傳了11張候選圖，比對 `js/00-main.js` 裡
+  技能資料庫中（搜尋 `element:"earth"` 可以找到全部12個）土系技能的
+  名稱/描述後，配對了其中10個（`petrifyFist`、`stoneBreakSky`、
+  `earthquakeCrush`、`stoneThrow`、`sandWind`、`flyingSandStrike`、`dustStorm`、
+  `earthShield`、`rockWall`、`barrier`），存進 `assets/skills/earth-*.jpg`
+  （120x120，跟火/水系icon同規格），並在 `js/00-main.js` 的
+  `elementSkillIconMap` 補上對應項目（含配對理由註解）。
+  **`stoneSlash`（入門單體技能）跟 `earthEX`（被動）這兩個沒有配對**，
+  因為上傳的圖裡沒有明顯對應的畫面（`earthEX` 需要的是類似
+  `fire-ex.jpg`/`water-ex.jpg` 那種圖上直接寫「EX」字樣的專用icon，
+  這次沒有提供這款）。另外有1張候選圖（岩石尖塔+光環，跟其他候選圖
+  區分度太低）這次也沒用上。這些都是刻意留白，不是遺漏——如果之後
+  要補這兩個技能的icon或想調整某個配對，直接改
+  `js/00-main.js` 裡 `elementSkillIconMap` 那個物件就好。
+
 ### 2026-08-25 — 男角 Q 版巡怪立繪（PR #2，已合併）
 
 - 來源：使用者上傳 4 張男角 Q 版立繪（火/水/風/土，只有正面）
@@ -176,7 +201,10 @@ V131 的所有 override（`finishPlayerAction`、`getSkillTargets`、`learnSkill
 
 ## 已知限制 / 待辦事項
 
-- [ ] 男角 Q 版巡怪立繪缺背面圖（目前固定顯示正面，見上方限制說明）
+- [x] ~~男角 Q 版巡怪立繪缺背面圖~~ 2026-08-25 已補上，見上方記錄
+- [ ] 土系技能 `stoneSlash`（土石斬）、`earthEX`（土元素EX，被動）
+      還沒有技能icon，`earthEX` 需要類似 `fire-ex.jpg` 那種圖上寫著
+      「EX」字樣的專用icon
 - [ ] V131 這整批修正都只做過「語法檢查 + 程式邏輯追蹤驗證」，**沒有在真實瀏覽器
       （尤其 Android Chrome 實機）上操作驗證過**。如果使用者回報某個功能「看起來沒生效」，
       優先確認是不是瀏覽器快取問題，其次才懷疑程式邏輯本身。
