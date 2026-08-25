@@ -288,20 +288,43 @@
         };
     }
 
+    /*
+       ★ 修正：
+       原本用 onclick="learnSkill(...)" 這種字串正則去猜
+       這一列是哪個技能，但實際的技能列（.skill-row）
+       用的是 upgradeSkill(...)（已學但未滿級時）而不只
+       learnSkill(...)，正則沒涵蓋到，導致大部分列都抓不到
+       skillId。改成直接讀icon那個<div id="skillIcon_xxx">
+       的id，這個id本來就是渲染時直接塞技能id進去的，
+       比猜onclick字串可靠。
+    */
     function extractSkillIdFromRow(row){
+        const iconEl=row.querySelector('[id^="skillIcon_"]');
+        if(iconEl){
+            return iconEl.id.slice("skillIcon_".length);
+        }
         const controls=row.querySelectorAll("[onclick]");
         for(const control of controls){
             const code=control.getAttribute("onclick")||"";
-            const match=code.match(/(?:learnSkill|equipSkill|unequipSkill)\(['\"]([^'\"]+)['\"]\)/);
+            const match=code.match(/(?:learnSkill|upgradeSkill|equipSkill|unequipSkill)\(['\"]([^'\"]+)['\"]\)/);
             if(match){ return match[1]; }
         }
         return null;
     }
 
+    /*
+       ★ 修正：
+       真正的技能列容器是 #allSkillsList 底下的
+       .skill-row（不是原本猜的.learned-skill／
+       .learnable-skill，那組class在目前版本的技能頁
+       裡根本不存在，導致這個函式之前完全沒有作用）。
+       技能名稱也是 .skill-row-text 裡的 <b>，不是
+       <strong>。
+    */
     function decorateSkillRows(){
         const list=document.getElementById("allSkillsList");
         if(!list){ return; }
-        list.querySelectorAll(".learned-skill,.learnable-skill").forEach(row=>{
+        list.querySelectorAll(".skill-row").forEach(row=>{
             if(row.querySelector(".v131-skill-kind")){ return; }
             const skillId=extractSkillIdFromRow(row);
             const skill=skillId && skillDatabase[skillId];
@@ -309,7 +332,7 @@
             const badge=document.createElement("span");
             badge.className="v131-skill-kind "+skill.category;
             badge.textContent=skill.category==="physical" ? "物理" : "法術";
-            const textHost=row.querySelector("strong,.skill-name,.skill-row-name") || row;
+            const textHost=row.querySelector(".skill-row-text b,strong,.skill-name,.skill-row-name") || row;
             if(textHost===row){ row.insertBefore(badge,row.firstChild); }
             else{ textHost.insertAdjacentElement("afterend",badge); }
         });

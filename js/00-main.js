@@ -3355,42 +3355,54 @@ const elementSkillIconMap = {
        （不是技能icon，另外處理），剩下11張是技能icon候選。
        土系總共12個技能，逐張比對名稱/技能描述後配對：
 
+       ★ 修正（2026-08-25，使用者提供帶名稱標籤的參考圖重新核對）：
+       使用者把8張候選圖各自標上正確的技能名稱傳回來，
+       用像素比對（不是肉眼猜）確認每張標籤圖對應到
+       原始候選圖裡的哪一張，抓出實際配錯的4個，
+       並補上一張全新的earthEX專用圖（圖上直接寫著
+       「EX」字樣，跟fire-ex.jpg／water-ex.jpg同款式）：
+
        petrifyFist（石盾拳，物理，造成傷害+全體護盾）
-         → 拳頭出擊、身後有岩石護盾光環的畫面，
-           對應「盾」+「拳」兩個字
+         → 拳頭出擊、身後有岩石護盾光環的畫面。原本配對正確，
+           沒有變動。
        stoneBreakSky（石破天驚，物理，單體大傷害+護盾）
-         → 巨大岩石裂開、光芒炸開的畫面，
-           對應「石破天驚」的震撼感
+         → 巨大岩石裂開、光芒炸開的畫面（帶漩渦光環那張）。
+           ★原本誤配到「土石斬」用的那張圖，這次修正。
        earthquakeCrush（地裂重拳，物理，三人傷害+自身護盾）
-         → 岩層裂開、金光四射的畫面，對應「地裂」
+         → 巨大拳頭形岩層裂開、金光四射的畫面。
+           ★原本誤配到「飛沙瞬擊」用的那張圖，這次修正。
        stoneThrow（落石術，法術，三人傷害+降防）
-         → 巨石從天而降的畫面，直接對應「落石」
+         → 巨石從天而降的畫面，直接對應「落石」。原本配對
+           正確，沒有變動。
        sandWind（滾石術，法術，橫排傷害+降防）
-         → 巨石滾動、拖出光跡的畫面，對應「滾石」
+         → 巨石滾動、拖出光跡的畫面，對應「滾石」。
+           ★原本誤配到「飛沙瞬擊」用的那張圖，這次修正。
        flyingSandStrike（飛沙瞬擊，法術，全體傷害+機率石化）
-         → 金色沙塵/能量漩渦畫面，對應「飛沙」
+         → 金色沙塵/能量漩渦畫面，對應「飛沙」。
+           ★原本誤配到「滾石術」用的那張圖，這次修正。
        dustStorm（地牛猛襲，法術，全體傷害+降防）
-         → 岩石巨牛衝鋒的畫面，直接對應「地牛」
-       earthShield（萬象土盾，增益，單體反傷護盾）
-         → 火水風土四元素環繞中央土屬性圓盤的畫面，
-           對應「萬象」（各種現象/元素匯聚）
+         → 岩石巨牛衝鋒的畫面，直接對應「地牛」。原本配對
+           正確，沒有變動。
        rockWall（岩石壁壘，增益，全體防禦提升）
-         → 一整排岩石尖塔並列的畫面，直接對應「壁壘」
+         → 一整排岩石尖塔並列的畫面，直接對應「壁壘」。原本
+           配對正確，沒有變動。
        barrier（結界，增益，單體完全防護）
-         → 發光的魔法陣圓頂結界畫面，直接對應「結界」
+         → 發光的魔法陣圓頂結界畫面，直接對應「結界」。原本
+           配對正確，沒有變動。
+       stoneSlash（土石斬，入門單體物理技能）
+         → 使用者標明是「岩石裂開、光束斜劈」那張圖
+           （原本誤配到「地裂重拳」，現在補回正確位置）。
+       earthEX（土元素EX，被動）
+         → 使用者新提供的專用「EX」字樣圖，跟
+           fire-ex.jpg／water-ex.jpg同款式。
 
-       以下2個技能這次沒有信心足夠的圖可以配對，先不放（保持
+       ★ earthShield（萬象土盾，增益，單體反傷護盾）
+       這次唯一沒有圖的技能：原本配對這格的「四元素環繞
+       中央土盤」那張圖，使用者標籤證實其實是sandWind要用的，
+       被抽走後earthShield暫時沒有圖可用，先不放（保持
        elementSkillIconMap沒有這個key，getSkillIconBackgroundImage()
-       會自動安全降級成空字串，UI不會報錯，只是那格icon框維持空白）：
-       stoneSlash（土石斬，入門單體物理技能，上傳的圖沒有
-         明顯「斬擊」動作的畫面，硬配容易配錯）
-       earthEX（土元素EX，被動）：fire-ex.jpg／water-ex.jpg
-         都是圖片本身直接寫著「EX」字樣的專用icon，這次上傳的
-         11張圖沒有同款式的，等之後補上再放。
-
-       另外有1張圖（岩石尖塔+光環，較抽象、跟其他候選圖區分度低）
-       這次也沒有用上，保留在原始上傳紀錄裡，之後如果新增技能
-       或想換掉某個配對可以再用。
+       會自動安全降級成空字串，UI不會報錯，只是那格icon框
+       維持空白），等之後有合適的圖再補。
     */
 
     petrifyFist:"assets/skills/earth-petrify-fist.jpg",
@@ -3400,9 +3412,10 @@ const elementSkillIconMap = {
     sandWind:"assets/skills/earth-sand-wind.jpg",
     flyingSandStrike:"assets/skills/earth-flying-sand-strike.jpg",
     dustStorm:"assets/skills/earth-dust-storm.jpg",
-    earthShield:"assets/skills/earth-shield.jpg",
     rockWall:"assets/skills/earth-rock-wall.jpg",
-    barrier:"assets/skills/earth-barrier.jpg"
+    barrier:"assets/skills/earth-barrier.jpg",
+    stoneSlash:"assets/skills/earth-stone-slash.jpg",
+    earthEX:"assets/skills/earth-ex.jpg"
 };
 
 /*
