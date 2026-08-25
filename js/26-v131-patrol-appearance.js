@@ -3,7 +3,59 @@
     "use strict";
 
     const STORAGE_KEY="v131_patrol_character_index";
-    const TRANSPARENT_PIXEL="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+
+    /*
+       ★ 修正（巡怪空白方塊 bug 的根源修法）：
+       原本用「img.src設1x1透明GIF佔位 +
+       CSS background-image疊上真正的圖」這招，
+       在Chromium（至少目前這個版本）上，
+       只要<img>的src是一張能成功解碼的圖片
+       （就算只有1x1、全透明），背景圖大部分
+       區域就會被畫成不透明白色，跟
+       object-fit、素材內容都無關——用最小
+       重現案例驗證過：同樣的background-image
+       套在完全沒有src的<div>上完全正常，
+       套在有合法src的<img>上就會出現白色。
+
+       遊戲原本（V131之前）的巡怪立繪就是直接
+       img.src=PATROL_CHAR_FRONT_B64，不透過
+       CSS背景疊圖，所以沒有踩到這個問題。
+
+       改成同樣的作法：不用CSS背景疊圖，
+       而是用一個共用的<canvas>把sprite sheet
+       裡需要的那一格「裁」成一張獨立的圖片
+       （canvas.toDataURL()），直接設定
+       img.src，這樣<img>顯示的就是它自己
+       真正的內容，不會再有背景圖被蓋掉的問題。
+    */
+
+    const CELL_W=56;
+    const CELL_H=84;
+
+    function loadImageAsync(url){
+        return new Promise(function(resolve,reject){
+            const image=new Image();
+            image.onload=function(){ resolve(image); };
+            image.onerror=reject;
+            image.src=url;
+        });
+    }
+
+    const cropCanvas=document.createElement("canvas");
+    cropCanvas.width=CELL_W;
+    cropCanvas.height=CELL_H;
+    const cropCtx=cropCanvas.getContext("2d");
+
+    function cropCellDataUrl(sheetImage,col,row){
+        cropCtx.clearRect(0,0,CELL_W,CELL_H);
+        cropCtx.drawImage(
+            sheetImage,
+            col*CELL_W,row*CELL_H,CELL_W,CELL_H,
+            0,0,CELL_W,CELL_H
+        );
+        return cropCanvas.toDataURL("image/png");
+    }
+
     const chunks=Array.isArray(window.V131_PATROL_SPRITE_CHUNKS)
         ? window.V131_PATROL_SPRITE_CHUNKS
         : [];
@@ -41,16 +93,9 @@
         wind:{front:[2,0],back:[2,1]},
         earth:{front:[3,0],back:[3,1]}
     };
-    const MALE_SPRITE_COLS=4;
 
     function isMaleCharacter(character){
         return !!(character && character.gender==="male");
-    }
-
-    function maleBackgroundPosition(cell){
-        const col=cell[0];
-        const row=cell[1];
-        return (col*(100/(MALE_SPRITE_COLS-1)))+"% "+(row===0?"0%":"100%");
     }
 
     let selectedIndex=Number(localStorage.getItem(STORAGE_KEY));
@@ -90,12 +135,17 @@
         return spriteCells[key] ? key : "fire";
     }
 
-    function backgroundPosition(cell){
-        const col=cell[0];
-        const row=cell[1];
-        return (col===0?"0%":col===1?"50%":"100%")+" "+
-               (row===0?"0%":row===1?"50%":"100%");
-    }
+    let femaleSheetImage=null;
+    let maleSheetImage=null;
+
+    const spritesReady=Promise.all([
+        loadImageAsync(spriteUrl).then(function(image){ femaleSheetImage=image; }),
+        maleSpriteUrl
+            ? loadImageAsync(maleSpriteUrl).then(function(image){ maleSheetImage=image; }).catch(function(){ maleSheetImage=null; })
+            : Promise.resolve()
+    ]).catch(function(error){
+        console.error("V131 巡怪 sprite 圖片載入失敗：",error);
+    });
 
     function applyPatrolArt(facingBack){
         const img=document.getElementById("patrolCharacterImg");
@@ -105,28 +155,51 @@
         if(!character){ return; }
         const element=getElementKey(character);
 
-        img.src=TRANSPARENT_PIXEL;
         img.classList.add("v131-patrol-q-art");
         img.style.setProperty("width","70px","important");
         img.style.setProperty("height","105px","important");
-        img.style.setProperty("background-repeat","no-repeat","important");
 
-        if(maleSpriteUrl && isMaleCharacter(character)){
-            const cell=maleSpriteCells[element][facingBack ? "back" : "front"];
-            img.style.setProperty("background-image",'url("'+maleSpriteUrl+'")',"important");
-            img.style.setProperty("background-size",(MALE_SPRITE_COLS*100)+"% 200%","important");
-            img.style.setProperty("background-position",maleBackgroundPosition(cell),"important");
-        }
-        else{
-            const cell=spriteCells[element][facingBack ? "back" : "front"];
-            img.style.setProperty("background-image",'url("'+spriteUrl+'")',"important");
-            img.style.setProperty("background-size","300% 300%","important");
-            img.style.setProperty("background-position",backgroundPosition(cell),"important");
+        const useMale=!!(maleSheetImage && isMaleCharacter(character));
+        const sheetImage=useMale ? maleSheetImage : femaleSheetImage;
+        const cellMap=useMale ? maleSpriteCells : spriteCells;
+        const cell=cellMap[element][facingBack ? "back" : "front"];
+
+        if(sheetImage){
+            const cropped=cropCellDataUrl(sheetImage,cell[0],cell[1]);
+            img.src=cropped;
+            updateSwitchIcon(cropped);
         }
 
         img.alt=(character.id||("角色"+(index+1)))+"巡怪形象";
         img.dataset.v131PatrolCharacter=String(index);
         img.dataset.v131Facing=facingBack ? "back" : "front";
+    }
+
+    /*
+       ★ 修正（依照使用者要求，「形象切換按鈕圖片畫質太差、
+       按鈕太小」）：
+       原本形象切換按鈕的icon是寫死套用女角sprite的
+       固定一格（不管玩家目前選的是誰），而且是拿
+       background-image+background-position硬摳
+       一小塊出來顯示，跟主要巡怪立繪原本踩到的白色
+       方塊是同一種寫法（只是span沒有img那個bug，
+       沒有整個裁到看不到而已）。
+       這裡改成：每次套用巡怪立繪時，直接把「剛剛裁切好
+       這一格」的裁切結果（跟主要立繪同一張圖）也套到
+       按鈕icon上，永遠顯示「目前真正選中的角色」，
+       不再寫死女角。畫質仍然受限於原始sprite本身的
+       解析度（56x84，是為了控制檔案大小刻意壓縮的），
+       放大顯示能改善的有限，如果需要更清晰的按鈕icon，
+       需要另外提供一組解析度更高的素材專門給這個按鈕用。
+    */
+    function updateSwitchIcon(croppedDataUrl){
+        const icon=document.querySelector(
+            "#v131PatrolAppearanceSwitchWrap .v131-switch-icon-sprite"
+        );
+        if(!icon){ return; }
+        icon.style.backgroundImage='url("'+croppedDataUrl+'")';
+        icon.style.backgroundSize="cover";
+        icon.style.backgroundPosition="center 20%";
     }
 
     function refreshChoicePanel(){
@@ -170,7 +243,6 @@
 
         const wrap=document.createElement("div");
         wrap.id="v131PatrolAppearanceSwitchWrap";
-        wrap.style.setProperty("--v131-patrol-sprite",'url("'+spriteUrl+'")');
 
         const button=document.createElement("button");
         button.id="v131PatrolAppearanceSwitch";
@@ -232,7 +304,9 @@
     function boot(){
         normalizeSelection();
         installSwitcher();
-        applyPatrolArt(false);
+        spritesReady.then(function(){
+            applyPatrolArt(false);
+        });
     }
 
     if(document.readyState==="loading"){

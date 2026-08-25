@@ -10,9 +10,19 @@
     gap:6px;
     pointer-events:auto;
 }
+/*
+   ★ 修正（依照使用者要求，「按鈕太小」）：
+   58px→76px，加大點擊範圍跟可視面積。
+   icon本身改成由JS（updateSwitchIcon()）直接
+   設定background-image/size/position為「目前
+   選中角色裁切好的單一格圖片」，不再靠這裡的
+   CSS去背景圖裡摳一小塊，所以不需要再算
+   background-size/position的百分比，
+   直接cover鋪滿viewport即可。
+*/
 #game-stage #mapPage #v131PatrolAppearanceSwitch{
-    width:58px;
-    height:58px;
+    width:76px;
+    height:76px;
     padding:0;
     border:0;
     border-radius:50%;
@@ -23,22 +33,16 @@
 #game-stage #mapPage .v131-switch-icon-viewport{
     position:relative;
     display:block;
-    width:58px;
-    height:58px;
+    width:76px;
+    height:76px;
     overflow:hidden;
     border-radius:50%;
     filter:drop-shadow(0 3px 5px rgba(0,0,0,.72));
 }
 #game-stage #mapPage .v131-switch-icon-sprite{
     position:absolute;
-    left:0;
-    top:-14.5px;
-    width:58px;
-    height:87px;
+    inset:0;
     display:block;
-    background-image:var(--v131-patrol-sprite);
-    background-size:300% 300%;
-    background-position:100% 100%;
     background-repeat:no-repeat;
 }
 #game-stage #mapPage #v131PatrolAppearancePanel{
@@ -72,12 +76,29 @@
     color:#fff1b8;
     box-shadow:0 0 0 1px rgba(240,180,41,.25) inset;
 }
+/*
+   ★ 修正（巡怪空白方塊 bug）：
+   這張img的實際畫面內容全部來自CSS
+   background-image（元素/正背面用
+   background-position切換），img自己的
+   src只是一個1x1透明GIF佔位，本來就不需要
+   object-fit。但保留object-fit:contain時，
+   Chromium在「img有intrinsic content（哪怕
+   只是1x1透明像素）+ object-fit + CSS
+   background-image」這個組合下，會把背景圖
+   大部分區域畫成不透明白色（用最小重現案例
+   驗證過：同樣的background-image/size/position
+   套在<div>上完全正常，只有套在<img>+
+   object-fit時才會出現這塊白色，
+   跟background-image本身、素材本身都無關）。
+   拿掉object-fit直接解決，因為這裡從來
+   沒有用到它原本的功能（縮放img自身的src內容）。
+*/
 #game-stage #mapPage #patrolCharacterImg.v131-patrol-q-art{
     width:70px !important;
     height:105px !important;
     display:block !important;
     margin:0 auto !important;
-    object-fit:contain !important;
     background-color:transparent !important;
     filter:drop-shadow(0 4px 5px rgba(0,0,0,.6));
 }
