@@ -605,8 +605,29 @@
 
     if(originalConfirmAutoBattleSettings){
         confirmAutoBattleSettings=function(){
+            /*
+               ★ 修正（依照使用者回報，「戰鬥中開啟元素匣，
+               套用啟動才是沒反應」）：
+               這顆按鈕的文字被ensureElementBoxStatsUI()改成
+               「套用並啟動」，但這裡原本只呼叫
+               originalConfirmAutoBattleSettings()儲存表單設定，
+               從頭到尾沒有真的把autoBattle打開——玩家看到的
+               就是「按了套用並啟動，畫面卻什麼都沒變、戰鬥
+               還是要自己手動操作」，跟按鈕文字承諾的行為對
+               不起來。這裡補上：套用設定之後，如果目前還沒
+               開自動戰鬥，直接呼叫既有的toggleAutoBattle()
+               （跟按面板最上面「啟動」按鈕完全同一套邏輯，
+               autoConfig/autoConfig2/autoConfig3、UI、戰鬤
+               紀錄都會一起正確同步），讓「套用並啟動」名符
+               其實。如果玩家點的當下自動戰鬥其實已經是開著的
+               （只是想改設定），就不要再呼叫一次toggle，
+               避免反而把它關掉。
+            */
             const activate=()=>{
                 originalConfirmAutoBattleSettings.apply(this,arguments);
+                if(!autoBattle && typeof toggleAutoBattle==="function"){
+                    toggleAutoBattle();
+                }
                 elementBoxActive=true;
                 elementBoxLastTick=Date.now();
                 persistElementBoxState();
