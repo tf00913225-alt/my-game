@@ -188,6 +188,30 @@
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
     padding-bottom:90px !important;
+    transform:translateZ(0) !important;
+}
+
+/*
+   ★ 修正（依照使用者回報「破圖」，附截圖顯示捲動時文字
+   疊在一起、看起來像亂碼）：
+   在headless Chromium測試環境用真實觸控滑動反覆重現
+   （包含快速連續滑動、切分頁時滑動），都沒有真的重現出
+   使用者截圖裡那種文字疊字的畫面，比較像是手機瀏覽器
+   在捲動慣性還沒結束、GPU還沒把新的畫面完整合成好的
+   那一瞬間被截圖截到（畫面撕裂/合成不同步這種現象），
+   文字級數變大之後每一格要重繪的範圍也變大，這種情況
+   在效能較弱的手機上更容易發生。
+
+   這裡沒辦法從程式邏輯上「修好」一個捲動當下的合成時序
+   問題，只能做常見的手機捲動效能優化：把每一張技能卡片
+   獨立成自己的合成層、限制瀏覽器的重繪範圍只在卡片自己
+   的邊界內，降低捲動時整體要重新合成的畫面量，减少這種
+   問題出現的機率。如果之後還是常常發生，需要使用者提供
+   螢幕錄影（不是截圖）才能確認是不是同一種情況。
+*/
+#game-stage #allElementSkillPreviewModal .skill-preview-card{
+    contain:content !important;
+    will-change:transform !important;
 }
 
 #game-stage #inventoryPortraitFrame{

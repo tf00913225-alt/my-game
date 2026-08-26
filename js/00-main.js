@@ -17560,13 +17560,36 @@ function processSingleMonsterAttack(monsterIndex,token){
             }
 
 
-            showPlayerHit(
-                damage,
-                "hp",
-                targetIndex,
-                false,
-                monsterCrit
-            );
+            /*
+               ★ 修正（依照使用者要求，「戰鬥中擁有護盾，
+               受到傷害時，扣HP的...就不用跳動，直接顯示
+               白色護盾扣除的數字，除非護盾剩餘承受量小於
+               傷害，那則一起顯示」）：
+               上面護盾吸收的邏輯執行完之後，damage已經是
+               「護盾擋不住、真正會扣血」的剩餘量——護盾
+               完全擋下這次攻擊時damage會變成0，這裡原本
+               不管damage是不是0都會呼叫showPlayerHit()，
+               連帶觸發卡片震動效果跟「-0HP」這種沒有意義
+               的紅字彈出動畫，明明血量根本沒扣、卻看起來
+               又跳字又震動，跟護盾應該要有的「完全擋下」
+               觀感不符。改成只有damage>0（護盾沒有完全
+               擋住、真的有扣到血）才呼叫，天然就同時滿足
+               「護盾夠用時只顯示白字」跟「護盾不夠用時
+               白字紅字一起顯示」（因為showShieldAbsorb()
+               已經在上面護盾吸收邏輯裡呼叫過了，這裡只是
+               另外決定要不要「再加上」紅字HP扣血提示）。
+            */
+            if(damage>0){
+
+                showPlayerHit(
+                    damage,
+                    "hp",
+                    targetIndex,
+                    false,
+                    monsterCrit
+                );
+
+            }
 
 
             addBattleLog(
@@ -25441,6 +25464,33 @@ function closeHomeFeature(){
     if(helpBtn){
 
         helpBtn.style.display=
+            "none";
+
+    }
+
+
+    /*
+       ★ 修正（依照使用者回報，「自動戰鬥的框...套用並
+       期待按鈕再戰鬥中根本沒有反應」旁邊那張截圖，
+       「全屬性技能預覽」按鈕出現在自動戰鬥設定視窗上）：
+       跟上面statusHelpButton同一個bug、漏了同一個地方
+       沒重置——skillPreviewHeaderButton只有在
+       switchCharacterTab()裡被設成顯示/隱藏，只要玩家
+       進過一次角色視窗的「技能」分頁，這顆按鈕的
+       inline style.display會停在"inline-block"，
+       之後不管開什麼視窗（自動戰鬥設定、商店、任務……）
+       都會殘留顯示，因為切分頁跟關視窗是兩條不同路徑，
+       關視窗那邊原本沒有重置到它。這裡補上跟
+       statusHelpButton一樣的收尾重置。
+    */
+
+    const skillPreviewBtn=
+        $("skillPreviewHeaderButton");
+
+
+    if(skillPreviewBtn){
+
+        skillPreviewBtn.style.display=
             "none";
 
     }
