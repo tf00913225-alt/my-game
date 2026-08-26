@@ -219,9 +219,44 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 （`"fire"`/`"water"`/`"wind"`/`"earth"`）是兩個獨立欄位，立繪/Q版素材要同時看這兩個
 欄位才能選到正確的圖（見 `getCharacterArtworkPath()` 在 `js/00-main.js`）。
 
+### 5. `#game-stage` 裡新增任何需要手指捲動的容器，記得加進觸控鎖白名單
+
+`js/01-stage-v8-touch-lock.js` 有一個全域的 `touchmove` 監聽，只要觸控目標在
+`#game-stage` 裡面、又不在它自己維護的 `allowedSelector` 白名單覆蓋的可捲動容器內，
+就會 `preventDefault()` 整個擋掉，防止手指誤滑到遊戲背景造成非預期的頁面捲動/縮放。
+
+**這代表：任何新增的、預期要能讓玩家手指滑動捲動的容器（新彈窗、新列表……），
+如果沒有把它自己的 class/id 加進這份白名單，程式化設定 `scrollTop` 會正常運作
+（因為那不經過touchmove事件），但玩家真的用手指滑的時候會完全沒反應**——這正是
+2026-08-26「全屬性技能預覽」彈窗「不能捲動」回報的根本原因，`.skill-preview-body`
+從這個功能一開始做出來就沒被加進白名單，只是內容夠短、從來不需要真的捲動，才一直
+沒被發現。之前好幾輪单純用`scrollTop`/`getBoundingClientRect()`驗證捲動「看起來沒問題」，
+其實都沒有測到真正的手指觸控路徑，都是不夠準的驗證方式。
+
+**以後只要新增/發現任何「這裡應該要能捲動」的容器，驗證方式要用模擬真實觸控滑動
+（Playwright的`Input.dispatchTouchEvent`，`touchStart`→`touchMove`→`touchEnd`），
+不能只測`scrollTop`賦值或`overflow-y:auto`的computed style，這兩種都測不出
+觸控鎖擋住手勢這種問題。**
+
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-26 — 全屬性技能預覽：真正修好捲動 + 字級調到舒服大小
+
+上一輪把文字加大到90px（螢幕上約35px）之後，使用者回報「不能捲動，下面看不到」，
+而且35px確實太大。這次兩個問題一起修：
+
+1. **捲動bug的真正根因**：`js/01-stage-v8-touch-lock.js`的全域觸控鎖白名單
+   一直沒有把`.skill-preview-body`加進去，手指真的滑動時被完全擋掉（程式化
+   `scrollTop`賦值不受影響，所以之前用這個方法驗證「看起來沒問題」其實沒測到
+   真正的問題）。加進白名單後，用Playwright模擬真實觸控滑動
+   （`Input.dispatchTouchEvent`）驗證過`scrollTop`真的會跟著改變。詳細原理見
+   上方「系統架構重點」第5節，以後任何新增的可捲動容器都要記得檢查這份白名單。
+2. **字級調到舒服大小**：90px降到標題49px（螢幕約19px）、屬性分頁按鈕39px
+   （螢幕約15px）、技能名稱44px（螢幕約17px）、分類標籤33px（螢幕約13px）、
+   說明文字39px（螢幕約15px），都是用0.388889縮放比例換算，數值在
+   `css/31-v131-fix-batch.css`裡`#allElementSkillPreviewModal`那幾條規則。
 
 ### 2026-08-26 — 全屬性技能預覽文字真正的根因修正（PR #9）
 
