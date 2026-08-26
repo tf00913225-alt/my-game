@@ -282,3 +282,29 @@
         setTimeout(load,0);
     }
 })();
+
+/* V133 loader — EXP curve / gold rank multiplier / shop tier pricing rebalance. */
+(function loadV133EconomyRebalance(){
+    function load(){
+        if(!document.getElementById("v133-economy-rebalance-style")){
+            const link=document.createElement("link");
+            link.id="v133-economy-rebalance-style";
+            link.rel="stylesheet";
+            link.href="css/34-v133-economy-rebalance.css?v=133";
+            document.head.appendChild(link);
+        }
+
+        if(!document.getElementById("v133-economy-rebalance-runtime")){
+            const script=document.createElement("script");
+            script.id="v133-economy-rebalance-runtime";
+            script.src="js/28-v133-economy-rebalance.js?v=133";
+            document.body.appendChild(script);
+        }
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
