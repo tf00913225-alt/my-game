@@ -30,7 +30,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-26，V136 待合併回 main）
+## 目前狀態（截至 2026-08-26，V136／PR #23 已合併回 main）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
