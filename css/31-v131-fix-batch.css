@@ -407,27 +407,39 @@
 }
 
 /*
-   ★ 修正（依照使用者要求，「全技能預覽文字太小了」，
-   這是第三次加大：13.5/14.5/15px→17/19/20px使用者仍
-   反映太小。這裡再加大一級到19/21/22px；另外同一輪
-   也發現這個檔案的載入版本號（css/31-v131-fix-batch.css）
-   從V131第一批修正到現在都固定是?v=131從未變動過，
-   代表瀏覽器很可能整段時間都在用快取的舊版CSS，
-   使用者看到的字級可能根本不是最新這幾輪改過的結果——
-   已經在js/20-anonymous-20.js把版本號改成?v=132，
-   這裡數值本身也一併再加大，兩個問題一起解決。
+   ★ 真正根因終於找到了（依照使用者要求，「還是很小，
+   妳直接加到35px」）：
+   這個彈窗（#allElementSkillPreviewModal）活在
+   #game-stage那層transform:scale()座標系裡面——整個
+   遊戲畫面是先在1080寬的設計稿座標畫好，再用CSS
+   transform整體縮小貼合手機實際螢幕寬度（用Playwright
+   量測到420px寬的手機viewport下，實際縮放比例是
+   0.388889）。這代表這裡CSS寫的font-size，最後顯示在
+   螢幕上會被再乘上這個縮放比例——前三輪一路加大的
+   13.5→17→19→21→22px，全部都被這層縮放吃掉六成多，
+   22px實際顯示出來只有約8.6px，難怪使用者一直反映
+   「還是很小」，不是沒生效，是每次加大的效果都被這層
+   縮放默默抵銷了大半。
+
+   這次使用者直接要求「35px」，如果照字面把這裡寫死35px，
+   一樣會被縮放成約13.6px、大概還是不夠大、大概率又是
+   下一輪繼續反映太小。已經用getBoundingClientRect()
+   實測確認縮放比例，直接反推：想要螢幕上真的顯示35px，
+   這裡要寫35÷0.388889≈90px，才會讓使用者手機上看到的
+   實際大小符合「35px」這個期望。三個元素（技能名稱、
+   分類標籤、說明文字）統一用這個補償過的數值。
 */
 #game-stage #allElementSkillPreviewModal .skill-preview-card span{
-    font-size:19px !important;
+    font-size:90px !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card p{
-    font-size:21px !important;
-    line-height:1.6 !important;
+    font-size:90px !important;
+    line-height:1.5 !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card strong{
-    font-size:22px !important;
+    font-size:90px !important;
 }
 
 #game-stage .stat-explanation{
