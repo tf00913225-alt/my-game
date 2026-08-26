@@ -29,8 +29,24 @@
        真正的內容，不會再有背景圖被蓋掉的問題。
     */
 
-    const CELL_W=56;
-    const CELL_H=84;
+    /*
+       ★ 修正（依照使用者要求，「巡怪立繪的解析度變得那麼
+       低，幫我徹底修好」）：
+       女角sprite原本跟男角共用同一組56x84裁切格，這個
+       尺寸是刻意壓縮控制檔案大小，但70x105顯示、手機
+       螢幕通常又是2~3倍DPI，56x84的來源在螢幕上等於只有
+       不到1倍的實際像素，看起來明顯模糊。女角這次重新
+       用更高解析度的來源圖建置sprite，格子尺寸放大到
+       140x210（等於顯示尺寸的2倍，retina螢幕下依然清晰）。
+       男角sprite沒有一起換新素材，維持原本56x84不變，
+       所以裁切格尺寸不能再共用同一個常數/同一張裁切用
+       canvas，改成裁切函式接受cellW/cellH參數，各自
+       建立自己尺寸的canvas。
+    */
+    const FEMALE_CELL_W=140;
+    const FEMALE_CELL_H=210;
+    const MALE_CELL_W=56;
+    const MALE_CELL_H=84;
 
     function loadImageAsync(url){
         return new Promise(function(resolve,reject){
@@ -41,26 +57,30 @@
         });
     }
 
-    const cropCanvas=document.createElement("canvas");
-    cropCanvas.width=CELL_W;
-    cropCanvas.height=CELL_H;
-    const cropCtx=cropCanvas.getContext("2d");
-
-    function cropCellDataUrl(sheetImage,col,row){
-        cropCtx.clearRect(0,0,CELL_W,CELL_H);
-        cropCtx.drawImage(
-            sheetImage,
-            col*CELL_W,row*CELL_H,CELL_W,CELL_H,
-            0,0,CELL_W,CELL_H
-        );
-        return cropCanvas.toDataURL("image/png");
+    function makeCropper(cellW,cellH){
+        const canvas=document.createElement("canvas");
+        canvas.width=cellW;
+        canvas.height=cellH;
+        const ctx=canvas.getContext("2d");
+        return function cropCellDataUrl(sheetImage,col,row){
+            ctx.clearRect(0,0,cellW,cellH);
+            ctx.drawImage(
+                sheetImage,
+                col*cellW,row*cellH,cellW,cellH,
+                0,0,cellW,cellH
+            );
+            return canvas.toDataURL("image/png");
+        };
     }
+
+    const cropFemaleCell=makeCropper(FEMALE_CELL_W,FEMALE_CELL_H);
+    const cropMaleCell=makeCropper(MALE_CELL_W,MALE_CELL_H);
 
     const chunks=Array.isArray(window.V131_PATROL_SPRITE_CHUNKS)
         ? window.V131_PATROL_SPRITE_CHUNKS
         : [];
 
-    if(chunks.length<6 || chunks.some(chunk=>!chunk)){
+    if(chunks.length<43 || chunks.some(chunk=>!chunk)){
         console.warn("V131 patrol sprite data incomplete; keep legacy patrol artwork.");
         return;
     }
@@ -162,10 +182,11 @@
         const useMale=!!(maleSheetImage && isMaleCharacter(character));
         const sheetImage=useMale ? maleSheetImage : femaleSheetImage;
         const cellMap=useMale ? maleSpriteCells : spriteCells;
+        const cropCell=useMale ? cropMaleCell : cropFemaleCell;
         const cell=cellMap[element][facingBack ? "back" : "front"];
 
         if(sheetImage){
-            const cropped=cropCellDataUrl(sheetImage,cell[0],cell[1]);
+            const cropped=cropCell(sheetImage,cell[0],cell[1]);
             img.src=cropped;
         }
 

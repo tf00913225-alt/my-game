@@ -125,14 +125,14 @@
             const link=document.createElement("link");
             link.id="v131-fix-batch-style";
             link.rel="stylesheet";
-            link.href="css/31-v131-fix-batch.css?v=131";
+            link.href="css/31-v131-fix-batch.css?v=132";
             document.head.appendChild(link);
         }
 
         if(!document.getElementById("v131-fix-batch-runtime")){
             const script=document.createElement("script");
             script.id="v131-fix-batch-runtime";
-            script.src="js/25-v131-fix-batch.js?v=131";
+            script.src="js/25-v131-fix-batch.js?v=132";
             document.body.appendChild(script);
         }
     }
@@ -151,22 +151,55 @@
         const link=document.createElement("link");
         link.id="v131-patrol-appearance-style";
         link.rel="stylesheet";
-        link.href="css/32-v131-patrol-appearance.css?v=131a";
+        link.href="css/32-v131-patrol-appearance.css?v=132";
         document.head.appendChild(link);
     }
 
     function loadScripts(){
         const sources=[
-            "js/v131-patrol-sprite-0.js?v=131e",
-            "js/v131-patrol-sprite-1.js?v=131e",
-            "js/v131-patrol-sprite-2.js?v=131e",
-            "js/v131-patrol-sprite-3.js?v=131e",
-            "js/v131-patrol-sprite-4.js?v=131e",
-            "js/v131-patrol-sprite-5.js?v=131e",
-            "js/v131-patrol-sprite-6.js?v=131e",
-            "js/v131-patrol-sprite-7.js?v=131e",
-            "js/v131-patrol-sprite-8.js?v=131e",
-            "js/v131-patrol-sprite-9.js?v=131e",
+            "js/v131-patrol-sprite-0.js?v=131f",
+            "js/v131-patrol-sprite-1.js?v=131f",
+            "js/v131-patrol-sprite-2.js?v=131f",
+            "js/v131-patrol-sprite-3.js?v=131f",
+            "js/v131-patrol-sprite-4.js?v=131f",
+            "js/v131-patrol-sprite-5.js?v=131f",
+            "js/v131-patrol-sprite-6.js?v=131f",
+            "js/v131-patrol-sprite-7.js?v=131f",
+            "js/v131-patrol-sprite-8.js?v=131f",
+            "js/v131-patrol-sprite-9.js?v=131f",
+            "js/v131-patrol-sprite-10.js?v=131f",
+            "js/v131-patrol-sprite-11.js?v=131f",
+            "js/v131-patrol-sprite-12.js?v=131f",
+            "js/v131-patrol-sprite-13.js?v=131f",
+            "js/v131-patrol-sprite-14.js?v=131f",
+            "js/v131-patrol-sprite-15.js?v=131f",
+            "js/v131-patrol-sprite-16.js?v=131f",
+            "js/v131-patrol-sprite-17.js?v=131f",
+            "js/v131-patrol-sprite-18.js?v=131f",
+            "js/v131-patrol-sprite-19.js?v=131f",
+            "js/v131-patrol-sprite-20.js?v=131f",
+            "js/v131-patrol-sprite-21.js?v=131f",
+            "js/v131-patrol-sprite-22.js?v=131f",
+            "js/v131-patrol-sprite-23.js?v=131f",
+            "js/v131-patrol-sprite-24.js?v=131f",
+            "js/v131-patrol-sprite-25.js?v=131f",
+            "js/v131-patrol-sprite-26.js?v=131f",
+            "js/v131-patrol-sprite-27.js?v=131f",
+            "js/v131-patrol-sprite-28.js?v=131f",
+            "js/v131-patrol-sprite-29.js?v=131f",
+            "js/v131-patrol-sprite-30.js?v=131f",
+            "js/v131-patrol-sprite-31.js?v=131f",
+            "js/v131-patrol-sprite-32.js?v=131f",
+            "js/v131-patrol-sprite-33.js?v=131f",
+            "js/v131-patrol-sprite-34.js?v=131f",
+            "js/v131-patrol-sprite-35.js?v=131f",
+            "js/v131-patrol-sprite-36.js?v=131f",
+            "js/v131-patrol-sprite-37.js?v=131f",
+            "js/v131-patrol-sprite-38.js?v=131f",
+            "js/v131-patrol-sprite-39.js?v=131f",
+            "js/v131-patrol-sprite-40.js?v=131f",
+            "js/v131-patrol-sprite-41.js?v=131f",
+            "js/v131-patrol-sprite-42.js?v=131f",
             "js/v131-patrol-sprite-male-0.js?v=131c",
             "js/v131-patrol-sprite-male-1.js?v=131c",
             "js/v131-patrol-sprite-male-2.js?v=131c",
@@ -185,7 +218,7 @@
             "js/v131-patrol-sprite-male-15.js?v=131c",
             "js/v131-patrol-sprite-male-16.js?v=131c",
             "js/v131-patrol-sprite-male-17.js?v=131c",
-            "js/26-v131-patrol-appearance.js?v=131c"
+            "js/26-v131-patrol-appearance.js?v=132"
         ];
 
         function next(index){

@@ -1,5 +1,22 @@
 /* V131 — targeted gameplay/UI fixes for request batch 17. */
 
+/*
+   ★ 修正（依照使用者要求，「不管怪物數量是一排還是
+   兩排，把戰鬥資訊框跟人物卡牌高度，都固定為有兩排
+   怪物時的高度」）：
+   原本這個容器的高度完全由實際內容（幾排怪物）自然
+   撐開（來自.battle-monsters的min-height:90px，
+   只夠1排），只有1排怪物時整個容器就矮一截，下面
+   靠flex-grow吃剩餘空間的.battle-monster-gap-filler
+   跟「有多少剩餘空間就自動長多大」的turn-target-row
+   （回合/目標資訊框）就會跟著變高，人物卡牌也會被
+   推到不同的高度，一下貼上面、一下貼下面。
+   直接給這個容器一個固定的min-height，數值抓「兩排
+   怪物卡片（每排90px高）+ 排間5px間距 + 容器自己
+   上下各2px的padding」＝90+5+90+4=189px，無論實際
+   幾排怪物都固定保留這個高度，下面所有靠剩餘空間
+   決定大小的區塊自然就不會再跟著伸縮。
+*/
 #game-stage #battleMonsterArea.v131-formation{
     display:flex !important;
     flex-direction:column !important;
@@ -7,6 +24,7 @@
     justify-content:flex-start !important;
     gap:5px !important;
     width:100% !important;
+    min-height:189px !important;
     overflow:visible !important;
 }
 
@@ -390,20 +408,26 @@
 
 /*
    ★ 修正（依照使用者要求，「全技能預覽文字太小了」，
-   這是第二次加大：上一輪13.5/14.5/15px使用者反映
-   仍然太小，這次大幅加大到17/19/20px）。
+   這是第三次加大：13.5/14.5/15px→17/19/20px使用者仍
+   反映太小。這裡再加大一級到19/21/22px；另外同一輪
+   也發現這個檔案的載入版本號（css/31-v131-fix-batch.css）
+   從V131第一批修正到現在都固定是?v=131從未變動過，
+   代表瀏覽器很可能整段時間都在用快取的舊版CSS，
+   使用者看到的字級可能根本不是最新這幾輪改過的結果——
+   已經在js/20-anonymous-20.js把版本號改成?v=132，
+   這裡數值本身也一併再加大，兩個問題一起解決。
 */
 #game-stage #allElementSkillPreviewModal .skill-preview-card span{
-    font-size:17px !important;
+    font-size:19px !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card p{
-    font-size:19px !important;
+    font-size:21px !important;
     line-height:1.6 !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card strong{
-    font-size:20px !important;
+    font-size:22px !important;
 }
 
 #game-stage .stat-explanation{

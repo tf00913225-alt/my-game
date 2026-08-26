@@ -74,24 +74,34 @@
     box-sizing:border-box !important;
 }
 
-/* ---------- 角色切換：參考圖是窄的一條人物名稱列 ---------- */
+/* ---------- 角色切換：參考圖是窄的一條人物名稱列 ----------
+   ★ 修正（依照使用者回報，「背包介面的角色切換按鈕與返回
+   按鈕重疊了，把兩邊的箭頭切換按鈕都往角色ID靠攏」）：
+   原本用grid-template-columns:13% 74% 13%把整條列撐滿
+   整個外殼寬度，右側箭頭因此被推到最右邊緣，正好卡在
+   絕對定位、貼右上角的「關閉」按鈕（.map-inventory-
+   overlay-close）下面，兩者疊在一起。改成flex置中排列，
+   兩顆箭頭改成貼著角色名稱兩側（用gap控制間距，不用
+   固定寬度撐滿整列），右箭頭自然遠離右上角，不會再跟
+   關閉按鈕重疊。
+*/
 #game-stage #inventoryPage .inventory-character-switch{
     width:100% !important;
     min-height:48px !important;
-    display:grid !important;
-    grid-template-columns:13% minmax(0,74%) 13% !important;
+    display:flex !important;
+    justify-content:center !important;
     align-items:center !important;
-    gap:0 !important;
+    gap:14px !important;
     margin:0 0 4px !important;
 }
 #game-stage #inventoryPage .inventory-character-arrow{
-    width:64% !important;
+    width:30px !important;
     aspect-ratio:1 / 1 !important;
     height:auto !important;
     min-height:0 !important;
-    justify-self:center !important;
+    flex:0 0 auto !important;
     border-radius:10px !important;
-    font-size:28px !important;
+    font-size:20px !important;
     line-height:1 !important;
 }
 #game-stage #inventoryPage .inventory-character-name{

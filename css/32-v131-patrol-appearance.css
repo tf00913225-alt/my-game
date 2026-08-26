@@ -11,18 +11,15 @@
     pointer-events:auto;
 }
 /*
-   ★ 修正（依照使用者要求，「按鈕太小」）：
-   58px→76px，加大點擊範圍跟可視面積。
-   icon本身改成由JS（updateSwitchIcon()）直接
-   設定background-image/size/position為「目前
-   選中角色裁切好的單一格圖片」，不再靠這裡的
-   CSS去背景圖裡摳一小塊，所以不需要再算
-   background-size/position的百分比，
-   直接cover鋪滿viewport即可。
+   ★ 修正（依照使用者要求，「形象切換鈕小一點，與
+   上面返回鍵同一個大小」）：
+   上一輪為了「按鈕太小」把它從58px放大到76px，這次
+   使用者進一步要求跟正上方的返回鍵（.map-page-
+   return-float，68x68px）統一大小，改成68px。
 */
 #game-stage #mapPage #v131PatrolAppearanceSwitch{
-    width:76px;
-    height:76px;
+    width:68px;
+    height:68px;
     padding:0;
     border:0;
     border-radius:50%;
@@ -33,8 +30,8 @@
 #game-stage #mapPage .v131-switch-icon-viewport{
     position:relative;
     display:block;
-    width:76px;
-    height:76px;
+    width:68px;
+    height:68px;
     overflow:hidden;
     border-radius:50%;
     filter:drop-shadow(0 3px 5px rgba(0,0,0,.72));
