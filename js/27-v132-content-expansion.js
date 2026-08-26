@@ -57,11 +57,48 @@
         }
     }
 
+    /*
+       ★ 新增（依照使用者要求，「套裝效果顯示再點擊裝備的時候
+       就應該顯示」）：不管是點背包裡還沒穿的套裝物品，還是點
+       已經穿在身上的套裝物品，都在物品詳細彈窗補上「目前這件
+       所屬套裝，這個角色身上已經穿了幾件／5件」跟兩條套裝加成
+       說明，未達成的門檻用「未啟動」+較暗的樣式呈現，已達成的
+       用「已啟動」+較亮的樣式呈現，一眼就能看出離下一階效果
+       還差幾件。這裡刻意只「附加」在既有stats區塊後面，不去
+       動getStatText()本身的輸出，一般裝備/非套裝物品完全不受
+       影響（item.setId不存在時直接跳過）。
+    */
+    function appendEquipmentSetInfo(item){
+        if(!item || !item.setId){ return; }
+        const equipmentKey=getBackpackEquipmentKey(inventoryCharacterIndex);
+        if(!equipmentKey){ return; }
+        const counts=getEquipmentSetCounts(equipmentKey);
+        const count=counts[item.setId]||0;
+        const label=getSetLabel(item.setId);
+        const elementKey=getSetElement(item.setId);
+        const elementName=(elementKey && elementDatabase[elementKey]) ? elementDatabase[elementKey].name : "";
+        const threeActive=count>=3;
+        const fiveActive=count>=5;
+        const html=
+            '<div class="v132-set-info">'+
+            '<div class="v132-set-title">['+escapeHtml(label)+']'+count+'/5</div>'+
+            '<div class="v132-set-bonus'+(threeActive ? " active" : " inactive")+'">'+
+            '裝備三件　全能力+1　'+(threeActive ? "[已啟動]" : "[未啟動]")+
+            '</div>'+
+            '<div class="v132-set-bonus'+(fiveActive ? " active" : " inactive")+'">'+
+            '裝備五件　'+escapeHtml(elementName)+'元素技能傷害+2%　'+(fiveActive ? "[已啟動]" : "[未啟動]")+
+            '</div>'+
+            '</div>';
+        const statsEl=document.getElementById("itemModalStats");
+        if(statsEl){ statsEl.insertAdjacentHTML("beforeend",html); }
+    }
+
     if(typeof openItemModal==="function"){
         const originalOpenItemModal=openItemModal;
         openItemModal=function(slotIndex){
             const result=originalOpenItemModal.apply(this,arguments);
             fixItemModalIconRendering();
+            appendEquipmentSetInfo(inventorySlots[slotIndex]);
             return result;
         };
     }
@@ -71,6 +108,7 @@
         openEquippedItem=function(item,slot){
             const result=originalOpenEquippedItem.apply(this,arguments);
             fixItemModalIconRendering();
+            appendEquipmentSetInfo(item);
             return result;
         };
     }
@@ -130,6 +168,18 @@
             '<path d="M16 18 H48 M16 26 H48 M16 34 H36 M16 42 H40" '+
             'stroke="'+c.glow+'" stroke-width="1.6"/>'+
             '<circle cx="46" cy="46" r="6" fill="none" stroke="'+c.glow+'" stroke-width="2"/>',
+            c.glow
+        );
+    }
+
+    function chestIcon(){
+        const c=TIER_COLORS.mid;
+        return svgWrap(
+            '<rect x="8" y="26" width="48" height="30" rx="3" '+
+            'fill="#2a1c0e" stroke="'+c.main+'" stroke-width="2.5"/>'+
+            '<path d="M8 30 Q32 12 56 30" fill="#3a270f" stroke="'+c.main+'" stroke-width="2.5"/>'+
+            '<rect x="27" y="26" width="10" height="18" fill="'+c.glow+'" opacity="0.85"/>'+
+            '<circle cx="32" cy="34" r="3.4" fill="#2a1c0e" stroke="'+c.glow+'" stroke-width="1.4"/>',
             c.glow
         );
     }
@@ -401,6 +451,36 @@
     }
 
     window.v132AddItemToInventory=addItemToInventory;
+
+    /*
+       通用「從背包扣掉N個某ID物品」——寶箱/抽獎券開啟都要用到
+       同一種「消耗庫存」邏輯，寫成共用版本，不用每個新物品類型
+       各自複製一份扣庫存的迴圈。找不到足夠庫存時完全不動背包，
+       回傳false。
+    */
+    function consumeStackItem(itemId,amount){
+        const needed=Math.max(1,Math.floor(Number(amount)||1));
+        const owned=inventoryItems.reduce((sum,item)=>{
+            if(!item || item.id!==itemId){ return sum; }
+            return sum+Math.max(0,Math.floor(Number(item.count)||0));
+        },0);
+        if(owned<needed){ return false; }
+
+        let remaining=needed;
+        for(let index=inventoryItems.length-1;index>=0 && remaining>0;index--){
+            const item=inventoryItems[index];
+            if(!item || item.id!==itemId){ continue; }
+            const current=Math.max(0,Math.floor(Number(item.count)||0));
+            const take=Math.min(current,remaining);
+            if(current-take<=0){
+                inventoryItems.splice(index,1);
+            }else{
+                item.count=current-take;
+            }
+            remaining-=take;
+        }
+        return true;
+    }
 
 
     /* =====================================================
@@ -779,11 +859,66 @@
     window.useEquipmentTicket=useEquipmentTicket;
 
     /*
-       ★ 物品詳細彈窗補上符咒/抽獎券的「使用」按鈕——
-       這兩種東西不是藥水（不走usePotion()那條路）、
-       也不是裝備（不能穿戴），原本的itemEquipButton
-       在這兩種類型上會被判成「不可裝備」整個鎖死，
-       這裡另外接一顆「使用」按鈕上去。
+       開啟寶箱/抽獎券之前，先讓玩家看看「這個東西開了可能拿到
+       什麼」——重用既有的v132ShowRewardModal彈窗，不用另外做
+       一整套新UI。
+    */
+    function showItemPreview(item){
+        if(!item){ return; }
+        let html;
+
+        if(item.type==="chest"){
+            const rows=CHEST_TIER_WEIGHTS.map(tier=>
+                '<div class="v132-preview-row">'+
+                '<span>'+tier.label+'礦石／'+tier.label+'裝備設計圖紙</span>'+
+                '<span>'+tier.weight+'%</span>'+
+                '</div>'
+            ).join("");
+            html=
+                '<div class="v132-reward-modal-inner">'+
+                '<h3>'+escapeHtml(item.name)+' 開啟預覽</h3>'+
+                '<p>開啟1個寶箱，會各自獨立擲一次礦石階級與裝備設計圖紙階級'+
+                '（礦石為對應階級固定1種，設計圖紙則是該階級5個部位裡隨機1種）：</p>'+
+                '<div class="v132-preview-list">'+rows+'</div>'+
+                '<div class="v132-reward-actions">'+
+                '<button type="button" onclick="v132CloseRewardModal()">關閉</button>'+
+                '</div></div>';
+        }
+        else if(item.type==="ticket"){
+            const ticketDef=getTicketDefinition(item.id);
+            const pieces=ticketDef ? getEquipmentSetItemDefinitions(ticketDef.setId) : [];
+            const grid=pieces.map(p=>
+                '<div class="v132-preview-item">'+
+                '<span class="v132-preview-icon">'+p.icon+'</span>'+
+                '<span>'+escapeHtml(p.name)+'</span>'+
+                '</div>'
+            ).join("");
+            html=
+                '<div class="v132-reward-modal-inner">'+
+                '<h3>'+escapeHtml(item.name)+' 開啟預覽</h3>'+
+                '<p>開啟後，從以下10件['+(ticketDef ? getSetLabel(ticketDef.setId) : "")+']套裝部位中'+
+                '隨機獲得1件（每件機率相同，各10%）：</p>'+
+                '<div class="v132-preview-grid">'+grid+'</div>'+
+                '<div class="v132-reward-actions">'+
+                '<button type="button" onclick="v132CloseRewardModal()">關閉</button>'+
+                '</div></div>';
+        }
+        else{
+            return;
+        }
+
+        v132ShowRewardModal(html);
+    }
+    window.v132ShowItemPreview=showItemPreview;
+
+    /*
+       ★ 物品詳細彈窗補上符咒/抽獎券/寶箱的「開啟」跟「預覽」
+       按鈕——這幾種東西不是藥水（不走usePotion()那條路）、
+       也不是裝備（不能穿戴），原本的itemEquipButton在這幾種
+       類型上只會被判成「不可裝備」整個鎖死但還是顯示著，這裡
+       依照使用者要求（寶箱/抽獎券點開只會看到「開啟/預覽/
+       出售」三顆按鈕），把穿戴鍵直接整個藏起來，另外接「開啟」
+       跟「預覽」兩顆按鈕上去。
     */
     if(typeof openItemModal==="function"){
         const afterOpenItemModal=openItemModal;
@@ -793,6 +928,7 @@
             const item=inventorySlots[slotIndex];
             const equipButton=document.getElementById("itemEquipButton");
             let useButton=document.getElementById("v132ItemUseButton");
+            let previewButton=document.getElementById("v132ItemPreviewButton");
 
             if(!useButton && equipButton && equipButton.parentElement){
                 useButton=document.createElement("button");
@@ -802,19 +938,58 @@
                 equipButton.parentElement.insertBefore(useButton,equipButton.nextSibling);
             }
 
-            if(!useButton){ return result; }
-
-            if(item && item.type==="ticket"){
-                useButton.style.display="";
-                useButton.textContent="開啟";
-                useButton.onclick=function(){
-                    useEquipmentTicket(item.id);
-                    closeItemModal();
-                };
+            if(!previewButton && useButton && useButton.parentElement){
+                previewButton=document.createElement("button");
+                previewButton.id="v132ItemPreviewButton";
+                previewButton.type="button";
+                previewButton.className=useButton.className;
+                useButton.parentElement.insertBefore(previewButton,useButton.nextSibling);
             }
-            else{
-                useButton.style.display="none";
-                useButton.onclick=null;
+
+            const isChestOrTicket=item && (item.type==="chest" || item.type==="ticket");
+
+            if(equipButton){
+                equipButton.style.display=isChestOrTicket ? "none" : "";
+            }
+
+            if(useButton){
+                if(item && item.type==="ticket"){
+                    useButton.style.display="";
+                    useButton.textContent="開啟";
+                    useButton.onclick=function(){
+                        useEquipmentTicket(item.id);
+                        closeItemModal();
+                    };
+                }
+                else if(item && item.type==="chest"){
+                    useButton.style.display="";
+                    useButton.textContent="開啟";
+                    useButton.onclick=function(){
+                        const opened=openSingleMaterialChestFromInventory();
+                        closeItemModal();
+                        if(opened){
+                            alert("開啟"+item.name+"，獲得：\n"+opened.join("\n"));
+                        }
+                    };
+                }
+                else{
+                    useButton.style.display="none";
+                    useButton.onclick=null;
+                }
+            }
+
+            if(previewButton){
+                if(isChestOrTicket){
+                    previewButton.style.display="";
+                    previewButton.textContent="預覽";
+                    previewButton.onclick=function(){
+                        showItemPreview(item);
+                    };
+                }
+                else{
+                    previewButton.style.display="none";
+                    previewButton.onclick=null;
+                }
             }
 
             return result;
@@ -859,7 +1034,17 @@
         }
     }
 
+    /*
+       ★ 修正（依照使用者要求，「副本先取消挑戰次數，方便我頻繁
+       測試」）：先關掉每日次數限制，只要把這個常數改回true，
+       markDungeonUsed()就會恢復正常記錄「今天挑戰過了」，
+       isDungeonAvailable()/dungeonEntryCard()的UI也會自動恢復
+       擋下重複挑戰，不用再改別的地方。
+    */
+    const DUNGEON_DAILY_LIMIT_ENABLED=false;
+
     function markDungeonUsed(type){
+        if(!DUNGEON_DAILY_LIMIT_ENABLED){ return; }
         ensureDungeonStateCurrent();
         dungeonState.used[type]=true;
         persistDungeonState();
@@ -1223,15 +1408,25 @@
         });
     }
 
-    function getNextLevelExpTotal(){
-        return getExistingPartyIndexes().reduce((sum,index)=>{
+    /*
+       ★ 修正（依照使用者要求，經驗副本結算公式重寫）：
+       原本用一個假想的getExpToNextLevel()函式（這個專案裡根本
+       不存在，之前只會落到「等級×100」這個隨便寫的備援值），
+       乘0.5當獎勵。使用者明確指出真正該用的是每個角色實際的
+       「升下一級所需總經驗」——這個數字本來就已經存在角色物件的
+       character.expNext欄位裡（見js/00-main.js的checkLevelUp()，
+       每次升級後expNext會更新成「下一級需要多少」）。新公式：
+       隊伍每個角色的expNext加總，再除以角色人數，不再乘0.5。
+    */
+    function getExpDungeonRewardExp(){
+        const indexes=getExistingPartyIndexes();
+        if(indexes.length===0){ return 0; }
+        const total=indexes.reduce((sum,index)=>{
             const character=getPartyCharacterByIndex(index);
             if(!character){ return sum; }
-            const needed=typeof getExpToNextLevel==="function"
-                ? getExpToNextLevel(character)
-                : Math.max(0,(character.level||1)*100);
-            return sum+Math.max(0,needed);
+            return sum+Math.max(0,Number(character.expNext)||0);
         },0);
+        return Math.floor(total/indexes.length);
     }
 
     function showExpDungeonRewardModal(rewardExp){
@@ -1249,7 +1444,7 @@
     window.v132ClaimExpDungeonReward=function(doubled){
         function grant(){
             const rewardMultiplier=doubled ? 2 : 1;
-            const rewardExp=Math.floor(getNextLevelExpTotal()*0.5*rewardMultiplier);
+            const rewardExp=Math.floor(getExpDungeonRewardExp()*rewardMultiplier);
             sharedExp+=rewardExp;
             addBattleLog("經驗副本結算，獲得"+rewardExp+"EXP，已存入經驗池。");
             saveGame();
@@ -1277,7 +1472,7 @@
             alert("經驗副本需要主角色等級達到10級才能開啟。");
             return;
         }
-        const rewardExp=getNextLevelExpTotal()*0.5;
+        const rewardExp=getExpDungeonRewardExp();
         startExpDungeonBattle(1,rewardExp);
     }
     window.v132BeginExpDungeon=beginExpDungeon;
@@ -1328,34 +1523,72 @@
     }
     window.v132BeginMaterialDungeon=beginMaterialDungeon;
 
+    /*
+       ★ 修正（依照使用者要求，「副本寶箱領取時，不應該直接
+       開啟，而是放進包包給玩家自主開起」）：
+       原本「材料副本挑戰成功」按「直接領取」就會馬上把寶箱
+       全部拆開、材料直接進背包，玩家完全沒有機會自己選時機
+       開。改成：領取只把「材料寶箱」這個新物品（可堆疊）
+       放進背包，真正的開箱（骰礦石/設計圖階級）延後到玩家
+       在背包裡點開這個物品、按下「開啟」的那一刻才進行。
+    */
+    const CHEST_TIER_WEIGHTS=[
+        {key:"low",label:"低階",weight:40},
+        {key:"mid",label:"中階",weight:30},
+        {key:"high",label:"高階",weight:20},
+        {key:"perfect",label:"極品",weight:10}
+    ];
+
+    const materialChestDefinition={
+        id:"materialChest",
+        name:"材料寶箱",
+        icon:chestIcon(),
+        type:"chest",
+        price:0,
+        stats:{}
+    };
+
     function pickWeightedTier(){
         const roll=Math.random()*100;
-        if(roll<40){ return "low"; }
-        if(roll<70){ return "mid"; }
-        if(roll<90){ return "high"; }
-        return "perfect";
+        let acc=0;
+        for(const tier of CHEST_TIER_WEIGHTS){
+            acc+=tier.weight;
+            if(roll<acc){ return tier.key; }
+        }
+        return CHEST_TIER_WEIGHTS[CHEST_TIER_WEIGHTS.length-1].key;
     }
 
-    function openMaterialChests(chestCount){
-        const rewards=[];
-        for(let i=0;i<chestCount;i++){
-            const oreTier=pickWeightedTier();
-            const oreDef=getOreDefinition("ore"+oreTier.charAt(0).toUpperCase()+oreTier.slice(1));
-            const oreAmount=oreTier==="perfect" ? 5 : 10;
-            addItemToInventory(oreDef,oreAmount);
-            rewards.push(oreDef.name+"×"+oreAmount);
+    /* 骰「開1個材料寶箱」會拿到的內容，純計算、不碰背包。 */
+    function rollMaterialChestRewards(){
+        const oreTier=pickWeightedTier();
+        const oreDef=getOreDefinition("ore"+oreTier.charAt(0).toUpperCase()+oreTier.slice(1));
+        const oreAmount=oreTier==="perfect" ? 5 : 10;
 
-            const blueprintTier=pickWeightedTier();
-            const blueprintPool=getBlueprintDefinitionsByTier(blueprintTier);
-            const blueprintDef=blueprintPool[Math.floor(Math.random()*blueprintPool.length)];
-            const blueprintAmount=blueprintTier==="perfect" ? 5 : 10;
-            addItemToInventory(blueprintDef,blueprintAmount);
-            rewards.push(blueprintDef.name+"×"+blueprintAmount);
-        }
+        const blueprintTier=pickWeightedTier();
+        const blueprintPool=getBlueprintDefinitionsByTier(blueprintTier);
+        const blueprintDef=blueprintPool[Math.floor(Math.random()*blueprintPool.length)];
+        const blueprintAmount=blueprintTier==="perfect" ? 5 : 10;
+
+        return [
+            {def:oreDef,amount:oreAmount},
+            {def:blueprintDef,amount:blueprintAmount}
+        ];
+    }
+
+    /*
+       從背包實際開啟1個材料寶箱：先確認庫存夠、扣掉1個寶箱，
+       再骰內容、加進背包。回傳結果字串陣列給呼叫端顯示，
+       扣寶箱失敗（沒庫存）回傳null。
+    */
+    function openSingleMaterialChestFromInventory(){
+        if(!consumeStackItem("materialChest",1)){ return null; }
+        const rewards=rollMaterialChestRewards();
+        rewards.forEach(r=>addItemToInventory(r.def,r.amount));
         rebuildInventorySlots();
         saveGame();
-        return rewards;
+        return rewards.map(r=>r.def.name+"×"+r.amount);
     }
+    window.v132OpenMaterialChest=openSingleMaterialChestFromInventory;
 
     function showMaterialDungeonRewardModal(chestCount){
         const html=
@@ -1372,9 +1605,15 @@
     window.v132ClaimMaterialDungeonReward=function(chestCount,doubled){
         function grant(){
             const finalCount=doubled ? chestCount*2 : chestCount;
-            const rewards=openMaterialChests(finalCount);
+            const added=addItemToInventory(materialChestDefinition,finalCount);
+            rebuildInventorySlots();
+            saveGame();
             v132CloseRewardModal();
-            alert("開啟"+finalCount+"個寶箱，獲得：\n"+rewards.join("\n"));
+            if(!added){
+                alert("背包空間不足，材料寶箱無法放入背包。");
+            }else{
+                alert("獲得材料寶箱×"+finalCount+"，請到背包自行開啟。");
+            }
             showPage("dungeon");
             switchDungeonTab("daily");
         }
