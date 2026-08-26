@@ -77,6 +77,13 @@
             const result=originalAutoActionForCharacter.apply(this,arguments);
 
             try{
+                /* V136 已接管設定持久化、fallback 說明與實際 queued action
+                   校正；在這裡即時判斷旗標，避免兩層同時印重複訊息。
+                   不管 V135/V136 兩支動態 script 誰先下載完成都安全。 */
+                if(window.v136AutoBattleFixInstalled){
+                    return result;
+                }
+
                 /* 只有「玩家真的設了一個技能」才需要檢查；normal/defend
                    本來就不是技能，沒有「被退回」這回事。 */
                 if(
