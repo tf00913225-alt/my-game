@@ -63,7 +63,10 @@
        1200ms，確保它一定在下一位出手前就消失。
        只改移除時間，不改任何動畫本身或戰鬥邏輯。
     */
-    const V134_SKILL_BADGE_MS=1200;
+    /* ★ 這個數字必須小於 js/25 的 V131_RESOLVE_DELAY_MS（目前1250），
+       否則上一位的技能名稱會跨到下一位出手，看起來會疊在一起。
+       節奏改成1.25秒之後，這裡跟著從1200收到1000。 */
+    const V134_SKILL_BADGE_MS=1000;
 
     function trimSkillBadgeLifetime(badge){
         if(!badge){ return; }
@@ -108,90 +111,21 @@
        ===================================================== */
 
     /*
-       ★ 根因（讀 js/00-main.js:20239-20249 確認）：
-       autoActionForCharacter() 有四個條件會把玩家設定好的技能默默
-       丟掉、退回普通攻擊，而且一行戰鬥紀錄都不寫：
-         (1) skillDatabase 裡查不到這個技能
-         (2) getSkillLevel(key,id) <= 0（等於還沒學）
-         (3) character.sp < 技能的 spCost  ← 最常見
-         (4) 技能是 buff/passive/heal/revive 這幾類
+       ★ 這一段原本在這裡（V134），已經在 V135 被更好的做法取代，
+       所以整段移除，避免兩份邏輯同時印出重複的訊息。
 
-       其中 (3) 特別致命：自動戰鬥路徑已經把喝藥邏輯整個移除
-       （見 00-main.js:20196 的註解），戰鬥中完全沒有任何 SP 回復，
-       applyPostBattleAutoRecovery() 又只在「戰鬥結束後而且身上有
-       藥水」才補。技能 spCost 是 6～62，所以 SP 一見底就永遠退回
-       普攻——這就是「設定出招了還一直普通攻擊」。
+       V134 的做法是「在原函式跑之前，自己複製一份引擎的四個判斷
+       條件去預測會不會退回普攻」。缺點是：只要引擎因為某個沒被
+       複製到的理由退回，預判就會全部通過、什麼都不印，玩家還是
+       看到莫名其妙的普攻。使用者接著就回報了「我很確定有SP，
+       自動戰鬥還是使用普通攻擊」——正是這種預判對不上的情況。
 
-       對照組：手動路徑的 castDamageSkill()（15015）**會**印
-       「SP不足，改用普通攻擊。」，只有自動路徑是靜默的。
-
-       依使用者決定：**不**自動喝藥，只把原因寫進戰鬥紀錄。
-       這裡在原函式跑之前先自己判斷一次「會不會被退回、為什麼」，
-       需要的話印一行說明，然後原封不動交給原函式去做真正的決定
-       ——完全不改變任何行為，只補上玩家看得到的回饋。
-       另外用 lastReason 去重，避免長時間掛機時每回合洗版。
+       V135 改成「以實際結果為準」：讓原函式跑完，再去看
+       queuedPlayerActions 裡實際排進去的是什麼，只要
+       「設定的是技能、實際卻是普通攻擊」就一定會印說明。
+       詳見 js/30-v135-fixes.js 第 1 節。
     */
-    const v134LastFallbackReason={};
 
-    function describeAutoFallbackReason(characterIndex){
-        const character=getPartyCharacterByIndex(characterIndex);
-        const config=getPartyAutoConfig(characterIndex);
-        if(!character || !config){ return null; }
-
-        const action=config.skill;
-        if(!action || action==="normal" || action==="defend"){ return null; }
-
-        const skill=skillDatabase[action];
-        if(!skill){ return "找不到「"+action+"」這個技能，改用普通攻擊。"; }
-
-        const skillKey=getPartyCharacterKey(characterIndex);
-        if(getSkillLevel(skillKey,action)<=0){
-            return (character.id||"角色")+"還沒學會「"+skill.name+"」，改用普通攻擊。";
-        }
-
-        const spCost=skill.spCost!==undefined ? skill.spCost : (skill.cost||0);
-        if(character.sp<spCost){
-            return (character.id||"角色")+"SP不足（"+
-                Math.floor(character.sp)+"/"+spCost+
-                "），無法使用「"+skill.name+"」，改用普通攻擊。";
-        }
-
-        if(["buff","passive","heal","revive"].includes(skill.category)){
-            return "「"+skill.name+"」屬於"+
-                (skill.category==="heal" ? "治療" :
-                 skill.category==="revive" ? "復活" :
-                 skill.category==="buff" ? "增益" : "被動")+
-                "類技能，自動戰鬥目前不支援，改用普通攻擊。";
-        }
-
-        return null;
-    }
-
-    if(typeof autoActionForCharacter==="function"){
-        const originalAutoActionForCharacter=autoActionForCharacter;
-        autoActionForCharacter=function(characterIndex,token){
-            try{
-                const autoOn=characterIndex===0
-                    ? autoBattle
-                    : getPartyAutoConfig(characterIndex).enabled;
-
-                if(battleActive && autoOn && token===battleToken){
-                    const reason=describeAutoFallbackReason(characterIndex);
-                    if(reason && v134LastFallbackReason[characterIndex]!==reason){
-                        v134LastFallbackReason[characterIndex]=reason;
-                        addBattleLog("⚠️ "+reason);
-                    }
-                    else if(!reason){
-                        v134LastFallbackReason[characterIndex]=null;
-                    }
-                }
-            }catch(error){
-                console.error("V134 自動戰鬥回饋判斷失敗：",error);
-            }
-
-            return originalAutoActionForCharacter.apply(this,arguments);
-        };
-    }
 
     /*
        ★ 調查記錄（給下一個接手的人，避免重複走冤枉路）：
