@@ -21,12 +21,22 @@
 }
 
 /* The image itself is now transparent. Also remove the card's own
-   black fallback background so no rectangle is painted behind it. */
+   black fallback background so no rectangle is painted behind it.
+
+   ★ 修正（依照使用者回報，「角色土皇戰鬥時沒有黃色外框」）：
+   這裡原本連border/outline/box-shadow一起清成0/none，是V41那個年代
+   （角色卡片還沒有金色外框這個功能）為了拿掉舊版黑底卡片殘留的
+   邊框/陰影而寫的。後來V131在.battle-player上加了統一的金色外框
+   （border:2px solid #d8aa36 !important + box-shadow），但因為
+   這裡用的是#battlePlayerCard0這個ID選擇器，specificity比
+   .battle-player這個class選擇器高，就算兩邊都是!important，
+   ID選擇器還是會贏——結果變成只要是「隊伍第一位」的角色，
+   不管是哪個元素，戰鬥卡片永遠不會有金色外框（其他位置的
+   角色不受影響）。border/outline/box-shadow這三行拿掉，
+   背景透明化（跟這次外框問題無關的部分）繼續保留。
+*/
 #game-stage > #app > #game-content #battlePage #battlePlayerCard0{
     background-color:transparent !important;
     background-repeat:no-repeat !important;
     background-position:center top !important;
-    border:0 !important;
-    outline:0 !important;
-    box-shadow:none !important;
 }

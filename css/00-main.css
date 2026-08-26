@@ -3499,6 +3499,25 @@ button:active{
     background:linear-gradient(180deg,#5b8fff,#2050c0);
 }
 
+/*
+   ★ 新增（依照使用者要求，「護盾效果生成的話，我方
+   血量條要增加等值長度的白色血量條」）：
+   護盾不是真的HP，是額外的傷害吸收額度，用一段疊在
+   血條上、緊接在紅色血量後面的白色色塊表示「還有多少
+   吸收額度」，跟血條同一個容器、同一個座標系，
+   left由JS設成目前HP佔比（緊接血量右側開始），
+   寬度由JS設成護盾佔maxHP的比例。
+*/
+.battle-player .hp-bar-shield-overlay{
+    position:absolute;
+    top:0;
+    height:100%;
+    width:0;
+    background:rgba(255,255,255,.92);
+    box-shadow:inset 0 0 2px rgba(0,0,0,.35);
+    transition:left .25s ease,width .25s ease;
+}
+
 .battle-player .hp-bar-text,
 .battle-player .sp-bar-text{
     position:absolute;
@@ -3770,12 +3789,41 @@ button:active{
         0 0 10px rgba(0,255,102,1);
 }
 
+/*
+   ★ 新增（依照使用者要求，「護盾傷害機制...顯示白色
+   數字扣除動畫」）：
+   護盾吸收的傷害用白色文字表示，跟HP掉血的紅字、
+   SP的藍字、回復的綠字都不一樣，一眼就能看出「這筆
+   傷害被護盾扛下來了，沒有真的扣到血」。
+*/
+.damage-popup.shield-popup{
+    color:#fff;
+    -webkit-text-stroke:1px #444;
+    paint-order:stroke fill;
+    text-shadow:
+        0 0 4px rgba(255,255,255,.85),
+        1px 1px 0 #000;
+}
+
 /* V100 — 爆擊顯示保留紅色傷害字、白框字與加強彈跳動畫；
-   浮動文字格式統一為「爆擊 123」，不顯示驚嘆號與 HP/SP 字樣。 */
+   浮動文字格式統一為「爆擊 123」，不顯示驚嘆號與 HP/SP 字樣。
+
+   ★ 修正（依照使用者要求，「爆擊字體再縮小一點，超出
+   人物框一點點即可」）：
+   原本font-size:27px，加上damageFloatCrit動畫在10%那個
+   關鍵影格還會再放大到scale(1.62)，兩個疊乘起來瞬間
+   峰值等於43.7px，「爆擊 1234」這種7個字的文字實際
+   寬度遠超過人物/怪物卡片本身的寬度（76~116px），
+   多張卡片同時爆擊時，好幾組文字疊在一起看起來像
+   一坨誇張的巨大色塊。改成font-size:17px，動畫峰值
+   scale也一併調降（見下面damageFloatCrit），兩者疊乘
+   後峰值約21px，只會比卡片邊界略寬一點點，不會整團
+   蓋過旁邊的卡片。
+*/
 .damage-popup.critical-popup{
-    font-size:27px;
+    font-size:17px;
     letter-spacing:.5px;
-    -webkit-text-stroke:1.35px #fff;
+    -webkit-text-stroke:1.1px #fff;
     paint-order:stroke fill;
     text-shadow:2px 2px 0 #000;
     animation:damageFloatCrit 1.8s cubic-bezier(.16,.88,.25,1.15) forwards;
@@ -3871,25 +3919,25 @@ button:active{
 
     10%{
         opacity:1;
-        transform:translate(-50%,-12px) scale(1.62) rotate(7deg);
+        transform:translate(-50%,-12px) scale(1.25) rotate(7deg);
     }
 
     22%{
-        transform:translate(-50%,-7px) scale(1.22) rotate(-4deg);
+        transform:translate(-50%,-7px) scale(1.08) rotate(-4deg);
     }
 
     36%{
-        transform:translate(-50%,-12px) scale(1.38) rotate(2deg);
+        transform:translate(-50%,-12px) scale(1.14) rotate(2deg);
     }
 
     68%{
         opacity:1;
-        transform:translate(-50%,-22px) scale(1.18) rotate(0deg);
+        transform:translate(-50%,-22px) scale(1.05) rotate(0deg);
     }
 
     100%{
         opacity:0;
-        transform:translate(-50%,-38px) scale(1.08) rotate(0deg);
+        transform:translate(-50%,-38px) scale(1) rotate(0deg);
     }
 
 }
@@ -5507,6 +5555,23 @@ body.skill-detail-scroll-active,
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-panel{
     flex:0 0 auto !important;
     min-height:0 !important;
+}
+
+/*
+   ★ 修正（依照使用者回報，「背包介面的角色切換按鈕與
+   返回按鈕重疊了」，這是同一個問題的第二部分）：
+   把箭頭改成置中貼齊角色名稱兩側之後，名稱一長
+   （例如角色自訂名稱本身就比較長），整組「箭頭+名稱+
+   箭頭」置中出來的寬度還是可能大到讓右箭頭又頂到
+   絕對定位、貼右上角的「關閉」按鈕（只有從地圖頁開啟
+   的這個覆蓋層版本才有關閉按鈕，一般從下方導覽列
+   進背包沒有這個按鈕、不受影響）。這裡只在覆蓋層開啟
+   這個情境下，讓這條列的置中範圍往左讓出關閉按鈕的
+   寬度（56px按鈕+右邊5px留白+一點安全間距），
+   右箭頭不管名稱多長都不會再跑到關閉按鈕底下。
+*/
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-switch{
+    padding-right:64px !important;
 }
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-stage{
     height:220px !important;

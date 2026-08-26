@@ -4118,6 +4118,31 @@ function getCharacterArtworkPath(character){
 }
 
 
+/*
+   ★ 新增（依照使用者要求，「玩家戰鬥立繪能否去背」）：
+   跟getCharacterArtworkPath()共用同一組gender/element
+   判斷邏輯，但回傳的是另外用rembg去背過的透明PNG
+   （assets/characters/battle_性別_元素.png），只給戰鬥
+   卡片（.battle-player的background-image）這一個用途
+   使用。角色創建預覽、背包立繪頁面的大圖仍然呼叫
+   getCharacterArtworkPath()、繼續顯示原本帶場景背景的
+   版本——這兩個地方的圖片本來就是同一份素材共用，
+   直接把來源檔案整個換成去背版會連帶影響到那些其實
+   使用者沒有要求改的畫面，所以另外開一個函式、
+   只在戰鬥卡片那一處呼叫，其餘地方完全不受影響。
+*/
+function getCharacterBattleArtworkPath(character){
+    if(!character){ return ""; }
+
+    const gender=character.gender==="male" ? "male" : "female";
+    const element=elementDatabase[character.element]
+        ? character.element
+        : "fire";
+
+    return "assets/characters/battle_"+gender+"_"+element+".png";
+}
+
+
 function getCharacterDisplayNameByIndex(index){
     const character=getPartyCharacterByIndex(index);
     return character ? (character.id||("角色"+(index+1))) : ("角色"+(index+1));
@@ -14688,6 +14713,7 @@ function tickStatusEffects(){
                                         "護盾吸收了"+absorbed+
                                         "點燃燒傷害（剩餘"+shieldBuff.remaining+"點）。"
                                     );
+                                    showShieldAbsorb(charIndex,absorbed);
                                 }
                             }
                         }
@@ -17453,6 +17479,11 @@ function processSingleMonsterAttack(monsterIndex,token){
                             "點傷害（剩餘"+
                             shieldBuff.remaining+
                             "點）。"
+                        );
+
+                        showShieldAbsorb(
+                            targetIndex,
+                            absorbed
                         );
 
                     }
@@ -22564,7 +22595,7 @@ function renderPlayers(){
             index;
 
         box.style.backgroundImage=
-            "url('"+getCharacterArtworkPath(entry.character)+"')";
+            "url('"+getCharacterBattleArtworkPath(entry.character)+"')";
 
 
         box.innerHTML =
@@ -22584,6 +22615,11 @@ function renderPlayers(){
             <div
                 id="battlePlayerHPBar${index}"
                 class="hp-bar-inner"
+            ></div>
+
+            <div
+                id="battlePlayerShieldBar${index}"
+                class="hp-bar-shield-overlay"
             ></div>
 
             <div class="hp-bar-text"></div>
@@ -22774,18 +22810,76 @@ function updateSingleCharacterBars(
         $("battlePlayerSPBar"+index);
 
 
+    const shieldBar =
+        $("battlePlayerShieldBar"+index);
+
+
+    const hpPercent =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                character.hp/
+                stats.maxHP*
+                100
+            )
+        );
+
+
     if(hpBar){
 
         hpBar.style.width =
+            hpPercent+
+            "%";
+
+    }
+
+
+    /*
+       ★ 新增（依照使用者要求，「護盾效果生成的話，
+       我方血量條要增加等值長度的白色血量條」）：
+       白色色塊緊接在紅色血量右側開始（left=hpPercent），
+       寬度＝護盾剩餘量佔maxHP的比例，跟血條本身用
+       同一個maxHP基準換算，超出容器的部分因為
+       .hp-bar本身overflow:hidden會自動被裁掉，
+       不會畫出格線外。
+    */
+
+    if(shieldBar){
+
+        const shieldBuff=
+
+            (character.activeBuffs||[])
+            .find(
+                b=>
+
+                    b.type==="shield"&&
+                    b.turnsLeft>0&&
+                    b.remaining>0
+
+            );
+
+
+        const shieldPercent=
+
+            shieldBuff
+            ?
             Math.max(
                 0,
-                Math.min(
-                    100,
-                    character.hp/
-                    stats.maxHP*
-                    100
-                )
-            )+
+                shieldBuff.remaining/
+                stats.maxHP*
+                100
+            )
+            :
+            0;
+
+
+        shieldBar.style.left=
+            hpPercent+
+            "%";
+
+        shieldBar.style.width=
+            shieldPercent+
             "%";
 
     }
@@ -22908,6 +23002,10 @@ function showDamagePopup(element,text,type,isCrit){
             type==="miss"
             ?
             "miss-popup"
+            :
+            type==="shield"
+            ?
+            "shield-popup"
             :
             "hp-popup"
         )+
@@ -23937,6 +24035,38 @@ function showPlayerHit(amount,type,characterIndex,isPositive,isCrit){
         );
 
     }
+
+}
+
+
+/*
+   ★ 新增（依照使用者要求，「護盾傷害機制...顯示白色
+   數字扣除動畫，如：[-567]」）：
+   跟showPlayerHit()同樣找battlePlayerCard元素，
+   但用專屬的shield類型（白色文字，見.damage-popup.
+   shield-popup），跟一般HP掉血的紅字明確區分開來，
+   代表「這是護盾扛下來的量，不是真的扣血」。
+*/
+function showShieldAbsorb(characterIndex,absorbed){
+
+    if(!absorbed || absorbed<=0){
+        return;
+    }
+
+    const element =
+        $("battlePlayerCard"+
+            (characterIndex||0)
+        );
+
+    if(!element){
+        return;
+    }
+
+    showDamagePopup(
+        element,
+        "-"+absorbed,
+        "shield"
+    );
 
 }
 
@@ -25016,55 +25146,22 @@ function openHomeFeature(type){
 
 
         /*
-           ★ 新增（依照使用者要求，「自動
-           戰鬥的設定頁面，緊貼戰鬥資訊框
-           上緣，不然現在靠上面很醜」）：
-           這個彈窗預設是「整個遮罩置中」
-           （.home-feature-modal的align-items:
-           center），改成幫這個彈窗加一個
-           dock-bottom樣式，讓它貼著畫面
-           下緣（戰鬥資訊框/導覽列上方）
-           顯示，而不是飄在畫面正中央或
-           （修好前）貼在最上面。
-           其他功能（休息、角色、任務……）
-           開啟時會在下面統一清掉這個class，
-           不受影響，一樣維持原本置中顯示。
-        */
+           ★ 修正（依照使用者最新要求，「為什麼有時候
+           自動戰鬥設定頁面很置中，有時候很靠下面，都把
+           它固定置中；把整個頁面放大讓文字都能塞進去，
+           不要讓他捲動」）：
+           這裡原本依照更早一輪的要求加了dock-bottom樣式
+           （戰鬥中讓視窗貼齊畫面下緣的戰鬥資訊框），這正是
+           「有時候置中、有時候靠下面」的原因——戰鬥中貼底、
+           不在戰鬥中置中，兩種狀態交替出現。使用者現在
+           明確要求「都固定置中」，改成完全不再加dock-bottom
+           這個class，不管在不在戰鬥中都維持
+           .home-feature-modal預設的置中顯示。
 
-        modal.classList.add(
-            "dock-bottom"
-        );
-
-
-        /*
-           ★ 修正（依照使用者要求，「自動戰鬥設定頁面
-           沒辦法捲動，或者把整個框放大」）：
-           上面的172px padding-bottom是為了「貼齊戰鬥
-           資訊框上緣」算出來的，但這個設定視窗不是只有
-           在戰鬥中才會打開（主城、地圖上的元素匣按鈕
-           平常也能開），不在戰鬥中的時候畫面下方根本
-           沒有戰鬥資訊框，這172px的留白純粹是浪費空間、
-           把視窗往上擠，導致內容被壓縮、看起來要一直捲
-           才看得完。改成只有真的在戰鬥中（battleActive）
-           才保留172px，其餘情況只留一點點安全距離，
-           把多出來的空間還給視窗本身。
-        */
-
-        modal.style.setProperty(
-            "padding-bottom",
-            battleActive ? "172px" : "24px",
-            "important"
-        );
-
-
-        /*
-           ★ 修正（同一個問題的另一半）：
-           光把padding-bottom讓出來還不夠——視窗本身
-           （.home-feature-modal-box）還有一條寫死的
-           max-height:80dvh，不管外面讓出多少空間，
-           視窗自己最高就是卡在螢幕的80%，不在戰鬥中時
-           其實可以再放寬，讓使用者不用捲那麼多下
-           （甚至常見情況下可以整頁看完不用捲）。
+           同時把視窗本身（.home-feature-modal-box）的
+           max-height放寬到96dvh（原本戰鬥中只有80dvh，
+           非戰鬥中已經是96dvh，這裡統一成不分情境都用
+           96dvh），盡量讓內容一次就能完整顯示、不用捲動。
         */
 
         const settingsBox=
@@ -25077,7 +25174,7 @@ function openHomeFeature(type){
 
             settingsBox.style.setProperty(
                 "max-height",
-                battleActive ? "80dvh" : "96dvh",
+                "96dvh",
                 "important"
             );
 
@@ -30035,7 +30132,7 @@ function renderEquipment(){
     const slots=[
         {key:"head",name:"頭"},
         {key:"hand",name:"手"},
-        {key:"shoulder",name:"肩甲"},
+        {key:"shoulder",name:"護腕"},
         {key:"armor",name:"衣服"},
         {key:"shoes",name:"鞋子"},
         {key:"ring",name:"戒指"}
