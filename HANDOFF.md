@@ -242,6 +242,45 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-08-26 — 自動戰鬥設定：拆掉雙層框、拿掉多餘的內部捲動
+
+使用者回報自動戰鬥設定視窗「不用又有一個內框，直接一個框就好，然後把框放大，
+讓所有按鈕文字一次就呈現，無需捲動」（附截圖：外層`.home-feature-modal-box`
+裡面還套了一層有自己金色邊框/底色的`#autoBattleSettingsPanel`，內層框自己
+被截斷、下面還有一段捲軸，內容被裁掉一部分）。
+
+**根因**：`css/08-stage-v14-character-scroll-fix.css`裡有一條舊規則
+`#homeFeatureModal .auto-settings-expanded{ max-height:70dvh; overflow-y:auto !important; }`，
+把這個面板單獨鎖在比外層`.home-feature-modal-box`（`max-height:96dvh`）矮很多
+的高度上，造成「外層框其實還有空間、內層框卻先被截斷、還要自己捲動」的雙框
+＋內部捲動怪象。這條規則是V14那一輪為了修捲動問題加的，後來`.dock-bottom`
+被拿掉、外層框的max-height也已經放寬到96dvh，這條70dvh的舊規則卻沒有跟著
+拿掉，變成技術債。
+
+**修法**：
+1. 拿掉這個面板自己的`max-height:70dvh`跟`overflow-y:auto !important`，
+   改成`overflow:visible !important; max-height:none !important;`，讓它
+   單純隨內容長高，捲動完全交給外層`.home-feature-modal-box`一個人負責
+   （本來就有`overflow-y:auto`＋`96dvh`）。
+2. 新增`#homeFeatureModal #autoBattleSettingsPanel.auto-settings-expanded{border:0;background:transparent;border-radius:0;box-shadow:none;padding:0;}`，
+   拿掉面板自己的視覺框（原本`.auto-settings-expanded`基礎樣式在
+   `00-main.css`裡有自己的金框/深底/圓角/10px padding），只留外層那一個
+   框，外層本來就有16px padding，內容不會貼邊。
+
+**驗證方式**：Playwright量測`getBoundingClientRect`/`getComputedStyle`，
+確認：內層面板`border`/`background`/`padding`都歸零、`max-height:none`、
+`overflow-y:visible`；在900px高的視窗下外層框（663px）完全不需要捲動就能
+裝下全部內容（含最下面「套用並啟動」按鈕）；把視窗高度模擬降到700px甚至
+600px時，也只有外層框一個捲軸（不再是雙層框各自截斷），符合預期的優雅
+降級行為。截圖比對確認視覺上真的變成單一個框、所有卡片與按鈕一次顯示。
+另外用Playwright實際點擊「啟動」按鈕確認`autoBattle`狀態正常切換，
+確認這次改動沒有動到任何點擊事件邏輯。
+
+**已知限制**：`css/08-stage-v14-character-scroll-fix.css`目前沒有被納入
+`?v=`快取版本號機制（原本就是用純`<link>`標籤靜態載入，不像V131/V132那幾個
+檔案有動態載入器＋版本號），這次修改如果使用者瀏覽器快取了舊版CSS，可能
+需要手動清一次快取或強制重新整理才會看到效果。
+
 ### 2026-08-26 — V132：新增符咒／材料／裝備套裝／抽獎券／三個日常副本（第四輪大改動）
 
 使用者這輪提出一次大型內容擴充需求（不是回報bug）：新增3種符咒（冰封/隱身/結界，各4階，

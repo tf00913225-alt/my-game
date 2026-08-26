@@ -29,13 +29,38 @@
     touch-action:pan-y !important;
 }
 
+/*
+   ★ 修正（依照使用者回報「自動戰鬥設定不用又有一個內框，
+   直接一個框就好，然後把框放大，讓所有按鈕文字一次就呈現，
+   無需捲動」）：
+   這裡原本的max-height:70dvh把面板單獨鎖死在比外層
+   .home-feature-modal-box（max-height:96dvh）矮很多的高度，
+   造成「外層框還有空間、內層框卻先被截斷還要自己捲動」的
+   雙框+內部捲動怪象。拿掉這個獨立的高度上限跟自己的
+   overflow-y:auto，讓這個面板單純隨內容長高，捲動完全交給
+   外層.home-feature-modal-box（本來就有overflow-y:auto+
+   96dvh）一個人負責，視覺上也不會再有兩層邊框疊在一起。
+*/
 #homeFeatureModal .auto-settings-expanded{
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    -webkit-overflow-scrolling:touch !important;
-    overscroll-behavior:contain !important;
+    overflow:visible !important;
     touch-action:pan-y !important;
-    max-height:70dvh;
+    max-height:none !important;
+}
+
+/*
+   ★ 同一輪修正：面板本身的金色邊框/深底/圓角/padding
+   （.auto-settings-expanded基礎樣式，00-main.css）在借進
+   #homeFeatureModal之後，會疊在外層.home-feature-modal-box
+   自己的邊框/底色上，變成「一個框裡面又一個框」。這裡拿掉
+   面板自己的視覺框，只留外層那一個，padding也拿掉——外層
+   本來就有16px padding，內容不會貼邊。
+*/
+#homeFeatureModal #autoBattleSettingsPanel.auto-settings-expanded{
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    padding:0 !important;
 }
 
 /* When the status/skill pages are borrowed into the character modal,
