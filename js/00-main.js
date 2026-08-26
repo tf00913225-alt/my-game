@@ -25181,6 +25181,54 @@ function openHomeFeature(type){
         }
 
 
+        /*
+           ★ 修正（依照使用者要求，「自動戰鬥設定頁面
+           沒辦法捲動，或者把整個框放大」）：
+           上面的172px padding-bottom是為了「貼齊戰鬥
+           資訊框上緣」算出來的，但這個設定視窗不是只有
+           在戰鬥中才會打開（主城、地圖上的元素匣按鈕
+           平常也能開），不在戰鬥中的時候畫面下方根本
+           沒有戰鬥資訊框，這172px的留白純粹是浪費空間、
+           把視窗往上擠，導致內容被壓縮、看起來要一直捲
+           才看得完。改成只有真的在戰鬥中（battleActive）
+           才保留172px，其餘情況只留一點點安全距離，
+           把多出來的空間還給視窗本身。
+        */
+
+        modal.style.setProperty(
+            "padding-bottom",
+            battleActive ? "172px" : "24px",
+            "important"
+        );
+
+
+        /*
+           ★ 修正（同一個問題的另一半）：
+           光把padding-bottom讓出來還不夠——視窗本身
+           （.home-feature-modal-box）還有一條寫死的
+           max-height:80dvh，不管外面讓出多少空間，
+           視窗自己最高就是卡在螢幕的80%，不在戰鬥中時
+           其實可以再放寬，讓使用者不用捲那麼多下
+           （甚至常見情況下可以整頁看完不用捲）。
+        */
+
+        const settingsBox=
+            modal.querySelector(
+                ".home-feature-modal-box"
+            );
+
+
+        if(settingsBox){
+
+            settingsBox.style.setProperty(
+                "max-height",
+                battleActive ? "80dvh" : "96dvh",
+                "important"
+            );
+
+        }
+
+
         const characterSelect=
             $("autoSettingsCharacterSelect");
 
