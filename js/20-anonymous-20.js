@@ -256,3 +256,29 @@
         setTimeout(load,0);
     }
 })();
+
+/* V132 loader — talismans/materials/equipment sets/daily dungeons content patch. */
+(function loadV132ContentExpansion(){
+    function load(){
+        if(!document.getElementById("v132-content-expansion-style")){
+            const link=document.createElement("link");
+            link.id="v132-content-expansion-style";
+            link.rel="stylesheet";
+            link.href="css/33-v132-content-expansion.css?v=132";
+            document.head.appendChild(link);
+        }
+
+        if(!document.getElementById("v132-content-expansion-runtime")){
+            const script=document.createElement("script");
+            script.id="v132-content-expansion-runtime";
+            script.src="js/27-v132-content-expansion.js?v=132";
+            document.body.appendChild(script);
+        }
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
