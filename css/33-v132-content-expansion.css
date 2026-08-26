@@ -1,0 +1,163 @@
+/*
+   V132 — 符咒／材料／裝備套裝／副本的最小可用樣式。
+   道具圖示本身是inline SVG（見js/27），這裡只負責
+   版面排版跟色調，之後美術資源到位可以整份替換。
+*/
+
+.v132-reward-modal{
+    position:fixed;
+    left:0;
+    top:0;
+    right:0;
+    bottom:0;
+    z-index:9999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(10,8,6,0.72);
+    padding:24px;
+}
+
+.v132-reward-modal.show{
+    display:flex;
+}
+
+.v132-reward-modal-inner{
+    background:#20180f;
+    border:2px solid #e8a93c;
+    border-radius:14px;
+    padding:26px 22px;
+    max-width:420px;
+    width:100%;
+    color:#f5ecd9;
+    text-align:center;
+    box-shadow:0 12px 32px rgba(0,0,0,0.5);
+}
+
+.v132-reward-modal-inner h3{
+    margin:0 0 12px;
+    font-size:22px;
+    color:#ffe08a;
+}
+
+.v132-reward-modal-inner p{
+    margin:0 0 18px;
+    font-size:16px;
+    line-height:1.6;
+}
+
+.v132-reward-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.v132-reward-actions button{
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid #e8a93c;
+    background:#3a2a15;
+    color:#f5ecd9;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.v132-reward-actions button:active{
+    background:#e8a93c;
+    color:#20180f;
+}
+
+.v132-ticket-choices{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:14px;
+}
+
+.v132-ticket-choice{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #6a5230;
+    background:#2a2013;
+    color:#f5ecd9;
+    font-size:14px;
+    cursor:pointer;
+}
+
+.v132-ticket-choice:active{
+    border-color:#e8a93c;
+}
+
+.v132-ticket-icon{
+    width:40px;
+    height:40px;
+    display:inline-block;
+}
+
+.v132-dungeon-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:16px;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+}
+
+.v132-dungeon-card{
+    background:#20180f;
+    border:1px solid #6a5230;
+    border-radius:12px;
+    padding:16px;
+    color:#f5ecd9;
+}
+
+.v132-dungeon-card-title{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:6px;
+    color:#ffe08a;
+}
+
+.v132-dungeon-card-req{
+    font-size:13px;
+    color:#c9b896;
+    margin-bottom:4px;
+}
+
+.v132-dungeon-card-reward{
+    font-size:13px;
+    color:#c9b896;
+    margin-bottom:12px;
+}
+
+.v132-dungeon-enter-btn{
+    width:100%;
+    padding:11px;
+    border-radius:9px;
+    border:1px solid #e8a93c;
+    background:#3a2a15;
+    color:#f5ecd9;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.v132-dungeon-enter-btn:active{
+    background:#e8a93c;
+    color:#20180f;
+}
+
+.v132-dungeon-enter-btn:disabled{
+    opacity:0.5;
+    cursor:default;
+}
+
+.v132-dungeon-done{
+    text-align:center;
+    color:#8a9a8a;
+    font-size:14px;
+    padding:8px 0;
+}

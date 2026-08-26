@@ -2,7 +2,11 @@
 (function installV131FixBatch(){
     "use strict";
 
-    const V131_RESOLVE_DELAY_MS=1300;
+    /*
+       ★ 修正（依照使用者要求，「修復回合與回合之間的
+       空拍太久問題，把它固定為1.5秒」）：1300→1500。
+    */
+    const V131_RESOLVE_DELAY_MS=1500;
     const V131_MONSTER_STRENGTH=1.30;
     const V131_EXP_MULTIPLIER=3.5;
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;

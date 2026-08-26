@@ -242,6 +242,75 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-08-26 — V132：新增符咒／材料／裝備套裝／抽獎券／三個日常副本（第四輪大改動）
+
+使用者這輪提出一次大型內容擴充需求（不是回報bug）：新增3種符咒（冰封/隱身/結界，各4階，
+命中機率＝階級固定機率＋角色智力加成）、礦石與裝備設計圖紙材料、一般練功4種低階道具各5%
+獨立掉落、3個日常副本（經驗/材料/裝備，各每日1次、失敗不扣次數）、4元素裝備套裝（赤炎/
+寒泉/岩岳/青嵐，各10件、3件6圍全+1／5件對應元素技能傷害+2%）、抽獎券開套裝機制，外加
+把回合間空拍從1.3秒調到1.5秒。全部新增邏輯放在新檔案：
+
+- **`js/27-v132-content-expansion.js`**（新檔）：整包內容邏輯，用同一個IIFE、「讀舊函式→
+  包一層→呼叫原函式→加新邏輯→塞回同名全域變數」的既有override手法接進
+  `killMonster`/`winBattle`/`loseBattle`/`resolveQueuedPlayerAction`/`getEquipmentBonus`/
+  `getElementDamagePassiveMultiplier`/`equipSelectedItem`/`renderBattleItemMenu`/
+  `renderDungeonTabContent`/`openItemModal`/`openEquippedItem` 這些既有函式，沒有改動任何
+  一行`js/00-main.js`本體。副本怪物借用`monsters`全域陣列本來就可以整包替換的既有慣例
+  （`launchDungeonBattle()`借完整份`monsters`/`currentZone`，結束後完整還原）。
+- **`css/33-v132-content-expansion.css`**（新檔）：獎勵彈窗、副本清單卡片、抽獎券選擇按鈕
+  的最小可用樣式，跟遊戲既有深色系配色一致。
+- **`js/20-anonymous-20.js`**：比照V131的動態載入器模式，新增`loadV132ContentExpansion()`，
+  在`DOMContentLoaded`後動態插入上面兩個新檔案（`?v=132`）。
+- **`js/25-v131-fix-batch.js`**：`V131_RESOLVE_DELAY_MS` 從1300改成1500（回合間空拍1.5秒）。
+
+**過程中發現並修正的2個真bug**（都是先寫程式碼再用Playwright實際跑過才抓到的）：
+
+1. 一開始寫talisman結算的dispatch override時猜錯了`js/00-main.js`裡「宣告後結算」那個
+   函式的名字（猜成`resolveQueuedActionForCharacter`），實際上是`resolveQueuedPlayerAction`
+   （`characterIndex,token`兩個參數）。已用`grep`實際確認函式名稱並修正，不然符咒在戰鬥中
+   會完全沒有結算效果（原本的程式碼有`console.warn`防呆，但如果沒特別去看console log
+   很容易漏掉這個問題，之後接手的人寫override前務必先grep確認函式名稱存在）。
+2. 4元素裝備套裝裡武器部位（刀/扇）的物品`type`原本寫成`"hand"`，但`js/00-main.js`裡
+   實際決定「這個type能不能被穿到哪個裝備欄」的`getInventoryEquipmentSlot()`只認
+   `"weapon"`這個type字串（`"hand"`不在對照表裡，會導致穿裝失敗但不會報錯，
+   `equipSelectedItem()`只是靜默return）。這個bug在headless瀏覽器裡實際測試「裝備套裝
+   3件加成」時才發現（穿裝之後套裝計數一直卡在2，湊不滿3件）。已修正成`type:"weapon"`。
+   `js/00-main.js`本身這裡有個既有的不一致（`isEquipmentInventoryType()`把`"hand"`也算
+   進去、但`getInventoryEquipmentSlot()`不認），這次沒有動`00-main.js`去修這個不一致，
+   只是確保新增的物品定義用對的type值。
+
+**驗證方式**：用本機 `python3 -m http.server 8899` + Playwright headless Chromium，全程繞過
+UI表單直接呼叫`createCharacter()`/`createAdditionalCharacter()`建立測試角色（等級直接改
+`player.level`），逐一實際跑過以下流程並確認資料/DOM狀態正確、全程零`pageerror`：
+- 一般練功掉落：強制RNG必中，確認4種低階道具（3符咒+1礦石）各自獨立判定、能正確加入背包
+- 符咒戰鬥使用：冰封符命中（怪物正確拿到`{type:"freeze",turnsLeft:4}`狀態、庫存正確扣1）、
+  未命中（畫版失敗log、不消耗額外庫存）、`renderBattleItemMenu()`在符咒分頁正確渲染出
+  可點擊按鈕（含「生效機率35%」文字、`onclick="useTalisman(...)"`）
+- 裝備套裝：等級門檻（<20阻擋並跳alert、≥20放行）、3件6圍+1加成（數值逐項核對正確）、
+  5件對應元素傷害+2%（用`player`本人跟`player2`分別驗證只有元素/套裝都符合的角色才吃到）
+- 抽獎券開套裝：消耗1張券、正確拿到1件對應套裝的隨機部位
+- 三個日常副本完整跑過（用真實的`winBattle()`/`loseBattle()`/`checkBattleEnd()`結算，不是
+  另外模擬）：經驗副本3場車輪戰完整跑完、獎勵彈窗、直接領取後`sharedExp`正確增加、
+  今日已完成後二次挑戰被正確擋下；材料副本依回合數判斷寶箱數量、開箱正確拿到材料；
+  裝備副本boss+4精英、抽獎券選擇彈窗、直接領取跟看廣告雙倍領取（`showRewardedAd`）兩條
+  路徑都測過；戰敗路徑確認`monsters`/`currentZone`會正確還原、當日挑戰次數不會被扣掉、
+  可以立刻重新挑戰
+- 每日重置：把`localStorage`裡`v132_daily_dungeon_state`的日期改成很久以前，重新整理頁面
+  （模擬跨日）後確認`used`狀態正確重置、副本重新可挑戰
+- 物品詳細彈窗SVG圖示渲染修正：確認`openItemModal()`裡的圖示元素`innerHTML`真的長出
+  `<svg>` DOM節點，不是被當成一整串文字印出來
+
+**已知限制**：
+- 只做了資料/邏輯層跟最小可用的CSS/inline SVG視覺（依使用者明確指示「先暫時用
+  CSS/JavaScript動畫+Canvas/SVG做出來，後期再用美術更改」），沒有做逐畫面UI走查
+  （例如真的用滑鼠點過副本清單頁的排版、抽獎券選擇按鈕在小螢幕的實際觸感），這次全部
+  驗證都是直接呼叫底層函式/操作DOM狀態，不是模擬真實手指點擊整個流程。
+- 沒有測試三個角色（`player3`）情境下的套裝加成/副本開放條件，目前雙角色門檻只用
+  `player`+`player2`驗證過。
+- `js/27-v132-content-expansion.js`裡裝備副本的雙倍領取流程（`v132ClaimEquipmentDungeonReward`
+  裡的`grant2`巢狀函式）寫法稍微繞，邏輯正確但之後如果要再擴充建議順手整理成跟
+  `v132ClaimMaterialDungeonReward`/`v132ClaimExpDungeonReward`一致的寫法。
+
 ### 2026-08-26 — 按鈕洩漏到其他視窗、護盾扣血提示重複、技能預覽捲動破圖調查
 
 使用者這輪回報4個問題，附了5張截圖：
