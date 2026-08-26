@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="135";
+const V_ASSET_VERSION="136";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -383,6 +383,24 @@ function vAssetUrl(path){
             const script=document.createElement("script");
             script.id="v135-fixes-runtime";
             script.src=vAssetUrl("js/30-v135-fixes.js");
+            document.body.appendChild(script);
+        }
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V136 loader — auto-battle setting persistence and queued-action correction. */
+(function loadV136AutoBattleFix(){
+    function load(){
+        if(!document.getElementById("v136-auto-battle-fix-runtime")){
+            const script=document.createElement("script");
+            script.id="v136-auto-battle-fix-runtime";
+            script.src=vAssetUrl("js/31-v136-auto-battle-fix.js");
             document.body.appendChild(script);
         }
     }
