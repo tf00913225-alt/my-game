@@ -891,6 +891,34 @@
         return DUNGEON_ELEMENTS[Math.floor(Math.random()*DUNGEON_ELEMENTS.length)];
     }
 
+    /*
+       ★ 新增（依照使用者回報「副本的怪物感覺太弱了」）：
+       makeZoneMonster()做出來的是「裸的」基礎數值，一般
+       練功區域的怪物實際上都會再套用js/25-v131-fix-batch.js
+       裡strengthenMonster()那套+30%強化（HP/SP/攻擊/防禦/
+       魔攻各×1.30，見該檔案V131_MONSTER_STRENGTH常數），
+       但副本怪物是這次新增的、繞過了那條強化路徑，直接用
+       makeZoneMonster()的原始數值——等於同一等級下，副本
+       怪物比一般練功區域怪物弱了整整30%，這正是使用者
+       感覺到的落差。這裡套用完全相同的倍率，讓副本怪物至少
+       跟一般練功區域同等級怪物打平（副本本身難度更高，用
+       更高等級/更多精英/BOSS去堆疊挑戰性，不需要再讓
+       同等級怪物本身數值更弱）。
+    */
+    const DUNGEON_MONSTER_STRENGTH=1.30;
+
+    function applyDungeonMonsterStrength(monster){
+        if(!monster){ return monster; }
+        ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
+            if(Number.isFinite(Number(monster[key]))){
+                monster[key]=Math.max(1,Math.round(Number(monster[key])*DUNGEON_MONSTER_STRENGTH));
+            }
+        });
+        monster.hp=monster.maxHP;
+        monster.sp=monster.maxSP;
+        return monster;
+    }
+
     function setMonsterSkillTier(monster,tier,chance){
         const pool=Object.keys(skillDatabase).filter(skillId=>{
             const skill=skillDatabase[skillId];
@@ -1084,7 +1112,7 @@
         const level=getDungeonMonsterLevel();
         const roster=[];
         for(let i=0;i<10;i++){
-            const monster=makeZoneMonster("經驗軍團兵",level,randomElement());
+            const monster=applyDungeonMonsterStrength(makeZoneMonster("經驗軍團兵",level,randomElement()));
             roster.push(monster);
         }
         roster.forEach(monster=>{ setMonsterSkillTier(monster,2,0.5); });
@@ -1190,12 +1218,12 @@
         const level=getDungeonMonsterLevel();
         const roster=[];
         for(let i=0;i<5;i++){
-            const monster=makeZoneMonster("礦脈守衛精英",level,randomElement(),"elite");
+            const monster=applyDungeonMonsterStrength(makeZoneMonster("礦脈守衛精英",level,randomElement(),"elite"));
             setMonsterSkillTier(monster,3,0.7);
             roster.push(monster);
         }
         for(let i=0;i<5;i++){
-            const monster=makeZoneMonster("礦脈守衛",level,randomElement());
+            const monster=applyDungeonMonsterStrength(makeZoneMonster("礦脈守衛",level,randomElement()));
             setMonsterSkillTier(monster,2,0.7);
             roster.push(monster);
         }
@@ -1296,11 +1324,11 @@
         const level=getDungeonMonsterLevel();
         const bossElement=randomElement();
         const roster=[];
-        const boss=makeZoneMonster("裝備殿守護者",Math.round(level*1.15),bossElement,"boss");
+        const boss=applyDungeonMonsterStrength(makeZoneMonster("裝備殿守護者",Math.round(level*1.15),bossElement,"boss"));
         setMonsterMaxTierSkills(boss,0.7);
         roster.push(boss);
         for(let i=0;i<4;i++){
-            const monster=makeZoneMonster("殿前護衛精英",level,randomElement(),"elite");
+            const monster=applyDungeonMonsterStrength(makeZoneMonster("殿前護衛精英",level,randomElement(),"elite"));
             setMonsterSkillTier(monster,3,0.7);
             roster.push(monster);
         }
