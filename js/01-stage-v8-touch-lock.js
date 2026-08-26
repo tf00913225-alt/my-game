@@ -17,11 +17,26 @@
             return false;
         }
 
+        /*
+           ★ 修正（依照使用者回報，「全屬性技能預覽」頁面
+           「不能捲動，下面看不到」）：
+           這裡是全域的觸控鎖，`#game-stage`裡任何觸控目標
+           只要不在這份白名單覆蓋的可捲動容器內，一律
+           `preventDefault()`擋掉原生捲動手勢。
+           `.skill-preview-body`（全屬性技能預覽彈窗真正
+           的捲動容器）從一開始就沒有被加進這份白名單，
+           程式化設定`scrollTop`看起來正常、但手指真的滑動
+           時（真正會經過touchmove事件）完全被這裡擋掉，
+           這是原本就存在的bug，只是內容字級變大、真的需要
+           捲動才會看到內容之後才會被踩到——之前字級小、
+           內容剛好塞得進viewport，從來沒真的需要捲動過。
+        */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
             ".home-feature-modal-box, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .item-modal-box, #skillDetailStats, " +
+            ".skill-preview-body, " +
             "textarea, select, input";
 
         let node =
