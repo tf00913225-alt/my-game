@@ -875,14 +875,28 @@
        14. 副本怪物等級公式：玩家總角色等級加總 ÷ 角色數量
     ===================================================== */
 
+    /*
+       ★ 修正（依照使用者明確指正）：
+       原本「所有已建立角色等級總和÷角色數量」的算法，
+       在高等主力帶低等角色時會把副本等級平均得很低
+       （例如Lv.50+Lv.20+Lv.10只會算出約Lv.27），造成
+       副本明顯偏簡單。改成「隊伍最高角色等級×0.70＋
+       隊伍平均角色等級×0.30」，讓副本等級主要跟著隊伍
+       裡最強的角色走，平均值只用來做小幅度的微調，
+       不會再被低等角色拖累太多。只有一名角色時，
+       最高等級跟平均等級相同，算出來還是原本的角色
+       等級，行為不變。
+    */
     function getDungeonMonsterLevel(){
         const indexes=getExistingPartyIndexes();
         if(indexes.length===0){ return 1; }
-        const totalLevel=indexes.reduce((sum,index)=>{
+        const levels=indexes.map(index=>{
             const character=getPartyCharacterByIndex(index);
-            return sum+((character && character.level)||1);
-        },0);
-        return Math.max(1,Math.round(totalLevel/indexes.length));
+            return (character && character.level)||1;
+        });
+        const maxLevel=Math.max(...levels);
+        const avgLevel=levels.reduce((sum,l)=>sum+l,0)/levels.length;
+        return Math.max(1,Math.round(maxLevel*0.70+avgLevel*0.30));
     }
 
     const DUNGEON_ELEMENTS=["fire","water","earth","wind"];
@@ -916,6 +930,79 @@
         });
         monster.hp=monster.maxHP;
         monster.sp=monster.maxSP;
+        return monster;
+    }
+
+    /*
+       ★ 新增（依照使用者要求，「副本怪物整體仍然偏弱」的
+       第二輪調整）：
+       上面的DUNGEON_MONSTER_STRENGTH（×1.30）只讓副本怪
+       打平一般野怪，這裡疊加「副本普通怪」自己的額外強化
+       （×1.10，含SP），讓同等級的副本普通怪本來就應該比
+       野外普通怪再強一截（1.30×1.10≈1.43倍）。精英/BOSS
+       都是先墊到這一層「副本普通怪」的完整數值，才各自再
+       疊加精英/BOSS專屬倍率（見下面applyDungeonRankStrength），
+       不是另外從裸數值重算，也不會讓×1.30被套用第二次
+       ——這五個函式（makeZoneMonster→
+       applyDungeonMonsterStrength→applyDungeonNormalBonus→
+       applyDungeonRankStrength，全部包在buildDungeonMonster()
+       裡）就是唯一負責副本怪數值的地方，一般野怪完全不會
+       經過這裡，不受影響。
+    */
+    const DUNGEON_NORMAL_BONUS=1.10;
+
+    function applyDungeonNormalBonus(monster){
+        if(!monster){ return monster; }
+        ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
+            if(Number.isFinite(Number(monster[key]))){
+                monster[key]=Math.max(1,Math.round(Number(monster[key])*DUNGEON_NORMAL_BONUS));
+            }
+        });
+        monster.hp=monster.maxHP;
+        monster.sp=monster.maxSP;
+        return monster;
+    }
+
+    /*
+       精英/BOSS專屬倍率，都是從「副本普通怪」的完整數值
+       （已經套過×1.30跟×1.10）再往上疊加，不重新從裸數值
+       算起。刻意不動maxSP/sp——精英/BOSS的SP維持在跟副本
+       普通怪同一個水準，避免SP太多、放技能次數變得誇張。
+       只認monster.rank（makeZoneMonster()第4個參數決定），
+       一般怪（rank是undefined）這裡什麼都不做，直接跳過。
+    */
+    const DUNGEON_ELITE_MULTIPLIERS={maxHP:1.60,attack:1.30,magicAttack:1.30,defense:1.25};
+    const DUNGEON_BOSS_MULTIPLIERS={maxHP:3.00,attack:1.50,magicAttack:1.50,defense:1.40};
+
+    function applyDungeonRankStrength(monster){
+        if(!monster){ return monster; }
+        const multipliers=
+            monster.rank==="elite" ? DUNGEON_ELITE_MULTIPLIERS :
+            monster.rank==="boss" ? DUNGEON_BOSS_MULTIPLIERS :
+            null;
+        if(!multipliers){ return monster; }
+        Object.keys(multipliers).forEach(key=>{
+            if(Number.isFinite(Number(monster[key]))){
+                monster[key]=Math.max(1,Math.round(Number(monster[key])*multipliers[key]));
+            }
+        });
+        monster.hp=monster.maxHP;
+        return monster;
+    }
+
+    /*
+       ★ 副本怪物唯一的建構入口——取代原本呼叫端各自寫
+       applyDungeonMonsterStrength(makeZoneMonster(...))的
+       寫法，把「makeZoneMonster()→套×1.30→套副本普通怪
+       ×1.10→套精英/BOSS專屬倍率」這整條固定順序收在同一個
+       函式裡，避免之後新增副本怪物時漏掉某一步、或不小心
+       把倍率套錯順序/套第二次。
+    */
+    function buildDungeonMonster(name,level,element,rank){
+        const monster=makeZoneMonster(name,level,element,rank);
+        applyDungeonMonsterStrength(monster);
+        applyDungeonNormalBonus(monster);
+        applyDungeonRankStrength(monster);
         return monster;
     }
 
@@ -1112,7 +1199,7 @@
         const level=getDungeonMonsterLevel();
         const roster=[];
         for(let i=0;i<10;i++){
-            const monster=applyDungeonMonsterStrength(makeZoneMonster("經驗軍團兵",level,randomElement()));
+            const monster=buildDungeonMonster("經驗軍團兵",level,randomElement());
             roster.push(monster);
         }
         roster.forEach(monster=>{ setMonsterSkillTier(monster,2,0.5); });
@@ -1218,12 +1305,12 @@
         const level=getDungeonMonsterLevel();
         const roster=[];
         for(let i=0;i<5;i++){
-            const monster=applyDungeonMonsterStrength(makeZoneMonster("礦脈守衛精英",level,randomElement(),"elite"));
+            const monster=buildDungeonMonster("礦脈守衛精英",level,randomElement(),"elite");
             setMonsterSkillTier(monster,3,0.7);
             roster.push(monster);
         }
         for(let i=0;i<5;i++){
-            const monster=applyDungeonMonsterStrength(makeZoneMonster("礦脈守衛",level,randomElement()));
+            const monster=buildDungeonMonster("礦脈守衛",level,randomElement());
             setMonsterSkillTier(monster,2,0.7);
             roster.push(monster);
         }
@@ -1324,11 +1411,11 @@
         const level=getDungeonMonsterLevel();
         const bossElement=randomElement();
         const roster=[];
-        const boss=applyDungeonMonsterStrength(makeZoneMonster("裝備殿守護者",Math.round(level*1.15),bossElement,"boss"));
+        const boss=buildDungeonMonster("裝備殿守護者",Math.round(level*1.15),bossElement,"boss");
         setMonsterMaxTierSkills(boss,0.7);
         roster.push(boss);
         for(let i=0;i<4;i++){
-            const monster=applyDungeonMonsterStrength(makeZoneMonster("殿前護衛精英",level,randomElement(),"elite"));
+            const monster=buildDungeonMonster("殿前護衛精英",level,randomElement(),"elite");
             setMonsterSkillTier(monster,3,0.7);
             roster.push(monster);
         }
