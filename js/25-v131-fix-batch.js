@@ -76,6 +76,68 @@
         };
     }
 
+    /*
+       ★ 新增（依照使用者要求，「怪物之間的出手時間也調為1.5秒」，
+       完整節奏：進入戰鬥＞1.5秒＞玩家1出手＞1.5秒＞玩家2出手＞
+       1.5秒＞野怪1＞1.5秒＞野怪2＞1.5秒＞下一回合開始＞1.5秒＞
+       玩家1出手……）：
+       上面finishPlayerAction()的override已經確保「同一大回合內、
+       每一位角色/怪物實際出手之間」都固定等V131_RESOLVE_DELAY_MS，
+       但漏了兩個時間點——「進入戰鬥」到「這一回合第一位出手」、
+       跟「下一回合開始」到「新回合第一位出手」——這兩個時間點
+       原本都是宣告階段一結束，startResolutionPhase()馬上同步呼叫
+       processNextCombatant()，中間完全沒有停頓，造成「每回合的
+       第一下出手感覺特別快、節奏跟其他出手對不起來」。
+
+       這裡不改寫startResolutionPhase()本體（避免重做一套複雜的
+       結算階段初始化邏輯），改成標記法：startResolutionPhase()
+       被呼叫的當下，設一個旗標記住「等一下processNextCombatant()
+       第一次被呼叫時，要先補這1.5秒的停頓」；processNextCombatant()
+       這邊只在偵測到這個旗標時，才把「真正執行」包進
+       setTimeout(...,V131_RESOLVE_DELAY_MS)裡延後，消費掉旗標後
+       就不會再影響同一回合裡後面正常的呼叫（那些已經各自被
+       finishPlayerAction()的1.5秒排程過了，不會被這裡重複延遲）。
+    */
+    let v131PendingFirstResolveDelay=false;
+
+    if(typeof startResolutionPhase==="function"){
+        const originalStartResolutionPhase=startResolutionPhase;
+        startResolutionPhase=function(token){
+            /*
+               ★ 修正（實測抓到的bug）：startResolutionPhase()
+               本體自己就有防重複呼叫的機制（resolutionPhaseStarted
+               已經是true就直接return、不做任何事）——但如果我在
+               呼叫原本函式「之前」就無條件把旗標設成true，遇到
+               這種「重複呼叫、原本函式其實什麼都沒做」的情況，
+               旗標還是會被錯誤地重新架上，導致之後某個不相關的
+               processNextCombatant()呼叫被多延遲了一次1.5秒
+               （量測到同一回合內兩位角色間距變成3秒的雙倍延遲）。
+               這裡改成先複製原本函式自己的判斷條件，只有「這次
+               呼叫真的會執行」時才架旗標，跟原本函式的行為完全
+               對齊。
+            */
+            if(battleActive && token===battleToken && !resolutionPhaseStarted){
+                v131PendingFirstResolveDelay=true;
+            }
+            return originalStartResolutionPhase.apply(this,arguments);
+        };
+    }
+
+    if(typeof processNextCombatant==="function"){
+        const originalProcessNextCombatant=processNextCombatant;
+        processNextCombatant=function(token){
+            if(v131PendingFirstResolveDelay){
+                v131PendingFirstResolveDelay=false;
+                setTimeout(()=>{
+                    if(!battleActive || token!==battleToken){ return; }
+                    originalProcessNextCombatant.call(this,token);
+                },V131_RESOLVE_DELAY_MS);
+                return;
+            }
+            return originalProcessNextCombatant.apply(this,arguments);
+        };
+    }
+
     getSkillTargets=function(centerIndex,targetType){
         const alive=currentBattleMonsters.filter(
             i=>monsters[i] && monsters[i].alive
