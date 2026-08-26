@@ -266,6 +266,9 @@
     function getTalismanDefinition(id){
         return talismanDefinitions.find(def=>def.id===id)||null;
     }
+    /* 暴露出去給 js/30-v135-fixes.js 的「作用對象標示」用——符咒不在
+       skillDatabase 裡，那邊沒有別的方法可以認出一個符咒id。 */
+    window.v132GetTalismanDefinition=getTalismanDefinition;
 
 
     /* =====================================================

@@ -3,10 +3,15 @@
     "use strict";
 
     /*
-       ★ 修正（依照使用者要求，「修復回合與回合之間的
-       空拍太久問題，把它固定為1.5秒」）：1300→1500。
+       ★ 修正（依照使用者要求，節奏調整歷程）：
+       1300 →（「固定為1.5秒」）1500 →（「所有出手、回合間隔
+       都調整至1.25秒」）1250。
+       這個常數同時控制「同一回合內每一位角色/怪物出手之間」
+       跟（配合下面 startResolutionPhase/processNextCombatant
+       的包裝）「進入戰鬥→第一位出手」「新回合開始→第一位出手」
+       這三種間隔，改這一個數字就會整場戰鬥一致。
     */
-    const V131_RESOLVE_DELAY_MS=1500;
+    const V131_RESOLVE_DELAY_MS=1250;
     const V131_MONSTER_STRENGTH=1.30;
     const V131_EXP_MULTIPLIER=3.5;
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;
@@ -120,6 +125,35 @@
     */
     let v131PendingFirstResolveDelay=false;
 
+    /*
+       ★ 新增（依照使用者要求「把所有出手、回合間隔都調整至1.25秒」）：
+       只把上面那個「第一位出手前補一段延遲」寫死成
+       V131_RESOLVE_DELAY_MS 是不夠準的——宣告階段本身也會花時間
+       （每個自動角色會經過 beginCharacterTurn 的 150ms 自動出手延遲，
+       加上 finishPlayerAction 宣告分支的 BATTLE_DECLARE_ADVANCE_MS
+       90ms），所以「回合開始 → 第一位出手」實際上會變成
+       1250 + 240 ≈ 1500ms，跟其他每一步的 1250ms 對不齊，實測就是
+       這樣（第一步 1507ms、後面每步 1255ms）。
+
+       改成以「這一回合開始的時間點」為錨：等待時間 =
+       1250 - (宣告階段已經花掉的時間)，不足就不再等。這樣不管隊伍
+       有幾個自動角色、宣告階段花多久，玩家看到的
+       「第N回合開始 → 第一位出手」都會剛好是 1.25 秒。
+       如果宣告階段本身就超過 1.25 秒（例如手動角色思考很久），
+       等待會變成 0，玩家一按完就馬上結算，不會再無謂地多等。
+    */
+    let v131TurnStartedAt=0;
+
+    if(typeof startTurn==="function"){
+        const originalStartTurn=startTurn;
+        startTurn=function(token){
+            if(battleActive && token===battleToken){
+                v131TurnStartedAt=Date.now();
+            }
+            return originalStartTurn.apply(this,arguments);
+        };
+    }
+
     if(typeof startResolutionPhase==="function"){
         const originalStartResolutionPhase=startResolutionPhase;
         startResolutionPhase=function(token){
@@ -148,10 +182,16 @@
         processNextCombatant=function(token){
             if(v131PendingFirstResolveDelay){
                 v131PendingFirstResolveDelay=false;
+
+                /* 扣掉宣告階段已經花掉的時間，讓「回合開始→第一位
+                   出手」剛好等於 V131_RESOLVE_DELAY_MS。 */
+                const elapsed=v131TurnStartedAt>0 ? (Date.now()-v131TurnStartedAt) : 0;
+                const wait=Math.max(0,V131_RESOLVE_DELAY_MS-elapsed);
+
                 setTimeout(()=>{
                     if(!battleActive || token!==battleToken){ return; }
                     originalProcessNextCombatant.call(this,token);
-                },V131_RESOLVE_DELAY_MS);
+                },wait);
                 return;
             }
             return originalProcessNextCombatant.apply(this,arguments);

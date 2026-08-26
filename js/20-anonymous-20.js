@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="134";
+const V_ASSET_VERSION="135";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -357,6 +357,32 @@ function vAssetUrl(path){
             const script=document.createElement("script");
             script.id="v134-fixes-runtime";
             script.src=vAssetUrl("js/29-v134-fixes.js");
+            document.body.appendChild(script);
+        }
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V135 loader — auto-battle feedback, skill target scope labels, shield bar. */
+(function loadV135Fixes(){
+    function load(){
+        if(!document.getElementById("v135-fixes-style")){
+            const link=document.createElement("link");
+            link.id="v135-fixes-style";
+            link.rel="stylesheet";
+            link.href=vAssetUrl("css/36-v135-fixes.css");
+            document.head.appendChild(link);
+        }
+
+        if(!document.getElementById("v135-fixes-runtime")){
+            const script=document.createElement("script");
+            script.id="v135-fixes-runtime";
+            script.src=vAssetUrl("js/30-v135-fixes.js");
             document.body.appendChild(script);
         }
     }
