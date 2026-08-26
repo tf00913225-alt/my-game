@@ -407,39 +407,51 @@
 }
 
 /*
-   ★ 真正根因終於找到了（依照使用者要求，「還是很小，
-   妳直接加到35px」）：
-   這個彈窗（#allElementSkillPreviewModal）活在
-   #game-stage那層transform:scale()座標系裡面——整個
-   遊戲畫面是先在1080寬的設計稿座標畫好，再用CSS
-   transform整體縮小貼合手機實際螢幕寬度（用Playwright
-   量測到420px寬的手機viewport下，實際縮放比例是
-   0.388889）。這代表這裡CSS寫的font-size，最後顯示在
-   螢幕上會被再乘上這個縮放比例——前三輪一路加大的
-   13.5→17→19→21→22px，全部都被這層縮放吃掉六成多，
-   22px實際顯示出來只有約8.6px，難怪使用者一直反映
-   「還是很小」，不是沒生效，是每次加大的效果都被這層
-   縮放默默抵銷了大半。
+   ★ 修正（依照使用者要求，「標題、選單、內容都要放大，
+   而且要可以捲動...35好像太大了。妳幫我調一個標題、
+   選單、內容都舒服的大小」）：
+   上一輪用90px（換算後螢幕上約35px）確認太大、而且這次
+   使用者也回報「不能捲動」——這個「不能捲動」是真的bug
+   （見js/01-stage-v8-touch-lock.js的修正，全域觸控鎖
+   白名單一直沒有把.skill-preview-body加進去，手指滑動
+   一直被擋掉，只是內容變大、真的需要捲動之後才會被踩到），
+   不是這裡字級的問題，但兩個問題剛好同一輪一起修。
 
-   這次使用者直接要求「35px」，如果照字面把這裡寫死35px，
-   一樣會被縮放成約13.6px、大概還是不夠大、大概率又是
-   下一輪繼續反映太小。已經用getBoundingClientRect()
-   實測確認縮放比例，直接反推：想要螢幕上真的顯示35px，
-   這裡要寫35÷0.388889≈90px，才會讓使用者手機上看到的
-   實際大小符合「35px」這個期望。三個元素（技能名稱、
-   分類標籤、說明文字）統一用這個補償過的數值。
+   這裡改成三層都各自給一個「螢幕上看起來舒服、不用瞇眼睛
+   也不會過大」的字級，全部依照實測的0.388889縮放比例
+   （螢幕實際px ÷ 0.388889 = 這裡要寫的設計稿px）反推：
+   - 標題「全屬性技能預覽」：螢幕約19px（這裡49px）
+   - 屬性分頁按鈕（火/水/風/土屬性）：螢幕約15px（這裡39px）
+   - 技能名稱：螢幕約17px（這裡44px）
+   - 物理/法術/增益等分類標籤：螢幕約13px（這裡33px）
+   - 技能說明文字：螢幕約15px（這裡39px）
+   標題/分頁按鈕的規則見下面另外新增的區塊。
 */
 #game-stage #allElementSkillPreviewModal .skill-preview-card span{
-    font-size:90px !important;
+    font-size:33px !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card p{
-    font-size:90px !important;
+    font-size:39px !important;
     line-height:1.5 !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card strong{
-    font-size:90px !important;
+    font-size:44px !important;
+}
+
+#game-stage #allElementSkillPreviewModal .skill-preview-heading h2{
+    font-size:49px !important;
+}
+
+#game-stage #allElementSkillPreviewModal .skill-preview-heading button{
+    font-size:33px !important;
+    padding:10px 16px !important;
+}
+
+#game-stage #allElementSkillPreviewModal .skill-preview-tabs button{
+    font-size:39px !important;
+    padding:14px 8px !important;
 }
 
 #game-stage .stat-explanation{
