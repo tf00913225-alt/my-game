@@ -1,5 +1,31 @@
 
 /* =====================================================
+   ★★★ 資產快取版本號（改動任何被下面 loader 載入的檔案，
+   就把這個數字往上加一，只要改這一個地方）★★★
+
+   為什麼要有這個：這個專案的 patch 檔（js/25、js/26、js/27、js/28、
+   css/31~34……）不是靠 index.html 的 <script> 標籤載入，而是由下面
+   幾個 loader 動態插進來的，網址後面都帶 ?v=NNN。瀏覽器是用「完整
+   網址」當快取鍵，所以只要這個數字沒變，就算檔案內容整個換掉，
+   手機瀏覽器還是會繼續拿舊的快取版本，使用者會看到「修了但沒生效」。
+
+   過去這個數字是散在 4 個 loader 裡各寫各的字面值，結果從 v=132 之後
+   連續 4 個 PR（#17/#18/#19/#20）改了 js/25、js/27、css/33，版本號
+   卻一次都沒動——使用者整整 4 輪都在跑舊程式碼，回報了一堆「已經
+   修好卻還在發生」的問題。改成單一常數就是為了讓「忘記改」這件事
+   不可能再發生：只要記得動這一行就好。
+
+   ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
+   改到那個檔案時要另外去 index.html 更新。
+===================================================== */
+const V_ASSET_VERSION="134";
+
+function vAssetUrl(path){
+    return path+"?v="+V_ASSET_VERSION;
+}
+
+
+/* =====================================================
    V109 — 戰鬥元素匣：可重複拖曳懸浮按鈕
    - 點一下：開啟原本自動戰鬥設定
    - 拖曳：只改元素匣位置，不觸發設定
@@ -125,14 +151,14 @@
             const link=document.createElement("link");
             link.id="v131-fix-batch-style";
             link.rel="stylesheet";
-            link.href="css/31-v131-fix-batch.css?v=132";
+            link.href=vAssetUrl("css/31-v131-fix-batch.css");
             document.head.appendChild(link);
         }
 
         if(!document.getElementById("v131-fix-batch-runtime")){
             const script=document.createElement("script");
             script.id="v131-fix-batch-runtime";
-            script.src="js/25-v131-fix-batch.js?v=132";
+            script.src=vAssetUrl("js/25-v131-fix-batch.js");
             document.body.appendChild(script);
         }
     }
@@ -151,7 +177,7 @@
         const link=document.createElement("link");
         link.id="v131-patrol-appearance-style";
         link.rel="stylesheet";
-        link.href="css/32-v131-patrol-appearance.css?v=132";
+        link.href=vAssetUrl("css/32-v131-patrol-appearance.css");
         document.head.appendChild(link);
     }
 
@@ -218,7 +244,14 @@
             "js/v131-patrol-sprite-male-15.js?v=131c",
             "js/v131-patrol-sprite-male-16.js?v=131c",
             "js/v131-patrol-sprite-male-17.js?v=131c",
-            "js/26-v131-patrol-appearance.js?v=132"
+            /*
+               ★ 上面 61 個 sprite chunk 是純 base64 圖片資料、內容從
+               V131 之後就沒再變過，而且體積很大——所以刻意「不」跟著
+               V_ASSET_VERSION 走，維持釘死在各自的舊版本號，避免每次
+               改一行邏輯就害使用者重新下載一整包圖片。真的換圖時再手動
+               改這幾個字面值即可。下面這個才是會跟著改的邏輯檔。
+            */
+            vAssetUrl("js/26-v131-patrol-appearance.js")
         ];
 
         function next(index){
@@ -264,14 +297,14 @@
             const link=document.createElement("link");
             link.id="v132-content-expansion-style";
             link.rel="stylesheet";
-            link.href="css/33-v132-content-expansion.css?v=132";
+            link.href=vAssetUrl("css/33-v132-content-expansion.css");
             document.head.appendChild(link);
         }
 
         if(!document.getElementById("v132-content-expansion-runtime")){
             const script=document.createElement("script");
             script.id="v132-content-expansion-runtime";
-            script.src="js/27-v132-content-expansion.js?v=132";
+            script.src=vAssetUrl("js/27-v132-content-expansion.js");
             document.body.appendChild(script);
         }
     }
@@ -290,14 +323,40 @@
             const link=document.createElement("link");
             link.id="v133-economy-rebalance-style";
             link.rel="stylesheet";
-            link.href="css/34-v133-economy-rebalance.css?v=133";
+            link.href=vAssetUrl("css/34-v133-economy-rebalance.css");
             document.head.appendChild(link);
         }
 
         if(!document.getElementById("v133-economy-rebalance-runtime")){
             const script=document.createElement("script");
             script.id="v133-economy-rebalance-runtime";
-            script.src="js/28-v133-economy-rebalance.js?v=133";
+            script.src=vAssetUrl("js/28-v133-economy-rebalance.js");
+            document.body.appendChild(script);
+        }
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V134 loader — battle HUD/pacing, auto-battle feedback, backpack back button. */
+(function loadV134Fixes(){
+    function load(){
+        if(!document.getElementById("v134-fixes-style")){
+            const link=document.createElement("link");
+            link.id="v134-fixes-style";
+            link.rel="stylesheet";
+            link.href=vAssetUrl("css/35-v134-fixes.css");
+            document.head.appendChild(link);
+        }
+
+        if(!document.getElementById("v134-fixes-runtime")){
+            const script=document.createElement("script");
+            script.id="v134-fixes-runtime";
+            script.src=vAssetUrl("js/29-v134-fixes.js");
             document.body.appendChild(script);
         }
     }

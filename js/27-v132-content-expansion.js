@@ -575,6 +575,124 @@
         return false;
     }
 
+    /*
+       ★ 新增（依照使用者要求，「點選符咒沒有問選擇目標」）：
+       符咒現在完全比照技能的選目標流程——冰封符要玩家自己點要冰封
+       哪一隻怪，隱身符/結界符要玩家自己點要給我方哪一位角色。
+
+       作法上刻意「不」自己造一套選目標UI，而是直接沿用遊戲既有的
+       那一整套（setBattleTargetSelectionMode/selectBattleTarget、
+       setBattleAllyTargetSelectionMode/selectBattleAllyTarget），
+       只把符咒id當成pendingAction傳進去。好處是提示文字、卡片高亮、
+       「返回」取消、結算階段讀queued.target/queued.targetAlly……
+       全部原本就是對的，不用重寫也不會跟技能的行為不一致。
+
+       ★ 已確認的相容性重點（讀過00-main.js確認）：
+       - selectBattleTarget()（11119）完全不查skillDatabase，只把
+         pendingAction原封不動存進queuedPlayerActions，所以「選怪物」
+         這條路徑不用改任何東西就能直接用符咒id。
+       - 「選我方」那條路徑不行：setBattleAllyTargetSelectionMode()
+         （10713）跟selectBattleAllyTarget()（10744）都會做
+         skillDatabase[actionType] 並要求 targetType 是 ally/deadAlly，
+         符咒id查不到就會整個當成無效。所以下面補了這兩個的覆寫，
+         遇到符咒id時改用一個「長得像技能」的合成物件走同一套判斷。
+       - getBattleActionDisplayName()（10609）查不到會直接回傳原始id，
+         提示會變成「選擇 [freezeTalismanLow]」這種醜東西，也一起覆寫。
+    */
+    function getTalismanTargetKind(definition){
+        if(!definition){ return null; }
+        return definition.talismanEffect==="freeze" ? "monster" : "ally";
+    }
+
+    /* 給既有的我方選目標流程用的「合成技能物件」——只需要
+       targetType 跟 name 這兩個欄位就能讓那套邏輯正常運作。 */
+    function makeTalismanPseudoSkill(definition){
+        return {
+            id:definition.id,
+            name:definition.name,
+            targetType:"ally",
+            category:"buff"
+        };
+    }
+
+    if(typeof getBattleActionDisplayName==="function"){
+        const originalGetBattleActionDisplayName=getBattleActionDisplayName;
+        getBattleActionDisplayName=function(actionType){
+            const definition=getTalismanDefinition(actionType);
+            if(definition){ return definition.name; }
+            return originalGetBattleActionDisplayName.apply(this,arguments);
+        };
+    }
+
+    if(typeof setBattleAllyTargetSelectionMode==="function"){
+        const originalSetBattleAllyTargetSelectionMode=setBattleAllyTargetSelectionMode;
+        setBattleAllyTargetSelectionMode=function(actionType){
+            const definition=getTalismanDefinition(actionType);
+            if(!definition){
+                return originalSetBattleAllyTargetSelectionMode.apply(this,arguments);
+            }
+
+            const pseudoSkill=makeTalismanPseudoSkill(definition);
+            const region=document.getElementById("battleActionRegion");
+            const promptAction=document.getElementById("battleTargetPromptAction");
+
+            if(region){ region.classList.add("target-selecting"); }
+            if(promptAction){
+                promptAction.textContent="選擇 ["+definition.name+"] 的我方目標";
+            }
+
+            currentBattleMonsters.forEach(index=>{
+                const card=document.getElementById("battleMonster"+index);
+                if(card){ card.classList.remove("targetable","target"); }
+            });
+
+            [0,1,2].forEach(index=>{
+                const character=getBattleCharacterByIndex(index);
+                const card=document.getElementById("battlePlayerCard"+index);
+                if(card){
+                    card.classList.toggle(
+                        "ally-targetable",
+                        isValidAllyTargetForSkill(pseudoSkill,character,index)
+                    );
+                }
+            });
+
+            const targetText=document.getElementById("battleTarget");
+            if(targetText){ targetText.textContent="目標：請選擇我方角色"; }
+        };
+    }
+
+    if(typeof selectBattleAllyTarget==="function"){
+        const originalSelectBattleAllyTarget=selectBattleAllyTarget;
+        selectBattleAllyTarget=function(index){
+            const definition=getTalismanDefinition(pendingAction);
+            if(!definition){
+                return originalSelectBattleAllyTarget.apply(this,arguments);
+            }
+
+            if(!battleActive || battlePhase!=="declare" || !actionReady || !pendingAction){
+                return;
+            }
+
+            const pseudoSkill=makeTalismanPseudoSkill(definition);
+            const character=getBattleCharacterByIndex(index);
+            if(!isValidAllyTargetForSkill(pseudoSkill,character,index)){ return; }
+
+            const action=pendingAction;
+            actionReady=false;
+            pendingAction=null;
+            clearBattleTargetSelectionMode();
+
+            queuedPlayerActions[activeBattleCharacterIndex]={
+                action:action,
+                target:null,
+                targetAlly:index
+            };
+
+            finishPlayerAction();
+        };
+    }
+
     function useTalisman(talismanId){
         const definition=getTalismanDefinition(talismanId);
         if(!definition){ return; }
@@ -589,27 +707,55 @@
         const activeCharacter=getPartyCharacterByIndex(activeBattleCharacterIndex);
         if(!activeCharacter || activeCharacter.hp<=0){ return; }
 
-        const owned=inventoryItems.some(item=>item && item.id===talismanId && Number(item.count)>0);
-        if(!owned){
-            addBattleLog(definition.name+"目前沒有庫存。");
+        /*
+           ★ 修正（依照使用者回報「三個人都使用符咒，結果都是一個人
+           在使用」的第二個成因）：宣告階段要把「已經被其他角色預定
+           走的符咒」也算進去。原本只看背包剩幾張，三個角色可以同時
+           宣告同一張最後一張符咒，結算時先手用掉、後面兩位撞到
+           「已經沒有庫存了」白白浪費一整個回合。
+        */
+        const ownedCount=inventoryItems.reduce((sum,item)=>{
+            if(!item || item.id!==talismanId){ return sum; }
+            return sum+Math.max(0,Math.floor(Number(item.count)||0));
+        },0);
+
+        const reservedCount=Object.keys(queuedPlayerActions).reduce((sum,key)=>{
+            const queued=queuedPlayerActions[key];
+            if(!queued || Number(key)===activeBattleCharacterIndex){ return sum; }
+            return sum+(queued.action===talismanId ? 1 : 0);
+        },0);
+
+        if(ownedCount-reservedCount<=0){
+            addBattleLog(
+                definition.name+
+                (reservedCount>0
+                    ? "剩下的數量已經被這回合其他角色預定了。"
+                    : "目前沒有庫存。")
+            );
             renderBattleItemMenu();
             return;
         }
 
+        /*
+           ★ 進入選目標階段（而不是直接宣告完畢）：符咒id直接當成
+           pendingAction，之後由既有的selectBattleTarget()／
+           selectBattleAllyTarget()負責寫進queuedPlayerActions。
+        */
         actionReady=true;
-        queuedPlayerActions[activeBattleCharacterIndex]={
-            action:"talisman",
-            talismanId:talismanId,
-            target:null
-        };
-
+        pendingAction=talismanId;
         closeMenus();
+
+        if(getTalismanTargetKind(definition)==="monster"){
+            setBattleTargetSelectionMode(talismanId);
+        }else{
+            setBattleAllyTargetSelectionMode(talismanId);
+        }
+
         updateUI();
-        finishPlayerAction();
     }
     window.useTalisman=useTalisman;
 
-    function applyTalismanEffect(talismanId,characterIndex){
+    function applyTalismanEffect(talismanId,characterIndex,queued){
         const definition=getTalismanDefinition(talismanId);
         const character=getPartyCharacterByIndex(characterIndex);
 
@@ -628,8 +774,23 @@
         const hitChance=getTalismanHitChance(definition,character);
         const success=Math.random()*100<hitChance;
 
-        lungePlayerCard();
-        showSkillNameBadge(definition.name,definition.talismanEffect==="freeze" ? "water" : "wind");
+        /*
+           ★ 修正（這就是使用者說「三個人都使用符咒，結果都是一個人
+           在使用」的真正原因）：lungePlayerCard()跟showSkillNameBadge()
+           的最後一個參數都是characterIndex，內部是
+           $("battlePlayerCard"+(characterIndex||0))——原本這兩個呼叫
+           都沒有傳，所以不管是誰施放，前傾動畫跟技能名稱都永遠演在
+           0號角色的卡片上。二三號角色其實有正常結算（戰鬥紀錄有印、
+           buff也有上），但畫面看起來就像「只有第一個人在用」。
+           （同一個函式下面的showMissEffect()本來就有正確傳，所以
+           「畫符失敗」反而一直是演在對的卡片上，剛好可以對照。）
+        */
+        lungePlayerCard(characterIndex);
+        showSkillNameBadge(
+            definition.name,
+            definition.talismanEffect==="freeze" ? "water" : "wind",
+            characterIndex
+        );
 
         if(!success){
             addBattleLog((character.id||"你")+"使用"+definition.name+"，畫符失敗！");
@@ -639,33 +800,57 @@
         }
 
         if(definition.talismanEffect==="freeze"){
-            const aliveTargets=currentBattleMonsters.filter(i=>monsters[i] && monsters[i].alive);
-            if(aliveTargets.length===0){
-                addBattleLog(definition.name+"沒有可以生效的目標。");
-                finishPlayerAction();
-                return;
+            /*
+               ★ 改成優先使用玩家在宣告階段選的目標（queued.target），
+               只有在那隻怪已經死掉/不存在時才退回「隨機挑一隻活的」
+               當保險，不會因為目標中途死亡就整張符咒白白浪費。
+            */
+            let targetIndex=queued && Number.isInteger(queued.target) ? queued.target : null;
+
+            if(targetIndex===null || !monsters[targetIndex] || !monsters[targetIndex].alive){
+                const aliveTargets=currentBattleMonsters.filter(i=>monsters[i] && monsters[i].alive);
+                if(aliveTargets.length===0){
+                    addBattleLog(definition.name+"沒有可以生效的目標。");
+                    finishPlayerAction();
+                    return;
+                }
+                targetIndex=aliveTargets[Math.floor(Math.random()*aliveTargets.length)];
             }
-            const targetIndex=aliveTargets[Math.floor(Math.random()*aliveTargets.length)];
+
             applyFreezeEffect(monsters[targetIndex],definition.talismanDuration);
             addBattleLog(
                 (character.id||"你")+"使用"+definition.name+"，"+
                 monsters[targetIndex].name+"被冰封了！"
             );
         }
-        else if(definition.talismanEffect==="stealth"){
-            character.activeBuffs=(character.activeBuffs||[]).filter(b=>b.type!=="stealthSkill");
-            character.activeBuffs.push({type:"stealthSkill",turnsLeft:definition.talismanDuration});
+        else{
+            /*
+               ★ 隱身符/結界符改成作用在玩家選的我方角色
+               （queued.targetAlly），沒有選或那位已經倒下時才退回
+               施法者自己。
+            */
+            let allyIndex=queued && Number.isInteger(queued.targetAlly) ? queued.targetAlly : characterIndex;
+            let allyCharacter=getBattleCharacterByIndex(allyIndex);
+
+            if(!allyCharacter || allyCharacter.hp<=0){
+                allyIndex=characterIndex;
+                allyCharacter=character;
+            }
+
+            const buffType=definition.talismanEffect==="stealth" ? "stealthSkill" : "barrier";
+            allyCharacter.activeBuffs=(allyCharacter.activeBuffs||[]).filter(b=>b.type!==buffType);
+            allyCharacter.activeBuffs.push({type:buffType,turnsLeft:definition.talismanDuration});
+
+            const allyName=allyIndex===characterIndex
+                ? (character.id||"你")
+                : (allyCharacter.id||("角色"+(allyIndex+1)));
+
             addBattleLog(
-                (character.id||"你")+"使用"+definition.name+"，進入隱身，"+
-                "無法被單體攻擊選中，持續"+definition.talismanDuration+"回合。"
-            );
-        }
-        else if(definition.talismanEffect==="barrier"){
-            character.activeBuffs=(character.activeBuffs||[]).filter(b=>b.type!=="barrier");
-            character.activeBuffs.push({type:"barrier",turnsLeft:definition.talismanDuration});
-            addBattleLog(
-                (character.id||"你")+"使用"+definition.name+"，獲得結界，"+
-                "可抵擋所有傷害，持續"+definition.talismanDuration+"回合。"
+                definition.talismanEffect==="stealth"
+                    ? (character.id||"你")+"使用"+definition.name+"，"+allyName+
+                      "進入隱身，無法被單體攻擊選中，持續"+definition.talismanDuration+"回合。"
+                    : (character.id||"你")+"使用"+definition.name+"，"+allyName+
+                      "獲得結界，可抵擋所有傷害，持續"+definition.talismanDuration+"回合。"
             );
         }
 
@@ -683,11 +868,25 @@
         const originalResolveQueuedPlayerAction=resolveQueuedPlayerAction;
         resolveQueuedPlayerAction=function(characterIndex,token){
             const queued=queuedPlayerActions[characterIndex];
-            if(queued && queued.action==="talisman"){
+
+            /*
+               ★ 改成用「queued.action本身是不是一個符咒id」來判斷。
+               以前是寫死 action==="talisman" 再另外存 talismanId，
+               但現在符咒要走既有的選目標流程，而那套流程
+               （selectBattleTarget/selectBattleAllyTarget）是把
+               pendingAction原封不動寫進queued.action的，沒辦法順便
+               多塞一個talismanId欄位——所以直接讓action帶符咒id，
+               這裡用getTalismanDefinition()反查即可。
+               同時把整個queued傳下去，讓結算端讀得到玩家選的
+               target／targetAlly。
+            */
+            const talismanId=queued && queued.action ? queued.action : null;
+            if(talismanId && getTalismanDefinition(talismanId)){
                 activeBattleCharacterIndex=characterIndex;
-                applyTalismanEffect(queued.talismanId,characterIndex);
+                applyTalismanEffect(talismanId,characterIndex,queued);
                 return;
             }
+
             return originalResolveQueuedPlayerAction.apply(this,arguments);
         };
     }
@@ -948,8 +1147,21 @@
 
             const isChestOrTicket=item && (item.type==="chest" || item.type==="ticket");
 
+            /*
+               ★ 修正（依照使用者回報）：符咒不是裝備，但原本的
+               openItemModal()只針對 type==="potion" 把「穿戴」鍵鎖住
+               （js/00-main.js:30447），符咒會落到else分支變成一顆
+               可以按的「穿戴」鍵——按下去因為
+               getInventoryEquipmentSlot("talisman")查不到對應欄位，
+               equipSelectedItem()只是靜默return，等於是一顆騙人的
+               死按鈕。依使用者決定「符咒不能在戰鬥外使用」，這裡
+               只把這顆錯誤的按鈕藏掉，不另外補「使用」鍵。
+            */
+            const isBattleOnlyItem=item && item.type==="talisman";
+
             if(equipButton){
-                equipButton.style.display=isChestOrTicket ? "none" : "";
+                equipButton.style.display=
+                    (isChestOrTicket || isBattleOnlyItem) ? "none" : "";
             }
 
             if(useButton){
@@ -1050,10 +1262,53 @@
         persistDungeonState();
     }
 
-    function isDungeonAvailable(type){
+    /*
+       ★ 修正（依照使用者回報「刪除角色了，為何副本次數沒有重置」）：
+       上一版只在「寫入」端（markDungeonUsed）擋了旗標，「讀取」端
+       （這裡跟dungeonEntryCard）卻照樣直接讀dungeonState.used——
+       結果是旗標關掉之前就已經存進localStorage的used:true，會繼續
+       讓按鈕永久disabled到隔天為止，看起來就像「次數根本沒解除」。
+       讀取端也要一起看旗標，關閉時一律視為可挑戰。
+    */
+    function isDungeonUsedToday(type){
+        if(!DUNGEON_DAILY_LIMIT_ENABLED){ return false; }
         ensureDungeonStateCurrent();
-        return !dungeonState.used[type];
+        return !!dungeonState.used[type];
     }
+
+    function isDungeonAvailable(type){
+        return !isDungeonUsedToday(type);
+    }
+
+    /*
+       ★ 修正（同一個回報的另一半）：副本次數是存在
+       v132_daily_dungeon_state這個「獨立的localStorage key」裡，
+       而刪角色用的resetGame()（js/00-main.js）只清SAVE_KEY跟兩個
+       舊版存檔key，從來沒有碰過這個key——所以刪完角色重新創角，
+       副本次數還是上一個角色用掉的狀態。
+
+       這裡不去包resetGame()（它是先confirm()再location.reload()，
+       包在外面會變成「使用者按了取消，資料卻已經被清掉」），改成
+       在腳本載入時判斷「目前根本沒有任何角色」——resetGame()會
+       reload，reload後loadGame()找不到存檔，player.id會是空字串，
+       這個時機點就是最乾淨的「全新開始」信號，順手把這兩個側邊
+       key一起清乾淨。
+    */
+    (function resetSideCarStateWhenNoCharacter(){
+        const hasAnyCharacter=
+            (typeof player!=="undefined" && player && player.id) ||
+            (typeof player2!=="undefined" && player2 && player2.id) ||
+            (typeof player3!=="undefined" && player3 && player3.id);
+
+        if(hasAnyCharacter){ return; }
+
+        try{
+            localStorage.removeItem(DUNGEON_STATE_KEY);
+            localStorage.removeItem("v131_element_box_state");
+        }catch(_){ }
+
+        dungeonState={date:todayString(),used:{exp:false,material:false,equipment:false}};
+    })();
 
 
     /* =====================================================
@@ -1772,8 +2027,10 @@
     ===================================================== */
 
     function dungeonEntryCard(type,title,requirement,rewardPreview,onClick){
-        ensureDungeonStateCurrent();
-        const used=dungeonState.used[type];
+        /* ★ 改用isDungeonUsedToday()，這樣每日次數旗標關閉時，
+           畫面也一定跟著顯示「可挑戰」，不會出現「按鈕是灰的、
+           但其實邏輯允許挑戰」這種自相矛盾的狀態。 */
+        const used=isDungeonUsedToday(type);
         return (
             '<div class="v132-dungeon-card">'+
             '<div class="v132-dungeon-card-title">'+title+
@@ -1793,7 +2050,10 @@
             '<div class="v132-dungeon-list">'+
             dungeonEntryCard(
                 "exp","經驗副本","單一角色達到10級",
-                "當前所有角色升下一級所需經驗總和的50%","v132BeginExpDungeon"
+                /* ★ 說明文字跟著V133的新公式更新：現在是「隊伍平均
+                   升下一級所需經驗」的10%（看廣告雙倍約20%），
+                   不再是舊的50%。 */
+                "隊伍平均升級所需經驗的10%（廣告雙倍20%）","v132BeginExpDungeon"
             )+
             dungeonEntryCard(
                 "material","材料副本","雙角色達到20級",
@@ -1804,8 +2064,11 @@
                 "高極裝備寶箱×1（自選抽獎券）","v132BeginEquipmentDungeon"
             )+
             '<div style="font-size:11px;color:#7a6f5c;margin-top:6px;">'+
-            '每個副本每日只能挑戰1次，挑戰失敗不會扣除次數，'+
-            '領取獎勵之後才會計入今日已完成。'+
+            (DUNGEON_DAILY_LIMIT_ENABLED
+                ? '每個副本每日只能挑戰1次，挑戰失敗不會扣除次數，'+
+                  '領取獎勵之後才會計入今日已完成。'
+                : '⚙️ 測試模式：每日挑戰次數限制目前為關閉狀態，'+
+                  '所有副本都可以無限次重複挑戰。')+
             '</div>'+
             '</div>'
         );
