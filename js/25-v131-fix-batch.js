@@ -510,17 +510,26 @@
 
     function previewCostForCharacter(character,count){
         if(!character || count<=0){ return 0; }
+        const maxLevel=Math.max(1,Number(window.v133MaxLevel)||Infinity);
+        const startLevel=Math.max(1,Math.floor(Number(character.level)||1));
+        if(startLevel+count>maxLevel){ return Infinity; }
+
         let exp=Math.max(0,Number(character.exp)||0);
         let expNext=Math.max(1,Number(character.expNext)||100);
+        let previewLevel=startLevel;
         let total=0;
         for(let i=0;i<count;i++){
             const need=Math.max(1,expNext-exp);
             total+=need;
             exp=0;
-            expNext=Math.max(expNext+1,Math.floor(expNext*1.2));
+            previewLevel++;
+            expNext=typeof window.v133GetExpNextForLevel==="function"
+                ? window.v133GetExpNextForLevel(previewLevel)
+                : Math.max(expNext+1,Math.floor(expNext*1.2));
         }
         return total;
     }
+    window.v131PreviewCostForCharacter=previewCostForCharacter;
 
     function totalPreviewCost(){
         return [0,1,2].reduce((sum,index)=>{
@@ -537,6 +546,11 @@
         const character=getPartyCharacterByIndex(index);
         if(!character){ return; }
         const current=expPreviewCounts[index]||0;
+        const maxLevel=Math.max(1,Number(window.v133MaxLevel)||Infinity);
+        if(character.level+current>=maxLevel){
+            alert("這名角色已達 Lv."+maxLevel+" 滿等。");
+            return;
+        }
         const beforeCost=previewCostForCharacter(character,current);
         const afterCost=previewCostForCharacter(character,current+1);
         const extra=afterCost-beforeCost;
@@ -573,7 +587,14 @@
         const plan=[0,1,2].map(index=>({
             index,
             character:getPartyCharacterByIndex(index),
-            count:expPreviewCounts[index]||0
+            count:Math.min(
+                expPreviewCounts[index]||0,
+                Math.max(
+                    0,
+                    (Number(window.v133MaxLevel)||Infinity)-
+                    ((getPartyCharacterByIndex(index)||{}).level||1)
+                )
+            )
         })).filter(entry=>entry.character && entry.count>0);
         [0,1,2].forEach(index=>{ expPreviewCounts[index]=0; });
         plan.forEach(entry=>{
@@ -599,7 +620,9 @@
                 const previewLevel=character.level+count;
                 const cost=previewCostForCharacter(character,count);
                 const nextExtra=previewCostForCharacter(character,count+1)-cost;
-                const canPreview=totalPreviewCost()+nextExtra<=sharedExp;
+                const maxLevel=Math.max(1,Number(window.v133MaxLevel)||Infinity);
+                const isMaxLevel=previewLevel>=maxLevel;
+                const canPreview=!isMaxLevel && totalPreviewCost()+nextExtra<=sharedExp;
                 return (
                     '<div class="v131-exp-row">'+
                         '<div class="v131-exp-name">'+(character.id||("角色"+(index+1)))+'</div>'+
@@ -608,7 +631,8 @@
                         '</div>'+
                         '<button type="button" class="v131-exp-preview-btn" '+
                             (canPreview?'':'disabled ')+
-                            'onclick="v131PreviewExpLevel('+index+')">點擊預覽升級</button>'+
+                            'onclick="v131PreviewExpLevel('+index+')">'+
+                            (isMaxLevel ? '已達滿等' : '點擊預覽升級')+'</button>'+
                     '</div>'
                 );
             }).join("");
@@ -637,7 +661,25 @@
     }
 
     const elementBoxState=loadElementBoxState();
-    let elementBoxActive=false;
+
+    function hasAnyAutoBattleEnabled(){
+        return !!(
+            autoBattle ||
+            autoConfig.enabled ||
+            (player2 && autoConfig2.enabled) ||
+            (player3 && autoConfig3.enabled)
+        );
+    }
+
+    /*
+       V137：V136會保存自動戰鬥開關，但元素匣舊版每次重新載入都把
+       active寫死成false。結果同一份已啟用的自動設定在reload後仍會
+       自動出手，卻不扣元素匣時數、EXP也恢復100%。只要還有時數且
+       任一角色的自動設定為開，就恢復同一個元素匣啟用狀態。
+    */
+    let elementBoxActive=
+        elementBoxState.remainingMs>0 &&
+        hasAnyAutoBattleEnabled();
     let elementBoxLastTick=Date.now();
     let elementBoxLastPersist=0;
     const elementBoxSession={activeMs:0,battles:0,exp:0,gold:0};
@@ -650,7 +692,7 @@
         }catch(_){ }
     }
 
-    function stopElementBoxWhenTimeEnds(){
+    function stopElementBoxWhenTimeEnds(message){
         elementBoxActive=false;
         autoConfig.enabled=false;
         if(player2){ autoConfig2.enabled=false; }
@@ -658,8 +700,35 @@
         autoBattle=false;
         if(typeof updateAutoButton==="function"){ updateAutoButton(); }
         if(typeof updateActionHudVisibility==="function"){ updateActionHudVisibility(); }
-        addBattleLog("元素匣時數已用完，自動戰鬥已停止。");
+        addBattleLog(message||"元素匣時數已用完，自動戰鬥已停止。");
+        if(typeof saveGame==="function"){ saveGame(); }
     }
+
+    function syncElementBoxForBattle(options){
+        const silent=!!(options && options.silent);
+        if(hasAnyAutoBattleEnabled() && elementBoxState.remainingMs<=0){
+            stopElementBoxWhenTimeEnds(
+                silent
+                    ? "元素匣沒有可用時數，自動戰鬥已停止。"
+                    : "元素匣沒有可用時數，自動戰鬥已停止；請先取得時數。"
+            );
+            return false;
+        }
+
+        elementBoxActive=
+            elementBoxState.remainingMs>0 &&
+            hasAnyAutoBattleEnabled();
+        elementBoxLastTick=Date.now();
+        persistElementBoxState();
+        return elementBoxActive;
+    }
+    window.v131SyncElementBoxForBattle=syncElementBoxForBattle;
+    window.v131GetElementBoxState=function(){
+        return {
+            active:elementBoxActive,
+            remainingMs:Math.max(0,Math.floor(elementBoxState.remainingMs))
+        };
+    };
 
     function tickElementBoxClock(){
         const now=Date.now();
@@ -777,6 +846,44 @@
         };
     }
 
+    /*
+       所有能開啟自動戰鬥的入口都必須經過元素匣檢查。舊版只攔
+       「套用並啟動」，戰鬥HUD上的直接切換鍵可以完全繞過廣告與
+       時數。沒有時數時保留手動狀態並打開設定面板；有時數時才讓
+       原本切換邏輯執行。
+    */
+    if(typeof toggleAutoBattle==="function"){
+        const originalToggleAutoBattle=toggleAutoBattle;
+        toggleAutoBattle=function(){
+            const isTurningOn=!autoBattle;
+            if(isTurningOn && elementBoxState.remainingMs<=0){
+                alert("元素匣目前沒有可用時數，請先觀看廣告取得8小時時數。");
+                if(typeof openHomeFeature==="function"){
+                    openHomeFeature("autoBattleSettings");
+                }
+                return false;
+            }
+
+            const result=originalToggleAutoBattle.apply(this,arguments);
+            syncElementBoxForBattle({silent:true});
+            return result;
+        };
+    }
+
+    /* startBattle()會從存檔的autoConfig重新打開自動狀態；每一場開始
+       後再同步一次，避免reload或舊存檔直接繞過元素匣。 */
+    if(typeof startBattle==="function"){
+        const originalStartBattle=startBattle;
+        startBattle=function(){
+            if(hasAnyAutoBattleEnabled() && elementBoxState.remainingMs<=0){
+                stopElementBoxWhenTimeEnds("元素匣沒有可用時數，自動戰鬥已停止。");
+            }
+            const result=originalStartBattle.apply(this,arguments);
+            if(battleActive){ syncElementBoxForBattle({silent:true}); }
+            return result;
+        };
+    }
+
     if(typeof openHomeFeature==="function"){
         const originalOpenHomeFeature=openHomeFeature;
         openHomeFeature=function(type){
@@ -877,6 +984,7 @@
     }
 
     function initialSync(){
+        syncElementBoxForBattle({silent:true});
         applyBattleFormation();
         syncInventoryPortrait();
         decorateSkillRows();

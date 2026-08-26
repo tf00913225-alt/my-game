@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="136";
+const V_ASSET_VERSION="137";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -155,12 +155,6 @@ function vAssetUrl(path){
             document.head.appendChild(link);
         }
 
-        if(!document.getElementById("v131-fix-batch-runtime")){
-            const script=document.createElement("script");
-            script.id="v131-fix-batch-runtime";
-            script.src=vAssetUrl("js/25-v131-fix-batch.js");
-            document.body.appendChild(script);
-        }
     }
 
     if(document.readyState==="loading"){
@@ -301,12 +295,6 @@ function vAssetUrl(path){
             document.head.appendChild(link);
         }
 
-        if(!document.getElementById("v132-content-expansion-runtime")){
-            const script=document.createElement("script");
-            script.id="v132-content-expansion-runtime";
-            script.src=vAssetUrl("js/27-v132-content-expansion.js");
-            document.body.appendChild(script);
-        }
     }
 
     if(document.readyState==="loading"){
@@ -327,12 +315,6 @@ function vAssetUrl(path){
             document.head.appendChild(link);
         }
 
-        if(!document.getElementById("v133-economy-rebalance-runtime")){
-            const script=document.createElement("script");
-            script.id="v133-economy-rebalance-runtime";
-            script.src=vAssetUrl("js/28-v133-economy-rebalance.js");
-            document.body.appendChild(script);
-        }
     }
 
     if(document.readyState==="loading"){
@@ -353,12 +335,6 @@ function vAssetUrl(path){
             document.head.appendChild(link);
         }
 
-        if(!document.getElementById("v134-fixes-runtime")){
-            const script=document.createElement("script");
-            script.id="v134-fixes-runtime";
-            script.src=vAssetUrl("js/29-v134-fixes.js");
-            document.body.appendChild(script);
-        }
     }
 
     if(document.readyState==="loading"){
@@ -379,12 +355,6 @@ function vAssetUrl(path){
             document.head.appendChild(link);
         }
 
-        if(!document.getElementById("v135-fixes-runtime")){
-            const script=document.createElement("script");
-            script.id="v135-fixes-runtime";
-            script.src=vAssetUrl("js/30-v135-fixes.js");
-            document.body.appendChild(script);
-        }
     }
 
     if(document.readyState==="loading"){
@@ -394,15 +364,60 @@ function vAssetUrl(path){
     }
 })();
 
-/* V136 loader — auto-battle setting persistence and queued-action correction. */
-(function loadV136AutoBattleFix(){
-    function load(){
-        if(!document.getElementById("v136-auto-battle-fix-runtime")){
-            const script=document.createElement("script");
-            script.id="v136-auto-battle-fix-runtime";
-            script.src=vAssetUrl("js/31-v136-auto-battle-fix.js");
-            document.body.appendChild(script);
+/*
+   V137 — all runtime patches must execute in version order.
+
+   Dynamically appended scripts default to async=true.  The old loader appended
+   V131/V132/V133/V134/V135/V136 independently, so cache/network timing could
+   reverse wrappers that deliberately build on one another.  In particular,
+   V131 could wrap V132's dungeon win interceptor (granting ordinary battle EXP
+   inside dungeons), and V132/V135 could disagree about target-scope labels.
+   Load one script at a time and append the next only after the previous one has
+   executed, which makes the wrapper stack deterministic on every device.
+*/
+(function loadVersionedRuntimePatchesInOrder(){
+    const runtimes=[
+        {id:"v131-fix-batch-runtime",src:"js/25-v131-fix-batch.js"},
+        {id:"v132-content-expansion-runtime",src:"js/27-v132-content-expansion.js"},
+        {id:"v133-economy-rebalance-runtime",src:"js/28-v133-economy-rebalance.js"},
+        {id:"v134-fixes-runtime",src:"js/29-v134-fixes.js"},
+        {id:"v135-fixes-runtime",src:"js/30-v135-fixes.js"},
+        {id:"v136-auto-battle-fix-runtime",src:"js/31-v136-auto-battle-fix.js"}
+    ];
+
+    function next(index){
+        if(index>=runtimes.length){ return; }
+        const runtime=runtimes[index];
+        const existing=document.getElementById(runtime.id);
+
+        if(existing){
+            if(existing.dataset.loaded==="1" || existing.dataset.failed==="1"){
+                next(index+1);
+                return;
+            }
+            existing.addEventListener("load",()=>next(index+1),{once:true});
+            existing.addEventListener("error",()=>next(index+1),{once:true});
+            return;
         }
+
+        const script=document.createElement("script");
+        script.id=runtime.id;
+        script.async=false;
+        script.src=vAssetUrl(runtime.src);
+        script.addEventListener("load",function(){
+            script.dataset.loaded="1";
+            next(index+1);
+        },{once:true});
+        script.addEventListener("error",function(){
+            script.dataset.failed="1";
+            console.error("版本補丁載入失敗：",runtime.src);
+            next(index+1);
+        },{once:true});
+        document.body.appendChild(script);
+    }
+
+    function load(){
+        next(0);
     }
 
     if(document.readyState==="loading"){

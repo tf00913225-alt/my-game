@@ -27,7 +27,11 @@
     ===================================================== */
 
     function todayString(){
-        return new Date().toISOString().slice(0,10);
+        const now=new Date();
+        const year=now.getFullYear();
+        const month=String(now.getMonth()+1).padStart(2,"0");
+        const day=String(now.getDate()).padStart(2,"0");
+        return year+"-"+month+"-"+day;
     }
 
     function escapeHtml(text){
@@ -411,12 +415,44 @@
           抽獎券/裝備都能用同一套堆疊規則）
     ===================================================== */
 
+    function getItemInventoryCapacity(definition){
+        if(!definition){ return 0; }
+        const maxStack=isEquipmentInventoryType(definition.type)
+            ? 1
+            : INVENTORY_MAX_STACK_DEFAULT;
+        const matchingStacks=inventoryItems.filter(
+            item=>item && item.id===definition.id
+        );
+        const stackFreeSpace=maxStack<=1
+            ? 0
+            : matchingStacks.reduce(
+                (sum,item)=>sum+Math.max(0,maxStack-(Number(item.count)||0)),
+                0
+            );
+        const freeSlots=Math.max(0,102-inventoryItems.length);
+        return stackFreeSpace+freeSlots*maxStack;
+    }
+
+    function canAddItemToInventory(definition,amount){
+        const quantity=Math.max(1,Math.floor(Number(amount)||1));
+        return quantity<=getItemInventoryCapacity(definition);
+    }
+    window.v132CanAddItemToInventory=canAddItemToInventory;
+
     function addItemToInventory(definition,amount){
         if(!definition){ return false; }
         const quantity=Math.max(1,Math.floor(Number(amount)||1));
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
             : INVENTORY_MAX_STACK_DEFAULT;
+
+        /*
+           V137：舊版是一邊塞、一邊才檢查102格上限，數量較大時可能
+           已經放入一部分才回傳false，呼叫端卻把整筆視為失敗。
+           先算完整容量，確定整批都放得下才開始改背包，讓加入操作
+           具備all-or-nothing語意。
+        */
+        if(!canAddItemToInventory(definition,quantity)){ return false; }
 
         if(maxStack<=1){
             let remaining=quantity;
@@ -454,6 +490,43 @@
     }
 
     window.v132AddItemToInventory=addItemToInventory;
+
+    function cloneInventorySnapshot(){
+        return inventoryItems.map(item=>{
+            if(!item || typeof item!=="object"){ return item; }
+            const copy={...item};
+            copy.stats=item.stats && typeof item.stats==="object"
+                ? {...item.stats}
+                : {};
+            return copy;
+        });
+    }
+
+    function restoreInventorySnapshot(snapshot){
+        inventoryItems.splice(
+            0,
+            inventoryItems.length,
+            ...snapshot.map(item=>{
+                if(!item || typeof item!=="object"){ return item; }
+                const copy={...item};
+                copy.stats=item.stats && typeof item.stats==="object"
+                    ? {...item.stats}
+                    : {};
+                return copy;
+            })
+        );
+    }
+
+    function runInventoryTransaction(operation){
+        const snapshot=cloneInventorySnapshot();
+        try{
+            if(operation()){ return true; }
+        }catch(error){
+            console.error("背包交易失敗，已還原：",error);
+        }
+        restoreInventorySnapshot(snapshot);
+        return false;
+    }
 
     /*
        通用「從背包扣掉N個某ID物品」——寶箱/抽獎券開啟都要用到
@@ -1037,25 +1110,18 @@
 
         const won=pieces[Math.floor(Math.random()*pieces.length)];
 
-        for(let index=inventoryItems.length-1;index>=0;index--){
-            const item=inventoryItems[index];
-            if(!item || item.id!==ticketId){ continue; }
-            const current=Math.max(0,Math.floor(Number(item.count)||0));
-            if(current<=1){ inventoryItems.splice(index,1); }
-            else{ item.count=current-1; }
-            break;
-        }
-
-        const added=addItemToInventory(won,1);
+        const added=runInventoryTransaction(()=>{
+            return consumeStackItem(ticketId,1) && addItemToInventory(won,1);
+        });
         rebuildInventorySlots();
         renderInventoryItems();
-        saveGame();
 
         if(!added){
-            alert("背包空間不足，"+won.name+"無法放入背包，抽獎券已消耗。");
+            alert("背包空間不足，"+won.name+"無法放入背包；抽獎券未消耗。");
             return;
         }
 
+        saveGame();
         alert("使用"+definition.name+"，獲得【"+won.name+"】！");
     }
     window.useEquipmentTicket=useEquipmentTicket;
@@ -1282,6 +1348,14 @@
     function isDungeonAvailable(type){
         return !isDungeonUsedToday(type);
     }
+
+    function hasTwoCharactersAtLevel20(){
+        return getExistingPartyIndexes().filter(index=>{
+            const character=getPartyCharacterByIndex(index);
+            return character && (Number(character.level)||1)>=20;
+        }).length>=2;
+    }
+    window.v132HasTwoCharactersAtLevel20=hasTwoCharactersAtLevel20;
 
     /*
        ★ 修正（同一個回報的另一半）：副本次數是存在
@@ -1515,26 +1589,26 @@
         actionReady=false;
         pendingAction=null;
 
-        player.activeBuffs=[];
-        player.statusEffects=[];
-        player.isDefending=false;
-
-        if(player2){
-            const stats2=getPlayer2BattleStats();
-            player2.hp=stats2.maxHP;
-            player2.sp=stats2.maxSP;
-            player2.activeBuffs=[];
-            player2.statusEffects=[];
-            player2.isDefending=false;
-        }
-        if(player3){
-            const stats3=getPartyBattleStats(2);
-            player3.hp=stats3.maxHP;
-            player3.sp=stats3.maxSP;
-            player3.activeBuffs=[];
-            player3.statusEffects=[];
-            player3.isDefending=false;
-        }
+        /*
+           V137：副本舊版每次launch（經驗副本三個stage也各算一次）
+           都把第二、第三角色補滿，主角卻保留殘血，造成免費補血與
+           車輪戰難度失真。比照一般戰鬥，三名角色一律只夾在目前
+           上限內，不平白回復HP/SP。
+        */
+        getExistingPartyIndexes().forEach(characterIndex=>{
+            const character=getPartyCharacterByIndex(characterIndex);
+            const stats=getPartyBattleStats(characterIndex);
+            if(!character || !stats){ return; }
+            character.hp=Number.isFinite(Number(character.hp))
+                ? Math.max(0,Math.min(stats.maxHP,Number(character.hp)))
+                : stats.maxHP;
+            character.sp=Number.isFinite(Number(character.sp))
+                ? Math.max(0,Math.min(stats.maxSP,Number(character.sp)))
+                : stats.maxSP;
+            character.activeBuffs=[];
+            character.statusEffects=[];
+            character.isDefending=false;
+        });
 
         currentBattleMonsters=monsterList.map((m,i)=>i);
         currentBattleMonsters.forEach(i=>{
@@ -1548,6 +1622,9 @@
         showPage("battle");
 
         autoBattle=autoConfig.enabled;
+        if(typeof window.v131SyncElementBoxForBattle==="function"){
+            window.v131SyncElementBoxForBattle({silent:true});
+        }
         syncBattleAutoSettings();
         updateAutoButton();
 
@@ -1620,16 +1697,42 @@
                 return originalLoseBattle.apply(this,arguments);
             }
 
-            const result=originalLoseBattle.apply(this,arguments);
-
+            /*
+               不呼叫一般loseBattle()：它會排一個2.2秒後返回巡怪地圖的
+               timeout。舊版雖然先顯示副本頁，仍會被那個延遲回呼踢回
+               地圖。副本失敗在這裡完整收尾並補滿隊伍，再交給副本
+               callback回到日常副本頁。
+            */
+            battleActive=false;
+            autoBattle=false;
+            actionReady=false;
+            pendingAction=null;
+            clearInterval(timerId);
+            timerId=null;
+            if(battleAdvanceTimeoutId){
+                clearTimeout(battleAdvanceTimeoutId);
+                battleAdvanceTimeoutId=null;
+            }
+            battleAdvanceScheduled=false;
+            battleToken++;
+            closeMenus();
+            addBattleLog("副本挑戰失敗……");
             restoreDungeonMonsters();
             window.v132ActiveDungeonRun=null;
+
+            getExistingPartyIndexes().forEach(characterIndex=>{
+                const character=getPartyCharacterByIndex(characterIndex);
+                const stats=getPartyBattleStats(characterIndex);
+                if(!character || !stats){ return; }
+                character.hp=stats.maxHP;
+                character.sp=stats.maxSP;
+            });
+            updateUI();
+            saveGame();
 
             if(run.onComplete){
                 run.onComplete({result:"lose"});
             }
-
-            return result;
         };
     }
 
@@ -1661,7 +1764,6 @@
                 return;
             }
 
-            markDungeonUsed("exp");
             showExpDungeonRewardModal(rewardExp);
         });
     }
@@ -1714,6 +1816,7 @@
             const rewardMultiplier=doubled ? 2 : 1;
             const rewardExp=Math.floor(getExpDungeonRewardExp()*rewardMultiplier);
             sharedExp+=rewardExp;
+            markDungeonUsed("exp");
             addBattleLog("經驗副本結算，獲得"+rewardExp+"EXP，已存入經驗池。");
             saveGame();
             v132CloseRewardModal();
@@ -1755,13 +1858,12 @@
             alert("材料副本今天已經挑戰過了。");
             return;
         }
-        if(getExistingPartyIndexes().length<2){
-            alert("材料副本需要雙角色（至少建立第二角色）才能開啟。");
+        if(!hasTwoCharactersAtLevel20()){
+            alert("材料副本需要至少兩名角色都達到20級才能開啟。");
             return;
         }
-        const mainCharacter=getPartyCharacterByIndex(0);
-        if(!mainCharacter || (mainCharacter.level||1)<20){
-            alert("材料副本需要角色等級達到20級才能開啟。");
+        if(!canAddItemToInventory(materialChestDefinition,3)){
+            alert("請先預留可放入3個材料寶箱的背包空間，再挑戰材料副本。");
             return;
         }
 
@@ -1784,7 +1886,6 @@
                 switchDungeonTab("daily");
                 return;
             }
-            markDungeonUsed("material");
             const chestCount=outcome.turnsUsed<5 ? 3 : (outcome.turnsUsed<10 ? 2 : 1);
             showMaterialDungeonRewardModal(chestCount);
         });
@@ -1849,10 +1950,16 @@
        扣寶箱失敗（沒庫存）回傳null。
     */
     function openSingleMaterialChestFromInventory(){
-        if(!consumeStackItem("materialChest",1)){ return null; }
         const rewards=rollMaterialChestRewards();
-        rewards.forEach(r=>addItemToInventory(r.def,r.amount));
+        const opened=runInventoryTransaction(()=>{
+            if(!consumeStackItem("materialChest",1)){ return false; }
+            return rewards.every(r=>addItemToInventory(r.def,r.amount));
+        });
         rebuildInventorySlots();
+        if(!opened){
+            alert("背包空間不足，材料寶箱未消耗。請先整理背包。");
+            return null;
+        }
         saveGame();
         return rewards.map(r=>r.def.name+"×"+r.amount);
     }
@@ -1875,13 +1982,14 @@
             const finalCount=doubled ? chestCount*2 : chestCount;
             const added=addItemToInventory(materialChestDefinition,finalCount);
             rebuildInventorySlots();
+            if(!added){
+                alert("背包空間不足，材料寶箱尚未領取；請先整理背包後再試。");
+                return;
+            }
+            markDungeonUsed("material");
             saveGame();
             v132CloseRewardModal();
-            if(!added){
-                alert("背包空間不足，材料寶箱無法放入背包。");
-            }else{
-                alert("獲得材料寶箱×"+finalCount+"，請到背包自行開啟。");
-            }
+            alert("獲得材料寶箱×"+finalCount+"，請到背包自行開啟。");
             showPage("dungeon");
             switchDungeonTab("daily");
         }
@@ -1905,13 +2013,12 @@
             alert("裝備副本今天已經挑戰過了。");
             return;
         }
-        if(getExistingPartyIndexes().length<2){
-            alert("裝備副本需要雙角色（至少建立第二角色）才能開啟。");
+        if(!hasTwoCharactersAtLevel20()){
+            alert("裝備副本需要至少兩名角色都達到20級才能開啟。");
             return;
         }
-        const mainCharacter=getPartyCharacterByIndex(0);
-        if(!mainCharacter || (mainCharacter.level||1)<20){
-            alert("裝備副本需要角色等級達到20級才能開啟。");
+        if(!ticketDefinitions.some(definition=>canAddItemToInventory(definition,1))){
+            alert("請先預留至少1張裝備抽獎券的背包空間，再挑戰裝備副本。");
             return;
         }
 
@@ -1933,7 +2040,6 @@
                 switchDungeonTab("daily");
                 return;
             }
-            markDungeonUsed("equipment");
             showEquipmentDungeonRewardModal();
         });
     }
@@ -1959,12 +2065,16 @@
     }
 
     window.v132ClaimEquipmentDungeonReward=function(ticketId,doubled){
-        function grant(){
+        function grant(amount){
             const definition=getTicketDefinition(ticketId);
             if(!definition){ return; }
-            const amount=doubled ? 2 : 1;
-            addItemToInventory(definition,amount);
+            if(!addItemToInventory(definition,amount)){
+                rebuildInventorySlots();
+                alert("背包空間不足，抽獎券尚未領取；請先整理背包後再試。");
+                return;
+            }
             rebuildInventorySlots();
+            markDungeonUsed("equipment");
             saveGame();
             v132CloseRewardModal();
             alert("獲得"+definition.name+"×"+amount+"！");
@@ -1972,29 +2082,22 @@
             switchDungeonTab("daily");
         }
 
+        if(doubled){
+            grant(2);
+            return;
+        }
+
         if(!doubled){
             const askDouble=window.confirm("要看廣告雙倍領取這張抽獎券嗎？");
             if(askDouble){
-                showRewardedAd(function(){ grant2(ticketId); },function(){
+                showRewardedAd(function(){ grant(2); },function(){
                     alert("廣告未完成，改為直接領取。");
-                    grant();
+                    grant(1);
                 });
                 return;
             }
         }
-        grant();
-
-        function grant2(id){
-            const definition=getTicketDefinition(id);
-            if(!definition){ return; }
-            addItemToInventory(definition,2);
-            rebuildInventorySlots();
-            saveGame();
-            v132CloseRewardModal();
-            alert("獲得"+definition.name+"×2！");
-            showPage("dungeon");
-            switchDungeonTab("daily");
-        }
+        grant(1);
     };
 
 
@@ -2059,11 +2162,11 @@
                 "隊伍平均升級所需經驗的10%（廣告雙倍20%）","v132BeginExpDungeon"
             )+
             dungeonEntryCard(
-                "material","材料副本","雙角色達到20級",
+                "material","材料副本","至少兩名角色達到20級",
                 "材料寶箱×1～3（依通關回合數）","v132BeginMaterialDungeon"
             )+
             dungeonEntryCard(
-                "equipment","裝備副本","雙角色達到20級",
+                "equipment","裝備副本","至少兩名角色達到20級",
                 "高極裝備寶箱×1（自選抽獎券）","v132BeginEquipmentDungeon"
             )+
             '<div style="font-size:11px;color:#7a6f5c;margin-top:6px;">'+

@@ -6792,6 +6792,33 @@ function loadGame(){
 
 
         /*
+           V137：讀檔原本只校正主角HP/SP，第二、第三角色若是舊存檔
+           缺欄位、NaN或超過裝備後的新上限，要等到進戰鬥才會被修正，
+           角色／背包頁在那之前可能顯示NaN或錯誤比例。三名角色使用
+           同一套讀檔正規化規則。
+        */
+        [1,2].forEach(characterIndex=>{
+            const character=getPartyCharacterByIndex(characterIndex);
+            const stats=getPartyBattleStats(characterIndex);
+            if(!character || !stats){ return; }
+
+            character.hp=(
+                !Number.isFinite(Number(character.hp)) ||
+                Number(character.hp)<=0
+            )
+                ? stats.maxHP
+                : Math.min(Number(character.hp),stats.maxHP);
+
+            character.sp=(
+                !Number.isFinite(Number(character.sp)) ||
+                Number(character.sp)<0
+            )
+                ? stats.maxSP
+                : Math.min(Number(character.sp),stats.maxSP);
+        });
+
+
+        /*
            ★ 最重要：
            讀檔成功後明確顯示遊戲。
         */
@@ -20229,9 +20256,25 @@ function autoActionForCharacter(characterIndex,token){
 
     const skill=skillDatabase[config.skill];
     const spreads=skill && ["tri","row","column","all"].includes(skill.targetType);
-    const target=spreads
-        ? aliveInBattle[Math.floor((aliveInBattle.length-1)/2)]
-        : aliveInBattle[0];
+    let target=aliveInBattle[0];
+
+    /*
+       V137：怪物擴充到最多10隻、並分成兩排之後，「整份存活清單的
+       中間」不再等於「技能能打最多人的中心」。例如6隻怪時舊算法
+       會選第一排最右邊，tri技能只打到2隻。逐一用真正的
+       getSkillTargets()評估候選中心，選命中數最多的那一個，row／
+       tri技能才會依目前陣形與死亡缺口正確選位。
+    */
+    if(spreads && typeof getSkillTargets==="function"){
+        let bestCount=-1;
+        aliveInBattle.forEach(candidate=>{
+            const hitCount=getSkillTargets(candidate,skill.targetType).length;
+            if(hitCount>bestCount){
+                bestCount=hitCount;
+                target=candidate;
+            }
+        });
+    }
 
     let action=config.skill||"normal";
     const skillKey=getPartyCharacterKey(characterIndex);
@@ -24434,9 +24477,17 @@ function checkLevelUp(targetCharacter){
         }
         else{
 
+            const characterIndex=
+                getPartyCharacterIndex(
+                    character
+                );
+
+
             const bonus2 =
                 getEquipmentBonus(
-                    "player2"
+                    getPartyCharacterKey(
+                        characterIndex
+                    )
                 );
 
 
@@ -31295,107 +31346,13 @@ function sellSelectedItem(){
 ===================================================== */
 
 /*
-   ★ 防呆：
-   每個事件綁定都個別用try/catch包起來。
-   就算某個瀏覽器上有一顆select意外抓不到，
-   也不會讓後面所有事件綁定跟初始化整個中斷。
-*/
+   ★ V137（清除殘留錯誤訊息）：
+   autoEnabled、autoSkillHome、hpUsePctHome、spUsePctHome
+   是舊版主城內嵌自動設定的元素，現行設定已改由
+   autoBattleSettingsPanel動態表單處理。舊版safeBind仍在每次載入
+   主動把這四個「已知不存在」的元素記成console.error，會掩蓋真正
+   的錯誤；四段無效綁定已移除。
 
-function safeBind(id,handler){
-
-    try{
-
-        const el =
-            $(id);
-
-
-        if(!el){
-
-            console.error(
-                "找不到元素：",
-                id
-            );
-
-            return;
-
-        }
-
-
-        el.addEventListener(
-            "change",
-            handler
-        );
-
-    }
-    catch(error){
-
-        console.error(
-            "綁定事件失敗：",
-            id,
-            error
-        );
-
-    }
-
-}
-
-
-safeBind(
-    "autoEnabled",
-    event=>{
-
-        autoConfig.enabled =
-            event.target.checked;
-
-    }
-);
-
-
-safeBind(
-    "autoSkillHome",
-    event=>{
-
-        autoConfig.skill =
-            event.target.value;
-
-        syncBattleAutoSettings();
-
-    }
-);
-
-
-safeBind(
-    "hpUsePctHome",
-    event=>{
-
-        autoConfig.hp =
-            Number(
-                event.target.value
-            );
-
-        syncBattleAutoSettings();
-
-    }
-);
-
-
-safeBind(
-    "spUsePctHome",
-    event=>{
-
-        autoConfig.sp =
-            Number(
-                event.target.value
-            );
-
-        syncBattleAutoSettings();
-
-    }
-);
-
-
-/*
-   ★ 修正（清除殘留錯誤訊息）：
    autoSkillBattle、hpUsePctBattle、spUsePctBattle
    這三個是很早期版本、戰鬥畫面內嵌下拉選單的
    舊元素ID，後來重新設計成現在這種

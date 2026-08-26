@@ -55,15 +55,27 @@
     */
     const EXP_CURVE_BASE=400;
     const EXP_CURVE_EXPONENT=2.5;
+    const MAX_CHARACTER_LEVEL=100;
+    window.v133MaxLevel=MAX_CHARACTER_LEVEL;
 
     function getExpNextForLevel(level){
-        const safeLevel=Math.max(1,Math.floor(Number(level)||1));
+        const safeLevel=Math.min(
+            MAX_CHARACTER_LEVEL,
+            Math.max(1,Math.floor(Number(level)||1))
+        );
         return Math.max(1,Math.round(EXP_CURVE_BASE*Math.pow(safeLevel,EXP_CURVE_EXPONENT)));
     }
     window.v133GetExpNextForLevel=getExpNextForLevel;
 
     function recalibrateCharacterExpNext(character){
         if(!character){ return; }
+        character.level=Math.min(
+            MAX_CHARACTER_LEVEL,
+            Math.max(1,Math.floor(Number(character.level)||1))
+        );
+        if(character.level>=MAX_CHARACTER_LEVEL){
+            character.exp=0;
+        }
         character.expNext=getExpNextForLevel(character.level);
     }
 
@@ -92,11 +104,57 @@
         checkLevelUp=function(targetCharacter){
             const character=targetCharacter||player;
             const levelBefore=character.level;
+
+            /* V133規格以Lv.100為滿等；舊版只做了1~100曲線，卻沒有
+               真正的上限，Lv.100仍可繼續升到101以上。 */
+            if(levelBefore>=MAX_CHARACTER_LEVEL){
+                recalibrateCharacterExpNext(character);
+                if(typeof refreshCharacterAvatarLevels==="function"){
+                    refreshCharacterAvatarLevels();
+                }
+                if(typeof updateUI==="function"){ updateUI(); }
+                if(typeof saveGame==="function"){ saveGame(); }
+                return false;
+            }
+
             const result=originalCheckLevelUp.apply(this,arguments);
+            if(character.level>MAX_CHARACTER_LEVEL){
+                const excessLevels=character.level-MAX_CHARACTER_LEVEL;
+                character.level=MAX_CHARACTER_LEVEL;
+                character.attributePoints=Math.max(
+                    0,
+                    (Number(character.attributePoints)||0)-excessLevels*5
+                );
+                character.skillPoints=Math.max(
+                    0,
+                    (Number(character.skillPoints)||0)-excessLevels*2
+                );
+                character.bonusHP=Math.max(
+                    0,
+                    (Number(character.bonusHP)||0)-excessLevels*30
+                );
+                character.bonusSP=Math.max(
+                    0,
+                    (Number(character.bonusSP)||0)-excessLevels*10
+                );
+                character.exp=0;
+            }
             if(character.level!==levelBefore){
                 recalibrateCharacterExpNext(character);
+                if(typeof saveGame==="function"){ saveGame(); }
             }
             return result;
+        };
+    }
+
+    if(typeof distributeExpToCharacter==="function"){
+        const originalDistributeExpToCharacterV133=distributeExpToCharacter;
+        distributeExpToCharacter=function(character){
+            if(character && (Number(character.level)||1)>=MAX_CHARACTER_LEVEL){
+                alert((character.id||"角色")+"已達 Lv."+MAX_CHARACTER_LEVEL+" 滿等。");
+                return false;
+            }
+            return originalDistributeExpToCharacterV133.apply(this,arguments);
         };
     }
 
@@ -116,6 +174,10 @@
             recalibrateCharacterExpNext(slotNumber===3 ? player3 : player2);
             return result;
         };
+    }
+
+    if(typeof renderExpDistributeList==="function"){
+        renderExpDistributeList();
     }
 
 
