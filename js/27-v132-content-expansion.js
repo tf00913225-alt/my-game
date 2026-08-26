@@ -1418,6 +1418,16 @@
        每次升級後expNext會更新成「下一級需要多少」）。新公式：
        隊伍每個角色的expNext加總，再除以角色人數，不再乘0.5。
     */
+    /*
+       ★ 修正（依照使用者要求，「經驗副本不能變成主要升級來源」）：
+       原本是「隊伍平均expNext」，等於單人隊伍打一次就拿到自己
+       升下一級所需的100%經驗，太誇張。改成再乘上一個比例常數，
+       目標是「打完正常獎勵≈升下一級所需的10%，看廣告雙倍≈20%」
+       ——doubled的×2邏輯已經在v132ClaimExpDungeonReward()那裡
+       處理，這裡只需要把「正常（未doubled）」的基準壓到10%。
+    */
+    const EXP_DUNGEON_REWARD_RATIO=0.10;
+
     function getExpDungeonRewardExp(){
         const indexes=getExistingPartyIndexes();
         if(indexes.length===0){ return 0; }
@@ -1426,7 +1436,7 @@
             if(!character){ return sum; }
             return sum+Math.max(0,Number(character.expNext)||0);
         },0);
-        return Math.floor(total/indexes.length);
+        return Math.floor((total/indexes.length)*EXP_DUNGEON_REWARD_RATIO);
     }
 
     function showExpDungeonRewardModal(rewardExp){

@@ -1,0 +1,15 @@
+/*
+   V133 — 經濟／養成重新設計的最小樣式（商店階級提示）。
+*/
+
+.v133-shop-tier-note{
+    margin-bottom:10px;
+    padding:6px 10px;
+    border-radius:6px;
+    background:#100e0b;
+    border:1px solid #6a5230;
+    color:#e8a93c;
+    font-size:12px;
+    text-align:center;
+    font-weight:bold;
+}

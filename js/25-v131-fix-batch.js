@@ -12,6 +12,26 @@
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;
     const ELEMENT_BOX_KEY="v131_element_box_state";
 
+    /*
+       ★ 新增（依照使用者要求，經濟／養成重新設計第一輪）：
+       1. 精英/BOSS的戰鬥EXP要比普通怪高（精英×1.5、BOSS×3），
+          原本不管rank一律是「等級×10」，這裡在既有×3.5加成
+          「之前」先套rank倍率，兩個倍率疊乘、不是另外多加一次
+          ×3.5（使用者明確要求×3.5保留、不要再疊加）。
+       2. 元素匣（自動掛機）戰鬥的EXP只給70%，金幣/掉落/材料
+          完全不受影響（那些是另外獨立的函式，這裡完全沒有動）。
+          目的是讓「掛機」明顯比「手動玩」慢，避免無腦掛機
+          就能在短時間衝到滿等。
+    */
+    const ELEMENT_BOX_EXP_RATIO=0.70;
+
+    function getMonsterExpRankMultiplier(monster){
+        const rank=getMonsterRank(monster);
+        if(rank==="boss"){ return 3; }
+        if(rank==="elite"){ return 1.5; }
+        return 1;
+    }
+
     function getFormationRows(indexes){
         const list=(indexes||[]).slice(0,10);
         const n=list.length;
@@ -752,19 +772,54 @@
         const originalWinBattle=winBattle;
         winBattle=function(){
             if(!battleActive){ return originalWinBattle.apply(this,arguments); }
-            const baseExp=currentBattleMonsters.reduce(
+
+            /*
+               flatExpGain：跟原本winBattle()內部自己會算、
+               直接加進sharedExp的數字完全一樣算法（等級×10，
+               不含rank倍率、不含3.5倍加成）——用來推算「原本
+               函式這次會自己加多少」，才能正確算出還要「補多少
+               差額」，不會跟原本的計算重複疊加。
+            */
+            const flatExpGain=currentBattleMonsters.reduce(
                 (total,index)=>total+(monsters[index] ? (Number(monsters[index].level)||0)*10 : 0),
                 0
             );
-            const finalExp=Math.floor(baseExp*V131_EXP_MULTIPLIER);
-            const bonusExp=Math.max(0,finalExp-baseExp);
+
+            /* rankAdjustedExp：這裡才是真正決定最終獎勵的基準，
+               每隻怪先各自套rank倍率（普通×1／精英×1.5／BOSS×3），
+               再統一乘上既有的3.5倍加成——兩個倍率是「疊乘」，
+               不是額外多加一次3.5。 */
+            const rankAdjustedExp=currentBattleMonsters.reduce(
+                (total,index)=>{
+                    const monster=monsters[index];
+                    if(!monster){ return total; }
+                    return total+(Number(monster.level)||0)*10*getMonsterExpRankMultiplier(monster);
+                },
+                0
+            );
+
+            let finalExp=Math.floor(rankAdjustedExp*V131_EXP_MULTIPLIER);
+
+            /* 元素匣（自動掛機）只給70%EXP，金幣/掉落/材料不受影響
+               （那些各自獨立的函式完全沒有被這裡動到）。 */
+            const isElementBoxBattle=elementBoxActive;
+            if(isElementBoxBattle){
+                /* ★ 用Math.round不用Math.floor：700*0.7在浮點數運算下
+                   會是489.999999...，Math.floor會誤差扣掉1點EXP，
+                   Math.round才會正確算出490。 */
+                finalExp=Math.round(finalExp*ELEMENT_BOX_EXP_RATIO);
+            }
+
+            const bonusExp=finalExp-flatExpGain;
             const battleGoldStart=elementBoxBattleStartGold===null ? gold : elementBoxBattleStartGold;
             const result=originalWinBattle.apply(this,arguments);
-            if(bonusExp>0){
-                sharedExp+=bonusExp;
+            if(bonusExp!==0){
+                sharedExp=Math.max(0,sharedExp+bonusExp);
                 addBattleLog(
-                    "戰鬥經驗 3.5 倍加成：額外 +"+
-                    bonusExp+" EXP，本場共 "+finalExp+" EXP。"
+                    (isElementBoxBattle
+                        ? "戰鬥經驗（精英/BOSS加成＋3.5倍加成，元素匣掛機70%）："
+                        : "戰鬥經驗（精英/BOSS加成＋3.5倍加成）：")+
+                    "本場共 "+finalExp+" EXP。"
                 );
                 saveGame();
             }
