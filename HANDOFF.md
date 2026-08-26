@@ -107,6 +107,42 @@ commit之前）就沒再變過，但這之後好幾輪修改（`elementSkillIcon
 裡對應那個檔案的 `?v=...`），沒改版本號 = 使用者的瀏覽器很可能繼續看到
 舊版，等於這次的修改在使用者端形同沒發生過。
 
+---
+
+#### ★★★ 2026-08-26 更新：這個坑又踩了 4 輪，已經改成「單一常數」機制 ★★★
+
+即使上面整段警告就寫在這裡，**從 PR #15 之後還是又連續 4 個 PR
+（#17／#18／#19／#20）改了 `js/25`／`js/27`／`css/33`，版本號卻一次都
+沒動**，全部卡在 `?v=132`。結果使用者整整 4 輪都在跑 PR #15 時代的舊
+程式碼，回報了一堆「已經修好卻還在發生」的問題（副本次數沒解除、
+戰鬥節奏沒改善……），實際上那些修正他根本沒收到。
+
+**根本問題是「版本號散在 4 個 loader 裡各寫各的字面值」**，只要有一個
+忘記改就破功——光靠文件提醒顯然沒用（這段警告本來就在，還是漏了 4 次）。
+
+**現在的做法**：`js/20-anonymous-20.js` 檔案最上面有唯一的一行
+
+```js
+const V_ASSET_VERSION="134";
+function vAssetUrl(path){ return path+"?v="+V_ASSET_VERSION; }
+```
+
+4 個 loader 全部改用 `vAssetUrl("css/31-....css")` 這種寫法。
+**以後改任何被這些 loader 載入的檔案，只要把 `V_ASSET_VERSION`
+那一個數字加一就好。**
+
+還有兩個例外要記得：
+1. `js/00-main.js` 的 `?v=` 寫在 `index.html`（不經過 loader），
+   改那個檔案要另外去 `index.html` 更新。
+2. `js/v131-patrol-sprite-*.js` 那 61 個 sprite chunk 是純 base64
+   圖片、體積很大、內容也很久沒變，**刻意維持釘死在舊版本號**
+   （`?v=131f` / `?v=131c`），不跟著 `V_ASSET_VERSION` 走，避免改
+   一行邏輯就害使用者重新下載一整包圖片。真的換圖時再手動改。
+
+另外這次也順手把 `css/08-stage-v14-character-scroll-fix.css`
+（原本是 `index.html` 裡連 `?v=` 都沒有的靜態 `<link>`，但 PR #16
+改過它）補上了 `?v=134`。
+
 至於沒有版本號、用純靜態 `<link>`/`<script>` 標籤載入的檔案（例如
 `css/00-main.css`、`css/22-stage-v78-character-inventory-core.css`）——
 這些沒有辦法用改版本號的方式強制刷新，只能依賴 GitHub Pages 預設的
@@ -241,6 +277,129 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-26 — V134：修復 6 項回報問題（其中 2 項的真正原因是快取版本號忘了加）
+
+使用者回報 6 個問題。**調查後發現其中至少 2 項根本不是新 bug，而是使用者
+的瀏覽器從來沒拿到先前已經合併的修正**——詳見上方「系統架構重點」1.2 節
+新增的那段。這次除了修 bug，也把版本號機制化（單一常數）避免再犯。
+
+1. **刪除角色後副本次數沒有重置**：副本每日次數存在**獨立的 localStorage
+   key**（`v132_daily_dungeon_state`），而刪角色用的 `resetGame()`
+   （`js/00-main.js:6907`）只清 `SAVE_KEY` 跟兩個舊版存檔 key，從來沒碰過
+   這個 key。修法刻意**不去包 `resetGame()`**（它是先 `confirm()` 再
+   `location.reload()`，包在外面會變成「使用者按取消、資料卻已被清掉」），
+   改成在 `js/27` 載入時判斷「目前完全沒有任何角色」（reload 後 `loadGame()`
+   找不到存檔，`player.id` 是空字串）就順手清掉這個 key 跟
+   `v131_element_box_state`。
+2. **副本次數限制要維持關閉**：上一版只在「寫入」端（`markDungeonUsed`）
+   擋了 `DUNGEON_DAILY_LIMIT_ENABLED` 旗標，**「讀取」端（`isDungeonAvailable`
+   跟 `dungeonEntryCard`）沒擋**——所以旗標關掉之前就已經存進去的
+   `used:true` 會繼續讓按鈕永久 disabled 到隔天。新增 `isDungeonUsedToday()`
+   讓讀寫兩端都看旗標，並把畫面底部那行寫死的「每日只能挑戰1次」也改成
+   跟著旗標切換文案（關閉時顯示「⚙️ 測試模式」），不再自相矛盾。順手把
+   經驗副本卡片上還寫著舊公式「50%」的說明更新成 V133 的實際值（10%）。
+3. **戰鬥「空拍很久」**：真正原因是 `updateActionHudVisibility()`
+   （`00-main.js:31898`）**從來沒有被 `beginCharacterTurn()` 呼叫過**——
+   全專案只有 `startTurn`（此時 index 恆為 0）、`startResolutionPhase`、
+   `toggleAutoBattle` 三處會呼叫。所以只要 0 號自動、1／2 號手動，指令列
+   在回合一開始就被判定隱藏，之後整個宣告階段都不再更新：輪到手動角色時
+   玩家**看不到任何按鈕**、什麼都不能做，只能乾等 `beginCharacterTurn`
+   裡那個 20 秒倒數跑完才跳「⏰ 時間到」。一個手動角色 20 秒、兩個就 40 秒。
+   修法是包一層 `beginCharacterTurn()`，在原函式跑完後補呼叫一次
+   `updateActionHudVisibility()`。依使用者決定 **20 秒倒數本身保留不動**。
+   另外把技能名稱徽章壽命從 2200ms 收到 1200ms——原本比每步 1500ms 還長，
+   上一位的特效會跨到下一位出手，看起來會「疊在一起、怪怪的」。
+4. **符咒沒問目標、三個人用卻只有一個人在用**：三個獨立的 bug。
+   (a) `useTalisman()` 跳過了遊戲既有的選目標流程，直接寫死
+   `{target:null}`，`applyTalismanEffect()` 則是冰封符**隨機**挑一隻怪、
+   隱身/結界符寫死只給施法者自己。依使用者決定「完全比照技能」，改成接上
+   既有的 `setBattleTargetSelectionMode`／`selectBattleTarget`（選怪）與
+   `setBattleAllyTargetSelectionMode`／`selectBattleAllyTarget`（選我方），
+   不自己造一套 UI。**踩到的相容性坑**：`selectBattleTarget()` 完全不查
+   `skillDatabase`，所以選怪那條路直接就能用符咒 id；但選我方那條路
+   （`setBattleAllyTargetSelectionMode`／`selectBattleAllyTarget`）跟
+   `getBattleActionDisplayName()` 都會查 `skillDatabase[actionType]` 並
+   要求 `targetType` 是 ally，符咒 id 查不到就整個失效——所以額外覆寫了
+   這三個函式，遇到符咒 id 時改用一個「長得像技能」的合成物件走同一套判斷。
+   (b) **「只有一個人在用」的真正原因是動畫打錯卡片**：
+   `lungePlayerCard()` 跟 `showSkillNameBadge()` 的最後一個參數都是
+   `characterIndex`（內部 `$("battlePlayerCard"+(characterIndex||0))`），
+   原本兩個呼叫都**沒有傳**，所以不管誰施放，特效永遠演在 0 號卡片上。
+   二三號角色其實有正常結算（log 有印、buff 有上），只是畫面看起來像沒用。
+   （同一個函式裡的 `showMissEffect()` 本來就有正確傳，所以「畫符失敗」
+   反而一直演在對的卡片上，剛好是對照組。）
+   (c) 庫存沒有預留：宣告時只檢查不扣、結算才扣，只有 1 張符咒時三個人
+   都能宣告，結果先手用掉、後面兩位白白浪費回合。改成宣告時把「這回合
+   其他角色已經預定的數量」也算進去。
+   (d) 背包裡點符咒會跳出一顆**騙人的「穿戴」按鈕**（按了因為
+   `getInventoryEquipmentSlot("talisman")` 查不到欄位而靜默失敗）——
+   依使用者決定「符咒不能在戰鬥外使用」，只把這顆按鈕藏掉。
+5. **元素匣設定出招卻一直普通攻擊**：`autoActionForCharacter()`
+   （`00-main.js:20239-20249`）有 4 個條件會把設定好的技能默默丟掉退回
+   普攻，而且**一行戰鬥紀錄都不寫**。其中最常見的是 **SP 不足**——自動
+   戰鬥路徑已經把喝藥邏輯整個移除，戰鬥中完全沒有任何 SP 回復，
+   `applyPostBattleAutoRecovery()` 又只在戰鬥結束後且身上有藥水才補，
+   所以 SP 一見底就永遠退回普攻。對照組：手動路徑的 `castDamageSkill()`
+   **會**印「SP不足，改用普通攻擊。」，只有自動路徑是靜默的。
+   依使用者決定 **不自動喝藥、只把原因寫出來**，現在會印出例如
+   「⚠️ 主角ASP不足（5/15），無法使用「會心一擊」，改用普通攻擊。」
+   （並且用 lastReason 去重，長時間掛機不會洗版）。
+   **另外查證推翻了一個原本以為要修的東西**：本來以為
+   `populateAutoSkillOptions()` 少濾 heal/revive 是個 bug，實際 grep 發現
+   它操作的 `#autoSkillHome`／`#autoSkillBattle`／`#autoEnabled` 在現在的
+   `index.html` 裡**根本不存在**（這也正是 console 一直在印「找不到元素：
+   autoSkillHome」的原因），是舊版主城面板的殘留死程式碼；玩家真正在用的
+   `#autoSettingsActionSelect` 由 `switchCharacterTab`/`switchAutoSettingsCharacter`
+   填充，**本來就有**正確濾掉 heal/revive。所以沒有加多餘的修正，只在
+   `js/29` 留下註解說明查證結果。
+6. **背包沒有返回鍵**：`#inventoryPage` 唯一的關閉鍵
+   `#mapInventoryOverlayClose` 被 CSS（`css/00-main.css:5604`）綁死只在
+   `.map-inventory-overlay-open` 這個 class 存在時顯示，而那個 class
+   **只有 `openMapInventoryOverlay()` 會加**。背包有三種進入方式，只有
+   「從地圖頁」那種會加——使用者截圖是從**下方導覽列**進去的，那條路徑
+   完全沒有任何返回控制項。（這也解釋了上一輪我「找不到、無法重現」——
+   當時只測了地圖覆蓋層那條路徑。）修法：CSS 改成在 `#inventoryPage` 一律
+   顯示（視覺完全沿用原本那組），JS 依使用者決定「返回上一個頁面」，包一層
+   `showPage()` 記錄前一頁，按鈕行為改成三選一：覆蓋層開著→關覆蓋層／
+   背包被借進角色彈窗→關彈窗／否則→回上一頁。**這裡踩到一個坑**：
+   一開始「有沒有被借進彈窗」是用「彈窗是不是可見」判斷，太寬鬆——只要
+   畫面上剛好有任何 home-feature 彈窗開著（即使跟背包無關），按返回就只會
+   關掉那個不相干的彈窗、背包頁留在原地（實測重現）。改成用
+   `homeFeatureModalBody.contains(inventoryPage)` 檢查真正的父子關係才精準。
+
+**新增檔案**：`js/29-v134-fixes.js`、`css/35-v134-fixes.css`
+（已接進 `js/20-anonymous-20.js` 的 loader）。
+
+**驗證方式**（全部 Playwright 實測，零 `pageerror`）：
+- 版本號：確認 4 個 loader 注入的 script/link 全部帶 `?v=134`，
+  sprite chunk 正確維持釘死舊版本，`js/00-main.js?v=132` 確認內容真的
+  沒變過所以不用動
+- 副本次數：先把 `v132_daily_dungeon_state` 寫成三個都 `used:true` 再
+  reload，確認三張卡片都沒有「今日已完成／今日已挑戰」、`disabled` 數為 0、
+  有「測試模式」字樣；再用**真正的 `resetGame()`**（不是手動刪 key——
+  手動刪會被 unload 時的自動存檔重新寫回去，這點也踩過）確認刪角色後
+  兩個側邊 key 都被清乾淨
+- 戰鬥空拍：0 號自動、1 號手動，實測輪到 1 號時
+  `battleCommandRow.classList.contains("battle-hud-hidden")` 為 **false**
+  （修好前會是 true → 乾等 20 秒）
+- 符咒：冰封符進入選怪模式（提示正確顯示「選擇 [極品冰封符]」而不是
+  原始 id、3 隻怪都可選）→ 指定第 3 隻 → 結算後**只有那隻**被冰封、
+  另外兩隻沒有；結界符進入選我方模式 → 副手B 指定給 主角A → 結算後
+  buff 正確落在 主角A 身上而不是施法者；動畫參數實測為 `[0,1]`
+  （修好前是 `[undefined,undefined]` 全部落在 0 號卡）；只剩 1 張符咒時
+  第二個人被正確擋下並提示「剩下的數量已經被這回合其他角色預定了」
+- 自動出招：SP 不足／未學會／治療類三種情境都會印出對應的 ⚠️ 說明，
+  SP 足夠且已學會時不會印、且技能正確進入 `queuedPlayerActions`
+- 背包返回鍵：下方導覽列路徑有返回鍵且回到上一頁（training）；地圖覆蓋層
+  路徑仍正常關閉覆蓋層並留在 mapPage；借進角色彈窗時正確關閉彈窗
+- 回合節奏回歸：重新量 `addBattleLog()` 時間戳，連續 3 回合每一步都穩定
+  落在 ~1.5 秒，確認這次的 `beginCharacterTurn` 包裝沒有破壞既有節奏
+
+**已知限制**：`console` 仍會印「找不到元素： autoSkillHome / autoEnabled /
+hpUsePctHome / spUsePctHome」這幾行——那是上面第 5 點查到的舊版主城自動
+面板殘留死程式碼在找已經不存在的元素，無害，這次沒有動它（清理它屬於
+獨立的技術債整理，不在這輪範圍）。
 
 ### 2026-08-26 — V133：經濟／養成全面重新設計（升級曲線、掛機EXP效率、經驗副本、精英/BOSS倍率、商店價格階級、藥水配置）
 

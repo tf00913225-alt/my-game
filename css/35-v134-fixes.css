@@ -1,0 +1,40 @@
+/*
+   V134 — 背包返回鍵。
+
+   ★ 原因：#inventoryPage 唯一的關閉鍵 #mapInventoryOverlayClose
+   在 css/00-main.css:5604 被寫死 display:none，只有
+   #inventoryPage.map-inventory-overlay-open 這個 class 在的時候
+   （也就是「從地圖頁開覆蓋層」那一種進入方式）才會顯示。
+   但背包有三種進入方式，下方導覽列那條（showPage('inventory')）
+   根本不會加這個 class，所以整個畫面完全沒有返回鍵。
+
+   這裡把樣式改成「只要在 #inventoryPage 裡就一律顯示」，
+   視覺（位置/配色/大小）完全沿用原本覆蓋層那組，不另外設計，
+   避免兩種進入方式看起來不一樣。
+*/
+
+#inventoryPage .map-inventory-overlay-close{
+    display:flex !important;
+    position:absolute;
+    top:4px;
+    right:5px;
+    z-index:8;
+    min-width:56px;
+    height:30px;
+    padding:0 10px;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #b98a3e;
+    border-radius:7px;
+    background:linear-gradient(180deg,#4a2d14,#23160c);
+    color:#ffe4a0;
+    font-size:12px;
+    font-weight:900;
+    line-height:1;
+    box-shadow:0 2px 8px rgba(0,0,0,.55);
+}
+
+#inventoryPage .map-inventory-overlay-close:active{
+    transform:scale(.95);
+    filter:brightness(1.12);
+}
