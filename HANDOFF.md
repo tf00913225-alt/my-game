@@ -381,8 +381,13 @@ V137 9/9、V138 10/10、V139 7/7、V140 14/14、V141 18/18、V142 14/14，
 共 72 項自動回歸全部通過。V142 專屬測試涵蓋普通／小／大技能時間、
 既有 1.6 秒節奏、自動戰鬥宣告階段、長動畫阻擋 initiative、重複完成、
 切背景恢復、200 次長戰鬥清理，以及極帝天尊三招。環境沒有 Chromium，
-所以 `tests/v138-browser-smoke.js` 明確略過；正式 Pages 部署與線上資源
-仍待本次推送後確認。
+所以 `tests/v138-browser-smoke.js` 明確略過。GitHub Pages 第 46 次部署已於
+2026-08-27 成功，正式 `main` 提交為 `de2e5f2a5096848f376f5be84818c0002ddf76a5`；
+線上 `?audit=142` 已確認外層 loader、V131～V142 共 12 個依序載入的版本補丁、
+`js/37-v142-skill-animation.js?v=142` 與
+`css/39-v142-skill-animation.css?v=142` 全部載入，沒有任何 runtime 標記失敗。
+線上頁面沒有新增遊戲來源的 console error／warning；檢查環境顯示的兩筆 error
+來自 Chrome 擴充套件，不屬於遊戲程式。
 
 ### 2026-08-27 — V141：36 項遊戲系統、戰鬥表現、深淵與合成整合
 
