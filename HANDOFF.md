@@ -398,8 +398,9 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 - `node --check` 已通過所有 V141 新增／修改 JS。
 - `tests/v137-regressions.test.js` 9 項、`v138` 10 項、`v139` 7 項、`v140` 14 項、
   新增 `tests/v141-system-expansion.test.js` 18 項，共 58 項全部通過。
-- `git diff --check` 通過。雲端瀏覽器無法連線容器 localhost，推送後須再從 GitHub Pages
-  公開網址做載入與 Console 檢查。
+- `git diff --check` 通過。正式 GitHub Pages 已完成部署驗證：`index.html` 正確載入
+  `js/00-main.js?v=141`、V141 三個 runtime 與 `css/38-v141-system-expansion.css`；
+  Console 沒有遊戲來源的 error／warning（僅雲端瀏覽器擴充套件自身訊息）。
 
 **已知限制：**
 
