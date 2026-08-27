@@ -1,0 +1,59 @@
+/* V139 — 休息經驗；沿用既有主城彈窗，不新增第二層捲動容器。 */
+.v139-rested-exp-panel{
+    position:relative;
+    margin-top:var(--space-md,12px);
+    padding:var(--space-md,12px) var(--space-lg,16px);
+    overflow:hidden;
+    color:var(--ui-text,#f4ead4);
+    border:1px solid rgba(200,154,72,.72);
+    border-color:color-mix(in srgb,var(--ui-gold,#c89a48) 72%,transparent);
+    border-radius:var(--radius-md,10px);
+    background:
+        linear-gradient(135deg,rgba(200,154,72,.13),transparent 52%),
+        rgba(23,19,15,.88);
+    box-shadow:inset 0 0 18px rgba(200,154,72,.07);
+}
+
+.v139-rested-exp-panel::before{
+    content:"";
+    position:absolute;
+    inset:0 auto 0 0;
+    width:4px;
+    background:linear-gradient(180deg,#f0c56f,#8c5b22);
+}
+
+.v139-rested-exp-heading{
+    color:var(--ui-gold,#c89a48);
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:.08em;
+}
+
+.v139-rested-exp-count{
+    display:flex;
+    align-items:baseline;
+    gap:var(--space-xs,4px);
+    margin-top:var(--space-xs,4px);
+}
+
+.v139-rested-exp-count strong{
+    color:#ffe3a3;
+    font-size:24px;
+    line-height:1.2;
+}
+
+.v139-rested-exp-count span,
+.v139-rested-exp-meta{
+    color:var(--ui-text-muted,#a99b83);
+    font-size:12px;
+}
+
+.v139-rested-exp-panel p{
+    margin:var(--space-sm,8px) 0;
+    font-size:13px;
+    line-height:1.55;
+}
+
+.v139-rested-exp-meta{
+    line-height:1.5;
+}

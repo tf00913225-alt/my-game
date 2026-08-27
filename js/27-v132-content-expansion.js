@@ -1831,15 +1831,12 @@
     }
 
     /*
-       ★ 修正（依照使用者要求，經驗副本結算公式重寫）：
-       原本用一個假想的getExpToNextLevel()函式（這個專案裡根本
-       不存在，之前只會落到「等級×100」這個隨便寫的備援值），
-       乘0.5當獎勵。使用者明確指出真正該用的是每個角色實際的
-       「升下一級所需總經驗」——這個數字本來就已經存在角色物件的
-       character.expNext欄位裡（見js/00-main.js的checkLevelUp()，
-       每次升級後expNext會更新成「下一級需要多少」）。新公式：
-       隊伍每個角色的expNext加總，再除以角色人數，不再乘0.5。
+       V139經驗副本基礎獎勵固定為「目前全隊升級需求平均值的11%」，
+       落在使用者指定的每日約10～12%區間。看廣告雙倍仍沿用既有
+       流程，因此一般領取約11%、雙倍領取約22%。
     */
+    const EXP_DUNGEON_REWARD_RATIO=0.11;
+
     function getExpDungeonRewardExp(){
         const indexes=getExistingPartyIndexes();
         if(indexes.length===0){ return 0; }
@@ -1848,9 +1845,10 @@
             if(!character){ return sum; }
             return sum+Math.max(0,Number(character.expNext)||0);
         },0);
-        return Math.floor(total/indexes.length);
+        return Math.floor((total/indexes.length)*EXP_DUNGEON_REWARD_RATIO);
     }
     window.v138GetExpDungeonRewardExp=getExpDungeonRewardExp;
+    window.v139GetExpDungeonRewardExp=getExpDungeonRewardExp;
 
     function showExpDungeonRewardModal(rewardExp){
         const html=
@@ -1906,7 +1904,7 @@
         }
         if(!confirmDungeonEntry(
             "經驗副本",
-            "將連續進行3場戰鬥，最終獎勵依目前全隊升級所需經驗的平均值計算。"
+            "將連續進行3場戰鬥，基礎獎勵為目前全隊升級需求平均值的11%。"
         )){
             return;
         }
@@ -2256,7 +2254,7 @@
             '<div class="v132-dungeon-list">'+
             dungeonEntryCard(
                 "exp","經驗副本","單一角色達到10級",
-                "全隊升下一級所需總經驗的平均值（廣告可雙倍）","v132BeginExpDungeon"
+                "全隊升下一級所需總經驗平均值的11%（廣告可雙倍）","v132BeginExpDungeon"
             )+
             dungeonEntryCard(
                 "material","材料副本","至少兩名角色達到20級",

@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="138";
+const V_ASSET_VERSION="139";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -364,6 +364,24 @@ function vAssetUrl(path){
     }
 })();
 
+/* V139 loader — rested EXP status panel. */
+(function loadV139RestedExperienceStyle(){
+    function load(){
+        if(document.getElementById("v139-rested-experience-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v139-rested-experience-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/37-v139-rested-experience.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -382,7 +400,8 @@ function vAssetUrl(path){
         {id:"v133-economy-rebalance-runtime",src:"js/28-v133-economy-rebalance.js"},
         {id:"v134-fixes-runtime",src:"js/29-v134-fixes.js"},
         {id:"v135-fixes-runtime",src:"js/30-v135-fixes.js"},
-        {id:"v136-auto-battle-fix-runtime",src:"js/31-v136-auto-battle-fix.js"}
+        {id:"v136-auto-battle-fix-runtime",src:"js/31-v136-auto-battle-fix.js"},
+        {id:"v139-rested-experience-runtime",src:"js/32-v139-rested-experience.js"}
     ];
 
     function next(index){

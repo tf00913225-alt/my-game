@@ -1071,11 +1071,20 @@
             /* 元素匣（自動掛機）只給70%EXP，金幣/掉落/材料不受影響
                （那些各自獨立的函式完全沒有被這裡動到）。 */
             const isElementBoxBattle=elementBoxActive;
+            let restedExpResult=null;
             if(isElementBoxBattle){
                 /* ★ 用Math.round不用Math.floor：700*0.7在浮點數運算下
                    會是489.999999...，Math.floor會誤差扣掉1點EXP，
                    Math.round才會正確算出490。 */
                 finalExp=Math.round(finalExp*ELEMENT_BOX_EXP_RATIO);
+            }else if(typeof window.v139TryConsumeRestedBattle==="function"){
+                /* V139休息經驗只允許一般練功戰鬥使用。副本勝利由
+                   js/27先攔截，不會走進這個一般winBattle wrapper；
+                   元素匣則在上面的分支明確排除，不會消耗場數。 */
+                restedExpResult=window.v139TryConsumeRestedBattle();
+                if(restedExpResult && restedExpResult.applied){
+                    finalExp=Math.round(finalExp*2);
+                }
             }
 
             const bonusExp=finalExp-flatExpGain;
@@ -1086,9 +1095,18 @@
                 addBattleLog(
                     (isElementBoxBattle
                         ? "戰鬥經驗（精英/BOSS加成＋3.5倍加成，元素匣掛機70%）："
+                        : restedExpResult && restedExpResult.applied
+                        ? "戰鬥經驗（精英/BOSS加成＋3.5倍加成＋休息經驗×2）："
                         : "戰鬥經驗（精英/BOSS加成＋3.5倍加成）：")+
                     "本場共 "+finalExp+" EXP。"
                 );
+                if(restedExpResult && restedExpResult.applied){
+                    addBattleLog(
+                        "休息經驗已生效，剩餘 "+
+                        restedExpResult.remainingBattles+
+                        " 場。"
+                    );
+                }
                 saveGame();
             }
             v131PendingExpToast=finalExp;

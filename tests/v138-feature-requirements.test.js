@@ -107,15 +107,16 @@ test("monster and player frames use element colors while names use rank colors",
     );
 });
 
-test("EXP dungeon reward averages every current character expNext without a ratio",()=>{
+test("EXP dungeon reward is 11% of the party's average current expNext",()=>{
     const players=[{expNext:50000},{expNext:60000}];
     const ctx=context({
         getExistingPartyIndexes:()=>[0,1],
         getPartyCharacterByIndex:index=>players[index]
     });
     vm.runInContext(extractFunction(v132Source,"getExpDungeonRewardExp"),ctx);
-    assert.equal(vm.runInContext("getExpDungeonRewardExp()",ctx),55000);
-    assert.doesNotMatch(v132Source,/EXP_DUNGEON_REWARD_RATIO/);
+    ctx.EXP_DUNGEON_REWARD_RATIO=0.11;
+    assert.equal(vm.runInContext("getExpDungeonRewardExp()",ctx),6050);
+    assert.match(v132Source,/const EXP_DUNGEON_REWARD_RATIO=0\.11/);
 });
 
 test("equipment dungeon creates one BOSS per player and fills five slots with elites",()=>{
@@ -178,9 +179,9 @@ test("set bonuses and skill costs are visible before extra detail clicks",()=>{
     assert.match(indexSource,/剩餘技能點：/);
 });
 
-test("V138 cache version reaches the loader and all dynamic assets",()=>{
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=138/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="138"/);
+test("current cache version reaches the loader and all dynamic assets",()=>{
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=139/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="139"/);
 });
 
 console.log("\nV138 feature suite: "+passed+" tests passed.");

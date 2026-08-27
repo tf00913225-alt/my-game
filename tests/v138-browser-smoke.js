@@ -109,7 +109,7 @@ async function seedParty(page){
         assert.ok(skillUi.costs.every(text=>/^學習需要 \d+ 技能點$/.test(text)));
 
         const expReward=await page.evaluate(()=>window.v138GetExpDungeonRewardExp());
-        assert.equal(expReward,55000);
+        assert.equal(expReward,6050);
 
         await page.evaluate(()=>{
             inventoryItems.length=0;

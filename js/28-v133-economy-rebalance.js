@@ -1,6 +1,6 @@
 /*
    V133 — 經濟／養成重新設計：
-   1. Lv.1~100升級曲線重做（長期單機養成節奏，不是快速衝滿等）
+   1. Lv.1~100升級曲線依各練功區實際平均EXP反推
    2. 怪物金幣掉落rank倍率調整（精英×2、BOSS×5，取代原本的×3/×8）
    3. 商店價格改成看「帳號內已建立角色的最高等級」決定階級倍率
    4. 藥水補品重新整理（新增30%階、商店下架100%階但保留道具資料）
@@ -20,52 +20,158 @@
        ===================================================== */
 
     /*
-       ★ 新增（依照使用者要求，重新設計升級曲線）：
-       原本checkLevelUp()裡expNext是「每次升級後，用舊的expNext
-       乘1.2（或至少+1）」這種複利型公式，早期還好，等級一高
-       會爆炸性成長、而且成長節奏完全不受控制（無法個別調整
-       某個等級區間要多快/多慢）。
+       V139不再用expNext×1.20，也不再用單一Lv^2.5公式猜產出。
+       每一級需求改成：
 
-       改成直接用「目標等級」算出一個平滑的公式：
-         expNext(Lv) = round(400 × Lv^2.5)
-       這是純粹的次方成長（不是逐級複利），本身就是平滑曲線，
-       而且指數2.5能自然做出「前期快、後期非常慢」的節奏，不用
-       為每個等級區間各自寫死一段。
+         該級練功區實際平均每場EXP × 該級目標有效戰鬥場數
 
-       ★ 校準依據（詳細算式見這次交接文件/PR說明，這裡摘要）：
-       - 假設「正常練功一場戰鬥」的平均EXP≈105×怪物等級
-         （對應現有機制：一般練功區平均3隻怪、每隻等級≈玩家
-         等級、每隻基礎EXP=等級×10、再套既有×3.5倍加成，
-         3×10×3.5=105，跟怪物等級同乘）。
-       - 用這個換算出Lv.1→100全程總戰鬥場數≈150,481場，
-         跟使用者要求的「總量約等同150,000場正常100%效率戰鬥」
-         幾乎完全吻合。
-       - 各區間換算出的場數分布（1~20約2,898場、21~40約13,006場、
-         41~60約27,476場、61~80約45,214場、81~100約61,886場）
-         本身就自然呈現「前期快、後期非常慢」，不需要另外分段
-         微調，81~100這個區間單獨就佔了全程超過4成的場數，
-         符合「Lv.90~100每級需要大量戰鬥」的要求。
-       - 用「1分鐘5場＋元素匣掛機只拿70%EXP＋每天掛8小時」反推
-         Lv.1→100所需天數≈89.6天，跟使用者要求的「約90天左右」
-         幾乎精確吻合；24小時掛機則約30天，超過「一兩週」的下限，
-         符合「24小時極端掛機也不應該一兩週滿等」的要求。
+       「實際平均」直接讀目前zoneConfig的六隻怪物，逐隻套用
+       等級×10、普通×1／精英×1.5／BOSS×3、現有EXP×3.5，
+       再乘上遭遇系統真正的平均怪物數（前兩區1～3隻平均2隻，
+       其餘區3～6隻平均4.5隻）。fallback只在測試或資料尚未
+       初始化時使用，數值同樣由目前main的怪物編成算出。
 
-       實際驗證數字（真的用Playwright測過，不是純理論）：
-       見這次PR說明／HANDOFF.md，這裡不重複貼一次。
+       目標場數用少量錨點線性插值，讓前期快、中期漸慢、後期
+       明顯變慢；Lv.1→100合計69,760場，Lv.99→100為4,000場。
     */
-    const EXP_CURVE_BASE=400;
-    const EXP_CURVE_EXPONENT=2.5;
     const MAX_CHARACTER_LEVEL=100;
+    const TRAINING_EXP_MULTIPLIER=3.5;
+
+    const TRAINING_ZONE_EXP_PROFILES=[
+        {minLevel:1,maxLevel:10,key:"forest",averageGroupSize:2,fallbackAverageExp:175},
+        {minLevel:11,maxLevel:20,key:"desert",averageGroupSize:2,fallbackAverageExp:1085},
+        {minLevel:21,maxLevel:30,key:"ice",averageGroupSize:4.5,fallbackAverageExp:4528},
+        {minLevel:31,maxLevel:40,key:"zone4",averageGroupSize:4.5,fallbackAverageExp:6484},
+        {minLevel:41,maxLevel:50,key:"zone5",averageGroupSize:4.5,fallbackAverageExp:8321},
+        {minLevel:51,maxLevel:60,key:"zone6",averageGroupSize:4.5,fallbackAverageExp:10159},
+        {minLevel:61,maxLevel:70,key:"zone7",averageGroupSize:4.5,fallbackAverageExp:11996},
+        {minLevel:71,maxLevel:80,key:"zone8",averageGroupSize:4.5,fallbackAverageExp:11760},
+        {minLevel:81,maxLevel:90,key:"zone9",averageGroupSize:4.5,fallbackAverageExp:13335},
+        {minLevel:91,maxLevel:99,key:"zone10",averageGroupSize:4.5,fallbackAverageExp:14910}
+    ];
+
+    const TARGET_BATTLE_ANCHORS=[
+        {level:1,battles:3},
+        {level:10,battles:15},
+        {level:20,battles:45},
+        {level:30,battles:100},
+        {level:40,battles:250},
+        {level:50,battles:400},
+        {level:60,battles:650},
+        {level:70,battles:900},
+        {level:80,battles:1200},
+        {level:90,battles:1700},
+        {level:95,battles:2600},
+        {level:98,battles:3500},
+        {level:99,battles:4000}
+    ];
+
     window.v133MaxLevel=MAX_CHARACTER_LEVEL;
 
-    function getExpNextForLevel(level){
+    function getCurveMonsterRankMultiplier(monster){
+        let rank="regular";
+        if(typeof getMonsterRank==="function"){
+            rank=getMonsterRank(monster);
+        }else if(monster && monster.rank){
+            rank=monster.rank;
+        }else if(monster && monster.name && monster.name.endsWith("王")){
+            rank="elite";
+        }
+        if(rank==="boss"){ return 3; }
+        if(rank==="elite"){ return 1.5; }
+        return 1;
+    }
+
+    function getTrainingExpProfile(level){
         const safeLevel=Math.min(
-            MAX_CHARACTER_LEVEL,
+            MAX_CHARACTER_LEVEL-1,
             Math.max(1,Math.floor(Number(level)||1))
         );
-        return Math.max(1,Math.round(EXP_CURVE_BASE*Math.pow(safeLevel,EXP_CURVE_EXPONENT)));
+        return TRAINING_ZONE_EXP_PROFILES.find(profile=>
+            safeLevel>=profile.minLevel && safeLevel<=profile.maxLevel
+        )||TRAINING_ZONE_EXP_PROFILES[TRAINING_ZONE_EXP_PROFILES.length-1];
+    }
+
+    function getTrainingZoneRoster(profile){
+        try{
+            if(typeof zoneConfig==="undefined" || !zoneConfig[profile.key]){
+                return null;
+            }
+            const source=zoneConfig[profile.key].monsters;
+            const roster=typeof source==="function" ? source() : source;
+            return Array.isArray(roster) && roster.length>0 ? roster : null;
+        }catch(_){
+            return null;
+        }
+    }
+
+    function getTrainingZoneAverageExpForLevel(level){
+        const profile=getTrainingExpProfile(level);
+        const roster=getTrainingZoneRoster(profile);
+        if(!roster){ return profile.fallbackAverageExp; }
+
+        const averageWeightedMonsterExp=roster.reduce((sum,monster)=>{
+            if(!monster){ return sum; }
+            const monsterLevel=Math.max(1,Number(monster.level)||1);
+            return sum+monsterLevel*10*getCurveMonsterRankMultiplier(monster);
+        },0)/roster.length;
+
+        return Math.max(
+            1,
+            Math.round(
+                averageWeightedMonsterExp*
+                profile.averageGroupSize*
+                TRAINING_EXP_MULTIPLIER
+            )
+        );
+    }
+
+    function getTargetBattlesForLevel(level){
+        const safeLevel=Math.min(
+            MAX_CHARACTER_LEVEL-1,
+            Math.max(1,Math.floor(Number(level)||1))
+        );
+        if(safeLevel<=TARGET_BATTLE_ANCHORS[0].level){
+            return TARGET_BATTLE_ANCHORS[0].battles;
+        }
+        for(let index=1;index<TARGET_BATTLE_ANCHORS.length;index++){
+            const right=TARGET_BATTLE_ANCHORS[index];
+            if(safeLevel>right.level){ continue; }
+            const left=TARGET_BATTLE_ANCHORS[index-1];
+            const progress=(safeLevel-left.level)/(right.level-left.level);
+            return Math.max(
+                1,
+                Math.round(left.battles+(right.battles-left.battles)*progress)
+            );
+        }
+        return TARGET_BATTLE_ANCHORS[TARGET_BATTLE_ANCHORS.length-1].battles;
+    }
+
+    function getExpNextForLevel(level){
+        return Math.max(
+            1,
+            Math.round(
+                getTrainingZoneAverageExpForLevel(level)*
+                getTargetBattlesForLevel(level)
+            )
+        );
     }
     window.v133GetExpNextForLevel=getExpNextForLevel;
+    window.v139GetTrainingZoneAverageExpForLevel=getTrainingZoneAverageExpForLevel;
+    window.v139GetTargetBattlesForLevel=getTargetBattlesForLevel;
+    window.v139GetExpCurveAudit=function(){
+        const checkpoints=[10,30,50,70,80,90,99].map(level=>({
+            level:level,
+            averageBattleExp:getTrainingZoneAverageExpForLevel(level),
+            targetBattles:getTargetBattlesForLevel(level),
+            expNext:getExpNextForLevel(level)
+        }));
+        let totalEffectiveBattles=0;
+        for(let level=1;level<MAX_CHARACTER_LEVEL;level++){
+            totalEffectiveBattles+=getTargetBattlesForLevel(level);
+        }
+        return {totalEffectiveBattles:totalEffectiveBattles,checkpoints:checkpoints};
+    };
 
     function recalibrateCharacterExpNext(character){
         if(!character){ return; }
@@ -256,19 +362,25 @@
 
     /*
        ★ 新增（依照使用者要求，「請根據目前10%與50%的基礎價格
-       補出合理中間價格...讓大容量藥水有一點單位價格優惠」）：
-       10%單位價最貴（方便）、50%單位價最划算（但單瓶最貴）、
-       30%取中間——用10%跟50%兩點的「每%單價」線性內插算出
-       30%那一點的每%單價，再乘30算出價格，最後湊整到5的倍數。
-       HP：10%單價20/10=2.0、50%單價80/50=1.6，內插30%≈1.8→54
-       湊整成55；SP：10%單價25/10=2.5、50%單價100/50=2.0，
-       內插30%≈2.25→68湊整成70。這裡直接把新定義push進既有的
+       補出指定的30%階」）：HP 30%=50、SP 30%=65。這裡直接把
+       新定義push進既有的
        potionDefinitions陣列（同一個陣列參照，背包/戰鬥道具欄/
        商店本來就都是讀這個陣列，不用另外改讀取端）。
     */
+    const SHOP_POTION_BASE_PRICES={
+        hpPotion10:20,
+        hpPotion30:50,
+        hpPotion50:80,
+        spPotion10:25,
+        spPotion30:65,
+        spPotion50:100
+    };
+    const SHOP_POTION_IDS=Object.keys(SHOP_POTION_BASE_PRICES);
+
     if(typeof potionDefinitions!=="undefined" && Array.isArray(potionDefinitions)){
-        if(!potionDefinitions.some(p=>p && p.id==="hpPotion30")){
-            potionDefinitions.push({
+        let hpPotion30=potionDefinitions.find(p=>p && p.id==="hpPotion30");
+        if(!hpPotion30){
+            hpPotion30={
                 id:"hpPotion30",
                 name:"回復30%HP藥水",
                 shortName:"HP 30%",
@@ -276,12 +388,16 @@
                 type:"potion",
                 resource:"hp",
                 recoveryPercent:30,
-                price:55,
+                price:50,
                 stats:{}
-            });
+            };
+            potionDefinitions.push(hpPotion30);
         }
-        if(!potionDefinitions.some(p=>p && p.id==="spPotion30")){
-            potionDefinitions.push({
+        hpPotion30.price=50;
+
+        let spPotion30=potionDefinitions.find(p=>p && p.id==="spPotion30");
+        if(!spPotion30){
+            spPotion30={
                 id:"spPotion30",
                 name:"回復30%SP藥水",
                 shortName:"SP 30%",
@@ -289,10 +405,20 @@
                 type:"potion",
                 resource:"sp",
                 recoveryPercent:30,
-                price:70,
+                price:65,
                 stats:{}
-            });
+            };
+            potionDefinitions.push(spPotion30);
         }
+        spPotion30.price=65;
+
+        /* 六種一般商店藥水的基礎價是正式規格。即使舊資料或其他
+           補丁曾改過價錢，載入V139時也會回到這份唯一價格表。 */
+        potionDefinitions.forEach(item=>{
+            if(item && Object.prototype.hasOwnProperty.call(SHOP_POTION_BASE_PRICES,item.id)){
+                item.price=SHOP_POTION_BASE_PRICES[item.id];
+            }
+        });
     }
 
     /*
@@ -312,7 +438,9 @@
     */
     function getShoppablePotions(){
         if(typeof potionDefinitions==="undefined" || !Array.isArray(potionDefinitions)){ return []; }
-        return potionDefinitions.filter(item=>item && item.recoveryPercent<100);
+        return SHOP_POTION_IDS
+            .map(itemId=>potionDefinitions.find(item=>item && item.id===itemId))
+            .filter(Boolean);
     }
 
     if(typeof renderShopContent==="function"){
@@ -370,7 +498,7 @@
     if(typeof buyShopItem==="function"){
         buyShopItem=function(itemId,requestedQuantity){
             const shopItem=typeof getPotionDefinition==="function" ? getPotionDefinition(itemId) : null;
-            if(!shopItem || shopItem.recoveryPercent>=100){ return; }
+            if(!shopItem || !SHOP_POTION_IDS.includes(itemId)){ return; }
 
             const unitPrice=getShopItemPrice(shopItem);
             if(!Number.isFinite(unitPrice)){
