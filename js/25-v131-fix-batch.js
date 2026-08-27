@@ -3,15 +3,23 @@
     "use strict";
 
     /*
-       ★ 修正（依照使用者要求，節奏調整歷程）：
-       1300 →（「固定為1.5秒」）1500 →（「所有出手、回合間隔
-       都調整至1.25秒」）1250。
-       這個常數同時控制「同一回合內每一位角色/怪物出手之間」
-       跟（配合下面 startResolutionPhase/processNextCombatant
-       的包裝）「進入戰鬥→第一位出手」「新回合開始→第一位出手」
-       這三種間隔，改這一個數字就會整場戰鬥一致。
+       ★ V138：節奏拆成兩個明確規則。
+       - 每一位有效角色／怪物出手後，等 1.6 秒才輪下一位。
+       - 一整輪最後一位出手到下一輪第一位出手，總共固定 2 秒。
+
+       舊版共用一個 1.25 秒常數，而且已死亡的佇列成員仍會逐個
+       呼叫 finishPlayerAction()、每個再多等一次，尾端剛好有
+       2～3 個死亡成員時就會累積成玩家感受到的 3～5 秒。
+       V138 會在排程前一次略過所有已死亡空位。2 秒總轉場由
+       0.4 秒的回合交接＋1.6 秒的首位出手等待組成，不會錯疊成
+       2+1.6＝3.6 秒，也不會再隨死亡數量越拖越久。
     */
-    const V131_RESOLVE_DELAY_MS=1250;
+    const V138_ACTION_DELAY_MS=1600;
+    const V138_ROUND_TRANSITION_MS=2000;
+    const V138_ROUND_HANDOFF_DELAY_MS=Math.max(
+        0,
+        V138_ROUND_TRANSITION_MS-V138_ACTION_DELAY_MS
+    );
     const V131_MONSTER_STRENGTH=1.30;
     const V131_EXP_MULTIPLIER=3.5;
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;
@@ -37,12 +45,54 @@
         return 1;
     }
 
+    function getFormationRankWeight(monsterIndex){
+        const monster=monsters[monsterIndex];
+        const rank=getMonsterRank(monster);
+        if(rank==="boss"){ return 3; }
+        if(rank==="elite"){ return 2; }
+        return 1;
+    }
+
+    function arrangeRowCenterFirst(monsterIndexes){
+        const ranked=(monsterIndexes||[]).slice();
+        const arranged=new Array(ranked.length);
+        const centerOrder=[];
+        const leftCenter=Math.floor((ranked.length-1)/2);
+        const rightCenter=Math.ceil((ranked.length-1)/2);
+
+        centerOrder.push(leftCenter);
+        if(rightCenter!==leftCenter){ centerOrder.push(rightCenter); }
+        for(let distance=1;centerOrder.length<ranked.length;distance++){
+            const left=leftCenter-distance;
+            const right=rightCenter+distance;
+            if(left>=0){ centerOrder.push(left); }
+            if(right<ranked.length){ centerOrder.push(right); }
+        }
+
+        ranked.forEach((monsterIndex,priorityIndex)=>{
+            arranged[centerOrder[priorityIndex]]=monsterIndex;
+        });
+        return arranged;
+    }
+
     function getFormationRows(indexes){
-        const list=(indexes||[]).slice(0,10);
-        const n=list.length;
-        if(n<=5){ return [list,[]]; }
-        if(n===6){ return [list.slice(0,3),list.slice(3,6)]; }
-        return [list.slice(0,5),list.slice(5,10)];
+        const originalOrder=(indexes||[]).slice(0,10);
+        const stablePosition=new Map(originalOrder.map((index,position)=>[index,position]));
+        const ranked=originalOrder.slice().sort((a,b)=>{
+            const rankDifference=getFormationRankWeight(b)-getFormationRankWeight(a);
+            return rankDifference || stablePosition.get(a)-stablePosition.get(b);
+        });
+        const n=ranked.length;
+        const rowSizes=n<=5 ? [n] : (n===6 ? [3,3] : [5,n-5]);
+        const rows=[];
+        let cursor=0;
+
+        rowSizes.forEach(size=>{
+            rows.push(arrangeRowCenterFirst(ranked.slice(cursor,cursor+size)));
+            cursor+=size;
+        });
+        while(rows.length<2){ rows.push([]); }
+        return rows;
     }
 
     function currentFormationRows(){
@@ -55,6 +105,29 @@
         const hours=Math.floor(totalMinutes/60);
         const minutes=totalMinutes%60;
         return hours+"小時 "+minutes+"分鐘";
+    }
+
+    function isInitiativeEntryActive(entry){
+        if(!entry){ return false; }
+        if(entry.type==="player"){
+            const character=getPartyCharacterByIndex(entry.characterIndex);
+            return !!(character && character.hp>0);
+        }
+        if(entry.type==="monster"){
+            const monster=monsters[entry.monsterIndex];
+            return !!(monster && monster.alive);
+        }
+        return false;
+    }
+
+    function skipInactiveInitiativeEntries(){
+        while(
+            initiativeIndex<initiativeQueue.length &&
+            !isInitiativeEntryActive(initiativeQueue[initiativeIndex])
+        ){
+            processedInitiativeIndexes.add(initiativeIndex);
+            initiativeIndex++;
+        }
     }
 
     if(typeof finishPlayerAction==="function"){
@@ -79,8 +152,12 @@
                 },BATTLE_DECLARE_ADVANCE_MS);
                 return;
             }
-
             initiativeIndex++;
+            skipInactiveInitiativeEntries();
+            const delayMs=
+                initiativeIndex>=initiativeQueue.length
+                ? V138_ROUND_HANDOFF_DELAY_MS
+                : V138_ACTION_DELAY_MS;
             battleAdvanceTimeoutId=setTimeout(()=>{
                 battleAdvanceTimeoutId=null;
                 battleAdvanceScheduled=false;
@@ -97,17 +174,15 @@
                     initiativeIndex++;
                     processNextCombatant(token);
                 }
-            },V131_RESOLVE_DELAY_MS);
+            },delayMs);
         };
     }
 
     /*
-       ★ 新增（依照使用者要求，「怪物之間的出手時間也調為1.5秒」，
-       完整節奏：進入戰鬥＞1.5秒＞玩家1出手＞1.5秒＞玩家2出手＞
-       1.5秒＞野怪1＞1.5秒＞野怪2＞1.5秒＞下一回合開始＞1.5秒＞
-       玩家1出手……）：
+       首位出手也套用跟一般有效出手相同的 1.6 秒節奏：
+       進入戰鬥／新回合開始後，第一位實際行動者不會立即跳出。
        上面finishPlayerAction()的override已經確保「同一大回合內、
-       每一位角色/怪物實際出手之間」都固定等V131_RESOLVE_DELAY_MS，
+       每一位角色/怪物實際出手之間」都固定等V138_ACTION_DELAY_MS，
        但漏了兩個時間點——「進入戰鬥」到「這一回合第一位出手」、
        跟「下一回合開始」到「新回合第一位出手」——這兩個時間點
        原本都是宣告階段一結束，startResolutionPhase()馬上同步呼叫
@@ -117,29 +192,28 @@
        這裡不改寫startResolutionPhase()本體（避免重做一套複雜的
        結算階段初始化邏輯），改成標記法：startResolutionPhase()
        被呼叫的當下，設一個旗標記住「等一下processNextCombatant()
-       第一次被呼叫時，要先補這1.5秒的停頓」；processNextCombatant()
+       第一次被呼叫時，要先補這段停頓」；processNextCombatant()
        這邊只在偵測到這個旗標時，才把「真正執行」包進
-       setTimeout(...,V131_RESOLVE_DELAY_MS)裡延後，消費掉旗標後
+       setTimeout(...,V138_ACTION_DELAY_MS)裡延後，消費掉旗標後
        就不會再影響同一回合裡後面正常的呼叫（那些已經各自被
-       finishPlayerAction()的1.5秒排程過了，不會被這裡重複延遲）。
+       finishPlayerAction()的排程過了，不會被這裡重複延遲）。
     */
     let v131PendingFirstResolveDelay=false;
 
     /*
-       ★ 新增（依照使用者要求「把所有出手、回合間隔都調整至1.25秒」）：
+       首位出手的等待要扣除宣告階段已花掉的時間：
        只把上面那個「第一位出手前補一段延遲」寫死成
-       V131_RESOLVE_DELAY_MS 是不夠準的——宣告階段本身也會花時間
+       V138_ACTION_DELAY_MS 是不夠準的——宣告階段本身也會花時間
        （每個自動角色會經過 beginCharacterTurn 的 150ms 自動出手延遲，
        加上 finishPlayerAction 宣告分支的 BATTLE_DECLARE_ADVANCE_MS
        90ms），所以「回合開始 → 第一位出手」實際上會變成
-       1250 + 240 ≈ 1500ms，跟其他每一步的 1250ms 對不齊，實測就是
-       這樣（第一步 1507ms、後面每步 1255ms）。
+       如果直接再等完整 1600ms，會讓第一位比後續出手多等宣告時間。
 
        改成以「這一回合開始的時間點」為錨：等待時間 =
-       1250 - (宣告階段已經花掉的時間)，不足就不再等。這樣不管隊伍
+       1600 - (宣告階段已經花掉的時間)，不足就不再等。這樣不管隊伍
        有幾個自動角色、宣告階段花多久，玩家看到的
-       「第N回合開始 → 第一位出手」都會剛好是 1.25 秒。
-       如果宣告階段本身就超過 1.25 秒（例如手動角色思考很久），
+       「第N回合開始 → 第一位出手」都會以 1.6 秒為目標。
+       如果宣告階段本身就超過 1.6 秒（例如手動角色思考很久），
        等待會變成 0，玩家一按完就馬上結算，不會再無謂地多等。
     */
     let v131TurnStartedAt=0;
@@ -164,7 +238,7 @@
                呼叫原本函式「之前」就無條件把旗標設成true，遇到
                這種「重複呼叫、原本函式其實什麼都沒做」的情況，
                旗標還是會被錯誤地重新架上，導致之後某個不相關的
-               processNextCombatant()呼叫被多延遲了一次1.5秒
+               processNextCombatant()呼叫被多延遲一次
                （量測到同一回合內兩位角色間距變成3秒的雙倍延遲）。
                這裡改成先複製原本函式自己的判斷條件，只有「這次
                呼叫真的會執行」時才架旗標，跟原本函式的行為完全
@@ -184,9 +258,9 @@
                 v131PendingFirstResolveDelay=false;
 
                 /* 扣掉宣告階段已經花掉的時間，讓「回合開始→第一位
-                   出手」剛好等於 V131_RESOLVE_DELAY_MS。 */
+                   出手」剛好等於 V138_ACTION_DELAY_MS。 */
                 const elapsed=v131TurnStartedAt>0 ? (Date.now()-v131TurnStartedAt) : 0;
-                const wait=Math.max(0,V131_RESOLVE_DELAY_MS-elapsed);
+                const wait=Math.max(0,V138_ACTION_DELAY_MS-elapsed);
 
                 setTimeout(()=>{
                     if(!battleActive || token!==battleToken){ return; }
@@ -233,7 +307,13 @@
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battleMonster"+index);
-            if(card){ cards.set(index,card); }
+            if(card){
+                const monster=monsters[index];
+                const rank=getMonsterRank(monster);
+                card.dataset.element=(monster && monster.element)||"unknown";
+                card.dataset.rank=rank==="boss" ? "boss" : (rank==="elite" ? "elite" : "regular");
+                cards.set(index,card);
+            }
         });
         area.innerHTML="";
         area.classList.add("v131-formation");
@@ -250,6 +330,16 @@
         });
     }
 
+    function applyPlayerElementFrames(){
+        getExistingPartyIndexes().forEach(characterIndex=>{
+            const character=getPartyCharacterByIndex(characterIndex);
+            const card=document.getElementById("battlePlayerCard"+characterIndex);
+            if(card){
+                card.dataset.element=(character && character.element)||"unknown";
+            }
+        });
+    }
+
     let elementBoxBattleStartGold=null;
     let elementBoxBattleStartExp=null;
 
@@ -258,10 +348,18 @@
         renderBattle=function(){
             originalRenderBattle.apply(this,arguments);
             applyBattleFormation();
+            applyPlayerElementFrames();
             elementBoxBattleStartGold=Math.max(0,Number(gold)||0);
             elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
         };
     }
+
+    window.v138GetFormationRows=getFormationRows;
+    window.v138BattlePacing={
+        actionDelayMs:V138_ACTION_DELAY_MS,
+        roundDelayMs:V138_ROUND_TRANSITION_MS,
+        roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS
+    };
 
     function strengthenMonster(monster){
         if(!monster || monster._v131StrengthApplied){ return; }
@@ -482,16 +580,39 @@
         const list=document.getElementById("allSkillsList");
         if(!list){ return; }
         list.querySelectorAll(".skill-row").forEach(row=>{
-            if(row.querySelector(".v131-skill-kind")){ return; }
             const skillId=extractSkillIdFromRow(row);
             const skill=skillId && skillDatabase[skillId];
-            if(!skill || !["physical","magic"].includes(skill.category)){ return; }
-            const badge=document.createElement("span");
-            badge.className="v131-skill-kind "+skill.category;
-            badge.textContent=skill.category==="physical" ? "物理" : "法術";
-            const textHost=row.querySelector(".skill-row-text b,strong,.skill-name,.skill-row-name") || row;
-            if(textHost===row){ row.insertBefore(badge,row.firstChild); }
-            else{ textHost.insertAdjacentElement("afterend",badge); }
+            if(!skill){ return; }
+
+            if(
+                ["physical","magic"].includes(skill.category) &&
+                !row.querySelector(".v131-skill-kind")
+            ){
+                const badge=document.createElement("span");
+                badge.className="v131-skill-kind "+skill.category;
+                badge.textContent=skill.category==="physical" ? "物理" : "法術";
+                const nameHost=row.querySelector(".skill-row-text b,strong,.skill-name,.skill-row-name") || row;
+                if(nameHost===row){ row.insertBefore(badge,row.firstChild); }
+                else{ nameHost.insertAdjacentElement("afterend",badge); }
+            }
+
+            const loadout=characterSkillLoadouts[currentSkillCharacter];
+            const learnedLevel=
+                loadout && loadout.skillLevels
+                ? Math.max(0,Number(loadout.skillLevels[skillId])||0)
+                : 0;
+            const textHost=row.querySelector(".skill-row-text");
+            if(
+                learnedLevel===0 &&
+                textHost &&
+                !textHost.querySelector(".v138-skill-learn-cost")
+            ){
+                const cost=document.createElement("span");
+                cost.className="v138-skill-learn-cost";
+                cost.textContent="學習需要 "+Math.max(0,Number(skill.learnCost)||0)+" 技能點";
+                const detailLink=textHost.querySelector(".skill-row-detail-link");
+                textHost.insertBefore(cost,detailLink||null);
+            }
         });
     }
 

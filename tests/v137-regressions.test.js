@@ -124,8 +124,8 @@ test("runtime patch loader strictly waits for each prior script",()=>{
     };
     const context=makeContext({
         document,
-        V_ASSET_VERSION:"137",
-        vAssetUrl:path=>path+"?v=137",
+        V_ASSET_VERSION:"138",
+        vAssetUrl:path=>path+"?v=138",
         setTimeout:handler=>handler()
     });
 
@@ -355,10 +355,10 @@ test("auto battle keeps a valid selected skill instead of silently queuing norma
     assert.equal(vm.runInContext("v136GetAutoBattleDecision(0).kind",context),"skill");
 });
 
-test("V137 source invariants remain wired to the deployed entry points",()=>{
+test("V137 regressions remain wired through the current deployed entry points",()=>{
     assert.match(indexSource,/js\/00-main\.js\?v=137/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=137/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="137"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=138/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="138"/);
     assert.match(v133Source,/const MAX_CHARACTER_LEVEL=100/);
     assert.doesNotMatch(mainSource,/safeBind\(\s*["'](?:autoEnabled|autoSkillHome|hpUsePctHome|spUsePctHome)/);
     assert.doesNotMatch(v132Source,/const result=originalLoseBattle\.apply/);

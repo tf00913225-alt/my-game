@@ -106,6 +106,21 @@
     text-align:left;
 }
 
+.v132-preview-list-scroll{
+    max-height:280px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+}
+
+.v132-preview-section-title{
+    margin:10px 0 6px;
+    color:#ffe08a;
+    font-size:14px;
+    font-weight:800;
+    text-align:left;
+}
+
 .v132-preview-row{
     display:flex;
     justify-content:space-between;
@@ -116,6 +131,18 @@
     background:#2a2013;
     color:#f5ecd9;
     font-size:13px;
+}
+
+.v132-preview-row-main{
+    display:flex;
+    align-items:center;
+    min-width:0;
+    gap:8px;
+}
+
+.v132-preview-row > b{
+    flex:0 0 auto;
+    color:#ffc46b;
 }
 
 .v132-preview-grid{
@@ -138,6 +165,16 @@
     background:#2a2013;
     color:#f5ecd9;
     font-size:13px;
+}
+
+.v132-preview-item-name{
+    flex:1 1 auto;
+    min-width:0;
+}
+
+.v132-preview-item > b{
+    flex:0 0 auto;
+    color:#ffc46b;
 }
 
 .v132-preview-icon{

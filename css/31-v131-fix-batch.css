@@ -54,9 +54,88 @@
     background-color:transparent !important;
 }
 
-#game-stage #battlePage .battle-player{
-    border:2px solid #d8aa36 !important;
-    box-shadow:0 0 0 1px rgba(255,226,122,.18),0 4px 12px rgba(0,0,0,.42) !important;
+/* V138：角色與怪物卡片外框一律依元素辨識，不再使用共用黃色框。 */
+#game-stage #battlePage .battle-player,
+#game-stage #battlePage .battle-monster{
+    --v138-element-color:#94a3b8;
+    --v138-element-glow:rgba(148,163,184,.45);
+}
+
+#game-stage #battlePage [data-element="fire"]{
+    --v138-element-color:#ff5b4d;
+    --v138-element-glow:rgba(255,91,77,.52);
+}
+
+#game-stage #battlePage [data-element="water"]{
+    --v138-element-color:#4da3ff;
+    --v138-element-glow:rgba(77,163,255,.52);
+}
+
+#game-stage #battlePage [data-element="wind"]{
+    --v138-element-color:#42d6a4;
+    --v138-element-glow:rgba(66,214,164,.5);
+}
+
+#game-stage #battlePage [data-element="earth"]{
+    --v138-element-color:#a86f43;
+    --v138-element-glow:rgba(168,111,67,.52);
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player{
+    border:2px solid var(--v138-element-color) !important;
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,.12),
+        0 0 10px var(--v138-element-glow),
+        0 4px 12px rgba(0,0,0,.42) !important;
+}
+
+#game-stage #battlePage .battle-monster{
+    border:2px solid var(--v138-element-color) !important;
+    box-shadow:0 0 8px var(--v138-element-glow) !important;
+}
+
+#game-stage #battlePage .battle-monster.target{
+    border-color:var(--v138-element-color) !important;
+    box-shadow:
+        0 0 0 2px rgba(255,255,255,.86),
+        0 0 12px var(--v138-element-glow) !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player.active-turn::after{
+    border-color:var(--v138-element-color) !important;
+    animation:v138ElementTurnFrameFlash .34s linear infinite !important;
+}
+
+@keyframes v138ElementTurnFrameFlash{
+    0%,100%{
+        opacity:1;
+        box-shadow:
+            0 0 0 1px rgba(255,255,255,.26),
+            0 0 11px 3px var(--v138-element-glow);
+    }
+    50%{
+        opacity:.42;
+        box-shadow:
+            0 0 0 2px rgba(255,255,255,.72),
+            0 0 21px 7px var(--v138-element-glow);
+    }
+}
+
+/* 怪物名稱只負責強度識別：野怪白、精英橘、BOSS桃粉。 */
+#game-stage #battlePage .battle-monster-name{
+    color:#f8fafc !important;
+    font-weight:800 !important;
+    text-shadow:0 1px 3px #000 !important;
+}
+
+#game-stage #battlePage .battle-monster[data-rank="elite"] .battle-monster-name{
+    color:#ff9f43 !important;
+    text-shadow:0 0 5px rgba(255,159,67,.62),0 1px 3px #000 !important;
+}
+
+#game-stage #battlePage .battle-monster[data-rank="boss"] .battle-monster-name{
+    color:#ff5fa2 !important;
+    text-shadow:0 0 6px rgba(255,95,162,.7),0 1px 3px #000 !important;
 }
 
 #game-stage #homeFeatureModal .home-feature-modal-box.wide{
@@ -134,6 +213,52 @@
     padding:6px 8px !important;
     font-size:12px !important;
     line-height:1.3 !important;
+}
+
+/* V138：剩餘技能點改成高對比資訊條，未點詳細也能看到學習成本。 */
+#game-stage #skillPage .v138-skill-point-summary{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+    border:2px solid #e8a93c !important;
+    background:linear-gradient(135deg,#2d1d0d,#120e09) !important;
+    color:#f5ecd9 !important;
+    font-size:15px !important;
+    font-weight:800 !important;
+    box-shadow:0 0 12px rgba(232,169,60,.28) !important;
+}
+
+#game-stage #skillPage #skillPoints{
+    display:inline-flex !important;
+    min-width:52px !important;
+    min-height:34px !important;
+    align-items:center !important;
+    justify-content:center !important;
+    padding:2px 10px !important;
+    border-radius:999px !important;
+    background:#e8a93c !important;
+    color:#17100a !important;
+    font-size:22px !important;
+    line-height:1 !important;
+    box-shadow:0 0 10px rgba(255,224,138,.45) !important;
+}
+
+#game-stage #allSkillsList .v138-skill-learn-cost{
+    display:flex !important;
+    width:max-content !important;
+    max-width:100% !important;
+    margin-top:4px !important;
+    margin-right:6px !important;
+    padding:2px 7px !important;
+    border:1px solid #d88a32 !important;
+    border-radius:999px !important;
+    background:#301b0a !important;
+    color:#ffc46b !important;
+    font-size:11px !important;
+    line-height:1.35 !important;
+    font-weight:800 !important;
+    white-space:nowrap !important;
 }
 
 .v131-skill-kind{

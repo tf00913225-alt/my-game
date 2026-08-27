@@ -1131,23 +1131,51 @@
        什麼」——重用既有的v132ShowRewardModal彈窗，不用另外做
        一整套新UI。
     */
+    function formatPreviewProbability(value){
+        const rounded=Math.round(Number(value)*10)/10;
+        return (Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1))+"%";
+    }
+
+    function previewRow(icon,name,amount,probability){
+        return (
+            '<div class="v132-preview-row">'+
+            '<span class="v132-preview-row-main">'+
+            (icon ? '<span class="v132-preview-icon">'+icon+'</span>' : '')+
+            '<span>'+escapeHtml(name)+(amount ? ' ×'+amount : '')+'</span>'+
+            '</span>'+
+            '<b>'+formatPreviewProbability(probability)+'</b>'+
+            '</div>'
+        );
+    }
+
     function showItemPreview(item){
         if(!item){ return; }
         let html;
 
         if(item.type==="chest"){
-            const rows=CHEST_TIER_WEIGHTS.map(tier=>
-                '<div class="v132-preview-row">'+
-                '<span>'+tier.label+'礦石／'+tier.label+'裝備設計圖紙</span>'+
-                '<span>'+tier.weight+'%</span>'+
-                '</div>'
-            ).join("");
+            const oreRows=CHEST_TIER_WEIGHTS.map(tier=>{
+                const oreDef=getOreDefinition(
+                    "ore"+tier.key.charAt(0).toUpperCase()+tier.key.slice(1)
+                );
+                const amount=tier.key==="perfect" ? 5 : 10;
+                return oreDef ? previewRow(oreDef.icon,oreDef.name,amount,tier.weight) : "";
+            }).join("");
+            const blueprintRows=CHEST_TIER_WEIGHTS.map(tier=>{
+                const pool=getBlueprintDefinitionsByTier(tier.key);
+                const eachChance=pool.length ? tier.weight/pool.length : 0;
+                const amount=tier.key==="perfect" ? 5 : 10;
+                return pool.map(definition=>
+                    previewRow(definition.icon,definition.name,amount,eachChance)
+                ).join("");
+            }).join("");
             html=
                 '<div class="v132-reward-modal-inner">'+
                 '<h3>'+escapeHtml(item.name)+' 開啟預覽</h3>'+
-                '<p>開啟1個寶箱，會各自獨立擲一次礦石階級與裝備設計圖紙階級'+
-                '（礦石為對應階級固定1種，設計圖紙則是該階級5個部位裡隨機1種）：</p>'+
-                '<div class="v132-preview-list">'+rows+'</div>'+
+                '<p>每次開啟會各獲得1組礦石與1種裝備設計圖；兩類獎勵分開抽取。</p>'+
+                '<div class="v132-preview-section-title">可能獲得的礦石</div>'+
+                '<div class="v132-preview-list">'+oreRows+'</div>'+
+                '<div class="v132-preview-section-title">可能獲得的裝備設計圖</div>'+
+                '<div class="v132-preview-list v132-preview-list-scroll">'+blueprintRows+'</div>'+
                 '<div class="v132-reward-actions">'+
                 '<button type="button" onclick="v132CloseRewardModal()">關閉</button>'+
                 '</div></div>';
@@ -1155,17 +1183,19 @@
         else if(item.type==="ticket"){
             const ticketDef=getTicketDefinition(item.id);
             const pieces=ticketDef ? getEquipmentSetItemDefinitions(ticketDef.setId) : [];
+            const chance=pieces.length ? 100/pieces.length : 0;
             const grid=pieces.map(p=>
                 '<div class="v132-preview-item">'+
                 '<span class="v132-preview-icon">'+p.icon+'</span>'+
-                '<span>'+escapeHtml(p.name)+'</span>'+
+                '<span class="v132-preview-item-name">'+escapeHtml(p.name)+'</span>'+
+                '<b>'+formatPreviewProbability(chance)+'</b>'+
                 '</div>'
             ).join("");
             html=
                 '<div class="v132-reward-modal-inner">'+
                 '<h3>'+escapeHtml(item.name)+' 開啟預覽</h3>'+
                 '<p>開啟後，從以下10件['+(ticketDef ? getSetLabel(ticketDef.setId) : "")+']套裝部位中'+
-                '隨機獲得1件（每件機率相同，各10%）：</p>'+
+                '隨機獲得1件：</p>'+
                 '<div class="v132-preview-grid">'+grid+'</div>'+
                 '<div class="v132-reward-actions">'+
                 '<button type="button" onclick="v132CloseRewardModal()">關閉</button>'+
@@ -1184,9 +1214,8 @@
        按鈕——這幾種東西不是藥水（不走usePotion()那條路）、
        也不是裝備（不能穿戴），原本的itemEquipButton在這幾種
        類型上只會被判成「不可裝備」整個鎖死但還是顯示著，這裡
-       依照使用者要求（寶箱/抽獎券點開只會看到「開啟/預覽/
-       出售」三顆按鈕），把穿戴鍵直接整個藏起來，另外接「開啟」
-       跟「預覽」兩顆按鈕上去。
+       依照 V138 最新規格，寶箱/抽獎券點開只顯示「開啟／預覽」
+       兩個物品動作；穿戴與售出都隱藏，避免零售價物品被誤售。
     */
     if(typeof openItemModal==="function"){
         const afterOpenItemModal=openItemModal;
@@ -1195,6 +1224,7 @@
 
             const item=inventorySlots[slotIndex];
             const equipButton=document.getElementById("itemEquipButton");
+            const sellButton=document.querySelector("#itemModal .sell-button");
             let useButton=document.getElementById("v132ItemUseButton");
             let previewButton=document.getElementById("v132ItemPreviewButton");
 
@@ -1231,6 +1261,21 @@
             if(equipButton){
                 equipButton.style.display=
                     (isChestOrTicket || isBattleOnlyItem) ? "none" : "";
+            }
+
+            if(sellButton){
+                sellButton.style.display=isChestOrTicket ? "none" : "";
+            }
+
+            if(isChestOrTicket){
+                const statsEl=document.getElementById("itemModalStats");
+                if(statsEl){
+                    Array.from(statsEl.children).forEach(child=>{
+                        if((child.textContent||"").includes("售價：")){
+                            child.remove();
+                        }
+                    });
+                }
             }
 
             if(useButton){
@@ -1273,6 +1318,20 @@
                 }
             }
 
+            return result;
+        };
+    }
+
+    if(typeof openEquippedItem==="function"){
+        const afterOpenEquippedItemActions=openEquippedItem;
+        openEquippedItem=function(){
+            const result=afterOpenEquippedItemActions.apply(this,arguments);
+            const sellButton=document.querySelector("#itemModal .sell-button");
+            const useButton=document.getElementById("v132ItemUseButton");
+            const previewButton=document.getElementById("v132ItemPreviewButton");
+            if(sellButton){ sellButton.style.display=""; }
+            if(useButton){ useButton.style.display="none"; useButton.onclick=null; }
+            if(previewButton){ previewButton.style.display="none"; previewButton.onclick=null; }
             return result;
         };
     }
@@ -1483,13 +1542,15 @@
     /*
        精英/BOSS專屬倍率，都是從「副本普通怪」的完整數值
        （已經套過×1.30跟×1.10）再往上疊加，不重新從裸數值
-       算起。刻意不動maxSP/sp——精英/BOSS的SP維持在跟副本
-       普通怪同一個水準，避免SP太多、放技能次數變得誇張。
+       算起。V138 依最新規格在原有強度上再加：精英最終HP
+       再+100%、SP+100%；BOSS最終HP再+50%、SP+100%。
+       因此保留既有的攻擊／魔攻／防禦倍率，HP倍率分別由
+       1.60×2.00＝3.20、3.00×1.50＝4.50，SP則兩者皆×2.00。
        只認monster.rank（makeZoneMonster()第4個參數決定），
        一般怪（rank是undefined）這裡什麼都不做，直接跳過。
     */
-    const DUNGEON_ELITE_MULTIPLIERS={maxHP:1.60,attack:1.30,magicAttack:1.30,defense:1.25};
-    const DUNGEON_BOSS_MULTIPLIERS={maxHP:3.00,attack:1.50,magicAttack:1.50,defense:1.40};
+    const DUNGEON_ELITE_MULTIPLIERS={maxHP:3.20,maxSP:2.00,attack:1.30,magicAttack:1.30,defense:1.25};
+    const DUNGEON_BOSS_MULTIPLIERS={maxHP:4.50,maxSP:2.00,attack:1.50,magicAttack:1.50,defense:1.40};
 
     function applyDungeonRankStrength(monster){
         if(!monster){ return monster; }
@@ -1504,6 +1565,7 @@
             }
         });
         monster.hp=monster.maxHP;
+        monster.sp=monster.maxSP;
         return monster;
     }
 
@@ -1778,16 +1840,6 @@
        每次升級後expNext會更新成「下一級需要多少」）。新公式：
        隊伍每個角色的expNext加總，再除以角色人數，不再乘0.5。
     */
-    /*
-       ★ 修正（依照使用者要求，「經驗副本不能變成主要升級來源」）：
-       原本是「隊伍平均expNext」，等於單人隊伍打一次就拿到自己
-       升下一級所需的100%經驗，太誇張。改成再乘上一個比例常數，
-       目標是「打完正常獎勵≈升下一級所需的10%，看廣告雙倍≈20%」
-       ——doubled的×2邏輯已經在v132ClaimExpDungeonReward()那裡
-       處理，這裡只需要把「正常（未doubled）」的基準壓到10%。
-    */
-    const EXP_DUNGEON_REWARD_RATIO=0.10;
-
     function getExpDungeonRewardExp(){
         const indexes=getExistingPartyIndexes();
         if(indexes.length===0){ return 0; }
@@ -1796,8 +1848,9 @@
             if(!character){ return sum; }
             return sum+Math.max(0,Number(character.expNext)||0);
         },0);
-        return Math.floor((total/indexes.length)*EXP_DUNGEON_REWARD_RATIO);
+        return Math.floor(total/indexes.length);
     }
+    window.v138GetExpDungeonRewardExp=getExpDungeonRewardExp;
 
     function showExpDungeonRewardModal(rewardExp){
         const html=
@@ -1809,6 +1862,14 @@
             '<button type="button" onclick="v132ClaimExpDungeonReward(true)">看廣告雙倍領取</button>'+
             '</div></div>';
         v132ShowRewardModal(html);
+    }
+
+    function confirmDungeonEntry(title,details){
+        return window.confirm(
+            "確定要進入「"+title+"」嗎？\n\n"+
+            details+"\n\n"+
+            "進入後才會開始戰鬥；挑戰失敗不會扣除今日次數。"
+        );
     }
 
     window.v132ClaimExpDungeonReward=function(doubled){
@@ -1843,6 +1904,12 @@
             alert("經驗副本需要主角色等級達到10級才能開啟。");
             return;
         }
+        if(!confirmDungeonEntry(
+            "經驗副本",
+            "將連續進行3場戰鬥，最終獎勵依目前全隊升級所需經驗的平均值計算。"
+        )){
+            return;
+        }
         const rewardExp=getExpDungeonRewardExp();
         startExpDungeonBattle(1,rewardExp);
     }
@@ -1864,6 +1931,12 @@
         }
         if(!canAddItemToInventory(materialChestDefinition,3)){
             alert("請先預留可放入3個材料寶箱的背包空間，再挑戰材料副本。");
+            return;
+        }
+        if(!confirmDungeonEntry(
+            "材料副本",
+            "本場共有10隻怪物；通關後材料寶箱只會放進背包，不會自動開啟。"
+        )){
             return;
         }
 
@@ -2008,6 +2081,18 @@
        18. 裝備副本：雙角色20級開放，1BOSS+4精英，高極裝備寶箱
     ===================================================== */
 
+    function getEquipmentDungeonComposition(){
+        const playerCount=Math.max(1,getExistingPartyIndexes().length);
+        const bossCount=Math.min(5,playerCount);
+        return {
+            playerCount:playerCount,
+            bossCount:bossCount,
+            eliteCount:Math.max(0,5-bossCount),
+            total:5
+        };
+    }
+    window.v138GetEquipmentDungeonComposition=getEquipmentDungeonComposition;
+
     function beginEquipmentDungeon(){
         if(!isDungeonAvailable("equipment")){
             alert("裝備副本今天已經挑戰過了。");
@@ -2022,13 +2107,28 @@
             return;
         }
 
+        const composition=getEquipmentDungeonComposition();
+        if(!confirmDungeonEntry(
+            "裝備副本",
+            "偵測到"+composition.playerCount+"名玩家：本場將出現"+
+            composition.bossCount+"隻BOSS與"+composition.eliteCount+"隻精英怪。"
+        )){
+            return;
+        }
+
         const level=getDungeonMonsterLevel();
-        const bossElement=randomElement();
         const roster=[];
-        const boss=buildDungeonMonster("裝備殿守護者",Math.round(level*1.15),bossElement,"boss");
-        setMonsterMaxTierSkills(boss,0.7);
-        roster.push(boss);
-        for(let i=0;i<4;i++){
+        for(let i=0;i<composition.bossCount;i++){
+            const boss=buildDungeonMonster(
+                "裝備殿守護者",
+                Math.round(level*1.15),
+                randomElement(),
+                "boss"
+            );
+            setMonsterMaxTierSkills(boss,0.7);
+            roster.push(boss);
+        }
+        for(let i=0;i<composition.eliteCount;i++){
             const monster=buildDungeonMonster("殿前護衛精英",level,randomElement(),"elite");
             setMonsterSkillTier(monster,3,0.7);
             roster.push(monster);
@@ -2156,10 +2256,7 @@
             '<div class="v132-dungeon-list">'+
             dungeonEntryCard(
                 "exp","經驗副本","單一角色達到10級",
-                /* ★ 說明文字跟著V133的新公式更新：現在是「隊伍平均
-                   升下一級所需經驗」的10%（看廣告雙倍約20%），
-                   不再是舊的50%。 */
-                "隊伍平均升級所需經驗的10%（廣告雙倍20%）","v132BeginExpDungeon"
+                "全隊升下一級所需總經驗的平均值（廣告可雙倍）","v132BeginExpDungeon"
             )+
             dungeonEntryCard(
                 "material","材料副本","至少兩名角色達到20級",
