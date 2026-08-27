@@ -26,7 +26,9 @@
    `tests/v137-regressions.test.js`，V138 另有需求驗收
    `tests/v138-feature-requirements.test.js`，V139 新增經濟／休息經驗驗收
    `tests/v139-economy-rested-exp.test.js`，V140 新增四元素技能定案驗收
-   `tests/v140-four-element-balance.test.js`。驗證至少要包含：
+   `tests/v140-four-element-balance.test.js`，V141 新增系統擴充驗收
+   `tests/v141-system-expansion.test.js`，V142 新增技能動畫／行動閘門驗收
+   `tests/v142-skill-animation.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -38,7 +40,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-27，V141 系統擴充整合版）
+## 目前狀態（截至 2026-08-27，V142 技能動畫與行動閘門版）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -69,6 +71,12 @@
   離線 EXP 等級倍率與大量不捲動介面調整。核心檔案為 `js/34-v141-core-systems.js`、
   `js/35-v141-ui-battle.js`、`js/36-v141-content-systems.js`、
   `css/38-v141-system-expansion.css`，快取版本已升至 141。
+- V142 新增可重用技能動畫控制器：普通攻擊維持 520ms 表現，初階／中階／高階／
+  終極技能分別依實際 `animationDuration`／`resolveDuration` 完成後才允許推進；
+  V138 既有 1.6 秒出手與 2 秒換回合節奏保留，短動畫不額外加時，長動畫只補足
+  尚未播放完的部分。玩家、怪物與自動戰鬥共用同一個一次性 Promise 行動閘門。
+  極帝天尊同步補齊元相光明（全體 350 HP／95 SP）、元光護體（全體 200 護盾
+  2 回合）與元祖賜福（全體淨化＋敏捷 75% 兩回合）。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -95,9 +103,9 @@ V131～V136 的邏輯 patch 則在 V137 改由
 
 **不要把 V131～V136 runtime 改回各自獨立 append。** 動態插入的 script
 原本會以 async 行為競速；這些檔案又會一層層包裝相同全域函式，載入順序
-改變就會改變實際行為。V137 已把順序固定；V140 現在完整順序為
+改變就會改變實際行為。V137 已把順序固定；V142 現在完整順序為
 `js/25` → `js/27` → `js/28` → `js/29` → `js/30` → `js/31` → `js/32` → `js/33`
-→ `js/34` → `js/35` → `js/36`。
+→ `js/34` → `js/35` → `js/36` → `js/37`。
 
 **如果你在 `index.html` 裡直接看到「這幾個檔案好像沒被載入」而想手動加 `<script>` 標籤，
 先住手、去讀 `js/20-anonymous-20.js`**——手動加標籤幾乎一定會造成重複載入，
@@ -335,6 +343,46 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-27 — V142：共用技能動畫控制器、行動完成閘門與極帝天尊三技能
+
+1. 新增 `js/37-v142-skill-animation.js`，為每個技能集中提供
+   `animationDuration`、`resolveDuration`、演出分級與效果風格。普通攻擊為
+   520ms；初階約 720～980ms、中型約 1.05～1.7 秒、高階約 1.85～2.5 秒，
+   霸龍裂天斬／火鳳天鳴等終極技能為 2.65～3.2 秒。沒有修改任何技能傷害、
+   SP、命中、Buff／Debuff 或自動戰鬥選招。
+2. 玩家與怪物的技能名稱入口共用同一個動畫 director；視覺由 CSS 動畫、
+   SVG 劍氣／能量環與一張重用 Canvas 的自適應粒子組成。火龍、火鳳、
+   冰晶、水浪、暴風、雷光、巨石、地裂、護盾、治療／復活及光系支援均
+   以同一套 renderer 狀態組合，不再每招各寫一套推進計時器。
+3. V138 既有戰鬥節奏完整保留：一般結算仍以 1.6 秒為基準、換回合仍為
+   0.4＋1.6 秒。V142 只在動畫比既有排程更長時等待 animation Promise；
+   短動畫不額外加時，大招則在實際 `animationend`／Promise resolve 後才
+   進入下一個 initiative。
+4. 每次 `finishPlayerAction` 只簽發一張含 battle token、phase 與 index 的
+   行動票；`beginCharacterTurn`／`processNextCombatant` 只能消耗一次。
+   animationend、fallback timer、背景恢復重複觸發時，gate 的 once guard
+   與既有 processed-index 防護共同阻止重複攻擊、跳人或連跳兩回合。
+5. 效能採一個持久舞台＋一張持久 Canvas：每招結束會取消 RAF、清 timer、
+   清粒子、移除卡牌 class 與 visibility listener。依 `deviceMemory`、
+   `hardwareConcurrency` 及 reduced-motion 降低粒子、陰影品質，但不取消
+   技能主動畫；另保留 renderer 註冊介面供未來少數大招接 WebGL／Shader。
+6. 極帝天尊技能更新：元相光明為存活我方全體回復 350 HP／95 SP；
+   元光護體為全體 200 護盾、2 回合；新增元祖賜福，清除全體
+   `statusEffects` 並使敏捷提高 75%、持續 2 回合，結束後恢復原敏捷。
+   支援 AI 會依負面狀態、HP／SP 缺口、護盾及賜福狀態選招；被冰封／石化
+   時仍沿用既有不能行動規則。
+7. 新增 `css/39-v142-skill-animation.css` 與
+   `tests/v142-skill-animation.test.js`；loader 嚴格接在 `js/36` 後，
+   `V_ASSET_VERSION` 與最外層 loader URL 同步升為 142。
+
+**驗證**：全部 JavaScript 通過 `node --check`，`git diff --check` 通過。
+V137 9/9、V138 10/10、V139 7/7、V140 14/14、V141 18/18、V142 14/14，
+共 72 項自動回歸全部通過。V142 專屬測試涵蓋普通／小／大技能時間、
+既有 1.6 秒節奏、自動戰鬥宣告階段、長動畫阻擋 initiative、重複完成、
+切背景恢復、200 次長戰鬥清理，以及極帝天尊三招。環境沒有 Chromium，
+所以 `tests/v138-browser-smoke.js` 明確略過；正式 Pages 部署與線上資源
+仍待本次推送後確認。
 
 ### 2026-08-27 — V141：36 項遊戲系統、戰鬥表現、深淵與合成整合
 
@@ -1647,6 +1695,8 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       回歸，V138 的 `tests/v138-feature-requirements.test.js` 另有 10 項需求驗收，
       V139 的 `tests/v139-economy-rested-exp.test.js` 有 7 項經濟／休息經驗驗收，
       V140 的 `tests/v140-four-element-balance.test.js` 有 14 項技能定案驗收，
+      V141 的 `tests/v141-system-expansion.test.js` 有 18 項系統擴充驗收，
+      V142 的 `tests/v142-skill-animation.test.js` 有 14 項動畫／行動閘門驗收，
       並保留可選的 `tests/v138-browser-smoke.js`。本機仍缺少該腳本需要的 Chromium，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。

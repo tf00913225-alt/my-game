@@ -1,0 +1,300 @@
+/* V142 — shared mobile skill-animation stage.
+   One stage and one Canvas are reused for every action. */
+#v142-skill-stage{
+    --v142-duration:520ms;
+    --v142-color:#f1e7d3;
+    --v142-color-soft:#fff;
+    position:fixed;
+    inset:0;
+    z-index:8700;
+    pointer-events:none;
+    overflow:hidden;
+    opacity:0;
+    contain:layout paint style;
+    isolation:isolate;
+}
+#v142-skill-stage.v142-active{opacity:1}
+#v142-skill-stage .v142-particle-canvas,
+#v142-skill-stage .v142-vignette,
+#v142-skill-stage .v142-ground,
+#v142-skill-stage .v142-vector-stage,
+#v142-skill-stage .v142-cast-core,
+#v142-skill-stage .v142-projectile,
+#v142-skill-stage .v142-summon,
+#v142-skill-stage .v142-impact{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+}
+#v142-skill-stage .v142-particle-canvas{z-index:5}
+#v142-skill-stage .v142-vignette{
+    z-index:1;
+    background:
+        radial-gradient(circle at 50% 52%,transparent 10%,color-mix(in srgb,var(--v142-color) 20%,transparent) 46%,rgba(0,0,0,.72) 100%);
+    opacity:0;
+}
+#v142-skill-stage .v142-ground{
+    z-index:2;
+    inset:auto 5% 16%;
+    width:90%;
+    height:23%;
+    border-radius:50%;
+    border:2px solid color-mix(in srgb,var(--v142-color) 80%,transparent);
+    background:repeating-conic-gradient(from 12deg,color-mix(in srgb,var(--v142-color) 18%,transparent) 0 8deg,transparent 8deg 24deg);
+    transform:perspective(440px) rotateX(68deg) scale(.2);
+    opacity:0;
+    filter:drop-shadow(0 0 16px var(--v142-color));
+}
+#v142-skill-stage .v142-vector-stage{z-index:4;overflow:visible}
+#v142-skill-stage .v142-energy-ring,
+#v142-skill-stage .v142-vector-slash,
+#v142-skill-stage .v142-wave-line{
+    fill:none;
+    stroke:var(--v142-color-soft);
+    vector-effect:non-scaling-stroke;
+    filter:drop-shadow(0 0 4px var(--v142-color));
+    opacity:0;
+}
+#v142-skill-stage .v142-energy-ring{
+    stroke-width:1.2;
+    stroke-dasharray:8 5;
+    transform-origin:50px 50px;
+}
+#v142-skill-stage .v142-vector-slash{
+    stroke-width:2.4;
+    stroke-linecap:round;
+    stroke-dasharray:130;
+    stroke-dashoffset:130;
+}
+#v142-skill-stage .v142-wave-line{
+    stroke-width:2;
+    stroke-dasharray:140;
+    stroke-dashoffset:140;
+}
+#v142-skill-stage .v142-cast-core{
+    z-index:3;
+    inset:38% auto auto 50%;
+    width:clamp(74px,22vw,210px);
+    height:clamp(74px,22vw,210px);
+    transform:translate(-50%,-50%) scale(.08);
+    border:clamp(2px,.5vw,5px) solid var(--v142-color-soft);
+    border-radius:50%;
+    background:
+        radial-gradient(circle,var(--v142-color-soft) 0 5%,var(--v142-color) 6% 18%,transparent 20%),
+        conic-gradient(from 0deg,transparent,var(--v142-color),transparent,var(--v142-color),transparent);
+    box-shadow:0 0 20px var(--v142-color),inset 0 0 20px var(--v142-color);
+    opacity:0;
+}
+#v142-skill-stage .v142-projectile{
+    z-index:6;
+    inset:46% auto auto -18%;
+    width:32%;
+    height:8%;
+    border-radius:50%;
+    background:linear-gradient(90deg,transparent,var(--v142-color),var(--v142-color-soft));
+    filter:drop-shadow(0 0 15px var(--v142-color));
+    transform:skewX(-22deg) scaleX(.15);
+    opacity:0;
+}
+#v142-skill-stage .v142-impact{
+    z-index:7;
+    inset:43% auto auto 50%;
+    width:clamp(90px,30vw,300px);
+    height:clamp(90px,30vw,300px);
+    transform:translate(-50%,-50%) scale(.05);
+    border-radius:50%;
+    background:
+        repeating-conic-gradient(from 0deg,var(--v142-color-soft) 0 4deg,transparent 4deg 17deg),
+        radial-gradient(circle,var(--v142-color-soft),var(--v142-color) 22%,transparent 65%);
+    mix-blend-mode:screen;
+    opacity:0;
+}
+#v142-skill-stage .v142-summon{
+    z-index:4;
+    inset:18% auto auto 50%;
+    width:min(70vw,520px);
+    height:min(48vh,520px);
+    transform:translateX(-50%) scale(.2);
+    opacity:0;
+    filter:drop-shadow(0 0 22px var(--v142-color));
+}
+#v142-skill-stage .v142-summon::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    color:var(--v142-color-soft);
+    font-size:clamp(90px,30vw,300px);
+    font-weight:900;
+    line-height:1;
+    text-shadow:0 0 12px var(--v142-color),0 0 34px var(--v142-color);
+}
+#v142-skill-stage[data-style="dragon"] .v142-summon::before{content:"龍"}
+#v142-skill-stage[data-style="phoenix"] .v142-summon::before{content:"鳳"}
+#v142-skill-stage[data-style="wave"] .v142-summon::before{content:"浪"}
+#v142-skill-stage[data-style="tempest"] .v142-summon::before,
+#v142-skill-stage[data-style="tornado"] .v142-summon::before{content:"風"}
+#v142-skill-stage[data-style="earthquake"] .v142-summon::before,
+#v142-skill-stage[data-style="stone-impact"] .v142-summon::before{content:"岳"}
+#v142-skill-stage[data-style^="holy"] .v142-summon::before{content:"元"}
+#v142-skill-stage[data-style="revive"] .v142-summon::before{content:"生"}
+#v142-skill-stage .v142-skill-caption{
+    position:absolute;
+    z-index:10;
+    left:50%;
+    top:max(calc(env(safe-area-inset-top) + 8%),8%);
+    transform:translate(-50%,-18px);
+    min-width:min(70vw,420px);
+    padding:clamp(7px,1.8vw,16px) clamp(16px,4vw,36px);
+    clip-path:polygon(7% 0,93% 0,100% 50%,93% 100%,7% 100%,0 50%);
+    border-inline:2px solid var(--v142-color);
+    background:linear-gradient(90deg,transparent,rgba(10,8,7,.9) 16% 84%,transparent);
+    color:#fff8e8;
+    text-align:center;
+    opacity:0;
+    filter:drop-shadow(0 0 8px var(--v142-color));
+}
+#v142-skill-stage .v142-skill-caption b{
+    display:block;
+    font-size:clamp(18px,4.8vw,44px);
+    letter-spacing:.12em;
+    white-space:nowrap;
+}
+#v142-skill-stage .v142-skill-caption span{
+    display:block;
+    margin-top:2px;
+    color:var(--v142-color-soft);
+    font-size:clamp(10px,2.5vw,22px);
+    letter-spacing:.16em;
+}
+#v142-skill-stage .v142-animation-clock{
+    position:absolute;
+    width:1px;
+    height:1px;
+    opacity:.001;
+}
+#v142-skill-stage.v142-active .v142-clock-running{animation:v142ActionClock var(--v142-duration) linear both}
+#v142-skill-stage.v142-active .v142-skill-caption{animation:v142Caption var(--v142-duration) ease-out both}
+#v142-skill-stage.v142-active .v142-vignette{animation:v142Vignette var(--v142-duration) ease-in-out both}
+#v142-skill-stage.v142-active .v142-ground{animation:v142Ground var(--v142-duration) ease-out both}
+#v142-skill-stage.v142-active .v142-cast-core{animation:v142Charge var(--v142-duration) cubic-bezier(.2,.8,.2,1) both}
+#v142-skill-stage.v142-active .v142-projectile{animation:v142Projectile var(--v142-duration) cubic-bezier(.2,.75,.25,1) both}
+#v142-skill-stage.v142-active .v142-impact{animation:v142Impact var(--v142-duration) ease-out both}
+#v142-skill-stage.v142-active .v142-summon{animation:v142Summon var(--v142-duration) ease-in-out both}
+#v142-skill-stage.v142-active .v142-energy-ring{animation:v142Ring var(--v142-duration) linear both}
+#v142-skill-stage.v142-active .v142-vector-slash-a{animation:v142SlashA var(--v142-duration) ease-out both}
+#v142-skill-stage.v142-active .v142-vector-slash-b{animation:v142SlashB var(--v142-duration) ease-out both}
+#v142-skill-stage.v142-active .v142-wave-line{animation:v142Wave var(--v142-duration) ease-out both}
+#v142-skill-stage[data-tier="normal"] .v142-vignette,
+#v142-skill-stage[data-tier="normal"] .v142-ground,
+#v142-skill-stage[data-tier="normal"] .v142-summon,
+#v142-skill-stage[data-tier="normal"] .v142-cast-core,
+#v142-skill-stage[data-tier="normal"] .v142-projectile{display:none}
+#v142-skill-stage[data-tier="basic"] .v142-summon,
+#v142-skill-stage[data-tier="medium"] .v142-summon{display:none}
+#v142-skill-stage[data-tier="normal"] .v142-skill-caption span{display:none}
+#v142-skill-stage[data-tier="ultimate"] .v142-vignette{
+    background:radial-gradient(circle at 50% 52%,transparent 6%,color-mix(in srgb,var(--v142-color) 34%,transparent) 34%,rgba(0,0,0,.9) 82%);
+}
+#v142-skill-stage[data-style="heal"] .v142-projectile,
+#v142-skill-stage[data-style="holy-heal"] .v142-projectile,
+#v142-skill-stage[data-style="holy-shield"] .v142-projectile,
+#v142-skill-stage[data-style="holy-blessing"] .v142-projectile,
+#v142-skill-stage[data-style="aura"] .v142-projectile,
+#v142-skill-stage[data-style="shield"] .v142-projectile,
+#v142-skill-stage[data-style="barrier"] .v142-projectile{display:none}
+#v142-skill-stage[data-style*="ice"] .v142-impact,
+#v142-skill-stage[data-style="freeze"] .v142-impact{
+    clip-path:polygon(50% 0,62% 34%,90% 10%,70% 43%,100% 52%,68% 61%,88% 91%,60% 69%,50% 100%,40% 68%,10% 92%,31% 60%,0 50%,33% 41%,12% 8%,40% 34%);
+}
+#v142-skill-stage[data-style="shield"] .v142-impact,
+#v142-skill-stage[data-style="barrier"] .v142-impact,
+#v142-skill-stage[data-style="holy-shield"] .v142-impact{
+    background:radial-gradient(circle,transparent 42%,var(--v142-color-soft) 44% 47%,var(--v142-color) 50%,transparent 68%);
+}
+#v142-skill-stage[data-style="cross-slash"] .v142-vector-slash-b,
+#v142-skill-stage[data-style="barrage"] .v142-vector-slash-b,
+#v142-skill-stage[data-style="ice-barrage"] .v142-vector-slash-b{
+    animation-delay:calc(var(--v142-duration) * .08);
+}
+#v142-skill-stage.v142-quality-low .v142-vignette{filter:none}
+#v142-skill-stage.v142-quality-low .v142-ground{box-shadow:none}
+.v142-target-hit{box-shadow:0 0 10px color-mix(in srgb,var(--v142-color,#fff) 75%,transparent)}
+.v142-target-heavy{filter:drop-shadow(0 0 10px var(--v142-color,#fff))}
+#v142-skill-stage.v142-screen-shake{animation:v142ScreenShake var(--v142-duration,520ms) ease-in-out both}
+#v142-skill-stage.v142-screen-shake-heavy{animation:v142ScreenShakeHeavy var(--v142-duration,2500ms) ease-in-out both}
+
+@keyframes v142ActionClock{from{opacity:.001}to{opacity:.002}}
+@keyframes v142Caption{
+    0%,8%{opacity:0;transform:translate(-50%,-18px)}
+    15%,72%{opacity:1;transform:translate(-50%,0)}
+    100%{opacity:0;transform:translate(-50%,8px)}
+}
+@keyframes v142Vignette{0%,100%{opacity:0}12%,72%{opacity:1}}
+@keyframes v142Ground{
+    0%,12%{opacity:0;transform:perspective(440px) rotateX(68deg) scale(.2)}
+    28%,78%{opacity:.9;transform:perspective(440px) rotateX(68deg) scale(1)}
+    100%{opacity:0;transform:perspective(440px) rotateX(68deg) scale(1.24)}
+}
+@keyframes v142Charge{
+    0%,8%{opacity:0;transform:translate(-50%,-50%) scale(.08) rotate(0)}
+    18%,45%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(210deg)}
+    62%,100%{opacity:0;transform:translate(-50%,-50%) scale(1.35) rotate(420deg)}
+}
+@keyframes v142Projectile{
+    0%,32%{opacity:0;transform:skewX(-22deg) scaleX(.15)}
+    42%{opacity:1}
+    68%{opacity:1;transform:translateX(370%) skewX(-22deg) scaleX(1.3)}
+    72%,100%{opacity:0;transform:translateX(390%) skewX(-22deg) scaleX(.2)}
+}
+@keyframes v142Impact{
+    0%,56%{opacity:0;transform:translate(-50%,-50%) scale(.05) rotate(0)}
+    66%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(75deg)}
+    84%{opacity:.75;transform:translate(-50%,-50%) scale(1.8) rotate(130deg)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(2.3) rotate(180deg)}
+}
+@keyframes v142Summon{
+    0%,18%{opacity:0;transform:translateX(-50%) scale(.2) translateY(12%)}
+    38%,68%{opacity:.82;transform:translateX(-50%) scale(1) translateY(0)}
+    82%,100%{opacity:0;transform:translateX(-50%) scale(1.25) translateY(-8%)}
+}
+@keyframes v142Ring{
+    0%,12%{opacity:0;transform:scale(.2) rotate(0)}
+    25%,72%{opacity:1;transform:scale(1) rotate(210deg)}
+    100%{opacity:0;transform:scale(1.7) rotate(390deg)}
+}
+@keyframes v142SlashA{
+    0%,44%{opacity:0;stroke-dashoffset:130}
+    50%,73%{opacity:1;stroke-dashoffset:0}
+    100%{opacity:0;stroke-dashoffset:-130}
+}
+@keyframes v142SlashB{
+    0%,54%{opacity:0;stroke-dashoffset:130}
+    60%,78%{opacity:1;stroke-dashoffset:0}
+    100%{opacity:0;stroke-dashoffset:-130}
+}
+@keyframes v142Wave{
+    0%,35%{opacity:0;stroke-dashoffset:140;transform:translateY(15px)}
+    48%,78%{opacity:1;stroke-dashoffset:0;transform:translateY(0)}
+    100%{opacity:0;stroke-dashoffset:-140;transform:translateY(-12px)}
+}
+@keyframes v142ScreenShake{
+    0%,58%,100%{transform:translate(0,0)}
+    61%{transform:translate(-2px,1px)}
+    64%{transform:translate(2px,-1px)}
+    67%{transform:translate(-1px,0)}
+}
+@keyframes v142ScreenShakeHeavy{
+    0%,55%,100%{transform:translate(0,0)}
+    58%{transform:translate(-5px,3px)}
+    61%{transform:translate(6px,-3px)}
+    64%{transform:translate(-4px,2px)}
+    68%{transform:translate(3px,-1px)}
+    72%{transform:translate(-1px,0)}
+}
+@media (prefers-reduced-motion:reduce){
+    #v142-skill-stage .v142-vignette{filter:none}
+    #v142-skill-stage .v142-summon{filter:drop-shadow(0 0 8px var(--v142-color))}
+}

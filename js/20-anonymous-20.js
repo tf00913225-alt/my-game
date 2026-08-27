@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="141";
+const V_ASSET_VERSION="142";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -400,6 +400,24 @@ function vAssetUrl(path){
     }
 })();
 
+/* V142 loader — shared action-timed skill animations. */
+(function loadV142SkillAnimationStyle(){
+    function load(){
+        if(document.getElementById("v142-skill-animation-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v142-skill-animation-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/39-v142-skill-animation.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -423,7 +441,8 @@ function vAssetUrl(path){
         {id:"v140-four-element-balance-runtime",src:"js/33-v140-four-element-balance.js"},
         {id:"v141-core-systems-runtime",src:"js/34-v141-core-systems.js"},
         {id:"v141-ui-battle-runtime",src:"js/35-v141-ui-battle.js"},
-        {id:"v141-content-systems-runtime",src:"js/36-v141-content-systems.js"}
+        {id:"v141-content-systems-runtime",src:"js/36-v141-content-systems.js"},
+        {id:"v142-skill-animation-runtime",src:"js/37-v142-skill-animation.js"}
     ];
 
     function next(index){

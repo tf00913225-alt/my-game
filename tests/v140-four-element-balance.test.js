@@ -573,19 +573,20 @@ test("existing lifesteal paths still accumulate post-critical final damage",()=>
     assert.match(player2Cast,/critResult\.multiplier[\s\S]*?totalLifesteal\+=\s*damage/);
 });
 
-test("V140 remains before the ordered V141 layers and both cache keys are bumped",()=>{
+test("V140 remains before the ordered V141/V142 layers and both cache keys are bumped",()=>{
     const runtimeOrder=[
         "js/31-v136-auto-battle-fix.js",
         "js/32-v139-rested-experience.js",
         "js/33-v140-four-element-balance.js",
         "js/34-v141-core-systems.js",
         "js/35-v141-ui-battle.js",
-        "js/36-v141-content-systems.js"
+        "js/36-v141-content-systems.js",
+        "js/37-v142-skill-animation.js"
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
-    assert.match(loaderSource,/const V_ASSET_VERSION="141"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=141/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="142"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=142/);
 });
 
 console.log("\nV140 four-element balance suite: "+passed+" tests passed.");

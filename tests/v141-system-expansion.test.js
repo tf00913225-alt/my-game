@@ -64,19 +64,20 @@ function extractAssignedFunction(source,name){
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
-test("V141 assets load after all prior layers with cache version 141",()=>{
+test("V141 assets remain ordered before V142 with cache version 142",()=>{
     const paths=[
         "js/33-v140-four-element-balance.js",
         "js/34-v141-core-systems.js",
         "js/35-v141-ui-battle.js",
-        "js/36-v141-content-systems.js"
+        "js/36-v141-content-systems.js",
+        "js/37-v142-skill-animation.js"
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="141"/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="142"/);
     assert.match(indexSource,/js\/00-main\.js\?v=141/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=141/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=142/);
 });
 
 test("backpack is 120 slots rendered as five cyclic pages of 24 without drag or slot numbers",()=>{
