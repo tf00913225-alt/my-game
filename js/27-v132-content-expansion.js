@@ -295,7 +295,7 @@
 
 
     /* =====================================================
-       4. 裝備設計圖紙（頭／護腕／鞋子／武器／衣服 × 4階，共20件）
+       4. 裝備設計圖紙（5部位 × 4階 × 4系列，共80件）
     ===================================================== */
 
     const BLUEPRINT_SLOTS=[
@@ -306,18 +306,28 @@
         {key:"armor",label:"衣服"}
     ];
 
+    const BLUEPRINT_SERIES=[
+        {id:"setFire",label:"赤炎"},
+        {id:"setWater",label:"寒泉"},
+        {id:"setEarth",label:"岩岳"},
+        {id:"setWind",label:"青嵐"}
+    ];
+
     const blueprintDefinitions=[];
     BLUEPRINT_SLOTS.forEach(slot=>{
         TALISMAN_TIERS.forEach(tier=>{
-            blueprintDefinitions.push({
-                id:"blueprint"+slot.key.charAt(0).toUpperCase()+slot.key.slice(1)+tier.key.charAt(0).toUpperCase()+tier.key.slice(1),
-                name:tier.label+slot.label+"設計圖",
-                icon:blueprintIcon(tier.key),
-                type:"material",
-                blueprintSlot:slot.key,
-                tierKey:tier.key,
-                price:0,
-                stats:{}
+            BLUEPRINT_SERIES.forEach(series=>{
+                blueprintDefinitions.push({
+                    id:"blueprint"+series.id.replace("set","")+slot.key.charAt(0).toUpperCase()+slot.key.slice(1)+tier.key.charAt(0).toUpperCase()+tier.key.slice(1),
+                    name:series.label+tier.label+slot.label+"設計圖",
+                    icon:blueprintIcon(tier.key),
+                    type:"material",
+                    blueprintSlot:slot.key,
+                    tierKey:tier.key,
+                    setId:series.id,
+                    price:0,
+                    stats:{}
+                });
             });
         });
     });
@@ -409,6 +419,28 @@
         return set ? set.element : null;
     }
 
+    /*
+       V141 合成／精英掉落共用資料橋接。
+       回傳淺拷貝陣列，避免外部補丁誤改原始定義清單；單筆定義仍是
+       同一個唯讀資料物件，背包加入時既有函式本來就會複製它。
+    */
+    window.v132GetOreDefinition=getOreDefinition;
+    window.v132GetTicketDefinition=getTicketDefinition;
+    window.v132GetBlueprintDefinition=function(id){
+        return blueprintDefinitions.find(def=>def.id===id)||null;
+    };
+    window.v132GetEquipmentSetItemDefinitions=getEquipmentSetItemDefinitions;
+    window.v132GetContentDefinitions=function(){
+        return {
+            talismans:talismanDefinitions.slice(),
+            ores:oreDefinitions.slice(),
+            blueprints:blueprintDefinitions.slice(),
+            tickets:ticketDefinitions.slice(),
+            equipmentSets:EQUIPMENT_SETS.slice(),
+            equipmentSetItems:equipmentSetItemDefinitions.slice()
+        };
+    };
+
 
     /* =====================================================
        7. 通用「加入背包」函式（不限藥水，材料/符咒/設計圖/
@@ -429,7 +461,7 @@
                 (sum,item)=>sum+Math.max(0,maxStack-(Number(item.count)||0)),
                 0
             );
-        const freeSlots=Math.max(0,102-inventoryItems.length);
+        const freeSlots=Math.max(0,120-inventoryItems.length);
         return stackFreeSpace+freeSlots*maxStack;
     }
 
@@ -457,7 +489,7 @@
         if(maxStack<=1){
             let remaining=quantity;
             while(remaining>0){
-                if(inventoryItems.length>=102){
+                if(inventoryItems.length>=120){
                     return false;
                 }
                 inventoryItems.push(cloneInventoryStackItem(definition,1));
@@ -478,7 +510,7 @@
         });
 
         while(remaining>0){
-            if(inventoryItems.length>=102){
+            if(inventoryItems.length>=120){
                 return false;
             }
             const stackCount=Math.min(maxStack,remaining);
@@ -557,6 +589,10 @@
         }
         return true;
     }
+
+    /* V141 bridge：合成系統沿用同一套原子背包交易與扣除邏輯。 */
+    window.v132ConsumeStackItem=consumeStackItem;
+    window.v132RunInventoryTransaction=runInventoryTransaction;
 
 
     /* =====================================================
@@ -1381,7 +1417,7 @@
        isDungeonAvailable()/dungeonEntryCard()的UI也會自動恢復
        擋下重複挑戰，不用再改別的地方。
     */
-    const DUNGEON_DAILY_LIMIT_ENABLED=false;
+    const DUNGEON_DAILY_LIMIT_ENABLED=true;
 
     function markDungeonUsed(type){
         if(!DUNGEON_DAILY_LIMIT_ENABLED){ return; }
@@ -1407,6 +1443,8 @@
     function isDungeonAvailable(type){
         return !isDungeonUsedToday(type);
     }
+    window.v132IsDungeonAvailable=isDungeonAvailable;
+    window.v132IsDungeonUsedToday=isDungeonUsedToday;
 
     function hasTwoCharactersAtLevel20(){
         return getExistingPartyIndexes().filter(index=>{
@@ -1474,6 +1512,7 @@
         const avgLevel=levels.reduce((sum,l)=>sum+l,0)/levels.length;
         return Math.max(1,Math.round(maxLevel*0.70+avgLevel*0.30));
     }
+    window.v132GetDungeonMonsterLevel=getDungeonMonsterLevel;
 
     const DUNGEON_ELEMENTS=["fire","water","earth","wind"];
 
@@ -1584,6 +1623,7 @@
         applyDungeonRankStrength(monster);
         return monster;
     }
+    window.v132BuildDungeonMonster=buildDungeonMonster;
 
     function setMonsterSkillTier(monster,tier,chance){
         const pool=Object.keys(skillDatabase).filter(skillId=>{
@@ -1698,6 +1738,7 @@
         startTurn(battleToken);
         return true;
     }
+    window.v132LaunchDungeonBattle=launchDungeonBattle;
 
     /*
        ★ winBattle()/loseBattle()是既有巡怪系統勝負結算
@@ -1807,7 +1848,13 @@
         const level=getDungeonMonsterLevel();
         const roster=[];
         for(let i=0;i<10;i++){
-            const monster=buildDungeonMonster("經驗軍團兵",level,randomElement());
+            const monster=buildDungeonMonster(
+                "經驗軍團兵",
+                level,
+                randomElement(),
+                stage===3 ? "elite" : "regular"
+            );
+            monster.v141DungeonStage=stage;
             roster.push(monster);
         }
         roster.forEach(monster=>{ setMonsterSkillTier(monster,2,0.5); });
@@ -2085,8 +2132,8 @@
         return {
             playerCount:playerCount,
             bossCount:bossCount,
-            eliteCount:Math.max(0,5-bossCount),
-            total:5
+            eliteCount:Math.max(0,10-bossCount),
+            total:10
         };
     }
     window.v138GetEquipmentDungeonComposition=getEquipmentDungeonComposition;

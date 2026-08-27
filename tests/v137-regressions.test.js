@@ -124,8 +124,8 @@ test("runtime patch loader strictly waits for each prior script",()=>{
     };
     const context=makeContext({
         document,
-        V_ASSET_VERSION:"140",
-        vAssetUrl:path=>path+"?v=140",
+        V_ASSET_VERSION:"141",
+        vAssetUrl:path=>path+"?v=141",
         setTimeout:handler=>handler()
     });
 
@@ -138,7 +138,10 @@ test("runtime patch loader strictly waits for each prior script",()=>{
         "v135-fixes-runtime",
         "v136-auto-battle-fix-runtime",
         "v139-rested-experience-runtime",
-        "v140-four-element-balance-runtime"
+        "v140-four-element-balance-runtime",
+        "v141-core-systems-runtime",
+        "v141-ui-battle-runtime",
+        "v141-content-systems-runtime"
     ];
 
     assert.equal(appended.length,1,"第一支完成前不可先插入後續補丁");
@@ -189,30 +192,30 @@ test("generic inventory additions never partially mutate a full backpack",()=>{
         "consumeStackItem"
     ].forEach(name=>vm.runInContext(extractFunction(v132Source,name),context));
 
-    context.inventoryItems=Array.from({length:101},(_,i)=>({id:"filler"+i,count:1,type:"material",stats:{}}));
+    context.inventoryItems=Array.from({length:119},(_,i)=>({id:"filler"+i,count:1,type:"material",stats:{}}));
     assert.equal(
         vm.runInContext("addItemToInventory({id:'sword',type:'weapon',stats:{}},2)",context),
         false
     );
-    assert.equal(context.inventoryItems.length,101);
+    assert.equal(context.inventoryItems.length,119);
 
     context.inventoryItems=[
         {id:"ore",count:99,type:"material",stats:{}},
-        ...Array.from({length:101},(_,i)=>({id:"full"+i,count:1,type:"material",stats:{}}))
+        ...Array.from({length:119},(_,i)=>({id:"full"+i,count:1,type:"material",stats:{}}))
     ];
     assert.equal(vm.runInContext("addItemToInventory({id:'ore',type:'material',stats:{}},2)",context),false);
     assert.equal(context.inventoryItems[0].count,99);
 
     context.inventoryItems=[
         {id:"ticket",count:2,type:"ticket",stats:{}},
-        ...Array.from({length:101},(_,i)=>({id:"slot"+i,count:1,type:"material",stats:{}}))
+        ...Array.from({length:119},(_,i)=>({id:"slot"+i,count:1,type:"material",stats:{}}))
     ];
     const transactionResult=vm.runInContext(
         "runInventoryTransaction(()=>consumeStackItem('ticket',1) && addItemToInventory({id:'reward',type:'weapon',stats:{}},1))",
         context
     );
     assert.equal(transactionResult,false);
-    assert.equal(context.inventoryItems.length,102);
+    assert.equal(context.inventoryItems.length,120);
     assert.equal(context.inventoryItems.find(item=>item.id==="ticket").count,2);
 });
 
@@ -358,9 +361,9 @@ test("auto battle keeps a valid selected skill instead of silently queuing norma
 });
 
 test("V137 regressions remain wired through the current deployed entry points",()=>{
-    assert.match(indexSource,/js\/00-main\.js\?v=137/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=140/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="140"/);
+    assert.match(indexSource,/js\/00-main\.js\?v=141/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=141/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="141"/);
     assert.match(v133Source,/const MAX_CHARACTER_LEVEL=100/);
     assert.doesNotMatch(mainSource,/safeBind\(\s*["'](?:autoEnabled|autoSkillHome|hpUsePctHome|spUsePctHome)/);
     assert.doesNotMatch(v132Source,/const result=originalLoseBattle\.apply/);

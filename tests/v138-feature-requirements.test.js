@@ -119,23 +119,23 @@ test("EXP dungeon reward is 11% of the party's average current expNext",()=>{
     assert.match(v132Source,/const EXP_DUNGEON_REWARD_RATIO=0\.11/);
 });
 
-test("equipment dungeon creates one BOSS per player and fills five slots with elites",()=>{
+test("equipment dungeon keeps one BOSS per player and adds five more elites",()=>{
     let playerCount=1;
     const ctx=context({getExistingPartyIndexes:()=>Array.from({length:playerCount},(_,i)=>i)});
     vm.runInContext(extractFunction(v132Source,"getEquipmentDungeonComposition"),ctx);
     assert.deepEqual(
         JSON.parse(JSON.stringify(vm.runInContext("getEquipmentDungeonComposition()",ctx))),
-        {playerCount:1,bossCount:1,eliteCount:4,total:5}
+        {playerCount:1,bossCount:1,eliteCount:9,total:10}
     );
     playerCount=2;
     assert.deepEqual(
         JSON.parse(JSON.stringify(vm.runInContext("getEquipmentDungeonComposition()",ctx))),
-        {playerCount:2,bossCount:2,eliteCount:3,total:5}
+        {playerCount:2,bossCount:2,eliteCount:8,total:10}
     );
     playerCount=3;
     assert.deepEqual(
         JSON.parse(JSON.stringify(vm.runInContext("getEquipmentDungeonComposition()",ctx))),
-        {playerCount:3,bossCount:3,eliteCount:2,total:5}
+        {playerCount:3,bossCount:3,eliteCount:7,total:10}
     );
 });
 
@@ -180,8 +180,8 @@ test("set bonuses and skill costs are visible before extra detail clicks",()=>{
 });
 
 test("current cache version reaches the loader and all dynamic assets",()=>{
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=140/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="140"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=141/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="141"/);
 });
 
 console.log("\nV138 feature suite: "+passed+" tests passed.");

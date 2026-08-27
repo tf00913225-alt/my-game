@@ -72,8 +72,7 @@ function makeEconomyContext(){
         players,
         potionDefinitions,
         zoneConfig:makeZoneConfig(),
-        getMonsterRank:monster=>monster.rank ||
-            (monster.name && monster.name.endsWith("王") ? "elite" : "regular"),
+        getMonsterRank:monster=>monster.rank||"regular",
         getExistingPartyIndexes:()=>players.map((_,index)=>index),
         getPartyCharacterByIndex:index=>players[index]||null,
         getMonsterGoldDrop:()=>0
@@ -97,9 +96,9 @@ test("Lv.1→100 curve is derived from current zone EXP and totals 69,760 effect
 
     const expected={
         10:{averageBattleExp:175,targetBattles:15,expNext:2625},
-        30:{averageBattleExp:4528,targetBattles:100,expNext:452800},
-        50:{averageBattleExp:8321,targetBattles:400,expNext:3328400},
-        70:{averageBattleExp:11996,targetBattles:900,expNext:10796400},
+        30:{averageBattleExp:3806,targetBattles:100,expNext:380600},
+        50:{averageBattleExp:7035,targetBattles:400,expNext:2814000},
+        70:{averageBattleExp:10185,targetBattles:900,expNext:9166500},
         80:{averageBattleExp:11760,targetBattles:1200,expNext:14112000},
         90:{averageBattleExp:13335,targetBattles:1700,expNext:22669500},
         99:{averageBattleExp:14910,targetBattles:4000,expNext:59640000}
@@ -210,8 +209,8 @@ test("modular item art is permanent guidance and current assets are cache-versio
     assert.match(uiGuidelines,/新增約 100 個一般道具/);
     assert.match(loaderSource,/js\/32-v139-rested-experience\.js/);
     assert.match(loaderSource,/css\/37-v139-rested-experience\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="140"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=140/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="141"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=141/);
 });
 
 console.log("\nV139 economy/rested EXP suite: "+passed+" tests passed.");

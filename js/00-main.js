@@ -1191,7 +1191,7 @@ function normalizeInventoryStacks(){
             return;
         }
 
-        while(remaining>0 && normalized.length<102){
+        while(remaining>0 && normalized.length<120){
             const stackCount=Math.min(maxStack,remaining);
             normalized.push(cloneInventoryStackItem(item,stackCount));
             remaining-=stackCount;
@@ -1199,7 +1199,7 @@ function normalizeInventoryStacks(){
 
         if(remaining>0){
             console.warn(
-                "背包堆疊超過102格容量，剩餘物品未能放入：",
+                "背包堆疊超過120格容量，剩餘物品未能放入：",
                 item.id,
                 remaining
             );
@@ -1291,7 +1291,7 @@ function addPotionToInventory(potionId,amount=1){
             total+Math.max(0,INVENTORY_MAX_STACK_DEFAULT-(Number(item.count)||0)),
         0
     );
-    const freeSlots=Math.max(0,102-inventoryItems.length);
+    const freeSlots=Math.max(0,120-inventoryItems.length);
     const totalCapacity=
         stackFreeSpace+
         freeSlots*INVENTORY_MAX_STACK_DEFAULT;
@@ -2580,7 +2580,7 @@ const ANTI_CRIT_PER_SPIRIT_POINT = 0.1;
 const ANTI_CRIT_MAX_PERCENT = 25;
 const CRIT_CHANCE_MIN_AFTER_ANTI_CRIT = 5;
 
-const MAX_TRAINING_MONSTERS = 6;
+const MAX_TRAINING_MONSTERS = 8;
 
 
 const forestMonsters = [
@@ -3699,7 +3699,7 @@ const inventoryItems = [
 
 
 const inventorySlots =
-    new Array(102).fill(null);
+    new Array(120).fill(null);
 
 
 function rebuildInventorySlots(){
@@ -3712,7 +3712,7 @@ function rebuildInventorySlots(){
     inventoryItems.forEach(
         (item,index)=>{
 
-            if(index<102){
+            if(index<120){
 
                 inventorySlots[index] =
                     item;
@@ -12828,16 +12828,12 @@ function getMonsterRank(monster){
     }
 
 
-    if(monster.rank){
-        return monster.rank;
-    }
-
-
     if(
-        monster.name&&
-        monster.name.endsWith("王")
+        monster.rank==="regular"||
+        monster.rank==="elite"||
+        monster.rank==="boss"
     ){
-        return "elite";
+        return monster.rank;
     }
 
 
@@ -22721,7 +22717,7 @@ function renderPlayers(){
         ).textContent =
 
             entry.id+
-            "Lv."+
+            " Lv."+
             entry.level;
 
 
@@ -29926,7 +29922,7 @@ function removeEquippedSkill(index){
 ===================================================== */
 
 let inventoryFilter = "equipment";
-const INVENTORY_CATEGORY_SLOT_COUNT = 102;
+const INVENTORY_CATEGORY_SLOT_COUNT = 120;
 
 function getBackpackPartyCharacters(){
     return [player, player2, player3];
@@ -31214,7 +31210,7 @@ function unequipItem(slot){
 
 
     if(
-        inventoryItems.length>=102
+        inventoryItems.length>=120
     ){
 
         alert(

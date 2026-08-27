@@ -775,7 +775,12 @@
     function loadElementBoxState(){
         try{
             const parsed=JSON.parse(localStorage.getItem(ELEMENT_BOX_KEY)||"{}");
-            return {remainingMs:Math.max(0,Number(parsed.remainingMs)||0)};
+            return {
+                remainingMs:Math.min(
+                    32*60*60*1000,
+                    Math.max(0,Number(parsed.remainingMs)||0)
+                )
+            };
         }catch(_){
             return {remainingMs:0};
         }
@@ -849,6 +854,17 @@
             active:elementBoxActive,
             remainingMs:Math.max(0,Math.floor(elementBoxState.remainingMs))
         };
+    };
+    window.v131GrantElementBoxHours=function(hours,maxHours){
+        const safeHours=Math.max(0,Number(hours)||0);
+        const capMs=Math.max(0,Number(maxHours)||32)*60*60*1000;
+        elementBoxState.remainingMs=Math.min(
+            capMs,
+            Math.max(0,elementBoxState.remainingMs)+safeHours*60*60*1000
+        );
+        persistElementBoxState();
+        updateElementBoxStatsUI();
+        return Math.max(0,Math.floor(elementBoxState.remainingMs));
     };
 
     function tickElementBoxClock(){
@@ -952,8 +968,7 @@
                 if(!watch){ return; }
                 showRewardedAd(
                     ()=>{
-                        elementBoxState.remainingMs+=ELEMENT_BOX_REWARD_MS;
-                        persistElementBoxState();
+                        window.v131GrantElementBoxHours(8,32);
                         ensureElementBoxStatsUI();
                         activate();
                     },
@@ -1094,10 +1109,10 @@
                 sharedExp=Math.max(0,sharedExp+bonusExp);
                 addBattleLog(
                     (isElementBoxBattle
-                        ? "戰鬥經驗（精英/BOSS加成＋3.5倍加成，元素匣掛機70%）："
+                        ? "戰鬥經驗（元素匣收益70%）："
                         : restedExpResult && restedExpResult.applied
-                        ? "戰鬥經驗（精英/BOSS加成＋3.5倍加成＋休息經驗×2）："
-                        : "戰鬥經驗（精英/BOSS加成＋3.5倍加成）：")+
+                        ? "戰鬥經驗（含休息經驗加成）："
+                        : "戰鬥經驗：")+
                     "本場共 "+finalExp+" EXP。"
                 );
                 if(restedExpResult && restedExpResult.applied){

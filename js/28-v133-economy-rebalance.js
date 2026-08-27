@@ -69,13 +69,17 @@
     window.v133MaxLevel=MAX_CHARACTER_LEVEL;
 
     function getCurveMonsterRankMultiplier(monster){
+        /* V141一般地圖改為每次生成獨立10%精英判定。曲線不能讀取
+           上一場戰鬥留下的隨機rank，改用期望值1×90%+1.5×10%。 */
+        if(monster&&Number.isFinite(Number(monster.v141CurveEliteRate))){
+            const rate=Math.max(0,Math.min(1,Number(monster.v141CurveEliteRate)));
+            return 1+rate*.5;
+        }
         let rank="regular";
         if(typeof getMonsterRank==="function"){
             rank=getMonsterRank(monster);
         }else if(monster && monster.rank){
             rank=monster.rank;
-        }else if(monster && monster.name && monster.name.endsWith("王")){
-            rank="elite";
         }
         if(rank==="boss"){ return 3; }
         if(rank==="elite"){ return 1.5; }

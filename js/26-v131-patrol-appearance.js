@@ -57,24 +57,31 @@
         });
     }
 
-    function makeCropper(cellW,cellH){
+    function makeCropper(cellW,cellH,outputW,outputH){
+        const renderW=outputW||cellW;
+        const renderH=outputH||cellH;
         const canvas=document.createElement("canvas");
-        canvas.width=cellW;
-        canvas.height=cellH;
+        canvas.width=renderW;
+        canvas.height=renderH;
         const ctx=canvas.getContext("2d");
         return function cropCellDataUrl(sheetImage,col,row){
-            ctx.clearRect(0,0,cellW,cellH);
+            ctx.clearRect(0,0,renderW,renderH);
+            ctx.imageSmoothingEnabled=true;
+            ctx.imageSmoothingQuality="high";
             ctx.drawImage(
                 sheetImage,
                 col*cellW,row*cellH,cellW,cellH,
-                0,0,cellW,cellH
+                0,0,renderW,renderH
             );
             return canvas.toDataURL("image/png");
         };
     }
 
     const cropFemaleCell=makeCropper(FEMALE_CELL_W,FEMALE_CELL_H);
-    const cropMaleCell=makeCropper(MALE_CELL_W,MALE_CELL_H);
+    /* 男角舊素材仍只有56×84；先以高品質Canvas重採樣到顯示尺寸
+       的2倍，避免瀏覽器直接放大低解析格造成額外鋸齒與模糊。
+       真正增加原生細節仍需日後替換140×210以上的男角sprite。 */
+    const cropMaleCell=makeCropper(MALE_CELL_W,MALE_CELL_H,140,210);
 
     const chunks=Array.isArray(window.V131_PATROL_SPRITE_CHUNKS)
         ? window.V131_PATROL_SPRITE_CHUNKS
@@ -194,6 +201,7 @@
         img.dataset.v131PatrolCharacter=String(index);
         img.dataset.v131Facing=facingBack ? "back" : "front";
     }
+    window.v131ApplyPatrolArt=applyPatrolArt;
 
     /*
        ★ 修正（依照使用者要求，「形象切換按鈕圖片畫質太差、

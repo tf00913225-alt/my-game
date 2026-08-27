@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="140";
+const V_ASSET_VERSION="141";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -382,6 +382,24 @@ function vAssetUrl(path){
     }
 })();
 
+/* V141 loader — synthesis, compact mobile UI, battle effects and Abyss. */
+(function loadV141SystemExpansionStyle(){
+    function load(){
+        if(document.getElementById("v141-system-expansion-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v141-system-expansion-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/38-v141-system-expansion.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -402,7 +420,10 @@ function vAssetUrl(path){
         {id:"v135-fixes-runtime",src:"js/30-v135-fixes.js"},
         {id:"v136-auto-battle-fix-runtime",src:"js/31-v136-auto-battle-fix.js"},
         {id:"v139-rested-experience-runtime",src:"js/32-v139-rested-experience.js"},
-        {id:"v140-four-element-balance-runtime",src:"js/33-v140-four-element-balance.js"}
+        {id:"v140-four-element-balance-runtime",src:"js/33-v140-four-element-balance.js"},
+        {id:"v141-core-systems-runtime",src:"js/34-v141-core-systems.js"},
+        {id:"v141-ui-battle-runtime",src:"js/35-v141-ui-battle.js"},
+        {id:"v141-content-systems-runtime",src:"js/36-v141-content-systems.js"}
     ];
 
     function next(index){

@@ -832,11 +832,10 @@
         版面對齊，之後如果還有更多新功能，
         可以直接把空格換成真的卡片。
 
-        「合成」「系統」目前都還沒有實際
-        功能，先做出跟其他卡片一致的視覺
-        入口，點下去openHomeFeature()還沒有
-        對應的處理分支，之後要接功能時，
-        照著其他分支的寫法加一段就好。
+        V141 已把「合成」接上裝備合成、冶煉、
+        符咒與碎片四分頁；「系統」沿用既有
+        openHomeFeature() 分支。卡片位置仍保留
+        原本第3列左右對齊的設計。
     -->
 
     <div
@@ -2771,7 +2770,7 @@
 </div>
 
 
-<script src="js/00-main.js?v=137"></script>
+<script src="js/00-main.js?v=141"></script>
 
 </div>
 </div>
@@ -2900,10 +2899,10 @@
 <link id="stage-v90-quest-interface-core" rel="stylesheet" href="css/25-stage-v90-quest-interface-core.css">
 
 <!-- =========================================================
-     V87 — INVENTORY CATEGORY CAPACITY 102
-     - Core inventorySlots: 102
-     - Each of the four category tabs renders 102 slots
-     - Full-inventory guard: 102
+     V141 — INVENTORY CATEGORY CAPACITY 120
+     - Core inventorySlots: 120
+     - Each category uses five cyclic pages of 24 slots
+     - Full-inventory guard: 120
      - Scroll architecture unchanged from V86
 ========================================================= -->
 
@@ -2913,7 +2912,7 @@
      No damage/SP/initiative/skill formulas changed. -->
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
-<script src="js/20-anonymous-20.js?v=140"></script>
+<script src="js/20-anonymous-20.js?v=141"></script>
 <script id="v129-character-creation-native-runtime" src="js/24-v125-character-creation-native-runtime.js?v=129a"></script>
 
 
