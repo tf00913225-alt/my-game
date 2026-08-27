@@ -204,14 +204,14 @@ test("gold, highest-level shop tiers, and exact six potion prices remain enforce
     assert.doesNotMatch(v133Source,/potionDefinitions\.filter\(item=>item && item\.recoveryPercent<100\)/);
 });
 
-test("modular item art is permanent guidance and V139 assets are cache-versioned",()=>{
+test("modular item art is permanent guidance and current assets are cache-versioned",()=>{
     assert.match(uiGuidelines,/道具 Icon 必須模組化/);
     assert.match(uiGuidelines,/基底圖/);
     assert.match(uiGuidelines,/新增約 100 個一般道具/);
     assert.match(loaderSource,/js\/32-v139-rested-experience\.js/);
     assert.match(loaderSource,/css\/37-v139-rested-experience\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="139"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=139/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="140"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=140/);
 });
 
 console.log("\nV139 economy/rested EXP suite: "+passed+" tests passed.");
