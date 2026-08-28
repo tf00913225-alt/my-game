@@ -379,6 +379,9 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 `node --check`、`git diff --check` 及 V137～V146 全套 103 項測試全部通過。
 `assets-library/assets/inbox/` 四張測試圖僅以唯讀方式下載暫存副本逐張觀看，本次未修改、
 移動、重新命名或提交該分支任何檔案。
+已發布至 `dev`（`367e633`）與 `main`（`77effbd`），兩分支檔案樹一致；GitHub Pages
+正式網址、`home-shop-v147.png`、V147 loader 與 V146 polish script 均回傳 HTTP 200，
+線上內容已確認載入透明商店圖與快取版本 147。
 
 ### 2026-08-28 — V146：戰鬥演出、深淵流程與手機介面最終修正
 
