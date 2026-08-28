@@ -726,8 +726,9 @@
         if(event.target.closest("button")){ return; }
         const map=document.getElementById("v141AbyssMap");
         const rect=map.getBoundingClientRect();
-        const x=Math.max(8,Math.min(92,(event.clientX-rect.left)/rect.width*100));
-        const y=Math.max(15,Math.min(86,(event.clientY-rect.top)/rect.height*100));
+        /* V143：地圖放大後同步放寬可走區，保留角色半身安全邊界即可。 */
+        const x=Math.max(4,Math.min(96,(event.clientX-rect.left)/rect.width*100));
+        const y=Math.max(8,Math.min(94,(event.clientY-rect.top)/rect.height*100));
         moveAbyssPlayer(x,y);
     };
 
@@ -736,7 +737,10 @@
         abyssBattleStarting=true;
         const floor=abyssState.floor;
         const lines=floor<5?abyssFloors[floor].taunts:["五帝同臨，你已無路可退。","極光會照見你的敗亡。","此處便是深淵盡頭！"];
-        const count=1+Math.floor(Math.random()*3);
+        /* V143 的中央點擊對話已由上層逐句完成，完成後不再重播舊自動泡泡。 */
+        const dialogueAlreadyCompleted=window.__v143AbyssDialogueComplete===true;
+        window.__v143AbyssDialogueComplete=false;
+        const count=dialogueAlreadyCompleted?0:1+Math.floor(Math.random()*3);
         const chosen=lines.slice().sort(()=>Math.random()-.5).slice(0,count);
         const bubble=document.getElementById("v141AbyssSpeech");
         chosen.forEach((line,index)=>setTimeout(()=>{
@@ -761,7 +765,7 @@
                 persistAbyss(); switchDungeonTab("abyss");
             });
             if(!started){ abyssBattleStarting=false; }
-        },count*720+260);
+        },dialogueAlreadyCompleted?80:count*720+260);
     };
 
     window.v141UseAbyssPortal=function(){

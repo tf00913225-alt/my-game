@@ -18,9 +18,9 @@
 
     const GENERAL_STATUS_BOUNDS={min:5,max:95};
     const LOCKDOWN_STATUS_BOUNDS={
-        regular:{min:5,max:75},
+        regular:{min:5,max:80},
         elite:{min:5,max:45},
-        boss:{min:5,max:15}
+        boss:{min:5,max:30}
     };
     const LEVEL_FACTOR_PER_LEVEL=0.05;
     const LEVEL_FACTOR_MIN=0.5;
@@ -163,7 +163,7 @@
     setLifestealSkill(
         "iceArrowRain",
         LIFESTEAL_BY_SKILL.iceArrowRain,
-        "對敵方全體各造成30點基礎法術傷害；吸取實際造成傷害的1%/2%/3%/4%/5%，只恢復自身HP。"
+        "對敵方全體各造成30點基礎法術傷害；吸取實際造成傷害的1%/2%/3%/4%/5%，只恢復自身HP；並有50%基礎機率使隨機單一目標冰封2回合。"
     );
 
     /*

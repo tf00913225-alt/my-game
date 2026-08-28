@@ -64,20 +64,23 @@ function extractAssignedFunction(source,name){
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
-test("V141 assets remain ordered before V142 with cache version 142",()=>{
+test("V141 assets remain ordered before V142/V143/V144 with cache version 144",()=>{
     const paths=[
         "js/33-v140-four-element-balance.js",
         "js/34-v141-core-systems.js",
         "js/35-v141-ui-battle.js",
         "js/36-v141-content-systems.js",
-        "js/37-v142-skill-animation.js"
+        "js/37-v142-skill-animation.js",
+        "js/38-v143-system-fixes.js",
+        "js/39-v143-skill-animation.js",
+        "js/40-v144-rules-and-abyss.js"
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="142"/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="144"/);
     assert.match(indexSource,/js\/00-main\.js\?v=141/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=142/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=144/);
 });
 
 test("backpack is 120 slots rendered as five cyclic pages of 24 without drag or slot numbers",()=>{
@@ -268,7 +271,7 @@ test("synthesis implements exact material costs, replacement-only reforge and pe
 test("Abyss has exact five-floor rosters, fixed center support BOSS and click-only final chest",()=>{
     ["東帝","南帝","天帝","北帝","極帝天尊","東帝天尊","南帝天尊","北帝天尊","天帝天尊"].forEach(name=>assert.ok(contentSource.includes(name)));
     ["flyingSandStrike","dustStorm","stoneSlash","explosiveFlurry","dragonSlash","fireRocket","windHowlLightning","stormFlurry","windCrossSlash","floodBeast","frostPunch","waterKnife"].forEach(id=>assert.ok(contentSource.includes(id)));
-    assert.match(contentSource,/const count=1\+Math\.floor\(Math\.random\(\)\*3\)/);
+    assert.match(contentSource,/const count=dialogueAlreadyCompleted\?0:1\+Math\.floor\(Math\.random\(\)\*3\)/);
     assert.match(contentSource,/if\(spec\[0\]==="極帝天尊"\)/);
     assert.match(contentSource,/v141FormationPosition=position/);
     assert.match(contentSource,/monster\.maxHP\+=extraHp/);

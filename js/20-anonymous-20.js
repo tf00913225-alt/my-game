@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="142";
+const V_ASSET_VERSION="144";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -418,6 +418,42 @@ function vAssetUrl(path){
     }
 })();
 
+/* V143 loader — readable enemy cards, dungeon flow and per-ID animations. */
+(function loadV143CombatDungeonPolishStyle(){
+    function load(){
+        if(document.getElementById("v143-combat-dungeon-polish-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v143-combat-dungeon-polish-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/40-v143-combat-dungeon-polish.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V144 loader — economy, monster loadouts, hard-control and Abyss rules. */
+(function loadV144RulesAndAbyssStyle(){
+    function load(){
+        if(document.getElementById("v144-rules-and-abyss-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v144-rules-and-abyss-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/41-v144-rules-and-abyss.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -442,7 +478,10 @@ function vAssetUrl(path){
         {id:"v141-core-systems-runtime",src:"js/34-v141-core-systems.js"},
         {id:"v141-ui-battle-runtime",src:"js/35-v141-ui-battle.js"},
         {id:"v141-content-systems-runtime",src:"js/36-v141-content-systems.js"},
-        {id:"v142-skill-animation-runtime",src:"js/37-v142-skill-animation.js"}
+        {id:"v142-skill-animation-runtime",src:"js/37-v142-skill-animation.js"},
+        {id:"v143-system-fixes-runtime",src:"js/38-v143-system-fixes.js"},
+        {id:"v143-skill-animation-runtime",src:"js/39-v143-skill-animation.js"},
+        {id:"v144-rules-and-abyss-runtime",src:"js/40-v144-rules-and-abyss.js"}
     ];
 
     function next(index){

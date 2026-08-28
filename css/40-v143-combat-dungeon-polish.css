@@ -1,0 +1,438 @@
+/* =====================================================
+   V143 — combat readability, card-to-card animation and dungeon polish
+===================================================== */
+
+/* 1. Enemy identity and resource numbers use the existing card width. */
+#game-stage > #app > #game-content #battlePage .battle-monster{
+    width:76px !important;
+    max-width:76px !important;
+    height:100px !important;
+    min-height:100px !important;
+    padding:3px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-monster-icon{
+    width:25px !important;
+    height:22px !important;
+    flex:0 0 22px !important;
+    font-size:20px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-monster-name.v143-monster-identity{
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    min-height:19px !important;
+    max-height:19px !important;
+    flex:0 0 19px !important;
+    overflow:visible !important;
+    color:#fff2cf !important;
+    font-size:16px !important;
+    font-weight:900 !important;
+    line-height:19px !important;
+    letter-spacing:-.25px !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    text-overflow:clip !important;
+    overflow-wrap:normal !important;
+    transform-origin:center top;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-monster-level[hidden]{
+    display:none !important;
+}
+
+#game-stage #battlePage .battle-monster .monster-status-badges{
+    min-height:10px !important;
+    max-height:10px !important;
+    flex:0 0 10px !important;
+    line-height:10px !important;
+}
+
+#game-stage #battlePage .battle-monster .monster-hp,
+#game-stage #battlePage .battle-monster .monster-sp{
+    width:68px !important;
+    height:13px !important;
+    min-height:13px !important;
+    flex:0 0 13px !important;
+    margin-top:1px !important;
+    border-radius:4px !important;
+}
+
+#game-stage #battlePage .battle-monster .monster-bar-text{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    height:13px !important;
+    color:#fff !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+    line-height:13px !important;
+    letter-spacing:-.35px !important;
+    text-align:center !important;
+    text-shadow:0 1px 2px #000,0 0 2px #000 !important;
+    transform:scaleX(.94);
+}
+
+/* 9. Ally choices use the exact same flashing crosshair language as enemies. */
+#game-stage > #app > #game-content #battlePage .battle-player.ally-targetable{
+    cursor:crosshair;
+    outline:none !important;
+    box-shadow:0 0 10px rgba(255,216,77,.62) !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player.ally-targetable::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    z-index:60;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    pointer-events:none;
+    transform:translate(-50%,-50%);
+    background:
+        linear-gradient(#ffd84d,#ffd84d) center/3px 100% no-repeat,
+        linear-gradient(90deg,#ffd84d,#ffd84d) center/100% 3px no-repeat,
+        radial-gradient(circle at center,transparent 0 26%,#ffd84d 29% 34%,transparent 37% 100%);
+    filter:drop-shadow(0 0 4px rgba(255,216,77,.9));
+    animation:battleTargetReticleFlash .38s ease-in-out infinite;
+}
+
+/* 7. Wanxiang Earth Shield: red/yellow/green/blue corners + 象, never 界. */
+#game-stage #battlePage .v143-earth-shield-effect{
+    position:absolute;
+    inset:0;
+    display:block;
+    border-radius:inherit;
+    pointer-events:none;
+}
+
+#game-stage #battlePage .v143-earth-shield-effect i{
+    position:absolute;
+    width:22px;
+    height:22px;
+    border-style:solid;
+    border-width:0;
+    animation:v143EarthCornerBreath 1.15s ease-in-out infinite alternate;
+}
+#game-stage #battlePage .v143-earth-shield-effect i:nth-child(1){left:0;top:0;border-left-width:4px;border-top-width:4px;border-color:#ff4e48;color:#ff4e48;}
+#game-stage #battlePage .v143-earth-shield-effect i:nth-child(2){right:0;top:0;border-right-width:4px;border-top-width:4px;border-color:#ffe15b;color:#ffe15b;animation-delay:-.28s;}
+#game-stage #battlePage .v143-earth-shield-effect i:nth-child(3){right:0;bottom:0;border-right-width:4px;border-bottom-width:4px;border-color:#65ed7e;color:#65ed7e;animation-delay:-.56s;}
+#game-stage #battlePage .v143-earth-shield-effect i:nth-child(4){left:0;bottom:0;border-left-width:4px;border-bottom-width:4px;border-color:#5ba8ff;color:#5ba8ff;animation-delay:-.84s;}
+#game-stage #battlePage .v143-earth-shield-effect b{
+    position:absolute;
+    right:3px;
+    top:2px;
+    width:21px;
+    height:21px;
+    border:1px solid #f7e6bc;
+    border-radius:50%;
+    color:#fff4ca;
+    background:rgba(37,28,12,.78);
+    box-shadow:0 0 8px rgba(255,235,170,.65);
+    font-size:13px;
+    font-weight:900;
+    line-height:20px;
+    text-align:center;
+}
+@keyframes v143EarthCornerBreath{
+    from{opacity:.48;filter:drop-shadow(0 0 2px currentColor)}
+    to{opacity:1;filter:drop-shadow(0 0 8px currentColor)}
+}
+
+/* 2. V142's full-screen generic caption is retired. */
+#v142-skill-stage{display:none !important;}
+
+.skill-name-badge.v143-caster-skill-label{
+    z-index:16020 !important;
+    overflow:hidden !important;
+    border:1px solid color-mix(in srgb,currentColor 58%,#fff) !important;
+    border-radius:6px !important;
+    opacity:0;
+    background:rgba(12,10,8,.88) !important;
+    box-shadow:0 3px 10px rgba(0,0,0,.55) !important;
+    text-align:center !important;
+    text-overflow:ellipsis !important;
+    transform:translate(-50%,-118%) !important;
+    animation:v143CasterLabel .62s ease-out both !important;
+}
+
+@keyframes v143CasterLabel{
+    0%{opacity:0;transform:translate(-50%,-95%) scale(.9)}
+    14%,66%{opacity:1;transform:translate(-50%,-118%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-132%) scale(.98)}
+}
+
+.v143-skill-stage{
+    position:fixed;
+    inset:0;
+    z-index:16000;
+    overflow:hidden;
+    contain:strict;
+    pointer-events:none;
+    --v143-color:#fff;
+    --v143-soft:#fff;
+}
+
+.v143-cast-charge,
+.v143-skill-flight,
+.v143-hit-impact,
+.v143-skill-field{
+    position:fixed;
+    display:block;
+    box-sizing:border-box;
+    color:var(--v143-soft);
+    text-align:center;
+    pointer-events:none;
+    will-change:transform,opacity,filter;
+}
+
+.v143-cast-charge{
+    width:58px;
+    height:58px;
+    margin:-29px 0 0 -29px;
+    border:2px solid var(--v143-color);
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.42),color-mix(in srgb,var(--v143-color) 38%,transparent) 42%,transparent 68%);
+    box-shadow:0 0 18px var(--v143-color),inset 0 0 12px var(--v143-soft);
+    font-size:22px;
+    font-style:normal;
+    font-weight:900;
+    line-height:54px;
+    text-shadow:0 0 8px var(--v143-color);
+    animation:v143Charge var(--v143-charge,300ms) ease-out both;
+}
+
+.v143-skill-flight{
+    width:34px;
+    height:34px;
+    margin:-17px 0 0 -17px;
+    border-radius:50%;
+    opacity:0;
+    background:radial-gradient(circle,var(--v143-soft) 0 12%,var(--v143-color) 20%,transparent 66%);
+    filter:drop-shadow(0 0 7px var(--v143-color));
+    font-size:19px;
+    font-style:normal;
+    font-weight:900;
+    line-height:34px;
+    text-shadow:0 0 5px #000;
+    offset-distance:0;
+    offset-rotate:0deg;
+    animation:v143Fly var(--v143-flight-duration,360ms) cubic-bezier(.2,.62,.2,1) var(--v143-flight-delay,90ms) both;
+}
+
+.v143-skill-flight.motion-spin,
+.v143-skill-flight.motion-spiral,
+.v143-skill-flight.motion-orbit,
+.v143-skill-flight.motion-orbit-fast,
+.v143-skill-flight.motion-orbit-heavy,
+.v143-skill-flight.motion-orbit-reverse{animation-name:v143FlySpin;}
+.v143-skill-flight.motion-dash,
+.v143-skill-flight.motion-blink,
+.v143-skill-flight.motion-afterimage{border-radius:4px;transform:scaleX(1.65);}
+.v143-skill-flight.motion-ground,
+.v143-skill-flight.motion-ground-wave,
+.v143-skill-flight.motion-burrow{background:linear-gradient(90deg,transparent,var(--v143-color),var(--v143-soft));}
+
+.v143-skill-field{
+    overflow:hidden;
+    border:2px solid color-mix(in srgb,var(--v143-color) 70%,transparent);
+    border-radius:18px;
+    opacity:0;
+    background:
+        repeating-radial-gradient(ellipse at center,transparent 0 12px,color-mix(in srgb,var(--v143-color) 18%,transparent) 14px 16px,transparent 18px 27px),
+        linear-gradient(180deg,transparent,color-mix(in srgb,var(--v143-color) 22%,transparent));
+    box-shadow:inset 0 0 22px color-mix(in srgb,var(--v143-color) 38%,transparent),0 0 16px color-mix(in srgb,var(--v143-color) 45%,transparent);
+    animation:v143Field var(--v143-field-duration,800ms) ease-in-out var(--v143-field-delay,140ms) both;
+}
+
+.v143-hit-impact{
+    width:78px;
+    height:78px;
+    margin:-39px 0 0 -39px;
+    border:3px solid var(--v143-soft);
+    border-radius:50%;
+    background:radial-gradient(circle,var(--v143-soft) 0 5%,var(--v143-color) 12%,color-mix(in srgb,var(--v143-color) 34%,transparent) 34%,transparent 69%);
+    box-shadow:0 0 23px var(--v143-color),inset 0 0 17px var(--v143-soft);
+    font-size:23px;
+    font-style:normal;
+    font-weight:900;
+    line-height:72px;
+    text-shadow:0 0 7px #000;
+    animation:v143Impact var(--v143-impact-duration,.54s) cubic-bezier(.16,.75,.24,1) both;
+}
+
+.v143-hit-particle{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:5px;
+    height:5px;
+    margin:-2px;
+    border-radius:50%;
+    background:var(--v143-soft);
+    box-shadow:0 0 7px var(--v143-color);
+    animation:v143Particle var(--v143-particle-duration,.48s) ease-out var(--pd,0ms) both;
+}
+
+/* Element vocabulary. */
+.v143-skill-stage[data-element="fire"] .v143-hit-impact{border-radius:52% 48% 62% 38%;clip-path:polygon(50% 0,63% 32%,88% 17%,72% 48%,100% 58%,64% 66%,52% 100%,38% 68%,3% 59%,29% 45%,14% 16%,40% 31%);}
+.v143-skill-stage[data-element="water"] .v143-hit-impact{border-radius:50% 50% 56% 44%;background:radial-gradient(circle,var(--v143-soft),var(--v143-color) 27%,transparent 68%);}
+.v143-skill-stage[data-element="wind"] .v143-hit-impact{border-style:dashed;transform:rotate(18deg);}
+.v143-skill-stage[data-element="earth"] .v143-hit-impact{border-radius:15%;clip-path:polygon(19% 4%,76% 0,100% 31%,91% 82%,55% 100%,8% 86%,0 37%);}
+
+/* Attack-method vocabulary. */
+.v143-skill-stage[data-impact*="cut"] .v143-hit-impact,
+.v143-skill-stage[data-impact*="cleave"] .v143-hit-impact,
+.v143-skill-stage[data-impact*="slash"] .v143-hit-impact{width:110px;height:34px;margin:-17px 0 0 -55px;border-width:0 0 5px;border-radius:50%;background:linear-gradient(0deg,var(--v143-color),transparent 45%);transform:rotate(-18deg);}
+.v143-skill-stage[data-impact*="fist"] .v143-hit-impact,
+.v143-skill-stage[data-impact*="knuckle"] .v143-hit-impact{width:64px;height:64px;margin:-32px;border-width:5px;transform:rotate(-12deg);}
+.v143-skill-stage[data-impact*="tornado"] .v143-hit-impact,
+.v143-skill-stage[data-impact*="storm"] .v143-hit-impact{width:98px;height:112px;margin:-70px 0 0 -49px;border-width:5px 1px;border-radius:50% 50% 25% 25%;animation-name:v143ImpactSpin;}
+.v143-skill-stage[data-impact*="prison"] .v143-hit-impact,
+.v143-skill-stage[data-impact*="crush"] .v143-hit-impact{border-radius:8%;clip-path:polygon(50% 0,65% 31%,91% 10%,72% 45%,100% 54%,68% 65%,87% 94%,59% 72%,49% 100%,39% 70%,10% 92%,31% 62%,0 52%,33% 42%,12% 8%,41% 34%);}
+.v143-skill-stage[data-impact*="dome"] .v143-hit-impact,
+.v143-skill-stage[data-impact*="shield"] .v143-hit-impact,
+.v143-skill-stage[data-impact*="wall"] .v143-hit-impact{width:94px;height:112px;margin:-56px 0 0 -47px;border-radius:50% 50% 14% 14%;background:linear-gradient(180deg,color-mix(in srgb,var(--v143-soft) 28%,transparent),color-mix(in srgb,var(--v143-color) 18%,transparent));}
+.v143-skill-stage[data-impact*="rift"] .v143-hit-impact,
+.v143-skill-stage[data-impact*="quake"] .v143-hit-impact{width:130px;height:42px;margin:-5px 0 0 -65px;border-width:0 0 6px;border-radius:50%;background:repeating-linear-gradient(125deg,transparent 0 10px,var(--v143-color) 12px 15px,transparent 17px 25px);}
+
+/* Named signatures add the final skill-specific silhouette. */
+.v143-skill-stage[data-skill="dragonSlash"] .v143-skill-flight{width:64px;height:42px;margin:-21px 0 0 -32px;font-size:31px;line-height:42px;}
+.v143-skill-stage[data-skill="phoenixCry"] .v143-skill-flight{width:72px;height:52px;margin:-26px 0 0 -36px;font-size:35px;line-height:52px;}
+.v143-skill-stage[data-skill="fireRocket"] .v143-skill-flight{border-radius:2px;background:linear-gradient(90deg,var(--v143-soft),var(--v143-color) 28%,transparent 31%);}
+.v143-skill-stage[data-skill="iceArrowRain"] .v143-skill-flight{clip-path:polygon(48% 0,61% 35%,100% 50%,61% 62%,50% 100%,39% 62%,0 50%,39% 35%);}
+.v143-skill-stage[data-skill="windCrossSlash"] .v143-hit-impact::after{content:"";position:absolute;inset:0;border-bottom:5px solid var(--v143-soft);transform:rotate(86deg);}
+.v143-skill-stage[data-skill="stormRain"] .v143-skill-field{background:repeating-linear-gradient(105deg,transparent 0 18px,color-mix(in srgb,var(--v143-soft) 38%,transparent) 20px 22px,transparent 24px 43px),radial-gradient(circle at 50% 10%,color-mix(in srgb,var(--v143-color) 38%,transparent),transparent 65%);}
+.v143-skill-stage[data-skill="earthShield"] .v143-hit-impact{border-color:#ff504c #ffe25c #60ec80 #59a9ff;clip-path:none;border-radius:15%;}
+.v143-skill-stage[data-skill="barrier"] .v143-hit-impact{border-style:double;font-size:18px;}
+
+.v143-caster-active{filter:drop-shadow(0 0 8px var(--v143-color,#fff));}
+.v143-impact-target{animation:v143CardImpact .46s ease-out both;}
+
+@keyframes v143Charge{
+    0%{opacity:0;transform:scale(.15) rotate(-90deg)}
+    42%{opacity:1;transform:scale(1) rotate(20deg)}
+    100%{opacity:0;transform:scale(1.34) rotate(135deg)}
+}
+@keyframes v143Fly{
+    0%{offset-distance:0;opacity:0;transform:scale(.2)}
+    12%{opacity:1}
+    82%{opacity:1;transform:scale(var(--v143-flight-scale,1))}
+    100%{offset-distance:100%;opacity:0;transform:scale(.35)}
+}
+@keyframes v143FlySpin{
+    0%{offset-distance:0;opacity:0;transform:rotate(0) scale(.2)}
+    15%{opacity:1}
+    100%{offset-distance:100%;opacity:0;transform:rotate(720deg) scale(1.1)}
+}
+@keyframes v143Field{0%,100%{opacity:0;transform:scale(.72)}28%,78%{opacity:.92;transform:scale(1)}}
+@keyframes v143Impact{0%{opacity:0;transform:scale(.08) rotate(-45deg)}28%{opacity:1;transform:scale(1) rotate(12deg)}100%{opacity:0;transform:scale(2) rotate(110deg)}}
+@keyframes v143ImpactSpin{0%{opacity:0;transform:scale(.12) rotate(0)}35%{opacity:1;transform:scale(1) rotate(180deg)}100%{opacity:0;transform:scale(1.6) rotate(620deg)}}
+@keyframes v143Particle{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(.2)}}
+@keyframes v143CardImpact{0%,100%{transform:translate(0)}22%{transform:translate(-3px,1px)}44%{transform:translate(3px,-1px)}66%{transform:translate(-1px,0)}}
+
+/* 4 / 5. Dungeon content uses the available screen and its nav is in-scale. */
+#game-stage #dungeonPage{
+    height:100% !important;
+    min-height:0 !important;
+    padding:6px 7px 86px !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+}
+#game-stage #dungeonPage.active{display:flex !important;flex-direction:column !important;}
+#game-stage #dungeonPage > h2{flex:0 0 auto;margin:2px 0 3px !important;font-size:22px !important;line-height:28px !important;}
+#game-stage #dungeonPage > h2 + div{flex:0 0 auto;margin:3px 4px 6px !important;}
+#game-stage #dungeonTabContent{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    margin:0 3px !important;
+    overflow:auto !important;
+    overscroll-behavior:contain;
+}
+#game-stage #dungeonTabContent > .v141-abyss-shell{height:100% !important;min-height:0 !important;overflow:hidden !important;}
+#game-stage .v141-abyss-map{height:auto !important;min-height:0 !important;flex:1 1 auto !important;}
+#game-stage #dungeonPage .v141-dungeon-return{display:none !important;}
+#game-stage #v141DungeonNav{
+    width:100% !important;
+    max-width:none !important;
+    height:84px !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    box-sizing:border-box !important;
+}
+#game-stage #v141DungeonNav .nav-art-button{height:64px !important;max-width:94% !important;}
+
+.v143-abyss-dialogue{
+    position:absolute !important;
+    inset:0 !important;
+    z-index:80 !important;
+    display:flex !important;
+    width:100% !important;
+    height:100% !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:12px !important;
+    padding:28px !important;
+    border:0 !important;
+    border-radius:10px !important;
+    color:#fff0c9 !important;
+    background:radial-gradient(circle at center,rgba(53,35,16,.88),rgba(5,5,5,.94) 70%) !important;
+    box-shadow:inset 0 0 42px rgba(218,154,56,.25) !important;
+    text-align:center !important;
+}
+.v143-abyss-dialogue small{color:#e7bc66;font-size:16px !important;font-weight:900;}
+.v143-abyss-dialogue b{max-width:340px;color:#fff3d5;font-family:"Noto Serif TC",serif;font-size:21px !important;line-height:1.65 !important;text-shadow:0 2px 8px #000;}
+.v143-abyss-dialogue span{color:#c5b99f;font-size:14px !important;animation:v143DialogueHint 1s ease-in-out infinite alternate;}
+@keyframes v143DialogueHint{to{opacity:.52;transform:translateY(3px)}}
+
+/* 6. Icon-first synthesis controls. */
+#game-stage .v143-synthesis .v141-synthesis-body{overflow:auto !important;overscroll-behavior:contain;}
+#game-stage .v143-synthesis .v141-synthesis-card{height:auto !important;min-height:100%;}
+#game-stage .v143-synthesis .v141-synthesis-card label{display:block !important;margin-bottom:7px !important;}
+#game-stage .v143-synthesis .v141-synthesis-card select[hidden]{display:none !important;}
+#game-stage .v143-item-picker{
+    display:grid;
+    grid-auto-flow:column;
+    grid-auto-columns:74px;
+    gap:6px;
+    margin-top:6px;
+    padding:3px 1px 7px;
+    overflow-x:auto;
+    scroll-snap-type:x proximity;
+}
+#game-stage .v143-item-picker button{
+    display:flex;
+    min-width:0;
+    min-height:82px;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    gap:3px;
+    padding:5px 3px;
+    border:1px solid #6c5434;
+    border-radius:8px;
+    color:#cbbd9f;
+    background:linear-gradient(160deg,#211a12,#0d0b08);
+    scroll-snap-align:start;
+}
+#game-stage .v143-item-picker button.selected{border-color:#f0bd59;color:#fff0c5;box-shadow:0 0 10px rgba(232,169,60,.5),inset 0 0 9px rgba(232,169,60,.15);}
+#game-stage .v143-item-picker i,#game-stage .v143-item-picker svg{display:block;width:48px;height:48px;flex:0 0 48px;}
+#game-stage .v143-item-picker span{display:-webkit-box;overflow:hidden;font-size:10px;line-height:12px;text-align:center;-webkit-box-orient:vertical;-webkit-line-clamp:2;}
+#game-stage .v143-synthesis .v141-blueprint-series b{color:#f2d28c;}
+#game-stage .v143-synthesis .v141-craft-preview span{white-space:normal;line-height:1.35;}
+
+@media (max-height:720px){
+    #game-stage #dungeonPage{padding-bottom:82px !important;}
+    #game-stage #v141DungeonNav{height:80px !important;}
+    #game-stage #v141DungeonNav .nav-art-button{height:60px !important;}
+    #game-stage .v143-abyss-dialogue b{font-size:19px !important;}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .v143-skill-stage *{animation-timing-function:linear !important;}
+    .v143-hit-particle:nth-child(n+11){display:none;}
+    .v143-earth-shield-effect i{animation-duration:2s !important;}
+}

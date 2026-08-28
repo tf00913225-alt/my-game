@@ -435,9 +435,9 @@ test("hard-control square-root scaling and rank caps stay exact",()=>{
     const calculate=rank=>context.v140CalculateStatusEffectChance(
         90,10,10,100,0,true,rank,0,"physical"
     );
-    assert.equal(calculate("regular"),75);
+    assert.equal(calculate("regular"),80);
     assert.equal(calculate("elite"),45);
-    assert.equal(calculate("boss"),15);
+    assert.equal(calculate("boss"),30);
     assert.equal(context.v140CalculateStatusEffectChance(
         30,10,10,100,20,true,"regular",0,"physical"
     ),26);
@@ -581,12 +581,14 @@ test("V140 remains before the ordered V141/V142 layers and both cache keys are b
         "js/34-v141-core-systems.js",
         "js/35-v141-ui-battle.js",
         "js/36-v141-content-systems.js",
-        "js/37-v142-skill-animation.js"
+        "js/37-v142-skill-animation.js",
+        "js/38-v143-system-fixes.js",
+        "js/39-v143-skill-animation.js"
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
-    assert.match(loaderSource,/const V_ASSET_VERSION="142"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=142/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="144"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=144/);
 });
 
 console.log("\nV140 four-element balance suite: "+passed+" tests passed.");
