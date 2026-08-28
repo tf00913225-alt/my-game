@@ -164,10 +164,10 @@ function createContext(options={}){
 
 (async()=>{
     await test("V142 assets are versioned and loaded after V141",()=>{
-        assert.match(loader,/const V_ASSET_VERSION="144"/);
+        assert.match(loader,/const V_ASSET_VERSION="146"/);
         assert.match(loader,/css\/39-v142-skill-animation\.css/);
         assert.match(loader,/js\/36-v141-content-systems\.js[\s\S]*js\/37-v142-skill-animation\.js/);
-        assert.match(index,/js\/20-anonymous-20\.js\?v=144/);
+        assert.match(index,/js\/20-anonymous-20\.js\?v=146/);
     });
 
     await test("normal, small and ultimate skills keep distinct durations",()=>{
@@ -281,7 +281,7 @@ function createContext(options={}){
         assert.equal(calls.process,1);
     });
 
-    await test("round handoff keeps its 400ms anchor but cannot start the next actor early",async()=>{
+    await test("round handoff cannot expose the next manual turn before the final animation ends",async()=>{
         const {context,scheduler,calls}=createContext({roundFlow:true});
         context.initiativeQueue=[{type:"player"}];
         const gate=context.v142SkillAnimationDirector.play(
@@ -292,12 +292,13 @@ function createContext(options={}){
         scheduler.advance(400);
         await Promise.resolve();
         await Promise.resolve();
-        assert.equal(calls.startTurn,1,"round timing anchor remains at the existing 400ms handoff");
+        assert.equal(calls.startTurn,0,"startTurn must remain gated while the final animation is active");
         assert.equal(calls.begin,0,"the next actor may not begin while the prior animation is active");
         scheduler.advance(760);
         gate.complete("animationend");
         await Promise.resolve();
         await Promise.resolve();
+        assert.equal(calls.startTurn,1);
         assert.equal(calls.begin,1);
     });
 

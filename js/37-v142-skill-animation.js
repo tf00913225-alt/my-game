@@ -630,13 +630,16 @@
                     :null;
                 state.tickets.resolve={
                     token:token,index:initiativeIndex,
-                    gate:roundEnded?null:actionGate,
-                    gateId:roundEnded
-                        ?"round-"+(actionGate?actionGate.id:"none")
-                        :(actionGate?actionGate.id:"none"),
-                    earliestAt:roundEnded
-                        ?calledAt+CURRENT_ROUND_HANDOFF_MS
-                        :Math.max(calledAt+resolveDelay(initiativeIndex),actionGate?actionGate.deadline:0),
+                    /* The last combatant must also hold processNextCombatant.
+                       Waiting only inside beginCharacterTurn was too late:
+                       startTurn had already switched to declare and exposed
+                       the manual HUD while the last animation was playing. */
+                    gate:actionGate,
+                    gateId:actionGate?actionGate.id:"none",
+                    earliestAt:Math.max(
+                        calledAt+resolveDelay(initiativeIndex),
+                        actionGate?actionGate.deadline:0
+                    ),
                     consumed:false
                 };
             }

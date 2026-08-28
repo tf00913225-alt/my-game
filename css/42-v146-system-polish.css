@@ -1,0 +1,344 @@
+/* =====================================================
+   V146 — final mobile polish
+===================================================== */
+
+/* Keep caster captions inside the battlefield without enlarging enemy rows. */
+#game-stage #battlePage #battleMonsterArea{
+    position:relative;
+    z-index:4;
+    transform:translateY(16px);
+}
+
+/* Skill names are hints: outlined text only, never a filled black plaque. */
+.skill-name-badge.v143-caster-skill-label{
+    overflow:visible !important;
+    border:0 !important;
+    border-radius:0 !important;
+    color:#fff4d7 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    -webkit-text-stroke:1.15px #050403 !important;
+    paint-order:stroke fill !important;
+    text-shadow:0 1px 2px #000,0 0 5px #000 !important;
+}
+.skill-name-badge.v143-caster-skill-label.badge-normal,
+.skill-name-badge.v143-caster-skill-label[data-skill="normal"]{
+    color:#fff !important;
+    -webkit-text-fill-color:#fff !important;
+}
+
+/* Exact card-to-card centreline and named projectile silhouettes. */
+.v143-skill-flight{
+    offset-anchor:50% 50%;
+    transform-origin:50% 50%;
+}
+.v146-flight-art{
+    display:block;
+    width:100%;
+    height:100%;
+    overflow:visible;
+    color:inherit;
+    filter:drop-shadow(0 0 8px var(--v143-color));
+}
+.v143-skill-stage[data-skill="dragonSlash"] .v143-skill-flight{
+    width:92px;height:52px;margin:-26px 0 0 -46px;background:transparent;
+}
+.v143-skill-stage[data-skill="phoenixCry"] .v143-skill-flight{
+    width:108px;height:66px;margin:-33px 0 0 -54px;background:transparent;
+}
+.v143-skill-stage[data-skill="iceArrowRain"] .v143-skill-flight,
+.v143-skill-stage[data-skill="fireRocket"] .v143-skill-flight,
+.v143-skill-stage[data-skill="windArrow"] .v143-skill-flight{
+    width:58px;height:26px;margin:-13px 0 0 -29px;border-radius:0;
+    clip-path:none;background:transparent;
+}
+.v143-skill-stage[data-skill="stoneThrow"] .v143-skill-flight,
+.v143-skill-stage[data-skill="stoneBreakSky"] .v143-skill-flight,
+.v143-skill-stage[data-skill="sandWind"] .v143-skill-flight,
+.v143-skill-stage[data-skill="flyingSandStrike"] .v143-skill-flight,
+.v143-skill-stage[data-skill="dustStorm"] .v143-skill-flight{
+    width:48px;height:48px;margin:-24px;background:transparent;
+}
+.v143-skill-stage[data-skill="iceArrowRain"] .v143-skill-field{
+    background:
+        repeating-linear-gradient(112deg,transparent 0 17px,rgba(145,229,255,.42) 19px 21px,transparent 23px 39px),
+        radial-gradient(ellipse at center,rgba(65,180,255,.28),transparent 68%);
+}
+.v143-skill-stage[data-skill="phoenixCry"] .v143-skill-field,
+.v143-skill-stage[data-skill="dragonSlash"] .v143-skill-field{
+    box-shadow:inset 0 0 48px rgba(255,70,22,.55),0 0 34px rgba(255,95,25,.62);
+}
+.v143-hit-impact{
+    width:92px;height:92px;margin:-46px 0 0 -46px;
+    box-shadow:0 0 32px var(--v143-color),inset 0 0 23px var(--v143-soft);
+}
+.v143-skill-field{filter:drop-shadow(0 0 12px var(--v143-color));}
+
+/* Wide attacks disturb formation in every direction, then return exactly. */
+.v146-area-impact{
+    animation:v146AreaImpact .66s cubic-bezier(.2,.72,.25,1) both !important;
+}
+@keyframes v146AreaImpact{
+    0%,100%{transform:translate(0,0) rotate(0)}
+    16%{transform:translate(-7px,-5px) rotate(-1.4deg)}
+    31%{transform:translate(8px,4px) rotate(1.5deg)}
+    47%{transform:translate(-4px,7px) rotate(-.8deg)}
+    63%{transform:translate(6px,-6px) rotate(1deg)}
+    79%{transform:translate(-3px,3px) rotate(-.5deg)}
+}
+
+.v146-status-popup{
+    position:fixed;
+    z-index:17100;
+    min-width:66px;
+    padding:4px 9px;
+    border:1px solid currentColor;
+    border-radius:999px;
+    color:#fff3b1;
+    background:rgba(7,6,5,.82);
+    box-shadow:0 0 16px currentColor;
+    font-family:"Noto Serif TC",serif;
+    font-size:14px;
+    font-weight:900;
+    line-height:1.2;
+    text-align:center;
+    white-space:nowrap;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    animation:v146StatusPopup 1.18s ease-out both;
+}
+.v146-status-popup.status-burn{color:#ff8b54;}
+.v146-status-popup.status-freeze{color:#9fe8ff;}
+.v146-status-popup.status-petrify{color:#e0bf7c;}
+.v146-status-popup.status-agilityDown{color:#8beac1;}
+.v146-status-popup.status-defenseDown{color:#ffd17b;}
+.v146-status-popup.status-stun{color:#e9e6ff;}
+@keyframes v146StatusPopup{
+    0%{opacity:0;transform:translate(-50%,-25%) scale(.72)}
+    18%,64%{opacity:1;transform:translate(-50%,-70%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-135%) scale(.94)}
+}
+
+/* Defeated cards can never advertise themselves as legal VFX targets. */
+#battlePage .v146-defeated.targetable::after,
+#battlePage .v146-defeated.ally-targetable::after,
+#battlePage .v146-defeated .v141-effect,
+#battlePage .v146-defeated .v143-earth-shield-effect{
+    display:none !important;
+}
+#battlePage .v146-defeated{pointer-events:none !important;}
+
+/* Backpack: six columns by three rows = exactly 18 visible cells. */
+#game-stage #inventoryPage .inventory-grid-scroll{
+    flex:0 0 auto !important;
+    overflow:hidden !important;
+    touch-action:none !important;
+}
+#game-stage #inventoryPage .inventory-grid-classic{
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
+    align-content:start !important;
+    overflow:hidden !important;
+}
+#game-stage #inventoryPage .v141-inventory-pager{
+    grid-template-columns:44px minmax(62px,auto) 44px !important;
+}
+#game-stage #inventoryPage .v141-inventory-pager button{
+    font-family:Arial,sans-serif !important;
+    font-size:24px !important;
+    line-height:29px !important;
+}
+
+/* Home party summary occupies the previously unused lower area. */
+#game-stage #homePage .v146-home-roster{
+    position:relative;
+    z-index:3;
+    display:grid;
+    gap:5px;
+    margin:2px 10px 8px;
+    padding:7px;
+    border:1px solid rgba(181,132,58,.78);
+    border-radius:10px;
+    color:#f4e7c8;
+    background:linear-gradient(155deg,rgba(35,24,14,.94),rgba(7,7,6,.94));
+    box-shadow:0 6px 17px rgba(0,0,0,.46),inset 0 0 13px rgba(214,158,63,.07);
+}
+#game-stage #homePage .v146-home-roster > header{
+    display:flex;align-items:center;justify-content:space-between;
+    color:#eac670;font-size:12px;line-height:16px;
+}
+#game-stage #homePage .v146-home-roster > header span{color:#ffe2a0;font-weight:900;}
+#game-stage #homePage .v146-home-character{
+    display:grid;
+    grid-template-columns:46px minmax(0,1fr);
+    gap:7px;
+    align-items:center;
+    min-height:48px;
+    padding:3px 5px 3px 3px;
+    border:1px solid rgba(117,89,50,.75);
+    border-radius:7px;
+    background:rgba(13,11,8,.74);
+}
+#game-stage #homePage .v146-home-character > img{
+    width:46px;height:46px;border-radius:6px;object-fit:cover;object-position:center 22%;
+}
+#game-stage #homePage .v146-home-character-main{display:grid;gap:3px;min-width:0;}
+#game-stage #homePage .v146-home-character-main > div:first-child{
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+    min-width:0;font-size:12px;line-height:13px;
+}
+#game-stage #homePage .v146-home-character-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#game-stage #homePage .v146-home-character-main span{color:#d8bd83;font-weight:800;white-space:nowrap;}
+#game-stage #homePage .v146-home-resource{
+    position:relative;height:11px;overflow:hidden;border-radius:4px;background:#241010;
+}
+#game-stage #homePage .v146-home-resource.sp{background:#0c1730;}
+#game-stage #homePage .v146-home-resource i{
+    position:absolute;inset:0 auto 0 0;background:linear-gradient(#f26763,#b91e20);
+}
+#game-stage #homePage .v146-home-resource.sp i{background:linear-gradient(#659bff,#2455bd);}
+#game-stage #homePage .v146-home-resource strong{
+    position:absolute;inset:0;z-index:2;color:#fff;font-size:8px;line-height:11px;text-align:center;text-shadow:0 1px 2px #000;
+}
+
+/* Shop: quantity, live total and buy button remain on one stable row. */
+#game-stage .shop-potion-purchase-row{
+    display:grid !important;
+    grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;
+    gap:5px !important;
+    align-items:center !important;
+}
+#game-stage .v146-shop-total{
+    min-width:0;
+    color:#f3cf79;
+    font-size:12px;
+    font-weight:900;
+    text-align:right;
+    white-space:nowrap;
+}
+
+/* Equipment synthesis has one decision: choose an icon, receive ordinary gear. */
+#game-stage .v146-synthesis-ordinary .v141-blueprint-series,
+#game-stage .v146-synthesis-ordinary label[hidden]{display:none !important;}
+#game-stage .v146-synthesis-ordinary .v143-item-picker{
+    grid-auto-columns:58px;
+    gap:7px;
+}
+#game-stage .v146-synthesis-ordinary .v143-item-picker button{
+    min-height:58px !important;
+    padding:4px !important;
+    justify-content:center !important;
+}
+#game-stage .v146-synthesis-ordinary .v143-item-picker i,
+#game-stage .v146-synthesis-ordinary .v143-item-picker svg{
+    width:48px;height:48px;flex-basis:48px;
+}
+
+/* Correct dungeon shell: intro art -> full-height walk-up map -> battle. */
+#game-stage #dungeonPage.v146-abyss-active{
+    padding:0 0 82px !important;
+    background:#090806;
+}
+#game-stage #dungeonPage.v146-abyss-active > h2,
+#game-stage #dungeonPage.v146-abyss-active > h2 + div{
+    display:none !important;
+}
+#game-stage #dungeonPage.v146-abyss-active #dungeonTabContent{
+    margin:0 !important;
+    overflow:hidden !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell{
+    height:100% !important;
+    gap:0 !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell > header{
+    z-index:20;
+    min-height:48px;
+    padding:7px 58px 7px 10px;
+    border-width:0 0 1px;
+    border-radius:0;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell > header span{
+    font-size:12px;white-space:normal;text-align:right;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map{
+    width:100%;height:100% !important;min-height:0 !important;
+    border:0;border-radius:0;
+}
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro{
+    min-height:0;
+    border:0;
+    background:
+        linear-gradient(180deg,rgba(8,6,4,.18),rgba(8,6,4,.92)),
+        url(../assets/ui/training-background.jpg) center/cover no-repeat;
+    box-shadow:inset 0 0 70px #000;
+}
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro p{
+    padding:8px 12px;border-radius:8px;color:#f0e0bd;background:rgba(5,4,3,.72);
+}
+#game-stage .v146-abyss-return{
+    position:absolute;
+    right:7px;
+    top:5px;
+    z-index:95;
+    width:42px;
+    height:42px;
+    min-height:42px !important;
+    padding:3px !important;
+    border:1px solid #b68a45;
+    border-radius:50%;
+    background:rgba(16,12,8,.9);
+    box-shadow:0 3px 12px rgba(0,0,0,.62);
+}
+#game-stage .v146-abyss-return img{display:block;width:100%;height:100%;object-fit:contain;}
+#game-stage .v141-abyss-map.v146-moving{cursor:progress;}
+#game-stage .v141-abyss-map.v146-too-far{animation:v146AbyssReject .6s ease;}
+@keyframes v146AbyssReject{25%{box-shadow:inset 0 0 45px rgba(255,72,45,.48)}70%{box-shadow:inset 0 0 20px rgba(255,72,45,.18)}}
+
+#game-stage #v141DungeonNav{
+    display:grid !important;
+    width:100% !important;
+    max-width:none !important;
+    height:82px !important;
+    box-sizing:border-box !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    gap:0 !important;
+}
+#game-stage #v141DungeonNav[data-v146-columns="4"]{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+}
+#game-stage #v141DungeonNav .nav-button{min-width:0 !important;padding:3px !important;}
+#game-stage #v141DungeonNav .nav-art-button{width:auto !important;height:62px !important;max-width:92% !important;object-fit:contain !important;}
+
+.v143-abyss-dialogue{
+    padding:34px 25px !important;
+}
+.v143-abyss-dialogue b{
+    font-size:23px !important;
+    line-height:1.7 !important;
+}
+.v143-abyss-dialogue span{font-size:15px !important;}
+
+@media (max-height:720px){
+    #game-stage #battlePage #battleMonsterArea{transform:translateY(12px);}
+    #game-stage #homePage .v146-home-character{min-height:43px;grid-template-columns:41px minmax(0,1fr);}
+    #game-stage #homePage .v146-home-character > img{width:41px;height:41px;}
+    #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
+    #game-stage #v141DungeonNav{height:78px !important;}
+    #game-stage #v141DungeonNav .nav-art-button{height:58px !important;}
+}
+
+@media (max-width:380px){
+    #game-stage .shop-potion-purchase-row{
+        grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;
+        gap:3px !important;
+    }
+    #game-stage .v146-shop-total{font-size:11px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .v146-area-impact,.v146-status-popup,#game-stage .v141-abyss-map.v146-too-far{
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+    }
+}

@@ -44,9 +44,9 @@
         if(heal){
             Object.assign(heal,{
                 learnCost:20,maxLevel:5,spCost:40,targetType:"allyAll",
-                baseHeal:95,healPerLevel:15,baseHealSP:15,healSPPerLevel:15,
+                baseHeal:350,healPerLevel:30,baseHealSP:35,healSPPerLevel:30,
                 requires:["iceArrowRain","iceSpin"],
-                description:"需先學習冰霜箭雨或冰旋一閃其一。對我方全體恢復95 HP與15 SP；每升1級，HP與SP恢復量各提升15點。"
+                description:"需先學習冰霜箭雨或冰旋一閃其一。對我方全體恢復350 HP與35 SP；每升1級，HP與SP恢復量各提升30點。"
             });
         }
         const dodge=skillDatabase.dodgeSkill;
@@ -81,6 +81,57 @@
                 description:"需先學習石破天驚或飛沙瞬擊其一。使我方全體獲得50%反傷土盾，持續3回合。"
             });
         }
+        const rockWall=skillDatabase.rockWall;
+        if(rockWall){
+            Object.assign(rockWall,{
+                learnCost:15,maxLevel:1,spCost:45,targetType:"allyAll",duration:4,
+                defenseBonusPercent:30,requires:["barrier"],
+                description:"需先學習結界。使我方全體防禦力提升30%，持續4回合。"
+            });
+        }
+        const waterEX=skillDatabase.waterEX;
+        if(waterEX){
+            Object.assign(waterEX,{
+                learnCost:25,maxLevel:1,damageBonusPercent:5,healBonusPercent:10,statusResistBonus:10,
+                description:"永久提升水元素傷害5%、回復系技能回復量10%、異常狀態抗性10%。"
+            });
+        }
+        const frostCrush=skillDatabase.frostCrush;
+        if(frostCrush){
+            Object.assign(frostCrush,{
+                learnCost:30,maxLevel:5,baseDamage:100,damagePerLevel:15,spCost:50,
+                freezeChance:75,freezeDuration:2,lifestealPercentByLevel:[4,5,6,7,8],
+                requires:["iceSpin"],
+                description:"需先學習冰旋一閃。對單體造成100點基礎傷害，每升1級傷害+15；75%基礎機率冰封2回合，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。"
+            });
+        }
+        const rain=skillDatabase.iceArrowRain;
+        if(rain){
+            Object.assign(rain,{
+                learnCost:20,maxLevel:5,baseDamage:30,damagePerLevel:12,spCost:75,
+                freezeChance:50,freezeDuration:2,freezeSingleTarget:false,
+                lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],
+                description:"需先學習洪水猛獸。對敵方全體各造成30點基礎傷害，每升1級傷害+12；吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP，每個命中目標各有50%基礎機率冰封2回合。"
+            });
+        }
+        const rage=skillDatabase.rage;
+        if(rage){
+            Object.assign(rage,{
+                learnCost:25,maxLevel:5,spCost:50,targetType:"allyAll",duration:2,
+                critBonusByLevel:[5,10,15,20,25],critChanceBonusByLevel:[5,10,15,20,25],
+                critDamageBonusByLevel:[10,20,30,40,50],requires:["explosiveFlurry","flameTornado"],
+                description:"需先學習火爆亂擊或烈焰龍捲其一。提高我方中、左、右最多3名存活角色的爆擊率5%/10%/15%/20%/25%與爆擊傷害10%/20%/30%/40%/50%，持續2回合。"
+            });
+        }
+        const phoenix=skillDatabase.phoenixCry;
+        if(phoenix){
+            Object.assign(phoenix,{
+                learnCost:45,maxLevel:5,baseDamage:53,damagePerLevel:15,spCost:62,
+                burnChance:70,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],
+                requires:["flameTornado"],
+                description:"需先學習烈焰龍捲。對敵方全體各造成53點基礎傷害，每升1級傷害+15；70%基礎機率燃燒2回合，每回合造成目標最大HP的5%/7%/9%/11%/13%傷害。"
+            });
+        }
         const holy=skillDatabase.yuanXiangGuangMing;
         if(holy){
             Object.assign(holy,{
@@ -99,7 +150,7 @@
         getSkillEffectPreviewText=function(skill,level){
             if(skill&&skill.id==="healSpell"){
                 const lv=Math.max(1,Math.min(5,Math.floor(numeric(level)||1)));
-                return "我方全體回復 "+(95+15*(lv-1))+" HP、"+(15+15*(lv-1))+" SP";
+                return "我方全體回復 "+(350+30*(lv-1))+" HP、"+(35+30*(lv-1))+" SP";
             }
             if(skill&&skill.id==="dinghaishenzhen"){
                 return "我方全體異常狀態抗性 +45%、命中 +50%，持續3回合";
@@ -114,7 +165,7 @@
             if(skill&&skill.id==="healSpell"){
                 return Array.from({length:5},(_,index)=>{
                     const level=index+1;
-                    return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);"><span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span><span style="flex:1;">我方全體回復 '+(95+15*index)+' HP、'+(15+15*index)+' SP</span></div>';
+                    return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);"><span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span><span style="flex:1;">我方全體回復 '+(350+30*index)+' HP、'+(35+30*index)+' SP</span></div>';
                 }).join("");
             }
             if(skill&&skill.id==="dinghaishenzhen"){
@@ -203,8 +254,8 @@
                 return '<div class="shop-potion-card '+item.resource+'">'+
                     '<div class="shop-potion-card-head"><span class="shop-potion-type">'+label+'</span><span class="shop-potion-stock">持有 '+getPotionCount(item.id)+'</span></div>'+
                     '<div class="shop-potion-name">'+escapeHtml(item.name)+'</div><div class="shop-potion-effect">回復最大'+label+'的 '+item.recoveryPercent+'%</div>'+
-                    '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="9999" step="1" value="1">'+
-                    '<button class="home-feature-buy-btn shop-potion-buy" '+(gold<price?'disabled':'')+' onclick="buyShopItem(\''+item.id+'\',document.getElementById(\'shopQuantity-'+item.id+'\').value)">'+price+' 金幣</button></div></div>';
+                    '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" data-unit-price="'+price+'" type="number" inputmode="numeric" min="1" max="9999" step="1" value="1" oninput="v146UpdateShopTotal(\''+item.id+'\')">'+
+                    '<span class="v146-shop-total" id="shopTotal-'+item.id+'">'+price+' 金幣</span><button class="home-feature-buy-btn shop-potion-buy" '+(gold<price?'disabled':'')+' onclick="buyShopItem(\''+item.id+'\',document.getElementById(\'shopQuantity-'+item.id+'\').value)">購買</button></div></div>';
             }).join("");
             return '<div class="shop-potion-interface"><div class="shop-potion-note">只販售 HP／SP 10%、20%、30% 回復藥水</div>'+
                 '<div class="v133-shop-tier-note">目前商店階級：'+tier.label+'（價格×'+tier.multiplier+'）</div><div class="shop-potion-list">'+cards+'</div></div>';
@@ -369,8 +420,10 @@
         if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
         showSkillNameBadge(skill.name,skill.element,characterIndex);
         if(typeof showPlayerSpPopup==="function"){ setTimeout(()=>showPlayerSpPopup(cost,characterIndex),500); }
-        const hpAmount=95+15*(level-1);
-        const spAmount=15+15*(level-1);
+        const exLevel=Math.max(0,Math.floor(numeric(getSkillLevel(characterKey,"waterEX"))));
+        const recoveryMultiplier=exLevel>0?1+(numeric(skillDatabase.waterEX&&skillDatabase.waterEX.healBonusPercent)||10)/100:1;
+        const hpAmount=Math.floor((350+30*(level-1))*recoveryMultiplier);
+        const spAmount=Math.floor((35+30*(level-1))*recoveryMultiplier);
         let hpTotal=0;
         let spTotal=0;
         getExistingPartyIndexes().forEach(index=>{
@@ -429,7 +482,7 @@
         const previousLoseBattleForLabel=loseBattle;
         loseBattle=function(){
             const result=previousLoseBattleForLabel.apply(this,arguments);
-            setTransitionLabel("失敗","lose");
+            setTransitionLabel("戰鬥失敗","lose");
             return result;
         };
     }
@@ -574,14 +627,21 @@
             let hpTotal=0,spTotal=0,removed=0;
             allies.forEach(entry=>{
                 const ally=entry.monster;
-                hpTotal+=typeof window.v141HealMonsterPreservingShield==="function"
+                const healed=typeof window.v141HealMonsterPreservingShield==="function"
                     ?window.v141HealMonsterPreservingShield(ally,450):0;
+                hpTotal+=healed;
                 const before=numeric(ally.sp);
                 ally.sp=Math.min(numeric(ally.maxSP),before+95);
-                spTotal+=ally.sp-before;
+                const restoredSp=ally.sp-before;
+                spTotal+=restoredSp;
                 removed+=Array.isArray(ally.statusEffects)?ally.statusEffects.length:0;
                 ally.statusEffects=[];
                 applyExtremeAgility(ally);
+                if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
+                if(restoredSp>0&&typeof showDamagePopup==="function"){
+                    const card=document.getElementById("battleMonster"+entry.index);
+                    if(card){ showDamagePopup(card,"+"+restoredSp+" SP","sp"); }
+                }
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
             });
             addBattleLog("極帝天尊施放元相光明：全體回復"+hpTotal+" HP、"+spTotal+" SP，解除"+removed+"個負面狀態並提升75%敏捷2回合。");
@@ -622,11 +682,18 @@
             let hpTotal=0,spTotal=0;
             living.forEach(entry=>{
                 const ally=entry.monster;
-                hpTotal+=typeof window.v141HealMonsterPreservingShield==="function"
-                    ?window.v141HealMonsterPreservingShield(ally,155):0;
+                const healed=typeof window.v141HealMonsterPreservingShield==="function"
+                    ?window.v141HealMonsterPreservingShield(ally,470):0;
+                hpTotal+=healed;
                 const before=numeric(ally.sp);
-                ally.sp=Math.min(numeric(ally.maxSP),before+75);
-                spTotal+=ally.sp-before;
+                ally.sp=Math.min(numeric(ally.maxSP),before+155);
+                const restoredSp=ally.sp-before;
+                spTotal+=restoredSp;
+                if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
+                if(restoredSp>0&&typeof showDamagePopup==="function"){
+                    const card=document.getElementById("battleMonster"+entry.index);
+                    if(card){ showDamagePopup(card,"+"+restoredSp+" SP","sp"); }
+                }
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
             });
             addBattleLog("北帝天尊施放最高等級治療術：全體回復"+hpTotal+" HP、"+spTotal+" SP。");

@@ -47,7 +47,7 @@
 #game-stage .system-panel-row strong{font-size:16px;}
 #game-stage .system-panel-row small{font-size:13px;line-height:1.55;}
 
-/* ----- Backpack: exactly 24 visible slots, five cyclic pages ----- */
+/* ----- Backpack: exactly 18 visible slots, seven cyclic pages ----- */
 #game-stage #inventoryPage .inventory-grid-scroll{
     flex:0 0 auto !important;
     height:auto !important;
@@ -59,7 +59,7 @@
 
 #game-stage #inventoryPage .inventory-grid-classic{
     grid-template-columns:repeat(6,minmax(0,1fr)) !important;
-    grid-template-rows:repeat(4,minmax(0,1fr)) !important;
+    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
     gap:5px !important;
     overflow:hidden !important;
 }

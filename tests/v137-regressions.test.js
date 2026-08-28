@@ -124,8 +124,8 @@ test("runtime patch loader strictly waits for each prior script",()=>{
     };
     const context=makeContext({
         document,
-        V_ASSET_VERSION:"144",
-        vAssetUrl:path=>path+"?v=144",
+        V_ASSET_VERSION:"146",
+        vAssetUrl:path=>path+"?v=146",
         setTimeout:handler=>handler()
     });
 
@@ -145,7 +145,8 @@ test("runtime patch loader strictly waits for each prior script",()=>{
         "v142-skill-animation-runtime",
         "v143-system-fixes-runtime",
         "v143-skill-animation-runtime",
-        "v144-rules-and-abyss-runtime"
+        "v144-rules-and-abyss-runtime",
+        "v146-system-polish-runtime"
     ];
 
     assert.equal(appended.length,1,"第一支完成前不可先插入後續補丁");
@@ -366,8 +367,8 @@ test("auto battle keeps a valid selected skill instead of silently queuing norma
 
 test("V137 regressions remain wired through the current deployed entry points",()=>{
     assert.match(indexSource,/js\/00-main\.js\?v=141/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=144/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="144"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=146/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="146"/);
     assert.match(v133Source,/const MAX_CHARACTER_LEVEL=100/);
     assert.doesNotMatch(mainSource,/safeBind\(\s*["'](?:autoEnabled|autoSkillHome|hpUsePctHome|spUsePctHome)/);
     assert.doesNotMatch(v132Source,/const result=originalLoseBattle\.apply/);
