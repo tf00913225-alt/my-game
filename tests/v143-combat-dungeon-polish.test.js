@@ -13,9 +13,9 @@ const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
-test("V143 assets stay ordered before V144/V146 under cache version 146",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=146/);
-    assert.match(loader,/const V_ASSET_VERSION="146"/);
+test("V143 assets stay ordered before V144/V146 under cache version 147",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=147/);
+    assert.match(loader,/const V_ASSET_VERSION="147"/);
     assert.match(loader,/css\/40-v143-combat-dungeon-polish\.css/);
     const order=[
         "js/37-v142-skill-animation.js",

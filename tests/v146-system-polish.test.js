@@ -6,6 +6,7 @@ const index=fs.readFileSync("index.html","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const ui=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
+const fixes=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
 const rules=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const source=fs.readFileSync("js/41-v146-system-polish.js","utf8");
@@ -40,9 +41,9 @@ function baseContext(overrides={}){
     return context;
 }
 
-test("V146 is the final ordered runtime and cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=146/);
-    assert.match(loader,/const V_ASSET_VERSION="146"/);
+test("V146 is the final ordered runtime under cache key 147",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=147/);
+    assert.match(loader,/const V_ASSET_VERSION="147"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -180,6 +181,10 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.match(css,/#v141DungeonNav\[data-v146-columns="4"\]/);
     assert.match(css,/\.v146-abyss-return/);
     assert.match(rules,/"戰鬥失敗"/);
+    [index,fixes,source].forEach(file=>assert.match(file,/assets\/ui\/home-shop-v147\.png/));
+    const shopIcon=fs.readFileSync("assets/ui/home-shop-v147.png");
+    assert.equal(shopIcon.subarray(1,4).toString(),"PNG");
+    assert.equal(shopIcon[25],6,"shop icon must retain an RGBA alpha channel");
 });
 
 console.log("\nV146 system polish suite: "+passed+" tests passed.");
