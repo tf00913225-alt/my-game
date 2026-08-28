@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="144";
+const V_ASSET_VERSION="146";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -454,6 +454,24 @@ function vAssetUrl(path){
     }
 })();
 
+/* V146 loader — final combat, Abyss, inventory and economy polish. */
+(function loadV146SystemPolishStyle(){
+    function load(){
+        if(document.getElementById("v146-system-polish-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v146-system-polish-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/42-v146-system-polish.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -481,7 +499,8 @@ function vAssetUrl(path){
         {id:"v142-skill-animation-runtime",src:"js/37-v142-skill-animation.js"},
         {id:"v143-system-fixes-runtime",src:"js/38-v143-system-fixes.js"},
         {id:"v143-skill-animation-runtime",src:"js/39-v143-skill-animation.js"},
-        {id:"v144-rules-and-abyss-runtime",src:"js/40-v144-rules-and-abyss.js"}
+        {id:"v144-rules-and-abyss-runtime",src:"js/40-v144-rules-and-abyss.js"},
+        {id:"v146-system-polish-runtime",src:"js/41-v146-system-polish.js"}
     ];
 
     function next(index){

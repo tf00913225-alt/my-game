@@ -1,6 +1,6 @@
 /*
    V141 — mobile UI and battle presentation
-   - 24-slot / 5-page backpack, compact dialogs and shop confirmation
+   - 18-slot / 7-page backpack, compact dialogs and shop confirmation
    - battle card status effects, monster shield bar, entrance/exit transitions
    - black-gold post-battle reward summary
    - click-to-move patrol character + draggable quest tracker
@@ -9,8 +9,8 @@
 (function installV141UiAndBattle(){
     "use strict";
 
-    const INVENTORY_PAGE_SIZE=24;
-    const INVENTORY_PAGE_COUNT=5;
+    const INVENTORY_PAGE_SIZE=18;
+    const INVENTORY_PAGE_COUNT=7;
     const ANNOUNCEMENT_READ_KEY="v141_announcement_read";
     const QUEST_MILESTONE_KEY="v141_quest_milestones";
     const TASK_TRACKER_KEY="v141_task_tracker";
@@ -41,7 +41,7 @@
     }
 
     /* =====================================================
-       Backpack: 24 slots × 5 pages
+       Backpack: 18 slots × 7 pages (the final page keeps the 120-slot cap)
     ===================================================== */
     function ensureInventoryPager(){
         const scroller=document.getElementById("inventoryGridScroll");
@@ -50,9 +50,9 @@
         pager.id="v141InventoryPager";
         pager.className="v141-inventory-pager";
         pager.innerHTML=
-            '<button type="button" aria-label="上一頁" onclick="v141ChangeInventoryPage(-1)">▲</button>'+
-            '<span id="v141InventoryPageLabel">1 / 5</span>'+
-            '<button type="button" aria-label="下一頁" onclick="v141ChangeInventoryPage(1)">▼</button>';
+            '<button type="button" aria-label="上一頁" onclick="v141ChangeInventoryPage(-1)">←</button>'+
+            '<span id="v141InventoryPageLabel">1 / 7</span>'+
+            '<button type="button" aria-label="下一頁" onclick="v141ChangeInventoryPage(1)">→</button>';
         scroller.insertAdjacentElement("afterend",pager);
     }
 
@@ -791,8 +791,20 @@
         const wasDungeon=!!window.v132ActiveDungeonRun;
         const page=document.getElementById("battlePage");
         const overlay=ensureBattleTransitionOverlay();
-        if(page){ page.classList.add(kind==="win"?"v141-exit-player":"v141-exit-monster"); }
-        setTimeout(()=>{ if(overlay){ overlay.classList.add("show"); } },650);
+        /* Keep the final hit / death pose readable before cards leave and the
+           opaque result seal arrives.  This is deliberately longer than the
+           card-hit animation and is still owned by the battle exit lifecycle. */
+        setTimeout(()=>{
+            if(page){ page.classList.add(kind==="win"?"v141-exit-player":"v141-exit-monster"); }
+        },720);
+        setTimeout(()=>{
+            if(overlay){
+                const label=overlay.querySelector("b");
+                if(label){ label.textContent=kind==="win"?"勝利":"戰鬥失敗"; }
+                overlay.dataset.v144Kind=kind==="win"?"win":"lose";
+                overlay.classList.add("show");
+            }
+        },1450);
         setTimeout(()=>{
             /* 舊 winBattle 會再延遲呼叫一次 showExpToast；必須在進入舊
                結算前先抑制，否則會先跳單獨 EXP，再跳本層整合獎勵。 */
@@ -811,7 +823,7 @@
                 if(kind==="win"){ setTimeout(()=>showBlackGoldReward(summary),120); }
             }
             return result;
-        },1650);
+        },2700);
     }
 
     if(typeof winBattle==="function"){

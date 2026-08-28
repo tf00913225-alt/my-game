@@ -13,15 +13,16 @@ const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
-test("V143 assets stay ordered before V144 under cache version 144",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=144/);
-    assert.match(loader,/const V_ASSET_VERSION="144"/);
+test("V143 assets stay ordered before V144/V146 under cache version 146",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=146/);
+    assert.match(loader,/const V_ASSET_VERSION="146"/);
     assert.match(loader,/css\/40-v143-combat-dungeon-polish\.css/);
     const order=[
         "js/37-v142-skill-animation.js",
         "js/38-v143-system-fixes.js",
         "js/39-v143-skill-animation.js",
-        "js/40-v144-rules-and-abyss.js"
+        "js/40-v144-rules-and-abyss.js",
+        "js/41-v146-system-polish.js"
     ].map(path=>loader.indexOf(path));
     assert.ok(order.every(value=>value>=0));
     assert.deepEqual(order.slice().sort((a,b)=>a-b),order);
@@ -76,7 +77,7 @@ test("the three revised skills and hard-control caps match the requested values"
     assert.match(system,/rain\.spCost=75/);
     assert.match(system,/rain\.freezeChance=50/);
     assert.match(system,/rain\.freezeDuration=2/);
-    assert.match(system,/rain\.freezeSingleTarget=true/);
+    assert.match(system,/rain\.freezeSingleTarget=false/);
     assert.match(system,/freeze\.freezeChance=80/);
     assert.match(system,/freeze\.freezeDuration=4/);
     assert.match(rules,/regular:\{min:5,max:80\}/);
@@ -104,11 +105,11 @@ test("V143 rule patch applies the requested skill metadata at runtime",()=>{
     assert.equal(snapshot.stormRain.spCost,75);
     assert.equal(snapshot.iceArrowRain.spCost,75);
     assert.equal(snapshot.iceArrowRain.freezeChance,50);
-    assert.equal(snapshot.iceArrowRain.freezeSingleTarget,true);
+    assert.equal(snapshot.iceArrowRain.freezeSingleTarget,false);
     assert.equal(snapshot.freeze.freezeChance,80);
 });
 
-test("Ice Arrow Rain rolls Freeze once after its all-target damage",()=>{
+test("Ice Arrow Rain rolls Freeze independently for every living target after damage",()=>{
     let originalFreezeChance=null;
     let frozen=0;
     const caster={level:30,sp:200,hp:500};
@@ -133,7 +134,7 @@ test("Ice Arrow Rain rolls Freeze once after its all-target damage",()=>{
     vm.runInContext(system,context);
     context.castDamageSkill("iceArrowRain");
     assert.equal(originalFreezeChance,0,"the legacy per-target Freeze loop must be disabled");
-    assert.equal(frozen,1,"exactly one enemy may receive the extra Freeze roll");
+    assert.equal(frozen,3,"every successfully rolled target receives Freeze");
     assert.equal(context.skillDatabase.iceArrowRain.freezeChance,50,"metadata must be restored after the cast");
 });
 

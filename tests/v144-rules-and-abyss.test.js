@@ -60,12 +60,12 @@ function run(context){
     return context;
 }
 
-test("V144 assets are cache-versioned after both V143 runtimes",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=144/);
-    assert.match(loader,/const V_ASSET_VERSION="144"/);
+test("V144 assets remain ordered before V146 under cache version 146",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=146/);
+    assert.match(loader,/const V_ASSET_VERSION="146"/);
     assert.match(loader,/css\/41-v144-rules-and-abyss\.css/);
     const order=[
-        "js/38-v143-system-fixes.js","js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js"
+        "js/38-v143-system-fixes.js","js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
     ].map(path=>loader.indexOf(path));
     assert.ok(order.every(value=>value>=0));
     assert.deepEqual(order.slice().sort((a,b)=>a-b),order);
@@ -165,7 +165,7 @@ test("battle transition wording is entry, victory and defeat instead of one gene
     context.winBattle();
     assert.equal(text.textContent,"勝利");
     context.loseBattle();
-    assert.equal(text.textContent,"失敗");
+    assert.equal(text.textContent,"戰鬥失敗");
     assert.match(css,/min-width:118px/);
     assert.match(css,/data-v144-kind="lose"/);
 });
@@ -178,7 +178,7 @@ test("the five revised player skills expose the exact costs, targets and effects
         getSkillPreviewSummary:()=>"legacy"
     }));
     const db=context.skillDatabase;
-    assert.deepEqual([db.healSpell.baseHeal,db.healSpell.baseHealSP,db.healSpell.healPerLevel,db.healSpell.healSPPerLevel,db.healSpell.spCost],[95,15,15,15,40]);
+    assert.deepEqual([db.healSpell.baseHeal,db.healSpell.baseHealSP,db.healSpell.healPerLevel,db.healSpell.healSPPerLevel,db.healSpell.spCost],[350,35,30,30,40]);
     assert.equal(db.healSpell.targetType,"allyAll");
     assert.deepEqual(JSON.parse(JSON.stringify(db.healSpell.requires)),["iceArrowRain","iceSpin"]);
     assert.equal(db.dodgeSkill.evasionBonusPercent,60);
@@ -186,8 +186,8 @@ test("the five revised player skills expose the exact costs, targets and effects
     assert.deepEqual([db.dinghaishenzhen.statusResistBonus,db.dinghaishenzhen.accuracyBonusPercent,db.dinghaishenzhen.spCost],[45,50,77]);
     assert.deepEqual([db.earthShield.targetType,db.earthShield.reflectPercent,db.earthShield.spCost],["allyAll",50,66]);
     assert.equal(context.getMainCharacterStats().accuracy,150,"氣定神閒 must affect real accuracy");
-    assert.equal(context.getSkillEffectPreviewText(db.healSpell,5),"我方全體回復 155 HP、75 SP");
-    assert.match(context.buildSkillLevelBreakdownHTML(db.healSpell),/Lv\.5[\s\S]*155 HP、75 SP/);
+    assert.equal(context.getSkillEffectPreviewText(db.healSpell,5),"我方全體回復 470 HP、155 SP");
+    assert.match(context.buildSkillLevelBreakdownHTML(db.healSpell),/Lv\.5[\s\S]*470 HP、155 SP/);
     assert.match(context.getSkillEffectPreviewText(db.dinghaishenzhen,1),/抗性 \+45%、命中 \+50%/);
 });
 
@@ -202,14 +202,14 @@ test("Heal Spell restores its exact level-scaled HP and SP to every living ally"
     const context=run(baseContext({
         queuedPlayerActions:{0:{action:"healSpell",target:null,targetAlly:null}},
         getPartyCharacterByIndex:index=>party[index]||null,getPartyCharacterKey:index=>"p"+index,
-        getSkillLevel:()=>5,getExistingPartyIndexes:()=>[0,1,2],getPartyBattleStats:index=>maxima[index],
+        getSkillLevel:(key,id)=>id==="healSpell"?5:0,getExistingPartyIndexes:()=>[0,1,2],getPartyBattleStats:index=>maxima[index],
         resolveQueuedPlayerAction(){ throw new Error("legacy single-target heal should not run"); },
         lungePlayerCard(){},showSkillNameBadge(){},showPlayerSpPopup(){},showPlayerHit(){},
         addBattleLog(){},updateUI(){},finishPlayerAction(){ finishes++; }
     }));
     context.resolveQueuedPlayerAction(0,1);
-    assert.deepEqual(party.map(item=>item.hp),[255,165,200]);
-    assert.deepEqual(party.map(item=>item.sp),[135,75,200]);
+    assert.deepEqual(party.map(item=>item.hp),[300,300,200]);
+    assert.deepEqual(party.map(item=>item.sp),[200,155,200]);
     assert.equal(finishes,1);
 });
 

@@ -69,10 +69,10 @@
             rain.spCost=75;
             rain.freezeChance=50;
             rain.freezeDuration=2;
-            rain.freezeSingleTarget=true;
+            rain.freezeSingleTarget=false;
             rain.lifestealPercentByLevel=[1,2,3,4,5];
             rain.requires=["floodBeast"];
-            rain.description="對敵方全體各造成30點基礎法術傷害；吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；另有50%基礎機率使隨機單一目標冰封2回合。";
+            rain.description="對敵方全體各造成30點基礎法術傷害；吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；每個命中目標各有50%基礎機率冰封2回合。";
         }
         const freeze=skillDatabase.freeze;
         if(freeze){
@@ -97,7 +97,7 @@
         };
     };
 
-    /* Ice Arrow Rain damages everyone, but rolls Freeze only once. */
+    /* Ice Arrow Rain damages everyone and each hit target rolls Freeze. */
     function playerIceRainTargets(centerIndex){
         if(typeof getSkillTargets!=="function"){ return []; }
         let center=Number.isInteger(centerIndex)?centerIndex:
@@ -106,30 +106,31 @@
         return center===null?[]:getSkillTargets(center,"all").slice();
     }
 
-    function applySingleIceRainFreeze(casterIndex,targetIndexes){
+    function applyIceRainFreezeToTargets(casterIndex,targetIndexes){
         if(!targetIndexes.length || typeof rollStatusEffectHit!=="function"){ return; }
         const candidates=targetIndexes.filter(index=>{
             const monster=typeof monsters!=="undefined"?monsters[index]:null;
             return monster&&monster.alive&&monster.hp>0;
         });
         if(!candidates.length){ return; }
-        const index=candidates[Math.floor(Math.random()*candidates.length)];
-        const monster=monsters[index];
         const caster=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(casterIndex):null;
         const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(casterIndex):null;
         if(!caster||!stats){ return; }
-        const hit=rollStatusEffectHit(
-            50,caster.level,monster.level,stats.intelligence,
-            typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
-            true,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
-        );
-        if(hit){
-            applyFreezeEffect(monster,2);
-            addBattleLog(monster.name+"被冰霜箭雨冰封2回合！");
-            if(typeof updateMonsterUI==="function"){ updateMonsterUI(index); }
-        }else{
-            addBattleLog("冰霜箭雨的冰封效果被"+monster.name+"抵抗了。");
-        }
+        candidates.forEach(index=>{
+            const monster=monsters[index];
+            const hit=rollStatusEffectHit(
+                50,caster.level,monster.level,stats.intelligence,
+                typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
+                true,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
+            );
+            if(hit){
+                applyFreezeEffect(monster,2);
+                addBattleLog(monster.name+"被冰霜箭雨冰封2回合！");
+                if(typeof updateMonsterUI==="function"){ updateMonsterUI(index); }
+            }else{
+                addBattleLog("冰霜箭雨的冰封效果被"+monster.name+"抵抗了。");
+            }
+        });
     }
 
     function wrapPlayerIceRainFunction(name,casterIndexFromArgs,centerFromArgs){
@@ -150,7 +151,7 @@
             let result;
             try{ result=previous.apply(this,args); }
             finally{ skill.freezeChance=chance; }
-            if(caster&&numeric(caster.sp)<beforeSp){ applySingleIceRainFreeze(casterIndex,targets); }
+            if(caster&&numeric(caster.sp)<beforeSp){ applyIceRainFreezeToTargets(casterIndex,targets); }
             return result;
         };
     }
@@ -158,7 +159,7 @@
     wrapPlayerIceRainFunction("castSecondaryCharacterSkill",args=>Number(args[0])||0,args=>Number(args[2]));
     wrapPlayerIceRainFunction("castPlayer2Skill",()=>1,args=>Number(args[1]));
 
-    /* Monster Ice Arrow Rain follows the same one-target Freeze rule. */
+    /* Monster Ice Arrow Rain follows the same per-target Freeze rule. */
     if(typeof processSingleMonsterAttack==="function"){
         const previousProcessSingleMonsterAttack=processSingleMonsterAttack;
         processSingleMonsterAttack=function(monsterIndex){
@@ -183,8 +184,7 @@
                     const character=getPartyCharacterByIndex(index);
                     return character&&character.hp>0;
                 });
-                if(living.length){
-                    const targetIndex=living[Math.floor(Math.random()*living.length)];
+                living.forEach(targetIndex=>{
                     const target=getPartyCharacterByIndex(targetIndex);
                     const caster=monsters[monsterIndex];
                     const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
@@ -195,7 +195,7 @@
                         addBattleLog((target.id||"角色")+"被冰霜箭雨冰封2回合！");
                         if(typeof updateUI==="function"){ updateUI(); }
                     }
-                }
+                });
             }
             return result;
         };

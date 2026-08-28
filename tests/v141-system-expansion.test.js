@@ -64,7 +64,7 @@ function extractAssignedFunction(source,name){
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
-test("V141 assets remain ordered before V142/V143/V144 with cache version 144",()=>{
+test("V141 assets remain ordered before V142/V143/V144/V146 with cache version 146",()=>{
     const paths=[
         "js/33-v140-four-element-balance.js",
         "js/34-v141-core-systems.js",
@@ -73,25 +73,26 @@ test("V141 assets remain ordered before V142/V143/V144 with cache version 144",(
         "js/37-v142-skill-animation.js",
         "js/38-v143-system-fixes.js",
         "js/39-v143-skill-animation.js",
-        "js/40-v144-rules-and-abyss.js"
+        "js/40-v144-rules-and-abyss.js",
+        "js/41-v146-system-polish.js"
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="144"/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="146"/);
     assert.match(indexSource,/js\/00-main\.js\?v=141/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=144/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=146/);
 });
 
-test("backpack is 120 slots rendered as five cyclic pages of 24 without drag or slot numbers",()=>{
+test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or slot numbers",()=>{
     assert.match(mainSource,/new Array\(120\)\.fill\(null\)/);
     assert.match(mainSource,/const INVENTORY_CATEGORY_SLOT_COUNT = 120/);
-    assert.match(uiSource,/const INVENTORY_PAGE_SIZE=24/);
-    assert.match(uiSource,/const INVENTORY_PAGE_COUNT=5/);
+    assert.match(uiSource,/const INVENTORY_PAGE_SIZE=18/);
+    assert.match(uiSource,/const INVENTORY_PAGE_COUNT=7/);
     assert.match(uiSource,/inventoryPageIndex=\(inventoryPageIndex\+Number\(direction\)\+INVENTORY_PAGE_COUNT\)%INVENTORY_PAGE_COUNT/);
     assert.match(uiSource,/box\.draggable=false/);
     assert.doesNotMatch(uiSource,/inventory-slot-number/);
-    assert.match(cssSource,/grid-template-rows:repeat\(4,minmax\(0,1fr\)\)/);
+    assert.match(cssSource,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
     assert.match(cssSource,/\.inventory-slot-number\{\s*display:none/);
 });
 
@@ -212,7 +213,7 @@ test("card VFX cover all requested status groups and battle transitions are dire
 
 test("battle rewards wait until exit and use one black-gold map toast",()=>{
     assert.match(uiSource,/finishBattleExit/);
-    assert.match(uiSource,/setTimeout\(\(\)=>\{[\s\S]*?original\.apply\(context,args\)[\s\S]*?\},1650\)/);
+    assert.match(uiSource,/setTimeout\(\(\)=>\{[\s\S]*?original\.apply\(context,args\)[\s\S]*?\},2700\)/);
     assert.match(uiSource,/showPage\("map"\)/);
     assert.match(uiSource,/v141-reward-toast/);
     const exitBody=extractFunction(uiSource,"finishBattleExit");
