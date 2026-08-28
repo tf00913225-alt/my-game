@@ -64,7 +64,7 @@ function extractAssignedFunction(source,name){
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
-test("V141 assets remain ordered before V142/V143/V144/V146 with cache version 146",()=>{
+test("V141 assets remain ordered before V142/V143/V144/V146 with cache version 147",()=>{
     const paths=[
         "js/33-v140-four-element-balance.js",
         "js/34-v141-core-systems.js",
@@ -79,9 +79,9 @@ test("V141 assets remain ordered before V142/V143/V144/V146 with cache version 1
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="146"/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="147"/);
     assert.match(indexSource,/js\/00-main\.js\?v=141/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=146/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=147/);
 });
 
 test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or slot numbers",()=>{

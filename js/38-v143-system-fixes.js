@@ -610,7 +610,7 @@
         nav.innerHTML=
             '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'character\')" aria-label="角色"><img class="nav-art-button" src="assets/ui/nav-character.png" alt=""><span class="nav-sr-only">角色</span></button>'+
             '<button class="nav-button nav-art-button-wrap" onclick="openMapInventoryOverlay()" aria-label="背包"><img class="nav-art-button" src="assets/ui/nav-backpack.png" alt=""><span class="nav-sr-only">背包</span></button>'+
-            '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'shop\')" aria-label="商店"><img class="nav-art-button" src="assets/ui/home-shop.png" alt=""><span class="nav-sr-only">商店</span></button>'+
+            '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'shop\')" aria-label="商店"><img class="nav-art-button" src="assets/ui/home-shop-v147.png" alt=""><span class="nav-sr-only">商店</span></button>'+
             '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'autoBattleSettings\')" aria-label="元素匣"><img class="nav-art-button" src="assets/ui/nav-element-box.png" alt=""><span class="nav-sr-only">元素匣</span></button>'+
             '<button class="nav-button nav-art-button-wrap" onclick="showPage(\'home\')" aria-label="返回"><img class="nav-art-button" src="assets/ui/map-return.png" alt=""><span class="nav-sr-only">返回</span></button>';
         nav.dataset.v143Fixed="1";
