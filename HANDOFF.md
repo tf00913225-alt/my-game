@@ -391,6 +391,12 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 V138 10/10、V139 7/7、V140 14/14、V141 18/18、V142 14/14、V143 12/12、
 V144 11/11、V146 8/8，共 103 項。`tests/v138-browser-smoke.js` 已執行，但本環境
 沒有 Chromium，腳本依設計略過；仍需正式手機實機走一次深淵與十怪大型技能。
+2026-08-28 經使用者再次明確確認目的地後，已將 V146 發布至 `dev`
+（`3659625`）與 `main`（`bcc2304`）。`main` 使用雙親合併提交保留外部 V145
+（`845c955`）歷史，但整份檔案樹精確採用 V146，不包含 V145 的 wrapper loader、
+`js/20-anonymous-20-v144-original.js` 或 `js/41-v145-wind-skill-icons.js`。GitHub Pages
+正式網址回傳 HTTP 200，線上 `index.html` 已確認載入 `?v=146`，`js/20`、`js/41`
+與 `css/42` 均回傳 HTTP 200 且內容／SHA 與本機 V146 一致。
 
 **已知限制**：使用者提到「另一個對話新上傳的去背商店 icon」，該素材不在此工作樹且
 本對話無法讀取，因此 V146 保留 `assets/ui/home-shop.png`，不得用猜測素材覆蓋；待重新
