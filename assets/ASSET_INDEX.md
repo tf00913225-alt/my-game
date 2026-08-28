@@ -44,6 +44,7 @@ This branch is dedicated to game art assets only.
 - `assets/ui/icons/`
 - `assets/ui/panels/`
 - `assets/ui/portraits/`
+- `assets/ui/loading/elemental/`
 - `assets/effects/battle/`
 - `assets/effects/status/`
 - `assets/effects/buffs/`
@@ -54,7 +55,18 @@ This branch is dedicated to game art assets only.
 
 | Original purpose | New filename | GitHub path |
 | --- | --- | --- |
-| _No new assets uploaded yet_ | — | — |
+| _No binary assets imported yet_ | — | — |
+
+## Pending Binary Import
+
+The following images were supplied in chat and classified. Their target names and paths are reserved, but the current GitHub connector cannot stream chat-attachment binary bytes into repository blobs. Do not reuse these filenames for other assets. When binary upload capability is available, import the exact supplied files to these target paths and then move these rows into **Asset Mapping**.
+
+| Original purpose | New filename | Target GitHub path | SHA-256 of supplied file |
+| --- | --- | --- | --- |
+| 火元素轉場載入美術圖 | `loading-element-fire.jpg` | `assets/ui/loading/elemental/loading-element-fire.jpg` | `bcfca98f97020c01f4d112ea8d072efdd06b37f4198f17815b71550090e105d7` |
+| 水元素轉場載入美術圖 | `loading-element-water.jpg` | `assets/ui/loading/elemental/loading-element-water.jpg` | `8e1d8d0233ba4c6c386cc67f3d55e9acaaac38395ecb6859d76e1ea9b6cde7dd` |
+| 土元素轉場載入美術圖 | `loading-element-earth.jpg` | `assets/ui/loading/elemental/loading-element-earth.jpg` | `4be47f50505cc723ecf3a1228607f4dc16e44d6ed3e53ffdfb2a2792d7e84cc4` |
+| 風元素轉場載入美術圖 | `loading-element-wind.jpg` | `assets/ui/loading/elemental/loading-element-wind.jpg` | `c53424a8e9f06090d03d9efbc8a509733d665277c5ac3793e93fad87d4a88114` |
 
 ## Handoff Note
 
