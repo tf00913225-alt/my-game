@@ -42,8 +42,8 @@ function baseContext(overrides={}){
 }
 
 test("V146 remains ordered before V149 under cache key 154",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=154/);
-    assert.match(loader,/const V_ASSET_VERSION="154"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=155/);
+    assert.match(loader,/const V_ASSET_VERSION="155"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -68,7 +68,7 @@ test("latest skill table contains every exact requested value",()=>{
 });
 
 test("battle timing, dead-target filtering and named choreography are enforced",()=>{
-    assert.match(timing,/earliestAt:Math\.max\([\s\S]*actionGate\?actionGate\.deadline:0/);
+    assert.match(timing,/earliestAt:Math\.max\([\s\S]*boundaryGate\?boundaryGate\.deadline:0/);
     assert.match(animation,/function canReceive\(config,side,index\)/);
     assert.match(animation,/entity\.hp\)>0/);
     assert.match(animation,/getSkillTargets\(queued\.target,targetType\)/);

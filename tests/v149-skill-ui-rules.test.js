@@ -70,11 +70,11 @@ function compact(skill){
 }
 
 test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=154/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=155/);
     assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=149/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
-    assert.match(loader,/const V_ASSET_VERSION="154"/);
+    assert.match(loader,/const V_ASSET_VERSION="155"/);
     assert.match(loader,/css\/44-v149-skill-ui-rules\.css/);
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
@@ -270,6 +270,29 @@ test("Dragon Slash repeats once at 33 percent without charging SP twice",()=>{
     assert.deepEqual(targets,[1,1]);
 });
 
+test("Dragon Slash adds a second repeat when the first repeat is critical",()=>{
+    const math=Object.create(Math); math.random=()=>0;
+    let finishes=0;
+    const player={id:"火俠",element:"fire",hp:100,sp:200,activeBuffs:[],statusEffects:[]};
+    const monsters=[{name:"敵人",alive:true,hp:999,statusEffects:[]}];
+    const context={
+        window:null,console,Math:math,Date,Number,Object,Array,Set,Map,Promise,
+        skillDatabase:database(),document:bareDocument(),player,monsters,currentBattleMonsters:[0],selectedMonster:0,
+        getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>player,
+        castCount:0,battleActive:true,finishPlayerAction(){ finishes++; },
+        rollCritical(){ return {isCrit:context.castCount===2,multiplier:1}; },
+        setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback()
+    };
+    context.window=context;
+    vm.createContext(context);
+    vm.runInContext("castDamageSkill=function(id){player.sp-=skillDatabase[id].spCost;castCount++;rollCritical();finishPlayerAction()}",context);
+    vm.runInContext(source,context);
+    context.castDamageSkill("dragonSlash");
+    assert.equal(context.castCount,3);
+    assert.equal(player.sp,135);
+    assert.equal(finishes,1);
+});
+
 test("enemy Dragon Slash repeat preserves the active battle token",()=>{
     const math=Object.create(Math); math.random=()=>0;
     const calls=[];
@@ -289,6 +312,30 @@ test("enemy Dragon Slash repeat preserves the active battle token",()=>{
     });
     context.processSingleMonsterAttack(0,77);
     assert.deepEqual(calls,[[0,77],[0,77]]);
+    assert.equal(monsters[0].sp,135);
+    assert.equal(finishes,1);
+});
+
+test("enemy Dragon Slash adds a second repeat after a critical first repeat",()=>{
+    const math=Object.create(Math); math.random=()=>0;
+    const calls=[];
+    let finishes=0;
+    const party=[{id:"我方",hp:100,activeBuffs:[],statusEffects:[]}];
+    const monsters=[{name:"敵方",alive:true,hp:100,sp:200,skillIds:["dragonSlash"],skillChance:1,statusEffects:[]}];
+    const context=load({
+        Math:math,monsters,currentBattleMonsters:[0],showPlayerHit(){},
+        getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:index=>party[index],
+        processSingleMonsterAttack(index,token){
+            calls.push([index,token]);
+            this.showMonsterSkillNameBadge("霸龍裂天斬","fire",index);
+            monsters[index].sp-=this.skillDatabase.dragonSlash.spCost;
+            this.showPlayerHit(10,"hp",0,false,calls.length===2);
+            this.finishPlayerAction();
+        },
+        showMonsterSkillNameBadge(){},finishPlayerAction(){ finishes++; },addBattleLog(){}
+    });
+    context.processSingleMonsterAttack(0,88);
+    assert.deepEqual(calls,[[0,88],[0,88],[0,88]]);
     assert.equal(monsters[0].sp,135);
     assert.equal(finishes,1);
 });

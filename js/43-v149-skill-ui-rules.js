@@ -561,7 +561,7 @@
         };
     }
 
-    /* ----- Dragon Slash can cast one extra time without a second SP cost. ----- */
+    /* ----- Dragon Slash can add one cast, then one conditional final cast. ----- */
     function firstLivingMonsterIndex(){
         const indexes=livingMonsterIndexes();
         return indexes.length?indexes[0]:null;
@@ -577,6 +577,67 @@
             ?window.v142SkillAnimationDirector.getActive():null;
         if(gate&&gate.promise&&!gate.done){ gate.promise.then(callback); }
         else{ setTimeout(callback,0); }
+    }
+
+    function runPlayerDragonRepeat(options,allowConditionalRepeat){
+        scheduleAfterAnimation(()=>{
+            const nextTarget=preferredLivingMonsterIndex(options.originalTarget);
+            if(nextTarget===null||typeof battleActive!=="undefined"&&!battleActive){
+                if(options.realFinish){ options.realFinish(); }
+                return;
+            }
+
+            const repeatArgs=options.args.slice();
+            if(Number.isInteger(options.centerArgIndex)){ repeatArgs[options.centerArgIndex]=nextTarget; }
+            if(typeof selectedMonster!=="undefined"){ selectedMonster=nextTarget; }
+            const target=typeof monsters!=="undefined"?monsters[nextTarget]:null;
+            const targetWasAlive=!!(target&&target.alive!==false&&numeric(target.hp)>0);
+            const originalCost=options.skill.spCost;
+            const originalPopup=typeof showPlayerSpPopup==="function"?showPlayerSpPopup:null;
+            const originalRoll=typeof rollCritical==="function"?rollCritical:null;
+            let finishRequested=false;
+            let repeatedCritical=false;
+            let failed=false;
+
+            options.skill.spCost=0;
+            if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+            if(originalPopup){ showPlayerSpPopup=function(){}; }
+            if(originalRoll){
+                rollCritical=function(){
+                    const result=originalRoll.apply(this,arguments);
+                    if(result&&result.isCrit){ repeatedCritical=true; }
+                    return result;
+                };
+            }
+            try{ options.previous.apply(options.that,repeatArgs); }
+            catch(error){
+                failed=true;
+                console.error("霸龍裂天斬再施放失敗：",error);
+            }
+            finally{
+                options.skill.spCost=originalCost;
+                if(options.realFinish){ finishPlayerAction=options.realFinish; }
+                if(originalPopup){ showPlayerSpPopup=originalPopup; }
+                if(originalRoll){ rollCritical=originalRoll; }
+            }
+
+            if(failed){
+                if(options.realFinish){ options.realFinish(); }
+                return;
+            }
+            const defeatedTarget=targetWasAlive&&(!target||target.alive===false||numeric(target.hp)<=0);
+            if(
+                finishRequested&&allowConditionalRepeat&&(repeatedCritical||defeatedTarget)&&
+                preferredLivingMonsterIndex(options.originalTarget)!==null
+            ){
+                if(typeof addBattleLog==="function"){
+                    addBattleLog("霸龍裂天斬追加攻擊出現爆擊或擊敗目標，再追加一次！");
+                }
+                runPlayerDragonRepeat(options,false);
+                return;
+            }
+            if(finishRequested&&options.realFinish){ options.realFinish(); }
+        });
     }
 
     function wrapDragonRepeat(name,skillArgIndex,centerArgIndex,casterFromArgs){
@@ -605,30 +666,10 @@
                 return result;
             }
             if(typeof addBattleLog==="function"){ addBattleLog("霸龍裂天斬觸發再施放！"); }
-            const that=this;
-            scheduleAfterAnimation(()=>{
-                const nextTarget=preferredLivingMonsterIndex(originalTarget);
-                if(nextTarget===null||typeof battleActive!=="undefined"&&!battleActive){
-                    if(realFinish){ realFinish(); }
-                    return;
-                }
-                const repeatArgs=args.slice();
-                if(Number.isInteger(centerArgIndex)){ repeatArgs[centerArgIndex]=nextTarget; }
-                if(typeof selectedMonster!=="undefined"){ selectedMonster=nextTarget; }
-                const originalCost=skill.spCost;
-                const originalPopup=typeof showPlayerSpPopup==="function"?showPlayerSpPopup:null;
-                skill.spCost=0;
-                if(originalPopup){ showPlayerSpPopup=function(){}; }
-                try{ previous.apply(that,repeatArgs); }
-                catch(error){
-                    console.error("霸龍裂天斬再施放失敗：",error);
-                    if(realFinish){ realFinish(); }
-                }
-                finally{
-                    skill.spCost=originalCost;
-                    if(originalPopup){ showPlayerSpPopup=originalPopup; }
-                }
-            });
+            runPlayerDragonRepeat({
+                previous:previous,that:this,args:args,skill:skill,
+                centerArgIndex:centerArgIndex,originalTarget:originalTarget,realFinish:realFinish
+            },true);
             return result;
         };
     }
@@ -773,6 +814,95 @@
         };
     }
 
+    function runMonsterDragonRepeat(options,allowConditionalRepeat){
+        scheduleAfterAnimation(()=>{
+            const monster=options.monster;
+            if(!monster||monster.alive===false||numeric(monster.hp)<=0||!livingPartyIndexes().length){
+                if(options.realFinish){ options.realFinish(); }
+                return;
+            }
+
+            const originalCost=options.skill.spCost;
+            const originalIds=monster.skillIds;
+            const originalSupports=monster.v141SupportSkillIds;
+            const originalChance=monster.skillChance;
+            const originalHit=typeof showPlayerHit==="function"?showPlayerHit:null;
+            const originalLog=typeof addBattleLog==="function"?addBattleLog:null;
+            const previousRepeatAttacker=currentReflectAttacker;
+            const livingBefore=livingPartyIndexes().map(index=>({
+                character:getPartyCharacterByIndex(index),
+                alive:numeric(getPartyCharacterByIndex(index)&&getPartyCharacterByIndex(index).hp)>0
+            }));
+            let finishRequested=false;
+            let repeatedCritical=false;
+            let failed=false;
+
+            options.skill.spCost=0;
+            monster.skillIds=["dragonSlash"];
+            monster.v141SupportSkillIds=[];
+            monster.skillChance=1;
+            currentReflectAttacker=options.monsterIndex;
+            monsterTeamFreezeApplied=false;
+            if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+            if(originalHit){
+                showPlayerHit=function(){
+                    if(arguments[4]===true){ repeatedCritical=true; }
+                    return originalHit.apply(this,arguments);
+                };
+            }
+            if(originalLog){
+                addBattleLog=function(message){
+                    if(String(message||"").includes("霸龍裂天斬")&&String(message||"").includes("（爆擊！）")){
+                        repeatedCritical=true;
+                    }
+                    return originalLog.apply(this,arguments);
+                };
+            }
+            try{
+                if(typeof window.v155WithForcedFinalAbyssSkillLevel==="function"){
+                    window.v155WithForcedFinalAbyssSkillLevel(monster,()=>
+                        options.previous.apply(options.that,options.attackArgs)
+                    );
+                }else{
+                    options.previous.apply(options.that,options.attackArgs);
+                }
+            }
+            catch(error){
+                failed=true;
+                console.error("敵方霸龍裂天斬再施放失敗：",error);
+            }
+            finally{
+                if(options.realFinish){ finishPlayerAction=options.realFinish; }
+                if(originalHit){ showPlayerHit=originalHit; }
+                if(originalLog){ addBattleLog=originalLog; }
+                currentReflectAttacker=previousRepeatAttacker;
+                options.skill.spCost=originalCost;
+                monster.skillIds=originalIds;
+                monster.v141SupportSkillIds=originalSupports;
+                monster.skillChance=originalChance;
+            }
+
+            if(failed){
+                if(options.realFinish){ options.realFinish(); }
+                return;
+            }
+            const defeatedTarget=livingBefore.some(entry=>
+                entry.alive&&(!entry.character||numeric(entry.character.hp)<=0)
+            );
+            if(
+                finishRequested&&allowConditionalRepeat&&(repeatedCritical||defeatedTarget)&&
+                monster.alive!==false&&numeric(monster.hp)>0&&livingPartyIndexes().length
+            ){
+                if(typeof addBattleLog==="function"){
+                    addBattleLog(monster.name+"的霸龍裂天斬追加攻擊出現爆擊或擊敗目標，再追加一次！");
+                }
+                runMonsterDragonRepeat(options,false);
+                return;
+            }
+            if(finishRequested&&options.realFinish){ options.realFinish(); }
+        });
+    }
+
     if(typeof processSingleMonsterAttack==="function"){
         const previousMonsterAttack=processSingleMonsterAttack;
         processSingleMonsterAttack=function(monsterIndex){
@@ -825,35 +955,10 @@
                 return result;
             }
             if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"的霸龍裂天斬觸發再施放！"); }
-            scheduleAfterAnimation(()=>{
-                if(!monster||monster.alive===false||numeric(monster.hp)<=0||!livingPartyIndexes().length){
-                    if(realFinish){ realFinish(); }
-                    return;
-                }
-                const originalCost=repeatSkill.spCost;
-                const originalIds=monster.skillIds;
-                const originalSupports=monster.v141SupportSkillIds;
-                const originalChance=monster.skillChance;
-                repeatSkill.spCost=0;
-                monster.skillIds=["dragonSlash"];
-                monster.v141SupportSkillIds=[];
-                monster.skillChance=1;
-                currentReflectAttacker=monsterIndex;
-                monsterTeamFreezeApplied=false;
-                const previousRepeatAttacker=currentReflectAttacker;
-                try{ previousMonsterAttack.apply(this,attackArgs); }
-                catch(error){
-                    console.error("敵方霸龍裂天斬再施放失敗：",error);
-                    if(realFinish){ realFinish(); }
-                }
-                finally{
-                    currentReflectAttacker=previousRepeatAttacker;
-                    repeatSkill.spCost=originalCost;
-                    monster.skillIds=originalIds;
-                    monster.v141SupportSkillIds=originalSupports;
-                    monster.skillChance=originalChance;
-                }
-            });
+            runMonsterDragonRepeat({
+                previous:previousMonsterAttack,that:this,attackArgs:attackArgs,
+                monster:monster,monsterIndex:monsterIndex,skill:repeatSkill,realFinish:realFinish
+            },true);
             return result;
         };
     }

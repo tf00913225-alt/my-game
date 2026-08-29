@@ -115,7 +115,7 @@
         if(typeof skillDatabase==="undefined"){ return {id:skillId,skill:null}; }
         if(skillId&&skillDatabase[skillId]){ return {id:skillId,skill:skillDatabase[skillId]}; }
         let foundId=null;
-        Object.keys(skillDatabase).some(id=>{
+        Object.getOwnPropertyNames(skillDatabase).some(id=>{
             const candidate=skillDatabase[id];
             if(candidate&&candidate.name===name&&(!element||!candidate.element||candidate.element===element)){
                 foundId=id;
@@ -615,20 +615,26 @@
             const beforeDeclare=typeof activeBattleCharacterIndex!=="undefined"?activeBattleCharacterIndex:null;
             const beforeResolve=typeof initiativeIndex!=="undefined"?initiativeIndex:null;
             const calledAt=Date.now();
+            const delayOverride=typeof window!=="undefined"&&Number.isFinite(Number(window.__battleAdvanceDelayOverrideMs))
+                ?Math.max(0,Number(window.__battleAdvanceDelayOverrideMs)):null;
             const result=previous.apply(this,arguments);
             const actionGate=currentGate();
+            const boundaryGate=delayOverride===null?actionGate:null;
 
             if(phase==="declare"&&typeof activeBattleCharacterIndex!=="undefined"&&activeBattleCharacterIndex!==beforeDeclare){
                 state.tickets.declare={
                     token:token,round:typeof turn!=="undefined"?turn:0,index:activeBattleCharacterIndex,
-                    gate:actionGate,gateId:actionGate?actionGate.id:"none",
-                    earliestAt:Math.max(calledAt+CURRENT_DECLARE_DELAY_MS,actionGate?actionGate.deadline:0),
+                    gate:boundaryGate,gateId:boundaryGate?boundaryGate.id:"none",
+                    earliestAt:Math.max(
+                        calledAt+(delayOverride===null?CURRENT_DECLARE_DELAY_MS:delayOverride),
+                        boundaryGate?boundaryGate.deadline:0
+                    ),
                     consumed:false
                 };
             }else if(phase==="resolve"&&typeof initiativeIndex!=="undefined"&&initiativeIndex!==beforeResolve){
                 const roundEnded=typeof initiativeQueue!=="undefined"&&initiativeIndex>=initiativeQueue.length;
-                state.roundGate=roundEnded&&actionGate
-                    ?{token:token,gate:actionGate,consumed:false}
+                state.roundGate=roundEnded&&boundaryGate
+                    ?{token:token,gate:boundaryGate,consumed:false}
                     :null;
                 state.tickets.resolve={
                     token:token,round:typeof turn!=="undefined"?turn:0,index:initiativeIndex,
@@ -636,11 +642,11 @@
                        Waiting only inside beginCharacterTurn was too late:
                        startTurn had already switched to declare and exposed
                        the manual HUD while the last animation was playing. */
-                    gate:actionGate,
-                    gateId:actionGate?actionGate.id:"none",
+                    gate:boundaryGate,
+                    gateId:boundaryGate?boundaryGate.id:"none",
                     earliestAt:Math.max(
-                        calledAt+resolveDelay(initiativeIndex),
-                        actionGate?actionGate.deadline:0
+                        calledAt+(delayOverride===null?resolveDelay(initiativeIndex):delayOverride),
+                        boundaryGate?boundaryGate.deadline:0
                     ),
                     consumed:false
                 };

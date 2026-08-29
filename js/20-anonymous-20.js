@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="154";
+const V_ASSET_VERSION="155";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -576,7 +576,8 @@ function vAssetUrl(path){
         {id:"v148-combat-dungeon-fixes-runtime",src:"js/42-v148-combat-dungeon-fixes.js"},
         {id:"v149-skill-ui-rules-runtime",src:"js/43-v149-skill-ui-rules.js"},
         {id:"v152-dev-fixes-runtime",src:"js/44-v152-dev-fixes.js"},
-        {id:"v154-dev-fixes-runtime",src:"js/45-v154-dev-fixes.js"}
+        {id:"v154-dev-fixes-runtime",src:"js/45-v154-dev-fixes.js"},
+        {id:"v155-dev-fixes-runtime",src:"js/46-v155-dev-fixes.js"}
     ];
 
     function next(index){

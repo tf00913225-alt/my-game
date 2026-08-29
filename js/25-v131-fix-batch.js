@@ -130,6 +130,16 @@
         }
     }
 
+    function consumeBattleAdvanceDelayOverride(fallback){
+        const override=typeof window!=="undefined"
+            ?Number(window.__battleAdvanceDelayOverrideMs):NaN;
+        if(typeof window!=="undefined"&&Number.isFinite(override)){
+            delete window.__battleAdvanceDelayOverrideMs;
+            return Math.max(0,override);
+        }
+        return fallback;
+    }
+
     if(typeof finishPlayerAction==="function"){
         finishPlayerAction=function(){
             if(!battleActive){ return; }
@@ -144,20 +154,22 @@
 
             if(battlePhase==="declare"){
                 activeBattleCharacterIndex++;
+                const delayMs=consumeBattleAdvanceDelayOverride(BATTLE_DECLARE_ADVANCE_MS);
                 battleAdvanceTimeoutId=setTimeout(()=>{
                     battleAdvanceTimeoutId=null;
                     battleAdvanceScheduled=false;
                     if(!battleActive || token!==battleToken){ return; }
                     beginCharacterTurn(token);
-                },BATTLE_DECLARE_ADVANCE_MS);
+                },delayMs);
                 return;
             }
             initiativeIndex++;
             skipInactiveInitiativeEntries();
-            const delayMs=
+            const normalDelayMs=
                 initiativeIndex>=initiativeQueue.length
                 ? V138_ROUND_HANDOFF_DELAY_MS
                 : V138_ACTION_DELAY_MS;
+            const delayMs=consumeBattleAdvanceDelayOverride(normalDelayMs);
             battleAdvanceTimeoutId=setTimeout(()=>{
                 battleAdvanceTimeoutId=null;
                 battleAdvanceScheduled=false;

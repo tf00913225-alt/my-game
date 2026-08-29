@@ -71,12 +71,13 @@ function loadRuntime(overrides={}){
     return {context,button,battlePage,cards};
 }
 
-test("V154 is the final ordered runtime and cache-busted entry",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="154"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=154/);
+test("V154 remains ordered immediately before V155",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="155"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=155/);
     assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=154/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.ok(loader.indexOf("js/45-v154-dev-fixes.js")>loader.indexOf("js/44-v152-dev-fixes.js"));
+    assert.ok(loader.indexOf("js/46-v155-dev-fixes.js")>loader.indexOf("js/45-v154-dev-fixes.js"));
 });
 
 test("element box uses the top apply-and-start action and removes the bottom action row",()=>{
