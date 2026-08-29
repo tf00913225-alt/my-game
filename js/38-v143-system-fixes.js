@@ -108,6 +108,10 @@
 
     function applyIceRainFreezeToTargets(casterIndex,targetIndexes){
         if(!targetIndexes.length || typeof rollStatusEffectHit!=="function"){ return; }
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.iceArrowRain:null;
+        const freezeChance=Math.max(0,numeric(skill&&skill.freezeChance));
+        const freezeDuration=Math.max(1,numeric(skill&&skill.freezeDuration)||2);
+        if(!freezeChance){ return; }
         const candidates=targetIndexes.filter(index=>{
             const monster=typeof monsters!=="undefined"?monsters[index]:null;
             return monster&&monster.alive&&monster.hp>0;
@@ -119,13 +123,13 @@
         candidates.forEach(index=>{
             const monster=monsters[index];
             const hit=rollStatusEffectHit(
-                50,caster.level,monster.level,stats.intelligence,
+                freezeChance,caster.level,monster.level,stats.intelligence,
                 typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
                 true,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
             );
             if(hit){
-                applyFreezeEffect(monster,2);
-                addBattleLog(monster.name+"被冰霜箭雨冰封2回合！");
+                applyFreezeEffect(monster,freezeDuration);
+                addBattleLog(monster.name+"被冰霜箭雨冰封"+freezeDuration+"回合！");
                 if(typeof updateMonsterUI==="function"){ updateMonsterUI(index); }
             }else{
                 addBattleLog("冰霜箭雨的冰封效果被"+monster.name+"抵抗了。");
@@ -180,6 +184,8 @@
                 if(skill){ skill.freezeChance=savedChance; }
             }
             if(usedIceRain&&skill){
+                const freezeChance=Math.max(0,numeric(skill.freezeChance));
+                const freezeDuration=Math.max(1,numeric(skill.freezeDuration)||2);
                 const living=(typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes():[0,1,2]).filter(index=>{
                     const character=getPartyCharacterByIndex(index);
                     return character&&character.hp>0;
@@ -189,10 +195,10 @@
                     const caster=monsters[monsterIndex];
                     const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
                         ?getFinalBattleSpiritForPlayerTarget(target,targetIndex):numeric(target.spirit);
-                    if(rollStatusEffectHit(50,caster.level,target.level,numeric(caster.intelligencePoints),spirit,true,"regular",
+                    if(rollStatusEffectHit(freezeChance,caster.level,target.level,numeric(caster.intelligencePoints),spirit,true,"regular",
                         typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0)){
-                        applyFreezeEffect(target,2);
-                        addBattleLog((target.id||"角色")+"被冰霜箭雨冰封2回合！");
+                        applyFreezeEffect(target,freezeDuration);
+                        addBattleLog((target.id||"角色")+"被冰霜箭雨冰封"+freezeDuration+"回合！");
                         if(typeof updateUI==="function"){ updateUI(); }
                     }
                 });

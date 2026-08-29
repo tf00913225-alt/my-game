@@ -35,7 +35,6 @@
         phoenixCry:{glyph:"鳳",motion:"swoop",impact:"phoenix-field",hit:.76,pulses:6,spread:112,flightCount:2},
         rage:{glyph:"怒",motion:"rise",impact:"rage-aura",hit:.52,pulses:3,spread:55},
         fireEX:{glyph:"焰",motion:"orbit",impact:"fire-crown",hit:.74,pulses:7,spread:95},
-        fireBurstStrike:{glyph:"爆",motion:"dash",impact:"burst-knuckle",hit:.65,pulses:3,spread:46},
 
         waterKnife:{glyph:"刃",motion:"wave",impact:"water-cut",hit:.57,pulses:1,spread:0},
         frostPunch:{glyph:"拳",motion:"dash",impact:"ice-fist",hit:.61,pulses:2,spread:18},

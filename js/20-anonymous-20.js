@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="151";
+const V_ASSET_VERSION="152";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -508,6 +508,24 @@ function vAssetUrl(path){
     }
 })();
 
+/* V152 loader — current dev fixes, dungeon art and final balance values. */
+(function loadV152DevFixesStyle(){
+    function load(){
+        if(document.getElementById("v152-dev-fixes-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v152-dev-fixes-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/45-v152-dev-fixes.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -538,7 +556,8 @@ function vAssetUrl(path){
         {id:"v144-rules-and-abyss-runtime",src:"js/40-v144-rules-and-abyss.js"},
         {id:"v146-system-polish-runtime",src:"js/41-v146-system-polish.js"},
         {id:"v148-combat-dungeon-fixes-runtime",src:"js/42-v148-combat-dungeon-fixes.js"},
-        {id:"v149-skill-ui-rules-runtime",src:"js/43-v149-skill-ui-rules.js"}
+        {id:"v149-skill-ui-rules-runtime",src:"js/43-v149-skill-ui-rules.js"},
+        {id:"v152-dev-fixes-runtime",src:"js/44-v152-dev-fixes.js"}
     ];
 
     function next(index){

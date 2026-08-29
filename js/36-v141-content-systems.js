@@ -463,10 +463,6 @@
     if(!skillDatabase.stormSpell){
         skillDatabase.stormSpell=Object.assign({},skillDatabase.windHowlLightning,{id:"stormSpell",name:"暴風術",tier:4,targetType:"all"});
     }
-    if(!skillDatabase.fireBurstStrike){
-        skillDatabase.fireBurstStrike=Object.assign({},skillDatabase.fireCritical,{id:"fireBurstStrike",name:"火爆一擊"});
-    }
-
     function defaultAbyssState(){ return {active:false,floor:1,phase:"boss",x:18,y:78,message:"",clears:0}; }
     function loadAbyssState(){
         try{
@@ -527,7 +523,7 @@
             roster.push(monster);
         });
         const elites=[
-            ["water","frostCrush"],["earth","stoneThrow"],["fire","fireBurstStrike"],["wind",null],["water","frostCrush"]
+            ["water","frostCrush"],["earth","stoneThrow"],["fire","fireCritical"],["wind",null],["water","frostCrush"]
         ];
         elites.forEach((spec,position)=>{
             const monster=makeAbyssMonster("天兵天將",level,spec[0],"elite",3500,spec[1]?[spec[1]]:[],1);

@@ -304,9 +304,10 @@
                 false,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
             );
             if(hit){
-                applyFrostbite(monster,skill.frostbiteDuration||2);
+                const duration=skill.frostbiteDuration||2;
+                applyFrostbite(monster,duration);
                 playFrostbiteEffect("monster",index);
-                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，2回合內無法使用技能。"); }
+                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，"+duration+"回合內無法使用技能。"); }
             }else if(typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+monster.name+"抵抗了）");
             }
@@ -326,9 +327,10 @@
                 skill.frostbiteChance,casterLevel,target.level,casterIntelligence,spirit,false,"regular",resist
             );
             if(hit){
-                applyFrostbite(target,skill.frostbiteDuration||2);
+                const duration=skill.frostbiteDuration||2;
+                applyFrostbite(target,duration);
                 playFrostbiteEffect("player",index);
-                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，2回合內無法使用技能。"); }
+                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，"+duration+"回合內無法使用技能。"); }
             }else if(typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+(target.id||"角色")+"抵抗了）");
             }

@@ -498,7 +498,7 @@
     };
     const FINAL_ELITES=[
         {element:"water",skill:"frostCrush"},{element:"earth",skill:"stoneThrow"},
-        {element:"fire",skill:"fireBurstStrike"},{element:"wind",skill:"dodgeSkill"},
+        {element:"fire",skill:"fireCritical"},{element:"wind",skill:"dodgeSkill"},
         {element:"water",skill:"frostCrush"}
     ];
 

@@ -13,9 +13,9 @@ const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
-test("V143 assets stay ordered before later patches under cache version 151",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=151/);
-    assert.match(loader,/const V_ASSET_VERSION="151"/);
+test("V143 assets stay ordered before later patches under cache version 152",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=152/);
+    assert.match(loader,/const V_ASSET_VERSION="152"/);
     assert.match(loader,/css\/40-v143-combat-dungeon-polish\.css/);
     const order=[
         "js/37-v142-skill-animation.js",
@@ -55,7 +55,7 @@ test("every known battle skill has its own animation choreography",()=>{
         "waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain","freeze","healSpell","revive","waterEX",
         "stormFist","stormFlurry","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen","windEX",
         "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush","stoneThrow","sandWind","flyingSandStrike","dustStorm","earthShield","rockWall","barrier","earthEX",
-        "stormSpell","fireBurstStrike","yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing","windArrow"
+        "stormSpell","yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing","windArrow"
     ];
     expected.forEach(id=>assert.ok(context.v143SkillAnimationManifest[id],id+" needs a manifest entry"));
     const choreographies=expected.map(id=>JSON.stringify(context.v143SkillAnimationManifest[id]));

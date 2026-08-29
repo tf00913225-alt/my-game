@@ -33,7 +33,9 @@
    `tests/v144-rules-and-abyss.test.js`，V146 新增最後一輪手機／戰鬥／套裝驗收
    `tests/v146-system-polish.test.js`，V148 新增戰鬥目標／副本流程驗收
    `tests/v148-combat-dungeon-fixes.test.js`，V149 新增技能定案／介面規則驗收
-   `tests/v149-skill-ui-rules.test.js`。驗證至少要包含：
+   `tests/v149-skill-ui-rules.test.js`，V150 新增冰霜箭雨 VFX 驗收
+   `tests/v150-ice-arrow-rain-vfx.test.js`，V152 新增本輪技能／副本／戰鬥介面驗收
+   `tests/v152-dev-fixes.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -45,7 +47,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-29，V151 冰霜箭雨 VFX 載入修正版）
+## 目前狀態（截至 2026-08-29，V152 dev 技能／副本修正版）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -111,6 +113,10 @@
   本輪只發布到 `dev` 供實機測試，未合併 `main`。
 - V151 修正 V149 逐字圓圈包裝器覆蓋正式 Sprite 動畫的載入衝突；已有 Sprite metadata
   的技能保留原動畫 ID 與既有 VFX 播放器，快取版本升至 151，只發布 `dev`。
+- V152 依最新需求校正角色獨立技能點顯示、移除誤植火系技能、四元素技能與異常命中、
+  怒火、極帝天尊三招、凍傷禁用技能、自動回復、戰鬥資訊及副本／巡怪介面；加入日常
+  副本封面與深淵一至四關立繪，並修正傷害字層級、怪物文字、指令熱區與戰鬥獎勵框。
+  快取版本升至 152；依使用者要求只發布 `dev`，不得合併或推送 `main`。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -137,10 +143,10 @@ V131～V136 的邏輯 patch 則在 V137 改由
 
 **不要把 V131～V136 runtime 改回各自獨立 append。** 動態插入的 script
 原本會以 async 行為競速；這些檔案又會一層層包裝相同全域函式，載入順序
-改變就會改變實際行為。V137 已把順序固定；V149 現在完整順序為
+改變就會改變實際行為。V137 已把順序固定；V152 現在完整順序為
 `js/25` → `js/27` → `js/28` → `js/29` → `js/30` → `js/31` → `js/32` → `js/33`
 → `js/34` → `js/35` → `js/36` → `js/37` → `js/38` → `js/39` → `js/40` → `js/41`
-→ `js/42` → `js/43`。
+→ `js/42` → `js/43` → `js/44`。
 
 **如果你在 `index.html` 裡直接看到「這幾個檔案好像沒被載入」而想手動加 `<script>` 標籤，
 先住手、去讀 `js/20-anonymous-20.js`**——手動加標籤幾乎一定會造成重複載入，
@@ -378,6 +384,21 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-29 — V152：技能、戰鬥與副本最新定案（dev）
+
+1. 角色技能點維持逐角色獨立儲存與扣除，補正技能頁切換角色後的點數顯示；移除誤植的
+   `fireBurstStrike`，並依本輪定案調整火／水／風／土技能、異常狀態公式與硬控上限。
+2. 補正怒火實際爆擊率／爆擊傷害、凍傷手動禁用技能、霸龍裂天斬逐級追擊率、傷害文字
+   最上層、怪物文字置中、技能指令邊界、巡怪獎勵點擊關閉、任務追蹤移除與進圖自動回復。
+3. 極帝天尊的元相光明、元光護體、元祖賜福改為本輪指定數值與機率；深淵戰鬥補上戰鬥
+   資訊框，日常／深淵副本導覽版面修正並接入日常三張封面、深淵封面與一至四關帝君／
+   天兵天將立繪。主要新增 `js/44-v152-dev-fixes.js`、`css/45-v152-dev-fixes.css`、
+   `tests/v152-dev-fixes.test.js` 與 `assets/dungeons/`。
+4. loader 與資產快取版本升至 152；本輪依使用者明確要求只發布 `dev`，不合併 `main`。
+
+**驗證**：全部 JavaScript 語法檢查通過，V137～V152 共 13 份、143 項 Node 回歸測試
+與 `git diff --check` 全部通過；雲端瀏覽器攔截本機 localhost，無法執行雲端手機互動走查。
 
 ### 2026-08-29 — V151：冰霜箭雨正式 VFX 載入修正（dev）
 
@@ -1934,7 +1955,9 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V144 的 `tests/v144-rules-and-abyss.test.js` 有 11 項商店／怪物技能／深淵驗收，
       V146 的 `tests/v146-system-polish.test.js` 有 8 項戰鬥／深淵／手機介面驗收，
       V148 的 `tests/v148-combat-dungeon-fixes.test.js` 有 12 項戰鬥目標／副本驗收，
-      V149 的 `tests/v149-skill-ui-rules.test.js` 有 11 項技能／介面規則驗收，並保留
+      V149 的 `tests/v149-skill-ui-rules.test.js` 有 11 項技能／介面規則驗收，
+      V150 的 `tests/v150-ice-arrow-rain-vfx.test.js` 有 6 項正式 Sprite VFX 驗收，
+      V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，並保留
       可選的 `tests/v138-browser-smoke.js`。本輪雲端瀏覽器攔截 localhost，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。
