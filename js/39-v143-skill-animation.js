@@ -26,14 +26,62 @@
         normal:{glyph:"✦",motion:"line",impact:"spark",hit:.57,pulses:1,spread:0},
 
         flameSlash:{glyph:"╱",motion:"arc-up",impact:"flame-cut",hit:.58,pulses:1,spread:0},
-        fireCritical:{glyph:"拳",motion:"dash",impact:"ember-fist",hit:.62,pulses:2,spread:0},
-        explosiveFlurry:{glyph:"拳",motion:"zigzag",impact:"fire-combo",hit:.68,pulses:4,spread:54},
-        dragonSlash:{glyph:"龍",motion:"serpent",impact:"dragon-cleave",hit:.73,pulses:3,spread:92,flightCount:2},
-        fireRocket:{glyph:"➶",motion:"arc-down",impact:"arrow-burst",hit:.64,pulses:1,spread:42},
-        blazeSpell:{glyph:"火",motion:"orb",impact:"flame-bloom",hit:.61,pulses:2,spread:30},
-        flameTornado:{glyph:"炎",motion:"spiral",impact:"fire-tornado",hit:.72,pulses:5,spread:82,flightCount:3},
-        phoenixCry:{glyph:"鳳",motion:"swoop",impact:"phoenix-field",hit:.76,pulses:6,spread:112,flightCount:2},
-        rage:{glyph:"怒",motion:"rise",impact:"rage-aura",hit:.52,pulses:3,spread:55},
+        fireCritical:{
+            glyph:"拳",motion:"dash",impact:"ember-fist",hit:.5833333333,pulses:2,spread:0,
+            sprite:{
+                src:"assets/vfx/fire/fire-critical-cast.png",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.15,maxSize:260
+            }
+        },
+        explosiveFlurry:{
+            glyph:"拳",motion:"zigzag",impact:"fire-combo",hit:.5833333333,pulses:4,spread:54,
+            sprite:{
+                src:"assets/vfx/fire/explosive-flurry-cast.png",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"group",scale:1.08,minSize:190
+            }
+        },
+        dragonSlash:{
+            glyph:"龍",motion:"serpent",impact:"dragon-cleave",hit:.5833333333,pulses:3,spread:92,flightCount:2,
+            sprite:{
+                src:"assets/vfx/fire/dragon-slash-cast.png",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.35,maxSize:300
+            }
+        },
+        fireRocket:{
+            glyph:"➶",motion:"arc-down",impact:"arrow-burst",hit:.5833333333,pulses:1,spread:42,
+            sprite:{
+                src:"assets/vfx/fire/fire-rocket-cast.png",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"trajectory",scale:1.04,minSize:210
+            }
+        },
+        blazeSpell:{
+            glyph:"火",motion:"orb",impact:"flame-bloom",hit:.5833333333,pulses:2,spread:30,
+            sprite:{
+                src:"assets/vfx/fire/blaze-spell-cast.png",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.15,maxSize:260
+            }
+        },
+        flameTornado:{
+            glyph:"炎",motion:"spiral",impact:"fire-tornado",hit:.5833333333,pulses:5,spread:82,flightCount:3,
+            sprite:{
+                src:"assets/vfx/fire/flame-tornado-cast.png",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.35,maxSize:300
+            }
+        },
+        phoenixCry:{
+            glyph:"鳳",motion:"swoop",impact:"phoenix-field",hit:.5833333333,pulses:6,spread:112,flightCount:2,
+            sprite:{
+                src:"assets/vfx/fire/phoenix-cry-cast.png",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"group",scale:1.12,minSize:280
+            }
+        },
+        rage:{
+            glyph:"怒",motion:"rise",impact:"rage-aura",hit:.5833333333,pulses:3,spread:55,
+            sprite:{
+                src:"assets/vfx/fire/rage-cast.png",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"group",scale:1.08,minSize:190
+            }
+        },
         fireEX:{glyph:"焰",motion:"orbit",impact:"fire-crown",hit:.74,pulses:7,spread:95},
 
         waterKnife:{glyph:"刃",motion:"wave",impact:"water-cut",hit:.57,pulses:1,spread:0},
@@ -112,20 +160,31 @@
         };
     }
 
+    const STATUS_SPRITES={
+        burn:{src:"assets/vfx/fire/burn-loop.png",columns:4,rows:2,frames:8,duration:800},
+        rage:{src:"assets/vfx/fire/rage-buff-loop.png",columns:4,rows:2,frames:8,duration:1000}
+    };
+
     window.v143SkillAnimationManifest=MANIFEST;
+    window.v143StatusSpriteManifest=STATUS_SPRITES;
     window.v143GetSkillAnimationModel=function(skillId){
         const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
         return modelFor({id:skillId,name:skill&&skill.name||skillId});
     };
 
-    /* Warm the one external frame asset without creating a second renderer. */
+    /* Warm shared Sprite Sheet assets without creating a second renderer. */
     if(typeof Image==="function"){
+        const sources=[];
         Object.keys(MANIFEST).forEach(id=>{
             const sprite=MANIFEST[id]&&MANIFEST[id].sprite;
             if(!sprite||!sprite.src){ return; }
+            sources.push(sprite.src);
+        });
+        Object.keys(STATUS_SPRITES).forEach(type=>sources.push(STATUS_SPRITES[type].src));
+        Array.from(new Set(sources)).forEach(source=>{
             const image=new Image();
             image.decoding="async";
-            image.src=sprite.src;
+            image.src=source;
         });
     }
 
@@ -196,6 +255,14 @@
         const targetType=String(config.targetType||"");
         const all=/all/i.test(targetType);
         const formation=/row|tri|column/i.test(targetType);
+        const explicit=Array.isArray(meta.targetIds)
+            ?meta.targetIds
+            :(Number.isInteger(meta.targetId)?[meta.targetId]:[]);
+        if(explicit.length){
+            return Array.from(new Set(explicit.filter(index=>
+                Number.isInteger(index)&&canReceive(config,targetSide,index)
+            )));
+        }
         if(meta.side==="player"&&typeof queuedPlayerActions!=="undefined"){
             const queued=queuedPlayerActions&&queuedPlayerActions[meta.actorIndex];
             if(queued){
@@ -235,6 +302,77 @@
         const bottom=Math.max.apply(null,rects.map(rect=>rect.bottom));
         return {left:left,top:top,width:right-left,height:bottom-top};
     }
+
+    function hasTimedEffect(entity,type){
+        if(!entity){ return false; }
+        const collection=type==="burn"?entity.statusEffects:entity.activeBuffs;
+        if(Array.isArray(collection)&&collection.some(effect=>
+            effect&&effect.type===type&&Number(effect.turnsLeft)>0
+        )){ return true; }
+        return type==="rage"&&Array.isArray(entity.v141TeamBuffs)&&entity.v141TeamBuffs.some(effect=>
+            effect&&effect.type==="rage"&&Number(effect.turnsLeft)>0
+        );
+    }
+
+    function statusNode(card,type){
+        if(!card){ return null; }
+        if(typeof card.querySelector==="function"){
+            return card.querySelector(".v153-status-vfx-"+type);
+        }
+        return Array.from(card.children||[]).find(node=>
+            String(node.className||"").split(/\s+/).includes("v153-status-vfx-"+type)
+        )||null;
+    }
+
+    function syncStatusSprite(side,index,type){
+        const spec=STATUS_SPRITES[type];
+        const card=cardFor(side,index);
+        const entity=entityFor(side,index);
+        const alive=!!(
+            spec&&card&&entity&&Number(entity.hp)>0&&
+            (side!=="monster"||entity.alive!==false)
+        );
+        const active=alive&&hasTimedEffect(entity,type);
+        let node=statusNode(card,type);
+        if(!active){
+            if(node&&typeof node.remove==="function"){ node.remove(); }
+            else if(node&&node.parentNode){ node.parentNode.removeChild(node); }
+            return;
+        }
+        if(!node){
+            node=document.createElement("i");
+            node.className="v153-status-vfx v153-status-vfx-"+type;
+            node.dataset.statusType=type;
+            node.dataset.frames=String(spec.frames);
+            if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
+            node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
+            node.style.backgroundSize=(spec.columns*100)+"% "+(spec.rows*100)+"%";
+            node.style.setProperty("--v153-status-duration",spec.duration+"ms");
+            card.appendChild(node);
+        }
+        const rect=card.getBoundingClientRect?card.getBoundingClientRect():null;
+        const size=Math.max(96,Math.max(Number(rect&&rect.width)||0,Number(rect&&rect.height)||0)*1.18);
+        node.style.width=size+"px";
+        node.style.height=size+"px";
+    }
+
+    function syncStatusSpriteEffects(){
+        for(let index=0;index<10;index++){
+            syncStatusSprite("monster",index,"burn");
+            syncStatusSprite("monster",index,"rage");
+        }
+        for(let index=0;index<3;index++){
+            syncStatusSprite("player",index,"burn");
+            syncStatusSprite("player",index,"rage");
+        }
+    }
+
+    function removeStatusSpriteEffects(){
+        if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
+        document.querySelectorAll(".v153-status-vfx").forEach(node=>node.remove());
+    }
+
+    window.v143SyncStatusSpriteEffects=syncStatusSpriteEffects;
 
     function makePath(dx,dy,motion){
         const bend=Math.max(28,Math.min(110,Math.hypot(dx,dy)*.28));
@@ -324,6 +462,7 @@
             window.v143SyncEarthShieldEffects();
             setTimer(()=>window.v143SyncEarthShieldEffects(),0);
         }
+        syncStatusSpriteEffects();
         setTimer(()=>card.classList.remove("v143-impact-target"),520);
         if(current.model.sprite){
             current.hitReached=true;
@@ -355,25 +494,91 @@
         current.hitReached=true;
     }
 
-    function addSprite(current,index,target){
-        const sprite=current.model.sprite;
-        if(!sprite||!target||current.spriteNodes.has(index)){ return; }
-        const size=Math.max(
-            96,
-            Math.min(184,Math.max(target.rect.width,target.rect.height)*1.8)
+    function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
+
+    function emittedSpriteTargets(current){
+        return current.targetIndexes.filter(index=>
+            current.emitted.has(index)&&current.validTargets.has(index)&&!!cardFor(current.targetSide,index)
         );
-        const node=appendNode("v143-vfx-sprite v143-vfx-sprite-"+current.config.id);
-        node.dataset.targetSide=current.targetSide;
-        node.dataset.targetIndex=String(index);
-        node.dataset.frames=String(sprite.frames);
-        node.style.left=target.x+"px";
-        node.style.top=target.y+"px";
+    }
+
+    function placeSprite(current,node,index,target){
+        const sprite=current.model.sprite;
+        const placement=String(sprite.placement||"single");
+        if(placement==="single"){
+            const scale=Number(sprite.scale)||1.8;
+            const size=clamp(
+                Math.max(target.rect.width,target.rect.height)*scale,
+                Number(sprite.minSize)||96,
+                Number(sprite.maxSize)||184
+            );
+            node.dataset.targetIndex=String(index);
+            node.dataset.targetIndexes=String(index);
+            node.style.left=target.x+"px";
+            node.style.top=target.y+"px";
+            node.style.width=size+"px";
+            node.style.height=size+"px";
+            node.style.setProperty("--v143-sprite-angle","0deg");
+            return;
+        }
+
+        const indexes=emittedSpriteTargets(current);
+        const targetCards=indexes.map(targetIndex=>cardFor(current.targetSide,targetIndex)).filter(Boolean);
+        const targetBounds=fieldBounds(targetCards);
+        if(!targetBounds){ return; }
+        const coverageCards=placement==="trajectory"&&current.actorCard
+            ?[current.actorCard].concat(targetCards)
+            :targetCards;
+        const coverage=fieldBounds(coverageCards)||targetBounds;
+        const scale=Number(sprite.scale)||1;
+        const naturalSize=(Math.max(coverage.width,coverage.height)+40)*scale;
+        const viewportWidth=Number(window.innerWidth)||960;
+        const viewportHeight=Number(window.innerHeight)||720;
+        const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
+        const size=clamp(
+            naturalSize,
+            Number(sprite.minSize)||160,
+            Number(sprite.maxSize)||dynamicMaximum
+        );
+        node.dataset.targetIndexes=indexes.join(",");
+        node.style.left=(coverage.left+coverage.width/2)+"px";
+        node.style.top=(coverage.top+coverage.height/2)+"px";
         node.style.width=size+"px";
         node.style.height=size+"px";
-        node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
-        node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
-        node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
-        current.spriteNodes.set(index,node);
+        let angle=0;
+        if(placement==="trajectory"){
+            const actor=cardCenter(current.actorCard);
+            const destination={
+                x:targetBounds.left+targetBounds.width/2,
+                y:targetBounds.top+targetBounds.height/2
+            };
+            if(actor){ angle=Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI; }
+        }
+        node.style.setProperty("--v143-sprite-angle",angle+"deg");
+    }
+
+    function addSprite(current,index,target){
+        const sprite=current.model.sprite;
+        if(!sprite||!target){ return; }
+        const placement=String(sprite.placement||"single");
+        const key=placement==="single"?index:"main";
+        let node=current.spriteNodes.get(key);
+        if(!node){
+            node=appendNode(
+                "v143-vfx-sprite v143-vfx-sprite-"+current.config.id+
+                (String(sprite.src).includes("/fire/")?" v153-fire-cast-sprite":"")
+            );
+            node.dataset.targetSide=current.targetSide;
+            node.dataset.placement=placement;
+            node.dataset.columns=String(sprite.columns);
+            node.dataset.rows=String(sprite.rows);
+            node.dataset.frames=String(sprite.frames);
+            node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
+            node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
+            node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
+            current.spriteNodes.set(key,node);
+        }
+        placeSprite(current,node,index,target);
     }
 
     function emitFlight(current,index,allowDefeated){
@@ -458,6 +663,8 @@
         const current={
             sequence:++sequence,config:config,model:model,gate:gate,
             side:meta.side||"player",actorIndex:Number.isInteger(meta.actorIndex)?meta.actorIndex:0,
+            targetId:Number.isInteger(meta.targetId)?meta.targetId:null,
+            targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),
             validTargets:validTargets,spriteNodes:new Map(),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
@@ -500,10 +707,23 @@
         return gate;
     };
 
+    /* Fire Rocket's official sheet already contains the complete three-arrow
+       travel and burst. Keep the legacy projectile helper for non-sheet calls,
+       but never stack it over this shared Sprite Sheet action. */
+    if(typeof playFireRocketAnimation==="function"){
+        const previousFireRocketAnimation=playFireRocketAnimation;
+        playFireRocketAnimation=function(){
+            const current=state.current;
+            if(current&&!current.done&&current.config.id==="fireRocket"&&current.model.sprite){ return; }
+            return previousFireRocketAnimation.apply(this,arguments);
+        };
+    }
+
     director.dispose=function(){
         clearTimers();
         if(state.current&&!state.current.done){ cleanupCurrent(state.current,"dispose"); }
         document.querySelectorAll("#v143-skill-stage").forEach(node=>node.remove());
+        removeStatusSpriteEffects();
         return originalDispose();
     };
 
@@ -522,8 +742,12 @@
     if(typeof showMonsterHit==="function"){
         const previousShowMonsterHit=showMonsterHit;
         showMonsterHit=function(index){
-            const args=arguments;
+            const args=Array.prototype.slice.call(arguments);
             const wait=delayFor("monster",index,true);
+            const current=state.current;
+            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="monster"){
+                args[3]=true;
+            }
             if(wait>8){
                 state.metrics.delayedNumbers++;
                 setTimer(()=>previousShowMonsterHit.apply(this,args),wait);
@@ -536,8 +760,15 @@
     if(typeof showPlayerHit==="function"){
         const previousShowPlayerHit=showPlayerHit;
         showPlayerHit=function(amount,type,index){
-            const args=arguments;
+            const args=Array.prototype.slice.call(arguments);
             const wait=delayFor("player",Number(index)||0,true);
+            const current=state.current;
+            if(
+                current&&!current.done&&current.config.id==="fireCritical"&&
+                current.targetSide==="player"&&!args[3]
+            ){
+                args[4]=true;
+            }
             if(wait>8){
                 state.metrics.delayedNumbers++;
                 setTimer(()=>previousShowPlayerHit.apply(this,args),wait);
@@ -570,8 +801,13 @@
                 window.v143LastPotionEffectTarget=null;
             }
             const wait=delayFor(side,index,false);
-            if(wait>8){ setTimer(()=>previousCardEffect.apply(this,args),wait); return; }
-            return previousCardEffect.apply(this,args);
+            const invoke=()=>{
+                const result=previousCardEffect.apply(this,args);
+                syncStatusSpriteEffects();
+                return result;
+            };
+            if(wait>8){ setTimer(invoke,wait); return; }
+            return invoke();
         };
     }
 
@@ -606,11 +842,14 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previousUpdateMonsterUI.apply(this,args);
+                        syncStatusSpriteEffects();
                     },wait);
                 }
                 return;
             }
-            return previousUpdateMonsterUI.apply(this,arguments);
+            const result=previousUpdateMonsterUI.apply(this,arguments);
+            syncStatusSpriteEffects();
+            return result;
         };
     }
 
@@ -627,11 +866,14 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previousUpdatePlayerStatus.apply(this,args);
+                        syncStatusSpriteEffects();
                     },wait);
                 }
                 return;
             }
-            return previousUpdatePlayerStatus.apply(this,arguments);
+            const result=previousUpdatePlayerStatus.apply(this,arguments);
+            syncStatusSpriteEffects();
+            return result;
         };
     }
 

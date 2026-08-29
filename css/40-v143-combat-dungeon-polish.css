@@ -228,6 +228,77 @@
     100%{opacity:0;transform:translate(-50%,-50%) scale(1.04)}
 }
 
+.v143-skill-stage .v153-fire-cast-sprite{
+    filter:drop-shadow(0 0 11px rgba(255,87,25,.9));
+    animation:
+        v153FireCastFrames var(--v143-sprite-duration,1500ms) steps(1,end) 1 both,
+        v153FireCastEnvelope var(--v143-sprite-duration,1500ms) linear 1 both;
+}
+
+@keyframes v153FireCastFrames{
+    0%{background-position:0 0}
+    8.333333%{background-position:33.333333% 0}
+    16.666667%{background-position:66.666667% 0}
+    25%{background-position:100% 0}
+    33.333333%{background-position:0 50%}
+    41.666667%{background-position:33.333333% 50%}
+    50%{background-position:66.666667% 50%}
+    58.333333%{background-position:100% 50%}
+    66.666667%{background-position:0 100%}
+    75%{background-position:33.333333% 100%}
+    83.333333%{background-position:66.666667% 100%}
+    91.666667%,100%{background-position:100% 100%}
+}
+
+@keyframes v153FireCastEnvelope{
+    0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(.9)}
+    3%,95%{opacity:1;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(1.03)}
+}
+
+#game-stage #battlePage .v153-status-vfx{
+    position:absolute;
+    left:50%;
+    top:50%;
+    z-index:4;
+    display:block;
+    box-sizing:border-box;
+    background-position:0 0;
+    background-repeat:no-repeat;
+    image-rendering:auto;
+    mix-blend-mode:screen;
+    opacity:.82;
+    pointer-events:none;
+    transform:translate(-50%,-50%);
+    transform-origin:center;
+    will-change:background-position,opacity;
+    animation:v153StatusSpriteFrames var(--v153-status-duration,800ms) steps(1,end) infinite;
+}
+
+#game-stage #battlePage .v153-status-vfx-burn{
+    filter:drop-shadow(0 0 7px rgba(255,79,23,.82));
+}
+
+#game-stage #battlePage .v153-status-vfx-rage{
+    filter:drop-shadow(0 0 8px rgba(255,35,20,.9));
+}
+
+#battlePage .v146-defeated > .v153-status-vfx,
+#battlePage .battle-player.down > .v153-status-vfx{
+    display:none !important;
+}
+
+@keyframes v153StatusSpriteFrames{
+    0%{background-position:0 0}
+    12.5%{background-position:33.333333% 0}
+    25%{background-position:66.666667% 0}
+    37.5%{background-position:100% 0}
+    50%{background-position:0 100%}
+    62.5%{background-position:33.333333% 100%}
+    75%{background-position:66.666667% 100%}
+    87.5%,100%{background-position:100% 100%}
+}
+
 .v143-cast-charge{
     width:58px;
     height:58px;

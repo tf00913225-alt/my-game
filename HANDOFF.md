@@ -35,7 +35,8 @@
    `tests/v148-combat-dungeon-fixes.test.js`，V149 新增技能定案／介面規則驗收
    `tests/v149-skill-ui-rules.test.js`，V150 新增冰霜箭雨 VFX 驗收
    `tests/v150-ice-arrow-rain-vfx.test.js`，V152 新增本輪技能／副本／戰鬥介面驗收
-   `tests/v152-dev-fixes.test.js`。驗證至少要包含：
+   `tests/v152-dev-fixes.test.js`，V153 新增火元素施放／持續狀態正式圖驗收
+   `tests/v153-fire-vfx.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -47,7 +48,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-29，V152 dev 技能／副本修正版）
+## 目前狀態（截至 2026-08-29，V153 火元素正式 VFX Sprite Sheet）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -117,6 +118,12 @@
   怒火、極帝天尊三招、凍傷禁用技能、自動回復、戰鬥資訊及副本／巡怪介面；加入日常
   副本封面與深淵一至四關立繪，並修正傷害字層級、怪物文字、指令熱區與戰鬥獎勵框。
   快取版本升至 152；依使用者要求只發布 `dev`，不得合併或推送 `main`。
+- V153 將本次收到的 8 張火元素施放動畫與 2 張持續狀態動畫接入 V142／V143 共用
+  Sprite Sheet 播放器：單體依實際目標卡中央、同排技能依實際目標合併範圍且主動畫
+  只播一次、火鳳天鳴全場只播一隻、火箭涵蓋施放者至目標群組；第 8 幀同步傷害／MISS／
+  命中／成功狀態，完整 12 幀後才解除行動閘門。燃燒 0.8 秒與怒火 1 秒循環不阻擋回合，
+  並依既有狀態資料移除。快取版本升至 153，只發布 `dev`；本批沒有收到
+  `flame-slash-cast.png`，火焰斬仍沿用舊通用演出，禁止拿其他技能素材代替。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -143,7 +150,7 @@ V131～V136 的邏輯 patch 則在 V137 改由
 
 **不要把 V131～V136 runtime 改回各自獨立 append。** 動態插入的 script
 原本會以 async 行為競速；這些檔案又會一層層包裝相同全域函式，載入順序
-改變就會改變實際行為。V137 已把順序固定；V152 現在完整順序為
+改變就會改變實際行為。V137 已把順序固定；V153 現在完整順序為
 `js/25` → `js/27` → `js/28` → `js/29` → `js/30` → `js/31` → `js/32` → `js/33`
 → `js/34` → `js/35` → `js/36` → `js/37` → `js/38` → `js/39` → `js/40` → `js/41`
 → `js/42` → `js/43` → `js/44`。
@@ -384,6 +391,36 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-29 — V153：火元素正式 Sprite Sheet VFX（dev）
+
+1. 把本次收到的 10 張流水號素材核對並輸出為 `assets/vfx/fire/` 下的正式 RGBA PNG：
+   `fire-critical-cast.png`、`explosive-flurry-cast.png`、`dragon-slash-cast.png`、
+   `fire-rocket-cast.png`、`blaze-spell-cast.png`、`flame-tornado-cast.png`、
+   `phoenix-cry-cast.png`、`rage-cast.png`、`rage-buff-loop.png`、`burn-loop.png`。
+   上傳檔實際是無 Alpha 的 JPEG；只將黑色合成底還原成透明／半透明 Alpha，未重繪。
+   兩張 1536×1024 的 12 幀素材逐格置中補成 384×384 透明畫布，未拉伸內容。
+2. `js/39-v143-skill-animation.js` 沿用既有 V143 導演與 Sprite Sheet renderer，新增單體、
+   目標群組、施放者到目標群組三種定位；所有座標均取實際卡牌矩形與既有 target 結果。
+   火爆亂擊／火箭／怒火每次只產生一個主動畫，火鳳天鳴無論幾個有效目標都只有一隻鳳凰；
+   死亡／無效目標排除，傷害、MISS、爆擊視覺與增益／燃燒成功反應統一在第 8 幀開始點。
+3. `rage-buff-loop.png` 與 `burn-loop.png` 由同一份狀態 Sprite metadata 驅動，分別以 1 秒／
+   0.8 秒在每張實際有效卡牌循環；只讀既有 `activeBuffs`／`statusEffects`，不重判機率、
+   不建立 action gate，狀態結束、清除、死亡或戰鬥結束即移除。
+4. `css/40-v143-combat-dungeon-polish.css` 新增共用 4×3 一次性幀序與 4×2 持續幀序；
+   `js/37-v142-skill-animation.js` 明確略過被動／`targetType:none` 的技能名稱動畫，確保
+   `fireEX` 不施放、不占回合。火箭舊大型飛行主特效在正式 Sprite 播放時停用，小型卡牌
+   命中、傷害數字與狀態提示保留。霸龍裂天斬的既有逐級追擊機率與目標仍完全由現行
+   戰鬥邏輯決定，第一段 2.8 秒 gate 結束後才開始第二段，VFX 未抽取機率或改選目標。
+5. 快取鍵同步升至 153；新增 `tests/v153-fire-vfx.test.js` 驗收 RGBA／尺寸／幀序、精準
+   目標、單主動畫、第 8 幀、完整 gate、火箭去重、狀態循環及 Fire EX 被動規則。
+
+**已知限制**：本批沒有 `flame-slash-cast.png`，所以 `flameSlash`／火焰斬尚未接入正式
+Sprite Sheet；其餘收到的 10 張素材均已接入。未建立替代素材，避免錯綁會心一擊或其他圖。
+
+**驗證**：全部 V137～V153 共 14 份、150 項 Node 測試通過；`node --check`、
+`git diff --check` 與 10 張素材的 PNG 8-bit sRGBA／透明及半透明 Alpha 驗收通過。
+本輪只提交並發布 `dev`，不合併 `main`。
 
 ### 2026-08-29 — V152：技能、戰鬥與副本最新定案（dev）
 
@@ -1957,7 +1994,8 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V148 的 `tests/v148-combat-dungeon-fixes.test.js` 有 12 項戰鬥目標／副本驗收，
       V149 的 `tests/v149-skill-ui-rules.test.js` 有 11 項技能／介面規則驗收，
       V150 的 `tests/v150-ice-arrow-rain-vfx.test.js` 有 6 項正式 Sprite VFX 驗收，
-      V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，並保留
+      V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，
+      V153 的 `tests/v153-fire-vfx.test.js` 有 7 項火元素正式 Sprite VFX 驗收，並保留
       可選的 `tests/v138-browser-smoke.js`。本輪雲端瀏覽器攔截 localhost，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。

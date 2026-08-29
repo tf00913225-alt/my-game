@@ -509,7 +509,9 @@
 
     function startFromBadge(side,name,element,actorIndex){
         if(typeof battleActive!=="undefined"&&!battleActive){ return null; }
-        return director.play(animationConfig(null,name,element),{
+        const config=animationConfig(null,name,element);
+        if(config.category==="passive"||config.targetType==="none"){ return null; }
+        return director.play(config,{
             side:side,
             actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
             key:identity(side,name,actorIndex)

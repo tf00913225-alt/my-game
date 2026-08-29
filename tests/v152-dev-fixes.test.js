@@ -63,9 +63,9 @@ function load(overrides={}){
     return context;
 }
 
-test("V152 is the final ordered and cache-busted patch",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=152/);
-    assert.match(loader,/const V_ASSET_VERSION="152"/);
+test("V152 remains the final ordered runtime patch under cache version 153",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=153/);
+    assert.match(loader,/const V_ASSET_VERSION="153"/);
     assert.match(loader,/css\/45-v152-dev-fixes\.css/);
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
     const v152=loader.indexOf("js/44-v152-dev-fixes.js");
