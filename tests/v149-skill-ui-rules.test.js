@@ -70,11 +70,11 @@ function compact(skill){
 }
 
 test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=150/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=151/);
     assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=149/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
-    assert.match(loader,/const V_ASSET_VERSION="150"/);
+    assert.match(loader,/const V_ASSET_VERSION="151"/);
     assert.match(loader,/css\/44-v149-skill-ui-rules\.css/);
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
@@ -293,7 +293,7 @@ test("enemy Dragon Slash repeat preserves the active battle token",()=>{
     assert.equal(finishes,1);
 });
 
-test("word-circle animation emits exactly one circle per displayed character",()=>{
+test("word-circle animation emits one circle per character without replacing sprite sheets",()=>{
     const delays=[];
     const flights=Array.from({length:4},(_,index)=>({
         dataset:{order:String(index)},style:{
@@ -317,6 +317,12 @@ test("word-circle animation emits exactly one circle per displayed character",()
     assert.equal(context.v143SkillAnimationManifest[played.id].sequence,"火鳳天鳴");
     assert.equal(context.v143SkillAnimationManifest[played.id].flightCount,4);
     assert.deepEqual(delays,["100ms","120ms","140ms","160ms"]);
+    context.v143SkillAnimationManifest.iceArrowRain={sprite:{frames:12}};
+    context.v142SkillAnimationDirector.play({
+        id:"iceArrowRain",name:"冰霜箭雨",element:"water",category:"magic",targetType:"all",duration:2500
+    },{side:"player",actorIndex:0});
+    assert.equal(played.id,"iceArrowRain");
+    assert.equal(context.v143SkillAnimationManifest["v149-word-iceArrowRain"],undefined);
     assert.match(animationSource,/const repeats=Math\.max\(1,requested\)/);
     assert.match(css,/v149-word-circle-stage \.v143-skill-flight/);
 });

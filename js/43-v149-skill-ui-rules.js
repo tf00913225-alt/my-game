@@ -866,6 +866,10 @@
             if(!config||config.id==="normal"||config.name==="普通攻擊"){
                 return previousPlay(config,meta);
             }
+            const existing=manifest[config.id];
+            if(existing&&existing.sprite){
+                return previousPlay(config,meta);
+            }
             const characters=Array.from(String(config.name||"技能").replace(/\s+/g,""));
             const syntheticId="v149-word-"+String(config.id||"skill");
             manifest[syntheticId]={

@@ -60,9 +60,9 @@ function run(context){
     return context;
 }
 
-test("V144 assets remain ordered before later patches under cache version 150",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=150/);
-    assert.match(loader,/const V_ASSET_VERSION="150"/);
+test("V144 assets remain ordered before later patches under cache version 151",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=151/);
+    assert.match(loader,/const V_ASSET_VERSION="151"/);
     assert.match(loader,/css\/41-v144-rules-and-abyss\.css/);
     const order=[
         "js/38-v143-system-fixes.js","js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
