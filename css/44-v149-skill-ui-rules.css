@@ -1,0 +1,188 @@
+/* =====================================================
+   V149 — shop alignment, skill word circles and combat state feedback
+===================================================== */
+
+/* The shop modal stays centred inside the 420px game canvas. */
+#game-stage #homeFeatureModal.v131-shop-open{
+    align-items:center !important;
+    justify-content:center !important;
+    box-sizing:border-box !important;
+    padding:12px !important;
+    overflow:hidden !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .home-feature-modal-box{
+    width:100% !important;
+    max-width:396px !important;
+    max-height:calc(100% - 24px) !important;
+    margin:0 auto !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+    transform:none !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody,
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface,
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-list,
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-card{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody{
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior:contain !important;
+    touch-action:pan-y !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
+    display:grid !important;
+    grid-template-columns:auto 46px minmax(0,1fr) !important;
+    gap:4px !important;
+    align-items:center !important;
+    min-width:0 !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+    min-width:0 !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v146-shop-total{
+    min-width:0 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+}
+
+/* One readable circle for every character in the displayed skill name. */
+.v143-skill-stage.v149-word-circle-stage .v143-skill-flight{
+    width:38px !important;
+    height:38px !important;
+    margin:-19px 0 0 -19px !important;
+    border:2px solid var(--v143-soft) !important;
+    border-radius:50% !important;
+    clip-path:none !important;
+    color:#fff !important;
+    background:
+        radial-gradient(circle,rgba(255,255,255,.5) 0 10%,var(--v143-color) 24%,color-mix(in srgb,var(--v143-color) 52%,transparent) 48%,transparent 72%) !important;
+    box-shadow:0 0 10px var(--v143-color),inset 0 0 7px var(--v143-soft) !important;
+    filter:drop-shadow(0 0 8px var(--v143-color)) !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:20px !important;
+    font-style:normal !important;
+    font-weight:900 !important;
+    line-height:34px !important;
+    text-align:center !important;
+    text-shadow:0 1px 3px #000,0 0 5px #000 !important;
+}
+
+/* Barrier: four deep-yellow corners, each showing the remaining block count. */
+#game-stage #battlePage .v149-barrier-corners{
+    position:absolute;
+    inset:0;
+    z-index:18;
+    display:block;
+    border-radius:inherit;
+    pointer-events:none;
+}
+#game-stage #battlePage .v149-barrier-corners i{
+    position:absolute;
+    display:flex;
+    width:24px;
+    height:24px;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+    border-color:#c79520;
+    border-style:solid;
+    border-width:0;
+    color:#ffe49b;
+    background:radial-gradient(circle,rgba(72,45,3,.88),rgba(34,22,3,.58) 52%,transparent 70%);
+    filter:drop-shadow(0 0 5px rgba(218,169,45,.9));
+    font-family:Arial,sans-serif;
+    font-size:11px;
+    font-style:normal;
+    font-weight:900;
+    line-height:1;
+    text-shadow:0 1px 2px #000;
+    animation:v149BarrierCornerPulse 1.2s ease-in-out infinite alternate;
+}
+#game-stage #battlePage .v149-barrier-corners i:nth-child(1){left:0;top:0;border-left-width:4px;border-top-width:4px;}
+#game-stage #battlePage .v149-barrier-corners i:nth-child(2){right:0;top:0;border-right-width:4px;border-top-width:4px;animation-delay:-.3s;}
+#game-stage #battlePage .v149-barrier-corners i:nth-child(3){right:0;bottom:0;border-right-width:4px;border-bottom-width:4px;animation-delay:-.6s;}
+#game-stage #battlePage .v149-barrier-corners i:nth-child(4){left:0;bottom:0;border-left-width:4px;border-bottom-width:4px;animation-delay:-.9s;}
+#game-stage #battlePage .v149-has-barrier .v141-effect-barrier,
+#game-stage #battlePage .v149-has-barrier .v141-effect-barrier::before{
+    display:none !important;
+    content:none !important;
+}
+#game-stage #battlePage .battle-monster.v149-has-barrier .v141-monster-shield-bar{
+    display:none !important;
+}
+@keyframes v149BarrierCornerPulse{
+    from{opacity:.58;filter:drop-shadow(0 0 2px rgba(218,169,45,.65));}
+    to{opacity:1;filter:drop-shadow(0 0 8px rgba(255,209,88,1));}
+}
+
+/* A revived enemy must immediately return to the normal living-card brightness. */
+#game-stage #battlePage .battle-monster.v149-living-monster{
+    opacity:1 !important;
+    filter:none !important;
+    pointer-events:auto !important;
+}
+
+/* Rank colours are final-cascade rules for every combat and patrol name node. */
+#game-stage #battlePage .battle-monster[data-rank="elite"] .battle-monster-name,
+#game-stage #battlePage .battle-monster[data-rank="elite"] .v143-monster-identity,
+#game-stage #mapPage .map-monster[data-rank="elite"] .map-monster-name{
+    color:#ff9f43 !important;
+    -webkit-text-fill-color:#ff9f43 !important;
+    text-shadow:0 1px 2px #000,0 0 8px rgba(255,126,30,.86) !important;
+}
+#game-stage #battlePage .battle-monster[data-rank="boss"] .battle-monster-name,
+#game-stage #battlePage .battle-monster[data-rank="boss"] .v143-monster-identity,
+#game-stage #mapPage .map-monster[data-rank="boss"] .map-monster-name{
+    color:#ff5f9d !important;
+    -webkit-text-fill-color:#ff5f9d !important;
+    text-shadow:0 1px 2px #000,0 0 8px rgba(255,52,132,.88) !important;
+}
+
+/* Wanxiang Earth Shield reflection appears on the attacking card. */
+#game-stage #battlePage .v149-reflect-popup{
+    position:absolute;
+    left:50%;
+    top:35%;
+    z-index:95;
+    min-width:max-content;
+    padding:3px 7px;
+    border:1px solid #ffc85d;
+    border-radius:999px;
+    color:#fff0a2;
+    background:rgba(60,21,4,.9);
+    box-shadow:0 0 12px rgba(255,147,38,.88);
+    font-family:"Noto Serif TC",serif;
+    font-size:12px;
+    font-weight:900;
+    line-height:16px;
+    white-space:nowrap;
+    pointer-events:none;
+    transform:translate(-50%,-50%);
+    animation:v149ReflectDamage 1.3s ease-out both;
+}
+@keyframes v149ReflectDamage{
+    0%{opacity:0;transform:translate(-50%,0) scale(.72);}
+    18%,62%{opacity:1;transform:translate(-50%,-60%) scale(1);}
+    100%{opacity:0;transform:translate(-50%,-145%) scale(.94);}
+}
+
+@media (max-width:380px){
+    #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
+        grid-template-columns:auto 42px minmax(0,1fr) !important;
+    }
+}
+
+@media (prefers-reduced-motion:reduce){
+    #game-stage #battlePage .v149-barrier-corners i,
+    #game-stage #battlePage .v149-reflect-popup{
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+    }
+}

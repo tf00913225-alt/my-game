@@ -1,0 +1,102 @@
+/* =====================================================
+   V148 — combat targets, dungeon scrolling and navigation
+===================================================== */
+
+/* A dead card stays inert unless Revive is actively selecting it. */
+#game-stage #battlePage .battle-player.v146-defeated.v148-revive-target.ally-targetable{
+    pointer-events:auto !important;
+    cursor:crosshair !important;
+    opacity:.72 !important;
+    filter:grayscale(.25) brightness(.86) !important;
+    box-shadow:0 0 13px rgba(255,216,77,.72) !important;
+}
+#game-stage #battlePage .battle-player.v146-defeated.v148-revive-target.ally-targetable::after{
+    display:block !important;
+}
+
+/* V143's white identity rule loaded after V131's rank colours. Restore the
+   requested combat/patrol elite orange at the final cascade layer. */
+#game-stage #battlePage .battle-monster[data-rank="elite"] .battle-monster-name.v143-monster-identity{
+    color:#ff9f43 !important;
+    text-shadow:0 1px 2px #000,0 0 8px rgba(255,126,30,.78) !important;
+}
+#game-stage #battlePage .battle-monster[data-rank="boss"] .battle-monster-name.v143-monster-identity{
+    color:#ff668f !important;
+    text-shadow:0 1px 2px #000,0 0 8px rgba(255,55,106,.78) !important;
+}
+#game-stage #mapPage .map-monster[data-rank="elite"] .map-monster-name{
+    color:#ff9f43 !important;
+    text-shadow:0 1px 2px #000,0 0 7px rgba(255,126,30,.78) !important;
+}
+#game-stage #mapPage .map-monster[data-rank="boss"] .map-monster-name{
+    color:#ff668f !important;
+    text-shadow:0 1px 2px #000,0 0 7px rgba(255,55,106,.78) !important;
+}
+
+/* Daily dungeons own the vertical gesture and stop before the fixed nav. */
+#game-stage #dungeonPage:not(.v146-abyss-active).active{
+    display:flex !important;
+    flex-direction:column !important;
+    height:100% !important;
+    min-height:0 !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+    background:linear-gradient(180deg,#171108 0%,#090806 100%) !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) > h2,
+#game-stage #dungeonPage:not(.v146-abyss-active) > h2 + div{
+    flex:0 0 auto !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) #dungeonTabContent{
+    flex:1 1 auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:16px !important;
+    background:linear-gradient(180deg,rgba(34,24,13,.58),rgba(8,7,5,.82));
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) .v141-dungeon-cover-list{
+    min-height:max-content !important;
+    align-content:start !important;
+    padding-bottom:28px !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) .v141-dungeon-cover-art small{
+    display:none !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="exp"] .v141-dungeon-cover-art{
+    background:
+        linear-gradient(180deg,rgba(7,8,5,.18),rgba(7,5,3,.76)),
+        url("../assets/ui/training-background.jpg") center 33% / cover no-repeat !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="material"] .v141-dungeon-cover-art{
+    background:
+        linear-gradient(180deg,rgba(12,6,2,.08),rgba(8,4,2,.72)),
+        url("../assets/ui/home-synthesis.png") center / auto 98% no-repeat,
+        radial-gradient(circle at center,#6a3917 0%,#251208 58%,#0d0805 100%) !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{
+    background:
+        linear-gradient(180deg,rgba(8,4,2,.05),rgba(7,4,2,.72)),
+        url("../assets/battle/element-box.png") center / auto 84% no-repeat,
+        radial-gradient(circle at center,#6c2c12 0%,#241008 62%,#0b0705 100%) !important;
+}
+
+/* Deep Abyss uses the same five-slot bottom navigation as Daily Dungeon. */
+#game-stage #v146AbyssReturn{display:none !important;}
+#game-stage #v141DungeonNav,
+#game-stage #v141DungeonNav[data-v146-columns="4"],
+#game-stage #v141DungeonNav[data-v146-columns="5"]{
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+}
+
+/* Automatic patrol keeps the original smooth route; the manual click gait is retired. */
+#game-stage #mapPage #patrolCharacterWrap.v148-auto-route{
+    transition:left 1.8s ease-in-out,top 1.8s ease-in-out !important;
+}
+#game-stage #mapPage #patrolCharacterWrap.v148-auto-route #patrolCharacterImg.v141-manual-walking{
+    animation:none !important;
+}

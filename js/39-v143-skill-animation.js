@@ -351,8 +351,8 @@
         const requested=Math.max(1,Number(current.model.flightCount)||Math.min(4,current.model.pulses));
         const totalFlightBudget=lowQuality?30:54;
         const perTargetFlightBudget=Math.max(1,Math.floor(totalFlightBudget/Math.max(1,current.targetIndexes.length)));
-        const repeats=Math.max(1,Math.min(lowQuality?4:8,requested,perTargetFlightBudget));
-        const sequence=String(current.model.sequence||current.model.glyph||"技").split("");
+        const repeats=Math.max(1,requested);
+        const sequence=Array.from(String(current.model.sequence||current.model.glyph||"技"));
         for(let repeat=0;repeat<repeats;repeat++){
             const flight=appendNode("v143-skill-flight motion-"+current.model.motion);
             const symbol=sequence[repeat%sequence.length]||current.model.glyph;

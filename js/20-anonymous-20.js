@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="147";
+const V_ASSET_VERSION="149";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -472,6 +472,42 @@ function vAssetUrl(path){
     }
 })();
 
+/* V148 loader — target truth, support rules and dungeon usability. */
+(function loadV148CombatDungeonFixesStyle(){
+    function load(){
+        if(document.getElementById("v148-combat-dungeon-fixes-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v148-combat-dungeon-fixes-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/43-v148-combat-dungeon-fixes.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V149 loader — final skill rules, shop alignment and combat feedback. */
+(function loadV149SkillUiRulesStyle(){
+    function load(){
+        if(document.getElementById("v149-skill-ui-rules-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v149-skill-ui-rules-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/44-v149-skill-ui-rules.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -500,7 +536,9 @@ function vAssetUrl(path){
         {id:"v143-system-fixes-runtime",src:"js/38-v143-system-fixes.js"},
         {id:"v143-skill-animation-runtime",src:"js/39-v143-skill-animation.js"},
         {id:"v144-rules-and-abyss-runtime",src:"js/40-v144-rules-and-abyss.js"},
-        {id:"v146-system-polish-runtime",src:"js/41-v146-system-polish.js"}
+        {id:"v146-system-polish-runtime",src:"js/41-v146-system-polish.js"},
+        {id:"v148-combat-dungeon-fixes-runtime",src:"js/42-v148-combat-dungeon-fixes.js"},
+        {id:"v149-skill-ui-rules-runtime",src:"js/43-v149-skill-ui-rules.js"}
     ];
 
     function next(index){
