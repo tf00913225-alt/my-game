@@ -36,7 +36,8 @@
    `tests/v149-skill-ui-rules.test.js`，V150 新增冰霜箭雨 VFX 驗收
    `tests/v150-ice-arrow-rain-vfx.test.js`，V152 新增本輪技能／副本／戰鬥介面驗收
    `tests/v152-dev-fixes.test.js`，V153 新增火元素施放／持續狀態正式圖驗收
-   `tests/v153-fire-vfx.test.js`。驗證至少要包含：
+   `tests/v153-fire-vfx.test.js`，V154 新增本輪戰鬥／元素匣／深淵／版面驗收
+   `tests/v154-current-request.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -391,6 +392,34 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-29 — V154：戰鬥交棒、元素匣、怒火動畫與深淵立繪／介面修正（dev）
+
+- 依使用者要求只在既有 `dev` 分支施工，未建立新分支、未合併或修改 `main`。
+- 戰鬥中途停住：`js/37-v142-skill-animation.js` 的動畫交棒完成識別加入回合序號，避免
+  無動畫／沿用上一個 gate 的後續回合被誤判成已處理，並在 V142 測試加入跨回合重用
+  gate 的回歸情境。
+- 元素匣：新增 `js/45-v154-dev-fixes.js`，上方主按鈕在未啟動時直接「套用並啟動」，
+  下方重複操作列由 `css/46-v154-dev-fixes.css` 收起；自動恢復會持續使用可用補品，直到
+  HP／SP 高於各角色設定門檻或庫存耗盡。
+- 怒火：`js/39-v143-skill-animation.js` 改成每個實際受影響卡牌各自一張小型 Sprite Sheet
+  動畫，不再用戰場中央的群組大動畫；持續狀態循環維持原本逐卡行為。
+- 能力值頁：`js/19-stage-v78-character-inventory-runtime.js` 改用 `characterTabContent` 起點
+  到 modal body 底部的真正剩餘高度，保留它作為單一縱向捲動容器，修正下方被裁切。
+- 日常裝備副本：V154 CSS 以同等 specificity 覆寫 V148 遺留的 `background-size:auto 84%`，
+  讓 V152 裝備封面真正填滿卡片。
+- 深淵：1～4 關取消脆弱的 roster 數量限制並保留既有東／南／天／北帝與天兵圖；第 5 關
+  接入使用者提供的綠、白、黑、紅、金及男天兵六張立繪，轉成
+  `assets/dungeons/abyss/floor5-*.webp`（皆 1152×1536），按完整怪物名稱固定對應。
+  戰鬥卡片維持原尺寸與 HP／SP 資訊，立繪鋪滿 3:4 框且技能 VFX 仍以卡片即時矩形定位。
+- 深淵入口只保留底部行動按鈕，地圖樓層資訊改成小型浮層、收起重複提示／玩家標籤並縮小
+  守關者按鈕，降低遮擋美術圖的面積。
+- 載入：`V_ASSET_VERSION` 與 `index.html` loader 提升到 154，新增 V154 CSS／runtime 並
+  保持既有順序載入；V78 直載腳本另加 `?v=154`。
+- 驗證：所有 JS `node --check`、`git diff --check`、六張新圖格式／尺寸檢查通過；執行
+  `tests/*.js` 共 158 項全數通過。`tests/v138-browser-smoke.js` 因執行環境沒有本機
+  Chromium 依既有規則略過；遠端 dev 預覽另被 raw.githack 安全中繼頁攔截，因此本輪
+  視覺校準以使用者兩張實機截圖、原始美術與 DOM/CSS 尺寸檢查完成。
 
 ### 2026-08-29 — V153：火元素正式 Sprite Sheet VFX（dev）
 
@@ -1987,7 +2016,7 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V139 的 `tests/v139-economy-rested-exp.test.js` 有 7 項經濟／休息經驗驗收，
       V140 的 `tests/v140-four-element-balance.test.js` 有 14 項技能定案驗收，
       V141 的 `tests/v141-system-expansion.test.js` 有 18 項系統擴充驗收，
-      V142 的 `tests/v142-skill-animation.test.js` 有 14 項動畫／行動閘門驗收，
+      V142 的 `tests/v142-skill-animation.test.js` 有 15 項動畫／行動閘門驗收，
       V143 的 `tests/v143-combat-dungeon-polish.test.js` 有 12 項本輪需求驗收，
       V144 的 `tests/v144-rules-and-abyss.test.js` 有 11 項商店／怪物技能／深淵驗收，
       V146 的 `tests/v146-system-polish.test.js` 有 8 項戰鬥／深淵／手機介面驗收，
@@ -1995,8 +2024,9 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V149 的 `tests/v149-skill-ui-rules.test.js` 有 11 項技能／介面規則驗收，
       V150 的 `tests/v150-ice-arrow-rain-vfx.test.js` 有 6 項正式 Sprite VFX 驗收，
       V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，
-      V153 的 `tests/v153-fire-vfx.test.js` 有 7 項火元素正式 Sprite VFX 驗收，並保留
-      可選的 `tests/v138-browser-smoke.js`。本輪雲端瀏覽器攔截 localhost，
+      V153 的 `tests/v153-fire-vfx.test.js` 有 8 項火元素正式 Sprite VFX 驗收，
+      V154 的 `tests/v154-current-request.test.js` 有 6 項本輪需求驗收，並保留
+      可選的 `tests/v138-browser-smoke.js`。本輪遠端瀏覽器遇到預覽站安全中繼頁，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。
 - [x] ~~V146 暫時沿用舊商店 icon~~ 2026-08-28 已由 V147 使用使用者補交圖完成透明化、

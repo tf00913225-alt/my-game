@@ -550,7 +550,7 @@
     }
 
     function runTicket(kind,ticket,invoke){
-        const key=[kind,ticket.token,ticket.index,ticket.gateId].join("|");
+        const key=[kind,ticket.token,ticket.round,ticket.index,ticket.gateId].join("|");
         if(ticket.consumed||state.completedBoundaries.indexOf(key)>=0){
             state.metrics.duplicateBoundariesBlocked++;
             return;
@@ -620,7 +620,7 @@
 
             if(phase==="declare"&&typeof activeBattleCharacterIndex!=="undefined"&&activeBattleCharacterIndex!==beforeDeclare){
                 state.tickets.declare={
-                    token:token,index:activeBattleCharacterIndex,
+                    token:token,round:typeof turn!=="undefined"?turn:0,index:activeBattleCharacterIndex,
                     gate:actionGate,gateId:actionGate?actionGate.id:"none",
                     earliestAt:Math.max(calledAt+CURRENT_DECLARE_DELAY_MS,actionGate?actionGate.deadline:0),
                     consumed:false
@@ -631,7 +631,7 @@
                     ?{token:token,gate:actionGate,consumed:false}
                     :null;
                 state.tickets.resolve={
-                    token:token,index:initiativeIndex,
+                    token:token,round:typeof turn!=="undefined"?turn:0,index:initiativeIndex,
                     /* The last combatant must also hold processNextCombatant.
                        Waiting only inside beginCharacterTurn was too late:
                        startTurn had already switched to declare and exposed

@@ -164,10 +164,10 @@ function createContext(options={}){
 
 (async()=>{
     await test("V142 assets are versioned and loaded after V141",()=>{
-        assert.match(loader,/const V_ASSET_VERSION="153"/);
+        assert.match(loader,/const V_ASSET_VERSION="154"/);
         assert.match(loader,/css\/39-v142-skill-animation\.css/);
         assert.match(loader,/js\/36-v141-content-systems\.js[\s\S]*js\/37-v142-skill-animation\.js/);
-        assert.match(index,/js\/20-anonymous-20\.js\?v=153/);
+        assert.match(index,/js\/20-anonymous-20\.js\?v=154/);
     });
 
     await test("normal, small and ultimate skills keep distinct durations",()=>{
@@ -279,6 +279,29 @@ function createContext(options={}){
         await Promise.resolve();
         await Promise.resolve();
         assert.equal(calls.process,1);
+    });
+
+    await test("completed boundaries stay unique when a later round reuses the last gate",async()=>{
+        const {context,scheduler,calls}=createContext();
+        const gate=context.v142SkillAnimationDirector.play(
+            context.v142GetSkillAnimationConfig("flameSlash"),
+            {side:"player",actorIndex:0,render:false}
+        );
+        gate.complete("animationend");
+
+        context.finishPlayerAction();
+        scheduler.advance(1600);
+        await Promise.resolve();
+        await Promise.resolve();
+        assert.equal(calls.process,1);
+
+        context.turn=2;
+        context.initiativeIndex=0;
+        context.finishPlayerAction();
+        scheduler.advance(3200);
+        await Promise.resolve();
+        await Promise.resolve();
+        assert.equal(calls.process,2,"a repeated gate id in round two must still advance combat");
     });
 
     await test("round handoff cannot expose the next manual turn before the final animation ends",async()=>{

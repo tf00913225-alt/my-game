@@ -79,7 +79,7 @@
             glyph:"怒",motion:"rise",impact:"rage-aura",hit:.5833333333,pulses:3,spread:55,
             sprite:{
                 src:"assets/vfx/fire/rage-cast.png",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"group",scale:1.08,minSize:190
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:.82,minSize:64,maxSize:108
             }
         },
         fireEX:{glyph:"焰",motion:"orbit",impact:"fire-crown",hit:.74,pulses:7,spread:95},

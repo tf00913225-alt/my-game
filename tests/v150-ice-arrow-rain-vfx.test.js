@@ -204,11 +204,11 @@ test("runtime places sprites on the two living target-card centres and skips the
     assert.ok(scheduled.some(timer=>timer.delay>=2490),"full twelve-frame gate must stay alive for 2.5 seconds");
 });
 
-test("the shared action gate owns the full sprite duration under cache version 153",()=>{
+test("the shared action gate owns the full sprite duration under cache version 154",()=>{
     assert.match(animation,/setTimer\(\(\)=>cleanupCurrent\(current,"v143-animation-complete"\),Math\.max\(duration,Number\(config\.resolveDuration\)\|\|duration\)\)/);
     assert.match(animation,/current\.gate\.complete\(reason\|\|"v143-animation-complete"\)/);
-    assert.match(loader,/const V_ASSET_VERSION="153"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=153/);
+    assert.match(loader,/const V_ASSET_VERSION="154"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=154/);
 });
 
 console.log(`\n${passed} V150 Ice Arrow Rain VFX tests passed.`);

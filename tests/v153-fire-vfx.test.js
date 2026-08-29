@@ -221,7 +221,7 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
         blazeSpell:["blaze-spell-cast.png","single"],
         flameTornado:["flame-tornado-cast.png","single"],
         phoenixCry:["phoenix-cry-cast.png","group"],
-        rage:["rage-cast.png","group"]
+        rage:["rage-cast.png","single"]
     };
     Object.entries(expected).forEach(([id,[filename,placement]])=>{
         const sprite=manifest[id].sprite;
@@ -295,6 +295,19 @@ test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main
     assert.equal(runtime.legacyRocketCalls(),0);
 });
 
+test("Rage creates one cast sheet inside every affected card",()=>{
+    const runtime=loadRuntime();
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("rage",1500,"allyAll","buff"),{side:"player",actorIndex:2}
+    );
+    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
+    assert.equal(sprites.length,3);
+    assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
+    sprites.forEach(node=>assert.equal(node.dataset.placement,"single"));
+    sprites.forEach(node=>assert.ok(parseFloat(node.style.width)<=108));
+});
+
 test("frame eight delays hit numbers together and Fire Critical keeps its critical text reaction",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
@@ -339,14 +352,14 @@ test("Burn and Rage loops follow live status records without owning an action ga
     assert.equal(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-rage"),null);
 });
 
-test("cast sheets are one-shot, status sheets loop, and cache version is V153",()=>{
+test("cast sheets are one-shot, status sheets loop, and cache version is V154",()=>{
     assert.match(css,/v153FireCastFrames var\(--v143-sprite-duration,1500ms\) steps\(1,end\) 1 both/);
     assert.doesNotMatch(css,/v153FireCastFrames[^;]*infinite/);
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
     assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png",columns:4,rows:2,frames:8,duration:800\}/);
     assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png",columns:4,rows:2,frames:8,duration:1000\}/);
-    assert.match(loader,/const V_ASSET_VERSION="153"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=153/);
+    assert.match(loader,/const V_ASSET_VERSION="154"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=154/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);
