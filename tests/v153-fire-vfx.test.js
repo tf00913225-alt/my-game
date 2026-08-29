@@ -358,8 +358,8 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V154",(
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
     assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png",columns:4,rows:2,frames:8,duration:800\}/);
     assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png",columns:4,rows:2,frames:8,duration:1000\}/);
-    assert.match(loader,/const V_ASSET_VERSION="155"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=155/);
+    assert.match(loader,/const V_ASSET_VERSION="156"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=156/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

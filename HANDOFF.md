@@ -38,7 +38,8 @@
    `tests/v152-dev-fixes.test.js`，V153 新增火元素施放／持續狀態正式圖驗收
    `tests/v153-fire-vfx.test.js`，V154 新增本輪戰鬥／元素匣／深淵／版面驗收
    `tests/v154-current-request.test.js`，V155 新增硬控節奏／深淵第五關／火系終階技能驗收
-   `tests/v155-current-request.test.js`。驗證至少要包含：
+   `tests/v155-current-request.test.js`，V156 新增深淵地圖立繪／點擊熱區與元素匣狀態不同步驗收
+   `tests/v156-deep-trace-fixes.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -50,7 +51,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-29，V155 深淵第五關與火系終階技能定案）
+## 目前狀態（截至 2026-08-29，V156 深淵地圖立繪與元素匣深追修正）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -132,6 +133,10 @@
   指定技能，五帝固定最高等級、精英固定最低等級。元祖賜福改為 20% 全淨化與閃避
   +30% 兩回合；霸龍裂天斬與火鳳天鳴依本輪數值及追加／未燃燒補償規則定案。
   快取版本升至 155，只發布 `dev`，不得合併或推送 `main`。
+- V156 深追確認前版只把深淵立繪接到戰鬥卡牌，地圖守關者仍是文字按鈕，且 V154 CSS
+  把其最小寬高歸零；現改為 1～5 關各自的大型 3:4 立繪挑戰按鈕。元素匣補品原先被
+  角色個別 `enabled` 旗標誤擋，現以元素匣實際啟動狀態授權全隊補給，保留原門檻、
+  補品與死亡角色規則。快取版本升至 156，只發布 `dev`，不得合併或推送 `main`。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -399,6 +404,28 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-29 — V156：深淵地圖立繪／點擊熱區與元素匣補品深追修正（dev）
+
+- 依使用者要求只沿用既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
+- 深追確認 V152／V154 只在戰鬥卡片套用深淵立繪；地圖仍由 `js/36-v141-content-systems.js`
+  產生純文字 `.v141-abyss-boss`，而 V154 CSS 又把其 `min-width`／`min-height` 設成 0，
+  因此地圖沒有立繪且實機點擊區極小。`css/46-v154-dev-fixes.css` 現在依樓層接入東／南／
+  天／北帝與第五關極帝立繪，保持 `contain` 比例，並將整個既有語意按鈕擴為 200×280。
+- 深追確認 V154 自動補品只接受角色個別 `config.enabled=true`；元素匣實際已啟動但舊存檔
+  角色旗標不同步時會直接略過。`js/45-v154-dev-fixes.js` 現以
+  `v131GetElementBoxState().active` 作為全隊共用授權，仍依每名角色原 HP／SP 門檻持續吃藥，
+  元素匣未啟動時不會繞過角色設定；頁面載入時若元素匣已啟動也會立即完成一次補給。
+- `V_ASSET_VERSION` 與外層 loader 提升至 156；新增
+  `tests/v156-deep-trace-fixes.test.js`，覆蓋先前漏測的「元素匣啟動、角色旗標為 false」、
+  未啟動不得越權、五層地圖立繪與大型點擊區。
+- 驗證：17 份 Node suite 共 173 項全數通過；`js/`／`tests/` 共 125 支 JavaScript
+  全部通過 `node --check`，`git diff --check`、五張地圖立繪 1152×1536 WebP 與 loader
+  版本檢查通過。雲端瀏覽器被預覽站安全中繼頁攔截，本機亦無 Chromium，browser smoke
+  依既有規則略過。
+
+**已知限制**：本輪無可用瀏覽器做真實觸控截圖驗收；新增的 VM 回歸已直接重現並覆蓋
+元素匣狀態不同步路徑，實機視覺與點擊手感仍需使用者在 `dev` 確認。
 
 ### 2026-08-29 — V155：硬控快跳、深淵第五關技能與火系終階技能定案（dev）
 
@@ -2057,7 +2084,8 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，
       V153 的 `tests/v153-fire-vfx.test.js` 有 8 項火元素正式 Sprite VFX 驗收，
       V154 的 `tests/v154-current-request.test.js` 有 6 項本輪需求驗收，
-      V155 的 `tests/v155-current-request.test.js` 有 8 項本輪需求驗收，並保留
+      V155 的 `tests/v155-current-request.test.js` 有 8 項本輪需求驗收，
+      V156 的 `tests/v156-deep-trace-fixes.test.js` 有 5 項深淵地圖／元素匣驗收，並保留
       可選的 `tests/v138-browser-smoke.js`。本輪遠端瀏覽器遇到預覽站安全中繼頁，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。

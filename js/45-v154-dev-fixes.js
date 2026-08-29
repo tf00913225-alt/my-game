@@ -80,6 +80,16 @@
         };
     }
 
+    function isElementBoxRecoveryActive(){
+        if(typeof window.v131GetElementBoxState==="function"){
+            try{
+                const state=window.v131GetElementBoxState();
+                return !!(state&&state.active);
+            }catch(_){ }
+        }
+        return typeof autoBattle!=="undefined"&&!!autoBattle;
+    }
+
     function finishAutoRecovery(){
         if(
             typeof getExistingPartyIndexes!=="function"||
@@ -88,11 +98,15 @@
             typeof getPartyBattleStats!=="function"
         ){ return 0; }
         let consumed=0;
+        const elementBoxActive=isElementBoxRecoveryActive();
         getExistingPartyIndexes().forEach(characterIndex=>{
             const character=getPartyCharacterByIndex(characterIndex);
             const config=getPartyAutoConfig(characterIndex);
             const stats=getPartyBattleStats(characterIndex);
-            if(!character||character.hp<=0||!config||!config.enabled||!stats){ return; }
+            if(
+                !character||character.hp<=0||!config||!stats||
+                (!config.enabled&&!elementBoxActive)
+            ){ return; }
 
             ["hp","sp"].forEach(resource=>{
                 const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);
@@ -127,6 +141,7 @@
         return consumed;
     }
     window.v154FinishAutoRecovery=finishAutoRecovery;
+    window.v154IsElementBoxRecoveryActive=isElementBoxRecoveryActive;
 
     if(typeof applyPostBattleAutoRecovery==="function"){
         const previousAutoRecovery=applyPostBattleAutoRecovery;
@@ -168,6 +183,18 @@
             syncElementBoxPrimaryButton();
             return result;
         };
+    }
+    if(typeof setTimeout==="function"){
+        setTimeout(()=>{
+            if(
+                isElementBoxRecoveryActive()&&
+                !(typeof battleActive!=="undefined"&&battleActive)
+            ){
+                const consumed=finishAutoRecovery();
+                if(consumed&&typeof updateUI==="function"){ updateUI(); }
+                if(consumed&&typeof saveGame==="function"){ saveGame(); }
+            }
+        },0);
     }
     syncElementBoxPrimaryButton();
     syncAbyssPortraits();
