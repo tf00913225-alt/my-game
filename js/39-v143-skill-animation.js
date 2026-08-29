@@ -43,7 +43,14 @@
         frostCrush:{glyph:"槌",motion:"drop",impact:"ice-crush",hit:.71,pulses:4,spread:58},
         waterBall:{glyph:"●",motion:"wave",impact:"water-splash",hit:.62,pulses:1,spread:34},
         floodBeast:{glyph:"獸",motion:"surge",impact:"flood-jaw",hit:.68,pulses:4,spread:66},
-        iceArrowRain:{glyph:"➶",motion:"rain",impact:"ice-rain",hit:.72,pulses:7,spread:104,flightCount:7},
+        iceArrowRain:{
+            glyph:"➶",motion:"rain",impact:"ice-rain",hit:.5833333333,
+            pulses:7,spread:104,flightCount:7,
+            sprite:{
+                src:"assets/vfx/water/ice-arrow-rain.png",
+                columns:4,rows:3,frames:12,hitFrame:7
+            }
+        },
         freeze:{glyph:"晶",motion:"crystal",impact:"ice-prison",hit:.69,pulses:3,spread:48},
         healSpell:{glyph:"癒",motion:"rise",impact:"healing-spring",hit:.58,pulses:3,spread:46},
         revive:{glyph:"生",motion:"ascend",impact:"revive-pillar",hit:.70,pulses:5,spread:70},
@@ -111,6 +118,17 @@
         const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
         return modelFor({id:skillId,name:skill&&skill.name||skillId});
     };
+
+    /* Warm the one external frame asset without creating a second renderer. */
+    if(typeof Image==="function"){
+        Object.keys(MANIFEST).forEach(id=>{
+            const sprite=MANIFEST[id]&&MANIFEST[id].sprite;
+            if(!sprite||!sprite.src){ return; }
+            const image=new Image();
+            image.decoding="async";
+            image.src=sprite.src;
+        });
+    }
 
     const director=window.v142SkillAnimationDirector;
     const originalPlay=director.play.bind(director);
@@ -284,7 +302,8 @@
 
     function targetHitTime(current,index){
         const position=Math.max(0,current.targetIndexes.indexOf(index));
-        const stagger=current.targetIndexes.length>1?Math.min(210,position*55):0;
+        const stagger=current.model.sprite?0:
+            (current.targetIndexes.length>1?Math.min(210,position*55):0);
         return Math.min(
             current.startedAt+current.duration-140,
             current.startedAt+current.duration*current.model.hit+stagger
@@ -307,6 +326,10 @@
             setTimer(()=>window.v143SyncEarthShieldEffects(),0);
         }
         setTimer(()=>card.classList.remove("v143-impact-target"),520);
+        if(current.model.sprite){
+            current.hitReached=true;
+            return;
+        }
         const impact=appendNode("v143-hit-impact impact-"+current.model.impact);
         impact.textContent=current.model.glyph;
         impact.style.left=target.x+"px";
@@ -333,8 +356,30 @@
         current.hitReached=true;
     }
 
+    function addSprite(current,index,target){
+        const sprite=current.model.sprite;
+        if(!sprite||!target||current.spriteNodes.has(index)){ return; }
+        const size=Math.max(
+            96,
+            Math.min(184,Math.max(target.rect.width,target.rect.height)*1.8)
+        );
+        const node=appendNode("v143-vfx-sprite v143-vfx-sprite-"+current.config.id);
+        node.dataset.targetSide=current.targetSide;
+        node.dataset.targetIndex=String(index);
+        node.dataset.frames=String(sprite.frames);
+        node.style.left=target.x+"px";
+        node.style.top=target.y+"px";
+        node.style.width=size+"px";
+        node.style.height=size+"px";
+        node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
+        node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
+        node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
+        current.spriteNodes.set(index,node);
+    }
+
     function emitFlight(current,index,allowDefeated){
         if(!state.stage||current.emitted.has(index)){ return; }
+        if(!current.validTargets.has(index)){ return; }
         if(!allowDefeated&&!canReceive(current.config,current.targetSide,index)){ return; }
         const actor=cardCenter(current.actorCard);
         const targetCard=cardFor(current.targetSide,index);
@@ -346,6 +391,11 @@
         const hitAt=targetHitTime(current,index);
         const startDelay=Math.max(40,current.duration*.2+Math.max(0,current.targetIndexes.indexOf(index))*30);
         const travel=Math.max(150,hitAt-current.startedAt-startDelay);
+        if(current.model.sprite){
+            addSprite(current,index,target);
+            setTimer(()=>addImpact(current,index),Math.max(0,hitAt-Date.now()));
+            return;
+        }
         const device=typeof navigator!=="undefined"?navigator:{};
         const lowQuality=(Number(device.deviceMemory)||4)<=2||(Number(device.hardwareConcurrency)||4)<=2;
         const requested=Math.max(1,Number(current.model.flightCount)||Math.min(4,current.model.pulses));
@@ -403,10 +453,14 @@
         const model=modelFor(config);
         const targetSide=targetSideFor(config,meta.side||"player");
         const duration=Math.max(520,Number(config.duration)||520);
+        const validTargets=new Set(
+            activeCards(targetSide,config).map(entry=>entry.index)
+        );
         const current={
             sequence:++sequence,config:config,model:model,gate:gate,
             side:meta.side||"player",actorIndex:Number.isInteger(meta.actorIndex)?meta.actorIndex:0,
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),
+            validTargets:validTargets,spriteNodes:new Map(),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),duration:duration,hitReached:false,done:false
         };
@@ -427,8 +481,10 @@
         state.stage=stage;
         state.current=current;
         state.metrics.started++;
-        addCharge(current);
-        addField(current);
+        if(!model.sprite){
+            addCharge(current);
+            addField(current);
+        }
         current.targetIndexes.slice().forEach(index=>emitFlight(current,index));
         setTimer(()=>cleanupCurrent(current,"v143-animation-complete"),Math.max(duration,Number(config.resolveDuration)||duration));
         gate.promise.then(()=>{

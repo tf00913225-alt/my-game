@@ -179,7 +179,8 @@
 .v143-cast-charge,
 .v143-skill-flight,
 .v143-hit-impact,
-.v143-skill-field{
+.v143-skill-field,
+.v143-vfx-sprite{
     position:fixed;
     display:block;
     box-sizing:border-box;
@@ -187,6 +188,44 @@
     text-align:center;
     pointer-events:none;
     will-change:transform,opacity,filter;
+}
+
+.v143-vfx-sprite{
+    background-position:0 0;
+    background-repeat:no-repeat;
+    image-rendering:auto;
+    filter:drop-shadow(0 0 10px rgba(91,202,255,.88));
+    mix-blend-mode:screen;
+    transform:translate(-50%,-50%);
+    transform-origin:center;
+    will-change:background-position,transform,opacity,filter;
+}
+
+.v143-skill-stage[data-skill="iceArrowRain"] .v143-vfx-sprite{
+    animation:
+        v150IceArrowRainFrames var(--v143-sprite-duration,2500ms) steps(1,end) 1 both,
+        v150IceArrowRainEnvelope var(--v143-sprite-duration,2500ms) linear 1 both;
+}
+
+@keyframes v150IceArrowRainFrames{
+    0%{background-position:0 0}
+    8.333333%{background-position:33.333333% 0}
+    16.666667%{background-position:66.666667% 0}
+    25%{background-position:100% 0}
+    33.333333%{background-position:0 50%}
+    41.666667%{background-position:33.333333% 50%}
+    50%{background-position:66.666667% 50%}
+    58.333333%{background-position:100% 50%}
+    66.666667%{background-position:0 100%}
+    75%{background-position:33.333333% 100%}
+    83.333333%{background-position:66.666667% 100%}
+    91.666667%,100%{background-position:100% 100%}
+}
+
+@keyframes v150IceArrowRainEnvelope{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.88)}
+    4%,94%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(1.04)}
 }
 
 .v143-cast-charge{
