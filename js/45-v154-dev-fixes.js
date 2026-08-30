@@ -30,6 +30,37 @@
             .filter(entry=>entry.monster&&entry.monster.v141Abyss);
     }
 
+    function syncAbyssPortraitArt(card,portrait){
+        if(!card){ return; }
+        const selector=".v162-abyss-battle-portrait-art";
+        const art=typeof card.querySelector==="function"?card.querySelector(selector):null;
+        if(!portrait){
+            if(art&&typeof art.remove==="function"){ art.remove(); }
+            else if(art&&art.parentNode&&typeof art.parentNode.removeChild==="function"){
+                art.parentNode.removeChild(art);
+            }
+            return;
+        }
+        let portraitArt=art;
+        if(!portraitArt&&typeof document.createElement==="function"){
+            portraitArt=document.createElement("img");
+            portraitArt.className="v162-abyss-battle-portrait-art";
+            portraitArt.alt="";
+            portraitArt.draggable=false;
+            portraitArt.decoding="async";
+            portraitArt.setAttribute("aria-hidden","true");
+            if(card.firstChild&&typeof card.insertBefore==="function"){
+                card.insertBefore(portraitArt,card.firstChild);
+            }else if(typeof card.appendChild==="function"){
+                card.appendChild(portraitArt);
+            }
+        }
+        if(portraitArt&&portraitArt.dataset.abyssPortraitSrc!==portrait){
+            portraitArt.src=portrait;
+            portraitArt.dataset.abyssPortraitSrc=portrait;
+        }
+    }
+
     function syncAbyssPortraits(){
         if(typeof document==="undefined"){ return; }
         const roster=currentAbyssRoster();
@@ -59,6 +90,7 @@
                 card.style.removeProperty("--v152-abyss-portrait");
                 delete card.dataset.abyssPortrait;
             }
+            syncAbyssPortraitArt(card,portrait);
         });
     }
     window.v154SyncAbyssPortraits=syncAbyssPortraits;
@@ -179,6 +211,28 @@
         button.textContent=active?"⏹ 停止":"套用並啟動";
         button.classList.toggle("active",active);
     }
+
+    function setElementBoxSettingsLayer(active){
+        if(typeof document==="undefined"||!document.body||!document.body.classList){ return; }
+        document.body.classList.toggle("v162-element-box-settings-open",!!active);
+    }
+
+    if(typeof openHomeFeature==="function"){
+        const previousOpenHomeFeature=openHomeFeature;
+        openHomeFeature=function(type){
+            const result=previousOpenHomeFeature.apply(this,arguments);
+            setElementBoxSettingsLayer(type==="autoBattleSettings");
+            return result;
+        };
+    }
+    if(typeof closeHomeFeature==="function"){
+        const previousCloseHomeFeature=closeHomeFeature;
+        closeHomeFeature=function(){
+            const result=previousCloseHomeFeature.apply(this,arguments);
+            setElementBoxSettingsLayer(false);
+            return result;
+        };
+    }
     window.v154UseElementBoxPrimaryAction=function(){
         if(typeof autoBattle!=="undefined"&&autoBattle){
             return typeof toggleAutoBattle==="function"?toggleAutoBattle():undefined;
@@ -199,6 +253,15 @@
         openAutoBattleSettings=function(){
             const result=previousOpenAutoBattleSettings.apply(this,arguments);
             syncElementBoxPrimaryButton();
+            setElementBoxSettingsLayer(true);
+            return result;
+        };
+    }
+    if(typeof closeAutoBattleSettings==="function"){
+        const previousCloseAutoBattleSettings=closeAutoBattleSettings;
+        closeAutoBattleSettings=function(){
+            const result=previousCloseAutoBattleSettings.apply(this,arguments);
+            setElementBoxSettingsLayer(false);
             return result;
         };
     }

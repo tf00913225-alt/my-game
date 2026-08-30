@@ -11,6 +11,15 @@
     padding-inline:10px !important;
 }
 
+/* Keep Element Box settings above every document-level battle effect. */
+body.v162-element-box-settings-open #game-stage{
+    z-index:2147483644 !important;
+}
+body.v162-element-box-settings-open #homeFeatureModal,
+body.v162-element-box-settings-open > #autoBattleSettingsPanel{
+    z-index:2147483645 !important;
+}
+
 /* The older equipment-specific shorthand kept background-size:auto 84%.
    Override it at equal specificity so the supplied cover fills the card. */
 #game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{
@@ -41,6 +50,20 @@
     background-position:center,center 12% !important;
     background-size:100% 100%,cover !important;
     background-repeat:no-repeat !important;
+}
+#game-stage #battlePage.v154-abyss-battle .battle-monster.v154-abyss-portrait > img.v162-abyss-battle-portrait-art{
+    position:absolute !important;
+    inset:0 !important;
+    z-index:0 !important;
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    border:0 !important;
+    border-radius:inherit !important;
+    object-fit:cover !important;
+    object-position:center 12% !important;
+    opacity:1 !important;
+    pointer-events:none !important;
 }
 #game-stage #battlePage.v154-abyss-battle .battle-monster.v154-abyss-portrait .battle-monster-icon{
     width:27px !important;

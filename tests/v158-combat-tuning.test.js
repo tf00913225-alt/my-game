@@ -49,9 +49,9 @@ function load(overrides={}){
     return context;
 }
 
-test("V158 publishes before the final V159 runtime under cache version 161",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="161"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=161/);
+test("V158 publishes before the final V159 runtime under cache version 162",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="162"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=162/);
     assert.match(loader,/css\/47-v158-combat-tuning\.css/);
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");

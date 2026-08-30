@@ -380,6 +380,38 @@
 
     window.v143SyncStatusSpriteEffects=syncStatusSpriteEffects;
 
+    function syncAppliedStatusSprite(entity,type){
+        if(!entity){ return; }
+        let side=null,index=-1;
+        if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
+            index=monsters.indexOf(entity);
+            if(index>=0){ side="monster"; }
+        }
+        if(!side&&typeof getPartyCharacterByIndex==="function"){
+            for(let partyIndex=0;partyIndex<3;partyIndex++){
+                if(getPartyCharacterByIndex(partyIndex)===entity){
+                    side="player";
+                    index=partyIndex;
+                    break;
+                }
+            }
+        }
+        if(!side||index<0){ return; }
+        const invoke=()=>syncStatusSprite(side,index,type);
+        const wait=existingTargetDelay(side,index);
+        if(wait>8){ setTimer(invoke,wait); }
+        else{ invoke(); }
+    }
+
+    if(typeof applyBurnEffect==="function"){
+        const previousApplyBurnEffect=applyBurnEffect;
+        applyBurnEffect=function(entity){
+            const result=previousApplyBurnEffect.apply(this,arguments);
+            syncAppliedStatusSprite(entity,"burn");
+            return result;
+        };
+    }
+
     function makePath(dx,dy,motion){
         const bend=Math.max(28,Math.min(110,Math.hypot(dx,dy)*.28));
         if(/arc-up|lob|swoop/.test(motion)){ return "M 0 0 Q "+(dx*.48)+" "+(dy*.48-bend)+" "+dx+" "+dy; }

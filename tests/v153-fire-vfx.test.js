@@ -155,6 +155,12 @@ function loadRuntime(options={}){
         },
         clearTimeout(){},
         showMonsterHit(){ monsterHits.push(Array.from(arguments)); },
+        applyBurnEffect(entity,duration,percent){
+            entity.statusEffects=Array.isArray(entity.statusEffects)?entity.statusEffects:[];
+            const existing=entity.statusEffects.find(effect=>effect&&effect.type==="burn");
+            if(existing){ existing.turnsLeft=duration; existing.percent=percent; }
+            else{ entity.statusEffects.push({type:"burn",turnsLeft:duration,percent}); }
+        },
         v141PlayCardEffect(){},
         playFireRocketAnimation(){ legacyRocketCalls++; },
         document:{
@@ -394,14 +400,32 @@ test("Burn and Rage loops follow live status records without owning an action ga
     assert.equal(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-rage"),null);
 });
 
+test("a newly applied Burn starts its loop on the exact target hit frame",()=>{
+    const runtime=loadRuntime();
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("flameTornado",2100,"single","magic"),{side:"player",actorIndex:0}
+    );
+    runtime.context.showMonsterHit(1,135,"hp",false);
+    const beforeBurn=runtime.scheduled.length;
+    runtime.context.applyBurnEffect(runtime.monsters[1],2,3);
+    assert.equal(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-burn"),null);
+    assert.equal(runtime.scheduled.length,beforeBurn+1);
+    const statusTimer=runtime.scheduled[runtime.scheduled.length-1];
+    assert.ok(statusTimer.delay>0);
+    statusTimer.callback();
+    assert.ok(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-burn"));
+    assert.equal(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-burn"),null);
+    assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-burn"),null);
+});
+
 test("cast sheets are one-shot, status sheets loop, and cache version is V154",()=>{
     assert.match(css,/v153FireCastFrames var\(--v143-sprite-duration,1500ms\) steps\(1,end\) 1 both/);
     assert.doesNotMatch(css,/v153FireCastFrames[^;]*infinite/);
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
     assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png",columns:4,rows:2,frames:8,duration:800\}/);
     assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png",columns:4,rows:2,frames:8,duration:1000\}/);
-    assert.match(loader,/const V_ASSET_VERSION="161"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=161/);
+    assert.match(loader,/const V_ASSET_VERSION="162"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=162/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

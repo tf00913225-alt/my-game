@@ -40,17 +40,41 @@ function style(){
 }
 
 function element(){
-    return {
-        classList:classList(),style:style(),dataset:{},attributes:{},textContent:"",
-        setAttribute(name,value){ this.attributes[name]=String(value); }
+    const node={
+        className:"",classList:classList(),style:style(),dataset:{},attributes:{},textContent:"",
+        children:[],parentNode:null,src:"",
+        setAttribute(name,value){ this.attributes[name]=String(value); },
+        appendChild(child){ child.parentNode=this; this.children.push(child); return child; },
+        insertBefore(child,before){
+            child.parentNode=this;
+            const index=this.children.indexOf(before);
+            if(index<0){ this.children.push(child); }
+            else{ this.children.splice(index,0,child); }
+            return child;
+        },
+        removeChild(child){
+            this.children=this.children.filter(item=>item!==child);
+            child.parentNode=null;
+        },
+        remove(){ if(this.parentNode){ this.parentNode.removeChild(this); } },
+        querySelector(selector){
+            if(!selector.startsWith(".")){ return null; }
+            const name=selector.slice(1);
+            return this.children.find(child=>String(child.className||"").split(/\s+/).includes(name))||null;
+        }
     };
+    Object.defineProperty(node,"firstChild",{get(){ return this.children[0]||null; }});
+    return node;
 }
 
 function loadRuntime(overrides={}){
     const button=element();
     const battlePage=element();
+    const body=element();
     const cards=Array.from({length:10},()=>element());
     const document={
+        body,
+        createElement(){ return element(); },
         getElementById(id){
             if(id==="autoBattleButton"){ return button; }
             if(id==="battlePage"){ return battlePage; }
@@ -61,19 +85,20 @@ function loadRuntime(overrides={}){
     const context=Object.assign({
         window:null,document,console,Math,Number,Object,Array,Set,Map,Promise,
         currentBattleMonsters:[],monsters:[],autoBattle:false,
-        updateAutoButton(){},openAutoBattleSettings(){},
+        updateAutoButton(){},openAutoBattleSettings(){},closeAutoBattleSettings(){},
+        openHomeFeature(){},closeHomeFeature(){},
         applyPostBattleAutoRecovery(){},
         confirmAutoBattleSettings(){},toggleAutoBattle(){}
     },overrides);
     context.window=context;
     vm.createContext(context);
     vm.runInContext(source,context);
-    return {context,button,battlePage,cards};
+    return {context,button,battlePage,body,cards};
 }
 
 test("V154 remains ordered immediately before V155",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="161"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=161/);
+    assert.match(loader,/const V_ASSET_VERSION="162"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=162/);
     assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=154/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.ok(loader.indexOf("js/45-v154-dev-fixes.js")>loader.indexOf("js/44-v152-dev-fixes.js"));
@@ -88,6 +113,20 @@ test("element box uses the top apply-and-start action and removes the bottom act
     runtime.context.v154UseElementBoxPrimaryAction();
     assert.equal(confirmations,1);
     assert.match(css,/v131-element-box-panel \.auto-settings-actions\s*\{\s*display:none !important/);
+});
+
+test("element box settings temporarily rise above document-level skill effects",()=>{
+    const runtime=loadRuntime();
+    runtime.context.openHomeFeature("autoBattleSettings");
+    assert.equal(runtime.body.classList.contains("v162-element-box-settings-open"),true);
+    runtime.context.closeHomeFeature();
+    assert.equal(runtime.body.classList.contains("v162-element-box-settings-open"),false);
+    runtime.context.openAutoBattleSettings();
+    assert.equal(runtime.body.classList.contains("v162-element-box-settings-open"),true);
+    runtime.context.closeAutoBattleSettings();
+    assert.equal(runtime.body.classList.contains("v162-element-box-settings-open"),false);
+    assert.match(css,/v162-element-box-settings-open #game-stage\{[\s\S]*?z-index:2147483644 !important/);
+    assert.match(css,/v162-element-box-settings-open #homeFeatureModal,[\s\S]*?z-index:2147483645 !important/);
 });
 
 test("automatic recovery keeps using potions until the configured threshold is cleared",()=>{
@@ -126,6 +165,8 @@ test("Abyss floors 1 to 4 and floor 5 receive their exact portrait sets",()=>{
         early.context.v154SyncAbyssPortraits();
         assert.ok(early.cards[0].style.getPropertyValue("--v152-abyss-portrait").endsWith(asset+'")'));
         assert.match(early.cards[1].style.getPropertyValue("--v152-abyss-portrait"),/soldier\.webp/);
+        assert.ok(early.cards[0].querySelector(".v162-abyss-battle-portrait-art").src.endsWith(asset));
+        assert.ok(early.cards[1].querySelector(".v162-abyss-battle-portrait-art").src.endsWith("soldier.webp"));
         assert.equal(early.cards[0].dataset.abyssPortrait,"floor1-4");
     });
 
@@ -145,6 +186,9 @@ test("Abyss floors 1 to 4 and floor 5 receive their exact portrait sets",()=>{
     ];
     expected.forEach((asset,index)=>assert.ok(
         final.cards[index].style.getPropertyValue("--v152-abyss-portrait").endsWith(asset+'")')
+    ));
+    expected.forEach((asset,index)=>assert.ok(
+        final.cards[index].querySelector(".v162-abyss-battle-portrait-art").src.endsWith(asset)
     ));
     assert.equal(final.cards[0].dataset.abyssPortrait,"floor5");
     assert.equal(final.battlePage.classList.contains("v154-abyss-final"),true);
@@ -166,6 +210,7 @@ test("equipment cover, ability scrolling and Abyss decluttering stay scoped",()=
     assert.match(css,/v141-abyss-intro:not\(\.complete\)[\s\S]*?justify-content:flex-end !important/);
     assert.match(css,/v141-abyss-shell > header\{[\s\S]*?position:absolute !important/);
     assert.match(css,/v154-abyss-portrait[\s\S]*?var\(--v152-abyss-portrait\)/);
+    assert.match(css,/v162-abyss-battle-portrait-art\{[\s\S]*?object-fit:cover !important/);
 });
 
 console.log("\nV154 current request suite: "+passed+" tests passed.");
