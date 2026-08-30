@@ -44,13 +44,14 @@ function load(overrides={}){
     return context;
 }
 
-test("V155 remains the final ordered runtime under cache version 157",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="157"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=157/);
+test("V155 remains ordered before V158 under cache version 158",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="158"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=158/);
     assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=154/);
     const v154=loader.indexOf("js/45-v154-dev-fixes.js");
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
-    assert.ok(v154>=0&&v155>v154);
+    const v158=loader.indexOf("js/47-v158-combat-tuning.js");
+    assert.ok(v154>=0&&v155>v154&&v158>v155);
 });
 
 test("Dragon Slash and Phoenix Cry expose every requested final value",()=>{

@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="157";
+const V_ASSET_VERSION="158";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -544,6 +544,24 @@ function vAssetUrl(path){
     }
 })();
 
+/* V158 loader — final skill, combat-value and Abyss portrait tuning. */
+(function loadV158CombatTuningStyle(){
+    function load(){
+        if(document.getElementById("v158-combat-tuning-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v158-combat-tuning-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/47-v158-combat-tuning.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -577,7 +595,8 @@ function vAssetUrl(path){
         {id:"v149-skill-ui-rules-runtime",src:"js/43-v149-skill-ui-rules.js"},
         {id:"v152-dev-fixes-runtime",src:"js/44-v152-dev-fixes.js"},
         {id:"v154-dev-fixes-runtime",src:"js/45-v154-dev-fixes.js"},
-        {id:"v155-dev-fixes-runtime",src:"js/46-v155-dev-fixes.js"}
+        {id:"v155-dev-fixes-runtime",src:"js/46-v155-dev-fixes.js"},
+        {id:"v158-combat-tuning-runtime",src:"js/47-v158-combat-tuning.js"}
     ];
 
     function next(index){
