@@ -235,6 +235,12 @@
         v153FireCastEnvelope var(--v143-sprite-duration,1500ms) linear 1 both;
 }
 
+.v143-skill-stage[data-skill="fireRocket"] .v153-fire-cast-sprite{
+    animation:
+        v153FireCastFrames var(--v143-sprite-duration,900ms) steps(1,end) 1 both,
+        v165FireRocketTravel var(--v143-sprite-duration,900ms) linear 1 both;
+}
+
 @keyframes v153FireCastFrames{
     0%{background-position:0 0}
     8.333333%{background-position:33.333333% 0}
@@ -254,6 +260,48 @@
     0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(.9)}
     3%,95%{opacity:1;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(1)}
     100%{opacity:0;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(1.03)}
+}
+
+@keyframes v165FireRocketTravel{
+    0%{
+        opacity:0;
+        transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(.9);
+    }
+    3%,24.999%{
+        opacity:1;
+        transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(1);
+    }
+    25%{
+        opacity:1;
+        transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(1);
+    }
+    49.999%{
+        opacity:1;
+        transform:
+            translate(
+                calc(-50% + var(--v143-sprite-dx,0px)),
+                calc(-50% + var(--v143-sprite-dy,0px))
+            )
+            rotate(var(--v143-sprite-angle,0deg)) scale(1);
+    }
+    50%,95%{
+        opacity:1;
+        transform:
+            translate(
+                calc(-50% + var(--v143-sprite-dx,0px)),
+                calc(-50% + var(--v143-sprite-dy,0px))
+            )
+            rotate(0deg) scale(1);
+    }
+    100%{
+        opacity:0;
+        transform:
+            translate(
+                calc(-50% + var(--v143-sprite-dx,0px)),
+                calc(-50% + var(--v143-sprite-dy,0px))
+            )
+            rotate(0deg) scale(1.03);
+    }
 }
 
 #game-stage #battlePage .v153-status-vfx{

@@ -35,56 +35,57 @@
         fireCritical:{
             glyph:"拳",motion:"dash",impact:"ember-fist",hit:.5833333333,pulses:2,spread:0,
             sprite:{
-                src:"assets/vfx/fire/fire-critical-cast.png?v=164",
+                src:"assets/vfx/fire/fire-critical-cast.png?v=165",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.15,maxSize:260
             }
         },
         explosiveFlurry:{
             glyph:"拳",motion:"zigzag",impact:"fire-combo",hit:.5833333333,pulses:4,spread:54,
             sprite:{
-                src:"assets/vfx/fire/explosive-flurry-cast.png?v=164",
+                src:"assets/vfx/fire/explosive-flurry-cast.png?v=165",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"group",scale:1.08,minSize:190
             }
         },
         dragonSlash:{
             glyph:"龍",motion:"serpent",impact:"dragon-cleave",hit:.5833333333,pulses:3,spread:92,flightCount:2,
             sprite:{
-                src:"assets/vfx/fire/dragon-slash-cast.png?v=164",
+                src:"assets/vfx/fire/dragon-slash-cast.png?v=165",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.35,maxSize:300
             }
         },
         fireRocket:{
             glyph:"➶",motion:"arc-down",impact:"arrow-burst",hit:.5833333333,pulses:1,spread:42,
             sprite:{
-                src:"assets/vfx/fire/fire-rocket-cast.png?v=164",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"trajectory",scale:.72,minSize:180,maxSize:280
+                src:"assets/vfx/fire/fire-rocket-cast.png?v=165",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"trajectory",travelToTargets:true,
+                scale:.72,minSize:180,maxSize:280
             }
         },
         blazeSpell:{
             glyph:"火",motion:"orb",impact:"flame-bloom",hit:.5833333333,pulses:2,spread:30,
             sprite:{
-                src:"assets/vfx/fire/blaze-spell-cast.png?v=164",
+                src:"assets/vfx/fire/blaze-spell-cast.png?v=165",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.15,maxSize:260
             }
         },
         flameTornado:{
             glyph:"炎",motion:"spiral",impact:"fire-tornado",hit:.5833333333,pulses:5,spread:82,flightCount:3,
             sprite:{
-                src:"assets/vfx/fire/flame-tornado-cast.png?v=164",
+                src:"assets/vfx/fire/flame-tornado-cast.png?v=165",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.35,maxSize:300
             }
         },
         phoenixCry:{
             glyph:"鳳",motion:"swoop",impact:"phoenix-field",hit:.5833333333,pulses:6,spread:112,flightCount:2,
             sprite:{
-                src:"assets/vfx/fire/phoenix-cry-cast.png?v=164",
+                src:"assets/vfx/fire/phoenix-cry-cast.png?v=165",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"group",scale:1.12,minSize:280
             }
         },
         rage:{
             glyph:"怒",motion:"rise",impact:"rage-aura",hit:.5833333333,pulses:3,spread:55,
             sprite:{
-                src:"assets/vfx/fire/rage-cast.png?v=164",
+                src:"assets/vfx/fire/rage-cast.png?v=165",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:.82,minSize:64,maxSize:108
             }
         },
@@ -167,8 +168,8 @@
     }
 
     const STATUS_SPRITES={
-        burn:{src:"assets/vfx/fire/burn-loop.png?v=164",columns:4,rows:2,frames:8,duration:800},
-        rage:{src:"assets/vfx/fire/rage-buff-loop.png?v=164",columns:4,rows:2,frames:8,duration:1000}
+        burn:{src:"assets/vfx/fire/burn-loop.png?v=165",columns:4,rows:2,frames:8,duration:800},
+        rage:{src:"assets/vfx/fire/rage-buff-loop.png?v=165",columns:4,rows:2,frames:8,duration:1000}
     };
 
     window.v143SkillAnimationManifest=MANIFEST;
@@ -579,19 +580,28 @@
             Number(sprite.maxSize)||dynamicMaximum
         );
         node.dataset.targetIndexes=indexes.join(",");
-        node.style.left=(coverage.left+coverage.width/2)+"px";
-        node.style.top=(coverage.top+coverage.height/2)+"px";
         node.style.width=size+"px";
         node.style.height=size+"px";
         let angle=0;
-        if(placement==="trajectory"){
-            const actor=cardCenter(current.actorCard);
-            const destination={
-                x:targetBounds.left+targetBounds.width/2,
-                y:targetBounds.top+targetBounds.height/2
-            };
-            if(actor){ angle=Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI; }
+        const actor=placement==="trajectory"?cardCenter(current.actorCard):null;
+        const destination={
+            x:targetBounds.left+targetBounds.width/2,
+            y:targetBounds.top+targetBounds.height/2
+        };
+        const travelsToTargets=!!(placement==="trajectory"&&sprite.travelToTargets&&actor);
+        if(travelsToTargets){
+            node.dataset.travelToTargets="true";
+            node.style.left=actor.x+"px";
+            node.style.top=actor.y+"px";
+            node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");
+            node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");
+        }else{
+            node.style.left=(coverage.left+coverage.width/2)+"px";
+            node.style.top=(coverage.top+coverage.height/2)+"px";
+            node.style.setProperty("--v143-sprite-dx","0px");
+            node.style.setProperty("--v143-sprite-dy","0px");
         }
+        if(actor){ angle=Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI; }
         node.style.setProperty("--v143-sprite-angle",angle+"deg");
     }
 

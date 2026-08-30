@@ -14,8 +14,8 @@ let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V160 corrections remain published under the current cache version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="164"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=164/);
+    assert.match(loader,/const V_ASSET_VERSION="165"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=165/);
 });
 
 test("Ice Arrow Rain ends at twenty percent Freeze for two rounds",()=>{

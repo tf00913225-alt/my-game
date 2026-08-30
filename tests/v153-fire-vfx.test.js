@@ -239,7 +239,7 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
     Object.entries(expected).forEach(([id,[filename,placement]])=>{
         const sprite=manifest[id].sprite;
         assert.ok(sprite.src.split("?")[0].endsWith(filename),id);
-        if(id!=="flameSlash"){ assert.ok(sprite.src.endsWith("?v=164"),id); }
+        if(id!=="flameSlash"){ assert.ok(sprite.src.endsWith("?v=165"),id); }
         assert.deepEqual([sprite.columns,sprite.rows,sprite.frames,sprite.hitFrame],[4,3,12,7],id);
         assert.equal(sprite.placement,placement,id);
         assert.equal(manifest[id].hit,.5833333333,id);
@@ -303,11 +303,33 @@ test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.placement,"trajectory");
+    assert.equal(sprites[0].dataset.travelToTargets,"true");
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
+    assert.equal(sprites[0].style.left,"79px");
+    assert.equal(sprites[0].style.top,"398px");
+    assert.equal(sprites[0].style["--v143-sprite-dx"],"359px");
+    assert.equal(sprites[0].style["--v143-sprite-dy"],"-258px");
     assert.notEqual(sprites[0].style["--v143-sprite-angle"],"0deg");
     assert.equal(sprites[0].style.width,sprites[0].style.height);
     assert.equal(sprites[0].style.width,"280px");
     assert.equal(runtime.legacyRocketCalls(),0);
+});
+
+test("enemy Fire Rocket follows late target registration back to the player row",()=>{
+    const runtime=loadRuntime();
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("fireRocket",900,"tri","magic"),{side:"monster",actorIndex:0}
+    );
+    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,0);
+    [0,1,2].forEach(index=>runtime.context.v141PlayCardEffect("player",index,"damage"));
+    const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
+    assert.equal(sprites.length,1);
+    assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
+    assert.equal(sprites[0].style.left,"338px");
+    assert.equal(sprites[0].style.top,"140px");
+    assert.equal(sprites[0].style["--v143-sprite-dx"],"-119px");
+    assert.equal(sprites[0].style["--v143-sprite-dy"],"258px");
 });
 
 test("Fire Slash plays one sheet on the selected target and reaches damage at frame eight",()=>{
@@ -419,14 +441,14 @@ test("a newly applied Burn starts its loop on the exact target hit frame",()=>{
     assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-burn"),null);
 });
 
-test("cast sheets are one-shot, status sheets loop, and cache version is V154",()=>{
+test("cast sheets are one-shot, status sheets loop, and cache version is V165",()=>{
     assert.match(css,/v153FireCastFrames var\(--v143-sprite-duration,1500ms\) steps\(1,end\) 1 both/);
     assert.doesNotMatch(css,/v153FireCastFrames[^;]*infinite/);
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
-    assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png\?v=164",columns:4,rows:2,frames:8,duration:800\}/);
-    assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png\?v=164",columns:4,rows:2,frames:8,duration:1000\}/);
-    assert.match(loader,/const V_ASSET_VERSION="164"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=164/);
+    assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:800\}/);
+    assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:1000\}/);
+    assert.match(loader,/const V_ASSET_VERSION="165"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=165/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

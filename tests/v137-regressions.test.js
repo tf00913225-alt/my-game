@@ -374,8 +374,8 @@ test("auto battle keeps a valid selected skill instead of silently queuing norma
 
 test("V137 regressions remain wired through the current deployed entry points",()=>{
     assert.match(indexSource,/js\/00-main\.js\?v=141/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=164/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="164"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=165/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="165"/);
     assert.match(v133Source,/const MAX_CHARACTER_LEVEL=100/);
     assert.doesNotMatch(mainSource,/safeBind\(\s*["'](?:autoEnabled|autoSkillHome|hpUsePctHome|spUsePctHome)/);
     assert.doesNotMatch(v132Source,/const result=originalLoseBattle\.apply/);
