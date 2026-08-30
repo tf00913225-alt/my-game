@@ -44,6 +44,7 @@ test("a persisted Abyss run pauses at a progress gate without resetting its floo
     assert.match(abyss,/if\(page!=="dungeon"&&page!=="battle"\)\{ abyssMapEntered=false; \}/);
     assert.match(abyss,/raw\.phase==="portal"&&Number\(raw\.rewardVersion\|\|0\)<1/);
     assert.match(css,/\.v141-abyss-intro\.v169-abyss-resume/);
+    assert.doesNotMatch(css,/v169-abyss-resume[^{}]*\{[^}]*(?:display|padding|background|justify-content)\s*:/);
 });
 
 test("every floor starts bottom-center with its guardian and teleporter centered",()=>{
@@ -59,11 +60,17 @@ test("floors one through four require their chest reward before portal travel",(
     assert.match(abyss,/class="v141-abyss-portal'\+\(abyssState\.phase==="chest"\?' locked':''\)/);
     assert.match(abyss,/1:"ticketSetEarth",2:"ticketSetFire",3:"ticketSetWind",4:"ticketSetWater"/);
     assert.match(abyss,/abyssState\.phase="portal"/);
-    assert.match(abyss,/v141ShowBlackGoldReward\(\{exp:0,gold:0,items:/);
+    assert.match(abyss,/v141ShowBlackGoldReward\(\{\s*exp:0,\s*gold:0,\s*items:/);
     assert.match(abyss,/寶箱已開啟。請點擊上方傳送點前往下一層/);
     assert.match(css,/chest-closed\.png/);
     assert.match(css,/chest-open\.png/);
     assert.match(css,/portal\.png/);
+});
+
+test("supplied chest and portal art stays inside the previous compact footprint",()=>{
+    assert.match(css,/\.v141-abyss-portal,\s*#game-stage[^\n]*\.v141-abyss-chest\{[^}]*width:94px !important;[^}]*height:62px !important;/);
+    assert.match(css,/\.v141-abyss-portal i,\s*#game-stage[^\n]*\.v141-abyss-chest i\{[^}]*height:44px !important;/);
+    assert.doesNotMatch(css,/width:(?:106|112)px !important|height:(?:76|92)px !important/);
 });
 
 test("guardian dialogue approaches first and remains a local boss-anchored bubble",()=>{

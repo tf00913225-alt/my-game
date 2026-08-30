@@ -858,7 +858,16 @@
                 abyssState.message="寶箱已開啟。請點擊上方傳送點前往下一層。";
                 persistAbyss(); rebuildInventorySlots(); saveGame(); refreshAbyssPage();
                 if(ticket&&window.v141ShowBlackGoldReward){
-                    window.v141ShowBlackGoldReward({exp:0,gold:0,items:[{name:ticket.name,count:1}]});
+                    window.v141ShowBlackGoldReward({
+                        exp:0,
+                        gold:0,
+                        items:[{
+                            id:ticket.id,
+                            name:ticket.name,
+                            count:1,
+                            icon:ticket.icon
+                        }]
+                    });
                 }
                 return;
             }

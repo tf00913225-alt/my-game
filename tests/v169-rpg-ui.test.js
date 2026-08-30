@@ -7,6 +7,7 @@ const vm=require("node:vm");
 
 const uiSource=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const baseCss=fs.readFileSync("css/00-main.css","utf8");
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const layoutSource=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
@@ -85,6 +86,47 @@ function loadDialogRuntime(){
     return {context,created};
 }
 
+function runFlatShopArrangement(resources){
+    const cards=resources.map((resource,index)=>({
+        key:resource+(index+1),
+        classList:{contains(name){ return name===resource; }}
+    }));
+    const appended=[];
+    const removedClasses=[];
+    const list={
+        classList:{remove(name){ removedClasses.push(name); }},
+        querySelectorAll(selector){
+            assert.equal(selector,":scope > .shop-potion-card");
+            return cards;
+        },
+        appendChild(card){ appended.push(card); return card; },
+        set textContent(value){
+            assert.equal(value,"");
+            appended.length=0;
+        }
+    };
+    const template={
+        content:{querySelector(selector){
+            assert.equal(selector,".shop-potion-list");
+            return list;
+        }},
+        set innerHTML(_value){},
+        get innerHTML(){ return appended.map(card=>card.key).join(","); }
+    };
+    const document={createElement(tagName){
+        assert.equal(tagName,"template");
+        return template;
+    }};
+    const context={window:null,document,console,Promise,String,Object,Array,Set,Map,Number};
+    context.window=context;
+    vm.createContext(context);
+    vm.runInContext(uiSource,context);
+    return {
+        order:context.v169ArrangeShopColumns('<div class="shop-potion-list"></div>'),
+        removedClasses
+    };
+}
+
 test("RPG alert and confirm share one serial dialog queue",()=>{
     const {context,created}=loadDialogRuntime();
     const first=context.rpgAlert("第一則");
@@ -132,31 +174,37 @@ test("beforeunload only saves and never triggers a browser leave prompt",()=>{
     assert.match(mainSource,/await window\.rpgConfirm\([\s\S]*title:"離開冒險"/);
 });
 
-test("character runtime marks fixed and scrollable tabs before setting overflow",()=>{
-    assert.match(layoutSource,/root\.dataset\.characterTab=\s*activeCharacterTab/);
-    assert.match(layoutSource,/activeCharacterTab==="status"\s*\|\|\s*activeCharacterTab==="expPool"/);
-    assert.match(layoutSource,/inventoryOwnsScroll \|\| fixedCharacterTab\s*\? "hidden"\s*: "auto"/);
-    assert.match(css,/data-character-tab="status"\][\s\S]*data-character-tab="expPool"\][\s\S]*overflow-y:hidden !important/);
-    assert.match(css,/data-character-tab="skill"\][\s\S]*overflow-y:auto !important/);
+test("character runtime preserves the previous natural-scroll layout",()=>{
+    assert.match(layoutSource,/inventoryOwnsScroll\s*\? "hidden"\s*: "scroll"/);
+    assert.doesNotMatch(layoutSource,/dataset\.characterTab|fixedCharacterTab/);
+    assert.doesNotMatch(css,/data-character-tab=/);
 });
 
-test("status and EXP are compact fixed layouts while skills retain only a small tail",()=>{
+test("character pages remove only historical tails without compacting their content",()=>{
     assert.match(css,/#characterTabContent\{[\s\S]{0,180}padding-bottom:0 !important/);
     assert.match(css,/#characterTabContent > #skillPage\{[\s\S]{0,120}padding:0 0 12px !important/);
     assert.match(css,/#allSkillsList\{[\s\S]{0,100}padding-bottom:12px !important/);
-    assert.match(css,/data-character-tab="status"\][\s\S]*#statusPage[\s\S]*display:flex !important/);
-    assert.match(css,/data-character-tab="expPool"\][\s\S]*#homeExpPoolCard[\s\S]*display:flex !important/);
-    assert.match(css,/#expDistributeList\{[\s\S]*overflow:hidden/);
+    assert.doesNotMatch(css,/#statusPage[^{]*\{[^}]*display:flex !important/);
+    assert.doesNotMatch(css,/#homeExpPoolCard[^{]*\{[^}]*height:100% !important/);
+    assert.doesNotMatch(css,/#expDistributeList[^{]*\{[^}]*overflow:hidden/);
 });
 
-test("shop renderer creates stable HP-left and SP-right columns",()=>{
-    assert.match(uiSource,/makeColumn\("hp","HP 藥水",hpCards\)/);
-    assert.match(uiSource,/makeColumn\("sp","SP 藥水",spCards\)/);
+test("shop renderer keeps flat cards ordered HP-left and SP-right",()=>{
+    assert.match(uiSource,/const orderedCards=\[\]/);
+    assert.match(uiSource,/if\(hpCards\[index\]\)\{ orderedCards\.push\(hpCards\[index\]\); \}/);
+    assert.match(uiSource,/if\(spCards\[index\]\)\{ orderedCards\.push\(spCards\[index\]\); \}/);
     assert.ok(
-        uiSource.indexOf('makeColumn("hp"')<uiSource.indexOf('makeColumn("sp"'),
-        "HP column is appended before SP"
+        uiSource.indexOf("orderedCards.push(hpCards[index])")<uiSource.indexOf("orderedCards.push(spCards[index])"),
+        "each flat-grid row appends HP before SP"
     );
-    assert.match(css,/\.shop-potion-list\.v169-shop-columns\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+    assert.match(uiSource,/orderedCards\.forEach\(card=>list\.appendChild\(card\)\)/);
+    assert.doesNotMatch(uiSource,/makeColumn|v169-shop-column(?:["\s])/);
+    assert.doesNotMatch(css,/v169-shop-columns|v169-shop-column/);
+    assert.match(baseCss,/\.shop-potion-list\{[^}]*display:grid;[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+
+    const arranged=runFlatShopArrangement(["hp","hp","sp","sp","other"]);
+    assert.equal(arranged.order,"hp1,sp3,hp2,sp4,other5");
+    assert.deepEqual(arranged.removedClasses,["v169-shop-columns"]);
 });
 
 test("successful potion purchases enqueue an RPG receipt only after inventory changes",()=>{
@@ -171,6 +219,7 @@ test("dungeon backpack reuses the real inventory and rises above the dungeon nav
     assert.match(uiSource,/mapPage\.classList\.add\("active"\)/);
     assert.match(uiSource,/previousOpenMapInventoryOverlay\.apply/);
     assert.match(uiSource,/classList\.add\("v169-dungeon-inventory-overlay"\)/);
+    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*inset:8px 8px 76px 8px !important/);
     assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*z-index:900 !important/);
 });
 
@@ -180,10 +229,10 @@ test("perpetual modal glow and skill-card compositing are static",()=>{
 });
 
 test("V169 styles and runtimes are deployed last under fresh cache keys",()=>{
-    assert.match(loaderSource,/const V_ASSET_VERSION="169"/);
-    assert.match(indexSource,/js\/00-main\.js\?v=169/);
-    assert.match(indexSource,/js\/19-stage-v78-character-inventory-runtime\.js\?v=169/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=169/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="170"/);
+    assert.match(indexSource,/js\/00-main\.js\?v=170/);
+    assert.match(indexSource,/js\/19-stage-v78-character-inventory-runtime\.js\?v=170/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=170/);
 
     const styles=[
         "css/48-v169-element-box-settings.css",

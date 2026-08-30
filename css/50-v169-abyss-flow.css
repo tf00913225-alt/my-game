@@ -4,27 +4,7 @@
 
 /* A persisted run always pauses at a readable progress gate on a later visit. */
 #game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro.v169-abyss-resume:not(.complete){
-    justify-content:flex-end !important;
     gap:7px !important;
-    padding:18px 18px 25px !important;
-    background:
-        linear-gradient(180deg,transparent 0 48%,rgba(4,4,6,.42) 66%,rgba(3,3,5,.94) 100%),
-        url("../assets/dungeons/abyss/abyss-cover.webp") center 35% / cover no-repeat !important;
-}
-#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro.v169-abyss-resume:not(.complete) h3,
-#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro.v169-abyss-resume:not(.complete) p{
-    display:block !important;
-}
-#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro.v169-abyss-resume:not(.complete) h3{
-    margin:0 !important;
-    text-shadow:0 2px 8px #000 !important;
-}
-#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro.v169-abyss-resume:not(.complete) p{
-    max-width:340px !important;
-    margin:0 !important;
-    padding:5px 9px !important;
-    font-size:12px !important;
-    line-height:1.45 !important;
 }
 #game-stage .v169-abyss-progress{
     display:block;
@@ -53,13 +33,16 @@
     overflow:visible !important;
     touch-action:manipulation !important;
 }
-#game-stage #dungeonPage.v146-abyss-active .v141-abyss-portal{width:112px !important;height:92px !important;}
-#game-stage #dungeonPage.v146-abyss-active .v141-abyss-chest{width:106px !important;height:92px !important;}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-portal,
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-chest{
+    width:94px !important;
+    height:62px !important;
+}
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-portal i,
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-chest i{
     display:block !important;
     width:100% !important;
-    height:76px !important;
+    height:44px !important;
     border:0 !important;
     border-radius:0 !important;
     background-color:transparent !important;
@@ -163,9 +146,11 @@
 .v169-talisman-art.v169-rarity-perfect,.v169-blueprint-art.v169-rarity-perfect{border-color:#ff4fa7;box-shadow:0 0 7px #ff4fa7,0 0 16px rgba(255,79,167,.88),inset 0 0 9px rgba(255,79,167,.48);}
 .v132-ticket-icon .v169-item-art{width:58px;height:58px;}
 .v141-result-item > .v169-item-art{width:74px;height:74px;}
+.v141-reward-toast .v141-reward-item{display:inline-flex;align-items:center;gap:5px;}
+.v141-reward-toast .v141-reward-item-icon{display:inline-flex;width:30px;height:30px;flex:0 0 30px;}
+.v141-reward-toast .v141-reward-item-icon .v169-item-art{width:100%;height:100%;padding:1px;border-width:1px;border-radius:6px;}
 
 @media (max-height:720px){
-    #game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro.v169-abyss-resume:not(.complete){padding-bottom:15px !important;}
     #game-stage .v141-abyss-map > .v143-abyss-dialogue{min-height:72px !important;padding:7px 11px !important;}
 }
 @media (prefers-reduced-motion:reduce){

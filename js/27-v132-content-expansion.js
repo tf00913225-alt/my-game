@@ -344,6 +344,30 @@
         return ticketDefinitions.find(def=>def.id===id)||null;
     }
 
+    /*
+       V169：抽獎券圖改為 inbox 提供的 PNG 後，舊存檔仍會保留
+       當時寫入物件裡的 inline SVG（或空 icon）。依穩定 id 只同步
+       四張抽獎券的展示資料，不碰數量、掉落與套裝裝備本體。
+    */
+    function syncTicketPresentation(item,definition){
+        if(!item || !definition || item.id!==definition.id){ return item; }
+        item.name=definition.name;
+        item.icon=definition.icon;
+        item.type=definition.type;
+        item.setId=definition.setId;
+        item.price=definition.price;
+        return item;
+    }
+
+    function hydrateOwnedTicketPresentation(){
+        inventoryItems.forEach(item=>{
+            const definition=item&&getTicketDefinition(item.id);
+            if(definition){ syncTicketPresentation(item,definition); }
+        });
+    }
+
+    hydrateOwnedTicketPresentation();
+
 
     /* =====================================================
        6. 裝備套裝本體（4元素 × 10件，共40件）
@@ -488,8 +512,10 @@
 
         let remaining=quantity;
         const stacks=inventoryItems.filter(item=>item && item.id===definition.id);
+        const ticketDefinition=getTicketDefinition(definition.id);
         stacks.forEach(stack=>{
             if(remaining<=0){ return; }
+            if(ticketDefinition){ syncTicketPresentation(stack,ticketDefinition); }
             const current=Math.max(0,Math.floor(Number(stack.count)||0));
             const space=Math.max(0,maxStack-current);
             const add=Math.min(space,remaining);

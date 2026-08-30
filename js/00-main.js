@@ -462,6 +462,23 @@ function getCharacters(){
 }
 
 
+function normalizeCharacterIdForComparison(value){
+    const trimmed=String(value||"").trim();
+    const normalized=typeof trimmed.normalize==="function"
+        ? trimmed.normalize("NFKC")
+        : trimmed;
+    return normalized.toLocaleLowerCase();
+}
+
+
+function isCharacterIdTaken(id){
+    const normalizedId=normalizeCharacterIdForComparison(id);
+    return !!normalizedId && getCharacters().some(character=>
+        normalizeCharacterIdForComparison(character&&character.id)===normalizedId
+    );
+}
+
+
 let selectedCreationElement2 =
     "fire";
 
@@ -594,11 +611,11 @@ let gold = 300;
 /* =====================================================
    V93 — 開發測試資源
    測試按鈕改成「每按一次就直接追加」：
-   金幣 +1,000,000；共用經驗池 +10,000,000。
+   金幣 +1,000,000；共用經驗池 +1,000,000,000。
    不再存在最低值、永久鎖定或自動補回機制。
 ===================================================== */
 const TEST_GOLD_GRANT=1000000;
-const TEST_EXP_POOL_GRANT=10000000;
+const TEST_EXP_POOL_GRANT=1000000000;
 
 /*
    ★ 新增（依照使用者要求，主城新增六個
@@ -5261,6 +5278,8 @@ function updateCreationScreenContext(){
     const subtitle=$("creationContextSubtitle");
     const submitLabel=$("creationSubmitLabel");
     const cancelButton=$("creationCancelButton");
+    const primaryNextButton=$("creationPrimaryNextButton");
+    const additionalStepOneActions=$("creationAdditionalStepOneActions");
 
     const ordinal=
         creationTargetSlot===3
@@ -5283,6 +5302,14 @@ function updateCreationScreenContext(){
 
     if(cancelButton){
         cancelButton.hidden=creationTargetSlot===1;
+    }
+
+    if(primaryNextButton){
+        primaryNextButton.hidden=creationTargetSlot!==1;
+    }
+
+    if(additionalStepOneActions){
+        additionalStepOneActions.hidden=creationTargetSlot===1;
     }
 }
 
@@ -5432,8 +5459,7 @@ function createAdditionalCharacter(slotNumber){
         return;
     }
 
-    const duplicated=getCharacters().some(character=>character.id===id);
-    if(duplicated){
+    if(isCharacterIdTaken(id)){
         alert("角色 ID 不能與現有角色重複。");
         return;
     }
@@ -5606,6 +5632,17 @@ function createSecondCharacter(){
 
         alert(
             "ID至少需要2個字元。"
+        );
+
+        return;
+
+    }
+
+
+    if(isCharacterIdTaken(id)){
+
+        alert(
+            "角色 ID 不能與現有角色重複。"
         );
 
         return;
@@ -27500,7 +27537,7 @@ function grantTestExpTenMillion(){
     saveGame();
 
     alert(
-        "經驗池 +10,000,000，目前共有 "+
+        "經驗池 +1,000,000,000，目前共有 "+
         sharedExp.toLocaleString("zh-TW")+
         " EXP。"
     );
@@ -27515,7 +27552,7 @@ function updateHomeTestTools(){
     }
 
     if(expButton){
-        expButton.innerHTML="經驗池 <b>+1000萬</b>";
+        expButton.innerHTML="經驗池 <b>+10億</b>";
     }
 }
 

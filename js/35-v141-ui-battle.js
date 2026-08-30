@@ -9,6 +9,12 @@
 (function installV141UiAndBattle(){
     "use strict";
 
+    const V141_RASTER_TICKET_IDS=new Set([
+        "ticketSetFire",
+        "ticketSetWater",
+        "ticketSetEarth",
+        "ticketSetWind"
+    ]);
     const INVENTORY_PAGE_SIZE=18;
     const INVENTORY_PAGE_COUNT=7;
     const ANNOUNCEMENT_READ_KEY="v141_announcement_read";
@@ -29,11 +35,27 @@
             .replace(/'/g,"&#039;");
     }
 
+    function getCanonicalTicketIcon(item){
+        if(!item || !V141_RASTER_TICKET_IDS.has(item.id)){ return ""; }
+        const definition=typeof window.v132GetTicketDefinition==="function"
+            ?window.v132GetTicketDefinition(item.id)
+            :null;
+        const icon=definition&&definition.id===item.id ? definition.icon : "";
+        return (
+            typeof icon==="string" &&
+            icon.includes("v169-ticket-art")
+        ) ? icon : "";
+    }
+
     function getItemCounts(){
         const counts=new Map();
         inventoryItems.forEach(item=>{
             if(!item||!item.id){ return; }
-            const current=counts.get(item.id)||{count:0,name:item.name||item.id};
+            const current=counts.get(item.id)||{
+                id:item.id,
+                count:0,
+                name:item.name||item.id
+            };
             current.count+=Math.max(1,Number(item.count)||1);
             counts.set(item.id,current);
         });
@@ -747,7 +769,13 @@
         nowItems.forEach((entry,id)=>{
             const before=snapshot.items.get(id);
             const delta=entry.count-(before?before.count:0);
-            if(delta>0){ items.push({name:entry.name,count:delta}); }
+            if(delta>0){
+                items.push({
+                    id,
+                    name:entry.name,
+                    count:delta
+                });
+            }
         });
         return {
             exp:Math.max(0,Math.floor((Number(sharedExp)||0)-snapshot.exp)),
@@ -767,7 +795,16 @@
         const parts=[];
         if(summary.exp>0){ parts.push('<span><b>EXP</b> +'+summary.exp.toLocaleString("zh-TW")+'</span>'); }
         if(summary.gold>0){ parts.push('<span><b>金幣</b> +'+summary.gold.toLocaleString("zh-TW")+'</span>'); }
-        summary.items.forEach(item=>parts.push('<span><b>物品</b> '+escapeHtml(item.name)+' ×'+item.count+'</span>'));
+        summary.items.forEach(item=>{
+            const canonicalIcon=getCanonicalTicketIcon(item);
+            const icon=canonicalIcon
+                ? '<i class="v141-reward-item-icon" aria-hidden="true">'+canonicalIcon+'</i>'
+                : "";
+            parts.push(
+                '<span class="v141-reward-item">'+icon+
+                '<span><b>物品</b> '+escapeHtml(item.name)+' ×'+item.count+'</span></span>'
+            );
+        });
         if(!parts.length){ return; }
         toast.innerHTML='<strong>戰鬥獎勵</strong><div>'+parts.join("")+'</div>';
         toast.classList.remove("show");

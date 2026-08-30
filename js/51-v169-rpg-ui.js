@@ -184,7 +184,7 @@
         };
     };
 
-    /* ----- Shop: HP is always the left column and SP the right. ----- */
+    /* ----- Shop: keep the proven flat grid, ordered HP-left / SP-right. ----- */
     function arrangeShopColumns(markup){
         if(typeof markup!=="string"||markup.indexOf("shop-potion-list")<0){
             return markup;
@@ -201,23 +201,21 @@
             const spCards=cards.filter(card=>card.classList.contains("sp"));
             if(hpCards.length===0&&spCards.length===0){ return markup; }
 
-            const makeColumn=(resource,label,columnCards)=>{
-                const column=document.createElement("section");
-                column.className="v169-shop-column "+resource;
-                column.dataset.resource=resource;
-                const heading=document.createElement("h3");
-                heading.textContent=label;
-                column.appendChild(heading);
-                columnCards.forEach(card=>column.appendChild(card));
-                return column;
-            };
+            const otherCards=cards.filter(card=>
+                !card.classList.contains("hp")&&
+                !card.classList.contains("sp")
+            );
+            const orderedCards=[];
+            const rowCount=Math.max(hpCards.length,spCards.length);
+            for(let index=0;index<rowCount;index++){
+                if(hpCards[index]){ orderedCards.push(hpCards[index]); }
+                if(spCards[index]){ orderedCards.push(spCards[index]); }
+            }
+            orderedCards.push(...otherCards);
 
             list.textContent="";
-            list.classList.add("v169-shop-columns");
-            list.append(
-                makeColumn("hp","HP 藥水",hpCards),
-                makeColumn("sp","SP 藥水",spCards)
-            );
+            list.classList.remove("v169-shop-columns");
+            orderedCards.forEach(card=>list.appendChild(card));
             return template.innerHTML;
         }catch(_){
             return markup;
