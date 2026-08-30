@@ -41,7 +41,8 @@
    `tests/v155-current-request.test.js`，V156 新增深淵地圖立繪／點擊熱區與元素匣狀態不同步驗收
    `tests/v156-deep-trace-fixes.test.js`，V157 新增深淵地圖立繪尺寸與直接點擊驗收
    `tests/v157-abyss-map-tap-fix.test.js`，V158 新增技能／命中／傷害與深淵立繪驗收
-   `tests/v158-combat-tuning.test.js`。驗證至少要包含：
+   `tests/v158-combat-tuning.test.js`，V159 新增深淵戰鬥立繪載入時序驗收
+   `tests/v159-abyss-battle-portraits.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -53,7 +54,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-30，V158 技能、戰鬥數值與深淵立繪修正）
+## 目前狀態（截至 2026-08-30，V159 深淵戰鬥立繪載入時序修正）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -148,6 +149,10 @@
   降低命中 Debuff 可降至 60%，怪物預設閃避改為等級×0.5，傷害浮動改為 95%～105%
   並四捨五入。深淵地圖立繪移除外框、卡片黑底與陰影，保留 V157 尺寸及直接點擊。
   快取版本升至 158，只發布 `dev`，不得合併或推送 `main`。
+- V159 修正 Githack 冷載入時可能先建立深淵戰鬥卡、後完成 V154 runtime，導致戰鬥立繪
+  沒有補掛的時序問題；同時把最終同步排在 V152 的舊 UI 更新之後，避免第五關圖片路徑
+  被舊層再次移除。進入副本戰鬥、補丁延後載入與每次 UI 更新都會重掛既有立繪資料。
+  快取版本升至 159，只發布 `dev`，不得合併或推送 `main`。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -174,10 +179,10 @@ V131～V136 的邏輯 patch 則在 V137 改由
 
 **不要把 V131～V136 runtime 改回各自獨立 append。** 動態插入的 script
 原本會以 async 行為競速；這些檔案又會一層層包裝相同全域函式，載入順序
-改變就會改變實際行為。V137 已把順序固定；V158 現在完整順序為
+改變就會改變實際行為。V137 已把順序固定；V159 現在完整順序為
 `js/25` → `js/27` → `js/28` → `js/29` → `js/30` → `js/31` → `js/32` → `js/33`
 → `js/34` → `js/35` → `js/36` → `js/37` → `js/38` → `js/39` → `js/40` → `js/41`
-→ `js/42` → `js/43` → `js/44` → `js/45` → `js/46` → `js/47`。
+→ `js/42` → `js/43` → `js/44` → `js/45` → `js/46` → `js/47` → `js/48`。
 
 **如果你在 `index.html` 裡直接看到「這幾個檔案好像沒被載入」而想手動加 `<script>` 標籤，
 先住手、去讀 `js/20-anonymous-20.js`**——手動加標籤幾乎一定會造成重複載入，
@@ -415,6 +420,23 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-30 — V159：深淵戰鬥立繪載入時序修正（dev）
+
+- 依使用者實機截圖深追：素材與 V154 立繪映射都存在，但動態 runtime 若在戰鬥卡建立後
+  才載入，V154 安裝時沒有主動同步已存在卡牌；第五關每次 `updateUI()` 結束時，V152 舊層
+  還會在 V154 之後移除圖片變數，因此會只剩黑色卡底。
+- 新增 `js/48-v159-abyss-battle-portraits.js`，不重做素材映射，只在 runtime 安裝完成、
+  `v132LaunchDungeonBattle()` 建立卡牌後與最終 `updateUI()` 後重新呼叫既有 V154 同步入口；
+  同步補一個 animation frame 與 120ms DOM 穩定點，涵蓋 Githack 冷載入及已開戰畫面。
+- `V_ASSET_VERSION` 與外層 loader 升至 159，V159 runtime 排在 V158 後；新增
+  `tests/v159-abyss-battle-portraits.test.js` 4 項載入時序／開戰／舊層覆蓋驗收，舊測試快取
+  與 runtime 數量斷言同步更新。
+- 驗證：20 份 Node suite 共 187 項全數通過；`js/`／`tests/` 共 130 支 JavaScript
+  全部通過 `node --check`，`git diff --check` 通過。環境沒有 Chromium，修正後仍需使用者
+  由 Githack `dev` 實機確認立繪呈現。
+
+**已知限制**：本輪沒有已知未完成功能；無本機瀏覽器可做最後視覺截圖。
 
 ### 2026-08-30 — V158：技能、命中／傷害與深淵地圖立繪定案（dev）
 
@@ -2117,7 +2139,8 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V155 的 `tests/v155-current-request.test.js` 有 8 項本輪需求驗收，
       V156 的 `tests/v156-deep-trace-fixes.test.js` 有 5 項深淵地圖／元素匣驗收，V157 的
       `tests/v157-abyss-map-tap-fix.test.js` 有 3 項立繪尺寸／直接點擊驗收，V158 的
-      `tests/v158-combat-tuning.test.js` 有 7 項技能／命中／傷害／立繪驗收，並保留
+      `tests/v158-combat-tuning.test.js` 有 7 項技能／命中／傷害／立繪驗收，V159 的
+      `tests/v159-abyss-battle-portraits.test.js` 有 4 項立繪載入時序驗收，並保留
       可選的 `tests/v138-browser-smoke.js`。本輪遠端瀏覽器遇到預覽站安全中繼頁，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。
