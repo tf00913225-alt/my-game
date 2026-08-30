@@ -61,8 +61,8 @@ function baseContext(overrides={}){
 }
 
 test("V148 remains ordered under the current runtime and cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=165/);
-    assert.match(loader,/const V_ASSET_VERSION="165"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
+    assert.match(loader,/const V_ASSET_VERSION="166"/);
     assert.match(loader,/css\/43-v148-combat-dungeon-fixes\.css/);
     assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=149/);
     const v146=loader.indexOf("js/41-v146-system-polish.js");
@@ -187,6 +187,47 @@ test("Revive gives defeated cards a selectable reticle",()=>{
     assert.equal(cards[1].classList.contains("ally-targetable"),true);
     assert.equal(cards[1].classList.contains("v148-revive-target"),true);
     assert.match(css,/v146-defeated\.v148-revive-target\.ally-targetable[\s\S]*pointer-events:auto !important/);
+});
+
+test("Revive restores HP and shows its popup only at the official hit frame",()=>{
+    const party=[
+        {id:"甲",hp:500,sp:100,activeBuffs:[]},
+        {id:"乙",hp:0,sp:0,activeBuffs:[]},
+        {id:"丙",hp:500,sp:100,activeBuffs:[]}
+    ];
+    const hits=[];
+    const effects=[];
+    const logs=[];
+    let scheduledImpact=null;
+    const context=baseContext({
+        getExistingPartyIndexes:()=>[0,1,2],getPartyCharacterByIndex:index=>party[index],
+        getPartyCharacterKey:()=>"water",getSkillLevel:(key,id)=>id==="revive"?1:0,
+        getPartyBattleStats:()=>({maxHP:500,maxSP:200,intelligence:80}),
+        lungePlayerCard(){},showSkillNameBadge(){},showPlayerSpPopup(){},addBattleLog:message=>logs.push(message),
+        updateUI(){},finishPlayerAction(){},
+        showPlayerHit:(amount,type,index)=>hits.push([amount,type,index]),
+        v141PlayCardEffect:(side,index,type)=>effects.push([side,index,type]),
+        v143RunAtTargetHit(side,index,callback,allowDefeated){
+            scheduledImpact={side,index,callback,allowDefeated};
+            return 1050;
+        }
+    });
+    context.v148ResolveSupportAction(
+        0,{action:"revive",targetAlly:1},context.skillDatabase.revive
+    );
+    assert.equal(party[1].hp,0,"the defeated ally stays down before frame eight");
+    assert.deepEqual(hits,[]);
+    assert.deepEqual(effects,[]);
+    assert.deepEqual(logs,[]);
+    assert.deepEqual(
+        [scheduledImpact.side,scheduledImpact.index,scheduledImpact.allowDefeated],
+        ["player",1,true]
+    );
+    scheduledImpact.callback();
+    assert.equal(party[1].hp,100,"level one revives for twenty percent max HP");
+    assert.deepEqual(hits,[[100,"heal",1]]);
+    assert.deepEqual(effects,[["player",1,"revive"]]);
+    assert.deepEqual(logs,["乙被復活術復活，恢復100 HP。"]);
 });
 
 test("Freeze and Petrify replace rather than coexist",()=>{

@@ -412,15 +412,28 @@
         const multiplier=exSkill&&exLevel>0&&numeric(exSkill.healBonusPercent)>0
             ?1+numeric(exSkill.healBonusPercent)/100:1;
         const percent=levelValue(skill.reviveHealPercentByLevel,state.level,20);
-        target.hp=Math.max(1,Math.min(numeric(targetStats.maxHP),Math.floor(numeric(targetStats.maxHP)*percent/100*multiplier)));
-        if(typeof updateUI==="function"){ updateUI(); }
-        if(typeof showPlayerHit==="function"){
-            setTimeout(()=>showPlayerHit(target.hp,"heal",targetIndex,true),300);
+        const restoredHP=Math.max(1,Math.min(
+            numeric(targetStats.maxHP),
+            Math.floor(numeric(targetStats.maxHP)*percent/100*multiplier)
+        ));
+        const reviveMessage=(target.id||"隊友")+"被"+skill.name+"復活，恢復"+restoredHP+" HP。";
+        const reviveAtImpact=()=>{
+            if(numeric(target.hp)>0){ return; }
+            target.hp=restoredHP;
+            if(typeof addBattleLog==="function"){ addBattleLog(reviveMessage); }
+            if(typeof updateUI==="function"){ updateUI(); }
+            if(typeof showPlayerHit==="function"){ showPlayerHit(restoredHP,"heal",targetIndex,true); }
+            if(typeof window.v141PlayCardEffect==="function"){
+                window.v141PlayCardEffect("player",targetIndex,"revive");
+            }
+        };
+        if(typeof window.v143RunAtTargetHit==="function"){
+            window.v143RunAtTargetHit("player",targetIndex,reviveAtImpact,true);
+        }else{
+            const duration=Math.max(520,numeric(skill.animationDuration)||1800);
+            setTimeout(reviveAtImpact,Math.round(duration*7/12));
         }
-        if(typeof window.v141PlayCardEffect==="function"){
-            window.v141PlayCardEffect("player",targetIndex,"revive");
-        }
-        return finishSupport((target.id||"隊友")+"被"+skill.name+"復活，恢復"+target.hp+" HP。");
+        return finishSupport();
     }
 
     function resolveSupportAction(characterIndex,queued,skill){

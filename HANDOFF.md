@@ -47,7 +47,8 @@
    `tests/v161-flame-slash-vfx.test.js`。V162 的燃燒同步、元素匣層級與深淵戰鬥立繪
    驗收則補強在 `tests/v153-fire-vfx.test.js` 與 `tests/v154-current-request.test.js`；V163 新增
    inbox 原始 PNG 校正驗收 `tests/v163-flame-slash-source.test.js`；V165 新增怒火／霸龍裂天斬
-   圖片與火箭移動落點驗收 `tests/v165-fire-vfx-fixes.test.js`。驗證至少要包含：
+   圖片與火箭移動落點驗收 `tests/v165-fire-vfx-fixes.test.js`；V166 新增水元素十招施放、
+   兩種狀態循環、逐目標投射與整區 AOE 驗收 `tests/v166-water-vfx.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -59,7 +60,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-30，V165 火元素技能動畫修正）
+## 目前狀態（截至 2026-08-30，V166 水元素技能動畫）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -186,6 +187,15 @@
   只發布 `dev`，不得合併或推送 `main`。本輪已完成全部 JS／測試語法檢查、24 套共
   208 項 Node 驗收及 `git diff --check`；本機未做實際手機瀏覽器操作，仍需在 `dev`
   以真機確認最終視覺比例與爆炸前後景感。
+- V166 確認 assets-library inbox 的 12 張水／冰動畫全為可完整解碼的 8-bit RGBA 真透明 PNG；
+  10 張施放圖正規化為 4×3、12 幀，凍傷／冰封狀態圖正規化為 4×2、8 幀，僅逐格置中補透明邊，
+  未縮放或重繪。水刀斬、冰霜拳、冰封重擊、冰封、治療與復活依每張實際卡牌定位；冰旋一閃
+  依 1／2／3 個實際目標各自定位且同步命中；水球術與洪水猛獸由施放卡移動到各自實際目標；
+  冰霜箭雨固定覆蓋完整敵方戰鬥區，即使僅一名敵人也不縮成單體。十招均依指定總長並在第 8 幀
+  同步數字／命中反應，復活的 HP 與站起時點也延至第 8 幀。凍傷 1.0 秒、冰封 1.1 秒只讀既有
+  `statusEffects` 循環，施放圖結束後才接續，解除立即移除且不觸發 DOT／控制結算。V158 最終
+  `freeze=tri`、`healSpell=allyAll` 與 Frostbite 非 DOT 的正式戰鬥規則均保留；快取升至 166，
+  只發布 `dev`，不得合併或推送 `main`。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -453,6 +463,31 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-30 — V166：水元素正式 Sprite Sheet VFX（dev）
+
+- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
+- 從 `origin/assets-library` 的 `assets/inbox/` 取用 12 張本次素材；全部通過 PNG chunk、zlib、
+  8-bit RGBA、透明與半透明 Alpha 檢查。九張 1448×1086 來源以 362×362 格置中補至 384×384；
+  `tidal-beast.png` 依 384px 四欄及 341／342／341px 三列補成正方格；兩張 1774×887 狀態圖
+  依 444／443px 邊界切為八格再補至 444×444。正式輸出的 136 個影格與各自來源內容區逐像素
+  比對差異皆為 0，沒有縮放、拉伸或重繪。
+- `js/37-v142-skill-animation.js`、`js/39-v143-skill-animation.js` 與
+  `css/40-v143-combat-dungeon-polish.css` 接入十招指定檔名與 0.80／0.90／1.00／1.15／1.10／
+  1.35／0.95／1.25／1.80／1.60 秒時序，統一第 8 幀命中。單卡、實際 1～3 卡、每目標獨立
+  投射、完整敵方區 AOE 均由當次 DOM 座標計算；停用舊冰旋投射，避免重疊播放。
+- 凍傷與冰封狀態圖只鏡射 canonical `statusEffects`，循環頻率不會觸發 HP／DOT／控制邏輯；
+  一次性施放圖完成後才建立 loop，狀態解除或角色倒下立即移除。舊生成式冰封覆蓋層已由正式
+  Frozen loop 取代。
+- `js/42-v148-combat-dungeon-fixes.js` 將復活 HP、卡牌站起、數字與復活反應統一排到第 8 幀；
+  治療仍保留 V158 的全體規則，冰封仍保留 V158 的同排最多三人規則，冰封重擊／冰旋一閃沿用
+  正式 Frostbite 規則，沒有藉動畫工作改動平衡數值或新增 DOT。
+- `V_ASSET_VERSION` 與外層 loader 升至 166；重寫 V150 全區冰霜箭雨驗收、新增 V166 端到端
+  動畫驗收並補強 V148 第 8 幀復活測試。最終 25 份 Node suite、224 項全數通過；`js/`／
+  `tests/` 共 135 支 JavaScript 通過 `node --check`，`git diff --check` 通過。
+
+**已知限制**：環境沒有 Chromium，未做本機瀏覽器／手機視覺測試；需在 `dev` 真機確認各張
+正式圖的最終顯示比例、混色與遮擋感。
 
 ### 2026-08-30 — V163：火焰斬原始透明 PNG 校正（dev）
 
@@ -2228,7 +2263,7 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V143 的 `tests/v143-combat-dungeon-polish.test.js` 有 12 項本輪需求驗收，
       V144 的 `tests/v144-rules-and-abyss.test.js` 有 11 項商店／怪物技能／深淵驗收，
       V146 的 `tests/v146-system-polish.test.js` 有 8 項戰鬥／深淵／手機介面驗收，
-      V148 的 `tests/v148-combat-dungeon-fixes.test.js` 有 12 項戰鬥目標／副本驗收，
+      V148 的 `tests/v148-combat-dungeon-fixes.test.js` 有 13 項戰鬥目標／副本驗收，
       V149 的 `tests/v149-skill-ui-rules.test.js` 有 13 項技能／介面規則驗收，
       V150 的 `tests/v150-ice-arrow-rain-vfx.test.js` 有 6 項正式 Sprite VFX 驗收，
       V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，
@@ -2240,7 +2275,10 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       `tests/v158-combat-tuning.test.js` 有 7 項技能／命中／傷害／立繪驗收，V159 的
       `tests/v159-abyss-battle-portraits.test.js` 有 4 項立繪載入時序驗收，V160 的
       `tests/v160-current-request.test.js` 有 5 項本輪數值／目標／補給／動畫驗收，V161 的
-      `tests/v161-flame-slash-vfx.test.js` 有 5 項火焰斬正式 Sprite VFX 驗收，並保留
+      `tests/v161-flame-slash-vfx.test.js` 有 5 項火焰斬正式 Sprite VFX 驗收，V163 的
+      `tests/v163-flame-slash-source.test.js` 有 3 項來源校正驗收，V165 的
+      `tests/v165-fire-vfx-fixes.test.js` 有 3 項火系圖與火箭落點驗收，V166 的
+      `tests/v166-water-vfx.test.js` 有 15 項水／冰正式 Sprite VFX 驗收，並保留
       可選的 `tests/v138-browser-smoke.js`。本輪遠端瀏覽器遇到預覽站安全中繼頁，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。

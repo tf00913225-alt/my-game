@@ -445,10 +445,10 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V165",(
     assert.match(css,/v153FireCastFrames var\(--v143-sprite-duration,1500ms\) steps\(1,end\) 1 both/);
     assert.doesNotMatch(css,/v153FireCastFrames[^;]*infinite/);
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
-    assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:800\}/);
-    assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:1000\}/);
-    assert.match(loader,/const V_ASSET_VERSION="165"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=165/);
+    assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:800,collection:"statusEffects"\}/);
+    assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:1000,collection:"activeBuffs"\}/);
+    assert.match(loader,/const V_ASSET_VERSION="166"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

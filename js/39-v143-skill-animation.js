@@ -91,23 +91,83 @@
         },
         fireEX:{glyph:"焰",motion:"orbit",impact:"fire-crown",hit:.74,pulses:7,spread:95},
 
-        waterKnife:{glyph:"刃",motion:"wave",impact:"water-cut",hit:.57,pulses:1,spread:0},
-        frostPunch:{glyph:"拳",motion:"dash",impact:"ice-fist",hit:.61,pulses:2,spread:18},
-        iceSpin:{glyph:"輪",motion:"spin",impact:"ice-wheel",hit:.67,pulses:3,spread:42},
-        frostCrush:{glyph:"槌",motion:"drop",impact:"ice-crush",hit:.71,pulses:4,spread:58},
-        waterBall:{glyph:"●",motion:"wave",impact:"water-splash",hit:.62,pulses:1,spread:34},
-        floodBeast:{glyph:"獸",motion:"surge",impact:"flood-jaw",hit:.68,pulses:4,spread:66},
-        iceArrowRain:{
-            glyph:"➶",motion:"rain",impact:"ice-rain",hit:.5833333333,
-            pulses:7,spread:104,flightCount:7,
+        waterKnife:{
+            glyph:"刃",motion:"wave",impact:"water-cut",hit:.5833333333,pulses:1,spread:0,
             sprite:{
-                src:"assets/vfx/water/ice-arrow-rain.png",
-                columns:4,rows:3,frames:12,hitFrame:7
+                src:"assets/vfx/water/water-blade-slash-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.05,maxSize:250
             }
         },
-        freeze:{glyph:"晶",motion:"crystal",impact:"ice-prison",hit:.69,pulses:3,spread:48},
-        healSpell:{glyph:"癒",motion:"rise",impact:"healing-spring",hit:.58,pulses:3,spread:46},
-        revive:{glyph:"生",motion:"ascend",impact:"revive-pillar",hit:.70,pulses:5,spread:70},
+        frostPunch:{
+            glyph:"拳",motion:"dash",impact:"ice-fist",hit:.5833333333,pulses:2,spread:18,
+            sprite:{
+                src:"assets/vfx/water/frost-fist-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.15,maxSize:260
+            }
+        },
+        iceSpin:{
+            glyph:"輪",motion:"spin",impact:"ice-wheel",hit:.5833333333,pulses:3,spread:42,
+            deferredStatusTypes:["frostbite"],
+            sprite:{
+                src:"assets/vfx/water/frost-spinning-slash-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:1.95,maxSize:235
+            }
+        },
+        frostCrush:{
+            glyph:"槌",motion:"drop",impact:"ice-crush",hit:.5833333333,pulses:4,spread:58,
+            deferredStatusTypes:["frostbite"],
+            sprite:{
+                src:"assets/vfx/water/freeze-heavy-strike-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.35,maxSize:290
+            }
+        },
+        waterBall:{
+            glyph:"●",motion:"wave",impact:"water-splash",hit:.5833333333,pulses:1,spread:34,
+            sprite:{
+                src:"assets/vfx/water/water-orb-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true,
+                scale:1.65,minSize:150,maxSize:225
+            }
+        },
+        floodBeast:{
+            glyph:"獸",motion:"surge",impact:"flood-jaw",hit:.5833333333,pulses:4,spread:66,
+            deferredStatusTypes:["freeze"],
+            sprite:{
+                src:"assets/vfx/water/tidal-beast-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true,
+                scale:2.35,minSize:220,maxSize:320
+            }
+        },
+        iceArrowRain:{
+            glyph:"➶",motion:"rain",impact:"ice-rain",hit:.5833333333,
+            pulses:7,spread:104,flightCount:7,deferredStatusTypes:["freeze"],
+            sprite:{
+                src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",scale:1
+            }
+        },
+        freeze:{
+            glyph:"晶",motion:"crystal",impact:"ice-prison",hit:.5833333333,pulses:3,spread:48,
+            deferredStatusTypes:["freeze"],
+            sprite:{
+                src:"assets/vfx/water/freeze-cast-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.2,maxSize:270
+            }
+        },
+        healSpell:{
+            glyph:"癒",motion:"rise",impact:"healing-spring",hit:.5833333333,pulses:3,spread:46,
+            sprite:{
+                src:"assets/vfx/water/water-heal-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.05,maxSize:250
+            }
+        },
+        revive:{
+            glyph:"生",motion:"ascend",impact:"revive-pillar",hit:.5833333333,pulses:5,spread:70,
+            sprite:{
+                src:"assets/vfx/water/water-revive-vfx.png?v=166",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:2.3,maxSize:285
+            }
+        },
         waterEX:{glyph:"泉",motion:"orbit-reverse",impact:"tidal-crown",hit:.74,pulses:7,spread:95},
 
         stormFist:{glyph:"拳",motion:"dash",impact:"wind-fist",hit:.56,pulses:1,spread:0},
@@ -168,8 +228,10 @@
     }
 
     const STATUS_SPRITES={
-        burn:{src:"assets/vfx/fire/burn-loop.png?v=165",columns:4,rows:2,frames:8,duration:800},
-        rage:{src:"assets/vfx/fire/rage-buff-loop.png?v=165",columns:4,rows:2,frames:8,duration:1000}
+        burn:{src:"assets/vfx/fire/burn-loop.png?v=165",columns:4,rows:2,frames:8,duration:800,collection:"statusEffects"},
+        rage:{src:"assets/vfx/fire/rage-buff-loop.png?v=165",columns:4,rows:2,frames:8,duration:1000,collection:"activeBuffs"},
+        frostbite:{src:"assets/vfx/water/frostbite-status-loop-vfx.png?v=166",columns:4,rows:2,frames:8,duration:1000,collection:"statusEffects",scale:1.22},
+        freeze:{src:"assets/vfx/water/frozen-status-loop-vfx.png?v=166",columns:4,rows:2,frames:8,duration:1100,collection:"statusEffects",scale:1.28}
     };
 
     window.v143SkillAnimationManifest=MANIFEST;
@@ -270,6 +332,8 @@
                 Number.isInteger(index)&&canReceive(config,targetSide,index)
             )));
         }
+        const cards=activeCards(targetSide,config);
+        if(all){ return cards.map(entry=>entry.index); }
         if(meta.side==="player"&&typeof queuedPlayerActions!=="undefined"){
             const queued=queuedPlayerActions&&queuedPlayerActions[meta.actorIndex];
             if(queued){
@@ -288,8 +352,6 @@
                 }
             }
         }
-        const cards=activeCards(targetSide,config);
-        if(all){ return cards.map(entry=>entry.index); }
         /* Enemy row/tri actions do not expose their chosen centre before the
            engine resolves the hit list.  Let the real hit callbacks register
            those cards; treating a row as all targets was the old mismatch. */
@@ -310,9 +372,31 @@
         return {left:left,top:top,width:right-left,height:bottom-top};
     }
 
+    function sideAreaBounds(side){
+        const id=side==="monster"?"battleMonsterArea":"battlePlayerRow";
+        const area=document.getElementById(id);
+        const rect=area&&area.getBoundingClientRect?area.getBoundingClientRect():null;
+        if(rect&&rect.width&&rect.height){
+            return {left:rect.left,top:rect.top,width:rect.width,height:rect.height,id:id};
+        }
+        const cards=activeCards(side,{category:""}).map(entry=>entry.card);
+        const fallback=fieldBounds(cards);
+        return fallback?Object.assign({id:id},fallback):null;
+    }
+
+    function deferredStatusDuringCast(side,index,type){
+        const current=state.current;
+        if(!current||current.done||current.targetSide!==side){ return false; }
+        const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
+        if(types.indexOf(type)<0){ return false; }
+        const tracked=current.deferredStatusTargets&&current.deferredStatusTargets.get(type);
+        return current.targetIndexes.indexOf(index)>=0||!!(tracked&&tracked.has(index));
+    }
+
     function hasTimedEffect(entity,type){
         if(!entity){ return false; }
-        const collection=type==="burn"?entity.statusEffects:entity.activeBuffs;
+        const spec=STATUS_SPRITES[type];
+        const collection=spec&&spec.collection==="statusEffects"?entity.statusEffects:entity.activeBuffs;
         if(Array.isArray(collection)&&collection.some(effect=>
             effect&&effect.type===type&&Number(effect.turnsLeft)>0
         )){ return true; }
@@ -341,7 +425,7 @@
         );
         const active=alive&&hasTimedEffect(entity,type);
         let node=statusNode(card,type);
-        if(!active){
+        if(!active||deferredStatusDuringCast(side,index,type)){
             if(node&&typeof node.remove==="function"){ node.remove(); }
             else if(node&&node.parentNode){ node.parentNode.removeChild(node); }
             return;
@@ -358,19 +442,19 @@
             card.appendChild(node);
         }
         const rect=card.getBoundingClientRect?card.getBoundingClientRect():null;
-        const size=Math.max(96,Math.max(Number(rect&&rect.width)||0,Number(rect&&rect.height)||0)*1.18);
+        const scale=Number(spec.scale)||1.18;
+        const size=Math.max(96,Math.max(Number(rect&&rect.width)||0,Number(rect&&rect.height)||0)*scale);
         node.style.width=size+"px";
         node.style.height=size+"px";
     }
 
     function syncStatusSpriteEffects(){
+        const types=Object.keys(STATUS_SPRITES);
         for(let index=0;index<10;index++){
-            syncStatusSprite("monster",index,"burn");
-            syncStatusSprite("monster",index,"rage");
+            types.forEach(type=>syncStatusSprite("monster",index,type));
         }
         for(let index=0;index<3;index++){
-            syncStatusSprite("player",index,"burn");
-            syncStatusSprite("player",index,"rage");
+            types.forEach(type=>syncStatusSprite("player",index,type));
         }
     }
 
@@ -398,6 +482,22 @@
             }
         }
         if(!side||index<0){ return; }
+        const current=state.current;
+        if(
+            current&&!current.done&&current.targetSide===side&&
+            current.config.id==="freeze"&&!current.emitted.has(index)
+        ){
+            registerTarget(side,index,true);
+        }
+        const types=current&&Array.isArray(current.model.deferredStatusTypes)
+            ?current.model.deferredStatusTypes:[];
+        if(current&&!current.done&&current.targetSide===side&&types.indexOf(type)>=0){
+            let tracked=current.deferredStatusTargets.get(type);
+            if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
+            tracked.add(index);
+            syncStatusSprite(side,index,type);
+            return;
+        }
         const invoke=()=>syncStatusSprite(side,index,type);
         const wait=existingTargetDelay(side,index);
         if(wait>8){ setTimer(invoke,wait); }
@@ -409,6 +509,24 @@
         applyBurnEffect=function(entity){
             const result=previousApplyBurnEffect.apply(this,arguments);
             syncAppliedStatusSprite(entity,"burn");
+            return result;
+        };
+    }
+
+    if(typeof applyFreezeEffect==="function"){
+        const previousApplyFreezeEffect=applyFreezeEffect;
+        applyFreezeEffect=function(entity){
+            const result=previousApplyFreezeEffect.apply(this,arguments);
+            syncAppliedStatusSprite(entity,"freeze");
+            return result;
+        };
+    }
+
+    if(typeof applyMonsterDebuff==="function"){
+        const previousApplyMonsterDebuff=applyMonsterDebuff;
+        applyMonsterDebuff=function(entity,type){
+            const result=previousApplyMonsterDebuff.apply(this,arguments);
+            if(type==="frostbite"){ syncAppliedStatusSprite(entity,"frostbite"); }
             return result;
         };
     }
@@ -561,6 +679,48 @@
             return;
         }
 
+        if(placement==="targetTrajectory"){
+            const actor=cardCenter(current.actorCard);
+            if(!actor){ return; }
+            const scale=Number(sprite.scale)||1.7;
+            const size=clamp(
+                Math.max(target.rect.width,target.rect.height)*scale,
+                Number(sprite.minSize)||140,
+                Number(sprite.maxSize)||240
+            );
+            node.dataset.targetIndex=String(index);
+            node.dataset.targetIndexes=String(index);
+            node.dataset.travelToTargets="true";
+            node.style.left=actor.x+"px";
+            node.style.top=actor.y+"px";
+            node.style.width=size+"px";
+            node.style.height=size+"px";
+            node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
+            node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
+            node.style.setProperty("--v143-sprite-angle","0deg");
+            return;
+        }
+
+        if(placement==="battlefield"){
+            const indexes=emittedSpriteTargets(current);
+            const bounds=sideAreaBounds(current.targetSide);
+            if(!bounds){ return; }
+            const size=Math.max(bounds.width,bounds.height);
+            const horizontalInset=Math.max(0,(size-bounds.width)/2);
+            const verticalInset=Math.max(0,(size-bounds.height)/2);
+            node.dataset.targetIndexes=indexes.join(",");
+            node.dataset.areaId=bounds.id;
+            node.style.left=(bounds.left+bounds.width/2)+"px";
+            node.style.top=(bounds.top+bounds.height/2)+"px";
+            node.style.width=size+"px";
+            node.style.height=size+"px";
+            node.style.clipPath="inset("+verticalInset+"px "+horizontalInset+"px)";
+            node.style.setProperty("--v143-sprite-dx","0px");
+            node.style.setProperty("--v143-sprite-dy","0px");
+            node.style.setProperty("--v143-sprite-angle","0deg");
+            return;
+        }
+
         const indexes=emittedSpriteTargets(current);
         const targetCards=indexes.map(targetIndex=>cardFor(current.targetSide,targetIndex)).filter(Boolean);
         const targetBounds=fieldBounds(targetCards);
@@ -609,12 +769,13 @@
         const sprite=current.model.sprite;
         if(!sprite||!target){ return; }
         const placement=String(sprite.placement||"single");
-        const key=placement==="single"?index:"main";
+        const key=placement==="single"||placement==="targetTrajectory"?index:"main";
         let node=current.spriteNodes.get(key);
         if(!node){
             node=appendNode(
                 "v143-vfx-sprite v143-vfx-sprite-"+current.config.id+
-                (String(sprite.src).includes("/fire/")?" v153-fire-cast-sprite":"")
+                (String(sprite.src).includes("/fire/")?" v153-fire-cast-sprite":"")+
+                (String(sprite.src).includes("/water/")?" v166-water-cast-sprite":"")
             );
             node.dataset.targetSide=current.targetSide;
             node.dataset.placement=placement;
@@ -624,6 +785,11 @@
             node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
             node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
             node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
+            node.style.setProperty(
+                "--v143-sprite-delay",
+                -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"
+            );
+            if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);
@@ -691,6 +857,7 @@
         });
         if(state.stage&&state.stage.dataset.sequence===String(current.sequence)){ state.stage.remove(); }
         if(state.current===current){ state.current=null; state.stage=null; }
+        syncStatusSpriteEffects();
         state.metrics.completed++;
         if(current.gate&&!current.gate.done){ current.gate.complete(reason||"v143-animation-complete"); }
     }
@@ -714,7 +881,7 @@
             targetId:Number.isInteger(meta.targetId)?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),
-            validTargets:validTargets,spriteNodes:new Map(),
+            validTargets:validTargets,spriteNodes:new Map(),deferredStatusTargets:new Map(),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),duration:duration,hitReached:false,done:false
         };
@@ -735,6 +902,9 @@
         state.stage=stage;
         state.current=current;
         state.metrics.started++;
+        if(Array.isArray(model.deferredStatusTypes)&&model.deferredStatusTypes.length){
+            syncStatusSpriteEffects();
+        }
         if(!model.sprite){
             addCharge(current);
             addField(current);
@@ -767,6 +937,16 @@
         };
     }
 
+    /* Ice Spin's official sheets already own every resolved target. */
+    if(typeof playIceSpinProjectile==="function"){
+        const previousIceSpinProjectile=playIceSpinProjectile;
+        playIceSpinProjectile=function(){
+            const current=state.current;
+            if(current&&!current.done&&current.config.id==="iceSpin"&&current.model.sprite){ return; }
+            return previousIceSpinProjectile.apply(this,arguments);
+        };
+    }
+
     director.dispose=function(){
         clearTimers();
         if(state.current&&!state.current.done){ cleanupCurrent(state.current,"dispose"); }
@@ -780,6 +960,14 @@
         if(!current){ return 0; }
         return Math.max(0,targetHitTime(current,index)-Date.now());
     }
+
+    window.v143RunAtTargetHit=function(targetSide,index,callback,allowDefeated){
+        if(typeof callback!=="function"){ return 0; }
+        const wait=delayFor(targetSide,index,allowDefeated===true);
+        if(wait>8){ setTimer(callback,wait); }
+        else{ callback(); }
+        return wait;
+    };
 
     function existingTargetDelay(targetSide,index){
         const current=state.current;
@@ -896,6 +1084,17 @@
                 return;
             }
             const result=previousUpdateMonsterUI.apply(this,arguments);
+            syncStatusSpriteEffects();
+            return result;
+        };
+    }
+
+    /* Status turns can expire in several combat paths. A completed UI refresh
+       is the common boundary where stale loop nodes can be removed at once. */
+    if(typeof updateUI==="function"){
+        const previousUpdateUI=updateUI;
+        updateUI=function(){
+            const result=previousUpdateUI.apply(this,arguments);
             syncStatusSpriteEffects();
             return result;
         };

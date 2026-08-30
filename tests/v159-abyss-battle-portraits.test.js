@@ -30,8 +30,8 @@ function load(overrides={}){
 }
 
 test("V159 remains the final ordered runtime under cache key 163",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="165"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=165/);
+    assert.match(loader,/const V_ASSET_VERSION="166"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
     const v159=loader.indexOf("js/48-v159-abyss-battle-portraits.js");
     assert.ok(v158>=0&&v159>v158);

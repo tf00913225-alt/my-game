@@ -25,11 +25,11 @@
         flameTornado:[2100,"high","tornado"],phoenixCry:[3200,"ultimate","phoenix"],
         rage:[1500,"medium","aura"],fireEX:[3000,"ultimate","aura"],
 
-        waterKnife:[720,"basic","slash"],frostPunch:[980,"basic","ice-impact"],
-        iceSpin:[1500,"medium","ice-barrage"],frostCrush:[2150,"high","ice-impact"],
-        waterBall:[900,"basic","projectile"],floodBeast:[1650,"medium","wave"],
-        iceArrowRain:[2500,"high","ice-rain"],freeze:[1850,"high","freeze"],
-        healSpell:[1500,"medium","heal"],revive:[2400,"high","revive"],
+        waterKnife:[800,"basic","slash"],frostPunch:[900,"basic","ice-impact"],
+        iceSpin:[1000,"medium","ice-barrage"],frostCrush:[1150,"high","ice-impact"],
+        waterBall:[1100,"basic","projectile"],floodBeast:[1350,"medium","wave"],
+        iceArrowRain:[1600,"high","ice-rain"],freeze:[950,"high","freeze"],
+        healSpell:[1250,"medium","heal"],revive:[1800,"high","revive"],
         waterEX:[3000,"ultimate","aura"],
 
         stormFist:[720,"basic","impact"],stormFlurry:[1250,"medium","barrage"],

@@ -201,13 +201,28 @@
     will-change:background-position,transform,opacity,filter;
 }
 
-.v143-skill-stage[data-skill="iceArrowRain"] .v143-vfx-sprite{
+.v143-skill-stage .v166-water-cast-sprite{
+    filter:drop-shadow(0 0 11px rgba(76,205,255,.9));
     animation:
-        v150IceArrowRainFrames var(--v143-sprite-duration,2500ms) steps(1,end) 1 both,
-        v150IceArrowRainEnvelope var(--v143-sprite-duration,2500ms) linear 1 both;
+        v166WaterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        v166WaterCastEnvelope var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
-@keyframes v150IceArrowRainFrames{
+.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite,
+.v143-skill-stage[data-skill="floodBeast"] .v166-water-cast-sprite{
+    animation:
+        v166WaterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        v166WaterTargetTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+
+.v143-skill-stage[data-skill="iceArrowRain"] .v166-water-cast-sprite{
+    contain:paint;
+    animation:
+        v166WaterCastFrames var(--v143-sprite-duration,1600ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        v166WaterAoeEnvelope var(--v143-sprite-duration,1600ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+
+@keyframes v166WaterCastFrames{
     0%{background-position:0 0}
     8.333333%{background-position:33.333333% 0}
     16.666667%{background-position:66.666667% 0}
@@ -222,10 +237,52 @@
     91.666667%,100%{background-position:100% 100%}
 }
 
-@keyframes v150IceArrowRainEnvelope{
-    0%{opacity:0;transform:translate(-50%,-50%) scale(.88)}
-    4%,94%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-    100%{opacity:0;transform:translate(-50%,-50%) scale(1.04)}
+@keyframes v166WaterCastEnvelope{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.9)}
+    3%,95%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(1.03)}
+}
+
+@keyframes v166WaterTargetTravel{
+    0%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(.9);
+    }
+    3%,33.332%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+    }
+    33.333%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+    }
+    58.332%{
+        opacity:1;
+        transform:translate(
+            calc(-50% + var(--v143-sprite-dx,0px)),
+            calc(-50% + var(--v143-sprite-dy,0px))
+        ) scale(1);
+    }
+    58.333%,95%{
+        opacity:1;
+        transform:translate(
+            calc(-50% + var(--v143-sprite-dx,0px)),
+            calc(-50% + var(--v143-sprite-dy,0px))
+        ) scale(1);
+    }
+    100%{
+        opacity:0;
+        transform:translate(
+            calc(-50% + var(--v143-sprite-dx,0px)),
+            calc(-50% + var(--v143-sprite-dy,0px))
+        ) scale(1.03);
+    }
+}
+
+@keyframes v166WaterAoeEnvelope{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.96)}
+    3%,95%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(1.015)}
 }
 
 .v143-skill-stage .v153-fire-cast-sprite{
@@ -329,6 +386,21 @@
 
 #game-stage #battlePage .v153-status-vfx-rage{
     filter:drop-shadow(0 0 8px rgba(255,35,20,.9));
+}
+
+#game-stage #battlePage .v153-status-vfx-frostbite{
+    opacity:.9;
+    filter:drop-shadow(0 0 8px rgba(101,219,255,.88));
+}
+
+#game-stage #battlePage .v153-status-vfx-freeze{
+    opacity:.94;
+    filter:drop-shadow(0 0 10px rgba(178,238,255,.96));
+}
+
+/* The official Frozen loop replaces the older generated ice overlay. */
+#game-stage #battlePage .v141-effect-freeze{
+    display:none !important;
 }
 
 #battlePage .v146-defeated > .v153-status-vfx,

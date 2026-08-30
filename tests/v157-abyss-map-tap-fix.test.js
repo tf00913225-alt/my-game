@@ -17,8 +17,8 @@ function test(name,handler){
 }
 
 test("cache key 163 delivers the Abyss tap correction",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="165"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=165/);
+    assert.match(loader,/const V_ASSET_VERSION="166"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
 });
 
 test("Abyss map portraits use the reduced mobile size and keep a full button hit area",()=>{

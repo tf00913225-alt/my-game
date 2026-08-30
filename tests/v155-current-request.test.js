@@ -45,8 +45,8 @@ function load(overrides={}){
 }
 
 test("V155 remains ordered before V158 under cache version 165",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="165"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=165/);
+    assert.match(loader,/const V_ASSET_VERSION="166"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
     assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=154/);
     const v154=loader.indexOf("js/45-v154-dev-fixes.js");
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
