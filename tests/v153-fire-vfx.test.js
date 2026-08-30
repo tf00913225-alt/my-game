@@ -238,7 +238,8 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
     };
     Object.entries(expected).forEach(([id,[filename,placement]])=>{
         const sprite=manifest[id].sprite;
-        assert.ok(sprite.src.endsWith(filename),id);
+        assert.ok(sprite.src.split("?")[0].endsWith(filename),id);
+        if(id!=="flameSlash"){ assert.ok(sprite.src.endsWith("?v=164"),id); }
         assert.deepEqual([sprite.columns,sprite.rows,sprite.frames,sprite.hitFrame],[4,3,12,7],id);
         assert.equal(sprite.placement,placement,id);
         assert.equal(manifest[id].hit,.5833333333,id);
@@ -422,10 +423,10 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V154",(
     assert.match(css,/v153FireCastFrames var\(--v143-sprite-duration,1500ms\) steps\(1,end\) 1 both/);
     assert.doesNotMatch(css,/v153FireCastFrames[^;]*infinite/);
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
-    assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png",columns:4,rows:2,frames:8,duration:800\}/);
-    assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png",columns:4,rows:2,frames:8,duration:1000\}/);
-    assert.match(loader,/const V_ASSET_VERSION="163"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=163/);
+    assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png\?v=164",columns:4,rows:2,frames:8,duration:800\}/);
+    assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png\?v=164",columns:4,rows:2,frames:8,duration:1000\}/);
+    assert.match(loader,/const V_ASSET_VERSION="164"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=164/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);
