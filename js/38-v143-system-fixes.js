@@ -90,7 +90,7 @@
     window.v143CombatRuleSnapshot=function(){
         return {
             version:VERSION,
-            lockdownCaps:{regular:80,elite:45,boss:30},
+            lockdownCaps:{regular:80,elite:60,boss:40},
             stormRain:skillDatabase&&skillDatabase.stormRain,
             iceArrowRain:skillDatabase&&skillDatabase.iceArrowRain,
             freeze:skillDatabase&&skillDatabase.freeze

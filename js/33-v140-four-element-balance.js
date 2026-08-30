@@ -19,8 +19,8 @@
     const GENERAL_STATUS_BOUNDS={min:5,max:95};
     const LOCKDOWN_STATUS_BOUNDS={
         regular:{min:5,max:80},
-        elite:{min:5,max:45},
-        boss:{min:5,max:30}
+        elite:{min:5,max:60},
+        boss:{min:5,max:40}
     };
     const LEVEL_FACTOR_PER_LEVEL=0.05;
     const LEVEL_FACTOR_MIN=0.5;

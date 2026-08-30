@@ -51,7 +51,7 @@
             glyph:"➶",motion:"arc-down",impact:"arrow-burst",hit:.5833333333,pulses:1,spread:42,
             sprite:{
                 src:"assets/vfx/fire/fire-rocket-cast.png",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"trajectory",scale:1.04,minSize:210
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"trajectory",scale:.72,minSize:180,maxSize:280
             }
         },
         blazeSpell:{
@@ -253,7 +253,7 @@
 
     function initialTargetIndexes(config,meta,targetSide){
         const targetType=String(config.targetType||"");
-        const all=/all/i.test(targetType);
+        const all=targetType==="all"||targetType==="allyAll";
         const formation=/row|tri|column/i.test(targetType);
         const explicit=Array.isArray(meta.targetIds)
             ?meta.targetIds

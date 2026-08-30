@@ -979,9 +979,11 @@
             }
             const characters=Array.from(String(config.name||"技能").replace(/\s+/g,""));
             const syntheticId="v149-word-"+String(config.id||"skill");
+            const flameSlash=config.id==="flameSlash";
             manifest[syntheticId]={
                 glyph:characters[0]||"技",sequence:characters.join(""),motion:"tempest",
-                impact:"storm-domain",hit:.75,pulses:Math.max(4,characters.length+2),
+                impact:flameSlash?"flame-cut":"storm-domain",hit:flameSlash?.58:.75,
+                pulses:Math.max(4,characters.length+2),
                 spread:110,flightCount:characters.length
             };
             const wordConfig=Object.assign({},config,{id:syntheticId,v149OriginalSkillId:config.id});

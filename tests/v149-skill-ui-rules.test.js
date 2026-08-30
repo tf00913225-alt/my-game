@@ -70,11 +70,11 @@ function compact(skill){
 }
 
 test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=159/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=160/);
     assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=149/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
-    assert.match(loader,/const V_ASSET_VERSION="159"/);
+    assert.match(loader,/const V_ASSET_VERSION="160"/);
     assert.match(loader,/css\/44-v149-skill-ui-rules\.css/);
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
@@ -364,6 +364,12 @@ test("word-circle animation emits one circle per character without replacing spr
     assert.equal(context.v143SkillAnimationManifest[played.id].sequence,"火鳳天鳴");
     assert.equal(context.v143SkillAnimationManifest[played.id].flightCount,4);
     assert.deepEqual(delays,["100ms","120ms","140ms","160ms"]);
+    context.v142SkillAnimationDirector.play({
+        id:"flameSlash",name:"火焰斬",element:"fire",category:"physical",targetType:"single",duration:760
+    },{side:"player",actorIndex:0});
+    assert.equal(played.id,"v149-word-flameSlash");
+    assert.equal(context.v143SkillAnimationManifest[played.id].impact,"flame-cut");
+    assert.equal(context.v143SkillAnimationManifest[played.id].hit,.58);
     context.v143SkillAnimationManifest.iceArrowRain={sprite:{frames:12}};
     context.v142SkillAnimationDirector.play({
         id:"iceArrowRain",name:"冰霜箭雨",element:"water",category:"magic",targetType:"all",duration:2500
@@ -372,6 +378,8 @@ test("word-circle animation emits one circle per character without replacing spr
     assert.equal(context.v143SkillAnimationManifest["v149-word-iceArrowRain"],undefined);
     assert.match(animationSource,/const repeats=Math\.max\(1,requested\)/);
     assert.match(css,/v149-word-circle-stage \.v143-skill-flight/);
+    assert.match(css,/data-skill="v149-word-flameSlash"/);
+    assert.match(css,/@keyframes v160FlameSlashImpact/);
 });
 
 test("Barrier corners, revive brightness, rank colours and reflect label are final rules",()=>{

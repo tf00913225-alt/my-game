@@ -14,8 +14,8 @@ let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
 test("V143 assets stay ordered before later patches under cache version 154",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=159/);
-    assert.match(loader,/const V_ASSET_VERSION="159"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=160/);
+    assert.match(loader,/const V_ASSET_VERSION="160"/);
     assert.match(loader,/css\/40-v143-combat-dungeon-polish\.css/);
     const order=[
         "js/37-v142-skill-animation.js",
@@ -81,8 +81,8 @@ test("the three revised skills and hard-control caps match the requested values"
     assert.match(system,/freeze\.freezeChance=80/);
     assert.match(system,/freeze\.freezeDuration=4/);
     assert.match(rules,/regular:\{min:5,max:80\}/);
-    assert.match(rules,/elite:\{min:5,max:45\}/);
-    assert.match(rules,/boss:\{min:5,max:30\}/);
+    assert.match(rules,/elite:\{min:5,max:60\}/);
+    assert.match(rules,/boss:\{min:5,max:40\}/);
 });
 
 test("V143 rule patch applies the requested skill metadata at runtime",()=>{
@@ -101,7 +101,7 @@ test("V143 rule patch applies the requested skill metadata at runtime",()=>{
     vm.createContext(context);
     vm.runInContext(system,context);
     const snapshot=context.v143CombatRuleSnapshot();
-    assert.deepEqual(JSON.parse(JSON.stringify(snapshot.lockdownCaps)),{regular:80,elite:45,boss:30});
+    assert.deepEqual(JSON.parse(JSON.stringify(snapshot.lockdownCaps)),{regular:80,elite:60,boss:40});
     assert.equal(snapshot.stormRain.spCost,75);
     assert.equal(snapshot.iceArrowRain.spCost,75);
     assert.equal(snapshot.iceArrowRain.freezeChance,50);

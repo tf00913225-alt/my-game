@@ -50,22 +50,26 @@ function loadRuntime(overrides={}){
     return context;
 }
 
-test("cache key 159 delivers the repaired runtime and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="159"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=159/);
+test("cache key 160 delivers the repaired runtime and CSS",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="160"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=160/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.match(loader,/js\/45-v154-dev-fixes\.js/);
 });
 
 test("an active element box heals the whole party even when a stale character flag is false",()=>{
-    const character={id:"測火",hp:20,sp:100};
+    const characters=[
+        {id:"測火",hp:20,sp:100},
+        {id:"測水",hp:20,sp:100},
+        {id:"測風",hp:20,sp:100}
+    ];
     let potions=5;
     let baseCalls=0;
     const context=loadRuntime({
         v131GetElementBoxState:()=>({active:true,remainingMs:1000}),
         applyPostBattleAutoRecovery(){ baseCalls++; },
-        getExistingPartyIndexes:()=>[0],
-        getPartyCharacterByIndex:()=>character,
+        getExistingPartyIndexes:()=>[0,1,2],
+        getPartyCharacterByIndex:index=>characters[index],
         getPartyAutoConfig:()=>({enabled:false,hp:50,sp:25}),
         getPartyBattleStats:()=>({maxHP:100,maxSP:100}),
         normalizeAutoBattleThreshold:value=>Number(value),
@@ -77,8 +81,8 @@ test("an active element box heals the whole party even when a stale character fl
 
     context.applyPostBattleAutoRecovery();
     assert.equal(baseCalls,1);
-    assert.equal(character.hp,60);
-    assert.equal(potions,1);
+    assert.deepEqual(characters.map(character=>character.hp),[40,40,30]);
+    assert.equal(potions,0);
 });
 
 test("an inactive element box does not bypass a disabled character setting",()=>{

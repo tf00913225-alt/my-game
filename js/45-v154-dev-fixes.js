@@ -99,43 +99,61 @@
         ){ return 0; }
         let consumed=0;
         const elementBoxActive=isElementBoxRecoveryActive();
-        getExistingPartyIndexes().forEach(characterIndex=>{
-            const character=getPartyCharacterByIndex(characterIndex);
-            const config=getPartyAutoConfig(characterIndex);
-            const stats=getPartyBattleStats(characterIndex);
+        const entries=getExistingPartyIndexes().map(characterIndex=>{
+            const entry={
+                characterIndex:characterIndex,
+                character:getPartyCharacterByIndex(characterIndex),
+                config:getPartyAutoConfig(characterIndex),
+                stats:getPartyBattleStats(characterIndex)
+            };
             if(
-                !character||character.hp<=0||!config||!stats||
-                (!config.enabled&&!elementBoxActive)
-            ){ return; }
+                !entry.character||entry.character.hp<=0||!entry.config||!entry.stats||
+                (!entry.config.enabled&&!elementBoxActive)
+            ){ return null; }
+            return entry;
+        }).filter(Boolean);
 
-            ["hp","sp"].forEach(resource=>{
-                const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);
-                const threshold=normalizeAutoBattleThreshold(
-                    config[resource],
-                    resource==="hp"?50:25
-                );
-                let guard=0;
-                while(guard++<100){
+        ["hp","sp"].forEach(resource=>{
+            let pending=entries.slice();
+            let guard=0;
+            while(pending.length&&guard++<Math.max(100,entries.length*100)){
+                let progressed=false;
+                const next=[];
+                pending.forEach(entry=>{
+                    const character=entry.character;
+                    const config=entry.config;
+                    const stats=entry.stats;
+                    const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);
+                    const threshold=normalizeAutoBattleThreshold(
+                        config[resource],
+                        resource==="hp"?50:25
+                    );
                     const currentValue=Number(character[resource])||0;
-                    if(maxValue<=0||currentValue>=maxValue||currentValue/maxValue*100>threshold){ break; }
+                    if(maxValue<=0||currentValue>=maxValue||currentValue/maxValue*100>threshold){ return; }
                     const potionId=getAutoPotionId(resource);
                     const definition=getPotionDefinition(potionId);
-                    if(!definition||!consumePotionFromInventory(potionId,1)){ break; }
+                    if(!definition||!consumePotionFromInventory(potionId,1)){ return; }
                     const planned=definition.recoveryPercent>=100
                         ?maxValue-currentValue
                         :Math.max(1,Math.round(maxValue*definition.recoveryPercent/100));
                     const recovered=Math.max(0,Math.min(maxValue-currentValue,planned));
                     character[resource]=Math.min(maxValue,currentValue+recovered);
                     consumed++;
+                    progressed=true;
                     if(typeof addBattleLog==="function"){
                         addBattleLog(
                             "元素匣為"+(character.id||"角色")+"自動使用"+
                             definition.name+"，恢復"+recovered+" "+resource.toUpperCase()+"。"
                         );
                     }
-                    if(recovered<=0){ break; }
-                }
-            });
+                    const updatedValue=Number(character[resource])||0;
+                    if(recovered>0&&updatedValue<maxValue&&updatedValue/maxValue*100<=threshold){
+                        next.push(entry);
+                    }
+                });
+                pending=next;
+                if(!progressed){ break; }
+            }
         });
         if(consumed&&typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
         return consumed;

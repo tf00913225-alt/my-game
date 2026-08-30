@@ -67,7 +67,10 @@
     if(typeof skillDatabase!=="undefined"&&skillDatabase.earthquakeCrush){
         delete skillDatabase.earthquakeCrush.selfShieldByLevel;
     }
-    patchSkill("iceArrowRain",{freezeChance:40,freezeDuration:2});
+    patchSkill("iceArrowRain",{
+        freezeChance:20,freezeDuration:2,
+        description:"需先學習洪水猛獸。對敵方全體各造成30點傷害，消耗75 SP；最高5級，每升1級傷害+12。吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；每個命中目標各有20%基礎機率冰封2回合。"
+    });
     patchSkill("yuanXiangGuangMing",{
         targetType:"allyAll",baseHeal:150,baseHealSP:55,
         description:"我方全體回復150 HP、55 SP。"

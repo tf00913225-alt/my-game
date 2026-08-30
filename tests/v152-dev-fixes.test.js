@@ -64,8 +64,8 @@ function load(overrides={}){
 }
 
 test("V152 remains ordered before V154 under cache version 154",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=159/);
-    assert.match(loader,/const V_ASSET_VERSION="159"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=160/);
+    assert.match(loader,/const V_ASSET_VERSION="160"/);
     assert.match(loader,/css\/45-v152-dev-fixes\.css/);
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
     const v152=loader.indexOf("js/44-v152-dev-fixes.js");
@@ -88,6 +88,8 @@ test("the latest requested skill values replace the V149 snapshot",()=>{
     assert.equal(skills.earthquakeCrush.selfShieldByLevel,undefined);
     assert.deepEqual(Array.from(skills.earthquakeCrush.petrifyChanceByLevel),[30,35,40,45,50]);
     assert.equal(skills.earthquakeCrush.petrifyDuration,3);
+    assert.deepEqual([skills.iceArrowRain.freezeChance,skills.iceArrowRain.freezeDuration],[20,2]);
+    assert.match(skills.iceArrowRain.description,/20%基礎機率冰封2回合/);
     assert.deepEqual([skills.yuanXiangGuangMing.baseHeal,skills.yuanXiangGuangMing.baseHealSP],[150,55]);
     assert.deepEqual([skills.yuanGuangShield.shieldAmount,skills.yuanGuangShield.shieldDuration],[100,2]);
     assert.deepEqual([skills.yuanZuBlessing.cleanseChance,skills.yuanZuBlessing.agilityBonusPercent,skills.yuanZuBlessing.duration],[20,50,2]);
@@ -246,8 +248,8 @@ test("the final abnormal formula and Ice Arrow Rain chance remain authoritative"
     assert.match(v140,/MAGIC_STATUS_COEFFICIENT=0\.3/);
     assert.match(v140,/Math\.sqrt\(power\)\*LOCKDOWN_STATUS_COEFFICIENT/);
     assert.match(v140,/regular:\{min:5,max:80\}/);
-    assert.match(v140,/elite:\{min:5,max:45\}/);
-    assert.match(v140,/boss:\{min:5,max:30\}/);
+    assert.match(v140,/elite:\{min:5,max:60\}/);
+    assert.match(v140,/boss:\{min:5,max:40\}/);
     assert.match(v143,/const freezeChance=Math\.max\(0,numeric\(skill&&skill\.freezeChance\)\)/);
     assert.doesNotMatch(v143,/rollStatusEffectHit\(\s*50,caster\.level/);
 });

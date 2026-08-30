@@ -125,6 +125,11 @@ function loadRuntime(options={}){
         battleMonster1:makeNode({left:400,top:90,right:476,bottom:190,width:76,height:100}),
         battleMonster2:makeNode({left:500,top:90,right:576,bottom:190,width:76,height:100})
     };
+    for(let index=3;index<10;index++){
+        const left=300+(index%5)*100;
+        const top=index<5?90:205;
+        cards["battleMonster"+index]=makeNode({left,top,right:left+76,bottom:top+100,width:76,height:100});
+    }
     const monsters=options.monsters||[
         {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
         {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
@@ -150,6 +155,7 @@ function loadRuntime(options={}){
         },
         clearTimeout(){},
         showMonsterHit(){ monsterHits.push(Array.from(arguments)); },
+        v141PlayCardEffect(){},
         playFireRocketAnimation(){ legacyRocketCalls++; },
         document:{
             body,
@@ -292,6 +298,7 @@ test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
     assert.notEqual(sprites[0].style["--v143-sprite-angle"],"0deg");
     assert.equal(sprites[0].style.width,sprites[0].style.height);
+    assert.equal(sprites[0].style.width,"280px");
     assert.equal(runtime.legacyRocketCalls(),0);
 });
 
@@ -306,6 +313,20 @@ test("Rage creates one cast sheet inside every affected card",()=>{
     assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
     sprites.forEach(node=>assert.equal(node.dataset.placement,"single"));
     sprites.forEach(node=>assert.ok(parseFloat(node.style.width)<=108));
+});
+
+test("enemy Rage allyTri waits for and animates only the three resolved targets",()=>{
+    const monsters=Array.from({length:10},()=>({alive:true,hp:100,statusEffects:[],activeBuffs:[]}));
+    const runtime=loadRuntime({monsters});
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("rage",1500,"allyTri","buff"),{side:"monster",actorIndex:0}
+    );
+    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,0);
+    [4,5,6].forEach(index=>runtime.context.v141PlayCardEffect("monster",index,"buff"));
+    const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
+    assert.equal(sprites.length,3);
+    assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["4","5","6"]);
 });
 
 test("frame eight delays hit numbers together and Fire Critical keeps its critical text reaction",()=>{
@@ -358,8 +379,8 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V154",(
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
     assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png",columns:4,rows:2,frames:8,duration:800\}/);
     assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png",columns:4,rows:2,frames:8,duration:1000\}/);
-    assert.match(loader,/const V_ASSET_VERSION="159"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=159/);
+    assert.match(loader,/const V_ASSET_VERSION="160"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=160/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

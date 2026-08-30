@@ -42,7 +42,8 @@
    `tests/v156-deep-trace-fixes.test.js`，V157 新增深淵地圖立繪尺寸與直接點擊驗收
    `tests/v157-abyss-map-tap-fix.test.js`，V158 新增技能／命中／傷害與深淵立繪驗收
    `tests/v158-combat-tuning.test.js`，V159 新增深淵戰鬥立繪載入時序驗收
-   `tests/v159-abyss-battle-portraits.test.js`。驗證至少要包含：
+   `tests/v159-abyss-battle-portraits.test.js`，V160 新增技能數值／目標、元素匣與火系動畫驗收
+   `tests/v160-current-request.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -54,7 +55,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-30，V159 深淵戰鬥立繪載入時序修正）
+## 目前狀態（截至 2026-08-30，V160 技能／元素匣／火系動畫修正）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -153,6 +154,9 @@
   沒有補掛的時序問題；同時把最終同步排在 V152 的舊 UI 更新之後，避免第五關圖片路徑
   被舊層再次移除。進入副本戰鬥、補丁延後載入與每次 UI 更新都會重掛既有立繪資料。
   快取版本升至 159，只發布 `dev`，不得合併或推送 `main`。
+- V160 將冰霜箭雨最終冰封率改為 20%，硬控上限改為普通 80%／精英 60%／BOSS 40%；
+  修正 `allyTri` 被動畫層誤當全體、元素匣補品被第一人優先耗盡、火焰斬缺少命中斬擊與
+  火箭 Sprite 過度放大。快取版本升至 160，不新增 runtime，只發布 `dev`，不得合併或推送 `main`。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -179,7 +183,7 @@ V131～V136 的邏輯 patch 則在 V137 改由
 
 **不要把 V131～V136 runtime 改回各自獨立 append。** 動態插入的 script
 原本會以 async 行為競速；這些檔案又會一層層包裝相同全域函式，載入順序
-改變就會改變實際行為。V137 已把順序固定；V159 現在完整順序為
+改變就會改變實際行為。V137 已把順序固定；V160 現在完整順序仍為
 `js/25` → `js/27` → `js/28` → `js/29` → `js/30` → `js/31` → `js/32` → `js/33`
 → `js/34` → `js/35` → `js/36` → `js/37` → `js/38` → `js/39` → `js/40` → `js/41`
 → `js/42` → `js/43` → `js/44` → `js/45` → `js/46` → `js/47` → `js/48`。
@@ -420,6 +424,23 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-30 — V160：技能數值／目標、元素匣與火系動畫修正（dev）
+
+- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
+- `js/44-v152-dev-fixes.js` 將冰霜箭雨最終冰封率改為 20% 並同步說明；
+  `js/33-v140-four-element-balance.js` 與 `js/38-v143-system-fixes.js` 將硬控上限統一為
+  普通 80%／精英 60%／BOSS 40%。
+- `js/39-v143-skill-animation.js` 改為只把精確 `all`／`allyAll` 當全體，敵方怒火等待實際
+  三個解析目標才逐卡播放；火箭保留原軌跡並將 Sprite 限制在 180～280px。
+- `js/43-v149-skill-ui-rules.js` 與 `css/44-v149-skill-ui-rules.css` 保留火焰斬三個字圈，命中時追加
+  緊湊火焰月牙斬擊；`js/45-v154-dev-fixes.js` 將元素匣 HP／SP 補品改為可用角色輪流使用，
+  避免有限補品全被玩家 1 耗完。
+- `V_ASSET_VERSION` 與外層 loader 升至 160；新增 `tests/v160-current-request.test.js` 5 項驗收，
+  並加強 V140／V143／V149／V152／V153／V156 相關回歸。驗證結果為 21 份 Node suite、193 項全數通過；
+  `js/`／`tests/` 共 131 支 JavaScript 全部通過 `node --check`，`git diff --check` 通過。
+
+**已知限制**：環境沒有 Chromium，未做本機瀏覽器視覺測試；需由使用者在 `dev` 實機確認動畫尺寸與手感。
 
 ### 2026-08-30 — V159：深淵戰鬥立繪載入時序修正（dev）
 
@@ -2134,13 +2155,14 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V149 的 `tests/v149-skill-ui-rules.test.js` 有 13 項技能／介面規則驗收，
       V150 的 `tests/v150-ice-arrow-rain-vfx.test.js` 有 6 項正式 Sprite VFX 驗收，
       V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，
-      V153 的 `tests/v153-fire-vfx.test.js` 有 8 項火元素正式 Sprite VFX 驗收，
+      V153 的 `tests/v153-fire-vfx.test.js` 有 9 項火元素正式 Sprite VFX 驗收，
       V154 的 `tests/v154-current-request.test.js` 有 6 項本輪需求驗收，
       V155 的 `tests/v155-current-request.test.js` 有 8 項本輪需求驗收，
       V156 的 `tests/v156-deep-trace-fixes.test.js` 有 5 項深淵地圖／元素匣驗收，V157 的
       `tests/v157-abyss-map-tap-fix.test.js` 有 3 項立繪尺寸／直接點擊驗收，V158 的
       `tests/v158-combat-tuning.test.js` 有 7 項技能／命中／傷害／立繪驗收，V159 的
-      `tests/v159-abyss-battle-portraits.test.js` 有 4 項立繪載入時序驗收，並保留
+      `tests/v159-abyss-battle-portraits.test.js` 有 4 項立繪載入時序驗收，V160 的
+      `tests/v160-current-request.test.js` 有 5 項本輪數值／目標／補給／動畫驗收，並保留
       可選的 `tests/v138-browser-smoke.js`。本輪遠端瀏覽器遇到預覽站安全中繼頁，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。
