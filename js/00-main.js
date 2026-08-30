@@ -462,6 +462,23 @@ function getCharacters(){
 }
 
 
+function normalizeCharacterIdForComparison(value){
+    const trimmed=String(value||"").trim();
+    const normalized=typeof trimmed.normalize==="function"
+        ? trimmed.normalize("NFKC")
+        : trimmed;
+    return normalized.toLocaleLowerCase();
+}
+
+
+function isCharacterIdTaken(id){
+    const normalizedId=normalizeCharacterIdForComparison(id);
+    return !!normalizedId && getCharacters().some(character=>
+        normalizeCharacterIdForComparison(character&&character.id)===normalizedId
+    );
+}
+
+
 let selectedCreationElement2 =
     "fire";
 
@@ -594,11 +611,11 @@ let gold = 300;
 /* =====================================================
    V93 — 開發測試資源
    測試按鈕改成「每按一次就直接追加」：
-   金幣 +1,000,000；共用經驗池 +10,000,000。
+   金幣 +1,000,000；共用經驗池 +1,000,000,000。
    不再存在最低值、永久鎖定或自動補回機制。
 ===================================================== */
 const TEST_GOLD_GRANT=1000000;
-const TEST_EXP_POOL_GRANT=10000000;
+const TEST_EXP_POOL_GRANT=1000000000;
 
 /*
    ★ 新增（依照使用者要求，主城新增六個
@@ -5261,6 +5278,8 @@ function updateCreationScreenContext(){
     const subtitle=$("creationContextSubtitle");
     const submitLabel=$("creationSubmitLabel");
     const cancelButton=$("creationCancelButton");
+    const primaryNextButton=$("creationPrimaryNextButton");
+    const additionalStepOneActions=$("creationAdditionalStepOneActions");
 
     const ordinal=
         creationTargetSlot===3
@@ -5283,6 +5302,14 @@ function updateCreationScreenContext(){
 
     if(cancelButton){
         cancelButton.hidden=creationTargetSlot===1;
+    }
+
+    if(primaryNextButton){
+        primaryNextButton.hidden=creationTargetSlot!==1;
+    }
+
+    if(additionalStepOneActions){
+        additionalStepOneActions.hidden=creationTargetSlot===1;
     }
 }
 
@@ -5432,8 +5459,7 @@ function createAdditionalCharacter(slotNumber){
         return;
     }
 
-    const duplicated=getCharacters().some(character=>character.id===id);
-    if(duplicated){
+    if(isCharacterIdTaken(id)){
         alert("角色 ID 不能與現有角色重複。");
         return;
     }
@@ -5606,6 +5632,17 @@ function createSecondCharacter(){
 
         alert(
             "ID至少需要2個字元。"
+        );
+
+        return;
+
+    }
+
+
+    if(isCharacterIdTaken(id)){
+
+        alert(
+            "角色 ID 不能與現有角色重複。"
         );
 
         return;
@@ -6931,11 +6968,18 @@ function showCreation(){
    清除存檔
 ===================================================== */
 
-function resetGame(){
+async function resetGame(){
 
     if(
-        !confirm(
-            "確定要刪除角色並重新創建嗎？"
+        typeof window.rpgConfirm!=="function" ||
+        !await window.rpgConfirm(
+            "確定要刪除角色並重新創建嗎？",
+            {
+                title:"刪除角色",
+                confirmText:"確定刪除",
+                cancelText:"保留角色",
+                danger:true
+            }
         )
     ){
         return;
@@ -27493,7 +27537,7 @@ function grantTestExpTenMillion(){
     saveGame();
 
     alert(
-        "經驗池 +10,000,000，目前共有 "+
+        "經驗池 +1,000,000,000，目前共有 "+
         sharedExp.toLocaleString("zh-TW")+
         " EXP。"
     );
@@ -27508,7 +27552,7 @@ function updateHomeTestTools(){
     }
 
     if(expButton){
-        expButton.innerHTML="經驗池 <b>+1000萬</b>";
+        expButton.innerHTML="經驗池 <b>+10億</b>";
     }
 }
 
@@ -31247,7 +31291,7 @@ function unequipItem(slot){
    售出
 ===================================================== */
 
-function sellSelectedItem(){
+async function sellSelectedItem(){
 
     if(
         selectedInventorySlot===null
@@ -31273,14 +31317,27 @@ function sellSelectedItem(){
 
 
     if(
-        !confirm(
+        typeof window.rpgConfirm!=="function" ||
+        !await window.rpgConfirm(
             "確定要出售"+
             item.name+
             "？\n"+
             "獲得"+
             price+
-            "金幣。"
+            "金幣。",
+            {
+                title:"出售裝備",
+                confirmText:"確定出售",
+                cancelText:"返回"
+            }
         )
+    ){
+        return;
+    }
+
+    if(
+        selectedInventorySlot===null ||
+        inventorySlots[selectedInventorySlot]!==item
     ){
         return;
     }
@@ -31311,7 +31368,7 @@ function sellSelectedItem(){
 
     /*
        ★ 修正（真正抓到問題根源）：
-       之前這裡的confirm()訊息一直說「獲得
+       之前這裡的確認訊息一直說「獲得
        XX金幣」，但從頭到尾沒有任何一行
        程式碼真的把這個數字加進任何地方——
        金幣系統當時根本不存在，這句話等於
@@ -33110,6 +33167,7 @@ catch(error){
 (function installMobileBackConfirmation(){
 
     let allowingExit=false;
+    let exitPromptOpen=false;
 
     window.allowGameNavigation=()=>{
         allowingExit=true;
@@ -33122,24 +33180,39 @@ catch(error){
         console.warn("無法建立返回防呆紀錄：",error);
     }
 
-    window.addEventListener("popstate",()=>{
+    window.addEventListener("popstate",async()=>{
         if(allowingExit){ return; }
 
-        const confirmed=confirm("確定要離開遊戲嗎？目前進度會先自動存檔。");
+        /* Native confirm used to block browser history while it was open.
+           The RPG dialog is asynchronous, so immediately restore a guard
+           entry before awaiting the player's choice. */
+        let guardRestored=false;
+        try{
+            history.pushState({rpgExitGuard:true},"",location.href);
+            guardRestored=true;
+        }catch(_){ }
+
+        if(exitPromptOpen){ return; }
+        exitPromptOpen=true;
+
+        const confirmed=
+            typeof window.rpgConfirm==="function" &&
+            await window.rpgConfirm(
+                "確定要離開遊戲嗎？目前進度會先自動存檔。",
+                {
+                    title:"離開冒險",
+                    confirmText:"儲存並離開",
+                    cancelText:"繼續冒險"
+                }
+            );
+
+        exitPromptOpen=false;
 
         if(confirmed){
             allowingExit=true;
             saveGame();
-            history.back();
-        }else{
-            history.pushState({rpgExitGuard:true},"",location.href);
+            history.go(guardRestored?-2:-1);
         }
-    });
-
-    window.addEventListener("beforeunload",event=>{
-        if(allowingExit){ return; }
-        event.preventDefault();
-        event.returnValue="";
     });
 
 })();

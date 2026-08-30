@@ -41,9 +41,9 @@ function baseContext(overrides={}){
     return context;
 }
 
-test("V146 is the final ordered runtime under cache key 147",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=147/);
-    assert.match(loader,/const V_ASSET_VERSION="147"/);
+test("V146 remains ordered before V149 under the current cache key",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=170/);
+    assert.match(loader,/const V_ASSET_VERSION="170"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -68,7 +68,7 @@ test("latest skill table contains every exact requested value",()=>{
 });
 
 test("battle timing, dead-target filtering and named choreography are enforced",()=>{
-    assert.match(timing,/earliestAt:Math\.max\([\s\S]*actionGate\?actionGate\.deadline:0/);
+    assert.match(timing,/earliestAt:Math\.max\([\s\S]*boundaryGate\?boundaryGate\.deadline:0/);
     assert.match(animation,/function canReceive\(config,side,index\)/);
     assert.match(animation,/entity\.hp\)>0/);
     assert.match(animation,/getSkillTargets\(queued\.target,targetType\)/);
@@ -134,7 +134,7 @@ test("turning on auto outside combat immediately consumes configured recovery",(
     assert.equal(saved,1);
 });
 
-test("Abyss rapid taps are locked, one step is bounded and NPC requires proximity",()=>{
+test("Abyss rapid taps are locked, one step is bounded and NPC portrait remains directly clickable",()=>{
     let moves=0,challenges=0;
     const map=element({
         dataset:{},classList:{add(){},remove(){}},
@@ -163,11 +163,8 @@ test("Abyss rapid taps are locked, one step is bounded and NPC requires proximit
     assert.ok(Math.hypot(parseFloat(player.style.left)-18,parseFloat(player.style.top)-78)<=24.001);
     map.dataset.v146Moving="0";
     context.v141ChallengeAbyssBoss();
-    assert.equal(challenges,0);
-    assert.match(message.textContent,/距離太遠/);
-    player.style.left="70%"; player.style.top="30%";
-    context.v141ChallengeAbyssBoss();
     assert.equal(challenges,1);
+    assert.equal(message.textContent,"");
 });
 
 test("inventory, home, synthesis, nav and slow exit all use the latest mobile contract",()=>{
@@ -181,7 +178,8 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.match(css,/#v141DungeonNav\[data-v146-columns="4"\]/);
     assert.match(css,/\.v146-abyss-return/);
     assert.match(rules,/"戰鬥失敗"/);
-    [index,fixes,source].forEach(file=>assert.match(file,/assets\/ui\/home-shop-v147\.png/));
+    assert.match(index,/assets\/ui\/home-shop\.png/);
+    [fixes,source].forEach(file=>assert.match(file,/assets\/ui\/home-shop-v147\.png/));
     const shopIcon=fs.readFileSync("assets/ui/home-shop-v147.png");
     assert.equal(shopIcon.subarray(1,4).toString(),"PNG");
     assert.equal(shopIcon[25],6,"shop icon must retain an RGBA alpha channel");

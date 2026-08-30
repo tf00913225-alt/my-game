@@ -1,0 +1,196 @@
+/* =====================================================
+   V154 — current dev layout and Abyss presentation fixes
+===================================================== */
+
+/* The single top action now applies and starts the element box. */
+#autoBattleSettingsPanel.v131-element-box-panel .auto-settings-actions{
+    display:none !important;
+}
+#autoBattleSettingsPanel.v131-element-box-panel #autoBattleButton{
+    min-width:112px !important;
+    padding-inline:10px !important;
+}
+
+/* Keep Element Box settings above every document-level battle effect. */
+body.v162-element-box-settings-open #game-stage{
+    z-index:2147483644 !important;
+}
+body.v162-element-box-settings-open #homeFeatureModal,
+body.v162-element-box-settings-open > #autoBattleSettingsPanel{
+    z-index:2147483645 !important;
+}
+
+/* The older equipment-specific shorthand kept background-size:auto 84%.
+   Override it at equal specificity so the supplied cover fills the card. */
+#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{
+    width:100% !important;
+    min-width:100% !important;
+    margin:0 !important;
+    background-position:center !important;
+    background-size:cover !important;
+}
+
+/* Keep the ability panel inside its real viewport and make it the scroll owner. */
+#game-stage #homeFeatureModal #characterTabContent{
+    box-sizing:border-box !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch !important;
+}
+
+/* Abyss portraits use the full 3:4 card frame; identity and bars remain readable. */
+#game-stage #battlePage.v154-abyss-battle .battle-monster.v154-abyss-portrait{
+    isolation:isolate !important;
+    overflow:visible !important;
+    background-image:
+        linear-gradient(180deg,rgba(3,3,3,.02) 0 48%,rgba(3,3,3,.32) 65%,rgba(3,3,3,.9) 100%),
+        var(--v152-abyss-portrait) !important;
+    background-position:center,center 12% !important;
+    background-size:100% 100%,cover !important;
+    background-repeat:no-repeat !important;
+}
+#game-stage #battlePage.v154-abyss-battle .battle-monster.v154-abyss-portrait > img.v162-abyss-battle-portrait-art{
+    position:absolute !important;
+    inset:0 !important;
+    z-index:0 !important;
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    border:0 !important;
+    border-radius:inherit !important;
+    object-fit:cover !important;
+    object-position:center 12% !important;
+    opacity:1 !important;
+    pointer-events:none !important;
+}
+#game-stage #battlePage.v154-abyss-battle .battle-monster.v154-abyss-portrait .battle-monster-icon{
+    width:27px !important;
+    height:29px !important;
+    min-height:29px !important;
+    flex:0 0 29px !important;
+    border:0 !important;
+    color:transparent !important;
+    background:none !important;
+    box-shadow:none !important;
+}
+#game-stage #battlePage.v154-abyss-battle .battle-monster.v154-abyss-portrait .battle-monster-name{
+    border-radius:3px !important;
+    background:rgba(3,3,3,.64) !important;
+    text-shadow:0 1px 2px #000,0 0 5px #000 !important;
+}
+#game-stage #battlePage.v154-abyss-battle .battle-monster.v154-abyss-portrait .monster-hp,
+#game-stage #battlePage.v154-abyss-battle .battle-monster.v154-abyss-portrait .monster-sp{
+    border-color:rgba(240,210,145,.58) !important;
+    background:rgba(4,4,4,.78) !important;
+}
+
+/* The cover already contains its title and character art; leave only the action. */
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete){
+    align-items:center !important;
+    justify-content:flex-end !important;
+    padding:14px 18px 22px !important;
+    background:
+        linear-gradient(180deg,transparent 0 76%,rgba(3,3,3,.76) 100%),
+        url("../assets/dungeons/abyss/abyss-cover.webp") center 35% / cover no-repeat !important;
+}
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) .v141-abyss-seal,
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) h3,
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) p{
+    display:none !important;
+}
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) button{
+    min-width:136px !important;
+    min-height:38px !important;
+    padding:7px 15px !important;
+    box-shadow:0 3px 14px rgba(0,0,0,.72) !important;
+}
+
+/* Map information becomes a compact overlay instead of consuming the art area. */
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell{
+    position:relative !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell > header{
+    position:absolute !important;
+    left:8px !important;
+    right:auto !important;
+    top:7px !important;
+    z-index:30 !important;
+    width:auto !important;
+    min-height:30px !important;
+    padding:4px 9px !important;
+    border:1px solid rgba(184,134,65,.7) !important;
+    border-radius:7px !important;
+    background:rgba(10,8,6,.72) !important;
+    box-shadow:0 2px 9px rgba(0,0,0,.48) !important;
+    backdrop-filter:blur(2px);
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell > header b{
+    font-size:14px !important;
+    line-height:20px !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell > header span{
+    display:none !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-boss{
+    width:120px !important;
+    height:168px !important;
+    min-width:120px !important;
+    min-height:168px !important;
+    gap:4px !important;
+    padding:6px 7px 8px !important;
+    overflow:hidden !important;
+    border-radius:12px !important;
+    background:linear-gradient(180deg,rgba(13,9,6,.2),rgba(13,9,6,.9)) !important;
+    box-shadow:0 0 20px rgba(226,149,39,.48),0 7px 18px rgba(0,0,0,.62) !important;
+    touch-action:manipulation !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-boss::before{
+    content:"" !important;
+    display:block !important;
+    width:100% !important;
+    min-height:0 !important;
+    flex:1 1 auto !important;
+    border-radius:8px !important;
+    background-position:center bottom !important;
+    background-repeat:no-repeat !important;
+    background-size:contain !important;
+    filter:drop-shadow(0 4px 5px rgba(0,0,0,.72));
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-1 .v141-abyss-boss::before{
+    background-image:url("../assets/dungeons/abyss/east-emperor.webp") !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-2 .v141-abyss-boss::before{
+    background-image:url("../assets/dungeons/abyss/south-emperor.webp") !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-3 .v141-abyss-boss::before{
+    background-image:url("../assets/dungeons/abyss/heaven-emperor.webp") !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-4 .v141-abyss-boss::before{
+    background-image:url("../assets/dungeons/abyss/north-emperor.webp") !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-5 .v141-abyss-boss::before{
+    background-image:url("../assets/dungeons/abyss/floor5-extreme-emperor.webp") !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-boss b{
+    display:block !important;
+    width:100% !important;
+    flex:0 0 auto !important;
+    padding:3px 4px !important;
+    border-radius:6px !important;
+    font-size:15px !important;
+    line-height:20px !important;
+    background:rgba(3,3,3,.72) !important;
+    text-align:center !important;
+    text-shadow:0 1px 3px #000 !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-boss span,
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-player small{
+    display:none !important;
+}

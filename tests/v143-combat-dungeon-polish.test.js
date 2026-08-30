@@ -13,9 +13,9 @@ const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
-test("V143 assets stay ordered before V144/V146 under cache version 147",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=147/);
-    assert.match(loader,/const V_ASSET_VERSION="147"/);
+test("V143 assets stay ordered before later patches under the current cache version",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=170/);
+    assert.match(loader,/const V_ASSET_VERSION="170"/);
     assert.match(loader,/css\/40-v143-combat-dungeon-polish\.css/);
     const order=[
         "js/37-v142-skill-animation.js",
@@ -55,7 +55,7 @@ test("every known battle skill has its own animation choreography",()=>{
         "waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain","freeze","healSpell","revive","waterEX",
         "stormFist","stormFlurry","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen","windEX",
         "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush","stoneThrow","sandWind","flyingSandStrike","dustStorm","earthShield","rockWall","barrier","earthEX",
-        "stormSpell","fireBurstStrike","yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing","windArrow"
+        "stormSpell","yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing","windArrow"
     ];
     expected.forEach(id=>assert.ok(context.v143SkillAnimationManifest[id],id+" needs a manifest entry"));
     const choreographies=expected.map(id=>JSON.stringify(context.v143SkillAnimationManifest[id]));
@@ -81,8 +81,8 @@ test("the three revised skills and hard-control caps match the requested values"
     assert.match(system,/freeze\.freezeChance=80/);
     assert.match(system,/freeze\.freezeDuration=4/);
     assert.match(rules,/regular:\{min:5,max:80\}/);
-    assert.match(rules,/elite:\{min:5,max:45\}/);
-    assert.match(rules,/boss:\{min:5,max:30\}/);
+    assert.match(rules,/elite:\{min:5,max:60\}/);
+    assert.match(rules,/boss:\{min:5,max:40\}/);
 });
 
 test("V143 rule patch applies the requested skill metadata at runtime",()=>{
@@ -101,7 +101,7 @@ test("V143 rule patch applies the requested skill metadata at runtime",()=>{
     vm.createContext(context);
     vm.runInContext(system,context);
     const snapshot=context.v143CombatRuleSnapshot();
-    assert.deepEqual(JSON.parse(JSON.stringify(snapshot.lockdownCaps)),{regular:80,elite:45,boss:30});
+    assert.deepEqual(JSON.parse(JSON.stringify(snapshot.lockdownCaps)),{regular:80,elite:60,boss:40});
     assert.equal(snapshot.stormRain.spCost,75);
     assert.equal(snapshot.iceArrowRain.spCost,75);
     assert.equal(snapshot.iceArrowRain.freezeChance,50);
@@ -147,7 +147,8 @@ test("dungeon escape restores its owner and Abyss movement uses the expanded map
     assert.match(dungeon,/Math\.max\(4,Math\.min\(96/);
     assert.match(dungeon,/Math\.max\(8,Math\.min\(94/);
     assert.match(css,/\.v141-abyss-map\{height:auto !important;min-height:0 !important;flex:1 1 auto !important;\}/);
-    assert.match(system,/點擊畫面繼續/);
+    assert.match(system,/點擊對話繼續/);
+    assert.match(system,/v141ApproachAbyssBoss\(openBossBubble\)/);
 });
 
 test("dungeon nav is in the scaled shell with exactly the five requested destinations",()=>{

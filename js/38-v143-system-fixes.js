@@ -90,7 +90,7 @@
     window.v143CombatRuleSnapshot=function(){
         return {
             version:VERSION,
-            lockdownCaps:{regular:80,elite:45,boss:30},
+            lockdownCaps:{regular:80,elite:60,boss:40},
             stormRain:skillDatabase&&skillDatabase.stormRain,
             iceArrowRain:skillDatabase&&skillDatabase.iceArrowRain,
             freeze:skillDatabase&&skillDatabase.freeze
@@ -108,6 +108,10 @@
 
     function applyIceRainFreezeToTargets(casterIndex,targetIndexes){
         if(!targetIndexes.length || typeof rollStatusEffectHit!=="function"){ return; }
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.iceArrowRain:null;
+        const freezeChance=Math.max(0,numeric(skill&&skill.freezeChance));
+        const freezeDuration=Math.max(1,numeric(skill&&skill.freezeDuration)||2);
+        if(!freezeChance){ return; }
         const candidates=targetIndexes.filter(index=>{
             const monster=typeof monsters!=="undefined"?monsters[index]:null;
             return monster&&monster.alive&&monster.hp>0;
@@ -119,13 +123,13 @@
         candidates.forEach(index=>{
             const monster=monsters[index];
             const hit=rollStatusEffectHit(
-                50,caster.level,monster.level,stats.intelligence,
+                freezeChance,caster.level,monster.level,stats.intelligence,
                 typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
                 true,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
             );
             if(hit){
-                applyFreezeEffect(monster,2);
-                addBattleLog(monster.name+"被冰霜箭雨冰封2回合！");
+                applyFreezeEffect(monster,freezeDuration);
+                addBattleLog(monster.name+"被冰霜箭雨冰封"+freezeDuration+"回合！");
                 if(typeof updateMonsterUI==="function"){ updateMonsterUI(index); }
             }else{
                 addBattleLog("冰霜箭雨的冰封效果被"+monster.name+"抵抗了。");
@@ -180,6 +184,8 @@
                 if(skill){ skill.freezeChance=savedChance; }
             }
             if(usedIceRain&&skill){
+                const freezeChance=Math.max(0,numeric(skill.freezeChance));
+                const freezeDuration=Math.max(1,numeric(skill.freezeDuration)||2);
                 const living=(typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes():[0,1,2]).filter(index=>{
                     const character=getPartyCharacterByIndex(index);
                     return character&&character.hp>0;
@@ -189,10 +195,10 @@
                     const caster=monsters[monsterIndex];
                     const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
                         ?getFinalBattleSpiritForPlayerTarget(target,targetIndex):numeric(target.spirit);
-                    if(rollStatusEffectHit(50,caster.level,target.level,numeric(caster.intelligencePoints),spirit,true,"regular",
+                    if(rollStatusEffectHit(freezeChance,caster.level,target.level,numeric(caster.intelligencePoints),spirit,true,"regular",
                         typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0)){
-                        applyFreezeEffect(target,2);
-                        addBattleLog((target.id||"角色")+"被冰霜箭雨冰封2回合！");
+                        applyFreezeEffect(target,freezeDuration);
+                        addBattleLog((target.id||"角色")+"被冰霜箭雨冰封"+freezeDuration+"回合！");
                         if(typeof updateUI==="function"){ updateUI(); }
                     }
                 });
@@ -630,35 +636,55 @@
         const previousChallenge=window.v141ChallengeAbyssBoss;
         window.v141ChallengeAbyssBoss=function(){
             const map=document.getElementById("v141AbyssMap");
-            if(!map||map.querySelector(".v143-abyss-dialogue")){ return; }
-            const heading=document.querySelector(".v141-abyss-shell > header b");
-            const match=heading&&heading.textContent.match(/第\s*(\d+)/);
-            const floor=Math.max(1,Math.min(5,Number(match&&match[1])||1));
-            const boss=map.querySelector(".v141-abyss-boss b");
-            const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();
-            let index=0;
-            const overlay=document.createElement("button");
-            overlay.type="button";
-            overlay.className="v143-abyss-dialogue";
-            overlay.innerHTML='<small>'+escapeHtml(boss&&boss.textContent||"守關者")+'</small><b></b><span>點擊畫面繼續　'+(index+1)+' / '+lines.length+'</span>';
-            const text=overlay.querySelector("b");
-            const hint=overlay.querySelector("span");
-            text.textContent=lines[index];
-            overlay.onclick=event=>{
-                event.preventDefault(); event.stopPropagation();
-                index++;
-                if(index<lines.length){
-                    text.textContent=lines[index];
-                    hint.textContent="點擊畫面繼續　"+(index+1)+" / "+lines.length;
-                    return;
+            if(!map||map.querySelector(".v143-abyss-dialogue")||map.dataset.v169DialogueApproaching==="1"){ return; }
+            map.dataset.v169DialogueApproaching="1";
+
+            const openBossBubble=()=>{
+                delete map.dataset.v169DialogueApproaching;
+                if(map.isConnected===false||map.querySelector(".v143-abyss-dialogue")){ return; }
+                const heading=document.querySelector(".v141-abyss-shell > header b");
+                const match=heading&&heading.textContent.match(/第\s*(\d+)/);
+                const floor=Math.max(1,Math.min(5,Number(match&&match[1])||1));
+                const bossButton=map.querySelector(".v141-abyss-boss");
+                const boss=bossButton&&bossButton.querySelector("b");
+                const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();
+                let index=0;
+                const overlay=document.createElement("button");
+                overlay.type="button";
+                overlay.className="v143-abyss-dialogue";
+                overlay.setAttribute("aria-label","守關者對話，點擊繼續");
+                overlay.innerHTML='<small>'+escapeHtml(boss&&boss.textContent||"守關者")+'</small><b></b><span>點擊對話繼續　'+(index+1)+' / '+lines.length+'</span>';
+                const text=overlay.querySelector("b");
+                const hint=overlay.querySelector("span");
+                text.textContent=lines[index];
+                overlay.onclick=event=>{
+                    event.preventDefault(); event.stopPropagation();
+                    index++;
+                    if(index<lines.length){
+                        text.textContent=lines[index];
+                        hint.textContent="點擊對話繼續　"+(index+1)+" / "+lines.length;
+                        return;
+                    }
+                    text.textContent="進入戰鬥……";
+                    hint.textContent="";
+                    overlay.disabled=true;
+                    window.__v143AbyssDialogueComplete=true;
+                    setTimeout(()=>{ overlay.remove(); previousChallenge(); },180);
+                };
+                map.appendChild(overlay);
+                if(bossButton){
+                    const mapRect=map.getBoundingClientRect();
+                    const bossRect=bossButton.getBoundingClientRect();
+                    overlay.style.left=(bossRect.left+bossRect.width/2-mapRect.left)+"px";
+                    overlay.style.top=Math.max(104,bossRect.top-mapRect.top-8)+"px";
                 }
-                text.textContent="進入戰鬥……";
-                hint.textContent="";
-                overlay.disabled=true;
-                window.__v143AbyssDialogueComplete=true;
-                setTimeout(()=>{ overlay.remove(); previousChallenge(); },180);
             };
-            map.appendChild(overlay);
+
+            if(typeof window.v141ApproachAbyssBoss==="function"){
+                if(!window.v141ApproachAbyssBoss(openBossBubble)){ delete map.dataset.v169DialogueApproaching; }
+            }else{
+                openBossBubble();
+            }
         };
     }
 

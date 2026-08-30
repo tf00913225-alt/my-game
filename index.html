@@ -203,10 +203,30 @@
             >
         </section>
 
-        <button class="creation-next" type="button" onclick="setCreationStep(2)">
+        <button
+            id="creationPrimaryNextButton"
+            class="creation-next creation-cancel-additional"
+            type="button"
+            onclick="setCreationStep(2)"
+        >
             <span>下一步：能力配點</span>
             <small>STEP 2 OF 2</small>
         </button>
+
+        <div
+            id="creationAdditionalStepOneActions"
+            class="creation-action-row creation-cancel-additional"
+            hidden
+        >
+            <button class="creation-back" type="button" onclick="cancelAdditionalCharacterCreation()">
+                <span>返回角色頁</span>
+                <small>RETURN</small>
+            </button>
+            <button class="creation-next" type="button" onclick="setCreationStep(2)">
+                <span>下一步：能力配點</span>
+                <small>STEP 2 OF 2</small>
+            </button>
+        </div>
 
         </div>
 
@@ -674,7 +694,7 @@
         金幣 <b>+100萬</b>
     </button>
     <button type="button" class="home-test-button" id="testExpTenMillionButton" onclick="grantTestExpTenMillion()">
-        經驗池 <b>+1000萬</b>
+        經驗池 <b>+10億</b>
     </button>
 </div>
 
@@ -730,7 +750,7 @@
         <div
             id="homeIconShop"
             class="home-card-icon"
-            style="background-image:url(assets/ui/home-shop-v147.png);"
+            style="background-image:url(assets/ui/home-shop.png);"
         ></div>
         <div class="home-card-label">
             商店
@@ -2770,13 +2790,13 @@
 </div>
 
 
-<script src="js/00-main.js?v=141"></script>
+<script src="js/00-main.js?v=170"></script>
 
 </div>
 </div>
 </div>
 <!-- V86: inventory-grid-scroll is now recognized by the existing V8 touch lock as the sole inventory scroll owner. -->
-<script id="stage-v8-touch-lock" src="js/01-stage-v8-touch-lock.js"></script>
+<script id="stage-v8-touch-lock" src="js/01-stage-v8-touch-lock.js?v=149"></script>
 
 
 <script id="stage-v9-native-coordinate-api" src="js/02-stage-v9-native-coordinate-api.js"></script>
@@ -2882,7 +2902,7 @@
 
 
 
-<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js"></script>
+<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js?v=170"></script>
 
 
 
@@ -2912,7 +2932,7 @@
      No damage/SP/initiative/skill formulas changed. -->
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
-<script src="js/20-anonymous-20.js?v=147"></script>
+<script src="js/20-anonymous-20.js?v=170"></script>
 <script id="v129-character-creation-native-runtime" src="js/24-v125-character-creation-native-runtime.js?v=129a"></script>
 
 

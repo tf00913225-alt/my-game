@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="147";
+const V_ASSET_VERSION="170";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -472,6 +472,122 @@ function vAssetUrl(path){
     }
 })();
 
+/* V148 loader — target truth, support rules and dungeon usability. */
+(function loadV148CombatDungeonFixesStyle(){
+    function load(){
+        if(document.getElementById("v148-combat-dungeon-fixes-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v148-combat-dungeon-fixes-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/43-v148-combat-dungeon-fixes.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V149 loader — final skill rules, shop alignment and combat feedback. */
+(function loadV149SkillUiRulesStyle(){
+    function load(){
+        if(document.getElementById("v149-skill-ui-rules-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v149-skill-ui-rules-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/44-v149-skill-ui-rules.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V152 loader — current dev fixes, dungeon art and final balance values. */
+(function loadV152DevFixesStyle(){
+    function load(){
+        if(document.getElementById("v152-dev-fixes-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v152-dev-fixes-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/45-v152-dev-fixes.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V154 loader — current battle, element box and Abyss fixes. */
+(function loadV154DevFixesStyle(){
+    function load(){
+        if(document.getElementById("v154-dev-fixes-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v154-dev-fixes-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/46-v154-dev-fixes.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V158 loader — final skill, combat-value and Abyss portrait tuning. */
+(function loadV158CombatTuningStyle(){
+    function load(){
+        if(document.getElementById("v158-combat-tuning-style")){ return; }
+        const link=document.createElement("link");
+        link.id="v158-combat-tuning-style";
+        link.rel="stylesheet";
+        link.href=vAssetUrl("css/47-v158-combat-tuning.css");
+        document.head.appendChild(link);
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
+/* V169 loader — Element Box settings, RPG UI and Abyss reward flow. */
+(function loadV169Styles(){
+    const styles=[
+        {id:"v169-element-box-settings-style",href:"css/48-v169-element-box-settings.css"},
+        {id:"v169-rpg-ui-style",href:"css/49-v169-rpg-ui.css"},
+        {id:"v169-abyss-flow-style",href:"css/50-v169-abyss-flow.css"}
+    ];
+
+    function load(){
+        styles.forEach(style=>{
+            if(document.getElementById(style.id)){ return; }
+            const link=document.createElement("link");
+            link.id=style.id;
+            link.rel="stylesheet";
+            link.href=vAssetUrl(style.href);
+            document.head.appendChild(link);
+        });
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -500,7 +616,17 @@ function vAssetUrl(path){
         {id:"v143-system-fixes-runtime",src:"js/38-v143-system-fixes.js"},
         {id:"v143-skill-animation-runtime",src:"js/39-v143-skill-animation.js"},
         {id:"v144-rules-and-abyss-runtime",src:"js/40-v144-rules-and-abyss.js"},
-        {id:"v146-system-polish-runtime",src:"js/41-v146-system-polish.js"}
+        {id:"v146-system-polish-runtime",src:"js/41-v146-system-polish.js"},
+        {id:"v148-combat-dungeon-fixes-runtime",src:"js/42-v148-combat-dungeon-fixes.js"},
+        {id:"v149-skill-ui-rules-runtime",src:"js/43-v149-skill-ui-rules.js"},
+        {id:"v152-dev-fixes-runtime",src:"js/44-v152-dev-fixes.js"},
+        {id:"v154-dev-fixes-runtime",src:"js/45-v154-dev-fixes.js"},
+        {id:"v155-dev-fixes-runtime",src:"js/46-v155-dev-fixes.js"},
+        {id:"v158-combat-tuning-runtime",src:"js/47-v158-combat-tuning.js"},
+        {id:"v159-abyss-battle-portraits-runtime",src:"js/48-v159-abyss-battle-portraits.js"},
+        {id:"v169-element-box-settings-runtime",src:"js/49-v169-element-box-settings.js"},
+        {id:"v169-water-skill-rules-runtime",src:"js/50-v169-water-skill-rules.js"},
+        {id:"v169-rpg-ui-runtime",src:"js/51-v169-rpg-ui.js"}
     ];
 
     function next(index){

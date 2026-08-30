@@ -436,8 +436,8 @@ test("hard-control square-root scaling and rank caps stay exact",()=>{
         90,10,10,100,0,true,rank,0,"physical"
     );
     assert.equal(calculate("regular"),80);
-    assert.equal(calculate("elite"),45);
-    assert.equal(calculate("boss"),30);
+    assert.equal(calculate("elite"),60);
+    assert.equal(calculate("boss"),40);
     assert.equal(context.v140CalculateStatusEffectChance(
         30,10,10,100,20,true,"regular",0,"physical"
     ),26);
@@ -587,8 +587,8 @@ test("V140 remains before the ordered V141/V142 layers and both cache keys are b
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
-    assert.match(loaderSource,/const V_ASSET_VERSION="147"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=147/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="170"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=170/);
 });
 
 console.log("\nV140 four-element balance suite: "+passed+" tests passed.");

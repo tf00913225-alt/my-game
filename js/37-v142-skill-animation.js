@@ -25,11 +25,11 @@
         flameTornado:[2100,"high","tornado"],phoenixCry:[3200,"ultimate","phoenix"],
         rage:[1500,"medium","aura"],fireEX:[3000,"ultimate","aura"],
 
-        waterKnife:[720,"basic","slash"],frostPunch:[980,"basic","ice-impact"],
-        iceSpin:[1500,"medium","ice-barrage"],frostCrush:[2150,"high","ice-impact"],
-        waterBall:[900,"basic","projectile"],floodBeast:[1650,"medium","wave"],
-        iceArrowRain:[2500,"high","ice-rain"],freeze:[1850,"high","freeze"],
-        healSpell:[1500,"medium","heal"],revive:[2400,"high","revive"],
+        waterKnife:[800,"basic","slash"],frostPunch:[900,"basic","ice-impact"],
+        iceSpin:[1000,"medium","ice-barrage"],frostCrush:[1150,"high","ice-impact"],
+        waterBall:[1100,"basic","projectile"],floodBeast:[1350,"medium","wave"],
+        iceArrowRain:[1600,"high","ice-rain"],freeze:[950,"high","freeze"],
+        healSpell:[1250,"medium","heal"],revive:[1800,"high","revive"],
         waterEX:[3000,"ultimate","aura"],
 
         stormFist:[720,"basic","impact"],stormFlurry:[1250,"medium","barrage"],
@@ -46,7 +46,7 @@
         earthShield:[1600,"medium","shield"],rockWall:[1850,"high","shield"],
         barrier:[2300,"high","barrier"],earthEX:[3000,"ultimate","aura"],
 
-        stormSpell:[2450,"high","tempest"],fireBurstStrike:[1250,"medium","burst"],
+        stormSpell:[2450,"high","tempest"],
         yuanXiangGuangMing:[2200,"high","holy-heal"],
         yuanGuangShield:[1950,"high","holy-shield"],
         yuanZuBlessing:[2500,"high","holy-blessing"]
@@ -115,7 +115,7 @@
         if(typeof skillDatabase==="undefined"){ return {id:skillId,skill:null}; }
         if(skillId&&skillDatabase[skillId]){ return {id:skillId,skill:skillDatabase[skillId]}; }
         let foundId=null;
-        Object.keys(skillDatabase).some(id=>{
+        Object.getOwnPropertyNames(skillDatabase).some(id=>{
             const candidate=skillDatabase[id];
             if(candidate&&candidate.name===name&&(!element||!candidate.element||candidate.element===element)){
                 foundId=id;
@@ -509,7 +509,9 @@
 
     function startFromBadge(side,name,element,actorIndex){
         if(typeof battleActive!=="undefined"&&!battleActive){ return null; }
-        return director.play(animationConfig(null,name,element),{
+        const config=animationConfig(null,name,element);
+        if(config.category==="passive"||config.targetType==="none"){ return null; }
+        return director.play(config,{
             side:side,
             actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
             key:identity(side,name,actorIndex)
@@ -548,7 +550,7 @@
     }
 
     function runTicket(kind,ticket,invoke){
-        const key=[kind,ticket.token,ticket.index,ticket.gateId].join("|");
+        const key=[kind,ticket.token,ticket.round,ticket.index,ticket.gateId].join("|");
         if(ticket.consumed||state.completedBoundaries.indexOf(key)>=0){
             state.metrics.duplicateBoundariesBlocked++;
             return;
@@ -613,32 +615,38 @@
             const beforeDeclare=typeof activeBattleCharacterIndex!=="undefined"?activeBattleCharacterIndex:null;
             const beforeResolve=typeof initiativeIndex!=="undefined"?initiativeIndex:null;
             const calledAt=Date.now();
+            const delayOverride=typeof window!=="undefined"&&Number.isFinite(Number(window.__battleAdvanceDelayOverrideMs))
+                ?Math.max(0,Number(window.__battleAdvanceDelayOverrideMs)):null;
             const result=previous.apply(this,arguments);
             const actionGate=currentGate();
+            const boundaryGate=delayOverride===null?actionGate:null;
 
             if(phase==="declare"&&typeof activeBattleCharacterIndex!=="undefined"&&activeBattleCharacterIndex!==beforeDeclare){
                 state.tickets.declare={
-                    token:token,index:activeBattleCharacterIndex,
-                    gate:actionGate,gateId:actionGate?actionGate.id:"none",
-                    earliestAt:Math.max(calledAt+CURRENT_DECLARE_DELAY_MS,actionGate?actionGate.deadline:0),
+                    token:token,round:typeof turn!=="undefined"?turn:0,index:activeBattleCharacterIndex,
+                    gate:boundaryGate,gateId:boundaryGate?boundaryGate.id:"none",
+                    earliestAt:Math.max(
+                        calledAt+(delayOverride===null?CURRENT_DECLARE_DELAY_MS:delayOverride),
+                        boundaryGate?boundaryGate.deadline:0
+                    ),
                     consumed:false
                 };
             }else if(phase==="resolve"&&typeof initiativeIndex!=="undefined"&&initiativeIndex!==beforeResolve){
                 const roundEnded=typeof initiativeQueue!=="undefined"&&initiativeIndex>=initiativeQueue.length;
-                state.roundGate=roundEnded&&actionGate
-                    ?{token:token,gate:actionGate,consumed:false}
+                state.roundGate=roundEnded&&boundaryGate
+                    ?{token:token,gate:boundaryGate,consumed:false}
                     :null;
                 state.tickets.resolve={
-                    token:token,index:initiativeIndex,
+                    token:token,round:typeof turn!=="undefined"?turn:0,index:initiativeIndex,
                     /* The last combatant must also hold processNextCombatant.
                        Waiting only inside beginCharacterTurn was too late:
                        startTurn had already switched to declare and exposed
                        the manual HUD while the last animation was playing. */
-                    gate:actionGate,
-                    gateId:actionGate?actionGate.id:"none",
+                    gate:boundaryGate,
+                    gateId:boundaryGate?boundaryGate.id:"none",
                     earliestAt:Math.max(
-                        calledAt+resolveDelay(initiativeIndex),
-                        actionGate?actionGate.deadline:0
+                        calledAt+(delayOverride===null?resolveDelay(initiativeIndex):delayOverride),
+                        boundaryGate?boundaryGate.deadline:0
                     ),
                     consumed:false
                 };

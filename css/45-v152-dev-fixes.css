@@ -1,0 +1,264 @@
+/* =====================================================
+   V152 — current dev layout, combat and dungeon art fixes
+===================================================== */
+
+/* Dungeon pages occupy one legacy canvas; only their content reserves nav space. */
+#game-stage #app.v141-dungeon-active > #game-content{
+    padding:0 !important;
+    overflow:hidden !important;
+}
+#game-stage #app.v141-dungeon-active #dungeonPage,
+#game-stage #app.v141-dungeon-active #dungeonPage.active{
+    position:absolute !important;
+    inset:0 !important;
+    display:flex !important;
+    width:auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    flex-direction:column !important;
+    box-sizing:border-box !important;
+    padding:6px 7px 84px !important;
+    overflow:hidden !important;
+    background:linear-gradient(180deg,#171108 0%,#090806 100%) !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) > h2,
+#game-stage #dungeonPage:not(.v146-abyss-active) > h2 + div{
+    flex:0 0 auto !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) #dungeonTabContent{
+    flex:1 1 auto !important;
+    width:auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 3px !important;
+    padding:0 0 10px !important;
+    box-sizing:border-box !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) .v141-dungeon-cover-list{
+    display:grid !important;
+    min-height:0 !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    align-content:start !important;
+    gap:9px !important;
+    padding:4px 3px 12px !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) .v141-dungeon-cover-card,
+#game-stage #dungeonPage:not(.v146-abyss-active) .v141-dungeon-cover-card:first-child{
+    width:100% !important;
+    min-width:0 !important;
+    grid-column:auto !important;
+    box-sizing:border-box !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) .v141-dungeon-cover-art{
+    aspect-ratio:16 / 9 !important;
+    background-position:center !important;
+    background-size:cover !important;
+    background-repeat:no-repeat !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) .v141-dungeon-cover-art span,
+#game-stage #dungeonPage:not(.v146-abyss-active) .v141-dungeon-cover-art small{
+    display:none !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="exp"] .v141-dungeon-cover-art{
+    background-image:linear-gradient(180deg,transparent 58%,rgba(7,5,3,.38)),url("../assets/dungeons/covers/exp.webp") !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="material"] .v141-dungeon-cover-art{
+    background-image:linear-gradient(180deg,transparent 58%,rgba(7,5,3,.38)),url("../assets/dungeons/covers/material.webp") !important;
+}
+#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{
+    background-image:linear-gradient(180deg,transparent 58%,rgba(7,5,3,.38)),url("../assets/dungeons/covers/equipment.webp") !important;
+}
+
+/* Daily and Abyss share one undistorted five-slot bottom navigation. */
+#game-stage #app.v141-dungeon-active #v141DungeonNav,
+#game-stage #app.v141-dungeon-active #v141DungeonNav[data-v146-columns="4"],
+#game-stage #app.v141-dungeon-active #v141DungeonNav[data-v146-columns="5"]{
+    position:absolute !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    z-index:790 !important;
+    display:grid !important;
+    width:420px !important;
+    max-width:none !important;
+    height:84px !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    gap:0 !important;
+    box-sizing:border-box !important;
+    transform:none !important;
+    overflow:hidden !important;
+}
+#game-stage #v141DungeonNav .nav-button{
+    display:flex !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    height:100% !important;
+    align-items:center !important;
+    justify-content:center !important;
+    padding:2px !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+}
+#game-stage #v141DungeonNav .nav-art-button{
+    display:block !important;
+    width:100% !important;
+    height:72px !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    transform:none !important;
+}
+
+#game-stage #dungeonPage.v146-abyss-active{
+    padding:0 0 84px !important;
+}
+#game-stage #dungeonPage.v146-abyss-active #dungeonTabContent{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    margin:0 !important;
+}
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro{
+    min-height:0 !important;
+    background:
+        linear-gradient(180deg,rgba(5,4,3,.08),rgba(5,4,3,.74)),
+        url("../assets/dungeons/abyss/abyss-cover.webp") center 35% / cover no-repeat !important;
+}
+
+/* HP loss always sits above the document-level skill stage. */
+body > .damage-popup.v152-top-damage{
+    position:fixed !important;
+    z-index:2147483646 !important;
+    margin:0 !important;
+    pointer-events:none !important;
+}
+
+/* Enemy identity is centered on its actual card width. */
+#game-stage > #app > #game-content #battlePage .battle-monster-name.v143-monster-identity{
+    display:flex !important;
+    width:100% !important;
+    align-self:center !important;
+    align-items:center !important;
+    justify-content:center !important;
+    margin-right:auto !important;
+    margin-left:auto !important;
+    padding:0 !important;
+    box-sizing:border-box !important;
+    text-align:center !important;
+    transform-origin:center center !important;
+}
+
+/* Abyss floors 1–4 use the supplied emperor/soldier illustrations. */
+#game-stage #battlePage .battle-monster.v152-abyss-portrait{
+    isolation:isolate;
+    background-image:
+        linear-gradient(180deg,rgba(6,5,4,.05) 0%,rgba(6,5,4,.42) 47%,rgba(6,5,4,.94) 100%),
+        var(--v152-abyss-portrait) !important;
+    background-position:center 17% !important;
+    background-size:cover !important;
+    background-repeat:no-repeat !important;
+}
+#game-stage #battlePage .battle-monster.v152-abyss-portrait > *{
+    position:relative;
+    z-index:2;
+}
+#game-stage #battlePage .battle-monster.v152-abyss-portrait .battle-monster-icon{
+    color:transparent !important;
+    background-image:var(--v152-abyss-portrait) !important;
+    background-position:center 15% !important;
+    background-size:cover !important;
+    background-repeat:no-repeat !important;
+    border-radius:4px !important;
+    box-shadow:0 0 5px rgba(255,220,145,.45) !important;
+}
+
+/* Frostbite blocks only the skill command and equipped skill choices. */
+#game-stage #mainBattleMenu > .menu-button.skill.v152-frostbite-blocked{
+    z-index:6 !important;
+    cursor:not-allowed !important;
+    pointer-events:none !important;
+}
+#game-stage #mainBattleMenu > .menu-button.skill.v152-frostbite-blocked::after{
+    content:"🚫" !important;
+    inset:10% !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    border-radius:12px !important;
+    opacity:1 !important;
+    color:#fff !important;
+    background:rgba(8,12,18,.56) !important;
+    filter:drop-shadow(0 0 4px #000) !important;
+    font-size:31px !important;
+    line-height:1 !important;
+}
+#game-stage .skill-quick-button.v152-frostbite-blocked{
+    cursor:not-allowed !important;
+    filter:grayscale(.85) brightness(.58) !important;
+}
+#game-stage .skill-quick-button .v152-frostbite-symbol{
+    position:absolute;
+    inset:0;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    background:rgba(7,11,17,.44);
+    font-size:27px;
+    line-height:1;
+    text-shadow:0 2px 4px #000;
+    pointer-events:none;
+}
+
+/* Give the Skill hotspot a narrow priority overlap at its right boundary. */
+#game-stage #mainBattleMenu > .menu-button.skill{
+    width:21.5% !important;
+    z-index:4 !important;
+}
+
+/* Patrol overlays requested for removal/dismissal. */
+#v141TaskTracker,
+#game-stage #mapPage .v141-task-tracker{
+    display:none !important;
+}
+.v141-reward-toast{
+    pointer-events:auto !important;
+    cursor:pointer !important;
+    touch-action:manipulation !important;
+}
+
+/* Abyss battles keep the standard combat information panel visible. */
+#game-stage #battlePage.v152-abyss-battle #battleInfo{
+    display:block !important;
+    min-height:42px !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    overflow-y:auto !important;
+}
+
+@media (max-height:720px){
+    #game-stage #app.v141-dungeon-active #dungeonPage,
+    #game-stage #app.v141-dungeon-active #dungeonPage.active{
+        padding-bottom:80px !important;
+    }
+    #game-stage #app.v141-dungeon-active #v141DungeonNav{
+        height:80px !important;
+    }
+    #game-stage #v141DungeonNav .nav-art-button{
+        height:68px !important;
+    }
+}
+
+@media (prefers-reduced-motion:reduce){
+    body > .damage-popup.v152-top-damage{
+        animation-duration:.01ms !important;
+    }
+}

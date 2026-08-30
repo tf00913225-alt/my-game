@@ -60,9 +60,9 @@ function run(context){
     return context;
 }
 
-test("V144 assets remain ordered before V146 under cache version 147",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=147/);
-    assert.match(loader,/const V_ASSET_VERSION="147"/);
+test("V144 assets remain ordered before later patches under the current cache version",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=170/);
+    assert.match(loader,/const V_ASSET_VERSION="170"/);
     assert.match(loader,/css\/41-v144-rules-and-abyss\.css/);
     const order=[
         "js/38-v143-system-fixes.js","js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -229,7 +229,7 @@ test("Abyss floor 5 has the exact fixed order, skills and maximum levels",()=>{
     assert.deepEqual(Array.from(roster[3].skillIds),["iceArrowRain"]);
     assert.deepEqual(Array.from(roster[3].v141SupportSkillIds),["revive","healSpell"]);
     assert.deepEqual(Array.from(roster[4].skillIds),["phoenixCry","dragonSlash"]);
-    assert.deepEqual(Array.from(roster[7].skillIds),["fireBurstStrike"]);
+    assert.deepEqual(Array.from(roster[7].skillIds),["fireCritical"]);
     assert.deepEqual(Array.from(roster[8].v141SupportSkillIds),["dodgeSkill"]);
     assert.ok(roster.every(monster=>monster.v141ForceSkillLevel===5));
 });

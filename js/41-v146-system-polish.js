@@ -355,30 +355,6 @@
         };
     }
 
-    if(typeof window.v141ChallengeAbyssBoss==="function"){
-        const previousAbyssChallenge=window.v141ChallengeAbyssBoss;
-        window.v141ChallengeAbyssBoss=function(){
-            const map=document.getElementById("v141AbyssMap");
-            const playerElement=document.getElementById("v141AbyssPlayer");
-            const boss=map&&map.querySelector(".v141-abyss-boss");
-            if(!map||!playerElement||!boss){ return; }
-            const distance=Math.hypot(
-                percentagePosition(playerElement,"left",18)-percentagePosition(boss,"left",70),
-                percentagePosition(playerElement,"top",78)-percentagePosition(boss,"top",26)
-            );
-            if(map.dataset.v146Moving==="1"||distance>20){
-                const message=document.querySelector(".v141-abyss-shell > header span");
-                if(message){ message.textContent=map.dataset.v146Moving==="1"?"請等角色走完再與守關者對話":"距離太遠，請先走到守關者旁邊。"; }
-                map.classList.remove("v146-too-far");
-                void map.offsetWidth;
-                map.classList.add("v146-too-far");
-                setTimeout(()=>map.classList.remove("v146-too-far"),620);
-                return;
-            }
-            return previousAbyssChallenge.apply(this,arguments);
-        };
-    }
-
     function dungeonNavMarkup(abyssMapActive){
         const buttons=[
             ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],

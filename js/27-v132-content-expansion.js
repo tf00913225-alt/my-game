@@ -142,16 +142,27 @@
         );
     }
 
-    function talismanIcon(tier){
-        const c=TIER_COLORS[tier]||TIER_COLORS.low;
-        return svgWrap(
-            '<rect x="14" y="6" width="36" height="52" rx="4" '+
-            'fill="#241a10" stroke="'+c.main+'" stroke-width="2.5"/>'+
-            '<line x1="32" y1="12" x2="32" y2="52" stroke="'+c.glow+'" stroke-width="1.2" stroke-dasharray="2,3"/>'+
-            '<circle cx="32" cy="20" r="4" fill="'+c.main+'"/>'+
-            '<path d="M22 30 L42 30 M22 38 L42 38 M22 46 L42 46" stroke="'+c.glow+'" stroke-width="2"/>',
-            c.glow
-        );
+    const TALISMAN_ART={
+        freeze:"assets/items/talismans/freeze.png",
+        barrier:"assets/items/talismans/barrier.png",
+        stealth:"assets/items/talismans/stealth.png"
+    };
+    const BLUEPRINT_ART={
+        head:"assets/items/blueprints/head.png",
+        shoulder:"assets/items/blueprints/shoulder.png",
+        shoes:"assets/items/blueprints/shoes.png",
+        hand:"assets/items/blueprints/hand.png",
+        armor:"assets/items/blueprints/armor.png"
+    };
+
+    function rasterItemIcon(path,tier,kind){
+        const rarity=tier?" v169-rarity-"+tier:"";
+        return '<span class="v169-item-art v169-'+kind+'-art'+rarity+'">'+
+            '<img src="'+path+'" alt="" aria-hidden="true" draggable="false"></span>';
+    }
+
+    function talismanIcon(effect,tier){
+        return rasterItemIcon(TALISMAN_ART[effect]||TALISMAN_ART.freeze,tier,"talisman");
     }
 
     function oreIcon(tier){
@@ -164,16 +175,8 @@
         );
     }
 
-    function blueprintIcon(tier){
-        const c=TIER_COLORS[tier]||TIER_COLORS.low;
-        return svgWrap(
-            '<rect x="10" y="8" width="44" height="48" rx="2" '+
-            'fill="#12251f" stroke="'+c.main+'" stroke-width="2.5"/>'+
-            '<path d="M16 18 H48 M16 26 H48 M16 34 H36 M16 42 H40" '+
-            'stroke="'+c.glow+'" stroke-width="1.6"/>'+
-            '<circle cx="46" cy="46" r="6" fill="none" stroke="'+c.glow+'" stroke-width="2"/>',
-            c.glow
-        );
+    function blueprintIcon(slot,tier){
+        return rasterItemIcon(BLUEPRINT_ART[slot]||BLUEPRINT_ART.hand,tier,"blueprint");
     }
 
     function chestIcon(){
@@ -189,22 +192,7 @@
     }
 
     function ticketIcon(elementKey){
-        const palette={
-            fire:{main:"#d94a2a",glow:"#ffb37a"},
-            water:{main:"#2a7ed9",glow:"#9ed4ff"},
-            earth:{main:"#b3792a",glow:"#f0c987"},
-            wind:{main:"#2fa870",glow:"#a8f0cf"}
-        };
-        const c=palette[elementKey]||palette.fire;
-        return svgWrap(
-            '<rect x="6" y="18" width="52" height="28" rx="5" '+
-            'fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2.5"/>'+
-            '<circle cx="6" cy="32" r="5" fill="#12100c"/>'+
-            '<circle cx="58" cy="32" r="5" fill="#12100c"/>'+
-            '<line x1="24" y1="18" x2="24" y2="46" stroke="'+c.glow+'" stroke-width="1.5" stroke-dasharray="2,3"/>'+
-            '<circle cx="42" cy="32" r="7" fill="'+c.glow+'" opacity="0.85"/>',
-            c.glow
-        );
+        return rasterItemIcon("assets/items/tickets/"+elementKey+".png",null,"ticket");
     }
 
     const SET_PALETTE={
@@ -255,7 +243,7 @@
             talismanDefinitions.push({
                 id:effect.key+"Talisman"+tier.key.charAt(0).toUpperCase()+tier.key.slice(1),
                 name:tier.label+effect.label,
-                icon:talismanIcon(tier.key),
+                icon:talismanIcon(effect.key,tier.key),
                 type:"talisman",
                 talismanEffect:effect.key,
                 talismanDuration:effect.duration,
@@ -320,7 +308,7 @@
                 blueprintDefinitions.push({
                     id:"blueprint"+series.id.replace("set","")+slot.key.charAt(0).toUpperCase()+slot.key.slice(1)+tier.key.charAt(0).toUpperCase()+tier.key.slice(1),
                     name:series.label+tier.label+slot.label+"設計圖",
-                    icon:blueprintIcon(tier.key),
+                    icon:blueprintIcon(slot.key,tier.key),
                     type:"material",
                     blueprintSlot:slot.key,
                     tierKey:tier.key,
@@ -355,6 +343,30 @@
     function getTicketDefinition(id){
         return ticketDefinitions.find(def=>def.id===id)||null;
     }
+
+    /*
+       V169：抽獎券圖改為 inbox 提供的 PNG 後，舊存檔仍會保留
+       當時寫入物件裡的 inline SVG（或空 icon）。依穩定 id 只同步
+       四張抽獎券的展示資料，不碰數量、掉落與套裝裝備本體。
+    */
+    function syncTicketPresentation(item,definition){
+        if(!item || !definition || item.id!==definition.id){ return item; }
+        item.name=definition.name;
+        item.icon=definition.icon;
+        item.type=definition.type;
+        item.setId=definition.setId;
+        item.price=definition.price;
+        return item;
+    }
+
+    function hydrateOwnedTicketPresentation(){
+        inventoryItems.forEach(item=>{
+            const definition=item&&getTicketDefinition(item.id);
+            if(definition){ syncTicketPresentation(item,definition); }
+        });
+    }
+
+    hydrateOwnedTicketPresentation();
 
 
     /* =====================================================
@@ -500,8 +512,10 @@
 
         let remaining=quantity;
         const stacks=inventoryItems.filter(item=>item && item.id===definition.id);
+        const ticketDefinition=getTicketDefinition(definition.id);
         stacks.forEach(stack=>{
             if(remaining<=0){ return; }
+            if(ticketDefinition){ syncTicketPresentation(stack,ticketDefinition); }
             const current=Math.max(0,Math.floor(Number(stack.count)||0));
             const space=Math.max(0,maxStack-current);
             const add=Math.min(space,remaining);
@@ -1461,7 +1475,7 @@
        舊版存檔key，從來沒有碰過這個key——所以刪完角色重新創角，
        副本次數還是上一個角色用掉的狀態。
 
-       這裡不去包resetGame()（它是先confirm()再location.reload()，
+       這裡不去包resetGame()（它是先取得玩家確認再location.reload()，
        包在外面會變成「使用者按了取消，資料卻已經被清掉」），改成
        在腳本載入時判斷「目前根本沒有任何角色」——resetGame()會
        reload，reload後loadGame()找不到存檔，player.id會是空字串，
@@ -1910,10 +1924,18 @@
     }
 
     function confirmDungeonEntry(title,details){
-        return window.confirm(
+        if(typeof window.rpgConfirm!=="function"){
+            return Promise.resolve(false);
+        }
+        return window.rpgConfirm(
             "確定要進入「"+title+"」嗎？\n\n"+
             details+"\n\n"+
-            "進入後才會開始戰鬥；挑戰失敗不會扣除今日次數。"
+            "進入後才會開始戰鬥；挑戰失敗不會扣除今日次數。",
+            {
+                title:"副本確認",
+                confirmText:"進入副本",
+                cancelText:"返回"
+            }
         );
     }
 
@@ -1939,7 +1961,7 @@
         }
     };
 
-    function beginExpDungeon(){
+    async function beginExpDungeon(){
         if(!isDungeonAvailable("exp")){
             alert("經驗副本今天已經挑戰過了。");
             return;
@@ -1949,7 +1971,7 @@
             alert("經驗副本需要主角色等級達到10級才能開啟。");
             return;
         }
-        if(!confirmDungeonEntry(
+        if(!await confirmDungeonEntry(
             "經驗副本",
             "將連續進行3場戰鬥，基礎獎勵為目前全隊升級需求平均值的11%。"
         )){
@@ -1965,7 +1987,7 @@
        17. 材料副本：雙角色20級開放，5精英+5普通，寶箱獎勵
     ===================================================== */
 
-    function beginMaterialDungeon(){
+    async function beginMaterialDungeon(){
         if(!isDungeonAvailable("material")){
             alert("材料副本今天已經挑戰過了。");
             return;
@@ -1978,7 +2000,7 @@
             alert("請先預留可放入3個材料寶箱的背包空間，再挑戰材料副本。");
             return;
         }
-        if(!confirmDungeonEntry(
+        if(!await confirmDungeonEntry(
             "材料副本",
             "本場共有10隻怪物；通關後材料寶箱只會放進背包，不會自動開啟。"
         )){
@@ -2138,7 +2160,7 @@
     }
     window.v138GetEquipmentDungeonComposition=getEquipmentDungeonComposition;
 
-    function beginEquipmentDungeon(){
+    async function beginEquipmentDungeon(){
         if(!isDungeonAvailable("equipment")){
             alert("裝備副本今天已經挑戰過了。");
             return;
@@ -2153,7 +2175,7 @@
         }
 
         const composition=getEquipmentDungeonComposition();
-        if(!confirmDungeonEntry(
+        if(!await confirmDungeonEntry(
             "裝備副本",
             "偵測到"+composition.playerCount+"名玩家：本場將出現"+
             composition.bossCount+"隻BOSS與"+composition.eliteCount+"隻精英怪。"
@@ -2209,7 +2231,7 @@
         v132ShowRewardModal(html);
     }
 
-    window.v132ClaimEquipmentDungeonReward=function(ticketId,doubled){
+    window.v132ClaimEquipmentDungeonReward=async function(ticketId,doubled){
         function grant(amount){
             const definition=getTicketDefinition(ticketId);
             if(!definition){ return; }
@@ -2233,7 +2255,16 @@
         }
 
         if(!doubled){
-            const askDouble=window.confirm("要看廣告雙倍領取這張抽獎券嗎？");
+            const askDouble=
+                typeof window.rpgConfirm==="function" &&
+                await window.rpgConfirm(
+                    "要看廣告雙倍領取這張抽獎券嗎？",
+                    {
+                        title:"裝備副本獎勵",
+                        confirmText:"觀看廣告雙倍",
+                        cancelText:"直接領取"
+                    }
+                );
             if(askDouble){
                 showRewardedAd(function(){ grant(2); },function(){
                     alert("廣告未完成，改為直接領取。");
