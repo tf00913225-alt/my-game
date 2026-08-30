@@ -43,7 +43,8 @@
    `tests/v157-abyss-map-tap-fix.test.js`，V158 新增技能／命中／傷害與深淵立繪驗收
    `tests/v158-combat-tuning.test.js`，V159 新增深淵戰鬥立繪載入時序驗收
    `tests/v159-abyss-battle-portraits.test.js`，V160 新增技能數值／目標、元素匣與火系動畫驗收
-   `tests/v160-current-request.test.js`。驗證至少要包含：
+   `tests/v160-current-request.test.js`，V161 新增火焰斬正式 Sprite VFX 驗收
+   `tests/v161-flame-slash-vfx.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -55,7 +56,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-30，V160 技能／元素匣／火系動畫修正）
+## 目前狀態（截至 2026-08-30，V161 火焰斬正式 Sprite VFX）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -130,7 +131,7 @@
   只播一次、火鳳天鳴全場只播一隻、火箭涵蓋施放者至目標群組；第 8 幀同步傷害／MISS／
   命中／成功狀態，完整 12 幀後才解除行動閘門。燃燒 0.8 秒與怒火 1 秒循環不阻擋回合，
   並依既有狀態資料移除。快取版本升至 153，只發布 `dev`；本批沒有收到
-  `flame-slash-cast.png`，火焰斬仍沿用舊通用演出，禁止拿其他技能素材代替。
+  `flame-slash-cast.png`，火焰斬當時仍沿用舊通用演出；V161 已用後續補交的正式素材完成接入。
 - V154 修正戰鬥動畫交棒、元素匣自動補品與主按鈕、怒火逐卡動畫、能力值捲動、裝備
   副本封面、深淵一至五關立繪及資訊遮擋；只發布 `dev`，未合併 `main`。
 - V155 將冰封／石化不能行動的交棒固定為 0.3 秒；第五關五帝與五名天兵天將改用本輪
@@ -157,6 +158,9 @@
 - V160 將冰霜箭雨最終冰封率改為 20%，硬控上限改為普通 80%／精英 60%／BOSS 40%；
   修正 `allyTri` 被動畫層誤當全體、元素匣補品被第一人優先耗盡、火焰斬缺少命中斬擊與
   火箭 Sprite 過度放大。快取版本升至 160，不新增 runtime，只發布 `dev`，不得合併或推送 `main`。
+- V161 將補交的 `flame-slash-cast.png` 校正為真正透明 RGBA PNG，依 4×3、12 幀接入既有
+  V142／V143 播放器；只在有效單體目標中央播放一次、總長 0.76 秒，第 8 幀同步傷害與命中反應。
+  V160 的臨時 CSS 斬擊已移除，快取版本升至 161，只發布 `dev`，不得合併或推送 `main`。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -183,7 +187,7 @@ V131～V136 的邏輯 patch 則在 V137 改由
 
 **不要把 V131～V136 runtime 改回各自獨立 append。** 動態插入的 script
 原本會以 async 行為競速；這些檔案又會一層層包裝相同全域函式，載入順序
-改變就會改變實際行為。V137 已把順序固定；V160 現在完整順序仍為
+改變就會改變實際行為。V137 已把順序固定；V161 現在完整順序仍為
 `js/25` → `js/27` → `js/28` → `js/29` → `js/30` → `js/31` → `js/32` → `js/33`
 → `js/34` → `js/35` → `js/36` → `js/37` → `js/38` → `js/39` → `js/40` → `js/41`
 → `js/42` → `js/43` → `js/44` → `js/45` → `js/46` → `js/47` → `js/48`。
@@ -425,6 +429,22 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-08-30 — V161：火焰斬正式 Sprite Sheet VFX（dev）
+
+- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
+- 上傳的 1536×1152 素材實際為無 Alpha 的 JPEG；只將黑色合成底還原為透明／半透明 Alpha，
+  未重繪或改動 4×3、12 幀內容，輸出為 `assets/vfx/fire/flame-slash-cast.png` 的 8-bit RGBA PNG。
+- `js/39-v143-skill-animation.js` 將 `flameSlash` 接到既有 V143 Sprite renderer：單體定位、
+  4×3、12 幀、`hitFrame:7`，動畫只在本次有效目標卡牌中央產生一次；既有 V142 時長 760ms
+  保持不變，第 8 幀開始同步傷害、MISS 與卡牌命中反應。
+- `js/43-v149-skill-ui-rules.js` 會依既有 Sprite metadata 保留正式動畫 ID；移除 V160 在
+  `css/44-v149-skill-ui-rules.css` 的臨時月牙斬，避免正式素材與替代特效重疊。
+- `V_ASSET_VERSION` 與外層 loader 升至 161；新增 `tests/v161-flame-slash-vfx.test.js` 5 項驗收，
+  並加強 V149／V153／V160 回歸。驗證結果為 22 份 Node suite、199 項全數通過；`js/`／`tests/`
+  共 132 支 JavaScript 全部通過 `node --check`，`git diff --check` 通過。
+
+**已知限制**：環境沒有 Chromium，未做本機瀏覽器視覺測試；需由使用者在 `dev` 手機確認實際動畫尺寸。
+
 ### 2026-08-30 — V160：技能數值／目標、元素匣與火系動畫修正（dev）
 
 - 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
@@ -575,8 +595,8 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 5. 快取鍵同步升至 153；新增 `tests/v153-fire-vfx.test.js` 驗收 RGBA／尺寸／幀序、精準
    目標、單主動畫、第 8 幀、完整 gate、火箭去重、狀態循環及 Fire EX 被動規則。
 
-**已知限制**：本批沒有 `flame-slash-cast.png`，所以 `flameSlash`／火焰斬尚未接入正式
-Sprite Sheet；其餘收到的 10 張素材均已接入。未建立替代素材，避免錯綁會心一擊或其他圖。
+**已知限制（V161 已解決）**：本批當時沒有 `flame-slash-cast.png`；後續補交素材已於 V161
+接入 `flameSlash`，其餘收到的 10 張素材維持原設定。
 
 **驗證**：全部 V137～V153 共 14 份、150 項 Node 測試通過；`node --check`、
 `git diff --check` 與 10 張素材的 PNG 8-bit sRGBA／透明及半透明 Alpha 驗收通過。
@@ -2155,14 +2175,15 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V149 的 `tests/v149-skill-ui-rules.test.js` 有 13 項技能／介面規則驗收，
       V150 的 `tests/v150-ice-arrow-rain-vfx.test.js` 有 6 項正式 Sprite VFX 驗收，
       V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，
-      V153 的 `tests/v153-fire-vfx.test.js` 有 9 項火元素正式 Sprite VFX 驗收，
+      V153 的 `tests/v153-fire-vfx.test.js` 有 10 項火元素正式 Sprite VFX 驗收，
       V154 的 `tests/v154-current-request.test.js` 有 6 項本輪需求驗收，
       V155 的 `tests/v155-current-request.test.js` 有 8 項本輪需求驗收，
       V156 的 `tests/v156-deep-trace-fixes.test.js` 有 5 項深淵地圖／元素匣驗收，V157 的
       `tests/v157-abyss-map-tap-fix.test.js` 有 3 項立繪尺寸／直接點擊驗收，V158 的
       `tests/v158-combat-tuning.test.js` 有 7 項技能／命中／傷害／立繪驗收，V159 的
       `tests/v159-abyss-battle-portraits.test.js` 有 4 項立繪載入時序驗收，V160 的
-      `tests/v160-current-request.test.js` 有 5 項本輪數值／目標／補給／動畫驗收，並保留
+      `tests/v160-current-request.test.js` 有 5 項本輪數值／目標／補給／動畫驗收，V161 的
+      `tests/v161-flame-slash-vfx.test.js` 有 5 項火焰斬正式 Sprite VFX 驗收，並保留
       可選的 `tests/v138-browser-smoke.js`。本輪遠端瀏覽器遇到預覽站安全中繼頁，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。

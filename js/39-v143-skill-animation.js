@@ -25,7 +25,13 @@
     const MANIFEST={
         normal:{glyph:"✦",motion:"line",impact:"spark",hit:.57,pulses:1,spread:0},
 
-        flameSlash:{glyph:"╱",motion:"arc-up",impact:"flame-cut",hit:.58,pulses:1,spread:0},
+        flameSlash:{
+            glyph:"╱",motion:"arc-up",impact:"flame-cut",hit:.5833333333,pulses:1,spread:0,
+            sprite:{
+                src:"assets/vfx/fire/flame-slash-cast.png",
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:1.85,maxSize:220
+            }
+        },
         fireCritical:{
             glyph:"拳",motion:"dash",impact:"ember-fist",hit:.5833333333,pulses:2,spread:0,
             sprite:{

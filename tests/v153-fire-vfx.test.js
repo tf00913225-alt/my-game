@@ -196,7 +196,7 @@ function castConfig(id,duration,targetType,category="physical"){
 
 test("all supplied cast and loop sheets are exact RGBA Sprite Sheet grids",()=>{
     const castAssets=[
-        "fire-critical-cast.png","explosive-flurry-cast.png","dragon-slash-cast.png",
+        "flame-slash-cast.png","fire-critical-cast.png","explosive-flurry-cast.png","dragon-slash-cast.png",
         "fire-rocket-cast.png","blaze-spell-cast.png","flame-tornado-cast.png",
         "phoenix-cry-cast.png","rage-cast.png"
     ];
@@ -220,6 +220,7 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
     const runtime=loadRuntime().context;
     const manifest=runtime.v143SkillAnimationManifest;
     const expected={
+        flameSlash:["flame-slash-cast.png","single"],
         fireCritical:["fire-critical-cast.png","single"],
         explosiveFlurry:["explosive-flurry-cast.png","group"],
         dragonSlash:["dragon-slash-cast.png","single"],
@@ -302,6 +303,26 @@ test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main
     assert.equal(runtime.legacyRocketCalls(),0);
 });
 
+test("Fire Slash plays one sheet on the selected target and reaches damage at frame eight",()=>{
+    const runtime=loadRuntime();
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("flameSlash",760,"single"),{side:"player",actorIndex:0}
+    );
+    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
+    assert.equal(sprites.length,1);
+    assert.equal(sprites[0].dataset.placement,"single");
+    assert.equal(sprites[0].dataset.targetIndex,"1");
+    assert.ok(parseFloat(sprites[0].style.width)<=220);
+    assert.equal(stage.children.some(node=>node.className.includes("v143-skill-flight")),false);
+    const before=runtime.scheduled.length;
+    runtime.context.showMonsterHit(1,17,"hp",false);
+    assert.equal(runtime.monsterHits.length,0);
+    assert.equal(runtime.scheduled.length,before+1);
+    const damageTimer=runtime.scheduled[runtime.scheduled.length-1];
+    assert.ok(damageTimer.delay>=425&&damageTimer.delay<=450);
+});
+
 test("Rage creates one cast sheet inside every affected card",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
@@ -379,8 +400,8 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V154",(
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
     assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png",columns:4,rows:2,frames:8,duration:800\}/);
     assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png",columns:4,rows:2,frames:8,duration:1000\}/);
-    assert.match(loader,/const V_ASSET_VERSION="160"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=160/);
+    assert.match(loader,/const V_ASSET_VERSION="161"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=161/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

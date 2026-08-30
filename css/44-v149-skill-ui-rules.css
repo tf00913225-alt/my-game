@@ -74,48 +74,6 @@
     text-shadow:0 1px 3px #000,0 0 5px #000 !important;
 }
 
-/* Fire Slash keeps the word circles, then lands as a compact fiery crescent. */
-.v143-skill-stage[data-skill="v149-word-flameSlash"] .v143-hit-impact{
-    width:150px !important;
-    height:68px !important;
-    margin:-34px 0 0 -75px !important;
-    border:0 !important;
-    border-bottom:8px solid #fff4a8 !important;
-    border-radius:0 0 55% 55% !important;
-    clip-path:none !important;
-    color:transparent !important;
-    background:linear-gradient(0deg,rgba(255,45,0,.78),rgba(255,168,24,.42) 38%,transparent 70%) !important;
-    box-shadow:0 10px 12px rgba(255,54,0,.5) !important;
-    filter:drop-shadow(0 0 7px #ff4e24) drop-shadow(0 0 12px #ffb52e) !important;
-    line-height:1 !important;
-    transform:rotate(-18deg) scale(.45) !important;
-    animation:v160FlameSlashImpact var(--v143-impact-duration,.32s) cubic-bezier(.16,.75,.24,1) both !important;
-}
-.v143-skill-stage[data-skill="v149-word-flameSlash"] .v143-hit-impact::before,
-.v143-skill-stage[data-skill="v149-word-flameSlash"] .v143-hit-impact::after{
-    content:"";
-    position:absolute;
-    left:12px;
-    right:12px;
-    bottom:-12px;
-    height:32px;
-    border-bottom:4px solid #ff6a1c;
-    border-radius:0 0 55% 55%;
-    opacity:.78;
-}
-.v143-skill-stage[data-skill="v149-word-flameSlash"] .v143-hit-impact::after{
-    left:28px;
-    right:28px;
-    bottom:-19px;
-    border-bottom-color:#ffd25b;
-    opacity:.55;
-}
-@keyframes v160FlameSlashImpact{
-    0%{opacity:0;transform:rotate(-18deg) scale(.35) translateX(-26px);}
-    38%{opacity:1;transform:rotate(-18deg) scale(1.08) translateX(3px);}
-    100%{opacity:0;transform:rotate(-18deg) scale(1.32) translateX(18px);}
-}
-
 /* Barrier: four deep-yellow corners, each showing the remaining block count. */
 #game-stage #battlePage .v149-barrier-corners{
     position:absolute;
@@ -223,8 +181,7 @@
 
 @media (prefers-reduced-motion:reduce){
     #game-stage #battlePage .v149-barrier-corners i,
-    #game-stage #battlePage .v149-reflect-popup,
-    .v143-skill-stage[data-skill="v149-word-flameSlash"] .v143-hit-impact{
+    #game-stage #battlePage .v149-reflect-popup{
         animation-duration:.01ms !important;
         animation-iteration-count:1 !important;
     }
