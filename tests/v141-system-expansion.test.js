@@ -79,9 +79,9 @@ test("V141 assets remain ordered before later patches with cache version 154",()
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="162"/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="163"/);
     assert.match(indexSource,/js\/00-main\.js\?v=141/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=162/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=163/);
 });
 
 test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or slot numbers",()=>{

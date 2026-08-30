@@ -41,9 +41,9 @@ function baseContext(overrides={}){
     return context;
 }
 
-test("V146 remains ordered before V149 under cache key 162",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=162/);
-    assert.match(loader,/const V_ASSET_VERSION="162"/);
+test("V146 remains ordered before V149 under cache key 163",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=163/);
+    assert.match(loader,/const V_ASSET_VERSION="163"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"

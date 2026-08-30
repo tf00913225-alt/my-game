@@ -45,7 +45,8 @@
    `tests/v159-abyss-battle-portraits.test.js`，V160 新增技能數值／目標、元素匣與火系動畫驗收
    `tests/v160-current-request.test.js`，V161 新增火焰斬正式 Sprite VFX 驗收
    `tests/v161-flame-slash-vfx.test.js`。V162 的燃燒同步、元素匣層級與深淵戰鬥立繪
-   驗收則補強在 `tests/v153-fire-vfx.test.js` 與 `tests/v154-current-request.test.js`。驗證至少要包含：
+   驗收則補強在 `tests/v153-fire-vfx.test.js` 與 `tests/v154-current-request.test.js`；V163 新增
+   inbox 原始 PNG 校正驗收 `tests/v163-flame-slash-source.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -57,7 +58,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-30，V162 戰鬥特效／元素匣／深淵立繪修正）
+## 目前狀態（截至 2026-08-30，V163 火焰斬原始透明 PNG 校正）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -166,6 +167,10 @@
   卡牌。元素匣設定開啟期間會把遊戲舞台提升到技能與狀態特效之上，關閉後立即復原；深淵
   1～5 關戰鬥卡牌改為插入實際立繪 `<img>` 圖層，不再只依賴容易被覆寫的背景樣式。
   快取版本升至 162，只發布 `dev`，不得合併或推送 `main`。
+- V163 確認 assets-library inbox 的 `flame-slash-cast.png` 本身是 1448×1086、8-bit RGBA
+  透明 PNG；將 12 格 362×362 原始像素逐格置中補透明邊為 384×384，未縮放、拉伸或重繪，
+  並替換 V161 由聊天附件轉出的版本。既有單體定位、0.76 秒與第 8 幀命中設定完全不變；
+  快取版本升至 163，只發布 `dev`，不得合併或推送 `main`。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -433,6 +438,24 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-30 — V163：火焰斬原始透明 PNG 校正（dev）
+
+- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
+- 從 `origin/assets-library` 的 `assets/inbox/flame-slash-cast.png` 取用本次素材；已確認原檔為
+  1448×1086、8-bit RGBA 透明 PNG，4×3 共 12 幀，每格實際 362×362。
+- 將每格原始像素置中補 11px 透明邊為 384×384，再組成 1536×1152 Sprite Sheet；12 格逐像素
+  比對差異皆為 0，未縮放、拉伸、重繪或加入底色。正式檔案覆蓋
+  `assets/vfx/fire/flame-slash-cast.png`。
+- V161 既有 `flameSlash` 綁定維持不變：只在本次有效單體目標中央播放一次、總長 760ms、
+  第 8 幀開始顯示傷害與命中反應，完整 12 幀後才解除行動閘門。
+- `V_ASSET_VERSION` 與外層 loader 升至 163；新增 `tests/v163-flame-slash-source.test.js`
+  驗證正式素材雜湊、RGBA／尺寸、技能設定與快取發布。
+- 驗證結果為 23 份 Node suite、204 項全數通過；`js/`／`tests/` 共 133 支 JavaScript
+  全部通過 `node --check`，`git diff --check` 通過，正式輸出與 inbox 原圖的 12 格逐像素
+  比對差異皆為 0。
+
+**已知限制**：環境沒有 Chromium，未做本機瀏覽器視覺測試；需由使用者在 `dev` 手機確認實際動畫尺寸。
 
 ### 2026-08-30 — V162：燃燒特效、元素匣層級與深淵戰鬥立繪（dev）
 
