@@ -41,9 +41,9 @@ function baseContext(overrides={}){
     return context;
 }
 
-test("V146 remains ordered before V149 under cache key 154",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=156/);
-    assert.match(loader,/const V_ASSET_VERSION="156"/);
+test("V146 remains ordered before V149 under cache key 157",()=>{
+    assert.match(index,/js\/20-anonymous-20\.js\?v=157/);
+    assert.match(loader,/const V_ASSET_VERSION="157"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -134,7 +134,7 @@ test("turning on auto outside combat immediately consumes configured recovery",(
     assert.equal(saved,1);
 });
 
-test("Abyss rapid taps are locked, one step is bounded and NPC requires proximity",()=>{
+test("Abyss rapid taps are locked, one step is bounded and NPC portrait remains directly clickable",()=>{
     let moves=0,challenges=0;
     const map=element({
         dataset:{},classList:{add(){},remove(){}},
@@ -163,11 +163,8 @@ test("Abyss rapid taps are locked, one step is bounded and NPC requires proximit
     assert.ok(Math.hypot(parseFloat(player.style.left)-18,parseFloat(player.style.top)-78)<=24.001);
     map.dataset.v146Moving="0";
     context.v141ChallengeAbyssBoss();
-    assert.equal(challenges,0);
-    assert.match(message.textContent,/距離太遠/);
-    player.style.left="70%"; player.style.top="30%";
-    context.v141ChallengeAbyssBoss();
     assert.equal(challenges,1);
+    assert.equal(message.textContent,"");
 });
 
 test("inventory, home, synthesis, nav and slow exit all use the latest mobile contract",()=>{

@@ -64,8 +64,8 @@ function load(overrides={}){
 }
 
 test("V152 remains ordered before V154 under cache version 154",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=156/);
-    assert.match(loader,/const V_ASSET_VERSION="156"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=157/);
+    assert.match(loader,/const V_ASSET_VERSION="157"/);
     assert.match(loader,/css\/45-v152-dev-fixes\.css/);
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
     const v152=loader.indexOf("js/44-v152-dev-fixes.js");

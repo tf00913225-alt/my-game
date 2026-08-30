@@ -50,9 +50,9 @@ function loadRuntime(overrides={}){
     return context;
 }
 
-test("cache key 156 delivers the repaired runtime and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="156"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=156/);
+test("cache key 157 delivers the repaired runtime and CSS",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="157"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=157/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.match(loader,/js\/45-v154-dev-fixes\.js/);
 });
@@ -102,14 +102,14 @@ test("an inactive element box does not bypass a disabled character setting",()=>
     assert.equal(consumed,0);
 });
 
-test("every Abyss map floor presents a large portrait-backed challenge button",()=>{
+test("every Abyss map floor presents a portrait-backed challenge button",()=>{
     [
         "east-emperor.webp","south-emperor.webp","heaven-emperor.webp",
         "north-emperor.webp","floor5-extreme-emperor.webp"
     ].forEach((asset,index)=>{
         assert.match(css,new RegExp("floor-"+(index+1)+"[\\s\\S]*"+asset.replace(".","\\.")));
     });
-    assert.match(css,/\.v141-abyss-boss\{[\s\S]*width:200px !important;[\s\S]*height:280px !important;/);
+    assert.match(css,/\.v141-abyss-boss\{[\s\S]*width:120px !important;[\s\S]*height:168px !important;/);
     assert.match(css,/\.v141-abyss-boss::before\{[\s\S]*background-size:contain !important;/);
     assert.match(css,/touch-action:manipulation !important/);
     assert.match(abyss,/<button class="v141-abyss-boss"[\s\S]*v141ChallengeAbyssBoss\(\)/);

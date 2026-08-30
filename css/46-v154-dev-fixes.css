@@ -116,10 +116,10 @@
     min-height:0 !important;
 }
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-boss{
-    width:200px !important;
-    height:280px !important;
-    min-width:200px !important;
-    min-height:280px !important;
+    width:120px !important;
+    height:168px !important;
+    min-width:120px !important;
+    min-height:168px !important;
     gap:4px !important;
     padding:6px 7px 8px !important;
     overflow:hidden !important;

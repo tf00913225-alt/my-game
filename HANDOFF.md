@@ -39,7 +39,8 @@
    `tests/v153-fire-vfx.test.js`，V154 新增本輪戰鬥／元素匣／深淵／版面驗收
    `tests/v154-current-request.test.js`，V155 新增硬控節奏／深淵第五關／火系終階技能驗收
    `tests/v155-current-request.test.js`，V156 新增深淵地圖立繪／點擊熱區與元素匣狀態不同步驗收
-   `tests/v156-deep-trace-fixes.test.js`。驗證至少要包含：
+   `tests/v156-deep-trace-fixes.test.js`，V157 新增深淵地圖立繪尺寸與直接點擊驗收
+   `tests/v157-abyss-map-tap-fix.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -51,7 +52,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-29，V156 深淵地圖立繪與元素匣深追修正）
+## 目前狀態（截至 2026-08-30，V157 深淵地圖立繪尺寸與點擊修正）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -137,6 +138,10 @@
   把其最小寬高歸零；現改為 1～5 關各自的大型 3:4 立繪挑戰按鈕。元素匣補品原先被
   角色個別 `enabled` 旗標誤擋，現以元素匣實際啟動狀態授權全隊補給，保留原門檻、
   補品與死亡角色規則。快取版本升至 156，只發布 `dev`，不得合併或推送 `main`。
+- V157 依使用者手機錄影確認深淵守關立繪 200×280 過大，已縮為 120×168；錄影中的
+  點擊高亮證實事件有進入，但 V146 的距離限制攔下挑戰，而警告文字又被精簡版面隱藏，
+  因此視覺上完全無反應。現移除守關立繪的距離攔截，保留原按鈕、對話與戰鬥流程，
+  快取版本升至 157，只發布 `dev`，不得合併或推送 `main`。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -2085,7 +2090,8 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V153 的 `tests/v153-fire-vfx.test.js` 有 8 項火元素正式 Sprite VFX 驗收，
       V154 的 `tests/v154-current-request.test.js` 有 6 項本輪需求驗收，
       V155 的 `tests/v155-current-request.test.js` 有 8 項本輪需求驗收，
-      V156 的 `tests/v156-deep-trace-fixes.test.js` 有 5 項深淵地圖／元素匣驗收，並保留
+      V156 的 `tests/v156-deep-trace-fixes.test.js` 有 5 項深淵地圖／元素匣驗收，V157 的
+      `tests/v157-abyss-map-tap-fix.test.js` 有 3 項立繪尺寸／直接點擊驗收，並保留
       可選的 `tests/v138-browser-smoke.js`。本輪遠端瀏覽器遇到預覽站安全中繼頁，
       所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。
