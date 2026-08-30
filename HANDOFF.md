@@ -48,7 +48,10 @@
    驗收則補強在 `tests/v153-fire-vfx.test.js` 與 `tests/v154-current-request.test.js`；V163 新增
    inbox 原始 PNG 校正驗收 `tests/v163-flame-slash-source.test.js`；V165 新增怒火／霸龍裂天斬
    圖片與火箭移動落點驗收 `tests/v165-fire-vfx-fixes.test.js`；V166 新增水元素十招施放、
-   兩種狀態循環、逐目標投射與整區 AOE 驗收 `tests/v166-water-vfx.test.js`。驗證至少要包含：
+   兩種狀態循環、逐目標投射與整區 AOE 驗收 `tests/v166-water-vfx.test.js`；V169 新增
+   RPG 視窗／角色與商店介面、元素匣逐角色設定、水技能最終規則及深淵資產／流程四套驗收：
+   `tests/v169-rpg-ui.test.js`、`tests/v169-element-box-settings.test.js`、
+   `tests/v169-water-skill-rules.test.js`、`tests/v169-abyss-assets-flow.test.js`。驗證至少要包含：
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -60,7 +63,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-30，V166 水元素技能動畫）
+## 目前狀態（截至 2026-08-30，V169 RPG 介面、元素匣、水技能與深淵流程）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -196,6 +199,13 @@
   `statusEffects` 循環，施放圖結束後才接續，解除立即移除且不觸發 DOT／控制結算。V158 最終
   `freeze=tri`、`healSpell=allyAll` 與 Frostbite 非 DOT 的正式戰鬥規則均保留；快取升至 166，
   只發布 `dev`，不得合併或推送 `main`。
+- V169 以遠端 V166 `dev` 為唯一基底，逐 hunk 移植本輪施工，不合併 `main`。角色能力值／經驗池
+  改為固定不捲動的緊湊排版，技能頁保留自身捲動；原生 alert／confirm 改為排隊式 RPG 主題視窗；
+  商店固定 HP 左欄、SP 右欄並在購買成功後顯示收據；副本背包提升至導覽列之上。元素匣逐角色即時
+  保存設定，啟動中仍可編輯並另設停止鍵。七項水技能由 `js/50-v169-water-skill-rules.js` 定案；
+  深淵重新進入顯示進度，玩家／守關者固定位置，1～4 層新增寶箱與上方傳送點流程。15 張 inbox PNG
+  直接使用原檔，11 張深淵人物 WebP 只移除黑色外背景；Android 合成層的永久陰影／技能卡
+  `will-change` 已靜態化。快取與直載 query 升至 169。
 - V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
   精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
   精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
@@ -463,6 +473,31 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-30 — V169：RPG 視窗、角色／商店、元素匣、水技能與深淵流程（dev）
+
+- 以遠端 `dev=a325b1c` 為唯一基底，逐 hunk 移植 `9014748` 本輪實際修改；未 merge `main`，
+  未整檔覆蓋衝突檔案。V167／V168 測試及其前置施工不屬於本次 commit，沒有夾帶。
+- `js/51-v169-rpg-ui.js`／`css/49-v169-rpg-ui.css` 新增排隊式 RPG alert／confirm；角色能力值
+  與經驗池固定於可視高度，技能頁保留自身捲動。商店重排為 HP 左、SP 右且成功購買才顯示收據；
+  副本頁背包沿用真實背包 DOM，並提升至副本導覽之上。
+- `js/49-v169-element-box-settings.js`／`css/48-v169-element-box-settings.css` 讓行動、HP、SP、
+  回城門檻、切換角色與關閉都保存目前角色；元素匣啟動中可繼續編輯，另有獨立停止鍵。
+- `js/50-v169-water-skill-rules.js` 定案冰霜拳、冰旋一閃、冰封重擊、水球術、洪水猛獸、
+  冰霜箭雨與冰封的學習／升級成本、SP、傷害、吸血、目標與前置；凍傷只禁止技能，
+  冰封為單體 90%／5 回合純控制。
+- `js/27-v132-content-expansion.js`、`js/36-v141-content-systems.js`、
+  `js/38-v143-system-fixes.js` 與 `css/50-v169-abyss-flow.css` 接入符咒、抽獎券、設計圖、
+  開／關寶箱與傳送點共 15 張原始 PNG；深淵加入進度入口、固定地圖位置、局部 Boss 對話、
+  1～4 層寶箱／對應元素券／傳送點流程。11 張人物立繪只將黑色外背景轉透明。
+- 彈窗永久呼吸陰影與技能卡 `will-change` 已靜態化，降低 Android 合成層矩形穿透。
+  `V_ASSET_VERSION`、`js/00-main.js`、`js/19...` 與外層 loader query 升至 169。
+- 驗證結果：29 份 Node test suite 共 254 項全數通過；另有瀏覽器 smoke 因缺少 Chromium
+  自動略過。共有 142 支 `js/`／`tests/` JavaScript 通過 `node --check`，
+  `git diff --check` 通過。
+
+**已知限制**：Android／Samsung 合成層問題無法在目前無 Chromium 的環境重現；仍需同一台手機
+將角色／元素匣／技能詳細視窗各保持開啟約 10 秒確認。
 
 ### 2026-08-30 — V166：水元素正式 Sprite Sheet VFX（dev）
 
@@ -2267,8 +2302,8 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       V149 的 `tests/v149-skill-ui-rules.test.js` 有 13 項技能／介面規則驗收，
       V150 的 `tests/v150-ice-arrow-rain-vfx.test.js` 有 6 項正式 Sprite VFX 驗收，
       V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，
-      V153 的 `tests/v153-fire-vfx.test.js` 有 10 項火元素正式 Sprite VFX 驗收，
-      V154 的 `tests/v154-current-request.test.js` 有 6 項本輪需求驗收，
+      V153 的 `tests/v153-fire-vfx.test.js` 有 12 項火元素正式 Sprite VFX 驗收，
+      V154 的 `tests/v154-current-request.test.js` 有 7 項本輪需求驗收，
       V155 的 `tests/v155-current-request.test.js` 有 8 項本輪需求驗收，
       V156 的 `tests/v156-deep-trace-fixes.test.js` 有 5 項深淵地圖／元素匣驗收，V157 的
       `tests/v157-abyss-map-tap-fix.test.js` 有 3 項立繪尺寸／直接點擊驗收，V158 的
@@ -2278,25 +2313,20 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       `tests/v161-flame-slash-vfx.test.js` 有 5 項火焰斬正式 Sprite VFX 驗收，V163 的
       `tests/v163-flame-slash-source.test.js` 有 3 項來源校正驗收，V165 的
       `tests/v165-fire-vfx-fixes.test.js` 有 3 項火系圖與火箭落點驗收，V166 的
-      `tests/v166-water-vfx.test.js` 有 15 項水／冰正式 Sprite VFX 驗收，並保留
-      可選的 `tests/v138-browser-smoke.js`。本輪遠端瀏覽器遇到預覽站安全中繼頁，
-      所以完整戰鬥／副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
+      `tests/v166-water-vfx.test.js` 有 15 項水／冰正式 Sprite VFX 驗收，V169 四套測試
+      合計 30 項 RPG UI／元素匣／水技能／深淵資產流程驗收，並保留可選的
+      `tests/v138-browser-smoke.js`。本輪環境沒有 Chromium executable，所以完整戰鬥／
+      副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
       曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。
 - [x] ~~V146 暫時沿用舊商店 icon~~ 2026-08-28 已由 V147 使用使用者補交圖完成透明化、
       手機尺寸優化與三入口替換，採新檔 `assets/ui/home-shop-v147.png` 避免覆寫舊資產。
 - [ ] 元素匣的「金幣」統計目前跟著既有的 `gold` 全域變數走，沒有另外檢查這個變數
       本身的來源/正確性是否符合預期（超出這次需求範圍，沒有深入查證）。
-- [ ] **全屬性技能預覽頁面捲動時「破圖」（文字疊字/亂碼）**（2026-08-26
-      這一輪使用者附截圖回報，沒有修好）：這次已經確認捲動本身的機制是
-      正常的（touch-lock白名單漏洞已修好、真實觸控滑動能正常運作），
-      「破圖」單純是視覺呈現問題。用真實觸控滑動（含快速連續滑動、
-      滑動中間截圖、切分頁時滑動）在headless Chromium測試環境都無法
-      重現截圖裡那種疊字/亂碼畫面，懷疑是手機捲動慣性還沒完全合成好
-      畫面那一瞬間被截圖截到的時序artifact，不是持續性的邏輯bug（詳見
-      上方「已完成功能記錄」）。已加上`contain`/`will-change`降低發生
-      機率，但沒有辦法確認是否真的解決。下一個接手的人如果使用者還在
-      回報，需要跟使用者要**螢幕錄影**（不是截圖）才有機會抓到真正的
-      畫面時序。
+- [ ] **角色／元素匣／技能視窗的 Android 合成層破圖需真機複驗**：V169 已確認底層頁面
+      會以矩形 tile 穿透仍開啟的視窗；最可能原因是 transform／paint containment 內的彈窗
+      永久 `box-shadow` 動畫與每張技能卡 `will-change:transform` 同時建立大量合成層。
+      V169 已將前者 `animation:none`、後者改為 `will-change:auto`。目前缺少 Chromium，
+      需在同款 Android 裝置把角色、元素匣與技能詳細視窗各保持開啟約 10 秒複驗。
 - [ ] **背包介面「返回鍵」不見了**（2026-08-26這一輪使用者回報，沒有找到
       也沒有重現）：檢查過背包的兩個進入路徑（下方導覽列的
       `#inventoryPage`、地圖頁`openMapInventoryOverlay()`開的覆蓋層），

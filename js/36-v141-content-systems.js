@@ -419,11 +419,25 @@
         showSynthesisResult("碎片合成成功",'<div class="v141-result-item">'+ticket.icon+'<b>'+escapeHtml(ticket.name)+' ×'+qty+'</b></div>');
     };
 
-    window.v141DecomposeSeriesItem=function(slotIndex){
+    window.v141DecomposeSeriesItem=async function(slotIndex){
         const item=inventorySlots[slotIndex];
         const fragment=item&&getFragmentDefinition(item.setId);
         if(!item||!fragment||!isEquipmentInventoryType(item.type)){ return; }
-        if(!window.confirm("確定分解「"+item.name+"」？\n將固定獲得"+fragment.name+"×10，裝備無法復原。")){ return; }
+        if(
+            typeof window.rpgConfirm!=="function" ||
+            !await window.rpgConfirm(
+                "確定分解「"+item.name+"」？\n將固定獲得"+fragment.name+"×10，裝備無法復原。",
+                {
+                    title:"分解裝備",
+                    confirmText:"確定分解",
+                    cancelText:"返回",
+                    danger:true
+                }
+            )
+        ){
+            return;
+        }
+        if(inventorySlots[slotIndex]!==item){ return; }
         const realIndex=inventoryItems.indexOf(item);
         if(realIndex<0){ return; }
         const success=runInventoryTransaction(()=>{
@@ -463,14 +477,24 @@
     if(!skillDatabase.stormSpell){
         skillDatabase.stormSpell=Object.assign({},skillDatabase.windHowlLightning,{id:"stormSpell",name:"暴風術",tier:4,targetType:"all"});
     }
-    function defaultAbyssState(){ return {active:false,floor:1,phase:"boss",x:18,y:78,message:"",clears:0}; }
+    function defaultAbyssState(){ return {active:false,floor:1,phase:"boss",x:50,y:84,message:"",clears:0,rewardVersion:1}; }
     function loadAbyssState(){
         try{
             const raw=JSON.parse(localStorage.getItem(ABYSS_STORAGE_KEY)||"{}");
-            return Object.assign(defaultAbyssState(),raw,{floor:Math.max(1,Math.min(5,Number(raw.floor)||1))});
+            const state=Object.assign(defaultAbyssState(),raw,{floor:Math.max(1,Math.min(5,Number(raw.floor)||1))});
+            /* Before floor chests existed, phase=portal meant that no reward had
+               been claimed. Migrate that one legacy phase back to its chest. */
+            if(raw.phase==="portal"&&Number(raw.rewardVersion||0)<1){
+                state.phase="chest";
+                state.message="守關寶箱已補上。請先領取獎勵，再使用傳送點。";
+            }
+            return state;
         }catch(_){ return defaultAbyssState(); }
     }
     let abyssState=loadAbyssState();
+    /* Whether this page visit has entered the persisted run. Never persist it: a
+       reload or a later visit must return to the progress gate first. */
+    let abyssMapEntered=false;
     let abyssBattleStarting=false;
     function persistAbyss(){ try{ localStorage.setItem(ABYSS_STORAGE_KEY,JSON.stringify(abyssState)); }catch(_){ } }
 
@@ -651,20 +675,29 @@
         };
     }
 
-    function bossPosition(floor){ return [[0,0],[76,25],[70,32],[75,22],[68,30],[70,26]][floor]; }
+    function bossPosition(){ return [50,33]; }
+    function abyssProgressLabel(){
+        const phaseLabels={boss:"等待挑戰",chest:"寶箱待開啟",portal:"寶箱已領取・傳送點已開啟"};
+        return "目前進度：第 "+abyssState.floor+" / 5 層・"+(phaseLabels[abyssState.phase]||"挑戰進行中");
+    }
     function renderAbyss(){
-        if(!abyssState.active){
-            return '<div class="v141-abyss-intro"><div class="v141-abyss-seal">深淵</div><h3>五帝深淵</h3><p>共5張地圖、5場戰鬥。點擊地面移動，擊敗守關者後走入傳送點。</p><button onclick="v141StartAbyss()">進入深淵</button></div>';
-        }
         if(abyssState.phase==="complete"){
             return '<div class="v141-abyss-intro complete"><div class="v141-abyss-seal">破</div><h3>本輪深淵已通關</h3><p>深淵寶箱已開啟。可重新開始下一輪挑戰。</p><button onclick="v141ResetAbyss()">重新挑戰</button></div>';
+        }
+        if(!abyssState.active||!abyssMapEntered){
+            const resume=abyssState.active;
+            return '<div class="v141-abyss-intro'+(resume?' v169-abyss-resume':'')+'"><div class="v141-abyss-seal">深淵</div><h3>五帝深淵</h3><p>共5張地圖、5場戰鬥。擊敗守關者、領取寶箱，再由傳送點前往下一層。</p>'+
+                (resume?'<strong class="v169-abyss-progress">'+escapeHtml(abyssProgressLabel())+'</strong>':'')+
+                '<button onclick="v141StartAbyss()">'+(resume?'繼續挑戰':'進入深淵')+'</button></div>';
         }
         const floor=abyssState.floor;
         const info=floor<5?abyssFloors[floor]:{boss:"五帝聯軍",element:"light"};
         const pos=bossPosition(floor);
         const boss=abyssState.phase==="boss"?'<button class="v141-abyss-boss" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v141ChallengeAbyssBoss()"><b>'+escapeHtml(info.boss)+'</b><span>'+elementLabel[info.element]+'元素・點擊挑戰</span></button>':'';
-        const portal=abyssState.phase==="portal"?'<button class="v141-abyss-portal" style="left:74%;top:25%" onclick="event.stopPropagation();v141UseAbyssPortal()"><i></i><span>前往下一層</span></button>':'';
-        const chest=abyssState.phase==="chest"?'<button class="v141-abyss-chest" style="left:72%;top:30%" onclick="event.stopPropagation();v141OpenAbyssChest()"><i></i><span>深淵寶箱</span></button>':'';
+        const hasFloorReward=floor<5&&(abyssState.phase==="chest"||abyssState.phase==="portal");
+        const portal=hasFloorReward?'<button class="v141-abyss-portal'+(abyssState.phase==="chest"?' locked':'')+'" style="left:50%;top:10%" aria-disabled="'+(abyssState.phase==="chest"?'true':'false')+'" onclick="event.stopPropagation();v141UseAbyssPortal()"><i></i><span>'+(abyssState.phase==="chest"?'先開啟寶箱':'前往下一層')+'</span></button>':'';
+        const showChest=abyssState.phase==="chest"||abyssState.phase==="portal";
+        const chest=showChest?'<button class="v141-abyss-chest'+(abyssState.phase==="portal"?' open':'')+'" style="left:'+pos[0]+'%;top:'+pos[1]+'%" '+(abyssState.phase==="portal"?'aria-disabled="true"':'onclick="event.stopPropagation();v141OpenAbyssChest()"')+'><i></i><span>'+(abyssState.phase==="portal"?'寶箱已開啟':'深淵寶箱')+'</span></button>':'';
         return '<div class="v141-abyss-shell"><header><b>深淵 第'+floor+'/5層</b><span>'+escapeHtml(abyssState.message||'點擊地面移動角色')+'</span></header>'+
             '<div id="v141AbyssMap" class="v141-abyss-map floor-'+floor+'" onclick="v141AbyssMoveByEvent(event)">'+
             '<div id="v141AbyssSpeech" class="v141-abyss-speech"></div>'+boss+portal+chest+
@@ -698,14 +731,35 @@
     if(typeof switchDungeonTab==="function"){
         const originalSwitchDungeonTab=switchDungeonTab;
         switchDungeonTab=function(tabName){
+            if(tabName!=="abyss"){ abyssMapEntered=false; }
             const result=originalSwitchDungeonTab.apply(this,arguments);
             if(tabName==="abyss"){ requestAnimationFrame(syncAbyssPlayerArt); }
             return result;
         };
     }
+    if(typeof showPage==="function"){
+        const originalShowPage=showPage;
+        showPage=function(page){
+            /* Entering battle is part of the same map visit. Every other page
+               exit must pause the run at its progress gate. */
+            if(page!=="dungeon"&&page!=="battle"){ abyssMapEntered=false; }
+            return originalShowPage.apply(this,arguments);
+        };
+    }
 
-    window.v141StartAbyss=function(){ abyssState=Object.assign(defaultAbyssState(),{active:true}); persistAbyss(); refreshAbyssPage(); };
-    window.v141ResetAbyss=function(){ abyssState=Object.assign(defaultAbyssState(),{active:true,clears:abyssState.clears||0}); persistAbyss(); refreshAbyssPage(); };
+    window.v141StartAbyss=function(){
+        if(!abyssState.active){ abyssState=Object.assign(defaultAbyssState(),{active:true,clears:abyssState.clears||0}); }
+        abyssMapEntered=true;
+        abyssState.x=50; abyssState.y=84;
+        persistAbyss(); refreshAbyssPage();
+    };
+    window.v141ResetAbyss=function(){
+        abyssState=Object.assign(defaultAbyssState(),{active:true,clears:abyssState.clears||0});
+        abyssMapEntered=true;
+        persistAbyss(); refreshAbyssPage();
+    };
+    window.v141GetAbyssState=function(){ return Object.assign({mapEntered:abyssMapEntered},abyssState); };
+    window.v141LeaveAbyssMap=function(){ abyssMapEntered=false; };
 
     function moveAbyssPlayer(x,y,callback){
         const playerEl=document.getElementById("v141AbyssPlayer");
@@ -718,9 +772,21 @@
         playerEl.classList.add("walking");
         setTimeout(()=>{ playerEl.classList.remove("walking"); if(callback){ callback(); } },duration*1000+30);
     }
+    window.v141ApproachAbyssBoss=function(callback){
+        if(abyssState.phase!=="boss"){ return false; }
+        const pos=bossPosition(abyssState.floor);
+        const approachY=Math.min(84,pos[1]+27);
+        if(Math.hypot(abyssState.x-pos[0],abyssState.y-approachY)<=8){
+            if(callback){ callback(); }
+        }else{
+            moveAbyssPlayer(pos[0],approachY,callback);
+        }
+        return true;
+    };
     window.v141AbyssMoveByEvent=function(event){
         if(event.target.closest("button")){ return; }
         const map=document.getElementById("v141AbyssMap");
+        if(map.dataset.v169DialogueApproaching==="1"){ return; }
         const rect=map.getBoundingClientRect();
         /* V143：地圖放大後同步放寬可走區，保留角色半身安全邊界即可。 */
         const x=Math.max(4,Math.min(96,(event.clientX-rect.left)/rect.width*100));
@@ -751,13 +817,10 @@
                     abyssState.message="挑戰失敗，守關者仍在等待。";
                     persistAbyss(); switchDungeonTab("abyss"); return;
                 }
-                if(floor<5){
-                    abyssState.phase="portal";
-                    abyssState.message=abyssFloors[floor].boss+"：此戰……是你勝了。傳送點已開啟。";
-                }else{
-                    abyssState.phase="chest";
-                    abyssState.message="五帝聯軍消失，深淵寶箱已出現。";
-                }
+                abyssState.phase="chest";
+                abyssState.message=floor<5
+                    ?abyssFloors[floor].boss+"已退場。請開啟寶箱，再使用上方傳送點。"
+                    :"五帝聯軍消失，深淵寶箱已出現。";
                 persistAbyss(); switchDungeonTab("abyss");
             });
             if(!started){ abyssBattleStarting=false; }
@@ -765,20 +828,40 @@
     };
 
     window.v141UseAbyssPortal=function(){
+        if(abyssState.floor>=5){ return; }
+        if(abyssState.phase==="chest"){
+            abyssState.message="請先點擊守關者位置的寶箱領取獎勵。";
+            persistAbyss(); refreshAbyssPage();
+            return;
+        }
         if(abyssState.phase!=="portal"){ return; }
-        moveAbyssPlayer(74,28,()=>{
+        moveAbyssPlayer(50,18,()=>{
             abyssState.floor=Math.min(5,abyssState.floor+1);
-            abyssState.phase="boss"; abyssState.x=18; abyssState.y=78; abyssState.message="";
+            abyssState.phase="boss"; abyssState.x=50; abyssState.y=84; abyssState.message="";
             persistAbyss(); refreshAbyssPage();
         });
     };
 
     window.v141OpenAbyssChest=function(){
         if(abyssState.phase!=="chest"){ return; }
-        moveAbyssPlayer(72,34,()=>{
+        const pos=bossPosition(abyssState.floor);
+        moveAbyssPlayer(pos[0],Math.min(84,pos[1]+27),()=>{
             const data=definitions();
-            const ticket=data.tickets[Math.floor(Math.random()*data.tickets.length)];
+            const floorTickets={1:"ticketSetEarth",2:"ticketSetFire",3:"ticketSetWind",4:"ticketSetWater"};
+            const ticket=abyssState.floor<5
+                ?data.tickets.find(item=>item.id===floorTickets[abyssState.floor])
+                :data.tickets[Math.floor(Math.random()*data.tickets.length)];
             if(ticket&&window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(ticket,1)){ alert("背包空間不足，請整理後再開啟深淵寶箱。"); return; }
+            if(abyssState.floor<5){
+                if(ticket&&!addItem(ticket,1)){ alert("背包空間不足，寶箱尚未開啟。"); return; }
+                abyssState.phase="portal";
+                abyssState.message="寶箱已開啟。請點擊上方傳送點前往下一層。";
+                persistAbyss(); rebuildInventorySlots(); saveGame(); refreshAbyssPage();
+                if(ticket&&window.v141ShowBlackGoldReward){
+                    window.v141ShowBlackGoldReward({exp:0,gold:0,items:[{name:ticket.name,count:1}]});
+                }
+                return;
+            }
             const indexes=getExistingPartyIndexes();
             const avgNeed=indexes.length?indexes.reduce((sum,index)=>sum+(Number(getPartyCharacterByIndex(index).expNext)||0),0)/indexes.length:0;
             const exp=Math.max(100,Math.floor(avgNeed*.15));

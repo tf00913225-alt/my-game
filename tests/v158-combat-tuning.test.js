@@ -49,14 +49,20 @@ function load(overrides={}){
     return context;
 }
 
-test("V158 publishes before the final V159 runtime under cache version 165",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="166"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
+test("V158 and V159 remain ordered before the final V169 runtimes",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="169"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=169/);
     assert.match(loader,/css\/47-v158-combat-tuning\.css/);
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
     const v159=loader.indexOf("js/48-v159-abyss-battle-portraits.js");
-    assert.ok(v155>=0&&v158>v155&&v159>v158);
+    const v169ElementBox=loader.indexOf("js/49-v169-element-box-settings.js");
+    const v169Water=loader.indexOf("js/50-v169-water-skill-rules.js");
+    const v169Ui=loader.indexOf("js/51-v169-rpg-ui.js");
+    assert.ok(
+        v155>=0&&v158>v155&&v159>v158&&
+        v169ElementBox>v159&&v169Water>v169ElementBox&&v169Ui>v169Water
+    );
 });
 
 test("Rage, Freeze and Heal expose the requested final values",()=>{

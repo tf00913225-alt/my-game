@@ -636,35 +636,55 @@
         const previousChallenge=window.v141ChallengeAbyssBoss;
         window.v141ChallengeAbyssBoss=function(){
             const map=document.getElementById("v141AbyssMap");
-            if(!map||map.querySelector(".v143-abyss-dialogue")){ return; }
-            const heading=document.querySelector(".v141-abyss-shell > header b");
-            const match=heading&&heading.textContent.match(/第\s*(\d+)/);
-            const floor=Math.max(1,Math.min(5,Number(match&&match[1])||1));
-            const boss=map.querySelector(".v141-abyss-boss b");
-            const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();
-            let index=0;
-            const overlay=document.createElement("button");
-            overlay.type="button";
-            overlay.className="v143-abyss-dialogue";
-            overlay.innerHTML='<small>'+escapeHtml(boss&&boss.textContent||"守關者")+'</small><b></b><span>點擊畫面繼續　'+(index+1)+' / '+lines.length+'</span>';
-            const text=overlay.querySelector("b");
-            const hint=overlay.querySelector("span");
-            text.textContent=lines[index];
-            overlay.onclick=event=>{
-                event.preventDefault(); event.stopPropagation();
-                index++;
-                if(index<lines.length){
-                    text.textContent=lines[index];
-                    hint.textContent="點擊畫面繼續　"+(index+1)+" / "+lines.length;
-                    return;
+            if(!map||map.querySelector(".v143-abyss-dialogue")||map.dataset.v169DialogueApproaching==="1"){ return; }
+            map.dataset.v169DialogueApproaching="1";
+
+            const openBossBubble=()=>{
+                delete map.dataset.v169DialogueApproaching;
+                if(map.isConnected===false||map.querySelector(".v143-abyss-dialogue")){ return; }
+                const heading=document.querySelector(".v141-abyss-shell > header b");
+                const match=heading&&heading.textContent.match(/第\s*(\d+)/);
+                const floor=Math.max(1,Math.min(5,Number(match&&match[1])||1));
+                const bossButton=map.querySelector(".v141-abyss-boss");
+                const boss=bossButton&&bossButton.querySelector("b");
+                const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();
+                let index=0;
+                const overlay=document.createElement("button");
+                overlay.type="button";
+                overlay.className="v143-abyss-dialogue";
+                overlay.setAttribute("aria-label","守關者對話，點擊繼續");
+                overlay.innerHTML='<small>'+escapeHtml(boss&&boss.textContent||"守關者")+'</small><b></b><span>點擊對話繼續　'+(index+1)+' / '+lines.length+'</span>';
+                const text=overlay.querySelector("b");
+                const hint=overlay.querySelector("span");
+                text.textContent=lines[index];
+                overlay.onclick=event=>{
+                    event.preventDefault(); event.stopPropagation();
+                    index++;
+                    if(index<lines.length){
+                        text.textContent=lines[index];
+                        hint.textContent="點擊對話繼續　"+(index+1)+" / "+lines.length;
+                        return;
+                    }
+                    text.textContent="進入戰鬥……";
+                    hint.textContent="";
+                    overlay.disabled=true;
+                    window.__v143AbyssDialogueComplete=true;
+                    setTimeout(()=>{ overlay.remove(); previousChallenge(); },180);
+                };
+                map.appendChild(overlay);
+                if(bossButton){
+                    const mapRect=map.getBoundingClientRect();
+                    const bossRect=bossButton.getBoundingClientRect();
+                    overlay.style.left=(bossRect.left+bossRect.width/2-mapRect.left)+"px";
+                    overlay.style.top=Math.max(104,bossRect.top-mapRect.top-8)+"px";
                 }
-                text.textContent="進入戰鬥……";
-                hint.textContent="";
-                overlay.disabled=true;
-                window.__v143AbyssDialogueComplete=true;
-                setTimeout(()=>{ overlay.remove(); previousChallenge(); },180);
             };
-            map.appendChild(overlay);
+
+            if(typeof window.v141ApproachAbyssBoss==="function"){
+                if(!window.v141ApproachAbyssBoss(openBossBubble)){ delete map.dataset.v169DialogueApproaching; }
+            }else{
+                openBossBubble();
+            }
         };
     }
 

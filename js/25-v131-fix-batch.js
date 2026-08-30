@@ -500,7 +500,7 @@
 
     if(typeof learnSkill==="function"){
         const originalLearnSkill=learnSkill;
-        learnSkill=function(skillId){
+        learnSkill=async function(skillId){
             const skill=skillDatabase[skillId];
             const loadout=characterSkillLoadouts[currentSkillCharacter];
             if(!skill || !loadout){
@@ -508,7 +508,17 @@
             }
             const before=Math.max(0,Number(loadout.skillLevels[skillId])||0);
             const actionText=before>0 ? "升級" : "學習";
-            if(!window.confirm("確定要"+actionText+"「"+skill.name+"」嗎？")){
+            if(
+                typeof window.rpgConfirm!=="function" ||
+                !await window.rpgConfirm(
+                    "確定要"+actionText+"「"+skill.name+"」嗎？",
+                    {
+                        title:actionText+"技能",
+                        confirmText:"確定"+actionText,
+                        cancelText:"返回"
+                    }
+                )
+            ){
                 return;
             }
             const result=originalLearnSkill.apply(this,arguments);
@@ -536,14 +546,24 @@
     */
     if(typeof upgradeSkill==="function"){
         const originalUpgradeSkill=upgradeSkill;
-        upgradeSkill=function(skillId){
+        upgradeSkill=async function(skillId){
             const skill=skillDatabase[skillId];
             const loadout=characterSkillLoadouts[currentSkillCharacter];
             if(!skill || !loadout){
                 return originalUpgradeSkill.apply(this,arguments);
             }
             const before=Math.max(0,Number(loadout.skillLevels[skillId])||0);
-            if(!window.confirm("確定要升級「"+skill.name+"」嗎？")){
+            if(
+                typeof window.rpgConfirm!=="function" ||
+                !await window.rpgConfirm(
+                    "確定要升級「"+skill.name+"」嗎？",
+                    {
+                        title:"升級技能",
+                        confirmText:"確定升級",
+                        cancelText:"返回"
+                    }
+                )
+            ){
                 return;
             }
             const result=originalUpgradeSkill.apply(this,arguments);
@@ -944,7 +964,7 @@
         typeof confirmAutoBattleSettings==="function" ? confirmAutoBattleSettings : null;
 
     if(originalConfirmAutoBattleSettings){
-        confirmAutoBattleSettings=function(){
+        confirmAutoBattleSettings=async function(){
             /*
                ★ 修正（依照使用者回報，「戰鬥中開啟元素匣，
                套用啟動才是沒反應」）：
@@ -974,9 +994,16 @@
                 addBattleLog("元素匣已啟動，剩餘 "+formatDuration(elementBoxState.remainingMs)+"。");
             };
             if(elementBoxState.remainingMs<=0){
-                const watch=window.confirm(
-                    "元素匣目前沒有可用時數。\n觀看廣告可獲得 8 小時元素匣啟動時數。\n\n要觀看廣告嗎？"
-                );
+                const watch=
+                    typeof window.rpgConfirm==="function" &&
+                    await window.rpgConfirm(
+                        "元素匣目前沒有可用時數。\n觀看廣告可獲得 8 小時元素匣啟動時數。\n\n要觀看廣告嗎？",
+                        {
+                            title:"補充元素匣時數",
+                            confirmText:"觀看廣告",
+                            cancelText:"稍後再說"
+                        }
+                    );
                 if(!watch){ return; }
                 showRewardedAd(
                     ()=>{

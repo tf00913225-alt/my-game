@@ -6931,11 +6931,18 @@ function showCreation(){
    清除存檔
 ===================================================== */
 
-function resetGame(){
+async function resetGame(){
 
     if(
-        !confirm(
-            "確定要刪除角色並重新創建嗎？"
+        typeof window.rpgConfirm!=="function" ||
+        !await window.rpgConfirm(
+            "確定要刪除角色並重新創建嗎？",
+            {
+                title:"刪除角色",
+                confirmText:"確定刪除",
+                cancelText:"保留角色",
+                danger:true
+            }
         )
     ){
         return;
@@ -31247,7 +31254,7 @@ function unequipItem(slot){
    售出
 ===================================================== */
 
-function sellSelectedItem(){
+async function sellSelectedItem(){
 
     if(
         selectedInventorySlot===null
@@ -31273,14 +31280,27 @@ function sellSelectedItem(){
 
 
     if(
-        !confirm(
+        typeof window.rpgConfirm!=="function" ||
+        !await window.rpgConfirm(
             "確定要出售"+
             item.name+
             "？\n"+
             "獲得"+
             price+
-            "金幣。"
+            "金幣。",
+            {
+                title:"出售裝備",
+                confirmText:"確定出售",
+                cancelText:"返回"
+            }
         )
+    ){
+        return;
+    }
+
+    if(
+        selectedInventorySlot===null ||
+        inventorySlots[selectedInventorySlot]!==item
     ){
         return;
     }
@@ -31311,7 +31331,7 @@ function sellSelectedItem(){
 
     /*
        ★ 修正（真正抓到問題根源）：
-       之前這裡的confirm()訊息一直說「獲得
+       之前這裡的確認訊息一直說「獲得
        XX金幣」，但從頭到尾沒有任何一行
        程式碼真的把這個數字加進任何地方——
        金幣系統當時根本不存在，這句話等於
@@ -33110,6 +33130,7 @@ catch(error){
 (function installMobileBackConfirmation(){
 
     let allowingExit=false;
+    let exitPromptOpen=false;
 
     window.allowGameNavigation=()=>{
         allowingExit=true;
@@ -33122,24 +33143,39 @@ catch(error){
         console.warn("無法建立返回防呆紀錄：",error);
     }
 
-    window.addEventListener("popstate",()=>{
+    window.addEventListener("popstate",async()=>{
         if(allowingExit){ return; }
 
-        const confirmed=confirm("確定要離開遊戲嗎？目前進度會先自動存檔。");
+        /* Native confirm used to block browser history while it was open.
+           The RPG dialog is asynchronous, so immediately restore a guard
+           entry before awaiting the player's choice. */
+        let guardRestored=false;
+        try{
+            history.pushState({rpgExitGuard:true},"",location.href);
+            guardRestored=true;
+        }catch(_){ }
+
+        if(exitPromptOpen){ return; }
+        exitPromptOpen=true;
+
+        const confirmed=
+            typeof window.rpgConfirm==="function" &&
+            await window.rpgConfirm(
+                "確定要離開遊戲嗎？目前進度會先自動存檔。",
+                {
+                    title:"離開冒險",
+                    confirmText:"儲存並離開",
+                    cancelText:"繼續冒險"
+                }
+            );
+
+        exitPromptOpen=false;
 
         if(confirmed){
             allowingExit=true;
             saveGame();
-            history.back();
-        }else{
-            history.pushState({rpgExitGuard:true},"",location.href);
+            history.go(guardRestored?-2:-1);
         }
-    });
-
-    window.addEventListener("beforeunload",event=>{
-        if(allowingExit){ return; }
-        event.preventDefault();
-        event.returnValue="";
     });
 
 })();

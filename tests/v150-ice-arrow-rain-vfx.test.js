@@ -235,9 +235,9 @@ test("all damage numbers share frame eight while remaining target-specific",()=>
     assert.equal(runtime.hitCalls(),2,"each real card owns its own damage number");
 });
 
-test("cache version 166 publishes the 1.6 second battlefield choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="166"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
+test("the current cache version publishes the 1.6 second battlefield choreography",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="169"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=169/);
     assert.match(animation,/frost-arrow-rain-vfx\.png\?v=166/);
 });
 

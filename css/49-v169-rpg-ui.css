@@ -1,0 +1,410 @@
+/* =====================================================
+   V169 — RPG dialogs, fixed character tabs and UI fixes
+===================================================== */
+
+/* Native-looking prompts are replaced by a game-owned, body-level layer. */
+.v169-rpg-dialog-layer{
+    position:fixed;
+    inset:0;
+    z-index:2147483647;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+    padding:18px;
+    padding-top:max(18px,env(safe-area-inset-top));
+    padding-right:max(18px,env(safe-area-inset-right));
+    padding-bottom:max(18px,env(safe-area-inset-bottom));
+    padding-left:max(18px,env(safe-area-inset-left));
+    overflow:hidden;
+    visibility:hidden;
+    opacity:0;
+    pointer-events:none;
+    background:
+        radial-gradient(circle at 50% 38%,rgba(118,75,25,.2),transparent 45%),
+        rgba(3,2,2,.82);
+    transition:opacity .16s ease,visibility 0s linear .16s;
+}
+
+.v169-rpg-dialog-layer.show{
+    visibility:visible;
+    opacity:1;
+    pointer-events:auto;
+    transition-delay:0s;
+}
+
+.v169-rpg-dialog{
+    position:relative;
+    width:min(100%,390px);
+    box-sizing:border-box;
+    padding:28px 20px 18px;
+    overflow:hidden;
+    border:2px solid #b88a42;
+    border-radius:14px;
+    background:
+        linear-gradient(135deg,transparent 13px,#22180e 0) top left,
+        linear-gradient(225deg,transparent 13px,#22180e 0) top right,
+        linear-gradient(45deg,transparent 13px,#110c08 0) bottom left,
+        linear-gradient(315deg,transparent 13px,#110c08 0) bottom right;
+    background-size:51% 51%;
+    background-repeat:no-repeat;
+    color:#eadfc9;
+    box-shadow:
+        0 18px 48px rgba(0,0,0,.78),
+        inset 0 0 0 1px rgba(255,226,151,.08),
+        inset 0 0 26px rgba(185,124,40,.08);
+    text-align:center;
+}
+
+.v169-rpg-dialog::before,
+.v169-rpg-dialog::after{
+    content:"";
+    position:absolute;
+    left:18px;
+    right:18px;
+    height:1px;
+    background:linear-gradient(90deg,transparent,#c69a50,transparent);
+    opacity:.72;
+}
+
+.v169-rpg-dialog::before{ top:14px; }
+.v169-rpg-dialog::after{ bottom:10px; }
+
+.v169-rpg-dialog-crest{
+    position:absolute;
+    top:5px;
+    left:50%;
+    min-width:28px;
+    padding:0 4px;
+    transform:translateX(-50%);
+    background:#21170d;
+    color:#efc96f;
+    font-size:16px;
+    line-height:20px;
+    text-shadow:0 0 8px rgba(240,180,41,.45);
+}
+
+.v169-rpg-dialog[data-tone="danger"]{
+    border-color:#b95746;
+    box-shadow:
+        0 18px 48px rgba(0,0,0,.78),
+        inset 0 0 0 1px rgba(255,186,162,.08),
+        inset 0 0 30px rgba(145,35,22,.12);
+}
+
+.v169-rpg-dialog[data-tone="danger"] .v169-rpg-dialog-crest{
+    color:#ff9b83;
+}
+
+.v169-rpg-dialog[data-tone="success"]{
+    border-color:#6ca995;
+    box-shadow:
+        0 18px 48px rgba(0,0,0,.78),
+        inset 0 0 0 1px rgba(188,255,229,.08),
+        inset 0 0 30px rgba(29,119,91,.12);
+}
+
+.v169-rpg-dialog h2{
+    margin:3px 0 11px;
+    color:#f3d899;
+    font-family:"Noto Serif TC",serif;
+    font-size:20px;
+    font-weight:900;
+    letter-spacing:1px;
+    line-height:1.35;
+}
+
+.v169-rpg-dialog-message{
+    min-height:24px;
+    color:#ddd0ba;
+    font-size:14px;
+    line-height:1.65;
+    white-space:pre-line;
+    overflow-wrap:anywhere;
+}
+
+.v169-rpg-dialog-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+    margin-top:17px;
+}
+
+.v169-rpg-dialog[data-kind="alert"] .v169-rpg-dialog-actions{
+    grid-template-columns:minmax(0,1fr);
+}
+
+.v169-rpg-dialog-button{
+    min-height:42px;
+    padding:8px 12px;
+    border:1px solid #896838;
+    border-radius:8px;
+    color:#e6d8bc;
+    background:linear-gradient(180deg,#332719,#17100a);
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:.5px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.v169-rpg-dialog-button.primary{
+    border-color:#c2964d;
+    color:#2b1908;
+    background:linear-gradient(180deg,#f1ce7a,#bd7d2d);
+}
+
+.v169-rpg-dialog-button.primary.danger{
+    border-color:#d26a55;
+    color:#fff1e9;
+    background:linear-gradient(180deg,#9f3d2d,#5e1f17);
+}
+
+.v169-rpg-dialog-button:focus-visible{
+    outline:2px solid #fff0b3;
+    outline-offset:2px;
+}
+
+/* Stop the two perpetual modal glows that caused video-visible flashing. */
+.item-modal-box,
+.home-feature-modal:not(#trainingZoneModal) > .home-feature-modal-box{
+    animation:none !important;
+}
+
+/* A permanently promoted layer made skill cards shimmer while scrolling. */
+.skill-preview-card{
+    will-change:auto !important;
+}
+
+/* ----- Character pages: remove historical spacer blocks. ----- */
+#game-stage #homeFeatureModal #characterTabContent{
+    padding-bottom:0 !important;
+    box-sizing:border-box !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent > #skillPage{
+    padding:0 0 12px !important;
+}
+
+#game-stage #homeFeatureModal #allSkillsList{
+    padding-bottom:12px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"],
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"]{
+    overflow-y:hidden !important;
+    touch-action:none !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="skill"]{
+    overflow-y:auto !important;
+    touch-action:pan-y !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] > #statusPage,
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] > #homeExpPoolCard{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] > #statusPage{
+    display:flex !important;
+    flex-direction:column !important;
+    padding:0 2px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] #statusPageTitle{
+    flex:0 0 auto;
+    margin:2px 0 3px !important;
+    line-height:1.25;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] .status-card{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    margin:0 !important;
+    padding:6px 8px !important;
+    box-sizing:border-box;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] .status-preview-bars{
+    margin-bottom:3px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] .status-preview-bar-row{
+    margin-bottom:3px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] .status-formula-hint{
+    margin-bottom:3px !important;
+    line-height:1.25;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] .status-row{
+    flex:1 1 0;
+    min-height:27px;
+    margin-bottom:3px !important;
+    line-height:1.2;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] .status-btn{
+    width:26px;
+    height:26px;
+    flex-basis:26px;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] .status-points-line{
+    margin:2px 0 !important;
+    line-height:1.25;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="status"] .status-confirm{
+    flex:0 0 auto;
+    margin-top:3px !important;
+    padding:6px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] > #homeExpPoolCard{
+    display:flex !important;
+    flex-direction:column !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .exp-pool-hero{
+    flex:0 0 auto;
+    padding:7px 10px 6px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .exp-pool-title{
+    margin-top:1px !important;
+    font-size:16px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .exp-pool-total{
+    margin-top:4px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .exp-pool-value{
+    font-size:25px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .exp-pool-caption{
+    margin-top:3px !important;
+    font-size:11px !important;
+    line-height:1.3 !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .exp-pool-section-head{
+    flex:0 0 auto;
+    margin:5px 3px 3px !important;
+    padding-bottom:3px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] #expDistributeList{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    gap:4px !important;
+    overflow:hidden;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .v131-exp-row{
+    flex:1 1 0;
+    min-height:0;
+    padding:5px 7px !important;
+    gap:2px 6px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .v131-exp-name{
+    font-size:13px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .v131-exp-level{
+    font-size:12px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .v131-exp-preview-btn{
+    padding:4px 7px !important;
+    font-size:12px !important;
+    line-height:1.25;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .v131-exp-preview-summary{
+    flex:0 0 auto;
+    padding:1px 2px !important;
+    font-size:11px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .v131-exp-actions{
+    flex:0 0 auto;
+    gap:6px !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent[data-character-tab="expPool"] .v131-exp-actions button{
+    padding:5px 7px !important;
+}
+
+/* ----- Shop: resource columns do not depend on card source order. ----- */
+#game-stage .shop-potion-list.v169-shop-columns{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    align-items:start !important;
+    gap:7px !important;
+}
+
+#game-stage .v169-shop-column{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+#game-stage .v169-shop-column > h3{
+    margin:0;
+    padding:5px 4px;
+    border:1px solid #74542d;
+    border-radius:7px;
+    color:#ead6ab;
+    background:linear-gradient(180deg,#291e13,#140e09);
+    font-size:12px;
+    line-height:1.25;
+    text-align:center;
+}
+
+#game-stage .v169-shop-column.hp > h3{
+    border-color:#8f493d;
+    color:#ffc0b3;
+}
+
+#game-stage .v169-shop-column.sp > h3{
+    border-color:#3f618d;
+    color:#bdd9ff;
+}
+
+#game-stage .v169-shop-column .shop-potion-card{
+    width:100%;
+    box-sizing:border-box;
+}
+
+/* The dungeon nav is z-index 790; its backpack must be above that layer. */
+#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
+    display:block !important;
+    inset:8px !important;
+    z-index:900 !important;
+}
+
+#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay::before{
+    z-index:-1 !important;
+}
+
+@media (prefers-reduced-motion:reduce){
+    .v169-rpg-dialog-layer{
+        transition:none;
+    }
+}

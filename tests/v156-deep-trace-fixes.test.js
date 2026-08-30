@@ -50,9 +50,9 @@ function loadRuntime(overrides={}){
     return context;
 }
 
-test("cache key 163 delivers the repaired runtime and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="166"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
+test("the current cache key delivers the repaired runtime and CSS",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="169"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=169/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.match(loader,/js\/45-v154-dev-fixes\.js/);
 });

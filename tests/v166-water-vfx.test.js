@@ -621,9 +621,9 @@ test("final combat targeting and Frostbite rules remain unchanged",()=>{
     assert.match(waterRules,/iceSpin:\{[\s\S]*?frostbiteChance:60/);
 });
 
-test("cache version 166 publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="166"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
+test("the current cache version publishes the water sheets, choreography and CSS",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="169"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=169/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });

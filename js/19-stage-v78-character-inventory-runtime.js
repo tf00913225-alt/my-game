@@ -49,6 +49,21 @@ function applyNow(){
             "inventoryPage"
         );
 
+    const statusPage=
+        document.getElementById(
+            "statusPage"
+        );
+
+    const skillPage=
+        document.getElementById(
+            "skillPage"
+        );
+
+    const expPool=
+        document.getElementById(
+            "homeExpPoolCard"
+        );
+
     if(
         !modal ||
         !body ||
@@ -166,11 +181,29 @@ function applyNow(){
             inventory.parentElement===root
         );
 
+    const activeCharacterTab=
+        inventoryOwnsScroll
+            ? "inventory"
+            : statusPage && statusPage.parentElement===root
+                ? "status"
+                : expPool && expPool.parentElement===root
+                    ? "expPool"
+                    : skillPage && skillPage.parentElement===root
+                        ? "skill"
+                        : "";
+
+    root.dataset.characterTab=
+        activeCharacterTab;
+
+    const fixedCharacterTab=
+        activeCharacterTab==="status" ||
+        activeCharacterTab==="expPool";
+
     root.style.setProperty(
         "overflow-y",
-        inventoryOwnsScroll
+        inventoryOwnsScroll || fixedCharacterTab
             ? "hidden"
-            : "scroll",
+            : "auto",
         "important"
     );
 

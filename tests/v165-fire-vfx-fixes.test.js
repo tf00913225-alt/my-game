@@ -131,11 +131,11 @@ test("Fire Rocket travels from its caster to the real target group before bursti
     assert.match(timing,/fireRocket:\[900/);
 });
 
-test("cache version 165 publishes the repaired sheets and choreography",()=>{
+test("the current cache version publishes the repaired sheets and choreography",()=>{
     assert.match(animation,/dragon-slash-cast\.png\?v=165/);
     assert.match(animation,/rage-cast\.png\?v=165/);
-    assert.match(loader,/const V_ASSET_VERSION="166"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=166/);
+    assert.match(loader,/const V_ASSET_VERSION="169"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=169/);
 });
 
 console.log("\nV165 Fire VFX fixes suite: "+passed+" tests passed.");

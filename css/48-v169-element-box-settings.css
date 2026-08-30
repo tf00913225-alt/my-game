@@ -1,0 +1,54 @@
+/* =====================================================
+   V169 — Element Box save/stop controls
+===================================================== */
+
+#autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active{
+    grid-template-columns:minmax(0,1fr) minmax(96px,112px) minmax(78px,94px);
+    gap:6px;
+}
+
+#autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status #autoBattleButton{
+    width:100% !important;
+    min-width:0 !important;
+    padding-inline:7px !important;
+}
+
+#autoBattleSettingsPanel .v169-element-box-stop{
+    width:100%;
+    height:46px;
+    min-width:0;
+    padding:0 7px;
+    border:1px solid #8f4c35;
+    border-radius:9px;
+    color:#ffd9b0;
+    background:
+        linear-gradient(180deg,rgba(126,43,29,.92),rgba(54,18,13,.98));
+    box-shadow:
+        inset 0 1px 0 rgba(255,226,146,.1),
+        0 3px 0 #260a06,
+        0 6px 12px rgba(0,0,0,.28);
+    font:900 11px/1 sans-serif;
+    letter-spacing:.03em;
+    cursor:pointer;
+    touch-action:manipulation;
+    transition:filter .12s ease,transform .12s ease;
+}
+
+#autoBattleSettingsPanel .v169-element-box-stop:active{
+    filter:brightness(1.13);
+    transform:translateY(1px);
+}
+
+#autoBattleSettingsPanel .v169-element-box-stop[hidden]{
+    display:none !important;
+}
+
+@media (max-width:380px){
+    #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active{
+        grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    }
+
+    #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active .auto-premium-status-copy{
+        grid-column:1/-1;
+    }
+}

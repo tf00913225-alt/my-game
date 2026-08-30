@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="166";
+const V_ASSET_VERSION="169";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -562,6 +562,32 @@ function vAssetUrl(path){
     }
 })();
 
+/* V169 loader — Element Box settings, RPG UI and Abyss reward flow. */
+(function loadV169Styles(){
+    const styles=[
+        {id:"v169-element-box-settings-style",href:"css/48-v169-element-box-settings.css"},
+        {id:"v169-rpg-ui-style",href:"css/49-v169-rpg-ui.css"},
+        {id:"v169-abyss-flow-style",href:"css/50-v169-abyss-flow.css"}
+    ];
+
+    function load(){
+        styles.forEach(style=>{
+            if(document.getElementById(style.id)){ return; }
+            const link=document.createElement("link");
+            link.id=style.id;
+            link.rel="stylesheet";
+            link.href=vAssetUrl(style.href);
+            document.head.appendChild(link);
+        });
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",load,{once:true});
+    }else{
+        setTimeout(load,0);
+    }
+})();
+
 /*
    V137 — all runtime patches must execute in version order.
 
@@ -597,7 +623,10 @@ function vAssetUrl(path){
         {id:"v154-dev-fixes-runtime",src:"js/45-v154-dev-fixes.js"},
         {id:"v155-dev-fixes-runtime",src:"js/46-v155-dev-fixes.js"},
         {id:"v158-combat-tuning-runtime",src:"js/47-v158-combat-tuning.js"},
-        {id:"v159-abyss-battle-portraits-runtime",src:"js/48-v159-abyss-battle-portraits.js"}
+        {id:"v159-abyss-battle-portraits-runtime",src:"js/48-v159-abyss-battle-portraits.js"},
+        {id:"v169-element-box-settings-runtime",src:"js/49-v169-element-box-settings.js"},
+        {id:"v169-water-skill-rules-runtime",src:"js/50-v169-water-skill-rules.js"},
+        {id:"v169-rpg-ui-runtime",src:"js/51-v169-rpg-ui.js"}
     ];
 
     function next(index){

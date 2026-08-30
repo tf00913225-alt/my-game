@@ -13,7 +13,8 @@ async function waitForV138(page){
             window.v138BattlePacing &&
             window.v132ShowItemPreview &&
             window.v138GetEquipmentDungeonComposition &&
-            window.v138GetExpDungeonRewardExp
+            window.v138GetExpDungeonRewardExp &&
+            window.__v169RpgUiInstalled
         );
     },null,{timeout:20000});
 }
@@ -196,24 +197,26 @@ async function seedParty(page){
         assert.match(setDisplay.active,/全能力\+1.*已啟動/);
         assert.match(setDisplay.inactive,/土元素技能傷害\+2%.*未啟動/);
 
-        const confirmation=await page.evaluate(()=>{
+        const confirmation=await page.evaluate(async()=>{
             closeItemModal();
             let message="";
-            const originalConfirm=window.confirm;
-            window.confirm=text=>{ message=text; return false; };
+            const originalConfirm=window.rpgConfirm;
+            window.rpgConfirm=async text=>{ message=text; return false; };
             const before=battleActive;
-            v132BeginExpDungeon();
-            window.confirm=originalConfirm;
+            await v132BeginExpDungeon();
+            window.rpgConfirm=originalConfirm;
             return {message,before,after:battleActive};
         });
         assert.match(confirmation.message,/確定要進入「經驗副本」嗎/);
         assert.equal(confirmation.before,confirmation.after);
 
-        await page.evaluate(()=>{
+        await page.evaluate(async()=>{
             inventoryItems.length=0;
             rebuildInventorySlots();
-            window.confirm=()=>true;
-            v132BeginEquipmentDungeon();
+            const originalConfirm=window.rpgConfirm;
+            window.rpgConfirm=async()=>true;
+            await v132BeginEquipmentDungeon();
+            window.rpgConfirm=originalConfirm;
         });
         await page.waitForFunction(()=>document.querySelectorAll("#battleMonsterArea .battle-monster").length===5);
         const equipmentBattle=await page.evaluate(()=>{
