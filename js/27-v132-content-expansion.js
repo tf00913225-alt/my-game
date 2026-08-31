@@ -1431,7 +1431,7 @@
        isDungeonAvailable()/dungeonEntryCard()的UI也會自動恢復
        擋下重複挑戰，不用再改別的地方。
     */
-    const DUNGEON_DAILY_LIMIT_ENABLED=true;
+    const DUNGEON_DAILY_LIMIT_ENABLED=false;
 
     function markDungeonUsed(type){
         if(!DUNGEON_DAILY_LIMIT_ENABLED){ return; }

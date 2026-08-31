@@ -17,8 +17,8 @@ function test(name,handler){
 }
 
 test("the current cache key delivers the Abyss tap correction",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.10"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.10/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.11"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.11/);
 });
 
 test("Abyss map portraits use the reduced mobile size and keep a full button hit area",()=>{
@@ -35,6 +35,16 @@ test("map-level portrait bounds route a mobile pseudo-element tap to dialogue",(
     assert.match(
         abyss,
         /const boss=abyssState\.phase==="boss"\?map\.querySelector\("\.v141-abyss-boss"\):null;[\s\S]*if\(isAbyssMapControlHit\(event,boss\)\)\{[\s\S]*window\.v141ChallengeAbyssBoss\(\);[\s\S]*return;/
+    );
+});
+
+test("the final walking owner passes a BOSS tap through with its original coordinates",()=>{
+    const wrapper=polish.slice(polish.indexOf("const previousAbyssMove=window.v141AbyssMoveByEvent;"));
+    assert.match(wrapper,/const boss=map\.querySelector\("\.v141-abyss-boss"\);[\s\S]*?const bossHit=!!\(boss&&[\s\S]*?if\(bossHit\)\{ return previousAbyssMove\.apply\(this,arguments\); \}/);
+    assert.ok(
+        wrapper.indexOf("if(bossHit){ return previousAbyssMove.apply(this,arguments); }")<
+        wrapper.indexOf("const synthetic={"),
+        "BOSS input must be delegated before a one-step coordinate is created"
     );
 });
 

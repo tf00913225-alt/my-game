@@ -125,8 +125,8 @@
             glyph:"●",motion:"wave",impact:"water-splash",hit:.5833333333,pulses:1,spread:34,
             sprite:{
                 src:"assets/vfx/water/water-orb-vfx.png?v=173.9",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true,
-                scale:1.25,minSize:110,maxSize:165
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"group",
+                scale:1.22,minSize:150,maxSize:500
             }
         },
         floodBeast:{
@@ -143,7 +143,8 @@
             pulses:7,spread:104,flightCount:7,deferredStatusTypes:["frostbite"],
             sprite:{
                 src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=166",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",scale:1
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",coverageScale:1.22,
+                minWidth:140,minHeight:140
             }
         },
         freeze:{
@@ -659,7 +660,9 @@
 
     function emittedSpriteTargets(current){
         return current.targetIndexes.filter(index=>
-            current.emitted.has(index)&&current.validTargets.has(index)&&!!cardFor(current.targetSide,index)
+            current.emitted.has(index)&&current.validTargets.has(index)&&
+            canReceive(current.config,current.targetSide,index)&&
+            !!cardFor(current.targetSide,index)
         );
     }
 
@@ -736,30 +739,42 @@
             node.style.setProperty("--v143-sprite-target-left",target.x+"px");
             node.style.setProperty("--v143-sprite-target-top",target.y+"px");
             node.style.setProperty("--v143-sprite-angle","0deg");
-            if(current.config.id==="waterBall"){
-                node.style.setProperty("--v166-water-orb-half-offset",size/4+"px");
-            }
             return;
         }
 
         if(placement==="battlefield"){
+            /*
+               A battlefield Sprite Sheet is one VFX instance. Its destination
+               is based only on cards that are still valid targets, never on a
+               fixed side container or a dead/retired card.
+            */
             const indexes=emittedSpriteTargets(current);
-            const bounds=sideAreaBounds(current.targetSide);
+            const targetCards=indexes.map(targetIndex=>cardFor(current.targetSide,targetIndex))
+                .filter(card=>card&&card.offsetParent!==null);
+            const bounds=fieldBounds(targetCards);
             if(!bounds){ return; }
             const viewportWidth=Number(window.innerWidth)||960;
             const viewportHeight=Number(window.innerHeight)||720;
-            const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
-            const size=clamp(
-                Math.max(bounds.width,bounds.height)*(Number(sprite.scale)||1),
-                Number(sprite.minSize)||160,
-                Number(sprite.maxSize)||dynamicMaximum
+            const coverageScale=clamp(Number(sprite.coverageScale)||1.22,1.15,1.3);
+            const maxWidth=Math.max(240,Math.min(viewportWidth*.94,Number(sprite.maxWidth)||viewportWidth*.94));
+            const maxHeight=Math.max(240,Math.min(viewportHeight*.92,Number(sprite.maxHeight)||viewportHeight*.92));
+            const width=clamp(
+                Math.round(bounds.width*coverageScale),
+                Number(sprite.minWidth)||140,
+                maxWidth
+            );
+            const height=clamp(
+                Math.round(bounds.height*coverageScale),
+                Number(sprite.minHeight)||140,
+                maxHeight
             );
             node.dataset.targetIndexes=indexes.join(",");
-            node.dataset.areaId=bounds.id;
+            node.dataset.areaId="living-targets";
+            node.dataset.coverageScale=String(coverageScale);
             node.style.left=(bounds.left+bounds.width/2)+"px";
             node.style.top=(bounds.top+bounds.height/2)+"px";
-            node.style.width=size+"px";
-            node.style.height=size+"px";
+            node.style.width=width+"px";
+            node.style.height=height+"px";
             node.style.clipPath="none";
             node.style.setProperty("--v143-sprite-dx","0px");
             node.style.setProperty("--v143-sprite-dy","0px");
@@ -859,9 +874,6 @@
                 -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"
             );
             if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
-            if(current.config.id==="waterBall"&&placement==="targetTrajectory"){
-                node.dataset.formationLead=current.spriteNodes.size===0?"true":"false";
-            }
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);

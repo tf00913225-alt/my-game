@@ -164,7 +164,7 @@ test("official Ice Arrow Rain sheet is a complete 4x3 RGBA PNG",()=>{
     assert.equal(info.height/3,384);
 });
 
-test("manifest binds the renamed V166 sheet and frame-eight hit",()=>{
+test("manifest keeps one 4x3 sheet and frame-eight hit",()=>{
     const runtime=loadRuntime([0,1,2]);
     const model=runtime.context.v143SkillAnimationManifest.iceArrowRain;
     assert.equal(model.sprite.src,assetPath+"?v=166");
@@ -173,6 +173,8 @@ test("manifest binds the renamed V166 sheet and frame-eight hit",()=>{
         [4,3,12,7]
     );
     assert.equal(model.sprite.placement,"battlefield");
+    assert.equal(model.sprite.coverageScale,1.22);
+    assert.deepEqual([model.sprite.minWidth,model.sprite.minHeight],[140,140]);
     assert.equal(model.hit,.5833333333);
     assert.match(timing,/iceArrowRain:\[1600/);
 });
@@ -188,7 +190,7 @@ test("frame order remains left-to-right then top-to-bottom and never loops",()=>
     assert.doesNotMatch(css,/v166[^}]*ArrowRain[^}]*infinite/i);
 });
 
-test("one shared sheet always uses the complete enemy battlefield, even for one enemy",()=>{
+test("one shared sheet uses the bounding box of living targets only",()=>{
     const placements=[];
     [[1],[0,1,2]].forEach(indexes=>{
         const runtime=loadRuntime(indexes);
@@ -202,18 +204,19 @@ test("one shared sheet always uses the complete enemy battlefield, even for one 
         const sprite=sprites[0];
         assert.equal(sprite.dataset.placement,"battlefield");
         assert.equal(sprite.dataset.targetSide,"monster");
-        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
-        assert.equal(sprite.style.left,"460px");
-        assert.equal(sprite.style.top,"165px");
-        assert.deepEqual([sprite.style.width,sprite.style.height],["440px","440px"]);
+        assert.equal(sprite.dataset.areaId,"living-targets");
+        assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
+        assert.equal(sprite.style.left,"438px");
+        assert.equal(sprite.style.top,"130px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
-        assert.ok(sprite.style.backgroundImage.includes(assetPath),"the complete sheet stays centered");
-        const tiles=sprite.querySelectorAll(".v166-water-battlefield-tile");
-        assert.equal(tiles.length,0,"one large sheet replaces tiled copies");
+        assert.ok(sprite.style.backgroundImage.includes(assetPath),"the single sheet stays centered");
+        assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0,"no tiled copies");
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
         assert.ok(runtime.scheduled.some(timer=>timer.delay>=1590),"full 1.6 second action gate");
     });
-    assert.deepEqual(placements[0],placements[1],"AOE must not shrink to a single target");
+    assert.deepEqual(placements[0],["438px","130px","140px","140px"]);
+    assert.deepEqual(placements[1],["438px","130px","386px","140px"]);
+    assert.notDeepEqual(placements[0],placements[1],"AOE follows the living formation instead of a fixed side box");
 });
 
 test("all damage numbers share frame eight while remaining target-specific",()=>{
@@ -238,8 +241,8 @@ test("all damage numbers share frame eight while remaining target-specific",()=>
 });
 
 test("the current cache version publishes the 1.6 second battlefield choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.10"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.10/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.11"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.11/);
     assert.match(animation,/frost-arrow-rain-vfx\.png\?v=166/);
 });
 

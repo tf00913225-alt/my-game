@@ -209,33 +209,19 @@
 }
 
 .v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite{
+    /*
+       Water Ball's sheet already contains its three-water-ball formation.
+       Keep one cropped frame centered over the living target group.
+    */
     animation:
-        v166WaterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
-        v173WaterOrbTargetTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+        v166WaterCastFrames var(--v143-sprite-duration,1400ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        v166WaterCastEnvelope var(--v143-sprite-duration,1400ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
 .v143-skill-stage[data-skill="floodBeast"] .v166-water-cast-sprite{
     animation:
         v166WaterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
         v166WaterTargetTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
-}
-
-.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite{
-    --v166-water-full-clip:inset(0);
-    --v166-water-flight-clip:inset(0 0 50% 0);
-    --v166-water-impact-clip:inset(50% 0 0 0);
-}
-
-.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite[data-formation-lead="false"]{
-    --v166-water-formation-opacity:0;
-}
-
-.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite[data-target-side="monster"]{
-    --v173-water-flight-rotation:90deg;
-}
-
-.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite[data-target-side="player"]{
-    --v173-water-flight-rotation:-90deg;
 }
 
 .v143-skill-stage[data-skill="iceArrowRain"] .v166-water-cast-sprite{
@@ -311,64 +297,6 @@
     }
 }
 
-@keyframes v173WaterOrbTargetTravel{
-    0%{
-        opacity:0;
-        left:var(--v143-sprite-start-left);
-        top:var(--v143-sprite-start-top);
-        clip-path:var(--v166-water-full-clip,inset(0));
-        transform-origin:50% 50%;
-        transform:translate(-50%,-50%) rotate(0deg) scale(.9);
-    }
-    3%,33.332%{
-        opacity:var(--v166-water-formation-opacity,1);
-        left:var(--v143-sprite-start-left);
-        top:var(--v143-sprite-start-top);
-        clip-path:var(--v166-water-full-clip,inset(0));
-        transform-origin:50% 50%;
-        transform:translate(-50%,-50%) rotate(0deg) scale(1);
-    }
-    33.333%{
-        opacity:1;
-        left:var(--v143-sprite-start-left);
-        top:calc(var(--v143-sprite-start-top) + var(--v166-water-orb-half-offset));
-        clip-path:var(--v166-water-flight-clip);
-        transform-origin:50% 25%;
-        transform:translate(-50%,-50%) rotate(var(--v173-water-flight-rotation)) scale(1);
-    }
-    58.332%{
-        opacity:1;
-        left:var(--v143-sprite-target-left);
-        top:calc(var(--v143-sprite-target-top) + var(--v166-water-orb-half-offset));
-        clip-path:var(--v166-water-flight-clip);
-        transform-origin:50% 25%;
-        transform:translate(-50%,-50%) rotate(var(--v173-water-flight-rotation)) scale(1);
-    }
-    58.333%,66.665%{
-        opacity:1;
-        left:var(--v143-sprite-target-left);
-        top:calc(var(--v143-sprite-target-top) - var(--v166-water-orb-half-offset));
-        clip-path:var(--v166-water-impact-clip);
-        transform-origin:50% 75%;
-        transform:translate(-50%,-50%) rotate(0deg) scale(1);
-    }
-    66.666%,95%{
-        opacity:1;
-        left:var(--v143-sprite-target-left);
-        top:var(--v143-sprite-target-top);
-        clip-path:var(--v166-water-full-clip,inset(0));
-        transform-origin:50% 50%;
-        transform:translate(-50%,-50%) rotate(0deg) scale(1);
-    }
-    100%{
-        opacity:0;
-        left:var(--v143-sprite-target-left);
-        top:var(--v143-sprite-target-top);
-        clip-path:var(--v166-water-full-clip,inset(0));
-        transform-origin:50% 50%;
-        transform:translate(-50%,-50%) rotate(0deg) scale(1.03);
-    }
-}
 
 @keyframes v166WaterAoeEnvelope{
     0%{opacity:0;transform:translate(-50%,-50%) scale(1)}

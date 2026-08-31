@@ -1,7 +1,6 @@
 "use strict";
 
 const assert=require("node:assert/strict");
-const crypto=require("node:crypto");
 const fs=require("node:fs");
 
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
@@ -12,77 +11,35 @@ const index=fs.readFileSync("index.html","utf8");
 let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
-test("V173 keeps the original twelve-frame Water Orb sprite",()=>{
-    const asset=fs.readFileSync("assets/vfx/water/water-orb-vfx.png");
-    assert.equal(
-        crypto.createHash("sha256").update(asset).digest("hex"),
-        "d3bdcafbd65965a9c54c9785baa1922849f11f1c1fc905bf6c4723024c745c2d"
-    );
+test("Water Ball owns a 12-frame, 4x3 group sprite with the frame-eight hit",()=>{
     assert.match(
         animation,
-        /waterBall:\{[\s\S]*?hit:\.5833333333[\s\S]*?frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true/
+        /waterBall:\{[\s\S]*?hit:\.5833333333[\s\S]*?frames:12,hitFrame:7,placement:"group"/
     );
 });
 
-test("Water Orb owns a dedicated travel timeline and Flood Beast keeps its old one",()=>{
+test("the single group VFX is centered on actual live targets rather than the caster",()=>{
+    const placement=animation.slice(animation.indexOf("function placeSprite(current,node,index,target){"));
     assert.match(
-        css,
-        /data-skill="waterBall"[^\{]*v166-water-cast-sprite\{[\s\S]*?v173WaterOrbTargetTravel/
+        placement,
+        /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(targetIndex=>cardFor\(current\.targetSide,targetIndex\)\)/
     );
     assert.match(
-        css,
-        /data-skill="floodBeast"[^\{]*v166-water-cast-sprite\{[\s\S]*?v166WaterTargetTravel/
+        placement,
+        /const destination=\{[\s\S]*?x:targetBounds\.left\+targetBounds\.width\/2,[\s\S]*?y:targetBounds\.top\+targetBounds\.height\/2/
     );
+    assert.doesNotMatch(placement,/waterBall.*targetTrajectory/);
 });
 
-test("Frames five through seven rotate each real projectile toward its target",()=>{
-    assert.match(
-        css,
-        /data-target-side="monster"[^\{]*\{\s*--v173-water-flight-rotation:90deg;/
-    );
-    assert.match(
-        css,
-        /data-target-side="player"[^\{]*\{\s*--v173-water-flight-rotation:-90deg;/
-    );
-    const travel=css.match(/@keyframes v173WaterOrbTargetTravel\{[\s\S]*?\n\}/);
-    assert.ok(travel);
-    for(const boundary of ["33.333%","58.332%"]){
-        const escaped=boundary.replace(".","\\.");
-        assert.match(
-            travel[0],
-            new RegExp(escaped+"\\{[\\s\\S]*?clip-path:var\\(--v166-water-flight-clip\\);[\\s\\S]*?transform-origin:50% 25%;[\\s\\S]*?rotate\\(var\\(--v173-water-flight-rotation\\)\\)")
-        );
-    }
+test("the CSS visits frames left-to-right, top-to-bottom once without a per-target travel animation",()=>{
+    assert.match(css,/@keyframes v166WaterCastFrames\{[\s\S]*?33\.333333%\{background-position:0 50%\}[\s\S]*?66\.666667%\{background-position:0 100%\}/);
+    assert.match(css,/data-skill="waterBall"[\s\S]*?v166WaterCastEnvelope/);
+    assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v173WaterOrbTargetTravel/);
 });
 
-test("Frame eight hits with the lower splash and frames nine through twelve use full explosions",()=>{
-    const travel=css.match(/@keyframes v173WaterOrbTargetTravel\{[\s\S]*?\n\}/);
-    assert.ok(travel);
-    assert.match(
-        travel[0],
-        /58\.333%,66\.665%\{[\s\S]*?left:var\(--v143-sprite-target-left\);[\s\S]*?clip-path:var\(--v166-water-impact-clip\);[\s\S]*?transform-origin:50% 75%;[\s\S]*?rotate\(0deg\)/
-    );
-    assert.match(
-        travel[0],
-        /66\.666%,95%\{[\s\S]*?left:var\(--v143-sprite-target-left\);[\s\S]*?top:var\(--v143-sprite-target-top\);[\s\S]*?clip-path:var\(--v166-water-full-clip,inset\(0\)\);[\s\S]*?rotate\(0deg\)/
-    );
+test("the published build label is V173.11",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.11"/);
+    assert.match(index,/aria-label="目前版本 V173\.11"[\s\S]*?>V173\.11<\/div>/);
 });
 
-test("Only actual targets receive copies and the published build label is V173.10",()=>{
-    assert.match(
-        animation,
-        /const key=placement==="single"\|\|placement==="targetTrajectory"\?index:"main";/
-    );
-    assert.match(
-        animation,
-        /if\(!current\.validTargets\.has\(index\)\)\{ return; \}[\s\S]*?if\(!allowDefeated&&!canReceive\(current\.config,current\.targetSide,index\)\)\{ return; \}/
-    );
-    assert.match(
-        animation,
-        /node\.dataset\.formationLead=current\.spriteNodes\.size===0\?"true":"false";/
-    );
-    assert.match(loader,/const V_ASSET_VERSION="173\.10"/);
-    assert.match(index,/aria-label="目前版本 V173\.10"[\s\S]*?>V173\.10<\/div>/);
-});
-
-console.log("\nV173 Water Orb direction VFX suite: "+passed+" tests passed.");
+console.log("\nV173 Water Ball target-group VFX suite: "+passed+" tests passed.");
