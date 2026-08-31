@@ -1,5 +1,7 @@
 "use strict";
 
+/* HISTORICAL SPEC SNAPSHOT (V169): 水系值雖與 V170 相容，本檔仍非完整載入整合；V170 以 v170-final-spec-integration.test.js 為準。 */
+
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");

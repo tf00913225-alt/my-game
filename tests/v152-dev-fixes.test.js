@@ -1,3 +1,5 @@
+/* HISTORICAL SPEC SNAPSHOT (V152): 只保留該版驗收紀錄；V170 最終規格以 v170-final-spec-integration.test.js 為準。 */
+
 const assert=require("assert");
 const fs=require("fs");
 const vm=require("vm");
