@@ -23731,7 +23731,11 @@ const badgePoint =
 
     },2200);
 
-}
+
+
+    if(typeof window.v142PlaySkillAnimationFromBadge==="function"){
+        window.v142PlaySkillAnimationFromBadge("player",skillName,elementType,characterIndex||0);
+    }}
 
 
 /*
@@ -23837,7 +23841,11 @@ const badgePoint =
 
     },2200);
 
-}
+
+
+    if(typeof window.v142PlaySkillAnimationFromBadge==="function"){
+        window.v142PlaySkillAnimationFromBadge("monster",skillName,elementType,monsterIndex||0);
+    }}
 
 
 /*

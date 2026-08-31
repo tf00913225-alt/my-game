@@ -17,4 +17,4 @@ assert.match(animation,/water-orb-vfx\.png\?v=173\.6/);
 assert.match(loader,/const V_ASSET_VERSION="173\.6"/);
 assert.match(index,/<title>四象江湖傳 V173\.6<\/title>/);
 
-console.log("V173.6 P0 runtime recovery: 7 tests passed.");
+console.log("V173.7 P0 runtime recovery: 7 tests passed.");
