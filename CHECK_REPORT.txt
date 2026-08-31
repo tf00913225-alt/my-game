@@ -1,18 +1,18 @@
-V173.3 專案基線檢查報告
+V173.4 元素匣金幣統計檢查報告
 
 產生日期：2026-08-31
 起始基準：main/dev 同步點 8c7ceea1643a519b110ffab95a50d2de3cb69adf
-發布標示：V173.3
+發布標示：V173.4
 
 一、目前檔案與資產統計
 
-- Git 追蹤檔案：350 個。
+- Git 追蹤檔案：351 個。
 - HTML：1 個（index.html）。
 - CSS：50 個（css/）。
 - 正式 JavaScript：112 個（js/）。
-- tests/ JavaScript：37 個，其中 36 個 *.test.js Node suite，另 1 個
+- tests/ JavaScript：38 個，其中 37 個 *.test.js Node suite，另 1 個
   tests/v138-browser-smoke.js 需要 Playwright／Chromium，不列入 Node suite。
-- JavaScript 語法檢查總數：149 個（js/ 112 + tests/ 37）。
+- JavaScript 語法檢查總數：150 個（js/ 112 + tests/ 38）。
 - assets/：142 個檔案，共 128,596,711 bytes（122.64 MiB）。
   其中圖片 141 個，共 128,587,355 bytes（122.63 MiB）：47 JPG、78 PNG、
   16 WEBP；另有 assets/ASSET_MAP.txt 1 個。
@@ -29,14 +29,14 @@ V173.3 專案基線檢查報告
   gameplay runtime。
 - 正式 release entry：js/00-main.js、
   js/19-stage-v78-character-inventory-runtime.js、js/20-anonymous-20.js；
-  index query、首頁版本標示與 Loader 版本皆一致為 V173.3。
+  index query、首頁版本標示與 Loader 版本皆一致為 V173.4。
 
 三、本次實際執行的檢查
 
 靜態檢查：
 
 - .github/scripts/ci.mjs 語法檢查：通過。
-- js/ 與 tests/ JavaScript 語法：149 / 149 通過。
+- js/ 與 tests/ JavaScript 語法：150 / 150 通過。
 - 本地 HTML／CSS／JavaScript／圖片等資源引用：通過，0 缺檔。
 - HTML 重複 ID：通過，0 組重複。
 - 正式版本、index entry、Loader 相依檔與 runtime 順序完整性：通過。
@@ -44,24 +44,29 @@ V173.3 專案基線檢查報告
 
 Node 測試：
 
-- 36 / 36 套 Node unit／integration suite 通過。
+- 37 / 37 套 Node unit／integration suite 通過。
+- 新增 tests/v173.4-element-box-gold.test.js：驗證怪物實際入帳金額、未啟用、
+  既有／非怪物金幣、停止／時數耗盡、切角／重載、副本排除及舊 normal 設定不變。
 - 測試包含 V170 最終整合規格；歷史版本 suite 仍保留作版本紀錄。
 
 四、本次沒有執行的驗證
 
-- V173.3 本輪沒有執行 Samsung／Android 或其他手機真機測試。
-- V173.3 本輪沒有執行完整 Playwright／Chromium 網站操作、視覺、Console
+- V173.4 本輪沒有執行 Samsung／Android 或其他手機真機測試。
+- V173.4 本輪沒有執行完整 Playwright／Chromium 網站操作、視覺、Console
   或完整戰鬥流程驗證。
-- tests/v138-browser-smoke.js 未由正式 CI 執行，也沒有計入 36 套 Node 測試；
+- tests/v138-browser-smoke.js 未由正式 CI 執行，也沒有計入 37 套 Node 測試；
   不得把它的 skip 或未執行狀態宣稱為瀏覽器測試通過。
 - V173.2 曾完成的 Samsung 真機觸控／捲動驗證屬前一版紀錄，不能代替
-  V173.3 本輪的真機驗證。
+  V173.4 本輪的真機驗證。
 
 五、本次變更邊界
 
-- 只更新基線報告、HTML title、版本標示、快取版本及相應測試斷言。
-- 未修改戰鬥、技能、數值、存檔、掉落、動畫、角色能力、美術資產或
-  JavaScript 補丁架構。
+- 元素匣「本次上線獲得金幣」改在 awardMonsterGoldDrop() 成功入帳並回傳實際
+  amount 後直接累加；移除以全域 gold 戰前／戰後差額推算的路徑。
+- 只在元素匣正常巡怪啟用時統計，排除副本；野外精英保留既有巡怪涵蓋範圍。
+- 更新 V173.4 HTML title、首頁標示、發布 entry query、Loader 快取版本及相應測試斷言。
+- 未修改帳號總 gold、掉落公式、副本獎勵、戰鬥數值、技能、存檔、動畫、美術或舊存檔
+  autoConfig.skill="normal"。
 
 ============================================================
 V121_SPLIT 歷史檢查報告（僅保留拆檔歷史，不是目前專案基線）

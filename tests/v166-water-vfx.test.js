@@ -704,8 +704,8 @@ test("final combat targeting and Frostbite rules remain unchanged",()=>{
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.3"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.3/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });

@@ -595,6 +595,30 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-08-31 — V173.4：P2 第三階段元素匣本次上線金幣統計（dev）
+
+- 以 `origin/dev=a2d99b4b05d4c5f5c3f421bf7dc1d1c1c017404d` 為唯一施工基礎；本機
+  `dev` 已依使用者明確授權重設至該 SHA。未建立分支、未修改或合併 `main`。
+- `js/25-v131-fix-batch.js` 移除元素匣以戰鬥前後全域 `gold` 差額累計的路徑；改為包裝
+  `awardMonsterGoldDrop()`，在既有原函式已成功將怪物掉落入帳並回傳實際 `amount` 後，
+  僅於元素匣有效的一般巡怪累加該筆 amount。真正副本（`v132ActiveDungeonRun`）排除；
+  V141 野外精英的短暫掉落隔離旗標仍視為既有一般巡怪，避免少算精英掉落。
+- `elementBoxSession.gold` 保持「本次上線」暫存，重新載入仍歸零；帳號共用 `gold`、怪物
+  掉落公式、副本獎勵與存檔結構均未改動。舊存檔 `autoConfig.skill="normal"` 不讀、不寫、
+  不提示也不還原。
+- 新增 `tests/v173.4-element-box-gold.test.js`，涵蓋逐筆入帳、未啟用、既有／非怪物金幣、
+  中途停止、時數耗盡、切換角色、重新載入、副本排除、野外精英與 legacy normal 不變。
+- 發布／快取同步升為 V173.4：`index.html` 首頁標示與 release entry query、
+  `js/20-anonymous-20.js` 的 `V_ASSET_VERSION`、現行發布版測試斷言。
+- 本機完整 CI 同等檢查通過：`node --check .github/scripts/ci.mjs`、JavaScript 150／150、
+  Node suites 37／37、300 個靜態資源、272 個 HTML ID、V173.4 Loader／entry 及 Git
+  whitespace／conflict marker 全數通過。`tests/v138-browser-smoke.js` 未執行／未計入；
+  本輪未做手機真機或 Playwright／Chromium 視覺驗證。
+
+**本輪刻意未處理**：舊存檔 `autoConfig.skill="normal"` 無法可靠判別，維持不動；怒火、
+水球術、洪水猛獸、冰霜箭雨保留待獨立修正。燃燒素材 `burn-loop.png` 仍只在具名 stash
+`pre-v173.4-burn-loop-local-20260831`，不得納入本版。
+
 ### 2026-08-31 — V173.3：P2 第一階段專案基線整理（dev）
 
 - 開工前確認遠端 `main=8c7ceea1643a519b110ffab95a50d2de3cb69adf`，原 `dev`
