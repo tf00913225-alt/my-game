@@ -164,7 +164,7 @@ test("daily dungeon formations and element balancing match the requested expansi
     assert.match(v132Source,/stage===3 \? "elite" : "regular"/);
     assert.match(v132Source,/eliteCount:Math\.max\(0,10-bossCount\)/);
     assert.match(v132Source,/total:10/);
-    assert.match(v132Source,/const DUNGEON_DAILY_LIMIT_ENABLED=true/);
+    assert.match(v132Source,/const DUNGEON_DAILY_LIMIT_ENABLED=false/);
     assert.match(uiSource,/const elements=\["fire","water","earth","wind"\]/);
     assert.match(uiSource,/monster\.element=elements\[index%elements\.length\]/);
     assert.match(uiSource,/bosses\.forEach/);
