@@ -360,9 +360,9 @@ function createContext(options={}){
         assert.equal(completions,1);
     });
 
-    await test("player and monster badge hooks share one director and cleanup path",()=>{
-        assert.match(source,/showSkillNameBadge=function/);
-        assert.match(source,/showMonsterSkillNameBadge=function/);
+    await test("direct badge action trigger shares one director and cleanup path",()=>{
+        assert.match(source,/window\.v142PlaySkillAnimationFromBadge=function/);
+        assert.doesNotMatch(source,/const previous=showSkillNameBadge/);
         assert.match(source,/animationend/);
         assert.match(source,/cancelAnimationFrame/);
         assert.match(source,/removeEventListener\("visibilitychange"/);
