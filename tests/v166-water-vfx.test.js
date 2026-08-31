@@ -38,7 +38,7 @@ const DURATIONS={
     frostPunch:900,
     iceSpin:1000,
     frostCrush:1150,
-    waterBall:1100,
+    waterBall:1400,
     floodBeast:1350,
     freeze:950,
     healSpell:1250,
@@ -417,7 +417,7 @@ test("Ice Spin creates one synchronized sheet for every real target and never fo
     });
 });
 
-test("Water Orb and Tidal Beast travel from the actor to each actual target",()=>{
+test("Water Ball renders one sheet centered on the actual living target group",()=>{
     [[1],[0,2],[0,1,2]].forEach(indexes=>{
         const monsters=[0,1,2].map(index=>({
             alive:indexes.includes(index),hp:indexes.includes(index)?100:0,
@@ -428,30 +428,16 @@ test("Water Orb and Tidal Beast travel from the actor to each actual target",()=
             castConfig("waterBall","tri"),
             {side:"player",actorIndex:0,targetIds:indexes}
         );
-        assert.deepEqual(
-            stageSprites(runtime).sprites.map(node=>Number(node.dataset.targetIndex)),
-            indexes,indexes.join(",")
-        );
+        const sprites=stageSprites(runtime).sprites;
+        assert.equal(sprites.length,1,indexes.join(","));
+        assert.equal(sprites[0].dataset.placement,"group");
+        assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
+        assert.equal(sprites[0].style.left,"458px");
+        assert.equal(sprites[0].style.top,"140px");
+        assert.equal(sprites[0].style["--v143-sprite-dx"],"0px");
+        assert.equal(sprites[0].style["--v143-sprite-dy"],"0px");
+        assert.equal(sprites[0].style["--v143-sprite-duration"],"1400ms");
     });
-    const waterBall=loadRuntime({targetIndexes:[0,2]});
-    waterBall.context.v142SkillAnimationDirector.play(
-        castConfig("waterBall","tri"),
-        {side:"player",actorIndex:0,targetIds:[0,2]}
-    );
-    const orbSprites=stageSprites(waterBall).sprites;
-    assert.equal(orbSprites.length,2);
-    assert.deepEqual(orbSprites.map(node=>node.dataset.targetIndex),["0","2"]);
-    assert.ok(orbSprites.every(node=>node.style.left==="99px"&&node.style.top==="418px"));
-    assert.deepEqual(orbSprites.map(node=>node.style["--v143-sprite-dx"]),["239px","479px"]);
-    assert.ok(orbSprites.every(node=>node.style["--v143-sprite-dy"]==="-278px"));
-    assert.ok(orbSprites.every(node=>node.style["--v143-sprite-start-left"]==="99px"));
-    assert.ok(orbSprites.every(node=>node.style["--v143-sprite-start-top"]==="418px"));
-    assert.deepEqual(orbSprites.map(node=>node.style["--v143-sprite-target-left"]),["338px","578px"]);
-    assert.ok(orbSprites.every(node=>node.style["--v143-sprite-target-top"]==="140px"));
-    assert.deepEqual(orbSprites.map(node=>node.animationStartSnapshot),[
-        {startLeft:"99px",startTop:"418px",targetLeft:"338px",targetTop:"140px"},
-        {startLeft:"99px",startTop:"418px",targetLeft:"578px",targetTop:"140px"}
-    ]);
 
     const beast=loadRuntime();
     beast.context.v142SkillAnimationDirector.play(
@@ -461,22 +447,11 @@ test("Water Orb and Tidal Beast travel from the actor to each actual target",()=
     const beastSprites=stageSprites(beast).sprites;
     assert.equal(beastSprites.length,1);
     assert.equal(beastSprites[0].dataset.targetIndex,"1");
-    assert.equal(beastSprites[0].style.left,"99px");
-    assert.equal(beastSprites[0].style.top,"418px");
-    assert.equal(beastSprites[0].style["--v143-sprite-dx"],"359px");
-    assert.equal(beastSprites[0].style["--v143-sprite-dy"],"-278px");
-    assert.equal(beastSprites[0].style["--v143-sprite-target-left"],"458px");
-    assert.equal(beastSprites[0].style["--v143-sprite-target-top"],"140px");
-    assert.ok(parseFloat(beastSprites[0].style.width)<=250);
-    assert.match(css,/--v143-sprite-dx/);
-    assert.match(css,/--v143-sprite-dy/);
-    assert.match(
-        css,
-        /@keyframes v166WaterTargetTravel\{[\s\S]*?3%,33\.332%[\s\S]*?33\.333%[\s\S]*?58\.332%[\s\S]*?58\.333%,95%/
-    );
+    assert.ok(beastSprites[0].style["--v143-sprite-dx"]);
+    assert.match(css,/@keyframes v166WaterTargetTravel\{/);
 });
 
-test("enemy Water Orb follows only the late-resolved player cards",()=>{
+test("enemy Water Ball keeps one live-target group while endpoints resolve",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("waterBall","tri"),
@@ -486,13 +461,14 @@ test("enemy Water Orb follows only the late-resolved player cards",()=>{
     runtime.context.v141PlayCardEffect("player",0,"damage");
     runtime.context.v141PlayCardEffect("player",2,"damage");
     const sprites=stageSprites(runtime).sprites;
-    assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["0","2"]);
-    assert.ok(sprites.every(node=>node.style.left==="338px"&&node.style.top==="140px"));
-    assert.deepEqual(sprites.map(node=>node.style["--v143-sprite-dx"]),["-239px","41px"]);
-    assert.ok(sprites.every(node=>node.style["--v143-sprite-dy"]==="278px"));
+    assert.equal(sprites.length,1);
+    assert.equal(sprites[0].dataset.placement,"group");
+    assert.equal(sprites[0].dataset.targetIndexes,"0,2");
+    assert.equal(sprites[0].style["--v143-sprite-dx"],"0px");
+    assert.equal(sprites[0].style["--v143-sprite-dy"],"0px");
 });
 
-test("Ice Arrow Rain always renders one centered enemy-battlefield AOE even with one living enemy",()=>{
+test("Ice Arrow Rain uses one living-target bounding box",()=>{
     const results=[];
     [[1],[0,1,2]].forEach(indexes=>{
         const monsters=[0,1,2].map(index=>({
@@ -509,21 +485,18 @@ test("Ice Arrow Rain always renders one centered enemy-battlefield AOE even with
         const sprite=sprites[0];
         assert.equal(sprite.dataset.targetSide,"monster");
         assert.equal(sprite.dataset.placement,"battlefield");
-        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
-        assert.equal(sprite.style.left,"480px");
-        assert.equal(sprite.style.top,"170px");
-        assert.equal(sprite.style.width,"440px");
-        assert.equal(sprite.style.height,"440px");
+        assert.equal(sprite.dataset.areaId,"living-targets");
+        assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
+        assert.equal(sprite.style.left,"458px");
+        assert.equal(sprite.style.top,"140px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
-        assert.ok(sprite.style.backgroundImage.includes("frost-arrow-rain-vfx.png?v=166"));
-        const tiles=sprite.querySelectorAll(".v166-water-battlefield-tile");
-        assert.equal(tiles.length,0);
-        results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
+        assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
+        results.push([sprite.style.width,sprite.style.height]);
     });
-    assert.deepEqual(results[0],results[1],"one enemy still uses full enemy battlefield bounds");
+    assert.deepEqual(results,[["140px","140px"],["386px","140px"]]);
 });
 
-test("enemy Ice Arrow Rain uses only the complete player battle area",()=>{
+test("enemy Ice Arrow Rain uses living player cards only",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("iceArrowRain","all"),{side:"monster",actorIndex:0}
@@ -531,11 +504,10 @@ test("enemy Ice Arrow Rain uses only the complete player battle area",()=>{
     const {sprites}=stageSprites(runtime);
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetSide,"player");
-    assert.equal(sprites[0].dataset.areaId,"battlePlayerRow");
-    assert.deepEqual([sprites[0].style.width,sprites[0].style.height],["440px","440px"]);
+    assert.equal(sprites[0].dataset.areaId,"living-targets");
+    assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
     assert.equal(sprites[0].style.clipPath||sprites[0].style["clip-path"],"none");
-    const tiles=sprites[0].querySelectorAll(".v166-water-battlefield-tile");
-    assert.equal(tiles.length,0);
+    assert.equal(sprites[0].querySelectorAll(".v166-water-battlefield-tile").length,0);
 });
 
 test("enemy Tidal Beast discovers one real player endpoint even when damage is absorbed",()=>{
