@@ -124,7 +124,7 @@
         waterBall:{
             glyph:"●",motion:"wave",impact:"water-splash",hit:.5833333333,pulses:1,spread:34,
             sprite:{
-                src:"assets/vfx/water/water-orb-vfx.png?v=173.8",
+                src:"assets/vfx/water/water-orb-vfx.png?v=173.9",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true,
                 scale:1.25,minSize:110,maxSize:165
             }

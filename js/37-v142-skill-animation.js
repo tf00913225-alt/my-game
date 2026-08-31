@@ -5,10 +5,7 @@
 (function installV142SkillAnimationSystem(){
     "use strict";
 
-    if(typeof window==="undefined"){ return; }
-    /* Recover if an earlier runtime load set only the sentinel before it failed. */
-    if(window.__v142SkillAnimationInstalled && window.v142SkillAnimationDirector &&
-        typeof window.v142PlaySkillAnimationFromBadge==="function"){ return; }
+    if(typeof window==="undefined" || window.__v142SkillAnimationInstalled){ return; }
     window.__v142SkillAnimationInstalled=true;
 
     const VERSION="142";
@@ -521,13 +518,24 @@
         });
     }
 
-    /* Battle's source badge functions own the action boundary.  Export one
-       direct trigger there instead of depending on a wrapper chain that later
-       runtimes can replace. */
-    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex){
-        return startFromBadge(side,name,element,actorIndex);
-    };
-
+    if(typeof showSkillNameBadge==="function"){
+        const previous=showSkillNameBadge;
+        showSkillNameBadge=function(name,element,characterIndex){
+            const result=previous.apply(this,arguments);
+            const index=Number.isInteger(characterIndex)?characterIndex:
+                (typeof activeBattleCharacterIndex!=="undefined"?activeBattleCharacterIndex:0);
+            startFromBadge("player",name,element,index);
+            return result;
+        };
+    }
+    if(typeof showMonsterSkillNameBadge==="function"){
+        const previous=showMonsterSkillNameBadge;
+        showMonsterSkillNameBadge=function(name,element,monsterIndex){
+            const result=previous.apply(this,arguments);
+            startFromBadge("monster",name,element,monsterIndex);
+            return result;
+        };
+    }
 
     function currentGate(){
         const gate=state.latest;

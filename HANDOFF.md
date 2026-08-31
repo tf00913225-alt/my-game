@@ -595,6 +595,13 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-08-31 — V173.9：P0 恢復已驗證技能動畫觸發鏈（dev）
+
+- 以 V173.4 main 為正確基準，恢復 `js/37-v142-skill-animation.js` 的原始 `showSkillNameBadge()`／`showMonsterSkillNameBadge()` wrapper 與一次性初始化守衛。
+- 移除 V173.6～V173.8 新增但未能實際觸發的直接 badge hook；保留 V173.5 的水球素材與演出、凍傷處理，以及 `js/38-v143-system-fixes.js` 的深淵對話縮放修正。
+- owner：`js/37-v142-skill-animation.js`；本次沒有暫時補丁。
+- 頁面、Loader 與動畫素材快取版本升為 V173.9；CI 與 dev 手動測試待本次提交後確認。
+
 ### 2026-08-31 — V173.8：P0 技能動畫初始化完整性（dev）
 
 - V142 僅在既有 director 與新版直接觸發器都存在時才略過初始化；舊快取只留下部分 runtime 狀態時，會重新建立同一個動畫 owner。

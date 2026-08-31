@@ -74,16 +74,16 @@ test("Flood Beast keeps the full-frame default while the current cache publishes
     assert.match(css,/clip-path:var\(--v166-water-full-clip,none\)/);
     assert.match(css,/clip-path:var\(--v166-water-flight-clip,none\)/);
     assert.match(css,/clip-path:var\(--v166-water-impact-clip,none\)/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.8"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.8/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.8/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.8/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.9"/);
+    assert.match(index,/js\/00-main\.js\?v=173\.9/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.9/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.9/);
 });
 
-test("Home cover exposes the current V173.8 build in its bottom-right safe area",()=>{
+test("Home cover exposes the current V173.9 build in its bottom-right safe area",()=>{
     assert.match(
         index,
-        /id="homeVersionBadge"[\s\S]*?class="home-version-badge"[\s\S]*?aria-label="目前版本 V173\.8"[\s\S]*?>V173\.8<\/div>/
+        /id="homeVersionBadge"[\s\S]*?class="home-version-badge"[\s\S]*?aria-label="目前版本 V173\.9"[\s\S]*?>V173\.9<\/div>/
     );
     assert.match(
         index,

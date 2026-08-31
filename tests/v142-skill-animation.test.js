@@ -166,10 +166,10 @@ function createContext(options={}){
 
 (async()=>{
     await test("V142 assets are versioned and loaded after V141",()=>{
-        assert.match(loader,/const V_ASSET_VERSION="173\.8"/);
+        assert.match(loader,/const V_ASSET_VERSION="173\.9"/);
         assert.match(loader,/css\/39-v142-skill-animation\.css/);
         assert.match(loader,/js\/36-v141-content-systems\.js[\s\S]*js\/37-v142-skill-animation\.js/);
-        assert.match(index,/js\/20-anonymous-20\.js\?v=173\.8/);
+        assert.match(index,/js\/20-anonymous-20\.js\?v=173\.9/);
     });
 
     await test("normal, small and ultimate skills keep distinct durations",()=>{
@@ -360,9 +360,9 @@ function createContext(options={}){
         assert.equal(completions,1);
     });
 
-    await test("direct badge action trigger shares one director and cleanup path",()=>{
-        assert.match(source,/window\.v142PlaySkillAnimationFromBadge=function/);
-        assert.doesNotMatch(source,/const previous=showSkillNameBadge/);
+    await test("player and monster badge hooks share one director and cleanup path",()=>{
+        assert.match(source,/showSkillNameBadge=function/);
+        assert.match(source,/showMonsterSkillNameBadge=function/);
         assert.match(source,/animationend/);
         assert.match(source,/cancelAnimationFrame/);
         assert.match(source,/removeEventListener\("visibilitychange"/);
