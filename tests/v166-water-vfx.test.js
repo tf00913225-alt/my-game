@@ -352,7 +352,7 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
         const model=manifest[id];
         assert.ok(model&&model.sprite,id+" sprite metadata");
         assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+filename,id);
-        assert.ok(model.sprite.src.endsWith(id==="waterBall"?"?v=173.10":"?v=166"),id+" cache version");
+        assert.ok(model.sprite.src.endsWith(id==="waterBall"?"?v=173.9":"?v=166"),id+" cache version");
         assert.deepEqual(
             [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
             [4,3,12,7],id
