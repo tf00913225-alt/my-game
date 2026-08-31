@@ -25,8 +25,8 @@
   `js/26` 與正式 gameplay runtime 鏈並行，只管外觀，不能插進平衡補丁順序。
 - `tests/v170-final-spec-integration.test.js` 會在同一個 `vm.Context` 真正依上述順序
   執行 49 支 JavaScript，再檢查最終資料與行為；這套測試才是目前唯一 canonical
-  integration suite。V170 規格基準與目前 `dev` 的 V173.1 顯示版本是兩件事；
-  V173.1 只更新版本辨識與快取鍵，不修改 V170 已定案的遊戲規格。
+  integration suite。V170 規格基準與目前 `dev` 的 V173.2 顯示版本是兩件事；
+  V173.2 只更新手機觸控／捲動介面與快取鍵，不修改 V170 已定案的遊戲規格。
 - 下表格式為「Lv1 傷害／每級成長；SP；目標；初學／升級／最高；前置」。前置有兩項時
   沿用正式邏輯，代表任一項即可。
 
@@ -180,7 +180,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-31，V173.1 版本辨識與快取同步）
+## 目前狀態（截至 2026-08-31，V173.2 手機觸控／捲動修正）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -591,6 +591,24 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-31 — V173.2：創角手機觸控尺寸與技能詳細捲動（dev）
+
+- 只修正已確認的 UI 根因：native 創角能力值加減按鈕由 `72px` 改為真實
+  `136×136px`（含 `min-width`／`min-height`），並調整同列間距與卡片最小高度；
+  1080px 舞台縮放至 360px 手機時，按鈕實際為約 `45.3×45.3px`，390px／412px
+  寬度則約為 `49.1px`／`51.9px`。第一、第二、第三角色均共用這套 native 創角頁。
+- `js/01-stage-v8-touch-lock.js` 只新增真正捲動 owner
+  `.creation-skill-detail-levels` 至既有白名單；保留 `scrollHeight > clientHeight`
+  判定與其餘 `#game-stage` 觸控鎖，不放寬背景、彈窗外區域或其他介面。
+- 新增 `tests/v173.2-mobile-touch-scroll.test.js`：驗證各目標手機尺寸的實際縮放下限、
+  每顆能力值按鈕僅一個 action path、技能詳細清單能通過 touchmove／pointermove，
+  且 modal 背景仍會被鎖住。
+- 快取同步：首頁版本標示、三個 release entry、直接載入的創角 CSS 與觸控鎖腳本、
+  `V_ASSET_VERSION` 全部升為 `V173.2`。本輪不修改戰鬥、技能、存檔、掉落或動畫。
+- 瀏覽器限制：雲端瀏覽器對本機與 CDN URL 回報 `ERR_BLOCKED_BY_CLIENT`，而本機雖有
+  Playwright 套件但沒有 Chromium 執行檔；未下載瀏覽器或等待重試。因此實機／Chromium
+  視覺驗證仍須在可用瀏覽器環境補做，不能以 Node 回歸測試冒充完成。
 
 ### 2026-08-31 — V173.1：版本辨識與小數修訂號規則（dev）
 

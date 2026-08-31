@@ -851,8 +851,11 @@ body.creation-fixed-active{
 }
 
 #creationPage .creation-stat{
-    min-height:144px;
-    padding:20px 20px 20px 25px;
+    /* The 1080px native stage is rendered at one third size on a 360px
+       phone. Keep the real button box at 136px so its physical hit area is
+       at least 45px, without relying on transform scaling. */
+    min-height:184px;
+    padding:20px 18px 20px 20px;
 }
 
 #creationPage .creation-stat-copy{
@@ -875,20 +878,25 @@ body.creation-fixed-active{
 }
 
 #creationPage .creation-stat-right{
-    gap:12px;
+    gap:8px;
 }
 
 #creationPage .creation-stat-right > b{
-    min-width:42px;
+    min-width:36px;
     font-size:35px;
 }
 
 #creationPage .creation-stat-button{
-    width:72px;
-    height:72px;
-    border-radius:20px;
-    font-size:40px;
-    line-height:67px;
+    display:grid;
+    place-items:center;
+    width:136px;
+    min-width:136px;
+    height:136px;
+    min-height:136px;
+    padding:0;
+    border-radius:24px;
+    font-size:54px;
+    line-height:1;
 }
 
 #creationPage .creation-stat-details summary{

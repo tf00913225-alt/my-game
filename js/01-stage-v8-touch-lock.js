@@ -36,7 +36,7 @@
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
             ".home-feature-modal-box, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .item-modal-box, #skillDetailStats, " +
-            ".skill-preview-body, #dungeonTabContent, " +
+            ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, " +
             "textarea, select, input";
 
         let node =
