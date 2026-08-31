@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Repository checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Prepare Git comparison base
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ "$CI_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] && \
+             [[ ! "$CI_BASE_SHA" =~ ^0{40}$ ]] && \
+             ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
+          fi
+
+      - name: Check CI script syntax
+        run: node --check .github/scripts/ci.mjs
+
+      - name: Check all project JavaScript syntax
+        run: node .github/scripts/ci.mjs syntax
+
+      - name: Ensure existing asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run all Node unit and integration suites
+        run: node .github/scripts/ci.mjs tests
+
+      - name: Check static local resources
+        run: node .github/scripts/ci.mjs resources
+
+      - name: Check duplicate HTML IDs
+        run: node .github/scripts/ci.mjs html-ids
+
+      - name: Check release entries and loader integrity
+        run: node .github/scripts/ci.mjs loader
+
+      - name: Check Git whitespace and conflict markers
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node .github/scripts/ci.mjs git-diff
