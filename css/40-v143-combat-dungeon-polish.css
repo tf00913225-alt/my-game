@@ -245,17 +245,6 @@
     animation:v166WaterAoeEnvelope var(--v143-sprite-duration,1600ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
-.v143-skill-stage[data-skill="iceArrowRain"] .v166-water-cast-sprite > .v166-water-battlefield-tile{
-    position:absolute;
-    display:block;
-    box-sizing:border-box;
-    background-position:0 0;
-    background-repeat:no-repeat;
-    image-rendering:auto;
-    animation:v166WaterCastFrames var(--v143-sprite-duration,1600ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both;
-    will-change:background-position;
-}
-
 @keyframes v166WaterCastFrames{
     0%{background-position:0 0}
     8.333333%{background-position:33.333333% 0}

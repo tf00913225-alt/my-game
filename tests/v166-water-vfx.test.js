@@ -57,7 +57,7 @@ const FINAL_HASHES={
     "tidal-beast-vfx.png":"bfb1a3520a5bb95104e98d3dc6d2b3d1d6c9b2bb686b6e64a0f4840e6fcc7327",
     "water-blade-slash-vfx.png":"e2b370417926f9380ff2c3aa8762b7ff7d534ebfb8cf8d011da463e708a45bc6",
     "water-heal-vfx.png":"e927ade2449d536f6d1b68218bbcef33a257dbc8269493363dbf45137f2d445c",
-    "water-orb-vfx.png":"72e9d411e11ec77d030361a2995f71aba7dfa936e7942ca2bdfe2aa22cb2d6fe",
+    "water-orb-vfx.png":"d3bdcafbd65965a9c54c9785baa1922849f11f1c1fc905bf6c4723024c745c2d",
     "water-revive-vfx.png":"955cca67c156d0848d704ab12adf59d9692e0b46aa15b38b140cde9efeaa600d"
 };
 
@@ -326,7 +326,11 @@ test("all ten cast sheets and both status sheets fully decode as transparent RGB
     Object.values(CAST_ASSETS).forEach(filename=>{
         const path="assets/vfx/water/"+filename;
         const image=decodeRgbaPng(path,4,3);
-        assert.deepEqual([image.width,image.height],[1536,1152],filename);
+        assert.deepEqual(
+            [image.width,image.height],
+            filename==="water-orb-vfx.png"?[1448,1086]:[1536,1152],
+            filename
+        );
         assert.equal(image.sha256,FINAL_HASHES[filename],filename+" normalized asset hash");
         assert.ok(image.transparent>image.total*.1,filename+" needs real transparent pixels");
         assert.ok(image.partial>0,filename+" needs partial alpha");
@@ -348,7 +352,7 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
         const model=manifest[id];
         assert.ok(model&&model.sprite,id+" sprite metadata");
         assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+filename,id);
-        assert.ok(model.sprite.src.endsWith("?v=166"),id+" cache version");
+        assert.ok(model.sprite.src.endsWith(id==="waterBall"?"?v=173.5":"?v=166"),id+" cache version");
         assert.deepEqual(
             [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
             [4,3,12,7],id
@@ -488,7 +492,7 @@ test("enemy Water Orb follows only the late-resolved player cards",()=>{
     assert.ok(sprites.every(node=>node.style["--v143-sprite-dy"]==="278px"));
 });
 
-test("Ice Arrow Rain always renders one enemy-battlefield AOE even with one living enemy",()=>{
+test("Ice Arrow Rain always renders one centered enemy-battlefield AOE even with one living enemy",()=>{
     const results=[];
     [[1],[0,1,2]].forEach(indexes=>{
         const monsters=[0,1,2].map(index=>({
@@ -509,13 +513,11 @@ test("Ice Arrow Rain always renders one enemy-battlefield AOE even with one livi
         assert.equal(sprite.style.left,"480px");
         assert.equal(sprite.style.top,"170px");
         assert.equal(sprite.style.width,"440px");
-        assert.equal(sprite.style.height,"260px");
+        assert.equal(sprite.style.height,"440px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
-        assert.equal(sprite.style.backgroundImage,"none");
+        assert.ok(sprite.style.backgroundImage.includes("frost-arrow-rain-vfx.png?v=166"));
         const tiles=sprite.querySelectorAll(".v166-water-battlefield-tile");
-        assert.equal(tiles.length,2);
-        assert.ok(tiles.every(tile=>tile.style.width===tile.style.height&&tile.style.width==="260px"));
-        assert.ok(tiles.every(tile=>tile.style.backgroundImage.includes("frost-arrow-rain-vfx.png?v=166")));
+        assert.equal(tiles.length,0);
         results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
     assert.deepEqual(results[0],results[1],"one enemy still uses full enemy battlefield bounds");
@@ -530,11 +532,10 @@ test("enemy Ice Arrow Rain uses only the complete player battle area",()=>{
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetSide,"player");
     assert.equal(sprites[0].dataset.areaId,"battlePlayerRow");
-    assert.deepEqual([sprites[0].style.width,sprites[0].style.height],["440px","160px"]);
+    assert.deepEqual([sprites[0].style.width,sprites[0].style.height],["440px","440px"]);
     assert.equal(sprites[0].style.clipPath||sprites[0].style["clip-path"],"none");
     const tiles=sprites[0].querySelectorAll(".v166-water-battlefield-tile");
-    assert.equal(tiles.length,3);
-    assert.ok(tiles.every(tile=>tile.style.width===tile.style.height&&tile.style.width==="160px"));
+    assert.equal(tiles.length,0);
 });
 
 test("enemy Tidal Beast discovers one real player endpoint even when damage is absorbed",()=>{
@@ -704,8 +705,8 @@ test("final combat targeting and Frostbite rules remain unchanged",()=>{
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.5"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.5/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });

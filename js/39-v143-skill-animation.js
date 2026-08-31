@@ -79,7 +79,7 @@
             glyph:"鳳",motion:"swoop",impact:"phoenix-field",hit:.5833333333,pulses:6,spread:112,flightCount:2,
             sprite:{
                 src:"assets/vfx/fire/phoenix-cry-cast.png?v=165",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"group",scale:1.12,minSize:280
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",scale:1.12,minSize:280
             }
         },
         rage:{
@@ -124,7 +124,7 @@
         waterBall:{
             glyph:"●",motion:"wave",impact:"water-splash",hit:.5833333333,pulses:1,spread:34,
             sprite:{
-                src:"assets/vfx/water/water-orb-vfx.png?v=166",
+                src:"assets/vfx/water/water-orb-vfx.png?v=173.5",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true,
                 scale:1.25,minSize:110,maxSize:165
             }
@@ -746,16 +746,21 @@
             const indexes=emittedSpriteTargets(current);
             const bounds=sideAreaBounds(current.targetSide);
             if(!bounds){ return; }
+            const viewportWidth=Number(window.innerWidth)||960;
+            const viewportHeight=Number(window.innerHeight)||720;
+            const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
+            const size=clamp(
+                Math.max(bounds.width,bounds.height)*(Number(sprite.scale)||1),
+                Number(sprite.minSize)||160,
+                Number(sprite.maxSize)||dynamicMaximum
+            );
             node.dataset.targetIndexes=indexes.join(",");
             node.dataset.areaId=bounds.id;
             node.style.left=(bounds.left+bounds.width/2)+"px";
             node.style.top=(bounds.top+bounds.height/2)+"px";
-            node.style.width=bounds.width+"px";
-            node.style.height=bounds.height+"px";
+            node.style.width=size+"px";
+            node.style.height=size+"px";
             node.style.clipPath="none";
-            node.style.backgroundImage="none";
-            node.style.backgroundSize="auto";
-            buildBattlefieldSpriteTiles(node,sprite,bounds);
             node.style.setProperty("--v143-sprite-dx","0px");
             node.style.setProperty("--v143-sprite-dy","0px");
             node.style.setProperty("--v143-sprite-angle","0deg");

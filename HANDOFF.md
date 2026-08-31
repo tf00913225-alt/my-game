@@ -595,6 +595,16 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-08-31 — V173.5：深淵、掉落互動與水／火 VFX 修正（dev）
+
+- 深淵地圖守關立繪改為直接開啟對話：權威位置為 `js/38-v143-system-fixes.js` 的 `v141ChallengeAbyssBoss`；不再經過會讓手機點擊看似無反應的接近移動閘門。
+- 野怪戰鬥獎勵 toast 的隱藏狀態恢復 `pointer-events:none`，只在 `.show` 時接收點擊；權威樣式為 `css/45-v152-dev-fixes.css`，不會再留下透明攔截區塊。
+- `assets-review/assets/inbox/water-orb.png` 已覆蓋為 `assets/vfx/water/water-orb-vfx.png`；`js/39-v143-skill-animation.js` 的水球術保留既有 4×3／12 幀、三目標軌跡與命中時機，僅更新素材快取為 `v=173.5`。
+- 火鳳天鳴與冰霜箭雨在 `js/39-v143-skill-animation.js` 統一改為單張、固定敵／我方戰區中央的全場 Sprite，不隨剩餘目標數縮小，也不再拆成多張 tile。
+- 凍傷加入 `js/00-main.js` 的 `tickStatusEffects()` 正式回合倒數，時間結束後資料與狀態動畫會隨既有 UI 同步移除；不變更凍傷機率、回合數或其他技能數值。
+- 新增 `tests/v173.5-bugfixes.test.js`，並更新相關水系／全場 VFX 回歸。完整 CI 同等檢查已通過：151/151 JavaScript 語法、38/38 Node suites、300 個靜態資源、272 個 HTML ID、Loader／版本一致性與 Git 格式皆正常。
+- 發布、Loader、頁面與快取版本升為 V173.5。
+
 ### 2026-08-31 — 永久架構規則已啟用（dev）
 
 - 新增 `ARCHITECTURE_RULES.md` 作為永久架構規則唯一來源；完整規則只保留於該文件，避免在交接日誌重複而產生版本分歧。

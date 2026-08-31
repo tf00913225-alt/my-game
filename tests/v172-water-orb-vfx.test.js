@@ -16,7 +16,7 @@ test("Water Orb keeps the original transparent sprite and uses a smaller card-sc
     const asset=fs.readFileSync("assets/vfx/water/water-orb-vfx.png");
     assert.equal(
         crypto.createHash("sha256").update(asset).digest("hex"),
-        "72e9d411e11ec77d030361a2995f71aba7dfa936e7942ca2bdfe2aa22cb2d6fe"
+        "d3bdcafbd65965a9c54c9785baa1922849f11f1c1fc905bf6c4723024c745c2d"
     );
     assert.match(
         animation,
@@ -74,16 +74,16 @@ test("Flood Beast keeps the full-frame default while the current cache publishes
     assert.match(css,/clip-path:var\(--v166-water-full-clip,none\)/);
     assert.match(css,/clip-path:var\(--v166-water-flight-clip,none\)/);
     assert.match(css,/clip-path:var\(--v166-water-impact-clip,none\)/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.4/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.4/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.5"/);
+    assert.match(index,/js\/00-main\.js\?v=173\.5/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.5/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.5/);
 });
 
-test("Home cover exposes the current V173.4 build in its bottom-right safe area",()=>{
+test("Home cover exposes the current V173.5 build in its bottom-right safe area",()=>{
     assert.match(
         index,
-        /id="homeVersionBadge"[\s\S]*?class="home-version-badge"[\s\S]*?aria-label="目前版本 V173\.4"[\s\S]*?>V173\.4<\/div>/
+        /id="homeVersionBadge"[\s\S]*?class="home-version-badge"[\s\S]*?aria-label="目前版本 V173\.5"[\s\S]*?>V173\.5<\/div>/
     );
     assert.match(
         index,

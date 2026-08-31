@@ -14455,7 +14455,8 @@ function tickStatusEffects(){
         statDown:"全屬性降低",
         damageDown:"傷害降低",
         defenseDown:"防禦降低",
-        stun:"暈眩（MISS率提高）"
+        stun:"暈眩（MISS率提高）",
+        frostbite:"凍傷"
 
     };
 

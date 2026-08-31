@@ -680,11 +680,9 @@
                 }
             };
 
-            if(typeof window.v141ApproachAbyssBoss==="function"){
-                if(!window.v141ApproachAbyssBoss(openBossBubble)){ delete map.dataset.v169DialogueApproaching; }
-            }else{
-                openBossBubble();
-            }
+            /* Boss portraits are direct dialogue controls.  Requiring a
+               separate approach animation made mobile taps look inert. */
+            openBossBubble();
         };
     }
 

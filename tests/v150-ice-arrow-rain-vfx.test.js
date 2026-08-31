@@ -205,17 +205,11 @@ test("one shared sheet always uses the complete enemy battlefield, even for one 
         assert.equal(sprite.dataset.areaId,"battleMonsterArea");
         assert.equal(sprite.style.left,"460px");
         assert.equal(sprite.style.top,"165px");
-        assert.deepEqual([sprite.style.width,sprite.style.height],["440px","270px"]);
+        assert.deepEqual([sprite.style.width,sprite.style.height],["440px","440px"]);
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
-        assert.equal(sprite.style.backgroundImage,"none","the exact battlefield is a clipping wrapper");
+        assert.ok(sprite.style.backgroundImage.includes(assetPath),"the complete sheet stays centered");
         const tiles=sprite.querySelectorAll(".v166-water-battlefield-tile");
-        assert.equal(tiles.length,2,"square sheets tile across the full wide battlefield");
-        tiles.forEach(tile=>{
-            assert.equal(tile.style.width,tile.style.height,"frames keep their original 1:1 ratio");
-            assert.equal(tile.style.width,"270px");
-            assert.ok(tile.style.backgroundImage.includes(assetPath));
-            assert.equal(tile.style.backgroundSize,"400% 300%");
-        });
+        assert.equal(tiles.length,0,"one large sheet replaces tiled copies");
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
         assert.ok(runtime.scheduled.some(timer=>timer.delay>=1590),"full 1.6 second action gate");
     });
@@ -244,8 +238,8 @@ test("all damage numbers share frame eight while remaining target-specific",()=>
 });
 
 test("the current cache version publishes the 1.6 second battlefield choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.5"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.5/);
     assert.match(animation,/frost-arrow-rain-vfx\.png\?v=166/);
 });
 

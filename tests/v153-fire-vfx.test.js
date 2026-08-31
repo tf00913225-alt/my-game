@@ -118,6 +118,8 @@ function makeNode(rect){
 function loadRuntime(options={}){
     const body=makeNode();
     const cards={
+        battleMonsterArea:makeNode({left:250,top:40,right:850,bottom:310,width:600,height:270}),
+        battlePlayerRow:makeNode({left:20,top:330,right:620,bottom:470,width:600,height:140}),
         battlePlayerCard0:makeNode({left:20,top:340,right:138,bottom:456,width:118,height:116}),
         battlePlayerCard1:makeNode({left:160,top:340,right:278,bottom:456,width:118,height:116}),
         battlePlayerCard2:makeNode({left:300,top:340,right:418,bottom:456,width:118,height:116}),
@@ -233,7 +235,7 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
         fireRocket:["fire-rocket-cast.png","trajectory"],
         blazeSpell:["blaze-spell-cast.png","single"],
         flameTornado:["flame-tornado-cast.png","single"],
-        phoenixCry:["phoenix-cry-cast.png","group"],
+        phoenixCry:["phoenix-cry-cast.png","battlefield"],
         rage:["rage-cast.png","single"]
     };
     Object.entries(expected).forEach(([id,[filename,placement]])=>{
@@ -260,7 +262,7 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
     assert.match(timing,/if\(config\.category==="passive"\|\|config\.targetType==="none"\)\{ return null; \}/);
 });
 
-test("tri and all-target skills create one main sheet over only valid target cards",()=>{
+test("tri skills follow valid targets while Phoenix Cry keeps one full-field sheet",()=>{
     const tri=loadRuntime();
     tri.context.v142SkillAnimationDirector.play(
         castConfig("explosiveFlurry",1450,"tri"),{side:"player",actorIndex:0}
@@ -289,6 +291,23 @@ test("tri and all-target skills create one main sheet over only valid target car
     const phoenixes=allStage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
     assert.equal(phoenixes.length,1,"Phoenix Cry must never clone the phoenix per target");
     assert.equal(phoenixes[0].dataset.targetIndexes,"0,2");
+    const onlyOne=loadRuntime({
+        monsters:[
+            {alive:false,hp:0,statusEffects:[],activeBuffs:[]},
+            {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
+            {alive:false,hp:0,statusEffects:[],activeBuffs:[]}
+        ]
+    });
+    onlyOne.context.v142SkillAnimationDirector.play(
+        castConfig("phoenixCry",3200,"all","magic"),{side:"player",actorIndex:0}
+    );
+    const lonePhoenix=onlyOne.body.children.find(node=>node.id==="v143-skill-stage")
+        .children.find(node=>node.className.includes("v143-vfx-sprite"));
+    assert.equal(lonePhoenix.dataset.targetIndexes,"1");
+    ["width","height","left","top"].forEach(property=>{
+        assert.equal(lonePhoenix.style[property],phoenixes[0].style[property],
+            "Phoenix Cry keeps its full-field placement when only one target remains");
+    });
 });
 
 test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main projectile",()=>{
@@ -474,8 +493,8 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V165",(
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
     assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:800,collection:"statusEffects"\}/);
     assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:1000,collection:"activeBuffs"\}/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.5"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.5/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

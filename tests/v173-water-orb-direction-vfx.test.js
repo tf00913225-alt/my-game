@@ -16,7 +16,7 @@ test("V173 keeps the original twelve-frame Water Orb sprite",()=>{
     const asset=fs.readFileSync("assets/vfx/water/water-orb-vfx.png");
     assert.equal(
         crypto.createHash("sha256").update(asset).digest("hex"),
-        "72e9d411e11ec77d030361a2995f71aba7dfa936e7942ca2bdfe2aa22cb2d6fe"
+        "d3bdcafbd65965a9c54c9785baa1922849f11f1c1fc905bf6c4723024c745c2d"
     );
     assert.match(
         animation,
@@ -68,7 +68,7 @@ test("Frame eight hits with the lower splash and frames nine through twelve use 
     );
 });
 
-test("Only actual targets receive copies and the published build label is V173.4",()=>{
+test("Only actual targets receive copies and the published build label is V173.5",()=>{
     assert.match(
         animation,
         /const key=placement==="single"\|\|placement==="targetTrajectory"\?index:"main";/
@@ -81,8 +81,8 @@ test("Only actual targets receive copies and the published build label is V173.4
         animation,
         /node\.dataset\.formationLead=current\.spriteNodes\.size===0\?"true":"false";/
     );
-    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(index,/aria-label="目前版本 V173\.4"[\s\S]*?>V173\.4<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.5"/);
+    assert.match(index,/aria-label="目前版本 V173\.5"[\s\S]*?>V173\.5<\/div>/);
 });
 
 console.log("\nV173 Water Orb direction VFX suite: "+passed+" tests passed.");

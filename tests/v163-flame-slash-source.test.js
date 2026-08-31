@@ -29,8 +29,8 @@ test("Fire Slash keeps the requested target, timing, and frame-eight hit",()=>{
 });
 
 test("the current cache version publishes the replacement asset",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.5"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.5/);
 });
 
 console.log("\nV163 Fire Slash source suite: "+passed+" tests passed.");
