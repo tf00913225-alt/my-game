@@ -76,4 +76,15 @@ test("Flood Beast keeps the full-frame default while V172 cache-busts the fix",(
     assert.match(index,/js\/20-anonymous-20\.js\?v=172/);
 });
 
+test("Home cover exposes the current V172 build in its bottom-right safe area",()=>{
+    assert.match(
+        index,
+        /id="homeVersionBadge"[\s\S]*?class="home-version-badge"[\s\S]*?aria-label="目前版本 V172"[\s\S]*?>V172<\/div>/
+    );
+    assert.match(
+        index,
+        /#game-stage #homePage \.home-version-badge\{[\s\S]*?right:10px;[\s\S]*?bottom:10px;[\s\S]*?pointer-events:none;/
+    );
+});
+
 console.log("\nV172 Water Orb VFX suite: "+passed+" tests passed.");

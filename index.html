@@ -11,6 +11,31 @@
 
 <link rel="stylesheet" href="css/00-main.css">
 
+<style id="v172-home-version-badge-style">
+#game-stage #homePage .home-version-badge{
+    position:absolute;
+    right:10px;
+    bottom:10px;
+    z-index:4;
+    box-sizing:border-box;
+    padding:4px 9px 3px;
+    border:1px solid rgba(224,181,92,.82);
+    border-radius:999px;
+    background:linear-gradient(180deg,rgba(31,23,14,.88),rgba(9,8,6,.9));
+    color:#f5dda0;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-size:10px;
+    font-weight:900;
+    line-height:1;
+    letter-spacing:.08em;
+    text-shadow:0 1px 2px #000;
+    box-shadow:0 2px 7px rgba(0,0,0,.5),inset 0 0 6px rgba(224,181,92,.1);
+    white-space:nowrap;
+    pointer-events:none;
+    user-select:none;
+}
+</style>
+
 <link id="stage-v8-map-page-fix" rel="stylesheet" href="css/01-stage-v8-map-page-fix.css">
 
 <link id="stage-v3-layout-fix" rel="stylesheet" href="css/02-stage-v3-layout-fix.css">
@@ -685,6 +710,12 @@
 -->
 
 <div class="home-bg-fixed-layer"></div>
+
+<div
+    id="homeVersionBadge"
+    class="home-version-badge"
+    aria-label="目前版本 V172"
+>V172</div>
 
 <h2>主城</h2>
 
