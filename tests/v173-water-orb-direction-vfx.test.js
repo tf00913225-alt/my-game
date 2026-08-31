@@ -81,8 +81,8 @@ test("Only actual targets receive copies and the published build label is V173.8
         animation,
         /node\.dataset\.formationLead=current\.spriteNodes\.size===0\?"true":"false";/
     );
-    assert.match(loader,/const V_ASSET_VERSION="173\.6"/);
-    assert.match(index,/aria-label="目前版本 V173\.6"[\s\S]*?>V173\.6<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.8"/);
+    assert.match(index,/aria-label="目前版本 V173\.8"[\s\S]*?>V173\.8<\/div>/);
 });
 
 console.log("\nV173 Water Orb direction VFX suite: "+passed+" tests passed.");
