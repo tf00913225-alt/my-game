@@ -164,10 +164,10 @@ function createContext(options={}){
 
 (async()=>{
     await test("V142 assets are versioned and loaded after V141",()=>{
-        assert.match(loader,/const V_ASSET_VERSION="172"/);
+        assert.match(loader,/const V_ASSET_VERSION="173"/);
         assert.match(loader,/css\/39-v142-skill-animation\.css/);
         assert.match(loader,/js\/36-v141-content-systems\.js[\s\S]*js\/37-v142-skill-animation\.js/);
-        assert.match(index,/js\/20-anonymous-20\.js\?v=172/);
+        assert.match(index,/js\/20-anonymous-20\.js\?v=173/);
     });
 
     await test("normal, small and ultimate skills keep distinct durations",()=>{

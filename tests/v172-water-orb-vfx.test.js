@@ -50,36 +50,40 @@ test("Flight frames expose only the projectile and impact frames expose only the
         animation,
         /current\.config\.id==="waterBall"[\s\S]*?--v166-water-orb-half-offset",size\/4\+"px"/
     );
-    const travel=css.match(/@keyframes v166WaterTargetTravel\{[\s\S]*?\n\}/);
+    const travel=css.match(/@keyframes v173WaterOrbTargetTravel\{[\s\S]*?\n\}/);
     assert.ok(travel);
     assert.match(
         travel[0],
-        /33\.333%\{[\s\S]*?top:calc\(var\(--v143-sprite-start-top\) \+ var\(--v166-water-orb-half-offset,0px\)\);[\s\S]*?clip-path:var\(--v166-water-flight-clip,none\)/
+        /33\.333%\{[\s\S]*?top:calc\(var\(--v143-sprite-start-top\) \+ var\(--v166-water-orb-half-offset\)\);[\s\S]*?clip-path:var\(--v166-water-flight-clip\)/
     );
     assert.match(
         travel[0],
-        /58\.332%\{[\s\S]*?top:calc\(var\(--v143-sprite-target-top\) \+ var\(--v166-water-orb-half-offset,0px\)\);[\s\S]*?clip-path:var\(--v166-water-flight-clip,none\)/
+        /58\.332%\{[\s\S]*?top:calc\(var\(--v143-sprite-target-top\) \+ var\(--v166-water-orb-half-offset\)\);[\s\S]*?clip-path:var\(--v166-water-flight-clip\)/
     );
     assert.match(
         travel[0],
-        /58\.333%,95%\{[\s\S]*?top:calc\(var\(--v143-sprite-target-top\) - var\(--v166-water-orb-half-offset,0px\)\);[\s\S]*?clip-path:var\(--v166-water-impact-clip,none\)/
+        /58\.333%,66\.665%\{[\s\S]*?top:calc\(var\(--v143-sprite-target-top\) - var\(--v166-water-orb-half-offset\)\);[\s\S]*?clip-path:var\(--v166-water-impact-clip\)/
+    );
+    assert.match(
+        travel[0],
+        /66\.666%,95%\{[\s\S]*?top:var\(--v143-sprite-target-top\);[\s\S]*?clip-path:var\(--v166-water-full-clip,inset\(0\)\)/
     );
 });
 
-test("Flood Beast keeps the full-frame default while V172 cache-busts the fix",()=>{
+test("Flood Beast keeps the full-frame default while the current cache publishes the fix",()=>{
     assert.match(css,/clip-path:var\(--v166-water-full-clip,none\)/);
     assert.match(css,/clip-path:var\(--v166-water-flight-clip,none\)/);
     assert.match(css,/clip-path:var\(--v166-water-impact-clip,none\)/);
-    assert.match(loader,/const V_ASSET_VERSION="172"/);
-    assert.match(index,/js\/00-main\.js\?v=172/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=172/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=172/);
+    assert.match(loader,/const V_ASSET_VERSION="173"/);
+    assert.match(index,/js\/00-main\.js\?v=173/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173/);
 });
 
-test("Home cover exposes the current V172 build in its bottom-right safe area",()=>{
+test("Home cover exposes the current V173 build in its bottom-right safe area",()=>{
     assert.match(
         index,
-        /id="homeVersionBadge"[\s\S]*?class="home-version-badge"[\s\S]*?aria-label="目前版本 V172"[\s\S]*?>V172<\/div>/
+        /id="homeVersionBadge"[\s\S]*?class="home-version-badge"[\s\S]*?aria-label="目前版本 V173"[\s\S]*?>V173<\/div>/
     );
     assert.match(
         index,

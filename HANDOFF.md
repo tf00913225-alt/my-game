@@ -54,7 +54,8 @@
    `tests/v169-water-skill-rules.test.js`、`tests/v169-abyss-assets-flow.test.js`。驗證至少要包含：
    V171 另新增怒火／水球術／洪水猛獸／冰霜箭雨定位與單體凍傷範圍驗收
    `tests/v171-combat-vfx-fixes.test.js`；V172 新增水球術多目標分層播放與原圖保留驗收
-   `tests/v172-water-orb-vfx.test.js`。
+   `tests/v172-water-orb-vfx.test.js`；V173 新增水球術雙向旋轉飛行、完整命中畫格與版本標示驗收
+   `tests/v173-water-orb-direction-vfx.test.js`。
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -63,10 +64,12 @@
 6. **任何 UI、CSS、版面、美術圖片、背包、裝備、技能、戰鬥介面等修改前，
    都必須先完整閱讀 `UI_GUIDELINES.md`。** UI 規範不得只依賴聊天記憶；
    `AGENTS.md` 與 `CLAUDE.md` 只提供入口，本體以 `UI_GUIDELINES.md` 為準。
+7. **每次對外更新都必須升一個版本號**，同步更新 loader cache、`index.html` 直載 query
+   與主頁封面右下角的版本標示；交付時也必須明確告知使用者本次版本號。
 
 ---
 
-## 目前狀態（截至 2026-08-31，V172 水球術多目標動畫修正）
+## 目前狀態（截至 2026-08-31，V173 水球術旋轉飛行與完整命中修正）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -476,6 +479,24 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-31 — V173：水球術旋轉飛行與完整命中修正（dev）
+
+- 依使用者影片逐段檢查水球術：V172 第 5～7 幀雖已複製至實際目標，卻仍保持原始橫向；
+  第 9～12 幀也沿用只顯示下半張的裁切，造成三個命中特效互相連成藍色長條。
+- 不修改、不重製也不重新編碼 `assets/vfx/water/water-orb-vfx.png`；原圖實際只有 4×3、
+  共 12 幀，因此需求中的第 13 幀以既有第 12 幀作為動畫收尾，不讀取不存在的畫格。
+- 水球術改用獨立 `v173WaterOrbTargetTravel`：第 1～4 幀仍只顯示一顆共同聚集；第 5～7 幀
+  依本次 1／2／3 個實際有效目標建立對應副本，玩家往敵方飛行時旋轉 `+90deg`，敵方往玩家
+  飛行時旋轉 `-90deg`，並從施術卡移動至各自目標卡中心。
+- 第 8 幀先在各目標位置播放原圖下半部主要水爆，第 9～12 幀改用完整畫格於各自目標附近
+  爆炸、消散；三名有效目標維持同步命中。洪水猛獸仍使用原有時間軸，沒有被此修正影響。
+- 快取、直載 query 與主頁右下版本標示同步升為 `V173`；新增
+  `tests/v173-water-orb-direction-vfx.test.js`，並更新 V172 與既有 cache-bust 驗收。
+- 驗證結果：`node --test tests/*.test.js` 共 34 份 suite 全數通過；異動 loader 與全部測試檔
+  均通過 `node --check`，`git diff --check` 通過，原始水球 PNG SHA-256 保持不變。另以未移動
+  分支的候選 commit 在雲端 Chrome 載入實際 CSS 與 PNG 慢速預覽，確認聚集期只有一顆、
+  飛行期三顆依不同目標座標旋轉移動，命中期三個完整水爆分別鎖定三張目標卡牌。
 
 ### 2026-08-31 — V172：水球術多目標動畫分層修正（dev）
 
