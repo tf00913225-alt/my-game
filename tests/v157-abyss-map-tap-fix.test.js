@@ -17,14 +17,25 @@ function test(name,handler){
 }
 
 test("the current cache key delivers the Abyss tap correction",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.9"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.9/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.10"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.10/);
 });
 
 test("Abyss map portraits use the reduced mobile size and keep a full button hit area",()=>{
     assert.match(css,/\.v141-abyss-boss\{[\s\S]*width:120px !important;[\s\S]*height:168px !important;/);
     assert.match(css,/\.v141-abyss-boss\{[\s\S]*touch-action:manipulation !important;/);
     assert.match(abyss,/<button class="v141-abyss-boss"[\s\S]*onclick="event\.stopPropagation\(\);v141ChallengeAbyssBoss\(\)"/);
+});
+
+test("map-level portrait bounds route a mobile pseudo-element tap to dialogue",()=>{
+    assert.match(
+        abyss,
+        /function isAbyssMapControlHit\(event,control\)[\s\S]*target\.closest\("button"\)===control[\s\S]*rect=control\.getBoundingClientRect\(\)[\s\S]*x>=rect\.left&&x<=rect\.right&&y>=rect\.top&&y<=rect\.bottom/
+    );
+    assert.match(
+        abyss,
+        /const boss=abyssState\.phase==="boss"\?map\.querySelector\("\.v141-abyss-boss"\):null;[\s\S]*if\(isAbyssMapControlHit\(event,boss\)\)\{[\s\S]*window\.v141ChallengeAbyssBoss\(\);[\s\S]*return;/
+    );
 });
 
 test("the old proximity wrapper no longer swallows portrait taps",()=>{

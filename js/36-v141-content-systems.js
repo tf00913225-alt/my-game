@@ -783,10 +783,35 @@
         }
         return true;
     };
+    function isAbyssMapControlHit(event,control){
+        if(!event||!control){ return false; }
+        const target=event.target;
+        if(target&&typeof target.closest==="function"&&target.closest("button")===control){
+            return true;
+        }
+        const x=Number(event.clientX);
+        const y=Number(event.clientY);
+        if(!Number.isFinite(x)||!Number.isFinite(y)){ return false; }
+        const rect=control.getBoundingClientRect();
+        return x>=rect.left&&x<=rect.right&&y>=rect.top&&y<=rect.bottom;
+    }
+
     window.v141AbyssMoveByEvent=function(event){
-        if(event.target.closest("button")){ return; }
         const map=document.getElementById("v141AbyssMap");
-        if(map.dataset.v169DialogueApproaching==="1"){ return; }
+        if(!map||map.dataset.v169DialogueApproaching==="1"){ return; }
+        const boss=abyssState.phase==="boss"?map.querySelector(".v141-abyss-boss"):null;
+        /*
+           Mobile browsers may report the portrait pseudo-element as the map
+           target.  Route the touch by the guardian button's rendered bounds
+           before treating it as a ground-movement request.
+        */
+        if(isAbyssMapControlHit(event,boss)){
+            if(event.preventDefault){ event.preventDefault(); }
+            if(event.stopPropagation){ event.stopPropagation(); }
+            window.v141ChallengeAbyssBoss();
+            return;
+        }
+        if(event.target&&typeof event.target.closest==="function"&&event.target.closest("button")){ return; }
         const rect=map.getBoundingClientRect();
         /* V143：地圖放大後同步放寬可走區，保留角色半身安全邊界即可。 */
         const x=Math.max(4,Math.min(96,(event.clientX-rect.left)/rect.width*100));
