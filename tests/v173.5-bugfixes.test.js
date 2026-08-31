@@ -72,4 +72,4 @@ test("Frostbite expires from monsters and players at the normal status tick",()=
     assert.equal(updates,1);
 });
 
-console.log("\nV173.7 bug-fix suite: "+passed+" tests passed.");
+console.log("\nV173.8 bug-fix suite: "+passed+" tests passed.");

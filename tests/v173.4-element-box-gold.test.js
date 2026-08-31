@@ -130,4 +130,4 @@ test("legacy autoConfig normal is untouched and no gold-difference tracker remai
     assert.doesNotMatch(source,/elementBoxBattleStartGold|battleGoldStart/);
 });
 
-console.log("\nV173.7 Element Box gold suite: "+passed+" tests passed.");
+console.log("\nV173.8 Element Box gold suite: "+passed+" tests passed.");

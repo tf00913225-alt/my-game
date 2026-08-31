@@ -80,7 +80,7 @@ test("Flood Beast keeps the full-frame default while the current cache publishes
     assert.match(index,/js\/20-anonymous-20\.js\?v=173\.6/);
 });
 
-test("Home cover exposes the current V173.7 build in its bottom-right safe area",()=>{
+test("Home cover exposes the current V173.8 build in its bottom-right safe area",()=>{
     assert.match(
         index,
         /id="homeVersionBadge"[\s\S]*?class="home-version-badge"[\s\S]*?aria-label="目前版本 V173\.6"[\s\S]*?>V173\.6<\/div>/

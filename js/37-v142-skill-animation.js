@@ -7,7 +7,8 @@
 
     if(typeof window==="undefined"){ return; }
     /* Recover if an earlier runtime load set only the sentinel before it failed. */
-    if(window.__v142SkillAnimationInstalled && window.v142SkillAnimationDirector){ return; }
+    if(window.__v142SkillAnimationInstalled && window.v142SkillAnimationDirector &&
+        typeof window.v142PlaySkillAnimationFromBadge==="function"){ return; }
     window.__v142SkillAnimationInstalled=true;
 
     const VERSION="142";

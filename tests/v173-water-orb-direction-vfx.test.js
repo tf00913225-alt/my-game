@@ -68,7 +68,7 @@ test("Frame eight hits with the lower splash and frames nine through twelve use 
     );
 });
 
-test("Only actual targets receive copies and the published build label is V173.7",()=>{
+test("Only actual targets receive copies and the published build label is V173.8",()=>{
     assert.match(
         animation,
         /const key=placement==="single"\|\|placement==="targetTrajectory"\?index:"main";/

@@ -595,12 +595,18 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
-### 2026-08-31 — V173.7：P0 技能動畫直接觸發收斂（dev）
+### 2026-08-31 — V173.8：P0 技能動畫初始化完整性（dev）
+
+- V142 僅在既有 director 與新版直接觸發器都存在時才略過初始化；舊快取只留下部分 runtime 狀態時，會重新建立同一個動畫 owner。
+- 不新增 runtime patch，不改戰鬥、技能數值、素材或存檔；深淵立繪對話縮放修正維持不變。
+- 頁面、Loader 與動畫素材快取版本升為 V173.8；CI 與 dev 實測待本次提交後確認。
+
+### 2026-08-31 — V173.8：P0 技能動畫直接觸發收斂（dev）
 
 - 技能動畫的唯一觸發點收斂為 `js/00-main.js` 既有的 `showSkillNameBadge()` 與 `showMonsterSkillNameBadge()`；兩者在既有 badge 建立後直接呼叫 `js/37-v142-skill-animation.js` 匯出的 `v142PlaySkillAnimationFromBadge()`。
 - 移除 V142 以 wrapper 攔截 badge 的依賴，避免後續 runtime wrapper 順序造成所有技能演出失效；不改技能數值、傷害、回合、素材或存檔。
 - 深淵立繪對話的縮放座標修正維持於 `js/38-v143-system-fixes.js`，本次未改動其他深淵規則。
-- 頁面、Loader 與動畫素材快取版本升為 V173.7；CI 與 dev 實測待本次提交後確認。
+- 頁面、Loader 與動畫素材快取版本升為 V173.8；CI 與 dev 實測待本次提交後確認。
 
 ### 2026-08-31 — V173.6：P0 動畫 runtime 與深淵對話定位修復（dev）
 
