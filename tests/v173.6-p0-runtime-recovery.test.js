@@ -21,4 +21,4 @@ assert.match(animation,/water-orb-vfx\.png\?v=173\.9/);
 assert.match(loader,/const V_ASSET_VERSION="173\.9"/);
 assert.match(index,/<title>四象江湖傳 V173\.9<\/title>/);
 
-console.log("V173.9 P0 known-good animation-chain recovery: 10 tests passed.");
+console.log("V173.10 P0 known-good animation-chain recovery: 10 tests passed.");
