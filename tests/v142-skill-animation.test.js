@@ -172,6 +172,16 @@ function createContext(options={}){
         assert.match(index,/js\/20-anonymous-20\.js\?v=173\.9/);
     });
 
+    await test("player and monster skill badges actually start animation gates",()=>{
+        const {context}=createContext();
+        context.showSkillNameBadge("火焰斬","fire",0);
+        assert.equal(context.v142SkillAnimationDirector.getLatest().config.name,"火焰斬");
+        assert.equal(context.v142GetAnimationDiagnostics().last.side,"player");
+        context.showMonsterSkillNameBadge("火焰斬","fire",0);
+        assert.equal(context.v142SkillAnimationDirector.getLatest().config.name,"火焰斬");
+        assert.equal(context.v142GetAnimationDiagnostics().last.side,"monster");
+    });
+
     await test("normal, small and ultimate skills keep distinct durations",()=>{
         const {context}=createContext({battleActive:false});
         assert.equal(context.v142GetSkillAnimationConfig("normal").duration,520);
