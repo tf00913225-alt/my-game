@@ -595,6 +595,14 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-08-31 — V173.6：P0 動畫 runtime 與深淵對話定位修復（dev）
+
+- 技能動畫 owner 為 `js/37-v142-skill-animation.js`：若前一輪載入只留下 `__v142SkillAnimationInstalled` 旗標卻沒有建立控制器，現在會安全重建控制器；`js/39-v143-skill-animation.js` 的所有 Sprite 動畫可再次掛入既有 director。
+- 深淵對話目前由 `js/38-v143-system-fixes.js` 產生；對話定位改以地圖的實際縮放比例轉回邏輯座標，避免泡泡被渲染到畫面上方而不可見。
+- 實際 dev 隔離瀏覽器已重現：修正前深淵對話按鈕的 computed top 為負值，且水球術施放後沒有任何 `#v143-skill-stage`。
+- 本次僅處理 P0 動畫 runtime 與深淵對話；不修改技能數值、存檔、掉落、素材內容或 UI 版面。完整 CI 與 dev 實測待本輪提交後執行。
+- 頁面與 Loader 快取版本升為 V173.6。
+
 ### 2026-08-31 — V173.5：深淵、掉落互動與水／火 VFX 修正（dev）
 
 - 深淵地圖守關立繪改為直接開啟對話：權威位置為 `js/38-v143-system-fixes.js` 的 `v141ChallengeAbyssBoss`；不再經過會讓手機點擊看似無反應的接近移動閘門。

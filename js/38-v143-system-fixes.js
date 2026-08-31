@@ -675,8 +675,13 @@
                 if(bossButton){
                     const mapRect=map.getBoundingClientRect();
                     const bossRect=bossButton.getBoundingClientRect();
-                    overlay.style.left=(bossRect.left+bossRect.width/2-mapRect.left)+"px";
-                    overlay.style.top=Math.max(104,bossRect.top-mapRect.top-8)+"px";
+                    /* The map lives in the scaled game stage.  Convert viewport
+                       pixels back to its logical coordinate space before positioning
+                       the speech button, otherwise it is rendered above the screen. */
+                    const scaleX=mapRect.width?map.offsetWidth/mapRect.width:1;
+                    const scaleY=mapRect.height?map.offsetHeight/mapRect.height:1;
+                    overlay.style.left=((bossRect.left+bossRect.width/2-mapRect.left)*scaleX)+"px";
+                    overlay.style.top=Math.max(104,(bossRect.top-mapRect.top-8)*scaleY)+"px";
                 }
             };
 
