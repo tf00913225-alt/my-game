@@ -215,6 +215,16 @@
         v166WaterTargetTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
+.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite{
+    --v166-water-full-clip:inset(0);
+    --v166-water-flight-clip:inset(0 0 50% 0);
+    --v166-water-impact-clip:inset(50% 0 0 0);
+}
+
+.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite[data-formation-lead="false"]{
+    --v166-water-formation-opacity:0;
+}
+
 .v143-skill-stage[data-skill="iceArrowRain"] .v166-water-cast-sprite{
     contain:paint;
     overflow:hidden;
@@ -259,36 +269,42 @@
         opacity:0;
         left:var(--v143-sprite-start-left);
         top:var(--v143-sprite-start-top);
+        clip-path:var(--v166-water-full-clip,none);
         transform:translate(-50%,-50%) scale(.9);
     }
     3%,33.332%{
-        opacity:1;
+        opacity:var(--v166-water-formation-opacity,1);
         left:var(--v143-sprite-start-left);
         top:var(--v143-sprite-start-top);
+        clip-path:var(--v166-water-full-clip,none);
         transform:translate(-50%,-50%) scale(1);
     }
     33.333%{
         opacity:1;
         left:var(--v143-sprite-start-left);
-        top:var(--v143-sprite-start-top);
+        top:calc(var(--v143-sprite-start-top) + var(--v166-water-orb-half-offset,0px));
+        clip-path:var(--v166-water-flight-clip,none);
         transform:translate(-50%,-50%) scale(1);
     }
     58.332%{
         opacity:1;
         left:var(--v143-sprite-target-left);
-        top:var(--v143-sprite-target-top);
+        top:calc(var(--v143-sprite-target-top) + var(--v166-water-orb-half-offset,0px));
+        clip-path:var(--v166-water-flight-clip,none);
         transform:translate(-50%,-50%) scale(1);
     }
     58.333%,95%{
         opacity:1;
         left:var(--v143-sprite-target-left);
-        top:var(--v143-sprite-target-top);
+        top:calc(var(--v143-sprite-target-top) - var(--v166-water-orb-half-offset,0px));
+        clip-path:var(--v166-water-impact-clip,none);
         transform:translate(-50%,-50%) scale(1);
     }
     100%{
         opacity:0;
         left:var(--v143-sprite-target-left);
-        top:var(--v143-sprite-target-top);
+        top:calc(var(--v143-sprite-target-top) - var(--v166-water-orb-half-offset,0px));
+        clip-path:var(--v166-water-impact-clip,none);
         transform:translate(-50%,-50%) scale(1.03);
     }
 }

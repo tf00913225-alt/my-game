@@ -126,7 +126,7 @@
             sprite:{
                 src:"assets/vfx/water/water-orb-vfx.png?v=166",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true,
-                scale:1.65,minSize:150,maxSize:225
+                scale:1.25,minSize:110,maxSize:165
             }
         },
         floodBeast:{
@@ -736,6 +736,9 @@
             node.style.setProperty("--v143-sprite-target-left",target.x+"px");
             node.style.setProperty("--v143-sprite-target-top",target.y+"px");
             node.style.setProperty("--v143-sprite-angle","0deg");
+            if(current.config.id==="waterBall"){
+                node.style.setProperty("--v166-water-orb-half-offset",size/4+"px");
+            }
             return;
         }
 
@@ -851,6 +854,9 @@
                 -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"
             );
             if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
+            if(current.config.id==="waterBall"&&placement==="targetTrajectory"){
+                node.dataset.formationLead=current.spriteNodes.size===0?"true":"false";
+            }
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);

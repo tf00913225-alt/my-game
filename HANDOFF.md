@@ -53,7 +53,8 @@
    `tests/v169-rpg-ui.test.js`、`tests/v169-element-box-settings.test.js`、
    `tests/v169-water-skill-rules.test.js`、`tests/v169-abyss-assets-flow.test.js`。驗證至少要包含：
    V171 另新增怒火／水球術／洪水猛獸／冰霜箭雨定位與單體凍傷範圍驗收
-   `tests/v171-combat-vfx-fixes.test.js`。
+   `tests/v171-combat-vfx-fixes.test.js`；V172 新增水球術多目標分層播放與原圖保留驗收
+   `tests/v172-water-orb-vfx.test.js`。
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -65,7 +66,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-31，V171 戰鬥技能 VFX 定位修正）
+## 目前狀態（截至 2026-08-31，V172 水球術多目標動畫修正）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -475,6 +476,19 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-31 — V172：水球術多目標動畫分層修正（dev）
+
+- 保留 `assets/vfx/water/water-orb-vfx.png` 原始透明 PNG，不修改、不重製也不重新編碼；
+  修正先前每個目標都各自播放完整 12 幀 Sprite，導致共同聚集疊成大型光團、飛行途中又夾帶
+  提前爆裂圖塊的問題。
+- 第 1～4 幀只顯示一個共同水球聚集；第 5～7 幀依每個實際有效目標分別移動畫格上半部的
+  水球，抵達對應卡牌後才於第 7～8 幀切換為畫格下半部命中特效，第 8～12 幀留在目標附近
+  完成水爆消散。水球術尺寸同步縮為 1.25 倍、110～165px。
+- 上述分層、裁切及尺寸只套用於 `waterBall`；洪水猛獸沿用完整畫格與原定位、尺寸，不受影響。
+  快取與直載 query 升至 172，新增 `tests/v172-water-orb-vfx.test.js`。
+- 驗證結果：`node --test tests/*.test.js` 共 33 份 suite 全數通過；瀏覽器實戰已建立並裝備
+  水球術角色，確認三名實際目標在同一命中時點各自受到傷害。
 
 ### 2026-08-31 — V171：怒火、水球／洪水與冰霜箭雨定位修正（dev）
 

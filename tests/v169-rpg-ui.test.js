@@ -229,10 +229,10 @@ test("perpetual modal glow and skill-card compositing are static",()=>{
 });
 
 test("V169 styles and runtimes are deployed last under fresh cache keys",()=>{
-    assert.match(loaderSource,/const V_ASSET_VERSION="171"/);
-    assert.match(indexSource,/js\/00-main\.js\?v=171/);
-    assert.match(indexSource,/js\/19-stage-v78-character-inventory-runtime\.js\?v=171/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=171/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="172"/);
+    assert.match(indexSource,/js\/00-main\.js\?v=172/);
+    assert.match(indexSource,/js\/19-stage-v78-character-inventory-runtime\.js\?v=172/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=172/);
 
     const styles=[
         "css/48-v169-element-box-settings.css",

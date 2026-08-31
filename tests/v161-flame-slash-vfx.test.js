@@ -37,8 +37,8 @@ test("the official Sprite bypasses the old word-circle fallback",()=>{
 });
 
 test("the current cache version publishes the corrected source asset and metadata",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="171"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=171/);
+    assert.match(loader,/const V_ASSET_VERSION="172"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=172/);
 });
 
 console.log("\nV161 Fire Slash VFX suite: "+passed+" tests passed.");
