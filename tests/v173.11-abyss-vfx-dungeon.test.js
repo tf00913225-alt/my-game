@@ -26,7 +26,7 @@ assert.match(
 );
 assert.match(
     animation,
-    /iceArrowRain:\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",coverageScale:1\.22/
+    /iceArrowRain:\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",targetBounds:true,coverageScale:1\.22/
 );
 assert.match(
     animation,

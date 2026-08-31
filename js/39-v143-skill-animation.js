@@ -143,7 +143,7 @@
             pulses:7,spread:104,flightCount:7,deferredStatusTypes:["frostbite"],
             sprite:{
                 src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=166",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",coverageScale:1.22,
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",targetBounds:true,coverageScale:1.22,
                 minWidth:140,minHeight:140
             }
         },
@@ -743,12 +743,41 @@
         }
 
         if(placement==="battlefield"){
-            /*
-               A battlefield Sprite Sheet is one VFX instance. Its destination
-               is based only on cards that are still valid targets, never on a
-               fixed side container or a dead/retired card.
-            */
             const indexes=emittedSpriteTargets(current);
+            /*
+               Most full-field skills (for example Phoenix Cry) intentionally
+               cover the entire opposing formation even after casualties.
+               Ice Arrow Rain opts into the living-card bounds below.
+            */
+            if(!sprite.targetBounds){
+                const bounds=sideAreaBounds(current.targetSide);
+                if(!bounds){ return; }
+                const viewportWidth=Number(window.innerWidth)||960;
+                const viewportHeight=Number(window.innerHeight)||720;
+                const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
+                const size=clamp(
+                    Math.max(bounds.width,bounds.height)*(Number(sprite.scale)||1),
+                    Number(sprite.minSize)||160,
+                    Number(sprite.maxSize)||dynamicMaximum
+                );
+                node.dataset.targetIndexes=indexes.join(",");
+                node.dataset.areaId=bounds.id;
+                node.style.left=(bounds.left+bounds.width/2)+"px";
+                node.style.top=(bounds.top+bounds.height/2)+"px";
+                node.style.width=size+"px";
+                node.style.height=size+"px";
+                node.style.clipPath="none";
+                node.style.setProperty("--v143-sprite-dx","0px");
+                node.style.setProperty("--v143-sprite-dy","0px");
+                node.style.setProperty("--v143-sprite-angle","0deg");
+                return;
+            }
+
+            /*
+               Ice Arrow Rain is one VFX instance. Its destination is based
+               only on cards that are still valid targets, never on a fixed
+               side container or a dead/retired card.
+            */
             const targetCards=indexes.map(targetIndex=>cardFor(current.targetSide,targetIndex))
                 .filter(card=>card&&card.offsetParent!==null);
             const bounds=fieldBounds(targetCards);
