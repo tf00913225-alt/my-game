@@ -99,8 +99,8 @@
         },
         floodBeast:{
             learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:85,damagePerLevel:8,spCost:15,
-            freezeChance:0,teamFreezeChance:55,teamFreezeDuration:2,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterBall"],
-            description:"需先學習水球術。對單體造成85點傷害，消耗15 SP；最高5級，每升1級傷害+8，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。技能命中後，敵方每個存活目標各有55%基礎機率冰封2回合。"
+            freezeChance:0,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterBall"],
+            description:"需先學習水球術。對單體造成85點傷害，消耗15 SP；最高5級，每升1級傷害+8，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。"
         },
         iceArrowRain:{
             learnCost:20,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:30,damagePerLevel:12,spCost:75,
@@ -455,7 +455,7 @@
         };
     }
 
-    /* ----- Player skill context: Fire EX and Flood Beast team Freeze. ----- */
+    /* ----- Player skill context: Fire EX damage bonus. ----- */
     let playerSkillContext=null;
 
     function wrapPlayerSkillContext(name,skillArgIndex,characterIndexFromArgs){
@@ -467,7 +467,7 @@
             const characterIndex=characterIndexFromArgs(args);
             const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
             const previousContext=playerSkillContext;
-            playerSkillContext={skill:skill,character:character,characterIndex:characterIndex,teamFreezeApplied:false};
+            playerSkillContext={skill:skill,character:character,characterIndex:characterIndex};
             try{ return previous.apply(this,args); }
             finally{ playerSkillContext=previousContext; }
         };
@@ -494,68 +494,6 @@
             if(result>0&&bonus>0&&learnedFireEX(playerSkillContext)&&target&&Array.isArray(target.statusEffects)&&
                 target.statusEffects.some(effect=>effect&&numeric(effect.turnsLeft)>0)){
                 result=Math.floor(result*(1+bonus/100));
-            }
-            return result;
-        };
-    }
-
-    function applyTeamFreezeToMonsters(skill,casterLevel,casterIntelligence){
-        livingMonsterIndexes().forEach(index=>{
-            const monster=monsters[index];
-            const hit=typeof rollStatusEffectHit==="function"&&rollStatusEffectHit(
-                skill.teamFreezeChance,casterLevel,monster.level,casterIntelligence,
-                typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
-                true,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
-            );
-            if(hit){
-                if(typeof applyFreezeEffect==="function"){ applyFreezeEffect(monster,skill.teamFreezeDuration||2); }
-                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"被冰封了！"); }
-            }else{
-                if(typeof showMissEffect==="function"){ showMissEffect(false,index,"抵抗"); }
-                if(typeof addBattleLog==="function"){ addBattleLog("（冰封效果被"+monster.name+"抵抗了）"); }
-            }
-        });
-    }
-
-    function applyTeamFreezeToPlayers(skill,casterLevel,casterIntelligence){
-        livingPartyIndexes().forEach(index=>{
-            const target=getPartyCharacterByIndex(index);
-            const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
-                ?getFinalBattleSpiritForPlayerTarget(target,index):numeric(target.spirit);
-            const resist=typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0;
-            const hit=typeof rollStatusEffectHit==="function"&&rollStatusEffectHit(
-                skill.teamFreezeChance,casterLevel,target.level,casterIntelligence,spirit,true,"regular",resist
-            );
-            if(hit){
-                if(typeof applyFreezeEffect==="function"){ applyFreezeEffect(target,skill.teamFreezeDuration||2); }
-                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"被冰封了！"); }
-            }else{
-                if(typeof showMissEffect==="function"){ showMissEffect(true,index,"抵抗"); }
-                if(typeof addBattleLog==="function"){ addBattleLog("（冰封效果被"+(target.id||"角色")+"抵抗了）"); }
-            }
-        });
-    }
-
-    if(typeof applySkillDebuffEffects==="function"){
-        const previousForTeamFreeze=applySkillDebuffEffects;
-        applySkillDebuffEffects=function(skill,level,monster,index,casterLevel,casterIntelligence){
-            const result=previousForTeamFreeze.apply(this,arguments);
-            if(skill&&numeric(skill.teamFreezeChance)&&playerSkillContext&&!playerSkillContext.teamFreezeApplied){
-                playerSkillContext.teamFreezeApplied=true;
-                applyTeamFreezeToMonsters(skill,casterLevel,casterIntelligence);
-            }
-            return result;
-        };
-    }
-
-    let monsterTeamFreezeApplied=false;
-    if(typeof applySkillDebuffEffectsToPlayer==="function"){
-        const previousForMonsterTeamFreeze=applySkillDebuffEffectsToPlayer;
-        applySkillDebuffEffectsToPlayer=function(skill,level,target,index,casterLevel,casterIntelligence){
-            const result=previousForMonsterTeamFreeze.apply(this,arguments);
-            if(skill&&numeric(skill.teamFreezeChance)&&!monsterTeamFreezeApplied){
-                monsterTeamFreezeApplied=true;
-                applyTeamFreezeToPlayers(skill,casterLevel,casterIntelligence);
             }
             return result;
         };
@@ -842,7 +780,6 @@
             monster.v141SupportSkillIds=[];
             monster.skillChance=1;
             currentReflectAttacker=options.monsterIndex;
-            monsterTeamFreezeApplied=false;
             if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
             if(originalHit){
                 showPlayerHit=function(){
@@ -932,7 +869,6 @@
             }
             const previousAttacker=currentReflectAttacker;
             currentReflectAttacker=monsterIndex;
-            monsterTeamFreezeApplied=false;
             let result;
             try{ result=previousMonsterAttack.apply(this,arguments); }
             finally{

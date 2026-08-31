@@ -86,7 +86,7 @@
             glyph:"怒",motion:"rise",impact:"rage-aura",hit:.5833333333,pulses:3,spread:55,
             sprite:{
                 src:"assets/vfx/fire/rage-cast.png?v=165",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:.82,minSize:64,maxSize:108
+                columns:4,rows:3,frames:12,hitFrame:7,placement:"single",scale:1.08,minSize:96,maxSize:148
             }
         },
         fireEX:{glyph:"焰",motion:"orbit",impact:"fire-crown",hit:.74,pulses:7,spread:95},
@@ -126,21 +126,21 @@
             sprite:{
                 src:"assets/vfx/water/water-orb-vfx.png?v=166",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true,
-                scale:1.65,minSize:150,maxSize:225
+                scale:1.25,minSize:110,maxSize:165
             }
         },
         floodBeast:{
             glyph:"獸",motion:"surge",impact:"flood-jaw",hit:.5833333333,pulses:4,spread:66,
-            deferredStatusTypes:["freeze"],
+            deferredStatusTypes:["frostbite"],
             sprite:{
                 src:"assets/vfx/water/tidal-beast-vfx.png?v=166",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true,
-                scale:2.35,minSize:220,maxSize:320
+                scale:1.85,minSize:175,maxSize:250
             }
         },
         iceArrowRain:{
             glyph:"➶",motion:"rain",impact:"ice-rain",hit:.5833333333,
-            pulses:7,spread:104,flightCount:7,deferredStatusTypes:["freeze"],
+            pulses:7,spread:104,flightCount:7,deferredStatusTypes:["frostbite"],
             sprite:{
                 src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=166",
                 columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",scale:1
@@ -387,6 +387,10 @@
     function deferredStatusDuringCast(side,index,type){
         const current=state.current;
         if(!current||current.done||current.targetSide!==side){ return false; }
+        if(type==="rage"&&current.config.id==="rage"){
+            const card=cardFor(side,index);
+            if(card&&card.classList&&card.classList.contains("v143-effects-pending")){ return true; }
+        }
         const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
         if(types.indexOf(type)<0){ return false; }
         const tracked=current.deferredStatusTargets&&current.deferredStatusTargets.get(type);
@@ -659,6 +663,36 @@
         );
     }
 
+    function buildBattlefieldSpriteTiles(node,sprite,bounds){
+        const tileSize=Math.max(1,Math.min(bounds.width,bounds.height));
+        const columns=Math.max(1,Math.ceil(bounds.width/tileSize));
+        const rows=Math.max(1,Math.ceil(bounds.height/tileSize));
+        const geometry=[bounds.width,bounds.height,tileSize,columns,rows].join(":");
+        if(node.dataset.tileGeometry===geometry){ return; }
+
+        if(typeof node.querySelectorAll==="function"){
+            node.querySelectorAll(".v166-water-battlefield-tile").forEach(tile=>tile.remove());
+        }
+        const startX=(bounds.width-columns*tileSize)/2;
+        const startY=(bounds.height-rows*tileSize)/2;
+        for(let row=0;row<rows;row++){
+            for(let column=0;column<columns;column++){
+                const tile=document.createElement("span");
+                tile.className="v166-water-battlefield-tile";
+                tile.style.left=(startX+column*tileSize)+"px";
+                tile.style.top=(startY+row*tileSize)+"px";
+                tile.style.width=tileSize+"px";
+                tile.style.height=tileSize+"px";
+                tile.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
+                tile.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
+                if(typeof tile.setAttribute==="function"){ tile.setAttribute("aria-hidden","true"); }
+                node.appendChild(tile);
+            }
+        }
+        node.dataset.tileGeometry=geometry;
+        node.dataset.tileCount=String(columns*rows);
+    }
+
     function placeSprite(current,node,index,target){
         const sprite=current.model.sprite;
         const placement=String(sprite.placement||"single");
@@ -697,7 +731,14 @@
             node.style.height=size+"px";
             node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
+            node.style.setProperty("--v143-sprite-start-left",actor.x+"px");
+            node.style.setProperty("--v143-sprite-start-top",actor.y+"px");
+            node.style.setProperty("--v143-sprite-target-left",target.x+"px");
+            node.style.setProperty("--v143-sprite-target-top",target.y+"px");
             node.style.setProperty("--v143-sprite-angle","0deg");
+            if(current.config.id==="waterBall"){
+                node.style.setProperty("--v166-water-orb-half-offset",size/4+"px");
+            }
             return;
         }
 
@@ -705,16 +746,16 @@
             const indexes=emittedSpriteTargets(current);
             const bounds=sideAreaBounds(current.targetSide);
             if(!bounds){ return; }
-            const size=Math.max(bounds.width,bounds.height);
-            const horizontalInset=Math.max(0,(size-bounds.width)/2);
-            const verticalInset=Math.max(0,(size-bounds.height)/2);
             node.dataset.targetIndexes=indexes.join(",");
             node.dataset.areaId=bounds.id;
             node.style.left=(bounds.left+bounds.width/2)+"px";
             node.style.top=(bounds.top+bounds.height/2)+"px";
-            node.style.width=size+"px";
-            node.style.height=size+"px";
-            node.style.clipPath="inset("+verticalInset+"px "+horizontalInset+"px)";
+            node.style.width=bounds.width+"px";
+            node.style.height=bounds.height+"px";
+            node.style.clipPath="none";
+            node.style.backgroundImage="none";
+            node.style.backgroundSize="auto";
+            buildBattlefieldSpriteTiles(node,sprite,bounds);
             node.style.setProperty("--v143-sprite-dx","0px");
             node.style.setProperty("--v143-sprite-dy","0px");
             node.style.setProperty("--v143-sprite-angle","0deg");
@@ -765,23 +806,46 @@
         node.style.setProperty("--v143-sprite-angle",angle+"deg");
     }
 
+    function startSpriteAnimation(node){
+        const animationClass=node&&node.__v143PendingAnimationClass;
+        if(!animationClass){ return; }
+        node.style.opacity="";
+        node.className+=animationClass;
+        node.__v143PendingAnimationClass="";
+    }
+
+    function scheduleSharedSpriteAnimation(current,node){
+        if(!node||node.__v143AnimationStartScheduled){ return; }
+        node.__v143AnimationStartScheduled=true;
+        setTimer(()=>{
+            node.__v143AnimationStartScheduled=false;
+            if(state.current===current&&!current.done){ startSpriteAnimation(node); }
+        },0);
+    }
+
     function addSprite(current,index,target){
         const sprite=current.model.sprite;
         if(!sprite||!target){ return; }
         const placement=String(sprite.placement||"single");
         const key=placement==="single"||placement==="targetTrajectory"?index:"main";
         let node=current.spriteNodes.get(key);
+        let animationClass="";
+        let isNew=false;
         if(!node){
             node=appendNode(
-                "v143-vfx-sprite v143-vfx-sprite-"+current.config.id+
-                (String(sprite.src).includes("/fire/")?" v153-fire-cast-sprite":"")+
-                (String(sprite.src).includes("/water/")?" v166-water-cast-sprite":"")
+                "v143-vfx-sprite v143-vfx-sprite-"+current.config.id
             );
+            animationClass=
+                (String(sprite.src).includes("/fire/")?" v153-fire-cast-sprite":"")+
+                (String(sprite.src).includes("/water/")?" v166-water-cast-sprite":"");
+            node.__v143PendingAnimationClass=animationClass;
+            isNew=true;
             node.dataset.targetSide=current.targetSide;
             node.dataset.placement=placement;
             node.dataset.columns=String(sprite.columns);
             node.dataset.rows=String(sprite.rows);
             node.dataset.frames=String(sprite.frames);
+            node.style.opacity="0";
             node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
             node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
             node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
@@ -790,9 +854,19 @@
                 -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"
             );
             if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
+            if(current.config.id==="waterBall"&&placement==="targetTrajectory"){
+                node.dataset.formationLead=current.spriteNodes.size===0?"true":"false";
+            }
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);
+        /* Android browsers may snapshot custom-property fallbacks if the
+           animation class is present before the real card coordinates. */
+        if(isNew&&(placement==="single"||placement==="targetTrajectory")){
+            startSpriteAnimation(node);
+        }else if(!current.collectingInitialTargets&&node.__v143PendingAnimationClass){
+            scheduleSharedSpriteAnimation(current,node);
+        }
     }
 
     function emitFlight(current,index,allowDefeated){
@@ -843,6 +917,8 @@
     function registerTarget(targetSide,index,allowDefeated){
         const current=state.current;
         if(!current||current.done||current.targetSide!==targetSide){ return null; }
+        const single=String(current.config.targetType||"")==="single";
+        if(single&&current.targetIndexes.length&&current.targetIndexes.indexOf(index)<0){ return null; }
         emitFlight(current,index,allowDefeated===true);
         return current.emitted.has(index)?current:null;
     }
@@ -883,7 +959,8 @@
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),
             validTargets:validTargets,spriteNodes:new Map(),deferredStatusTargets:new Map(),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
-            startedAt:Date.now(),duration:duration,hitReached:false,done:false
+            startedAt:Date.now(),duration:duration,hitReached:false,done:false,
+            collectingInitialTargets:true
         };
         current.targetIndexes=initialTargetIndexes(config,current,targetSide);
         const stage=document.createElement("div");
@@ -910,6 +987,8 @@
             addField(current);
         }
         current.targetIndexes.slice().forEach(index=>emitFlight(current,index));
+        current.collectingInitialTargets=false;
+        current.spriteNodes.forEach(node=>startSpriteAnimation(node));
         setTimer(()=>cleanupCurrent(current,"v143-animation-complete"),Math.max(duration,Number(config.resolveDuration)||duration));
         gate.promise.then(()=>{
             if(state.current===current&&!current.done){ cleanupCurrent(current,gate.reason||"gate-complete"); }
@@ -1011,6 +1090,16 @@
                 return;
             }
             return previousShowPlayerHit.apply(this,args);
+        };
+    }
+
+    /* Barrier can absorb an enemy hit before showPlayerHit() runs. The debuff
+       settlement still exposes the real player endpoint for its VFX. */
+    if(typeof applySkillDebuffEffectsToPlayer==="function"){
+        const previousPlayerDebuffEffects=applySkillDebuffEffectsToPlayer;
+        applySkillDebuffEffectsToPlayer=function(skill,level,target,index){
+            registerTarget("player",Number(index)||0,true);
+            return previousPlayerDebuffEffects.apply(this,arguments);
         };
     }
 

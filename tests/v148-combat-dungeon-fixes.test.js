@@ -1,3 +1,5 @@
+/* HISTORICAL SPEC SNAPSHOT (V148): 只保留該版驗收紀錄；V170 最終規格以 v170-final-spec-integration.test.js 為準。 */
+
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
@@ -61,14 +63,14 @@ function baseContext(overrides={}){
 }
 
 test("V148 remains ordered under the current runtime and cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=170/);
-    assert.match(loader,/const V_ASSET_VERSION="170"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.2/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.2"/);
     assert.match(loader,/css\/43-v148-combat-dungeon-fixes\.css/);
-    assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=149/);
+assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.2/);
     const v146=loader.indexOf("js/41-v146-system-polish.js");
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     assert.ok(v146>=0&&v148>v146);
-    assert.match(touchLock,/\.skill-preview-body, #dungeonTabContent/);
+    assert.match(touchLock,/\.skill-preview-body, \.creation-skill-detail-levels, #dungeonTabContent/);
     assert.match(css,/touch-action:pan-y !important/);
     assert.match(css,/#dungeonPage:not\(\.v146-abyss-active\)\.active[\s\S]*display:flex !important/);
     ["assets/ui/training-background.jpg","assets/ui/home-synthesis.png","assets/battle/element-box.png"]

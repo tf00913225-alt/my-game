@@ -1,5 +1,7 @@
 "use strict";
 
+/* HISTORICAL SPEC SNAPSHOT (V142): 只保留該版驗收紀錄；V170 最終規格以 v170-final-spec-integration.test.js 為準。 */
+
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
@@ -164,10 +166,10 @@ function createContext(options={}){
 
 (async()=>{
     await test("V142 assets are versioned and loaded after V141",()=>{
-        assert.match(loader,/const V_ASSET_VERSION="170"/);
+        assert.match(loader,/const V_ASSET_VERSION="173\.2"/);
         assert.match(loader,/css\/39-v142-skill-animation\.css/);
         assert.match(loader,/js\/36-v141-content-systems\.js[\s\S]*js\/37-v142-skill-animation\.js/);
-        assert.match(index,/js\/20-anonymous-20\.js\?v=170/);
+        assert.match(index,/js\/20-anonymous-20\.js\?v=173\.2/);
     });
 
     await test("normal, small and ultimate skills keep distinct durations",()=>{

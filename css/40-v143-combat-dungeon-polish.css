@@ -208,18 +208,52 @@
         v166WaterCastEnvelope var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
-.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite,
+.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite{
+    animation:
+        v166WaterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        v173WaterOrbTargetTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+
 .v143-skill-stage[data-skill="floodBeast"] .v166-water-cast-sprite{
     animation:
         v166WaterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
         v166WaterTargetTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
+.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite{
+    --v166-water-full-clip:inset(0);
+    --v166-water-flight-clip:inset(0 0 50% 0);
+    --v166-water-impact-clip:inset(50% 0 0 0);
+}
+
+.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite[data-formation-lead="false"]{
+    --v166-water-formation-opacity:0;
+}
+
+.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite[data-target-side="monster"]{
+    --v173-water-flight-rotation:90deg;
+}
+
+.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite[data-target-side="player"]{
+    --v173-water-flight-rotation:-90deg;
+}
+
 .v143-skill-stage[data-skill="iceArrowRain"] .v166-water-cast-sprite{
     contain:paint;
-    animation:
-        v166WaterCastFrames var(--v143-sprite-duration,1600ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
-        v166WaterAoeEnvelope var(--v143-sprite-duration,1600ms) linear var(--v143-sprite-delay,0ms) 1 both;
+    overflow:hidden;
+    border-radius:10px;
+    animation:v166WaterAoeEnvelope var(--v143-sprite-duration,1600ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+
+.v143-skill-stage[data-skill="iceArrowRain"] .v166-water-cast-sprite > .v166-water-battlefield-tile{
+    position:absolute;
+    display:block;
+    box-sizing:border-box;
+    background-position:0 0;
+    background-repeat:no-repeat;
+    image-rendering:auto;
+    animation:v166WaterCastFrames var(--v143-sprite-duration,1600ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both;
+    will-change:background-position;
 }
 
 @keyframes v166WaterCastFrames{
@@ -246,43 +280,111 @@
 @keyframes v166WaterTargetTravel{
     0%{
         opacity:0;
+        left:var(--v143-sprite-start-left);
+        top:var(--v143-sprite-start-top);
+        clip-path:var(--v166-water-full-clip,none);
         transform:translate(-50%,-50%) scale(.9);
     }
     3%,33.332%{
-        opacity:1;
+        opacity:var(--v166-water-formation-opacity,1);
+        left:var(--v143-sprite-start-left);
+        top:var(--v143-sprite-start-top);
+        clip-path:var(--v166-water-full-clip,none);
         transform:translate(-50%,-50%) scale(1);
     }
     33.333%{
         opacity:1;
+        left:var(--v143-sprite-start-left);
+        top:calc(var(--v143-sprite-start-top) + var(--v166-water-orb-half-offset,0px));
+        clip-path:var(--v166-water-flight-clip,none);
         transform:translate(-50%,-50%) scale(1);
     }
     58.332%{
         opacity:1;
-        transform:translate(
-            calc(-50% + var(--v143-sprite-dx,0px)),
-            calc(-50% + var(--v143-sprite-dy,0px))
-        ) scale(1);
+        left:var(--v143-sprite-target-left);
+        top:calc(var(--v143-sprite-target-top) + var(--v166-water-orb-half-offset,0px));
+        clip-path:var(--v166-water-flight-clip,none);
+        transform:translate(-50%,-50%) scale(1);
     }
     58.333%,95%{
         opacity:1;
-        transform:translate(
-            calc(-50% + var(--v143-sprite-dx,0px)),
-            calc(-50% + var(--v143-sprite-dy,0px))
-        ) scale(1);
+        left:var(--v143-sprite-target-left);
+        top:calc(var(--v143-sprite-target-top) - var(--v166-water-orb-half-offset,0px));
+        clip-path:var(--v166-water-impact-clip,none);
+        transform:translate(-50%,-50%) scale(1);
     }
     100%{
         opacity:0;
-        transform:translate(
-            calc(-50% + var(--v143-sprite-dx,0px)),
-            calc(-50% + var(--v143-sprite-dy,0px))
-        ) scale(1.03);
+        left:var(--v143-sprite-target-left);
+        top:calc(var(--v143-sprite-target-top) - var(--v166-water-orb-half-offset,0px));
+        clip-path:var(--v166-water-impact-clip,none);
+        transform:translate(-50%,-50%) scale(1.03);
+    }
+}
+
+@keyframes v173WaterOrbTargetTravel{
+    0%{
+        opacity:0;
+        left:var(--v143-sprite-start-left);
+        top:var(--v143-sprite-start-top);
+        clip-path:var(--v166-water-full-clip,inset(0));
+        transform-origin:50% 50%;
+        transform:translate(-50%,-50%) rotate(0deg) scale(.9);
+    }
+    3%,33.332%{
+        opacity:var(--v166-water-formation-opacity,1);
+        left:var(--v143-sprite-start-left);
+        top:var(--v143-sprite-start-top);
+        clip-path:var(--v166-water-full-clip,inset(0));
+        transform-origin:50% 50%;
+        transform:translate(-50%,-50%) rotate(0deg) scale(1);
+    }
+    33.333%{
+        opacity:1;
+        left:var(--v143-sprite-start-left);
+        top:calc(var(--v143-sprite-start-top) + var(--v166-water-orb-half-offset));
+        clip-path:var(--v166-water-flight-clip);
+        transform-origin:50% 25%;
+        transform:translate(-50%,-50%) rotate(var(--v173-water-flight-rotation)) scale(1);
+    }
+    58.332%{
+        opacity:1;
+        left:var(--v143-sprite-target-left);
+        top:calc(var(--v143-sprite-target-top) + var(--v166-water-orb-half-offset));
+        clip-path:var(--v166-water-flight-clip);
+        transform-origin:50% 25%;
+        transform:translate(-50%,-50%) rotate(var(--v173-water-flight-rotation)) scale(1);
+    }
+    58.333%,66.665%{
+        opacity:1;
+        left:var(--v143-sprite-target-left);
+        top:calc(var(--v143-sprite-target-top) - var(--v166-water-orb-half-offset));
+        clip-path:var(--v166-water-impact-clip);
+        transform-origin:50% 75%;
+        transform:translate(-50%,-50%) rotate(0deg) scale(1);
+    }
+    66.666%,95%{
+        opacity:1;
+        left:var(--v143-sprite-target-left);
+        top:var(--v143-sprite-target-top);
+        clip-path:var(--v166-water-full-clip,inset(0));
+        transform-origin:50% 50%;
+        transform:translate(-50%,-50%) rotate(0deg) scale(1);
+    }
+    100%{
+        opacity:0;
+        left:var(--v143-sprite-target-left);
+        top:var(--v143-sprite-target-top);
+        clip-path:var(--v166-water-full-clip,inset(0));
+        transform-origin:50% 50%;
+        transform:translate(-50%,-50%) rotate(0deg) scale(1.03);
     }
 }
 
 @keyframes v166WaterAoeEnvelope{
-    0%{opacity:0;transform:translate(-50%,-50%) scale(.96)}
+    0%{opacity:0;transform:translate(-50%,-50%) scale(1)}
     3%,95%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-    100%{opacity:0;transform:translate(-50%,-50%) scale(1.015)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
 }
 
 .v143-skill-stage .v153-fire-cast-sprite{
@@ -385,6 +487,8 @@
 }
 
 #game-stage #battlePage .v153-status-vfx-rage{
+    z-index:5;
+    opacity:1;
     filter:drop-shadow(0 0 8px rgba(255,35,20,.9));
 }
 
@@ -396,6 +500,13 @@
 #game-stage #battlePage .v153-status-vfx-freeze{
     opacity:.94;
     filter:drop-shadow(0 0 10px rgba(178,238,255,.96));
+}
+
+/* Abyss portrait cards make direct children position:relative. Keep Rage and
+   all other timed status sheets anchored over their own card. */
+#game-stage #battlePage .battle-monster.v152-abyss-portrait > .v153-status-vfx{
+    position:absolute !important;
+    z-index:5 !important;
 }
 
 /* The official Frozen loop replaces the older generated ice overlay. */

@@ -1,3 +1,5 @@
+/* HISTORICAL SPEC SNAPSHOT (V149): 只保留該版驗收紀錄；V170 最終規格以 v170-final-spec-integration.test.js 為準。 */
+
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
@@ -70,11 +72,11 @@ function compact(skill){
 }
 
 test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=170/);
-    assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=149/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.2/);
+assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.2/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
-    assert.match(loader,/const V_ASSET_VERSION="170"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.2"/);
     assert.match(loader,/css\/44-v149-skill-ui-rules\.css/);
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
@@ -129,7 +131,8 @@ test("every special percentage, duration and prerequisite is exact",()=>{
     assert.deepEqual([s.iceSpin.frostbiteChance,s.iceSpin.frostbiteDuration],[60,2]);
     assertArray(s.iceSpin.lifestealPercentByLevel,[3,4,5,6,7]);
     assert.deepEqual([s.frostCrush.frostbiteChance,s.frostCrush.frostbiteDuration],[50,2]);
-    assert.deepEqual([s.floodBeast.teamFreezeChance,s.floodBeast.teamFreezeDuration],[55,2]);
+    assert.equal(s.floodBeast.teamFreezeChance,undefined);
+    assert.equal(s.floodBeast.teamFreezeDuration,undefined);
     assert.deepEqual([s.iceArrowRain.freezeChance,s.iceArrowRain.freezeDuration],[40,2]);
     assert.deepEqual([s.freeze.freezeChance,s.freeze.freezeDuration],[80,4]);
     assert.deepEqual([s.healSpell.baseHeal,s.healSpell.healPerLevel,s.healSpell.baseHealSP,s.healSpell.healSPPerLevel],[350,30,35,30]);
@@ -220,7 +223,7 @@ test("Fire EX adds five percent only when its target has an abnormal status",()=
     assert.equal(context.castDamageSkill("flameSlash"),100);
 });
 
-test("Flood Beast checks Freeze against every living enemy after a hit",()=>{
+test("Flood Beast never performs the obsolete all-enemy Freeze sweep",()=>{
     const party=[{id:"水俠",element:"water",hp:100,sp:100,activeBuffs:[],statusEffects:[]}];
     const monsters=[
         {name:"甲怪",alive:true,hp:100,level:1,spiritPoints:0,statusEffects:[]},
@@ -230,7 +233,8 @@ test("Flood Beast checks Freeze against every living enemy after a hit",()=>{
         window:null,console,Math,Date,Number,Object,Array,Set,Map,Promise,
         skillDatabase:database(),document:bareDocument(),monsters,currentBattleMonsters:[0,1],
         getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:index=>party[index],
-        rollStatusEffectHit:()=>true,getMonsterEffectiveSpiritPoints:()=>0,getMonsterRank:()=>"regular",
+        rollStatusEffectHit(){ throw new Error("legacy team Freeze must not roll"); },
+        getMonsterEffectiveSpiritPoints:()=>0,getMonsterRank:()=>"regular",
         applyFreezeEffect(entity,duration){ entity.statusEffects.push({type:"freeze",turnsLeft:duration}); },
         addBattleLog(){},setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback()
     };
@@ -239,7 +243,8 @@ test("Flood Beast checks Freeze against every living enemy after a hit",()=>{
     vm.runInContext("applySkillDebuffEffects=function(){}; castDamageSkill=function(){applySkillDebuffEffects(skillDatabase.floodBeast,1,monsters[0],0,1,1)}",context);
     vm.runInContext(source,context);
     context.castDamageSkill("floodBeast");
-    assert.deepEqual(monsters.map(monster=>monster.statusEffects[0].turnsLeft),[2,2]);
+    assert.deepEqual(monsters.map(monster=>monster.statusEffects),[[],[]]);
+    assert.doesNotMatch(source,/applyTeamFreezeToMonsters|applyTeamFreezeToPlayers/);
 });
 
 test("Dragon Slash repeats once at 33 percent without charging SP twice",()=>{

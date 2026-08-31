@@ -1,5 +1,7 @@
 "use strict";
 
+/* HISTORICAL SPEC SNAPSHOT (V166): 只保留該版驗收紀錄；V170 最終規格以 v170-final-spec-integration.test.js 為準。 */
+
 const assert=require("node:assert/strict");
 const crypto=require("node:crypto");
 const fs=require("node:fs");
@@ -138,7 +140,7 @@ function decodeRgbaPng(path,columns,rows){
 function makeNode(rect){
     const classes=new Set();
     const node={
-        id:"",className:"",dataset:{},children:[],parentNode:null,offsetParent:{},
+        id:"",dataset:{},children:[],parentNode:null,offsetParent:{},
         style:{
             setProperty(name,value){ this[name]=String(value); },
             getPropertyValue(name){ return this[name]||""; }
@@ -179,6 +181,26 @@ function makeNode(rect){
             return results;
         }
     };
+    let className="";
+    Object.defineProperty(node,"className",{
+        configurable:true,enumerable:true,
+        get(){ return className; },
+        set(value){
+            className=String(value||"");
+            if(
+                !node.animationStartSnapshot&&
+                /(?:^|\s)(?:v153-fire-cast-sprite|v166-water-cast-sprite)(?:\s|$)/.test(className)
+            ){
+                node.animationStartSnapshot={
+                    startLeft:node.style["--v143-sprite-start-left"]||"",
+                    startTop:node.style["--v143-sprite-start-top"]||"",
+                    targetLeft:node.style["--v143-sprite-target-left"]||"",
+                    targetTop:node.style["--v143-sprite-target-top"]||""
+                };
+            }
+        }
+    });
+    node.className="";
     return node;
 }
 
@@ -245,6 +267,7 @@ function loadRuntime(options={}){
             entity.statusEffects=Array.isArray(entity.statusEffects)?entity.statusEffects:[];
             entity.statusEffects.push({type:"freeze",turnsLeft:duration});
         },
+        applySkillDebuffEffectsToPlayer(){},
         document:{
             body,
             createElement(){ return makeNode(); },
@@ -417,6 +440,14 @@ test("Water Orb and Tidal Beast travel from the actor to each actual target",()=
     assert.ok(orbSprites.every(node=>node.style.left==="99px"&&node.style.top==="418px"));
     assert.deepEqual(orbSprites.map(node=>node.style["--v143-sprite-dx"]),["239px","479px"]);
     assert.ok(orbSprites.every(node=>node.style["--v143-sprite-dy"]==="-278px"));
+    assert.ok(orbSprites.every(node=>node.style["--v143-sprite-start-left"]==="99px"));
+    assert.ok(orbSprites.every(node=>node.style["--v143-sprite-start-top"]==="418px"));
+    assert.deepEqual(orbSprites.map(node=>node.style["--v143-sprite-target-left"]),["338px","578px"]);
+    assert.ok(orbSprites.every(node=>node.style["--v143-sprite-target-top"]==="140px"));
+    assert.deepEqual(orbSprites.map(node=>node.animationStartSnapshot),[
+        {startLeft:"99px",startTop:"418px",targetLeft:"338px",targetTop:"140px"},
+        {startLeft:"99px",startTop:"418px",targetLeft:"578px",targetTop:"140px"}
+    ]);
 
     const beast=loadRuntime();
     beast.context.v142SkillAnimationDirector.play(
@@ -430,6 +461,9 @@ test("Water Orb and Tidal Beast travel from the actor to each actual target",()=
     assert.equal(beastSprites[0].style.top,"418px");
     assert.equal(beastSprites[0].style["--v143-sprite-dx"],"359px");
     assert.equal(beastSprites[0].style["--v143-sprite-dy"],"-278px");
+    assert.equal(beastSprites[0].style["--v143-sprite-target-left"],"458px");
+    assert.equal(beastSprites[0].style["--v143-sprite-target-top"],"140px");
+    assert.ok(parseFloat(beastSprites[0].style.width)<=250);
     assert.match(css,/--v143-sprite-dx/);
     assert.match(css,/--v143-sprite-dy/);
     assert.match(
@@ -474,11 +508,59 @@ test("Ice Arrow Rain always renders one enemy-battlefield AOE even with one livi
         assert.equal(sprite.dataset.areaId,"battleMonsterArea");
         assert.equal(sprite.style.left,"480px");
         assert.equal(sprite.style.top,"170px");
-        assert.equal(sprite.style.width,sprite.style.height,"AOE sheet cells stay square");
-        assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"inset(90px 0px)");
+        assert.equal(sprite.style.width,"440px");
+        assert.equal(sprite.style.height,"260px");
+        assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
+        assert.equal(sprite.style.backgroundImage,"none");
+        const tiles=sprite.querySelectorAll(".v166-water-battlefield-tile");
+        assert.equal(tiles.length,2);
+        assert.ok(tiles.every(tile=>tile.style.width===tile.style.height&&tile.style.width==="260px"));
+        assert.ok(tiles.every(tile=>tile.style.backgroundImage.includes("frost-arrow-rain-vfx.png?v=166")));
         results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
     assert.deepEqual(results[0],results[1],"one enemy still uses full enemy battlefield bounds");
+});
+
+test("enemy Ice Arrow Rain uses only the complete player battle area",()=>{
+    const runtime=loadRuntime();
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("iceArrowRain","all"),{side:"monster",actorIndex:0}
+    );
+    const {sprites}=stageSprites(runtime);
+    assert.equal(sprites.length,1);
+    assert.equal(sprites[0].dataset.targetSide,"player");
+    assert.equal(sprites[0].dataset.areaId,"battlePlayerRow");
+    assert.deepEqual([sprites[0].style.width,sprites[0].style.height],["440px","160px"]);
+    assert.equal(sprites[0].style.clipPath||sprites[0].style["clip-path"],"none");
+    const tiles=sprites[0].querySelectorAll(".v166-water-battlefield-tile");
+    assert.equal(tiles.length,3);
+    assert.ok(tiles.every(tile=>tile.style.width===tile.style.height&&tile.style.width==="160px"));
+});
+
+test("enemy Tidal Beast discovers one real player endpoint even when damage is absorbed",()=>{
+    const runtime=loadRuntime();
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("floodBeast","single"),{side:"monster",actorIndex:0}
+    );
+    assert.equal(stageSprites(runtime).sprites.length,0);
+    runtime.context.applySkillDebuffEffectsToPlayer(
+        castConfig("floodBeast","single"),1,runtime.party[2],2,1,1
+    );
+    const sprites=stageSprites(runtime).sprites;
+    assert.equal(sprites.length,1);
+    assert.equal(sprites[0].dataset.targetIndex,"2");
+    assert.equal(sprites[0].style["--v143-sprite-target-left"],"379px");
+    assert.equal(sprites[0].style["--v143-sprite-target-top"],"418px");
+});
+
+test("late callbacks cannot expand a single-target Tidal Beast cast",()=>{
+    const runtime=loadRuntime();
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("floodBeast","single"),{side:"player",actorIndex:0,targetId:1}
+    );
+    assert.deepEqual(stageSprites(runtime).sprites.map(node=>node.dataset.targetIndex),["1"]);
+    runtime.context.showMonsterHit(2,10,"hp");
+    assert.deepEqual(stageSprites(runtime).sprites.map(node=>node.dataset.targetIndex),["1"]);
 });
 
 test("the retained tri-target Freeze and ally-all Heal still follow each actual card",()=>{
@@ -622,8 +704,8 @@ test("final combat targeting and Frostbite rules remain unchanged",()=>{
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="170"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=170/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.2"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.2/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });

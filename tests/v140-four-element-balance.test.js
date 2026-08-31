@@ -1,5 +1,7 @@
 "use strict";
 
+/* HISTORICAL SPEC SNAPSHOT (V140): 只保留該版驗收紀錄；V170 最終規格以 v170-final-spec-integration.test.js 為準。 */
+
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
@@ -587,8 +589,8 @@ test("V140 remains before the ordered V141/V142 layers and both cache keys are b
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
-    assert.match(loaderSource,/const V_ASSET_VERSION="170"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=170/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.2"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.2/);
 });
 
 console.log("\nV140 four-element balance suite: "+passed+" tests passed.");

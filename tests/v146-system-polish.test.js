@@ -1,3 +1,5 @@
+/* HISTORICAL SPEC SNAPSHOT (V146): 只保留該版驗收紀錄；V170 最終規格以 v170-final-spec-integration.test.js 為準。 */
+
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
@@ -42,8 +44,8 @@ function baseContext(overrides={}){
 }
 
 test("V146 remains ordered before V149 under the current cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=170/);
-    assert.match(loader,/const V_ASSET_VERSION="170"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.2/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.2"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
