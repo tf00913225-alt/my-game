@@ -128,11 +128,11 @@ test("A touch inside skill levels is allowed once, while the modal background re
     assert.equal(dispatch("pointermove",modalBackground,"touch"),true);
 });
 
-test("The published mobile fix is cache-versioned as V173.2",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.2"/);
-    assert.match(index,/css\/29-v125-character-creation-native\.css\?v=173\.2/);
-    assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.2/);
-    assert.match(index,/aria-label="目前版本 V173\.2"[\s\S]*?>V173\.2<\/div>/);
+test("The published mobile fix remains covered in the V173.4 cache release",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
+    assert.match(index,/css\/29-v125-character-creation-native\.css\?v=173\.4/);
+    assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.4/);
+    assert.match(index,/aria-label="目前版本 V173\.4"[\s\S]*?>V173\.4<\/div>/);
 });
 
 console.log("\nV173.2 mobile touch and scroll suite: "+passed+" tests passed.");

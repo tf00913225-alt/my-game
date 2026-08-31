@@ -25,8 +25,9 @@
   `js/26` 與正式 gameplay runtime 鏈並行，只管外觀，不能插進平衡補丁順序。
 - `tests/v170-final-spec-integration.test.js` 會在同一個 `vm.Context` 真正依上述順序
   執行 49 支 JavaScript，再檢查最終資料與行為；這套測試才是目前唯一 canonical
-  integration suite。V170 規格基準與目前 `dev` 的 V173.2 顯示版本是兩件事；
-  V173.2 只更新手機觸控／捲動介面與快取鍵，不修改 V170 已定案的遊戲規格。
+  integration suite。V170 規格基準與目前 `dev` 的 V173.3 顯示版本是兩件事；
+  V173.3 只更新專案基線報告、頁面標題、版本標示與快取鍵，不修改 V170
+  已定案的遊戲規格。
 - 下表格式為「Lv1 傷害／每級成長；SP；目標；初學／升級／最高；前置」。前置有兩項時
   沿用正式邏輯，代表任一項即可。
 
@@ -128,7 +129,9 @@
 4. **改動前，先搞懂下面「系統架構重點」，尤其是動態載入器那段**——這個專案的載入機制
    不是單純看 `index.html` 的 `<script>` 標籤就能判斷完的，之前有一次連 Claude 自己
    都誤判過，多花了一輪工才發現搞錯。
-5. 這個專案目前**沒有 CI**；V137 起有一組針對高風險回歸的 Node 測試
+5. 這個專案已有 GitHub Actions CI（`.github/workflows/ci.yml`，正式 required check 名稱為
+   `Repository checks`），會自動執行語法、Node suites、資源、HTML ID、版本／Loader 與
+   Git 差異格式檢查；V137 起另有一組針對高風險回歸的 Node 測試
    `tests/v137-regressions.test.js`，V138 另有需求驗收
    `tests/v138-feature-requirements.test.js`，V139 新增經濟／休息經驗驗收
    `tests/v139-economy-rested-exp.test.js`，V140 新增四元素技能定案驗收
@@ -180,7 +183,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-31，V173.2 手機觸控／捲動修正）
+## 目前狀態（截至 2026-08-31，V173.3 專案基線整理）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -591,6 +594,54 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-31 — V173.4：P2 第三階段元素匣本次上線金幣統計（dev）
+
+- 以 `origin/dev=a2d99b4b05d4c5f5c3f421bf7dc1d1c1c017404d` 為唯一施工基礎；本機
+  `dev` 已依使用者明確授權重設至該 SHA。未建立分支、未修改或合併 `main`。
+- `js/25-v131-fix-batch.js` 移除元素匣以戰鬥前後全域 `gold` 差額累計的路徑；改為包裝
+  `awardMonsterGoldDrop()`，在既有原函式已成功將怪物掉落入帳並回傳實際 `amount` 後，
+  僅於元素匣有效的一般巡怪累加該筆 amount。真正副本（`v132ActiveDungeonRun`）排除；
+  V141 野外精英的短暫掉落隔離旗標仍視為既有一般巡怪，避免少算精英掉落。
+- `elementBoxSession.gold` 保持「本次上線」暫存，重新載入仍歸零；帳號共用 `gold`、怪物
+  掉落公式、副本獎勵與存檔結構均未改動。舊存檔 `autoConfig.skill="normal"` 不讀、不寫、
+  不提示也不還原。
+- 新增 `tests/v173.4-element-box-gold.test.js`，涵蓋逐筆入帳、未啟用、既有／非怪物金幣、
+  中途停止、時數耗盡、切換角色、重新載入、副本排除、野外精英與 legacy normal 不變。
+- 發布／快取同步升為 V173.4：`index.html` 首頁標示與 release entry query、
+  `js/20-anonymous-20.js` 的 `V_ASSET_VERSION`、現行發布版測試斷言。
+- 本機完整 CI 同等檢查通過：`node --check .github/scripts/ci.mjs`、JavaScript 150／150、
+  Node suites 37／37、300 個靜態資源、272 個 HTML ID、V173.4 Loader／entry 及 Git
+  whitespace／conflict marker 全數通過。`tests/v138-browser-smoke.js` 未執行／未計入；
+  本輪未做手機真機或 Playwright／Chromium 視覺驗證。
+
+**本輪刻意未處理**：舊存檔 `autoConfig.skill="normal"` 無法可靠判別，維持不動；怒火、
+水球術、洪水猛獸、冰霜箭雨保留待獨立修正。燃燒素材 `burn-loop.png` 仍只在具名 stash
+`pre-v173.4-burn-loop-local-20260831`，不得納入本版。
+
+### 2026-08-31 — V173.3：P2 第一階段專案基線整理（dev）
+
+- 開工前確認遠端 `main=8c7ceea1643a519b110ffab95a50d2de3cb69adf`，原 `dev`
+  `1d695f2868e77e7ce62bb0ccf59b0610661b0880` 是其直接祖先且沒有分歧；已用非強制
+  fast-forward 將 `dev` 安全同步到相同基線，未建立新分支、未修改 `main`。
+- `CHECK_REPORT.txt` 已由 V121 拆檔快照改為 V173.3 現行基線：記錄 1 HTML、50 CSS、
+  112 支正式 JavaScript、37 支 tests JavaScript、142 個資產、272 個靜態 HTML ID、
+  23 支 index 直載腳本、108 個 Loader 相依檔與 26 支 ordered runtime；V121 原報告仍保留為
+  歷史附錄，明確不代表目前專案。
+- `index.html` 過期 title 由「戰鬥完整版 V129 SPLIT」改為「四象江湖傳 V173.3」；首頁
+  版本標示、相關 CSS／JavaScript query、`js/20-anonymous-20.js` 的 `V_ASSET_VERSION` 及
+  現行發布版測試斷言同步為 V173.3。歷史釘死快取鍵與舊版測試檔名均保留。
+- 本輪只更新基線文件、title 與發布／快取版本；未修改戰鬥、技能、數值、存檔、掉落、
+  動畫、角色能力、美術資產或 JavaScript 補丁架構，也未修改 V170 最終技能規格。
+- 本機完整 CI 同等檢查：`.github/scripts/ci.mjs` 語法、JavaScript 149／149、Node suites
+  36／36、300 個靜態資源目標、272 個 HTML ID、V173.3 release／Loader 完整性及 Git
+  whitespace／conflict marker 全數通過。
+
+**本輪刻意未處理、留待獨立修正的既有戰鬥演出問題**：怒火 Buff 顯示、水球術定位、
+洪水猛獸定位與尺寸、冰霜箭雨演出。
+
+**驗證限制**：V173.3 未執行手機真機或完整 Playwright／Chromium 視覺與操作驗證；
+`tests/v138-browser-smoke.js` 未納入 36 套 Node suite，不得把未執行／skip 當成瀏覽器通過。
 
 ### 2026-08-31 — V173.2：創角手機觸控尺寸與技能詳細捲動（dev）
 
@@ -2539,7 +2590,8 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       bump到`?v=132`。**這不是一次性修好就沒事了——之後每次改這五個檔案
       裡任何一個，都要記得手動把對應的`?v=`數字往上加一**，詳見上方
       「系統架構重點」1.2節，這是目前最容易被忽略、後果卻最嚴重的坑。
-- [ ] 目前仍沒有 CI；V137 的 `tests/v137-regressions.test.js` 有 9 項高風險
+- [x] ~~目前仍沒有 CI~~ V173.1 已建立 GitHub Actions `Repository checks`；V137 的
+      `tests/v137-regressions.test.js` 有 9 項高風險
       回歸，V138 的 `tests/v138-feature-requirements.test.js` 另有 10 項需求驗收，
       V139 的 `tests/v139-economy-rested-exp.test.js` 有 7 項經濟／休息經驗驗收，
       V140 的 `tests/v140-four-element-balance.test.js` 有 14 項技能定案驗收，

@@ -1,9 +1,81 @@
-V121_SPLIT 檢查報告
+V173.4 元素匣金幣統計檢查報告
+
+產生日期：2026-08-31
+起始基準：main/dev 同步點 8c7ceea1643a519b110ffab95a50d2de3cb69adf
+發布標示：V173.4
+
+一、目前檔案與資產統計
+
+- Git 追蹤檔案：351 個。
+- HTML：1 個（index.html）。
+- CSS：50 個（css/）。
+- 正式 JavaScript：112 個（js/）。
+- tests/ JavaScript：38 個，其中 37 個 *.test.js Node suite，另 1 個
+  tests/v138-browser-smoke.js 需要 Playwright／Chromium，不列入 Node suite。
+- JavaScript 語法檢查總數：150 個（js/ 112 + tests/ 38）。
+- assets/：142 個檔案，共 128,596,711 bytes（122.64 MiB）。
+  其中圖片 141 個，共 128,587,355 bytes（122.63 MiB）：47 JPG、78 PNG、
+  16 WEBP；另有 assets/ASSET_MAP.txt 1 個。
+
+二、HTML、資源與 Loader 基線
+
+- 靜態 HTML ID：272 個；重複 ID：0。
+- 靜態資源檢查：300 個唯一的本地引用目標均存在。
+- 資源掃描範圍：1 個 HTML、50 個 CSS、51 個非內嵌型 JavaScript。
+- index.html 直接載入：29 個本地 CSS、23 個本地 script，沒有重複載入；
+  外部 Google Fonts stylesheet 不計入本地 CSS。
+- js/20-anonymous-20.js 動態 Loader：108 個唯一 JavaScript／CSS 相依檔；
+  其中 20 個 CSS、88 個 JavaScript，並有 26 個依正式順序串行載入的
+  gameplay runtime。
+- 正式 release entry：js/00-main.js、
+  js/19-stage-v78-character-inventory-runtime.js、js/20-anonymous-20.js；
+  index query、首頁版本標示與 Loader 版本皆一致為 V173.4。
+
+三、本次實際執行的檢查
+
+靜態檢查：
+
+- .github/scripts/ci.mjs 語法檢查：通過。
+- js/ 與 tests/ JavaScript 語法：150 / 150 通過。
+- 本地 HTML／CSS／JavaScript／圖片等資源引用：通過，0 缺檔。
+- HTML 重複 ID：通過，0 組重複。
+- 正式版本、index entry、Loader 相依檔與 runtime 順序完整性：通過。
+- Git whitespace 與未解決 conflict marker：通過。
+
+Node 測試：
+
+- 37 / 37 套 Node unit／integration suite 通過。
+- 新增 tests/v173.4-element-box-gold.test.js：驗證怪物實際入帳金額、未啟用、
+  既有／非怪物金幣、停止／時數耗盡、切角／重載、副本排除及舊 normal 設定不變。
+- 測試包含 V170 最終整合規格；歷史版本 suite 仍保留作版本紀錄。
+
+四、本次沒有執行的驗證
+
+- V173.4 本輪沒有執行 Samsung／Android 或其他手機真機測試。
+- V173.4 本輪沒有執行完整 Playwright／Chromium 網站操作、視覺、Console
+  或完整戰鬥流程驗證。
+- tests/v138-browser-smoke.js 未由正式 CI 執行，也沒有計入 37 套 Node 測試；
+  不得把它的 skip 或未執行狀態宣稱為瀏覽器測試通過。
+- V173.2 曾完成的 Samsung 真機觸控／捲動驗證屬前一版紀錄，不能代替
+  V173.4 本輪的真機驗證。
+
+五、本次變更邊界
+
+- 元素匣「本次上線獲得金幣」改在 awardMonsterGoldDrop() 成功入帳並回傳實際
+  amount 後直接累加；移除以全域 gold 戰前／戰後差額推算的路徑。
+- 只在元素匣正常巡怪啟用時統計，排除副本；野外精英保留既有巡怪涵蓋範圍。
+- 更新 V173.4 HTML title、首頁標示、發布 entry query、Loader 快取版本及相應測試斷言。
+- 未修改帳號總 gold、掉落公式、副本獎勵、戰鬥數值、技能、存檔、動畫、美術或舊存檔
+  autoConfig.skill="normal"。
+
+============================================================
+V121_SPLIT 歷史檢查報告（僅保留拆檔歷史，不是目前專案基線）
+============================================================
 
 母版：V120
 拆檔目的：只做外部化，不改遊戲機制。
 
-靜態檢查：
+當時的靜態檢查：
 - 原始實際 CSS 區塊：27
 - 拆出 CSS 檔案：27
 - CSS 原始載入順序：完全保留
@@ -21,18 +93,23 @@ V121_SPLIT 檢查報告
 - 未被引用圖片：0
 - 本地資源路徑檢查：0 缺檔
 
-大小：
+當時的大小：
 - V120 單檔：約 15.14 MB
 - V121_SPLIT 全部檔案：約 11.13 MB
 - index.html：約 74 KB
 - Base64 膨脹已移除，圖片改為獨立檔案。
 
-架構保護：
+當時的架構保護：
 - 沒有把 21 個 script 強制合成單一 game.js。
-- 原因：V120 有多個歷史 runtime/migration 區塊；合併會改變錯誤邊界與 top-level let/const 初始化時機。
-- V121_SPLIT 先保持每個 script 為獨立 classic script，避免因拆檔而改變舊系統執行語意。
+- 原因：V120 有多個歷史 runtime/migration 區塊；合併會改變錯誤邊界與
+  top-level let/const 初始化時機。
+- V121_SPLIT 保持每個 script 為獨立 classic script，避免因拆檔而改變
+  舊系統執行語意。
 
-執行環境驗證：
-- 已做桌面 Chromium 的重組/解析 smoke test，函式與 V120 行為基線一致。
-- 容器環境禁止直接導覽 localhost/file URL，因此無法在此做真正「外部檔案 URL 載入」的 Chromium 導覽測試。
-- Android Chrome 實機仍需使用者驗證；這點不能用程式檢查冒充實機驗證。
+當時的執行環境驗證：
+- 曾做桌面 Chromium 的重組／解析 smoke test，函式與 V120 行為基線一致。
+- 當時容器環境禁止直接導覽 localhost／file URL，無法做真正的外部檔案 URL
+  載入 Chromium 導覽測試。
+- 當時 Android Chrome 實機仍需使用者驗證。
+
+以上 V121 數字與驗證只代表當時拆檔成果，不可用來判定 V173.3 現況。

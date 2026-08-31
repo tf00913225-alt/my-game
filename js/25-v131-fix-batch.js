@@ -352,7 +352,6 @@
         });
     }
 
-    let elementBoxBattleStartGold=null;
     let elementBoxBattleStartExp=null;
 
     if(typeof renderBattle==="function"){
@@ -361,7 +360,6 @@
             originalRenderBattle.apply(this,arguments);
             applyBattleFormation();
             applyPlayerElementFrames();
-            elementBoxBattleStartGold=Math.max(0,Number(gold)||0);
             elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
         };
     }
@@ -960,6 +958,37 @@
         });
     }
 
+    /*
+       元素匣的「本次上線獲得金幣」只記錄一般巡怪中實際入帳的怪物掉落。
+       副本會設置 v132ActiveDungeonRun；V141 的野外精英掉落隔離旗標不是副本，
+       仍維持和既有巡怪戰鬥統計相同的涵蓋範圍。
+    */
+    function isElementBoxNormalPatrolGoldTrackingActive(){
+        const dungeonRun=window.v132ActiveDungeonRun;
+        return !!(
+            elementBoxActive &&
+            (!dungeonRun || dungeonRun.v141EliteDropIsolation===true)
+        );
+    }
+
+    function recordElementBoxMonsterGold(amount){
+        const safeAmount=Math.max(0,Math.floor(Number(amount)||0));
+        if(safeAmount<=0 || !isElementBoxNormalPatrolGoldTrackingActive()){
+            return;
+        }
+        elementBoxSession.gold+=safeAmount;
+        updateElementBoxStatsUI();
+    }
+
+    if(typeof awardMonsterGoldDrop==="function"){
+        const originalAwardMonsterGoldDrop=awardMonsterGoldDrop;
+        awardMonsterGoldDrop=function(){
+            const amount=originalAwardMonsterGoldDrop.apply(this,arguments);
+            recordElementBoxMonsterGold(amount);
+            return amount;
+        };
+    }
+
     const originalConfirmAutoBattleSettings=
         typeof confirmAutoBattleSettings==="function" ? confirmAutoBattleSettings : null;
 
@@ -1142,7 +1171,6 @@
             }
 
             const bonusExp=finalExp-flatExpGain;
-            const battleGoldStart=elementBoxBattleStartGold===null ? gold : elementBoxBattleStartGold;
             const result=originalWinBattle.apply(this,arguments);
             if(bonusExp!==0){
                 sharedExp=Math.max(0,sharedExp+bonusExp);
@@ -1167,10 +1195,8 @@
             if(elementBoxActive){
                 elementBoxSession.battles++;
                 elementBoxSession.exp+=finalExp;
-                elementBoxSession.gold+=Math.max(0,(Number(gold)||0)-(Number(battleGoldStart)||0));
                 updateElementBoxStatsUI();
             }
-            elementBoxBattleStartGold=null;
             elementBoxBattleStartExp=null;
             return result;
         };
