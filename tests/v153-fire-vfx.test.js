@@ -362,7 +362,10 @@ test("Rage creates one cast sheet inside every affected card",()=>{
     assert.equal(sprites.length,3);
     assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
     sprites.forEach(node=>assert.equal(node.dataset.placement,"single"));
-    sprites.forEach(node=>assert.ok(parseFloat(node.style.width)<=108));
+    sprites.forEach(node=>{
+        assert.ok(parseFloat(node.style.width)>=120);
+        assert.ok(parseFloat(node.style.width)<=148);
+    });
 });
 
 test("enemy Rage allyTri waits for and animates only the three resolved targets",()=>{
@@ -377,6 +380,23 @@ test("enemy Rage allyTri waits for and animates only the three resolved targets"
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
     assert.equal(sprites.length,3);
     assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["4","5","6"]);
+});
+
+test("enemy Rage loop begins on the hit frame and follows its canonical ledger",()=>{
+    const monsters=Array.from({length:10},()=>({alive:true,hp:100,statusEffects:[],activeBuffs:[]}));
+    const runtime=loadRuntime({monsters});
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("rage",1500,"allyTri","buff"),{side:"monster",actorIndex:0}
+    );
+    monsters[4].v141TeamBuffs=[{type:"rage",turnsLeft:2}];
+    runtime.context.v141PlayCardEffect("monster",4,"buff");
+    runtime.context.v143SyncStatusSpriteEffects();
+    assert.equal(runtime.cards.battleMonster4.querySelector(".v153-status-vfx-rage"),null);
+
+    const impactTimer=runtime.scheduled.find(timer=>timer.delay>=860&&timer.delay<=890);
+    assert.ok(impactTimer,"frame-eight Rage impact timer");
+    impactTimer.callback();
+    assert.ok(runtime.cards.battleMonster4.querySelector(".v153-status-vfx-rage"));
 });
 
 test("frame eight delays hit numbers together and Fire Critical keeps its critical text reaction",()=>{
@@ -401,7 +421,7 @@ test("Burn and Rage loops follow live status records without owning an action ga
         monsters:[
             {alive:true,hp:100,statusEffects:[{type:"burn",turnsLeft:2}],activeBuffs:[]},
             {alive:false,hp:0,statusEffects:[{type:"burn",turnsLeft:2}],activeBuffs:[]},
-            {alive:true,hp:100,statusEffects:[],activeBuffs:[]}
+            {alive:true,hp:100,statusEffects:[],activeBuffs:[],v141TeamBuffs:[{type:"rage",turnsLeft:2}]}
         ],
         party:[
             {hp:100,statusEffects:[],activeBuffs:[{type:"rage",turnsLeft:2}]},
@@ -412,15 +432,22 @@ test("Burn and Rage loops follow live status records without owning an action ga
     runtime.context.v143SyncStatusSpriteEffects();
     assert.ok(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-burn"));
     assert.equal(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-burn"),null);
+    assert.ok(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-rage"));
     assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-rage"));
     assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-rage"),null);
     assert.equal(runtime.context.v143SkillAnimationState.current,null,"status loops must not open an action gate");
 
     runtime.monsters[0].statusEffects[0].turnsLeft=0;
+    runtime.monsters[2].v141TeamBuffs[0].turnsLeft=0;
     runtime.party[0].activeBuffs[0].turnsLeft=0;
     runtime.context.v143SyncStatusSpriteEffects();
     assert.equal(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-burn"),null);
+    assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-rage"),null);
     assert.equal(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-rage"),null);
+    assert.match(
+        css,
+        /battle-monster\.v152-abyss-portrait\s*>\s*\.v153-status-vfx\{[\s\S]*?position:absolute\s*!important;[\s\S]*?z-index:5\s*!important;/
+    );
 });
 
 test("a newly applied Burn starts its loop on the exact target hit frame",()=>{
@@ -447,8 +474,8 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V165",(
     assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
     assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:800,collection:"statusEffects"\}/);
     assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:1000,collection:"activeBuffs"\}/);
-    assert.match(loader,/const V_ASSET_VERSION="170"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=170/);
+    assert.match(loader,/const V_ASSET_VERSION="171"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=171/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

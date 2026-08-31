@@ -52,6 +52,8 @@
    RPG 視窗／角色與商店介面、元素匣逐角色設定、水技能最終規則及深淵資產／流程四套驗收：
    `tests/v169-rpg-ui.test.js`、`tests/v169-element-box-settings.test.js`、
    `tests/v169-water-skill-rules.test.js`、`tests/v169-abyss-assets-flow.test.js`。驗證至少要包含：
+   V171 另新增怒火／水球術／洪水猛獸／冰霜箭雨定位與單體凍傷範圍驗收
+   `tests/v171-combat-vfx-fixes.test.js`。
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -63,7 +65,7 @@
 
 ---
 
-## 目前狀態（截至 2026-08-30，V170 返回、抽獎券圖示與上一版版面回復）
+## 目前狀態（截至 2026-08-31，V171 戰鬥技能 VFX 定位修正）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -473,6 +475,31 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-08-31 — V171：怒火、水球／洪水與冰霜箭雨定位修正（dev）
+
+- 怒火的施放 Sprite 由過小的 0.82 倍、64～108px 調整為 1.08 倍、96～148px，貼近實際
+  受益卡牌邊緣；玩家 `activeBuffs` 與敵方 `v141TeamBuffs` 均建立持續 loop。另覆寫深淵
+  立繪卡的高權重 `position:relative`，避免敵方怒火／其他狀態圖被推離卡牌。
+- 水球術與洪水猛獸改為先寫入施術者及各實際目標的 `left/top`，再掛上 Sprite 動畫 class；
+  33.333%～58.332% 由施術卡移動到目標卡中心，修正部分 Android／WebView 把 fallback
+  座標快照成 0、動畫停在自己位置的問題。洪水猛獸同步縮為 1.85 倍、175～250px。
+- 冰霜箭雨不再以敵我區域較長邊建立正方形後置中裁切；現在以完整目標方戰鬥區為 clipping
+  rectangle，依短邊建立同步 Sprite tiles。玩家施放只覆蓋敵方區，敵方施放只覆蓋我方區；
+  傷害數字仍逐張卡牌顯示。
+- 移除 V149 遺留的 `teamFreezeChance` 與雙方全隊冰封迴圈。影片中洪水猛獸命中一人卻讓
+  10 名敵人各自出現冰封／抵抗，根因即為這段舊邏輯；V169 最終規則維持只對實際命中單體
+  進行 40% 凍傷判定、持續 1 回合。另加單體技能晚到 callback 防護，不能擴張到其他卡牌。
+- 快取版本升至 171；修改 `js/39-v143-skill-animation.js`、
+  `css/40-v143-combat-dungeon-polish.css`、`js/43-v149-skill-ui-rules.js`、loader 與相關回歸。
+  沒有修改、重製或重新編碼任何 PNG。
+- 驗證結果：`node --test tests/*.test.js` 共 32 份 suite 全數通過；三支異動 JavaScript
+  通過 `node --check`，`git diff --check` 通過。另以雲端 Chrome 載入未移動分支的候選 commit，
+  實際從主城建立／升級角色、學習並裝備怒火，再進入 5～6 敵人戰鬥；敵方水球術由敵方命中
+  實際我方卡牌，怒火成功套用且戰鬥 DOM 顯示「怒火生效中」。
+
+**已知限制**：自動測試與瀏覽器桌面戰鬥 smoke 均通過；動畫最終大小與手機 GPU 合成效果仍應
+由使用者在 `dev` 的目標 Android 裝置實測手感，確認後再決定是否升版至 `main`。
 
 ### 2026-08-30 — V170：創角返回、抽獎券圖示與上一版版面回復（dev）
 
