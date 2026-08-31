@@ -599,7 +599,7 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 - V142 僅在既有 director 與新版直接觸發器都存在時才略過初始化；舊快取只留下部分 runtime 狀態時，會重新建立同一個動畫 owner。
 - 不新增 runtime patch，不改戰鬥、技能數值、素材或存檔；深淵立繪對話縮放修正維持不變。
-- 頁面、Loader 與動畫素材快取版本升為 V173.8；CI 與 dev 實測待本次提交後確認。
+- 頁面、Loader 與動畫素材快取版本升為 V173.8；Repository checks 已成功，dev 手動測試請使用不可變 commit URL，避免 raw.githack 的 dev 快取。
 
 ### 2026-08-31 — V173.8：P0 技能動畫直接觸發收斂（dev）
 
