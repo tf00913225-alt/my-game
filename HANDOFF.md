@@ -595,6 +595,12 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-08-31 — 永久架構規則已啟用（dev）
+
+- 新增 `ARCHITECTURE_RULES.md` 作為永久架構規則唯一來源；完整規則只保留於該文件，避免在交接日誌重複而產生版本分歧。
+- `AGENTS.md` 與 `CLAUDE.md` 已要求任何程式、CSS、UI、戰鬥、存檔、技能、掉落、動畫或資產整合修改前，完整閱讀 `HANDOFF.md`、`UI_GUIDELINES.md` 與 `ARCHITECTURE_RULES.md`；並須先回報 owner 檔案、主要函式、既有 wrapper／後續覆蓋點與暫時補丁需求。
+- 本次僅變更規範文件；未修改遊戲程式、CSS、資產、測試、版本號、快取或 Pages 設定。
+
 ### 2026-08-31 — V173.4：P2 第三階段元素匣本次上線金幣統計（dev）
 
 - 以 `origin/dev=a2d99b4b05d4c5f5c3f421bf7dc1d1c1c017404d` 為唯一施工基礎；本機
