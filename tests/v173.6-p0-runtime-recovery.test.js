@@ -17,7 +17,7 @@ assert.doesNotMatch(v142,/v142PlaySkillAnimationFromBadge/);
 assert.doesNotMatch(main,/v142PlaySkillAnimationFromBadge/);
 assert.match(abyss,/map\.offsetWidth\/mapRect\.width/);
 assert.match(abyss,/map\.offsetHeight\/mapRect\.height/);
-assert.match(animation,/water-orb-vfx\.png\?v=173\.10/);
+assert.match(animation,/water-orb-vfx\.png\?v=173\.9/);
 assert.match(loader,/const V_ASSET_VERSION="173\.10"/);
 assert.match(index,/<title>四象江湖傳 V173\.10<\/title>/);
 

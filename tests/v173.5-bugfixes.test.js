@@ -40,7 +40,7 @@ test("new Water Orb sheet is the approved transparent four-by-three asset",()=>{
     assert.equal(crypto.createHash("sha256").update(asset).digest("hex"),"d3bdcafbd65965a9c54c9785baa1922849f11f1c1fc905bf6c4723024c745c2d");
     assert.equal(asset.toString("ascii",12,16),"IHDR");
     assert.deepEqual([asset.readUInt32BE(16),asset.readUInt32BE(20)],[1448,1086]);
-    assert.match(animation,/water-orb-vfx\.png\?v=173\.10[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true/);
+    assert.match(animation,/water-orb-vfx\.png\?v=173\.9[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,placement:"targetTrajectory",travelToTargets:true/);
 });
 
 test("Phoenix Cry and Ice Arrow Rain use one centered battlefield sheet",()=>{
