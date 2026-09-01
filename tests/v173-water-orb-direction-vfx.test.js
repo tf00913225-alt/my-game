@@ -14,7 +14,7 @@ function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 test("Water Ball owns a 12-frame, 4x3 group sprite with the frame-eight hit",()=>{
     assert.match(
         animation,
-        /waterBall:\{[\s\S]*?hit:\.5833333333[\s\S]*?frames:12,hitFrame:7,placement:"group"/
+        /waterBall:\{[\s\S]*?hit:\.5833333333[\s\S]*?frames:12,frameWidth:384,frameHeight:384,hitFrame:7,placement:"group",renderer:"canvas-crop"/
     );
 });
 

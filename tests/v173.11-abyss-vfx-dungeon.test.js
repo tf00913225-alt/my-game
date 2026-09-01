@@ -22,11 +22,11 @@ assert.match(dungeon,/if\(!DUNGEON_DAILY_LIMIT_ENABLED\)\{ return false; \}/);
 
 assert.match(
     animation,
-    /waterBall:\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,placement:"group"/
+    /waterBall:\{[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,placement:"group",renderer:"canvas-crop"/
 );
 assert.match(
     animation,
-    /iceArrowRain:\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",targetBounds:true,coverageScale:1\.22/
+    /iceArrowRain:\{[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,placement:"battlefield",renderer:"canvas-crop",targetBounds:true,coverageScale:1\.22/
 );
 assert.match(
     animation,

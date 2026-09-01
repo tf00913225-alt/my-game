@@ -272,7 +272,9 @@ test("synthesis implements exact material costs, replacement-only reforge and pe
 test("Abyss has exact five-floor rosters, fixed center support BOSS and click-only final chest",()=>{
     ["東帝","南帝","天帝","北帝","極帝天尊","東帝天尊","南帝天尊","北帝天尊","天帝天尊"].forEach(name=>assert.ok(contentSource.includes(name)));
     ["flyingSandStrike","dustStorm","stoneSlash","explosiveFlurry","dragonSlash","fireRocket","windHowlLightning","stormFlurry","windCrossSlash","floodBeast","frostPunch","waterKnife"].forEach(id=>assert.ok(contentSource.includes(id)));
-    assert.match(contentSource,/const count=dialogueAlreadyCompleted\?0:1\+Math\.floor\(Math\.random\(\)\*3\)/);
+    assert.match(contentSource,/function openAbyssBossDialogue\(\)/);
+    assert.match(contentSource,/const overlay=document\.createElement\("button"\)/);
+    assert.match(contentSource,/window\.v141ChallengeAbyssBoss=function\(\)\{\s*return openAbyssBossDialogue\(\);\s*\}/);
     assert.match(contentSource,/if\(spec\[0\]==="極帝天尊"\)/);
     assert.match(contentSource,/v141FormationPosition=position/);
     assert.match(contentSource,/monster\.maxHP\+=extraHp/);

@@ -47,7 +47,7 @@ test("new Water Orb sheet is the supplied 1536×1152 four-by-three asset",()=>{
 
 test("Phoenix Cry and Ice Arrow Rain use one centered battlefield sheet",()=>{
     assert.match(animation,/phoenixCry:\{[\s\S]*?placement:"battlefield",scale:1\.12,minSize:280/);
-    assert.match(animation,/iceArrowRain:\{[\s\S]*?placement:"battlefield",targetBounds:true,coverageScale:1\.22,[\s\S]*?minWidth:140,minHeight:140/);
+    assert.match(animation,/iceArrowRain:\{[\s\S]*?placement:"battlefield",renderer:"canvas-crop",targetBounds:true,coverageScale:1\.22,[\s\S]*?minWidth:140,minHeight:140/);
     const placement=sourceFunction(animation,"function placeSprite(current,node,index,target){");
     assert.match(placement,/if\(placement==="battlefield"\)[\s\S]*?node\.style\.width=size\+"px";[\s\S]*?node\.style\.height=size\+"px";/);
     assert.doesNotMatch(placement,/buildBattlefieldSpriteTiles\(/);
