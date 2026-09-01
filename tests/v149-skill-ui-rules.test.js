@@ -72,11 +72,11 @@ function compact(skill){
 }
 
 test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.18/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.19/);
+assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.19/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.19"/);
     assert.match(loader,/css\/44-v149-skill-ui-rules\.css/);
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
@@ -90,20 +90,20 @@ test("the Fire, Wind and Earth owner matches the authoritative costs, targets an
     const s=load().skillDatabase;
     const expected={
         flameSlash:[2,5,"single",30,6,10],fireCritical:[10,5,"single",45,9,28],
-        explosiveFlurry:[20,5,"tri",50,10,47],dragonSlash:[45,5,"single",165,33,65],
+        explosiveFlurry:[20,5,"tri",50,10,47],dragonSlash:[35,5,"single",165,33,65],
         fireRocket:[2,5,"tri",13,4,10],blazeSpell:[10,5,"single",45,9,28],
-        flameTornado:[30,5,"single",150,30,47],phoenixCry:[45,5,"all",42,9,60],
+        flameTornado:[30,5,"single",150,30,47],phoenixCry:[35,5,"all",28,6,60],
         rage:[25,5,"allyTri",null,null,50],fireEX:[25,1,"none",null,null,null],
         stormFist:[2,5,"single",26,6,7],stormFlurry:[10,5,"tri",13,3,20],
         windCrossSlash:[15,5,"single",128,26,39],dizzyFist:[30,5,"single",141,29,55],
         windSpell:[2,5,"tri",12,3,9],stormCircle:[10,5,"tri",14,4,18],
-        windHowlLightning:[15,5,"single",128,26,55],stormRain:[30,5,"all",36,7,75],
+        windHowlLightning:[15,5,"single",128,26,55],stormRain:[30,5,"all",24,5,75],
         dodgeSkill:[10,1,"allyTri",null,null,20],
         stealthSkill:[15,1,"ally",null,null,45],dinghaishenzhen:[20,1,"allyAll",null,null,77],
         windEX:[25,1,"none",null,null,null],stoneSlash:[2,5,"single",26,6,7],
         petrifyFist:[10,5,"tri",13,3,26],stoneBreakSky:[15,5,"single",128,26,42],
         earthquakeCrush:[30,5,"tri",47,9,55],stoneThrow:[2,5,"tri",12,3,7],
-        sandWind:[10,5,"tri",14,4,19],flyingSandStrike:[15,5,"all",32,6,55],
+        sandWind:[10,5,"tri",14,4,19],flyingSandStrike:[15,5,"all",24,5,55],
         dustStorm:[30,5,"single",140,28,65],earthShield:[10,1,"allyTri",null,null,66],
         rockWall:[15,1,"allyTri",null,null,45],barrier:[20,1,"ally",null,null,40],
         earthEX:[25,1,"none",null,null,null]
@@ -166,7 +166,7 @@ test("Frostbite rejects skills but allows normal actions and auto falls back",()
     assert.equal(misses,2);
 });
 
-test("Barrier conflicts reject the whole cast before SP is spent",()=>{
+test("differently named buffs no longer reject or overwrite one another",()=>{
     const party=[
         {id:"甲",hp:500,sp:200,activeBuffs:[],statusEffects:[]},
         {id:"乙",hp:500,sp:200,activeBuffs:[{type:"barrier",turnsLeft:5,remainingBlocks:5}],statusEffects:[]}
@@ -180,13 +180,13 @@ test("Barrier conflicts reject the whole cast before SP is spent",()=>{
         finishPlayerAction(){ finished++; },showMissEffect(){ misses++; },addBattleLog(){},updateUI(){}
     });
     context.resolveQueuedPlayerAction(0,1);
-    assert.equal(legacy,0);
-    assert.equal(finished,1);
-    assert.equal(misses,1);
-    assert.equal(party[0].sp,200,"conflicting cast spends no SP");
+    assert.equal(legacy,1);
+    assert.equal(finished,0);
+    assert.equal(misses,0);
+    assert.equal(party[0].sp,200);
     assert.equal(context.isValidAllyTargetForSkill(context.skillDatabase.dodgeSkill,party[1],1),true,
-        "a conflicting target remains selectable so the cast can show MISS");
-    assert.deepEqual(Array.from(context.v149GetBuffConflictTargets(context.skillDatabase.dodgeSkill,null,0)),[1]);
+        "a target with Barrier remains legal for the differently named Wind Walker state");
+    assert.equal(context.v149GetBuffConflictTargets,undefined);
 });
 
 test("Fire EX adds five percent only when its target has an abnormal status",()=>{

@@ -167,7 +167,7 @@ test("official Ice Arrow Rain sheet is a complete 4x3 RGBA PNG",()=>{
 test("manifest keeps one 4x3 sheet and frame-eight hit",()=>{
     const runtime=loadRuntime([0,1,2]);
     const model=runtime.context.v143SkillAnimationManifest.iceArrowRain;
-    assert.equal(model.sprite.src,assetPath+"?v=173.18");
+    assert.equal(model.sprite.src,assetPath+"?v=173.19");
     assert.equal(model.sprite.renderer,"canvas-crop");
     assert.deepEqual([model.sprite.frameWidth,model.sprite.frameHeight],[384,384]);
     assert.deepEqual(
@@ -244,9 +244,9 @@ test("all damage numbers share frame eight while remaining target-specific",()=>
 });
 
 test("the current cache version publishes the 1.6 second battlefield choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
-    assert.match(animation,/frost-arrow-rain-vfx\.png\?v=173\.18/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.19"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.19/);
+    assert.match(animation,/frost-arrow-rain-vfx\.png\?v=173\.19/);
 });
 
 console.log("\n"+passed+" V150 Ice Arrow Rain VFX tests passed.");

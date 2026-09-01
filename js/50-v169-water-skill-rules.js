@@ -18,6 +18,7 @@
         "floodBeast","iceArrowRain","freeze","healSpell","revive","waterEX"
     ];
     const WATER_PREVIEW_SKILL_ID_SET=new Set(WATER_SKILL_IDS.slice(0,8));
+    const WATER_SUPPORT_PREVIEW_SKILL_ID_SET=new Set(["healSpell","revive","waterEX"]);
     const STATUS_FIELDS=[
         "freezeChance","freezeDuration","freezeSingleTarget",
         "teamFreezeChance","teamFreezeDuration",
@@ -77,23 +78,23 @@
         iceArrowRain:{
             id:"iceArrowRain",tier:3,name:"冰霜箭雨",element:"water",category:"magic",
             targetType:"all",learnCost:20,maxLevel:5,upgradeCost:1,
-            baseDamage:30,damagePerLevel:6,spCost:75,
+            baseDamage:20,damagePerLevel:4,spCost:75,
             frostbiteChance:20,frostbiteDuration:1,
             lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],
-            description:"需先學習洪水猛獸。初次學習需20技能點，對敵方全體各造成30點傷害，消耗75 SP；20%基礎機率使目標凍傷1回合，並吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+6。"
+            description:"需先學習洪水猛獸。初次學習需20技能點，對敵方全體各造成20點傷害，消耗75 SP；每名目標獨立有20%基礎機率獲得【凍傷】1回合，並依各目標實際傷害計算1%/2%/3%/4%/5%吸血後加總恢復自身HP。最高5級，每升1級消耗1技能點，傷害+4。"
         },
         freeze:{
             id:"freeze",tier:4,name:"冰封",element:"water",category:"magic",
             targetType:"column",learnCost:25,maxLevel:1,spCost:32,
-            freezeChance:90,freezeDuration:5,requires:["iceArrowRain"],
-            description:"需先學習冰霜箭雨。初次學習需25技能點，對前、後排同位置最多2名目標各有90%基礎機率造成冰封，使其無法行動5回合，消耗32 SP；最高1級，純控制技能，不造成傷害。"
+            freezeChance:90,freezeDuration:3,requires:["iceArrowRain"],
+            description:"需先學習冰霜箭雨。初次學習需25技能點，對前、後排同位置最多2名有效目標各以90%基礎機率附加【冰封】3回合，使其完全無法行動；消耗32 SP，最高1級，不造成傷害。已有【冰封】時新的冰封直接MISS且不擲命中。"
         },
         healSpell:{
             id:"healSpell",tier:5,name:"治療術",element:"water",category:"heal",
             targetType:"allyTri",learnCost:20,maxLevel:5,upgradeCost:1,
-            baseHeal:550,healPerLevel:30,baseHealSP:65,healSPPerLevel:30,spCost:45,
+            baseHeal:550,healPerLevel:30,baseHealSP:35,healSPPerLevel:0,spCost:45,
             cleanseAll:true,requires:["iceArrowRain","iceSpin"],
-            description:"需先學習冰霜箭雨或冰旋一閃其一。初次學習需20技能點，對我方中、左、右3人恢復550 HP與65 SP並解除所有負面狀態；施放者本人不恢復SP。消耗45 SP，最高5級，每升1級消耗1技能點，HP與SP恢復量各+30。"
+            description:"需先學習冰霜箭雨或冰旋一閃其一。初次學習需20技能點，對我方中、左、右最多3名存活角色恢復550 HP與固定35 SP，並解除所有可解除負面狀態；施放者本人可恢復HP但不恢復SP。消耗45 SP，最高5級，每升1級消耗1技能點，HP恢復量+30，SP恢復量不變。"
         },
         revive:{
             id:"revive",tier:6,name:"復活術",element:"water",category:"revive",
@@ -155,6 +156,28 @@
 
     applyFinalSkillData();
 
+    /* Final Water/utility values load after the historical talisman sync. */
+    if(typeof window.v132GetTalismanDefinition==="function"){
+        ["Low","Mid","High","Perfect"].forEach(tier=>{
+            const freezeTalisman=window.v132GetTalismanDefinition("freezeTalisman"+tier);
+            if(freezeTalisman){
+                freezeTalisman.sharedSkillId="freeze";
+                freezeTalisman.talismanDuration=numeric(skillDatabase.freeze.freezeDuration);
+            }
+            const stealthTalisman=window.v132GetTalismanDefinition("stealthTalisman"+tier);
+            if(stealthTalisman){
+                stealthTalisman.sharedSkillId="stealthSkill";
+                stealthTalisman.talismanDuration=numeric(skillDatabase.stealthSkill.duration);
+            }
+            const barrierTalisman=window.v132GetTalismanDefinition("barrierTalisman"+tier);
+            if(barrierTalisman){
+                barrierTalisman.sharedSkillId="barrier";
+                barrierTalisman.talismanDuration=numeric(skillDatabase.barrier.duration);
+                barrierTalisman.barrierBlockCount=numeric(skillDatabase.barrier.barrierBlockCount);
+            }
+        });
+    }
+
     function activeFrostbite(entity){
         return !!(entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(effect=>
             effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0
@@ -192,6 +215,21 @@
 
     wrapSecondaryFreeze("castSecondaryCharacterSkill",1);
     wrapSecondaryFreeze("castPlayer2Skill",0);
+
+    if(typeof window.castDamageSkill==="function"&&typeof window.v158CastTriFreeze==="function"){
+        const previousCastDamageSkill=window.castDamageSkill;
+        window.castDamageSkill=function(skillId,centerIndex){
+            if(
+                skillId==="freeze"&&
+                withFinalFreezeTargets(()=>
+                    window.v158CastTriFreeze(0,skillId,centerIndex,false)
+                )
+            ){
+                return;
+            }
+            return previousCastDamageSkill.apply(this,arguments);
+        };
+    }
 
     /* Frostbite blocks skills, not the whole action.  Returning false here
        lets the existing Frostbite-aware normal-attack fallback continue, but
@@ -362,9 +400,37 @@
         return lines.join("");
     }
 
+    function waterSupportEffectText(skill,level){
+        const lv=Math.max(1,Math.min(numeric(skill&&skill.maxLevel)||1,Math.floor(numeric(level)||1)));
+        if(skill&&skill.id==="healSpell"){
+            return "我方中、左、右最多3名存活角色恢復 "+
+                (numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(lv-1))+" HP、固定35 SP並解除所有可解除負面狀態；施放者本人不恢復SP";
+        }
+        if(skill&&skill.id==="revive"){
+            return "使1名死亡友方原地復活並恢復最大HP的"+
+                levelValue(skill.reviveHealPercentByLevel,lv)+"%；不恢復SP";
+        }
+        if(skill&&skill.id==="waterEX"){
+            return "永久提升水元素傷害5%、回復類技能HP恢復量10%；每回合開始前有30%機率解除自身所有可解除負面狀態";
+        }
+        return "";
+    }
+
+    function buildWaterSupportLevelBreakdown(skill){
+        const maxLevel=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel)||1));
+        return Array.from({length:maxLevel},(_,index)=>
+            '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);">'+
+            '<span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+(index+1)+'</span>'+
+            '<span style="flex:1;">'+escapeHtml(waterSupportEffectText(skill,index+1))+'</span></div>'
+        ).join("");
+    }
+
     if(typeof window.getSkillPreviewSummary==="function"){
         const previousPreviewSummary=window.getSkillPreviewSummary;
         window.getSkillPreviewSummary=function(skill){
+            if(skill&&WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)){
+                return waterSupportEffectText(skill,1)+"。";
+            }
             if(!skill||!WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
                 return previousPreviewSummary.apply(this,arguments);
             }
@@ -381,6 +447,9 @@
     if(typeof window.getSkillEffectPreviewText==="function"){
         const previousEffectPreview=window.getSkillEffectPreviewText;
         window.getSkillEffectPreviewText=function(skill,level){
+            if(skill&&WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)){
+                return waterSupportEffectText(skill,level);
+            }
             if(skill&&WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
                 return waterSkillEffectParts(skill,level).join("｜");
             }
@@ -391,6 +460,9 @@
     if(typeof window.buildSkillLevelBreakdownHTML==="function"){
         const previousLevelBreakdown=window.buildSkillLevelBreakdownHTML;
         window.buildSkillLevelBreakdownHTML=function(skill){
+            if(skill&&WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)){
+                return buildWaterSupportLevelBreakdown(skill);
+            }
             if(skill&&WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
                 return buildWaterSkillLevelBreakdown(skill);
             }
@@ -403,11 +475,20 @@
         window.showCreationSkillDetail=function(skillId){
             const result=previousCreationSkillDetail.apply(this,arguments);
             const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
-            if(skill&&WATER_PREVIEW_SKILL_ID_SET.has(skill.id)&&typeof document!=="undefined"){
+            if(
+                skill&&(
+                    WATER_PREVIEW_SKILL_ID_SET.has(skill.id)||
+                    WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)
+                )&&typeof document!=="undefined"
+            ){
                 const description=document.getElementById("creationSkillDetailDescription");
                 const levels=document.getElementById("creationSkillDetailLevels");
                 if(description){ description.textContent=skill.description; }
-                if(levels){ levels.innerHTML=buildWaterSkillLevelBreakdown(skill); }
+                if(levels){
+                    levels.innerHTML=WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)
+                        ?buildWaterSupportLevelBreakdown(skill)
+                        :buildWaterSkillLevelBreakdown(skill);
+                }
             }
             return result;
         };

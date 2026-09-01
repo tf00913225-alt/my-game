@@ -124,7 +124,7 @@
         waterBall:{
             glyph:"●",motion:"wave",impact:"water-splash",hit:.5833333333,pulses:1,spread:34,
             sprite:{
-                src:"assets/vfx/water/water-orb-vfx.png?v=173.18",
+                src:"assets/vfx/water/water-orb-vfx.png?v=173.19",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"group",renderer:"canvas-crop",scale:1.22,minSize:150,maxSize:500
             }
@@ -142,7 +142,7 @@
             glyph:"➶",motion:"rain",impact:"ice-rain",hit:.5833333333,
             pulses:7,spread:104,flightCount:7,deferredStatusTypes:["frostbite"],
             sprite:{
-                src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=173.18",
+                src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"battlefield",renderer:"canvas-crop",targetBounds:true,coverageScale:1.22,
                 minWidth:140,minHeight:140

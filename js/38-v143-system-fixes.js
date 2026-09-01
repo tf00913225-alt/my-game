@@ -352,28 +352,54 @@
         const previousApplyMonsterShield=window.v141ApplyMonsterShield;
         window.v141ApplyMonsterShield=function(monster,amount,turns){
             const barrier=numeric(amount)>=999999;
+            const stateType=barrier?"barrier":"shield";
+            const monsterIndex=typeof monsters!=="undefined"?monsters.indexOf(monster):-1;
+            if(
+                typeof window.v173CanApplyNamedPersistentState==="function"&&
+                !window.v173CanApplyNamedPersistentState(
+                    monster,stateType,"monster",monsterIndex>=0?monsterIndex:undefined,
+                    barrier?"結界":"岩盾"
+                )
+            ){
+                return 0;
+            }
             const result=previousApplyMonsterShield.call(this,monster,barrier?1:amount,barrier?5:turns);
-            if(barrier&&monster&&monster.v141Shield){
-                monster.v141Shield.isBarrier=true;
-                monster.v141Shield.turnsLeft=5;
-                monster.v141Shield.remainingBlocks=5;
-                monster.v141Shield.barrierRule="shared";
+            if(monster&&monster.v141Shield){
+                if(barrier){
+                    monster.v141Shield.isBarrier=true;
+                    monster.v141Shield.turnsLeft=5;
+                    monster.v141Shield.remainingBlocks=5;
+                    monster.v141Shield.barrierRule="shared";
+                }
+                if(typeof window.v173MarkPersistentStateName==="function"){
+                    window.v173MarkPersistentStateName(monster.v141Shield,stateType);
+                }
             }
             return result;
         };
     }
 
     let directPlayerActionDepth=0;
+    let directPlayerBarrierContext=null;
     function wrapDirectPlayerAction(name){
         const previous=window[name];
         if(typeof previous!=="function"){ return; }
         window[name]=function(){
+            const outermost=directPlayerActionDepth===0;
+            const previousContext=directPlayerBarrierContext;
+            if(outermost){ directPlayerBarrierContext={blocked:new Map()}; }
             directPlayerActionDepth++;
             try{ return previous.apply(this,arguments); }
-            finally{ directPlayerActionDepth=Math.max(0,directPlayerActionDepth-1); }
+            finally{
+                directPlayerActionDepth=Math.max(0,directPlayerActionDepth-1);
+                if(outermost){ directPlayerBarrierContext=previousContext; }
+            }
         };
     }
-    ["normalAttack","secondaryCharacterNormalAttack","windArrowAttack"].forEach(wrapDirectPlayerAction);
+    [
+        "normalAttack","secondaryCharacterNormalAttack","player2NormalAttack","windArrowAttack",
+        "castDamageSkill","castSecondaryCharacterSkill","castPlayer2Skill"
+    ].forEach(wrapDirectPlayerAction);
 
     function currentAnimationIsPlayerAttack(){
         const current=window.v143SkillAnimationState&&window.v143SkillAnimationState.current;
@@ -400,14 +426,28 @@
         const previousShowMonsterHit=showMonsterHit;
         showMonsterHit=function(index,amount,type){
             const monster=typeof monsters!=="undefined"?monsters[index]:null;
-            if(!monster||type!=="hp"||!isMonsterBarrier(monster)){
+            const blockedShield=monster&&directPlayerBarrierContext
+                ?directPlayerBarrierContext.blocked.get(monster)
+                :null;
+            if(!monster||type!=="hp"||(!isMonsterBarrier(monster)&&!blockedShield)){
                 return previousShowMonsterHit.apply(this,arguments);
             }
-            const shield=monster.v141Shield;
+            const shield=blockedShield||monster.v141Shield;
             const damage=Math.max(0,numeric(amount));
             const direct=directPlayerActionDepth>0||currentAnimationIsPlayerAttack();
             if(direct){
-                monster.hp=Math.max(0,numeric(shield.baseHp))+Math.max(0,numeric(shield.remaining));
+                monster.hp=Math.max(0,numeric(shield.baseHp))+
+                    (monster.v141Shield===shield?Math.max(0,numeric(shield.remaining)):0);
+                if(blockedShield){
+                    const card=document.getElementById("battleMonster"+index);
+                    if(card&&typeof showDamagePopup==="function"){
+                        showDamagePopup(card,"格擋 "+Math.max(0,numeric(shield.remainingBlocks)),"shield");
+                    }
+                    return;
+                }
+                if(directPlayerBarrierContext){
+                    directPlayerBarrierContext.blocked.set(monster,shield);
+                }
                 shield.remainingBlocks=Math.max(0,(numeric(shield.remainingBlocks)||5)-1);
                 const card=document.getElementById("battleMonster"+index);
                 if(card&&typeof showDamagePopup==="function"){ showDamagePopup(card,"格擋 "+shield.remainingBlocks,"shield"); }

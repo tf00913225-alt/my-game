@@ -278,23 +278,41 @@
     }
 
     function applyEvasionBlessing(monster){
-        if(!monster||monster.alive===false){ return; }
-        clearOldAgilityBlessing(monster);
-        let blessing=monster.v155EvasionBlessing;
-        if(!blessing||blessing.battleToken!==currentBattleToken()){
-            const display={type:"v141TeamBuff",v141BuffType:"dodge",turnsLeft:2};
-            blessing={
-                originalEvasion:numeric(monster.evasion),displayBuff:display,
-                battleToken:currentBattleToken(),expiresTurn:currentRound()+2
-            };
-            monster.v155EvasionBlessing=blessing;
-            monster.activeBuffs=monster.activeBuffs||[];
-            monster.activeBuffs.push(display);
-        }else{
-            blessing.expiresTurn=currentRound()+2;
-            blessing.displayBuff.turnsLeft=2;
+        if(!monster||monster.alive===false){ return false; }
+        const existing=monster.v155EvasionBlessing;
+        if(
+            existing&&existing.battleToken===currentBattleToken()&&
+            currentRound()<numeric(existing.expiresTurn)
+        ){
+            if(typeof window.v173CanApplyNamedPersistentState==="function"){
+                window.v173CanApplyNamedPersistentState(
+                    monster,"元祖賜福","monster",
+                    typeof monsters!=="undefined"?monsters.indexOf(monster):undefined,
+                    "元祖賜福"
+                );
+            }
+            return false;
         }
-        monster.evasion=Math.round(blessing.originalEvasion*1.3);
+        clearOldAgilityBlessing(monster);
+        const display={
+            type:"v141TeamBuff",v141BuffType:"dodge",statusName:"元祖賜福",turnsLeft:2
+        };
+        const blessing={
+            type:"v141TeamBuff",statusName:"元祖賜福",turnsLeft:2,
+            originalEvasion:numeric(monster.evasion),displayBuff:display,
+            battleToken:currentBattleToken(),expiresTurn:currentRound()+2
+        };
+        monster.v155EvasionBlessing=blessing;
+        monster.activeBuffs=monster.activeBuffs||[];
+        monster.activeBuffs.push(display);
+        monster.evasion=typeof window.v173CombineEvasionRates==="function"
+            ?window.v173CombineEvasionRates([blessing.originalEvasion,30])
+            :Math.min(85,blessing.originalEvasion);
+        if(typeof window.v173MarkPersistentStateName==="function"){
+            window.v173MarkPersistentStateName(blessing,"元祖賜福");
+            window.v173MarkPersistentStateName(display,"元祖賜福");
+        }
+        return true;
     }
 
     function resolveExtremeEmperorAction(monsterIndex,forcedSkillId,forcedCleanse){
@@ -423,14 +441,15 @@
         if(typeof showMonsterSkillNameBadge==="function"){
             showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex);
         }
-        const display={type:"stealthSkill",v141BuffType:"stealth",turnsLeft:2};
+        const duration=Math.max(1,Math.floor(numeric(skill.duration)||3));
+        const display={type:"stealthSkill",v141BuffType:"stealth",statusName:"隱身",turnsLeft:duration};
         monster.v155MonsterStealth={
-            battleToken:currentBattleToken(),expiresTurn:currentRound()+2,displayBuff:display
+            battleToken:currentBattleToken(),expiresTurn:currentRound()+duration,displayBuff:display
         };
         monster.activeBuffs=monster.activeBuffs||[];
         monster.activeBuffs.push(display);
         if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",monsterIndex,"buff"); }
-        if(typeof addBattleLog==="function"){ addBattleLog("天兵天將施放隱身術，2回合內無法被單體技能選中。"); }
+        if(typeof addBattleLog==="function"){ addBattleLog("天兵天將施放隱身術，"+duration+"回合內無法被單體技能選中。"); }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
         return true;
@@ -541,18 +560,16 @@
                     if(stealth.battleToken!==token||round>=numeric(stealth.expiresTurn)){ removeMonsterStealth(monster); }
                     else{ stealth.displayBuff.turnsLeft=Math.max(1,numeric(stealth.expiresTurn)-round); }
                 }
-                const phoenix=monster&&monster.v155PhoenixDamageBuff;
-                if(phoenix&&(phoenix.battleToken!==token||round>=numeric(phoenix.expiresTurn))){
-                    delete monster.v155PhoenixDamageBuff;
-                }
-            });
-        }
-        if(typeof getExistingPartyIndexes==="function"&&typeof getPartyCharacterByIndex==="function"){
-            getExistingPartyIndexes().forEach(index=>{
-                const character=getPartyCharacterByIndex(index);
-                const phoenix=character&&character.v155PhoenixDamageBuff;
-                if(phoenix&&(phoenix.battleToken!==token||round>=numeric(phoenix.expiresTurn))){
-                    delete character.v155PhoenixDamageBuff;
+                if(monster&&Array.isArray(monster.activeBuffs)){
+                    monster.activeBuffs=monster.activeBuffs.filter(buff=>{
+                        if(!buff||buff.type!=="phoenixMight"){ return true; }
+                        const active=buff.battleToken===token&&round<numeric(buff.expiresTurn);
+                        if(active){ buff.turnsLeft=Math.max(1,numeric(buff.expiresTurn)-round); }
+                        else if(typeof addBattleLog==="function"){
+                            addBattleLog("⏳鳳威效果已結束。");
+                        }
+                        return active;
+                    });
                 }
             });
         }
@@ -567,30 +584,65 @@
     }
 
     let phoenixCastContext=null;
+    let damageActorContext=null;
 
     function phoenixBuffReady(actor){
-        const buff=actor&&actor.v155PhoenixDamageBuff;
-        return !!(buff&&buff.battleToken===currentBattleToken()&&buff.readyTurn===currentRound()&&
-            currentRound()<numeric(buff.expiresTurn));
+        const buff=actor&&Array.isArray(actor.activeBuffs)
+            ?actor.activeBuffs.find(entry=>
+                entry&&entry.type==="phoenixMight"&&numeric(entry.turnsLeft)>0
+            )
+            :null;
+        return buff&&buff.battleToken===currentBattleToken()&&
+            currentRound()>=numeric(buff.readyTurn)&&currentRound()<numeric(buff.expiresTurn)
+            ?buff
+            :null;
     }
 
     function finalizePhoenixCast(context){
         if(!context||!context.castStarted||!context.actor){ return; }
-        if(phoenixBuffReady(context.actor)){ delete context.actor.v155PhoenixDamageBuff; }
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.phoenixCry:null;
         const threshold=Math.max(1,Math.floor(numeric(skill&&skill.burnBonusThreshold)||3));
         const bonusPercent=Math.max(0,numeric(skill&&skill.nextRoundDamageBonusPercent)||30);
         const duration=Math.max(1,Math.floor(numeric(skill&&skill.nextRoundDamageBonusDuration)||1));
         if(context.burnTargets.size<threshold){
-            context.actor.v155PhoenixDamageBuff={
+            const targetSide=context.side==="player"?"player":"monster";
+            const canApply=typeof window.v173CanApplyNamedPersistentState!=="function"||
+                window.v173CanApplyNamedPersistentState(
+                    context.actor,"phoenixMight",targetSide,context.actorIndex,"火鳳天鳴"
+                );
+            if(!canApply){ return; }
+            const buff={
+                type:"phoenixMight",statusName:"鳳威",turnsLeft:duration,
                 battleToken:currentBattleToken(),readyTurn:currentRound()+1,
                 expiresTurn:currentRound()+1+duration,bonusPercent:bonusPercent
             };
+            if(typeof window.v173MarkPersistentStateName==="function"){
+                window.v173MarkPersistentStateName(buff,"phoenixMight");
+            }
+            context.actor.activeBuffs=context.actor.activeBuffs||[];
+            context.actor.activeBuffs.push(buff);
             if(typeof addBattleLog==="function"){
-                addBattleLog("火鳳天鳴本次燃燒目標少於"+threshold+"人，下一回合火鳳天鳴傷害提升"+bonusPercent+"%。");
+                addBattleLog("火鳳天鳴本次成功新增燃燒少於"+threshold+"人，施法者獲得【鳳威】，下一回合造成的所有傷害提升"+bonusPercent+"%。");
             }
         }
     }
+
+    function withDamageActor(actor,callback){
+        const previousActor=damageActorContext;
+        damageActorContext=actor||null;
+        try{ return callback(); }
+        finally{ damageActorContext=previousActor; }
+    }
+
+    function currentDamageActor(){
+        return damageActorContext||window.v149CurrentDamageActor||null;
+    }
+
+    window.v155GetCurrentDamageActor=currentDamageActor;
+    window.v155GetPhoenixMightMultiplier=function(actor){
+        const buff=phoenixBuffReady(actor);
+        return buff?1+numeric(buff.bonusPercent)/100:1;
+    };
 
     function withPhoenixCast(side,actor,actorIndex,callback){
         const previousContext=phoenixCastContext;
@@ -645,19 +697,10 @@
         const previousApplyBurn=applyBurnEffect;
         applyBurnEffect=function(target){
             const result=previousApplyBurn.apply(this,arguments);
-            if(phoenixCastContext&&phoenixCastContext.castStarted&&target){ phoenixCastContext.burnTargets.add(target); }
+            if(result===true&&phoenixCastContext&&phoenixCastContext.castStarted&&target){
+                phoenixCastContext.burnTargets.add(target);
+            }
             return result;
-        };
-    }
-
-    if(typeof calculateSkillDamage==="function"){
-        const previousCalculateSkillDamage=calculateSkillDamage;
-        calculateSkillDamage=function(){
-            const result=previousCalculateSkillDamage.apply(this,arguments);
-            const buff=phoenixCastContext&&phoenixCastContext.actor&&phoenixCastContext.actor.v155PhoenixDamageBuff;
-            return phoenixCastContext&&phoenixCastContext.side==="player"&&phoenixCastContext.castStarted&&
-                phoenixBuffReady(phoenixCastContext.actor)
-                ?Math.floor(numeric(result)*(1+numeric(buff&&buff.bonusPercent)/100)):result;
         };
     }
 
@@ -665,19 +708,47 @@
         const previousCalculateDamage=calculateDamage;
         calculateDamage=function(){
             const result=previousCalculateDamage.apply(this,arguments);
-            const buff=phoenixCastContext&&phoenixCastContext.actor&&phoenixCastContext.actor.v155PhoenixDamageBuff;
-            return phoenixCastContext&&phoenixCastContext.side==="monster"&&phoenixCastContext.castStarted&&
-                phoenixBuffReady(phoenixCastContext.actor)
-                ?Math.floor(numeric(result)*(1+numeric(buff&&buff.bonusPercent)/100)):result;
+            const buff=phoenixBuffReady(currentDamageActor());
+            return buff
+                ?Math.floor(numeric(result)*(1+numeric(buff.bonusPercent)/100))
+                :result;
         };
     }
+
+    function wrapPlayerDamageActor(name,actorFromArguments){
+        const previous=window[name];
+        if(typeof previous!=="function"){ return; }
+        window[name]=function(){
+            const args=Array.prototype.slice.call(arguments);
+            const actor=actorFromArguments(args);
+            const that=this;
+            return withDamageActor(actor,()=>previous.apply(that,args));
+        };
+    }
+
+    wrapPlayerDamageActor("normalAttack",()=>typeof player!=="undefined"?player:null);
+    wrapPlayerDamageActor("castDamageSkill",()=>typeof player!=="undefined"?player:null);
+    wrapPlayerDamageActor("secondaryCharacterNormalAttack",args=>
+        typeof getPartyCharacterByIndex==="function"
+            ?getPartyCharacterByIndex(Math.max(0,Math.floor(numeric(args[0]))))
+            :null
+    );
+    wrapPlayerDamageActor("castSecondaryCharacterSkill",args=>
+        typeof getPartyCharacterByIndex==="function"
+            ?getPartyCharacterByIndex(Math.max(0,Math.floor(numeric(args[0]))))
+            :null
+    );
+    wrapPlayerDamageActor("player2NormalAttack",()=>typeof player2!=="undefined"?player2:null);
+    wrapPlayerDamageActor("castPlayer2Skill",()=>typeof player2!=="undefined"?player2:null);
 
     if(typeof processSingleMonsterAttack==="function"){
         const previousMonsterAttack=processSingleMonsterAttack;
         processSingleMonsterAttack=function(monsterIndex){
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
             const that=this,args=arguments;
-            const invoke=()=>withPhoenixCast("monster",monster,monsterIndex,()=>previousMonsterAttack.apply(that,args));
+            const invoke=()=>withDamageActor(monster,()=>
+                withPhoenixCast("monster",monster,monsterIndex,()=>previousMonsterAttack.apply(that,args))
+            );
             const invokeAtForcedLevel=()=>withForcedFinalAbyssSkillLevel(monster,invoke);
             return hardControlled(monster)?withHardControlDelay(invokeAtForcedLevel):invokeAtForcedLevel();
         };

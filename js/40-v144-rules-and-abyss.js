@@ -153,7 +153,7 @@
                 return "我方全體回復 "+(350+30*(lv-1))+" HP、"+(35+30*(lv-1))+" SP";
             }
             if(skill&&skill.id==="dinghaishenzhen"){
-                return "我方全體異常狀態抗性 +45%、命中 +50%，持續3回合";
+                return "我方全體異常狀態抗性 +65%、命中 +50%，持續3回合";
             }
             return previousSkillEffectPreview.apply(this,arguments);
         };
@@ -169,7 +169,7 @@
                 }).join("");
             }
             if(skill&&skill.id==="dinghaishenzhen"){
-                return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);"><span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.1</span><span style="flex:1;">我方全體異常狀態抗性 +45%、命中 +50%，持續3回合</span></div>';
+                return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);"><span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.1</span><span style="flex:1;">我方全體異常狀態抗性 +65%、命中 +50%，持續3回合</span></div>';
             }
             return previousSkillLevelBreakdown.apply(this,arguments);
         };

@@ -566,24 +566,49 @@
 
     function applyTimedMonsterBuff(monstersToBuff,type,turns,amount){
         monstersToBuff.forEach(monster=>{
-            if(!monster||!monster.alive||monster.v141TeamBuffs?.some(buff=>buff.type===type&&buff.turnsLeft>0)){ return; }
+            if(!monster||!monster.alive){ return; }
+            const monsterIndex=typeof monsters!=="undefined"?monsters.indexOf(monster):-1;
+            if(
+                typeof window.v173CanApplyNamedPersistentState==="function"&&
+                !window.v173CanApplyNamedPersistentState(
+                    monster,type,"monster",monsterIndex>=0?monsterIndex:undefined,
+                    type==="rage"?"怒火":type==="resistance"?"氣定神閒":"閃躲術"
+                )
+            ){ return; }
+            if(monster.v141TeamBuffs?.some(buff=>buff.type===type&&buff.turnsLeft>0)){ return; }
             monster.v141TeamBuffs=monster.v141TeamBuffs||[];
             const buff={type,turnsLeft:turns,amount};
             if(type==="rage"){
                 buff.originalAttack=monster.attack; buff.originalMagicAttack=monster.magicAttack;
-                monster.attack=Math.round(monster.attack*(1+amount/100));
-                monster.magicAttack=Math.round(monster.magicAttack*(1+amount/100));
+                buff.bonusPercent=25;
+                buff.critChanceBonusPercent=25;
+                buff.critDamageBonusPercent=50;
             }else if(type==="resistance"){
+                buff.accuracyBonusPercent=50;
                 monster.resistance=(Number(monster.resistance)||0)+amount;
             }else if(type==="dodge"){
                 buff.originalEvasion=monster.evasion;
-                monster.evasion=Math.round((Number(monster.evasion)||0)*(1+amount/100));
+                monster.evasion=typeof window.v173CombineEvasionRates==="function"
+                    ?window.v173CombineEvasionRates([buff.originalEvasion,amount])
+                    :Math.min(85,Number(monster.evasion)||0);
             }
             const displayBuff={
                 type:type==="rage"?"rage":"v141TeamBuff",
                 v141BuffType:type,
                 turnsLeft:turns
             };
+            if(type==="resistance"){
+                displayBuff.accuracyBonusPercent=buff.accuracyBonusPercent;
+            }
+            if(type==="rage"){
+                displayBuff.bonusPercent=buff.bonusPercent;
+                displayBuff.critChanceBonusPercent=buff.critChanceBonusPercent;
+                displayBuff.critDamageBonusPercent=buff.critDamageBonusPercent;
+            }
+            if(typeof window.v173MarkPersistentStateName==="function"){
+                window.v173MarkPersistentStateName(buff,type);
+                window.v173MarkPersistentStateName(displayBuff,type);
+            }
             buff.displayBuff=displayBuff;
             monster.v141TeamBuffs.push(buff);
             monster.activeBuffs=monster.activeBuffs||[];
@@ -623,14 +648,14 @@
             target.v141Shield.isBarrier=true;
             addBattleLog(monster.name+"為"+target.name+"施放結界，完全防護4回合。");
         }else if(skillId==="rage"){
-            applyTimedMonsterBuff(allies,"rage",2,50);
-            addBattleLog(monster.name+"施放怒火，敵方全體攻擊提升2回合。");
+            applyTimedMonsterBuff(allies,"rage",3,0);
+            addBattleLog(monster.name+"施放怒火，敵方全體爆擊率與爆擊傷害提升3回合。");
         }else if(skillId==="dinghaishenzhen"){
-            applyTimedMonsterBuff(allies,"resistance",3,35);
+            applyTimedMonsterBuff(allies,"resistance",3,65);
             addBattleLog(monster.name+"施放氣定神閒，敵方全體抗性提升3回合。");
         }else if(skillId==="dodgeSkill"){
-            applyTimedMonsterBuff(allies,"dodge",2,30);
-            addBattleLog(monster.name+"施放閃躲術，敵方全體閃躲提升2回合。");
+            applyTimedMonsterBuff(allies,"dodge",3,75);
+            addBattleLog(monster.name+"施放閃躲術，敵方全體閃躲提升3回合。");
         }
         updateUI(); finishPlayerAction();
         return true;

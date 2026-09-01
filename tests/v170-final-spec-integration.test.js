@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.18)
+ * CURRENT FINAL INTEGRATION SPEC (V173.19)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
@@ -77,11 +77,11 @@ const FINAL_FOUR_ELEMENT_CORE={
     flameSlash:[30,6,10,"single",2,1,5,[]],
     fireCritical:[45,9,28,"single",10,1,5,["flameSlash"]],
     explosiveFlurry:[50,10,47,"tri",20,1,5,["fireCritical"]],
-    dragonSlash:[165,33,65,"single",45,1,5,["explosiveFlurry"]],
+    dragonSlash:[165,33,65,"single",35,1,5,["explosiveFlurry"]],
     fireRocket:[13,4,10,"tri",2,1,5,[]],
     blazeSpell:[45,9,28,"single",10,1,5,["fireRocket"]],
     flameTornado:[150,30,47,"single",30,1,5,["blazeSpell"]],
-    phoenixCry:[42,9,60,"all",45,1,5,["flameTornado"]],
+    phoenixCry:[28,6,60,"all",35,1,5,["flameTornado"]],
     rage:[null,null,50,"allyTri",25,1,5,["explosiveFlurry","flameTornado"]],
     fireEX:[null,null,null,"none",25,null,1,[]],
 
@@ -91,7 +91,7 @@ const FINAL_FOUR_ELEMENT_CORE={
     frostCrush:[116,24,60,"single",30,1,5,["iceSpin"]],
     waterBall:[10,2,8,"tri",2,1,5,[]],
     floodBeast:[105,21,35,"single",15,1,5,["waterBall"]],
-    iceArrowRain:[30,6,75,"all",20,1,5,["floodBeast"]],
+    iceArrowRain:[20,4,75,"all",20,1,5,["floodBeast"]],
     freeze:[null,null,32,"column",25,null,1,["iceArrowRain"]],
     healSpell:[null,null,45,"allyTri",20,1,5,["iceArrowRain","iceSpin"]],
     revive:[null,null,45,"deadAlly",20,1,5,["healSpell"]],
@@ -104,7 +104,7 @@ const FINAL_FOUR_ELEMENT_CORE={
     windSpell:[12,3,9,"tri",2,1,5,[]],
     stormCircle:[14,4,18,"tri",10,1,5,["windSpell"]],
     windHowlLightning:[128,26,55,"single",15,1,5,["stormCircle"]],
-    stormRain:[36,7,75,"all",30,1,5,["windHowlLightning"]],
+    stormRain:[24,5,75,"all",30,1,5,["windHowlLightning"]],
     dodgeSkill:[null,null,20,"allyTri",10,null,1,["windCrossSlash","windHowlLightning"]],
     stealthSkill:[null,null,45,"ally",15,null,1,["dodgeSkill"]],
     dinghaishenzhen:[null,null,77,"allyAll",20,null,1,["stealthSkill"]],
@@ -116,7 +116,7 @@ const FINAL_FOUR_ELEMENT_CORE={
     earthquakeCrush:[47,9,55,"tri",30,1,5,["stoneBreakSky"]],
     stoneThrow:[12,3,7,"tri",2,1,5,[]],
     sandWind:[14,4,19,"tri",10,1,5,["stoneThrow"]],
-    flyingSandStrike:[32,6,55,"all",15,1,5,["sandWind"]],
+    flyingSandStrike:[24,5,55,"all",15,1,5,["sandWind"]],
     dustStorm:[140,28,65,"single",30,1,5,["flyingSandStrike"]],
     earthShield:[null,null,66,"allyTri",10,null,1,["stoneBreakSky","flyingSandStrike"]],
     rockWall:[null,null,45,"allyTri",15,null,1,["barrier"]],
@@ -308,7 +308,7 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
         waterBall:{frostbiteChance:10,frostbiteDuration:1},
         floodBeast:{frostbiteChance:15,frostbiteDuration:1},
         iceArrowRain:{frostbiteChance:20,frostbiteDuration:1},
-        freeze:{freezeChance:90,freezeDuration:5},
+        freeze:{freezeChance:90,freezeDuration:3},
         stormFist:{agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1},
         stormFlurry:{damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2},
         windCrossSlash:{damageDownChance:65,damageDownByLevel:[20,30,35,40,50],damageDownDuration:1},
@@ -346,7 +346,7 @@ test("final normal hit and status-effect bounds override the historical floors",
     const hit=runtime.context.v158GetHitChancePercent;
     assert.deepEqual(
         [hit(0,0,0),hit(10,0,0),hit(0,10,0),hit(0,1000,0),hit(0,1000,50),hit(1000,0,0)],
-        [95,98,92,80,60,99]
+        [95,98,85.5,14.250000000000002,7.500000000000001,99]
     );
     const status=runtime.context.v140CalculateStatusEffectChance;
     assert.equal(status(50,10,10,100,20,false,"regular",0,"physical"),64);
@@ -357,7 +357,7 @@ test("final normal hit and status-effect bounds override the historical floors",
     );
 });
 
-test("status refresh, hard-control exclusion and Frostbite action blocking remain active",()=>{
+test("same-name states miss without refresh while differently named hard controls coexist",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         const target={name:"狀態目標",hp:100,maxHP:100,alive:true,statusEffects:[]};
@@ -380,10 +380,233 @@ test("status refresh, hard-control exclusion and Frostbite action blocking remai
         return {burn:burn,afterPetrify:afterPetrify,afterFreeze:afterFreeze,action:action,sp:monsters[0].sp};
     })()`);
     assert.deepEqual(result,{
-        burn:[{type:"burn",turnsLeft:2,percent:8}],
-        afterPetrify:["burn","petrify"],afterFreeze:["burn","freeze"],
+        burn:[{type:"burn",turnsLeft:2,percent:3,statusName:"燃燒"}],
+        afterPetrify:["burn","freeze","petrify"],afterFreeze:["burn","freeze","petrify"],
         action:false,sp:500
     });
+});
+
+test("same-name detection runs before the probability roll and keeps the original payload",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const target={name:"同名目標",alive:true,hp:100,statusEffects:[{
+            type:"burn",statusName:"燃燒",turnsLeft:2,percent:3
+        }]};
+        let rolls=0;
+        rollStatusEffectHit=function(){ rolls++; return true; };
+        const duplicate=v173RollNamedPersistentStatusEffect(
+            target,"burn",[100,1,1,0,0],"monster",0,"烈火術"
+        );
+        const different=v173RollNamedPersistentStatusEffect(
+            target,"freeze",[100,1,1,0,0,true,"regular"],"monster",0,"冰封"
+        );
+        return {duplicate:duplicate,different:different,rolls:rolls,effects:target.statusEffects};
+    })()`);
+    assert.deepEqual(result,{
+        duplicate:{duplicate:true,hit:false},different:{duplicate:false,hit:true},rolls:1,
+        effects:[{type:"burn",statusName:"燃燒",turnsLeft:2,percent:3}]
+    });
+});
+
+test("guaranteed Burn bypasses probability only after the same-name check",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const target={name:"必燃目標",alive:true,hp:100,statusEffects:[]};
+        let rolls=0;
+        rollStatusEffectHit=function(){ rolls++; return false; };
+        const first=v173RollNamedPersistentStatusEffect(
+            target,"burn",[100,1,1,0,0],"monster",0,"烈焰龍捲",true
+        );
+        if(first.hit){ applyBurnEffect(target,1,3); }
+        const duplicate=v173RollNamedPersistentStatusEffect(
+            target,"burn",[100,1,1,0,0],"monster",0,"烈焰龍捲",true
+        );
+        return {first:first,duplicate:duplicate,rolls:rolls,effects:target.statusEffects};
+    })()`);
+    assert.deepEqual(result,{
+        first:{duplicate:false,hit:true},duplicate:{duplicate:true,hit:false},rolls:0,
+        effects:[{type:"burn",turnsLeft:1,percent:3,statusName:"燃燒"}]
+    });
+});
+
+test("accuracy, enemy Rage, monster shields and Stealth use their formal state rules",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Object.assign(player,{spirit:10,activeBuffs:[]});
+        const basePlayerAccuracy=getMainCharacterStats().accuracy;
+        player.activeBuffs=[{
+            type:"dinghaishenzhen",statusName:"氣定神閒",turnsLeft:3,
+            resistBonus:65,accuracyBonusPercent:50
+        }];
+        const playerAccuracy=getMainCharacterStats().accuracy;
+        const supportMonster={
+            name:"支援怪",level:50,accuracy:100,hp:1000,maxHP:1000,alive:true,
+            activeBuffs:[],statusEffects:[],v141TeamBuffs:[{
+                type:"resistance",statusName:"氣定神閒",turnsLeft:3,amount:65,
+                accuracyBonusPercent:50
+            },{
+                type:"rage",statusName:"怒火",turnsLeft:3,
+                critChanceBonusPercent:25,critDamageBonusPercent:50
+            }]
+        };
+        monsters.splice(0,monsters.length,supportMonster);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        const monsterAccuracy=getMonsterAccuracy(supportMonster);
+        const rage=v173GetActiveRageCriticalBonuses(supportMonster);
+        const firstShield=v141ApplyMonsterShield(supportMonster,100,2);
+        supportMonster.v141Shield.remaining=37;
+        supportMonster.hp=supportMonster.v141Shield.baseHp+37;
+        const secondShield=v141ApplyMonsterShield(supportMonster,200,5);
+        const shield={
+            first:firstShield,second:secondShield,statusName:supportMonster.v141Shield.statusName,
+            remaining:supportMonster.v141Shield.remaining,turnsLeft:supportMonster.v141Shield.turnsLeft
+        };
+
+        const elite={
+            name:"天兵天將",element:"wind",v141Abyss:true,alive:true,
+            hp:100,maxHP:100,sp:100,maxSP:100,skillChance:1,activeBuffs:[],statusEffects:[]
+        };
+        monsters.splice(0,monsters.length,elite);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        battleToken=91;turn=4;
+        const stealthCast=v155ResolveWindEliteStealth(0,true);
+        return {
+            playerAccuracyMultiplier:playerAccuracy/basePlayerAccuracy,
+            monsterAccuracy:monsterAccuracy,rage:rage,shield:shield,
+            stealthCast:stealthCast,stealth:elite.activeBuffs.find(buff=>buff.type==="stealthSkill"),
+            stealthExpires:elite.v155MonsterStealth&&elite.v155MonsterStealth.expiresTurn
+        };
+    })()`);
+    assert.deepEqual(result,{
+        playerAccuracyMultiplier:1.5,monsterAccuracy:150,rage:{chance:25,damage:50},
+        shield:{first:100,second:0,statusName:"岩盾",remaining:37,turnsLeft:2},
+        stealthCast:true,stealth:{type:"stealthSkill",v141BuffType:"stealth",statusName:"隱身",turnsLeft:3},
+        stealthExpires:7
+    });
+});
+
+test("reflection uses actual HP loss and cannot reflect absorbed or overkill damage",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Object.assign(player,{
+            id:"反傷者",level:1,hp:10,sp:0,vitality:0,energy:0,intelligence:0,spirit:0,agility:0,
+            activeBuffs:[{type:"earthShield",statusName:"萬象土盾",turnsLeft:3,percent:50}],statusEffects:[]
+        });
+        player2=null;player3=null;
+        const attacker={
+            name:"過量攻擊者",level:100,attack:10000,element:"fire",accuracy:1000,
+            hp:1000,maxHP:1000,sp:0,maxSP:0,alive:true,skillIds:[],skillChance:0,
+            activeBuffs:[],statusEffects:[]
+        };
+        monsters.splice(0,monsters.length,attacker);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        battleActive=true;battleToken=77;Math.random=function(){ return 0; };
+        finishPlayerAction=function(){};updateUI=function(){};addBattleLog=function(){};
+        showMonsterSkillNameBadge=function(){};showPlayerHit=function(){};showMonsterHit=function(){};
+        processSingleMonsterAttack(0,battleToken);
+        return {playerHp:player.hp,attackerHp:attacker.hp};
+    })()`);
+    assert.deepEqual(result,{playerHp:0,attackerHp:995});
+});
+
+test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once per skill cast",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const target={activeBuffs:[{
+            type:"barrier",statusName:"結界",turnsLeft:5,remainingBlocks:5
+        }]};
+        const blocked=v173WithDirectBarrierCast(function(){
+            return [v140ConsumeDirectBarrier(target),v140ConsumeDirectBarrier(target),v140ConsumeDirectBarrier(target)];
+        });
+        return {
+            combined:v173CombineEvasionRates([35,75]),
+            capped:v173CombineEvasionRates([80,80]),
+            blocked:blocked,remaining:target.activeBuffs[0].remainingBlocks
+        };
+    })()`);
+    assert.deepEqual(result,{combined:83.75,capped:85,blocked:[true,true,true],remaining:4});
+});
+
+test("multi-target buffs resolve same-name MISS independently without replacing existing values",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Object.assign(player,{
+            id:"中",hp:500,sp:100,level:10,activeBuffs:[{
+                type:"rage",statusName:"怒火",turnsLeft:2,
+                bonusPercent:5,critChanceBonusPercent:5,critDamageBonusPercent:10
+            }],statusEffects:[]
+        });
+        player2={id:"左",hp:500,sp:100,level:10,activeBuffs:[],statusEffects:[]};
+        player3={id:"右",hp:500,sp:100,level:10,activeBuffs:[],statusEffects:[]};
+        battleActive=true;activeBattleCharacterIndex=0;
+        getSkillLevel=function(_key,id){ return id==="rage"?5:0; };
+        getPartyBattleStats=function(){ return {maxHP:500,maxSP:100,intelligence:0}; };
+        updateUI=function(){};finishPlayerAction=function(){};lungePlayerCard=function(){};
+        showSkillNameBadge=function(){};showPlayerSpPopup=function(){};showMissEffect=function(){};addBattleLog=function(){};
+        v148ResolveSupportAction(0,{action:"rage",targetAlly:0},skillDatabase.rage);
+        return {
+            sp:player.sp,
+            buffs:[player,player2,player3].map(character=>character.activeBuffs.map(buff=>({
+                type:buff.type,statusName:buff.statusName,turnsLeft:buff.turnsLeft,
+                chance:buff.critChanceBonusPercent,damage:buff.critDamageBonusPercent
+            })))
+        };
+    })()`);
+    assert.deepEqual(result,{
+        sp:50,
+        buffs:[
+            [{type:"rage",statusName:"怒火",turnsLeft:2,chance:5,damage:10}],
+            [{type:"rage",statusName:"怒火",turnsLeft:3,chance:25,damage:50}],
+            [{type:"rage",statusName:"怒火",turnsLeft:3,chance:25,damage:50}]
+        ]
+    });
+});
+
+test("Phoenix Might counts only newly added Burns and boosts every direct damage formula next round",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Object.assign(player,{
+            id:"火角",element:"fire",level:50,hp:1000,sp:1000,
+            activeBuffs:[],statusEffects:[]
+        });
+        characterSkillLoadouts.fire.skillLevels.phoenixCry=1;
+        monsters.splice(0,monsters.length);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length);
+        for(let index=0;index<3;index++){
+            monsters.push({
+                name:"鳳威目標"+index,level:50,hp:5000,maxHP:5000,sp:0,maxSP:0,
+                alive:true,element:"earth",defense:0,evasion:0,spiritPoints:0,
+                activeBuffs:[],statusEffects:index<2?[{type:"burn",statusName:"燃燒",turnsLeft:2,percent:1}]:[]
+            });
+            currentBattleMonsters.push(index);
+        }
+        selectedMonster=1;battleActive=true;autoBattle=false;turn=4;battleToken=77;
+        getMainCharacterStats=function(){
+            return {attack:0,magicAttack:0,intelligence:0,accuracy:1000,maxHP:1000,maxSP:1000};
+        };
+        getMonsterEvasion=function(){ return 0; };
+        getMonsterEffectiveSpiritPoints=function(){ return 0; };
+        getMonsterRank=function(){ return "regular"; };
+        updateUI=function(){};finishPlayerAction=function(){};lungePlayerCard=function(){};
+        showPlayerSpPopup=function(){};showMonsterHit=function(){};showMissEffect=function(){};addBattleLog=function(){};
+        Math.random=function(){ return 0; };
+        castDamageSkill("phoenixCry");
+        const buff=player.activeBuffs.find(entry=>entry.type==="phoenixMight");
+        const burnCounts=monsters.map(monster=>monster.statusEffects.filter(effect=>effect.type==="burn").length);
+        turn=5;
+        window.v149CurrentDamageActor=player;
+        const boosted=calculateDamage(100,0,1,1,"fire","earth");
+        player.activeBuffs=[];
+        const plain=calculateDamage(100,0,1,1,"fire","earth");
+        return {
+            burnCounts:burnCounts,
+            buff:buff&&{statusName:buff.statusName,readyTurn:buff.readyTurn,expiresTurn:buff.expiresTurn,bonusPercent:buff.bonusPercent},
+            boosted:boosted,plain:plain
+        };
+    })()`);
+    assert.deepEqual(result.burnCounts,[1,1,1]);
+    assert.deepEqual(result.buff,{statusName:"鳳威",readyTurn:5,expiresTurn:6,bonusPercent:30});
+    assert.equal(result.boosted,Math.floor(result.plain*1.3));
 });
 
 test("Flood Beast stays single-target while Ice Arrow Rain resolves every living enemy",()=>{
@@ -405,7 +628,7 @@ test("Flood Beast stays single-target while Ice Arrow Rain resolves every living
         false,false,false,false,true,false,false,false,false,false
     ]);
     assert.deepEqual(flood.effects,[
-        [],[],[],[],[{type:"frostbite",turnsLeft:1,value:0}],[],[],[],[],[]
+        [],[],[],[],[{type:"frostbite",turnsLeft:1,value:0,statusName:"凍傷"}],[],[],[],[],[]
     ]);
     assert.equal(flood.effects.flat().some(effect=>effect.type==="freeze"),false);
     assert.equal(flood.sp,965);
@@ -450,8 +673,8 @@ test("Heal Spell restores allies but never refunds the caster's own SP",()=>{
         };
     })()`);
     assert.deepEqual(result,{
-        settled:true,caster:{hp:650,sp:55},ally:{hp:750,sp:75},statuses:[[],[]],
-        data:{baseHeal:550,healPerLevel:30,baseHealSP:65,healSPPerLevel:30,spCost:45,targetType:"allyTri"}
+        settled:true,caster:{hp:650,sp:55},ally:{hp:750,sp:45},statuses:[[],[]],
+        data:{baseHeal:550,healPerLevel:30,baseHealSP:35,healSPPerLevel:0,spCost:45,targetType:"allyTri"}
     });
 });
 
@@ -556,10 +779,10 @@ test("the three Extreme Emperor skills settle with the final V155 behavior",()=>
     assert.deepEqual(blessing,{
         first:true,second:true,
         afterFirst:[
-            {evasion:130,statusEffects:[],turnsLeft:2},
-            {evasion:130,statusEffects:[],turnsLeft:2}
+            {evasion:85,statusEffects:[],turnsLeft:2},
+            {evasion:85,statusEffects:[],turnsLeft:2}
         ],
-        afterSecond:[{evasion:130,blessings:1},{evasion:130,blessings:1}]
+        afterSecond:[{evasion:85,blessings:1},{evasion:85,blessings:1}]
     });
 
     const data=healRuntime.skills;

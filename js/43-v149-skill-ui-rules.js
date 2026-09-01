@@ -8,13 +8,6 @@
     window.__v149SkillUiRulesInstalled=true;
 
     const VERSION="149";
-    const BUFF_CONFLICTS={
-        barrier:["earthShield","stealthSkill","dodgeSkill"],
-        earthShield:["barrier"],
-        stealthSkill:["barrier"],
-        dodgeSkill:["barrier"]
-    };
-
     function numeric(value){
         const result=Number(value);
         return Number.isFinite(result)?result:0;
@@ -57,9 +50,9 @@
             description:"需先學習會心一擊。初次學習需20技能點，對同排中、左、右最多3名目標各造成50點傷害，消耗47 SP；任一目標死亡或爆擊時免費再施放1次。最高5級，每升1級消耗1技能點，傷害+10。"
         },
         dragonSlash:{
-            learnCost:45,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:165,damagePerLevel:33,spCost:65,
+            learnCost:35,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:165,damagePerLevel:33,spCost:65,
             followUpOnCriticalOrDefeat:true,followUpMaxCasts:2,requires:["explosiveFlurry"],
-            description:"需先學習火爆亂擊。初次學習需45技能點，對單體造成165點傷害，消耗65 SP；目標死亡或爆擊時免費再施放，最多追擊2次。最高5級，每升1級消耗1技能點，傷害+33。"
+            description:"需先學習火爆亂擊。初次學習需35技能點，對單體造成165點傷害，消耗65 SP；目標死亡或爆擊時免費追擊，最多額外追擊2次。追擊不消耗SP，原目標死亡時自動改選存活敵人。最高5級，每升1級消耗1技能點，傷害+33。"
         },
         fireRocket:{
             learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:13,damagePerLevel:4,spCost:10,
@@ -77,10 +70,10 @@
             description:"需先學習烈火術。初次學習需30技能點，對單一目標造成150點傷害，消耗47 SP；必定燃燒1回合，每回合造成目標最大HP的3%/4%/5%/6%/7%。最高5級，每升1級消耗1技能點，傷害+30。"
         },
         phoenixCry:{
-            learnCost:45,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:42,damagePerLevel:9,spCost:60,
+            learnCost:35,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:28,damagePerLevel:6,spCost:60,
             burnChance:40,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],
             burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1,requires:["flameTornado"],
-            description:"需先學習烈焰龍捲。初次學習需45技能點，對敵方全體各造成42點傷害，消耗60 SP；40%基礎機率燃燒2回合。每次施放後燃燒目標少於3人時，下一回合火鳳天鳴傷害+30%。每回合燃燒傷害為目標最大HP的5%/7%/9%/11%/13%。最高5級，每升1級消耗1技能點，傷害+9。"
+            description:"需先學習烈焰龍捲。初次學習需35技能點，對敵方全體各造成28點傷害，消耗60 SP；各目標有40%基礎機率獲得【燃燒】2回合。每回合燃燒傷害為目標最大HP的5%/7%/9%/11%/13%。本次實際新增燃燒少於3人時，施法者獲得【鳳威】1回合，造成的所有傷害+30%。最高5級，每升1級消耗1技能點，傷害+6。"
         },
         rage:{
             learnCost:25,maxLevel:5,upgradeCost:1,targetType:"allyTri",spCost:50,duration:3,
@@ -130,9 +123,9 @@
             description:"需先學習風焰術。初次學習需15技能點，對單體造成128點傷害，消耗55 SP；65%基礎機率降低目標造成的傷害15%/20%/25%/30%/35%，持續1回合。最高5級，每升1級消耗1技能點，傷害+26。"
         },
         stormRain:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:36,damagePerLevel:7,spCost:75,
+            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:24,damagePerLevel:5,spCost:75,
             stunChance:35,missBonusByLevel:[30,45,50,55,65],stunDuration:1,requires:["windHowlLightning"],
-            description:"需先學習風哮電擊。初次學習需30技能點，對敵方全體各造成36點傷害，消耗75 SP；35%基礎機率暈眩1回合，使目標MISS率提高30%/45%/50%/55%/65%。最高5級，每升1級消耗1技能點，傷害+7。"
+            description:"需先學習風哮電擊。初次學習需30技能點，對敵方全體各造成24點傷害，消耗75 SP；35%基礎機率附加【暈眩】1回合，使目標MISS率提高30%/45%/50%/55%/65%。最高5級，每升1級消耗1技能點，傷害+5。"
         },
         dodgeSkill:{
             learnCost:10,maxLevel:1,targetType:"allyTri",spCost:20,duration:3,evasionBonusPercent:75,
@@ -181,9 +174,9 @@
             description:"需先學習落石術。初次學習需10技能點，對同排中、左、右最多3名目標各造成14點傷害，消耗19 SP；65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+4。"
         },
         flyingSandStrike:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:32,damagePerLevel:6,spCost:55,
+            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:24,damagePerLevel:5,spCost:55,
             defenseDownChance:60,defenseDownByLevel:[10,15,20,25,35],defenseDownDuration:2,requires:["sandWind"],
-            description:"需先學習滾石術。初次學習需15技能點，對敵方全體各造成32點傷害，消耗55 SP；60%基礎機率降低目標防禦10%/15%/20%/25%/35%，持續2回合。最高5級，每升1級消耗1技能點，傷害+6。"
+            description:"需先學習滾石術。初次學習需15技能點，對敵方全體各造成24點傷害，消耗55 SP；60%基礎機率附加【破防】2回合，降低防禦10%/15%/20%/25%/35%。最高5級，每升1級消耗1技能點，傷害+5。"
         },
         dustStorm:{
             learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:140,damagePerLevel:28,spCost:65,
@@ -252,15 +245,26 @@
     }
 
     function applyFrostbite(entity,duration){
-        if(!entity){ return; }
+        if(!entity){ return false; }
+        if(typeof window.v173HasNamedPersistentState==="function"&&window.v173HasNamedPersistentState(entity,"frostbite")){
+            return false;
+        }
         if(typeof applyMonsterDebuff==="function"){
-            applyMonsterDebuff(entity,"frostbite",Math.max(1,numeric(duration)||2),0);
-            return;
+            return applyMonsterDebuff(entity,"frostbite",Math.max(1,numeric(duration)||2),0)!==false;
         }
         entity.statusEffects=entity.statusEffects||[];
-        const existing=entity.statusEffects.find(effect=>effect&&effect.type==="frostbite");
-        if(existing){ existing.turnsLeft=Math.max(existing.turnsLeft||0,duration||2); }
-        else{ entity.statusEffects.push({type:"frostbite",turnsLeft:duration||2,value:0}); }
+        const entry={type:"frostbite",turnsLeft:duration||2,value:0};
+        if(
+            typeof getPartyCharacterIndex==="function"&&
+            getPartyCharacterIndex(entity)>=0
+        ){
+            entry.deferFirstTick=true;
+        }
+        if(typeof window.v173MarkPersistentStateName==="function"){
+            window.v173MarkPersistentStateName(entry,"frostbite");
+        }
+        entity.statusEffects.push(entry);
+        return true;
     }
 
     function playFrostbiteEffect(side,index){
@@ -274,17 +278,20 @@
         applySkillDebuffEffects=function(skill,level,monster,index,casterLevel,casterIntelligence){
             const result=previousApplySkillDebuffs.apply(this,arguments);
             if(!skill||!numeric(skill.frostbiteChance)||!monster||!monster.alive){ return result; }
-            const hit=typeof rollStatusEffectHit==="function"&&rollStatusEffectHit(
+            const args=[
                 skill.frostbiteChance,casterLevel,monster.level,casterIntelligence,
                 typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
                 false,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
-            );
-            if(hit){
+            ];
+            const roll=typeof window.v173RollNamedPersistentStatusEffect==="function"
+                ?window.v173RollNamedPersistentStatusEffect(monster,"frostbite",args,"monster",index,skill.name)
+                :{duplicate:false,hit:typeof rollStatusEffectHit==="function"&&rollStatusEffectHit.apply(null,args)};
+            if(roll.hit){
                 const duration=skill.frostbiteDuration||2;
                 applyFrostbite(monster,duration);
                 playFrostbiteEffect("monster",index);
                 if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，"+duration+"回合內無法使用技能。"); }
-            }else if(typeof addBattleLog==="function"){
+            }else if(!roll.duplicate&&typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+monster.name+"抵抗了）");
             }
             return result;
@@ -299,15 +306,16 @@
             const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
                 ?getFinalBattleSpiritForPlayerTarget(target,index):numeric(target.spirit);
             const resist=typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0;
-            const hit=typeof rollStatusEffectHit==="function"&&rollStatusEffectHit(
-                skill.frostbiteChance,casterLevel,target.level,casterIntelligence,spirit,false,"regular",resist
-            );
-            if(hit){
+            const args=[skill.frostbiteChance,casterLevel,target.level,casterIntelligence,spirit,false,"regular",resist];
+            const roll=typeof window.v173RollNamedPersistentStatusEffect==="function"
+                ?window.v173RollNamedPersistentStatusEffect(target,"frostbite",args,"player",index,skill.name)
+                :{duplicate:false,hit:typeof rollStatusEffectHit==="function"&&rollStatusEffectHit.apply(null,args)};
+            if(roll.hit){
                 const duration=skill.frostbiteDuration||2;
                 applyFrostbite(target,duration);
                 playFrostbiteEffect("player",index);
                 if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，"+duration+"回合內無法使用技能。"); }
-            }else if(typeof addBattleLog==="function"){
+            }else if(!roll.duplicate&&typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+(target.id||"角色")+"抵抗了）");
             }
             return result;
@@ -318,6 +326,10 @@
         if(!entity||!Array.isArray(entity.statusEffects)){ return; }
         entity.statusEffects=entity.statusEffects.filter(effect=>{
             if(!effect||effect.type!=="frostbite"){ return true; }
+            if(effect.deferFirstTick){
+                effect.deferFirstTick=false;
+                return true;
+            }
             effect.turnsLeft=numeric(effect.turnsLeft)-1;
             if(effect.turnsLeft<=0&&typeof addBattleLog==="function"){
                 addBattleLog(label+"的凍傷效果已解除。");
@@ -377,39 +389,6 @@
         };
     }
 
-    /* ----- Buff incompatibility: reject before SP is spent. ----- */
-    function conflictingBuffTypes(skillId){ return BUFF_CONFLICTS[skillId]||[]; }
-
-    function requestedBuffIndexes(skill,targetIndex,casterIndex){
-        if(!skill){ return []; }
-        if(skill.targetType==="allyAll"||skill.targetType==="allyTri"){ return livingPartyIndexes(); }
-        const selected=Number.isInteger(targetIndex)?targetIndex:casterIndex;
-        const target=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(selected):null;
-        return target&&numeric(target.hp)>0?[selected]:[];
-    }
-
-    function buffConflictTargets(skill,targetIndex,casterIndex){
-        const types=skill?conflictingBuffTypes(skill.id):[];
-        if(!types.length){ return []; }
-        return requestedBuffIndexes(skill,targetIndex,casterIndex).filter(index=>{
-            const target=getPartyCharacterByIndex(index);
-            return types.some(type=>activeBuff(target,type));
-        });
-    }
-
-    function rejectBuffConflict(skill,targetIndex,casterIndex,consumeTurn){
-        const conflicts=buffConflictTargets(skill,targetIndex,casterIndex);
-        if(!conflicts.length){ return false; }
-        conflicts.forEach(index=>{
-            if(typeof showMissEffect==="function"){ showMissEffect(true,index,"MISS"); }
-        });
-        if(typeof addBattleLog==="function"){
-            addBattleLog(skill.name+"與目標現有的結界／萬象土盾／隱身／閃躲效果不能並存，MISS。");
-        }
-        if(consumeTurn&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
-        return true;
-    }
-
     if(typeof resolveQueuedPlayerAction==="function"){
         const previousResolveQueuedAction=resolveQueuedPlayerAction;
         resolveQueuedPlayerAction=function(characterIndex){
@@ -417,18 +396,7 @@
             const skill=queued&&typeof skillDatabase!=="undefined"?skillDatabase[queued.action]:null;
             const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
             if(skill&&rejectFrostbittenSkill(character,characterIndex,skill,true)){ return; }
-            if(skill&&skill.category==="buff"&&rejectBuffConflict(skill,queued.targetAlly,characterIndex,true)){ return; }
             return previousResolveQueuedAction.apply(this,arguments);
-        };
-    }
-
-    if(typeof castBuffSkill==="function"){
-        const previousCastBuffSkill=castBuffSkill;
-        castBuffSkill=function(skillId,targetIndex){
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
-            const casterIndex=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-            if(skill&&rejectBuffConflict(skill,targetIndex,casterIndex,true)){ return; }
-            return previousCastBuffSkill.apply(this,arguments);
         };
     }
 
@@ -453,9 +421,14 @@
 
     function withPlayerSkillContext(context,callback){
         const previousContext=playerSkillContext;
+        const previousDamageActor=window.v149CurrentDamageActor;
         playerSkillContext=context;
+        window.v149CurrentDamageActor=context&&context.character||null;
         try{ return callback(); }
-        finally{ playerSkillContext=previousContext; }
+        finally{
+            playerSkillContext=previousContext;
+            window.v149CurrentDamageActor=previousDamageActor;
+        }
     }
 
     function withGuaranteedBurn(skill,callback){
@@ -820,6 +793,8 @@
                     return originalStatusRoll.apply(this,arguments);
                 };
             }
+            const previousDamageActor=window.v149CurrentDamageActor;
+            window.v149CurrentDamageActor=monster;
             try{
                 if(typeof window.v155WithForcedFinalAbyssSkillLevel==="function"){
                     window.v155WithForcedFinalAbyssSkillLevel(monster,()=>
@@ -839,6 +814,7 @@
                 if(originalLog){ addBattleLog=originalLog; }
                 if(originalStatusRoll){ rollStatusEffectHit=originalStatusRoll; }
                 currentReflectAttacker=previousRepeatAttacker;
+                window.v149CurrentDamageActor=previousDamageActor;
                 options.skill.spCost=originalCost;
                 monster.skillIds=originalIds;
                 monster.v141SupportSkillIds=originalSupports;
@@ -923,11 +899,14 @@
                 };
             }
             const previousAttacker=currentReflectAttacker;
+            const previousDamageActor=window.v149CurrentDamageActor;
             currentReflectAttacker=monsterIndex;
+            window.v149CurrentDamageActor=monster;
             let result;
             try{ result=previousMonsterAttack.apply(this,arguments); }
             finally{
                 currentReflectAttacker=previousAttacker;
+                window.v149CurrentDamageActor=previousDamageActor;
                 if(realFinish){ finishPlayerAction=realFinish; }
                 if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
                 if(previousHit){ showPlayerHit=previousHit; }
@@ -1037,11 +1016,10 @@
     }else{ boot(); }
 
     window.v149SyncCombatCards=syncAllCombatCards;
-    window.v149GetBuffConflictTargets=buffConflictTargets;
     window.v149Diagnostics=function(){
         return {
             version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:true,
-            barrierConflicts:true,barrierCornerCount:true,wordCirclePerCharacter:true,
+            sameNameStateMiss:true,barrierCornerCount:true,wordCirclePerCharacter:true,
             mainShopIcon:"assets/ui/home-shop.png",navShopIcon:"assets/ui/home-shop-v147.png"
         };
     };
