@@ -503,6 +503,8 @@ let creationPoints2 =
    玩家
 ===================================================== */
 
+const INITIAL_CHARACTER_SKILL_POINTS=2;
+
 const player = {
 
     id:"",
@@ -3421,6 +3423,19 @@ const elementSkillIconMap = {
 
     iceArrowRain:"assets/skills/water-ice-arrow-rain.jpg",
 
+    /* V173.21：使用者提供的風系技能 icon；分身術圖對應閃躲術。 */
+    stormFist:"assets/skills/wind-storm-fist.jpg",
+    stormFlurry:"assets/skills/wind-storm-flurry.jpg",
+    windCrossSlash:"assets/skills/wind-cross-slash.jpg",
+    dizzyFist:"assets/skills/wind-dizzy-fist.jpg",
+    stormCircle:"assets/skills/wind-storm-circle.jpg",
+    windHowlLightning:"assets/skills/wind-howl-lightning.jpg",
+    stormRain:"assets/skills/wind-storm-rain.jpg",
+    dodgeSkill:"assets/skills/wind-dodge.jpg",
+    stealthSkill:"assets/skills/wind-stealth.jpg",
+    dinghaishenzhen:"assets/skills/wind-calm-mind.jpg",
+    windEX:"assets/skills/wind-ex.jpg",
+
     /*
        ★ 新增（依照使用者要求，土系技能icon）：
        這次使用者上傳了15張圖，其中4張是男角Q版巡怪背面立繪
@@ -5461,7 +5476,7 @@ function buildAdditionalCharacter(id,element,gender){
         bonusHP:0,
         bonusSP:0,
         attributePoints:creationPoints,
-        skillPoints:0,
+        skillPoints:INITIAL_CHARACTER_SKILL_POINTS,
         hp:100+creationStats.vitality*50,
         sp:50+creationStats.energy*15,
         activeBuffs:[],
@@ -5757,7 +5772,7 @@ function createSecondCharacter(){
         attributePoints:
             creationPoints2,
 
-        skillPoints:0,
+        skillPoints:INITIAL_CHARACTER_SKILL_POINTS,
 
         hp:100,
 
@@ -5955,6 +5970,9 @@ function createCharacter(){
 
     player.attributePoints =
         creationPoints;
+
+    player.skillPoints =
+        INITIAL_CHARACTER_SKILL_POINTS;
 
 
     /*
@@ -8181,9 +8199,9 @@ const PATROL_CHAR_FRONT_B64="assets/characters/patrol-character.png";
 
 const PATROL_CHAR_BACK_B64="assets/characters/patrol-back.png";
 
-const PATROL_FIGHT1_B64="assets/battle/patrol-fight-1.png";
+const PATROL_FIGHT1_B64="assets/battle/patrol-fight-1-v173.21.webp";
 
-const PATROL_FIGHT2_B64="assets/battle/patrol-fight-2.png";
+const PATROL_FIGHT2_B64="assets/battle/patrol-fight-2-v173.21.webp";
 
 
 let patrolWalkIntervalId=
@@ -32551,7 +32569,7 @@ function applyMapZoneBackground(zoneKey){
    不用改任何其他程式碼。
 */
 
-const skillIconImages={};
+const skillIconImages=elementSkillIconMap;
 
 
 const zoneBackgroundImages={

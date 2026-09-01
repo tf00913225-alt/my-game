@@ -1055,6 +1055,10 @@
         return {date:today(),daily:{},commission:{}};
     }
     let milestoneState=loadMilestones();
+    const milestoneChestImages={
+        closed:"assets/ui/quest-chest-closed-v173.21.webp",
+        open:"assets/ui/quest-chest-open-v173.21.webp"
+    };
     const milestoneRewards={
         daily:{20:{gold:20},40:{gold:30,exp:20},60:{gold:40},80:{gold:50,exp:30},100:{gold:80,exp:50}},
         commission:{20:{gold:50},40:{gold:75,exp:30},60:{gold:100},80:{gold:150,exp:70},100:{gold:250,exp:120}}
@@ -1080,6 +1084,7 @@
                     '<div class="quest-milestone-percent">'+threshold+'%</div>'+
                     '<button type="button" class="quest-milestone-slot" '+(!reached||claimed?"disabled":"")+
                     ' onclick="v141ClaimQuestMilestone(\''+type+'\','+threshold+')">'+
+                    '<img class="quest-milestone-chest" src="'+(claimed?milestoneChestImages.open:milestoneChestImages.closed)+'" alt="" aria-hidden="true" draggable="false">'+
                     '<span>'+(claimed?"已領":reached?"領取":"寶箱")+'</span><small>'+rewardLabel(reward)+'</small></button></div>';
             }).join("");
             return '<div class="quest-completion-head"><span>完成度寶箱</span><strong>'+display+'%</strong></div>'+

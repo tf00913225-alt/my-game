@@ -21,6 +21,7 @@
         V138_ROUND_TRANSITION_MS-V138_ACTION_DELAY_MS
     );
     const V131_MONSTER_STRENGTH=1.30;
+    const V173_21_BEGINNER_FOREST_STRENGTH=0.75;
     const V131_EXP_MULTIPLIER=3.5;
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;
     const ELEMENT_BOX_KEY="v131_element_box_state";
@@ -371,12 +372,15 @@
         roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS
     };
 
-    function strengthenMonster(monster){
+    function strengthenMonster(monster,multiplier){
         if(!monster || monster._v131StrengthApplied){ return; }
+        const strengthMultiplier=Number.isFinite(Number(multiplier))
+            ? Number(multiplier)
+            : V131_MONSTER_STRENGTH;
         monster._v131StrengthApplied=true;
         ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
             if(Number.isFinite(Number(monster[key]))){
-                monster[key]=Math.max(1,Math.round(Number(monster[key])*V131_MONSTER_STRENGTH));
+                monster[key]=Math.max(1,Math.round(Number(monster[key])*strengthMultiplier));
             }
         });
         monster.hp=monster.maxHP;
@@ -384,8 +388,10 @@
     }
 
     function strengthenAllZoneMonsters(){
+        const beginnerForest=
+            typeof forestMonsters!=="undefined" ? forestMonsters : null;
         const arrays=[
-            typeof forestMonsters!=="undefined" ? forestMonsters : null,
+            beginnerForest,
             typeof desertMonsters!=="undefined" ? desertMonsters : null,
             typeof iceMountainMonsters!=="undefined" ? iceMountainMonsters : null,
             typeof zone4Monsters!=="undefined" ? zone4Monsters : null,
@@ -400,7 +406,12 @@
         arrays.forEach(zone=>zone.forEach(monster=>{
             if(!seen.has(monster)){
                 seen.add(monster);
-                strengthenMonster(monster);
+                strengthenMonster(
+                    monster,
+                    zone===beginnerForest
+                        ? V173_21_BEGINNER_FOREST_STRENGTH
+                        : V131_MONSTER_STRENGTH
+                );
             }
         }));
     }
