@@ -202,7 +202,42 @@
         setWind:{main:"#2fa870",glow:"#a8f0cf",label:"青嵐"}
     };
 
+    const EQUIPMENT_SET_ATTACK_ART={
+        setFire:{
+            blade:"assets/equipment/sets/fire-blade-attack-v173.22.webp",
+            heavyArmor:"assets/equipment/sets/fire-heavy-armor-attack-v173.22.webp",
+            boots:"assets/equipment/sets/fire-boots-attack-v173.22.webp",
+            helm:"assets/equipment/sets/fire-helm-attack-v173.22.webp",
+            wristguard:"assets/equipment/sets/fire-wristguard-attack-v173.22.webp"
+        },
+        setWater:{
+            blade:"assets/equipment/sets/water-blade-attack-v173.22.webp",
+            heavyArmor:"assets/equipment/sets/water-heavy-armor-attack-v173.22.webp",
+            boots:"assets/equipment/sets/water-boots-attack-v173.22.webp",
+            helm:"assets/equipment/sets/water-helm-attack-v173.22.webp",
+            wristguard:"assets/equipment/sets/water-wristguard-attack-v173.22.webp"
+        },
+        setEarth:{
+            blade:"assets/equipment/sets/earth-blade-attack-v173.22.webp",
+            heavyArmor:"assets/equipment/sets/earth-heavy-armor-attack-v173.22.webp",
+            boots:"assets/equipment/sets/earth-boots-attack-v173.22.webp",
+            helm:"assets/equipment/sets/earth-helm-attack-v173.22.webp",
+            wristguard:"assets/equipment/sets/earth-wristguard-attack-v173.22.webp"
+        },
+        setWind:{
+            blade:"assets/equipment/sets/wind-blade-attack-v173.22.webp",
+            heavyArmor:"assets/equipment/sets/wind-heavy-armor-attack-v173.22.webp",
+            boots:"assets/equipment/sets/wind-boots-attack-v173.22.webp",
+            helm:"assets/equipment/sets/wind-helm-attack-v173.22.webp",
+            wristguard:"assets/equipment/sets/wind-wristguard-attack-v173.22.webp"
+        }
+    };
+
     function equipmentSetIcon(setId,pieceKey){
+        const attackArt=EQUIPMENT_SET_ATTACK_ART[setId];
+        if(attackArt&&attackArt[pieceKey]){
+            return rasterItemIcon(attackArt[pieceKey],null,"equipment");
+        }
         const c=SET_PALETTE[setId]||SET_PALETTE.setFire;
         const shapes={
             blade:'<path d="M32 6 L38 40 L32 58 L26 40 Z" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',

@@ -92,8 +92,14 @@
     function syncSetDefinitions(){
         const content=typeof window.v132GetContentDefinitions==="function"
             ?window.v132GetContentDefinitions():null;
-        (content&&content.equipmentSetItems||[]).forEach(applySetRule);
-        allOwnedItems().forEach(applySetRule);
+        const definitions=content&&content.equipmentSetItems||[];
+        const definitionById=new Map(definitions.map(item=>[item.id,item]));
+        definitions.forEach(applySetRule);
+        allOwnedItems().forEach(item=>{
+            const definition=definitionById.get(item&&item.id);
+            if(definition){ item.icon=definition.icon; }
+            applySetRule(item);
+        });
     }
 
     function variantCountsForEquipment(equipmentKey,setId){
