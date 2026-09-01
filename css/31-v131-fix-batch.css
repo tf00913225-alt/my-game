@@ -162,7 +162,7 @@
     touch-action:pan-y !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
-    padding-bottom:110px !important;
+    padding-bottom:0 !important;
 }
 
 #game-stage #homeFeatureModal #characterTabContent > #skillPage{

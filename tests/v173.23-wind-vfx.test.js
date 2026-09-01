@@ -455,10 +455,10 @@ test("wind sheets replace procedural wind effects and keep noninteractive status
     assert.doesNotMatch(animation,/assets\/inbox\/[\s\S]{0,80}(?:base64|blob:)/i);
 });
 
-test("the development cache release is V173.25",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.25"/);
-    assert.match(index,/<title>四象江湖傳 V173\.25<\/title>/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.25/);
+test("the development cache release is V173.26",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.26"/);
+    assert.match(index,/<title>四象江湖傳 V173\.26<\/title>/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.26/);
 });
 
-console.log("\n"+passed+" V173.25 wind Sprite VFX tests passed.");
+console.log("\n"+passed+" V173.26 wind Sprite VFX tests passed.");

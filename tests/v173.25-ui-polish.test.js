@@ -11,6 +11,7 @@ const itemCss=read("css/38-v141-system-expansion.css");
 const badgeCss=read("css/40-v143-combat-dungeon-polish.css");
 const statusCss=read("css/42-v146-system-polish.css");
 const frostbiteCss=read("css/45-v152-dev-fixes.css");
+const v131LayoutCss=read("css/31-v131-fix-batch.css");
 const lateLayoutCss=read("css/49-v169-rpg-ui.css");
 const main=read("js/00-main.js");
 const content=read("js/27-v132-content-expansion.js");
@@ -46,6 +47,8 @@ test("backpack ability details keep the close button outside the scroll owner",(
 test("the ability page no longer owns a synthetic black spacer",()=>{
     assert.match(characterCore,/#characterTabContent\{[\s\S]*padding-bottom:0 !important/);
     assert.doesNotMatch(characterCore,/padding-bottom:160px/);
+    assert.match(v131LayoutCss,/#homeFeatureModal #characterTabContent\{[\s\S]{0,700}padding-bottom:0 !important/);
+    assert.doesNotMatch(v131LayoutCss,/padding-bottom:110px/);
     assert.doesNotMatch(lateLayoutCss,/#characterTabContent\{\s*padding-bottom:0/);
 });
 
@@ -79,15 +82,15 @@ test("frostbite uses text instead of a prohibition icon",()=>{
 });
 
 test("status text sits below damage and stays fully visible for one second",()=>{
-    assert.match(statusUi,/rect\.top\+rect\.height\*\.68/);
+    assert.match(statusUi,/rect\.top\+rect\.height\*\.86/);
     assert.match(statusCss,/animation:v146StatusPopup 1\.25s/);
     assert.match(statusCss,/10%,90%\{opacity:1/);
 });
 
-test("development cache and visible build advance to V173.25",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.25"/);
-    assert.match(index,/<title>四象江湖傳 V173\.25<\/title>/);
-    assert.match(index,/>V173\.25<\/div>/);
+test("development cache and visible build advance to V173.26",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.26"/);
+    assert.match(index,/<title>四象江湖傳 V173\.26<\/title>/);
+    assert.match(index,/>V173\.26<\/div>/);
 });
 
-console.log("\n"+passed+" V173.25 UI polish tests passed.");
+console.log("\n"+passed+" V173.26 UI polish tests passed.");

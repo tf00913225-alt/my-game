@@ -4417,7 +4417,7 @@ function makeSelectValueReactive(
 ){
 
     let currentValue=
-        selectEl.value;
+        String(selectEl.value);
 
 
     Object.defineProperty(
@@ -4432,7 +4432,7 @@ function makeSelectValueReactive(
             set(newValue){
 
                 currentValue=
-                    newValue;
+                    String(newValue);
 
 
                 Array.from(
@@ -4443,7 +4443,7 @@ function makeSelectValueReactive(
                         opt.selected=
                             (
                                 opt.value===
-                                newValue
+                                currentValue
                             );
 
                     }
@@ -4451,7 +4451,7 @@ function makeSelectValueReactive(
 
 
                 onValueChanged(
-                    newValue
+                    currentValue
                 );
 
             },
@@ -10141,6 +10141,13 @@ function startTurn(token){
     tickStatusEffects();
 
     tickPlayerBuffs();
+
+    if(
+        typeof window!=="undefined" &&
+        typeof window.v143SyncStatusSpriteEffects==="function"
+    ){
+        window.v143SyncStatusSpriteEffects();
+    }
 
 
     if(
