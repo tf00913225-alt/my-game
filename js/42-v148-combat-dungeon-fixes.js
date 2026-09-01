@@ -154,7 +154,6 @@
         isValidAllyTargetForSkill=function(skill,character,index){
             if(!skill||!character){ return false; }
             if(skill.targetType==="deadAlly"){ return numeric(character.hp)<=0; }
-            if(skill.category==="buff"&&activeBuff(character,skill.id)){ return false; }
             return previousIsValidAllyTarget.apply(this,arguments);
         };
     }
@@ -209,48 +208,9 @@
         };
     }
 
-    /* Freeze and Petrify replace one another; they can never coexist. */
-    function removeHardControlsExcept(entity,preferredType){
-        if(!entity||!Array.isArray(entity.statusEffects)){ return; }
-        entity.statusEffects=entity.statusEffects.filter(effect=>
-            !effect||!HARD_CONTROL_TYPES.includes(effect.type)||effect.type===preferredType||numeric(effect.turnsLeft)<=0
-        );
-    }
-
-    if(typeof applyFreezeEffect==="function"){
-        const previousApplyFreeze=applyFreezeEffect;
-        applyFreezeEffect=function(entity){
-            removeHardControlsExcept(entity,"freeze");
-            return previousApplyFreeze.apply(this,arguments);
-        };
-    }
-
-    if(typeof applyMonsterDebuff==="function"){
-        const previousApplyMonsterDebuff=applyMonsterDebuff;
-        applyMonsterDebuff=function(entity,type){
-            if(type==="petrify"){ removeHardControlsExcept(entity,"petrify"); }
-            return previousApplyMonsterDebuff.apply(this,arguments);
-        };
-    }
-
-    function normalizeHardControls(entity){
-        if(!entity||!Array.isArray(entity.statusEffects)){ return; }
-        const active=entity.statusEffects.filter(effect=>
-            effect&&HARD_CONTROL_TYPES.includes(effect.type)&&numeric(effect.turnsLeft)>0
-        );
-        if(active.length<=1){ return; }
-        const keep=active[0];
-        entity.statusEffects=entity.statusEffects.filter(effect=>
-            !effect||!HARD_CONTROL_TYPES.includes(effect.type)||numeric(effect.turnsLeft)<=0||effect===keep
-        );
-    }
-
-    function normalizeAllHardControls(){
-        partyIndexes().forEach(index=>normalizeHardControls(getPartyCharacterByIndex(index)));
-        if(typeof currentBattleMonsters!=="undefined"&&typeof monsters!=="undefined"){
-            currentBattleMonsters.forEach(index=>normalizeHardControls(monsters[index]));
-        }
-    }
+    /* Different formal names may coexist.  Only a repeated name is rejected
+       by the shared persistent-state owner in 00-main.js. */
+    function normalizeAllHardControls(){ return HARD_CONTROL_TYPES.length; }
 
     /* ----- One support resolver for every party slot. ----- */
     function finishSupport(message){
@@ -321,23 +281,35 @@
 
     function resolvePartyBuff(characterIndex,queued,skill,state){
         const requested=requestedBuffTargets(characterIndex,queued,skill);
+        if(!requested.length){ return finishSupport(skill.name+"目前沒有有效目標。"); }
         const eligible=requested.filter(index=>{
             const target=getPartyCharacterByIndex(index);
-            return target&&numeric(target.hp)>0&&!activeBuff(target,skill.id);
+            if(!target||numeric(target.hp)<=0){ return false; }
+            if(typeof window.v173CanApplyNamedPersistentState==="function"){
+                return window.v173CanApplyNamedPersistentState(target,skill.id,"player",index,skill.name);
+            }
+            return !activeBuff(target,skill.id);
         });
-        if(!requested.length){ return finishSupport(skill.name+"目前沒有有效目標。"); }
-        if(!eligible.length){ return finishSupport(skill.name+"效果仍存在，無法重複施放或延長回合。"); }
 
         animateSupportCast(state,characterIndex,skill);
         const extra=buffFields(skill,state.level);
         eligible.forEach(index=>{
             const target=getPartyCharacterByIndex(index);
             target.activeBuffs=(target.activeBuffs||[]).filter(buff=>
-                !(buff&&buff.type===skill.id&&numeric(buff.turnsLeft)<=0)
+                !(
+                    buff&&buff.type===skill.id&&(
+                        numeric(buff.turnsLeft)<=0||
+                        skill.id==="barrier"&&numeric(buff.remainingBlocks)<=0
+                    )
+                )
             );
-            target.activeBuffs.push(Object.assign({
+            const buff=Object.assign({
                 type:skill.id,turnsLeft:Math.max(1,numeric(skill.duration)||2)
-            },extra));
+            },extra);
+            if(typeof window.v173MarkPersistentStateName==="function"){
+                window.v173MarkPersistentStateName(buff,skill.id);
+            }
+            target.activeBuffs.push(buff);
             if(typeof window.v141PlayCardEffect==="function"){
                 const effect=skill.id==="barrier"?"barrier":skill.id==="earthShield"?"shield":"buff";
                 window.v141PlayCardEffect("player",index,effect);
@@ -345,8 +317,8 @@
         });
         const skipped=requested.length-eligible.length;
         return finishSupport(
-            (state.character.id||"角色")+"施放"+skill.name+"，效果套用於"+eligible.length+"名存活友方"+
-            (skipped>0?"；"+skipped+"名既有效果未刷新。":"。")
+            (state.character.id||"角色")+"施放"+skill.name+"，效果成功套用於"+eligible.length+"名存活友方"+
+            (skipped>0?"；"+skipped+"名同名狀態MISS。":"。")
         );
     }
 
@@ -361,8 +333,8 @@
             ?Math.floor(hpBase*multiplier)
             :Math.floor(calculateHealingAmount(hpBase,state.stats.intelligence)*multiplier);
         const sp=isFlatPartyHeal
-            ?Math.floor(spBase*multiplier)
-            :Math.floor(calculateSPHealingAmount(spBase,state.stats.intelligence)*multiplier);
+            ?Math.floor(spBase)
+            :Math.floor(calculateSPHealingAmount(spBase,state.stats.intelligence));
         return {hp:Math.max(0,hp),sp:Math.max(0,sp),maxHP:numeric(targetStats.maxHP),maxSP:numeric(targetStats.maxSP)};
     }
 
@@ -520,6 +492,9 @@
 
     /* Enemy Rage uses one visual trio and never the complete ten-card roster. */
     function activeMonsterTeamBuff(monster,type){
+        if(typeof window.v173HasNamedPersistentState==="function"){
+            return window.v173HasNamedPersistentState(monster,type);
+        }
         return !!(monster&&Array.isArray(monster.v141TeamBuffs)&&monster.v141TeamBuffs.some(buff=>
             buff&&buff.type===type&&numeric(buff.turnsLeft)>0
         ));
@@ -540,7 +515,7 @@
                     .filter(target=>alive.includes(target));
                 const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
                 const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
-                if(score>bestScore){ best=eligible; bestScore=score; }
+                if(score>bestScore){ best=trio; bestScore=score; }
             });
         });
         return best.slice(0,3);
@@ -560,27 +535,54 @@
         if(typeof showMonsterSkillNameBadge==="function"){
             showMonsterSkillNameBadge(skill.name,skill.element||caster.element,monsterIndex);
         }
+        let appliedCount=0;
         targets.forEach(index=>{
             const monster=monsters[index];
-            const amount=50;
+            if(
+                typeof window.v173CanApplyNamedPersistentState==="function"&&
+                !window.v173CanApplyNamedPersistentState(
+                    monster,"rage","monster",index,skill.name
+                )
+            ){ return; }
+            const level=Math.max(1,Math.min(
+                numeric(skill.maxLevel)||5,
+                Math.floor(numeric(caster.v141ForceSkillLevel)||1)
+            ));
+            const critChance=levelValue(
+                skill.critChanceBonusByLevel||skill.critBonusByLevel,level,0
+            );
+            const critDamage=levelValue(
+                skill.critDamageBonusByLevel||skill.critBonusByLevel,level,0
+            );
             const buff={
-                type:"rage",turnsLeft:Math.max(1,numeric(skill.duration)||2),amount:amount,
+                type:"rage",turnsLeft:Math.max(1,numeric(skill.duration)||3),amount:0,
+                bonusPercent:critChance,
+                critChanceBonusPercent:critChance,
+                critDamageBonusPercent:critDamage,
                 originalAttack:numeric(monster.attack),originalMagicAttack:numeric(monster.magicAttack)
             };
-            monster.attack=Math.round(buff.originalAttack*(1+amount/100));
-            monster.magicAttack=Math.round(buff.originalMagicAttack*(1+amount/100));
-            const display={type:"rage",v141BuffType:"rage",turnsLeft:buff.turnsLeft};
+            const display={
+                type:"rage",v141BuffType:"rage",turnsLeft:buff.turnsLeft,
+                bonusPercent:critChance,
+                critChanceBonusPercent:critChance,
+                critDamageBonusPercent:critDamage
+            };
+            if(typeof window.v173MarkPersistentStateName==="function"){
+                window.v173MarkPersistentStateName(buff,"rage");
+                window.v173MarkPersistentStateName(display,"rage");
+            }
             buff.displayBuff=display;
             monster.v141TeamBuffs=monster.v141TeamBuffs||[];
             monster.v141TeamBuffs.push(buff);
             monster.activeBuffs=monster.activeBuffs||[];
             monster.activeBuffs.push(display);
+            appliedCount++;
             if(typeof window.v141PlayCardEffect==="function"){
                 window.v141PlayCardEffect("monster",index,"buff");
             }
         });
         if(typeof addBattleLog==="function"){
-            addBattleLog(caster.name+"施放怒火，只強化敵方同排中、左、右最多3名，持續2回合。");
+            addBattleLog(caster.name+"施放怒火，敵方同排中、左、右有"+appliedCount+"名成功獲得效果，持續3回合。");
         }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
@@ -881,7 +883,7 @@
         const database=typeof skillDatabase!=="undefined"?skillDatabase:null;
         return {
             version:VERSION,rageTargetType:database&&database.rage&&database.rage.targetType,
-            duplicateBuffRefresh:false,hardControlsExclusive:true,healCasterSp:false,
+            duplicateBuffRefresh:false,hardControlsExclusive:false,healCasterSp:false,
             reviveDeadTarget:true,dungeonTouchScroll:true,abyssRedirectable:true,
             patrolManualMovement:false,shopIcon:"assets/ui/home-shop-v147.png"
         };

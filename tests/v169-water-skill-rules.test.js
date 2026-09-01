@@ -87,8 +87,8 @@ test("the eight offensive and control Water skill definitions are exact",()=>{
         frostCrush:{category:"physical",targetType:"single",learnCost:30,maxLevel:5,upgradeCost:1,baseDamage:116,damagePerLevel:24,spCost:60,lifestealPercentByLevel:[4,5,6,7,8],requires:["iceSpin"],frostbiteChance:25,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
         waterBall:{category:"magic",targetType:"tri",learnCost:2,maxLevel:5,upgradeCost:1,baseDamage:10,damagePerLevel:2,spCost:8,lifestealPercentByLevel:[3,4,5,6,7],requires:[],frostbiteChance:10,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
         floodBeast:{category:"magic",targetType:"single",learnCost:15,maxLevel:5,upgradeCost:1,baseDamage:105,damagePerLevel:21,spCost:35,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterBall"],frostbiteChance:15,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        iceArrowRain:{category:"magic",targetType:"all",learnCost:20,maxLevel:5,upgradeCost:1,baseDamage:30,damagePerLevel:6,spCost:75,lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],frostbiteChance:20,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        freeze:{category:"magic",targetType:"column",learnCost:25,maxLevel:1,upgradeCost:undefined,baseDamage:undefined,damagePerLevel:undefined,spCost:32,lifestealPercentByLevel:undefined,requires:["iceArrowRain"],frostbiteChance:undefined,frostbiteDuration:undefined,freezeChance:90,freezeDuration:5}
+        iceArrowRain:{category:"magic",targetType:"all",learnCost:20,maxLevel:5,upgradeCost:1,baseDamage:20,damagePerLevel:4,spCost:75,lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],frostbiteChance:20,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
+        freeze:{category:"magic",targetType:"column",learnCost:25,maxLevel:1,upgradeCost:undefined,baseDamage:undefined,damagePerLevel:undefined,spCost:32,lifestealPercentByLevel:undefined,requires:["iceArrowRain"],frostbiteChance:undefined,frostbiteDuration:undefined,freezeChance:90,freezeDuration:3}
     };
     Object.entries(expected).forEach(([id,value])=>assert.deepEqual(fields(skills[id]),value,id));
 });
@@ -113,7 +113,7 @@ test("Water support, revive and EX passive are owned by the same final layer",()
     assert.deepEqual(
         [skills.healSpell.targetType,skills.healSpell.baseHeal,skills.healSpell.healPerLevel,
             skills.healSpell.baseHealSP,skills.healSpell.healSPPerLevel,skills.healSpell.spCost,skills.healSpell.cleanseAll],
-        ["allyTri",550,30,65,30,45,true]
+        ["allyTri",550,30,35,0,45,true]
     );
     assert.deepEqual(Array.from(skills.healSpell.requires),["iceArrowRain","iceSpin"]);
     assert.deepEqual(Array.from(skills.revive.reviveHealPercentByLevel),[20,40,60,80,100]);
@@ -132,7 +132,7 @@ test("damage growth sequences and HP-only lifesteal text match every level",()=>
     const sequences={
         waterKnife:[21,26,31,36,41],frostPunch:[32,39,46,53,60],iceSpin:[35,42,49,56,63],
         frostCrush:[116,140,164,188,212],waterBall:[10,12,14,16,18],
-        floodBeast:[105,126,147,168,189],iceArrowRain:[30,36,42,48,54]
+        floodBeast:[105,126,147,168,189],iceArrowRain:[20,24,28,32,36]
     };
     Object.entries(sequences).forEach(([id,expected])=>{
         const actual=[1,2,3,4,5].map(level=>{
@@ -147,7 +147,7 @@ test("damage growth sequences and HP-only lifesteal text match every level",()=>
     assert.match(preview,/吸取實際傷害7%（只恢復自身HP）/);
     assert.doesNotMatch(preview,/HP\/SP|冰封/);
     const freeze=context.getSkillEffectPreviewText(context.skillDatabase.freeze,1);
-    assert.match(freeze,/90%基礎機率冰封5回合/);
+    assert.match(freeze,/90%基礎機率冰封3回合/);
     assert.match(freeze,/不造成傷害/);
 });
 
@@ -218,7 +218,7 @@ test("monster Freeze remains pure control even against Defend and Barrier",()=>{
     assert.equal(target.isDefending,true,"Defend state is restored");
     assert.equal(barrier.remainingBlocks,1,"pure control cannot consume a direct-hit Barrier charge");
     assert.equal(target.activeBuffs.includes(barrier),true);
-    assert.deepEqual(target.statusEffects,[{type:"freeze",turnsLeft:5}]);
+    assert.deepEqual(target.statusEffects,[{type:"freeze",turnsLeft:3}]);
     assert.deepEqual(logs,[],"legacy zero-damage and Barrier messages are suppressed");
 });
 
@@ -245,10 +245,10 @@ test("all final UI description entry points expose Frostbite and HP-only recover
     assert.match(summary,/敵方全體/);
     assert.match(summary,/凍傷，只禁止技能/);
     assert.match(summary,/恢復自身HP/);
-    assert.match(effect,/42/);
+    assert.match(effect,/28/);
     assert.match(effect,/20%基礎機率凍傷1回合/);
     assert.match(breakdown,/Lv\.5/);
-    assert.match(breakdown,/54/);
+    assert.match(breakdown,/36/);
     assert.match(breakdown,/只恢復自身HP/);
     assert.equal(creationCalls,1);
     assert.equal(description.textContent,skill.description);

@@ -18,13 +18,13 @@
 
     function hitChancePercent(casterAccuracy,targetEvasion,directChanceReductionPercent){
         const directReduction=Math.max(0,numeric(directChanceReductionPercent));
-        const minimum=directReduction>0?60:80;
-        const rawChance=
+        const rawAccuracyChance=
             95+
             numeric(casterAccuracy)*0.3-
-            numeric(targetEvasion)*0.3-
             directReduction;
-        return clamp(rawChance,minimum,99);
+        const accuracyChance=clamp(rawAccuracyChance,50,99);
+        const evasionRate=clamp(numeric(targetEvasion),0,85);
+        return clamp(accuracyChance*(1-evasionRate/100),1,99);
     }
 
     window.v158GetHitChancePercent=hitChancePercent;
@@ -119,7 +119,18 @@
                 adjustedAttack*formulaConstant/
                 (formulaConstant+Math.max(0,numeric(defense)));
             const randomFactor=0.95+Math.random()*0.10;
-            return Math.max(1,Math.round(rawDamage*randomFactor));
+            let result=Math.max(1,Math.round(rawDamage*randomFactor));
+            if(
+                typeof window.v155GetCurrentDamageActor==="function"&&
+                typeof window.v155GetPhoenixMightMultiplier==="function"
+            ){
+                result=Math.max(1,Math.floor(
+                    result*window.v155GetPhoenixMightMultiplier(
+                        window.v155GetCurrentDamageActor()
+                    )
+                ));
+            }
+            return result;
         };
     }
 
@@ -166,28 +177,35 @@
         targets.forEach(index=>{
             const monster=typeof monsters!=="undefined"?monsters[index]:null;
             if(!monster||monster.alive===false||numeric(monster.hp)<=0){ return; }
-            const hit=typeof rollStatusEffectHit==="function"
-                ?rollStatusEffectHit(
-                    skill.freezeChance,
-                    character.level,
-                    monster.level,
-                    stats.intelligence,
-                    typeof getMonsterEffectiveSpiritPoints==="function"
-                        ?getMonsterEffectiveSpiritPoints(monster)
-                        :numeric(monster.spiritPoints),
-                    true,
-                    typeof getMonsterRank==="function"?getMonsterRank(monster):monster.rank
+            const rollArguments=[
+                skill.freezeChance,
+                character.level,
+                monster.level,
+                stats.intelligence,
+                typeof getMonsterEffectiveSpiritPoints==="function"
+                    ?getMonsterEffectiveSpiritPoints(monster)
+                    :numeric(monster.spiritPoints),
+                true,
+                typeof getMonsterRank==="function"?getMonsterRank(monster):monster.rank
+            ];
+            const statusResult=typeof window.v173RollNamedPersistentStatusEffect==="function"
+                ?window.v173RollNamedPersistentStatusEffect(
+                    monster,"freeze",rollArguments,"monster",index,skill.name
                 )
-                :false;
+                :{
+                    duplicate:false,
+                    hit:typeof rollStatusEffectHit==="function"&&
+                        rollStatusEffectHit.apply(null,rollArguments)
+                };
 
-            if(hit){
+            if(statusResult.hit){
                 if(typeof applyFreezeEffect==="function"){
                     applyFreezeEffect(monster,skill.freezeDuration);
                 }
                 if(typeof addBattleLog==="function"){
                     addBattleLog(monster.name+"被冰封了！");
                 }
-            }else{
+            }else if(!statusResult.duplicate){
                 if(typeof showMissEffect==="function"){ showMissEffect(false,index,"抵抗"); }
                 if(typeof addBattleLog==="function"){
                     addBattleLog(skill.name+"對"+monster.name+"沒有生效（抵抗）。");
@@ -226,8 +244,8 @@
                 const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
                 if(note){
                     note.innerHTML=
-                        "命中機率＝95%＋命中×0.3－目標閃避×0.3；一般限制80%～99%，受到降低命中的效果時最低60%。<br>"+
-                        "每1精神＝+0.3個百分點異常抗性、+2命中、+0.1%抗暴；每1敏捷＝+1速度、+2閃避。";
+                        "命中先依95%＋命中×0.3計算（50%～99%），再乘上(1－目標最終閃躲率)。<br>"+
+                        "所有閃躲來源採乘算，最終閃躲率最高85%；每1精神＝+0.3個百分點異常抗性、+2命中、+0.1%抗暴。";
                 }
             }
             return result;

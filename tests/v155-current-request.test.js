@@ -47,9 +47,9 @@ function load(overrides={}){
 }
 
 test("V155 remains ordered before V158 under the current cache version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.18/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.19"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.19/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.19/);
     const v154=loader.indexOf("js/45-v154-dev-fixes.js");
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
@@ -126,7 +126,7 @@ test("Extreme Emperor heal, shield and blessing resolve exact values",()=>{
     assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",true),true);
     assert.deepEqual(array(ally.statusEffects),[]);
     assert.equal(ally.agility,100,"old agility blessing is removed");
-    assert.equal(ally.evasion,195);
+    assert.equal(ally.evasion,85);
     assert.equal(ally.v155EvasionBlessing.displayBuff.turnsLeft,2);
     ally.hp=100; ally.sp=10;
     assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanXiangGuangMing"),true);
@@ -170,7 +170,7 @@ test("wind elite Stealth blocks only single-target selection for two rounds",()=
     assert.equal(finishes,1);
 });
 
-test("Phoenix fewer-than-three Burn cast grants one next-round 30 percent damage boost",()=>{
+test("Phoenix fewer-than-three Burn cast grants one non-refreshable next-round 30 percent damage boost",()=>{
     const player={id:"火俠",hp:100,sp:300,activeBuffs:[]};
     const damages=[];
     let burnCount=0;
@@ -187,12 +187,17 @@ test("Phoenix fewer-than-three Burn cast grants one next-round 30 percent damage
     });
     context.castDamageSkill("phoenixCry");
     assert.deepEqual(damages,[100]);
-    assert.deepEqual([player.v155PhoenixDamageBuff.readyTurn,player.v155PhoenixDamageBuff.expiresTurn],[2,3]);
+    const buff=player.activeBuffs.find(entry=>entry.type==="phoenixMight");
+    assert.deepEqual([buff.statusName,buff.readyTurn,buff.expiresTurn,buff.bonusPercent],["鳳威",2,3,30]);
     context.turn=2;
     burnCount=3;
+    assert.equal(context.v155GetPhoenixMightMultiplier(player),1.3);
     context.castDamageSkill("phoenixCry");
-    assert.deepEqual(damages,[100,130]);
-    assert.equal(player.v155PhoenixDamageBuff,undefined,"three Burn targets consume the one-round boost without rearming it");
+    assert.deepEqual(damages,[100,100],"the isolated fixture bypasses the production damage formula");
+    assert.deepEqual(
+        [buff.readyTurn,buff.expiresTurn,buff.bonusPercent],[2,3,30],
+        "an existing Phoenix Might state is never refreshed or replaced"
+    );
 });
 
 test("hard-controlled player and monster finish with the 300 ms override only",()=>{

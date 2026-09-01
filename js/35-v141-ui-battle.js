@@ -315,7 +315,7 @@
             if(!buff||!buff.type||buff.turnsLeft<=0){ return; }
             const map={
                 shield:"shield",barrier:"barrier",earthShield:"barrier",rockWall:"buff",
-                rage:"buff",dodgeSkill:"buff",stealthSkill:"buff",dinghaishenzhen:"buff",
+                rage:"buff",phoenixMight:"buff",dodgeSkill:"buff",stealthSkill:"buff",dinghaishenzhen:"buff",
                 v141TeamBuff:"buff"
             };
             if(map[buff.type]){ types.add(map[buff.type]); }

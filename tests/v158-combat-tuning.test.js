@@ -52,8 +52,8 @@ function load(overrides={}){
 }
 
 test("V158 and V159 remain ordered before the final V169 runtimes",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.19"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.19/);
     assert.match(loader,/css\/47-v158-combat-tuning\.css/);
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
@@ -87,13 +87,13 @@ test("V158 combat tuning no longer overwrites final skill data",()=>{
     assert.deepEqual(Array.from(result.healSpell.requires),["iceArrowRain","iceSpin"]);
 });
 
-test("normal hit chance is 80 to 99 while direct hit debuffs can reach 60",()=>{
+test("accuracy and the final capped evasion rate combine multiplicatively",()=>{
     const context=load();
     assert.equal(context.v158GetHitChancePercent(0,0,0),95);
     assert.equal(context.v158GetHitChancePercent(10,0,0),98);
-    assert.equal(context.v158GetHitChancePercent(0,10,0),92);
-    assert.equal(context.v158GetHitChancePercent(0,1000,0),80);
-    assert.equal(context.v158GetHitChancePercent(0,1000,50),60);
+    assert.equal(context.v158GetHitChancePercent(0,10,0),85.5);
+    assert.equal(context.v158GetHitChancePercent(0,1000,0),14.250000000000002);
+    assert.equal(context.v158GetHitChancePercent(0,1000,50),7.500000000000001);
     assert.equal(context.v158GetHitChancePercent(1000,0,0),99);
 });
 

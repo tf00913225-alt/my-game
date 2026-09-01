@@ -244,23 +244,28 @@
         );
     };
 
-    /* 只把既有命中公式的最終下限改為 50%，其餘輸入與係數不變。 */
+    /*
+       命中先依既有命中值算出基礎命中率，再讓正式閃躲率獨立擲算。
+       閃躲來源本身已在角色能力端用乘算合併，最終上限85%。
+    */
     function getV140HitChancePercent(
         casterAccuracy,
         targetEvasion,
         directChanceReductionPercent
     ){
-        const rawChance=
+        const rawAccuracyChance=
             95+
             casterAccuracy*0.3-
-            targetEvasion*0.3-
             (directChanceReductionPercent||0);
 
-        return clamp(
-            rawChance,
+        const accuracyChance=clamp(
+            rawAccuracyChance,
             50,
             99
         );
+        const evasionRate=clamp(targetEvasion,0,85);
+
+        return clamp(accuracyChance*(1-evasionRate/100),1,99);
     }
 
     window.v140GetHitChancePercent=getV140HitChancePercent;
@@ -375,7 +380,16 @@
         );
     }
 
+    let directBarrierCastContext=null;
+
     function consumeV140DirectBarrier(character){
+        if(
+            directBarrierCastContext&&
+            directBarrierCastContext.blockedCharacters.has(character)
+        ){
+            return true;
+        }
+
         const buffs=character&&Array.isArray(character.activeBuffs)
             ? character.activeBuffs
             : [];
@@ -393,6 +407,9 @@
         }
 
         barrier.remainingBlocks=remaining-1;
+        if(directBarrierCastContext){
+            directBarrierCastContext.blockedCharacters.add(character);
+        }
         if(barrier.remainingBlocks<=0){
             character.activeBuffs=buffs.filter(buff=>buff!==barrier);
         }
@@ -400,6 +417,12 @@
     }
 
     window.v140ConsumeDirectBarrier=consumeV140DirectBarrier;
+    window.v173WithDirectBarrierCast=function(callback){
+        const previousContext=directBarrierCastContext;
+        directBarrierCastContext={blockedCharacters:new Set()};
+        try{ return callback(); }
+        finally{ directBarrierCastContext=previousContext; }
+    };
 
     /* 讓技能施放後的 buff 帶有新規格需要的獨立欄位。 */
     const previousCastBuffSkill=castBuffSkill;
@@ -802,6 +825,8 @@
         }
 
         const previousContext=statusSkillContext;
+        const previousBarrierContext=directBarrierCastContext;
+        directBarrierCastContext={blockedCharacters:new Set()};
         const context={
             skill:null,
             physicalAttack:getMonsterPhysicalAttack(monster),
@@ -851,6 +876,7 @@
             if(previousLog){ addBattleLog=previousLog; }
             hasActiveBuff=previousHasActiveBuff;
             statusSkillContext=previousContext;
+            directBarrierCastContext=previousBarrierContext;
 
             if(
                 context.skill&&

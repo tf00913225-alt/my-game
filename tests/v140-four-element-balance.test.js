@@ -557,11 +557,11 @@ test("skill UI text matches HP-only lifesteal, split rage values, and no self SP
     assert.match(breakdown("healSpell"),/施放者本人不回復SP/);
 });
 
-test("hit chance keeps the old formula and only changes its floor to 50%",()=>{
+test("hit chance applies the final capped evasion rate after accuracy",()=>{
     const context=makeContext();
-    assert.equal(context.v140GetHitChancePercent(0,1000,0),50);
+    assert.equal(context.v140GetHitChancePercent(0,1000,0),14.250000000000002);
     assert.equal(context.v140GetHitChancePercent(1000,0,0),99);
-    assert.equal(context.v140GetHitChancePercent(100,80,10),91);
+    assert.ok(Math.abs(context.v140GetHitChancePercent(100,80,10)-19.8)<Number.EPSILON*100);
 });
 
 test("existing lifesteal paths still accumulate post-critical final damage",()=>{
@@ -569,10 +569,10 @@ test("existing lifesteal paths still accumulate post-critical final damage",()=>
     const monsterCast=mainSource.slice(mainSource.indexOf("function processSingleMonsterAttack"),mainSource.indexOf("function checkBattleEnd"));
     const secondaryCast=mainSource.slice(mainSource.indexOf("function castSecondaryCharacterSkill"),mainSource.indexOf("function player2NormalAttack"));
     const player2Cast=mainSource.slice(mainSource.indexOf("function castPlayer2Skill"),mainSource.indexOf("function getMonsterGoldDrop"));
-    assert.match(mainCast,/critResult\.multiplier[\s\S]*?totalLifestealDamage\+=\s*damage/);
+    assert.match(mainCast,/critResult\.multiplier[\s\S]*?totalLifestealDamage\+=[\s\S]*?actualDamageDealt/);
     assert.match(monsterCast,/monsterCrit[\s\S]*?monsterLifestealDamage\+=damage/);
-    assert.match(secondaryCast,/critResult\.multiplier[\s\S]*?totalLifesteal\+=damage/);
-    assert.match(player2Cast,/critResult\.multiplier[\s\S]*?totalLifesteal\+=\s*damage/);
+    assert.match(secondaryCast,/critResult\.multiplier[\s\S]*?totalLifesteal\+=actualDamageDealt/);
+    assert.match(player2Cast,/critResult\.multiplier[\s\S]*?totalLifesteal\+=[\s\S]*?actualDamageDealt/);
 });
 
 test("V140 remains before the ordered V141/V142 layers and both cache keys are bumped",()=>{
@@ -589,8 +589,8 @@ test("V140 remains before the ordered V141/V142 layers and both cache keys are b
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.18"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.18/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.19"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.19/);
 });
 
 console.log("\nV140 four-element balance suite: "+passed+" tests passed.");

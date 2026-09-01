@@ -63,10 +63,10 @@ function baseContext(overrides={}){
 }
 
 test("V148 remains ordered under the current runtime and cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.19/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.19"/);
     assert.match(loader,/css\/43-v148-combat-dungeon-fixes\.css/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.18/);
+assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.19/);
     const v146=loader.indexOf("js/41-v146-system-polish.js");
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     assert.ok(v146>=0&&v148>v146);
@@ -130,7 +130,7 @@ test("single buffs animate only their selected living target and cannot refresh"
     assert.equal(party[0].sp,155);
     context.v148ResolveSupportAction(0,{action:"stealthSkill",targetAlly:2},skill);
     assert.equal(party[2].activeBuffs[0].turnsLeft,2,"the existing duration is unchanged");
-    assert.equal(party[0].sp,155,"an entirely invalid recast spends no SP");
+    assert.equal(party[0].sp,110,"a cast still spends SP when its same-name status misses");
     assert.equal(effects.length,1,"no second/all-party visual is emitted");
     assert.equal(finishes,2);
 });
@@ -232,7 +232,7 @@ test("Revive restores HP and shows its popup only at the official hit frame",()=
     assert.deepEqual(logs,["乙被復活術復活，恢復100 HP。"]);
 });
 
-test("Freeze and Petrify replace rather than coexist",()=>{
+test("differently named Freeze and Petrify coexist without replacing each other",()=>{
     const context=baseContext({
         applyFreezeEffect(entity,duration){
             entity.statusEffects.push({type:"freeze",turnsLeft:duration});
@@ -243,9 +243,7 @@ test("Freeze and Petrify replace rather than coexist",()=>{
     });
     const entity={statusEffects:[{type:"freeze",turnsLeft:2}]};
     context.applyMonsterDebuff(entity,"petrify",3,0);
-    assert.deepEqual(entity.statusEffects.map(effect=>effect.type),["petrify"]);
-    context.applyFreezeEffect(entity,4);
-    assert.deepEqual(entity.statusEffects.map(effect=>effect.type),["freeze"]);
+    assert.deepEqual(entity.statusEffects.map(effect=>effect.type),["freeze","petrify"]);
 });
 
 test("Earth Shield visibly and actually reflects fifty percent",()=>{

@@ -918,9 +918,6 @@
         }
         rebuildInventorySlots();
 
-        const hitChance=getTalismanHitChance(definition,character);
-        const success=Math.random()*100<hitChance;
-
         /*
            ★ 修正（這就是使用者說「三個人都使用符咒，結果都是一個人
            在使用」的真正原因）：lungePlayerCard()跟showSkillNameBadge()
@@ -939,6 +936,59 @@
             characterIndex
         );
 
+        let targetIndex=null;
+        let targetMonster=null;
+        let allyIndex=null;
+        let allyCharacter=null;
+        let buffType=null;
+
+        if(definition.talismanEffect==="freeze"){
+            targetIndex=queued&&Number.isInteger(queued.target)?queued.target:null;
+            if(targetIndex===null||!monsters[targetIndex]||!monsters[targetIndex].alive){
+                const aliveTargets=currentBattleMonsters.filter(
+                    index=>monsters[index]&&monsters[index].alive
+                );
+                if(aliveTargets.length===0){
+                    addBattleLog(definition.name+"沒有可以生效的目標。");
+                    finishPlayerAction();
+                    return;
+                }
+                targetIndex=aliveTargets[Math.floor(Math.random()*aliveTargets.length)];
+            }
+            targetMonster=monsters[targetIndex];
+            if(
+                typeof window.v173CanApplyNamedPersistentState==="function"&&
+                !window.v173CanApplyNamedPersistentState(
+                    targetMonster,"freeze","monster",targetIndex,definition.name
+                )
+            ){
+                finishPlayerAction();
+                return;
+            }
+        }else{
+            allyIndex=queued&&Number.isInteger(queued.targetAlly)
+                ?queued.targetAlly
+                :characterIndex;
+            allyCharacter=getBattleCharacterByIndex(allyIndex);
+            if(!allyCharacter||allyCharacter.hp<=0){
+                allyIndex=characterIndex;
+                allyCharacter=character;
+            }
+            buffType=definition.talismanEffect==="stealth"?"stealthSkill":"barrier";
+            if(
+                typeof window.v173CanApplyNamedPersistentState==="function"&&
+                !window.v173CanApplyNamedPersistentState(
+                    allyCharacter,buffType,"player",allyIndex,definition.name
+                )
+            ){
+                finishPlayerAction();
+                return;
+            }
+        }
+
+        const hitChance=getTalismanHitChance(definition,character);
+        const success=Math.random()*100<hitChance;
+
         if(!success){
             addBattleLog((character.id||"你")+"使用"+definition.name+"，畫符失敗！");
             showMissEffect(true,characterIndex,"畫符失敗");
@@ -947,27 +997,10 @@
         }
 
         if(definition.talismanEffect==="freeze"){
-            /*
-               ★ 改成優先使用玩家在宣告階段選的目標（queued.target），
-               只有在那隻怪已經死掉/不存在時才退回「隨機挑一隻活的」
-               當保險，不會因為目標中途死亡就整張符咒白白浪費。
-            */
-            let targetIndex=queued && Number.isInteger(queued.target) ? queued.target : null;
-
-            if(targetIndex===null || !monsters[targetIndex] || !monsters[targetIndex].alive){
-                const aliveTargets=currentBattleMonsters.filter(i=>monsters[i] && monsters[i].alive);
-                if(aliveTargets.length===0){
-                    addBattleLog(definition.name+"沒有可以生效的目標。");
-                    finishPlayerAction();
-                    return;
-                }
-                targetIndex=aliveTargets[Math.floor(Math.random()*aliveTargets.length)];
-            }
-
-            applyFreezeEffect(monsters[targetIndex],definition.talismanDuration);
+            applyFreezeEffect(targetMonster,definition.talismanDuration);
             addBattleLog(
                 (character.id||"你")+"使用"+definition.name+"，"+
-                monsters[targetIndex].name+"被冰封了！"
+                targetMonster.name+"被冰封了！"
             );
         }
         else{
@@ -976,17 +1009,12 @@
                （queued.targetAlly），沒有選或那位已經倒下時才退回
                施法者自己。
             */
-            let allyIndex=queued && Number.isInteger(queued.targetAlly) ? queued.targetAlly : characterIndex;
-            let allyCharacter=getBattleCharacterByIndex(allyIndex);
-
-            if(!allyCharacter || allyCharacter.hp<=0){
-                allyIndex=characterIndex;
-                allyCharacter=character;
+            allyCharacter.activeBuffs=allyCharacter.activeBuffs||[];
+            const buff={type:buffType,turnsLeft:definition.talismanDuration};
+            if(typeof window.v173MarkPersistentStateName==="function"){
+                window.v173MarkPersistentStateName(buff,buffType);
             }
-
-            const buffType=definition.talismanEffect==="stealth" ? "stealthSkill" : "barrier";
-            allyCharacter.activeBuffs=(allyCharacter.activeBuffs||[]).filter(b=>b.type!==buffType);
-            allyCharacter.activeBuffs.push({type:buffType,turnsLeft:definition.talismanDuration});
+            allyCharacter.activeBuffs.push(buff);
 
             const allyName=allyIndex===characterIndex
                 ? (character.id||"你")

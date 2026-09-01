@@ -2012,6 +2012,59 @@ function getPlayerDefenseDownPercent(character){
     return Math.max(0,getMonsterDebuffValue(character,"defenseDown"));
 }
 
+const FINAL_EVASION_RATE_CAP=85;
+
+/*
+   閃躲來源採獨立機率乘算，不再直接相加或拿去放大敏捷閃躲值。
+   例如風元素EX 35%與風行75%：1-(1-.35)*(1-.75)=83.75%。
+*/
+function combineEvasionRates(sources){
+    const remainingChance=(Array.isArray(sources)?sources:[]).reduce(
+        (remaining,source)=>{
+            const rate=Math.max(0,Math.min(100,Number(source)||0))/100;
+            return remaining*(1-rate);
+        },
+        1
+    );
+    return Math.min(FINAL_EVASION_RATE_CAP,(1-remainingChance)*100);
+}
+
+window.v173CombineEvasionRates=combineEvasionRates;
+
+/* 氣定神閒的命中加成同時供玩家與怪物共用。鏡像顯示紀錄
+   可能同時存在於 activeBuffs / v141TeamBuffs，因此取最高值而不相加。 */
+function getActiveAccuracyBonusPercent(entity){
+    if(!entity){ return 0; }
+    const entries=(entity.activeBuffs||[]).concat(entity.v141TeamBuffs||[]);
+    return entries.reduce((highest,buff)=>{
+        if(!buff||Number(buff.turnsLeft)<=0){ return highest; }
+        const isAccuracyState=
+            buff.type==="dinghaishenzhen"||
+            buff.type==="resistance"||
+            buff.v141BuffType==="resistance"||
+            buff.statusName==="氣定神閒";
+        return isAccuracyState
+            ?Math.max(highest,Number(buff.accuracyBonusPercent)||0)
+            :highest;
+    },0);
+}
+
+function getActiveRageCriticalBonuses(entity){
+    if(!entity){ return {chance:0,damage:0}; }
+    const entries=(entity.v141TeamBuffs||[]).concat(entity.activeBuffs||[]);
+    return entries.reduce((result,buff)=>{
+        if(!buff||Number(buff.turnsLeft)<=0){ return result; }
+        const isRage=buff.type==="rage"||buff.v141BuffType==="rage"||buff.statusName==="怒火";
+        if(!isRage){ return result; }
+        result.chance=Math.max(result.chance,Number(buff.critChanceBonusPercent)||0);
+        result.damage=Math.max(result.damage,Number(buff.critDamageBonusPercent)||0);
+        return result;
+    },{chance:0,damage:0});
+}
+
+window.v173GetActiveAccuracyBonusPercent=getActiveAccuracyBonusPercent;
+window.v173GetActiveRageCriticalBonuses=getActiveRageCriticalBonuses;
+
 /* =====================================================
    主角最終能力
 ===================================================== */
@@ -2087,10 +2140,11 @@ function getMainCharacterStats(){
         antiCrit:calculateAntiCritPercent(effectiveSpirit),
         speed:effectiveAgility,
 
-        evasion:Math.max(
-            0,
-            Math.round(rawEvasion*(1+(evasionBuffPercent+evasionPassivePercent)/100))
-        ),
+        evasion:combineEvasionRates([
+            rawEvasion,
+            evasionBuffPercent,
+            evasionPassivePercent
+        ]),
 
         vitality:effectiveVitality,
         energy:effectiveEnergy,
@@ -2240,10 +2294,11 @@ function getAdditionalCharacterBattleStats(character,characterKey){
         antiCrit:calculateAntiCritPercent(effectiveSpirit),
         speed:effectiveAgility,
 
-        evasion:Math.max(
-            0,
-            Math.round(rawEvasion*(1+(evasionBuffPercent+evasionPassivePercent)/100))
-        ),
+        evasion:combineEvasionRates([
+            rawEvasion,
+            evasionBuffPercent,
+            evasionPassivePercent
+        ]),
 
         vitality:effectiveVitality,
         energy:effectiveEnergy,
@@ -11790,7 +11845,8 @@ function getMonsterAccuracy(monster){
     return Math.max(
         0,
         base*
-        (1-statDown/100)
+        (1-statDown/100)*
+        (1+getActiveAccuracyBonusPercent(monster)/100)
     );
 
 }
@@ -12635,23 +12691,33 @@ function rollHitChance(
     directChanceReductionPercent
 ){
 
-    const rawChance =
+    const rawAccuracyChance =
         HIT_CHANCE_BASE+
         casterAccuracy*
         HIT_CHANCE_ACCURACY_COEFFICIENT-
-        targetEvasion*
-        HIT_CHANCE_EVASION_COEFFICIENT-
         (directChanceReductionPercent||0);
 
-
-    const chance =
+    const accuracyChance =
         Math.max(
             HIT_CHANCE_MIN_PERCENT,
             Math.min(
                 HIT_CHANCE_MAX_PERCENT,
-                rawChance
+                rawAccuracyChance
             )
         );
+
+    const evasionRate=Math.max(
+        0,
+        Math.min(FINAL_EVASION_RATE_CAP,Number(targetEvasion)||0)
+    );
+
+    const chance=Math.max(
+        1,
+        Math.min(
+            HIT_CHANCE_MAX_PERCENT,
+            accuracyChance*(1-evasionRate/100)
+        )
+    );
 
 
     return (
@@ -13378,8 +13444,12 @@ function getSkillTargets(centerIndex,targetType){
     }
 
     if(targetType==="column"){
-        /* 舊技能相容：目前最新正式技能沒有使用縱排。 */
-        return alive;
+        const formationPosition=currentBattleMonsters.indexOf(centerIndex);
+        if(formationPosition<0){ return []; }
+        const column=formationPosition%3;
+        return currentBattleMonsters.filter((index,position)=>
+            position%3===column&&monsters[index]&&monsters[index].alive
+        );
     }
 
     if(targetType==="all"){
@@ -13390,14 +13460,168 @@ function getSkillTargets(centerIndex,targetType){
 }
 
 
-/*
-   燃燒狀態：套用/更新。
-   同一隻怪身上只會有一個燃燒效果，
-   重複命中就直接刷新持續回合數跟傷害%數，
-   不會疊加多層燃燒。
-*/
+/* =====================================================
+   Persistent-state identity
+
+   Every lasting effect is identified by its formal state name.  A target
+   that already owns an active state with the same name rejects the new
+   application before any status-chance roll is made.  The rule is shared by
+   skills, monsters and talismans; instant damage/healing is settled by the
+   caller before it reaches this helper.
+===================================================== */
+
+const PERSISTENT_STATE_NAMES=Object.freeze({
+    burn:"燃燒",
+    rage:"怒火",
+    phoenixMight:"鳳威",
+    frostbite:"凍傷",
+    freeze:"冰封",
+    agilityDown:"重力",
+    damageDown:"殤風",
+    stun:"暈眩",
+    dodgeSkill:"風行",
+    dodge:"風行",
+    stealthSkill:"隱身",
+    dinghaishenzhen:"氣定神閒",
+    resistance:"氣定神閒",
+    defenseDown:"破防",
+    shield:"岩盾",
+    petrify:"石化",
+    earthShield:"萬象土盾",
+    rockWall:"岩石壁壘",
+    barrier:"結界"
+});
+
+function getPersistentStateName(stateOrType){
+    const raw=stateOrType&&typeof stateOrType==="object"
+        ?(
+            stateOrType.statusName||
+            (stateOrType.type==="v141TeamBuff"?stateOrType.v141BuffType:stateOrType.type)||
+            stateOrType.v141BuffType||
+            ""
+        )
+        :String(stateOrType||"");
+    if(Object.values(PERSISTENT_STATE_NAMES).includes(raw)){ return raw; }
+    return PERSISTENT_STATE_NAMES[raw]||raw;
+}
+
+function isActivePersistentStateEntry(entry){
+    if(!entry){ return false; }
+    if(Number(entry.turnsLeft)<=0){ return false; }
+    const name=getPersistentStateName(entry);
+    if(name==="岩盾"&&Number(entry.remaining)<=0){ return false; }
+    if(name==="結界"&&entry.remainingBlocks!==undefined&&Number(entry.remainingBlocks)<=0){ return false; }
+    return true;
+}
+
+function getPersistentStateEntries(entity){
+    if(!entity){ return []; }
+    const entries=[];
+    if(Array.isArray(entity.statusEffects)){ entries.push(...entity.statusEffects); }
+    if(Array.isArray(entity.activeBuffs)){ entries.push(...entity.activeBuffs); }
+    if(Array.isArray(entity.v141TeamBuffs)){ entries.push(...entity.v141TeamBuffs); }
+    if(entity.v141Shield&&Number(entity.v141Shield.turnsLeft)>0){
+        entries.push(Object.assign(
+            {type:entity.v141Shield.isBarrier?"barrier":"shield"},
+            entity.v141Shield
+        ));
+    }
+    return entries;
+}
+
+function hasNamedPersistentState(entity,stateOrType){
+    const requestedName=getPersistentStateName(stateOrType);
+    if(!requestedName){ return false; }
+    return getPersistentStateEntries(entity).some(entry=>
+        isActivePersistentStateEntry(entry)&&getPersistentStateName(entry)===requestedName
+    );
+}
+
+function markPersistentStateName(entry,stateOrType){
+    if(entry&&typeof entry==="object"){
+        entry.statusName=getPersistentStateName(stateOrType||entry);
+    }
+    return entry;
+}
+
+function reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName){
+    const stateName=getPersistentStateName(stateOrType);
+    if(typeof showMissEffect==="function"&&Number.isInteger(targetIndex)){
+        showMissEffect(targetSide==="player",targetIndex,"MISS");
+    }
+    if(typeof addBattleLog==="function"){
+        const targetName=entity&&(entity.name||entity.id)||"目標";
+        addBattleLog(
+            (sourceName?sourceName+"：":"")+targetName+"已有【"+stateName+"】，新的【"+stateName+"】MISS。"
+        );
+    }
+    return false;
+}
+
+function canApplyNamedPersistentState(entity,stateOrType,targetSide,targetIndex,sourceName){
+    return hasNamedPersistentState(entity,stateOrType)
+        ?reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName)
+        :true;
+}
+
+function getMonsterTimedStatusResistanceBonus(monster){
+    if(!monster){ return 0; }
+    const teamBuff=(monster.v141TeamBuffs||[]).find(buff=>
+        buff&&buff.type==="resistance"&&Number(buff.turnsLeft)>0
+    );
+    if(teamBuff){ return Math.max(0,Number(teamBuff.amount)||0); }
+    const directBuff=(monster.activeBuffs||[]).find(buff=>
+        buff&&buff.type==="dinghaishenzhen"&&Number(buff.turnsLeft)>0
+    );
+    return directBuff?Math.max(0,Number(directBuff.resistBonus)||0):0;
+}
+
+function rollNamedPersistentStatusEffect(
+    entity,
+    stateOrType,
+    rollArguments,
+    targetSide,
+    targetIndex,
+    sourceName,
+    guaranteedHit
+){
+    if(!canApplyNamedPersistentState(entity,stateOrType,targetSide,targetIndex,sourceName)){
+        return {duplicate:true,hit:false};
+    }
+    const finalRollArguments=(rollArguments||[]).slice();
+    if(targetSide==="monster"){
+        if(finalRollArguments[5]===undefined){ finalRollArguments[5]=false; }
+        if(finalRollArguments[6]===undefined&&typeof getMonsterRank==="function"){
+            finalRollArguments[6]=getMonsterRank(entity);
+        }
+        finalRollArguments[7]=(Number(finalRollArguments[7])||0)+
+            getMonsterTimedStatusResistanceBonus(entity);
+    }
+    return {
+        duplicate:false,
+        hit:guaranteedHit===true||(
+            typeof rollStatusEffectHit==="function"&&
+            rollStatusEffectHit.apply(null,finalRollArguments)
+        )
+    };
+}
+
+window.v173PersistentStateNames=PERSISTENT_STATE_NAMES;
+window.v173GetPersistentStateName=getPersistentStateName;
+window.v173HasNamedPersistentState=hasNamedPersistentState;
+window.v173CanApplyNamedPersistentState=canApplyNamedPersistentState;
+window.v173MarkPersistentStateName=markPersistentStateName;
+window.v173RollNamedPersistentStatusEffect=rollNamedPersistentStatusEffect;
+window.v173GetMonsterTimedStatusResistanceBonus=getMonsterTimedStatusResistanceBonus;
+
+
+/* 燃燒：同名狀態存在時由前置判定直接MISS，不覆蓋或刷新。 */
 
 function applyBurnEffect(monster,duration,percent){
+
+    if(hasNamedPersistentState(monster,"burn")){
+        return false;
+    }
 
     if(!monster.statusEffects){
 
@@ -13406,31 +13630,26 @@ function applyBurnEffect(monster,duration,percent){
     }
 
 
-    const existing =
-        monster.statusEffects.find(
-            effect=>
-                effect.type==="burn"
-        );
+    monster.statusEffects=monster.statusEffects.filter(effect=>
+        !effect||effect.type!=="burn"||Number(effect.turnsLeft)>0
+    );
 
-
-    if(existing){
-
-        existing.turnsLeft=
-            duration;
-
-        existing.percent=
-            percent;
-
-    }
-    else{
-
-        monster.statusEffects.push({
-            type:"burn",
-            turnsLeft:duration,
-            percent:percent
+    const burnState=markPersistentStateName({
+        type:"burn",
+        turnsLeft:duration,
+        percent:percent
+    },"burn");
+    const burnSource=typeof window.v155GetCurrentDamageActor==="function"
+        ?window.v155GetCurrentDamageActor()
+        :null;
+    if(burnSource){
+        Object.defineProperty(burnState,"sourceActor",{
+            value:burnSource,writable:true,configurable:true,enumerable:false
         });
-
     }
+    monster.statusEffects.push(burnState);
+
+    return true;
 
 }
 
@@ -13444,6 +13663,10 @@ function applyBurnEffect(monster,duration,percent){
 
 function applyFreezeEffect(monster,duration){
 
+    if(hasNamedPersistentState(monster,"freeze")){
+        return false;
+    }
+
     if(!monster.statusEffects){
 
         monster.statusEffects=[];
@@ -13451,27 +13674,18 @@ function applyFreezeEffect(monster,duration){
     }
 
 
-    const existing =
-        monster.statusEffects.find(
-            effect=>
-                effect.type==="freeze"
-        );
+    monster.statusEffects=monster.statusEffects.filter(effect=>
+        !effect||effect.type!=="freeze"||Number(effect.turnsLeft)>0
+    );
 
+    const deferredForPlayer=
+        typeof getPartyCharacterIndex==="function"&&getPartyCharacterIndex(monster)>=0;
 
-    if(existing){
+    const freezeState={type:"freeze",turnsLeft:duration};
+    if(deferredForPlayer){ freezeState.deferFirstTick=true; }
+    monster.statusEffects.push(markPersistentStateName(freezeState,"freeze"));
 
-        existing.turnsLeft=
-            duration;
-
-    }
-    else{
-
-        monster.statusEffects.push({
-            type:"freeze",
-            turnsLeft:duration
-        });
-
-    }
+    return true;
 
 }
 
@@ -13498,9 +13712,8 @@ function isMonsterFrozen(monster){
    （降敏捷）、statDown（降全屬性）、
    defenseDown（降防禦）、damageDown（降低造成傷害）、
    stun（提高MISS率）、petrify（石化，無法行動）這六種怪物身上
-   的減益效果，都是「同一種類型只保留一份、
-   重複命中刷新持續時間」的規則，跟燃燒/
-   冰封一致。
+   的減益效果。同名狀態存在時一律MISS，
+   不疊加、不覆蓋、不刷新持續時間。
 
    value的意義依type而不同：
    agilityDown/statDown/defenseDown/damageDown/stun
@@ -13517,6 +13730,10 @@ function applyMonsterDebuff(
     extraFields
 ){
 
+    if(hasNamedPersistentState(monster,type)){
+        return false;
+    }
+
     if(!monster.statusEffects){
 
         monster.statusEffects=[];
@@ -13524,41 +13741,21 @@ function applyMonsterDebuff(
     }
 
 
-    const existing=
+    monster.statusEffects=monster.statusEffects.filter(effect=>
+        !effect||effect.type!==type||Number(effect.turnsLeft)>0
+    );
 
-        monster.statusEffects.find(
-            effect=>
-                effect.type===type
-        );
+    const deferredForPlayer=
+        typeof getPartyCharacterIndex==="function"&&getPartyCharacterIndex(monster)>=0;
 
+    const state=Object.assign(
+        {type:type,turnsLeft:duration,value:value},
+        extraFields||{}
+    );
+    if(deferredForPlayer){ state.deferFirstTick=true; }
+    monster.statusEffects.push(markPersistentStateName(state,type));
 
-    if(existing){
-
-        existing.turnsLeft=
-            duration;
-
-        existing.value=
-            value;
-
-        if(extraFields){
-            Object.assign(existing,extraFields);
-        }
-
-    }
-    else{
-
-        monster.statusEffects.push(
-            Object.assign(
-                {
-                    type:type,
-                    turnsLeft:duration,
-                    value:value
-                },
-                extraFields||{}
-            )
-        );
-
-    }
+    return true;
 
 }
 
@@ -13778,14 +13975,12 @@ function applySkillDebuffEffects(
         skill.agilityDownByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.agilityDownChance,
-                casterLevel,
-                monster.level,
-                casterIntelligence,
-                getMonsterEffectiveSpiritPoints(monster)
-            );
+        const hit=rollNamedPersistentStatusEffect(
+            monster,"agilityDown",[
+                skill.agilityDownChance,casterLevel,monster.level,
+                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+            ],"monster",index,skill.name
+        ).hit;
 
 
         if(hit){
@@ -13816,14 +14011,12 @@ function applySkillDebuffEffects(
         skill.statDownByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.statDownChance,
-                casterLevel,
-                monster.level,
-                casterIntelligence,
-                getMonsterEffectiveSpiritPoints(monster)
-            );
+        const hit=rollNamedPersistentStatusEffect(
+            monster,"statDown",[
+                skill.statDownChance,casterLevel,monster.level,
+                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+            ],"monster",index,skill.name
+        ).hit;
 
 
         if(hit){
@@ -13855,14 +14048,12 @@ function applySkillDebuffEffects(
         skill.damageDownByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.damageDownChance,
-                casterLevel,
-                monster.level,
-                casterIntelligence,
-                getMonsterEffectiveSpiritPoints(monster)
-            );
+        const hit=rollNamedPersistentStatusEffect(
+            monster,"damageDown",[
+                skill.damageDownChance,casterLevel,monster.level,
+                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+            ],"monster",index,skill.name
+        ).hit;
 
 
         if(hit){
@@ -13893,14 +14084,12 @@ function applySkillDebuffEffects(
         skill.defenseDownByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.defenseDownChance,
-                casterLevel,
-                monster.level,
-                casterIntelligence,
-                getMonsterEffectiveSpiritPoints(monster)
-            );
+        const hit=rollNamedPersistentStatusEffect(
+            monster,"defenseDown",[
+                skill.defenseDownChance,casterLevel,monster.level,
+                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+            ],"monster",index,skill.name
+        ).hit;
 
 
         if(hit){
@@ -13931,14 +14120,12 @@ function applySkillDebuffEffects(
         skill.missBonusByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.stunChance,
-                casterLevel,
-                monster.level,
-                casterIntelligence,
-                getMonsterEffectiveSpiritPoints(monster)
-            );
+        const hit=rollNamedPersistentStatusEffect(
+            monster,"stun",[
+                skill.stunChance,casterLevel,monster.level,
+                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+            ],"monster",index,skill.name
+        ).hit;
 
 
         if(hit){
@@ -13974,16 +14161,12 @@ function applySkillDebuffEffects(
             ];
 
 
-        const hit=
-            rollStatusEffectHit(
-                chance,
-                casterLevel,
-                monster.level,
-                casterIntelligence,
-                getMonsterEffectiveSpiritPoints(monster),
-                true,
-                getMonsterRank(monster)
-            );
+        const hit=rollNamedPersistentStatusEffect(
+            monster,"petrify",[
+                chance,casterLevel,monster.level,casterIntelligence,
+                getMonsterEffectiveSpiritPoints(monster),true,getMonsterRank(monster)
+            ],"monster",index,skill.name
+        ).hit;
 
 
         if(hit){
@@ -14088,18 +14271,13 @@ function applySkillDebuffEffectsToPlayer(
         skill.agilityDownByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.agilityDownChance,
-                casterLevel,
-                targetCharacter.level,
-                casterIntelligence,
-                targetFinalSpirit
-            ,
-                false,
-                "regular",
+        const hit=rollNamedPersistentStatusEffect(
+            targetCharacter,"agilityDown",[
+                skill.agilityDownChance,casterLevel,targetCharacter.level,
+                casterIntelligence,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
-            );
+            ],"player",targetIndex,skill.name
+        ).hit;
 
 
         if(hit){
@@ -14129,18 +14307,13 @@ function applySkillDebuffEffectsToPlayer(
         skill.statDownByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.statDownChance,
-                casterLevel,
-                targetCharacter.level,
-                casterIntelligence,
-                targetFinalSpirit
-            ,
-                false,
-                "regular",
+        const hit=rollNamedPersistentStatusEffect(
+            targetCharacter,"statDown",[
+                skill.statDownChance,casterLevel,targetCharacter.level,
+                casterIntelligence,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
-            );
+            ],"player",targetIndex,skill.name
+        ).hit;
 
 
         if(hit){
@@ -14171,17 +14344,13 @@ function applySkillDebuffEffectsToPlayer(
         skill.damageDownByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.damageDownChance,
-                casterLevel,
-                targetCharacter.level,
-                casterIntelligence,
-                targetFinalSpirit,
-                false,
-                "regular",
+        const hit=rollNamedPersistentStatusEffect(
+            targetCharacter,"damageDown",[
+                skill.damageDownChance,casterLevel,targetCharacter.level,
+                casterIntelligence,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
-            );
+            ],"player",targetIndex,skill.name
+        ).hit;
 
 
         if(hit){
@@ -14211,18 +14380,13 @@ function applySkillDebuffEffectsToPlayer(
         skill.defenseDownByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.defenseDownChance,
-                casterLevel,
-                targetCharacter.level,
-                casterIntelligence,
-                targetFinalSpirit
-            ,
-                false,
-                "regular",
+        const hit=rollNamedPersistentStatusEffect(
+            targetCharacter,"defenseDown",[
+                skill.defenseDownChance,casterLevel,targetCharacter.level,
+                casterIntelligence,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
-            );
+            ],"player",targetIndex,skill.name
+        ).hit;
 
 
         if(hit){
@@ -14252,18 +14416,13 @@ function applySkillDebuffEffectsToPlayer(
         skill.missBonusByLevel
     ){
 
-        const hit=
-            rollStatusEffectHit(
-                skill.stunChance,
-                casterLevel,
-                targetCharacter.level,
-                casterIntelligence,
-                targetFinalSpirit
-            ,
-                false,
-                "regular",
+        const hit=rollNamedPersistentStatusEffect(
+            targetCharacter,"stun",[
+                skill.stunChance,casterLevel,targetCharacter.level,
+                casterIntelligence,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
-            );
+            ],"player",targetIndex,skill.name
+        ).hit;
 
 
         if(hit){
@@ -14290,16 +14449,13 @@ function applySkillDebuffEffectsToPlayer(
 
     if(skill.freezeChance){
 
-        const hit=rollStatusEffectHit(
-            skill.freezeChance,
-            casterLevel,
-            targetCharacter.level,
-            casterIntelligence,
-            targetFinalSpirit,
-            true,
-            "regular",
-            getPlayerStatusResistBonus(targetCharacter)
-        );
+        const hit=rollNamedPersistentStatusEffect(
+            targetCharacter,"freeze",[
+                skill.freezeChance,casterLevel,targetCharacter.level,
+                casterIntelligence,targetFinalSpirit,true,"regular",
+                getPlayerStatusResistBonus(targetCharacter)
+            ],"player",targetIndex,skill.name
+        ).hit;
 
         if(hit){
             applyFreezeEffect(
@@ -14325,17 +14481,12 @@ function applySkillDebuffEffectsToPlayer(
             ];
 
 
-        const hit=
-            rollStatusEffectHit(
-                chance,
-                casterLevel,
-                targetCharacter.level,
-                casterIntelligence,
-                targetFinalSpirit,
-                true,
-                "regular",
-                getPlayerStatusResistBonus(targetCharacter)
-            );
+        const hit=rollNamedPersistentStatusEffect(
+            targetCharacter,"petrify",[
+                chance,casterLevel,targetCharacter.level,casterIntelligence,
+                targetFinalSpirit,true,"regular",getPlayerStatusResistBonus(targetCharacter)
+            ],"player",targetIndex,skill.name
+        ).hit;
 
 
         if(hit){
@@ -14373,18 +14524,13 @@ function applySkillDebuffEffectsToPlayer(
         skill.burnPercentByLevel
     ){
 
-        const burnHit=
-            rollStatusEffectHit(
-                skill.burnChance,
-                casterLevel,
-                targetCharacter.level,
-                casterIntelligence,
-                targetFinalSpirit
-            ,
-                false,
-                "regular",
+        const burnHit=rollNamedPersistentStatusEffect(
+            targetCharacter,"burn",[
+                skill.burnChance,casterLevel,targetCharacter.level,
+                casterIntelligence,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
-            );
+            ],"player",targetIndex,skill.name,skill.guaranteedBurn===true
+        ).hit;
 
 
         if(burnHit){
@@ -14451,12 +14597,11 @@ function tickStatusEffects(){
 
     const simpleDebuffLabels={
 
-        agilityDown:"敏捷降低",
+        agilityDown:"重力",
         statDown:"全屬性降低",
-        damageDown:"傷害降低",
-        defenseDown:"防禦降低",
-        stun:"暈眩（MISS率提高）",
-        frostbite:"凍傷"
+        damageDown:"殤風",
+        defenseDown:"破防",
+        stun:"暈眩"
 
     };
 
@@ -14572,23 +14717,31 @@ function tickStatusEffects(){
                         }
 
 
+                        const burnMultiplier=effect.sourceActor&&
+                            typeof window.v155GetPhoenixMightMultiplier==="function"
+                            ?window.v155GetPhoenixMightMultiplier(effect.sourceActor)
+                            :1;
                         const burnDamage =
                             Math.max(
                                 1,
                                 Math.floor(
                                     monster.maxHP*
                                     effect.percent/
-                                    100
+                                    100*
+                                    burnMultiplier
                                 )
                             );
 
 
-                        monster.hp =
-                            Math.max(
-                                0,
-                                monster.hp-
-                                burnDamage
-                            );
+                        const directShield=monster.v141Shield;
+                        if(directShield&&!directShield.isBarrier){
+                            const remaining=Math.max(0,Number(directShield.remaining)||0);
+                            const baseHp=Math.max(0,(Number(monster.hp)||0)-remaining);
+                            directShield.baseHp=Math.max(0,baseHp-burnDamage);
+                            monster.hp=directShield.baseHp+remaining;
+                        }else{
+                            monster.hp=Math.max(0,monster.hp-burnDamage);
+                        }
 
 
                         showMonsterHit(
@@ -14607,9 +14760,18 @@ function tickStatusEffects(){
                         );
 
 
-                        if(
-                            monster.hp<=0
-                        ){
+                        const hpAfterDot=monster.v141Shield
+                            ?Math.max(
+                                0,
+                                Number.isFinite(Number(monster.v141Shield.baseHp))
+                                    ?Number(monster.v141Shield.baseHp)
+                                    :(Number(monster.hp)||0)-(Number(monster.v141Shield.remaining)||0)
+                            )
+                            :monster.hp;
+
+                        if(hpAfterDot<=0){
+
+                            monster.hp=0;
 
                             killMonster(
                                 index
@@ -14681,6 +14843,11 @@ function tickStatusEffects(){
                             effect.type==="petrify"
                         ){
 
+                            if(effect.deferFirstTick){
+                                effect.deferFirstTick=false;
+                                return true;
+                            }
+
                             effect.turnsLeft--;
 
 
@@ -14715,6 +14882,11 @@ function tickStatusEffects(){
                             ]
                         ){
 
+                            if(effect.deferFirstTick){
+                                effect.deferFirstTick=false;
+                                return true;
+                            }
+
                             effect.turnsLeft--;
 
 
@@ -14748,43 +14920,20 @@ function tickStatusEffects(){
                             getPartyBattleStats(charIndex);
 
 
-                        let burnDamage=
+                        const burnMultiplier=effect.sourceActor&&
+                            typeof window.v155GetPhoenixMightMultiplier==="function"
+                            ?window.v155GetPhoenixMightMultiplier(effect.sourceActor)
+                            :1;
+                        const burnDamage=
                             Math.max(
                                 1,
                                 Math.floor(
                                     targetStats.maxHP*
                                     effect.percent/
-                                    100
+                                    100*
+                                    burnMultiplier
                                 )
                             );
-
-
-                        if(hasActiveBuff(character,"barrier")){
-                            burnDamage=0;
-                            addBattleLog(
-                                (character.id||"你")+
-                                "的結界抵擋了燃燒傷害。"
-                            );
-                        }
-                        else{
-                            const shieldBuff=(character.activeBuffs||[]).find(
-                                b=>b.type==="shield" && b.turnsLeft>0 && b.remaining>0
-                            );
-
-                            if(shieldBuff){
-                                const absorbed=Math.min(burnDamage,shieldBuff.remaining);
-                                shieldBuff.remaining-=absorbed;
-                                burnDamage-=absorbed;
-
-                                if(absorbed>0){
-                                    addBattleLog(
-                                        "護盾吸收了"+absorbed+
-                                        "點燃燒傷害（剩餘"+shieldBuff.remaining+"點）。"
-                                    );
-                                    showShieldAbsorb(charIndex,absorbed);
-                                }
-                            }
-                        }
 
 
                         if(burnDamage>0){
@@ -15332,19 +15481,16 @@ function castDamageSkill(skillId){
 
             if(skill.freezeChance){
 
-                const freezeHit =
-                    rollStatusEffectHit(
-                        skill.freezeChance,
-                        player.level,
-                        monster.level,
-                        stats.intelligence,
-                        getMonsterEffectiveSpiritPoints(monster),
-                        true,
-                        getMonsterRank(monster)
-                    );
+                const freezeRoll=rollNamedPersistentStatusEffect(
+                    monster,"freeze",[
+                        skill.freezeChance,player.level,monster.level,
+                        stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                        true,getMonsterRank(monster)
+                    ],"monster",index,skill.name
+                );
 
 
-                if(freezeHit){
+                if(freezeRoll.hit){
 
                     applyFreezeEffect(
                         monster,
@@ -15359,7 +15505,7 @@ function castDamageSkill(skillId){
                     );
 
                 }
-                else{
+                else if(!freezeRoll.duplicate){
 
                     showMissEffect(
                         false,
@@ -15476,6 +15622,7 @@ function castDamageSkill(skillId){
 
         damage=applyOutgoingDamageReduction(damage,player);
 
+        const hpBeforeDirectDamage=monster.hp;
 
         monster.hp =
             Math.max(
@@ -15490,6 +15637,8 @@ function castDamageSkill(skillId){
             "hp",
             critResult.isCrit
         );
+
+        const actualDamageDealt=Math.max(0,hpBeforeDirectDamage-monster.hp);
 
 
         addBattleLog(
@@ -15515,27 +15664,15 @@ function castDamageSkill(skillId){
             skill.burnChance
         ){
 
-            const burnHit =
-                rollStatusEffectHit(
-                    skill.burnChance,
-                    player.level,
-                    monster.level,
-                    stats.intelligence,
-                    /*
-                       ★ 修正（使用者指正得對，之前這裡的
-                       註解是錯的）：怪物其實有精神數值，
-                       makeZoneMonster()裡就有算
-                       spiritPoints，只是這裡之前沒有真的
-                       去用它、錯用怪物等級頂替。改成用
-                       monster.spiritPoints，跟公式原本
-                       設計（智力/精神都是「原始點數」
-                       這個尺度）保持一致。
-                    */
-                    getMonsterEffectiveSpiritPoints(monster)
-                );
+            const burnRoll=rollNamedPersistentStatusEffect(
+                monster,"burn",[
+                    skill.burnChance,player.level,monster.level,
+                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
+                ],"monster",index,skill.name,skill.guaranteedBurn===true
+            );
 
 
-            if(burnHit){
+            if(burnRoll.hit){
 
                 const burnPercent =
                     skill.burnPercentByLevel[
@@ -15557,7 +15694,7 @@ function castDamageSkill(skillId){
                 );
 
             }
-            else{
+            else if(!burnRoll.duplicate){
 
                 addBattleLog(
                     "（燃燒效果被"+
@@ -15584,19 +15721,16 @@ function castDamageSkill(skillId){
             skill.freezeChance
         ){
 
-            const freezeHit =
-                rollStatusEffectHit(
-                    skill.freezeChance,
-                    player.level,
-                    monster.level,
-                    stats.intelligence,
-                    getMonsterEffectiveSpiritPoints(monster),
-                        true,
-                        getMonsterRank(monster)
-                );
+            const freezeRoll=rollNamedPersistentStatusEffect(
+                monster,"freeze",[
+                    skill.freezeChance,player.level,monster.level,
+                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    true,getMonsterRank(monster)
+                ],"monster",index,skill.name
+            );
 
 
-            if(freezeHit){
+            if(freezeRoll.hit){
 
                 applyFreezeEffect(
                     monster,
@@ -15611,7 +15745,7 @@ function castDamageSkill(skillId){
                 );
 
             }
-            else{
+            else if(!freezeRoll.duplicate){
 
                 addBattleLog(
                     "（冰封效果被"+
@@ -15653,7 +15787,7 @@ function castDamageSkill(skillId){
         ){
 
             totalLifestealDamage+=
-                damage;
+                actualDamageDealt;
 
         }
 
@@ -15767,30 +15901,15 @@ function castDamageSkill(skillId){
             ];
 
 
-        player.activeBuffs=
-            (player.activeBuffs||[])
-            .filter(
-                b=>b.type!=="shield"
+        if(canApplyNamedPersistentState(player,"shield","player",0,skill.name)){
+            player.activeBuffs=(player.activeBuffs||[]).filter(
+                b=>!b||b.type!=="shield"||Number(b.turnsLeft)>0&&Number(b.remaining)>0
             );
-
-
-        player.activeBuffs.push({
-            type:"shield",
-            turnsLeft:
-                skill.shieldDuration||2,
-            remaining:
-                shieldAmount
-
-        });
-
-
-        addBattleLog(
-            "獲得"+
-            shieldAmount+
-            "點護盾，持續"+
-            (skill.shieldDuration||2)+
-            "回合。"
-        );
+            player.activeBuffs.push(markPersistentStateName({
+                type:"shield",turnsLeft:skill.shieldDuration||2,remaining:shieldAmount
+            },"shield"));
+            addBattleLog("獲得【岩盾】"+shieldAmount+"點，持續"+(skill.shieldDuration||2)+"回合。");
+        }
 
     }
 
@@ -15813,28 +15932,23 @@ function castDamageSkill(skillId){
                 }
 
 
-                character.activeBuffs=
-                    (character.activeBuffs||[])
-                    .filter(
-                        b=>b.type!=="shield"
-                    );
-
-
-                character.activeBuffs.push({
-                    type:"shield",
-                    turnsLeft:
-                        skill.shieldDuration||2,
-                    remaining:
-                        shieldAmount
-
-                });
+                const targetIndex=getPartyCharacterIndex(character);
+                if(!canApplyNamedPersistentState(character,"shield","player",targetIndex,skill.name)){
+                    return;
+                }
+                character.activeBuffs=(character.activeBuffs||[]).filter(
+                    b=>!b||b.type!=="shield"||Number(b.turnsLeft)>0&&Number(b.remaining)>0
+                );
+                character.activeBuffs.push(markPersistentStateName({
+                    type:"shield",turnsLeft:skill.shieldDuration||2,remaining:shieldAmount
+                },"shield"));
 
             }
         );
 
 
         addBattleLog(
-            "我方全體獲得"+
+            "我方有效目標獲得【岩盾】"+
             shieldAmount+
             "點護盾，持續"+
             (skill.shieldDuration||2)+
@@ -15961,12 +16075,16 @@ function castBuffSkill(skillId,targetIndex){
 
         targets.forEach(character=>{
             if(!character || character.hp<=0){ return; }
+            const characterIndex=getPartyCharacterIndex(character);
+            if(!canApplyNamedPersistentState(
+                character,skillId,"player",characterIndex,skill.name
+            )){ return; }
             character.activeBuffs=(character.activeBuffs||[])
-                .filter(b=>b.type!==skillId);
-            character.activeBuffs.push(Object.assign(
+                .filter(b=>!b||b.type!==skillId||Number(b.turnsLeft)>0);
+            character.activeBuffs.push(markPersistentStateName(Object.assign(
                 {type:skillId,turnsLeft:skill.duration},
                 extraFields||{}
-            ));
+            ),skillId));
         });
     }
 
@@ -16302,13 +16420,14 @@ function castReviveSkill(skillId,targetIndex){
 const BUFF_EXPIRE_LABELS={
 
     rage:"怒火",
-    dodgeSkill:"閃躲術",
+    phoenixMight:"鳳威",
+    dodgeSkill:"風行",
     rockWall:"岩石壁壘",
     earthShield:"萬象土盾（反傷）",
     barrier:"結界",
-    stealthSkill:"隱身術",
+    stealthSkill:"隱身",
     dinghaishenzhen:"氣定神閒",
-    shield:"護盾"
+    shield:"岩盾"
 
 };
 
@@ -16327,6 +16446,18 @@ function tickBuffsForCharacter(character){
     character.activeBuffs=
         character.activeBuffs.filter(
             buff=>{
+
+                if(buff.type==="phoenixMight"){
+                    const active=
+                        buff.battleToken===battleToken&&
+                        turn<Number(buff.expiresTurn);
+                    if(active){
+                        buff.turnsLeft=Math.max(1,Number(buff.expiresTurn)-turn);
+                        return true;
+                    }
+                    addBattleLog("⏳鳳威效果已結束。");
+                    return false;
+                }
 
                 buff.turnsLeft--;
 
@@ -17058,6 +17189,11 @@ function processSingleMonsterAttack(monsterIndex,token){
        普通攻擊」是同一種行為。
     */
 
+    const hasVisibleSingleTarget=getExistingPartyIndexes().some(index=>{
+        const character=getPartyCharacterByIndex(index);
+        return character&&character.hp>0&&!hasActiveBuff(character,"stealthSkill");
+    });
+
     const affordableSkillIds=
 
         Array.isArray(monster.skillIds)
@@ -17071,7 +17207,8 @@ function processSingleMonsterAttack(monsterIndex,token){
 
                 return (
                     data &&
-                    monster.sp>=data.spCost
+                    monster.sp>=data.spCost&&
+                    (data.targetType!=="single"||hasVisibleSingleTarget)
                 );
 
             }
@@ -17439,10 +17576,11 @@ function processSingleMonsterAttack(monsterIndex,token){
                最終爆擊率最低保留5%，不改怪物原本爆傷。
             */
 
+            const rageCriticalBonuses=getActiveRageCriticalBonuses(monster);
             const monsterCritChance=
                 Math.max(
                     CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,
-                    10-(targetStats.antiCrit||0)
+                    10+rageCriticalBonuses.chance-(targetStats.antiCrit||0)
                 );
 
             const monsterCrit=
@@ -17453,7 +17591,7 @@ function processSingleMonsterAttack(monsterIndex,token){
 
                 damage=
                     Math.floor(
-                        damage*1.5
+                        damage*(1.5+rageCriticalBonuses.damage/100)
                     );
 
             }
@@ -17561,12 +17699,16 @@ function processSingleMonsterAttack(monsterIndex,token){
             }
 
 
+            const hpBeforeDirectDamage=Math.max(0,Number(targetCharacter.hp)||0);
+
             targetCharacter.hp=
                 Math.max(
                     0,
                     targetCharacter.hp-
                     damage
                 );
+
+            const actualHpDamage=Math.max(0,hpBeforeDirectDamage-targetCharacter.hp);
 
 
             /*
@@ -17585,7 +17727,7 @@ function processSingleMonsterAttack(monsterIndex,token){
 
             if(
                 reflectPercent>0 &&
-                damage>0
+                actualHpDamage>0
             ){
 
                 const reflectDamage=
@@ -17593,7 +17735,7 @@ function processSingleMonsterAttack(monsterIndex,token){
                     Math.max(
                         1,
                         Math.floor(
-                            damage*
+                            actualHpDamage*
                             reflectPercent/
                             100
                         )
@@ -21002,20 +21144,27 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
 
         if(resolvedIndex!==null && skill.freezeChance){
             const monster=monsters[resolvedIndex];
-            const freezeHit=rollStatusEffectHit(
-                skill.freezeChance,
-                character.level,
-                monster.level,
-                stats.intelligence,
-                getMonsterEffectiveSpiritPoints(monster),
-                true,
-                getMonsterRank(monster)
+            const freezeResult=rollNamedPersistentStatusEffect(
+                monster,
+                "freeze",
+                [
+                    skill.freezeChance,
+                    character.level,
+                    monster.level,
+                    stats.intelligence,
+                    getMonsterEffectiveSpiritPoints(monster),
+                    true,
+                    getMonsterRank(monster)
+                ],
+                "monster",
+                resolvedIndex,
+                skill.name
             );
 
-            if(freezeHit){
+            if(freezeResult.hit){
                 applyFreezeEffect(monster,skill.freezeDuration);
                 addBattleLog(monster.name+"被冰封了！");
-            }else{
+            }else if(!freezeResult.duplicate){
                 showMissEffect(false,resolvedIndex,"抵抗");
                 addBattleLog(skill.name+"對"+monster.name+"沒有生效（抵抗）。");
             }
@@ -21083,28 +21232,51 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
 
         damage=Math.floor(damage*critResult.multiplier);
         damage=applyOutgoingDamageReduction(damage,character);
+        const hpBeforeDirectDamage=monster.hp;
         monster.hp=Math.max(0,monster.hp-damage);
 
         showMonsterHit(index,damage,"hp",critResult.isCrit);
+        const actualDamageDealt=Math.max(0,hpBeforeDirectDamage-monster.hp);
         addBattleLog(
             (character.id||"隊友")+"施放"+skill.name+"命中"+monster.name+
             (critResult.isCrit ? "（爆擊！）" : "")+
             "，造成"+damage+"傷害。"
         );
 
-        if(skill.burnChance && rollStatusEffectHit(
-            skill.burnChance,character.level,monster.level,
-            stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
-        )){
+        const burnResult=skill.burnChance
+            ?rollNamedPersistentStatusEffect(
+                monster,
+                "burn",
+                [
+                    skill.burnChance,character.level,monster.level,
+                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
+                ],
+                "monster",
+                index,
+                skill.name,
+                skill.guaranteedBurn===true
+            )
+            :null;
+        if(burnResult&&burnResult.hit){
             applyBurnEffect(monster,skill.burnDuration,skill.burnPercentByLevel[level-1]);
             addBattleLog(monster.name+"陷入燃燒狀態！");
         }
 
-        if(skill.freezeChance && rollStatusEffectHit(
-            skill.freezeChance,character.level,monster.level,
-            stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
-            true,getMonsterRank(monster)
-        )){
+        const freezeResult=skill.freezeChance
+            ?rollNamedPersistentStatusEffect(
+                monster,
+                "freeze",
+                [
+                    skill.freezeChance,character.level,monster.level,
+                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    true,getMonsterRank(monster)
+                ],
+                "monster",
+                index,
+                skill.name
+            )
+            :null;
+        if(freezeResult&&freezeResult.hit){
             applyFreezeEffect(monster,skill.freezeDuration);
             addBattleLog(monster.name+"被冰封了！");
         }
@@ -21113,7 +21285,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
             skill,level,monster,index,character.level,stats.intelligence
         );
 
-        if(skill.lifestealPercentByLevel){ totalLifesteal+=damage; }
+        if(skill.lifestealPercentByLevel){ totalLifesteal+=actualDamageDealt; }
         if(monster.hp<=0){ killMonster(index); }
     });
 
@@ -21127,24 +21299,33 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         addBattleLog((character.id||"隊友")+"吸收傷害並回復HP與SP。");
     }
 
-    if(skill.selfShieldByLevel){
-        character.activeBuffs=(character.activeBuffs||[]).filter(b=>b.type!=="shield");
-        character.activeBuffs.push({
+    if(skill.selfShieldByLevel&&canApplyNamedPersistentState(
+        character,"shield","player",characterIndex,skill.name
+    )){
+        character.activeBuffs=(character.activeBuffs||[]).filter(buff=>
+            !buff||buff.type!=="shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
+        );
+        character.activeBuffs.push(markPersistentStateName({
             type:"shield",
             turnsLeft:skill.shieldDuration||2,
             remaining:skill.selfShieldByLevel[level-1]
-        });
+        },"shield"));
     }
 
     if(skill.allyShieldByLevel){
         const amount=skill.allyShieldByLevel[level-1];
-        getActivePlayerCharacters().forEach(target=>{
-            target.activeBuffs=(target.activeBuffs||[]).filter(b=>b.type!=="shield");
-            target.activeBuffs.push({
+        getActivePlayerCharacters().forEach((target,targetIndex)=>{
+            if(!canApplyNamedPersistentState(
+                target,"shield","player",targetIndex,skill.name
+            )){ return; }
+            target.activeBuffs=(target.activeBuffs||[]).filter(buff=>
+                !buff||buff.type!=="shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
+            );
+            target.activeBuffs.push(markPersistentStateName({
                 type:"shield",
                 turnsLeft:skill.shieldDuration||2,
                 remaining:amount
-            });
+            },"shield"));
         });
     }
 
@@ -21554,19 +21735,26 @@ function castPlayer2Skill(skillId,centerIndex){
 
         if(skill.freezeChance){
 
-            const freezeHit=
-                rollStatusEffectHit(
-                    skill.freezeChance,
-                    player2.level,
-                    monster.level,
-                    stats2.intelligence,
-                    getMonsterEffectiveSpiritPoints(monster),
+            const freezeResult=
+                rollNamedPersistentStatusEffect(
+                    monster,
+                    "freeze",
+                    [
+                        skill.freezeChance,
+                        player2.level,
+                        monster.level,
+                        stats2.intelligence,
+                        getMonsterEffectiveSpiritPoints(monster),
                         true,
                         getMonsterRank(monster)
+                    ],
+                    "monster",
+                    resolvedIndex,
+                    skill.name
                 );
 
 
-            if(freezeHit){
+            if(freezeResult.hit){
 
                 applyFreezeEffect(
                     monster,
@@ -21581,7 +21769,7 @@ function castPlayer2Skill(skillId,centerIndex){
                 );
 
             }
-            else{
+            else if(!freezeResult.duplicate){
 
                 showMissEffect(
                     false,
@@ -21750,6 +21938,7 @@ function castPlayer2Skill(skillId,centerIndex){
 
         damage=applyOutgoingDamageReduction(damage,player2);
 
+        const hpBeforeDirectDamage=monster.hp;
 
         monster.hp=
             Math.max(
@@ -21764,6 +21953,8 @@ function castPlayer2Skill(skillId,centerIndex){
             "hp",
             critResult.isCrit
         );
+
+        const actualDamageDealt=Math.max(0,hpBeforeDirectDamage-monster.hp);
 
 
         addBattleLog(
@@ -21787,17 +21978,25 @@ function castPlayer2Skill(skillId,centerIndex){
 
         if(skill.burnChance){
 
-            const burnHit=
-                rollStatusEffectHit(
-                    skill.burnChance,
-                    player2.level,
-                    monster.level,
-                    stats2.intelligence,
-                    getMonsterEffectiveSpiritPoints(monster)
+            const burnResult=
+                rollNamedPersistentStatusEffect(
+                    monster,
+                    "burn",
+                    [
+                        skill.burnChance,
+                        player2.level,
+                        monster.level,
+                        stats2.intelligence,
+                        getMonsterEffectiveSpiritPoints(monster)
+                    ],
+                    "monster",
+                    index,
+                    skill.name,
+                    skill.guaranteedBurn===true
                 );
 
 
-            if(burnHit){
+            if(burnResult.hit){
 
                 applyBurnEffect(
                     monster,
@@ -21821,19 +22020,26 @@ function castPlayer2Skill(skillId,centerIndex){
 
         if(skill.freezeChance){
 
-            const freezeHit=
-                rollStatusEffectHit(
-                    skill.freezeChance,
-                    player2.level,
-                    monster.level,
-                    stats2.intelligence,
-                    getMonsterEffectiveSpiritPoints(monster),
+            const freezeResult=
+                rollNamedPersistentStatusEffect(
+                    monster,
+                    "freeze",
+                    [
+                        skill.freezeChance,
+                        player2.level,
+                        monster.level,
+                        stats2.intelligence,
+                        getMonsterEffectiveSpiritPoints(monster),
                         true,
                         getMonsterRank(monster)
+                    ],
+                    "monster",
+                    index,
+                    skill.name
                 );
 
 
-            if(freezeHit){
+            if(freezeResult.hit){
 
                 applyFreezeEffect(
                     monster,
@@ -21871,7 +22077,7 @@ function castPlayer2Skill(skillId,centerIndex){
         if(skill.lifestealPercentByLevel){
 
             totalLifesteal+=
-                damage;
+                actualDamageDealt;
 
         }
 
@@ -21944,7 +22150,9 @@ function castPlayer2Skill(skillId,centerIndex){
        邏輯）：
     */
 
-    if(skill.selfShieldByLevel){
+    if(skill.selfShieldByLevel&&canApplyNamedPersistentState(
+        player2,"shield","player",1,skill.name
+    )){
 
         const shieldAmount=
             skill.selfShieldByLevel[
@@ -21952,21 +22160,19 @@ function castPlayer2Skill(skillId,centerIndex){
             ];
 
 
-        player2.activeBuffs=
-            (player2.activeBuffs||[])
-            .filter(
-                b=>b.type!=="shield"
-            );
+        player2.activeBuffs=(player2.activeBuffs||[]).filter(buff=>
+            !buff||buff.type!=="shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
+        );
 
 
-        player2.activeBuffs.push({
+        player2.activeBuffs.push(markPersistentStateName({
             type:"shield",
             turnsLeft:
                 skill.shieldDuration||2,
             remaining:
                 shieldAmount
 
-        });
+        },"shield"));
 
 
         addBattleLog(
@@ -21991,7 +22197,7 @@ function castPlayer2Skill(skillId,centerIndex){
 
 
         getCharacters().forEach(
-            character=>{
+            (character,targetIndex)=>{
 
                 if(
                     character.hp<=0
@@ -21999,22 +22205,23 @@ function castPlayer2Skill(skillId,centerIndex){
                     return;
                 }
 
+                if(!canApplyNamedPersistentState(
+                    character,"shield","player",targetIndex,skill.name
+                )){ return; }
 
-                character.activeBuffs=
-                    (character.activeBuffs||[])
-                    .filter(
-                        b=>b.type!=="shield"
-                    );
+                character.activeBuffs=(character.activeBuffs||[]).filter(buff=>
+                    !buff||buff.type!=="shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
+                );
 
 
-                character.activeBuffs.push({
+                character.activeBuffs.push(markPersistentStateName({
                     type:"shield",
                     turnsLeft:
                         skill.shieldDuration||2,
                     remaining:
                         shieldAmount
 
-                });
+                },"shield"));
 
             }
         );
@@ -22518,7 +22725,7 @@ function updateMonsterUI(index){
             (
                 hasAgilityDown
                 ?
-                '<span class="monster-status-badge"title="敏捷降低中"></span>'
+                '<span class="monster-status-badge"title="重力中"></span>'
                 :
                 ""
             )+
@@ -22532,14 +22739,14 @@ function updateMonsterUI(index){
             (
                 hasDefenseDown
                 ?
-                '<span class="monster-status-badge"title="防禦降低中"></span>'
+                '<span class="monster-status-badge"title="破防中"></span>'
                 :
                 ""
             )+
             (
                 hasDamageDown
                 ?
-                '<span class="monster-status-badge"title="傷害降低中"></span>'
+                '<span class="monster-status-badge"title="殤風中"></span>'
                 :
                 ""
             )+

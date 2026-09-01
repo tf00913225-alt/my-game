@@ -63,8 +63,8 @@ function run(context){
 }
 
 test("V144 assets remain ordered before later patches under the current cache version",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.19/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.19"/);
     assert.match(loader,/css\/41-v144-rules-and-abyss\.css/);
     const order=[
         "js/38-v143-system-fixes.js","js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -190,7 +190,7 @@ test("the five revised player skills expose the exact costs, targets and effects
     assert.equal(context.getMainCharacterStats().accuracy,150,"氣定神閒 must affect real accuracy");
     assert.equal(context.getSkillEffectPreviewText(db.healSpell,5),"我方全體回復 470 HP、155 SP");
     assert.match(context.buildSkillLevelBreakdownHTML(db.healSpell),/Lv\.5[\s\S]*470 HP、155 SP/);
-    assert.match(context.getSkillEffectPreviewText(db.dinghaishenzhen,1),/抗性 \+45%、命中 \+50%/);
+    assert.match(context.getSkillEffectPreviewText(db.dinghaishenzhen,1),/抗性 \+65%、命中 \+50%/);
 });
 
 test("Heal Spell restores its exact level-scaled HP and SP to every living ally",()=>{
