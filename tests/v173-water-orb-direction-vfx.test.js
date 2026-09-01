@@ -37,9 +37,9 @@ test("the CSS visits frames left-to-right, top-to-bottom once without a per-targ
     assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v173WaterOrbTargetTravel/);
 });
 
-test("the published build label is V173.11",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.11"/);
-    assert.match(index,/aria-label="目前版本 V173\.11"[\s\S]*?>V173\.11<\/div>/);
+test("the published build label is V173.12",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.12"/);
+    assert.match(index,/aria-label="目前版本 V173\.12"[\s\S]*?>V173\.12<\/div>/);
 });
 
 console.log("\nV173 Water Ball target-group VFX suite: "+passed+" tests passed.");

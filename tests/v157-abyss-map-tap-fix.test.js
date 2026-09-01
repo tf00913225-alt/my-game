@@ -17,14 +17,26 @@ function test(name,handler){
 }
 
 test("the current cache key delivers the Abyss tap correction",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.11"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.11/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.12"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.12/);
 });
 
 test("Abyss map portraits use the reduced mobile size and keep a full button hit area",()=>{
     assert.match(css,/\.v141-abyss-boss\{[\s\S]*width:120px !important;[\s\S]*height:168px !important;/);
     assert.match(css,/\.v141-abyss-boss\{[\s\S]*touch-action:manipulation !important;/);
-    assert.match(abyss,/<button class="v141-abyss-boss"[\s\S]*onclick="event\.stopPropagation\(\);v141ChallengeAbyssBoss\(\)"/);
+    assert.match(abyss,/<button type="button" class="v141-abyss-boss"[\s\S]*data-abyss-boss-control="true"[\s\S]*onclick="v141HandleAbyssBossInteraction\(event\)"/);
+});
+
+test("capture-phase BOSS bridge wins over every portrait or player layer",()=>{
+    assert.match(
+        abyss,
+        /function installAbyssBossInputBridge\(\)[\s\S]*?map\.addEventListener\("pointerup",[\s\S]*?isAbyssMapControlHit\(event,boss\)[\s\S]*?v141HandleAbyssBossInteraction\(event\)/
+    );
+    assert.match(
+        abyss,
+        /window\.v141HandleAbyssBossInteraction=function\(event\)[\s\S]*?event\.preventDefault[\s\S]*?event\.stopPropagation[\s\S]*?window\.v141ChallengeAbyssBoss\(\)/
+    );
+    assert.match(css,/\.v141-abyss-boss\{[\s\S]*?pointer-events:auto !important;[\s\S]*?z-index:20 !important;/);
 });
 
 test("map-level portrait bounds route a mobile pseudo-element tap to dialogue",()=>{

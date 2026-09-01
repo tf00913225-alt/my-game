@@ -693,7 +693,7 @@
         const floor=abyssState.floor;
         const info=floor<5?abyssFloors[floor]:{boss:"五帝聯軍",element:"light"};
         const pos=bossPosition(floor);
-        const boss=abyssState.phase==="boss"?'<button class="v141-abyss-boss" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v141ChallengeAbyssBoss()"><b>'+escapeHtml(info.boss)+'</b><span>'+elementLabel[info.element]+'元素・點擊挑戰</span></button>':'';
+        const boss=abyssState.phase==="boss"?'<button type="button" class="v141-abyss-boss" data-abyss-boss-control="true" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="v141HandleAbyssBossInteraction(event)"><b>'+escapeHtml(info.boss)+'</b><span>'+elementLabel[info.element]+'元素・點擊挑戰</span></button>':'';
         const hasFloorReward=floor<5&&(abyssState.phase==="chest"||abyssState.phase==="portal");
         const portal=hasFloorReward?'<button class="v141-abyss-portal'+(abyssState.phase==="chest"?' locked':'')+'" style="left:50%;top:10%" aria-disabled="'+(abyssState.phase==="chest"?'true':'false')+'" onclick="event.stopPropagation();v141UseAbyssPortal()"><i></i><span>'+(abyssState.phase==="chest"?'先開啟寶箱':'前往下一層')+'</span></button>':'';
         const showChest=abyssState.phase==="chest"||abyssState.phase==="portal";
@@ -714,6 +714,7 @@
             target.style.backgroundPosition="center";
             target.style.backgroundRepeat="no-repeat";
         }
+        installAbyssBossInputBridge();
     }
 
     function refreshAbyssPage(){
@@ -796,6 +797,32 @@
         return x>=rect.left&&x<=rect.right&&y>=rect.top&&y<=rect.bottom;
     }
 
+    /*
+       All BOSS input enters here.  It is used both by the visible button and
+       by a capture-phase pointer bridge on the map, so a portrait/pseudo-layer
+       cannot turn a BOSS tap into a ground-movement request.
+    */
+    window.v141HandleAbyssBossInteraction=function(event){
+        if(event){
+            if(event.preventDefault){ event.preventDefault(); }
+            if(event.stopPropagation){ event.stopPropagation(); }
+        }
+        if(abyssState.phase!=="boss"){ return false; }
+        window.v141ChallengeAbyssBoss();
+        return true;
+    };
+
+    function installAbyssBossInputBridge(){
+        const map=document.getElementById("v141AbyssMap");
+        if(!map||map.dataset.v173BossInputBridge==="1"){ return; }
+        map.dataset.v173BossInputBridge="1";
+        map.addEventListener("pointerup",event=>{
+            const boss=abyssState.phase==="boss"?map.querySelector(".v141-abyss-boss"):null;
+            if(!isAbyssMapControlHit(event,boss)){ return; }
+            window.v141HandleAbyssBossInteraction(event);
+        },true);
+    }
+
     window.v141AbyssMoveByEvent=function(event){
         const map=document.getElementById("v141AbyssMap");
         if(!map||map.dataset.v169DialogueApproaching==="1"){ return; }
@@ -808,7 +835,7 @@
         if(isAbyssMapControlHit(event,boss)){
             if(event.preventDefault){ event.preventDefault(); }
             if(event.stopPropagation){ event.stopPropagation(); }
-            window.v141ChallengeAbyssBoss();
+            window.v141HandleAbyssBossInteraction(event);
             return;
         }
         if(event.target&&typeof event.target.closest==="function"&&event.target.closest("button")){ return; }

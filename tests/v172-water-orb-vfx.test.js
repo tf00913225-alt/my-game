@@ -57,9 +57,9 @@ test("Water Ball lasts 1.4 seconds and retains exact one-frame-at-a-time 4x3 CSS
 });
 
 test("the current cache version publishes the grouped Water Ball choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.11"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.11/);
-    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.11"[\s\S]*?>V173\.11<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.12"/);
+    assert.match(index,/js\/00-main\.js\?v=173\.12/);
+    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.12"[\s\S]*?>V173\.12<\/div>/);
 });
 
 console.log("\nV172 Water Ball VFX suite: "+passed+" tests passed.");

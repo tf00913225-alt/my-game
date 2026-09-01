@@ -150,6 +150,8 @@ body.v162-element-box-settings-open > #autoBattleSettingsPanel{
     background:linear-gradient(180deg,rgba(13,9,6,.2),rgba(13,9,6,.9)) !important;
     box-shadow:0 0 20px rgba(226,149,39,.48),0 7px 18px rgba(0,0,0,.62) !important;
     touch-action:manipulation !important;
+    pointer-events:auto !important;
+    z-index:20 !important;
 }
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-boss::before{
     content:"" !important;
