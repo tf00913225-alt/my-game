@@ -16,8 +16,8 @@ assert.match(v142,/showMonsterSkillNameBadge=function/);
 assert.doesNotMatch(v142,/v142PlaySkillAnimationFromBadge/);
 assert.doesNotMatch(main,/v142PlaySkillAnimationFromBadge/);
 assert.doesNotMatch(abyss,/v141ChallengeAbyssBoss=function/);
-assert.match(animation,/water-orb-vfx\.png\?v=173\.15/);
-assert.match(loader,/const V_ASSET_VERSION="173\.15"/);
-assert.match(index,/<title>四象江湖傳 V173\.15<\/title>/);
+assert.match(animation,/water-orb-vfx\.png\?v=173\.16/);
+assert.match(loader,/const V_ASSET_VERSION="173\.16"/);
+assert.match(index,/<title>四象江湖傳 V173\.16<\/title>/);
 
-console.log("V173.15 P0 known-good animation-chain recovery: 10 tests passed.");
+console.log("V173.16 P0 known-good animation-chain recovery: 10 tests passed.");

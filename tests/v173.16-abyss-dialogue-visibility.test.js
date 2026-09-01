@@ -45,7 +45,7 @@ function dialogueHarness(){
         removeChild(child){ this.children=this.children.filter(item=>item!==child); child.parentNode=null; }
     };
     const overlay={
-        className:"",style:{},offsetWidth:330,offsetHeight:104,parentNode:null,disabled:false,
+        className:"",style:{setProperty(name,value){ this[name]=String(value); }},offsetWidth:330,offsetHeight:104,parentNode:null,disabled:false,
         setAttribute(name,value){ this[name]=String(value); },
         querySelector(selector){ return selector==="b"?text:selector==="span"?hint:null; },
         remove(){ if(this.parentNode){ this.parentNode.removeChild(this); } }
@@ -81,11 +81,16 @@ test("Abyss dialogue and battle launch have one direct runtime owner",()=>{
     assert.equal(owners,1);
     assert.match(abyss,/window\.v141ChallengeAbyssBoss=function\(\)\{\s*return openAbyssBossDialogue\(\);\s*\}/);
     assert.match(abyss,/map\.appendChild\(overlay\);\s*positionAbyssBossDialogue\(map,overlay,bossButton\);/);
+    const css=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
+    assert.match(css,/left:var\(--v141-abyss-dialogue-left,50%\) !important;/);
+    assert.match(css,/top:var\(--v141-abyss-dialogue-top,112px\) !important;/);
 });
 
 test("scaled-stage coordinates keep the entire dialogue inside the map",()=>{
     const harness=dialogueHarness();
     assert.equal(harness.context.runPosition(harness.map,harness.overlay,harness.boss),true);
+    assert.equal(harness.overlay.style["--v141-abyss-dialogue-left"],harness.overlay.style.left);
+    assert.equal(harness.overlay.style["--v141-abyss-dialogue-top"],harness.overlay.style.top);
     const logicalLeft=parseFloat(harness.overlay.style.left);
     const logicalTop=parseFloat(harness.overlay.style.top);
     const scaleX=harness.map.offsetWidth/harness.mapRect.width;
@@ -117,10 +122,10 @@ test("one guardian tap shows dialogue and three dialogue taps launch battle",()=
     assert.equal(harness.map.children.length,0);
 });
 
-test("the published cache release is V173.15",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.15"/);
-    assert.match(index,/<title>四象江湖傳 V173\.15<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.15"[\s\S]*?>V173\.15<\/div>/);
+test("the published cache release is V173.16",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.16"/);
+    assert.match(index,/<title>四象江湖傳 V173\.16<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.16"[\s\S]*?>V173\.16<\/div>/);
 });
 
-console.log("\n"+passed+" V173.15 Abyss dialogue visibility tests passed.");
+console.log("\n"+passed+" V173.16 Abyss dialogue visibility tests passed.");

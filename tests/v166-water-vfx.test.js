@@ -354,7 +354,7 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
         const model=manifest[id];
         assert.ok(model&&model.sprite,id+" sprite metadata");
         assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+filename,id);
-        const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.15":"?v=166";
+        const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.16":"?v=166";
         assert.ok(model.sprite.src.endsWith(cacheVersion),id+" cache version");
         if(["waterBall","iceArrowRain"].includes(id)){
             assert.equal(model.sprite.renderer,"canvas-crop",id+" Canvas renderer");
@@ -684,8 +684,8 @@ test("final combat targeting and Frostbite rules remain unchanged",()=>{
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.15"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.15/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.16"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.16/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });

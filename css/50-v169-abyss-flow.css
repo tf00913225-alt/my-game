@@ -89,6 +89,8 @@
 #game-stage .v141-abyss-map > .v143-abyss-dialogue{
     position:absolute !important;
     inset:auto !important;
+    left:var(--v141-abyss-dialogue-left,50%) !important;
+    top:var(--v141-abyss-dialogue-top,112px) !important;
     z-index:80 !important;
     display:flex !important;
     width:min(84%,330px) !important;

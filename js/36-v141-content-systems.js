@@ -920,8 +920,17 @@
             }
         }
 
-        overlay.style.left=Math.max(minLeft,Math.min(maxLeft,desiredLeft))+"px";
-        overlay.style.top=Math.max(minTop,Math.min(maxTop,desiredTop))+"px";
+        const left=Math.max(minLeft,Math.min(maxLeft,desiredLeft))+"px";
+        const top=Math.max(minTop,Math.min(maxTop,desiredTop))+"px";
+        overlay.style.left=left;
+        overlay.style.top=top;
+        if(typeof overlay.style.setProperty==="function"){
+            /* Final Abyss CSS must override the legacy full-map inset:0 rule.
+               Custom properties carry these measured coordinates through that
+               important rule without introducing another runtime wrapper. */
+            overlay.style.setProperty("--v141-abyss-dialogue-left",left);
+            overlay.style.setProperty("--v141-abyss-dialogue-top",top);
+        }
         return true;
     }
 
