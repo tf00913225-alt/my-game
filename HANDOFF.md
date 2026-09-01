@@ -680,7 +680,7 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
   runtimes）、空白與衝突標記檢查皆正常。此環境沒有 Chromium，因此 Playwright browser
   smoke 未執行；素材本身與整合後聯絡表已人工檢視，仍建議在真實 Android 直式畫面複驗。
   原遠端 `dev` 程式 commit 為 `011dd6a89005afc54d78eb954ac3df97bfcd11ae`。後續連同 V173.20
-  透過 PR #31 合併為 `main` commit `2f8dbc2a389464aecc3b9375f422fc9cc3fbc93a`；main CI #67 與
+  透過 PR #31 合併為 `main` commit `2f8dbc2a389464aecc3b9375f422fc9cc3fbc93a`；main CI #68 與
   Pages build/deploy #63 均成功。
 
 ### 2026-09-01 — V173.20：雙圖開場載入動畫（dev）
