@@ -883,16 +883,59 @@
         return true;
     }
 
+    function positionAbyssBossDialogue(map,overlay,bossButton){
+        if(
+            !map||!overlay||typeof map.getBoundingClientRect!=="function"||
+            !overlay.style
+        ){ return false; }
+        const mapRect=map.getBoundingClientRect();
+        const renderedWidth=Number(mapRect&&mapRect.width);
+        const renderedHeight=Number(mapRect&&mapRect.height);
+        if(!(renderedWidth>0)||!(renderedHeight>0)){ return false; }
+
+        /* The map is rendered inside the scaled 1080x1920 stage. Convert the
+           guardian's viewport rectangle back into map-local logical pixels. */
+        const logicalWidth=Number(map.offsetWidth)>0?Number(map.offsetWidth):renderedWidth;
+        const logicalHeight=Number(map.offsetHeight)>0?Number(map.offsetHeight):renderedHeight;
+        const scaleX=logicalWidth/renderedWidth;
+        const scaleY=logicalHeight/renderedHeight;
+        const dialogueWidth=Math.max(0,Math.min(logicalWidth,Number(overlay.offsetWidth)||0));
+        const dialogueHeight=Math.max(0,Math.min(logicalHeight,Number(overlay.offsetHeight)||0));
+        const inset=12;
+        const minLeft=Math.min(logicalWidth/2,dialogueWidth/2+inset);
+        const maxLeft=Math.max(minLeft,logicalWidth-dialogueWidth/2-inset);
+        const minTop=Math.min(logicalHeight,dialogueHeight+inset);
+        const maxTop=Math.max(minTop,logicalHeight-inset);
+        let desiredLeft=logicalWidth/2;
+        let desiredTop=minTop;
+
+        if(bossButton&&typeof bossButton.getBoundingClientRect==="function"){
+            const bossRect=bossButton.getBoundingClientRect();
+            const bossWidth=Number(bossRect&&bossRect.width);
+            const bossLeft=Number(bossRect&&bossRect.left);
+            const bossTop=Number(bossRect&&bossRect.top);
+            if(Number.isFinite(bossLeft)&&Number.isFinite(bossTop)&&Number.isFinite(bossWidth)){
+                desiredLeft=(bossLeft+bossWidth/2-mapRect.left)*scaleX;
+                desiredTop=(bossTop-mapRect.top-8)*scaleY;
+            }
+        }
+
+        overlay.style.left=Math.max(minLeft,Math.min(maxLeft,desiredLeft))+"px";
+        overlay.style.top=Math.max(minTop,Math.min(maxTop,desiredTop))+"px";
+        return true;
+    }
+
     function openAbyssBossDialogue(){
         if(abyssBattleStarting||abyssState.phase!=="boss"){ return false; }
         const map=document.getElementById("v141AbyssMap");
-        if(
-            !map||map.querySelector(".v143-abyss-dialogue")||
-            map.dataset.v141AbyssDialogueOpening==="1"
-        ){ return false; }
+        if(!map||map.dataset.v141AbyssDialogueOpening==="1"){ return false; }
+        const bossButton=map.querySelector(".v141-abyss-boss");
+        const existingDialogue=map.querySelector(".v143-abyss-dialogue");
+        if(existingDialogue){
+            return positionAbyssBossDialogue(map,existingDialogue,bossButton);
+        }
         map.dataset.v141AbyssDialogueOpening="1";
         const floor=Math.max(1,Math.min(5,Number(abyssState.floor)||1));
-        const bossButton=map.querySelector(".v141-abyss-boss");
         const boss=bossButton&&bossButton.querySelector("b");
         const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();
         let index=0;
@@ -921,6 +964,7 @@
             },180);
         };
         map.appendChild(overlay);
+        positionAbyssBossDialogue(map,overlay,bossButton);
         delete map.dataset.v141AbyssDialogueOpening;
         return true;
     }
