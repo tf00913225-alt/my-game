@@ -19,7 +19,7 @@ test("Water Ball uses the supplied 1536×1152 inbox sheet with an explicit fixed
     assert.deepEqual([asset.readUInt32BE(16),asset.readUInt32BE(20)],[1536,1152]);
     assert.match(
         animation,
-        /waterBall:\{[\s\S]*?water-orb-vfx\.png\?v=173\.16[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,[\s\S]*?placement:"group",renderer:"canvas-crop"/
+        /waterBall:\{[\s\S]*?water-orb-vfx\.png\?v=173\.17[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,[\s\S]*?placement:"group",renderer:"canvas-crop"/
     );
 });
 
@@ -47,9 +47,9 @@ test("Water Ball lasts 1.4 seconds and renders exactly one Canvas crop per frame
 });
 
 test("the current cache version publishes the grouped Water Ball choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.16"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.16/);
-    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.16"[\s\S]*?>V173\.16<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.17"/);
+    assert.match(index,/js\/00-main\.js\?v=173\.17/);
+    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.17"[\s\S]*?>V173\.17<\/div>/);
 });
 
 console.log("\nV172 Water Ball VFX suite: "+passed+" tests passed.");

@@ -129,6 +129,7 @@
 /* Item illustrations share one safe square and rarity is identified by border glow. */
 .v169-item-art{
     position:relative;
+    isolation:isolate;
     display:block;
     width:100%;
     height:100%;
@@ -141,12 +142,28 @@
     background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.08),rgba(3,5,10,.92));
     box-sizing:border-box;
 }
-.v169-item-art > img{display:block;width:100%;height:100%;object-fit:contain;object-position:center;}
+.v169-item-art::before{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    display:grid;
+    place-items:center;
+    color:#d8bd84;
+    font-size:clamp(18px,42%,32px);
+    font-weight:900;
+    line-height:1;
+    text-shadow:0 0 8px rgba(226,176,80,.58);
+}
+.v169-ticket-art::before{content:"券";}
+.v169-talisman-art::before{content:"符";}
+.v169-blueprint-art::before{content:"圖";}
+.v169-item-art > img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center;}
+.v169-item-art > img[hidden]{display:none !important;}
 .v169-talisman-art.v169-rarity-low,.v169-blueprint-art.v169-rarity-low{border-color:#3ba7ff;box-shadow:0 0 5px #3ba7ff,0 0 12px rgba(59,167,255,.72),inset 0 0 7px rgba(59,167,255,.38);}
 .v169-talisman-art.v169-rarity-mid,.v169-blueprint-art.v169-rarity-mid{border-color:#a855f7;box-shadow:0 0 5px #a855f7,0 0 13px rgba(168,85,247,.76),inset 0 0 7px rgba(168,85,247,.4);}
 .v169-talisman-art.v169-rarity-high,.v169-blueprint-art.v169-rarity-high{border-color:#ff9f38;box-shadow:0 0 6px #ff9f38,0 0 14px rgba(255,159,56,.8),inset 0 0 8px rgba(255,159,56,.42);}
 .v169-talisman-art.v169-rarity-perfect,.v169-blueprint-art.v169-rarity-perfect{border-color:#ff4fa7;box-shadow:0 0 7px #ff4fa7,0 0 16px rgba(255,79,167,.88),inset 0 0 9px rgba(255,79,167,.48);}
-.v132-ticket-icon .v169-item-art{width:58px;height:58px;}
+.v132-ticket-icon .v169-item-art{width:100%;height:100%;}
 .v141-result-item > .v169-item-art{width:74px;height:74px;}
 .v141-reward-toast .v141-reward-item{display:inline-flex;align-items:center;gap:5px;}
 .v141-reward-toast .v141-reward-item-icon{display:inline-flex;width:30px;height:30px;flex:0 0 30px;}
