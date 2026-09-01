@@ -1604,7 +1604,8 @@
         };
     }
 
-    /* Base badges used 72px / 2.2s. V143 keeps them as brief caster labels. */
+    /* Base badge lifetime now comes from V142's per-skill animation duration.
+       This wrapper only applies the compact caster-label presentation. */
     function wrapBadge(name){
         const previous=window[name];
         if(typeof previous!=="function"){ return; }
@@ -1630,7 +1631,6 @@
                     badge.style.setProperty("color","#fff","important");
                     badge.style.setProperty("text-shadow","0 1px 2px #000,0 0 5px #000","important");
                 }
-                setTimer(()=>{ if(badge.parentNode){ badge.remove(); } },650);
             });
             return result;
         };

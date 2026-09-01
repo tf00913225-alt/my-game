@@ -273,9 +273,11 @@
             popup.className="v146-status-popup status-"+type;
             popup.textContent=label;
             popup.style.left=(rect.left+rect.width/2)+"px";
-            popup.style.top=(rect.top+rect.height*.32)+"px";
+            /* HP damage owns the upper quarter of the card.  Status text uses
+               the lower third so both remain independently readable. */
+            popup.style.top=(rect.top+rect.height*.68)+"px";
             document.body.appendChild(popup);
-            setTimeout(()=>popup.remove(),1250);
+            setTimeout(()=>popup.remove(),1300);
         },statusHitDelay(location));
     }
 

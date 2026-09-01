@@ -74,4 +74,4 @@ test("Frostbite expires once from its final monster and player status owner",()=
     assert.deepEqual(player.statusEffects,[]);
 });
 
-console.log("\nV173.24 bug-fix suite: "+passed+" tests passed.");
+console.log("\nV173.25 bug-fix suite: "+passed+" tests passed.");

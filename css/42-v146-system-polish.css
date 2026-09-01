@@ -105,7 +105,7 @@
     white-space:nowrap;
     transform:translate(-50%,-50%);
     pointer-events:none;
-    animation:v146StatusPopup 1.18s ease-out both;
+    animation:v146StatusPopup 1.25s ease-out both;
 }
 .v146-status-popup.status-burn{color:#ff8b54;}
 .v146-status-popup.status-freeze{color:#9fe8ff;}
@@ -114,9 +114,9 @@
 .v146-status-popup.status-defenseDown{color:#ffd17b;}
 .v146-status-popup.status-stun{color:#e9e6ff;}
 @keyframes v146StatusPopup{
-    0%{opacity:0;transform:translate(-50%,-25%) scale(.72)}
-    18%,64%{opacity:1;transform:translate(-50%,-70%) scale(1)}
-    100%{opacity:0;transform:translate(-50%,-135%) scale(.94)}
+    0%{opacity:0;transform:translate(-50%,-20%) scale(.82)}
+    10%,90%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-88%) scale(.96)}
 }
 
 /* Defeated cards can never advertise themselves as legal VFX targets. */

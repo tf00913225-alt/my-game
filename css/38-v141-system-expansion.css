@@ -178,6 +178,18 @@
     overflow:hidden;
 }
 
+/* Equipment artwork used to inherit width/height:100% from .v169-item-art
+   while its parent had no definite height.  The intrinsic square then grew
+   until the modal's 240px clipping boundary cut the image and pushed copy
+   out of view.  Give equipment one responsive, definite square instead. */
+#itemModal .item-modal-icon > .v169-equipment-art{
+    width:min(46vw,190px);
+    height:min(46vw,190px);
+    max-width:190px;
+    max-height:190px;
+    flex:0 1 auto;
+}
+
 #itemModal .item-modal-icon > .v169-talisman-art{
     width:150px;
     height:225px;
@@ -218,12 +230,8 @@
 #itemModal .item-stat-list{
     flex:0 1 auto;
     min-height:0;
-    max-height:190px !important;
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
-    overscroll-behavior-y:contain;
-    -webkit-overflow-scrolling:touch;
-    touch-action:pan-y;
+    max-height:none !important;
+    overflow:visible !important;
 }
 
 .item-modal .item-modal-buttons{

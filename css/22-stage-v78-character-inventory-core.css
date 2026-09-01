@@ -39,7 +39,9 @@
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
     box-sizing:border-box !important;
-    padding-bottom:160px !important;
+    /* No synthetic spacer: statusPage is shorter than the shared viewport,
+       so the former 160px padding rendered as a black block below the card. */
+    padding-bottom:0 !important;
 }
 #game-stage #homeFeatureModal #characterTabContent > #statusPage,
 #game-stage #homeFeatureModal #characterTabContent > #skillPage,

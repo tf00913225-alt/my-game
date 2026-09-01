@@ -156,7 +156,7 @@
     text-align:center !important;
     text-overflow:ellipsis !important;
     transform:translate(-50%,-118%) !important;
-    animation:v143CasterLabel .62s ease-out both !important;
+    animation:v143CasterLabel var(--skill-name-display-duration,347ms) ease-out both !important;
 }
 
 @keyframes v143CasterLabel{

@@ -60,18 +60,29 @@
 .inventory-character-detail-modal{
     z-index:9000 !important;
 }
-.inventory-character-detail-box{
+#inventoryCharacterDetailModal .inventory-character-detail-box{
     width:min(88vw,520px) !important;
     max-width:520px !important;
-    max-height:82dvh !important;
-    overflow-y:auto !important;
+    max-height:calc(100% - 20px) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
 }
-.inventory-character-detail-grid{
+#inventoryCharacterDetailModal .inventory-character-detail-grid{
     display:grid !important;
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
     gap:8px !important;
     width:100% !important;
-    margin:12px 0 16px !important;
+    min-height:0 !important;
+    flex:1 1 auto !important;
+    margin:12px 0 10px !important;
+    padding:0 2px 4px 0 !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+    touch-action:pan-y !important;
 }
 .inventory-character-detail-row{
     display:flex !important;
@@ -98,4 +109,9 @@
 
 .inventory-character-detail-row b{
     color:#ffe27a !important;
+}
+
+#inventoryCharacterDetailModal .close-item-button{
+    flex:0 0 auto !important;
+    margin-top:0 !important;
 }

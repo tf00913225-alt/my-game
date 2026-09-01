@@ -16,8 +16,8 @@ let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
 test("V143 assets stay ordered before later patches under the current cache version",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.24/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.24"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.25/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.25"/);
     assert.match(loader,/css\/40-v143-combat-dungeon-polish\.css/);
     const order=[
         "js/37-v142-skill-animation.js",
@@ -67,7 +67,8 @@ test("every known battle skill has its own animation choreography",()=>{
 test("skill names are brief caster labels and hit numbers wait for the target frame",()=>{
     assert.match(css,/#v142-skill-stage\{display:none !important;\}/);
     assert.match(animation,/font-size","15px","important/);
-    assert.match(animation,/setTimer\(\(\)=>\{ if\(badge\.parentNode\)\{ badge\.remove\(\); \} \},650\)/);
+    assert.match(css,/animation:v143CasterLabel var\(--skill-name-display-duration,347ms\)/);
+    assert.doesNotMatch(animation,/badge\.remove\(\); \} \},650/);
     assert.match(animation,/state\.metrics\.delayedNumbers\+\+/);
     assert.match(animation,/targetHitTime\(current,index\)-Date\.now\(\)/);
     assert.match(animation,/gate\.complete\(reason\|\|"v143-animation-complete"\)/);

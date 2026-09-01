@@ -56,56 +56,6 @@
         };
     }
 
-    /*
-       ★ 次要的節奏違和：技能名稱徽章原本存活 2200ms，比每一步的
-       1500ms 還長，所以上一位的技能名稱還飄在畫面上、下一位就已經
-       出手了，看起來會「疊在一起、怪怪的」。這裡把徽章壽命收到
-       1200ms，確保它一定在下一位出手前就消失。
-       只改移除時間，不改任何動畫本身或戰鬥邏輯。
-    */
-    /* ★ 這個數字必須小於 js/25 的有效出手間隔（V138目前1600ms），
-       否則上一位的技能名稱會跨到下一位出手，看起來會疊在一起。
-       1000ms 仍保留足夠閱讀時間，也會在下一位出手前消失。 */
-    const V134_SKILL_BADGE_MS=1000;
-
-    function trimSkillBadgeLifetime(badge){
-        if(!badge){ return; }
-        setTimeout(()=>{
-            if(badge && badge.parentNode){
-                badge.parentNode.removeChild(badge);
-            }
-        },V134_SKILL_BADGE_MS);
-    }
-
-    if(typeof showSkillNameBadge==="function"){
-        const originalShowSkillNameBadge=showSkillNameBadge;
-        showSkillNameBadge=function(skillName,elementType,characterIndex){
-            const result=originalShowSkillNameBadge.apply(this,arguments);
-            const layer=
-                document.getElementById("game-overlay-layer") ||
-                document.getElementById("game-stage");
-            if(layer){
-                trimSkillBadgeLifetime(layer.querySelector(".skill-name-badge:last-child"));
-            }
-            return result;
-        };
-    }
-
-    if(typeof showMonsterSkillNameBadge==="function"){
-        const originalShowMonsterSkillNameBadge=showMonsterSkillNameBadge;
-        showMonsterSkillNameBadge=function(skillName,elementType,monsterIndex){
-            const result=originalShowMonsterSkillNameBadge.apply(this,arguments);
-            const layer=
-                document.getElementById("game-overlay-layer") ||
-                document.getElementById("game-stage");
-            if(layer){
-                trimSkillBadgeLifetime(layer.querySelector(".skill-name-badge:last-child"));
-            }
-            return result;
-        };
-    }
-
-
     /* =====================================================
        2. 自動戰鬥：退回普攻時要說明原因
        ===================================================== */

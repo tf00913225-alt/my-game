@@ -23786,6 +23786,29 @@ function spawnFireSparkBurst(
 }
 
 
+function getSkillNameBadgeDuration(skillName,elementType){
+
+    if(
+        typeof window!=="undefined" &&
+        typeof window.v142GetSkillNameDisplayDuration==="function"
+    ){
+        const duration=
+            Number(
+                window.v142GetSkillNameDisplayDuration(
+                    skillName,
+                    elementType
+                )
+            );
+
+        if(Number.isFinite(duration) && duration>0){
+            return Math.round(duration);
+        }
+    }
+
+    return Math.round(520*2/3);
+}
+
+
 function showSkillNameBadge(skillName,elementType,characterIndex){
 
     const element =
@@ -23841,6 +23864,17 @@ function showSkillNameBadge(skillName,elementType,characterIndex){
     badge.textContent =
         skillName;
 
+    const badgeDuration=
+        getSkillNameBadgeDuration(
+            skillName,
+            elementType
+        );
+
+    badge.style.setProperty(
+        "--skill-name-display-duration",
+        badgeDuration+"ms"
+    );
+
 
     
     /* V38 SOURCE-LEVEL UI SIZE FIX:
@@ -23892,7 +23926,7 @@ const badgePoint =
 
         }
 
-    },2200);
+    },badgeDuration);
 
 }
 
@@ -23947,6 +23981,17 @@ function showMonsterSkillNameBadge(
     badge.textContent=
         skillName;
 
+    const badgeDuration=
+        getSkillNameBadgeDuration(
+            skillName,
+            elementType
+        );
+
+    badge.style.setProperty(
+        "--skill-name-display-duration",
+        badgeDuration+"ms"
+    );
+
 
     
     /* V38 SOURCE-LEVEL UI SIZE FIX:
@@ -23998,7 +24043,7 @@ const badgePoint =
 
         }
 
-    },2200);
+    },badgeDuration);
 
 }
 

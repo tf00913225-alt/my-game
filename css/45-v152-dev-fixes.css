@@ -186,36 +186,31 @@ body > .damage-popup.v152-top-damage{
     pointer-events:none !important;
 }
 #game-stage #mainBattleMenu > .menu-button.skill.v152-frostbite-blocked::after{
-    content:"🚫" !important;
-    inset:10% !important;
+    content:"凍傷禁止使用技能" !important;
+    left:16% !important;
+    right:2% !important;
+    top:12% !important;
+    bottom:10% !important;
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
-    border-radius:12px !important;
+    box-sizing:border-box !important;
+    padding:4px 3px !important;
+    border-radius:9px !important;
     opacity:1 !important;
     color:#fff !important;
     background:rgba(8,12,18,.56) !important;
-    filter:drop-shadow(0 0 4px #000) !important;
-    font-size:31px !important;
-    line-height:1 !important;
+    filter:none !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+    line-height:1.3 !important;
+    text-align:center !important;
+    white-space:normal !important;
+    text-shadow:0 1px 3px #000,0 0 4px #000 !important;
 }
 #game-stage .skill-quick-button.v152-frostbite-blocked{
     cursor:not-allowed !important;
     filter:grayscale(.85) brightness(.58) !important;
-}
-#game-stage .skill-quick-button .v152-frostbite-symbol{
-    position:absolute;
-    inset:0;
-    z-index:20;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#fff;
-    background:rgba(7,11,17,.44);
-    font-size:27px;
-    line-height:1;
-    text-shadow:0 2px 4px #000;
-    pointer-events:none;
 }
 
 /* Give the Skill hotspot a narrow priority overlap at its right boundary. */

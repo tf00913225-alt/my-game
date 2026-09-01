@@ -44,8 +44,8 @@ function baseContext(overrides={}){
 }
 
 test("V146 remains ordered before V149 under the current cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.24/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.24"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.25/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.25"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -82,6 +82,10 @@ test("battle timing, dead-target filtering and named choreography are enforced",
     assert.match(css,/\.badge-normal[\s\S]*color:#fff !important/);
     assert.match(css,/@keyframes v146AreaImpact/);
     assert.match(css,/\.v146-status-popup/);
+    assert.match(source,/rect\.top\+rect\.height\*\.68/);
+    assert.match(source,/setTimeout\(\(\)=>popup\.remove\(\),1300\)/);
+    assert.match(css,/animation:v146StatusPopup 1\.25s ease-out both/);
+    assert.match(css,/10%,90%\{opacity:1/);
 });
 
 test("shop quantity calculates and disables against the live total",()=>{

@@ -105,7 +105,8 @@ test("ticket choices keep image and label in separate layout boxes",()=>{
 test("item preview stays inside the stage with a reachable return button",()=>{
     assert.match(itemCss,/max-height:calc\(100% - 24px\) !important/);
     assert.match(itemCss,/#itemModal \.item-modal-icon > \.v169-talisman-art\{[\s\S]*?width:150px;[\s\S]*?height:225px;/);
-    assert.match(itemCss,/#itemModal \.item-stat-list\{[\s\S]*?overflow-y:auto !important/);
+    assert.match(itemCss,/#itemModal \.item-modal-icon > \.v169-equipment-art\{[\s\S]*?max-height:190px;/);
+    assert.match(itemCss,/#itemModal \.item-stat-list\{[\s\S]*?max-height:none !important;[\s\S]*?overflow:visible !important/);
     assert.match(touchSource,/#itemModalStats/);
     const modal=html.slice(html.indexOf('id="itemModal"'),html.indexOf('id="skillDetailModal"'));
     assert.match(modal,/class="close-item-button"[\s\S]*?>\s*返回\s*<\/button>/);
@@ -119,10 +120,10 @@ test("equipment reward has a visible return action and resilient image fallback"
     assert.match(assetCss,/\.v169-item-art > img\[hidden\]\{display:none !important;\}/);
 });
 
-test("published development label advances to V173.24",()=>{
-    assert.match(html,/<title>四象江湖傳 V173\.24<\/title>/);
-    assert.match(html,/>V173\.24<\/div>/);
-    assert.match(read("js/20-anonymous-20.js"),/const V_ASSET_VERSION="173\.24"/);
+test("published development label advances to V173.25",()=>{
+    assert.match(html,/<title>四象江湖傳 V173\.25<\/title>/);
+    assert.match(html,/>V173\.25<\/div>/);
+    assert.match(read("js/20-anonymous-20.js"),/const V_ASSET_VERSION="173\.25"/);
 });
 
-console.log("\n"+passed+" V173.24 item UI and asset tests passed.");
+console.log("\n"+passed+" V173.25 item UI and asset tests passed.");
