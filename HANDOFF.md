@@ -212,7 +212,7 @@
 
 ---
 
-## 目前狀態（截至 2026-09-01，V173.26 dev）
+## 目前狀態（截至 2026-09-01，V173.27 dev）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -239,6 +239,10 @@
   110px 能力頁底部空白；自訂下拉統一以原生字串值同步，切換角色不再殘留上一角色的假
   100% 補品門檻；凍傷回合結束後立即同步移除狀態 Sprite；異常文字再下移至卡牌高度 86%。
   `main` 仍維持 V173.24。
+- V173.27（僅 `dev`，待使用者實機驗收）確認黑色空區不是能力值頁內容，而是角色頁共用
+  外框被 V78 runtime 與 V131 CSS 固定撐到 94%～96% 高度。共用外框現改為依分頁內容自然
+  收合、最高仍限制在 96%；短的能力值／經驗池頁不再留下黑色尾區，長的技能頁仍由既有
+  `#characterTabContent` 單一容器捲動。`main` 仍維持 V173.24。
 - 母版歷史：V120（單一巨大 index.html，全部 inline）→ V121_SPLIT（拆成外部檔案，
   行為完全不變，過程見 `CHECK_REPORT.txt` / `README_*.txt`）→ 之後陸續疊加 V123～V131
   各種 stage patch，一路疊到現在。
@@ -654,12 +658,32 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-09-01 — V173.27：角色頁共用外框黑色尾區根因修正（dev）
+
+- 正式站瀏覽器實測確認問題橫跨整個角色頁：能力值分頁的固定共用內容區比實際內容多出約
+  152px，經驗池分頁多出超過 370px；因此黑色區塊不是能力卡或單一分頁的 padding，而是
+  `.home-feature-modal-box.wide`、`#homeFeatureModalBody` 與 `#characterTabContent` 被共同
+  強制填滿接近整個視窗。
+- 根因 owner 是 `js/19-stage-v78-character-inventory-runtime.js` 的 `applyNow()`，其將外框
+  高度固定為 96%，再以量測結果固定內容區高度；後載 `css/31-v131-fix-batch.css` 又以 94%
+  外框及 `height:0 + flex:1` 延續填滿行為。V173.27 直接修正這些既有 owner，改為內容自然
+  高度與可收縮 flex，保留 96% 可視上限、長分頁內層捲動及背包既有專用捲動，不新增補丁檔
+  或第二套 layout runtime。
+- `css/22-stage-v78-character-inventory-core.css` 同步改為共用外框自然收合；V154 的舊固定高度
+  歷史期待已更新，新增 `tests/v173.27-character-shell.test.js` 鎖定短分頁收合、後載 V131 不得
+  恢復固定黑尾、長技能頁仍保留單一捲動 owner，以及版本升至 V173.27。
+- 本地 Repository checks 為 JavaScript 語法 `165/165`、Node suites `51/51`、靜態資源
+  `383`、HTML ID `283`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered runtimes）
+  及 Git 空白／衝突標記全數通過。雲端瀏覽器已在正式 V173.24 重現並量測根因，但無法載入
+  未發布的 dev 候選，因此 V173.27 最終顯示仍依要求留待使用者在 dev 實機驗收。
+
 ### 2026-09-01 — V173.26：實機回報之角色頁、元素匣與狀態顯示補正（dev）
 
 - 深追能力值頁黑框後確認 V173.25 只移除了 `css/22-stage-v78-character-inventory-core.css`
   的舊 160px 留白，但後載 `css/31-v131-fix-batch.css` 仍有同選擇器、同為 `!important` 的
   110px 留白。V173.26 直接將這個最終生效 owner 歸零，不新增更晚的覆寫規則；技能頁仍保留
-  自己的 240px 專用底部空間，背包頁也維持既有頁內 padding。
+  自己的 240px 專用底部空間，背包頁也維持既有頁內 padding。實機後續確認固定高度共用外框
+  仍會形成更大的黑色尾區，該層根因已由 V173.27 修正。
 - `js/00-main.js` 的 `makeSelectValueReactive()` 原先把程式寫入的數字 `50`／`25` 與 option
   的字串 `"50"`／`"25"` 嚴格比較，沒有任何選項命中時，假下拉標籤就沿用上一角色的
   `100%`，但實際 config 仍是 50／25，形成「看似 100% 卻不補」的假畫面。現在 setter

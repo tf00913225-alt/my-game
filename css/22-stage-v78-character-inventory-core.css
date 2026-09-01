@@ -9,7 +9,7 @@
 #game-stage #homeFeatureModal .home-feature-modal-box.wide{
     width:100% !important;
     max-width:1080px !important;
-    height:96% !important;
+    height:auto !important;
     max-height:96% !important;
     min-height:0 !important;
     display:flex !important;
@@ -20,7 +20,7 @@
 #game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
     display:flex !important;
     flex-direction:column !important;
-    flex:1 1 auto !important;
+    flex:0 1 auto !important;
     height:auto !important;
     min-height:0 !important;
     overflow:hidden !important;
@@ -28,19 +28,18 @@
 #game-stage #homeFeatureModal #characterTabContent{
     display:block !important;
     width:100% !important;
-    flex:0 0 auto !important;
-    height:var(--character-scroll-height,900px) !important;
+    flex:0 1 auto !important;
+    height:auto !important;
     min-height:0 !important;
-    max-height:var(--character-scroll-height,900px) !important;
-    overflow-y:hidden !important;
+    max-height:none !important;
+    overflow-y:auto !important;
     overflow-x:hidden !important;
     -webkit-overflow-scrolling:touch !important;
     scrollbar-gutter:stable;
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
     box-sizing:border-box !important;
-    /* No synthetic spacer: statusPage is shorter than the shared viewport,
-       so the former 160px padding rendered as a black block below the card. */
+    /* The shell now shrink-wraps short tabs; long tabs use this sole scroll owner. */
     padding-bottom:0 !important;
 }
 #game-stage #homeFeatureModal #characterTabContent > #statusPage,
