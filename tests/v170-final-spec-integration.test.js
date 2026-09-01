@@ -19,6 +19,7 @@ const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
 
 const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "js/23-v125-character-creation-bootstrap.js",
+    "js/52-v173.20-startup-loader.js",
     "js/00-main.js",
     "js/01-stage-v8-touch-lock.js",
     "js/02-stage-v9-native-coordinate-api.js",
