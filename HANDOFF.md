@@ -16,10 +16,10 @@
 
 ### 目前最終值
 
-- 正式 `main` 目前是 V173.22 merge commit
-  `2a2cbe86d1719c722007d2f28fe65b0f05bade3a`；V173.22 狂風術與四元素攻擊套裝 icon 已透過
-  PR #32 發布。V173.23 風系施放與持續狀態 Sprite VFX 依本輪指示只更新 `dev`，不再合併
-  `main`。
+- 正式 `main` 目前是 V173.23；風系施放與持續狀態 Sprite VFX 的完整遊戲檔案樹已進入
+  `main` commit `e0c0c780d6f72dcb2af5581c2cb501c3a141b260`，並由 PR #33 補齊正式發布紀錄、
+  `main` Repository checks 與 GitHub Pages 部署流程。V173.22 狂風術與四元素攻擊套裝 icon
+  先前已透過 PR #32 發布。
 - 真實載入是 `index.html` 的 24 支同步 classic script（`js/23` → `js/52` 開場 loader → `js/00` →
   `js/01`～`js/20` → `js/24`），再由 `js/20-anonymous-20.js` 依 `load/error → next`
   嚴格串行載入 26 支正式 runtime：`js/25` → `js/27`～`js/51`。巡怪素材鏈最後的
@@ -640,7 +640,7 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
-### 2026-09-01 — V173.23：風系施放與持續狀態 Sprite VFX（dev）
+### 2026-09-01 — V173.23：風系施放與持續狀態 Sprite VFX（main）
 
 - 沿用 `js/39-v143-skill-animation.js` 現有 VFX renderer、預載圖片快取、目標註冊、命中延遲
   與 action gate，接入 11 張風系施放 PNG。單體依實際卡牌中央定位，三人技能只在目標列
@@ -661,7 +661,10 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
   全數通過：JavaScript 語法 `162/162`、Node suites `48/48`、靜態資源 `363`、HTML ID `283`、
   版本／Loader（24 支直載、108 個相依資源、26 支 ordered runtimes）、空白與衝突標記檢查
   皆正常。環境沒有 Chromium，因此 Playwright browser smoke 與真機視覺對位／流暢度仍需
-  人工確認。正式 `main` 停留在 V173.22 `2a2cbe86d1719c722007d2f28fe65b0f05bade3a`。
+  人工確認。遠端 `dev` 遊戲 commit `432c801baef7267f0932029eb84f4cd71c813c2f` 的 push CI #75
+  與 PR #33 CI #76 均成功；相同遊戲檔案樹已進入 `main` commit
+  `e0c0c780d6f72dcb2af5581c2cb501c3a141b260`，PR #33 另補齊本筆正式發布紀錄並觸發
+  `main` CI／Pages。
 
 ### 2026-09-01 — V173.22：狂風術與四元素攻擊套裝 icon（main）
 
