@@ -16,10 +16,10 @@
 
 ### 目前最終值
 
-- 正式 `main` 目前仍是 V173.19 release commit
-  `795330298e76748c6b4ecc47ad7d0843c6b02051`；V173.20 開場載入動畫已推至 `dev` commit
-  `38c955cd55139c42799c95212b4dd49b740e93f8`，V173.21 新手期平衡與素材更新已推至
-  `dev` 程式 commit `011dd6a89005afc54d78eb954ac3df97bfcd11ae`。兩版均未合併 `main`。
+- 正式 `main` 目前是 V173.21 merge commit
+  `2f8dbc2a389464aecc3b9375f422fc9cc3fbc93a`；V173.20 開場載入動畫、V173.21 新手期平衡與
+  素材更新已透過 PR #31 合併。V173.22 狂風術與四元素攻擊套裝 icon 已推至 `dev` 程式
+  commit `175bfd33394b69e227480edc3eb68f343f3a35f9`，尚未合併 `main`。
 - 真實載入是 `index.html` 的 24 支同步 classic script（`js/23` → `js/52` 開場 loader → `js/00` →
   `js/01`～`js/20` → `js/24`），再由 `js/20-anonymous-20.js` 依 `load/error → next`
   嚴格串行載入 26 支正式 runtime：`js/25` → `js/27`～`js/51`。巡怪素材鏈最後的
@@ -207,7 +207,7 @@
 
 ---
 
-## 目前狀態（截至 2026-09-01，V173.21）
+## 目前狀態（截至 2026-09-01，V173.22）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -217,8 +217,10 @@
   維持 Lv2～Lv3，且只套用 `makeZoneMonster()` 基礎值 ×0.75，不再疊加一般練功區 ×1.30。
   離開新手森林後的一般練功區仍為 ×1.30，Lv1～10 野怪仍只使用普通攻擊。
 - V173.21 同步加入 11 張風系技能 icon、日常完成度寶箱已領／未領狀態、四元素男角巡怪
-  正背面新立繪及兩張巡怪戰鬥圖；上傳素材沒有「狂風術」同名 icon，因此該招暫時保持空白，
-  沒有拿其他技能圖片誤配。
+  正背面新立繪及兩張巡怪戰鬥圖。
+- V173.22 補上狂風術 icon，並依火／水／土／風與刀、鎧甲、靴、盔、護腕五個部位接入
+  20 張攻擊套裝 icon；法術套裝仍使用原本圖示。既有存檔的背包與已穿戴套裝會依穩定 ID
+  同步新圖，不更動存檔格式、裝備數值或套裝規則。
 - 母版歷史：V120（單一巨大 index.html，全部 inline）→ V121_SPLIT（拆成外部檔案，
   行為完全不變，過程見 `CHECK_REPORT.txt` / `README_*.txt`）→ 之後陸續疊加 V123～V131
   各種 stage patch，一路疊到現在。
@@ -634,7 +636,27 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
-### 2026-09-01 — V173.21：新手期平衡與素材更新（dev）
+### 2026-09-01 — V173.22：狂風術與四元素攻擊套裝 icon（dev）
+
+- `js/00-main.js` 的既有 `elementSkillIconMap` 補上 `windSpell`，技能列表與詳情共用
+  `assets/skills/wind-gale-spell.jpg`，沒有新增第二份技能 icon owner。
+- 將本輪 20 張裝備素材依元素色與部位整理為 512×512 透明 lossless WebP，放在
+  `assets/equipment/sets/`；火／水／土／風各自對應刀、鎧甲、靴、盔、護腕。只有五個攻擊
+  variant 使用新圖，扇、袍、履、冠、法環五個法術 variant 保持既有 SVG。
+- `js/27-v132-content-expansion.js` 在原本 `equipmentSetIcon()` owner 內加入攻擊裝路徑表，
+  沿用既有 `rasterItemIcon()` 與 `.v169-item-art` 顯示，不新增 CSS。`js/41-v146-system-polish.js`
+  的既有 `syncSetDefinitions()` 會把 canonical icon 回填到舊背包與已穿戴物品，ID、數值、
+  元素限制、套裝效果與存檔 schema 均未改。
+- 版本標題、首頁 badge、直載 query 與 runtime cache 同步升至 V173.22。新增
+  `tests/v173.22-skill-equipment-icons.test.js`，鎖定狂風術映射、20 張 512×512 WebP、攻擊／
+  法術 variant 邊界，以及舊存檔與已穿戴裝備圖示同步。
+- 本機 Repository checks 全數通過：JavaScript 語法 `161/161`、Node suites `47/47`、
+  靜態資源 `346`、HTML ID `283`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
+  runtimes）、空白與衝突標記檢查皆正常。環境沒有 Chromium，因此 Playwright browser smoke
+  未執行；20 張成品已用聯絡表逐張人工檢視。遠端 `dev` 程式 commit 為
+  `175bfd33394b69e227480edc3eb68f343f3a35f9`；`main` 保持 V173.21。
+
+### 2026-09-01 — V173.21：新手期平衡與素材更新（main）
 
 - 新角色技能點的唯一建立流程已改為 Lv1 初始 2 點，涵蓋主角色、第二／第三角色與舊版第二
   角色入口；`player` 預設模板仍保留 0，避免讀取缺欄位舊存檔時無條件補發。既有升級流程
@@ -657,7 +679,9 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
   靜態資源 `325`、HTML ID `283`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
   runtimes）、空白與衝突標記檢查皆正常。此環境沒有 Chromium，因此 Playwright browser
   smoke 未執行；素材本身與整合後聯絡表已人工檢視，仍建議在真實 Android 直式畫面複驗。
-  遠端 `dev` 程式 commit 為 `011dd6a89005afc54d78eb954ac3df97bfcd11ae`；`main` 未動。
+  原遠端 `dev` 程式 commit 為 `011dd6a89005afc54d78eb954ac3df97bfcd11ae`。後續連同 V173.20
+  透過 PR #31 合併為 `main` commit `2f8dbc2a389464aecc3b9375f422fc9cc3fbc93a`；main CI #68 與
+  Pages build/deploy #63 均成功。
 
 ### 2026-09-01 — V173.20：雙圖開場載入動畫（dev）
 
@@ -1008,8 +1032,8 @@ false，且 dev V171 已物理移除；1 回合凍傷在回合開頭倒數的既
 - 驗證結果：31 份 Node test suite 共 264 項全數通過；`js/`／`tests/` 共 144 支
   JavaScript 通過 `node --check`，`git diff --check` 通過。
 
-**已知限制**：四張 inbox PNG 是四元素「裝備抽獎券」圖，不是四套各十件裝備的獨立美術；
-目前 repository 沒有赤炎十個部位各自對應的新 PNG，所以套裝本體維持原有部位 SVG。
+**當時限制（已於 V173.22 部分解除）**：V169 收到的四張 inbox PNG 是四元素「裝備抽獎券」
+圖，不是套裝本體。V173.22 已補齊四套各五個攻擊部位的新圖；五個法術部位目前仍維持原有 SVG。
 
 ### 2026-08-30 — V169：RPG 視窗、角色／商店、元素匣、水技能與深淵流程（dev）
 

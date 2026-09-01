@@ -3423,7 +3423,8 @@ const elementSkillIconMap = {
 
     iceArrowRain:"assets/skills/water-ice-arrow-rain.jpg",
 
-    /* V173.21：使用者提供的風系技能 icon；分身術圖對應閃躲術。 */
+    /* V173.22：補上狂風術；分身術圖對應閃躲術。 */
+    windSpell:"assets/skills/wind-gale-spell.jpg",
     stormFist:"assets/skills/wind-storm-fist.jpg",
     stormFlurry:"assets/skills/wind-storm-flurry.jpg",
     windCrossSlash:"assets/skills/wind-cross-slash.jpg",

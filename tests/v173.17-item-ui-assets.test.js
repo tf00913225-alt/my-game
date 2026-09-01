@@ -119,10 +119,10 @@ test("equipment reward has a visible return action and resilient image fallback"
     assert.match(assetCss,/\.v169-item-art > img\[hidden\]\{display:none !important;\}/);
 });
 
-test("published development label advances to V173.21",()=>{
-    assert.match(html,/<title>四象江湖傳 V173\.21<\/title>/);
-    assert.match(html,/>V173\.21<\/div>/);
-    assert.match(read("js/20-anonymous-20.js"),/const V_ASSET_VERSION="173\.21"/);
+test("published development label advances to V173.22",()=>{
+    assert.match(html,/<title>四象江湖傳 V173\.22<\/title>/);
+    assert.match(html,/>V173\.22<\/div>/);
+    assert.match(read("js/20-anonymous-20.js"),/const V_ASSET_VERSION="173\.22"/);
 });
 
-console.log("\n"+passed+" V173.21 item UI and asset tests passed.");
+console.log("\n"+passed+" V173.22 item UI and asset tests passed.");

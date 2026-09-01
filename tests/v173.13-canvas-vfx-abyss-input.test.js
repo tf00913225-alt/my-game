@@ -203,10 +203,10 @@ test("Abyss dialogue is owned directly by the map source and has pointer plus cl
     assert.doesNotMatch(legacyAbyssPatch,/v141ChallengeAbyssBoss=function/);
 });
 
-test("the published release is V173.21",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.21"/);
-    assert.match(index,/<title>四象江湖傳 V173\.21<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.21"[\s\S]*?>V173\.21<\/div>/);
+test("the published release is V173.22",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.22"/);
+    assert.match(index,/<title>四象江湖傳 V173\.22<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.22"[\s\S]*?>V173\.22<\/div>/);
 });
 
-console.log("\n"+passed+" V173.21 Canvas VFX and Abyss input tests passed.");
+console.log("\n"+passed+" V173.22 Canvas VFX and Abyss input tests passed.");
