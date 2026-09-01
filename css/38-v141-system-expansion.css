@@ -134,7 +134,7 @@
 .item-modal .item-modal-box{
     width:min(92vw,470px) !important;
     max-width:470px !important;
-    max-height:92dvh !important;
+    max-height:calc(100% - 24px) !important;
     overflow:hidden !important;
     padding:15px !important;
     box-sizing:border-box;
@@ -156,6 +156,35 @@
     height:46px;
 }
 
+#itemModal .item-modal-box{
+    display:flex;
+    flex-direction:column;
+}
+
+#itemModal .item-modal-icon{
+    flex:0 0 auto;
+    max-height:240px;
+    overflow:hidden;
+}
+
+#itemModal .item-modal-icon > .v169-talisman-art{
+    width:150px;
+    height:225px;
+    flex:0 0 auto;
+}
+
+#itemModal .item-modal-icon > .v169-ticket-art{
+    width:216px;
+    height:144px;
+    flex:0 0 auto;
+}
+
+#itemModal .item-modal-icon > .v169-blueprint-art{
+    width:176px;
+    height:176px;
+    flex:0 0 auto;
+}
+
 .item-modal .item-modal-name{
     margin:5px 0 9px !important;
     color:var(--v141-gold-soft);
@@ -175,8 +204,24 @@
     padding:11px !important;
 }
 
+#itemModal .item-stat-list{
+    flex:0 1 auto;
+    min-height:0;
+    max-height:190px !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+}
+
 .item-modal .item-modal-buttons{
     grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+#itemModal .item-modal-buttons,
+#itemModal .close-item-button{
+    flex:0 0 auto;
 }
 
 .item-modal .item-modal-button,

@@ -143,9 +143,9 @@
     }
 
     const TALISMAN_ART={
-        freeze:"assets/items/talismans/freeze.png",
-        barrier:"assets/items/talismans/barrier.png",
-        stealth:"assets/items/talismans/stealth.png"
+        freeze:"assets/items/talismans/freeze-icon.png",
+        barrier:"assets/items/talismans/barrier-icon.png",
+        stealth:"assets/items/talismans/stealth-icon.png"
     };
     const BLUEPRINT_ART={
         head:"assets/items/blueprints/head.png",
@@ -158,7 +158,7 @@
     function rasterItemIcon(path,tier,kind){
         const rarity=tier?" v169-rarity-"+tier:"";
         return '<span class="v169-item-art v169-'+kind+'-art'+rarity+'">'+
-            '<img src="'+path+'" alt="" aria-hidden="true" draggable="false"></span>';
+            '<img src="'+path+'" alt="" aria-hidden="true" draggable="false" decoding="async" onerror="this.hidden=true"></span>';
     }
 
     function talismanIcon(effect,tier){
@@ -192,7 +192,7 @@
     }
 
     function ticketIcon(elementKey){
-        return rasterItemIcon("assets/items/tickets/"+elementKey+".png",null,"ticket");
+        return rasterItemIcon("assets/items/tickets/"+elementKey+"-icon.png",null,"ticket");
     }
 
     const SET_PALETTE={
@@ -366,7 +366,28 @@
         });
     }
 
-    hydrateOwnedTicketPresentation();
+    function syncStaticContentPresentation(item,definition){
+        if(!item || !definition || item.id!==definition.id){ return item; }
+        [
+            "name","icon","type","price","setId","tierKey","blueprintSlot",
+            "talismanEffect","talismanDuration","tierChance"
+        ].forEach(key=>{
+            if(Object.prototype.hasOwnProperty.call(definition,key)){
+                item[key]=definition[key];
+            }
+        });
+        if(!item.stats || typeof item.stats!=="object"){ item.stats={}; }
+        return item;
+    }
+
+    function hydrateOwnedStaticContentPresentation(){
+        const definitions=[].concat(talismanDefinitions,oreDefinitions,blueprintDefinitions);
+        const definitionById=new Map(definitions.map(definition=>[definition.id,definition]));
+        inventoryItems.forEach(item=>{
+            const definition=item&&definitionById.get(item.id);
+            if(definition){ syncStaticContentPresentation(item,definition); }
+        });
+    }
 
 
     /* =====================================================
@@ -2057,6 +2078,18 @@
         stats:{}
     };
 
+    function hydrateOwnedContentPresentation(){
+        hydrateOwnedTicketPresentation();
+        hydrateOwnedStaticContentPresentation();
+        inventoryItems.forEach(item=>{
+            if(item&&item.id===materialChestDefinition.id){
+                syncStaticContentPresentation(item,materialChestDefinition);
+            }
+        });
+    }
+    window.v132HydrateOwnedContentPresentation=hydrateOwnedContentPresentation;
+    hydrateOwnedContentPresentation();
+
     function pickWeightedTier(){
         const roll=Math.random()*100;
         let acc=0;
@@ -2221,15 +2254,22 @@
             ticketDefinitions.map(def=>
                 '<button type="button" class="v132-ticket-choice" onclick="v132ClaimEquipmentDungeonReward(\''+def.id+'\',false)">'+
                 '<span class="v132-ticket-icon">'+def.icon+'</span>'+
-                '<span>'+def.name+'</span>'+
+                '<span class="v132-ticket-name">'+def.name+'</span>'+
                 '</button>'
             ).join("")+
             '</div>'+
             '<div class="v132-reward-actions">'+
-            '<span style="font-size:12px;color:#b3a58c;">選好之後可再選擇是否看廣告雙倍領取（雙倍＝同款抽獎券×2）</span>'+
+            '<span class="v132-reward-note">選好之後可再選擇是否看廣告雙倍領取（雙倍＝同款抽獎券×2）</span>'+
+            '<button type="button" class="v132-reward-back" onclick="v132LeaveEquipmentReward()">返回</button>'+
             '</div></div>';
         v132ShowRewardModal(html);
     }
+
+    window.v132LeaveEquipmentReward=function(){
+        v132CloseRewardModal();
+        showPage("dungeon");
+        switchDungeonTab("daily");
+    };
 
     window.v132ClaimEquipmentDungeonReward=async function(ticketId,doubled){
         function grant(amount){

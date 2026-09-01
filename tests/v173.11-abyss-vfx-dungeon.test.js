@@ -33,4 +33,4 @@ assert.match(
     /const targetCards=indexes\.map\(targetIndex=>cardFor\(current\.targetSide,targetIndex\)\)[\s\S]*?const bounds=fieldBounds\(targetCards\);/
 );
 
-console.log("V173.16 Abyss, VFX, and daily-dungeon regression checks passed.");
+console.log("V173.17 Abyss, VFX, and daily-dungeon regression checks passed.");

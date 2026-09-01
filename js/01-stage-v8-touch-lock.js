@@ -35,7 +35,7 @@
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
             ".home-feature-modal-box, .auto-settings-expanded, " +
-            ".inventory-character-detail-box, .item-modal-box, #skillDetailStats, " +
+            ".inventory-character-detail-box, .item-modal-box, #itemModalStats, #skillDetailStats, " +
             ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, " +
             "textarea, select, input";
 

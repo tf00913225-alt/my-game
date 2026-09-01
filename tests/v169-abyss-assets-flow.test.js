@@ -14,13 +14,13 @@ function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("supplied item art is mapped by effect, equipment slot and element",()=>{
     [
-        "talismans/freeze.png","talismans/barrier.png","talismans/stealth.png",
+        "talismans/freeze-icon.png","talismans/barrier-icon.png","talismans/stealth-icon.png",
         "blueprints/head.png","blueprints/shoulder.png","blueprints/shoes.png",
         "blueprints/hand.png","blueprints/armor.png"
     ].forEach(path=>assert.ok(items.includes("assets/items/"+path),path));
     ["fire","water","earth","wind"].forEach(element=>{
         assert.match(items,new RegExp('ticketIcon\\("'+element+'"\\)'));
-        assert.ok(items.includes('"assets/items/tickets/"+elementKey+".png"'));
+        assert.ok(items.includes('"assets/items/tickets/"+elementKey+"-icon.png"'));
     });
     assert.match(items,/talismanIcon\(effect\.key,tier\.key\)/);
     assert.match(items,/blueprintIcon\(slot\.key,tier\.key\)/);
