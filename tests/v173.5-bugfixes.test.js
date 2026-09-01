@@ -42,7 +42,7 @@ test("new Water Orb sheet is the supplied 1536×1152 four-by-three asset",()=>{
     const asset=fs.readFileSync("assets/vfx/water/water-orb-vfx.png");
     assert.equal(asset.toString("ascii",12,16),"IHDR");
     assert.deepEqual([asset.readUInt32BE(16),asset.readUInt32BE(20)],[1536,1152]);
-    assert.match(animation,/water-orb-vfx\.png\?v=173\.17[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,[\s\S]*?renderer:"canvas-crop"/);
+    assert.match(animation,/water-orb-vfx\.png\?v=173\.18[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,[\s\S]*?renderer:"canvas-crop"/);
 });
 
 test("Phoenix Cry and Ice Arrow Rain use one centered battlefield sheet",()=>{
@@ -74,4 +74,4 @@ test("Frostbite expires from monsters and players at the normal status tick",()=
     assert.equal(updates,1);
 });
 
-console.log("\nV173.17 bug-fix suite: "+passed+" tests passed.");
+console.log("\nV173.18 bug-fix suite: "+passed+" tests passed.");

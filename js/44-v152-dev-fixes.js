@@ -8,7 +8,6 @@
     window.__v152DevFixesInstalled=true;
 
     const VERSION="152";
-    const DRAGON_REPEAT_BY_LEVEL=[5,10,20,30,40];
     const ABYSS_PORTRAITS={
         東帝:"assets/dungeons/abyss/east-emperor.webp",
         天帝:"assets/dungeons/abyss/heaven-emperor.webp",
@@ -35,42 +34,6 @@
         });
     }
 
-    patchSkill("dragonSlash",{
-        baseDamage:165,damagePerLevel:25,spCost:65,repeatChanceByLevel:DRAGON_REPEAT_BY_LEVEL,
-        repeatChance:DRAGON_REPEAT_BY_LEVEL[0],repeatMaxCasts:1,
-        description:"需先學習火爆亂擊。對單體造成165點傷害，消耗65 SP；最高5級，每升1級傷害+25，再施放機率依等級為5%/10%/20%/30%/40%。"
-    });
-    patchSkill("phoenixCry",{
-        baseDamage:60,damagePerLevel:18,spCost:68,
-        description:"需先學習烈焰龍捲。對敵方全體各造成60點傷害，消耗68 SP；最高5級，每升1級傷害+18。70%基礎機率燃燒2回合，每回合造成目標最大HP的5%/7%/9%/11%/13%傷害。"
-    });
-    patchSkill("iceSpin",{
-        frostbiteChance:40,frostbiteDuration:1,
-        description:"需先學習冰霜拳。對同排中、左、右最多3名目標各造成25點傷害，消耗20 SP；最高5級，每升1級傷害+7，並吸取實際傷害的3%/4%/5%/6%/7%恢復自身HP。每個命中目標有40%基礎機率凍傷1回合；凍傷只禁止技能。"
-    });
-    patchSkill("frostCrush",{
-        frostbiteChance:50,frostbiteDuration:1,
-        description:"需先學習冰旋一閃。對單體造成100點傷害，消耗50 SP；最高5級，每升1級傷害+15，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。50%基礎機率凍傷1回合；凍傷只禁止技能。"
-    });
-    patchSkill("stormFlurry",{
-        damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2,
-        description:"需先學習暴風拳。對同排中、左、右最多3名目標各造成28點傷害，消耗20 SP；最高5級，每升1級傷害+7。50%基礎機率降低目標造成的傷害10%/20%/30%/40%/50%，持續2回合。"
-    });
-    patchSkill("dizzyFist",{
-        stunChance:65,missBonusByLevel:[30,45,50,55,65],stunDuration:5,
-        description:"需先學習暴風亂擊。對單體造成120點傷害，消耗55 SP；最高5級，每升1級傷害+15。65%基礎機率暈眩5回合，使目標MISS率提高30%/45%/50%/55%/65%。"
-    });
-    patchSkill("earthquakeCrush",{
-        petrifyChanceByLevel:[30,35,40,45,50],petrifyDuration:3,
-        description:"需先學習石破天驚。對同排中、左、右最多3名目標各造成48點傷害，消耗55 SP；最高5級，每升1級傷害+14。依等級有30%/35%/40%/45%/50%基礎機率石化3回合。"
-    });
-    if(typeof skillDatabase!=="undefined"&&skillDatabase.earthquakeCrush){
-        delete skillDatabase.earthquakeCrush.selfShieldByLevel;
-    }
-    patchSkill("iceArrowRain",{
-        freezeChance:20,freezeDuration:2,
-        description:"需先學習洪水猛獸。對敵方全體各造成30點傷害，消耗75 SP；最高5級，每升1級傷害+12。吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；每個命中目標各有20%基礎機率冰封2回合。"
-    });
     patchSkill("yuanXiangGuangMing",{
         targetType:"allyAll",baseHeal:150,baseHealSP:55,
         description:"我方全體回復150 HP、55 SP。"
@@ -139,42 +102,6 @@
         const key=typeof getPartyCharacterKey==="function"
             ?getPartyCharacterKey(characterIndex):(characterIndex===0?"fire":"player"+(characterIndex+1));
         return Math.max(1,Math.min(5,Math.floor(numeric(getSkillLevel(key,skillId))||1)));
-    }
-
-    function dragonRepeatChance(level){
-        return levelValue(DRAGON_REPEAT_BY_LEVEL,level,DRAGON_REPEAT_BY_LEVEL[0]);
-    }
-
-    function wrapDragonLevelChance(name,skillArgIndex,characterIndexFromArgs){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(){
-            const args=arguments;
-            const skillId=args[skillArgIndex];
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
-            if(!skill||skill.id!=="dragonSlash"){ return previous.apply(this,args); }
-            const saved=skill.repeatChance;
-            skill.repeatChance=dragonRepeatChance(partySkillLevel(characterIndexFromArgs(args),skill.id));
-            try{ return previous.apply(this,args); }
-            finally{ skill.repeatChance=saved; }
-        };
-    }
-    wrapDragonLevelChance("castDamageSkill",0,()=>0);
-    wrapDragonLevelChance("castSecondaryCharacterSkill",1,args=>Math.max(0,Math.floor(numeric(args[0]))));
-    wrapDragonLevelChance("castPlayer2Skill",0,()=>1);
-
-    if(typeof processSingleMonsterAttack==="function"){
-        const previousMonsterAttackForDragon=processSingleMonsterAttack;
-        processSingleMonsterAttack=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase.dragonSlash:null;
-            if(!monster||!skill){ return previousMonsterAttackForDragon.apply(this,arguments); }
-            const saved=skill.repeatChance;
-            const level=monster.v141ForceSkillLevel||monster.v141SkillLevel||monster.skillLevel||1;
-            skill.repeatChance=dragonRepeatChance(level);
-            try{ return previousMonsterAttackForDragon.apply(this,arguments); }
-            finally{ skill.repeatChance=saved; }
-        };
     }
 
     function rageLevelFor(character,buff){
@@ -596,7 +523,6 @@
 
     window.v152SyncSkillPointDisplay=syncSkillPointDisplay;
     window.v152NormalizeRageBuff=normalizeRageBuff;
-    window.v152GetDragonRepeatChance=dragonRepeatChance;
     window.v152ResolveExtremeEmperorAction=resolveExtremeEmperorAction;
     window.v152SyncFrostbiteSkillControls=syncFrostbiteSkillControls;
     window.v152SyncAbyssBattleUi=syncAbyssBattleUi;

@@ -22,52 +22,71 @@
 
     function copyValue(value){ return Array.isArray(value)?value.slice():value; }
 
+    const SKILL_CLEANUP_FIELDS={
+        flameSlash:["repeatChance","repeatChanceByLevel","repeatMaxCasts"],
+        fireCritical:["repeatChance","repeatChanceByLevel","repeatMaxCasts"],
+        explosiveFlurry:["repeatChance","repeatChanceByLevel","repeatMaxCasts"],
+        dragonSlash:["repeatChance","repeatChanceByLevel","repeatMaxCasts"],
+        petrifyFist:["allyShieldByLevel"],
+        stoneBreakSky:["allyShieldByLevel"],
+        earthquakeCrush:["selfShieldByLevel"],
+        flyingSandStrike:["petrifyChanceByLevel","petrifyDuration"],
+        dustStorm:["defenseDownChance","defenseDownByLevel","defenseDownDuration"]
+    };
+
     function patchSkill(id,fields){
         if(typeof skillDatabase==="undefined"||!skillDatabase[id]){ return; }
+        (SKILL_CLEANUP_FIELDS[id]||[]).forEach(key=>{ delete skillDatabase[id][key]; });
         Object.keys(fields).forEach(key=>{ skillDatabase[id][key]=copyValue(fields[key]); });
     }
 
     const SKILLS={
         flameSlash:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:17,damagePerLevel:10,spCost:8,
-            description:"初次學習需2技能點。對單體造成17點傷害，消耗8 SP；最高5級，每升1級傷害+10。"
+            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:30,damagePerLevel:6,spCost:10,
+            followUpOnCriticalOrDefeat:true,followUpMaxCasts:1,
+            description:"初次學習需2技能點。對單體造成30點傷害，消耗10 SP；目標死亡或爆擊時免費再施放1次。最高5級，每升1級消耗1技能點，傷害+6。"
         },
         fireCritical:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:39,damagePerLevel:13,spCost:15,
-            requires:["flameSlash"],description:"需先學習火焰斬。對單體造成39點傷害，消耗15 SP；最高5級，每升1級傷害+13。"
+            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:45,damagePerLevel:9,spCost:28,
+            followUpOnCriticalOrDefeat:true,followUpMaxCasts:1,requires:["flameSlash"],
+            description:"需先學習火焰斬。初次學習需10技能點，對單體造成45點傷害，消耗28 SP；目標死亡或爆擊時免費再施放1次。最高5級，每升1級消耗1技能點，傷害+9。"
         },
         explosiveFlurry:{
-            learnCost:20,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:35,damagePerLevel:15,spCost:22,
-            requires:["fireCritical"],description:"需先學習會心一擊。對同排中、左、右最多3名目標各造成35點傷害，消耗22 SP；最高5級，每升1級傷害+15。"
+            learnCost:20,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:50,damagePerLevel:10,spCost:47,
+            followUpOnCriticalOrDefeat:true,followUpMaxCasts:1,requires:["fireCritical"],
+            description:"需先學習會心一擊。初次學習需20技能點，對同排中、左、右最多3名目標各造成50點傷害，消耗47 SP；任一目標死亡或爆擊時免費再施放1次。最高5級，每升1級消耗1技能點，傷害+10。"
         },
         dragonSlash:{
-            learnCost:45,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:145,damagePerLevel:25,spCost:65,
-            repeatChance:33,repeatMaxCasts:1,requires:["explosiveFlurry"],
-            description:"需先學習火爆亂擊。對單體造成145點傷害，消耗65 SP，並有33%機率免費再施放1次；最高5級，每升1級傷害+25。"
+            learnCost:45,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:165,damagePerLevel:33,spCost:65,
+            followUpOnCriticalOrDefeat:true,followUpMaxCasts:2,requires:["explosiveFlurry"],
+            description:"需先學習火爆亂擊。初次學習需45技能點，對單體造成165點傷害，消耗65 SP；目標死亡或爆擊時免費再施放，最多追擊2次。最高5級，每升1級消耗1技能點，傷害+33。"
         },
         fireRocket:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:17,damagePerLevel:8,spCost:8,
-            description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成17點傷害，消耗8 SP；最高5級，每升1級傷害+8。"
+            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:13,damagePerLevel:4,spCost:10,
+            burnChance:25,burnDuration:2,burnPercentByLevel:[1,1,2,2,3],
+            description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成13點傷害，消耗10 SP；25%基礎機率燃燒2回合，每回合造成目標最大HP的1%/1%/2%/2%/3%。最高5級，每升1級消耗1技能點，傷害+4。"
         },
         blazeSpell:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:42,damagePerLevel:15,spCost:15,
-            requires:["fireRocket"],description:"需先學習火箭。對單體造成42點傷害，消耗15 SP；最高5級，每升1級傷害+15。"
+            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:45,damagePerLevel:9,spCost:28,
+            burnChance:30,burnDuration:2,burnPercentByLevel:[1,2,3,4,5],requires:["fireRocket"],
+            description:"需先學習火箭。初次學習需10技能點，對單體造成45點傷害，消耗28 SP；30%基礎機率燃燒2回合，每回合造成目標最大HP的1%/2%/3%/4%/5%。最高5級，每升1級消耗1技能點，傷害+9。"
         },
         flameTornado:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:135,damagePerLevel:13,spCost:55,
-            burnChance:30,burnDuration:2,burnPercentByLevel:[3,4,5,6,8],requires:["blazeSpell"],
-            description:"需先學習烈火術。對單一目標造成135點傷害，消耗55 SP；最高5級，每升1級傷害+13。30%基礎機率燃燒2回合，每回合造成目標最大HP的3%/4%/5%/6%/8%傷害。"
+            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:150,damagePerLevel:30,spCost:47,
+            burnChance:100,guaranteedBurn:true,burnDuration:1,burnPercentByLevel:[3,4,5,6,7],requires:["blazeSpell"],
+            description:"需先學習烈火術。初次學習需30技能點，對單一目標造成150點傷害，消耗47 SP；必定燃燒1回合，每回合造成目標最大HP的3%/4%/5%/6%/7%。最高5級，每升1級消耗1技能點，傷害+30。"
         },
         phoenixCry:{
-            learnCost:45,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:58,damagePerLevel:18,spCost:68,
-            burnChance:70,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],requires:["flameTornado"],
-            description:"需先學習烈焰龍捲。對敵方全體各造成58點傷害，消耗68 SP；最高5級，每升1級傷害+18。70%基礎機率燃燒2回合，每回合造成目標最大HP的5%/7%/9%/11%/13%傷害。"
+            learnCost:45,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:42,damagePerLevel:9,spCost:60,
+            burnChance:40,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],
+            burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1,requires:["flameTornado"],
+            description:"需先學習烈焰龍捲。初次學習需45技能點，對敵方全體各造成42點傷害，消耗60 SP；40%基礎機率燃燒2回合。每次施放後燃燒目標少於3人時，下一回合火鳳天鳴傷害+30%。每回合燃燒傷害為目標最大HP的5%/7%/9%/11%/13%。最高5級，每升1級消耗1技能點，傷害+9。"
         },
         rage:{
-            learnCost:25,maxLevel:5,upgradeCost:1,targetType:"allyTri",spCost:50,duration:2,
+            learnCost:25,maxLevel:5,upgradeCost:1,targetType:"allyTri",spCost:50,duration:3,
             critBonusByLevel:[5,10,15,20,25],critChanceBonusByLevel:[5,10,15,20,25],
             critDamageBonusByLevel:[10,20,30,40,50],requires:["explosiveFlurry","flameTornado"],
-            description:"需先學習火爆亂擊或烈焰龍捲其一。提高我方同排中、左、右最多3人的爆擊率5%/10%/15%/20%/25%與爆擊傷害10%/20%/30%/40%/50%，持續2回合，消耗50 SP。"
+            description:"需先學習火爆亂擊或烈焰龍捲其一。初次學習需25技能點，提高我方中、左、右3人的爆擊率5%/10%/15%/20%/25%與爆擊傷害10%/20%/30%/40%/50%，持續3回合，消耗50 SP。最高5級，每升1級消耗1技能點。"
         },
         fireEX:{
             learnCost:25,maxLevel:1,targetType:"none",damageBonusPercent:10,critChanceBonusPercent:5,critDamageBonusPercent:5,
@@ -75,166 +94,116 @@
             description:"永久提升火元素傷害10%、爆擊率5%、爆擊傷害5%；對有異常狀態的目標傷害再提升5%。"
         },
 
-        waterKnife:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:13,damagePerLevel:3,spCost:6,
-            lifestealPercentByLevel:[4,5,6,7,8],description:"初次學習需2技能點。對單體造成13點傷害，消耗6 SP；最高5級，每升1級傷害+3，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。"
-        },
-        frostPunch:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:30,damagePerLevel:8,spCost:17,
-            lifestealPercentByLevel:[4,5,6,7,8],requires:["waterKnife"],description:"需先學習水刀斬。對單體造成30點傷害，消耗17 SP；最高5級，每升1級傷害+8，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。"
-        },
-        iceSpin:{
-            learnCost:20,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:25,damagePerLevel:7,spCost:20,
-            freezeChance:0,frostbiteChance:60,frostbiteDuration:2,lifestealPercentByLevel:[3,4,5,6,7],requires:["frostPunch"],
-            description:"需先學習冰霜拳。對同排中、左、右最多3名目標各造成25點傷害，消耗20 SP；最高5級，每升1級傷害+7，並吸取實際傷害的3%/4%/5%/6%/7%恢復自身HP。每個命中目標有60%基礎機率凍傷2回合；凍傷只禁止技能，仍可使用補品、符咒、普通攻擊、防禦與逃脫。"
-        },
-        frostCrush:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:100,damagePerLevel:15,spCost:50,
-            freezeChance:0,frostbiteChance:50,frostbiteDuration:2,lifestealPercentByLevel:[4,5,6,7,8],requires:["iceSpin"],
-            description:"需先學習冰旋一閃。對單體造成100點傷害，消耗50 SP；最高5級，每升1級傷害+15，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。50%基礎機率凍傷2回合；凍傷只禁止技能，仍可使用補品、符咒、普通攻擊、防禦與逃脫。"
-        },
-        waterBall:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:17,damagePerLevel:3,spCost:8,
-            lifestealPercentByLevel:[3,4,5,6,7],description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成17點傷害，消耗8 SP；最高5級，每升1級傷害+3，並吸取實際傷害的3%/4%/5%/6%/7%恢復自身HP。"
-        },
-        floodBeast:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:85,damagePerLevel:8,spCost:15,
-            freezeChance:0,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterBall"],
-            description:"需先學習水球術。對單體造成85點傷害，消耗15 SP；最高5級，每升1級傷害+8，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。"
-        },
-        iceArrowRain:{
-            learnCost:20,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:30,damagePerLevel:12,spCost:75,
-            freezeChance:40,freezeDuration:2,freezeSingleTarget:false,lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],
-            description:"需先學習洪水猛獸。對敵方全體各造成30點傷害，消耗75 SP；最高5級，每升1級傷害+12，並吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP。每個命中目標各有40%基礎機率冰封2回合。"
-        },
-        freeze:{
-            learnCost:25,maxLevel:1,targetType:"single",spCost:22,freezeChance:80,freezeDuration:4,requires:["iceArrowRain"],
-            description:"需先學習冰霜箭雨。80%基礎機率冰封單一目標，使其無法行動4回合，消耗22 SP；不造成傷害。"
-        },
-        healSpell:{
-            learnCost:20,maxLevel:5,upgradeCost:1,targetType:"allyAll",baseHeal:350,healPerLevel:30,
-            baseHealSP:35,healSPPerLevel:30,spCost:40,requires:["iceArrowRain","iceSpin"],
-            description:"需先學習冰霜箭雨或冰旋一閃其一。對我方全體恢復350 HP與35 SP，消耗40 SP；最高5級，每升1級HP與SP恢復量各+30。施放者本人不恢復SP。"
-        },
-        revive:{
-            learnCost:20,maxLevel:5,upgradeCost:1,targetType:"deadAlly",spCost:45,reviveHealPercentByLevel:[20,40,60,80,100],requires:["healSpell"],
-            description:"需先學習治療術。選擇1名友方死亡目標原地復活，依等級恢復20%/40%/60%/80%/100%最大HP，消耗45 SP。"
-        },
-        waterEX:{
-            learnCost:25,maxLevel:1,targetType:"none",damageBonusPercent:5,healBonusPercent:10,statusResistBonus:10,
-            description:"永久提升水元素傷害5%、回復系技能回復量10%、異常狀態抗性10%。"
-        },
-
         stormFist:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:14,damagePerLevel:2,spCost:7,
+            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:26,damagePerLevel:6,spCost:7,
             agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1,
-            description:"初次學習需2技能點。對單體造成14點傷害，消耗7 SP；最高5級，每升1級傷害+2。50%基礎機率降低目標敏捷30%/40%/50%/60%/70%，持續1回合。"
+            description:"初次學習需2技能點。對單體造成26點傷害，消耗7 SP；50%基礎機率降低目標敏捷30%/40%/50%/60%/70%，持續1回合。最高5級，每升1級消耗1技能點，傷害+6。"
         },
         stormFlurry:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:28,damagePerLevel:7,spCost:20,
-            damageDownChance:50,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1,requires:["stormFist"],
-            description:"需先學習暴風拳。對同排中、左、右最多3名目標各造成28點傷害，消耗20 SP；最高5級，每升1級傷害+7。50%基礎機率降低目標造成的傷害15%/18%/21%/25%/30%，持續1回合。"
+            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:13,damagePerLevel:3,spCost:20,
+            damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2,requires:["stormFist"],
+            description:"需先學習暴風拳。初次學習需10技能點，對同排中、左、右最多3名目標各造成13點傷害，消耗20 SP；50%基礎機率降低目標造成的傷害10%/20%/30%/40%/50%，持續2回合。最高5級，每升1級消耗1技能點，傷害+3。"
         },
         windCrossSlash:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:90,damagePerLevel:12,spCost:39,
-            damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1,requires:["stormFlurry"],
-            description:"需先學習暴風亂擊。對單體造成90點傷害，消耗39 SP；最高5級，每升1級傷害+12。65%基礎機率降低目標造成的傷害15%/20%/25%/30%/35%，持續1回合。"
+            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:128,damagePerLevel:26,spCost:39,
+            damageDownChance:65,damageDownByLevel:[20,30,35,40,50],damageDownDuration:1,requires:["stormFlurry"],
+            description:"需先學習暴風亂擊。初次學習需15技能點，對單體造成128點傷害，消耗39 SP；65%基礎機率降低目標造成的傷害20%/30%/35%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+26。"
         },
         dizzyFist:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:120,damagePerLevel:15,spCost:55,
-            stunChance:65,missBonusByLevel:[10,20,30,40,50],stunDuration:2,requires:["stormFlurry"],
-            description:"需先學習暴風亂擊。對單體造成120點傷害，消耗55 SP；最高5級，每升1級傷害+15。65%基礎機率暈眩2回合，使目標命中率降低10%/20%/30%/40%/50%。"
+            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:141,damagePerLevel:29,spCost:55,
+            stunChance:65,missBonusByLevel:[30,45,50,55,65],stunDuration:5,requires:["stormFlurry"],
+            description:"需先學習暴風亂擊。初次學習需30技能點，對單體造成141點傷害，消耗55 SP；65%基礎機率使目標暈眩5回合，MISS率提高30%/45%/50%/55%/65%。最高5級，每升1級消耗1技能點，傷害+29。"
         },
         windSpell:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:18,damagePerLevel:2,spCost:9,
+            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:12,damagePerLevel:3,spCost:9,
             agilityDownChance:50,agilityDownByLevel:[10,20,30,40,50],agilityDownDuration:1,
-            description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成18點傷害，消耗9 SP；最高5級，每升1級傷害+2。50%基礎機率降低目標敏捷10%/20%/30%/40%/50%，持續1回合。"
+            description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成12點傷害，消耗9 SP；50%基礎機率降低目標敏捷10%/20%/30%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+3。"
         },
         stormCircle:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"row",baseDamage:38,damagePerLevel:9,spCost:18,
+            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:14,damagePerLevel:4,spCost:18,
             damageDownChance:55,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1,requires:["windSpell"],
-            description:"需先學習狂風術。對敵方任一橫排各造成38點傷害，消耗18 SP；最高5級，每升1級傷害+9。55%基礎機率降低目標造成的傷害15%/18%/21%/25%/30%，持續1回合。"
+            description:"需先學習狂風術。初次學習需10技能點，對同排中、左、右最多3名目標各造成14點傷害，消耗18 SP；55%基礎機率降低目標造成的傷害15%/18%/21%/25%/30%，持續1回合。最高5級，每升1級消耗1技能點，傷害+4。"
         },
         windHowlLightning:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:98,damagePerLevel:15,spCost:55,
+            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:128,damagePerLevel:26,spCost:55,
             damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1,requires:["stormCircle"],
-            description:"需先學習風焰術。對單體造成98點傷害，消耗55 SP；最高5級，每升1級傷害+15。65%基礎機率降低目標造成的傷害15%/20%/25%/30%/35%，持續1回合。"
+            description:"需先學習風焰術。初次學習需15技能點，對單體造成128點傷害，消耗55 SP；65%基礎機率降低目標造成的傷害15%/20%/25%/30%/35%，持續1回合。最高5級，每升1級消耗1技能點，傷害+26。"
         },
         stormRain:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:48,damagePerLevel:14,spCost:75,
+            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:36,damagePerLevel:7,spCost:75,
             stunChance:35,missBonusByLevel:[30,45,50,55,65],stunDuration:1,requires:["windHowlLightning"],
-            description:"需先學習風哮電擊。對敵方全體各造成48點傷害，消耗75 SP；最高5級，每升1級傷害+14。35%基礎機率暈眩1回合，使目標MISS率提高30%/45%/50%/55%/65%。"
+            description:"需先學習風哮電擊。初次學習需30技能點，對敵方全體各造成36點傷害，消耗75 SP；35%基礎機率暈眩1回合，使目標MISS率提高30%/45%/50%/55%/65%。最高5級，每升1級消耗1技能點，傷害+7。"
         },
         dodgeSkill:{
-            learnCost:10,maxLevel:1,targetType:"allyAll",spCost:20,duration:2,evasionBonusPercent:60,
-            requires:["windCrossSlash","windHowlLightning"],description:"需先學習風旋十字斬或風哮電擊其一。使我方全體閃躲率提升60%，持續2回合，消耗20 SP。"
+            learnCost:10,maxLevel:1,targetType:"allyTri",spCost:20,duration:3,evasionBonusPercent:75,
+            requires:["windCrossSlash","windHowlLightning"],description:"需先學習風旋十字斬或風哮電擊其一。初次學習需10技能點，使我方中、左、右3人閃躲率提升75%，持續3回合，消耗20 SP。最高1級。"
         },
         stealthSkill:{
-            learnCost:15,maxLevel:1,targetType:"ally",spCost:45,duration:2,requires:["dodgeSkill"],
-            description:"需先學習閃躲術。使單一友方隱身2回合，期間無法被單體技能選中，但仍會受到範圍技能波及，消耗45 SP。"
+            learnCost:15,maxLevel:1,targetType:"ally",spCost:45,duration:3,requires:["dodgeSkill"],
+            description:"需先學習閃躲術。初次學習需15技能點，使我方1人隱身3回合；期間無法被單體技能選中，但仍會受到範圍技能波及，消耗45 SP。最高1級。"
         },
         dinghaishenzhen:{
-            learnCost:20,maxLevel:1,targetType:"allyAll",spCost:77,duration:3,statusResistBonus:45,accuracyBonusPercent:50,
-            requires:["stealthSkill"],description:"需先學習隱身術。使我方全體異常狀態抗性提升45%、命中提升50%，持續3回合，消耗77 SP。"
+            learnCost:20,maxLevel:1,targetType:"allyAll",spCost:77,duration:3,statusResistBonus:65,accuracyBonusPercent:50,
+            requires:["stealthSkill"],description:"需先學習隱身術。初次學習需20技能點，使我方全體異常狀態抗性提升65%、命中提升50%，持續3回合，消耗77 SP。最高1級。"
         },
         windEX:{
-            learnCost:25,maxLevel:1,targetType:"none",evasionBonusPercent:25,description:"永久提升風元素角色的閃躲率25%。"
+            learnCost:25,maxLevel:1,targetType:"none",evasionBonusPercent:35,description:"初次學習需25技能點，最大1級；永久提升風元素角色的閃躲率35%。"
         },
 
         stoneSlash:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:14,damagePerLevel:2,spCost:7,
+            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:26,damagePerLevel:6,spCost:7,
             defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1,
-            description:"初次學習需2技能點。對單體造成14點傷害，消耗7 SP；最高5級，每升1級傷害+2。65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。"
+            description:"初次學習需2技能點。對單體造成26點傷害，消耗7 SP；65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+6。"
         },
         petrifyFist:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:28,damagePerLevel:7,spCost:26,
-            allyShieldByLevel:[100,125,150,175,200],shieldDuration:2,requires:["stoneSlash"],
-            description:"需先學習土石斬。對同排中、左、右最多3名目標各造成28點傷害，消耗26 SP；最高5級，每升1級傷害+7，並使我方全體獲得100/125/150/175/200點護盾2回合。"
+            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:13,damagePerLevel:3,spCost:26,
+            selfShieldByLevel:[100,125,150,175,200],shieldDuration:2,requires:["stoneSlash"],
+            description:"需先學習土石斬。初次學習需10技能點，對同排中、左、右最多3名目標各造成13點傷害，消耗26 SP；並使自身獲得100/125/150/175/200點護盾2回合。最高5級，每升1級消耗1技能點，傷害+3。"
         },
         stoneBreakSky:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:65,damagePerLevel:9,spCost:42,
-            allyShieldByLevel:[100,125,150,175,200],shieldDuration:2,requires:["petrifyFist"],
-            description:"需先學習石盾拳。對單體造成65點傷害，消耗42 SP；最高5級，每升1級傷害+9，並使我方全體獲得100/125/150/175/200點護盾2回合。"
+            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:128,damagePerLevel:26,spCost:42,
+            selfShieldByLevel:[100,125,150,175,200],shieldDuration:2,requires:["petrifyFist"],
+            description:"需先學習石盾拳。初次學習需15技能點，對單體造成128點傷害，消耗42 SP；並使自身獲得100/125/150/175/200點護盾2回合。最高5級，每升1級消耗1技能點，傷害+26。"
         },
         earthquakeCrush:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:48,damagePerLevel:14,spCost:55,
-            selfShieldByLevel:[100,150,200,250,300],shieldDuration:2,requires:["stoneBreakSky"],
-            description:"需先學習石破天驚。對同排中、左、右最多3名目標各造成48點傷害，消耗55 SP；最高5級，每升1級傷害+14，並使自身獲得100/150/200/250/300點護盾2回合。"
+            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:47,damagePerLevel:9,spCost:55,
+            petrifyChanceByLevel:[30,35,40,45,50],petrifyDuration:2,requires:["stoneBreakSky"],
+            description:"需先學習石破天驚。初次學習需30技能點，對同排中、左、右最多3名目標各造成47點傷害，消耗55 SP；依等級有30%/35%/40%/45%/50%基礎機率石化目標2回合。最高5級，每升1級消耗1技能點，傷害+9。"
         },
         stoneThrow:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:14,damagePerLevel:2,spCost:7,
+            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:12,damagePerLevel:3,spCost:7,
             defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1,
-            description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成14點傷害，消耗7 SP；最高5級，每升1級傷害+2。65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。"
+            description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成12點傷害，消耗7 SP；65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+3。"
         },
         sandWind:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"row",baseDamage:17,damagePerLevel:5,spCost:19,
+            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:14,damagePerLevel:4,spCost:19,
             defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1,requires:["stoneThrow"],
-            description:"需先學習落石術。對敵方任一橫排各造成17點傷害，消耗19 SP；最高5級，每升1級傷害+5。65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。"
+            description:"需先學習落石術。初次學習需10技能點，對同排中、左、右最多3名目標各造成14點傷害，消耗19 SP；65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+4。"
         },
         flyingSandStrike:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:35,damagePerLevel:8,spCost:26,
-            petrifyChanceByLevel:[25,35,45,55,65],petrifyDuration:2,requires:["sandWind"],
-            description:"需先學習滾石術。對敵方全體各造成35點傷害，消耗26 SP；最高5級，每升1級傷害+8。依等級25%/35%/45%/55%/65%基礎機率石化目標2回合，使其無法行動。"
+            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:32,damagePerLevel:6,spCost:55,
+            defenseDownChance:60,defenseDownByLevel:[10,15,20,25,35],defenseDownDuration:2,requires:["sandWind"],
+            description:"需先學習滾石術。初次學習需15技能點，對敵方全體各造成32點傷害，消耗55 SP；60%基礎機率降低目標防禦10%/15%/20%/25%/35%，持續2回合。最高5級，每升1級消耗1技能點，傷害+6。"
         },
         dustStorm:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:98,damagePerLevel:15,spCost:55,
-            defenseDownChance:60,defenseDownByLevel:[10,15,20,25,35],defenseDownDuration:1,requires:["flyingSandStrike"],
-            description:"需先學習飛沙瞬擊。對單體造成98點傷害，消耗55 SP；最高5級，每升1級傷害+15。60%基礎機率降低目標防禦10%/15%/20%/25%/35%，持續1回合。"
+            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:140,damagePerLevel:28,spCost:65,
+            petrifyChanceByLevel:[20,25,30,35,45],petrifyDuration:2,requires:["flyingSandStrike"],
+            description:"需先學習飛沙瞬擊。初次學習需30技能點，對單體造成140點傷害，消耗65 SP；依等級有20%/25%/30%/35%/45%基礎機率石化目標2回合。最高5級，每升1級消耗1技能點，傷害+28。"
         },
         earthShield:{
-            learnCost:10,maxLevel:1,targetType:"allyAll",spCost:66,duration:3,reflectPercent:50,
-            requires:["stoneBreakSky","flyingSandStrike"],description:"需先學習石破天驚或飛沙瞬擊其一。使我方全體獲得50%反傷土盾，受到傷害時將實際傷害的50%反彈給攻擊者，持續3回合，消耗66 SP。"
+            learnCost:10,maxLevel:1,targetType:"allyTri",spCost:66,duration:3,reflectPercent:50,
+            requires:["stoneBreakSky","flyingSandStrike"],description:"需先學習石破天驚或飛沙瞬擊其一。初次學習需10技能點，使我方中、左、右3人獲得50%反傷土盾，持續3回合，消耗66 SP。最高1級。"
         },
         rockWall:{
-            learnCost:15,maxLevel:1,targetType:"allyAll",spCost:45,duration:4,defenseBonusPercent:30,requires:["barrier"],
-            description:"需先學習結界。使我方全體防禦力提升30%，持續4回合，消耗45 SP。"
+            learnCost:15,maxLevel:1,targetType:"allyTri",spCost:45,duration:4,defenseBonusPercent:35,requires:["barrier"],
+            description:"需先學習結界。初次學習需15技能點，使我方中、左、右3人防禦力提升35%，持續4回合，消耗45 SP。最高1級。"
         },
         barrier:{
             learnCost:20,maxLevel:1,targetType:"ally",spCost:40,duration:5,barrierBlockCount:5,requires:["earthShield"],
             description:"需先學習萬象土盾。使我方1人獲得結界，完全抵擋接下來5次直接傷害，最多存在5回合；燃燒、毒等持續傷害不抵擋且不消耗次數，消耗40 SP。"
         },
         earthEX:{
-            learnCost:25,maxLevel:1,targetType:"none",defenseBonusPercent:25,description:"永久提升土元素角色的防禦力25%。"
+            learnCost:25,maxLevel:1,targetType:"none",defenseBonusPercent:35,description:"初次學習需25技能點，最大1級；永久提升土元素角色的防禦力35%。"
         }
     };
 
@@ -273,6 +242,13 @@
             const monster=monsters[index];
             return monster&&monster.alive!==false&&numeric(monster.hp)>0;
         });
+    }
+
+    function learnedPartySkill(index,skillId){
+        if(typeof getSkillLevel!=="function"){ return false; }
+        const key=typeof getPartyCharacterKey==="function"
+            ?getPartyCharacterKey(index):(index===0?"fire":"player"+(index+1));
+        return numeric(getSkillLevel(key,skillId))>0;
     }
 
     function applyFrostbite(entity,duration){
@@ -353,6 +329,23 @@
     if(typeof tickStatusEffects==="function"){
         const previousTickStatusEffects=tickStatusEffects;
         tickStatusEffects=function(){
+            const waterEX=typeof skillDatabase!=="undefined"?skillDatabase.waterEX:null;
+            const cleanseChance=Math.max(0,numeric(waterEX&&waterEX.turnStartCleanseChance));
+            if(cleanseChance>0){
+                partyIndexes().forEach(index=>{
+                    const character=getPartyCharacterByIndex(index);
+                    if(
+                        !character||numeric(character.hp)<=0||character.element!=="water"||
+                        !Array.isArray(character.statusEffects)||!character.statusEffects.length||
+                        !learnedPartySkill(index,"waterEX")||Math.random()*100>=cleanseChance
+                    ){ return; }
+                    const removed=character.statusEffects.length;
+                    character.statusEffects=[];
+                    if(typeof addBattleLog==="function"){
+                        addBattleLog((character.id||"角色")+"的水元素EX在回合開始前解除"+removed+"個負面狀態。");
+                    }
+                });
+            }
             const result=previousTickStatusEffects.apply(this,arguments);
             livingMonsterIndexes().forEach(index=>tickFrostbite(monsters[index],monsters[index].name));
             partyIndexes().forEach(index=>{
@@ -455,27 +448,26 @@
         };
     }
 
-    /* ----- Player skill context: Fire EX damage bonus. ----- */
+    /* ----- Player Fire EX, guaranteed Burn and conditional follow-ups. ----- */
     let playerSkillContext=null;
 
-    function wrapPlayerSkillContext(name,skillArgIndex,characterIndexFromArgs){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(){
-            const args=arguments;
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase[args[skillArgIndex]]:null;
-            const characterIndex=characterIndexFromArgs(args);
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const previousContext=playerSkillContext;
-            playerSkillContext={skill:skill,character:character,characterIndex:characterIndex};
-            try{ return previous.apply(this,args); }
-            finally{ playerSkillContext=previousContext; }
-        };
+    function withPlayerSkillContext(context,callback){
+        const previousContext=playerSkillContext;
+        playerSkillContext=context;
+        try{ return callback(); }
+        finally{ playerSkillContext=previousContext; }
     }
 
-    wrapPlayerSkillContext("castDamageSkill",0,()=>0);
-    wrapPlayerSkillContext("castSecondaryCharacterSkill",1,args=>Number(args[0])||0);
-    wrapPlayerSkillContext("castPlayer2Skill",0,()=>1);
+    function withGuaranteedBurn(skill,callback){
+        const previousStatusRoll=typeof rollStatusEffectHit==="function"?rollStatusEffectHit:null;
+        if(!skill||!skill.guaranteedBurn||!previousStatusRoll){ return callback(); }
+        rollStatusEffectHit=function(baseChance){
+            if(numeric(baseChance)===numeric(skill.burnChance)){ return true; }
+            return previousStatusRoll.apply(this,arguments);
+        };
+        try{ return callback(); }
+        finally{ rollStatusEffectHit=previousStatusRoll; }
+    }
 
     function learnedFireEX(context){
         if(!context||!context.character||context.character.element!=="fire"){ return false; }
@@ -499,7 +491,7 @@
         };
     }
 
-    /* ----- Dragon Slash can add one cast, then one conditional final cast. ----- */
+    /* Every qualifying Fire physical skill reuses this one owner. */
     function firstLivingMonsterIndex(){
         const indexes=livingMonsterIndexes();
         return indexes.length?indexes[0]:null;
@@ -517,7 +509,58 @@
         else{ setTimeout(callback,0); }
     }
 
-    function runPlayerDragonRepeat(options,allowConditionalRepeat){
+    function livingMonsterSnapshot(){
+        return livingMonsterIndexes().map(index=>({
+            index:index,monster:monsters[index],wasAlive:true
+        }));
+    }
+
+    function snapshotHasDefeat(snapshot){
+        return (snapshot||[]).some(entry=>
+            entry.wasAlive&&(!entry.monster||entry.monster.alive===false||numeric(entry.monster.hp)<=0)
+        );
+    }
+
+    function invokeTrackedPlayerSkill(options,freeCast){
+        const snapshot=livingMonsterSnapshot();
+        const originalCost=options.skill.spCost;
+        const hadFreeFlag=Object.prototype.hasOwnProperty.call(options.skill,"v149FreeFollowUp");
+        const originalFreeFlag=options.skill.v149FreeFollowUp;
+        const originalRoll=typeof rollCritical==="function"?rollCritical:null;
+        let finishRequested=false;
+        let critical=false;
+        let result;
+
+        if(freeCast){
+            options.skill.spCost=0;
+            options.skill.v149FreeFollowUp=true;
+        }
+        if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+        if(originalRoll){
+            rollCritical=function(){
+                const roll=originalRoll.apply(this,arguments);
+                if(roll&&roll.isCrit){ critical=true; }
+                return roll;
+            };
+        }
+        try{
+            result=withPlayerSkillContext(options.context,()=>
+                withGuaranteedBurn(options.skill,()=>options.previous.apply(options.that,options.args))
+            );
+        }finally{
+            if(originalRoll){ rollCritical=originalRoll; }
+            if(options.realFinish){ finishPlayerAction=options.realFinish; }
+            options.skill.spCost=originalCost;
+            if(hadFreeFlag){ options.skill.v149FreeFollowUp=originalFreeFlag; }
+            else{ delete options.skill.v149FreeFollowUp; }
+        }
+        return {
+            result:result,finishRequested:finishRequested,critical:critical,
+            defeated:snapshotHasDefeat(snapshot)
+        };
+    }
+
+    function runPlayerFollowUp(options,castNumber){
         scheduleAfterAnimation(()=>{
             const nextTarget=preferredLivingMonsterIndex(options.originalTarget);
             if(nextTarget===null||typeof battleActive!=="undefined"&&!battleActive){
@@ -528,93 +571,68 @@
             const repeatArgs=options.args.slice();
             if(Number.isInteger(options.centerArgIndex)){ repeatArgs[options.centerArgIndex]=nextTarget; }
             if(typeof selectedMonster!=="undefined"){ selectedMonster=nextTarget; }
-            const target=typeof monsters!=="undefined"?monsters[nextTarget]:null;
-            const targetWasAlive=!!(target&&target.alive!==false&&numeric(target.hp)>0);
-            const originalCost=options.skill.spCost;
-            const originalPopup=typeof showPlayerSpPopup==="function"?showPlayerSpPopup:null;
-            const originalRoll=typeof rollCritical==="function"?rollCritical:null;
-            let finishRequested=false;
-            let repeatedCritical=false;
-            let failed=false;
-
-            options.skill.spCost=0;
-            if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
-            if(originalPopup){ showPlayerSpPopup=function(){}; }
-            if(originalRoll){
-                rollCritical=function(){
-                    const result=originalRoll.apply(this,arguments);
-                    if(result&&result.isCrit){ repeatedCritical=true; }
-                    return result;
-                };
-            }
-            try{ options.previous.apply(options.that,repeatArgs); }
-            catch(error){
-                failed=true;
-                console.error("霸龍裂天斬再施放失敗：",error);
-            }
-            finally{
-                options.skill.spCost=originalCost;
-                if(options.realFinish){ finishPlayerAction=options.realFinish; }
-                if(originalPopup){ showPlayerSpPopup=originalPopup; }
-                if(originalRoll){ rollCritical=originalRoll; }
-            }
-
-            if(failed){
+            let outcome;
+            try{
+                outcome=invokeTrackedPlayerSkill(Object.assign({},options,{args:repeatArgs}),true);
+            }catch(error){
+                console.error(options.skill.name+"追擊施放失敗：",error);
                 if(options.realFinish){ options.realFinish(); }
                 return;
             }
-            const defeatedTarget=targetWasAlive&&(!target||target.alive===false||numeric(target.hp)<=0);
             if(
-                finishRequested&&allowConditionalRepeat&&(repeatedCritical||defeatedTarget)&&
+                outcome.finishRequested&&castNumber<numeric(options.skill.followUpMaxCasts)&&
+                (outcome.critical||outcome.defeated)&&
                 preferredLivingMonsterIndex(options.originalTarget)!==null
             ){
                 if(typeof addBattleLog==="function"){
-                    addBattleLog("霸龍裂天斬追加攻擊出現爆擊或擊敗目標，再追加一次！");
+                    addBattleLog(options.skill.name+"追擊出現爆擊或擊敗目標，再追擊一次！");
                 }
-                runPlayerDragonRepeat(options,false);
+                runPlayerFollowUp(options,castNumber+1);
                 return;
             }
-            if(finishRequested&&options.realFinish){ options.realFinish(); }
+            if(outcome.finishRequested&&options.realFinish){ options.realFinish(); }
         });
     }
 
-    function wrapDragonRepeat(name,skillArgIndex,centerArgIndex,casterFromArgs){
+    function wrapPlayerSkillCast(name,skillArgIndex,centerArgIndex,characterIndexFromArgs){
         const previous=window[name];
         if(typeof previous!=="function"){ return; }
         window[name]=function(){
             const args=Array.prototype.slice.call(arguments);
             const skill=typeof skillDatabase!=="undefined"?skillDatabase[args[skillArgIndex]]:null;
-            if(!skill||skill.id!=="dragonSlash"){ return previous.apply(this,args); }
+            const characterIndex=characterIndexFromArgs(args);
+            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
+            const context={skill:skill,character:character,characterIndex:characterIndex};
+            if(!skill||!skill.followUpOnCriticalOrDefeat){
+                const that=this;
+                return withPlayerSkillContext(context,()=>withGuaranteedBurn(skill,()=>previous.apply(that,args)));
+            }
             const originalTarget=Number.isInteger(centerArgIndex)&&Number.isInteger(args[centerArgIndex])
                 ?args[centerArgIndex]
                 :(typeof selectedMonster!=="undefined"&&Number.isInteger(selectedMonster)?selectedMonster:null);
-            const caster=casterFromArgs(args);
-            const beforeSp=numeric(caster&&caster.sp);
+            const beforeSp=numeric(character&&character.sp);
             const realFinish=typeof finishPlayerAction==="function"?finishPlayerAction:null;
-            let finishRequested=false;
-            if(realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
-            let result;
-            try{ result=previous.apply(this,args); }
-            finally{ if(realFinish){ finishPlayerAction=realFinish; } }
-            const spent=beforeSp-numeric(caster&&caster.sp)>=numeric(skill.spCost);
-            const target=preferredLivingMonsterIndex(originalTarget);
-            const repeat=finishRequested&&spent&&target!==null&&Math.random()*100<numeric(skill.repeatChance);
-            if(!repeat){
-                if(finishRequested&&realFinish){ realFinish(); }
-                return result;
-            }
-            if(typeof addBattleLog==="function"){ addBattleLog("霸龍裂天斬觸發再施放！"); }
-            runPlayerDragonRepeat({
-                previous:previous,that:this,args:args,skill:skill,
+            const options={
+                previous:previous,that:this,args:args,skill:skill,context:context,
                 centerArgIndex:centerArgIndex,originalTarget:originalTarget,realFinish:realFinish
-            },true);
-            return result;
+            };
+            const outcome=invokeTrackedPlayerSkill(options,false);
+            const spent=beforeSp-numeric(character&&character.sp)>=numeric(skill.spCost);
+            const target=preferredLivingMonsterIndex(originalTarget);
+            const follow=outcome.finishRequested&&spent&&target!==null&&(outcome.critical||outcome.defeated);
+            if(!follow){
+                if(outcome.finishRequested&&realFinish){ realFinish(); }
+                return outcome.result;
+            }
+            if(typeof addBattleLog==="function"){ addBattleLog(skill.name+"觸發追擊！"); }
+            runPlayerFollowUp(options,1);
+            return outcome.result;
         };
     }
 
-    wrapDragonRepeat("castDamageSkill",0,null,()=>typeof player!=="undefined"?player:null);
-    wrapDragonRepeat("castSecondaryCharacterSkill",1,2,args=>typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(Number(args[0])||0):null);
-    wrapDragonRepeat("castPlayer2Skill",0,1,()=>typeof player2!=="undefined"?player2:null);
+    wrapPlayerSkillCast("castDamageSkill",0,null,()=>0);
+    wrapPlayerSkillCast("castSecondaryCharacterSkill",1,2,args=>Number(args[0])||0);
+    wrapPlayerSkillCast("castPlayer2Skill",0,1,()=>1);
 
     /* ----- Barrier corners, revived brightness and rank colours. ----- */
     function barrierState(entity){
@@ -725,7 +743,7 @@
         };
     }
 
-    /* ----- Reflect damage label and monster Frostbite/Dragon repeat. ----- */
+    /* ----- Reflect damage label and monster Frostbite/Fire follow-ups. ----- */
     let currentReflectAttacker=null;
 
     function showReflectDamage(index,amount){
@@ -752,7 +770,7 @@
         };
     }
 
-    function runMonsterDragonRepeat(options,allowConditionalRepeat){
+    function runMonsterFollowUp(options,castNumber){
         scheduleAfterAnimation(()=>{
             const monster=options.monster;
             if(!monster||monster.alive===false||numeric(monster.hp)<=0||!livingPartyIndexes().length){
@@ -766,6 +784,7 @@
             const originalChance=monster.skillChance;
             const originalHit=typeof showPlayerHit==="function"?showPlayerHit:null;
             const originalLog=typeof addBattleLog==="function"?addBattleLog:null;
+            const originalStatusRoll=typeof rollStatusEffectHit==="function"?rollStatusEffectHit:null;
             const previousRepeatAttacker=currentReflectAttacker;
             const livingBefore=livingPartyIndexes().map(index=>({
                 character:getPartyCharacterByIndex(index),
@@ -776,7 +795,7 @@
             let failed=false;
 
             options.skill.spCost=0;
-            monster.skillIds=["dragonSlash"];
+            monster.skillIds=[options.skill.id];
             monster.v141SupportSkillIds=[];
             monster.skillChance=1;
             currentReflectAttacker=options.monsterIndex;
@@ -789,10 +808,16 @@
             }
             if(originalLog){
                 addBattleLog=function(message){
-                    if(String(message||"").includes("霸龍裂天斬")&&String(message||"").includes("（爆擊！）")){
+                    if(String(message||"").includes(options.skill.name)&&String(message||"").includes("（爆擊！）")){
                         repeatedCritical=true;
                     }
                     return originalLog.apply(this,arguments);
+                };
+            }
+            if(originalStatusRoll&&options.skill.guaranteedBurn){
+                rollStatusEffectHit=function(baseChance){
+                    if(numeric(baseChance)===numeric(options.skill.burnChance)){ return true; }
+                    return originalStatusRoll.apply(this,arguments);
                 };
             }
             try{
@@ -806,12 +831,13 @@
             }
             catch(error){
                 failed=true;
-                console.error("敵方霸龍裂天斬再施放失敗：",error);
+                console.error("敵方"+options.skill.name+"追擊施放失敗：",error);
             }
             finally{
                 if(options.realFinish){ finishPlayerAction=options.realFinish; }
                 if(originalHit){ showPlayerHit=originalHit; }
                 if(originalLog){ addBattleLog=originalLog; }
+                if(originalStatusRoll){ rollStatusEffectHit=originalStatusRoll; }
                 currentReflectAttacker=previousRepeatAttacker;
                 options.skill.spCost=originalCost;
                 monster.skillIds=originalIds;
@@ -827,13 +853,14 @@
                 entry.alive&&(!entry.character||numeric(entry.character.hp)<=0)
             );
             if(
-                finishRequested&&allowConditionalRepeat&&(repeatedCritical||defeatedTarget)&&
+                finishRequested&&castNumber<numeric(options.skill.followUpMaxCasts)&&
+                (repeatedCritical||defeatedTarget)&&
                 monster.alive!==false&&numeric(monster.hp)>0&&livingPartyIndexes().length
             ){
                 if(typeof addBattleLog==="function"){
-                    addBattleLog(monster.name+"的霸龍裂天斬追加攻擊出現爆擊或擊敗目標，再追加一次！");
+                    addBattleLog(monster.name+"的"+options.skill.name+"追擊出現爆擊或擊敗目標，再追擊一次！");
                 }
-                runMonsterDragonRepeat(options,false);
+                runMonsterFollowUp(options,castNumber+1);
                 return;
             }
             if(finishRequested&&options.realFinish){ options.realFinish(); }
@@ -856,8 +883,15 @@
             }
             const realFinish=typeof finishPlayerAction==="function"?finishPlayerAction:null;
             const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
+            const previousHit=typeof showPlayerHit==="function"?showPlayerHit:null;
+            const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
+            const previousStatusRoll=typeof rollStatusEffectHit==="function"?rollStatusEffectHit:null;
+            const livingBefore=livingPartyIndexes().map(index=>({
+                character:getPartyCharacterByIndex(index),alive:true
+            }));
             let finishRequested=false;
             let castSkillId=null;
+            let critical=false;
             if(realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
             if(previousBadge){
                 showMonsterSkillNameBadge=function(name){
@@ -865,6 +899,27 @@
                         castSkillId=Object.keys(skillDatabase).find(id=>skillDatabase[id]&&skillDatabase[id].name===name)||null;
                     }
                     return previousBadge.apply(this,arguments);
+                };
+            }
+            if(previousHit){
+                showPlayerHit=function(){
+                    if(arguments[4]===true){ critical=true; }
+                    return previousHit.apply(this,arguments);
+                };
+            }
+            if(previousLog){
+                addBattleLog=function(message){
+                    const text=String(message||"");
+                    const skill=castSkillId&&typeof skillDatabase!=="undefined"?skillDatabase[castSkillId]:null;
+                    if(skill&&text.includes(skill.name)&&text.includes("（爆擊！）")){ critical=true; }
+                    return previousLog.apply(this,arguments);
+                };
+            }
+            if(previousStatusRoll){
+                rollStatusEffectHit=function(baseChance){
+                    const skill=castSkillId&&typeof skillDatabase!=="undefined"?skillDatabase[castSkillId]:null;
+                    if(skill&&skill.guaranteedBurn&&numeric(baseChance)===numeric(skill.burnChance)){ return true; }
+                    return previousStatusRoll.apply(this,arguments);
                 };
             }
             const previousAttacker=currentReflectAttacker;
@@ -875,6 +930,9 @@
                 currentReflectAttacker=previousAttacker;
                 if(realFinish){ finishPlayerAction=realFinish; }
                 if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
+                if(previousHit){ showPlayerHit=previousHit; }
+                if(previousLog){ addBattleLog=previousLog; }
+                if(previousStatusRoll){ rollStatusEffectHit=previousStatusRoll; }
                 if(frostbitten&&monster){
                     monster.skillIds=saved.skillIds;
                     monster.v141SupportSkillIds=saved.supports;
@@ -883,18 +941,21 @@
             }
             const repeatSkill=castSkillId&&skillDatabase[castSkillId];
             const livingTargets=livingPartyIndexes();
-            const repeat=finishRequested&&repeatSkill&&repeatSkill.id==="dragonSlash"&&monster&&
+            const defeatedTarget=livingBefore.some(entry=>
+                entry.alive&&(!entry.character||numeric(entry.character.hp)<=0)
+            );
+            const repeat=finishRequested&&repeatSkill&&repeatSkill.followUpOnCriticalOrDefeat&&monster&&
                 monster.alive!==false&&numeric(monster.hp)>0&&livingTargets.length&&
-                Math.random()*100<numeric(repeatSkill.repeatChance);
+                (critical||defeatedTarget);
             if(!repeat){
                 if(finishRequested&&realFinish){ realFinish(); }
                 return result;
             }
-            if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"的霸龍裂天斬觸發再施放！"); }
-            runMonsterDragonRepeat({
+            if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"的"+repeatSkill.name+"觸發追擊！"); }
+            runMonsterFollowUp({
                 previous:previousMonsterAttack,that:this,attackArgs:attackArgs,
                 monster:monster,monsterIndex:monsterIndex,skill:repeatSkill,realFinish:realFinish
-            },true);
+            },1);
             return result;
         };
     }

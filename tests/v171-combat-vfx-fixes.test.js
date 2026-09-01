@@ -14,9 +14,9 @@ let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V171 cache-busts every changed combat asset",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.17"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.17/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.17/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
+    assert.match(index,/js\/00-main\.js\?v=173\.18/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
 });
 
 test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path",()=>{
@@ -25,7 +25,7 @@ test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path"
     const finalDefinition=finalWaterRules.match(/floodBeast:\{[\s\S]*?\n\s*\},\n\s*iceArrowRain:/);
     assert.ok(finalDefinition);
     assert.match(finalDefinition[0],/targetType:"single"/);
-    assert.match(finalDefinition[0],/frostbiteChance:40,frostbiteDuration:1/);
+    assert.match(finalDefinition[0],/frostbiteChance:15,frostbiteDuration:1/);
     assert.doesNotMatch(finalDefinition[0],/freezeChance|teamFreeze/);
     assert.match(
         animation,

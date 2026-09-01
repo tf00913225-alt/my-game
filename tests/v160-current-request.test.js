@@ -9,20 +9,20 @@ const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const balance=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
-const latest=fs.readFileSync("js/44-v152-dev-fixes.js","utf8");
+const finalWater=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const recovery=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 
 let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V160 corrections remain published under the current cache version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.17"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.17/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
 });
 
-test("Ice Arrow Rain ends at twenty percent Freeze for two rounds",()=>{
-    assert.match(latest,/patchSkill\("iceArrowRain",\{[\s\S]*?freezeChance:20,freezeDuration:2/);
-    assert.match(latest,/20%基礎機率冰封2回合/);
+test("Ice Arrow Rain ends at twenty percent Frostbite for one round",()=>{
+    assert.match(finalWater,/iceArrowRain:\{[\s\S]*?frostbiteChance:20,frostbiteDuration:1/);
+    assert.match(finalWater,/20%基礎機率使目標凍傷1回合/);
 });
 
 test("hard-control caps end at regular eighty, elite sixty and boss forty",()=>{

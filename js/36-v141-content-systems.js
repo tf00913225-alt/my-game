@@ -868,6 +868,10 @@
             const started=window.v132LaunchDungeonBattle(roster,function(outcome){
                 abyssBattleStarting=false;
                 showPage("dungeon");
+                /* Returning from combat must preserve the entered-map state.
+                   showPage/switchDungeonTab may restore the daily tab first,
+                   which otherwise clears this flag and reopens the cover. */
+                abyssMapEntered=true;
                 if(outcome.result!=="win"){
                     abyssState.message="挑戰失敗，守關者仍在等待。";
                     persistAbyss(); switchDungeonTab("abyss"); return;

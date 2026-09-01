@@ -16,39 +16,6 @@
         return Math.max(min,Math.min(max,value));
     }
 
-    function patchSkill(id,fields){
-        if(typeof skillDatabase==="undefined"||!skillDatabase[id]){ return; }
-        Object.keys(fields).forEach(key=>{
-            const value=fields[key];
-            skillDatabase[id][key]=Array.isArray(value)?value.slice():value;
-        });
-    }
-
-    patchSkill("rage",{
-        targetType:"allyTri",
-        spCost:65,
-        duration:4,
-        description:"需先學習火爆亂擊或烈焰龍捲其一。提高我方同排中、左、右最多3人的爆擊率5%/10%/15%/20%/25%與爆擊傷害10%/20%/30%/40%/50%，持續4回合，消耗65 SP。"
-    });
-
-    patchSkill("freeze",{
-        targetType:"tri",
-        spCost:66,
-        freezeChance:80,
-        freezeDuration:4,
-        description:"需先學習冰霜箭雨。對同排中、左、右最多3名目標各有80%基礎機率造成冰封，使其無法行動4回合，消耗66 SP；不造成傷害。"
-    });
-
-    patchSkill("healSpell",{
-        targetType:"allyAll",
-        baseHeal:550,
-        healPerLevel:30,
-        baseHealSP:65,
-        healSPPerLevel:30,
-        spCost:45,
-        description:"需先學習冰霜箭雨或冰旋一閃其一。對我方全體恢復550 HP與65 SP，消耗45 SP；最高5級，每升1級HP與SP恢復量各+30。施放者本人不恢復SP。"
-    });
-
     function hitChancePercent(casterAccuracy,targetEvasion,directChanceReductionPercent){
         const directReduction=Math.max(0,numeric(directChanceReductionPercent));
         const minimum=directReduction>0?60:80;

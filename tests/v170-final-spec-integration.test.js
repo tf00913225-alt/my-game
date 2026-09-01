@@ -1,9 +1,9 @@
 "use strict";
 
 /*
- * V170 FINAL INTEGRATION SPEC
+ * CURRENT FINAL INTEGRATION SPEC (V173.18)
  *
- * This suite is the only test that represents the fully loaded V170 rules.
+ * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
  * patch layer and must not be used as the current source of truth.
  */
@@ -74,52 +74,52 @@ const EXPECTED_RUNTIME_PATHS=[
 
 /* damage, growth, SP, target, learn, upgrade, max, prerequisites */
 const FINAL_FOUR_ELEMENT_CORE={
-    flameSlash:[17,10,8,"single",2,1,5,[]],
-    fireCritical:[39,13,15,"single",10,1,5,["flameSlash"]],
-    explosiveFlurry:[35,15,22,"tri",20,1,5,["fireCritical"]],
-    dragonSlash:[165,25,65,"single",45,1,5,["explosiveFlurry"]],
-    fireRocket:[17,8,8,"tri",2,1,5,[]],
-    blazeSpell:[42,15,15,"single",10,1,5,["fireRocket"]],
-    flameTornado:[135,13,55,"single",30,1,5,["blazeSpell"]],
-    phoenixCry:[60,18,68,"all",45,1,5,["flameTornado"]],
-    rage:[null,null,65,"allyTri",25,1,5,["explosiveFlurry","flameTornado"]],
+    flameSlash:[30,6,10,"single",2,1,5,[]],
+    fireCritical:[45,9,28,"single",10,1,5,["flameSlash"]],
+    explosiveFlurry:[50,10,47,"tri",20,1,5,["fireCritical"]],
+    dragonSlash:[165,33,65,"single",45,1,5,["explosiveFlurry"]],
+    fireRocket:[13,4,10,"tri",2,1,5,[]],
+    blazeSpell:[45,9,28,"single",10,1,5,["fireRocket"]],
+    flameTornado:[150,30,47,"single",30,1,5,["blazeSpell"]],
+    phoenixCry:[42,9,60,"all",45,1,5,["flameTornado"]],
+    rage:[null,null,50,"allyTri",25,1,5,["explosiveFlurry","flameTornado"]],
     fireEX:[null,null,null,"none",25,null,1,[]],
 
-    waterKnife:[13,3,6,"single",2,1,5,[]],
-    frostPunch:[30,8,17,"single",10,1,5,["waterKnife"]],
-    iceSpin:[25,7,45,"tri",20,1,5,["frostPunch"]],
-    frostCrush:[100,15,60,"single",30,1,5,["iceSpin"]],
-    waterBall:[17,3,8,"tri",2,1,5,[]],
-    floodBeast:[85,8,35,"single",15,1,5,["waterBall"]],
-    iceArrowRain:[30,12,75,"all",20,1,5,["floodBeast"]],
-    freeze:[null,null,32,"single",25,null,1,["iceArrowRain"]],
-    healSpell:[null,null,45,"allyAll",20,1,5,["iceArrowRain","iceSpin"]],
+    waterKnife:[21,5,6,"single",2,1,5,[]],
+    frostPunch:[32,7,17,"single",10,1,5,["waterKnife"]],
+    iceSpin:[35,7,45,"tri",20,1,5,["frostPunch"]],
+    frostCrush:[116,24,60,"single",30,1,5,["iceSpin"]],
+    waterBall:[10,2,8,"tri",2,1,5,[]],
+    floodBeast:[105,21,35,"single",15,1,5,["waterBall"]],
+    iceArrowRain:[30,6,75,"all",20,1,5,["floodBeast"]],
+    freeze:[null,null,32,"column",25,null,1,["iceArrowRain"]],
+    healSpell:[null,null,45,"allyTri",20,1,5,["iceArrowRain","iceSpin"]],
     revive:[null,null,45,"deadAlly",20,1,5,["healSpell"]],
     waterEX:[null,null,null,"none",25,null,1,[]],
 
-    stormFist:[14,2,7,"single",2,1,5,[]],
-    stormFlurry:[28,7,20,"tri",10,1,5,["stormFist"]],
-    windCrossSlash:[90,12,39,"single",15,1,5,["stormFlurry"]],
-    dizzyFist:[120,15,55,"single",30,1,5,["stormFlurry"]],
-    windSpell:[18,2,9,"tri",2,1,5,[]],
-    stormCircle:[38,9,18,"row",10,1,5,["windSpell"]],
-    windHowlLightning:[98,15,55,"single",15,1,5,["stormCircle"]],
-    stormRain:[48,14,75,"all",30,1,5,["windHowlLightning"]],
-    dodgeSkill:[null,null,20,"allyAll",10,null,1,["windCrossSlash","windHowlLightning"]],
+    stormFist:[26,6,7,"single",2,1,5,[]],
+    stormFlurry:[13,3,20,"tri",10,1,5,["stormFist"]],
+    windCrossSlash:[128,26,39,"single",15,1,5,["stormFlurry"]],
+    dizzyFist:[141,29,55,"single",30,1,5,["stormFlurry"]],
+    windSpell:[12,3,9,"tri",2,1,5,[]],
+    stormCircle:[14,4,18,"tri",10,1,5,["windSpell"]],
+    windHowlLightning:[128,26,55,"single",15,1,5,["stormCircle"]],
+    stormRain:[36,7,75,"all",30,1,5,["windHowlLightning"]],
+    dodgeSkill:[null,null,20,"allyTri",10,null,1,["windCrossSlash","windHowlLightning"]],
     stealthSkill:[null,null,45,"ally",15,null,1,["dodgeSkill"]],
     dinghaishenzhen:[null,null,77,"allyAll",20,null,1,["stealthSkill"]],
     windEX:[null,null,null,"none",25,null,1,[]],
 
-    stoneSlash:[14,2,7,"single",2,1,5,[]],
-    petrifyFist:[28,7,26,"tri",10,1,5,["stoneSlash"]],
-    stoneBreakSky:[65,9,42,"single",15,1,5,["petrifyFist"]],
-    earthquakeCrush:[48,14,55,"tri",30,1,5,["stoneBreakSky"]],
-    stoneThrow:[14,2,7,"tri",2,1,5,[]],
-    sandWind:[17,5,19,"row",10,1,5,["stoneThrow"]],
-    flyingSandStrike:[35,8,26,"all",15,1,5,["sandWind"]],
-    dustStorm:[98,15,55,"single",30,1,5,["flyingSandStrike"]],
-    earthShield:[null,null,66,"allyAll",10,null,1,["stoneBreakSky","flyingSandStrike"]],
-    rockWall:[null,null,45,"allyAll",15,null,1,["barrier"]],
+    stoneSlash:[26,6,7,"single",2,1,5,[]],
+    petrifyFist:[13,3,26,"tri",10,1,5,["stoneSlash"]],
+    stoneBreakSky:[128,26,42,"single",15,1,5,["petrifyFist"]],
+    earthquakeCrush:[47,9,55,"tri",30,1,5,["stoneBreakSky"]],
+    stoneThrow:[12,3,7,"tri",2,1,5,[]],
+    sandWind:[14,4,19,"tri",10,1,5,["stoneThrow"]],
+    flyingSandStrike:[32,6,55,"all",15,1,5,["sandWind"]],
+    dustStorm:[140,28,65,"single",30,1,5,["flyingSandStrike"]],
+    earthShield:[null,null,66,"allyTri",10,null,1,["stoneBreakSky","flyingSandStrike"]],
+    rockWall:[null,null,45,"allyTri",15,null,1,["barrier"]],
     barrier:[null,null,40,"ally",20,null,1,["earthShield"]],
     earthEX:[null,null,null,"none",25,null,1,[]]
 };
@@ -273,7 +273,7 @@ function executeFullWaterCast(skillId){
     })()`);
 }
 
-test("V170 baseline and the real index/js20 runtime order are pinned",()=>{
+test("the baseline and the real index/js20 runtime order are pinned",()=>{
     assert.equal(MAIN_BASELINE_SHA,"9115b66988feb992822826eb5397e9515b4d795e");
     const directScripts=Array.from(indexSource.matchAll(/<script\b[^>]*\bsrc="([^"?]+)(?:\?[^\"]*)?"/g),match=>match[1]);
     assert.deepEqual(directScripts,EXPECTED_DIRECT_SCRIPT_PATHS);
@@ -281,12 +281,12 @@ test("V170 baseline and the real index/js20 runtime order are pinned",()=>{
     EXPECTED_RUNTIME_PATHS.forEach(path=>assert.equal(fs.existsSync(path),true,path));
 });
 
-test("all V170 formal runtimes execute once in production order",()=>{
+test("all formal runtimes execute once in production order",()=>{
     const runtime=loadFinalRuntime();
     assert.deepEqual(runtime.loaded,EXPECTED_DIRECT_SCRIPT_PATHS.concat(EXPECTED_RUNTIME_PATHS));
 });
 
-test("the complete four-element V170 core table is final after every patch",()=>{
+test("the complete four-element core table is final after every patch",()=>{
     const skills=loadFinalRuntime().skills;
     assert.equal(Object.keys(FINAL_FOUR_ELEMENT_CORE).length,45);
     Object.entries(FINAL_FOUR_ELEMENT_CORE).forEach(([id,expected])=>{
@@ -297,16 +297,21 @@ test("the complete four-element V170 core table is final after every patch",()=>
 test("Burn, Frostbite, Freeze and every other final status definition are exact",()=>{
     const skills=loadFinalRuntime().skills;
     const expected={
-        flameTornado:{burnChance:30,burnDuration:2,burnPercentByLevel:[3,4,5,6,8]},
-        phoenixCry:{burnChance:70,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],burnBonusOnNoTargetsPercent:50,burnBonusDuration:1},
-        iceSpin:{frostbiteChance:30,frostbiteDuration:1},
-        frostCrush:{frostbiteChance:40,frostbiteDuration:1},
-        floodBeast:{frostbiteChance:40,frostbiteDuration:1},
+        fireRocket:{burnChance:25,burnDuration:2,burnPercentByLevel:[1,1,2,2,3]},
+        blazeSpell:{burnChance:30,burnDuration:2,burnPercentByLevel:[1,2,3,4,5]},
+        flameTornado:{burnChance:100,guaranteedBurn:true,burnDuration:1,burnPercentByLevel:[3,4,5,6,7]},
+        phoenixCry:{burnChance:40,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1},
+        waterKnife:{frostbiteChance:10,frostbiteDuration:1},
+        frostPunch:{frostbiteChance:15,frostbiteDuration:1},
+        iceSpin:{frostbiteChance:20,frostbiteDuration:1},
+        frostCrush:{frostbiteChance:25,frostbiteDuration:1},
+        waterBall:{frostbiteChance:10,frostbiteDuration:1},
+        floodBeast:{frostbiteChance:15,frostbiteDuration:1},
         iceArrowRain:{frostbiteChance:20,frostbiteDuration:1},
         freeze:{freezeChance:90,freezeDuration:5},
         stormFist:{agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1},
         stormFlurry:{damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2},
-        windCrossSlash:{damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1},
+        windCrossSlash:{damageDownChance:65,damageDownByLevel:[20,30,35,40,50],damageDownDuration:1},
         dizzyFist:{stunChance:65,missBonusByLevel:[30,45,50,55,65],stunDuration:5},
         windSpell:{agilityDownChance:50,agilityDownByLevel:[10,20,30,40,50],agilityDownDuration:1},
         stormCircle:{damageDownChance:55,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1},
@@ -315,14 +320,14 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
         stoneSlash:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         stoneThrow:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         sandWind:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
-        flyingSandStrike:{petrifyChanceByLevel:[25,35,45,55,65],petrifyDuration:2},
-        dustStorm:{defenseDownChance:60,defenseDownByLevel:[10,15,20,25,35],defenseDownDuration:1},
-        earthquakeCrush:{petrifyChanceByLevel:[30,35,40,45,50],petrifyDuration:3}
+        flyingSandStrike:{defenseDownChance:60,defenseDownByLevel:[10,15,20,25,35],defenseDownDuration:2},
+        dustStorm:{petrifyChanceByLevel:[20,25,30,35,45],petrifyDuration:2},
+        earthquakeCrush:{petrifyChanceByLevel:[30,35,40,45,50],petrifyDuration:2}
     };
     Object.entries(expected).forEach(([id,fields])=>{
         Object.entries(fields).forEach(([field,value])=>assert.deepEqual(skills[id][field],value,id+"."+field));
     });
-    ["iceSpin","frostCrush","floodBeast","iceArrowRain"].forEach(id=>{
+    ["waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain"].forEach(id=>{
         ["freezeChance","freezeDuration","freezeSingleTarget","teamFreezeChance","teamFreezeDuration"].forEach(field=>{
             assert.equal(skills[id][field],undefined,id+" must not retain "+field);
         });
@@ -330,6 +335,10 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
     assert.equal(skills.freeze.baseDamage,undefined);
     assert.equal(skills.freeze.frostbiteChance,undefined);
     assert.equal(skills.earthquakeCrush.selfShieldByLevel,undefined);
+    assert.deepEqual(skills.petrifyFist.selfShieldByLevel,[100,125,150,175,200]);
+    assert.deepEqual(skills.stoneBreakSky.selfShieldByLevel,[100,125,150,175,200]);
+    assert.equal(skills.flyingSandStrike.petrifyChanceByLevel,undefined);
+    assert.equal(skills.dustStorm.defenseDownChance,undefined);
 });
 
 test("final normal hit and status-effect bounds override the historical floors",()=>{
@@ -417,12 +426,12 @@ test("Heal Spell restores allies but never refunds the caster's own SP",()=>{
         Object.assign(player,{
             id:"施法者",element:"water",level:50,hp:100,sp:100,
             attack:0,vitality:0,energy:0,intelligence:0,spirit:0,agility:0,
-            bonusHP:0,bonusSP:0,activeBuffs:[],statusEffects:[]
+            bonusHP:0,bonusSP:0,activeBuffs:[],statusEffects:[{type:"burn",turnsLeft:2}]
         });
         player2={
             id:"隊友",element:"fire",level:50,hp:200,sp:10,
             attack:0,vitality:0,energy:0,intelligence:0,spirit:0,agility:0,
-            bonusHP:0,bonusSP:0,activeBuffs:[],statusEffects:[]
+            bonusHP:0,bonusSP:0,activeBuffs:[],statusEffects:[{type:"stun",turnsLeft:1}]
         };
         player3=null;
         getPartyBattleStats=function(){ return {maxHP:1000,maxSP:1000,intelligence:0}; };
@@ -434,16 +443,67 @@ test("Heal Spell restores allies but never refunds the caster's own SP",()=>{
         return {
             settled:settled,
             caster:{hp:player.hp,sp:player.sp},
-            ally:{hp:player2.hp,sp:player2.sp},
+            ally:{hp:player2.hp,sp:player2.sp},statuses:[player.statusEffects,player2.statusEffects],
             data:{baseHeal:skillDatabase.healSpell.baseHeal,healPerLevel:skillDatabase.healSpell.healPerLevel,
                 baseHealSP:skillDatabase.healSpell.baseHealSP,healSPPerLevel:skillDatabase.healSpell.healSPPerLevel,
                 spCost:skillDatabase.healSpell.spCost,targetType:skillDatabase.healSpell.targetType}
         };
     })()`);
     assert.deepEqual(result,{
-        settled:true,caster:{hp:650,sp:55},ally:{hp:750,sp:75},
-        data:{baseHeal:550,healPerLevel:30,baseHealSP:65,healSPPerLevel:30,spCost:45,targetType:"allyAll"}
+        settled:true,caster:{hp:650,sp:55},ally:{hp:750,sp:75},statuses:[[],[]],
+        data:{baseHeal:550,healPerLevel:30,baseHealSP:65,healSPPerLevel:30,spCost:45,targetType:"allyTri"}
     });
+});
+
+test("final support passives and front/back Freeze behavior are exact",()=>{
+    const runtime=loadFinalRuntime();
+    const skills=runtime.skills;
+    assert.deepEqual(
+        [skills.rage.duration,skills.dodgeSkill.evasionBonusPercent,skills.dodgeSkill.duration,
+            skills.stealthSkill.duration,skills.dinghaishenzhen.statusResistBonus,
+            skills.dinghaishenzhen.accuracyBonusPercent,skills.windEX.evasionBonusPercent],
+        [3,75,3,3,65,50,35]
+    );
+    assert.deepEqual(
+        [skills.earthShield.reflectPercent,skills.earthShield.duration,
+            skills.rockWall.defenseBonusPercent,skills.rockWall.duration,
+            skills.barrier.barrierBlockCount,skills.barrier.duration,skills.earthEX.defenseBonusPercent],
+        [50,3,35,4,5,5,35]
+    );
+    assert.deepEqual(
+        [skills.waterEX.damageBonusPercent,skills.waterEX.healBonusPercent,
+            skills.waterEX.turnStartCleanseChance,skills.waterEX.statusResistBonus],
+        [5,10,30,undefined]
+    );
+    assert.deepEqual(
+        [skills.fireEX.damageBonusPercent,skills.fireEX.critChanceBonusPercent,
+            skills.fireEX.critDamageBonusPercent,skills.fireEX.statusTargetDamageBonusPercent],
+        [10,5,5,5]
+    );
+    ["flameSlash","fireCritical","explosiveFlurry"].forEach(id=>{
+        assert.deepEqual([skills[id].followUpOnCriticalOrDefeat,skills[id].followUpMaxCasts],[true,1],id);
+    });
+    assert.deepEqual([skills.dragonSlash.followUpOnCriticalOrDefeat,skills.dragonSlash.followUpMaxCasts],[true,2]);
+
+    const result=evaluateJson(runtime.context,`(function(){
+        monsters.splice(0,monsters.length);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length);
+        for(let index=0;index<6;index++){
+            monsters.push({
+                name:"列目標"+index,hp:100,alive:true,
+                v141FormationRow:Math.floor(index/3),v141FormationPosition:index%3
+            });
+            currentBattleMonsters.push(index);
+        }
+        Object.assign(player,{id:"水角",element:"water",hp:100,statusEffects:[{type:"burn",turnsLeft:2}]});
+        player2=null;player3=null;battleActive=true;
+        getSkillLevel=function(_key,id){ return id==="waterEX"?1:0; };
+        Math.random=function(){ return 0; };
+        const column=getSkillTargets(1,"column");
+        tickStatusEffects();
+        return {column:column,statuses:player.statusEffects};
+    })()`);
+    assert.deepEqual(result,{column:[1,4],statuses:[]});
 });
 
 function prepareExtremeEmperor(context){

@@ -97,9 +97,9 @@ function loadRuntime(overrides={}){
 }
 
 test("V154 remains ordered immediately before V155",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.17"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.17/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.17/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.18/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.ok(loader.indexOf("js/45-v154-dev-fixes.js")>loader.indexOf("js/44-v152-dev-fixes.js"));
     assert.ok(loader.indexOf("js/46-v155-dev-fixes.js")>loader.indexOf("js/45-v154-dev-fixes.js"));
