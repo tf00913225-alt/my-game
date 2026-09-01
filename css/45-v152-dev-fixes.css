@@ -230,6 +230,9 @@ body > .damage-popup.v152-top-damage{
     display:none !important;
 }
 .v141-reward-toast{
+    pointer-events:none !important;
+}
+.v141-reward-toast.show{
     pointer-events:auto !important;
     cursor:pointer !important;
     touch-action:manipulation !important;

@@ -324,6 +324,23 @@
             const map=document.getElementById("v141AbyssMap");
             const playerElement=document.getElementById("v141AbyssPlayer");
             if(!map||!playerElement){ return previousAbyssMove.apply(this,arguments); }
+            /*
+               The map's later walking wrapper must never rewrite a BOSS tap to
+               a one-step ground coordinate. Let the source map handler use
+               the original event so its portrait bounds open the dialogue.
+            */
+            const boss=map.querySelector(".v141-abyss-boss");
+            const bossRect=boss&&boss.getBoundingClientRect?boss.getBoundingClientRect():null;
+            const pointX=Number(event&&event.clientX);
+            const pointY=Number(event&&event.clientY);
+            const target=event&&event.target;
+            const bossHit=!!(boss&&(
+                (target&&target.closest&&target.closest(".v141-abyss-boss")===boss)||
+                (bossRect&&Number.isFinite(pointX)&&Number.isFinite(pointY)&&
+                    pointX>=bossRect.left&&pointX<=bossRect.right&&
+                    pointY>=bossRect.top&&pointY<=bossRect.bottom)
+            ));
+            if(bossHit){ return previousAbyssMove.apply(this,arguments); }
             if(map.dataset.v146Moving==="1"){ return; }
             if(event&&event.target&&event.target.closest&&event.target.closest("button")){ return; }
             const rect=map.getBoundingClientRect();

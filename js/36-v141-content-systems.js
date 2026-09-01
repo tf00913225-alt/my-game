@@ -676,6 +676,13 @@
     }
 
     function bossPosition(){ return [50,33]; }
+    const ABYSS_DIALOGUE={
+        1:["凡人也敢踏入帝境？","黃沙會埋葬你的名字。","先過天兵這一關再說！"],
+        2:["烈火會把你的勇氣燒光。","再向前一步，便是灰燼。","你撐不過南天之焰！"],
+        3:["風起之時，無人能立。","你的招式太慢了。","天威不是凡人能挑戰的！"],
+        4:["寒泉已封住你的退路。","讓冰霜替你長眠。","北境之前，止步吧！"],
+        5:["五帝同臨，你已無路可退。","極光會照見你的敗亡。","此處便是深淵盡頭！"]
+    };
     function abyssProgressLabel(){
         const phaseLabels={boss:"等待挑戰",chest:"寶箱待開啟",portal:"寶箱已領取・傳送點已開啟"};
         return "目前進度：第 "+abyssState.floor+" / 5 層・"+(phaseLabels[abyssState.phase]||"挑戰進行中");
@@ -693,7 +700,7 @@
         const floor=abyssState.floor;
         const info=floor<5?abyssFloors[floor]:{boss:"五帝聯軍",element:"light"};
         const pos=bossPosition(floor);
-        const boss=abyssState.phase==="boss"?'<button class="v141-abyss-boss" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v141ChallengeAbyssBoss()"><b>'+escapeHtml(info.boss)+'</b><span>'+elementLabel[info.element]+'元素・點擊挑戰</span></button>':'';
+        const boss=abyssState.phase==="boss"?'<button type="button" class="v141-abyss-boss" data-abyss-boss-control="true" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="v141HandleAbyssBossInteraction(event)"><b>'+escapeHtml(info.boss)+'</b><span>'+elementLabel[info.element]+'元素・點擊挑戰</span></button>':'';
         const hasFloorReward=floor<5&&(abyssState.phase==="chest"||abyssState.phase==="portal");
         const portal=hasFloorReward?'<button class="v141-abyss-portal'+(abyssState.phase==="chest"?' locked':'')+'" style="left:50%;top:10%" aria-disabled="'+(abyssState.phase==="chest"?'true':'false')+'" onclick="event.stopPropagation();v141UseAbyssPortal()"><i></i><span>'+(abyssState.phase==="chest"?'先開啟寶箱':'前往下一層')+'</span></button>':'';
         const showChest=abyssState.phase==="chest"||abyssState.phase==="portal";
@@ -714,6 +721,7 @@
             target.style.backgroundPosition="center";
             target.style.backgroundRepeat="no-repeat";
         }
+        installAbyssBossInputBridge();
     }
 
     function refreshAbyssPage(){
@@ -783,10 +791,67 @@
         }
         return true;
     };
-    window.v141AbyssMoveByEvent=function(event){
-        if(event.target.closest("button")){ return; }
+    function isAbyssMapControlHit(event,control){
+        if(!event||!control){ return false; }
+        const target=event.target;
+        if(target&&typeof target.closest==="function"&&target.closest("button")===control){
+            return true;
+        }
+        const x=Number(event.clientX);
+        const y=Number(event.clientY);
+        if(!Number.isFinite(x)||!Number.isFinite(y)){ return false; }
+        const rect=control.getBoundingClientRect();
+        return x>=rect.left&&x<=rect.right&&y>=rect.top&&y<=rect.bottom;
+    }
+
+    /*
+       All BOSS input enters here.  It is used both by the visible button and
+       by a capture-phase pointer bridge on the map, so a portrait/pseudo-layer
+       cannot turn a BOSS tap into a ground-movement request.
+    */
+    window.v141HandleAbyssBossInteraction=function(event){
+        if(event){
+            if(event.preventDefault){ event.preventDefault(); }
+            if(event.stopPropagation){ event.stopPropagation(); }
+        }
+        if(abyssState.phase!=="boss"){ return false; }
+        window.v141ChallengeAbyssBoss();
+        return true;
+    };
+
+    function installAbyssBossInputBridge(){
         const map=document.getElementById("v141AbyssMap");
-        if(map.dataset.v169DialogueApproaching==="1"){ return; }
+        if(!map||map.dataset.v173BossInputBridge==="1"){ return; }
+        map.dataset.v173BossInputBridge="1";
+        ["pointerup","click"].forEach(type=>map.addEventListener(type,event=>{
+            /*
+               The dialogue itself occupies the map.  Capture handlers run before
+               its own click handler, so never route a dialogue click back into
+               the guardian trigger.
+            */
+            if(event.target&&typeof event.target.closest==="function"&&event.target.closest(".v143-abyss-dialogue")){ return; }
+            const boss=abyssState.phase==="boss"?map.querySelector(".v141-abyss-boss"):null;
+            if(!isAbyssMapControlHit(event,boss)){ return; }
+            window.v141HandleAbyssBossInteraction(event);
+        },true));
+    }
+
+    window.v141AbyssMoveByEvent=function(event){
+        const map=document.getElementById("v141AbyssMap");
+        if(!map||map.dataset.v169DialogueApproaching==="1"){ return; }
+        const boss=abyssState.phase==="boss"?map.querySelector(".v141-abyss-boss"):null;
+        /*
+           Mobile browsers may report the portrait pseudo-element as the map
+           target.  Route the touch by the guardian button's rendered bounds
+           before treating it as a ground-movement request.
+        */
+        if(isAbyssMapControlHit(event,boss)){
+            if(event.preventDefault){ event.preventDefault(); }
+            if(event.stopPropagation){ event.stopPropagation(); }
+            window.v141HandleAbyssBossInteraction(event);
+            return;
+        }
+        if(event.target&&typeof event.target.closest==="function"&&event.target.closest("button")){ return; }
         const rect=map.getBoundingClientRect();
         /* V143：地圖放大後同步放寬可走區，保留角色半身安全邊界即可。 */
         const x=Math.max(4,Math.min(96,(event.clientX-rect.left)/rect.width*100));
@@ -794,20 +859,10 @@
         moveAbyssPlayer(x,y);
     };
 
-    window.v141ChallengeAbyssBoss=function(){
-        if(abyssBattleStarting||abyssState.phase!=="boss"){ return; }
+    function launchAbyssBossBattle(){
+        if(abyssBattleStarting||abyssState.phase!=="boss"){ return false; }
         abyssBattleStarting=true;
         const floor=abyssState.floor;
-        const lines=floor<5?abyssFloors[floor].taunts:["五帝同臨，你已無路可退。","極光會照見你的敗亡。","此處便是深淵盡頭！"];
-        /* V143 的中央點擊對話已由上層逐句完成，完成後不再重播舊自動泡泡。 */
-        const dialogueAlreadyCompleted=window.__v143AbyssDialogueComplete===true;
-        window.__v143AbyssDialogueComplete=false;
-        const count=dialogueAlreadyCompleted?0:1+Math.floor(Math.random()*3);
-        const chosen=lines.slice().sort(()=>Math.random()-.5).slice(0,count);
-        const bubble=document.getElementById("v141AbyssSpeech");
-        chosen.forEach((line,index)=>setTimeout(()=>{
-            if(bubble){ bubble.textContent=line; bubble.classList.add("show"); }
-        },index*720));
         setTimeout(()=>{
             const roster=buildAbyssRoster(floor);
             const started=window.v132LaunchDungeonBattle(roster,function(outcome){
@@ -824,7 +879,107 @@
                 persistAbyss(); switchDungeonTab("abyss");
             });
             if(!started){ abyssBattleStarting=false; }
-        },dialogueAlreadyCompleted?80:count*720+260);
+        },180);
+        return true;
+    }
+
+    function positionAbyssBossDialogue(map,overlay,bossButton){
+        if(
+            !map||!overlay||typeof map.getBoundingClientRect!=="function"||
+            !overlay.style
+        ){ return false; }
+        const mapRect=map.getBoundingClientRect();
+        const renderedWidth=Number(mapRect&&mapRect.width);
+        const renderedHeight=Number(mapRect&&mapRect.height);
+        if(!(renderedWidth>0)||!(renderedHeight>0)){ return false; }
+
+        /* The map is rendered inside the scaled 1080x1920 stage. Convert the
+           guardian's viewport rectangle back into map-local logical pixels. */
+        const logicalWidth=Number(map.offsetWidth)>0?Number(map.offsetWidth):renderedWidth;
+        const logicalHeight=Number(map.offsetHeight)>0?Number(map.offsetHeight):renderedHeight;
+        const scaleX=logicalWidth/renderedWidth;
+        const scaleY=logicalHeight/renderedHeight;
+        const dialogueWidth=Math.max(0,Math.min(logicalWidth,Number(overlay.offsetWidth)||0));
+        const dialogueHeight=Math.max(0,Math.min(logicalHeight,Number(overlay.offsetHeight)||0));
+        const inset=12;
+        const minLeft=Math.min(logicalWidth/2,dialogueWidth/2+inset);
+        const maxLeft=Math.max(minLeft,logicalWidth-dialogueWidth/2-inset);
+        const minTop=Math.min(logicalHeight,dialogueHeight+inset);
+        const maxTop=Math.max(minTop,logicalHeight-inset);
+        let desiredLeft=logicalWidth/2;
+        let desiredTop=minTop;
+
+        if(bossButton&&typeof bossButton.getBoundingClientRect==="function"){
+            const bossRect=bossButton.getBoundingClientRect();
+            const bossWidth=Number(bossRect&&bossRect.width);
+            const bossLeft=Number(bossRect&&bossRect.left);
+            const bossTop=Number(bossRect&&bossRect.top);
+            if(Number.isFinite(bossLeft)&&Number.isFinite(bossTop)&&Number.isFinite(bossWidth)){
+                desiredLeft=(bossLeft+bossWidth/2-mapRect.left)*scaleX;
+                desiredTop=(bossTop-mapRect.top-8)*scaleY;
+            }
+        }
+
+        const left=Math.max(minLeft,Math.min(maxLeft,desiredLeft))+"px";
+        const top=Math.max(minTop,Math.min(maxTop,desiredTop))+"px";
+        overlay.style.left=left;
+        overlay.style.top=top;
+        if(typeof overlay.style.setProperty==="function"){
+            /* Final Abyss CSS must override the legacy full-map inset:0 rule.
+               Custom properties carry these measured coordinates through that
+               important rule without introducing another runtime wrapper. */
+            overlay.style.setProperty("--v141-abyss-dialogue-left",left);
+            overlay.style.setProperty("--v141-abyss-dialogue-top",top);
+        }
+        return true;
+    }
+
+    function openAbyssBossDialogue(){
+        if(abyssBattleStarting||abyssState.phase!=="boss"){ return false; }
+        const map=document.getElementById("v141AbyssMap");
+        if(!map||map.dataset.v141AbyssDialogueOpening==="1"){ return false; }
+        const bossButton=map.querySelector(".v141-abyss-boss");
+        const existingDialogue=map.querySelector(".v143-abyss-dialogue");
+        if(existingDialogue){
+            return positionAbyssBossDialogue(map,existingDialogue,bossButton);
+        }
+        map.dataset.v141AbyssDialogueOpening="1";
+        const floor=Math.max(1,Math.min(5,Number(abyssState.floor)||1));
+        const boss=bossButton&&bossButton.querySelector("b");
+        const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();
+        let index=0;
+        const overlay=document.createElement("button");
+        overlay.type="button";
+        overlay.className="v143-abyss-dialogue";
+        overlay.setAttribute("aria-label","守關者對話，點擊繼續");
+        overlay.innerHTML='<small>'+escapeHtml(boss&&boss.textContent||"守關者")+'</small><b></b><span>點擊對話繼續　'+(index+1)+' / '+lines.length+'</span>';
+        const text=overlay.querySelector("b");
+        const hint=overlay.querySelector("span");
+        text.textContent=lines[index];
+        overlay.onclick=event=>{
+            event.preventDefault(); event.stopPropagation();
+            index++;
+            if(index<lines.length){
+                text.textContent=lines[index];
+                hint.textContent="點擊對話繼續　"+(index+1)+" / "+lines.length;
+                return;
+            }
+            text.textContent="進入戰鬥……";
+            hint.textContent="";
+            overlay.disabled=true;
+            setTimeout(()=>{
+                overlay.remove();
+                launchAbyssBossBattle();
+            },180);
+        };
+        map.appendChild(overlay);
+        positionAbyssBossDialogue(map,overlay,bossButton);
+        delete map.dataset.v141AbyssDialogueOpening;
+        return true;
+    }
+
+    window.v141ChallengeAbyssBoss=function(){
+        return openAbyssBossDialogue();
     };
 
     window.v141UseAbyssPortal=function(){

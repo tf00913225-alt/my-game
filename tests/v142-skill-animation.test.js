@@ -166,10 +166,20 @@ function createContext(options={}){
 
 (async()=>{
     await test("V142 assets are versioned and loaded after V141",()=>{
-        assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
+        assert.match(loader,/const V_ASSET_VERSION="173\.16"/);
         assert.match(loader,/css\/39-v142-skill-animation\.css/);
         assert.match(loader,/js\/36-v141-content-systems\.js[\s\S]*js\/37-v142-skill-animation\.js/);
-        assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
+        assert.match(index,/js\/20-anonymous-20\.js\?v=173\.16/);
+    });
+
+    await test("player and monster skill badges actually start animation gates",()=>{
+        const {context}=createContext();
+        context.showSkillNameBadge("火焰斬","fire",0);
+        assert.equal(context.v142SkillAnimationDirector.getLatest().config.name,"火焰斬");
+        assert.equal(context.v142GetAnimationDiagnostics().last.side,"player");
+        context.showMonsterSkillNameBadge("火焰斬","fire",0);
+        assert.equal(context.v142SkillAnimationDirector.getLatest().config.name,"火焰斬");
+        assert.equal(context.v142GetAnimationDiagnostics().last.side,"monster");
     });
 
     await test("normal, small and ultimate skills keep distinct durations",()=>{

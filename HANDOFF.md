@@ -165,7 +165,8 @@
    V171 另新增怒火／水球術／洪水猛獸／冰霜箭雨定位與單體凍傷範圍驗收
    `tests/v171-combat-vfx-fixes.test.js`；V172 新增水球術多目標分層播放與原圖保留驗收
    `tests/v172-water-orb-vfx.test.js`；V173 新增水球術雙向旋轉飛行、完整命中畫格與版本標示驗收
-   `tests/v173-water-orb-direction-vfx.test.js`。
+   `tests/v173-water-orb-direction-vfx.test.js`；V173.16 新增深淵對話縮放定位、可視邊界與三段對話
+   進戰鬥驗收 `tests/v173.16-abyss-dialogue-visibility.test.js`。
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -492,6 +493,13 @@ V136 已把入口改成：
 再回推「螢幕上想要的實際px值 ÷ 縮放比例」寫進CSS，不要直接把使用者說的
 數字原封不動寫進去。**
 
+V173.16 又確認一個同類陷阱：即使 JavaScript 已把 viewport 座標正確換回 map-local
+邏輯座標，最終 CSS 的 `inset:auto !important` 仍會把 inline `left/top` 當成無效，
+造成元素的 `style.left/top` 看似有值、實際 `getBoundingClientRect()` 卻仍落在畫面外。
+深淵對話目前由 `js/36-v141-content-systems.js` 計算座標並寫入 CSS custom properties，
+再由 `css/50-v169-abyss-flow.css` 的最終 `left/top:var(...) !important` 消費；檢查這類問題
+不能只讀 `element.style`，必須同時量 computed style、元素 rect 與容器 rect。
+
 反過來，`#homeFeatureModal`（角色/技能列表、狀態頁那個彈窗）已經在
 更早一輪（`js/19-stage-v78-character-inventory-runtime.js`那次修正）
 證實是1:1顯示、沒有被這層縮放影響，同一個技巧不適用在那個彈窗上——
@@ -594,6 +602,73 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-09-01 — V173.16：正式發布（main）
+
+- 使用者在 V173.16 的 `dev` CI 成功後明確指示升正式版；以已驗證的 `dev` commit `31927bc` 為遊戲內容基準，採非強制 fast-forward 推進 `main`，不改寫歷史、不覆蓋既有檔案。
+- 本次發布除本交接紀錄外，不再修改遊戲程式、素材、測試或版本字樣；發布前 `main` commit `7646154` 是 `dev` 的直接祖先，兩分支沒有分岔。
+
+### 2026-09-01 — V173.16：深淵守關者對話可視定位與完整點擊流程（dev）
+
+- 根因鏈：V173.13 把深淵 Boss 對話 owner 從 `js/38-v143-system-fixes.js` 收斂回 `js/36-v141-content-systems.js` 時，漏帶 V173.6 已驗證的縮放座標換算；補回換算後，真實瀏覽器又確認 `css/50-v169-abyss-flow.css` 的 `inset:auto !important` 仍會覆蓋一般 inline `left/top`，因此程式碼看似已有座標，但對話 rect 仍完整位於地圖上緣外。
+- 唯一 owner 維持 `js/36-v141-content-systems.js`：Boss 按鈕、capture `pointerup/click` 與地圖 bounds fallback 都進同一個 `v141HandleAbyssBossInteraction()`／`openAbyssBossDialogue()`／`launchAbyssBossBattle()` 流程；`js/38` 不再覆寫挑戰函式，`js/41`／`js/42` 只保留既有地圖移動 wrapper，沒有新增 runtime patch 或第二套 Boss 元素。
+- `positionAbyssBossDialogue()` 以地圖 `offsetWidth/Height` 對照實際 rect，將守關者 viewport 座標換回 map-local 邏輯座標，並依對話實際寬高限制在地圖四邊內；既有對話再次觸發時也會重新定位。最終座標以 CSS custom properties 交給 `css/50-v169-abyss-flow.css` 的權威 `left/top !important` 使用，保留 legacy `inset:0 !important` 的右／下清除但不再蓋掉定位。
+- 新增 `tests/v173.16-abyss-dialogue-visibility.test.js`，動態驗證縮放座標、完整可視邊界、唯一 owner，以及點守關者後三段對話可連續點擊並正式進戰鬥；發布與所有現行快取斷言同步升至 `V173.16`。
+- 完整 Repository checks 通過：JavaScript 語法 `155/155`、Node suites `42/42`、本地資源 `300`、HTML ID `272`、版本／Loader 與 Git 差異檢查全數正常。不可變 `dev` commit `6542718` 的雲端 Chrome 實測：點東帝後對話 rect 完整位於地圖 rect 內（`fullyVisible=true`），三次點擊依序顯示三句並進入東帝＋四名天兵戰鬥；無遊戲來源 console error。未修改或合併 `main`，仍待使用者在原 Android 裝置做最後手感確認。
+
+### 2026-09-01 — V173.14：水球術固定 4×3 Sprite Sheet 校正（dev）
+
+- 水球術的唯一 owner 仍是 `js/39-v143-skill-animation.js`：既有 `drawCanvasCropSprite()` 與 `placeSprite()` 已使用單一 `group` Canvas node、固定 `384×384` source crop、存活目標群組中心與第 7～8 幀命中；本輪沒有新增 wrapper 或平行播放路徑。
+- 根因：`assets-library/assets/inbox/water-orb.png` 與 `frost-arrow-rain.png` 原始檔均為 `1448×1086`（固定 4×3、每格 `362×362`），卻被直接覆蓋到正式 `assets/vfx/water/`；Canvas renderer 已依 384px 格讀取，造成來源與裁切座標不一致。
+- 兩張正式 VFX 均依固定格座標處理：每格來源 `x=(frameIndex % 4)×362`、`y=floor(frameIndex / 4)×362`，不做透明邊界偵測、不縮放、不重繪；每個 362px 格僅置中補 11px 透明邊，輸出為 `1536×1152`、4×3、每格 `384×384` 的 RGBA PNG。12 格逐一像素比對原內容均為差異 0。
+- 發布／資產快取同步升至 `V173.14`，包括首頁、直載入口、Loader、兩張水系 Canvas 素材 URL 與現行版本回歸；三個歷史靜態測試（V157、V169、V173.11）僅放寬為驗證目前直接 owner／允許格式換行，未回填已移除的 legacy runtime patch。
+- 直接驗證通過：水球術、冰霜箭雨、V166 水系、V171、V172、V173 與 Canvas／深淵輸入共 44 項直接斷言。完整 CI 已通過：JavaScript 語法 `154/154`、Node 測試 `41/41`、本地資源 `300`、HTML ID／版本／Loader／`git diff --check`；Browser smoke 因本機未安裝 Playwright/Chromium 未執行。未修改 `main`、技能數值、傷害、存檔或目標規則，仍待 Android 實機視覺驗收。
+
+### 2026-09-01 — V173.13：深淵守關者點擊與水系 Canvas Sprite Sheet 收斂（dev）
+
+- 深淵守關者的唯一 owner 收斂回 `js/36-v141-content-systems.js`：對話與進戰鬥流程不再由 `js/38-v143-system-fixes.js` wrapper 覆蓋；守關立繪、地圖 click 與 capture-phase `pointerup/click` 都進入同一個直接對話入口。既有 `js/41-v146-system-polish.js`／`js/42-v148-combat-dungeon-fixes.js` 只保留地圖移動事件的原始座標傳遞。
+- 從 `assets-library/assets/inbox/` 選擇性複製 `water-orb.png` 與 `frost-arrow-rain.png` 到既有 `assets/vfx/water/` 對應路徑；未合併或修改 `assets-library`。
+- 水球術與冰霜箭雨的唯一 VFX owner 仍是 `js/39-v143-skill-animation.js`。兩招改用既有 VFX node／生命週期中的 Canvas crop renderer：每次僅以固定 384×384 source cell 繪製第 0～11 幀，再以既有目標群組或存活敵方 bounding box 決定顯示範圍；舊 CSS background-sheet 播放路徑已只對這兩招移除。
+- 水球術維持 1.4 秒、單一 live-target-group instance；冰霜箭雨維持單一 all-living-targets AOE instance。兩者均保留第 7～8 幀命中時機、死亡目標排除與既有動畫結束清理，不修改技能數值、傷害、存檔或其他水系技能。
+- 新增／更新直接回歸：Canvas 固定裁切、兩項新素材尺寸、群組／AOE 定位、深淵直接對話入口、版本／Loader 一致性。Repository checks 與真機點擊、動畫驗證待此 dev commit 完成後執行。
+
+### 2026-08-31 — V173.9：P0 恢復已驗證技能動畫觸發鏈（dev）
+
+- 以 V173.4 main 為正確基準，恢復 `js/37-v142-skill-animation.js` 的原始 `showSkillNameBadge()`／`showMonsterSkillNameBadge()` wrapper 與一次性初始化守衛。
+- 移除 V173.6～V173.8 新增但未能實際觸發的直接 badge hook；保留 V173.5 的水球素材與演出、凍傷處理，以及 `js/38-v143-system-fixes.js` 的深淵對話縮放修正。
+- owner：`js/37-v142-skill-animation.js`；本次沒有暫時補丁。
+- 頁面、Loader 與動畫素材快取版本升為 V173.9；CI 與 dev 手動測試待本次提交後確認。
+
+### 2026-08-31 — V173.8：P0 技能動畫初始化完整性（dev）
+
+- V142 僅在既有 director 與新版直接觸發器都存在時才略過初始化；舊快取只留下部分 runtime 狀態時，會重新建立同一個動畫 owner。
+- 不新增 runtime patch，不改戰鬥、技能數值、素材或存檔；深淵立繪對話縮放修正維持不變。
+- 頁面、Loader 與動畫素材快取版本升為 V173.8；Repository checks 已成功，dev 手動測試請使用不可變 commit URL，避免 raw.githack 的 dev 快取。
+
+### 2026-08-31 — V173.8：P0 技能動畫直接觸發收斂（dev）
+
+- 技能動畫的唯一觸發點收斂為 `js/00-main.js` 既有的 `showSkillNameBadge()` 與 `showMonsterSkillNameBadge()`；兩者在既有 badge 建立後直接呼叫 `js/37-v142-skill-animation.js` 匯出的 `v142PlaySkillAnimationFromBadge()`。
+- 移除 V142 以 wrapper 攔截 badge 的依賴，避免後續 runtime wrapper 順序造成所有技能演出失效；不改技能數值、傷害、回合、素材或存檔。
+- 深淵立繪對話的縮放座標修正維持於 `js/38-v143-system-fixes.js`，本次未改動其他深淵規則。
+- 頁面、Loader 與動畫素材快取版本升為 V173.8；CI 與 dev 實測待本次提交後確認。
+
+### 2026-08-31 — V173.6：P0 動畫 runtime 與深淵對話定位修復（dev）
+
+- 技能動畫 owner 為 `js/37-v142-skill-animation.js`：若前一輪載入只留下 `__v142SkillAnimationInstalled` 旗標卻沒有建立控制器，現在會安全重建控制器；`js/39-v143-skill-animation.js` 的所有 Sprite 動畫可再次掛入既有 director。
+- 深淵對話目前由 `js/38-v143-system-fixes.js` 產生；對話定位改以地圖的實際縮放比例轉回邏輯座標，避免泡泡被渲染到畫面上方而不可見。
+- 實際 dev 隔離瀏覽器已重現：修正前深淵對話按鈕的 computed top 為負值，且水球術施放後沒有任何 `#v143-skill-stage`。
+- 本次僅處理 P0 動畫 runtime 與深淵對話；不修改技能數值、存檔、掉落、素材內容或 UI 版面。完整 CI 與 dev 實測待本輪提交後執行。
+- 頁面與 Loader 快取版本升為 V173.6。
+
+### 2026-08-31 — V173.5：深淵、掉落互動與水／火 VFX 修正（dev）
+
+- 深淵地圖守關立繪改為直接開啟對話：權威位置為 `js/38-v143-system-fixes.js` 的 `v141ChallengeAbyssBoss`；不再經過會讓手機點擊看似無反應的接近移動閘門。
+- 野怪戰鬥獎勵 toast 的隱藏狀態恢復 `pointer-events:none`，只在 `.show` 時接收點擊；權威樣式為 `css/45-v152-dev-fixes.css`，不會再留下透明攔截區塊。
+- `assets-review/assets/inbox/water-orb.png` 已覆蓋為 `assets/vfx/water/water-orb-vfx.png`；`js/39-v143-skill-animation.js` 的水球術保留既有 4×3／12 幀、三目標軌跡與命中時機，僅更新素材快取為 `v=173.5`。
+- 火鳳天鳴與冰霜箭雨在 `js/39-v143-skill-animation.js` 統一改為單張、固定敵／我方戰區中央的全場 Sprite，不隨剩餘目標數縮小，也不再拆成多張 tile。
+- 凍傷加入 `js/00-main.js` 的 `tickStatusEffects()` 正式回合倒數，時間結束後資料與狀態動畫會隨既有 UI 同步移除；不變更凍傷機率、回合數或其他技能數值。
+- 新增 `tests/v173.5-bugfixes.test.js`，並更新相關水系／全場 VFX 回歸。完整 CI 同等檢查已通過：151/151 JavaScript 語法、38/38 Node suites、300 個靜態資源、272 個 HTML ID、Loader／版本一致性與 Git 格式皆正常。
+- 發布、Loader、頁面與快取版本升為 V173.5。
 
 ### 2026-08-31 — 永久架構規則已啟用（dev）
 

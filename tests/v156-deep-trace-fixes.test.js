@@ -51,8 +51,8 @@ function loadRuntime(overrides={}){
 }
 
 test("the current cache key delivers the repaired runtime and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.16"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.16/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.match(loader,/js\/45-v154-dev-fixes\.js/);
 });
@@ -116,7 +116,7 @@ test("every Abyss map floor presents a portrait-backed challenge button",()=>{
     assert.match(css,/\.v141-abyss-boss\{[\s\S]*width:120px !important;[\s\S]*height:168px !important;/);
     assert.match(css,/\.v141-abyss-boss::before\{[\s\S]*background-size:contain !important;/);
     assert.match(css,/touch-action:manipulation !important/);
-    assert.match(abyss,/<button class="v141-abyss-boss"[\s\S]*v141ChallengeAbyssBoss\(\)/);
+    assert.match(abyss,/<button type="button" class="v141-abyss-boss"[\s\S]*data-abyss-boss-control="true"[\s\S]*v141HandleAbyssBossInteraction\(event\)/);
 });
 
 test("all map portrait assets exist on dev",()=>{

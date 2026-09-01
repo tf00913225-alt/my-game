@@ -624,69 +624,6 @@
         if(oldReturn){ oldReturn.remove(); }
     }
 
-    const ABYSS_DIALOGUE={
-        1:["凡人也敢踏入帝境？","黃沙會埋葬你的名字。","先過天兵這一關再說！"],
-        2:["烈火會把你的勇氣燒光。","再向前一步，便是灰燼。","你撐不過南天之焰！"],
-        3:["風起之時，無人能立。","你的招式太慢了。","天威不是凡人能挑戰的！"],
-        4:["寒泉已封住你的退路。","讓冰霜替你長眠。","北境之前，止步吧！"],
-        5:["五帝同臨，你已無路可退。","極光會照見你的敗亡。","此處便是深淵盡頭！"]
-    };
-
-    if(typeof window.v141ChallengeAbyssBoss==="function"){
-        const previousChallenge=window.v141ChallengeAbyssBoss;
-        window.v141ChallengeAbyssBoss=function(){
-            const map=document.getElementById("v141AbyssMap");
-            if(!map||map.querySelector(".v143-abyss-dialogue")||map.dataset.v169DialogueApproaching==="1"){ return; }
-            map.dataset.v169DialogueApproaching="1";
-
-            const openBossBubble=()=>{
-                delete map.dataset.v169DialogueApproaching;
-                if(map.isConnected===false||map.querySelector(".v143-abyss-dialogue")){ return; }
-                const heading=document.querySelector(".v141-abyss-shell > header b");
-                const match=heading&&heading.textContent.match(/第\s*(\d+)/);
-                const floor=Math.max(1,Math.min(5,Number(match&&match[1])||1));
-                const bossButton=map.querySelector(".v141-abyss-boss");
-                const boss=bossButton&&bossButton.querySelector("b");
-                const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();
-                let index=0;
-                const overlay=document.createElement("button");
-                overlay.type="button";
-                overlay.className="v143-abyss-dialogue";
-                overlay.setAttribute("aria-label","守關者對話，點擊繼續");
-                overlay.innerHTML='<small>'+escapeHtml(boss&&boss.textContent||"守關者")+'</small><b></b><span>點擊對話繼續　'+(index+1)+' / '+lines.length+'</span>';
-                const text=overlay.querySelector("b");
-                const hint=overlay.querySelector("span");
-                text.textContent=lines[index];
-                overlay.onclick=event=>{
-                    event.preventDefault(); event.stopPropagation();
-                    index++;
-                    if(index<lines.length){
-                        text.textContent=lines[index];
-                        hint.textContent="點擊對話繼續　"+(index+1)+" / "+lines.length;
-                        return;
-                    }
-                    text.textContent="進入戰鬥……";
-                    hint.textContent="";
-                    overlay.disabled=true;
-                    window.__v143AbyssDialogueComplete=true;
-                    setTimeout(()=>{ overlay.remove(); previousChallenge(); },180);
-                };
-                map.appendChild(overlay);
-                if(bossButton){
-                    const mapRect=map.getBoundingClientRect();
-                    const bossRect=bossButton.getBoundingClientRect();
-                    overlay.style.left=(bossRect.left+bossRect.width/2-mapRect.left)+"px";
-                    overlay.style.top=Math.max(104,bossRect.top-mapRect.top-8)+"px";
-                }
-            };
-
-            if(typeof window.v141ApproachAbyssBoss==="function"){
-                if(!window.v141ApproachAbyssBoss(openBossBubble)){ delete map.dataset.v169DialogueApproaching; }
-            }else{
-                openBossBubble();
-            }
-        };
-    }
 
     /* ----- 6. Synthesis uses icon pickers and creates ordinary random gear. ----- */
     function definitions(){

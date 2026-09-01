@@ -164,31 +164,35 @@ test("official Ice Arrow Rain sheet is a complete 4x3 RGBA PNG",()=>{
     assert.equal(info.height/3,384);
 });
 
-test("manifest binds the renamed V166 sheet and frame-eight hit",()=>{
+test("manifest keeps one 4x3 sheet and frame-eight hit",()=>{
     const runtime=loadRuntime([0,1,2]);
     const model=runtime.context.v143SkillAnimationManifest.iceArrowRain;
-    assert.equal(model.sprite.src,assetPath+"?v=166");
+    assert.equal(model.sprite.src,assetPath+"?v=173.16");
+    assert.equal(model.sprite.renderer,"canvas-crop");
+    assert.deepEqual([model.sprite.frameWidth,model.sprite.frameHeight],[384,384]);
     assert.deepEqual(
         [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
         [4,3,12,7]
     );
     assert.equal(model.sprite.placement,"battlefield");
+    assert.equal(model.sprite.coverageScale,1.22);
+    assert.deepEqual([model.sprite.minWidth,model.sprite.minHeight],[140,140]);
     assert.equal(model.hit,.5833333333);
     assert.match(timing,/iceArrowRain:\[1600/);
 });
 
-test("frame order remains left-to-right then top-to-bottom and never loops",()=>{
-    const expected=[
-        "0 0","33.333333% 0","66.666667% 0","100% 0",
-        "0 50%","33.333333% 50%","66.666667% 50%","100% 50%",
-        "0 100%","33.333333% 100%","66.666667% 100%","100% 100%"
-    ];
-    expected.forEach(position=>assert.ok(css.includes("background-position:"+position),position));
-    assert.match(css,/steps\(1,end\) var\(--v143-sprite-delay,0ms\) 1 both/);
-    assert.doesNotMatch(css,/v166[^}]*ArrowRain[^}]*infinite/i);
+test("Canvas crops exactly one 384×384 frame left-to-right, top-to-bottom, once",()=>{
+    assert.match(animation,/const frameIndex=Math\.min\(11,Math\.floor\(progress\*12\)\);/);
+    assert.match(animation,/const column=frameIndex%4;[\s\S]*?const row=Math\.floor\(frameIndex\/4\);/);
+    assert.match(animation,/const sourceX=column\*384;[\s\S]*?const sourceY=row\*384;/);
+    assert.match(
+        animation,
+        /context\.drawImage\([\s\S]*?image,[\s\S]*?sourceX,[\s\S]*?sourceY,[\s\S]*?384,[\s\S]*?384,[\s\S]*?0,[\s\S]*?0,[\s\S]*?node\.width,[\s\S]*?node\.height/
+    );
+    assert.doesNotMatch(css,/data-skill="iceArrowRain"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("one shared sheet always uses the complete enemy battlefield, even for one enemy",()=>{
+test("one shared sheet uses the bounding box of living targets only",()=>{
     const placements=[];
     [[1],[0,1,2]].forEach(indexes=>{
         const runtime=loadRuntime(indexes);
@@ -202,24 +206,20 @@ test("one shared sheet always uses the complete enemy battlefield, even for one 
         const sprite=sprites[0];
         assert.equal(sprite.dataset.placement,"battlefield");
         assert.equal(sprite.dataset.targetSide,"monster");
-        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
-        assert.equal(sprite.style.left,"460px");
-        assert.equal(sprite.style.top,"165px");
-        assert.deepEqual([sprite.style.width,sprite.style.height],["440px","270px"]);
+        assert.equal(sprite.dataset.areaId,"living-targets");
+        assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
+        assert.equal(sprite.style.left,"438px");
+        assert.equal(sprite.style.top,"130px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
-        assert.equal(sprite.style.backgroundImage,"none","the exact battlefield is a clipping wrapper");
-        const tiles=sprite.querySelectorAll(".v166-water-battlefield-tile");
-        assert.equal(tiles.length,2,"square sheets tile across the full wide battlefield");
-        tiles.forEach(tile=>{
-            assert.equal(tile.style.width,tile.style.height,"frames keep their original 1:1 ratio");
-            assert.equal(tile.style.width,"270px");
-            assert.ok(tile.style.backgroundImage.includes(assetPath));
-            assert.equal(tile.style.backgroundSize,"400% 300%");
-        });
+        assert.equal(sprite.dataset.renderer,"canvas-crop");
+        assert.equal(sprite.style.backgroundImage,"none","the sheet is never a CSS background");
+        assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0,"no tiled copies");
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
         assert.ok(runtime.scheduled.some(timer=>timer.delay>=1590),"full 1.6 second action gate");
     });
-    assert.deepEqual(placements[0],placements[1],"AOE must not shrink to a single target");
+    assert.deepEqual(placements[0],["438px","130px","140px","140px"]);
+    assert.deepEqual(placements[1],["438px","130px","386px","140px"]);
+    assert.notDeepEqual(placements[0],placements[1],"AOE follows the living formation instead of a fixed side box");
 });
 
 test("all damage numbers share frame eight while remaining target-specific",()=>{
@@ -244,9 +244,9 @@ test("all damage numbers share frame eight while remaining target-specific",()=>
 });
 
 test("the current cache version publishes the 1.6 second battlefield choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
-    assert.match(animation,/frost-arrow-rain-vfx\.png\?v=166/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.16"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.16/);
+    assert.match(animation,/frost-arrow-rain-vfx\.png\?v=173\.16/);
 });
 
 console.log("\n"+passed+" V150 Ice Arrow Rain VFX tests passed.");

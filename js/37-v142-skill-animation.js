@@ -27,7 +27,7 @@
 
         waterKnife:[800,"basic","slash"],frostPunch:[900,"basic","ice-impact"],
         iceSpin:[1000,"medium","ice-barrage"],frostCrush:[1150,"high","ice-impact"],
-        waterBall:[1100,"basic","projectile"],floodBeast:[1350,"medium","wave"],
+        waterBall:[1400,"basic","projectile"],floodBeast:[1350,"medium","wave"],
         iceArrowRain:[1600,"high","ice-rain"],freeze:[950,"high","freeze"],
         healSpell:[1250,"medium","heal"],revive:[1800,"high","revive"],
         waterEX:[3000,"ultimate","aura"],

@@ -14,9 +14,9 @@ let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V171 cache-busts every changed combat asset",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.4/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.4/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.16"/);
+    assert.match(index,/js\/00-main\.js\?v=173\.16/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.16/);
 });
 
 test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path",()=>{
@@ -51,15 +51,17 @@ test("Water trajectories start only after real actor and target coordinates exis
     );
 });
 
-test("Ice Arrow Rain uses one clipped target-side rectangle with synchronized square tiles",()=>{
+test("Ice Arrow Rain uses one centered full-field sheet without tiles",()=>{
     const battlefield=animation.match(/if\(placement==="battlefield"\)\{[\s\S]*?\n\s*return;\n\s*\}/);
     assert.ok(battlefield);
-    assert.match(battlefield[0],/node\.style\.width=bounds\.width\+"px"/);
-    assert.match(battlefield[0],/node\.style\.height=bounds\.height\+"px"/);
+    assert.match(battlefield[0],/Math\.max\(bounds\.width,bounds\.height\)/);
+    assert.match(battlefield[0],/node\.style\.width=size\+"px"/);
+    assert.match(battlefield[0],/node\.style\.height=size\+"px"/);
+    assert.match(battlefield[0],/node\.style\.left=\(bounds\.left\+bounds\.width\/2\)\+"px"/);
+    assert.match(battlefield[0],/node\.style\.top=\(bounds\.top\+bounds\.height\/2\)\+"px"/);
     assert.match(battlefield[0],/node\.style\.clipPath="none"/);
-    assert.match(battlefield[0],/buildBattlefieldSpriteTiles\(node,sprite,bounds\)/);
-    assert.doesNotMatch(battlefield[0],/Math\.max\(bounds\.width,bounds\.height\)/);
-    assert.match(css,/\.v166-water-battlefield-tile\{[\s\S]*?v166WaterCastFrames/);
+    assert.doesNotMatch(battlefield[0],/buildBattlefieldSpriteTiles\(node,sprite,bounds\)/);
+    assert.doesNotMatch(css,/\.v166-water-battlefield-tile\{/);
 });
 
 test("Rage cast and loop remain visible and card-anchored on both sides",()=>{

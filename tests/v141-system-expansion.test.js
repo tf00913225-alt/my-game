@@ -79,9 +79,9 @@ test("V141 assets remain ordered before later patches with the current cache ver
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.4"/);
-    assert.match(indexSource,/js\/00-main\.js\?v=173\.4/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.4/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.16"/);
+    assert.match(indexSource,/js\/00-main\.js\?v=173\.16/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.16/);
 });
 
 test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or slot numbers",()=>{
@@ -164,7 +164,7 @@ test("daily dungeon formations and element balancing match the requested expansi
     assert.match(v132Source,/stage===3 \? "elite" : "regular"/);
     assert.match(v132Source,/eliteCount:Math\.max\(0,10-bossCount\)/);
     assert.match(v132Source,/total:10/);
-    assert.match(v132Source,/const DUNGEON_DAILY_LIMIT_ENABLED=true/);
+    assert.match(v132Source,/const DUNGEON_DAILY_LIMIT_ENABLED=false/);
     assert.match(uiSource,/const elements=\["fire","water","earth","wind"\]/);
     assert.match(uiSource,/monster\.element=elements\[index%elements\.length\]/);
     assert.match(uiSource,/bosses\.forEach/);
@@ -272,7 +272,9 @@ test("synthesis implements exact material costs, replacement-only reforge and pe
 test("Abyss has exact five-floor rosters, fixed center support BOSS and click-only final chest",()=>{
     ["東帝","南帝","天帝","北帝","極帝天尊","東帝天尊","南帝天尊","北帝天尊","天帝天尊"].forEach(name=>assert.ok(contentSource.includes(name)));
     ["flyingSandStrike","dustStorm","stoneSlash","explosiveFlurry","dragonSlash","fireRocket","windHowlLightning","stormFlurry","windCrossSlash","floodBeast","frostPunch","waterKnife"].forEach(id=>assert.ok(contentSource.includes(id)));
-    assert.match(contentSource,/const count=dialogueAlreadyCompleted\?0:1\+Math\.floor\(Math\.random\(\)\*3\)/);
+    assert.match(contentSource,/function openAbyssBossDialogue\(\)/);
+    assert.match(contentSource,/const overlay=document\.createElement\("button"\)/);
+    assert.match(contentSource,/window\.v141ChallengeAbyssBoss=function\(\)\{\s*return openAbyssBossDialogue\(\);\s*\}/);
     assert.match(contentSource,/if\(spec\[0\]==="極帝天尊"\)/);
     assert.match(contentSource,/v141FormationPosition=position/);
     assert.match(contentSource,/monster\.maxHP\+=extraHp/);
