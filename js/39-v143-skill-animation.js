@@ -172,17 +172,105 @@
         },
         waterEX:{glyph:"泉",motion:"orbit-reverse",impact:"tidal-crown",hit:.74,pulses:7,spread:95},
 
-        stormFist:{glyph:"拳",motion:"dash",impact:"wind-fist",hit:.56,pulses:1,spread:0},
-        stormFlurry:{glyph:"迅",motion:"afterimage",impact:"wind-combo",hit:.64,pulses:4,spread:48},
-        windCrossSlash:{glyph:"十",motion:"cross",impact:"cross-gale",hit:.68,pulses:2,spread:58},
-        dizzyFist:{glyph:"雷",motion:"blink",impact:"thunder-fist",hit:.70,pulses:4,spread:62},
-        windSpell:{glyph:"➤",motion:"curve",impact:"wind-blade",hit:.60,pulses:1,spread:30},
-        stormCircle:{glyph:"旋",motion:"spiral",impact:"gale-ring",hit:.66,pulses:3,spread:56},
-        windHowlLightning:{glyph:"⚡",motion:"bolt",impact:"lightning-fang",hit:.68,pulses:4,spread:62},
-        stormRain:{glyph:"風",sequence:"風起雲湧",motion:"tempest",impact:"storm-domain",hit:.75,pulses:7,spread:110,flightCount:4},
-        dodgeSkill:{glyph:"疾",motion:"afterimage",impact:"speed-aura",hit:.54,pulses:3,spread:50},
-        stealthSkill:{glyph:"隱",motion:"veil",impact:"vanish-mist",hit:.59,pulses:3,spread:52},
-        dinghaishenzhen:{glyph:"定",motion:"orbit",impact:"calm-seal",hit:.67,pulses:5,spread:72},
+        stormFist:{
+            glyph:"拳",motion:"dash",impact:"wind-fist",hit:.5,pulses:1,spread:0,
+            deferredStatusTypes:["agilityDown"],
+            sprite:{
+                src:"assets/inbox/暴風拳-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.15,maxSize:260
+            }
+        },
+        stormFlurry:{
+            glyph:"迅",motion:"afterimage",impact:"wind-combo",hit:.5,pulses:4,spread:48,
+            deferredStatusTypes:["damageDown"],
+            sprite:{
+                src:"assets/inbox/暴風亂擊-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        windCrossSlash:{
+            glyph:"十",motion:"cross",impact:"cross-gale",hit:.5,pulses:2,spread:58,
+            deferredStatusTypes:["damageDown"],
+            sprite:{
+                src:"assets/inbox/風旋十字斬-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.25,maxSize:280
+            }
+        },
+        dizzyFist:{
+            glyph:"雷",motion:"blink",impact:"thunder-fist",hit:.5,pulses:4,spread:62,
+            deferredStatusTypes:["stun"],
+            sprite:{
+                src:"assets/inbox/暈眩猛擊-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.35,maxSize:290
+            }
+        },
+        windSpell:{
+            glyph:"➤",motion:"curve",impact:"wind-blade",hit:.5,pulses:1,spread:30,
+            deferredStatusTypes:["agilityDown"],
+            sprite:{
+                src:"assets/inbox/狂風術-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        stormCircle:{
+            glyph:"旋",motion:"spiral",impact:"gale-ring",hit:.5,pulses:3,spread:56,
+            deferredStatusTypes:["damageDown"],
+            sprite:{
+                src:"assets/inbox/風焰術-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        windHowlLightning:{
+            glyph:"⚡",motion:"bolt",impact:"lightning-fang",hit:.5,pulses:4,spread:62,
+            deferredStatusTypes:["damageDown"],
+            sprite:{
+                src:"assets/inbox/風哮電擊-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.35,maxSize:290
+            }
+        },
+        stormRain:{
+            glyph:"風",sequence:"風起雲湧",motion:"tempest",impact:"storm-domain",hit:.5,pulses:7,spread:110,flightCount:4,
+            deferredStatusTypes:["stun"],
+            sprite:{
+                src:"assets/inbox/風起雲湧-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"battlefield",renderer:"canvas-crop",naturalGrid:true,scale:1.08,minSize:280
+            }
+        },
+        dodgeSkill:{
+            glyph:"疾",motion:"afterimage",impact:"speed-aura",hit:.5,pulses:3,spread:50,
+            deferredStatusTypes:["dodgeSkill"],
+            sprite:{
+                src:"assets/inbox/閃躲術-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        stealthSkill:{
+            glyph:"隱",motion:"veil",impact:"vanish-mist",hit:.5,pulses:3,spread:52,
+            deferredStatusTypes:["stealthSkill"],
+            sprite:{
+                src:"assets/inbox/隱身術-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.15,maxSize:260
+            }
+        },
+        dinghaishenzhen:{
+            glyph:"定",motion:"orbit",impact:"calm-seal",hit:.5,pulses:5,spread:72,
+            deferredStatusTypes:["dinghaishenzhen"],
+            sprite:{
+                src:"assets/inbox/氣定神閒-技能動態圖.png?v=173.23",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"battlefield",renderer:"canvas-crop",naturalGrid:true,scale:1.08,minSize:280
+            }
+        },
         windEX:{glyph:"嵐",motion:"orbit-fast",impact:"wind-crown",hit:.74,pulses:7,spread:95},
         stormSpell:{glyph:"暴",motion:"tempest",impact:"storm-eye",hit:.72,pulses:6,spread:86},
 
@@ -233,7 +321,13 @@
         burn:{src:"assets/vfx/fire/burn-loop.png?v=165",columns:4,rows:2,frames:8,duration:800,collection:"statusEffects"},
         rage:{src:"assets/vfx/fire/rage-buff-loop.png?v=165",columns:4,rows:2,frames:8,duration:1000,collection:"activeBuffs"},
         frostbite:{src:"assets/vfx/water/frostbite-status-loop-vfx.png?v=166",columns:4,rows:2,frames:8,duration:1000,collection:"statusEffects",scale:1.22},
-        freeze:{src:"assets/vfx/water/frozen-status-loop-vfx.png?v=166",columns:4,rows:2,frames:8,duration:1100,collection:"statusEffects",scale:1.28}
+        freeze:{src:"assets/vfx/water/frozen-status-loop-vfx.png?v=166",columns:4,rows:2,frames:8,duration:1100,collection:"statusEffects",scale:1.28},
+        agilityDown:{src:"assets/inbox/重力-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1000,collection:"statusEffects"},
+        damageDown:{src:"assets/inbox/殤風-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1100,collection:"statusEffects"},
+        stun:{src:"assets/inbox/暈眩-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:900,collection:"statusEffects"},
+        dodgeSkill:{src:"assets/inbox/風行-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:850,collection:"activeBuffs"},
+        stealthSkill:{src:"assets/inbox/隱身-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs"},
+        dinghaishenzhen:{src:"assets/inbox/氣定神閒-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs"}
     };
 
     window.v143SkillAnimationManifest=MANIFEST;
@@ -412,7 +506,16 @@
         const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
         if(types.indexOf(type)<0){ return false; }
         const tracked=current.deferredStatusTargets&&current.deferredStatusTargets.get(type);
-        return current.targetIndexes.indexOf(index)>=0||!!(tracked&&tracked.has(index));
+        if(tracked&&tracked.has(index)){ return true; }
+        const key=side+":"+index+":"+type;
+        if(current.statusAtStart&&current.statusAtStart.has(key)){ return false; }
+        if(hasTimedEffect(entityFor(side,index),type)){
+            let targets=current.deferredStatusTargets.get(type);
+            if(!targets){ targets=new Set(); current.deferredStatusTargets.set(type,targets); }
+            targets.add(index);
+            return true;
+        }
+        return false;
     }
 
     function hasTimedEffect(entity,type){
@@ -425,6 +528,20 @@
         return type==="rage"&&Array.isArray(entity.v141TeamBuffs)&&entity.v141TeamBuffs.some(effect=>
             effect&&effect.type==="rage"&&Number(effect.turnsLeft)>0
         );
+    }
+
+    function snapshotTimedEffects(){
+        const snapshot=new Set();
+        [["monster",10],["player",3]].forEach(entry=>{
+            const side=entry[0];
+            for(let index=0;index<entry[1];index++){
+                const entity=entityFor(side,index);
+                Object.keys(STATUS_SPRITES).forEach(type=>{
+                    if(hasTimedEffect(entity,type)){ snapshot.add(side+":"+index+":"+type); }
+                });
+            }
+        });
+        return snapshot;
     }
 
     function statusNode(card,type){
@@ -530,7 +647,7 @@
         const previousApplyBurnEffect=applyBurnEffect;
         applyBurnEffect=function(entity){
             const result=previousApplyBurnEffect.apply(this,arguments);
-            syncAppliedStatusSprite(entity,"burn");
+            if(result!==false){ syncAppliedStatusSprite(entity,"burn"); }
             return result;
         };
     }
@@ -539,7 +656,7 @@
         const previousApplyFreezeEffect=applyFreezeEffect;
         applyFreezeEffect=function(entity){
             const result=previousApplyFreezeEffect.apply(this,arguments);
-            syncAppliedStatusSprite(entity,"freeze");
+            if(result!==false){ syncAppliedStatusSprite(entity,"freeze"); }
             return result;
         };
     }
@@ -548,7 +665,7 @@
         const previousApplyMonsterDebuff=applyMonsterDebuff;
         applyMonsterDebuff=function(entity,type){
             const result=previousApplyMonsterDebuff.apply(this,arguments);
-            if(type==="frostbite"){ syncAppliedStatusSprite(entity,"frostbite"); }
+            if(result!==false&&STATUS_SPRITES[type]){ syncAppliedStatusSprite(entity,type); }
             return result;
         };
     }
@@ -610,12 +727,69 @@
         },16);
     }
 
+    function drawNaturalGridCanvasSprite(runtime){
+        if(!runtime||runtime.stopped){ return; }
+        const current=runtime.current;
+        if(!current||current.done||state.current!==current){ return; }
+        const node=runtime.node;
+        const sprite=runtime.sprite||{};
+        const columns=Math.max(1,Math.floor(Number(sprite.columns)||4));
+        const rows=Math.max(1,Math.floor(Number(sprite.rows)||3));
+        const frames=Math.max(1,Math.min(columns*rows,Math.floor(Number(sprite.frames)||columns*rows)));
+        const duration=Math.max(1,Number(current.duration)||1);
+        const progress=Math.min(1,Math.max(0,(Date.now()-current.startedAt)/duration));
+        const frameIndex=Math.min(frames-1,Math.floor(progress*frames));
+        const frameX=frameIndex%columns;
+        const frameY=Math.floor(frameIndex/columns);
+        const imageRecord=runtime.imageRecord||getSpriteImage(sprite.src);
+        runtime.imageRecord=imageRecord;
+        const image=imageRecord&&imageRecord.image;
+        const ready=!!(
+            image&&(
+                imageRecord.ready||
+                (image.complete&&Number(image.naturalWidth)>0&&Number(image.naturalHeight)>0)
+            )
+        );
+        const sourceWidth=ready?Number(image.naturalWidth)/columns:0;
+        const sourceHeight=ready?Number(image.naturalHeight)/rows:0;
+        const sourceX=frameX*sourceWidth;
+        const sourceY=frameY*sourceHeight;
+        const context=node&&typeof node.getContext==="function"?node.getContext("2d"):null;
+        node.dataset.frameIndex=String(frameIndex);
+        node.dataset.frameX=String(frameX);
+        node.dataset.frameY=String(frameY);
+        node.dataset.sourceX=String(sourceX);
+        node.dataset.sourceY=String(sourceY);
+        node.dataset.sourceWidth=String(sourceWidth);
+        node.dataset.sourceHeight=String(sourceHeight);
+        node.style.opacity=String(canvasSpriteOpacity(progress));
+        if(context&&image&&ready){
+            context.clearRect(0,0,node.width,node.height);
+            context.drawImage(
+                image,
+                sourceX,
+                sourceY,
+                sourceWidth,
+                sourceHeight,
+                0,
+                0,
+                node.width,
+                node.height
+            );
+        }
+        if(progress<1){ scheduleCanvasCropSprite(runtime); }
+    }
+
     /*
        Fixed 4×3 Canvas crop renderer. The source is always one 384×384 cell;
        CSS width/height on the existing VFX node are only the destination size.
     */
     function drawCanvasCropSprite(runtime){
         if(!runtime||runtime.stopped){ return; }
+        if(runtime.sprite&&runtime.sprite.naturalGrid){
+            drawNaturalGridCanvasSprite(runtime);
+            return;
+        }
         const current=runtime.current;
         if(!current||current.done||state.current!==current){ return; }
         const node=runtime.node;
@@ -724,18 +898,21 @@
         const card=cardFor(current.targetSide,index);
         const target=cardCenter(card);
         if(!target){ return; }
+        const beneficial=["buff","heal","revive"].includes(String(current.config.category||""));
         card.classList.remove("v143-effects-pending");
-        card.classList.add("v143-impact-target");
-        if(current.targetIndexes.length>1&&/all|row|tri/i.test(String(current.config.targetType||""))){
-            card.classList.add("v146-area-impact");
-            setTimer(()=>card.classList.remove("v146-area-impact"),680);
+        if(!beneficial){
+            card.classList.add("v143-impact-target");
+            if(current.targetIndexes.length>1&&/all|row|tri/i.test(String(current.config.targetType||""))){
+                card.classList.add("v146-area-impact");
+                setTimer(()=>card.classList.remove("v146-area-impact"),680);
+            }
         }
         if(typeof window.v143SyncEarthShieldEffects==="function"){
             window.v143SyncEarthShieldEffects();
             setTimer(()=>window.v143SyncEarthShieldEffects(),0);
         }
         syncStatusSpriteEffects();
-        setTimer(()=>card.classList.remove("v143-impact-target"),520);
+        if(!beneficial){ setTimer(()=>card.classList.remove("v143-impact-target"),520); }
         if(current.model.sprite){
             current.hitReached=true;
             return;
@@ -804,6 +981,34 @@
         }
         node.dataset.tileGeometry=geometry;
         node.dataset.tileCount=String(columns*rows);
+    }
+
+    function groupLayoutBounds(current,indexes){
+        if(current.targetSide==="player"){
+            return sideAreaBounds("player");
+        }
+        if(
+            current.targetSide==="monster"&&
+            typeof window.v138GetFormationRows==="function"&&
+            typeof currentBattleMonsters!=="undefined"
+        ){
+            const queued=current.side==="player"&&typeof queuedPlayerActions!=="undefined"
+                ?queuedPlayerActions&&queuedPlayerActions[current.actorIndex]:null;
+            const center=Number.isInteger(current.targetId)
+                ?current.targetId
+                :(queued&&Number.isInteger(queued.target)?queued.target:indexes[0]);
+            const rows=window.v138GetFormationRows(currentBattleMonsters);
+            const row=Array.isArray(rows)&&rows.find(candidate=>Array.isArray(candidate)&&candidate.includes(center));
+            if(row){
+                const position=row.indexOf(center);
+                const layoutIndexes=/tri/i.test(String(current.config.targetType||""))
+                    ?row.slice(Math.max(0,position-1),Math.min(row.length,position+2))
+                    :row;
+                const layout=fieldBounds(layoutIndexes.map(index=>cardFor("monster",index)).filter(Boolean));
+                if(layout){ return layout; }
+            }
+        }
+        return fieldBounds(indexes.map(index=>cardFor(current.targetSide,index)).filter(Boolean));
     }
 
     function placeSprite(current,node,index,target){
@@ -923,7 +1128,9 @@
 
         const indexes=emittedSpriteTargets(current);
         const targetCards=indexes.map(targetIndex=>cardFor(current.targetSide,targetIndex)).filter(Boolean);
-        const targetBounds=fieldBounds(targetCards);
+        const targetBounds=sprite.alignToSlots
+            ?groupLayoutBounds(current,indexes)
+            :fieldBounds(targetCards);
         if(!targetBounds){ return; }
         const coverageCards=placement==="trajectory"&&current.actorCard
             ?[current.actorCard].concat(targetCards)
@@ -1020,8 +1227,8 @@
                 -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"
             );
             if(canvasSprite){
-                node.width=384;
-                node.height=384;
+                node.width=Math.max(1,Math.floor(Number(sprite.frameWidth)||384));
+                node.height=Math.max(1,Math.floor(Number(sprite.frameHeight)||384));
                 node.dataset.renderer="canvas-crop";
                 node.style.backgroundImage="none";
                 node.style.backgroundSize="auto";
@@ -1141,6 +1348,7 @@
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),
             validTargets:validTargets,spriteNodes:new Map(),deferredStatusTargets:new Map(),
+            statusAtStart:snapshotTimedEffects(),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),duration:duration,hitReached:false,done:false,
             collectingInitialTargets:true

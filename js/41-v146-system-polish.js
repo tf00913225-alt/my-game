@@ -223,9 +223,9 @@
 
     /* ----- First successful abnormal-status application gets a named popup. ----- */
     const STATUS_LABELS={
-        burn:"燃燒",freeze:"冰封",petrify:"石化",agilityDown:"敏捷降低",
-        defenseDown:"防禦降低",statDown:"全屬性降低",damageDown:"傷害降低",
-        stun:"暈眩・MISS提高"
+        burn:"燃燒",freeze:"冰封",petrify:"石化",agilityDown:"重力",
+        defenseDown:"防禦降低",statDown:"全屬性降低",damageDown:"殤風",
+        stun:"暈眩"
     };
 
     function locateEntity(entity){
@@ -250,7 +250,9 @@
         const current=window.v143SkillAnimationState&&window.v143SkillAnimationState.current;
         if(!current||current.done||current.targetSide!==location.side){ return 30; }
         const position=Math.max(0,current.targetIndexes.indexOf(location.index));
-        const stagger=current.targetIndexes.length>1?Math.min(210,position*55):0;
+        const stagger=current.model&&current.model.sprite
+            ?0
+            :(current.targetIndexes.length>1?Math.min(210,position*55):0);
         const hitAt=Math.min(
             current.startedAt+current.duration-140,
             current.startedAt+current.duration*numeric(current.model&&current.model.hit)+stagger

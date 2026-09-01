@@ -201,6 +201,11 @@
     will-change:background-position,transform,opacity,filter;
 }
 
+.v143-skill-stage[data-element="wind"] .v143-vfx-sprite{
+    filter:drop-shadow(0 0 12px rgba(83,241,184,.92));
+    mix-blend-mode:screen;
+}
+
 .v143-skill-stage .v166-water-cast-sprite{
     filter:drop-shadow(0 0 11px rgba(76,205,255,.9));
     animation:
@@ -396,6 +401,29 @@
     filter:drop-shadow(0 0 10px rgba(178,238,255,.96));
 }
 
+#game-stage #battlePage .v153-status-vfx-agilityDown{
+    opacity:.9;
+    filter:drop-shadow(0 0 9px rgba(83,241,184,.92));
+}
+
+#game-stage #battlePage .v153-status-vfx-damageDown{
+    opacity:.9;
+    filter:drop-shadow(0 0 9px rgba(40,190,157,.9));
+}
+
+#game-stage #battlePage .v153-status-vfx-stun{
+    opacity:.94;
+    filter:drop-shadow(0 0 10px rgba(182,255,108,.94));
+}
+
+#game-stage #battlePage .v153-status-vfx-dodgeSkill,
+#game-stage #battlePage .v153-status-vfx-stealthSkill,
+#game-stage #battlePage .v153-status-vfx-dinghaishenzhen{
+    z-index:5;
+    opacity:.92;
+    filter:drop-shadow(0 0 9px rgba(127,255,205,.92));
+}
+
 /* Abyss portrait cards make direct children position:relative. Keep Rage and
    all other timed status sheets anchored over their own card. */
 #game-stage #battlePage .battle-monster.v152-abyss-portrait > .v153-status-vfx{
@@ -539,8 +567,6 @@
 .v143-skill-stage[data-skill="phoenixCry"] .v143-skill-flight{width:72px;height:52px;margin:-26px 0 0 -36px;font-size:35px;line-height:52px;}
 .v143-skill-stage[data-skill="fireRocket"] .v143-skill-flight{border-radius:2px;background:linear-gradient(90deg,var(--v143-soft),var(--v143-color) 28%,transparent 31%);}
 .v143-skill-stage[data-skill="iceArrowRain"] .v143-skill-flight{clip-path:polygon(48% 0,61% 35%,100% 50%,61% 62%,50% 100%,39% 62%,0 50%,39% 35%);}
-.v143-skill-stage[data-skill="windCrossSlash"] .v143-hit-impact::after{content:"";position:absolute;inset:0;border-bottom:5px solid var(--v143-soft);transform:rotate(86deg);}
-.v143-skill-stage[data-skill="stormRain"] .v143-skill-field{background:repeating-linear-gradient(105deg,transparent 0 18px,color-mix(in srgb,var(--v143-soft) 38%,transparent) 20px 22px,transparent 24px 43px),radial-gradient(circle at 50% 10%,color-mix(in srgb,var(--v143-color) 38%,transparent),transparent 65%);}
 .v143-skill-stage[data-skill="earthShield"] .v143-hit-impact{border-color:#ff504c #ffe25c #60ec80 #59a9ff;clip-path:none;border-radius:15%;}
 .v143-skill-stage[data-skill="barrier"] .v143-hit-impact{border-style:double;font-size:18px;}
 

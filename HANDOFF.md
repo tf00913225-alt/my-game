@@ -16,10 +16,10 @@
 
 ### 目前最終值
 
-- 正式 `main` 目前是 V173.21 merge commit
-  `2f8dbc2a389464aecc3b9375f422fc9cc3fbc93a`；V173.20 開場載入動畫、V173.21 新手期平衡與
-  素材更新已透過 PR #31 合併。V173.22 狂風術與四元素攻擊套裝 icon 已推至 `dev` 程式
-  commit `175bfd33394b69e227480edc3eb68f343f3a35f9`，尚未合併 `main`。
+- 正式 `main` 目前是 V173.22 merge commit
+  `2a2cbe86d1719c722007d2f28fe65b0f05bade3a`；V173.22 狂風術與四元素攻擊套裝 icon 已透過
+  PR #32 發布。V173.23 風系施放與持續狀態 Sprite VFX 依本輪指示只更新 `dev`，不再合併
+  `main`。
 - 真實載入是 `index.html` 的 24 支同步 classic script（`js/23` → `js/52` 開場 loader → `js/00` →
   `js/01`～`js/20` → `js/24`），再由 `js/20-anonymous-20.js` 依 `load/error → next`
   嚴格串行載入 26 支正式 runtime：`js/25` → `js/27`～`js/51`。巡怪素材鏈最後的
@@ -189,7 +189,8 @@
    進戰鬥驗收 `tests/v173.16-abyss-dialogue-visibility.test.js`；V173.17 新增物品視窗、裝備副本
    抽獎券版面、舊存檔展示資料修復與手機縮圖驗收 `tests/v173.17-item-ui-assets.test.js`；V173.18
    新增符咒格線、深淵勝敗回圖與下游不得覆蓋最終技能 owner 驗收
-   `tests/v173.18-final-request.test.js`。
+   `tests/v173.18-final-request.test.js`；V173.23 新增 11 招風系施放、6 種持續狀態、逐格裁切、
+   實際目標定位、單次命中同步與狀態生命週期驗收 `tests/v173.23-wind-vfx.test.js`。
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -207,7 +208,7 @@
 
 ---
 
-## 目前狀態（截至 2026-09-01，V173.22）
+## 目前狀態（截至 2026-09-01，V173.23）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -221,6 +222,9 @@
 - V173.22 補上狂風術 icon，並依火／水／土／風與刀、鎧甲、靴、盔、護腕五個部位接入
   20 張攻擊套裝 icon；法術套裝仍使用原本圖示。既有存檔的背包與已穿戴套裝會依穩定 ID
   同步新圖，不更動存檔格式、裝備數值或套裝規則。
+- V173.23 將 11 招風系施放與重力、殤風、暈眩、風行、隱身、氣定神閒 6 種持續狀態接入
+  專案現有共用 Sprite VFX renderer、圖片快取、定位與戰鬥行動佇列；施放圖只播放一次，
+  狀態圖逐角色循環，同名狀態再次 MISS 不重啟。技能數值、結算、機率與回合數未改。
 - 母版歷史：V120（單一巨大 index.html，全部 inline）→ V121_SPLIT（拆成外部檔案，
   行為完全不變，過程見 `CHECK_REPORT.txt` / `README_*.txt`）→ 之後陸續疊加 V123～V131
   各種 stage patch，一路疊到現在。
@@ -636,7 +640,30 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
-### 2026-09-01 — V173.22：狂風術與四元素攻擊套裝 icon（dev）
+### 2026-09-01 — V173.23：風系施放與持續狀態 Sprite VFX（dev）
+
+- 沿用 `js/39-v143-skill-animation.js` 現有 VFX renderer、預載圖片快取、目標註冊、命中延遲
+  與 action gate，接入 11 張風系施放 PNG。單體依實際卡牌中央定位，三人技能只在目標列
+  播放一份內含三路的圖，全體技能只覆蓋實際目標隊伍區域一份；玩家與敵方施放共用同一套
+  動態定位。第 7 幀只釋放既有結算結果一次，第 8 幀不再次結算。
+- 接入重力、殤風、暈眩、風行、隱身、氣定神閒 6 張循環 PNG。只有狀態實際成功套用後才
+  顯示；同名狀態再次施加 MISS 時保留原節點、不重啟或刷新；到期、解除、死亡、卡牌移除
+  或戰鬥結束會清除。增益施放不加傷害、受擊震動或範圍震動。
+- 風系正式 Sprite 路徑會略過原程序化 charge／flight／field／impact 節點，並刪除兩條舊的
+  風系技能專屬 CSS 圖形規則。`js/37-v142-skill-animation.js` 只依指定值調整動畫時長；
+  `js/41-v146-system-polish.js` 只同步正式狀態名與多目標同幀提示。技能數值、傷害、目標、
+  狀態機率與回合數均未修改。
+- 17 張 `assets/inbox/` 原檔未重新生成、修改、裁切、重新命名或轉碼，SHA-256 已由新測試
+  鎖定。實際施放圖尺寸為 1448×1086，另有暴風拳／風焰術為 1536×1024；狀態圖皆為
+  1774×887，與需求文字中的 1536×1152／1024×512 不同。renderer 因此按圖片實際尺寸除以
+  4×3／4×2 動態取來源格，再繪入 384×384／256×256 目的格，沒有改動來源素材。
+- 版本標題、首頁 badge、直載 query 與 runtime cache 同步升至 V173.23。Repository checks
+  全數通過：JavaScript 語法 `162/162`、Node suites `48/48`、靜態資源 `363`、HTML ID `283`、
+  版本／Loader（24 支直載、108 個相依資源、26 支 ordered runtimes）、空白與衝突標記檢查
+  皆正常。環境沒有 Chromium，因此 Playwright browser smoke 與真機視覺對位／流暢度仍需
+  人工確認。正式 `main` 停留在 V173.22 `2a2cbe86d1719c722007d2f28fe65b0f05bade3a`。
+
+### 2026-09-01 — V173.22：狂風術與四元素攻擊套裝 icon（main）
 
 - `js/00-main.js` 的既有 `elementSkillIconMap` 補上 `windSpell`，技能列表與詳情共用
   `assets/skills/wind-gale-spell.jpg`，沒有新增第二份技能 icon owner。
@@ -653,8 +680,9 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 - 本機 Repository checks 全數通過：JavaScript 語法 `161/161`、Node suites `47/47`、
   靜態資源 `346`、HTML ID `283`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
   runtimes）、空白與衝突標記檢查皆正常。環境沒有 Chromium，因此 Playwright browser smoke
-  未執行；20 張成品已用聯絡表逐張人工檢視。遠端 `dev` 程式 commit 為
-  `175bfd33394b69e227480edc3eb68f343f3a35f9`；`main` 保持 V173.21。
+  未執行；20 張成品已用聯絡表逐張人工檢視。遠端 `dev` 程式 commit
+  `175bfd33394b69e227480edc3eb68f343f3a35f9` 已透過 PR #32 發布；正式 `main` merge commit
+  為 `2a2cbe86d1719c722007d2f28fe65b0f05bade3a`，Repository checks 與 Pages 均成功。
 
 ### 2026-09-01 — V173.21：新手期平衡與素材更新（main）
 
