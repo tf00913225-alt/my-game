@@ -165,7 +165,8 @@
    V171 另新增怒火／水球術／洪水猛獸／冰霜箭雨定位與單體凍傷範圍驗收
    `tests/v171-combat-vfx-fixes.test.js`；V172 新增水球術多目標分層播放與原圖保留驗收
    `tests/v172-water-orb-vfx.test.js`；V173 新增水球術雙向旋轉飛行、完整命中畫格與版本標示驗收
-   `tests/v173-water-orb-direction-vfx.test.js`。
+   `tests/v173-water-orb-direction-vfx.test.js`；V173.16 新增深淵對話縮放定位、可視邊界與三段對話
+   進戰鬥驗收 `tests/v173.16-abyss-dialogue-visibility.test.js`。
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -492,6 +493,13 @@ V136 已把入口改成：
 再回推「螢幕上想要的實際px值 ÷ 縮放比例」寫進CSS，不要直接把使用者說的
 數字原封不動寫進去。**
 
+V173.16 又確認一個同類陷阱：即使 JavaScript 已把 viewport 座標正確換回 map-local
+邏輯座標，最終 CSS 的 `inset:auto !important` 仍會把 inline `left/top` 當成無效，
+造成元素的 `style.left/top` 看似有值、實際 `getBoundingClientRect()` 卻仍落在畫面外。
+深淵對話目前由 `js/36-v141-content-systems.js` 計算座標並寫入 CSS custom properties，
+再由 `css/50-v169-abyss-flow.css` 的最終 `left/top:var(...) !important` 消費；檢查這類問題
+不能只讀 `element.style`，必須同時量 computed style、元素 rect 與容器 rect。
+
 反過來，`#homeFeatureModal`（角色/技能列表、狀態頁那個彈窗）已經在
 更早一輪（`js/19-stage-v78-character-inventory-runtime.js`那次修正）
 證實是1:1顯示、沒有被這層縮放影響，同一個技巧不適用在那個彈窗上——
@@ -594,6 +602,14 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-09-01 — V173.16：深淵守關者對話可視定位與完整點擊流程（dev）
+
+- 根因鏈：V173.13 把深淵 Boss 對話 owner 從 `js/38-v143-system-fixes.js` 收斂回 `js/36-v141-content-systems.js` 時，漏帶 V173.6 已驗證的縮放座標換算；補回換算後，真實瀏覽器又確認 `css/50-v169-abyss-flow.css` 的 `inset:auto !important` 仍會覆蓋一般 inline `left/top`，因此程式碼看似已有座標，但對話 rect 仍完整位於地圖上緣外。
+- 唯一 owner 維持 `js/36-v141-content-systems.js`：Boss 按鈕、capture `pointerup/click` 與地圖 bounds fallback 都進同一個 `v141HandleAbyssBossInteraction()`／`openAbyssBossDialogue()`／`launchAbyssBossBattle()` 流程；`js/38` 不再覆寫挑戰函式，`js/41`／`js/42` 只保留既有地圖移動 wrapper，沒有新增 runtime patch 或第二套 Boss 元素。
+- `positionAbyssBossDialogue()` 以地圖 `offsetWidth/Height` 對照實際 rect，將守關者 viewport 座標換回 map-local 邏輯座標，並依對話實際寬高限制在地圖四邊內；既有對話再次觸發時也會重新定位。最終座標以 CSS custom properties 交給 `css/50-v169-abyss-flow.css` 的權威 `left/top !important` 使用，保留 legacy `inset:0 !important` 的右／下清除但不再蓋掉定位。
+- 新增 `tests/v173.16-abyss-dialogue-visibility.test.js`，動態驗證縮放座標、完整可視邊界、唯一 owner，以及點守關者後三段對話可連續點擊並正式進戰鬥；發布與所有現行快取斷言同步升至 `V173.16`。
+- 完整 Repository checks 通過：JavaScript 語法 `155/155`、Node suites `42/42`、本地資源 `300`、HTML ID `272`、版本／Loader 與 Git 差異檢查全數正常。不可變 `dev` commit `6542718` 的雲端 Chrome 實測：點東帝後對話 rect 完整位於地圖 rect 內（`fullyVisible=true`），三次點擊依序顯示三句並進入東帝＋四名天兵戰鬥；無遊戲來源 console error。未修改或合併 `main`，仍待使用者在原 Android 裝置做最後手感確認。
 
 ### 2026-09-01 — V173.14：水球術固定 4×3 Sprite Sheet 校正（dev）
 
