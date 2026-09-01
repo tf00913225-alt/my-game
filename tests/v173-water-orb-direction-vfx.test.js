@@ -38,9 +38,9 @@ test("Canvas visits frames left-to-right, top-to-bottom once without per-target 
     assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("the published build label is V173.22",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.22"/);
-    assert.match(index,/aria-label="目前版本 V173\.22"[\s\S]*?>V173\.22<\/div>/);
+test("the published build label is V173.23",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.23"/);
+    assert.match(index,/aria-label="目前版本 V173\.23"[\s\S]*?>V173\.23<\/div>/);
 });
 
 console.log("\nV173 Water Ball target-group VFX suite: "+passed+" tests passed.");

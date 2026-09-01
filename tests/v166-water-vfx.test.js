@@ -605,7 +605,7 @@ test("Freeze and Frostbite loops mirror statusEffects only and never open an act
     assert.match(css,/v153-status-vfx-freeze[\s\S]*?infinite/);
 });
 
-test("Frozen and Frostbite loops begin only after their one-shot cast finishes",()=>{
+test("existing Frozen and Frostbite loops do not restart during a duplicate cast",()=>{
     [
         {id:"freeze",type:"freeze",duration:950},
         {id:"frostCrush",type:"frostbite",duration:1150}
@@ -617,22 +617,24 @@ test("Frozen and Frostbite loops begin only after their one-shot cast finishes",
         ];
         const runtime=loadRuntime({monsters,targetIndexes:[0]});
         runtime.context.v143SyncStatusSpriteEffects();
-        assert.ok(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type));
+        const existing=runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type);
+        assert.ok(existing);
         runtime.context.v142SkillAnimationDirector.play(
             castConfig(id,id==="freeze"?"tri":"single"),
             {side:"player",actorIndex:0,targetId:0}
         );
-        assert.equal(
+        assert.strictEqual(
             runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type),
-            null,
-            id+" cast and status loop must not overlap permanently"
+            existing,
+            id+" duplicate cast must preserve the existing loop"
         );
         const completion=runtime.scheduled.find(timer=>timer.delay>=duration-2&&timer.delay<=duration+2);
         assert.ok(completion,id+" full cast timer");
         completion.callback();
-        assert.ok(
+        assert.strictEqual(
             runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type),
-            id+" loop begins after the cast"
+            existing,
+            id+" duplicate cast must not restart the loop after completion"
         );
     });
 });
@@ -686,8 +688,8 @@ test("final combat targeting and Frostbite rules use the Water owner",()=>{
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.22"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.22/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.23"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.23/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });

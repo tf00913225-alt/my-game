@@ -32,11 +32,11 @@
         healSpell:[1250,"medium","heal"],revive:[1800,"high","revive"],
         waterEX:[3000,"ultimate","aura"],
 
-        stormFist:[720,"basic","impact"],stormFlurry:[1250,"medium","barrage"],
-        windCrossSlash:[1900,"high","cross-slash"],dizzyFist:[2200,"high","lightning"],
-        windSpell:[900,"basic","projectile"],stormCircle:[1500,"medium","tornado"],
-        windHowlLightning:[2150,"high","lightning"],stormRain:[2850,"ultimate","tempest"],
-        dodgeSkill:[1400,"medium","aura"],stealthSkill:[1700,"medium","veil"],
+        stormFist:[1200,"basic","impact"],stormFlurry:[1500,"medium","barrage"],
+        windCrossSlash:[1700,"high","cross-slash"],dizzyFist:[1800,"high","lightning"],
+        windSpell:[1400,"basic","projectile"],stormCircle:[1600,"medium","tornado"],
+        windHowlLightning:[1900,"high","lightning"],stormRain:[2600,"ultimate","tempest"],
+        dodgeSkill:[1600,"medium","aura"],stealthSkill:[1700,"medium","veil"],
         dinghaishenzhen:[2200,"high","aura"],windEX:[3000,"ultimate","aura"],
 
         stoneSlash:[760,"basic","slash"],petrifyFist:[1300,"medium","stone-impact"],
