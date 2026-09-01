@@ -149,9 +149,9 @@ test("dungeon escape restores its owner and Abyss portrait opens dialogue direct
     assert.match(dungeon,/Math\.max\(4,Math\.min\(96/);
     assert.match(dungeon,/Math\.max\(8,Math\.min\(94/);
     assert.match(css,/\.v141-abyss-map\{height:auto !important;min-height:0 !important;flex:1 1 auto !important;\}/);
-    assert.match(system,/點擊對話繼續/);
-    assert.match(system,/openBossBubble\(\);/);
-    assert.doesNotMatch(system,/v141ApproachAbyssBoss\(openBossBubble\)/);
+    assert.match(dungeon,/function openAbyssBossDialogue\(\)[\s\S]*?點擊對話繼續/);
+    assert.match(dungeon,/window\.v141ChallengeAbyssBoss=function\(\)[\s\S]*?return openAbyssBossDialogue\(\);/);
+    assert.doesNotMatch(system,/v141ChallengeAbyssBoss=function/);
 });
 
 test("dungeon nav is in the scaled shell with exactly the five requested destinations",()=>{
