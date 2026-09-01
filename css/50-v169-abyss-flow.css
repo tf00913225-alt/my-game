@@ -159,6 +159,12 @@
 .v169-blueprint-art::before{content:"圖";}
 .v169-item-art > img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center;}
 .v169-item-art > img[hidden]{display:none !important;}
+#game-stage #inventoryPage .inventory-item-classic .inventory-icon > .v169-item-art{
+    width:100%;
+    height:100%;
+    max-width:100%;
+    max-height:100%;
+}
 .v169-talisman-art.v169-rarity-low,.v169-blueprint-art.v169-rarity-low{border-color:#3ba7ff;box-shadow:0 0 5px #3ba7ff,0 0 12px rgba(59,167,255,.72),inset 0 0 7px rgba(59,167,255,.38);}
 .v169-talisman-art.v169-rarity-mid,.v169-blueprint-art.v169-rarity-mid{border-color:#a855f7;box-shadow:0 0 5px #a855f7,0 0 13px rgba(168,85,247,.76),inset 0 0 7px rgba(168,85,247,.4);}
 .v169-talisman-art.v169-rarity-high,.v169-blueprint-art.v169-rarity-high{border-color:#ff9f38;box-shadow:0 0 6px #ff9f38,0 0 14px rgba(255,159,56,.8),inset 0 0 8px rgba(255,159,56,.42);}

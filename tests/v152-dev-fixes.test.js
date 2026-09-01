@@ -66,32 +66,22 @@ function load(overrides={}){
 }
 
 test("V152 remains ordered before V154 under the current cache version",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.17/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.17"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
     assert.match(loader,/css\/45-v152-dev-fixes\.css/);
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
     const v152=loader.indexOf("js/44-v152-dev-fixes.js");
     assert.ok(v149>=0&&v152>v149);
 });
 
-test("the latest requested skill values replace the V149 snapshot",()=>{
+test("V152 no longer overwrites final elemental skill owners",()=>{
     const context=load();
     const skills=context.skillDatabase;
     assert.equal(skills.fireBurstStrike,undefined);
-    assert.deepEqual(Array.from(skills.dragonSlash.repeatChanceByLevel),[5,10,20,30,40]);
-    assert.equal(skills.dragonSlash.baseDamage,165);
-    assert.equal(skills.phoenixCry.baseDamage,60);
-    assert.deepEqual([skills.iceSpin.frostbiteChance,skills.iceSpin.frostbiteDuration],[40,1]);
-    assert.deepEqual([skills.frostCrush.frostbiteChance,skills.frostCrush.frostbiteDuration],[50,1]);
-    assert.deepEqual(Array.from(skills.stormFlurry.damageDownByLevel),[10,20,30,40,50]);
-    assert.equal(skills.stormFlurry.damageDownDuration,2);
-    assert.deepEqual(Array.from(skills.dizzyFist.missBonusByLevel),[30,45,50,55,65]);
-    assert.equal(skills.dizzyFist.stunDuration,5);
-    assert.equal(skills.earthquakeCrush.selfShieldByLevel,undefined);
-    assert.deepEqual(Array.from(skills.earthquakeCrush.petrifyChanceByLevel),[30,35,40,45,50]);
-    assert.equal(skills.earthquakeCrush.petrifyDuration,3);
-    assert.deepEqual([skills.iceArrowRain.freezeChance,skills.iceArrowRain.freezeDuration],[20,2]);
-    assert.match(skills.iceArrowRain.description,/20%基礎機率冰封2回合/);
+    assert.equal(skills.dragonSlash.repeatChanceByLevel,undefined);
+    assert.equal(skills.dragonSlash.repeatChance,33);
+    ["dragonSlash","phoenixCry","iceSpin","frostCrush","stormFlurry","dizzyFist","earthquakeCrush","iceArrowRain"]
+        .forEach(id=>assert.doesNotMatch(source,new RegExp('patchSkill\\("'+id+'"')));
     assert.deepEqual([skills.yuanXiangGuangMing.baseHeal,skills.yuanXiangGuangMing.baseHealSP],[150,55]);
     assert.deepEqual([skills.yuanGuangShield.shieldAmount,skills.yuanGuangShield.shieldDuration],[100,2]);
     assert.deepEqual([skills.yuanZuBlessing.cleanseChance,skills.yuanZuBlessing.agilityBonusPercent,skills.yuanZuBlessing.duration],[20,50,2]);
@@ -119,19 +109,17 @@ test("role switching refreshes only the selected owner's independent skill-point
     assert.deepEqual(Array.from(loadouts.fire.equippedSkills),["flameSlash"]);
 });
 
-test("Dragon Slash uses the caster's own per-level repeat chance",()=>{
+test("V152 leaves conditional Fire follow-ups to the V149 owner",()=>{
     const observed=[];
     const context=load({
-        getPartyCharacterKey:index=>index===0?"fire":"player2",
-        getSkillLevel:(key,id)=>key==="fire"&&id==="dragonSlash"?3:1,
         castDamageSkill(id){ observed.push(["player",this.skillDatabase[id].repeatChance]); },
         monsters:[{v141ForceSkillLevel:5}],
         processSingleMonsterAttack(){ observed.push(["monster",this.skillDatabase.dragonSlash.repeatChance]); }
     });
     context.castDamageSkill("dragonSlash");
     context.processSingleMonsterAttack(0);
-    assert.deepEqual(observed,[["player",20],["monster",40]]);
-    assert.equal(context.v152GetDragonRepeatChance(2),10);
+    assert.deepEqual(observed,[["player",33],["monster",33]]);
+    assert.equal(context.v152GetDragonRepeatChance,undefined);
 });
 
 test("Rage supplies separate critical chance and critical-damage values to the live resolver",()=>{

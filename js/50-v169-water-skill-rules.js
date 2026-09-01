@@ -1,8 +1,8 @@
 /* =====================================================
    V169 — final Water skill rules
 
-   This late runtime is the single authoritative layer for the seven
-   offensive/control Water skills requested in V169.  It intentionally
+   This late runtime is the single authoritative layer for every Water
+   skill.  It intentionally
    patches data and narrow compatibility seams instead of reopening the
    legacy combat engine.
 ===================================================== */
@@ -14,69 +14,98 @@
 
     const VERSION="169";
     const WATER_SKILL_IDS=[
-        "frostPunch","iceSpin","frostCrush","waterBall",
-        "floodBeast","iceArrowRain","freeze"
+        "waterKnife","frostPunch","iceSpin","frostCrush","waterBall",
+        "floodBeast","iceArrowRain","freeze","healSpell","revive","waterEX"
     ];
-    const WATER_SKILL_ID_SET=new Set(WATER_SKILL_IDS);
+    const WATER_PREVIEW_SKILL_ID_SET=new Set(WATER_SKILL_IDS.slice(0,8));
     const STATUS_FIELDS=[
         "freezeChance","freezeDuration","freezeSingleTarget",
         "teamFreezeChance","teamFreezeDuration",
-        "frostbiteChance","frostbiteDuration"
+        "frostbiteChance","frostbiteDuration","statusResistBonus"
     ];
     const FROSTBITE_ACTION_TEXT="仍可使用補品、符咒、普通攻擊、防禦與逃脫";
 
     const FINAL_SKILLS={
+        waterKnife:{
+            id:"waterKnife",tier:1,name:"水刀斬",element:"water",category:"physical",
+            targetType:"single",learnCost:2,maxLevel:5,upgradeCost:1,
+            baseDamage:21,damagePerLevel:5,spCost:6,
+            frostbiteChance:10,frostbiteDuration:1,
+            lifestealPercentByLevel:[4,5,6,7,8],requires:[],
+            description:"初次學習需2技能點，對單體造成21點傷害，消耗6 SP；10%基礎機率使目標凍傷1回合，凍傷期間無法使用技能，仍可使用補品、符咒、普通攻擊、防禦與逃脫。吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+5。"
+        },
         frostPunch:{
             id:"frostPunch",tier:2,name:"冰霜拳",element:"water",category:"physical",
             targetType:"single",learnCost:10,maxLevel:5,upgradeCost:1,
-            baseDamage:30,damagePerLevel:8,spCost:17,
+            baseDamage:32,damagePerLevel:7,spCost:17,
+            frostbiteChance:15,frostbiteDuration:1,
             lifestealPercentByLevel:[4,5,6,7,8],requires:["waterKnife"],
-            description:"需先學習水刀斬。初次學習需10技能點，對單體造成30點傷害，消耗17 SP；最高5級，每升1級消耗1技能點，傷害+8，並吸取實際造成傷害的4%/5%/6%/7%/8%恢復自身HP。"
+            description:"需先學習水刀斬。初次學習需10技能點，對單體造成32點傷害，消耗17 SP；15%基礎機率使目標凍傷1回合，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+7。"
         },
         iceSpin:{
             id:"iceSpin",tier:3,name:"冰旋一閃",element:"water",category:"physical",
             targetType:"tri",learnCost:20,maxLevel:5,upgradeCost:1,
-            baseDamage:25,damagePerLevel:7,spCost:45,
-            frostbiteChance:30,frostbiteDuration:1,
+            baseDamage:35,damagePerLevel:7,spCost:45,
+            frostbiteChance:20,frostbiteDuration:1,
             lifestealPercentByLevel:[3,4,5,6,7],requires:["frostPunch"],
-            description:"需先學習冰霜拳。初次學習需20技能點，對同排中、左、右最多3名目標各造成25點傷害，消耗45 SP；最高5級，每升1級消耗1技能點，傷害+7，並吸取實際造成傷害的3%/4%/5%/6%/7%恢復自身HP。每個命中目標有30%基礎機率凍傷1回合；凍傷期間無法使用技能，仍可使用補品、符咒、普通攻擊、防禦與逃脫。"
+            description:"需先學習冰霜拳。初次學習需20技能點，對同排中、左、右最多3名目標各造成35點傷害，消耗45 SP；20%基礎機率使目標凍傷1回合，並吸取實際傷害的3%/4%/5%/6%/7%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+7。"
         },
         frostCrush:{
             id:"frostCrush",tier:4,name:"冰封重擊",element:"water",category:"physical",
             targetType:"single",learnCost:30,maxLevel:5,upgradeCost:1,
-            baseDamage:100,damagePerLevel:15,spCost:60,
-            frostbiteChance:40,frostbiteDuration:1,
+            baseDamage:116,damagePerLevel:24,spCost:60,
+            frostbiteChance:25,frostbiteDuration:1,
             lifestealPercentByLevel:[4,5,6,7,8],requires:["iceSpin"],
-            description:"需先學習冰旋一閃。初次學習需30技能點，對單體造成100點傷害，消耗60 SP；最高5級，每升1級消耗1技能點，傷害+15，並吸取實際造成傷害的4%/5%/6%/7%/8%恢復自身HP。命中目標有40%基礎機率凍傷1回合；凍傷期間無法使用技能，仍可使用補品、符咒、普通攻擊、防禦與逃脫。"
+            description:"需先學習冰旋一閃。初次學習需30技能點，對單體造成116點傷害，消耗60 SP；25%基礎機率使目標凍傷1回合，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+24。"
         },
         waterBall:{
             id:"waterBall",tier:1,name:"水球術",element:"water",category:"magic",
             targetType:"tri",learnCost:2,maxLevel:5,upgradeCost:1,
-            baseDamage:17,damagePerLevel:3,spCost:8,
+            baseDamage:10,damagePerLevel:2,spCost:8,
+            frostbiteChance:10,frostbiteDuration:1,
             lifestealPercentByLevel:[3,4,5,6,7],requires:[],
-            description:"初次學習需2技能點，對同排中、左、右最多3名目標各造成17點傷害，消耗8 SP；最高5級，每升1級消耗1技能點，傷害+3，並吸取實際造成傷害的3%/4%/5%/6%/7%恢復自身HP。"
+            description:"初次學習需2技能點，對同排中、左、右最多3名目標各造成10點傷害，消耗8 SP；10%基礎機率使目標凍傷1回合，並吸取實際傷害的3%/4%/5%/6%/7%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+2。"
         },
         floodBeast:{
             id:"floodBeast",tier:2,name:"洪水猛獸",element:"water",category:"magic",
             targetType:"single",learnCost:15,maxLevel:5,upgradeCost:1,
-            baseDamage:85,damagePerLevel:8,spCost:35,
-            frostbiteChance:40,frostbiteDuration:1,
+            baseDamage:105,damagePerLevel:21,spCost:35,
+            frostbiteChance:15,frostbiteDuration:1,
             lifestealPercentByLevel:[4,5,6,7,8],requires:["waterBall"],
-            description:"需先學習水球術。初次學習需15技能點，對單體造成85點傷害，消耗35 SP；最高5級，每升1級消耗1技能點，傷害+8，並吸取實際造成傷害的4%/5%/6%/7%/8%恢復自身HP。命中目標有40%基礎機率凍傷1回合；凍傷期間無法使用技能，仍可使用補品、符咒、普通攻擊、防禦與逃脫。"
+            description:"需先學習水球術。初次學習需15技能點，對單體造成105點傷害，消耗35 SP；15%基礎機率使目標凍傷1回合，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+21。"
         },
         iceArrowRain:{
             id:"iceArrowRain",tier:3,name:"冰霜箭雨",element:"water",category:"magic",
             targetType:"all",learnCost:20,maxLevel:5,upgradeCost:1,
-            baseDamage:30,damagePerLevel:12,spCost:75,
+            baseDamage:30,damagePerLevel:6,spCost:75,
             frostbiteChance:20,frostbiteDuration:1,
             lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],
-            description:"需先學習洪水猛獸。初次學習需20技能點，對敵方全體各造成30點傷害，消耗75 SP；最高5級，每升1級消耗1技能點，傷害+12，並吸取實際造成傷害的1%/2%/3%/4%/5%恢復自身HP。每個命中目標各有20%基礎機率凍傷1回合；凍傷期間無法使用技能，仍可使用補品、符咒、普通攻擊、防禦與逃脫。"
+            description:"需先學習洪水猛獸。初次學習需20技能點，對敵方全體各造成30點傷害，消耗75 SP；20%基礎機率使目標凍傷1回合，並吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+6。"
         },
         freeze:{
             id:"freeze",tier:4,name:"冰封",element:"water",category:"magic",
-            targetType:"single",learnCost:25,maxLevel:1,spCost:32,
+            targetType:"column",learnCost:25,maxLevel:1,spCost:32,
             freezeChance:90,freezeDuration:5,requires:["iceArrowRain"],
-            description:"需先學習冰霜箭雨。初次學習需25技能點，90%基礎機率冰封單一目標，使其無法行動5回合，消耗32 SP；純控制技能，不造成傷害。"
+            description:"需先學習冰霜箭雨。初次學習需25技能點，對前、後排同位置最多2名目標各有90%基礎機率造成冰封，使其無法行動5回合，消耗32 SP；最高1級，純控制技能，不造成傷害。"
+        },
+        healSpell:{
+            id:"healSpell",tier:5,name:"治療術",element:"water",category:"heal",
+            targetType:"allyTri",learnCost:20,maxLevel:5,upgradeCost:1,
+            baseHeal:550,healPerLevel:30,baseHealSP:65,healSPPerLevel:30,spCost:45,
+            cleanseAll:true,requires:["iceArrowRain","iceSpin"],
+            description:"需先學習冰霜箭雨或冰旋一閃其一。初次學習需20技能點，對我方中、左、右3人恢復550 HP與65 SP並解除所有負面狀態；施放者本人不恢復SP。消耗45 SP，最高5級，每升1級消耗1技能點，HP與SP恢復量各+30。"
+        },
+        revive:{
+            id:"revive",tier:6,name:"復活術",element:"water",category:"revive",
+            targetType:"deadAlly",learnCost:20,maxLevel:5,upgradeCost:1,spCost:45,
+            reviveHealPercentByLevel:[20,40,60,80,100],requires:["healSpell"],
+            description:"需先學習治療術。初次學習需20技能點，選擇1名死亡友方原地復活，依等級恢復20%/40%/60%/80%/100%最大HP，消耗45 SP。最高5級，每升1級消耗1技能點。"
+        },
+        waterEX:{
+            id:"waterEX",tier:7,name:"水元素EX",element:"water",category:"passive",
+            targetType:"none",learnCost:25,maxLevel:1,damageBonusPercent:5,healBonusPercent:10,
+            turnStartCleanseChance:30,requires:[],
+            description:"初次學習需25技能點，最大1級；永久提升水元素傷害5%、回復系技能回復量10%，每回合開始前有30%機率解除自身所有負面狀態。"
         }
     };
 
@@ -132,15 +161,16 @@
         ));
     }
 
-    /* V158's compatibility resolver predates the final single-target rule and
-       asks getSkillTargets(..., "tri") explicitly.  Keep the mature SP/status
-       settlement, but narrow only a Freeze invocation to its resolved card. */
-    function withSingleFreezeTarget(callback){
+    /* V158's compatibility resolver predates the final front/back column rule
+       and asks getSkillTargets(..., "tri") explicitly.  Keep the mature
+       SP/status settlement, but redirect only a Freeze invocation to the
+       authoritative column resolver. */
+    function withFinalFreezeTargets(callback){
         const previousTargets=window.getSkillTargets;
         if(typeof previousTargets!=="function"){ return callback(); }
 
         window.getSkillTargets=function(centerIndex,targetType){
-            if(targetType==="tri"){ return [centerIndex]; }
+            if(targetType==="tri"){ return previousTargets(centerIndex,"column"); }
             return previousTargets.apply(this,arguments);
         };
 
@@ -154,7 +184,7 @@
         window[functionName]=function(){
             const args=arguments;
             if(args[skillArgumentIndex]==="freeze"){
-                return withSingleFreezeTarget(()=>previous.apply(this,args));
+                return withFinalFreezeTargets(()=>previous.apply(this,args));
             }
             return previous.apply(this,args);
         };
@@ -335,10 +365,10 @@
     if(typeof window.getSkillPreviewSummary==="function"){
         const previousPreviewSummary=window.getSkillPreviewSummary;
         window.getSkillPreviewSummary=function(skill){
-            if(!skill||!WATER_SKILL_ID_SET.has(skill.id)){
+            if(!skill||!WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
                 return previousPreviewSummary.apply(this,arguments);
             }
-            const scope={single:"單一敵人",tri:"同排最多3名敵人",all:"敵方全體"}[skill.targetType]||"技能目標";
+            const scope={single:"單一敵人",tri:"同排最多3名敵人",column:"前後排同位置最多2名敵人",all:"敵方全體"}[skill.targetType]||"技能目標";
             const type=skill.id==="freeze"?"純控制":(skill.category==="physical"?"物理傷害":"法術傷害");
             const status=numeric(skill.frostbiteChance)>0
                 ?"；可能使目標凍傷，只禁止技能"
@@ -351,7 +381,7 @@
     if(typeof window.getSkillEffectPreviewText==="function"){
         const previousEffectPreview=window.getSkillEffectPreviewText;
         window.getSkillEffectPreviewText=function(skill,level){
-            if(skill&&WATER_SKILL_ID_SET.has(skill.id)){
+            if(skill&&WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
                 return waterSkillEffectParts(skill,level).join("｜");
             }
             return previousEffectPreview.apply(this,arguments);
@@ -361,7 +391,7 @@
     if(typeof window.buildSkillLevelBreakdownHTML==="function"){
         const previousLevelBreakdown=window.buildSkillLevelBreakdownHTML;
         window.buildSkillLevelBreakdownHTML=function(skill){
-            if(skill&&WATER_SKILL_ID_SET.has(skill.id)){
+            if(skill&&WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
                 return buildWaterSkillLevelBreakdown(skill);
             }
             return previousLevelBreakdown.apply(this,arguments);
@@ -373,7 +403,7 @@
         window.showCreationSkillDetail=function(skillId){
             const result=previousCreationSkillDetail.apply(this,arguments);
             const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
-            if(skill&&WATER_SKILL_ID_SET.has(skill.id)&&typeof document!=="undefined"){
+            if(skill&&WATER_PREVIEW_SKILL_ID_SET.has(skill.id)&&typeof document!=="undefined"){
                 const description=document.getElementById("creationSkillDetailDescription");
                 const levels=document.getElementById("creationSkillDetailLevels");
                 if(description){ description.textContent=skill.description; }

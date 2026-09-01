@@ -72,11 +72,11 @@ function compact(skill){
 }
 
 test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.17/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.17/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
+assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.18/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.17"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
     assert.match(loader,/css\/44-v149-skill-ui-rules\.css/);
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
@@ -86,76 +86,61 @@ assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.17/);
     assert.match(css,/max-width:396px/);
 });
 
-test("all 45 four-element entries match the authoritative costs, targets and damage",()=>{
+test("the Fire, Wind and Earth owner matches the authoritative costs, targets and damage",()=>{
     const s=load().skillDatabase;
     const expected={
-        flameSlash:[2,5,"single",17,10,8],fireCritical:[10,5,"single",39,13,15],
-        explosiveFlurry:[20,5,"tri",35,15,22],dragonSlash:[45,5,"single",145,25,65],
-        fireRocket:[2,5,"tri",17,8,8],blazeSpell:[10,5,"single",42,15,15],
-        flameTornado:[30,5,"single",135,13,55],phoenixCry:[45,5,"all",58,18,68],
+        flameSlash:[2,5,"single",30,6,10],fireCritical:[10,5,"single",45,9,28],
+        explosiveFlurry:[20,5,"tri",50,10,47],dragonSlash:[45,5,"single",165,33,65],
+        fireRocket:[2,5,"tri",13,4,10],blazeSpell:[10,5,"single",45,9,28],
+        flameTornado:[30,5,"single",150,30,47],phoenixCry:[45,5,"all",42,9,60],
         rage:[25,5,"allyTri",null,null,50],fireEX:[25,1,"none",null,null,null],
-        waterKnife:[2,5,"single",13,3,6],frostPunch:[10,5,"single",30,8,17],
-        iceSpin:[20,5,"tri",25,7,20],frostCrush:[30,5,"single",100,15,50],
-        waterBall:[2,5,"tri",17,3,8],floodBeast:[15,5,"single",85,8,15],
-        iceArrowRain:[20,5,"all",30,12,75],freeze:[25,1,"single",null,null,22],
-        healSpell:[20,5,"allyAll",null,null,40],revive:[20,5,"deadAlly",null,null,45],
-        waterEX:[25,1,"none",null,null,null],stormFist:[2,5,"single",14,2,7],
-        stormFlurry:[10,5,"tri",28,7,20],windCrossSlash:[15,5,"single",90,12,39],
-        dizzyFist:[30,5,"single",120,15,55],windSpell:[2,5,"tri",18,2,9],
-        stormCircle:[10,5,"row",38,9,18],windHowlLightning:[15,5,"single",98,15,55],
-        stormRain:[30,5,"all",48,14,75],dodgeSkill:[10,1,"allyAll",null,null,20],
+        stormFist:[2,5,"single",26,6,7],stormFlurry:[10,5,"tri",13,3,20],
+        windCrossSlash:[15,5,"single",128,26,39],dizzyFist:[30,5,"single",141,29,55],
+        windSpell:[2,5,"tri",12,3,9],stormCircle:[10,5,"tri",14,4,18],
+        windHowlLightning:[15,5,"single",128,26,55],stormRain:[30,5,"all",36,7,75],
+        dodgeSkill:[10,1,"allyTri",null,null,20],
         stealthSkill:[15,1,"ally",null,null,45],dinghaishenzhen:[20,1,"allyAll",null,null,77],
-        windEX:[25,1,"none",null,null,null],stoneSlash:[2,5,"single",14,2,7],
-        petrifyFist:[10,5,"tri",28,7,26],stoneBreakSky:[15,5,"single",65,9,42],
-        earthquakeCrush:[30,5,"tri",48,14,55],stoneThrow:[2,5,"tri",14,2,7],
-        sandWind:[10,5,"row",17,5,19],flyingSandStrike:[15,5,"all",35,8,26],
-        dustStorm:[30,5,"single",98,15,55],earthShield:[10,1,"allyAll",null,null,66],
-        rockWall:[15,1,"allyAll",null,null,45],barrier:[20,1,"ally",null,null,40],
+        windEX:[25,1,"none",null,null,null],stoneSlash:[2,5,"single",26,6,7],
+        petrifyFist:[10,5,"tri",13,3,26],stoneBreakSky:[15,5,"single",128,26,42],
+        earthquakeCrush:[30,5,"tri",47,9,55],stoneThrow:[2,5,"tri",12,3,7],
+        sandWind:[10,5,"tri",14,4,19],flyingSandStrike:[15,5,"all",32,6,55],
+        dustStorm:[30,5,"single",140,28,65],earthShield:[10,1,"allyTri",null,null,66],
+        rockWall:[15,1,"allyTri",null,null,45],barrier:[20,1,"ally",null,null,40],
         earthEX:[25,1,"none",null,null,null]
     };
-    assert.equal(Object.keys(expected).length,Object.keys(DEFINITIONS).length);
+    assert.equal(Object.keys(expected).length,34);
     Object.entries(expected).forEach(([id,value])=>assert.deepEqual(compact(s[id]),value,id));
+    assert.equal(s.waterKnife.baseDamage,undefined,"Water data is owned only by js/50");
 });
 
 test("every special percentage, duration and prerequisite is exact",()=>{
     const s=load().skillDatabase;
-    assert.equal(s.dragonSlash.repeatChance,33);
-    assertArray(s.flameTornado.burnPercentByLevel,[3,4,5,6,8]);
-    assert.deepEqual([s.phoenixCry.burnChance,s.phoenixCry.burnDuration],[70,2]);
+    assert.deepEqual([s.dragonSlash.followUpOnCriticalOrDefeat,s.dragonSlash.followUpMaxCasts],[true,2]);
+    assertArray(s.flameTornado.burnPercentByLevel,[3,4,5,6,7]);
+    assert.deepEqual([s.flameTornado.burnChance,s.flameTornado.guaranteedBurn,s.flameTornado.burnDuration],[100,true,1]);
+    assert.deepEqual([s.phoenixCry.burnChance,s.phoenixCry.burnDuration,s.phoenixCry.burnBonusThreshold,s.phoenixCry.nextRoundDamageBonusPercent],[40,2,3,30]);
     assertArray(s.phoenixCry.burnPercentByLevel,[5,7,9,11,13]);
     assertArray(s.rage.critChanceBonusByLevel,[5,10,15,20,25]);
     assertArray(s.rage.critDamageBonusByLevel,[10,20,30,40,50]);
     assert.deepEqual([s.fireEX.damageBonusPercent,s.fireEX.critChanceBonusPercent,s.fireEX.critDamageBonusPercent,s.fireEX.statusTargetDamageBonusPercent],[10,5,5,5]);
-    assertArray(s.waterKnife.lifestealPercentByLevel,[4,5,6,7,8]);
-    assertArray(s.frostPunch.lifestealPercentByLevel,[4,5,6,7,8]);
-    assert.deepEqual([s.iceSpin.frostbiteChance,s.iceSpin.frostbiteDuration],[60,2]);
-    assertArray(s.iceSpin.lifestealPercentByLevel,[3,4,5,6,7]);
-    assert.deepEqual([s.frostCrush.frostbiteChance,s.frostCrush.frostbiteDuration],[50,2]);
-    assert.equal(s.floodBeast.teamFreezeChance,undefined);
-    assert.equal(s.floodBeast.teamFreezeDuration,undefined);
-    assert.deepEqual([s.iceArrowRain.freezeChance,s.iceArrowRain.freezeDuration],[40,2]);
-    assert.deepEqual([s.freeze.freezeChance,s.freeze.freezeDuration],[80,4]);
-    assert.deepEqual([s.healSpell.baseHeal,s.healSpell.healPerLevel,s.healSpell.baseHealSP,s.healSpell.healSPPerLevel],[350,30,35,30]);
-    assertArray(s.revive.reviveHealPercentByLevel,[20,40,60,80,100]);
-    assert.deepEqual([s.waterEX.damageBonusPercent,s.waterEX.healBonusPercent,s.waterEX.statusResistBonus],[5,10,10]);
     assertArray(s.stormFist.agilityDownByLevel,[30,40,50,60,70]);
-    assertArray(s.stormFlurry.damageDownByLevel,[15,18,21,25,30]);
-    assertArray(s.windCrossSlash.damageDownByLevel,[15,20,25,30,35]);
-    assertArray(s.dizzyFist.missBonusByLevel,[10,20,30,40,50]);
+    assertArray(s.stormFlurry.damageDownByLevel,[10,20,30,40,50]);
+    assertArray(s.windCrossSlash.damageDownByLevel,[20,30,35,40,50]);
+    assertArray(s.dizzyFist.missBonusByLevel,[30,45,50,55,65]);
     assertArray(s.stormRain.missBonusByLevel,[30,45,50,55,65]);
-    assert.deepEqual([s.dodgeSkill.evasionBonusPercent,s.dodgeSkill.duration],[60,2]);
-    assert.deepEqual([s.dinghaishenzhen.statusResistBonus,s.dinghaishenzhen.accuracyBonusPercent,s.dinghaishenzhen.duration],[45,50,3]);
-    assert.equal(s.windEX.evasionBonusPercent,25);
-    assertArray(s.petrifyFist.allyShieldByLevel,[100,125,150,175,200]);
-    assertArray(s.earthquakeCrush.selfShieldByLevel,[100,150,200,250,300]);
-    assertArray(s.flyingSandStrike.petrifyChanceByLevel,[25,35,45,55,65]);
-    assertArray(s.dustStorm.defenseDownByLevel,[10,15,20,25,35]);
+    assert.deepEqual([s.dodgeSkill.evasionBonusPercent,s.dodgeSkill.duration],[75,3]);
+    assert.deepEqual([s.dinghaishenzhen.statusResistBonus,s.dinghaishenzhen.accuracyBonusPercent,s.dinghaishenzhen.duration],[65,50,3]);
+    assert.equal(s.windEX.evasionBonusPercent,35);
+    assertArray(s.petrifyFist.selfShieldByLevel,[100,125,150,175,200]);
+    assertArray(s.stoneBreakSky.selfShieldByLevel,[100,125,150,175,200]);
+    assertArray(s.earthquakeCrush.petrifyChanceByLevel,[30,35,40,45,50]);
+    assertArray(s.flyingSandStrike.defenseDownByLevel,[10,15,20,25,35]);
+    assertArray(s.dustStorm.petrifyChanceByLevel,[20,25,30,35,45]);
     assert.deepEqual([s.earthShield.reflectPercent,s.earthShield.duration],[50,3]);
-    assert.deepEqual([s.rockWall.defenseBonusPercent,s.rockWall.duration],[30,4]);
+    assert.deepEqual([s.rockWall.defenseBonusPercent,s.rockWall.duration],[35,4]);
     assert.deepEqual([s.barrier.barrierBlockCount,s.barrier.duration],[5,5]);
-    assert.equal(s.earthEX.defenseBonusPercent,25);
+    assert.equal(s.earthEX.defenseBonusPercent,35);
     assertArray(s.rage.requires,["explosiveFlurry","flameTornado"]);
-    assertArray(s.healSpell.requires,["iceArrowRain","iceSpin"]);
     assertArray(s.earthShield.requires,["stoneBreakSky","flyingSandStrike"]);
 });
 
@@ -247,7 +232,7 @@ test("Flood Beast never performs the obsolete all-enemy Freeze sweep",()=>{
     assert.doesNotMatch(source,/applyTeamFreezeToMonsters|applyTeamFreezeToPlayers/);
 });
 
-test("Dragon Slash repeats once at 33 percent without charging SP twice",()=>{
+test("Dragon Slash follows up after an initial critical without charging SP twice",()=>{
     const math=Object.create(Math); math.random=()=>0;
     let finishes=0;
     const player={id:"火俠",element:"fire",hp:100,sp:200,activeBuffs:[],statusEffects:[]};
@@ -260,13 +245,13 @@ test("Dragon Slash repeats once at 33 percent without charging SP twice",()=>{
         window:null,console,Math:math,Date,Number,Object,Array,Set,Map,Promise,
         skillDatabase:database(),document:bareDocument(),player,monsters,targets,currentBattleMonsters:[0,1],selectedMonster:1,
         getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>player,
-        castCount:0,battleActive:true,
+        castCount:0,battleActive:true,rollCritical(){ return {isCrit:context.castCount===1,multiplier:1}; },
         finishPlayerAction(){ finishes++; },
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback()
     };
     context.window=context;
     vm.createContext(context);
-    vm.runInContext("castDamageSkill=function(id){player.sp-=skillDatabase[id].spCost;targets.push(selectedMonster);castCount++;finishPlayerAction()}",context);
+    vm.runInContext("castDamageSkill=function(id){player.sp-=skillDatabase[id].spCost;targets.push(selectedMonster);castCount++;rollCritical();finishPlayerAction()}",context);
     vm.runInContext(source,context);
     context.castDamageSkill("dragonSlash");
     assert.equal(context.castCount,2);
@@ -285,7 +270,7 @@ test("Dragon Slash adds a second repeat when the first repeat is critical",()=>{
         skillDatabase:database(),document:bareDocument(),player,monsters,currentBattleMonsters:[0],selectedMonster:0,
         getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>player,
         castCount:0,battleActive:true,finishPlayerAction(){ finishes++; },
-        rollCritical(){ return {isCrit:context.castCount===2,multiplier:1}; },
+        rollCritical(){ return {isCrit:context.castCount<=2,multiplier:1}; },
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback()
     };
     context.window=context;
@@ -311,9 +296,10 @@ test("enemy Dragon Slash repeat preserves the active battle token",()=>{
             calls.push([index,token]);
             this.showMonsterSkillNameBadge("霸龍裂天斬","fire",index);
             monsters[index].sp-=this.skillDatabase.dragonSlash.spCost;
+            this.showPlayerHit(10,"hp",0,false,calls.length===1);
             this.finishPlayerAction();
         },
-        showMonsterSkillNameBadge(){},finishPlayerAction(){ finishes++; },addBattleLog(){}
+        showMonsterSkillNameBadge(){},showPlayerHit(){},finishPlayerAction(){ finishes++; },addBattleLog(){}
     });
     context.processSingleMonsterAttack(0,77);
     assert.deepEqual(calls,[[0,77],[0,77]]);
@@ -334,7 +320,7 @@ test("enemy Dragon Slash adds a second repeat after a critical first repeat",()=
             calls.push([index,token]);
             this.showMonsterSkillNameBadge("霸龍裂天斬","fire",index);
             monsters[index].sp-=this.skillDatabase.dragonSlash.spCost;
-            this.showPlayerHit(10,"hp",0,false,calls.length===2);
+            this.showPlayerHit(10,"hp",0,false,calls.length<=2);
             this.finishPlayerAction();
         },
         showMonsterSkillNameBadge(){},finishPlayerAction(){ finishes++; },addBattleLog(){}

@@ -49,19 +49,6 @@
         return numeric(values[index]);
     }
 
-    /* Rage is a formation skill, not an alias for every ally. */
-    if(typeof skillDatabase!=="undefined"){
-        const rage=skillDatabase.rage;
-        if(rage){
-            rage.targetType="allyTri";
-            rage.description="需先學習火爆亂擊或烈焰龍捲其一。提高我方同排中、左、右最多3名存活角色的爆擊率5%/10%/15%/20%/25%與爆擊傷害10%/20%/30%/40%/50%，持續2回合；效果存在時不可刷新。";
-        }
-        const heal=skillDatabase.healSpell;
-        if(heal){
-            heal.description="需先學習冰霜箭雨或冰旋一閃其一。對我方全體恢復350 HP與35 SP；每升1級各提升30點。施放者本人只恢復HP，不恢復SP。";
-        }
-    }
-
     if(typeof window.v135GetSkillTargetScopeLabel==="function"){
         const previousScopeLabel=window.v135GetSkillTargetScopeLabel;
         window.v135GetSkillTargetScopeLabel=function(skill){
@@ -135,6 +122,24 @@
                     ?row
                     :row.slice(Math.max(0,row.indexOf(centerIndex)-1),Math.min(row.length,row.indexOf(centerIndex)+2));
                 return selected.filter(index=>alive.includes(index));
+            }
+            if(targetType==="column"){
+                const rows=visualFormationRows(indexes);
+                const selectedRow=rows.find(candidate=>candidate.includes(centerIndex));
+                if(!selectedRow){ return []; }
+                const selectedMonster=typeof monsters!=="undefined"?monsters[centerIndex]:null;
+                const explicitPosition=selectedMonster&&Number.isInteger(selectedMonster.v141FormationPosition)
+                    ?selectedMonster.v141FormationPosition:null;
+                const fallbackPosition=Math.max(0,selectedRow.indexOf(centerIndex));
+                return rows.map(row=>{
+                    if(explicitPosition!==null&&typeof monsters!=="undefined"){
+                        const exact=row.find(index=>
+                            monsters[index]&&monsters[index].v141FormationPosition===explicitPosition
+                        );
+                        if(Number.isInteger(exact)){ return exact; }
+                    }
+                    return row[fallbackPosition];
+                }).filter(index=>Number.isInteger(index)&&alive.includes(index)).slice(0,2);
             }
             const legacy=previousGetSkillTargets.apply(this,arguments);
             return Array.isArray(legacy)?legacy.filter(index=>alive.includes(index)):[];
@@ -362,25 +367,25 @@
     }
 
     function resolvePartyHeal(characterIndex,queued,skill,state){
-        const targets=skill.targetType==="allyAll"
-            ?livingPartyIndexes()
-            :[Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex].filter(index=>{
-                const target=getPartyCharacterByIndex(index);
-                return target&&numeric(target.hp)>0;
-            });
+        const targets=requestedBuffTargets(characterIndex,queued,skill);
         if(!targets.length){ return finishSupport(skill.name+"目前沒有可治療的存活目標。"); }
         animateSupportCast(state,characterIndex,skill);
         let hpTotal=0;
         let spTotal=0;
+        let cleansedTotal=0;
         targets.forEach(index=>{
             const target=getPartyCharacterByIndex(index);
             const targetStats=getPartyBattleStats(index);
             if(!target||!targetStats||numeric(target.hp)<=0){ return; }
-            const planned=healAmounts(skill,state,targetStats,skill.id==="healSpell"&&skill.targetType==="allyAll");
+            const planned=healAmounts(skill,state,targetStats,skill.id==="healSpell");
             const hp=Math.max(0,Math.min(planned.hp,planned.maxHP-numeric(target.hp)));
             const sp=index===characterIndex?0:Math.max(0,Math.min(planned.sp,planned.maxSP-numeric(target.sp)));
             target.hp=Math.min(planned.maxHP,numeric(target.hp)+planned.hp);
             if(index!==characterIndex){ target.sp=Math.min(planned.maxSP,numeric(target.sp)+planned.sp); }
+            if(skill.cleanseAll&&Array.isArray(target.statusEffects)){
+                cleansedTotal+=target.statusEffects.length;
+                target.statusEffects=[];
+            }
             hpTotal+=hp;
             spTotal+=sp;
             if(hp>0&&typeof showPlayerHit==="function"){ showPlayerHit(hp,"heal",index,true); }
@@ -389,7 +394,8 @@
         });
         return finishSupport(
             (state.character.id||"角色")+"施放"+skill.name+"，我方存活角色共恢復"+
-            hpTotal+" HP、"+spTotal+" SP；施放者本人不恢復SP。"
+            hpTotal+" HP、"+spTotal+" SP"+
+            (skill.cleanseAll?"，並解除"+cleansedTotal+"個負面狀態":"")+"；施放者本人不恢復SP。"
         );
     }
 

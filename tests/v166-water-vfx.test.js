@@ -11,7 +11,7 @@ const zlib=require("node:zlib");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const support=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
-const waterRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
+const waterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const finalRules=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
@@ -354,7 +354,7 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
         const model=manifest[id];
         assert.ok(model&&model.sprite,id+" sprite metadata");
         assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+filename,id);
-        const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.17":"?v=166";
+        const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.18":"?v=166";
         assert.ok(model.sprite.src.endsWith(cacheVersion),id+" cache version");
         if(["waterBall","iceArrowRain"].includes(id)){
             assert.equal(model.sprite.renderer,"canvas-crop",id+" Canvas renderer");
@@ -676,16 +676,18 @@ test("revive activation and its HP popup wait for the frame-eight hit",()=>{
     );
 });
 
-test("final combat targeting and Frostbite rules remain unchanged",()=>{
-    assert.match(finalRules,/patchSkill\("freeze",\{[\s\S]*?targetType:"tri"/);
-    assert.match(finalRules,/patchSkill\("healSpell",\{[\s\S]*?targetType:"allyAll"/);
-    assert.match(waterRules,/frostCrush:\{[\s\S]*?frostbiteChance:50/);
-    assert.match(waterRules,/iceSpin:\{[\s\S]*?frostbiteChance:60/);
+test("final combat targeting and Frostbite rules use the Water owner",()=>{
+    assert.doesNotMatch(finalRules,/patchSkill\("freeze"/);
+    assert.doesNotMatch(finalRules,/patchSkill\("healSpell"/);
+    assert.match(waterRules,/freeze:\{[\s\S]*?targetType:"column"/);
+    assert.match(waterRules,/healSpell:\{[\s\S]*?targetType:"allyTri"/);
+    assert.match(waterRules,/frostCrush:\{[\s\S]*?frostbiteChance:25/);
+    assert.match(waterRules,/iceSpin:\{[\s\S]*?frostbiteChance:20/);
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.17"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.17/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });

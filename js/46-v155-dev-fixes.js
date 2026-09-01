@@ -9,8 +9,6 @@
 
     const VERSION="155";
     const HARD_CONTROL_SKIP_MS=300;
-    const DRAGON_REPEAT_BY_LEVEL=[5,10,20,30,40];
-    const PHOENIX_BURN_BY_LEVEL=[5,7,9,11,13];
     const FINAL_BOSS_ORDER=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
     const FINAL_BOSS_RULES={
         東帝天尊:{element:"earth",skills:["dustStorm","stoneBreakSky"],supports:["barrier"]},
@@ -39,20 +37,6 @@
         Object.keys(fields).forEach(key=>{ skillDatabase[id][key]=copyValue(fields[key]); });
     }
 
-    patchSkill("dragonSlash",{
-        learnCost:45,maxLevel:5,upgradeCost:1,targetType:"single",
-        baseDamage:165,damagePerLevel:25,spCost:65,requires:["explosiveFlurry"],
-        repeatChanceByLevel:DRAGON_REPEAT_BY_LEVEL,repeatChance:DRAGON_REPEAT_BY_LEVEL[0],
-        repeatMaxCasts:2,
-        description:"需先學習火爆亂擊。初次學習需45技能點，對單體造成165點傷害，消耗65 SP；再施放率依等級為5%/10%/20%/30%/40%，首次追加若爆擊或擊敗目標可再追加一次，最多追加2次。最高5級，每升1級消耗1技能點，傷害+25。"
-    });
-    patchSkill("phoenixCry",{
-        learnCost:45,maxLevel:5,upgradeCost:1,targetType:"all",
-        baseDamage:60,damagePerLevel:18,spCost:68,requires:["flameTornado"],
-        burnChance:70,burnDuration:2,burnPercentByLevel:PHOENIX_BURN_BY_LEVEL,
-        burnBonusOnNoTargetsPercent:50,burnBonusDuration:1,
-        description:"需先學習烈焰龍捲。初次學習需45技能點，對敵方全體各造成60點傷害，消耗68 SP；最高5級，每升1級消耗1技能點，傷害+18。70%基礎機率燃燒2回合，每回合造成目標最大HP的5%/7%/9%/11%/13%；本次未使任何目標燃燒時，下一回合火鳳天鳴傷害+50%。"
-    });
     patchSkill("yuanXiangGuangMing",{
         targetType:"allyAll",baseHeal:150,baseHealSP:55,
         description:"我方全體回復150 HP、55 SP。"
@@ -593,12 +577,17 @@
     function finalizePhoenixCast(context){
         if(!context||!context.castStarted||!context.actor){ return; }
         if(phoenixBuffReady(context.actor)){ delete context.actor.v155PhoenixDamageBuff; }
-        if(context.burnTargets.size<1){
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.phoenixCry:null;
+        const threshold=Math.max(1,Math.floor(numeric(skill&&skill.burnBonusThreshold)||3));
+        const bonusPercent=Math.max(0,numeric(skill&&skill.nextRoundDamageBonusPercent)||30);
+        const duration=Math.max(1,Math.floor(numeric(skill&&skill.nextRoundDamageBonusDuration)||1));
+        if(context.burnTargets.size<threshold){
             context.actor.v155PhoenixDamageBuff={
-                battleToken:currentBattleToken(),readyTurn:currentRound()+1,expiresTurn:currentRound()+2
+                battleToken:currentBattleToken(),readyTurn:currentRound()+1,
+                expiresTurn:currentRound()+1+duration,bonusPercent:bonusPercent
             };
             if(typeof addBattleLog==="function"){
-                addBattleLog("火鳳天鳴本次未使任何目標燃燒，下一回合火鳳天鳴傷害提升50%。");
+                addBattleLog("火鳳天鳴本次燃燒目標少於"+threshold+"人，下一回合火鳳天鳴傷害提升"+bonusPercent+"%。");
             }
         }
     }
@@ -665,8 +654,10 @@
         const previousCalculateSkillDamage=calculateSkillDamage;
         calculateSkillDamage=function(){
             const result=previousCalculateSkillDamage.apply(this,arguments);
+            const buff=phoenixCastContext&&phoenixCastContext.actor&&phoenixCastContext.actor.v155PhoenixDamageBuff;
             return phoenixCastContext&&phoenixCastContext.side==="player"&&phoenixCastContext.castStarted&&
-                phoenixBuffReady(phoenixCastContext.actor)?Math.floor(numeric(result)*1.5):result;
+                phoenixBuffReady(phoenixCastContext.actor)
+                ?Math.floor(numeric(result)*(1+numeric(buff&&buff.bonusPercent)/100)):result;
         };
     }
 
@@ -674,8 +665,10 @@
         const previousCalculateDamage=calculateDamage;
         calculateDamage=function(){
             const result=previousCalculateDamage.apply(this,arguments);
+            const buff=phoenixCastContext&&phoenixCastContext.actor&&phoenixCastContext.actor.v155PhoenixDamageBuff;
             return phoenixCastContext&&phoenixCastContext.side==="monster"&&phoenixCastContext.castStarted&&
-                phoenixBuffReady(phoenixCastContext.actor)?Math.floor(numeric(result)*1.5):result;
+                phoenixBuffReady(phoenixCastContext.actor)
+                ?Math.floor(numeric(result)*(1+numeric(buff&&buff.bonusPercent)/100)):result;
         };
     }
 
@@ -695,8 +688,7 @@
     window.v155RuleDiagnostics=function(){
         return {
             version:VERSION,hardControlSkipMs:HARD_CONTROL_SKIP_MS,
-            dragonRepeatChanceByLevel:DRAGON_REPEAT_BY_LEVEL.slice(),
-            phoenixBurnByLevel:PHOENIX_BURN_BY_LEVEL.slice(),
+            elementalSkillDataOwnedByFinalLayers:true,
             monsterOnlyFireBurst:!!(typeof skillDatabase!=="undefined"&&skillDatabase.fireBurstStrike)
         };
     };

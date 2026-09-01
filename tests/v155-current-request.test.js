@@ -19,12 +19,12 @@ function skills(){
         explosiveFlurry:{id:"explosiveFlurry",name:"火爆亂擊"},
         flameTornado:{id:"flameTornado",name:"烈焰龍捲"},
         fireCritical:{id:"fireCritical",name:"會心一擊",element:"fire",category:"physical",targetType:"single",maxLevel:5,spCost:15},
-        dragonSlash:{id:"dragonSlash",name:"霸龍裂天斬",element:"fire",category:"physical"},
-        phoenixCry:{id:"phoenixCry",name:"火鳳天鳴",element:"fire",category:"magic"},
+        dragonSlash:{id:"dragonSlash",name:"霸龍裂天斬",element:"fire",category:"physical",targetType:"single",learnCost:45,maxLevel:5,upgradeCost:1,baseDamage:165,damagePerLevel:33,spCost:65,followUpOnCriticalOrDefeat:true,followUpMaxCasts:2,requires:["explosiveFlurry"]},
+        phoenixCry:{id:"phoenixCry",name:"火鳳天鳴",element:"fire",category:"magic",targetType:"all",learnCost:45,maxLevel:5,upgradeCost:1,baseDamage:42,damagePerLevel:9,spCost:60,burnChance:40,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1,requires:["flameTornado"]},
         yuanXiangGuangMing:{id:"yuanXiangGuangMing",name:"元相光明",element:"light",category:"heal",maxLevel:5,spCost:35},
         yuanGuangShield:{id:"yuanGuangShield",name:"元光護體",element:"light",category:"buff",maxLevel:5,spCost:40},
         yuanZuBlessing:{id:"yuanZuBlessing",name:"元祖賜福",element:"light",category:"buff",maxLevel:1,spCost:45},
-        healSpell:{id:"healSpell",name:"治療術",element:"water",category:"heal",maxLevel:5,spCost:40,baseHeal:350,healPerLevel:30,baseHealSP:35,healSPPerLevel:30},
+        healSpell:{id:"healSpell",name:"治療術",element:"water",category:"heal",maxLevel:5,spCost:45,baseHeal:550,healPerLevel:30,baseHealSP:65,healSPPerLevel:30},
         stealthSkill:{id:"stealthSkill",name:"隱身術",element:"wind",category:"buff",targetType:"ally",maxLevel:1,spCost:45,duration:2}
     };
 }
@@ -47,26 +47,26 @@ function load(overrides={}){
 }
 
 test("V155 remains ordered before V158 under the current cache version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.17"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.17/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.17/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.18/);
     const v154=loader.indexOf("js/45-v154-dev-fixes.js");
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
     assert.ok(v154>=0&&v155>v154&&v158>v155);
 });
 
-test("Dragon Slash and Phoenix Cry expose every requested final value",()=>{
+test("V155 preserves the final Fire owner while retaining Emperor support data",()=>{
     const s=load().skillDatabase;
     assert.deepEqual(
-        [s.dragonSlash.learnCost,s.dragonSlash.maxLevel,s.dragonSlash.upgradeCost,s.dragonSlash.baseDamage,s.dragonSlash.damagePerLevel,s.dragonSlash.spCost,s.dragonSlash.repeatMaxCasts],
-        [45,5,1,165,25,65,2]
+        [s.dragonSlash.learnCost,s.dragonSlash.maxLevel,s.dragonSlash.upgradeCost,s.dragonSlash.baseDamage,s.dragonSlash.damagePerLevel,s.dragonSlash.spCost,s.dragonSlash.followUpMaxCasts],
+        [45,5,1,165,33,65,2]
     );
     assert.deepEqual(array(s.dragonSlash.requires),["explosiveFlurry"]);
-    assert.deepEqual(array(s.dragonSlash.repeatChanceByLevel),[5,10,20,30,40]);
+    assert.equal(s.dragonSlash.repeatChanceByLevel,undefined);
     assert.deepEqual(
-        [s.phoenixCry.learnCost,s.phoenixCry.maxLevel,s.phoenixCry.upgradeCost,s.phoenixCry.baseDamage,s.phoenixCry.damagePerLevel,s.phoenixCry.spCost,s.phoenixCry.burnChance,s.phoenixCry.burnDuration,s.phoenixCry.burnBonusOnNoTargetsPercent],
-        [45,5,1,60,18,68,70,2,50]
+        [s.phoenixCry.learnCost,s.phoenixCry.maxLevel,s.phoenixCry.upgradeCost,s.phoenixCry.baseDamage,s.phoenixCry.damagePerLevel,s.phoenixCry.spCost,s.phoenixCry.burnChance,s.phoenixCry.burnDuration,s.phoenixCry.burnBonusThreshold,s.phoenixCry.nextRoundDamageBonusPercent],
+        [45,5,1,42,9,60,40,2,3,30]
     );
     assert.deepEqual(array(s.phoenixCry.requires),["flameTornado"]);
     assert.deepEqual(array(s.phoenixCry.burnPercentByLevel),[5,7,9,11,13]);
@@ -103,9 +103,9 @@ test("final Abyss roster uses exact boss maxima and elite minima",()=>{
     let forcedSnapshot;
     context.v155WithForcedFinalAbyssSkillLevel(byName("南帝天尊"),()=>{
         const skill=context.skillDatabase.dragonSlash;
-        forcedSnapshot=[skill.maxLevel,skill.baseDamage,skill.damagePerLevel,array(skill.repeatChanceByLevel)];
+        forcedSnapshot=[skill.maxLevel,skill.baseDamage,skill.damagePerLevel,skill.followUpMaxCasts];
     });
-    assert.deepEqual(forcedSnapshot,[1,265,0,[40]],"a low-level floor 5 boss still resolves the maximum skill rank");
+    assert.deepEqual(forcedSnapshot,[1,297,0,2],"a low-level floor 5 boss still resolves the maximum skill rank");
     assert.deepEqual([context.skillDatabase.dragonSlash.maxLevel,context.skillDatabase.dragonSlash.baseDamage],[5,165]);
 });
 
@@ -150,8 +150,8 @@ test("North Emperor heals at level five and never carries Revive",()=>{
         v141HealMonsterPreservingShield(monster,amount){ const before=monster.hp; monster.hp=Math.min(monster.maxHP,monster.hp+amount); return monster.hp-before; }
     });
     assert.equal(context.v155ResolveNorthHeal(0,true),true);
-    assert.equal(ally.hp,480);
-    assert.equal(ally.sp,165);
+    assert.equal(ally.hp,680);
+    assert.equal(ally.sp,195);
     assert.equal(finishes,1);
 });
 
@@ -170,27 +170,29 @@ test("wind elite Stealth blocks only single-target selection for two rounds",()=
     assert.equal(finishes,1);
 });
 
-test("Phoenix zero-burn cast grants one next-round 50 percent damage boost",()=>{
+test("Phoenix fewer-than-three Burn cast grants one next-round 30 percent damage boost",()=>{
     const player={id:"火俠",hp:100,sp:300,activeBuffs:[]};
     const damages=[];
-    let shouldBurn=false;
+    let burnCount=0;
     const context=load({
         player,battleToken:7,turn:1,addBattleLog(){},showSkillNameBadge(){},
         calculateSkillDamage(){ return 100; },applyBurnEffect(){},
         castDamageSkill(id){
             this.showSkillNameBadge(this.skillDatabase[id].name,"fire",0);
             damages.push(this.calculateSkillDamage());
-            if(shouldBurn){ this.applyBurnEffect({name:"目標"},2,5); }
+            for(let index=0;index<burnCount;index++){
+                this.applyBurnEffect({name:"目標"+index},2,5);
+            }
         }
     });
     context.castDamageSkill("phoenixCry");
     assert.deepEqual(damages,[100]);
     assert.deepEqual([player.v155PhoenixDamageBuff.readyTurn,player.v155PhoenixDamageBuff.expiresTurn],[2,3]);
     context.turn=2;
-    shouldBurn=true;
+    burnCount=3;
     context.castDamageSkill("phoenixCry");
-    assert.deepEqual(damages,[100,150]);
-    assert.equal(player.v155PhoenixDamageBuff,undefined,"successful burn consumes the one-round boost without rearming it");
+    assert.deepEqual(damages,[100,130]);
+    assert.equal(player.v155PhoenixDamageBuff,undefined,"three Burn targets consume the one-round boost without rearming it");
 });
 
 test("hard-controlled player and monster finish with the 300 ms override only",()=>{

@@ -52,8 +52,8 @@ function load(overrides={}){
 }
 
 test("V158 and V159 remain ordered before the final V169 runtimes",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.17"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.17/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.18"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.18/);
     assert.match(loader,/css\/47-v158-combat-tuning\.css/);
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
@@ -67,22 +67,22 @@ test("V158 and V159 remain ordered before the final V169 runtimes",()=>{
     );
 });
 
-test("Rage, Freeze and Heal expose the requested final values",()=>{
+test("V158 combat tuning no longer overwrites final skill data",()=>{
     const result=load().skillDatabase;
     assert.deepEqual(
         [result.rage.targetType,result.rage.spCost,result.rage.duration],
-        ["allyTri",65,4]
+        ["allyTri",50,2]
     );
     assert.deepEqual(Array.from(result.rage.requires),["explosiveFlurry","flameTornado"]);
     assert.deepEqual(
         [result.freeze.targetType,result.freeze.spCost,result.freeze.freezeChance,result.freeze.freezeDuration],
-        ["tri",66,80,4]
+        ["single",22,80,4]
     );
     assert.deepEqual(Array.from(result.freeze.requires),["iceArrowRain"]);
     assert.deepEqual(
         [result.healSpell.targetType,result.healSpell.baseHeal,result.healSpell.healPerLevel,
             result.healSpell.baseHealSP,result.healSpell.healSPPerLevel,result.healSpell.spCost],
-        ["allyAll",550,30,65,30,45]
+        ["allyAll",350,30,35,30,40]
     );
     assert.deepEqual(Array.from(result.healSpell.requires),["iceArrowRain","iceSpin"]);
 });
@@ -145,7 +145,7 @@ test("secondary Freeze resolves all three selected formation targets",()=>{
     });
     context.castSecondaryCharacterSkill(1,"freeze",1);
     assert.deepEqual(targets.map(target=>target.frozenFor),[4,4,4]);
-    assert.equal(partyMember.sp,34);
+    assert.equal(partyMember.sp,78);
     assert.equal(finishes,1);
 });
 
