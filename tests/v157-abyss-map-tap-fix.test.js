@@ -46,7 +46,7 @@ test("map-level portrait bounds route a mobile pseudo-element tap to dialogue",(
     );
     assert.match(
         abyss,
-        /const boss=abyssState\.phase==="boss"\?map\.querySelector\("\.v141-abyss-boss"\):null;[\s\S]*if\(isAbyssMapControlHit\(event,boss\)\)\{[\s\S]*window\.v141ChallengeAbyssBoss\(\);[\s\S]*return;/
+        /const boss=abyssState\.phase==="boss"\?map\.querySelector\("\.v141-abyss-boss"\):null;[\s\S]*if\(isAbyssMapControlHit\(event,boss\)\)\{[\s\S]*window\.v141HandleAbyssBossInteraction\(event\);[\s\S]*return;/
     );
 });
 
