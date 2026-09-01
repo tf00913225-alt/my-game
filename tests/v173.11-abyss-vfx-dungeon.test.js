@@ -22,15 +22,15 @@ assert.match(dungeon,/if\(!DUNGEON_DAILY_LIMIT_ENABLED\)\{ return false; \}/);
 
 assert.match(
     animation,
-    /waterBall:\{[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,placement:"group",renderer:"canvas-crop"/
+    /waterBall:\{[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,\s*placement:"group",renderer:"canvas-crop"/
 );
 assert.match(
     animation,
-    /iceArrowRain:\{[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,placement:"battlefield",renderer:"canvas-crop",targetBounds:true,coverageScale:1\.22/
+    /iceArrowRain:\{[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,\s*placement:"battlefield",renderer:"canvas-crop",targetBounds:true,coverageScale:1\.22/
 );
 assert.match(
     animation,
     /const targetCards=indexes\.map\(targetIndex=>cardFor\(current\.targetSide,targetIndex\)\)[\s\S]*?const bounds=fieldBounds\(targetCards\);/
 );
 
-console.log("V173.13 Abyss, VFX, and daily-dungeon regression checks passed.");
+console.log("V173.14 Abyss, VFX, and daily-dungeon regression checks passed.");

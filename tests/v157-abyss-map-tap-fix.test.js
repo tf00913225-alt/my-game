@@ -17,8 +17,8 @@ function test(name,handler){
 }
 
 test("the current cache key delivers the Abyss tap correction",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.13"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.13/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.14"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.14/);
 });
 
 test("Abyss map portraits use the reduced mobile size and keep a full button hit area",()=>{
@@ -30,7 +30,7 @@ test("Abyss map portraits use the reduced mobile size and keep a full button hit
 test("capture-phase BOSS bridge wins over every portrait or player layer",()=>{
     assert.match(
         abyss,
-        /function installAbyssBossInputBridge\(\)[\s\S]*?map\.addEventListener\("pointerup",[\s\S]*?isAbyssMapControlHit\(event,boss\)[\s\S]*?v141HandleAbyssBossInteraction\(event\)/
+        /function installAbyssBossInputBridge\(\)[\s\S]*?\["pointerup","click"\]\.forEach\(type=>map\.addEventListener\(type,event=>[\s\S]*?isAbyssMapControlHit\(event,boss\)[\s\S]*?v141HandleAbyssBossInteraction\(event\)/
     );
     assert.match(
         abyss,

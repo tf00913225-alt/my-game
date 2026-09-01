@@ -14,7 +14,7 @@ function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 test("Water Ball owns a 12-frame, 4x3 group sprite with the frame-eight hit",()=>{
     assert.match(
         animation,
-        /waterBall:\{[\s\S]*?hit:\.5833333333[\s\S]*?frames:12,frameWidth:384,frameHeight:384,hitFrame:7,placement:"group",renderer:"canvas-crop"/
+        /waterBall:\{[\s\S]*?hit:\.5833333333[\s\S]*?frames:12,frameWidth:384,frameHeight:384,hitFrame:7,\s*placement:"group",renderer:"canvas-crop"/
     );
 });
 
@@ -38,9 +38,9 @@ test("Canvas visits frames left-to-right, top-to-bottom once without per-target 
     assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("the published build label is V173.13",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.13"/);
-    assert.match(index,/aria-label="目前版本 V173\.13"[\s\S]*?>V173\.13<\/div>/);
+test("the published build label is V173.14",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.14"/);
+    assert.match(index,/aria-label="目前版本 V173\.14"[\s\S]*?>V173\.14<\/div>/);
 });
 
 console.log("\nV173 Water Ball target-group VFX suite: "+passed+" tests passed.");

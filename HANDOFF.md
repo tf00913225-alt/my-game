@@ -595,6 +595,14 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-09-01 — V173.14：水球術固定 4×3 Sprite Sheet 校正（dev）
+
+- 水球術的唯一 owner 仍是 `js/39-v143-skill-animation.js`：既有 `drawCanvasCropSprite()` 與 `placeSprite()` 已使用單一 `group` Canvas node、固定 `384×384` source crop、存活目標群組中心與第 7～8 幀命中；本輪沒有新增 wrapper 或平行播放路徑。
+- 根因：`assets-library/assets/inbox/water-orb.png` 與 `frost-arrow-rain.png` 原始檔均為 `1448×1086`（固定 4×3、每格 `362×362`），卻被直接覆蓋到正式 `assets/vfx/water/`；Canvas renderer 已依 384px 格讀取，造成來源與裁切座標不一致。
+- 兩張正式 VFX 均依固定格座標處理：每格來源 `x=(frameIndex % 4)×362`、`y=floor(frameIndex / 4)×362`，不做透明邊界偵測、不縮放、不重繪；每個 362px 格僅置中補 11px 透明邊，輸出為 `1536×1152`、4×3、每格 `384×384` 的 RGBA PNG。12 格逐一像素比對原內容均為差異 0。
+- 發布／資產快取同步升至 `V173.14`，包括首頁、直載入口、Loader、兩張水系 Canvas 素材 URL 與現行版本回歸；三個歷史靜態測試（V157、V169、V173.11）僅放寬為驗證目前直接 owner／允許格式換行，未回填已移除的 legacy runtime patch。
+- 直接驗證通過：水球術、冰霜箭雨、V166 水系、V171、V172、V173 與 Canvas／深淵輸入共 44 項直接斷言。完整 CI 已通過：JavaScript 語法 `154/154`、Node 測試 `41/41`、本地資源 `300`、HTML ID／版本／Loader／`git diff --check`；Browser smoke 因本機未安裝 Playwright/Chromium 未執行。未修改 `main`、技能數值、傷害、存檔或目標規則，仍待 Android 實機視覺驗收。
+
 ### 2026-09-01 — V173.13：深淵守關者點擊與水系 Canvas Sprite Sheet 收斂（dev）
 
 - 深淵守關者的唯一 owner 收斂回 `js/36-v141-content-systems.js`：對話與進戰鬥流程不再由 `js/38-v143-system-fixes.js` wrapper 覆蓋；守關立繪、地圖 click 與 capture-phase `pointerup/click` 都進入同一個直接對話入口。既有 `js/41-v146-system-polish.js`／`js/42-v148-combat-dungeon-fixes.js` 只保留地圖移動事件的原始座標傳遞。

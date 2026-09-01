@@ -75,10 +75,9 @@ test("supplied chest and portal art stays inside the previous compact footprint"
 
 test("guardian dialogue opens directly and remains a local boss-anchored bubble",()=>{
     assert.match(abyss,/window\.v141ApproachAbyssBoss=function/);
-    assert.match(dialogue,/openBossBubble\(\);/);
-    assert.doesNotMatch(dialogue,/v141ApproachAbyssBoss\(openBossBubble\)/);
-    assert.match(dialogue,/bossRect\.left\+bossRect\.width\/2-mapRect\.left/);
-    assert.match(dialogue,/bossRect\.top-mapRect\.top-8/);
+    assert.match(abyss,/function openAbyssBossDialogue\(\)[\s\S]*?overlay\.className="v143-abyss-dialogue"/);
+    assert.match(abyss,/window\.v141ChallengeAbyssBoss=function\(\)[\s\S]*?return openAbyssBossDialogue\(\);/);
+    assert.doesNotMatch(dialogue,/openBossBubble\(\);/);
     assert.match(css,/\.v141-abyss-map > \.v143-abyss-dialogue\{[\s\S]*inset:auto !important;[\s\S]*height:auto !important;/);
     assert.match(css,/transform:translate\(-50%,-100%\)/);
     assert.doesNotMatch(css,/\.v141-abyss-map > \.v143-abyss-dialogue\{[^}]*height:100%/);
