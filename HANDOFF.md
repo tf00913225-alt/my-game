@@ -166,7 +166,8 @@
    `tests/v171-combat-vfx-fixes.test.js`；V172 新增水球術多目標分層播放與原圖保留驗收
    `tests/v172-water-orb-vfx.test.js`；V173 新增水球術雙向旋轉飛行、完整命中畫格與版本標示驗收
    `tests/v173-water-orb-direction-vfx.test.js`；V173.16 新增深淵對話縮放定位、可視邊界與三段對話
-   進戰鬥驗收 `tests/v173.16-abyss-dialogue-visibility.test.js`。
+   進戰鬥驗收 `tests/v173.16-abyss-dialogue-visibility.test.js`；V173.17 新增物品視窗、裝備副本
+   抽獎券版面、舊存檔展示資料修復與手機縮圖驗收 `tests/v173.17-item-ui-assets.test.js`。
    - `node --check 檔案.js` 確認語法沒錯
    - `node tests/v137-regressions.test.js` 跑既有高風險回歸
    - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
@@ -602,6 +603,14 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-09-01 — V173.17：物品／裝備副本彈窗、破圖與返回鍵修正（dev）
+
+- 根因不是單一圖片壞掉：`js/27-v132-content-expansion.js` 仍把 2.3～2.9 MB 的原始抽獎券／符咒 PNG 直接放進背包與彈窗；`css/50-v169-abyss-flow.css` 又把抽獎券內圖固定成 `58×58`，超出 `css/33-v132-content-expansion.css` 當時的 `40×40` 父框，因而和名稱穿疊；舊存檔則保留建立當下的空白／舊 `icon`，V170 只補過四張券，其他符咒、礦石、設計圖仍會顯示菱形或舊圖。裝備副本成功彈窗本身也沒有離開按鈕，物品詳情則允許大圖與內容把最下方按鈕推離可視範圍。
+- 原始圖全部保留、沒有覆蓋；另建四張 `assets/items/tickets/*-icon.png`（384×256）與三張 `assets/items/talismans/*-icon.png`（384×576）供手機 UI 使用。圖片解碼失敗會隱藏壞掉的 `<img>` 並顯示「券／符／圖」文字後備，不再露出瀏覽器破圖符號。
+- 唯一內容 owner 維持 `js/27-v132-content-expansion.js`，沒有新增 wrapper：舊存檔只依穩定 id 同步白名單內的名稱、圖示、類型與展示欄位，不碰數量；裝備副本獎券改為固定圖片列／名稱列並新增「返回」。`css/33`／`css/38`／`css/50` 收斂彈窗高度、圖片框與捲動，`js/01-stage-v8-touch-lock.js` 將 `#itemModalStats` 納入真實觸控捲動白名單；物品詳情底部文字統一為「返回」。
+- 版本與快取升至 `V173.17`。本機 Repository checks 全數通過：JavaScript `156/156`、Node suites `43/43`、靜態資源 `300`、HTML ID `272`、版本／Loader／Git 差異皆正常；遠端 `dev` code commit `77ea395` 的 GitHub Actions run #46 亦成功。
+- 不可變 `dev` 頁面以雲端 Chrome 實測：七張手機圖均 `complete=true` 且自然尺寸正確，物品詳情的框體完整留在 overlay 內、底部「返回」可見且點擊後確實關閉；裝備副本獎勵預覽的「返回」亦可點擊關閉，遊戲來源 console error 為 0。雲端瀏覽器固定舞台為約 526×936，無法切成回報截圖的精確 Android viewport；因此最終 Android 真機的字級／手感仍應由使用者複驗。未修改或合併 `main`。
 
 ### 2026-09-01 — V173.16：正式發布（main）
 
@@ -2710,12 +2719,10 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
       永久 `box-shadow` 動畫與每張技能卡 `will-change:transform` 同時建立大量合成層。
       V169 已將前者 `animation:none`、後者改為 `will-change:auto`。目前缺少 Chromium，
       需在同款 Android 裝置把角色、元素匣與技能詳細視窗各保持開啟約 10 秒複驗。
-- [ ] **背包介面「返回鍵」不見了**（2026-08-26這一輪使用者回報，沒有找到
-      也沒有重現）：檢查過背包的兩個進入路徑（下方導覽列的
-      `#inventoryPage`、地圖頁`openMapInventoryOverlay()`開的覆蓋層），
-      關閉/返回按鈕在兩邊都正常。使用者這次沒有附背包畫面的截圖，缺乏
-      視覺線索比對，下一個接手的人需要先跟使用者要一張實際看到問題的
-      截圖，才能判斷到底是哪個背包相關畫面、哪個按鈕。
+- [x] ~~**背包介面「返回鍵」不見了**~~ V173.17 由使用者截圖確認問題畫面其實是
+      `#itemModal` 物品詳情，而不是背包主頁或地圖背包覆蓋層；物品圖與內容會把原本最下方
+      的關閉鍵推出可視範圍。現已限制圖片／內容高度、允許內容區捲動，按鈕文字改為「返回」，
+      並以線上瀏覽器實際點擊確認可見、可關閉。
 - [ ] **V136 舊存檔若早已只剩 `autoConfig.skill="normal"`，無法反推出原本
       選過的技能**：更新後需要玩家在元素匣重新選一次；之後會由
       `v136ActionIntent`／`v136LastSkill`保護，不再被舊同步靜默洗掉。
