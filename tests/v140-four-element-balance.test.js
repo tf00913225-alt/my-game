@@ -426,8 +426,8 @@ test("water lifesteal uses final damage and restores HP only on every actor path
 test("physical and magic abnormal hit formulas use their specified offensive stats",()=>{
     const context=makeContext();
     const calculate=(...args)=>context.v140CalculateStatusEffectChance(...args);
-    assert.equal(calculate(50,10,10,100,20,false,"regular",0,"physical"),64);
-    assert.equal(calculate(50,10,10,100,20,false,"regular",0,"magic"),74);
+    assert.equal(calculate(50,10,10,100,20,false,"regular",0,"physical"),54);
+    assert.equal(calculate(50,10,10,100,20,false,"regular",0,"magic"),54);
     assert.equal(calculate(40,30,10,0,0,false,"regular",10,"magic"),50);
     assert.equal(calculate(40,1,30,0,0,false,"regular",0,"magic"),20);
 });
@@ -451,7 +451,7 @@ test("hard-control square-root scaling and rank caps stay exact",()=>{
 test("real actor wrappers feed physical attack or intelligence to abnormal rolls",()=>{
     const context=makeContext();
     vm.runInContext("castDamageSkill('frostPunch')",context);
-    assert.equal(context.lastPlayerStatusChance,64);
+    assert.equal(context.lastPlayerStatusChance,54);
     context.player.sp=100;
     vm.runInContext("castDamageSkill('fireRocket')",context);
     assert.equal(context.lastPlayerStatusChance,50);
@@ -589,8 +589,8 @@ test("V140 remains before the ordered V141/V142 layers and both cache keys are b
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.23"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.23/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.24"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.24/);
 });
 
 console.log("\nV140 four-element balance suite: "+passed+" tests passed.");

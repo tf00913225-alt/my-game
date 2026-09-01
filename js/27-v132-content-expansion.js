@@ -233,10 +233,45 @@
         }
     };
 
+    const EQUIPMENT_SET_MAGIC_ART={
+        setFire:{
+            fan:"assets/equipment/sets/fire-fan-magic-v173.24.webp",
+            robe:"assets/equipment/sets/fire-robe-magic-v173.24.webp",
+            shoes:"assets/equipment/sets/fire-shoes-magic-v173.24.webp",
+            crown:"assets/equipment/sets/fire-crown-magic-v173.24.webp",
+            focus:"assets/equipment/sets/fire-focus-magic-v173.24.webp"
+        },
+        setWater:{
+            fan:"assets/equipment/sets/water-fan-magic-v173.24.webp",
+            robe:"assets/equipment/sets/water-robe-magic-v173.24.webp",
+            shoes:"assets/equipment/sets/water-shoes-magic-v173.24.webp",
+            crown:"assets/equipment/sets/water-crown-magic-v173.24.webp",
+            focus:"assets/equipment/sets/water-focus-magic-v173.24.webp"
+        },
+        setEarth:{
+            fan:"assets/equipment/sets/earth-fan-magic-v173.24.webp",
+            robe:"assets/equipment/sets/earth-robe-magic-v173.24.webp",
+            shoes:"assets/equipment/sets/earth-shoes-magic-v173.24.webp",
+            crown:"assets/equipment/sets/earth-crown-magic-v173.24.webp",
+            focus:"assets/equipment/sets/earth-focus-magic-v173.24.webp"
+        },
+        setWind:{
+            fan:"assets/equipment/sets/wind-fan-magic-v173.24.webp",
+            robe:"assets/equipment/sets/wind-robe-magic-v173.24.webp",
+            shoes:"assets/equipment/sets/wind-shoes-magic-v173.24.webp",
+            crown:"assets/equipment/sets/wind-crown-magic-v173.24.webp",
+            focus:"assets/equipment/sets/wind-focus-magic-v173.24.webp"
+        }
+    };
+
     function equipmentSetIcon(setId,pieceKey){
         const attackArt=EQUIPMENT_SET_ATTACK_ART[setId];
         if(attackArt&&attackArt[pieceKey]){
             return rasterItemIcon(attackArt[pieceKey],null,"equipment");
+        }
+        const magicArt=EQUIPMENT_SET_MAGIC_ART[setId];
+        if(magicArt&&magicArt[pieceKey]){
+            return rasterItemIcon(magicArt[pieceKey],null,"equipment");
         }
         const c=SET_PALETTE[setId]||SET_PALETTE.setFire;
         const shapes={

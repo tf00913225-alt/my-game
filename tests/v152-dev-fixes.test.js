@@ -66,8 +66,8 @@ function load(overrides={}){
 }
 
 test("V152 remains ordered before V154 under the current cache version",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.23/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.23"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.24/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.24"/);
     assert.match(loader,/css\/45-v152-dev-fixes\.css/);
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
     const v152=loader.indexOf("js/44-v152-dev-fixes.js");
@@ -234,8 +234,9 @@ test("HP popups are reparented above the full-screen skill stage",()=>{
 });
 
 test("the final abnormal formula and Ice Arrow Rain chance remain authoritative",()=>{
-    assert.match(v140,/PHYSICAL_STATUS_COEFFICIENT=0\.2/);
-    assert.match(v140,/MAGIC_STATUS_COEFFICIENT=0\.3/);
+    assert.match(v140,/GENERAL_STATUS_COEFFICIENT=0\.05/);
+    assert.match(v140,/GENERAL_STATUS_SPIRIT_COEFFICIENT=0\.05/);
+    assert.match(v140,/LOCKDOWN_STATUS_SPIRIT_COEFFICIENT=0\.3/);
     assert.match(v140,/Math\.sqrt\(power\)\*LOCKDOWN_STATUS_COEFFICIENT/);
     assert.match(v140,/regular:\{min:5,max:80\}/);
     assert.match(v140,/elite:\{min:5,max:60\}/);

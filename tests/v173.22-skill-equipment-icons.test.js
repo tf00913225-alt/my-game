@@ -67,6 +67,13 @@ const pieces={
     helm:"helm",
     wristguard:"wristguard"
 };
+const magicPieces={
+    fan:"fan",
+    robe:"robe",
+    shoes:"shoes",
+    crown:"crown",
+    focus:"focus"
+};
 
 test("狂風術使用這次補上的風系技能圖示",()=>{
     const relative="assets/skills/wind-gale-spell.jpg";
@@ -87,14 +94,17 @@ test("四元素攻擊套裝依元素與五個部位映射到二十張新圖",()=
     assert.match(content,/return rasterItemIcon\(attackArt\[pieceKey\],null,"equipment"\);/);
 });
 
-test("法術套裝繼續使用原本圖示，不被攻擊裝素材誤取代",()=>{
-    const artBlock=content.slice(
-        content.indexOf("const EQUIPMENT_SET_ATTACK_ART="),
-        content.indexOf("function equipmentSetIcon")
-    );
-    ["fan","robe","shoes","crown","focus"].forEach(piece=>{
-        assert.doesNotMatch(artBlock,new RegExp("\\b"+piece+":"));
+test("四元素法師套裝依元素與五個部位映射到二十張新圖",()=>{
+    Object.entries(sets).forEach(([setId,element])=>{
+        Object.entries(magicPieces).forEach(([pieceKey,filePart])=>{
+            const relative="assets/equipment/sets/"+element+"-"+filePart+"-magic-v173.24.webp";
+            assert.ok(content.includes(setId+":{"),setId+" mapping exists");
+            assert.ok(content.includes(pieceKey+':"'+relative+'"'),setId+" "+pieceKey+" mapping");
+            assert.deepEqual(webpDimensions(relative),{width:512,height:512});
+            assert.ok(fs.statSync(path.join(root,relative)).size>100000,relative+" is not empty");
+        });
     });
+    assert.match(content,/return rasterItemIcon\(magicArt\[pieceKey\],null,"equipment"\);/);
     assert.match(content,/return svgWrap\(shapes\[pieceKey\]\|\|shapes\.blade,c\.glow\);/);
 });
 
@@ -124,11 +134,11 @@ test("既有存檔與已穿戴套裝會同步取得新版圖示",()=>{
     assert.equal(equipped.requiredElement,"fire");
 });
 
-test("開發版本與快取版本更新為 V173.23",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.23"/);
-    assert.match(index,/<title>四象江湖傳 V173\.23<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.23"[\s\S]*?>V173\.23<\/div>/);
-    assert.match(index,/js\/00-main\.js\?v=173\.23/);
+test("開發版本與快取版本更新為 V173.24",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.24"/);
+    assert.match(index,/<title>四象江湖傳 V173\.24<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.24"[\s\S]*?>V173\.24<\/div>/);
+    assert.match(index,/js\/00-main\.js\?v=173\.24/);
 });
 
-console.log("\n"+passed+" V173.23 skill and equipment icon tests passed.");
+console.log("\n"+passed+" V173.24 skill and equipment icon tests passed.");

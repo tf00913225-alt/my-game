@@ -25,10 +25,10 @@
     const LEVEL_FACTOR_PER_LEVEL=0.05;
     const LEVEL_FACTOR_MIN=0.5;
     const LEVEL_FACTOR_MAX=1.5;
-    const PHYSICAL_STATUS_COEFFICIENT=0.2;
-    const MAGIC_STATUS_COEFFICIENT=0.3;
+    const GENERAL_STATUS_COEFFICIENT=0.05;
     const LOCKDOWN_STATUS_COEFFICIENT=0.2;
-    const STATUS_SPIRIT_COEFFICIENT=0.3;
+    const GENERAL_STATUS_SPIRIT_COEFFICIENT=0.05;
+    const LOCKDOWN_STATUS_SPIRIT_COEFFICIENT=0.3;
 
     const LIFESTEAL_BY_SKILL={
         waterKnife:[4,5,6,7,8],
@@ -169,7 +169,8 @@
     /*
        純計算入口同時供正式判定與回歸測試使用。
        等級差、精神、額外抗性及既有上下限完整保留；
-       唯一分流是 physical 使用物理攻擊力，magic 使用智力。
+       一般異常的物理攻擊／智力與目標精神統一使用0.05；
+       硬控仍維持開根號屬性加成與原本精神係數。
     */
     function calculateV140StatusChance(
         baseChancePercent,
@@ -191,14 +192,15 @@
         const power=Math.max(0,numeric(offensivePower));
         const attributeBonus=isLockdown
             ? Math.sqrt(power)*LOCKDOWN_STATUS_COEFFICIENT
-            : power*(skillCategory==="physical"
-                ? PHYSICAL_STATUS_COEFFICIENT
-                : MAGIC_STATUS_COEFFICIENT);
+            : power*GENERAL_STATUS_COEFFICIENT;
+        const spiritCoefficient=isLockdown
+            ? LOCKDOWN_STATUS_SPIRIT_COEFFICIENT
+            : GENERAL_STATUS_SPIRIT_COEFFICIENT;
 
         const rawChance=
             numeric(baseChancePercent)*levelFactor+
             attributeBonus-
-            Math.max(0,numeric(targetSpirit))*STATUS_SPIRIT_COEFFICIENT-
+            Math.max(0,numeric(targetSpirit))*spiritCoefficient-
             numeric(targetBonusResistancePercent);
 
         const bounds=isLockdown
