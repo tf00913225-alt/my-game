@@ -16,16 +16,16 @@
 
 ### 目前最終值
 
-- 正式 `main` 目前是 V173.18 merge commit
-  `cef7b2766786ce5db03ce35b7d6415d76bdd3705`；V173.19 四元素正式規格已完成並推送
-  `dev`，程式 commit 為 `d31f4cd63c460db9e7c05da1d7e0ff5359fa098a`。本輪依使用者順序
-  未把 V173.19 合併 `main`。
-- 真實載入是 `index.html` 的 23 支同步 classic script（`js/23` → `js/00` →
+- 正式 `main` 目前仍是 V173.19 release commit
+  `795330298e76748c6b4ecc47ad7d0843c6b02051`；V173.20 開場載入動畫已推至 `dev` commit
+  `38c955cd55139c42799c95212b4dd49b740e93f8`，V173.21 新手期平衡與素材更新已推至
+  `dev` 程式 commit `011dd6a89005afc54d78eb954ac3df97bfcd11ae`。兩版均未合併 `main`。
+- 真實載入是 `index.html` 的 24 支同步 classic script（`js/23` → `js/52` 開場 loader → `js/00` →
   `js/01`～`js/20` → `js/24`），再由 `js/20-anonymous-20.js` 依 `load/error → next`
   嚴格串行載入 26 支正式 runtime：`js/25` → `js/27`～`js/51`。巡怪素材鏈最後的
   `js/26` 與正式 gameplay runtime 鏈並行，只管外觀，不能插進平衡補丁順序。
 - `tests/v170-final-spec-integration.test.js` 會在同一個 `vm.Context` 真正依上述順序
-  執行 49 支 JavaScript，再檢查最終資料與行為；V173.19 另鎖定同名狀態先判定、正式狀態名、
+  執行 50 支 JavaScript，再檢查最終資料與行為；V173.19 另鎖定同名狀態先判定、正式狀態名、
   必定燃燒、鳳威、追擊、吸血、硬控、反傷、岩盾、結界、乘算閃躲與敵我支援技能。
   `tests/v173.18-final-request.test.js` 繼續鎖定符咒格線、深淵戰後回程與最終 owner。
 - 下表格式為「Lv1 傷害／每級成長；SP；目標；初學／升級／最高；前置」。前置有兩項時
@@ -207,10 +207,18 @@
 
 ---
 
-## 目前狀態（截至 2026-09-01，V173.19）
+## 目前狀態（截至 2026-09-01，V173.21）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
+- V173.20 新增 12～15 秒隨機雙圖開場載入動畫：Logo 四元素依序發光後切換主城空景，
+  100% 時停留並閃爍提示，必須由玩家點擊或鍵盤確認才會揭露已在下層初始化的遊戲。
+- V173.21 讓新創角色在 Lv1 取得 2 點技能點，既有升級每級 +2 不變；新手森林最終怪物
+  維持 Lv2～Lv3，且只套用 `makeZoneMonster()` 基礎值 ×0.75，不再疊加一般練功區 ×1.30。
+  離開新手森林後的一般練功區仍為 ×1.30，Lv1～10 野怪仍只使用普通攻擊。
+- V173.21 同步加入 11 張風系技能 icon、日常完成度寶箱已領／未領狀態、四元素男角巡怪
+  正背面新立繪及兩張巡怪戰鬥圖；上傳素材沒有「狂風術」同名 icon，因此該招暫時保持空白，
+  沒有拿其他技能圖片誤配。
 - 母版歷史：V120（單一巨大 index.html，全部 inline）→ V121_SPLIT（拆成外部檔案，
   行為完全不變，過程見 `CHECK_REPORT.txt` / `README_*.txt`）→ 之後陸續疊加 V123～V131
   各種 stage patch，一路疊到現在。
@@ -625,6 +633,56 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-09-01 — V173.21：新手期平衡與素材更新（dev）
+
+- 新角色技能點的唯一建立流程已改為 Lv1 初始 2 點，涵蓋主角色、第二／第三角色與舊版第二
+  角色入口；`player` 預設模板仍保留 0，避免讀取缺欄位舊存檔時無條件補發。既有升級流程
+  `checkLevelUp()` 的每級 +2 完全未改。
+- 一般野怪強化仍由既有 `strengthenMonster()`／`strengthenNewWildMonster()` 負責；只為
+  新手森林傳入 ×0.75，其他一般練功區仍使用 V131 ×1.30，並沿用既有已套用旗標避免重複
+  強化。新手森林後加的風／土怪物由 Lv4 校正為 Lv3，使完整載入後全區都維持 Lv2～Lv3。
+  精英、BOSS、副本與 Lv1～10 野怪普通攻擊規則均未改動。
+- 風系技能表加入 11 張對應 icon；上傳檔沒有「狂風術」同名圖，因此保留空白，未誤配素材。
+  上傳的「分身術」依畫面內容接到既有「閃躲術」。技能列表與技能詳情共用同一份既有
+  `elementSkillIconMap` owner。
+- 日常副本完成度獎勵改用寶箱 icon：未領取顯示明亮的關閉寶箱，領取後改為開啟寶箱並
+  降低飽和度與亮度。男性巡怪依玩家元素切換火／水／風／土四套新正背面立繪；女性流程
+  保持原狀。兩張巡怪戰鬥圖亦換成最新素材。新圖僅另存為最佳化 WebP／JPEG，沒有覆蓋
+  上傳原檔。
+- 版本標題、首頁 badge、直載 query 與 runtime cache 同步升至 V173.21。新增／擴充測試
+  鎖定 Lv1 初始點數、升級 +2、舊存檔預設、新手森林完整最終數值、其他練功區 ×1.30、
+  無技能野怪，以及各素材 owner 與 UI 狀態。
+- 本機 Repository checks 全數通過：JavaScript 語法 `160/160`、Node suites `46/46`、
+  靜態資源 `325`、HTML ID `283`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
+  runtimes）、空白與衝突標記檢查皆正常。此環境沒有 Chromium，因此 Playwright browser
+  smoke 未執行；素材本身與整合後聯絡表已人工檢視，仍建議在真實 Android 直式畫面複驗。
+  遠端 `dev` 程式 commit 為 `011dd6a89005afc54d78eb954ac3df97bfcd11ae`；`main` 未動。
+
+### 2026-09-01 — V173.20：雙圖開場載入動畫（dev）
+
+- 使用者提供的 Logo 與主城空景原檔實際皆為 JPEG 864×1536；未覆蓋附件，改以正確副檔名
+  保存為 `assets/ui/startup-logo-v173.20.jpg` 與
+  `assets/ui/startup-main-city-v173.20.jpg`。兩張圖均以 9:16 原比例鋪滿 1080×1920 native
+  stage，Logo 為第一幕、主城空景為第二幕。
+- 新增唯一開場 owner `js/52-v173.20-startup-loader.js` 與
+  `css/51-v173.20-startup-loader.css`；`index.html` 只負責資源 preload、DOM、樣式與 runtime
+  入口。開場層置於 `#game-stage` 最上層，既有 `loadGame()` 與 26 支正式 gameplay runtime
+  仍在下層照原順序初始化；沒有包裝既有函式、沒有新增 gameplay override 或臨時補丁。
+- 每次開啟會抽出合計 12～15 秒總時長，Logo 約佔 36%～43% 後淡入主城；載入文字會在必要
+  文件、資源驗證、角色資料、四元素核心、存檔、戰鬥模組、場景渲染、行動裝置校準等階段
+  切換，百分比以不等距小幅跳動且在總時長前最高只到99%。到時強制第二幕與100%，不會
+  自動進遊戲；持續閃爍 `〔點擊空白處 進入遊戲〕`，完成後點擊／觸控或 Enter／Space 才淡出。
+- Logo 四象位置各有獨立 screen blend 光暈，依火紅、水藍、風綠、土金的延遲順序循環亮起；
+  同時保留輕微呼吸與主城景深推近，未改動原始圖像像素。
+- 版本標題、首頁 badge、直載 query 與 runtime cache 同步升至 V173.20。新增
+  `tests/v173.20-startup-loader.test.js`，以假時鐘覆蓋 12 秒與15秒邊界、提前點擊無效、
+  100% 不自動進入、點擊後淡出與事件送出；並把整合載入順序納入正式測試。
+- 本機 Repository checks 全數通過：JavaScript 語法 `159/159`、Node suites `45/45`、
+  靜態資源 `304`、HTML ID `283`、版本／Loader（24 支直載、26 支 ordered runtimes）、空白與
+  衝突標記檢查皆正常。此環境沒有 Chromium，因此 Playwright browser smoke 未執行；仍需在
+  真實 Android 直式畫面確認最終光暈位置與閱讀手感。遠端 `dev` commit 為
+  `38c955cd55139c42799c95212b4dd49b740e93f8`；未合併 `main`。
 
 ### 2026-09-01 — V173.19：四元素技能完整正式規格（dev）
 

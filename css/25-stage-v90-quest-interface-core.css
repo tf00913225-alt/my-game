@@ -276,7 +276,7 @@ body.quest-scroll-active,
 #game-stage #homeFeatureModal.quest-mode .quest-milestone{
     min-width:0 !important;
     text-align:center !important;
-    opacity:.48 !important;
+    opacity:1 !important;
 }
 
 #game-stage #homeFeatureModal.quest-mode .quest-milestone.reached{
@@ -295,8 +295,9 @@ body.quest-scroll-active,
 }
 
 #game-stage #homeFeatureModal.quest-mode .quest-milestone-slot{
-    min-height:31px !important;
+    min-height:78px !important;
     display:flex !important;
+    flex-direction:column !important;
     align-items:center !important;
     justify-content:center !important;
     padding:4px !important;
@@ -305,6 +306,24 @@ body.quest-scroll-active,
     background:rgba(0,0,0,.25) !important;
     color:#8f8371 !important;
     font-size:9px !important;
+}
+
+#game-stage #homeFeatureModal.quest-mode .quest-milestone-chest{
+    display:block !important;
+    width:48px !important;
+    height:48px !important;
+    margin:0 auto 2px !important;
+    object-fit:contain !important;
+    opacity:1 !important;
+    filter:none !important;
+}
+
+#game-stage #homeFeatureModal.quest-mode .quest-milestone.claimed .quest-milestone-slot{
+    opacity:.62 !important;
+}
+
+#game-stage #homeFeatureModal.quest-mode .quest-milestone.claimed .quest-milestone-chest{
+    filter:saturate(.42) brightness(.58) !important;
 }
 
 #game-stage #homeFeatureModal.quest-mode .quest-milestone.reached .quest-milestone-slot{

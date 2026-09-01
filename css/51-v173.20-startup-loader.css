@@ -1,0 +1,280 @@
+/* =====================================================
+   V173.20 — 開場載入動畫
+   唯一 owner：#startupLoader（1080 × 1920 native stage）
+===================================================== */
+
+#game-stage > #startupLoader{
+    position:absolute;
+    inset:0;
+    z-index:2147483646;
+    width:1080px;
+    height:1920px;
+    overflow:hidden;
+    background:#000;
+    color:#f7e7bd;
+    font-family:"Noto Serif TC","Noto Sans TC",serif;
+    opacity:1;
+    visibility:visible;
+    touch-action:manipulation;
+    user-select:none;
+    -webkit-user-select:none;
+    transition:opacity .72s ease,visibility 0s linear .72s;
+}
+
+#game-stage > #startupLoader[hidden]{
+    display:none !important;
+}
+
+#game-stage > #startupLoader.is-leaving{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+}
+
+#startupLoader .startup-scene{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    opacity:0;
+    transition:opacity 1.05s ease;
+}
+
+#startupLoader .startup-scene.is-active{
+    opacity:1;
+}
+
+#startupLoader .startup-scene-image{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+    pointer-events:none;
+}
+
+#startupLoader .startup-logo-scene{
+    z-index:1;
+    background:#000;
+}
+
+#startupLoader .startup-logo-scene .startup-scene-image{
+    animation:startupLogoBreath 4.2s ease-in-out infinite alternate;
+}
+
+#startupLoader .startup-city-scene{
+    z-index:2;
+    background:#17130f;
+}
+
+#startupLoader .startup-city-scene.is-active .startup-scene-image{
+    animation:startupCityDrift 9s ease-out both;
+}
+
+#startupLoader .startup-element-light{
+    position:absolute;
+    z-index:2;
+    width:390px;
+    height:390px;
+    border-radius:50%;
+    opacity:0;
+    transform:translate(-50%,-50%) scale(.72);
+    mix-blend-mode:screen;
+    filter:blur(8px);
+    pointer-events:none;
+    animation:startupElementCycle 3.8s ease-in-out infinite both;
+}
+
+#startupLoader .startup-element-light.fire{
+    left:34%;
+    top:38.5%;
+    background:radial-gradient(circle,rgba(255,220,112,.92) 0,rgba(255,74,18,.52) 28%,rgba(156,14,0,.18) 50%,transparent 72%);
+    animation-delay:0s;
+}
+
+#startupLoader .startup-element-light.water{
+    left:68%;
+    top:38.5%;
+    background:radial-gradient(circle,rgba(218,250,255,.94) 0,rgba(33,173,255,.56) 30%,rgba(0,60,195,.2) 52%,transparent 72%);
+    animation-delay:.95s;
+}
+
+#startupLoader .startup-element-light.wind{
+    left:34%;
+    top:62.5%;
+    background:radial-gradient(circle,rgba(217,255,222,.92) 0,rgba(24,231,111,.5) 30%,rgba(0,109,48,.18) 52%,transparent 72%);
+    animation-delay:1.9s;
+}
+
+#startupLoader .startup-element-light.earth{
+    left:68%;
+    top:62.5%;
+    background:radial-gradient(circle,rgba(255,244,181,.94) 0,rgba(255,177,47,.54) 30%,rgba(139,70,0,.2) 52%,transparent 72%);
+    animation-delay:2.85s;
+}
+
+#startupLoader .startup-logo-scene:not(.is-active) .startup-element-light{
+    animation-play-state:paused;
+    opacity:0;
+}
+
+#startupLoader .startup-vignette{
+    position:absolute;
+    inset:0;
+    z-index:3;
+    pointer-events:none;
+    background:
+        linear-gradient(180deg,rgba(0,0,0,.08) 0%,transparent 50%,rgba(0,0,0,.78) 100%),
+        radial-gradient(ellipse at center,transparent 46%,rgba(0,0,0,.26) 100%);
+}
+
+#startupLoader .startup-loading-panel{
+    position:absolute;
+    left:74px;
+    right:74px;
+    bottom:82px;
+    z-index:4;
+    min-height:242px;
+    padding:38px 44px 34px;
+    border:2px solid rgba(229,190,103,.72);
+    border-radius:14px;
+    background:linear-gradient(180deg,rgba(13,11,8,.68),rgba(3,3,3,.9));
+    box-shadow:
+        0 14px 46px rgba(0,0,0,.7),
+        inset 0 0 32px rgba(225,174,72,.08),
+        0 0 22px rgba(224,175,76,.12);
+    backdrop-filter:blur(5px);
+    -webkit-backdrop-filter:blur(5px);
+}
+
+#startupLoader .startup-loading-panel::before,
+#startupLoader .startup-loading-panel::after{
+    content:"◆";
+    position:absolute;
+    top:-20px;
+    color:#f2cc73;
+    font-size:30px;
+    line-height:1;
+    text-shadow:0 0 12px rgba(255,201,91,.75);
+}
+
+#startupLoader .startup-loading-panel::before{left:24px;}
+#startupLoader .startup-loading-panel::after{right:24px;}
+
+#startupLoader .startup-status-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:28px;
+}
+
+#startupLoader .startup-status-copy{
+    min-width:0;
+    flex:1 1 auto;
+}
+
+#startupLoader .startup-status-title{
+    overflow:hidden;
+    color:#fff4d2;
+    font-size:41px;
+    font-weight:900;
+    line-height:1.28;
+    letter-spacing:.06em;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    text-shadow:0 2px 5px #000,0 0 10px rgba(255,202,102,.25);
+}
+
+#startupLoader .startup-status-detail{
+    margin-top:10px;
+    overflow:hidden;
+    color:rgba(224,213,187,.8);
+    font-family:"Noto Sans TC",sans-serif;
+    font-size:29px;
+    font-weight:500;
+    line-height:1.35;
+    letter-spacing:.035em;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+#startupLoader .startup-percent{
+    flex:0 0 auto;
+    color:#f8d879;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-size:47px;
+    font-weight:900;
+    line-height:1;
+    letter-spacing:.035em;
+    text-shadow:0 2px 4px #000,0 0 14px rgba(255,195,67,.32);
+}
+
+#startupLoader .startup-progress-track{
+    position:relative;
+    width:100%;
+    height:18px;
+    margin-top:25px;
+    overflow:hidden;
+    border:2px solid rgba(223,183,92,.78);
+    border-radius:999px;
+    background:rgba(0,0,0,.64);
+    box-shadow:inset 0 2px 7px rgba(0,0,0,.9),0 0 8px rgba(224,176,75,.16);
+}
+
+#startupLoader .startup-progress-fill{
+    width:0;
+    height:100%;
+    border-radius:inherit;
+    background:linear-gradient(90deg,#7f2a12 0%,#d17b25 42%,#ffe59b 74%,#fff5cf 100%);
+    box-shadow:0 0 15px rgba(255,199,79,.82);
+    transition:width .34s cubic-bezier(.2,.72,.2,1);
+}
+
+#startupLoader .startup-enter-prompt{
+    margin-top:28px;
+    color:#fff0bd;
+    font-size:50px;
+    font-weight:900;
+    line-height:1.25;
+    letter-spacing:.1em;
+    text-align:center;
+    text-shadow:0 3px 6px #000,0 0 15px rgba(255,210,111,.5);
+    animation:startupEnterBlink 1.15s ease-in-out infinite;
+}
+
+#startupLoader .startup-enter-prompt[hidden]{
+    display:none;
+}
+
+#startupLoader.is-ready{
+    cursor:pointer;
+}
+
+#startupLoader.is-ready .startup-loading-panel{
+    border-color:rgba(255,218,126,.92);
+    box-shadow:
+        0 14px 48px rgba(0,0,0,.72),
+        inset 0 0 38px rgba(234,187,84,.12),
+        0 0 26px rgba(242,197,95,.2);
+}
+
+@keyframes startupElementCycle{
+    0%,48%,100%{opacity:0;transform:translate(-50%,-50%) scale(.72);}
+    10%{opacity:.26;}
+    23%{opacity:.88;transform:translate(-50%,-50%) scale(1.08);}
+    36%{opacity:.18;transform:translate(-50%,-50%) scale(.92);}
+}
+
+@keyframes startupLogoBreath{
+    from{transform:scale(1);filter:brightness(.94) contrast(1.03);}
+    to{transform:scale(1.012);filter:brightness(1.08) contrast(1.06);}
+}
+
+@keyframes startupCityDrift{
+    from{transform:scale(1.035);filter:brightness(.88) saturate(.92);}
+    to{transform:scale(1);filter:brightness(1) saturate(1);}
+}
+
+@keyframes startupEnterBlink{
+    0%,100%{opacity:.38;transform:scale(.985);}
+    50%{opacity:1;transform:scale(1);}
+}

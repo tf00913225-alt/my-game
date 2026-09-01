@@ -19,6 +19,7 @@ const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
 
 const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "js/23-v125-character-creation-bootstrap.js",
+    "js/52-v173.20-startup-loader.js",
     "js/00-main.js",
     "js/01-stage-v8-touch-lock.js",
     "js/02-stage-v9-native-coordinate-api.js",
@@ -284,6 +285,65 @@ test("the baseline and the real index/js20 runtime order are pinned",()=>{
 test("all formal runtimes execute once in production order",()=>{
     const runtime=loadFinalRuntime();
     assert.deepEqual(runtime.loaded,EXPECTED_DIRECT_SCRIPT_PATHS.concat(EXPECTED_RUNTIME_PATHS));
+});
+
+test("new Lv1 characters start with two skill points while level-up remains plus two",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const additional=buildAdditionalCharacter("新角","fire","male");
+        return {
+            initial:INITIAL_CHARACTER_SKILL_POINTS,
+            additional:additional.skillPoints
+        };
+    })()`);
+    assert.deepEqual(result,{initial:2,additional:2});
+    assert.match(mainSource,/function createCharacter\(\)[\s\S]*?player\.skillPoints\s*=\s*INITIAL_CHARACTER_SKILL_POINTS;/);
+    assert.match(mainSource,/function checkLevelUp\(targetCharacter\)[\s\S]*?character\.skillPoints\s*\+=\s*2;/);
+    assert.match(mainSource,/const player\s*=\s*\{[\s\S]*?skillPoints:0,/);
+});
+
+test("beginner forest alone is base times 0.75 and keeps Lv2-Lv3 normal attacks",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        function expected(monster,multiplier){
+            return {
+                maxHP:Math.max(1,Math.round((100+monster.vitalityPoints*50)*multiplier)),
+                maxSP:Math.max(1,Math.round((50+monster.energyPoints*15)*multiplier)),
+                attack:Math.max(1,Math.round((10+monster.attackPoints*5)*multiplier)),
+                defense:Math.max(1,Math.round((10+monster.vitalityPoints*15)*multiplier)),
+                magicAttack:Math.max(1,Math.round((monster.intelligencePoints*5)*multiplier))
+            };
+        }
+        function actual(monster){
+            return {
+                maxHP:monster.maxHP,maxSP:monster.maxSP,attack:monster.attack,
+                defense:monster.defense,magicAttack:monster.magicAttack
+            };
+        }
+        return {
+            forest:forestMonsters.map(monster=>({
+                name:monster.name,level:monster.level,actual:actual(monster),
+                expected:expected(monster,.75),skillIds:monster.skillIds,
+                skillChance:monster.skillChance,applied:monster._v131StrengthApplied
+            })),
+            desert:desertMonsters.map(monster=>({
+                actual:actual(monster),expected:expected(monster,1.30),
+                applied:monster._v131StrengthApplied
+            }))
+        };
+    })()`);
+    assert.ok(result.forest.length>=8);
+    result.forest.forEach(monster=>{
+        assert.ok(monster.level===2||monster.level===3,monster.name+" level");
+        assert.deepEqual(monster.actual,monster.expected,monster.name+" forest multiplier");
+        assert.deepEqual(monster.skillIds,[],monster.name+" skill pool");
+        assert.equal(monster.skillChance,0,monster.name+" skill chance");
+        assert.equal(monster.applied,true,monster.name+" strength flag");
+    });
+    result.desert.forEach(monster=>{
+        assert.deepEqual(monster.actual,monster.expected,"desert multiplier");
+        assert.equal(monster.applied,true,"desert strength flag");
+    });
 });
 
 test("the complete four-element core table is final after every patch",()=>{

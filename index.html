@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>四象江湖傳 V173.19</title>
+<title>四象江湖傳 V173.21</title>
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
@@ -11,7 +11,7 @@
 
 <link rel="stylesheet" href="css/00-main.css">
 
-<style id="v173.19-home-version-badge-style">
+<style id="v173.21-home-version-badge-style">
 #game-stage #homePage .home-version-badge{
     position:absolute;
     right:10px;
@@ -49,13 +49,72 @@
 
 
 <link id="v119-ally-target-style" rel="stylesheet" href="css/04-v119-ally-target-style.css">
-<link id="v129-character-creation-native" rel="stylesheet" href="css/29-v125-character-creation-native.css?v=173.19">
+<link rel="preload" as="image" href="assets/ui/startup-logo-v173.20.jpg?v=173.20">
+<link rel="preload" as="image" href="assets/ui/startup-main-city-v173.20.jpg?v=173.20">
+<link id="v173.20-startup-loader-style" rel="stylesheet" href="css/51-v173.20-startup-loader.css?v=173.20">
+<link id="v129-character-creation-native" rel="stylesheet" href="css/29-v125-character-creation-native.css?v=173.21">
 
 </head>
 
 <body>
 <div id="game-viewport">
 <div id="game-stage">
+<section
+    id="startupLoader"
+    aria-label="四象江湖傳正在載入"
+    aria-live="polite"
+    data-scene="logo"
+>
+    <div id="startupLogoScene" class="startup-scene startup-logo-scene is-active" aria-hidden="false">
+        <img
+            class="startup-scene-image"
+            src="assets/ui/startup-logo-v173.20.jpg?v=173.20"
+            alt=""
+            draggable="false"
+        >
+        <i class="startup-element-light fire" aria-hidden="true"></i>
+        <i class="startup-element-light water" aria-hidden="true"></i>
+        <i class="startup-element-light wind" aria-hidden="true"></i>
+        <i class="startup-element-light earth" aria-hidden="true"></i>
+    </div>
+
+    <div id="startupCityScene" class="startup-scene startup-city-scene" aria-hidden="true">
+        <img
+            class="startup-scene-image"
+            src="assets/ui/startup-main-city-v173.20.jpg?v=173.20"
+            alt=""
+            draggable="false"
+        >
+    </div>
+
+    <div class="startup-vignette" aria-hidden="true"></div>
+
+    <div class="startup-loading-panel">
+        <div class="startup-status-row">
+            <div class="startup-status-copy">
+                <div id="startupStatusTitle" class="startup-status-title">建立啟動環境</div>
+                <div id="startupStatusDetail" class="startup-status-detail">檢查必要文件 / core.manifest</div>
+            </div>
+            <div id="startupPercent" class="startup-percent">0%</div>
+        </div>
+
+        <div
+            id="startupProgress"
+            class="startup-progress-track"
+            role="progressbar"
+            aria-label="遊戲載入進度"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+        >
+            <div id="startupProgressFill" class="startup-progress-fill"></div>
+        </div>
+
+        <div id="startupEnterPrompt" class="startup-enter-prompt" hidden>
+            〔點擊空白處 進入遊戲〕
+        </div>
+    </div>
+</section>
 <div id="game-overlay-layer" aria-hidden="true"></div>
 <div id="app">
 
@@ -714,8 +773,8 @@
 <div
     id="homeVersionBadge"
     class="home-version-badge"
-    aria-label="目前版本 V173.19"
->V173.19</div>
+    aria-label="目前版本 V173.21"
+>V173.21</div>
 
 <h2>主城</h2>
 
@@ -2821,13 +2880,14 @@
 </div>
 
 
-<script src="js/00-main.js?v=173.19"></script>
+<script id="v173.20-startup-loader-runtime" src="js/52-v173.20-startup-loader.js?v=173.20"></script>
+<script src="js/00-main.js?v=173.21"></script>
 
 </div>
 </div>
 </div>
 <!-- V86: inventory-grid-scroll is now recognized by the existing V8 touch lock as the sole inventory scroll owner. -->
-<script id="stage-v8-touch-lock" src="js/01-stage-v8-touch-lock.js?v=173.19"></script>
+<script id="stage-v8-touch-lock" src="js/01-stage-v8-touch-lock.js?v=173.21"></script>
 
 
 <script id="stage-v9-native-coordinate-api" src="js/02-stage-v9-native-coordinate-api.js"></script>
@@ -2933,7 +2993,7 @@
 
 
 
-<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js?v=173.19"></script>
+<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js?v=173.21"></script>
 
 
 
@@ -2947,7 +3007,7 @@
 
 
 
-<link id="stage-v90-quest-interface-core" rel="stylesheet" href="css/25-stage-v90-quest-interface-core.css">
+<link id="stage-v90-quest-interface-core" rel="stylesheet" href="css/25-stage-v90-quest-interface-core.css?v=173.21">
 
 <!-- =========================================================
      V146 — INVENTORY CATEGORY CAPACITY 120
@@ -2963,7 +3023,7 @@
      No damage/SP/initiative/skill formulas changed. -->
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
-<script src="js/20-anonymous-20.js?v=173.19"></script>
+<script src="js/20-anonymous-20.js?v=173.21"></script>
 <script id="v129-character-creation-native-runtime" src="js/24-v125-character-creation-native-runtime.js?v=129a"></script>
 
 

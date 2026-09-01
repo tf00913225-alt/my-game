@@ -120,6 +120,24 @@
         wind:{front:[2,0],back:[2,1]},
         earth:{front:[3,0],back:[3,1]}
     };
+    const malePatrolArtUrls={
+        fire:{
+            front:"assets/characters/patrol-male-fire-front-v173.21.webp",
+            back:"assets/characters/patrol-male-fire-back-v173.21.webp"
+        },
+        water:{
+            front:"assets/characters/patrol-male-water-front-v173.21.webp",
+            back:"assets/characters/patrol-male-water-back-v173.21.webp"
+        },
+        wind:{
+            front:"assets/characters/patrol-male-wind-front-v173.21.webp",
+            back:"assets/characters/patrol-male-wind-back-v173.21.webp"
+        },
+        earth:{
+            front:"assets/characters/patrol-male-earth-front-v173.21.webp",
+            back:"assets/characters/patrol-male-earth-back-v173.21.webp"
+        }
+    };
 
     function isMaleCharacter(character){
         return !!(character && character.gender==="male");
@@ -186,15 +204,20 @@
         img.style.setProperty("width","70px","important");
         img.style.setProperty("height","105px","important");
 
-        const useMale=!!(maleSheetImage && isMaleCharacter(character));
-        const sheetImage=useMale ? maleSheetImage : femaleSheetImage;
-        const cellMap=useMale ? maleSpriteCells : spriteCells;
-        const cropCell=useMale ? cropMaleCell : cropFemaleCell;
-        const cell=cellMap[element][facingBack ? "back" : "front"];
+        const facing=facingBack ? "back" : "front";
+        const maleArt=isMaleCharacter(character)
+            ? malePatrolArtUrls[element][facing]
+            : "";
 
-        if(sheetImage){
-            const cropped=cropCell(sheetImage,cell[0],cell[1]);
-            img.src=cropped;
+        if(maleArt){
+            img.src=maleArt;
+        }
+        else{
+            const sheetImage=femaleSheetImage;
+            const cell=spriteCells[element][facing];
+            if(sheetImage){
+                img.src=cropFemaleCell(sheetImage,cell[0],cell[1]);
+            }
         }
 
         img.alt=(character.id||("角色"+(index+1)))+"巡怪形象";
