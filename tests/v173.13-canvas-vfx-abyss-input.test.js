@@ -199,6 +199,7 @@ test("Abyss dialogue is owned directly by the map source and has pointer plus cl
     assert.match(abyss,/function openAbyssBossDialogue\(\)[\s\S]*?overlay\.onclick=[\s\S]*?launchAbyssBossBattle\(\)/);
     assert.match(abyss,/window\.v141ChallengeAbyssBoss=function\(\)[\s\S]*?return openAbyssBossDialogue\(\);/);
     assert.match(abyss,/\["pointerup","click"\]\.forEach\(type=>map\.addEventListener\(type,event=>/);
+    assert.match(abyss,/event\.target&&typeof event\.target\.closest==="function"&&event\.target\.closest\("\.v143-abyss-dialogue"\)\)\{ return; \}/);
     assert.doesNotMatch(legacyAbyssPatch,/v141ChallengeAbyssBoss=function/);
 });
 

@@ -824,6 +824,12 @@
         if(!map||map.dataset.v173BossInputBridge==="1"){ return; }
         map.dataset.v173BossInputBridge="1";
         ["pointerup","click"].forEach(type=>map.addEventListener(type,event=>{
+            /*
+               The dialogue itself occupies the map.  Capture handlers run before
+               its own click handler, so never route a dialogue click back into
+               the guardian trigger.
+            */
+            if(event.target&&typeof event.target.closest==="function"&&event.target.closest(".v143-abyss-dialogue")){ return; }
             const boss=abyssState.phase==="boss"?map.querySelector(".v141-abyss-boss"):null;
             if(!isAbyssMapControlHit(event,boss)){ return; }
             window.v141HandleAbyssBossInteraction(event);
