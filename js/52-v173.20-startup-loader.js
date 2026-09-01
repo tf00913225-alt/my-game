@@ -145,4 +145,3 @@
     window.setTimeout(advanceProgress,Math.round(randomBetween(180,420)));
     renderProgress(0);
 })();
-
