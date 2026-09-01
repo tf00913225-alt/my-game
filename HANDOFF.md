@@ -603,6 +603,11 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-09-01 — V173.16：正式發布（main）
+
+- 使用者在 V173.16 的 `dev` CI 成功後明確指示升正式版；以已驗證的 `dev` commit `31927bc` 為遊戲內容基準，採非強制 fast-forward 推進 `main`，不改寫歷史、不覆蓋既有檔案。
+- 本次發布除本交接紀錄外，不再修改遊戲程式、素材、測試或版本字樣；發布前 `main` commit `7646154` 是 `dev` 的直接祖先，兩分支沒有分岔。
+
 ### 2026-09-01 — V173.16：深淵守關者對話可視定位與完整點擊流程（dev）
 
 - 根因鏈：V173.13 把深淵 Boss 對話 owner 從 `js/38-v143-system-fixes.js` 收斂回 `js/36-v141-content-systems.js` 時，漏帶 V173.6 已驗證的縮放座標換算；補回換算後，真實瀏覽器又確認 `css/50-v169-abyss-flow.css` 的 `inset:auto !important` 仍會覆蓋一般 inline `left/top`，因此程式碼看似已有座標，但對話 rect 仍完整位於地圖上緣外。
