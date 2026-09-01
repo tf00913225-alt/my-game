@@ -17,8 +17,9 @@
 ### 目前最終值
 
 - 正式 `main` 目前是 V173.18 merge commit
-  `cef7b2766786ce5db03ce35b7d6415d76bdd3705`；V173.19 四元素正式規格正在本工作樹完成，
-  本輪依使用者順序只推送 `dev`，未獲指示前不再合併 `main`。
+  `cef7b2766786ce5db03ce35b7d6415d76bdd3705`；V173.19 四元素正式規格已完成並推送
+  `dev`，程式 commit 為 `d31f4cd63c460db9e7c05da1d7e0ff5359fa098a`。本輪依使用者順序
+  未把 V173.19 合併 `main`。
 - 真實載入是 `index.html` 的 23 支同步 classic script（`js/23` → `js/00` →
   `js/01`～`js/20` → `js/24`），再由 `js/20-anonymous-20.js` 依 `load/error → next`
   嚴格串行載入 26 支正式 runtime：`js/25` → `js/27`～`js/51`。巡怪素材鏈最後的
@@ -649,8 +650,8 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
   的目前版本與已被正式規格取代的期望值。版本、首頁標示、直載 query 與 loader cache
   同步升至 V173.19。本機 Repository checks 全數通過：JavaScript 語法 `157/157`、Node
   suites `44/44`、靜態資源 `300`、HTML ID `272`、版本／Loader、空白與衝突標記檢查皆正常。
-  V173.19 遠端 `dev` commit 與 Actions 結果以本輪推送紀錄為準；未經使用者另行指示，
-  不合併 `main`。
+  遠端 `dev` 程式 commit `d31f4cd63c460db9e7c05da1d7e0ff5359fa098a` 的 GitHub Actions
+  run #56（`33493617136`）成功；未經使用者另行指示，不合併 `main`。
 
 ### 2026-09-01 — V173.18：符咒格線、深淵戰後回圖與四元素技能最終定案（main）
 
