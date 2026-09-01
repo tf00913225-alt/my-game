@@ -39,27 +39,11 @@
         };
     }
 
-    function approximatelyEqual(left,right){
-        return Math.abs(numeric(left)-numeric(right))<0.000001;
-    }
-
     function normalizeMonsterDefaultEvasion(monster){
         if(!monster){ return monster; }
         const level=Math.max(1,numeric(monster.level)||1);
-        const desiredDefault=level*0.5;
-        const current=monster.evasion;
-        const legacyLevelDefault=level*1.5;
-        const generatedAttributeDefault=
-            monster.agilityPoints===undefined
-            ?null
-            :numeric(monster.agilityPoints)*2;
-        const usesDefault=
-            current===undefined||
-            approximatelyEqual(current,legacyLevelDefault)||
-            (generatedAttributeDefault!==null&&approximatelyEqual(current,generatedAttributeDefault));
-
-        if(usesDefault){
-            monster.evasion=desiredDefault;
+        if(monster.evasion===undefined){
+            monster.evasion=Math.min(30,level*0.3);
         }
         return monster;
     }
@@ -245,7 +229,7 @@
                 if(note){
                     note.innerHTML=
                         "命中先依95%＋命中×0.3計算（50%～99%），再乘上(1－目標最終閃躲率)。<br>"+
-                        "所有閃躲來源採乘算，最終閃躲率最高85%；每1精神＝+0.3個百分點異常抗性、+2命中、+0.1%抗暴。";
+                        "所有閃躲來源採乘算，最終閃躲率最高85%；一般異常每1精神降低0.05個百分點命中率，硬控維持原公式。";
                 }
             }
             return result;

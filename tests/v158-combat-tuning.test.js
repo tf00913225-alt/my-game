@@ -43,7 +43,7 @@ function load(overrides={}){
         calculateDamage(){ return 0; },
         getElementalDamageMultiplier:()=>1,
         getMonsterEvasion:monster=>monster.evasion,
-        makeZoneMonster:(name,level)=>({name,level,agilityPoints:level,evasion:level*2})
+        makeZoneMonster:(name,level)=>({name,level,agilityPoints:level})
     },overrides);
     context.window=context;
     vm.createContext(context);
@@ -52,8 +52,8 @@ function load(overrides={}){
 }
 
 test("V158 and V159 remain ordered before the final V169 runtimes",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.23"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.23/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.24"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.24/);
     assert.match(loader,/css\/47-v158-combat-tuning\.css/);
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
@@ -97,17 +97,20 @@ test("accuracy and the final capped evasion rate combine multiplicatively",()=>{
     assert.equal(context.v158GetHitChancePercent(1000,0,0),99);
 });
 
-test("default monster evasion becomes level times 0.5 without replacing custom evasion",()=>{
-    const existing={level:20,agilityPoints:12,evasion:24};
+test("default monster evasion is level times 0.3 capped at 30 without replacing any custom evasion",()=>{
+    const missing={level:20,agilityPoints:12};
+    const formerGeneratedValue={level:20,agilityPoints:12,evasion:24};
     const custom={level:20,agilityPoints:12,evasion:37};
     const context=load({
-        monsters:[existing,custom],
-        zoneConfig:{forest:{monsters:()=>[existing,custom]}}
+        monsters:[missing,formerGeneratedValue,custom],
+        zoneConfig:{forest:{monsters:()=>[missing,formerGeneratedValue,custom]}}
     });
-    assert.equal(existing.evasion,10);
+    assert.equal(missing.evasion,6);
+    assert.equal(formerGeneratedValue.evasion,24);
     assert.equal(custom.evasion,37);
-    assert.equal(context.getMonsterEvasion({level:30}),15);
-    assert.equal(context.makeZoneMonster("測試怪",40).evasion,20);
+    assert.equal(context.getMonsterEvasion({level:30}),9);
+    assert.equal(context.makeZoneMonster("測試怪",40).evasion,12);
+    assert.equal(context.makeZoneMonster("高等測試怪",200).evasion,30);
 });
 
 test("damage variance is 95 to 105 percent and uses rounding",()=>{

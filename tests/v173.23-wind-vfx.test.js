@@ -265,7 +265,7 @@ test("all eleven casts and six loops use the requested mapping, timing and share
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        assert.equal(model.sprite.src,"assets/inbox/"+spec.file+"?v=173.23",id);
+        assert.equal(model.sprite.src,"assets/inbox/"+spec.file+"?v=173.24",id);
         assert.deepEqual(
             Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.frameWidth,model.sprite.frameHeight,model.sprite.hitFrame]),
             [4,3,12,384,384,7],id
@@ -280,7 +280,7 @@ test("all eleven casts and six loops use the requested mapping, timing and share
     const statuses=runtime.context.v143StatusSpriteManifest;
     Object.entries(STATUSES).forEach(([type,spec])=>{
         const sprite=statuses[type];
-        assert.equal(sprite.src,"assets/inbox/"+spec.file+"?v=173.23",type);
+        assert.equal(sprite.src,"assets/inbox/"+spec.file+"?v=173.24",type);
         assert.deepEqual(
             Array.from([sprite.columns,sprite.rows,sprite.frames,sprite.frameWidth,sprite.frameHeight]),
             [4,2,8,256,256],type
@@ -403,7 +403,7 @@ test("status loops start only on success, never restart on duplicate MISS, and c
     runTimers(applied,1200);
     const gravity=applied.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown");
     assert.ok(gravity,"successful status starts its loop");
-    assert.ok(gravity.style.backgroundImage.includes("重力-狀態循環圖.png?v=173.23"));
+    assert.ok(gravity.style.backgroundImage.includes("重力-狀態循環圖.png?v=173.24"));
     assert.equal(gravity.style["--v153-status-duration"],"1000ms");
 
     applied.monsters[0].statusEffects.push({type:"damageDown",turnsLeft:1});
@@ -455,10 +455,10 @@ test("wind sheets replace procedural wind effects and keep noninteractive status
     assert.doesNotMatch(animation,/assets\/inbox\/[\s\S]{0,80}(?:base64|blob:)/i);
 });
 
-test("the development cache release is V173.23",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.23"/);
-    assert.match(index,/<title>四象江湖傳 V173\.23<\/title>/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.23/);
+test("the development cache release is V173.24",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.24"/);
+    assert.match(index,/<title>四象江湖傳 V173\.24<\/title>/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.24/);
 });
 
-console.log("\n"+passed+" V173.23 wind Sprite VFX tests passed.");
+console.log("\n"+passed+" V173.24 wind Sprite VFX tests passed.");

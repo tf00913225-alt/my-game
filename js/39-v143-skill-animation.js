@@ -176,7 +176,7 @@
             glyph:"拳",motion:"dash",impact:"wind-fist",hit:.5,pulses:1,spread:0,
             deferredStatusTypes:["agilityDown"],
             sprite:{
-                src:"assets/inbox/暴風拳-技能動態圖.png?v=173.23",
+                src:"assets/inbox/暴風拳-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.15,maxSize:260
             }
@@ -185,7 +185,7 @@
             glyph:"迅",motion:"afterimage",impact:"wind-combo",hit:.5,pulses:4,spread:48,
             deferredStatusTypes:["damageDown"],
             sprite:{
-                src:"assets/inbox/暴風亂擊-技能動態圖.png?v=173.23",
+                src:"assets/inbox/暴風亂擊-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
             }
@@ -194,7 +194,7 @@
             glyph:"十",motion:"cross",impact:"cross-gale",hit:.5,pulses:2,spread:58,
             deferredStatusTypes:["damageDown"],
             sprite:{
-                src:"assets/inbox/風旋十字斬-技能動態圖.png?v=173.23",
+                src:"assets/inbox/風旋十字斬-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.25,maxSize:280
             }
@@ -203,7 +203,7 @@
             glyph:"雷",motion:"blink",impact:"thunder-fist",hit:.5,pulses:4,spread:62,
             deferredStatusTypes:["stun"],
             sprite:{
-                src:"assets/inbox/暈眩猛擊-技能動態圖.png?v=173.23",
+                src:"assets/inbox/暈眩猛擊-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.35,maxSize:290
             }
@@ -212,7 +212,7 @@
             glyph:"➤",motion:"curve",impact:"wind-blade",hit:.5,pulses:1,spread:30,
             deferredStatusTypes:["agilityDown"],
             sprite:{
-                src:"assets/inbox/狂風術-技能動態圖.png?v=173.23",
+                src:"assets/inbox/狂風術-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
             }
@@ -221,7 +221,7 @@
             glyph:"旋",motion:"spiral",impact:"gale-ring",hit:.5,pulses:3,spread:56,
             deferredStatusTypes:["damageDown"],
             sprite:{
-                src:"assets/inbox/風焰術-技能動態圖.png?v=173.23",
+                src:"assets/inbox/風焰術-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
             }
@@ -230,7 +230,7 @@
             glyph:"⚡",motion:"bolt",impact:"lightning-fang",hit:.5,pulses:4,spread:62,
             deferredStatusTypes:["damageDown"],
             sprite:{
-                src:"assets/inbox/風哮電擊-技能動態圖.png?v=173.23",
+                src:"assets/inbox/風哮電擊-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.35,maxSize:290
             }
@@ -239,7 +239,7 @@
             glyph:"風",sequence:"風起雲湧",motion:"tempest",impact:"storm-domain",hit:.5,pulses:7,spread:110,flightCount:4,
             deferredStatusTypes:["stun"],
             sprite:{
-                src:"assets/inbox/風起雲湧-技能動態圖.png?v=173.23",
+                src:"assets/inbox/風起雲湧-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"battlefield",renderer:"canvas-crop",naturalGrid:true,scale:1.08,minSize:280
             }
@@ -248,7 +248,7 @@
             glyph:"疾",motion:"afterimage",impact:"speed-aura",hit:.5,pulses:3,spread:50,
             deferredStatusTypes:["dodgeSkill"],
             sprite:{
-                src:"assets/inbox/閃躲術-技能動態圖.png?v=173.23",
+                src:"assets/inbox/閃躲術-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
             }
@@ -257,7 +257,7 @@
             glyph:"隱",motion:"veil",impact:"vanish-mist",hit:.5,pulses:3,spread:52,
             deferredStatusTypes:["stealthSkill"],
             sprite:{
-                src:"assets/inbox/隱身術-技能動態圖.png?v=173.23",
+                src:"assets/inbox/隱身術-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.15,maxSize:260
             }
@@ -266,7 +266,7 @@
             glyph:"定",motion:"orbit",impact:"calm-seal",hit:.5,pulses:5,spread:72,
             deferredStatusTypes:["dinghaishenzhen"],
             sprite:{
-                src:"assets/inbox/氣定神閒-技能動態圖.png?v=173.23",
+                src:"assets/inbox/氣定神閒-技能動態圖.png?v=173.24",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
                 placement:"battlefield",renderer:"canvas-crop",naturalGrid:true,scale:1.08,minSize:280
             }
@@ -322,12 +322,12 @@
         rage:{src:"assets/vfx/fire/rage-buff-loop.png?v=165",columns:4,rows:2,frames:8,duration:1000,collection:"activeBuffs"},
         frostbite:{src:"assets/vfx/water/frostbite-status-loop-vfx.png?v=166",columns:4,rows:2,frames:8,duration:1000,collection:"statusEffects",scale:1.22},
         freeze:{src:"assets/vfx/water/frozen-status-loop-vfx.png?v=166",columns:4,rows:2,frames:8,duration:1100,collection:"statusEffects",scale:1.28},
-        agilityDown:{src:"assets/inbox/重力-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1000,collection:"statusEffects"},
-        damageDown:{src:"assets/inbox/殤風-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1100,collection:"statusEffects"},
-        stun:{src:"assets/inbox/暈眩-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:900,collection:"statusEffects"},
-        dodgeSkill:{src:"assets/inbox/風行-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:850,collection:"activeBuffs"},
-        stealthSkill:{src:"assets/inbox/隱身-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs"},
-        dinghaishenzhen:{src:"assets/inbox/氣定神閒-狀態循環圖.png?v=173.23",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs"}
+        agilityDown:{src:"assets/inbox/重力-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1000,collection:"statusEffects"},
+        damageDown:{src:"assets/inbox/殤風-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1100,collection:"statusEffects"},
+        stun:{src:"assets/inbox/暈眩-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:900,collection:"statusEffects"},
+        dodgeSkill:{src:"assets/inbox/風行-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:850,collection:"activeBuffs"},
+        stealthSkill:{src:"assets/inbox/隱身-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs"},
+        dinghaishenzhen:{src:"assets/inbox/氣定神閒-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs"}
     };
 
     window.v143SkillAnimationManifest=MANIFEST;

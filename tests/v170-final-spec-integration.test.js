@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.19)
+ * CURRENT FINAL INTEGRATION SPEC (V173.24)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
@@ -402,6 +402,9 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
 });
 
 test("final normal hit and status-effect bounds override the historical floors",()=>{
+    assert.match(mainSource,/const STATUS_RESIST_PER_SPIRIT_POINT = 0\.05;/);
+    assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 50;/);
+    assert.doesNotMatch(mainSource,/STATUS_HIT_INT_COEFFICIENT|HIT_CHANCE_MIN_PERCENT = 60/);
     const runtime=loadFinalRuntime();
     const hit=runtime.context.v158GetHitChancePercent;
     assert.deepEqual(
@@ -409,8 +412,12 @@ test("final normal hit and status-effect bounds override the historical floors",
         [95,98,85.5,14.250000000000002,7.500000000000001,99]
     );
     const status=runtime.context.v140CalculateStatusEffectChance;
-    assert.equal(status(50,10,10,100,20,false,"regular",0,"physical"),64);
-    assert.equal(status(50,10,10,100,20,false,"regular",0,"magic"),74);
+    assert.equal(status(50,10,10,100,20,false,"regular",0,"physical"),54);
+    assert.equal(status(50,10,10,100,20,false,"regular",0,"magic"),54);
+    assert.equal(status(50,10,10,100,100,false,"regular",7,"physical"),43);
+    assert.equal(status(50,10,10,100,100,false,"regular",7,"magic"),43);
+    assert.equal(status(30,10,10,100,20,true,"regular",0,"physical"),26);
+    assert.equal(status(30,10,10,100,20,true,"regular",0,"magic"),26);
     assert.deepEqual(
         ["regular","elite","boss"].map(rank=>status(90,10,10,100,0,true,rank,0,"magic")),
         [80,60,40]
@@ -487,6 +494,53 @@ test("guaranteed Burn bypasses probability only after the same-name check",()=>{
         first:{duplicate:false,hit:true},duplicate:{duplicate:true,hit:false},rolls:0,
         effects:[{type:"burn",turnsLeft:1,percent:3,statusName:"燃燒"}]
     });
+});
+
+test("duplicate status MISS remains distinct and never cancels landed direct damage",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const logs=[];
+        const popups=[];
+        Object.assign(player,{
+            id:"火角",element:"fire",level:50,hp:1000,sp:1000,
+            attack:0,vitality:0,energy:0,intelligence:0,spirit:0,agility:0,
+            bonusHP:0,bonusSP:0,activeBuffs:[],statusEffects:[]
+        });
+        characterSkillLoadouts.fire.skillLevels.fireRocket=1;
+        const target={
+            name:"燃燒目標",level:50,hp:1000,maxHP:1000,sp:0,maxSP:0,
+            alive:true,element:"earth",defense:0,evasion:0,spiritPoints:0,
+            activeBuffs:[],statusEffects:[{type:"burn",statusName:"燃燒",turnsLeft:2,percent:3}]
+        };
+        monsters.splice(0,monsters.length,target);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        selectedMonster=0;battleActive=true;autoBattle=false;
+        getMainCharacterStats=function(){
+            return {attack:0,magicAttack:0,intelligence:0,accuracy:1000,maxHP:1000,maxSP:1000};
+        };
+        getMonsterEvasion=function(){ return 0; };
+        getMonsterEffectiveSpiritPoints=function(){ return 0; };
+        getMonsterRank=function(){ return "regular"; };
+        updateUI=function(){};finishPlayerAction=function(){};lungePlayerCard=function(){};
+        showSkillNameBadge=function(){};showPlayerSpPopup=function(){};showMonsterHit=function(){};
+        showMissEffect=function(_playerSide,_index,label){ popups.push(label); };
+        addBattleLog=function(message){ logs.push(String(message)); };
+        Math.random=function(){ return 0; };
+        const before=target.hp;
+        castDamageSkill("fireRocket");
+        const afterHit=target.hp;
+        Math.random=function(){ return .999999; };
+        castDamageSkill("fireRocket");
+        return {
+            before:before,afterHit:afterHit,afterMiss:target.hp,popups:popups,logs:logs,
+            effects:target.statusEffects
+        };
+    })()`);
+    assert.ok(result.afterHit<result.before,"the landed direct hit must still deal damage");
+    assert.equal(result.afterMiss,result.afterHit,"an actual attack MISS must deal no damage");
+    assert.deepEqual(result.popups,["狀態MISS","MISS"]);
+    assert.equal(result.effects.length,1);
+    assert.match(result.logs.join("\n"),/已有【燃燒】，新的【燃燒】MISS。/);
 });
 
 test("accuracy, enemy Rage, monster shields and Stealth use their formal state rules",()=>{
@@ -585,6 +639,27 @@ test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once pe
         };
     })()`);
     assert.deepEqual(result,{combined:83.75,capped:85,blocked:[true,true,true],remaining:4});
+});
+
+test("player agility and default monster level use the V173.24 evasion rules",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Object.assign(player,{
+            element:"fire",agility:100,activeBuffs:[],statusEffects:[]
+        });
+        characterSkillLoadouts.fire.skillLevels.windEX=0;
+        const custom={level:80,evasion:24,agilityPoints:12,statusEffects:[]};
+        const missing={level:200,statusEffects:[]};
+        v158NormalizeMonsterDefaultEvasion(custom);
+        v158NormalizeMonsterDefaultEvasion(missing);
+        return {
+            player:getMainCharacterStats().evasion,
+            level40:makeZoneMonster("四十級怪",40,"fire").evasion,
+            level200:makeZoneMonster("兩百級怪",200,"fire").evasion,
+            custom:custom.evasion,missing:missing.evasion
+        };
+    })()`);
+    assert.deepEqual(result,{player:60,level40:12,level200:30,custom:24,missing:30});
 });
 
 test("multi-target buffs resolve same-name MISS independently without replacing existing values",()=>{

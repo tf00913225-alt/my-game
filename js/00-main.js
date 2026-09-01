@@ -1846,7 +1846,7 @@ function getBaseStats(){
             player.agility,
 
         evasion:
-            player.agility*2
+            player.agility*0.6
 
     };
 
@@ -2108,7 +2108,7 @@ function getMainCharacterStats(){
         1+(defenseBuffPercent+defensePassivePercent)/100
     );
 
-    const rawEvasion=effectiveAgility*2;
+    const rawEvasion=effectiveAgility*0.6;
 
     return {
         /* 暫時六圍減益不動態壓縮最大HP/SP；詳見上方統一規則。 */
@@ -2263,7 +2263,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
     const buffedDefense=rawDefense*(
         1+(defenseBuffPercent+defensePassivePercent)/100
     );
-    const rawEvasion=effectiveAgility*2;
+    const rawEvasion=effectiveAgility*0.6;
 
     return {
         maxHP:
@@ -2647,9 +2647,9 @@ const skillDatabase = {
    V126 — MONSTER BOOTSTRAP CONSTANT ORDER
    Monster arrays are constructed immediately below. These four confirmed
    constants must be initialized before makeZoneMonster() calculates status
-   resistance and anti-crit values. Values and formulas are unchanged.
+   resistance and anti-crit values.
 ===================================================== */
-const STATUS_RESIST_PER_SPIRIT_POINT = 0.3;
+const STATUS_RESIST_PER_SPIRIT_POINT = 0.05;
 const ANTI_CRIT_PER_SPIRIT_POINT = 0.1;
 const ANTI_CRIT_MAX_PERCENT = 25;
 const CRIT_CHANCE_MIN_AFTER_ANTI_CRIT = 5;
@@ -2767,8 +2767,8 @@ const iceMountainMonsters = [
    防禦     = 10  + 體質×15
    法術攻擊  = 智力×5
    命中 = 精神×2
-   異常抗性 = 精神×0.3（百分點）
-   閃避     = 敏捷×2
+   一般異常抗性 = 精神×0.05（百分點）
+   預設閃避 = min(30%, 等級×0.3%)
    速度(行動順序用) = 敏捷（原始點數，不額外乘）
 */
 
@@ -3126,7 +3126,7 @@ function makeZoneMonster(
             calculateAntiCritPercent(points.spirit),
 
         evasion:
-            points.agility*2,
+            Math.min(30,Math.max(0,Number(level)||0)*0.3),
 
         agility:
             points.agility,
@@ -11730,34 +11730,17 @@ function calculateDamage(
 /* =====================================================
    ★ 命中判定（新增）
 
-   之前普通攻擊、技能攻擊都是保證命中，
-   角色資料裡有「命中」「閃避」兩個能力值
-   （精神×2、敏捷×2換算；它們是能力值，不是直接百分比），但完全沒被拿來用。
-
-   現在補上真正的命中判定：
-
-   最終命中機率(%) = 95 + 攻擊方命中×0.3 − 防守方閃避×0.3
-   夾在 60% ~ 99% 之間
-   （不會低到常常打空，也不會保證100%必中，
-     跟異常狀態命中公式一樣，故意不做到極端值）。
-
-   怪物目前沒有獨立的命中/閃躲數值，
-   用怪物等級做粗略換算：
-   怪物閃避 = 等級 × 1.5
-   怪物命中 = 等級 × 2
-   （跟之前處理怪物「精神」抗性的作法一致，
-     都是先用等級當替代值，
-     之後如果要幫怪物做完整屬性表，
-     這裡可以直接替換成真正的數值）。
+   基礎命中率 = clamp(95 + 命中×0.3 - 直接命中率降低, 50%, 99%)。
+   最終命中率 = clamp(基礎命中率 × (1 - 最終閃躲率), 1%, 99%)。
+   玩家基礎閃躲為有效敏捷×0.6%；普通怪物預設閃躲為
+   min(30%, 等級×0.3%)，特殊怪物明確指定的 evasion 保留。
 ===================================================== */
 
 const HIT_CHANCE_BASE = 95;
 
 const HIT_CHANCE_ACCURACY_COEFFICIENT = 0.3;
 
-const HIT_CHANCE_EVASION_COEFFICIENT = 0.3;
-
-const HIT_CHANCE_MIN_PERCENT = 60;
+const HIT_CHANCE_MIN_PERCENT = 50;
 
 const HIT_CHANCE_MAX_PERCENT = 99;
 
@@ -11769,7 +11752,7 @@ const HIT_CHANCE_MAX_PERCENT = 99;
    makeZoneMonster()已經把evasion/accuracy/
    resistance/agility這些最終數值算好存在
    怪物物件上了（跟玩家getBaseStats()同一套
-   公式：閃避=敏捷×2、命中=精神×2、異常抗性=精神×0.3、
+   公式：預設閃避=min(30%,等級×0.3%)、命中=精神×2、一般異常抗性=精神×0.05、
    行動順序用的速度=敏捷原始點數），
    這裡直接讀出來，不用再另外算一次。
 
@@ -11799,7 +11782,7 @@ function getMonsterEvasion(monster){
 
         monster.evasion!==undefined
         ? monster.evasion
-        : monster.level*1.5;
+        : Math.min(30,Math.max(0,Number(monster.level)||0)*0.3);
 
 
     const agilityDown=
@@ -12842,33 +12825,13 @@ function calculateSkillDamage(
      智力越高，異常狀態命中機率就越高，
      再加上等級壓制也會影響整體機率」
 
-   設計出來的公式：
+   一般異常最終機率 = 基礎機率×等級差倍率
+     + 物理攻擊力或智力×0.05
+     - 目標精神×0.05
+     - 額外異常抗性，最後限制在5%～95%。
 
-   最終命中機率 ％
-     = 技能本身標示的基礎機率
-       × 等級差距係數（沿用上面傷害公式同一組常數，
-                       跟傷害公式邏輯一致，不用另外發明一套）
-       + 施放者智力 × 0.3
-       − 目標精神   × 0.3
-     然後夾在上下限之間
-     （刻意不做到0%或100%，
-       不管數值差多懸殊，
-       永遠保留一點點運氣成分，
-       避免「這隻怪你永遠冰不了」
-       或「這隻怪你每次都能冰」這種絕對結果）。
-
-   舉例：
-   烈焰龍捲 30%機率燃燒，
-   假設施放者智力34、目標精神10、雙方等級相同（係數=1）：
-   30 × 1 + 34×0.3 − 10×0.3
-   = 30 + 10.2 − 3
-   = 37.2%
-
-   係數 0.3 是可以調的，
-   放在下面 STATUS_HIT_INT_COEFFICIENT /
-   STATUS_HIT_SPIRIT_COEFFICIENT 這兩個常數，
-   之後覺得智力/精神影響力太強或太弱都可以直接改這裡，
-   不用動公式本身的結構。
+   冰封、石化等硬控維持獨立公式：屬性加成為
+   sqrt(物攻或智力)×0.2，精神與稀有度上限沿用既有規則。
 
    ★ 修正（依照使用者要求，「鎖死行動的
    技能獨立設一組範圍，5%~60%」）：
@@ -12881,25 +12844,22 @@ function calculateSkillDamage(
    堆一堆，冰封機率也能衝到9成，等於
    讓對手整場都動不了，太強。
 
-   新增isLockdown這個參數，冰封/石化
-   呼叫時傳true，套用比較嚴格的
-   5%~60%上限；其他一般debuff（敏捷/
+   isLockdown 參數供冰封／石化呼叫時傳 true；
+   其他一般debuff（敏捷/
    防禦/全屬性降低、暈眩）維持原本的
    5%~95%，不受影響。
 ===================================================== */
 
-const STATUS_HIT_INT_COEFFICIENT = 0.3;
+const GENERAL_STATUS_OFFENSE_COEFFICIENT = 0.05;
+const LOCKDOWN_STATUS_SPIRIT_COEFFICIENT = 0.3;
 
 /*
-   V118：精神的「異常抗性」正式統一。
-   每1點精神 = 0.3個百分點異常抗性，
-   顯示值與實際異常命中公式使用完全相同的換算。
+   一般異常每1點精神降低0.05個百分點命中率；
+   硬控仍在獨立公式使用原本的0.3係數。
 */
 function calculateStatusResistancePercent(spiritPoints){
     return Math.max(0,Number(spiritPoints)||0)*STATUS_RESIST_PER_SPIRIT_POINT;
 }
-
-const STATUS_HIT_SPIRIT_COEFFICIENT = STATUS_RESIST_PER_SPIRIT_POINT;
 
 const STATUS_HIT_MIN_PERCENT = 5;
 
@@ -12909,17 +12869,8 @@ const STATUS_HIT_MAX_PERCENT = 95;
    ★ 修正（依照使用者要求，「限制行動的
    異常狀態常數修改」，改成依怪物等級
    分三個等級各自的上下限）：
-   原本鎖死行動類技能（冰封/石化）全部
-   共用同一組5%~60%上限，現在改成依
-   目標怪物的「稀有度」分開設定：
-
-   野怪　　5%~75%（一般小怪，好鎖）
-   精英怪　5%~45%（帶「王」字的區域頭目
-            級怪物，比較難鎖）
-   BOSS　　5%~15%（獨立/地獄BOSS，幾乎
-            鎖不住，目前BOSS戰鬥內容本身
-            還沒做，這組數字先備著，等
-            BOSS真的能打的時候直接套用）
+   鎖死行動類技能（冰封/石化）依目標怪物
+   稀有度使用普通80%、精英60%、BOSS40%的上限。
 
    怎麼判斷一隻怪物是「野怪」還是「精英怪」：
    看getMonsterRank()——目前規則很單純，
@@ -12934,17 +12885,17 @@ const LOCKDOWN_HIT_BOUNDS = {
 
     regular:{
         min:5,
-        max:75
+        max:80
     },
 
     elite:{
         min:5,
-        max:45
+        max:60
     },
 
     boss:{
         min:5,
-        max:15
+        max:40
     }
 
 };
@@ -13050,19 +13001,8 @@ function getPhysicalSkillRankBonusMultiplier(
    卡死在60%上限、之後智力再怎麼加都
    感受不到差異。
 
-   係數定案0.2（使用者最終選擇），
-   對照試算：
-   - 智力95（目前）：野怪機率約56.55%
-   - 智力729：野怪機率才會觸頂60%
-   - 比原本線性版（智力324就觸頂）晚了
-     一大截，兩者都比"完全不管智力、
-     直接觸頂"的舊版本健康很多。
-
-   之後BOSS的精神數值抓得比一般怪高，
-   這個係數維持不變即可——BOSS那邊會
-   因為精神×0.3那項扣得更多，自然拉低
-   機率，不用因為BOSS精神變高就跟著改
-   智力這一側的係數。
+   係數維持0.2；BOSS精神仍按硬控原本的0.3
+   係數扣除，不受一般異常0.05調整影響。
 */
 
 const LOCKDOWN_INT_COEFFICIENT = 0.2;
@@ -13084,8 +13024,8 @@ const LOCKDOWN_INT_COEFFICIENT = 0.2;
    呼叫、25%抗性目前對實戰沒有影響，先把
    「查詢用的函式」跟「buff儲存」都做對，
    等之後真的要做「怪物對玩家下異常狀態」
-   時，直接呼叫這個函式就能把定海神針的
-   效果接上，不用再回頭補。
+   時，直接把這個函式回傳值當成額外異常抗性
+   傳進正式公式即可。
 
    改成吃character參數（跟getActiveBuffPercent()/
    hasActiveBuff()同一種通用設計），不寫死
@@ -13093,11 +13033,7 @@ const LOCKDOWN_INT_COEFFICIENT = 0.2;
    呼叫這個函式時傳自己的角色物件進來就好，
    不用另外寫一份player2專用版本。
 
-   用法設計成跟rollStatusEffectHit()同一種
-   模式：算出「怪物對某角色」那套異常狀態
-   命中機率之後，最終機率再乘上
-   (1 - getPlayerStatusResistBonus(character)/100)，
-   抗性25%就是把最終機率打75折。
+   額外異常抗性採百分點直接扣除，不做第二次乘算。
 */
 
 function getPlayerStatusResistBonus(character){
@@ -13169,7 +13105,7 @@ function calculateStatusEffectChance(
        公式，兩者互不影響。
     */
 
-    const intelligenceBonus=
+    const attributeBonus=
 
         isLockdown
         ?
@@ -13177,18 +13113,19 @@ function calculateStatusEffectChance(
         LOCKDOWN_INT_COEFFICIENT
         :
         casterIntelligence*
-        STATUS_HIT_INT_COEFFICIENT;
+        GENERAL_STATUS_OFFENSE_COEFFICIENT;
 
 
     const targetResistancePercent =
-        calculateStatusResistancePercent(
-            targetSpirit
-        );
+        Math.max(0,Number(targetSpirit)||0)*
+        (isLockdown
+            ?LOCKDOWN_STATUS_SPIRIT_COEFFICIENT
+            :STATUS_RESIST_PER_SPIRIT_POINT);
 
     const rawChance =
         baseChancePercent*
         levelFactor+
-        intelligenceBonus-
+        attributeBonus-
         targetResistancePercent-
         (Number(targetBonusResistancePercent)||0);
 
@@ -13566,7 +13503,7 @@ function markPersistentStateName(entry,stateOrType){
 function reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName){
     const stateName=getPersistentStateName(stateOrType);
     if(typeof showMissEffect==="function"&&Number.isInteger(targetIndex)){
-        showMissEffect(targetSide==="player",targetIndex,"MISS");
+        showMissEffect(targetSide==="player",targetIndex,"狀態MISS");
     }
     if(typeof addBattleLog==="function"){
         const targetName=entity&&(entity.name||entity.id)||"目標";
@@ -14232,11 +14169,11 @@ function applySkillDebuffEffects(
 
    ★ 關於鎖定類效果（冰封/石化）用哪組
    上下限：目前的LOCKDOWN_HIT_BOUNDS三級
-   （野怪/精英怪/BOSS）設計上是給「玩家
+   （普通/精英/BOSS）設計上是給「玩家
    打怪物」這個方向用的，用來衡量「這隻
    怪物多難鎖」。這裡反過來是「怪物打
    玩家」，玩家沒有稀有度可言，這裡先固定
-   用"regular"（5%~75%，最寬鬆那組）—— 
+   用"regular"（上限80%）——
    這是我先抓的預設，如果你覺得玩家被
    鎖定的上限應該跟野怪不一樣（例如更難
    被鎖，畢竟是玩家角色），跟我說一聲，
@@ -30245,7 +30182,7 @@ function getBackpackCharacterStats(index){
         accuracy:character.spirit*2+bonus.spirit*2,
         resistance:calculateStatusResistancePercent(character.spirit+bonus.spirit),
         antiCrit:calculateAntiCritPercent(character.spirit+bonus.spirit),
-        evasion:character.agility*2+bonus.agility*2
+        evasion:(character.agility+bonus.agility)*0.6
     };
 }
 
@@ -30474,8 +30411,8 @@ function openInventoryCharacterDetail(){
             `
         ).join("")+
         `<div class="inventory-character-detail-note">
-            命中機率＝95%＋命中×0.3－目標閃避×0.3，最終限制60%～99%。<br>
-            每1精神＝+0.3個百分點異常抗性、+2命中、+0.1%抗暴；每1敏捷＝+1速度、+2閃避。
+            基礎命中率＝clamp(95%＋命中×0.3－直接命中率降低, 50%, 99%)，再乘上(1－目標最終閃躲率)。<br>
+            一般異常每1精神降低0.05個百分點命中率；每1敏捷＝+1速度、+0.6個百分點基礎閃躲。
         </div>`;
 
     modal.classList.add("show");
