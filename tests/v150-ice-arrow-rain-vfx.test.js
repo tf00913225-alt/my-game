@@ -167,7 +167,9 @@ test("official Ice Arrow Rain sheet is a complete 4x3 RGBA PNG",()=>{
 test("manifest keeps one 4x3 sheet and frame-eight hit",()=>{
     const runtime=loadRuntime([0,1,2]);
     const model=runtime.context.v143SkillAnimationManifest.iceArrowRain;
-    assert.equal(model.sprite.src,assetPath+"?v=166");
+    assert.equal(model.sprite.src,assetPath+"?v=173.13");
+    assert.equal(model.sprite.renderer,"canvas-crop");
+    assert.deepEqual([model.sprite.frameWidth,model.sprite.frameHeight],[384,384]);
     assert.deepEqual(
         [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
         [4,3,12,7]
@@ -179,15 +181,15 @@ test("manifest keeps one 4x3 sheet and frame-eight hit",()=>{
     assert.match(timing,/iceArrowRain:\[1600/);
 });
 
-test("frame order remains left-to-right then top-to-bottom and never loops",()=>{
-    const expected=[
-        "0 0","33.333333% 0","66.666667% 0","100% 0",
-        "0 50%","33.333333% 50%","66.666667% 50%","100% 50%",
-        "0 100%","33.333333% 100%","66.666667% 100%","100% 100%"
-    ];
-    expected.forEach(position=>assert.ok(css.includes("background-position:"+position),position));
-    assert.match(css,/steps\(1,end\) var\(--v143-sprite-delay,0ms\) 1 both/);
-    assert.doesNotMatch(css,/v166[^}]*ArrowRain[^}]*infinite/i);
+test("Canvas crops exactly one 384×384 frame left-to-right, top-to-bottom, once",()=>{
+    assert.match(animation,/const frameIndex=Math\.min\(11,Math\.floor\(progress\*12\)\);/);
+    assert.match(animation,/const column=frameIndex%4;[\s\S]*?const row=Math\.floor\(frameIndex\/4\);/);
+    assert.match(animation,/const sourceX=column\*384;[\s\S]*?const sourceY=row\*384;/);
+    assert.match(
+        animation,
+        /context\.drawImage\([\s\S]*?image,[\s\S]*?sourceX,[\s\S]*?sourceY,[\s\S]*?384,[\s\S]*?384,[\s\S]*?0,[\s\S]*?0,[\s\S]*?node\.width,[\s\S]*?node\.height/
+    );
+    assert.doesNotMatch(css,/data-skill="iceArrowRain"[\s\S]*?v166-water-cast-sprite/);
 });
 
 test("one shared sheet uses the bounding box of living targets only",()=>{
@@ -209,7 +211,8 @@ test("one shared sheet uses the bounding box of living targets only",()=>{
         assert.equal(sprite.style.left,"438px");
         assert.equal(sprite.style.top,"130px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
-        assert.ok(sprite.style.backgroundImage.includes(assetPath),"the single sheet stays centered");
+        assert.equal(sprite.dataset.renderer,"canvas-crop");
+        assert.equal(sprite.style.backgroundImage,"none","the sheet is never a CSS background");
         assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0,"no tiled copies");
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
         assert.ok(runtime.scheduled.some(timer=>timer.delay>=1590),"full 1.6 second action gate");
@@ -241,9 +244,9 @@ test("all damage numbers share frame eight while remaining target-specific",()=>
 });
 
 test("the current cache version publishes the 1.6 second battlefield choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.12"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.12/);
-    assert.match(animation,/frost-arrow-rain-vfx\.png\?v=166/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.13"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.13/);
+    assert.match(animation,/frost-arrow-rain-vfx\.png\?v=173\.13/);
 });
 
 console.log("\n"+passed+" V150 Ice Arrow Rain VFX tests passed.");

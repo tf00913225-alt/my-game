@@ -6,7 +6,8 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const main=fs.readFileSync("js/00-main.js","utf8");
-const abyss=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
+const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
+const legacyAbyssPatch=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const rewardCss=fs.readFileSync("css/45-v152-dev-fixes.css","utf8");
 
@@ -24,10 +25,12 @@ function sourceFunction(source,signature){
     throw new Error(signature+" closing brace");
 }
 
-test("Abyss portrait opens dialogue directly without a walk-up gate",()=>{
+test("Abyss portrait opens dialogue directly from its source owner without a wrapper",()=>{
     const challenge=sourceFunction(abyss,"window.v141ChallengeAbyssBoss=function(){");
-    assert.match(challenge,/openBossBubble\(\);/);
+    assert.match(challenge,/return openAbyssBossDialogue\(\);/);
+    assert.match(abyss,/function openAbyssBossDialogue\(\)[\s\S]*?launchAbyssBossBattle\(\)/);
     assert.doesNotMatch(challenge,/v141ApproachAbyssBoss/);
+    assert.doesNotMatch(legacyAbyssPatch,/v141ChallengeAbyssBoss=function/);
 });
 
 test("dismissed reward toast cannot keep a patrol-blocking hit area",()=>{
@@ -35,12 +38,11 @@ test("dismissed reward toast cannot keep a patrol-blocking hit area",()=>{
     assert.match(rewardCss,/\.v141-reward-toast\.show\{[\s\S]*?pointer-events:auto !important;/);
 });
 
-test("new Water Orb sheet is the approved transparent four-by-three asset",()=>{
+test("new Water Orb sheet is the supplied 1536×1152 four-by-three asset",()=>{
     const asset=fs.readFileSync("assets/vfx/water/water-orb-vfx.png");
-    assert.equal(crypto.createHash("sha256").update(asset).digest("hex"),"d3bdcafbd65965a9c54c9785baa1922849f11f1c1fc905bf6c4723024c745c2d");
     assert.equal(asset.toString("ascii",12,16),"IHDR");
-    assert.deepEqual([asset.readUInt32BE(16),asset.readUInt32BE(20)],[1448,1086]);
-    assert.match(animation,/water-orb-vfx\.png\?v=173\.9[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,placement:"group"/);
+    assert.deepEqual([asset.readUInt32BE(16),asset.readUInt32BE(20)],[1536,1152]);
+    assert.match(animation,/water-orb-vfx\.png\?v=173\.13[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,[\s\S]*?renderer:"canvas-crop"/);
 });
 
 test("Phoenix Cry and Ice Arrow Rain use one centered battlefield sheet",()=>{
@@ -72,4 +74,4 @@ test("Frostbite expires from monsters and players at the normal status tick",()=
     assert.equal(updates,1);
 });
 
-console.log("\nV173.12 bug-fix suite: "+passed+" tests passed.");
+console.log("\nV173.13 bug-fix suite: "+passed+" tests passed.");

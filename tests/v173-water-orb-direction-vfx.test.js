@@ -31,15 +31,16 @@ test("the single group VFX is centered on actual live targets rather than the ca
     assert.doesNotMatch(placement,/waterBall.*targetTrajectory/);
 });
 
-test("the CSS visits frames left-to-right, top-to-bottom once without a per-target travel animation",()=>{
-    assert.match(css,/@keyframes v166WaterCastFrames\{[\s\S]*?33\.333333%\{background-position:0 50%\}[\s\S]*?66\.666667%\{background-position:0 100%\}/);
-    assert.match(css,/data-skill="waterBall"[\s\S]*?v166WaterCastEnvelope/);
-    assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v173WaterOrbTargetTravel/);
+test("Canvas visits frames left-to-right, top-to-bottom once without per-target travel",()=>{
+    assert.match(animation,/const column=frameIndex%4;[\s\S]*?const row=Math\.floor\(frameIndex\/4\);/);
+    assert.match(animation,/const sourceX=column\*384;[\s\S]*?const sourceY=row\*384;/);
+    assert.match(animation,/if\(progress<1\)\{ scheduleCanvasCropSprite\(runtime\); \}/);
+    assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("the published build label is V173.12",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.12"/);
-    assert.match(index,/aria-label="目前版本 V173\.12"[\s\S]*?>V173\.12<\/div>/);
+test("the published build label is V173.13",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.13"/);
+    assert.match(index,/aria-label="目前版本 V173\.13"[\s\S]*?>V173\.13<\/div>/);
 });
 
 console.log("\nV173 Water Ball target-group VFX suite: "+passed+" tests passed.");

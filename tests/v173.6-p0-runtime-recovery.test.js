@@ -15,10 +15,9 @@ assert.match(v142,/showSkillNameBadge=function/);
 assert.match(v142,/showMonsterSkillNameBadge=function/);
 assert.doesNotMatch(v142,/v142PlaySkillAnimationFromBadge/);
 assert.doesNotMatch(main,/v142PlaySkillAnimationFromBadge/);
-assert.match(abyss,/map\.offsetWidth\/mapRect\.width/);
-assert.match(abyss,/map\.offsetHeight\/mapRect\.height/);
-assert.match(animation,/water-orb-vfx\.png\?v=173\.9/);
-assert.match(loader,/const V_ASSET_VERSION="173\.12"/);
-assert.match(index,/<title>四象江湖傳 V173\.12<\/title>/);
+assert.doesNotMatch(abyss,/v141ChallengeAbyssBoss=function/);
+assert.match(animation,/water-orb-vfx\.png\?v=173\.13/);
+assert.match(loader,/const V_ASSET_VERSION="173\.13"/);
+assert.match(index,/<title>四象江湖傳 V173\.13<\/title>/);
 
-console.log("V173.12 P0 known-good animation-chain recovery: 10 tests passed.");
+console.log("V173.13 P0 known-good animation-chain recovery: 10 tests passed.");

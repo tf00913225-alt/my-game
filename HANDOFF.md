@@ -595,6 +595,14 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 
 ## 已完成功能記錄（新的加在最上面）
 
+### 2026-09-01 — V173.13：深淵守關者點擊與水系 Canvas Sprite Sheet 收斂（dev）
+
+- 深淵守關者的唯一 owner 收斂回 `js/36-v141-content-systems.js`：對話與進戰鬥流程不再由 `js/38-v143-system-fixes.js` wrapper 覆蓋；守關立繪、地圖 click 與 capture-phase `pointerup/click` 都進入同一個直接對話入口。既有 `js/41-v146-system-polish.js`／`js/42-v148-combat-dungeon-fixes.js` 只保留地圖移動事件的原始座標傳遞。
+- 從 `assets-library/assets/inbox/` 選擇性複製 `water-orb.png` 與 `frost-arrow-rain.png` 到既有 `assets/vfx/water/` 對應路徑；未合併或修改 `assets-library`。
+- 水球術與冰霜箭雨的唯一 VFX owner 仍是 `js/39-v143-skill-animation.js`。兩招改用既有 VFX node／生命週期中的 Canvas crop renderer：每次僅以固定 384×384 source cell 繪製第 0～11 幀，再以既有目標群組或存活敵方 bounding box 決定顯示範圍；舊 CSS background-sheet 播放路徑已只對這兩招移除。
+- 水球術維持 1.4 秒、單一 live-target-group instance；冰霜箭雨維持單一 all-living-targets AOE instance。兩者均保留第 7～8 幀命中時機、死亡目標排除與既有動畫結束清理，不修改技能數值、傷害、存檔或其他水系技能。
+- 新增／更新直接回歸：Canvas 固定裁切、兩項新素材尺寸、群組／AOE 定位、深淵直接對話入口、版本／Loader 一致性。Repository checks 與真機點擊、動畫驗證待此 dev commit 完成後執行。
+
 ### 2026-08-31 — V173.9：P0 恢復已驗證技能動畫觸發鏈（dev）
 
 - 以 V173.4 main 為正確基準，恢復 `js/37-v142-skill-animation.js` 的原始 `showSkillNameBadge()`／`showMonsterSkillNameBadge()` wrapper 與一次性初始化守衛。

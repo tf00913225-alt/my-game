@@ -208,27 +208,10 @@
         v166WaterCastEnvelope var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
-.v143-skill-stage[data-skill="waterBall"] .v166-water-cast-sprite{
-    /*
-       Water Ball's sheet already contains its three-water-ball formation.
-       Keep one cropped frame centered over the living target group.
-    */
-    animation:
-        v166WaterCastFrames var(--v143-sprite-duration,1400ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
-        v166WaterCastEnvelope var(--v143-sprite-duration,1400ms) linear var(--v143-sprite-delay,0ms) 1 both;
-}
-
 .v143-skill-stage[data-skill="floodBeast"] .v166-water-cast-sprite{
     animation:
         v166WaterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
         v166WaterTargetTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
-}
-
-.v143-skill-stage[data-skill="iceArrowRain"] .v166-water-cast-sprite{
-    contain:paint;
-    overflow:hidden;
-    border-radius:10px;
-    animation:v166WaterAoeEnvelope var(--v143-sprite-duration,1600ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
 @keyframes v166WaterCastFrames{
@@ -297,12 +280,6 @@
     }
 }
 
-
-@keyframes v166WaterAoeEnvelope{
-    0%{opacity:0;transform:translate(-50%,-50%) scale(1)}
-    3%,95%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-    100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
-}
 
 .v143-skill-stage .v153-fire-cast-sprite{
     filter:drop-shadow(0 0 11px rgba(255,87,25,.9));

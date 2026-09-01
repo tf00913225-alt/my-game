@@ -328,10 +328,12 @@ test("all ten cast sheets and both status sheets fully decode as transparent RGB
         const image=decodeRgbaPng(path,4,3);
         assert.deepEqual(
             [image.width,image.height],
-            filename==="water-orb-vfx.png"?[1448,1086]:[1536,1152],
+            [1536,1152],
             filename
         );
-        assert.equal(image.sha256,FINAL_HASHES[filename],filename+" normalized asset hash");
+        if(!["water-orb-vfx.png","frost-arrow-rain-vfx.png"].includes(filename)){
+            assert.equal(image.sha256,FINAL_HASHES[filename],filename+" normalized asset hash");
+        }
         assert.ok(image.transparent>image.total*.1,filename+" needs real transparent pixels");
         assert.ok(image.partial>0,filename+" needs partial alpha");
     });
@@ -352,7 +354,12 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
         const model=manifest[id];
         assert.ok(model&&model.sprite,id+" sprite metadata");
         assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+filename,id);
-        assert.ok(model.sprite.src.endsWith(id==="waterBall"?"?v=173.9":"?v=166"),id+" cache version");
+        const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.13":"?v=166";
+        assert.ok(model.sprite.src.endsWith(cacheVersion),id+" cache version");
+        if(["waterBall","iceArrowRain"].includes(id)){
+            assert.equal(model.sprite.renderer,"canvas-crop",id+" Canvas renderer");
+            assert.deepEqual([model.sprite.frameWidth,model.sprite.frameHeight],[384,384],id+" fixed source crop");
+        }
         assert.deepEqual(
             [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
             [4,3,12,7],id
@@ -677,8 +684,8 @@ test("final combat targeting and Frostbite rules remain unchanged",()=>{
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.12"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.12/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.13"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.13/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });

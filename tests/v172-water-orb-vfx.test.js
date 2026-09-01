@@ -13,19 +13,17 @@ const index=fs.readFileSync("index.html","utf8");
 let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
-test("Water Ball keeps the current image until the supplied inbox PNG is available",()=>{
+test("Water Ball uses the supplied 1536×1152 inbox sheet with an explicit fixed crop",()=>{
     const asset=fs.readFileSync("assets/vfx/water/water-orb-vfx.png");
-    assert.equal(
-        crypto.createHash("sha256").update(asset).digest("hex"),
-        "d3bdcafbd65965a9c54c9785baa1922849f11f1c1fc905bf6c4723024c745c2d"
-    );
+    assert.equal(asset.toString("ascii",12,16),"IHDR");
+    assert.deepEqual([asset.readUInt32BE(16),asset.readUInt32BE(20)],[1536,1152]);
     assert.match(
         animation,
-        /waterBall:\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,placement:"group",[\s\S]*?scale:1\.22,minSize:150,maxSize:500/
+        /waterBall:\{[\s\S]*?water-orb-vfx\.png\?v=173\.13[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,[\s\S]*?placement:"group",renderer:"canvas-crop"/
     );
 });
 
-test("Water Ball renders one centered, square-preserving sprite for the live target group",()=>{
+test("Water Ball remains one centered live-target group and no longer uses the CSS sheet path",()=>{
     assert.match(
         animation,
         /const key=placement==="single"\|\|placement==="targetTrajectory"\?index:"main";/
@@ -38,28 +36,20 @@ test("Water Ball renders one centered, square-preserving sprite for the live tar
         animation,
         /current\.config\.id==="waterBall"&&placement==="targetTrajectory"/
     );
-    assert.match(
-        css,
-        /data-skill="waterBall"[\s\S]*?v166WaterCastFrames[\s\S]*?v166WaterCastEnvelope/
-    );
-    assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v173WaterOrbTargetTravel/);
+    assert.match(animation,/node\.dataset\.renderer="canvas-crop";[\s\S]*?node\.style\.backgroundImage="none";/);
+    assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("Water Ball lasts 1.4 seconds and retains exact one-frame-at-a-time 4x3 CSS crops",()=>{
+test("Water Ball lasts 1.4 seconds and renders exactly one Canvas crop per frame",()=>{
     assert.match(timing,/waterBall:\[1400,"basic","projectile"\]/);
-    const expected=[
-        "0 0","33.333333% 0","66.666667% 0","100% 0",
-        "0 50%","33.333333% 50%","66.666667% 50%","100% 50%",
-        "0 100%","33.333333% 100%","66.666667% 100%","100% 100%"
-    ];
-    expected.forEach(position=>assert.ok(css.includes("background-position:"+position),position));
-    assert.match(css,/v166WaterCastFrames var\(--v143-sprite-duration,1400ms\) steps\(1,end\)[\s\S]*? 1 both/);
+    assert.match(animation,/const frameIndex=Math\.min\(11,Math\.floor\(progress\*12\)\);/);
+    assert.match(animation,/sourceX,[\s\S]*?sourceY,[\s\S]*?384,[\s\S]*?384,[\s\S]*?0,[\s\S]*?0,[\s\S]*?node\.width,[\s\S]*?node\.height/);
 });
 
 test("the current cache version publishes the grouped Water Ball choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.12"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.12/);
-    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.12"[\s\S]*?>V173\.12<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.13"/);
+    assert.match(index,/js\/00-main\.js\?v=173\.13/);
+    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.13"[\s\S]*?>V173\.13<\/div>/);
 });
 
 console.log("\nV172 Water Ball VFX suite: "+passed+" tests passed.");

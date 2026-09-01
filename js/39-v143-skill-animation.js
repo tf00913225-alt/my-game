@@ -124,9 +124,9 @@
         waterBall:{
             glyph:"●",motion:"wave",impact:"water-splash",hit:.5833333333,pulses:1,spread:34,
             sprite:{
-                src:"assets/vfx/water/water-orb-vfx.png?v=173.9",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"group",
-                scale:1.22,minSize:150,maxSize:500
+                src:"assets/vfx/water/water-orb-vfx.png?v=173.13",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",scale:1.22,minSize:150,maxSize:500
             }
         },
         floodBeast:{
@@ -142,8 +142,9 @@
             glyph:"➶",motion:"rain",impact:"ice-rain",hit:.5833333333,
             pulses:7,spread:104,flightCount:7,deferredStatusTypes:["frostbite"],
             sprite:{
-                src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=166",
-                columns:4,rows:3,frames:12,hitFrame:7,placement:"battlefield",targetBounds:true,coverageScale:1.22,
+                src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=173.13",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"battlefield",renderer:"canvas-crop",targetBounds:true,coverageScale:1.22,
                 minWidth:140,minHeight:140
             }
         },
@@ -242,21 +243,37 @@
         return modelFor({id:skillId,name:skill&&skill.name||skillId});
     };
 
-    /* Warm shared Sprite Sheet assets without creating a second renderer. */
-    if(typeof Image==="function"){
-        const sources=[];
-        Object.keys(MANIFEST).forEach(id=>{
-            const sprite=MANIFEST[id]&&MANIFEST[id].sprite;
-            if(!sprite||!sprite.src){ return; }
-            sources.push(sprite.src);
-        });
-        Object.keys(STATUS_SPRITES).forEach(type=>sources.push(STATUS_SPRITES[type].src));
-        Array.from(new Set(sources)).forEach(source=>{
-            const image=new Image();
-            image.decoding="async";
-            image.src=source;
-        });
+    /*
+       Shared image cache for the existing Sprite renderer. Water Ball and
+       Ice Arrow Rain use the same VFX lifecycle but draw one fixed source
+       cell on a canvas instead of exposing a CSS background sheet.
+    */
+    const spriteImageCache=new Map();
+    function getSpriteImage(source){
+        const key=String(source||"");
+        if(!key||typeof Image!=="function"){ return null; }
+        let record=spriteImageCache.get(key);
+        if(record){ return record; }
+        const image=new Image();
+        record={image:image,ready:false,failed:false};
+        image.decoding="async";
+        image.onload=()=>{ record.ready=true; };
+        image.onerror=()=>{ record.failed=true; };
+        image.src=key;
+        if(image.complete&&Number(image.naturalWidth)>0){ record.ready=true; }
+        spriteImageCache.set(key,record);
+        return record;
     }
+    function isCanvasCropSprite(sprite){
+        return !!(sprite&&sprite.renderer==="canvas-crop");
+    }
+
+    /* Warm shared Sprite Sheet assets without creating a second renderer. */
+    Object.keys(MANIFEST).forEach(id=>{
+        const sprite=MANIFEST[id]&&MANIFEST[id].sprite;
+        if(sprite&&sprite.src){ getSpriteImage(sprite.src); }
+    });
+    Object.keys(STATUS_SPRITES).forEach(type=>getSpriteImage(STATUS_SPRITES[type].src));
 
     const director=window.v142SkillAnimationDirector;
     const originalPlay=director.play.bind(director);
@@ -549,12 +566,105 @@
         return "M 0 0 L "+dx+" "+dy;
     }
 
-    function appendNode(className,parent){
-        const node=document.createElement("i");
+    function appendNode(className,parent,tagName){
+        const node=document.createElement(tagName||"i");
         node.className=className;
         (parent||state.stage).appendChild(node);
         if(state.stage){ state.metrics.peakNodes=Math.max(state.metrics.peakNodes,state.stage.childElementCount); }
         return node;
+    }
+
+    function stopCanvasCropSprite(node){
+        const runtime=node&&node.__v173CanvasSprite;
+        if(!runtime){ return; }
+        runtime.stopped=true;
+        if(
+            runtime.usesAnimationFrame&&runtime.frameId&&typeof window!=="undefined"&&
+            typeof window.cancelAnimationFrame==="function"
+        ){
+            window.cancelAnimationFrame(runtime.frameId);
+        }
+        runtime.frameId=0;
+    }
+
+    function canvasSpriteOpacity(progress){
+        if(progress<.03){ return progress/.03; }
+        if(progress>.95){ return Math.max(0,(1-progress)/.05); }
+        return 1;
+    }
+
+    function scheduleCanvasCropSprite(runtime){
+        if(!runtime||runtime.stopped||runtime.frameId){ return; }
+        if(typeof window!=="undefined"&&typeof window.requestAnimationFrame==="function"){
+            runtime.usesAnimationFrame=true;
+            runtime.frameId=window.requestAnimationFrame(()=>{
+                runtime.frameId=0;
+                drawCanvasCropSprite(runtime);
+            });
+            return;
+        }
+        runtime.usesAnimationFrame=false;
+        runtime.frameId=setTimer(()=>{
+            runtime.frameId=0;
+            drawCanvasCropSprite(runtime);
+        },16);
+    }
+
+    /*
+       Fixed 4×3 Canvas crop renderer. The source is always one 384×384 cell;
+       CSS width/height on the existing VFX node are only the destination size.
+    */
+    function drawCanvasCropSprite(runtime){
+        if(!runtime||runtime.stopped){ return; }
+        const current=runtime.current;
+        if(!current||current.done||state.current!==current){ return; }
+        const node=runtime.node;
+        const duration=Math.max(1,Number(current.duration)||1);
+        const progress=Math.min(1,Math.max(0,(Date.now()-current.startedAt)/duration));
+        const frameIndex=Math.min(11,Math.floor(progress*12));
+        const column=frameIndex%4;
+        const row=Math.floor(frameIndex/4);
+        const sourceX=column*384;
+        const sourceY=row*384;
+        const imageRecord=runtime.imageRecord||getSpriteImage(runtime.sprite.src);
+        runtime.imageRecord=imageRecord;
+        const image=imageRecord&&imageRecord.image;
+        const ready=!!(
+            image&&(
+                imageRecord.ready||
+                (image.complete&&Number(image.naturalWidth)>0)
+            )
+        );
+        const context=node&&typeof node.getContext==="function"?node.getContext("2d"):null;
+        node.dataset.frameIndex=String(frameIndex);
+        node.dataset.sourceX=String(sourceX);
+        node.dataset.sourceY=String(sourceY);
+        node.dataset.sourceWidth="384";
+        node.dataset.sourceHeight="384";
+        node.style.opacity=String(canvasSpriteOpacity(progress));
+        if(context&&image&&ready){
+            context.clearRect(0,0,node.width,node.height);
+            context.drawImage(
+                image,
+                sourceX,
+                sourceY,
+                384,
+                384,
+                0,
+                0,
+                node.width,
+                node.height
+            );
+        }
+        if(progress<1){ scheduleCanvasCropSprite(runtime); }
+    }
+
+    function startCanvasCropSprite(node){
+        const runtime=node&&node.__v173CanvasSprite;
+        if(!runtime||runtime.started||runtime.stopped){ return; }
+        runtime.started=true;
+        node.style.opacity="0";
+        drawCanvasCropSprite(runtime);
     }
 
     function flightMarkup(skillId,glyph){
@@ -856,6 +966,10 @@
     }
 
     function startSpriteAnimation(node){
+        if(node&&node.__v173CanvasSprite){
+            startCanvasCropSprite(node);
+            return;
+        }
         const animationClass=node&&node.__v143PendingAnimationClass;
         if(!animationClass){ return; }
         node.style.opacity="";
@@ -880,13 +994,18 @@
         let node=current.spriteNodes.get(key);
         let animationClass="";
         let isNew=false;
+        const canvasSprite=isCanvasCropSprite(sprite);
         if(!node){
             node=appendNode(
-                "v143-vfx-sprite v143-vfx-sprite-"+current.config.id
+                "v143-vfx-sprite v143-vfx-sprite-"+current.config.id,
+                null,
+                canvasSprite?"canvas":undefined
             );
-            animationClass=
-                (String(sprite.src).includes("/fire/")?" v153-fire-cast-sprite":"")+
-                (String(sprite.src).includes("/water/")?" v166-water-cast-sprite":"");
+            if(!canvasSprite){
+                animationClass=
+                    (String(sprite.src).includes("/fire/")?" v153-fire-cast-sprite":"")+
+                    (String(sprite.src).includes("/water/")?" v166-water-cast-sprite":"");
+            }
             node.__v143PendingAnimationClass=animationClass;
             isNew=true;
             node.dataset.targetSide=current.targetSide;
@@ -895,20 +1014,37 @@
             node.dataset.rows=String(sprite.rows);
             node.dataset.frames=String(sprite.frames);
             node.style.opacity="0";
-            node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
-            node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
             node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
             node.style.setProperty(
                 "--v143-sprite-delay",
                 -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"
             );
+            if(canvasSprite){
+                node.width=384;
+                node.height=384;
+                node.dataset.renderer="canvas-crop";
+                node.style.backgroundImage="none";
+                node.style.backgroundSize="auto";
+                node.__v173CanvasSprite={
+                    node:node,current:current,sprite:sprite,
+                    imageRecord:getSpriteImage(sprite.src),
+                    started:false,stopped:false,usesAnimationFrame:false,frameId:0
+                };
+            }else{
+                node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
+                node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
+            }
             if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);
-        /* Android browsers may snapshot custom-property fallbacks if the
-           animation class is present before the real card coordinates. */
-        if(isNew&&(placement==="single"||placement==="targetTrajectory")){
+        /*
+           Android browsers may snapshot custom-property fallbacks if the
+           animation class is present before the real card coordinates.
+        */
+        if(isNew&&canvasSprite){
+            if(!current.collectingInitialTargets){ startSpriteAnimation(node); }
+        }else if(isNew&&(placement==="single"||placement==="targetTrajectory")){
             startSpriteAnimation(node);
         }else if(!current.collectingInitialTargets&&node.__v143PendingAnimationClass){
             scheduleSharedSpriteAnimation(current,node);
@@ -972,6 +1108,7 @@
     function cleanupCurrent(current,reason){
         if(!current||current.done){ return; }
         current.done=true;
+        current.spriteNodes.forEach(stopCanvasCropSprite);
         current.actorCard&&current.actorCard.classList.remove("v143-caster-active");
         current.targetIndexes.forEach(index=>{
             const card=cardFor(current.targetSide,index);
