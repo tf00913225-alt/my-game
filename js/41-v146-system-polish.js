@@ -15,6 +15,25 @@
         return Number.isFinite(number)?number:0;
     }
 
+    function formatHomeResourceValue(value){
+        const whole=Math.max(0,Math.floor(numeric(value)));
+        if(whole>=100000000){
+            const compact=Math.floor(whole/1000000)/100;
+            return compact.toFixed(2).replace(/\.?0+$/g,"")+"億";
+        }
+        if(whole>=10000){ return Math.floor(whole/10000)+"萬"; }
+        return whole.toLocaleString("zh-TW");
+    }
+
+    function syncHomeResourceValue(node,value){
+        if(!node){ return; }
+        const whole=Math.max(0,Math.floor(numeric(value)));
+        const full=whole.toLocaleString("zh-TW");
+        node.textContent=formatHomeResourceValue(whole);
+        node.title=full;
+        node.setAttribute("aria-label",full);
+    }
+
     function escapeHtml(value){
         return String(value==null?"":value)
             .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -476,8 +495,8 @@
         const hudExp=document.getElementById("homeHudExpValue");
         if(hudName){ hudName.textContent=primaryCharacter&&primaryCharacter.id||"江湖俠客"; }
         if(hudLevel){ hudLevel.textContent="Lv."+Math.max(1,Math.floor(numeric(primaryCharacter&&primaryCharacter.level)||1)); }
-        if(hudGold){ hudGold.textContent=Math.floor(numeric(typeof gold!=="undefined"?gold:0)).toLocaleString("zh-TW"); }
-        if(hudExp){ hudExp.textContent=Math.floor(numeric(typeof sharedExp!=="undefined"?sharedExp:0)).toLocaleString("zh-TW"); }
+        syncHomeResourceValue(hudGold,typeof gold!=="undefined"?gold:0);
+        syncHomeResourceValue(hudExp,typeof sharedExp!=="undefined"?sharedExp:0);
         let roster=document.getElementById("v146HomeRoster");
         if(!roster){
             roster=document.createElement("section");

@@ -934,11 +934,9 @@ button:disabled{
 
 .home-hud-resources b{
     display:inline-block;
-    max-width:64px;
-    overflow:hidden;
     color:#ffe093;
     font-size:9px;
-    text-overflow:ellipsis;
+    font-variant-numeric:tabular-nums;
     white-space:nowrap;
 }
 
@@ -998,20 +996,19 @@ button:disabled{
 
 .home-secondary-actions{
     display:grid;
-    grid-template-columns:repeat(2,64px);
-    grid-template-rows:repeat(3,46px);
-    justify-content:space-between;
-    gap:3px 0;
-    min-height:144px;
-    padding:0 16px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:repeat(3,44px);
+    gap:4px 0;
+    min-height:140px;
+    padding:0 22px;
 }
 
 .home-utility-actions{
     display:grid;
-    grid-template-columns:minmax(0,146px) minmax(0,92px);
-    justify-content:space-between;
-    gap:10px;
-    padding:0 16px;
+    grid-template-columns:116px 88px;
+    justify-content:center;
+    gap:22px;
+    padding:0 22px;
 }
 
 .home-card{
@@ -1058,7 +1055,7 @@ button:disabled{
 }
 
 .home-card-primary{
-    height:96px;
+    height:84px;
     overflow:hidden;
     border:1px solid rgba(222,170,70,.9);
     border-radius:11px;
@@ -1097,19 +1094,27 @@ button:disabled{
 
 .home-card-secondary{
     display:grid;
-    grid-template-rows:33px 13px;
+    grid-template-rows:32px 11px;
+    align-content:center;
     justify-items:center;
     width:64px;
-    height:46px;
+    height:44px;
     border:0;
     border-radius:10px;
     background:transparent;
     box-shadow:none;
 }
 
+.home-card-secondary:nth-child(odd){justify-self:start;}
+.home-card-secondary:nth-child(even){justify-self:end;}
+.home-card-secondary:nth-child(3){margin-inline-start:14px;}
+.home-card-secondary:nth-child(4){margin-inline-end:14px;}
+.home-card-secondary:nth-child(5){margin-inline-start:28px;}
+.home-card-secondary:nth-child(6){margin-inline-end:28px;}
+
 .home-card-secondary .home-card-icon{
-    width:33px;
-    height:33px;
+    width:32px;
+    height:32px;
     border:1px solid rgba(198,151,65,.76);
     border-radius:10px;
     box-shadow:0 3px 8px rgba(0,0,0,.58),inset 0 0 7px rgba(220,166,64,.08);
@@ -1118,31 +1123,31 @@ button:disabled{
 .home-card-secondary .home-card-label{
     align-self:end;
     font-size:10px;
-    line-height:13px;
+    line-height:11px;
 }
 
 .home-card-utility{
     display:grid;
-    grid-template-columns:34px minmax(0,1fr);
+    grid-template-columns:28px minmax(0,1fr);
     align-items:center;
-    height:36px;
+    height:30px;
     overflow:hidden;
-    border:1px solid rgba(139,103,55,.62);
-    border-radius:8px;
-    background:linear-gradient(90deg,rgba(8,7,6,.88),rgba(31,19,11,.72));
-    box-shadow:0 3px 8px rgba(0,0,0,.42);
+    border:1px solid rgba(139,103,55,.4);
+    border-radius:7px;
+    background:rgba(8,7,6,.52);
+    box-shadow:0 2px 5px rgba(0,0,0,.3);
 }
 
 .home-card-utility .home-card-icon{
-    width:34px;
-    height:34px;
-    border-right:1px solid rgba(139,103,55,.5);
+    width:28px;
+    height:28px;
+    border-right:1px solid rgba(139,103,55,.34);
 }
 
 .home-card-utility .home-card-label{
-    padding:0 7px;
+    padding:0 5px;
     font-size:9px;
-    line-height:34px;
+    line-height:28px;
     text-align:left;
 }
 
