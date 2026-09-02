@@ -678,13 +678,16 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
   `css/19-stage-v54-main-city-moderate-native-scale.css` 與
   `js/16-stage-v54-main-city-runtime.js`；`.github/scripts/ci.mjs` 把三者加入正式 release entry
   一致性檢查，之後任何一項漏掉或版本不一致都會令 Repository checks 失敗。
-- 不可變 V173.28 commit 在雲端 Chrome 以新鮮資源載入後，主城正確呈現兩個主要入口、左右
-  六個次要入口、兩個工具入口及固定底部導航，證明版面 owner 本身正常；V173.29 的遠端分支
-  驗證需待遠端 `dev` push 後進行。
+- 遠端 V173.29 commit `3275d5a34dee375772bfd5cd5b7203ed9a21f3dc` 與帶版本參數的
+  `dev/index.html?v=173.29` 均已在雲端 Chrome 實際載入：標題及三個主城 owner query 都是
+  V173.29；526.5×936 遊戲畫面內可見兩個主要入口、六個次要入口、兩個工具入口與五個固定
+  底部導航，文件高度同為 936px、無頁面捲動。既有瀏覽器若仍快取無版本參數的舊 `dev` HTML，
+  須改開上述帶版本參數網址或重新整理一次，之後主城 CSS／runtime 會由新 query 隔離舊快取。
 - 本機 Repository checks 全數通過：JavaScript 語法 `166/166`、Node suites `52/52`、靜態
   資源 `383`、HTML ID `287`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
-  runtimes）及 Git 空白／衝突標記均正常。本機 `dev` commit 為 `2c888f8`；安全規則要求
-  使用者明確授權遠端寫入，因此目前尚未 push，`main` 完全未修改。
+  runtimes）及 Git 空白／衝突標記均正常。本機遊戲 commit 為 `2c888f8`；遠端 `dev` 內容
+  commit 為 `3275d5a34dee375772bfd5cd5b7203ed9a21f3dc`，GitHub Actions CI
+  `33583378303` 成功，`main` 完全未修改。
 
 ### 2026-09-02 — V173.28：主城首頁 RPG Lobby 視覺層級重整（dev）
 
