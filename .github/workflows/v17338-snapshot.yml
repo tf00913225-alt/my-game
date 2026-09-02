@@ -1,0 +1,35 @@
+name: V173.38 Source Snapshot
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17338-snapshot.yml
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v17338-dev-source
+          if-no-files-found: error
+          retention-days: 1
+          include-hidden-files: true
+          path: |
+            js
+            tests
+            index.html
+            HANDOFF.md
+            AGENTS.md
+            ARCHITECTURE_RULES.md
+            UI_GUIDELINES.md
+            package.json
+            .github/workflows/ci.yml
+            .github/scripts
