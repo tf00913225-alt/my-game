@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.35)
+ * CURRENT FINAL INTEGRATION SPEC (V173.36)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
@@ -576,7 +576,7 @@ test("duplicate status MISS remains distinct and never cancels landed direct dam
     assert.match(result.logs.join("\n"),/已有【燃燒】，新的【燃燒】MISS。/);
 });
 
-test("accuracy, enemy Rage, monster shields and Stealth use their formal state rules",()=>{
+test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         Object.assign(player,{spirit:10,activeBuffs:[]});
@@ -611,24 +611,27 @@ test("accuracy, enemy Rage, monster shields and Stealth use their formal state r
 
         const elite={
             name:"天兵天將",element:"wind",v141Abyss:true,alive:true,
-            hp:100,maxHP:100,sp:100,maxSP:100,skillChance:1,activeBuffs:[],statusEffects:[]
+            hp:100,maxHP:100,sp:100,maxSP:100,evasion:20,skillChance:1,activeBuffs:[],statusEffects:[]
         };
         monsters.splice(0,monsters.length,elite);
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
         battleToken=91;turn=4;
-        const stealthCast=v155ResolveWindEliteStealth(0,true);
+        const dodgeCast=v155ResolveWindEliteDodge(0,true);
         return {
             playerAccuracyMultiplier:playerAccuracy/basePlayerAccuracy,
             monsterAccuracy:monsterAccuracy,rage:rage,shield:shield,
-            stealthCast:stealthCast,stealth:elite.activeBuffs.find(buff=>buff.type==="stealthSkill"),
-            stealthExpires:elite.v155MonsterStealth&&elite.v155MonsterStealth.expiresTurn
+            dodgeCast:dodgeCast,evasion:elite.evasion,
+            dodge:elite.activeBuffs.find(buff=>buff.type==="dodgeSkill"),
+            dodgeExpires:elite.v155WindDodge&&elite.v155WindDodge.expiresTurn,
+            hasStealth:elite.activeBuffs.some(buff=>buff.type==="stealthSkill"||buff.statusName==="隱身")
         };
     })()`);
     assert.deepEqual(result,{
         playerAccuracyMultiplier:1.5,monsterAccuracy:150,rage:{chance:25,damage:50},
         shield:{first:100,second:0,statusName:"岩盾",remaining:37,turnsLeft:2},
-        stealthCast:true,stealth:{type:"stealthSkill",v141BuffType:"stealth",statusName:"隱身",turnsLeft:3},
-        stealthExpires:7
+        dodgeCast:true,evasion:80,
+        dodge:{type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:3,statusName:"風行"},
+        dodgeExpires:7,hasStealth:false
     });
 });
 
@@ -985,12 +988,12 @@ test("Abyss floors one through five keep exact compositions, skill levels and ad
         "天兵天將","天兵天將","天兵天將","天兵天將","天兵天將"]);
     assert.deepEqual(final.ranks,["boss","boss","boss","boss","boss","elite","elite","elite","elite","elite"]);
     assert.deepEqual(final.elements,["earth","wind","light","water","fire","water","earth","fire","wind","water"]);
-    assert.deepEqual(final.forceLevels,[5,5,5,5,5,4,4,4,4,4]);
+    assert.deepEqual(final.forceLevels,[5,5,5,5,5,5,5,5,5,5]);
     assert.deepEqual(final.extraHP,[10000,10000,10000,10000,10000,3500,3500,3500,3500,3500]);
-    assert.deepEqual(final.skills.slice(0,5),[["dustStorm","stoneBreakSky"],["windHowlLightning","stormRain","stormSpell"],[],
-        ["iceArrowRain","freeze"],["phoenixCry","dragonSlash"]]);
-    assert.deepEqual(final.supports.slice(0,5),[["barrier"],[],["yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"],["healSpell"],["rage"]]);
-    assert.deepEqual(final.skills.slice(5),[[],["stoneBreakSky"],["phoenixCry"],[],[]]);
+    assert.deepEqual(final.skills.slice(0,5),[["dustStorm","stoneBreakSky"],["windHowlLightning","stormRain"],[],
+        ["iceArrowRain"],["dragonSlash","flameTornado"]]);
+    assert.deepEqual(final.supports.slice(0,5),[["earthShield"],["dinghaishenzhen"],["yuanZuBlessing"],["revive","healSpell"],["rage"]]);
+    assert.deepEqual(final.skills.slice(5),[[],["stoneBreakSky"],["flameTornado"],[],[]]);
     assert.deepEqual(final.supports.slice(5),[["healSpell"],[],[],["dodgeSkill"],["healSpell"]]);
     assert.deepEqual(final.rows,[0,0,0,0,0,1,1,1,1,1]);
     assert.deepEqual(final.positions,[0,1,2,3,4,0,1,2,3,4]);
@@ -1006,7 +1009,7 @@ test("enemy Heal Spell affects only one same-row trio for both North Emperor and
                 rank:index<5?"boss":"elite",v141Abyss:true,v155FinalAbyss:true,alive:true,
                 hp:(index>=1&&index<=3)?100:900,maxHP:1000,sp:1000,maxSP:1000,
                 activeBuffs:[],statusEffects:[],v141FormationRow:index<5?0:1,v141FormationPosition:index%5,
-                v141SupportSkillIds:index===3?["healSpell"]:[],v141ForceSkillLevel:index===3?5:4,skillChance:1});
+                v141SupportSkillIds:index===3?["revive","healSpell"]:[],v141ForceSkillLevel:5,skillChance:1});
             currentBattleMonsters.push(index);
         }
         updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
@@ -1017,13 +1020,64 @@ test("enemy Heal Spell affects only one same-row trio for both North Emperor and
 
         monsters.forEach((monster,index)=>{ monster.hp=(index>=6&&index<=8)?100:1000;monster.sp=1000;monster.v141SupportSkillIds=[]; });
         monsters[5].v141SupportSkillIds=["healSpell"];
-        monsters[5].v141ForceSkillLevel=4;
+        monsters[5].v141ForceSkillLevel=5;
         const beforeElite=monsters.map(monster=>monster.hp);
         const elite=v141TryMonsterSpecialAction(5);
         const eliteChanged=monsters.map((monster,index)=>monster.hp!==beforeElite[index]?index:null).filter(index=>index!==null);
         return {north:north,northChanged:northChanged,elite:elite,eliteChanged:eliteChanged};
     })()`);
     assert.deepEqual(result,{north:true,northChanged:[1,2,3],elite:true,eliteChanged:[6,7,8]});
+});
+
+test("North Emperor prioritizes maximum-level Revive for a defeated boss",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        monsters.splice(0,monsters.length,
+            {name:"東帝天尊",rank:"boss",v141Abyss:true,v155FinalAbyss:true,alive:false,hp:0,maxHP:1000,sp:0,maxSP:1000,activeBuffs:[],statusEffects:[]},
+            {name:"天帝天尊",rank:"boss",v141Abyss:true,v155FinalAbyss:true,alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,activeBuffs:[],statusEffects:[]},
+            {name:"極帝天尊",rank:"boss",v141Abyss:true,v155FinalAbyss:true,alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,activeBuffs:[],statusEffects:[]},
+            {name:"北帝天尊",rank:"boss",v141Abyss:true,v155FinalAbyss:true,alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,v141ForceSkillLevel:5,activeBuffs:[],statusEffects:[],skillChance:1},
+            {name:"天兵天將",rank:"elite",v141Abyss:true,v155FinalAbyss:true,alive:false,hp:0,maxHP:1000,sp:0,maxSP:1000,activeBuffs:[],statusEffects:[]}
+        );
+        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);
+        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
+        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};
+        const cast=v155ResolveNorthSupport(3,true);
+        return {cast:cast,boss:{alive:monsters[0].alive,hp:monsters[0].hp},elite:{alive:monsters[4].alive,hp:monsters[4].hp}};
+    })()`);
+    assert.deepEqual(result,{cast:true,boss:{alive:true,hp:1000},elite:{alive:false,hp:0}});
+});
+
+test("East Earth Shield and Heaven Calm use their assigned formal support values",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const names=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
+        monsters.splice(0,monsters.length,...names.map((name,index)=>({
+            name:name,rank:"boss",element:index===0?"earth":index===1?"wind":"light",
+            v141Abyss:true,v155FinalAbyss:true,alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,
+            resistance:0,evasion:0,skillChance:1,activeBuffs:[],statusEffects:[],
+            v141FormationRow:0,v141FormationPosition:index
+        })));
+        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);
+        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
+        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};
+        const earth=v155ResolveEastEarthShield(0,true);
+        const calm=v155ResolveHeavenCalm(1,true);
+        return {
+            earth:earth,calm:calm,
+            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,
+            calmTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="氣定神閒")).length,
+            earthBuff:monsters[0].activeBuffs.find(buff=>buff.statusName==="萬象土盾"),
+            calmBuff:monsters[0].v141TeamBuffs.find(buff=>buff.statusName==="氣定神閒")
+        };
+    })()`);
+    assert.equal(result.earth,true);
+    assert.equal(result.calm,true);
+    assert.equal(result.earthTargets,2);
+    assert.equal(result.calmTargets,5);
+    assert.deepEqual(result.earthBuff,{type:"earthShield",v141BuffType:"earthShield",turnsLeft:3,percent:50,statusName:"萬象土盾"});
+    assert.deepEqual(result.calmBuff,{type:"resistance",turnsLeft:3,amount:65,accuracyBonusPercent:50,statusName:"氣定神閒",
+        displayBuff:{type:"v141TeamBuff",v141BuffType:"resistance",turnsLeft:3,accuracyBonusPercent:50,statusName:"氣定神閒"}});
 });
 
 function prepareExtremeEmperor(context){
@@ -1040,58 +1094,40 @@ function prepareExtremeEmperor(context){
     `,context);
 }
 
-test("the three Extreme Emperor skills settle with the final V155 behavior",()=>{
-    const healRuntime=loadFinalRuntime();
-    prepareExtremeEmperor(healRuntime.context);
-    const heal=evaluateJson(healRuntime.context,`(function(){
-        const ok=v155ResolveExtremeEmperorAction(0,"yuanXiangGuangMing",false);
-        return {ok:ok,allies:monsters.map(monster=>({hp:monster.hp,sp:monster.sp,evasion:monster.evasion,statusEffects:monster.statusEffects}))};
-    })()`);
-    assert.deepEqual(heal,{
-        ok:true,allies:[
-            {hp:650,sp:520,evasion:100,statusEffects:[{type:"burn",turnsLeft:2}]},
-            {hp:550,sp:65,evasion:100,statusEffects:[{type:"stun",turnsLeft:1}]}
-        ]
-    });
-
-    const shieldRuntime=loadFinalRuntime();
-    prepareExtremeEmperor(shieldRuntime.context);
-    const shield=evaluateJson(shieldRuntime.context,`(function(){
-        const ok=v155ResolveExtremeEmperorAction(0,"yuanGuangShield",false);
-        return {ok:ok,sp:monsters[0].sp,shields:monsters.map(monster=>({remaining:monster.v141Shield.remaining,turnsLeft:monster.v141Shield.turnsLeft}))};
-    })()`);
-    assert.deepEqual(shield,{ok:true,sp:460,shields:[{remaining:100,turnsLeft:2},{remaining:100,turnsLeft:2}]});
-
+test("Extreme Emperor carries only Yuan Zu Blessing and settles its final behavior",()=>{
     const blessingRuntime=loadFinalRuntime();
     prepareExtremeEmperor(blessingRuntime.context);
     const blessing=evaluateJson(blessingRuntime.context,`(function(){
         const first=v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",[true,false]);
-        const afterFirst=monsters.map(monster=>({evasion:monster.evasion,statusEffects:monster.statusEffects,
+        const afterFirst=monsters.map(monster=>({hp:monster.hp,sp:monster.sp,evasion:monster.evasion,statusEffects:monster.statusEffects,
             turnsLeft:monster.v155EvasionBlessing.displayBuff.turnsLeft}));
         monsters[0].sp=500;
         const second=v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",[false,true]);
-        return {first:first,second:second,afterFirst:afterFirst,
-            afterSecond:monsters.map(monster=>({evasion:monster.evasion,statusEffects:monster.statusEffects,
-                blessings:monster.activeBuffs.filter(buff=>buff.v141BuffType==="dodge").length}))};
+        const rejectedFormerSkills=[
+            v155ResolveExtremeEmperorAction(0,"yuanXiangGuangMing",false),
+            v155ResolveExtremeEmperorAction(0,"yuanGuangShield",false)
+        ];
+        return {first:first,second:second,rejectedFormerSkills:rejectedFormerSkills,afterFirst:afterFirst,
+            afterSecond:monsters.map(monster=>({hp:monster.hp,sp:monster.sp,evasion:monster.evasion,statusEffects:monster.statusEffects,
+                blessings:monster.activeBuffs.filter(buff=>buff.statusName==="元祖賜福").length}))};
     })()`);
     assert.deepEqual(blessing,{
-        first:true,second:true,
+        first:true,second:true,rejectedFormerSkills:[false,false],
         afterFirst:[
-            {evasion:85,statusEffects:[],turnsLeft:2},
-            {evasion:85,statusEffects:[{type:"stun",turnsLeft:1}],turnsLeft:2}
+            {hp:600,sp:555,evasion:85,statusEffects:[],turnsLeft:2},
+            {hp:500,sp:110,evasion:85,statusEffects:[{type:"stun",turnsLeft:1}],turnsLeft:2}
         ],
         afterSecond:[
-            {evasion:85,statusEffects:[],blessings:1},
-            {evasion:85,statusEffects:[{type:"stun",turnsLeft:1}],blessings:1}
+            {hp:700,sp:555,evasion:85,statusEffects:[],blessings:1},
+            {hp:600,sp:210,evasion:85,statusEffects:[],blessings:1}
         ]
     });
 
-    const data=healRuntime.skills;
+    const data=blessingRuntime.skills;
     assert.deepEqual(
-        [data.yuanXiangGuangMing.spCost,data.yuanXiangGuangMing.baseHeal,data.yuanXiangGuangMing.baseHealSP,
-            data.yuanGuangShield.spCost,data.yuanGuangShield.shieldAmount,data.yuanGuangShield.shieldDuration,
-            data.yuanZuBlessing.spCost,data.yuanZuBlessing.cleanseChance,data.yuanZuBlessing.evasionBonusPercent,data.yuanZuBlessing.duration],
-        [35,150,55,40,100,2,45,25,35,2]
+        [data.yuanZuBlessing.spCost,data.yuanZuBlessing.baseHeal,data.yuanZuBlessing.baseHealSP,
+            data.yuanZuBlessing.cleanseChance,data.yuanZuBlessing.evasionBonusPercent,data.yuanZuBlessing.duration],
+        [45,100,100,35,35,2]
     );
     assert.equal(data.yuanZuBlessing.agilityBonusPercent,undefined);
 });
