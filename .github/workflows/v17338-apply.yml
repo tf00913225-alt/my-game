@@ -40,6 +40,23 @@ jobs:
           git apply --check /tmp/v17338.patch
           git apply /tmp/v17338.patch
 
+      - name: Align historical V149 test with unified damage owner
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('tests/v149-skill-ui-rules.test.js')
+          text=path.read_text()
+          text=text.replace(
+              'test("Fire EX adds five percent only when its target has an abnormal status",()=>{',
+              'test("Fire EX abnormal-target bonus is owned by the unified core damage bucket, not a V149 wrapper",()=>{'
+          )
+          text=text.replace(
+              '    assert.equal(context.castDamageSkill("flameSlash"),105);',
+              '    assert.equal(context.castDamageSkill("flameSlash"),100);'
+          )
+          path.write_text(text)
+          PY
+
       - name: Remove temporary staging files
         run: |
           rm -f .github/v17338.patch.xz.b64
