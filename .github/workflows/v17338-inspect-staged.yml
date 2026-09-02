@@ -5,6 +5,7 @@ on:
     branches: [dev]
     paths:
       - .github/workflows/v17338-inspect-staged.yml
+      - .github/v17338.patch.xz.b64
 
 permissions:
   contents: read
@@ -22,6 +23,7 @@ jobs:
           base64 -d .github/v17338.patch.xz.b64 | xz -d > /tmp/v17338.patch
           git apply --check /tmp/v17338.patch
           git apply --stat /tmp/v17338.patch
+          sha256sum /tmp/v17338.patch
           cp /tmp/v17338.patch v17338.patch
       - uses: actions/upload-artifact@v4
         with:
