@@ -589,8 +589,8 @@ test("V140 remains before the ordered V141/V142 layers and both cache keys are b
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.27"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.27/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.28"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.28/);
 });
 
 console.log("\nV140 four-element balance suite: "+passed+" tests passed.");

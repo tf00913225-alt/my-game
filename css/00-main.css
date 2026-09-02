@@ -832,238 +832,318 @@ button:disabled{
    加金色光暈。
 */
 
-#homePage h2{
+/* Main-city lobby HUD: compact identity and existing resources. */
+.home-city-hud{
+    position:relative;
+    z-index:3;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px;
+    align-items:center;
+    min-height:50px;
+    margin:5px 10px 0;
+    padding:4px 7px;
+    border-top:1px solid rgba(224,177,80,.9);
+    border-bottom:1px solid rgba(132,85,32,.78);
+    background:
+        linear-gradient(90deg,rgba(8,7,6,.88),rgba(27,17,10,.78) 52%,rgba(8,7,6,.86));
+    box-shadow:
+        0 4px 13px rgba(0,0,0,.45),
+        inset 0 0 14px rgba(217,157,49,.08);
+}
+
+.home-hud-identity,
+.home-hud-side{
+    min-width:0;
+}
+
+.home-hud-identity{
+    display:grid;
+    gap:3px;
+    align-content:center;
+}
+
+.home-hud-kicker,
+.home-hud-character-line,
+.home-hud-resources,
+.home-test-tools{
     display:flex;
     align-items:center;
-    justify-content:center;
-    gap:14px;
-
-    position:relative;
-    z-index:2;
-
-    /*
-       ★ 修正（依照使用者要求，「主城
-       選單固定，不要捲動」）：上下margin/
-       padding都再收窄一點，替下面的
-       8宮格多省一點垂直空間。
-    */
-
-    margin:8px auto 0;
-    padding:6px 20px;
-
-    max-width:280px;
-
-    font-size:18px;
-    color:#f5dfa0;
-
-    text-shadow:
-        0 0 8px rgba(240,180,41,.7),
-        0 2px 3px rgba(0,0,0,.8);
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(30,22,12,.75),
-            rgba(18,13,8,.75)
-        );
-
-    border-top:2px solid #f0b429;
-    border-bottom:2px solid #f0b429;
-
-    box-shadow:
-        0 0 14px rgba(240,180,41,.35),
-        inset 0 0 10px rgba(240,180,41,.12);
 }
 
-#homePage h2::before,
-#homePage h2::after{
-    content:"";
-    flex:0 0 26px;
-    height:14px;
-
-    background:
-
-        linear-gradient(
-            90deg,
-            transparent,
-            #f0b429 45%,
-            transparent
-        );
-
-    position:relative;
+.home-hud-kicker{
+    gap:6px;
+    color:#c99a43;
+    font-family:"Noto Serif TC",serif;
+    font-size:8px;
+    font-weight:900;
+    letter-spacing:.16em;
+    line-height:1;
+    white-space:nowrap;
 }
 
-#homePage h2::before{
-
-    clip-path:polygon(
-        0% 50%, 60% 0%, 100% 50%, 60% 100%
-    );
-
+.home-hud-character-line{
+    gap:6px;
+    min-width:0;
 }
 
-#homePage h2::after{
-
-    clip-path:polygon(
-        100% 50%, 40% 0%, 0% 50%, 40% 100%
-    );
-
+.home-hud-character-line strong{
+    overflow:hidden;
+    color:#f7e4b4;
+    font-family:"Noto Serif TC",serif;
+    font-size:15px;
+    line-height:19px;
+    text-overflow:ellipsis;
+    text-shadow:0 1px 3px #000,0 0 8px rgba(222,166,70,.22);
+    white-space:nowrap;
 }
 
-/*
-   ★ 新增：主城純文字選單。
-   font-family特別把「標楷體」（Windows）跟
-   「BiauKai」（macOS）都列進去，兩種系統
-   都能正確顯示楷書字體，抓不到的話才會
-   退回serif字體。
-   -webkit-text-stroke做出「白字黑框」的
-   效果（黑色描邊、白色填色），純文字、
-   完全沒有任何方塊背景或邊框線條，
-   符合「不要有框框線條」的要求。
-*/
+.home-hud-character-line > span{
+    flex:0 0 auto;
+    color:#d9ba78;
+    font-size:10px;
+    font-weight:800;
+    white-space:nowrap;
+}
 
-/*
-   ★ 修正（依照使用者要求，改成參考圖那種
-   方塊卡片版面，取代原本的純文字選單）：
-   4欄×2列的網格，8張卡片。每張卡片：
-   上面是空的方形圖示區塊（使用者會自己
-   準備icon圖片，之後直接對id設定
-   background-image就能放進去，不用再動
-   HTML結構或這裡的CSS），下面緊貼著一條
-   深紅底金字的標籤（.home-card-label跟
-   .home-card-icon中間margin是0，完全貼合，
-   符合「文字緊貼著框框下面」的要求）。
-*/
+.home-hud-side{
+    display:grid;
+    gap:3px;
+    justify-items:end;
+}
 
+.home-hud-resources{
+    justify-content:flex-end;
+    gap:4px;
+}
+
+.home-hud-resources > span{
+    display:flex;
+    align-items:baseline;
+    gap:3px;
+    min-width:0;
+    padding:3px 5px;
+    border:1px solid rgba(139,101,48,.48);
+    border-radius:999px;
+    background:rgba(4,4,3,.56);
+    color:#bca77a;
+    font-size:8px;
+    line-height:10px;
+    white-space:nowrap;
+}
+
+.home-hud-resources b{
+    display:inline-block;
+    max-width:64px;
+    overflow:hidden;
+    color:#ffe093;
+    font-size:9px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/* V92 DEV shortcuts remain functional but deliberately recede from the lobby. */
+.home-test-tools{
+    justify-content:flex-end;
+    gap:3px;
+    max-width:218px;
+    margin:0;
+}
+
+.home-test-label{
+    color:#8d816c;
+    font:700 7px/1 Arial,sans-serif;
+    letter-spacing:.12em;
+}
+
+.home-test-button{
+    min-width:0;
+    height:20px;
+    padding:0 5px;
+    border:1px solid rgba(114,92,58,.42);
+    border-radius:4px;
+    background:rgba(11,10,8,.72);
+    color:#9f947d;
+    font-size:7px;
+    font-weight:700;
+    line-height:18px;
+    box-shadow:none;
+    opacity:.78;
+}
+
+.home-test-button b{color:#bda66f;}
+.home-test-button:active,
+.home-test-button.active{
+    border-color:#b8893e;
+    color:#e1c989;
+    opacity:1;
+}
+
+/* RPG lobby hierarchy: two hero entrances, two side rails, two utilities. */
 .home-card-grid{
     position:relative;
     z-index:2;
+    display:flex;
+    flex:0 0 auto;
+    flex-direction:column;
+    gap:4px;
+    padding:5px 10px 4px;
+}
 
+.home-primary-actions{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:8px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
 
-    padding:10px 10px;
+.home-secondary-actions{
+    display:grid;
+    grid-template-columns:repeat(2,64px);
+    grid-template-rows:repeat(3,46px);
+    justify-content:space-between;
+    gap:3px 0;
+    min-height:144px;
+    padding:0 16px;
+}
+
+.home-utility-actions{
+    display:grid;
+    grid-template-columns:minmax(0,146px) minmax(0,92px);
+    justify-content:space-between;
+    gap:10px;
+    padding:0 16px;
 }
 
 .home-card{
-    display:flex;
-    flex-direction:column;
-
-    border-radius:8px;
-    overflow:hidden;
-
-    border:1px solid #8a6a3a;
-
-    box-shadow:
-        0 3px 8px rgba(0,0,0,.5);
-
+    position:relative;
+    min-width:0;
+    margin:0;
+    padding:0;
+    appearance:none;
+    color:inherit;
+    font:inherit;
     cursor:pointer;
-
     -webkit-tap-highlight-color:transparent;
-
-    transition:transform .12s ease;
+    -webkit-touch-callout:none;
+    transition:transform .12s ease,filter .12s ease;
 }
 
 .home-card:active{
-    transform:scale(.94);
+    filter:brightness(1.1);
+    transform:scale(.96);
 }
 
-/*
-   ★ 修正（依照使用者要求，「主城選單
-   固定，不要捲動」）：
-   原本aspect-ratio:1/1會讓圖示格的
-   高度隨螢幕寬度變化，寬螢幕時圖示格
-   會被拉得很高，容易讓整個8宮格超出
-   一個畫面高度、只能靠捲動才看得到
-   全部。改成固定高度56px，不管螢幕
-   多寬，格線的總高度都是可預期的，
-   確保關掉捲動之後8張卡片還是能完整
-   塞進畫面。
-*/
+.home-card:focus-visible{
+    outline:2px solid #f1c55e;
+    outline-offset:2px;
+}
 
 .home-card-icon{
-    height:56px;
-
-    background:
-        linear-gradient(160deg,#241c12,#15100a);
-
-    background-size:cover;
+    display:block;
+    background-color:#080705;
     background-position:center;
-
-    border-bottom:1px solid #8a6a3a;
-
-    /*
-       ★ 修正（依照使用者回報，「合成icon
-       會反白，是瀏覽器關係嗎」）：
-       查證過圖片本身、background-color都
-       沒問題，真正原因是手機瀏覽器（尤其
-       三星瀏覽器）點擊時的預設「按下閃白」
-       效果——.home-card本身雖然已經設了
-       -webkit-tap-highlight-color:
-       transparent，但這個屬性不一定會
-       完整套用到子層的背景圖片上，圖示格
-       這裡直接也加一份，確保按下去不會
-       閃白。
-    */
-
+    background-repeat:no-repeat;
+    background-size:cover;
     -webkit-tap-highlight-color:transparent;
     -webkit-touch-callout:none;
 }
 
 .home-card-label{
-    padding:5px 2px;
-
+    color:#f5d67f;
+    font-family:"Noto Serif TC","標楷體","BiauKai",serif;
+    font-weight:900;
     text-align:center;
-
-    font-family:
-        "標楷體",
-        "DFKai-SB",
-        "BiauKai",
-        "KaiTi",
-        serif;
-
-    font-size:12px;
-    font-weight:bold;
-
-    color:#ffe27a;
-
-    background:
-        linear-gradient(180deg,#5a1a12,#2e0d09);
-
-    text-shadow:
-        0 1px 2px rgba(0,0,0,.8);
-
-    -webkit-tap-highlight-color:transparent;
-    -webkit-touch-callout:none;
+    text-shadow:0 1px 3px #000,0 0 7px rgba(229,178,71,.2);
+    white-space:nowrap;
 }
 
-/* V92：主城開發測試快捷鍵，維持固定頁面不產生額外 scrollHeight。 */
-.home-test-tools{
-    position:relative;
+.home-card-primary{
+    height:96px;
+    overflow:hidden;
+    border:1px solid rgba(222,170,70,.9);
+    border-radius:11px;
+    background:#0b0906;
+    box-shadow:
+        0 5px 13px rgba(0,0,0,.55),
+        0 0 10px rgba(224,169,64,.14),
+        inset 0 0 0 1px rgba(255,225,151,.08);
+}
+
+.home-card-primary::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    background:linear-gradient(180deg,transparent 48%,rgba(5,4,3,.34) 66%,rgba(24,8,5,.92) 100%);
+    pointer-events:none;
+}
+
+.home-card-primary .home-card-icon{
+    position:absolute;
+    inset:0;
+}
+
+.home-card-primary .home-card-label{
+    position:absolute;
+    right:0;
+    bottom:0;
+    left:0;
     z-index:2;
+    padding:7px 4px 8px;
+    font-size:15px;
+    line-height:18px;
+    letter-spacing:.12em;
+}
+
+.home-card-secondary{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:6px;
-    margin:7px 10px 0;
+    grid-template-rows:33px 13px;
+    justify-items:center;
+    width:64px;
+    height:46px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    box-shadow:none;
 }
-.home-test-button{
-    min-width:0;
+
+.home-card-secondary .home-card-icon{
+    width:33px;
+    height:33px;
+    border:1px solid rgba(198,151,65,.76);
+    border-radius:10px;
+    box-shadow:0 3px 8px rgba(0,0,0,.58),inset 0 0 7px rgba(220,166,64,.08);
+}
+
+.home-card-secondary .home-card-label{
+    align-self:end;
+    font-size:10px;
+    line-height:13px;
+}
+
+.home-card-utility{
+    display:grid;
+    grid-template-columns:34px minmax(0,1fr);
+    align-items:center;
+    height:36px;
+    overflow:hidden;
+    border:1px solid rgba(139,103,55,.62);
+    border-radius:8px;
+    background:linear-gradient(90deg,rgba(8,7,6,.88),rgba(31,19,11,.72));
+    box-shadow:0 3px 8px rgba(0,0,0,.42);
+}
+
+.home-card-utility .home-card-icon{
+    width:34px;
     height:34px;
-    padding:0 6px;
-    border:1px solid #8a6a3a;
-    border-radius:6px;
-    background:linear-gradient(180deg,rgba(36,28,18,.94),rgba(16,12,8,.96));
-    color:#e8d7a4;
-    font-size:11px;
-    font-weight:700;
-    box-shadow:0 2px 5px rgba(0,0,0,.35);
+    border-right:1px solid rgba(139,103,55,.5);
 }
-.home-test-button b{
-    color:#ffe27a;
-}
-.home-test-button.active{
-    border-color:#f0b429;
-    box-shadow:0 0 8px rgba(240,180,41,.32);
+
+.home-card-utility .home-card-label{
+    padding:0 7px;
+    font-size:9px;
+    line-height:34px;
+    text-align:left;
 }
 
 .home-gold-display{

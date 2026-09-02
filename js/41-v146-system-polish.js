@@ -468,14 +468,25 @@
         const page=document.getElementById("homePage");
         const grid=page&&page.querySelector(".home-card-grid");
         if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return; }
+        const partyIndexes=getExistingPartyIndexes();
+        const primaryCharacter=partyIndexes.length?getPartyCharacterByIndex(partyIndexes[0]):null;
+        const hudName=document.getElementById("homeHudCharacterName");
+        const hudLevel=document.getElementById("homeHudCharacterLevel");
+        const hudGold=document.getElementById("homeHudGoldValue");
+        const hudExp=document.getElementById("homeHudExpValue");
+        if(hudName){ hudName.textContent=primaryCharacter&&primaryCharacter.id||"江湖俠客"; }
+        if(hudLevel){ hudLevel.textContent="Lv."+Math.max(1,Math.floor(numeric(primaryCharacter&&primaryCharacter.level)||1)); }
+        if(hudGold){ hudGold.textContent=Math.floor(numeric(typeof gold!=="undefined"?gold:0)).toLocaleString("zh-TW"); }
+        if(hudExp){ hudExp.textContent=Math.floor(numeric(typeof sharedExp!=="undefined"?sharedExp:0)).toLocaleString("zh-TW"); }
         let roster=document.getElementById("v146HomeRoster");
         if(!roster){
             roster=document.createElement("section");
             roster.id="v146HomeRoster";
             roster.className="v146-home-roster";
+            roster.setAttribute("aria-label","冒險隊伍");
             grid.insertAdjacentElement("afterend",roster);
         }
-        const cards=getExistingPartyIndexes().map(index=>{
+        const cards=partyIndexes.map(index=>{
             const character=getPartyCharacterByIndex(index);
             const stats=getPartyBattleStats(index);
             if(!character||!stats){ return ""; }
@@ -485,12 +496,12 @@
             const spPercent=numeric(stats.maxSP)>0?sp/numeric(stats.maxSP)*100:0;
             const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
             return '<article class="v146-home-character" data-element="'+escapeHtml(character.element||"fire")+'">'+
-                '<img src="'+escapeHtml(artwork)+'" alt="'+escapeHtml(character.id||"角色")+'頭像">'+
+                '<div class="v146-home-avatar"><img src="'+escapeHtml(artwork)+'" alt="'+escapeHtml(character.id||"角色")+'頭像"></div>'+
                 '<div class="v146-home-character-main"><div><b>'+escapeHtml(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(numeric(character.level)||1))+'</span></div>'+
                 '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(numeric(stats.maxHP))+'</strong></div>'+
                 '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(numeric(stats.maxSP))+'</strong></div></div></article>';
         }).join("");
-        roster.innerHTML='<header><b>冒險隊伍</b><span>金幣 '+Math.floor(numeric(typeof gold!=="undefined"?gold:0)).toLocaleString("zh-TW")+'</span></header>'+cards;
+        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 3</span></header>'+cards;
     }
 
     /* ----- Synthesis step 2 is retired; equipment output is always ordinary. ----- */

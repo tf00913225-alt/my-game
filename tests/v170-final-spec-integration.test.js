@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.27)
+ * CURRENT FINAL INTEGRATION SPEC (V173.28)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
@@ -641,7 +641,7 @@ test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once pe
     assert.deepEqual(result,{combined:83.75,capped:85,blocked:[true,true,true],remaining:4});
 });
 
-test("player agility and default monster level use the V173.27 evasion rules",()=>{
+test("player agility and default monster level use the V173.28 evasion rules",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         Object.assign(player,{
