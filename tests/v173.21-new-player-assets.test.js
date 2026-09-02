@@ -78,11 +78,11 @@ test("both patrol fight frames point to the newly supplied images",()=>{
     assert.match(main,/const PATROL_FIGHT2_B64="assets\/battle\/patrol-fight-2-v173\.21\.webp";/);
 });
 
-test("the development release and cache advance to V173.30",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.30"/);
-    assert.match(index,/<title>四象江湖傳 V173\.30<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.30"[\s\S]*?>V173\.30<\/div>/);
-    assert.match(index,/css\/25-stage-v90-quest-interface-core\.css\?v=173\.30/);
+test("the development release and cache advance to V173.31",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.31"/);
+    assert.match(index,/<title>四象江湖傳 V173\.31<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.31"[\s\S]*?>V173\.31<\/div>/);
+    assert.match(index,/css\/25-stage-v90-quest-interface-core\.css\?v=173\.31/);
 });
 
-console.log("\n"+passed+" V173.30 new-player and supplied-asset tests passed.");
+console.log("\n"+passed+" V173.31 new-player and supplied-asset tests passed.");

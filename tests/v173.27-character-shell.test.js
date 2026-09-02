@@ -100,11 +100,11 @@ test("long character tabs retain the canonical internal scroll owner",()=>{
     assert.match(finalCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
 });
 
-test("the development release advances to V173.30",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.30"/);
-    assert.match(index,/<title>四象江湖傳 V173\.30<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.30"/);
-    assert.match(index,/>V173\.30<\/div>/);
+test("the development release advances to V173.31",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.31"/);
+    assert.match(index,/<title>四象江湖傳 V173\.31<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.31"/);
+    assert.match(index,/>V173\.31<\/div>/);
 });
 
-console.log("\n"+passed+" V173.30 character-shell regression tests passed.");
+console.log("\n"+passed+" V173.31 character-shell regression tests passed.");

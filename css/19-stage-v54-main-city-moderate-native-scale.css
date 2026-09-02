@@ -1,6 +1,6 @@
 
 /* V54 historical city scale bridge.
-   V173.30 keeps the lobby's explicit primary, secondary and utility typography
+   V173.31 keeps the lobby's explicit primary, secondary and utility typography
    in css/00-main.css, so this file must not flatten every entrance back to one
    inline-equivalent size. Bottom navigation and battle remain untouched. */
 

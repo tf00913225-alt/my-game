@@ -18,8 +18,9 @@
     function formatHomeResourceValue(value){
         const whole=Math.max(0,Math.floor(numeric(value)));
         if(whole>=100000000){
-            const compact=Math.floor(whole/1000000)/100;
-            return compact.toFixed(2).replace(/\.?0+$/g,"")+"億";
+            const compact=whole/100000000;
+            const precision=compact>=10?1:2;
+            return compact.toFixed(precision).replace(/\.?0+$/g,"")+"億";
         }
         if(whole>=10000){ return Math.floor(whole/10000)+"萬"; }
         return whole.toLocaleString("zh-TW");
@@ -487,14 +488,24 @@
         const page=document.getElementById("homePage");
         const grid=page&&page.querySelector(".home-card-grid");
         if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return; }
-        const partyIndexes=getExistingPartyIndexes();
-        const primaryCharacter=partyIndexes.length?getPartyCharacterByIndex(partyIndexes[0]):null;
-        const hudName=document.getElementById("homeHudCharacterName");
-        const hudLevel=document.getElementById("homeHudCharacterLevel");
+        const partyIndexes=getExistingPartyIndexes().slice(0,3);
+        const hudCharacters=document.getElementById("homeHudCharacterList");
         const hudGold=document.getElementById("homeHudGoldValue");
         const hudExp=document.getElementById("homeHudExpValue");
-        if(hudName){ hudName.textContent=primaryCharacter&&primaryCharacter.id||"江湖俠客"; }
-        if(hudLevel){ hudLevel.textContent="Lv."+Math.max(1,Math.floor(numeric(primaryCharacter&&primaryCharacter.level)||1)); }
+        if(hudCharacters){
+            hudCharacters.innerHTML=partyIndexes.map((index,position)=>{
+                const character=getPartyCharacterByIndex(index);
+                if(!character){ return ""; }
+                const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
+                const firstNameId=position===0?' id="homeHudCharacterName"':"";
+                const firstLevelId=position===0?' id="homeHudCharacterLevel"':"";
+                const avatar=artwork?'<img src="'+escapeHtml(artwork)+'" alt="">':"";
+                return '<div class="home-hud-character-row" data-element="'+escapeHtml(character.element||"fire")+'">'+
+                    '<span class="home-hud-character-avatar" aria-hidden="true">'+avatar+'</span>'+
+                    '<strong'+firstNameId+'>'+escapeHtml(character.id||("角色"+(index+1)))+'</strong>'+
+                    '<span'+firstLevelId+'>Lv.'+Math.max(1,Math.floor(numeric(character.level)||1))+'</span></div>';
+            }).join("");
+        }
         syncHomeResourceValue(hudGold,typeof gold!=="undefined"?gold:0);
         syncHomeResourceValue(hudExp,typeof sharedExp!=="undefined"?sharedExp:0);
         let roster=document.getElementById("v146HomeRoster");
