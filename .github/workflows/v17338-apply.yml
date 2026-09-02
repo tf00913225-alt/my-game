@@ -25,15 +25,29 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Apply staged V173.38 patch
+      - name: Rebuild and verify staged V173.38 patch
         run: |
-          base64 -d .github/v17338.patch.xz.b64 | xz -d > /tmp/v17338.patch
+          cat \
+            .github/v17338.patch.part00 \
+            .github/v17338.patch.part01 \
+            .github/v17338.patch.rem0 \
+            .github/v17338.patch.rem1 \
+            .github/v17338.patch.rem2 \
+            > /tmp/v17338.patch.xz.b64
+          echo "d81dd02eab5112600dba452c7ae1a0cd3edd4953e852bc44e46a361446842c77  /tmp/v17338.patch.xz.b64" | sha256sum -c -
+          base64 -d /tmp/v17338.patch.xz.b64 | xz -d > /tmp/v17338.patch
+          echo "eb038e90ddfb209ebcff430a40eb1f506f620db075b2539a5098b655c302bccf  /tmp/v17338.patch" | sha256sum -c -
           git apply --check /tmp/v17338.patch
           git apply /tmp/v17338.patch
 
       - name: Remove temporary staging files
         run: |
           rm -f .github/v17338.patch.xz.b64
+          rm -f .github/v17338.patch.part00
+          rm -f .github/v17338.patch.part01
+          rm -f .github/v17338.patch.rem0
+          rm -f .github/v17338.patch.rem1
+          rm -f .github/v17338.patch.rem2
           rm -f .github/workflows/v17338-snapshot.yml
           rm -f .github/workflows/v17338-apply.yml
 
