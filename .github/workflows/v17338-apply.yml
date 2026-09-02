@@ -1,0 +1,80 @@
+name: V173.38 Apply Damage Model
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17338-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Apply staged V173.38 patch
+        run: |
+          base64 -d .github/v17338.patch.xz.b64 | xz -d > /tmp/v17338.patch
+          git apply --check /tmp/v17338.patch
+          git apply /tmp/v17338.patch
+
+      - name: Remove temporary staging files
+        run: |
+          rm -f .github/v17338.patch.xz.b64
+          rm -f .github/workflows/v17338-snapshot.yml
+          rm -f .github/workflows/v17338-apply.yml
+
+      - name: Check CI script syntax
+        run: node --check .github/scripts/ci.mjs
+
+      - name: Check all JavaScript syntax
+        run: node .github/scripts/ci.mjs syntax
+
+      - name: Ensure ImageMagick dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run all Node suites
+        run: node .github/scripts/ci.mjs tests
+
+      - name: Check resources
+        run: node .github/scripts/ci.mjs resources
+
+      - name: Check HTML IDs
+        run: node .github/scripts/ci.mjs html-ids
+
+      - name: Check loader integrity
+        run: node .github/scripts/ci.mjs loader
+
+      - name: Create final local commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: finalize V173.38 combat damage model"
+
+      - name: Check Git diff rules
+        env:
+          CI_BASE_SHA: ${{ github.sha }}
+        run: |
+          CI_HEAD_SHA="$(git rev-parse HEAD)" node .github/scripts/ci.mjs git-diff
+
+      - name: Push final V173.38 to dev
+        run: git push origin HEAD:dev
