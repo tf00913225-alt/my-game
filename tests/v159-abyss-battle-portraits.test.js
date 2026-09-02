@@ -30,8 +30,8 @@ function load(overrides={}){
 }
 
 test("V159 remains ordered immediately before the final V169 runtimes",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.36"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.36/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.37"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.37/);
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
     const v159=loader.indexOf("js/48-v159-abyss-battle-portraits.js");
     const v169ElementBox=loader.indexOf("js/49-v169-element-box-settings.js");

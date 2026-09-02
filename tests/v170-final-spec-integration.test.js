@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.36)
+ * CURRENT FINAL INTEGRATION SPEC (V173.37)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one

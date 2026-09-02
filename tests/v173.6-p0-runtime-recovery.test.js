@@ -17,7 +17,7 @@ assert.doesNotMatch(v142,/v142PlaySkillAnimationFromBadge/);
 assert.doesNotMatch(main,/v142PlaySkillAnimationFromBadge/);
 assert.doesNotMatch(abyss,/v141ChallengeAbyssBoss=function/);
 assert.match(animation,/water-orb-vfx\.png\?v=173\.19/);
-assert.match(loader,/const V_ASSET_VERSION="173\.36"/);
-assert.match(index,/<title>四象江湖傳 V173\.36<\/title>/);
+assert.match(loader,/const V_ASSET_VERSION="173\.37"/);
+assert.match(index,/<title>四象江湖傳 V173\.37<\/title>/);
 
-console.log("V173.36 P0 known-good animation-chain recovery: 10 tests passed.");
+console.log("V173.37 P0 known-good animation-chain recovery: 10 tests passed.");

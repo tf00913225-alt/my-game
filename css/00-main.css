@@ -859,8 +859,11 @@ button:disabled{
 }
 
 .home-hud-identity{
+    position:relative;
     display:flex;
     align-items:center;
+    align-self:stretch;
+    inset-inline-start:4px;
 }
 
 .home-hud-kicker,
@@ -995,7 +998,7 @@ button:disabled{
     grid-template-columns:repeat(2,86px);
     justify-content:space-between;
     gap:0;
-    padding:0 88px;
+    padding:0 82px;
 }
 
 .home-card{
