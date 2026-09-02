@@ -17,6 +17,7 @@
         "waterKnife","frostPunch","iceSpin","frostCrush","waterBall",
         "floodBeast","iceArrowRain","freeze","healSpell","revive","waterEX"
     ];
+    const WATER_DAMAGE_SKILL_IDS=WATER_SKILL_IDS.slice(0,7);
     const WATER_PREVIEW_SKILL_ID_SET=new Set(WATER_SKILL_IDS.slice(0,8));
     const WATER_SUPPORT_PREVIEW_SKILL_ID_SET=new Set(["healSpell","revive","waterEX"]);
     const STATUS_FIELDS=[
@@ -155,6 +156,9 @@
     }
 
     applyFinalSkillData();
+    if(typeof window.v173ApplyFormalDamageRoleProfiles==="function"){
+        window.v173ApplyFormalDamageRoleProfiles(WATER_DAMAGE_SKILL_IDS);
+    }
 
     /* Final Water/utility values load after the historical talisman sync. */
     if(typeof window.v132GetTalismanDefinition==="function"){

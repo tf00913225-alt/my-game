@@ -114,10 +114,10 @@ test("late runtime files no longer overwrite the four-element skill table",()=>{
         .forEach(id=>assert.match(water,new RegExp("\\b"+id+":\\{"),id));
 });
 
-test("the development cache release is V173.33",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.33"/);
-    assert.match(index,/<title>四象江湖傳 V173\.33<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.33"[\s\S]*?>V173\.33<\/div>/);
+test("the development cache release is V173.34",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.34"/);
+    assert.match(index,/<title>四象江湖傳 V173\.34<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.34"[\s\S]*?>V173\.34<\/div>/);
 });
 
-console.log("\n"+passed+" V173.33 final-request tests passed.");
+console.log("\n"+passed+" V173.34 final-request tests passed.");

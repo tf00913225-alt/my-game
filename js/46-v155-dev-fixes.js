@@ -189,7 +189,13 @@
             }
             save("maxLevel");
             skill.maxLevel=1;
-            [["baseDamage","damagePerLevel"],["baseHeal","healPerLevel"],["baseHealSP","healSPPerLevel"]]
+            [
+                ["baseDamage","damagePerLevel"],
+                ["powerMultiplier","powerPerLevel"],
+                ["flatDamage","flatDamagePerLevel"],
+                ["baseHeal","healPerLevel"],
+                ["baseHealSP","healSPPerLevel"]
+            ]
                 .forEach(keys=>{
                     const baseKey=keys[0],perKey=keys[1];
                     if(!Object.prototype.hasOwnProperty.call(skill,baseKey)){ return; }

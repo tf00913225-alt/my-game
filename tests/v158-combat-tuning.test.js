@@ -52,8 +52,8 @@ function load(overrides={}){
 }
 
 test("V158 and V159 remain ordered before the final V169 runtimes",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.33"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.33/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.34"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.34/);
     assert.match(loader,/css\/47-v158-combat-tuning\.css/);
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
@@ -113,16 +113,11 @@ test("default monster evasion is level times 0.3 capped at 30 without replacing 
     assert.equal(context.makeZoneMonster("高等測試怪",200).evasion,30);
 });
 
-test("damage variance is 95 to 105 percent and uses rounding",()=>{
-    const context=load();
-    context.Math.random=()=>0;
-    assert.equal(context.calculateDamage(100,0,10,10,"fire","fire"),95);
-    context.Math.random=()=>0.5;
-    assert.equal(context.calculateDamage(100,0,10,10,"fire","fire"),100);
-    context.Math.random=()=>0.999999;
-    assert.equal(context.calculateDamage(100,0,10,10,"fire","fire"),105);
-    context.Math.random=()=>0.5;
-    assert.equal(context.calculateDamage(100,350,10,10,"fire","fire"),50);
+test("V158 leaves the shared damage formula owned by the core runtime",()=>{
+    const originalDamage=()=>321;
+    const context=load({calculateDamage:originalDamage});
+    assert.equal(context.calculateDamage,originalDamage);
+    assert.equal(context.calculateDamage(),321);
 });
 
 test("secondary Freeze resolves all three selected formation targets",()=>{

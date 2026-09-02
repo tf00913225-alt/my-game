@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.33)
+ * CURRENT FINAL INTEGRATION SPEC (V173.34)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
@@ -123,6 +123,25 @@ const FINAL_FOUR_ELEMENT_CORE={
     rockWall:[null,null,45,"allyTri",15,null,1,["barrier"]],
     barrier:[null,null,40,"ally",20,null,1,["earthShield"]],
     earthEX:[null,null,null,"none",25,null,1,[]]
+};
+
+const FINAL_DAMAGE_ROLE_PROFILES={
+    single_low:[1.40,.05,0,0],single_normal:[1.75,.075,10,0],single_burst:[2.10,.10,20,0],
+    tri_damage:[1.35,.05,5,0],aoe_damage:[1.10,.05,0,0],
+    single_control:[1.35,.05,0,0],tri_control:[1.20,.04,0,0],aoe_control:[.95,.04,0,0],
+    single_dot:[1.50,.06,5,0],tri_dot:[1.15,.04,0,0],aoe_dot:[.95,.04,0,0]
+};
+
+const FINAL_DAMAGE_SKILL_ROLES={
+    flameSlash:"single_low",fireCritical:"single_normal",explosiveFlurry:"tri_damage",dragonSlash:"single_burst",
+    fireRocket:"tri_dot",blazeSpell:"single_dot",flameTornado:"single_dot",phoenixCry:"aoe_dot",
+    waterKnife:"single_low",frostPunch:"single_normal",iceSpin:"tri_damage",frostCrush:"single_burst",
+    waterBall:"tri_damage",floodBeast:"single_normal",iceArrowRain:"aoe_damage",
+    stormFist:"single_low",stormFlurry:"tri_damage",windCrossSlash:"single_normal",dizzyFist:"single_normal",
+    windSpell:"tri_damage",stormCircle:"tri_damage",windHowlLightning:"single_normal",stormRain:"aoe_damage",
+    stormSpell:"aoe_damage",stoneSlash:"single_low",petrifyFist:"tri_damage",stoneBreakSky:"single_normal",
+    earthquakeCrush:"tri_control",stoneThrow:"tri_damage",sandWind:"tri_damage",
+    flyingSandStrike:"aoe_damage",dustStorm:"single_control"
 };
 
 function extractRuntimePaths(){
@@ -309,9 +328,9 @@ test("all ten wild zones use the exact one-pass curve and the beginner forest st
             return {
                 maxHP:Math.max(1,Math.round((100+monster.vitalityPoints*50)*multiplier)),
                 maxSP:Math.max(1,Math.round((50+monster.energyPoints*15)*multiplier)),
-                attack:Math.max(1,Math.round((10+monster.attackPoints*5)*multiplier)),
-                defense:Math.max(1,Math.round((10+monster.vitalityPoints*15)*multiplier)),
-                magicAttack:Math.max(1,Math.round((monster.intelligencePoints*5)*multiplier))
+                attack:Math.max(1,Math.round((10+monster.attackPoints*8)*multiplier)),
+                defense:Math.max(1,Math.round((10+monster.vitalityPoints*6)*multiplier)),
+                magicAttack:Math.max(1,Math.round((10+monster.intelligencePoints*8)*multiplier))
             };
         }
         function actual(monster){
@@ -655,7 +674,7 @@ test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once pe
     assert.deepEqual(result,{combined:83.75,capped:85,blocked:[true,true,true],remaining:4});
 });
 
-test("player agility and default monster level use the V173.33 evasion rules",()=>{
+test("player agility and default monster level retain the final evasion rules",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         Object.assign(player,{
@@ -1075,6 +1094,218 @@ test("the three Extreme Emperor skills settle with the final V155 behavior",()=>
         [35,150,55,40,100,2,45,25,35,2]
     );
     assert.equal(data.yuanZuBlessing.agilityBonusPercent,undefined);
+});
+
+test("all formal four-element damage skills use one fixed damage-role table",()=>{
+    const runtime=loadFinalRuntime();
+    const profiles=evaluateJson(runtime.context,"v173DamageRoleProfiles");
+    const mapping=evaluateJson(runtime.context,"v173FormalDamageSkillRoles");
+    assert.deepEqual(mapping,FINAL_DAMAGE_SKILL_ROLES);
+    assert.equal(Object.keys(mapping).length,32);
+
+    Object.entries(FINAL_DAMAGE_ROLE_PROFILES).forEach(([role,expected])=>{
+        const profile=profiles[role];
+        assert.deepEqual(
+            [profile.powerMultiplier,profile.powerPerLevel,profile.flatDamage,profile.flatDamagePerLevel],
+            expected,
+            role
+        );
+    });
+
+    Object.entries(mapping).forEach(([skillId,role])=>{
+        const skill=runtime.skills[skillId];
+        assert.ok(skill,skillId);
+        assert.equal(skill.damageRole,role,skillId);
+        assert.deepEqual(
+            [skill.powerMultiplier,skill.powerPerLevel,skill.flatDamage,skill.flatDamagePerLevel],
+            FINAL_DAMAGE_ROLE_PROFILES[role],
+            skillId
+        );
+        assert.equal(typeof skill.baseDamage,"number",skillId+" legacy baseDamage");
+        assert.equal(typeof skill.damagePerLevel,"number",skillId+" legacy damagePerLevel");
+    });
+    const discovered=Object.values(runtime.skills)
+        .filter(skill=>["fire","water","wind","earth"].includes(skill.element))
+        .filter(skill=>skill.category==="physical"||skill.category==="magic")
+        .filter(skill=>typeof skill.baseDamage==="number")
+        .map(skill=>skill.id)
+        .sort();
+    assert.deepEqual(discovered,Object.keys(mapping).sort());
+    assert.equal(runtime.skills.freeze.damageRole,undefined);
+    const monsterOnly=evaluateJson(runtime.context,`(function(){
+        const skill=skillDatabase.fireBurstStrike;
+        return [skill.damageRole,skill.powerMultiplier,skill.powerPerLevel,skill.flatDamage,skill.flatDamagePerLevel];
+    })()`);
+    assert.deepEqual(monsterOnly,["single_normal",1.75,.075,10,0]);
+    assert.doesNotMatch(mainSource,/skillBonusDamage/);
+    ["castDamageSkill","castSecondaryCharacterSkill","castPlayer2Skill","processSingleMonsterAttack"].forEach(name=>{
+        const start=mainSource.indexOf("function "+name+"(");
+        assert.ok(start>=0,name);
+        assert.match(mainSource.slice(start,start+18000),/calculateSkillDamage\(\{/);
+    });
+    assert.doesNotMatch(fs.readFileSync("js/47-v158-combat-tuning.js","utf8"),/calculateDamage\s*=\s*function/);
+});
+
+test("dynamic defense, recalibrated attributes and modern or legacy skills share one core",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Math.random=function(){ return .5; };
+        Object.assign(player,{attack:10,intelligence:10,vitality:10,energy:0,spirit:0,agility:0,bonusHP:0,bonusSP:0});
+        const base=getBaseStats();
+        const monster=makeZoneMonster("比例怪",50,"fire","regular");
+        const target={level:50,element:"fire",defense:0,statusEffects:[]};
+        const modern=calculateSkillDamage({skill:skillDatabase.flameSlash,skillLevel:1,
+            effectiveAttack:100,target:target,targetDefense:0,casterLevel:50,casterElement:"fire"});
+        const legacySkill={baseDamage:30,damagePerLevel:5};
+        const legacy=calculateSkillDamage({skill:legacySkill,skillLevel:3,
+            effectiveAttack:100,target:target,targetDefense:0,casterLevel:50,casterElement:"fire"});
+        return {
+            constants:[20,50,80,100].map(v173GetDamageFormulaConstant),
+            half:[20,50,80,100].map(level=>{
+                const k=v173GetDamageFormulaConstant(level);
+                return calculateDamage(k,k,level,level,"fire","fire");
+            }),
+            base:{maxHP:base.maxHP,attack:base.attack,magicAttack:base.magicAttack,defense:base.defense},
+            monster:{attack:monster.attack,expectedAttack:10+monster.attackPoints*8,
+                magicAttack:monster.magicAttack,expectedMagicAttack:10+monster.intelligencePoints*8,
+                defense:monster.defense,expectedDefense:10+monster.vitalityPoints*6},
+            modern:modern,modernRaw:v173GetSkillRawAttack(skillDatabase.flameSlash,1,100),
+            legacy:legacy,legacyRaw:v173GetSkillRawAttack(legacySkill,3,100)
+        };
+    })()`);
+    assert.deepEqual(result.constants,[550,1000,1450,1750]);
+    assert.deepEqual(result.half,[275,500,725,875]);
+    assert.deepEqual(result.base,{maxHP:600,attack:90,magicAttack:90,defense:70});
+    assert.equal(result.monster.attack,result.monster.expectedAttack);
+    assert.equal(result.monster.magicAttack,result.monster.expectedMagicAttack);
+    assert.equal(result.monster.defense,result.monster.expectedDefense);
+    assert.deepEqual([result.modern,result.modernRaw],[140,140]);
+    assert.deepEqual([result.legacy,result.legacyRaw],[140,140]);
+});
+
+test("the live monster skill path uses the same modern skill calculator",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Object.assign(player,{id:"受擊者",element:"light",level:50,hp:4070,sp:100,
+            activeBuffs:[],statusEffects:[],isDefending:false});
+        player2=null;player3=null;
+        getMainCharacterStats=function(){
+            return {maxHP:4070,maxSP:100,defense:310,evasion:0,antiCrit:100,
+                vitality:50,spirit:0,accuracy:0,attack:0,magicAttack:0};
+        };
+        const attacker={name:"共用公式怪",element:"fire",level:50,rank:"regular",
+            hp:1000,maxHP:1000,sp:1000,maxSP:1000,attack:100,magicAttack:100,
+            accuracy:1000,evasion:0,spiritPoints:0,alive:true,skillIds:["dragonSlash"],
+            skillChance:1,v141ForceSkillLevel:5,activeBuffs:[],statusEffects:[]};
+        monsters.splice(0,monsters.length,attacker);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        battleActive=true;battleToken=734;turn=1;Math.random=function(){ return .5; };
+        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
+        showMonsterSkillNameBadge=function(){};showPlayerHit=function(){};showMonsterHit=function(){};
+        const expected=calculateSkillDamage({skill:skillDatabase.dragonSlash,skillLevel:5,effectiveAttack:100,
+            target:player,targetDefense:310,casterLevel:50,casterElement:"fire"});
+        processSingleMonsterAttack(0,battleToken);
+        return {expected:expected,actual:4070-player.hp};
+    })()`);
+    assert.deepEqual(result,{expected:206,actual:206});
+});
+
+test("representative normal, equipment and Abyss damage stays in the intended hierarchy",()=>{
+    const runtime=loadFinalRuntime();
+    const report=evaluateJson(runtime.context,`(function(){
+        Math.random=function(){ return .5; };
+        function playerFixture(level){
+            return {level:level,element:"light",maxHP:100+level*50+(level-1)*30,defense:10+level*6};
+        }
+        function percent(damage,maxHP){ return Math.round(damage/maxHP*10000)/100; }
+        function skillForRole(role){
+            return Object.assign({id:"role-"+role,category:"physical"},v173DamageRoleProfiles[role],{damageRole:role});
+        }
+        function skillDamage(monster,skill,skillLevel,target){
+            const offense=skill.category==="magic"?monster.magicAttack:monster.attack;
+            return calculateSkillDamage({skill:skill,skillLevel:skillLevel,effectiveAttack:offense,
+                target:target,targetDefense:target.defense,casterLevel:monster.level,casterElement:monster.element});
+        }
+        const roles=["single_low","single_normal","single_burst","tri_damage","aoe_damage","single_control","aoe_control"];
+        const levelRows=[20,50,80,100].map(level=>{
+            const target=playerFixture(level);
+            const monster=makeZoneMonster("同級野怪",level,"fire","regular");
+            const multiplier=v173WildZoneStrengthMultipliers[Math.ceil(level/10)-1];
+            ["maxHP","maxSP","attack","magicAttack","defense"].forEach(key=>{
+                monster[key]=Math.max(1,Math.round(monster[key]*multiplier));
+            });
+            const normal=calculateDamage(monster.attack,target.defense,level,level,"fire","light");
+            const skillLevel=Math.min(5,Math.ceil(level/20));
+            const damages={};
+            roles.forEach(role=>{ damages[role]=skillDamage(monster,skillForRole(role),skillLevel,target); });
+            return {level:level,skillLevel:skillLevel,maxHP:target.maxHP,normal:normal,
+                normalPercent:percent(normal,target.maxHP),damages:damages};
+        });
+
+        Object.assign(player,{id:"基準角色",level:60});player2=null;player3=null;
+        const equipment=v132BuildEquipmentDungeonRoster();
+        const equipmentTarget=playerFixture(60);
+        const equipmentRows=[equipment.find(monster=>monster.rank==="elite"),equipment.find(monster=>monster.rank==="boss")].map(monster=>{
+            const skill=skillDatabase[monster.skillIds[0]];
+            const normal=calculateDamage(monster.attack,equipmentTarget.defense,monster.level,60,monster.element,"light");
+            const damage=skillDamage(monster,skill,monster.v141ForceSkillLevel,equipmentTarget);
+            return {rank:monster.rank,normal:normal,normalPercent:percent(normal,equipmentTarget.maxHP),
+                skillId:skill.id,skillLevel:monster.v141ForceSkillLevel,skillDamage:damage,
+                skillPercent:percent(damage,equipmentTarget.maxHP)};
+        });
+
+        Object.assign(player,{id:"基準角色",level:100});
+        const abyssTarget=playerFixture(100);
+        const preferred={1:"dustStorm",2:"dragonSlash",3:"windCrossSlash",4:"floodBeast",5:"dragonSlash"};
+        const abyssRows=[1,2,3,4,5].map(floor=>{
+            const roster=v141BuildAbyssRoster(floor);
+            if(floor===5){ v155PatchFinalAbyssRoster(roster); }
+            const monster=floor===5?roster.find(entry=>entry.name==="南帝天尊"):roster[0];
+            const skill=skillDatabase[preferred[floor]];
+            const normal=calculateDamage(monster.attack,abyssTarget.defense,monster.level,100,monster.element,"light");
+            const damage=skillDamage(monster,skill,monster.v141ForceSkillLevel,abyssTarget);
+            return {floor:floor,boss:monster.name,normal:normal,normalPercent:percent(normal,abyssTarget.maxHP),
+                skillId:skill.id,skillLevel:monster.v141ForceSkillLevel,skillDamage:damage,
+                skillPercent:percent(damage,abyssTarget.maxHP),extraHP:monster.v141ExtraHP};
+        });
+        return {levels:levelRows,equipment:equipmentRows,abyss:abyssRows};
+    })()`);
+
+    report.levels.forEach(row=>{
+        assert.ok(row.normalPercent>=3&&row.normalPercent<=7,"Lv"+row.level+" normal "+row.normalPercent+"%");
+        const ratio=role=>row.damages[role]/row.normal;
+        assert.ok(ratio("single_low")>=1.3&&ratio("single_low")<=1.65);
+        assert.ok(ratio("single_normal")>=1.6&&ratio("single_normal")<=2.2);
+        assert.ok(ratio("single_burst")>=2&&ratio("single_burst")<=2.7);
+        assert.ok(row.damages.tri_damage<row.damages.single_normal);
+        assert.ok(row.damages.aoe_damage<row.damages.single_burst);
+        assert.ok(row.damages.single_control<row.damages.single_burst);
+        assert.ok(row.damages.aoe_control<row.damages.aoe_damage);
+    });
+    assert.ok(report.equipment[0].normalPercent>=5&&report.equipment[0].normalPercent<=9);
+    assert.ok(report.equipment[1].normalPercent>=6&&report.equipment[1].normalPercent<=11);
+    assert.deepEqual(report.equipment.map(row=>row.skillLevel),[2,3]);
+    report.abyss.forEach(row=>assert.ok(row.normalPercent>=6&&row.normalPercent<=11));
+    assert.deepEqual(report.abyss.map(row=>row.skillLevel),[1,2,3,4,5]);
+    assert.deepEqual(report.abyss.map(row=>row.extraHP),[5000,5000,5000,5000,10000]);
+    assert.ok(report.abyss[4].skillPercent>=15&&report.abyss[4].skillPercent<=25);
+});
+
+test("forced final-Abyss skill levels fold the modern scaling fields exactly once",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const monster={v155FinalAbyss:true,v141ForceSkillLevel:5,skillIds:["dragonSlash"],v141SupportSkillIds:[]};
+        const skill=skillDatabase.dragonSlash;
+        const before=[skill.maxLevel,skill.powerMultiplier,skill.powerPerLevel,skill.flatDamage,skill.flatDamagePerLevel];
+        const during=v155WithForcedFinalAbyssSkillLevel(monster,function(){
+            return [skill.maxLevel,skill.powerMultiplier,skill.powerPerLevel,skill.flatDamage,skill.flatDamagePerLevel];
+        });
+        const after=[skill.maxLevel,skill.powerMultiplier,skill.powerPerLevel,skill.flatDamage,skill.flatDamagePerLevel];
+        return {before:before,during:during,after:after};
+    })()`);
+    assert.deepEqual(result,{
+        before:[5,2.1,.1,20,0],during:[1,2.5,0,20,0],after:[5,2.1,.1,20,0]
+    });
 });
 
 console.log("\nV170 final integration suite: "+passed+" tests passed.");

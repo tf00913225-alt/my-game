@@ -108,11 +108,11 @@ test("status popup stays below the HP damage lane",()=>{
     assert.doesNotMatch(statusPopup,/rect\.top\+rect\.height\*\.68/);
 });
 
-test("development release advances to V173.33",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.33"/);
-    assert.match(index,/<title>四象江湖傳 V173\.33<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.33"/);
-    assert.match(index,/>V173\.33<\/div>/);
+test("development release advances to V173.34",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.34"/);
+    assert.match(index,/<title>四象江湖傳 V173\.34<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.34"/);
+    assert.match(index,/>V173\.34<\/div>/);
 });
 
-console.log("\n"+passed+" V173.33 follow-up regression tests passed.");
+console.log("\n"+passed+" V173.34 follow-up regression tests passed.");

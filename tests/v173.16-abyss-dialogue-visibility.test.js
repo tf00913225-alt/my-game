@@ -122,10 +122,10 @@ test("one guardian tap shows dialogue and three dialogue taps launch battle",()=
     assert.equal(harness.map.children.length,0);
 });
 
-test("the published cache release is V173.33",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.33"/);
-    assert.match(index,/<title>四象江湖傳 V173\.33<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.33"[\s\S]*?>V173\.33<\/div>/);
+test("the published cache release is V173.34",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.34"/);
+    assert.match(index,/<title>四象江湖傳 V173\.34<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.34"[\s\S]*?>V173\.34<\/div>/);
 });
 
-console.log("\n"+passed+" V173.33 Abyss dialogue visibility tests passed.");
+console.log("\n"+passed+" V173.34 Abyss dialogue visibility tests passed.");

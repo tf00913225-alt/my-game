@@ -7,27 +7,29 @@
 
 ---
 
-## V173.33 最終正式規格
+## V173.34 最終正式規格
 
 > **目前唯一最終規格入口。** 本節、`tests/v170-final-spec-integration.test.js` 與
-> `tests/v173.18-final-request.test.js` 共同代表「完整載入所有補丁後」的 V173.33
+> `tests/v173.18-final-request.test.js` 共同代表「完整載入所有補丁後」的 V173.34
 > 最終狀態；下方 V140～V173.17 各段落與同名測試只保留歷史版本紀錄，不能再拿來判定
 > 目前數值。
 
 ### 目前最終值
 
 - 正式 `main` 目前仍是 V173.24（SHA `5256564115b613c0ea4bab1d97506a5734aff8ee`）；
-  V173.25～V173.33 目前只存在 `dev`。本輪依使用者明確要求只提交／推送 `dev`，不合併 main。
+  V173.25～V173.34 目前只存在 `dev`。本輪依使用者明確要求只提交／推送 `dev`，不合併 main。
 - 真實載入是 `index.html` 的 24 支同步 classic script（`js/23` → `js/52` 開場 loader → `js/00` →
   `js/01`～`js/20` → `js/24`），再由 `js/20-anonymous-20.js` 依 `load/error → next`
   嚴格串行載入 26 支正式 runtime：`js/25` → `js/27`～`js/51`。巡怪素材鏈最後的
   `js/26` 與正式 gameplay runtime 鏈並行，只管外觀，不能插進平衡補丁順序。
 - `tests/v170-final-spec-integration.test.js` 會在同一個 `vm.Context` 真正依上述順序
-  執行 50 支 JavaScript，再檢查最終資料與行為；V173.33 另鎖定同名狀態先判定、正式狀態名、
-  必定燃燒、鳳威、追擊、吸血、硬控、反傷、岩盾、結界、乘算閃躲與敵我支援技能。
+  執行 50 支 JavaScript，再檢查最終資料與行為；V173.34 另鎖定同名狀態先判定、正式狀態名、
+  必定燃燒、鳳威、追擊、吸血、硬控、反傷、岩盾、結界、乘算閃躲、敵我支援技能，以及
+  32 招正式傷害技能的 damageRole、動態防禦、六圍尺度與各層副本代表傷害。
   `tests/v173.18-final-request.test.js` 繼續鎖定符咒格線、深淵戰後回程與最終 owner。
-- 下表格式為「Lv1 傷害／每級成長；SP；目標；初學／升級／最高；前置」。前置有兩項時
-  沿用正式邏輯，代表任一項即可。
+- 下表的「傷害」欄是為相容舊程式、預覽與歷史測試而保留的 `baseDamage／damagePerLevel`；
+  V173.34 已遷移的正式直接傷害不再以該欄為主傷害，而是使用表後的 damageRole 倍率。
+  其餘格式為「SP；目標；初學／升級／最高；前置」，前置有兩項時代表任一項即可。
 
 | 元素 | 技能 | 傷害 | SP | 目標 | 技能點（初學／升級／最高） | 前置 |
 |---|---|---:|---:|---|---|---|
@@ -76,6 +78,35 @@
 | 土 | 岩石壁壘 | — | 45 | 我方同排最多3人 | 15／—／1 | 結界 |
 | 土 | 結界 | — | 40 | 友方單體 | 20／—／1 | 萬象土盾 |
 | 土 | 土元素EX | — | — | 被動 | 25／—／1 | 無 |
+
+V173.34 正式傷害模型：
+
+- 物理技能 `rawAttack = effectiveAttack × effectivePower + effectiveFlatDamage`；法術技能把
+  `effectiveAttack` 換成 `effectiveMagicAttack`。`effectivePower = powerMultiplier +
+  powerPerLevel × (skillLevel - 1)`；固定傷害同樣依 `flatDamage + flatDamagePerLevel ×
+  (skillLevel - 1)` 計算。已有新版欄位時必走倍率制，尚未遷移者才回退舊固定傷害；
+  `baseDamage／damagePerLevel` 暫不刪除。
+- 共用核心再依序套入既有等級差、元素、防禦、爆擊、Buff／Debuff 與 95%～105% 浮動。
+  防禦尺度為 `K = 250 + 目標等級×15`、`defenseFactor = K/(K+DEF)`，最低傷害1；
+  物攻為 `10 + 攻擊點×8`、魔攻為 `10 + 智力點×8`、防禦為 `10 + 體質點×6`、
+  HP 維持 `100 + 體質點×50 + 既有升級／裝備加成`。玩家與怪物共用換算尺度。
+
+| damageRole | Lv1倍率 | 每級 | 固定傷害 | 正式技能 |
+|---|---:|---:|---:|---|
+| single_low | 1.40 | +0.05 | 0 | 火焰斬、水刀斬、暴風拳、土石斬 |
+| single_normal | 1.75 | +0.075 | 10 | 會心一擊、冰霜拳、洪水猛獸、風旋十字斬、暈眩猛擊、風哮電擊、石破天驚 |
+| single_burst | 2.10 | +0.10 | 20 | 霸龍裂天斬、冰封重擊 |
+| tri_damage | 1.35 | +0.05 | 5 | 火爆亂擊、冰旋一閃、水球術、暴風亂擊、狂風術、風焰術、石盾拳、落石術、滾石術 |
+| aoe_damage | 1.10 | +0.05 | 0 | 冰霜箭雨、風起雲湧、暴風術、飛沙瞬擊 |
+| single_control | 1.35 | +0.05 | 0 | 地牛猛襲 |
+| tri_control | 1.20 | +0.04 | 0 | 地裂重拳 |
+| aoe_control | 0.95 | +0.04 | 0 | 目前無正式直接傷害技能，保留共用 profile |
+| single_dot | 1.50 | +0.06 | 5 | 烈火術、烈焰龍捲 |
+| tri_dot | 1.15 | +0.04 | 0 | 火箭 |
+| aoe_dot | 0.95 | +0.04 | 0 | 火鳳天鳴 |
+
+`flatDamagePerLevel` 目前全部為0。暈眩猛擊／風起雲湧的現行「暈眩」是提高 MISS、不是禁止
+行動，因此依實際狀態效果歸入 damage 類；冰封純控不造成直接傷害，沒有 damageRole。
 
 狀態與高風險行為的目前最終值：
 
@@ -133,7 +164,9 @@
   查詢入口在 `js/00`，怪物結界／岩盾相容層在 `js/38`，鳳威在 `js/46`，最終水技能在 `js/50`。
 - `skillDatabase.yuanXiangGuangMing` 的歷史欄位仍由 V155 正式 resolver 隔離；V173.32 在
   `js/46-v155-dev-fixes.js` 校正極帝天尊三招最終資料與逐目標祝福結算。
-- 本輪沒有另建臨時 runtime 或平行 owner；修改都落在既有正式 owner，避免下游再次覆蓋。
+- V173.34 的 `calculateDamage()`、`calculateSkillDamage()`、damageRole profile 與六圍換算唯一 owner
+  是 `js/00-main.js`；`js/47` 不再重寫傷害公式，`js/43`／`js/50` 只在各自技能資料完成後套入
+  共用 profile。本輪沒有另建臨時 runtime 或平行 owner，避免下游再次覆蓋。
 
 ---
 
@@ -211,7 +244,7 @@
 
 ---
 
-## 目前狀態（截至 2026-09-02，V173.33 dev）
+## 目前狀態（截至 2026-09-02，V173.34 dev）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -272,6 +305,11 @@
   至少70px高並保留1～3名動態角色，兩張主入口為內層46%寬、90px高；左右六個入口改為
   90×95px完整金框方形按鈕；離線經驗／系統為98×46px完整橫向按鈕；隊伍列改為48px高、
   頭像49px、HP／SP條10px。底部導航、背景、入口事件、角色資料與所有遊戲邏輯均未修改。
+- V173.34（`dev`）重構底層傷害模型：32 招四元素正式傷害技能改用固定 damageRole 倍率，
+  玩家與怪物技能統一走 `calculateSkillDamage()`，再共用 `calculateDamage()`；舊固定傷害欄位
+  僅保留相容回退。防禦改為 `K=250+目標等級×15` 的動態軟上限，玩家與怪物的攻／魔攻／防
+  六圍換算統一為每點 +8／+8／+6，HP 每點體質 +50 不變。裝備副本、深淵倍率、技能配置、
+  AI、狀態、SP、UI、存檔與地圖均未修改。
 - 母版歷史：V120（單一巨大 index.html，全部 inline）→ V121_SPLIT（拆成外部檔案，
   行為完全不變，過程見 `CHECK_REPORT.txt` / `README_*.txt`）→ 之後陸續疊加 V123～V131
   各種 stage patch，一路疊到現在。
@@ -686,6 +724,34 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-09-02 — V173.34：底層傷害模型倍率化與動態防禦尺度（dev）
+
+- `js/00-main.js` 成為唯一核心傷害公式 owner：正式技能以
+  `有效攻／魔攻×effectivePower+effectiveFlatDamage` 建立 rawAttack，再只套一次等級差、元素與
+  `K/(K+DEF)`；`K=250+目標等級×15`，最低傷害1。`js/47-v158-combat-tuning.js` 已停止覆寫
+  `calculateDamage()`，`js/46-v155-dev-fixes.js` 的鳳威效果 wrapper 與 `js/50` 冰封局部攔截保留。
+- 正式 damageRole 對照共32招，固定 profile 由 `js/00-main.js` 提供，火／風／土正式 owner
+  `js/43-v149-skill-ui-rules.js` 與水系 owner `js/50-v169-water-skill-rules.js` 在最終資料落定後套用。
+  純冰封不造成傷害所以不遷移；舊 `baseDamage／damagePerLevel` 全數保留，僅供尚未遷移流程
+  回退。`js/43` 的火元素EX wrapper 已兼容新版 options 呼叫，`js/46` 的深淵強制技能等級會同步
+  折算 `powerMultiplier／flatDamage`，避免第五層仍誤用Lv1倍率或重複套用。
+- 玩家與怪物的數值換算統一：物攻 `10+攻擊點×8`、魔攻 `10+智力點×8`、防禦
+  `10+體質點×6`；HP維持 `100+體質點×50+既有加成`。主角、第二／第三角色、背包預覽與
+  `makeZoneMonster()` 已同步，裝備詞條、Buff／Debuff、rank 與既有被動繼續在原入口生效。
+- 同級、中位浮動、無爆擊／無剋制、合理20%體質配置的實際驗算：Lv20／50／80／100野怪普攻
+  分別為66／143／246／318，佔玩家最大HP 3.95%／3.51%／3.80%／3.94%。各級 role 比例均符合
+  單體低階 < 一般 < 爆發，三人／全體單目標低於一般／爆發，控制低於純爆發。
+- 裝備副本Lv60實際驗算：精英普攻261（5.36% HP）、Tier3 Lv2代表技能484（9.94%）；BOSS
+  普攻295（6.06%）、Tier4 Lv3代表技能378（7.76%）。原專用rank倍率與固定1王4精英未改。
+  深淵Lv100第1～5層BOSS普攻皆為525（6.51%）；代表技能依Lv1～5為709（8.79%）、
+  1170（14.50%）、1005（12.45%）、1044（12.94%）、1327（16.44%）。不同技能Role不強制
+  單調，但同一Role會隨技能等級提升；第五層霸龍裂天斬落在15%～25%強單體目標區間。
+- 驗證更新於 `tests/v170-final-spec-integration.test.js` 與歷史 owner 測試
+  `tests/v158-combat-tuning.test.js`：鎖定32招無遺漏、Role固定值、新舊公式分流、動態K、六圍、
+  玩家／怪物共用入口、裝備／深淵代表傷害及第五層倍率只折算一次。發布版本同步更新
+  `index.html`、`js/20-anonymous-20.js` 與版本驗收。尚待人工實玩確認不同配點、裝備、元素剋制、
+  爆擊與Buff疊加下的長期體感；本輪沒有改副本倍率、AI、技能數量、狀態機率、UI、VFX或存檔。
 
 ### 2026-09-02 — V173.33：主城第四輪厚實 RPG 版面重構（dev）
 

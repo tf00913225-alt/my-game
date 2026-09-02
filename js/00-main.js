@@ -1796,6 +1796,14 @@ function ensureDailyQuestsCurrent(){
    ★ 基礎能力計算
 ===================================================== */
 
+const BASE_PHYSICAL_ATTACK = 10;
+const BASE_MAGIC_ATTACK = 10;
+const BASE_DEFENSE = 10;
+const ATTACK_PER_POINT = 8;
+const MAGIC_ATTACK_PER_POINT = 8;
+const DEFENSE_PER_VITALITY_POINT = 6;
+const HP_PER_VITALITY_POINT = 50;
+
 function getBaseStats(){
 
     return {
@@ -1804,7 +1812,9 @@ function getBaseStats(){
            這裡只給角色固定基礎值。
            六項能力仍然完全由玩家配點。
 
-           1體質 = +50HP +15防禦
+           1體質 = +50HP +6防禦
+           1攻擊 = +8物攻
+           1智力 = +8魔攻
            1能量 = +15SP
 
            bonusHP / bonusSP 是每次升級
@@ -1814,7 +1824,7 @@ function getBaseStats(){
 
         maxHP:
             100+
-            player.vitality*50+
+            player.vitality*HP_PER_VITALITY_POINT+
             player.bonusHP,
 
         maxSP:
@@ -1823,15 +1833,16 @@ function getBaseStats(){
             player.bonusSP,
 
         attack:
-            10+
-            player.attack*5,
+            BASE_PHYSICAL_ATTACK+
+            player.attack*ATTACK_PER_POINT,
 
         defense:
-            10+
-            player.vitality*15,
+            BASE_DEFENSE+
+            player.vitality*DEFENSE_PER_VITALITY_POINT,
 
         magicAttack:
-            player.intelligence*5,
+            BASE_MAGIC_ATTACK+
+            player.intelligence*MAGIC_ATTACK_PER_POINT,
 
         accuracy:
             player.spirit*2,
@@ -2099,8 +2110,8 @@ function getMainCharacterStats(){
     const defenseDownPercent=getPlayerDefenseDownPercent(player);
 
     const rawDefense=(
-        10+
-        effectiveVitality*15+
+        BASE_DEFENSE+
+        effectiveVitality*DEFENSE_PER_VITALITY_POINT+
         (Number(bonus.defense)||0)
     );
 
@@ -2114,7 +2125,7 @@ function getMainCharacterStats(){
         /* 暫時六圍減益不動態壓縮最大HP/SP；詳見上方統一規則。 */
         maxHP:
             100+
-            (player.vitality+(Number(bonus.vitality)||0))*50+
+            (player.vitality+(Number(bonus.vitality)||0))*HP_PER_VITALITY_POINT+
             player.bonusHP+
             (Number(bonus.maxHP)||0),
 
@@ -2125,8 +2136,8 @@ function getMainCharacterStats(){
             (Number(bonus.maxSP)||0),
 
         attack:
-            10+
-            effectiveAttackPoints*5+
+            BASE_PHYSICAL_ATTACK+
+            effectiveAttackPoints*ATTACK_PER_POINT+
             (Number(bonus.attack)||0),
 
         attackPoints:effectiveAttackPoints,
@@ -2136,7 +2147,7 @@ function getMainCharacterStats(){
             Math.round(buffedDefense*(1-defenseDownPercent/100))
         ),
 
-        magicAttack:effectiveIntelligence*5,
+        magicAttack:BASE_MAGIC_ATTACK+effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
         accuracy:effectiveSpirit*2,
         resistance:calculateStatusResistancePercent(effectiveSpirit),
         antiCrit:calculateAntiCritPercent(effectiveSpirit),
@@ -2256,8 +2267,8 @@ function getAdditionalCharacterBattleStats(character,characterKey){
     const defenseDownPercent=getPlayerDefenseDownPercent(character);
 
     const rawDefense=(
-        10+
-        effectiveVitality*15+
+        BASE_DEFENSE+
+        effectiveVitality*DEFENSE_PER_VITALITY_POINT+
         (Number(bonus.defense)||0)
     );
     const buffedDefense=rawDefense*(
@@ -2268,7 +2279,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
     return {
         maxHP:
             100+
-            (character.vitality+(Number(bonus.vitality)||0))*50+
+            (character.vitality+(Number(bonus.vitality)||0))*HP_PER_VITALITY_POINT+
             (Number(character.bonusHP)||0)+
             (Number(bonus.maxHP)||0),
 
@@ -2279,8 +2290,8 @@ function getAdditionalCharacterBattleStats(character,characterKey){
             (Number(bonus.maxSP)||0),
 
         attack:
-            10+
-            effectiveAttackPoints*5+
+            BASE_PHYSICAL_ATTACK+
+            effectiveAttackPoints*ATTACK_PER_POINT+
             (Number(bonus.attack)||0),
 
         attackPoints:effectiveAttackPoints,
@@ -2290,7 +2301,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
             Math.round(buffedDefense*(1-defenseDownPercent/100))
         ),
 
-        magicAttack:effectiveIntelligence*5,
+        magicAttack:BASE_MAGIC_ATTACK+effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
         accuracy:effectiveSpirit*2,
         resistance:calculateStatusResistancePercent(effectiveSpirit),
         antiCrit:calculateAntiCritPercent(effectiveSpirit),
@@ -2333,6 +2344,103 @@ function getPartyBattleStats(index){
 /* =====================================================
    怪物
 ===================================================== */
+
+const DAMAGE_ROLE_PROFILES = Object.freeze({
+    single_low:Object.freeze({powerMultiplier:1.40,powerPerLevel:0.05,flatDamage:0,flatDamagePerLevel:0}),
+    single_normal:Object.freeze({powerMultiplier:1.75,powerPerLevel:0.075,flatDamage:10,flatDamagePerLevel:0}),
+    single_burst:Object.freeze({powerMultiplier:2.10,powerPerLevel:0.10,flatDamage:20,flatDamagePerLevel:0}),
+    tri_damage:Object.freeze({powerMultiplier:1.35,powerPerLevel:0.05,flatDamage:5,flatDamagePerLevel:0}),
+    aoe_damage:Object.freeze({powerMultiplier:1.10,powerPerLevel:0.05,flatDamage:0,flatDamagePerLevel:0}),
+    single_control:Object.freeze({powerMultiplier:1.35,powerPerLevel:0.05,flatDamage:0,flatDamagePerLevel:0}),
+    tri_control:Object.freeze({powerMultiplier:1.20,powerPerLevel:0.04,flatDamage:0,flatDamagePerLevel:0}),
+    aoe_control:Object.freeze({powerMultiplier:0.95,powerPerLevel:0.04,flatDamage:0,flatDamagePerLevel:0}),
+    single_dot:Object.freeze({powerMultiplier:1.50,powerPerLevel:0.06,flatDamage:5,flatDamagePerLevel:0}),
+    tri_dot:Object.freeze({powerMultiplier:1.15,powerPerLevel:0.04,flatDamage:0,flatDamagePerLevel:0}),
+    aoe_dot:Object.freeze({powerMultiplier:0.95,powerPerLevel:0.04,flatDamage:0,flatDamagePerLevel:0})
+});
+
+const FORMAL_DAMAGE_SKILL_ROLES = Object.freeze({
+    flameSlash:"single_low",
+    fireCritical:"single_normal",
+    explosiveFlurry:"tri_damage",
+    dragonSlash:"single_burst",
+    fireRocket:"tri_dot",
+    blazeSpell:"single_dot",
+    flameTornado:"single_dot",
+    phoenixCry:"aoe_dot",
+    waterKnife:"single_low",
+    frostPunch:"single_normal",
+    iceSpin:"tri_damage",
+    frostCrush:"single_burst",
+    waterBall:"tri_damage",
+    floodBeast:"single_normal",
+    iceArrowRain:"aoe_damage",
+    stormFist:"single_low",
+    stormFlurry:"tri_damage",
+    windCrossSlash:"single_normal",
+    dizzyFist:"single_normal",
+    windSpell:"tri_damage",
+    stormCircle:"tri_damage",
+    windHowlLightning:"single_normal",
+    stormRain:"aoe_damage",
+    stormSpell:"aoe_damage",
+    stoneSlash:"single_low",
+    petrifyFist:"tri_damage",
+    stoneBreakSky:"single_normal",
+    earthquakeCrush:"tri_control",
+    stoneThrow:"tri_damage",
+    sandWind:"tri_damage",
+    flyingSandStrike:"aoe_damage",
+    dustStorm:"single_control"
+});
+
+function applyDamageRoleProfile(skill,damageRole){
+    const profile=DAMAGE_ROLE_PROFILES[damageRole];
+    if(!skill||!profile){ return false; }
+
+    skill.damageRole=damageRole;
+    skill.powerMultiplier=profile.powerMultiplier;
+    skill.powerPerLevel=profile.powerPerLevel;
+    skill.flatDamage=profile.flatDamage;
+    skill.flatDamagePerLevel=profile.flatDamagePerLevel;
+    return true;
+}
+
+function applyFormalDamageRoleProfiles(skillIds){
+    if(typeof skillDatabase==="undefined"){ return []; }
+    const ids=Array.isArray(skillIds)?skillIds:Object.keys(FORMAL_DAMAGE_SKILL_ROLES);
+    return ids.filter(skillId=>
+        applyDamageRoleProfile(skillDatabase[skillId],FORMAL_DAMAGE_SKILL_ROLES[skillId])
+    );
+}
+
+function hasDamageRoleProfile(skill){
+    return !!(
+        skill&&
+        DAMAGE_ROLE_PROFILES[skill.damageRole]&&
+        Number.isFinite(Number(skill.powerMultiplier))&&
+        Number.isFinite(Number(skill.powerPerLevel))&&
+        Number.isFinite(Number(skill.flatDamage))&&
+        Number.isFinite(Number(skill.flatDamagePerLevel))
+    );
+}
+
+function getSkillPowerAtLevel(skill,level){
+    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
+    return Number(skill.powerMultiplier)+Number(skill.powerPerLevel)*(resolvedLevel-1);
+}
+
+function getSkillFlatDamageAtLevel(skill,level){
+    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
+    return Number(skill.flatDamage)+Number(skill.flatDamagePerLevel)*(resolvedLevel-1);
+}
+
+window.v173DamageRoleProfiles=DAMAGE_ROLE_PROFILES;
+window.v173FormalDamageSkillRoles=FORMAL_DAMAGE_SKILL_ROLES;
+window.v173ApplyFormalDamageRoleProfiles=applyFormalDamageRoleProfiles;
+window.v173HasDamageRoleProfile=hasDamageRoleProfile;
+window.v173GetSkillPowerAtLevel=getSkillPowerAtLevel;
+window.v173GetSkillFlatDamageAtLevel=getSkillFlatDamageAtLevel;
 
 
 /* V120_FINAL_SKILL_WIRING
@@ -2749,23 +2857,20 @@ const iceMountainMonsters = [
    完全比照玩家的能力點分配/換算公式，
    不再是手動填死的HP/SP/攻擊/防禦數字）：
 
-   總能力點 = 10 + 等級×5
+   總能力點 = 10 + 等級×2
    敏捷點數 = round(等級÷3)，從總能力點裡扣除
    可分配點數 = 總能力點 − 敏捷點數
-   能量點數 = round(可分配點數 × 20%)，固定
-   體質最低點數 = round(可分配點數 × 40%)，保底
-   剩餘點數 = 可分配點數 − 能量點數 − 體質最低點數
-     → 隨機分配給「體質(額外加碼)/攻擊/智力/精神」
-       四項，體質最終一定 ≥ 40%（保底 + 隨機加碼），
-       其餘三項純隨機、每隻怪物都不一樣。
+   體質點數 = round(可分配點數 × 10%)，固定
+   剩餘點數平均分配給攻擊／能量／智力／精神，
+   餘數依固定順序補入，確保同名同級怪物數值一致。
 
    換算成實際數值時，直接套用跟玩家
    getBaseStats()完全相同的公式：
    maxHP    = 100 + 體質×50
    maxSP    = 50  + 能量×15
-   攻擊力    = 10  + 攻擊×5
-   防禦     = 10  + 體質×15
-   法術攻擊  = 智力×5
+   攻擊力    = 10  + 攻擊×8
+   防禦     = 10  + 體質×6
+   法術攻擊  = 10  + 智力×8
    命中 = 精神×2
    一般異常抗性 = 精神×0.05（百分點）
    預設閃避 = min(30%, 等級×0.3%)
@@ -3046,7 +3151,7 @@ function makeZoneMonster(
 
     const maxHP=
         100+
-        points.vitality*50;
+        points.vitality*HP_PER_VITALITY_POINT;
 
 
     const maxSP=
@@ -3106,15 +3211,16 @@ function makeZoneMonster(
 
 
         attack:
-            10+
-            points.attack*5,
+            BASE_PHYSICAL_ATTACK+
+            points.attack*ATTACK_PER_POINT,
 
         defense:
-            10+
-            points.vitality*15,
+            BASE_DEFENSE+
+            points.vitality*DEFENSE_PER_VITALITY_POINT,
 
         magicAttack:
-            points.intelligence*5,
+            BASE_MAGIC_ATTACK+
+            points.intelligence*MAGIC_ATTACK_PER_POINT,
 
         accuracy:
             points.spirit*2,
@@ -11501,63 +11607,10 @@ function executeAction(action){
 ===================================================== */
 
 /*
-   ★ 修正（重要）：
-   之前普通攻擊、怪物攻擊玩家，都是直接用
-   calculateDamage(attack, defense)，
-   完全沒有套用等級壓制，
-   只有技能傷害（calculateSkillDamage）
-   額外疊加了等級差修正，
-   兩套邏輯不一致——同一個角色，
-   普通攻擊跟技能傷害對等級差的反應完全不同，
-   這不合理。
-
-   現在把等級壓制直接內建進calculateDamage()本身，
-   之後不管是普通攻擊、技能、還是怪物反打玩家，
-   全部統一經過這裡，同一套公式、同一種感受。
-
-   ★ 防禦力怎麼轉換成減傷（順便說明給你聽）：
-
-   最終傷害 = 攻擊力 × 等級修正 × DAMAGE_FORMULA_CONSTANT/(DAMAGE_FORMULA_CONSTANT+防禦力)
-
-   ★ 修正（依照使用者要求，怪物六圍系統
-   上線後重新校準）：
-   這條公式當初設計時，是照著「防禦力大概
-   落在0~300」這個範圍去校準常數的（見下面
-   舊的範例：防禦300→減傷75%，已經算是
-   當初設定的高防禦上限）。
-
-   但怪物六圍系統做完之後，體質保底40%+
-   隨機加碼、乘上×15的防禦係數，Lv48怪物
-   防禦力隨便就衝到600~800，是舊常數校準
-   範圍的兩倍以上——常數沒有跟著新的數值
-   規模一起放大，才會出現「普通攻擊打怪物
-   只有1傷害」這種近乎打假的情況（100/
-   (100+700)≈12.5%，攻擊力本來就不高的
-   角色，打完只剩零頭，四捨五入到最低值1）。
-
-   把常數從100調到350，同樣的700防禦，
-   減傷比例會變成350/(350+700)≈33%，
-   重新落回「有打有感覺，但不會秒殺」的
-   合理區間。公式的「軟上限」特性完全沒變，
-   只是重新校準到跟新的數值規模匹配。
-
-   舉例（新常數350）：
-   防禦100 → 350/(350+100) ≈ 78%，減傷約22%
-   防禦300 → 350/(350+300) ≈ 54%，減傷約46%
-   防禦700 → 350/(350+700) ≈ 33%，減傷約67%
-   防禦1000→ 350/(350+1000) ≈ 26%，減傷約74%
-
-   這是「軟上限」曲線：防禦越高，每一點防禦帶來的
-   邊際減傷效果會遞減，不會出現「疊到某個防禦值
-   就完全免傷」的極端情況，數值再怎麼衝都還是會
-   吃到傷害，比較平衡。
-
-   體質怎麼換算成防禦：
-   防禦 = 基礎10 + 體質×15 + 裝備防禦加成
-   （這個公式其實原本就有，只是散落在
-   getMainCharacterStats()/getPlayer2BattleStats()
-   裡沒有特別強調，你才會覺得「怎麼一直忘記」——
-   其實體質一直都有轉換成防禦，只是不夠顯眼）。
+   V173.34：玩家、怪物、普通攻擊與技能都只走這一套核心。
+   防禦採動態尺度 K=250+目標等級×15，避免固定常數在
+   Lv1～100 的數值跨度中失真；K/(K+DEF) 保持軟上限，
+   防禦再高也不會形成完全免傷。
 */
 
 const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0.02;
@@ -11566,15 +11619,15 @@ const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0.70;
 
 const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1.30;
 
-/*
-   ★ 新增：傷害公式裡「防禦轉換成減傷比例」
-   用的常數，原本是寫死的100，這次調高到
-   350，原因見上面整段說明。之後如果數值
-   規模又整個換過，只要調這一個常數就好，
-   不用去改calculateDamage()本體的邏輯。
-*/
+const DAMAGE_FORMULA_BASE_CONSTANT = 250;
+const DAMAGE_FORMULA_PER_TARGET_LEVEL = 15;
 
-const DAMAGE_FORMULA_CONSTANT = 350;
+function getDamageFormulaConstant(targetLevel){
+    const resolvedTargetLevel=Math.max(1,Number(targetLevel)||1);
+    return DAMAGE_FORMULA_BASE_CONSTANT+resolvedTargetLevel*DAMAGE_FORMULA_PER_TARGET_LEVEL;
+}
+
+window.v173GetDamageFormulaConstant=getDamageFormulaConstant;
 
 
 /*
@@ -11682,51 +11735,21 @@ function calculateDamage(
 
 
     const adjustedAttack=
-        attack*
+        Math.max(0,Number(attack)||0)*
         levelFactor*
         elementFactor;
 
-
-    const rawDamage=
-
-        adjustedAttack*
-        DAMAGE_FORMULA_CONSTANT/
-        (DAMAGE_FORMULA_CONSTANT+defense);
-
-
-    /*
-       ★ 新增（依照使用者要求）：
-       這裡是全遊戲不管玩家、怪物、普通攻擊
-       還是技能，唯一共用的最終傷害計算
-       函式——所有傷害都會經過這裡，改一個
-       地方就能讓「所有」傷害數字一起套用
-       浮動，不用一個個技能/普通攻擊分開改。
-
-       原本算出來的數字每次都是同一個公式
-       固定推出來的結果，同樣的攻擊力/防禦力/
-       等級差，打出來的數字永遠一模一樣，
-       這正是「視覺上很疲勞」的原因——完全
-       沒有隨機感，跟看報表數字沒兩樣。
-
-       改成在最終算出來的數字（100%）跟
-       低1%（99%）之間隨機浮動，數值本身
-       幾乎不影響平衡（波動範圍只有1%，
-       不會讓角色/怪物實際強度跟著亂跳），
-       純粹是視覺上每次打出來的數字會有
-       細微差異，看起來更像「真的在打」，
-       不是同一個數字重複貼上去。
-    */
-
-    const randomFactor=
-
-        0.99+
-        Math.random()*0.01;
+    const formulaConstant=getDamageFormulaConstant(targetLevel);
+    const safeDefense=Math.max(0,Number(defense)||0);
+    const defenseFactor=formulaConstant/(formulaConstant+safeDefense);
+    const randomFactor=0.95+Math.random()*0.10;
 
 
     return Math.max(
         1,
-        Math.floor(
-            rawDamage*
+        Math.round(
+            adjustedAttack*
+            defenseFactor*
             randomFactor
         )
     );
@@ -12738,34 +12761,9 @@ function rollHitChance(
 
 
 /* =====================================================
-   ★ 技能傷害公式（可調整）
-
-   最終傷害 = (技能基礎傷害 + 能力加成)
-              × 等級差距係數
-              → 再套用防禦力減傷
-
-   1. 能力加成：
-      例如火箭是法術技能，加成用「智力換算後的magicAttack」
-      （這個值已經包含裝備上的智力加成，
-      跟主城/背包看到的數字一致）。
-      如果之後要做別的技能，
-      物理系技能可以改傳 stats.attack 之類的值進來，
-      這個函式本身不限定一定要用智力。
-
-   2. 等級差距係數（新增的部分）：
-      (玩家等級 - 怪物等級) 每差 1 級 ±2%，
-      上限 +30%（等級壓倒性優勢時封頂，
-      不會無限膨脹），
-      下限 -30%（打太高等級的怪最多只會被壓到七成，
-      不會出現打1點傷害這種誇張情況）。
-      這三個數字都抽成常數，
-      要調整難度曲線的話改下面
-      LEVEL_DIFF_FACTOR_* 這幾個常數就好。
-
-   3. 防禦力減傷：
-      沿用原本 calculateDamage() 的公式，
-      跟普通攻擊、其他技能算法一致，
-      不會因為換了公式就變成兩套邏輯。
+   V173.34 技能傷害：有效攻擊×Role倍率＋少量固定傷害，
+   再且只再交給 calculateDamage() 一次。舊式五參數呼叫及
+   尚未遷移的技能仍保留固定傷害回退，供歷史流程相容。
 ===================================================== */
 
 const LEVEL_DIFF_FACTOR_PER_LEVEL = 0.02;
@@ -12775,52 +12773,49 @@ const LEVEL_DIFF_FACTOR_MIN = 0.70;
 const LEVEL_DIFF_FACTOR_MAX = 1.30;
 
 
-function calculateSkillDamage(
-    baseDamage,
-    statBonus,
-    monster,
-    casterLevel,
-    casterElement
-){
+function getSkillRawAttack(skill,skillLevel,effectiveAttack){
+    const attack=Math.max(0,Number(effectiveAttack)||0);
+    if(hasDamageRoleProfile(skill)){
+        return attack*getSkillPowerAtLevel(skill,skillLevel)+
+            getSkillFlatDamageAtLevel(skill,skillLevel);
+    }
 
-    /*
-       ★ 修正兩個問題：
+    return attack+getSkillDamageAtLevel(skill,skillLevel);
+}
 
-       1. 這裡原本永遠讀player.level，
-          player2施放技能時，等級壓制用的
-          還是第一角色的等級，算錯人。
-          現在改成用參數casterLevel
-          （呼叫的地方自己決定要傳player.level
-          還是player2.level）。
+window.v173GetSkillRawAttack=getSkillRawAttack;
 
-       2. 等級壓制邏輯現在統一移到
-          calculateDamage()內部處理，
-          這裡不再自己疊一次，
-          不然會變成「疊兩次等級修正」，
-          等級差距一大，數值會跑掉。
+function calculateSkillDamage(skillOrOptions,statBonus,monster,casterLevel,casterElement){
+    if(
+        skillOrOptions&&
+        typeof skillOrOptions==="object"&&
+        skillOrOptions.skill
+    ){
+        const options=skillOrOptions;
+        const target=options.target||{};
+        const explicitDefense=Number(options.targetDefense);
+        const targetDefense=Number.isFinite(explicitDefense)
+            ?explicitDefense
+            :getMonsterEffectiveDefense(target);
 
-       ★ 新增：casterElement（施法者的元素，
-       呼叫的地方傳player.element或
-       player2.element），連同monster.element
-       一起交給calculateDamage()判斷元素
-       相剋，這裡不用自己算，統一交給
-       共用函式處理。
-    */
-
-    const afterStatBonus =
-        baseDamage+
-        statBonus;
-
+        return calculateDamage(
+            getSkillRawAttack(options.skill,options.skillLevel,options.effectiveAttack),
+            targetDefense,
+            options.casterLevel,
+            target.level,
+            options.casterElement,
+            target.element
+        );
+    }
 
     return calculateDamage(
-        afterStatBonus,
+        (Number(skillOrOptions)||0)+(Number(statBonus)||0),
         getMonsterEffectiveDefense(monster),
         casterLevel,
         monster.level,
         casterElement,
         monster.element
     );
-
 }
 
 
@@ -13246,15 +13241,15 @@ function rollStatusEffectHit(
 
    我的判斷：10點智力才+1點恢復量太弱了。
    對照現有的傷害公式，
-   智力對「法術攻擊」是 1點智力 = +5點傷害
-   （getBaseStats()裡 magicAttack: intelligence*5）。
+   智力對「法術攻擊」是 1點智力 = +8點魔攻
+   （getBaseStats()與戰鬥數值共用同一換算常數）。
    如果治療只給10點智力+1，
    會變成「點智力去打傷害」跟
    「點智力去治療」的報酬率差距非常懸殊，
    沒有人會想點智力去玩補師路線。
 
    正式改用 1點智力 = +1.25點治療量，
-   抓比攻擊係數(5)低，
+   抓比魔攻係數(8)低，
    是因為治療技能通常沒有防禦力減免這道關卡
    （治療不會被「防禦力」打折扣），
    如果係數跟攻擊一樣高，
@@ -15301,13 +15296,6 @@ function castDamageSkill(skillId){
         stats.attack;
 
 
-    const baseDamage =
-        getSkillDamageAtLevel(
-            skill,
-            level
-        );
-
-
     /*
        ★ 修正：
        原本這裡寫死抓"fire"/"fireEX"，
@@ -15537,13 +15525,14 @@ function castDamageSkill(skillId){
 
 
         let damage =
-            calculateSkillDamage(
-                baseDamage,
-                statBonus,
-                monster,
-                player.level,
-                player.element
-            );
+            calculateSkillDamage({
+                skill:skill,
+                skillLevel:level,
+                effectiveAttack:statBonus,
+                target:monster,
+                casterLevel:player.level,
+                casterElement:player.element
+            });
 
 
         damage =
@@ -17418,19 +17407,6 @@ function processSingleMonsterAttack(monsterIndex,token){
         0;
 
 
-    const skillBonusDamage=
-
-        castSkillData2
-        ?
-        (
-            (castSkillData2.baseDamage||0)+
-            (castSkillData2.damagePerLevel||0)*
-            (effectiveSkillLevel-1)
-        )
-        :
-        0;
-
-
     /*
        ★ 新增（依照使用者要求，物理/法術
        分開算，完全比照玩家castDamageSkill()
@@ -17521,9 +17497,18 @@ function processSingleMonsterAttack(monsterIndex,token){
 
 
             let damage=
-                calculateDamage(
-                    baseAttackStat+
-                    skillBonusDamage,
+                castSkillData2
+                ?calculateSkillDamage({
+                    skill:castSkillData2,
+                    skillLevel:effectiveSkillLevel,
+                    effectiveAttack:baseAttackStat,
+                    target:targetCharacter,
+                    targetDefense:targetStats.defense,
+                    casterLevel:monster.level,
+                    casterElement:monster.element
+                })
+                :calculateDamage(
+                    baseAttackStat,
                     targetStats.defense,
                     monster.level,
                     targetCharacter.level,
@@ -21095,7 +21080,6 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
     setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
 
     const statBonus=skill.category==="magic" ? stats.magicAttack : stats.attack;
-    const baseDamage=getSkillDamageAtLevel(skill,level);
     const exSkill=skillDatabase[skill.element+"EX"];
     const exLevel=getSkillLevel(characterKey,skill.element+"EX");
     const passiveMultiplier=(exSkill && exLevel>0 && exSkill.damageBonusPercent)
@@ -21176,13 +21160,14 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
             return;
         }
 
-        let damage=calculateSkillDamage(
-            baseDamage,
-            statBonus,
-            monster,
-            character.level,
-            character.element
-        );
+        let damage=calculateSkillDamage({
+            skill:skill,
+            skillLevel:level,
+            effectiveAttack:statBonus,
+            target:monster,
+            casterLevel:character.level,
+            casterElement:character.element
+        });
 
         damage=Math.floor(damage*passiveMultiplier);
         damage=Math.floor(damage*getPhysicalSkillRankBonusMultiplier(skill,monster));
@@ -21613,13 +21598,6 @@ function castPlayer2Skill(skillId,centerIndex){
         stats2.attack;
 
 
-    const baseDamage=
-        getSkillDamageAtLevel(
-            skill,
-            level
-        );
-
-
     const exSkillId=
         skill.element+
         "EX";
@@ -21854,13 +21832,14 @@ function castPlayer2Skill(skillId,centerIndex){
 
 
         let damage=
-            calculateSkillDamage(
-                baseDamage,
-                statBonus,
-                monster,
-                player2.level,
-                player2.element
-            );
+            calculateSkillDamage({
+                skill:skill,
+                skillLevel:level,
+                effectiveAttack:statBonus,
+                target:monster,
+                casterLevel:player2.level,
+                casterElement:player2.element
+            });
 
 
         damage=
@@ -30222,10 +30201,11 @@ function getBackpackCharacterStats(index){
     const bonus=getEquipmentBonus(key);
 
     return {
-        maxHP:100+(character.bonusHP||0)+character.vitality*50+bonus.maxHP+bonus.vitality*50,
+        maxHP:100+(character.bonusHP||0)+character.vitality*HP_PER_VITALITY_POINT+bonus.maxHP+bonus.vitality*HP_PER_VITALITY_POINT,
         maxSP:50+(character.bonusSP||0)+character.energy*15+bonus.maxSP+bonus.energy*15,
-        attack:10+character.attack*5+bonus.attack,
-        defense:10+character.vitality*15+bonus.defense+bonus.vitality*15,
+        attack:BASE_PHYSICAL_ATTACK+character.attack*ATTACK_PER_POINT+bonus.attack,
+        magicAttack:BASE_MAGIC_ATTACK+(character.intelligence+bonus.intelligence)*MAGIC_ATTACK_PER_POINT,
+        defense:BASE_DEFENSE+character.vitality*DEFENSE_PER_VITALITY_POINT+bonus.defense+bonus.vitality*DEFENSE_PER_VITALITY_POINT,
         vitality:character.vitality+bonus.vitality,
         energy:character.energy+bonus.energy,
         intelligence:character.intelligence+bonus.intelligence,

@@ -83,41 +83,6 @@
         };
     }
 
-    if(typeof calculateDamage==="function"){
-        calculateDamage=function(
-            attack,
-            defense,
-            casterLevel,
-            targetLevel,
-            casterElement,
-            targetElement
-        ){
-            const levelDiff=(numeric(casterLevel)||1)-(numeric(targetLevel)||1);
-            const levelFactor=clamp(1+levelDiff*0.02,0.70,1.30);
-            const elementFactor=typeof getElementalDamageMultiplier==="function"
-                ?getElementalDamageMultiplier(casterElement,targetElement)
-                :1;
-            const adjustedAttack=numeric(attack)*levelFactor*numeric(elementFactor||1);
-            const formulaConstant=350;
-            const rawDamage=
-                adjustedAttack*formulaConstant/
-                (formulaConstant+Math.max(0,numeric(defense)));
-            const randomFactor=0.95+Math.random()*0.10;
-            let result=Math.max(1,Math.round(rawDamage*randomFactor));
-            if(
-                typeof window.v155GetCurrentDamageActor==="function"&&
-                typeof window.v155GetPhoenixMightMultiplier==="function"
-            ){
-                result=Math.max(1,Math.floor(
-                    result*window.v155GetPhoenixMightMultiplier(
-                        window.v155GetCurrentDamageActor()
-                    )
-                ));
-            }
-            return result;
-        };
-    }
-
     function castTriFreeze(characterIndex,skillId,centerIndex,legacyPlayer2){
         const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
         const character=legacyPlayer2
