@@ -1,0 +1,30 @@
+name: V173.38 Inspect Staged Patch
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17338-inspect-staged.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 2
+      - name: Decode and validate staged patch
+        run: |
+          base64 -d .github/v17338.patch.xz.b64 | xz -d > /tmp/v17338.patch
+          git apply --check /tmp/v17338.patch
+          git apply --stat /tmp/v17338.patch
+          cp /tmp/v17338.patch v17338.patch
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v17338-staged-patch
+          path: v17338.patch
+          retention-days: 1
