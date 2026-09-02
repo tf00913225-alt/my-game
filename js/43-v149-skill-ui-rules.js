@@ -454,32 +454,6 @@
         finally{ rollStatusEffectHit=previousStatusRoll; }
     }
 
-    function learnedFireEX(context){
-        if(!context||!context.character||context.character.element!=="fire"){ return false; }
-        if(typeof getSkillLevel!=="function"){ return false; }
-        const key=typeof getPartyCharacterKey==="function"
-            ?getPartyCharacterKey(context.characterIndex)
-            :(context.characterIndex===0?"fire":"player"+(context.characterIndex+1));
-        return numeric(getSkillLevel(key,"fireEX"))>0;
-    }
-
-    if(typeof calculateSkillDamage==="function"){
-        const previousCalculateSkillDamage=calculateSkillDamage;
-        calculateSkillDamage=function(){
-            const options=arguments[0];
-            const target=options&&typeof options==="object"&&options.skill
-                ?options.target
-                :arguments[2];
-            let result=previousCalculateSkillDamage.apply(this,arguments);
-            const bonus=skillDatabase.fireEX&&numeric(skillDatabase.fireEX.statusTargetDamageBonusPercent);
-            if(result>0&&bonus>0&&learnedFireEX(playerSkillContext)&&target&&Array.isArray(target.statusEffects)&&
-                target.statusEffects.some(effect=>effect&&numeric(effect.turnsLeft)>0)){
-                result=Math.floor(result*(1+bonus/100));
-            }
-            return result;
-        };
-    }
-
     /* Every qualifying Fire physical skill reuses this one owner. */
     function firstLivingMonsterIndex(){
         const indexes=livingMonsterIndexes();

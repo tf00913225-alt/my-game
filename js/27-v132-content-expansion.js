@@ -1706,14 +1706,13 @@
         return DUNGEON_ELEMENTS[Math.floor(Math.random()*DUNGEON_ELEMENTS.length)];
     }
 
-    /* 副本普通怪沿用既有的完整基準：裸值×1.30，再套副本普通
-       ×1.10。這組基準獨立於十區野怪曲線，裝備副本與深淵都先
-       由此建立，再各自取得且只取得一套對應的 rank 強化。 */
+    /* 副本普通怪的 HP／SP／防禦沿用既有耐久基準；攻擊與魔攻
+       不在建怪階段放大，怪物對玩家的輸出統一交由敵方壓力倍率。 */
     const DUNGEON_MONSTER_STRENGTH=1.30;
 
     function applyDungeonMonsterStrength(monster){
         if(!monster){ return monster; }
-        ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
+        ["maxHP","maxSP","defense"].forEach(key=>{
             if(Number.isFinite(Number(monster[key]))){
                 monster[key]=Math.max(1,Math.round(Number(monster[key])*DUNGEON_MONSTER_STRENGTH));
             }
@@ -1743,7 +1742,7 @@
 
     function applyDungeonNormalBonus(monster){
         if(!monster){ return monster; }
-        ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
+        ["maxHP","maxSP","defense"].forEach(key=>{
             if(Number.isFinite(Number(monster[key]))){
                 monster[key]=Math.max(1,Math.round(Number(monster[key])*DUNGEON_NORMAL_BONUS));
             }
@@ -1758,15 +1757,16 @@
        （已經套過×1.30跟×1.10）再往上疊加，不重新從裸數值
        算起。V138 依最新規格在原有強度上再加：精英最終HP
        再+100%、SP+100%；BOSS最終HP再+50%、SP+100%。
-       因此保留既有的攻擊／魔攻／防禦倍率，HP倍率分別由
-       1.60×2.00＝3.20、3.00×1.50＝4.50，SP則兩者皆×2.00。
+       V173.38 起 rank 只放大生存資源；攻擊／魔攻不再於建怪階段
+       乘算，敵方輸出壓力統一交由正式 enemyPressure 加算桶控制。
+       HP倍率分別為3.20、4.50，SP兩者皆×2.00，防禦倍率保留。
        只認monster.rank（makeZoneMonster()第4個參數決定），
        一般怪（rank是undefined）這裡什麼都不做，直接跳過。
     */
-    const DUNGEON_ELITE_MULTIPLIERS={maxHP:3.20,maxSP:2.00,attack:1.30,magicAttack:1.30,defense:1.25};
-    const DUNGEON_BOSS_MULTIPLIERS={maxHP:4.50,maxSP:2.00,attack:1.50,magicAttack:1.50,defense:1.40};
-    const EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS={maxHP:1.80,attack:1.15,magicAttack:1.15,defense:1.10};
-    const EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS={maxHP:2.80,attack:1.30,magicAttack:1.30,defense:1.20};
+    const DUNGEON_ELITE_MULTIPLIERS={maxHP:3.20,maxSP:2.00,defense:1.25};
+    const DUNGEON_BOSS_MULTIPLIERS={maxHP:4.50,maxSP:2.00,defense:1.40};
+    const EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS={maxHP:1.80,defense:1.10};
+    const EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS={maxHP:2.80,defense:1.20};
 
     function applyDungeonRankStrength(monster){
         if(!monster){ return monster; }
@@ -1792,6 +1792,7 @@
         applyDungeonMonsterStrength(monster);
         applyDungeonNormalBonus(monster);
         applyDungeonRankStrength(monster);
+        monster.v132Dungeon=true;
         return monster;
     }
     window.v132BuildDungeonMonster=buildDungeonMonster;
@@ -1818,6 +1819,7 @@
         applyDungeonMonsterStrength(monster);
         applyDungeonNormalBonus(monster);
         applyEquipmentDungeonRankStrength(monster);
+        monster.v132Dungeon=true;
         monster.v132EquipmentDungeon=true;
         return monster;
     }

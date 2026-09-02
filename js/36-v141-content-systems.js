@@ -525,10 +525,13 @@
         const level=window.v132GetDungeonMonsterLevel?window.v132GetDungeonMonsterLevel():Math.max(1,window.v141GetHighestCharacterLevel());
         if(floor<5){
             const data=abyssFloors[floor];
-            const boss=makeAbyssMonster(data.boss,level,data.element,"boss",5000,data.skills,floor);
+            const skillLevel=typeof window.v141GetMonsterFixedSkillLevel==="function"
+                ?window.v141GetMonsterFixedSkillLevel(level)
+                :(level<=20?1:level<=40?2:level<=60?3:level<=80?4:5);
+            const boss=makeAbyssMonster(data.boss,level,data.element,"boss",5000,data.skills,skillLevel);
             const roster=[boss];
             for(let i=0;i<4;i++){
-                roster.push(makeAbyssMonster("天兵天將",level,data.element,"elite",2500,[data.eliteSkill],floor));
+                roster.push(makeAbyssMonster("天兵天將",level,data.element,"elite",2500,[data.eliteSkill],skillLevel));
             }
             return roster;
         }
@@ -554,9 +557,9 @@
             ["wind",null,"dodgeSkill"],["water",null,"healSpell"]
         ];
         elites.forEach((spec,position)=>{
-            const monster=makeAbyssMonster("天兵天將",level,spec[0],"elite",3500,spec[1]?[spec[1]]:[],4);
+            const monster=makeAbyssMonster("天兵天將",level,spec[0],"elite",3500,spec[1]?[spec[1]]:[],5);
             monster.v141SupportSkillIds=spec[2]?[spec[2]]:[];
-            monster.v141ForceSkillLevel=4;
+            monster.v141ForceSkillLevel=5;
             monster.v141FormationRow=1;
             monster.v141FormationPosition=position;
             roster.push(monster);

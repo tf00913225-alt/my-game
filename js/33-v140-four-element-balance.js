@@ -316,7 +316,10 @@
 
         if(result&&result.isCrit){
             return Object.assign({},result,{
-                multiplier:result.multiplier+(damageBonus-chanceBonus)/100
+                multiplier:Math.min(
+                    typeof CRIT_MULTIPLIER_MAX==="number"?CRIT_MULTIPLIER_MAX:2.25,
+                    result.multiplier+(damageBonus-chanceBonus)/100
+                )
             });
         }
         return result;

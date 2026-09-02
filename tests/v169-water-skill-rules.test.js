@@ -186,40 +186,12 @@ test("Frostbite rejects Abyss special skills while allowing the normal fallback"
     assert.equal(context.v169WaterSkillRules.isFrostbitten(monsters[0]),true);
 });
 
-test("monster Freeze remains pure control even against Defend and Barrier",()=>{
-    const barrier={type:"barrier",turnsLeft:5,remainingBlocks:1};
-    const target={id:"玩家",hp:100,isDefending:true,activeBuffs:[barrier],statusEffects:[]};
-    const logs=[];
-    const context=load({
-        player:target,
-        monsters:[{name:"北帝天尊"}],
-        getExistingPartyIndexes:()=>[0],
-        getPartyCharacterByIndex:()=>target,
-        showMonsterSkillNameBadge(){},
-        calculateDamage(){ return 80; },
-        addBattleLog(message){ logs.push(message); },
-        processSingleMonsterAttack(){
-            this.showMonsterSkillNameBadge("冰封","water",0);
-            let damage=this.calculateDamage(80,0,1,1,"water","water");
-            if(target.isDefending){ damage=Math.max(1,Math.floor(damage*.5)); }
-            if(target.activeBuffs.some(buff=>buff.type==="barrier"&&buff.remainingBlocks>0)){
-                barrier.remainingBlocks--;
-                target.activeBuffs=target.activeBuffs.filter(buff=>buff.remainingBlocks>0);
-                this.addBattleLog("玩家的結界完全格擋了這次攻擊！");
-                damage=0;
-            }
-            target.hp-=damage;
-            target.statusEffects.push({type:"freeze",turnsLeft:this.skillDatabase.freeze.freezeDuration});
-            this.addBattleLog("北帝天尊施放冰封玩家，造成"+damage+"傷害。");
-        }
-    });
-    context.processSingleMonsterAttack(0);
-    assert.equal(target.hp,100,"pure control cannot remove HP");
-    assert.equal(target.isDefending,true,"Defend state is restored");
-    assert.equal(barrier.remainingBlocks,1,"pure control cannot consume a direct-hit Barrier charge");
-    assert.equal(target.activeBuffs.includes(barrier),true);
-    assert.deepEqual(target.statusEffects,[{type:"freeze",turnsLeft:3}]);
-    assert.deepEqual(logs,[],"legacy zero-damage and Barrier messages are suppressed");
+test("monster Freeze pure-control damage is owned by the authoritative core",()=>{
+    const main=fs.readFileSync("js/00-main.js","utf8");
+    assert.doesNotMatch(source,/window\.calculateDamage\s*=/);
+    assert.match(main,/const isPureControlSkill=[\s\S]*?castSkillData2\.id==="freeze"/);
+    assert.match(main,/let damage=[\s\S]*?isPureControlSkill[\s\S]*?\?0/);
+    assert.match(main,/if\(damage>0 && hasBarrier\)/);
 });
 
 test("all final UI description entry points expose Frostbite and HP-only recovery",()=>{

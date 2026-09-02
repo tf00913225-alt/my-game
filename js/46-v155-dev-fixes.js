@@ -932,17 +932,6 @@
         };
     }
 
-    if(typeof calculateDamage==="function"){
-        const previousCalculateDamage=calculateDamage;
-        calculateDamage=function(){
-            const result=previousCalculateDamage.apply(this,arguments);
-            const buff=phoenixBuffReady(currentDamageActor());
-            return buff
-                ?Math.floor(numeric(result)*(1+numeric(buff.bonusPercent)/100))
-                :result;
-        };
-    }
-
     function wrapPlayerDamageActor(name,actorFromArguments){
         const previous=window[name];
         if(typeof previous!=="function"){ return; }

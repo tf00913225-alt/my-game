@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.37)
+ * CURRENT FINAL INTEGRATION SPEC (V173.38)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
@@ -126,10 +126,10 @@ const FINAL_FOUR_ELEMENT_CORE={
 };
 
 const FINAL_DAMAGE_ROLE_PROFILES={
-    single_low:[1.40,.05,0,0],single_normal:[1.75,.075,10,0],single_burst:[2.10,.10,20,0],
-    tri_damage:[1.35,.05,5,0],aoe_damage:[1.10,.05,0,0],
-    single_control:[1.35,.05,0,0],tri_control:[1.20,.04,0,0],aoe_control:[.95,.04,0,0],
-    single_dot:[1.50,.06,5,0],tri_dot:[1.15,.04,0,0],aoe_dot:[.95,.04,0,0]
+    single_low:[1.20,.05,0,0],single_normal:[1.50,.075,0,0],single_burst:[1.75,.10,0,0],
+    tri_damage:[.95,.05,0,0],aoe_damage:[.70,.04,0,0],
+    single_control:[1.50,.075,0,0],tri_control:[.95,.05,0,0],aoe_control:[.70,.04,0,0],
+    single_dot:[1.50,.075,0,0],tri_dot:[.95,.05,0,0],aoe_dot:[.70,.04,0,0]
 };
 
 const FINAL_DAMAGE_SKILL_ROLES={
@@ -328,9 +328,9 @@ test("all ten wild zones use the exact one-pass curve and the beginner forest st
             return {
                 maxHP:Math.max(1,Math.round((100+monster.vitalityPoints*50)*multiplier)),
                 maxSP:Math.max(1,Math.round((50+monster.energyPoints*15)*multiplier)),
-                attack:Math.max(1,Math.round((10+monster.attackPoints*8)*multiplier)),
-                defense:Math.max(1,Math.round((10+monster.vitalityPoints*6)*multiplier)),
-                magicAttack:Math.max(1,Math.round((10+monster.intelligencePoints*8)*multiplier))
+                attack:Math.max(1,Math.round((30+monster.level*4+monster.attackPoints*3)*multiplier)),
+                defense:Math.max(1,Math.round((30+monster.level*3+monster.vitalityPoints*4)*multiplier)),
+                magicAttack:Math.max(1,Math.round((30+monster.level*4+monster.intelligencePoints*3)*multiplier))
             };
         }
         function actual(monster){
@@ -419,9 +419,9 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
 
 test("final normal hit and status-effect bounds override the historical floors",()=>{
     assert.match(mainSource,/const STATUS_RESIST_PER_SPIRIT_POINT = 0\.05;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0\.02;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0\.70;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1\.30;/);
+    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0\.01;/);
+    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0\.85;/);
+    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1\.15;/);
     assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 50;/);
     assert.doesNotMatch(mainSource,/STATUS_HIT_INT_COEFFICIENT|HIT_CHANCE_MIN_PERCENT = 60/);
     const runtime=loadFinalRuntime();
@@ -453,7 +453,7 @@ test("final normal hit and status-effect bounds override the historical floors",
     runtime.context.Math.random=()=>.5;
     assert.deepEqual(
         levelCases.map(([difference])=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
-        [100,110,120,130,130,90,80,70,70]
+        [100,105,110,115,115,95,90,85,85]
     );
 });
 
@@ -764,11 +764,10 @@ test("Phoenix Might counts only newly added Burns and boosts every direct damage
         castDamageSkill("phoenixCry");
         const buff=player.activeBuffs.find(entry=>entry.type==="phoenixMight");
         const burnCounts=monsters.map(monster=>monster.statusEffects.filter(effect=>effect.type==="burn").length);
-        turn=5;
-        window.v149CurrentDamageActor=player;
-        const boosted=calculateDamage(100,0,1,1,"fire","earth");
+        turn=5;Math.random=function(){ return .5; };
+        const boosted=calculateDamage(100,0,1,1,"fire","earth",{attacker:player,target:monsters[0]});
         player.activeBuffs=[];
-        const plain=calculateDamage(100,0,1,1,"fire","earth");
+        const plain=calculateDamage(100,0,1,1,"fire","earth",{attacker:player,target:monsters[0]});
         return {
             burnCounts:burnCounts,
             buff:buff&&{statusName:buff.statusName,readyTurn:buff.readyTurn,expiresTurn:buff.expiresTurn,bonusPercent:buff.bonusPercent},
@@ -929,15 +928,14 @@ test("equipment dungeon is fixed at one boss plus four elites with its own singl
         const equipmentBoss=v132BuildEquipmentDungeonMonster("裝備首領",60,"fire","boss");
         function expected(base,multiplier){
             return {maxHP:Math.round(base.maxHP*multiplier.maxHP),maxSP:base.maxSP,
-                attack:Math.round(base.attack*multiplier.attack),
-                magicAttack:Math.round(base.magicAttack*multiplier.magicAttack),
+                attack:base.attack,magicAttack:base.magicAttack,
                 defense:Math.round(base.defense*multiplier.defense)};
         }
         function actual(monster){ return {maxHP:monster.maxHP,maxSP:monster.maxSP,attack:monster.attack,
             magicAttack:monster.magicAttack,defense:monster.defense}; }
         return {compositions:compositions,multipliers:v173EquipmentDungeonRankMultipliers,
-            elite:{actual:actual(equipmentElite),expected:expected(normalEliteBase,{maxHP:1.8,attack:1.15,magicAttack:1.15,defense:1.1})},
-            boss:{actual:actual(equipmentBoss),expected:expected(normalBossBase,{maxHP:2.8,attack:1.3,magicAttack:1.3,defense:1.2})}};
+            elite:{actual:actual(equipmentElite),expected:expected(normalEliteBase,{maxHP:1.8,defense:1.1})},
+            boss:{actual:actual(equipmentBoss),expected:expected(normalBossBase,{maxHP:2.8,defense:1.2})}};
     })()`);
     result.compositions.forEach((entry,index)=>{
         assert.deepEqual(entry.composition,{playerCount:index+1,bossCount:1,eliteCount:4,total:5});
@@ -951,8 +949,8 @@ test("equipment dungeon is fixed at one boss plus four elites with its own singl
         assert.equal(entry.unchanged,true);
         assert.equal(entry.locked,true);
     });
-    assert.deepEqual(result.multipliers,{elite:{maxHP:1.8,attack:1.15,magicAttack:1.15,defense:1.1},
-        boss:{maxHP:2.8,attack:1.3,magicAttack:1.3,defense:1.2}});
+    assert.deepEqual(result.multipliers,{elite:{maxHP:1.8,defense:1.1},
+        boss:{maxHP:2.8,defense:1.2}});
     assert.deepEqual(result.elite.actual,result.elite.expected);
     assert.deepEqual(result.boss.actual,result.boss.expected);
 });
@@ -975,11 +973,10 @@ test("Abyss floors one through five keep exact compositions, skill levels and ad
                 positions:roster.map(monster=>monster.v141FormationPosition)};
         });
     })()`);
-    result.slice(0,4).forEach((floor,index)=>{
-        const level=index+1;
+    result.slice(0,4).forEach(floor=>{
         assert.equal(floor.count,5);
         assert.deepEqual(floor.ranks,["boss","elite","elite","elite","elite"]);
-        assert.deepEqual(floor.forceLevels,[level,level,level,level,level]);
+        assert.deepEqual(floor.forceLevels,[4,4,4,4,4]);
         assert.deepEqual(floor.extraHP,[5000,2500,2500,2500,2500]);
     });
     const final=result[4];
@@ -1172,7 +1169,7 @@ test("all formal four-element damage skills use one fixed damage-role table",()=
         const skill=skillDatabase.fireBurstStrike;
         return [skill.damageRole,skill.powerMultiplier,skill.powerPerLevel,skill.flatDamage,skill.flatDamagePerLevel];
     })()`);
-    assert.deepEqual(monsterOnly,["single_normal",1.75,.075,10,0]);
+    assert.deepEqual(monsterOnly,["single_normal",1.50,.075,0,0]);
     assert.doesNotMatch(mainSource,/skillBonusDamage/);
     ["castDamageSkill","castSecondaryCharacterSkill","castPlayer2Skill","processSingleMonsterAttack"].forEach(name=>{
         const start=mainSource.indexOf("function "+name+"(");
@@ -1202,20 +1199,20 @@ test("dynamic defense, recalibrated attributes and modern or legacy skills share
                 return calculateDamage(k,k,level,level,"fire","fire");
             }),
             base:{maxHP:base.maxHP,attack:base.attack,magicAttack:base.magicAttack,defense:base.defense},
-            monster:{attack:monster.attack,expectedAttack:10+monster.attackPoints*8,
-                magicAttack:monster.magicAttack,expectedMagicAttack:10+monster.intelligencePoints*8,
-                defense:monster.defense,expectedDefense:10+monster.vitalityPoints*6},
+            monster:{attack:monster.attack,expectedAttack:30+monster.level*4+monster.attackPoints*3,
+                magicAttack:monster.magicAttack,expectedMagicAttack:30+monster.level*4+monster.intelligencePoints*3,
+                defense:monster.defense,expectedDefense:30+monster.level*3+monster.vitalityPoints*4},
             modern:modern,modernRaw:v173GetSkillRawAttack(skillDatabase.flameSlash,1,100),
             legacy:legacy,legacyRaw:v173GetSkillRawAttack(legacySkill,3,100)
         };
     })()`);
-    assert.deepEqual(result.constants,[550,1000,1450,1750]);
-    assert.deepEqual(result.half,[275,500,725,875]);
-    assert.deepEqual(result.base,{maxHP:600,attack:90,magicAttack:90,defense:70});
+    assert.deepEqual(result.constants,[600,900,1200,1400]);
+    assert.deepEqual(result.half,[300,450,600,700]);
+    assert.deepEqual(result.base,{maxHP:600,attack:64,magicAttack:64,defense:73});
     assert.equal(result.monster.attack,result.monster.expectedAttack);
     assert.equal(result.monster.magicAttack,result.monster.expectedMagicAttack);
     assert.equal(result.monster.defense,result.monster.expectedDefense);
-    assert.deepEqual([result.modern,result.modernRaw],[140,140]);
+    assert.deepEqual([result.modern,result.modernRaw],[120,120]);
     assert.deepEqual([result.legacy,result.legacyRaw],[140,140]);
 });
 
@@ -1243,88 +1240,69 @@ test("the live monster skill path uses the same modern skill calculator",()=>{
         processSingleMonsterAttack(0,battleToken);
         return {expected:expected,actual:4070-player.hp};
     })()`);
-    assert.deepEqual(result,{expected:206,actual:206});
+    assert.deepEqual(result,{expected:160,actual:160});
 });
 
-test("representative normal, equipment and Abyss damage stays in the intended hierarchy",()=>{
+test("V173.38 formal damage matrix covers levels, roles, elements, pressure and snapshot range",()=>{
     const runtime=loadFinalRuntime();
     const report=evaluateJson(runtime.context,`(function(){
         Math.random=function(){ return .5; };
-        function playerFixture(level){
-            return {level:level,element:"light",maxHP:100+level*50+(level-1)*30,defense:10+level*6};
+        const roles=["single_low","single_normal","single_burst","tri_damage","aoe_damage"];
+        function roleSkill(role){
+            return Object.assign({id:"test-"+role,category:"physical",damageRole:role},v173DamageRoleProfiles[role]);
         }
-        function percent(damage,maxHP){ return Math.round(damage/maxHP*10000)/100; }
-        function skillForRole(role){
-            return Object.assign({id:"role-"+role,category:"physical"},v173DamageRoleProfiles[role],{damageRole:role});
+        function direct(level,role,skillLevel){
+            const attack=30+level*4+level*3;
+            const defense=30+level*3+level*4;
+            return calculateSkillDamage({skill:roleSkill(role),skillLevel:skillLevel,effectiveAttack:attack,
+                target:{level:level,element:"light",statusEffects:[]},targetDefense:defense,
+                casterLevel:level,casterElement:"light"});
         }
-        function skillDamage(monster,skill,skillLevel,target){
-            const offense=skill.category==="magic"?monster.magicAttack:monster.attack;
-            return calculateSkillDamage({skill:skill,skillLevel:skillLevel,effectiveAttack:offense,
-                target:target,targetDefense:target.defense,casterLevel:monster.level,casterElement:monster.element});
-        }
-        const roles=["single_low","single_normal","single_burst","tri_damage","aoe_damage","single_control","aoe_control"];
-        const levelRows=[20,50,80,100].map(level=>{
-            const target=playerFixture(level);
-            const monster=makeZoneMonster("同級野怪",level,"fire","regular");
-            const multiplier=v173WildZoneStrengthMultipliers[Math.ceil(level/10)-1];
-            ["maxHP","maxSP","attack","magicAttack","defense"].forEach(key=>{
-                monster[key]=Math.max(1,Math.round(monster[key]*multiplier));
-            });
-            const normal=calculateDamage(monster.attack,target.defense,level,level,"fire","light");
-            const skillLevel=Math.min(5,Math.ceil(level/20));
-            const damages={};
-            roles.forEach(role=>{ damages[role]=skillDamage(monster,skillForRole(role),skillLevel,target); });
-            return {level:level,skillLevel:skillLevel,maxHP:target.maxHP,normal:normal,
-                normalPercent:percent(normal,target.maxHP),damages:damages};
-        });
+        const levels=[20,50,80,100].map(level=>({
+            level:level,
+            values:Object.fromEntries(roles.map(role=>[role,direct(level,role,Math.min(5,Math.ceil(level/20)))]))
+        }));
+        const baseOptions={ordinaryDamageBonusPercent:0,critMultiplier:1};
+        const same=calculateDamage(1000,0,50,50,"light","light",baseOptions);
+        const high=calculateDamage(1000,0,60,50,"light","light",baseOptions);
+        const low=calculateDamage(1000,0,30,50,"light","light",baseOptions);
+        const neutral=calculateDamage(1000,0,50,50,"earth","fire",baseOptions);
+        const advantage=calculateDamage(1000,0,50,50,"earth","water",baseOptions);
+        const disadvantage=calculateDamage(1000,0,50,50,"water","earth",baseOptions);
 
-        Object.assign(player,{id:"基準角色",level:60});player2=null;player3=null;
-        const equipment=v132BuildEquipmentDungeonRoster();
-        const equipmentTarget=playerFixture(60);
-        const equipmentRows=[equipment.find(monster=>monster.rank==="elite"),equipment.find(monster=>monster.rank==="boss")].map(monster=>{
-            const skill=skillDatabase[monster.skillIds[0]];
-            const normal=calculateDamage(monster.attack,equipmentTarget.defense,monster.level,60,monster.element,"light");
-            const damage=skillDamage(monster,skill,monster.v141ForceSkillLevel,equipmentTarget);
-            return {rank:monster.rank,normal:normal,normalPercent:percent(normal,equipmentTarget.maxHP),
-                skillId:skill.id,skillLevel:monster.v141ForceSkillLevel,skillDamage:damage,
-                skillPercent:percent(damage,equipmentTarget.maxHP)};
-        });
+        Object.assign(player,{id:"目標",level:100,element:"light"});player2=null;player3=null;
+        const world={rank:"regular",level:100,element:"fire"};
+        const elite={rank:"elite",level:100,element:"fire"};
+        const boss={rank:"boss",level:100,element:"fire"};
+        const daily={rank:"boss",level:100,element:"fire",v132Dungeon:true};
+        const abyss={rank:"boss",level:100,element:"fire",v132Dungeon:true,v141Abyss:true};
+        const pressures=[world,elite,boss,daily,abyss].map(attacker=>v173GetEnemyPressureMultiplier(attacker,player));
+        const reverse=v173GetEnemyPressureMultiplier(player,abyss);
 
-        Object.assign(player,{id:"基準角色",level:100});
-        const abyssTarget=playerFixture(100);
-        const preferred={1:"dustStorm",2:"dragonSlash",3:"windCrossSlash",4:"floodBeast",5:"dragonSlash"};
-        const abyssRows=[1,2,3,4,5].map(floor=>{
-            const roster=v141BuildAbyssRoster(floor);
-            if(floor===5){ v155PatchFinalAbyssRoster(roster); }
-            const monster=floor===5?roster.find(entry=>entry.name==="南帝天尊"):roster[0];
-            const skill=skillDatabase[preferred[floor]];
-            const normal=calculateDamage(monster.attack,abyssTarget.defense,monster.level,100,monster.element,"light");
-            const damage=skillDamage(monster,skill,monster.v141ForceSkillLevel,abyssTarget);
-            return {floor:floor,boss:monster.name,normal:normal,normalPercent:percent(normal,abyssTarget.maxHP),
-                skillId:skill.id,skillLevel:monster.v141ForceSkillLevel,skillDamage:damage,
-                skillPercent:percent(damage,abyssTarget.maxHP),extraHP:monster.v141ExtraHP};
-        });
-        return {levels:levelRows,equipment:equipmentRows,abyss:abyssRows};
+        const burst=roleSkill("single_burst");
+        const snapshot=calculateSkillDamage({skill:burst,skillLevel:5,effectiveAttack:1330,
+            target:{level:100,element:"light",statusEffects:[]},targetDefense:1330,
+            casterLevel:100,casterElement:"light",critMultiplier:1});
+        const budget=calculateSkillDamage({skill:Object.assign({},burst,{damageBudgetMultiplier:.9}),skillLevel:5,effectiveAttack:1330,
+            target:{level:100,element:"light",statusEffects:[]},targetDefense:1330,
+            casterLevel:100,casterElement:"light",critMultiplier:1});
+        return {levels:levels,level:[same,high,low],element:[neutral,advantage,disadvantage],
+            pressures:pressures,reverse:reverse,snapshot:snapshot,budget:budget};
     })()`);
 
     report.levels.forEach(row=>{
-        assert.ok(row.normalPercent>=3&&row.normalPercent<=7,"Lv"+row.level+" normal "+row.normalPercent+"%");
-        const ratio=role=>row.damages[role]/row.normal;
-        assert.ok(ratio("single_low")>=1.3&&ratio("single_low")<=1.65);
-        assert.ok(ratio("single_normal")>=1.6&&ratio("single_normal")<=2.2);
-        assert.ok(ratio("single_burst")>=2&&ratio("single_burst")<=2.7);
-        assert.ok(row.damages.tri_damage<row.damages.single_normal);
-        assert.ok(row.damages.aoe_damage<row.damages.single_burst);
-        assert.ok(row.damages.single_control<row.damages.single_burst);
-        assert.ok(row.damages.aoe_control<row.damages.aoe_damage);
+        assert.ok(row.values.single_low<row.values.single_normal);
+        assert.ok(row.values.single_normal<row.values.single_burst);
+        assert.ok(row.values.tri_damage<row.values.single_normal);
+        assert.ok(row.values.aoe_damage<row.values.tri_damage);
+        Object.values(row.values).forEach(value=>assert.ok(Number.isFinite(value)&&value>=1));
     });
-    assert.ok(report.equipment[0].normalPercent>=5&&report.equipment[0].normalPercent<=9);
-    assert.ok(report.equipment[1].normalPercent>=6&&report.equipment[1].normalPercent<=11);
-    assert.deepEqual(report.equipment.map(row=>row.skillLevel),[2,3]);
-    report.abyss.forEach(row=>assert.ok(row.normalPercent>=6&&row.normalPercent<=11));
-    assert.deepEqual(report.abyss.map(row=>row.skillLevel),[1,2,3,4,5]);
-    assert.deepEqual(report.abyss.map(row=>row.extraHP),[5000,5000,5000,5000,10000]);
-    assert.ok(report.abyss[4].skillPercent>=15&&report.abyss[4].skillPercent<=25);
+    assert.deepEqual(report.level,[1000,1100,850]);
+    assert.deepEqual(report.element,[1000,1200,850]);
+    assert.deepEqual(report.pressures,[1,1.1,1.2,1.25,1.35]);
+    assert.equal(report.reverse,1);
+    assert.ok(report.snapshot>=1300&&report.snapshot<=1700,report.snapshot);
+    assert.ok(report.budget<report.snapshot);
 });
 
 test("forced final-Abyss skill levels fold the modern scaling fields exactly once",()=>{
@@ -1340,8 +1318,108 @@ test("forced final-Abyss skill levels fold the modern scaling fields exactly onc
         return {before:before,during:during,after:after};
     })()`);
     assert.deepEqual(result,{
-        before:[5,2.1,.1,20,0],during:[1,2.5,0,20,0],after:[5,2.1,.1,20,0]
+        before:[5,1.75,.1,0,0],during:[1,2.15,0,0,0],after:[5,1.75,.1,0,0]
     });
+});
+
+
+
+test("ordinary bonuses share one capped additive bucket and critical damage caps at 2.25",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Math.random=function(){ return .5; };
+        getElementDamagePassiveMultiplier=function(){ return 1.12; };
+        getPhysicalSkillRankBonusMultiplier=function(){ return 1.15; };
+        getLearnedElementEX=function(){ return {}; };
+        window.v155GetPhoenixMightMultiplier=function(){ return 1; };
+        const attacker={element:"fire",activeBuffs:[],statusEffects:[]};
+        const target={rank:"boss",level:50,element:"light",statusEffects:[{type:"burn",turnsLeft:1}]};
+        const skill={category:"physical"};
+        const options={attacker:attacker,target:target,skill:skill,critMultiplier:1};
+        const percent=v173GetOrdinaryDamageBonusPercent(options);
+        const additive=calculateDamage(1000,0,50,50,"fire","light",options);
+        const capped=calculateDamage(1000,0,50,50,"light","light",{
+            ordinaryDamageBonusPercent:[40,20],critMultiplier:1
+        });
+        const cappedCrit=calculateDamage(1000,0,50,50,"light","light",{critMultiplier:99});
+
+        Object.assign(player,{level:100,attack:1000,element:"fire",activeBuffs:[{
+            type:"rage",turnsLeft:2,skillLevel:5,bonusPercent:1000,
+            critChanceBonusPercent:1000,critDamageBonusPercent:1000
+        }]});
+        getSkillLevel=function(){ return 0; };
+        Math.random=function(){ return 0; };
+        const roll=rollCritical(player,"physical",0);
+        return {percent:percent,additive:additive,capped:capped,cappedCrit:cappedCrit,roll:roll};
+    })()`);
+    assert.deepEqual(result,{percent:32,additive:1320,capped:1500,cappedCrit:2250,
+        roll:{isCrit:true,multiplier:2.25}});
+    assert.doesNotMatch(fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8"),/previousCalculateSkillDamage/);
+    assert.doesNotMatch(fs.readFileSync("js/46-v155-dev-fixes.js","utf8"),/previousCalculateDamage/);
+    assert.doesNotMatch(fs.readFileSync("js/50-v169-water-skill-rules.js","utf8"),/window\.calculateDamage\s*=/);
+});
+
+test("damage safety, full pressure matrix and Abyss level brackets remain formal",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Object.assign(player,{id:"壓力目標",level:100,element:"light"});player2=null;player3=null;
+        function attacker(rank,mode){
+            const value={rank:rank,level:100,element:"fire"};
+            if(mode==="daily"){ value.v132Dungeon=true; }
+            if(mode==="abyss"){ value.v132Dungeon=true;value.v141Abyss=true; }
+            return value;
+        }
+        const pressure={};
+        ["world","daily","abyss"].forEach(mode=>{
+            pressure[mode]=["regular","elite","boss"].map(rank=>
+                v173GetEnemyPressureMultiplier(attacker(rank,mode),player)
+            );
+        });
+        const reverse=v173GetEnemyPressureMultiplier(player,attacker("boss","abyss"));
+
+        Math.random=function(){ return .5; };
+        const dailyRegular=v132BuildDungeonMonster("普通",60,"fire","regular");
+        const dailyElite=v132BuildDungeonMonster("精英",60,"fire","elite");
+        const dailyBoss=v132BuildDungeonMonster("首領",60,"fire","boss");
+        const rankAttack=[dailyRegular,dailyElite,dailyBoss].map(monster=>[monster.attack,monster.magicAttack]);
+
+        const abyssLevels=[20,50,80,100].map(level=>{
+            window.v132GetDungeonMonsterLevel=function(){ return level; };
+            return v141BuildAbyssRoster(1)[0].v141ForceSkillLevel;
+        });
+        window.v132GetDungeonMonsterLevel=function(){ return 100; };
+        const floor5=v141BuildAbyssRoster(5);
+
+        const burst=Object.assign({id:"snapshot",category:"physical",damageRole:"single_burst"},
+            v173DamageRoleProfiles.single_burst);
+        Math.random=function(){ return 0; };
+        const low=calculateSkillDamage({skill:burst,skillLevel:5,effectiveAttack:1330,
+            target:{level:100,element:"light",statusEffects:[]},targetDefense:1330,
+            casterLevel:100,casterElement:"light",critMultiplier:1});
+        Math.random=function(){ return 1; };
+        const high=calculateSkillDamage({skill:burst,skillLevel:5,effectiveAttack:1330,
+            target:{level:100,element:"light",statusEffects:[]},targetDefense:1330,
+            casterLevel:100,casterElement:"light",critMultiplier:1});
+        const unsafe=[
+            calculateDamage(NaN,NaN,NaN,NaN,null,null),
+            calculateDamage(Infinity,0,100,100,"fire","wind"),
+            calculateDamage(1000,Infinity,100,100,"fire","wind"),
+            calculateDamage(-100,-100,100,100,"fire","wind")
+        ];
+        return {pressure:pressure,reverse:reverse,rankAttack:rankAttack,abyssLevels:abyssLevels,
+            floor5Count:floor5.length,floor5Levels:floor5.map(monster=>monster.v141ForceSkillLevel),
+            low:low,high:high,unsafe:unsafe};
+    })()`);
+    assert.deepEqual(result.pressure,{world:[1,1.1,1.2],daily:[1.05,1.15,1.25],abyss:[1.15,1.25,1.35]});
+    assert.equal(result.reverse,1);
+    assert.deepEqual(result.rankAttack,[result.rankAttack[0],result.rankAttack[0],result.rankAttack[0]]);
+    assert.deepEqual(result.abyssLevels,[1,3,4,5]);
+    assert.equal(result.floor5Count,10);
+    assert.ok(result.floor5Levels.every(level=>level===5));
+    assert.ok(result.low>=1300&&result.low<=1700,result.low);
+    assert.ok(result.high>=1300&&result.high<=1700,result.high);
+    assert.ok(result.low<result.high);
+    result.unsafe.forEach(value=>assert.ok(Number.isFinite(value)&&value>=1));
 });
 
 console.log("\nV170 final integration suite: "+passed+" tests passed.");
