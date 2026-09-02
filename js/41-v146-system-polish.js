@@ -483,29 +483,14 @@
         };
     }
 
-    /* ----- Main city: compact party identity and resource bars. ----- */
+    /* ----- Main city: deduplicated HUD resources and complete party roster. ----- */
     function renderHomeRoster(){
         const page=document.getElementById("homePage");
         const grid=page&&page.querySelector(".home-card-grid");
         if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return; }
         const partyIndexes=getExistingPartyIndexes().slice(0,3);
-        const hudCharacters=document.getElementById("homeHudCharacterList");
         const hudGold=document.getElementById("homeHudGoldValue");
         const hudExp=document.getElementById("homeHudExpValue");
-        if(hudCharacters){
-            hudCharacters.innerHTML=partyIndexes.map((index,position)=>{
-                const character=getPartyCharacterByIndex(index);
-                if(!character){ return ""; }
-                const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
-                const firstNameId=position===0?' id="homeHudCharacterName"':"";
-                const firstLevelId=position===0?' id="homeHudCharacterLevel"':"";
-                const avatar=artwork?'<img src="'+escapeHtml(artwork)+'" alt="">':"";
-                return '<div class="home-hud-character-row" data-element="'+escapeHtml(character.element||"fire")+'">'+
-                    '<span class="home-hud-character-avatar" aria-hidden="true">'+avatar+'</span>'+
-                    '<strong'+firstNameId+'>'+escapeHtml(character.id||("角色"+(index+1)))+'</strong>'+
-                    '<span'+firstLevelId+'>Lv.'+Math.max(1,Math.floor(numeric(character.level)||1))+'</span></div>';
-            }).join("");
-        }
         syncHomeResourceValue(hudGold,typeof gold!=="undefined"?gold:0);
         syncHomeResourceValue(hudExp,typeof sharedExp!=="undefined"?sharedExp:0);
         let roster=document.getElementById("v146HomeRoster");

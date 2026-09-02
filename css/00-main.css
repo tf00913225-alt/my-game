@@ -832,17 +832,17 @@ button:disabled{
    加金色光暈。
 */
 
-/* Main-city lobby HUD: complete party identity and framed resources. */
+/* Main-city lobby HUD: identity, resources and DEV tools without party duplication. */
 .home-city-hud{
     position:relative;
     z-index:3;
     display:grid;
-    grid-template-columns:minmax(0,1fr) auto;
-    gap:7px;
+    grid-template-columns:auto minmax(0,1fr);
+    gap:8px;
     align-items:center;
-    min-height:70px;
+    min-height:48px;
     margin:5px 10px 0;
-    padding:2px 7px;
+    padding:3px 7px;
     border:1px solid rgba(191,139,57,.82);
     border-radius:9px;
     background:
@@ -859,14 +859,11 @@ button:disabled{
 }
 
 .home-hud-identity{
-    display:grid;
-    gap:1px;
-    align-content:center;
+    display:flex;
+    align-items:center;
 }
 
 .home-hud-kicker,
-.home-hud-character-row,
-.home-hud-resources,
 .home-test-tools{
     display:flex;
     align-items:center;
@@ -883,83 +880,22 @@ button:disabled{
     white-space:nowrap;
 }
 
-.home-hud-character-list{
-    display:grid;
-    gap:1px;
-    min-width:0;
-}
-
-.home-hud-character-row{
-    display:grid;
-    grid-template-columns:17px minmax(0,1fr) auto;
-    gap:5px;
-    align-items:center;
-    min-width:0;
-    min-height:17px;
-    padding:0 4px 0 1px;
-    border-left:1px solid rgba(205,157,70,.42);
-    border-radius:4px;
-    background:linear-gradient(90deg,rgba(8,7,5,.72),rgba(18,13,8,.48));
-}
-
-.home-hud-character-avatar{
-    display:block;
-    width:17px;
-    height:17px;
-    overflow:hidden;
-    border:1px solid rgba(211,170,91,.64);
-    border-radius:50%;
-    background:#090806;
-    box-shadow:0 1px 3px rgba(0,0,0,.62);
-}
-
-.home-hud-character-avatar img{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center 22%;
-}
-
-.home-hud-character-row[data-element="fire"] .home-hud-character-avatar{border-color:rgba(205,87,54,.76);}
-.home-hud-character-row[data-element="water"] .home-hud-character-avatar{border-color:rgba(81,145,202,.76);}
-.home-hud-character-row[data-element="wind"] .home-hud-character-avatar{border-color:rgba(71,165,122,.72);}
-.home-hud-character-row[data-element="earth"] .home-hud-character-avatar{border-color:rgba(203,158,73,.78);}
-
-.home-hud-character-row strong{
-    overflow:hidden;
-    color:#f7e4b4;
-    font-family:"Noto Serif TC",serif;
-    font-size:11px;
-    line-height:16px;
-    text-overflow:ellipsis;
-    text-shadow:0 1px 3px #000,0 0 8px rgba(222,166,70,.22);
-    white-space:nowrap;
-}
-
-.home-hud-character-row > span:last-child{
-    flex:0 0 auto;
-    color:#d9ba78;
-    font-size:9px;
-    font-weight:800;
-    line-height:16px;
-    white-space:nowrap;
-}
-
 .home-hud-side{
     display:grid;
-    gap:4px;
-    justify-items:end;
+    gap:3px;
+    justify-items:stretch;
 }
 
 .home-hud-resources{
-    justify-content:flex-end;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:5px;
 }
 
 .home-hud-resources > span{
     display:flex;
     align-items:baseline;
+    justify-content:center;
     gap:3px;
     min-width:0;
     min-height:20px;
@@ -984,9 +920,9 @@ button:disabled{
 
 /* V92 DEV shortcuts remain functional but deliberately recede from the lobby. */
 .home-test-tools{
-    justify-content:flex-end;
+    justify-content:center;
     gap:4px;
-    max-width:218px;
+    max-width:none;
     margin:0;
 }
 
@@ -1041,25 +977,25 @@ button:disabled{
 
 .home-secondary-actions{
     display:grid;
-    grid-template-columns:repeat(2,90px);
-    grid-template-rows:repeat(3,95px);
+    grid-template-columns:repeat(2,80px);
+    grid-template-rows:repeat(3,82px);
     justify-content:space-between;
-    gap:1px 0;
-    min-height:287px;
+    gap:5px 0;
+    min-height:256px;
     padding:0;
 }
 
 .home-utility-actions{
     position:absolute;
-    right:50%;
-    bottom:26px;
+    right:0;
+    bottom:5px;
+    left:0;
     z-index:4;
     display:grid;
-    grid-template-columns:repeat(2,98px);
-    justify-content:center;
-    gap:6px;
-    padding:0;
-    transform:translateX(50%);
+    grid-template-columns:repeat(2,86px);
+    justify-content:space-between;
+    gap:0;
+    padding:0 88px;
 }
 
 .home-card{
@@ -1128,7 +1064,7 @@ button:disabled{
 
 .home-card-primary .home-card-icon{
     position:absolute;
-    inset:0 0 28px;
+    inset:0 0 19px;
 }
 
 .home-card-primary .home-card-label{
@@ -1137,22 +1073,22 @@ button:disabled{
     bottom:0;
     left:0;
     z-index:2;
-    height:28px;
-    padding:5px 4px 4px;
+    height:19px;
+    padding:1px 4px;
     border-top:1px solid rgba(218,165,66,.72);
     background:linear-gradient(180deg,rgba(61,20,14,.98),rgba(20,10,7,.98));
-    font-size:15px;
-    line-height:18px;
+    font-size:14px;
+    line-height:16px;
     letter-spacing:.12em;
 }
 
 .home-card-secondary{
     display:grid;
-    grid-template-rows:67px 26px;
+    grid-template-rows:59px 21px;
     align-content:stretch;
     justify-items:stretch;
-    width:90px;
-    height:95px;
+    width:80px;
+    height:82px;
     overflow:hidden;
     border:1px solid rgba(205,154,65,.82);
     border-radius:11px;
@@ -1169,7 +1105,7 @@ button:disabled{
 
 .home-card-secondary .home-card-icon{
     width:100%;
-    height:67px;
+    height:59px;
     border:0;
     border-bottom:1px solid rgba(198,151,65,.62);
     border-radius:10px 10px 0 0;
@@ -1178,17 +1114,17 @@ button:disabled{
 
 .home-card-secondary .home-card-label{
     align-self:stretch;
-    padding:4px 3px 3px;
+    padding:2px 3px 1px;
     background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));
-    font-size:14px;
-    line-height:19px;
+    font-size:13px;
+    line-height:18px;
 }
 
 .home-card-utility{
     display:grid;
-    grid-template-columns:43px minmax(0,1fr);
+    grid-template-columns:36px minmax(0,1fr);
     align-items:center;
-    height:46px;
+    height:40px;
     overflow:hidden;
     border:1px solid rgba(186,137,57,.76);
     border-radius:8px;
@@ -1197,8 +1133,8 @@ button:disabled{
 }
 
 .home-card-utility .home-card-icon{
-    width:42px;
-    height:44px;
+    width:35px;
+    height:38px;
     margin-left:1px;
     border-radius:7px 0 0 7px;
     border-right:1px solid rgba(174,127,55,.55);
@@ -1206,8 +1142,8 @@ button:disabled{
 
 .home-card-utility .home-card-label{
     padding:0 4px;
-    font-size:11px;
-    line-height:44px;
+    font-size:10px;
+    line-height:38px;
     text-align:center;
 }
 
