@@ -106,12 +106,15 @@ test("the fixed 9:16 home keeps one compact non-scrolling layout owner",()=>{
     assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
 });
 
-test("development cache and visible version advance to V173.28",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.28"/);
-    assert.match(index,/<title>四象江湖傳 V173\.28<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.28"[\s\S]*?>V173\.28<\/div>/);
-    assert.match(index,/js\/00-main\.js\?v=173\.28/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.28/);
+test("development cache and visible version advance to V173.29",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.29"/);
+    assert.match(index,/<title>四象江湖傳 V173\.29<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.29"[\s\S]*?>V173\.29<\/div>/);
+    assert.match(index,/css\/00-main\.css\?v=173\.29/);
+    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.29/);
+    assert.match(index,/js\/00-main\.js\?v=173\.29/);
+    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.29/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.29/);
 });
 
-console.log("\n"+passed+" V173.28 main-city lobby tests passed.");
+console.log("\n"+passed+" V173.29 main-city lobby tests passed.");
