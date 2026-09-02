@@ -832,24 +832,25 @@ button:disabled{
    加金色光暈。
 */
 
-/* Main-city lobby HUD: compact identity and existing resources. */
+/* Main-city lobby HUD: complete party identity and framed resources. */
 .home-city-hud{
     position:relative;
     z-index:3;
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
-    gap:6px;
+    gap:7px;
     align-items:center;
-    min-height:64px;
+    min-height:70px;
     margin:5px 10px 0;
-    padding:4px 7px;
-    border-top:1px solid rgba(224,177,80,.9);
-    border-bottom:1px solid rgba(132,85,32,.78);
+    padding:2px 7px;
+    border:1px solid rgba(191,139,57,.82);
+    border-radius:9px;
     background:
-        linear-gradient(90deg,rgba(8,7,6,.88),rgba(27,17,10,.78) 52%,rgba(8,7,6,.86));
+        linear-gradient(90deg,rgba(8,7,6,.95),rgba(31,19,11,.91) 52%,rgba(8,7,6,.94));
     box-shadow:
-        0 4px 13px rgba(0,0,0,.45),
-        inset 0 0 14px rgba(217,157,49,.08);
+        0 5px 14px rgba(0,0,0,.52),
+        inset 0 0 0 1px rgba(255,222,143,.07),
+        inset 0 0 16px rgba(217,157,49,.1);
 }
 
 .home-hud-identity,
@@ -859,7 +860,7 @@ button:disabled{
 
 .home-hud-identity{
     display:grid;
-    gap:2px;
+    gap:1px;
     align-content:center;
 }
 
@@ -875,7 +876,7 @@ button:disabled{
     gap:6px;
     color:#c99a43;
     font-family:"Noto Serif TC",serif;
-    font-size:7px;
+    font-size:8px;
     font-weight:900;
     letter-spacing:.16em;
     line-height:1;
@@ -890,16 +891,21 @@ button:disabled{
 
 .home-hud-character-row{
     display:grid;
-    grid-template-columns:12px minmax(0,1fr) auto;
-    gap:4px;
+    grid-template-columns:17px minmax(0,1fr) auto;
+    gap:5px;
+    align-items:center;
     min-width:0;
-    min-height:13px;
+    min-height:17px;
+    padding:0 4px 0 1px;
+    border-left:1px solid rgba(205,157,70,.42);
+    border-radius:4px;
+    background:linear-gradient(90deg,rgba(8,7,5,.72),rgba(18,13,8,.48));
 }
 
 .home-hud-character-avatar{
     display:block;
-    width:12px;
-    height:12px;
+    width:17px;
+    height:17px;
     overflow:hidden;
     border:1px solid rgba(211,170,91,.64);
     border-radius:50%;
@@ -924,8 +930,8 @@ button:disabled{
     overflow:hidden;
     color:#f7e4b4;
     font-family:"Noto Serif TC",serif;
-    font-size:10px;
-    line-height:12px;
+    font-size:11px;
+    line-height:16px;
     text-overflow:ellipsis;
     text-shadow:0 1px 3px #000,0 0 8px rgba(222,166,70,.22);
     white-space:nowrap;
@@ -934,21 +940,21 @@ button:disabled{
 .home-hud-character-row > span:last-child{
     flex:0 0 auto;
     color:#d9ba78;
-    font-size:8px;
+    font-size:9px;
     font-weight:800;
-    line-height:12px;
+    line-height:16px;
     white-space:nowrap;
 }
 
 .home-hud-side{
     display:grid;
-    gap:2px;
+    gap:4px;
     justify-items:end;
 }
 
 .home-hud-resources{
     justify-content:flex-end;
-    gap:4px;
+    gap:5px;
 }
 
 .home-hud-resources > span{
@@ -956,20 +962,22 @@ button:disabled{
     align-items:baseline;
     gap:3px;
     min-width:0;
-    padding:3px 5px;
-    border:1px solid rgba(139,101,48,.48);
-    border-radius:999px;
-    background:rgba(4,4,3,.56);
-    color:#bca77a;
+    min-height:20px;
+    padding:4px 6px;
+    border:1px solid rgba(191,139,57,.72);
+    border-radius:7px;
+    background:linear-gradient(180deg,rgba(30,21,12,.94),rgba(8,7,5,.92));
+    color:#ceb887;
     font-size:8px;
     line-height:10px;
+    box-shadow:inset 0 0 0 1px rgba(255,224,151,.05),0 2px 5px rgba(0,0,0,.3);
     white-space:nowrap;
 }
 
 .home-hud-resources b{
     display:inline-block;
     color:#ffe093;
-    font-size:9px;
+    font-size:10px;
     font-variant-numeric:tabular-nums;
     white-space:nowrap;
 }
@@ -977,7 +985,7 @@ button:disabled{
 /* V92 DEV shortcuts remain functional but deliberately recede from the lobby. */
 .home-test-tools{
     justify-content:flex-end;
-    gap:3px;
+    gap:4px;
     max-width:218px;
     margin:0;
 }
@@ -1018,8 +1026,8 @@ button:disabled{
     display:flex;
     flex:0 0 auto;
     flex-direction:column;
-    gap:3px;
-    padding:4px 10px 3px;
+    gap:1px;
+    padding:1px 7px 0;
 }
 
 .home-primary-actions{
@@ -1027,25 +1035,31 @@ button:disabled{
     grid-template-columns:repeat(2,minmax(0,46%));
     justify-content:space-between;
     align-self:center;
-    width:93%;
+    width:100%;
     gap:0;
 }
 
 .home-secondary-actions{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    grid-template-rows:repeat(3,58px);
-    gap:0;
-    min-height:174px;
-    padding:0 12px;
+    grid-template-columns:repeat(2,90px);
+    grid-template-rows:repeat(3,95px);
+    justify-content:space-between;
+    gap:1px 0;
+    min-height:287px;
+    padding:0;
 }
 
 .home-utility-actions{
+    position:absolute;
+    right:50%;
+    bottom:26px;
+    z-index:4;
     display:grid;
-    grid-template-columns:repeat(2,108px);
+    grid-template-columns:repeat(2,98px);
     justify-content:center;
-    gap:18px;
+    gap:6px;
     padding:0;
+    transform:translateX(50%);
 }
 
 .home-card{
@@ -1092,7 +1106,7 @@ button:disabled{
 }
 
 .home-card-primary{
-    height:78px;
+    height:90px;
     overflow:hidden;
     border:1px solid rgba(222,170,70,.9);
     border-radius:11px;
@@ -1108,13 +1122,13 @@ button:disabled{
     position:absolute;
     inset:0;
     border-radius:inherit;
-    background:linear-gradient(180deg,transparent 48%,rgba(5,4,3,.34) 66%,rgba(24,8,5,.92) 100%);
+    background:linear-gradient(180deg,rgba(255,220,142,.04),transparent 58%,rgba(5,4,3,.18) 100%);
     pointer-events:none;
 }
 
 .home-card-primary .home-card-icon{
     position:absolute;
-    inset:0;
+    inset:0 0 28px;
 }
 
 .home-card-primary .home-card-label{
@@ -1123,71 +1137,78 @@ button:disabled{
     bottom:0;
     left:0;
     z-index:2;
-    padding:5px 4px 6px;
-    font-size:14px;
-    line-height:17px;
+    height:28px;
+    padding:5px 4px 4px;
+    border-top:1px solid rgba(218,165,66,.72);
+    background:linear-gradient(180deg,rgba(61,20,14,.98),rgba(20,10,7,.98));
+    font-size:15px;
+    line-height:18px;
     letter-spacing:.12em;
 }
 
 .home-card-secondary{
     display:grid;
-    grid-template-rows:44px 14px;
-    align-content:center;
-    justify-items:center;
-    width:72px;
-    height:58px;
-    border:0;
-    border-radius:10px;
-    background:transparent;
-    box-shadow:none;
+    grid-template-rows:67px 26px;
+    align-content:stretch;
+    justify-items:stretch;
+    width:90px;
+    height:95px;
+    overflow:hidden;
+    border:1px solid rgba(205,154,65,.82);
+    border-radius:11px;
+    background:linear-gradient(155deg,rgba(35,25,15,.96),rgba(8,7,5,.96));
+    box-shadow:0 4px 10px rgba(0,0,0,.52),inset 0 0 0 1px rgba(255,224,151,.06);
 }
 
 .home-card-secondary:nth-child(odd){justify-self:start;}
 .home-card-secondary:nth-child(even){justify-self:end;}
-.home-card-secondary:nth-child(3){margin-inline-start:34px;}
-.home-card-secondary:nth-child(4){margin-inline-end:34px;}
-.home-card-secondary:nth-child(5){margin-inline-start:68px;}
-.home-card-secondary:nth-child(6){margin-inline-end:68px;}
+.home-card-secondary:nth-child(3),
+.home-card-secondary:nth-child(5){margin-inline-start:0;}
+.home-card-secondary:nth-child(4),
+.home-card-secondary:nth-child(6){margin-inline-end:0;}
 
 .home-card-secondary .home-card-icon{
-    width:44px;
-    height:44px;
-    border:1px solid rgba(198,151,65,.76);
-    border-radius:10px;
-    box-shadow:0 3px 8px rgba(0,0,0,.58),inset 0 0 7px rgba(220,166,64,.08);
+    width:100%;
+    height:67px;
+    border:0;
+    border-bottom:1px solid rgba(198,151,65,.62);
+    border-radius:10px 10px 0 0;
+    box-shadow:inset 0 0 10px rgba(220,166,64,.08);
 }
 
 .home-card-secondary .home-card-label{
-    align-self:end;
+    align-self:stretch;
+    padding:4px 3px 3px;
+    background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));
     font-size:14px;
-    line-height:14px;
+    line-height:19px;
 }
 
 .home-card-utility{
     display:grid;
-    grid-template-columns:34px minmax(0,1fr);
+    grid-template-columns:43px minmax(0,1fr);
     align-items:center;
-    height:40px;
+    height:46px;
     overflow:hidden;
-    border:1px solid rgba(139,103,55,.4);
-    border-radius:999px;
-    background:rgba(8,7,6,.42);
-    box-shadow:0 2px 5px rgba(0,0,0,.26),inset 0 0 8px rgba(220,166,64,.04);
+    border:1px solid rgba(186,137,57,.76);
+    border-radius:8px;
+    background:linear-gradient(180deg,rgba(38,26,15,.96),rgba(9,8,6,.96));
+    box-shadow:0 3px 8px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,224,151,.05);
 }
 
 .home-card-utility .home-card-icon{
-    width:32px;
-    height:32px;
-    margin-left:3px;
-    border-radius:50%;
-    border-right:1px solid rgba(139,103,55,.34);
+    width:42px;
+    height:44px;
+    margin-left:1px;
+    border-radius:7px 0 0 7px;
+    border-right:1px solid rgba(174,127,55,.55);
 }
 
 .home-card-utility .home-card-label{
-    padding:0 7px 0 4px;
-    font-size:9px;
-    line-height:38px;
-    text-align:left;
+    padding:0 4px;
+    font-size:11px;
+    line-height:44px;
+    text-align:center;
 }
 
 .home-gold-display{
