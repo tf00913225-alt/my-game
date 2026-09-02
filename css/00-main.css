@@ -3993,7 +3993,7 @@ button:active{
 
     z-index:9999;
 
-    animation:skillBadgePop 2.2s ease-out forwards;
+    animation:skillBadgePop var(--skill-name-display-duration,347ms) ease-out forwards;
 }
 
 /*
@@ -5377,13 +5377,10 @@ body.skill-detail-scroll-active,
     font-weight:bold;
 }
 
-.equip-button{
-    background:var(--theme-accent-bg);
-    color:var(--theme-text-gold);
-}
-
+.equip-button,
 .sell-button{
     background:linear-gradient(180deg,#8a2a1e,#5a160e);
+    color:#f2ead9;
 }
 
 .close-item-button{
@@ -6998,4 +6995,3 @@ html, body{
 #skillQuickBar{
     z-index:30 !important;
 }
-

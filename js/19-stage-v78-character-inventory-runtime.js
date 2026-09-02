@@ -79,9 +79,14 @@ function applyNow(){
         "important"
     );
 
+    /*
+       角色頁外框不能固定撐滿 96% 高度。能力值／經驗池內容較短時，
+       固定高度只會在內容下方留下大片黑色空區；改成內容自然高度，
+       只有內容過長時才由 max-height 限制在可視區內。
+    */
     box.style.setProperty(
         "height",
-        "96%",
+        "auto",
         "important"
     );
 
@@ -117,7 +122,7 @@ function applyNow(){
 
     body.style.setProperty(
         "flex",
-        "1 1 auto",
+        "0 1 auto",
         "important"
     );
 
@@ -133,24 +138,21 @@ function applyNow(){
         "important"
     );
 
-    /* root 上方還有角色頭像與頁籤，不能把 body 的完整高度
-       再分配給 root；只取 root 起點到 body 底部的剩餘空間。 */
-    const bodyRect=body.getBoundingClientRect();
-    const rootRect=root.getBoundingClientRect();
-    const availableLogical=Math.max(
-        180,
-        Math.floor(bodyRect.bottom-rootRect.top-10)
+    root.style.setProperty(
+        "flex",
+        "0 1 auto",
+        "important"
     );
 
     root.style.setProperty(
         "height",
-        availableLogical+"px",
+        "auto",
         "important"
     );
 
     root.style.setProperty(
         "max-height",
-        availableLogical+"px",
+        "none",
         "important"
     );
 
@@ -221,7 +223,10 @@ function applyNow(){
                 Math.min(
                     300,
                     Math.round(
-                        availableLogical*
+                        Math.max(
+                            180,
+                            root.clientHeight
+                        )*
                         2/9
                     )
                 )

@@ -66,8 +66,8 @@ function load(overrides={}){
 }
 
 test("V152 remains ordered before V154 under the current cache version",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.24/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.24"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.27/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.27"/);
     assert.match(loader,/css\/45-v152-dev-fixes\.css/);
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
     const v152=loader.indexOf("js/44-v152-dev-fixes.js");
@@ -176,8 +176,7 @@ test("Extreme Emperor's three Light skills use the exact final values",()=>{
 test("Frostbite visibly disables the Skill command without disabling normal attack",()=>{
     const skillButton={disabled:false,dataset:{},classList:classList(),setAttribute(){}};
     const normalButton={disabled:false};
-    const icon={symbol:null,querySelector(){ return this.symbol; },appendChild(node){ this.symbol=node; }};
-    const quick={disabled:false,onclick(){},classList:classList(),querySelector(selector){ return selector===".sq-icon-wrap"?icon:null; }};
+    const quick={disabled:false,onclick(){},classList:classList()};
     const character={statusEffects:[{type:"frostbite",turnsLeft:1}]};
     const document=bareDocument({
         querySelector(selector){ return selector.includes("menu-button.skill")?skillButton:null; },
@@ -188,8 +187,10 @@ test("Frostbite visibly disables the Skill command without disabling normal atta
     context.populateSkillQuickBar();
     assert.equal(skillButton.disabled,true);
     assert.equal(quick.disabled,true);
-    assert.equal(icon.symbol.textContent,"🚫");
     assert.equal(normalButton.disabled,false);
+    assert.match(css,/content:"凍傷禁止使用技能" !important/);
+    assert.doesNotMatch(css,/content:"🚫"|v152-frostbite-symbol/);
+    assert.doesNotMatch(source,/symbol\.textContent="🚫"/);
 });
 
 test("entering a map immediately runs configured auto recovery exactly once",()=>{

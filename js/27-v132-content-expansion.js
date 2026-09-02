@@ -1354,14 +1354,16 @@
             const pieces=ticketDef ? getEquipmentSetItemDefinitions(ticketDef.setId) : [];
             const chance=pieces.length ? 100/pieces.length : 0;
             const grid=pieces.map(p=>
-                '<div class="v132-preview-item">'+
+                '<button type="button" class="v132-preview-item" data-item-id="'+escapeHtml(p.id)+'" '+
+                'aria-label="查看'+escapeHtml(p.name)+'詳細資料" '+
+                'onclick="v132OpenPreviewEquipmentDetail(this.dataset.itemId)">'+
                 '<span class="v132-preview-icon">'+p.icon+'</span>'+
                 '<span class="v132-preview-item-name">'+escapeHtml(p.name)+'</span>'+
                 '<b>'+formatPreviewProbability(chance)+'</b>'+
-                '</div>'
+                '</button>'
             ).join("");
             html=
-                '<div class="v132-reward-modal-inner">'+
+                '<div class="v132-reward-modal-inner v132-ticket-preview-modal">'+
                 '<h3>'+escapeHtml(item.name)+' 開啟預覽</h3>'+
                 '<p>開啟後，從以下10件['+(ticketDef ? getSetLabel(ticketDef.setId) : "")+']套裝部位中'+
                 '隨機獲得1件：</p>'+
@@ -1378,6 +1380,36 @@
     }
     window.v132ShowItemPreview=showItemPreview;
 
+    function openPreviewEquipmentDetail(itemId){
+        const item=equipmentSetItemDefinitions.find(definition=>definition.id===String(itemId||""));
+        if(!item||typeof openEquippedItem!=="function"){ return; }
+
+        const rewardModal=document.getElementById("v132RewardModal");
+        if(rewardModal){ rewardModal.classList.add("v132-detail-paused"); }
+
+        openEquippedItem(item,"");
+
+        const modal=document.getElementById("itemModal");
+        if(!modal){
+            if(rewardModal){ rewardModal.classList.remove("v132-detail-paused"); }
+            return;
+        }
+
+        modal.classList.add("v132-ticket-preview-detail");
+
+        const title=document.getElementById("itemModalName");
+        if(title){ title.textContent=item.name; }
+
+        [
+            document.getElementById("itemEquipButton"),
+            modal.querySelector(".sell-button"),
+            document.getElementById("v132ItemUseButton"),
+            document.getElementById("v132ItemPreviewButton"),
+            document.getElementById("v141DecomposeButton")
+        ].forEach(button=>{ if(button){ button.style.display="none"; } });
+    }
+    window.v132OpenPreviewEquipmentDetail=openPreviewEquipmentDetail;
+
     /*
        ★ 物品詳細彈窗補上符咒/抽獎券/寶箱的「開啟」跟「預覽」
        按鈕——這幾種東西不是藥水（不走usePotion()那條路）、
@@ -1389,6 +1421,8 @@
     if(typeof openItemModal==="function"){
         const afterOpenItemModal=openItemModal;
         openItemModal=function(slotIndex){
+            const modal=document.getElementById("itemModal");
+            if(modal){ modal.classList.remove("v132-ticket-preview-detail"); }
             const result=afterOpenItemModal.apply(this,arguments);
 
             const item=inventorySlots[slotIndex];
@@ -1494,6 +1528,8 @@
     if(typeof openEquippedItem==="function"){
         const afterOpenEquippedItemActions=openEquippedItem;
         openEquippedItem=function(){
+            const modal=document.getElementById("itemModal");
+            if(modal){ modal.classList.remove("v132-ticket-preview-detail"); }
             const result=afterOpenEquippedItemActions.apply(this,arguments);
             const sellButton=document.querySelector("#itemModal .sell-button");
             const useButton=document.getElementById("v132ItemUseButton");
@@ -1501,6 +1537,23 @@
             if(sellButton){ sellButton.style.display=""; }
             if(useButton){ useButton.style.display="none"; useButton.onclick=null; }
             if(previewButton){ previewButton.style.display="none"; previewButton.onclick=null; }
+            return result;
+        };
+    }
+
+    if(typeof closeItemModal==="function"){
+        const afterCloseItemModal=closeItemModal;
+        closeItemModal=function(){
+            const modal=document.getElementById("itemModal");
+            const returningToTicketPreview=!!(
+                modal&&modal.classList.contains("v132-ticket-preview-detail")
+            );
+            const result=afterCloseItemModal.apply(this,arguments);
+            if(modal){ modal.classList.remove("v132-ticket-preview-detail"); }
+            if(returningToTicketPreview){
+                const rewardModal=document.getElementById("v132RewardModal");
+                if(rewardModal){ rewardModal.classList.remove("v132-detail-paused"); }
+            }
             return result;
         };
     }

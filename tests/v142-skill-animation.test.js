@@ -166,10 +166,10 @@ function createContext(options={}){
 
 (async()=>{
     await test("V142 assets are versioned and loaded after V141",()=>{
-        assert.match(loader,/const V_ASSET_VERSION="173\.24"/);
+        assert.match(loader,/const V_ASSET_VERSION="173\.27"/);
         assert.match(loader,/css\/39-v142-skill-animation\.css/);
         assert.match(loader,/js\/36-v141-content-systems\.js[\s\S]*js\/37-v142-skill-animation\.js/);
-        assert.match(index,/js\/20-anonymous-20\.js\?v=173\.24/);
+        assert.match(index,/js\/20-anonymous-20\.js\?v=173\.27/);
     });
 
     await test("player and monster skill badges actually start animation gates",()=>{
@@ -189,6 +189,9 @@ function createContext(options={}){
         assert.equal(context.v142GetSkillAnimationConfig("explosiveFlurry").duration,1450);
         assert.equal(context.v142GetSkillAnimationConfig("phoenixCry").duration,3200);
         assert.equal(context.skillDatabase.phoenixCry.resolveDuration,3200);
+        assert.equal(context.v142GetSkillNameDisplayDuration("普通攻擊","normal"),347);
+        assert.equal(context.v142GetSkillNameDisplayDuration("火焰斬","fire"),507);
+        assert.equal(context.v142GetSkillNameDisplayDuration("火鳳天鳴","fire"),2133);
     });
 
     await test("an animation gate resolves exactly once",async()=>{

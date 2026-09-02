@@ -499,6 +499,10 @@
         const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
         return animationConfig(skillId,skill&&skill.name,skill&&skill.element);
     };
+    window.v142GetSkillNameDisplayDuration=function(name,element){
+        const config=animationConfig(null,name,element);
+        return Math.max(1,Math.round(config.duration*2/3));
+    };
     window.v142GetAnimationDiagnostics=function(){ return director.getMetrics(); };
     window.v142CreateAnimationGateForTest=function(duration,onComplete){
         return createGate({

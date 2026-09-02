@@ -7,6 +7,7 @@ const vm=require("node:vm");
 
 const uiSource=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const characterCoreCss=fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8");
 const baseCss=fs.readFileSync("css/00-main.css","utf8");
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const layoutSource=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
@@ -181,7 +182,9 @@ test("character runtime preserves the previous natural-scroll layout",()=>{
 });
 
 test("character pages remove only historical tails without compacting their content",()=>{
-    assert.match(css,/#characterTabContent\{[\s\S]{0,180}padding-bottom:0 !important/);
+    assert.match(characterCoreCss,/#characterTabContent\{[\s\S]{0,900}padding-bottom:0 !important/);
+    assert.doesNotMatch(characterCoreCss,/padding-bottom:160px/);
+    assert.doesNotMatch(css,/#characterTabContent\{\s*padding-bottom:0/);
     assert.match(css,/#characterTabContent > #skillPage\{[\s\S]{0,120}padding:0 0 12px !important/);
     assert.match(css,/#allSkillsList\{[\s\S]{0,100}padding-bottom:12px !important/);
     assert.doesNotMatch(css,/#statusPage[^{]*\{[^}]*display:flex !important/);
@@ -229,10 +232,10 @@ test("perpetual modal glow and skill-card compositing are static",()=>{
 });
 
 test("V169 styles and runtimes are deployed last under fresh cache keys",()=>{
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.24"/);
-    assert.match(indexSource,/js\/00-main\.js\?v=173\.24/);
-    assert.match(indexSource,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.24/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.24/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.27"/);
+    assert.match(indexSource,/js\/00-main\.js\?v=173\.27/);
+    assert.match(indexSource,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.27/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.27/);
 
     const styles=[
         "css/48-v169-element-box-settings.css",

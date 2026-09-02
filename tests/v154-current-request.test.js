@@ -97,9 +97,9 @@ function loadRuntime(overrides={}){
 }
 
 test("V154 remains ordered immediately before V155",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.24"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.24/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.24/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.27"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.27/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.27/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.ok(loader.indexOf("js/45-v154-dev-fixes.js")>loader.indexOf("js/44-v152-dev-fixes.js"));
     assert.ok(loader.indexOf("js/46-v155-dev-fixes.js")>loader.indexOf("js/45-v154-dev-fixes.js"));
@@ -206,7 +206,8 @@ test("all six supplied floor 5 portraits are optimized at the source dimensions"
 test("equipment cover, ability scrolling and Abyss decluttering stay scoped",()=>{
     assert.match(css,/data-dungeon-cover="equipment"[\s\S]*?background-size:cover !important/);
     assert.match(css,/#characterTabContent\{[\s\S]*?overflow-y:auto !important/);
-    assert.match(characterRuntime,/bodyRect\.bottom-rootRect\.top-10/);
+    assert.match(characterRuntime,/root\.style\.setProperty\(\s*"height",\s*"auto",\s*"important"/);
+    assert.doesNotMatch(characterRuntime,/bodyRect\.bottom-rootRect\.top-10/);
     assert.match(css,/v141-abyss-intro:not\(\.complete\)[\s\S]*?justify-content:flex-end !important/);
     assert.match(css,/v141-abyss-shell > header\{[\s\S]*?position:absolute !important/);
     assert.match(css,/v154-abyss-portrait[\s\S]*?var\(--v152-abyss-portrait\)/);

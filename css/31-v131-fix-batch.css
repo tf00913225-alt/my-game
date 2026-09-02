@@ -139,22 +139,22 @@
 }
 
 #game-stage #homeFeatureModal .home-feature-modal-box.wide{
-    height:94% !important;
-    max-height:94% !important;
+    height:auto !important;
+    max-height:96% !important;
     overflow:hidden !important;
     display:flex !important;
     flex-direction:column !important;
 }
 
 #game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
-    flex:1 1 auto !important;
+    flex:0 1 auto !important;
     min-height:0 !important;
     overflow:hidden !important;
 }
 
 #game-stage #homeFeatureModal #characterTabContent{
-    flex:1 1 auto !important;
-    height:0 !important;
+    flex:0 1 auto !important;
+    height:auto !important;
     min-height:0 !important;
     max-height:none !important;
     overflow-y:auto !important;
@@ -162,7 +162,7 @@
     touch-action:pan-y !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
-    padding-bottom:110px !important;
+    padding-bottom:0 !important;
 }
 
 #game-stage #homeFeatureModal #characterTabContent > #skillPage{

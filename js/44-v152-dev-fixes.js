@@ -292,7 +292,7 @@
                 mainButton.disabled=true;
                 mainButton.dataset.v152FrostbiteBlocked="1";
                 mainButton.classList.add("v152-frostbite-blocked");
-                mainButton.setAttribute("aria-label","凍傷中，禁止使用技能");
+                mainButton.setAttribute("aria-label","凍傷禁止使用技能");
             }else if(mainButton.dataset.v152FrostbiteBlocked==="1"){
                 mainButton.disabled=false;
                 delete mainButton.dataset.v152FrostbiteBlocked;
@@ -300,18 +300,14 @@
                 mainButton.setAttribute("aria-label","技能");
             }
         }
+        if(document.querySelectorAll){
+            document.querySelectorAll(".v152-frostbite-symbol").forEach(symbol=>symbol.remove());
+        }
         if(!blocked||!document.querySelectorAll){ return; }
         document.querySelectorAll("#skillQuickBarGrid .skill-quick-button").forEach(button=>{
             button.disabled=true;
             button.onclick=null;
             button.classList.add("v152-frostbite-blocked");
-            const icon=button.querySelector(".sq-icon-wrap")||button;
-            if(!icon.querySelector(".v152-frostbite-symbol")){
-                const symbol=document.createElement("span");
-                symbol.className="v152-frostbite-symbol";
-                symbol.textContent="🚫";
-                icon.appendChild(symbol);
-            }
         });
     }
 

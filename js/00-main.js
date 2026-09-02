@@ -4417,7 +4417,7 @@ function makeSelectValueReactive(
 ){
 
     let currentValue=
-        selectEl.value;
+        String(selectEl.value);
 
 
     Object.defineProperty(
@@ -4432,7 +4432,7 @@ function makeSelectValueReactive(
             set(newValue){
 
                 currentValue=
-                    newValue;
+                    String(newValue);
 
 
                 Array.from(
@@ -4443,7 +4443,7 @@ function makeSelectValueReactive(
                         opt.selected=
                             (
                                 opt.value===
-                                newValue
+                                currentValue
                             );
 
                     }
@@ -4451,7 +4451,7 @@ function makeSelectValueReactive(
 
 
                 onValueChanged(
-                    newValue
+                    currentValue
                 );
 
             },
@@ -10141,6 +10141,13 @@ function startTurn(token){
     tickStatusEffects();
 
     tickPlayerBuffs();
+
+    if(
+        typeof window!=="undefined" &&
+        typeof window.v143SyncStatusSpriteEffects==="function"
+    ){
+        window.v143SyncStatusSpriteEffects();
+    }
 
 
     if(
@@ -23786,6 +23793,29 @@ function spawnFireSparkBurst(
 }
 
 
+function getSkillNameBadgeDuration(skillName,elementType){
+
+    if(
+        typeof window!=="undefined" &&
+        typeof window.v142GetSkillNameDisplayDuration==="function"
+    ){
+        const duration=
+            Number(
+                window.v142GetSkillNameDisplayDuration(
+                    skillName,
+                    elementType
+                )
+            );
+
+        if(Number.isFinite(duration) && duration>0){
+            return Math.round(duration);
+        }
+    }
+
+    return Math.round(520*2/3);
+}
+
+
 function showSkillNameBadge(skillName,elementType,characterIndex){
 
     const element =
@@ -23841,6 +23871,17 @@ function showSkillNameBadge(skillName,elementType,characterIndex){
     badge.textContent =
         skillName;
 
+    const badgeDuration=
+        getSkillNameBadgeDuration(
+            skillName,
+            elementType
+        );
+
+    badge.style.setProperty(
+        "--skill-name-display-duration",
+        badgeDuration+"ms"
+    );
+
 
     
     /* V38 SOURCE-LEVEL UI SIZE FIX:
@@ -23892,7 +23933,7 @@ const badgePoint =
 
         }
 
-    },2200);
+    },badgeDuration);
 
 }
 
@@ -23947,6 +23988,17 @@ function showMonsterSkillNameBadge(
     badge.textContent=
         skillName;
 
+    const badgeDuration=
+        getSkillNameBadgeDuration(
+            skillName,
+            elementType
+        );
+
+    badge.style.setProperty(
+        "--skill-name-display-duration",
+        badgeDuration+"ms"
+    );
+
 
     
     /* V38 SOURCE-LEVEL UI SIZE FIX:
@@ -23998,7 +24050,7 @@ const badgePoint =
 
         }
 
-    },2200);
+    },badgeDuration);
 
 }
 

@@ -175,12 +175,7 @@
     will-change:auto !important;
 }
 
-/* ----- Character pages: remove historical spacer blocks. ----- */
-#game-stage #homeFeatureModal #characterTabContent{
-    padding-bottom:0 !important;
-    box-sizing:border-box !important;
-}
-
+/* ----- Character pages: historical spacer is removed in the V78 core owner. ----- */
 #game-stage #homeFeatureModal #characterTabContent > #skillPage{
     padding:0 0 12px !important;
 }
