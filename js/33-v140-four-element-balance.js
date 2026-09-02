@@ -22,9 +22,9 @@
         elite:{min:5,max:60},
         boss:{min:5,max:40}
     };
-    const LEVEL_FACTOR_PER_LEVEL=0.05;
-    const LEVEL_FACTOR_MIN=0.5;
-    const LEVEL_FACTOR_MAX=1.5;
+    const LEVEL_FACTOR_PER_LEVEL=0.02;
+    const LEVEL_FACTOR_MIN=0.70;
+    const LEVEL_FACTOR_MAX=1.30;
     const GENERAL_STATUS_COEFFICIENT=0.05;
     const LOCKDOWN_STATUS_COEFFICIENT=0.2;
     const GENERAL_STATUS_SPIRIT_COEFFICIENT=0.05;

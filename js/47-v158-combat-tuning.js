@@ -93,7 +93,7 @@
             targetElement
         ){
             const levelDiff=(numeric(casterLevel)||1)-(numeric(targetLevel)||1);
-            const levelFactor=clamp(1+levelDiff*0.05,0.5,1.5);
+            const levelFactor=clamp(1+levelDiff*0.02,0.70,1.30);
             const elementFactor=typeof getElementalDamageMultiplier==="function"
                 ?getElementalDamageMultiplier(casterElement,targetElement)
                 :1;

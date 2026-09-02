@@ -63,8 +63,8 @@ function run(context){
 }
 
 test("V144 assets remain ordered before later patches under the current cache version",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.31/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.31"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.32/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.32"/);
     assert.match(loader,/css\/41-v144-rules-and-abyss\.css/);
     const order=[
         "js/38-v143-system-fixes.js","js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -225,15 +225,16 @@ test("Abyss floor 5 has the exact fixed order, skills and maximum levels",()=>{
     context.v144PatchFinalAbyssRoster(roster);
     assert.deepEqual(roster.slice(0,5).map(monster=>monster.name),names);
     assert.deepEqual(roster.slice(5).map(monster=>monster.element),elements);
-    assert.deepEqual(Array.from(roster[0].skillIds),["flyingSandStrike","stoneBreakSky"]);
+    assert.deepEqual(Array.from(roster[0].skillIds),["dustStorm","stoneBreakSky"]);
     assert.deepEqual(Array.from(roster[0].v141SupportSkillIds),["barrier"]);
-    assert.deepEqual(Array.from(roster[2].v141SupportSkillIds),["yuanXiangGuangMing","yuanGuangShield"]);
-    assert.deepEqual(Array.from(roster[3].skillIds),["iceArrowRain"]);
-    assert.deepEqual(Array.from(roster[3].v141SupportSkillIds),["revive","healSpell"]);
+    assert.deepEqual(Array.from(roster[2].v141SupportSkillIds),["yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"]);
+    assert.deepEqual(Array.from(roster[3].skillIds),["iceArrowRain","freeze"]);
+    assert.deepEqual(Array.from(roster[3].v141SupportSkillIds),["healSpell"]);
     assert.deepEqual(Array.from(roster[4].skillIds),["phoenixCry","dragonSlash"]);
-    assert.deepEqual(Array.from(roster[7].skillIds),["fireCritical"]);
+    assert.deepEqual(Array.from(roster[7].skillIds),["phoenixCry"]);
     assert.deepEqual(Array.from(roster[8].v141SupportSkillIds),["dodgeSkill"]);
-    assert.ok(roster.every(monster=>monster.v141ForceSkillLevel===5));
+    assert.ok(roster.slice(0,5).every(monster=>monster.v141ForceSkillLevel===5));
+    assert.ok(roster.slice(5).every(monster=>monster.v141ForceSkillLevel===4));
 });
 
 test("Extreme Emperor's Light heals 450/95, cleanses and grants 75% agility",()=>{

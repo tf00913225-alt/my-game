@@ -47,9 +47,9 @@ function load(overrides={}){
 }
 
 test("V155 remains ordered before V158 under the current cache version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.31"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.31/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.31/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.32"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.32/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.32/);
     const v154=loader.indexOf("js/45-v154-dev-fixes.js");
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
@@ -70,7 +70,7 @@ test("V155 preserves the final Fire owner while retaining Emperor support data",
     );
     assert.deepEqual(array(s.phoenixCry.requires),["flameTornado"]);
     assert.deepEqual(array(s.phoenixCry.burnPercentByLevel),[5,7,9,11,13]);
-    assert.deepEqual([s.yuanZuBlessing.cleanseChance,s.yuanZuBlessing.evasionBonusPercent,s.yuanZuBlessing.duration],[20,30,2]);
+    assert.deepEqual([s.yuanZuBlessing.cleanseChance,s.yuanZuBlessing.evasionBonusPercent,s.yuanZuBlessing.duration],[25,35,2]);
     assert.equal(s.yuanZuBlessing.agilityBonusPercent,undefined);
 });
 
@@ -92,11 +92,11 @@ test("final Abyss roster uses exact boss maxima and elite minima",()=>{
     assert.deepEqual(array(byName("南帝天尊").v141SupportSkillIds),["rage"]);
     roster.slice(0,5).forEach(monster=>assert.equal(monster.v141ForceSkillLevel,5));
     assert.deepEqual(roster.slice(5).map(monster=>[monster.name,monster.element,array(monster.skillIds),array(monster.v141SupportSkillIds),monster.v141ForceSkillLevel]),[
-        ["天兵天將","water",["frostCrush"],[],1],
-        ["天兵天將","earth",["stoneThrow"],[],1],
-        ["天兵天將","fire",["fireBurstStrike"],[],1],
-        ["天兵天將","wind",[],["stealthSkill"],1],
-        ["天兵天將","water",["frostCrush"],[],1]
+        ["天兵天將","water",[],["healSpell"],4],
+        ["天兵天將","earth",["stoneBreakSky"],[],4],
+        ["天兵天將","fire",["phoenixCry"],[],4],
+        ["天兵天將","wind",[],["dodgeSkill"],4],
+        ["天兵天將","water",[],["healSpell"],4]
     ]);
     assert.equal(context.skillDatabase.fireBurstStrike.name,"火爆一擊");
     assert.equal(Object.keys(context.skillDatabase).includes("fireBurstStrike"),false,"monster-only skill must not leak into player lists");

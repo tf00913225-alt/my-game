@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.31)
+ * CURRENT FINAL INTEGRATION SPEC (V173.32)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
@@ -302,7 +302,7 @@ test("new Lv1 characters start with two skill points while level-up remains plus
     assert.match(mainSource,/const player\s*=\s*\{[\s\S]*?skillPoints:0,/);
 });
 
-test("beginner forest alone is base times 0.75 and keeps Lv2-Lv3 normal attacks",()=>{
+test("all ten wild zones use the exact one-pass curve and the beginner forest stays basic-only",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         function expected(monster,multiplier){
@@ -320,29 +320,26 @@ test("beginner forest alone is base times 0.75 and keeps Lv2-Lv3 normal attacks"
                 defense:monster.defense,magicAttack:monster.magicAttack
             };
         }
-        return {
-            forest:forestMonsters.map(monster=>({
-                name:monster.name,level:monster.level,actual:actual(monster),
-                expected:expected(monster,.75),skillIds:monster.skillIds,
-                skillChance:monster.skillChance,applied:monster._v131StrengthApplied
-            })),
-            desert:desertMonsters.map(monster=>({
-                actual:actual(monster),expected:expected(monster,1.30),
-                applied:monster._v131StrengthApplied
-            }))
-        };
+        const multipliers=Array.from(v173WildZoneStrengthMultipliers);
+        const zones=[forestMonsters,desertMonsters,iceMountainMonsters,zone4Monsters,zone5Monsters,
+            zone6Monsters,zone7Monsters,zone8Monsters,zone9Monsters,zone10Monsters];
+        return {multipliers:multipliers,zones:zones.map((zone,index)=>zone.map(monster=>({
+            name:monster.name,level:monster.level,actual:actual(monster),
+            expected:expected(monster,multipliers[index]),skillIds:monster.skillIds,
+            skillChance:monster.skillChance,applied:monster._v131StrengthApplied
+        })))};
     })()`);
-    assert.ok(result.forest.length>=8);
-    result.forest.forEach(monster=>{
+    assert.deepEqual(result.multipliers,[.75,.90,.95,1,1.05,1.10,1.15,1.20,1.25,1.30]);
+    assert.equal(result.zones.length,10);
+    result.zones.forEach((zone,index)=>zone.forEach(monster=>{
+        assert.deepEqual(monster.actual,monster.expected,monster.name+" zone "+(index+1)+" multiplier");
+        assert.equal(monster.applied,true,monster.name+" strength flag");
+    }));
+    assert.ok(result.zones[0].length>=8);
+    result.zones[0].forEach(monster=>{
         assert.ok(monster.level===2||monster.level===3,monster.name+" level");
-        assert.deepEqual(monster.actual,monster.expected,monster.name+" forest multiplier");
         assert.deepEqual(monster.skillIds,[],monster.name+" skill pool");
         assert.equal(monster.skillChance,0,monster.name+" skill chance");
-        assert.equal(monster.applied,true,monster.name+" strength flag");
-    });
-    result.desert.forEach(monster=>{
-        assert.deepEqual(monster.actual,monster.expected,"desert multiplier");
-        assert.equal(monster.applied,true,"desert strength flag");
     });
 });
 
@@ -403,6 +400,9 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
 
 test("final normal hit and status-effect bounds override the historical floors",()=>{
     assert.match(mainSource,/const STATUS_RESIST_PER_SPIRIT_POINT = 0\.05;/);
+    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0\.02;/);
+    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0\.70;/);
+    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1\.30;/);
     assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 50;/);
     assert.doesNotMatch(mainSource,/STATUS_HIT_INT_COEFFICIENT|HIT_CHANCE_MIN_PERCENT = 60/);
     const runtime=loadFinalRuntime();
@@ -421,6 +421,20 @@ test("final normal hit and status-effect bounds override the historical floors",
     assert.deepEqual(
         ["regular","elite","boss"].map(rank=>status(90,10,10,100,0,true,rank,0,"magic")),
         [80,60,40]
+    );
+    const levelCases=[[0,1],[5,1.1],[10,1.2],[15,1.3],[30,1.3],[-5,.9],[-10,.8],[-15,.7],[-30,.7]];
+    assert.deepEqual(
+        levelCases.map(([difference])=>status(40,50+difference,50,0,0,false,"regular",0,"magic")),
+        [40,44,48,52,52,36,32,28,28]
+    );
+    assert.deepEqual(
+        levelCases.map(([difference])=>status(40,50+difference,50,0,0,true,"regular",0,"magic")),
+        [40,44,48,52,52,36,32,28,28]
+    );
+    runtime.context.Math.random=()=>.5;
+    assert.deepEqual(
+        levelCases.map(([difference])=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
+        [100,110,120,130,130,90,80,70,70]
     );
 });
 
@@ -641,7 +655,7 @@ test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once pe
     assert.deepEqual(result,{combined:83.75,capped:85,blocked:[true,true,true],remaining:4});
 });
 
-test("player agility and default monster level use the V173.31 evasion rules",()=>{
+test("player agility and default monster level use the V173.32 evasion rules",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         Object.assign(player,{
@@ -864,6 +878,135 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
     assert.deepEqual(result,{column:[1,4],statuses:[]});
 });
 
+test("equipment dungeon is fixed at one boss plus four elites with its own single rank multiplier",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Math.random=function(){ return 0; };
+        function character(id){ return {id:id,level:60}; }
+        const compositions=[];
+        [1,2,3].forEach(count=>{
+            Object.assign(player,character("主角"));
+            player2=count>=2?character("角色2"):null;
+            player3=count>=3?character("角色3"):null;
+            const composition=v138GetEquipmentDungeonComposition();
+            const roster=v132BuildEquipmentDungeonRoster();
+            const before=roster.map(monster=>monster.skillIds.slice());
+            roster.forEach(monster=>v144ConfigureMonsterEncounterSkills(monster,"equipment-test"));
+            compositions.push({composition:composition,count:roster.length,
+                ranks:roster.map(monster=>monster.rank),levels:roster.map(monster=>monster.level),
+                skillLevels:roster.map(monster=>monster.v141ForceSkillLevel),
+                chances:roster.map(monster=>monster.skillChance),
+                tiers:roster.map(monster=>monster.skillIds.map(id=>skillDatabase[id].tier)),
+                unchanged:roster.every((monster,index)=>JSON.stringify(monster.skillIds)===JSON.stringify(before[index])),
+                locked:roster.every(monster=>monster.v132FixedSkillLoadout===true)
+            });
+        });
+        const normalEliteBase=v132BuildDungeonMonster("基準精英",60,"fire","regular");
+        const equipmentElite=v132BuildEquipmentDungeonMonster("裝備精英",60,"fire","elite");
+        const normalBossBase=v132BuildDungeonMonster("基準首領",60,"fire","regular");
+        const equipmentBoss=v132BuildEquipmentDungeonMonster("裝備首領",60,"fire","boss");
+        function expected(base,multiplier){
+            return {maxHP:Math.round(base.maxHP*multiplier.maxHP),maxSP:base.maxSP,
+                attack:Math.round(base.attack*multiplier.attack),
+                magicAttack:Math.round(base.magicAttack*multiplier.magicAttack),
+                defense:Math.round(base.defense*multiplier.defense)};
+        }
+        function actual(monster){ return {maxHP:monster.maxHP,maxSP:monster.maxSP,attack:monster.attack,
+            magicAttack:monster.magicAttack,defense:monster.defense}; }
+        return {compositions:compositions,multipliers:v173EquipmentDungeonRankMultipliers,
+            elite:{actual:actual(equipmentElite),expected:expected(normalEliteBase,{maxHP:1.8,attack:1.15,magicAttack:1.15,defense:1.1})},
+            boss:{actual:actual(equipmentBoss),expected:expected(normalBossBase,{maxHP:2.8,attack:1.3,magicAttack:1.3,defense:1.2})}};
+    })()`);
+    result.compositions.forEach((entry,index)=>{
+        assert.deepEqual(entry.composition,{playerCount:index+1,bossCount:1,eliteCount:4,total:5});
+        assert.equal(entry.count,5);
+        assert.deepEqual(entry.ranks,["boss","elite","elite","elite","elite"]);
+        assert.deepEqual(entry.levels,[60,60,60,60,60]);
+        assert.deepEqual(entry.skillLevels,[3,2,2,2,2]);
+        assert.deepEqual(entry.chances,[.7,.7,.7,.7,.7]);
+        assert.ok(entry.tiers[0].length>0&&entry.tiers[0].every(tier=>tier===4));
+        entry.tiers.slice(1).forEach(tiers=>assert.ok(tiers.length>0&&tiers.every(tier=>tier===3)));
+        assert.equal(entry.unchanged,true);
+        assert.equal(entry.locked,true);
+    });
+    assert.deepEqual(result.multipliers,{elite:{maxHP:1.8,attack:1.15,magicAttack:1.15,defense:1.1},
+        boss:{maxHP:2.8,attack:1.3,magicAttack:1.3,defense:1.2}});
+    assert.deepEqual(result.elite.actual,result.elite.expected);
+    assert.deepEqual(result.boss.actual,result.boss.expected);
+});
+
+test("Abyss floors one through five keep exact compositions, skill levels and additional HP",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        Object.assign(player,{id:"主角",level:70});player2=null;player3=null;
+        Math.random=function(){ return 0; };
+        return [1,2,3,4,5].map(floor=>{
+            const roster=v141BuildAbyssRoster(floor);
+            if(floor===5){ v155PatchFinalAbyssRoster(roster); }
+            return {floor:floor,count:roster.length,names:roster.map(monster=>monster.name),
+                ranks:roster.map(monster=>monster.rank),elements:roster.map(monster=>monster.element),
+                forceLevels:roster.map(monster=>monster.v141ForceSkillLevel),
+                extraHP:roster.map(monster=>monster.v141ExtraHP),
+                skills:roster.map(monster=>monster.skillIds.slice()),
+                supports:roster.map(monster=>Array.from(monster.v141SupportSkillIds||[])),
+                rows:roster.map(monster=>monster.v141FormationRow),
+                positions:roster.map(monster=>monster.v141FormationPosition)};
+        });
+    })()`);
+    result.slice(0,4).forEach((floor,index)=>{
+        const level=index+1;
+        assert.equal(floor.count,5);
+        assert.deepEqual(floor.ranks,["boss","elite","elite","elite","elite"]);
+        assert.deepEqual(floor.forceLevels,[level,level,level,level,level]);
+        assert.deepEqual(floor.extraHP,[5000,2500,2500,2500,2500]);
+    });
+    const final=result[4];
+    assert.equal(final.count,10);
+    assert.deepEqual(final.names,["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊",
+        "天兵天將","天兵天將","天兵天將","天兵天將","天兵天將"]);
+    assert.deepEqual(final.ranks,["boss","boss","boss","boss","boss","elite","elite","elite","elite","elite"]);
+    assert.deepEqual(final.elements,["earth","wind","light","water","fire","water","earth","fire","wind","water"]);
+    assert.deepEqual(final.forceLevels,[5,5,5,5,5,4,4,4,4,4]);
+    assert.deepEqual(final.extraHP,[10000,10000,10000,10000,10000,3500,3500,3500,3500,3500]);
+    assert.deepEqual(final.skills.slice(0,5),[["dustStorm","stoneBreakSky"],["windHowlLightning","stormRain","stormSpell"],[],
+        ["iceArrowRain","freeze"],["phoenixCry","dragonSlash"]]);
+    assert.deepEqual(final.supports.slice(0,5),[["barrier"],[],["yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"],["healSpell"],["rage"]]);
+    assert.deepEqual(final.skills.slice(5),[[],["stoneBreakSky"],["phoenixCry"],[],[]]);
+    assert.deepEqual(final.supports.slice(5),[["healSpell"],[],[],["dodgeSkill"],["healSpell"]]);
+    assert.deepEqual(final.rows,[0,0,0,0,0,1,1,1,1,1]);
+    assert.deepEqual(final.positions,[0,1,2,3,4,0,1,2,3,4]);
+});
+
+test("enemy Heal Spell affects only one same-row trio for both North Emperor and water elites",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        monsters.splice(0,monsters.length);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length);
+        for(let index=0;index<10;index++){
+            monsters.push({name:index===3?"北帝天尊":"天兵天將",element:"water",level:100,
+                rank:index<5?"boss":"elite",v141Abyss:true,v155FinalAbyss:true,alive:true,
+                hp:(index>=1&&index<=3)?100:900,maxHP:1000,sp:1000,maxSP:1000,
+                activeBuffs:[],statusEffects:[],v141FormationRow:index<5?0:1,v141FormationPosition:index%5,
+                v141SupportSkillIds:index===3?["healSpell"]:[],v141ForceSkillLevel:index===3?5:4,skillChance:1});
+            currentBattleMonsters.push(index);
+        }
+        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
+        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};Math.random=function(){ return 0; };
+        const beforeNorth=monsters.map(monster=>monster.hp);
+        const north=v155ResolveNorthHeal(3,true);
+        const northChanged=monsters.map((monster,index)=>monster.hp!==beforeNorth[index]?index:null).filter(index=>index!==null);
+
+        monsters.forEach((monster,index)=>{ monster.hp=(index>=6&&index<=8)?100:1000;monster.sp=1000;monster.v141SupportSkillIds=[]; });
+        monsters[5].v141SupportSkillIds=["healSpell"];
+        monsters[5].v141ForceSkillLevel=4;
+        const beforeElite=monsters.map(monster=>monster.hp);
+        const elite=v141TryMonsterSpecialAction(5);
+        const eliteChanged=monsters.map((monster,index)=>monster.hp!==beforeElite[index]?index:null).filter(index=>index!==null);
+        return {north:north,northChanged:northChanged,elite:elite,eliteChanged:eliteChanged};
+    })()`);
+    assert.deepEqual(result,{north:true,northChanged:[1,2,3],elite:true,eliteChanged:[6,7,8]});
+});
+
 function prepareExtremeEmperor(context){
     vm.runInContext(`
         monsters.splice(0,monsters.length,
@@ -903,21 +1046,25 @@ test("the three Extreme Emperor skills settle with the final V155 behavior",()=>
     const blessingRuntime=loadFinalRuntime();
     prepareExtremeEmperor(blessingRuntime.context);
     const blessing=evaluateJson(blessingRuntime.context,`(function(){
-        const first=v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",true);
+        const first=v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",[true,false]);
         const afterFirst=monsters.map(monster=>({evasion:monster.evasion,statusEffects:monster.statusEffects,
             turnsLeft:monster.v155EvasionBlessing.displayBuff.turnsLeft}));
         monsters[0].sp=500;
-        const second=v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",false);
+        const second=v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",[false,true]);
         return {first:first,second:second,afterFirst:afterFirst,
-            afterSecond:monsters.map(monster=>({evasion:monster.evasion,blessings:monster.activeBuffs.filter(buff=>buff.v141BuffType==="dodge").length}))};
+            afterSecond:monsters.map(monster=>({evasion:monster.evasion,statusEffects:monster.statusEffects,
+                blessings:monster.activeBuffs.filter(buff=>buff.v141BuffType==="dodge").length}))};
     })()`);
     assert.deepEqual(blessing,{
         first:true,second:true,
         afterFirst:[
             {evasion:85,statusEffects:[],turnsLeft:2},
-            {evasion:85,statusEffects:[],turnsLeft:2}
+            {evasion:85,statusEffects:[{type:"stun",turnsLeft:1}],turnsLeft:2}
         ],
-        afterSecond:[{evasion:85,blessings:1},{evasion:85,blessings:1}]
+        afterSecond:[
+            {evasion:85,statusEffects:[],blessings:1},
+            {evasion:85,statusEffects:[{type:"stun",turnsLeft:1}],blessings:1}
+        ]
     });
 
     const data=healRuntime.skills;
@@ -925,7 +1072,7 @@ test("the three Extreme Emperor skills settle with the final V155 behavior",()=>
         [data.yuanXiangGuangMing.spCost,data.yuanXiangGuangMing.baseHeal,data.yuanXiangGuangMing.baseHealSP,
             data.yuanGuangShield.spCost,data.yuanGuangShield.shieldAmount,data.yuanGuangShield.shieldDuration,
             data.yuanZuBlessing.spCost,data.yuanZuBlessing.cleanseChance,data.yuanZuBlessing.evasionBonusPercent,data.yuanZuBlessing.duration],
-        [35,150,55,40,100,2,45,20,30,2]
+        [35,150,55,40,100,2,45,25,35,2]
     );
     assert.equal(data.yuanZuBlessing.agilityBonusPercent,undefined);
 });

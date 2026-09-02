@@ -79,9 +79,9 @@ test("V141 assets remain ordered before later patches with the current cache ver
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.31"/);
-    assert.match(indexSource,/js\/00-main\.js\?v=173\.31/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.31/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.32"/);
+    assert.match(indexSource,/js\/00-main\.js\?v=173\.32/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.32/);
 });
 
 test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or slot numbers",()=>{
@@ -162,8 +162,9 @@ test("offline EXP uses highest-character level bands without changing its time c
 test("daily dungeon formations and element balancing match the requested expansion",()=>{
     assert.match(v132Source,/for\(let i=0;i<10;i\+\+\)/);
     assert.match(v132Source,/stage===3 \? "elite" : "regular"/);
-    assert.match(v132Source,/eliteCount:Math\.max\(0,10-bossCount\)/);
-    assert.match(v132Source,/total:10/);
+    assert.match(v132Source,/bossCount:1/);
+    assert.match(v132Source,/eliteCount:4/);
+    assert.match(v132Source,/total:5/);
     assert.match(v132Source,/const DUNGEON_DAILY_LIMIT_ENABLED=false/);
     assert.match(uiSource,/const elements=\["fire","water","earth","wind"\]/);
     assert.match(uiSource,/monster\.element=elements\[index%elements\.length\]/);

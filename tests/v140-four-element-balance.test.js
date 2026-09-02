@@ -428,8 +428,8 @@ test("physical and magic abnormal hit formulas use their specified offensive sta
     const calculate=(...args)=>context.v140CalculateStatusEffectChance(...args);
     assert.equal(calculate(50,10,10,100,20,false,"regular",0,"physical"),54);
     assert.equal(calculate(50,10,10,100,20,false,"regular",0,"magic"),54);
-    assert.equal(calculate(40,30,10,0,0,false,"regular",10,"magic"),50);
-    assert.equal(calculate(40,1,30,0,0,false,"regular",0,"magic"),20);
+    assert.equal(calculate(40,30,10,0,0,false,"regular",10,"magic"),42);
+    assert.equal(calculate(40,1,30,0,0,false,"regular",0,"magic"),28);
 });
 
 test("hard-control square-root scaling and rank caps stay exact",()=>{
@@ -589,8 +589,8 @@ test("V140 remains before the ordered V141/V142 layers and both cache keys are b
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.31"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.31/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.32"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.32/);
 });
 
 console.log("\nV140 four-element balance suite: "+passed+" tests passed.");

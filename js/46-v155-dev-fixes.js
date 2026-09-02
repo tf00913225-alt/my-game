@@ -18,11 +18,11 @@
         南帝天尊:{element:"fire",skills:["phoenixCry","dragonSlash"],supports:["rage"]}
     };
     const FINAL_ELITE_RULES=[
-        {element:"water",skills:["frostCrush"],supports:[]},
-        {element:"earth",skills:["stoneThrow"],supports:[]},
-        {element:"fire",skills:["fireBurstStrike"],supports:[]},
-        {element:"wind",skills:[],supports:["stealthSkill"]},
-        {element:"water",skills:["frostCrush"],supports:[]}
+        {element:"water",skills:[],supports:["healSpell"]},
+        {element:"earth",skills:["stoneBreakSky"],supports:[]},
+        {element:"fire",skills:["phoenixCry"],supports:[]},
+        {element:"wind",skills:[],supports:["dodgeSkill"]},
+        {element:"water",skills:[],supports:["healSpell"]}
     ];
 
     function numeric(value){
@@ -46,9 +46,9 @@
         description:"我方全體獲得100護盾，持續2回合。"
     });
     patchSkill("yuanZuBlessing",{
-        targetType:"allyAll",cleanseChance:20,evasionBonusPercent:30,
+        targetType:"allyAll",cleanseChance:25,evasionBonusPercent:35,
         duration:2,
-        description:"對我方全體施放祝福，有20%機率解除所有負面狀態，並增加閃避30%，持續2回合。"
+        description:"對我方全體施放祝福，每個目標獨立有25%機率解除身上負面狀態，並增加閃避35%，持續2回合。"
     });
     if(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing){
         delete skillDatabase.yuanZuBlessing.agilityBonusPercent;
@@ -113,9 +113,9 @@
             monster.element=rule.element;
             monster.skillIds=rule.skills.slice();
             monster.v141SupportSkillIds=rule.supports.slice();
-            monster.v141ForceSkillLevel=1;
-            monster.v141SkillLevel=1;
-            monster.v144SkillLevel=1;
+            monster.v141ForceSkillLevel=4;
+            monster.v141SkillLevel=4;
+            monster.v144SkillLevel=4;
             monster.v141FormationRow=1;
             monster.v141FormationPosition=position;
             monster.skillChance=.78;
@@ -306,7 +306,7 @@
         monster.activeBuffs=monster.activeBuffs||[];
         monster.activeBuffs.push(display);
         monster.evasion=typeof window.v173CombineEvasionRates==="function"
-            ?window.v173CombineEvasionRates([blessing.originalEvasion,30])
+            ?window.v173CombineEvasionRates([blessing.originalEvasion,35])
             :Math.min(85,blessing.originalEvasion);
         if(typeof window.v173MarkPersistentStateName==="function"){
             window.v173MarkPersistentStateName(blessing,"元祖賜福");
@@ -366,20 +366,28 @@
             });
             if(typeof addBattleLog==="function"){ addBattleLog("極帝天尊施放元光護體：我方全體獲得100護盾，持續2回合。"); }
         }else if(skillId==="yuanZuBlessing"){
-            const cleansed=forcedCleanse===undefined?Math.random()*100<20:!!forcedCleanse;
             let removed=0;
-            allies.forEach(entry=>{
+            let cleansedTargets=0;
+            let blessedTargets=0;
+            allies.forEach((entry,index)=>{
                 const ally=entry.monster;
+                if(!applyEvasionBlessing(ally)){ return; }
+                blessedTargets++;
+                const cleansed=forcedCleanse===undefined
+                    ?Math.random()*100<numeric(skill.cleanseChance)
+                    :Array.isArray(forcedCleanse)
+                    ?!!forcedCleanse[index]
+                    :!!forcedCleanse;
                 if(cleansed&&Array.isArray(ally.statusEffects)){
+                    cleansedTargets++;
                     removed+=ally.statusEffects.length;
                     ally.statusEffects=[];
                 }
-                applyEvasionBlessing(ally);
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"buff"); }
             });
             if(typeof addBattleLog==="function"){
-                addBattleLog("極帝天尊施放元祖賜福：我方全體閃避提升30%，持續2回合；"+
-                    (cleansed?"並解除"+removed+"個負面狀態。":"本次未觸發負面狀態解除。"));
+                addBattleLog("極帝天尊施放元祖賜福："+blessedTargets+"名友方閃避提升35%，持續2回合；"+
+                    cleansedTargets+"名目標觸發淨化，共解除"+removed+"個負面狀態。");
             }
         }else{ return false; }
         if(typeof updateUI==="function"){ updateUI(); }
@@ -392,7 +400,9 @@
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.healSpell:null;
         if(!monster||monster.name!=="北帝天尊"||!skill||hardControlled(monster)){ return false; }
-        const allies=currentAbyssEntries();
+        const allies=typeof window.v141GetMonsterAllyTriTargets==="function"
+            ?window.v141GetMonsterAllyTriTargets(monsterIndex,currentAbyssEntries())
+            :currentAbyssEntries().slice(0,3);
         const needsHeal=allies.some(entry=>monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)||
             numeric(entry.monster.sp)<numeric(entry.monster.maxSP));
         if(!needsHeal||(forceCast!==true&&Math.random()>.55)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
@@ -416,7 +426,8 @@
             if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
         });
         if(typeof addBattleLog==="function"){
-            addBattleLog("北帝天尊施放最高等級治療術：我方全體回復"+hpAmount+" HP、"+spAmount+" SP。");
+            addBattleLog("北帝天尊施放最高等級治療術：同排最多"+allies.length+"名友方各回復"+
+                hpAmount+" HP、"+spAmount+" SP。");
         }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }

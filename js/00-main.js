@@ -11560,11 +11560,11 @@ function executeAction(action){
    其實體質一直都有轉換成防禦，只是不夠顯眼）。
 */
 
-const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0.05;
+const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0.02;
 
-const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0.5;
+const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0.70;
 
-const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1.5;
+const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1.30;
 
 /*
    ★ 新增：傷害公式裡「防禦轉換成減傷比例」
@@ -12753,10 +12753,10 @@ function rollHitChance(
       這個函式本身不限定一定要用智力。
 
    2. 等級差距係數（新增的部分）：
-      (玩家等級 - 怪物等級) 每差 1 級 ±5%，
-      上限 +50%（等級壓倒性優勢時封頂，
+      (玩家等級 - 怪物等級) 每差 1 級 ±2%，
+      上限 +30%（等級壓倒性優勢時封頂，
       不會無限膨脹），
-      下限 -50%（打太高等級的怪最多只會被壓到打對折，
+      下限 -30%（打太高等級的怪最多只會被壓到七成，
       不會出現打1點傷害這種誇張情況）。
       這三個數字都抽成常數，
       要調整難度曲線的話改下面
@@ -12768,11 +12768,11 @@ function rollHitChance(
       不會因為換了公式就變成兩套邏輯。
 ===================================================== */
 
-const LEVEL_DIFF_FACTOR_PER_LEVEL = 0.05;
+const LEVEL_DIFF_FACTOR_PER_LEVEL = 0.02;
 
-const LEVEL_DIFF_FACTOR_MIN = 0.5;
+const LEVEL_DIFF_FACTOR_MIN = 0.70;
 
-const LEVEL_DIFF_FACTOR_MAX = 1.5;
+const LEVEL_DIFF_FACTOR_MAX = 1.30;
 
 
 function calculateSkillDamage(
@@ -17409,9 +17409,9 @@ function processSingleMonsterAttack(monsterIndex,token){
             castSkillData2.maxLevel||1,
             Math.max(
                 1,
-                Math.round(
-                    monster.level/8
-                )
+                Number.isFinite(Number(monster.v141ForceSkillLevel))
+                    ?Math.floor(Number(monster.v141ForceSkillLevel))
+                    :Math.round(monster.level/8)
             )
         )
         :
