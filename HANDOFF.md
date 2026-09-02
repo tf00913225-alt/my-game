@@ -214,7 +214,7 @@
 
 ---
 
-## 目前狀態（截至 2026-09-02，V173.28 dev）
+## 目前狀態（截至 2026-09-02，V173.29 dev）
 
 - 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
   `assets/`，沒有 build step、沒有 bundler。
@@ -248,6 +248,9 @@
   資源 HUD，角色與商店為兩個主要入口，六個次要入口沿左右側排列保留中央城門，離線經驗與
   系統降為低權重橫向入口；三人冒險隊伍改為直列隊伍卡。所有原 ID、onclick、圖片與背景均
   保留，DEV 金幣／經驗快捷鍵縮入 HUD，未修改任何遊戲資料或戰鬥邏輯。
+- V173.29（僅 `dev`）修正 V173.28 在 Githack／手機快取下出現「新 HTML 搭配舊 CSS／JS」的
+  混版問題：`css/00-main.css`、V54 主城相容 CSS 與 runtime 均改由 `index.html` 使用同一
+  發布版 query 載入，CI 也會強制檢查這三個主城 owner。版面結構、事件、素材及遊戲邏輯未改。
 - 母版歷史：V120（單一巨大 index.html，全部 inline）→ V121_SPLIT（拆成外部檔案，
   行為完全不變，過程見 `CHECK_REPORT.txt` / `README_*.txt`）→ 之後陸續疊加 V123～V131
   各種 stage patch，一路疊到現在。
@@ -662,6 +665,26 @@ chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
 ---
 
 ## 已完成功能記錄（新的加在最上面）
+
+### 2026-09-02 — V173.29：主城 Githack／手機快取混版根因修正（dev）
+
+- 使用者實機截圖中的直欄破版不是 V173.28 正式 CSS 的排版結果，而是分支網址載入新版
+  `index.html` 後，仍從無 query 的固定網址取得舊 `css/00-main.css`、舊 V54 CSS 與舊 V54
+  runtime。舊 runtime 會把所有入口重新寫成同一字級，舊 CSS 又只認舊九宮格結構，因而形成
+  大型 DEV 按鈕、功能直欄與底部導覽遮擋。
+- 唯一版面 owner 仍是 `index.html` 與 `css/00-main.css`；V54 只保留相容橋接，V146
+  `renderHomeRoster()` 仍只同步 HUD／隊伍資料。本輪沒有新增補丁檔、wrapper 或第二套版面。
+- `index.html` 現以 `?v=173.29` 載入 `css/00-main.css`、
+  `css/19-stage-v54-main-city-moderate-native-scale.css` 與
+  `js/16-stage-v54-main-city-runtime.js`；`.github/scripts/ci.mjs` 把三者加入正式 release entry
+  一致性檢查，之後任何一項漏掉或版本不一致都會令 Repository checks 失敗。
+- 不可變 V173.28 commit 在雲端 Chrome 以新鮮資源載入後，主城正確呈現兩個主要入口、左右
+  六個次要入口、兩個工具入口及固定底部導航，證明版面 owner 本身正常；V173.29 的遠端分支
+  驗證需待遠端 `dev` push 後進行。
+- 本機 Repository checks 全數通過：JavaScript 語法 `166/166`、Node suites `52/52`、靜態
+  資源 `383`、HTML ID `287`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
+  runtimes）及 Git 空白／衝突標記均正常。本機 `dev` commit 為 `2c888f8`；安全規則要求
+  使用者明確授權遠端寫入，因此目前尚未 push，`main` 完全未修改。
 
 ### 2026-09-02 — V173.28：主城首頁 RPG Lobby 視覺層級重整（dev）
 
