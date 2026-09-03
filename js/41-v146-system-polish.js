@@ -293,8 +293,6 @@
             popup.className="v146-status-popup status-"+type;
             popup.textContent=label;
             popup.style.left=(rect.left+rect.width/2)+"px";
-            /* HP damage owns the upper quarter of the card. Status text stays
-               close to the card bottom so both remain independently readable. */
             popup.style.top=(rect.top+rect.height*.86)+"px";
             document.body.appendChild(popup);
             setTimeout(()=>popup.remove(),1300);
@@ -354,11 +352,6 @@
             const map=document.getElementById("v141AbyssMap");
             const playerElement=document.getElementById("v141AbyssPlayer");
             if(!map||!playerElement){ return previousAbyssMove.apply(this,arguments); }
-            /*
-               The map's later walking wrapper must never rewrite a BOSS tap to
-               a one-step ground coordinate. Let the source map handler use
-               the original event so its portrait bounds open the dialogue.
-            */
             const boss=map.querySelector(".v141-abyss-boss");
             const bossRect=boss&&boss.getBoundingClientRect?boss.getBoundingClientRect():null;
             const pointX=Number(event&&event.clientX);
@@ -491,8 +484,11 @@
         const partyIndexes=getExistingPartyIndexes().slice(0,3);
         const hudGold=document.getElementById("homeHudGoldValue");
         const hudExp=document.getElementById("homeHudExpValue");
+        const availableExp=typeof window.v173GetAvailableExpPool==="function"
+            ?window.v173GetAvailableExpPool(Date.now())
+            :(typeof sharedExp!=="undefined"?sharedExp:0);
         syncHomeResourceValue(hudGold,typeof gold!=="undefined"?gold:0);
-        syncHomeResourceValue(hudExp,typeof sharedExp!=="undefined"?sharedExp:0);
+        syncHomeResourceValue(hudExp,availableExp);
         let roster=document.getElementById("v146HomeRoster");
         if(!roster){
             roster=document.createElement("section");
@@ -578,8 +574,16 @@
         const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
         if(!character){ return false; }
         const maxLevel=Math.max(1,numeric(window.v133MaxLevel)||100);
-        return numeric(character.level)<maxLevel&&
-            numeric(typeof sharedExp!=="undefined"?sharedExp:0)>=Math.max(1,numeric(character.expNext)||1);
+        if(numeric(character.level)>=maxLevel){ return false; }
+        const need=Math.max(1,numeric(character.expNext)-Math.max(0,numeric(character.exp)));
+        const catchUp=typeof window.v173GetExpPoolCatchUpMultiplierForLevel==="function"
+            ?Math.max(1,numeric(window.v173GetExpPoolCatchUpMultiplierForLevel(character.level))||1)
+            :1;
+        const poolCost=Math.max(1,Math.ceil(need/catchUp));
+        const available=typeof window.v173GetAvailableExpPool==="function"
+            ?numeric(window.v173GetAvailableExpPool(Date.now()))
+            :numeric(typeof sharedExp!=="undefined"?sharedExp:0);
+        return available>=poolCost;
     }
 
     function characterSkillAttention(index){
