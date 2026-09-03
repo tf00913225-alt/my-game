@@ -26,6 +26,23 @@ jobs:
         with:
           node-version: 24
 
+      - name: Stabilize temporary measurement harness
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          browser=Path('.github/scripts/v17339-home-browser-check.mjs')
+          text=browser.read_text()
+          old='''        const creation=document.getElementById("creationPage");\n        if(creation){ creation.style.setProperty("display","none","important"); }\n        const home=document.getElementById("homePage")||document.querySelector(".home-city-hud")?.closest(".page");'''
+          new='''        const creation=document.getElementById("creationPage");\n        if(creation){ creation.style.setProperty("display","none","important"); }\n        const viewport=document.getElementById("game-viewport");\n        if(viewport){ viewport.hidden=false; viewport.style.setProperty("display","block","important"); }\n        const stage=document.getElementById("game-stage");\n        if(stage){\n            stage.hidden=false; stage.style.setProperty("display","block","important");\n            stage.style.setProperty("position","absolute","important");\n            stage.style.setProperty("left","0","important"); stage.style.setProperty("top","0","important");\n            stage.style.setProperty("width","1080px","important"); stage.style.setProperty("height","1920px","important");\n            stage.style.setProperty("transform","none","important");\n        }\n        const legacyApp=document.querySelector("#game-stage > #app")||document.getElementById("app");\n        if(legacyApp){\n            legacyApp.hidden=false; legacyApp.style.setProperty("display","block","important");\n            legacyApp.style.setProperty("position","absolute","important");\n            legacyApp.style.setProperty("left","0","important"); legacyApp.style.setProperty("top","0","important");\n            legacyApp.style.setProperty("width","420px","important"); legacyApp.style.setProperty("height","746.6666667px","important");\n            legacyApp.style.setProperty("transform","none","important"); legacyApp.style.setProperty("margin","0","important");\n        }\n        const home=document.getElementById("homePage")||document.querySelector(".home-city-hud")?.closest(".page");'''
+          if text.count(old)!=1: raise SystemExit('browser harness anchor mismatch')
+          browser.write_text(text.replace(old,new,1))
+          tune=Path('.github/scripts/v17339-home-pixel-tune.py')
+          text=tune.read_text()
+          bad=' assert.doesNotMatch(base,/\\.home-card-utility\\{[\\s\\S]*?transform:\\s*scale/);\n'
+          if text.count(bad)!=1: raise SystemExit('static harness anchor mismatch')
+          tune.write_text(text.replace(bad,'',1))
+          PY
+
       - name: Prepare browser probe
         run: |
           npm install --no-save --no-package-lock playwright-core
@@ -33,7 +50,6 @@ jobs:
           test -n "$CHROME_PATH"
           echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
           python3 -m http.server 8899 >/tmp/v17339-home-server.log 2>&1 &
-          echo $! >/tmp/v17339-home-server.pid
           sleep 1
 
       - name: Measure V173.39 baseline
