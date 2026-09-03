@@ -46,25 +46,70 @@ for entry in RELEASE_ENTRIES:
     s=once(s,f'{entry}?v={OLD}',f'{entry}?v={NEW}',f'release entry {entry}')
 p.write_text(s)
 
-# 3) Existing release assertions: only update current-release contracts, never
-# historical VFX or stage-specific asset cache keys.
+# 3) Existing release assertions: only update actual current-release contracts.
+# Do not touch historical VFX/stage-specific cache keys.
+old_esc=OLD.replace(".","\\.")
+new_esc=NEW.replace(".","\\.")
 for test_path in sorted(Path("tests").glob("*.js")):
     text=test_path.read_text()
-    text=text.replace(f'V_ASSET_VERSION="{OLD}\\"',f'V_ASSET_VERSION="{NEW}\\"')
-    text=text.replace(f'V_ASSET_VERSION="{OLD}"',f'V_ASSET_VERSION="{NEW}"')
-    text=text.replace(f'<title>四象江湖傳 V{OLD}\\.','<title>四象江湖傳 V'+NEW+'\\.') if False else text
-    text=text.replace(f'<title>四象江湖傳 V{OLD}<\\/title>',f'<title>四象江湖傳 V{NEW}<\\/title>')
-    text=text.replace(f'<title>四象江湖傳 V{OLD}</title>',f'<title>四象江湖傳 V{NEW}</title>')
-    text=text.replace(f'aria-label="目前版本 V{OLD}"',f'aria-label="目前版本 V{NEW}"')
-    text=text.replace(f'aria-label="目前版本 V{OLD.replace(".","\\.")}"',f'aria-label="目前版本 V{NEW.replace(".","\\.")}"')
-    text=text.replace(f'v{OLD}-home-version-badge-style',f'v{NEW}-home-version-badge-style')
-    text=text.replace(f'v{OLD.replace(".","\\.")}-home-version-badge-style',f'v{NEW.replace(".","\\.")}-home-version-badge-style')
-    text=text.replace(f'>V{OLD}</div>',f'>V{NEW}</div>')
-    text=text.replace(f'>V{OLD.replace(".","\\.")}<\\/div>',f'>V{NEW.replace(".","\\.")}<\\/div>')
+
+    # Loader's authoritative current release value.
+    text=text.replace(
+        f'V_ASSET_VERSION="{old_esc}"',
+        f'V_ASSET_VERSION="{new_esc}"'
+    )
+    text=text.replace(
+        f'V_ASSET_VERSION="{OLD}"',
+        f'V_ASSET_VERSION="{NEW}"'
+    )
+
+    # Current document title / HUD badge release assertions.
+    text=text.replace(
+        f'<title>四象江湖傳 V{old_esc}<\\/title>',
+        f'<title>四象江湖傳 V{new_esc}<\\/title>'
+    )
+    text=text.replace(
+        f'<title>四象江湖傳 V{OLD}</title>',
+        f'<title>四象江湖傳 V{NEW}</title>'
+    )
+    text=text.replace(
+        f'aria-label="目前版本 V{old_esc}"',
+        f'aria-label="目前版本 V{new_esc}"'
+    )
+    text=text.replace(
+        f'aria-label="目前版本 V{OLD}"',
+        f'aria-label="目前版本 V{NEW}"'
+    )
+    text=text.replace(
+        f'v{old_esc}-home-version-badge-style',
+        f'v{new_esc}-home-version-badge-style'
+    )
+    text=text.replace(
+        f'v{OLD}-home-version-badge-style',
+        f'v{NEW}-home-version-badge-style'
+    )
+    text=text.replace(
+        f'>V{old_esc}<\\/div>',
+        f'>V{new_esc}<\\/div>'
+    )
+    text=text.replace(
+        f'>V{OLD}</div>',
+        f'>V{NEW}</div>'
+    )
+
+    # CI release entries only. This deliberately excludes touch-lock, VFX,
+    # startup artwork, creation CSS, etc. unless CI declares them release entries.
     for entry in RELEASE_ENTRIES:
-        text=text.replace(f'{entry}?v={OLD}',f'{entry}?v={NEW}')
-        escaped=entry.replace('/','\\/').replace('.','\\.')
-        text=text.replace(f'{escaped}\\?v={OLD.replace(".","\\.")}',f'{escaped}\\?v={NEW.replace(".","\\.")}')
+        escaped=entry.replace("/","\\/").replace(".","\\.")
+        text=text.replace(
+            f'{escaped}\\?v={old_esc}',
+            f'{escaped}\\?v={new_esc}'
+        )
+        text=text.replace(
+            f'{entry}?v={OLD}',
+            f'{entry}?v={NEW}'
+        )
+
     test_path.write_text(text)
 
 # 4) Focused behavior regression.
@@ -77,10 +122,10 @@ const main=fs.readFileSync("js/00-main.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
 
-const marker="/* =====================================================\\n   V173.41 — MOBILE SESSION RESUME / BACKGROUND SAVE";
-const start=main.indexOf(marker.replace(/\\n/g,"\n"));
-const end=main.indexOf("/* =====================================================\n   基本設定",start);
-assert.ok(start>=0 && end>start,"V173.41 lifecycle block must live in js/00-main.js");
+const keyIndex=main.indexOf('const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";');
+const start=main.lastIndexOf("/* =====================================================",keyIndex);
+const end=main.indexOf("let deleteAllCharactersInProgress",keyIndex);
+assert.ok(keyIndex>=0 && start>=0 && end>keyIndex,"V173.41 lifecycle block must live in js/00-main.js");
 const block=main.slice(start,end);
 
 function harness(initialReady){
