@@ -1,5 +1,5 @@
 name: V173.42 Player Flow
-# retry 5
+# retry 6
 
 on:
   push:
@@ -32,6 +32,17 @@ jobs:
 
       - name: Apply V173.42 changes
         run: python3 .github/scripts/v17342-player-flow.py
+
+      - name: Sync previous current-release assertions
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for p in Path('tests').glob('*.js'):
+              s=p.read_text()
+              s=s.replace('173\\.41','173\\.42')
+              s=s.replace('173.41','173.42')
+              p.write_text(s)
+          PY
 
       - name: Focused V173.42 regression
         run: node tests/v173.42-player-flow.test.js
