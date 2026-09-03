@@ -33,6 +33,9 @@ jobs:
           echo "85c7e22a791bcfcb2da4c5b5761f51f2f0613e3cd159e834e5c3da4348f11a1d  /tmp/v17339.patch" | sha256sum -c -
           git apply --check /tmp/v17339.patch
           git apply /tmp/v17339.patch
+          echo "ef5ea07c60beac0d119b3e37edaae050beae0245a35a9d1efbe6ff1bac3e1cb4  .github/v17339-supplement.patch" | sha256sum -c -
+          git apply --check .github/v17339-supplement.patch
+          git apply .github/v17339-supplement.patch
 
       - name: Align historical cache-version assertions
         run: |
@@ -49,7 +52,7 @@ jobs:
 
       - name: Remove staging files
         run: |
-          rm -f .github/v17339.patch.part00 .github/v17339.patch.part01
+          rm -f .github/v17339.patch.part00 .github/v17339.patch.part01 .github/v17339-supplement.patch
           rm -f .github/workflows/v17339-apply.yml
 
       - name: Check CI script syntax
