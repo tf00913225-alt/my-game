@@ -303,13 +303,16 @@
             card.appendChild(layer);
         }
         const active=hasActiveBuffType(entity,"earthShield");
+        const spriteOwnsEarthShield=!!(
+            window.v143StatusSpriteManifest&&window.v143StatusSpriteManifest.earthShield
+        );
         let effect=layer.querySelector(":scope > .v143-earth-shield-effect");
-        if(active&&!effect){
+        if(active&&!spriteOwnsEarthShield&&!effect){
             effect=document.createElement("span");
             effect.className="v143-earth-shield-effect";
             effect.innerHTML="<i></i><i></i><i></i><i></i><b>象</b>";
             layer.appendChild(effect);
-        }else if(!active&&effect){ effect.remove(); }
+        }else if((!active||spriteOwnsEarthShield)&&effect){ effect.remove(); }
         const realBarrier=hasActiveBuffType(entity,"barrier")||!!(entity&&entity.v141Shield&&entity.v141Shield.isBarrier);
         const oldBarrier=layer.querySelector(":scope > .v141-effect-barrier");
         if(active&&!realBarrier&&oldBarrier){ oldBarrier.remove(); }

@@ -39,17 +39,17 @@
         dodgeSkill:[1600,"medium","aura"],stealthSkill:[1700,"medium","veil"],
         dinghaishenzhen:[2200,"high","aura"],windEX:[3000,"ultimate","aura"],
 
-        stoneSlash:[760,"basic","slash"],petrifyFist:[1300,"medium","stone-impact"],
-        stoneBreakSky:[2150,"high","stone-impact"],earthquakeCrush:[2650,"ultimate","earthquake"],
-        stoneThrow:[900,"basic","projectile"],sandWind:[1450,"medium","sandstorm"],
-        flyingSandStrike:[2200,"high","petrify"],dustStorm:[2750,"ultimate","earthquake"],
-        earthShield:[1600,"medium","shield"],rockWall:[1850,"high","shield"],
-        barrier:[2300,"high","barrier"],earthEX:[3000,"ultimate","aura"],
+        stoneSlash:[1100,"basic","slash"],petrifyFist:[1400,"medium","stone-impact"],
+        stoneBreakSky:[1700,"high","stone-impact"],earthquakeCrush:[1800,"ultimate","earthquake"],
+        stoneThrow:[1300,"basic","projectile"],sandWind:[1500,"medium","sandstorm"],
+        flyingSandStrike:[2000,"high","petrify"],dustStorm:[2000,"ultimate","earthquake"],
+        earthShield:[1800,"medium","shield"],rockWall:[1700,"high","shield"],
+        barrier:[1900,"high","barrier"],earthEX:[3000,"ultimate","aura"],
 
         stormSpell:[2450,"high","tempest"],
         yuanXiangGuangMing:[2200,"high","holy-heal"],
         yuanGuangShield:[1950,"high","holy-shield"],
-        yuanZuBlessing:[2500,"high","holy-blessing"]
+        yuanZuBlessing:[2000,"high","holy-blessing"]
     };
 
     const COLORS={

@@ -155,15 +155,15 @@ test("the full three-character layout fits the fixed home height above the uncha
     assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:45px;[\s\S]*height:45px/);
 });
 
-test("development cache and visible version advance to V173.38",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.38"/);
-    assert.match(index,/<title>四象江湖傳 V173\.38<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.38"[\s\S]*?>V173\.38<\/div>/);
-    assert.match(index,/css\/00-main\.css\?v=173\.38/);
-    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.38/);
-    assert.match(index,/js\/00-main\.js\?v=173\.38/);
-    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.38/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.38/);
+test("development cache and visible version advance to V173.39",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
+    assert.match(index,/<title>四象江湖傳 V173\.39<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.39"[\s\S]*?>V173\.39<\/div>/);
+    assert.match(index,/css\/00-main\.css\?v=173\.39/);
+    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.39/);
+    assert.match(index,/js\/00-main\.js\?v=173\.39/);
+    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.39/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.39/);
 });
 
-console.log("\n"+passed+" V173.38 main-city lobby tests passed.");
+console.log("\n"+passed+" V173.39 main-city lobby tests passed.");

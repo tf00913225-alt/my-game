@@ -7,6 +7,27 @@
 
 ---
 
+## V173.39 土／光元素 Sprite VFX（目前 dev）
+
+> **目前 VFX 整合入口。** V173.38 的正式傷害模型完全保留；本輪只把 assets-library 已完成的
+> 土元素與極帝天尊【元祖賜福】Sprite Sheet 接入既有 V142/V143 動畫 owner。
+
+- `js/37-v142-skill-animation.js` 仍是技能演出時間唯一 owner；土石斬／石盾拳／石破天驚／
+  地裂重拳／落石術／滾石術／飛沙瞬擊／地牛猛襲／萬象土盾／岩石壁壘／結界與元祖賜福
+  已依成品 Sprite Sheet 的 1.1～2.0 秒節奏校準。
+- `js/39-v143-skill-animation.js` 仍是 Sprite 播放與狀態循環唯一 owner；12 幀技能圖統一用
+  `canvas-crop + naturalGrid` 按 4×3、384×384 逐格裁切，8 幀狀態圖按 4×2、256×256
+  無縫循環，不建立每幀獨立 PNG，也不新增 runtime。
+- 正式 production assets 放在 `assets/vfx/earth/` 與 `assets/vfx/light/`；來源保留在
+  `assets-library/assets/inbox/`。技能對應包含單體、同排三人、全場與我方增益定位；元祖賜福
+  依極帝現有 `yuanZuBlessing`／`statusName:"元祖賜福"` 狀態 owner 顯示。
+- 新增持續狀態 Sprite：破防、岩盾、石化、萬象土盾、岩石壁壘、結界、元祖賜福。
+  石盾拳／石破天驚的岩盾屬於施術者自身，V143 會等施放 Sprite 結束後才顯示持續岩盾；
+  元祖賜福則以正式 `statusName` 對應極帝的 `v141TeamBuff` 顯示資料。
+- `js/38-v143-system-fixes.js` 只收斂萬象土盾舊的「四角＋象字」程序特效：當新的 Sprite
+  status owner 存在時不再疊加舊效果；反傷規則、結界次數 UI、狀態資料與戰鬥數值皆不改。
+- 本輪只發布 `dev`，不修改／合併 `main`。
+
 ## V173.38 正式傷害模型（目前 dev）
 
 > **目前唯一傷害規格入口。** 本節與 `tests/v170-final-spec-integration.test.js` 代表
