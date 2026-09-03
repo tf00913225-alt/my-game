@@ -20,12 +20,11 @@ test("utility buttons use image-over-text cards and preserve the centre passage"
  assert.match(base,/#app\.no-header \.header,\s*#app:has\(#homePage\.active\) #gameHeaderBar\{[\s\S]*?display:none;/);
  assert.equal(396-(74*2)-(92*2),64);
 });
-test("roster uses the closest feasible geometry while bottom nav remains fixed",()=>{
- assert.match(roster,/\.v146-home-roster\{[\s\S]*?margin:45\.5px 10px 0;[\s\S]*?padding:3\.5px 7px;/);
- assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?min-height:15px;[\s\S]*?line-height:15px;/);
- assert.match(roster,/\.v146-home-character\{[\s\S]*?height:47px;[\s\S]*?padding:1\.5px 7px 1\.5px 2px;/);
- const oldHeight=166,newHeight=171;
- assert.equal(45.5-8,37.5);assert.equal(newHeight-oldHeight,5);assert.equal(newHeight,171);
+test("roster uses the current three-cell horizontal geometry while bottom nav remains fixed",()=>{
+ assert.match(roster,/\.v146-home-roster\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?margin:45\.5px 10px 0;[\s\S]*?padding:3\.5px 7px 5px;/);
+ assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?grid-column:1\/-1;[\s\S]*?min-height:15px;[\s\S]*?line-height:15px;/);
+ assert.match(roster,/\.v146-home-character\{[\s\S]*?grid-template-columns:32px minmax\(0,1fr\);[\s\S]*?height:59px;[\s\S]*?padding:3px 4px 3px 2px;/);
+ assert.match(roster,/\.v146-home-avatar\{[\s\S]*?width:32px;[\s\S]*?height:32px;[\s\S]*?transform:none/);
  assert.match(runtime,/function renderHomeRoster\(\)[\s\S]*?grid\.insertAdjacentElement\("afterend",roster\)/);
 });
 test("forbidden entry sizes and navigation remain untouched",()=>{
