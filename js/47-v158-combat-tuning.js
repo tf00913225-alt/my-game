@@ -72,12 +72,12 @@
     }
 
     function normalizeBeginnerForestMonster(monster){
+        if(!monster){ return monster; }
+        monster.v173BeginnerForest=true;
         normalizeMonsterDefaultEvasion(monster);
-        if(monster&&monster.v173BeginnerForest===true){
-            halveMonsterCoreStats(monster,"v17342BeginnerStatsHalved");
-            monster.agilityPoints=0;
-            monster.agility=0;
-        }
+        halveMonsterCoreStats(monster,"v17342BeginnerStatsHalved");
+        monster.agilityPoints=0;
+        monster.agility=0;
         return monster;
     }
 
