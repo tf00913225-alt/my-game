@@ -76,6 +76,8 @@ for test_path in sorted(Path('tests').glob('*.js')):
     text=text.replace('v173\\.39-home-version-badge-style','v173\\.40-home-version-badge-style')
     text=text.replace('v173.39-home-version-badge-style','v173.40-home-version-badge-style')
     text=text.replace('>\\s*V173\\.39\\s*<','>\\s*V173\\.40\\s*<')
+    text=text.replace('>V173\\.39<\\/div>','>V173\\.40<\\/div>')
+    text=text.replace('>V173.39</div>','>V173.40</div>')
     for entry in RELEASE_ENTRIES:
         escaped=entry.replace('/','\\/').replace('.','\\.')
         text=text.replace(f'{escaped}\\?v=173\\.39',f'{escaped}\\?v=173\\.40')
