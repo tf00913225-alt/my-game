@@ -28,6 +28,13 @@ jobs:
       - name: Apply main-city owner edits
         run: python3 .github/scripts/v17339-home-final-polish.py apply
 
+      - name: Ensure ImageMagick dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
       - name: Run repository checks
         run: |
           node --check .github/scripts/ci.mjs
