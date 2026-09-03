@@ -519,7 +519,9 @@
         roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 3</span></header>'+cards;
     }
 
-    /* Character entry red dot covers level-up, unspent attribute points and unspent skill points. */
+    /* ----- Progressive character growth guidance. ----- */
+    const EQUIPPABLE_SKILL_CATEGORIES=new Set(["physical","magic","buff","heal","revive"]);
+
     function setCharacterAttentionDot(target,show,label){
         if(!target){ return; }
         let dot=target.querySelector(":scope > .v141-notice-dot");
@@ -535,29 +537,251 @@
         else if(target.title===label){ target.removeAttribute("title"); }
     }
 
-    function getCharacterGrowthAttention(){
-        if(typeof getExistingPartyIndexes!=="function"){ return {show:false,label:""}; }
+    function setGrowthGuidanceDot(target,show,label){
+        if(!target){ return; }
+        let dot=target.querySelector(":scope > .v141-notice-dot.v146-growth-guidance-dot");
+        if(show&&!dot){
+            dot=document.createElement("span");
+            dot.className="v141-notice-dot v146-growth-guidance-dot";
+            dot.setAttribute("aria-hidden","true");
+            target.appendChild(dot);
+        }else if(!show&&dot){
+            dot.remove();
+        }
+        if(show){
+            target.classList.add("v146-growth-attention-target");
+            if(typeof getComputedStyle==="function"){
+                try{
+                    if(getComputedStyle(target).position==="static"){ target.style.position="relative"; }
+                }catch(_){ }
+            }
+            target.dataset.v146GrowthTitle=label||"有可處理內容";
+            target.title=label||"有可處理內容";
+        }else{
+            target.classList.remove("v146-growth-attention-target");
+            if(target.dataset&&target.dataset.v146GrowthTitle&&target.title===target.dataset.v146GrowthTitle){
+                target.removeAttribute("title");
+            }
+            if(target.dataset){ delete target.dataset.v146GrowthTitle; }
+        }
+    }
+
+    function clearGrowthGuidanceDots(){
+        document.querySelectorAll(".v146-growth-attention-target").forEach(target=>{
+            setGrowthGuidanceDot(target,false,"");
+        });
+    }
+
+    function characterKeyForIndex(index){
+        if(typeof getPartyCharacterKey==="function"){
+            const key=getPartyCharacterKey(index);
+            if(key){ return key; }
+        }
+        return index===2?"player3":index===1?"player2":"fire";
+    }
+
+    function characterCanLevel(index){
+        const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+        if(!character){ return false; }
         const maxLevel=Math.max(1,numeric(window.v133MaxLevel)||100);
+        return numeric(character.level)<maxLevel&&
+            numeric(typeof sharedExp!=="undefined"?sharedExp:0)>=Math.max(1,numeric(character.expNext)||1);
+    }
+
+    function characterSkillAttention(index){
+        const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+        const key=characterKeyForIndex(index);
+        const loadout=typeof characterSkillLoadouts!=="undefined"&&characterSkillLoadouts
+            ?characterSkillLoadouts[key]:null;
+        if(!character||!loadout||typeof skillDatabase==="undefined"||!skillDatabase){
+            return {show:false,canSpend:false,canEquip:false};
+        }
+        const levels=loadout.skillLevels||{};
+        const equipped=Array.isArray(loadout.equippedSkills)?loadout.equippedSkills:[];
+        const points=Math.max(0,numeric(character.skillPoints));
+        let canSpend=false;
+        let canEquip=false;
+        Object.keys(skillDatabase).forEach(skillId=>{
+            const skill=skillDatabase[skillId];
+            if(!skill||skill.element!==character.element){ return; }
+            const level=Math.max(0,numeric(levels[skillId]));
+            if(level<=0){
+                const prereqMet=typeof isSkillPrereqMet==="function"
+                    ?!!isSkillPrereqMet(levels,skill)
+                    :(skill.requires||[]).every(requiredId=>numeric(levels[requiredId])>0);
+                if(prereqMet&&points>=Math.max(0,numeric(skill.learnCost))){ canSpend=true; }
+            }else if(level<Math.max(1,numeric(skill.maxLevel)||1)&&points>=1){
+                canSpend=true;
+            }
+            if(
+                level>0&&
+                EQUIPPABLE_SKILL_CATEGORIES.has(skill.category)&&
+                !equipped.includes(skillId)&&
+                equipped.length<4
+            ){
+                canEquip=true;
+            }
+        });
+        return {show:canSpend||canEquip,canSpend:canSpend,canEquip:canEquip};
+    }
+
+    function getCharacterGrowthAttention(){
+        if(typeof getExistingPartyIndexes!=="function"){ return {show:false,label:"",byIndex:{}}; }
         let canLevel=false;
         let hasAttributePoints=false;
-        let hasSkillPoints=false;
+        let hasSkillAttention=false;
+        const byIndex={};
         getExistingPartyIndexes().slice(0,3).forEach(index=>{
             const character=getPartyCharacterByIndex(index);
             if(!character){ return; }
-            if(
-                numeric(character.level)<maxLevel&&
-                numeric(typeof sharedExp!=="undefined"?sharedExp:0)>=Math.max(1,numeric(character.expNext)||1)
-            ){
-                canLevel=true;
-            }
-            if(numeric(character.attributePoints)>0){ hasAttributePoints=true; }
-            if(numeric(character.skillPoints)>0){ hasSkillPoints=true; }
+            const skill=characterSkillAttention(index);
+            const item={
+                canLevel:characterCanLevel(index),
+                hasAttributePoints:numeric(character.attributePoints)>0,
+                skill:skill
+            };
+            byIndex[index]=item;
+            if(item.canLevel){ canLevel=true; }
+            if(item.hasAttributePoints){ hasAttributePoints=true; }
+            if(skill.show){ hasSkillAttention=true; }
         });
         const reasons=[];
         if(canLevel){ reasons.push("可升級"); }
         if(hasAttributePoints){ reasons.push("能力點未分配"); }
-        if(hasSkillPoints){ reasons.push("技能點未使用"); }
-        return {show:reasons.length>0,label:reasons.length?"角色："+reasons.join("、"):""};
+        if(hasSkillAttention){ reasons.push("技能可學習／升級／裝備"); }
+        return {
+            show:reasons.length>0,
+            label:reasons.length?"角色："+reasons.join("、"):"",
+            canLevel:canLevel,
+            hasAttributePoints:hasAttributePoints,
+            hasSkillAttention:hasSkillAttention,
+            byIndex:byIndex
+        };
+    }
+
+    function clearLegacyHudExpAttention(){
+        const target=document.getElementById("homeHudExpValue")?.parentElement||null;
+        if(!target){ return; }
+        const dot=target.querySelector(":scope > .v141-notice-dot");
+        if(dot){ dot.remove(); }
+        if(target.title==="經驗池可讓角色升級"){ target.removeAttribute("title"); }
+    }
+
+    function guideCharacterAvatars(attention,type){
+        Object.keys(attention.byIndex||{}).forEach(key=>{
+            const index=Number(key);
+            const item=attention.byIndex[key];
+            const avatar=document.getElementById("characterAvatar"+index);
+            const target=avatar&&avatar.parentElement?avatar.parentElement:avatar;
+            const show=type==="expPool"
+                ?item.canLevel
+                :type==="status"
+                ?item.hasAttributePoints
+                :type==="skill"
+                ?item.skill&&item.skill.show
+                :false;
+            if(show){
+                const label=type==="expPool"?"這名角色可以升級":type==="status"?"這名角色有能力點未分配":"這名角色有技能可處理";
+                setGrowthGuidanceDot(target,true,label);
+            }
+        });
+    }
+
+    function guideExpPool(attention){
+        guideCharacterAvatars(attention,"expPool");
+        const container=document.getElementById("expDistributeList");
+        if(!container){ return; }
+        const indexes=typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes().slice(0,3):[];
+        Array.from(container.querySelectorAll(".v131-exp-row")).forEach((row,position)=>{
+            const index=indexes[position];
+            if(index===undefined||!attention.byIndex[index]||!attention.byIndex[index].canLevel){ return; }
+            const button=row.querySelector(".v131-exp-preview-btn");
+            if(button&&!button.disabled){ setGrowthGuidanceDot(button,true,"點擊預覽升級"); }
+        });
+        const confirm=container.querySelector(".v131-exp-confirm");
+        if(confirm&&!confirm.disabled){ setGrowthGuidanceDot(confirm,true,"確認本次升級"); }
+    }
+
+    function guideStatus(attention){
+        guideCharacterAvatars(attention,"status");
+        const page=document.getElementById("statusPage");
+        if(!page){ return; }
+        const index=typeof statusCharacterIndex!=="undefined"&&Number.isInteger(Number(statusCharacterIndex))
+            ?Number(statusCharacterIndex):0;
+        const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+        const used=typeof pendingStats!=="undefined"&&pendingStats
+            ?Object.values(pendingStats).reduce((sum,value)=>sum+Math.max(0,numeric(value)),0):0;
+        const remaining=Math.max(0,numeric(character&&character.attributePoints)-used);
+        if(remaining>0){
+            page.querySelectorAll("[onclick*='addPoint']").forEach(button=>{
+                setGrowthGuidanceDot(button,true,"尚有能力點可分配");
+            });
+        }
+        const confirm=document.getElementById("confirmStatusButton");
+        if(confirm&&used>0&&!confirm.disabled){ setGrowthGuidanceDot(confirm,true,"確認能力配點"); }
+    }
+
+    function skillIdFromRow(row){
+        const icon=row&&row.querySelector?row.querySelector("[id^='skillIcon_']"):null;
+        return icon?icon.id.slice("skillIcon_".length):"";
+    }
+
+    function guideSkills(attention){
+        guideCharacterAvatars(attention,"skill");
+        const page=document.getElementById("skillPage");
+        if(!page||typeof currentSkillCharacter==="undefined"){ return; }
+        const indexes=typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes().slice(0,3):[];
+        const currentIndex=indexes.find(index=>characterKeyForIndex(index)===currentSkillCharacter);
+        if(currentIndex===undefined){ return; }
+        const character=getPartyCharacterByIndex(currentIndex);
+        const loadout=typeof characterSkillLoadouts!=="undefined"&&characterSkillLoadouts
+            ?characterSkillLoadouts[currentSkillCharacter]:null;
+        if(!character||!loadout||typeof skillDatabase==="undefined"){ return; }
+        const levels=loadout.skillLevels||{};
+        const equipped=Array.isArray(loadout.equippedSkills)?loadout.equippedSkills:[];
+        const points=Math.max(0,numeric(character.skillPoints));
+        let hasEquipReminder=false;
+
+        page.querySelectorAll("#allSkillsList .skill-row").forEach(row=>{
+            const skillId=skillIdFromRow(row);
+            const skill=skillId&&skillDatabase[skillId];
+            if(!skill){ return; }
+            const level=Math.max(0,numeric(levels[skillId]));
+            const actionCards=Array.from(row.querySelectorAll(".skill-action-card"));
+            const growthCard=actionCards.find(card=>{
+                const onclick=card.getAttribute("onclick")||"";
+                return onclick.includes("learnSkill(")||onclick.includes("upgradeSkill(");
+            });
+            let canSpend=false;
+            if(level<=0){
+                const prereqMet=typeof isSkillPrereqMet==="function"
+                    ?!!isSkillPrereqMet(levels,skill)
+                    :(skill.requires||[]).every(requiredId=>numeric(levels[requiredId])>0);
+                canSpend=prereqMet&&points>=Math.max(0,numeric(skill.learnCost));
+            }else{
+                canSpend=level<Math.max(1,numeric(skill.maxLevel)||1)&&points>=1;
+            }
+            if(canSpend&&growthCard&&!growthCard.classList.contains("disabled")){
+                setGrowthGuidanceDot(growthCard,true,level>0?"技能點足夠，可升級":"技能點足夠，可學習");
+            }
+
+            const equipCard=actionCards.find(card=>(card.getAttribute("onclick")||"").includes("equipSkill("));
+            const canEquip=
+                level>0&&
+                EQUIPPABLE_SKILL_CATEGORIES.has(skill.category)&&
+                !equipped.includes(skillId)&&
+                equipped.length<4;
+            if(canEquip&&equipCard&&!equipCard.classList.contains("disabled")){
+                setGrowthGuidanceDot(equipCard,true,"已學習但尚未裝備");
+                hasEquipReminder=true;
+            }
+        });
+
+        if(hasEquipReminder){
+            const emptySlot=Array.from(page.querySelectorAll("#skillLoadout .skill-loadout-slot"))
+                .find(slot=>!slot.querySelector("[id^='loadoutIcon_']"));
+            if(emptySlot){ setGrowthGuidanceDot(emptySlot,true,"這個技能欄位可以裝備技能"); }
+        }
     }
 
     function syncCharacterAttentionDots(){
@@ -567,8 +791,26 @@
         document.querySelectorAll("#mapPageNav button[aria-label='角色']").forEach(button=>{
             setCharacterAttentionDot(button,attention.show,attention.label);
         });
+        clearLegacyHudExpAttention();
+
+        clearGrowthGuidanceDots();
+        const modal=document.getElementById("homeFeatureModal");
+        const tabContent=document.getElementById("characterTabContent");
+        if(!modal||!tabContent||!modal.classList.contains("show")){ return; }
+
+        setGrowthGuidanceDot(document.getElementById("characterTabBtnExpPool"),attention.canLevel,"有角色可以升級");
+        setGrowthGuidanceDot(document.getElementById("characterTabBtnStatus"),attention.hasAttributePoints,"有能力點尚未分配");
+        setGrowthGuidanceDot(document.getElementById("characterTabBtnSkill"),attention.hasSkillAttention,"有技能可以學習、升級或裝備");
+
+        const expPage=document.getElementById("homeExpPoolCard");
+        const statusPage=document.getElementById("statusPage");
+        const skillPage=document.getElementById("skillPage");
+        if(expPage&&tabContent.contains(expPage)){ guideExpPool(attention); }
+        if(statusPage&&tabContent.contains(statusPage)){ guideStatus(attention); }
+        if(skillPage&&tabContent.contains(skillPage)){ guideSkills(attention); }
     }
     window.v146SyncCharacterAttentionDots=syncCharacterAttentionDots;
+    window.v146GetCharacterGrowthAttention=getCharacterGrowthAttention;
 
     /* ----- Synthesis blueprints and crafted results are ordinary equipment, never elemental sets. ----- */
     const SYNTHESIS_SET_PREFIX=/^(赤炎|寒泉|岩岳|青嵐)/;
