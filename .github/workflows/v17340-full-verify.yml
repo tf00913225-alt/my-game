@@ -26,6 +26,9 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Preserve canonical forest roster
+        run: python3 .github/scripts/v17340-forest-compat.py
+
       - name: Check CI script syntax
         run: node --check .github/scripts/ci.mjs
 
@@ -52,16 +55,18 @@ jobs:
       - name: Check release entries and loader integrity
         run: node .github/scripts/ci.mjs loader
 
-      - name: Remove verification workflow
-        run: rm -f .github/workflows/v17340-full-verify.yml
+      - name: Remove verification tooling
+        run: |
+          rm -f .github/scripts/v17340-forest-compat.py
+          rm -f .github/workflows/v17340-full-verify.yml
 
-      - name: Commit cleanup
+      - name: Commit validated compatibility fix and cleanup
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --check
-          git commit -m "chore: clean V173.40 verification"
+          git commit -m "fix: preserve V173.40 forest roster contracts"
 
       - name: Check final Git diff
         run: |
@@ -69,5 +74,5 @@ jobs:
           CI_HEAD_SHA="$(git rev-parse HEAD)" \
           node .github/scripts/ci.mjs git-diff
 
-      - name: Push cleanup to dev
+      - name: Push validated V173.40 to dev
         run: git push origin HEAD:dev
