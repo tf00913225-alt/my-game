@@ -1,0 +1,82 @@
+name: V173.39 Apply Earth Light VFX
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17339-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Rebuild and verify V173.39 patch
+        run: |
+          cat .github/v17339.patch.part00 .github/v17339.patch.part01 > /tmp/v17339.patch.xz.b64
+          echo "4f00af8ef38c6fea7febc62b8232666a5f78b85de168d469b038a2dd03662cff  /tmp/v17339.patch.xz.b64" | sha256sum -c -
+          base64 -d /tmp/v17339.patch.xz.b64 | xz -d > /tmp/v17339.patch
+          echo "85c7e22a791bcfcb2da4c5b5761f51f2f0613e3cd159e834e5c3da4348f11a1d  /tmp/v17339.patch" | sha256sum -c -
+          git apply --check /tmp/v17339.patch
+          git apply /tmp/v17339.patch
+
+      - name: Remove staging files
+        run: |
+          rm -f .github/v17339.patch.part00 .github/v17339.patch.part01
+          rm -f .github/workflows/v17339-apply.yml
+
+      - name: Check CI script syntax
+        run: node --check .github/scripts/ci.mjs
+
+      - name: Check all JavaScript syntax
+        run: node .github/scripts/ci.mjs syntax
+
+      - name: Ensure ImageMagick dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run all Node suites
+        run: node .github/scripts/ci.mjs tests
+
+      - name: Check resources
+        run: node .github/scripts/ci.mjs resources
+
+      - name: Check HTML IDs
+        run: node .github/scripts/ci.mjs html-ids
+
+      - name: Check loader integrity
+        run: node .github/scripts/ci.mjs loader
+
+      - name: Create final V173.39 commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: integrate V173.39 earth and light sprite VFX"
+
+      - name: Check Git diff rules
+        env:
+          CI_BASE_SHA: ${{ github.sha }}
+        run: |
+          CI_HEAD_SHA="$(git rev-parse HEAD)" node .github/scripts/ci.mjs git-diff
+
+      - name: Push V173.39 to dev
+        run: git push origin HEAD:dev
