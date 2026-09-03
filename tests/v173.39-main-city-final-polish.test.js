@@ -34,4 +34,4 @@ test("forbidden entry sizes and navigation remain untouched",()=>{
  assert.match(base,/\.home-secondary-actions\{[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?grid-template-rows:repeat\(3,82px\);/);
  assert.match(base,/#homePage\{[\s\S]{0,520}height:100%;[\s\S]{0,180}overflow:hidden/);
 });
-console.log("\n"+passed+" V173.40 main-city pixel-tune tests passed.");
+console.log("\n"+passed+" V173.39 main-city pixel-tune tests passed.");

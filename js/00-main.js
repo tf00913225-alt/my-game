@@ -2789,24 +2789,22 @@ function rollBeginnerForestNormalAttackDamage(){
         );
 }
 
-function makeBeginnerForestMonster(name,level,element){
-    const monster=makeZoneMonster(name,level,element);
+const forestMonsters = [
+
+    makeZoneMonster("哥布林",3,"fire"),
+    makeZoneMonster("史萊姆",2,"water"),
+    makeZoneMonster("哥布林",3,"fire"),
+    makeZoneMonster("史萊姆",2,"water"),
+    makeZoneMonster("哥布林",3,"fire"),
+    makeZoneMonster("史萊姆",2,"water")
+
+];
+
+forestMonsters.forEach(monster=>{
     monster.agilityPoints=0;
     monster.agility=0;
     monster.v173BeginnerForest=true;
-    return monster;
-}
-
-const forestMonsters = [
-
-    makeBeginnerForestMonster("哥布林",3,"fire"),
-    makeBeginnerForestMonster("史萊姆",2,"water"),
-    makeBeginnerForestMonster("哥布林",3,"fire"),
-    makeBeginnerForestMonster("史萊姆",2,"water"),
-    makeBeginnerForestMonster("哥布林",3,"fire"),
-    makeBeginnerForestMonster("史萊姆",2,"water")
-
-];
+});
 
 
 /*

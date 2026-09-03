@@ -9,9 +9,10 @@ const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 let passed=0;function test(name,fn){fn();passed++;console.log("✓ "+name);}
 
-test("newbie forest owns zero agility monsters",()=>{
-    assert.match(main,/function makeBeginnerForestMonster\(name,level,element\)[\s\S]*?monster\.agilityPoints=0;[\s\S]*?monster\.agility=0;[\s\S]*?monster\.v173BeginnerForest=true;/);
-    assert.equal((main.match(/makeBeginnerForestMonster\("(?:哥布林|史萊姆)"/g)||[]).length,6);
+test("newbie forest owns zero agility monsters while preserving the six canonical monster rows",()=>{
+    const forest=(main.match(/const forestMonsters = \[[\s\S]*?\n\];/)||[])[0]||"";
+    assert.equal((forest.match(/makeZoneMonster\("(?:哥布林|史萊姆)"/g)||[]).length,6);
+    assert.match(main,/forestMonsters\.forEach\(monster=>\{[\s\S]*?monster\.agilityPoints=0;[\s\S]*?monster\.agility=0;[\s\S]*?monster\.v173BeginnerForest=true;/);
 });
 
 test("newbie forest normal attacks are final 10 to 15 before defend or shields and cannot crit",()=>{
