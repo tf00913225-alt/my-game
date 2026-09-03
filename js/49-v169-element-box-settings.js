@@ -1,57 +1,92 @@
 /* =====================================================
-   V169 — Element Box per-character settings persistence
+   V169 / V173.42 — Element Box settings ownership
+   - Auto action remains per character.
+   - HP / SP potion thresholds + return-home are shared by the whole party.
+   - Settings are locked while Element Box is active; stop first to edit.
 ===================================================== */
 (function installV169ElementBoxSettings(){
     "use strict";
 
-    if(
-        typeof window==="undefined"||
-        typeof document==="undefined"||
-        window.__v169ElementBoxSettingsInstalled
-    ){
-        return;
-    }
+    if(typeof window==="undefined"||typeof document==="undefined"||window.__v169ElementBoxSettingsInstalled){ return; }
     window.__v169ElementBoxSettingsInstalled=true;
 
     const SETTINGS_PANEL_ID="autoBattleSettingsPanel";
     const STOP_BUTTON_ID="v169ElementBoxStopButton";
-    const IMMEDIATE_FIELD_IDS=[
-        "autoSettingsActionSelect",
-        "autoSettingsHP",
-        "autoSettingsSP",
-        "autoSettingsReturnCity"
-    ];
+    const LOCK_NOTICE_ID="v17342ElementBoxLockNotice";
+    const CONTROL_IDS=["autoSettingsCharacterSelect","autoSettingsActionSelect","autoSettingsHP","autoSettingsSP","autoSettingsReturnCity"];
+    const IMMEDIATE_FIELD_IDS=["autoSettingsActionSelect","autoSettingsHP","autoSettingsSP","autoSettingsReturnCity"];
+
+    function elementBoxIsActive(){
+        if(typeof window.v131GetElementBoxState==="function"){
+            try{ const state=window.v131GetElementBoxState(); if(state&&state.active){ return true; } }catch(_){ }
+        }
+        return typeof autoBattle!=="undefined"&&!!autoBattle;
+    }
 
     function selectedCharacterIndex(){
-        const characterSelect=document.getElementById("autoSettingsCharacterSelect");
-        if(!characterSelect){ return null; }
+        const select=document.getElementById("autoSettingsCharacterSelect");
+        if(!select){ return null; }
+        const index=Number(select.value);
+        if(!Number.isInteger(index)||index<0||index>2){ return null; }
+        if(typeof getPartyCharacterByIndex==="function"&&!getPartyCharacterByIndex(index)){ return null; }
+        return index;
+    }
 
-        const characterIndex=Number(characterSelect.value);
-        if(!Number.isInteger(characterIndex)||characterIndex<0||characterIndex>2){
-            return null;
-        }
-        if(
-            typeof getPartyCharacterByIndex==="function"&&
-            !getPartyCharacterByIndex(characterIndex)
-        ){
-            return null;
-        }
-        return characterIndex;
+    function existingIndexes(){
+        if(typeof getExistingPartyIndexes==="function"){ return getExistingPartyIndexes().slice(0,3); }
+        return [0,1,2].filter(index=>typeof getPartyCharacterByIndex!=="function"||!!getPartyCharacterByIndex(index));
+    }
+
+    function sharedSourceConfig(){
+        if(typeof getPartyAutoConfig!=="function"){ return null; }
+        const indexes=existingIndexes();
+        return getPartyAutoConfig(indexes.length?indexes[0]:0)||null;
+    }
+
+    function syncSharedRecoveryForm(){
+        const config=sharedSourceConfig();
+        if(!config){ return; }
+        const hp=document.getElementById("autoSettingsHP");
+        const sp=document.getElementById("autoSettingsSP");
+        const back=document.getElementById("autoSettingsReturnCity");
+        if(hp){ hp.value=String(config.hp==null?50:config.hp); }
+        if(sp){ sp.value=String(config.sp==null?25:config.sp); }
+        if(back){ back.checked=!!config.returnToCityWhenEmpty; }
+    }
+
+    function writeSharedRecoveryFromForm(){
+        if(typeof getPartyAutoConfig!=="function"){ return; }
+        const hp=document.getElementById("autoSettingsHP");
+        const sp=document.getElementById("autoSettingsSP");
+        const back=document.getElementById("autoSettingsReturnCity");
+        const hpValue=hp?Number(hp.value):50;
+        const spValue=sp?Number(sp.value):25;
+        const returnValue=!!(back&&back.checked);
+        existingIndexes().forEach(index=>{
+            const config=getPartyAutoConfig(index);
+            if(!config){ return; }
+            config.hp=hpValue;
+            config.sp=spValue;
+            config.returnToCityWhenEmpty=returnValue;
+        });
+    }
+
+    function normalizeSharedRecoveryAcrossParty(){
+        syncSharedRecoveryForm();
+        writeSharedRecoveryFromForm();
+    }
+
+    function notifyLocked(){
+        alert("先停止元素匣，才能設定");
     }
 
     function persistSelectedCharacterSettings(){
-        const characterIndex=selectedCharacterIndex();
-        if(
-            characterIndex===null||
-            typeof saveAutoSettingsFormToCharacter!=="function"
-        ){
-            return false;
-        }
-
-        saveAutoSettingsFormToCharacter(characterIndex);
-        if(typeof saveGame==="function"){
-            saveGame();
-        }
+        if(elementBoxIsActive()){ notifyLocked(); syncSharedRecoveryForm(); return false; }
+        const index=selectedCharacterIndex();
+        if(index===null||typeof saveAutoSettingsFormToCharacter!=="function"){ return false; }
+        saveAutoSettingsFormToCharacter(index);
+        writeSharedRecoveryFromForm();
+        if(typeof saveGame==="function"){ saveGame(); }
         return true;
     }
     window.v169PersistElementBoxSettings=persistSelectedCharacterSettings;
@@ -59,87 +94,49 @@
     function bindImmediatePersistence(){
         IMMEDIATE_FIELD_IDS.forEach(id=>{
             const field=document.getElementById(id);
-            if(
-                !field||
-                typeof field.addEventListener!=="function"||
-                field.dataset.v169ImmediateSave==="1"
-            ){
-                return;
-            }
+            if(!field||typeof field.addEventListener!=="function"||field.dataset.v169ImmediateSave==="1"){ return; }
             field.dataset.v169ImmediateSave="1";
-            field.addEventListener("change",persistSelectedCharacterSettings);
+            field.addEventListener("change",()=>{
+                if(elementBoxIsActive()){ notifyLocked(); syncSharedRecoveryForm(); return; }
+                persistSelectedCharacterSettings();
+            });
         });
     }
 
-    /* The original switch already writes the outgoing form into that
-       character's config. Persist immediately after it does so, instead of
-       waiting for a later Apply click that may never happen. */
     if(typeof switchAutoSettingsCharacter==="function"){
-        const previousSwitchAutoSettingsCharacter=switchAutoSettingsCharacter;
+        const previous=switchAutoSettingsCharacter;
         switchAutoSettingsCharacter=function(){
-            const result=previousSwitchAutoSettingsCharacter.apply(this,arguments);
-            if(typeof saveGame==="function"){
-                saveGame();
-            }
+            if(elementBoxIsActive()){ notifyLocked(); return false; }
+            const result=previous.apply(this,arguments);
+            syncSharedRecoveryForm();
+            if(typeof saveGame==="function"){ saveGame(); }
             return result;
         };
     }
 
     function settingsPanelIsVisible(){
         const panel=document.getElementById(SETTINGS_PANEL_ID);
-        return !!(
-            panel&&
-            panel.style&&
-            panel.style.display!=="none"
-        );
+        return !!(panel&&panel.style&&panel.style.display!=="none");
     }
 
-    /* Both the shared home modal and the legacy battle overlay can own this
-       panel. Save once before either close path restores/hides the DOM node. */
     let closeSaveDepth=0;
     function wrapCloseWithSave(previousClose){
         return function(){
-            if(closeSaveDepth===0&&settingsPanelIsVisible()){
-                persistSelectedCharacterSettings();
-            }
+            if(closeSaveDepth===0&&settingsPanelIsVisible()&&!elementBoxIsActive()){ persistSelectedCharacterSettings(); }
             closeSaveDepth++;
-            try{
-                return previousClose.apply(this,arguments);
-            }finally{
-                closeSaveDepth--;
-            }
+            try{ return previousClose.apply(this,arguments); }
+            finally{ closeSaveDepth--; }
         };
     }
-
-    if(typeof closeHomeFeature==="function"){
-        closeHomeFeature=wrapCloseWithSave(closeHomeFeature);
-    }
-    if(typeof closeAutoBattleSettings==="function"){
-        closeAutoBattleSettings=wrapCloseWithSave(closeAutoBattleSettings);
-    }
-
-    function elementBoxIsActive(){
-        if(typeof window.v131GetElementBoxState==="function"){
-            try{
-                const state=window.v131GetElementBoxState();
-                if(state&&state.active){ return true; }
-            }catch(_){ }
-        }
-        return typeof autoBattle!=="undefined"&&!!autoBattle;
-    }
+    if(typeof closeHomeFeature==="function"){ closeHomeFeature=wrapCloseWithSave(closeHomeFeature); }
+    if(typeof closeAutoBattleSettings==="function"){ closeAutoBattleSettings=wrapCloseWithSave(closeAutoBattleSettings); }
 
     function ensureStopButton(){
         let button=document.getElementById(STOP_BUTTON_ID);
         if(button){ return button; }
-
         const panel=document.getElementById(SETTINGS_PANEL_ID);
-        const status=panel&&typeof panel.querySelector==="function"
-            ?panel.querySelector(".auto-premium-status")
-            :null;
-        if(!status||typeof document.createElement!=="function"){
-            return null;
-        }
-
+        const status=panel&&panel.querySelector?panel.querySelector(".auto-premium-status"):null;
+        if(!status||typeof document.createElement!=="function"){ return null; }
         button=document.createElement("button");
         button.id=STOP_BUTTON_ID;
         button.type="button";
@@ -152,86 +149,81 @@
         return button;
     }
 
+    function ensureLockNotice(){
+        let notice=document.getElementById(LOCK_NOTICE_ID);
+        if(notice){ return notice; }
+        const panel=document.getElementById(SETTINGS_PANEL_ID);
+        if(!panel||typeof document.createElement!=="function"){ return null; }
+        notice=document.createElement("div");
+        notice.id=LOCK_NOTICE_ID;
+        notice.className="v17342-element-box-lock-notice";
+        notice.textContent="元素匣運作中：先停止元素匣，才能修改設定";
+        notice.hidden=true;
+        const shared=panel.querySelector&&panel.querySelector(".v17342-element-box-shared");
+        panel.insertBefore(notice,shared||panel.firstChild||null);
+        return notice;
+    }
+
     function syncElementBoxSettingControls(){
         const active=elementBoxIsActive();
         const primary=document.getElementById("autoBattleButton");
         const stopButton=ensureStopButton();
+        const notice=ensureLockNotice();
         const panel=document.getElementById(SETTINGS_PANEL_ID);
-        const status=panel&&typeof panel.querySelector==="function"
-            ?panel.querySelector(".auto-premium-status")
-            :null;
+        const status=panel&&panel.querySelector?panel.querySelector(".auto-premium-status"):null;
 
+        CONTROL_IDS.forEach(id=>{ const field=document.getElementById(id); if(field){ field.disabled=active; } });
         if(primary){
             primary.setAttribute("onclick","v169SaveElementBoxSettings()");
-            primary.textContent=active?"儲存設定":"套用並啟動";
+            primary.textContent=active?"先停止後設定":"套用並啟動";
+            primary.disabled=active;
             primary.classList.toggle("active",active);
-            primary.dataset.v169Mode=active?"save":"activate";
+            primary.dataset.v169Mode=active?"locked":"activate";
         }
-        if(stopButton){
-            stopButton.hidden=!active;
-            stopButton.classList.toggle("active",active);
-        }
-        if(status){
-            status.classList.toggle("v169-element-box-active",active);
-        }
+        if(stopButton){ stopButton.hidden=!active; stopButton.classList.toggle("active",active); }
+        if(notice){ notice.hidden=!active; }
+        if(status){ status.classList.toggle("v169-element-box-active",active); }
+        if(panel){ panel.classList.toggle("v17342-settings-locked",active); }
+        syncSharedRecoveryForm();
     }
     window.v169SyncElementBoxSettingControls=syncElementBoxSettingControls;
 
     window.v169SaveElementBoxSettings=function(){
+        if(elementBoxIsActive()){ notifyLocked(); return false; }
         persistSelectedCharacterSettings();
-        if(typeof confirmAutoBattleSettings==="function"){
-            return confirmAutoBattleSettings();
-        }
+        if(typeof confirmAutoBattleSettings==="function"){ return confirmAutoBattleSettings(); }
+        return true;
     };
 
     window.v169StopElementBox=function(){
-        persistSelectedCharacterSettings();
-        if(!elementBoxIsActive()||typeof toggleAutoBattle!=="function"){
-            syncElementBoxSettingControls();
-            return false;
-        }
-
-        /* winBattle() can temporarily clear autoBattle while the V131 Element
-           Box session remains active. Normalize that transient state so the
-           existing toggle path performs a real stop (and clears all party
-           enabled flags) instead of accidentally starting it again. */
-        if(typeof autoBattle!=="undefined"&&!autoBattle){
-            autoBattle=true;
-        }
+        if(!elementBoxIsActive()||typeof toggleAutoBattle!=="function"){ syncElementBoxSettingControls(); return false; }
+        if(typeof autoBattle!=="undefined"&&!autoBattle){ autoBattle=true; }
         const result=toggleAutoBattle();
         syncElementBoxSettingControls();
         return result;
     };
 
     if(typeof updateAutoButton==="function"){
-        const previousUpdateAutoButton=updateAutoButton;
-        updateAutoButton=function(){
-            const result=previousUpdateAutoButton.apply(this,arguments);
-            syncElementBoxSettingControls();
-            return result;
-        };
-    }
-    if(typeof openHomeFeature==="function"){
-        const previousOpenHomeFeature=openHomeFeature;
-        openHomeFeature=function(type){
-            const result=previousOpenHomeFeature.apply(this,arguments);
-            if(type==="autoBattleSettings"){
-                bindImmediatePersistence();
-                syncElementBoxSettingControls();
-            }
-            return result;
-        };
-    }
-    if(typeof openAutoBattleSettings==="function"){
-        const previousOpenAutoBattleSettings=openAutoBattleSettings;
-        openAutoBattleSettings=function(){
-            const result=previousOpenAutoBattleSettings.apply(this,arguments);
-            bindImmediatePersistence();
-            syncElementBoxSettingControls();
-            return result;
-        };
+        const previous=updateAutoButton;
+        updateAutoButton=function(){ const result=previous.apply(this,arguments); syncElementBoxSettingControls(); return result; };
     }
 
+    function afterOpen(type){
+        if(type!=="autoBattleSettings"){ return; }
+        bindImmediatePersistence();
+        syncElementBoxSettingControls();
+        if(elementBoxIsActive()){ setTimeout(notifyLocked,0); }
+    }
+    if(typeof openHomeFeature==="function"){
+        const previous=openHomeFeature;
+        openHomeFeature=function(type){ const result=previous.apply(this,arguments); afterOpen(type); return result; };
+    }
+    if(typeof openAutoBattleSettings==="function"){
+        const previous=openAutoBattleSettings;
+        openAutoBattleSettings=function(){ const result=previous.apply(this,arguments); afterOpen("autoBattleSettings"); return result; };
+    }
+
+    normalizeSharedRecoveryAcrossParty();
     bindImmediatePersistence();
     syncElementBoxSettingControls();
 })();

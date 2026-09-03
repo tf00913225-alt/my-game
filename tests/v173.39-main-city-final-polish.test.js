@@ -31,7 +31,7 @@ test("roster uses the closest feasible geometry while bottom nav remains fixed",
 test("forbidden entry sizes and navigation remain untouched",()=>{
  assert.match(base,/\.home-card-primary\{[\s\S]*?height:90px;/);
  assert.match(base,/\.home-card-secondary\{[\s\S]*?width:80px;[\s\S]*?height:82px;/);
- assert.match(base,/\.home-secondary-actions\{[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?grid-template-rows:repeat\(3,82px\);/);
+ assert.match(base,/\.home-secondary-actions\{[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?grid-template-rows:repeat\(4,82px\);/);
  assert.match(base,/#homePage\{[\s\S]{0,520}height:100%;[\s\S]{0,180}overflow:hidden/);
 });
 console.log("\n"+passed+" V173.39 main-city pixel-tune tests passed.");

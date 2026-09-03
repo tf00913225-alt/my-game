@@ -210,6 +210,60 @@
         };
     }
 
+
+    /* V173.42 — backpack potion use follows the currently selected backpack character. */
+    function syncInventoryPotionUseButton(item,slotIndex){
+        const buttons=document.querySelector("#itemModal .item-modal-buttons");
+        if(!buttons){ return; }
+        let button=document.getElementById("v17342InventoryPotionUse");
+        const definition=item&&typeof getPotionDefinition==="function"?getPotionDefinition(item.id):null;
+        if(!definition){
+            if(button){ button.remove(); }
+            return;
+        }
+        if(!button){
+            button=document.createElement("button");
+            button.id="v17342InventoryPotionUse";
+            button.type="button";
+            button.className="item-modal-button v17342-inventory-potion-use";
+            buttons.insertBefore(button,buttons.firstChild||null);
+        }
+        button.textContent="使用";
+        button.onclick=()=>window.v17342UseInventoryPotion(slotIndex);
+    }
+
+    window.v17342UseInventoryPotion=function(slotIndex){
+        const item=typeof inventorySlots!=="undefined"?inventorySlots[slotIndex]:null;
+        const definition=item&&typeof getPotionDefinition==="function"?getPotionDefinition(item.id):null;
+        const character=typeof getBackpackCharacter==="function"?getBackpackCharacter(inventoryCharacterIndex):null;
+        const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(inventoryCharacterIndex):null;
+        if(!definition||!character||!stats){ return false; }
+        const resource=definition.resource;
+        const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);
+        const currentValue=Number(character[resource])||0;
+        if(!(maxValue>0)||currentValue>=maxValue){
+            alert((character.id||"角色")+(resource==="hp"?" HP":" SP")+"目前不需要補充。");
+            return false;
+        }
+        if(typeof consumePotionFromInventory!=="function"||!consumePotionFromInventory(definition.id,1)){
+            alert(definition.name+"數量不足。");
+            return false;
+        }
+        const planned=definition.recoveryPercent>=100
+            ?maxValue-currentValue
+            :Math.max(1,Math.round(maxValue*Number(definition.recoveryPercent||0)/100));
+        const recovered=Math.max(0,Math.min(maxValue-currentValue,planned));
+        character[resource]=Math.min(maxValue,currentValue+recovered);
+        if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
+        if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
+        if(typeof renderInventory==="function"){ renderInventory(); }
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof saveGame==="function"){ saveGame(); }
+        if(typeof closeItemModal==="function"){ closeItemModal(); }
+        alert((character.id||"角色")+"使用"+definition.name+"，恢復"+recovered+" "+resource.toUpperCase()+"。");
+        return true;
+    };
+
     if(typeof openItemModal==="function"){
         const originalOpenItemModal=openItemModal;
         openItemModal=function(slotIndex){
@@ -219,6 +273,7 @@
             if(icon&&item){ icon.innerHTML=item.icon||"◆"; }
             appendReforgeStatsToModal(item);
             syncDecomposeButton(item,slotIndex);
+            syncInventoryPotionUseButton(item,slotIndex);
             return result;
         };
     }
@@ -231,6 +286,7 @@
             if(icon&&item){ icon.innerHTML=item.icon||"◆"; }
             appendReforgeStatsToModal(item);
             syncDecomposeButton(null,null);
+            syncInventoryPotionUseButton(null,null);
             return result;
         };
     }
@@ -1063,6 +1119,23 @@
         daily:{20:{gold:20},40:{gold:30,exp:20},60:{gold:40},80:{gold:50,exp:30},100:{gold:80,exp:50}},
         commission:{20:{gold:50},40:{gold:75,exp:30},60:{gold:100},80:{gold:150,exp:70},100:{gold:250,exp:120}}
     };
+    const v17342ScaledProgressRewards=new WeakSet();
+    function v17342ScaleReward(reward){
+        if(!reward||typeof reward!=="object"||v17342ScaledProgressRewards.has(reward)){ return reward; }
+        if(Number.isFinite(Number(reward.exp))){ reward.exp=Math.round(Number(reward.exp)*3); }
+        if(Number.isFinite(Number(reward.gold))){ reward.gold=Math.round(Number(reward.gold)*5); }
+        v17342ScaledProgressRewards.add(reward);
+        return reward;
+    }
+    function v17342ScaleProgressRewards(){
+        [
+            typeof dailyQuestDefinitions!=="undefined"?dailyQuestDefinitions:[],
+            typeof commissionQuestDefinitions!=="undefined"?commissionQuestDefinitions:[],
+            typeof achievementDefinitions!=="undefined"?achievementDefinitions:[]
+        ].forEach(list=>(list||[]).forEach(item=>v17342ScaleReward(item&&item.reward)));
+        Object.values(milestoneRewards).forEach(table=>Object.values(table).forEach(v17342ScaleReward));
+    }
+    v17342ScaleProgressRewards();
     function persistMilestones(){
         try{ localStorage.setItem(QUEST_MILESTONE_KEY,JSON.stringify(milestoneState)); }catch(_){ }
     }
@@ -1200,7 +1273,7 @@
        Daily dungeon covers and dungeon navigation
     ===================================================== */
     const dungeonCoverData={
-        exp:{title:"經驗副本",requirement:"單一角色達到10級",reward:"當前升級需求平均值的11% EXP",action:"v132BeginExpDungeon"},
+        exp:{title:"經驗副本",requirement:"單一角色達到10級",reward:"當前升級需求平均值的33% EXP",action:"v132BeginExpDungeon"},
         material:{title:"材料副本",requirement:"至少兩名角色達到20級",reward:"材料寶箱 ×1～3",action:"v132BeginMaterialDungeon"},
         equipment:{title:"裝備副本",requirement:"至少兩名角色達到20級",reward:"自選系列裝備抽獎券",action:"v132BeginEquipmentDungeon"}
     };
@@ -1280,9 +1353,16 @@
             ...commissionQuestDefinitions.map(quest=>[quest,commissionQuestState])
         ].some(([quest,state])=>!state.claimed[quest.id]);
         const hasAchievement=achievementDefinitions.some(item=>item.check()&&!achievementState[item.id]);
+        const hasExpLevelUp=typeof getExistingPartyIndexes==="function"&&getExistingPartyIndexes().some(index=>{
+            const character=getPartyCharacterByIndex(index);
+            const maxLevel=Math.max(1,Number(window.v133MaxLevel)||100);
+            return !!(character&&Number(character.level)<maxLevel&&Number(sharedExp)>=Math.max(1,Number(character.expNext)||1));
+        });
         const announcementUnread=localStorage.getItem(ANNOUNCEMENT_READ_KEY)!=="1";
         setNotificationDot(document.getElementById("homeIconQuest")?.parentElement,hasQuestNotice,"任務有新進度");
         setNotificationDot(document.getElementById("homeIconAchievement")?.parentElement,hasAchievement,"成就可領取");
+        setNotificationDot(document.getElementById("homeIconCharacter")?.parentElement,hasExpLevelUp,"經驗池可讓角色升級");
+        setNotificationDot(document.getElementById("homeHudExpValue")?.parentElement,hasExpLevelUp,"經驗池可讓角色升級");
         setNotificationDot(document.getElementById("homeIconOfflineExp")?.parentElement,pendingOfflineExp>0,"有離線經驗可領取");
         setNotificationDot(document.getElementById("homeIconAnnouncement")?.parentElement,announcementUnread,"公告未讀");
         const dungeonPending=["exp","material","equipment"].some(type=>

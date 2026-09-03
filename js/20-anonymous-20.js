@@ -18,7 +18,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="173.41";
+const V_ASSET_VERSION="173.42";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;

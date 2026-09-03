@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>四象江湖傳 V173.41</title>
+<title>四象江湖傳 V173.42</title>
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap"rel="stylesheet">
 
-<link rel="stylesheet" href="css/00-main.css?v=173.41">
+<link rel="stylesheet" href="css/00-main.css?v=173.42">
 
-<style id="v173.41-home-version-badge-style">
+<style id="v173.42-home-version-badge-style">
 #game-stage #homePage .home-version-badge{
     position:static;
     display:inline-flex;
@@ -776,8 +776,8 @@
             <div
                 id="homeVersionBadge"
                 class="home-version-badge"
-                aria-label="目前版本 V173.41"
-            >V173.41</div>
+                aria-label="目前版本 V173.42"
+            >V173.42</div>
         </div>
     </div>
 
@@ -841,19 +841,18 @@
             <span id="homeIconAnnouncement" class="home-card-icon" style="background-image:url(assets/ui/home-announcement.png);"></span>
             <span class="home-card-label">公告</span>
         </button>
-    </div>
 
-    <div class="home-utility-actions" aria-label="其他功能">
-        <button type="button" class="home-card home-card-utility" onclick="openHomeFeature('offlineExp')" aria-label="離線經驗">
+        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('offlineExp')" aria-label="離線經驗">
             <span id="homeIconOfflineExp" class="home-card-icon" style="background-image:url(assets/ui/home-offline-exp.png);"></span>
             <span class="home-card-label">離線經驗</span>
         </button>
 
-        <button type="button" class="home-card home-card-utility" onclick="openHomeFeature('system')" aria-label="系統">
+        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('system')" aria-label="系統">
             <span id="homeIconSystem" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-system.png);"></span>
             <span class="home-card-label">系統</span>
         </button>
     </div>
+
 </div>
 
 <div
@@ -1772,13 +1771,15 @@
 
 </div>
 
+<section class="v17342-element-box-shared" aria-label="三名角色共用設定">
+    <div class="v17342-element-box-shared-head"><b>共用設定</b><span>三名角色共用</span></div>
 <div class="auto-threshold-grid">
     <div class="auto-threshold-card hp">
         <div class="auto-threshold-head">
             <span class="auto-threshold-emblem">HP</span>
             <div>
                 <strong>生命補給</strong>
-                <small>戰鬥結束後低於門檻時使用補品</small>
+                <small>低於門檻時自動使用補品</small>
             </div>
         </div>
         <select id="autoSettingsHP">
@@ -1795,7 +1796,7 @@
             <span class="auto-threshold-emblem">SP</span>
             <div>
                 <strong>能量補給</strong>
-                <small>戰鬥結束後低於門檻時使用補品</small>
+                <small>低於門檻時自動使用補品</small>
             </div>
         </div>
         <select id="autoSettingsSP">
@@ -1824,6 +1825,7 @@
         </span>
     </span>
 </label>
+</section>
 
 <div class="auto-settings-actions">
     <button
@@ -2756,7 +2758,7 @@
 
 
 <script id="v173.20-startup-loader-runtime" src="js/52-v173.20-startup-loader.js?v=173.20"></script>
-<script src="js/00-main.js?v=173.41"></script>
+<script src="js/00-main.js?v=173.42"></script>
 
 </div>
 </div>
@@ -2847,10 +2849,10 @@
 <script id="stage-v51-runtime" src="js/15-stage-v51-runtime.js"></script>
 
 
-<link id="stage-v54-main-city-moderate-native-scale" rel="stylesheet" href="css/19-stage-v54-main-city-moderate-native-scale.css?v=173.41">
+<link id="stage-v54-main-city-moderate-native-scale" rel="stylesheet" href="css/19-stage-v54-main-city-moderate-native-scale.css?v=173.42">
 
 
-<script id="stage-v54-main-city-runtime" src="js/16-stage-v54-main-city-runtime.js?v=173.41"></script>
+<script id="stage-v54-main-city-runtime" src="js/16-stage-v54-main-city-runtime.js?v=173.42"></script>
 
 
 <link id="stage-v60-training-only-safety" rel="stylesheet" href="css/20-stage-v60-training-only-safety.css">
@@ -2868,7 +2870,7 @@
 
 
 
-<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js?v=173.41"></script>
+<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js?v=173.42"></script>
 
 
 
@@ -2898,7 +2900,7 @@
      No damage/SP/initiative/skill formulas changed. -->
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
-<script src="js/20-anonymous-20.js?v=173.41"></script>
+<script src="js/20-anonymous-20.js?v=173.42"></script>
 <script id="v129-character-creation-native-runtime" src="js/24-v125-character-creation-native-runtime.js?v=129a"></script>
 
 

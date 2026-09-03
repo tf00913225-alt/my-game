@@ -31981,6 +31981,14 @@ function clearBattleLog(){
     $("battleInfo")
         .innerHTML="";
 
+    /* V173.42: Element Box can use potions while no battle is running.
+       Carry those notices into the next battle-info panel exactly once. */
+    const pendingElementBoxNotices=
+        typeof window!=="undefined"&&Array.isArray(window.v17342PendingBattleNotices)
+            ? window.v17342PendingBattleNotices.splice(0)
+            : [];
+    pendingElementBoxNotices.forEach(message=>addBattleLog(message));
+
 
     /*
        ★ 新增（依照使用者要求，巡邏頁面的

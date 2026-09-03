@@ -157,7 +157,7 @@ test("dynamic redraw keeps the upper EXP label at one billion",()=>{
     vm.runInContext(extractFunction(main,"updateHomeTestTools"),context);
     context.updateHomeTestTools();
     assert.equal(nodes.testExpTenMillionButton.innerHTML,"經驗池 <b>+10億</b>");
-    assert.match(index,/js\/00-main\.js\?v=173\.41/);
+    assert.match(index,/js\/00-main\.js\?v=173\.42/);
 });
 
 console.log("\nV167 character creation / EXP suite: "+passed+" tests passed.");

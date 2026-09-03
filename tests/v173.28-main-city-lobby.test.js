@@ -52,12 +52,12 @@ test("character and shop are the only two primary entrances",()=>{
     assert.ok((28-19)/28>=.30&&(28-19)/28<=.40);
 });
 
-test("six secondary entrances form two substantial vertical button rails",()=>{
-    assert.equal(count(actions,/class="home-card home-card-secondary"/g),6);
-    ["rest","synthesis","quest","bestiary","achievement","announcement"].forEach(type=>{
+test("eight secondary entrances form two substantial vertical button rails",()=>{
+    assert.equal(count(actions,/class="home-card home-card-secondary"/g),8);
+    ["rest","synthesis","quest","bestiary","achievement","announcement","offlineExp","system"].forEach(type=>{
         assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)"));
     });
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,80px\);[\s\S]*grid-template-rows:repeat\(3,82px\);[\s\S]*min-height:256px/);
+    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,80px\);[\s\S]*grid-template-rows:repeat\(4,82px\);[\s\S]*min-height:343px/);
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
     assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:80px;[\s\S]*height:82px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
     assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:59px/);
@@ -66,15 +66,13 @@ test("six secondary entrances form two substantial vertical button rails",()=>{
     assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
 });
 
-test("offline experience and system use complete framed image-over-text buttons",()=>{
-    assert.equal(count(actions,/class="home-card home-card-utility"/g),2);
-    assert.match(actions,/home-utility-actions[\s\S]*openHomeFeature\('offlineExp'\)[\s\S]*openHomeFeature\('system'\)/);
-    assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute;[\s\S]*right:0;[\s\S]*left:0;[\s\S]*grid-template-columns:repeat\(2,92px\);[\s\S]*justify-content:space-between;[\s\S]*padding:0 74px/);
-    assert.doesNotMatch(baseCss,/\.home-utility-actions\{[\s\S]{0,360}(?:right:50%|transform:translateX\(50%\))/);
-    assert.match(baseCss,/\.home-card-utility\{[\s\S]*grid-template-columns:1fr;[\s\S]*grid-template-rows:52px 24px;[\s\S]*height:78px;[\s\S]*border:1px solid/);
-    assert.match(baseCss,/\.home-card-utility \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:52px;[\s\S]*border-bottom:1px solid/);
-    assert.match(baseCss,/\.home-card-utility \.home-card-label\{[\s\S]*font-size:15\.5px;[\s\S]*line-height:23px/);
-    assert.equal(396-(74*2)-(92*2),64);
+test("offline experience and system join the existing side rails",()=>{
+    assert.equal(count(actions,/openHomeFeature\('offlineExp'\)/g),1);
+    assert.equal(count(actions,/openHomeFeature\('system'\)/g),1);
+    assert.equal(count(actions,/class="home-card home-card-utility"/g),0);
+    assert.doesNotMatch(actions,/home-utility-actions/);
+    assert.match(actions,/homeIconOfflineExp/);
+    assert.match(actions,/homeIconSystem/);
 });
 
 test("all ten existing entry IDs and click contracts remain intact",()=>{
@@ -139,7 +137,7 @@ test("the fixed 9:16 home keeps one substantial non-scrolling layout owner",()=>
     assert.match(baseCss,/#homePage\{[\s\S]{0,420}height:100%;[\s\S]{0,120}overflow:hidden/);
     assert.match(baseCss,/\.home-card-grid\{[\s\S]*display:flex;[\s\S]*flex:0 0 auto/);
     assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:90px/);
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*min-height:256px/);
+    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*min-height:343px/);
     assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
 });
 
@@ -156,14 +154,14 @@ test("the full three-character layout fits the fixed home height above the uncha
 });
 
 test("development cache and visible version advance to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.41"/);
-    assert.match(index,/<title>四象江湖傳 V173\.41<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.41"[\s\S]*?>V173\.41<\/div>/);
-    assert.match(index,/css\/00-main\.css\?v=173\.41/);
-    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.41/);
-    assert.match(index,/js\/00-main\.js\?v=173\.41/);
-    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.41/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.41/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
+    assert.match(index,/<title>四象江湖傳 V173\.42<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.42"[\s\S]*?>V173\.42<\/div>/);
+    assert.match(index,/css\/00-main\.css\?v=173\.42/);
+    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.42/);
+    assert.match(index,/js\/00-main\.js\?v=173\.42/);
+    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.42/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
 });
 
 console.log("\n"+passed+" V173.39 main-city lobby tests passed.");

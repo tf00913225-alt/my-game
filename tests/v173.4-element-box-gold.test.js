@@ -62,10 +62,10 @@ function loadRuntime(options={}){
 test("normal Element Box patrol records each credited monster amount exactly once",()=>{
     const runtime=loadRuntime({gold:1000});
 
-    assert.equal(runtime.context.awardMonsterGoldDrop({amount:7}),7);
-    assert.equal(runtime.context.awardMonsterGoldDrop({amount:13}),13);
-    assert.equal(runtime.sessionGold(),20);
-    assert.equal(runtime.context.gold,1020,"account gold is still credited by the original function");
+    assert.equal(runtime.context.awardMonsterGoldDrop({amount:7}),35);
+    assert.equal(runtime.context.awardMonsterGoldDrop({amount:13}),65);
+    assert.equal(runtime.sessionGold(),100);
+    assert.equal(runtime.context.gold,1100,"account gold reflects the V173.42 x5 economy multiplier");
 });
 
 test("pre-battle and unrelated account-gold changes never enter the Element Box session",()=>{
@@ -74,15 +74,15 @@ test("pre-battle and unrelated account-gold changes never enter the Element Box 
     runtime.context.gold+=400;
     assert.equal(runtime.sessionGold(),0);
     runtime.context.awardMonsterGoldDrop({amount:9});
-    assert.equal(runtime.sessionGold(),9);
-    assert.equal(runtime.context.gold,1409);
+    assert.equal(runtime.sessionGold(),45);
+    assert.equal(runtime.context.gold,1445);
 });
 
 test("inactive, stopped, and expired Element Box states do not add drops",()=>{
     const inactive=loadRuntime({gold:1000,remainingMs:0});
     inactive.context.awardMonsterGoldDrop({amount:8});
     assert.equal(inactive.sessionGold(),0);
-    assert.equal(inactive.context.gold,1008);
+    assert.equal(inactive.context.gold,1040);
 
     const stopped=loadRuntime({gold:1000});
     stopped.context.autoConfig.enabled=false;
@@ -102,12 +102,12 @@ test("character changes and reload begin no duplicate session total",()=>{
     currentSession.context.awardMonsterGoldDrop({amount:6});
     currentSession.context.player={id:"角色二"};
     currentSession.context.awardMonsterGoldDrop({amount:4});
-    assert.equal(currentSession.sessionGold(),10);
+    assert.equal(currentSession.sessionGold(),50);
 
     const reloaded=loadRuntime({gold:currentSession.context.gold});
     reloaded.context.awardMonsterGoldDrop({amount:5});
-    assert.equal(reloaded.sessionGold(),5);
-    assert.equal(reloaded.context.gold,1015);
+    assert.equal(reloaded.sessionGold(),25);
+    assert.equal(reloaded.context.gold,1075);
 });
 
 test("dungeon drops are excluded while wild elite isolation remains normal patrol",()=>{
@@ -119,8 +119,8 @@ test("dungeon drops are excluded while wild elite isolation remains normal patro
 
     runtime.context.v132ActiveDungeonRun={v141EliteDropIsolation:true};
     runtime.context.awardMonsterGoldDrop({amount:6});
-    assert.equal(runtime.sessionGold(),6);
-    assert.equal(runtime.context.gold,1018);
+    assert.equal(runtime.sessionGold(),30);
+    assert.equal(runtime.context.gold,1090);
 });
 
 test("legacy autoConfig normal is untouched and no gold-difference tracker remains",()=>{

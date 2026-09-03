@@ -773,7 +773,7 @@
             const result=originalCalculateOfflineExpSince.apply(this,arguments);
             const baseGain=Math.max(0,(Number(pendingOfflineExp)||0)-before);
             if(baseGain>0){
-                pendingOfflineExp=before+Math.round(baseGain*getOfflineLevelMultiplier());
+                pendingOfflineExp=before+Math.round(baseGain*getOfflineLevelMultiplier()*3);
             }
             return result;
         };

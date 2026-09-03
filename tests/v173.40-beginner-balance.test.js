@@ -24,12 +24,13 @@ test("newbie forest normal attacks are final 10 to 15 before defend or shields a
     assert.match(main,/:isBeginnerForestNormalAttack\s*\?rollBeginnerForestNormalAttackDamage\(\)/);
 });
 
-test("newbie EXP is tied to the current Lv1-to-10 curve and twenty normal wins",()=>{
+test("newbie EXP keeps the Lv1-to-10 reference but now pays per monster and follows global x3",()=>{
     assert.match(rewards,/const V173_BEGINNER_FOREST_TARGET_BATTLES=20;/);
     assert.match(rewards,/const V173_BEGINNER_FOREST_FALLBACK_EXP=690;/);
     assert.match(rewards,/for\(let level=1;level<=9;level\+\+\)[\s\S]*?v133GetExpNextForLevel\(level\)/);
     assert.match(rewards,/Math\.ceil\(totalRequired\/V173_BEGINNER_FOREST_TARGET_BATTLES\)/);
-    assert.match(rewards,/currentZone==="forest"[\s\S]*?player[\s\S]*?player\.level\)\|\|1\)<10[\s\S]*?finalExp=getBeginnerForestBattleExp\(\)/);
+    assert.match(rewards,/function getBeginnerForestMonsterExpUnit\(\)[\s\S]*?getBeginnerForestBattleExp\(\)\/3/);
+    assert.match(rewards,/if\(isBeginnerForestBattle\)\{[\s\S]*?currentBattleMonsters\.reduce[\s\S]*?getBeginnerForestMonsterExpUnit\(\)[\s\S]*?V17342_GLOBAL_EXP_REWARD_MULTIPLIER/);
     // Current forest curve sanity: avg battle EXP 184; level target-battles 3,4,6,7,8,10,11,12,14.
     const targetBattles=[3,4,6,7,8,10,11,12,14];
     const total=targetBattles.reduce((sum,battles)=>sum+184*battles,0);
@@ -57,9 +58,9 @@ test("range VFX fixes remain fixed-size and centered after casualties",()=>{
 });
 
 test("release/cache advances to V173.40",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.41"/);
-    assert.match(index,/<title>四象江湖傳 V173\.41<\/title>/);
-    assert.match(index,/js\/00-main\.js\?v=173\.41/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.41/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
+    assert.match(index,/<title>四象江湖傳 V173\.42<\/title>/);
+    assert.match(index,/js\/00-main\.js\?v=173\.42/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
 });
 console.log("\n"+passed+" V173.40 beginner balance and patrol tests passed.");

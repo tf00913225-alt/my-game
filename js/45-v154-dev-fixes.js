@@ -122,6 +122,18 @@
         return typeof autoBattle!=="undefined"&&!!autoBattle;
     }
 
+    function logElementBoxRecovery(message){
+        const text=String(message||"");
+        if(!text){ return; }
+        if(typeof addBattleLog==="function"){ addBattleLog(text); }
+        if(!(typeof battleActive!=="undefined"&&battleActive)&&typeof window!=="undefined"){
+            window.v17342PendingBattleNotices=Array.isArray(window.v17342PendingBattleNotices)
+                ?window.v17342PendingBattleNotices:[];
+            window.v17342PendingBattleNotices.push(text);
+            if(window.v17342PendingBattleNotices.length>12){ window.v17342PendingBattleNotices.shift(); }
+        }
+    }
+
     function finishAutoRecovery(){
         if(
             typeof getExistingPartyIndexes!=="function"||
@@ -130,6 +142,7 @@
             typeof getPartyBattleStats!=="function"
         ){ return 0; }
         let consumed=0;
+        let shouldReturnToCity=false;
         const elementBoxActive=isElementBoxRecoveryActive();
         const entries=getExistingPartyIndexes().map(characterIndex=>{
             const entry={
@@ -164,7 +177,10 @@
                     if(maxValue<=0||currentValue>=maxValue||currentValue/maxValue*100>threshold){ return; }
                     const potionId=getAutoPotionId(resource);
                     const definition=getPotionDefinition(potionId);
-                    if(!definition||!consumePotionFromInventory(potionId,1)){ return; }
+                    if(!definition||!consumePotionFromInventory(potionId,1)){
+                        if(config.returnToCityWhenEmpty){ shouldReturnToCity=true; }
+                        return;
+                    }
                     const planned=definition.recoveryPercent>=100
                         ?maxValue-currentValue
                         :Math.max(1,Math.round(maxValue*definition.recoveryPercent/100));
@@ -172,12 +188,10 @@
                     character[resource]=Math.min(maxValue,currentValue+recovered);
                     consumed++;
                     progressed=true;
-                    if(typeof addBattleLog==="function"){
-                        addBattleLog(
-                            "元素匣為"+(character.id||"角色")+"自動使用"+
-                            definition.name+"，恢復"+recovered+" "+resource.toUpperCase()+"。"
-                        );
-                    }
+                    logElementBoxRecovery(
+                        "元素匣為"+(character.id||"角色")+"自動使用"+
+                        definition.name+"，恢復"+recovered+" "+resource.toUpperCase()+"。"
+                    );
                     const updatedValue=Number(character[resource])||0;
                     if(recovered>0&&updatedValue<maxValue&&updatedValue/maxValue*100<=threshold){
                         next.push(entry);
@@ -188,6 +202,12 @@
             }
         });
         if(consumed&&typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
+        if(shouldReturnToCity&&elementBoxActive){
+            logElementBoxRecovery("元素匣偵測到補品不足，已停止巡練並返回主城。");
+            if(typeof window.v169StopElementBox==="function"){ window.v169StopElementBox(); }
+            else if(typeof toggleAutoBattle==="function"&&typeof autoBattle!=="undefined"&&autoBattle){ toggleAutoBattle(); }
+            if(typeof showPage==="function"){ showPage("home"); }
+        }
         return consumed;
     }
     window.v154FinishAutoRecovery=finishAutoRecovery;
@@ -276,6 +296,18 @@
                 if(consumed&&typeof saveGame==="function"){ saveGame(); }
             }
         },0);
+    }
+    if(typeof setInterval==="function"){
+        setInterval(()=>{
+            if(
+                isElementBoxRecoveryActive()&&
+                !(typeof battleActive!=="undefined"&&battleActive)
+            ){
+                const consumed=finishAutoRecovery();
+                if(consumed&&typeof updateUI==="function"){ updateUI(); }
+                if(consumed&&typeof saveGame==="function"){ saveGame(); }
+            }
+        },1000);
     }
     syncElementBoxPrimaryButton();
     syncAbyssPortraits();

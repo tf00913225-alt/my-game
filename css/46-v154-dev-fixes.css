@@ -89,11 +89,22 @@ body.v162-element-box-settings-open > #autoBattleSettingsPanel{
 /* The cover already contains its title and character art; leave only the action. */
 #game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete){
     align-items:center !important;
-    justify-content:flex-end !important;
-    padding:14px 18px 22px !important;
-    background:
-        linear-gradient(180deg,transparent 0 76%,rgba(3,3,3,.76) 100%),
-        url("../assets/dungeons/abyss/abyss-cover.webp") center 35% / cover no-repeat !important;
+    justify-content:flex-start !important;
+    gap:8px !important;
+    padding:8px 18px 14px !important;
+    background:#080705 !important;
+}
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete)::before{
+    content:"";
+    display:block;
+    width:min(100%,336px);
+    max-height:calc(100% - 58px);
+    aspect-ratio:9/16;
+    flex:1 1 auto;
+    border:1px solid rgba(184,134,65,.68);
+    border-radius:10px;
+    background:url("../assets/dungeons/abyss/abyss-cover.webp") center 35% / cover no-repeat;
+    box-shadow:0 6px 18px rgba(0,0,0,.58);
 }
 #game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) .v141-abyss-seal,
 #game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) h3,
@@ -135,9 +146,38 @@ body.v162-element-box-settings-open > #autoBattleSettingsPanel{
 }
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-map{
     width:100% !important;
-    height:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    flex:1 1 auto !important;
+}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell{
+    display:flex !important;
+    flex-direction:column !important;
     min-height:0 !important;
 }
+#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-info{
+    flex:0 0 82px;
+    min-height:82px;
+    padding:5px 8px 7px;
+    overflow:hidden;
+    border-top:1px solid rgba(190,142,65,.72);
+    background:linear-gradient(180deg,rgba(24,17,10,.96),rgba(7,6,5,.98));
+    color:#e9dcc0;
+}
+#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-info > b{
+    display:block;
+    margin-bottom:3px;
+    color:#f1c66f;
+    font-size:12px;
+}
+#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-info > div{
+    height:54px;
+    overflow-y:auto;
+    font-size:10px;
+    line-height:1.35;
+    scrollbar-width:thin;
+}
+#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-empty{color:#9f947d;}
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-boss{
     width:120px !important;
     height:168px !important;
