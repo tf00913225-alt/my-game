@@ -1,5 +1,5 @@
 name: V173.42 Player Flow
-# retry 11
+# retry 12
 
 on:
   push:
@@ -79,6 +79,28 @@ jobs:
                   '});'
               ])
               s=s[:block_start]+new_block+s[block_end:]
+          p.write_text(s)
+
+          p=Path('tests/v173.4-element-box-gold.test.js')
+          s=p.read_text()
+          replacements={
+              'assert.equal(runtime.context.awardMonsterGoldDrop({amount:7}),7);':'assert.equal(runtime.context.awardMonsterGoldDrop({amount:7}),35);',
+              'assert.equal(runtime.context.awardMonsterGoldDrop({amount:13}),13);':'assert.equal(runtime.context.awardMonsterGoldDrop({amount:13}),65);',
+              'assert.equal(runtime.sessionGold(),20);':'assert.equal(runtime.sessionGold(),100);',
+              'assert.equal(runtime.context.gold,1020,"account gold is still credited by the original function");':'assert.equal(runtime.context.gold,1100,"account gold reflects the V173.42 x5 economy multiplier");',
+              'assert.equal(runtime.sessionGold(),9);':'assert.equal(runtime.sessionGold(),45);',
+              'assert.equal(runtime.context.gold,1409);':'assert.equal(runtime.context.gold,1445);',
+              'assert.equal(inactive.context.gold,1008);':'assert.equal(inactive.context.gold,1040);',
+              'assert.equal(currentSession.sessionGold(),10);':'assert.equal(currentSession.sessionGold(),50);',
+              'assert.equal(reloaded.sessionGold(),5);':'assert.equal(reloaded.sessionGold(),25);',
+              'assert.equal(reloaded.context.gold,1015);':'assert.equal(reloaded.context.gold,1075);',
+              'assert.equal(runtime.sessionGold(),6);':'assert.equal(runtime.sessionGold(),30);',
+              'assert.equal(runtime.context.gold,1018);':'assert.equal(runtime.context.gold,1090);'
+          }
+          for old,new in replacements.items():
+              if old not in s:
+                  raise SystemExit('V173.4 gold assertion not found: '+old)
+              s=s.replace(old,new,1)
           p.write_text(s)
           PY
 
