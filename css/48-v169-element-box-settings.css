@@ -5,8 +5,8 @@
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active{
     grid-template-columns:minmax(0,1fr) minmax(92px,106px) minmax(86px,100px);
     gap:5px;
-    min-height:68px;
-    padding:7px 9px;
+    min-height:64px;
+    padding:6px 8px;
     overflow:visible;
     box-sizing:border-box;
 }
@@ -21,80 +21,96 @@
     overflow:visible;
 }
 
-/* Element Box must fit in one view. The modal never becomes a secondary scroll
-   surface; spacing is compacted at the existing component owner instead. */
-body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-box{
-    max-height:calc(100% - 76px) !important;
+/* Element Box owns no scroll surface. The whole settings sheet is fitted inside
+   the stage so every control and the remaining-time row stay visible at once. */
+body.v162-element-box-settings-open #homeFeatureModal{
     overflow:hidden !important;
 }
+body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-box{
+    width:min(96%,480px) !important;
+    max-height:calc(100% - 12px) !important;
+    height:auto !important;
+    padding:8px 10px !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+}
 body.v162-element-box-settings-open #homeFeatureModalBody{
-    overflow:visible !important;
+    max-height:none !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+    touch-action:manipulation !important;
 }
 body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-panel{
     box-sizing:border-box !important;
-    gap:5px !important;
-    padding:0 2px 3px !important;
+    gap:4px !important;
+    max-height:none !important;
+    padding:0 1px 2px !important;
     overflow:visible !important;
 }
 body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-title{
-    margin-bottom:6px !important;
-    padding-bottom:6px !important;
+    margin-bottom:4px !important;
+    padding-bottom:4px !important;
+    font-size:20px !important;
+    line-height:1.15 !important;
 }
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status{
-    min-height:62px;
-    padding:7px 9px;
+    min-height:58px;
+    padding:6px 8px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status-copy strong{
     font-size:16px;
-    line-height:19px;
+    line-height:18px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status-copy small{
     font-size:8px;
-    line-height:10px;
+    line-height:9px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-setting-card{
-    min-height:48px;
-    padding:5px 8px;
+    min-height:44px;
+    padding:4px 7px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-card{
-    padding:6px;
+    padding:5px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-head{
-    margin-bottom:4px;
+    margin-bottom:3px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-return-card{
-    min-height:48px;
-    padding:5px 8px;
+    min-height:44px;
+    padding:4px 7px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel #v131ElementBoxStats{
-    margin-top:2px !important;
+    margin:1px 0 0 !important;
+    padding:6px 7px !important;
 }
 #autoBattleSettingsPanel.v131-element-box-panel #v131ElementBoxStats > small{
     display:none !important;
+}
+#autoBattleSettingsPanel.v131-element-box-panel .v141-element-box-remaining{
+    min-height:34px !important;
+}
+#autoBattleSettingsPanel.v131-element-box-panel .v141-element-box-ad{
+    min-height:36px !important;
 }
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status #autoBattleButton{
     width:100% !important;
     min-width:0 !important;
-    height:40px !important;
-    padding-inline:6px !important;
+    height:38px !important;
+    padding-inline:5px !important;
 }
 
 #autoBattleSettingsPanel .v169-element-box-stop{
     width:100%;
-    height:40px;
+    height:38px;
     min-width:0;
-    padding:0 6px;
+    padding:0 5px;
     border:1px solid #8f4c35;
     border-radius:9px;
     color:#ffd9b0;
-    background:
-        linear-gradient(180deg,rgba(126,43,29,.92),rgba(54,18,13,.98));
-    box-shadow:
-        inset 0 1px 0 rgba(255,226,146,.1),
-        0 3px 0 #260a06,
-        0 5px 10px rgba(0,0,0,.28);
+    background:linear-gradient(180deg,rgba(126,43,29,.92),rgba(54,18,13,.98));
+    box-shadow:inset 0 1px 0 rgba(255,226,146,.1),0 3px 0 #260a06,0 5px 10px rgba(0,0,0,.28);
     font:900 11px/1 sans-serif;
     letter-spacing:.03em;
     cursor:pointer;
@@ -107,27 +123,23 @@ body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-title{
     transform:translateY(1px);
 }
 
-#autoBattleSettingsPanel .v169-element-box-stop[hidden]{
-    display:none !important;
-}
+#autoBattleSettingsPanel .v169-element-box-stop[hidden]{display:none !important;}
 
 @media (max-width:380px){
     #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active{
         grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-        min-height:104px;
+        min-height:96px;
     }
-
     #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active .auto-premium-status-copy{
         grid-column:1/-1;
     }
 }
 
-
 /* V173.42 — shared recovery section and active-session edit lock. */
 #autoBattleSettingsPanel .v17342-element-box-shared{
     display:block;
-    margin:5px 0 0;
-    padding:7px;
+    margin:4px 0 0;
+    padding:6px;
     border:1px solid rgba(193,144,67,.62);
     border-radius:11px;
     background:linear-gradient(160deg,rgba(42,30,18,.92),rgba(10,9,7,.96));
@@ -137,20 +149,20 @@ body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-title{
     align-items:center;
     justify-content:space-between;
     gap:6px;
-    margin-bottom:4px;
+    margin-bottom:3px;
     color:#f2ce83;
 }
 #autoBattleSettingsPanel .v17342-element-box-shared-head b{font-size:13px;}
 #autoBattleSettingsPanel .v17342-element-box-shared-head span{font-size:10px;color:#bba57a;}
 #autoBattleSettingsPanel .v17342-element-box-lock-notice{
-    margin:4px 0;
-    padding:6px 8px;
+    margin:3px 0;
+    padding:5px 7px;
     border:1px solid rgba(216,89,59,.72);
     border-radius:9px;
     color:#ffd7b8;
     background:rgba(80,25,17,.86);
     font-size:11px;
-    line-height:1.25;
+    line-height:1.2;
     font-weight:900;
     text-align:center;
 }
@@ -159,19 +171,13 @@ body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-title{
     opacity:.48;
     filter:saturate(.45);
 }
-#autoBattleSettingsPanel.v17342-settings-locked #autoBattleButton:disabled{
-    opacity:.55;
-}
+#autoBattleSettingsPanel.v17342-settings-locked #autoBattleButton:disabled{opacity:.55;}
 
-/* While active, controls stay visually locked but their parent cards remain tappable
-   so the runtime can explain why editing is unavailable. */
+/* Controls remain tappable through their cards while active so the player gets
+   the explanation only after trying to edit; opening the page itself is silent. */
 #autoBattleSettingsPanel.v17342-settings-locked .auto-setting-card,
 #autoBattleSettingsPanel.v17342-settings-locked .auto-threshold-card,
-#autoBattleSettingsPanel.v17342-settings-locked .auto-return-card{
-    cursor:not-allowed;
-}
+#autoBattleSettingsPanel.v17342-settings-locked .auto-return-card{cursor:not-allowed;}
 #autoBattleSettingsPanel.v17342-settings-locked .auto-setting-control,
 #autoBattleSettingsPanel.v17342-settings-locked .auto-threshold-card .auto-premium-dropdown,
-#autoBattleSettingsPanel.v17342-settings-locked .auto-return-card input{
-    pointer-events:none;
-}
+#autoBattleSettingsPanel.v17342-settings-locked .auto-return-card input{pointer-events:none;}
