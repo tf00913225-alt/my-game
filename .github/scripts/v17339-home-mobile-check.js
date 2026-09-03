@@ -21,6 +21,7 @@ function character(id,element){
                 }
                 const loader=document.getElementById("startupLoader"); if(loader){ loader.style.display="none"; }
                 const creation=document.getElementById("creationPage"); if(creation){ creation.style.display="none"; }
+                const gameInterface=document.getElementById("gameInterface"); if(gameInterface){ gameInterface.style.display="block"; }
                 showPage("home");
                 updateUI();
             },{p1:character("赤炎旅者","fire"),p2:character("寒泉旅者","water"),p3:character("青嵐旅者","wind")});
