@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 
 def once(text, old, new, label):
@@ -21,8 +22,14 @@ p.write_text(s)
 
 p=Path('tests/v173.40-beginner-balance.test.js')
 t=p.read_text()
-old='''test("newbie forest owns zero agility monsters",()=>{\n    assert.match(main,/function makeBeginnerForestMonster\\(name,level,element\\)[\\s\\S]*?monster\\.agilityPoints=0;[\\s\\S]*?monster\\.agility=0;[\\s\\S]*?monster\\.v173BeginnerForest=true;/);\n    assert.equal((main.match(/makeBeginnerForestMonster\\(\\"(?:哥布林|史萊姆)\\"/g)||[]).length,6);\n});'''
-new='''test("newbie forest owns zero agility monsters while preserving the six canonical monster rows",()=>{\n    const forest=(main.match(/const forestMonsters = \\[[\\s\\S]*?\\n\\];/)||[])[0]||"";\n    assert.equal((forest.match(/makeZoneMonster\\(\\"(?:哥布林|史萊姆)\\"/g)||[]).length,6);\n    assert.match(main,/forestMonsters\\.forEach\\(monster=>\\{[\\s\\S]*?monster\\.agilityPoints=0;[\\s\\S]*?monster\\.agility=0;[\\s\\S]*?monster\\.v173BeginnerForest=true;/);\n});'''
-t=once(t,old,new,'focused forest test')
+pattern=r'test\("newbie forest owns zero agility monsters",\(\)=>\{[\s\S]*?\n\}\);'
+new=r'''test("newbie forest owns zero agility monsters while preserving the six canonical monster rows",()=>{
+    const forest=(main.match(/const forestMonsters = \[[\s\S]*?\n\];/)||[])[0]||"";
+    assert.equal((forest.match(/makeZoneMonster\("(?:哥布林|史萊姆)"/g)||[]).length,6);
+    assert.match(main,/forestMonsters\.forEach\(monster=>\{[\s\S]*?monster\.agilityPoints=0;[\s\S]*?monster\.agility=0;[\s\S]*?monster\.v173BeginnerForest=true;/);
+});'''
+t,n=re.subn(pattern,lambda _:new,t,count=1)
+if n!=1:
+    raise SystemExit(f'focused forest test: expected 1 regex match, found {n}')
 p.write_text(t)
 print('forest roster compatibility preserved')
