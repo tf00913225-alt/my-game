@@ -1,0 +1,79 @@
+name: V173.39 VFX Footprint Repair
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - .github/workflows/v17339-vfx-footprint-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Apply VFX geometry repair
+        run: python3 .github/scripts/v17339-vfx-footprint-repair.py apply
+
+      - name: Check animation syntax
+        run: node --check js/39-v143-skill-animation.js
+
+      - name: Run focused VFX regressions
+        run: |
+          node tests/v150-ice-arrow-rain-vfx.test.js
+          node tests/v173.23-wind-vfx.test.js
+          node tests/v173.39-earth-light-vfx.test.js
+
+      - name: Ensure ImageMagick dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run repository checks
+        run: |
+          node --check .github/scripts/ci.mjs
+          node .github/scripts/ci.mjs syntax
+          node .github/scripts/ci.mjs tests
+          node .github/scripts/ci.mjs resources
+          node .github/scripts/ci.mjs html-ids
+          node .github/scripts/ci.mjs loader
+
+      - name: Record repair
+        run: python3 .github/scripts/v17339-vfx-footprint-repair.py record
+
+      - name: Remove staging files
+        run: |
+          rm -f .github/workflows/v17339-vfx-footprint-repair.yml
+          rm -f .github/scripts/v17339-vfx-footprint-repair.py
+
+      - name: Commit repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: stabilize area skill VFX footprints"
+
+      - name: Check final diff rules
+        env:
+          CI_BASE_SHA: ${{ github.event.before }}
+        run: CI_HEAD_SHA="$(git rev-parse HEAD)" node .github/scripts/ci.mjs git-diff
+
+      - name: Push to dev
+        run: git push origin HEAD:dev
