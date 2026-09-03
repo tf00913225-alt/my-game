@@ -4,39 +4,24 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[2]
 
-
-def replace_once(text, old, new, label):
-    count=text.count(old)
-    if count!=1:
-        raise SystemExit(f"{label}: expected 1 match, found {count}")
-    return text.replace(old,new,1)
-
-
 def sub_once(text, pattern, repl, label):
     updated,count=re.subn(pattern,repl,text,count=1,flags=re.S)
     if count!=1:
         raise SystemExit(f"{label}: expected 1 match, found {count}")
     return updated
 
-
 def apply():
     main_path=ROOT/"css/00-main.css"
     main=main_path.read_text()
-
     main=sub_once(main,r'(\.home-hud-kicker\{[\s\S]*?\bgap:)7px;',r'\g<1>8px;',"HUD gap")
     main=sub_once(main,r'(\.home-hud-kicker\{[\s\S]*?\bfont-size:)10px;',r'\g<1>15px;',"HUD title font")
-
     main=sub_once(main,r'(\.home-utility-actions\{[\s\S]*?\bbottom:)5px;',r'\g<1>0;',"utility vertical position")
     main=sub_once(main,r'(\.home-utility-actions\{[\s\S]*?grid-template-columns:)repeat\(2,100px\);',r'\g<1>repeat(2,104px);',"utility columns")
-    main=sub_once(main,r'(\.home-utility-actions\{[\s\S]*?\bpadding:)0 68px;',r'\g<1>0 68px;',"utility horizontal padding")
-
     main=sub_once(main,r'(\.home-card-utility\{[\s\S]*?grid-template-columns:)42px minmax\(0,1fr\);',r'\g<1>40px minmax(0,1fr);',"utility internal columns")
     main=sub_once(main,r'(\.home-card-utility\{[\s\S]*?\bheight:)47px;',r'\g<1>46px;',"utility height")
-
     main=sub_once(main,r'(\.home-card-utility \.home-card-icon\{[\s\S]*?\bwidth:)41px;',r'\g<1>40px;',"utility icon width")
     main=sub_once(main,r'(\.home-card-utility \.home-card-icon\{[\s\S]*?\bheight:)45px;',r'\g<1>40px;',"utility icon height")
     main=sub_once(main,r'(\.home-card-utility \.home-card-icon\{[\s\S]*?\bmargin-left:)1px;',r'\g<1>0;',"utility icon margin")
-
     main=sub_once(main,r'(\.home-card-utility \.home-card-label\{[\s\S]*?\bpadding:)0 4px;',r'\g<1>0;',"utility label padding")
     main=sub_once(main,r'(\.home-card-utility \.home-card-label\{[\s\S]*?\bfont-size:)12px;',r'\g<1>16px;',"utility label font")
     main=sub_once(main,r'(\.home-card-utility \.home-card-label\{[\s\S]*?\bline-height:)45px;',r'\g<1>44px;',"utility label line-height")
@@ -50,12 +35,12 @@ def apply():
 
     roster_path=ROOT/"css/42-v146-system-polish.css"
     roster=roster_path.read_text()
-    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-roster\{[\s\S]*?\bmargin:)8px 10px 0;',r'\g<1>50px 10px 0;',"roster margin")
-    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-roster\{[\s\S]*?\bpadding:)3px 7px;',r'\g<1>4px 7px;',"roster padding")
-    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-roster > header\{[\s\S]*?\bmin-height:)14px;',r'\g<1>16px;',"roster header height")
-    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-roster > header\{[\s\S]*?\bline-height:)14px;',r'\g<1>16px;',"roster header line-height")
-    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-character\{[\s\S]*?\bheight:)46px;',r'\g<1>48px;',"roster row height")
-    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-character\{[\s\S]*?\bpadding:)1px 7px 1px 2px;',r'\g<1>2px 7px 2px 2px;',"roster row padding")
+    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-roster\{[\s\S]*?\bmargin:)8px 10px 0;',r'\g<1>45.5px 10px 0;',"roster margin")
+    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-roster\{[\s\S]*?\bpadding:)3px 7px;',r'\g<1>3.5px 7px;',"roster padding")
+    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-roster > header\{[\s\S]*?\bmin-height:)14px;',r'\g<1>15px;',"roster header height")
+    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-roster > header\{[\s\S]*?\bline-height:)14px;',r'\g<1>15px;',"roster header line-height")
+    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-character\{[\s\S]*?\bheight:)46px;',r'\g<1>47px;',"roster row height")
+    roster=sub_once(roster,r'(#game-stage #homePage \.v146-home-character\{[\s\S]*?\bpadding:)1px 7px 1px 2px;',r'\g<1>1.5px 7px 1.5px 2px;',"roster row padding")
     roster_path.write_text(roster)
 
     test_path=ROOT/"tests/v173.39-main-city-final-polish.test.js"
@@ -80,12 +65,12 @@ test("utility buttons are 104x46 with 40px icons and a 52px centre corridor",()=
  assert.match(base,/\.home-card-utility \.home-card-label\{[\s\S]*?font-size:16px;[\s\S]*?letter-spacing:-\.75px;/);
  assert.equal(396-(68*2)-(104*2),52);
 });
-test("roster shifts down exactly 42px and grows exactly 10px",()=>{
- assert.match(roster,/\.v146-home-roster\{[\s\S]*?margin:50px 10px 0;[\s\S]*?padding:4px 7px;/);
- assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?min-height:16px;[\s\S]*?line-height:16px;/);
- assert.match(roster,/\.v146-home-character\{[\s\S]*?height:48px;[\s\S]*?padding:2px 7px 2px 2px;/);
- const oldHeight=2+6+14+6+(3*46),newHeight=2+8+16+6+(3*48);
- assert.equal(50-8,42);assert.equal(newHeight-oldHeight,10);assert.equal(newHeight,176);
+test("roster uses the closest feasible geometry while bottom nav remains fixed",()=>{
+ assert.match(roster,/\.v146-home-roster\{[\s\S]*?margin:45\.5px 10px 0;[\s\S]*?padding:3\.5px 7px;/);
+ assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?min-height:15px;[\s\S]*?line-height:15px;/);
+ assert.match(roster,/\.v146-home-character\{[\s\S]*?height:47px;[\s\S]*?padding:1\.5px 7px 1\.5px 2px;/);
+ const oldHeight=166,newHeight=171;
+ assert.equal(45.5-8,37.5);assert.equal(newHeight-oldHeight,5);assert.equal(newHeight,171);
  assert.match(runtime,/function renderHomeRoster\(\)[\s\S]*?grid\.insertAdjacentElement\("afterend",roster\)/);
 });
 test("forbidden entry sizes and navigation remain untouched",()=>{
