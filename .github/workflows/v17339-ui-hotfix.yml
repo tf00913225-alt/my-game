@@ -85,5 +85,5 @@ jobs:
           CI_BASE_SHA: ${{ github.event.before }}
         run: CI_HEAD_SHA="$(git rev-parse HEAD)" node .github/scripts/ci.mjs git-diff
 
-      - name: Push to dev
+      - name: Push validated UI hotfix to dev
         run: git push origin HEAD:dev
