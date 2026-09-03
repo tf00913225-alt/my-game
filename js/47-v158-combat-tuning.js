@@ -83,7 +83,12 @@
 
     function normalizeDailyDungeonMonster(monster){
         if(!monster||monster.v141Abyss===true){ return monster; }
-        return halveMonsterCoreStats(monster,"v17342DailyDungeonStatsHalved");
+        /* V173.42 follow-up: regular daily dungeons are reduced by another 50%.
+           Fresh monsters therefore receive 0.5 × 0.5 = 25% of the original
+           core combat values. Keeping a second marker also makes reused monster
+           objects receive only the missing second pass instead of being quartered twice. */
+        halveMonsterCoreStats(monster,"v17342DailyDungeonStatsHalved");
+        return halveMonsterCoreStats(monster,"v17342DailyDungeonStatsHalvedAgain");
     }
 
     window.v158NormalizeMonsterDefaultEvasion=normalizeMonsterDefaultEvasion;
