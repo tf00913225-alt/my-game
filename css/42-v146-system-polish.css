@@ -65,7 +65,13 @@
 .v146-status-popup.status-agilityDown{color:#8beac1;}.v146-status-popup.status-defenseDown{color:#ffd17b;}.v146-status-popup.status-stun{color:#e9e6ff;}
 @keyframes v146StatusPopup{0%{opacity:0;transform:translate(-50%,-20%) scale(.82)}10%,90%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-88%) scale(.96)}}
 
-/* Notification dots never inherit a muted button state. */
+/* Growth attention targets are never composited dimmer than their red dot.
+   This keeps the reminder fully luminous even when the underlying tab/action
+   would normally be rendered with disabled/inactive opacity. */
+#game-stage .v146-growth-attention-target{
+    opacity:1 !important;
+    filter:none !important;
+}
 #game-stage .v141-notice-dot,
 #game-stage .v146-growth-guidance-dot{
     z-index:20050 !important;
