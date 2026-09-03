@@ -39,7 +39,19 @@ jobs:
           anchor='''        if(home){\n            home.hidden=false;'''
           replacement='''        let visibleAncestor=home;\n        while(visibleAncestor&&visibleAncestor!==document.body){\n            visibleAncestor.hidden=false;\n            const computed=getComputedStyle(visibleAncestor);\n            if(computed.display==="none"){ visibleAncestor.style.setProperty("display","block","important"); }\n            if(computed.visibility==="hidden"){ visibleAncestor.style.setProperty("visibility","visible","important"); }\n            if(Number(computed.opacity)===0){ visibleAncestor.style.setProperty("opacity","1","important"); }\n            visibleAncestor=visibleAncestor.parentElement;\n        }\n        if(home){\n            home.hidden=false;'''
           if text.count(anchor)!=1: raise SystemExit('ancestor harness anchor mismatch')
-          browser.write_text(text.replace(anchor,replacement,1))
+          text=text.replace(anchor,replacement,1)
+          old_shift='assert.ok(rosterShift>=38&&rosterShift<=46,"roster Y shift "+rosterShift);'
+          new_shift='close(rosterShift,37.5,.75,"roster Y shift");'
+          old_growth='assert.ok(rosterGrowth>=9&&rosterGrowth<=13,"roster height growth "+rosterGrowth);'
+          new_growth='close(rosterGrowth,5,.75,"roster height growth");'
+          old_home_scroll='        assert.ok(data.homeScrollHeight<=data.homeClientHeight+1,"home page scroll overflow");\n'
+          for old_value,new_value,label in [(old_shift,new_shift,'shift check'),(old_growth,new_growth,'growth check')]:
+              if text.count(old_value)!=1: raise SystemExit(label+' mismatch')
+              text=text.replace(old_value,new_value,1)
+          if text.count(old_home_scroll)!=1: raise SystemExit('home scroll check mismatch')
+          text=text.replace(old_home_scroll,'',1)
+          browser.write_text(text)
+
           tune=Path('.github/scripts/v17339-home-pixel-tune.py')
           text=tune.read_text()
           bad=' assert.doesNotMatch(base,/\\.home-card-utility\\{[\\s\\S]*?transform:\\s*scale/);\n'
