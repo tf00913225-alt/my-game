@@ -1,0 +1,88 @@
+name: V173.39 Home Pixel Tune
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - .github/workflows/v17339-home-pixel-tune.yml
+
+permissions:
+  contents: write
+
+jobs:
+  tune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Prepare browser probe
+        run: |
+          npm install --no-save --no-package-lock playwright-core
+          CHROME_PATH="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          python3 -m http.server 8899 >/tmp/v17339-home-server.log 2>&1 &
+          echo $! >/tmp/v17339-home-server.pid
+          sleep 1
+
+      - name: Measure V173.39 baseline
+        run: node .github/scripts/v17339-home-browser-check.mjs baseline http://127.0.0.1:8899 /tmp/v17339-home-baseline.json
+
+      - name: Apply exact pixel tune
+        run: python3 .github/scripts/v17339-home-pixel-tune.py apply
+
+      - name: Run focused static regression
+        run: node tests/v173.39-main-city-final-polish.test.js
+
+      - name: Verify 420x746.67 logical geometry in Chromium
+        run: node .github/scripts/v17339-home-browser-check.mjs final http://127.0.0.1:8899 /tmp/v17339-home-baseline.json
+
+      - name: Ensure ImageMagick dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run repository checks
+        run: |
+          node --check .github/scripts/ci.mjs
+          node .github/scripts/ci.mjs syntax
+          node .github/scripts/ci.mjs tests
+          node .github/scripts/ci.mjs resources
+          node .github/scripts/ci.mjs html-ids
+          node .github/scripts/ci.mjs loader
+
+      - name: Remove temporary tooling
+        run: |
+          rm -rf node_modules
+          rm -f .github/workflows/v17339-home-pixel-tune.yml
+          rm -f .github/scripts/v17339-home-pixel-tune.py
+          rm -f .github/scripts/v17339-home-browser-check.mjs
+
+      - name: Commit exact main-city tune
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "style: tune V173.39 main-city pixel geometry"
+
+      - name: Check final diff rules
+        env:
+          CI_BASE_SHA: ${{ github.event.before }}
+        run: CI_HEAD_SHA="$(git rev-parse HEAD)" node .github/scripts/ci.mjs git-diff
+
+      - name: Push to dev
+        run: git push origin HEAD:dev
