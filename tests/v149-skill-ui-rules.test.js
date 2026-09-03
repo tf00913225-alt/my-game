@@ -72,11 +72,11 @@ function compact(skill){
 }
 
 test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.27/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.27/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.39/);
+assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.39/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.27"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
     assert.match(loader,/css\/44-v149-skill-ui-rules\.css/);
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
@@ -189,7 +189,7 @@ test("differently named buffs no longer reject or overwrite one another",()=>{
     assert.equal(context.v149GetBuffConflictTargets,undefined);
 });
 
-test("Fire EX adds five percent only when its target has an abnormal status",()=>{
+test("Fire EX abnormal-target bonus is owned by the unified core damage bucket, not a V149 wrapper",()=>{
     const party=[{id:"火俠",element:"fire",hp:100,sp:100,activeBuffs:[],statusEffects:[]}];
     const target={hp:100,alive:true,statusEffects:[{type:"burn",turnsLeft:2}]};
     const context={
@@ -203,7 +203,7 @@ test("Fire EX adds five percent only when its target has an abnormal status",()=
     vm.createContext(context);
     vm.runInContext("calculateSkillDamage=function(){return 100}; castDamageSkill=function(){return calculateSkillDamage(1,1,damageTarget,1,'fire')}",context);
     vm.runInContext(source,context);
-    assert.equal(context.castDamageSkill("flameSlash"),105);
+    assert.equal(context.castDamageSkill("flameSlash"),100);
     target.statusEffects=[];
     assert.equal(context.castDamageSkill("flameSlash"),100);
 });

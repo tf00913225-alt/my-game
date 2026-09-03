@@ -17,6 +17,7 @@
         "waterKnife","frostPunch","iceSpin","frostCrush","waterBall",
         "floodBeast","iceArrowRain","freeze","healSpell","revive","waterEX"
     ];
+    const WATER_DAMAGE_SKILL_IDS=WATER_SKILL_IDS.slice(0,7);
     const WATER_PREVIEW_SKILL_ID_SET=new Set(WATER_SKILL_IDS.slice(0,8));
     const WATER_SUPPORT_PREVIEW_SKILL_ID_SET=new Set(["healSpell","revive","waterEX"]);
     const STATUS_FIELDS=[
@@ -155,6 +156,9 @@
     }
 
     applyFinalSkillData();
+    if(typeof window.v173ApplyFormalDamageRoleProfiles==="function"){
+        window.v173ApplyFormalDamageRoleProfiles(WATER_DAMAGE_SKILL_IDS);
+    }
 
     /* Final Water/utility values load after the historical talisman sync. */
     if(typeof window.v132GetTalismanDefinition==="function"){
@@ -240,112 +244,6 @@
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
             if(activeFrostbite(monster)){ return false; }
             return previousMonsterSpecial.apply(this,arguments);
-        };
-    }
-
-    function partyCharacters(){
-        if(typeof getExistingPartyIndexes==="function"&&typeof getPartyCharacterByIndex==="function"){
-            return getExistingPartyIndexes().map(index=>getPartyCharacterByIndex(index)).filter(Boolean);
-        }
-        return [
-            typeof player!=="undefined"?player:null,
-            typeof player2!=="undefined"?player2:null,
-            typeof player3!=="undefined"?player3:null
-        ].filter(Boolean);
-    }
-
-    /* The legacy monster damage path treats every selected skill as an attack.
-       Freeze is the one pure-control exception: it still spends SP, rolls its
-       status and respects single-target selection, but produces no HP hit. */
-    if(typeof window.processSingleMonsterAttack==="function"){
-        const previousMonsterAttack=window.processSingleMonsterAttack;
-        window.processSingleMonsterAttack=function(){
-            let freezeCast=false;
-            let defenseSuppressed=false;
-            const characters=partyCharacters();
-            const defenseState=characters.map(character=>({
-                character:character,
-                had:Object.prototype.hasOwnProperty.call(character,"isDefending"),
-                value:character.isDefending
-            }));
-            const barrierState=characters.map(character=>({
-                character:character,
-                entries:(character.activeBuffs||[]).map((buff,index)=>({
-                    buff:buff,index:index,
-                    isBarrier:!!(buff&&buff.type==="barrier"),
-                    remainingBlocks:buff&&buff.remainingBlocks,
-                    turnsLeft:buff&&buff.turnsLeft
-                })).filter(entry=>entry.isBarrier)
-            }));
-            const previousBadge=window.showMonsterSkillNameBadge;
-            const previousDamage=window.calculateDamage;
-            const previousLog=window.addBattleLog;
-
-            function suppressDefense(){
-                if(defenseSuppressed){ return; }
-                defenseSuppressed=true;
-                defenseState.forEach(entry=>{ entry.character.isDefending=false; });
-            }
-
-            if(typeof previousBadge==="function"){
-                window.showMonsterSkillNameBadge=function(skillName){
-                    const freezeSkill=typeof skillDatabase!=="undefined"?skillDatabase.freeze:null;
-                    if(freezeSkill&&skillName===freezeSkill.name){ freezeCast=true; }
-                    return previousBadge.apply(this,arguments);
-                };
-            }
-
-            if(typeof previousDamage==="function"){
-                window.calculateDamage=function(){
-                    if(freezeCast){
-                        suppressDefense();
-                        return 0;
-                    }
-                    return previousDamage.apply(this,arguments);
-                };
-            }
-
-            if(typeof previousLog==="function"){
-                window.addBattleLog=function(message){
-                    const text=String(message==null?"":message);
-                    if(
-                        freezeCast&&(
-                            text.includes("結界完全格擋了這次攻擊")||
-                            (text.includes("施放冰封")&&/造成0點?傷害/.test(text))
-                        )
-                    ){
-                        return;
-                    }
-                    return previousLog.apply(this,arguments);
-                };
-            }
-
-            try{ return previousMonsterAttack.apply(this,arguments); }
-            finally{
-                if(typeof previousBadge==="function"){ window.showMonsterSkillNameBadge=previousBadge; }
-                if(typeof previousDamage==="function"){ window.calculateDamage=previousDamage; }
-                if(typeof previousLog==="function"){ window.addBattleLog=previousLog; }
-
-                defenseState.forEach(entry=>{
-                    if(entry.had){ entry.character.isDefending=entry.value; }
-                    else{ delete entry.character.isDefending; }
-                });
-
-                if(freezeCast){
-                    barrierState.forEach(state=>{
-                        state.character.activeBuffs=state.character.activeBuffs||[];
-                        state.entries.forEach(entry=>{
-                            entry.buff.remainingBlocks=entry.remainingBlocks;
-                            entry.buff.turnsLeft=entry.turnsLeft;
-                            if(!state.character.activeBuffs.includes(entry.buff)){
-                                state.character.activeBuffs.splice(
-                                    Math.min(entry.index,state.character.activeBuffs.length),0,entry.buff
-                                );
-                            }
-                        });
-                    });
-                }
-            }
         };
     }
 

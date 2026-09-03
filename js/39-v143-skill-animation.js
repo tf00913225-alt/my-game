@@ -144,7 +144,7 @@
             sprite:{
                 src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
-                placement:"battlefield",renderer:"canvas-crop",targetBounds:true,coverageScale:1.22,
+                placement:"battlefield",renderer:"canvas-crop",fixedFormation:true,coverageScale:1.22,
                 minWidth:140,minHeight:140
             }
         },
@@ -274,22 +274,118 @@
         windEX:{glyph:"嵐",motion:"orbit-fast",impact:"wind-crown",hit:.74,pulses:7,spread:95},
         stormSpell:{glyph:"暴",motion:"tempest",impact:"storm-eye",hit:.72,pulses:6,spread:86},
 
-        stoneSlash:{glyph:"斬",motion:"heavy-arc",impact:"stone-cut",hit:.59,pulses:1,spread:0},
-        petrifyFist:{glyph:"岩",motion:"dash",impact:"petrify-fist",hit:.64,pulses:2,spread:28},
-        stoneBreakSky:{glyph:"柱",motion:"erupt",impact:"stone-pillar",hit:.70,pulses:4,spread:78,flightCount:3},
-        earthquakeCrush:{glyph:"裂",motion:"ground",impact:"earth-rift",hit:.74,pulses:6,spread:92},
-        stoneThrow:{glyph:"◆",motion:"lob",impact:"rock-shatter",hit:.62,pulses:2,spread:42,flightCount:3},
-        sandWind:{glyph:"石",sequence:"滾石",motion:"swirl",impact:"sand-cloud",hit:.66,pulses:4,spread:72,flightCount:4},
-        flyingSandStrike:{glyph:"沙",sequence:"飛沙",motion:"burrow",impact:"petrify-spike",hit:.71,pulses:5,spread:88,flightCount:5},
-        dustStorm:{glyph:"裂",sequence:"地牛猛襲",motion:"ground-wave",impact:"dust-quake",hit:.76,pulses:7,spread:112,flightCount:4},
-        earthShield:{glyph:"象",motion:"corner",impact:"four-earth-aura",hit:.57,pulses:4,spread:55},
-        rockWall:{glyph:"壁",motion:"erupt",impact:"rock-wall",hit:.64,pulses:4,spread:60},
-        barrier:{glyph:"界",motion:"seal",impact:"barrier-dome",hit:.68,pulses:5,spread:72},
+        stoneSlash:{
+            glyph:"斬",motion:"heavy-arc",impact:"stone-cut",hit:.5,pulses:1,spread:0,
+            deferredStatusTypes:["defenseDown"],
+            sprite:{
+                src:"assets/vfx/earth/stone-slash-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.2,maxSize:270
+            }
+        },
+        petrifyFist:{
+            glyph:"岩",motion:"dash",impact:"petrify-fist",hit:.5,pulses:2,spread:28,
+            deferredActorStatusTypes:["shield"],
+            sprite:{
+                src:"assets/vfx/earth/petrify-fist-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        stoneBreakSky:{
+            glyph:"柱",motion:"erupt",impact:"stone-pillar",hit:.5,pulses:4,spread:78,
+            deferredActorStatusTypes:["shield"],
+            sprite:{
+                src:"assets/vfx/earth/stone-break-sky-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.35,maxSize:290
+            }
+        },
+        earthquakeCrush:{
+            glyph:"裂",motion:"ground",impact:"earth-rift",hit:.5,pulses:6,spread:92,
+            deferredStatusTypes:["petrify"],
+            sprite:{
+                src:"assets/vfx/earth/earthquake-crush-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        stoneThrow:{
+            glyph:"◆",motion:"lob",impact:"rock-shatter",hit:.5,pulses:2,spread:42,
+            deferredStatusTypes:["defenseDown"],
+            sprite:{
+                src:"assets/vfx/earth/stone-throw-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        sandWind:{
+            glyph:"石",sequence:"滾石",motion:"swirl",impact:"sand-cloud",hit:.5,pulses:4,spread:72,
+            deferredStatusTypes:["defenseDown"],
+            sprite:{
+                src:"assets/vfx/earth/sand-wind-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,preserveSourceAspect:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        flyingSandStrike:{
+            glyph:"沙",sequence:"飛沙",motion:"burrow",impact:"petrify-spike",hit:.5,pulses:5,spread:88,
+            deferredStatusTypes:["defenseDown"],
+            sprite:{
+                src:"assets/vfx/earth/flying-sand-strike-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"battlefield",renderer:"canvas-crop",naturalGrid:true,scale:1.08,minSize:280
+            }
+        },
+        dustStorm:{
+            glyph:"裂",sequence:"地牛猛襲",motion:"ground-wave",impact:"dust-quake",hit:.5,pulses:7,spread:112,
+            deferredStatusTypes:["petrify"],
+            sprite:{
+                src:"assets/vfx/earth/dust-storm-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.4,maxSize:300
+            }
+        },
+        earthShield:{
+            glyph:"象",motion:"corner",impact:"four-earth-aura",hit:.5,pulses:4,spread:55,
+            deferredStatusTypes:["earthShield"],
+            sprite:{
+                src:"assets/vfx/earth/earth-shield-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        rockWall:{
+            glyph:"壁",motion:"erupt",impact:"rock-wall",hit:.5,pulses:4,spread:60,
+            deferredStatusTypes:["rockWall"],
+            sprite:{
+                src:"assets/vfx/earth/rock-wall-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"group",renderer:"canvas-crop",naturalGrid:true,alignToSlots:true,scale:1.08,minSize:190
+            }
+        },
+        barrier:{
+            glyph:"界",motion:"seal",impact:"barrier-dome",hit:.5,pulses:5,spread:72,
+            deferredStatusTypes:["barrier"],
+            sprite:{
+                src:"assets/vfx/earth/barrier-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"single",renderer:"canvas-crop",naturalGrid:true,scale:2.25,maxSize:280
+            }
+        },
         earthEX:{glyph:"岳",motion:"orbit-heavy",impact:"earth-crown",hit:.74,pulses:7,spread:95},
 
         yuanXiangGuangMing:{glyph:"光",motion:"ascend",impact:"holy-rain",hit:.66,pulses:6,spread:82},
         yuanGuangShield:{glyph:"護",motion:"seal",impact:"holy-dome",hit:.63,pulses:5,spread:70},
-        yuanZuBlessing:{glyph:"賜",motion:"orbit",impact:"holy-blessing",hit:.69,pulses:7,spread:90},
+        yuanZuBlessing:{
+            glyph:"賜",motion:"orbit",impact:"holy-blessing",hit:.5,pulses:7,spread:90,
+            deferredStatusTypes:["yuanZuBlessing"],
+            sprite:{
+                src:"assets/vfx/light/yuan-zu-blessing-cast.png?v=173.39",
+                columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
+                placement:"battlefield",renderer:"canvas-crop",naturalGrid:true,scale:1.08,minSize:280
+            }
+        },
         windArrow:{glyph:"➳",motion:"curve",impact:"wind-arrow",hit:.61,pulses:1,spread:18}
     };
 
@@ -327,7 +423,14 @@
         stun:{src:"assets/inbox/暈眩-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:900,collection:"statusEffects"},
         dodgeSkill:{src:"assets/inbox/風行-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:850,collection:"activeBuffs"},
         stealthSkill:{src:"assets/inbox/隱身-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs"},
-        dinghaishenzhen:{src:"assets/inbox/氣定神閒-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs"}
+        dinghaishenzhen:{src:"assets/inbox/氣定神閒-狀態循環圖.png?v=173.24",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs"},
+        defenseDown:{src:"assets/vfx/earth/defense-down-loop.png?v=173.39",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1100,collection:"statusEffects"},
+        shield:{src:"assets/vfx/earth/rock-shield-loop.png?v=173.39",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs",scale:1.22},
+        petrify:{src:"assets/vfx/earth/petrify-loop.png?v=173.39",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1300,collection:"statusEffects",scale:1.22},
+        earthShield:{src:"assets/vfx/earth/earth-shield-loop.png?v=173.39",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1000,collection:"activeBuffs",scale:1.20},
+        rockWall:{src:"assets/vfx/earth/rock-wall-loop.png?v=173.39",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1400,collection:"activeBuffs",scale:1.20},
+        barrier:{src:"assets/vfx/earth/barrier-loop.png?v=173.39",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs",scale:1.24,cellAspect:.75},
+        yuanZuBlessing:{src:"assets/vfx/light/yuan-zu-blessing-loop.png?v=173.39",columns:4,rows:2,frames:8,frameWidth:256,frameHeight:256,duration:1200,collection:"activeBuffs",statusName:"元祖賜福",scale:1.18}
     };
 
     window.v143SkillAnimationManifest=MANIFEST;
@@ -498,7 +601,16 @@
 
     function deferredStatusDuringCast(side,index,type){
         const current=state.current;
-        if(!current||current.done||current.targetSide!==side){ return false; }
+        if(!current||current.done){ return false; }
+        const actorTypes=Array.isArray(current.model.deferredActorStatusTypes)?current.model.deferredActorStatusTypes:[];
+        if(
+            actorTypes.indexOf(type)>=0&&current.side===side&&current.actorIndex===index&&
+            !(current.statusAtStart&&current.statusAtStart.has(side+":"+index+":"+type))&&
+            hasTimedEffect(entityFor(side,index),type)
+        ){
+            return true;
+        }
+        if(current.targetSide!==side){ return false; }
         if(type==="rage"&&current.config.id==="rage"){
             const card=cardFor(side,index);
             if(card&&card.classList&&card.classList.contains("v143-effects-pending")){ return true; }
@@ -523,7 +635,9 @@
         const spec=STATUS_SPRITES[type];
         const collection=spec&&spec.collection==="statusEffects"?entity.statusEffects:entity.activeBuffs;
         if(Array.isArray(collection)&&collection.some(effect=>
-            effect&&effect.type===type&&Number(effect.turnsLeft)>0
+            effect&&Number(effect.turnsLeft)>0&&(
+                effect.type===type||spec&&spec.statusName&&effect.statusName===spec.statusName
+            )
         )){ return true; }
         return type==="rage"&&Array.isArray(entity.v141TeamBuffs)&&entity.v141TeamBuffs.some(effect=>
             effect&&effect.type==="rage"&&Number(effect.turnsLeft)>0
@@ -583,8 +697,14 @@
         const rect=card.getBoundingClientRect?card.getBoundingClientRect():null;
         const scale=Number(spec.scale)||1.18;
         const size=Math.max(96,Math.max(Number(rect&&rect.width)||0,Number(rect&&rect.height)||0)*scale);
-        node.style.width=size+"px";
-        node.style.height=size+"px";
+        const cellAspect=Math.max(.1,Number(spec.cellAspect)||1);
+        if(cellAspect>=1){
+            node.style.width=size+"px";
+            node.style.height=(size/cellAspect)+"px";
+        }else{
+            node.style.width=(size*cellAspect)+"px";
+            node.style.height=size+"px";
+        }
     }
 
     function syncStatusSpriteEffects(){
@@ -765,16 +885,32 @@
         node.style.opacity=String(canvasSpriteOpacity(progress));
         if(context&&image&&ready){
             context.clearRect(0,0,node.width,node.height);
+            let destX=0,destY=0,destWidth=node.width,destHeight=node.height;
+            if(sprite.preserveSourceAspect&&sourceWidth>0&&sourceHeight>0&&node.width>0&&node.height>0){
+                const sourceAspect=sourceWidth/sourceHeight;
+                const destinationAspect=node.width/node.height;
+                if(sourceAspect>destinationAspect){
+                    destHeight=node.width/sourceAspect;
+                    destY=(node.height-destHeight)/2;
+                }else if(sourceAspect<destinationAspect){
+                    destWidth=node.height*sourceAspect;
+                    destX=(node.width-destWidth)/2;
+                }
+            }
+            node.dataset.destX=String(destX);
+            node.dataset.destY=String(destY);
+            node.dataset.destWidth=String(destWidth);
+            node.dataset.destHeight=String(destHeight);
             context.drawImage(
                 image,
                 sourceX,
                 sourceY,
                 sourceWidth,
                 sourceHeight,
-                0,
-                0,
-                node.width,
-                node.height
+                destX,
+                destY,
+                destWidth,
+                destHeight
             );
         }
         if(progress<1){ scheduleCanvasCropSprite(runtime); }
@@ -983,28 +1119,98 @@
         node.dataset.tileCount=String(columns*rows);
     }
 
+    function formationRowsForVfx(indexes){
+        const resolver=typeof window!=="undefined"&&typeof window.v148GetFormationRows==="function"
+            ?window.v148GetFormationRows
+            :(typeof window!=="undefined"&&typeof window.v138GetFormationRows==="function"
+                ?window.v138GetFormationRows:null);
+        if(!resolver){ return []; }
+        const rows=resolver(indexes||[]);
+        return Array.isArray(rows)
+            ?rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice())
+            :[];
+    }
+
+    function fixedTriLayoutBounds(current,indexes){
+        const targetType=String(current.config.targetType||"");
+        if(targetType==="allyTri"&&current.targetSide==="player"){
+            const playerArea=sideAreaBounds("player");
+            if(playerArea){
+                playerArea.centerX=playerArea.left+playerArea.width/2;
+                playerArea.centerY=playerArea.top+playerArea.height/2;
+                playerArea.fixedSlots=3;
+                return playerArea;
+            }
+        }
+
+        const queued=current.side==="player"&&typeof queuedPlayerActions!=="undefined"
+            ?queuedPlayerActions&&queuedPlayerActions[current.actorIndex]:null;
+        let center=Number.isInteger(current.targetId)?current.targetId:null;
+        if(center===null&&queued){
+            if(current.targetSide==="monster"&&Number.isInteger(queued.target)){ center=queued.target; }
+            if(current.targetSide==="player"&&Number.isInteger(queued.targetAlly)){ center=queued.targetAlly; }
+        }
+        if(center===null&&indexes.length){
+            center=indexes[Math.floor((indexes.length-1)/2)];
+        }
+        const anchorCard=Number.isInteger(center)?cardFor(current.targetSide,center):null;
+        const anchor=cardCenter(anchorCard);
+        if(!anchor){
+            const area=sideAreaBounds(current.targetSide);
+            if(area){
+                area.centerX=area.left+area.width/2;
+                area.centerY=area.top+area.height/2;
+                area.fixedSlots=3;
+            }
+            return area;
+        }
+
+        let step=Math.max(1,anchor.rect.width+3);
+        if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
+            const rows=formationRowsForVfx(currentBattleMonsters);
+            const row=rows.find(candidate=>candidate.includes(center));
+            if(row){
+                const position=row.indexOf(center);
+                const neighborIndexes=[row[position-1],row[position+1]].filter(Number.isInteger);
+                const distances=neighborIndexes.map(neighborIndex=>cardCenter(cardFor("monster",neighborIndex)))
+                    .filter(Boolean).map(neighbor=>Math.abs(neighbor.x-anchor.x)).filter(distance=>distance>1);
+                if(distances.length){ step=Math.min.apply(null,distances); }
+            }
+        }else if(current.targetSide==="player"){
+            const partyCenters=[0,1,2].map(partyIndex=>cardCenter(cardFor("player",partyIndex))).filter(Boolean);
+            const distances=partyCenters.map(candidate=>Math.abs(candidate.x-anchor.x)).filter(distance=>distance>1);
+            if(distances.length){ step=Math.min.apply(null,distances); }
+        }
+
+        const width=anchor.rect.width+step*2;
+        return {
+            left:anchor.x-width/2,
+            top:anchor.rect.top,
+            width:width,
+            height:anchor.rect.height,
+            centerX:anchor.x,
+            centerY:anchor.y,
+            fixedSlots:3,
+            id:"fixed-tri-slots"
+        };
+    }
+
     function groupLayoutBounds(current,indexes){
+        const targetType=String(current.config.targetType||"");
+        if(/tri/i.test(targetType)){ return fixedTriLayoutBounds(current,indexes); }
         if(current.targetSide==="player"){
             return sideAreaBounds("player");
         }
-        if(
-            current.targetSide==="monster"&&
-            typeof window.v138GetFormationRows==="function"&&
-            typeof currentBattleMonsters!=="undefined"
-        ){
+        if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
             const queued=current.side==="player"&&typeof queuedPlayerActions!=="undefined"
                 ?queuedPlayerActions&&queuedPlayerActions[current.actorIndex]:null;
             const center=Number.isInteger(current.targetId)
                 ?current.targetId
                 :(queued&&Number.isInteger(queued.target)?queued.target:indexes[0]);
-            const rows=window.v138GetFormationRows(currentBattleMonsters);
-            const row=Array.isArray(rows)&&rows.find(candidate=>Array.isArray(candidate)&&candidate.includes(center));
+            const rows=formationRowsForVfx(currentBattleMonsters);
+            const row=rows.find(candidate=>candidate.includes(center));
             if(row){
-                const position=row.indexOf(center);
-                const layoutIndexes=/tri/i.test(String(current.config.targetType||""))
-                    ?row.slice(Math.max(0,position-1),Math.min(row.length,position+2))
-                    :row;
-                const layout=fieldBounds(layoutIndexes.map(index=>cardFor("monster",index)).filter(Boolean));
+                const layout=fieldBounds(row.map(index=>cardFor("monster",index)).filter(Boolean));
                 if(layout){ return layout; }
             }
         }
@@ -1064,7 +1270,7 @@
                cover the entire opposing formation even after casualties.
                Ice Arrow Rain opts into the living-card bounds below.
             */
-            if(!sprite.targetBounds){
+            if(!sprite.targetBounds&&!sprite.fixedFormation){
                 const bounds=sideAreaBounds(current.targetSide);
                 if(!bounds){ return; }
                 const viewportWidth=Number(window.innerWidth)||960;
@@ -1088,10 +1294,43 @@
                 return;
             }
 
+            if(sprite.fixedFormation){
+                const bounds=sideAreaBounds(current.targetSide);
+                if(!bounds){ return; }
+                const viewportWidth=Number(window.innerWidth)||960;
+                const viewportHeight=Number(window.innerHeight)||720;
+                const coverageScale=clamp(Number(sprite.coverageScale)||1,1,1.4);
+                const maxWidth=Math.max(240,Math.min(viewportWidth*.94,Number(sprite.maxWidth)||viewportWidth*.94));
+                const maxHeight=Math.max(240,Math.min(viewportHeight*.92,Number(sprite.maxHeight)||viewportHeight*.92));
+                const width=clamp(
+                    Math.round(bounds.width*coverageScale),
+                    Number(sprite.minWidth)||160,
+                    maxWidth
+                );
+                const height=clamp(
+                    Math.round(bounds.height*coverageScale),
+                    Number(sprite.minHeight)||160,
+                    maxHeight
+                );
+                node.dataset.targetIndexes=indexes.join(",");
+                node.dataset.areaId=bounds.id;
+                node.dataset.fixedFormation="true";
+                node.dataset.coverageScale=String(coverageScale);
+                node.style.left=(bounds.left+bounds.width/2)+"px";
+                node.style.top=(bounds.top+bounds.height/2)+"px";
+                node.style.width=width+"px";
+                node.style.height=height+"px";
+                node.style.clipPath="none";
+                node.style.setProperty("--v143-sprite-dx","0px");
+                node.style.setProperty("--v143-sprite-dy","0px");
+                node.style.setProperty("--v143-sprite-angle","0deg");
+                return;
+            }
+
             /*
-               Ice Arrow Rain is one VFX instance. Its destination is based
-               only on cards that are still valid targets, never on a fixed
-               side container or a dead/retired card.
+               Optional target-bounds battlefield mode remains available for
+               skills that explicitly want a living-target footprint. Fixed
+               formation skills never enter this branch.
             */
             const targetCards=indexes.map(targetIndex=>cardFor(current.targetSide,targetIndex))
                 .filter(card=>card&&card.offsetParent!==null);
@@ -1135,7 +1374,7 @@
         const coverageCards=placement==="trajectory"&&current.actorCard
             ?[current.actorCard].concat(targetCards)
             :targetCards;
-        const coverage=fieldBounds(coverageCards)||targetBounds;
+        const coverage=sprite.alignToSlots?targetBounds:(fieldBounds(coverageCards)||targetBounds);
         const scale=Number(sprite.scale)||1;
         const naturalSize=(Math.max(coverage.width,coverage.height)+40)*scale;
         const viewportWidth=Number(window.innerWidth)||960;
@@ -1163,8 +1402,12 @@
             node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");
         }else{
-            node.style.left=(coverage.left+coverage.width/2)+"px";
-            node.style.top=(coverage.top+coverage.height/2)+"px";
+            const centerX=sprite.alignToSlots&&Number.isFinite(targetBounds.centerX)
+                ?targetBounds.centerX:coverage.left+coverage.width/2;
+            const centerY=sprite.alignToSlots&&Number.isFinite(targetBounds.centerY)
+                ?targetBounds.centerY:coverage.top+coverage.height/2;
+            node.style.left=centerX+"px";
+            node.style.top=centerY+"px";
             node.style.setProperty("--v143-sprite-dx","0px");
             node.style.setProperty("--v143-sprite-dy","0px");
         }
@@ -1370,7 +1613,10 @@
         state.stage=stage;
         state.current=current;
         state.metrics.started++;
-        if(Array.isArray(model.deferredStatusTypes)&&model.deferredStatusTypes.length){
+        if(
+            Array.isArray(model.deferredStatusTypes)&&model.deferredStatusTypes.length||
+            Array.isArray(model.deferredActorStatusTypes)&&model.deferredActorStatusTypes.length
+        ){
             syncStatusSpriteEffects();
         }
         if(!model.sprite){

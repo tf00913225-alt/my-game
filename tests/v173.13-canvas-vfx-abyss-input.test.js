@@ -62,6 +62,14 @@ function loadCanvasRuntime(skillId,targetType,targetIds,duration){
     const raf=[];
     const body=makeNode();
     const nodes={};
+    const monsterArea=makeNode({left:240,top:30,right:680,bottom:300,width:440,height:270});
+    monsterArea.id="battleMonsterArea";
+    nodes[monsterArea.id]=monsterArea;
+    body.appendChild(monsterArea);
+    const playerArea=makeNode({left:20,top:350,right:460,bottom:500,width:440,height:150});
+    playerArea.id="battlePlayerRow";
+    nodes[playerArea.id]=playerArea;
+    body.appendChild(playerArea);
     const monsterRects=[
         {left:280,top:80,right:356,bottom:180,width:76,height:100},
         {left:400,top:80,right:476,bottom:180,width:76,height:100},
@@ -173,8 +181,11 @@ test("the Canvas renderer crops only one exact source cell at runtime",()=>{
     const rainCanvas=rain.stage.children.find(node=>node.dataset.renderer==="canvas-crop");
     assert.ok(rainCanvas);
     assert.equal(rain.stage.children.filter(node=>node.dataset.renderer==="canvas-crop").length,1);
-    assert.equal(rainCanvas.dataset.areaId,"living-targets");
+    assert.equal(rainCanvas.dataset.areaId,"battleMonsterArea");
+    assert.equal(rainCanvas.dataset.fixedFormation,"true");
     assert.equal(rainCanvas.dataset.targetIndexes,"0,1,2");
+    assert.equal(rainCanvas.style.left,"460px");
+    assert.equal(rainCanvas.style.top,"165px");
 });
 
 test("the Canvas renderer crops one fixed cell in row-major order",()=>{
@@ -203,10 +214,10 @@ test("Abyss dialogue is owned directly by the map source and has pointer plus cl
     assert.doesNotMatch(legacyAbyssPatch,/v141ChallengeAbyssBoss=function/);
 });
 
-test("the published release is V173.27",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.27"/);
-    assert.match(index,/<title>四象江湖傳 V173\.27<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.27"[\s\S]*?>V173\.27<\/div>/);
+test("the published release is V173.39",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
+    assert.match(index,/<title>四象江湖傳 V173\.39<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.39"[\s\S]*?>V173\.39<\/div>/);
 });
 
-console.log("\n"+passed+" V173.27 Canvas VFX and Abyss input tests passed.");
+console.log("\n"+passed+" V173.39 Canvas VFX and Abyss input tests passed.");

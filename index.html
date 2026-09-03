@@ -3,33 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>四象江湖傳 V173.27</title>
+<title>四象江湖傳 V173.39</title>
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap"rel="stylesheet">
 
-<link rel="stylesheet" href="css/00-main.css">
+<link rel="stylesheet" href="css/00-main.css?v=173.39">
 
-<style id="v173.27-home-version-badge-style">
+<style id="v173.39-home-version-badge-style">
 #game-stage #homePage .home-version-badge{
-    position:absolute;
-    right:10px;
-    bottom:10px;
-    z-index:4;
+    position:static;
+    display:inline-flex;
+    align-items:center;
     box-sizing:border-box;
-    padding:4px 9px 3px;
-    border:1px solid rgba(224,181,92,.82);
+    padding:3px 6px 2px;
+    border:1px solid rgba(224,181,92,.46);
     border-radius:999px;
-    background:linear-gradient(180deg,rgba(31,23,14,.88),rgba(9,8,6,.9));
-    color:#f5dda0;
+    background:rgba(8,7,5,.58);
+    color:#bda46d;
     font-family:"Cinzel","Noto Serif TC",serif;
-    font-size:10px;
-    font-weight:900;
+    font-size:11px;
+    font-weight:700;
     line-height:1;
-    letter-spacing:.08em;
+    letter-spacing:.04em;
     text-shadow:0 1px 2px #000;
-    box-shadow:0 2px 7px rgba(0,0,0,.5),inset 0 0 6px rgba(224,181,92,.1);
+    box-shadow:none;
     white-space:nowrap;
     pointer-events:none;
     user-select:none;
@@ -52,7 +51,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo-v173.20.jpg?v=173.20">
 <link rel="preload" as="image" href="assets/ui/startup-main-city-v173.20.jpg?v=173.20">
 <link id="v173.20-startup-loader-style" rel="stylesheet" href="css/51-v173.20-startup-loader.css?v=173.20">
-<link id="v129-character-creation-native" rel="stylesheet" href="css/29-v125-character-creation-native.css?v=173.27">
+<link id="v129-character-creation-native" rel="stylesheet" href="css/29-v125-character-creation-native.css?v=173.39">
 
 </head>
 
@@ -770,215 +769,91 @@
 
 <div class="home-bg-fixed-layer"></div>
 
-<div
-    id="homeVersionBadge"
-    class="home-version-badge"
-    aria-label="目前版本 V173.27"
->V173.27</div>
-
-<h2>主城</h2>
-
-<!-- V92：開發測試快捷鍵。正式版上線前可整塊移除。 -->
-<div class="home-test-tools" id="homeTestTools">
-    <button type="button" class="home-test-button" id="testGoldMillionButton" onclick="grantTestGoldMillion()">
-        金幣 <b>+100萬</b>
-    </button>
-    <button type="button" class="home-test-button" id="testExpTenMillionButton" onclick="grantTestExpTenMillion()">
-        經驗池 <b>+10億</b>
-    </button>
-</div>
-
-<!--
-    ★ 新增（依照使用者要求）：
-    主城純文字選單，沒有任何方塊/邊框，
-    標楷體、白字黑框，點文字用JS
-    openHomeFeature()跳出對應的彈出視窗。
--->
-
-<!--
-    ★ 修正（依照使用者要求，主城金幣訊息
-    全部拿掉）：原本這裡的金幣顯示區塊
-    整個移除。金幣數值本身還是繼續正常
-    累加/存檔，只是不再顯示在主城畫面上，
-    商店裡買東西的畫面還是看得到金幣。
--->
-
-<!--
-    ★ 修正（依照使用者要求，改成參考圖那種
-    方塊卡片版面）：
-    每張卡片：上方是空的方形圖示區塊
-    （.home-card-icon，裡面故意留空，
-    使用者會自己準備icon圖片，之後只要用
-    id指定background-image就能放進去，
-    不用再動這裡的HTML結構），下方緊貼著
-    （沒有間距）一條深紅底金字的標籤列。
-    onclick沿用原本一模一樣的
-    openHomeFeature(...)呼叫，功能完全
-    不變，只是外觀從純文字改成卡片。
--->
-
-<div class="home-card-grid">
-
-    <div
-        class="home-card"
-        onclick="openHomeFeature('rest')"
-    >
-        <div
-            id="homeIconRest"
-            class="home-card-icon"
-            style="background-color:#000;background-image:url(assets/ui/home-rest.png);"
-        ></div>
-        <div class="home-card-label">
-            休息
+<header class="home-city-hud" aria-label="主城與資源資訊">
+    <div class="home-hud-identity">
+        <div class="home-hud-kicker">
+            <span>四象主城</span>
+            <div
+                id="homeVersionBadge"
+                class="home-version-badge"
+                aria-label="目前版本 V173.39"
+            >V173.39</div>
         </div>
     </div>
 
-    <div
-        class="home-card"
-        onclick="openHomeFeature('shop')"
-    >
-        <div
-            id="homeIconShop"
-            class="home-card-icon"
-            style="background-image:url(assets/ui/home-shop.png);"
-        ></div>
-        <div class="home-card-label">
-            商店
+    <div class="home-hud-side">
+        <div class="home-hud-resources" aria-label="主城資源">
+            <span>金幣 <b id="homeHudGoldValue">0</b></span>
+            <span>經驗池 <b id="homeHudExpValue">0</b></span>
+        </div>
+        <div class="home-test-tools" id="homeTestTools" aria-label="開發測試工具">
+            <span class="home-test-label">DEV</span>
+            <button type="button" class="home-test-button" id="testGoldMillionButton" onclick="grantTestGoldMillion()">
+                金幣 <b>+100萬</b>
+            </button>
+            <button type="button" class="home-test-button" id="testExpTenMillionButton" onclick="grantTestExpTenMillion()">
+                經驗池 <b>+10億</b>
+            </button>
         </div>
     </div>
+</header>
 
-    <div
-        class="home-card"
-        onclick="openHomeFeature('character')"
-    >
-        <div
-            id="homeIconCharacter"
-            class="home-card-icon"
-            style="background-image:url(assets/ui/home-character.png);"
-        ></div>
-        <div class="home-card-label">
-            角色
-        </div>
+<div class="home-card-grid" aria-label="主城功能">
+    <div class="home-primary-actions">
+        <button type="button" class="home-card home-card-primary" onclick="openHomeFeature('character')" aria-label="角色">
+            <span id="homeIconCharacter" class="home-card-icon" style="background-image:url(assets/ui/home-character.png);"></span>
+            <span class="home-card-label">角色</span>
+        </button>
+
+        <button type="button" class="home-card home-card-primary" onclick="openHomeFeature('shop')" aria-label="商店">
+            <span id="homeIconShop" class="home-card-icon" style="background-image:url(assets/ui/home-shop.png);"></span>
+            <span class="home-card-label">商店</span>
+        </button>
     </div>
 
-    <div
-        class="home-card"
-        onclick="openHomeFeature('offlineExp')"
-    >
-        <div
-            id="homeIconOfflineExp"
-            class="home-card-icon"
-            style="background-image:url(assets/ui/home-offline-exp.png);"
-        ></div>
-        <div class="home-card-label">
-            離線經驗
-        </div>
+    <div class="home-secondary-actions" aria-label="城內設施">
+        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('rest')" aria-label="休息">
+            <span id="homeIconRest" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-rest.png);"></span>
+            <span class="home-card-label">休息</span>
+        </button>
+
+        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('synthesis')" aria-label="合成">
+            <span id="homeIconSynthesis" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-synthesis.png);"></span>
+            <span class="home-card-label">合成</span>
+        </button>
+
+        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('quest')" aria-label="任務">
+            <span id="homeIconQuest" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-quest.png);"></span>
+            <span class="home-card-label">任務</span>
+        </button>
+
+        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('bestiary')" aria-label="圖鑑">
+            <span id="homeIconBestiary" class="home-card-icon" style="background-image:url(assets/ui/home-bestiary.png);"></span>
+            <span class="home-card-label">圖鑑</span>
+        </button>
+
+        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('achievement')" aria-label="成就">
+            <span id="homeIconAchievement" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-achievement.png);"></span>
+            <span class="home-card-label">成就</span>
+        </button>
+
+        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('announcement')" aria-label="公告">
+            <span id="homeIconAnnouncement" class="home-card-icon" style="background-image:url(assets/ui/home-announcement.png);"></span>
+            <span class="home-card-label">公告</span>
+        </button>
     </div>
 
-    <div
-        class="home-card"
-        onclick="openHomeFeature('quest')"
-    >
-        <div
-            id="homeIconQuest"
-            class="home-card-icon"
-            style="background-color:#000;background-image:url(assets/ui/home-quest.png);"
-        ></div>
-        <div class="home-card-label">
-            任務
-        </div>
+    <div class="home-utility-actions" aria-label="其他功能">
+        <button type="button" class="home-card home-card-utility" onclick="openHomeFeature('offlineExp')" aria-label="離線經驗">
+            <span id="homeIconOfflineExp" class="home-card-icon" style="background-image:url(assets/ui/home-offline-exp.png);"></span>
+            <span class="home-card-label">離線經驗</span>
+        </button>
+
+        <button type="button" class="home-card home-card-utility" onclick="openHomeFeature('system')" aria-label="系統">
+            <span id="homeIconSystem" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-system.png);"></span>
+            <span class="home-card-label">系統</span>
+        </button>
     </div>
-
-    <div
-        class="home-card"
-        onclick="openHomeFeature('bestiary')"
-    >
-        <div
-            id="homeIconBestiary"
-            class="home-card-icon"
-            style="background-image:url(assets/ui/home-bestiary.png);"
-        ></div>
-        <div class="home-card-label">
-            圖鑑
-        </div>
-    </div>
-
-    <div
-        class="home-card"
-        onclick="openHomeFeature('achievement')"
-    >
-        <div
-            id="homeIconAchievement"
-            class="home-card-icon"
-            style="background-color:#000;background-image:url(assets/ui/home-achievement.png);"
-        ></div>
-        <div class="home-card-label">
-            成就
-        </div>
-    </div>
-
-    <div
-        class="home-card"
-        onclick="openHomeFeature('announcement')"
-    >
-        <div
-            id="homeIconAnnouncement"
-            class="home-card-icon"
-            style="background-image:url(assets/ui/home-announcement.png);"
-        ></div>
-        <div class="home-card-label">
-            公告
-        </div>
-    </div>
-
-    <!--
-        ★ 新增（依照使用者要求，「任務下方
-        新增合成、公告下面新增系統」）：
-        4欄網格裡，任務在第2列第1欄，公告
-        在第2列第4欄，這兩張新卡片刻意放在
-        「正下方」（第3列第1欄／第3列第4欄），
-        中間第2/3欄先留空（用不會顯示任何
-        內容、純粹佔位置的空白格子），維持
-        版面對齊，之後如果還有更多新功能，
-        可以直接把空格換成真的卡片。
-
-        V141 已把「合成」接上裝備合成、冶煉、
-        符咒與碎片四分頁；「系統」沿用既有
-        openHomeFeature() 分支。卡片位置仍保留
-        原本第3列左右對齊的設計。
-    -->
-
-    <div
-        class="home-card"
-        onclick="openHomeFeature('synthesis')"
-    >
-        <div
-            id="homeIconSynthesis"
-            class="home-card-icon"
-            style="background-color:#000;background-image:url(assets/ui/home-synthesis.png);"
-        ></div>
-        <div class="home-card-label">
-            合成
-        </div>
-    </div>
-
-    <div class="home-card"style="visibility:hidden;"></div>
-    <div class="home-card"style="visibility:hidden;"></div>
-
-    <div
-        class="home-card"
-        onclick="openHomeFeature('system')"
-    >
-        <div
-            id="homeIconSystem"
-            class="home-card-icon"
-            style="background-color:#000;background-image:url(assets/ui/home-system.png);"
-        ></div>
-        <div class="home-card-label">
-            系統
-        </div>
-    </div>
-
 </div>
 
 <div
@@ -2881,13 +2756,13 @@
 
 
 <script id="v173.20-startup-loader-runtime" src="js/52-v173.20-startup-loader.js?v=173.20"></script>
-<script src="js/00-main.js?v=173.27"></script>
+<script src="js/00-main.js?v=173.39"></script>
 
 </div>
 </div>
 </div>
 <!-- V86: inventory-grid-scroll is now recognized by the existing V8 touch lock as the sole inventory scroll owner. -->
-<script id="stage-v8-touch-lock" src="js/01-stage-v8-touch-lock.js?v=173.27"></script>
+<script id="stage-v8-touch-lock" src="js/01-stage-v8-touch-lock.js?v=173.39"></script>
 
 
 <script id="stage-v9-native-coordinate-api" src="js/02-stage-v9-native-coordinate-api.js"></script>
@@ -2972,10 +2847,10 @@
 <script id="stage-v51-runtime" src="js/15-stage-v51-runtime.js"></script>
 
 
-<link id="stage-v54-main-city-moderate-native-scale" rel="stylesheet" href="css/19-stage-v54-main-city-moderate-native-scale.css">
+<link id="stage-v54-main-city-moderate-native-scale" rel="stylesheet" href="css/19-stage-v54-main-city-moderate-native-scale.css?v=173.39">
 
 
-<script id="stage-v54-main-city-runtime" src="js/16-stage-v54-main-city-runtime.js"></script>
+<script id="stage-v54-main-city-runtime" src="js/16-stage-v54-main-city-runtime.js?v=173.39"></script>
 
 
 <link id="stage-v60-training-only-safety" rel="stylesheet" href="css/20-stage-v60-training-only-safety.css">
@@ -2993,7 +2868,7 @@
 
 
 
-<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js?v=173.27"></script>
+<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js?v=173.39"></script>
 
 
 
@@ -3007,7 +2882,7 @@
 
 
 
-<link id="stage-v90-quest-interface-core" rel="stylesheet" href="css/25-stage-v90-quest-interface-core.css?v=173.27">
+<link id="stage-v90-quest-interface-core" rel="stylesheet" href="css/25-stage-v90-quest-interface-core.css?v=173.39">
 
 <!-- =========================================================
      V146 — INVENTORY CATEGORY CAPACITY 120
@@ -3023,7 +2898,7 @@
      No damage/SP/initiative/skill formulas changed. -->
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
-<script src="js/20-anonymous-20.js?v=173.27"></script>
+<script src="js/20-anonymous-20.js?v=173.39"></script>
 <script id="v129-character-creation-native-runtime" src="js/24-v125-character-creation-native-runtime.js?v=129a"></script>
 
 

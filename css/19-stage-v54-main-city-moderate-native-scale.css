@@ -1,28 +1,8 @@
 
-/* V54 — restrained main-city UI scale.
-   Baseline: V51. V53 is NOT used because it was too large.
-   Scope is #homePage only; bottom navigation and battle are untouched. */
-
-#game-stage #homePage h1,
-#game-stage #homePage h2,
-#game-stage #homePage .title,
-#game-stage #homePage .page-title,
-#game-stage #homePage .city-title{
-    font-size:28px !important;
-    line-height:1.1 !important;
-    white-space:nowrap !important;
-}
-
-#game-stage #homePage button,
-#game-stage #homePage a,
-#game-stage #homePage [role="button"],
-#game-stage #homePage .menu-item,
-#game-stage #homePage .menu-card,
-#game-stage #homePage .home-menu-item,
-#game-stage #homePage .home-card{
-    font-size:18px !important;
-    line-height:1.05 !important;
-}
+/* V54 historical city scale bridge.
+   V173.33 keeps the lobby's explicit primary, secondary and utility typography
+   in css/00-main.css, so this file must not flatten every entrance back to one
+   inline-equivalent size. Bottom navigation and battle remain untouched. */
 
 #game-stage #homePage button img,
 #game-stage #homePage a img,

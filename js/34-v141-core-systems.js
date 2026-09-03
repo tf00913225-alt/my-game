@@ -13,8 +13,7 @@
     const INVENTORY_CAPACITY=120;
     const VALID_RANKS=new Set(["regular","elite","boss"]);
     const WILD_ELITE_RATE=0.10;
-    const BEGINNER_FOREST_STRENGTH=0.75;
-    const REGULAR_ZONE_STRENGTH=1.30;
+    const WILD_ZONE_STRENGTHS=window.v173WildZoneStrengthMultipliers;
     const V141_PROGRESS_KEY="v141_account_progress";
 
     window.V141_INVENTORY_CAPACITY=INVENTORY_CAPACITY;
@@ -65,16 +64,16 @@
     ===================================================== */
     function getWildZoneSpecs(){
         return [
-            [typeof forestMonsters!=="undefined"?forestMonsters:null,3,"林間風靈","苔岩獸",BEGINNER_FOREST_STRENGTH],
-            [typeof desertMonsters!=="undefined"?desertMonsters:null,17,"風沙隼","岩甲蠍"],
-            [typeof iceMountainMonsters!=="undefined"?iceMountainMonsters:null,25,"霜風妖","凍岩獸"],
-            [typeof zone4Monsters!=="undefined"?zone4Monsters:null,35,"焰風鬼","熔岩石怪"],
-            [typeof zone5Monsters!=="undefined"?zone5Monsters:null,45,"蒼風巨獸","山岳巨獸"],
-            [typeof zone6Monsters!=="undefined"?zone6Monsters:null,55,"風刃修羅","岩鎧修羅"],
-            [typeof zone7Monsters!=="undefined"?zone7Monsters:null,65,"嵐影魔君","岳魂魔君"],
-            [typeof zone8Monsters!=="undefined"?zone8Monsters:null,75,"青嵐龍衛","岩岳龍衛"],
-            [typeof zone9Monsters!=="undefined"?zone9Monsters:null,85,"虛空風靈","虛空岩靈"],
-            [typeof zone10Monsters!=="undefined"?zone10Monsters:null,95,"終焉風神","終焉地神"]
+            [typeof forestMonsters!=="undefined"?forestMonsters:null,3,"林間風靈","苔岩獸",WILD_ZONE_STRENGTHS[0]],
+            [typeof desertMonsters!=="undefined"?desertMonsters:null,17,"風沙隼","岩甲蠍",WILD_ZONE_STRENGTHS[1]],
+            [typeof iceMountainMonsters!=="undefined"?iceMountainMonsters:null,25,"霜風妖","凍岩獸",WILD_ZONE_STRENGTHS[2]],
+            [typeof zone4Monsters!=="undefined"?zone4Monsters:null,35,"焰風鬼","熔岩石怪",WILD_ZONE_STRENGTHS[3]],
+            [typeof zone5Monsters!=="undefined"?zone5Monsters:null,45,"蒼風巨獸","山岳巨獸",WILD_ZONE_STRENGTHS[4]],
+            [typeof zone6Monsters!=="undefined"?zone6Monsters:null,55,"風刃修羅","岩鎧修羅",WILD_ZONE_STRENGTHS[5]],
+            [typeof zone7Monsters!=="undefined"?zone7Monsters:null,65,"嵐影魔君","岳魂魔君",WILD_ZONE_STRENGTHS[6]],
+            [typeof zone8Monsters!=="undefined"?zone8Monsters:null,75,"青嵐龍衛","岩岳龍衛",WILD_ZONE_STRENGTHS[7]],
+            [typeof zone9Monsters!=="undefined"?zone9Monsters:null,85,"虛空風靈","虛空岩靈",WILD_ZONE_STRENGTHS[8]],
+            [typeof zone10Monsters!=="undefined"?zone10Monsters:null,95,"終焉風神","終焉地神",WILD_ZONE_STRENGTHS[9]]
         ].filter(entry=>Array.isArray(entry[0]));
     }
 
@@ -82,7 +81,7 @@
         if(!monster || monster._v131StrengthApplied){ return monster; }
         const strengthMultiplier=Number.isFinite(Number(multiplier))
             ? Number(multiplier)
-            : REGULAR_ZONE_STRENGTH;
+            : WILD_ZONE_STRENGTHS[WILD_ZONE_STRENGTHS.length-1];
         monster._v131StrengthApplied=true;
         ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
             if(Number.isFinite(Number(monster[key]))){

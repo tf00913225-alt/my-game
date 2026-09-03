@@ -511,7 +511,10 @@
         monster.maxHP+=extraHp;
         monster.hp=monster.maxHP;
         monster.v141Abyss=true;
+        monster.v141ExtraHP=extraHp;
         monster.v141ForceSkillLevel=forceLevel;
+        monster.v141SkillLevel=forceLevel;
+        monster.v144SkillLevel=forceLevel;
         monster.skillIds=(skills||[]).slice();
         monster.skillChance=.78;
         monster.activeBuffs=[];
@@ -522,10 +525,13 @@
         const level=window.v132GetDungeonMonsterLevel?window.v132GetDungeonMonsterLevel():Math.max(1,window.v141GetHighestCharacterLevel());
         if(floor<5){
             const data=abyssFloors[floor];
-            const boss=makeAbyssMonster(data.boss,level,data.element,"boss",5000,data.skills,1);
+            const skillLevel=typeof window.v141GetMonsterFixedSkillLevel==="function"
+                ?window.v141GetMonsterFixedSkillLevel(level)
+                :(level<=20?1:level<=40?2:level<=60?3:level<=80?4:5);
+            const boss=makeAbyssMonster(data.boss,level,data.element,"boss",5000,data.skills,skillLevel);
             const roster=[boss];
             for(let i=0;i<4;i++){
-                roster.push(makeAbyssMonster("天兵天將",level,data.element,"elite",2500,[data.eliteSkill],1));
+                roster.push(makeAbyssMonster("天兵天將",level,data.element,"elite",2500,[data.eliteSkill],skillLevel));
             }
             return roster;
         }
@@ -533,8 +539,8 @@
         const roster=[];
         const bossSpecs=[
             ["東帝天尊","earth",["dustStorm","stoneBreakSky"],["barrier"]],
-            ["天帝天尊","wind",["stormRain","stormSpell"],["dinghaishenzhen"]],
-            ["極帝天尊","light",[],["yuanXiangGuangMing","yuanGuangShield"]],
+            ["天帝天尊","wind",["windHowlLightning","stormRain","stormSpell"],[]],
+            ["極帝天尊","light",[],["yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"]],
             ["北帝天尊","water",["iceArrowRain","freeze"],["healSpell"]],
             ["南帝天尊","fire",["phoenixCry","dragonSlash"],["rage"]]
         ];
@@ -547,22 +553,60 @@
             roster.push(monster);
         });
         const elites=[
-            ["water","frostCrush"],["earth","stoneThrow"],["fire","fireCritical"],["wind",null],["water","frostCrush"]
+            ["water",null,"healSpell"],["earth","stoneBreakSky",null],["fire","phoenixCry",null],
+            ["wind",null,"dodgeSkill"],["water",null,"healSpell"]
         ];
         elites.forEach((spec,position)=>{
-            const monster=makeAbyssMonster("天兵天將",level,spec[0],"elite",3500,spec[1]?[spec[1]]:[],1);
-            if(spec[0]==="wind"){ monster.v141SupportSkillIds=["dodgeSkill"]; }
+            const monster=makeAbyssMonster("天兵天將",level,spec[0],"elite",3500,spec[1]?[spec[1]]:[],5);
+            monster.v141SupportSkillIds=spec[2]?[spec[2]]:[];
+            monster.v141ForceSkillLevel=5;
             monster.v141FormationRow=1;
             monster.v141FormationPosition=position;
             roster.push(monster);
         });
         return roster;
     }
+    window.v141BuildAbyssRoster=buildAbyssRoster;
 
     function monsterBaseHp(monster){
         const shield=monster&&monster.v141Shield;
         return shield?Math.max(0,monster.hp-(shield.remaining||0)):monster.hp;
     }
+
+    function monsterBaseMaxHp(monster){
+        const shield=monster&&monster.v141Shield;
+        return Math.max(1,Number(shield&&shield.baseMaxHP)||Number(monster&&monster.maxHP)||1);
+    }
+
+    function getMonsterAllyTriTargets(casterIndex,entries){
+        const living=(entries||currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})))
+            .filter(entry=>entry&&entry.monster&&entry.monster.alive!==false&&Number(entry.monster.hp)>0);
+        const livingByIndex=new Map(living.map(entry=>[entry.index,entry]));
+        const rows=typeof window.v148GetFormationRows==="function"
+            ?window.v148GetFormationRows(currentBattleMonsters)
+            :typeof window.v138GetFormationRows==="function"
+            ?window.v138GetFormationRows(currentBattleMonsters)
+            :[currentBattleMonsters.slice()];
+        let best=[];
+        let bestScore=-1;
+        rows.forEach(row=>{
+            row.forEach((center,position)=>{
+                if(!livingByIndex.has(center)){ return; }
+                const trio=row.slice(Math.max(0,position-1),Math.min(row.length,position+2))
+                    .map(index=>livingByIndex.get(index)).filter(Boolean);
+                const score=trio.reduce((sum,entry)=>{
+                    const ally=entry.monster;
+                    const hpNeed=(monsterBaseMaxHp(ally)-monsterBaseHp(ally))/monsterBaseMaxHp(ally);
+                    const maxSP=Math.max(1,Number(ally.maxSP)||1);
+                    const spNeed=(maxSP-Math.max(0,Number(ally.sp)||0))/maxSP;
+                    return sum+Math.max(0,hpNeed)+Math.max(0,spNeed);
+                },0)+(trio.some(entry=>entry.index===casterIndex)?0.0001:0);
+                if(score>bestScore){ best=trio; bestScore=score; }
+            });
+        });
+        return best.slice(0,3);
+    }
+    window.v141GetMonsterAllyTriTargets=getMonsterAllyTriTargets;
 
     function applyTimedMonsterBuff(monstersToBuff,type,turns,amount){
         monstersToBuff.forEach(monster=>{
@@ -620,13 +664,18 @@
         const monster=monsters[monsterIndex];
         const supportIds=monster&&monster.v141SupportSkillIds||[];
         if(!monster||!monster.alive||!supportIds.length||Math.random()>.55){ return false; }
-        const allies=currentBattleMonsters.map(index=>monsters[index]).filter(item=>item&&item.alive);
+        const allyEntries=currentBattleMonsters.map(index=>({index:index,monster:monsters[index]}))
+            .filter(entry=>entry.monster&&entry.monster.alive);
+        const allies=allyEntries.map(entry=>entry.monster);
         let skillId=null;
         let target=null;
+        let healTargets=[];
         if(supportIds.includes("healSpell")){
-            target=allies.sort((a,b)=>monsterBaseHp(a)/(a.v141Shield?a.v141Shield.baseMaxHP:a.maxHP)-monsterBaseHp(b)/(b.v141Shield?b.v141Shield.baseMaxHP:b.maxHP))[0];
-            const max=target&&(target.v141Shield?target.v141Shield.baseMaxHP:target.maxHP);
-            if(target&&monsterBaseHp(target)<max){ skillId="healSpell"; }
+            healTargets=getMonsterAllyTriTargets(monsterIndex,allyEntries);
+            if(healTargets.some(entry=>
+                monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)||
+                Number(entry.monster.sp)<Number(entry.monster.maxSP)
+            )){ skillId="healSpell"; }
         }
         if(!skillId&&supportIds.includes("barrier")){
             target=allies.find(item=>!(item.v141Shield&&item.v141Shield.isBarrier));
@@ -641,8 +690,29 @@
         monster.sp-=skill.spCost||0;
         showMonsterSkillNameBadge(skill.name,skill.element||monster.element,monsterIndex);
         if(skillId==="healSpell"){
-            const healed=window.v141HealMonsterPreservingShield(target,350);
-            addBattleLog(monster.name+"施放治療術，為"+target.name+"回復"+healed+" HP。");
+            const level=Math.max(1,Math.min(Number(skill.maxLevel)||1,Number(monster.v141ForceSkillLevel||monster.v141SkillLevel)||1));
+            const hpAmount=(Number(skill.baseHeal)||0)+(Number(skill.healPerLevel)||0)*(level-1);
+            const spAmount=(Number(skill.baseHealSP)||0)+(Number(skill.healSPPerLevel)||0)*(level-1);
+            let hpTotal=0;
+            let spTotal=0;
+            let cleansedTotal=0;
+            healTargets.forEach(entry=>{
+                const ally=entry.monster;
+                const healed=window.v141HealMonsterPreservingShield(ally,hpAmount);
+                const beforeSP=Math.max(0,Number(ally.sp)||0);
+                ally.sp=Math.min(Math.max(beforeSP,Number(ally.maxSP)||0),beforeSP+spAmount);
+                const restoredSP=ally.sp-beforeSP;
+                if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){
+                    cleansedTotal+=ally.statusEffects.length;
+                    ally.statusEffects=[];
+                }
+                hpTotal+=healed;
+                spTotal+=restoredSP;
+                if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
+                if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
+            });
+            addBattleLog(monster.name+"施放治療術，為同排最多"+healTargets.length+"名友方共回復"+
+                hpTotal+" HP、"+spTotal+" SP"+(skill.cleanseAll?"，並解除"+cleansedTotal+"個負面狀態":"")+"。");
         }else if(skillId==="barrier"){
             window.v141ApplyMonsterShield(target,999999,4);
             target.v141Shield.isBarrier=true;

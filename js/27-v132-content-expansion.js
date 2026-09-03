@@ -1706,25 +1706,13 @@
         return DUNGEON_ELEMENTS[Math.floor(Math.random()*DUNGEON_ELEMENTS.length)];
     }
 
-    /*
-       ★ 新增（依照使用者回報「副本的怪物感覺太弱了」）：
-       makeZoneMonster()做出來的是「裸的」基礎數值，一般
-       練功區域的怪物實際上都會再套用js/25-v131-fix-batch.js
-       裡strengthenMonster()那套+30%強化（HP/SP/攻擊/防禦/
-       魔攻各×1.30，見該檔案V131_MONSTER_STRENGTH常數），
-       但副本怪物是這次新增的、繞過了那條強化路徑，直接用
-       makeZoneMonster()的原始數值——等於同一等級下，副本
-       怪物比一般練功區域怪物弱了整整30%，這正是使用者
-       感覺到的落差。這裡套用完全相同的倍率，讓副本怪物至少
-       跟一般練功區域同等級怪物打平（副本本身難度更高，用
-       更高等級/更多精英/BOSS去堆疊挑戰性，不需要再讓
-       同等級怪物本身數值更弱）。
-    */
+    /* 副本普通怪的 HP／SP／防禦沿用既有耐久基準；攻擊與魔攻
+       不在建怪階段放大，怪物對玩家的輸出統一交由敵方壓力倍率。 */
     const DUNGEON_MONSTER_STRENGTH=1.30;
 
     function applyDungeonMonsterStrength(monster){
         if(!monster){ return monster; }
-        ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
+        ["maxHP","maxSP","defense"].forEach(key=>{
             if(Number.isFinite(Number(monster[key]))){
                 monster[key]=Math.max(1,Math.round(Number(monster[key])*DUNGEON_MONSTER_STRENGTH));
             }
@@ -1754,7 +1742,7 @@
 
     function applyDungeonNormalBonus(monster){
         if(!monster){ return monster; }
-        ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
+        ["maxHP","maxSP","defense"].forEach(key=>{
             if(Number.isFinite(Number(monster[key]))){
                 monster[key]=Math.max(1,Math.round(Number(monster[key])*DUNGEON_NORMAL_BONUS));
             }
@@ -1769,13 +1757,16 @@
        （已經套過×1.30跟×1.10）再往上疊加，不重新從裸數值
        算起。V138 依最新規格在原有強度上再加：精英最終HP
        再+100%、SP+100%；BOSS最終HP再+50%、SP+100%。
-       因此保留既有的攻擊／魔攻／防禦倍率，HP倍率分別由
-       1.60×2.00＝3.20、3.00×1.50＝4.50，SP則兩者皆×2.00。
+       V173.38 起 rank 只放大生存資源；攻擊／魔攻不再於建怪階段
+       乘算，敵方輸出壓力統一交由正式 enemyPressure 加算桶控制。
+       HP倍率分別為3.20、4.50，SP兩者皆×2.00，防禦倍率保留。
        只認monster.rank（makeZoneMonster()第4個參數決定），
        一般怪（rank是undefined）這裡什麼都不做，直接跳過。
     */
-    const DUNGEON_ELITE_MULTIPLIERS={maxHP:3.20,maxSP:2.00,attack:1.30,magicAttack:1.30,defense:1.25};
-    const DUNGEON_BOSS_MULTIPLIERS={maxHP:4.50,maxSP:2.00,attack:1.50,magicAttack:1.50,defense:1.40};
+    const DUNGEON_ELITE_MULTIPLIERS={maxHP:3.20,maxSP:2.00,defense:1.25};
+    const DUNGEON_BOSS_MULTIPLIERS={maxHP:4.50,maxSP:2.00,defense:1.40};
+    const EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS={maxHP:1.80,defense:1.10};
+    const EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS={maxHP:2.80,defense:1.20};
 
     function applyDungeonRankStrength(monster){
         if(!monster){ return monster; }
@@ -1794,22 +1785,49 @@
         return monster;
     }
 
-    /*
-       ★ 副本怪物唯一的建構入口——取代原本呼叫端各自寫
-       applyDungeonMonsterStrength(makeZoneMonster(...))的
-       寫法，把「makeZoneMonster()→套×1.30→套副本普通怪
-       ×1.10→套精英/BOSS專屬倍率」這整條固定順序收在同一個
-       函式裡，避免之後新增副本怪物時漏掉某一步、或不小心
-       把倍率套錯順序/套第二次。
-    */
+    /* 共用副本／深淵入口：完整普通基準後套共用 rank 倍率。
+       裝備副本使用下方專用入口，避免與共用 rank 倍率疊乘。 */
     function buildDungeonMonster(name,level,element,rank){
         const monster=makeZoneMonster(name,level,element,rank);
         applyDungeonMonsterStrength(monster);
         applyDungeonNormalBonus(monster);
         applyDungeonRankStrength(monster);
+        monster.v132Dungeon=true;
         return monster;
     }
     window.v132BuildDungeonMonster=buildDungeonMonster;
+
+    function applyEquipmentDungeonRankStrength(monster){
+        if(!monster){ return monster; }
+        const multipliers=
+            monster.rank==="elite" ? EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS :
+            monster.rank==="boss" ? EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS :
+            null;
+        if(!multipliers){ return monster; }
+        Object.keys(multipliers).forEach(key=>{
+            if(Number.isFinite(Number(monster[key]))){
+                monster[key]=Math.max(1,Math.round(Number(monster[key])*multipliers[key]));
+            }
+        });
+        monster.hp=monster.maxHP;
+        monster.sp=monster.maxSP;
+        return monster;
+    }
+
+    function buildEquipmentDungeonMonster(name,level,element,rank){
+        const monster=makeZoneMonster(name,level,element,rank);
+        applyDungeonMonsterStrength(monster);
+        applyDungeonNormalBonus(monster);
+        applyEquipmentDungeonRankStrength(monster);
+        monster.v132Dungeon=true;
+        monster.v132EquipmentDungeon=true;
+        return monster;
+    }
+    window.v132BuildEquipmentDungeonMonster=buildEquipmentDungeonMonster;
+    window.v173EquipmentDungeonRankMultipliers=Object.freeze({
+        elite:Object.freeze(Object.assign({},EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS)),
+        boss:Object.freeze(Object.assign({},EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS))
+    });
 
     function setMonsterSkillTier(monster,tier,chance){
         const pool=Object.keys(skillDatabase).filter(skillId=>{
@@ -1835,6 +1853,15 @@
         });
         monster.skillIds=pool;
         monster.skillChance=chance;
+    }
+
+    function lockDungeonSkillConfiguration(monster,skillLevel){
+        const level=Math.max(1,Math.floor(Number(skillLevel)||1));
+        monster.v132FixedSkillLoadout=true;
+        monster.v141ForceSkillLevel=level;
+        monster.v141SkillLevel=level;
+        monster.v144SkillLevel=level;
+        return monster;
     }
 
 
@@ -2334,15 +2361,36 @@
 
     function getEquipmentDungeonComposition(){
         const playerCount=Math.max(1,getExistingPartyIndexes().length);
-        const bossCount=Math.min(5,playerCount);
         return {
             playerCount:playerCount,
-            bossCount:bossCount,
-            eliteCount:Math.max(0,10-bossCount),
-            total:10
+            bossCount:1,
+            eliteCount:4,
+            total:5
         };
     }
     window.v138GetEquipmentDungeonComposition=getEquipmentDungeonComposition;
+
+    function buildEquipmentDungeonRoster(){
+        const composition=getEquipmentDungeonComposition();
+        const level=getDungeonMonsterLevel();
+        const roster=[];
+        for(let i=0;i<composition.bossCount;i++){
+            const boss=buildEquipmentDungeonMonster(
+                "裝備殿守護者",level,randomElement(),"boss"
+            );
+            setMonsterMaxTierSkills(boss,0.7);
+            lockDungeonSkillConfiguration(boss,3);
+            roster.push(boss);
+        }
+        for(let i=0;i<composition.eliteCount;i++){
+            const monster=buildEquipmentDungeonMonster("殿前護衛精英",level,randomElement(),"elite");
+            setMonsterSkillTier(monster,3,0.7);
+            lockDungeonSkillConfiguration(monster,2);
+            roster.push(monster);
+        }
+        return roster;
+    }
+    window.v132BuildEquipmentDungeonRoster=buildEquipmentDungeonRoster;
 
     async function beginEquipmentDungeon(){
         if(!isDungeonAvailable("equipment")){
@@ -2361,29 +2409,12 @@
         const composition=getEquipmentDungeonComposition();
         if(!await confirmDungeonEntry(
             "裝備副本",
-            "偵測到"+composition.playerCount+"名玩家：本場將出現"+
-            composition.bossCount+"隻BOSS與"+composition.eliteCount+"隻精英怪。"
+            "固定編成：1隻BOSS與4隻精英怪，共5名敵人。"
         )){
             return;
         }
 
-        const level=getDungeonMonsterLevel();
-        const roster=[];
-        for(let i=0;i<composition.bossCount;i++){
-            const boss=buildDungeonMonster(
-                "裝備殿守護者",
-                Math.round(level*1.15),
-                randomElement(),
-                "boss"
-            );
-            setMonsterMaxTierSkills(boss,0.7);
-            roster.push(boss);
-        }
-        for(let i=0;i<composition.eliteCount;i++){
-            const monster=buildDungeonMonster("殿前護衛精英",level,randomElement(),"elite");
-            setMonsterSkillTier(monster,3,0.7);
-            roster.push(monster);
-        }
+        const roster=buildEquipmentDungeonRoster();
 
         launchDungeonBattle(roster,function(outcome){
             if(outcome.result!=="win"){

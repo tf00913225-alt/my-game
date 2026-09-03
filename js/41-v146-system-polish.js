@@ -15,6 +15,26 @@
         return Number.isFinite(number)?number:0;
     }
 
+    function formatHomeResourceValue(value){
+        const whole=Math.max(0,Math.floor(numeric(value)));
+        if(whole>=100000000){
+            const compact=whole/100000000;
+            const precision=compact>=10?1:2;
+            return compact.toFixed(precision).replace(/\.?0+$/g,"")+"億";
+        }
+        if(whole>=10000){ return Math.floor(whole/10000)+"萬"; }
+        return whole.toLocaleString("zh-TW");
+    }
+
+    function syncHomeResourceValue(node,value){
+        if(!node){ return; }
+        const whole=Math.max(0,Math.floor(numeric(value)));
+        const full=whole.toLocaleString("zh-TW");
+        node.textContent=formatHomeResourceValue(whole);
+        node.title=full;
+        node.setAttribute("aria-label",full);
+    }
+
     function escapeHtml(value){
         return String(value==null?"":value)
             .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -463,19 +483,25 @@
         };
     }
 
-    /* ----- Main city: compact party identity and resource bars. ----- */
+    /* ----- Main city: deduplicated HUD resources and complete party roster. ----- */
     function renderHomeRoster(){
         const page=document.getElementById("homePage");
         const grid=page&&page.querySelector(".home-card-grid");
         if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return; }
+        const partyIndexes=getExistingPartyIndexes().slice(0,3);
+        const hudGold=document.getElementById("homeHudGoldValue");
+        const hudExp=document.getElementById("homeHudExpValue");
+        syncHomeResourceValue(hudGold,typeof gold!=="undefined"?gold:0);
+        syncHomeResourceValue(hudExp,typeof sharedExp!=="undefined"?sharedExp:0);
         let roster=document.getElementById("v146HomeRoster");
         if(!roster){
             roster=document.createElement("section");
             roster.id="v146HomeRoster";
             roster.className="v146-home-roster";
+            roster.setAttribute("aria-label","冒險隊伍");
             grid.insertAdjacentElement("afterend",roster);
         }
-        const cards=getExistingPartyIndexes().map(index=>{
+        const cards=partyIndexes.map(index=>{
             const character=getPartyCharacterByIndex(index);
             const stats=getPartyBattleStats(index);
             if(!character||!stats){ return ""; }
@@ -485,12 +511,12 @@
             const spPercent=numeric(stats.maxSP)>0?sp/numeric(stats.maxSP)*100:0;
             const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
             return '<article class="v146-home-character" data-element="'+escapeHtml(character.element||"fire")+'">'+
-                '<img src="'+escapeHtml(artwork)+'" alt="'+escapeHtml(character.id||"角色")+'頭像">'+
+                '<div class="v146-home-avatar"><img src="'+escapeHtml(artwork)+'" alt="'+escapeHtml(character.id||"角色")+'頭像"></div>'+
                 '<div class="v146-home-character-main"><div><b>'+escapeHtml(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(numeric(character.level)||1))+'</span></div>'+
                 '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(numeric(stats.maxHP))+'</strong></div>'+
                 '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(numeric(stats.maxSP))+'</strong></div></div></article>';
         }).join("");
-        roster.innerHTML='<header><b>冒險隊伍</b><span>金幣 '+Math.floor(numeric(typeof gold!=="undefined"?gold:0)).toLocaleString("zh-TW")+'</span></header>'+cards;
+        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 3</span></header>'+cards;
     }
 
     /* ----- Synthesis step 2 is retired; equipment output is always ordinary. ----- */

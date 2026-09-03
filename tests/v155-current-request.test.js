@@ -21,11 +21,20 @@ function skills(){
         fireCritical:{id:"fireCritical",name:"會心一擊",element:"fire",category:"physical",targetType:"single",maxLevel:5,spCost:15},
         dragonSlash:{id:"dragonSlash",name:"霸龍裂天斬",element:"fire",category:"physical",targetType:"single",learnCost:45,maxLevel:5,upgradeCost:1,baseDamage:165,damagePerLevel:33,spCost:65,followUpOnCriticalOrDefeat:true,followUpMaxCasts:2,requires:["explosiveFlurry"]},
         phoenixCry:{id:"phoenixCry",name:"火鳳天鳴",element:"fire",category:"magic",targetType:"all",learnCost:45,maxLevel:5,upgradeCost:1,baseDamage:42,damagePerLevel:9,spCost:60,burnChance:40,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1,requires:["flameTornado"]},
+        dustStorm:{id:"dustStorm",name:"地牛猛襲",element:"earth",category:"magic",targetType:"single",maxLevel:5,spCost:65},
+        stoneBreakSky:{id:"stoneBreakSky",name:"石破天驚",element:"earth",category:"physical",targetType:"single",maxLevel:5,spCost:42},
+        earthShield:{id:"earthShield",name:"萬象土盾",element:"earth",category:"buff",targetType:"allyTri",maxLevel:1,spCost:66,duration:3,reflectPercent:50},
+        windHowlLightning:{id:"windHowlLightning",name:"風哮電擊",element:"wind",category:"magic",targetType:"single",maxLevel:5,spCost:55},
+        stormRain:{id:"stormRain",name:"風起雲湧",element:"wind",category:"magic",targetType:"all",maxLevel:5,spCost:75},
+        dinghaishenzhen:{id:"dinghaishenzhen",name:"氣定神閒",element:"wind",category:"buff",targetType:"allyAll",maxLevel:1,spCost:77,duration:3,statusResistBonus:65,accuracyBonusPercent:50},
+        iceArrowRain:{id:"iceArrowRain",name:"冰霜箭雨",element:"water",category:"magic",targetType:"all",maxLevel:5,spCost:45},
         yuanXiangGuangMing:{id:"yuanXiangGuangMing",name:"元相光明",element:"light",category:"heal",maxLevel:5,spCost:35},
         yuanGuangShield:{id:"yuanGuangShield",name:"元光護體",element:"light",category:"buff",maxLevel:5,spCost:40},
         yuanZuBlessing:{id:"yuanZuBlessing",name:"元祖賜福",element:"light",category:"buff",maxLevel:1,spCost:45},
-        healSpell:{id:"healSpell",name:"治療術",element:"water",category:"heal",maxLevel:5,spCost:45,baseHeal:550,healPerLevel:30,baseHealSP:65,healSPPerLevel:30},
-        stealthSkill:{id:"stealthSkill",name:"隱身術",element:"wind",category:"buff",targetType:"ally",maxLevel:1,spCost:45,duration:2}
+        healSpell:{id:"healSpell",name:"治療術",element:"water",category:"heal",maxLevel:5,spCost:40,baseHeal:350,healPerLevel:30,baseHealSP:35,healSPPerLevel:30,cleanseAll:true},
+        revive:{id:"revive",name:"復活術",element:"water",category:"revive",targetType:"deadAlly",maxLevel:5,spCost:45,reviveHealPercentByLevel:[20,40,60,80,100]},
+        rage:{id:"rage",name:"怒火",element:"fire",category:"buff",targetType:"allyTri",maxLevel:5,spCost:50,duration:3},
+        dodgeSkill:{id:"dodgeSkill",name:"閃躲術",element:"wind",category:"buff",targetType:"allyTri",maxLevel:1,spCost:20,duration:3,evasionBonusPercent:75}
     };
 }
 
@@ -47,9 +56,9 @@ function load(overrides={}){
 }
 
 test("V155 remains ordered before V158 under the current cache version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.27"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.27/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.27/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.39/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.39/);
     const v154=loader.indexOf("js/45-v154-dev-fixes.js");
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
@@ -70,11 +79,14 @@ test("V155 preserves the final Fire owner while retaining Emperor support data",
     );
     assert.deepEqual(array(s.phoenixCry.requires),["flameTornado"]);
     assert.deepEqual(array(s.phoenixCry.burnPercentByLevel),[5,7,9,11,13]);
-    assert.deepEqual([s.yuanZuBlessing.cleanseChance,s.yuanZuBlessing.evasionBonusPercent,s.yuanZuBlessing.duration],[20,30,2]);
+    assert.deepEqual(
+        [s.yuanZuBlessing.baseHeal,s.yuanZuBlessing.baseHealSP,s.yuanZuBlessing.cleanseChance,s.yuanZuBlessing.evasionBonusPercent,s.yuanZuBlessing.duration],
+        [100,100,35,35,2]
+    );
     assert.equal(s.yuanZuBlessing.agilityBonusPercent,undefined);
 });
 
-test("final Abyss roster uses exact boss maxima and elite minima",()=>{
+test("final Abyss roster uses the exact ten-enemy loadout at maximum skill levels",()=>{
     const bossNames=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
     const roster=bossNames.map(name=>({name,v141Abyss:true,hp:100,alive:true}));
     for(let index=0;index<5;index++){ roster.push({name:"天兵天將",v141Abyss:true,hp:100,alive:true}); }
@@ -82,21 +94,21 @@ test("final Abyss roster uses exact boss maxima and elite minima",()=>{
     context.v155PatchFinalAbyssRoster(roster);
     const byName=name=>roster.find(monster=>monster.name===name);
     assert.deepEqual(array(byName("東帝天尊").skillIds),["dustStorm","stoneBreakSky"]);
-    assert.deepEqual(array(byName("東帝天尊").v141SupportSkillIds),["barrier"]);
-    assert.deepEqual(array(byName("天帝天尊").skillIds),["windHowlLightning","stormRain","stormSpell"]);
-    assert.deepEqual(array(byName("天帝天尊").v141SupportSkillIds),[]);
-    assert.deepEqual(array(byName("極帝天尊").v141SupportSkillIds),["yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"]);
-    assert.deepEqual(array(byName("北帝天尊").skillIds),["iceArrowRain","freeze"]);
-    assert.deepEqual(array(byName("北帝天尊").v141SupportSkillIds),["healSpell"]);
-    assert.deepEqual(array(byName("南帝天尊").skillIds),["phoenixCry","dragonSlash"]);
+    assert.deepEqual(array(byName("東帝天尊").v141SupportSkillIds),["earthShield"]);
+    assert.deepEqual(array(byName("天帝天尊").skillIds),["windHowlLightning","stormRain"]);
+    assert.deepEqual(array(byName("天帝天尊").v141SupportSkillIds),["dinghaishenzhen"]);
+    assert.deepEqual(array(byName("極帝天尊").v141SupportSkillIds),["yuanZuBlessing"]);
+    assert.deepEqual(array(byName("北帝天尊").skillIds),["iceArrowRain"]);
+    assert.deepEqual(array(byName("北帝天尊").v141SupportSkillIds),["revive","healSpell"]);
+    assert.deepEqual(array(byName("南帝天尊").skillIds),["dragonSlash","flameTornado"]);
     assert.deepEqual(array(byName("南帝天尊").v141SupportSkillIds),["rage"]);
     roster.slice(0,5).forEach(monster=>assert.equal(monster.v141ForceSkillLevel,5));
     assert.deepEqual(roster.slice(5).map(monster=>[monster.name,monster.element,array(monster.skillIds),array(monster.v141SupportSkillIds),monster.v141ForceSkillLevel]),[
-        ["天兵天將","water",["frostCrush"],[],1],
-        ["天兵天將","earth",["stoneThrow"],[],1],
-        ["天兵天將","fire",["fireBurstStrike"],[],1],
-        ["天兵天將","wind",[],["stealthSkill"],1],
-        ["天兵天將","water",["frostCrush"],[],1]
+        ["天兵天將","water",[],["healSpell"],5],
+        ["天兵天將","earth",["stoneBreakSky"],[],5],
+        ["天兵天將","fire",["flameTornado"],[],5],
+        ["天兵天將","wind",[],["dodgeSkill"],5],
+        ["天兵天將","water",[],["healSpell"],5]
     ]);
     assert.equal(context.skillDatabase.fireBurstStrike.name,"火爆一擊");
     assert.equal(Object.keys(context.skillDatabase).includes("fireBurstStrike"),false,"monster-only skill must not leak into player lists");
@@ -109,10 +121,10 @@ test("final Abyss roster uses exact boss maxima and elite minima",()=>{
     assert.deepEqual([context.skillDatabase.dragonSlash.maxLevel,context.skillDatabase.dragonSlash.baseDamage],[5,165]);
 });
 
-test("Extreme Emperor heal, shield and blessing resolve exact values",()=>{
+test("Extreme Emperor uses only Yuan Zu Blessing with independent cleanse and instant recovery",()=>{
     let finishes=0;
     const oldDisplay={type:"v141TeamBuff"};
-    const extreme={name:"極帝天尊",v141Abyss:true,alive:true,hp:500,maxHP:500,sp:500,maxSP:500,evasion:50,agility:50,activeBuffs:[],statusEffects:[]};
+    const extreme={name:"極帝天尊",v141Abyss:true,alive:true,hp:300,maxHP:500,sp:200,maxSP:500,evasion:50,agility:50,activeBuffs:[],statusEffects:[{type:"burn"}]};
     const ally={name:"盟友",v141Abyss:true,alive:true,hp:100,maxHP:500,sp:10,maxSP:300,evasion:150,agility:150,
         activeBuffs:[oldDisplay],statusEffects:[{type:"burn"}],v142AgilityBlessing:{originalAgility:100,displayBuff:oldDisplay,turnsLeft:2}};
     const monsters=[extreme,ally];
@@ -120,54 +132,81 @@ test("Extreme Emperor heal, shield and blessing resolve exact values",()=>{
         monsters,currentBattleMonsters:[0,1],battleToken:9,turn:1,
         isMonsterFrozen:()=>false,isMonsterPetrified:()=>false,
         finishPlayerAction(){ finishes++; },showMonsterSkillNameBadge(){},showMonsterHit(){},addBattleLog(){},updateUI(){},
-        v141HealMonsterPreservingShield(monster,amount){ const before=monster.hp; monster.hp=Math.min(monster.maxHP,monster.hp+amount); return monster.hp-before; },
-        v141ApplyMonsterShield(monster,amount,duration){ monster.v141Shield={remaining:amount,turnsLeft:duration,baseMaxHP:monster.maxHP}; }
+        v141HealMonsterPreservingShield(monster,amount){ const before=monster.hp; monster.hp=Math.min(monster.maxHP,monster.hp+amount); return monster.hp-before; }
     });
-    assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",true),true);
-    assert.deepEqual(array(ally.statusEffects),[]);
+    assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",[true,false]),true);
+    assert.deepEqual(array(extreme.statusEffects),[]);
+    assert.equal(ally.statusEffects.length,1);
+    assert.deepEqual([extreme.hp,extreme.sp],[400,255]);
+    assert.deepEqual([ally.hp,ally.sp],[200,110]);
     assert.equal(ally.agility,100,"old agility blessing is removed");
     assert.equal(ally.evasion,85);
     assert.equal(ally.v155EvasionBlessing.displayBuff.turnsLeft,2);
-    ally.hp=100; ally.sp=10;
-    assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanXiangGuangMing"),true);
-    assert.equal(ally.hp,250);
-    assert.equal(ally.sp,65);
-    assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanGuangShield"),true);
-    assert.deepEqual([ally.v141Shield.remaining,ally.v141Shield.turnsLeft],[100,2]);
-    assert.equal(finishes,3);
+    ally.hp=200; ally.sp=110;
+    assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",[false,true]),true);
+    assert.deepEqual(array(ally.statusEffects),[]);
+    assert.deepEqual([ally.hp,ally.sp],[300,210]);
+    assert.equal(ally.activeBuffs.filter(buff=>buff.statusName==="元祖賜福").length,1,"same blessing does not stack or refresh");
+    assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanXiangGuangMing"),false,"unassigned former skills cannot be forced");
+    assert.equal(finishes,2);
     context.turn=3;
     context.startTurn?context.startTurn(9):context.v155RuleDiagnostics();
 });
 
-test("North Emperor heals at level five and never carries Revive",()=>{
+test("North Emperor revives first, then heals at level five",()=>{
     let finishes=0;
-    const north={name:"北帝天尊",v141Abyss:true,alive:true,hp:500,maxHP:500,sp:500,maxSP:500,activeBuffs:[],statusEffects:[]};
-    const ally={name:"盟友",v141Abyss:true,alive:true,hp:10,maxHP:1000,sp:10,maxSP:500,activeBuffs:[],statusEffects:[]};
+    const north={name:"北帝天尊",v141Abyss:true,alive:true,hp:500,maxHP:500,sp:500,maxSP:500,v141ForceSkillLevel:5,activeBuffs:[],statusEffects:[]};
+    const ally={name:"盟友",rank:"boss",v141Abyss:true,alive:false,hp:0,maxHP:1000,sp:10,maxSP:500,activeBuffs:[],statusEffects:[]};
     const context=load({
         monsters:[north,ally],currentBattleMonsters:[0,1],
         isMonsterFrozen:()=>false,isMonsterPetrified:()=>false,
         finishPlayerAction(){ finishes++; },showMonsterSkillNameBadge(){},showMonsterHit(){},addBattleLog(){},updateUI(){},
         v141HealMonsterPreservingShield(monster,amount){ const before=monster.hp; monster.hp=Math.min(monster.maxHP,monster.hp+amount); return monster.hp-before; }
     });
+    assert.equal(context.v155ResolveNorthSupport(0,true),true);
+    assert.equal(ally.alive,true);
+    assert.equal(ally.hp,1000);
+    ally.hp=10;
     assert.equal(context.v155ResolveNorthHeal(0,true),true);
-    assert.equal(ally.hp,680);
-    assert.equal(ally.sp,195);
-    assert.equal(finishes,1);
+    assert.equal(ally.hp,480);
+    assert.equal(ally.sp,165);
+    assert.equal(finishes,2);
 });
 
-test("wind elite Stealth blocks only single-target selection for two rounds",()=>{
+test("wind elite uses Dodge, never Stealth",()=>{
     let finishes=0;
-    const elite={name:"天兵天將",element:"wind",v141Abyss:true,alive:true,hp:100,sp:100,maxSP:100,skillChance:1,activeBuffs:[]};
+    const elite={name:"天兵天將",element:"wind",v141Abyss:true,alive:true,hp:100,maxHP:100,sp:100,maxSP:100,evasion:20,skillChance:1,activeBuffs:[]};
     const context=load({
         monsters:[elite],currentBattleMonsters:[0],battleToken:4,turn:1,
         isMonsterFrozen:()=>false,isMonsterPetrified:()=>false,
         getSkillTargets(center,targetType){ return targetType==="all"?[0]:[center]; },
         finishPlayerAction(){ finishes++; },showMonsterSkillNameBadge(){},addBattleLog(){},updateUI(){}
     });
-    assert.equal(context.v155ResolveWindEliteStealth(0,true),true);
-    assert.deepEqual(array(context.getSkillTargets(0,"single")),[]);
+    assert.equal(context.v155ResolveWindEliteDodge(0,true),true);
+    assert.deepEqual(array(context.getSkillTargets(0,"single")),[0]);
     assert.deepEqual(array(context.getSkillTargets(0,"all")),[0]);
+    assert.equal(elite.evasion,80);
+    assert.deepEqual(
+        [elite.v155WindDodge.statusName,elite.v155WindDodge.bonusPercent,elite.v155WindDodge.expiresTurn],
+        ["風行",75,4]
+    );
+    assert.equal(elite.activeBuffs.some(buff=>buff.type==="stealthSkill"||buff.statusName==="隱身"),false);
+    assert.equal(context.v155ResolveWindEliteDodge(0,true),false,"same Wind Walk state does not refresh");
     assert.equal(finishes,1);
+});
+
+test("enemy Myriad Earth Shield reflects only actual HP loss",()=>{
+    const player={id:"攻擊者",hp:1000,maxHP:1000,activeBuffs:[]};
+    const target={name:"護盾目標",alive:true,hp:60,maxHP:60,sp:0,maxSP:0,evasion:0,
+        activeBuffs:[{type:"earthShield",statusName:"萬象土盾",turnsLeft:3,percent:50}],statusEffects:[]};
+    const context=load({
+        player,monsters:[target],currentBattleMonsters:[0],
+        showMonsterHit(){},showPlayerHit(){},addBattleLog(){},
+        normalAttack(){ target.hp=Math.max(0,target.hp-100); this.showMonsterHit(0,100,"hp"); }
+    });
+    context.normalAttack();
+    assert.equal(target.hp,0);
+    assert.equal(player.hp,970,"overkill reflects half of the actual 60 HP loss, not half of 100 damage");
 });
 
 test("Phoenix fewer-than-three Burn cast grants one non-refreshable next-round 30 percent damage boost",()=>{

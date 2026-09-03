@@ -326,6 +326,14 @@
     let encounterSequence=0;
     function configureEncounterSkills(monster,encounterId){
         if(!monster||monster.v141Abyss){ return monster; }
+        if(monster.v132FixedSkillLoadout){
+            const forcedLevel=Math.max(1,Math.floor(numeric(monster.v141ForceSkillLevel)||1));
+            monster.v144LegalSkillPool=(monster.skillIds||[]).slice();
+            monster.v141SkillLevel=forcedLevel;
+            monster.v144SkillLevel=forcedLevel;
+            monster.v144SkillEncounter=encounterId||("fixed-"+(++encounterSequence));
+            return monster;
+        }
         const pool=legalMonsterSkillPool(monster);
         monster.v144LegalSkillPool=pool.slice();
         monster.skillIds=shuffled(pool).slice(0,monsterCarryLimit(monster.level));
@@ -490,16 +498,18 @@
     /* ----- Abyss floor 5 exact formation and carried skills. ----- */
     const FINAL_BOSS_ORDER=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
     const FINAL_BOSS_RULES={
-        東帝天尊:{element:"earth",skills:["flyingSandStrike","stoneBreakSky"],supports:["barrier"]},
-        天帝天尊:{element:"wind",skills:["stormRain","stormSpell"],supports:["dinghaishenzhen"]},
-        極帝天尊:{element:"light",skills:[],supports:["yuanXiangGuangMing","yuanGuangShield"]},
-        北帝天尊:{element:"water",skills:["iceArrowRain"],supports:["revive","healSpell"]},
+        東帝天尊:{element:"earth",skills:["dustStorm","stoneBreakSky"],supports:["barrier"]},
+        天帝天尊:{element:"wind",skills:["windHowlLightning","stormRain","stormSpell"],supports:[]},
+        極帝天尊:{element:"light",skills:[],supports:["yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"]},
+        北帝天尊:{element:"water",skills:["iceArrowRain","freeze"],supports:["healSpell"]},
         南帝天尊:{element:"fire",skills:["phoenixCry","dragonSlash"],supports:["rage"]}
     };
     const FINAL_ELITES=[
-        {element:"water",skill:"frostCrush"},{element:"earth",skill:"stoneThrow"},
-        {element:"fire",skill:"fireCritical"},{element:"wind",skill:"dodgeSkill"},
-        {element:"water",skill:"frostCrush"}
+        {element:"water",skills:[],supports:["healSpell"]},
+        {element:"earth",skills:["stoneBreakSky"],supports:[]},
+        {element:"fire",skills:["phoenixCry"],supports:[]},
+        {element:"wind",skills:[],supports:["dodgeSkill"]},
+        {element:"water",skills:[],supports:["healSpell"]}
     ];
 
     function isFinalAbyssRoster(roster){
@@ -524,9 +534,9 @@
             const rule=FINAL_ELITES[position];
             monster.name="天兵天將";
             monster.element=rule.element;
-            monster.skillIds=rule.skill==="dodgeSkill"?[]:[rule.skill];
-            monster.v141SupportSkillIds=rule.skill==="dodgeSkill"?["dodgeSkill"]:[];
-            monster.v141ForceSkillLevel=5;
+            monster.skillIds=rule.skills.slice();
+            monster.v141SupportSkillIds=rule.supports.slice();
+            monster.v141ForceSkillLevel=4;
             monster.v141FormationRow=1;
             monster.v141FormationPosition=position;
         });
@@ -659,10 +669,11 @@
     function castNorthSupport(monsterIndex){
         const monster=monsters[monsterIndex];
         if(!monster||monster.name!=="北帝天尊"||monsterControlled(monster)){ return false; }
-        const entries=abyssAllies();
-        const dead=entries.find(entry=>entry.monster&&(!entry.monster.alive||numeric(entry.monster.hp)<=0));
-        const living=entries.filter(entry=>entry.monster&&entry.monster.alive);
-        let skillId=dead?"revive":living.some(entry=>{
+        const entries=abyssAllies().filter(entry=>entry.monster&&entry.monster.alive);
+        const living=typeof window.v141GetMonsterAllyTriTargets==="function"
+            ?window.v141GetMonsterAllyTriTargets(monsterIndex,entries)
+            :entries.slice(0,3);
+        const skillId=living.some(entry=>{
             const ally=entry.monster;
             const shield=ally.v141Shield;
             const hp=shield?numeric(ally.hp)-numeric(shield.remaining):numeric(ally.hp);
@@ -670,34 +681,30 @@
             return hp<max||numeric(ally.sp)<numeric(ally.maxSP);
         })?"healSpell":null;
         if(!skillId||Math.random()>.55||!spendAndBadge(monster,monsterIndex,skillId)){ return false; }
-        if(skillId==="revive"){
-            const target=dead.monster;
-            target.alive=true;
-            target.v141Shield=null;
-            target.hp=Math.max(1,numeric(target.maxHP));
-            target.statusEffects=[];
-            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",dead.index,"revive"); }
-            addBattleLog("北帝天尊施放最高等級復活術，"+target.name+"以100% HP復活。");
-        }else{
-            let hpTotal=0,spTotal=0;
-            living.forEach(entry=>{
-                const ally=entry.monster;
-                const healed=typeof window.v141HealMonsterPreservingShield==="function"
-                    ?window.v141HealMonsterPreservingShield(ally,470):0;
-                hpTotal+=healed;
-                const before=numeric(ally.sp);
-                ally.sp=Math.min(numeric(ally.maxSP),before+155);
-                const restoredSp=ally.sp-before;
-                spTotal+=restoredSp;
-                if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
-                if(restoredSp>0&&typeof showDamagePopup==="function"){
-                    const card=document.getElementById("battleMonster"+entry.index);
-                    if(card){ showDamagePopup(card,"+"+restoredSp+" SP","sp"); }
-                }
-                if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
-            });
-            addBattleLog("北帝天尊施放最高等級治療術：全體回復"+hpTotal+" HP、"+spTotal+" SP。");
-        }
+        const skill=skillDatabase.healSpell;
+        const level=Math.max(1,numeric(skill.maxLevel)||1);
+        const hpAmount=numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(level-1);
+        const spAmount=numeric(skill.baseHealSP)+numeric(skill.healSPPerLevel)*(level-1);
+        let hpTotal=0,spTotal=0;
+        living.forEach(entry=>{
+            const ally=entry.monster;
+            const healed=typeof window.v141HealMonsterPreservingShield==="function"
+                ?window.v141HealMonsterPreservingShield(ally,hpAmount):0;
+            hpTotal+=healed;
+            const before=numeric(ally.sp);
+            ally.sp=Math.min(numeric(ally.maxSP),before+spAmount);
+            const restoredSp=ally.sp-before;
+            spTotal+=restoredSp;
+            if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){ ally.statusEffects=[]; }
+            if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
+            if(restoredSp>0&&typeof showDamagePopup==="function"){
+                const card=document.getElementById("battleMonster"+entry.index);
+                if(card){ showDamagePopup(card,"+"+restoredSp+" SP","sp"); }
+            }
+            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
+        });
+        addBattleLog("北帝天尊施放最高等級治療術：同排最多"+living.length+"名友方共回復"+
+            hpTotal+" HP、"+spTotal+" SP。");
         updateUI(); finishPlayerAction();
         return true;
     }

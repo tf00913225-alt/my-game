@@ -509,7 +509,10 @@ function checkLoader(){
     }
 
     const releaseEntries=[
+        "css/00-main.css",
+        "css/19-stage-v54-main-city-moderate-native-scale.css",
         "js/00-main.js",
+        "js/16-stage-v54-main-city-runtime.js",
         "js/19-stage-v78-character-inventory-runtime.js",
         "js/20-anonymous-20.js"
     ];

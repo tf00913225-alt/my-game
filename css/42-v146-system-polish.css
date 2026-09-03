@@ -149,56 +149,73 @@
     line-height:29px !important;
 }
 
-/* Home party summary occupies the previously unused lower area. */
+/* Home party cards: the sole complete character-information area. */
 #game-stage #homePage .v146-home-roster{
     position:relative;
     z-index:3;
     display:grid;
-    gap:5px;
-    margin:2px 10px 8px;
-    padding:7px;
-    border:1px solid rgba(181,132,58,.78);
-    border-radius:10px;
+    flex:0 0 auto;
+    gap:2px;
+    margin:45.5px 10px 0;
+    padding:3.5px 7px;
+    border:1px solid rgba(190,139,59,.54);
+    border-radius:11px;
     color:#f4e7c8;
-    background:linear-gradient(155deg,rgba(35,24,14,.94),rgba(7,7,6,.94));
-    box-shadow:0 6px 17px rgba(0,0,0,.46),inset 0 0 13px rgba(214,158,63,.07);
+    background:linear-gradient(155deg,rgba(29,19,11,.91),rgba(5,5,4,.86));
+    box-shadow:0 5px 13px rgba(0,0,0,.46),inset 0 0 13px rgba(214,158,63,.04);
 }
 #game-stage #homePage .v146-home-roster > header{
     display:flex;align-items:center;justify-content:space-between;
-    color:#eac670;font-size:12px;line-height:16px;
+    min-height:15px;color:#f0cb70;font-size:11px;line-height:15px;
+    letter-spacing:.05em;
 }
-#game-stage #homePage .v146-home-roster > header span{color:#ffe2a0;font-weight:900;}
+#game-stage #homePage .v146-home-roster > header span{color:#c7ad76;font-size:9px;font-weight:800;}
 #game-stage #homePage .v146-home-character{
     display:grid;
-    grid-template-columns:46px minmax(0,1fr);
-    gap:7px;
+    grid-template-columns:43px minmax(0,1fr);
+    gap:6px;
     align-items:center;
-    min-height:48px;
-    padding:3px 5px 3px 3px;
-    border:1px solid rgba(117,89,50,.75);
-    border-radius:7px;
-    background:rgba(13,11,8,.74);
+    height:47px;
+    padding:1.5px 7px 1.5px 2px;
+    border:1px solid rgba(145,107,53,.38);
+    border-radius:9px;
+    background:linear-gradient(90deg,rgba(29,19,12,.9),rgba(8,8,7,.82));
+    box-shadow:inset 0 0 0 1px rgba(255,222,146,.02),0 2px 5px rgba(0,0,0,.3);
 }
-#game-stage #homePage .v146-home-character > img{
-    width:46px;height:46px;border-radius:6px;object-fit:cover;object-position:center 22%;
+#game-stage #homePage .v146-home-avatar{
+    width:45px;
+    height:45px;
+    overflow:hidden;
+    transform:translateX(-4px);
+    border:1px solid rgba(220,174,86,.84);
+    border-radius:50%;
+    background:#090806;
+    box-shadow:0 2px 7px rgba(0,0,0,.58);
 }
-#game-stage #homePage .v146-home-character-main{display:grid;gap:3px;min-width:0;}
+#game-stage #homePage .v146-home-avatar img{
+    display:block;width:100%;height:100%;object-fit:cover;object-position:center 22%;
+}
+#game-stage #homePage .v146-home-character[data-element="fire"] .v146-home-avatar{box-shadow:0 0 8px rgba(177,64,38,.34),0 2px 7px rgba(0,0,0,.58);}
+#game-stage #homePage .v146-home-character[data-element="water"] .v146-home-avatar{box-shadow:0 0 8px rgba(66,129,184,.34),0 2px 7px rgba(0,0,0,.58);}
+#game-stage #homePage .v146-home-character[data-element="wind"] .v146-home-avatar{box-shadow:0 0 8px rgba(58,151,110,.3),0 2px 7px rgba(0,0,0,.58);}
+#game-stage #homePage .v146-home-character[data-element="earth"] .v146-home-avatar{box-shadow:0 0 8px rgba(186,142,63,.34),0 2px 7px rgba(0,0,0,.58);}
+#game-stage #homePage .v146-home-character-main{display:grid;gap:1px;min-width:0;}
 #game-stage #homePage .v146-home-character-main > div:first-child{
     display:flex;align-items:center;justify-content:space-between;gap:6px;
-    min-width:0;font-size:12px;line-height:13px;
+    min-width:0;font-size:11px;line-height:13px;
 }
 #game-stage #homePage .v146-home-character-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-stage #homePage .v146-home-character-main span{color:#d8bd83;font-weight:800;white-space:nowrap;}
+#game-stage #homePage .v146-home-character-main span{color:#e2c58b;font-size:10px;font-weight:800;white-space:nowrap;}
 #game-stage #homePage .v146-home-resource{
-    position:relative;height:11px;overflow:hidden;border-radius:4px;background:#241010;
+    position:relative;height:9px;margin-inline:2px;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(36,16,16,.88);
 }
-#game-stage #homePage .v146-home-resource.sp{background:#0c1730;}
+#game-stage #homePage .v146-home-resource.sp{background:rgba(12,23,48,.78);}
 #game-stage #homePage .v146-home-resource i{
     position:absolute;inset:0 auto 0 0;background:linear-gradient(#f26763,#b91e20);
 }
 #game-stage #homePage .v146-home-resource.sp i{background:linear-gradient(#659bff,#2455bd);}
 #game-stage #homePage .v146-home-resource strong{
-    position:absolute;inset:0;z-index:2;color:#fff;font-size:8px;line-height:11px;text-align:center;text-shadow:0 1px 2px #000;
+    position:absolute;inset:0;z-index:2;color:#fff;font-size:8px;line-height:8px;text-align:center;text-shadow:0 1px 2px #000;
 }
 
 /* Shop: quantity, live total and buy button remain on one stable row. */
@@ -321,8 +338,6 @@
 
 @media (max-height:720px){
     #game-stage #battlePage #battleMonsterArea{transform:translateY(12px);}
-    #game-stage #homePage .v146-home-character{min-height:43px;grid-template-columns:41px minmax(0,1fr);}
-    #game-stage #homePage .v146-home-character > img{width:41px;height:41px;}
     #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
     #game-stage #v141DungeonNav{height:78px !important;}
     #game-stage #v141DungeonNav .nav-art-button{height:58px !important;}

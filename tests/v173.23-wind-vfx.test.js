@@ -344,6 +344,57 @@ test("single, three-lane and battlefield casts each own one correctly positioned
     assert.equal(allSprites[0].style.top,"170px");
 });
 
+test("three-target wind sheets keep a fixed three-slot footprint centered on the selected target",()=>{
+    const placements=[];
+    [
+        [
+            {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
+            {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
+            {alive:true,hp:100,statusEffects:[],activeBuffs:[]}
+        ],
+        [
+            {alive:false,hp:0,statusEffects:[],activeBuffs:[]},
+            {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
+            {alive:false,hp:0,statusEffects:[],activeBuffs:[]}
+        ]
+    ].forEach(monsters=>{
+        const runtime=loadRuntime({monsters});
+        runtime.context.v142SkillAnimationDirector.play(
+            config("stormFlurry","tri","physical"),
+            {side:"player",actorIndex:0}
+        );
+        const sprite=stageSprites(runtime).sprites[0];
+        assert.ok(sprite);
+        assert.equal(sprite.dataset.placement,"group");
+        assert.equal(sprite.style.left,"458px","selected middle target remains the visual centre");
+        assert.equal(sprite.style.top,"140px");
+        placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
+    });
+    assert.deepEqual(placements[1],placements[0],"casualties do not shrink or move the three-target sheet");
+});
+
+test("full-field wind sheets stay locked to the complete enemy area after casualties",()=>{
+    const placements=[];
+    [
+        undefined,
+        [
+            {alive:false,hp:0,statusEffects:[],activeBuffs:[]},
+            {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
+            {alive:false,hp:0,statusEffects:[],activeBuffs:[]}
+        ]
+    ].forEach(monsters=>{
+        const runtime=loadRuntime(monsters?{monsters}:{});
+        runtime.context.v142SkillAnimationDirector.play(
+            config("stormRain","all","magic"),
+            {side:"player",actorIndex:0}
+        );
+        const sprite=stageSprites(runtime).sprites[0];
+        assert.ok(sprite);
+        placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
+    });
+    assert.deepEqual(placements[1],placements[0],"full-field VFX does not follow survivor bounds");
+});
+
 test("enemy casts discover the real player target instead of using a fixed faction position",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
@@ -455,10 +506,10 @@ test("wind sheets replace procedural wind effects and keep noninteractive status
     assert.doesNotMatch(animation,/assets\/inbox\/[\s\S]{0,80}(?:base64|blob:)/i);
 });
 
-test("the development cache release is V173.27",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.27"/);
-    assert.match(index,/<title>四象江湖傳 V173\.27<\/title>/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.27/);
+test("the development cache release is V173.39",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
+    assert.match(index,/<title>四象江湖傳 V173\.39<\/title>/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.39/);
 });
 
-console.log("\n"+passed+" V173.27 wind Sprite VFX tests passed.");
+console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");

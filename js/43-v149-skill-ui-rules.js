@@ -202,6 +202,18 @@
 
     Object.keys(SKILLS).forEach(id=>patchSkill(id,SKILLS[id]));
 
+    const FINAL_FIRE_WIND_EARTH_DAMAGE_SKILL_IDS=[
+        "flameSlash","fireCritical","explosiveFlurry","dragonSlash",
+        "fireRocket","blazeSpell","flameTornado","phoenixCry",
+        "stormFist","stormFlurry","windCrossSlash","dizzyFist",
+        "windSpell","stormCircle","windHowlLightning","stormRain","stormSpell",
+        "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush",
+        "stoneThrow","sandWind","flyingSandStrike","dustStorm"
+    ];
+    if(typeof window.v173ApplyFormalDamageRoleProfiles==="function"){
+        window.v173ApplyFormalDamageRoleProfiles(FINAL_FIRE_WIND_EARTH_DAMAGE_SKILL_IDS);
+    }
+
     /* ----- Status rules: Frostbite blocks skills only. ----- */
     function activeStatus(entity,type){
         return !!(entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(effect=>
@@ -440,28 +452,6 @@
         };
         try{ return callback(); }
         finally{ rollStatusEffectHit=previousStatusRoll; }
-    }
-
-    function learnedFireEX(context){
-        if(!context||!context.character||context.character.element!=="fire"){ return false; }
-        if(typeof getSkillLevel!=="function"){ return false; }
-        const key=typeof getPartyCharacterKey==="function"
-            ?getPartyCharacterKey(context.characterIndex)
-            :(context.characterIndex===0?"fire":"player"+(context.characterIndex+1));
-        return numeric(getSkillLevel(key,"fireEX"))>0;
-    }
-
-    if(typeof calculateSkillDamage==="function"){
-        const previousCalculateSkillDamage=calculateSkillDamage;
-        calculateSkillDamage=function(baseDamage,statBonus,target){
-            let result=previousCalculateSkillDamage.apply(this,arguments);
-            const bonus=skillDatabase.fireEX&&numeric(skillDatabase.fireEX.statusTargetDamageBonusPercent);
-            if(result>0&&bonus>0&&learnedFireEX(playerSkillContext)&&target&&Array.isArray(target.statusEffects)&&
-                target.statusEffects.some(effect=>effect&&numeric(effect.turnsLeft)>0)){
-                result=Math.floor(result*(1+bonus/100));
-            }
-            return result;
-        };
     }
 
     /* Every qualifying Fire physical skill reuses this one owner. */
