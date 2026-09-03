@@ -873,10 +873,10 @@ button:disabled{
 }
 
 .home-hud-kicker{
-    gap:7px;
+    gap:8px;
     color:#c99a43;
     font-family:"Noto Serif TC",serif;
-    font-size:10px;
+    font-size:15px;
     font-weight:900;
     letter-spacing:.16em;
     line-height:1.15;
@@ -991,11 +991,11 @@ button:disabled{
 .home-utility-actions{
     position:absolute;
     right:0;
-    bottom:5px;
+    bottom:0;
     left:0;
     z-index:4;
     display:grid;
-    grid-template-columns:repeat(2,100px);
+    grid-template-columns:repeat(2,104px);
     justify-content:space-between;
     gap:0;
     padding:0 68px;
@@ -1125,9 +1125,9 @@ button:disabled{
 
 .home-card-utility{
     display:grid;
-    grid-template-columns:42px minmax(0,1fr);
+    grid-template-columns:40px minmax(0,1fr);
     align-items:center;
-    height:47px;
+    height:46px;
     overflow:hidden;
     border:1px solid rgba(186,137,57,.76);
     border-radius:8px;
@@ -1136,18 +1136,19 @@ button:disabled{
 }
 
 .home-card-utility .home-card-icon{
-    width:41px;
-    height:45px;
-    margin-left:1px;
+    width:40px;
+    height:40px;
+    margin-left:0;
     border-radius:7px 0 0 7px;
     border-right:1px solid rgba(174,127,55,.55);
 }
 
 .home-card-utility .home-card-label{
-    padding:0 4px;
-    font-size:12px;
-    line-height:45px;
+    padding:0;
+    font-size:16px;
+    line-height:44px;
     text-align:center;
+    letter-spacing:-.75px;
 }
 
 .home-gold-display{

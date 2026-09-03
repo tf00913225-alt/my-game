@@ -156,8 +156,8 @@
     display:grid;
     flex:0 0 auto;
     gap:2px;
-    margin:8px 10px 0;
-    padding:3px 7px;
+    margin:45.5px 10px 0;
+    padding:3.5px 7px;
     border:1px solid rgba(190,139,59,.54);
     border-radius:11px;
     color:#f4e7c8;
@@ -166,7 +166,7 @@
 }
 #game-stage #homePage .v146-home-roster > header{
     display:flex;align-items:center;justify-content:space-between;
-    min-height:14px;color:#f0cb70;font-size:11px;line-height:14px;
+    min-height:15px;color:#f0cb70;font-size:11px;line-height:15px;
     letter-spacing:.05em;
 }
 #game-stage #homePage .v146-home-roster > header span{color:#c7ad76;font-size:9px;font-weight:800;}
@@ -175,8 +175,8 @@
     grid-template-columns:43px minmax(0,1fr);
     gap:6px;
     align-items:center;
-    height:46px;
-    padding:1px 7px 1px 2px;
+    height:47px;
+    padding:1.5px 7px 1.5px 2px;
     border:1px solid rgba(145,107,53,.38);
     border-radius:9px;
     background:linear-gradient(90deg,rgba(29,19,12,.9),rgba(8,8,7,.82));

@@ -69,12 +69,12 @@ test("six secondary entrances form two substantial vertical button rails",()=>{
 test("offline experience and system use complete framed horizontal buttons",()=>{
     assert.equal(count(actions,/class="home-card home-card-utility"/g),2);
     assert.match(actions,/home-utility-actions[\s\S]*openHomeFeature\('offlineExp'\)[\s\S]*openHomeFeature\('system'\)/);
-    assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute;[\s\S]*right:0;[\s\S]*left:0;[\s\S]*grid-template-columns:repeat\(2,100px\);[\s\S]*justify-content:space-between;[\s\S]*padding:0 68px/);
+    assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute;[\s\S]*right:0;[\s\S]*left:0;[\s\S]*grid-template-columns:repeat\(2,104px\);[\s\S]*justify-content:space-between;[\s\S]*padding:0 68px/);
     assert.doesNotMatch(baseCss,/\.home-utility-actions\{[\s\S]{0,360}(?:right:50%|transform:translateX\(50%\))/);
-    assert.match(baseCss,/\.home-card-utility\{[\s\S]*height:47px;[\s\S]*border:1px solid[\s\S]*border-radius:8px;[\s\S]*background:linear-gradient/);
-    assert.ok((100-86)/86>=.15&&(100-86)/86<=.20);
-    assert.ok((47-40)/40>=.15&&(47-40)/40<=.20);
-    assert.equal(82-68,14);
+    assert.match(baseCss,/\.home-card-utility\{[\s\S]*height:46px;[\s\S]*border:1px solid[\s\S]*border-radius:8px;[\s\S]*background:linear-gradient/);
+    assert.ok((104-86)/86>=.20&&(104-86)/86<=.22);
+    assert.ok((46-40)/40>=.15&&(46-40)/40<=.16);
+    assert.equal(396-(68*2)-(104*2),52);
 });
 
 test("all ten existing entry IDs and click contracts remain intact",()=>{
@@ -114,7 +114,7 @@ test("the roster renderer keeps all character details only in the adventure part
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*gap:2px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*border:1px solid rgba\(190,139,59,.54\);[\s\S]*inset 0 0 13px rgba\(214,158,63,.04\)/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:43px minmax\(0,1fr\);[\s\S]*height:46px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:43px minmax\(0,1fr\);[\s\S]*height:47px/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*border:1px solid rgba\(145,107,53,.38\);[\s\S]*inset 0 0 0 1px rgba\(255,222,146,.02\)/);
     assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:45px;[\s\S]*height:45px;[\s\S]*transform:translateX\(-4px\)/);
     assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:9px;[\s\S]*margin-inline:2px/);
@@ -147,11 +147,11 @@ test("the full three-character layout fits the fixed home height above the uncha
     const safeHeight=746.6666667-10-78-(14*2);
     const hudHeight=5+48;
     const actionHeight=1+90+1+256;
-    const rosterHeight=8+(3*2)+2+14+(3*2)+(3*46);
-    assert.equal(hudHeight+actionHeight+rosterHeight,575);
+    const rosterHeight=45.5+171;
+    assert.equal(hudHeight+actionHeight+rosterHeight,617.5);
     assert.ok(hudHeight+actionHeight+rosterHeight<=safeHeight);
     assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:46px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:47px/);
     assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:45px;[\s\S]*height:45px/);
 });
 
