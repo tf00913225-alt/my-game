@@ -143,7 +143,7 @@ body.creation-fixed-active{
 
 #creationPage .creation-subtitle{
     margin:12px 0 0;
-    font-size:28px;
+    font-size:32px;
     letter-spacing:2.571px;
     color:#aa987d;
 }
@@ -156,7 +156,7 @@ body.creation-fixed-active{
     gap:20px;
     margin-top:20px;
     color:#786c5c;
-    font-size:22px;
+    font-size:24.5px;
     font-weight:900;
     letter-spacing:2px;
 }
@@ -315,7 +315,7 @@ body.creation-fixed-active{
 #creationPage .creation-section-kicker{
     margin-bottom:15.429px;
     color:#c8b28e;
-    font-size:23.143px;
+    font-size:26.5px;
     font-weight:700;
     letter-spacing:4.114px;
 }
@@ -336,7 +336,7 @@ body.creation-fixed-active{
     border-radius:23.143px;
     background:linear-gradient(180deg,#191510,#0e0c09);
     color:#b9aa93;
-    font-size:28.286px;
+    font-size:32px;
     font-weight:700;
 }
 
@@ -352,7 +352,7 @@ body.creation-fixed-active{
     width:41.143px;
     margin-right:5.143px;
     color:#efbc61;
-    font-size:33.429px;
+    font-size:37px;
 }
 
 #creationPage .creation-element-grid{
@@ -397,7 +397,7 @@ body.creation-fixed-active{
 
 #creationPage .element-option .element-name{
     margin:0;
-    font-size:20.571px;
+    font-size:24.5px;
     white-space:nowrap;
 }
 
@@ -445,14 +445,14 @@ body.creation-fixed-active{
 #creationPage .creation-role-title{
     color:#fff2d8;
     font-family:"Noto Serif TC",serif;
-    font-size:38px;
+    font-size:42px;
     font-weight:900;
 }
 
 #creationPage .creation-role-subtitle{
     margin-top:7px;
     color:var(--creation-accent-light,#e7b85e);
-    font-size:25px;
+    font-size:29px;
     font-weight:700;
     letter-spacing:0.771px;
 }
@@ -460,8 +460,8 @@ body.creation-fixed-active{
 #creationPage .creation-role-description{
     margin-top:20px;
     color:#b9aa93;
-    font-size:26px;
-    line-height:1.6;
+    font-size:30px;
+    line-height:1.65;
 }
 
 #creationPage .creation-role-tags{
@@ -477,7 +477,7 @@ body.creation-fixed-active{
     border:2.571px solid rgba(255,255,255,.08);
     background:rgba(255,255,255,.035);
     color:#d7c8b0;
-    font-size:21px;
+    font-size:23.5px;
 }
 
 #creationPage .creation-card{
@@ -523,14 +523,14 @@ body.creation-fixed-active{
 #creationPage .creation-label{
     margin:0;
     color:#f4e8d4;
-    font-size:30.857px;
+    font-size:34.5px;
     font-weight:900;
 }
 
 #creationPage .creation-card-caption{
     margin-top:5.143px;
     color:#8f806c;
-    font-size:20.571px;
+    font-size:24.5px;
 }
 
 #creationPage .creation-input{
@@ -543,7 +543,7 @@ body.creation-fixed-active{
     color:#fff0d8;
     padding:0 30.857px;
     outline:none;
-    font-size:33.429px;
+    font-size:39px;
     box-shadow:inset 0 0 36px rgba(0,0,0,.25);
 }
 
@@ -589,7 +589,7 @@ body.creation-fixed-active{
 #creationPage .creation-next span,
 #creationPage .creation-back span{
     font-family:"Noto Serif TC",serif;
-    font-size:34px;
+    font-size:36px;
     font-weight:900;
     letter-spacing:4px;
 }
@@ -599,7 +599,7 @@ body.creation-fixed-active{
     margin-top:6px;
     color:#af9364;
     font-family:"Cinzel",serif;
-    font-size:16px;
+    font-size:18px;
     letter-spacing:4px;
 }
 
