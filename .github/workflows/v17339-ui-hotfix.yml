@@ -51,6 +51,7 @@ jobs:
       - name: Ensure asset-test dependency
         run: |
           if ! command -v identify >/dev/null 2>&1; then
+            sudo grep -RIl "packages.microsoft.com/repos/azure-cli" /etc/apt/sources.list.d 2>/dev/null | xargs -r sudo rm -f
             sudo apt-get update
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
