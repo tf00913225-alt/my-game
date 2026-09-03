@@ -15,6 +15,7 @@
     const LOCK_NOTICE_ID="v17342ElementBoxLockNotice";
     const CONTROL_IDS=["autoSettingsCharacterSelect","autoSettingsActionSelect","autoSettingsHP","autoSettingsSP","autoSettingsReturnCity"];
     const IMMEDIATE_FIELD_IDS=["autoSettingsActionSelect","autoSettingsHP","autoSettingsSP","autoSettingsReturnCity"];
+    const LOCKED_SETTING_SELECTOR=".auto-setting-card,.auto-threshold-card,.auto-return-card";
 
     function elementBoxIsActive(){
         if(typeof window.v131GetElementBoxState==="function"){
@@ -101,6 +102,24 @@
                 persistSelectedCharacterSettings();
             });
         });
+    }
+
+    function bindLockedInteractionGuard(){
+        const panel=document.getElementById(SETTINGS_PANEL_ID);
+        if(!panel||typeof panel.addEventListener!=="function"||panel.dataset.v17342LockGuard==="1"){ return; }
+        panel.dataset.v17342LockGuard="1";
+        panel.addEventListener("click",event=>{
+            if(!elementBoxIsActive()){ return; }
+            const target=event&&event.target;
+            if(!target||typeof target.closest!=="function"){ return; }
+            if(target.closest("#"+STOP_BUTTON_ID)){ return; }
+            const setting=target.closest(LOCKED_SETTING_SELECTOR);
+            if(!setting||typeof panel.contains==="function"&&!panel.contains(setting)){ return; }
+            if(typeof event.preventDefault==="function"){ event.preventDefault(); }
+            if(typeof event.stopPropagation==="function"){ event.stopPropagation(); }
+            notifyLocked();
+            syncSharedRecoveryForm();
+        },true);
     }
 
     if(typeof switchAutoSettingsCharacter==="function"){
@@ -211,8 +230,8 @@
     function afterOpen(type){
         if(type!=="autoBattleSettings"){ return; }
         bindImmediatePersistence();
+        bindLockedInteractionGuard();
         syncElementBoxSettingControls();
-        if(elementBoxIsActive()){ setTimeout(notifyLocked,0); }
     }
     if(typeof openHomeFeature==="function"){
         const previous=openHomeFeature;
@@ -225,5 +244,6 @@
 
     normalizeSharedRecoveryAcrossParty();
     bindImmediatePersistence();
+    bindLockedInteractionGuard();
     syncElementBoxSettingControls();
 })();
