@@ -101,7 +101,7 @@ test("the historical V54 bridge no longer flattens hierarchy with inline importa
     assert.doesNotMatch(v54Css,/#game-stage #homePage button,[\s\S]*font-size:18px !important/);
 });
 
-test("the roster renderer keeps all character details only in the adventure party",()=>{
+test("the roster renderer keeps all character details only in the adventure party and lays three slots in one row",()=>{
     assert.match(rosterRuntime,/const partyIndexes=getExistingPartyIndexes\(\)\.slice\(0,3\)/);
     assert.doesNotMatch(rosterRuntime,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
     assert.doesNotMatch(rosterRuntime,/home-hud-character-(?:list|row|avatar)/);
@@ -110,17 +110,14 @@ test("the roster renderer keeps all character details only in the adventure part
     assert.match(rosterRuntime,/homeHudExpValue/);
     assert.match(rosterRuntime,/隊伍 '\+partyIndexes\.length\+' \/ 3/);
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
-    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*gap:2px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
+    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:3px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
+    assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*border:1px solid rgba\(190,139,59,.54\);[\s\S]*inset 0 0 13px rgba\(214,158,63,.04\)/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:43px minmax\(0,1fr\);[\s\S]*height:47px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:32px minmax\(0,1fr\);[\s\S]*height:59px/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*border:1px solid rgba\(145,107,53,.38\);[\s\S]*inset 0 0 0 1px rgba\(255,222,146,.02\)/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:45px;[\s\S]*height:45px;[\s\S]*transform:translateX\(-4px\)/);
-    assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:9px;[\s\S]*margin-inline:2px/);
+    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:32px;[\s\S]*height:32px;[\s\S]*transform:none/);
+    assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:8px;[\s\S]*margin-inline:0/);
     ["fire","water","wind","earth"].forEach(element=>assert.match(rosterCss,new RegExp('data-element="'+element+'"')));
-    const previousRosterContainerHeight=(2*2)+2+14+(3*2)+(3*44);
-    const polishedRosterContainerHeight=(3*2)+2+14+(3*2)+(3*46);
-    assert.ok((polishedRosterContainerHeight-previousRosterContainerHeight)/previousRosterContainerHeight>=.05);
-    assert.ok((polishedRosterContainerHeight-previousRosterContainerHeight)/previousRosterContainerHeight<=.08);
 });
 
 test("gold and EXP share one compact formatter without ellipsis",()=>{
@@ -141,16 +138,16 @@ test("the fixed 9:16 home keeps one substantial non-scrolling layout owner",()=>
     assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
 });
 
-test("the full three-character layout fits the fixed home height above the unchanged navigation",()=>{
+test("the full three-character horizontal roster fits the fixed home height above the unchanged navigation",()=>{
     const safeHeight=746.6666667-10-78-(14*2);
     const hudHeight=5+48;
     const actionHeight=1+90+1+256;
-    const rosterHeight=45.5+171;
-    assert.equal(hudHeight+actionHeight+rosterHeight,617.5);
+    const rosterHeight=45.5+3.5+15+3+59+5+2;
     assert.ok(hudHeight+actionHeight+rosterHeight<=safeHeight);
     assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:47px/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:45px;[\s\S]*height:45px/);
+    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:59px/);
+    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:32px;[\s\S]*height:32px/);
 });
 
 test("development cache and visible version advance to V173.39",()=>{
