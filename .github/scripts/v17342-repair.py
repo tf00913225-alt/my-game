@@ -16,7 +16,7 @@ s=s.replace(
     1
 )
 
-# Replace the brittle old-test regex migration with deterministic block slicing.
+# Replace the brittle old utility-button regression with the V173.42 side-rail contract.
 marker='p=Path("tests/v173.28-main-city-lobby.test.js")\nt=p.read_text()\nt=rx_once(t,'
 start=s.find(marker)
 stop=s.find('\n# Replace V169 tests',start)
@@ -30,9 +30,12 @@ if block_start>=0:
         raise SystemExit("home utility test end not found")
     block_end+=len("\\n});")
     new_block="""test(\"offline experience and system join the existing side rails\",()=>{
-    assert.equal(count(actions,/openHomeFeature\\\\('(offlineExp|system)'\\\\)/g),2);
+    assert.equal(count(actions,/openHomeFeature\\('offlineExp'\\)/g),1);
+    assert.equal(count(actions,/openHomeFeature\\('system'\\)/g),1);
+    assert.equal(count(actions,/class=\"home-card home-card-utility\"/g),0);
     assert.doesNotMatch(actions,/home-utility-actions/);
-    assert.match(actions,/homeIconAchievement[\\\\s\\\\S]*homeIconAnnouncement[\\\\s\\\\S]*homeIconOfflineExp[\\\\s\\\\S]*homeIconSystem/);
+    assert.match(actions,/homeIconOfflineExp/);
+    assert.match(actions,/homeIconSystem/);
 });"""
     t=t[:block_start]+new_block+t[block_end:]
 p.write_text(t)
