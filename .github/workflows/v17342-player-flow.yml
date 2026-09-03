@@ -1,4 +1,5 @@
 name: V173.42 Player Flow
+# retry 2
 
 on:
   push:
@@ -25,6 +26,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+
+      - name: Repair duplicate shared-copy matcher
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/scripts/v17342-player-flow.py')
+          s=p.read_text()
+          old='''s=once(s,\n''' + "'''                <small>戰鬥結束後低於門檻時使用補品</small>'''" + ''',\n''' + "'''                <small>低於門檻時自動使用補品</small>'''" + ''',\n"HP shared copy")\ns=once(s,\n''' + "'''                <small>戰鬥結束後低於門檻時使用補品</small>'''" + ''',\n''' + "'''                <small>低於門檻時自動使用補品</small>'''" + ''',\n"SP shared copy")'''
+          new='''s=s.replace(\n''' + "'''                <small>戰鬥結束後低於門檻時使用補品</small>'''" + ''',\n''' + "'''                <small>低於門檻時自動使用補品</small>'''" + ''',1)\ns=s.replace(\n''' + "'''                <small>戰鬥結束後低於門檻時使用補品</small>'''" + ''',\n''' + "'''                <small>低於門檻時自動使用補品</small>'''" + ''',1)'''
+          if old not in s:
+              raise SystemExit('shared-copy matcher block not found')
+          p.write_text(s.replace(old,new,1))
+          PY
 
       - name: Apply V173.42 changes
         run: python3 .github/scripts/v17342-player-flow.py
