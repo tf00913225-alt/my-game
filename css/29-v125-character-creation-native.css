@@ -901,13 +901,13 @@ body.creation-fixed-active{
 
 #creationPage .creation-stat-details summary{
     padding:27px 29px;
-    font-size:28px;
+    font-size:30px;
     line-height:1.4;
 }
 
 #creationPage .creation-stat-details[open] .creation-stat-details-body{
     padding:16px 29px 28px;
-    font-size:29px;
+    font-size:32px;
     line-height:1.65;
 }
 

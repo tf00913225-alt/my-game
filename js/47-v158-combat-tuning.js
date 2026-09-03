@@ -48,7 +48,47 @@
         return monster;
     }
 
+    const V17342_HALF_MONSTER_FIELDS=[
+        "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
+        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","spiritPoints","agilityPoints",
+        "vitality","energy","intelligence","spirit","agility","accuracy","evasion"
+    ];
+
+    function halveMonsterCoreStats(monster,marker){
+        if(!monster||monster[marker]){ return monster; }
+        V17342_HALF_MONSTER_FIELDS.forEach(key=>{
+            if(!Number.isFinite(Number(monster[key]))){ return; }
+            const minimum=["maxHP","hp","maxSP","sp"].includes(key)?1:0;
+            monster[key]=Math.max(minimum,Math.round(Number(monster[key])*0.5));
+        });
+        if(Number.isFinite(Number(monster.maxHP))){
+            monster.hp=Math.max(1,Math.min(Number(monster.maxHP),Number(monster.hp)||Number(monster.maxHP)));
+        }
+        if(Number.isFinite(Number(monster.maxSP))){
+            monster.sp=Math.max(0,Math.min(Number(monster.maxSP),Number(monster.sp)||Number(monster.maxSP)));
+        }
+        monster[marker]=true;
+        return monster;
+    }
+
+    function normalizeBeginnerForestMonster(monster){
+        normalizeMonsterDefaultEvasion(monster);
+        if(monster&&monster.v173BeginnerForest===true){
+            halveMonsterCoreStats(monster,"v17342BeginnerStatsHalved");
+            monster.agilityPoints=0;
+            monster.agility=0;
+        }
+        return monster;
+    }
+
+    function normalizeDailyDungeonMonster(monster){
+        if(!monster||monster.v141Abyss===true){ return monster; }
+        return halveMonsterCoreStats(monster,"v17342DailyDungeonStatsHalved");
+    }
+
     window.v158NormalizeMonsterDefaultEvasion=normalizeMonsterDefaultEvasion;
+    window.v17342NormalizeBeginnerForestMonster=normalizeBeginnerForestMonster;
+    window.v17342NormalizeDailyDungeonMonster=normalizeDailyDungeonMonster;
 
     if(typeof makeZoneMonster==="function"){
         const previousMakeZoneMonster=makeZoneMonster;
@@ -65,12 +105,42 @@
             const entries=config&&typeof config.monsters==="function"
                 ?config.monsters()
                 :[];
-            (entries||[]).forEach(normalizeMonsterDefaultEvasion);
+            (entries||[]).forEach(monster=>{
+                normalizeMonsterDefaultEvasion(monster);
+                if(key==="forest"){ normalizeBeginnerForestMonster(monster); }
+            });
         });
     }
 
     if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
-        monsters.forEach(normalizeMonsterDefaultEvasion);
+        monsters.forEach(monster=>{
+            normalizeMonsterDefaultEvasion(monster);
+            if(monster&&monster.v173BeginnerForest===true){ normalizeBeginnerForestMonster(monster); }
+        });
+    }
+
+    if(typeof rollBeginnerForestNormalAttackDamage==="function"){
+        rollBeginnerForestNormalAttackDamage=function(){
+            return 5+Math.floor(Math.random()*4);
+        };
+    }
+
+    if(typeof renderBattle==="function"){
+        const previousRenderBattle=renderBattle;
+        renderBattle=function(){
+            const isDungeonBattle=
+                typeof currentZone!=="undefined"&&currentZone==="dungeon"&&
+                !!window.v132ActiveDungeonRun&&
+                typeof currentBattleMonsters!=="undefined"&&
+                Array.isArray(currentBattleMonsters)&&
+                typeof monsters!=="undefined"&&Array.isArray(monsters);
+            if(isDungeonBattle){
+                const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
+                const isAbyss=roster.some(monster=>monster&&monster.v141Abyss===true);
+                if(!isAbyss){ roster.forEach(normalizeDailyDungeonMonster); }
+            }
+            return previousRenderBattle.apply(this,arguments);
+        };
     }
 
     if(typeof getMonsterEvasion==="function"){

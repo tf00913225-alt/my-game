@@ -519,6 +519,120 @@
         roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 3</span></header>'+cards;
     }
 
+    /* Character entry red dot covers level-up, unspent attribute points and unspent skill points. */
+    function setCharacterAttentionDot(target,show,label){
+        if(!target){ return; }
+        let dot=target.querySelector(":scope > .v141-notice-dot");
+        if(show&&!dot){
+            dot=document.createElement("span");
+            dot.className="v141-notice-dot";
+            dot.setAttribute("aria-hidden","true");
+            target.appendChild(dot);
+        }else if(!show&&dot){
+            dot.remove();
+        }
+        if(show){ target.title=label; }
+        else if(target.title===label){ target.removeAttribute("title"); }
+    }
+
+    function getCharacterGrowthAttention(){
+        if(typeof getExistingPartyIndexes!=="function"){ return {show:false,label:""}; }
+        const maxLevel=Math.max(1,numeric(window.v133MaxLevel)||100);
+        let canLevel=false;
+        let hasAttributePoints=false;
+        let hasSkillPoints=false;
+        getExistingPartyIndexes().slice(0,3).forEach(index=>{
+            const character=getPartyCharacterByIndex(index);
+            if(!character){ return; }
+            if(
+                numeric(character.level)<maxLevel&&
+                numeric(typeof sharedExp!=="undefined"?sharedExp:0)>=Math.max(1,numeric(character.expNext)||1)
+            ){
+                canLevel=true;
+            }
+            if(numeric(character.attributePoints)>0){ hasAttributePoints=true; }
+            if(numeric(character.skillPoints)>0){ hasSkillPoints=true; }
+        });
+        const reasons=[];
+        if(canLevel){ reasons.push("可升級"); }
+        if(hasAttributePoints){ reasons.push("能力點未分配"); }
+        if(hasSkillPoints){ reasons.push("技能點未使用"); }
+        return {show:reasons.length>0,label:reasons.length?"角色："+reasons.join("、"):""};
+    }
+
+    function syncCharacterAttentionDots(){
+        const attention=getCharacterGrowthAttention();
+        const homeButton=document.getElementById("homeIconCharacter")?.parentElement||null;
+        setCharacterAttentionDot(homeButton,attention.show,attention.label);
+        document.querySelectorAll("#mapPageNav button[aria-label='角色']").forEach(button=>{
+            setCharacterAttentionDot(button,attention.show,attention.label);
+        });
+    }
+    window.v146SyncCharacterAttentionDots=syncCharacterAttentionDots;
+
+    /* ----- Synthesis blueprints and crafted results are ordinary equipment, never elemental sets. ----- */
+    const SYNTHESIS_SET_PREFIX=/^(赤炎|寒泉|岩岳|青嵐)/;
+    const SYNTHESIS_SET_COLORS=/#(?:e24b32|4bb9e8|c59a54|55cda3)/gi;
+
+    function normalizeOrdinaryBlueprintItem(item){
+        if(!item||!item.blueprintSlot){ return item; }
+        item.name=String(item.name||"裝備設計圖").replace(SYNTHESIS_SET_PREFIX,"");
+        delete item.setId;
+        item.v146OrdinaryBlueprint=true;
+        return item;
+    }
+
+    function normalizeOrdinaryCraftedItem(item){
+        if(!item||!item.v141Crafted){ return item; }
+        item.name=String(item.name||"普通裝備").replace(SYNTHESIS_SET_PREFIX,"");
+        delete item.setId;
+        delete item.requiredElement;
+        delete item.setVariant;
+        if(typeof item.icon==="string"){
+            item.icon=item.icon.replace(SYNTHESIS_SET_COLORS,"#c59a54");
+        }
+        item.v146OrdinaryCrafted=true;
+        return item;
+    }
+
+    function normalizeOrdinarySynthesisData(){
+        const content=typeof window.v132GetContentDefinitions==="function"
+            ?window.v132GetContentDefinitions():null;
+        const definitions=content&&Array.isArray(content.blueprints)?content.blueprints:[];
+        definitions.forEach(normalizeOrdinaryBlueprintItem);
+        if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
+            inventoryItems.forEach(item=>{
+                normalizeOrdinaryBlueprintItem(item);
+                normalizeOrdinaryCraftedItem(item);
+            });
+        }
+    }
+
+    if(typeof window.v141CraftEquipment==="function"){
+        const previousCraftEquipment=window.v141CraftEquipment;
+        window.v141CraftEquipment=function(){
+            const before=new Set(
+                (typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)?inventoryItems:[])
+                    .map(item=>item&&item.v141Uid).filter(Boolean)
+            );
+            const result=previousCraftEquipment.apply(this,arguments);
+            let normalized=false;
+            if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
+                inventoryItems.forEach(item=>{
+                    if(!item||!item.v141Crafted||before.has(item.v141Uid)){ return; }
+                    normalizeOrdinaryCraftedItem(item);
+                    normalized=true;
+                });
+            }
+            if(normalized){
+                if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
+                if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
+                if(typeof saveGame==="function"){ saveGame(); }
+            }
+            return result;
+        };
+    }
+
     /* ----- Synthesis step 2 is retired; equipment output is always ordinary. ----- */
     function polishSynthesis(){
         const root=document.querySelector(".v141-synthesis");
@@ -531,7 +645,7 @@
         root.querySelectorAll(".v143-item-picker button").forEach(button=>{
             const span=button.querySelector("span");
             const original=button.getAttribute("aria-label")||span&&span.textContent||"設計圖";
-            const cleaned=original.replace(/^(赤炎|寒泉|岩岳|青嵐)/,"");
+            const cleaned=original.replace(SYNTHESIS_SET_PREFIX,"");
             button.setAttribute("aria-label",cleaned);
             button.title=cleaned;
             if(span){ span.remove(); }
@@ -559,6 +673,7 @@
             if(page==="home"){ renderHomeRoster(); }
             if(page==="dungeon"){ setTimeout(syncDungeonShell,0); }
             setTimeout(syncDefeatedCards,0);
+            setTimeout(syncCharacterAttentionDots,0);
             return result;
         };
     }
@@ -570,6 +685,7 @@
             renderHomeRoster();
             syncDefeatedCards();
             syncShopTotals();
+            syncCharacterAttentionDots();
             return result;
         };
     }
@@ -589,6 +705,7 @@
             const result=previousUpdateGoldDisplay.apply(this,arguments);
             renderHomeRoster();
             syncShopTotals();
+            syncCharacterAttentionDots();
             return result;
         };
     }
@@ -600,6 +717,7 @@
         syncDungeonShell();
         polishSynthesis();
         syncDefeatedCards();
+        syncCharacterAttentionDots();
     }
     if(typeof MutationObserver!=="undefined"){
         const observer=new MutationObserver(()=>{
@@ -612,9 +730,10 @@
         else{ startObserver(); }
     }
 
+    normalizeOrdinarySynthesisData();
     syncSetDefinitions();
     const boot=()=>{
-        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); polishSynthesis(); syncDefeatedCards();
+        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); polishSynthesis(); syncDefeatedCards(); syncCharacterAttentionDots();
     };
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
     else{ boot(); }

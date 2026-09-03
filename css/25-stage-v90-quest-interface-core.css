@@ -295,6 +295,7 @@ body.quest-scroll-active,
 }
 
 #game-stage #homeFeatureModal.quest-mode .quest-milestone-slot{
+    position:relative !important;
     min-height:78px !important;
     display:flex !important;
     flex-direction:column !important;
@@ -318,16 +319,30 @@ body.quest-scroll-active,
     filter:none !important;
 }
 
+/* Unavailable and already-claimed chests use the same subdued state. */
+#game-stage #homeFeatureModal.quest-mode .quest-milestone:not(.reached) .quest-milestone-slot,
 #game-stage #homeFeatureModal.quest-mode .quest-milestone.claimed .quest-milestone-slot{
-    opacity:.62 !important;
+    opacity:.5 !important;
 }
-
+#game-stage #homeFeatureModal.quest-mode .quest-milestone:not(.reached) .quest-milestone-chest,
 #game-stage #homeFeatureModal.quest-mode .quest-milestone.claimed .quest-milestone-chest{
-    filter:saturate(.42) brightness(.58) !important;
+    filter:saturate(.35) brightness(.58) !important;
 }
 
-#game-stage #homeFeatureModal.quest-mode .quest-milestone.reached .quest-milestone-slot{
+#game-stage #homeFeatureModal.quest-mode .quest-milestone.reached:not(.claimed) .quest-milestone-slot{
     border-color:#b8862c !important;
     box-shadow:inset 0 0 8px rgba(240,180,41,.09) !important;
     color:#d9c59c !important;
+}
+#game-stage #homeFeatureModal.quest-mode .quest-milestone.reached:not(.claimed) .quest-milestone-slot::after{
+    content:"" !important;
+    position:absolute !important;
+    right:4px !important;
+    top:4px !important;
+    width:9px !important;
+    height:9px !important;
+    border:2px solid #fff0dc !important;
+    border-radius:50% !important;
+    background:#ff2d2d !important;
+    box-shadow:0 0 7px rgba(255,45,45,.9) !important;
 }

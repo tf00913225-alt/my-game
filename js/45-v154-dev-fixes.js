@@ -122,10 +122,39 @@
         return typeof autoBattle!=="undefined"&&!!autoBattle;
     }
 
+    function showElementBoxUseNotice(message){
+        if(typeof document==="undefined"){ return; }
+        const host=document.getElementById("game-stage")||document.body;
+        if(!host){ return; }
+        let stack=document.getElementById("v17342ElementBoxNoticeStack");
+        if(!stack){
+            stack=document.createElement("div");
+            stack.id="v17342ElementBoxNoticeStack";
+            stack.className="v17342-element-box-notice-stack";
+            stack.setAttribute("aria-live","polite");
+            stack.setAttribute("aria-atomic","false");
+            host.appendChild(stack);
+        }
+        const notice=document.createElement("div");
+        notice.className="v17342-element-box-use-notice";
+        notice.textContent=String(message||"");
+        stack.appendChild(notice);
+        requestAnimationFrame(()=>notice.classList.add("show"));
+        setTimeout(()=>{
+            notice.classList.remove("show");
+            setTimeout(()=>{
+                if(notice.parentNode){ notice.remove(); }
+                if(stack&&stack.childElementCount===0&&stack.parentNode){ stack.remove(); }
+            },180);
+        },2200);
+    }
+    window.v17342ShowElementBoxUseNotice=showElementBoxUseNotice;
+
     function logElementBoxRecovery(message){
         const text=String(message||"");
         if(!text){ return; }
         if(typeof addBattleLog==="function"){ addBattleLog(text); }
+        if(text.includes("自動使用")){ showElementBoxUseNotice(text); }
         if(!(typeof battleActive!=="undefined"&&battleActive)&&typeof window!=="undefined"){
             window.v17342PendingBattleNotices=Array.isArray(window.v17342PendingBattleNotices)
                 ?window.v17342PendingBattleNotices:[];
