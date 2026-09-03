@@ -1,5 +1,5 @@
 name: V173.42 Player Flow
-# retry 12
+# retry 13
 
 on:
   push:
@@ -101,6 +101,20 @@ jobs:
               if old not in s:
                   raise SystemExit('V173.4 gold assertion not found: '+old)
               s=s.replace(old,new,1)
+          p.write_text(s)
+
+          p=Path('tests/v173.40-beginner-balance.test.js')
+          s=p.read_text()
+          old='assert.match(rewards,/currentZone==="forest"[\\s\\S]*?player[\\s\\S]*?player\\.level\\)\\|\\|1\\)<10[\\s\\S]*?finalExp=getBeginnerForestBattleExp\\(\\)/);'
+          new='\n'.join([
+              'assert.match(rewards,/function getBeginnerForestMonsterExpUnit\\(\\)[\\s\\S]*?getBeginnerForestBattleExp\\(\\)\\/3/);',
+              '    assert.match(rewards,/if\\(isBeginnerForestBattle\\)\\{[\\s\\S]*?currentBattleMonsters\\.reduce[\\s\\S]*?getBeginnerForestMonsterExpUnit\\(\\)[\\s\\S]*?V17342_GLOBAL_EXP_REWARD_MULTIPLIER/);'
+          ])
+          if old not in s:
+              raise SystemExit('V173.40 flat beginner EXP assertion not found')
+          s=s.replace(old,new,1)
+          s=s.replace('test("newbie EXP is tied to the current Lv1-to-10 curve and twenty normal wins"',
+                      'test("newbie EXP keeps the Lv1-to-10 reference but now pays per monster and follows global x3"',1)
           p.write_text(s)
           PY
 
