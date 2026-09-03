@@ -144,7 +144,7 @@
             sprite:{
                 src:"assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19",
                 columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,
-                placement:"battlefield",renderer:"canvas-crop",targetBounds:true,coverageScale:1.22,
+                placement:"battlefield",renderer:"canvas-crop",fixedFormation:true,coverageScale:1.22,
                 minWidth:140,minHeight:140
             }
         },
@@ -1119,28 +1119,98 @@
         node.dataset.tileCount=String(columns*rows);
     }
 
+    function formationRowsForVfx(indexes){
+        const resolver=typeof window!=="undefined"&&typeof window.v148GetFormationRows==="function"
+            ?window.v148GetFormationRows
+            :(typeof window!=="undefined"&&typeof window.v138GetFormationRows==="function"
+                ?window.v138GetFormationRows:null);
+        if(!resolver){ return []; }
+        const rows=resolver(indexes||[]);
+        return Array.isArray(rows)
+            ?rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice())
+            :[];
+    }
+
+    function fixedTriLayoutBounds(current,indexes){
+        const targetType=String(current.config.targetType||"");
+        if(targetType==="allyTri"&&current.targetSide==="player"){
+            const playerArea=sideAreaBounds("player");
+            if(playerArea){
+                playerArea.centerX=playerArea.left+playerArea.width/2;
+                playerArea.centerY=playerArea.top+playerArea.height/2;
+                playerArea.fixedSlots=3;
+                return playerArea;
+            }
+        }
+
+        const queued=current.side==="player"&&typeof queuedPlayerActions!=="undefined"
+            ?queuedPlayerActions&&queuedPlayerActions[current.actorIndex]:null;
+        let center=Number.isInteger(current.targetId)?current.targetId:null;
+        if(center===null&&queued){
+            if(current.targetSide==="monster"&&Number.isInteger(queued.target)){ center=queued.target; }
+            if(current.targetSide==="player"&&Number.isInteger(queued.targetAlly)){ center=queued.targetAlly; }
+        }
+        if(center===null&&indexes.length){
+            center=indexes[Math.floor((indexes.length-1)/2)];
+        }
+        const anchorCard=Number.isInteger(center)?cardFor(current.targetSide,center):null;
+        const anchor=cardCenter(anchorCard);
+        if(!anchor){
+            const area=sideAreaBounds(current.targetSide);
+            if(area){
+                area.centerX=area.left+area.width/2;
+                area.centerY=area.top+area.height/2;
+                area.fixedSlots=3;
+            }
+            return area;
+        }
+
+        let step=Math.max(1,anchor.rect.width+3);
+        if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
+            const rows=formationRowsForVfx(currentBattleMonsters);
+            const row=rows.find(candidate=>candidate.includes(center));
+            if(row){
+                const position=row.indexOf(center);
+                const neighborIndexes=[row[position-1],row[position+1]].filter(Number.isInteger);
+                const distances=neighborIndexes.map(neighborIndex=>cardCenter(cardFor("monster",neighborIndex)))
+                    .filter(Boolean).map(neighbor=>Math.abs(neighbor.x-anchor.x)).filter(distance=>distance>1);
+                if(distances.length){ step=Math.min.apply(null,distances); }
+            }
+        }else if(current.targetSide==="player"){
+            const partyCenters=[0,1,2].map(partyIndex=>cardCenter(cardFor("player",partyIndex))).filter(Boolean);
+            const distances=partyCenters.map(candidate=>Math.abs(candidate.x-anchor.x)).filter(distance=>distance>1);
+            if(distances.length){ step=Math.min.apply(null,distances); }
+        }
+
+        const width=anchor.rect.width+step*2;
+        return {
+            left:anchor.x-width/2,
+            top:anchor.rect.top,
+            width:width,
+            height:anchor.rect.height,
+            centerX:anchor.x,
+            centerY:anchor.y,
+            fixedSlots:3,
+            id:"fixed-tri-slots"
+        };
+    }
+
     function groupLayoutBounds(current,indexes){
+        const targetType=String(current.config.targetType||"");
+        if(/tri/i.test(targetType)){ return fixedTriLayoutBounds(current,indexes); }
         if(current.targetSide==="player"){
             return sideAreaBounds("player");
         }
-        if(
-            current.targetSide==="monster"&&
-            typeof window.v138GetFormationRows==="function"&&
-            typeof currentBattleMonsters!=="undefined"
-        ){
+        if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
             const queued=current.side==="player"&&typeof queuedPlayerActions!=="undefined"
                 ?queuedPlayerActions&&queuedPlayerActions[current.actorIndex]:null;
             const center=Number.isInteger(current.targetId)
                 ?current.targetId
                 :(queued&&Number.isInteger(queued.target)?queued.target:indexes[0]);
-            const rows=window.v138GetFormationRows(currentBattleMonsters);
-            const row=Array.isArray(rows)&&rows.find(candidate=>Array.isArray(candidate)&&candidate.includes(center));
+            const rows=formationRowsForVfx(currentBattleMonsters);
+            const row=rows.find(candidate=>candidate.includes(center));
             if(row){
-                const position=row.indexOf(center);
-                const layoutIndexes=/tri/i.test(String(current.config.targetType||""))
-                    ?row.slice(Math.max(0,position-1),Math.min(row.length,position+2))
-                    :row;
-                const layout=fieldBounds(layoutIndexes.map(index=>cardFor("monster",index)).filter(Boolean));
+                const layout=fieldBounds(row.map(index=>cardFor("monster",index)).filter(Boolean));
                 if(layout){ return layout; }
             }
         }
@@ -1200,7 +1270,7 @@
                cover the entire opposing formation even after casualties.
                Ice Arrow Rain opts into the living-card bounds below.
             */
-            if(!sprite.targetBounds){
+            if(!sprite.targetBounds&&!sprite.fixedFormation){
                 const bounds=sideAreaBounds(current.targetSide);
                 if(!bounds){ return; }
                 const viewportWidth=Number(window.innerWidth)||960;
@@ -1224,10 +1294,43 @@
                 return;
             }
 
+            if(sprite.fixedFormation){
+                const bounds=sideAreaBounds(current.targetSide);
+                if(!bounds){ return; }
+                const viewportWidth=Number(window.innerWidth)||960;
+                const viewportHeight=Number(window.innerHeight)||720;
+                const coverageScale=clamp(Number(sprite.coverageScale)||1,1,1.4);
+                const maxWidth=Math.max(240,Math.min(viewportWidth*.94,Number(sprite.maxWidth)||viewportWidth*.94));
+                const maxHeight=Math.max(240,Math.min(viewportHeight*.92,Number(sprite.maxHeight)||viewportHeight*.92));
+                const width=clamp(
+                    Math.round(bounds.width*coverageScale),
+                    Number(sprite.minWidth)||160,
+                    maxWidth
+                );
+                const height=clamp(
+                    Math.round(bounds.height*coverageScale),
+                    Number(sprite.minHeight)||160,
+                    maxHeight
+                );
+                node.dataset.targetIndexes=indexes.join(",");
+                node.dataset.areaId=bounds.id;
+                node.dataset.fixedFormation="true";
+                node.dataset.coverageScale=String(coverageScale);
+                node.style.left=(bounds.left+bounds.width/2)+"px";
+                node.style.top=(bounds.top+bounds.height/2)+"px";
+                node.style.width=width+"px";
+                node.style.height=height+"px";
+                node.style.clipPath="none";
+                node.style.setProperty("--v143-sprite-dx","0px");
+                node.style.setProperty("--v143-sprite-dy","0px");
+                node.style.setProperty("--v143-sprite-angle","0deg");
+                return;
+            }
+
             /*
-               Ice Arrow Rain is one VFX instance. Its destination is based
-               only on cards that are still valid targets, never on a fixed
-               side container or a dead/retired card.
+               Optional target-bounds battlefield mode remains available for
+               skills that explicitly want a living-target footprint. Fixed
+               formation skills never enter this branch.
             */
             const targetCards=indexes.map(targetIndex=>cardFor(current.targetSide,targetIndex))
                 .filter(card=>card&&card.offsetParent!==null);
@@ -1271,7 +1374,7 @@
         const coverageCards=placement==="trajectory"&&current.actorCard
             ?[current.actorCard].concat(targetCards)
             :targetCards;
-        const coverage=fieldBounds(coverageCards)||targetBounds;
+        const coverage=sprite.alignToSlots?targetBounds:(fieldBounds(coverageCards)||targetBounds);
         const scale=Number(sprite.scale)||1;
         const naturalSize=(Math.max(coverage.width,coverage.height)+40)*scale;
         const viewportWidth=Number(window.innerWidth)||960;
@@ -1299,8 +1402,12 @@
             node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");
         }else{
-            node.style.left=(coverage.left+coverage.width/2)+"px";
-            node.style.top=(coverage.top+coverage.height/2)+"px";
+            const centerX=sprite.alignToSlots&&Number.isFinite(targetBounds.centerX)
+                ?targetBounds.centerX:coverage.left+coverage.width/2;
+            const centerY=sprite.alignToSlots&&Number.isFinite(targetBounds.centerY)
+                ?targetBounds.centerY:coverage.top+coverage.height/2;
+            node.style.left=centerX+"px";
+            node.style.top=centerY+"px";
             node.style.setProperty("--v143-sprite-dx","0px");
             node.style.setProperty("--v143-sprite-dy","0px");
         }

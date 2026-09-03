@@ -175,6 +175,8 @@ test("manifest keeps one 4x3 sheet and frame-eight hit",()=>{
         [4,3,12,7]
     );
     assert.equal(model.sprite.placement,"battlefield");
+    assert.equal(model.sprite.fixedFormation,true);
+    assert.equal(model.sprite.targetBounds,undefined);
     assert.equal(model.sprite.coverageScale,1.22);
     assert.deepEqual([model.sprite.minWidth,model.sprite.minHeight],[140,140]);
     assert.equal(model.hit,.5833333333);
@@ -192,7 +194,7 @@ test("Canvas crops exactly one 384×384 frame left-to-right, top-to-bottom, once
     assert.doesNotMatch(css,/data-skill="iceArrowRain"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("one shared sheet uses the bounding box of living targets only",()=>{
+test("one shared sheet stays locked to the complete enemy formation after casualties",()=>{
     const placements=[];
     [[1],[0,1,2]].forEach(indexes=>{
         const runtime=loadRuntime(indexes);
@@ -206,10 +208,11 @@ test("one shared sheet uses the bounding box of living targets only",()=>{
         const sprite=sprites[0];
         assert.equal(sprite.dataset.placement,"battlefield");
         assert.equal(sprite.dataset.targetSide,"monster");
-        assert.equal(sprite.dataset.areaId,"living-targets");
+        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+        assert.equal(sprite.dataset.fixedFormation,"true");
         assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprite.style.left,"438px");
-        assert.equal(sprite.style.top,"130px");
+        assert.equal(sprite.style.left,"460px");
+        assert.equal(sprite.style.top,"165px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
         assert.equal(sprite.dataset.renderer,"canvas-crop");
         assert.equal(sprite.style.backgroundImage,"none","the sheet is never a CSS background");
@@ -217,9 +220,8 @@ test("one shared sheet uses the bounding box of living targets only",()=>{
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
         assert.ok(runtime.scheduled.some(timer=>timer.delay>=1590),"full 1.6 second action gate");
     });
-    assert.deepEqual(placements[0],["438px","130px","140px","140px"]);
-    assert.deepEqual(placements[1],["438px","130px","386px","140px"]);
-    assert.notDeepEqual(placements[0],placements[1],"AOE follows the living formation instead of a fixed side box");
+    assert.deepEqual(placements[0],["460px","165px","537px","329px"]);
+    assert.deepEqual(placements[1],placements[0],"one survivor and three survivors use the same full-formation footprint");
 });
 
 test("all damage numbers share frame eight while remaining target-specific",()=>{

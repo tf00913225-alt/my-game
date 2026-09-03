@@ -475,7 +475,7 @@ test("enemy Water Ball keeps one live-target group while endpoints resolve",()=>
     assert.equal(sprites[0].style["--v143-sprite-dy"],"0px");
 });
 
-test("Ice Arrow Rain uses one living-target bounding box",()=>{
+test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
     const results=[];
     [[1],[0,1,2]].forEach(indexes=>{
         const monsters=[0,1,2].map(index=>({
@@ -492,18 +492,20 @@ test("Ice Arrow Rain uses one living-target bounding box",()=>{
         const sprite=sprites[0];
         assert.equal(sprite.dataset.targetSide,"monster");
         assert.equal(sprite.dataset.placement,"battlefield");
-        assert.equal(sprite.dataset.areaId,"living-targets");
+        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+        assert.equal(sprite.dataset.fixedFormation,"true");
         assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprite.style.left,"458px");
-        assert.equal(sprite.style.top,"140px");
+        assert.equal(sprite.style.left,"480px");
+        assert.equal(sprite.style.top,"170px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
         assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
-        results.push([sprite.style.width,sprite.style.height]);
+        results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
-    assert.deepEqual(results,[["140px","140px"],["386px","140px"]]);
+    assert.deepEqual(results[0],["480px","170px","537px","317px"]);
+    assert.deepEqual(results[1],results[0]);
 });
 
-test("enemy Ice Arrow Rain uses living player cards only",()=>{
+test("enemy Ice Arrow Rain stays centered on the complete player formation",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("iceArrowRain","all"),{side:"monster",actorIndex:0}
@@ -511,8 +513,13 @@ test("enemy Ice Arrow Rain uses living player cards only",()=>{
     const {sprites}=stageSprites(runtime);
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetSide,"player");
-    assert.equal(sprites[0].dataset.areaId,"living-targets");
+    assert.equal(sprites[0].dataset.areaId,"battlePlayerRow");
+    assert.equal(sprites[0].dataset.fixedFormation,"true");
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
+    assert.equal(sprites[0].style.left,"240px");
+    assert.equal(sprites[0].style.top,"420px");
+    assert.equal(sprites[0].style.width,"537px");
+    assert.equal(sprites[0].style.height,"195px");
     assert.equal(sprites[0].style.clipPath||sprites[0].style["clip-path"],"none");
     assert.equal(sprites[0].querySelectorAll(".v166-water-battlefield-tile").length,0);
 });

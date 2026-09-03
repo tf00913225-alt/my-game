@@ -151,6 +151,20 @@ test("all casts use row-major canvas cropping, frame seven impact and the reques
     });
 });
 
+test("earth trio sheets opt into fixed slot alignment and full-field earth stays formation-locked",()=>{
+    const runtime=statusRuntime();
+    const manifest=runtime.context.v143SkillAnimationManifest;
+    ["petrifyFist","earthquakeCrush","stoneThrow","sandWind","earthShield","rockWall"].forEach(id=>{
+        assert.equal(manifest[id].sprite.placement,"group",id);
+        assert.equal(manifest[id].sprite.alignToSlots,true,id);
+    });
+    assert.equal(manifest.flyingSandStrike.sprite.placement,"battlefield");
+    assert.equal(manifest.flyingSandStrike.sprite.targetBounds,undefined);
+    assert.match(animation,/function fixedTriLayoutBounds\(current,indexes\)/);
+    assert.match(animation,/const coverage=sprite\.alignToSlots\?targetBounds:/);
+    assert.match(animation,/sprite\.alignToSlots&&Number\.isFinite\(targetBounds\.centerX\)/);
+});
+
 test("all seven persistent effects use 4x2 runtime cropping with the requested loop cadence",()=>{
     const runtime=statusRuntime();
     const manifest=runtime.context.v143StatusSpriteManifest;
