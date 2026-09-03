@@ -1,4 +1,10 @@
 
+## V173.41 手機背景恢復／啟動動畫工作階段
+- 同一個瀏覽器分頁工作階段首次完成12～15秒啟動並點擊進入後，以 sessionStorage 記錄已進入；同分頁後續因 Android/Chrome renderer 回收而重載時，`js/00-main.js` 會立即隱藏 startup loader，不再要求等待完整啟動動畫。
+- `visibilitychange -> hidden` 與 `pagehide` 會立即呼叫現有 `saveGame()`，降低 Android 背景回收造成的未存進度風險。
+- 關閉分頁／新的瀏覽器工作階段仍會正常播放首次啟動動畫；沒有使用 Wake Lock、假音訊、reload 攔截或 runtime patch。
+- 本輪只修改 dev，不修改 main。
+
 ## V173.40 新手森林生存／EXP與巡怪打架圖方向
 - 新手森林六隻怪物的敏捷與敏捷點數固定為0。
 - 新手森林普通攻擊（非技能）不爆擊，未防禦／未被盾吸收前固定10～15傷害。

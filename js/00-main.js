@@ -272,6 +272,59 @@ window.eventToGamePoint = getGamePointFromEvent;
 const SAVE_KEY =
     "battle_full_version_save_v5";
 
+
+/* =====================================================
+   V173.41 — MOBILE SESSION RESUME / BACKGROUND SAVE
+   - The 12~15 second startup sequence remains first-entry only.
+   - A reload inside the same browser tab session skips the long overlay.
+   - Android background/page suspension saves immediately before eviction.
+===================================================== */
+const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
+
+(function installMobileSessionResume(){
+
+    if(window.v17341SessionResumeInstalled){ return; }
+    window.v17341SessionResumeInstalled=true;
+
+    function sessionHasEntered(){
+        try{
+            return window.sessionStorage.getItem(STARTUP_SESSION_READY_KEY)==="1";
+        }catch(_){
+            return false;
+        }
+    }
+
+    function rememberEnteredSession(){
+        try{
+            window.sessionStorage.setItem(STARTUP_SESSION_READY_KEY,"1");
+        }catch(_){ }
+    }
+
+    function persistBeforeSuspend(){
+        try{
+            if(typeof saveGame==="function"){ saveGame(); }
+        }catch(_){ }
+    }
+
+    if(sessionHasEntered()){
+        const startupRoot=document.getElementById("startupLoader");
+        if(startupRoot){
+            startupRoot.hidden=true;
+            startupRoot.dataset.sessionResume="1";
+            startupRoot.setAttribute("aria-hidden","true");
+        }
+    }
+
+    document.addEventListener("v173.20:startup-entered",rememberEnteredSession);
+
+    document.addEventListener("visibilitychange",function(){
+        if(document.hidden){ persistBeforeSuspend(); }
+    });
+
+    window.addEventListener("pagehide",persistBeforeSuspend);
+
+})();
+
 let deleteAllCharactersInProgress=false;
 
 
