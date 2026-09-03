@@ -103,7 +103,7 @@ test("default monster evasion is level times 0.3 capped at 30 without replacing 
     const custom={level:20,agilityPoints:12,evasion:37};
     const context=load({
         monsters:[missing,formerGeneratedValue,custom],
-        zoneConfig:{forest:{monsters:()=>[missing,formerGeneratedValue,custom]}}
+        zoneConfig:{desert:{monsters:()=>[missing,formerGeneratedValue,custom]}}
     });
     assert.equal(missing.evasion,6);
     assert.equal(formerGeneratedValue.evasion,24);
