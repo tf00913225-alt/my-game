@@ -71,10 +71,14 @@ jobs:
         run: node .github/scripts/v17339-home-browser-check.mjs baseline http://127.0.0.1:8899 /tmp/v17339-home-baseline.json
 
       - name: Apply exact pixel tune
-        run: python3 .github/scripts/v17339-home-pixel-tune.py apply
+        run: |
+          python3 .github/scripts/v17339-home-pixel-tune.py apply
+          python3 .github/scripts/v17339-update-main-city-lobby-test.py
 
       - name: Run focused static regression
-        run: node tests/v173.39-main-city-final-polish.test.js
+        run: |
+          node tests/v173.39-main-city-final-polish.test.js
+          node tests/v173.28-main-city-lobby.test.js
 
       - name: Verify 420x746.67 logical geometry in Chromium
         run: node .github/scripts/v17339-home-browser-check.mjs final http://127.0.0.1:8899 /tmp/v17339-home-baseline.json
@@ -101,6 +105,7 @@ jobs:
           rm -f .github/workflows/v17339-home-pixel-tune.yml
           rm -f .github/scripts/v17339-home-pixel-tune.py
           rm -f .github/scripts/v17339-home-browser-check.mjs
+          rm -f .github/scripts/v17339-update-main-city-lobby-test.py
 
       - name: Commit exact main-city tune
         run: |
