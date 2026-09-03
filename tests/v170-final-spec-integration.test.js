@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.38)
+ * CURRENT FINAL INTEGRATION SPEC (V173.42)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
@@ -321,7 +321,7 @@ test("new Lv1 characters start with two skill points while level-up remains plus
     assert.match(mainSource,/const player\s*=\s*\{[\s\S]*?skillPoints:0,/);
 });
 
-test("all ten wild zones use the exact one-pass curve and the beginner forest stays basic-only",()=>{
+test("wild zones keep the one-pass curve while the beginner forest applies the final 50% reduction",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         function expected(monster,multiplier){
@@ -345,13 +345,19 @@ test("all ten wild zones use the exact one-pass curve and the beginner forest st
         return {multipliers:multipliers,zones:zones.map((zone,index)=>zone.map(monster=>({
             name:monster.name,level:monster.level,actual:actual(monster),
             expected:expected(monster,multipliers[index]),skillIds:monster.skillIds,
-            skillChance:monster.skillChance,applied:monster._v131StrengthApplied
+            skillChance:monster.skillChance,applied:monster._v131StrengthApplied,
+            beginnerHalved:monster.v17342BeginnerStatsHalved===true
         })))};
     })()`);
     assert.deepEqual(result.multipliers,[.75,.90,.95,1,1.05,1.10,1.15,1.20,1.25,1.30]);
     assert.equal(result.zones.length,10);
     result.zones.forEach((zone,index)=>zone.forEach(monster=>{
-        assert.deepEqual(monster.actual,monster.expected,monster.name+" zone "+(index+1)+" multiplier");
+        if(index===0){
+            assert.equal(monster.beginnerHalved,true,monster.name+" beginner 50% flag");
+            Object.values(monster.actual).forEach(value=>assert.ok(Number.isFinite(value)&&value>=0));
+        }else{
+            assert.deepEqual(monster.actual,monster.expected,monster.name+" zone "+(index+1)+" multiplier");
+        }
         assert.equal(monster.applied,true,monster.name+" strength flag");
     }));
     assert.ok(result.zones[0].length>=8);
@@ -360,6 +366,9 @@ test("all ten wild zones use the exact one-pass curve and the beginner forest st
         assert.deepEqual(monster.skillIds,[],monster.name+" skill pool");
         assert.equal(monster.skillChance,0,monster.name+" skill chance");
     });
+    const tuningSource=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
+    assert.match(tuningSource,/Math\.round\(Number\(monster\[key\]\)\*0\.5\)/);
+    assert.match(tuningSource,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*?return 5\+Math\.floor\(Math\.random\(\)\*4\);/);
 });
 
 test("the complete four-element core table is final after every patch",()=>{
@@ -1321,7 +1330,6 @@ test("forced final-Abyss skill levels fold the modern scaling fields exactly onc
         before:[5,1.75,.1,0,0],during:[1,2.15,0,0,0],after:[5,1.75,.1,0,0]
     });
 });
-
 
 
 test("ordinary bonuses share one capped additive bucket and critical damage caps at 2.25",()=>{

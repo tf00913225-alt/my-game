@@ -63,8 +63,8 @@ function baseContext(overrides={}){
 }
 
 test("V148 remains ordered under the current runtime and cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.39/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
     assert.match(loader,/css\/43-v148-combat-dungeon-fixes\.css/);
 assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.39/);
     const v146=loader.indexOf("js/41-v146-system-polish.js");
@@ -299,7 +299,7 @@ test("Abyss movement freezes the current frame and accepts a new direction",()=>
     assert.equal(player.style.top,"40%");
 });
 
-test("Abyss return is the fifth bottom-nav button and elite names are orange",()=>{
+test("Abyss keeps a top return while the fifth bottom-nav button goes to the city",()=>{
     let html="";
     const nav=element({dataset:{},children:[1,2,3,4]});
     Object.defineProperty(nav,"innerHTML",{get:()=>html,set:value=>{ html=value; nav.children=[1,2,3,4,5]; }});
@@ -313,9 +313,11 @@ test("Abyss return is the fifth bottom-nav button and elite names are orange",()
     });
     context.v148SyncDungeonShell();
     assert.equal((html.match(/<button/g)||[]).length,5);
-    assert.match(html,/onclick="v146ExitAbyssMap\(\)" aria-label="返回"/);
+    assert.match(html,/onclick="showPage\('home'\)" aria-label="主城"/);
+    assert.match(html,/src="assets\/ui\/nav-home\.png"/);
     assert.equal(nav.dataset.v146Columns,"5");
-    assert.equal(topReturn.removed,true);
+    assert.notEqual(topReturn.removed,true);
+    assert.match(source,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
     assert.match(css,/data-rank="elite"[\s\S]*color:#ff9f43 !important/);
     assert.match(css,/#mapPage \.map-monster\[data-rank="elite"\]/);
     assert.match(source,/card\.dataset\.rank=rank==="boss"\?"boss":rank==="elite"\?"elite":"regular"/);

@@ -97,9 +97,9 @@ function loadRuntime(overrides={}){
 }
 
 test("V154 remains ordered immediately before V155",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.39/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.39/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
+    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.42/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.ok(loader.indexOf("js/45-v154-dev-fixes.js")>loader.indexOf("js/44-v152-dev-fixes.js"));
     assert.ok(loader.indexOf("js/46-v155-dev-fixes.js")>loader.indexOf("js/45-v154-dev-fixes.js"));
@@ -208,7 +208,7 @@ test("equipment cover, ability scrolling and Abyss decluttering stay scoped",()=
     assert.match(css,/#characterTabContent\{[\s\S]*?overflow-y:auto !important/);
     assert.match(characterRuntime,/root\.style\.setProperty\(\s*"height",\s*"auto",\s*"important"/);
     assert.doesNotMatch(characterRuntime,/bodyRect\.bottom-rootRect\.top-10/);
-    assert.match(css,/v141-abyss-intro:not\(\.complete\)[\s\S]*?justify-content:flex-end !important/);
+    assert.match(css,/v141-abyss-intro:not\(\.complete\)::before\{[\s\S]*?aspect-ratio:9\/16/);
     assert.match(css,/v141-abyss-shell > header\{[\s\S]*?position:absolute !important/);
     assert.match(css,/v154-abyss-portrait[\s\S]*?var\(--v152-abyss-portrait\)/);
     assert.match(css,/v162-abyss-battle-portrait-art\{[\s\S]*?object-fit:cover !important/);

@@ -39,6 +39,31 @@
           就能在短時間衝到滿等。
     */
     const ELEMENT_BOX_EXP_RATIO=0.70;
+    const V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3;
+    const V17342_GLOBAL_GOLD_REWARD_MULTIPLIER=5;
+    const V173_BEGINNER_FOREST_TARGET_BATTLES=20;
+    const V173_BEGINNER_FOREST_FALLBACK_EXP=690;
+
+    function getBeginnerForestBattleExp(){
+        if(typeof window.v133GetExpNextForLevel!=="function"){
+            return V173_BEGINNER_FOREST_FALLBACK_EXP;
+        }
+        let totalRequired=0;
+        for(let level=1;level<=9;level++){
+            totalRequired+=Math.max(1,Math.round(Number(window.v133GetExpNextForLevel(level))||0));
+        }
+        return Math.max(1,Math.ceil(totalRequired/V173_BEGINNER_FOREST_TARGET_BATTLES));
+    }
+
+    window.v173GetBeginnerForestBattleExp=getBeginnerForestBattleExp;
+
+    function getBeginnerForestMonsterExpUnit(){
+        /* V173.40 targeted ~20 battles using one flat battle reward.
+           V173.42 keeps that old 3-monster reference value, but pays per
+           defeated monster so 1 / 2 / 3 monsters are no longer identical. */
+        return Math.max(1,Math.ceil(getBeginnerForestBattleExp()/3));
+    }
+    window.v17342GetBeginnerForestMonsterExpUnit=getBeginnerForestMonsterExpUnit;
 
     function getMonsterExpRankMultiplier(monster){
         const rank=getMonsterRank(monster);
@@ -989,7 +1014,13 @@
     if(typeof awardMonsterGoldDrop==="function"){
         const originalAwardMonsterGoldDrop=awardMonsterGoldDrop;
         awardMonsterGoldDrop=function(){
-            const amount=originalAwardMonsterGoldDrop.apply(this,arguments);
+            const baseAmount=Math.max(0,Number(originalAwardMonsterGoldDrop.apply(this,arguments))||0);
+            const bonusAmount=Math.max(0,Math.floor(baseAmount*(V17342_GLOBAL_GOLD_REWARD_MULTIPLIER-1)));
+            if(bonusAmount>0){
+                gold+=bonusAmount;
+                if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
+            }
+            const amount=baseAmount+bonusAmount;
             recordElementBoxMonsterGold(amount);
             return amount;
         };
@@ -1155,7 +1186,27 @@
                 0
             );
 
-            let finalExp=Math.floor(rankAdjustedExp*V131_EXP_MULTIPLIER);
+            let finalExp=Math.floor(
+                rankAdjustedExp*V131_EXP_MULTIPLIER*V17342_GLOBAL_EXP_REWARD_MULTIPLIER
+            );
+
+            const isBeginnerForestBattle=
+                currentZone==="forest" &&
+                typeof player!=="undefined" &&
+                player &&
+                Math.max(1,Number(player.level)||1)<10;
+
+            if(isBeginnerForestBattle){
+                const beginnerMonsterUnits=currentBattleMonsters.reduce((total,index)=>{
+                    const monster=monsters[index];
+                    return monster ? total+getMonsterExpRankMultiplier(monster) : total;
+                },0);
+                finalExp=Math.max(1,Math.round(
+                    getBeginnerForestMonsterExpUnit()*
+                    Math.max(1,beginnerMonsterUnits)*
+                    V17342_GLOBAL_EXP_REWARD_MULTIPLIER
+                ));
+            }
 
             /* 元素匣（自動掛機）只給70%EXP，金幣/掉落/材料不受影響
                （那些各自獨立的函式完全沒有被這裡動到）。 */

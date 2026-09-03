@@ -52,12 +52,12 @@ test("character and shop are the only two primary entrances",()=>{
     assert.ok((28-19)/28>=.30&&(28-19)/28<=.40);
 });
 
-test("six secondary entrances form two substantial vertical button rails",()=>{
-    assert.equal(count(actions,/class="home-card home-card-secondary"/g),6);
-    ["rest","synthesis","quest","bestiary","achievement","announcement"].forEach(type=>{
+test("eight secondary entrances form two substantial vertical button rails",()=>{
+    assert.equal(count(actions,/class="home-card home-card-secondary"/g),8);
+    ["rest","synthesis","quest","bestiary","achievement","announcement","offlineExp","system"].forEach(type=>{
         assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)"));
     });
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,80px\);[\s\S]*grid-template-rows:repeat\(3,82px\);[\s\S]*min-height:256px/);
+    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,80px\);[\s\S]*grid-template-rows:repeat\(4,82px\);[\s\S]*min-height:343px/);
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
     assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:80px;[\s\S]*height:82px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
     assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:59px/);
@@ -66,15 +66,13 @@ test("six secondary entrances form two substantial vertical button rails",()=>{
     assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
 });
 
-test("offline experience and system use complete framed horizontal buttons",()=>{
-    assert.equal(count(actions,/class="home-card home-card-utility"/g),2);
-    assert.match(actions,/home-utility-actions[\s\S]*openHomeFeature\('offlineExp'\)[\s\S]*openHomeFeature\('system'\)/);
-    assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute;[\s\S]*right:0;[\s\S]*left:0;[\s\S]*grid-template-columns:repeat\(2,104px\);[\s\S]*justify-content:space-between;[\s\S]*padding:0 68px/);
-    assert.doesNotMatch(baseCss,/\.home-utility-actions\{[\s\S]{0,360}(?:right:50%|transform:translateX\(50%\))/);
-    assert.match(baseCss,/\.home-card-utility\{[\s\S]*height:46px;[\s\S]*border:1px solid[\s\S]*border-radius:8px;[\s\S]*background:linear-gradient/);
-    assert.ok((104-86)/86>=.20&&(104-86)/86<=.22);
-    assert.ok((46-40)/40>=.15&&(46-40)/40<=.16);
-    assert.equal(396-(68*2)-(104*2),52);
+test("offline experience and system join the existing side rails",()=>{
+    assert.equal(count(actions,/openHomeFeature\('offlineExp'\)/g),1);
+    assert.equal(count(actions,/openHomeFeature\('system'\)/g),1);
+    assert.equal(count(actions,/class="home-card home-card-utility"/g),0);
+    assert.doesNotMatch(actions,/home-utility-actions/);
+    assert.match(actions,/homeIconOfflineExp/);
+    assert.match(actions,/homeIconSystem/);
 });
 
 test("all ten existing entry IDs and click contracts remain intact",()=>{
@@ -103,7 +101,7 @@ test("the historical V54 bridge no longer flattens hierarchy with inline importa
     assert.doesNotMatch(v54Css,/#game-stage #homePage button,[\s\S]*font-size:18px !important/);
 });
 
-test("the roster renderer keeps all character details only in the adventure party",()=>{
+test("the roster renderer keeps all character details only in the adventure party and lays three slots in one row",()=>{
     assert.match(rosterRuntime,/const partyIndexes=getExistingPartyIndexes\(\)\.slice\(0,3\)/);
     assert.doesNotMatch(rosterRuntime,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
     assert.doesNotMatch(rosterRuntime,/home-hud-character-(?:list|row|avatar)/);
@@ -112,17 +110,14 @@ test("the roster renderer keeps all character details only in the adventure part
     assert.match(rosterRuntime,/homeHudExpValue/);
     assert.match(rosterRuntime,/隊伍 '\+partyIndexes\.length\+' \/ 3/);
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
-    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*gap:2px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
+    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:3px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
+    assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*border:1px solid rgba\(190,139,59,.54\);[\s\S]*inset 0 0 13px rgba\(214,158,63,.04\)/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:43px minmax\(0,1fr\);[\s\S]*height:47px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:32px minmax\(0,1fr\);[\s\S]*height:59px/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*border:1px solid rgba\(145,107,53,.38\);[\s\S]*inset 0 0 0 1px rgba\(255,222,146,.02\)/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:45px;[\s\S]*height:45px;[\s\S]*transform:translateX\(-4px\)/);
-    assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:9px;[\s\S]*margin-inline:2px/);
+    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:32px;[\s\S]*height:32px;[\s\S]*transform:none/);
+    assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:8px;[\s\S]*margin-inline:0/);
     ["fire","water","wind","earth"].forEach(element=>assert.match(rosterCss,new RegExp('data-element="'+element+'"')));
-    const previousRosterContainerHeight=(2*2)+2+14+(3*2)+(3*44);
-    const polishedRosterContainerHeight=(3*2)+2+14+(3*2)+(3*46);
-    assert.ok((polishedRosterContainerHeight-previousRosterContainerHeight)/previousRosterContainerHeight>=.05);
-    assert.ok((polishedRosterContainerHeight-previousRosterContainerHeight)/previousRosterContainerHeight<=.08);
 });
 
 test("gold and EXP share one compact formatter without ellipsis",()=>{
@@ -139,31 +134,31 @@ test("the fixed 9:16 home keeps one substantial non-scrolling layout owner",()=>
     assert.match(baseCss,/#homePage\{[\s\S]{0,420}height:100%;[\s\S]{0,120}overflow:hidden/);
     assert.match(baseCss,/\.home-card-grid\{[\s\S]*display:flex;[\s\S]*flex:0 0 auto/);
     assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:90px/);
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*min-height:256px/);
+    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*min-height:343px/);
     assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
 });
 
-test("the full three-character layout fits the fixed home height above the unchanged navigation",()=>{
+test("the full three-character horizontal roster fits the fixed home height above the unchanged navigation",()=>{
     const safeHeight=746.6666667-10-78-(14*2);
     const hudHeight=5+48;
     const actionHeight=1+90+1+256;
-    const rosterHeight=45.5+171;
-    assert.equal(hudHeight+actionHeight+rosterHeight,617.5);
+    const rosterHeight=45.5+3.5+15+3+59+5+2;
     assert.ok(hudHeight+actionHeight+rosterHeight<=safeHeight);
     assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:47px/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:45px;[\s\S]*height:45px/);
+    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:59px/);
+    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:32px;[\s\S]*height:32px/);
 });
 
 test("development cache and visible version advance to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
-    assert.match(index,/<title>四象江湖傳 V173\.39<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.39"[\s\S]*?>V173\.39<\/div>/);
-    assert.match(index,/css\/00-main\.css\?v=173\.39/);
-    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.39/);
-    assert.match(index,/js\/00-main\.js\?v=173\.39/);
-    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.39/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.39/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
+    assert.match(index,/<title>四象江湖傳 V173\.42<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.42"[\s\S]*?>V173\.42<\/div>/);
+    assert.match(index,/css\/00-main\.css\?v=173\.42/);
+    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.42/);
+    assert.match(index,/js\/00-main\.js\?v=173\.42/);
+    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.42/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
 });
 
 console.log("\n"+passed+" V173.39 main-city lobby tests passed.");

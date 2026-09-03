@@ -272,6 +272,59 @@ window.eventToGamePoint = getGamePointFromEvent;
 const SAVE_KEY =
     "battle_full_version_save_v5";
 
+
+/* =====================================================
+   V173.41 — MOBILE SESSION RESUME / BACKGROUND SAVE
+   - The 12~15 second startup sequence remains first-entry only.
+   - A reload inside the same browser tab session skips the long overlay.
+   - Android background/page suspension saves immediately before eviction.
+===================================================== */
+const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
+
+(function installMobileSessionResume(){
+
+    if(window.v17341SessionResumeInstalled){ return; }
+    window.v17341SessionResumeInstalled=true;
+
+    function sessionHasEntered(){
+        try{
+            return window.sessionStorage.getItem(STARTUP_SESSION_READY_KEY)==="1";
+        }catch(_){
+            return false;
+        }
+    }
+
+    function rememberEnteredSession(){
+        try{
+            window.sessionStorage.setItem(STARTUP_SESSION_READY_KEY,"1");
+        }catch(_){ }
+    }
+
+    function persistBeforeSuspend(){
+        try{
+            if(typeof saveGame==="function"){ saveGame(); }
+        }catch(_){ }
+    }
+
+    if(sessionHasEntered()){
+        const startupRoot=document.getElementById("startupLoader");
+        if(startupRoot){
+            startupRoot.hidden=true;
+            startupRoot.dataset.sessionResume="1";
+            startupRoot.setAttribute("aria-hidden","true");
+        }
+    }
+
+    document.addEventListener("v173.20:startup-entered",rememberEnteredSession);
+
+    document.addEventListener("visibilitychange",function(){
+        if(document.hidden){ persistBeforeSuspend(); }
+    });
+
+    window.addEventListener("pagehide",persistBeforeSuspend);
+
+})();
+
 let deleteAllCharactersInProgress=false;
 
 
@@ -2778,6 +2831,17 @@ const CRIT_CHANCE_MIN_AFTER_ANTI_CRIT = 5;
 const MAX_TRAINING_MONSTERS = 8;
 
 
+const BEGINNER_FOREST_NORMAL_DAMAGE_MIN=10;
+const BEGINNER_FOREST_NORMAL_DAMAGE_MAX=15;
+
+function rollBeginnerForestNormalAttackDamage(){
+    return BEGINNER_FOREST_NORMAL_DAMAGE_MIN+
+        Math.floor(
+            Math.random()*
+            (BEGINNER_FOREST_NORMAL_DAMAGE_MAX-BEGINNER_FOREST_NORMAL_DAMAGE_MIN+1)
+        );
+}
+
 const forestMonsters = [
 
     makeZoneMonster("哥布林",3,"fire"),
@@ -2788,6 +2852,12 @@ const forestMonsters = [
     makeZoneMonster("史萊姆",2,"water")
 
 ];
+
+forestMonsters.forEach(monster=>{
+    monster.agilityPoints=0;
+    monster.agility=0;
+    monster.v173BeginnerForest=true;
+});
 
 
 /*
@@ -8417,6 +8487,9 @@ function resetPatrolCharacterToIdle(){
         img.style.width=
             "70px";
 
+        img.style.transform=
+            "none";
+
         img.src=
             PATROL_CHAR_FRONT_B64;
 
@@ -8492,6 +8565,9 @@ function movePatrolCharacterRandomly(){
     const movingUp=
         newTop<patrolCurrentTop;
 
+
+    img.style.transform=
+        "none";
 
     img.src=
         (movingUp ? PATROL_CHAR_BACK_B64 : PATROL_CHAR_FRONT_B64);
@@ -8634,6 +8710,9 @@ function playPatrolFightAnimation(callback){
         img.style.width=
             "120px";
 
+        img.style.transform=
+            "rotate(90deg)";
+
         img.src=
             PATROL_FIGHT1_B64;
 
@@ -8644,6 +8723,9 @@ function playPatrolFightAnimation(callback){
         setTimeout(()=>{
 
             if(img){
+
+                img.style.transform=
+                    "rotate(90deg)";
 
                 img.src=
                     PATROL_FIGHT2_B64;
@@ -17446,14 +17528,21 @@ function processSingleMonsterAttack(monsterIndex,token){
             }
 
 
-            /* 怪物爆擊先完成判定，倍率由唯一傷害 owner 依正式順序套用。 */
+            const isBeginnerForestNormalAttack=
+                currentZone==="forest" &&
+                !castSkillData2 &&
+                monster &&
+                monster.v173BeginnerForest===true;
+
+            /* 新手森林普通攻擊是教學保護值：不吃爆擊，未防禦時固定10～15。 */
             const rageCriticalBonuses=getActiveRageCriticalBonuses(monster);
-            const monsterCritChance=
-                Math.max(
+            const monsterCritChance=isBeginnerForestNormalAttack
+                ?0
+                :Math.max(
                     CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,
                     10+rageCriticalBonuses.chance-(targetStats.antiCrit||0)
                 );
-            const monsterCrit=Math.random()*100<monsterCritChance;
+            const monsterCrit=!isBeginnerForestNormalAttack&&Math.random()*100<monsterCritChance;
             const monsterCritMultiplier=monsterCrit
                 ?Math.min(CRIT_MULTIPLIER_MAX,1.5+rageCriticalBonuses.damage/100)
                 :1;
@@ -17461,6 +17550,8 @@ function processSingleMonsterAttack(monsterIndex,token){
             let damage=
                 isPureControlSkill
                 ?0
+                :isBeginnerForestNormalAttack
+                ?rollBeginnerForestNormalAttackDamage()
                 :castSkillData2
                 ?calculateSkillDamage({
                     skill:castSkillData2,
@@ -31889,6 +31980,14 @@ function clearBattleLog(){
 
     $("battleInfo")
         .innerHTML="";
+
+    /* V173.42: Element Box can use potions while no battle is running.
+       Carry those notices into the next battle-info panel exactly once. */
+    const pendingElementBoxNotices=
+        typeof window!=="undefined"&&Array.isArray(window.v17342PendingBattleNotices)
+            ? window.v17342PendingBattleNotices.splice(0)
+            : [];
+    pendingElementBoxNotices.forEach(message=>addBattleLog(message));
 
 
     /*

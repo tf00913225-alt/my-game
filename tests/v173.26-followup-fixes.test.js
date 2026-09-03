@@ -109,10 +109,10 @@ test("status popup stays below the HP damage lane",()=>{
 });
 
 test("development release advances to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
-    assert.match(index,/<title>四象江湖傳 V173\.39<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.39"/);
-    assert.match(index,/>V173\.39<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
+    assert.match(index,/<title>四象江湖傳 V173\.42<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.42"/);
+    assert.match(index,/>V173\.42<\/div>/);
 });
 
 console.log("\n"+passed+" V173.39 follow-up regression tests passed.");

@@ -149,15 +149,16 @@
     line-height:29px !important;
 }
 
-/* Home party cards: the sole complete character-information area. */
+/* Home party HUD: header plus up to three equal character cells in one horizontal row. */
 #game-stage #homePage .v146-home-roster{
     position:relative;
     z-index:3;
     display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
     flex:0 0 auto;
-    gap:2px;
+    gap:3px;
     margin:45.5px 10px 0;
-    padding:3.5px 7px;
+    padding:3.5px 7px 5px;
     border:1px solid rgba(190,139,59,.54);
     border-radius:11px;
     color:#f4e7c8;
@@ -165,6 +166,7 @@
     box-shadow:0 5px 13px rgba(0,0,0,.46),inset 0 0 13px rgba(214,158,63,.04);
 }
 #game-stage #homePage .v146-home-roster > header{
+    grid-column:1/-1;
     display:flex;align-items:center;justify-content:space-between;
     min-height:15px;color:#f0cb70;font-size:11px;line-height:15px;
     letter-spacing:.05em;
@@ -172,21 +174,22 @@
 #game-stage #homePage .v146-home-roster > header span{color:#c7ad76;font-size:9px;font-weight:800;}
 #game-stage #homePage .v146-home-character{
     display:grid;
-    grid-template-columns:43px minmax(0,1fr);
-    gap:6px;
+    grid-template-columns:32px minmax(0,1fr);
+    gap:4px;
     align-items:center;
-    height:47px;
-    padding:1.5px 7px 1.5px 2px;
+    min-width:0;
+    height:59px;
+    padding:3px 4px 3px 2px;
     border:1px solid rgba(145,107,53,.38);
-    border-radius:9px;
+    border-radius:8px;
     background:linear-gradient(90deg,rgba(29,19,12,.9),rgba(8,8,7,.82));
     box-shadow:inset 0 0 0 1px rgba(255,222,146,.02),0 2px 5px rgba(0,0,0,.3);
 }
 #game-stage #homePage .v146-home-avatar{
-    width:45px;
-    height:45px;
+    width:32px;
+    height:32px;
     overflow:hidden;
-    transform:translateX(-4px);
+    transform:none;
     border:1px solid rgba(220,174,86,.84);
     border-radius:50%;
     background:#090806;
@@ -199,15 +202,15 @@
 #game-stage #homePage .v146-home-character[data-element="water"] .v146-home-avatar{box-shadow:0 0 8px rgba(66,129,184,.34),0 2px 7px rgba(0,0,0,.58);}
 #game-stage #homePage .v146-home-character[data-element="wind"] .v146-home-avatar{box-shadow:0 0 8px rgba(58,151,110,.3),0 2px 7px rgba(0,0,0,.58);}
 #game-stage #homePage .v146-home-character[data-element="earth"] .v146-home-avatar{box-shadow:0 0 8px rgba(186,142,63,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-stage #homePage .v146-home-character-main{display:grid;gap:1px;min-width:0;}
+#game-stage #homePage .v146-home-character-main{display:grid;gap:2px;min-width:0;}
 #game-stage #homePage .v146-home-character-main > div:first-child{
-    display:flex;align-items:center;justify-content:space-between;gap:6px;
-    min-width:0;font-size:11px;line-height:13px;
+    display:flex;align-items:center;justify-content:space-between;gap:3px;
+    min-width:0;font-size:9px;line-height:11px;
 }
 #game-stage #homePage .v146-home-character-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-stage #homePage .v146-home-character-main span{color:#e2c58b;font-size:10px;font-weight:800;white-space:nowrap;}
+#game-stage #homePage .v146-home-character-main span{color:#e2c58b;font-size:8px;font-weight:800;white-space:nowrap;}
 #game-stage #homePage .v146-home-resource{
-    position:relative;height:9px;margin-inline:2px;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(36,16,16,.88);
+    position:relative;height:8px;margin-inline:0;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(36,16,16,.88);
 }
 #game-stage #homePage .v146-home-resource.sp{background:rgba(12,23,48,.78);}
 #game-stage #homePage .v146-home-resource i{
@@ -215,7 +218,7 @@
 }
 #game-stage #homePage .v146-home-resource.sp i{background:linear-gradient(#659bff,#2455bd);}
 #game-stage #homePage .v146-home-resource strong{
-    position:absolute;inset:0;z-index:2;color:#fff;font-size:8px;line-height:8px;text-align:center;text-shadow:0 1px 2px #000;
+    position:absolute;inset:0;z-index:2;color:#fff;font-size:6.5px;line-height:7px;text-align:center;text-shadow:0 1px 2px #000;white-space:nowrap;
 }
 
 /* Shop: quantity, live total and buy button remain on one stable row. */

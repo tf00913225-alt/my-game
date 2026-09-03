@@ -52,3 +52,43 @@
         grid-column:1/-1;
     }
 }
+
+
+/* V173.42 — shared recovery section and active-session edit lock. */
+#autoBattleSettingsPanel .v17342-element-box-shared{
+    display:block;
+    margin:8px 0 0;
+    padding:9px;
+    border:1px solid rgba(193,144,67,.62);
+    border-radius:11px;
+    background:linear-gradient(160deg,rgba(42,30,18,.92),rgba(10,9,7,.96));
+}
+#autoBattleSettingsPanel .v17342-element-box-shared-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:7px;
+    color:#f2ce83;
+}
+#autoBattleSettingsPanel .v17342-element-box-shared-head b{font-size:14px;}
+#autoBattleSettingsPanel .v17342-element-box-shared-head span{font-size:11px;color:#bba57a;}
+#autoBattleSettingsPanel .v17342-element-box-lock-notice{
+    margin:7px 0;
+    padding:8px 10px;
+    border:1px solid rgba(216,89,59,.72);
+    border-radius:9px;
+    color:#ffd7b8;
+    background:rgba(80,25,17,.86);
+    font-size:12px;
+    font-weight:900;
+    text-align:center;
+}
+#autoBattleSettingsPanel.v17342-settings-locked select:disabled,
+#autoBattleSettingsPanel.v17342-settings-locked input:disabled{
+    opacity:.48;
+    filter:saturate(.45);
+}
+#autoBattleSettingsPanel.v17342-settings-locked #autoBattleButton:disabled{
+    opacity:.55;
+}

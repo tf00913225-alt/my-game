@@ -722,7 +722,7 @@
             ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
             ["商店","assets/ui/home-shop-v147.png","openHomeFeature('shop')"],
             ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"],
-            ["返回","assets/ui/map-return.png",isAbyss?"v146ExitAbyssMap()":"showPage('home')"]
+            ["主城","assets/ui/nav-home.png","showPage('home')"]
         ];
         return buttons.map(button=>
             '<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'">'+
@@ -736,8 +736,19 @@
         const nav=document.getElementById("v141DungeonNav");
         if(!page){ return; }
         const isAbyss=!!page.querySelector(".v141-abyss-shell,.v141-abyss-intro");
-        const topReturn=document.getElementById("v146AbyssReturn");
-        if(topReturn){ topReturn.remove(); }
+        let topReturn=document.getElementById("v146AbyssReturn");
+        if(isAbyss&&!topReturn){
+            topReturn=document.createElement("button");
+            topReturn.id="v146AbyssReturn";
+            topReturn.type="button";
+            topReturn.className="v146-abyss-return";
+            topReturn.setAttribute("aria-label","返回上一層");
+            topReturn.innerHTML='<img src="assets/ui/map-return.png" alt="">';
+            topReturn.onclick=window.v146ExitAbyssMap;
+            page.appendChild(topReturn);
+        }else if(!isAbyss&&topReturn){
+            topReturn.remove();
+        }
         if(nav){
             const mode=isAbyss?"abyss":"daily";
             if(nav.dataset.v148Mode!==mode||nav.children.length!==5){

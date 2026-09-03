@@ -782,6 +782,12 @@
         const phaseLabels={boss:"等待挑戰",chest:"寶箱待開啟",portal:"寶箱已領取・傳送點已開啟"};
         return "目前進度：第 "+abyssState.floor+" / 5 層・"+(phaseLabels[abyssState.phase]||"挑戰進行中");
     }
+    function abyssBattleInfoMarkup(){
+        const source=document.getElementById("battleInfo");
+        const html=source&&String(source.innerHTML||"").trim();
+        return html||'<div class="v17342-abyss-battle-empty">尚無戰鬥資訊</div>';
+    }
+
     function renderAbyss(){
         if(abyssState.phase==="complete"){
             return '<div class="v141-abyss-intro complete"><div class="v141-abyss-seal">破</div><h3>本輪深淵已通關</h3><p>深淵寶箱已開啟。可重新開始下一輪挑戰。</p><button onclick="v141ResetAbyss()">重新挑戰</button></div>';
@@ -803,7 +809,8 @@
         return '<div class="v141-abyss-shell"><header><b>深淵 第'+floor+'/5層</b><span>'+escapeHtml(abyssState.message||'點擊地面移動角色')+'</span></header>'+
             '<div id="v141AbyssMap" class="v141-abyss-map floor-'+floor+'" onclick="v141AbyssMoveByEvent(event)">'+
             '<div id="v141AbyssSpeech" class="v141-abyss-speech"></div>'+boss+portal+chest+
-            '<div id="v141AbyssPlayer" class="v141-abyss-player" style="left:'+abyssState.x+'%;top:'+abyssState.y+'%"><span></span><small>玩家</small></div></div></div>';
+            '<div id="v141AbyssPlayer" class="v141-abyss-player" style="left:'+abyssState.x+'%;top:'+abyssState.y+'%"><span></span><small>玩家</small></div></div>'+
+            '<section class="v17342-abyss-battle-info" aria-label="戰鬥資訊"><b>戰鬥資訊</b><div>'+abyssBattleInfoMarkup()+'</div></section></div>';
     }
 
     function syncAbyssPlayerArt(){
@@ -1127,8 +1134,8 @@
             }
             const indexes=getExistingPartyIndexes();
             const avgNeed=indexes.length?indexes.reduce((sum,index)=>sum+(Number(getPartyCharacterByIndex(index).expNext)||0),0)/indexes.length:0;
-            const exp=Math.max(100,Math.floor(avgNeed*.15));
-            const rewardGold=2000+window.v141GetHighestCharacterLevel()*50;
+            const exp=Math.max(300,Math.floor(avgNeed*.45));
+            const rewardGold=(2000+window.v141GetHighestCharacterLevel()*50)*5;
             if(ticket&&!addItem(ticket,1)){ alert("背包空間不足，寶箱尚未開啟。"); return; }
             sharedExp+=exp; gold+=rewardGold; abyssState.phase="complete"; abyssState.clears=(abyssState.clears||0)+1;
             persistAbyss(); rebuildInventorySlots(); updateGoldDisplay(); saveGame();

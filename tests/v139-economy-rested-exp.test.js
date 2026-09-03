@@ -119,8 +119,8 @@ test("monster EXP keeps ×3.5, rank multipliers, and element-box 70%",()=>{
     assert.match(v131Source,/finalExp=Math\.round\(finalExp\*ELEMENT_BOX_EXP_RATIO\)/);
 });
 
-test("EXP dungeon grants 11% of the party's current average level requirement",()=>{
-    assert.match(v132Source,/const EXP_DUNGEON_REWARD_RATIO=0\.11/);
+test("EXP dungeon grants 33% of the party's current average level requirement",()=>{
+    assert.match(v132Source,/const EXP_DUNGEON_REWARD_RATIO=0\.33/);
     assert.match(
         v132Source,
         /Math\.floor\(\(total\/indexes\.length\)\*EXP_DUNGEON_REWARD_RATIO\)/
@@ -209,8 +209,8 @@ test("modular item art is permanent guidance and current assets are cache-versio
     assert.match(uiGuidelines,/新增約 100 個一般道具/);
     assert.match(loaderSource,/js\/32-v139-rested-experience\.js/);
     assert.match(loaderSource,/css\/37-v139-rested-experience\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.39"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.39/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.42"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.42/);
 });
 
 console.log("\nV139 economy/rested EXP suite: "+passed+" tests passed.");

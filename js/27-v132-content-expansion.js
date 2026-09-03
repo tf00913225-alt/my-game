@@ -2095,7 +2095,7 @@
        落在使用者指定的每日約10～12%區間。看廣告雙倍仍沿用既有
        流程，因此一般領取約11%、雙倍領取約22%。
     */
-    const EXP_DUNGEON_REWARD_RATIO=0.11;
+    const EXP_DUNGEON_REWARD_RATIO=0.33;
 
     function getExpDungeonRewardExp(){
         const indexes=getExistingPartyIndexes();

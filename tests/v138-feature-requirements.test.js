@@ -114,9 +114,9 @@ test("EXP dungeon reward is 11% of the party's average current expNext",()=>{
         getPartyCharacterByIndex:index=>players[index]
     });
     vm.runInContext(extractFunction(v132Source,"getExpDungeonRewardExp"),ctx);
-    ctx.EXP_DUNGEON_REWARD_RATIO=0.11;
-    assert.equal(vm.runInContext("getExpDungeonRewardExp()",ctx),6050);
-    assert.match(v132Source,/const EXP_DUNGEON_REWARD_RATIO=0\.11/);
+    ctx.EXP_DUNGEON_REWARD_RATIO=0.33;
+    assert.equal(vm.runInContext("getExpDungeonRewardExp()",ctx),18150);
+    assert.match(v132Source,/const EXP_DUNGEON_REWARD_RATIO=0\.33/);
 });
 
 test("equipment dungeon always keeps one BOSS and four elites",()=>{
@@ -180,8 +180,8 @@ test("set bonuses and skill costs are visible before extra detail clicks",()=>{
 });
 
 test("current cache version reaches the loader and all dynamic assets",()=>{
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.39/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.39"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.42/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.42"/);
 });
 
 console.log("\nV138 feature suite: "+passed+" tests passed.");

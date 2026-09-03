@@ -52,8 +52,8 @@ function load(overrides={}){
 }
 
 test("V158 and V159 remain ordered before the final V169 runtimes",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.39/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
     assert.match(loader,/css\/47-v158-combat-tuning\.css/);
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
@@ -103,7 +103,7 @@ test("default monster evasion is level times 0.3 capped at 30 without replacing 
     const custom={level:20,agilityPoints:12,evasion:37};
     const context=load({
         monsters:[missing,formerGeneratedValue,custom],
-        zoneConfig:{forest:{monsters:()=>[missing,formerGeneratedValue,custom]}}
+        zoneConfig:{desert:{monsters:()=>[missing,formerGeneratedValue,custom]}}
     });
     assert.equal(missing.evasion,6);
     assert.equal(formerGeneratedValue.evasion,24);
