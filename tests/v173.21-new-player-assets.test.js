@@ -45,7 +45,7 @@ test("all supplied wind icons are mapped to their matching final skill owners",(
     assert.match(main,/const skillIconImages=elementSkillIconMap;/);
 });
 
-test("quest milestones use bright unopened art and dim opened art after claiming",()=>{
+test("quest milestones keep claimable chests bright while unavailable and claimed states share the dim treatment",()=>{
     [
         "assets/ui/quest-chest-closed-v173.21.webp",
         "assets/ui/quest-chest-open-v173.21.webp"
@@ -54,7 +54,8 @@ test("quest milestones use bright unopened art and dim opened art after claiming
     assert.match(quests,/open:"assets\/ui\/quest-chest-open-v173\.21\.webp"/);
     assert.match(quests,/claimed\?milestoneChestImages\.open:milestoneChestImages\.closed/);
     assert.match(questCss,/\.quest-milestone-chest\{[\s\S]*?opacity:1 !important;[\s\S]*?filter:none !important;/);
-    assert.match(questCss,/\.quest-milestone\.claimed \.quest-milestone-chest\{[\s\S]*?saturate\(\.42\) brightness\(\.58\)/);
+    assert.match(questCss,/\.quest-milestone:not\(\.reached\) \.quest-milestone-chest,[\s\S]*?\.quest-milestone\.claimed \.quest-milestone-chest\{[\s\S]*?saturate\(\.35\) brightness\(\.58\)/);
+    assert.match(questCss,/\.quest-milestone\.reached:not\(\.claimed\) \.quest-milestone-slot::after\{/);
 });
 
 test("male patrol art switches front and back images for every element",()=>{
