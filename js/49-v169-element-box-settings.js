@@ -124,11 +124,14 @@
 
     if(typeof switchAutoSettingsCharacter==="function"){
         const previous=switchAutoSettingsCharacter;
-        switchAutoSettingsCharacter=function(){
-            if(elementBoxIsActive()){ notifyLocked(); return false; }
+        switchAutoSettingsCharacter=function(initializing){
+            /* openHomeFeature('autoBattleSettings') uses true only to populate the
+               existing form. That initialization is not a player edit and must
+               never show the locked warning. */
+            if(elementBoxIsActive()&&initializing!==true){ notifyLocked(); return false; }
             const result=previous.apply(this,arguments);
             syncSharedRecoveryForm();
-            if(typeof saveGame==="function"){ saveGame(); }
+            if(!elementBoxIsActive()&&typeof saveGame==="function"){ saveGame(); }
             return result;
         };
     }
@@ -191,7 +194,15 @@
         const panel=document.getElementById(SETTINGS_PANEL_ID);
         const status=panel&&panel.querySelector?panel.querySelector(".auto-premium-status"):null;
 
-        CONTROL_IDS.forEach(id=>{ const field=document.getElementById(id); if(field){ field.disabled=active; } });
+        /* Keep setting controls technically enabled so taps reach the capture
+           guard and can explain the lock. The guard prevents the edit itself. */
+        CONTROL_IDS.forEach(id=>{
+            const field=document.getElementById(id);
+            if(!field){ return; }
+            field.disabled=false;
+            field.setAttribute("aria-disabled",active?"true":"false");
+            field.dataset.v169Locked=active?"1":"0";
+        });
         if(primary){
             primary.setAttribute("onclick","v169SaveElementBoxSettings()");
             primary.textContent=active?"先停止後設定":"套用並啟動";
