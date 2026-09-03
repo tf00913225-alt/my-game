@@ -1,5 +1,5 @@
 name: V173.42 Player Flow
-# retry 6
+# retry 7
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
       - name: Apply V173.42 changes
         run: python3 .github/scripts/v17342-player-flow.py
 
-      - name: Sync previous current-release assertions
+      - name: Sync intentional V173.42 assertions
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -42,6 +42,14 @@ jobs:
               s=s.replace('173\\.41','173\\.42')
               s=s.replace('173.41','173.42')
               p.write_text(s)
+
+          p=Path('tests/v154-current-request.test.js')
+          s=p.read_text()
+          old='assert.match(css,/v141-abyss-intro:not\\(\\.complete\\)[\\s\\S]*?justify-content:flex-end !important/);'
+          new='assert.match(css,/v141-abyss-intro:not\\(\\.complete\\)::before\\{[\\s\\S]*?aspect-ratio:9\\/16/);'
+          if old not in s:
+              raise SystemExit('V154 abyss cover assertion not found')
+          p.write_text(s.replace(old,new,1))
           PY
 
       - name: Focused V173.42 regression
