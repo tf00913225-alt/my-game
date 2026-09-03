@@ -33,8 +33,10 @@ jobs:
         run: |
           python3 -c 'from pathlib import Path; p=Path("js/39-v143-skill-animation.js"); s=p.read_text(); old="            if(!sprite.targetBounds){\n                const bounds=sideAreaBounds(current.targetSide);"; new="            if(!sprite.targetBounds&&!sprite.fixedFormation){\n                const bounds=sideAreaBounds(current.targetSide);"; assert s.count(old)==1; p.write_text(s.replace(old,new,1))'
 
-      - name: Update legacy Ice Arrow Rain expectations
-        run: python3 .github/scripts/v17339-update-v166-ice-rain-test.py
+      - name: Update Ice Arrow Rain regression expectations
+        run: |
+          python3 .github/scripts/v17339-update-v166-ice-rain-test.py
+          python3 .github/scripts/v17339-update-stale-ice-rain-tests.py
 
       - name: Check animation syntax
         run: node --check js/39-v143-skill-animation.js
@@ -43,6 +45,9 @@ jobs:
         run: |
           node tests/v150-ice-arrow-rain-vfx.test.js
           node tests/v166-water-vfx.test.js
+          node tests/v173.5-bugfixes.test.js
+          node tests/v173.11-abyss-vfx-dungeon.test.js
+          node tests/v173.13-canvas-vfx-abyss-input.test.js
           node tests/v173.23-wind-vfx.test.js
           node tests/v173.39-earth-light-vfx.test.js
 
@@ -70,6 +75,7 @@ jobs:
           rm -f .github/workflows/v17339-vfx-footprint-repair.yml
           rm -f .github/scripts/v17339-vfx-footprint-repair.py
           rm -f .github/scripts/v17339-update-v166-ice-rain-test.py
+          rm -f .github/scripts/v17339-update-stale-ice-rain-tests.py
 
       - name: Commit repair
         run: |
