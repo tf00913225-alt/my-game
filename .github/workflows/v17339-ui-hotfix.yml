@@ -26,7 +26,9 @@ jobs:
           node-version: 24
 
       - name: Apply UI hotfix
-        run: python3 .github/scripts/v17339-ui-hotfix.py
+        run: |
+          python3 .github/scripts/v17339-ui-hotfix.py
+          python3 .github/scripts/v17339-ui-hotfix-fit.py
 
       - name: Focused creation and home regressions
         run: |
@@ -66,6 +68,7 @@ jobs:
         run: |
           rm -rf node_modules
           rm -f .github/scripts/v17339-ui-hotfix.py
+          rm -f .github/scripts/v17339-ui-hotfix-fit.py
           rm -f .github/scripts/v17339-ui-hotfix-check.mjs
           rm -f .github/workflows/v17339-ui-hotfix.yml
 
