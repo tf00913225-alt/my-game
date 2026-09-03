@@ -18,15 +18,8 @@ assert.ok(actionStart>=0&&actionEnd>actionStart,"main-city action markup exists"
 const actions=index.slice(actionStart,actionEnd);
 
 let passed=0;
-function test(name,callback){
-    callback();
-    passed++;
-    console.log("✓ "+name);
-}
-
-function count(source,pattern){
-    return (source.match(pattern)||[]).length;
-}
+function test(name,callback){callback();passed++;console.log("✓ "+name);}
+function count(source,pattern){return (source.match(pattern)||[]).length;}
 
 test("the HUD keeps only city identity, resources and DEV tools",()=>{
     assert.match(index,/class="home-city-hud"[^>]*aria-label="主城與資源資訊"/);
@@ -54,9 +47,7 @@ test("character and shop are the only two primary entrances",()=>{
 
 test("eight secondary entrances form two substantial vertical button rails",()=>{
     assert.equal(count(actions,/class="home-card home-card-secondary"/g),8);
-    ["rest","synthesis","quest","bestiary","achievement","announcement","offlineExp","system"].forEach(type=>{
-        assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)"));
-    });
+    ["rest","synthesis","quest","bestiary","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
     assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,80px\);[\s\S]*grid-template-rows:repeat\(4,82px\);[\s\S]*min-height:343px/);
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
     assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:80px;[\s\S]*height:82px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
@@ -76,11 +67,7 @@ test("offline experience and system join the existing side rails",()=>{
 });
 
 test("all ten existing entry IDs and click contracts remain intact",()=>{
-    const entries={
-        Character:"character",Shop:"shop",Rest:"rest",Synthesis:"synthesis",Quest:"quest",
-        Bestiary:"bestiary",Achievement:"achievement",Announcement:"announcement",
-        OfflineExp:"offlineExp",System:"system"
-    };
+    const entries={Character:"character",Shop:"shop",Rest:"rest",Synthesis:"synthesis",Quest:"quest",Bestiary:"bestiary",Achievement:"achievement",Announcement:"announcement",OfflineExp:"offlineExp",System:"system"};
     Object.entries(entries).forEach(([id,type])=>{
         assert.equal(count(actions,new RegExp('id="homeIcon'+id+'"','g')),1);
         assert.equal(count(actions,new RegExp("openHomeFeature\\('"+type+"'\\)",'g')),1);
@@ -101,7 +88,7 @@ test("the historical V54 bridge no longer flattens hierarchy with inline importa
     assert.doesNotMatch(v54Css,/#game-stage #homePage button,[\s\S]*font-size:18px !important/);
 });
 
-test("the roster renderer keeps all character details only in the adventure party and lays three slots in one row",()=>{
+test("the roster renderer keeps all character details only in the adventure party and lays three enlarged slots in one row",()=>{
     assert.match(rosterRuntime,/const partyIndexes=getExistingPartyIndexes\(\)\.slice\(0,3\)/);
     assert.doesNotMatch(rosterRuntime,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
     assert.doesNotMatch(rosterRuntime,/home-hud-character-(?:list|row|avatar)/);
@@ -113,10 +100,10 @@ test("the roster renderer keeps all character details only in the adventure part
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:3px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
     assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*border:1px solid rgba\(190,139,59,.54\);[\s\S]*inset 0 0 13px rgba\(214,158,63,.04\)/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:32px minmax\(0,1fr\);[\s\S]*height:59px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:36px minmax\(0,1fr\);[\s\S]*height:64px/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*border:1px solid rgba\(145,107,53,.38\);[\s\S]*inset 0 0 0 1px rgba\(255,222,146,.02\)/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:32px;[\s\S]*height:32px;[\s\S]*transform:none/);
-    assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:8px;[\s\S]*margin-inline:0/);
+    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:36px;[\s\S]*height:36px;[\s\S]*transform:none/);
+    assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:10px;[\s\S]*margin-inline:0/);
     ["fire","water","wind","earth"].forEach(element=>assert.match(rosterCss,new RegExp('data-element="'+element+'"')));
 });
 
@@ -138,19 +125,19 @@ test("the fixed 9:16 home keeps one substantial non-scrolling layout owner",()=>
     assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
 });
 
-test("the full three-character horizontal roster fits the fixed home height above the unchanged navigation",()=>{
+test("the enlarged three-character horizontal roster still fits above the unchanged navigation",()=>{
     const safeHeight=746.6666667-10-78-(14*2);
     const hudHeight=5+48;
     const actionHeight=1+90+1+256;
-    const rosterHeight=45.5+3.5+15+3+59+5+2;
+    const rosterHeight=45.5+3.5+15+3+64+5+2;
     assert.ok(hudHeight+actionHeight+rosterHeight<=safeHeight);
     assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:59px/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:32px;[\s\S]*height:32px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:64px/);
+    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:36px;[\s\S]*height:36px/);
 });
 
-test("development cache and visible version advance to V173.39",()=>{
+test("development cache and visible version stay synchronized",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
     assert.match(index,/<title>四象江湖傳 V173\.42<\/title>/);
     assert.match(index,/aria-label="目前版本 V173\.42"[\s\S]*?>V173\.42<\/div>/);

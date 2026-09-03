@@ -64,18 +64,28 @@ function makeEconomyContext(){
         {id:"hpPotion100",resource:"hp",recoveryPercent:100,price:180},
         {id:"spPotion100",resource:"sp",recoveryPercent:100,price:220}
     ];
+    const storage=new Map();
     const context=vm.createContext({
         console,
         Math:math,
-        Number,String,Object,Array,Infinity,
+        Number,String,Object,Array,Infinity,JSON,Date,
         player:players[0],player2:null,player3:null,
         players,
+        sharedExp:0,
         potionDefinitions,
         zoneConfig:makeZoneConfig(),
         getMonsterRank:monster=>monster.rank||"regular",
         getExistingPartyIndexes:()=>players.map((_,index)=>index),
         getPartyCharacterByIndex:index=>players[index]||null,
-        getMonsterGoldDrop:()=>0
+        getMonsterGoldDrop:()=>0,
+        localStorage:{
+            getItem:key=>storage.has(key)?storage.get(key):null,
+            setItem:(key,value)=>storage.set(key,String(value))
+        },
+        setTimeout:()=>0,
+        setInterval:()=>0,
+        alert:()=>{},
+        saveGame:()=>{}
     });
     context.window=context;
     vm.runInContext(v133Source,context);
@@ -89,26 +99,27 @@ function test(name,fn){
     console.log("✓ "+name);
 }
 
-test("Lv.1→100 curve is derived from current zone EXP and totals 69,760 effective battles",()=>{
+test("formal growth curve keeps the legacy zone audit but uses the new fast/smooth EXP requirements",()=>{
     const context=makeEconomyContext();
     const audit=vm.runInContext("v139GetExpCurveAudit()",context);
     assert.equal(audit.totalEffectiveBattles,69760);
+    assert.equal(audit.beginnerTotalExp,37950);
 
-    const expected={
-        10:{averageBattleExp:175,targetBattles:15,expNext:2625},
-        30:{averageBattleExp:3806,targetBattles:100,expNext:380600},
-        50:{averageBattleExp:7035,targetBattles:400,expNext:2814000},
-        70:{averageBattleExp:10185,targetBattles:900,expNext:9166500},
-        80:{averageBattleExp:11760,targetBattles:1200,expNext:14112000},
-        90:{averageBattleExp:13335,targetBattles:1700,expNext:22669500},
-        99:{averageBattleExp:14910,targetBattles:4000,expNext:59640000}
+    const expectedExpNext={
+        10:1200,20:8000,30:60000,40:120000,49:200000,50:215000,
+        60:400000,70:650000,80:1000000,90:1500000,95:2000000,99:2800000
     };
     for(const checkpoint of audit.checkpoints){
-        assert.deepEqual(
-            JSON.parse(JSON.stringify(checkpoint)),
-            {level:checkpoint.level,...expected[checkpoint.level]}
-        );
+        assert.equal(checkpoint.expNext,expectedExpNext[checkpoint.level],"Lv"+checkpoint.level+" expNext");
+        assert.ok(checkpoint.averageBattleExp>0,"zone EXP audit remains available");
+        assert.ok(checkpoint.targetBattles>0,"legacy battle audit remains available");
     }
+    assert.ok(expectedExpNext[50]/expectedExpNext[49]<1.08,"Lv49→50 must not cliff");
+    assert.equal(vm.runInContext("v173GetNaturalChargeLevelsPerDay(20)",context),1.30);
+    assert.equal(vm.runInContext("v173GetNaturalChargeLevelsPerDay(50)",context),1.00);
+    assert.equal(vm.runInContext("v173GetNaturalChargeLevelsPerDay(99)",context),0.32);
+    assert.equal(vm.runInContext("v173GetDailyTotalTarget(20)",context),3.00);
+    assert.equal(vm.runInContext("v173GetDailyTotalTarget(99)",context),1.00);
 });
 
 test("monster EXP keeps ×3.5, rank multipliers, and element-box 70%",()=>{

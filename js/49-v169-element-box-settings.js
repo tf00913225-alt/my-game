@@ -15,6 +15,7 @@
     const LOCK_NOTICE_ID="v17342ElementBoxLockNotice";
     const CONTROL_IDS=["autoSettingsCharacterSelect","autoSettingsActionSelect","autoSettingsHP","autoSettingsSP","autoSettingsReturnCity"];
     const IMMEDIATE_FIELD_IDS=["autoSettingsActionSelect","autoSettingsHP","autoSettingsSP","autoSettingsReturnCity"];
+    const LOCKED_SETTING_SELECTOR=".auto-setting-card,.auto-threshold-card,.auto-return-card";
 
     function elementBoxIsActive(){
         if(typeof window.v131GetElementBoxState==="function"){
@@ -103,13 +104,34 @@
         });
     }
 
+    function bindLockedInteractionGuard(){
+        const panel=document.getElementById(SETTINGS_PANEL_ID);
+        if(!panel||typeof panel.addEventListener!=="function"||panel.dataset.v17342LockGuard==="1"){ return; }
+        panel.dataset.v17342LockGuard="1";
+        panel.addEventListener("click",event=>{
+            if(!elementBoxIsActive()){ return; }
+            const target=event&&event.target;
+            if(!target||typeof target.closest!=="function"){ return; }
+            if(target.closest("#"+STOP_BUTTON_ID)){ return; }
+            const setting=target.closest(LOCKED_SETTING_SELECTOR);
+            if(!setting||typeof panel.contains==="function"&&!panel.contains(setting)){ return; }
+            if(typeof event.preventDefault==="function"){ event.preventDefault(); }
+            if(typeof event.stopPropagation==="function"){ event.stopPropagation(); }
+            notifyLocked();
+            syncSharedRecoveryForm();
+        },true);
+    }
+
     if(typeof switchAutoSettingsCharacter==="function"){
         const previous=switchAutoSettingsCharacter;
-        switchAutoSettingsCharacter=function(){
-            if(elementBoxIsActive()){ notifyLocked(); return false; }
+        switchAutoSettingsCharacter=function(initializing){
+            /* openHomeFeature('autoBattleSettings') uses true only to populate the
+               existing form. That initialization is not a player edit and must
+               never show the locked warning. */
+            if(elementBoxIsActive()&&initializing!==true){ notifyLocked(); return false; }
             const result=previous.apply(this,arguments);
             syncSharedRecoveryForm();
-            if(typeof saveGame==="function"){ saveGame(); }
+            if(!elementBoxIsActive()&&typeof saveGame==="function"){ saveGame(); }
             return result;
         };
     }
@@ -172,7 +194,15 @@
         const panel=document.getElementById(SETTINGS_PANEL_ID);
         const status=panel&&panel.querySelector?panel.querySelector(".auto-premium-status"):null;
 
-        CONTROL_IDS.forEach(id=>{ const field=document.getElementById(id); if(field){ field.disabled=active; } });
+        /* Keep setting controls technically enabled so taps reach the capture
+           guard and can explain the lock. The guard prevents the edit itself. */
+        CONTROL_IDS.forEach(id=>{
+            const field=document.getElementById(id);
+            if(!field){ return; }
+            field.disabled=false;
+            field.setAttribute("aria-disabled",active?"true":"false");
+            field.dataset.v169Locked=active?"1":"0";
+        });
         if(primary){
             primary.setAttribute("onclick","v169SaveElementBoxSettings()");
             primary.textContent=active?"先停止後設定":"套用並啟動";
@@ -211,8 +241,8 @@
     function afterOpen(type){
         if(type!=="autoBattleSettings"){ return; }
         bindImmediatePersistence();
+        bindLockedInteractionGuard();
         syncElementBoxSettingControls();
-        if(elementBoxIsActive()){ setTimeout(notifyLocked,0); }
     }
     if(typeof openHomeFeature==="function"){
         const previous=openHomeFeature;
@@ -225,5 +255,6 @@
 
     normalizeSharedRecoveryAcrossParty();
     bindImmediatePersistence();
+    bindLockedInteractionGuard();
     syncElementBoxSettingControls();
 })();

@@ -124,7 +124,7 @@ test("elite special loot uses one 19% cumulative table and isolates the normal l
     assert.match(coreSource,/v141EliteDropIsolation:true/);
     assert.match(v132Source,/if\(window\.v132ActiveDungeonRun\)\{ return; \}/);
     assert.match(v131Source,/rank==="elite"\)\{ return 1\.5; \}/);
-    assert.match(v133Source,/rank==="elite"\s*\? 2/);
+    assert.match(v133Source,/rank==="elite"\s*\?\s*2/);
 });
 
 test("final EXP curve follows the eight-monster zones and deterministic 10% elite expectation",()=>{
