@@ -1,5 +1,5 @@
 name: V173.41 Session Resume
-# retry 2
+# retry 3
 
 on:
   push:
@@ -29,19 +29,6 @@ jobs:
 
       - name: Apply V173.41 lifecycle fix
         run: python3 .github/scripts/v17341-session-resume.py
-
-      - name: Repair focused test block extraction
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('tests/v173.41-session-resume.test.js')
-          s=p.read_text()
-          old='''const marker="/* =====================================================\\\\n   V173.41 — MOBILE SESSION RESUME / BACKGROUND SAVE";\nconst start=main.indexOf(marker.replace(/\\\\n/g,"\\n"));\nconst end=main.indexOf("/* =====================================================\\n   基本設定",start);\nassert.ok(start>=0 && end>start,"V173.41 lifecycle block must live in js/00-main.js");\nconst block=main.slice(start,end);'''
-          new='''const keyIndex=main.indexOf('const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";');\nconst start=main.lastIndexOf("/* =====================================================",keyIndex);\nconst end=main.indexOf("let deleteAllCharactersInProgress",keyIndex);\nassert.ok(keyIndex>=0 && start>=0 && end>keyIndex,"V173.41 lifecycle block must live in js/00-main.js");\nconst block=main.slice(start,end);'''
-          if old not in s:
-              raise SystemExit('focused extraction anchor not found')
-          p.write_text(s.replace(old,new,1))
-          PY
 
       - name: Focused session-resume regression
         run: node tests/v173.41-session-resume.test.js
