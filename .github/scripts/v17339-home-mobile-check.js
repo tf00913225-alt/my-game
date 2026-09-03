@@ -1,4 +1,5 @@
 "use strict";
+// Staging verifier; the final workflow removes this file after the portrait checks pass.
 const assert=require("node:assert/strict");
 const {chromium}=require("playwright-core");
 const executablePath=process.env.BROWSER_PATH;
