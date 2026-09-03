@@ -29,6 +29,19 @@ jobs:
       - name: Apply VFX geometry repair
         run: python3 .github/scripts/v17339-vfx-footprint-repair.py apply
 
+      - name: Route fixed formation before generic battlefield
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path("js/39-v143-skill-animation.js")
+          text=path.read_text()
+          old='            if(!sprite.targetBounds){\n                const bounds=sideAreaBounds(current.targetSide);'
+          new='            if(!sprite.targetBounds&&!sprite.fixedFormation){\n                const bounds=sideAreaBounds(current.targetSide);'
+          if text.count(old)!=1:
+              raise SystemExit("generic battlefield branch mismatch")
+          path.write_text(text.replace(old,new,1))
+          PY
+
       - name: Check animation syntax
         run: node --check js/39-v143-skill-animation.js
 
