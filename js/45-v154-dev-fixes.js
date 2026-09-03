@@ -139,7 +139,9 @@
         notice.className="v17342-element-box-use-notice";
         notice.textContent=String(message||"");
         stack.appendChild(notice);
-        requestAnimationFrame(()=>notice.classList.add("show"));
+        const revealNotice=()=>notice.classList.add("show");
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(revealNotice); }
+        else{ revealNotice(); }
         setTimeout(()=>{
             notice.classList.remove("show");
             setTimeout(()=>{
