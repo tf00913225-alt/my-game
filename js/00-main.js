@@ -2778,14 +2778,33 @@ const CRIT_CHANCE_MIN_AFTER_ANTI_CRIT = 5;
 const MAX_TRAINING_MONSTERS = 8;
 
 
+const BEGINNER_FOREST_NORMAL_DAMAGE_MIN=10;
+const BEGINNER_FOREST_NORMAL_DAMAGE_MAX=15;
+
+function rollBeginnerForestNormalAttackDamage(){
+    return BEGINNER_FOREST_NORMAL_DAMAGE_MIN+
+        Math.floor(
+            Math.random()*
+            (BEGINNER_FOREST_NORMAL_DAMAGE_MAX-BEGINNER_FOREST_NORMAL_DAMAGE_MIN+1)
+        );
+}
+
+function makeBeginnerForestMonster(name,level,element){
+    const monster=makeZoneMonster(name,level,element);
+    monster.agilityPoints=0;
+    monster.agility=0;
+    monster.v173BeginnerForest=true;
+    return monster;
+}
+
 const forestMonsters = [
 
-    makeZoneMonster("哥布林",3,"fire"),
-    makeZoneMonster("史萊姆",2,"water"),
-    makeZoneMonster("哥布林",3,"fire"),
-    makeZoneMonster("史萊姆",2,"water"),
-    makeZoneMonster("哥布林",3,"fire"),
-    makeZoneMonster("史萊姆",2,"water")
+    makeBeginnerForestMonster("哥布林",3,"fire"),
+    makeBeginnerForestMonster("史萊姆",2,"water"),
+    makeBeginnerForestMonster("哥布林",3,"fire"),
+    makeBeginnerForestMonster("史萊姆",2,"water"),
+    makeBeginnerForestMonster("哥布林",3,"fire"),
+    makeBeginnerForestMonster("史萊姆",2,"water")
 
 ];
 
@@ -8417,6 +8436,9 @@ function resetPatrolCharacterToIdle(){
         img.style.width=
             "70px";
 
+        img.style.transform=
+            "none";
+
         img.src=
             PATROL_CHAR_FRONT_B64;
 
@@ -8492,6 +8514,9 @@ function movePatrolCharacterRandomly(){
     const movingUp=
         newTop<patrolCurrentTop;
 
+
+    img.style.transform=
+        "none";
 
     img.src=
         (movingUp ? PATROL_CHAR_BACK_B64 : PATROL_CHAR_FRONT_B64);
@@ -8634,6 +8659,9 @@ function playPatrolFightAnimation(callback){
         img.style.width=
             "120px";
 
+        img.style.transform=
+            "rotate(90deg)";
+
         img.src=
             PATROL_FIGHT1_B64;
 
@@ -8644,6 +8672,9 @@ function playPatrolFightAnimation(callback){
         setTimeout(()=>{
 
             if(img){
+
+                img.style.transform=
+                    "rotate(90deg)";
 
                 img.src=
                     PATROL_FIGHT2_B64;
@@ -17446,14 +17477,21 @@ function processSingleMonsterAttack(monsterIndex,token){
             }
 
 
-            /* 怪物爆擊先完成判定，倍率由唯一傷害 owner 依正式順序套用。 */
+            const isBeginnerForestNormalAttack=
+                currentZone==="forest" &&
+                !castSkillData2 &&
+                monster &&
+                monster.v173BeginnerForest===true;
+
+            /* 新手森林普通攻擊是教學保護值：不吃爆擊，未防禦時固定10～15。 */
             const rageCriticalBonuses=getActiveRageCriticalBonuses(monster);
-            const monsterCritChance=
-                Math.max(
+            const monsterCritChance=isBeginnerForestNormalAttack
+                ?0
+                :Math.max(
                     CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,
                     10+rageCriticalBonuses.chance-(targetStats.antiCrit||0)
                 );
-            const monsterCrit=Math.random()*100<monsterCritChance;
+            const monsterCrit=!isBeginnerForestNormalAttack&&Math.random()*100<monsterCritChance;
             const monsterCritMultiplier=monsterCrit
                 ?Math.min(CRIT_MULTIPLIER_MAX,1.5+rageCriticalBonuses.damage/100)
                 :1;
@@ -17461,6 +17499,8 @@ function processSingleMonsterAttack(monsterIndex,token){
             let damage=
                 isPureControlSkill
                 ?0
+                :isBeginnerForestNormalAttack
+                ?rollBeginnerForestNormalAttackDamage()
                 :castSkillData2
                 ?calculateSkillDamage({
                     skill:castSkillData2,

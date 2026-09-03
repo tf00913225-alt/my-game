@@ -87,10 +87,10 @@ test("status text sits below damage and stays fully visible for one second",()=>
     assert.match(statusCss,/10%,90%\{opacity:1/);
 });
 
-test("development cache and visible build advance to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
-    assert.match(index,/<title>四象江湖傳 V173\.39<\/title>/);
-    assert.match(index,/>V173\.39<\/div>/);
+test("development cache and visible build advance to V173.40",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.40"/);
+    assert.match(index,/<title>四象江湖傳 V173\.40<\/title>/);
+    assert.match(index,/>V173\.40<\/div>/);
 });
 
-console.log("\n"+passed+" V173.39 UI polish tests passed.");
+console.log("\n"+passed+" V173.40 UI polish tests passed.");

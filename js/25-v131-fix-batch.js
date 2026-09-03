@@ -39,6 +39,21 @@
           就能在短時間衝到滿等。
     */
     const ELEMENT_BOX_EXP_RATIO=0.70;
+    const V173_BEGINNER_FOREST_TARGET_BATTLES=20;
+    const V173_BEGINNER_FOREST_FALLBACK_EXP=690;
+
+    function getBeginnerForestBattleExp(){
+        if(typeof window.v133GetExpNextForLevel!=="function"){
+            return V173_BEGINNER_FOREST_FALLBACK_EXP;
+        }
+        let totalRequired=0;
+        for(let level=1;level<=9;level++){
+            totalRequired+=Math.max(1,Math.round(Number(window.v133GetExpNextForLevel(level))||0));
+        }
+        return Math.max(1,Math.ceil(totalRequired/V173_BEGINNER_FOREST_TARGET_BATTLES));
+    }
+
+    window.v173GetBeginnerForestBattleExp=getBeginnerForestBattleExp;
 
     function getMonsterExpRankMultiplier(monster){
         const rank=getMonsterRank(monster);
@@ -1156,6 +1171,16 @@
             );
 
             let finalExp=Math.floor(rankAdjustedExp*V131_EXP_MULTIPLIER);
+
+            const isBeginnerForestBattle=
+                currentZone==="forest" &&
+                typeof player!=="undefined" &&
+                player &&
+                Math.max(1,Number(player.level)||1)<10;
+
+            if(isBeginnerForestBattle){
+                finalExp=getBeginnerForestBattleExp();
+            }
 
             /* 元素匣（自動掛機）只給70%EXP，金幣/掉落/材料不受影響
                （那些各自獨立的函式完全沒有被這裡動到）。 */
