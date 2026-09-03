@@ -5,6 +5,7 @@ on:
     branches: [dev]
     paths:
       - .github/workflows/v17339-home-final-polish.yml
+      - .github/scripts/v17339-home-mobile-check.js
 
 permissions:
   contents: write

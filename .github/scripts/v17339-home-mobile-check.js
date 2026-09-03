@@ -73,6 +73,7 @@ function makeCharacter(id,element,level){
                     labelFont:parseFloat(getComputedStyle(label).fontSize),
                     utilityCorridor:ur[1].left-ur[0].right,
                     utilityVisualWidth:ur[0].width,
+                    utilityVisualHeight:ur[0].height,
                     actionRosterGap:rr.top-Math.max(ur[0].bottom,ur[1].bottom),
                     rosterNavGap:nr.top-rr.bottom,
                     rosterMarginTop:parseFloat(getComputedStyle(roster).marginTop),
@@ -81,6 +82,7 @@ function makeCharacter(id,element,level){
                 };
             });
 
+            console.log("METRICS "+viewport.label+" "+JSON.stringify(m));
             assert.equal(m.rows,3,viewport.label+" roster rows");
             assert.equal(m.homeOverflow,"hidden",viewport.label+" home overflow");
             assert.ok(m.homeScroll<=m.homeClient+1,viewport.label+" home must not scroll");
@@ -98,10 +100,7 @@ function makeCharacter(id,element,level){
             assert.ok(m.rosterMarginTop>=8,viewport.label+" roster downshift");
             assert.ok(m.hudRect.top>=m.homeRect.top-1&&m.hudRect.bottom<=m.homeRect.bottom+1,viewport.label+" HUD crop");
             assert.ok(m.rosterRect.top>=m.homeRect.top-1&&m.rosterRect.bottom<=m.homeRect.bottom+1,viewport.label+" roster crop");
-            console.log("✓ "+viewport.label+" portrait layout "+JSON.stringify({
-                utility:[m.utilityWidth,m.utilityHeight],corridor:m.utilityCorridor,
-                rosterNavGap:m.rosterNavGap,home:[m.homeClient,m.homeScroll]
-            }));
+            console.log("✓ "+viewport.label+" portrait layout "+JSON.stringify({utility:[m.utilityWidth,m.utilityHeight],corridor:m.utilityCorridor,rosterNavGap:m.rosterNavGap,home:[m.homeClient,m.homeScroll]}));
             await page.close();
         }
     }finally{
