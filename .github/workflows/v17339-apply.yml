@@ -65,6 +65,10 @@ jobs:
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
 
+      - name: Audit supplied Sprite Sheet dimensions
+        run: |
+          find assets/vfx/earth assets/vfx/light -type f -name '*.png' -print0 | sort -z | xargs -0 -n1 identify -format '%i %wx%h\n'
+
       - name: Run all Node suites
         run: node .github/scripts/ci.mjs tests
 
