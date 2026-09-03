@@ -1,5 +1,5 @@
 name: V173.42 Player Flow
-# retry 10
+# retry 11
 
 on:
   push:
@@ -61,7 +61,6 @@ jobs:
                       '["rest","synthesis","quest","bestiary","achievement","announcement","offlineExp","system"]',1)
           s=s.replace('grid-template-rows:repeat\\(3,82px\\);[\\s\\S]*min-height:256px',
                       'grid-template-rows:repeat\\(4,82px\\);[\\s\\S]*min-height:343px',1)
-
           old_name='test("offline experience and system use complete framed image-over-text buttons"'
           block_start=s.find(old_name)
           if block_start>=0:
@@ -69,14 +68,16 @@ jobs:
               if block_end<0:
                   raise SystemExit('V173.28 utility test end not found')
               block_end+=len('\n});')
-              new_block='''test("offline experience and system join the existing side rails",()=>{
-    assert.equal(count(actions,/openHomeFeature\\('offlineExp'\\)/g),1);
-    assert.equal(count(actions,/openHomeFeature\\('system'\\)/g),1);
-    assert.equal(count(actions,/class="home-card home-card-utility"/g),0);
-    assert.doesNotMatch(actions,/home-utility-actions/);
-    assert.match(actions,/homeIconOfflineExp/);
-    assert.match(actions,/homeIconSystem/);
-});'''
+              new_block='\n'.join([
+                  'test("offline experience and system join the existing side rails",()=>{',
+                  '    assert.equal(count(actions,/openHomeFeature\\(\'offlineExp\'\\)/g),1);',
+                  '    assert.equal(count(actions,/openHomeFeature\\(\'system\'\\)/g),1);',
+                  '    assert.equal(count(actions,/class="home-card home-card-utility"/g),0);',
+                  '    assert.doesNotMatch(actions,/home-utility-actions/);',
+                  '    assert.match(actions,/homeIconOfflineExp/);',
+                  '    assert.match(actions,/homeIconSystem/);',
+                  '});'
+              ])
               s=s[:block_start]+new_block+s[block_end:]
           p.write_text(s)
           PY
