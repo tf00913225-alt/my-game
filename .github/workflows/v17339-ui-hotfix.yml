@@ -1,0 +1,86 @@
+name: V173.39 UI Hotfix
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17339-ui-hotfix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  hotfix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Apply UI hotfix
+        run: python3 .github/scripts/v17339-ui-hotfix.py
+
+      - name: Focused creation and home regressions
+        run: |
+          node tests/v173.2-mobile-touch-scroll.test.js
+          node tests/v173.28-main-city-lobby.test.js
+          node tests/v173.39-main-city-final-polish.test.js
+
+      - name: Prepare mobile browser probe
+        run: |
+          npm install --no-save --no-package-lock playwright-core
+          CHROME_PATH="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          python3 -m http.server 8899 >/tmp/v17339-ui-hotfix-server.log 2>&1 &
+          sleep 1
+
+      - name: Verify creation and home on mobile viewport
+        run: node .github/scripts/v17339-ui-hotfix-check.mjs http://127.0.0.1:8899
+
+      - name: Ensure asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Repository checks
+        run: |
+          node --check .github/scripts/ci.mjs
+          node .github/scripts/ci.mjs syntax
+          node .github/scripts/ci.mjs tests
+          node .github/scripts/ci.mjs resources
+          node .github/scripts/ci.mjs html-ids
+          node .github/scripts/ci.mjs loader
+
+      - name: Remove temporary tooling
+        run: |
+          rm -rf node_modules
+          rm -f .github/scripts/v17339-ui-hotfix.py
+          rm -f .github/scripts/v17339-ui-hotfix-check.mjs
+          rm -f .github/workflows/v17339-ui-hotfix.yml
+
+      - name: Commit UI hotfix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: refine creation readability and home UI"
+
+      - name: Check final diff rules
+        env:
+          CI_BASE_SHA: ${{ github.event.before }}
+        run: CI_HEAD_SHA="$(git rev-parse HEAD)" node .github/scripts/ci.mjs git-diff
+
+      - name: Push to dev
+        run: git push origin HEAD:dev
