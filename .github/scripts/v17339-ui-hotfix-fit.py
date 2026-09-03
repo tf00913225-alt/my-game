@@ -20,4 +20,19 @@ once('''#creationPage .creation-role-description{\n    margin-top:12px;\n    col
 once('''#creationPage .creation-role-tags{\n    display:flex;\n    flex-wrap:wrap;\n    gap:8px;\n    margin-top:10px;''','''#creationPage .creation-role-tags{\n    display:flex;\n    flex-wrap:wrap;\n    gap:6px;\n    margin-top:5px;''','role tags rhythm')
 once('''#creationPage .creation-role-tag{\n    padding:5px 13px;''','''#creationPage .creation-role-tag{\n    padding:3px 12px;''','role tag padding')
 p.write_text(s)
-print('creation fit tightened without reducing typography')
+
+# The focused creation suite is intentionally extended by the first script.
+# Keep its geometry expectations synchronized with this final, tighter fit.
+t=Path('tests/v173.2-mobile-touch-scroll.test.js')
+txt=t.read_text()
+def test_once(old,new,label):
+    global txt
+    c=txt.count(old)
+    if c!=1: raise SystemExit(f'{label}: expected 1 test match, found {c}')
+    txt=txt.replace(old,new,1)
+
+test_once(r'padding:24px 30\.857px 18px;',r'padding:12px 30\.857px 8px;','choice padding expectation')
+test_once(r'line-height:1\.55;',r'line-height:1\.48;','role line-height expectation')
+t.write_text(txt)
+
+print('creation fit tightened and regression synchronized')
