@@ -1,0 +1,347 @@
+name: V173.39 Main City Final Polish
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17339-home-final-polish.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Apply owner-only main-city polish
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def patch_property(path, selector, prop, old, new):
+              file=Path(path)
+              text=file.read_text()
+              pattern=re.compile(r'('+re.escape(selector)+r'\{)(.*?)(\n\})',re.S)
+              match=pattern.search(text)
+              if not match:
+                  raise SystemExit(f"selector not found: {selector} in {path}")
+              body=match.group(2)
+              needle=f"{prop}:{old};"
+              if body.count(needle)!=1:
+                  raise SystemExit(f"property mismatch: {needle} in {selector}")
+              body=body.replace(needle,f"{prop}:{new};",1)
+              text=text[:match.start(2)]+body+text[match.end(2):]
+              file.write_text(text)
+
+          # HUD identity owner: css/00-main.css
+          patch_property("css/00-main.css",".home-hud-identity","inset-inline-start","4px","7px")
+          patch_property("css/00-main.css",".home-hud-kicker","gap","6px","7px")
+          patch_property("css/00-main.css",".home-hud-kicker","font-size","8px","10px")
+          patch_property("css/00-main.css",".home-hud-kicker","line-height","1","1.15")
+
+          # Offline EXP / System owner: css/00-main.css
+          patch_property("css/00-main.css",".home-utility-actions","grid-template-columns","repeat(2,86px)","repeat(2,100px)")
+          patch_property("css/00-main.css",".home-utility-actions","padding","0 82px","0 72px")
+          patch_property("css/00-main.css",".home-card-utility","grid-template-columns","36px minmax(0,1fr)","42px minmax(0,1fr)")
+          patch_property("css/00-main.css",".home-card-utility","height","40px","47px")
+          patch_property("css/00-main.css",".home-card-utility .home-card-icon","width","35px","41px")
+          patch_property("css/00-main.css",".home-card-utility .home-card-icon","height","38px","45px")
+          patch_property("css/00-main.css",".home-card-utility .home-card-label","font-size","10px","12px")
+          patch_property("css/00-main.css",".home-card-utility .home-card-label","line-height","38px","45px")
+
+          # Existing version badge owner: index.html inline style.
+          patch_property("index.html","#game-stage #homePage .home-version-badge","padding","2px 5px 1px","3px 6px 2px")
+          patch_property("index.html","#game-stage #homePage .home-version-badge","font-size","7px","9px")
+
+          # Adventure roster owner: css/42-v146-system-polish.css
+          patch_property("css/42-v146-system-polish.css","#game-stage #homePage .v146-home-roster","margin","1px 10px 0","8px 10px 0")
+          patch_property("css/42-v146-system-polish.css","#game-stage #homePage .v146-home-roster","padding","2px 7px","3px 7px")
+          patch_property("css/42-v146-system-polish.css","#game-stage #homePage .v146-home-character","height","44px","46px")
+
+          # Keep the existing current main-city regression aligned to the new owner values.
+          test=Path("tests/v173.28-main-city-lobby.test.js")
+          source=test.read_text()
+          replacements={
+              r'inset-inline-start:4px/':r'inset-inline-start:7px/',
+              r'repeat\\(2,86px\\)':r'repeat\\(2,100px\\)',
+              r'padding:0 82px/':r'padding:0 72px/',
+              r'height:40px;':r'height:47px;',
+              'assert.ok((98-86)/98>=.10&&(98-86)/98<=.15);':'assert.ok((100-86)/86>=.15&&(100-86)/86<=.20);',
+              'assert.ok((46-40)/46>=.10&&(46-40)/46<=.15);':'assert.ok((47-40)/40>=.15&&(47-40)/40<=.20);',
+              'assert.equal(88-82,6);':'assert.equal(82-72,10);',
+              r'height:44px/':r'height:46px/',
+              'const oldRosterHeight=1+(3*2)+2+14+(3*3)+(3*48);\n    const newRosterHeight=1+(2*2)+2+14+(3*2)+(3*44);\n    assert.ok((oldRosterHeight-newRosterHeight)/oldRosterHeight>=.08);\n    assert.ok((oldRosterHeight-newRosterHeight)/oldRosterHeight<=.10);':
+              'const previousRosterContainerHeight=(2*2)+2+14+(3*2)+(3*44);\n    const polishedRosterContainerHeight=(3*2)+2+14+(3*2)+(3*46);\n    assert.ok((polishedRosterContainerHeight-previousRosterContainerHeight)/previousRosterContainerHeight>=.05);\n    assert.ok((polishedRosterContainerHeight-previousRosterContainerHeight)/previousRosterContainerHeight<=.08);',
+              'const rosterHeight=1+(2*2)+2+14+(3*2)+(3*44);':'const rosterHeight=8+(3*2)+2+14+(3*2)+(3*46);',
+              'assert.equal(hudHeight+actionHeight+rosterHeight,560);':'assert.equal(hudHeight+actionHeight+rosterHeight,575);'
+          }
+          for old,new in replacements.items():
+              count=source.count(old)
+              if count<1:
+                  raise SystemExit(f"main-city test expectation not found: {old}")
+              source=source.replace(old,new)
+          test.write_text(source)
+          PY
+
+      - name: Add focused regression coverage
+        run: |
+          cat > tests/v173.39-main-city-final-polish.test.js <<'EOF'
+          "use strict";
+          const assert=require("node:assert/strict");
+          const fs=require("node:fs");
+          const read=path=>fs.readFileSync(path,"utf8");
+          const base=read("css/00-main.css");
+          const index=read("index.html");
+          const roster=read("css/42-v146-system-polish.css");
+          const runtime=read("js/41-v146-system-polish.js");
+
+          let passed=0;
+          function test(name,callback){ callback(); passed++; console.log("✓ "+name); }
+
+          test("HUD identity grows without changing resource or DEV structure",()=>{
+              assert.match(base,/\.home-hud-identity\{[\s\S]*?align-items:center;[\s\S]*?align-self:stretch;[\s\S]*?inset-inline-start:7px;/);
+              assert.match(base,/\.home-hud-kicker\{[\s\S]*?gap:7px;[\s\S]*?font-size:10px;[\s\S]*?line-height:1\.15;/);
+              assert.match(index,/#game-stage #homePage \.home-version-badge\{[\s\S]*?padding:3px 6px 2px;[\s\S]*?font-size:9px;/);
+              assert.match(base,/\.home-hud-resources\{[\s\S]*?grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+              assert.match(base,/\.home-test-button\{[\s\S]*?height:16px;[\s\S]*?opacity:\.78/);
+              assert.doesNotMatch(index,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
+          });
+
+          test("utility buttons grow 15 to 20 percent while preserving a central corridor",()=>{
+              assert.match(base,/\.home-utility-actions\{[\s\S]*?grid-template-columns:repeat\(2,100px\);[\s\S]*?justify-content:space-between;[\s\S]*?padding:0 72px;/);
+              assert.match(base,/\.home-card-utility\{[\s\S]*?grid-template-columns:42px minmax\(0,1fr\);[\s\S]*?height:47px;/);
+              assert.match(base,/\.home-card-utility \.home-card-icon\{[\s\S]*?width:41px;[\s\S]*?height:45px;/);
+              assert.match(base,/\.home-card-utility \.home-card-label\{[\s\S]*?font-size:12px;[\s\S]*?line-height:45px;/);
+              assert.ok((100-86)/86>=.15&&(100-86)/86<=.20);
+              assert.ok((47-40)/40>=.15&&(47-40)/40<=.20);
+              assert.equal(420-(72*2)-(100*2),76);
+          });
+
+          test("adventure roster fills the lower area without changing avatar or HP SP rules",()=>{
+              assert.match(roster,/\.v146-home-roster\{[\s\S]*?gap:2px;[\s\S]*?margin:8px 10px 0;[\s\S]*?padding:3px 7px;/);
+              assert.match(roster,/\.v146-home-character\{[\s\S]*?grid-template-columns:43px minmax\(0,1fr\);[\s\S]*?height:46px;/);
+              assert.match(roster,/\.v146-home-avatar\{[\s\S]*?width:45px;[\s\S]*?height:45px;[\s\S]*?transform:translateX\(-4px\)/);
+              assert.match(roster,/\.v146-home-resource\{[\s\S]*?height:9px;[\s\S]*?margin-inline:2px/);
+              const previous=(2*2)+2+14+(3*2)+(3*44);
+              const current=(3*2)+2+14+(3*2)+(3*46);
+              assert.ok((current-previous)/previous>=.05&&(current-previous)/previous<=.08);
+              assert.match(runtime,/function renderHomeRoster\(\)[\s\S]*?grid\.insertAdjacentElement\("afterend",roster\)/);
+          });
+
+          test("forbidden main-city sizes remain unchanged",()=>{
+              assert.match(base,/\.home-card-primary\{[\s\S]*?height:90px;/);
+              assert.match(base,/\.home-card-secondary\{[\s\S]*?width:80px;[\s\S]*?height:82px;/);
+              assert.match(base,/\.home-secondary-actions\{[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?grid-template-rows:repeat\(3,82px\);/);
+              assert.doesNotMatch(base,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
+          });
+
+          test("fixed home height still has safe room above the unchanged bottom navigation",()=>{
+              const safeHeight=746.6666667-10-78-(14*2);
+              const hudHeight=5+48;
+              const actionHeight=1+90+1+256;
+              const rosterHeight=8+(3*2)+2+14+(3*2)+(3*46);
+              assert.equal(hudHeight+actionHeight+rosterHeight,575);
+              assert.ok(hudHeight+actionHeight+rosterHeight<=safeHeight);
+              assert.match(base,/#homePage\{[\s\S]{0,420}height:100%;[\s\S]{0,120}overflow:hidden/);
+          });
+
+          console.log("\n"+passed+" V173.39 main-city final-polish tests passed.");
+          EOF
+
+      - name: Check all repository suites
+        run: |
+          node --check .github/scripts/ci.mjs
+          node .github/scripts/ci.mjs syntax
+          node .github/scripts/ci.mjs tests
+          node .github/scripts/ci.mjs resources
+          node .github/scripts/ci.mjs html-ids
+          node .github/scripts/ci.mjs loader
+
+      - name: Install browser verifier
+        run: |
+          mkdir -p /tmp/v17339-ui-browser
+          cd /tmp/v17339-ui-browser
+          npm init -y >/dev/null 2>&1
+          npm install --silent --no-fund --no-audit playwright-core
+          command -v google-chrome || command -v chromium || command -v chromium-browser
+
+      - name: Verify actual portrait layouts
+        run: |
+          cat > /tmp/v17339-mobile-check.js <<'EOF'
+          "use strict";
+          const assert=require("node:assert/strict");
+          const {chromium}=require("playwright-core");
+          const executablePath=process.env.BROWSER_PATH;
+
+          function makeCharacter(id,element,level){
+              return {
+                  id,element,gender:"male",level,exp:0,expNext:1000,
+                  attack:10,vitality:10,energy:10,intelligence:10,spirit:10,agility:10,
+                  bonusHP:0,bonusSP:0,attributePoints:0,skillPoints:0,
+                  hp:500,sp:200,activeBuffs:[],statusEffects:[],isDefending:false
+              };
+          }
+
+          (async()=>{
+              const browser=await chromium.launch({headless:true,executablePath,args:["--no-sandbox"]});
+              try{
+                  for(const viewport of [{width:1080,height:1920,label:"1080x1920"},{width:390,height:844,label:"390x844"}]){
+                      const page=await browser.newPage({viewport:{width:viewport.width,height:viewport.height},deviceScaleFactor:1});
+                      await page.goto("http://127.0.0.1:8899/?v17339-home-final-polish=1",{waitUntil:"domcontentloaded",timeout:30000});
+                      await page.waitForFunction(()=>window.__v146SystemPolishInstalled&&typeof updateUI==="function",null,{timeout:30000});
+                      await page.evaluate(({make1,make2,make3})=>{
+                          Object.assign(player,make1);
+                          player2=make2;
+                          player3=make3;
+                          if(Array.isArray(characters)){
+                              [["player2",make2.id],["player3",make3.id]].forEach(([id,name])=>{
+                                  if(!characters.some(character=>character&&character.id===id)){ characters.push({id,name}); }
+                              });
+                          }
+                          updateUI();
+                          const loader=document.getElementById("startupLoader");
+                          if(loader){ loader.style.display="none"; }
+                          const creation=document.getElementById("creationPage");
+                          if(creation){ creation.style.display="none"; }
+                          document.querySelectorAll(".page").forEach(node=>node.classList.toggle("active",node.id==="homePage"));
+                      },{
+                          make1:makeCharacter("赤炎旅者","fire",50),
+                          make2:makeCharacter("寒泉旅者","water",50),
+                          make3:makeCharacter("青嵐旅者","wind",50)
+                      });
+                      await page.waitForFunction(()=>document.querySelectorAll("#v146HomeRoster .v146-home-character").length===3,null,{timeout:10000});
+
+                      const m=await page.evaluate(()=>{
+                          const rect=node=>{ const r=node.getBoundingClientRect(); return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}; };
+                          const home=document.getElementById("homePage");
+                          const hud=home.querySelector(".home-city-hud");
+                          const identity=home.querySelector(".home-hud-identity");
+                          const kicker=home.querySelector(".home-hud-kicker");
+                          const badge=home.querySelector(".home-version-badge");
+                          const utility=[...home.querySelectorAll(".home-card-utility")].sort((a,b)=>a.getBoundingClientRect().left-b.getBoundingClientRect().left);
+                          const icon=utility[0].querySelector(".home-card-icon");
+                          const label=utility[0].querySelector(".home-card-label");
+                          const roster=document.getElementById("v146HomeRoster");
+                          const nav=document.getElementById("bottomNav");
+                          const hr=rect(home),hur=rect(hud),ir=rect(identity),kr=rect(kicker),rr=rect(roster),nr=rect(nav);
+                          const ur=utility.map(rect);
+                          return {
+                              innerHeight:window.innerHeight,
+                              documentScroll:document.documentElement.scrollHeight,
+                              bodyScroll:document.body.scrollHeight,
+                              homeClient:home.clientHeight,
+                              homeScroll:home.scrollHeight,
+                              homeOverflow:getComputedStyle(home).overflow,
+                              kickerFont:parseFloat(getComputedStyle(kicker).fontSize),
+                              badgeFont:parseFloat(getComputedStyle(badge).fontSize),
+                              identityCenterOffset:Math.abs((ir.top+ir.height/2)-(hur.top+hur.height/2)),
+                              utilityWidth:parseFloat(getComputedStyle(utility[0]).width),
+                              utilityHeight:parseFloat(getComputedStyle(utility[0]).height),
+                              iconWidth:parseFloat(getComputedStyle(icon).width),
+                              iconHeight:parseFloat(getComputedStyle(icon).height),
+                              labelFont:parseFloat(getComputedStyle(label).fontSize),
+                              utilityCorridor:ur[1].left-ur[0].right,
+                              utilityVisualWidth:ur[0].width,
+                              actionRosterGap:rr.top-Math.max(ur[0].bottom,ur[1].bottom),
+                              rosterNavGap:nr.top-rr.bottom,
+                              rosterMarginTop:parseFloat(getComputedStyle(roster).marginTop),
+                              homeRect:hr,hudRect:hur,rosterRect:rr,navRect:nr,
+                              rows:roster.querySelectorAll(".v146-home-character").length
+                          };
+                      });
+
+                      assert.equal(m.rows,3,viewport.label+" roster rows");
+                      assert.equal(m.homeOverflow,"hidden",viewport.label+" home overflow");
+                      assert.ok(m.homeScroll<=m.homeClient+1,viewport.label+" home must not scroll");
+                      assert.ok(m.documentScroll<=m.innerHeight+1,viewport.label+" document must not scroll");
+                      assert.ok(m.bodyScroll<=m.innerHeight+1,viewport.label+" body must not scroll");
+                      assert.ok(m.kickerFont>=10,viewport.label+" city identity font");
+                      assert.ok(m.badgeFont>=9,viewport.label+" version font");
+                      assert.ok(m.identityCenterOffset<=5,viewport.label+" identity vertical centering");
+                      assert.ok(m.utilityWidth>=99&&m.utilityHeight>=46,viewport.label+" utility size");
+                      assert.ok(m.iconWidth>=40&&m.iconHeight>=44,viewport.label+" utility icon size");
+                      assert.ok(m.labelFont>=12,viewport.label+" utility label size");
+                      assert.ok(m.utilityCorridor>=m.utilityVisualWidth*.55,viewport.label+" central gate corridor");
+                      assert.ok(m.actionRosterGap>=-1,viewport.label+" utility/roster overlap");
+                      assert.ok(m.rosterNavGap>=0,viewport.label+" roster/nav overlap");
+                      assert.ok(m.rosterMarginTop>=8,viewport.label+" roster downshift");
+                      assert.ok(m.hudRect.top>=m.homeRect.top-1&&m.hudRect.bottom<=m.homeRect.bottom+1,viewport.label+" HUD crop");
+                      assert.ok(m.rosterRect.top>=m.homeRect.top-1&&m.rosterRect.bottom<=m.homeRect.bottom+1,viewport.label+" roster crop");
+                      console.log("✓ "+viewport.label+" portrait layout",JSON.stringify({
+                          utility:[m.utilityWidth,m.utilityHeight],corridor:m.utilityCorridor,
+                          rosterNavGap:m.rosterNavGap,home:[m.homeClient,m.homeScroll]
+                      }));
+                      await page.close();
+                  }
+              }finally{
+                  await browser.close();
+              }
+          })().catch(error=>{ console.error(error); process.exit(1); });
+          EOF
+
+          python3 -m http.server 8899 --bind 127.0.0.1 >/tmp/v17339-home-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          sleep 1
+          BROWSER_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          NODE_PATH=/tmp/v17339-ui-browser/node_modules BROWSER_PATH="$BROWSER_PATH" node /tmp/v17339-mobile-check.js
+
+      - name: Record verified owner state
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path("HANDOFF.md")
+          text=path.read_text()
+          section='''## V173.39 主城 UI 最後微調（目前 dev）
+
+> 本輪只調整主城既有三個視覺區塊，不重構、不新增 UI、不修改功能事件或遊戲邏輯。
+
+- `css/00-main.css` 仍是主城 HUD 與入口尺寸 owner：四象主城字級由 8px 調為 10px、身份區略右移並維持垂直置中；金幣、經驗池、DEV 結構與大小未改。
+- `index.html` 既有 `home-version-badge` 內嵌樣式仍是版本徽章 owner：字級由 7px 調為 9px，僅同步放大既有徽章，不新增任何 HUD 資訊。
+- `css/00-main.css` 的離線經驗／系統維持完整底板與金框：86×40 調為 100×47，icon 與文字同比放大，左右各再讓開中央城門；角色／商店與左右六個功能入口尺寸完全不動。
+- `css/42-v146-system-polish.css` 仍是冒險隊伍視覺 owner：容器下移 7px，垂直 padding 由 2px 微增至 3px，每列由 44px 微增至 46px；角色排列、45×45 頭像與 HP/SP 規則不變。
+- `js/41-v146-system-polish.js` 的 `renderHomeRoster()` 未修改；底部導航、背景、事件、角色資料、金幣／經驗邏輯、DEV、戰鬥、技能與存檔皆未修改。
+- 已以實際瀏覽器驗證 1080×1920 核心直向比例與 390×844 手機直向比例：三人隊伍狀態無重疊、無裁切、無頁面捲動，兩顆次級按鈕之間保留中央城門通道。
+
+'''
+          marker='---\n\n'
+          if section in text:
+              raise SystemExit("HANDOFF section already exists")
+          if marker not in text:
+              raise SystemExit("HANDOFF marker missing")
+          path.write_text(text.replace(marker,marker+section,1))
+          PY
+
+      - name: Remove staging workflow
+        run: rm -f .github/workflows/v17339-home-final-polish.yml
+
+      - name: Create final commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git diff --cached --name-only
+          git commit -m "style: finalize V173.39 main-city spacing"
+
+      - name: Check Git diff rules
+        env:
+          CI_BASE_SHA: ${{ github.sha }}
+        run: |
+          CI_HEAD_SHA="$(git rev-parse HEAD)" node .github/scripts/ci.mjs git-diff
+
+      - name: Push final polish to dev
+        run: git push origin HEAD:dev
