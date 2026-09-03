@@ -12,12 +12,13 @@ test("HUD uses the requested logical typography without growing its shell",()=>{
  assert.match(base,/\.home-hud-resources\{[\s\S]*?grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.doesNotMatch(index,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
 });
-test("utility buttons are 104x46 with 40px icons and a 52px centre corridor",()=>{
- assert.match(base,/\.home-utility-actions\{[\s\S]*?bottom:0;[\s\S]*?grid-template-columns:repeat\(2,104px\);[\s\S]*?padding:0 68px;/);
- assert.match(base,/\.home-card-utility\{[\s\S]*?grid-template-columns:40px minmax\(0,1fr\);[\s\S]*?height:46px;/);
- assert.match(base,/\.home-card-utility \.home-card-icon\{[\s\S]*?width:40px;[\s\S]*?height:40px;/);
- assert.match(base,/\.home-card-utility \.home-card-label\{[\s\S]*?font-size:16px;[\s\S]*?letter-spacing:-\.75px;/);
- assert.equal(396-(68*2)-(104*2),52);
+test("utility buttons use image-over-text cards and preserve the centre passage",()=>{
+ assert.match(base,/\.home-utility-actions\{[\s\S]*?bottom:0;[\s\S]*?grid-template-columns:repeat\(2,92px\);[\s\S]*?padding:0 74px;/);
+ assert.match(base,/\.home-card-utility\{[\s\S]*?grid-template-columns:1fr;[\s\S]*?grid-template-rows:52px 24px;[\s\S]*?height:78px;/);
+ assert.match(base,/\.home-card-utility \.home-card-icon\{[\s\S]*?width:100%;[\s\S]*?height:52px;[\s\S]*?border-bottom:1px solid/);
+ assert.match(base,/\.home-card-utility \.home-card-label\{[\s\S]*?font-size:15\.5px;[\s\S]*?line-height:23px;/);
+ assert.match(base,/#app\.no-header \.header,\s*#app:has\(#homePage\.active\) #gameHeaderBar\{[\s\S]*?display:none;/);
+ assert.equal(396-(74*2)-(92*2),64);
 });
 test("roster uses the closest feasible geometry while bottom nav remains fixed",()=>{
  assert.match(roster,/\.v146-home-roster\{[\s\S]*?margin:45\.5px 10px 0;[\s\S]*?padding:3\.5px 7px;/);

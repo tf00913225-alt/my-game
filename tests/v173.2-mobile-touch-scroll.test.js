@@ -128,6 +128,23 @@ test("A touch inside skill levels is allowed once, while the modal background re
     assert.equal(dispatch("pointermove",modalBackground,"touch"),true);
 });
 
+test("Creation step one keeps native geometry while using the larger readable typography",()=>{
+    assert.match(css,/#creationPage \.creation-showcase\{[\s\S]*height:820px;[\s\S]*min-height:820px;/);
+    assert.match(css,/#creationPage \.creation-portrait-image\{[\s\S]*width:108%;[\s\S]*height:104%;/);
+    assert.match(css,/#creationPage \.creation-choice-panel\{[\s\S]*padding:12px 30\.857px 8px;/);
+    assert.match(css,/#creationPage \.creation-subtitle\{[\s\S]*font-size:36px;/);
+    assert.match(css,/#creationPage \.creation-step-progress\{[\s\S]*font-size:27px;/);
+    assert.match(css,/#creationPage \.creation-section-kicker\{[\s\S]*font-size:30px;/);
+    assert.match(css,/#creationPage \.creation-gender-option\{[\s\S]*height:90px;[\s\S]*font-size:35px;/);
+    assert.match(css,/#creationPage \.creation-element-grid\{[\s\S]*grid-template-columns:repeat\(4,1fr\)/);
+    assert.match(css,/#creationPage \.element-option \.element-name\{[\s\S]*font-size:29px;/);
+    assert.match(css,/#creationPage \.creation-role-title\{[\s\S]*font-size:46px;/);
+    assert.match(css,/#creationPage \.creation-role-description\{[\s\S]*font-size:34px;[\s\S]*line-height:1\.48;/);
+    assert.match(css,/#creationPage \.creation-role-tag\{[\s\S]*font-size:26\.5px;/);
+    assert.match(css,/#creationPage \.creation-input\{[\s\S]*height:110\.571px;[\s\S]*font-size:42px;/);
+    assert.match(css,/#creationPage \.creation-next,[\s\S]*#creationPage \.creation-back\{[\s\S]*height:132px;/);
+});
+
 test("The published mobile fix remains covered in the V173.39 cache release",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.39"/);
     assert.match(index,/css\/29-v125-character-creation-native\.css\?v=173\.39/);

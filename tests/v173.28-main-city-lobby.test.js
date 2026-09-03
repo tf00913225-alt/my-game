@@ -66,15 +66,15 @@ test("six secondary entrances form two substantial vertical button rails",()=>{
     assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
 });
 
-test("offline experience and system use complete framed horizontal buttons",()=>{
+test("offline experience and system use complete framed image-over-text buttons",()=>{
     assert.equal(count(actions,/class="home-card home-card-utility"/g),2);
     assert.match(actions,/home-utility-actions[\s\S]*openHomeFeature\('offlineExp'\)[\s\S]*openHomeFeature\('system'\)/);
-    assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute;[\s\S]*right:0;[\s\S]*left:0;[\s\S]*grid-template-columns:repeat\(2,104px\);[\s\S]*justify-content:space-between;[\s\S]*padding:0 68px/);
+    assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute;[\s\S]*right:0;[\s\S]*left:0;[\s\S]*grid-template-columns:repeat\(2,92px\);[\s\S]*justify-content:space-between;[\s\S]*padding:0 74px/);
     assert.doesNotMatch(baseCss,/\.home-utility-actions\{[\s\S]{0,360}(?:right:50%|transform:translateX\(50%\))/);
-    assert.match(baseCss,/\.home-card-utility\{[\s\S]*height:46px;[\s\S]*border:1px solid[\s\S]*border-radius:8px;[\s\S]*background:linear-gradient/);
-    assert.ok((104-86)/86>=.20&&(104-86)/86<=.22);
-    assert.ok((46-40)/40>=.15&&(46-40)/40<=.16);
-    assert.equal(396-(68*2)-(104*2),52);
+    assert.match(baseCss,/\.home-card-utility\{[\s\S]*grid-template-columns:1fr;[\s\S]*grid-template-rows:52px 24px;[\s\S]*height:78px;[\s\S]*border:1px solid/);
+    assert.match(baseCss,/\.home-card-utility \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:52px;[\s\S]*border-bottom:1px solid/);
+    assert.match(baseCss,/\.home-card-utility \.home-card-label\{[\s\S]*font-size:15\.5px;[\s\S]*line-height:23px/);
+    assert.equal(396-(74*2)-(92*2),64);
 });
 
 test("all ten existing entry IDs and click contracts remain intact",()=>{
