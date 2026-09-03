@@ -5,6 +5,26 @@
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active{
     grid-template-columns:minmax(0,1fr) minmax(96px,112px) minmax(78px,94px);
     gap:6px;
+    min-height:88px;
+    padding-block:12px;
+    overflow:visible;
+    box-sizing:border-box;
+}
+
+#autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active .auto-premium-status-copy{
+    min-width:0;
+    overflow:visible;
+}
+
+#autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active .auto-premium-status-copy small{
+    white-space:normal;
+    overflow:visible;
+}
+
+body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-panel{
+    box-sizing:border-box !important;
+    padding:2px 2px 12px !important;
+    overflow:visible !important;
 }
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status #autoBattleButton{
@@ -46,6 +66,7 @@
 @media (max-width:380px){
     #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active{
         grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+        min-height:132px;
     }
 
     #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active .auto-premium-status-copy{
@@ -91,4 +112,17 @@
 }
 #autoBattleSettingsPanel.v17342-settings-locked #autoBattleButton:disabled{
     opacity:.55;
+}
+
+/* While active, controls stay visually locked but their parent cards remain tappable
+   so the runtime can explain why editing is unavailable. */
+#autoBattleSettingsPanel.v17342-settings-locked .auto-setting-card,
+#autoBattleSettingsPanel.v17342-settings-locked .auto-threshold-card,
+#autoBattleSettingsPanel.v17342-settings-locked .auto-return-card{
+    cursor:not-allowed;
+}
+#autoBattleSettingsPanel.v17342-settings-locked .auto-setting-control,
+#autoBattleSettingsPanel.v17342-settings-locked .auto-threshold-card .auto-premium-dropdown,
+#autoBattleSettingsPanel.v17342-settings-locked .auto-return-card input{
+    pointer-events:none;
 }
