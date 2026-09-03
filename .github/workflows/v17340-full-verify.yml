@@ -1,0 +1,73 @@
+name: V173.40 Full Verify
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17340-full-verify.yml
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    name: Repository checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 20
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Check CI script syntax
+        run: node --check .github/scripts/ci.mjs
+
+      - name: Check all project JavaScript syntax
+        run: node .github/scripts/ci.mjs syntax
+
+      - name: Ensure asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo rm -f /etc/apt/sources.list.d/azure-cli.list /etc/apt/sources.list.d/azure-cli.sources
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run all Node unit and integration suites
+        run: node .github/scripts/ci.mjs tests
+
+      - name: Check static local resources
+        run: node .github/scripts/ci.mjs resources
+
+      - name: Check duplicate HTML IDs
+        run: node .github/scripts/ci.mjs html-ids
+
+      - name: Check release entries and loader integrity
+        run: node .github/scripts/ci.mjs loader
+
+      - name: Remove verification workflow
+        run: rm -f .github/workflows/v17340-full-verify.yml
+
+      - name: Commit cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "chore: clean V173.40 verification"
+
+      - name: Check final Git diff
+        run: |
+          CI_BASE_SHA="45ebf0ce301195f689a258a87aa045baf450b2c3" \
+          CI_HEAD_SHA="$(git rev-parse HEAD)" \
+          node .github/scripts/ci.mjs git-diff
+
+      - name: Push cleanup to dev
+        run: git push origin HEAD:dev
