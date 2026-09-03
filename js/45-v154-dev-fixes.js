@@ -139,16 +139,32 @@
         notice.className="v17342-element-box-use-notice";
         notice.textContent=String(message||"");
         stack.appendChild(notice);
-        const revealNotice=()=>notice.classList.add("show");
+        const setNoticeVisible=visible=>{
+            if(!notice.classList){ return; }
+            if(typeof notice.classList.toggle==="function"){
+                notice.classList.toggle("show",!!visible);
+                return;
+            }
+            const method=visible?"add":"remove";
+            if(typeof notice.classList[method]==="function"){
+                notice.classList[method]("show");
+            }
+        };
+        const revealNotice=()=>setNoticeVisible(true);
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(revealNotice); }
         else{ revealNotice(); }
-        setTimeout(()=>{
-            notice.classList.remove("show");
+        if(typeof setTimeout==="function"){
             setTimeout(()=>{
-                if(notice.parentNode){ notice.remove(); }
-                if(stack&&stack.childElementCount===0&&stack.parentNode){ stack.remove(); }
-            },180);
-        },2200);
+                setNoticeVisible(false);
+                setTimeout(()=>{
+                    if(notice.parentNode&&typeof notice.remove==="function"){ notice.remove(); }
+                    const childCount=Number.isFinite(Number(stack&&stack.childElementCount))
+                        ?Number(stack.childElementCount)
+                        :(stack&&Array.isArray(stack.children)?stack.children.length:1);
+                    if(stack&&childCount===0&&stack.parentNode&&typeof stack.remove==="function"){ stack.remove(); }
+                },180);
+            },2200);
+        }
     }
     window.v17342ShowElementBoxUseNotice=showElementBoxUseNotice;
 
