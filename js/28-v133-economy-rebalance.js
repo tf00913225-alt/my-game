@@ -1,20 +1,10 @@
 /*
-   V133 — 經濟／養成重新設計：
-   1. Lv.1~100升級曲線與經驗池基礎成長
-   2. 怪物金幣掉落rank倍率調整（精英×2、BOSS×5，取代原本的×3/×8）
-   3. 商店價格改成看「帳號內已建立角色的最高等級」決定階級倍率
-   4. 藥水補品重新整理（新增30%階、商店下架100%階但保留道具資料）
-   5. 預留未來金幣消耗系統的共用工具函式
-
-   ★ 整體原則：EXP仍只進既有sharedExp／角色exp資料流；持續充能只保存
-   時間戳與解鎖狀態，不建立第二個經驗池。戰鬥能力、掉落與副本強度不動。
+   V133 — 經濟／養成重新設計 owner
+   EXP仍只進既有 sharedExp／角色 exp；自然充能只保存時間戳與解鎖狀態。
 */
 (function installV133EconomyRebalance(){
     "use strict";
 
-    /* =====================================================
-       1. Lv.1~100 升級曲線 + Lv20後經驗池持續充能
-       ===================================================== */
     const MAX_CHARACTER_LEVEL=100;
     const TRAINING_EXP_MULTIPLIER=3.5;
     const DAY_MS=24*60*60*1000;
@@ -33,9 +23,6 @@
         {minLevel:81,maxLevel:90,key:"zone9",averageGroupSize:4.5,fallbackAverageExp:13335},
         {minLevel:91,maxLevel:99,key:"zone10",averageGroupSize:4.5,fallbackAverageExp:14910}
     ];
-
-    /* 保留既有戰鬥場數audit，供野怪產出檢查；正式升級需求不再被
-       練功區切換綁死，避免Lv10/20等區域交界形成EXP斷層。 */
     const TARGET_BATTLE_ANCHORS=[
         {level:1,battles:3},{level:10,battles:15},{level:20,battles:45},
         {level:30,battles:100},{level:40,battles:250},{level:50,battles:400},
@@ -44,7 +31,7 @@
         {level:99,battles:4000}
     ];
 
-    /* Lv1~20快速成長；Lv20後平滑銜接長期曲線。 */
+    /* Lv1~20快速期；20後以少量錨點線性銜接，49→50只有約7.5%增加。 */
     const EXP_REQUIREMENT_ANCHORS=[
         {level:1,value:300},{level:5,value:600},{level:10,value:1200},
         {level:15,value:2500},{level:20,value:8000},{level:30,value:60000},
@@ -100,51 +87,42 @@
     }
 
     function getTrainingExpProfile(level){
-        const safeLevel=Math.min(MAX_CHARACTER_LEVEL-1,Math.max(1,Math.floor(Number(level)||1)));
-        return TRAINING_ZONE_EXP_PROFILES.find(profile=>
-            safeLevel>=profile.minLevel&&safeLevel<=profile.maxLevel
-        )||TRAINING_ZONE_EXP_PROFILES[TRAINING_ZONE_EXP_PROFILES.length-1];
+        const safeLevel=Math.min(99,Math.max(1,Math.floor(Number(level)||1)));
+        return TRAINING_ZONE_EXP_PROFILES.find(profile=>safeLevel>=profile.minLevel&&safeLevel<=profile.maxLevel)||TRAINING_ZONE_EXP_PROFILES[9];
     }
-
     function getTrainingZoneRoster(profile){
         try{
             if(typeof zoneConfig==="undefined"||!zoneConfig[profile.key]){ return null; }
             const source=zoneConfig[profile.key].monsters;
             const roster=typeof source==="function"?source():source;
-            return Array.isArray(roster)&&roster.length>0?roster:null;
+            return Array.isArray(roster)&&roster.length?roster:null;
         }catch(_){ return null; }
     }
-
     function getTrainingZoneAverageExpForLevel(level){
         const profile=getTrainingExpProfile(level);
         const roster=getTrainingZoneRoster(profile);
         if(!roster){ return profile.fallbackAverageExp; }
-        const averageWeightedMonsterExp=roster.reduce((sum,monster)=>{
+        const average=roster.reduce((sum,monster)=>{
             if(!monster){ return sum; }
-            const monsterLevel=Math.max(1,Number(monster.level)||1);
-            return sum+monsterLevel*10*getCurveMonsterRankMultiplier(monster);
+            return sum+Math.max(1,Number(monster.level)||1)*10*getCurveMonsterRankMultiplier(monster);
         },0)/roster.length;
-        return Math.max(1,Math.round(
-            averageWeightedMonsterExp*profile.averageGroupSize*TRAINING_EXP_MULTIPLIER
-        ));
+        return Math.max(1,Math.round(average*profile.averageGroupSize*TRAINING_EXP_MULTIPLIER));
     }
-
     function getTargetBattlesForLevel(level){
-        const safeLevel=Math.min(MAX_CHARACTER_LEVEL-1,Math.max(1,Math.floor(Number(level)||1)));
-        if(safeLevel<=TARGET_BATTLE_ANCHORS[0].level){ return TARGET_BATTLE_ANCHORS[0].battles; }
-        for(let index=1;index<TARGET_BATTLE_ANCHORS.length;index++){
-            const right=TARGET_BATTLE_ANCHORS[index];
-            if(safeLevel>right.level){ continue; }
-            const left=TARGET_BATTLE_ANCHORS[index-1];
-            const progress=(safeLevel-left.level)/(right.level-left.level);
-            return Math.max(1,Math.round(left.battles+(right.battles-left.battles)*progress));
+        const safe=Math.min(99,Math.max(1,Math.floor(Number(level)||1)));
+        if(safe<=TARGET_BATTLE_ANCHORS[0].level){ return TARGET_BATTLE_ANCHORS[0].battles; }
+        for(let i=1;i<TARGET_BATTLE_ANCHORS.length;i++){
+            const right=TARGET_BATTLE_ANCHORS[i];
+            if(safe>right.level){ continue; }
+            const left=TARGET_BATTLE_ANCHORS[i-1];
+            const t=(safe-left.level)/(right.level-left.level);
+            return Math.max(1,Math.round(left.battles+(right.battles-left.battles)*t));
         }
         return TARGET_BATTLE_ANCHORS[TARGET_BATTLE_ANCHORS.length-1].battles;
     }
-
     function getExpNextForLevel(level){
-        const safeLevel=Math.min(MAX_CHARACTER_LEVEL-1,Math.max(1,Math.floor(Number(level)||1)));
-        return Math.max(1,Math.round(interpolateAnchors(safeLevel,EXP_REQUIREMENT_ANCHORS)));
+        const safe=Math.min(99,Math.max(1,Math.floor(Number(level)||1)));
+        return Math.max(1,Math.round(interpolateAnchors(safe,EXP_REQUIREMENT_ANCHORS)));
     }
     window.v133GetExpNextForLevel=getExpNextForLevel;
     window.v139GetTrainingZoneAverageExpForLevel=getTrainingZoneAverageExpForLevel;
@@ -165,18 +143,14 @@
             return !!(character&&(Number(character.level)||1)<MAX_CHARACTER_LEVEL);
         });
     }
-
     function getNaturalChargeLevelsPerDay(level){
-        if((Number(level)||1)<20){ return 0; }
-        return Math.max(0,interpolateAnchors(level,NATURAL_CHARGE_LEVELS_PER_DAY));
+        return (Number(level)||1)<20?0:Math.max(0,interpolateAnchors(level,NATURAL_CHARGE_LEVELS_PER_DAY));
     }
     function getDailyQuestLevelsPerDay(level){
-        if((Number(level)||1)<20){ return 0; }
-        return Math.max(0,interpolateAnchors(level,DAILY_QUEST_LEVELS_PER_DAY));
+        return (Number(level)||1)<20?0:Math.max(0,interpolateAnchors(level,DAILY_QUEST_LEVELS_PER_DAY));
     }
     function getDailyTotalTarget(level){
-        if((Number(level)||1)<20){ return 0; }
-        return Math.max(0,interpolateAnchors(level,DAILY_TOTAL_TARGETS));
+        return (Number(level)||1)<20?0:Math.max(0,interpolateAnchors(level,DAILY_TOTAL_TARGETS));
     }
     window.v173GetNaturalChargeLevelsPerDay=getNaturalChargeLevelsPerDay;
     window.v173GetDailyQuestLevelsPerDay=getDailyQuestLevelsPerDay;
@@ -204,8 +178,7 @@
                 lastAt:Number.isFinite(Number(raw.lastAt))?Math.max(0,Number(raw.lastAt)):0,
                 noticeShown:raw.noticeShown===true,
                 lastCapped:raw.lastCapped===true,
-                newcomerRewards:raw.newcomerRewards&&typeof raw.newcomerRewards==="object"
-                    ?Object.assign({},raw.newcomerRewards):{}
+                newcomerRewards:raw.newcomerRewards&&typeof raw.newcomerRewards==="object"?Object.assign({},raw.newcomerRewards):{}
             };
         }catch(_){
             return {initialized:false,unlocked:false,lastAt:0,noticeShown:false,lastCapped:false,newcomerRewards:{}};
@@ -215,14 +188,12 @@
     function persistGrowthState(){
         try{ localStorage.setItem(GROWTH_STATE_KEY,JSON.stringify(growthState)); }catch(_){ }
     }
-
     function showChargeUnlockNotice(){
         if(growthState.noticeShown){ return; }
         growthState.noticeShown=true;
         persistGrowthState();
         alert("經驗池持續充能已解鎖\n即使不掛機，經驗池也會持續累積修為。");
     }
-
     function ensureExpPoolChargeUnlocked(now,showNotice){
         const timestamp=Number.isFinite(Number(now))?Number(now):Date.now();
         const hasCharacter=typeof getExistingPartyIndexes==="function"&&getExistingPartyIndexes().length>0;
@@ -268,9 +239,7 @@
         const elapsed=Math.min(CHARGE_MAX_MS,Math.max(0,rawElapsed));
         const referenceLevel=Math.min(99,Math.max(20,getHighestCreatedCharacterLevel()));
         const levelsPerDay=getNaturalChargeLevelsPerDay(referenceLevel);
-        const gain=Math.max(0,Math.floor(
-            getExpNextForLevel(referenceLevel)*levelsPerDay*(elapsed/DAY_MS)
-        ));
+        const gain=Math.max(0,Math.floor(getExpNextForLevel(referenceLevel)*levelsPerDay*(elapsed/DAY_MS)));
         return {gain:gain,elapsedMs:elapsed,capped:rawElapsed>=CHARGE_MAX_MS,levelsPerDay:levelsPerDay,referenceLevel:referenceLevel};
     }
     window.v173PreviewExpPoolCharge=getChargePreview;
@@ -305,15 +274,15 @@
     window.v173SettleExpPoolCharge=settleExpPoolCharge;
     window.v173GetExpPoolChargeState=function(){
         return {
-            initialized:growthState.initialized,unlocked:growthState.unlocked,
-            lastAt:growthState.lastAt,noticeShown:growthState.noticeShown,
-            lastCapped:growthState.lastCapped,maxHours:72
+            initialized:growthState.initialized,unlocked:growthState.unlocked,lastAt:growthState.lastAt,
+            noticeShown:growthState.noticeShown,lastCapped:growthState.lastCapped,maxHours:72
         };
     };
 
     function getDailyGrowthRewardBreakdown(level){
-        const referenceLevel=Math.min(99,Math.max(20,Math.floor(Number(level)||getHighestCreatedCharacterLevel())));
-        if(referenceLevel<20){ return {totalExp:0,taskExp:0,chestExp:0,levelsPerDay:0}; }
+        const raw=Number(level)||getHighestCreatedCharacterLevel();
+        if(raw<20){ return {totalExp:0,taskExp:0,chestExp:0,levelsPerDay:0}; }
+        const referenceLevel=Math.min(99,Math.max(20,Math.floor(raw)));
         const levelsPerDay=getDailyQuestLevelsPerDay(referenceLevel);
         const totalExp=Math.max(0,Math.round(getExpNextForLevel(referenceLevel)*levelsPerDay));
         const taskExp=Math.round(totalExp*.70);
@@ -334,7 +303,6 @@
         }
         return bonus;
     }
-
     if(typeof claimDailyQuest==="function"){
         const originalClaimDailyQuest=claimDailyQuest;
         claimDailyQuest=function(questId){
@@ -346,20 +314,291 @@
         };
     }
 
+    /* Late UI/reward bridge: V131 preview and V141 quest UI are loaded after this
+       economy owner. It installs once when those existing owners become ready. */
+    const lateState={
+        installed:false,previewWrapped:false,chestWrapped:false,
+        rewardBases:new WeakMap(),visualGain:null,attempts:0
+    };
+
+    function discountedPreviewCost(character,count){
+        if(!character||count<=0){ return 0; }
+        let level=Math.max(1,Math.floor(Number(character.level)||1));
+        let exp=Math.max(0,Number(character.exp)||0);
+        let expNext=Math.max(1,Number(character.expNext)||getExpNextForLevel(level));
+        let total=0;
+        for(let i=0;i<count&&level<MAX_CHARACTER_LEVEL;i++){
+            const need=Math.max(1,expNext-exp);
+            total+=Math.ceil(need/getExpPoolCatchUpMultiplierForLevel(level));
+            level++;
+            exp=0;
+            expNext=getExpNextForLevel(level);
+        }
+        return total;
+    }
+    window.v173GetDiscountedPreviewCost=discountedPreviewCost;
+
+    function readPreviewCounts(){
+        const counts={0:0,1:0,2:0};
+        const container=typeof document!=="undefined"?document.getElementById("expDistributeList"):null;
+        if(!container||typeof getExistingPartyIndexes!=="function"){ return counts; }
+        const rows=Array.from(container.querySelectorAll(".v131-exp-row"));
+        getExistingPartyIndexes().slice(0,3).forEach((index,position)=>{
+            const character=getPartyCharacterByIndex(index);
+            const text=rows[position]&&rows[position].querySelector(".v131-exp-level")?.textContent||"";
+            const match=text.match(/→\s*Lv\.(\d+)/);
+            const target=match?Number(match[1]):Number(character&&character.level)||1;
+            counts[index]=Math.max(0,target-(Number(character&&character.level)||1));
+        });
+        return counts;
+    }
+    function totalDiscountedPreviewCost(counts){
+        if(typeof getExistingPartyIndexes!=="function"){ return 0; }
+        return getExistingPartyIndexes().slice(0,3).reduce((sum,index)=>
+            sum+discountedPreviewCost(getPartyCharacterByIndex(index),Math.max(0,Number(counts[index])||0)),0
+        );
+    }
+
+    function decorateExpPoolDistributionUi(){
+        if(typeof document==="undefined"||typeof getExistingPartyIndexes!=="function"){ return; }
+        const container=document.getElementById("expDistributeList");
+        if(!container){ return; }
+        const indexes=getExistingPartyIndexes().slice(0,3);
+        const rows=Array.from(container.querySelectorAll(".v131-exp-row"));
+        const counts=readPreviewCounts();
+        indexes.forEach((index,position)=>{
+            const row=rows[position];
+            const character=getPartyCharacterByIndex(index);
+            if(!row||!character){ return; }
+            let meta=row.querySelector(".v173-exp-row-meta");
+            if(!meta){
+                meta=document.createElement("div");
+                meta.className="v173-exp-row-meta";
+                const levelNode=row.querySelector(".v131-exp-level");
+                (levelNode||row.firstChild)?.insertAdjacentElement?.("afterend",meta);
+                if(!meta.parentNode){ row.appendChild(meta); }
+            }
+            const multiplier=getExpPoolCatchUpMultiplierForLevel(character.level);
+            const currentExp=Math.max(0,Math.floor(Number(character.exp)||0));
+            const next=Math.max(1,Math.floor(Number(character.expNext)||getExpNextForLevel(character.level)));
+            meta.innerHTML="目前 "+currentExp.toLocaleString("zh-TW")+" / "+next.toLocaleString("zh-TW")+" EXP"+
+                (multiplier>1?'<b>追趕加成 ×'+multiplier.toFixed(2)+"</b>":"");
+
+            const previewButton=row.querySelector(".v131-exp-preview-btn");
+            if(previewButton){
+                const candidate=Object.assign({},counts);
+                candidate[index]=(candidate[index]||0)+1;
+                const can=(Number(character.level)||1)+(counts[index]||0)<MAX_CHARACTER_LEVEL&&
+                    totalDiscountedPreviewCost(candidate)<=Math.max(0,Number(sharedExp)||0);
+                previewButton.disabled=!can;
+            }
+        });
+        const summary=container.querySelector(".v131-exp-preview-summary");
+        if(summary){
+            const cost=totalDiscountedPreviewCost(counts);
+            summary.textContent="本次分配："+cost.toLocaleString("zh-TW")+" EXP";
+        }
+        if(typeof window.v146SyncCharacterAttentionDots==="function"){
+            window.v146SyncCharacterAttentionDots();
+        }
+    }
+    window.v173DecorateExpPoolDistributionUi=decorateExpPoolDistributionUi;
+
+    function wrapExpPreviewForCatchUp(){
+        if(lateState.previewWrapped||typeof window.v131PreviewExpLevel!=="function"||typeof window.v131ConfirmExpPreview!=="function"){ return; }
+        lateState.previewWrapped=true;
+        const previousPreview=window.v131PreviewExpLevel;
+        const previousConfirm=window.v131ConfirmExpPreview;
+        window.v131PreviewExpLevel=function(index){
+            settleExpPoolCharge(Date.now());
+            const counts=readPreviewCounts();
+            const candidate=Object.assign({},counts);
+            candidate[index]=(candidate[index]||0)+1;
+            const discounted=totalDiscountedPreviewCost(candidate);
+            const actual=Math.max(0,Number(sharedExp)||0);
+            if(discounted>actual){
+                alert("經驗池不足，還需要 "+(discounted-actual).toLocaleString("zh-TW")+" EXP。");
+                return false;
+            }
+            sharedExp=Number.MAX_SAFE_INTEGER/32;
+            try{ return previousPreview.apply(this,arguments); }
+            finally{
+                sharedExp=actual;
+                setTimeout(decorateExpPoolDistributionUi,0);
+            }
+        };
+        window.v131ConfirmExpPreview=function(){
+            settleExpPoolCharge(Date.now());
+            const counts=readPreviewCounts();
+            const discounted=totalDiscountedPreviewCost(counts);
+            const actual=Math.max(0,Number(sharedExp)||0);
+            if(discounted<=0||discounted>actual){
+                if(discounted>actual){ alert("經驗池不足，無法完成本次分配。"); }
+                return false;
+            }
+            let completed=false;
+            sharedExp=Number.MAX_SAFE_INTEGER/32;
+            try{
+                const result=previousConfirm.apply(this,arguments);
+                completed=true;
+                return result;
+            }finally{
+                sharedExp=completed?Math.max(0,actual-discounted):actual;
+                if(typeof updateUI==="function"){ updateUI(); }
+                if(typeof saveGame==="function"){ saveGame(); }
+                setTimeout(decorateExpPoolDistributionUi,0);
+            }
+        };
+    }
+
+    function syncDailyQuestGrowthRewards(){
+        if(typeof dailyQuestDefinitions==="undefined"||!Array.isArray(dailyQuestDefinitions)||!window.v141UpdateNotificationDots){ return; }
+        const breakdown=getDailyGrowthRewardBreakdown(getHighestCreatedCharacterLevel());
+        const quests=dailyQuestDefinitions.filter(quest=>quest&&quest.reward&&typeof quest.reward==="object");
+        if(!quests.length){ return; }
+        const each=Math.floor(breakdown.taskExp/quests.length);
+        let remainder=breakdown.taskExp-each*quests.length;
+        quests.forEach(quest=>{
+            const reward=quest.reward;
+            if(!lateState.rewardBases.has(reward)){
+                lateState.rewardBases.set(reward,Math.max(0,Number(reward.exp)||0));
+            }
+            const extra=each+(remainder>0?1:0);
+            if(remainder>0){ remainder--; }
+            reward.exp=lateState.rewardBases.get(reward)+extra;
+        });
+    }
+    window.v173SyncDailyQuestGrowthRewards=syncDailyQuestGrowthRewards;
+
+    function wrapDailyFinalChestBonus(){
+        if(lateState.chestWrapped||typeof window.v141ClaimQuestMilestone!=="function"){ return; }
+        lateState.chestWrapped=true;
+        const previous=window.v141ClaimQuestMilestone;
+        window.v141ClaimQuestMilestone=function(type,threshold){
+            const before=Math.max(0,Number(sharedExp)||0);
+            const result=previous.apply(this,arguments);
+            if(type==="daily"&&Number(threshold)===100&&Math.max(0,Number(sharedExp)||0)>before&&getHighestCreatedCharacterLevel()>=20){
+                const bonus=getDailyGrowthRewardBreakdown(getHighestCreatedCharacterLevel()).chestExp;
+                if(bonus>0){
+                    sharedExp+=bonus;
+                    if(typeof updateUI==="function"){ updateUI(); }
+                    if(typeof saveGame==="function"){ saveGame(); }
+                    if(typeof window.v141ShowBlackGoldReward==="function"){
+                        window.v141ShowBlackGoldReward({exp:bonus,gold:0,items:[]});
+                    }
+                }
+            }
+            return result;
+        };
+    }
+
+    function ensureChargeUi(){
+        if(typeof document==="undefined"){ return null; }
+        const card=document.getElementById("homeExpPoolCard");
+        if(!card){ return null; }
+        let panel=document.getElementById("v173ExpPoolChargeStatus");
+        if(!panel){
+            panel=document.createElement("section");
+            panel.id="v173ExpPoolChargeStatus";
+            panel.className="v173-exp-charge-status";
+            panel.innerHTML='<div><b id="v173ExpChargeTitle"></b><span id="v173ExpChargeRate"></span></div>'+
+                '<small id="v173ExpChargeText"></small><div class="v173-exp-charge-floats" aria-hidden="true"></div>';
+            const hero=card.querySelector(".exp-pool-hero");
+            if(hero){ hero.insertAdjacentElement("afterend",panel); }
+            else{ card.insertBefore(panel,card.firstChild||null); }
+        }
+        return panel;
+    }
+
+    function syncChargeUi(animate){
+        const panel=ensureChargeUi();
+        const card=typeof document!=="undefined"?document.getElementById("homeExpPoolCard"):null;
+        if(!panel||!card||card.style.display==="none"){ lateState.visualGain=null; return; }
+        const state=window.v173GetExpPoolChargeState();
+        const title=document.getElementById("v173ExpChargeTitle");
+        const rate=document.getElementById("v173ExpChargeRate");
+        const text=document.getElementById("v173ExpChargeText");
+        const highest=getHighestCreatedCharacterLevel();
+        if(highest<20||!state.unlocked){
+            if(title){ title.textContent="Lv20 解鎖持續充能"; }
+            if(rate){ rate.textContent="未啟動"; }
+            if(text){ text.textContent="達到 Lv20 後，即使離線也會持續累積經驗池。"; }
+            lateState.visualGain=null;
+            return;
+        }
+        const preview=getChargePreview(Date.now());
+        if(title){ title.textContent=state.lastCapped?"充能已滿・已按72小時上限結算":"持續充能中"; }
+        if(rate){ rate.textContent="約 "+Math.round(preview.levelsPerDay*100)+"% 等級進度／日"; }
+        if(text){ text.textContent="自然充能最多累積 72 小時；在線、離線都會計算。"; }
+        const value=document.getElementById("sharedExpValue");
+        if(value){ value.textContent=Math.floor((Number(sharedExp)||0)+preview.gain).toLocaleString("zh-TW"); }
+        if(animate&&lateState.visualGain!==null&&preview.gain>lateState.visualGain){
+            const delta=preview.gain-lateState.visualGain;
+            const layer=panel.querySelector(".v173-exp-charge-floats");
+            if(layer&&delta>0){
+                const float=document.createElement("span");
+                float.className="v173-exp-charge-float";
+                float.textContent="+"+delta.toLocaleString("zh-TW")+" EXP";
+                layer.appendChild(float);
+                setTimeout(()=>float.remove(),1500);
+            }
+        }
+        lateState.visualGain=preview.gain;
+    }
+    window.v173SyncExpPoolChargeUi=syncChargeUi;
+
+    function decorateDailyFinalChest(){
+        if(typeof document==="undefined"){ return; }
+        const daily=document.getElementById("questTabBtnDaily");
+        if(!daily||daily.getAttribute("aria-selected")!=="true"){ return; }
+        const bonus=getDailyGrowthRewardBreakdown(getHighestCreatedCharacterLevel()).chestExp;
+        document.querySelectorAll("#homeFeatureModal .quest-milestone").forEach(node=>{
+            if(node.querySelector(".quest-milestone-percent")?.textContent?.trim()!=="100%"){ return; }
+            const small=node.querySelector("small");
+            if(!small){ return; }
+            if(!small.dataset.v173BaseLabel){ small.dataset.v173BaseLabel=small.textContent||""; }
+            small.textContent=small.dataset.v173BaseLabel+(bonus>0?"＋"+bonus.toLocaleString("zh-TW")+"EXP":" ");
+        });
+    }
+
+    function installLateGrowthEnhancements(){
+        if(lateState.installed){ return; }
+        const ready=typeof window.v131PreviewExpLevel==="function"&&
+            typeof window.v141ClaimQuestMilestone==="function"&&
+            typeof window.v141UpdateNotificationDots==="function";
+        if(!ready){
+            lateState.attempts++;
+            if(lateState.attempts<200){ setTimeout(installLateGrowthEnhancements,50); }
+            return;
+        }
+        lateState.installed=true;
+        wrapExpPreviewForCatchUp();
+        wrapDailyFinalChestBonus();
+        syncDailyQuestGrowthRewards();
+        decorateExpPoolDistributionUi();
+        syncChargeUi(false);
+        decorateDailyFinalChest();
+        setInterval(()=>{
+            syncDailyQuestGrowthRewards();
+            decorateExpPoolDistributionUi();
+            syncChargeUi(true);
+            decorateDailyFinalChest();
+        },4000);
+    }
+
+    if(typeof document!=="undefined"&&typeof document.addEventListener==="function"){
+        document.addEventListener("pointerdown",()=>settleExpPoolCharge(Date.now()),true);
+    }
+
     window.v139GetExpCurveAudit=function(){
         const checkpoints=[10,20,30,40,49,50,60,70,80,90,95,99].map(level=>({
-            level:level,
-            averageBattleExp:getTrainingZoneAverageExpForLevel(level),
-            targetBattles:getTargetBattlesForLevel(level),
-            expNext:getExpNextForLevel(level),
-            naturalLevelsPerDay:getNaturalChargeLevelsPerDay(level),
-            dailyQuestLevelsPerDay:getDailyQuestLevelsPerDay(level),
+            level:level,averageBattleExp:getTrainingZoneAverageExpForLevel(level),
+            targetBattles:getTargetBattlesForLevel(level),expNext:getExpNextForLevel(level),
+            naturalLevelsPerDay:getNaturalChargeLevelsPerDay(level),dailyQuestLevelsPerDay:getDailyQuestLevelsPerDay(level),
             dailyTotalTarget:getDailyTotalTarget(level)
         }));
         let totalEffectiveBattles=0;
-        for(let level=1;level<MAX_CHARACTER_LEVEL;level++){
-            totalEffectiveBattles+=getTargetBattlesForLevel(level);
-        }
+        for(let level=1;level<MAX_CHARACTER_LEVEL;level++){ totalEffectiveBattles+=getTargetBattlesForLevel(level); }
         let beginnerTotalExp=0;
         for(let level=1;level<20;level++){ beginnerTotalExp+=getExpNextForLevel(level); }
         return {totalEffectiveBattles:totalEffectiveBattles,beginnerTotalExp:beginnerTotalExp,checkpoints:checkpoints};
@@ -443,7 +682,6 @@
             return result;
         };
     }
-
     if(typeof createAdditionalCharacter==="function"){
         const originalCreateAdditionalCharacter=createAdditionalCharacter;
         createAdditionalCharacter=function(slotNumber){
@@ -453,21 +691,16 @@
             return result;
         };
     }
-
     if(typeof document!=="undefined"&&typeof document.addEventListener==="function"){
-        document.addEventListener("visibilitychange",()=>{
-            if(!document.hidden){ settleExpPoolCharge(Date.now()); }
-        });
+        document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ settleExpPoolCharge(Date.now()); } });
     }
     if(typeof window!=="undefined"&&typeof window.addEventListener==="function"){
         window.addEventListener("pageshow",()=>settleExpPoolCharge(Date.now()));
     }
-
     if(typeof renderExpDistributeList==="function"){ renderExpDistributeList(); }
+    setTimeout(installLateGrowthEnhancements,0);
 
-    /* =====================================================
-       2. 怪物金幣掉落rank倍率調整（精英×2、BOSS×5）
-       ===================================================== */
+    /* 2. 怪物金幣掉落rank倍率 */
     if(typeof getMonsterGoldDrop==="function"){
         getMonsterGoldDrop=function(monster){
             if(!monster){ return 0; }
@@ -480,43 +713,27 @@
         };
     }
 
-    /* =====================================================
-       3. 商店價格：看帳號內已建立角色的最高等級
-       ===================================================== */
+    /* 3. 商店價格 */
     const SHOP_PRICE_TIERS=[
-        {maxLevel:30,multiplier:1,label:"Lv.1～30"},
-        {maxLevel:40,multiplier:1.5,label:"Lv.31～40"},
-        {maxLevel:50,multiplier:2,label:"Lv.41～50"},
-        {maxLevel:60,multiplier:2.5,label:"Lv.51～60"},
-        {maxLevel:70,multiplier:3,label:"Lv.61～70"},
-        {maxLevel:80,multiplier:3.5,label:"Lv.71～80"},
-        {maxLevel:90,multiplier:4,label:"Lv.81～90"},
-        {maxLevel:100,multiplier:4.5,label:"Lv.91～100"}
+        {maxLevel:30,multiplier:1,label:"Lv.1～30"},{maxLevel:40,multiplier:1.5,label:"Lv.31～40"},
+        {maxLevel:50,multiplier:2,label:"Lv.41～50"},{maxLevel:60,multiplier:2.5,label:"Lv.51～60"},
+        {maxLevel:70,multiplier:3,label:"Lv.61～70"},{maxLevel:80,multiplier:3.5,label:"Lv.71～80"},
+        {maxLevel:90,multiplier:4,label:"Lv.81～90"},{maxLevel:100,multiplier:4.5,label:"Lv.91～100"}
     ];
-
     function getShopPriceTier(){
         const highestLevel=getHighestCreatedCharacterLevel();
-        for(const tier of SHOP_PRICE_TIERS){
-            if(highestLevel<=tier.maxLevel){ return tier; }
-        }
+        for(const tier of SHOP_PRICE_TIERS){ if(highestLevel<=tier.maxLevel){ return tier; } }
         return SHOP_PRICE_TIERS[SHOP_PRICE_TIERS.length-1];
     }
-
     function getShopItemPrice(shopItem){
         if(!shopItem||!Number.isFinite(shopItem.price)){ return shopItem?shopItem.price:null; }
         return Math.round(shopItem.price*getShopPriceTier().multiplier);
     }
     window.v133GetShopItemPrice=getShopItemPrice;
 
-    /* =====================================================
-       4. 藥水補品重新整理：新增30%階、商店下架100%階
-       ===================================================== */
-    const SHOP_POTION_BASE_PRICES={
-        hpPotion10:20,hpPotion30:50,hpPotion50:80,
-        spPotion10:25,spPotion30:65,spPotion50:100
-    };
+    /* 4. 藥水補品 */
+    const SHOP_POTION_BASE_PRICES={hpPotion10:20,hpPotion30:50,hpPotion50:80,spPotion10:25,spPotion30:65,spPotion50:100};
     const SHOP_POTION_IDS=Object.keys(SHOP_POTION_BASE_PRICES);
-
     if(typeof potionDefinitions!=="undefined"&&Array.isArray(potionDefinitions)){
         let hpPotion30=potionDefinitions.find(p=>p&&p.id==="hpPotion30");
         if(!hpPotion30){
@@ -536,12 +753,10 @@
             }
         });
     }
-
     function getShoppablePotions(){
         if(typeof potionDefinitions==="undefined"||!Array.isArray(potionDefinitions)){ return []; }
-        return SHOP_POTION_IDS.map(itemId=>potionDefinitions.find(item=>item&&item.id===itemId)).filter(Boolean);
+        return SHOP_POTION_IDS.map(id=>potionDefinitions.find(item=>item&&item.id===id)).filter(Boolean);
     }
-
     if(typeof renderShopContent==="function"){
         renderShopContent=function(){
             const tier=getShopPriceTier();
@@ -553,33 +768,17 @@
                 const hasPrice=Number.isFinite(displayPrice);
                 const disabled=!hasPrice||gold<displayPrice;
                 const buttonText=!hasPrice?"價格待定":`${displayPrice} 金幣`;
-                return `
-                    <div class="shop-potion-card ${shopItem.resource}">
-                        <div class="shop-potion-card-head">
-                            <span class="shop-potion-type">${resourceLabel}</span>
-                            <span class="shop-potion-stock">持有 ${count}</span>
-                        </div>
-                        <div class="shop-potion-name">${shopItem.name}</div>
-                        <div class="shop-potion-effect">${effectText}</div>
-                        <div class="shop-potion-purchase-row">
-                            <label for="shopQuantity-${shopItem.id}">數量</label>
-                            <input id="shopQuantity-${shopItem.id}" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="9999" step="1" value="1">
-                            <button class="home-feature-buy-btn shop-potion-buy" ${disabled?"disabled":""}
-                                onclick="buyShopItem('${shopItem.id}',document.getElementById('shopQuantity-${shopItem.id}').value)">${buttonText}</button>
-                        </div>
-                    </div>
-                `;
+                return `<div class="shop-potion-card ${shopItem.resource}">
+                    <div class="shop-potion-card-head"><span class="shop-potion-type">${resourceLabel}</span><span class="shop-potion-stock">持有 ${count}</span></div>
+                    <div class="shop-potion-name">${shopItem.name}</div><div class="shop-potion-effect">${effectText}</div>
+                    <div class="shop-potion-purchase-row"><label for="shopQuantity-${shopItem.id}">數量</label>
+                    <input id="shopQuantity-${shopItem.id}" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="9999" step="1" value="1">
+                    <button class="home-feature-buy-btn shop-potion-buy" ${disabled?"disabled":""} onclick="buyShopItem('${shopItem.id}',document.getElementById('shopQuantity-${shopItem.id}').value)">${buttonText}</button></div></div>`;
             }).join("");
-            return `
-                <div class="shop-potion-interface">
-                    <div class="shop-potion-note">只販售 HP／SP 回復藥水</div>
-                    <div class="v133-shop-tier-note">目前商店階級：${tier.label}（價格×${tier.multiplier}）</div>
-                    <div class="shop-potion-list">${cards}</div>
-                </div>
-            `;
+            return `<div class="shop-potion-interface"><div class="shop-potion-note">只販售 HP／SP 回復藥水</div>
+                <div class="v133-shop-tier-note">目前商店階級：${tier.label}（價格×${tier.multiplier}）</div><div class="shop-potion-list">${cards}</div></div>`;
         };
     }
-
     if(typeof buyShopItem==="function"){
         buyShopItem=function(itemId,requestedQuantity){
             const shopItem=typeof getPotionDefinition==="function"?getPotionDefinition(itemId):null;
@@ -590,18 +789,14 @@
             const totalPrice=unitPrice*quantity;
             if(gold<totalPrice){ alert("金幣不夠，本次需要 "+totalPrice.toLocaleString("zh-TW")+" 金幣。"); return; }
             if(!addPotionToInventory(itemId,quantity)){ alert("背包已滿，或該藥水已沒有可用的堆疊空間。"); return; }
-            gold=gold-totalPrice;
-            rebuildInventorySlots();
-            updateGoldDisplay();
-            saveGame();
+            gold-=totalPrice;
+            rebuildInventorySlots(); updateGoldDisplay(); saveGame();
             const bodyEl=$("homeFeatureModalBody");
             if(bodyEl){ bodyEl.innerHTML=renderShopContent(); }
         };
     }
 
-    /* =====================================================
-       5. 預留未來金幣消耗系統共用工具
-       ===================================================== */
+    /* 5. 共用金幣消耗工具 */
     function spendGoldForFutureSystem(amount){
         const cost=Math.max(0,Math.floor(Number(amount)||0));
         if(cost<=0){ return true; }
