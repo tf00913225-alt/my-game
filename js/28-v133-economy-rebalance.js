@@ -56,7 +56,9 @@
         {level:85,value:1.57},{level:90,value:1.40},{level:94,value:1.30},
         {level:95,value:1.27},{level:99,value:1.00}
     ];
-    const NEWCOMER_DAILY_BONUSES={win3:5000,skills5:4000,kill10:6000};
+    /* 這三筆只在帳號第一次、且尚未Lv20時各領一次，讓新手內容而非
+       重複農怪承擔約6,000 EXP；其餘仍由正常戰鬥／原任務獎勵補足。 */
+    const NEWCOMER_DAILY_BONUSES={win3:2000,skills5:1500,kill10:2500};
 
     window.v133MaxLevel=MAX_CHARACTER_LEVEL;
 
@@ -188,6 +190,15 @@
     function persistGrowthState(){
         try{ localStorage.setItem(GROWTH_STATE_KEY,JSON.stringify(growthState)); }catch(_){ }
     }
+    function resetGrowthStateForNoCharacter(){
+        growthState.initialized=false;
+        growthState.unlocked=false;
+        growthState.lastAt=0;
+        growthState.noticeShown=false;
+        growthState.lastCapped=false;
+        growthState.newcomerRewards={};
+        persistGrowthState();
+    }
     function showChargeUnlockNotice(){
         if(growthState.noticeShown){ return; }
         growthState.noticeShown=true;
@@ -197,7 +208,10 @@
     function ensureExpPoolChargeUnlocked(now,showNotice){
         const timestamp=Number.isFinite(Number(now))?Number(now):Date.now();
         const hasCharacter=typeof getExistingPartyIndexes==="function"&&getExistingPartyIndexes().length>0;
-        if(!hasCharacter){ return false; }
+        if(!hasCharacter){
+            if(growthState.initialized||growthState.unlocked||growthState.lastAt>0){ resetGrowthStateForNoCharacter(); }
+            return false;
+        }
         const highest=getHighestCreatedCharacterLevel();
         if(!growthState.initialized){
             growthState.initialized=true;
@@ -232,25 +246,32 @@
 
     function getChargePreview(now){
         const timestamp=Number.isFinite(Number(now))?Number(now):Date.now();
-        if(!growthState.initialized||!growthState.unlocked||!hasNonMaxCharacter()){
-            return {gain:0,elapsedMs:0,capped:false,levelsPerDay:0,referenceLevel:getHighestCreatedCharacterLevel()};
+        const highest=getHighestCreatedCharacterLevel();
+        if(!growthState.initialized||!growthState.unlocked||highest<20||!hasNonMaxCharacter()){
+            return {gain:0,elapsedMs:0,capped:false,levelsPerDay:0,referenceLevel:highest};
         }
         const rawElapsed=timestamp>=growthState.lastAt?timestamp-growthState.lastAt:0;
         const elapsed=Math.min(CHARGE_MAX_MS,Math.max(0,rawElapsed));
-        const referenceLevel=Math.min(99,Math.max(20,getHighestCreatedCharacterLevel()));
+        const referenceLevel=Math.min(99,Math.max(20,highest));
         const levelsPerDay=getNaturalChargeLevelsPerDay(referenceLevel);
         const gain=Math.max(0,Math.floor(getExpNextForLevel(referenceLevel)*levelsPerDay*(elapsed/DAY_MS)));
         return {gain:gain,elapsedMs:elapsed,capped:rawElapsed>=CHARGE_MAX_MS,levelsPerDay:levelsPerDay,referenceLevel:referenceLevel};
     }
     window.v173PreviewExpPoolCharge=getChargePreview;
 
+    function getAvailableExpPool(now){
+        return Math.max(0,Number(typeof sharedExp!=="undefined"?sharedExp:0)||0)+getChargePreview(now).gain;
+    }
+    window.v173GetAvailableExpPool=getAvailableExpPool;
+
     function settleExpPoolCharge(now){
         const timestamp=Number.isFinite(Number(now))?Number(now):Date.now();
         const wasInitialized=growthState.initialized;
         if(!ensureExpPoolChargeUnlocked(timestamp,false)){ return 0; }
         if(!wasInitialized){ return 0; }
+        /* 裝置時間倒退時只拒絕這段時間，不把權威基準往回移；否則先
+           倒退再調回正確時間會再次產生同一段自然充能。 */
         if(timestamp<growthState.lastAt){
-            growthState.lastAt=timestamp;
             growthState.lastCapped=false;
             persistGrowthState();
             return 0;
@@ -389,7 +410,7 @@
                 const candidate=Object.assign({},counts);
                 candidate[index]=(candidate[index]||0)+1;
                 const can=(Number(character.level)||1)+(counts[index]||0)<MAX_CHARACTER_LEVEL&&
-                    totalDiscountedPreviewCost(candidate)<=Math.max(0,Number(sharedExp)||0);
+                    totalDiscountedPreviewCost(candidate)<=getAvailableExpPool(Date.now());
                 previewButton.disabled=!can;
             }
         });
@@ -424,7 +445,8 @@
             try{ return previousPreview.apply(this,arguments); }
             finally{
                 sharedExp=actual;
-                setTimeout(decorateExpPoolDistributionUi,0);
+                if(typeof setTimeout==="function"){ setTimeout(decorateExpPoolDistributionUi,0); }
+                else{ decorateExpPoolDistributionUi(); }
             }
         };
         window.v131ConfirmExpPreview=function(){
@@ -446,7 +468,8 @@
                 sharedExp=completed?Math.max(0,actual-discounted):actual;
                 if(typeof updateUI==="function"){ updateUI(); }
                 if(typeof saveGame==="function"){ saveGame(); }
-                setTimeout(decorateExpPoolDistributionUi,0);
+                if(typeof setTimeout==="function"){ setTimeout(decorateExpPoolDistributionUi,0); }
+                else{ decorateExpPoolDistributionUi(); }
             }
         };
     }
@@ -527,7 +550,7 @@
             return;
         }
         const preview=getChargePreview(Date.now());
-        if(title){ title.textContent=state.lastCapped?"充能已滿・已按72小時上限結算":"持續充能中"; }
+        if(title){ title.textContent=preview.capped?"充能已滿":"持續充能中"; }
         if(rate){ rate.textContent="約 "+Math.round(preview.levelsPerDay*100)+"% 等級進度／日"; }
         if(text){ text.textContent="自然充能最多累積 72 小時；在線、離線都會計算。"; }
         const value=document.getElementById("sharedExpValue");
@@ -540,7 +563,7 @@
                 float.className="v173-exp-charge-float";
                 float.textContent="+"+delta.toLocaleString("zh-TW")+" EXP";
                 layer.appendChild(float);
-                setTimeout(()=>float.remove(),1500);
+                if(typeof setTimeout==="function"){ setTimeout(()=>float.remove(),1500); }
             }
         }
         lateState.visualGain=preview.gain;
@@ -568,7 +591,7 @@
             typeof window.v141UpdateNotificationDots==="function";
         if(!ready){
             lateState.attempts++;
-            if(lateState.attempts<200){ setTimeout(installLateGrowthEnhancements,50); }
+            if(lateState.attempts<200&&typeof setTimeout==="function"){ setTimeout(installLateGrowthEnhancements,50); }
             return;
         }
         lateState.installed=true;
@@ -578,16 +601,15 @@
         decorateExpPoolDistributionUi();
         syncChargeUi(false);
         decorateDailyFinalChest();
-        setInterval(()=>{
-            syncDailyQuestGrowthRewards();
-            decorateExpPoolDistributionUi();
-            syncChargeUi(true);
-            decorateDailyFinalChest();
-        },4000);
-    }
-
-    if(typeof document!=="undefined"&&typeof document.addEventListener==="function"){
-        document.addEventListener("pointerdown",()=>settleExpPoolCharge(Date.now()),true);
+        /* 4秒 timer 只重繪／計算畫面，從不直接增加 sharedExp。 */
+        if(typeof setInterval==="function"){
+            setInterval(()=>{
+                syncDailyQuestGrowthRewards();
+                decorateExpPoolDistributionUi();
+                syncChargeUi(true);
+                decorateDailyFinalChest();
+            },4000);
+        }
     }
 
     window.v139GetExpCurveAudit=function(){
@@ -611,7 +633,7 @@
             total+=exp;
             requirements.push({level:level,expNext:exp});
         }
-        return {totalExpTo20:total,requirements:requirements,newcomerOneTimeExp:15000};
+        return {totalExpTo20:total,requirements:requirements,newcomerOneTimeExp:6000};
     };
 
     function recalibrateCharacterExpNext(character){
@@ -698,7 +720,7 @@
         window.addEventListener("pageshow",()=>settleExpPoolCharge(Date.now()));
     }
     if(typeof renderExpDistributeList==="function"){ renderExpDistributeList(); }
-    setTimeout(installLateGrowthEnhancements,0);
+    if(typeof setTimeout==="function"){ setTimeout(installLateGrowthEnhancements,0); }
 
     /* 2. 怪物金幣掉落rank倍率 */
     if(typeof getMonsterGoldDrop==="function"){
