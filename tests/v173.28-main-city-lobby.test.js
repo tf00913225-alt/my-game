@@ -36,7 +36,7 @@ test("the HUD keeps only city identity, resources and DEV tools",()=>{
     assert.match(index,/id="homeHudExpValue"/);
     assert.doesNotMatch(index,/<h2>主城<\/h2>/);
     assert.match(baseCss,/\.home-city-hud\{[\s\S]*grid-template-columns:auto minmax\(0,1fr\);[\s\S]*min-height:48px;[\s\S]*border:1px solid[\s\S]*background:/);
-    assert.match(baseCss,/\.home-hud-identity\{[\s\S]*position:relative;[\s\S]*align-items:center;[\s\S]*align-self:stretch;[\s\S]*inset-inline-start:4px/);
+    assert.match(baseCss,/\.home-hud-identity\{[\s\S]*position:relative;[\s\S]*align-items:center;[\s\S]*align-self:stretch;[\s\S]*inset-inline-start:7px/);
     assert.doesNotMatch(baseCss,/\.home-hud-character-(?:list|row|avatar)/);
     assert.match(baseCss,/\.home-hud-resources\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
     assert.match(baseCss,/\.home-hud-resources > span\{[\s\S]*min-height:20px;[\s\S]*border:1px solid[\s\S]*linear-gradient/);
@@ -69,12 +69,12 @@ test("six secondary entrances form two substantial vertical button rails",()=>{
 test("offline experience and system use complete framed horizontal buttons",()=>{
     assert.equal(count(actions,/class="home-card home-card-utility"/g),2);
     assert.match(actions,/home-utility-actions[\s\S]*openHomeFeature\('offlineExp'\)[\s\S]*openHomeFeature\('system'\)/);
-    assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute;[\s\S]*right:0;[\s\S]*left:0;[\s\S]*grid-template-columns:repeat\(2,86px\);[\s\S]*justify-content:space-between;[\s\S]*padding:0 82px/);
+    assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute;[\s\S]*right:0;[\s\S]*left:0;[\s\S]*grid-template-columns:repeat\(2,100px\);[\s\S]*justify-content:space-between;[\s\S]*padding:0 68px/);
     assert.doesNotMatch(baseCss,/\.home-utility-actions\{[\s\S]{0,360}(?:right:50%|transform:translateX\(50%\))/);
-    assert.match(baseCss,/\.home-card-utility\{[\s\S]*height:40px;[\s\S]*border:1px solid[\s\S]*border-radius:8px;[\s\S]*background:linear-gradient/);
-    assert.ok((98-86)/98>=.10&&(98-86)/98<=.15);
-    assert.ok((46-40)/46>=.10&&(46-40)/46<=.15);
-    assert.equal(88-82,6);
+    assert.match(baseCss,/\.home-card-utility\{[\s\S]*height:47px;[\s\S]*border:1px solid[\s\S]*border-radius:8px;[\s\S]*background:linear-gradient/);
+    assert.ok((100-86)/86>=.15&&(100-86)/86<=.20);
+    assert.ok((47-40)/40>=.15&&(47-40)/40<=.20);
+    assert.equal(82-68,14);
 });
 
 test("all ten existing entry IDs and click contracts remain intact",()=>{
@@ -114,15 +114,15 @@ test("the roster renderer keeps all character details only in the adventure part
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*gap:2px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*border:1px solid rgba\(190,139,59,.54\);[\s\S]*inset 0 0 13px rgba\(214,158,63,.04\)/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:43px minmax\(0,1fr\);[\s\S]*height:44px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:43px minmax\(0,1fr\);[\s\S]*height:46px/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*border:1px solid rgba\(145,107,53,.38\);[\s\S]*inset 0 0 0 1px rgba\(255,222,146,.02\)/);
     assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:45px;[\s\S]*height:45px;[\s\S]*transform:translateX\(-4px\)/);
     assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:9px;[\s\S]*margin-inline:2px/);
     ["fire","water","wind","earth"].forEach(element=>assert.match(rosterCss,new RegExp('data-element="'+element+'"')));
-    const oldRosterHeight=1+(3*2)+2+14+(3*3)+(3*48);
-    const newRosterHeight=1+(2*2)+2+14+(3*2)+(3*44);
-    assert.ok((oldRosterHeight-newRosterHeight)/oldRosterHeight>=.08);
-    assert.ok((oldRosterHeight-newRosterHeight)/oldRosterHeight<=.10);
+    const previousRosterContainerHeight=(2*2)+2+14+(3*2)+(3*44);
+    const polishedRosterContainerHeight=(3*2)+2+14+(3*2)+(3*46);
+    assert.ok((polishedRosterContainerHeight-previousRosterContainerHeight)/previousRosterContainerHeight>=.05);
+    assert.ok((polishedRosterContainerHeight-previousRosterContainerHeight)/previousRosterContainerHeight<=.08);
 });
 
 test("gold and EXP share one compact formatter without ellipsis",()=>{
@@ -147,11 +147,11 @@ test("the full three-character layout fits the fixed home height above the uncha
     const safeHeight=746.6666667-10-78-(14*2);
     const hudHeight=5+48;
     const actionHeight=1+90+1+256;
-    const rosterHeight=1+(2*2)+2+14+(3*2)+(3*44);
-    assert.equal(hudHeight+actionHeight+rosterHeight,560);
+    const rosterHeight=8+(3*2)+2+14+(3*2)+(3*46);
+    assert.equal(hudHeight+actionHeight+rosterHeight,575);
     assert.ok(hudHeight+actionHeight+rosterHeight<=safeHeight);
     assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:44px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:46px/);
     assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:45px;[\s\S]*height:45px/);
 });
 
