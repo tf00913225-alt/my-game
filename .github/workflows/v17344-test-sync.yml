@@ -1,0 +1,70 @@
+name: V173.44 legacy regression sync
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - .github/workflows/v17344-test-sync.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 2
+      - name: Update obsolete V137 daily dungeon assertion
+        shell: python
+        run: |
+          from pathlib import Path
+          path=Path('tests/v137-regressions.test.js')
+          text=path.read_text(encoding='utf-8')
+          old='''test("material and equipment dungeons require two actual Lv20 characters",()=>{
+              const context=makeContext({players:[]});
+              context.getExistingPartyIndexes=()=>context.players.map((_,index)=>index);
+              context.getPartyCharacterByIndex=index=>context.players[index];
+              vm.runInContext(extractFunction(v132Source,"hasTwoCharactersAtLevel20"),context);
+
+              context.players=[{level:20},{level:1}];
+              assert.equal(vm.runInContext("hasTwoCharactersAtLevel20()",context),false);
+              context.players=[{level:20},{level:20}];
+              assert.equal(vm.runInContext("hasTwoCharactersAtLevel20()",context),true);
+              context.players=[{level:1},{level:20},{level:20}];
+              assert.equal(vm.runInContext("hasTwoCharactersAtLevel20()",context),true);
+          });'''
+          new='''test("formal daily dungeons unlock when any actual character reaches Lv10",()=>{
+              const context=makeContext({players:[]});
+              context.getExistingPartyIndexes=()=>context.players.map((_,index)=>index);
+              context.getPartyCharacterByIndex=index=>context.players[index];
+              vm.runInContext(extractFunction(v132Source,"hasLevel10CharacterForDailyDungeon"),context);
+
+              context.players=[];
+              assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),false);
+              context.players=[{level:9},{level:1}];
+              assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),false);
+              context.players=[{level:10}];
+              assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),true);
+              context.players=[{level:1},{level:10}];
+              assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),true);
+          });'''
+          if old not in text:
+              raise SystemExit('obsolete V137 assertion block not found')
+          path.write_text(text.replace(old,new,1),encoding='utf-8')
+      - name: Verify focused suites
+        run: |
+          node tests/v137-regressions.test.js
+          node tests/v173.44-maintenance.test.js
+      - name: Commit test sync and remove one-shot workflow
+        run: |
+          git config user.name "tf00913225-alt"
+          git config user.email "tf00913225@gmail.com"
+          git rm .github/workflows/v17344-test-sync.yml
+          git add tests/v137-regressions.test.js
+          git commit -m "test: align daily dungeon regression with Lv10 rule"
+          git push origin HEAD:dev
