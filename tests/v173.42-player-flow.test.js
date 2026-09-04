@@ -50,21 +50,25 @@ assert.match(v131,/getBeginnerForestMonsterExpUnit/);
 assert.match(v131,/beginnerMonsterUnits/);
 
 /* V173.43 daily-dungeon strength is dynamic, not the old 0.5 × 0.5 path. */
-assert.match(tuning,/DAILY_PARTY_MULTIPLIERS=\{1:\.60,2:\.82,3:1\}/);
-assert.match(tuning,/DAILY_LEVEL_MODIFIERS=\{low:\.90,mid:1,high:1\.05\}/);
+assert.match(tuning,/const partyMultiplier=partySize===1\?\.60:partySize===2\?\.82:1;/);
+assert.match(tuning,/const levelMultiplier=highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05;/);
 assert.match(tuning,/function getDailyDungeonScaleContext\(\)/);
-assert.match(tuning,/function applyDailyDungeonDynamicScale\(monster\)/);
-assert.match(tuning,/partyMultiplier\*levelModifier/);
+assert.match(tuning,/function normalizeDailyDungeonMonster\(monster\)/);
+assert.match(tuning,/factor:partyMultiplier\*levelMultiplier/);
 assert.match(tuning,/monster\.v141Abyss===true/);
 assert.doesNotMatch(tuning,/v17342DailyDungeonStatsHalvedAgain/);
 assert.match(tuning,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*return 5\+Math\.floor\(Math\.random\(\)\*4\)/);
 
-/* Second / third character catch-up is EXP-only and ends at Lv20. */
-assert.match(economy,/getCatchUpSlot\(character\)/);
-assert.match(economy,/slot===2\?1\.50:2\.00/);
-assert.match(economy,/slot===2\?2:3/);
-assert.match(economy,/if\(level>=20\)\{ return 1; \}/);
-assert.match(economy,/applyAdditionalCharacterCatchUpStart/);
+/* Second / third character catch-up is EXP-only after the Lv10 fast start and ends at Lv20. */
+assert.match(economy,/function getCharacterPartyIndex\(character\)/);
+assert.match(economy,/function getAdditionalCharacterPoolMultiplier\(character,level\)/);
+assert.match(economy,/if\(safeLevel>=20\)\{ return 1; \}/);
+assert.match(economy,/if\(index===2\)\{ return 2\.00; \}/);
+assert.match(economy,/if\(index===1\)\{ return 1\.50; \}/);
+assert.match(economy,/function getDirectCatchUpExpMultiplier\(character\)/);
+assert.match(economy,/if\(index===2\)\{ return 3; \}/);
+assert.match(economy,/if\(index===1\)\{ return 2; \}/);
+assert.match(economy,/function grantFastStartToAdditionalCharacter\(character,slotNumber\)/);
 assert.match(economy,/character\.level=10/);
 assert.match(economy,/v173GrantCharacterCatchUpExp/);
 assert.match(economy,/v173GetDirectCatchUpExpMultiplier/);
