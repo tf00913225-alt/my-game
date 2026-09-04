@@ -153,6 +153,13 @@ test("Element Box open is silent; attempted setting interaction owns the warning
 test("Element Box has no scroll owner",()=>{assert.match(elementBoxCss,/body\.v162-element-box-settings-open #homeFeatureModal\{[\s\S]*overflow:hidden !important/);assert.match(elementBoxCss,/#homeFeatureModalBody\{[\s\S]*overflow:hidden !important/);});
 test("red dots stay fully bright",()=>{assert.match(polishCss,/\.v146-growth-attention-target\{[\s\S]*opacity:1 !important;[\s\S]*filter:none !important/);assert.match(polishCss,/\.v146-growth-guidance-dot\{[\s\S]*opacity:1 !important/);});
 test("three-character home HUD is enlarged but remains three columns",()=>{assert.match(polishCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(polishCss,/grid-template-columns:36px minmax\(0,1fr\)/);assert.match(polishCss,/height:64px/);assert.match(polishCss,/width:36px;height:36px/);});
-test("ordinary daily dungeons are 25% core stats and Abyss stays excluded",()=>{assert.match(dungeon,/v17342DailyDungeonStatsHalvedAgain/);assert.match(dungeon,/monster\.v141Abyss===true/);});
+test("ordinary daily dungeons use V173.43 dynamic party/level scaling and Abyss stays excluded",()=>{
+    assert.match(dungeon,/const partyMultiplier=partySize===1\?\.60:partySize===2\?\.82:1/);
+    assert.match(dungeon,/const levelMultiplier=highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05/);
+    assert.match(dungeon,/factor:partyMultiplier\*levelMultiplier/);
+    assert.match(dungeon,/function normalizeDailyDungeonMonster\(monster\)/);
+    assert.match(dungeon,/monster\.v141Abyss===true/);
+    assert.doesNotMatch(dungeon,/v17342DailyDungeonStatsHalvedAgain/);
+});
 
 console.log("\n"+passed+" V173.43 formal growth/charge checks passed.");
