@@ -15,17 +15,18 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect preview hosts
+      - name: Identify Pages source
         shell: bash
         run: |
           set -euo pipefail
-          for url in \
-            "https://tf00913225-alt.github.io/my-game/" \
-            "https://raw.githack.com/tf00913225-alt/my-game/dev/index.html"; do
-            echo "===== ${url} ====="
-            code=$(curl -L -sS --max-time 60 -D /tmp/headers -o /tmp/body -w '%{http_code}' "$url" || true)
-            echo "HTTP=${code}"
-            grep -iE '^(content-type|content-length|cache-control|age|server|location):' /tmp/headers || true
-            echo "BYTES=$(wc -c < /tmp/body)"
-            grep -o '<title>[^<]*</title>' /tmp/body | head -1 || true
+          base="https://tf00913225-alt.github.io/my-game"
+          for path in "/" "/js/47-v158-combat-tuning.js" "/assets/maps/zone10-v17344.png" "/tests/v173.44-current-request.test.js"; do
+            echo "===== ${path} ====="
+            code=$(curl -L -sS --max-time 60 -D /tmp/headers -o /tmp/body -w '%{http_code}' "${base}${path}" || true)
+            echo "HTTP=${code} BYTES=$(wc -c < /tmp/body)"
+            grep -iE '^(content-type|cache-control|age|server):' /tmp/headers || true
+            if [ "$path" = "/js/47-v158-combat-tuning.js" ]; then
+              grep -o 'partyMultiplier=partySize===1?\.[0-9][0-9]:partySize===2?\.[0-9][0-9]:1' /tmp/body | head -1 || true
+              grep -o 'highestLevel<=15?.80' /tmp/body | head -1 || true
+            fi
           done
