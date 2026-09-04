@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.42)
+ * CURRENT FINAL INTEGRATION SPEC (V173.43)
  *
  * This suite represents the fully loaded current rules.
  * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
@@ -92,10 +92,11 @@ const FINAL_FOUR_ELEMENT_CORE={
     frostCrush:[116,24,60,"single",30,1,5,["iceSpin"]],
     waterBall:[10,2,8,"tri",2,1,5,[]],
     floodBeast:[105,21,35,"single",15,1,5,["waterBall"]],
-    iceArrowRain:[20,4,75,"all",20,1,5,["floodBeast"]],
-    freeze:[null,null,32,"column",25,null,1,["iceArrowRain"]],
-    healSpell:[null,null,45,"allyTri",20,1,5,["iceArrowRain","iceSpin"]],
-    revive:[null,null,45,"deadAlly",20,1,5,["healSpell"]],
+    iceArrowRain:[30,6,75,"all",20,1,5,["floodBeast"]],
+    freeze:[null,null,32,"column",20,null,1,["frostPunch","floodBeast"]],
+    healSpell:[null,null,45,"allyTri",16,1,5,["frostPunch","floodBeast"]],
+    revive:[null,null,45,"deadAlly",18,1,5,["healSpell"]],
+    purifyMind:[null,null,22,"ally",1,null,1,["frostPunch","floodBeast"]],
     waterEX:[null,null,null,"none",25,null,1,[]],
 
     stormFist:[26,6,7,"single",2,1,5,[]],
@@ -373,7 +374,7 @@ test("wild zones keep the one-pass curve while the beginner forest applies the f
 
 test("the complete four-element core table is final after every patch",()=>{
     const skills=loadFinalRuntime().skills;
-    assert.equal(Object.keys(FINAL_FOUR_ELEMENT_CORE).length,45);
+    assert.equal(Object.keys(FINAL_FOUR_ELEMENT_CORE).length,46);
     Object.entries(FINAL_FOUR_ELEMENT_CORE).forEach(([id,expected])=>{
         assert.deepEqual(normalizedCore(skills[id]),expected,id);
     });
@@ -386,13 +387,13 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
         blazeSpell:{burnChance:30,burnDuration:2,burnPercentByLevel:[1,2,3,4,5]},
         flameTornado:{burnChance:100,guaranteedBurn:true,burnDuration:1,burnPercentByLevel:[3,4,5,6,7]},
         phoenixCry:{burnChance:40,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1},
-        waterKnife:{frostbiteChance:10,frostbiteDuration:1},
-        frostPunch:{frostbiteChance:15,frostbiteDuration:1},
-        iceSpin:{frostbiteChance:20,frostbiteDuration:1},
-        frostCrush:{frostbiteChance:25,frostbiteDuration:1},
-        waterBall:{frostbiteChance:10,frostbiteDuration:1},
-        floodBeast:{frostbiteChance:15,frostbiteDuration:1},
-        iceArrowRain:{frostbiteChance:20,frostbiteDuration:1},
+        waterKnife:{frostbiteChance:30,frostbiteDuration:1},
+        frostPunch:{frostbiteChance:35,frostbiteDuration:2},
+        iceSpin:{frostbiteChance:35,frostbiteDuration:2},
+        frostCrush:{frostbiteChance:45,frostbiteDuration:2},
+        waterBall:{frostbiteChance:30,frostbiteDuration:1},
+        floodBeast:{frostbiteChance:35,frostbiteDuration:2},
+        iceArrowRain:{frostbiteChance:35,frostbiteDuration:2},
         freeze:{freezeChance:90,freezeDuration:3},
         stormFist:{agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1},
         stormFlurry:{damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2},
@@ -485,13 +486,14 @@ test("same-name states miss without refresh while differently named hard control
             v141Abyss:true,v155FinalAbyss:true
         });
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        Math.random=function(){ return 0; };
         const action=v141TryMonsterSpecialAction(0);
         return {burn:burn,afterPetrify:afterPetrify,afterFreeze:afterFreeze,action:action,sp:monsters[0].sp};
     })()`);
     assert.deepEqual(result,{
         burn:[{type:"burn",turnsLeft:2,percent:3,statusName:"燃燒"}],
         afterPetrify:["burn","freeze","petrify"],afterFreeze:["burn","freeze","petrify"],
-        action:false,sp:500
+        action:true,sp:555
     });
 });
 
@@ -807,7 +809,7 @@ test("Flood Beast stays single-target while Ice Arrow Rain resolves every living
         false,false,false,false,true,false,false,false,false,false
     ]);
     assert.deepEqual(flood.effects,[
-        [],[],[],[],[{type:"frostbite",turnsLeft:1,value:0,statusName:"凍傷"}],[],[],[],[],[]
+        [],[],[],[],[{type:"frostbite",turnsLeft:2,value:0,statusName:"凍傷"}],[],[],[],[],[]
     ]);
     assert.equal(flood.effects.flat().some(effect=>effect.type==="freeze"),false);
     assert.equal(flood.sp,965);
@@ -816,7 +818,7 @@ test("Flood Beast stays single-target while Ice Arrow Rain resolves every living
     assert.deepEqual(rain.after.map((hp,index)=>hp<rain.before[index]),Array(10).fill(true));
     assert.deepEqual(
         rain.effects.map(effects=>effects.map(effect=>[effect.type,effect.turnsLeft])),
-        Array.from({length:10},()=>[["frostbite",1]])
+        Array.from({length:10},()=>[["frostbite",2]])
     );
     assert.equal(rain.effects.flat().some(effect=>effect.type==="freeze"),false);
     assert.equal(rain.sp,925);
@@ -908,60 +910,43 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
     assert.deepEqual(result,{column:[1,4],statuses:[]});
 });
 
-test("equipment dungeon is fixed at one boss plus four elites with its own single rank multiplier",()=>{
+test("all daily dungeons share three six-enemy waves and Gold replaces Equipment",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         Math.random=function(){ return 0; };
-        function character(id){ return {id:id,level:60}; }
-        const compositions=[];
-        [1,2,3].forEach(count=>{
-            Object.assign(player,character("主角"));
-            player2=count>=2?character("角色2"):null;
-            player3=count>=3?character("角色3"):null;
-            const composition=v138GetEquipmentDungeonComposition();
-            const roster=v132BuildEquipmentDungeonRoster();
-            const before=roster.map(monster=>monster.skillIds.slice());
-            roster.forEach(monster=>v144ConfigureMonsterEncounterSkills(monster,"equipment-test"));
-            compositions.push({composition:composition,count:roster.length,
-                ranks:roster.map(monster=>monster.rank),levels:roster.map(monster=>monster.level),
-                skillLevels:roster.map(monster=>monster.v141ForceSkillLevel),
-                chances:roster.map(monster=>monster.skillChance),
-                tiers:roster.map(monster=>monster.skillIds.map(id=>skillDatabase[id].tier)),
-                unchanged:roster.every((monster,index)=>JSON.stringify(monster.skillIds)===JSON.stringify(before[index])),
-                locked:roster.every(monster=>monster.v132FixedSkillLoadout===true)
-            });
+        Object.assign(player,{id:"主角",level:40});player2=null;player3=null;
+        const types=["exp","material","gold"];
+        const runs=types.map(type=>{
+            const built=v148BuildDailyDungeonWaves(type);
+            return {type:type,lengths:built.waves.map(wave=>wave.length),
+                ranks:built.waves.map(wave=>wave.map(monster=>getMonsterRank(monster))),
+                rows:built.waves.map(wave=>wave.map(monster=>monster.v141FormationRow)),
+                positions:built.waves.map(wave=>wave.map(monster=>monster.v141FormationPosition)),
+                orders:built.waves.map(wave=>wave.map(monster=>monster.v148TargetOrder))};
         });
-        const normalEliteBase=v132BuildDungeonMonster("基準精英",60,"fire","regular");
-        const equipmentElite=v132BuildEquipmentDungeonMonster("裝備精英",60,"fire","elite");
-        const normalBossBase=v132BuildDungeonMonster("基準首領",60,"fire","regular");
-        const equipmentBoss=v132BuildEquipmentDungeonMonster("裝備首領",60,"fire","boss");
-        function expected(base,multiplier){
-            return {maxHP:Math.round(base.maxHP*multiplier.maxHP),maxSP:base.maxSP,
-                attack:base.attack,magicAttack:base.magicAttack,
-                defense:Math.round(base.defense*multiplier.defense)};
-        }
-        function actual(monster){ return {maxHP:monster.maxHP,maxSP:monster.maxSP,attack:monster.attack,
-            magicAttack:monster.magicAttack,defense:monster.defense}; }
-        return {compositions:compositions,multipliers:v173EquipmentDungeonRankMultipliers,
-            elite:{actual:actual(equipmentElite),expected:expected(normalEliteBase,{maxHP:1.8,defense:1.1})},
-            boss:{actual:actual(equipmentBoss),expected:expected(normalBossBase,{maxHP:2.8,defense:1.2})}};
+        const one40=v173GetDailyDungeonScaleContext();
+        player2={id:"角色2",level:40};
+        const two40=v173GetDailyDungeonScaleContext();
+        player3={id:"角色3",level:80};
+        const three80=v173GetDailyDungeonScaleContext();
+        return {runs:runs,one40:one40,two40:two40,three80:three80,goldReward:v148GetGoldDungeonReward(40)};
     })()`);
-    result.compositions.forEach((entry,index)=>{
-        assert.deepEqual(entry.composition,{playerCount:index+1,bossCount:1,eliteCount:4,total:5});
-        assert.equal(entry.count,5);
-        assert.deepEqual(entry.ranks,["boss","elite","elite","elite","elite"]);
-        assert.deepEqual(entry.levels,[60,60,60,60,60]);
-        assert.deepEqual(entry.skillLevels,[3,2,2,2,2]);
-        assert.deepEqual(entry.chances,[.7,.7,.7,.7,.7]);
-        assert.ok(entry.tiers[0].length>0&&entry.tiers[0].every(tier=>tier===4));
-        entry.tiers.slice(1).forEach(tiers=>assert.ok(tiers.length>0&&tiers.every(tier=>tier===3)));
-        assert.equal(entry.unchanged,true);
-        assert.equal(entry.locked,true);
+    result.runs.forEach(run=>{
+        assert.deepEqual(run.lengths,[6,6,6],run.type);
+        assert.deepEqual(run.ranks[0],["regular","regular","regular","regular","regular","regular"]);
+        assert.deepEqual(run.ranks[1],["regular","regular","regular","regular","elite","elite"]);
+        assert.deepEqual(run.ranks[2],["regular","regular","regular","elite","boss","elite"]);
+        run.rows.forEach(row=>assert.deepEqual(row,[0,0,0,1,1,1]));
+        run.positions.forEach(row=>assert.deepEqual(row,[0,1,2,0,1,2]));
+        run.orders.forEach(row=>assert.deepEqual(row,[1,2,3,4,5,6]));
     });
-    assert.deepEqual(result.multipliers,{elite:{maxHP:1.8,defense:1.1},
-        boss:{maxHP:2.8,defense:1.2}});
-    assert.deepEqual(result.elite.actual,result.elite.expected);
-    assert.deepEqual(result.boss.actual,result.boss.expected);
+    assert.equal(result.one40.factor,.60);
+    assert.equal(result.two40.factor,.82);
+    assert.equal(result.three80.factor,1.05);
+    assert.ok(result.goldReward>0);
+    const dungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+    assert.match(dungeonSource,/金幣副本/);
+    assert.match(dungeonSource,/v132BeginEquipmentDungeon=function\(\)\{ return beginFormalDailyDungeon\("gold"\); \}/);
 });
 
 test("Abyss floors one through five keep exact compositions, skill levels and additional HP",()=>{
