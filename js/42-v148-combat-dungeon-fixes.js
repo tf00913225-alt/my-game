@@ -58,10 +58,10 @@
     }
 
     /*
-       The DOM row is the final formation truth. Fixed Abyss metadata is the
-       non-DOM fallback; the V138 rank arrangement remains the normal fallback.
-       This keeps B/C/D as B/C/D even when an Abyss row was rendered by a later
-       layer than V138.
+       Rendered DOM rows may lose dead cards, so they are only presentation
+       truth. Skill adjacency and auto-target order must use the full formation
+       that existed when the battle began; otherwise two surviving far-edge
+       monsters become false neighbours after the middle cards disappear.
     */
     function cardIndex(card){
         const match=card&&String(card.id||"").match(/^battleMonster(\d+)$/);
@@ -105,6 +105,51 @@
         return ordered.length?[ordered]:[];
     }
 
+    function stableFormationRows(indexes){
+        const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
+        if(typeof monsters!=="undefined"){
+            const fixed=ordered.map(index=>({index:index,monster:monsters[index]}))
+                .filter(entry=>entry.monster&&Number.isInteger(entry.monster.v141FormationRow));
+            if(fixed.length){
+                const rowNumbers=Array.from(new Set(fixed.map(entry=>entry.monster.v141FormationRow)))
+                    .sort((a,b)=>a-b);
+                return rowNumbers.map(rowNumber=>fixed
+                    .filter(entry=>entry.monster.v141FormationRow===rowNumber)
+                    .sort((a,b)=>numeric(a.monster.v141FormationPosition)-numeric(b.monster.v141FormationPosition))
+                    .map(entry=>entry.index)
+                );
+            }
+        }
+        if(typeof window.v138GetFormationRows==="function"){
+            const rows=window.v138GetFormationRows(ordered);
+            if(Array.isArray(rows)&&rows.some(row=>Array.isArray(row)&&row.length)){
+                return rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice());
+            }
+        }
+        return visualFormationRows(ordered);
+    }
+
+    function centerFirstOrder(row){
+        const values=(row||[]).slice();
+        if(values.length<=1){ return values; }
+        const order=[];
+        const leftCenter=Math.floor((values.length-1)/2);
+        const rightCenter=Math.ceil((values.length-1)/2);
+        order.push(leftCenter);
+        if(rightCenter!==leftCenter){ order.push(rightCenter); }
+        for(let distance=1;order.length<values.length;distance++){
+            const left=leftCenter-distance;
+            const right=rightCenter+distance;
+            if(left>=0){ order.push(left); }
+            if(right<values.length){ order.push(right); }
+        }
+        return order.map(position=>values[position]).filter(index=>Number.isInteger(index));
+    }
+
+    function autoTargetPriority(indexes){
+        return stableFormationRows(indexes).flatMap(centerFirstOrder);
+    }
+
     if(typeof getSkillTargets==="function"){
         const previousGetSkillTargets=getSkillTargets;
         getSkillTargets=function(centerIndex,targetType){
@@ -116,15 +161,16 @@
             if(targetType==="all"){ return alive; }
             if(targetType==="single"){ return alive.includes(centerIndex)?[centerIndex]:[]; }
             if(targetType==="tri"||targetType==="row"){
-                const row=visualFormationRows(indexes).find(candidate=>candidate.includes(centerIndex));
+                const row=stableFormationRows(indexes).find(candidate=>candidate.includes(centerIndex));
                 if(!row){ return []; }
+                const position=row.indexOf(centerIndex);
                 const selected=targetType==="row"
                     ?row
-                    :row.slice(Math.max(0,row.indexOf(centerIndex)-1),Math.min(row.length,row.indexOf(centerIndex)+2));
+                    :row.slice(Math.max(0,position-1),Math.min(row.length,position+2));
                 return selected.filter(index=>alive.includes(index));
             }
             if(targetType==="column"){
-                const rows=visualFormationRows(indexes);
+                const rows=stableFormationRows(indexes);
                 const selectedRow=rows.find(candidate=>candidate.includes(centerIndex));
                 if(!selectedRow){ return []; }
                 const selectedMonster=typeof monsters!=="undefined"?monsters[centerIndex]:null;
@@ -146,7 +192,8 @@
         };
     }
 
-    window.v148GetFormationRows=visualFormationRows;
+    window.v148GetFormationRows=stableFormationRows;
+    window.v148GetAutoTargetPriority=autoTargetPriority;
 
     /* A defeated card remains inert except while Revive is explicitly aiming. */
     if(typeof isValidAllyTargetForSkill==="function"){
@@ -508,7 +555,7 @@
         });
         let best=[];
         let bestScore=-1;
-        visualFormationRows(indexes).forEach(row=>{
+        stableFormationRows(indexes).forEach(row=>{
             row.forEach((center,index)=>{
                 if(!alive.includes(center)){ return; }
                 const trio=row.slice(Math.max(0,index-1),Math.min(row.length,index+2))
