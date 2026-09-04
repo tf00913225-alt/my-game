@@ -12,3 +12,4 @@
 - `dev` 每次 push 由 `.github/workflows/deploy-dev-cloudflare.yml` 自動部署到 Cloudflare Pages。
 - DEV 唯一固定測試網址：`https://four-symbols-dev.pages.dev`。
 - 不再使用 GitHack / RawCDN 作為 DEV 驗證來源。
+- `assets-library` 與 `assets-library/assets/inbox/` 仍維持 GitHub 素材工作流，不受 Cloudflare Pages 發布方式影響。
