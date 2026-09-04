@@ -33,41 +33,44 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-height:82px !important;
 }
 
-/* Auto-potion notices remain visible immediately instead of waiting for the next battle log. */
+/* Element Box auto-potion notices are a six-line, frame-free text feed. */
 #game-stage .v17342-element-box-notice-stack{
     position:absolute;
     left:50%;
-    top:176px;
+    top:25%;
     z-index:2147483646;
     display:flex;
-    width:min(820px,calc(100% - 120px));
+    width:min(760px,calc(100% - 100px));
     flex-direction:column;
     align-items:center;
-    gap:12px;
+    gap:4px;
     transform:translateX(-50%);
     pointer-events:none;
 }
 #game-stage .v17342-element-box-use-notice{
     max-width:100%;
     box-sizing:border-box;
-    padding:15px 24px;
-    border:2px solid rgba(211,159,67,.86);
-    border-radius:18px;
+    margin:0;
+    padding:0;
+    border:0;
+    border-radius:0;
     color:#fff0cf;
-    background:linear-gradient(180deg,rgba(47,31,16,.96),rgba(14,10,7,.97));
-    box-shadow:0 10px 30px rgba(0,0,0,.58),inset 0 0 22px rgba(238,180,67,.07);
+    background:none;
+    box-shadow:none;
     font-family:"Noto Serif TC",serif;
-    font-size:31px;
+    font-size:21px;
     font-weight:800;
     line-height:1.35;
     text-align:center;
+    text-shadow:0 2px 4px rgba(0,0,0,.95),0 0 8px rgba(0,0,0,.72);
+    white-space:nowrap;
     opacity:0;
-    transform:translateY(-14px) scale(.96);
+    transform:translateY(-8px);
     transition:opacity .16s ease,transform .16s ease;
 }
 #game-stage .v17342-element-box-use-notice.show{
     opacity:1;
-    transform:translateY(0) scale(1);
+    transform:translateY(0);
 }
 
 /* Current main-city production background. */
@@ -236,9 +239,12 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     color:#f1c66f;
     font-size:12px;
 }
-#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-info > div{
+#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-log{
     height:54px;
     overflow-y:auto;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+    -webkit-overflow-scrolling:touch;
     font-size:10px;
     line-height:1.35;
     scrollbar-width:thin;

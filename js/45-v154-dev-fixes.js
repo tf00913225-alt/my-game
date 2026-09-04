@@ -139,6 +139,11 @@
         notice.className="v17342-element-box-use-notice";
         notice.textContent=String(message||"");
         stack.appendChild(notice);
+        while(stack.children&&stack.children.length>6){
+            const oldest=stack.firstElementChild;
+            if(!oldest||oldest===notice){ break; }
+            oldest.remove();
+        }
         const setNoticeVisible=visible=>{
             if(!notice.classList){ return; }
             if(typeof notice.classList.toggle==="function"){
@@ -163,16 +168,19 @@
                         :(stack&&Array.isArray(stack.children)?stack.children.length:1);
                     if(stack&&childCount===0&&stack.parentNode&&typeof stack.remove==="function"){ stack.remove(); }
                 },180);
-            },2200);
+            },3000);
         }
     }
     window.v17342ShowElementBoxUseNotice=showElementBoxUseNotice;
 
-    function logElementBoxRecovery(message){
+    function logElementBoxRecovery(message,noticeOnly){
         const text=String(message||"");
         if(!text){ return; }
+        if(noticeOnly){
+            showElementBoxUseNotice(text);
+            return;
+        }
         if(typeof addBattleLog==="function"){ addBattleLog(text); }
-        if(text.includes("自動使用")){ showElementBoxUseNotice(text); }
         if(!(typeof battleActive!=="undefined"&&battleActive)&&typeof window!=="undefined"){
             window.v17342PendingBattleNotices=Array.isArray(window.v17342PendingBattleNotices)
                 ?window.v17342PendingBattleNotices:[];
@@ -236,8 +244,8 @@
                     consumed++;
                     progressed=true;
                     logElementBoxRecovery(
-                        "元素匣為"+(character.id||"角色")+"自動使用"+
-                        definition.name+"，恢復"+recovered+" "+resource.toUpperCase()+"。"
+                        "["+(character.id||"角色")+"使用補品 恢復"+recovered+resource.toUpperCase()+"]",
+                        true
                     );
                     const updatedValue=Number(character[resource])||0;
                     if(recovered>0&&updatedValue<maxValue&&updatedValue/maxValue*100<=threshold){

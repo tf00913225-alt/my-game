@@ -1,32 +1,92 @@
-name: V173.38 Inspect Staged Patch
+name: V173.45 Finalize Current Request
 
 on:
   push:
     branches: [dev]
     paths:
       - .github/workflows/v17338-inspect-staged.yml
-      - .github/v17338.patch.xz.b64
+      - .github/v17345-maintenance.py
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  inspect:
+  finalize:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           ref: dev
           fetch-depth: 2
-      - name: Decode and validate staged patch
+
+      - name: Apply V173.45 version and handoff maintenance
         run: |
-          base64 -d .github/v17338.patch.xz.b64 | xz -d > /tmp/v17338.patch
-          git apply --check /tmp/v17338.patch
-          git apply --stat /tmp/v17338.patch
-          sha256sum /tmp/v17338.patch
-          cp /tmp/v17338.patch v17338.patch
-      - uses: actions/upload-artifact@v4
-        with:
-          name: v17338-staged-patch
-          path: v17338.patch
-          retention-days: 1
+          set -euo pipefail
+          python3 .github/v17345-maintenance.py
+
+      - name: Validate focused request
+        run: |
+          set -euo pipefail
+          node --check js/01-stage-v8-touch-lock.js
+          node --check js/36-v141-content-systems.js
+          node --check js/42-v148-combat-dungeon-fixes.js
+          node --check js/45-v154-dev-fixes.js
+          node --check js/50-v169-water-skill-rules.js
+          node --check js/51-v169-rpg-ui.js
+          node tests/v173.45-current-request.test.js
+
+      - name: Run full project checks
+        run: |
+          set -euo pipefail
+          node .github/scripts/ci.mjs syntax
+          node .github/scripts/ci.mjs tests
+          node .github/scripts/ci.mjs resources
+          node .github/scripts/ci.mjs html-ids
+          node .github/scripts/ci.mjs loader
+          node .github/scripts/ci.mjs git-diff
+
+      - name: Restore inspector and publish finalized V173.45
+        run: |
+          set -euo pipefail
+          rm -f .github/v17345-maintenance.py
+          cat > .github/workflows/v17338-inspect-staged.yml <<'YAML'
+          name: V173.38 Inspect Staged Patch
+
+          on:
+            push:
+              branches: [dev]
+              paths:
+                - .github/workflows/v17338-inspect-staged.yml
+                - .github/v17338.patch.xz.b64
+
+          permissions:
+            contents: read
+
+          jobs:
+            inspect:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                  with:
+                    ref: dev
+                    fetch-depth: 2
+                - name: Decode and validate staged patch
+                  run: |
+                    base64 -d .github/v17338.patch.xz.b64 | xz -d > /tmp/v17338.patch
+                    git apply --check /tmp/v17338.patch
+                    git apply --stat /tmp/v17338.patch
+                    sha256sum /tmp/v17338.patch
+                    cp /tmp/v17338.patch v17338.patch
+                - uses: actions/upload-artifact@v4
+                  with:
+                    name: v17338-staged-patch
+                    path: v17338.patch
+                    retention-days: 1
+          YAML
+          git config user.name "tf00913225-alt"
+          git config user.email "tf00913225@gmail.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: finalize V173.45 combat dungeon shop and abyss maintenance"
+          git push origin HEAD:dev

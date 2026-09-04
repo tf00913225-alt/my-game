@@ -184,7 +184,7 @@
         };
     };
 
-    /* ----- Shop: keep the proven flat grid, ordered HP-left / SP-right. ----- */
+    /* ----- Shop: keep the proven potion grid and add the equipment preview page. ----- */
     function arrangeShopColumns(markup){
         if(typeof markup!=="string"||markup.indexOf("shop-potion-list")<0){
             return markup;
@@ -223,12 +223,114 @@
     }
     window.v169ArrangeShopColumns=arrangeShopColumns;
 
+    const SHOP_REFRESH_STORAGE_KEY="v169_equipment_shop_daily";
+    const SHOP_FREE_REFRESHES=5;
+    const SHOP_MAX_REFRESHES=10;
+    let shopPage="potion";
+    const SHOP_EQUIPMENT_PREVIEW=[
+        {name:"青鋒長劍",slot:"武器",glyph:"劍"},{name:"厚背砍刀",slot:"武器",glyph:"刀"},
+        {name:"沉木法杖",slot:"武器",glyph:"杖"},{name:"竹骨法扇",slot:"武器",glyph:"扇"},
+        {name:"烏金戰甲",slot:"衣服",glyph:"甲"},{name:"素紋法袍",slot:"衣服",glyph:"袍"},
+        {name:"鐵紋護腕",slot:"護腕",glyph:"腕"},{name:"雲紗護腕",slot:"護腕",glyph:"袖"},
+        {name:"玄鐵戰靴",slot:"鞋子",glyph:"靴"},{name:"行雲法履",slot:"鞋子",glyph:"履"},
+        {name:"束髮戰冠",slot:"頭部",glyph:"冠"},{name:"青布法帽",slot:"頭部",glyph:"帽"},
+        {name:"精鐵短劍",slot:"武器",glyph:"鋒"},{name:"斬馬闊刀",slot:"武器",glyph:"斬"},
+        {name:"檀木短杖",slot:"武器",glyph:"木"},{name:"素竹羽扇",slot:"武器",glyph:"羽"},
+        {name:"護心皮甲",slot:"衣服",glyph:"護"},{name:"清風道袍",slot:"衣服",glyph:"道"}
+    ];
+
+    function shopEscape(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;")
+            .replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;")
+            .replace(/'/g,"&#039;");
+    }
+
+    function shopDateKey(){
+        const now=new Date();
+        return now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+    }
+
+    function loadEquipmentShopRefreshState(){
+        const today=shopDateKey();
+        let state={date:today,refreshCount:0};
+        try{
+            const stored=JSON.parse(localStorage.getItem(SHOP_REFRESH_STORAGE_KEY)||"{}");
+            if(stored&&stored.date===today){
+                state.refreshCount=Math.max(0,Math.min(SHOP_MAX_REFRESHES,Math.floor(Number(stored.refreshCount)||0)));
+            }
+        }catch(_){ }
+        return state;
+    }
+
+    function saveEquipmentShopRefreshState(state){
+        try{ localStorage.setItem(SHOP_REFRESH_STORAGE_KEY,JSON.stringify(state)); }catch(_){ }
+    }
+
+    function equipmentShopOffers(refreshCount){
+        const count=Math.max(0,Math.floor(Number(refreshCount)||0));
+        const start=count*5%SHOP_EQUIPMENT_PREVIEW.length;
+        return Array.from({length:6},(_,offset)=>
+            SHOP_EQUIPMENT_PREVIEW[(start+offset)%SHOP_EQUIPMENT_PREVIEW.length]
+        );
+    }
+
+    function renderShopTabs(){
+        return '<div class="v17345-shop-tabs" role="tablist" aria-label="商店分類">'+
+            '<button type="button" class="'+(shopPage==="potion"?'active':'')+'" onclick="v169SwitchShopPage(\'potion\')">補品</button>'+
+            '<button type="button" class="'+(shopPage==="equipment"?'active':'')+'" onclick="v169SwitchShopPage(\'equipment\')">裝備</button></div>';
+    }
+
+    function renderEquipmentShop(){
+        const state=loadEquipmentShopRefreshState();
+        const offers=equipmentShopOffers(state.refreshCount);
+        const freeRemaining=Math.max(0,SHOP_FREE_REFRESHES-state.refreshCount);
+        const paidPending=state.refreshCount>=SHOP_FREE_REFRESHES&&state.refreshCount<SHOP_MAX_REFRESHES;
+        const goldText=typeof gold!=="undefined"?Math.max(0,Math.floor(Number(gold)||0)).toLocaleString("zh-TW"):"0";
+        const refreshLabel=freeRemaining>0
+            ?"免費刷新（剩"+freeRemaining+"次）"
+            :state.refreshCount>=SHOP_MAX_REFRESHES?"今日刷新已達上限":"金幣刷新・價格待設定";
+        return '<div class="v17345-equipment-shop">'+
+            '<div class="v17345-equipment-wallet"><span>裝備商店</span><b>金幣 '+goldText+'</b></div>'+
+            '<div class="v17345-equipment-grid">'+offers.map(item=>
+                '<article class="v17345-equipment-card"><div class="v17345-equipment-icon" aria-hidden="true">'+shopEscape(item.glyph)+'</div>'+
+                '<b>'+shopEscape(item.name)+'</b><span>'+shopEscape(item.slot)+'・普通裝備</span>'+
+                '<button type="button" disabled>售價待設定</button></article>'
+            ).join("")+'</div>'+
+            '<div class="v17345-equipment-refresh"><div><b>今日刷新 '+state.refreshCount+' / '+SHOP_MAX_REFRESHES+'</b>'+
+            '<span>前5次免費；第6～10次使用金幣，價格待下一步確認。</span></div>'+
+            '<button type="button" '+(freeRemaining>0?'onclick="v17345RefreshEquipmentShop()"':'disabled')+'>'+refreshLabel+'</button></div>'+
+            (paidPending?'<p class="v17345-equipment-pending">金幣刷新版面已保留，等確認刷新價格後再開放第6～10次。</p>':'')+
+            '</div>';
+    }
+
+    function rerenderShop(){
+        const body=document.getElementById("homeFeatureModalBody");
+        if(body&&typeof renderShopContent==="function"){ body.innerHTML=renderShopContent(); }
+    }
+
+    window.v169SwitchShopPage=function(page){
+        shopPage=page==="equipment"?"equipment":"potion";
+        rerenderShop();
+    };
+
+    window.v17345RefreshEquipmentShop=function(){
+        const state=loadEquipmentShopRefreshState();
+        if(state.refreshCount>=SHOP_FREE_REFRESHES){ return; }
+        state.refreshCount++;
+        saveEquipmentShopRefreshState(state);
+        rerenderShop();
+    };
+
     if(typeof renderShopContent==="function"){
         const previousRenderShopContent=renderShopContent;
         renderShopContent=function(){
-            return arrangeShopColumns(
-                previousRenderShopContent.apply(this,arguments)
-            );
+            const content=shopPage==="equipment"
+                ?renderEquipmentShop()
+                :arrangeShopColumns(previousRenderShopContent.apply(this,arguments));
+            return '<div class="v17345-shop-shell">'+renderShopTabs()+content+'</div>';
         };
     }
 

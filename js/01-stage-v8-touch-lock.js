@@ -36,7 +36,7 @@
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
             ".home-feature-modal-box, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .item-modal-box, #itemModalStats, #skillDetailStats, " +
-            ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, " +
+            ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .v17342-abyss-battle-log, " +
             "textarea, select, input";
 
         let node =

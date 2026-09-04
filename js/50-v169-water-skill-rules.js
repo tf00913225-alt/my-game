@@ -105,9 +105,9 @@
         },
         purifyMind:{
             id:"purifyMind",tier:5,name:"淨心訣",element:"water",category:"buff",
-            targetType:"ally",learnCost:1,maxLevel:1,spCost:22,
+            targetType:"ally",enemyTargetAllowed:true,learnCost:1,maxLevel:1,spCost:22,
             removeAllStates:true,requires:["frostPunch","floodBeast"],
-            description:"需先學習冰霜拳或洪水猛獸其一。初次學習需1技能點，選擇1名友方目標，解除其身上所有增益與所有異常狀態，消耗22 SP，最高1級。"
+            description:"需先學習冰霜拳或洪水猛獸其一。初次學習需1技能點，可選擇1名我方或敵方目標；對我方解除所有增益與所有異常狀態，對敵方解除所有增益狀態（包含結界、護盾等），不會移除敵方負面狀態。消耗22 SP，最高1級。"
         },
         waterEX:{
             id:"waterEX",tier:7,name:"水元素EX",element:"water",category:"passive",
@@ -483,7 +483,7 @@
                 levelValue(skill.reviveHealPercentByLevel,lv)+"%；不恢復SP";
         }
         if(skill&&skill.id==="purifyMind"){
-            return "解除1名友方目標身上所有增益與所有異常狀態";
+            return "可選擇1名我方或敵方目標；我方解除所有增益與異常狀態，敵方解除所有增益（包含結界、護盾等），不移除敵方負面狀態";
         }
         if(skill&&skill.id==="waterEX"){
             return "永久提升水元素傷害5%、回復類技能HP恢復量10%；每回合開始前有30%機率解除自身所有可解除負面狀態";
