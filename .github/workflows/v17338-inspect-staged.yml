@@ -1,4 +1,4 @@
-name: Inspect water skill learn gate
+name: Inspect skill owner mapping
 
 on:
   push:
@@ -16,8 +16,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: dev
-      - name: Inspect learnSkill
+      - name: Inspect skill owner mapping
         run: |
-          grep -n -A 140 -B 30 'function learnSkill' js/00-main.js || true
-          grep -n -A 100 -B 20 'function isSkillPrereqMet' js/00-main.js || true
-          grep -n -A 50 -B 20 'floodBeast' js/50-v169-water-skill-rules.js | head -120 || true
+          grep -n -A 140 -B 30 'function getSkillCharacterObject' js/00-main.js || true
+          grep -n -A 120 -B 30 'function selectCharacterForTabs' js/00-main.js || true
+          grep -n -A 100 -B 30 'currentSkillCharacter=' js/00-main.js | head -300 || true
