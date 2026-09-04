@@ -68,13 +68,32 @@ jobs:
           python /tmp/v17344_apply.py
           python - <<'PY'
           from pathlib import Path
-          path=Path('tests/v143-combat-dungeon-polish.test.js')
-          text=path.read_text(encoding='utf-8')
-          old='assert.match(dungeon,/function openAbyssBossDialogue\\(\\)[\\s\\S]*?點擊對話繼續/);'
-          new='assert.match(dungeon,/function openAbyssBossDialogue\\(\\)[\\s\\S]*?點擊空白處繼續/);'
-          if text.count(old)!=1:
-              raise SystemExit('V143 historical dialogue assertion was not found exactly once')
-          path.write_text(text.replace(old,new,1),encoding='utf-8')
+
+          def replace_once(path,old,new,label):
+              p=Path(path)
+              text=p.read_text(encoding='utf-8')
+              if text.count(old)!=1:
+                  raise SystemExit(f'{label} was not found exactly once')
+              p.write_text(text.replace(old,new,1),encoding='utf-8')
+
+          replace_once(
+              'tests/v143-combat-dungeon-polish.test.js',
+              'assert.match(dungeon,/function openAbyssBossDialogue\\(\\)[\\s\\S]*?點擊對話繼續/);',
+              'assert.match(dungeon,/function openAbyssBossDialogue\\(\\)[\\s\\S]*?點擊空白處繼續/);',
+              'V143 historical dialogue assertion'
+          )
+          replace_once(
+              'tests/v154-current-request.test.js',
+              'assert.match(css,/data-dungeon-cover="equipment"[\\s\\S]*?background-size:cover !important/);',
+              'assert.match(css,/data-dungeon-cover="gold"[\\s\\S]*?background-size:cover !important/);',
+              'V154 historical dungeon cover selector assertion'
+          )
+          replace_once(
+              'tests/v173.42-player-flow.test.js',
+              'assert.match(abyssCss,/equipment-v17343\\.png/);',
+              'assert.match(abyssCss,/gold-v17344\\.png/);',
+              'V173.42 current gold cover assertion'
+          )
           PY
 
       - name: Ensure full-suite image dependency
