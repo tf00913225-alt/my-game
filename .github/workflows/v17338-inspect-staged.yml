@@ -27,6 +27,13 @@ jobs:
           cp assets/ui/home-background-v17343.png assets/ui/home-background-v17344.png
           rm -f .github/workflows/v17344-maintenance-fix.yml
 
+      - name: Ensure image test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
       - name: Validate targeted and full checks
         run: |
           set -euo pipefail
