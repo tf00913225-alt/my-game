@@ -1,4 +1,4 @@
-# Final V173.44 maintenance trigger - historical Gold test retry
+# Final V173.44 maintenance trigger - current Gold call-site validation
 name: V173.44 Final Maintenance Apply
 
 on:
