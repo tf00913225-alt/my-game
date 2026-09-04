@@ -1,4 +1,4 @@
-# Final V173.44 maintenance trigger
+# Final V173.44 maintenance trigger - compatibility retry
 name: V173.44 Final Maintenance Apply
 
 on:
