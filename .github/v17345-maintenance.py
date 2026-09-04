@@ -1,6 +1,6 @@
 from pathlib import Path
 
-# Retry after correcting the focused V173.45 regression harness.
+# Retry after correcting the focused V173.45 regression harness and the historical Abyss arena expectation.
 OLD="173.44"
 NEW="173.45"
 
