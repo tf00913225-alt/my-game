@@ -25,6 +25,7 @@
         "teamFreezeChance","teamFreezeDuration",
         "frostbiteChance","frostbiteDuration","statusResistBonus"
     ];
+    const FROSTBITE_REMAINING_RATE=.75;
 
     const FINAL_SKILLS={
         waterKnife:{
@@ -190,6 +191,159 @@
             effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0
         ));
     }
+
+    /* Frostbite is a three-stat soft debuff, never a skill lock.  Historical
+       V149/V152 wrappers still exist for save compatibility; hide only the
+       Frostbite entry while those old narrow seams execute, then restore it. */
+    function withoutLegacyFrostbiteLock(entity,callback){
+        if(!entity||!Array.isArray(entity.statusEffects)||!activeFrostbite(entity)){
+            return callback();
+        }
+        const original=entity.statusEffects;
+        entity.statusEffects=original.filter(effect=>!(effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0));
+        try{ return callback(); }
+        finally{ entity.statusEffects=original; }
+    }
+
+    function clearLegacyFrostbiteSkillLocks(){
+        if(typeof document==="undefined"){ return; }
+        const mainButton=document.querySelector&&document.querySelector("#mainBattleMenu > .menu-button.skill.v152-frostbite-blocked");
+        if(mainButton){
+            mainButton.disabled=false;
+            mainButton.classList.remove("v152-frostbite-blocked");
+            if(mainButton.dataset){ delete mainButton.dataset.v152FrostbiteBlocked; }
+            mainButton.setAttribute("aria-label","技能");
+        }
+        if(document.querySelectorAll){
+            document.querySelectorAll("#skillQuickBarGrid .skill-quick-button.v152-frostbite-blocked").forEach(button=>{
+                button.disabled=false;
+                button.classList.remove("v152-frostbite-blocked");
+            });
+        }
+    }
+
+    if(typeof window.prepareAction==="function"){
+        const previousPrepareAction=window.prepareAction;
+        window.prepareAction=function(){
+            const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
+            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+            const that=this,args=arguments;
+            const result=withoutLegacyFrostbiteLock(character,()=>previousPrepareAction.apply(that,args));
+            clearLegacyFrostbiteSkillLocks();
+            return result;
+        };
+    }
+
+    if(typeof window.resolveQueuedPlayerAction==="function"){
+        const previousResolveQueuedPlayerAction=window.resolveQueuedPlayerAction;
+        window.resolveQueuedPlayerAction=function(characterIndex){
+            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
+            const that=this,args=arguments;
+            const result=withoutLegacyFrostbiteLock(character,()=>previousResolveQueuedPlayerAction.apply(that,args));
+            clearLegacyFrostbiteSkillLocks();
+            return result;
+        };
+    }
+
+    if(typeof window.autoActionForCharacter==="function"){
+        const previousAutoActionForCharacter=window.autoActionForCharacter;
+        window.autoActionForCharacter=function(characterIndex){
+            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
+            const that=this,args=arguments;
+            return withoutLegacyFrostbiteLock(character,()=>previousAutoActionForCharacter.apply(that,args));
+        };
+    }
+
+    if(typeof window.processSingleMonsterAttack==="function"){
+        const previousProcessSingleMonsterAttack=window.processSingleMonsterAttack;
+        window.processSingleMonsterAttack=function(monsterIndex){
+            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+            const that=this,args=arguments;
+            return withoutLegacyFrostbiteLock(monster,()=>previousProcessSingleMonsterAttack.apply(that,args));
+        };
+    }
+
+    if(typeof window.updateUI==="function"){
+        const previousUpdateUI=window.updateUI;
+        window.updateUI=function(){
+            const result=previousUpdateUI.apply(this,arguments);
+            clearLegacyFrostbiteSkillLocks();
+            return result;
+        };
+    }
+
+    /* Damage -25%.  Different named outgoing-damage reductions coexist by
+       multiplication, matching the shared status stacking rules. */
+    if(typeof window.getOutgoingDamageDownPercent==="function"){
+        const previousOutgoingDamageDown=window.getOutgoingDamageDownPercent;
+        window.getOutgoingDamageDownPercent=function(attacker){
+            const existing=Math.max(0,Math.min(100,numeric(previousOutgoingDamageDown.apply(this,arguments))));
+            if(!activeFrostbite(attacker)){ return existing; }
+            return Math.max(0,Math.min(100,100-(100-existing)*FROSTBITE_REMAINING_RATE));
+        };
+    }
+
+    /* Evasion -25% for monsters and all three player stat owners. */
+    if(typeof window.getMonsterEvasion==="function"){
+        const previousMonsterEvasion=window.getMonsterEvasion;
+        window.getMonsterEvasion=function(monster){
+            const value=numeric(previousMonsterEvasion.apply(this,arguments));
+            return activeFrostbite(monster)?value*FROSTBITE_REMAINING_RATE:value;
+        };
+    }
+
+    function wrapPlayerEvasionStats(functionName,characterGetter){
+        const previous=window[functionName];
+        if(typeof previous!=="function"){ return; }
+        window[functionName]=function(){
+            const stats=previous.apply(this,arguments);
+            const character=characterGetter();
+            if(!stats||!activeFrostbite(character)){ return stats; }
+            return Object.assign({},stats,{evasion:numeric(stats.evasion)*FROSTBITE_REMAINING_RATE});
+        };
+    }
+    wrapPlayerEvasionStats("getMainCharacterStats",()=>typeof player!=="undefined"?player:null);
+    wrapPlayerEvasionStats("getPlayer2BattleStats",()=>typeof player2!=="undefined"?player2:null);
+    wrapPlayerEvasionStats("getPlayer3BattleStats",()=>typeof player3!=="undefined"?player3:null);
+
+    /* Status resistance -25%.  Spirit-derived and explicit player bonus
+       resistance are reduced at their existing authoritative inputs. */
+    if(typeof window.getMonsterEffectiveSpiritPoints==="function"){
+        const previousMonsterSpirit=window.getMonsterEffectiveSpiritPoints;
+        window.getMonsterEffectiveSpiritPoints=function(monster){
+            const value=numeric(previousMonsterSpirit.apply(this,arguments));
+            return activeFrostbite(monster)?value*FROSTBITE_REMAINING_RATE:value;
+        };
+    }
+    if(typeof window.getFinalBattleSpiritForPlayerTarget==="function"){
+        const previousPlayerSpirit=window.getFinalBattleSpiritForPlayerTarget;
+        window.getFinalBattleSpiritForPlayerTarget=function(target){
+            const value=numeric(previousPlayerSpirit.apply(this,arguments));
+            return activeFrostbite(target)?value*FROSTBITE_REMAINING_RATE:value;
+        };
+    }
+    if(typeof window.getPlayerStatusResistBonus==="function"){
+        const previousPlayerResistBonus=window.getPlayerStatusResistBonus;
+        window.getPlayerStatusResistBonus=function(target){
+            const value=numeric(previousPlayerResistBonus.apply(this,arguments));
+            return activeFrostbite(target)?value*FROSTBITE_REMAINING_RATE:value;
+        };
+    }
+
+    /* V149's old application log mentioned a skill prohibition.  Keep the
+       application itself and rewrite only that obsolete explanatory sentence. */
+    if(typeof window.addBattleLog==="function"){
+        const previousAddBattleLog=window.addBattleLog;
+        window.addBattleLog=function(message){
+            let text=String(message==null?"":message);
+            if(text.includes("陷入凍傷")&&text.includes("無法使用技能")){
+                text=text.replace(/，\d+回合內無法使用技能。/,"，期間傷害、閃避、異常狀態抗性降低25%。");
+            }
+            return previousAddBattleLog.call(this,text);
+        };
+    }
+
+    clearLegacyFrostbiteSkillLocks();
 
     /* V158's compatibility resolver asks for tri. Freeze's final target truth is
        a front/back column of at most two valid targets. */
@@ -390,6 +544,7 @@
             const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
             return skill?waterSkillEffectParts(skill,level).slice():[];
         },
-        isFrostbitten:activeFrostbite
+        isFrostbitten:activeFrostbite,
+        frostbitePenaltyPercent:25
     });
 })();
