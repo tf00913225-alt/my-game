@@ -19,7 +19,7 @@ def ensure_replace(text, old, new, label):
     raise SystemExit(f"{label}: unexpected state old={old_count}, new={new_count}")
 
 
-# 1. V132 compatibility must follow current one-character-Lv10 daily dungeon rule.
+# 1. V132 compatibility follows current one-character-Lv10 daily dungeon rule.
 p="js/27-v132-content-expansion.js"
 s=read(p)
 s=ensure_replace(
@@ -31,8 +31,7 @@ s=ensure_replace(
 )
 write(p,s)
 
-# 2. Flood Beast backend already checks the selected real role, Water Ball prerequisite and skill points.
-#    Expose the exact prerequisite on the action button instead of generic "locked".
+# 2. Flood Beast keeps the formal Water Ball prerequisite; show that prerequisite on the lock button.
 p="js/00-main.js"
 s=read(p)
 s=ensure_replace(
@@ -47,17 +46,6 @@ write(p,s)
 p="css/46-v154-dev-fixes.css"
 s=read(p)
 s=ensure_replace(s,'home-background-v17343.png','home-background-v17344.png',"main-city UHD CSS path")
-write(p,s)
-
-# 3b. Keep the historical Gold-dungeon API name as a compatibility alias.
-p="js/42-v148-combat-dungeon-fixes.js"
-s=read(p)
-alias='    window.v148GetGoldDungeonReward=goldDungeonReward;'
-marker='    function showDailyGoldReward(amount){'
-if alias not in s:
-    if marker not in s:
-        raise SystemExit("gold dungeon compatibility marker missing")
-    s=s.replace(marker,alias+'\n\n'+marker,1)
 write(p,s)
 
 # 4. Historical player-flow regression aligns with current intended behavior.
@@ -86,7 +74,27 @@ s=s.replace('home-background-v17343\\.png','home-background-v17344\\.png')
 s=s.replace('"assets/ui/home-background-v17343.png"','"assets/ui/home-background-v17344.png"')
 write(p,s)
 
-# 5. Current-request regression covers all maintenance guarantees.
+# 5. V170 is a historical integration test. Validate the current Gold flow instead of a removed runtime helper API.
+p="tests/v170-final-spec-integration.test.js"
+s=read(p)
+s=ensure_replace(
+    s,
+    'return {runs:runs,one40:one40,two40:two40,three80:three80,goldReward:v148GetGoldDungeonReward(40)};',
+    'return {runs:runs,one40:one40,two40:two40,three80:three80};',
+    "V170 removed Gold helper call"
+)
+s=ensure_replace(
+    s,
+    '    assert.ok(result.goldReward>0);\n'
+    '    const dungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");',
+    '    const dungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");\n'
+    '    assert.match(dungeonSource,/function goldDungeonReward\\(level\\)/);\n'
+    '    assert.match(dungeonSource,/showDailyGoldReward\\(goldDungeonReward\\(active\\.level\\)\\)/);',
+    "V170 current Gold source checks"
+)
+write(p,s)
+
+# 6. Current-request regression covers all maintenance guarantees.
 p="tests/v173.44-current-request.test.js"
 s=read(p)
 anchor='const v131=fs.readFileSync("js/25-v131-fix-batch.js","utf8");'
@@ -124,7 +132,6 @@ assert.match(main,/"🔒 "\+getSkillPrereqLabel\(skill\)/);
 assert.match(water,/floodBeast:\{[\s\S]*?learnCost:15[\s\S]*?requires:\["waterBall"\]/);
 assert.match(main,/function learnSkill\(skillId\)[\s\S]*?isSkillPrereqMet\([\s\S]*?character\.skillLevels,[\s\S]*?skill[\s\S]*?availablePoints<learnCost[\s\S]*?owner\.skillPoints=availablePoints-learnCost/);
 assert.match(water,/applyFinalSkillData\(\);[\s\S]*?renderSkillLoadout\(\)/);
-assert.match(battle,/window\.v148GetGoldDungeonReward=goldDungeonReward/);
 assert.match(abyssCss,/home-background-v17344\.png/);
 assert.equal(fs.existsSync("assets/ui/home-background-v17344.png"),true,"assets/ui/home-background-v17344.png");
 assert.match(loader,/const V_ASSET_VERSION="173\.44"/);
@@ -136,7 +143,7 @@ if checks.strip() not in s:
     s=s.replace(marker,checks+'\n'+marker,1)
 write(p,s)
 
-# 6. Record the completed maintenance and permanent DEV publishing route.
+# 7. Record the completed maintenance and permanent DEV publishing route.
 p="HANDOFF.md"
 s=read(p)
 section='''\n## V173.44 維修收斂（目前 dev）\n- 三個正式日常副本統一為任一角色 Lv10 可進；經驗副本獎勵直接進共用經驗池，不再指定角色。\n- 第二／第三角色新建時固定從 Lv1 開始；Lv20 前只保留既有 EXP 追趕倍率，不再強制跳到 Lv10。\n- 水元素【洪水猛獸】維持正式規格：需先學水球術、初學 15 技能點；學習流程讀取目前選中角色的實際 skillPoints，鎖定按鈕直接顯示缺少的前置技能。\n- 主城 HUD、index 載入版本與 V_ASSET_VERSION 已同步 V173.44；主城 UHD 背景使用 home-background-v17344.png。\n- dev 預覽固定由 Cloudflare Pages 自動發布：`https://four-symbols-dev.pages.dev`；不再使用 GitHack／RawCDN 作為測試站。\n- 僅修改 dev，main 不動。\n'''
