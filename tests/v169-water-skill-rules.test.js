@@ -1,6 +1,7 @@
 "use strict";
 
-/* HISTORICAL SPEC SNAPSHOT (V169): 水系值雖與 V170 相容，本檔仍非完整載入整合；V170 以 v170-final-spec-integration.test.js 為準。 */
+/* CURRENT WATER SPEC: V169 remains the authoritative Water owner and is kept
+   aligned with the latest V173.43 design values. */
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -15,9 +16,7 @@ function test(name,handler){
     console.log("\u2713 "+name);
 }
 
-function clone(value){
-    return JSON.parse(JSON.stringify(value));
-}
+function clone(value){ return JSON.parse(JSON.stringify(value)); }
 
 function staleSkills(){
     const common={
@@ -46,7 +45,9 @@ function staleSkills(){
 
 function bareDocument(nodes={}){
     return {
-        getElementById(id){ return nodes[id]||null; }
+        getElementById(id){ return nodes[id]||null; },
+        querySelector(){ return null; },
+        querySelectorAll(){ return []; }
     };
 }
 
@@ -81,14 +82,14 @@ function fields(skill){
 test("the eight offensive and control Water skill definitions are exact",()=>{
     const skills=load().skillDatabase;
     const expected={
-        waterKnife:{category:"physical",targetType:"single",learnCost:2,maxLevel:5,upgradeCost:1,baseDamage:21,damagePerLevel:5,spCost:6,lifestealPercentByLevel:[4,5,6,7,8],requires:[],frostbiteChance:10,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        frostPunch:{category:"physical",targetType:"single",learnCost:10,maxLevel:5,upgradeCost:1,baseDamage:32,damagePerLevel:7,spCost:17,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterKnife"],frostbiteChance:15,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        iceSpin:{category:"physical",targetType:"tri",learnCost:20,maxLevel:5,upgradeCost:1,baseDamage:35,damagePerLevel:7,spCost:45,lifestealPercentByLevel:[3,4,5,6,7],requires:["frostPunch"],frostbiteChance:20,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        frostCrush:{category:"physical",targetType:"single",learnCost:30,maxLevel:5,upgradeCost:1,baseDamage:116,damagePerLevel:24,spCost:60,lifestealPercentByLevel:[4,5,6,7,8],requires:["iceSpin"],frostbiteChance:25,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        waterBall:{category:"magic",targetType:"tri",learnCost:2,maxLevel:5,upgradeCost:1,baseDamage:10,damagePerLevel:2,spCost:8,lifestealPercentByLevel:[3,4,5,6,7],requires:[],frostbiteChance:10,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        floodBeast:{category:"magic",targetType:"single",learnCost:15,maxLevel:5,upgradeCost:1,baseDamage:105,damagePerLevel:21,spCost:35,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterBall"],frostbiteChance:15,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        iceArrowRain:{category:"magic",targetType:"all",learnCost:20,maxLevel:5,upgradeCost:1,baseDamage:20,damagePerLevel:4,spCost:75,lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],frostbiteChance:20,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        freeze:{category:"magic",targetType:"column",learnCost:25,maxLevel:1,upgradeCost:undefined,baseDamage:undefined,damagePerLevel:undefined,spCost:32,lifestealPercentByLevel:undefined,requires:["iceArrowRain"],frostbiteChance:undefined,frostbiteDuration:undefined,freezeChance:90,freezeDuration:3}
+        waterKnife:{category:"physical",targetType:"single",learnCost:2,maxLevel:5,upgradeCost:1,baseDamage:21,damagePerLevel:5,spCost:6,lifestealPercentByLevel:[4,5,6,7,8],requires:[],frostbiteChance:30,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
+        frostPunch:{category:"physical",targetType:"single",learnCost:10,maxLevel:5,upgradeCost:1,baseDamage:32,damagePerLevel:7,spCost:17,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterKnife"],frostbiteChance:35,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
+        iceSpin:{category:"physical",targetType:"tri",learnCost:20,maxLevel:5,upgradeCost:1,baseDamage:35,damagePerLevel:7,spCost:45,lifestealPercentByLevel:[3,4,5,6,7],requires:["frostPunch"],frostbiteChance:35,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
+        frostCrush:{category:"physical",targetType:"single",learnCost:30,maxLevel:5,upgradeCost:1,baseDamage:116,damagePerLevel:24,spCost:60,lifestealPercentByLevel:[4,5,6,7,8],requires:["iceSpin"],frostbiteChance:45,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
+        waterBall:{category:"magic",targetType:"tri",learnCost:2,maxLevel:5,upgradeCost:1,baseDamage:10,damagePerLevel:2,spCost:8,lifestealPercentByLevel:[3,4,5,6,7],requires:[],frostbiteChance:30,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
+        floodBeast:{category:"magic",targetType:"single",learnCost:15,maxLevel:5,upgradeCost:1,baseDamage:105,damagePerLevel:21,spCost:35,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterBall"],frostbiteChance:35,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
+        iceArrowRain:{category:"magic",targetType:"all",learnCost:20,maxLevel:5,upgradeCost:1,baseDamage:30,damagePerLevel:6,spCost:75,lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],frostbiteChance:35,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
+        freeze:{category:"magic",targetType:"column",learnCost:20,maxLevel:1,upgradeCost:undefined,baseDamage:undefined,damagePerLevel:undefined,spCost:32,lifestealPercentByLevel:undefined,requires:["frostPunch","floodBeast"],frostbiteChance:undefined,frostbiteDuration:undefined,freezeChance:90,freezeDuration:3}
     };
     Object.entries(expected).forEach(([id,value])=>assert.deepEqual(fields(skills[id]),value,id));
 });
@@ -108,20 +109,25 @@ test("legacy Freeze and Frostbite conflict fields are deleted without touching u
     assert.equal(skills.waterEX.statusResistBonus,undefined);
 });
 
-test("Water support, revive and EX passive are owned by the same final layer",()=>{
+test("Water support, cleanse, revive and EX passive are owned by the same final layer",()=>{
     const skills=load().skillDatabase;
     assert.deepEqual(
-        [skills.healSpell.targetType,skills.healSpell.baseHeal,skills.healSpell.healPerLevel,
+        [skills.healSpell.targetType,skills.healSpell.learnCost,skills.healSpell.baseHeal,skills.healSpell.healPerLevel,
             skills.healSpell.baseHealSP,skills.healSpell.healSPPerLevel,skills.healSpell.spCost,skills.healSpell.cleanseAll],
-        ["allyTri",550,30,35,0,45,true]
+        ["allyTri",16,550,30,35,0,45,true]
     );
-    assert.deepEqual(Array.from(skills.healSpell.requires),["iceArrowRain","iceSpin"]);
-    assert.deepEqual(Array.from(skills.revive.reviveHealPercentByLevel),[20,40,60,80,100]);
+    assert.deepEqual(Array.from(skills.healSpell.requires),["frostPunch","floodBeast"]);
+    assert.deepEqual([skills.revive.learnCost,Array.from(skills.revive.reviveHealPercentByLevel),skills.revive.spCost],[18,[20,40,60,80,100],45]);
+    assert.deepEqual(
+        [skills.purifyMind.name,skills.purifyMind.targetType,skills.purifyMind.learnCost,skills.purifyMind.spCost,skills.purifyMind.removeAllStates],
+        ["淨心訣","ally",1,22,true]
+    );
+    assert.deepEqual(Array.from(skills.purifyMind.requires),["frostPunch","floodBeast"]);
     assert.deepEqual(
         [skills.waterEX.damageBonusPercent,skills.waterEX.healBonusPercent,skills.waterEX.turnStartCleanseChance,skills.waterEX.statusResistBonus],
         [5,10,30,undefined]
     );
-    assert.equal(load().v169WaterSkillRules.skillIds.length,11);
+    assert.equal(load().v169WaterSkillRules.skillIds.length,12);
 });
 
 test("damage growth sequences and HP-only lifesteal text match every level",()=>{
@@ -132,7 +138,7 @@ test("damage growth sequences and HP-only lifesteal text match every level",()=>
     const sequences={
         waterKnife:[21,26,31,36,41],frostPunch:[32,39,46,53,60],iceSpin:[35,42,49,56,63],
         frostCrush:[116,140,164,188,212],waterBall:[10,12,14,16,18],
-        floodBeast:[105,126,147,168,189],iceArrowRain:[20,24,28,32,36]
+        floodBeast:[105,126,147,168,189],iceArrowRain:[30,36,42,48,54]
     };
     Object.entries(sequences).forEach(([id,expected])=>{
         const actual=[1,2,3,4,5].map(level=>{
@@ -143,7 +149,8 @@ test("damage growth sequences and HP-only lifesteal text match every level",()=>
     });
     const preview=context.getSkillEffectPreviewText(context.skillDatabase.iceSpin,5);
     assert.match(preview,/63/);
-    assert.match(preview,/20%基礎機率凍傷1回合/);
+    assert.match(preview,/35%基礎機率凍傷2回合/);
+    assert.match(preview,/傷害-25%、閃避-25%、異常狀態抗性-25%/);
     assert.match(preview,/吸取實際傷害7%（只恢復自身HP）/);
     assert.doesNotMatch(preview,/HP\/SP|冰封/);
     const freeze=context.getSkillEffectPreviewText(context.skillDatabase.freeze,1);
@@ -169,21 +176,33 @@ test("secondary and legacy player-two Freeze resolve the front/back column",()=>
     ]);
 });
 
-test("Frostbite rejects Abyss special skills while allowing the normal fallback",()=>{
-    const monsters=[
-        {name:"極帝天尊",statusEffects:[{type:"frostbite",turnsLeft:1}]},
-        {name:"極帝天尊",statusEffects:[]}
-    ];
-    let specialCalls=0;
+test("Frostbite is a soft debuff and never blocks skills or monster special actions",()=>{
+    const frostbitten={name:"測試",statusEffects:[{type:"frostbite",turnsLeft:2}]};
+    const clean={name:"正常",statusEffects:[]};
+    let specials=0;
     const context=load({
-        monsters,
-        v141TryMonsterSpecialAction(){ specialCalls++; return true; }
+        player:frostbitten,monsters:[frostbitten,clean],activeBattleCharacterIndex:0,
+        getPartyCharacterByIndex:()=>frostbitten,
+        v141TryMonsterSpecialAction(){ specials++; return true; },
+        prepareAction(){ return "skill-ok"; },
+        processSingleMonsterAttack(){ return "monster-skill-ok"; },
+        getOutgoingDamageDownPercent(){ return 0; },
+        getMonsterEvasion(){ return 40; },
+        getMonsterEffectiveSpiritPoints(){ return 80; },
+        getPlayerStatusResistBonus(){ return 20; },
+        getFinalBattleSpiritForPlayerTarget(){ return 100; }
     });
-    assert.equal(context.v141TryMonsterSpecialAction(0),false);
-    assert.equal(specialCalls,0,"Frostbite must not enter a named special resolver");
-    assert.equal(context.v141TryMonsterSpecialAction(1),true);
-    assert.equal(specialCalls,1);
-    assert.equal(context.v169WaterSkillRules.isFrostbitten(monsters[0]),true);
+    assert.equal(context.v141TryMonsterSpecialAction(0),true);
+    assert.equal(specials,1);
+    assert.equal(context.prepareAction("waterKnife"),"skill-ok");
+    assert.equal(context.processSingleMonsterAttack(0),"monster-skill-ok");
+    assert.equal(context.getOutgoingDamageDownPercent(frostbitten),25);
+    assert.equal(context.getMonsterEvasion(frostbitten),30);
+    assert.equal(context.getMonsterEffectiveSpiritPoints(frostbitten),60);
+    assert.equal(context.getFinalBattleSpiritForPlayerTarget(frostbitten),75);
+    assert.equal(context.getPlayerStatusResistBonus(frostbitten),15);
+    assert.equal(context.v169WaterSkillRules.frostbitePenaltyPercent,25);
+    assert.equal(context.v169WaterSkillRules.isFrostbitten(frostbitten),true);
 });
 
 test("monster Freeze pure-control damage is owned by the authoritative core",()=>{
@@ -194,7 +213,7 @@ test("monster Freeze pure-control damage is owned by the authoritative core",()=
     assert.match(main,/if\(damage>0 && hasBarrier\)/);
 });
 
-test("all final UI description entry points expose Frostbite and HP-only recovery",()=>{
+test("all final UI description entry points expose current Frostbite and HP-only recovery",()=>{
     const description={textContent:""};
     const levels={innerHTML:""};
     let creationCalls=0;
@@ -215,16 +234,16 @@ test("all final UI description entry points expose Frostbite and HP-only recover
     context.showCreationSkillDetail("iceArrowRain");
 
     assert.match(summary,/敵方全體/);
-    assert.match(summary,/凍傷，只禁止技能/);
+    assert.match(summary,/凍傷：傷害、閃避、異常抗性各降低25%/);
     assert.match(summary,/恢復自身HP/);
-    assert.match(effect,/28/);
-    assert.match(effect,/20%基礎機率凍傷1回合/);
+    assert.match(effect,/42/);
+    assert.match(effect,/35%基礎機率凍傷2回合/);
     assert.match(breakdown,/Lv\.5/);
-    assert.match(breakdown,/36/);
+    assert.match(breakdown,/54/);
     assert.match(breakdown,/只恢復自身HP/);
     assert.equal(creationCalls,1);
     assert.equal(description.textContent,skill.description);
-    assert.match(levels.innerHTML,/凍傷1回合/);
+    assert.match(levels.innerHTML,/凍傷2回合/);
     assert.doesNotMatch(levels.innerHTML,/HP\/SP|冰封/);
 });
 
