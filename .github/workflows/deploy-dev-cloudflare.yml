@@ -1,0 +1,65 @@
+name: Deploy dev to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-pages-dev
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy dev preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PROJECT_NAME: four-symbols-dev
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+
+      - name: Verify Cloudflare secrets
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "CLOUDFLARE_API_TOKEN is missing"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "CLOUDFLARE_ACCOUNT_ID is missing"; exit 1; }
+
+      - name: Prepare static site
+        shell: bash
+        run: |
+          mkdir -p _deploy
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='tests/' \
+            --exclude='node_modules/' \
+            --exclude='_deploy/' \
+            ./ _deploy/
+          test -f _deploy/index.html || { echo "index.html not found"; exit 1; }
+
+      - name: Ensure Pages project exists
+        shell: bash
+        run: |
+          npx --yes wrangler@4 pages project create "$PROJECT_NAME" --production-branch=dev >/tmp/cf-project.log 2>&1 || true
+          cat /tmp/cf-project.log
+
+      - name: Deploy dev
+        shell: bash
+        run: |
+          npx --yes wrangler@4 pages deploy _deploy \
+            --project-name="$PROJECT_NAME" \
+            --branch=dev \
+            --commit-hash="${GITHUB_SHA}" \
+            --commit-message="${GITHUB_SHA::7} dev auto deploy"
+
+      - name: Preview URL
+        run: echo "https://four-symbols-dev.pages.dev"
