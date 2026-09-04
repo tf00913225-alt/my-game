@@ -36,6 +36,13 @@ jobs:
           node --check js/51-v169-rpg-ui.js
           node tests/v173.45-current-request.test.js
 
+      - name: Ensure existing asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
       - name: Run full project checks
         run: |
           set -euo pipefail
