@@ -1,0 +1,502 @@
+✓ V173.44 current request regression passed
+✓ tests/v137-regressions.test.js
+✓ tests/v138-feature-requirements.test.js
+✓ tests/v139-economy-rested-exp.test.js
+✓ tests/v140-four-element-balance.test.js
+✓ tests/v141-system-expansion.test.js
+✓ tests/v142-skill-animation.test.js
+✓ tests/v143-combat-dungeon-polish.test.js
+✓ tests/v144-rules-and-abyss.test.js
+✓ tests/v146-system-polish.test.js
+✓ tests/v148-combat-dungeon-fixes.test.js
+✓ tests/v149-skill-ui-rules.test.js
+✓ tests/v150-ice-arrow-rain-vfx.test.js
+✓ tests/v152-dev-fixes.test.js
+✓ tests/v153-fire-vfx.test.js
+✓ tests/v154-current-request.test.js
+✓ tests/v155-current-request.test.js
+✓ tests/v156-deep-trace-fixes.test.js
+✓ tests/v157-abyss-map-tap-fix.test.js
+✓ tests/v158-combat-tuning.test.js
+✓ tests/v159-abyss-battle-portraits.test.js
+✓ tests/v160-current-request.test.js
+✓ tests/v161-flame-slash-vfx.test.js
+✓ tests/v163-flame-slash-source.test.js
+✓ tests/v165-fire-vfx-fixes.test.js
+✓ tests/v166-water-vfx.test.js
+✓ tests/v167-character-creation-exp.test.js
+✓ tests/v169-abyss-assets-flow.test.js
+✓ tests/v169-element-box-settings.test.js
+✓ tests/v169-rpg-ui.test.js
+✓ tests/v169-ticket-icon-paths.test.js
+✓ tests/v169-water-skill-rules.test.js
+✓ tests/v170-final-spec-integration.test.js
+✓ tests/v171-combat-vfx-fixes.test.js
+✓ tests/v172-water-orb-vfx.test.js
+✓ tests/v173-water-orb-direction-vfx.test.js
+✓ tests/v173.11-abyss-vfx-dungeon.test.js
+
+Node test suite failed: tests/v173.13-canvas-vfx-abyss-input.test.js
+✓ the selected inbox sheets are both 1536×1152 4×3 sources
+✓ Water Ball and Ice Arrow Rain own Canvas-crop manifests
+✓ the Canvas renderer crops only one exact source cell at runtime
+✓ the Canvas renderer crops one fixed cell in row-major order
+✓ shared target geometry excludes dead cards and keeps one VFX node
+
+node:assert:883
+    throw err;
+    ^
+
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression /function openAbyssBossDialogue\(\)[\s\S]*?overlay\.onclick=[\s\S]*?launchAbyssBossBattle\(\)/. Input:
+
+'/*\n' +
+  '   V141 — synthesis and five-floor Abyss dungeon.\n' +
+  '   This layer reuses V132 inventory/dungeon bridges and keeps the legacy combat\n' +
+  '   engine intact.\n' +
+  '*/\n' +
+  '(function installV141ContentSystems(){\n' +
+  '    "use strict";\n' +
+  '\n' +
+  '    const ABYSS_STORAGE_KEY="v141_abyss_state";\n' +
+  '    const TIER_ORDER=["low","mid","high","perfect"];\n' +
+  '    const TIER_META={\n' +
+  '        low:{label:"低階",craftGold:500,reforgeGold:1000,main:[1,5],reforgeMain:[1,3]},\n' +
+  '        mid:{label:"中階",craftGold:1500,reforgeGold:3000,main:[3,8],reforgeMain:[2,5]},\n' +
+  '        high:{label:"高階",craftGold:4000,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[4,7],reforgeSub:[1,2]},\n' +
+  '        perfect:{label:"極品",craftGold:10000,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[6,10],reforgeSub:[2,4]}\n' +
+  '    };\n' +
+  '    const SLOT_META={\n' +
+  '        head:{label:"頭部",type:"head",glyph:"冠"},\n' +
+  '        shoulder:{label:"護腕",type:"shoulder",glyph:"腕"},\n' +
+  '        shoes:{label:"鞋子",type:"shoes",glyph:"履"},\n' +
+  '        hand:{label:"武器",type:"weapon",glyph:"刃"},\n' +
+  '        armor:{label:"衣服",type:"armor",glyph:"甲"}\n' +
+  '    };\n' +
+  '    const SERIES=[\n' +
+  '        {setId:"setFire",label:"赤炎",element:"fire",color:"#e24b32"},\n' +
+  '        {setId:"setWater",label:"寒泉",element:"water",color:"#4bb9e8"},\n' +
+  '        {setId:"setEarth",label:"岩岳",element:"earth",color:"#c59a54"},\n' +
+  '        {setId:"setWind",label:"青嵐",element:"wind",color:"#55cda3"}\n' +
+  '    ];\n' +
+  '    const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",agility:"敏捷",spirit:"精神"};\n' +
+  '    const MAIN_STATS=["attack","intelligence"];\n' +
+  '    const SUB_STATS=["vitality","energy","agility","spirit"];\n' +
+  '    const TALISMAN_GOLD={low:300,mid:1000,high:3000};\n' +
+  '    const synthesisState={\n' +
+  '        tab:"craft",blueprintId:null,seriesId:"setFire",reforgeUid:null,\n' +
+  '        talismanId:null,talismanQty:1,fragmentQty:{setFire:1,setWater:1,setEarth:1,setWind:1},\n' +
+  '        pendingReforge:null\n' +
+  '    };\n' +
+  '\n' +
+  '    function escapeHtml(value){\n' +
+  '        return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;")\n' +
+  `            .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");\n` +
+  '    }\n' +
+  '\n' +
+  '    function definitions(){\n' +
+  '        return window.v132GetContentDefinitions?window.v132GetContentDefinitions():{\n' +
+  '            talismans:[],ores:[],blueprints:[],tickets:[],equipmentSets:[],equipmentSetItems:[]\n' +
+  '        };\n' +
+  '    }\n' +
+  '\n' +
+  '    function svgIcon(glyph,color){\n' +
+  `        return '<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="v141g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2b2116"/><stop offset="1" stop-color="#080706"/></linearGradient></defs><rect x="3" y="3" width="58" height="58" rx="12" fill="url(#v141g)" stroke="'+color+'" stroke-width="3"/><circle cx="32" cy="32" r="19" fill="none" stroke="'+color+'" stroke-opacity=".45" stroke-width="2"/><text x="32" y="40" text-anchor="middle" font-size="22" font-weight="900" fill="'+color+'">'+glyph+'</text></svg>';\n` +
+  '    }\n' +
+  '\n' +
+  '    const fragmentDefinitions=SERIES.map(series=>({\n' +
+  '        id:"fragment"+series.setId.charAt(0).toUpperCase()+series.setId.slice(1),\n' +
+  '        name:series.label+"碎片",type:"material",setId:series.setId,tierKey:"fragment",\n' +
+  '        icon:svgIcon("碎",series.color),price:0,stats:{}\n' +
+  '    }));\n' +
+  '    function getFragmentDefinition(setId){ return fragmentDefinitions.find(item=>item.setId===setId)||null; }\n' +
+  '\n' +
+  '    function countItem(itemId){\n' +
+  '        return inventoryItems.reduce((sum,item)=>sum+(item&&item.id===itemId?Math.max(0,Number(item.count)||0):0),0);\n' +
+  '    }\n' +
+  '    function countMatching(predicate){\n' +
+  '        return inventoryItems.reduce((sum,item)=>sum+(item&&predicate(item)?Math.max(1,Number(item.count)||1):0),0);\n' +
+  '    }\n' +
+  '    function consumeMatching(predicate,amount){\n' +
+  '        let remaining=Math.max(0,Math.floor(Number(amount)||0));\n' +
+  '        if(countMatching(predicate)<remaining){ return false; }\n' +
+  '        for(let index=inventoryItems.length-1;index>=0&&remaining>0;index--){\n' +
+  '            const item=inventoryItems[index];\n' +
+  '            if(!item||!predicate(item)){ continue; }\n' +
+  '            const count=Math.max(1,Math.floor(Number(item.count)||1));\n' +
+  '            const take=Math.min(count,remaining);\n' +
+  '            if(count===take){ inventoryItems.splice(index,1); }\n' +
+  '            else{ item.count=count-take; }\n' +
+  '            remaining-=take;\n' +
+  '        }\n' +
+  '        return remaining===0;\n' +
+  '    }\n' +
+  '\n' +
+  '    function runInventoryTransaction(operation){\n' +
+  '        return window.v132RunInventoryTransaction?window.v132RunInventoryTransaction(operation):!!operation();\n' +
+  '    }\n' +
+  '    function addItem(definition,amount){\n' +
+  '        return !!(window.v132AddItemToInventory&&window.v132AddItemToInventory(definition,amount));\n' +
+  '    }\n' +
+  '\n' +
+  '    function makeUid(prefix){\n' +
+  '        return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,9);\n' +
+  '    }\n' +
+  '    function ensureEquipmentUids(){\n' +
+  '        let changed=false;\n' +
+  '        inventoryItems.forEach(item=>{\n' +
+  '            if(item&&isEquipmentInventoryType(item.type)&&!item.v141Uid){ item.v141Uid=makeUid("bag"); changed=true; }\n' +
+  '        });\n' +
+  '        Object.values(characterEquipment||{}).forEach(equipment=>{\n' +
+  '            Object.values(equipment||{}).forEach(item=>{\n' +
+  '                if(item&&!item.v141Uid){ item.v141Uid=makeUid("equip"); changed=true; }\n' +
+  '            });\n' +
+  '        });\n' +
+  '        if(changed&&typeof saveGame==="function"){ saveGame(); }\n' +
+  '    }\n' +
+  '\n' +
+  '    function allRefinableEquipment(){\n' +
+  '        ensureEquipmentUids();\n' +
+  '        const results=[];\n' +
+  '        inventoryItems.forEach(item=>{\n' +
+  '            if(item&&isEquipmentInventoryType(item.type)){ results.push({item,source:"背包"}); }\n' +
+  '        });\n' +
+  '        Object.keys(characterEquipment||{}).forEach(characterKey=>{\n' +
+  '            Object.values(characterEquipment[characterKey]||{}).forEach(item=>{\n' +
+  '                if(item){ results.push({item,source:"已裝備"}); }\n' +
+  '            });\n' +
+  '        });\n' +
+  '        return results;\n' +
+  '    }\n' +
+  '    function findEquipmentByUid(uid){\n' +
+  '        const entry=allRefinableEquipment().find(candidate=>candidate.item.v141Uid===uid);\n' +
+  '        return entry?entry.item:null;\n' +
+  '    }\n' +
+  '\n' +
+  '    function inferTier(item){\n' +
+  '        if(item&&TIER_META[item.tierKey]){ return item.tierKey; }\n' +
+  '        if(item&&item.setId){ return "high"; }\n' +
+  '        const total=Object.values(item&&item.stats||{}).reduce((sum,value)=>sum+Math.abs(Number(value)||0),0);\n' +
+  '        if(total>=18){ return "perfect"; }\n' +
+  '        if(total>=10){ return "high"; }\n' +
+  '        if(total>=5){ return "mid"; }\n' +
+  '        return "low";\n' +
+  '    }\n' +
+  '\n' +
+  '    function rollUniform(min,max){ return min+Math.floor(Math.random()*(max-min+1)); }\n' +
+  '    function rollSinglePeak(range){\n' +
+  '        return Math.random()<.10?range[1]:rollUniform(range[0],Math.max(range[0],range[1]-1));\n' +
+  '    }\n' +
+  '    function rollAffixes(tierKey,isReforge){\n' +
+  '        const meta=TIER_META[tierKey];\n' +
+  '        const mainRange=isReforge?meta.reforgeMain:meta.main;\n' +
+  '        const subRange=isReforge?meta.reforgeSub:meta.sub;\n' +
+  '        const stats={};\n' +
+  '        const main=MAIN_STATS[Math.floor(Math.random()*MAIN_STATS.length)];\n' +
+  '        if(!subRange){ stats[main]=rollSinglePeak(mainRange); return stats; }\n' +
+  '        const sub=SUB_STATS[Math.floor(Math.random()*SUB_STATS.length)];\n' +
+  '        if(Math.random()<.05){\n' +
+  '            stats[main]=mainRange[1];\n' +
+  '            stats[sub]=subRange[1];\n' +
+  '            return stats;\n' +
+  '        }\n' +
+  '        let mainValue=rollUniform(mainRange[0],mainRange[1]);\n' +
+  '        let subValue=rollUniform(subRange[0],subRange[1]);\n' +
+  '        if(mainValue===mainRange[1]&&subValue===subRange[1]){\n' +
+  '            if(Math.random()<.5){ mainValue=rollUniform(mainRange[0],Math.max(mainRange[0],mainRange[1]-1)); }\n' +
+  '            else{ subValue=rollUniform(subRange[0],Math.max(subRange[0],subRange[1]-1)); }\n' +
+  '        }\n' +
+  '        stats[main]=mainValue;\n' +
+  '        stats[sub]=subValue;\n' +
+  '        return stats;\n' +
+  '    }\n' +
+  '    window.v141RollCraftAffixes=rollAffixes;\n' +
+  '\n' +
+  '    function statsHtml(stats){\n' +
+  '        const entries=Object.entries(stats||{});\n' +
+  `        if(!entries.length){ return '<span class="muted">尚無冶煉詞條</span>'; }\n` +
+  `        return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+'</b></span>').join("");\n` +
+  '    }\n' +
+  '    function rangeText(tierKey,isReforge){\n' +
+  '        const meta=TIER_META[tierKey];\n' +
+  '        const main=isReforge?meta.reforgeMain:meta.main;\n' +
+  '        const sub=isReforge?meta.reforgeSub:meta.sub;\n' +
+  "        return '主詞條 '+main[0]+'～'+main[1]+(sub?'・副詞條 '+sub[0]+'～'+sub[1]:'');\n" +
+  '    }\n' +
+  '\n' +
+  '    function showSynthesisResult(title,body){\n' +
+  '        const modal=document.getElementById("homeFeatureModal");\n' +
+  '        if(modal){\n' +
+  '            modal.classList.add("v141-crafting-flash");\n' +
+  '            setTimeout(()=>modal.classList.remove("v141-crafting-flash"),650);\n' +
+  '        }\n' +
+  '        setTimeout(()=>{\n' +
+  '            if(window.v132ShowRewardModal){\n' +
+  '                window.v132ShowRewardModal(\n' +
+  `                    '<div class="v132-reward-modal-inner"><h3>'+escapeHtml(title)+'</h3>'+body+\n` +
+  `                    '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>'\n` +
+  '                );\n' +
+  '            }\n' +
+  '        },480);\n' +
+  '    }\n' +
+  '\n' +
+  '    function renderSynthesisTabs(){\n' +
+  '        const tabs=[\n' +
+  '            ["craft","裝備合成"],["reforge","裝備冶煉"],["talisman","符咒合成"],["fragment","碎片合成"]\n' +
+  '        ];\n' +
+  `        return '<div class="v141-synthesis-tabs">'+tabs.map(([id,label])=>\n` +
+  `            '<button type="button" class="'+(synthesisState.tab===id?'active':'')+'" onclick="v141SwitchSynthesisTab(\\''+id+'\\')">'+label+'</button>'\n` +
+  `        ).join("")+'</div>';\n` +
+  '    }\n' +
+  '\n' +
+  '    function heldBlueprints(){\n' +
+  '        const byId=new Map();\n' +
+  '        inventoryItems.forEach(item=>{\n' +
+  '            if(!item||!item.blueprintSlot||!TIER_META[item.tierKey]){ return; }\n' +
+  '            if(!byId.has(item.id)){ byId.set(item.id,item); }\n' +
+  '        });\n' +
+  '        return [...byId.values()];\n' +
+  '    }\n' +
+  '\n' +
+  '    function renderCraftTab(){\n' +
+  '        const blueprints=heldBlueprints();\n' +
+  '        if(!blueprints.length){\n' +
+  `            return '<div class="v141-synthesis-empty">背包內沒有裝備設計圖紙。<small>材料寶箱可取得圖紙與礦石。</small></div>';\n` +
+  '        }\n' +
+  '        if(!blueprints.some(item=>item.id===synthesisState.blueprintId)){ synthesisState.blueprintId=blueprints[0].id; }\n' +
+  '        const blueprint=blueprints.find(item=>item.id===syn'... 55611 more characters
+
+    at /home/runner/work/my-game/my-game/tests/v173.13-canvas-vfx-abyss-input.test.js:210:12
+    at test (/home/runner/work/my-game/my-game/tests/v173.13-canvas-vfx-abyss-input.test.js:15:30)
+    at Object.<anonymous> (/home/runner/work/my-game/my-game/tests/v173.13-canvas-vfx-abyss-input.test.js:209:1)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Object..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+    at Function._load (node:internal/modules/cjs/loader:1309:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: '/*\n' +
+    '   V141 — synthesis and five-floor Abyss dungeon.\n' +
+    '   This layer reuses V132 inventory/dungeon bridges and keeps the legacy combat\n' +
+    '   engine intact.\n' +
+    '*/\n' +
+    '(function installV141ContentSystems(){\n' +
+    '    "use strict";\n' +
+    '\n' +
+    '    const ABYSS_STORAGE_KEY="v141_abyss_state";\n' +
+    '    const TIER_ORDER=["low","mid","high","perfect"];\n' +
+    '    const TIER_META={\n' +
+    '        low:{label:"低階",craftGold:500,reforgeGold:1000,main:[1,5],reforgeMain:[1,3]},\n' +
+    '        mid:{label:"中階",craftGold:1500,reforgeGold:3000,main:[3,8],reforgeMain:[2,5]},\n' +
+    '        high:{label:"高階",craftGold:4000,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[4,7],reforgeSub:[1,2]},\n' +
+    '        perfect:{label:"極品",craftGold:10000,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[6,10],reforgeSub:[2,4]}\n' +
+    '    };\n' +
+    '    const SLOT_META={\n' +
+    '        head:{label:"頭部",type:"head",glyph:"冠"},\n' +
+    '        shoulder:{label:"護腕",type:"shoulder",glyph:"腕"},\n' +
+    '        shoes:{label:"鞋子",type:"shoes",glyph:"履"},\n' +
+    '        hand:{label:"武器",type:"weapon",glyph:"刃"},\n' +
+    '        armor:{label:"衣服",type:"armor",glyph:"甲"}\n' +
+    '    };\n' +
+    '    const SERIES=[\n' +
+    '        {setId:"setFire",label:"赤炎",element:"fire",color:"#e24b32"},\n' +
+    '        {setId:"setWater",label:"寒泉",element:"water",color:"#4bb9e8"},\n' +
+    '        {setId:"setEarth",label:"岩岳",element:"earth",color:"#c59a54"},\n' +
+    '        {setId:"setWind",label:"青嵐",element:"wind",color:"#55cda3"}\n' +
+    '    ];\n' +
+    '    const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",agility:"敏捷",spirit:"精神"};\n' +
+    '    const MAIN_STATS=["attack","intelligence"];\n' +
+    '    const SUB_STATS=["vitality","energy","agility","spirit"];\n' +
+    '    const TALISMAN_GOLD={low:300,mid:1000,high:3000};\n' +
+    '    const synthesisState={\n' +
+    '        tab:"craft",blueprintId:null,seriesId:"setFire",reforgeUid:null,\n' +
+    '        talismanId:null,talismanQty:1,fragmentQty:{setFire:1,setWater:1,setEarth:1,setWind:1},\n' +
+    '        pendingReforge:null\n' +
+    '    };\n' +
+    '\n' +
+    '    function escapeHtml(value){\n' +
+    '        return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;")\n' +
+    `            .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");\n` +
+    '    }\n' +
+    '\n' +
+    '    function definitions(){\n' +
+    '        return window.v132GetContentDefinitions?window.v132GetContentDefinitions():{\n' +
+    '            talismans:[],ores:[],blueprints:[],tickets:[],equipmentSets:[],equipmentSetItems:[]\n' +
+    '        };\n' +
+    '    }\n' +
+    '\n' +
+    '    function svgIcon(glyph,color){\n' +
+    `        return '<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="v141g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2b2116"/><stop offset="1" stop-color="#080706"/></linearGradient></defs><rect x="3" y="3" width="58" height="58" rx="12" fill="url(#v141g)" stroke="'+color+'" stroke-width="3"/><circle cx="32" cy="32" r="19" fill="none" stroke="'+color+'" stroke-opacity=".45" stroke-width="2"/><text x="32" y="40" text-anchor="middle" font-size="22" font-weight="900" fill="'+color+'">'+glyph+'</text></svg>';\n` +
+    '    }\n' +
+    '\n' +
+    '    const fragmentDefinitions=SERIES.map(series=>({\n' +
+    '        id:"fragment"+series.setId.charAt(0).toUpperCase()+series.setId.slice(1),\n' +
+    '        name:series.label+"碎片",type:"material",setId:series.setId,tierKey:"fragment",\n' +
+    '        icon:svgIcon("碎",series.color),price:0,stats:{}\n' +
+    '    }));\n' +
+    '    function getFragmentDefinition(setId){ return fragmentDefinitions.find(item=>item.setId===setId)||null; }\n' +
+    '\n' +
+    '    function countItem(itemId){\n' +
+    '        return inventoryItems.reduce((sum,item)=>sum+(item&&item.id===itemId?Math.max(0,Number(item.count)||0):0),0);\n' +
+    '    }\n' +
+    '    function countMatching(predicate){\n' +
+    '        return inventoryItems.reduce((sum,item)=>sum+(item&&predicate(item)?Math.max(1,Number(item.count)||1):0),0);\n' +
+    '    }\n' +
+    '    function consumeMatching(predicate,amount){\n' +
+    '        let remaining=Math.max(0,Math.floor(Number(amount)||0));\n' +
+    '        if(countMatching(predicate)<remaining){ return false; }\n' +
+    '        for(let index=inventoryItems.length-1;index>=0&&remaining>0;index--){\n' +
+    '            const item=inventoryItems[index];\n' +
+    '            if(!item||!predicate(item)){ continue; }\n' +
+    '            const count=Math.max(1,Math.floor(Number(item.count)||1));\n' +
+    '            const take=Math.min(count,remaining);\n' +
+    '            if(count===take){ inventoryItems.splice(index,1); }\n' +
+    '            else{ item.count=count-take; }\n' +
+    '            remaining-=take;\n' +
+    '        }\n' +
+    '        return remaining===0;\n' +
+    '    }\n' +
+    '\n' +
+    '    function runInventoryTransaction(operation){\n' +
+    '        return window.v132RunInventoryTransaction?window.v132RunInventoryTransaction(operation):!!operation();\n' +
+    '    }\n' +
+    '    function addItem(definition,amount){\n' +
+    '        return !!(window.v132AddItemToInventory&&window.v132AddItemToInventory(definition,amount));\n' +
+    '    }\n' +
+    '\n' +
+    '    function makeUid(prefix){\n' +
+    '        return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,9);\n' +
+    '    }\n' +
+    '    function ensureEquipmentUids(){\n' +
+    '        let changed=false;\n' +
+    '        inventoryItems.forEach(item=>{\n' +
+    '            if(item&&isEquipmentInventoryType(item.type)&&!item.v141Uid){ item.v141Uid=makeUid("bag"); changed=true; }\n' +
+    '        });\n' +
+    '        Object.values(characterEquipment||{}).forEach(equipment=>{\n' +
+    '            Object.values(equipment||{}).forEach(item=>{\n' +
+    '                if(item&&!item.v141Uid){ item.v141Uid=makeUid("equip"); changed=true; }\n' +
+    '            });\n' +
+    '        });\n' +
+    '        if(changed&&typeof saveGame==="function"){ saveGame(); }\n' +
+    '    }\n' +
+    '\n' +
+    '    function allRefinableEquipment(){\n' +
+    '        ensureEquipmentUids();\n' +
+    '        const results=[];\n' +
+    '        inventoryItems.forEach(item=>{\n' +
+    '            if(item&&isEquipmentInventoryType(item.type)){ results.push({item,source:"背包"}); }\n' +
+    '        });\n' +
+    '        Object.keys(characterEquipment||{}).forEach(characterKey=>{\n' +
+    '            Object.values(characterEquipment[characterKey]||{}).forEach(item=>{\n' +
+    '                if(item){ results.push({item,source:"已裝備"}); }\n' +
+    '            });\n' +
+    '        });\n' +
+    '        return results;\n' +
+    '    }\n' +
+    '    function findEquipmentByUid(uid){\n' +
+    '        const entry=allRefinableEquipment().find(candidate=>candidate.item.v141Uid===uid);\n' +
+    '        return entry?entry.item:null;\n' +
+    '    }\n' +
+    '\n' +
+    '    function inferTier(item){\n' +
+    '        if(item&&TIER_META[item.tierKey]){ return item.tierKey; }\n' +
+    '        if(item&&item.setId){ return "high"; }\n' +
+    '        const total=Object.values(item&&item.stats||{}).reduce((sum,value)=>sum+Math.abs(Number(value)||0),0);\n' +
+    '        if(total>=18){ return "perfect"; }\n' +
+    '        if(total>=10){ return "high"; }\n' +
+    '        if(total>=5){ return "mid"; }\n' +
+    '        return "low";\n' +
+    '    }\n' +
+    '\n' +
+    '    function rollUniform(min,max){ return min+Math.floor(Math.random()*(max-min+1)); }\n' +
+    '    function rollSinglePeak(range){\n' +
+    '        return Math.random()<.10?range[1]:rollUniform(range[0],Math.max(range[0],range[1]-1));\n' +
+    '    }\n' +
+    '    function rollAffixes(tierKey,isReforge){\n' +
+    '        const meta=TIER_META[tierKey];\n' +
+    '        const mainRange=isReforge?meta.reforgeMain:meta.main;\n' +
+    '        const subRange=isReforge?meta.reforgeSub:meta.sub;\n' +
+    '        const stats={};\n' +
+    '        const main=MAIN_STATS[Math.floor(Math.random()*MAIN_STATS.length)];\n' +
+    '        if(!subRange){ stats[main]=rollSinglePeak(mainRange); return stats; }\n' +
+    '        const sub=SUB_STATS[Math.floor(Math.random()*SUB_STATS.length)];\n' +
+    '        if(Math.random()<.05){\n' +
+    '            stats[main]=mainRange[1];\n' +
+    '            stats[sub]=subRange[1];\n' +
+    '            return stats;\n' +
+    '        }\n' +
+    '        let mainValue=rollUniform(mainRange[0],mainRange[1]);\n' +
+    '        let subValue=rollUniform(subRange[0],subRange[1]);\n' +
+    '        if(mainValue===mainRange[1]&&subValue===subRange[1]){\n' +
+    '            if(Math.random()<.5){ mainValue=rollUniform(mainRange[0],Math.max(mainRange[0],mainRange[1]-1)); }\n' +
+    '            else{ subValue=rollUniform(subRange[0],Math.max(subRange[0],subRange[1]-1)); }\n' +
+    '        }\n' +
+    '        stats[main]=mainValue;\n' +
+    '        stats[sub]=subValue;\n' +
+    '        return stats;\n' +
+    '    }\n' +
+    '    window.v141RollCraftAffixes=rollAffixes;\n' +
+    '\n' +
+    '    function statsHtml(stats){\n' +
+    '        const entries=Object.entries(stats||{});\n' +
+    `        if(!entries.length){ return '<span class="muted">尚無冶煉詞條</span>'; }\n` +
+    `        return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+'</b></span>').join("");\n` +
+    '    }\n' +
+    '    function rangeText(tierKey,isReforge){\n' +
+    '        const meta=TIER_META[tierKey];\n' +
+    '        const main=isReforge?meta.reforgeMain:meta.main;\n' +
+    '        const sub=isReforge?meta.reforgeSub:meta.sub;\n' +
+    "        return '主詞條 '+main[0]+'～'+main[1]+(sub?'・副詞條 '+sub[0]+'～'+sub[1]:'');\n" +
+    '    }\n' +
+    '\n' +
+    '    function showSynthesisResult(title,body){\n' +
+    '        const modal=document.getElementById("homeFeatureModal");\n' +
+    '        if(modal){\n' +
+    '            modal.classList.add("v141-crafting-flash");\n' +
+    '            setTimeout(()=>modal.classList.remove("v141-crafting-flash"),650);\n' +
+    '        }\n' +
+    '        setTimeout(()=>{\n' +
+    '            if(window.v132ShowRewardModal){\n' +
+    '                window.v132ShowRewardModal(\n' +
+    `                    '<div class="v132-reward-modal-inner"><h3>'+escapeHtml(title)+'</h3>'+body+\n` +
+    `                    '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>'\n` +
+    '                );\n' +
+    '            }\n' +
+    '        },480);\n' +
+    '    }\n' +
+    '\n' +
+    '    function renderSynthesisTabs(){\n' +
+    '        const tabs=[\n' +
+    '            ["craft","裝備合成"],["reforge","裝備冶煉"],["talisman","符咒合成"],["fragment","碎片合成"]\n' +
+    '        ];\n' +
+    `        return '<div class="v141-synthesis-tabs">'+tabs.map(([id,label])=>\n` +
+    `            '<button type="button" class="'+(synthesisState.tab===id?'active':'')+'" onclick="v141SwitchSynthesisTab(\\''+id+'\\')">'+label+'</button>'\n` +
+    `        ).join("")+'</div>';\n` +
+    '    }\n' +
+    '\n' +
+    '    function heldBlueprints(){\n' +
+    '        const byId=new Map();\n' +
+    '        inventoryItems.forEach(item=>{\n' +
+    '            if(!item||!item.blueprintSlot||!TIER_META[item.tierKey]){ return; }\n' +
+    '            if(!byId.has(item.id)){ byId.set(item.id,item); }\n' +
+    '        });\n' +
+    '        return [...byId.values()];\n' +
+    '    }\n' +
+    '\n' +
+    '    function renderCraftTab(){\n' +
+    '        const blueprints=heldBlueprints();\n' +
+    '        if(!blueprints.length){\n' +
+    `            return '<div class="v141-synthesis-empty">背包內沒有裝備設計圖紙。<small>材料寶箱可取得圖紙與礦石。</small></div>';\n` +
+    '        }\n' +
+    '        if(!blueprints.some(item=>item.id===synthesisState.blueprintId)){ synthesisState.blueprintId=blueprints[0].id; }\n' +
+    '        const blueprint=blueprints.find(item=>item.id===syn'... 55611 more characters,
+  expected: /function openAbyssBossDialogue\(\)[\s\S]*?overlay\.onclick=[\s\S]*?launchAbyssBossBattle\(\)/,
+  operator: 'match',
+  diff: 'simple'
+}
+
+Node.js v22.23.2
+
+CI check failed: 36/59 Node test suites passed.
