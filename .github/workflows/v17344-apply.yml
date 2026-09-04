@@ -1,0 +1,380 @@
+name: Apply V173.44 Requested Update
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17344-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch supplied assets
+        run: git fetch --no-tags origin assets-library:refs/remotes/origin/assets-library
+
+      - name: Place supplied art on dev
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/maps assets/dungeons/covers assets/dungeons/abyss/maps
+          git show origin/assets-library:'assets/inbox/荒漠地帶.png' > assets/maps/desert-v17344.png
+          git show origin/assets-library:'assets/inbox/冰霜山脈.png' > assets/maps/ice-v17344.png
+          git show origin/assets-library:'assets/inbox/熔岩深獄.png' > assets/maps/zone4-v17344.png
+          git show origin/assets-library:'assets/inbox/巨獸荒原.png' > assets/maps/zone5-v17344.png
+          git show origin/assets-library:'assets/inbox/修羅戰場.png' > assets/maps/zone6-v17344.png
+          git show origin/assets-library:'assets/inbox/魔君祭壇.png' > assets/maps/zone7-v17344.png
+          git show origin/assets-library:'assets/inbox/龍獄深淵.png' > assets/maps/zone8-v17344.png
+          git show origin/assets-library:'assets/inbox/虛空盡頭.png' > assets/maps/zone9-v17344.png
+          git show origin/assets-library:'assets/inbox/終焉之戰.png' > assets/maps/zone10-v17344.png
+          git show origin/assets-library:'assets/inbox/金幣副本.png' > assets/dungeons/covers/gold-v17344.png
+          git show origin/assets-library:'assets/inbox/深淵副本-東帝.png' > assets/dungeons/abyss/maps/floor-1.png
+          git show origin/assets-library:'assets/inbox/深淵副本-南帝.png' > assets/dungeons/abyss/maps/floor-2.png
+          git show origin/assets-library:'assets/inbox/深淵副本-天帝.png' > assets/dungeons/abyss/maps/floor-3.png
+          git show origin/assets-library:'assets/inbox/深淵副本-北帝.png' > assets/dungeons/abyss/maps/floor-4.png
+          git show origin/assets-library:'assets/inbox/深淵副本-五帝聯軍.png' > assets/dungeons/abyss/maps/floor-5.png
+
+      - name: Apply source changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
+
+          def write(path,text):
+              Path(path).write_text(text,encoding='utf-8')
+
+          def replace_once(path,old,new):
+              text=read(path)
+              count=text.count(old)
+              if count!=1:
+                  raise SystemExit(f'{path}: expected exactly 1 literal match, found {count}: {old[:100]!r}')
+              write(path,text.replace(old,new,1))
+
+          def regex_once(path,pattern,replacement,flags=0):
+              text=read(path)
+              next_text,count=re.subn(pattern,replacement,text,count=1,flags=flags)
+              if count!=1:
+                  raise SystemExit(f'{path}: expected exactly 1 regex match, found {count}: {pattern[:120]!r}')
+              write(path,next_text)
+
+          # ---- Daily dungeon final scaling and solo protection (V158 authority). ----
+          replace_once(
+              'js/47-v158-combat-tuning.js',
+              '        const partyMultiplier=partySize===1?.60:partySize===2?.82:1;',
+              '        const partyMultiplier=partySize===1?.40:partySize===2?.72:1;'
+          )
+          replace_once(
+              'js/47-v158-combat-tuning.js',
+              '        const levelMultiplier=highestLevel<=20?.90:highestLevel<=50?1:1.05;',
+              '        const levelMultiplier=highestLevel<=15?.80:highestLevel<=20?.90:highestLevel<=50?1:1.05;'
+          )
+          replace_once(
+              'js/47-v158-combat-tuning.js',
+              '    function normalizeDailyDungeonMonster(monster){\n        if(!monster||monster.v141Abyss===true){ return monster; }\n        normalizeMonsterDefaultEvasion(monster);',
+              '    const FORMAL_DAILY_DUNGEON_TYPES=new Set(["exp","material","gold"]);\n\n    function isFormalDailyDungeonMonster(monster){\n        return !!(monster&&FORMAL_DAILY_DUNGEON_TYPES.has(String(monster.v173DailyDungeonType||"")));\n    }\n\n    function normalizeDailyDungeonMonster(monster){\n        if(!isFormalDailyDungeonMonster(monster)||monster.v141Abyss===true){ return monster; }\n        normalizeMonsterDefaultEvasion(monster);'
+          )
+          replace_once(
+              'js/47-v158-combat-tuning.js',
+              '        const context=getDailyDungeonScaleContext();\n        const base=monster.v173DailyDungeonBaseStats;',
+              '        const context=getDailyDungeonScaleContext();\n        if(!Object.prototype.hasOwnProperty.call(monster,"v173DailyDungeonBaseSkillChance")){\n            monster.v173DailyDungeonBaseSkillChance=Number.isFinite(Number(monster.skillChance))?Number(monster.skillChance):0;\n        }\n        const base=monster.v173DailyDungeonBaseStats;'
+          )
+          replace_once(
+              'js/47-v158-combat-tuning.js',
+              '        monster.v173DailyDungeonScaleFactor=context.factor;\n        monster.v173DailyDungeonPartySize=context.partySize;\n        monster.v173DailyDungeonHighestLevel=context.highestLevel;\n        return monster;',
+              '        monster.v173DailyDungeonScaleFactor=context.factor;\n        monster.v173DailyDungeonPartySize=context.partySize;\n        monster.v173DailyDungeonHighestLevel=context.highestLevel;\n        monster.v173DailySoloProtected=context.partySize===1&&context.highestLevel<=20;\n        monster.v173DailyNoAccuracyCritBoost=monster.v173DailySoloProtected;\n        const baseSkillChance=Math.max(0,Math.min(1,Number(monster.v173DailyDungeonBaseSkillChance)||0));\n        if(monster.v173DailySoloProtected){\n            monster.skillChance=Number(monster.v141DungeonStage)===1?0:Math.min(.45,baseSkillChance*.60);\n        }else{\n            monster.skillChance=baseSkillChance;\n            monster.v173DailyBossUsedSkillLastAction=false;\n        }\n        return monster;'
+          )
+          replace_once(
+              'js/47-v158-combat-tuning.js',
+              '                if(!isAbyss){ roster.forEach(normalizeDailyDungeonMonster); }',
+              '                if(!isAbyss){ roster.forEach(normalizeDailyDungeonMonster); }'
+          )
+          replace_once(
+              'js/47-v158-combat-tuning.js',
+              '    window.v158CastTriFreeze=castTriFreeze;\n',
+              '''    /* Solo Lv1-20 formal daily protection: wave 1 is normal-attack only.\n       From wave 2 onward skills are allowed at a reduced rate; a BOSS that just\n       used a skill must perform one non-skill action before another skill. */\n    if(typeof processSingleMonsterAttack==="function"){\n        const previousDailyProtectedMonsterAttack=processSingleMonsterAttack;\n        processSingleMonsterAttack=function(monsterIndex){\n            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;\n            if(!monster||monster.v173DailySoloProtected!==true||monster.v141Abyss===true){\n                return previousDailyProtectedMonsterAttack.apply(this,arguments);\n            }\n            const rank=typeof getMonsterRank==="function"?getMonsterRank(monster):(monster.rank||"regular");\n            const forceNormal=Number(monster.v141DungeonStage)===1||\n                (rank==="boss"&&monster.v173DailyBossUsedSkillLastAction===true);\n            const savedSkillIds=monster.skillIds;\n            const savedSupports=monster.v141SupportSkillIds;\n            const savedChance=monster.skillChance;\n            const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;\n            let usedSkill=false;\n            if(forceNormal){\n                monster.skillIds=[];\n                monster.v141SupportSkillIds=[];\n                monster.skillChance=0;\n            }\n            if(previousBadge){\n                showMonsterSkillNameBadge=function(name){\n                    if(String(name||"")!=="普通攻擊"){ usedSkill=true; }\n                    return previousBadge.apply(this,arguments);\n                };\n            }\n            try{\n                return previousDailyProtectedMonsterAttack.apply(this,arguments);\n            }finally{\n                if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }\n                if(forceNormal){\n                    monster.skillIds=savedSkillIds;\n                    monster.v141SupportSkillIds=savedSupports;\n                    monster.skillChance=savedChance;\n                }\n                if(rank==="boss"){ monster.v173DailyBossUsedSkillLastAction=usedSkill; }\n            }\n        };\n    }\n\n    window.v158CastTriFreeze=castTriFreeze;\n'''
+          )
+          replace_once(
+              'js/47-v158-combat-tuning.js',
+              '    window.v173GetDailyDungeonScaleContext=getDailyDungeonScaleContext;\n',
+              '    window.v173GetDailyDungeonScaleContext=getDailyDungeonScaleContext;\n    window.v17344IsFormalDailyDungeonMonster=isFormalDailyDungeonMonster;\n'
+          )
+
+          # ---- Exact auto-target position order + daily wave composition (V148 authority). ----
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '    function autoTargetPriority(indexes){',
+              '''    const REFERENCE_TARGET_ORDER_6=[4,1,3,6,2,5];\n    const REFERENCE_TARGET_ORDER_10=[7,2,6,1,5,10,4,9,3,8];\n\n    function referenceTargetPriority(rows){\n        const flat=(rows||[]).flat().filter(index=>Number.isInteger(index));\n        const order=flat.length===6?REFERENCE_TARGET_ORDER_6:flat.length===10?REFERENCE_TARGET_ORDER_10:null;\n        if(!order){ return null; }\n        return flat.map((index,position)=>({index:index,order:order[position]}))\n            .sort((a,b)=>a.order-b.order).map(entry=>entry.index);\n    }\n\n    function autoTargetPriority(indexes){'''
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '        return stableFormationRows(ordered).flatMap(centerFirstOrder);\n    }',
+              '        const reference=referenceTargetPriority(stableFormationRows(ordered));\n        if(reference){ return reference; }\n        return stableFormationRows(ordered).flatMap(centerFirstOrder);\n    }'
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '        material:{title:"材料副本",requirement:"至少兩名角色達到20級",reward:"材料寶箱 ×1～3",legacyType:"material"},\n        gold:{title:"金幣副本",requirement:"至少兩名角色達到20級",reward:"大量金幣",legacyType:"equipment"}',
+              '        material:{title:"材料副本",requirement:"任一角色達到20級",reward:"材料寶箱 ×1～3",legacyType:"material"},\n        gold:{title:"金幣副本",requirement:"任一角色達到20級",reward:"大量金幣",legacyType:"equipment"}'
+          )
+          regex_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              r'    function dailyRankForSlot\(wave,slot\)\{.*?\n    \}\n\n    function dailyMonsterName',
+              '''    function dailyPartyContext(){\n        const indexes=partyIndexes().slice(0,3);\n        const partySize=Math.max(1,indexes.length||1);\n        const highestLevel=Math.max(1,...indexes.map(index=>numeric(getPartyCharacterByIndex(index)?.level)||1));\n        return {partySize:partySize,highestLevel:highestLevel,soloProtected:partySize===1&&highestLevel<=20};\n    }\n\n    function dailyRankForSlot(wave,slot,soloProtected){\n        if(wave===1){ return null; }\n        if(soloProtected){\n            if(wave===2){ return slot===4?"elite":null; }\n            if(slot===4){ return "boss"; }\n            return slot===3?"elite":null;\n        }\n        if(wave===2){ return slot>=4?"elite":null; }\n        if(slot===4){ return "boss"; }\n        if(slot===3||slot===5){ return "elite"; }\n        return null;\n    }\n\n    function dailyMonsterName''',
+              flags=re.S
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '    function buildDailyWave(type,wave,level){',
+              '    function buildDailyWave(type,wave,level,context){'
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '            const rank=dailyRankForSlot(wave,slot);',
+              '            const rank=dailyRankForSlot(wave,slot,!!(context&&context.soloProtected));'
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '            monster.v148TargetOrder=slot+1;',
+              '            monster.v148TargetOrder=REFERENCE_TARGET_ORDER_6[slot];\n            monster.v173DailySoloProtected=!!(context&&context.soloProtected);'
+          )
+          regex_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              r'    function buildDailyDungeonWaves\(type\)\{\n        const level=getDailyDungeonLevel\(\);\n        return \{\n            level:level,\n            waves:\[1,2,3\]\.map\(wave=>buildDailyWave\(type,wave,level\)\)\n        \};\n    \}',
+              '''    function buildDailyDungeonWaves(type){\n        const level=getDailyDungeonLevel();\n        const context=dailyPartyContext();\n        return {\n            level:level,\n            partySize:context.partySize,\n            highestLevel:context.highestLevel,\n            soloProtected:context.soloProtected,\n            waves:[1,2,3].map(wave=>buildDailyWave(type,wave,level,context))\n        };\n    }'''
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '    function hasTwoLevel20Characters(){\n        return partyIndexes().filter(index=>numeric(getPartyCharacterByIndex(index)?.level)>=20).length>=2;\n    }',
+              '    function hasLevel20Character(){\n        return partyIndexes().some(index=>numeric(getPartyCharacterByIndex(index)?.level)>=20);\n    }'
+          )
+          regex_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              r'    function confirmFormalDailyDungeon\(meta\)\{.*?\n    \}',
+              '''    function confirmFormalDailyDungeon(meta){\n        if(typeof window.rpgConfirm!=="function"){ return Promise.resolve(true); }\n        const protectedSolo=dailyPartyContext().soloProtected;\n        const layout=protectedSolo\n            ?"第1輪：6普通；第2輪：5普通＋1精英；第3輪：4普通＋1精英＋1BOSS。"\n            :"第1輪：6普通；第2輪：4普通＋2精英；第3輪：3普通＋2精英＋1BOSS。";\n        return window.rpgConfirm(\n            "確定要進入「"+meta.title+"」嗎？\\n\\n共3輪，每輪固定前排3隻＋後排3隻，共18隻敵人。\\n"+layout,\n            {title:"副本確認",confirmText:"進入副本",cancelText:"返回"}\n        );\n    }''',
+              flags=re.S
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '        }else if(!hasTwoLevel20Characters()){\n            alert(meta.title+"需要至少兩名角色達到20級才能開啟。");',
+              '        }else if(!hasLevel20Character()){\n            alert(meta.title+"需要任一角色達到20級才能開啟。");'
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '            type:type,meta:meta,level:built.level,waves:built.waves,waveIndex:0,totalTurns:0,baseExp:baseExp',
+              '            type:type,meta:meta,level:built.level,partySize:built.partySize,highestPartyLevel:built.highestLevel,soloProtected:built.soloProtected,waves:built.waves,waveIndex:0,totalTurns:0,baseExp:baseExp'
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '        if(started===false){ dailyDungeonSequence=null; }',
+              '        if(started===false){ dailyDungeonSequence=null; }\n        else if(window.v132ActiveDungeonRun){\n            window.v132ActiveDungeonRun.partySize=sequence.partySize;\n            window.v132ActiveDungeonRun.highestPartyLevel=sequence.highestPartyLevel;\n            window.v132ActiveDungeonRun.dailyDungeonType=type;\n        }'
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '        const wave=sequence.waves[nextIndex];\n        sequence.waveIndex=nextIndex;',
+              '        const wave=sequence.waves[nextIndex];\n        sequence.waveIndex=nextIndex;\n        if(window.v132ActiveDungeonRun){\n            window.v132ActiveDungeonRun.partySize=sequence.partySize;\n            window.v132ActiveDungeonRun.highestPartyLevel=sequence.highestPartyLevel;\n            window.v132ActiveDungeonRun.dailyDungeonType=sequence.type;\n        }'
+          )
+          replace_once(
+              'js/42-v148-combat-dungeon-fixes.js',
+              '        const html=\'<div class="v132-reward-modal-inner"><h3>\'+meta.title+\'獎勵預覽</h3><p>\'+meta.reward+\'</p>\'+\n            \'<p>固定3輪×6隻：6普通 → 4普通+2精英 → 3普通+2精英+1BOSS。</p>\'+',
+              '        const layout=dailyPartyContext().soloProtected\n            ?"6普通 → 5普通+1精英 → 4普通+1精英+1BOSS"\n            :"6普通 → 4普通+2精英 → 3普通+2精英+1BOSS";\n        const html=\'<div class="v132-reward-modal-inner"><h3>\'+meta.title+\'獎勵預覽</h3><p>\'+meta.reward+\'</p>\'+\n            \'<p>固定3輪×6隻：\'+layout+\'。</p>\'+'
+          )
+
+          # ---- Abyss final floor: supplied map owns Five-Emperor art; proximity triggers. ----
+          replace_once(
+              'js/36-v141-content-systems.js',
+              '    let abyssBattleStarting=false;',
+              '    let abyssBattleStarting=false;\n    let activeAbyssDialogueAdvance=null;'
+          )
+          replace_once(
+              'js/36-v141-content-systems.js',
+              '        const boss=abyssState.phase==="boss"?\'<button type="button" class="v141-abyss-boss" data-abyss-boss-control="true" style="left:\'+pos[0]+\'%;top:\'+pos[1]+\'%" onclick="v141HandleAbyssBossInteraction(event)"><b>\'+escapeHtml(info.boss)+\'</b><span>\'+elementLabel[info.element]+\'元素・點擊挑戰</span></button>\':\'\';',
+              '        const boss=abyssState.phase==="boss"&&floor<5?\'<button type="button" class="v141-abyss-boss" data-abyss-boss-control="true" style="left:\'+pos[0]+\'%;top:\'+pos[1]+\'%" onclick="v141HandleAbyssBossInteraction(event)"><b>\'+escapeHtml(info.boss)+\'</b><span>\'+elementLabel[info.element]+\'元素・點擊挑戰</span></button>\':\'\';'
+          )
+          replace_once(
+              'js/36-v141-content-systems.js',
+              '        setTimeout(()=>{ playerEl.classList.remove("walking"); if(callback){ callback(); } },duration*1000+30);',
+              '        setTimeout(()=>{\n            playerEl.classList.remove("walking");\n            if(callback){ callback(); }\n            else{ maybeTriggerFinalAbyssEncounter(); }\n        },duration*1000+30);'
+          )
+          replace_once(
+              'js/36-v141-content-systems.js',
+              '    function isAbyssMapControlHit(event,control){',
+              '''    function finalAbyssApproachPoint(){\n        const pos=bossPosition(5);\n        return [pos[0],Math.min(84,pos[1]+27)];\n    }\n\n    function maybeTriggerFinalAbyssEncounter(){\n        if(\n            abyssState.floor!==5||abyssState.phase!=="boss"||abyssBattleStarting||\n            activeAbyssDialogueAdvance\n        ){ return false; }\n        const approach=finalAbyssApproachPoint();\n        if(Math.hypot(abyssState.x-approach[0],abyssState.y-approach[1])>10){ return false; }\n        return openAbyssBossDialogue();\n    }\n\n    function isAbyssMapControlHit(event,control){'''
+          )
+          replace_once(
+              'js/36-v141-content-systems.js',
+              '        if(abyssState.phase!=="boss"){ return false; }\n        window.v141ChallengeAbyssBoss();',
+              '        if(abyssState.phase!=="boss"||abyssState.floor===5){ return false; }\n        window.v141ChallengeAbyssBoss();'
+          )
+          replace_once(
+              'js/36-v141-content-systems.js',
+              '        if(!map||map.dataset.v169DialogueApproaching==="1"){ return; }\n        const boss=abyssState.phase==="boss"?map.querySelector(".v141-abyss-boss"):null;',
+              '        if(!map||map.dataset.v169DialogueApproaching==="1"){ return; }\n        if(activeAbyssDialogueAdvance){\n            if(event&&event.preventDefault){ event.preventDefault(); }\n            if(event&&event.stopPropagation){ event.stopPropagation(); }\n            activeAbyssDialogueAdvance();\n            return;\n        }\n        const boss=abyssState.phase==="boss"?map.querySelector(".v141-abyss-boss"):null;'
+          )
+          replace_once(
+              'js/36-v141-content-systems.js',
+              '        const y=Math.max(8,Math.min(94,(event.clientY-rect.top)/rect.height*100));\n        moveAbyssPlayer(x,y);',
+              '''        const y=Math.max(8,Math.min(94,(event.clientY-rect.top)/rect.height*100));\n        if(abyssState.floor===5&&abyssState.phase==="boss"){\n            const emperorPos=bossPosition(5);\n            const nearFiveEmperors=Math.hypot(x-emperorPos[0],y-emperorPos[1])<=36||y<=62;\n            if(nearFiveEmperors){\n                const approach=finalAbyssApproachPoint();\n                moveAbyssPlayer(approach[0],approach[1],maybeTriggerFinalAbyssEncounter);\n                return;\n            }\n        }\n        moveAbyssPlayer(x,y);'''
+          )
+          replace_once(
+              'js/36-v141-content-systems.js',
+              '        const boss=bossButton&&bossButton.querySelector("b");\n        const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();',
+              '        const boss=bossButton&&bossButton.querySelector("b");\n        const speaker=boss&&boss.textContent||(floor===5?"五帝聯軍":"守關者");\n        const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();'
+          )
+          replace_once(
+              'js/36-v141-content-systems.js',
+              '        overlay.innerHTML=\'<small>\'+escapeHtml(boss&&boss.textContent||"守關者")+\'</small><b></b><span>點擊對話繼續　\'+(index+1)+\' / \'+lines.length+\'</span>\';',
+              '        overlay.innerHTML=\'<small>\'+escapeHtml(speaker)+\'</small><b></b><span>點擊空白處繼續　\'+(index+1)+\' / \'+lines.length+\'</span>\';'
+          )
+          regex_once(
+              'js/36-v141-content-systems.js',
+              r'        overlay\.onclick=event=>\{\n            event\.preventDefault\(\); event\.stopPropagation\(\);\n            index\+\+;\n            if\(index<lines\.length\)\{\n                text\.textContent=lines\[index\];\n                hint\.textContent="點擊對話繼續　"\+\(index\+1\)\+" / "\+lines\.length;\n                return;\n            \}\n            text\.textContent="進入戰鬥……";\n            hint\.textContent="";\n            overlay\.disabled=true;\n            setTimeout\(\(\)=>\{\n                overlay\.remove\(\);\n                launchAbyssBossBattle\(\);\n            \},180\);\n        \};',
+              '''        const advanceDialogue=()=>{\n            index++;\n            if(index<lines.length){\n                text.textContent=lines[index];\n                hint.textContent="點擊空白處繼續　"+(index+1)+" / "+lines.length;\n                return;\n            }\n            text.textContent="進入戰鬥……";\n            hint.textContent="";\n            overlay.disabled=true;\n            activeAbyssDialogueAdvance=null;\n            delete map.dataset.v141DialogueOpen;\n            setTimeout(()=>{\n                overlay.remove();\n                launchAbyssBossBattle();\n            },180);\n        };\n        activeAbyssDialogueAdvance=advanceDialogue;\n        map.dataset.v141DialogueOpen="1";\n        overlay.onclick=event=>{\n            event.preventDefault(); event.stopPropagation();\n            advanceDialogue();\n        };''',
+              flags=re.S
+          )
+
+          # ---- Training and patrol map art mapping. ----
+          replace_once(
+              'js/17-stage-v60-training-render-guard.js',
+              'window.GAME_NATIVE_LAST_SCOPE="training-full-source-audit";\n',
+              '''window.GAME_NATIVE_LAST_SCOPE="training-full-source-audit";\n\nconst V17344_ZONE_ART={\n    desert:"assets/maps/desert-v17344.png",\n    ice:"assets/maps/ice-v17344.png",\n    zone4:"assets/maps/zone4-v17344.png",\n    zone5:"assets/maps/zone5-v17344.png",\n    zone6:"assets/maps/zone6-v17344.png",\n    zone7:"assets/maps/zone7-v17344.png",\n    zone8:"assets/maps/zone8-v17344.png",\n    zone9:"assets/maps/zone9-v17344.png",\n    zone10:"assets/maps/zone10-v17344.png"\n};\ntry{ if(typeof zoneBackgroundImages!=="undefined"){ Object.assign(zoneBackgroundImages,V17344_ZONE_ART); } }catch(_){ }\ntry{ if(typeof mapZoneBackgroundImages!=="undefined"){ Object.assign(mapZoneBackgroundImages,V17344_ZONE_ART); } }catch(_){ }\n'''
+          )
+
+          # ---- Red dots: all current notification/growth dots smaller. ----
+          replace_once(
+              'css/42-v146-system-polish.css',
+              '    width:10px !important;\n    height:10px !important;',
+              '    width:7px !important;\n    height:7px !important;'
+          )
+
+          # ---- Gold cover and five supplied Abyss maps; floor 5 has no added portrait. ----
+          replace_once(
+              'css/46-v154-dev-fixes.css',
+              '#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{',
+              '#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="gold"] .v141-dungeon-cover-art{'
+          )
+          replace_once(
+              'css/46-v154-dev-fixes.css',
+              '        url("../assets/dungeons/covers/equipment-v17343.png") !important;',
+              '        url("../assets/dungeons/covers/gold-v17344.png") !important;'
+          )
+          replace_once(
+              'css/46-v154-dev-fixes.css',
+              '#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map{\n    width:100% !important;',
+              '''#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map{\n    width:100% !important;\n    background-position:center !important;\n    background-size:cover !important;\n    background-repeat:no-repeat !important;'''
+          )
+          replace_once(
+              'css/46-v154-dev-fixes.css',
+              '    flex:1 1 auto !important;\n}\n#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell{',
+              '''    flex:1 1 auto !important;\n}\n#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-1{background-image:url("../assets/dungeons/abyss/maps/floor-1.png") !important;}\n#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-2{background-image:url("../assets/dungeons/abyss/maps/floor-2.png") !important;}\n#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-3{background-image:url("../assets/dungeons/abyss/maps/floor-3.png") !important;}\n#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-4{background-image:url("../assets/dungeons/abyss/maps/floor-4.png") !important;}\n#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-5{background-image:url("../assets/dungeons/abyss/maps/floor-5.png") !important;}\n#game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell{'''
+          )
+          replace_once(
+              'css/46-v154-dev-fixes.css',
+              '#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-5 .v141-abyss-boss::before{\n    background-image:url("../assets/dungeons/abyss/floor5-extreme-emperor.webp") !important;\n}\n',
+              ''
+          )
+
+          # ---- Current tests: new values, exact reference order, manual wait guard, new assets. ----
+          p='tests/v173.42-player-flow.test.js'
+          text=read(p)
+          text=text.replace(r'const partyMultiplier=partySize===1\?\.60:partySize===2\?\.82:1;',r'const partyMultiplier=partySize===1\?\.40:partySize===2\?\.72:1;')
+          text=text.replace(r'const levelMultiplier=highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05;',r'const levelMultiplier=highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05;')
+          text=text.replace(r'width:10px !important;[\s\S]*height:10px !important',r'width:7px !important;[\s\S]*height:7px !important')
+          text=text.replace('assert.match(dungeonPolish,/monster\\.v148TargetOrder=slot\\+1/);','assert.match(dungeonPolish,/REFERENCE_TARGET_ORDER_6=\\[4,1,3,6,2,5\\]/);\nassert.match(dungeonPolish,/REFERENCE_TARGET_ORDER_10=\\[7,2,6,1,5,10,4,9,3,8\\]/);\nassert.match(dungeonPolish,/monster\\.v148TargetOrder=REFERENCE_TARGET_ORDER_6\\[slot\\]/);')
+          text=text.replace('assert.match(dungeonPolish,/if\\(wave===2\\)\\{ return slot>=4\\?"elite":null; \\}/);','assert.match(dungeonPolish,/if\\(soloProtected\\)[\\s\\S]*wave===2[\\s\\S]*slot===4\\?"elite":null/);\nassert.match(dungeonPolish,/if\\(wave===2\\)\\{ return slot>=4\\?"elite":null; \\}/);')
+          marker='/* Auto targeting and tri-target geometry use the original full formation. */'
+          if marker not in text: raise SystemExit('v173.42 target marker missing')
+          text=text.replace(marker,'/* Manual actions do not add a second empty wait after the turn declaration. */\nassert.match(v131,/const elapsed=v131TurnStartedAt>0 \\? \\(Date\\.now\\(\\)-v131TurnStartedAt\\) : 0/);\nassert.match(v131,/const wait=Math\\.max\\(0,V138_ACTION_DELAY_MS-elapsed\\)/);\n\n'+marker,1)
+          text=text.replace('"assets/dungeons/abyss/abyss-cover-v17343.png"','"assets/dungeons/abyss/abyss-cover-v17343.png",\n    "assets/dungeons/covers/gold-v17344.png",\n    "assets/dungeons/abyss/maps/floor-5.png",\n    "assets/maps/zone10-v17344.png"')
+          write(p,text)
+
+          p='tests/v173.43-growth-charge.test.js'
+          text=read(p)
+          text=text.replace(r'const partyMultiplier=partySize===1\?\.60:partySize===2\?\.82:1',r'const partyMultiplier=partySize===1\?\.40:partySize===2\?\.72:1')
+          text=text.replace(r'const levelMultiplier=highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05',r'const levelMultiplier=highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05')
+          write(p,text)
+
+          # V156 historical map test: floors 1-4 keep portrait buttons; floor 5 now owns baked-in Five-Emperor art.
+          p='tests/v156-deep-trace-fixes.test.js'
+          text=read(p)
+          old='''test("every Abyss map floor presents a portrait-backed challenge button",()=>{\n    [\n        "east-emperor.webp","south-emperor.webp","heaven-emperor.webp",\n        "north-emperor.webp","floor5-extreme-emperor.webp"\n    ].forEach((asset,index)=>{\n        assert.match(css,new RegExp("floor-"+(index+1)+"[\\\\s\\\\S]*"+asset.replace(".","\\\\.")));\n    });\n    assert.match(css,/\\.v141-abyss-boss\\{[\\s\\S]*width:120px !important;[\\s\\S]*height:168px !important;/);\n    assert.match(css,/\\.v141-abyss-boss::before\\{[\\s\\S]*background-size:contain !important;/);\n    assert.match(css,/touch-action:manipulation !important/);\n    assert.match(abyss,/<button type="button" class="v141-abyss-boss"[\\s\\S]*data-abyss-boss-control="true"[\\s\\S]*v141HandleAbyssBossInteraction\\(event\\)/);\n});'''
+          new='''test("Abyss floors 1-4 keep portrait challenge buttons while floor 5 uses baked-in Five-Emperor map art",()=>{\n    ["east-emperor.webp","south-emperor.webp","heaven-emperor.webp","north-emperor.webp"].forEach((asset,index)=>{\n        assert.match(css,new RegExp("floor-"+(index+1)+"[\\\\s\\\\S]*"+asset.replace(".","\\\\.")));\n    });\n    assert.match(css,/floor-5\\.png/);\n    assert.doesNotMatch(css,/floor-5 \\.v141-abyss-boss::before[\\s\\S]*floor5-extreme-emperor/);\n    assert.match(css,/\\.v141-abyss-boss\\{[\\s\\S]*width:120px !important;[\\s\\S]*height:168px !important;/);\n    assert.match(abyss,/abyssState\\.phase==="boss"&&floor<5/);\n    assert.match(abyss,/function maybeTriggerFinalAbyssEncounter\\(\\)/);\n});'''
+          if old not in text: raise SystemExit('v156 map test block missing')
+          text=text.replace(old,new,1)
+          write(p,text)
+
+          # New focused regression suite for this request.
+          Path('tests/v173.44-current-request.test.js').write_text(r'''"use strict";
+          const assert=require("node:assert/strict");
+          const fs=require("node:fs");
+          const battle=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+          const tuning=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
+          const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
+          const maps=fs.readFileSync("js/17-stage-v60-training-render-guard.js","utf8");
+          const ui=fs.readFileSync("css/42-v146-system-polish.css","utf8");
+          const abyssCss=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
+          const v131=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
+
+          assert.match(battle,/REFERENCE_TARGET_ORDER_6=\[4,1,3,6,2,5\]/);
+          assert.match(battle,/REFERENCE_TARGET_ORDER_10=\[7,2,6,1,5,10,4,9,3,8\]/);
+          assert.match(battle,/monster\.v148TargetOrder=REFERENCE_TARGET_ORDER_6\[slot\]/);
+          assert.match(tuning,/partySize===1\?\.40:partySize===2\?\.72:1/);
+          assert.match(tuning,/highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05/);
+          assert.match(tuning,/FORMAL_DAILY_DUNGEON_TYPES=new Set\(\["exp","material","gold"\]\)/);
+          assert.match(tuning,/v173DailySoloProtected=context\.partySize===1&&context\.highestLevel<=20/);
+          assert.match(tuning,/Number\(monster\.v141DungeonStage\)===1\?0:Math\.min\(\.45,baseSkillChance\*\.60\)/);
+          assert.match(tuning,/v173DailyBossUsedSkillLastAction===true/);
+          assert.doesNotMatch(tuning,/v17342DailyDungeonStatsHalvedAgain/);
+          assert.match(battle,/if\(soloProtected\)[\s\S]*slot===4\?"elite":null[\s\S]*slot===4\)\{ return "boss"; \}[\s\S]*slot===3\?"elite":null/);
+          assert.match(battle,/material:\{title:"材料副本",requirement:"任一角色達到20級"/);
+          assert.match(battle,/gold:\{title:"金幣副本",requirement:"任一角色達到20級"/);
+          assert.match(ui,/\.v141-notice-dot,[\s\S]*width:7px !important;[\s\S]*height:7px !important/);
+          assert.match(v131,/const wait=Math\.max\(0,V138_ACTION_DELAY_MS-elapsed\)/);
+          assert.match(abyss,/abyssState\.phase==="boss"&&floor<5/);
+          assert.match(abyss,/function maybeTriggerFinalAbyssEncounter\(\)/);
+          assert.match(abyss,/if\(activeAbyssDialogueAdvance\)/);
+          assert.match(abyss,/點擊空白處繼續/);
+          assert.match(abyssCss,/floor-5\.png/);
+          assert.doesNotMatch(abyssCss,/floor-5 \.v141-abyss-boss::before[\s\S]*floor5-extreme-emperor/);
+          ["desert","ice","zone4","zone5","zone6","zone7","zone8","zone9","zone10"].forEach(key=>assert.match(maps,new RegExp(key+':"assets/maps/')));
+          [
+            "assets/dungeons/covers/gold-v17344.png",
+            "assets/dungeons/abyss/maps/floor-1.png","assets/dungeons/abyss/maps/floor-2.png","assets/dungeons/abyss/maps/floor-3.png","assets/dungeons/abyss/maps/floor-4.png","assets/dungeons/abyss/maps/floor-5.png",
+            "assets/maps/desert-v17344.png","assets/maps/ice-v17344.png","assets/maps/zone4-v17344.png","assets/maps/zone5-v17344.png","assets/maps/zone6-v17344.png","assets/maps/zone7-v17344.png","assets/maps/zone8-v17344.png","assets/maps/zone9-v17344.png","assets/maps/zone10-v17344.png"
+          ].forEach(path=>assert.equal(fs.existsSync(path),true,path));
+          console.log("✓ V173.44 current request regression passed");
+          ''',encoding='utf-8')
+          PY
+
+      - name: Run focused and full repository checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/17-stage-v60-training-render-guard.js
+          node --check js/36-v141-content-systems.js
+          node --check js/42-v148-combat-dungeon-fixes.js
+          node --check js/47-v158-combat-tuning.js
+          node tests/v173.44-current-request.test.js
+          node .github/scripts/ci.mjs tests
+          node .github/scripts/ci.mjs resources
+
+      - name: Commit requested update and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/v17344-apply.yml
+          git config user.name "OpenAI ChatGPT"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js css tests assets
+          git commit -m "fix: apply combat dungeon scaling and map updates"
+          git push origin HEAD:dev
