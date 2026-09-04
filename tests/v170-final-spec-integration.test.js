@@ -938,10 +938,10 @@ test("all daily dungeons share three six-enemy waves and Gold replaces Equipment
         assert.deepEqual(run.ranks[2],["regular","regular","regular","elite","boss","elite"]);
         run.rows.forEach(row=>assert.deepEqual(row,[0,0,0,1,1,1]));
         run.positions.forEach(row=>assert.deepEqual(row,[0,1,2,0,1,2]));
-        run.orders.forEach(row=>assert.deepEqual(row,[1,2,3,4,5,6]));
+        run.orders.forEach(row=>assert.deepEqual(row,[4,1,3,6,2,5]));
     });
-    assert.equal(result.one40.factor,.60);
-    assert.equal(result.two40.factor,.82);
+    assert.equal(result.one40.factor,.40);
+    assert.equal(result.two40.factor,.72);
     assert.equal(result.three80.factor,1.05);
     assert.ok(result.goldReward>0);
     const dungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");

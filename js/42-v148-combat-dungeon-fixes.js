@@ -146,6 +146,17 @@
         return order.map(position=>values[position]).filter(index=>Number.isInteger(index));
     }
 
+    const REFERENCE_TARGET_ORDER_6=[4,1,3,6,2,5];
+    const REFERENCE_TARGET_ORDER_10=[7,2,6,1,5,10,4,9,3,8];
+
+    function referenceTargetPriority(rows){
+        const flat=(rows||[]).flat().filter(index=>Number.isInteger(index));
+        const order=flat.length===6?REFERENCE_TARGET_ORDER_6:flat.length===10?REFERENCE_TARGET_ORDER_10:null;
+        if(!order){ return null; }
+        return flat.map((index,position)=>({index:index,order:order[position]}))
+            .sort((a,b)=>a.order-b.order).map(entry=>entry.index);
+    }
+
     function autoTargetPriority(indexes){
         const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
         if(typeof monsters!=="undefined"&&ordered.length){
@@ -157,6 +168,8 @@
                 return explicit.sort((a,b)=>a.order-b.order).map(entry=>entry.index);
             }
         }
+        const reference=referenceTargetPriority(stableFormationRows(ordered));
+        if(reference){ return reference; }
         return stableFormationRows(ordered).flatMap(centerFirstOrder);
     }
 
@@ -796,8 +809,8 @@
     const DAILY_ELEMENTS=["fire","water","earth","wind"];
     const DAILY_DUNGEON_META={
         exp:{title:"經驗副本",requirement:"任一角色達到10級",reward:"通關後可指定1名角色獲得EXP",legacyType:"exp"},
-        material:{title:"材料副本",requirement:"至少兩名角色達到20級",reward:"材料寶箱 ×1～3",legacyType:"material"},
-        gold:{title:"金幣副本",requirement:"至少兩名角色達到20級",reward:"大量金幣",legacyType:"equipment"}
+        material:{title:"材料副本",requirement:"任一角色達到20級",reward:"材料寶箱 ×1～3",legacyType:"material"},
+        gold:{title:"金幣副本",requirement:"任一角色達到20級",reward:"大量金幣",legacyType:"equipment"}
     };
     let dailyDungeonSequence=null;
     let pendingDailyExpReward=null;
@@ -809,8 +822,20 @@
             :Math.max(1,...partyIndexes().map(index=>numeric(getPartyCharacterByIndex(index)?.level)||1));
     }
 
-    function dailyRankForSlot(wave,slot){
+    function dailyPartyContext(){
+        const indexes=partyIndexes().slice(0,3);
+        const partySize=Math.max(1,indexes.length||1);
+        const highestLevel=Math.max(1,...indexes.map(index=>numeric(getPartyCharacterByIndex(index)?.level)||1));
+        return {partySize:partySize,highestLevel:highestLevel,soloProtected:partySize===1&&highestLevel<=20};
+    }
+
+    function dailyRankForSlot(wave,slot,soloProtected){
         if(wave===1){ return null; }
+        if(soloProtected){
+            if(wave===2){ return slot===4?"elite":null; }
+            if(slot===4){ return "boss"; }
+            return slot===3?"elite":null;
+        }
         if(wave===2){ return slot>=4?"elite":null; }
         if(slot===4){ return "boss"; }
         if(slot===3||slot===5){ return "elite"; }
@@ -826,10 +851,10 @@
         return names[type][rank||"regular"];
     }
 
-    function buildDailyWave(type,wave,level){
+    function buildDailyWave(type,wave,level,context){
         const roster=[];
         for(let slot=0;slot<6;slot++){
-            const rank=dailyRankForSlot(wave,slot);
+            const rank=dailyRankForSlot(wave,slot,!!(context&&context.soloProtected));
             const element=DAILY_ELEMENTS[(wave*2+slot)%DAILY_ELEMENTS.length];
             const monster=typeof window.v132BuildDungeonMonster==="function"
                 ?window.v132BuildDungeonMonster(dailyMonsterName(type,rank),level,element,rank||undefined)
@@ -839,7 +864,8 @@
             monster.v141DungeonStage=wave;
             monster.v141FormationRow=slot<3?0:1;
             monster.v141FormationPosition=slot%3;
-            monster.v148TargetOrder=slot+1;
+            monster.v148TargetOrder=REFERENCE_TARGET_ORDER_6[slot];
+            monster.v173DailySoloProtected=!!(context&&context.soloProtected);
             roster.push(monster);
         }
         return roster;
@@ -847,9 +873,13 @@
 
     function buildDailyDungeonWaves(type){
         const level=getDailyDungeonLevel();
+        const context=dailyPartyContext();
         return {
             level:level,
-            waves:[1,2,3].map(wave=>buildDailyWave(type,wave,level))
+            partySize:context.partySize,
+            highestLevel:context.highestLevel,
+            soloProtected:context.soloProtected,
+            waves:[1,2,3].map(wave=>buildDailyWave(type,wave,level,context))
         };
     }
     window.v148BuildDailyDungeonWaves=buildDailyDungeonWaves;
@@ -858,14 +888,18 @@
         return !window.v132IsDungeonAvailable||window.v132IsDungeonAvailable(meta.legacyType);
     }
 
-    function hasTwoLevel20Characters(){
-        return partyIndexes().filter(index=>numeric(getPartyCharacterByIndex(index)?.level)>=20).length>=2;
+    function hasLevel20Character(){
+        return partyIndexes().some(index=>numeric(getPartyCharacterByIndex(index)?.level)>=20);
     }
 
     function confirmFormalDailyDungeon(meta){
         if(typeof window.rpgConfirm!=="function"){ return Promise.resolve(true); }
+        const protectedSolo=dailyPartyContext().soloProtected;
+        const layout=protectedSolo
+            ?"第1輪：6普通；第2輪：5普通＋1精英；第3輪：4普通＋1精英＋1BOSS。"
+            :"第1輪：6普通；第2輪：4普通＋2精英；第3輪：3普通＋2精英＋1BOSS。";
         return window.rpgConfirm(
-            "確定要進入「"+meta.title+"」嗎？\n\n共3輪，每輪固定前排3隻＋後排3隻，共18隻敵人。\n第1輪：6普通；第2輪：4普通＋2精英；第3輪：3普通＋2精英＋1BOSS。",
+            "確定要進入「"+meta.title+"」嗎？\n\n共3輪，每輪固定前排3隻＋後排3隻，共18隻敵人。\n"+layout,
             {title:"副本確認",confirmText:"進入副本",cancelText:"返回"}
         );
     }
@@ -883,6 +917,11 @@
         if(!sequence||dailyDungeonSequence!==sequence||!window.v132ActiveDungeonRun){ return; }
         const wave=sequence.waves[nextIndex];
         sequence.waveIndex=nextIndex;
+        if(window.v132ActiveDungeonRun){
+            window.v132ActiveDungeonRun.partySize=sequence.partySize;
+            window.v132ActiveDungeonRun.highestPartyLevel=sequence.highestPartyLevel;
+            window.v132ActiveDungeonRun.dailyDungeonType=sequence.type;
+        }
         monsters=wave;
         currentZone="dungeon";
         currentBattleMonsters=wave.map((monster,index)=>index);
@@ -1038,8 +1077,8 @@
         if(type==="exp"){
             const ready=partyIndexes().some(index=>numeric(getPartyCharacterByIndex(index)?.level)>=10);
             if(!ready){ alert("經驗副本需要任一角色達到10級才能開啟。"); return; }
-        }else if(!hasTwoLevel20Characters()){
-            alert(meta.title+"需要至少兩名角色達到20級才能開啟。");
+        }else if(!hasLevel20Character()){
+            alert(meta.title+"需要任一角色達到20級才能開啟。");
             return;
         }
         if(!await confirmFormalDailyDungeon(meta)){ return; }
@@ -1047,7 +1086,7 @@
         const baseExp=type==="exp"&&typeof window.v139GetExpDungeonRewardExp==="function"
             ?Math.max(0,Math.floor(numeric(window.v139GetExpDungeonRewardExp()))):0;
         const sequence={
-            type:type,meta:meta,level:built.level,waves:built.waves,waveIndex:0,totalTurns:0,baseExp:baseExp
+            type:type,meta:meta,level:built.level,partySize:built.partySize,highestPartyLevel:built.highestLevel,soloProtected:built.soloProtected,waves:built.waves,waveIndex:0,totalTurns:0,baseExp:baseExp
         };
         dailyDungeonSequence=sequence;
         const started=window.v132LaunchDungeonBattle(sequence.waves[0],function(outcome){
@@ -1075,6 +1114,11 @@
             }
         });
         if(started===false){ dailyDungeonSequence=null; }
+        else if(window.v132ActiveDungeonRun){
+            window.v132ActiveDungeonRun.partySize=sequence.partySize;
+            window.v132ActiveDungeonRun.highestPartyLevel=sequence.highestPartyLevel;
+            window.v132ActiveDungeonRun.dailyDungeonType=type;
+        }
     }
 
     window.v132BeginExpDungeon=function(){ return beginFormalDailyDungeon("exp"); };
@@ -1113,8 +1157,11 @@
     window.v148ShowDailyDungeonPreview=function(type){
         const meta=DAILY_DUNGEON_META[type];
         if(!meta||typeof window.v132ShowRewardModal!=="function"){ return; }
+        const layout=dailyPartyContext().soloProtected
+            ?"6普通 → 5普通+1精英 → 4普通+1精英+1BOSS"
+            :"6普通 → 4普通+2精英 → 3普通+2精英+1BOSS";
         const html='<div class="v132-reward-modal-inner"><h3>'+meta.title+'獎勵預覽</h3><p>'+meta.reward+'</p>'+
-            '<p>固定3輪×6隻：6普通 → 4普通+2精英 → 3普通+2精英+1BOSS。</p>'+
+            '<p>固定3輪×6隻：'+layout+'。</p>'+
             '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };

@@ -50,8 +50,8 @@ assert.match(v131,/getBeginnerForestMonsterExpUnit/);
 assert.match(v131,/beginnerMonsterUnits/);
 
 /* V173.43 daily-dungeon strength is dynamic, not the old 0.5 × 0.5 path. */
-assert.match(tuning,/const partyMultiplier=partySize===1\?\.60:partySize===2\?\.82:1;/);
-assert.match(tuning,/const levelMultiplier=highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05;/);
+assert.match(tuning,/const partyMultiplier=partySize===1\?\.40:partySize===2\?\.72:1;/);
+assert.match(tuning,/const levelMultiplier=highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05;/);
 assert.match(tuning,/function getDailyDungeonScaleContext\(\)/);
 assert.match(tuning,/function normalizeDailyDungeonMonster\(monster\)/);
 assert.match(tuning,/factor:partyMultiplier\*levelMultiplier/);
@@ -96,8 +96,12 @@ assert.match(homePolish,/隨機普通裝備/);
 /* Red dots reuse the small breathing creation prompt and taps never flash blue. */
 assert.match(homeCss,/#game-stage \*/);
 assert.match(homeCss,/-webkit-tap-highlight-color:rgba\(0,0,0,0\) !important/);
-assert.match(homeCss,/\.v141-notice-dot,[\s\S]*width:10px !important;[\s\S]*height:10px !important/);
+assert.match(homeCss,/\.v141-notice-dot,[\s\S]*width:7px !important;[\s\S]*height:7px !important/);
 assert.match(homeCss,/animation:v131RedDotPulse 1\.1s ease-in-out infinite alternate !important/);
+
+/* Manual actions do not add a second empty wait after the turn declaration. */
+assert.match(v131,/const elapsed=v131TurnStartedAt>0 \? \(Date\.now\(\)-v131TurnStartedAt\) : 0/);
+assert.match(v131,/const wait=Math\.max\(0,V138_ACTION_DELAY_MS-elapsed\)/);
 
 /* Auto targeting and tri-target geometry use the original full formation. */
 assert.match(autoBattle,/v148GetAutoTargetPriority/);
@@ -111,11 +115,14 @@ assert.match(dungeonPolish,/DAILY_DUNGEON_META=\{/);
 assert.match(dungeonPolish,/gold:\{title:"金幣副本"/);
 assert.match(dungeonPolish,/\[1,2,3\]\.map\(wave=>buildDailyWave/);
 assert.match(dungeonPolish,/for\(let slot=0;slot<6;slot\+\+\)/);
+assert.match(dungeonPolish,/if\(soloProtected\)[\s\S]*wave===2[\s\S]*slot===4\?"elite":null/);
 assert.match(dungeonPolish,/if\(wave===2\)\{ return slot>=4\?"elite":null; \}/);
 assert.match(dungeonPolish,/if\(slot===4\)\{ return "boss"; \}/);
 assert.match(dungeonPolish,/monster\.v141FormationRow=slot<3\?0:1/);
 assert.match(dungeonPolish,/monster\.v141FormationPosition=slot%3/);
-assert.match(dungeonPolish,/monster\.v148TargetOrder=slot\+1/);
+assert.match(dungeonPolish,/REFERENCE_TARGET_ORDER_6=\[4,1,3,6,2,5\]/);
+assert.match(dungeonPolish,/REFERENCE_TARGET_ORDER_10=\[7,2,6,1,5,10,4,9,3,8\]/);
+assert.match(dungeonPolish,/monster\.v148TargetOrder=REFERENCE_TARGET_ORDER_6\[slot\]/);
 assert.match(dungeonPolish,/dailyDungeonSequence\.waveIndex<2/);
 assert.match(dungeonPolish,/advanceDailyDungeonWave\(\)/);
 assert.match(dungeonPolish,/v173GrantCharacterCatchUpExp/);
@@ -150,13 +157,16 @@ assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !impor
 assert.match(questCss,/quest-milestone\.claimed[\s\S]*opacity:\.5 !important/);
 
 assert.match(abyssCss,/home-background-v17343\.png/);
-assert.match(abyssCss,/equipment-v17343\.png/);
+assert.match(abyssCss,/gold-v17344\.png/);
 assert.match(abyssCss,/abyss-cover-v17343\.png/);
 [
     "assets/ui/home-background-v17343.png",
     "assets/ui/home-character.png",
     "assets/dungeons/covers/equipment-v17343.png",
-    "assets/dungeons/abyss/abyss-cover-v17343.png"
+    "assets/dungeons/abyss/abyss-cover-v17343.png",
+    "assets/dungeons/covers/gold-v17344.png",
+    "assets/dungeons/abyss/maps/floor-5.png",
+    "assets/maps/zone10-v17344.png"
 ].forEach(path=>assert.equal(fs.existsSync(path),true,path+" must exist"));
 
 console.log("✓ V173.43 player flow / daily dungeons / catch-up / Water regression passed");

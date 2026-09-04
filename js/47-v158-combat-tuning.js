@@ -97,7 +97,7 @@
             }).length;
         }
         partySize=Math.max(1,Math.min(3,partySize||1));
-        const partyMultiplier=partySize===1?.60:partySize===2?.82:1;
+        const partyMultiplier=partySize===1?.40:partySize===2?.72:1;
 
         let highestLevel=Math.floor(numeric(run&&run.highestPartyLevel));
         if(!(highestLevel>0)&&typeof getExistingPartyIndexes==="function"){
@@ -107,7 +107,7 @@
             },1);
         }
         highestLevel=Math.max(1,highestLevel||1);
-        const levelMultiplier=highestLevel<=20?.90:highestLevel<=50?1:1.05;
+        const levelMultiplier=highestLevel<=15?.80:highestLevel<=20?.90:highestLevel<=50?1:1.05;
         return {
             partySize:partySize,
             highestLevel:highestLevel,
@@ -117,8 +117,14 @@
         };
     }
 
+    const FORMAL_DAILY_DUNGEON_TYPES=new Set(["exp","material","gold"]);
+
+    function isFormalDailyDungeonMonster(monster){
+        return !!(monster&&FORMAL_DAILY_DUNGEON_TYPES.has(String(monster.v173DailyDungeonType||"")));
+    }
+
     function normalizeDailyDungeonMonster(monster){
-        if(!monster||monster.v141Abyss===true){ return monster; }
+        if(!isFormalDailyDungeonMonster(monster)||monster.v141Abyss===true){ return monster; }
         normalizeMonsterDefaultEvasion(monster);
         if(!monster.v173DailyDungeonBaseStats){
             const base={};
@@ -128,6 +134,9 @@
             monster.v173DailyDungeonBaseStats=base;
         }
         const context=getDailyDungeonScaleContext();
+        if(!Object.prototype.hasOwnProperty.call(monster,"v173DailyDungeonBaseSkillChance")){
+            monster.v173DailyDungeonBaseSkillChance=Number.isFinite(Number(monster.skillChance))?Number(monster.skillChance):0;
+        }
         const base=monster.v173DailyDungeonBaseStats;
         DAILY_DUNGEON_SCALE_FIELDS.forEach(key=>{
             if(!Object.prototype.hasOwnProperty.call(base,key)){ return; }
@@ -139,6 +148,15 @@
         monster.v173DailyDungeonScaleFactor=context.factor;
         monster.v173DailyDungeonPartySize=context.partySize;
         monster.v173DailyDungeonHighestLevel=context.highestLevel;
+        monster.v173DailySoloProtected=context.partySize===1&&context.highestLevel<=20;
+        monster.v173DailyNoAccuracyCritBoost=monster.v173DailySoloProtected;
+        const baseSkillChance=Math.max(0,Math.min(1,Number(monster.v173DailyDungeonBaseSkillChance)||0));
+        if(monster.v173DailySoloProtected){
+            monster.skillChance=Number(monster.v141DungeonStage)===1?0:Math.min(.45,baseSkillChance*.60);
+        }else{
+            monster.skillChance=baseSkillChance;
+            monster.v173DailyBossUsedSkillLastAction=false;
+        }
         return monster;
     }
 
@@ -146,6 +164,7 @@
     window.v17342NormalizeBeginnerForestMonster=normalizeBeginnerForestMonster;
     window.v17342NormalizeDailyDungeonMonster=normalizeDailyDungeonMonster;
     window.v173GetDailyDungeonScaleContext=getDailyDungeonScaleContext;
+    window.v17344IsFormalDailyDungeonMonster=isFormalDailyDungeonMonster;
 
     if(typeof makeZoneMonster==="function"){
         const previousMakeZoneMonster=makeZoneMonster;
@@ -292,6 +311,49 @@
         if(typeof updateUI==="function"){ updateUI(); }
         if(!legacyPlayer2&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
         return true;
+    }
+
+    /* Solo Lv1-20 formal daily protection: wave 1 is normal-attack only.
+       From wave 2 onward skills are allowed at a reduced rate; a BOSS that just
+       used a skill must perform one non-skill action before another skill. */
+    if(typeof processSingleMonsterAttack==="function"){
+        const previousDailyProtectedMonsterAttack=processSingleMonsterAttack;
+        processSingleMonsterAttack=function(monsterIndex){
+            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+            if(!monster||monster.v173DailySoloProtected!==true||monster.v141Abyss===true){
+                return previousDailyProtectedMonsterAttack.apply(this,arguments);
+            }
+            const rank=typeof getMonsterRank==="function"?getMonsterRank(monster):(monster.rank||"regular");
+            const forceNormal=Number(monster.v141DungeonStage)===1||
+                (rank==="boss"&&monster.v173DailyBossUsedSkillLastAction===true);
+            const savedSkillIds=monster.skillIds;
+            const savedSupports=monster.v141SupportSkillIds;
+            const savedChance=monster.skillChance;
+            const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
+            let usedSkill=false;
+            if(forceNormal){
+                monster.skillIds=[];
+                monster.v141SupportSkillIds=[];
+                monster.skillChance=0;
+            }
+            if(previousBadge){
+                showMonsterSkillNameBadge=function(name){
+                    if(String(name||"")!=="普通攻擊"){ usedSkill=true; }
+                    return previousBadge.apply(this,arguments);
+                };
+            }
+            try{
+                return previousDailyProtectedMonsterAttack.apply(this,arguments);
+            }finally{
+                if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
+                if(forceNormal){
+                    monster.skillIds=savedSkillIds;
+                    monster.v141SupportSkillIds=savedSupports;
+                    monster.skillChance=savedChance;
+                }
+                if(rank==="boss"){ monster.v173DailyBossUsedSkillLastAction=usedSkill; }
+            }
+        };
     }
 
     window.v158CastTriFreeze=castTriFreeze;

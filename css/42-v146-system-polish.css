@@ -80,8 +80,8 @@
 }
 #game-stage .v141-notice-dot,
 #game-stage .v146-growth-guidance-dot{
-    width:10px !important;
-    height:10px !important;
+    width:7px !important;
+    height:7px !important;
     min-width:10px !important;
     min-height:10px !important;
     z-index:20050 !important;

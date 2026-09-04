@@ -496,6 +496,7 @@
        reload or a later visit must return to the progress gate first. */
     let abyssMapEntered=false;
     let abyssBattleStarting=false;
+    let activeAbyssDialogueAdvance=null;
     function persistAbyss(){ try{ localStorage.setItem(ABYSS_STORAGE_KEY,JSON.stringify(abyssState)); }catch(_){ } }
 
     const abyssFloors={
@@ -801,7 +802,7 @@
         const floor=abyssState.floor;
         const info=floor<5?abyssFloors[floor]:{boss:"五帝聯軍",element:"light"};
         const pos=bossPosition(floor);
-        const boss=abyssState.phase==="boss"?'<button type="button" class="v141-abyss-boss" data-abyss-boss-control="true" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="v141HandleAbyssBossInteraction(event)"><b>'+escapeHtml(info.boss)+'</b><span>'+elementLabel[info.element]+'元素・點擊挑戰</span></button>':'';
+        const boss=abyssState.phase==="boss"&&floor<5?'<button type="button" class="v141-abyss-boss" data-abyss-boss-control="true" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="v141HandleAbyssBossInteraction(event)"><b>'+escapeHtml(info.boss)+'</b><span>'+elementLabel[info.element]+'元素・點擊挑戰</span></button>':'';
         const hasFloorReward=floor<5&&(abyssState.phase==="chest"||abyssState.phase==="portal");
         const portal=hasFloorReward?'<button class="v141-abyss-portal'+(abyssState.phase==="chest"?' locked':'')+'" style="left:50%;top:10%" aria-disabled="'+(abyssState.phase==="chest"?'true':'false')+'" onclick="event.stopPropagation();v141UseAbyssPortal()"><i></i><span>'+(abyssState.phase==="chest"?'先開啟寶箱':'前往下一層')+'</span></button>':'';
         const showChest=abyssState.phase==="chest"||abyssState.phase==="portal";
@@ -880,7 +881,11 @@
         playerEl.style.transition="left "+duration+"s cubic-bezier(.22,.61,.36,1),top "+duration+"s cubic-bezier(.22,.61,.36,1)";
         playerEl.style.left=x+"%"; playerEl.style.top=y+"%";
         playerEl.classList.add("walking");
-        setTimeout(()=>{ playerEl.classList.remove("walking"); if(callback){ callback(); } },duration*1000+30);
+        setTimeout(()=>{
+            playerEl.classList.remove("walking");
+            if(callback){ callback(); }
+            else{ maybeTriggerFinalAbyssEncounter(); }
+        },duration*1000+30);
     }
     window.v141ApproachAbyssBoss=function(callback){
         if(abyssState.phase!=="boss"){ return false; }
@@ -893,6 +898,21 @@
         }
         return true;
     };
+    function finalAbyssApproachPoint(){
+        const pos=bossPosition(5);
+        return [pos[0],Math.min(84,pos[1]+27)];
+    }
+
+    function maybeTriggerFinalAbyssEncounter(){
+        if(
+            abyssState.floor!==5||abyssState.phase!=="boss"||abyssBattleStarting||
+            activeAbyssDialogueAdvance
+        ){ return false; }
+        const approach=finalAbyssApproachPoint();
+        if(Math.hypot(abyssState.x-approach[0],abyssState.y-approach[1])>10){ return false; }
+        return openAbyssBossDialogue();
+    }
+
     function isAbyssMapControlHit(event,control){
         if(!event||!control){ return false; }
         const target=event.target;
@@ -916,7 +936,7 @@
             if(event.preventDefault){ event.preventDefault(); }
             if(event.stopPropagation){ event.stopPropagation(); }
         }
-        if(abyssState.phase!=="boss"){ return false; }
+        if(abyssState.phase!=="boss"||abyssState.floor===5){ return false; }
         window.v141ChallengeAbyssBoss();
         return true;
     };
@@ -941,6 +961,12 @@
     window.v141AbyssMoveByEvent=function(event){
         const map=document.getElementById("v141AbyssMap");
         if(!map||map.dataset.v169DialogueApproaching==="1"){ return; }
+        if(activeAbyssDialogueAdvance){
+            if(event&&event.preventDefault){ event.preventDefault(); }
+            if(event&&event.stopPropagation){ event.stopPropagation(); }
+            activeAbyssDialogueAdvance();
+            return;
+        }
         const boss=abyssState.phase==="boss"?map.querySelector(".v141-abyss-boss"):null;
         /*
            Mobile browsers may report the portrait pseudo-element as the map
@@ -958,6 +984,15 @@
         /* V143：地圖放大後同步放寬可走區，保留角色半身安全邊界即可。 */
         const x=Math.max(4,Math.min(96,(event.clientX-rect.left)/rect.width*100));
         const y=Math.max(8,Math.min(94,(event.clientY-rect.top)/rect.height*100));
+        if(abyssState.floor===5&&abyssState.phase==="boss"){
+            const emperorPos=bossPosition(5);
+            const nearFiveEmperors=Math.hypot(x-emperorPos[0],y-emperorPos[1])<=36||y<=62;
+            if(nearFiveEmperors){
+                const approach=finalAbyssApproachPoint();
+                moveAbyssPlayer(approach[0],approach[1],maybeTriggerFinalAbyssEncounter);
+                return;
+            }
+        }
         moveAbyssPlayer(x,y);
     };
 
@@ -1052,31 +1087,39 @@
         map.dataset.v141AbyssDialogueOpening="1";
         const floor=Math.max(1,Math.min(5,Number(abyssState.floor)||1));
         const boss=bossButton&&bossButton.querySelector("b");
+        const speaker=boss&&boss.textContent||(floor===5?"五帝聯軍":"守關者");
         const lines=(ABYSS_DIALOGUE[floor]||ABYSS_DIALOGUE[1]).slice();
         let index=0;
         const overlay=document.createElement("button");
         overlay.type="button";
         overlay.className="v143-abyss-dialogue";
         overlay.setAttribute("aria-label","守關者對話，點擊繼續");
-        overlay.innerHTML='<small>'+escapeHtml(boss&&boss.textContent||"守關者")+'</small><b></b><span>點擊對話繼續　'+(index+1)+' / '+lines.length+'</span>';
+        overlay.innerHTML='<small>'+escapeHtml(speaker)+'</small><b></b><span>點擊空白處繼續　'+(index+1)+' / '+lines.length+'</span>';
         const text=overlay.querySelector("b");
         const hint=overlay.querySelector("span");
         text.textContent=lines[index];
-        overlay.onclick=event=>{
-            event.preventDefault(); event.stopPropagation();
+        const advanceDialogue=()=>{
             index++;
             if(index<lines.length){
                 text.textContent=lines[index];
-                hint.textContent="點擊對話繼續　"+(index+1)+" / "+lines.length;
+                hint.textContent="點擊空白處繼續　"+(index+1)+" / "+lines.length;
                 return;
             }
             text.textContent="進入戰鬥……";
             hint.textContent="";
             overlay.disabled=true;
+            activeAbyssDialogueAdvance=null;
+            delete map.dataset.v141DialogueOpen;
             setTimeout(()=>{
                 overlay.remove();
                 launchAbyssBossBattle();
             },180);
+        };
+        activeAbyssDialogueAdvance=advanceDialogue;
+        map.dataset.v141DialogueOpen="1";
+        overlay.onclick=event=>{
+            event.preventDefault(); event.stopPropagation();
+            advanceDialogue();
         };
         map.appendChild(overlay);
         positionAbyssBossDialogue(map,overlay,bossButton);

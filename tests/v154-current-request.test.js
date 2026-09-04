@@ -204,7 +204,7 @@ test("all six supplied floor 5 portraits are optimized at the source dimensions"
 });
 
 test("equipment cover, ability scrolling and Abyss decluttering stay scoped",()=>{
-    assert.match(css,/data-dungeon-cover="equipment"[\s\S]*?background-size:cover !important/);
+    assert.match(css,/data-dungeon-cover="gold"[\s\S]*?background-size:cover !important/);
     assert.match(css,/#characterTabContent\{[\s\S]*?overflow-y:auto !important/);
     assert.match(characterRuntime,/root\.style\.setProperty\(\s*"height",\s*"auto",\s*"important"/);
     assert.doesNotMatch(characterRuntime,/bodyRect\.bottom-rootRect\.top-10/);
