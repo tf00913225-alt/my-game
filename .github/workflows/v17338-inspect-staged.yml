@@ -1,97 +1,32 @@
-# Final V173.44 maintenance trigger - current Gold call-site validation
-name: V173.44 Final Maintenance Apply
+name: V173.38 Inspect Staged Patch
 
 on:
   push:
     branches: [dev]
     paths:
       - .github/workflows/v17338-inspect-staged.yml
+      - .github/v17338.patch.xz.b64
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  apply:
+  inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           ref: dev
           fetch-depth: 2
-
-      - name: Apply requested fixes
+      - name: Decode and validate staged patch
         run: |
-          set -euo pipefail
-          python3 .github/v17344-maintenance.py
-          cp assets/ui/home-background-v17343.png assets/ui/home-background-v17344.png
-          rm -f .github/workflows/v17344-maintenance-fix.yml
-
-      - name: Ensure image test dependency
-        run: |
-          if ! command -v identify >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends imagemagick
-          fi
-
-      - name: Validate targeted and full checks
-        run: |
-          set -euo pipefail
-          node --check js/00-main.js
-          node --check js/27-v132-content-expansion.js
-          node --check js/28-v133-economy-rebalance.js
-          node --check js/42-v148-combat-dungeon-fixes.js
-          node --check js/50-v169-water-skill-rules.js
-          node tests/v169-water-skill-rules.test.js
-          node tests/v172-water-orb-vfx.test.js
-          node tests/v173.20-startup-loader.test.js
-          node tests/v173.42-player-flow.test.js
-          node tests/v173.43-growth-charge.test.js
-          node tests/v173.44-current-request.test.js
-          node .github/scripts/ci.mjs tests
-          node .github/scripts/ci.mjs resources
-
-      - name: Restore workflow and publish final dev state
-        run: |
-          set -euo pipefail
-          rm -f .github/v17344-maintenance.py
-          cat > .github/workflows/v17338-inspect-staged.yml <<'YAML'
-          name: V173.38 Inspect Staged Patch
-
-          on:
-            push:
-              branches: [dev]
-              paths:
-                - .github/workflows/v17338-inspect-staged.yml
-                - .github/v17338.patch.xz.b64
-
-          permissions:
-            contents: read
-
-          jobs:
-            inspect:
-              runs-on: ubuntu-latest
-              steps:
-                - uses: actions/checkout@v4
-                  with:
-                    ref: dev
-                    fetch-depth: 2
-                - name: Decode and validate staged patch
-                  run: |
-                    base64 -d .github/v17338.patch.xz.b64 | xz -d > /tmp/v17338.patch
-                    git apply --check /tmp/v17338.patch
-                    git apply --stat /tmp/v17338.patch
-                    sha256sum /tmp/v17338.patch
-                    cp /tmp/v17338.patch v17338.patch
-                - uses: actions/upload-artifact@v4
-                  with:
-                    name: v17338-staged-patch
-                    path: v17338.patch
-                    retention-days: 1
-          YAML
-          git config user.name "tf00913225-alt"
-          git config user.email "tf00913225@gmail.com"
-          git add -A
-          git diff --cached --check
-          git commit -m "fix: finalize V173.44 dungeon growth and water UX maintenance"
-          git push origin HEAD:dev
+          base64 -d .github/v17338.patch.xz.b64 | xz -d > /tmp/v17338.patch
+          git apply --check /tmp/v17338.patch
+          git apply --stat /tmp/v17338.patch
+          sha256sum /tmp/v17338.patch
+          cp /tmp/v17338.patch v17338.patch
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v17338-staged-patch
+          path: v17338.patch
+          retention-days: 1

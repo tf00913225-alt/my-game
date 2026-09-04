@@ -59,7 +59,7 @@ assert.match(tuning,/monster\.v141Abyss===true/);
 assert.doesNotMatch(tuning,/v17342DailyDungeonStatsHalvedAgain/);
 assert.match(tuning,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*return 5\+Math\.floor\(Math\.random\(\)\*4\)/);
 
-/* Second / third character catch-up is EXP-only after the Lv10 fast start and ends at Lv20. */
+/* Second / third character starts at Lv1; catch-up is EXP-only and ends at Lv20. */
 assert.match(economy,/function getCharacterPartyIndex\(character\)/);
 assert.match(economy,/function getAdditionalCharacterPoolMultiplier\(character,level\)/);
 assert.match(economy,/if\(safeLevel>=20\)\{ return 1; \}/);
@@ -68,8 +68,8 @@ assert.match(economy,/if\(index===1\)\{ return 1\.50; \}/);
 assert.match(economy,/function getDirectCatchUpExpMultiplier\(character\)/);
 assert.match(economy,/if\(index===2\)\{ return 3; \}/);
 assert.match(economy,/if\(index===1\)\{ return 2; \}/);
-assert.match(economy,/function grantFastStartToAdditionalCharacter\(character,slotNumber\)/);
-assert.match(economy,/character\.level=10/);
+assert.doesNotMatch(economy,/function grantFastStartToAdditionalCharacter\(character,slotNumber\)/);
+assert.doesNotMatch(economy,/啟用追趕養成，從 Lv\.10 開始冒險/);
 assert.match(economy,/v173GrantCharacterCatchUpExp/);
 assert.match(economy,/v173GetDirectCatchUpExpMultiplier/);
 
@@ -125,7 +125,8 @@ assert.match(dungeonPolish,/REFERENCE_TARGET_ORDER_10=\[7,2,6,1,5,10,4,9,3,8\]/)
 assert.match(dungeonPolish,/monster\.v148TargetOrder=REFERENCE_TARGET_ORDER_6\[slot\]/);
 assert.match(dungeonPolish,/dailyDungeonSequence\.waveIndex<2/);
 assert.match(dungeonPolish,/advanceDailyDungeonWave\(\)/);
-assert.match(dungeonPolish,/v173GrantCharacterCatchUpExp/);
+assert.match(dungeonPolish,/function finishDailyExpReward\(amount\)[\s\S]*?sharedExp=Math\.max\(0,numeric\(sharedExp\)\+granted\)/);
+assert.doesNotMatch(dungeonPolish,/請指定1名角色領取/);
 assert.match(dungeonPolish,/v148ClaimDailyGoldReward/);
 assert.match(dungeonPolish,/v132BeginEquipmentDungeon=function\(\)\{ return beginFormalDailyDungeon\("gold"\); \}/);
 assert.match(dungeonPolish,/questRewardReady/);
@@ -156,11 +157,11 @@ assert.match(questCss,/quest-milestone\.reached:not\(\.claimed\) \.quest-milesto
 assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !important/);
 assert.match(questCss,/quest-milestone\.claimed[\s\S]*opacity:\.5 !important/);
 
-assert.match(abyssCss,/home-background-v17343\.png/);
+assert.match(abyssCss,/home-background-v17344\.png/);
 assert.match(abyssCss,/gold-v17344\.png/);
 assert.match(abyssCss,/abyss-cover-v17343\.png/);
 [
-    "assets/ui/home-background-v17343.png",
+    "assets/ui/home-background-v17344.png",
     "assets/ui/home-character.png",
     "assets/dungeons/covers/equipment-v17343.png",
     "assets/dungeons/abyss/abyss-cover-v17343.png",

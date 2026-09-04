@@ -29270,7 +29270,7 @@ function renderSkillLoadout(){
             actionLabel=
                 !prereqMet
                 ?
-                "🔒 未解鎖"
+                "🔒 "+getSkillPrereqLabel(skill)
                 :
                 (
                     canAfford

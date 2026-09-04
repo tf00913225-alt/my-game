@@ -1638,7 +1638,8 @@
             return character && (Number(character.level)||1)>=10;
         }).length>=1;
     }
-    window.v132HasTwoCharactersAtLevel20=hasTwoCharactersAtLevel20;
+    window.v132HasLevel10CharacterForDailyDungeon=hasLevel10CharacterForDailyDungeon;
+    window.v132HasTwoCharactersAtLevel20=hasLevel10CharacterForDailyDungeon;
 
     /*
        ★ 修正（同一個回報的另一半）：副本次數是存在
