@@ -49,6 +49,17 @@ s=read(p)
 s=ensure_replace(s,'home-background-v17343.png','home-background-v17344.png',"main-city UHD CSS path")
 write(p,s)
 
+# 3b. Keep the historical Gold-dungeon API name as a compatibility alias.
+p="js/42-v148-combat-dungeon-fixes.js"
+s=read(p)
+alias='    window.v148GetGoldDungeonReward=goldDungeonReward;'
+marker='    function showDailyGoldReward(amount){'
+if alias not in s:
+    if marker not in s:
+        raise SystemExit("gold dungeon compatibility marker missing")
+    s=s.replace(marker,alias+'\n\n'+marker,1)
+write(p,s)
+
 # 4. Historical player-flow regression aligns with current intended behavior.
 p="tests/v173.42-player-flow.test.js"
 s=read(p)
@@ -113,6 +124,7 @@ assert.match(main,/"🔒 "\+getSkillPrereqLabel\(skill\)/);
 assert.match(water,/floodBeast:\{[\s\S]*?learnCost:15[\s\S]*?requires:\["waterBall"\]/);
 assert.match(main,/function learnSkill\(skillId\)[\s\S]*?isSkillPrereqMet\([\s\S]*?character\.skillLevels,[\s\S]*?skill[\s\S]*?availablePoints<learnCost[\s\S]*?owner\.skillPoints=availablePoints-learnCost/);
 assert.match(water,/applyFinalSkillData\(\);[\s\S]*?renderSkillLoadout\(\)/);
+assert.match(battle,/window\.v148GetGoldDungeonReward=goldDungeonReward/);
 assert.match(abyssCss,/home-background-v17344\.png/);
 assert.equal(fs.existsSync("assets/ui/home-background-v17344.png"),true,"assets/ui/home-background-v17344.png");
 assert.match(loader,/const V_ASSET_VERSION="173\.44"/);
