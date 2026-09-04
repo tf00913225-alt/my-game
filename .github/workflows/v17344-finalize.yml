@@ -66,6 +66,16 @@ jobs:
           Path('/tmp/v17344_apply.py').write_text(body,encoding='utf-8')
           PY
           python /tmp/v17344_apply.py
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('tests/v143-combat-dungeon-polish.test.js')
+          text=path.read_text(encoding='utf-8')
+          old='assert.match(dungeon,/function openAbyssBossDialogue\\(\\)[\\s\\S]*?點擊對話繼續/);'
+          new='assert.match(dungeon,/function openAbyssBossDialogue\\(\\)[\\s\\S]*?點擊空白處繼續/);'
+          if text.count(old)!=1:
+              raise SystemExit('V143 historical dialogue assertion was not found exactly once')
+          path.write_text(text.replace(old,new,1),encoding='utf-8')
+          PY
 
       - name: Ensure full-suite image dependency
         shell: bash
