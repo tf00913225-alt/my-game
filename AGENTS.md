@@ -13,3 +13,4 @@
 - DEV 唯一固定測試網址：`https://four-symbols-dev.pages.dev`。
 - 不再使用 GitHack / RawCDN 作為 DEV 驗證來源。
 - `assets-library` 與 `assets-library/assets/inbox/` 仍維持 GitHub 素材工作流，不受 Cloudflare Pages 發布方式影響。
+- 每次維修或升版後，主城 HUD 顯示版本、`index.html` 的載入版本與 `V_ASSET_VERSION` 必須同步更新，避免手機載入舊快取。
