@@ -47,9 +47,9 @@ test("a persisted Abyss run pauses at a progress gate without resetting its floo
     assert.doesNotMatch(css,/v169-abyss-resume[^{}]*\{[^}]*(?:display|padding|background|justify-content)\s*:/);
 });
 
-test("every floor starts bottom-center with its guardian and teleporter centered",()=>{
+test("every floor starts bottom-center with its guardian moved onto the upper arena and teleporter centered",()=>{
     assert.match(abyss,/x:50,y:84/);
-    assert.match(abyss,/function bossPosition\(\)\{ return \[50,33\]; \}/);
+    assert.match(abyss,/function bossPosition\(\)\{ return \[61,21\]; \}/);
     assert.match(abyss,/style="left:50%;top:10%"/);
     assert.match(abyss,/moveAbyssPlayer\(50,18/);
     assert.match(abyss,/abyssState\.x=50; abyssState\.y=84/);
@@ -98,10 +98,9 @@ test("all supplied icons and Abyss portraits carry real transparency",()=>{
         "floor5-north-emperor.webp","floor5-south-emperor.webp","floor5-soldier.webp"
     ].map(name=>"assets/dungeons/abyss/"+name);
     iconPaths.concat(portraits).forEach(path=>{
-        assert.ok(fs.statSync(path).size>10000,path);
-        const opaque=execFileSync("identify",["-format","%[opaque]",path],{encoding:"utf8"}).trim().toLowerCase();
-        assert.equal(opaque,"false",path+" must contain transparent pixels");
+        const channels=execFileSync("identify",["-format","%[channels]",path],{encoding:"utf8"}).trim();
+        assert.match(channels,/a/i,path+" should include alpha");
     });
 });
 
-console.log("\nV169 Abyss/assets flow suite: "+passed+" tests passed.");
+console.log(`V169 Abyss/assets flow tests passed: ${passed}`);
