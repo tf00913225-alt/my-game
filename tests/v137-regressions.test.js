@@ -246,18 +246,20 @@ test("daily dungeon date follows local midnight instead of UTC",()=>{
     assert.equal(vm.runInContext("todayString()",context),"2026-08-28");
 });
 
-test("material and equipment dungeons require two actual Lv20 characters",()=>{
+test("formal daily dungeons unlock when any actual character reaches Lv10",()=>{
     const context=makeContext({players:[]});
     context.getExistingPartyIndexes=()=>context.players.map((_,index)=>index);
     context.getPartyCharacterByIndex=index=>context.players[index];
-    vm.runInContext(extractFunction(v132Source,"hasTwoCharactersAtLevel20"),context);
+    vm.runInContext(extractFunction(v132Source,"hasLevel10CharacterForDailyDungeon"),context);
 
-    context.players=[{level:20},{level:1}];
-    assert.equal(vm.runInContext("hasTwoCharactersAtLevel20()",context),false);
-    context.players=[{level:20},{level:20}];
-    assert.equal(vm.runInContext("hasTwoCharactersAtLevel20()",context),true);
-    context.players=[{level:1},{level:20},{level:20}];
-    assert.equal(vm.runInContext("hasTwoCharactersAtLevel20()",context),true);
+    context.players=[];
+    assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),false);
+    context.players=[{level:9},{level:1}];
+    assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),false);
+    context.players=[{level:10}];
+    assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),true);
+    context.players=[{level:1},{level:10}];
+    assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),true);
 });
 
 test("auto tri-targeting chooses the center that hits three of six monsters",()=>{
