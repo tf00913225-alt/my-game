@@ -29124,12 +29124,10 @@ function renderSkillLoadout(){
         );
 
 
-    const availableSkillPoints=
-        skillOwner
-        ?
-        skillOwner.skillPoints
-        :
-        0;
+    const availableSkillPoints=Math.max(
+        0,
+        Number(skillOwner ? skillOwner.skillPoints : 0)||0
+    );
 
 
     /*
@@ -29924,24 +29922,19 @@ function learnSkill(skillId){
     }
 
 
-    if(
-        owner.skillPoints<
-        skill.learnCost
-    ){
+    const learnCost=Math.max(0,Number(skill.learnCost)||0);
+    const availablePoints=Math.max(0,Number(owner.skillPoints)||0);
 
+    if(availablePoints<learnCost){
         alert(
             "技能點不足，需要"+
-            skill.learnCost+
+            learnCost+
             "點。"
         );
-
         return;
-
     }
 
-
-    owner.skillPoints-=
-        skill.learnCost;
+    owner.skillPoints=availablePoints-learnCost;
 
 
     character.skillLevels[skillId]=1;

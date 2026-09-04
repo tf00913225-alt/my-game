@@ -808,9 +808,9 @@
     /* ----- Formal daily dungeons: one shared 3-wave × 6-enemy battle flow. ----- */
     const DAILY_ELEMENTS=["fire","water","earth","wind"];
     const DAILY_DUNGEON_META={
-        exp:{title:"經驗副本",requirement:"任一角色達到10級",reward:"通關後可指定1名角色獲得EXP",legacyType:"exp"},
-        material:{title:"材料副本",requirement:"任一角色達到20級",reward:"材料寶箱 ×1～3",legacyType:"material"},
-        gold:{title:"金幣副本",requirement:"任一角色達到20級",reward:"大量金幣",legacyType:"equipment"}
+        exp:{title:"經驗副本",requirement:"任一角色達到10級",reward:"共用經驗池 EXP",legacyType:"exp"},
+        material:{title:"材料副本",requirement:"任一角色達到10級",reward:"材料寶箱 ×1～3",legacyType:"material"},
+        gold:{title:"金幣副本",requirement:"任一角色達到10級",reward:"大量金幣",legacyType:"equipment"}
     };
     let dailyDungeonSequence=null;
     let pendingDailyExpReward=null;
@@ -888,8 +888,8 @@
         return !window.v132IsDungeonAvailable||window.v132IsDungeonAvailable(meta.legacyType);
     }
 
-    function hasLevel20Character(){
-        return partyIndexes().some(index=>numeric(getPartyCharacterByIndex(index)?.level)>=20);
+    function hasLevel10Character(){
+        return partyIndexes().some(index=>numeric(getPartyCharacterByIndex(index)?.level)>=10);
     }
 
     function confirmFormalDailyDungeon(meta){
@@ -973,71 +973,42 @@
         return true;
     }
 
+    function finishDailyExpReward(amount){
+        const granted=Math.max(0,Math.floor(numeric(amount)));
+        if(granted<=0){ return; }
+        sharedExp=Math.max(0,numeric(sharedExp)+granted);
+        if(typeof addBattleLog==="function"){
+            addBattleLog("經驗副本：共用經驗池獲得"+granted+" EXP。");
+        }
+        pendingDailyExpReward=null;
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof saveGame==="function"){ saveGame(); }
+        if(typeof window.v132CloseRewardModal==="function"){ window.v132CloseRewardModal(); }
+        showPage("dungeon");
+        if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); }
+    }
+
     function showDailyExpReward(baseExp){
         pendingDailyExpReward={baseExp:Math.max(0,Math.floor(numeric(baseExp)))};
-        const choices=partyIndexes().map(index=>{
-            const character=getPartyCharacterByIndex(index);
-            const multiplier=typeof window.v173GetDirectCatchUpExpMultiplier==="function"
-                ?Math.max(1,numeric(window.v173GetDirectCatchUpExpMultiplier(character))||1):1;
-            return '<button type="button" onclick="v148ClaimDailyExpReward('+index+',false)">'+
-                (character.id||("角色"+(index+1)))+' Lv.'+Math.max(1,Math.floor(numeric(character.level)||1))+
-                (multiplier>1?'　追趕×'+multiplier:'')+'</button>';
-        }).join("");
-        const html='<div class="v132-reward-modal-inner"><h3>經驗副本挑戰成功！</h3>'+
-            '<p>基礎EXP：<b>'+pendingDailyExpReward.baseExp.toLocaleString("zh-TW")+'</b>，請指定1名角色領取。</p>'+
-            '<div class="v132-reward-actions">'+choices+
-            '<span class="v132-reward-note">選定角色後，可再選擇觀看廣告雙倍領取。</span></div></div>';
+        const html='<div class="v132-reward-modal-inner"><h3>經驗副本挑戰成功！</h3>'+ 
+            '<p>共用經驗池可獲得：<b>'+pendingDailyExpReward.baseExp.toLocaleString("zh-TW")+' EXP</b></p>'+ 
+            '<div class="v132-reward-actions">'+
+            '<button type="button" onclick="v148ClaimDailyExpReward(false)">直接領取</button>'+ 
+            '<button type="button" onclick="v148ClaimDailyExpReward(true)">看廣告雙倍領取</button>'+ 
+            '<span class="v132-reward-note">獎勵直接加入共用經驗池，不再指定角色。</span></div></div>';
         if(typeof window.v132ShowRewardModal==="function"){ window.v132ShowRewardModal(html); }
     }
 
-    window.v148ClaimDailyExpReward=async function(characterIndex,doubled){
+    window.v148ClaimDailyExpReward=function(doubled){
         const pending=pendingDailyExpReward;
-        const character=getPartyCharacterByIndex(Number(characterIndex));
-        if(!pending||!character){ return; }
-        const grant=multiplier=>{
-            const raw=Math.floor(pending.baseExp*multiplier);
-            const result=typeof window.v173GrantCharacterCatchUpExp==="function"
-                ?window.v173GrantCharacterCatchUpExp(character,raw)
-                :null;
-            if(!result){
-                character.exp=Math.max(0,numeric(character.exp)+raw);
-                if(typeof checkLevelUp==="function"){ checkLevelUp(character); }
-                if(typeof saveGame==="function"){ saveGame(); }
-            }
-            const granted=result?result.grantedExp:raw;
-            if(typeof addBattleLog==="function"){
-                addBattleLog("經驗副本："+(character.id||"角色")+"獲得"+granted+" EXP。");
-            }
-            pendingDailyExpReward=null;
-            if(typeof window.v132CloseRewardModal==="function"){ window.v132CloseRewardModal(); }
-            showPage("dungeon");
-            if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); }
-        };
-        if(doubled){
-            if(typeof showRewardedAd==="function"){
-                showRewardedAd(()=>grant(2),()=>alert("廣告未完成，未獲得雙倍獎勵。"));
-            }
-            return;
+        if(!pending){ return; }
+        const grant=multiplier=>finishDailyExpReward(Math.floor(pending.baseExp*multiplier));
+        if(doubled&&typeof showRewardedAd==="function"){
+            showRewardedAd(()=>grant(2),()=>alert("廣告未完成，未獲得雙倍獎勵。"));
+        }else{
+            grant(1);
         }
-        if(typeof window.rpgConfirm==="function"){
-            const useAd=await window.rpgConfirm(
-                "要觀看廣告，讓"+(character.id||"這名角色")+"獲得雙倍EXP嗎？",
-                {title:"經驗副本獎勵",confirmText:"觀看廣告雙倍",cancelText:"直接領取"}
-            );
-            if(useAd){
-                if(typeof showRewardedAd==="function"){
-                    showRewardedAd(()=>grant(2),()=>grant(1));
-                    return;
-                }
-            }
-        }
-        grant(1);
     };
-
-    function goldDungeonReward(level){
-        return Math.max(100,Math.round(26*(Math.max(1,numeric(level))*2+3)));
-    }
-    window.v148GetGoldDungeonReward=goldDungeonReward;
 
     function showDailyGoldReward(amount){
         pendingDailyGoldReward=Math.max(0,Math.floor(numeric(amount)));
@@ -1074,11 +1045,8 @@
             alert(meta.title+"今天已經挑戰過了。");
             return;
         }
-        if(type==="exp"){
-            const ready=partyIndexes().some(index=>numeric(getPartyCharacterByIndex(index)?.level)>=10);
-            if(!ready){ alert("經驗副本需要任一角色達到10級才能開啟。"); return; }
-        }else if(!hasLevel20Character()){
-            alert(meta.title+"需要任一角色達到20級才能開啟。");
+        if(!hasLevel10Character()){
+            alert(meta.title+"需要任一角色達到10級才能開啟。");
             return;
         }
         if(!await confirmFormalDailyDungeon(meta)){ return; }

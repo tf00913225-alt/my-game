@@ -1632,11 +1632,11 @@
     window.v132IsDungeonAvailable=isDungeonAvailable;
     window.v132IsDungeonUsedToday=isDungeonUsedToday;
 
-    function hasTwoCharactersAtLevel20(){
+    function hasLevel10CharacterForDailyDungeon(){
         return getExistingPartyIndexes().filter(index=>{
             const character=getPartyCharacterByIndex(index);
-            return character && (Number(character.level)||1)>=20;
-        }).length>=2;
+            return character && (Number(character.level)||1)>=10;
+        }).length>=1;
     }
     window.v132HasTwoCharactersAtLevel20=hasTwoCharactersAtLevel20;
 
@@ -2191,8 +2191,8 @@
             alert("材料副本今天已經挑戰過了。");
             return;
         }
-        if(!hasTwoCharactersAtLevel20()){
-            alert("材料副本需要至少兩名角色都達到20級才能開啟。");
+        if(!hasLevel10CharacterForDailyDungeon()){
+            alert("材料副本需要任一角色達到10級才能開啟。");
             return;
         }
         if(!canAddItemToInventory(materialChestDefinition,3)){
@@ -2397,8 +2397,8 @@
             alert("裝備副本今天已經挑戰過了。");
             return;
         }
-        if(!hasTwoCharactersAtLevel20()){
-            alert("裝備副本需要至少兩名角色都達到20級才能開啟。");
+        if(!hasLevel10CharacterForDailyDungeon()){
+            alert("裝備副本需要任一角色達到10級才能開啟。");
             return;
         }
         if(!ticketDefinitions.some(definition=>canAddItemToInventory(definition,1))){
@@ -2557,11 +2557,11 @@
                 "全隊升下一級所需總經驗平均值的11%（廣告可雙倍）","v132BeginExpDungeon"
             )+
             dungeonEntryCard(
-                "material","材料副本","至少兩名角色達到20級",
+                "material","材料副本","任一角色達到10級",
                 "材料寶箱×1～3（依通關回合數）","v132BeginMaterialDungeon"
             )+
             dungeonEntryCard(
-                "equipment","裝備副本","至少兩名角色達到20級",
+                "equipment","裝備副本","任一角色達到10級",
                 "高極裝備寶箱×1（自選抽獎券）","v132BeginEquipmentDungeon"
             )+
             '<div style="font-size:11px;color:#7a6f5c;margin-top:6px;">'+
