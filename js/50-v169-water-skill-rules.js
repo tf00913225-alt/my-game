@@ -263,6 +263,15 @@
         };
     }
 
+    if(typeof window.v141TryMonsterSpecialAction==="function"){
+        const previousTryMonsterSpecialAction=window.v141TryMonsterSpecialAction;
+        window.v141TryMonsterSpecialAction=function(monsterIndex){
+            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+            const that=this,args=arguments;
+            return withoutLegacyFrostbiteLock(monster,()=>previousTryMonsterSpecialAction.apply(that,args));
+        };
+    }
+
     if(typeof window.updateUI==="function"){
         const previousUpdateUI=window.updateUI;
         window.updateUI=function(){
