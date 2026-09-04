@@ -1,0 +1,81 @@
+name: V173.44 Browser Rendering Diagnostic
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17344-browser-debug.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Serve repository
+        shell: bash
+        run: |
+          python3 -m http.server 8899 --bind 127.0.0.1 >/tmp/v17344-http.log 2>&1 &
+          echo $! >/tmp/v17344-http.pid
+          sleep 2
+          curl -fsS http://127.0.0.1:8899/index.html >/dev/null
+      - name: Inspect real browser rendering
+        shell: bash
+        run: |
+          node <<'NODE'
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const page=await browser.newPage({viewport:{width:412,height:915},deviceScaleFactor:2,isMobile:true,hasTouch:true});
+            const failures=[];
+            const consoleErrors=[];
+            page.on('requestfailed',req=>failures.push({url:req.url(),error:req.failure()?.errorText||''}));
+            page.on('pageerror',err=>consoleErrors.push('pageerror: '+String(err)));
+            page.on('console',msg=>{ if(msg.type()==='error') consoleErrors.push('console: '+msg.text()); });
+            await page.goto('http://127.0.0.1:8899/index.html?browser-debug=1',{waitUntil:'networkidle',timeout:60000});
+            await page.waitForTimeout(1500);
+            const result=await page.evaluate(()=>{
+              const q=s=>document.querySelector(s);
+              const style=s=>{const el=q(s); if(!el)return null; const c=getComputedStyle(el); return {display:c.display,position:c.position,width:c.width,height:c.height,background:c.backgroundColor,color:c.color,fontSize:c.fontSize,zIndex:c.zIndex};};
+              const sheets=[...document.styleSheets].map(sheet=>{let rules=null,error=null;try{rules=sheet.cssRules.length}catch(e){error=String(e)}return {href:sheet.href,rules,error};});
+              return {
+                title:document.title,
+                body:style('body'),
+                stage:style('#game-stage'),
+                app:style('#app'),
+                creation:style('#creationPage'),
+                second:style('#secondCharacterModal'),
+                input:style('#creation2Id'),
+                gameInterface:style('#gameInterface'),
+                sheetCount:sheets.length,
+                sheets,
+                vAsset:typeof V_ASSET_VERSION==='undefined'?null:V_ASSET_VERSION,
+                mainLoaded:typeof openCharacterCreation==='function',
+                secondHandler:typeof openSecondCharacterModal==='function'
+              };
+            });
+            console.log('BROWSER_RENDER_DIAGNOSTIC='+JSON.stringify(result,null,2));
+            console.log('REQUEST_FAILURES='+JSON.stringify(failures,null,2));
+            console.log('BROWSER_ERRORS='+JSON.stringify(consoleErrors,null,2));
+            await page.screenshot({path:'v17344-browser-debug.png',fullPage:true});
+            await browser.close();
+            if(!result.mainLoaded) process.exitCode=2;
+            if(!result.sheets.some(x=>String(x.href||'').includes('/css/00-main.css'))) process.exitCode=3;
+            if(result.second?.display!=='none') process.exitCode=4;
+          })().catch(error=>{console.error(error);process.exit(10);});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v17344-browser-debug
+          path: v17344-browser-debug.png
+          if-no-files-found: ignore
