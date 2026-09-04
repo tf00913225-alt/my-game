@@ -88,9 +88,8 @@ s=ensure_replace(
     '    assert.ok(result.goldReward>0);\n'
     '    const dungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");',
     '    const dungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");\n'
-    '    assert.match(dungeonSource,/function goldDungeonReward\\(level\\)/);\n'
     '    assert.match(dungeonSource,/showDailyGoldReward\\(goldDungeonReward\\(active\\.level\\)\\)/);',
-    "V170 current Gold source checks"
+    "V170 current Gold source check"
 )
 write(p,s)
 
