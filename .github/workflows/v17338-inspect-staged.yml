@@ -1,4 +1,4 @@
-name: Inspect skill owner mapping
+name: V173.44 Final Maintenance Apply
 
 on:
   push:
@@ -7,17 +7,34 @@ on:
       - .github/workflows/v17338-inspect-staged.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  inspect:
+  apply:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           ref: dev
-      - name: Inspect skill owner mapping
+          fetch-depth: 2
+
+      - name: Apply requested fixes
+        shell: bash
         run: |
-          grep -n -A 140 -B 30 'function getSkillCharacterObject' js/00-main.js || true
-          grep -n -A 120 -B 30 'function selectCharacterForTabs' js/00-main.js || true
-          grep -n -A 100 -B 30 'currentSkillCharacter=' js/00-main.js | head -300 || true
+          set -euo pipefail
+          cat <<'PY64' | tr -d '\n' | base64 -d > /tmp/v17344-fix.py
+          ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCByZQoKZGVmIHJlYWQocGF0aCk6CiAgICByZXR1cm4gUGF0aChwYXRoKS5yZWFkX3RleHQo
+          ZW5jb2Rpbmc9InV0Zi04IikKCmRlZiB3cml0ZShwYXRoLCB0ZXh0KToKICAgIFBhdGgocGF0aCkud3JpdGVfdGV4dCh0ZXh0LCBlbmNvZGluZz0i
+          dXRmLTgiKQoKZGVmIHJlcGxhY2VfZXhhY3QodGV4dCwgb2xkLCBuZXcsIGxhYmVsLCBleHBlY3RlZD0xKToKICAgIGNvdW50ID0gdGV4dC5j
+          b3VudChvbGQpCiAgICBpZiBjb3VudCAhPSBleHBlY3RlZDoKICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KGYie2xhYmVsfTogZXhwZWN0ZWQge2V4
+          cGVjdGVkfSBtYXRjaGVzLCBnb3Qge2NvdW50fSIpCiAgICByZXR1cm4gdGV4dC5yZXBsYWNlKG9sZCwgbmV3KQoKZGVmIHN1Yl9vbmNlKHRl
+          eHQsIHBhdHRlcm4sIHJlcGwsIGxhYmVsLCBmbGFncz0wKToKICAgIG91dCwgY291bnQgPSByZS5zdWJuKHBhdHRlcm4sIHJlcGwsIHRleHQs
+          IGNvdW50PTEsIGZsYWdzPWZsYWdzKQogICAgaWYgY291bnQgIT0gMToKICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KGYie2xhYmVsfTogZXhw
+          ZWN0ZWQgMSBtYXRjaCwgZ290IHtjb3VudH0iKQogICAgcmV0dXJuIG91dAoKIyAxKSBGb3JtYWwgZGFpbHkgZHVuZ2VvbnM6IGFueSBvbmUg
+          THYxMDsgRVhQIGdvZXMgdG8gc2hhcmVkIHBvb2wuCnBhdGggPSAianMvNDItdjE0OC1jb21iYXQtZHVuZ2Vvbi1maXhlcy5qcyIKcyA9IHJl
+          YWQocGF0aCkKcyA9IHJlcGxhY2VfZXhhY3QocywgJ3JlcXVpcmVtZW50OiLku7vkuIDop5LoibLpgZTliLAyMOW4tO+6pyInLCAncmVxdWly
+          ZW1lbnQ6IuS7u+S4gOinkuiJsui+jOWIsDEw57SaIicsICJkYWlseSBMdjIwIHJlcXVpcmVtZW50cyIsIGV4cGVjdGVkPTIpCnMgPSByZXBs
+          YWNlX2V4YWN0KHMsICdyZXdhcmQ6IumAmumXnOW+jOWPr+aMh+WumuWQjeinkuiJsueroOeNsuW+l0VYUCInLCAncmV3YXJkOiLpgJrpm5zF
+          RVLng7nmlbDnm7TmjqXlrZjlhaXntpPpq5PmsKAiJywgIkVYUCByZXdhcmQgZGVzY3JpcHRpb24iKQpzID0gc3ViX29uY2UoCiAgICBzLAog
+          ICAgcidmdW5jdGlvbiBoYXNMZXZlbDIwQ2hhcmFjdGVyXCgx0L7QCm.........
