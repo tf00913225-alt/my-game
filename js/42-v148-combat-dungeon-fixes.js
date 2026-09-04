@@ -990,11 +990,11 @@
 
     function showDailyExpReward(baseExp){
         pendingDailyExpReward={baseExp:Math.max(0,Math.floor(numeric(baseExp)))};
-        const html='<div class="v132-reward-modal-inner"><h3>經驗副本挑戰成功！</h3>'+ 
-            '<p>共用經驗池可獲得：<b>'+pendingDailyExpReward.baseExp.toLocaleString("zh-TW")+' EXP</b></p>'+ 
+        const html='<div class="v132-reward-modal-inner"><h3>經驗副本挑戰成功！</h3>'+
+            '<p>共用經驗池可獲得：<b>'+pendingDailyExpReward.baseExp.toLocaleString("zh-TW")+' EXP</b></p>'+
             '<div class="v132-reward-actions">'+
-            '<button type="button" onclick="v148ClaimDailyExpReward(false)">直接領取</button>'+ 
-            '<button type="button" onclick="v148ClaimDailyExpReward(true)">看廣告雙倍領取</button>'+ 
+            '<button type="button" onclick="v148ClaimDailyExpReward(false)">直接領取</button>'+
+            '<button type="button" onclick="v148ClaimDailyExpReward(true)">看廣告雙倍領取</button>'+
             '<span class="v132-reward-note">獎勵直接加入共用經驗池，不再指定角色。</span></div></div>';
         if(typeof window.v132ShowRewardModal==="function"){ window.v132ShowRewardModal(html); }
     }
