@@ -1,6 +1,6 @@
 "use strict";
 
-/* HISTORICAL SPEC SNAPSHOT (V160): 只保留該版驗收紀錄；V170 最終規格以 v170-final-spec-integration.test.js 為準。 */
+/* HISTORICAL SPEC SNAPSHOT (V160): 非水系項目仍保留該版驗收紀錄；水系正式數值已由目前 V169 owner 依最新規格取代。 */
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -20,9 +20,9 @@ test("V160 corrections remain published under the current cache version",()=>{
     assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
 });
 
-test("Ice Arrow Rain ends at twenty percent Frostbite for one round",()=>{
-    assert.match(finalWater,/iceArrowRain:\{[\s\S]*?frostbiteChance:20,frostbiteDuration:1/);
-    assert.match(finalWater,/20%基礎機率使目標凍傷1回合/);
+test("Ice Arrow Rain follows the current thirty-five percent Frostbite for two rounds",()=>{
+    assert.match(finalWater,/iceArrowRain:\{[\s\S]*?frostbiteChance:35,frostbiteDuration:2/);
+    assert.match(finalWater,/35%基礎機率【凍傷】2回合/);
 });
 
 test("hard-control caps end at regular eighty, elite sixty and boss forty",()=>{
