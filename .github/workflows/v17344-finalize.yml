@@ -112,6 +112,18 @@ jobs:
               'assert.equal(result.two40.factor,.72);',
               'V170 two-character daily scale'
           )
+          replace_once(
+              'tests/v173.43-growth-charge.test.js',
+              'assert.match(dungeon,/const partyMultiplier=partySize===1\\?\\.60:partySize===2\\?\\.82:1/);',
+              'assert.match(dungeon,/const partyMultiplier=partySize===1\\?\\.40:partySize===2\\?\\.72:1/);',
+              'V173.43 daily party scale assertion'
+          )
+          replace_once(
+              'tests/v173.43-growth-charge.test.js',
+              'assert.match(dungeon,/const levelMultiplier=highestLevel<=20\\?\\.90:highestLevel<=50\\?1:1\\.05/);',
+              'assert.match(dungeon,/const levelMultiplier=highestLevel<=15\\?\\.80:highestLevel<=20\\?\\.90:highestLevel<=50\\?1:1\\.05/);',
+              'V173.43 daily level scale assertion'
+          )
           PY
 
       - name: Ensure full-suite image dependency
