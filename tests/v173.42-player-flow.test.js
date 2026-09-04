@@ -2,6 +2,8 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const v131=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
+const economy=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
+const autoBattle=fs.readFileSync("js/31-v136-auto-battle-fix.js","utf8");
 const v141=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const homePolish=fs.readFileSync("js/41-v146-system-polish.js","utf8");
@@ -9,6 +11,7 @@ const dungeonPolish=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8")
 const recovery=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const tuning=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const settings=fs.readFileSync("js/49-v169-element-box-settings.js","utf8");
+const waterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const settingsCss=fs.readFileSync("css/48-v169-element-box-settings.css","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const baseCss=fs.readFileSync("css/00-main.css","utf8");
@@ -46,13 +49,29 @@ assert.match(v131,/V17342_GLOBAL_GOLD_REWARD_MULTIPLIER=5/);
 assert.match(v131,/getBeginnerForestMonsterExpUnit/);
 assert.match(v131,/beginnerMonsterUnits/);
 
-assert.match(tuning,/V17342_HALF_MONSTER_FIELDS/);
-assert.match(tuning,/v17342BeginnerStatsHalved/);
-assert.match(tuning,/v17342DailyDungeonStatsHalved/);
-assert.match(tuning,/v17342DailyDungeonStatsHalvedAgain/);
-assert.match(tuning,/halveMonsterCoreStats\(monster,"v17342DailyDungeonStatsHalved"\);[\s\S]*halveMonsterCoreStats\(monster,"v17342DailyDungeonStatsHalvedAgain"\)/);
+/* V173.43 daily-dungeon strength is dynamic, not the old 0.5 × 0.5 path. */
+assert.match(tuning,/const partyMultiplier=partySize===1\?\.60:partySize===2\?\.82:1;/);
+assert.match(tuning,/const levelMultiplier=highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05;/);
+assert.match(tuning,/function getDailyDungeonScaleContext\(\)/);
+assert.match(tuning,/function normalizeDailyDungeonMonster\(monster\)/);
+assert.match(tuning,/factor:partyMultiplier\*levelMultiplier/);
+assert.match(tuning,/monster\.v141Abyss===true/);
+assert.doesNotMatch(tuning,/v17342DailyDungeonStatsHalvedAgain/);
 assert.match(tuning,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*return 5\+Math\.floor\(Math\.random\(\)\*4\)/);
-assert.match(tuning,/if\(!isAbyss\)\{ roster\.forEach\(normalizeDailyDungeonMonster\); \}/);
+
+/* Second / third character catch-up is EXP-only after the Lv10 fast start and ends at Lv20. */
+assert.match(economy,/function getCharacterPartyIndex\(character\)/);
+assert.match(economy,/function getAdditionalCharacterPoolMultiplier\(character,level\)/);
+assert.match(economy,/if\(safeLevel>=20\)\{ return 1; \}/);
+assert.match(economy,/if\(index===2\)\{ return 2\.00; \}/);
+assert.match(economy,/if\(index===1\)\{ return 1\.50; \}/);
+assert.match(economy,/function getDirectCatchUpExpMultiplier\(character\)/);
+assert.match(economy,/if\(index===2\)\{ return 3; \}/);
+assert.match(economy,/if\(index===1\)\{ return 2; \}/);
+assert.match(economy,/function grantFastStartToAdditionalCharacter\(character,slotNumber\)/);
+assert.match(economy,/character\.level=10/);
+assert.match(economy,/v173GrantCharacterCatchUpExp/);
+assert.match(economy,/v173GetDirectCatchUpExpMultiplier/);
 
 assert.match(homePolish,/getCharacterGrowthAttention/);
 assert.match(homePolish,/characterSkillAttention/);
@@ -73,6 +92,51 @@ assert.match(homePolish,/已學習但尚未裝備/);
 assert.match(homePolish,/normalizeOrdinaryBlueprintItem/);
 assert.match(homePolish,/delete item\.setId/);
 assert.match(homePolish,/隨機普通裝備/);
+
+/* Red dots reuse the small breathing creation prompt and taps never flash blue. */
+assert.match(homeCss,/#game-stage \*/);
+assert.match(homeCss,/-webkit-tap-highlight-color:rgba\(0,0,0,0\) !important/);
+assert.match(homeCss,/\.v141-notice-dot,[\s\S]*width:10px !important;[\s\S]*height:10px !important/);
+assert.match(homeCss,/animation:v131RedDotPulse 1\.1s ease-in-out infinite alternate !important/);
+
+/* Auto targeting and tri-target geometry use the original full formation. */
+assert.match(autoBattle,/v148GetAutoTargetPriority/);
+assert.match(dungeonPolish,/function stableFormationRows\(indexes\)/);
+assert.match(dungeonPolish,/function autoTargetPriority\(indexes\)/);
+assert.match(dungeonPolish,/row\.slice\(Math\.max\(0,position-1\),Math\.min\(row\.length,position\+2\)\)/);
+assert.match(dungeonPolish,/return selected\.filter\(index=>alive\.includes\(index\)\)/);
+
+/* Daily content is one shared 3-wave × 6 structure: EXP / Material / Gold. */
+assert.match(dungeonPolish,/DAILY_DUNGEON_META=\{/);
+assert.match(dungeonPolish,/gold:\{title:"金幣副本"/);
+assert.match(dungeonPolish,/\[1,2,3\]\.map\(wave=>buildDailyWave/);
+assert.match(dungeonPolish,/for\(let slot=0;slot<6;slot\+\+\)/);
+assert.match(dungeonPolish,/if\(wave===2\)\{ return slot>=4\?"elite":null; \}/);
+assert.match(dungeonPolish,/if\(slot===4\)\{ return "boss"; \}/);
+assert.match(dungeonPolish,/monster\.v141FormationRow=slot<3\?0:1/);
+assert.match(dungeonPolish,/monster\.v141FormationPosition=slot%3/);
+assert.match(dungeonPolish,/monster\.v148TargetOrder=slot\+1/);
+assert.match(dungeonPolish,/dailyDungeonSequence\.waveIndex<2/);
+assert.match(dungeonPolish,/advanceDailyDungeonWave\(\)/);
+assert.match(dungeonPolish,/v173GrantCharacterCatchUpExp/);
+assert.match(dungeonPolish,/v148ClaimDailyGoldReward/);
+assert.match(dungeonPolish,/v132BeginEquipmentDungeon=function\(\)\{ return beginFormalDailyDungeon\("gold"\); \}/);
+assert.match(dungeonPolish,/questRewardReady/);
+assert.match(dungeonPolish,/progress&&state\.progress\[quest\.id\]/);
+
+/* Water V173.43 values and Frostbite semantics. */
+assert.match(waterRules,/waterKnife:\{[\s\S]*frostbiteChance:30,frostbiteDuration:1/);
+assert.match(waterRules,/frostPunch:\{[\s\S]*frostbiteChance:35,frostbiteDuration:2/);
+assert.match(waterRules,/iceSpin:\{[\s\S]*frostbiteChance:35,frostbiteDuration:2/);
+assert.match(waterRules,/frostCrush:\{[\s\S]*frostbiteChance:45,frostbiteDuration:2/);
+assert.match(waterRules,/iceArrowRain:\{[\s\S]*baseDamage:30,damagePerLevel:6[\s\S]*frostbiteChance:35,frostbiteDuration:2/);
+assert.match(waterRules,/freeze:\{[\s\S]*learnCost:20[\s\S]*requires:\["frostPunch","floodBeast"\]/);
+assert.match(waterRules,/healSpell:\{[\s\S]*learnCost:16[\s\S]*requires:\["frostPunch","floodBeast"\]/);
+assert.match(waterRules,/revive:\{[\s\S]*learnCost:18/);
+assert.match(waterRules,/purifyMind:\{[\s\S]*learnCost:1[\s\S]*spCost:22[\s\S]*removeAllStates:true/);
+assert.match(waterRules,/FROSTBITE_REMAINING_RATE=\.75/);
+assert.match(waterRules,/previousTryMonsterSpecialAction/);
+assert.match(waterRules,/frostbitePenaltyPercent:25/);
 
 assert.match(dungeonPolish,/\["主城","assets\/ui\/nav-home\.png","showPage\('home'\)"\]/);
 assert.doesNotMatch(dungeonPolish,/\["返回","assets\/ui\/map-return\.png"/);
@@ -95,4 +159,4 @@ assert.match(abyssCss,/abyss-cover-v17343\.png/);
     "assets/dungeons/abyss/abyss-cover-v17343.png"
 ].forEach(path=>assert.equal(fs.existsSync(path),true,path+" must exist"));
 
-console.log("✓ V173.42 player flow / economy / Element Box / current dev regression passed");
+console.log("✓ V173.43 player flow / daily dungeons / catch-up / Water regression passed");

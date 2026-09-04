@@ -165,11 +165,43 @@
         if(gap>=10){ return 1.15; }
         return 1.00;
     }
+    function getCharacterPartyIndex(character){
+        if(!character){ return -1; }
+        if(typeof getExistingPartyIndexes==="function"&&typeof getPartyCharacterByIndex==="function"){
+            const index=getExistingPartyIndexes().slice(0,3).find(value=>getPartyCharacterByIndex(value)===character);
+            if(Number.isInteger(index)){ return index; }
+        }
+        if(typeof player2!=="undefined"&&character===player2){ return 1; }
+        if(typeof player3!=="undefined"&&character===player3){ return 2; }
+        if(typeof player!=="undefined"&&character===player){ return 0; }
+        return -1;
+    }
+    function getAdditionalCharacterPoolMultiplier(character,level){
+        const safeLevel=Math.max(1,Number(level)||Number(character&&character.level)||1);
+        if(safeLevel>=20){ return 1; }
+        const index=getCharacterPartyIndex(character);
+        if(index===2){ return 2.00; }
+        if(index===1){ return 1.50; }
+        return 1;
+    }
+    function getExpPoolCatchUpMultiplierAtLevel(character,level){
+        const slotMultiplier=getAdditionalCharacterPoolMultiplier(character,level);
+        if(slotMultiplier>1){ return slotMultiplier; }
+        return getExpPoolCatchUpMultiplierForLevel(level);
+    }
     function getExpPoolCatchUpMultiplier(character){
-        return getExpPoolCatchUpMultiplierForLevel(character&&character.level);
+        return getExpPoolCatchUpMultiplierAtLevel(character,character&&character.level);
+    }
+    function getDirectCatchUpExpMultiplier(character){
+        if(!character||(Number(character.level)||1)>=20){ return 1; }
+        const index=getCharacterPartyIndex(character);
+        if(index===2){ return 3; }
+        if(index===1){ return 2; }
+        return 1;
     }
     window.v173GetExpPoolCatchUpMultiplierForLevel=getExpPoolCatchUpMultiplierForLevel;
     window.v173GetExpPoolCatchUpMultiplier=getExpPoolCatchUpMultiplier;
+    window.v173GetDirectCatchUpExpMultiplier=getDirectCatchUpExpMultiplier;
 
     function loadGrowthState(){
         try{
@@ -350,7 +382,7 @@
         let total=0;
         for(let i=0;i<count&&level<MAX_CHARACTER_LEVEL;i++){
             const need=Math.max(1,expNext-exp);
-            total+=Math.ceil(need/getExpPoolCatchUpMultiplierForLevel(level));
+            total+=Math.ceil(need/getExpPoolCatchUpMultiplierAtLevel(character,level));
             level++;
             exp=0;
             expNext=getExpNextForLevel(level);
@@ -399,7 +431,7 @@
                 (levelNode||row.firstChild)?.insertAdjacentElement?.("afterend",meta);
                 if(!meta.parentNode){ row.appendChild(meta); }
             }
-            const multiplier=getExpPoolCatchUpMultiplierForLevel(character.level);
+            const multiplier=getExpPoolCatchUpMultiplier(character);
             const currentExp=Math.max(0,Math.floor(Number(character.exp)||0));
             const next=Math.max(1,Math.floor(Number(character.expNext)||getExpNextForLevel(character.level)));
             meta.innerHTML="目前 "+currentExp.toLocaleString("zh-TW")+" / "+next.toLocaleString("zh-TW")+" EXP"+
@@ -643,6 +675,48 @@
         character.expNext=getExpNextForLevel(character.level);
     }
 
+    function grantFastStartToAdditionalCharacter(character,slotNumber){
+        if(!character||Number(character.level)>=10){ return; }
+        const oldLevel=Math.max(1,Math.floor(Number(character.level)||1));
+        const gainedLevels=10-oldLevel;
+        character.level=10;
+        character.exp=0;
+        character.attributePoints=Math.max(0,Number(character.attributePoints)||0)+gainedLevels*5;
+        character.skillPoints=Math.max(0,Number(character.skillPoints)||0)+gainedLevels*2;
+        character.bonusHP=Math.max(0,Number(character.bonusHP)||0)+gainedLevels*30;
+        character.bonusSP=Math.max(0,Number(character.bonusSP)||0)+gainedLevels*10;
+        recalibrateCharacterExpNext(character);
+        if(typeof addBattleLog==="function"){
+            addBattleLog((character.id||("角色"+slotNumber))+"啟用追趕養成，從 Lv.10 開始冒險。");
+        }
+    }
+
+    function grantDirectCatchUpExp(character,baseExp){
+        if(!character||(Number(character.level)||1)>=MAX_CHARACTER_LEVEL){ return {baseExp:0,multiplier:1,grantedExp:0}; }
+        const raw=Math.max(0,Math.floor(Number(baseExp)||0));
+        const multiplier=getDirectCatchUpExpMultiplier(character);
+        const granted=Math.max(0,Math.floor(raw*multiplier));
+        if(granted<=0){ return {baseExp:raw,multiplier:multiplier,grantedExp:0}; }
+        character.exp=Math.max(0,Number(character.exp)||0)+granted;
+        let guard=0;
+        while((Number(character.level)||1)<MAX_CHARACTER_LEVEL&&character.exp>=Math.max(1,Number(character.expNext)||getExpNextForLevel(character.level))&&guard<100){
+            const before=Number(character.level)||1;
+            if(typeof checkLevelUp==="function"){ checkLevelUp(character); }
+            else{
+                character.exp-=Math.max(1,Number(character.expNext)||getExpNextForLevel(character.level));
+                character.level++;
+                recalibrateCharacterExpNext(character);
+            }
+            if((Number(character.level)||1)===before){ break; }
+            guard++;
+        }
+        if(typeof refreshCharacterAvatarLevels==="function"){ refreshCharacterAvatarLevels(); }
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof saveGame==="function"){ saveGame(); }
+        return {baseExp:raw,multiplier:multiplier,grantedExp:granted};
+    }
+    window.v173GrantCharacterCatchUpExp=grantDirectCatchUpExp;
+
     recalibrateCharacterExpNext(player);
     if(typeof player2!=="undefined"&&player2){ recalibrateCharacterExpNext(player2); }
     if(typeof player3!=="undefined"&&player3){ recalibrateCharacterExpNext(player3); }
@@ -708,8 +782,12 @@
         const originalCreateAdditionalCharacter=createAdditionalCharacter;
         createAdditionalCharacter=function(slotNumber){
             const result=originalCreateAdditionalCharacter.apply(this,arguments);
-            recalibrateCharacterExpNext(slotNumber===3?player3:player2);
+            const character=slotNumber===3?player3:player2;
+            grantFastStartToAdditionalCharacter(character,slotNumber);
+            recalibrateCharacterExpNext(character);
             ensureExpPoolChargeUnlocked(Date.now(),false);
+            if(typeof updateUI==="function"){ updateUI(); }
+            if(typeof saveGame==="function"){ saveGame(); }
             return result;
         };
     }

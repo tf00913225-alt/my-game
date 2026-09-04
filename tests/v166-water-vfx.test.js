@@ -1,6 +1,6 @@
 "use strict";
 
-/* HISTORICAL SPEC SNAPSHOT (V166): 只保留該版驗收紀錄；V170 最終規格以 v170-final-spec-integration.test.js 為準。 */
+/* HISTORICAL SPEC SNAPSHOT (V166): 只保留該版驗收紀錄；目前水系正式數值以 V169 Water owner 為準。 */
 
 const assert=require("node:assert/strict");
 const crypto=require("node:crypto");
@@ -690,8 +690,8 @@ test("final combat targeting and Frostbite rules use the Water owner",()=>{
     assert.doesNotMatch(finalRules,/patchSkill\("healSpell"/);
     assert.match(waterRules,/freeze:\{[\s\S]*?targetType:"column"/);
     assert.match(waterRules,/healSpell:\{[\s\S]*?targetType:"allyTri"/);
-    assert.match(waterRules,/frostCrush:\{[\s\S]*?frostbiteChance:25/);
-    assert.match(waterRules,/iceSpin:\{[\s\S]*?frostbiteChance:20/);
+    assert.match(waterRules,/frostCrush:\{[\s\S]*?frostbiteChance:45/);
+    assert.match(waterRules,/iceSpin:\{[\s\S]*?frostbiteChance:35/);
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{

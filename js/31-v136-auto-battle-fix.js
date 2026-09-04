@@ -275,6 +275,30 @@
         addBattleLog("⚠️ "+message);
     }
 
+    function getPriorityAutoTarget(){
+        const indexes=typeof currentBattleMonsters!=="undefined"&&Array.isArray(currentBattleMonsters)
+            ?currentBattleMonsters:[];
+        const priority=typeof window.v148GetAutoTargetPriority==="function"
+            ?window.v148GetAutoTargetPriority(indexes):indexes.slice();
+        return priority.find(index=>{
+            const monster=typeof monsters!=="undefined"?monsters[index]:null;
+            return !!(monster&&monster.alive!==false&&(Number(monster.hp)||0)>0);
+        });
+    }
+
+    function queuedActionTargetsEnemy(queued){
+        if(!queued){ return false; }
+        if(queued.action==="normal"){ return true; }
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase[queued.action]:null;
+        return !!(skill&&(skill.category==="physical"||skill.category==="magic")&&skill.targetType!=="none");
+    }
+
+    function enforceAutoTargetPriority(queued){
+        if(!queuedActionTargetsEnemy(queued)){ return; }
+        const target=getPriorityAutoTarget();
+        if(Number.isInteger(target)){ queued.target=target; }
+    }
+
     /*
        最後一道保護：原引擎跑完後直接檢查實際 queued action。如果所有
        合法條件都通過、卻仍被排成 normal，就把該筆佇列校正回玩家選的
@@ -341,6 +365,11 @@
                         decision.message
                     );
                 }
+
+                /* Offensive auto actions share one stable position priority.
+                   They keep attacking target #1 while it lives, then advance
+                   #2 → #3 → #4 → #5 only after the earlier position dies. */
+                enforceAutoTargetPriority(queued);
             }
             catch(error){
                 console.error("V136 自動戰鬥校正失敗：",error);
@@ -352,4 +381,5 @@
 
     /* 提供給瀏覽器測試／之後除錯，直接讀到引擎同一份判斷結果。 */
     window.v136GetAutoBattleDecision=getAutoDecision;
+    window.v136GetPriorityAutoTarget=getPriorityAutoTarget;
 })();

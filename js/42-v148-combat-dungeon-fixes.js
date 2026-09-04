@@ -58,10 +58,10 @@
     }
 
     /*
-       The DOM row is the final formation truth. Fixed Abyss metadata is the
-       non-DOM fallback; the V138 rank arrangement remains the normal fallback.
-       This keeps B/C/D as B/C/D even when an Abyss row was rendered by a later
-       layer than V138.
+       Rendered DOM rows may lose dead cards, so they are only presentation
+       truth. Skill adjacency and auto-target order must use the full formation
+       that existed when the battle began; otherwise two surviving far-edge
+       monsters become false neighbours after the middle cards disappear.
     */
     function cardIndex(card){
         const match=card&&String(card.id||"").match(/^battleMonster(\d+)$/);
@@ -105,6 +105,61 @@
         return ordered.length?[ordered]:[];
     }
 
+    function stableFormationRows(indexes){
+        const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
+        if(typeof monsters!=="undefined"){
+            const fixed=ordered.map(index=>({index:index,monster:monsters[index]}))
+                .filter(entry=>entry.monster&&Number.isInteger(entry.monster.v141FormationRow));
+            if(fixed.length){
+                const rowNumbers=Array.from(new Set(fixed.map(entry=>entry.monster.v141FormationRow)))
+                    .sort((a,b)=>a-b);
+                return rowNumbers.map(rowNumber=>fixed
+                    .filter(entry=>entry.monster.v141FormationRow===rowNumber)
+                    .sort((a,b)=>numeric(a.monster.v141FormationPosition)-numeric(b.monster.v141FormationPosition))
+                    .map(entry=>entry.index)
+                );
+            }
+        }
+        if(typeof window.v138GetFormationRows==="function"){
+            const rows=window.v138GetFormationRows(ordered);
+            if(Array.isArray(rows)&&rows.some(row=>Array.isArray(row)&&row.length)){
+                return rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice());
+            }
+        }
+        return visualFormationRows(ordered);
+    }
+
+    function centerFirstOrder(row){
+        const values=(row||[]).slice();
+        if(values.length<=1){ return values; }
+        const order=[];
+        const leftCenter=Math.floor((values.length-1)/2);
+        const rightCenter=Math.ceil((values.length-1)/2);
+        order.push(leftCenter);
+        if(rightCenter!==leftCenter){ order.push(rightCenter); }
+        for(let distance=1;order.length<values.length;distance++){
+            const left=leftCenter-distance;
+            const right=rightCenter+distance;
+            if(left>=0){ order.push(left); }
+            if(right<values.length){ order.push(right); }
+        }
+        return order.map(position=>values[position]).filter(index=>Number.isInteger(index));
+    }
+
+    function autoTargetPriority(indexes){
+        const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
+        if(typeof monsters!=="undefined"&&ordered.length){
+            const explicit=ordered.map(index=>({
+                index:index,
+                order:monsters[index]&&Number(monsters[index].v148TargetOrder)
+            }));
+            if(explicit.every(entry=>Number.isFinite(entry.order))){
+                return explicit.sort((a,b)=>a.order-b.order).map(entry=>entry.index);
+            }
+        }
+        return stableFormationRows(ordered).flatMap(centerFirstOrder);
+    }
+
     if(typeof getSkillTargets==="function"){
         const previousGetSkillTargets=getSkillTargets;
         getSkillTargets=function(centerIndex,targetType){
@@ -116,15 +171,16 @@
             if(targetType==="all"){ return alive; }
             if(targetType==="single"){ return alive.includes(centerIndex)?[centerIndex]:[]; }
             if(targetType==="tri"||targetType==="row"){
-                const row=visualFormationRows(indexes).find(candidate=>candidate.includes(centerIndex));
+                const row=stableFormationRows(indexes).find(candidate=>candidate.includes(centerIndex));
                 if(!row){ return []; }
+                const position=row.indexOf(centerIndex);
                 const selected=targetType==="row"
                     ?row
-                    :row.slice(Math.max(0,row.indexOf(centerIndex)-1),Math.min(row.length,row.indexOf(centerIndex)+2));
+                    :row.slice(Math.max(0,position-1),Math.min(row.length,position+2));
                 return selected.filter(index=>alive.includes(index));
             }
             if(targetType==="column"){
-                const rows=visualFormationRows(indexes);
+                const rows=stableFormationRows(indexes);
                 const selectedRow=rows.find(candidate=>candidate.includes(centerIndex));
                 if(!selectedRow){ return []; }
                 const selectedMonster=typeof monsters!=="undefined"?monsters[centerIndex]:null;
@@ -146,7 +202,8 @@
         };
     }
 
-    window.v148GetFormationRows=visualFormationRows;
+    window.v148GetFormationRows=stableFormationRows;
+    window.v148GetAutoTargetPriority=autoTargetPriority;
 
     /* A defeated card remains inert except while Revive is explicitly aiming. */
     if(typeof isValidAllyTargetForSkill==="function"){
@@ -414,10 +471,30 @@
         return finishSupport();
     }
 
+    function resolvePartyStateClear(characterIndex,queued,skill,state){
+        const targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+        const target=getPartyCharacterByIndex(targetIndex);
+        if(!target||numeric(target.hp)<=0){ return finishSupport(skill.name+"目前沒有有效目標。"); }
+        animateSupportCast(state,characterIndex,skill);
+        const negativeCount=Array.isArray(target.statusEffects)?target.statusEffects.length:0;
+        const buffCount=Array.isArray(target.activeBuffs)?target.activeBuffs.length:0;
+        target.statusEffects=[];
+        target.activeBuffs=[];
+        if(target.v141Shield){ target.v141Shield=null; }
+        if(typeof window.v141PlayCardEffect==="function"){
+            window.v141PlayCardEffect("player",targetIndex,"buff");
+        }
+        return finishSupport(
+            (state.character.id||"角色")+"施放"+skill.name+"，解除"+
+            (target.id||("角色"+(targetIndex+1)))+"身上"+(negativeCount+buffCount)+"個增益／異常狀態。"
+        );
+    }
+
     function resolveSupportAction(characterIndex,queued,skill){
         if(typeof activeBattleCharacterIndex!=="undefined"){ activeBattleCharacterIndex=characterIndex; }
         const state=validateSupportCaster(characterIndex,skill);
         if(state.error){ return finishSupport(state.error); }
+        if(skill.removeAllStates){ return resolvePartyStateClear(characterIndex,queued,skill,state); }
         if(skill.category==="buff"){ return resolvePartyBuff(characterIndex,queued,skill,state); }
         if(skill.category==="heal"){ return resolvePartyHeal(characterIndex,queued,skill,state); }
         if(skill.category==="revive"){ return resolvePartyRevive(characterIndex,queued,skill,state); }
@@ -508,7 +585,7 @@
         });
         let best=[];
         let bestScore=-1;
-        visualFormationRows(indexes).forEach(row=>{
+        stableFormationRows(indexes).forEach(row=>{
             row.forEach((center,index)=>{
                 if(!alive.includes(center)){ return; }
                 const trio=row.slice(Math.max(0,index-1),Math.min(row.length,index+2))
@@ -715,6 +792,405 @@
         };
     }
 
+    /* ----- Formal daily dungeons: one shared 3-wave × 6-enemy battle flow. ----- */
+    const DAILY_ELEMENTS=["fire","water","earth","wind"];
+    const DAILY_DUNGEON_META={
+        exp:{title:"經驗副本",requirement:"任一角色達到10級",reward:"通關後可指定1名角色獲得EXP",legacyType:"exp"},
+        material:{title:"材料副本",requirement:"至少兩名角色達到20級",reward:"材料寶箱 ×1～3",legacyType:"material"},
+        gold:{title:"金幣副本",requirement:"至少兩名角色達到20級",reward:"大量金幣",legacyType:"equipment"}
+    };
+    let dailyDungeonSequence=null;
+    let pendingDailyExpReward=null;
+    let pendingDailyGoldReward=0;
+
+    function getDailyDungeonLevel(){
+        return typeof window.v132GetDungeonMonsterLevel==="function"
+            ?Math.max(1,Math.floor(numeric(window.v132GetDungeonMonsterLevel())||1))
+            :Math.max(1,...partyIndexes().map(index=>numeric(getPartyCharacterByIndex(index)?.level)||1));
+    }
+
+    function dailyRankForSlot(wave,slot){
+        if(wave===1){ return null; }
+        if(wave===2){ return slot>=4?"elite":null; }
+        if(slot===4){ return "boss"; }
+        if(slot===3||slot===5){ return "elite"; }
+        return null;
+    }
+
+    function dailyMonsterName(type,rank){
+        const names={
+            exp:{regular:"修行弟子",elite:"修行精英",boss:"修行教頭"},
+            material:{regular:"礦脈守衛",elite:"礦脈精英",boss:"礦脈統領"},
+            gold:{regular:"金庫守衛",elite:"金庫精英",boss:"金庫總管"}
+        };
+        return names[type][rank||"regular"];
+    }
+
+    function buildDailyWave(type,wave,level){
+        const roster=[];
+        for(let slot=0;slot<6;slot++){
+            const rank=dailyRankForSlot(wave,slot);
+            const element=DAILY_ELEMENTS[(wave*2+slot)%DAILY_ELEMENTS.length];
+            const monster=typeof window.v132BuildDungeonMonster==="function"
+                ?window.v132BuildDungeonMonster(dailyMonsterName(type,rank),level,element,rank||undefined)
+                :makeZoneMonster(dailyMonsterName(type,rank),level,element,rank||undefined);
+            monster.v132Dungeon=true;
+            monster.v173DailyDungeonType=type;
+            monster.v141DungeonStage=wave;
+            monster.v141FormationRow=slot<3?0:1;
+            monster.v141FormationPosition=slot%3;
+            monster.v148TargetOrder=slot+1;
+            roster.push(monster);
+        }
+        return roster;
+    }
+
+    function buildDailyDungeonWaves(type){
+        const level=getDailyDungeonLevel();
+        return {
+            level:level,
+            waves:[1,2,3].map(wave=>buildDailyWave(type,wave,level))
+        };
+    }
+    window.v148BuildDailyDungeonWaves=buildDailyDungeonWaves;
+
+    function dailyDungeonAvailable(meta){
+        return !window.v132IsDungeonAvailable||window.v132IsDungeonAvailable(meta.legacyType);
+    }
+
+    function hasTwoLevel20Characters(){
+        return partyIndexes().filter(index=>numeric(getPartyCharacterByIndex(index)?.level)>=20).length>=2;
+    }
+
+    function confirmFormalDailyDungeon(meta){
+        if(typeof window.rpgConfirm!=="function"){ return Promise.resolve(true); }
+        return window.rpgConfirm(
+            "確定要進入「"+meta.title+"」嗎？\n\n共3輪，每輪固定前排3隻＋後排3隻，共18隻敵人。\n第1輪：6普通；第2輪：4普通＋2精英；第3輪：3普通＋2精英＋1BOSS。",
+            {title:"副本確認",confirmText:"進入副本",cancelText:"返回"}
+        );
+    }
+
+    function resetBattleAdvanceTimers(){
+        if(typeof timerId!=="undefined"&&timerId){ clearInterval(timerId); timerId=null; }
+        if(typeof battleAdvanceTimeoutId!=="undefined"&&battleAdvanceTimeoutId){
+            clearTimeout(battleAdvanceTimeoutId);
+            battleAdvanceTimeoutId=null;
+        }
+        if(typeof battleAdvanceScheduled!=="undefined"){ battleAdvanceScheduled=false; }
+    }
+
+    function activateDailyDungeonWave(sequence,nextIndex){
+        if(!sequence||dailyDungeonSequence!==sequence||!window.v132ActiveDungeonRun){ return; }
+        const wave=sequence.waves[nextIndex];
+        sequence.waveIndex=nextIndex;
+        monsters=wave;
+        currentZone="dungeon";
+        currentBattleMonsters=wave.map((monster,index)=>index);
+        currentBattleMonsters.forEach(index=>{
+            const monster=monsters[index];
+            monster.alive=true;
+            monster.hp=monster.maxHP;
+            monster.sp=monster.maxSP;
+            monster.statusEffects=[];
+        });
+        battleActive=true;
+        battleToken++;
+        turn=1;
+        actionReady=false;
+        pendingAction=null;
+        resetBattleAdvanceTimers();
+        if(typeof closeMenus==="function"){ closeMenus(); }
+        if(typeof clearBattleTargetSelectionMode==="function"){ clearBattleTargetSelectionMode(); }
+        renderBattle();
+        const priority=autoTargetPriority(currentBattleMonsters);
+        selectedMonster=priority.length?priority[0]:0;
+        if(typeof autoConfig!=="undefined"&&autoConfig){ autoBattle=!!autoConfig.enabled; }
+        if(typeof window.v131SyncElementBoxForBattle==="function"){
+            window.v131SyncElementBoxForBattle({silent:true});
+        }
+        if(typeof syncBattleAutoSettings==="function"){ syncBattleAutoSettings(); }
+        if(typeof updateAutoButton==="function"){ updateAutoButton(); }
+        if(typeof addBattleLog==="function"){
+            addBattleLog("第"+(nextIndex+1)+"輪開始：前排3隻、後排3隻敵人進場。");
+        }
+        startTurn(battleToken);
+    }
+
+    function advanceDailyDungeonWave(){
+        const sequence=dailyDungeonSequence;
+        if(!sequence||sequence.waveIndex>=2){ return false; }
+        sequence.totalTurns+=Math.max(1,Math.floor(numeric(typeof turn!=="undefined"?turn:1)));
+        battleActive=false;
+        actionReady=false;
+        pendingAction=null;
+        resetBattleAdvanceTimers();
+        battleToken++;
+        if(typeof closeMenus==="function"){ closeMenus(); }
+        if(typeof addBattleLog==="function"){
+            addBattleLog("第"+(sequence.waveIndex+1)+"輪突破，下一輪敵人無縫接戰！");
+        }
+        const nextIndex=sequence.waveIndex+1;
+        setTimeout(()=>activateDailyDungeonWave(sequence,nextIndex),360);
+        return true;
+    }
+
+    function showDailyExpReward(baseExp){
+        pendingDailyExpReward={baseExp:Math.max(0,Math.floor(numeric(baseExp)))};
+        const choices=partyIndexes().map(index=>{
+            const character=getPartyCharacterByIndex(index);
+            const multiplier=typeof window.v173GetDirectCatchUpExpMultiplier==="function"
+                ?Math.max(1,numeric(window.v173GetDirectCatchUpExpMultiplier(character))||1):1;
+            return '<button type="button" onclick="v148ClaimDailyExpReward('+index+',false)">'+
+                (character.id||("角色"+(index+1)))+' Lv.'+Math.max(1,Math.floor(numeric(character.level)||1))+
+                (multiplier>1?'　追趕×'+multiplier:'')+'</button>';
+        }).join("");
+        const html='<div class="v132-reward-modal-inner"><h3>經驗副本挑戰成功！</h3>'+
+            '<p>基礎EXP：<b>'+pendingDailyExpReward.baseExp.toLocaleString("zh-TW")+'</b>，請指定1名角色領取。</p>'+
+            '<div class="v132-reward-actions">'+choices+
+            '<span class="v132-reward-note">選定角色後，可再選擇觀看廣告雙倍領取。</span></div></div>';
+        if(typeof window.v132ShowRewardModal==="function"){ window.v132ShowRewardModal(html); }
+    }
+
+    window.v148ClaimDailyExpReward=async function(characterIndex,doubled){
+        const pending=pendingDailyExpReward;
+        const character=getPartyCharacterByIndex(Number(characterIndex));
+        if(!pending||!character){ return; }
+        const grant=multiplier=>{
+            const raw=Math.floor(pending.baseExp*multiplier);
+            const result=typeof window.v173GrantCharacterCatchUpExp==="function"
+                ?window.v173GrantCharacterCatchUpExp(character,raw)
+                :null;
+            if(!result){
+                character.exp=Math.max(0,numeric(character.exp)+raw);
+                if(typeof checkLevelUp==="function"){ checkLevelUp(character); }
+                if(typeof saveGame==="function"){ saveGame(); }
+            }
+            const granted=result?result.grantedExp:raw;
+            if(typeof addBattleLog==="function"){
+                addBattleLog("經驗副本："+(character.id||"角色")+"獲得"+granted+" EXP。");
+            }
+            pendingDailyExpReward=null;
+            if(typeof window.v132CloseRewardModal==="function"){ window.v132CloseRewardModal(); }
+            showPage("dungeon");
+            if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); }
+        };
+        if(doubled){
+            if(typeof showRewardedAd==="function"){
+                showRewardedAd(()=>grant(2),()=>alert("廣告未完成，未獲得雙倍獎勵。"));
+            }
+            return;
+        }
+        if(typeof window.rpgConfirm==="function"){
+            const useAd=await window.rpgConfirm(
+                "要觀看廣告，讓"+(character.id||"這名角色")+"獲得雙倍EXP嗎？",
+                {title:"經驗副本獎勵",confirmText:"觀看廣告雙倍",cancelText:"直接領取"}
+            );
+            if(useAd){
+                if(typeof showRewardedAd==="function"){
+                    showRewardedAd(()=>grant(2),()=>grant(1));
+                    return;
+                }
+            }
+        }
+        grant(1);
+    };
+
+    function goldDungeonReward(level){
+        return Math.max(100,Math.round(26*(Math.max(1,numeric(level))*2+3)));
+    }
+    window.v148GetGoldDungeonReward=goldDungeonReward;
+
+    function showDailyGoldReward(amount){
+        pendingDailyGoldReward=Math.max(0,Math.floor(numeric(amount)));
+        const html='<div class="v132-reward-modal-inner"><h3>金幣副本挑戰成功！</h3>'+
+            '<p>可獲得金幣：<b>'+pendingDailyGoldReward.toLocaleString("zh-TW")+'</b></p>'+
+            '<div class="v132-reward-actions">'+
+            '<button type="button" onclick="v148ClaimDailyGoldReward(false)">直接領取</button>'+
+            '<button type="button" onclick="v148ClaimDailyGoldReward(true)">看廣告雙倍領取</button></div></div>';
+        if(typeof window.v132ShowRewardModal==="function"){ window.v132ShowRewardModal(html); }
+    }
+
+    window.v148ClaimDailyGoldReward=function(doubled){
+        const grant=multiplier=>{
+            const amount=Math.floor(pendingDailyGoldReward*multiplier);
+            if(amount<=0){ return; }
+            gold=Math.max(0,numeric(gold)+amount);
+            pendingDailyGoldReward=0;
+            if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
+            if(typeof saveGame==="function"){ saveGame(); }
+            if(typeof addBattleLog==="function"){ addBattleLog("金幣副本結算，獲得"+amount+"金幣。"); }
+            if(typeof window.v132CloseRewardModal==="function"){ window.v132CloseRewardModal(); }
+            showPage("dungeon");
+            if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); }
+        };
+        if(doubled&&typeof showRewardedAd==="function"){
+            showRewardedAd(()=>grant(2),()=>alert("廣告未完成，未獲得雙倍獎勵。"));
+        }else{ grant(1); }
+    };
+
+    async function beginFormalDailyDungeon(type){
+        const meta=DAILY_DUNGEON_META[type];
+        if(!meta||dailyDungeonSequence||typeof window.v132LaunchDungeonBattle!=="function"){ return; }
+        if(!dailyDungeonAvailable(meta)){
+            alert(meta.title+"今天已經挑戰過了。");
+            return;
+        }
+        if(type==="exp"){
+            const ready=partyIndexes().some(index=>numeric(getPartyCharacterByIndex(index)?.level)>=10);
+            if(!ready){ alert("經驗副本需要任一角色達到10級才能開啟。"); return; }
+        }else if(!hasTwoLevel20Characters()){
+            alert(meta.title+"需要至少兩名角色達到20級才能開啟。");
+            return;
+        }
+        if(!await confirmFormalDailyDungeon(meta)){ return; }
+        const built=buildDailyDungeonWaves(type);
+        const baseExp=type==="exp"&&typeof window.v139GetExpDungeonRewardExp==="function"
+            ?Math.max(0,Math.floor(numeric(window.v139GetExpDungeonRewardExp()))):0;
+        const sequence={
+            type:type,meta:meta,level:built.level,waves:built.waves,waveIndex:0,totalTurns:0,baseExp:baseExp
+        };
+        dailyDungeonSequence=sequence;
+        const started=window.v132LaunchDungeonBattle(sequence.waves[0],function(outcome){
+            const active=dailyDungeonSequence||sequence;
+            if(outcome.result!=="win"){
+                dailyDungeonSequence=null;
+                showPage("dungeon");
+                if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); }
+                return;
+            }
+            active.totalTurns+=Math.max(1,Math.floor(numeric(outcome.turnsUsed)||1));
+            dailyDungeonSequence=null;
+            if(type==="exp"){
+                showDailyExpReward(active.baseExp);
+            }else if(type==="material"){
+                const count=active.totalTurns<15?3:active.totalTurns<30?2:1;
+                if(typeof window.v132ClaimMaterialDungeonReward==="function"&&typeof window.v132ShowRewardModal==="function"){
+                    const html='<div class="v132-reward-modal-inner"><h3>材料副本挑戰成功！</h3><p>獲得材料寶箱 ×'+count+'</p>'+
+                        '<div class="v132-reward-actions"><button type="button" onclick="v132ClaimMaterialDungeonReward('+count+',false)">直接領取</button>'+
+                        '<button type="button" onclick="v132ClaimMaterialDungeonReward('+count+',true)">看廣告雙倍領取</button></div></div>';
+                    window.v132ShowRewardModal(html);
+                }
+            }else{
+                showDailyGoldReward(goldDungeonReward(active.level));
+            }
+        });
+        if(started===false){ dailyDungeonSequence=null; }
+    }
+
+    window.v132BeginExpDungeon=function(){ return beginFormalDailyDungeon("exp"); };
+    window.v132BeginMaterialDungeon=function(){ return beginFormalDailyDungeon("material"); };
+    /* Compatibility name retained so existing buttons/saves do not need a migration. */
+    window.v132BeginEquipmentDungeon=function(){ return beginFormalDailyDungeon("gold"); };
+    window.v148BeginGoldDungeon=window.v132BeginEquipmentDungeon;
+
+    if(typeof winBattle==="function"){
+        const previousWinBattle=winBattle;
+        winBattle=function(){
+            if(dailyDungeonSequence&&window.v132ActiveDungeonRun&&dailyDungeonSequence.waveIndex<2){
+                if(advanceDailyDungeonWave()){ return; }
+            }
+            return previousWinBattle.apply(this,arguments);
+        };
+    }
+
+    function renderFormalDailyDungeonList(){
+        const cards=[
+            ["exp",DAILY_DUNGEON_META.exp,"v132BeginExpDungeon"],
+            ["material",DAILY_DUNGEON_META.material,"v132BeginMaterialDungeon"],
+            ["gold",DAILY_DUNGEON_META.gold,"v132BeginEquipmentDungeon"]
+        ];
+        return '<div class="v141-dungeon-cover-list">'+cards.map(([type,meta,action])=>{
+            const available=dailyDungeonAvailable(meta);
+            return '<article class="v141-dungeon-cover-card" data-dungeon-cover="'+type+'">'+
+                '<div class="v141-dungeon-cover-art"><span>'+meta.title+'</span><small>3輪 × 每輪6隻</small></div>'+
+                '<div class="v141-dungeon-cover-info"><b>'+meta.title+'</b><span>開放：'+meta.requirement+'</span></div>'+
+                '<div class="v141-dungeon-cover-actions"><button type="button" onclick="v148ShowDailyDungeonPreview(\''+type+'\')">獎勵預覽</button>'+
+                '<button type="button" '+(available?'onclick="'+action+'()"':'disabled')+'>挑戰</button></div>'+
+                '<div class="v141-dungeon-remaining">'+(available?'可挑戰':'今日已完成')+'</div></article>';
+        }).join("")+'</div>';
+    }
+
+    window.v148ShowDailyDungeonPreview=function(type){
+        const meta=DAILY_DUNGEON_META[type];
+        if(!meta||typeof window.v132ShowRewardModal!=="function"){ return; }
+        const html='<div class="v132-reward-modal-inner"><h3>'+meta.title+'獎勵預覽</h3><p>'+meta.reward+'</p>'+
+            '<p>固定3輪×6隻：6普通 → 4普通+2精英 → 3普通+2精英+1BOSS。</p>'+
+            '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
+        window.v132ShowRewardModal(html);
+    };
+
+    if(typeof renderDungeonTabContent==="function"){
+        const previousRenderDungeonTabContent=renderDungeonTabContent;
+        renderDungeonTabContent=function(tabName){
+            if(tabName==="daily"){ return renderFormalDailyDungeonList(); }
+            return previousRenderDungeonTabContent.apply(this,arguments);
+        };
+    }
+
+    /* ----- Quest notification: only a reward-ready quest gets the icon dot. ----- */
+    function questRewardReady(){
+        if(typeof ensureDailyQuestsCurrent==="function"){ ensureDailyQuestsCurrent(); }
+        const groups=[];
+        if(typeof dailyQuestDefinitions!=="undefined"&&typeof dailyQuestState!=="undefined"){
+            groups.push([dailyQuestDefinitions,dailyQuestState]);
+        }
+        if(typeof commissionQuestDefinitions!=="undefined"&&typeof commissionQuestState!=="undefined"){
+            groups.push([commissionQuestDefinitions,commissionQuestState]);
+        }
+        return groups.some(([definitions,state])=>(definitions||[]).some(quest=>
+            quest&&state&&state.claimed&&!state.claimed[quest.id]&&
+            numeric(state.progress&&state.progress[quest.id])>=Math.max(1,numeric(quest.goal)||1)
+        ));
+    }
+
+    function setQuestNoticeDot(target,show){
+        if(!target||!target.querySelector){ return; }
+        let dot=target.querySelector(":scope > .v141-notice-dot");
+        if(show&&!dot&&typeof document!=="undefined"){
+            dot=document.createElement("span");
+            dot.className="v141-notice-dot";
+            dot.setAttribute("aria-label","任務獎勵可領取");
+            target.appendChild(dot);
+        }else if(!show&&dot){ dot.remove(); }
+    }
+
+    function syncQuestNoticeDots(){
+        if(typeof document==="undefined"){ return; }
+        const show=questRewardReady();
+        const home=document.getElementById("homeIconQuest");
+        setQuestNoticeDot(home&&home.parentElement?home.parentElement:home,show);
+        document.querySelectorAll("#mapPageNav button[aria-label='任務'],#v141DungeonNav button[aria-label='任務']")
+            .forEach(button=>setQuestNoticeDot(button,show));
+    }
+    window.v148SyncQuestNoticeDots=syncQuestNoticeDots;
+
+    if(typeof window.v141UpdateNotificationDots==="function"){
+        const previousNotificationDots=window.v141UpdateNotificationDots;
+        window.v141UpdateNotificationDots=function(){
+            const result=previousNotificationDots.apply(this,arguments);
+            syncQuestNoticeDots();
+            return result;
+        };
+    }
+
+    if(typeof updateUI==="function"){
+        const previousUpdateUI=updateUI;
+        updateUI=function(){
+            const result=previousUpdateUI.apply(this,arguments);
+            syncQuestNoticeDots();
+            return result;
+        };
+    }
+
+    if(typeof openHomeFeature==="function"){
+        const previousOpenHomeFeature=openHomeFeature;
+        openHomeFeature=function(){
+            const result=previousOpenHomeFeature.apply(this,arguments);
+            syncQuestNoticeDots();
+            return result;
+        };
+    }
+
     /* ----- Dungeon navigation and movement. ----- */
     function dungeonNavMarkup(isAbyss){
         const buttons=[
@@ -765,6 +1241,7 @@
         switchDungeonTab=function(){
             const result=previousSwitchDungeonTab.apply(this,arguments);
             scheduleDungeonSync();
+            syncQuestNoticeDots();
             return result;
         };
     }
@@ -773,6 +1250,7 @@
         showPage=function(page){
             const result=previousShowPage.apply(this,arguments);
             if(page==="dungeon"){ scheduleDungeonSync(); }
+            syncQuestNoticeDots();
             return result;
         };
     }
@@ -869,6 +1347,7 @@
         installPatrolClickBlocker();
         decoratePatrolRanks();
         syncDungeonShell();
+        syncQuestNoticeDots();
         normalizeAllHardControls();
     }
 
@@ -877,7 +1356,7 @@
         const observer=new MutationObserver(()=>{
             if(queued){ return; }
             queued=true;
-            requestAnimationFrame(()=>{ queued=false; syncDungeonShell(); });
+            requestAnimationFrame(()=>{ queued=false; syncDungeonShell(); syncQuestNoticeDots(); });
         });
         const observe=()=>observer.observe(document.body,{childList:true,subtree:true});
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",observe,{once:true}); }
@@ -896,7 +1375,8 @@
             version:VERSION,rageTargetType:database&&database.rage&&database.rage.targetType,
             duplicateBuffRefresh:false,hardControlsExclusive:false,healCasterSp:false,
             reviveDeadTarget:true,dungeonTouchScroll:true,abyssRedirectable:true,
-            patrolManualMovement:false,shopIcon:"assets/ui/home-shop-v147.png"
+            patrolManualMovement:false,shopIcon:"assets/ui/home-shop-v147.png",
+            dailyDungeonWaves:3,dailyDungeonEnemiesPerWave:6,goldDungeon:true
         };
     };
 })();

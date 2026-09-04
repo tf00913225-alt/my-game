@@ -81,19 +81,71 @@
         return monster;
     }
 
+    const DAILY_DUNGEON_SCALE_FIELDS=[
+        "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
+        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","spiritPoints","agilityPoints",
+        "vitality","energy","intelligence","spirit","agility","accuracy","evasion"
+    ];
+
+    function getDailyDungeonScaleContext(){
+        const run=window.v132ActiveDungeonRun||null;
+        let partySize=Math.floor(numeric(run&&run.partySize));
+        if(!(partySize>=1&&partySize<=3)&&typeof getExistingPartyIndexes==="function"){
+            partySize=getExistingPartyIndexes().slice(0,3).filter(index=>{
+                const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+                return !!character;
+            }).length;
+        }
+        partySize=Math.max(1,Math.min(3,partySize||1));
+        const partyMultiplier=partySize===1?.60:partySize===2?.82:1;
+
+        let highestLevel=Math.floor(numeric(run&&run.highestPartyLevel));
+        if(!(highestLevel>0)&&typeof getExistingPartyIndexes==="function"){
+            highestLevel=getExistingPartyIndexes().slice(0,3).reduce((highest,index)=>{
+                const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+                return character?Math.max(highest,Math.floor(numeric(character.level)||1)):highest;
+            },1);
+        }
+        highestLevel=Math.max(1,highestLevel||1);
+        const levelMultiplier=highestLevel<=20?.90:highestLevel<=50?1:1.05;
+        return {
+            partySize:partySize,
+            highestLevel:highestLevel,
+            partyMultiplier:partyMultiplier,
+            levelMultiplier:levelMultiplier,
+            factor:partyMultiplier*levelMultiplier
+        };
+    }
+
     function normalizeDailyDungeonMonster(monster){
         if(!monster||monster.v141Abyss===true){ return monster; }
-        /* V173.42 follow-up: regular daily dungeons are reduced by another 50%.
-           Fresh monsters therefore receive 0.5 × 0.5 = 25% of the original
-           core combat values. Keeping a second marker also makes reused monster
-           objects receive only the missing second pass instead of being quartered twice. */
-        halveMonsterCoreStats(monster,"v17342DailyDungeonStatsHalved");
-        return halveMonsterCoreStats(monster,"v17342DailyDungeonStatsHalvedAgain");
+        normalizeMonsterDefaultEvasion(monster);
+        if(!monster.v173DailyDungeonBaseStats){
+            const base={};
+            DAILY_DUNGEON_SCALE_FIELDS.forEach(key=>{
+                if(Number.isFinite(Number(monster[key]))){ base[key]=Number(monster[key]); }
+            });
+            monster.v173DailyDungeonBaseStats=base;
+        }
+        const context=getDailyDungeonScaleContext();
+        const base=monster.v173DailyDungeonBaseStats;
+        DAILY_DUNGEON_SCALE_FIELDS.forEach(key=>{
+            if(!Object.prototype.hasOwnProperty.call(base,key)){ return; }
+            const minimum=key==="maxHP"||key==="hp"?1:0;
+            monster[key]=Math.max(minimum,Math.round(base[key]*context.factor));
+        });
+        if(Number.isFinite(Number(monster.maxHP))){ monster.hp=Math.max(1,Number(monster.maxHP)); }
+        if(Number.isFinite(Number(monster.maxSP))){ monster.sp=Math.max(0,Number(monster.maxSP)); }
+        monster.v173DailyDungeonScaleFactor=context.factor;
+        monster.v173DailyDungeonPartySize=context.partySize;
+        monster.v173DailyDungeonHighestLevel=context.highestLevel;
+        return monster;
     }
 
     window.v158NormalizeMonsterDefaultEvasion=normalizeMonsterDefaultEvasion;
     window.v17342NormalizeBeginnerForestMonster=normalizeBeginnerForestMonster;
     window.v17342NormalizeDailyDungeonMonster=normalizeDailyDungeonMonster;
+    window.v173GetDailyDungeonScaleContext=getDailyDungeonScaleContext;
 
     if(typeof makeZoneMonster==="function"){
         const previousMakeZoneMonster=makeZoneMonster;

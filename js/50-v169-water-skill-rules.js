@@ -2,9 +2,8 @@
    V169 — final Water skill rules
 
    This late runtime is the single authoritative layer for every Water
-   skill.  It intentionally
-   patches data and narrow compatibility seams instead of reopening the
-   legacy combat engine.
+   skill. It patches the existing database and narrow compatibility seams
+   without creating a second combat system.
 ===================================================== */
 (function installV169WaterSkillRules(){
     "use strict";
@@ -13,101 +12,108 @@
     window.__v169WaterSkillRulesInstalled=true;
 
     const VERSION="169";
-    const WATER_SKILL_IDS=[
-        "waterKnife","frostPunch","iceSpin","frostCrush","waterBall",
-        "floodBeast","iceArrowRain","freeze","healSpell","revive","waterEX"
+    const WATER_DAMAGE_SKILL_IDS=[
+        "waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain"
     ];
-    const WATER_DAMAGE_SKILL_IDS=WATER_SKILL_IDS.slice(0,7);
-    const WATER_PREVIEW_SKILL_ID_SET=new Set(WATER_SKILL_IDS.slice(0,8));
-    const WATER_SUPPORT_PREVIEW_SKILL_ID_SET=new Set(["healSpell","revive","waterEX"]);
+    const WATER_SKILL_IDS=WATER_DAMAGE_SKILL_IDS.concat([
+        "freeze","healSpell","revive","purifyMind","waterEX"
+    ]);
+    const WATER_PREVIEW_SKILL_ID_SET=new Set(WATER_DAMAGE_SKILL_IDS.concat(["freeze"]));
+    const WATER_SUPPORT_PREVIEW_SKILL_ID_SET=new Set(["healSpell","revive","purifyMind","waterEX"]);
     const STATUS_FIELDS=[
         "freezeChance","freezeDuration","freezeSingleTarget",
         "teamFreezeChance","teamFreezeDuration",
         "frostbiteChance","frostbiteDuration","statusResistBonus"
     ];
-    const FROSTBITE_ACTION_TEXT="仍可使用補品、符咒、普通攻擊、防禦與逃脫";
+    const FROSTBITE_REMAINING_RATE=.75;
 
     const FINAL_SKILLS={
         waterKnife:{
             id:"waterKnife",tier:1,name:"水刀斬",element:"water",category:"physical",
             targetType:"single",learnCost:2,maxLevel:5,upgradeCost:1,
             baseDamage:21,damagePerLevel:5,spCost:6,
-            frostbiteChance:10,frostbiteDuration:1,
+            frostbiteChance:30,frostbiteDuration:1,
             lifestealPercentByLevel:[4,5,6,7,8],requires:[],
-            description:"初次學習需2技能點，對單體造成21點傷害，消耗6 SP；10%基礎機率使目標凍傷1回合，凍傷期間無法使用技能，仍可使用補品、符咒、普通攻擊、防禦與逃脫。吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+5。"
+            description:"初次學習需2技能點，對單體造成21點傷害，消耗6 SP；30%基礎機率使目標【凍傷】1回合。吸取本次實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+5。"
         },
         frostPunch:{
             id:"frostPunch",tier:2,name:"冰霜拳",element:"water",category:"physical",
             targetType:"single",learnCost:10,maxLevel:5,upgradeCost:1,
             baseDamage:32,damagePerLevel:7,spCost:17,
-            frostbiteChance:15,frostbiteDuration:1,
+            frostbiteChance:35,frostbiteDuration:2,
             lifestealPercentByLevel:[4,5,6,7,8],requires:["waterKnife"],
-            description:"需先學習水刀斬。初次學習需10技能點，對單體造成32點傷害，消耗17 SP；15%基礎機率使目標凍傷1回合，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+7。"
+            description:"需先學習水刀斬。初次學習需10技能點，對單體造成32點傷害，消耗17 SP；35%基礎機率使目標【凍傷】2回合，並吸取本次實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+7。"
         },
         iceSpin:{
             id:"iceSpin",tier:3,name:"冰旋一閃",element:"water",category:"physical",
             targetType:"tri",learnCost:20,maxLevel:5,upgradeCost:1,
             baseDamage:35,damagePerLevel:7,spCost:45,
-            frostbiteChance:20,frostbiteDuration:1,
+            frostbiteChance:35,frostbiteDuration:2,
             lifestealPercentByLevel:[3,4,5,6,7],requires:["frostPunch"],
-            description:"需先學習冰霜拳。初次學習需20技能點，對同排中、左、右最多3名目標各造成35點傷害，消耗45 SP；20%基礎機率使目標凍傷1回合，並吸取實際傷害的3%/4%/5%/6%/7%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+7。"
+            description:"需先學習冰霜拳。初次學習需20技能點，對同排中、左、右最多3名有效目標各造成35點傷害，消耗45 SP；各目標有35%基礎機率【凍傷】2回合。依各目標實際受到傷害分別計算3%/4%/5%/6%/7%吸血後加總恢復自身HP。最高5級，每升1級消耗1技能點，傷害+7。"
         },
         frostCrush:{
             id:"frostCrush",tier:4,name:"冰封重擊",element:"water",category:"physical",
             targetType:"single",learnCost:30,maxLevel:5,upgradeCost:1,
             baseDamage:116,damagePerLevel:24,spCost:60,
-            frostbiteChance:25,frostbiteDuration:1,
+            frostbiteChance:45,frostbiteDuration:2,
             lifestealPercentByLevel:[4,5,6,7,8],requires:["iceSpin"],
-            description:"需先學習冰旋一閃。初次學習需30技能點，對單體造成116點傷害，消耗60 SP；25%基礎機率使目標凍傷1回合，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+24。"
+            description:"需先學習冰旋一閃。初次學習需30技能點，對單體造成116點傷害，消耗60 SP；45%基礎機率使目標【凍傷】2回合，並吸取本次實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+24。"
         },
         waterBall:{
             id:"waterBall",tier:1,name:"水球術",element:"water",category:"magic",
             targetType:"tri",learnCost:2,maxLevel:5,upgradeCost:1,
             baseDamage:10,damagePerLevel:2,spCost:8,
-            frostbiteChance:10,frostbiteDuration:1,
+            frostbiteChance:30,frostbiteDuration:1,
             lifestealPercentByLevel:[3,4,5,6,7],requires:[],
-            description:"初次學習需2技能點，對同排中、左、右最多3名目標各造成10點傷害，消耗8 SP；10%基礎機率使目標凍傷1回合，並吸取實際傷害的3%/4%/5%/6%/7%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+2。"
+            description:"初次學習需2技能點，對同排中、左、右最多3名有效目標各造成10點傷害，消耗8 SP；各目標有30%基礎機率【凍傷】1回合。依各目標實際受到傷害分別計算3%/4%/5%/6%/7%吸血後加總恢復自身HP。最高5級，每升1級消耗1技能點，傷害+2。"
         },
         floodBeast:{
             id:"floodBeast",tier:2,name:"洪水猛獸",element:"water",category:"magic",
             targetType:"single",learnCost:15,maxLevel:5,upgradeCost:1,
             baseDamage:105,damagePerLevel:21,spCost:35,
-            frostbiteChance:15,frostbiteDuration:1,
+            frostbiteChance:35,frostbiteDuration:2,
             lifestealPercentByLevel:[4,5,6,7,8],requires:["waterBall"],
-            description:"需先學習水球術。初次學習需15技能點，對單體造成105點傷害，消耗35 SP；15%基礎機率使目標凍傷1回合，並吸取實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+21。"
+            description:"需先學習水球術。初次學習需15技能點，對單體造成105點傷害，消耗35 SP；35%基礎機率使目標【凍傷】2回合，並吸取本次實際傷害的4%/5%/6%/7%/8%恢復自身HP。最高5級，每升1級消耗1技能點，傷害+21。"
         },
         iceArrowRain:{
             id:"iceArrowRain",tier:3,name:"冰霜箭雨",element:"water",category:"magic",
             targetType:"all",learnCost:20,maxLevel:5,upgradeCost:1,
-            baseDamage:20,damagePerLevel:4,spCost:75,
-            frostbiteChance:20,frostbiteDuration:1,
+            baseDamage:30,damagePerLevel:6,spCost:75,
+            frostbiteChance:35,frostbiteDuration:2,
             lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],
-            description:"需先學習洪水猛獸。初次學習需20技能點，對敵方全體各造成20點傷害，消耗75 SP；每名目標獨立有20%基礎機率獲得【凍傷】1回合，並依各目標實際傷害計算1%/2%/3%/4%/5%吸血後加總恢復自身HP。最高5級，每升1級消耗1技能點，傷害+4。"
+            description:"需先學習洪水猛獸。初次學習需20技能點，對敵方全體每名有效目標各造成30點傷害，消耗75 SP；各目標有35%基礎機率【凍傷】2回合。依所有目標實際受到傷害分別計算1%/2%/3%/4%/5%吸血後加總恢復自身HP。最高5級，每升1級消耗1技能點，傷害+6。"
         },
         freeze:{
             id:"freeze",tier:4,name:"冰封",element:"water",category:"magic",
-            targetType:"column",learnCost:25,maxLevel:1,spCost:32,
-            freezeChance:90,freezeDuration:3,requires:["iceArrowRain"],
-            description:"需先學習冰霜箭雨。初次學習需25技能點，對前、後排同位置最多2名有效目標各以90%基礎機率附加【冰封】3回合，使其完全無法行動；消耗32 SP，最高1級，不造成傷害。已有【冰封】時新的冰封直接MISS且不擲命中。"
+            targetType:"column",learnCost:20,maxLevel:1,spCost:32,
+            freezeChance:90,freezeDuration:3,requires:["frostPunch","floodBeast"],
+            description:"需先學習冰霜拳或洪水猛獸其一。初次學習需20技能點，對前、後共最多2名有效敵方目標各以90%基礎機率附加【冰封】3回合，使其完全無法行動；消耗32 SP，最高1級，不造成傷害，套用硬控命中規則。已有同名【冰封】時再次施加直接MISS。"
         },
         healSpell:{
             id:"healSpell",tier:5,name:"治療術",element:"water",category:"heal",
-            targetType:"allyTri",learnCost:20,maxLevel:5,upgradeCost:1,
+            targetType:"allyTri",learnCost:16,maxLevel:5,upgradeCost:1,
             baseHeal:550,healPerLevel:30,baseHealSP:35,healSPPerLevel:0,spCost:45,
-            cleanseAll:true,requires:["iceArrowRain","iceSpin"],
-            description:"需先學習冰霜箭雨或冰旋一閃其一。初次學習需20技能點，對我方中、左、右最多3名存活角色恢復550 HP與固定35 SP，並解除所有可解除負面狀態；施放者本人可恢復HP但不恢復SP。消耗45 SP，最高5級，每升1級消耗1技能點，HP恢復量+30，SP恢復量不變。"
+            cleanseAll:true,requires:["frostPunch","floodBeast"],
+            description:"需先學習冰霜拳或洪水猛獸其一。初次學習需16技能點，對我方中、左、右最多3名存活目標恢復550 HP與固定35 SP，並解除所有可解除負面狀態；施放者本人可恢復HP及解除負面狀態，但不恢復自身SP。消耗45 SP，最高5級，每升1級消耗1技能點，HP恢復量+30。"
         },
         revive:{
             id:"revive",tier:6,name:"復活術",element:"water",category:"revive",
-            targetType:"deadAlly",learnCost:20,maxLevel:5,upgradeCost:1,spCost:45,
+            targetType:"deadAlly",learnCost:18,maxLevel:5,upgradeCost:1,spCost:45,
             reviveHealPercentByLevel:[20,40,60,80,100],requires:["healSpell"],
-            description:"需先學習治療術。初次學習需20技能點，選擇1名死亡友方原地復活，依等級恢復20%/40%/60%/80%/100%最大HP，消耗45 SP。最高5級，每升1級消耗1技能點。"
+            description:"需先學習治療術。初次學習需18技能點，選擇1名死亡友方原地復活，依等級恢復20%/40%/60%/80%/100%最大HP，消耗45 SP。復活後不額外恢復SP。最高5級，每升1級消耗1技能點。"
+        },
+        purifyMind:{
+            id:"purifyMind",tier:5,name:"淨心訣",element:"water",category:"buff",
+            targetType:"ally",learnCost:1,maxLevel:1,spCost:22,
+            removeAllStates:true,requires:["frostPunch","floodBeast"],
+            description:"需先學習冰霜拳或洪水猛獸其一。初次學習需1技能點，選擇1名友方目標，解除其身上所有增益與所有異常狀態，消耗22 SP，最高1級。"
         },
         waterEX:{
             id:"waterEX",tier:7,name:"水元素EX",element:"water",category:"passive",
             targetType:"none",learnCost:25,maxLevel:1,damageBonusPercent:5,healBonusPercent:10,
             turnStartCleanseChance:30,requires:[],
-            description:"初次學習需25技能點，最大1級；永久提升水元素傷害5%、回復系技能回復量10%，每回合開始前有30%機率解除自身所有負面狀態。"
+            description:"初次學習需25技能點，最大1級；永久提升水元素傷害5%、回復類技能HP恢復量10%，每回合開始前有30%機率解除自身所有可解除的負面狀態。"
         }
     };
 
@@ -133,13 +139,11 @@
         if(typeof skillDatabase==="undefined"){ return; }
 
         WATER_SKILL_IDS.forEach(id=>{
+            if(!skillDatabase[id]){ skillDatabase[id]={id:id}; }
             const skill=skillDatabase[id];
             const finalData=FINAL_SKILLS[id];
             if(!skill||!finalData){ return; }
 
-            /* Remove every legacy control field before assigning one status
-               family.  In particular, freezeChance:0 still rendered as a
-               visible "0% Freeze" row in the character-creation modal. */
             STATUS_FIELDS.forEach(field=>{ delete skill[field]; });
 
             if(id==="freeze"){
@@ -182,16 +186,196 @@
         });
     }
 
-    function activeFrostbite(entity){
+    function hasStoredFrostbite(entity){
         return !!(entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(effect=>
             effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0
         ));
     }
 
-    /* V158's compatibility resolver predates the final front/back column rule
-       and asks getSkillTargets(..., "tri") explicitly.  Keep the mature
-       SP/status settlement, but redirect only a Freeze invocation to the
-       authoritative column resolver. */
+    function activeFrostbite(entity){
+        return !!(entity&&(entity.v169FrostbiteCompatibilityActive===true||hasStoredFrostbite(entity)));
+    }
+
+    /* Frostbite is a three-stat soft debuff, never a skill lock. Historical
+       V149/V152 wrappers still contain their old gating checks, so only those
+       checks see a filtered status list. A compatibility marker keeps the
+       real Frostbite penalties active while the underlying skill resolves. */
+    function withoutLegacyFrostbiteLock(entity,callback){
+        if(!entity||!Array.isArray(entity.statusEffects)||!hasStoredFrostbite(entity)){
+            return callback();
+        }
+        const original=entity.statusEffects;
+        const frostbite=original.filter(effect=>effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0);
+        const filtered=original.filter(effect=>!frostbite.includes(effect));
+        entity.statusEffects=filtered;
+        entity.v169FrostbiteCompatibilityActive=true;
+        try{ return callback(); }
+        finally{
+            const after=Array.isArray(entity.statusEffects)?entity.statusEffects:filtered;
+            delete entity.v169FrostbiteCompatibilityActive;
+            if(after===filtered){
+                entity.statusEffects=original;
+            }else if(after.length===0){
+                /* A cleanse replaced the filtered list with an empty list, so
+                   Frostbite must be removed too. */
+                entity.statusEffects=[];
+            }else{
+                entity.statusEffects=after.concat(frostbite.filter(effect=>numeric(effect.turnsLeft)>0));
+            }
+        }
+    }
+
+    function clearLegacyFrostbiteSkillLocks(){
+        if(typeof document==="undefined"){ return; }
+        const mainButton=document.querySelector&&document.querySelector("#mainBattleMenu > .menu-button.skill.v152-frostbite-blocked");
+        if(mainButton){
+            mainButton.disabled=false;
+            mainButton.classList.remove("v152-frostbite-blocked");
+            if(mainButton.dataset){ delete mainButton.dataset.v152FrostbiteBlocked; }
+            mainButton.setAttribute("aria-label","技能");
+        }
+        if(document.querySelectorAll){
+            document.querySelectorAll("#skillQuickBarGrid .skill-quick-button.v152-frostbite-blocked").forEach(button=>{
+                button.disabled=false;
+                button.classList.remove("v152-frostbite-blocked");
+            });
+        }
+    }
+
+    if(typeof window.prepareAction==="function"){
+        const previousPrepareAction=window.prepareAction;
+        window.prepareAction=function(){
+            const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
+            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+            const that=this,args=arguments;
+            const result=withoutLegacyFrostbiteLock(character,()=>previousPrepareAction.apply(that,args));
+            clearLegacyFrostbiteSkillLocks();
+            return result;
+        };
+    }
+
+    if(typeof window.resolveQueuedPlayerAction==="function"){
+        const previousResolveQueuedPlayerAction=window.resolveQueuedPlayerAction;
+        window.resolveQueuedPlayerAction=function(characterIndex){
+            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
+            const that=this,args=arguments;
+            const result=withoutLegacyFrostbiteLock(character,()=>previousResolveQueuedPlayerAction.apply(that,args));
+            clearLegacyFrostbiteSkillLocks();
+            return result;
+        };
+    }
+
+    if(typeof window.autoActionForCharacter==="function"){
+        const previousAutoActionForCharacter=window.autoActionForCharacter;
+        window.autoActionForCharacter=function(characterIndex){
+            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
+            const that=this,args=arguments;
+            return withoutLegacyFrostbiteLock(character,()=>previousAutoActionForCharacter.apply(that,args));
+        };
+    }
+
+    if(typeof window.processSingleMonsterAttack==="function"){
+        const previousProcessSingleMonsterAttack=window.processSingleMonsterAttack;
+        window.processSingleMonsterAttack=function(monsterIndex){
+            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+            const that=this,args=arguments;
+            return withoutLegacyFrostbiteLock(monster,()=>previousProcessSingleMonsterAttack.apply(that,args));
+        };
+    }
+
+    if(typeof window.v141TryMonsterSpecialAction==="function"){
+        const previousTryMonsterSpecialAction=window.v141TryMonsterSpecialAction;
+        window.v141TryMonsterSpecialAction=function(monsterIndex){
+            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+            const that=this,args=arguments;
+            return withoutLegacyFrostbiteLock(monster,()=>previousTryMonsterSpecialAction.apply(that,args));
+        };
+    }
+
+    if(typeof window.updateUI==="function"){
+        const previousUpdateUI=window.updateUI;
+        window.updateUI=function(){
+            const result=previousUpdateUI.apply(this,arguments);
+            clearLegacyFrostbiteSkillLocks();
+            return result;
+        };
+    }
+
+    /* Damage -25%. Different named outgoing-damage reductions coexist by
+       multiplication, matching the shared status stacking rules. */
+    if(typeof window.getOutgoingDamageDownPercent==="function"){
+        const previousOutgoingDamageDown=window.getOutgoingDamageDownPercent;
+        window.getOutgoingDamageDownPercent=function(attacker){
+            const existing=Math.max(0,Math.min(100,numeric(previousOutgoingDamageDown.apply(this,arguments))));
+            if(!activeFrostbite(attacker)){ return existing; }
+            return Math.max(0,Math.min(100,100-(100-existing)*FROSTBITE_REMAINING_RATE));
+        };
+    }
+
+    /* Evasion -25% for monsters and all three player stat owners. */
+    if(typeof window.getMonsterEvasion==="function"){
+        const previousMonsterEvasion=window.getMonsterEvasion;
+        window.getMonsterEvasion=function(monster){
+            const value=numeric(previousMonsterEvasion.apply(this,arguments));
+            return activeFrostbite(monster)?value*FROSTBITE_REMAINING_RATE:value;
+        };
+    }
+
+    function wrapPlayerEvasionStats(functionName,characterGetter){
+        const previous=window[functionName];
+        if(typeof previous!=="function"){ return; }
+        window[functionName]=function(){
+            const stats=previous.apply(this,arguments);
+            const character=characterGetter();
+            if(!stats||!activeFrostbite(character)){ return stats; }
+            return Object.assign({},stats,{evasion:numeric(stats.evasion)*FROSTBITE_REMAINING_RATE});
+        };
+    }
+    wrapPlayerEvasionStats("getMainCharacterStats",()=>typeof player!=="undefined"?player:null);
+    wrapPlayerEvasionStats("getPlayer2BattleStats",()=>typeof player2!=="undefined"?player2:null);
+    wrapPlayerEvasionStats("getPlayer3BattleStats",()=>typeof player3!=="undefined"?player3:null);
+
+    /* Status resistance -25%. Spirit-derived and explicit player bonus
+       resistance are reduced at their existing authoritative inputs. */
+    if(typeof window.getMonsterEffectiveSpiritPoints==="function"){
+        const previousMonsterSpirit=window.getMonsterEffectiveSpiritPoints;
+        window.getMonsterEffectiveSpiritPoints=function(monster){
+            const value=numeric(previousMonsterSpirit.apply(this,arguments));
+            return activeFrostbite(monster)?value*FROSTBITE_REMAINING_RATE:value;
+        };
+    }
+    if(typeof window.getFinalBattleSpiritForPlayerTarget==="function"){
+        const previousPlayerSpirit=window.getFinalBattleSpiritForPlayerTarget;
+        window.getFinalBattleSpiritForPlayerTarget=function(target){
+            const value=numeric(previousPlayerSpirit.apply(this,arguments));
+            return activeFrostbite(target)?value*FROSTBITE_REMAINING_RATE:value;
+        };
+    }
+    if(typeof window.getPlayerStatusResistBonus==="function"){
+        const previousPlayerResistBonus=window.getPlayerStatusResistBonus;
+        window.getPlayerStatusResistBonus=function(target){
+            const value=numeric(previousPlayerResistBonus.apply(this,arguments));
+            return activeFrostbite(target)?value*FROSTBITE_REMAINING_RATE:value;
+        };
+    }
+
+    /* V149's old application log mentioned a skill prohibition. Keep the
+       application itself and rewrite only that obsolete explanatory sentence. */
+    if(typeof window.addBattleLog==="function"){
+        const previousAddBattleLog=window.addBattleLog;
+        window.addBattleLog=function(message){
+            let text=String(message==null?"":message);
+            if(text.includes("陷入凍傷")&&text.includes("無法使用技能")){
+                text=text.replace(/，\d+回合內無法使用技能。/,"，期間傷害、閃避、異常狀態抗性降低25%。");
+            }
+            return previousAddBattleLog.call(this,text);
+        };
+    }
+
+    clearLegacyFrostbiteSkillLocks();
+
+    /* V158's compatibility resolver asks for tri. Freeze's final target truth is
+       a front/back column of at most two valid targets. */
     function withFinalFreezeTargets(callback){
         const previousTargets=window.getSkillTargets;
         if(typeof previousTargets!=="function"){ return callback(); }
@@ -235,18 +419,6 @@
         };
     }
 
-    /* Frostbite blocks skills, not the whole action.  Returning false here
-       lets the existing Frostbite-aware normal-attack fallback continue, but
-       prevents named Abyss support resolvers from bypassing that fallback. */
-    if(typeof window.v141TryMonsterSpecialAction==="function"){
-        const previousMonsterSpecial=window.v141TryMonsterSpecialAction;
-        window.v141TryMonsterSpecialAction=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            if(activeFrostbite(monster)){ return false; }
-            return previousMonsterSpecial.apply(this,arguments);
-        };
-    }
-
     function levelValue(values,level){
         if(!Array.isArray(values)||!values.length){ return 0; }
         const index=Math.max(0,Math.min(values.length-1,Math.floor(numeric(level)||1)-1));
@@ -267,14 +439,13 @@
         if(numeric(skill.frostbiteChance)>0){
             parts.push(
                 numeric(skill.frostbiteChance)+"%基礎機率凍傷"+
-                Math.max(1,numeric(skill.frostbiteDuration)||1)+"回合（只禁止技能；"+
-                FROSTBITE_ACTION_TEXT+"）"
+                Math.max(1,numeric(skill.frostbiteDuration)||1)+"回合（傷害-25%、閃避-25%、異常狀態抗性-25%）"
             );
         }
         if(numeric(skill.freezeChance)>0){
             parts.push(
                 numeric(skill.freezeChance)+"%基礎機率冰封"+
-                Math.max(1,numeric(skill.freezeDuration)||1)+"回合（無法行動）"
+                Math.max(1,numeric(skill.freezeDuration)||1)+"回合（完全無法行動）"
             );
         }
         if(Array.isArray(skill.lifestealPercentByLevel)){
@@ -302,11 +473,14 @@
         const lv=Math.max(1,Math.min(numeric(skill&&skill.maxLevel)||1,Math.floor(numeric(level)||1)));
         if(skill&&skill.id==="healSpell"){
             return "我方中、左、右最多3名存活角色恢復 "+
-                (numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(lv-1))+" HP、固定35 SP並解除所有可解除負面狀態；施放者本人不恢復SP";
+                (numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(lv-1))+" HP、固定35 SP並解除所有可解除負面狀態；施放者本人可恢復HP與解除負面，但不恢復自身SP";
         }
         if(skill&&skill.id==="revive"){
             return "使1名死亡友方原地復活並恢復最大HP的"+
                 levelValue(skill.reviveHealPercentByLevel,lv)+"%；不恢復SP";
+        }
+        if(skill&&skill.id==="purifyMind"){
+            return "解除1名友方目標身上所有增益與所有異常狀態";
         }
         if(skill&&skill.id==="waterEX"){
             return "永久提升水元素傷害5%、回復類技能HP恢復量10%；每回合開始前有30%機率解除自身所有可解除負面狀態";
@@ -332,10 +506,10 @@
             if(!skill||!WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
                 return previousPreviewSummary.apply(this,arguments);
             }
-            const scope={single:"單一敵人",tri:"同排最多3名敵人",column:"前後排同位置最多2名敵人",all:"敵方全體"}[skill.targetType]||"技能目標";
+            const scope={single:"單一敵人",tri:"同排最多3名有效敵人",column:"前後排同位置最多2名敵人",all:"敵方全體"}[skill.targetType]||"技能目標";
             const type=skill.id==="freeze"?"純控制":(skill.category==="physical"?"物理傷害":"法術傷害");
             const status=numeric(skill.frostbiteChance)>0
-                ?"；可能使目標凍傷，只禁止技能"
+                ?"；可能使目標凍傷：傷害、閃避、異常抗性各降低25%"
                 :numeric(skill.freezeChance)>0?"；可能使目標冰封並完全無法行動":"";
             const steal=Array.isArray(skill.lifestealPercentByLevel)?"；吸取實際傷害恢復自身HP":"";
             return scope+"；"+type+status+steal+"。";
@@ -399,6 +573,7 @@
             const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
             return skill?waterSkillEffectParts(skill,level).slice():[];
         },
-        isFrostbitten:activeFrostbite
+        isFrostbitten:activeFrostbite,
+        frostbitePenaltyPercent:25
     });
 })();
