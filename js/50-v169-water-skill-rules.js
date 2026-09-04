@@ -186,23 +186,43 @@
         });
     }
 
-    function activeFrostbite(entity){
+    function hasStoredFrostbite(entity){
         return !!(entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(effect=>
             effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0
         ));
     }
 
-    /* Frostbite is a three-stat soft debuff, never a skill lock.  Historical
-       V149/V152 wrappers still exist for save compatibility; hide only the
-       Frostbite entry while those old narrow seams execute, then restore it. */
+    function activeFrostbite(entity){
+        return !!(entity&&(entity.v169FrostbiteCompatibilityActive===true||hasStoredFrostbite(entity)));
+    }
+
+    /* Frostbite is a three-stat soft debuff, never a skill lock. Historical
+       V149/V152 wrappers still contain their old gating checks, so only those
+       checks see a filtered status list. A compatibility marker keeps the
+       real Frostbite penalties active while the underlying skill resolves. */
     function withoutLegacyFrostbiteLock(entity,callback){
-        if(!entity||!Array.isArray(entity.statusEffects)||!activeFrostbite(entity)){
+        if(!entity||!Array.isArray(entity.statusEffects)||!hasStoredFrostbite(entity)){
             return callback();
         }
         const original=entity.statusEffects;
-        entity.statusEffects=original.filter(effect=>!(effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0));
+        const frostbite=original.filter(effect=>effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0);
+        const filtered=original.filter(effect=>!frostbite.includes(effect));
+        entity.statusEffects=filtered;
+        entity.v169FrostbiteCompatibilityActive=true;
         try{ return callback(); }
-        finally{ entity.statusEffects=original; }
+        finally{
+            const after=Array.isArray(entity.statusEffects)?entity.statusEffects:filtered;
+            delete entity.v169FrostbiteCompatibilityActive;
+            if(after===filtered){
+                entity.statusEffects=original;
+            }else if(after.length===0){
+                /* A cleanse replaced the filtered list with an empty list, so
+                   Frostbite must be removed too. */
+                entity.statusEffects=[];
+            }else{
+                entity.statusEffects=after.concat(frostbite.filter(effect=>numeric(effect.turnsLeft)>0));
+            }
+        }
     }
 
     function clearLegacyFrostbiteSkillLocks(){
@@ -281,7 +301,7 @@
         };
     }
 
-    /* Damage -25%.  Different named outgoing-damage reductions coexist by
+    /* Damage -25%. Different named outgoing-damage reductions coexist by
        multiplication, matching the shared status stacking rules. */
     if(typeof window.getOutgoingDamageDownPercent==="function"){
         const previousOutgoingDamageDown=window.getOutgoingDamageDownPercent;
@@ -315,7 +335,7 @@
     wrapPlayerEvasionStats("getPlayer2BattleStats",()=>typeof player2!=="undefined"?player2:null);
     wrapPlayerEvasionStats("getPlayer3BattleStats",()=>typeof player3!=="undefined"?player3:null);
 
-    /* Status resistance -25%.  Spirit-derived and explicit player bonus
+    /* Status resistance -25%. Spirit-derived and explicit player bonus
        resistance are reduced at their existing authoritative inputs. */
     if(typeof window.getMonsterEffectiveSpiritPoints==="function"){
         const previousMonsterSpirit=window.getMonsterEffectiveSpiritPoints;
@@ -339,7 +359,7 @@
         };
     }
 
-    /* V149's old application log mentioned a skill prohibition.  Keep the
+    /* V149's old application log mentioned a skill prohibition. Keep the
        application itself and rewrite only that obsolete explanatory sentence. */
     if(typeof window.addBattleLog==="function"){
         const previousAddBattleLog=window.addBattleLog;
