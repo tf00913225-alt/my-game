@@ -63,12 +63,11 @@ jobs:
           npx --yes wrangler@4 pages project create "$PROJECT_NAME" --production-branch=dev >/tmp/cf-project.log 2>&1 || true
           cat /tmp/cf-project.log
 
-      - name: Deploy dev
+      - name: Deploy dev to production URL
         shell: bash
         run: |
           npx --yes wrangler@4 pages deploy _deploy \
             --project-name="$PROJECT_NAME" \
-            --branch=dev \
             --commit-hash="${GITHUB_SHA}" \
             --commit-message="${GITHUB_SHA::7} dev auto deploy"
 
