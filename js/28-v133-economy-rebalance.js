@@ -675,21 +675,6 @@
         character.expNext=getExpNextForLevel(character.level);
     }
 
-    function grantFastStartToAdditionalCharacter(character,slotNumber){
-        if(!character||Number(character.level)>=10){ return; }
-        const oldLevel=Math.max(1,Math.floor(Number(character.level)||1));
-        const gainedLevels=10-oldLevel;
-        character.level=10;
-        character.exp=0;
-        character.attributePoints=Math.max(0,Number(character.attributePoints)||0)+gainedLevels*5;
-        character.skillPoints=Math.max(0,Number(character.skillPoints)||0)+gainedLevels*2;
-        character.bonusHP=Math.max(0,Number(character.bonusHP)||0)+gainedLevels*30;
-        character.bonusSP=Math.max(0,Number(character.bonusSP)||0)+gainedLevels*10;
-        recalibrateCharacterExpNext(character);
-        if(typeof addBattleLog==="function"){
-            addBattleLog((character.id||("角色"+slotNumber))+"啟用追趕養成，從 Lv.10 開始冒險。");
-        }
-    }
 
     function grantDirectCatchUpExp(character,baseExp){
         if(!character||(Number(character.level)||1)>=MAX_CHARACTER_LEVEL){ return {baseExp:0,multiplier:1,grantedExp:0}; }
@@ -783,7 +768,6 @@
         createAdditionalCharacter=function(slotNumber){
             const result=originalCreateAdditionalCharacter.apply(this,arguments);
             const character=slotNumber===3?player3:player2;
-            grantFastStartToAdditionalCharacter(character,slotNumber);
             recalibrateCharacterExpNext(character);
             ensureExpPoolChargeUnlocked(Date.now(),false);
             if(typeof updateUI==="function"){ updateUI(); }

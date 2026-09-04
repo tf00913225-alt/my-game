@@ -24,4 +24,4 @@ assert.match(index,/三名角色共用/);
 assert.match(css,/v17342-element-box-lock-notice/);
 assert.match(css,/v17342-settings-locked/);
 assert.match(css,/overflow:hidden !important/);
-console.log("v169 / V173.42 shared Element Box settings checks passed");
+console.log("v169 / V173.44 shared Element Box settings checks passed");

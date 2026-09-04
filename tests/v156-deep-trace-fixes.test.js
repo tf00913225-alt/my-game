@@ -51,8 +51,8 @@ function loadRuntime(overrides={}){
 }
 
 test("the current cache key delivers the repaired runtime and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.44"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.44/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.match(loader,/js\/45-v154-dev-fixes\.js/);
 });
@@ -106,17 +106,15 @@ test("an inactive element box does not bypass a disabled character setting",()=>
     assert.equal(consumed,0);
 });
 
-test("every Abyss map floor presents a portrait-backed challenge button",()=>{
-    [
-        "east-emperor.webp","south-emperor.webp","heaven-emperor.webp",
-        "north-emperor.webp","floor5-extreme-emperor.webp"
-    ].forEach((asset,index)=>{
+test("Abyss floors 1-4 keep portrait challenge buttons while floor 5 uses baked-in Five-Emperor map art",()=>{
+    ["east-emperor.webp","south-emperor.webp","heaven-emperor.webp","north-emperor.webp"].forEach((asset,index)=>{
         assert.match(css,new RegExp("floor-"+(index+1)+"[\\s\\S]*"+asset.replace(".","\\.")));
     });
+    assert.match(css,/floor-5\.png/);
+    assert.doesNotMatch(css,/floor-5 \.v141-abyss-boss::before[\s\S]*floor5-extreme-emperor/);
     assert.match(css,/\.v141-abyss-boss\{[\s\S]*width:120px !important;[\s\S]*height:168px !important;/);
-    assert.match(css,/\.v141-abyss-boss::before\{[\s\S]*background-size:contain !important;/);
-    assert.match(css,/touch-action:manipulation !important/);
-    assert.match(abyss,/<button type="button" class="v141-abyss-boss"[\s\S]*data-abyss-boss-control="true"[\s\S]*v141HandleAbyssBossInteraction\(event\)/);
+    assert.match(abyss,/abyssState\.phase==="boss"&&floor<5/);
+    assert.match(abyss,/function maybeTriggerFinalAbyssEncounter\(\)/);
 });
 
 test("all map portrait assets exist on dev",()=>{

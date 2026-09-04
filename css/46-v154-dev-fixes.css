@@ -72,18 +72,18 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 
 /* Current main-city production background. */
 #game-stage .home-bg-fixed-layer{
-    background-image:url("../assets/ui/home-background-v17343.png") !important;
+    background-image:url("../assets/ui/home-background-v17344.png") !important;
 }
 
 /* The older equipment-specific shorthand kept background-size:auto 84%.
    Override it at equal specificity so the supplied cover fills the card. */
-#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{
+#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="gold"] .v141-dungeon-cover-art{
     width:100% !important;
     min-width:100% !important;
     margin:0 !important;
     background-image:
         linear-gradient(180deg,rgba(7,5,3,.04),rgba(7,5,3,.66)),
-        url("../assets/dungeons/covers/equipment-v17343.png") !important;
+        url("../assets/dungeons/covers/gold-v17344.png") !important;
     background-position:center !important;
     background-size:cover !important;
 }
@@ -204,10 +204,18 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-map{
     width:100% !important;
+    background-position:center !important;
+    background-size:cover !important;
+    background-repeat:no-repeat !important;
     height:auto !important;
     min-height:0 !important;
     flex:1 1 auto !important;
 }
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-1{background-image:url("../assets/dungeons/abyss/maps/floor-1.png") !important;}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-2{background-image:url("../assets/dungeons/abyss/maps/floor-2.png") !important;}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-3{background-image:url("../assets/dungeons/abyss/maps/floor-3.png") !important;}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-4{background-image:url("../assets/dungeons/abyss/maps/floor-4.png") !important;}
+#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-5{background-image:url("../assets/dungeons/abyss/maps/floor-5.png") !important;}
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-shell{
     display:flex !important;
     flex-direction:column !important;
@@ -274,9 +282,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-4 .v141-abyss-boss::before{
     background-image:url("../assets/dungeons/abyss/north-emperor.webp") !important;
-}
-#game-stage #dungeonPage.v146-abyss-active .v141-abyss-map.floor-5 .v141-abyss-boss::before{
-    background-image:url("../assets/dungeons/abyss/floor5-extreme-emperor.webp") !important;
 }
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-boss b{
     display:block !important;

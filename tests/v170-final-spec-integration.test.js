@@ -929,7 +929,7 @@ test("all daily dungeons share three six-enemy waves and Gold replaces Equipment
         const two40=v173GetDailyDungeonScaleContext();
         player3={id:"角色3",level:80};
         const three80=v173GetDailyDungeonScaleContext();
-        return {runs:runs,one40:one40,two40:two40,three80:three80,goldReward:v148GetGoldDungeonReward(40)};
+        return {runs:runs,one40:one40,two40:two40,three80:three80};
     })()`);
     result.runs.forEach(run=>{
         assert.deepEqual(run.lengths,[6,6,6],run.type);
@@ -938,13 +938,13 @@ test("all daily dungeons share three six-enemy waves and Gold replaces Equipment
         assert.deepEqual(run.ranks[2],["regular","regular","regular","elite","boss","elite"]);
         run.rows.forEach(row=>assert.deepEqual(row,[0,0,0,1,1,1]));
         run.positions.forEach(row=>assert.deepEqual(row,[0,1,2,0,1,2]));
-        run.orders.forEach(row=>assert.deepEqual(row,[1,2,3,4,5,6]));
+        run.orders.forEach(row=>assert.deepEqual(row,[4,1,3,6,2,5]));
     });
-    assert.equal(result.one40.factor,.60);
-    assert.equal(result.two40.factor,.82);
+    assert.equal(result.one40.factor,.40);
+    assert.equal(result.two40.factor,.72);
     assert.equal(result.three80.factor,1.05);
-    assert.ok(result.goldReward>0);
     const dungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+    assert.match(dungeonSource,/showDailyGoldReward\(goldDungeonReward\(active\.level\)\)/);
     assert.match(dungeonSource,/金幣副本/);
     assert.match(dungeonSource,/v132BeginEquipmentDungeon=function\(\)\{ return beginFormalDailyDungeon\("gold"\); \}/);
 });

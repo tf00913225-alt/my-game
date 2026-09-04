@@ -1273,9 +1273,9 @@
        Daily dungeon covers and dungeon navigation
     ===================================================== */
     const dungeonCoverData={
-        exp:{title:"經驗副本",requirement:"單一角色達到10級",reward:"當前升級需求平均值的33% EXP",action:"v132BeginExpDungeon"},
-        material:{title:"材料副本",requirement:"至少兩名角色達到20級",reward:"材料寶箱 ×1～3",action:"v132BeginMaterialDungeon"},
-        equipment:{title:"裝備副本",requirement:"至少兩名角色達到20級",reward:"自選系列裝備抽獎券",action:"v132BeginEquipmentDungeon"}
+        exp:{title:"經驗副本",requirement:"任一角色達到10級",reward:"共用經驗池 EXP",action:"v132BeginExpDungeon"},
+        material:{title:"材料副本",requirement:"任一角色達到10級",reward:"材料寶箱 ×1～3",action:"v132BeginMaterialDungeon"},
+        equipment:{title:"裝備副本",requirement:"任一角色達到10級",reward:"自選系列裝備抽獎券",action:"v132BeginEquipmentDungeon"}
     };
 
     function renderDungeonCoverCard(type){

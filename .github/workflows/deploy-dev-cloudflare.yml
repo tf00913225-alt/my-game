@@ -1,0 +1,76 @@
+# V173.44 finalized: this workflow publishes the current dev branch to the stable preview URL.
+name: Deploy dev to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-pages-dev
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy dev preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN_RAW: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID_RAW: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PROJECT_NAME: four-symbols-dev
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+
+      - name: Normalize and verify Cloudflare credentials
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN_RAW" || { echo "CLOUDFLARE_API_TOKEN is missing"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID_RAW" || { echo "CLOUDFLARE_ACCOUNT_ID is missing"; exit 1; }
+
+          TOKEN="$(printf '%s' "$CLOUDFLARE_API_TOKEN_RAW" | tr -d '\r\n' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//; s/^[Bb]earer[[:space:]]+//; s/^"//; s/"$//')"
+          ACCOUNT_ID="$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID_RAW" | tr -d '\r\n[:space:]' | sed -E 's/^"//; s/"$//')"
+
+          test -n "$TOKEN" || { echo "Cloudflare API token became empty after normalization"; exit 1; }
+          test -n "$ACCOUNT_ID" || { echo "Cloudflare Account ID became empty after normalization"; exit 1; }
+
+          echo "::add-mask::$TOKEN"
+          echo "::add-mask::$ACCOUNT_ID"
+          printf 'CLOUDFLARE_API_TOKEN=%s\n' "$TOKEN" >> "$GITHUB_ENV"
+          printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$ACCOUNT_ID" >> "$GITHUB_ENV"
+
+      - name: Prepare static site
+        shell: bash
+        run: |
+          mkdir -p _deploy
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='tests/' \
+            --exclude='node_modules/' \
+            --exclude='_deploy/' \
+            ./ _deploy/
+          test -f _deploy/index.html || { echo "index.html not found"; exit 1; }
+
+      - name: Ensure Pages project exists
+        shell: bash
+        run: |
+          npx --yes wrangler@4 pages project create "$PROJECT_NAME" --production-branch=dev >/tmp/cf-project.log 2>&1 || true
+          cat /tmp/cf-project.log
+
+      - name: Deploy dev to production URL
+        shell: bash
+        run: |
+          npx --yes wrangler@4 pages deploy _deploy \
+            --project-name="$PROJECT_NAME" \
+            --commit-hash="${GITHUB_SHA}" \
+            --commit-message="${GITHUB_SHA::7} dev auto deploy"
+
+      - name: Preview URL
+        run: echo "https://four-symbols-dev.pages.dev"

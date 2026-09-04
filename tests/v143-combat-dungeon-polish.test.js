@@ -16,8 +16,8 @@ let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
 test("V143 assets stay ordered before later patches under the current cache version",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.44/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.44"/);
     assert.match(loader,/css\/40-v143-combat-dungeon-polish\.css/);
     const order=[
         "js/37-v142-skill-animation.js",
@@ -150,7 +150,7 @@ test("dungeon escape restores its owner and Abyss portrait opens dialogue direct
     assert.match(dungeon,/Math\.max\(4,Math\.min\(96/);
     assert.match(dungeon,/Math\.max\(8,Math\.min\(94/);
     assert.match(css,/\.v141-abyss-map\{height:auto !important;min-height:0 !important;flex:1 1 auto !important;\}/);
-    assert.match(dungeon,/function openAbyssBossDialogue\(\)[\s\S]*?點擊對話繼續/);
+    assert.match(dungeon,/function openAbyssBossDialogue\(\)[\s\S]*?點擊空白處繼續/);
     assert.match(dungeon,/window\.v141ChallengeAbyssBoss=function\(\)[\s\S]*?return openAbyssBossDialogue\(\);/);
     assert.doesNotMatch(system,/v141ChallengeAbyssBoss=function/);
 });

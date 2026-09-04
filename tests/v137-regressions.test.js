@@ -246,18 +246,20 @@ test("daily dungeon date follows local midnight instead of UTC",()=>{
     assert.equal(vm.runInContext("todayString()",context),"2026-08-28");
 });
 
-test("material and equipment dungeons require two actual Lv20 characters",()=>{
+test("formal daily dungeons unlock when any actual character reaches Lv10",()=>{
     const context=makeContext({players:[]});
     context.getExistingPartyIndexes=()=>context.players.map((_,index)=>index);
     context.getPartyCharacterByIndex=index=>context.players[index];
-    vm.runInContext(extractFunction(v132Source,"hasTwoCharactersAtLevel20"),context);
+    vm.runInContext(extractFunction(v132Source,"hasLevel10CharacterForDailyDungeon"),context);
 
-    context.players=[{level:20},{level:1}];
-    assert.equal(vm.runInContext("hasTwoCharactersAtLevel20()",context),false);
-    context.players=[{level:20},{level:20}];
-    assert.equal(vm.runInContext("hasTwoCharactersAtLevel20()",context),true);
-    context.players=[{level:1},{level:20},{level:20}];
-    assert.equal(vm.runInContext("hasTwoCharactersAtLevel20()",context),true);
+    context.players=[];
+    assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),false);
+    context.players=[{level:9},{level:1}];
+    assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),false);
+    context.players=[{level:10}];
+    assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),true);
+    context.players=[{level:1},{level:10}];
+    assert.equal(vm.runInContext("hasLevel10CharacterForDailyDungeon()",context),true);
 });
 
 test("auto tri-targeting chooses the center that hits three of six monsters",()=>{
@@ -376,9 +378,9 @@ test("auto battle keeps a valid selected skill instead of silently queuing norma
 });
 
 test("V137 regressions remain wired through the current deployed entry points",()=>{
-    assert.match(indexSource,/js\/00-main\.js\?v=173\.42/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.42/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.42"/);
+    assert.match(indexSource,/js\/00-main\.js\?v=173\.44/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.44/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.44"/);
     assert.match(v133Source,/const MAX_CHARACTER_LEVEL=100/);
     assert.doesNotMatch(mainSource,/safeBind\(\s*["'](?:autoEnabled|autoSkillHome|hpUsePctHome|spUsePctHome)/);
     assert.doesNotMatch(v132Source,/const result=originalLoseBattle\.apply/);

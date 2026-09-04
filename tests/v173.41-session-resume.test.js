@@ -10,7 +10,7 @@ const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const keyIndex=main.indexOf('const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";');
 const start=main.lastIndexOf("/* =====================================================",keyIndex);
 const end=main.indexOf("let deleteAllCharactersInProgress",keyIndex);
-assert.ok(keyIndex>=0 && start>=0 && end>keyIndex,"V173.42 lifecycle block must live in js/00-main.js");
+assert.ok(keyIndex>=0 && start>=0 && end>keyIndex,"V173.44 lifecycle block must live in js/00-main.js");
 const block=main.slice(start,end);
 
 function harness(initialReady){
@@ -57,8 +57,8 @@ function harness(initialReady){
     assert.equal(h.saves,2,"pagehide must also persist before renderer eviction");
 }
 
-assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
-assert.match(index,/<title>四象江湖傳 V173\.42<\/title>/);
-assert.match(index,/js\/00-main\.js\?v=173\.42/);
-assert.match(index,/js\/20-anonymous-20\.js\?v=173\.42/);
-console.log("✓ V173.42 same-session resume and background save regression passed");
+assert.match(loader,/const V_ASSET_VERSION="173\.44"/);
+assert.match(index,/<title>四象江湖傳 V173\.44<\/title>/);
+assert.match(index,/js\/00-main\.js\?v=173\.44/);
+assert.match(index,/js\/20-anonymous-20\.js\?v=173\.44/);
+console.log("✓ V173.44 same-session resume and background save regression passed");

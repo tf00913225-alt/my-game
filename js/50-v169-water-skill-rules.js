@@ -160,6 +160,9 @@
     }
 
     applyFinalSkillData();
+    if(typeof renderSkillLoadout==="function"){
+        renderSkillLoadout();
+    }
     if(typeof window.v173ApplyFormalDamageRoleProfiles==="function"){
         window.v173ApplyFormalDamageRoleProfiles(WATER_DAMAGE_SKILL_IDS);
     }

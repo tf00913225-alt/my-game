@@ -206,18 +206,19 @@ test("shared target geometry excludes dead cards and keeps one VFX node",()=>{
     assert.match(animation,/const coverageScale=clamp\(Number\(sprite\.coverageScale\)\|\|1\.22,1\.15,1\.3\);/);
 });
 
-test("Abyss dialogue is owned directly by the map source and has pointer plus click fallback",()=>{
-    assert.match(abyss,/function openAbyssBossDialogue\(\)[\s\S]*?overlay\.onclick=[\s\S]*?launchAbyssBossBattle\(\)/);
+test("Abyss dialogue is owned by the map and blank-area taps can advance it",()=>{
+    assert.match(abyss,/function openAbyssBossDialogue\(\)[\s\S]*?launchAbyssBossBattle\(\)[\s\S]*?activeAbyssDialogueAdvance=advanceDialogue/);
+    assert.match(abyss,/overlay\.onclick=event=>[\s\S]*?advanceDialogue\(\)/);
     assert.match(abyss,/window\.v141ChallengeAbyssBoss=function\(\)[\s\S]*?return openAbyssBossDialogue\(\);/);
-    assert.match(abyss,/\["pointerup","click"\]\.forEach\(type=>map\.addEventListener\(type,event=>/);
-    assert.match(abyss,/event\.target&&typeof event\.target\.closest==="function"&&event\.target\.closest\("\.v143-abyss-dialogue"\)\)\{ return; \}/);
+    assert.match(abyss,/if\(activeAbyssDialogueAdvance\)[\s\S]*?activeAbyssDialogueAdvance\(\)/);
+    assert.match(abyss,/function maybeTriggerFinalAbyssEncounter\(\)/);
     assert.doesNotMatch(legacyAbyssPatch,/v141ChallengeAbyssBoss=function/);
 });
 
 test("the published release is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.42"/);
-    assert.match(index,/<title>四象江湖傳 V173\.42<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.42"[\s\S]*?>V173\.42<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.44"/);
+    assert.match(index,/<title>四象江湖傳 V173\.44<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.44"[\s\S]*?>V173\.44<\/div>/);
 });
 
 console.log("\n"+passed+" V173.39 Canvas VFX and Abyss input tests passed.");
