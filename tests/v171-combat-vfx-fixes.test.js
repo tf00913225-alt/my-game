@@ -25,7 +25,7 @@ test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path"
     const finalDefinition=finalWaterRules.match(/floodBeast:\{[\s\S]*?\n\s*\},\n\s*iceArrowRain:/);
     assert.ok(finalDefinition);
     assert.match(finalDefinition[0],/targetType:"single"/);
-    assert.match(finalDefinition[0],/frostbiteChance:15,frostbiteDuration:1/);
+    assert.match(finalDefinition[0],/frostbiteChance:35,frostbiteDuration:2/);
     assert.doesNotMatch(finalDefinition[0],/freezeChance|teamFreeze/);
     assert.match(
         animation,
