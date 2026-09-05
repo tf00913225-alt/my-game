@@ -15,14 +15,14 @@ body.quest-scroll-active,
 }
 
 #game-stage #homeFeatureModal.quest-mode{
-    padding:8px !important;
+    padding:12px !important;
 }
 
 #game-stage #homeFeatureModal.quest-mode .home-feature-modal-box{
-    width:98% !important;
-    max-width:412px !important;
-    height:90dvh !important;
-    max-height:90dvh !important;
+    width:100% !important;
+    max-width:var(--ui-large-panel-max-width,396px) !important;
+    height:min(var(--ui-large-panel-height,620px),calc(100% - var(--ui-large-panel-safe-space,24px))) !important;
+    max-height:calc(100% - var(--ui-large-panel-safe-space,24px)) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;

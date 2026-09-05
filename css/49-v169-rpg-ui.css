@@ -4,8 +4,8 @@
 
 /*
    Shared sizing authority for A-level / Large Panel surfaces that have been
-   migrated to the unified frame.  The shop is the first current owner.
-   Content quantity must never change these frame dimensions.
+   migrated to the unified frame. Content quantity must never change these
+   frame dimensions.
 */
 #game-stage{
     --ui-large-panel-max-width:396px;
@@ -188,13 +188,78 @@
     will-change:auto !important;
 }
 
-/* ----- Character pages: historical spacer is removed in the V78 core owner. ----- */
+/* ----- Character: same Large Panel frame as shop; only tab content changes. ----- */
+#game-stage #homeFeatureModal .home-feature-modal-box.wide{
+    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    max-width:var(--ui-large-panel-max-width) !important;
+    height:min(var(--ui-large-panel-height),calc(100% - var(--ui-large-panel-safe-space))) !important;
+    max-height:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
+    display:flex !important;
+    flex:1 1 auto !important;
+    flex-direction:column !important;
+    height:auto !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+}
+#game-stage #homeFeatureModal #characterTabContent{
+    flex:1 1 auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    scrollbar-gutter:stable !important;
+}
 #game-stage #homeFeatureModal #characterTabContent > #skillPage{
     padding:0 0 12px !important;
 }
 
 #game-stage #homeFeatureModal #allSkillsList{
     padding-bottom:12px !important;
+}
+
+/*
+   Simple A-level pages use existing stable DOM signatures instead of adding
+   runtime wrapper classes. Exclude the character .wide shell so its internal
+   tab scroll owner remains authoritative when the EXP pool is borrowed into it.
+*/
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) .home-feature-modal-box,
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) .home-feature-modal-box,
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) .home-feature-modal-box,
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) .home-feature-modal-box{
+    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    max-width:var(--ui-large-panel-max-width) !important;
+    height:min(var(--ui-large-panel-height),calc(100% - var(--ui-large-panel-safe-space))) !important;
+    max-height:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) .home-feature-modal-title,
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) .home-feature-modal-title,
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) .home-feature-modal-title,
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) .home-feature-modal-title{
+    flex:0 0 auto !important;
+}
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) #homeFeatureModalBody,
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) #homeFeatureModalBody,
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) #homeFeatureModalBody,
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) #homeFeatureModalBody{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
 }
 
 /* ----- Shop: one fixed Large Panel frame; tabs only replace body content. ----- */

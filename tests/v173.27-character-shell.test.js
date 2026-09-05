@@ -8,6 +8,7 @@ const read=path=>fs.readFileSync(path,"utf8");
 const runtime=read("js/19-stage-v78-character-inventory-runtime.js");
 const coreCss=read("css/22-stage-v78-character-inventory-core.css");
 const finalCss=read("css/31-v131-fix-batch.css");
+const sharedCss=read("css/49-v169-rpg-ui.css");
 const loader=read("js/20-anonymous-20.js");
 const index=read("index.html");
 
@@ -31,20 +32,14 @@ function makeElement(){
         clientHeight:520,
         parentElement:null,
         style:{
-            setProperty(name,value,priority){
-                values.set(name,{value,priority});
-            }
+            setProperty(name,value,priority){ values.set(name,{value,priority}); }
         },
-        value(name){
-            return values.get(name)?.value;
-        },
-        priority(name){
-            return values.get(name)?.priority;
-        }
+        value(name){ return values.get(name)?.value; },
+        priority(name){ return values.get(name)?.priority; }
     };
 }
 
-test("the V78 owner shrink-wraps short character tabs instead of forcing a viewport-height shell",()=>{
+test("the V78 owner keeps every character tab inside one fixed Large Panel",()=>{
     const body=makeElement();
     const root=makeElement();
     const inventory=makeElement();
@@ -59,52 +54,49 @@ test("the V78 owner shrink-wraps short character tabs instead of forcing a viewp
         characterTabContent:root,
         inventoryPage:inventory
     };
-    const context={
-        document:{getElementById:id=>elements[id]||null},
-        Math,Number
-    };
+    const context={document:{getElementById:id=>elements[id]||null},Math,Number};
     vm.createContext(context);
     vm.runInContext(extractFunction(runtime,"applyNow"),context);
     context.applyNow();
 
-    assert.equal(box.value("height"),"auto");
-    assert.equal(box.value("max-height"),"96%");
-    assert.equal(body.value("flex"),"0 1 auto");
-    assert.equal(root.value("flex"),"0 1 auto");
-    assert.equal(root.value("height"),"auto");
-    assert.equal(root.value("max-height"),"none");
+    assert.equal(box.value("width"),"calc(100% - var(--ui-large-panel-safe-space,24px))");
+    assert.equal(box.value("max-width"),"var(--ui-large-panel-max-width,396px)");
+    assert.equal(box.value("height"),"min(var(--ui-large-panel-height,620px),calc(100% - var(--ui-large-panel-safe-space,24px)))");
+    assert.equal(box.value("max-height"),"calc(100% - var(--ui-large-panel-safe-space,24px))");
+    assert.equal(body.value("flex"),"1 1 auto");
+    assert.equal(root.value("flex"),"1 1 auto");
     assert.equal(root.value("overflow-y"),"scroll");
+    assert.equal(root.value("scrollbar-gutter"),"stable");
     assert.equal(root.priority("height"),"important");
 });
 
-test("the core character shell uses content height with a 96 percent ceiling",()=>{
-    assert.match(coreCss,/\.home-feature-modal-box\.wide\{[\s\S]{0,320}height:auto !important;[\s\S]{0,80}max-height:96% !important/);
-    assert.match(coreCss,/\.home-feature-modal-box\.wide #homeFeatureModalBody\{[\s\S]{0,220}flex:0 1 auto !important/);
-    assert.match(coreCss,/#characterTabContent\{[\s\S]{0,280}flex:0 1 auto !important;[\s\S]{0,80}height:auto !important;[\s\S]{0,100}max-height:none !important/);
-    assert.doesNotMatch(coreCss,/--character-scroll-height/);
+test("the late shared design-system CSS is the authoritative character frame",()=>{
+    assert.match(sharedCss,/--ui-large-panel-max-width:396px/);
+    assert.match(sharedCss,/--ui-large-panel-height:620px/);
+    assert.match(sharedCss,/\.home-feature-modal-box\.wide\{[\s\S]{0,460}width:calc\(100% - var\(--ui-large-panel-safe-space\)\) !important;[\s\S]{0,120}max-width:var\(--ui-large-panel-max-width\) !important;[\s\S]{0,180}height:min\(var\(--ui-large-panel-height\),calc\(100% - var\(--ui-large-panel-safe-space\)\)\) !important/);
+    assert.match(sharedCss,/\.home-feature-modal-box\.wide #homeFeatureModalBody\{[\s\S]{0,220}flex:1 1 auto !important/);
+    assert.match(sharedCss,/#characterTabContent\{[\s\S]{0,220}flex:1 1 auto !important/);
 });
 
-test("the later V131 layout cannot restore the fixed black-tail shell",()=>{
-    assert.match(finalCss,/\.home-feature-modal-box\.wide\{[\s\S]{0,160}height:auto !important;[\s\S]{0,80}max-height:96% !important/);
-    assert.match(finalCss,/\.home-feature-modal-box\.wide #homeFeatureModalBody\{[\s\S]{0,160}flex:0 1 auto !important/);
-    assert.match(finalCss,/#characterTabContent\{[\s\S]{0,180}flex:0 1 auto !important;[\s\S]{0,80}height:auto !important/);
-    const shellBlock=finalCss.match(/#game-stage #homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*\}/)?.[0]||"";
-    const rootBlock=finalCss.match(/#game-stage #homeFeatureModal #characterTabContent\{[^}]*\}/)?.[0]||"";
-    assert.doesNotMatch(shellBlock,/^\s*height:94% !important;/m);
-    assert.doesNotMatch(rootBlock,/^\s*height:0 !important;/m);
+test("historical character rules remain compatible fallbacks instead of a scale-based layout patch",()=>{
+    assert.match(coreCss,/\.home-feature-modal-box\.wide/);
+    assert.match(finalCss,/\.home-feature-modal-box\.wide/);
+    assert.doesNotMatch(runtime,/transform\s*:\s*scale\s*\(|setProperty\(\s*["']transform["']\s*,\s*["']scale\s*\(/);
+    assert.doesNotMatch(runtime,/dataset\.characterTab|fixedCharacterTab/);
 });
 
 test("long character tabs retain the canonical internal scroll owner",()=>{
     assert.match(runtime,/inventoryOwnsScroll\s*\? "hidden"\s*: "scroll"/);
+    assert.match(runtime,/"scrollbar-gutter",[\s\S]*?"stable"/);
     assert.match(coreCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
     assert.match(finalCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
 });
 
-test("the development release advances to V173.39",()=>{
+test("the current released label remains V173.45 while this UI work stays on dev",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.45"/);
     assert.match(index,/<title>四象江湖傳 V173\.45<\/title>/);
     assert.match(index,/aria-label="目前版本 V173\.45"/);
     assert.match(index,/>V173\.45<\/div>/);
 });
 
-console.log("\n"+passed+" V173.39 character-shell regression tests passed.");
+console.log("\n"+passed+" character-shell regression tests passed.");
