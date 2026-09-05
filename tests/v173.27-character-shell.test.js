@@ -92,7 +92,7 @@ test("long character tabs retain the canonical internal scroll owner",()=>{
     assert.match(finalCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
 });
 
-test("the current released label remains V173.47 while this UI work stays on dev",()=>{
+test("the current released label remains V173.48 while this UI work stays on dev",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.47"/);
     assert.match(index,/<title>四象江湖傳 V173\.47<\/title>/);
     assert.match(index,/aria-label="目前版本 V173\.47"/);

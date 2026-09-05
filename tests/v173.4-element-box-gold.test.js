@@ -65,7 +65,7 @@ test("normal Element Box patrol records each credited monster amount exactly onc
     assert.equal(runtime.context.awardMonsterGoldDrop({amount:7}),35);
     assert.equal(runtime.context.awardMonsterGoldDrop({amount:13}),65);
     assert.equal(runtime.sessionGold(),100);
-    assert.equal(runtime.context.gold,1100,"account gold reflects the V173.47 x5 economy multiplier");
+    assert.equal(runtime.context.gold,1100,"account gold reflects the V173.48 x5 economy multiplier");
 });
 
 test("pre-battle and unrelated account-gold changes never enter the Element Box session",()=>{

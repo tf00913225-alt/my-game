@@ -7,7 +7,7 @@ const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 
-assert.ok(loader.indexOf("installV17347RuntimeReadinessGate")<loader.indexOf('const V_ASSET_VERSION="173.47"'),"readiness gate must install before late loaders can expose legacy UI");
+assert.ok(loader.indexOf("installV17347RuntimeReadinessGate")<loader.indexOf('const V_ASSET_VERSION="173.48"'),"readiness gate must install before late loaders can expose legacy UI");
 assert.match(loader,/__v17347RuntimeGateFail/);
 assert.match(loader,/stopImmediatePropagation/);
 assert.match(index,/js\/20-anonymous-20\.js\?v=173\.47/);
@@ -26,4 +26,4 @@ assert.match(equipment,/equipmentDungeonWaveIndex<2/);
 assert.match(equipment,/previousEquipmentPostBattleAutoRecovery/);
 assert.match(equipment,/equipmentDungeonWaveIndex=index/);
 
-console.log("V173.47 runtime integrity regressions passed");
+console.log("V173.48 runtime integrity regressions passed");

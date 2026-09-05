@@ -93,7 +93,7 @@ test("two supplied 9:16 JPEG images are preserved as correctly named startup ass
 
 test("the native startup layer is first, versioned, and starts before the game runtime",()=>{
     assert.ok(html.indexOf('id="startupLoader"')<html.indexOf('id="app"'));
-    assert.ok(html.indexOf("js/52-v173.20-startup-loader.js?v=173.20")<html.indexOf("js/00-main.js?v=173.47"));
+    assert.ok(html.indexOf("js/52-v173.20-startup-loader.js?v=173.20")<html.indexOf("js/00-main.js?v=173.48"));
     assert.match(html,/css\/51-v173\.20-startup-loader\.css\?v=173\.20/);
     assert.match(html,/startup-logo-v173\.20\.jpg\?v=173\.20/);
     assert.match(html,/startup-main-city-v173\.20\.jpg\?v=173\.20/);

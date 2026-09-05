@@ -60,4 +60,4 @@ assert.equal(fs.existsSync("assets/ui/home-background-v17344.png"),true,"assets/
 assert.match(loader,/const V_ASSET_VERSION="173\.47"/);
 assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.47"[\s\S]*?>V173\.47<\/div>/);
 
-console.log("✓ V173.47 current request regression passed");
+console.log("✓ V173.48 current request regression passed");

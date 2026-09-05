@@ -10,7 +10,7 @@ const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const keyIndex=main.indexOf('const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";');
 const start=main.lastIndexOf("/* =====================================================",keyIndex);
 const end=main.indexOf("let deleteAllCharactersInProgress",keyIndex);
-assert.ok(keyIndex>=0 && start>=0 && end>keyIndex,"V173.47 lifecycle block must live in js/00-main.js");
+assert.ok(keyIndex>=0 && start>=0 && end>keyIndex,"V173.48 lifecycle block must live in js/00-main.js");
 const block=main.slice(start,end);
 
 function harness(initialReady){
@@ -61,4 +61,4 @@ assert.match(loader,/const V_ASSET_VERSION="173\.47"/);
 assert.match(index,/<title>四象江湖傳 V173\.47<\/title>/);
 assert.match(index,/js\/00-main\.js\?v=173\.47/);
 assert.match(index,/js\/20-anonymous-20\.js\?v=173\.47/);
-console.log("✓ V173.47 same-session resume and background save regression passed");
+console.log("✓ V173.48 same-session resume and background save regression passed");
