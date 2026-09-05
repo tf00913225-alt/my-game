@@ -228,8 +228,14 @@
 #game-stage #itemModal .item-modal-buttons{
     flex:0 0 auto !important;
 }
+/*
+   Keep the Medium Modal frame fixed, but let a short potion/material stat card
+   hug its actual content. Long equipment details still shrink into the
+   available space and scroll here; the unused room stays as panel background
+   instead of becoming a giant black stat card.
+*/
 #game-stage #itemModal #itemModalStats{
-    flex:1 1 auto !important;
+    flex:0 1 auto !important;
     min-height:0 !important;
     max-height:none !important;
     overflow-x:hidden !important;
@@ -240,14 +246,13 @@
     scrollbar-gutter:stable !important;
 }
 #game-stage #itemModal .item-modal-buttons{
-    margin-top:0 !important;
+    margin-top:auto !important;
 }
 
 /* A permanently promoted layer made skill cards shimmer while scrolling. */
 .skill-preview-card{
     will-change:auto !important;
 }
-
 /* ----- Character: same Large Panel frame as shop; only tab content changes. ----- */
 #game-stage #homeFeatureModal .home-feature-modal-box.wide{
     width:calc(100% - var(--ui-large-panel-safe-space)) !important;
