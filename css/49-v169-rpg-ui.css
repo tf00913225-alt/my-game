@@ -18,8 +18,16 @@
     --ui-medium-modal-content-gap:10px;
 }
 
-/* Native-looking prompts are replaced by a game-owned, body-level layer. */
+/*
+   Small Dialog lives at body level instead of inside #game-stage, so its tier
+   tokens are owned by the dialog layer itself. Confirmation/warning content
+   scrolls internally instead of changing the dialog frame size.
+*/
 .v169-rpg-dialog-layer{
+    --ui-small-dialog-max-width:340px;
+    --ui-small-dialog-height:300px;
+    --ui-small-dialog-safe-space:32px;
+    --ui-small-dialog-content-gap:12px;
     position:fixed;
     inset:0;
     z-index:2147483647;
@@ -51,9 +59,15 @@
 
 .v169-rpg-dialog{
     position:relative;
-    width:min(100%,390px);
+    display:flex;
+    width:min(100%,var(--ui-small-dialog-max-width));
+    height:min(var(--ui-small-dialog-height),calc(100dvh - var(--ui-small-dialog-safe-space)));
+    max-height:calc(100dvh - var(--ui-small-dialog-safe-space));
+    min-height:0;
     box-sizing:border-box;
-    padding:28px 20px 18px;
+    flex-direction:column;
+    gap:var(--ui-small-dialog-content-gap);
+    padding:28px 18px 16px;
     overflow:hidden;
     border:2px solid #b88a42;
     border-radius:14px;
@@ -121,7 +135,8 @@
 }
 
 .v169-rpg-dialog h2{
-    margin:3px 0 11px;
+    flex:0 0 auto;
+    margin:3px 0 0;
     color:#f3d899;
     font-family:"Noto Serif TC",serif;
     font-size:20px;
@@ -131,9 +146,17 @@
 }
 
 .v169-rpg-dialog-message{
-    min-height:24px;
+    flex:1 1 auto;
+    min-height:0;
+    padding:0 2px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+    scrollbar-gutter:stable;
     color:#ddd0ba;
-    font-size:14px;
+    font-size:15px;
     line-height:1.65;
     white-space:pre-line;
     overflow-wrap:anywhere;
@@ -141,9 +164,10 @@
 
 .v169-rpg-dialog-actions{
     display:grid;
+    flex:0 0 auto;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:9px;
-    margin-top:17px;
+    margin-top:0;
 }
 
 .v169-rpg-dialog[data-kind="alert"] .v169-rpg-dialog-actions{
@@ -151,13 +175,13 @@
 }
 
 .v169-rpg-dialog-button{
-    min-height:42px;
+    min-height:44px;
     padding:8px 12px;
     border:1px solid #896838;
     border-radius:8px;
     color:#e6d8bc;
     background:linear-gradient(180deg,#332719,#17100a);
-    font-size:14px;
+    font-size:15px;
     font-weight:900;
     letter-spacing:.5px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
