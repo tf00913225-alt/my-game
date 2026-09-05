@@ -17,6 +17,9 @@ assert.match(battle,/\["addPoint","removePoint","confirmStatus","learnSkill","up
 assert.match(battle,/戰鬥進行中無法調整能力值，也無法學習或升級技能/);
 assert.match(battle,/list\.length!==5/);
 assert.match(battle,/return \[row\[2\],row\[1\],row\[3\],row\[0\],row\[4\]\]/);
+assert.match(battle,/previousRenderExpDistributeList/);
+assert.match(battle,/window\.v173DecorateExpPoolDistributionUi\(\)/);
+assert.match(battle,/\.v173-exp-row-meta/);
 assert.match(battle,/window\.showRewardedAd=function/);
 assert.match(battle,/let remain=3/);
 assert.match(css,/v17351-management-open #v143-skill-stage\{visibility:hidden/);
