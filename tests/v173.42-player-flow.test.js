@@ -30,7 +30,8 @@ assert.doesNotMatch(settings,/if\(elementBoxIsActive\(\)\)\{ setTimeout\(notifyL
 assert.match(settingsCss,/auto-premium-status\.v169-element-box-active[\s\S]*overflow:visible/);
 assert.match(settingsCss,/body\.v162-element-box-settings-open #homeFeatureModal\{[\s\S]*overflow:hidden !important/);
 assert.match(settingsCss,/#homeFeatureModalBody\{[\s\S]*overflow:hidden !important/);
-assert.match(settingsCss,/#autoBattleSettingsPanel\.v131-element-box-panel\{[\s\S]*padding:0 1px 2px !important;[\s\S]*overflow:visible !important/);
+assert.match(settingsCss,/body\.v162-element-box-settings-open #homeFeatureModal \.home-feature-modal-box\{[\s\S]*max-width:var\(--ui-medium-modal-max-width,360px\) !important;[\s\S]*height:min\(var\(--ui-medium-modal-height,540px\),calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)\) !important/);
+assert.match(settingsCss,/body\.v162-element-box-settings-open #autoBattleSettingsPanel\.v131-element-box-panel\{[\s\S]*padding:0 2px 8px !important;[\s\S]*overflow-y:auto !important;[\s\S]*touch-action:pan-y !important;[\s\S]*scrollbar-gutter:stable !important/);
 assert.match(settingsCss,/pointer-events:none/);
 assert.match(index,/v17342-element-box-shared/);
 assert.match(recovery,/setInterval\(\(\)=>\{[\s\S]*isElementBoxRecoveryActive/);
