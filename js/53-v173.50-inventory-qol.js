@@ -439,4 +439,41 @@
     }
 
     ensureBulkSellBar();
+
+    function loadV17351Qa(){
+        if(typeof document==="undefined"||!document.head){ return; }
+        if(!document.getElementById("v17351-qa-style")){
+            const link=document.createElement("link");
+            link.id="v17351-qa-style";
+            link.rel="stylesheet";
+            link.href="css/53-v173.51-qa.css?v=173.51";
+            document.head.appendChild(link);
+        }
+        const queue=[
+            ["v17351-battle-qa","js/54-v173.51-battle-qa.js?v=173.51"],
+            ["v17351-inventory-qa","js/55-v173.51-inventory-qa.js?v=173.51"],
+            ["v17351-shop-qa","js/56-v173.51-shop-qa.js?v=173.51"],
+            ["v17351-quest-qa","js/57-v173.51-quest-qa.js?v=173.51"]
+        ];
+        let index=0;
+        const next=function(){
+            if(index>=queue.length){ return; }
+            const pair=queue[index++];
+            if(document.getElementById(pair[0])){ next(); return; }
+            const script=document.createElement("script");
+            script.id=pair[0];
+            script.src=pair[1];
+            script.async=false;
+            script.onload=next;
+            script.onerror=function(){
+                if(typeof window.__v17347RuntimeGateFail==="function"){
+                    window.__v17347RuntimeGateFail("V173.51 功能載入失敗，請重新整理。");
+                }
+            };
+            document.head.appendChild(script);
+        };
+        next();
+    }
+    loadV17351Qa();
+
 })();

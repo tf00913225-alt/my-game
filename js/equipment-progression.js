@@ -516,9 +516,16 @@
         }
         const script=document.createElement("script");
         script.id="v17350-inventory-qol-runtime";
-        script.src="js/53-v173.50-inventory-qol.js?v=173.50";
+        script.src="js/53-v173.50-inventory-qol.js?v=173.51";
         script.async=false;
-        script.onload=releaseV17350RuntimeGate;
+        script.onload=function(){
+        const startedAt=Date.now();
+        (function waitForV17351(){
+            if(window.__v17351QaReady){ releaseV17350RuntimeGate(); return; }
+            if(Date.now()-startedAt>5000){ failV17350RuntimeGate("V173.51 功能載入逾時，請重新整理。"); return; }
+            setTimeout(waitForV17351,25);
+        })();
+    };
         script.onerror=function(){ failV17350RuntimeGate("背包與批量操作系統載入失敗，請重新整理。"); };
         document.head.appendChild(script);
     }

@@ -25,10 +25,10 @@ assert.match(qol,/descriptor\.kind==="ticket"/);
 assert.match(recovery,/window\.rpgAlert\([\s\S]*?title:"補品不足"[\s\S]*?confirmText:"知道了"/);
 assert.doesNotMatch(recovery,/補品不足[\s\S]{0,180}setTimeout\(/);
 assert.match(equipment,/css\/52-v173\.50-inventory-qol\.css\?v=173\.50/);
-assert.match(equipment,/js\/53-v173\.50-inventory-qol\.js\?v=173\.50/);
-assert.match(equipment,/script\.onload=releaseV17350RuntimeGate/);
-assert.ok(loader.includes('const V_ASSET_VERSION="173.50";'));
-assert.ok(ui.includes('js/equipment-progression.js?v=173.50'));
-assert.ok(index.includes('<title>四象江湖傳 V173.50</title>'));
+assert.match(equipment,/js\/53-v173\.50-inventory-qol\.js\?v=173\.51/);
+assert.match(equipment,/script\.onload=function\(\)\{[\s\S]*?__v17351QaReady/);
+assert.ok(loader.includes('const V_ASSET_VERSION="173.51";'));
+assert.ok(ui.includes('js/equipment-progression.js?v=173.51'));
+assert.ok(index.includes('<title>四象江湖傳 V173.51</title>'));
 
 console.log("✓ V173.50 inventory QoL and persistent no-potion warning");

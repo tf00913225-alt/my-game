@@ -399,10 +399,6 @@
         const known=MANIFEST[config.id];
         if(known){
             const model=Object.assign({signature:config.id},known);
-            if(config.id==="fireRocket"&&model.sprite&&typeof Image==="function"){
-                const record=getSpriteImage(model.sprite.src);
-                if(!record||record.failed||!record.ready){ model.sprite=null; }
-            }
             return model;
         }
         const hash=hashString(config.id+"|"+config.name);
