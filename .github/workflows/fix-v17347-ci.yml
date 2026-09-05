@@ -1,0 +1,40 @@
+name: Fix V173.47 CI compatibility
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'launch v173.47 ci compatibility fix')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Keep equipment loader compatible with DOM test doubles
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          p=Path('js/51-v169-rpg-ui.js')
+          s=p.read_text(encoding='utf-8')
+          old='''        script.async=false;\n        script.addEventListener("error",function(){\n            if(typeof window.__v17347RuntimeGateFail==="function"){\n                window.__v17347RuntimeGateFail("裝備與商店系統載入失敗，請重新整理。");\n            }\n        },{once:true});\n        document.head.appendChild(script);'''
+          new='''        script.async=false;\n        script.onerror=function(){\n            if(typeof window.__v17347RuntimeGateFail==="function"){\n                window.__v17347RuntimeGateFail("裝備與商店系統載入失敗，請重新整理。");\n            }\n        };\n        document.head.appendChild(script);'''
+          if s.count(old)!=1:
+              raise SystemExit(f'expected 1 loader error block, found {s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+          node --check js/51-v169-rpg-ui.js
+          node tests/ui-panel-sizing-regression.test.js
+          node tests/v173.47-runtime-integrity.test.js
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/51-v169-rpg-ui.js
+          git commit -m "fix equipment loader test compatibility"
+          git push origin HEAD:dev
