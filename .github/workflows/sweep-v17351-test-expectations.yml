@@ -1,0 +1,70 @@
+name: Sweep V173.51 test expectations
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  sweep:
+    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'launch V173.51 test expectation sweep')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Update current-version test expectations
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          replacements = [
+              ('V_ASSET_VERSION="173\\.50"', 'V_ASSET_VERSION="173\\.51"'),
+              ('20-anonymous-20\\.js\\?v=173\\.50', '20-anonymous-20\\.js\\?v=173\\.51'),
+              ('00-main\\.js\\?v=173\\.50', '00-main\\.js\\?v=173\\.51'),
+              ('equipment-progression\\.js\\?v=173\\.50', 'equipment-progression\\.js\\?v=173\\.51'),
+              ('53-v173\\.50-inventory-qol\\.js\\?v=173\\.50', '53-v173\\.50-inventory-qol\\.js\\?v=173\\.51'),
+              ('V_ASSET_VERSION="173.50"', 'V_ASSET_VERSION="173.51"'),
+              ('js/20-anonymous-20.js?v=173.50', 'js/20-anonymous-20.js?v=173.51'),
+              ('js/00-main.js?v=173.50', 'js/00-main.js?v=173.51'),
+              ('js/equipment-progression.js?v=173.50', 'js/equipment-progression.js?v=173.51'),
+              ('js/53-v173.50-inventory-qol.js?v=173.50', 'js/53-v173.50-inventory-qol.js?v=173.51'),
+              ('<title>四象江湖傳 V173.50</title>', '<title>四象江湖傳 V173.51</title>'),
+          ]
+
+          changed=[]
+          for path in sorted(Path('tests').glob('*.js')):
+              text=path.read_text(encoding='utf-8')
+              new=text
+              for old,repl in replacements:
+                  new=new.replace(old,repl)
+              if new!=text:
+                  path.write_text(new,encoding='utf-8')
+                  changed.append(str(path))
+
+          print('Changed files:')
+          print('\n'.join(changed) if changed else '(none)')
+          print('\nRemaining test lines containing 173.50:')
+          for path in sorted(Path('tests').glob('*.js')):
+              for no,line in enumerate(path.read_text(encoding='utf-8').splitlines(),1):
+                  if '173.50' in line or '173\\.50' in line:
+                      print(f'{path}:{no}:{line}')
+          PY
+      - name: Run all Node tests
+        run: node .github/scripts/ci.mjs tests
+      - name: Check whitespace
+        run: git diff --check
+      - name: Commit expectation sweep
+        run: |
+          if git diff --quiet -- tests; then
+            echo "No test expectation changes needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests
+          git commit -m "Update current test expectations for V173.51"
+          git push origin HEAD:dev
