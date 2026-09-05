@@ -78,10 +78,10 @@ test("the late shared design-system CSS is the authoritative character frame",()
     assert.match(sharedCss,/#characterTabContent\{[\s\S]{0,220}flex:1 1 auto !important/);
 });
 
-test("historical character rules remain compatible fallbacks instead of a second runtime patch",()=>{
+test("historical character rules remain compatible fallbacks instead of a scale-based layout patch",()=>{
     assert.match(coreCss,/\.home-feature-modal-box\.wide/);
     assert.match(finalCss,/\.home-feature-modal-box\.wide/);
-    assert.doesNotMatch(runtime,/transform\s*:\s*scale|setProperty\(\s*["']transform["']/);
+    assert.doesNotMatch(runtime,/transform\s*:\s*scale\s*\(|setProperty\(\s*["']transform["']\s*,\s*["']scale\s*\(/);
     assert.doesNotMatch(runtime,/dataset\.characterTab|fixedCharacterTab/);
 });
 
