@@ -16,7 +16,35 @@ function fivePriority(indexes){const list=(indexes||[]).filter(Number.isInteger)
 if(typeof window.v148GetAutoTargetPriority==="function"){const old=window.v148GetAutoTargetPriority;window.v148GetAutoTargetPriority=function(indexes){return fivePriority(indexes)||old.apply(this,arguments)}}
 window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 
-function syncManagement(){const shell=document.getElementById("characterPage")||document.getElementById("characterModal");const tab=document.getElementById("characterTabContent");const open=!!(tab&&visible(tab)&&(!shell||visible(shell)));document.body.classList.toggle("v17351-management-open",open);const stage=document.getElementById("v143-skill-stage");if(stage)stage.style.visibility=open?"hidden":"";document.querySelectorAll(".v17342-element-box-use-notice").forEach(n=>n.classList.add("v17351-large-use-notice"));}
+/* V173.51: the EXP-row metadata is injected by V133 after the V131 list render.
+   A later list rerender could replace those rows and momentarily/permanently remove
+   the "目前 EXP / 升下一級需求" line. Decorate synchronously after every render
+   so the requirement never disappears while the EXP pool is open. */
+function decorateExpRows(){
+    if(typeof window.v173DecorateExpPoolDistributionUi==="function"){
+        window.v173DecorateExpPoolDistributionUi();
+    }
+}
+if(typeof renderExpDistributeList==="function"&&!renderExpDistributeList.__v17351ExpStable){
+    const previousRenderExpDistributeList=renderExpDistributeList;
+    const stableRender=function(){
+        const result=previousRenderExpDistributeList.apply(this,arguments);
+        decorateExpRows();
+        return result;
+    };
+    stableRender.__v17351ExpStable=true;
+    renderExpDistributeList=stableRender;
+    window.renderExpDistributeList=stableRender;
+}
+function ensureExpRowsVisible(){
+    const list=document.getElementById("expDistributeList");
+    if(!list)return;
+    const rows=Array.from(list.querySelectorAll(".v131-exp-row"));
+    if(rows.length&&rows.some(row=>!row.querySelector(".v173-exp-row-meta")))decorateExpRows();
+}
+decorateExpRows();
+
+function syncManagement(){const shell=document.getElementById("characterPage")||document.getElementById("characterModal");const tab=document.getElementById("characterTabContent");const open=!!(tab&&visible(tab)&&(!shell||visible(shell)));document.body.classList.toggle("v17351-management-open",open);const stage=document.getElementById("v143-skill-stage");if(stage)stage.style.visibility=open?"hidden":"";document.querySelectorAll(".v17342-element-box-use-notice").forEach(n=>n.classList.add("v17351-large-use-notice"));ensureExpRowsVisible();}
 window.v17351SyncManagement=syncManagement;
 
 function adLayer(){let l=document.getElementById("v17351AdSimulator");if(l)return l;l=document.createElement("div");l.id="v17351AdSimulator";l.className="v17351-ad-simulator";l.setAttribute("aria-hidden","true");l.innerHTML='<section class="v17351-ad-panel" role="dialog" aria-modal="true"><div class="v17351-ad-badge">AD</div><h2>模擬觀看廣告</h2><p>測試模式：播放完成後才發放獎勵。</p><strong id="v17351AdCountdown">3</strong><span id="v17351AdStatus">秒後完成</span></section>';document.body.appendChild(l);return l;}
