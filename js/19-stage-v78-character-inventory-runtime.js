@@ -80,19 +80,32 @@ function applyNow(){
     );
 
     /*
-       角色頁外框不能固定撐滿 96% 高度。能力值／經驗池內容較短時，
-       固定高度只會在內容下方留下大片黑色空區；改成內容自然高度，
-       只有內容過長時才由 max-height 限制在可視區內。
+       Large Panel permanent rule:
+       character/status/skill/inventory tabs share one frame.  Content amount
+       may change the inner scroll height, but can no longer shrink or expand
+       the modal itself.  Reuse the same authoritative tokens as the shop.
     */
     box.style.setProperty(
+        "width",
+        "calc(100% - var(--ui-large-panel-safe-space,24px))",
+        "important"
+    );
+
+    box.style.setProperty(
+        "max-width",
+        "var(--ui-large-panel-max-width,396px)",
+        "important"
+    );
+
+    box.style.setProperty(
         "height",
-        "auto",
+        "min(var(--ui-large-panel-height,620px),calc(100% - var(--ui-large-panel-safe-space,24px)))",
         "important"
     );
 
     box.style.setProperty(
         "max-height",
-        "96%",
+        "calc(100% - var(--ui-large-panel-safe-space,24px))",
         "important"
     );
 
@@ -122,7 +135,13 @@ function applyNow(){
 
     body.style.setProperty(
         "flex",
-        "0 1 auto",
+        "1 1 auto",
+        "important"
+    );
+
+    body.style.setProperty(
+        "height",
+        "auto",
         "important"
     );
 
@@ -140,7 +159,7 @@ function applyNow(){
 
     root.style.setProperty(
         "flex",
-        "0 1 auto",
+        "1 1 auto",
         "important"
     );
 
@@ -197,6 +216,12 @@ function applyNow(){
     root.style.setProperty(
         "touch-action",
         "pan-y",
+        "important"
+    );
+
+    root.style.setProperty(
+        "scrollbar-gutter",
+        "stable",
         "important"
     );
 
