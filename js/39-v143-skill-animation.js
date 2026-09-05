@@ -397,7 +397,14 @@
 
     function modelFor(config){
         const known=MANIFEST[config.id];
-        if(known){ return Object.assign({signature:config.id},known); }
+        if(known){
+            const model=Object.assign({signature:config.id},known);
+            if(config.id==="fireRocket"&&model.sprite&&typeof Image==="function"){
+                const record=getSpriteImage(model.sprite.src);
+                if(!record||record.failed||!record.ready){ model.sprite=null; }
+            }
+            return model;
+        }
         const hash=hashString(config.id+"|"+config.name);
         const motions=["line","curve","arc-up","zigzag","spin","surge","drop","ground-wave"];
         const impacts=["spark","burst","ring","shatter","bloom","wave","pillar","flare"];
