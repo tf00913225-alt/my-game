@@ -37,8 +37,8 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
-#game-stage,#app,#game-content{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;}
-.content{position:absolute!important;inset:0!important;width:420px!important;box-sizing:border-box!important;}
+#game-stage,#app,#game-content{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
+.content{position:absolute!important;inset:0!important;width:420px!important;box-sizing:border-box!important;transform:none!important;}
 #inventoryPage{display:block!important;}
 .inventory-character-panel{height:120px;}.inventory-right-panel{height:360px;}.inventory-grid-scroll{height:180px;overflow-y:auto!important;}
 </style></head><body><div id="game-stage"><div id="app" class="on-inventory-page"><div id="game-content"><div class="content">
