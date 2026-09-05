@@ -37,8 +37,8 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
-#game-stage,#app,#game-content{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
-.content{position:absolute!important;inset:0!important;width:420px!important;box-sizing:border-box!important;transform:none!important;}
+#game-stage,#app,#game-content{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;}
+.content{position:absolute!important;inset:0!important;width:420px!important;box-sizing:border-box!important;}
 #inventoryPage{display:block!important;}
 .inventory-character-panel{height:120px;}.inventory-right-panel{height:360px;}.inventory-grid-scroll{height:180px;overflow-y:auto!important;}
 </style></head><body><div id="game-stage"><div id="app" class="on-inventory-page"><div id="game-content"><div class="content">
@@ -51,11 +51,12 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  const close=page.querySelector('.map-inventory-overlay-close');
  const grid=page.querySelector('.inventory-grid-scroll');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
+ const style=el=>{const s=getComputedStyle(el);return {width:s.width,maxWidth:s.maxWidth,height:s.height,minWidth:s.minWidth,top:s.top,bottom:s.bottom,transform:s.transform,scrollbarGutter:s.scrollbarGutter};};
  void page.offsetHeight;
- const standalone={page:rect(page),shell:rect(shell),shellWidth:getComputedStyle(shell).width,shellMaxWidth:getComputedStyle(shell).maxWidth,stageToken:getComputedStyle(document.getElementById('game-stage')).getPropertyValue('--ui-large-panel-max-width')};
+ const standalone={page:rect(page),shell:rect(shell),shellStyle:style(shell)};
  app.classList.remove('on-inventory-page');
  page.classList.add('map-inventory-overlay-open'); void page.offsetHeight;
- const overlay={page:rect(page),shell:rect(shell),close:rect(close),grid:rect(grid),gutter:getComputedStyle(grid).scrollbarGutter};
+ const overlay={page:rect(page),shell:rect(shell),close:rect(close),grid:rect(grid),pageStyle:style(page),closeStyle:style(close),gridStyle:style(grid)};
  document.getElementById('result').textContent=JSON.stringify({standalone,overlay});
 })();
 </script></body></html>`;
@@ -66,16 +67,17 @@ try{
     const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,"backpack browser layout result missing");
     const data=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
-    console.log("Backpack geometry:",JSON.stringify(data));
-    assert.ok(data.standalone.shell.width<=396.5,"standalone backpack shell must use Large Panel width ceiling");
-    assert.ok(Math.abs(data.standalone.shell.left-(420-data.standalone.shell.width)/2)<0.5,"standalone backpack shell must be centered");
-    assert.ok(data.overlay.page.width<=396.5,"map backpack overlay must use Large Panel width ceiling");
-    assert.ok(Math.abs(data.overlay.page.left-(420-data.overlay.page.width)/2)<0.5,"map backpack overlay must be centered");
-    assert.ok(Math.abs(data.overlay.page.top-12)<0.5,"map backpack overlay must keep 12px top safe margin");
-    assert.ok(data.overlay.page.bottom<=746.6667-81.5,"map backpack overlay must stay above the bottom nav");
-    assert.ok(data.overlay.close.height>=41.5&&data.overlay.close.width>=71.5,"overlay return control must remain a large touch target");
-    assert.ok(data.overlay.shell.width<=data.overlay.page.width+0.5,"overlay shell must not create a second horizontal inset");
-    assert.equal(data.overlay.gutter,"stable","inventory scroll owner must reserve stable scrollbar space");
+    assert.equal(data.standalone.shellStyle.width,"396px","standalone backpack shell must resolve to the Large Panel width");
+    assert.equal(data.standalone.shellStyle.maxWidth,"396px","standalone backpack shell must keep the Large Panel width ceiling");
+    assert.ok(Math.abs((data.standalone.shell.left-data.standalone.page.left)-(data.standalone.page.right-data.standalone.shell.right))<1,"standalone backpack shell must be centered after stage projection");
+    assert.equal(data.overlay.pageStyle.width,"396px","map backpack overlay must resolve to the Large Panel width");
+    assert.equal(data.overlay.pageStyle.maxWidth,"396px","map backpack overlay must keep the Large Panel width ceiling");
+    assert.equal(data.overlay.pageStyle.top,"12px","map backpack overlay must keep the top safe margin");
+    assert.equal(data.overlay.pageStyle.bottom,"82px","map backpack overlay must stay above the bottom nav");
+    assert.equal(data.overlay.closeStyle.height,"42px","overlay return control must keep a 42px height");
+    assert.equal(data.overlay.closeStyle.minWidth,"72px","overlay return control must keep a 72px minimum width");
+    assert.ok(Math.abs((data.overlay.shell.left-data.overlay.page.left)-(data.overlay.page.right-data.overlay.shell.right))<1,"overlay shell must use only the outer panel padding");
+    assert.equal(data.overlay.gridStyle.scrollbarGutter,"stable","inventory scroll owner must reserve stable scrollbar space");
     console.log("Headless Chrome: standalone and map backpack frames are aligned and scroll-safe");
 }finally{
     try{fs.unlinkSync(fixture);}catch(_){ }
