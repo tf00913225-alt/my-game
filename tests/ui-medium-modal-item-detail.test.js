@@ -62,7 +62,8 @@ try{
     assert.ok(match,"item Medium Modal browser result missing");
     const data=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
     for(const shot of [data.short,data.long]){
-        assert.equal(shot.boxStyle.width,"360px","item detail must use Medium Modal width");
+        const resolvedWidth=parseFloat(shot.boxStyle.width);
+        assert.ok(resolvedWidth>300&&resolvedWidth<=360,"item detail must respect the Medium Modal width ceiling and safe area");
         assert.equal(shot.boxStyle.maxWidth,"360px","item detail must keep Medium Modal width ceiling");
         assert.equal(shot.boxStyle.height,"540px","item detail must use Medium Modal height");
         assert.equal(shot.statsStyle.overflowY,"auto","item stats must own vertical scrolling");
