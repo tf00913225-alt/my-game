@@ -457,12 +457,61 @@
     }
     window.v173DecorateExpPoolDistributionUi=decorateExpPoolDistributionUi;
 
+    function v173CaptureExpPoolViewport(){
+        if(typeof document==="undefined"){ return null; }
+        const scroller=document.getElementById("characterTabContent");
+        if(!scroller){ return null; }
+        return {
+            scroller,
+            top:Math.max(0,Number(scroller.scrollTop)||0),
+            left:Math.max(0,Number(scroller.scrollLeft)||0)
+        };
+    }
+    function v173RestoreExpPoolViewport(snapshot){
+        if(!snapshot||!snapshot.scroller){ return; }
+        const restore=function(){
+            const scroller=snapshot.scroller;
+            if(!scroller||scroller.isConnected===false){ return; }
+            scroller.scrollTop=snapshot.top;
+            scroller.scrollLeft=snapshot.left;
+        };
+        restore();
+        if(typeof requestAnimationFrame==="function"){
+            requestAnimationFrame(function(){
+                restore();
+                requestAnimationFrame(restore);
+            });
+        }else if(typeof setTimeout==="function"){
+            setTimeout(restore,0);
+        }
+    }
+    function v173BlurExpPoolAction(){
+        if(typeof document==="undefined"){ return; }
+        const active=document.activeElement;
+        if(active&&typeof active.blur==="function"&&active.matches&&
+            active.matches("#homeExpPoolCard .v131-exp-preview-btn, #homeExpPoolCard .v131-exp-confirm, #homeExpPoolCard .v131-exp-back")){
+            active.blur();
+        }
+    }
+    function v173ScheduleExpPoolDecoration(snapshot){
+        v173RestoreExpPoolViewport(snapshot);
+        const finish=function(){
+            decorateExpPoolDistributionUi();
+            v173RestoreExpPoolViewport(snapshot);
+        };
+        if(typeof setTimeout==="function"){ setTimeout(finish,0); }
+        else{ finish(); }
+    }
+
     function wrapExpPreviewForCatchUp(){
         if(lateState.previewWrapped||typeof window.v131PreviewExpLevel!=="function"||typeof window.v131ConfirmExpPreview!=="function"){ return; }
         lateState.previewWrapped=true;
         const previousPreview=window.v131PreviewExpLevel;
         const previousConfirm=window.v131ConfirmExpPreview;
+        const previousCancel=window.v131CancelExpPreview;
         window.v131PreviewExpLevel=function(index){
+            const viewport=v173CaptureExpPoolViewport();
+            v173BlurExpPoolAction();
             settleExpPoolCharge(Date.now());
             const counts=readPreviewCounts();
             const candidate=Object.assign({},counts);
@@ -477,11 +526,12 @@
             try{ return previousPreview.apply(this,arguments); }
             finally{
                 sharedExp=actual;
-                if(typeof setTimeout==="function"){ setTimeout(decorateExpPoolDistributionUi,0); }
-                else{ decorateExpPoolDistributionUi(); }
+                v173ScheduleExpPoolDecoration(viewport);
             }
         };
         window.v131ConfirmExpPreview=function(){
+            const viewport=v173CaptureExpPoolViewport();
+            v173BlurExpPoolAction();
             settleExpPoolCharge(Date.now());
             const counts=readPreviewCounts();
             const discounted=totalDiscountedPreviewCost(counts);
@@ -500,10 +550,17 @@
                 sharedExp=completed?Math.max(0,actual-discounted):actual;
                 if(typeof updateUI==="function"){ updateUI(); }
                 if(typeof saveGame==="function"){ saveGame(); }
-                if(typeof setTimeout==="function"){ setTimeout(decorateExpPoolDistributionUi,0); }
-                else{ decorateExpPoolDistributionUi(); }
+                v173ScheduleExpPoolDecoration(viewport);
             }
         };
+        if(typeof previousCancel==="function"){
+            window.v131CancelExpPreview=function(){
+                const viewport=v173CaptureExpPoolViewport();
+                v173BlurExpPoolAction();
+                try{ return previousCancel.apply(this,arguments); }
+                finally{ v173ScheduleExpPoolDecoration(viewport); }
+            };
+        }
     }
 
     function syncDailyQuestGrowthRewards(){
