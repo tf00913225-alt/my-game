@@ -47,11 +47,14 @@
            .inventory-character-detail-grid；外框
            .inventory-character-detail-box 本身是 overflow:hidden，
            不能替內容區通過觸控鎖。把真正內容層加入同一白名單。
+
+           練功區地區資訊收斂成 Medium Modal 後，真正 scroll owner
+           改為 #trainingZoneModalBody；外框只負責固定尺寸。
         */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
-            ".home-feature-modal-box, #homeFeatureModalBody, .auto-settings-expanded, " +
+            ".home-feature-modal-box, #homeFeatureModalBody, #trainingZoneModalBody, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .inventory-character-detail-grid, .item-modal-box, #itemModalStats, #skillDetailStats, " +
             ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .v17342-abyss-battle-log, .v143-item-picker, " +
             "textarea, select, input";

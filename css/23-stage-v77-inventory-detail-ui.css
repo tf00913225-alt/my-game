@@ -159,20 +159,30 @@
 }
 
 /*
-   藥水不是裝備檢視器：權威 openItemModal 只會在 potion 將
-   #itemEquipButton 設為 disabled，因此可用這個既有狀態區分功能層級。
-   藥水採緊湊型物品操作視窗，資訊與操作列自然收合；裝備仍維持
-   540px Medium Modal 與內部捲動。這不是依內容量臨時改尺寸。
+   藥水不是裝備檢視器。前一版只用 #itemEquipButton:disabled 判斷，
+   但實際背包流程還會由 V173.42 插入專屬的 #v17342InventoryPotionUse；
+   真機最後 DOM 應以「藥水使用鍵存在」作為最穩定的功能訊號，disabled
+   僅保留為舊流程 fallback。兩種訊號都只代表 potion，不依文字量判斷。
+
+   這裡同時解除固定 Medium Modal 高度、flex 填滿與底部 auto margin，
+   讓效果／售價／操作列真正連續收合；裝備仍維持 540px inspector。
 */
+#game-stage #itemModal .item-modal-box:has(#v17342InventoryPotionUse),
 #game-stage #itemModal .item-modal-box:has(#itemEquipButton:disabled){
     height:auto !important;
     max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
     min-height:0 !important;
+    flex:0 0 auto !important;
+    align-self:center !important;
+    justify-content:flex-start !important;
 }
+#game-stage #itemModal .item-modal-box:has(#v17342InventoryPotionUse) #itemModalStats,
 #game-stage #itemModal .item-modal-box:has(#itemEquipButton:disabled) #itemModalStats{
-    flex:0 1 auto !important;
+    flex:0 0 auto !important;
+    min-height:0 !important;
     max-height:180px !important;
 }
+#game-stage #itemModal .item-modal-box:has(#v17342InventoryPotionUse) .item-modal-buttons,
 #game-stage #itemModal .item-modal-box:has(#itemEquipButton:disabled) .item-modal-buttons{
     margin-top:0 !important;
 }
