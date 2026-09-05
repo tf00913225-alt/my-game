@@ -1001,3 +1001,25 @@
     padding:2px 6px !important;
     font-size:11px !important;
 }
+
+/* V173.49 — EXP POOL TAP / SCROLL STABILITY
+   Keep Android Chrome from changing the character scroll position when the
+   EXP preview list is replaced, and do not let a tiny finger drift on an
+   action button become a vertical pan. */
+#game-stage #homeExpPoolCard,
+#game-stage #homeExpPoolCard .exp-pool-hero,
+#game-stage #homeExpPoolCard .v173-exp-charge-status,
+#game-stage #homeExpPoolCard #expDistributeList,
+#game-stage #homeExpPoolCard #expDistributeList *{
+    overflow-anchor:none !important;
+}
+#game-stage #homeExpPoolCard .v131-exp-preview-btn,
+#game-stage #homeExpPoolCard .v131-exp-confirm,
+#game-stage #homeExpPoolCard .v131-exp-back{
+    touch-action:none !important;
+    -webkit-user-select:none !important;
+    user-select:none !important;
+}
+#game-stage #homeFeatureModal #characterTabContent:has(#homeExpPoolCard){
+    scroll-behavior:auto !important;
+}
