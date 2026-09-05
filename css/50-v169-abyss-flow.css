@@ -159,6 +159,15 @@
 .v169-blueprint-art::before{content:"圖";}
 .v169-item-art > img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center;}
 .v169-item-art > img[hidden]{display:none !important;}
+
+/* Synthesis uses a compact 2:3 talisman preview so the controls remain visible. */
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow .v169-talisman-art{
+    width:92px;
+    height:138px;
+    max-width:100%;
+    flex:0 0 auto;
+}
+
 #game-stage #inventoryPage .inventory-item-classic .inventory-icon > .v169-item-art{
     width:100%;
     height:100%;
