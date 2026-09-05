@@ -14,9 +14,9 @@ let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V171 cache-busts every changed combat asset",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.45"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.45/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.45/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.47"/);
+    assert.match(index,/js\/00-main\.js\?v=173\.47/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.47/);
 });
 
 test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path",()=>{

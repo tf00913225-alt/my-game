@@ -49,7 +49,7 @@
     };
     const NAME_SUFFIX={
         warrior:{shoulder:"戰腕",head:"戰盔",armor:"戰甲",shoes:"戰靴",weapon:"戰刃"},
-        mage:{shoulder:"法環",head:"法冠",armor:"法袍",shoes:"法履",weapon:"法器"}
+        mage:{shoulder:"法環",head:"法冠",armor:"法袍",shoes:"法履",weapon:"法杖"}
     };
     const SET_RULES={
         blade:{stats:{attack:15,vitality:-2}},
@@ -67,6 +67,17 @@
     const SHOP_STORAGE_KEY="v169_equipment_shop_daily";
     let activeReforgeSnapshot=null;
     let equipmentDungeonRunning=false;
+    let equipmentDungeonWaveIndex=-1;
+
+    if(typeof applyPostBattleAutoRecovery==="function"){
+        const previousEquipmentPostBattleAutoRecovery=applyPostBattleAutoRecovery;
+        applyPostBattleAutoRecovery=function(){
+            if(equipmentDungeonRunning&&equipmentDungeonWaveIndex>=0&&equipmentDungeonWaveIndex<2){
+                return;
+            }
+            return previousEquipmentPostBattleAutoRecovery.apply(this,arguments);
+        };
+    }
 
     function escapeHtml(value){
         return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
@@ -95,10 +106,24 @@
         const list=ASSETS[classType]&&ASSETS[classType][slot]||[];
         return list.length?list[Math.floor(random()*list.length)%list.length]:"";
     }
-    function generatedName(rarity,classType,slot,random){
+    function mageWeaponSuffix(asset){
+        const source=String(asset||"");
+        return /weapon-(?:03|04)\.png(?:\?|$)/i.test(source)?"法扇":"法杖";
+    }
+    function generatedName(rarity,classType,slot,random,asset){
         const prefixes=NAME_PREFIX[rarity.key];
         const prefix=prefixes[Math.floor(random()*prefixes.length)%prefixes.length];
-        return prefix+NAME_SUFFIX[classType][slot];
+        const suffix=classType==="mage"&&slot==="weapon"
+            ?mageWeaponSuffix(asset)
+            :NAME_SUFFIX[classType][slot];
+        return prefix+suffix;
+    }
+    function normalizeGeneratedMageWeaponName(item){
+        if(!item||!item.v17346GeneratedEquipment||item.classType!=="mage"||item.type!=="weapon"){ return item; }
+        const source=item.assetPath||item.icon||"";
+        const suffix=mageWeaponSuffix(source);
+        if(/法器$/.test(String(item.name||""))){ item.name=String(item.name).replace(/法器$/,suffix); }
+        return item;
     }
     function generateEquipment(random=Math.random,forced={}){
         const rarity=forced.rarity?RARITY_BY_KEY[forced.rarity]||rarityFromRandom(random):rarityFromRandom(random);
@@ -109,7 +134,7 @@
         const stat=forced.stat||statPool[Math.floor(random()*statPool.length)%statPool.length];
         const value=forced.value==null?randomInt(rarity.min,rarity.max,random):Number(forced.value);
         const asset=assetVariant(classType,slot,random);
-        const name=generatedName(rarity,classType,slot,random);
+        const name=generatedName(rarity,classType,slot,random,asset);
         return {
             id:makeUid("gear"),v141Uid:makeUid("gearuid"),name,
             icon:artMarkup(asset,rarity.key),type:slot,count:1,price:Math.floor(rarity.shopPrice*.2),
@@ -181,9 +206,14 @@
             const defs=typeof window.v132GetContentDefinitions==="function"?window.v132GetContentDefinitions():null;
             (defs&&defs.equipmentSetItems||[]).forEach(applySetRule);
         }catch(_){ }
-        if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){ inventoryItems.forEach(applySetRule); }
+        if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
+            inventoryItems.forEach(item=>{ applySetRule(item); normalizeGeneratedMageWeaponName(item); });
+        }
         if(typeof characterEquipment!=="undefined"&&characterEquipment){
-            Object.values(characterEquipment).forEach(slots=>Object.values(slots||{}).forEach(applySetRule));
+            Object.values(characterEquipment).forEach(slots=>Object.values(slots||{}).forEach(item=>{
+                applySetRule(item);
+                normalizeGeneratedMageWeaponName(item);
+            }));
         }
     }
     syncFourElementSets();
@@ -417,14 +447,16 @@
         if(!accepted){ return; }
         equipmentDungeonRunning=true;
         const launch=index=>{
+            equipmentDungeonWaveIndex=index;
             const started=window.v132LaunchDungeonBattle(waves[index],function(outcome){
                 const win=outcome&&outcome.result==="win";
-                if(!win){ equipmentDungeonRunning=false; if(typeof showPage==="function"){ showPage("dungeon"); } if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); } return; }
+                if(!win){ equipmentDungeonRunning=false; equipmentDungeonWaveIndex=-1; if(typeof showPage==="function"){ showPage("dungeon"); } if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); } return; }
                 if(index<2){ setTimeout(()=>launch(index+1),320); return; }
                 equipmentDungeonRunning=false;
+                equipmentDungeonWaveIndex=-1;
                 showEquipmentReward();
             });
-            if(started===false){ equipmentDungeonRunning=false; }
+            if(started===false){ equipmentDungeonRunning=false; equipmentDungeonWaveIndex=-1; }
         };
         launch(0);
     }
@@ -454,4 +486,8 @@
     }
 
     if(typeof saveGame==="function"){ try{ saveGame(); }catch(_){ } }
+
+    if(typeof window.__v17347RuntimeGateRelease==="function"){
+        window.__v17347RuntimeGateRelease();
+    }
 })();

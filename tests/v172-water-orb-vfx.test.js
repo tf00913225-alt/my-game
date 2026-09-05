@@ -47,9 +47,9 @@ test("Water Ball lasts 1.4 seconds and renders exactly one Canvas crop per frame
 });
 
 test("the current cache version publishes the grouped Water Ball choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.45"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.45/);
-    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.45"[\s\S]*?>V173\.45<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.47"/);
+    assert.match(index,/js\/00-main\.js\?v=173\.47/);
+    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.47"[\s\S]*?>V173\.47<\/div>/);
 });
 
 console.log("\nV172 Water Ball VFX suite: "+passed+" tests passed.");

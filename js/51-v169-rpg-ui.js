@@ -386,8 +386,13 @@
         if(document.getElementById("equipment-progression-runtime")){ return; }
         const script=document.createElement("script");
         script.id="equipment-progression-runtime";
-        script.src="js/equipment-progression.js?v=173.46";
+        script.src="js/equipment-progression.js?v=173.47";
         script.async=false;
+        script.addEventListener("error",function(){
+            if(typeof window.__v17347RuntimeGateFail==="function"){
+                window.__v17347RuntimeGateFail("裝備與商店系統載入失敗，請重新整理。");
+            }
+        },{once:true});
         document.head.appendChild(script);
     }
     if(document.readyState==="loading"){
