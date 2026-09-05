@@ -57,3 +57,41 @@
 .v139-rested-exp-meta{
     line-height:1.5;
 }
+
+/*
+   Rest is a compact functional surface, so it belongs to the shared Medium
+   Modal tier. Content quantity must not resize the frame; only the modal body
+   owns vertical scrolling. The existing rest action and gameplay logic stay
+   untouched.
+*/
+#game-stage #homeFeatureModal:has(#restButton) .home-feature-modal-box{
+    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    max-width:var(--ui-medium-modal-max-width,360px) !important;
+    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:var(--ui-medium-modal-content-gap,10px) !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+
+#game-stage #homeFeatureModal:has(#restButton) .home-feature-modal-title{
+    flex:0 0 auto !important;
+}
+
+#game-stage #homeFeatureModal:has(#restButton) #homeFeatureModalBody{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
+}
+
+#game-stage #homeFeatureModal:has(#restButton) #restButton{
+    min-height:44px !important;
+}
