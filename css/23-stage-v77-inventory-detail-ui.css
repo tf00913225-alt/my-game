@@ -176,3 +176,53 @@
 #game-stage #itemModal .item-modal-box:has(#itemEquipButton:disabled) .item-modal-buttons{
     margin-top:0 !important;
 }
+
+/*
+   創角技能詳細是 1080×1920 原生介面的局部資訊視窗。
+   920px 寬度已等同比例接近既有 360px Medium Modal；高度固定為
+   1390px 原生座標（約等同比例 540px），內容量不再決定外框高度。
+   Header／摘要／底部關閉固定，只有等級清單負責垂直捲動。
+*/
+#game-stage #creationSkillDetailModal .creation-skill-detail-box{
+    width:920px !important;
+    max-width:920px !important;
+    height:1390px !important;
+    max-height:calc(100% - 96px) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+#game-stage #creationSkillDetailModal .creation-skill-detail-header,
+#game-stage #creationSkillDetailModal .creation-skill-detail-tags,
+#game-stage #creationSkillDetailModal .creation-skill-detail-description,
+#game-stage #creationSkillDetailModal .creation-skill-detail-meta,
+#game-stage #creationSkillDetailModal .creation-skill-detail-section-title,
+#game-stage #creationSkillDetailModal .creation-skill-detail-close{
+    flex:0 0 auto !important;
+}
+#game-stage #creationSkillDetailModal .creation-skill-detail-header{
+    grid-template-columns:92.571px minmax(0,1fr) 124px !important;
+}
+#game-stage #creationSkillDetailModal .creation-skill-detail-x{
+    width:124px !important;
+    height:124px !important;
+    min-width:124px !important;
+    min-height:124px !important;
+}
+#game-stage #creationSkillDetailModal .creation-skill-detail-levels{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
+}
+#game-stage #creationSkillDetailModal .creation-skill-detail-close{
+    height:124px !important;
+    min-height:124px !important;
+}
