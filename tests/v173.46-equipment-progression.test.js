@@ -30,6 +30,8 @@ assert.match(source,/\[可冶煉\]/);
 assert.match(source,/remainingReforgeSlots\(item\)<=0/);
 assert.match(source,/item\.reforgeUsed=Math\.min/);
 assert.match(source,/merged\[key\]=\(Number\(merged\[key\]\)\|\|0\)\+\(Number\(value\)\|\|0\)/);
+assert.match(source,/hasRecordedUse=Object\.prototype\.hasOwnProperty\.call\(item,"reforgeUsed"\)/);
+assert.match(source,/item\.reforgeStats&&Object\.keys\(item\.reforgeStats\)\.length\?1:0/);
 
 assert.match(source,/shoulder:\{label:"護腕",warrior:\["vitality","attack"\],mage:\["vitality","intelligence"\]\}/);
 assert.match(source,/head:\{label:"頭盔",warrior:\["vitality","attack","agility"\],mage:\["vitality","intelligence","agility"\]\}/);
@@ -38,7 +40,11 @@ assert.match(source,/weapon:\{label:"武器",warrior:\["attack"\],mage:\["intell
 assert.match(source,/currentShopOffers\(\)[\s\S]*?generateEquipment\(seededRandom/);
 assert.match(source,/window\.v17346BuyEquipmentShopOffer/);
 assert.match(source,/window\.v148BuildDailyDungeonWaves\("gold"\)/);
+assert.match(source,/window\.v17346BeginEquipmentDungeon=beginEquipmentDungeon/);
+assert.doesNotMatch(source,/window\.v132BeginEquipmentDungeon=beginEquipmentDungeon/);
+assert.match(source,/onclick="v17346BeginEquipmentDungeon\(\)"/);
 assert.match(source,/const count=6\*Math\.max\(1/);
+assert.match(source,/inventoryItems\.length\+pendingEquipmentRewards\.length>120/);
 assert.match(source,/看廣告雙倍為12件裝備/);
 assert.match(source,/白裝40%・藍裝40%・紫裝15%・橙裝5%/);
 assert.match(source,/dungeon-equipment-v17346\.png/);
