@@ -24,9 +24,16 @@ assert.match(guidelines,/功能層級決定視窗尺寸；內容量不決定視�
 
 const body={innerHTML:""};
 const storage=new Map();
+const injectedScripts=[];
 const document={
+    head:{appendChild(node){ injectedScripts.push(node); }},
     getElementById(id){ return id==="homeFeatureModalBody"?body:null; },
-    createElement(){ throw new Error("unexpected DOM parsing in focused shop switch test"); }
+    createElement(tag){
+        if(tag==="script"){
+            return {id:"",src:"",async:true};
+        }
+        throw new Error("unexpected DOM parsing in focused shop switch test");
+    }
 };
 const context={
     window:null,document,console,Promise,String,Object,Array,Set,Map,Number,Date,Math,
@@ -39,6 +46,9 @@ const context={
 context.window=context;
 vm.createContext(context);
 vm.runInContext(ui,context);
+
+assert.equal(injectedScripts.length,1,"equipment progression bootstrap should inject one script");
+assert.match(injectedScripts[0].src,/js\/equipment-progression\.js\?v=173\.46$/);
 
 const pages=["equipment","potion","equipment","potion","equipment"];
 pages.forEach(page=>{
