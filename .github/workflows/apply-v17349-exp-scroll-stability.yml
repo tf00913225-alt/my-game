@@ -1,0 +1,116 @@
+name: Apply V173.49 EXP panel stability fix
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'launch V173.49 EXP panel stability fix')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Apply EXP panel stability fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          growth_path=Path('js/28-v133-economy-rebalance.js')
+          growth=growth_path.read_text(encoding='utf-8')
+
+          helper='''    function v173CaptureExpPoolViewport(){\n        if(typeof document==="undefined"){ return null; }\n        const scroller=document.getElementById("characterTabContent");\n        if(!scroller){ return null; }\n        return {\n            scroller,\n            top:Math.max(0,Number(scroller.scrollTop)||0),\n            left:Math.max(0,Number(scroller.scrollLeft)||0)\n        };\n    }\n    function v173RestoreExpPoolViewport(snapshot){\n        if(!snapshot||!snapshot.scroller){ return; }\n        const restore=function(){\n            const scroller=snapshot.scroller;\n            if(!scroller||scroller.isConnected===false){ return; }\n            scroller.scrollTop=snapshot.top;\n            scroller.scrollLeft=snapshot.left;\n        };\n        restore();\n        if(typeof requestAnimationFrame==="function"){\n            requestAnimationFrame(function(){\n                restore();\n                requestAnimationFrame(restore);\n            });\n        }else if(typeof setTimeout==="function"){\n            setTimeout(restore,0);\n        }\n    }\n    function v173BlurExpPoolAction(){\n        if(typeof document==="undefined"){ return; }\n        const active=document.activeElement;\n        if(active&&typeof active.blur==="function"&&\n            active.matches&&active.matches("#homeExpPoolCard .v131-exp-preview-btn, #homeExpPoolCard .v131-exp-confirm, #homeExpPoolCard .v131-exp-back")){\n            active.blur();\n        }\n    }\n    function v173ScheduleExpPoolDecoration(snapshot){\n        v173RestoreExpPoolViewport(snapshot);\n        const finish=function(){\n            decorateExpPoolDistributionUi();\n            v173RestoreExpPoolViewport(snapshot);\n        };\n        if(typeof setTimeout==="function"){ setTimeout(finish,0); }\n        else{ finish(); }\n    }\n\n'''
+          anchor='    function wrapExpPreviewForCatchUp(){\n'
+          if helper not in growth:
+              if anchor not in growth:
+                  raise SystemExit('wrapExpPreviewForCatchUp anchor not found')
+              growth=growth.replace(anchor,helper+anchor,1)
+
+          old='''        const previousPreview=window.v131PreviewExpLevel;\n        const previousConfirm=window.v131ConfirmExpPreview;\n        window.v131PreviewExpLevel=function(index){\n            settleExpPoolCharge(Date.now());\n'''
+          new='''        const previousPreview=window.v131PreviewExpLevel;\n        const previousConfirm=window.v131ConfirmExpPreview;\n        const previousCancel=window.v131CancelExpPreview;\n        window.v131PreviewExpLevel=function(index){\n            const viewport=v173CaptureExpPoolViewport();\n            v173BlurExpPoolAction();\n            settleExpPoolCharge(Date.now());\n'''
+          if old in growth:
+              growth=growth.replace(old,new,1)
+          elif new not in growth:
+              raise SystemExit('preview wrapper anchor not found')
+
+          old='''            finally{\n                sharedExp=actual;\n                if(typeof setTimeout==="function"){ setTimeout(decorateExpPoolDistributionUi,0); }\n                else{ decorateExpPoolDistributionUi(); }\n            }\n        };\n        window.v131ConfirmExpPreview=function(){\n            settleExpPoolCharge(Date.now());\n'''
+          new='''            finally{\n                sharedExp=actual;\n                v173ScheduleExpPoolDecoration(viewport);\n            }\n        };\n        window.v131ConfirmExpPreview=function(){\n            const viewport=v173CaptureExpPoolViewport();\n            v173BlurExpPoolAction();\n            settleExpPoolCharge(Date.now());\n'''
+          if old in growth:
+              growth=growth.replace(old,new,1)
+          elif new not in growth:
+              raise SystemExit('preview finally / confirm wrapper anchor not found')
+
+          old='''                if(typeof updateUI==="function"){ updateUI(); }\n                if(typeof saveGame==="function"){ saveGame(); }\n                if(typeof setTimeout==="function"){ setTimeout(decorateExpPoolDistributionUi,0); }\n                else{ decorateExpPoolDistributionUi(); }\n            }\n        };\n    }\n\n    function syncDailyQuestGrowthRewards(){\n'''
+          new='''                if(typeof updateUI==="function"){ updateUI(); }\n                if(typeof saveGame==="function"){ saveGame(); }\n                v173ScheduleExpPoolDecoration(viewport);\n            }\n        };\n        if(typeof previousCancel==="function"){\n            window.v131CancelExpPreview=function(){\n                const viewport=v173CaptureExpPoolViewport();\n                v173BlurExpPoolAction();\n                try{ return previousCancel.apply(this,arguments); }\n                finally{ v173ScheduleExpPoolDecoration(viewport); }\n            };\n        }\n    }\n\n    function syncDailyQuestGrowthRewards(){\n'''
+          if old in growth:
+              growth=growth.replace(old,new,1)
+          elif new not in growth:
+              raise SystemExit('confirm finally / cancel wrapper anchor not found')
+
+          growth_path.write_text(growth,encoding='utf-8')
+
+          css_path=Path('css/49-v169-rpg-ui.css')
+          css=css_path.read_text(encoding='utf-8')
+          marker='/* V173.49 — EXP POOL TAP / SCROLL STABILITY */'
+          block='''\n\n/* V173.49 — EXP POOL TAP / SCROLL STABILITY\n   Re-rendering the preview rows used to let Android Chrome pick a new scroll\n   anchor (and a tiny finger drift could also start a pan), making the whole\n   EXP allocation surface jump vertically while the Large Panel itself stayed\n   fixed.  Keep this interaction visually locked to the player's viewport. */\n#game-stage #homeExpPoolCard,\n#game-stage #homeExpPoolCard .exp-pool-hero,\n#game-stage #homeExpPoolCard .v173-exp-charge-status,\n#game-stage #homeExpPoolCard #expDistributeList,\n#game-stage #homeExpPoolCard #expDistributeList *{\n    overflow-anchor:none !important;\n}\n#game-stage #homeExpPoolCard .v131-exp-preview-btn,\n#game-stage #homeExpPoolCard .v131-exp-confirm,\n#game-stage #homeExpPoolCard .v131-exp-back{\n    touch-action:none !important;\n    -webkit-user-select:none !important;\n    user-select:none !important;\n}\n#game-stage #homeFeatureModal #characterTabContent:has(#homeExpPoolCard){\n    scroll-behavior:auto !important;\n}\n'''
+          if marker not in css:
+              css=css.rstrip()+block+'\n'
+          css_path.write_text(css.rstrip()+'\n',encoding='utf-8')
+
+          loader_path=Path('js/20-anonymous-20.js')
+          loader=loader_path.read_text(encoding='utf-8')
+          if 'const V_ASSET_VERSION="173.48";' in loader:
+              loader=loader.replace('const V_ASSET_VERSION="173.48";','const V_ASSET_VERSION="173.49";',1)
+          elif 'const V_ASSET_VERSION="173.49";' not in loader:
+              raise SystemExit('asset version anchor not found')
+          loader_path.write_text(loader,encoding='utf-8')
+
+          ui_path=Path('js/51-v169-rpg-ui.js')
+          ui=ui_path.read_text(encoding='utf-8')
+          if 'js/equipment-progression.js?v=173.48' in ui:
+              ui=ui.replace('js/equipment-progression.js?v=173.48','js/equipment-progression.js?v=173.49',1)
+          elif 'js/equipment-progression.js?v=173.49' not in ui:
+              raise SystemExit('equipment runtime version anchor not found')
+          ui_path.write_text(ui,encoding='utf-8')
+
+          index_path=Path('index.html')
+          index=index_path.read_text(encoding='utf-8')
+          if '173.48' not in index and '173.49' not in index:
+              raise SystemExit('index version anchors not found')
+          index=index.replace('173.48','173.49')
+          index_path.write_text(index,encoding='utf-8')
+
+          # Update tests that assert the current release/cache version. Preserve
+          # the historical V173.48 shop marker assertion because that comment
+          # still documents the release in which the shop layout was introduced.
+          for p in Path('tests').glob('*.js'):
+              s=p.read_text(encoding='utf-8')
+              n=s.replace(r'173\\.48',r'173\\.49').replace('173.48','173.49')
+              if p.name=='v173.48-premium-shop-layout.test.js':
+                  n=n.replace(r'V173\\.49 — PREMIUM ONE-SCREEN SHOP',r'V173\\.48 — PREMIUM ONE-SCREEN SHOP')
+              if n!=s:
+                  p.write_text(n,encoding='utf-8')
+
+          test_path=Path('tests/v173.49-exp-pool-scroll-stability.test.js')
+          test_path.write_text(r'''"use strict";\n\nconst assert=require("node:assert/strict");\nconst fs=require("node:fs");\n\nconst growth=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");\nconst css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");\nconst loader=fs.readFileSync("js/20-anonymous-20.js","utf8");\nconst index=fs.readFileSync("index.html","utf8");\n\nassert.match(growth,/function v173CaptureExpPoolViewport\(\)/);\nassert.match(growth,/function v173RestoreExpPoolViewport\(snapshot\)/);\nassert.match(growth,/requestAnimationFrame\(function\(\)\{[\s\S]*?requestAnimationFrame\(restore\)/);\nassert.match(growth,/window\.v131PreviewExpLevel=function\(index\)\{[\s\S]*?v173CaptureExpPoolViewport\(\)[\s\S]*?v173ScheduleExpPoolDecoration\(viewport\)/);\nassert.match(growth,/window\.v131ConfirmExpPreview=function\(\)\{[\s\S]*?v173CaptureExpPoolViewport\(\)[\s\S]*?v173ScheduleExpPoolDecoration\(viewport\)/);\nassert.match(growth,/window\.v131CancelExpPreview=function\(\)\{[\s\S]*?v173CaptureExpPoolViewport\(\)[\s\S]*?v173ScheduleExpPoolDecoration\(viewport\)/);\nassert.match(css,/V173\.49 — EXP POOL TAP \/ SCROLL STABILITY/);\nassert.match(css,/#homeExpPoolCard #expDistributeList \*\{[\s\S]*?overflow-anchor:none !important;/);\nassert.match(css,/\.v131-exp-preview-btn,[\s\S]*?\.v131-exp-confirm,[\s\S]*?\.v131-exp-back\{[\s\S]*?touch-action:none !important;/);\nassert.ok(loader.includes('const V_ASSET_VERSION="173.49";'));\nassert.ok(index.includes('<title>四象江湖傳 V173.49</title>'));\n\nconsole.log("✓ V173.49 EXP pool viewport remains stable while preview rows re-render");\n''',encoding='utf-8')
+          PY
+
+          node --check js/28-v133-economy-rebalance.js
+          node --check js/20-anonymous-20.js
+          node --check js/51-v169-rpg-ui.js
+          node tests/v173.49-exp-pool-scroll-stability.test.js
+          git diff --check
+
+      - name: Commit V173.49
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/28-v133-economy-rebalance.js css/49-v169-rpg-ui.css js/20-anonymous-20.js js/51-v169-rpg-ui.js index.html tests
+          git commit -m "V173.49 stabilize EXP allocation viewport"
+          git push origin HEAD:dev
