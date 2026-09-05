@@ -150,7 +150,11 @@ test("34. +EXP float is visual only",()=>{
 });
 
 test("Element Box open is silent; attempted setting interaction owns the warning",()=>{assert.doesNotMatch(elementBox,/afterOpen[\s\S]*setTimeout\(notifyLocked/);assert.match(elementBox,/bindLockedInteractionGuard/);assert.match(elementBox,/notifyLocked\(\)/);});
-test("Element Box has no scroll owner",()=>{assert.match(elementBoxCss,/body\.v162-element-box-settings-open #homeFeatureModal\{[\s\S]*overflow:hidden !important/);assert.match(elementBoxCss,/#homeFeatureModalBody\{[\s\S]*overflow:hidden !important/);});
+test("Element Box uses the modal body as its single scroll owner",()=>{
+    assert.match(elementBoxCss,/body\.v162-element-box-settings-open #homeFeatureModal\{[\s\S]*overflow:hidden !important/);
+    assert.match(elementBoxCss,/body\.v162-element-box-settings-open #homeFeatureModalBody\{[\s\S]*overflow-y:auto !important;[\s\S]*touch-action:pan-y !important;[\s\S]*scrollbar-gutter:stable !important/);
+    assert.match(elementBoxCss,/body\.v162-element-box-settings-open #autoBattleSettingsPanel\.v131-element-box-panel\{[\s\S]*position:static !important;[\s\S]*overflow:visible !important/);
+});
 test("red dots stay fully bright",()=>{assert.match(polishCss,/\.v146-growth-attention-target\{[\s\S]*opacity:1 !important;[\s\S]*filter:none !important/);assert.match(polishCss,/\.v146-growth-guidance-dot\{[\s\S]*opacity:1 !important/);});
 test("three-character home HUD is enlarged but remains three columns",()=>{assert.match(polishCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(polishCss,/grid-template-columns:36px minmax\(0,1fr\)/);assert.match(polishCss,/height:64px/);assert.match(polishCss,/width:36px;height:36px/);});
 test("ordinary daily dungeons use V173.43 dynamic party/level scaling and Abyss stays excluded",()=>{
