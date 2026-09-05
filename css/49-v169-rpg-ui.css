@@ -517,6 +517,58 @@
     z-index:-1 !important;
 }
 
+/* ----- Backpack: standalone page and map/dungeon overlay share one A-level width. ----- */
+#game-stage > #app > #game-content > #inventoryPage.inventory-page-classic:not(.map-inventory-overlay-open) .inventory-classic-shell{
+    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    max-width:var(--ui-large-panel-max-width) !important;
+    margin:0 auto !important;
+}
+
+#game-stage > #app > #game-content > #inventoryPage.map-inventory-overlay-open{
+    left:50% !important;
+    right:auto !important;
+    top:12px !important;
+    bottom:82px !important;
+    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    max-width:var(--ui-large-panel-max-width) !important;
+    transform:translateX(-50%) !important;
+    padding:10px !important;
+}
+
+#game-stage > #app.v141-dungeon-active > #game-content > #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
+    left:50% !important;
+    right:auto !important;
+    top:12px !important;
+    bottom:82px !important;
+    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    max-width:var(--ui-large-panel-max-width) !important;
+    transform:translateX(-50%) !important;
+}
+
+#game-stage > #app > #game-content > #inventoryPage.map-inventory-overlay-open .inventory-classic-shell{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    gap:var(--ui-large-panel-content-gap) !important;
+}
+
+#game-stage > #app > #game-content > #inventoryPage.map-inventory-overlay-open .inventory-character-switch{
+    padding-right:86px !important;
+}
+
+#game-stage > #app > #game-content > #inventoryPage.map-inventory-overlay-open .map-inventory-overlay-close{
+    top:8px !important;
+    right:8px !important;
+    min-width:72px !important;
+    height:42px !important;
+    padding:0 12px !important;
+    font-size:15px !important;
+}
+
+#game-stage > #app > #game-content > #inventoryPage.map-inventory-overlay-open .inventory-grid-scroll{
+    scrollbar-gutter:stable !important;
+}
+
 @media (max-width:430px){
     #game-stage #homeFeatureModal .v17345-equipment-card{
         grid-template-columns:50px minmax(0,1fr);
