@@ -65,4 +65,4 @@ body.scrollHeight=body.clientHeight;
 assert.equal(window.isInsideAllowedScrollerV78(card),false,"body is allowed only when it actually has overflow");
 assert.equal(dispatch("touchmove",card),true,"non-scrollable content still respects the global stage lock");
 
-console.log("V173.49 shop touch-scroll regression checks passed");
+console.log("V173.50 shop touch-scroll regression checks passed");

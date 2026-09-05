@@ -214,9 +214,9 @@ test("the new Wanxiang loop retires the old procedural text/frame effect instead
 });
 
 test("V173.39 cache version loads the new owner code without stale V173.38 browser assets",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.49"/);
-    assert.match(index,/<title>四象江湖傳 V173\.49<\/title>/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.49/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.50"/);
+    assert.match(index,/<title>四象江湖傳 V173\.50<\/title>/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.50/);
 });
 
 console.log("\n"+passed+" V173.39 earth/light Sprite VFX tests passed.");

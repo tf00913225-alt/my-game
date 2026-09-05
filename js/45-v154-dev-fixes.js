@@ -258,10 +258,19 @@
         });
         if(consumed&&typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
         if(shouldReturnToCity&&elementBoxActive){
-            logElementBoxRecovery("元素匣偵測到補品不足，已停止巡練並返回主城。");
+            const emptyPotionMessage="元素匣偵測到補品不足，已停止巡練並返回主城。";
+            logElementBoxRecovery(emptyPotionMessage);
             if(typeof window.v169StopElementBox==="function"){ window.v169StopElementBox(); }
             else if(typeof toggleAutoBattle==="function"&&typeof autoBattle!=="undefined"&&autoBattle){ toggleAutoBattle(); }
             if(typeof showPage==="function"){ showPage("home"); }
+            if(typeof window.rpgAlert==="function"){
+                void window.rpgAlert(
+                    "自動補品已用完，元素匣已停止巡練並返回主城。\n請補充補品後，再重新啟動元素匣。",
+                    {title:"補品不足",confirmText:"知道了",danger:true}
+                );
+            }else if(typeof alert==="function"){
+                alert(emptyPotionMessage);
+            }
         }
         return consumed;
     }

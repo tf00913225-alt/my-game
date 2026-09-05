@@ -138,14 +138,14 @@ test("the enlarged three-character horizontal roster still fits above the unchan
 });
 
 test("development cache and visible version stay synchronized",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.49"/);
-    assert.match(index,/<title>四象江湖傳 V173\.49<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.49"[\s\S]*?>V173\.49<\/div>/);
-    assert.match(index,/css\/00-main\.css\?v=173\.49/);
-    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.49/);
-    assert.match(index,/js\/00-main\.js\?v=173\.49/);
-    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.49/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.49/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.50"/);
+    assert.match(index,/<title>四象江湖傳 V173\.50<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.50"[\s\S]*?>V173\.50<\/div>/);
+    assert.match(index,/css\/00-main\.css\?v=173\.50/);
+    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.50/);
+    assert.match(index,/js\/00-main\.js\?v=173\.50/);
+    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.50/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.50/);
 });
 
 console.log("\n"+passed+" V173.39 main-city lobby tests passed.");
