@@ -63,22 +63,43 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
   const content=document.getElementById('tabContent');
   const modal=document.getElementById('homeFeatureModal');
   const snapshots=[];
-  const card='<div class="v17345-equipment-card"><div class="v17345-equipment-icon">裝</div><b>測試裝備</b><span>普通裝備</span><button>售價待定</button></div>';
-  const pages=['equipment','potion','equipment','potion','equipment'];
   function rect(el){
     const r=el.getBoundingClientRect();
     return {left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom};
   }
+  function equipmentCard(index){
+    const reforge=index%2===0?'<span class="v17346-reforge-mini">[可冶煉]</span>':'';
+    return '<article class="v17345-equipment-card v17346-shop-card is-affordable">'+
+      '<div class="v17345-equipment-icon v17346-gear-art">裝</div>'+
+      '<b class="v17346-shop-name">測試裝備'+index+'</b>'+
+      '<span class="v17346-shop-slot">衣服</span>'+
+      '<span class="v17346-stat">敏捷 +9</span>'+reforge+
+      '<button class="v17346-shop-buy">4,000 金幣</button></article>';
+  }
+  function potionCard(index){
+    return '<div class="shop-potion-card '+(index%2?'sp':'hp')+'">'+
+      '<div class="shop-potion-card-head"><span class="shop-potion-type">'+(index%2?'SP':'HP')+'</span><span class="shop-potion-stock">持有 0</span></div>'+
+      '<div class="shop-potion-name">測試補品'+index+'</div>'+
+      '<div class="shop-potion-effect">回復最大'+(index%2?'SP':'HP')+'的 30%</div>'+
+      '<div class="shop-potion-purchase-row"><label>數量</label><input class="shop-potion-quantity" value="1"><span class="v146-shop-total">1,500 金幣</span><button class="shop-potion-buy">購買</button></div></div>';
+  }
+  const pages=['equipment','potion','equipment','potion','equipment'];
   pages.forEach(function(page){
     if(page==='equipment'){
       content.className='v17345-equipment-shop';
-      content.innerHTML='<div class="v17345-equipment-wallet"><span>今日裝備商店</span><b>999 金幣</b></div><div class="v17345-equipment-grid">'+card.repeat(12)+'</div><div class="v17345-equipment-refresh"><div><b>刷新商品</b><span>大量內容測試</span></div><button>免費刷新</button></div>';
+      content.innerHTML='<div class="v17345-equipment-wallet"><span>裝備商店</span><b>999 金幣</b></div><div class="v17345-equipment-grid">'+Array.from({length:6},(_,i)=>equipmentCard(i)).join('')+'</div><div class="v17345-equipment-refresh"><div><b>今日刷新 4 / 10</b><span>前5次免費；第6～10次尚未開放。</span></div><button>免費刷新（剩1次）</button></div>';
     }else{
       content.className='shop-potion-interface';
-      content.innerHTML='<div class="shop-potion-note">少量內容</div>';
+      content.innerHTML='<div class="shop-potion-note">只販售 HP／SP 回復藥水</div><div class="v133-shop-tier-note">目前商店階級：初階</div><div class="shop-potion-list">'+Array.from({length:6},(_,i)=>potionCard(i)).join('')+'</div>';
     }
     void box.offsetHeight;
-    snapshots.push({page:page,box:rect(box),header:rect(header),close:rect(close),tabs:rect(tabs),body:rect(body),modal:rect(modal),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight});
+    const equipmentCards=Array.from(content.querySelectorAll('.v17346-shop-card'));
+    const buyButtons=Array.from(content.querySelectorAll('.v17346-shop-buy'));
+    snapshots.push({
+      page:page,box:rect(box),header:rect(header),close:rect(close),tabs:rect(tabs),body:rect(body),modal:rect(modal),content:rect(content),
+      scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,contentScrollHeight:content.scrollHeight,contentClientHeight:content.clientHeight,
+      cardRects:equipmentCards.map(rect),buyRects:buyButtons.map(rect)
+    });
   });
   document.getElementById('result').textContent=JSON.stringify(snapshots);
 })();
@@ -110,10 +131,24 @@ try{
     snapshots.forEach(shot=>{
         assert.ok(shot.box.top>=shot.modal.top-0.25,"panel escaped top edge");
         assert.ok(shot.box.bottom<=shot.modal.bottom+0.25,"panel escaped bottom edge");
+        assert.ok(shot.scrollHeight<=shot.clientHeight+1,`${shot.page} made the shop body scroll`);
+        assert.ok(shot.contentScrollHeight<=shot.contentClientHeight+1,`${shot.page} made the tab content scroll`);
     });
-    assert.ok(snapshots.some(shot=>shot.scrollHeight>shot.clientHeight),"large content never entered the content scroller");
-    assert.ok(snapshots.some(shot=>shot.scrollHeight<=shot.clientHeight+1),"sparse content did not remain sparse inside the fixed frame");
-    console.log("Headless Chrome: shop frame stayed fixed across 5 tab switches");
+
+    snapshots.filter(shot=>shot.page==='equipment').forEach(shot=>{
+        assert.equal(shot.cardRects.length,6,"equipment shop must show six cards on one screen");
+        assert.equal(shot.buyRects.length,6,"each equipment card needs one aligned buy button");
+        const cardHeight=shot.cardRects[0].height;
+        const buttonWidth=shot.buyRects[0].width;
+        const buttonHeight=shot.buyRects[0].height;
+        shot.cardRects.forEach(card=>assert.ok(Math.abs(card.height-cardHeight)<0.25,"equipment card heights are inconsistent"));
+        shot.buyRects.forEach(button=>{
+            assert.ok(Math.abs(button.width-buttonWidth)<0.25,"equipment buy button widths are inconsistent");
+            assert.ok(Math.abs(button.height-buttonHeight)<0.25,"equipment buy button heights are inconsistent");
+        });
+    });
+
+    console.log("Headless Chrome: shop stayed fixed, non-scrollable and aligned across 5 tab switches");
 }finally{
     try{ fs.unlinkSync(fixture); }catch(_){ }
 }
