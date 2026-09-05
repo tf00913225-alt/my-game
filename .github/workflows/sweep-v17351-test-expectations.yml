@@ -16,6 +16,12 @@ jobs:
         with:
           ref: dev
           fetch-depth: 0
+      - name: Ensure asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
       - name: Update current-version test expectations
         run: |
           python - <<'PY'
@@ -27,12 +33,25 @@ jobs:
               ('00-main\\.js\\?v=173\\.50', '00-main\\.js\\?v=173\\.51'),
               ('equipment-progression\\.js\\?v=173\\.50', 'equipment-progression\\.js\\?v=173\\.51'),
               ('53-v173\\.50-inventory-qol\\.js\\?v=173\\.50', '53-v173\\.50-inventory-qol\\.js\\?v=173\\.51'),
+              ('19-stage-v78-character-inventory-runtime\\.js\\?v=173\\.50', '19-stage-v78-character-inventory-runtime\\.js\\?v=173\\.51'),
+              ('<title>四象江湖傳 V173\\.50<\\/title>', '<title>四象江湖傳 V173\\.51<\\/title>'),
+              ('aria-label="目前版本 V173\\.50"', 'aria-label="目前版本 V173\\.51"'),
+              ('>V173\\.50<\\/div>', '>V173\\.51<\\/div>'),
+              ('css\\/00-main\\.css\\?v=173\\.50', 'css\\/00-main\\.css\\?v=173\\.51'),
+              ('css\\/19-stage-v54-main-city-moderate-native-scale\\.css\\?v=173\\.50', 'css\\/19-stage-v54-main-city-moderate-native-scale\\.css\\?v=173\\.51'),
+              ('js\\/16-stage-v54-main-city-runtime\\.js\\?v=173\\.50', 'js\\/16-stage-v54-main-city-runtime\\.js\\?v=173\\.51'),
               ('V_ASSET_VERSION="173.50"', 'V_ASSET_VERSION="173.51"'),
               ('js/20-anonymous-20.js?v=173.50', 'js/20-anonymous-20.js?v=173.51'),
               ('js/00-main.js?v=173.50', 'js/00-main.js?v=173.51'),
               ('js/equipment-progression.js?v=173.50', 'js/equipment-progression.js?v=173.51'),
               ('js/53-v173.50-inventory-qol.js?v=173.50', 'js/53-v173.50-inventory-qol.js?v=173.51'),
+              ('js/19-stage-v78-character-inventory-runtime.js?v=173.50', 'js/19-stage-v78-character-inventory-runtime.js?v=173.51'),
               ('<title>四象江湖傳 V173.50</title>', '<title>四象江湖傳 V173.51</title>'),
+              ('aria-label="目前版本 V173.50"', 'aria-label="目前版本 V173.51"'),
+              ('>V173.50</div>', '>V173.51</div>'),
+              ('css/00-main.css?v=173.50', 'css/00-main.css?v=173.51'),
+              ('css/19-stage-v54-main-city-moderate-native-scale.css?v=173.50', 'css/19-stage-v54-main-city-moderate-native-scale.css?v=173.51'),
+              ('js/16-stage-v54-main-city-runtime.js?v=173.50', 'js/16-stage-v54-main-city-runtime.js?v=173.51'),
           ]
 
           changed=[]
