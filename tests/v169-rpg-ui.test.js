@@ -47,6 +47,8 @@ function loadDialogRuntime(){
     const document={
         activeElement:null,
         body:null,
+        readyState:"loading",
+        addEventListener(){},
         createElement(tagName){
             const listeners={};
             const node={
@@ -114,10 +116,14 @@ function runFlatShopArrangement(resources){
         set innerHTML(_value){},
         get innerHTML(){ return appended.map(card=>card.key).join(","); }
     };
-    const document={createElement(tagName){
-        assert.equal(tagName,"template");
-        return template;
-    }};
+    const document={
+        readyState:"loading",
+        addEventListener(){},
+        createElement(tagName){
+            assert.equal(tagName,"template");
+            return template;
+        }
+    };
     const context={window:null,document,console,Promise,String,Object,Array,Set,Map,Number};
     context.window=context;
     vm.createContext(context);
