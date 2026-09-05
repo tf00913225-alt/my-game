@@ -30,28 +30,14 @@ function enforceTrainingRender(){
             el.style.setProperty("box-sizing","border-box","important");
         });
     }
-    const modal=document.getElementById("trainingZoneModal");
-    if(!modal)return;
-    const box=modal.querySelector(".home-feature-modal-box");
-    const title=modal.querySelector(".home-feature-modal-title");
-    const body=document.getElementById("trainingZoneModalBody");
-    if(box){
-        box.style.setProperty("width","94%","important");
-        box.style.setProperty("max-width","400px","important");
-        box.style.setProperty("max-height","640px","important");
-        box.style.setProperty("overflow-y","auto","important");
-        box.style.setProperty("padding","18px","important");
-    }
-    if(title)title.style.setProperty("font-size","22px","important");
-    if(body){
-        body.style.setProperty("font-size","16px","important");
-        body.style.setProperty("line-height","1.9","important");
-    }
-    modal.querySelectorAll(".home-feature-buy-btn").forEach(function(btn){
-        btn.style.setProperty("font-size","16px","important");
-        btn.style.setProperty("min-height","46px","important");
-        btn.style.setProperty("padding","10px 12px","important");
-    });
+
+    /*
+       The training zone information modal used to receive width/max-height/
+       overflow inline styles here. Those declarations fought the shared UI
+       sizing authority and made the whole frame the scroll owner. Geometry is
+       now owned by css/20-stage-v60-training-only-safety.css; this runtime guard
+       intentionally touches only the training-zone list items above.
+    */
 }
 if(document.readyState==="loading"){
     document.addEventListener("DOMContentLoaded",enforceTrainingRender,{once:true});
