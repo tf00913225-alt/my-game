@@ -50,13 +50,16 @@
 
            練功區地區資訊收斂成 Medium Modal 後，真正 scroll owner
            改為 #trainingZoneModalBody；外框只負責固定尺寸。
+
+           狀態／能力說明收斂成 Medium Modal 後，真正 scroll owner
+           是 #statusHelpModal 內的 .item-stat-list；外框與返回鍵固定。
         */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
             ".home-feature-modal-box, #homeFeatureModalBody, #trainingZoneModalBody, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .inventory-character-detail-grid, .item-modal-box, #itemModalStats, #skillDetailStats, " +
-            ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .v17342-abyss-battle-log, .v143-item-picker, " +
+            "#statusHelpModal .item-stat-list, .skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .v17342-abyss-battle-log, .v143-item-picker, " +
             "textarea, select, input";
 
         let node =
