@@ -215,3 +215,44 @@
         font-size:12px;
     }
 }
+
+/*
+   Unified Large Panel ownership for the all-element skill preview.
+   V141 reparents this modal to <body>, so it cannot inherit the stage-scoped
+   design tokens. Use the shared token names with their current canonical
+   fallbacks, keep heading/tabs fixed, and let only the skill list scroll.
+*/
+html body .skill-preview-modal.v141-body-preview .skill-preview-dialog{
+    width:min(var(--ui-large-panel-max-width,396px),calc(100vw - var(--ui-large-panel-safe-space,24px))) !important;
+    max-width:var(--ui-large-panel-max-width,396px) !important;
+    height:min(var(--ui-large-panel-height,620px),calc(100dvh - var(--ui-large-panel-safe-space,24px))) !important;
+    max-height:calc(100dvh - var(--ui-large-panel-safe-space,24px)) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+
+html body .skill-preview-modal.v141-body-preview .skill-preview-heading,
+html body .skill-preview-modal.v141-body-preview .skill-preview-tabs{
+    flex:0 0 auto !important;
+}
+
+html body .skill-preview-modal.v141-body-preview .skill-preview-tabs button{
+    min-height:var(--ui-large-panel-tab-height,42px) !important;
+}
+
+html body .skill-preview-modal.v141-body-preview .skill-preview-body{
+    flex:1 1 auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    padding-bottom:12px !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
+}
