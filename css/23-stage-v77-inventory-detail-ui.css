@@ -1,7 +1,7 @@
 
 /*
  * V81 cleanup：V77 的虛擬 translateY 捲動維持停用。
- * 這裡只保留仍在使用的 HP/SP 與角色詳細資訊 UI；
+ * 這裡只保留仍在使用的 HP/SP 與角色／技能詳細資訊 UI；
  * 背包不再保留第二套 virtual-scroll CSS 來源。
  */
 
@@ -31,7 +31,7 @@
     background:rgba(0,0,0,.22) !important;
 }
 
-/* 立繪框右上角放大鏡 */
+/* 立繪框右上角角色詳細按鈕 */
 #game-stage #inventoryPage .inventory-portrait-frame{
     position:relative !important;
 }
@@ -113,5 +113,43 @@
 
 #inventoryCharacterDetailModal .close-item-button{
     flex:0 0 auto !important;
+    margin-top:0 !important;
+}
+
+/*
+   技能詳細正式歸入 Medium Modal：外框尺寸由共用 token 決定，
+   技能圖示／名稱／返回鍵固定，只有 #skillDetailStats 負責捲動。
+   技能說明多寡不得再改變整個視窗大小。
+*/
+#game-stage #skillDetailModal .item-modal-box{
+    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    max-width:var(--ui-medium-modal-max-width,360px) !important;
+    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:var(--ui-medium-modal-content-gap,10px) !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+    touch-action:pan-y !important;
+}
+#game-stage #skillDetailModal #skillDetailIcon,
+#game-stage #skillDetailModal #skillDetailName,
+#game-stage #skillDetailModal .close-item-button{
+    flex:0 0 auto !important;
+}
+#game-stage #skillDetailModal #skillDetailStats{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
+}
+#game-stage #skillDetailModal .close-item-button{
     margin-top:0 !important;
 }
