@@ -64,9 +64,12 @@ body.v162-element-box-settings-open #homeFeatureModalBody{
     scroll-padding-bottom:24px !important;
 }
 body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-panel{
+    position:static !important;
+    inset:auto !important;
     display:flex !important;
     flex:0 0 auto !important;
     width:100% !important;
+    height:auto !important;
     min-height:0 !important;
     max-height:none !important;
     flex-direction:column !important;
