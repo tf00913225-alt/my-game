@@ -7,8 +7,8 @@ const cp=require("node:child_process");
 
 const shared=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
 
-assert.match(shared,/#inventoryPage\.inventory-page-classic:not\(\.map-inventory-overlay-open\) \.inventory-classic-shell\{[\s\S]*?width:calc\(100% - var\(--ui-large-panel-safe-space\)\) !important;[\s\S]*?max-width:var\(--ui-large-panel-max-width\) !important;/);
-assert.match(shared,/#inventoryPage\.map-inventory-overlay-open\{[\s\S]*?left:50% !important;[\s\S]*?top:12px !important;[\s\S]*?bottom:82px !important;[\s\S]*?max-width:var\(--ui-large-panel-max-width\) !important;[\s\S]*?transform:translateX\(-50%\) !important;/);
+assert.match(shared,/#app\.on-inventory-page #inventoryPage\.inventory-page-classic:not\(\.map-inventory-overlay-open\) \.inventory-classic-shell\{[\s\S]*?width:calc\(100% - var\(--ui-large-panel-safe-space\)\) !important;[\s\S]*?max-width:var\(--ui-large-panel-max-width\) !important;/);
+assert.match(shared,/#game-content #inventoryPage\.map-inventory-overlay-open\{[\s\S]*?left:50% !important;[\s\S]*?top:12px !important;[\s\S]*?bottom:82px !important;[\s\S]*?max-width:var\(--ui-large-panel-max-width\) !important;[\s\S]*?transform:translateX\(-50%\) !important;/);
 assert.match(shared,/\.map-inventory-overlay-open \.inventory-classic-shell\{[\s\S]*?width:100% !important;[\s\S]*?margin:0 !important;/);
 assert.match(shared,/\.map-inventory-overlay-open \.map-inventory-overlay-close\{[\s\S]*?min-width:72px !important;[\s\S]*?height:42px !important;[\s\S]*?font-size:15px !important;/);
 assert.match(shared,/\.map-inventory-overlay-open \.inventory-grid-scroll\{[\s\S]*?scrollbar-gutter:stable !important;/);
@@ -33,22 +33,27 @@ const fileUrl="file://"+fixture.replace(/\\/g,"/");
 const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/00-main.css">
 <link rel="stylesheet" href="css/22-stage-v78-character-inventory-core.css">
+<link rel="stylesheet" href="css/24-stage-v85-inventory-inner-grid-scroll-root.css">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
 #game-stage,#app,#game-content{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;}
-#inventoryPage{display:block!important;position:absolute;inset:0;}
+.content{position:absolute!important;inset:0!important;width:420px!important;box-sizing:border-box!important;}
+#inventoryPage{display:block!important;}
 .inventory-character-panel{height:120px;}.inventory-right-panel{height:360px;}.inventory-grid-scroll{height:180px;overflow-y:auto!important;}
-</style></head><body><div id="game-stage"><div id="app"><div id="game-content">
+</style></head><body><div id="game-stage"><div id="app" class="on-inventory-page"><div id="game-content"><div class="content">
 <div id="inventoryPage" class="page inventory-page-classic"><div class="inventory-classic-shell"><button class="map-inventory-overlay-close">返回</button><div class="inventory-character-switch">角色</div><div class="inventory-character-panel"></div><div class="inventory-right-panel"><div class="inventory-grid-scroll">${'<div style="height:400px"></div>'}</div></div></div></div>
-</div></div></div><pre id="result"></pre><script>
+</div></div></div></div><pre id="result"></pre><script>
 (function(){
+ const app=document.getElementById('app');
  const page=document.getElementById('inventoryPage');
  const shell=page.querySelector('.inventory-classic-shell');
  const close=page.querySelector('.map-inventory-overlay-close');
  const grid=page.querySelector('.inventory-grid-scroll');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
+ void page.offsetHeight;
  const standalone={page:rect(page),shell:rect(shell)};
+ app.classList.remove('on-inventory-page');
  page.classList.add('map-inventory-overlay-open'); void page.offsetHeight;
  const overlay={page:rect(page),shell:rect(shell),close:rect(close),grid:rect(grid),gutter:getComputedStyle(grid).scrollbarGutter};
  document.getElementById('result').textContent=JSON.stringify({standalone,overlay});
