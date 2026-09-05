@@ -3,10 +3,10 @@
 ===================================================== */
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active{
-    grid-template-columns:minmax(0,1fr) minmax(92px,106px) minmax(86px,100px);
-    gap:5px;
-    min-height:64px;
-    padding:6px 8px;
+    grid-template-columns:minmax(0,1fr) minmax(108px,120px);
+    gap:8px;
+    min-height:70px;
+    padding:9px 10px;
     overflow:visible;
     box-sizing:border-box;
 }
@@ -21,97 +21,177 @@
     overflow:visible;
 }
 
-/* Element Box owns no scroll surface. The whole settings sheet is fitted inside
-   the stage so every control and the remaining-time row stay visible at once. */
+/*
+   Element Box and battle auto-settings are the same tool surface. Keep one
+   Medium Modal frame in both entry contexts. The title and compact status row
+   remain visible; #homeFeatureModalBody is the single vertical scroll owner so
+   the final recovery/time controls can always be reached on a phone.
+*/
 body.v162-element-box-settings-open #homeFeatureModal{
     overflow:hidden !important;
 }
 body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-box{
-    width:min(96%,480px) !important;
-    max-height:calc(100% - 12px) !important;
-    height:auto !important;
-    padding:8px 10px !important;
+    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    max-width:var(--ui-medium-modal-max-width,360px) !important;
+    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:var(--ui-medium-modal-content-gap,10px) !important;
+    padding:12px !important;
     overflow:hidden !important;
-    overscroll-behavior:none !important;
-}
-body.v162-element-box-settings-open #homeFeatureModalBody{
-    max-height:none !important;
-    overflow:hidden !important;
-    overscroll-behavior:none !important;
-    touch-action:manipulation !important;
-}
-body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-panel{
     box-sizing:border-box !important;
-    gap:4px !important;
-    max-height:none !important;
-    padding:0 1px 2px !important;
-    overflow:visible !important;
 }
 body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-title{
-    margin-bottom:4px !important;
-    padding-bottom:4px !important;
+    flex:0 0 auto !important;
+    margin-bottom:0 !important;
+    padding:0 2px 9px !important;
     font-size:20px !important;
-    line-height:1.15 !important;
+    line-height:1.2 !important;
+}
+body.v162-element-box-settings-open #homeFeatureModalBody{
+    display:block !important;
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
+    scroll-padding-bottom:24px !important;
+}
+body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-panel{
+    position:static !important;
+    inset:auto !important;
+    display:flex !important;
+    flex:0 0 auto !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    flex-direction:column !important;
+    gap:8px !important;
+    padding:0 2px 24px !important;
+    overflow:visible !important;
+    box-sizing:border-box !important;
+}
+body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status{
+    position:sticky !important;
+    top:0 !important;
+    z-index:7 !important;
+    flex:0 0 auto !important;
+    margin-bottom:0 !important;
+    background:
+        linear-gradient(110deg,rgba(100,58,18,.26),rgba(18,13,9,.96) 52%),
+        linear-gradient(180deg,#21170d,#120e0a) !important;
+    box-shadow:
+        inset 0 0 18px rgba(240,180,41,.045),
+        0 8px 14px rgba(0,0,0,.34) !important;
+}
+
+/* Active mode only needs the real stop action. Hiding the disabled duplicate
+   "先停止後設定" button prevents the status row from consuming two rows. */
+#autoBattleSettingsPanel.v131-element-box-panel.v17342-settings-locked #autoBattleButton{
+    display:none !important;
 }
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status{
-    min-height:58px;
-    padding:6px 8px;
+    min-height:70px;
+    padding:9px 10px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status-copy strong{
     font-size:16px;
-    line-height:18px;
+    line-height:20px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status-copy small{
-    font-size:8px;
-    line-height:9px;
+    font-size:11px;
+    line-height:14px;
+}
+#autoBattleSettingsPanel.v131-element-box-panel .auto-panel-kicker{
+    font-size:10px;
+    line-height:12px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-setting-card{
-    min-height:44px;
-    padding:4px 7px;
+    min-height:56px;
+    padding:8px 9px;
+}
+#autoBattleSettingsPanel.v131-element-box-panel .auto-setting-meta span{
+    font-size:10px;
+    line-height:13px;
+}
+#autoBattleSettingsPanel.v131-element-box-panel .auto-setting-meta strong{
+    font-size:13px;
+    line-height:16px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-card{
-    padding:5px;
+    padding:8px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-head{
-    margin-bottom:3px;
+    margin-bottom:7px;
+}
+#autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-head strong{
+    font-size:12px;
+    line-height:15px;
+}
+#autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-head small{
+    font-size:10px;
+    line-height:13px;
+    white-space:normal;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-return-card{
-    min-height:44px;
-    padding:4px 7px;
+    min-height:56px;
+    padding:8px 9px;
+}
+#autoBattleSettingsPanel.v131-element-box-panel .auto-return-copy strong{
+    font-size:12px;
+    line-height:15px;
+}
+#autoBattleSettingsPanel.v131-element-box-panel .auto-return-copy small{
+    font-size:10px;
+    line-height:13px;
 }
 #autoBattleSettingsPanel.v131-element-box-panel #v131ElementBoxStats{
-    margin:1px 0 0 !important;
-    padding:6px 7px !important;
+    margin:2px 0 0 !important;
+    padding:8px 9px !important;
 }
 #autoBattleSettingsPanel.v131-element-box-panel #v131ElementBoxStats > small{
-    display:none !important;
+    display:block !important;
+    font-size:11px !important;
+    line-height:1.45 !important;
 }
-#autoBattleSettingsPanel.v131-element-box-panel .v141-element-box-remaining{
-    min-height:34px !important;
-}
+#autoBattleSettingsPanel.v131-element-box-panel .v141-element-box-remaining,
 #autoBattleSettingsPanel.v131-element-box-panel .v141-element-box-ad{
-    min-height:36px !important;
+    min-height:44px !important;
 }
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status #autoBattleButton{
     width:100% !important;
     min-width:0 !important;
-    height:38px !important;
-    padding-inline:5px !important;
+    height:44px !important;
+    min-height:44px !important;
+    padding-inline:7px !important;
+}
+
+#autoBattleSettingsPanel.v131-element-box-panel .auto-premium-dropdown .custom-dropdown-label,
+#autoBattleSettingsPanel.v131-element-box-panel .auto-settings-actions .main-button{
+    min-height:44px !important;
 }
 
 #autoBattleSettingsPanel .v169-element-box-stop{
     width:100%;
-    height:38px;
+    height:44px;
+    min-height:44px;
     min-width:0;
-    padding:0 5px;
+    padding:0 7px;
     border:1px solid #8f4c35;
     border-radius:9px;
     color:#ffd9b0;
     background:linear-gradient(180deg,rgba(126,43,29,.92),rgba(54,18,13,.98));
     box-shadow:inset 0 1px 0 rgba(255,226,146,.1),0 3px 0 #260a06,0 5px 10px rgba(0,0,0,.28);
-    font:900 11px/1 sans-serif;
+    font:900 12px/1 sans-serif;
     letter-spacing:.03em;
     cursor:pointer;
     touch-action:manipulation;
@@ -127,11 +207,8 @@ body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-title{
 
 @media (max-width:380px){
     #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active{
-        grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-        min-height:96px;
-    }
-    #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active .auto-premium-status-copy{
-        grid-column:1/-1;
+        grid-template-columns:minmax(0,1fr) minmax(102px,112px);
+        min-height:74px;
     }
 }
 
@@ -139,7 +216,7 @@ body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-title{
 #autoBattleSettingsPanel .v17342-element-box-shared{
     display:block;
     margin:4px 0 0;
-    padding:6px;
+    padding:8px;
     border:1px solid rgba(193,144,67,.62);
     border-radius:11px;
     background:linear-gradient(160deg,rgba(42,30,18,.92),rgba(10,9,7,.96));
@@ -149,20 +226,20 @@ body.v162-element-box-settings-open #homeFeatureModal .home-feature-modal-title{
     align-items:center;
     justify-content:space-between;
     gap:6px;
-    margin-bottom:3px;
+    margin-bottom:5px;
     color:#f2ce83;
 }
 #autoBattleSettingsPanel .v17342-element-box-shared-head b{font-size:13px;}
-#autoBattleSettingsPanel .v17342-element-box-shared-head span{font-size:10px;color:#bba57a;}
+#autoBattleSettingsPanel .v17342-element-box-shared-head span{font-size:11px;color:#bba57a;}
 #autoBattleSettingsPanel .v17342-element-box-lock-notice{
-    margin:3px 0;
-    padding:5px 7px;
+    margin:4px 0;
+    padding:7px 8px;
     border:1px solid rgba(216,89,59,.72);
     border-radius:9px;
     color:#ffd7b8;
     background:rgba(80,25,17,.86);
-    font-size:11px;
-    line-height:1.2;
+    font-size:12px;
+    line-height:1.35;
     font-weight:900;
     text-align:center;
 }
