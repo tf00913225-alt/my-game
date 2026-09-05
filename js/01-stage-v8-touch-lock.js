@@ -42,12 +42,17 @@
            overflow-y，因此即使畫面已出現橫向 scrollbar，手指左右
            滑仍會被全域 touch lock 阻擋。現在同一份權威判斷同時
            接受真正可捲動的 X/Y 軸，避免再為單一頁面另做事件補丁。
+
+           角色詳細能力視窗的真正 scroll owner 是
+           .inventory-character-detail-grid；外框
+           .inventory-character-detail-box 本身是 overflow:hidden，
+           不能替內容區通過觸控鎖。把真正內容層加入同一白名單。
         */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
             ".home-feature-modal-box, #homeFeatureModalBody, .auto-settings-expanded, " +
-            ".inventory-character-detail-box, .item-modal-box, #itemModalStats, #skillDetailStats, " +
+            ".inventory-character-detail-box, .inventory-character-detail-grid, .item-modal-box, #itemModalStats, #skillDetailStats, " +
             ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .v17342-abyss-battle-log, .v143-item-picker, " +
             "textarea, select, input";
 
