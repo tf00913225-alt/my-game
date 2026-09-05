@@ -253,6 +253,44 @@
         };
     }
 
+    function markPurifyMindDualTargets(){
+        if(typeof document==="undefined"){ return; }
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.purifyMind:null;
+        if(!skill||typeof pendingAction==="undefined"||pendingAction!=="purifyMind"){ return; }
+        if(typeof currentBattleMonsters!=="undefined"){
+            currentBattleMonsters.forEach(index=>{
+                const monster=typeof monsters!=="undefined"?monsters[index]:null;
+                const card=document.getElementById("battleMonster"+index);
+                if(card){
+                    card.classList.toggle("targetable",!!(monster&&monster.alive!==false&&numeric(monster.hp)>0));
+                }
+            });
+        }
+        livingPartyIndexes().forEach(index=>{
+            const card=document.getElementById("battlePlayerCard"+index);
+            if(card){ card.classList.add("ally-targetable"); }
+        });
+        const prompt=document.getElementById("battleTargetPromptAction");
+        if(prompt){ prompt.textContent="選擇 [淨心訣] 的我方或敵方目標"; }
+        const targetText=document.getElementById("battleTarget");
+        if(targetText){ targetText.textContent="目標：請選擇我方或敵方角色"; }
+    }
+
+    if(typeof prepareAction==="function"){
+        const previousPrepareAction=prepareAction;
+        prepareAction=function(type){
+            const result=previousPrepareAction.apply(this,arguments);
+            if(
+                type==="purifyMind"&&
+                typeof actionReady!=="undefined"&&actionReady&&
+                typeof pendingAction!=="undefined"&&pendingAction==="purifyMind"
+            ){
+                markPurifyMindDualTargets();
+            }
+            return result;
+        };
+    }
+
     if(typeof clearBattleTargetSelectionMode==="function"){
         const previousClearTargetMode=clearBattleTargetSelectionMode;
         clearBattleTargetSelectionMode=function(){
@@ -484,7 +522,45 @@
         return finishSupport();
     }
 
+    function clearEnemyPositiveStates(enemy){
+        (enemy&&Array.isArray(enemy.v141TeamBuffs)?enemy.v141TeamBuffs:[]).forEach(buff=>{
+            if(!buff){ return; }
+            if(buff.type==="rage"){
+                if(Number.isFinite(Number(buff.originalAttack))){ enemy.attack=Number(buff.originalAttack); }
+                if(Number.isFinite(Number(buff.originalMagicAttack))){ enemy.magicAttack=Number(buff.originalMagicAttack); }
+            }else if(buff.type==="resistance"){
+                enemy.resistance=Math.max(0,numeric(enemy.resistance)-numeric(buff.amount));
+            }else if(buff.type==="dodge"&&Number.isFinite(Number(buff.originalEvasion))){
+                enemy.evasion=Number(buff.originalEvasion);
+            }
+        });
+        if(enemy){
+            enemy.v141TeamBuffs=[];
+            enemy.activeBuffs=[];
+            if(enemy.v141Shield){ enemy.v141Shield=null; }
+        }
+    }
+
     function resolvePartyStateClear(characterIndex,queued,skill,state){
+        const enemyIndex=skill.id==="purifyMind"&&Number.isInteger(queued.target)&&!Number.isInteger(queued.targetAlly)
+            ?queued.target:null;
+        if(enemyIndex!==null){
+            const enemy=typeof monsters!=="undefined"?monsters[enemyIndex]:null;
+            const isCurrent=typeof currentBattleMonsters!=="undefined"&&currentBattleMonsters.includes(enemyIndex);
+            if(!enemy||!isCurrent||enemy.alive===false||numeric(enemy.hp)<=0){
+                return finishSupport(skill.name+"目前沒有有效目標。");
+            }
+            animateSupportCast(state,characterIndex,skill);
+            clearEnemyPositiveStates(enemy);
+            if(typeof window.v141PlayCardEffect==="function"){
+                window.v141PlayCardEffect("monster",enemyIndex,"buff");
+            }
+            return finishSupport(
+                (state.character.id||"角色")+"施放"+skill.name+"，解除"+
+                (enemy.name||("敵人"+(enemyIndex+1)))+"身上所有增益狀態；負面狀態保留。"
+            );
+        }
+
         const targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
         const target=getPartyCharacterByIndex(targetIndex);
         if(!target||numeric(target.hp)<=0){ return finishSupport(skill.name+"目前沒有有效目標。"); }
@@ -959,7 +1035,10 @@
         const sequence=dailyDungeonSequence;
         if(!sequence||sequence.waveIndex>=2){ return false; }
         sequence.totalTurns+=Math.max(1,Math.floor(numeric(typeof turn!=="undefined"?turn:1)));
-        battleActive=false;
+        /* This is still the same battle session.  Keeping the battle flag true
+           prevents the Element Box out-of-battle recovery loop from firing in
+           the short handoff between two waves. */
+        battleActive=true;
         actionReady=false;
         pendingAction=null;
         resetBattleAdvanceTimers();
@@ -1009,6 +1088,11 @@
             grant(1);
         }
     };
+
+    function goldDungeonReward(level){
+        return Math.max(0,Math.floor(2000+Math.max(1,numeric(level))*50));
+    }
+    window.v148GetGoldDungeonReward=goldDungeonReward;
 
     function showDailyGoldReward(amount){
         pendingDailyGoldReward=Math.max(0,Math.floor(numeric(amount)));
@@ -1142,40 +1226,51 @@
         };
     }
 
-    /* ----- Quest notification: only a reward-ready quest gets the icon dot. ----- */
-    function questRewardReady(){
-        if(typeof ensureDailyQuestsCurrent==="function"){ ensureDailyQuestsCurrent(); }
-        const groups=[];
-        if(typeof dailyQuestDefinitions!=="undefined"&&typeof dailyQuestState!=="undefined"){
-            groups.push([dailyQuestDefinitions,dailyQuestState]);
-        }
-        if(typeof commissionQuestDefinitions!=="undefined"&&typeof commissionQuestState!=="undefined"){
-            groups.push([commissionQuestDefinitions,commissionQuestState]);
-        }
-        return groups.some(([definitions,state])=>(definitions||[]).some(quest=>
-            quest&&state&&state.claimed&&!state.claimed[quest.id]&&
+    /* ----- Quest notification: a ready commission lights its own tab too. ----- */
+    function questGroupRewardReady(definitions,state){
+        return !!(definitions&&state&&state.claimed&&(definitions||[]).some(quest=>
+            quest&&!state.claimed[quest.id]&&
             numeric(state.progress&&state.progress[quest.id])>=Math.max(1,numeric(quest.goal)||1)
         ));
     }
 
-    function setQuestNoticeDot(target,show){
+    function questRewardNoticeState(){
+        if(typeof ensureDailyQuestsCurrent==="function"){ ensureDailyQuestsCurrent(); }
+        const daily=typeof dailyQuestDefinitions!=="undefined"&&typeof dailyQuestState!=="undefined"
+            ?questGroupRewardReady(dailyQuestDefinitions,dailyQuestState):false;
+        const commission=typeof commissionQuestDefinitions!=="undefined"&&typeof commissionQuestState!=="undefined"
+            ?questGroupRewardReady(commissionQuestDefinitions,commissionQuestState):false;
+        return {daily:daily,commission:commission,any:daily||commission};
+    }
+
+    function questRewardReady(){ return questRewardNoticeState().any; }
+
+    function setQuestNoticeDot(target,show,label){
         if(!target||!target.querySelector){ return; }
         let dot=target.querySelector(":scope > .v141-notice-dot");
         if(show&&!dot&&typeof document!=="undefined"){
             dot=document.createElement("span");
             dot.className="v141-notice-dot";
-            dot.setAttribute("aria-label","任務獎勵可領取");
+            dot.setAttribute("aria-label",label||"任務獎勵可領取");
             target.appendChild(dot);
         }else if(!show&&dot){ dot.remove(); }
     }
 
     function syncQuestNoticeDots(){
         if(typeof document==="undefined"){ return; }
-        const show=questRewardReady();
+        const notices=questRewardNoticeState();
         const home=document.getElementById("homeIconQuest");
-        setQuestNoticeDot(home&&home.parentElement?home.parentElement:home,show);
+        setQuestNoticeDot(home&&home.parentElement?home.parentElement:home,notices.any,"任務獎勵可領取");
         document.querySelectorAll("#mapPageNav button[aria-label='任務'],#v141DungeonNav button[aria-label='任務']")
-            .forEach(button=>setQuestNoticeDot(button,show));
+            .forEach(button=>setQuestNoticeDot(button,notices.any,"任務獎勵可領取"));
+        document.querySelectorAll("#homeFeatureModal.quest-mode .quest-tab").forEach(tab=>{
+            const marker=((tab.getAttribute("onclick")||"")+" "+(tab.textContent||"")).toLowerCase();
+            if(marker.includes("commission")||marker.includes("委託")){
+                setQuestNoticeDot(tab,notices.commission,"委託任務獎勵可領取");
+            }else if(marker.includes("daily")||marker.includes("每日")){
+                setQuestNoticeDot(tab,notices.daily,"每日任務獎勵可領取");
+            }
+        });
     }
     window.v148SyncQuestNoticeDots=syncQuestNoticeDots;
 

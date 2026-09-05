@@ -180,8 +180,8 @@ test("set bonuses and skill costs are visible before extra detail clicks",()=>{
 });
 
 test("current cache version reaches the loader and all dynamic assets",()=>{
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.44/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.44"/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.45/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.45"/);
 });
 
 console.log("\nV138 feature suite: "+passed+" tests passed.");

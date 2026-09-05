@@ -101,10 +101,10 @@ test("long character tabs retain the canonical internal scroll owner",()=>{
 });
 
 test("the development release advances to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.44"/);
-    assert.match(index,/<title>四象江湖傳 V173\.44<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.44"/);
-    assert.match(index,/>V173\.44<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.45"/);
+    assert.match(index,/<title>四象江湖傳 V173\.45<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.45"/);
+    assert.match(index,/>V173\.45<\/div>/);
 });
 
 console.log("\n"+passed+" V173.39 character-shell regression tests passed.");

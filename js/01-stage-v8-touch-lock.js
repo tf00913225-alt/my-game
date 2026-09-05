@@ -30,13 +30,20 @@
            這是原本就存在的bug，只是內容字級變大、真的需要
            捲動才會看到內容之後才會被踩到——之前字級小、
            內容剛好塞得進viewport，從來沒真的需要捲動過。
+
+           V173.45 shop frame hotfix：商店改成固定 Large Panel 後，
+           真正的內容 scroll owner 是 #homeFeatureModalBody。
+           外框 .home-feature-modal-box 只負責固定尺寸且 overflow:hidden，
+           因此不能代替內頁通過觸控鎖；把真正 scroll owner 納入
+           同一份權威白名單，避免再次出現「看得到 scrollbar、
+           但手指滑不動」的假捲動狀態。
         */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
-            ".home-feature-modal-box, .auto-settings-expanded, " +
+            ".home-feature-modal-box, #homeFeatureModalBody, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .item-modal-box, #itemModalStats, #skillDetailStats, " +
-            ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, " +
+            ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .v17342-abyss-battle-log, " +
             "textarea, select, input";
 
         let node =

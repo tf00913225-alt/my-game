@@ -1,4 +1,4 @@
-# V173.44 finalized: this workflow publishes the current dev branch to the stable preview URL.
+# V173.45 finalized: this workflow publishes the current dev branch to the stable preview URL.
 name: Deploy dev to Cloudflare Pages
 
 on:

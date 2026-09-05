@@ -32,7 +32,7 @@
     const SUB_STATS=["vitality","energy","agility","spirit"];
     const TALISMAN_GOLD={low:300,mid:1000,high:3000};
     const synthesisState={
-        tab:"craft",blueprintId:null,seriesId:"setFire",reforgeUid:null,
+        tab:"reforge",blueprintId:null,seriesId:"setFire",reforgeUid:null,
         talismanId:null,talismanQty:1,fragmentQty:{setFire:1,setWater:1,setEarth:1,setWind:1},
         pendingReforge:null
     };
@@ -190,7 +190,7 @@
 
     function renderSynthesisTabs(){
         const tabs=[
-            ["craft","裝備合成"],["reforge","裝備冶煉"],["talisman","符咒合成"],["fragment","碎片合成"]
+            ["reforge","裝備冶煉"],["talisman","符咒合成"],["fragment","碎片合成"]
         ];
         return '<div class="v141-synthesis-tabs">'+tabs.map(([id,label])=>
             '<button type="button" class="'+(synthesisState.tab===id?'active':'')+'" onclick="v141SwitchSynthesisTab(\''+id+'\')">'+label+'</button>'
@@ -313,11 +313,17 @@
     function renderSynthesis(){
         const body=document.getElementById("homeFeatureModalBody");
         if(!body){ return; }
-        const content={craft:renderCraftTab,reforge:renderReforgeTab,talisman:renderTalismanTab,fragment:renderFragmentTab}[synthesisState.tab]();
+        const renderers={reforge:renderReforgeTab,talisman:renderTalismanTab,fragment:renderFragmentTab};
+        if(!renderers[synthesisState.tab]){ synthesisState.tab="reforge"; }
+        const content=renderers[synthesisState.tab]();
         body.innerHTML='<div class="v141-synthesis"><div class="v141-synthesis-wallet"><span>合成</span><b>金幣 '+Math.floor(gold).toLocaleString('zh-TW')+'</b></div>'+renderSynthesisTabs()+'<div class="v141-synthesis-body">'+content+'</div></div>';
     }
     window.v141RenderSynthesis=renderSynthesis;
-    window.v141SwitchSynthesisTab=function(tab){ synthesisState.tab=tab; synthesisState.pendingReforge=null; renderSynthesis(); };
+    window.v141SwitchSynthesisTab=function(tab){
+        synthesisState.tab=["reforge","talisman","fragment"].includes(tab)?tab:"reforge";
+        synthesisState.pendingReforge=null;
+        renderSynthesis();
+    };
     window.v141SelectCraftBlueprint=function(id){ synthesisState.blueprintId=id; renderSynthesis(); };
     window.v141SelectCraftSeries=function(id){ synthesisState.seriesId=id; renderSynthesis(); };
     window.v141SelectReforgeItem=function(uid){ synthesisState.reforgeUid=uid; synthesisState.pendingReforge=null; renderSynthesis(); };
@@ -771,7 +777,7 @@
         };
     }
 
-    function bossPosition(){ return [50,33]; }
+    function bossPosition(){ return [61,21]; }
     const ABYSS_DIALOGUE={
         1:["凡人也敢踏入帝境？","黃沙會埋葬你的名字。","先過天兵這一關再說！"],
         2:["烈火會把你的勇氣燒光。","再向前一步，便是灰燼。","你撐不過南天之焰！"],
@@ -811,7 +817,7 @@
             '<div id="v141AbyssMap" class="v141-abyss-map floor-'+floor+'" onclick="v141AbyssMoveByEvent(event)">'+
             '<div id="v141AbyssSpeech" class="v141-abyss-speech"></div>'+boss+portal+chest+
             '<div id="v141AbyssPlayer" class="v141-abyss-player" style="left:'+abyssState.x+'%;top:'+abyssState.y+'%"><span></span><small>玩家</small></div></div>'+
-            '<section class="v17342-abyss-battle-info" aria-label="戰鬥資訊"><b>戰鬥資訊</b><div>'+abyssBattleInfoMarkup()+'</div></section></div>';
+            '<section class="v17342-abyss-battle-info" aria-label="戰鬥資訊"><b>戰鬥資訊</b><div class="v17342-abyss-battle-log">'+abyssBattleInfoMarkup()+'</div></section></div>';
     }
 
     function syncAbyssPlayerArt(){
