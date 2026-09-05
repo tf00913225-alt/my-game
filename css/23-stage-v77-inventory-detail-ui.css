@@ -61,13 +61,16 @@
     z-index:9000 !important;
 }
 #inventoryCharacterDetailModal .inventory-character-detail-box{
-    width:min(88vw,520px) !important;
-    max-width:520px !important;
-    max-height:calc(100% - 20px) !important;
+    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    max-width:var(--ui-medium-modal-max-width,360px) !important;
+    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
+    gap:var(--ui-medium-modal-content-gap,10px) !important;
     overflow:hidden !important;
+    box-sizing:border-box !important;
 }
 #inventoryCharacterDetailModal .inventory-character-detail-grid{
     display:grid !important;
@@ -76,13 +79,14 @@
     width:100% !important;
     min-height:0 !important;
     flex:1 1 auto !important;
-    margin:12px 0 10px !important;
-    padding:0 2px 4px 0 !important;
+    margin:0 !important;
+    padding:2px 2px 4px 0 !important;
     overflow-x:hidden !important;
     overflow-y:auto !important;
     overscroll-behavior-y:contain !important;
     -webkit-overflow-scrolling:touch !important;
     touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
 }
 .inventory-character-detail-row{
     display:flex !important;
