@@ -157,3 +157,22 @@
 #game-stage #skillDetailModal .close-item-button{
     margin-top:0 !important;
 }
+
+/*
+   藥水不是裝備檢視器：權威 openItemModal 只會在 potion 將
+   #itemEquipButton 設為 disabled，因此可用這個既有狀態區分功能層級。
+   藥水採緊湊型物品操作視窗，資訊與操作列自然收合；裝備仍維持
+   540px Medium Modal 與內部捲動。這不是依內容量臨時改尺寸。
+*/
+#game-stage #itemModal .item-modal-box:has(#itemEquipButton:disabled){
+    height:auto !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    min-height:0 !important;
+}
+#game-stage #itemModal .item-modal-box:has(#itemEquipButton:disabled) #itemModalStats{
+    flex:0 1 auto !important;
+    max-height:180px !important;
+}
+#game-stage #itemModal .item-modal-box:has(#itemEquipButton:disabled) .item-modal-buttons{
+    margin-top:0 !important;
+}
