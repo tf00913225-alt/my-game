@@ -262,6 +262,68 @@
     scrollbar-gutter:stable !important;
 }
 
+/* ----- Synthesis: one Large Panel shell; wallet/tabs stay fixed, body scrolls. ----- */
+#game-stage #homeFeatureModal.v141-synthesis-modal{
+    padding:12px !important;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{
+    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    max-width:var(--ui-large-panel-max-width) !important;
+    height:min(var(--ui-large-panel-height),calc(100% - var(--ui-large-panel-safe-space))) !important;
+    max-height:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-title{
+    flex:0 0 auto !important;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal #homeFeatureModalBody{
+    display:flex !important;
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis{
+    display:flex !important;
+    flex:1 1 auto !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    flex-direction:column !important;
+    gap:var(--ui-large-panel-content-gap) !important;
+    overflow:hidden !important;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet,
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs{
+    flex:0 0 auto !important;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:8px !important;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs button{
+    min-height:var(--ui-large-panel-tab-height) !important;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-body{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card,
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-empty{
+    height:auto !important;
+    min-height:100% !important;
+    box-sizing:border-box !important;
+}
+
 /* ----- Shop: one fixed Large Panel frame; tabs only replace body content. ----- */
 #game-stage #homeFeatureModal.v131-shop-open .home-feature-modal-box{
     max-width:var(--ui-large-panel-max-width) !important;
