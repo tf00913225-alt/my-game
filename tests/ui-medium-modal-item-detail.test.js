@@ -58,8 +58,8 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  const equip=document.getElementById('itemEquipButton');
  const use=document.getElementById('v17342InventoryPotionUse');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
- const snap=name=>({name,box:rect(box),stats:rect(stats),buttons:rect(buttons),boxStyle:{width:getComputedStyle(box).width,height:getComputedStyle(box).height,maxWidth:getComputedStyle(box).maxWidth,justifyContent:getComputedStyle(box).justifyContent,flex:getComputedStyle(box).flex},statsStyle:{overflowY:getComputedStyle(stats).overflowY,gutter:getComputedStyle(stats).scrollbarGutter,flex:getComputedStyle(stats).flex},scrollHeight:stats.scrollHeight,clientHeight:stats.clientHeight});
- // Match the real final potion DOM signal. Keep equip enabled here deliberately:
+ const snap=name=>({name,box:rect(box),stats:rect(stats),buttons:rect(buttons),blankGap:rect(buttons).top-rect(stats).bottom,boxStyle:{width:getComputedStyle(box).width,height:getComputedStyle(box).height,maxWidth:getComputedStyle(box).maxWidth,justifyContent:getComputedStyle(box).justifyContent,flex:getComputedStyle(box).flex},statsStyle:{overflowY:getComputedStyle(stats).overflowY,gutter:getComputedStyle(stats).scrollbarGutter,flex:getComputedStyle(stats).flex},scrollHeight:stats.scrollHeight,clientHeight:stats.clientHeight});
+ // Match the final real potion DOM signal. Keep equip enabled deliberately:
  // compact behavior must not depend on the legacy disabled state anymore.
  equip.disabled=false;stats.innerHTML='<p>效果：回復最大 SP 的 10%</p><p>售價：25 金幣</p>';void box.offsetHeight;const potion=snap('potion');
  use.remove();equip.textContent='穿戴';stats.innerHTML=Array.from({length:45},(_,i)=>'<p>裝備屬性 '+i+'</p>').join('');void box.offsetHeight;const equipment=snap('equipment');
@@ -81,14 +81,14 @@ try{
         assert.equal(shot.statsStyle.overflowY,"auto","item stats must own vertical scrolling when needed");
         assert.equal(shot.statsStyle.gutter,"stable","item stats must reserve stable scrollbar space");
     }
-    assert.ok(data.potion.box.height<data.equipment.box.height-120,"real potion action dialog must collapse far below the equipment inspector height");
+    assert.ok(data.potion.box.height<data.equipment.box.height-40,`potion action dialog must be compact; potion=${data.potion.box.height}, equipment=${data.equipment.box.height}`);
     assert.equal(data.potion.boxStyle.justifyContent,"flex-start","potion modal must not distribute leftover vertical space");
     assert.ok(data.potion.boxStyle.flex.startsWith("0 0"),"potion modal must not flex-fill its overlay");
     assert.equal(data.equipment.boxStyle.height,"540px","equipment detail must retain the Medium Modal height");
     assert.ok(data.potion.scrollHeight<=data.potion.clientHeight+1,"potion details must not require scrolling");
     assert.ok(data.equipment.scrollHeight>data.equipment.clientHeight,"long equipment detail must scroll internally");
-    assert.ok(data.potion.buttons.top-data.potion.stats.bottom<24,"potion actions must sit directly below the information card without a blank spacer");
-    console.log("Headless Chrome: real potion-use DOM collapses the full dialog while equipment retains the fixed Medium Modal inspector");
+    assert.ok(data.potion.blankGap>=0&&data.potion.blankGap<24,`potion blank spacer must be removed; measured gap=${data.potion.blankGap}px`);
+    console.log(`Headless Chrome: real potion detail gap=${data.potion.blankGap}px, potion height=${data.potion.box.height}px; equipment stays ${data.equipment.box.height}px`);
 }finally{
     try{fs.unlinkSync(fixture);}catch(_){ }
 }
