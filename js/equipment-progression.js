@@ -102,7 +102,7 @@
     }
     function generateEquipment(random=Math.random,forced={}){
         const rarity=forced.rarity?RARITY_BY_KEY[forced.rarity]||rarityFromRandom(random):rarityFromRandom(random);
-        const classType=forced.classType|| (random()<.5?"warrior":"mage");
+        const classType=forced.classType||(random()<.5?"warrior":"mage");
         const slots=Object.keys(SLOT_META);
         const slot=forced.slot||slots[Math.floor(random()*slots.length)%slots.length];
         const statPool=SLOT_META[slot][classType];
@@ -145,7 +145,38 @@
         item.icon=addOrangeClass(item.icon);
         return item;
     }
+
+    /*
+       First-character equipment has two legacy identities in the current runtime:
+       backpack/equip uses the party-slot key ("fire"), while getMainCharacterStats()
+       still asks getEquipmentBonus(player.element). Keep both keys pointed at the same
+       slot object so non-fire first characters receive the equipment they visibly wear.
+       Existing element-key pieces are merged into empty slots before the alias is made.
+    */
+    function syncMainCharacterEquipmentStorage(){
+        if(
+            typeof player==="undefined"||!player||
+            typeof characterEquipment==="undefined"||!characterEquipment
+        ){ return; }
+        const elementKey=String(player.element||"");
+        const partyKey=typeof getBackpackEquipmentKey==="function"
+            ?getBackpackEquipmentKey(0)
+            :"fire";
+        if(!elementKey||!partyKey||elementKey===partyKey){ return; }
+        const partySlots=characterEquipment[partyKey];
+        const elementSlots=characterEquipment[elementKey];
+        if(!partySlots||typeof partySlots!=="object"){ return; }
+        if(elementSlots&&typeof elementSlots==="object"&&elementSlots!==partySlots){
+            Object.keys(partySlots).forEach(slot=>{
+                if(!partySlots[slot]&&elementSlots[slot]){ partySlots[slot]=elementSlots[slot]; }
+            });
+        }
+        characterEquipment[elementKey]=partySlots;
+    }
+    window.v17346SyncMainCharacterEquipmentStorage=syncMainCharacterEquipmentStorage;
+
     function syncFourElementSets(){
+        syncMainCharacterEquipmentStorage();
         try{
             const defs=typeof window.v132GetContentDefinitions==="function"?window.v132GetContentDefinitions():null;
             (defs&&defs.equipmentSetItems||[]).forEach(applySetRule);
@@ -175,6 +206,7 @@
     if(typeof openItemModal==="function"){
         const previousOpenItemModal=openItemModal;
         openItemModal=function(slotIndex){
+            syncMainCharacterEquipmentStorage();
             const result=previousOpenItemModal.apply(this,arguments);
             const item=typeof inventorySlots!=="undefined"?inventorySlots[slotIndex]:null;
             const modal=document.getElementById("itemModal");
@@ -186,6 +218,7 @@
     if(typeof openEquippedItem==="function"){
         const previousOpenEquippedItem=openEquippedItem;
         openEquippedItem=function(item){
+            syncMainCharacterEquipmentStorage();
             const result=previousOpenEquippedItem.apply(this,arguments);
             const modal=document.getElementById("itemModal");
             if(modal){ modal.classList.remove("v17346-potion-detail"); }
@@ -259,12 +292,14 @@
 #game-stage #itemModal.v17346-potion-detail .item-modal-box{height:auto!important;min-height:0!important;max-height:calc(100% - 28px)!important;flex:0 0 auto!important;align-self:center!important;justify-content:flex-start!important}
 #game-stage #itemModal.v17346-potion-detail #itemModalStats{flex:0 0 auto!important;min-height:0!important;max-height:180px!important}
 #game-stage #itemModal.v17346-potion-detail .item-modal-buttons{margin-top:0!important}
+#game-stage #itemModal #v17342InventoryPotionUse{-webkit-appearance:none!important;appearance:none!important;background:linear-gradient(180deg,#d9ad55 0%,#9c641c 100%)!important;border:1px solid #f2cf83!important;color:#1a1007!important;opacity:1!important;font-weight:900!important;text-shadow:none!important;box-shadow:inset 0 1px 0 rgba(255,242,192,.42),0 3px 8px rgba(0,0,0,.34)!important}
+#game-stage #itemModal #v17342InventoryPotionUse:focus,#game-stage #itemModal #v17342InventoryPotionUse:focus-visible,#game-stage #itemModal #v17342InventoryPotionUse:active{background:linear-gradient(180deg,#edc66d 0%,#ad7524 100%)!important;color:#160d05!important;outline:2px solid rgba(255,220,139,.72)!important;outline-offset:1px!important}
+#game-stage #itemModal #v17342InventoryPotionUse:disabled{background:#33291f!important;border-color:#66533d!important;color:#8f806b!important;box-shadow:none!important;opacity:.68!important}
 .v132-reward-modal-inner.v17346-preview-modal{width:min(360px,calc(100% - 24px))!important;height:min(540px,calc(100dvh - 24px))!important;max-height:calc(100dvh - 24px)!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:16px!important;box-sizing:border-box!important}
 .v132-reward-modal-inner.v17346-preview-modal>h3{position:static!important;flex:0 0 auto!important;margin:0 0 12px!important;padding:0!important;background:transparent!important}
 .v132-reward-modal-inner.v17346-preview-modal .v132-preview-list-scroll{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y;scrollbar-gutter:stable}
 .v132-reward-modal-inner.v17346-preview-modal .v132-reward-actions{position:static!important;flex:0 0 auto!important;margin-top:12px!important;padding-top:0!important;background:transparent!important}
-.v17346-shop-card{position:relative;overflow:hidden}.v17346-shop-card .v17346-gear-art{width:74px;height:74px;margin:0 auto 7px}.v17346-gear-art .v169-item-art{width:100%!important;height:100%!important}.v17346-shop-card .v17346-stat{color:#f5dfad;font-size:13px}.v17346-shop-card .v17346-reforge-mini{color:#ffbf5b;font-size:12px;font-weight:800}.v17346-shop-card button{min-height:40px}
-.v17346-equipment-dungeon-card .v141-dungeon-cover-art{background-image:linear-gradient(rgba(5,4,3,.2),rgba(5,4,3,.68)),url('assets/ui/dungeon-equipment-v17346.png')!important;background-size:cover!important;background-position:center!important}
+.v17346-shop-card{position:relative;overflow:hidden;padding:10px 9px 9px!important;transition:filter .16s ease,background .16s ease,border-color .16s ease}.v17346-shop-card .v17346-gear-art{width:74px;height:74px;margin:0 auto 7px}.v17346-gear-art .v169-item-art{width:100%!important;height:100%!important}.v17346-shop-card .v17346-shop-name{display:block;color:#f6e7c2!important;font-size:17px!important;line-height:1.22!important;font-weight:900!important;letter-spacing:.02em}.v17346-shop-card .v17346-shop-slot{display:block;margin-top:3px;color:#c9b894!important;font-size:14px!important;line-height:1.25!important}.v17346-shop-card .v17346-stat{display:block;margin-top:3px;color:#ffe0a0!important;font-size:15px!important;line-height:1.3!important;font-weight:800!important}.v17346-shop-card .v17346-reforge-mini{display:block;margin-top:2px;color:#ffbf5b;font-size:12px;font-weight:800}.v17346-shop-card .v17346-shop-buy{-webkit-appearance:none;appearance:none;width:100%;min-height:42px;margin-top:8px;border:1px solid rgba(226,181,87,.76);border-radius:7px;background:linear-gradient(180deg,rgba(119,78,25,.96),rgba(63,39,17,.98));color:#ffe4a7;font-size:15px;font-weight:900;line-height:1.15;box-shadow:inset 0 1px 0 rgba(255,220,141,.16),0 2px 6px rgba(0,0,0,.32)}.v17346-shop-card.is-affordable{background:linear-gradient(180deg,rgba(51,36,19,.94),rgba(19,14,10,.96))!important;box-shadow:inset 0 0 0 1px rgba(225,179,83,.08),0 0 10px rgba(211,155,54,.08)}.v17346-shop-card.is-affordable .v17346-shop-buy:active{background:linear-gradient(180deg,#d6a84f,#8c5919);color:#1b1006}.v17346-shop-card.is-unaffordable{background:linear-gradient(180deg,rgba(38,29,24,.94),rgba(17,14,12,.98))!important;border-color:rgba(119,83,61,.72)!important}.v17346-shop-card.is-unaffordable .v17346-gear-art{filter:saturate(.48) brightness(.72)}.v17346-shop-card.is-unaffordable .v17346-shop-name{color:#b9aa98!important}.v17346-shop-card.is-unaffordable .v17346-shop-slot,.v17346-shop-card.is-unaffordable .v17346-stat{color:#978878!important}.v17346-shop-card .v17346-shop-buy:disabled{background:linear-gradient(180deg,rgba(91,43,31,.82),rgba(48,27,23,.92))!important;border-color:rgba(167,79,56,.7)!important;color:#d79279!important;box-shadow:none!important;opacity:.86!important;cursor:not-allowed}.v17346-equipment-dungeon-card .v141-dungeon-cover-art{background-image:linear-gradient(rgba(5,4,3,.2),rgba(5,4,3,.68)),url('assets/ui/dungeon-equipment-v17346.png')!important;background-size:cover!important;background-position:center!important}
 `;
         document.head.appendChild(style);
     }
@@ -291,7 +326,7 @@
     }
     function statLine(item){
         const [key,value]=Object.entries(item.stats||{})[0]||["",0];
-        return (STAT_LABEL[key]||key)+(Number(value)>=0?"+":"")+value;
+        return (STAT_LABEL[key]||key)+(Number(value)>=0?" +":" ")+value;
     }
     function replaceEquipmentShop(){
         const root=document.querySelector("#homeFeatureModalBody .v17345-equipment-shop");
@@ -299,10 +334,12 @@
         const state=shopState();
         const offers=currentShopOffers();
         const freeRemaining=Math.max(0,5-state.refreshCount);
-        const goldText=typeof gold!=="undefined"?Math.max(0,Math.floor(Number(gold)||0)).toLocaleString("zh-TW"):"0";
+        const currentGold=typeof gold!=="undefined"?Math.max(0,Math.floor(Number(gold)||0)):0;
+        const goldText=currentGold.toLocaleString("zh-TW");
         root.innerHTML='<div class="v17345-equipment-wallet"><span>裝備商店</span><b>金幣 '+goldText+'</b></div><div class="v17345-equipment-grid">'+offers.map((item,index)=>{
             const rarity=RARITY_BY_KEY[item.rarityKey];
-            return '<article class="v17345-equipment-card v17346-shop-card"><div class="v17345-equipment-icon v17346-gear-art">'+item.icon+'</div><b>'+escapeHtml(item.name)+'</b><span>'+escapeHtml(SLOT_META[item.type].label)+'・'+rarity.label+'</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span>'+(item.reforgeSlots?'<span class="v17346-reforge-mini">[可冶煉]</span>':'')+'<button type="button" onclick="v17346BuyEquipmentShopOffer('+index+')">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</button></article>';
+            const canBuy=currentGold>=rarity.shopPrice;
+            return '<article class="v17345-equipment-card v17346-shop-card '+(canBuy?'is-affordable':'is-unaffordable')+'" data-rarity="'+escapeHtml(item.rarityKey)+'"><div class="v17345-equipment-icon v17346-gear-art">'+item.icon+'</div><b class="v17346-shop-name">'+escapeHtml(item.name)+'</b><span class="v17346-shop-slot">'+escapeHtml(SLOT_META[item.type].label)+'</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span>'+(item.reforgeSlots?'<span class="v17346-reforge-mini">[可冶煉]</span>':'')+'<button class="v17346-shop-buy" type="button" '+(canBuy?'onclick="v17346BuyEquipmentShopOffer('+index+')"':'disabled aria-disabled="true"')+'>'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</button></article>';
         }).join("")+'</div><div class="v17345-equipment-refresh"><div><b>今日刷新 '+state.refreshCount+' / 10</b><span>前5次免費；第6～10次價格尚未設定，因此暫不開放。</span></div><button type="button" '+(freeRemaining>0?'onclick="v17345RefreshEquipmentShop()"':'disabled')+'>'+(freeRemaining>0?'免費刷新（剩'+freeRemaining+'次）':'免費刷新已用完')+'</button></div>';
     }
     window.v17346BuyEquipmentShopOffer=function(index){
@@ -399,6 +436,13 @@
             const card='<article class="v141-dungeon-cover-card v17346-equipment-dungeon-card" data-dungeon-cover="equipment"><div class="v141-dungeon-cover-art"><span>裝備副本</span><small>3輪 × 每輪6隻</small></div><div class="v141-dungeon-cover-info"><b>裝備副本</b><span>難度：與一般副本相同</span></div><div class="v141-dungeon-cover-actions"><button type="button" onclick="v17346ShowEquipmentDungeonPreview()">獎勵預覽</button><button type="button" onclick="v17346BeginEquipmentDungeon()">挑戰</button></div><div class="v141-dungeon-remaining">可挑戰</div></article>';
             return html.replace(/<\/div>\s*$/,card+'</div>');
         };
+    }
+
+    syncMainCharacterEquipmentStorage();
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",syncMainCharacterEquipmentStorage,{once:true});
+    }else{
+        setTimeout(syncMainCharacterEquipmentStorage,0);
     }
 
     if(typeof saveGame==="function"){ try{ saveGame(); }catch(_){ } }
