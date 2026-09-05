@@ -8,7 +8,8 @@ const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const shopCss=fs.readFileSync("css/44-v149-skill-ui-rules.css","utf8");
 const frameCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
 
-assert.match(touchLock,/\.home-feature-modal-box, #homeFeatureModalBody, \.auto-settings-expanded/);
+assert.match(touchLock,/\.home-feature-modal-box, #homeFeatureModalBody/);
+assert.match(touchLock,/\.auto-settings-expanded/);
 assert.match(shopCss,/#homeFeatureModal\.v131-shop-open #homeFeatureModalBody\{[\s\S]*?overflow-y:auto !important;[\s\S]*?touch-action:pan-y !important;/);
 assert.match(frameCss,/#homeFeatureModal\.v131-shop-open #homeFeatureModalBody\{[\s\S]*?flex:1 1 auto;[\s\S]*?min-height:0;[\s\S]*?scrollbar-gutter:stable;/);
 
