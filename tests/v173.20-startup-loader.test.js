@@ -97,7 +97,7 @@ test("the native startup layer is first, versioned, and starts before the game r
     assert.match(html,/css\/51-v173\.20-startup-loader\.css\?v=173\.20/);
     assert.match(html,/startup-logo-v173\.20\.jpg\?v=173\.20/);
     assert.match(html,/startup-main-city-v173\.20\.jpg\?v=173\.20/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.47"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.48"/);
 });
 
 test("Logo light choreography cycles fire, water, wind, and earth independently",()=>{

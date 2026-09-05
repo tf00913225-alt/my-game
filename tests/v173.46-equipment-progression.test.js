@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const source=fs.readFileSync("js/equipment-progression.js","utf8");
 const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 
-assert.match(ui,/js\/equipment-progression\.js\?v=173\.47/);
+assert.match(ui,/js\/equipment-progression\.js\?v=173\.48/);
 assert.match(source,/\{key:"white",label:"白裝",chance:40,min:1,max:3,reforgeSlots:0/);
 assert.match(source,/\{key:"blue",label:"藍裝",chance:40,min:4,max:6,reforgeSlots:0/);
 assert.match(source,/\{key:"purple",label:"紫裝",chance:15,min:7,max:9,reforgeSlots:1/);
