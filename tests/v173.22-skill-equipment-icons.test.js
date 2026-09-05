@@ -135,10 +135,10 @@ test("既有存檔與已穿戴套裝會同步取得新版圖示",()=>{
 });
 
 test("開發版本與快取版本更新為 V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.50"/);
-    assert.match(index,/<title>四象江湖傳 V173\.50<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.50"[\s\S]*?>V173\.50<\/div>/);
-    assert.match(index,/js\/00-main\.js\?v=173\.50/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.51"/);
+    assert.match(index,/<title>四象江湖傳 V173\.51<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.51"[\s\S]*?>V173\.51<\/div>/);
+    assert.match(index,/js\/00-main\.js\?v=173\.51/);
 });
 
 console.log("\n"+passed+" V173.39 skill and equipment icon tests passed.");
