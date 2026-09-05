@@ -1,0 +1,39 @@
+name: Sync V173.48 regex test references
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'launch V173.48 regex test sync')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Update escaped and plain V173.47 expectations
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          changed=[]
+          for p in Path('tests').rglob('*.js'):
+              s=p.read_text(encoding='utf-8')
+              n=s.replace(r'173\.47', r'173\.48').replace('173.47','173.48')
+              if n!=s:
+                  p.write_text(n,encoding='utf-8')
+                  changed.append(str(p))
+          print('\n'.join(changed))
+          PY
+          git diff -- tests
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests
+          git commit -m "sync escaped tests with V173.48 entry versions"
+          git push origin HEAD:dev
