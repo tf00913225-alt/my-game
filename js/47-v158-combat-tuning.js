@@ -379,6 +379,15 @@
         openInventoryCharacterDetail=function(){
             const result=previousOpenInventoryCharacterDetail.apply(this,arguments);
             if(typeof document!=="undefined"){
+                const rows=Array.from(document.querySelectorAll("#inventoryCharacterDetailStats .inventory-character-detail-row"));
+                const evasionRow=rows.find(row=>{
+                    const label=row.querySelector("span");
+                    return label&&label.textContent.trim()==="閃避";
+                });
+                const evasionValue=evasionRow&&evasionRow.querySelector("b");
+                if(evasionValue){
+                    evasionValue.textContent=numeric(evasionValue.textContent).toFixed(1)+"%";
+                }
                 const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
                 if(note){
                     note.innerHTML=
