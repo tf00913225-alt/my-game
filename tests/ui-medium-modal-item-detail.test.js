@@ -11,8 +11,9 @@ assert.match(css,/--ui-medium-modal-max-width:360px;/);
 assert.match(css,/--ui-medium-modal-height:540px;/);
 assert.match(css,/--ui-medium-modal-safe-space:28px;/);
 assert.match(css,/#itemModal \.item-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height\),calc\(100% - var\(--ui-medium-modal-safe-space\)\)\) !important;/);
-assert.match(css,/#itemModal #itemModalStats\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
+assert.match(css,/#itemModal #itemModalStats\{[\s\S]*?flex:0 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
 assert.match(css,/#itemModal \.item-modal-buttons\{[\s\S]*?flex:0 0 auto !important;/);
+assert.match(css,/#itemModal \.item-modal-buttons\{[\s\S]*?margin-top:auto !important;/);
 
 function findChrome(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
@@ -47,8 +48,8 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  const stats=document.getElementById('itemModalStats');
  const buttons=document.querySelector('.item-modal-buttons');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
- const snap=name=>({name,box:rect(box),stats:rect(stats),buttons:rect(buttons),boxStyle:{width:getComputedStyle(box).width,height:getComputedStyle(box).height,maxWidth:getComputedStyle(box).maxWidth},statsStyle:{overflowY:getComputedStyle(stats).overflowY,gutter:getComputedStyle(stats).scrollbarGutter},scrollHeight:stats.scrollHeight,clientHeight:stats.clientHeight});
- stats.innerHTML='<p>短內容</p>';void box.offsetHeight;const short=snap('short');
+ const snap=name=>({name,box:rect(box),stats:rect(stats),buttons:rect(buttons),boxStyle:{width:getComputedStyle(box).width,height:getComputedStyle(box).height,maxWidth:getComputedStyle(box).maxWidth},statsStyle:{overflowY:getComputedStyle(stats).overflowY,gutter:getComputedStyle(stats).scrollbarGutter,flex:getComputedStyle(stats).flex},scrollHeight:stats.scrollHeight,clientHeight:stats.clientHeight});
+ stats.innerHTML='<p>效果：回復最大 HP 的 10%</p><p>售價：20 金幣</p>';void box.offsetHeight;const short=snap('short');
  stats.innerHTML=Array.from({length:45},(_,i)=>'<p>裝備屬性 '+i+'</p>').join('');void box.offsetHeight;const long=snap('long');
  document.getElementById('result').textContent=JSON.stringify({short,long});
 })();
@@ -66,17 +67,22 @@ try{
         assert.ok(resolvedWidth>300&&resolvedWidth<=360,"item detail must respect the Medium Modal width ceiling and safe area");
         assert.equal(shot.boxStyle.maxWidth,"360px","item detail must keep Medium Modal width ceiling");
         assert.equal(shot.boxStyle.height,"540px","item detail must use Medium Modal height");
-        assert.equal(shot.statsStyle.overflowY,"auto","item stats must own vertical scrolling");
+        assert.equal(shot.statsStyle.overflowY,"auto","item stats must own vertical scrolling when needed");
         assert.equal(shot.statsStyle.gutter,"stable","item stats must reserve stable scrollbar space");
     }
-    for(const part of ["box","stats","buttons"]){
+    for(const part of ["box","buttons"]){
         for(const key of ["left","top","width","height"]){
             assert.ok(Math.abs(data.short[part][key]-data.long[part][key])<0.25,`${part}.${key} must not move when item content changes`);
         }
     }
-    assert.ok(data.long.scrollHeight>data.long.clientHeight,"long item detail content must scroll internally");
-    assert.ok(data.short.scrollHeight<=data.short.clientHeight+1,"short item detail content must leave stable empty space instead of resizing the modal");
-    console.log("Headless Chrome: item/equipment detail uses one fixed Medium Modal frame");
+    for(const key of ["left","top","width"]){
+        assert.ok(Math.abs(data.short.stats[key]-data.long.stats[key])<0.25,`stats.${key} must stay aligned when content changes`);
+    }
+    assert.ok(data.long.scrollHeight>data.long.clientHeight,"long equipment detail must scroll internally");
+    assert.ok(data.short.scrollHeight<=data.short.clientHeight+1,"short item detail must not require scrolling");
+    assert.ok(data.short.stats.height<data.long.stats.height,"short potion/material stat card must hug its content instead of filling the modal");
+    assert.ok(data.short.buttons.top-data.short.stats.bottom>30,"unused space must remain as panel background above the fixed action row");
+    console.log("Headless Chrome: short item details hug content while long equipment details scroll in one fixed Medium Modal frame");
 }finally{
     try{fs.unlinkSync(fixture);}catch(_){ }
 }
