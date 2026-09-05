@@ -137,7 +137,11 @@
         item.quality="orange";
         item.rarityKey="orange";
         item.reforgeSlots=Math.max(1,Math.floor(Number(item.reforgeSlots)||0));
-        item.reforgeUsed=Math.max(0,Math.floor(Number(item.reforgeUsed)||0));
+        const hasRecordedUse=Object.prototype.hasOwnProperty.call(item,"reforgeUsed");
+        const migratedUse=hasRecordedUse
+            ?Math.max(0,Math.floor(Number(item.reforgeUsed)||0))
+            :(item.reforgeStats&&Object.keys(item.reforgeStats).length?1:0);
+        item.reforgeUsed=Math.min(item.reforgeSlots,migratedUse);
         item.icon=addOrangeClass(item.icon);
         return item;
     }
@@ -337,7 +341,14 @@
     window.v17346ClaimEquipmentDungeon=function(doubled){
         const grant=multiplier=>{
             pendingEquipmentRewards=equipmentRewardItems(multiplier);
-            if(window.v132CanAddItemToInventory&&pendingEquipmentRewards.some(item=>!window.v132CanAddItemToInventory(item,1))){ alert("背包空間不足，請先整理背包。"); pendingEquipmentRewards=[]; return; }
+            if(
+                typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)||
+                inventoryItems.length+pendingEquipmentRewards.length>120
+            ){
+                alert("背包空間不足，請先整理背包。");
+                pendingEquipmentRewards=[];
+                return;
+            }
             pendingEquipmentRewards.forEach(item=>inventoryItems.push(item));
             if(typeof saveGame==="function"){ saveGame(); }
             if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
@@ -372,7 +383,7 @@
         };
         launch(0);
     }
-    window.v132BeginEquipmentDungeon=beginEquipmentDungeon;
+    window.v17346BeginEquipmentDungeon=beginEquipmentDungeon;
 
     window.v17346ShowEquipmentDungeonPreview=function(){
         if(typeof window.v132ShowRewardModal!=="function"){ return; }
@@ -385,7 +396,7 @@
         renderDungeonTabContent=function(tabName){
             const html=previousRenderDungeonTabContent.apply(this,arguments);
             if(tabName!=="daily"||typeof html!=="string"||html.includes("v17346-equipment-dungeon-card")){ return html; }
-            const card='<article class="v141-dungeon-cover-card v17346-equipment-dungeon-card" data-dungeon-cover="equipment"><div class="v141-dungeon-cover-art"><span>裝備副本</span><small>3輪 × 每輪6隻</small></div><div class="v141-dungeon-cover-info"><b>裝備副本</b><span>難度：與一般副本相同</span></div><div class="v141-dungeon-cover-actions"><button type="button" onclick="v17346ShowEquipmentDungeonPreview()">獎勵預覽</button><button type="button" onclick="v132BeginEquipmentDungeon()">挑戰</button></div><div class="v141-dungeon-remaining">可挑戰</div></article>';
+            const card='<article class="v141-dungeon-cover-card v17346-equipment-dungeon-card" data-dungeon-cover="equipment"><div class="v141-dungeon-cover-art"><span>裝備副本</span><small>3輪 × 每輪6隻</small></div><div class="v141-dungeon-cover-info"><b>裝備副本</b><span>難度：與一般副本相同</span></div><div class="v141-dungeon-cover-actions"><button type="button" onclick="v17346ShowEquipmentDungeonPreview()">獎勵預覽</button><button type="button" onclick="v17346BeginEquipmentDungeon()">挑戰</button></div><div class="v141-dungeon-remaining">可挑戰</div></article>';
             return html.replace(/<\/div>\s*$/,card+'</div>');
         };
     }
