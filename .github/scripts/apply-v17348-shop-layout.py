@@ -1,0 +1,349 @@
+from pathlib import Path
+
+CSS_MARKER = '/* V173.48 — PREMIUM ONE-SCREEN SHOP */'
+CSS_BLOCK = r'''
+
+/* V173.48 — PREMIUM ONE-SCREEN SHOP
+   - The shop is a fixed game panel, never a webpage-like scrolling surface.
+   - Potion and equipment tabs share the same one-screen geometry.
+   - Equipment cards use explicit grid rows so rarity/reforge differences cannot
+     move names, stats or purchase buttons into different cells. */
+#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody{
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+    touch-action:none !important;
+    scrollbar-gutter:auto !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-shop-shell{
+    height:100% !important;
+    min-height:0 !important;
+    gap:8px !important;
+    overflow:hidden !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-shop-tabs{
+    position:static !important;
+    top:auto !important;
+    flex:0 0 42px !important;
+    height:42px !important;
+    min-height:42px !important;
+    padding:0 !important;
+    background:transparent !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-shop-tabs button{
+    min-height:40px !important;
+    height:40px !important;
+    font-size:15px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface,
+#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-shop{
+    flex:1 1 auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:hidden !important;
+}
+
+/* The top HUD already owns the gold balance, so the duplicated equipment
+   wallet row is removed and that space is returned to the six merchandise cards. */
+#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-wallet{
+    display:none !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-shop{
+    display:grid !important;
+    grid-template-rows:minmax(0,1fr) 58px !important;
+    gap:7px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-grid{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
+    align-content:stretch !important;
+    gap:7px !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card{
+    display:grid !important;
+    grid-template-columns:54px minmax(0,1fr) !important;
+    grid-template-rows:18px 15px 18px 12px 30px !important;
+    column-gap:7px !important;
+    row-gap:1px !important;
+    align-content:center !important;
+    align-items:center !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    padding:6px !important;
+    overflow:hidden !important;
+    border-radius:9px !important;
+    box-sizing:border-box !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art{
+    grid-column:1 !important;
+    grid-row:1 / 5 !important;
+    width:50px !important;
+    height:50px !important;
+    margin:0 !important;
+    align-self:center !important;
+    justify-self:center !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-name{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    min-width:0 !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    color:#f6e7c2 !important;
+    font-size:14px !important;
+    line-height:18px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-slot{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    min-width:0 !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    font-size:11px !important;
+    line-height:15px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-stat{
+    grid-column:2 !important;
+    grid-row:3 !important;
+    min-width:0 !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    font-size:13px !important;
+    line-height:18px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-reforge-mini{
+    grid-column:2 !important;
+    grid-row:4 !important;
+    min-width:0 !important;
+    min-height:12px !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    font-size:10px !important;
+    line-height:12px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-buy{
+    grid-column:1 / -1 !important;
+    grid-row:5 !important;
+    width:100% !important;
+    height:30px !important;
+    min-height:30px !important;
+    margin:0 !important;
+    padding:2px 6px !important;
+    border-radius:6px !important;
+    font-size:12px !important;
+    line-height:1 !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 128px !important;
+    align-items:center !important;
+    gap:8px !important;
+    width:100% !important;
+    height:58px !important;
+    min-height:58px !important;
+    margin:0 !important;
+    padding:7px 8px !important;
+    overflow:hidden !important;
+    border-radius:9px !important;
+    box-sizing:border-box !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh > div{
+    display:flex !important;
+    min-width:0 !important;
+    flex-direction:column !important;
+    gap:1px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh b{
+    font-size:12px !important;
+    line-height:15px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh span{
+    overflow:hidden !important;
+    font-size:10px !important;
+    line-height:13px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh > button{
+    width:128px !important;
+    min-width:128px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:4px 7px !important;
+    font-size:11px !important;
+}
+
+/* Potion tab: the same two-column / three-row rhythm as equipment. */
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface{
+    display:grid !important;
+    grid-template-rows:auto auto minmax(0,1fr) !important;
+    gap:4px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-note,
+#game-stage #homeFeatureModal.v131-shop-open .v133-shop-tier-note{
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 2px !important;
+    overflow:hidden !important;
+    font-size:10px !important;
+    line-height:13px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-list{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
+    gap:6px !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-card{
+    display:flex !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    flex-direction:column !important;
+    padding:6px 7px !important;
+    overflow:hidden !important;
+    border-radius:8px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-card-head{
+    margin-bottom:1px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-type{
+    font-size:11px !important;
+    line-height:13px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-stock{
+    font-size:9px !important;
+    line-height:12px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-name{
+    overflow:hidden !important;
+    font-size:13px !important;
+    line-height:16px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-effect{
+    overflow:hidden !important;
+    font-size:10px !important;
+    line-height:13px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
+    grid-template-columns:28px 40px minmax(0,1fr) !important;
+    gap:3px !important;
+    margin-top:auto !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row label{
+    font-size:10px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{
+    width:40px !important;
+    min-width:40px !important;
+    height:26px !important;
+    min-height:26px !important;
+    padding:0 3px !important;
+    font-size:11px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v146-shop-total{
+    font-size:10px !important;
+    line-height:12px !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+    height:28px !important;
+    min-height:28px !important;
+    margin-top:2px !important;
+    padding:2px 6px !important;
+    font-size:11px !important;
+}
+'''
+
+css_path = Path('css/49-v169-rpg-ui.css')
+css = css_path.read_text(encoding='utf-8')
+if CSS_MARKER not in css:
+    css_path.write_text(css.rstrip() + CSS_BLOCK + '\n', encoding='utf-8')
+
+equip_path = Path('js/equipment-progression.js')
+equip = equip_path.read_text(encoding='utf-8')
+old_copy = '前5次免費；第6～10次價格尚未設定，因此暫不開放。'
+new_copy = '前5次免費；第6～10次尚未開放。'
+if old_copy in equip:
+    equip = equip.replace(old_copy, new_copy, 1)
+elif new_copy not in equip:
+    raise SystemExit('equipment refresh copy anchor not found')
+equip_path.write_text(equip, encoding='utf-8')
+
+loader_path = Path('js/20-anonymous-20.js')
+loader = loader_path.read_text(encoding='utf-8')
+if 'const V_ASSET_VERSION="173.47";' in loader:
+    loader = loader.replace('const V_ASSET_VERSION="173.47";', 'const V_ASSET_VERSION="173.48";', 1)
+elif 'const V_ASSET_VERSION="173.48";' not in loader:
+    raise SystemExit('V_ASSET_VERSION anchor not found')
+loader_path.write_text(loader, encoding='utf-8')
+
+ui_path = Path('js/51-v169-rpg-ui.js')
+ui = ui_path.read_text(encoding='utf-8')
+if 'js/equipment-progression.js?v=173.47' in ui:
+    ui = ui.replace('js/equipment-progression.js?v=173.47', 'js/equipment-progression.js?v=173.48', 1)
+elif 'js/equipment-progression.js?v=173.48' not in ui:
+    raise SystemExit('equipment progression cache version anchor not found')
+ui_path.write_text(ui, encoding='utf-8')
+
+index_path = Path('index.html')
+index = index_path.read_text(encoding='utf-8')
+if '173.47' in index:
+    index = index.replace('173.47', '173.48')
+elif '173.48' not in index:
+    raise SystemExit('index version anchor not found')
+index_path.write_text(index, encoding='utf-8')
+
+test_path = Path('tests/v173.48-premium-shop-layout.test.js')
+test_path.write_text(r'''const assert=require("node:assert/strict");
+const fs=require("node:fs");
+
+const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const equip=fs.readFileSync("js/equipment-progression.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
+const index=fs.readFileSync("index.html","utf8");
+
+assert.match(css,/V173\.48 — PREMIUM ONE-SCREEN SHOP/);
+assert.match(css,/#homeFeatureModal\.v131-shop-open #homeFeatureModalBody\{[\s\S]*?overflow:hidden !important;[\s\S]*?touch-action:none !important;/);
+assert.match(css,/\.v17345-equipment-grid\{[\s\S]*?grid-template-rows:repeat\(3,minmax\(0,1fr\)\) !important;[\s\S]*?overflow:hidden !important;/);
+assert.match(css,/\.v17346-shop-card \.v17346-shop-buy\{[\s\S]*?grid-column:1 \/ -1 !important;[\s\S]*?grid-row:5 !important;/);
+assert.match(css,/\.v17346-shop-card \.v17346-reforge-mini\{[\s\S]*?grid-row:4 !important;/);
+assert.match(css,/\.v17345-equipment-refresh\{[\s\S]*?grid-template-columns:minmax\(0,1fr\) 128px !important;[\s\S]*?height:58px !important;/);
+assert.match(css,/\.shop-potion-list\{[\s\S]*?grid-template-rows:repeat\(3,minmax\(0,1fr\)\) !important;[\s\S]*?overflow:hidden !important;/);
+assert.ok(equip.includes("前5次免費；第6～10次尚未開放。"));
+assert.ok(loader.includes('const V_ASSET_VERSION="173.48";'));
+assert.ok(ui.includes('js/equipment-progression.js?v=173.48'));
+assert.ok(index.includes('<title>四象江湖傳 V173.48</title>'));
+assert.ok(index.includes('>V173.48</div>'));
+assert.ok(index.includes('js/20-anonymous-20.js?v=173.48'));
+
+console.log("✓ V173.48 premium one-screen shop layout");
+''', encoding='utf-8')
