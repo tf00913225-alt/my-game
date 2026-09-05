@@ -27,6 +27,7 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/38-v141-system-expansion.css">
 <link rel="stylesheet" href="css/40-v143-combat-dungeon-polish.css">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
+<link rel="stylesheet" href="css/50-v169-abyss-flow.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
 #game-stage{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;}
@@ -48,10 +49,15 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  const body=document.getElementById('body');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};
  const shots=[];
- const record=name=>{void box.offsetHeight;shots.push({name,box:rect(box),wallet:rect(wallet),tabs:rect(tabs),body:rect(body),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight});};
+ const record=name=>{void box.offsetHeight;shots.push({name,box:rect(box),wallet:rect(wallet),tabs:rect(tabs),body:rect(body),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,scrollWidth:body.scrollWidth,clientWidth:body.clientWidth});};
  body.innerHTML='<div class="v141-synthesis-card"><p>短內容</p></div>';record('reforge');
  body.innerHTML='<div class="v141-synthesis-card">'+Array.from({length:40},(_,i)=>'<p>符咒內容 '+i+'</p>').join('')+'</div>';record('talisman');
  body.innerHTML='<div class="v141-synthesis-card">'+Array.from({length:24},(_,i)=>'<p>碎片內容 '+i+'</p>').join('')+'</div>';record('fragment');
+ body.innerHTML='<div class="v141-synthesis-card"><div id="picker" class="v143-item-picker">'+Array.from({length:8},(_,i)=>'<button><i></i><span>裝備 '+i+'</span></button>').join('')+'</div><div class="v141-upgrade-flow"><section><div class="v169-item-art v169-talisman-art v169-rarity-low"></div><b>低階結界符 ×3</b></section><i>→</i><section><div class="v169-item-art v169-talisman-art v169-rarity-mid"></div><b>中階結界符 ×1</b></section></div></div>';
+ void box.offsetHeight;
+ const picker=document.getElementById('picker');
+ const art=body.querySelector('.v169-talisman-art');
+ shots.push({name:'controls',box:rect(box),wallet:rect(wallet),tabs:rect(tabs),body:rect(body),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,scrollWidth:body.scrollWidth,clientWidth:body.clientWidth,pickerScrollWidth:picker.scrollWidth,pickerClientWidth:picker.clientWidth,art:rect(art)});
  document.getElementById('result').textContent=JSON.stringify(shots);
 })();
 </script></div></body></html>`;
@@ -63,7 +69,7 @@ try{
     const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,"synthesis browser layout result missing");
     const shots=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
-    assert.equal(shots.length,3);
+    assert.equal(shots.length,4);
     const baseline=shots[0];
     for(const shot of shots){
         for(const part of ["box","wallet","tabs","body"]){
@@ -74,7 +80,11 @@ try{
     }
     assert.ok(shots[1].scrollHeight>shots[1].clientHeight,"long synthesis content must scroll only inside the synthesis body");
     assert.ok(shots[0].scrollHeight<=shots[0].clientHeight+1,"short synthesis content must not shrink the outer frame");
-    console.log("Headless Chrome: reforge, talisman and fragment synthesis share one Large Panel frame");
+    const controls=shots.find(shot=>shot.name==="controls");
+    assert.ok(controls.pickerScrollWidth>controls.pickerClientWidth,"equipment picker must retain real horizontal overflow");
+    assert.ok(controls.art.width<=92.5&&controls.art.height<=138.5,"talisman art must stay compact inside synthesis flow");
+    assert.ok(controls.scrollWidth<=controls.clientWidth+1,"synthesis content viewport must not gain page-level horizontal overflow");
+    console.log("Headless Chrome: synthesis frame, horizontal picker and compact talisman art verified");
 }finally{
     try{fs.unlinkSync(fixture);}catch(_){ }
 }
