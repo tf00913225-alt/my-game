@@ -1,1 +1,0 @@
-V173.49 stabilizes the EXP allocation viewport on mobile by preserving the character panel scroll position across preview/confirm/cancel re-renders and disabling local scroll anchoring on the EXP allocation surface.
