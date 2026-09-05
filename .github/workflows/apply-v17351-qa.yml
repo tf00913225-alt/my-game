@@ -1,0 +1,38 @@
+name: Apply V173.51 QA fixes
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'launch V173.51 QA patch')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Apply V173.51 patch
+        run: |
+          python .github/scripts/apply_v17351_qa.py
+          node --check js/39-v143-skill-animation.js
+          node --check js/53-v173.50-inventory-qol.js
+          node --check js/54-v173.51-battle-qa.js
+          node --check js/55-v173.51-inventory-qa.js
+          node --check js/56-v173.51-shop-qa.js
+          node --check js/57-v173.51-quest-qa.js
+          node --check js/equipment-progression.js
+          node tests/v173.50-inventory-qol.test.js
+          node tests/v173.51-qa.test.js
+          git diff --check
+      - name: Commit V173.51
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/39-v143-skill-animation.js js/53-v173.50-inventory-qol.js js/equipment-progression.js js/20-anonymous-20.js js/51-v169-rpg-ui.js index.html tests/v173.50-inventory-qol.test.js
+          git commit -m "V173.51 gameplay shop inventory and quest QA fixes"
+          git push origin HEAD:dev
