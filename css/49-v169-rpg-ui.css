@@ -517,6 +517,122 @@
     z-index:-1 !important;
 }
 
+/* ----- Backpack: standalone page and map/dungeon overlay share one A-level width. ----- */
+#game-stage #app.on-inventory-page #inventoryPage.inventory-page-classic:not(.map-inventory-overlay-open) .inventory-classic-shell{
+    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    max-width:var(--ui-large-panel-max-width) !important;
+    margin:0 auto !important;
+}
+
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open{
+    left:50% !important;
+    right:auto !important;
+    top:12px !important;
+    bottom:82px !important;
+    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    max-width:var(--ui-large-panel-max-width) !important;
+    transform:translateX(-50%) !important;
+    padding:10px !important;
+}
+
+#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
+    left:50% !important;
+    right:auto !important;
+    top:12px !important;
+    bottom:82px !important;
+    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
+    max-width:var(--ui-large-panel-max-width) !important;
+    transform:translateX(-50%) !important;
+}
+
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-classic-shell{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    gap:var(--ui-large-panel-content-gap) !important;
+}
+
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-switch{
+    padding-right:86px !important;
+}
+
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .map-inventory-overlay-close{
+    top:8px !important;
+    right:8px !important;
+    min-width:72px !important;
+    height:42px !important;
+    padding:0 12px !important;
+    font-size:15px !important;
+}
+
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-grid-scroll{
+    scrollbar-gutter:stable !important;
+}
+
+/* Backpack character presentation follows the same black-gold language as the panel. */
+#game-stage #inventoryPage .inventory-character-arrow{
+    width:44px !important;
+    height:44px !important;
+    min-width:44px !important;
+    min-height:44px !important;
+    aspect-ratio:1 / 1 !important;
+    padding:0 !important;
+    border:1px solid #b88a42 !important;
+    border-radius:50% !important;
+    color:#f3cf76 !important;
+    background:
+        radial-gradient(circle at 50% 30%,rgba(246,204,112,.18),transparent 52%),
+        linear-gradient(180deg,#362719,#130e09) !important;
+    box-shadow:
+        inset 0 0 0 1px rgba(255,225,151,.08),
+        inset 0 -8px 14px rgba(0,0,0,.28),
+        0 3px 9px rgba(0,0,0,.48),
+        0 0 8px rgba(205,151,65,.12) !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:28px !important;
+    font-weight:900 !important;
+    line-height:42px !important;
+    text-align:center !important;
+    text-shadow:0 1px 2px #000,0 0 6px rgba(240,180,41,.28) !important;
+}
+#game-stage #inventoryPage .inventory-character-arrow:active{
+    color:#fff0b8 !important;
+    background:linear-gradient(180deg,#49341e,#1b120b) !important;
+    transform:translateY(1px) !important;
+}
+#game-stage #inventoryPage #inventoryPortraitFrame{
+    background:
+        radial-gradient(circle at 50% 42%,rgba(194,132,47,.09),transparent 60%),
+        linear-gradient(180deg,#100c08,#060504) !important;
+}
+#game-stage #inventoryPage #inventoryPortraitFrame .v131-inventory-portrait{
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+    object-position:center center !important;
+}
+#game-stage #inventoryPage #inventoryCharacterDetailButton{
+    overflow:hidden !important;
+    color:transparent !important;
+    font-size:0 !important;
+    line-height:0 !important;
+}
+#game-stage #inventoryPage #inventoryCharacterDetailButton::before{
+    content:"!" !important;
+    display:flex !important;
+    width:100% !important;
+    height:100% !important;
+    align-items:center !important;
+    justify-content:center !important;
+    color:#ffe27a !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:27px !important;
+    font-weight:900 !important;
+    line-height:1 !important;
+    text-shadow:0 1px 2px #000,0 0 7px rgba(240,180,41,.34) !important;
+}
+
 @media (max-width:430px){
     #game-stage #homeFeatureModal .v17345-equipment-card{
         grid-template-columns:50px minmax(0,1fr);
