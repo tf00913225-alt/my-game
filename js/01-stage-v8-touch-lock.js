@@ -10,7 +10,7 @@
      * 但真正的 scroll owner 是它上面的 .content。
      *
      * 這裡改成一路往祖先走，只要其中任何一層
-     * 是真正可以垂直捲動的容器，就允許手勢通過。
+     * 是真正可以垂直或水平捲動的容器，就允許手勢通過。
      */
     function isInsideAllowedScroller(target){
         if(!target){
@@ -37,13 +37,18 @@
            因此不能代替內頁通過觸控鎖；把真正 scroll owner 納入
            同一份權威白名單，避免再次出現「看得到 scrollbar、
            但手指滑不動」的假捲動狀態。
+
+           合成裝備選擇列是水平 scroll owner。舊判斷只接受
+           overflow-y，因此即使畫面已出現橫向 scrollbar，手指左右
+           滑仍會被全域 touch lock 阻擋。現在同一份權威判斷同時
+           接受真正可捲動的 X/Y 軸，避免再為單一頁面另做事件補丁。
         */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
             ".home-feature-modal-box, #homeFeatureModalBody, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .item-modal-box, #itemModalStats, #skillDetailStats, " +
-            ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .v17342-abyss-battle-log, " +
+            ".skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .v17342-abyss-battle-log, .v143-item-picker, " +
             "textarea, select, input";
 
         let node =
@@ -60,7 +65,7 @@
                 const style =
                     window.getComputedStyle(node);
 
-                const canScroll =
+                const canScrollY =
                     (
                         style.overflowY==="auto" ||
                         style.overflowY==="scroll"
@@ -68,7 +73,15 @@
                     node.scrollHeight >
                     node.clientHeight + 1;
 
-                if(canScroll){
+                const canScrollX =
+                    (
+                        style.overflowX==="auto" ||
+                        style.overflowX==="scroll"
+                    ) &&
+                    node.scrollWidth >
+                    node.clientWidth + 1;
+
+                if(canScrollY || canScrollX){
                     return true;
                 }
             }
