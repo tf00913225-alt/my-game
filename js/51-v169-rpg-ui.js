@@ -379,6 +379,23 @@
         };
     }
 
+    /* V173.46 equipment progression is a first-class feature module. It is
+       deliberately loaded after the shared RPG UI so it can reuse the final
+       shop/dungeon/modal authorities without creating another legacy wrapper chain. */
+    function loadEquipmentProgression(){
+        if(document.getElementById("equipment-progression-runtime")){ return; }
+        const script=document.createElement("script");
+        script.id="equipment-progression-runtime";
+        script.src="js/equipment-progression.js?v=173.46";
+        script.async=false;
+        document.head.appendChild(script);
+    }
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",loadEquipmentProgression,{once:true});
+    }else{
+        loadEquipmentProgression();
+    }
+
     /* ----- Dungeon backpack: reuse the one inventory DOM above the map. ----- */
     if(typeof openMapInventoryOverlay==="function"){
         const previousOpenMapInventoryOverlay=openMapInventoryOverlay;
