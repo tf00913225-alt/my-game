@@ -451,3 +451,76 @@
 .v132-set-bonus.inactive{
     color:#6a6255;
 }
+
+/*
+   Equipment shop preview is mounted directly under document.body by
+   ensureRewardModalElement(), so it is not a descendant of #game-stage.
+   Target the real DOM owner here; the former #game-stage-prefixed selector
+   never matched on phones and left the generic 300px scrolling dialog active.
+*/
+.v132-reward-modal .v132-reward-modal-inner.v17346-shop-preview-modal{
+    width:min(100%,340px) !important;
+    height:400px !important;
+    max-width:340px !important;
+    max-height:400px !important;
+    min-height:400px !important;
+    gap:6px !important;
+    padding:14px !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+    -webkit-overflow-scrolling:auto !important;
+    touch-action:manipulation !important;
+    scrollbar-gutter:auto !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal > h3{
+    position:static !important;
+    top:auto !important;
+    margin:0 0 4px !important;
+    padding:0 !important;
+    background:none !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art{
+    width:138px !important;
+    height:138px !important;
+    flex:0 0 138px !important;
+    margin:0 auto 4px !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-info{
+    flex:0 0 auto !important;
+    gap:4px !important;
+    padding:8px 10px !important;
+    font-size:14px !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-info strong{
+    font-size:17px !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-price{
+    flex:0 0 auto !important;
+    margin-top:2px !important;
+    font-size:17px !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-reforge{
+    flex:0 0 auto !important;
+    margin-top:0 !important;
+    font-size:14px !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v132-reward-actions{
+    position:static !important;
+    bottom:auto !important;
+    flex:0 0 auto !important;
+    margin-top:auto !important;
+    padding-top:4px !important;
+    background:none !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v132-reward-actions button{
+    min-height:42px !important;
+    padding:8px 12px !important;
+}
