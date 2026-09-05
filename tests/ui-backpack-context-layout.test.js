@@ -52,7 +52,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  const grid=page.querySelector('.inventory-grid-scroll');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
  void page.offsetHeight;
- const standalone={page:rect(page),shell:rect(shell)};
+ const standalone={page:rect(page),shell:rect(shell),shellWidth:getComputedStyle(shell).width,shellMaxWidth:getComputedStyle(shell).maxWidth,stageToken:getComputedStyle(document.getElementById('game-stage')).getPropertyValue('--ui-large-panel-max-width')};
  app.classList.remove('on-inventory-page');
  page.classList.add('map-inventory-overlay-open'); void page.offsetHeight;
  const overlay={page:rect(page),shell:rect(shell),close:rect(close),grid:rect(grid),gutter:getComputedStyle(grid).scrollbarGutter};
@@ -66,6 +66,7 @@ try{
     const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,"backpack browser layout result missing");
     const data=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
+    console.log("Backpack geometry:",JSON.stringify(data));
     assert.ok(data.standalone.shell.width<=396.5,"standalone backpack shell must use Large Panel width ceiling");
     assert.ok(Math.abs(data.standalone.shell.left-(420-data.standalone.shell.width)/2)<0.5,"standalone backpack shell must be centered");
     assert.ok(data.overlay.page.width<=396.5,"map backpack overlay must use Large Panel width ceiling");
