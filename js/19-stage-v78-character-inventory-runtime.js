@@ -80,32 +80,33 @@ function applyNow(){
     );
 
     /*
-       Large Panel permanent rule:
-       character/status/skill/inventory tabs share one frame.  Content amount
-       may change the inner scroll height, but can no longer shrink or expand
-       the modal itself.  Reuse the same authoritative tokens as the shop.
+       V173.63 visible-layout authority:
+       character/status/skill/inventory share the maximum mobile canvas.
+       The former 396 × 620 inline Large Panel values overrode the V173.62
+       stylesheet, so the screen never actually expanded on phones.  Keep one
+       fixed outer frame here and let only the inner tab content scroll.
     */
     box.style.setProperty(
         "width",
-        "calc(100% - var(--ui-large-panel-safe-space,24px))",
+        "calc(100% - 8px)",
         "important"
     );
 
     box.style.setProperty(
         "max-width",
-        "var(--ui-large-panel-max-width,396px)",
+        "none",
         "important"
     );
 
     box.style.setProperty(
         "height",
-        "min(var(--ui-large-panel-height,620px),calc(100% - var(--ui-large-panel-safe-space,24px)))",
+        "calc(100% - 8px)",
         "important"
     );
 
     box.style.setProperty(
         "max-height",
-        "calc(100% - var(--ui-large-panel-safe-space,24px))",
+        "calc(100% - 8px)",
         "important"
     );
 
@@ -280,18 +281,33 @@ function schedule(){
         );
 }
 
+function loadV17363VisibleUiRepairs(){
+    if(document.getElementById("v17363-visible-ui-repairs-runtime")){
+        return;
+    }
+    const script=document.createElement("script");
+    script.id="v17363-visible-ui-repairs-runtime";
+    script.src="js/58-v173.63-visible-ui-repairs.js?v=173.62";
+    script.async=false;
+    document.body.appendChild(script);
+}
+
 if(
     document.readyState===
     "loading"
 ){
     document.addEventListener(
         "DOMContentLoaded",
-        schedule,
+        function(){
+            schedule();
+            loadV17363VisibleUiRepairs();
+        },
         {once:true}
     );
 }
 else{
     schedule();
+    loadV17363VisibleUiRepairs();
 }
 
 const observer=
