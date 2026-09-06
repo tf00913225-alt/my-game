@@ -695,8 +695,8 @@ test("final combat targeting and Frostbite rules use the Water owner",()=>{
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.51"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.51/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.52"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.52/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });
