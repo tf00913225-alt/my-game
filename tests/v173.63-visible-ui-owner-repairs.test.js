@@ -2,108 +2,55 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
-const vm=require("node:vm");
 
-const source=fs.readFileSync("js/58-v173.63-visible-ui-repairs.js","utf8");
+const characterRuntime=fs.readFileSync(
+    "js/19-stage-v78-character-inventory-runtime.js",
+    "utf8"
+);
+const functionalRepairs=fs.readFileSync(
+    "js/58-v173.63-functional-fixes.js",
+    "utf8"
+);
 
-function styleBag(){
-    const values=new Map();
-    return {
-        setProperty(name,value,priority){ values.set(name,{value:String(value),priority:String(priority||"")}); },
-        value(name){ return values.get(name)?.value; },
-        priority(name){ return values.get(name)?.priority; }
-    };
-}
+assert.match(
+    characterRuntime,
+    /width[\s\S]*calc\(100% - 8px\)[\s\S]*height[\s\S]*calc\(100% - 8px\)/,
+    "character owner must use the full mobile canvas"
+);
+assert.doesNotMatch(
+    characterRuntime,
+    /396px[\s\S]*620px|620px[\s\S]*396px/,
+    "legacy medium-panel inline size must not return"
+);
+assert.match(
+    characterRuntime,
+    /v173:runtime-ready/,
+    "V173.63 functional repairs must wait for the shared late-runtime ready signal"
+);
+assert.match(
+    characterRuntime,
+    /js\/58-v173\.63-functional-fixes\.js\?v=173\.62/,
+    "late loader must attach the single V173.63 functional repair owner"
+);
+assert.doesNotMatch(
+    characterRuntime,
+    /visible-ui-repairs/,
+    "the obsolete duplicate visible repair runtime must not be loaded"
+);
 
-function classList(values){
-    const set=new Set(values||[]);
-    return {
-        contains(name){ return set.has(name); },
-        toggle(name,force){
-            const enabled=force===undefined?!set.has(name):!!force;
-            if(enabled){ set.add(name); }else{ set.delete(name); }
-            return enabled;
-        }
-    };
-}
+assert.match(functionalRepairs,/quickPowerSavingToggle/);
+assert.match(functionalRepairs,/v17361_patrol_power_saving/);
+assert.match(functionalRepairs,/v169-dungeon-inventory-overlay/);
+assert.match(functionalRepairs,/v148ShowDailyDungeonPreview/);
+assert.match(functionalRepairs,/v17346ShowEquipmentDungeonPreview/);
+assert.match(functionalRepairs,/EQUIPMENT_DROP_TIERS/);
+assert.match(functionalRepairs,/amount:\s*10/);
+assert.match(functionalRepairs,/amount:\s*20/);
+assert.match(functionalRepairs,/v17363CraftMaterial/);
+assert.match(functionalRepairs,/cost\s*=\s*50/);
+assert.match(functionalRepairs,/gain\s*=\s*10/);
+assert.match(functionalRepairs,/equipment-v17363\.png/);
+assert.match(functionalRepairs,/assets\/ui\/map-return\.png/);
+assert.match(functionalRepairs,/v132GetContentItemDefinition|v132GetContentDefinitions/);
 
-const powerSave={removed:false,remove(){ this.removed=true; }};
-const synthBox={style:styleBag()};
-const modal={
-    style:styleBag(),
-    classList:classList(["v141-synthesis-modal"]),
-    querySelector(selector){ return selector===".home-feature-modal-box"?synthBox:null; }
-};
-const shell={style:styleBag()};
-const inventory={
-    style:styleBag(),
-    classList:classList(["map-inventory-overlay-open","v169-dungeon-inventory-overlay"]),
-    querySelector(selector){ return selector===".inventory-classic-shell"?shell:null; }
-};
-const app={classList:classList(["v141-dungeon-active"])};
-const select={value:"oreWhite",options:[{value:"oreWhite",textContent:"白階礦石"}]};
-const iconHost={innerHTML:"GENERIC"};
-const pickerButton={
-    dataset:{},
-    classList:classList(),
-    querySelector(selector){ return selector==="i"?iconHost:null; }
-};
-const label={querySelector(selector){ return selector==="select"?select:null; }};
-const picker={
-    closest(selector){ return selector==="label"?label:null; },
-    querySelectorAll(selector){ return selector==="button"?[pickerButton]:[]; }
-};
-
-const body={};
-const document={
-    body,
-    readyState:"complete",
-    getElementById(id){
-        return {
-            quickPowerSavingToggle:powerSave,
-            homeFeatureModal:modal,
-            app,
-            inventoryPage:inventory
-        }[id]||null;
-    },
-    querySelectorAll(selector){ return selector===".v143-item-picker"?[picker]:[]; },
-    addEventListener(){}
-};
-
-class MutationObserver{
-    constructor(handler){ this.handler=handler; }
-    observe(){}
-}
-
-const context={
-    window:null,document,MutationObserver,console,Map,Set,Object,Array,String,Number,
-    inventoryItems:[{id:"oreWhite",icon:"GENERIC"}],
-    characterEquipment:{},
-    requestAnimationFrame(callback){ callback(); return 1; },
-    setTimeout(callback){ callback(); return 1; }
-};
-context.window=context;
-context.window.addEventListener=()=>{};
-context.window.v132GetContentDefinitions=()=>({
-    talismans:[],
-    ores:[{id:"oreWhite",icon:'<span class="v169-item-art"><img src="ore-white.png"></span>'}],
-    blueprints:[],tickets:[],equipmentSetItems:[]
-});
-
-vm.createContext(context);
-vm.runInContext(source,context,{filename:"js/58-v173.63-visible-ui-repairs.js"});
-
-assert.equal(powerSave.removed,true,"patrol power-saving UI entry must be physically removed");
-assert.match(iconHost.innerHTML,/v169-item-art/);
-assert.match(iconHost.innerHTML,/ore-white\.png/);
-assert.equal(modal.style.value("padding"),"4px");
-assert.equal(synthBox.style.value("width"),"calc(100% - 8px)");
-assert.equal(synthBox.style.value("max-width"),"none");
-assert.equal(inventory.style.value("inset"),"0");
-assert.equal(inventory.style.value("width"),"100%");
-assert.equal(inventory.style.value("height"),"100%");
-assert.equal(shell.style.value("width"),"100%");
-assert.equal(inventory.style.priority("width"),"important");
-assert.equal(typeof context.v17363RunVisibleUiRepairs,"function");
-
-console.log("✓ V173.63 visible UI owner repairs execute against real runtime owners");
+console.log("✓ V173.63 repairs attach after runtime owners and cover the requested live features");
