@@ -1,0 +1,31 @@
+name: V173.61 whitespace cleanup
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17361-whitespace-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Remove trailing whitespace
+        run: |
+          sed -i 's/[[:space:]]\+$//' js/equipment-progression.js
+          git diff --check
+      - name: Commit cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/v17361-whitespace-fix.yml
+          git add js/equipment-progression.js
+          git commit -m "V173.61 clean reward preview whitespace"
+          git push origin HEAD:dev
