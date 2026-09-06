@@ -87,18 +87,20 @@ test("historical character rules remain compatible fallbacks instead of a scale-
 });
 
 test("long character tabs retain the canonical internal scroll owner",()=>{
-    assert.match(runtime,/inventoryOwnsScroll\s*\? "hidden"\s*: "scroll"/);
+    assert.match(runtime,/inventoryOwnsScroll\s*\?\s*"hidden"\s*:\s*"scroll"/);
     assert.match(runtime,/"scrollbar-gutter",[\s\S]*?"stable"/);
     assert.match(coreCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
     assert.match(finalCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
 });
 
-test("the visible V173.63 repair runtime is loaded from the real character owner",()=>{
-    assert.match(runtime,/v17363-visible-ui-repairs-runtime/);
-    assert.match(runtime,/js\/58-v173\.63-visible-ui-repairs\.js\?v=173\.62/);
+test("the functional V173.63 repair runtime attaches after late runtime owners",()=>{
+    assert.match(runtime,/v17363-functional-fixes-runtime/);
+    assert.match(runtime,/js\/58-v173\.63-functional-fixes\.js\?v=173\.62/);
+    assert.match(runtime,/v173:runtime-ready/);
+    assert.doesNotMatch(runtime,/visible-ui-repairs/);
 });
 
-test("the repository source remains V173.62 and dev deployment stamps V173.63",()=>{
+test("the repository source remains V173.62 and dev deployment keeps that source version",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.62"/);
     assert.match(index,/<title>四象江湖傳 V173\.62<\/title>/);
     assert.match(index,/aria-label="目前版本 V173\.62"/);
