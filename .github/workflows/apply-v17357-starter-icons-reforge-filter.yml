@@ -1,0 +1,43 @@
+name: Apply V173.57 starter icons and reforge filter
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'launch V173.57 starter icon and reforge filter fix')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Ensure asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+      - name: Apply V173.57 patch
+        run: python .github/scripts/apply-v17357-starter-icons-reforge-filter.py
+      - name: Syntax and full tests
+        run: |
+          node --check js/20-anonymous-20.js
+          node --check js/36-v141-content-systems.js
+          node --check js/51-v169-rpg-ui.js
+          node --check js/equipment-progression.js
+          node --check js/53-v173.50-inventory-qol.js
+          node --check js/56-v173.51-shop-qa.js
+          node .github/scripts/ci.mjs tests
+          git diff --check
+      - name: Commit V173.57
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html js tests
+          git commit -m "V173.57 repair starter equipment icons and filter reforge list"
+          git push origin HEAD:dev
