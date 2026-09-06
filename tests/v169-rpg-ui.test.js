@@ -223,13 +223,21 @@ test("successful potion purchases enqueue an RPG receipt only after inventory ch
     assert.match(uiSource,/window\.rpgAlert\([\s\S]*title:"購買成功"/);
 });
 
-test("dungeon backpack reuses the real inventory and rises above the dungeon nav",()=>{
+test("dungeon backpack reuses the real inventory and fills the dungeon canvas",()=>{
     assert.match(uiSource,/dungeonPage\.classList\.contains\("active"\)/);
     assert.match(uiSource,/mapPage\.classList\.add\("active"\)/);
     assert.match(uiSource,/previousOpenMapInventoryOverlay\.apply/);
     assert.match(uiSource,/classList\.add\("v169-dungeon-inventory-overlay"\)/);
-    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*inset:8px 8px 76px 8px !important/);
+    assert.match(css,/V173\.62 — character and dungeon backpack use the maximum mobile canvas/);
+    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*inset:0 !important/);
+    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*width:100% !important/);
     assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*z-index:900 !important/);
+});
+
+test("character panel fills the mobile canvas while preserving internal scroll",()=>{
+    assert.match(css,/#homeFeatureModal:has\(\.home-feature-modal-box\.wide\)\{[\s\S]*padding:4px !important/);
+    assert.match(css,/\.home-feature-modal-box\.wide\{[\s\S]*width:calc\(100% - 8px\) !important;[\s\S]*max-width:none !important;[\s\S]*height:calc\(100% - 8px\) !important/);
+    assert.match(css,/\.home-feature-modal-box\.wide #characterTabContent\{[\s\S]*overflow-y:auto !important/);
 });
 
 test("perpetual modal glow and skill-card compositing are static",()=>{
