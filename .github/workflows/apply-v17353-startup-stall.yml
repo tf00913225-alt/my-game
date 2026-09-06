@@ -1,0 +1,41 @@
+name: Apply V173.53 startup stall fix
+
+on:
+  push:
+    branches: [tmp-v17353-startup-stall]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'launch V173.53 startup stall fix')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: tmp-v17353-startup-stall
+          fetch-depth: 0
+      - name: Ensure asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+      - name: Apply patch
+        run: python .github/scripts/apply-v17353-startup-stall.py
+      - name: Syntax and tests
+        run: |
+          node --check js/54-v173.51-battle-qa.js
+          node --check js/55-v173.51-inventory-qa.js
+          node --check js/20-anonymous-20.js
+          node --check js/53-v173.50-inventory-qol.js
+          node .github/scripts/ci.mjs tests
+          git diff --check
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html js tests
+          git commit -m "V173.53 fix startup stall at module 29 of 32"
+          git push origin HEAD:tmp-v17353-startup-stall
