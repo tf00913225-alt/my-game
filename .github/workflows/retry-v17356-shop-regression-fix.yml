@@ -1,0 +1,67 @@
+name: Retry V173.56 shop regression fix
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'retry V173.56 shop regression fix')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Ensure asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+      - name: Apply patch and correct regression assertion
+        run: |
+          python .github/scripts/apply-v17356-shop-regression-fix.py
+          cat > tests/v173.56-shop-layout-preview-regression.test.js <<'EOF'
+          "use strict";
+          const assert=require("node:assert/strict");
+          const fs=require("node:fs");
+          const shop=fs.readFileSync("js/56-v173.51-shop-qa.js","utf8");
+          const css=fs.readFileSync("css/53-v173.51-qa.css","utf8");
+          const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+          const index=fs.readFileSync("index.html","utf8");
+          assert.ok(shop.includes("v17345-equipment-card v17346-shop-card"));
+          assert.ok(shop.includes("v17345-equipment-icon v17346-gear-art"));
+          assert.ok(shop.includes("v17346-shop-name"));
+          assert.ok(shop.includes("v17346-shop-slot"));
+          assert.ok(shop.includes("v17346-stat"));
+          assert.ok(shop.includes("v17346-shop-buy"));
+          assert.ok(shop.includes('onclick="v17351PreviewEquipmentShopOffer('));
+          assert.ok(shop.includes("window.v17351PreviewEquipmentShopOffer=function"));
+          assert.ok(shop.includes("window.v17346PreviewEquipmentShopOffer=window.v17351PreviewEquipmentShopOffer"));
+          assert.ok(!shop.includes("v17345-equipment-card v17351-shop-card"));
+          assert.ok(!css.includes(".v17351-shop-card{display:grid!important;grid-template-columns:88px"));
+          assert.ok(css.includes(".v17346-shop-card.purchased .v17346-shop-buy.v17351-purchased-buy"));
+          assert.match(loader,/const V_ASSET_VERSION="173\.56"/);
+          assert.match(index,/<title>四象江湖傳 V173\.56<\/title>/);
+          console.log("✓ V173.56 restores premium equipment shop layout and click preview");
+          EOF
+      - name: Syntax and full tests
+        run: |
+          node --check js/20-anonymous-20.js
+          node --check js/51-v169-rpg-ui.js
+          node --check js/equipment-progression.js
+          node --check js/53-v173.50-inventory-qol.js
+          node --check js/56-v173.51-shop-qa.js
+          node .github/scripts/ci.mjs tests
+          git diff --check
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html css js tests
+          git commit -m "V173.56 restore premium equipment shop layout and preview"
+          git push origin HEAD:dev
