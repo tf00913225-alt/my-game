@@ -1,6 +1,5 @@
 /* =====================================================
    V173.63 — requested functional fixes (runtime authority)
-   - patrol power-save UI removal / automatic screen-awake policy
    - maximum character, synthesis and dungeon-backpack canvases
    - canonical item art + formal rarity frames
    - premium text-only dungeon reward previews
@@ -61,19 +60,6 @@ function refreshInventory(){
     else if(typeof renderInventory==="function"){try{renderInventory();}catch(_){}}
     if(typeof updateGoldDisplay==="function"){try{updateGoldDisplay();}catch(_){}}
     if(typeof saveGame==="function"){try{saveGame();}catch(_){}}
-}
-
-/* ---------- 1. Patrol power-save entry removed; awake policy is automatic. ---------- */
-function removePatrolPowerSave(){
-    const button=document.getElementById("quickPowerSavingToggle");
-    if(button){button.remove();}
-    try{localStorage.removeItem("v17361_patrol_power_saving");}catch(_){ }
-    /* The old user-facing toggle is no longer an active API.  Keep only the
-       automatic wake request supplied by the existing compatibility layer. */
-    try{delete window.v17361TogglePowerSaving;}catch(_){window.v17361TogglePowerSaving=undefined;}
-    if(typeof window.v17361RequestWakeLock==="function"){
-        try{void window.v17361RequestWakeLock();}catch(_){ }
-    }
 }
 
 /* ---------- 2 / 6 / 7. Use the maximum game canvas. ---------- */
@@ -234,7 +220,6 @@ function ensureFunctionalStyles(){
     const style=document.createElement("style");
     style.id="v17363-functional-fixes-style";
     style.textContent=`
-#game-stage #mapPage .v17361-power-save-toggle,#game-stage #quickPowerSavingToggle{display:none!important;}
 #game-stage .v169-material-art{box-sizing:border-box!important;border:2px solid currentColor!important;border-radius:8px!important;padding:2px!important;background:#090b0f!important;}
 #game-stage .v169-material-art.v169-rarity-white,#game-stage .v169-material-art.v169-rarity-low{color:#D8D8D8!important;border-color:#D8D8D8!important;box-shadow:0 0 7px rgba(216,216,216,.78),inset 0 0 7px rgba(216,216,216,.24)!important;}
 #game-stage .v169-material-art.v169-rarity-blue,#game-stage .v169-material-art.v169-rarity-mid{color:#42A5FF!important;border-color:#42A5FF!important;box-shadow:0 0 8px rgba(66,165,255,.88),inset 0 0 7px rgba(66,165,255,.32)!important;}
@@ -468,7 +453,7 @@ function syncReturnIcons(){
 }
 
 function runRepairs(){
-    repairQueued=false;removePatrolPowerSave();ensureFunctionalStyles();syncCanonicalItemArt();maximizeCharacterPanel();maximizeSynthesisPanel();maximizeDungeonBackpack();repairSynthesisIcons();ensureMaterialTab();syncReturnIcons();
+    repairQueued=false;ensureFunctionalStyles();syncCanonicalItemArt();maximizeCharacterPanel();maximizeSynthesisPanel();maximizeDungeonBackpack();repairSynthesisIcons();ensureMaterialTab();syncReturnIcons();
 }
 function scheduleRepairs(){
     if(repairQueued){return;}repairQueued=true;

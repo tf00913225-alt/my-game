@@ -38,8 +38,7 @@ assert.doesNotMatch(
     "the obsolete duplicate visible repair runtime must not be loaded"
 );
 
-assert.match(functionalRepairs,/quickPowerSavingToggle/);
-assert.match(functionalRepairs,/v17361_patrol_power_saving/);
+assert.doesNotMatch(functionalRepairs,/quickPowerSavingToggle|v17361-power-save-toggle|v17361TogglePowerSaving|v17361_patrol_power_saving|v17361RequestWakeLock/);
 assert.match(functionalRepairs,/v169-dungeon-inventory-overlay/);
 assert.match(functionalRepairs,/v148ShowDailyDungeonPreview/);
 assert.match(functionalRepairs,/v17346ShowEquipmentDungeonPreview/);
