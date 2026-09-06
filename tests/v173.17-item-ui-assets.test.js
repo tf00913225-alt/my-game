@@ -121,9 +121,9 @@ test("equipment reward has a visible return action and resilient image fallback"
 });
 
 test("published development label advances to V173.39",()=>{
-    assert.match(html,/<title>四象江湖傳 V173\.51<\/title>/);
-    assert.match(html,/>V173\.51<\/div>/);
-    assert.match(read("js/20-anonymous-20.js"),/const V_ASSET_VERSION="173\.51"/);
+    assert.match(html,/<title>四象江湖傳 V173\.52<\/title>/);
+    assert.match(html,/>V173\.52<\/div>/);
+    assert.match(read("js/20-anonymous-20.js"),/const V_ASSET_VERSION="173\.52"/);
 });
 
 console.log("\n"+passed+" V173.39 item UI and asset tests passed.");

@@ -386,8 +386,13 @@
         if(document.getElementById("equipment-progression-runtime")){ return; }
         const script=document.createElement("script");
         script.id="equipment-progression-runtime";
-        script.src="js/equipment-progression.js?v=173.51";
+        script.src="js/equipment-progression.js?v=173.52";
         script.async=false;
+        script.onload=function(){
+            if(typeof window.__v173ReportRuntimeProgress==="function"){
+                window.__v173ReportRuntimeProgress("equipment-progression-runtime","裝備與商店系統");
+            }
+        };
         script.onerror=function(){
             if(typeof window.__v17347RuntimeGateFail==="function"){
                 window.__v17347RuntimeGateFail("裝備與商店系統載入失敗，請重新整理。");
