@@ -15,7 +15,7 @@ function findChrome(){
 
 const chrome=findChrome();
 if(!chrome){
-  console.log("V173.49 EXP viewport browser check skipped: Chrome not available");
+  console.log("V173.50 EXP viewport browser check skipped: Chrome not available");
   process.exit(0);
 }
 
@@ -25,7 +25,7 @@ const growth=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 
 const helperStart=growth.indexOf("    function v173CaptureExpPoolViewport()");
 const helperEnd=growth.indexOf("    function wrapExpPreviewForCatchUp()",helperStart);
-assert.ok(helperStart>=0&&helperEnd>helperStart,"V173.49 viewport helpers missing");
+assert.ok(helperStart>=0&&helperEnd>helperStart,"V173.50 viewport helpers missing");
 const helpers=growth.slice(helperStart,helperEnd);
 
 const html=`<!doctype html><html><head><meta charset="utf-8"><style>

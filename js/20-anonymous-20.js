@@ -1,17 +1,29 @@
 /* =====================================================
-   V173.47 — CRITICAL RUNTIME READINESS GATE
-   The app shell is parsed before late patch owners (V131→V169 and the
-   equipment progression runtime) finish loading. On a warm/session resume
-   that made old page renderers clickable for a short window. Block every
-   user interaction at the document capture phase until the final critical
-   runtime explicitly releases this gate. This is global, not shop-specific.
+   V173.52 — CRITICAL RUNTIME READINESS GATE + REAL PROGRESS
+   Gameplay remains blocked until the full late runtime stack is ready, but the
+   separate black gate UI is gone. The existing cinematic startup layer owns the
+   visible progress and receives one event per successfully loaded module.
 ===================================================== */
-(function installV17347RuntimeReadinessGate(){
+(function installV17352RuntimeReadinessGate(){
     if(typeof window==="undefined"||window.__v17347RuntimeGateInstalled){ return; }
     window.__v17347RuntimeGateInstalled=true;
+    const TOTAL_RUNTIME_MODULES=32;
+    const loadedKeys=new Set();
     let released=false;
     let failed=false;
 
+    function dispatch(name,detail){
+        try{
+            if(typeof CustomEvent==="function"){
+                document.dispatchEvent(new CustomEvent(name,{detail:detail||{}}));
+            }else if(document&&typeof document.dispatchEvent==="function"){
+                document.dispatchEvent({type:name,detail:detail||{}});
+            }
+        }catch(_){ }
+    }
+    function progressDetail(label){
+        return {loaded:loadedKeys.size,total:TOTAL_RUNTIME_MODULES,label:String(label||"")};
+    }
     function blockInteraction(event){
         if(released){ return; }
         if(event&&typeof event.preventDefault==="function"){ event.preventDefault(); }
@@ -23,28 +35,19 @@
     document.addEventListener("keydown",blockInteraction,true);
     document.addEventListener("touchstart",blockInteraction,{capture:true,passive:false});
 
-    function mountGate(){
-        if(released||!document.body||document.getElementById("v17347RuntimeGate")){ return; }
-        const gate=document.createElement("div");
-        gate.id="v17347RuntimeGate";
-        gate.setAttribute("role","status");
-        gate.setAttribute("aria-live","polite");
-        gate.style.cssText="position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050403;color:#f3d58b;font:700 16px/1.5 system-ui,sans-serif;letter-spacing:.05em;pointer-events:auto";
-        const status=document.createElement("div");
-        status.id="v17347RuntimeGateStatus";
-        status.textContent="正在同步最新遊戲系統…";
-        status.style.cssText="padding:12px 18px;border:1px solid #8c672e;border-radius:10px;background:#171008;box-shadow:0 6px 20px rgba(0,0,0,.45)";
-        gate.appendChild(status);
-        document.body.appendChild(gate);
-    }
-
-    window.__v17347RuntimeGateFail=function(message){
-        failed=true;
-        mountGate();
-        const status=document.getElementById("v17347RuntimeGateStatus");
-        if(status){ status.textContent=message||"必要遊戲模組載入失敗，請重新整理。"; }
+    window.__v173RuntimeProgressTotal=TOTAL_RUNTIME_MODULES;
+    window.__v173ReportRuntimeProgress=function(key,label){
+        if(key){ loadedKeys.add(String(key)); }
+        dispatch("v173:runtime-progress",progressDetail(label));
+        return loadedKeys.size;
     };
-
+    window.__v17347RuntimeGateFail=function(message){
+        if(failed||released){ return false; }
+        failed=true;
+        const text=String(message||"必要遊戲模組載入失敗，請重新整理。");
+        dispatch("v173:runtime-failed",{message:text,loaded:loadedKeys.size,total:TOTAL_RUNTIME_MODULES});
+        return false;
+    };
     window.__v17347RuntimeGateRelease=function(){
         if(released||failed){ return false; }
         released=true;
@@ -52,17 +55,13 @@
         document.removeEventListener("click",blockInteraction,true);
         document.removeEventListener("keydown",blockInteraction,true);
         document.removeEventListener("touchstart",blockInteraction,true);
-        const gate=document.getElementById("v17347RuntimeGate");
-        if(gate){ gate.remove(); }
-        document.documentElement.dataset.runtimeReady="173.47";
-        document.dispatchEvent(new CustomEvent("v17347:runtime-ready"));
+        document.documentElement.dataset.runtimeReady="173.55";
+        dispatch("v173:runtime-ready",{loaded:TOTAL_RUNTIME_MODULES,total:TOTAL_RUNTIME_MODULES});
+        dispatch("v17347:runtime-ready",{loaded:TOTAL_RUNTIME_MODULES,total:TOTAL_RUNTIME_MODULES});
         return true;
     };
-
-    if(document.body){ mountGate(); }
-    else{ document.addEventListener("DOMContentLoaded",mountGate,{once:true}); }
+    dispatch("v173:runtime-progress",{loaded:0,total:TOTAL_RUNTIME_MODULES,label:"啟動遊戲模組"});
 })();
-
 
 /* =====================================================
    ★★★ 資產快取版本號（改動任何被下面 loader 載入的檔案，
@@ -83,7 +82,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="173.49";
+const V_ASSET_VERSION="173.55";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;
@@ -700,11 +699,19 @@ function vAssetUrl(path){
         const existing=document.getElementById(runtime.id);
 
         if(existing){
-            if(existing.dataset.loaded==="1" || existing.dataset.failed==="1"){
+            if(existing.dataset.loaded==="1"){
+                if(typeof window!=="undefined"&&typeof window.__v173ReportRuntimeProgress==="function"){ window.__v173ReportRuntimeProgress(runtime.id,runtime.src); }
                 next(index+1);
                 return;
             }
-            existing.addEventListener("load",()=>next(index+1),{once:true});
+            if(existing.dataset.failed==="1"){
+                next(index+1);
+                return;
+            }
+            existing.addEventListener("load",()=>{
+                if(typeof window!=="undefined"&&typeof window.__v173ReportRuntimeProgress==="function"){ window.__v173ReportRuntimeProgress(runtime.id,runtime.src); }
+                next(index+1);
+            },{once:true});
             existing.addEventListener("error",()=>next(index+1),{once:true});
             return;
         }
@@ -715,6 +722,7 @@ function vAssetUrl(path){
         script.src=vAssetUrl(runtime.src);
         script.addEventListener("load",function(){
             script.dataset.loaded="1";
+            if(typeof window!=="undefined"&&typeof window.__v173ReportRuntimeProgress==="function"){ window.__v173ReportRuntimeProgress(runtime.id,runtime.src); }
             next(index+1);
         },{once:true});
         script.addEventListener("error",function(){

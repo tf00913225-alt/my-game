@@ -487,7 +487,65 @@
 
     if(typeof saveGame==="function"){ try{ saveGame(); }catch(_){ } }
 
-    if(typeof window.__v17347RuntimeGateRelease==="function"){
-        window.__v17347RuntimeGateRelease();
+    function releaseV17350RuntimeGate(){
+        if(typeof window.__v17347RuntimeGateRelease==="function"){
+            window.__v17347RuntimeGateRelease();
+        }
     }
+    function failV17350RuntimeGate(message){
+        if(typeof window.__v17347RuntimeGateFail==="function"){
+            window.__v17347RuntimeGateFail(message||"背包與批量操作系統載入失敗，請重新整理。");
+        }
+    }
+    function loadV17350InventoryQol(){
+        if(typeof document==="undefined"||!document.head){
+            releaseV17350RuntimeGate();
+            return;
+        }
+        if(!document.getElementById("v17350-inventory-qol-style")){
+            const link=document.createElement("link");
+            link.id="v17350-inventory-qol-style";
+            link.rel="stylesheet";
+            link.href="css/52-v173.50-inventory-qol.css?v=173.55";
+            link.onerror=function(){ failV17350RuntimeGate("背包介面樣式載入失敗，請重新整理。"); };
+            document.head.appendChild(link);
+        }
+        if(document.getElementById("v17350-inventory-qol-runtime")){
+            releaseV17350RuntimeGate();
+            return;
+        }
+        const script=document.createElement("script");
+        script.id="v17350-inventory-qol-runtime";
+        script.src="js/53-v173.50-inventory-qol.js?v=173.55";
+        script.async=false;
+        script.onload=function(){
+        if(typeof window.__v173ReportRuntimeProgress==="function"){
+            window.__v173ReportRuntimeProgress("v17350-inventory-qol-runtime","背包與批量操作系統");
+        }
+        if(window.__v17351QaReady){
+            releaseV17350RuntimeGate();
+            return;
+        }
+        let qaSettled=false;
+        const onQaReady=function(){
+            if(qaSettled){ return; }
+            qaSettled=true;
+            document.removeEventListener("v17351:qa-ready",onQaReady);
+            releaseV17350RuntimeGate();
+        };
+        document.addEventListener("v17351:qa-ready",onQaReady,{once:true});
+        setTimeout(function(){
+            if(qaSettled||window.__v17351QaReady){
+                if(!qaSettled){ onQaReady(); }
+                return;
+            }
+            qaSettled=true;
+            document.removeEventListener("v17351:qa-ready",onQaReady);
+            failV17350RuntimeGate("功能模組載入時間過長，請重新整理後再試。");
+        },30000);
+    };
+        script.onerror=function(){ failV17350RuntimeGate("背包與批量操作系統載入失敗，請重新整理。"); };
+        document.head.appendChild(script);
+    }
+    loadV17350InventoryQol();
 })();

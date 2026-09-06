@@ -146,10 +146,10 @@ test("Creation step one keeps native geometry while using the larger readable ty
 });
 
 test("The published mobile fix remains covered in the V173.39 cache release",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.49"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.55"/);
     assert.match(index,/css\/29-v125-character-creation-native\.css\?v=173\.39/);
     assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.39/);
-    assert.match(index,/aria-label="目前版本 V173\.49"[\s\S]*?>V173\.49<\/div>/);
+    assert.match(index,/aria-label="目前版本 V173\.55"[\s\S]*?>V173\.55<\/div>/);
 });
 
 console.log("\nV173.2 mobile touch and scroll suite: "+passed+" tests passed.");

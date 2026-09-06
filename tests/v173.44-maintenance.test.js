@@ -23,8 +23,8 @@ assert.match(water,/floodBeast:\{[\s\S]*?learnCost:15[\s\S]*?requires:\["waterBa
 assert.match(main,/const learnCost=Math\.max\(0,Number\(skill\.learnCost\)\|\|0\)/);
 assert.match(main,/owner\.skillPoints=availablePoints-learnCost/);
 assert.match(water,/applyFinalSkillData\(\);[\s\S]*?renderSkillLoadout\(\)/);
-assert.match(index,/<title>四象江湖傳 V173\.49<\/title>/);
-assert.match(index,/aria-label="目前版本 V173\.49"[\s\S]*?>V173\.49<\/div>/);
-assert.match(loader,/const V_ASSET_VERSION="173\.49"/);
+assert.match(index,/<title>四象江湖傳 V173\.55<\/title>/);
+assert.match(index,/aria-label="目前版本 V173\.55"[\s\S]*?>V173\.55<\/div>/);
+assert.match(loader,/const V_ASSET_VERSION="173\.55"/);
 assert.match(agents,/https:\/\/four-symbols-dev\.pages\.dev/);
-console.log("V173.49 maintenance regression checks passed");
+console.log("V173.50 maintenance regression checks passed");
