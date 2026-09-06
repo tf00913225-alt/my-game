@@ -53,13 +53,14 @@ jobs:
               'write("index.html",html)',
               '',
           ]
-          replacement='\n'.join(lines)+'\n'
-          p.write_text(s[:start]+replacement+s[end:],encoding='utf-8')
+          p.write_text(s[:start]+'\n'.join(lines)+'\n'+s[end:],encoding='utf-8')
           PY
       - name: Validate patch script syntax
         run: python -m py_compile .github/scripts/v17361_patch.py
       - name: Apply V173.61 source fixes
         run: python .github/scripts/v17361_patch.py
+      - name: Sync panel version regression
+        run: sed -i 's/173\\.60/173\\.61/g' tests/ui-panel-sizing-regression.test.js
       - name: Check modified JavaScript syntax
         run: |
           node --check js/00-main.js
