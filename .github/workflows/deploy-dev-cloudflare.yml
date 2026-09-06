@@ -1,4 +1,4 @@
-# V173.45 finalized: this workflow publishes the current dev branch to the stable preview URL.
+# V173.63: publish dev with one deployment-time cache stamp so mobile clients cannot reuse V173.62 assets.
 name: Deploy dev to Cloudflare Pages
 
 on:
@@ -23,6 +23,7 @@ jobs:
       CLOUDFLARE_API_TOKEN_RAW: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID_RAW: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PROJECT_NAME: four-symbols-dev
+      DEV_CACHE_VERSION: "173.63"
 
     steps:
       - name: Checkout dev
@@ -57,6 +58,23 @@ jobs:
             --exclude='_deploy/' \
             ./ _deploy/
           test -f _deploy/index.html || { echo "index.html not found"; exit 1; }
+
+          # Dev preview is a disposable build artifact. Stamp the current cache
+          # version only inside _deploy so every HTML/CSS/JS URL that still uses
+          # the previous V173.62 key is fetched again by mobile browsers.
+          while IFS= read -r -d '' file; do
+            sed -i "s/173\\.62/${DEV_CACHE_VERSION}/g" "$file"
+          done < <(find _deploy -type f \( -name '*.html' -o -name '*.css' -o -name '*.js' \) -print0)
+
+          grep -q "<title>四象江湖傳 V${DEV_CACHE_VERSION}</title>" _deploy/index.html || {
+            echo "dev visible version was not stamped"; exit 1;
+          }
+          grep -q "const V_ASSET_VERSION=\"${DEV_CACHE_VERSION}\";" _deploy/js/20-anonymous-20.js || {
+            echo "dev runtime cache version was not stamped"; exit 1;
+          }
+          if grep -R --include='*.html' --include='*.css' --include='*.js' -n "173\.62" _deploy; then
+            echo "stale V173.62 cache key remains in dev artifact"; exit 1;
+          fi
 
       - name: Ensure Pages project exists
         shell: bash
