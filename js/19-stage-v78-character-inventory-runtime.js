@@ -83,7 +83,7 @@ function applyNow(){
        V173.63 visible-layout authority:
        character/status/skill/inventory share the maximum mobile canvas.
        The former 396 × 620 inline Large Panel values overrode the V173.62
-       stylesheet, so the screen never actually expanded on phones.  Keep one
+       stylesheet, so the screen never actually expanded on phones. Keep one
        fixed outer frame here and let only the inner tab content scroll.
     */
     box.style.setProperty(
@@ -281,15 +281,38 @@ function schedule(){
         );
 }
 
-function loadV17363VisibleUiRepairs(){
-    if(document.getElementById("v17363-visible-ui-repairs-runtime")){
+function loadV17363FunctionalFixes(){
+    if(document.getElementById("v17363-functional-fixes-runtime")){
         return;
     }
+
     const script=document.createElement("script");
-    script.id="v17363-visible-ui-repairs-runtime";
-    script.src="js/58-v173.63-visible-ui-repairs.js?v=173.62";
+    script.id="v17363-functional-fixes-runtime";
+    script.src="js/58-v173.63-functional-fixes.js?v=173.62";
     script.async=false;
+    script.onerror=function(){
+        console.warn("V173.63 functional fixes failed to load");
+    };
     document.body.appendChild(script);
+}
+
+function armV17363FunctionalFixes(){
+    /*
+       The functional patch wraps late owners such as v141 synthesis and
+       equipment-progression. Loading it at DOMContentLoaded is too early and
+       leaves those wrappers detached. Wait for the shared runtime-ready event
+       so V173.63 always attaches after the actual feature owners exist.
+    */
+    if(document.documentElement.dataset.runtimeReady==="173.62"){
+        loadV17363FunctionalFixes();
+        return;
+    }
+
+    document.addEventListener(
+        "v173:runtime-ready",
+        loadV17363FunctionalFixes,
+        {once:true}
+    );
 }
 
 if(
@@ -300,14 +323,14 @@ if(
         "DOMContentLoaded",
         function(){
             schedule();
-            loadV17363VisibleUiRepairs();
+            armV17363FunctionalFixes();
         },
         {once:true}
     );
 }
 else{
     schedule();
-    loadV17363VisibleUiRepairs();
+    armV17363FunctionalFixes();
 }
 
 const observer=
