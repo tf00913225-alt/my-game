@@ -48,7 +48,7 @@ vm.createContext(context);
 vm.runInContext(ui,context);
 
 assert.equal(injectedScripts.length,1,"equipment progression bootstrap should inject one script");
-assert.match(injectedScripts[0].src,/js\/equipment-progression\.js\?v=173\.54$/);
+assert.match(injectedScripts[0].src,/js\/equipment-progression\.js\?v=173\.55$/);
 
 const pages=["equipment","potion","equipment","potion","equipment"];
 pages.forEach(page=>{

@@ -17,7 +17,7 @@ assert.match(growth,/window\.v131CancelExpPreview=function\(\)\{[\s\S]*?v173Capt
 assert.match(css,/V173\.49 — EXP POOL TAP \/ SCROLL STABILITY/);
 assert.match(css,/#homeExpPoolCard #expDistributeList \*\{[\s\S]*?overflow-anchor:none !important;/);
 assert.match(css,/\.v131-exp-preview-btn,[\s\S]*?\.v131-exp-confirm,[\s\S]*?\.v131-exp-back\{[\s\S]*?touch-action:none !important;/);
-assert.ok(loader.includes('const V_ASSET_VERSION="173.54";'));
-assert.ok(index.includes('<title>四象江湖傳 V173.54</title>'));
+assert.ok(loader.includes('const V_ASSET_VERSION="173.55";'));
+assert.ok(index.includes('<title>四象江湖傳 V173.55</title>'));
 
 console.log("V173.50 EXP pool scroll stability regression checks passed");
