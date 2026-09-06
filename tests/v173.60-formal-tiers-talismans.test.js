@@ -57,7 +57,7 @@ test("rarity visuals use the locked palette and four-symbol border",()=>{
   assert.match(rarityCss,/2\.8s ease-in-out infinite/);
 });
 
-test("release wiring is V173.61",()=>{
-  assert.ok(loader.includes('const V_ASSET_VERSION="173.61";'));
-  assert.ok(html.includes("四象江湖傳 V173.61"));
+test("release wiring is V173.62",()=>{
+  assert.ok(loader.includes('const V_ASSET_VERSION="173.62";'));
+  assert.ok(html.includes("四象江湖傳 V173.62"));
 });

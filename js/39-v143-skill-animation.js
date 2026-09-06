@@ -1603,6 +1603,8 @@
         const stage=document.createElement("div");
         stage.id="v143-skill-stage";
         stage.className="v143-skill-stage";
+        /* V173.62: a stale non-battle management state must never leave combat VFX hidden. */
+        stage.style.visibility="visible";
         stage.dataset.sequence=String(current.sequence);
         stage.dataset.skill=String(config.id||"unknown");
         stage.dataset.signature=model.signature;

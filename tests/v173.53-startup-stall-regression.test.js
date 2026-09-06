@@ -12,9 +12,9 @@ assert.match(battle,/stage\.style\.visibility!==nextVisibility/);
 assert.doesNotMatch(inventory,/obs\.observe\(document\.body,\{subtree:true,childList:true,attributes:true/);
 assert.match(inventory,/obs\.observe\(document\.body,\{subtree:true,childList:true\}\)/);
 assert.match(inventory,/classList\.contains\("v17351-inventory-fullscreen"\)!==open/);
-assert.match(loader,/const V_ASSET_VERSION="173\.61"/);
+assert.match(loader,/const V_ASSET_VERSION="173\.62"/);
 for(const name of ["54-v173.51-battle-qa.js","55-v173.51-inventory-qa.js","56-v173.51-shop-qa.js","57-v173.51-quest-qa.js"]){
-  assert.ok(qol.includes(name+"?v=173.61"),name+" fresh cache key");
+  assert.ok(qol.includes(name+"?v=173.62"),name+" fresh cache key");
 }
-assert.match(index,/<title>四象江湖傳 V173\.61<\/title>/);
-console.log("✓ V173.61 fixes 29/32 startup microtask starvation");
+assert.match(index,/<title>四象江湖傳 V173\.62<\/title>/);
+console.log("✓ V173.62 fixes 29/32 startup microtask starvation");

@@ -80,9 +80,9 @@ test("both patrol fight frames point to the newly supplied images",()=>{
 });
 
 test("the development release and cache advance to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.61"/);
-    assert.match(index,/<title>四象江湖傳 V173\.61<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.61"[\s\S]*?>V173\.61<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.62"/);
+    assert.match(index,/<title>四象江湖傳 V173\.62<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.62"[\s\S]*?>V173\.62<\/div>/);
     assert.match(index,/css\/25-stage-v90-quest-interface-core\.css\?v=173\.39/);
 });
 

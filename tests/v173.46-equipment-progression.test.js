@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const source=fs.readFileSync("js/equipment-progression.js","utf8");
 const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 
-assert.match(ui,/js\/equipment-progression\.js\?v=173\.61/);
+assert.match(ui,/js\/equipment-progression\.js\?v=173\.62/);
 assert.match(source,/\{key:"white",label:"白階",chance:40,min:1,max:3,reforgeSlots:0/);
 assert.match(source,/\{key:"blue",label:"藍階",chance:40,min:4,max:6,reforgeSlots:0/);
 assert.match(source,/\{key:"purple",label:"紫階",chance:15,min:7,max:9,reforgeSlots:1/);
@@ -62,6 +62,6 @@ assetPaths.forEach(file=>assert.equal(fs.existsSync(file),true,file));
 
 console.log("V173.46 equipment progression specification checks passed");
 
-// V173.61: reforgeSlots are affix-slot capacity; attempts are unlimited.
+// V173.62: reforgeSlots are affix-slot capacity; attempts are unlimited.
 assert.match(source,/return Math\.max\(explicit,existing\)/);
 assert.doesNotMatch(source,/item\.reforgeUsed=Math\.min/);
