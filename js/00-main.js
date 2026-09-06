@@ -3940,18 +3940,6 @@ const inventoryItems = [
     },
 
     {
-        id:"powerRing",
-        name:"力量戒指",
-        icon:"",
-        type:"accessory",
-        count:1,
-        price:200,
-        stats:{
-            attack:5
-        }
-    },
-
-    {
         id:"hpPotion10",
         name:"回復10%HP藥水",
         icon:"",

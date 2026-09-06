@@ -101,6 +101,40 @@
     function artMarkup(path,rarityKey){
         return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarityKey+'"><img src="'+path+'" alt="" draggable="false" onerror="this.hidden=true"></span>';
     }
+    const LEGACY_STARTER_EQUIPMENT_ART={
+        ironSword:{path:"assets/equipment/warrior/weapon-01.png",classType:"warrior"},
+        woodStaff:{path:"assets/equipment/mage/weapon-01.png",classType:"mage"},
+        leatherHelmet:{path:"assets/equipment/warrior/head-01.png"},
+        leatherArmor:{path:"assets/equipment/warrior/armor-01.png"},
+        leatherShoes:{path:"assets/equipment/warrior/shoes-01.png"},
+        powerRing:{ring:true}
+    };
+    function legacyStarterRingMarkup(){
+        return '<span class="v169-item-art v169-equipment-art v17346-rarity-white v17357-starter-ring"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" style="width:100%;height:100%;display:block"><defs><radialGradient id="v17357RingGem" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#fff1a8"/><stop offset=".45" stop-color="#d49a36"/><stop offset="1" stop-color="#6f4517"/></radialGradient><linearGradient id="v17357RingGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8dd86"/><stop offset=".55" stop-color="#b97623"/><stop offset="1" stop-color="#674016"/></linearGradient></defs><ellipse cx="32" cy="38" rx="18" ry="15" fill="none" stroke="url(#v17357RingGold)" stroke-width="7"/><path d="M21 24l6-8h10l6 8-6 7H27z" fill="url(#v17357RingGem)" stroke="#f6d47a" stroke-width="2"/><circle cx="32" cy="22" r="3" fill="#fff6c8" opacity=".9"/></svg></span>';
+    }
+    function repairLegacyStarterEquipmentIcons(){
+        if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){ return false; }
+        let changed=false;
+        inventoryItems.forEach(item=>{
+            if(!item){ return; }
+            const spec=LEGACY_STARTER_EQUIPMENT_ART[String(item.id||"")];
+            if(!spec){ return; }
+            const iconText=String(item.icon||"");
+            const hasRealArt=/<(?:img|svg)\\b/i.test(iconText);
+            if(!hasRealArt){
+                item.icon=spec.ring?legacyStarterRingMarkup():artMarkup(spec.path,"white");
+                changed=true;
+            }
+            if(spec.path&&item.assetPath!==spec.path){ item.assetPath=spec.path; changed=true; }
+            if(spec.classType&&!item.classType){ item.classType=spec.classType; changed=true; }
+            if(item.rarityKey!=="white"){ item.rarityKey="white"; changed=true; }
+            if(item.quality!=="white"){ item.quality="white"; changed=true; }
+            if(Number(item.reforgeSlots)!==0){ item.reforgeSlots=0; changed=true; }
+            if(Number(item.reforgeUsed)!==0){ item.reforgeUsed=0; changed=true; }
+        });
+        return changed;
+    }
+    window.v17357RepairLegacyStarterEquipmentIcons=repairLegacyStarterEquipmentIcons;
     function makeUid(prefix){ return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8); }
     function assetVariant(classType,slot,random){
         const list=ASSETS[classType]&&ASSETS[classType][slot]||[];
@@ -161,12 +195,11 @@
         item.stats={...SET_RULES[key].stats};
         item.quality="orange";
         item.rarityKey="orange";
-        item.reforgeSlots=Math.max(1,Math.floor(Number(item.reforgeSlots)||0));
-        const hasRecordedUse=Object.prototype.hasOwnProperty.call(item,"reforgeUsed");
-        const migratedUse=hasRecordedUse
-            ?Math.max(0,Math.floor(Number(item.reforgeUsed)||0))
-            :(item.reforgeStats&&Object.keys(item.reforgeStats).length?1:0);
-        item.reforgeUsed=Math.min(item.reforgeSlots,migratedUse);
+        const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
+        item.reforgeSlots=Math.max(1,legacyAffixCount,Math.floor(Number(item.reforgeSlots)||0));
+        // V173.58: reforgeUsed is retained only for old-save compatibility.
+        // Reforging is now unlimited; reforgeSlots means affix-slot count.
+        item.reforgeUsed=0;
         item.icon=addOrangeClass(item.icon);
         return item;
     }
@@ -201,6 +234,7 @@
     window.v17346SyncMainCharacterEquipmentStorage=syncMainCharacterEquipmentStorage;
 
     function syncFourElementSets(){
+        repairLegacyStarterEquipmentIcons();
         syncMainCharacterEquipmentStorage();
         try{
             const defs=typeof window.v132GetContentDefinitions==="function"?window.v132GetContentDefinitions():null;
@@ -218,9 +252,25 @@
     }
     syncFourElementSets();
     window.v17346SyncFourElementSets=syncFourElementSets;
+    if(typeof rebuildInventorySlots==="function"){
+        const previousV17357RebuildInventorySlots=rebuildInventorySlots;
+        rebuildInventorySlots=function(){ repairLegacyStarterEquipmentIcons(); return previousV17357RebuildInventorySlots.apply(this,arguments); };
+    }
+    if(typeof renderInventoryItems==="function"){
+        const previousV17357RenderInventoryItems=renderInventoryItems;
+        renderInventoryItems=function(){ repairLegacyStarterEquipmentIcons(); return previousV17357RenderInventoryItems.apply(this,arguments); };
+    }
+    if(typeof document!=="undefined"){
+        const repairAfterLoad=()=>{ repairLegacyStarterEquipmentIcons(); };
+        if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",repairAfterLoad,{once:true});
+        else setTimeout(repairAfterLoad,0);
+    }
 
     function remainingReforgeSlots(item){
-        return Math.max(0,Math.floor(Number(item&&item.reforgeSlots)||0)-Math.floor(Number(item&&item.reforgeUsed)||0));
+        if(!item){ return 0; }
+        const explicit=Math.max(0,Math.floor(Number(item.reforgeSlots)||0));
+        const existing=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
+        return Math.max(explicit,existing);
     }
     window.v17346RemainingReforgeSlots=remainingReforgeSlots;
 
@@ -281,31 +331,19 @@
         window.v141StartReforge=function(){
             const item=selectedReforgeItem();
             if(!item||remainingReforgeSlots(item)<=0){
-                if(typeof window.rpgAlert==="function"){ void window.rpgAlert("這件裝備沒有可用的［可冶煉］詞條槽。",{title:"無法冶煉"}); }
-                else{ alert("這件裝備沒有可用的［可冶煉］詞條槽。"); }
-                return;
+                if(typeof window.rpgAlert==="function"){ void window.rpgAlert("這件裝備沒有冶煉槽。",{title:"無法冶煉"}); }
+                else{ alert("這件裝備沒有冶煉槽。"); }
+                return false;
             }
-            activeReforgeSnapshot={uid:item.v141Uid,used:Math.max(0,Number(item.reforgeUsed)||0),stats:{...(item.reforgeStats||{})}};
             return previousStartReforge.apply(this,arguments);
         };
     }
     if(typeof window.v141ResolveReforge==="function"){
         const previousResolveReforge=window.v141ResolveReforge;
-        window.v141ResolveReforge=function(apply){
-            const snapshot=activeReforgeSnapshot;
-            const item=snapshot?allEquipment().find(entry=>entry&&entry.v141Uid===snapshot.uid):null;
-            const result=previousResolveReforge.apply(this,arguments);
-            if(apply&&item&&snapshot){
-                const rolled={...(item.reforgeStats||{})};
-                const merged={...snapshot.stats};
-                Object.entries(rolled).forEach(([key,value])=>{ merged[key]=(Number(merged[key])||0)+(Number(value)||0); });
-                item.reforgeStats=merged;
-                item.reforgeUsed=Math.min(Math.floor(Number(item.reforgeSlots)||0),snapshot.used+1);
-                if(typeof saveGame==="function"){ saveGame(); }
-                if(typeof window.v141RenderSynthesis==="function"){ window.v141RenderSynthesis(); }
-            }
-            activeReforgeSnapshot=null;
-            return result;
+        window.v141ResolveReforge=function(){
+            // V173.58: replacement semantics live in js/36. No additive merge and
+            // no reforgeUsed attempt consumption here.
+            return previousResolveReforge.apply(this,arguments);
         };
     }
 
@@ -506,7 +544,7 @@
             const link=document.createElement("link");
             link.id="v17350-inventory-qol-style";
             link.rel="stylesheet";
-            link.href="css/52-v173.50-inventory-qol.css?v=173.56";
+            link.href="css/52-v173.50-inventory-qol.css?v=173.58";
             link.onerror=function(){ failV17350RuntimeGate("背包介面樣式載入失敗，請重新整理。"); };
             document.head.appendChild(link);
         }
@@ -516,7 +554,7 @@
         }
         const script=document.createElement("script");
         script.id="v17350-inventory-qol-runtime";
-        script.src="js/53-v173.50-inventory-qol.js?v=173.56";
+        script.src="js/53-v173.50-inventory-qol.js?v=173.58";
         script.async=false;
         script.onload=function(){
         if(typeof window.__v173ReportRuntimeProgress==="function"){

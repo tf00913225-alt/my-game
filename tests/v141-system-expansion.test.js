@@ -79,9 +79,9 @@ test("V141 assets remain ordered before later patches with the current cache ver
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.56"/);
-    assert.match(indexSource,/js\/00-main\.js\?v=173\.56/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.56/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.58"/);
+    assert.match(indexSource,/js\/00-main\.js\?v=173\.58/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.58/);
 });
 
 test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or slot numbers",()=>{
@@ -259,8 +259,11 @@ test("synthesis implements exact material costs, replacement-only reforge and pe
     ["craftGold:500","craftGold:1500","craftGold:4000","craftGold:10000","reforgeGold:1000","reforgeGold:3000","reforgeGold:8000","reforgeGold:20000"].forEach(token=>assert.ok(contentSource.includes(token)));
     assert.match(contentSource,/ConsumeStackItem\(blueprint\.id,50\)/);
     assert.match(contentSource,/ConsumeStackItem\(ore\.id,50\)/);
-    assert.match(contentSource,/consumeMatching\([^\n]+,100\)/);
-    assert.match(contentSource,/ConsumeStackItem\(ore\.id,100\)/);
+    assert.match(contentSource,/return locks===0\?50:\(locks===1\?100:150\)/);
+    assert.match(contentSource,/consumeMatching\([^\n]+,cost\)/);
+    assert.match(contentSource,/ConsumeStackItem\(info\.ore\.id,cost\)/);
+    assert.match(contentSource,/reforgeMaterialTier:"low"/);
+    assert.match(contentSource,/裝備品質不限制材料階級/);
     assert.match(contentSource,/item\.reforgeStats=Object\.assign\(\{\},pending\.stats\)/);
     assert.match(contentSource,/Math\.random\(\)<\.10/);
     assert.match(contentSource,/Math\.random\(\)<\.05/);

@@ -33,6 +33,7 @@
     const TALISMAN_GOLD={low:300,mid:1000,high:3000};
     const synthesisState={
         tab:"reforge",blueprintId:null,seriesId:"setFire",reforgeUid:null,
+        reforgeMaterialTier:"low",lockedReforgeKeys:[],
         talismanId:null,talismanQty:1,fragmentQty:{setFire:1,setWater:1,setEarth:1,setWind:1},
         pendingReforge:null
     };
@@ -103,15 +104,46 @@
         if(changed&&typeof saveGame==="function"){ saveGame(); }
     }
 
+    function reforgeSlotCount(item){
+        if(!item){ return 0; }
+        const explicit=Math.max(0,Math.floor(Number(item.reforgeSlots)||0));
+        const existing=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
+        const slots=Math.max(explicit,existing);
+        if(slots>explicit){ item.reforgeSlots=slots; }
+        if(item.reforgeUsed){ item.reforgeUsed=0; }
+        return slots;
+    }
+    function canActuallyReforge(item){
+        return !!(item&&item.v17351Locked!==true&&reforgeSlotCount(item)>0);
+    }
+    function reforgeMaterialInfo(tierKey){
+        const tier=TIER_META[tierKey]?tierKey:"low";
+        const meta=TIER_META[tier];
+        const ore=definitions().ores.find(item=>item.tierKey===tier)||null;
+        const blueprintCount=countMatching(item=>item&&item.blueprintSlot&&item.tierKey===tier);
+        const oreCount=ore?countItem(ore.id):0;
+        return {tier,meta,ore,blueprintCount,oreCount};
+    }
+    function reforgeMaterialCost(lockCount){
+        const locks=Math.max(0,Math.min(2,Math.floor(Number(lockCount)||0)));
+        return locks===0?50:(locks===1?100:150);
+    }
+    function normalizeReforgeLocks(item){
+        const current=item&&item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats):[];
+        const maxLocks=Math.min(2,Math.max(0,reforgeSlotCount(item)-1));
+        synthesisState.lockedReforgeKeys=(synthesisState.lockedReforgeKeys||[])
+            .filter(key=>current.includes(key)).slice(0,maxLocks);
+        return synthesisState.lockedReforgeKeys;
+    }
     function allRefinableEquipment(){
         ensureEquipmentUids();
         const results=[];
         inventoryItems.forEach(item=>{
-            if(item&&isEquipmentInventoryType(item.type)){ results.push({item,source:"背包"}); }
+            if(item&&isEquipmentInventoryType(item.type)&&canActuallyReforge(item)){ results.push({item,source:"背包"}); }
         });
         Object.keys(characterEquipment||{}).forEach(characterKey=>{
             Object.values(characterEquipment[characterKey]||{}).forEach(item=>{
-                if(item){ results.push({item,source:"已裝備"}); }
+                if(item&&canActuallyReforge(item)){ results.push({item,source:"已裝備"}); }
             });
         });
         return results;
@@ -159,6 +191,59 @@
         return stats;
     }
     window.v141RollCraftAffixes=rollAffixes;
+
+    function reforgeRangeForSlot(tierKey,slotIndex){
+        const meta=TIER_META[tierKey]||TIER_META.low;
+        if(slotIndex<=0){ return meta.reforgeMain; }
+        return meta.reforgeSub||meta.reforgeMain;
+    }
+    function reforgeRangeText(tierKey,slotCount){
+        const meta=TIER_META[tierKey]||TIER_META.low;
+        const main=meta.reforgeMain;
+        const sub=meta.reforgeSub||meta.reforgeMain;
+        return slotCount<=1
+            ?"詞條 "+main[0]+"～"+main[1]
+            :"主槽 "+main[0]+"～"+main[1]+"・其餘槽 "+sub[0]+"～"+sub[1];
+    }
+    function rollReforgeAffixes(item,tierKey,lockedKeys){
+        const slots=reforgeSlotCount(item);
+        const current=item&&item.reforgeStats&&typeof item.reforgeStats==="object"?item.reforgeStats:{};
+        const result={};
+        const used=new Set();
+        const locks=(lockedKeys||[]).filter(key=>Object.prototype.hasOwnProperty.call(current,key)).slice(0,Math.min(2,Math.max(0,slots-1)));
+        locks.forEach(key=>{ result[key]=current[key]; used.add(key); });
+        const meta=TIER_META[tierKey]||TIER_META.low;
+        const unlockedCount=Math.max(0,slots-locks.length);
+        const forceDualPeak=locks.length===0&&slots>=2&&!!meta.reforgeSub&&Math.random()<.05;
+        let generated=0;
+        while(Object.keys(result).length<slots){
+            const needMain=!Array.from(used).some(key=>MAIN_STATS.includes(key));
+            const slotIndex=needMain?0:Math.max(1,Object.keys(result).length);
+            let pool=needMain?MAIN_STATS:SUB_STATS;
+            let available=pool.filter(key=>!used.has(key));
+            if(!available.length){ available=MAIN_STATS.concat(SUB_STATS).filter(key=>!used.has(key)); }
+            if(!available.length){ break; }
+            const key=available[Math.floor(Math.random()*available.length)%available.length];
+            const range=reforgeRangeForSlot(tierKey,slotIndex);
+            let value;
+            if(forceDualPeak&&generated<2){ value=range[1]; }
+            else if(!meta.reforgeSub||slots===1){ value=rollSinglePeak(range); }
+            else{ value=rollUniform(range[0],range[1]); }
+            result[key]=value;
+            used.add(key);
+            generated++;
+        }
+        if(!forceDualPeak&&locks.length===0&&slots>=2&&meta.reforgeSub){
+            const mainKey=Object.keys(result).find(key=>MAIN_STATS.includes(key));
+            const subKey=Object.keys(result).find(key=>SUB_STATS.includes(key));
+            if(mainKey&&subKey&&result[mainKey]===meta.reforgeMain[1]&&result[subKey]===meta.reforgeSub[1]){
+                if(Math.random()<.5){ result[mainKey]=rollUniform(meta.reforgeMain[0],Math.max(meta.reforgeMain[0],meta.reforgeMain[1]-1)); }
+                else{ result[subKey]=rollUniform(meta.reforgeSub[0],Math.max(meta.reforgeSub[0],meta.reforgeSub[1]-1)); }
+            }
+        }
+        return result;
+    }
+    window.v17358RollReforgeAffixes=rollReforgeAffixes;
 
     function statsHtml(stats){
         const entries=Object.entries(stats||{});
@@ -241,30 +326,54 @@
 
     function renderReforgeTab(){
         const entries=allRefinableEquipment();
-        if(!entries.length){ return '<div class="v141-synthesis-empty">沒有可冶煉的裝備。</div>'; }
-        if(!entries.some(entry=>entry.item.v141Uid===synthesisState.reforgeUid)){ synthesisState.reforgeUid=entries[0].item.v141Uid; }
+        if(!entries.length){ return '<div class="v141-synthesis-empty">沒有可冶煉的裝備。<small>只有具備至少 1 個冶煉槽、且未鎖定的裝備會出現在這裡。</small></div>'; }
+        if(!entries.some(entry=>entry.item.v141Uid===synthesisState.reforgeUid)){
+            synthesisState.reforgeUid=entries[0].item.v141Uid;
+            synthesisState.lockedReforgeKeys=[];
+        }
         const item=findEquipmentByUid(synthesisState.reforgeUid);
-        const tier=inferTier(item);
-        const meta=TIER_META[tier];
-        const blueprintCount=countMatching(candidate=>candidate.blueprintSlot&&candidate.tierKey===tier);
-        const ore=definitions().ores.find(candidate=>candidate.tierKey===tier);
-        const oreCount=ore?countItem(ore.id):0;
-        const can=blueprintCount>=100&&oreCount>=100&&gold>=meta.reforgeGold;
+        const slotCount=reforgeSlotCount(item);
+        const locks=normalizeReforgeLocks(item);
+        const lockSet=new Set(locks);
+        const maxLocks=Math.min(2,Math.max(0,slotCount-1));
+        const tier=TIER_META[synthesisState.reforgeMaterialTier]?synthesisState.reforgeMaterialTier:"low";
+        synthesisState.reforgeMaterialTier=tier;
+        const material=reforgeMaterialInfo(tier);
+        const materialCost=reforgeMaterialCost(locks.length);
+        const currentEntries=Object.entries(item.reforgeStats||{});
+        const can=!!material.ore&&material.blueprintCount>=materialCost&&material.oreCount>=materialCost&&gold>=material.meta.reforgeGold&&slotCount>locks.length;
         let compare="";
         if(synthesisState.pendingReforge&&synthesisState.pendingReforge.uid===item.v141Uid){
-            compare='<div class="v141-reforge-compare"><section><small>目前冶煉效果</small>'+statsHtml(item.reforgeStats)+'</section><b>VS</b><section><small>本次新效果</small>'+statsHtml(synthesisState.pendingReforge.stats)+'</section>'+
+            const pending=synthesisState.pendingReforge;
+            const pendingLabel=(TIER_META[pending.materialTier]||material.meta).label;
+            compare='<div class="v141-reforge-compare"><section><small>目前冶煉效果</small>'+statsHtml(item.reforgeStats)+'</section><b>VS</b><section><small>本次新效果・'+pendingLabel+'材料</small>'+statsHtml(pending.stats)+'</section>'+
                 '<div><button onclick="v141ResolveReforge(false)">保留原效果</button><button onclick="v141ResolveReforge(true)">套用新效果</button></div></div>';
         }
-        return '<div class="v141-synthesis-card">'+
+        const tierButtons=TIER_ORDER.map(key=>{
+            const info=reforgeMaterialInfo(key);
+            return '<button type="button" class="v17358-reforge-tier '+(key===tier?'active':'')+'" onclick="v141SelectReforgeMaterialTier(\''+key+'\')">'+
+                '<b>'+info.meta.label+'材料</b><span>圖紙 '+info.blueprintCount+'・礦石 '+info.oreCount+'</span><small>'+reforgeRangeText(key,slotCount)+'</small></button>';
+        }).join("");
+        const lockHtml=currentEntries.length
+            ?currentEntries.map(([key,value])=>{
+                const selected=lockSet.has(key);
+                return '<button type="button" class="v17358-affix-lock '+(selected?'locked':'')+'" '+(synthesisState.pendingReforge?'disabled':'')+' onclick="v141ToggleReforgeLock(\''+escapeHtml(key)+'\')">'+
+                    '<span>'+(selected?'🔒':'◇')+'</span><b>'+escapeHtml(STAT_LABEL[key]||key)+' +'+value+'</b><small>'+(selected?'已鎖定':'點擊鎖定')+'</small></button>';
+            }).join("")
+            :'<div class="v17358-no-affix-lock">首次冶煉尚無詞條可鎖定。</div>';
+        return '<div class="v141-synthesis-card v17358-reforge-card">'+
             '<label>選擇裝備<select onchange="v141SelectReforgeItem(this.value)">'+entries.map(entry=>
                 '<option value="'+entry.item.v141Uid+'" '+(entry.item.v141Uid===item.v141Uid?'selected':'')+'>'+escapeHtml(entry.item.name)+'［'+entry.source+'］</option>'
             ).join("")+'</select></label>'+
-            '<section class="v141-reforge-current"><b>'+escapeHtml(item.name)+'</b><small>'+meta.label+'・'+rangeText(tier,true)+'</small><div><em>原始詞條</em>'+statsHtml(item.stats)+'</div><div><em>目前冶煉</em>'+statsHtml(item.reforgeStats)+'</div></section>'+
-            '<div class="v141-material-lines"><span>同階圖紙 <b class="'+(blueprintCount>=100?'ok':'lack')+'">'+blueprintCount+' / 100</b></span>'+
-            '<span>'+escapeHtml(ore&&ore.name||meta.label+'礦石')+' <b class="'+(oreCount>=100?'ok':'lack')+'">'+oreCount+' / 100</b></span>'+
-            '<span>金幣 <b class="'+(gold>=meta.reforgeGold?'ok':'lack')+'">'+meta.reforgeGold.toLocaleString('zh-TW')+'</b></span></div>'+
+            '<section class="v141-reforge-current"><b>'+escapeHtml(item.name)+'</b><small>冶煉槽 '+slotCount+' 格・可不限次數重洗</small><div><em>原始詞條</em>'+statsHtml(item.stats)+'</div><div><em>目前冶煉</em>'+statsHtml(item.reforgeStats)+'</div></section>'+
+            '<section class="v17358-reforge-material"><div class="v17358-section-title"><b>選擇冶煉材料階級</b><span>裝備品質不限制材料；材料階級只決定本次數值範圍。</span></div><div class="v17358-reforge-tiers">'+tierButtons+'</div></section>'+
+            '<section class="v17358-reforge-lock-panel"><div class="v17358-section-title"><b>鎖定詞條</b><span>最多鎖 2 條，且至少保留 1 個槽位重新冶煉。</span></div><div class="v17358-reforge-lock-list">'+lockHtml+'</div><small>目前鎖定 '+locks.length+' / '+maxLocks+' 條</small></section>'+
+            '<div class="v141-material-lines v17358-reforge-cost"><span>設計圖 <b class="'+(material.blueprintCount>=materialCost?'ok':'lack')+'">'+material.blueprintCount+' / '+materialCost+'</b></span>'+
+            '<span>'+escapeHtml(material.ore&&material.ore.name||material.meta.label+'礦石')+' <b class="'+(material.oreCount>=materialCost?'ok':'lack')+'">'+material.oreCount+' / '+materialCost+'</b></span>'+
+            '<span>金幣 <b class="'+(gold>=material.meta.reforgeGold?'ok':'lack')+'">'+material.meta.reforgeGold.toLocaleString('zh-TW')+'</b></span></div>'+
+            '<div class="v17358-reforge-cost-note">未鎖定：50 圖紙＋50 礦石・鎖 1 條：100＋100・鎖 2 條：150＋150</div>'+
             '<button type="button" class="v141-synthesis-primary" '+(can&&!synthesisState.pendingReforge?'':'disabled')+' onclick="v141StartReforge()">開始冶煉</button>'+
-            '<button type="button" class="v141-affix-info" onclick="v141ShowAffixInfo()">ⓘ 詞條機率</button>'+compare+'</div>';
+            '<button type="button" class="v141-affix-info" onclick="v141ShowAffixInfo()">ⓘ 冶煉規則</button>'+compare+'</div>';
     }
 
     function availableTalismans(){
@@ -326,7 +435,35 @@
     };
     window.v141SelectCraftBlueprint=function(id){ synthesisState.blueprintId=id; renderSynthesis(); };
     window.v141SelectCraftSeries=function(id){ synthesisState.seriesId=id; renderSynthesis(); };
-    window.v141SelectReforgeItem=function(uid){ synthesisState.reforgeUid=uid; synthesisState.pendingReforge=null; renderSynthesis(); };
+    window.v141SelectReforgeItem=function(uid){
+        synthesisState.reforgeUid=uid;
+        synthesisState.pendingReforge=null;
+        synthesisState.lockedReforgeKeys=[];
+        renderSynthesis();
+    };
+    window.v141SelectReforgeMaterialTier=function(tier){
+        if(!TIER_META[tier]||synthesisState.pendingReforge){ return; }
+        synthesisState.reforgeMaterialTier=tier;
+        renderSynthesis();
+    };
+    window.v141ToggleReforgeLock=function(key){
+        if(synthesisState.pendingReforge){ return; }
+        const item=findEquipmentByUid(synthesisState.reforgeUid);
+        if(!item||!Object.prototype.hasOwnProperty.call(item.reforgeStats||{},key)){ return; }
+        const locks=normalizeReforgeLocks(item).slice();
+        const at=locks.indexOf(key);
+        if(at>=0){ locks.splice(at,1); }
+        else{
+            const maxLocks=Math.min(2,Math.max(0,reforgeSlotCount(item)-1));
+            if(locks.length>=maxLocks){
+                alert(maxLocks<=0?"這件裝備只有 1 個冶煉槽，不能把唯一詞條鎖住。":"至少要保留 1 個未鎖定槽位才能重新冶煉。");
+                return;
+            }
+            locks.push(key);
+        }
+        synthesisState.lockedReforgeKeys=locks;
+        renderSynthesis();
+    };
     window.v141SelectTalisman=function(id){ synthesisState.talismanId=id; synthesisState.talismanQty=1; renderSynthesis(); };
 
     window.v141AdjustTalismanQty=function(change){
@@ -345,8 +482,8 @@
     };
 
     window.v141ShowAffixInfo=function(){
-        const lines=TIER_ORDER.map(tier=>'<div><b>'+TIER_META[tier].label+'</b>　合成：'+rangeText(tier,false)+'　／　冶煉：'+rangeText(tier,true)+'</div>').join('');
-        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>詞條機率</h3><p>主詞條：攻擊／智力。<br>副詞條：體質／能量／敏捷／精神。</p>'+lines+'<p>單詞條最高值固定10%；雙詞條同時最高固定5%，失敗後的一般抽取不會再次產生雙峰頂。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
+        const lines=TIER_ORDER.map(tier=>'<div><b>'+TIER_META[tier].label+'材料</b>　'+reforgeRangeText(tier,2)+'　／　金幣 '+TIER_META[tier].reforgeGold.toLocaleString('zh-TW')+'</div>').join('');
+        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定 50 張設計圖＋50 礦石；鎖 1 條各 100；鎖 2 條各 150。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>單槽最高值固定10%；具副詞條範圍的材料，雙詞條同時最高固定5%。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
     };
 
     window.v141CraftEquipment=function(){
@@ -377,15 +514,30 @@
     window.v141StartReforge=function(){
         const item=findEquipmentByUid(synthesisState.reforgeUid);
         if(!item||synthesisState.pendingReforge){ return; }
-        const tier=inferTier(item);
-        const meta=TIER_META[tier];
-        const ore=definitions().ores.find(candidate=>candidate.tierKey===tier);
-        const hasBlueprint=countMatching(candidate=>candidate.blueprintSlot&&candidate.tierKey===tier)>=100;
-        if(!ore||!hasBlueprint||countItem(ore.id)<100||gold<meta.reforgeGold){ alert("同階素材或金幣不足。"); return; }
-        const success=runInventoryTransaction(()=>consumeMatching(candidate=>candidate.blueprintSlot&&candidate.tierKey===tier,100)&&window.v132ConsumeStackItem(ore.id,100));
+        const slotCount=reforgeSlotCount(item);
+        if(slotCount<=0){ alert("這件裝備沒有冶煉槽。"); return; }
+        const locks=normalizeReforgeLocks(item).slice();
+        if(locks.length>=slotCount){ alert("至少要保留 1 個未鎖定槽位才能重新冶煉。"); return; }
+        const tier=TIER_META[synthesisState.reforgeMaterialTier]?synthesisState.reforgeMaterialTier:"low";
+        const info=reforgeMaterialInfo(tier);
+        const cost=reforgeMaterialCost(locks.length);
+        if(!info.ore||info.blueprintCount<cost||info.oreCount<cost||gold<info.meta.reforgeGold){
+            alert(info.meta.label+"冶煉材料或金幣不足。");
+            return;
+        }
+        const success=runInventoryTransaction(()=>
+            consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&candidate.tierKey===tier,cost)&&
+            window.v132ConsumeStackItem(info.ore.id,cost)
+        );
         if(!success){ alert("冶煉素材扣除失敗，已自動還原。"); return; }
-        gold-=meta.reforgeGold;
-        synthesisState.pendingReforge={uid:item.v141Uid,stats:rollAffixes(tier,true)};
+        gold-=info.meta.reforgeGold;
+        synthesisState.pendingReforge={
+            uid:item.v141Uid,
+            stats:rollReforgeAffixes(item,tier,locks),
+            materialTier:tier,
+            lockedKeys:locks.slice(),
+            materialCost:cost
+        };
         rebuildInventorySlots(); updateGoldDisplay(); saveGame(); renderSynthesis();
     };
 
@@ -393,8 +545,14 @@
         const pending=synthesisState.pendingReforge;
         if(!pending){ return; }
         const item=findEquipmentByUid(pending.uid);
-        if(applyNew&&item){ item.reforgeStats=Object.assign({},pending.stats); }
+        if(applyNew&&item){
+            // Replace the unlocked result as one full roll; locked keys were already
+            // copied into pending.stats by rollReforgeAffixes(). No additive stacking.
+            item.reforgeStats=Object.assign({},pending.stats);
+            item.reforgeUsed=0;
+        }
         synthesisState.pendingReforge=null;
+        if(item){ normalizeReforgeLocks(item); }
         saveGame(); updateUI(); renderSynthesis();
         showSynthesisResult(applyNew?"已套用新冶煉效果":"已保留原冶煉效果",applyNew&&item?'<div class="v141-result-item"><b>'+escapeHtml(item.name)+'</b>'+statsHtml(item.reforgeStats)+'</div>':'<p>本次材料與金幣已消耗，原有效果維持不變。</p>');
     };
