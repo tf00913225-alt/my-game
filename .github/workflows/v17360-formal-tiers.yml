@@ -1,0 +1,42 @@
+name: V173.60 formal tier migration
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - .github/workflows/v17360-formal-tiers.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Apply formal tier migration
+        run: |
+          python .github/scripts/apply-v17360-formal-tiers.py
+      - name: Syntax and focused tests
+        run: |
+          node --check js/27-v132-content-expansion.js
+          node --check js/33-v140-four-element-balance.js
+          node --check js/36-v141-content-systems.js
+          node --check js/38-v143-system-fixes.js
+          node --check js/50-v169-water-skill-rules.js
+          node --check js/equipment-progression.js
+          node --check js/53-v173.50-inventory-qol.js
+          node --test tests/v173.60-formal-tiers-talismans.test.js
+          node tests/v173.46-equipment-progression.test.js
+      - name: Commit migration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/27-v132-content-expansion.js js/33-v140-four-element-balance.js js/36-v141-content-systems.js js/38-v143-system-fixes.js js/50-v169-water-skill-rules.js js/equipment-progression.js js/53-v173.50-inventory-qol.js css/50-v169-abyss-flow.css docs/ITEM_RARITY_UI_SPEC.md HANDOFF.md index.html js/20-anonymous-20.js js/51-v169-rpg-ui.js tests
+          git diff --cached --check
+          git commit -m "V173.60 formalize item tiers and talisman resolution"
+          git push origin HEAD:dev
