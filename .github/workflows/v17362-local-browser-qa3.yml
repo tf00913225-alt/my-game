@@ -1,0 +1,142 @@
+name: V173.62 local patrol VFX browser QA 3
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17362-local-browser-qa3.yml
+
+permissions:
+  contents: write
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install Playwright package only
+        run: npm install --no-save --ignore-scripts playwright@1.55.0
+      - name: Start local static server
+        run: |
+          python3 -m http.server 8899 --bind 127.0.0.1 >/tmp/v17362-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8899/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/v17362-http.log
+          exit 1
+      - name: Verify patrol skill produces visible V143 nodes
+        run: |
+          CHROME="$(command -v google-chrome-stable || command -v google-chrome || true)"
+          test -n "$CHROME"
+          export CHROME
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME,args:['--no-sandbox','--disable-dev-shm-usage']});
+            const page=await browser.newPage({viewport:{width:420,height:900}});
+            const pageErrors=[];
+            const failed=[];
+            page.on('pageerror',err=>pageErrors.push(String(err)));
+            page.on('requestfailed',req=>failed.push(req.url()+' :: '+(req.failure()?.errorText||'failed')));
+            page.on('response',res=>{ if(res.status()>=400) failed.push(res.status()+' '+res.url()); });
+            await page.goto('http://127.0.0.1:8899/?qa=v17362-local-patrol-vfx3',{waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForFunction(()=>document.documentElement.dataset.runtimeReady==='173.62',undefined,{timeout:60000});
+            const result=await page.evaluate(async()=>{
+              if(typeof window.v17351SyncManagement!=='function') throw new Error('v17351SyncManagement missing');
+              if(!window.v142SkillAnimationDirector||typeof window.v142SkillAnimationDirector.play!=='function') throw new Error('animation director missing');
+              if(typeof window.v142GetSkillAnimationConfig!=='function') throw new Error('animation config helper missing');
+
+              const shell=document.createElement('div');
+              shell.id='characterPage';
+              shell.style.cssText='display:block;visibility:visible;position:absolute;left:0;top:0;width:20px;height:20px';
+              const tab=document.createElement('div');
+              tab.id='characterTabContent';
+              tab.style.cssText='display:block;visibility:visible;width:10px;height:10px';
+              shell.appendChild(tab);
+              document.body.appendChild(shell);
+
+              const actor=document.createElement('div');
+              actor.id='battlePlayerCard0';
+              actor.style.cssText='display:block;visibility:visible;position:absolute;left:50px;top:600px;width:100px;height:140px';
+              document.body.appendChild(actor);
+              const target=document.createElement('div');
+              target.id='battleMonster0';
+              target.style.cssText='display:block;visibility:visible;position:absolute;left:260px;top:150px;width:100px;height:140px';
+              document.body.appendChild(target);
+
+              const oldMonster=monsters[0];
+              monsters[0]={id:'qa-wild-monster',name:'QA野怪',hp:100,maxHP:100,alive:true,level:1};
+
+              battleActive=false;
+              window.v17351SyncManagement();
+              const managementBefore=document.body.classList.contains('v17351-management-open');
+
+              battleActive=true;
+              window.v17351SyncManagement();
+              const managementDuring=document.body.classList.contains('v17351-management-open');
+
+              const config=window.v142GetSkillAnimationConfig('flameSlash');
+              const gate=window.v142SkillAnimationDirector.play(config,{side:'player',actorIndex:0,targetId:0,key:'v17362-local-browser-patrol3'});
+              await new Promise(resolve=>setTimeout(resolve,180));
+              window.v17351SyncManagement();
+              const stage=document.getElementById('v143-skill-stage');
+              const nodes=stage?Array.from(stage.children):[];
+              const snapshot={
+                runtimeReady:document.documentElement.dataset.runtimeReady,
+                managementBefore,
+                managementDuring,
+                targetOffsetParent:!!target.offsetParent,
+                stageExists:!!stage,
+                inlineVisibility:stage?stage.style.visibility:null,
+                computedVisibility:stage?getComputedStyle(stage).visibility:null,
+                computedDisplay:stage?getComputedStyle(stage).display:null,
+                stageSkill:stage?stage.getAttribute('data-skill'):null,
+                stageChildCount:nodes.length,
+                childClasses:nodes.map(node=>node.className),
+                hasSprite:nodes.some(node=>String(node.className).includes('v143-vfx-sprite')),
+                gateStarted:!!gate
+              };
+              if(gate&&typeof gate.complete==='function') gate.complete('browser-qa');
+              battleActive=false;
+              window.v17351SyncManagement();
+              monsters[0]=oldMonster;
+              shell.remove(); actor.remove(); target.remove();
+              return snapshot;
+            });
+            console.log('snapshot=',JSON.stringify(result));
+            console.log('pageErrors=',JSON.stringify(pageErrors));
+            console.log('failed=',JSON.stringify(failed.slice(0,30)));
+            assert.equal(result.runtimeReady,'173.62');
+            assert.equal(result.managementBefore,true,'Visible management state should reproduce the pre-battle conflict');
+            assert.equal(result.managementDuring,false,'Battle must clear management-open state');
+            assert.equal(result.targetOffsetParent,true,'Synthetic wild target must be layout-visible');
+            assert.equal(result.stageExists,true,'V143 stage must exist after a real skill play');
+            assert.equal(result.stageSkill,'flameSlash');
+            assert.notEqual(result.computedVisibility,'hidden','Patrol/wild battle VFX stage must remain visible');
+            assert.notEqual(result.computedDisplay,'none','Patrol/wild battle VFX stage must remain displayed');
+            assert.equal(result.gateStarted,true,'Skill animation gate must start');
+            assert.ok(result.stageChildCount>0,'VFX stage must render visual nodes when actor and target cards exist');
+            assert.equal(result.hasSprite,true,'Flame Slash must produce its V143 sprite node');
+            assert.deepEqual(pageErrors,[],'No page errors during local browser QA');
+            await browser.close();
+          })().catch(err=>{console.error(err);process.exit(1);});
+          NODE
+      - name: Remove temporary local browser QA workflow
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --ff-only origin dev
+          if test -f .github/workflows/v17362-local-browser-qa3.yml; then
+            git rm .github/workflows/v17362-local-browser-qa3.yml
+            git commit -m "clean V173.62 local browser QA 3 workflow"
+            git push origin HEAD:dev
+          fi
