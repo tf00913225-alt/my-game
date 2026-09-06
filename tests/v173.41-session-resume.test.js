@@ -57,8 +57,8 @@ function harness(initialReady){
     assert.equal(h.saves,2,"pagehide must also persist before renderer eviction");
 }
 
-assert.match(loader,/const V_ASSET_VERSION="173\.60"/);
-assert.match(index,/<title>四象江湖傳 V173\.60<\/title>/);
-assert.match(index,/js\/00-main\.js\?v=173\.60/);
-assert.match(index,/js\/20-anonymous-20\.js\?v=173\.60/);
+assert.match(loader,/const V_ASSET_VERSION="173\.61"/);
+assert.match(index,/<title>四象江湖傳 V173\.61<\/title>/);
+assert.match(index,/js\/00-main\.js\?v=173\.61/);
+assert.match(index,/js\/20-anonymous-20\.js\?v=173\.61/);
 console.log("✓ V173.50 same-session resume and background save regression passed");

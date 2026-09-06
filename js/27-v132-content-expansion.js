@@ -192,16 +192,10 @@
     }
 
     function chestIcon(){
-        const c=TIER_COLORS.blue;
-        return svgWrap(
-            '<rect x="8" y="26" width="48" height="30" rx="3" '+
-            'fill="#2a1c0e" stroke="'+c.main+'" stroke-width="2.5"/>'+
-            '<path d="M8 30 Q32 12 56 30" fill="#3a270f" stroke="'+c.main+'" stroke-width="2.5"/>'+
-            '<rect x="27" y="26" width="10" height="18" fill="'+c.glow+'" opacity="0.85"/>'+
-            '<circle cx="32" cy="34" r="3.4" fill="#2a1c0e" stroke="'+c.glow+'" stroke-width="1.4"/>',
-            c.glow
-        );
+        return rasterItemIcon("assets/items/chests/dungeon-chest.png","blue","chest");
     }
+    // All general-dungeon backpack chests share this visual; item name stays semantic.
+    window.v17361GeneralDungeonChestIcon=chestIcon;
 
     function ticketIcon(elementKey){
         return rasterItemIcon("assets/items/tickets/"+elementKey+"-icon.png",null,"ticket");
@@ -363,7 +357,7 @@
     const oreDefinitions=RESOURCE_TIERS.map(tier=>({
         id:"ore"+tier.idSuffix,
         name:tier.label+"礦石",
-        icon:oreIcon(tier.key),
+        icon:rasterItemIcon("assets/items/materials/ore.png",tier.key,"material"),
         type:"material",
         tierKey:tier.key,
         legacyTierKey:tier.legacyKey,
@@ -2355,6 +2349,18 @@
         price:0,
         stats:{}
     };
+
+    function syncV17361ItemArt(){
+        if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){ return; }
+        inventoryItems.forEach(item=>{
+            if(!item||!item.id){ return; }
+            const ore=oreDefinitions.find(def=>def.id===item.id);
+            if(ore){ item.icon=ore.icon; return; }
+            if(item.id===materialChestDefinition.id){ item.icon=materialChestDefinition.icon; }
+        });
+    }
+    window.v17361SyncItemArt=syncV17361ItemArt;
+    syncV17361ItemArt();
 
     function hydrateOwnedContentPresentation(){
         hydrateOwnedTicketPresentation();

@@ -26884,6 +26884,45 @@ function renderCommissionQuestListContent(){
 
 }
 
+function getClaimableQuestIds(definitions,state){
+    return (definitions||[]).filter(function(quest){
+        return quest && !state.claimed[quest.id] &&
+            (Number(state.progress[quest.id])||0)>=Math.max(1,Number(quest.goal)||1);
+    }).map(function(quest){ return quest.id; });
+}
+
+function v17361SyncQuestClaimAllButton(isCommission){
+    const button=$("questClaimAllButton");
+    if(!button){ return; }
+    const definitions=isCommission?commissionQuestDefinitions:dailyQuestDefinitions;
+    const state=isCommission?commissionQuestState:dailyQuestState;
+    const count=getClaimableQuestIds(definitions,state).length;
+    button.disabled=count<=0;
+    button.textContent=count>0?"一鍵領取（"+count+"）":"一鍵領取";
+    button.onclick=isCommission?v17361ClaimAllCommissionQuests:v17361ClaimAllDailyQuests;
+}
+
+function v17361RefreshOpenQuestPage(){
+    const body=$("questTabBody");
+    if(!body){ return false; }
+    const commissionBtn=$("questTabBtnCommission");
+    const isCommission=!!(commissionBtn&&commissionBtn.classList.contains("active"));
+    const scrollTop=body.scrollTop;
+    body.innerHTML=isCommission?renderCommissionQuestListContent():renderDailyQuestListContent();
+    const completionPanel=$("questCompletionPanel");
+    if(completionPanel){
+        completionPanel.innerHTML=renderQuestCompletionPanelContent(
+            isCommission?commissionQuestDefinitions:dailyQuestDefinitions,
+            isCommission?commissionQuestState:dailyQuestState
+        );
+    }
+    body.scrollTop=scrollTop;
+    v17361SyncQuestClaimAllButton(isCommission);
+    return true;
+}
+window.v17361RefreshOpenQuestPage=v17361RefreshOpenQuestPage;
+
+
 
 /*
    V89：任務視窗為「固定標籤列 + 內層任務清單 + 固定完成度獎勵」架構。
@@ -26913,6 +26952,15 @@ function renderQuestTabContent(activeTab){
                     "委託任務"+
                 '</button>'+
 
+            '</div>'+
+
+            '<div class="quest-batch-actions">'+
+                '<button id="questClaimAllButton" class="quest-claim-all-btn" type="button" '+
+                    (getClaimableQuestIds(
+                        isCommission?commissionQuestDefinitions:dailyQuestDefinitions,
+                        isCommission?commissionQuestState:dailyQuestState
+                    ).length?'':'disabled ')+
+                    'onclick="'+(isCommission?'v17361ClaimAllCommissionQuests()':'v17361ClaimAllDailyQuests()')+'">一鍵領取</button>'+
             '</div>'+
 
             '<div id="questTabBody" class="quest-tab-body" role="tabpanel">'+
@@ -27008,6 +27056,8 @@ function switchQuestTab(tabName){
             isCommission ? "true" : "false"
         );
     }
+
+    v17361SyncQuestClaimAllButton(isCommission);
 
 }
 
@@ -27232,10 +27282,7 @@ function claimDailyQuest(questId){
        這個舊函式已經拆成兩個分頁各自的
        渲染函式，不存在了。
     */
-
-    switchQuestTab(
-        "daily"
-    );
+    if(!window.__v17361BulkQuestClaim){ switchQuestTab("daily"); }
 
 }
 
@@ -27296,14 +27343,31 @@ function claimCommissionQuest(questId){
     updateUI();
 
     saveGame();
-
-
-    switchQuestTab(
-        "commission"
-    );
+    if(!window.__v17361BulkQuestClaim){ switchQuestTab("commission"); }
 
 }
 
+
+function v17361ClaimAllQuestGroup(definitions,state,claimFn,title){
+    const ids=getClaimableQuestIds(definitions,state);
+    if(!ids.length){ v17361RefreshOpenQuestPage(); return 0; }
+    window.__v17361BulkQuestClaim=true;
+    try{ ids.forEach(function(id){ claimFn(id); }); }
+    finally{ window.__v17361BulkQuestClaim=false; }
+    v17361RefreshOpenQuestPage();
+    if(typeof window.rpgAlert==="function"){
+        void window.rpgAlert("已一鍵領取 "+ids.length+" 個"+title+"獎勵。",{title:title+"獎勵",confirmText:"知道了",tone:"success"});
+    }
+    return ids.length;
+}
+function v17361ClaimAllDailyQuests(){
+    return v17361ClaimAllQuestGroup(dailyQuestDefinitions,dailyQuestState,claimDailyQuest,"每日任務");
+}
+function v17361ClaimAllCommissionQuests(){
+    return v17361ClaimAllQuestGroup(commissionQuestDefinitions,commissionQuestState,claimCommissionQuest,"委託任務");
+}
+window.v17361ClaimAllDailyQuests=v17361ClaimAllDailyQuests;
+window.v17361ClaimAllCommissionQuests=v17361ClaimAllCommissionQuests;
 
 /* =====================================================
    ★ 圖鑑

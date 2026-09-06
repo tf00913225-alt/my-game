@@ -458,12 +458,8 @@
     window.v141PlayCardEffect=function(side,index,type){
         const card=cardFor(side,index);
         if(!card){ return; }
-        const className="v141-once-"+type;
-        card.classList.remove(className);
-        void card.offsetWidth;
-        card.classList.add(className);
+        // V173.61: CSS skill flashes retired; non-CSS Canvas particles remain.
         playCanvasParticles(card,type);
-        setTimeout(()=>card.classList.remove(className),850);
     };
 
     function executeAdditionalSupportAction(characterIndex,queued,skill){

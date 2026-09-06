@@ -448,14 +448,14 @@
             const link=document.createElement("link");
             link.id="v17351-qa-style";
             link.rel="stylesheet";
-            link.href="css/53-v173.51-qa.css?v=173.60";
+            link.href="css/53-v173.51-qa.css?v=173.61";
             document.head.appendChild(link);
         }
         const queue=[
-            ["v17351-battle-qa","js/54-v173.51-battle-qa.js?v=173.60"],
-            ["v17351-inventory-qa","js/55-v173.51-inventory-qa.js?v=173.60"],
-            ["v17351-shop-qa","js/56-v173.51-shop-qa.js?v=173.60"],
-            ["v17351-quest-qa","js/57-v173.51-quest-qa.js?v=173.60"]
+            ["v17351-battle-qa","js/54-v173.51-battle-qa.js?v=173.61"],
+            ["v17351-inventory-qa","js/55-v173.51-inventory-qa.js?v=173.61"],
+            ["v17351-shop-qa","js/56-v173.51-shop-qa.js?v=173.61"],
+            ["v17351-quest-qa","js/57-v173.51-quest-qa.js?v=173.61"]
         ];
         let index=0;
         let readySent=false;

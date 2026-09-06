@@ -55,7 +55,7 @@
         document.removeEventListener("click",blockInteraction,true);
         document.removeEventListener("keydown",blockInteraction,true);
         document.removeEventListener("touchstart",blockInteraction,true);
-        document.documentElement.dataset.runtimeReady="173.60";
+        document.documentElement.dataset.runtimeReady="173.61";
         dispatch("v173:runtime-ready",{loaded:TOTAL_RUNTIME_MODULES,total:TOTAL_RUNTIME_MODULES});
         dispatch("v17347:runtime-ready",{loaded:TOTAL_RUNTIME_MODULES,total:TOTAL_RUNTIME_MODULES});
         return true;
@@ -82,7 +82,7 @@
    ⚠️ 提醒：js/00-main.js 的 ?v= 寫在 index.html 裡（不經過這裡），
    改到那個檔案時要另外去 index.html 更新。
 ===================================================== */
-const V_ASSET_VERSION="173.60";
+const V_ASSET_VERSION="173.61";
 
 function vAssetUrl(path){
     return path+"?v="+V_ASSET_VERSION;

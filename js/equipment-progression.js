@@ -508,7 +508,17 @@
 
     window.v17346ShowEquipmentDungeonPreview=function(){
         if(typeof window.v132ShowRewardModal!=="function"){ return; }
-        const html='<div class="v132-reward-modal-inner v17346-preview-modal"><h3>裝備副本獎勵預覽</h3><div class="v132-preview-list-scroll"><div class="v132-preview-reward"><span>⬜</span><b>白裝</b><strong>40%</strong><small>固定1詞條 +1～3</small></div><div class="v132-preview-reward"><span>🟦</span><b>藍裝</b><strong>40%</strong><small>固定1詞條 +4～6</small></div><div class="v132-preview-reward"><span>🟪</span><b>紫裝</b><strong>15%</strong><small>固定1詞條 +7～9・可冶煉×1</small></div><div class="v132-preview-reward"><span>🟧</span><b>橙裝</b><strong>5%</strong><small>固定1詞條 +10～12・可冶煉×1</small></div><p>勝利獲得2個寶箱，每箱3件；看廣告雙倍為12件裝備。</p></div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
+        const rewards=[
+            ["white","assets/equipment/warrior/head-01.png","40%"],
+            ["blue","assets/equipment/warrior/armor-01.png","40%"],
+            ["purple","assets/equipment/warrior/shoes-01.png","15%"],
+            ["orange","assets/equipment/warrior/weapon-01.png","5%"]
+        ];
+        const tiles=rewards.map(entry=>'<div class="v17361-reward-icon rarity-'+entry[0]+'"><img src="'+entry[1]+'" alt=""><em>'+entry[2]+'</em></div>').join("");
+        const html='<div class="v132-reward-modal-inner v17346-preview-modal v17361-reward-preview"><h3>裝備副本獎勵預覽</h3>'+ 
+            '<div class="v17361-reward-visual equipment">'+tiles+'</div>'+ 
+            '<div class="v17361-chest-count" aria-label="兩個裝備寶箱"><img src="assets/items/chests/dungeon-chest.png" alt=""><b>×2</b></div>'+ 
+            '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };
 
@@ -550,7 +560,7 @@
             const link=document.createElement("link");
             link.id="v17350-inventory-qol-style";
             link.rel="stylesheet";
-            link.href="css/52-v173.50-inventory-qol.css?v=173.60";
+            link.href="css/52-v173.50-inventory-qol.css?v=173.61";
             link.onerror=function(){ failV17350RuntimeGate("背包介面樣式載入失敗，請重新整理。"); };
             document.head.appendChild(link);
         }
@@ -560,7 +570,7 @@
         }
         const script=document.createElement("script");
         script.id="v17350-inventory-qol-runtime";
-        script.src="js/53-v173.50-inventory-qol.js?v=173.60";
+        script.src="js/53-v173.50-inventory-qol.js?v=173.61";
         script.async=false;
         script.onload=function(){
         if(typeof window.__v173ReportRuntimeProgress==="function"){

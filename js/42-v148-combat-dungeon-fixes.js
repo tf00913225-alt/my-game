@@ -1206,14 +1206,24 @@
         }).join("")+'</div>';
     }
 
+    function v17361DailyRewardVisual(type){
+        if(type==="material"){
+            return '<div class="v17361-reward-visual single"><div class="v17361-reward-icon material" aria-label="材料寶箱與礦石">'+
+                '<img class="v17361-chest-art" src="assets/items/chests/dungeon-chest.png" alt="材料寶箱">'+
+                '<img class="v17361-ore-mini" src="assets/items/materials/ore.png" alt="礦石">'+
+                '<em>1–3</em></div></div>';
+        }
+        if(type==="gold"){
+            return '<div class="v17361-reward-visual single"><div class="v17361-reward-icon cover" aria-label="金幣獎勵">'+
+                '<img src="assets/dungeons/covers/gold-v17344.png" alt="金幣"></div></div>';
+        }
+        return '<div class="v17361-reward-visual single"><div class="v17361-reward-icon" aria-label="經驗獎勵">'+
+            '<img src="assets/ui/home-offline-exp.png" alt="經驗"></div></div>';
+    }
     window.v148ShowDailyDungeonPreview=function(type){
         const meta=DAILY_DUNGEON_META[type];
         if(!meta||typeof window.v132ShowRewardModal!=="function"){ return; }
-        const layout=dailyPartyContext().soloProtected
-            ?"6普通 → 5普通+1精英 → 4普通+1精英+1BOSS"
-            :"6普通 → 4普通+2精英 → 3普通+2精英+1BOSS";
-        const html='<div class="v132-reward-modal-inner"><h3>'+meta.title+'獎勵預覽</h3><p>'+meta.reward+'</p>'+
-            '<p>固定3輪×6隻：'+layout+'。</p>'+
+        const html='<div class="v132-reward-modal-inner v17361-reward-preview"><h3>'+meta.title+'獎勵預覽</h3>'+v17361DailyRewardVisual(type)+
             '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };

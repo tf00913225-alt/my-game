@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const source=fs.readFileSync("js/equipment-progression.js","utf8");
 const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 
-assert.match(ui,/js\/equipment-progression\.js\?v=173\.60/);
+assert.match(ui,/js\/equipment-progression\.js\?v=173\.61/);
 assert.match(source,/\{key:"white",label:"白階",chance:40,min:1,max:3,reforgeSlots:0/);
 assert.match(source,/\{key:"blue",label:"藍階",chance:40,min:4,max:6,reforgeSlots:0/);
 assert.match(source,/\{key:"purple",label:"紫階",chance:15,min:7,max:9,reforgeSlots:1/);
@@ -40,8 +40,12 @@ assert.doesNotMatch(source,/window\.v132BeginEquipmentDungeon=beginEquipmentDung
 assert.match(source,/onclick="v17346BeginEquipmentDungeon\(\)"/);
 assert.match(source,/const count=6\*Math\.max\(1/);
 assert.match(source,/inventoryItems\.length\+pendingEquipmentRewards\.length>120/);
-assert.match(source,/看廣告雙倍為12件裝備/);
-assert.match(source,/白階40%・藍階40%・紫階15%・橙階5%/);
+assert.match(source,/\["white","assets\/equipment\/warrior\/head-01\.png","40%"\]/);
+assert.match(source,/\["blue","assets\/equipment\/warrior\/armor-01\.png","40%"\]/);
+assert.match(source,/\["purple","assets\/equipment\/warrior\/shoes-01\.png","15%"\]/);
+assert.match(source,/\["orange","assets\/equipment\/warrior\/weapon-01\.png","5%"\]/);
+assert.match(source,/assets\/items\/chests\/dungeon-chest\.png/);
+assert.match(source,/>×2<\/b>/);
 assert.match(source,/dungeon-equipment-v17346\.png/);
 
 assert.match(source,/v17346-potion-detail/);
@@ -58,6 +62,6 @@ assetPaths.forEach(file=>assert.equal(fs.existsSync(file),true,file));
 
 console.log("V173.46 equipment progression specification checks passed");
 
-// V173.60: reforgeSlots are affix-slot capacity; attempts are unlimited.
+// V173.61: reforgeSlots are affix-slot capacity; attempts are unlimited.
 assert.match(source,/return Math\.max\(explicit,existing\)/);
 assert.doesNotMatch(source,/item\.reforgeUsed=Math\.min/);
