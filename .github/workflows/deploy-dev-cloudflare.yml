@@ -91,7 +91,7 @@ jobs:
       - name: Ensure Pages project exists
         shell: bash
         run: |
-          npx --yes wrangler@4 pages project create "$PROJECT_NAME" --production-branch=dev >/tmp/cf-project.log 2>&1 || true
+          npx --yes wrangler@4 pages project create "$PROJECT_NAME" --production-branch="$EXPECTED_BRANCH" >/tmp/cf-project.log 2>&1 || true
           cat /tmp/cf-project.log
 
       - name: Deploy exact commit to dev URL
@@ -99,8 +99,10 @@ jobs:
         run: |
           npx --yes wrangler@4 pages deploy _deploy \
             --project-name="$PROJECT_NAME" \
+            --branch="$EXPECTED_BRANCH" \
             --commit-hash="$EXPECTED_COMMIT_SHA" \
-            --commit-message="${EXPECTED_COMMIT_SHA::7} verified dev deploy"
+            --commit-message="${EXPECTED_COMMIT_SHA::7} verified dev deploy" \
+            --commit-dirty=true
 
       - name: Verify deployed commit, game version and cache version
         env:
