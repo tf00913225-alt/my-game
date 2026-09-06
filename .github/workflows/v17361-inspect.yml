@@ -1,101 +1,40 @@
-name: V173.61 integration
+name: V173.61 recovery
 
 on:
   push:
     branches: [dev]
     paths:
       - .github/workflows/v17361-inspect.yml
-      - .github/scripts/v17361_patch.py
 
 permissions:
   contents: write
 
 jobs:
-  integrate:
+  recover:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: dev
           fetch-depth: 0
-      - name: Import approved item art from assets-library
+
+      - name: Restore verified V173.61 CSS and remove temporary integration tools
         run: |
-          git fetch origin assets-library
-          mkdir -p assets/items/materials assets/items/chests
-          git show "origin/assets-library:assets/inbox/道具icon/礦石.png" > assets/items/materials/ore.png
-          git show "origin/assets-library:assets/inbox/道具icon/副本與背包的寶箱.png" > assets/items/chests/dungeon-chest.png
-          file assets/items/materials/ore.png assets/items/chests/dungeon-chest.png
-      - name: Fix temporary patrol insertion anchor
+          git show f6469b94193fef4a0af748d10901b5a989574956:css/00-main.css > css/00-main.css
+          git rm -f .github/scripts/v17361_patch.py
+          git rm -f .github/workflows/v17361-inspect.yml
+
+      - name: Verify restored CSS and full Node suite
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('.github/scripts/v17361_patch.py')
-          s=p.read_text(encoding='utf-8')
-          start=s.index('# 2. Patrol power-saving control.')
-          end=s.index('# 3. Supplied ore + common general-dungeon chest art.',start)
-          lines=[
-              '# 2. Patrol power-saving control.',
-              'html = read("index.html")',
-              'pattern = r\'(    <button\\n        id="quickAutoPatrolToggle"[\\s\\S]*?\\n    </button>)(\\n\\n</div>)\'',
-              'power_button = r\'\\1\' + "\\n\\n" + "\\n".join([',
-              '    \'    <button\',',
-              '    \'        id="quickPowerSavingToggle"\',',
-              '    \'        class="map-quick-toggle-btn v17361-power-save-toggle"\',',
-              '    \'        type="button"\',',
-              '    \'        onclick="v17361TogglePowerSaving()"\',',
-              '    \'        aria-label="省電模式"\',',
-              '    \'        aria-pressed="false"\',',
-              '    \'    >省電 OFF</button>\'',
-              ']) + r\'\\2\'',
-              'html,count=re.subn(pattern,power_button,html,count=1)',
-              'if count!=1:',
-              '    raise SystemExit(f"patrol button insertion count={count}")',
-              'write("index.html",html)',
-              '',
-          ]
-          p.write_text(s[:start]+'\n'.join(lines)+'\n'+s[end:],encoding='utf-8')
-          PY
-      - name: Validate patch script syntax
-        run: python -m py_compile .github/scripts/v17361_patch.py
-      - name: Apply V173.61 source fixes
-        run: python .github/scripts/v17361_patch.py
-      - name: Sync current-version test assertions
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          for p in Path('tests').glob('*.test.js'):
-              s=p.read_text(encoding='utf-8')
-              s=s.replace('173\\.60','173\\.61').replace('173.60','173.61')
-              p.write_text(s,encoding='utf-8')
-          p=Path('tests/v173.46-equipment-progression.test.js')
-          s=p.read_text(encoding='utf-8')
-          old='''assert.match(source,/看廣告雙倍為12件裝備/);\nassert.match(source,/白階40%・藍階40%・紫階15%・橙階5%/);'''
-          new='''assert.match(source,/\\["white","assets\\/equipment\\/warrior\\/head-01\\.png","40%"\\]/);\nassert.match(source,/\\["blue","assets\\/equipment\\/warrior\\/armor-01\\.png","40%"\\]/);\nassert.match(source,/\\["purple","assets\\/equipment\\/warrior\\/shoes-01\\.png","15%"\\]/);\nassert.match(source,/\\["orange","assets\\/equipment\\/warrior\\/weapon-01\\.png","5%"\\]/);\nassert.match(source,/assets\\/items\\/chests\\/dungeon-chest\\.png/);\nassert.match(source,/>×2<\\/b>/);'''
-          if s.count(old)!=1:
-              raise SystemExit(f'equipment preview legacy assertions count={s.count(old)}')
-          p.write_text(s.replace(old,new,1),encoding='utf-8')
-          PY
-      - name: Check modified JavaScript syntax
-        run: |
-          node --check js/00-main.js
-          node --check js/27-v132-content-expansion.js
-          node --check js/34-v141-core-systems.js
-          node --check js/35-v141-ui-battle.js
-          node --check js/42-v148-combat-dungeon-fixes.js
-          node --check js/equipment-progression.js
-          node --check js/57-v173.51-quest-qa.js
-      - name: Ensure asset-test dependency
-        run: |
-          if ! command -v identify >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends imagemagick
-          fi
-      - name: Run complete Node suites
-        run: node .github/scripts/ci.mjs tests
-      - name: Commit V173.61 integration
+          test "$(wc -c < css/00-main.css)" -gt 100000
+          grep -q 'v17361-power-save-toggle' css/00-main.css
+          grep -q 'map-return.png' css/00-main.css
+          node .github/scripts/ci.mjs tests
+
+      - name: Commit recovery
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html js css tests HANDOFF.md assets/items/materials/ore.png assets/items/chests/dungeon-chest.png
-          git commit -m "V173.61 integrate UI assets power saving and quest fixes"
+          git add css/00-main.css .github/scripts/v17361_patch.py .github/workflows/v17361-inspect.yml
+          git commit -m "restore verified V173.61 CSS and clean temporary tooling"
           git push origin HEAD:dev
