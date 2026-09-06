@@ -67,6 +67,13 @@ jobs:
               s=p.read_text(encoding='utf-8')
               s=s.replace('173\\.60','173\\.61').replace('173.60','173.61')
               p.write_text(s,encoding='utf-8')
+          p=Path('tests/v173.46-equipment-progression.test.js')
+          s=p.read_text(encoding='utf-8')
+          old='''assert.match(source,/看廣告雙倍為12件裝備/);\nassert.match(source,/白階40%・藍階40%・紫階15%・橙階5%/);'''
+          new='''assert.match(source,/\\["white","assets\\/equipment\\/warrior\\/head-01\\.png","40%"\\]/);\nassert.match(source,/\\["blue","assets\\/equipment\\/warrior\\/armor-01\\.png","40%"\\]/);\nassert.match(source,/\\["purple","assets\\/equipment\\/warrior\\/shoes-01\\.png","15%"\\]/);\nassert.match(source,/\\["orange","assets\\/equipment\\/warrior\\/weapon-01\\.png","5%"\\]/);\nassert.match(source,/assets\\/items\\/chests\\/dungeon-chest\\.png/);\nassert.match(source,/>×2<\\/b>/);'''
+          if s.count(old)!=1:
+              raise SystemExit(f'equipment preview legacy assertions count={s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
           PY
       - name: Check modified JavaScript syntax
         run: |
