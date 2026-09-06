@@ -18,10 +18,11 @@ jobs:
         with:
           ref: dev
           fetch-depth: 0
-      - name: Update V141 assertions to formal tier authority
+      - name: Update legacy assertions to formal tier authority
         run: |
           python - <<'PY'
           from pathlib import Path
+
           p=Path('tests/v141-system-expansion.test.js')
           s=p.read_text(encoding='utf-8')
           replacements=[
@@ -30,9 +31,17 @@ jobs:
           ]
           for old,new in replacements:
               if s.count(old)!=1:
-                  raise SystemExit(f'expected exactly one anchor: {old!r}; found {s.count(old)}')
+                  raise SystemExit(f'v141 expected exactly one anchor: {old!r}; found {s.count(old)}')
               s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/v169-abyss-assets-flow.test.js')
+          s=p.read_text(encoding='utf-8')
+          old='''test("talisman and blueprint borders follow blue, purple, orange, magenta rarity order",()=>{\n    const expected={low:"#3ba7ff",mid:"#a855f7",high:"#ff9f38",perfect:"#ff4fa7"};\n    Object.entries(expected).forEach(([tier,color])=>{\n        assert.match(css,new RegExp("v169-(?:talisman|blueprint)-art\\\\.v169-rarity-"+tier+"[^}]+border-color:"+color));\n    });\n    assert.match(css,/\\.v169-item-art > img\\{[^}]*object-fit:contain/);\n});'''
+          new='''test("talisman and blueprint borders follow formal white, blue, purple, orange rarity order",()=>{\n    const expected={low:"#D8D8D8",mid:"#42A5FF",high:"#B05CFF",perfect:"#FF9F38"};\n    Object.entries(expected).forEach(([tier,color])=>{\n        assert.match(css,new RegExp("v169-(?:talisman|blueprint)-art\\\\.v169-rarity-"+tier+"[^}]+border-color:"+color));\n    });\n    assert.match(css,/v169-rarity-pink[^}]+border-color:#FF4FA7/);\n    assert.match(css,/v169-rarity-four-symbol/);\n    assert.match(css,/\\.v169-item-art > img\\{[^}]*object-fit:contain/);\n});'''
+          if s.count(old)!=1:
+              raise SystemExit(f'v169 expected exactly one rarity test anchor, found {s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
           PY
       - name: Ensure asset-test dependency
         run: |
@@ -47,7 +56,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/v141-system-expansion.test.js
+          git add tests/v141-system-expansion.test.js tests/v169-abyss-assets-flow.test.js
           git diff --cached --check
           git commit -m "V173.60 align legacy tests with formal tiers"
           git push origin HEAD:dev
