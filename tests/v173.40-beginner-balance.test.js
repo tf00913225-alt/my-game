@@ -58,9 +58,9 @@ test("range VFX fixes remain fixed-size and centered after casualties",()=>{
 });
 
 test("release/cache advances to V173.40",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.57"/);
-    assert.match(index,/<title>四象江湖傳 V173\.57<\/title>/);
-    assert.match(index,/js\/00-main\.js\?v=173\.57/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.57/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.58"/);
+    assert.match(index,/<title>四象江湖傳 V173\.58<\/title>/);
+    assert.match(index,/js\/00-main\.js\?v=173\.58/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.58/);
 });
 console.log("\n"+passed+" V173.40 beginner balance and patrol tests passed.");

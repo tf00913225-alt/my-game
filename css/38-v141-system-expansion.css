@@ -1065,3 +1065,27 @@
         animation-iteration-count:1 !important;
     }
 }
+
+/* V173.58 — FREE-MATERIAL REFORGE UI */
+#game-stage .v17358-reforge-card{gap:8px!important;}
+#game-stage .v17358-section-title{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;color:#f4dfb0;}
+#game-stage .v17358-section-title>b{font-size:14px;line-height:18px;}
+#game-stage .v17358-section-title>span{color:#aa9a7e;font-size:10px;line-height:14px;}
+#game-stage .v17358-reforge-material,
+#game-stage .v17358-reforge-lock-panel{padding:8px;border:1px solid rgba(177,128,57,.62);border-radius:9px;background:linear-gradient(180deg,rgba(36,27,16,.82),rgba(13,10,7,.9));}
+#game-stage .v17358-reforge-tiers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+#game-stage .v17358-reforge-tier{display:flex!important;min-height:58px!important;flex-direction:column;align-items:flex-start!important;justify-content:center!important;gap:1px;padding:6px 8px!important;border:1px solid #72552d!important;border-radius:7px!important;background:linear-gradient(180deg,#291f13,#110d08)!important;color:#e8d6ae!important;text-align:left!important;}
+#game-stage .v17358-reforge-tier.active{border-color:#efbd55!important;background:linear-gradient(180deg,#5b3d16,#231506)!important;box-shadow:inset 0 0 0 1px rgba(255,224,151,.32),0 0 9px rgba(224,161,56,.22)!important;}
+#game-stage .v17358-reforge-tier>b{font-size:12px;line-height:15px;}
+#game-stage .v17358-reforge-tier>span{font-size:10px;line-height:13px;color:#d9c49a;}
+#game-stage .v17358-reforge-tier>small{font-size:9px;line-height:12px;color:#9e8d72;}
+#game-stage .v17358-reforge-lock-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+#game-stage .v17358-affix-lock{display:grid!important;grid-template-columns:22px minmax(0,1fr);grid-template-rows:auto auto;min-height:48px!important;padding:5px 7px!important;border:1px solid #625039!important;border-radius:7px!important;background:#15100a!important;color:#d9c8a5!important;text-align:left!important;}
+#game-stage .v17358-affix-lock>span{grid-row:1/3;align-self:center;font-size:17px;}
+#game-stage .v17358-affix-lock>b{overflow:hidden;font-size:11px;line-height:14px;text-overflow:ellipsis;white-space:nowrap;}
+#game-stage .v17358-affix-lock>small{font-size:9px;line-height:11px;color:#8d8069;}
+#game-stage .v17358-affix-lock.locked{border-color:#e5ac45!important;background:linear-gradient(180deg,#39250d,#171006)!important;color:#ffe1a0!important;box-shadow:inset 0 0 9px rgba(239,189,85,.12)!important;}
+#game-stage .v17358-no-affix-lock{grid-column:1/-1;padding:8px;border:1px dashed rgba(165,128,72,.42);border-radius:6px;color:#9f927d;font-size:10px;text-align:center;}
+#game-stage .v17358-reforge-lock-panel>small{display:block;margin-top:5px;color:#a9997d;font-size:9px;}
+#game-stage .v17358-reforge-cost{margin-top:0!important;}
+#game-stage .v17358-reforge-cost-note{margin-top:-2px;color:#a9997d;font-size:9px;line-height:13px;text-align:center;}

@@ -195,12 +195,11 @@
         item.stats={...SET_RULES[key].stats};
         item.quality="orange";
         item.rarityKey="orange";
-        item.reforgeSlots=Math.max(1,Math.floor(Number(item.reforgeSlots)||0));
-        const hasRecordedUse=Object.prototype.hasOwnProperty.call(item,"reforgeUsed");
-        const migratedUse=hasRecordedUse
-            ?Math.max(0,Math.floor(Number(item.reforgeUsed)||0))
-            :(item.reforgeStats&&Object.keys(item.reforgeStats).length?1:0);
-        item.reforgeUsed=Math.min(item.reforgeSlots,migratedUse);
+        const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
+        item.reforgeSlots=Math.max(1,legacyAffixCount,Math.floor(Number(item.reforgeSlots)||0));
+        // V173.58: reforgeUsed is retained only for old-save compatibility.
+        // Reforging is now unlimited; reforgeSlots means affix-slot count.
+        item.reforgeUsed=0;
         item.icon=addOrangeClass(item.icon);
         return item;
     }
@@ -268,7 +267,10 @@
     }
 
     function remainingReforgeSlots(item){
-        return Math.max(0,Math.floor(Number(item&&item.reforgeSlots)||0)-Math.floor(Number(item&&item.reforgeUsed)||0));
+        if(!item){ return 0; }
+        const explicit=Math.max(0,Math.floor(Number(item.reforgeSlots)||0));
+        const existing=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
+        return Math.max(explicit,existing);
     }
     window.v17346RemainingReforgeSlots=remainingReforgeSlots;
 
@@ -329,31 +331,19 @@
         window.v141StartReforge=function(){
             const item=selectedReforgeItem();
             if(!item||remainingReforgeSlots(item)<=0){
-                if(typeof window.rpgAlert==="function"){ void window.rpgAlert("這件裝備沒有可用的［可冶煉］詞條槽。",{title:"無法冶煉"}); }
-                else{ alert("這件裝備沒有可用的［可冶煉］詞條槽。"); }
-                return;
+                if(typeof window.rpgAlert==="function"){ void window.rpgAlert("這件裝備沒有冶煉槽。",{title:"無法冶煉"}); }
+                else{ alert("這件裝備沒有冶煉槽。"); }
+                return false;
             }
-            activeReforgeSnapshot={uid:item.v141Uid,used:Math.max(0,Number(item.reforgeUsed)||0),stats:{...(item.reforgeStats||{})}};
             return previousStartReforge.apply(this,arguments);
         };
     }
     if(typeof window.v141ResolveReforge==="function"){
         const previousResolveReforge=window.v141ResolveReforge;
-        window.v141ResolveReforge=function(apply){
-            const snapshot=activeReforgeSnapshot;
-            const item=snapshot?allEquipment().find(entry=>entry&&entry.v141Uid===snapshot.uid):null;
-            const result=previousResolveReforge.apply(this,arguments);
-            if(apply&&item&&snapshot){
-                const rolled={...(item.reforgeStats||{})};
-                const merged={...snapshot.stats};
-                Object.entries(rolled).forEach(([key,value])=>{ merged[key]=(Number(merged[key])||0)+(Number(value)||0); });
-                item.reforgeStats=merged;
-                item.reforgeUsed=Math.min(Math.floor(Number(item.reforgeSlots)||0),snapshot.used+1);
-                if(typeof saveGame==="function"){ saveGame(); }
-                if(typeof window.v141RenderSynthesis==="function"){ window.v141RenderSynthesis(); }
-            }
-            activeReforgeSnapshot=null;
-            return result;
+        window.v141ResolveReforge=function(){
+            // V173.58: replacement semantics live in js/36. No additive merge and
+            // no reforgeUsed attempt consumption here.
+            return previousResolveReforge.apply(this,arguments);
         };
     }
 
@@ -554,7 +544,7 @@
             const link=document.createElement("link");
             link.id="v17350-inventory-qol-style";
             link.rel="stylesheet";
-            link.href="css/52-v173.50-inventory-qol.css?v=173.57";
+            link.href="css/52-v173.50-inventory-qol.css?v=173.58";
             link.onerror=function(){ failV17350RuntimeGate("背包介面樣式載入失敗，請重新整理。"); };
             document.head.appendChild(link);
         }
@@ -564,7 +554,7 @@
         }
         const script=document.createElement("script");
         script.id="v17350-inventory-qol-runtime";
-        script.src="js/53-v173.50-inventory-qol.js?v=173.57";
+        script.src="js/53-v173.50-inventory-qol.js?v=173.58";
         script.async=false;
         script.onload=function(){
         if(typeof window.__v173ReportRuntimeProgress==="function"){
