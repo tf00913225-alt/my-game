@@ -1,0 +1,53 @@
+name: V173.59 remove starter ring
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - .github/workflows/v17359-remove-starter-ring.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Remove starter ring from new-account inventory
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('js/00-main.js')
+          text = path.read_text(encoding='utf-8')
+          block = '''    {
+              id:"powerRing",
+              name:"力量戒指",
+              icon:"",
+              type:"accessory",
+              count:1,
+              price:200,
+              stats:{
+                  attack:5
+              }
+          },
+
+          '''
+          if text.count(block) != 1:
+              raise SystemExit(f'expected exactly one starter powerRing block, found {text.count(block)}')
+          path.write_text(text.replace(block, '', 1), encoding='utf-8')
+          PY
+          node --check js/00-main.js
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/00-main.js
+          git diff --cached --check
+          git commit -m "V173.59 remove starter ring from new accounts"
+          git push origin HEAD:dev
