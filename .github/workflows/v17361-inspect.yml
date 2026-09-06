@@ -59,8 +59,15 @@ jobs:
         run: python -m py_compile .github/scripts/v17361_patch.py
       - name: Apply V173.61 source fixes
         run: python .github/scripts/v17361_patch.py
-      - name: Sync panel version regression
-        run: sed -i 's/173\\.60/173\\.61/g' tests/ui-panel-sizing-regression.test.js
+      - name: Sync current-version test assertions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for p in Path('tests').glob('*.test.js'):
+              s=p.read_text(encoding='utf-8')
+              s=s.replace('173\\.60','173\\.61').replace('173.60','173.61')
+              p.write_text(s,encoding='utf-8')
+          PY
       - name: Check modified JavaScript syntax
         run: |
           node --check js/00-main.js
