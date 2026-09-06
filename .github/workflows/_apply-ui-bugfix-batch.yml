@@ -19,7 +19,9 @@ jobs:
           fetch-depth: 2
 
       - name: Apply owner-level fixes
-        run: python3 .github/scripts/_apply-ui-bugfix-batch.py
+        run: |
+          python3 .github/scripts/_apply-ui-bugfix-batch.py
+          python3 .github/scripts/_postfix-ui-bugfix-batch.py
 
       - name: Targeted syntax and regression checks
         shell: bash
@@ -39,7 +41,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm .github/workflows/_apply-ui-bugfix-batch.yml .github/scripts/_apply-ui-bugfix-batch.py
+          git rm .github/workflows/_apply-ui-bugfix-batch.yml .github/scripts/_apply-ui-bugfix-batch.py .github/scripts/_postfix-ui-bugfix-batch.py
           git add css/33-v132-content-expansion.css css/38-v141-system-expansion.css css/53-v173.51-qa.css \
                   js/01-stage-v8-touch-lock.js js/38-v143-system-fixes.js js/55-v173.51-inventory-qa.js js/58-v173.63-functional-fixes.js \
                   UI_GUIDELINES.md HANDOFF.md tests/v173.51-qa.test.js tests/ui-synthesis-dungeon-equipment-comparison-regression.test.js \
