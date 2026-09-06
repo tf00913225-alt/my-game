@@ -31,6 +31,14 @@ jobs:
           s=p.read_text(encoding='utf-8')
           s=s.replace('if(typeof window.__v173ReportRuntimeProgress==="function")','if(typeof window!=="undefined"&&typeof window.__v173ReportRuntimeProgress==="function")')
           p.write_text(s,encoding='utf-8')
+
+          # Historical V173.50 filenames remain unchanged, but the actual asset
+          # URL is intentionally cache-bumped for this V173.52 loader release.
+          t=Path('tests/v173.50-inventory-qol.test.js')
+          q=t.read_text(encoding='utf-8')
+          q=q.replace(r'css\/52-v173\.50-inventory-qol\.css\?v=173\.50',r'css\/52-v173\.50-inventory-qol\.css\?v=173\.52')
+          q=q.replace('css/52-v173.50-inventory-qol.css?v=173.50','css/52-v173.50-inventory-qol.css?v=173.52')
+          t.write_text(q,encoding='utf-8')
           PY
       - name: Syntax and tests
         run: |
