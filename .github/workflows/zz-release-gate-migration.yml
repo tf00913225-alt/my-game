@@ -1,0 +1,89 @@
+name: One-time release gate migration
+
+on:
+  push:
+    branches:
+      - release-gate-v17363
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: release-gate-v17363
+          fetch-depth: 0
+
+      - name: Remove deprecated patrol power-saving owner
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(path, pattern, replacement, flags=0):
+              p=Path(path)
+              text=p.read_text(encoding='utf-8')
+              new,count=re.subn(pattern,replacement,text,count=1,flags=flags)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one match, got {count}')
+              p.write_text(new,encoding='utf-8')
+
+          replace_once(
+              'index.html',
+              r'\n\s*<button\s+(?=[^>]*id="quickPowerSavingToggle")[\s\S]*?</button>',
+              '',
+              re.S,
+          )
+
+          core=Path('js/34-v141-core-systems.js')
+          text=core.read_text(encoding='utf-8')
+          marker='    /* V173.61 — screen wake / patrol power-saving owner. */'
+          if text.count(marker) != 1 or not text.rstrip().endswith('})();'):
+              raise SystemExit('core power-saving owner marker/closure did not match expected structure')
+          start=text.index(marker)
+          close=text.rfind('})();')
+          core.write_text(text[:start].rstrip()+'\n\n})();\n',encoding='utf-8')
+
+          css=Path('css/00-main.css')
+          text=css.read_text(encoding='utf-8')
+          for pattern in [
+              r'\n#game-stage \.map-quick-toggle-btn\.v17361-power-save-toggle\{[^}]*\}',
+              r'\n#game-stage \.map-quick-toggle-btn\.v17361-power-save-toggle\.active\{[^}]*\}',
+          ]:
+              text,count=re.subn(pattern,'',text,count=1,flags=re.S)
+              if count != 1:
+                  raise SystemExit(f'00-main.css: expected one deprecated selector for {pattern}, got {count}')
+          css.write_text(text,encoding='utf-8')
+
+          daily=Path('css/43-v148-combat-dungeon-fixes.css')
+          text=daily.read_text(encoding='utf-8')
+          text,count=re.subn(r'\n#game-stage #mapPage \.v17361-power-save-toggle\{[^}]*\}','',text,count=1,flags=re.S)
+          if count != 1:
+              raise SystemExit(f'43-v148-combat-dungeon-fixes.css: expected one hidden deprecated selector, got {count}')
+          daily.write_text(text,encoding='utf-8')
+
+          test=Path('tests/v173.61-current-request.test.js')
+          text=test.read_text(encoding='utf-8')
+          old='assert.match(dailyCss,/\\.v17361-power-save-toggle\\{[\\s\\S]*display:none !important/);\nassert.match(core,/navigator\\.wakeLock\\.request\\("screen"\\)/);'
+          new='assert.doesNotMatch(html,/quickPowerSavingToggle|v17361TogglePowerSaving|省電 OFF/);\nassert.doesNotMatch(mainCss,/v17361-power-save-toggle/);\nassert.doesNotMatch(dailyCss,/v17361-power-save-toggle/);\nassert.doesNotMatch(core,/V17361_POWER_SAVE_KEY|v17361TogglePowerSaving|navigator\\.wakeLock/);'
+          if old not in text:
+              raise SystemExit('test expectations did not match deprecated-code baseline')
+          test.write_text(text.replace(old,new,1),encoding='utf-8')
+          PY
+
+          git diff --check
+          git diff -- index.html js/34-v141-core-systems.js css/00-main.css css/43-v148-combat-dungeon-fixes.css tests/v173.61-current-request.test.js
+
+      - name: Commit migration to integration branch
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html js/34-v141-core-systems.js css/00-main.css css/43-v148-combat-dungeon-fixes.css tests/v173.61-current-request.test.js
+          git commit -m "fix: remove deprecated patrol power saving runtime"
+          git push origin HEAD:release-gate-v17363
