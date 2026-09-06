@@ -1,0 +1,87 @@
+name: V173.62 patrol VFX browser QA
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17362-browser-qa.yml
+
+permissions:
+  contents: write
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install Playwright package only
+        run: npm install --no-save --ignore-scripts playwright@1.55.0
+      - name: Verify patrol battle VFX remains visible
+        env:
+          DEV_URL: https://four-symbols-dev.pages.dev
+        run: |
+          CHROME="$(command -v google-chrome-stable || command -v google-chrome || true)"
+          test -n "$CHROME"
+          export CHROME
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME,args:['--no-sandbox','--disable-dev-shm-usage']});
+            const page=await browser.newPage({viewport:{width:420,height:900}});
+            page.on('console',msg=>{ if(msg.type()==='error') console.log('[page error]',msg.text()); });
+            await page.goto(process.env.DEV_URL+'/?qa=v17362-patrol-vfx',{waitUntil:'domcontentloaded',timeout:120000});
+            await page.waitForFunction(()=>document.documentElement.dataset.runtimeReady==='173.62',undefined,{timeout:120000});
+            const result=await page.evaluate(async()=>{
+              const tab=document.getElementById('characterTabContent');
+              const shell=document.getElementById('characterPage')||document.getElementById('characterModal');
+              if(!tab) throw new Error('characterTabContent missing');
+              tab.style.display='block';
+              tab.style.visibility='visible';
+              if(shell){ shell.style.display='block'; shell.style.visibility='visible'; }
+              if(typeof window.v17351SyncManagement!=='function') throw new Error('v17351SyncManagement missing');
+              if(!window.v142SkillAnimationDirector||typeof window.v142SkillAnimationDirector.play!=='function') throw new Error('animation director missing');
+              if(typeof window.v142GetSkillAnimationConfig!=='function') throw new Error('animation config helper missing');
+              battleActive=true;
+              window.v17351SyncManagement();
+              const config=window.v142GetSkillAnimationConfig('flameSlash');
+              const gate=window.v142SkillAnimationDirector.play(config,{side:'player',actorIndex:0,key:'v17362-browser-patrol'});
+              await new Promise(resolve=>setTimeout(resolve,160));
+              window.v17351SyncManagement();
+              const stage=document.getElementById('v143-skill-stage');
+              const snapshot={
+                stageExists:!!stage,
+                inlineVisibility:stage?stage.style.visibility:null,
+                computedVisibility:stage?getComputedStyle(stage).visibility:null,
+                bodyManagementOpen:document.body.classList.contains('v17351-management-open'),
+                stageSkill:stage?stage.getAttribute('data-skill'):null,
+                stageChildCount:stage?stage.childElementCount:0,
+                gateStarted:!!gate
+              };
+              if(gate&&typeof gate.complete==='function') gate.complete('browser-qa');
+              battleActive=false;
+              window.v17351SyncManagement();
+              return snapshot;
+            });
+            console.log(JSON.stringify(result));
+            assert.equal(result.stageExists,true,'V143 stage must exist after a real skill play');
+            assert.notEqual(result.computedVisibility,'hidden','Patrol/wild battle VFX stage must remain visible while battleActive');
+            assert.equal(result.bodyManagementOpen,false,'Management-open class must be cleared during battle');
+            assert.equal(result.gateStarted,true,'Skill animation gate must start');
+            assert.ok(result.stageChildCount>0,'VFX stage must render visual nodes');
+            await browser.close();
+          })().catch(err=>{console.error(err);process.exit(1);});
+          NODE
+      - name: Remove temporary browser QA workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/v17362-browser-qa.yml
+          git commit -m "clean V173.62 browser QA workflow"
+          git push origin HEAD:dev
