@@ -27,6 +27,11 @@ jobs:
           python .github/scripts/fix-v17358-patcher.py
           python .github/scripts/apply-v17358-reforge-redesign.py
           python .github/scripts/fix-v17358-tests.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('css/38-v141-system-expansion.css')
+          p.write_text(p.read_text(encoding='utf-8').rstrip()+"\n",encoding='utf-8')
+          PY
       - name: Syntax and full tests
         run: |
           node --check js/20-anonymous-20.js
