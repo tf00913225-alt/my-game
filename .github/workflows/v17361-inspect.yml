@@ -25,6 +25,17 @@ jobs:
           git show "origin/assets-library:assets/inbox/道具icon/礦石.png" > assets/items/materials/ore.png
           git show "origin/assets-library:assets/inbox/道具icon/副本與背包的寶箱.png" > assets/items/chests/dungeon-chest.png
           file assets/items/materials/ore.png assets/items/chests/dungeon-chest.png
+      - name: Fix temporary patrol insertion anchor
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/scripts/v17361_patch.py')
+          s=p.read_text(encoding='utf-8')
+          start=s.index('# 2. Patrol power-saving control.')
+          end=s.index('# 3. Supplied ore + common general-dungeon chest art.',start)
+          replacement='''# 2. Patrol power-saving control.\nhtml = read("index.html")\npattern = r'(    <button\\n        id="quickAutoPatrolToggle"[\\s\\S]*?\\n    </button>)(\\n\\n</div>)'\npower_button = r'''\\1\n\n    <button\n        id="quickPowerSavingToggle"\n        class="map-quick-toggle-btn v17361-power-save-toggle"\n        type="button"\n        onclick="v17361TogglePowerSaving()"\n        aria-label="省電模式"\n        aria-pressed="false"\n    >省電 OFF</button>\\2'''\nhtml,count=re.subn(pattern,power_button,html,count=1)\nif count!=1:\n    raise SystemExit(f"patrol button insertion count={count}")\nwrite("index.html",html)\n\n'''
+          p.write_text(s[:start]+replacement+s[end:],encoding='utf-8')
+          PY
       - name: Validate patch script syntax
         run: python -m py_compile .github/scripts/v17361_patch.py
       - name: Apply V173.61 source fixes
