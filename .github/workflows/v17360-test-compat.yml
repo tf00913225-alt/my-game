@@ -23,13 +23,6 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          def replace_once(path, old, new, label):
-              p=Path(path)
-              s=p.read_text(encoding='utf-8')
-              if s.count(old)!=1:
-                  raise SystemExit(f'{label}: expected exactly one anchor, found {s.count(old)}')
-              p.write_text(s.replace(old,new,1),encoding='utf-8')
-
           # V141: blueprint grid now has six formal tiers; reforge default is white.
           p=Path('tests/v141-system-expansion.test.js')
           s=p.read_text(encoding='utf-8')
@@ -63,6 +56,18 @@ jobs:
               s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8')
 
+          # V173.58 reforge rules stay intact; only the authoritative tier key changed to formal white.
+          p=Path('tests/v173.58-reforge-redesign.test.js')
+          s=p.read_text(encoding='utf-8')
+          for old,new in [
+              ('assert.match(synthesis,/reforgeMaterialTier:"low",lockedReforgeKeys:\\[\\]/);','assert.match(synthesis,/reforgeMaterialTier:"white",lockedReforgeKeys:\\[\\]/);'),
+              ('assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&candidate\\.tierKey===tier,cost/);','assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&normalizeTierKey\\(candidate\\.tierKey\\)===tier,cost/);')
+          ]:
+              if s.count(old)!=1:
+                  raise SystemExit(f'v173.58: expected one anchor {old!r}, found {s.count(old)}')
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+
           # Real cache-busting fix: nested V173.51 QA assets must follow the release version.
           p=Path('js/53-v173.50-inventory-qol.js')
           s=p.read_text(encoding='utf-8')
@@ -92,7 +97,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/v141-system-expansion.test.js tests/v169-abyss-assets-flow.test.js tests/v173.50-inventory-qol.test.js js/53-v173.50-inventory-qol.js
+          git add tests/v141-system-expansion.test.js tests/v169-abyss-assets-flow.test.js tests/v173.50-inventory-qol.test.js tests/v173.58-reforge-redesign.test.js js/53-v173.50-inventory-qol.js
           git diff --cached --check
           git commit -m "V173.60 align tier tests and nested QA cache wiring"
           git push origin HEAD:dev
