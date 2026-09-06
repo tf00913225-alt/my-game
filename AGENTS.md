@@ -120,8 +120,19 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 
 ## DEV 發布與測試位置
 - `main` 仍是正式版來源，除非使用者明確要求，不得把開發修改直接推進 `main`。
-- `dev` 每次 push 由 `.github/workflows/deploy-dev-cloudflare.yml` 自動部署到 Cloudflare Pages。
+- `dev` 只能在 `Repository checks` 成功且 Release Gate 通過後，由 `.github/workflows/deploy-dev-cloudflare.yml` 部署到 Cloudflare Pages。
 - DEV 唯一固定測試網址：`https://four-symbols-dev.pages.dev`。
 - 不再使用 GitHack / RawCDN 作為 DEV 驗證來源。
 - `assets-library` 與 `assets-library/assets/inbox/` 仍維持 GitHub 素材工作流，不受 Cloudflare Pages 發布方式影響。
-- 每次維修或升版後，主城 HUD 顯示版本、`index.html` 的載入版本與 `V_ASSET_VERSION` 必須同步更新，避免手機載入舊快取。
+- Game Version、Cache Version、主城 HUD、`index.html` 受管理 cache-busting 與 `V_ASSET_VERSION` 必須一致；部署流程禁止再用 `sed` 或其他方式在 `_deploy` 臨時補版本。
+
+## 最高優先：Release / Requirement Verification Gate
+- **`docs/RELEASE_VERIFICATION_RULES.md` 是本 `AGENTS.md` 的不可分割永久規範，所有 GPT、Claude、Codex 與其他 AI 開發代理都必須完整遵守。**
+- 任何一次包含多項修改的需求，必須先建立／更新 `release/requirements.json`，逐項使用 `TODO / IMPLEMENTED / VERIFIED / BLOCKED`；只有 N/N VERIFIED 才能宣稱完成。
+- **未完成逐項 VERIFIED 前，禁止更新正式版本號並宣稱完成。** 版本號只能表示「已驗證批次準備發布」，不能作為功能完成證據。
+- 程式修改、commit、push、Repository checks SUCCESS、Deploy SUCCESS、版本號更新，任何單一項都不等於完成；缺少 source/commit/push/CI/deploy SHA/Game+Cache/Requirement Verification 任一環節，一律回報 `NOT COMPLETE`。
+- `release/release.json` 是 Game Version／Cache Version 的 release source of truth；`.github/scripts/release-gate.mjs` 與 CI／deploy workflow 為強制執行 owner。
+- 正式移除功能必須在 `release/deprecated-code.json` 登記 forbidden tokens；舊 DOM id、class、handler、函式、設定 key 或顯示文字仍存在於正式 HTML/JS/CSS 時，CI 必須失敗。
+- UI、手機 viewport、捲動、裁切、icon、modal、loading、點擊等不能由靜態 CI 完整證明的需求，仍必須做最小必要實際視覺／操作驗收。
+- Cache invalidation、Game Version、Service Worker 更新不得清除玩家 localStorage、IndexedDB、雲端存檔、帳號、背包、等級、裝備或進度；靜態 Cache 與 Save Data 必須完全分離。
+- 完成回報固定包含：`Requirements: N/N VERIFIED`、Branch、Commit SHA、Game Version、Cache Version、Repository checks、Deploy、Deployment SHA verified。任一未完成即顯示 `NOT COMPLETE`。

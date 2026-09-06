@@ -1,10 +1,7 @@
-# V173.63: publish dev with one deployment-time cache stamp so mobile clients cannot reuse V173.62 assets.
 name: Deploy dev to Cloudflare Pages
 
 on:
-  push:
-    branches:
-      - dev
+  workflow_call:
   workflow_dispatch:
 
 concurrency:
@@ -23,11 +20,36 @@ jobs:
       CLOUDFLARE_API_TOKEN_RAW: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID_RAW: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PROJECT_NAME: four-symbols-dev
-      DEV_CACHE_VERSION: "173.63"
+      DEV_BASE_URL: https://four-symbols-dev.pages.dev
+      EXPECTED_BRANCH: dev
+      EXPECTED_COMMIT_SHA: ${{ github.sha }}
 
     steps:
-      - name: Checkout dev
+      - name: Checkout exact release commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Confirm this commit is still dev HEAD
+        shell: bash
+        run: |
+          REMOTE_HEAD="$(git ls-remote origin refs/heads/dev | cut -f1)"
+          test -n "$REMOTE_HEAD" || { echo "Cannot resolve dev HEAD"; exit 1; }
+          if [[ "$REMOTE_HEAD" != "$EXPECTED_COMMIT_SHA" ]]; then
+            echo "Refusing stale deployment: dev HEAD=$REMOTE_HEAD, workflow SHA=$EXPECTED_COMMIT_SHA"
+            exit 1
+          fi
+
+      - name: Re-run release gate before packaging
+        env:
+          CI_BASE_SHA: ""
+        run: node .github/scripts/release-gate.mjs ci
 
       - name: Normalize and verify Cloudflare credentials
         shell: bash
@@ -46,7 +68,7 @@ jobs:
           printf 'CLOUDFLARE_API_TOKEN=%s\n' "$TOKEN" >> "$GITHUB_ENV"
           printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$ACCOUNT_ID" >> "$GITHUB_ENV"
 
-      - name: Prepare static site
+      - name: Prepare immutable static site
         shell: bash
         run: |
           mkdir -p _deploy
@@ -56,25 +78,15 @@ jobs:
             --exclude='tests/' \
             --exclude='node_modules/' \
             --exclude='_deploy/' \
+            --exclude='release-manifest.final.json' \
             ./ _deploy/
           test -f _deploy/index.html || { echo "index.html not found"; exit 1; }
 
-          # Dev preview is a disposable build artifact. Stamp the current cache
-          # version only inside _deploy so every HTML/CSS/JS URL that still uses
-          # the previous V173.62 key is fetched again by mobile browsers.
-          while IFS= read -r -d '' file; do
-            sed -i "s/173\\.62/${DEV_CACHE_VERSION}/g" "$file"
-          done < <(find _deploy -type f \( -name '*.html' -o -name '*.css' -o -name '*.js' \) -print0)
-
-          grep -q "<title>四象江湖傳 V${DEV_CACHE_VERSION}</title>" _deploy/index.html || {
-            echo "dev visible version was not stamped"; exit 1;
-          }
-          grep -q "const V_ASSET_VERSION=\"${DEV_CACHE_VERSION}\";" _deploy/js/20-anonymous-20.js || {
-            echo "dev runtime cache version was not stamped"; exit 1;
-          }
-          if grep -R --include='*.html' --include='*.css' --include='*.js' -n "173\.62" _deploy; then
-            echo "stale V173.62 cache key remains in dev artifact"; exit 1;
-          fi
+          # Deployment is validation-only. Never rewrite Game/Cache versions here.
+          DEPLOY_DIR=_deploy \
+          EXPECTED_COMMIT_SHA="$EXPECTED_COMMIT_SHA" \
+          EXPECTED_BRANCH="$EXPECTED_BRANCH" \
+          node .github/scripts/release-gate.mjs prepare-artifact
 
       - name: Ensure Pages project exists
         shell: bash
@@ -82,13 +94,39 @@ jobs:
           npx --yes wrangler@4 pages project create "$PROJECT_NAME" --production-branch=dev >/tmp/cf-project.log 2>&1 || true
           cat /tmp/cf-project.log
 
-      - name: Deploy dev to production URL
+      - name: Deploy exact commit to dev URL
         shell: bash
         run: |
           npx --yes wrangler@4 pages deploy _deploy \
             --project-name="$PROJECT_NAME" \
-            --commit-hash="${GITHUB_SHA}" \
-            --commit-message="${GITHUB_SHA::7} dev auto deploy"
+            --commit-hash="$EXPECTED_COMMIT_SHA" \
+            --commit-message="${EXPECTED_COMMIT_SHA::7} verified dev deploy"
 
-      - name: Preview URL
-        run: echo "https://four-symbols-dev.pages.dev"
+      - name: Verify deployed commit, game version and cache version
+        env:
+          DEPLOY_BASE_URL: ${{ env.DEV_BASE_URL }}
+        run: |
+          success=0
+          for attempt in 1 2 3 4 5 6; do
+            if node .github/scripts/release-gate.mjs verify-deployed; then
+              success=1
+              break
+            fi
+            sleep 5
+          done
+          test "$success" = "1" || { echo "Deployed release manifest did not converge to expected SHA/version"; exit 1; }
+
+      - name: Upload final release manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-manifest-${{ github.sha }}
+          path: release-manifest.final.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Deployment summary
+        run: |
+          echo "Branch: dev" >> "$GITHUB_STEP_SUMMARY"
+          echo "Commit SHA: $EXPECTED_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployment SHA verified: YES" >> "$GITHUB_STEP_SUMMARY"
+          cat release-manifest.final.json >> "$GITHUB_STEP_SUMMARY"

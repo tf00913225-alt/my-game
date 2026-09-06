@@ -117,3 +117,15 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 - 【修改範圍必須和使用者要求一致，不得自行擴張。】
 - 【測試強度必須與修改風險相符。】
 - 【所有修改都必須以不破壞既有功能為前提。】
+
+## 最高優先：Release / Requirement Verification Gate
+- **`docs/RELEASE_VERIFICATION_RULES.md` 是本 `CLAUDE.md` 的不可分割永久規範；與 `AGENTS.md` 同步適用。**
+- 多項需求必須維護 `release/requirements.json`，狀態限 `TODO / IMPLEMENTED / VERIFIED / BLOCKED`；只有 N/N VERIFIED 才能宣稱完成。
+- **未完成逐項 VERIFIED 前，禁止更新正式版本號並宣稱完成。** 版本號不能作為功能完成證據。
+- diff、commit、push、Repository checks SUCCESS、Deploy SUCCESS、版本號更新都不能單獨代表完成；缺少任一 release chain 環節，一律 `NOT COMPLETE`。
+- `release/release.json` 是 Game Version／Cache Version 的 release source of truth；部署 workflow 只能驗證，不得在 `_deploy` 偷改版本。
+- 正式移除功能須在 `release/deprecated-code.json` 建立 forbidden-token assertion；正式 HTML/JS/CSS 還有舊 DOM/class/handler/function/key/text 時 CI 必須失敗。
+- dev 發布必須驗證 `dev HEAD == workflow commit SHA == deployed release-manifest commitSha`；main 若沒有 production deployment owner，必須如實標示人工／BLOCKED。
+- UI／手機 viewport／捲動／裁切／icon／modal／loading／點擊等仍需最小必要實際 UI 驗收，CI SUCCESS 不能取代 Requirement Verification。
+- Cache／版本／Service Worker 更新不得刪除 localStorage、IndexedDB、雲端存檔、帳號、背包、等級、裝備或進度；Cache invalidation 與 Save Data 必須分離。
+- 完成回報必須包含 Requirements N/N VERIFIED、Branch、Commit SHA、Game Version、Cache Version、Repository checks、Deploy、Deployment SHA verified；任一不足即 `NOT COMPLETE`。

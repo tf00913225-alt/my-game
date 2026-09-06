@@ -41,7 +41,9 @@ jobs:
           fi
 
       - name: Check CI script syntax
-        run: node --check .github/scripts/ci.mjs
+        run: |
+          node --check .github/scripts/ci.mjs
+          node --check .github/scripts/release-gate.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
@@ -65,8 +67,20 @@ jobs:
       - name: Check release entries and loader integrity
         run: node .github/scripts/ci.mjs loader
 
+      - name: Enforce release, cache, checklist and deprecated-code gates
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node .github/scripts/release-gate.mjs ci
+
       - name: Check Git whitespace and conflict markers
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node .github/scripts/ci.mjs git-diff
+
+  deploy_dev:
+    name: Dev deployment gate
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    uses: ./.github/workflows/deploy-dev-cloudflare.yml
+    secrets: inherit
