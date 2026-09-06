@@ -8,4 +8,10 @@ if old not in s:
     raise SystemExit('old V141 reforge cost assertions not found')
 s=s.replace(old,new,1)
 p.write_text(s,encoding='utf-8')
-print('V173.58 V141 reforge test expectations updated')
+
+p=Path('tests/v173.57-starter-icons-reforge-filter.test.js')
+s=p.read_text(encoding='utf-8')
+s=s.replace('assert.match(synthesis,/item\\.v17351Locked===true/);','assert.match(synthesis,/item\\.v17351Locked!==true/);')
+p.write_text(s,encoding='utf-8')
+
+print('V173.58 reforge regression expectations updated')
