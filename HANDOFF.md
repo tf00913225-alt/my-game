@@ -1,3 +1,12 @@
+## V173.61 返回圖示／道具圖／副本預覽／音效／常亮省電／任務即時領取（目前 dev）
+- V173.60 已通過受保護 Repository checks 並由 PR #70 正式合併 main；本輪新修改只在 dev。
+- `css/00-main.css` 是共用返回按鈕視覺 owner：所有實際使用 `assets/ui/map-return.png` 的入口統一補 `#050505` 圓形黑底。
+- 素材分支的「礦石.png」「副本與背包的寶箱.png」已導入 `assets/items/materials/ore.png`、`assets/items/chests/dungeon-chest.png`；既有背包礦石／材料寶箱也會同步新圖示。
+- 一般副本獎勵預覽由 `js/42` + `css/43` 改為圖片優先；裝備副本由既有 `js/equipment-progression.js` 同步改成實際裝備圖＋正式階級框。
+- 戰鬥程序音效 `js/34` master gain 0.22→0.30；`js/35` 移除 `v141-once-*` CSS flash，但保留 Canvas particles；`js/39` Sprite/VFX 時序仍是現行技能動畫 owner。
+- 一般模式在首次使用者操作後嘗試 Screen Wake Lock；巡怪新增「省電 OFF/ON」，省電 ON 釋放 Wake Lock，頁面隱藏時也會釋放。
+- 每日／委託正式加入一鍵領取；背景任務進度變化時只刷新已開啟的任務內容與完成度，保留目前分頁／捲動位置。成就既有一鍵領取保留。
+- 版本與 live cache key 同步 V173.61。
 
 ## V173.60 正式物品階級／符咒判定重構（目前 dev）
 - 正式一般物品階級統一為：白階（white）→藍階（blue）→紫階（purple）→橙階（orange）→桃紅階（pink）→四象階（four-symbol）；固定色號依 `docs/ITEM_RARITY_UI_SPEC.md`。

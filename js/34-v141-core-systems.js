@@ -331,7 +331,7 @@
             if(!AudioContextCtor){ return null; }
             context=new AudioContextCtor();
             master=context.createGain();
-            master.gain.value=0.22;
+            master.gain.value=0.30;
             master.connect(context.destination);
             return context;
         }
@@ -644,7 +644,12 @@
         const definitions=type==="commission"?commissionQuestDefinitions:dailyQuestDefinitions;
         const quest=definitions.find(item=>item.id===id);
         if(!quest){ return; }
-        state.progress[id]=Math.min(quest.goal,(Number(state.progress[id])||0)+Math.max(0,Number(amount)||0));
+        const before=Number(state.progress[id])||0;
+        const after=Math.min(quest.goal,before+Math.max(0,Number(amount)||0));
+        if(after===before){ return; }
+        state.progress[id]=after;
+        if(typeof window.v17361RefreshOpenQuestPage==="function"){ window.v17361RefreshOpenQuestPage(); }
+        if(typeof window.v148SyncQuestNoticeDots==="function"){ window.v148SyncQuestNoticeDots(); }
     }
     window.v141RecordQuestProgress=recordQuestProgress;
 
@@ -798,4 +803,63 @@
             return bonus;
         };
     }
+
+    /* V173.61 — screen wake / patrol power-saving owner. */
+    const V17361_POWER_SAVE_KEY="v17361_patrol_power_saving";
+    let v17361ScreenWakeLock=null;
+
+    function v17361PowerSavingEnabled(){
+        try{ return localStorage.getItem(V17361_POWER_SAVE_KEY)==="1"; }catch(_){ return false; }
+    }
+    function v17361SyncPowerSavingButton(){
+        if(typeof document==="undefined"){ return; }
+        const button=document.getElementById("quickPowerSavingToggle");
+        if(!button){ return; }
+        const enabled=v17361PowerSavingEnabled();
+        button.classList.toggle("active",enabled);
+        button.setAttribute("aria-pressed",enabled?"true":"false");
+        button.textContent=enabled?"省電 ON":"省電 OFF";
+        button.title=enabled?"允許螢幕依系統設定休眠":"遊戲會嘗試保持螢幕常亮";
+    }
+    async function v17361ReleaseWakeLock(){
+        const lock=v17361ScreenWakeLock;
+        v17361ScreenWakeLock=null;
+        if(lock&&typeof lock.release==="function"){ try{ await lock.release(); }catch(_){ } }
+    }
+    async function v17361RequestWakeLock(){
+        v17361SyncPowerSavingButton();
+        if(v17361PowerSavingEnabled()||typeof document==="undefined"||document.visibilityState!=="visible"){
+            await v17361ReleaseWakeLock();
+            return false;
+        }
+        if(typeof navigator==="undefined"||!navigator.wakeLock||typeof navigator.wakeLock.request!=="function"){ return false; }
+        if(v17361ScreenWakeLock&&!v17361ScreenWakeLock.released){ return true; }
+        try{
+            const lock=await navigator.wakeLock.request("screen");
+            v17361ScreenWakeLock=lock;
+            if(lock&&typeof lock.addEventListener==="function"){
+                lock.addEventListener("release",()=>{ if(v17361ScreenWakeLock===lock){ v17361ScreenWakeLock=null; } });
+            }
+            return true;
+        }catch(_){ v17361ScreenWakeLock=null; return false; }
+    }
+    window.v17361TogglePowerSaving=function(){
+        const next=!v17361PowerSavingEnabled();
+        try{ localStorage.setItem(V17361_POWER_SAVE_KEY,next?"1":"0"); }catch(_){ }
+        v17361SyncPowerSavingButton();
+        if(next){ void v17361ReleaseWakeLock(); }
+        else{ void v17361RequestWakeLock(); }
+        return next;
+    };
+    window.v17361RequestWakeLock=v17361RequestWakeLock;
+    window.v17361ReleaseWakeLock=v17361ReleaseWakeLock;
+    if(typeof document!=="undefined"){
+        document.addEventListener("pointerdown",()=>{ void v17361RequestWakeLock(); },{once:true,passive:true});
+        document.addEventListener("visibilitychange",()=>{
+            if(document.visibilityState==="visible"){ void v17361RequestWakeLock(); }
+            else{ void v17361ReleaseWakeLock(); }
+        });
+        setTimeout(v17361SyncPowerSavingButton,0);
+    }
+
 })();

@@ -12,9 +12,9 @@ for(const file of ["assets/ui/startup-logo-v173.20.jpg","assets/ui/startup-main-
   assert.equal(details,"JPEG 864 1536",file);
 }
 assert.ok(html.indexOf('id="startupLoader"')<html.indexOf('id="app"'));
-assert.ok(html.indexOf("js/52-v173.20-startup-loader.js?v=173.60")<html.indexOf("js/00-main.js?v=173.60"));
-assert.match(html,/css\/51-v173\.20-startup-loader\.css\?v=173\.60/);
-assert.match(loader,/const V_ASSET_VERSION="173\.60"/);
+assert.ok(html.indexOf("js/52-v173.20-startup-loader.js?v=173.61")<html.indexOf("js/00-main.js?v=173.61"));
+assert.match(html,/css\/51-v173\.20-startup-loader\.css\?v=173\.61/);
+assert.match(loader,/const V_ASSET_VERSION="173\.61"/);
 assert.match(loader,/TOTAL_RUNTIME_MODULES=32/);
 assert.match(loader,/__v173ReportRuntimeProgress/);
 assert.doesNotMatch(loader,/id="v17347RuntimeGate"/);
@@ -30,4 +30,4 @@ assert.match(source,/載入核心系統/);
 assert.match(source,/已載入 \"\+loaded\+\" \/ \"\+runtimeTotal\+\" 個遊戲模組/);
 assert.match(html,/〔點擊空白處 進入遊戲〕/);
 assert.match(css,/\.startup-enter-prompt\{[\s\S]*?animation:startupEnterBlink 1\.15s ease-in-out infinite;/);
-console.log("✓ V173.60 real startup progress + 12~15s cinematic gate");
+console.log("✓ V173.61 real startup progress + 12~15s cinematic gate");
