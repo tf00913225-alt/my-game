@@ -7,13 +7,21 @@
     "use strict";
 
     const ABYSS_STORAGE_KEY="v141_abyss_state";
-    const TIER_ORDER=["low","mid","high","perfect"];
+    const TIER_ALIASES={low:"white",mid:"blue",high:"purple",perfect:"orange"};
+    const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
+    const TALISMAN_TIER_ORDER=["white","blue","purple","orange"];
     const TIER_META={
-        low:{label:"低階",craftGold:500,reforgeGold:1000,main:[1,5],reforgeMain:[1,3]},
-        mid:{label:"中階",craftGold:1500,reforgeGold:3000,main:[3,8],reforgeMain:[2,5]},
-        high:{label:"高階",craftGold:4000,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[4,7],reforgeSub:[1,2]},
-        perfect:{label:"極品",craftGold:10000,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[6,10],reforgeSub:[2,4]}
+        white:{label:"白階",available:true,craftGold:500,reforgeGold:1000,main:[1,5],reforgeMain:[1,3]},
+        blue:{label:"藍階",available:true,craftGold:1500,reforgeGold:3000,main:[3,8],reforgeMain:[2,5]},
+        purple:{label:"紫階",available:true,craftGold:4000,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[4,7],reforgeSub:[1,2]},
+        orange:{label:"橙階",available:true,craftGold:10000,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[6,10],reforgeSub:[2,4]},
+        pink:{label:"桃紅階",available:false,planned:true},
+        "four-symbol":{label:"四象階",available:false,planned:true}
     };
+    function normalizeTierKey(value){
+        const key=String(value||"").toLowerCase();
+        return TIER_ALIASES[key]||key;
+    }
     const SLOT_META={
         head:{label:"頭部",type:"head",glyph:"冠"},
         shoulder:{label:"護腕",type:"shoulder",glyph:"腕"},
@@ -30,10 +38,10 @@
     const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",agility:"敏捷",spirit:"精神"};
     const MAIN_STATS=["attack","intelligence"];
     const SUB_STATS=["vitality","energy","agility","spirit"];
-    const TALISMAN_GOLD={low:300,mid:1000,high:3000};
+    const TALISMAN_GOLD={white:300,blue:1000,purple:3000};
     const synthesisState={
         tab:"reforge",blueprintId:null,seriesId:"setFire",reforgeUid:null,
-        reforgeMaterialTier:"low",lockedReforgeKeys:[],
+        reforgeMaterialTier:"white",lockedReforgeKeys:[],
         talismanId:null,talismanQty:1,fragmentQty:{setFire:1,setWater:1,setEarth:1,setWind:1},
         pendingReforge:null
     };
@@ -117,10 +125,11 @@
         return !!(item&&item.v17351Locked!==true&&reforgeSlotCount(item)>0);
     }
     function reforgeMaterialInfo(tierKey){
-        const tier=TIER_META[tierKey]?tierKey:"low";
+        const normalized=normalizeTierKey(tierKey);
+        const tier=TIER_META[normalized]?normalized:"white";
         const meta=TIER_META[tier];
-        const ore=definitions().ores.find(item=>item.tierKey===tier)||null;
-        const blueprintCount=countMatching(item=>item&&item.blueprintSlot&&item.tierKey===tier);
+        const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier)||null;
+        const blueprintCount=countMatching(item=>item&&item.blueprintSlot&&normalizeTierKey(item.tierKey)===tier);
         const oreCount=ore?countItem(ore.id):0;
         return {tier,meta,ore,blueprintCount,oreCount};
     }
@@ -154,13 +163,14 @@
     }
 
     function inferTier(item){
-        if(item&&TIER_META[item.tierKey]){ return item.tierKey; }
-        if(item&&item.setId){ return "high"; }
+        const declared=normalizeTierKey(item&&item.tierKey);
+        if(TIER_META[declared]){ return declared; }
+        if(item&&item.setId){ return "orange"; }
         const total=Object.values(item&&item.stats||{}).reduce((sum,value)=>sum+Math.abs(Number(value)||0),0);
-        if(total>=18){ return "perfect"; }
-        if(total>=10){ return "high"; }
-        if(total>=5){ return "mid"; }
-        return "low";
+        if(total>=18){ return "orange"; }
+        if(total>=10){ return "purple"; }
+        if(total>=5){ return "blue"; }
+        return "white";
     }
 
     function rollUniform(min,max){ return min+Math.floor(Math.random()*(max-min+1)); }
@@ -168,7 +178,9 @@
         return Math.random()<.10?range[1]:rollUniform(range[0],Math.max(range[0],range[1]-1));
     }
     function rollAffixes(tierKey,isReforge){
-        const meta=TIER_META[tierKey];
+        const tier=normalizeTierKey(tierKey);
+        const meta=TIER_META[tier];
+        if(!meta||meta.available===false||!Array.isArray(meta.main)){ throw new Error("此階級尚未開放數值設定："+tier); }
         const mainRange=isReforge?meta.reforgeMain:meta.main;
         const subRange=isReforge?meta.reforgeSub:meta.sub;
         const stats={};
@@ -193,12 +205,14 @@
     window.v141RollCraftAffixes=rollAffixes;
 
     function reforgeRangeForSlot(tierKey,slotIndex){
-        const meta=TIER_META[tierKey]||TIER_META.low;
+        const meta=TIER_META[normalizeTierKey(tierKey)]||TIER_META.white;
+        if(meta.available===false||!Array.isArray(meta.reforgeMain)){ return null; }
         if(slotIndex<=0){ return meta.reforgeMain; }
         return meta.reforgeSub||meta.reforgeMain;
     }
     function reforgeRangeText(tierKey,slotCount){
-        const meta=TIER_META[tierKey]||TIER_META.low;
+        const meta=TIER_META[normalizeTierKey(tierKey)]||TIER_META.white;
+        if(meta.available===false||!Array.isArray(meta.reforgeMain)){ return "尚未開放・數值待定"; }
         const main=meta.reforgeMain;
         const sub=meta.reforgeSub||meta.reforgeMain;
         return slotCount<=1
@@ -212,7 +226,8 @@
         const used=new Set();
         const locks=(lockedKeys||[]).filter(key=>Object.prototype.hasOwnProperty.call(current,key)).slice(0,Math.min(2,Math.max(0,slots-1)));
         locks.forEach(key=>{ result[key]=current[key]; used.add(key); });
-        const meta=TIER_META[tierKey]||TIER_META.low;
+        const meta=TIER_META[normalizeTierKey(tierKey)]||TIER_META.white;
+        if(meta.available===false){ throw new Error("此階級冶煉尚未開放"); }
         const unlockedCount=Math.max(0,slots-locks.length);
         const forceDualPeak=locks.length===0&&slots>=2&&!!meta.reforgeSub&&Math.random()<.05;
         let generated=0;
@@ -251,7 +266,8 @@
         return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+'</b></span>').join("");
     }
     function rangeText(tierKey,isReforge){
-        const meta=TIER_META[tierKey];
+        const meta=TIER_META[normalizeTierKey(tierKey)];
+        if(!meta||meta.available===false){ return "尚未開放・數值待定"; }
         const main=isReforge?meta.reforgeMain:meta.main;
         const sub=isReforge?meta.reforgeSub:meta.sub;
         return '主詞條 '+main[0]+'～'+main[1]+(sub?'・副詞條 '+sub[0]+'～'+sub[1]:'');
@@ -285,7 +301,10 @@
     function heldBlueprints(){
         const byId=new Map();
         inventoryItems.forEach(item=>{
-            if(!item||!item.blueprintSlot||!TIER_META[item.tierKey]){ return; }
+            if(!item||!item.blueprintSlot){ return; }
+            const tier=normalizeTierKey(item.tierKey);
+            if(!TIER_META[tier]||TIER_META[tier].available===false){ return; }
+            item.tierKey=tier;
             if(!byId.has(item.id)){ byId.set(item.id,item); }
         });
         return [...byId.values()];
@@ -298,7 +317,7 @@
         }
         if(!blueprints.some(item=>item.id===synthesisState.blueprintId)){ synthesisState.blueprintId=blueprints[0].id; }
         const blueprint=blueprints.find(item=>item.id===synthesisState.blueprintId);
-        const tier=blueprint.tierKey;
+        const tier=normalizeTierKey(blueprint.tierKey);
         const meta=TIER_META[tier];
         const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
         const blueprintSeries=SERIES.find(item=>item.setId===blueprint.setId)||null;
@@ -336,12 +355,13 @@
         const locks=normalizeReforgeLocks(item);
         const lockSet=new Set(locks);
         const maxLocks=Math.min(2,Math.max(0,slotCount-1));
-        const tier=TIER_META[synthesisState.reforgeMaterialTier]?synthesisState.reforgeMaterialTier:"low";
+        const requestedTier=normalizeTierKey(synthesisState.reforgeMaterialTier);
+        const tier=TIER_META[requestedTier]&&TIER_META[requestedTier].available!==false?requestedTier:"white";
         synthesisState.reforgeMaterialTier=tier;
         const material=reforgeMaterialInfo(tier);
         const materialCost=reforgeMaterialCost(locks.length);
         const currentEntries=Object.entries(item.reforgeStats||{});
-        const can=!!material.ore&&material.blueprintCount>=materialCost&&material.oreCount>=materialCost&&gold>=material.meta.reforgeGold&&slotCount>locks.length;
+        const can=material.meta.available!==false&&!!material.ore&&material.blueprintCount>=materialCost&&material.oreCount>=materialCost&&gold>=material.meta.reforgeGold&&slotCount>locks.length;
         let compare="";
         if(synthesisState.pendingReforge&&synthesisState.pendingReforge.uid===item.v141Uid){
             const pending=synthesisState.pendingReforge;
@@ -351,8 +371,10 @@
         }
         const tierButtons=TIER_ORDER.map(key=>{
             const info=reforgeMaterialInfo(key);
-            return '<button type="button" class="v17358-reforge-tier '+(key===tier?'active':'')+'" onclick="v141SelectReforgeMaterialTier(\''+key+'\')">'+
-                '<b>'+info.meta.label+'材料</b><span>圖紙 '+info.blueprintCount+'・礦石 '+info.oreCount+'</span><small>'+reforgeRangeText(key,slotCount)+'</small></button>';
+            const unavailable=info.meta.available===false;
+            return '<button type="button" class="v17358-reforge-tier '+(key===tier?'active ':'')+(unavailable?'planned':'')+'" '+
+                (unavailable?'disabled aria-disabled="true"':'onclick="v141SelectReforgeMaterialTier(\''+key+'\')"')+'>'+
+                '<b>'+info.meta.label+'材料</b><span>'+(unavailable?'尚未開放':'圖紙 '+info.blueprintCount+'・礦石 '+info.oreCount)+'</span><small>'+reforgeRangeText(key,slotCount)+'</small></button>';
         }).join("");
         const lockHtml=currentEntries.length
             ?currentEntries.map(([key,value])=>{
@@ -377,16 +399,17 @@
     }
 
     function availableTalismans(){
-        return definitions().talismans.filter(item=>item.tierKey!=="perfect"&&countItem(item.id)>0);
+        return definitions().talismans.filter(item=>TALISMAN_TIER_ORDER.slice(0,3).includes(normalizeTierKey(item.tierKey))&&countItem(item.id)>0);
     }
     function nextTalisman(source){
         if(!source){ return null; }
-        const nextTier=TIER_ORDER[TIER_ORDER.indexOf(source.tierKey)+1];
-        return definitions().talismans.find(item=>item.talismanEffect===source.talismanEffect&&item.tierKey===nextTier)||null;
+        const sourceTier=normalizeTierKey(source.tierKey);
+        const nextTier=TALISMAN_TIER_ORDER[TALISMAN_TIER_ORDER.indexOf(sourceTier)+1];
+        return definitions().talismans.find(item=>item.talismanEffect===source.talismanEffect&&normalizeTierKey(item.tierKey)===nextTier)||null;
     }
     function renderTalismanTab(){
         const list=availableTalismans();
-        if(!list.length){ return '<div class="v141-synthesis-empty">沒有可升階的低／中／高階符咒。</div>'; }
+        if(!list.length){ return '<div class="v141-synthesis-empty">沒有可升階的白／藍／紫階符咒。</div>'; }
         if(!list.some(item=>item.id===synthesisState.talismanId)){ synthesisState.talismanId=list[0].id; synthesisState.talismanQty=1; }
         const source=list.find(item=>item.id===synthesisState.talismanId);
         const target=nextTalisman(source);
@@ -442,8 +465,9 @@
         renderSynthesis();
     };
     window.v141SelectReforgeMaterialTier=function(tier){
-        if(!TIER_META[tier]||synthesisState.pendingReforge){ return; }
-        synthesisState.reforgeMaterialTier=tier;
+        const normalized=normalizeTierKey(tier);
+        if(!TIER_META[normalized]||TIER_META[normalized].available===false||synthesisState.pendingReforge){ return; }
+        synthesisState.reforgeMaterialTier=normalized;
         renderSynthesis();
     };
     window.v141ToggleReforgeLock=function(key){
@@ -482,15 +506,19 @@
     };
 
     window.v141ShowAffixInfo=function(){
-        const lines=TIER_ORDER.map(tier=>'<div><b>'+TIER_META[tier].label+'材料</b>　'+reforgeRangeText(tier,2)+'　／　金幣 '+TIER_META[tier].reforgeGold.toLocaleString('zh-TW')+'</div>').join('');
-        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定 50 張設計圖＋50 礦石；鎖 1 條各 100；鎖 2 條各 150。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>單槽最高值固定10%；具副詞條範圍的材料，雙詞條同時最高固定5%。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
+        const lines=TIER_ORDER.map(tier=>{
+            const meta=TIER_META[tier];
+            const cost=meta.available===false?'尚未開放・數值待定':'金幣 '+meta.reforgeGold.toLocaleString('zh-TW');
+            return '<div><b>'+meta.label+'材料</b>　'+reforgeRangeText(tier,2)+'　／　'+cost+'</div>';
+        }).join('');
+        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>桃紅階、四象階已預留正式階級，但目前不開放數值與取得來源。</p><p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定 50 張設計圖＋50 礦石；鎖 1 條各 100；鎖 2 條各 150。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>單槽最高值固定10%；具副詞條範圍的材料，雙詞條同時最高固定5%。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
     };
 
     window.v141CraftEquipment=function(){
         const blueprint=heldBlueprints().find(item=>item.id===synthesisState.blueprintId);
         if(!blueprint){ return; }
         const series=SERIES.find(item=>item.setId===(blueprint.setId||synthesisState.seriesId))||SERIES[0];
-        const tier=blueprint.tierKey;
+        const tier=normalizeTierKey(blueprint.tierKey);
         const meta=TIER_META[tier];
         const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
         const ore=definitions().ores.find(item=>item.tierKey===tier);
@@ -518,8 +546,9 @@
         if(slotCount<=0){ alert("這件裝備沒有冶煉槽。"); return; }
         const locks=normalizeReforgeLocks(item).slice();
         if(locks.length>=slotCount){ alert("至少要保留 1 個未鎖定槽位才能重新冶煉。"); return; }
-        const tier=TIER_META[synthesisState.reforgeMaterialTier]?synthesisState.reforgeMaterialTier:"low";
+        const tier=normalizeTierKey(synthesisState.reforgeMaterialTier);
         const info=reforgeMaterialInfo(tier);
+        if(!info.meta||info.meta.available===false){ alert("此材料階級尚未開放。"); return; }
         const cost=reforgeMaterialCost(locks.length);
         if(!info.ore||info.blueprintCount<cost||info.oreCount<cost||gold<info.meta.reforgeGold){
             alert(info.meta.label+"冶煉材料或金幣不足。");

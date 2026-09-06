@@ -12,9 +12,9 @@
 
     const BULK_SELL_KEY="v17350_bulk_sell_quality";
     const EQUIPMENT_TYPES=new Set(["head","shoulder","shoes","weapon","hand","armor"]);
-    const QUALITY_ORDER=["white","blue","purple","orange"];
-    const QUALITY_LABEL={white:"白裝",blue:"藍裝",purple:"紫裝",orange:"橙裝"};
-    const TIER_TO_QUALITY={low:"white",mid:"blue",high:"purple",perfect:"orange"};
+    const QUALITY_ORDER=["white","blue","purple","orange","pink","four-symbol"];
+    const QUALITY_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
+    const TIER_TO_QUALITY={white:"white",blue:"blue",purple:"purple",orange:"orange",pink:"pink","four-symbol":"four-symbol",low:"white",mid:"blue",high:"purple",perfect:"orange"};
 
     function escapeHtml(value){
         return String(value==null?"":value)
@@ -117,10 +117,12 @@
             bar.innerHTML=
                 '<b>一鍵售出</b>'+
                 '<select id="v17350BulkSellQuality" aria-label="售出品質上限">'+
-                    '<option value="white">白裝以下</option>'+
-                    '<option value="blue">藍裝以下</option>'+
-                    '<option value="purple">紫裝以下</option>'+
-                    '<option value="orange">橙裝以下</option>'+
+                    '<option value="white">白階以下</option>'+
+                    '<option value="blue">藍階以下</option>'+
+                    '<option value="purple">紫階以下</option>'+
+                    '<option value="orange">橙階以下</option>' +
+                    '<option value="pink">桃紅階以下</option>' +
+                    '<option value="four-symbol">四象階以下</option>'+
                 '</select>'+
                 '<button id="v17350BulkSellButton" type="button" onclick="v17350BulkSellEquipment()">售出 0 件</button>'+
                 '<small id="v17350BulkSellMeta">僅售出背包內未穿戴裝備</small>';
@@ -176,7 +178,7 @@
 
         if(summary.hasOrangeOrAbove){
             const accepted=typeof window.rpgConfirm==="function"&&await window.rpgConfirm(
-                "這次一鍵售出包含橙裝。\n將售出 "+summary.units+" 件裝備，獲得 "+summary.goldValue.toLocaleString("zh-TW")+" 金幣。\n橙裝售出後無法復原，確定繼續嗎？",
+                "這次一鍵售出包含橙階以上裝備。\n將售出 "+summary.units+" 件裝備，獲得 "+summary.goldValue.toLocaleString("zh-TW")+" 金幣。\n高階裝備售出後無法復原，確定繼續嗎？",
                 {title:"高品質裝備警告",confirmText:"確認售出",cancelText:"取消",danger:true}
             );
             if(!accepted){ return false; }

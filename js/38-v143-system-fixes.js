@@ -11,12 +11,19 @@
 
     const VERSION="143";
     const POTION_TARGET_ACTION="__v143PotionTarget";
+    const TIER_ALIASES={low:"white",mid:"blue",high:"purple",perfect:"orange"};
     const TIER_META={
-        low:{label:"低階",craftGold:500,main:[1,5],color:"#b88b58"},
-        mid:{label:"中階",craftGold:1500,main:[3,8],color:"#5fb7df"},
-        high:{label:"高階",craftGold:4000,main:[5,11],sub:[1,3],color:"#b788ed"},
-        perfect:{label:"極品",craftGold:10000,main:[7,14],sub:[2,5],color:"#f0c35b"}
+        white:{label:"白階",available:true,craftGold:500,main:[1,5],color:"#D8D8D8"},
+        blue:{label:"藍階",available:true,craftGold:1500,main:[3,8],color:"#42A5FF"},
+        purple:{label:"紫階",available:true,craftGold:4000,main:[5,11],sub:[1,3],color:"#B05CFF"},
+        orange:{label:"橙階",available:true,craftGold:10000,main:[7,14],sub:[2,5],color:"#FF9F38"},
+        pink:{label:"桃紅階",available:false,planned:true,color:"#FF4FA7"},
+        "four-symbol":{label:"四象階",available:false,planned:true,color:"#E5C06B"}
     };
+    function normalizeTierKey(value){
+        const key=String(value||"").toLowerCase();
+        return TIER_ALIASES[key]||key;
+    }
     const SLOT_META={
         head:{label:"頭部",type:"head",glyph:"冠"},
         shoulder:{label:"護腕",type:"shoulder",glyph:"腕"},
@@ -680,7 +687,7 @@
     function rollUniform(min,max){ return min+Math.floor(Math.random()*(max-min+1)); }
     function rollNormalAffixes(tier){
         if(typeof window.v141RollCraftAffixes==="function"){ return window.v141RollCraftAffixes(tier,false); }
-        const meta=TIER_META[tier];
+        const meta=TIER_META[normalizeTierKey(tier)];
         const stats={};
         stats[STAT_KEYS[Math.floor(Math.random()*STAT_KEYS.length)]]=rollUniform(meta.main[0],meta.main[1]);
         if(meta.sub){ stats[SUBSTAT_KEYS[Math.floor(Math.random()*SUBSTAT_KEYS.length)]]=rollUniform(meta.sub[0],meta.sub[1]); }
@@ -697,11 +704,11 @@
         const select=document.querySelector(".v141-synthesis-body select");
         const blueprint=select&&(inventoryItems||[]).find(item=>item&&item.id===select.value&&item.blueprintSlot);
         if(!blueprint){ return; }
-        const tier=blueprint.tierKey;
-        const meta=TIER_META[tier];
+        const tier=normalizeTierKey(blueprint.tierKey);
+        const meta=TIER_META[normalizeTierKey(tier)];
         const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
         const ore=definitions().ores.find(item=>item.tierKey===tier);
-        if(!meta||!ore||countItem(blueprint.id)<50||countItem(ore.id)<50||numeric(gold)<meta.craftGold){ alert("素材或金幣不足。"); return; }
+        if(!meta||meta.available===false||!ore||countItem(blueprint.id)<50||countItem(ore.id)<50||numeric(gold)<meta.craftGold){ alert("素材或金幣不足。"); return; }
         const item={
             id:"normal_crafted_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),
             v141Uid:"gear_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),

@@ -5,11 +5,11 @@ const fs=require("node:fs");
 const source=fs.readFileSync("js/equipment-progression.js","utf8");
 const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 
-assert.match(ui,/js\/equipment-progression\.js\?v=173\.58/);
-assert.match(source,/\{key:"white",label:"白裝",chance:40,min:1,max:3,reforgeSlots:0/);
-assert.match(source,/\{key:"blue",label:"藍裝",chance:40,min:4,max:6,reforgeSlots:0/);
-assert.match(source,/\{key:"purple",label:"紫裝",chance:15,min:7,max:9,reforgeSlots:1/);
-assert.match(source,/\{key:"orange",label:"橙裝",chance:5,min:10,max:12,reforgeSlots:1/);
+assert.match(ui,/js\/equipment-progression\.js\?v=173\.60/);
+assert.match(source,/\{key:"white",label:"白階",chance:40,min:1,max:3,reforgeSlots:0/);
+assert.match(source,/\{key:"blue",label:"藍階",chance:40,min:4,max:6,reforgeSlots:0/);
+assert.match(source,/\{key:"purple",label:"紫階",chance:15,min:7,max:9,reforgeSlots:1/);
+assert.match(source,/\{key:"orange",label:"橙階",chance:5,min:10,max:12,reforgeSlots:1/);
 
 assert.match(source,/blade:\{stats:\{attack:15,vitality:-2\}\}/);
 assert.match(source,/fan:\{stats:\{intelligence:15,vitality:-2\}\}/);
@@ -41,7 +41,7 @@ assert.match(source,/onclick="v17346BeginEquipmentDungeon\(\)"/);
 assert.match(source,/const count=6\*Math\.max\(1/);
 assert.match(source,/inventoryItems\.length\+pendingEquipmentRewards\.length>120/);
 assert.match(source,/看廣告雙倍為12件裝備/);
-assert.match(source,/白裝40%・藍裝40%・紫裝15%・橙裝5%/);
+assert.match(source,/白階40%・藍階40%・紫階15%・橙階5%/);
 assert.match(source,/dungeon-equipment-v17346\.png/);
 
 assert.match(source,/v17346-potion-detail/);
@@ -58,6 +58,6 @@ assetPaths.forEach(file=>assert.equal(fs.existsSync(file),true,file));
 
 console.log("V173.46 equipment progression specification checks passed");
 
-// V173.58: reforgeSlots are affix-slot capacity; attempts are unlimited.
+// V173.60: reforgeSlots are affix-slot capacity; attempts are unlimited.
 assert.match(source,/return Math\.max\(explicit,existing\)/);
 assert.doesNotMatch(source,/item\.reforgeUsed=Math\.min/);

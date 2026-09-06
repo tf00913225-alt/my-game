@@ -123,10 +123,12 @@
     ===================================================== */
 
     const TIER_COLORS={
-        low:{main:"#8a9a8a",glow:"#c9d6c9"},
-        mid:{main:"#4a90d9",glow:"#9ecbf5"},
-        high:{main:"#a25fd9",glow:"#d9b3f5"},
-        perfect:{main:"#e8a93c",glow:"#ffe08a"}
+        white:{main:"#D8D8D8",glow:"#F2F2F2"},
+        blue:{main:"#42A5FF",glow:"#7CC7FF"},
+        purple:{main:"#B05CFF",glow:"#D49BFF"},
+        orange:{main:"#FF9F38",glow:"#FFC46B"},
+        pink:{main:"#FF4FA7",glow:"#FF8CC7"},
+        "four-symbol":{main:"#E5C06B",glow:"#FFFFFF"}
     };
 
     function svgWrap(inner,glow){
@@ -166,7 +168,17 @@
     }
 
     function oreIcon(tier){
-        const c=TIER_COLORS[tier]||TIER_COLORS.low;
+        if(tier==="four-symbol"){
+            return svgWrap(
+                '<polygon points="32,6 52,22 44,56 20,56 12,22" fill="#181716" stroke="#f2dfb1" stroke-width="2.5"/>'+
+                '<path d="M32 6L52 22L32 32Z" fill="#FF5A36" opacity=".9"/>'+
+                '<path d="M52 22L44 56L32 32Z" fill="#42A5FF" opacity=".9"/>'+
+                '<path d="M44 56H20L32 32Z" fill="#47D6A3" opacity=".9"/>'+
+                '<path d="M20 56L12 22L32 32Z" fill="#C89B45" opacity=".9"/>',
+                "#FFFFFF"
+            );
+        }
+        const c=TIER_COLORS[tier]||TIER_COLORS.white;
         return svgWrap(
             '<polygon points="32,6 52,22 44,56 20,56 12,22" '+
             'fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2.5"/>'+
@@ -180,7 +192,7 @@
     }
 
     function chestIcon(){
-        const c=TIER_COLORS.mid;
+        const c=TIER_COLORS.blue;
         return svgWrap(
             '<rect x="8" y="26" width="48" height="30" rx="3" '+
             'fill="#2a1c0e" stroke="'+c.main+'" stroke-width="2.5"/>'+
@@ -291,15 +303,26 @@
 
 
     /* =====================================================
-       2. 符咒（3種效果 × 4階，共12件）
+       2. 正式階級與符咒（符咒固定只到橙階）
+       - 舊 Low/Mid/High/Perfect 僅保留在穩定 id，兼容舊存檔。
+       - 正式 tierKey 一律使用 white/blue/purple/orange/pink/four-symbol。
     ===================================================== */
 
-    const TALISMAN_TIERS=[
-        {key:"low",label:"低階",chance:35},
-        {key:"mid",label:"中階",chance:55},
-        {key:"high",label:"高階",chance:75},
-        {key:"perfect",label:"極品",chance:100}
+    const FORMAL_ITEM_TIERS=[
+        {key:"white",label:"白階",legacyKey:"low",idSuffix:"Low",available:true},
+        {key:"blue",label:"藍階",legacyKey:"mid",idSuffix:"Mid",available:true},
+        {key:"purple",label:"紫階",legacyKey:"high",idSuffix:"High",available:true},
+        {key:"orange",label:"橙階",legacyKey:"perfect",idSuffix:"Perfect",available:true},
+        {key:"pink",label:"桃紅階",legacyKey:null,idSuffix:"Pink",available:false,planned:true},
+        {key:"four-symbol",label:"四象階",legacyKey:null,idSuffix:"FourSymbol",available:false,planned:true}
     ];
+    const TALISMAN_ACTIVATION_CHANCES=[35,55,75,100];
+    const TALISMAN_TIERS=FORMAL_ITEM_TIERS.slice(0,4).map((tier,index)=>
+        Object.assign({},tier,{chance:TALISMAN_ACTIVATION_CHANCES[index]})
+    );
+    const RESOURCE_TIERS=FORMAL_ITEM_TIERS.slice();
+
+    window.v17360FormalItemTiers=FORMAL_ITEM_TIERS.map(tier=>Object.assign({},tier));
 
     const TALISMAN_EFFECTS=[
         {key:"freeze",label:"冰封符",duration:4},
@@ -311,7 +334,8 @@
     TALISMAN_EFFECTS.forEach(effect=>{
         TALISMAN_TIERS.forEach(tier=>{
             talismanDefinitions.push({
-                id:effect.key+"Talisman"+tier.key.charAt(0).toUpperCase()+tier.key.slice(1),
+                // Stable legacy id is intentional: old saves and old drop pools keep resolving.
+                id:effect.key+"Talisman"+tier.idSuffix,
                 name:tier.label+effect.label,
                 icon:talismanIcon(effect.key,tier.key),
                 type:"talisman",
@@ -319,6 +343,7 @@
                 talismanDuration:effect.duration,
                 tierChance:tier.chance,
                 tierKey:tier.key,
+                legacyTierKey:tier.legacyKey,
                 price:0,
                 stats:{}
             });
@@ -328,21 +353,22 @@
     function getTalismanDefinition(id){
         return talismanDefinitions.find(def=>def.id===id)||null;
     }
-    /* 暴露出去給 js/30-v135-fixes.js 的「作用對象標示」用——符咒不在
-       skillDatabase 裡，那邊沒有別的方法可以認出一個符咒id。 */
     window.v132GetTalismanDefinition=getTalismanDefinition;
 
 
     /* =====================================================
-       3. 礦石材料（4階）
+       3. 礦石材料（正式六階；桃紅／四象先規劃、不進目前掉落）
     ===================================================== */
 
-    const oreDefinitions=TALISMAN_TIERS.map(tier=>({
-        id:"ore"+tier.key.charAt(0).toUpperCase()+tier.key.slice(1),
+    const oreDefinitions=RESOURCE_TIERS.map(tier=>({
+        id:"ore"+tier.idSuffix,
         name:tier.label+"礦石",
         icon:oreIcon(tier.key),
         type:"material",
         tierKey:tier.key,
+        legacyTierKey:tier.legacyKey,
+        available:tier.available!==false,
+        planned:tier.planned===true,
         price:0,
         stats:{}
     }));
@@ -350,10 +376,15 @@
     function getOreDefinition(id){
         return oreDefinitions.find(def=>def.id===id)||null;
     }
+    function getOreDefinitionByTier(tierKey){
+        return oreDefinitions.find(def=>def.tierKey===tierKey)||null;
+    }
+    window.v132GetOreDefinitionByTier=getOreDefinitionByTier;
 
 
     /* =====================================================
-       4. 裝備設計圖紙（5部位 × 4階 × 4系列，共80件）
+       4. 裝備設計圖紙（5部位 × 正式六階 × 4系列）
+       桃紅／四象先建立資料結構；目前材料寶箱不會抽到。
     ===================================================== */
 
     const BLUEPRINT_SLOTS=[
@@ -373,15 +404,18 @@
 
     const blueprintDefinitions=[];
     BLUEPRINT_SLOTS.forEach(slot=>{
-        TALISMAN_TIERS.forEach(tier=>{
+        RESOURCE_TIERS.forEach(tier=>{
             BLUEPRINT_SERIES.forEach(series=>{
                 blueprintDefinitions.push({
-                    id:"blueprint"+series.id.replace("set","")+slot.key.charAt(0).toUpperCase()+slot.key.slice(1)+tier.key.charAt(0).toUpperCase()+tier.key.slice(1),
+                    id:"blueprint"+series.id.replace("set","")+slot.key.charAt(0).toUpperCase()+slot.key.slice(1)+tier.idSuffix,
                     name:series.label+tier.label+slot.label+"設計圖",
                     icon:blueprintIcon(slot.key,tier.key),
                     type:"material",
                     blueprintSlot:slot.key,
                     tierKey:tier.key,
+                    legacyTierKey:tier.legacyKey,
+                    available:tier.available!==false,
+                    planned:tier.planned===true,
                     setId:series.id,
                     price:0,
                     stats:{}
@@ -439,8 +473,8 @@
     function syncStaticContentPresentation(item,definition){
         if(!item || !definition || item.id!==definition.id){ return item; }
         [
-            "name","icon","type","price","setId","tierKey","blueprintSlot",
-            "talismanEffect","talismanDuration","tierChance"
+            "name","icon","type","price","setId","tierKey","legacyTierKey","available","planned","blueprintSlot",
+            "talismanEffect","talismanDuration","tierChance","sharedSkillId","talismanSkillLevel"
         ].forEach(key=>{
             if(Object.prototype.hasOwnProperty.call(definition,key)){
                 item[key]=definition[key];
@@ -753,15 +787,73 @@
 
 
     /* =====================================================
-       9. 符咒使用（戰鬥中消耗品，命中率＝階級機率＋角色
-          智力加成，依角色素質判定是否命中）
+       9. 符咒使用：兩段判定
+       1) 階級只決定「畫符／生效啟動」機率：35/55/75/100%。
+       2) 畫符成功後，再以施放角色素質走對應滿級技能的命中規則。
+       橙階 100% 代表一定畫符成功，不代表控制／符術一定命中。
     ===================================================== */
 
-    function getTalismanHitChance(definition,character){
-        const intelligence=(character && Number(character.intelligence))||0;
-        const bonus=Math.floor(intelligence/10);
-        return Math.min(100,Math.max(0,definition.tierChance+bonus));
+    function getTalismanActivationChance(definition){
+        return Math.max(0,Math.min(100,Number(definition&&definition.tierChance)||0));
     }
+
+    function getTalismanSharedSkill(definition){
+        if(!definition||typeof skillDatabase==="undefined"){ return null; }
+        const fallback={freeze:"freeze",stealth:"stealthSkill",barrier:"barrier"};
+        const skillId=definition.sharedSkillId||fallback[definition.talismanEffect];
+        return skillId?skillDatabase[skillId]||null:null;
+    }
+
+    function getTalismanCasterStats(characterIndex,character){
+        if(typeof getPartyBattleStats==="function"){
+            const stats=getPartyBattleStats(characterIndex);
+            if(stats){ return stats; }
+        }
+        if(characterIndex===0&&typeof getMainCharacterStats==="function"){
+            const stats=getMainCharacterStats();
+            if(stats){ return stats; }
+        }
+        return character||{};
+    }
+
+    function rollTalismanSkillHit(definition,characterIndex,targetMonster){
+        const character=getPartyCharacterByIndex(characterIndex);
+        if(!character){ return false; }
+        const stats=getTalismanCasterStats(characterIndex,character);
+        const skill=getTalismanSharedSkill(definition);
+        if(skill){
+            definition.talismanSkillLevel=Math.max(1,Math.floor(Number(skill.maxLevel)||1));
+        }
+
+        if(definition.talismanEffect==="freeze"&&targetMonster){
+            const baseChance=Math.max(0,Number(skill&&skill.freezeChance)||0);
+            const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
+            const targetSpirit=typeof getMonsterEffectiveSpiritPoints==="function"
+                ?Number(getMonsterEffectiveSpiritPoints(targetMonster))||0
+                :Number(targetMonster.spiritPoints||targetMonster.spirit)||0;
+            const rank=typeof getMonsterRank==="function"?getMonsterRank(targetMonster):"regular";
+            if(typeof rollStatusEffectHit==="function"){
+                return rollStatusEffectHit(
+                    baseChance,Number(character.level)||1,Number(targetMonster.level)||1,
+                    intelligence,targetSpirit,true,rank,0
+                );
+            }
+        }
+
+        // 隱身／結界是友方符術，不拿友軍閃避懲罰施放者；使用角色自身命中值。
+        const accuracy=Number(stats.accuracy);
+        if(Number.isFinite(accuracy)&&typeof rollHitChance==="function"){
+            return rollHitChance(accuracy,0,0);
+        }
+        const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
+        if(typeof rollStatusEffectHit==="function"){
+            return rollStatusEffectHit(100,Number(character.level)||1,Number(character.level)||1,intelligence,0,false,"regular",0);
+        }
+        return true;
+    }
+
+    window.v17360GetTalismanActivationChance=getTalismanActivationChance;
+    window.v17360RollTalismanSkillHit=rollTalismanSkillHit;
 
     function getTalismanInventoryItems(){
         const byId=new Map();
@@ -1056,12 +1148,21 @@
             }
         }
 
-        const hitChance=getTalismanHitChance(definition,character);
-        const success=Math.random()*100<hitChance;
-
-        if(!success){
+        const activationChance=getTalismanActivationChance(definition);
+        if(Math.random()*100>=activationChance){
             addBattleLog((character.id||"你")+"使用"+definition.name+"，畫符失敗！");
             showMissEffect(true,characterIndex,"畫符失敗");
+            finishPlayerAction();
+            return;
+        }
+
+        if(!rollTalismanSkillHit(definition,characterIndex,targetMonster)){
+            if(definition.talismanEffect==="freeze"&&targetMonster){
+                addBattleLog(targetMonster.name+"抵抗了"+definition.name+"的冰封效果。");
+            }else{
+                addBattleLog((character.id||"你")+"的"+definition.name+"畫符成功，但符術未命中。");
+            }
+            showMissEffect(true,characterIndex,"MISS");
             finishPlayerAction();
             return;
         }
@@ -1323,16 +1424,14 @@
 
         if(item.type==="chest"){
             const oreRows=CHEST_TIER_WEIGHTS.map(tier=>{
-                const oreDef=getOreDefinition(
-                    "ore"+tier.key.charAt(0).toUpperCase()+tier.key.slice(1)
-                );
-                const amount=tier.key==="perfect" ? 5 : 10;
+                const oreDef=getOreDefinitionByTier(tier.key);
+                const amount=tier.key==="orange" ? 5 : 10;
                 return oreDef ? previewRow(oreDef.icon,oreDef.name,amount,tier.weight) : "";
             }).join("");
             const blueprintRows=CHEST_TIER_WEIGHTS.map(tier=>{
                 const pool=getBlueprintDefinitionsByTier(tier.key);
                 const eachChance=pool.length ? tier.weight/pool.length : 0;
-                const amount=tier.key==="perfect" ? 5 : 10;
+                const amount=tier.key==="orange" ? 5 : 10;
                 return pool.map(definition=>
                     previewRow(definition.icon,definition.name,amount,eachChance)
                 ).join("");
@@ -2242,10 +2341,10 @@
        在背包裡點開這個物品、按下「開啟」的那一刻才進行。
     */
     const CHEST_TIER_WEIGHTS=[
-        {key:"low",label:"低階",weight:40},
-        {key:"mid",label:"中階",weight:30},
-        {key:"high",label:"高階",weight:20},
-        {key:"perfect",label:"極品",weight:10}
+        {key:"white",label:"白階",weight:40},
+        {key:"blue",label:"藍階",weight:30},
+        {key:"purple",label:"紫階",weight:20},
+        {key:"orange",label:"橙階",weight:10}
     ];
 
     const materialChestDefinition={
@@ -2282,13 +2381,13 @@
     /* 骰「開1個材料寶箱」會拿到的內容，純計算、不碰背包。 */
     function rollMaterialChestRewards(){
         const oreTier=pickWeightedTier();
-        const oreDef=getOreDefinition("ore"+oreTier.charAt(0).toUpperCase()+oreTier.slice(1));
-        const oreAmount=oreTier==="perfect" ? 5 : 10;
+        const oreDef=getOreDefinitionByTier(oreTier);
+        const oreAmount=oreTier==="orange" ? 5 : 10;
 
         const blueprintTier=pickWeightedTier();
         const blueprintPool=getBlueprintDefinitionsByTier(blueprintTier);
         const blueprintDef=blueprintPool[Math.floor(Math.random()*blueprintPool.length)];
-        const blueprintAmount=blueprintTier==="perfect" ? 5 : 10;
+        const blueprintAmount=blueprintTier==="orange" ? 5 : 10;
 
         return [
             {def:oreDef,amount:oreAmount},
