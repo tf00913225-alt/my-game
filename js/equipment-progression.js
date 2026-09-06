@@ -515,9 +515,9 @@
             ["orange","assets/equipment/warrior/weapon-01.png","5%"]
         ];
         const tiles=rewards.map(entry=>'<div class="v17361-reward-icon rarity-'+entry[0]+'"><img src="'+entry[1]+'" alt=""><em>'+entry[2]+'</em></div>').join("");
-        const html='<div class="v132-reward-modal-inner v17346-preview-modal v17361-reward-preview"><h3>裝備副本獎勵預覽</h3>'+ 
-            '<div class="v17361-reward-visual equipment">'+tiles+'</div>'+ 
-            '<div class="v17361-chest-count" aria-label="兩個裝備寶箱"><img src="assets/items/chests/dungeon-chest.png" alt=""><b>×2</b></div>'+ 
+        const html='<div class="v132-reward-modal-inner v17346-preview-modal v17361-reward-preview"><h3>裝備副本獎勵預覽</h3>'+
+            '<div class="v17361-reward-visual equipment">'+tiles+'</div>'+
+            '<div class="v17361-chest-count" aria-label="兩個裝備寶箱"><img src="assets/items/chests/dungeon-chest.png" alt=""><b>×2</b></div>'+
             '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };
