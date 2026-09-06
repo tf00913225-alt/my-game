@@ -33,589 +33,280 @@ jobs:
           import re
 
           def read(path):
-              return Path(path).read_text(encoding='utf-8')
+              return Path(path).read_text(encoding="utf-8")
           def write(path,text):
-              Path(path).write_text(text,encoding='utf-8')
+              Path(path).write_text(text,encoding="utf-8")
           def replace_once(path,old,new,label):
               s=read(path)
               count=s.count(old)
               if count!=1:
-                  raise SystemExit(f'{label}: expected one anchor, found {count}')
+                  raise SystemExit(f"{label}: expected one anchor, found {count}")
               write(path,s.replace(old,new,1))
+          def regex_once(path,pattern,replacement,label,flags=re.S):
+              s=read(path)
+              out,count=re.subn(pattern,replacement,s,count=1,flags=flags)
+              if count!=1:
+                  raise SystemExit(f"{label}: expected one regex anchor, found {count}")
+              write(path,out)
           def append_once(path,marker,block):
               s=read(path)
               if marker in s:
                   return
-              if not s.endswith('\n'):
-                  s+='\n'
-              write(path,s+block.strip('\n')+'\n')
+              write(path,s.rstrip()+"\n\n"+block.strip()+"\n")
 
           # Release/cache wiring.
-          write('index.html',read('index.html').replace('173.60','173.61'))
+          write("index.html",read("index.html").replace("173.60","173.61"))
           for path in [
-              'js/20-anonymous-20.js',
-              'js/51-v169-rpg-ui.js',
-              'js/53-v173.50-inventory-qol.js',
-              'js/equipment-progression.js'
+              "js/20-anonymous-20.js",
+              "js/51-v169-rpg-ui.js",
+              "js/53-v173.50-inventory-qol.js",
+              "js/equipment-progression.js"
           ]:
-              write(path,read(path).replace('173.60','173.61'))
-          version_tests=[
-              'tests/v173.20-startup-loader.test.js',
-              'tests/v173.47-runtime-integrity.test.js',
-              'tests/v173.48-premium-shop-layout.test.js',
-              'tests/v173.49-exp-pool-scroll-stability.test.js',
-              'tests/v173.50-inventory-qol.test.js',
-              'tests/v173.51-qa.test.js',
-              'tests/v173.53-startup-stall-regression.test.js',
-              'tests/v173.54-qa-readiness.test.js',
-              'tests/v173.55-inventory-observer-stall.test.js',
-              'tests/v173.60-formal-tiers-talismans.test.js'
-          ]
-          for path in version_tests:
-              write(path,read(path).replace('173.60','173.61'))
+              write(path,read(path).replace("173.60","173.61"))
+          for path in [
+              "tests/v173.20-startup-loader.test.js",
+              "tests/v173.47-runtime-integrity.test.js",
+              "tests/v173.48-premium-shop-layout.test.js",
+              "tests/v173.49-exp-pool-scroll-stability.test.js",
+              "tests/v173.50-inventory-qol.test.js",
+              "tests/v173.51-qa.test.js",
+              "tests/v173.53-startup-stall-regression.test.js",
+              "tests/v173.54-qa-readiness.test.js",
+              "tests/v173.55-inventory-observer-stall.test.js",
+              "tests/v173.60-formal-tiers-talismans.test.js"
+          ]:
+              write(path,read(path).replace("173.60","173.61"))
 
-          # Patrol page: add power-saving control beside the two existing shared toggles.
-          p='index.html'; s=read(p)
-          anchor='''    <button
-                  id="quickAutoPatrolToggle"
-                  class="map-quick-toggle-btn"
-                  onclick="toggleAutoPatrol()"
-                  aria-label="自動巡怪"
-              >
-                  <img class="icon-off" src="assets/battle/auto-patrol-off.png" alt="自動巡怪（關閉）">
-                  <img class="icon-on" src="assets/battle/auto-patrol-on.png" alt="自動巡怪（開啟中）">
-              </button>
-          '''
-          if s.count(anchor)!=1:
-              raise SystemExit(f'patrol button anchor count={s.count(anchor)}')
-          power='''
-              <button
-                  id="quickPowerSavingToggle"
-                  class="map-quick-toggle-btn v17361-power-save-toggle"
-                  type="button"
-                  onclick="v17361TogglePowerSaving()"
-                  aria-label="省電模式"
-                  aria-pressed="false"
-              >省電 OFF</button>
-          '''
-          write(p,s.replace(anchor,anchor+power,1))
+          # Patrol page: add power-saving control beside existing quick toggles.
+          p="index.html"; s=read(p)
+          marker='''              </button>\n\n              <div class="map-quick-toggle-hint">'''
+          if s.count(marker)!=1:
+              raise SystemExit(f"patrol insert marker count={s.count(marker)}")
+          power='''              </button>\n\n              <button\n                  id="quickPowerSavingToggle"\n                  class="map-quick-toggle-btn v17361-power-save-toggle"\n                  type="button"\n                  onclick="v17361TogglePowerSaving()"\n                  aria-label="省電模式"\n                  aria-pressed="false"\n              >省電 OFF</button>\n\n              <div class="map-quick-toggle-hint">'''
+          write(p,s.replace(marker,power,1))
 
-          # Shared item art: the supplied ore art is reused across formal tiers, while rarity stays on the frame.
+          # Supplied ore + common dungeon chest art, preserving formal rarity frames.
           replace_once(
-              'js/27-v132-content-expansion.js',
+              "js/27-v132-content-expansion.js",
               'icon:oreIcon(tier.key),',
               'icon:rasterItemIcon("assets/items/materials/ore.png",tier.key,"material"),',
-              'ore art'
+              "ore art"
           )
-          p='js/27-v132-content-expansion.js'; s=read(p)
-          chest_anchor='''    function chestIcon(){
-              const c=TIER_COLORS.blue;
-              return svgWrap(
-                  '<rect x="8" y="26" width="48" height="30" rx="3" '+
-                  'fill="#2a1c0e" stroke="'+c.main+'" stroke-width="2.5"/>'+
-                  '<path d="M8 30 Q32 12 56 30" fill="#3a270f" stroke="'+c.main+'" stroke-width="2.5"/>'+
-                  '<rect x="27" y="26" width="10" height="18" fill="'+c.glow+'" opacity="0.85"/>'+
-                  '<circle cx="32" cy="34" r="3.4" fill="#2a1c0e" stroke="'+c.glow+'" stroke-width="1.4"/>',
-                  c.glow
-              );
-          }
-          '''
-          if s.count(chest_anchor)!=1:
-              raise SystemExit(f'chest helper anchor count={s.count(chest_anchor)}')
-          chest_new='''    function chestIcon(){
-              return rasterItemIcon("assets/items/chests/dungeon-chest.png","blue","chest");
-          }
-          
-              // All current/future general-dungeon backpack chests reuse one visual source;
-              // the item name remains the semantic distinction.
-              window.v17361GeneralDungeonChestIcon=chestIcon;
-          '''
-          write(p,s.replace(chest_anchor,chest_new,1))
+          regex_once(
+              "js/27-v132-content-expansion.js",
+              r'    function chestIcon\(\)\{[\s\S]*?\n    \}\n\n    function ticketIcon',
+              '''    function chestIcon(){\n        return rasterItemIcon("assets/items/chests/dungeon-chest.png","blue","chest");\n    }\n    // All general-dungeon backpack chests share this visual; item name remains semantic.\n    window.v17361GeneralDungeonChestIcon=chestIcon;\n\n    function ticketIcon''',
+              "shared chest helper"
+          )
 
-          # Retire only the old CSS-class skill flash; keep the existing Canvas particles and later Sprite VFX.
-          p='js/35-v141-ui-battle.js'; s=read(p)
-          old='''    window.v141PlayCardEffect=function(side,index,type){
-              const card=cardFor(side,index);
-              if(!card){ return; }
-              const className="v141-once-"+type;
-              card.classList.remove(className);
-              void card.offsetWidth;
-              card.classList.add(className);
-              playCanvasParticles(card,type);
-              setTimeout(()=>card.classList.remove(className),850);
-          };
-          '''
-          new='''    window.v141PlayCardEffect=function(side,index,type){
-              const card=cardFor(side,index);
-              if(!card){ return; }
-              // V173.61: CSS skill flashes are retired. Keep non-CSS Canvas particles;
-              // js/39 continues to own current Sprite/VFX timing and status synchronization.
-              playCanvasParticles(card,type);
-          };
-          '''
-          if s.count(old)!=1:
-              raise SystemExit(f'v141PlayCardEffect anchor count={s.count(old)}')
-          write(p,s.replace(old,new,1))
-
-          p='css/38-v141-system-expansion.css'; s=read(p)
-          patterns=[
-              r'\n#game-stage #battlePage \.v141-once-heal,\n#game-stage #battlePage \.v141-once-potion\{\n    animation:v141HealFlash \.82s ease-out !important;\n\}\n\n#game-stage #battlePage \.v141-once-revive\{\n    animation:v141ReviveFlash \.82s ease-out !important;\n\}\n\n#game-stage #battlePage \.v141-once-talisman\{\n    animation:v141TalismanFlash \.82s ease-out !important;\n\}\n',
-              r'\n@keyframes v141HealFlash\{[^\n]*\}\n@keyframes v141ReviveFlash\{[^\n]*\}\n@keyframes v141TalismanFlash\{[^\n]*\}\n'
-          ]
-          for i,pattern in enumerate(patterns,1):
-              s,count=re.subn(pattern,'\n',s,count=1)
-              if count!=1:
-                  raise SystemExit(f'css skill animation block {i} count={count}')
+          # Remove old CSS skill flashes only; keep Canvas particles and current Sprite VFX.
+          regex_once(
+              "js/35-v141-ui-battle.js",
+              r'    window\.v141PlayCardEffect=function\(side,index,type\)\{[\s\S]*?\n    \};\n\n    function executeAdditionalSupportAction',
+              '''    window.v141PlayCardEffect=function(side,index,type){\n        const card=cardFor(side,index);\n        if(!card){ return; }\n        // V173.61: CSS skill flashes retired; non-CSS Canvas particles remain.\n        playCanvasParticles(card,type);\n    };\n\n    function executeAdditionalSupportAction''',
+              "v141 card CSS effect"
+          )
+          p="css/38-v141-system-expansion.css"; s=read(p)
+          s,n1=re.subn(r'\n#game-stage #battlePage \.v141-once-heal,[\s\S]*?#game-stage #battlePage \.v141-once-talisman\{\n    animation:v141TalismanFlash \.82s ease-out !important;\n\}\n','\n',s,count=1)
+          if n1!=1:
+              raise SystemExit(f"CSS one-shot skill classes count={n1}")
+          for name in ["v141HealFlash","v141ReviveFlash","v141TalismanFlash"]:
+              s,n=re.subn(r'@keyframes '+name+r'\{[^\n]*\}\n?','',s,count=1)
+              if n!=1:
+                  raise SystemExit(f"CSS keyframe {name} count={n}")
           write(p,s)
 
-          # Battle SFX: raise only the procedural battle master, not UI/global audio.
-          replace_once('js/34-v141-core-systems.js','master.gain.value=0.22;','master.gain.value=0.30;','battle audio gain')
+          # Battle procedural SFX only.
+          replace_once("js/34-v141-core-systems.js","master.gain.value=0.22;","master.gain.value=0.30;","battle gain")
 
-          # Live quest state refresh: only redraw the already-open quest body when progress actually changes.
-          p='js/34-v141-core-systems.js'; s=read(p)
-          old='''    function recordQuestProgress(id,amount,type){
-              if(typeof ensureDailyQuestsCurrent!=="function"){ return; }
-              ensureDailyQuestsCurrent();
-              const state=type==="commission"?commissionQuestState:dailyQuestState;
-              const definitions=type==="commission"?commissionQuestDefinitions:dailyQuestDefinitions;
-              const quest=definitions.find(item=>item.id===id);
-              if(!quest){ return; }
-              state.progress[id]=Math.min(quest.goal,(Number(state.progress[id])||0)+Math.max(0,Number(amount)||0));
-          }
-          '''
-          new='''    function recordQuestProgress(id,amount,type){
-              if(typeof ensureDailyQuestsCurrent!=="function"){ return; }
-              ensureDailyQuestsCurrent();
-              const state=type==="commission"?commissionQuestState:dailyQuestState;
-              const definitions=type==="commission"?commissionQuestDefinitions:dailyQuestDefinitions;
-              const quest=definitions.find(item=>item.id===id);
-              if(!quest){ return; }
-              const before=Number(state.progress[id])||0;
-              const after=Math.min(quest.goal,before+Math.max(0,Number(amount)||0));
-              if(after===before){ return; }
-              state.progress[id]=after;
-              if(typeof window.v17361RefreshOpenQuestPage==="function"){ window.v17361RefreshOpenQuestPage(); }
-              if(typeof window.v148SyncQuestNoticeDots==="function"){ window.v148SyncQuestNoticeDots(); }
-          }
-          '''
-          if s.count(old)!=1:
-              raise SystemExit(f'recordQuestProgress anchor count={s.count(old)}')
-          s=s.replace(old,new,1)
+          # Live quest state refresh when progress changes in background.
+          regex_once(
+              "js/34-v141-core-systems.js",
+              r'    function recordQuestProgress\(id,amount,type\)\{[\s\S]*?\n    \}\n    window\.v141RecordQuestProgress=recordQuestProgress;',
+              '''    function recordQuestProgress(id,amount,type){\n        if(typeof ensureDailyQuestsCurrent!=="function"){ return; }\n        ensureDailyQuestsCurrent();\n        const state=type==="commission"?commissionQuestState:dailyQuestState;\n        const definitions=type==="commission"?commissionQuestDefinitions:dailyQuestDefinitions;\n        const quest=definitions.find(item=>item.id===id);\n        if(!quest){ return; }\n        const before=Number(state.progress[id])||0;\n        const after=Math.min(quest.goal,before+Math.max(0,Number(amount)||0));\n        if(after===before){ return; }\n        state.progress[id]=after;\n        if(typeof window.v17361RefreshOpenQuestPage==="function"){ window.v17361RefreshOpenQuestPage(); }\n        if(typeof window.v148SyncQuestNoticeDots==="function"){ window.v148SyncQuestNoticeDots(); }\n    }\n    window.v141RecordQuestProgress=recordQuestProgress;''',
+              "live quest progress"
+          )
 
-          # Screen Wake Lock authority + patrol power-saving preference.
-          wake_block=r'''
-          
-              /* =====================================================
-                 V173.61 — screen wake / patrol power-saving owner
-                 Normal mode attempts Screen Wake Lock after the first user gesture.
-                 Power-saving mode releases it and lets the OS/browser dim normally.
-              ===================================================== */
-              const V17361_POWER_SAVE_KEY="v17361_patrol_power_saving";
-              let v17361ScreenWakeLock=null;
-          
-              function v17361PowerSavingEnabled(){
-                  try{ return localStorage.getItem(V17361_POWER_SAVE_KEY)==="1"; }catch(_){ return false; }
-              }
-              function v17361SyncPowerSavingButton(){
-                  if(typeof document==="undefined"){ return; }
-                  const button=document.getElementById("quickPowerSavingToggle");
-                  if(!button){ return; }
-                  const enabled=v17361PowerSavingEnabled();
-                  button.classList.toggle("active",enabled);
-                  button.setAttribute("aria-pressed",enabled?"true":"false");
-                  button.textContent=enabled?"省電 ON":"省電 OFF";
-                  button.title=enabled?"允許螢幕依系統設定休眠":"遊戲會嘗試保持螢幕常亮";
-              }
-              async function v17361ReleaseWakeLock(){
-                  const lock=v17361ScreenWakeLock;
-                  v17361ScreenWakeLock=null;
-                  if(lock&&typeof lock.release==="function"){
-                      try{ await lock.release(); }catch(_){ }
-                  }
-              }
-              async function v17361RequestWakeLock(){
-                  v17361SyncPowerSavingButton();
-                  if(v17361PowerSavingEnabled()||typeof document==="undefined"||document.visibilityState!=="visible"){
-                      await v17361ReleaseWakeLock();
-                      return false;
-                  }
-                  if(typeof navigator==="undefined"||!navigator.wakeLock||typeof navigator.wakeLock.request!=="function"){ return false; }
-                  if(v17361ScreenWakeLock&&!v17361ScreenWakeLock.released){ return true; }
-                  try{
-                      const lock=await navigator.wakeLock.request("screen");
-                      v17361ScreenWakeLock=lock;
-                      if(lock&&typeof lock.addEventListener==="function"){
-                          lock.addEventListener("release",()=>{ if(v17361ScreenWakeLock===lock){ v17361ScreenWakeLock=null; } });
-                      }
-                      return true;
-                  }catch(_){
-                      v17361ScreenWakeLock=null;
-                      return false;
-                  }
-              }
-              window.v17361TogglePowerSaving=function(){
-                  const next=!v17361PowerSavingEnabled();
-                  try{ localStorage.setItem(V17361_POWER_SAVE_KEY,next?"1":"0"); }catch(_){ }
-                  v17361SyncPowerSavingButton();
-                  if(next){ void v17361ReleaseWakeLock(); }
-                  else{ void v17361RequestWakeLock(); }
-                  return next;
-              };
-              window.v17361RequestWakeLock=v17361RequestWakeLock;
-              window.v17361ReleaseWakeLock=v17361ReleaseWakeLock;
-              if(typeof document!=="undefined"){
-                  document.addEventListener("pointerdown",()=>{ void v17361RequestWakeLock(); },{once:true,passive:true});
-                  document.addEventListener("visibilitychange",()=>{
-                      if(document.visibilityState==="visible"){ void v17361RequestWakeLock(); }
-                      else{ void v17361ReleaseWakeLock(); }
-                  });
-                  setTimeout(v17361SyncPowerSavingButton,0);
-              }
-          '''
-          if 'V17361_POWER_SAVE_KEY' not in s:
-              pos=s.rfind('\n})();')
+          # Screen Wake Lock owner + patrol power-saving preference.
+          p="js/34-v141-core-systems.js"; s=read(p)
+          if "V17361_POWER_SAVE_KEY" not in s:
+              pos=s.rfind("\n})();")
               if pos<0:
-                  raise SystemExit('js34 final IIFE anchor missing')
-              s=s[:pos]+wake_block+s[pos:]
+                  raise SystemExit("js34 final IIFE anchor missing")
+              wake='''\n\n    /* V173.61 — screen wake / patrol power-saving owner. */\n    const V17361_POWER_SAVE_KEY="v17361_patrol_power_saving";\n    let v17361ScreenWakeLock=null;\n\n    function v17361PowerSavingEnabled(){\n        try{ return localStorage.getItem(V17361_POWER_SAVE_KEY)==="1"; }catch(_){ return false; }\n    }\n    function v17361SyncPowerSavingButton(){\n        if(typeof document==="undefined"){ return; }\n        const button=document.getElementById("quickPowerSavingToggle");\n        if(!button){ return; }\n        const enabled=v17361PowerSavingEnabled();\n        button.classList.toggle("active",enabled);\n        button.setAttribute("aria-pressed",enabled?"true":"false");\n        button.textContent=enabled?"省電 ON":"省電 OFF";\n        button.title=enabled?"允許螢幕依系統設定休眠":"遊戲會嘗試保持螢幕常亮";\n    }\n    async function v17361ReleaseWakeLock(){\n        const lock=v17361ScreenWakeLock;\n        v17361ScreenWakeLock=null;\n        if(lock&&typeof lock.release==="function"){ try{ await lock.release(); }catch(_){ } }\n    }\n    async function v17361RequestWakeLock(){\n        v17361SyncPowerSavingButton();\n        if(v17361PowerSavingEnabled()||typeof document==="undefined"||document.visibilityState!=="visible"){\n            await v17361ReleaseWakeLock();\n            return false;\n        }\n        if(typeof navigator==="undefined"||!navigator.wakeLock||typeof navigator.wakeLock.request!=="function"){ return false; }\n        if(v17361ScreenWakeLock&&!v17361ScreenWakeLock.released){ return true; }\n        try{\n            const lock=await navigator.wakeLock.request("screen");\n            v17361ScreenWakeLock=lock;\n            if(lock&&typeof lock.addEventListener==="function"){\n                lock.addEventListener("release",()=>{ if(v17361ScreenWakeLock===lock){ v17361ScreenWakeLock=null; } });\n            }\n            return true;\n        }catch(_){ v17361ScreenWakeLock=null; return false; }\n    }\n    window.v17361TogglePowerSaving=function(){\n        const next=!v17361PowerSavingEnabled();\n        try{ localStorage.setItem(V17361_POWER_SAVE_KEY,next?"1":"0"); }catch(_){ }\n        v17361SyncPowerSavingButton();\n        if(next){ void v17361ReleaseWakeLock(); } else{ void v17361RequestWakeLock(); }\n        return next;\n    };\n    window.v17361RequestWakeLock=v17361RequestWakeLock;\n    window.v17361ReleaseWakeLock=v17361ReleaseWakeLock;\n    if(typeof document!=="undefined"){\n        document.addEventListener("pointerdown",()=>{ void v17361RequestWakeLock(); },{once:true,passive:true});\n        document.addEventListener("visibilitychange",()=>{\n            if(document.visibilityState==="visible"){ void v17361RequestWakeLock(); }\n            else{ void v17361ReleaseWakeLock(); }\n        });\n        setTimeout(v17361SyncPowerSavingButton,0);\n    }\n'''
+              s=s[:pos]+wake+s[pos:]
+              write(p,s)
+
+          # Quest owner: daily/commission claim-all + targeted open-page redraw.
+          p="js/00-main.js"; s=read(p)
+          insertion_marker='''\n\n\n/*\n   V89：任務視窗為「固定標籤列 + 內層任務清單 + 固定完成度獎勵」架構。'''
+          if s.count(insertion_marker)!=1:
+              raise SystemExit(f"quest helper insertion marker count={s.count(insertion_marker)}")
+          helpers='''\n\nfunction getClaimableQuestIds(definitions,state){\n    return (definitions||[]).filter(function(quest){\n        return quest && !state.claimed[quest.id] &&\n            (Number(state.progress[quest.id])||0)>=Math.max(1,Number(quest.goal)||1);\n    }).map(function(quest){ return quest.id; });\n}\n\nfunction v17361SyncQuestClaimAllButton(isCommission){\n    const button=$("questClaimAllButton");\n    if(!button){ return; }\n    const definitions=isCommission?commissionQuestDefinitions:dailyQuestDefinitions;\n    const state=isCommission?commissionQuestState:dailyQuestState;\n    const count=getClaimableQuestIds(definitions,state).length;\n    button.disabled=count<=0;\n    button.textContent=count>0?"一鍵領取（"+count+"）":"一鍵領取";\n    button.onclick=isCommission?v17361ClaimAllCommissionQuests:v17361ClaimAllDailyQuests;\n}\n\nfunction v17361RefreshOpenQuestPage(){\n    const body=$("questTabBody");\n    if(!body){ return false; }\n    const commissionBtn=$("questTabBtnCommission");\n    const isCommission=!!(commissionBtn&&commissionBtn.classList.contains("active"));\n    const scrollTop=body.scrollTop;\n    body.innerHTML=isCommission?renderCommissionQuestListContent():renderDailyQuestListContent();\n    const completionPanel=$("questCompletionPanel");\n    if(completionPanel){\n        completionPanel.innerHTML=renderQuestCompletionPanelContent(\n            isCommission?commissionQuestDefinitions:dailyQuestDefinitions,\n            isCommission?commissionQuestState:dailyQuestState\n        );\n    }\n    body.scrollTop=scrollTop;\n    v17361SyncQuestClaimAllButton(isCommission);\n    return true;\n}\nwindow.v17361RefreshOpenQuestPage=v17361RefreshOpenQuestPage;\n'''
+          s=s.replace(insertion_marker,helpers+insertion_marker,1)
+
+          toolbar_marker='''            '</div>'+\n\n            '<div id="questTabBody" class="quest-tab-body" role="tabpanel">'+'''
+          toolbar='''            '</div>'+\n\n            '<div class="quest-batch-actions">'+\n                '<button id="questClaimAllButton" class="quest-claim-all-btn" type="button" '+\n                    (getClaimableQuestIds(\n                        isCommission?commissionQuestDefinitions:dailyQuestDefinitions,\n                        isCommission?commissionQuestState:dailyQuestState\n                    ).length?'':'disabled ')+\n                    'onclick="'+(isCommission?'v17361ClaimAllCommissionQuests()':'v17361ClaimAllDailyQuests()')+'">一鍵領取</button>'+\n            '</div>'+\n\n            '<div id="questTabBody" class="quest-tab-body" role="tabpanel">'+'''
+          if s.count(toolbar_marker)!=1:
+              raise SystemExit(f"quest toolbar marker count={s.count(toolbar_marker)}")
+          s=s.replace(toolbar_marker,toolbar,1)
+
+          # Add claim-all sync immediately before switchQuestTab closes.
+          start=s.index("function switchQuestTab(tabName){")
+          end=s.index("\n\n\n/*\n   ★ 新增（依照使用者要求，新增副本/BOSS",start)
+          segment=s[start:end]
+          close=segment.rfind("\n}")
+          if close<0:
+              raise SystemExit("switchQuestTab close missing")
+          segment=segment[:close]+"\n    v17361SyncQuestClaimAllButton(isCommission);\n"+segment[close:]
+          s=s[:start]+segment+s[end:]
+
+          # Avoid per-item redraws during bulk claim.
+          s,n=re.subn(r'\n\s*switchQuestTab\(\s*"daily"\s*\);', '\n    if(!window.__v17361BulkQuestClaim){ switchQuestTab("daily"); }', s, count=1)
+          if n!=1: raise SystemExit(f"daily claim redraw count={n}")
+          s,n=re.subn(r'\n\s*switchQuestTab\(\s*"commission"\s*\);', '\n    if(!window.__v17361BulkQuestClaim){ switchQuestTab("commission"); }', s, count=1)
+          if n!=1: raise SystemExit(f"commission claim redraw count={n}")
+
+          bestiary='''/* =====================================================\n   ★ 圖鑑\n===================================================== */'''
+          if s.count(bestiary)!=1:
+              raise SystemExit(f"bestiary marker count={s.count(bestiary)}")
+          bulk='''function v17361ClaimAllQuestGroup(definitions,state,claimFn,title){\n    const ids=getClaimableQuestIds(definitions,state);\n    if(!ids.length){ v17361RefreshOpenQuestPage(); return 0; }\n    window.__v17361BulkQuestClaim=true;\n    try{ ids.forEach(function(id){ claimFn(id); }); }\n    finally{ window.__v17361BulkQuestClaim=false; }\n    v17361RefreshOpenQuestPage();\n    if(typeof window.rpgAlert==="function"){\n        void window.rpgAlert("已一鍵領取 "+ids.length+" 個"+title+"獎勵。",{title:title+"獎勵",confirmText:"知道了",tone:"success"});\n    }\n    return ids.length;\n}\nfunction v17361ClaimAllDailyQuests(){\n    return v17361ClaimAllQuestGroup(dailyQuestDefinitions,dailyQuestState,claimDailyQuest,"每日任務");\n}\nfunction v17361ClaimAllCommissionQuests(){\n    return v17361ClaimAllQuestGroup(commissionQuestDefinitions,commissionQuestState,claimCommissionQuest,"委託任務");\n}\nwindow.v17361ClaimAllDailyQuests=v17361ClaimAllDailyQuests;\nwindow.v17361ClaimAllCommissionQuests=v17361ClaimAllCommissionQuests;\n\n'''
+          s=s.replace(bestiary,bulk+bestiary,1)
           write(p,s)
 
-          # Quest list owner: claim-all controls + targeted redraw + bulk-claim suppression.
-          p='js/00-main.js'; s=read(p)
-          helper_anchor='''function renderCommissionQuestListContent(){
-          
-              return renderQuestListGeneric(
-                  commissionQuestDefinitions,
-                  commissionQuestState,
-                  "claimCommissionQuest"
-              );
-          
-          }
-          '''
-          helper_insert=r'''
-          
-          function getClaimableQuestIds(definitions,state){
-              return (definitions||[]).filter(function(quest){
-                  return quest && !state.claimed[quest.id] &&
-                      (Number(state.progress[quest.id])||0)>=Math.max(1,Number(quest.goal)||1);
-              }).map(function(quest){ return quest.id; });
-          }
-          
-          function v17361SyncQuestClaimAllButton(isCommission){
-              const button=$("questClaimAllButton");
-              if(!button){ return; }
-              const definitions=isCommission?commissionQuestDefinitions:dailyQuestDefinitions;
-              const state=isCommission?commissionQuestState:dailyQuestState;
-              const count=getClaimableQuestIds(definitions,state).length;
-              button.disabled=count<=0;
-              button.textContent=count>0?"一鍵領取（"+count+"）":"一鍵領取";
-              button.onclick=isCommission?v17361ClaimAllCommissionQuests:v17361ClaimAllDailyQuests;
-          }
-          
-          function v17361RefreshOpenQuestPage(){
-              const body=$("questTabBody");
-              if(!body){ return false; }
-              const commissionBtn=$("questTabBtnCommission");
-              const isCommission=!!(commissionBtn&&commissionBtn.classList.contains("active"));
-              const scrollTop=body.scrollTop;
-              body.innerHTML=isCommission?renderCommissionQuestListContent():renderDailyQuestListContent();
-              const completionPanel=$("questCompletionPanel");
-              if(completionPanel){
-                  completionPanel.innerHTML=renderQuestCompletionPanelContent(
-                      isCommission?commissionQuestDefinitions:dailyQuestDefinitions,
-                      isCommission?commissionQuestState:dailyQuestState
-                  );
-              }
-              body.scrollTop=scrollTop;
-              v17361SyncQuestClaimAllButton(isCommission);
-              return true;
-          }
-          window.v17361RefreshOpenQuestPage=v17361RefreshOpenQuestPage;
-          '''
-          if s.count(helper_anchor)!=1:
-              raise SystemExit(f'quest helper anchor count={s.count(helper_anchor)}')
-          s=s.replace(helper_anchor,helper_anchor+helper_insert,1)
-
-          toolbar_anchor='''            '</div>'+\n\n            '<div id="questTabBody" class="quest-tab-body" role="tabpanel">'+'''
-          toolbar_new='''            '</div>'+\n\n            '<div class="quest-batch-actions">'+\n                '<button id="questClaimAllButton" class="quest-claim-all-btn" type="button" '+\n                    (getClaimableQuestIds(\n                        isCommission?commissionQuestDefinitions:dailyQuestDefinitions,\n                        isCommission?commissionQuestState:dailyQuestState\n                    ).length?'':'disabled ')+\n                    'onclick="'+(isCommission?'v17361ClaimAllCommissionQuests()':'v17361ClaimAllDailyQuests()')+'">一鍵領取</button>'+\n            '</div>'+\n\n            '<div id="questTabBody" class="quest-tab-body" role="tabpanel">'+'''
-          if s.count(toolbar_anchor)!=1:
-              raise SystemExit(f'quest toolbar anchor count={s.count(toolbar_anchor)}')
-          s=s.replace(toolbar_anchor,toolbar_new,1)
-
-          pattern=r'(function switchQuestTab\(tabName\)\{[\s\S]*?)(\n\}\n\n\n/\*\n   ★ 新增\(依照使用者要求，新增副本/BOSS)'
-          match=re.search(pattern,s)
-          if not match:
-              raise SystemExit('switchQuestTab injection anchor missing')
-          body=match.group(1)
-          if 'v17361SyncQuestClaimAllButton(isCommission);' not in body:
-              body+='\n    v17361SyncQuestClaimAllButton(isCommission);\n'
-          s=s[:match.start()]+body+match.group(2)+s[match.end():]
-
-          daily_switch='''    switchQuestTab(
-              "daily"
-          );'''
-          commission_switch='''    switchQuestTab(
-              "commission"
-          );'''
-          if s.count(daily_switch)!=1 or s.count(commission_switch)!=1:
-              raise SystemExit(f'quest claim switch anchors daily={s.count(daily_switch)} commission={s.count(commission_switch)}')
-          s=s.replace(daily_switch,'    if(!window.__v17361BulkQuestClaim){ switchQuestTab("daily"); }',1)
-          s=s.replace(commission_switch,'    if(!window.__v17361BulkQuestClaim){ switchQuestTab("commission"); }',1)
-
-          bestiary_anchor='''/* =====================================================
-             ★ 圖鑑
-          ===================================================== */'''
-          bulk=r'''
-          function v17361ClaimAllQuestGroup(definitions,state,claimFn,title){
-              const ids=getClaimableQuestIds(definitions,state);
-              if(!ids.length){ v17361RefreshOpenQuestPage(); return 0; }
-              window.__v17361BulkQuestClaim=true;
-              try{ ids.forEach(function(id){ claimFn(id); }); }
-              finally{ window.__v17361BulkQuestClaim=false; }
-              v17361RefreshOpenQuestPage();
-              if(typeof window.rpgAlert==="function"){
-                  void window.rpgAlert("已一鍵領取 "+ids.length+" 個"+title+"獎勵。",{title:title+"獎勵",confirmText:"知道了",tone:"success"});
-              }
-              return ids.length;
-          }
-          function v17361ClaimAllDailyQuests(){
-              return v17361ClaimAllQuestGroup(dailyQuestDefinitions,dailyQuestState,claimDailyQuest,"每日任務");
-          }
-          function v17361ClaimAllCommissionQuests(){
-              return v17361ClaimAllQuestGroup(commissionQuestDefinitions,commissionQuestState,claimCommissionQuest,"委託任務");
-          }
-          window.v17361ClaimAllDailyQuests=v17361ClaimAllDailyQuests;
-          window.v17361ClaimAllCommissionQuests=v17361ClaimAllCommissionQuests;
-          
-          '''
-          if s.count(bestiary_anchor)!=1:
-              raise SystemExit(f'bestiary anchor count={s.count(bestiary_anchor)}')
-          s=s.replace(bestiary_anchor,bulk+bestiary_anchor,1)
-          write(p,s)
-
-          # Existing V173.51 per-item reward popups stay, but bulk claim emits only one summary popup.
-          p='js/57-v173.51-quest-qa.js'; s=read(p)
-          count=s.count('if(!b&&a&&q)')
+          # V173.51 keeps individual confirmation, but bulk claim emits one summary only.
+          p="js/57-v173.51-quest-qa.js"; s=read(p)
+          count=s.count("if(!b&&a&&q)")
           if count!=2:
-              raise SystemExit(f'quest QA popup anchors count={count}')
-          write(p,s.replace('if(!b&&a&&q)','if(!window.__v17361BulkQuestClaim&&!b&&a&&q)'))
+              raise SystemExit(f"quest QA popup anchors count={count}")
+          write(p,s.replace("if(!b&&a&&q)","if(!window.__v17361BulkQuestClaim&&!b&&a&&q)"))
 
-          # High-end image-first reward previews for EXP / materials / gold.
-          p='js/42-v148-combat-dungeon-fixes.js'; s=read(p)
-          old=r'''    window.v148ShowDailyDungeonPreview=function(type){
-              const meta=DAILY_DUNGEON_META[type];
-              if(!meta||typeof window.v132ShowRewardModal!=="function"){ return; }
-              const layout=dailyPartyContext().soloProtected
-                  ?"6普通 → 5普通+1精英 → 4普通+1精英+1BOSS"
-                  :"6普通 → 4普通+2精英 → 3普通+2精英+1BOSS";
-              const html='<div class="v132-reward-modal-inner"><h3>'+meta.title+'獎勵預覽</h3><p>'+meta.reward+'</p>'+
-                  '<p>固定3輪×6隻：'+layout+'。</p>'+
-                  '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
-              window.v132ShowRewardModal(html);
-          };
-          '''
-          new=r'''    function v17361DailyRewardVisual(type){
-              if(type==="material"){
-                  return '<div class="v17361-reward-visual single"><div class="v17361-reward-icon material" aria-label="材料寶箱與礦石">'+
-                      '<img class="v17361-chest-art" src="assets/items/chests/dungeon-chest.png" alt="材料寶箱">'+
-                      '<img class="v17361-ore-mini" src="assets/items/materials/ore.png" alt="礦石">'+
-                      '<em>1–3</em></div></div>';
-              }
-              if(type==="gold"){
-                  return '<div class="v17361-reward-visual single"><div class="v17361-reward-icon cover" aria-label="金幣獎勵">'+
-                      '<img src="assets/dungeons/covers/gold-v17344.png" alt="金幣"></div></div>';
-              }
-              return '<div class="v17361-reward-visual single"><div class="v17361-reward-icon" aria-label="經驗獎勵">'+
-                  '<img src="assets/ui/home-offline-exp.png" alt="經驗"></div></div>';
-          }
-          window.v148ShowDailyDungeonPreview=function(type){
-              const meta=DAILY_DUNGEON_META[type];
-              if(!meta||typeof window.v132ShowRewardModal!=="function"){ return; }
-              const html='<div class="v132-reward-modal-inner v17361-reward-preview"><h3>'+meta.title+'獎勵預覽</h3>'+v17361DailyRewardVisual(type)+
-                  '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
-              window.v132ShowRewardModal(html);
-          };
-          '''
-          if s.count(old)!=1:
-              raise SystemExit(f'daily preview anchor count={s.count(old)}')
-          write(p,s.replace(old,new,1))
+          # Image-first daily reward previews; no descriptive reward paragraphs.
+          regex_once(
+              "js/42-v148-combat-dungeon-fixes.js",
+              r'    window\.v148ShowDailyDungeonPreview=function\(type\)\{[\s\S]*?\n    \};\n\n    if\(typeof renderDungeonTabContent',
+              '''    function v17361DailyRewardVisual(type){\n        if(type==="material"){\n            return '<div class="v17361-reward-visual single"><div class="v17361-reward-icon material" aria-label="材料寶箱與礦石">'+\n                '<img class="v17361-chest-art" src="assets/items/chests/dungeon-chest.png" alt="材料寶箱">'+\n                '<img class="v17361-ore-mini" src="assets/items/materials/ore.png" alt="礦石">'+\n                '<em>1–3</em></div></div>';\n        }\n        if(type==="gold"){\n            return '<div class="v17361-reward-visual single"><div class="v17361-reward-icon cover" aria-label="金幣獎勵">'+\n                '<img src="assets/dungeons/covers/gold-v17344.png" alt="金幣"></div></div>';\n        }\n        return '<div class="v17361-reward-visual single"><div class="v17361-reward-icon" aria-label="經驗獎勵">'+\n            '<img src="assets/ui/home-offline-exp.png" alt="經驗"></div></div>';\n    }\n    window.v148ShowDailyDungeonPreview=function(type){\n        const meta=DAILY_DUNGEON_META[type];\n        if(!meta||typeof window.v132ShowRewardModal!=="function"){ return; }\n        const html='<div class="v132-reward-modal-inner v17361-reward-preview"><h3>'+meta.title+'獎勵預覽</h3>'+\n            v17361DailyRewardVisual(type)+\n            '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';\n        window.v132ShowRewardModal(html);\n    };\n\n    if(typeof renderDungeonTabContent''',
+              "daily reward preview"
+          )
 
-          # Equipment dungeon preview joins the same visual language and uses real equipment art.
-          p='js/equipment-progression.js'; s=read(p)
-          old=r'''    window.v17346ShowEquipmentDungeonPreview=function(){
-              if(typeof window.v132ShowRewardModal!=="function"){ return; }
-              const html='<div class="v132-reward-modal-inner v17346-preview-modal"><h3>裝備副本獎勵預覽</h3><div class="v132-preview-list-scroll"><div class="v132-preview-reward"><span>⬜</span><b>白裝</b><strong>40%</strong><small>固定1詞條 +1～3</small></div><div class="v132-preview-reward"><span>🟦</span><b>藍裝</b><strong>40%</strong><small>固定1詞條 +4～6</small></div><div class="v132-preview-reward"><span>🟪</span><b>紫裝</b><strong>15%</strong><small>固定1詞條 +7～9・可冶煉×1</small></div><div class="v132-preview-reward"><span>🟧</span><b>橙裝</b><strong>5%</strong><small>固定1詞條 +10～12・可冶煉×1</small></div><p>勝利獲得2個寶箱，每箱3件；看廣告雙倍為12件裝備。</p></div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
-              window.v132ShowRewardModal(html);
-          };
-          '''
-          new=r'''    window.v17346ShowEquipmentDungeonPreview=function(){
-              if(typeof window.v132ShowRewardModal!=="function"){ return; }
-              const rewards=[
-                  ["white","assets/equipment/warrior/head-01.png","40%"],
-                  ["blue","assets/equipment/warrior/armor-01.png","40%"],
-                  ["purple","assets/equipment/warrior/shoes-01.png","15%"],
-                  ["orange","assets/equipment/warrior/weapon-01.png","5%"]
-              ];
-              const tiles=rewards.map(entry=>'<div class="v17361-reward-icon rarity-'+entry[0]+'"><img src="'+entry[1]+'" alt=""><em>'+entry[2]+'</em></div>').join("");
-              const html='<div class="v132-reward-modal-inner v17346-preview-modal v17361-reward-preview"><h3>裝備副本獎勵預覽</h3><div class="v17361-reward-visual equipment">'+tiles+'</div><div class="v17361-chest-count" aria-label="兩個裝備寶箱"><img src="assets/items/chests/dungeon-chest.png" alt=""><b>×2</b></div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
-              window.v132ShowRewardModal(html);
-          };
-          '''
-          if s.count(old)!=1:
-              raise SystemExit(f'equipment preview anchor count={s.count(old)}')
-          write(p,s.replace(old,new,1))
+          # Equipment preview: actual item art + rarity frames + chest count.
+          regex_once(
+              "js/equipment-progression.js",
+              r'    window\.v17346ShowEquipmentDungeonPreview=function\(\)\{[\s\S]*?\n    \};\n\n    if\(typeof renderDungeonTabContent',
+              '''    window.v17346ShowEquipmentDungeonPreview=function(){\n        if(typeof window.v132ShowRewardModal!=="function"){ return; }\n        const rewards=[\n            ["white","assets/equipment/warrior/head-01.png","40%"],\n            ["blue","assets/equipment/warrior/armor-01.png","40%"],\n            ["purple","assets/equipment/warrior/shoes-01.png","15%"],\n            ["orange","assets/equipment/warrior/weapon-01.png","5%"]\n        ];\n        const tiles=rewards.map(entry=>'<div class="v17361-reward-icon rarity-'+entry[0]+'"><img src="'+entry[1]+'" alt=""><em>'+entry[2]+'</em></div>').join("");\n        const html='<div class="v132-reward-modal-inner v17346-preview-modal v17361-reward-preview"><h3>裝備副本獎勵預覽</h3>'+\n            '<div class="v17361-reward-visual equipment">'+tiles+'</div>'+\n            '<div class="v17361-chest-count" aria-label="兩個裝備寶箱"><img src="assets/items/chests/dungeon-chest.png" alt=""><b>×2</b></div>'+\n            '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';\n        window.v132ShowRewardModal(html);\n    };\n\n    if(typeof renderDungeonTabContent''',
+              "equipment reward preview"
+          )
 
-          # Shared return-button center fill, patrol power-save button, quest batch control.
-          append_once('css/00-main.css','V173.61 — shared return icon center fill',r'''
-          /* V173.61 — shared return icon center fill / patrol power saving / quest batch action */
-          #game-stage img[src*="map-return.png"]{
-              background:#050505;
-              border-radius:50%;
-          }
-          #game-stage .map-quick-toggle-btn.v17361-power-save-toggle{
-              width:auto !important;
-              min-width:64px;
-              padding:0 9px !important;
-              border:1px solid rgba(205,160,82,.74) !important;
-              border-radius:12px !important;
-              background:rgba(7,7,7,.9) !important;
-              color:#d8c79f !important;
-              font-size:10px !important;
-              font-weight:900 !important;
-              letter-spacing:.04em;
-              white-space:nowrap;
-          }
-          #game-stage .map-quick-toggle-btn.v17361-power-save-toggle.active{
-              border-color:#7ee0a9 !important;
-              color:#aef1c9 !important;
-              box-shadow:inset 0 0 0 1px rgba(126,224,169,.2),0 0 9px rgba(80,194,128,.2) !important;
-          }
-          #game-stage .quest-batch-actions{
-              display:flex;
-              justify-content:flex-end;
-              padding:8px 10px 4px;
-          }
-          #game-stage .quest-claim-all-btn{
-              min-width:108px;
-              min-height:36px;
-              padding:7px 12px;
-              border:1px solid #b98a42;
-              border-radius:8px;
-              background:linear-gradient(180deg,#4c3316,#211308);
-              color:#ffe0a0;
-              font-size:12px;
-              font-weight:900;
-          }
-          #game-stage .quest-claim-all-btn:disabled{
-              opacity:.42;
-              filter:grayscale(.35);
-          }
-          ''')
+          # Shared return fill, power-save control, quest claim-all styling.
+          append_once("css/00-main.css","V173.61 — shared return icon center fill",'''/* V173.61 — shared return icon center fill / patrol power saving / quest batch action */
+#game-stage img[src*="map-return.png"]{background:#050505;border-radius:50%;}
+#game-stage .map-quick-toggle-btn.v17361-power-save-toggle{
+    width:auto !important;min-width:64px;padding:0 9px !important;
+    border:1px solid rgba(205,160,82,.74) !important;border-radius:12px !important;
+    background:rgba(7,7,7,.9) !important;color:#d8c79f !important;
+    font-size:10px !important;font-weight:900 !important;letter-spacing:.04em;white-space:nowrap;
+}
+#game-stage .map-quick-toggle-btn.v17361-power-save-toggle.active{
+    border-color:#7ee0a9 !important;color:#aef1c9 !important;
+    box-shadow:inset 0 0 0 1px rgba(126,224,169,.2),0 0 9px rgba(80,194,128,.2) !important;
+}
+#game-stage .quest-batch-actions{display:flex;justify-content:flex-end;padding:8px 10px 4px;}
+#game-stage .quest-claim-all-btn{
+    min-width:108px;min-height:36px;padding:7px 12px;border:1px solid #b98a42;border-radius:8px;
+    background:linear-gradient(180deg,#4c3316,#211308);color:#ffe0a0;font-size:12px;font-weight:900;
+}
+#game-stage .quest-claim-all-btn:disabled{opacity:.42;filter:grayscale(.35);}''')
 
-          # Final daily-dungeon preview CSS owner.
-          append_once('css/43-v148-combat-dungeon-fixes.css','V173.61 — image-first daily reward previews',r'''
-          /* V173.61 — image-first daily reward previews */
-          #game-stage .v17361-reward-preview{max-width:420px;}
-          #game-stage .v17361-reward-visual{
-              display:grid;
-              gap:10px;
-              margin:10px auto 14px;
-          }
-          #game-stage .v17361-reward-visual.single{grid-template-columns:minmax(0,170px);justify-content:center;}
-          #game-stage .v17361-reward-visual.equipment{grid-template-columns:repeat(2,minmax(0,1fr));}
-          #game-stage .v17361-reward-icon{
-              position:relative;
-              aspect-ratio:1;
-              overflow:hidden;
-              border:1px solid rgba(209,167,92,.72);
-              border-radius:14px;
-              background:radial-gradient(circle at 50% 38%,rgba(104,79,38,.28),rgba(8,7,6,.96) 72%);
-              box-shadow:inset 0 0 20px rgba(0,0,0,.62),0 7px 18px rgba(0,0,0,.28);
-          }
-          #game-stage .v17361-reward-icon>img:not(.v17361-ore-mini){
-              width:100%;height:100%;display:block;object-fit:contain;padding:8px;box-sizing:border-box;
-          }
-          #game-stage .v17361-reward-icon.cover>img{object-fit:cover!important;padding:0!important;}
-          #game-stage .v17361-reward-icon.material .v17361-chest-art{padding:4px!important;}
-          #game-stage .v17361-reward-icon .v17361-ore-mini{
-              position:absolute;right:6px;bottom:6px;width:42%;height:42%;object-fit:contain;
-              padding:3px;border:1px solid rgba(255,255,255,.16);border-radius:10px;background:rgba(5,5,5,.82);
-          }
-          #game-stage .v17361-reward-icon>em{
-              position:absolute;right:7px;top:7px;min-width:34px;padding:3px 7px;border-radius:999px;
-              background:rgba(5,5,5,.88);border:1px solid rgba(238,195,113,.55);color:#ffe2a5;
-              font-style:normal;font-size:11px;font-weight:900;text-align:center;
-          }
-          #game-stage .v17361-reward-icon.rarity-white{border-color:#D8D8D8;}
-          #game-stage .v17361-reward-icon.rarity-blue{border-color:#42A5FF;box-shadow:inset 0 0 18px rgba(66,165,255,.16),0 0 10px rgba(66,165,255,.16);}
-          #game-stage .v17361-reward-icon.rarity-purple{border-color:#B05CFF;box-shadow:inset 0 0 18px rgba(176,92,255,.18),0 0 12px rgba(176,92,255,.18);}
-          #game-stage .v17361-reward-icon.rarity-orange{border-color:#FF9F38;box-shadow:inset 0 0 18px rgba(255,159,56,.2),0 0 14px rgba(255,159,56,.2);}
-          #game-stage .v17361-chest-count{
-              display:flex;align-items:center;justify-content:center;gap:4px;margin:-4px 0 10px;color:#f8d58d;font-weight:900;
-          }
-          #game-stage .v17361-chest-count img{width:42px;height:42px;object-fit:contain;}
-          #game-stage .v17361-chest-count b{font-size:14px;}
-          ''')
+          append_once("css/43-v148-combat-dungeon-fixes.css","V173.61 — image-first daily reward previews",'''/* V173.61 — image-first daily reward previews */
+#game-stage .v17361-reward-preview{max-width:420px;}
+#game-stage .v17361-reward-visual{display:grid;gap:10px;margin:10px auto 14px;}
+#game-stage .v17361-reward-visual.single{grid-template-columns:minmax(0,170px);justify-content:center;}
+#game-stage .v17361-reward-visual.equipment{grid-template-columns:repeat(2,minmax(0,1fr));}
+#game-stage .v17361-reward-icon{
+    position:relative;aspect-ratio:1;overflow:hidden;border:1px solid rgba(209,167,92,.72);border-radius:14px;
+    background:radial-gradient(circle at 50% 38%,rgba(104,79,38,.28),rgba(8,7,6,.96) 72%);
+    box-shadow:inset 0 0 20px rgba(0,0,0,.62),0 7px 18px rgba(0,0,0,.28);
+}
+#game-stage .v17361-reward-icon>img:not(.v17361-ore-mini){width:100%;height:100%;display:block;object-fit:contain;padding:8px;box-sizing:border-box;}
+#game-stage .v17361-reward-icon.cover>img{object-fit:cover!important;padding:0!important;}
+#game-stage .v17361-reward-icon.material .v17361-chest-art{padding:4px!important;}
+#game-stage .v17361-reward-icon .v17361-ore-mini{
+    position:absolute;right:6px;bottom:6px;width:42%;height:42%;object-fit:contain;padding:3px;
+    border:1px solid rgba(255,255,255,.16);border-radius:10px;background:rgba(5,5,5,.82);
+}
+#game-stage .v17361-reward-icon>em{
+    position:absolute;right:7px;top:7px;min-width:34px;padding:3px 7px;border-radius:999px;background:rgba(5,5,5,.88);
+    border:1px solid rgba(238,195,113,.55);color:#ffe2a5;font-style:normal;font-size:11px;font-weight:900;text-align:center;
+}
+#game-stage .v17361-reward-icon.rarity-white{border-color:#D8D8D8;}
+#game-stage .v17361-reward-icon.rarity-blue{border-color:#42A5FF;box-shadow:inset 0 0 18px rgba(66,165,255,.16),0 0 10px rgba(66,165,255,.16);}
+#game-stage .v17361-reward-icon.rarity-purple{border-color:#B05CFF;box-shadow:inset 0 0 18px rgba(176,92,255,.18),0 0 12px rgba(176,92,255,.18);}
+#game-stage .v17361-reward-icon.rarity-orange{border-color:#FF9F38;box-shadow:inset 0 0 18px rgba(255,159,56,.2),0 0 14px rgba(255,159,56,.2);}
+#game-stage .v17361-chest-count{display:flex;align-items:center;justify-content:center;gap:4px;margin:-4px 0 10px;color:#f8d58d;font-weight:900;}
+#game-stage .v17361-chest-count img{width:42px;height:42px;object-fit:contain;}
+#game-stage .v17361-chest-count b{font-size:14px;}''')
 
-          # Handoff: keep current owner truth at the top.
-          p='HANDOFF.md'; s=read(p)
-          entry='''\n## V173.61 返回圖示／道具圖／副本預覽／音效／常亮省電／任務即時領取（目前 dev）
-          - V173.60 已通過受保護 Repository checks 並由 PR #70 正式合併 main；本輪新修改只在 dev。
-          - `css/00-main.css` 是共用返回按鈕視覺 owner：所有實際使用 `assets/ui/map-return.png` 的入口統一補 `#050505` 圓形黑底，不逐頁複製樣式。
-          - `assets-library/assets/inbox/道具icon/礦石.png` 與 `副本與背包的寶箱.png` 已複製到 `assets/items/materials/ore.png`、`assets/items/chests/dungeon-chest.png`；`js/27-v132-content-expansion.js` 仍是礦石／材料寶箱資料 owner。正式階級框與色號規格不變。
-          - 一般副本獎勵預覽由 `js/42-v148-combat-dungeon-fixes.js` + `css/43-v148-combat-dungeon-fixes.css` 改為圖片優先；裝備副本由既有 `js/equipment-progression.js` owner 同步改成實際裝備圖＋正式階級框，不再用 emoji／長段文字列獎勵。
-          - 戰鬥程序音效 owner `js/34-v141-core-systems.js` master gain 0.22→0.30，只提高戰鬥音效。`js/35-v141-ui-battle.js` 移除 `v141-once-*` CSS flash，但保留 Canvas particles；`js/39-v143-skill-animation.js` 的 Sprite/VFX 時序仍是現行技能動畫 owner。
-          - 遊戲一般模式在首次使用者操作後嘗試 Screen Wake Lock；巡怪左上新增「省電 OFF/ON」。省電 ON 會釋放 Wake Lock，允許系統正常熄屏；頁面隱藏也會主動釋放，回到前景且省電關閉時再嘗試取得。
-          - 每日／委託任務在 `js/00-main.js` 正式加入一鍵領取；`js/34` 每次背景任務進度真正變化時只刷新已開啟的任務 body／完成度與領取按鈕，不重開視窗、不跳分頁。成就既有 `v17351ClaimAllAchievements` 保留。`js/57-v173.51-quest-qa.js` 在批量領取時抑制逐筆 popup，改由批量流程只提示一次。
-          - 版本與所有 live cache key 同步 V173.61。
-          \n'''.replace('          ','')
-          if not s.startswith('\n## V173.61') and not s.startswith('## V173.61'):
-              write(p,entry+s.lstrip('\n'))
+          # Handoff truth source.
+          p="HANDOFF.md"; s=read(p)
+          if not s.lstrip().startswith("## V173.61"):
+              entry='''## V173.61 返回圖示／道具圖／副本預覽／音效／常亮省電／任務即時領取（目前 dev）
+- V173.60 已通過受保護 Repository checks 並由 PR #70 正式合併 main；本輪新修改只在 dev。
+- `css/00-main.css` 是共用返回按鈕視覺 owner：所有實際使用 `assets/ui/map-return.png` 的入口統一補 `#050505` 圓形黑底。
+- 素材分支的「礦石.png」「副本與背包的寶箱.png」已導入 `assets/items/materials/ore.png`、`assets/items/chests/dungeon-chest.png`；`js/27-v132-content-expansion.js` 仍是礦石／材料寶箱資料 owner，正式階級框規格不變。
+- 一般副本獎勵預覽由 `js/42` + `css/43` 改為圖片優先；裝備副本由既有 `js/equipment-progression.js` 同步改成實際裝備圖＋正式階級框。
+- 戰鬥程序音效 `js/34` master gain 0.22→0.30；`js/35` 移除 `v141-once-*` CSS flash，但保留 Canvas particles；`js/39` Sprite/VFX 時序仍是現行技能動畫 owner。
+- 一般模式在首次使用者操作後嘗試 Screen Wake Lock；巡怪新增「省電 OFF/ON」，省電 ON 釋放 Wake Lock，頁面隱藏時也會釋放。
+- 每日／委託正式加入一鍵領取；背景任務進度變化時只刷新已開啟的任務內容與完成度，保留目前分頁／捲動位置。成就既有一鍵領取保留。
+- 版本與 live cache key 同步 V173.61。
+
+'''
+              write(p,entry+s.lstrip())
 
           # Dedicated regression test.
-          test=r'''"use strict";
-          const assert=require("node:assert/strict");
-          const fs=require("node:fs");
-          const path=require("node:path");
-          const root=path.resolve(__dirname,"..");
-          const read=p=>fs.readFileSync(path.join(root,p),"utf8");
-          const html=read("index.html");
-          const mainCss=read("css/00-main.css");
-          const dailyCss=read("css/43-v148-combat-dungeon-fixes.css");
-          const oldSkillCss=read("css/38-v141-system-expansion.css");
-          const ui=read("js/35-v141-ui-battle.js");
-          const core=read("js/34-v141-core-systems.js");
-          const quest=read("js/00-main.js");
-          const questQa=read("js/57-v173.51-quest-qa.js");
-          const daily=read("js/42-v148-combat-dungeon-fixes.js");
-          const content=read("js/27-v132-content-expansion.js");
-          const equipment=read("js/equipment-progression.js");
-          const loader=read("js/20-anonymous-20.js");
-          assert.ok(fs.existsSync(path.join(root,"assets/items/materials/ore.png")));
-          assert.ok(fs.existsSync(path.join(root,"assets/items/chests/dungeon-chest.png")));
-          assert.match(content,/assets\/items\/materials\/ore\.png/);
-          assert.match(content,/assets\/items\/chests\/dungeon-chest\.png/);
-          assert.match(mainCss,/img\[src\*="map-return\.png"\][\s\S]*background:#050505/);
-          assert.match(html,/id="quickPowerSavingToggle"/);
-          assert.match(core,/navigator\.wakeLock\.request\("screen"\)/);
-          assert.match(core,/V17361_POWER_SAVE_KEY/);
-          assert.match(core,/master\.gain\.value=0\.30/);
-          assert.doesNotMatch(ui,/v141-once-/);
-          assert.doesNotMatch(oldSkillCss,/v141HealFlash|v141ReviveFlash|v141TalismanFlash|v141-once-/);
-          assert.match(daily,/v17361DailyRewardVisual/);
-          assert.match(dailyCss,/v17361-reward-visual/);
-          assert.doesNotMatch(equipment,/⬜|🟦|🟪|🟧/);
-          assert.match(equipment,/rarity-white/);
-          assert.match(quest,/v17361ClaimAllDailyQuests/);
-          assert.match(quest,/v17361ClaimAllCommissionQuests/);
-          assert.match(quest,/v17361RefreshOpenQuestPage/);
-          assert.match(core,/v17361RefreshOpenQuestPage/);
-          assert.match(questQa,/__v17361BulkQuestClaim/);
-          assert.match(questQa,/v17351ClaimAllAchievements/);
-          assert.ok(loader.includes('const V_ASSET_VERSION="173.61";'));
-          assert.ok(html.includes('<title>四象江湖傳 V173.61</title>'));
-          console.log("✓ V173.61 current request integration");
-          '''.replace('          ','')
-          write('tests/v173.61-current-request.test.js',test)
+          test='''"use strict";
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const html=read("index.html");
+const mainCss=read("css/00-main.css");
+const dailyCss=read("css/43-v148-combat-dungeon-fixes.css");
+const oldSkillCss=read("css/38-v141-system-expansion.css");
+const ui=read("js/35-v141-ui-battle.js");
+const core=read("js/34-v141-core-systems.js");
+const quest=read("js/00-main.js");
+const questQa=read("js/57-v173.51-quest-qa.js");
+const daily=read("js/42-v148-combat-dungeon-fixes.js");
+const content=read("js/27-v132-content-expansion.js");
+const equipment=read("js/equipment-progression.js");
+const loader=read("js/20-anonymous-20.js");
+assert.ok(fs.existsSync(path.join(root,"assets/items/materials/ore.png")));
+assert.ok(fs.existsSync(path.join(root,"assets/items/chests/dungeon-chest.png")));
+assert.match(content,/assets\/items\/materials\/ore\.png/);
+assert.match(content,/assets\/items\/chests\/dungeon-chest\.png/);
+assert.match(mainCss,/img\[src\*="map-return\.png"\][\s\S]*background:#050505/);
+assert.match(html,/id="quickPowerSavingToggle"/);
+assert.match(core,/navigator\.wakeLock\.request\("screen"\)/);
+assert.match(core,/V17361_POWER_SAVE_KEY/);
+assert.match(core,/master\.gain\.value=0\.30/);
+assert.doesNotMatch(ui,/v141-once-/);
+assert.doesNotMatch(oldSkillCss,/v141HealFlash|v141ReviveFlash|v141TalismanFlash|v141-once-/);
+assert.match(daily,/v17361DailyRewardVisual/);
+assert.match(dailyCss,/v17361-reward-visual/);
+assert.doesNotMatch(equipment,/⬜|🟦|🟪|🟧/);
+assert.match(equipment,/rarity-white/);
+assert.match(quest,/v17361ClaimAllDailyQuests/);
+assert.match(quest,/v17361ClaimAllCommissionQuests/);
+assert.match(quest,/v17361RefreshOpenQuestPage/);
+assert.match(core,/v17361RefreshOpenQuestPage/);
+assert.match(questQa,/__v17361BulkQuestClaim/);
+assert.match(questQa,/v17351ClaimAllAchievements/);
+assert.ok(loader.includes('const V_ASSET_VERSION="173.61";'));
+assert.ok(html.includes('<title>四象江湖傳 V173.61</title>'));
+console.log("✓ V173.61 current request integration");
+'''
+          write("tests/v173.61-current-request.test.js",test)
           PY
 
       - name: Check modified JavaScript syntax
