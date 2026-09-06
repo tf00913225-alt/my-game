@@ -1,0 +1,47 @@
+name: V173.60 test compatibility
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - .github/workflows/v17360-test-compat.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Update V141 assertions to formal tier authority
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/v141-system-expansion.test.js')
+          s=p.read_text(encoding='utf-8')
+          replacements=[
+              ('assert.equal(5*4*4,80);','assert.equal(5*6*4,120);'),
+              ('assert.match(contentSource,/reforgeMaterialTier:"low"/);','assert.match(contentSource,/reforgeMaterialTier:"white"/);\n    assert.match(contentSource,/TIER_ALIASES=\\{low:"white",mid:"blue",high:"purple",perfect:"orange"\\}/);')
+          ]
+          for old,new in replacements:
+              if s.count(old)!=1:
+                  raise SystemExit(f'expected exactly one anchor: {old!r}; found {s.count(old)}')
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Run all Node test suites
+        run: |
+          node .github/scripts/ci.mjs tests
+      - name: Commit test compatibility
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/v141-system-expansion.test.js
+          git diff --cached --check
+          git commit -m "V173.60 align legacy tests with formal tiers"
+          git push origin HEAD:dev
