@@ -129,3 +129,86 @@
 #game-stage .v17361-chest-count{display:flex;align-items:center;justify-content:center;gap:4px;margin:-4px 0 10px;color:#f8d58d;font-weight:900;}
 #game-stage .v17361-chest-count img{width:42px;height:42px;object-fit:contain;}
 #game-stage .v17361-chest-count b{font-size:14px;}
+
+/* V173.62 — patrol power-saving entry removed and dungeon previews become premium text summaries. */
+#game-stage #mapPage .v17361-power-save-toggle{
+    display:none !important;
+}
+#game-stage .v17361-reward-preview{
+    width:min(360px,calc(100% - 24px)) !important;
+    max-width:360px !important;
+    padding:18px !important;
+    border:1px solid rgba(193,145,70,.76) !important;
+    border-radius:14px !important;
+    background:
+        radial-gradient(circle at 50% 0,rgba(224,168,72,.13),transparent 38%),
+        linear-gradient(165deg,#21170e,#0b0907 74%) !important;
+    box-shadow:0 18px 42px rgba(0,0,0,.72),inset 0 0 0 1px rgba(255,224,154,.06) !important;
+}
+#game-stage .v17361-reward-preview > h3{
+    margin:0 0 12px !important;
+    padding-bottom:11px !important;
+    border-bottom:1px solid rgba(196,148,74,.42) !important;
+    color:#f4d58d !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:20px !important;
+    font-weight:900 !important;
+    letter-spacing:.04em !important;
+    text-align:left !important;
+}
+#game-stage .v17361-reward-preview > h3::after{
+    content:"REWARD PREVIEW";
+    display:block;
+    margin-top:3px;
+    color:#8f7b5b;
+    font-family:"Cinzel",serif;
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.18em;
+}
+#game-stage .v17361-reward-preview .v17361-reward-visual{
+    display:block !important;
+    width:100% !important;
+    margin:0 0 14px !important;
+}
+#game-stage .v17361-reward-preview .v17361-reward-icon,
+#game-stage .v17361-reward-preview .v17361-chest-count{
+    display:none !important;
+}
+#game-stage .v17361-reward-preview .v17361-reward-visual::before{
+    display:block;
+    padding:15px 14px;
+    border:1px solid rgba(126,96,57,.64);
+    border-radius:10px;
+    color:#d9c9aa;
+    background:linear-gradient(180deg,rgba(28,21,14,.96),rgba(12,10,8,.97));
+    box-shadow:inset 0 0 18px rgba(224,169,74,.035);
+    font-size:13px;
+    font-weight:600;
+    line-height:1.85;
+    letter-spacing:.01em;
+    text-align:left;
+    white-space:pre-line;
+}
+#game-stage .v17361-reward-preview .v17361-reward-visual.single:has(.material)::before{
+    content:"材料寶箱  ×1～3\A━━━━━━━━━━━━\A通關回合越少，獲得的寶箱越多。\A寶箱可取得礦石、裝備設計圖等養成材料。";
+}
+#game-stage .v17361-reward-preview .v17361-reward-visual.single:has(.cover)::before{
+    content:"金幣獎勵\A━━━━━━━━━━━━\A依目前副本等級結算金幣數量。\A通關後可直接領取，或觀看廣告取得雙倍獎勵。";
+}
+#game-stage .v17361-reward-preview .v17361-reward-visual.single:not(:has(.material)):not(:has(.cover))::before{
+    content:"共用經驗池  EXP\A━━━━━━━━━━━━\A通關經驗直接存入共用經驗池，不綁定單一角色。\A可用於後續角色分配與升級；結算可選擇廣告雙倍。";
+}
+#game-stage .v17361-reward-preview .v17361-reward-visual.equipment::before{
+    content:"裝備寶箱  ×2\A━━━━━━━━━━━━\A每個寶箱隨機取得 3 件裝備。\A白階 40%　・　藍階 40%\A紫階 15%　・　橙階 5%";
+}
+#game-stage .v17361-reward-preview .v132-reward-actions{
+    margin-top:0 !important;
+}
+#game-stage .v17361-reward-preview .v132-reward-actions button{
+    min-height:42px !important;
+    border-color:#9e783d !important;
+    color:#f0ddba !important;
+    background:linear-gradient(180deg,#302318,#17100b) !important;
+    font-weight:900 !important;
+}
