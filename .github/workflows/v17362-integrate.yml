@@ -23,10 +23,17 @@ jobs:
           node-version: "24"
       - name: Apply V173.62 patch
         run: python3 .github/scripts/v17362_patch.py
-      - name: Update escaped current-version assertions
+      - name: Update V173.62 current-version wiring
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          loader=Path('js/20-anonymous-20.js')
+          text=loader.read_text(encoding='utf-8')
+          old='document.documentElement.dataset.runtimeReady="173.61";'
+          new='document.documentElement.dataset.runtimeReady="173.62";'
+          if text.count(old)!=1:
+              raise SystemExit(f'runtimeReady: expected 1 old marker, got {text.count(old)}')
+          loader.write_text(text.replace(old,new,1),encoding='utf-8')
           for path in Path('tests').glob('*.js'):
               text=path.read_text(encoding='utf-8')
               text=text.replace(r'173\.61',r'173\.62')
