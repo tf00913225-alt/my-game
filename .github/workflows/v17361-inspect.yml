@@ -33,7 +33,27 @@ jobs:
           s=p.read_text(encoding='utf-8')
           start=s.index('# 2. Patrol power-saving control.')
           end=s.index('# 3. Supplied ore + common general-dungeon chest art.',start)
-          replacement='''# 2. Patrol power-saving control.\nhtml = read("index.html")\npattern = r'(    <button\\n        id="quickAutoPatrolToggle"[\\s\\S]*?\\n    </button>)(\\n\\n</div>)'\npower_button = r'''\\1\n\n    <button\n        id="quickPowerSavingToggle"\n        class="map-quick-toggle-btn v17361-power-save-toggle"\n        type="button"\n        onclick="v17361TogglePowerSaving()"\n        aria-label="省電模式"\n        aria-pressed="false"\n    >省電 OFF</button>\\2'''\nhtml,count=re.subn(pattern,power_button,html,count=1)\nif count!=1:\n    raise SystemExit(f"patrol button insertion count={count}")\nwrite("index.html",html)\n\n'''
+          lines=[
+              '# 2. Patrol power-saving control.',
+              'html = read("index.html")',
+              'pattern = r\'(    <button\\n        id="quickAutoPatrolToggle"[\\s\\S]*?\\n    </button>)(\\n\\n</div>)\'',
+              'power_button = r\'\\1\' + "\\n\\n" + "\\n".join([',
+              '    \'    <button\',',
+              '    \'        id="quickPowerSavingToggle"\',',
+              '    \'        class="map-quick-toggle-btn v17361-power-save-toggle"\',',
+              '    \'        type="button"\',',
+              '    \'        onclick="v17361TogglePowerSaving()"\',',
+              '    \'        aria-label="省電模式"\',',
+              '    \'        aria-pressed="false"\',',
+              '    \'    >省電 OFF</button>\'',
+              ']) + r\'\\2\'',
+              'html,count=re.subn(pattern,power_button,html,count=1)',
+              'if count!=1:',
+              '    raise SystemExit(f"patrol button insertion count={count}")',
+              'write("index.html",html)',
+              '',
+          ]
+          replacement='\n'.join(lines)+'\n'
           p.write_text(s[:start]+replacement+s[end:],encoding='utf-8')
           PY
       - name: Validate patch script syntax
