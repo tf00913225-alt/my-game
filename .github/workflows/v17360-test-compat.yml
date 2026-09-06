@@ -18,41 +18,65 @@ jobs:
         with:
           ref: dev
           fetch-depth: 0
-      - name: Update legacy assertions to formal tier authority
+      - name: Update formal-tier compatibility and V173.60 cache wiring
         run: |
           python - <<'PY'
           from pathlib import Path
 
+          def replace_once(path, old, new, label):
+              p=Path(path)
+              s=p.read_text(encoding='utf-8')
+              if s.count(old)!=1:
+                  raise SystemExit(f'{label}: expected exactly one anchor, found {s.count(old)}')
+              p.write_text(s.replace(old,new,1),encoding='utf-8')
+
+          # V141: blueprint grid now has six formal tiers; reforge default is white.
           p=Path('tests/v141-system-expansion.test.js')
           s=p.read_text(encoding='utf-8')
-          replacements=[
+          for old,new in [
               ('assert.equal(5*4*4,80);','assert.equal(5*6*4,120);'),
               ('assert.match(contentSource,/reforgeMaterialTier:"low"/);','assert.match(contentSource,/reforgeMaterialTier:"white"/);\n    assert.match(contentSource,/TIER_ALIASES=\\{low:"white",mid:"blue",high:"purple",perfect:"orange"\\}/);')
-          ]
-          for old,new in replacements:
+          ]:
               if s.count(old)!=1:
-                  raise SystemExit(f'v141 expected exactly one anchor: {old!r}; found {s.count(old)}')
+                  raise SystemExit(f'v141: expected one anchor {old!r}, found {s.count(old)}')
               s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8')
 
+          # V169: old low/mid/high/perfect classes are compatibility aliases for white/blue/purple/orange.
           p=Path('tests/v169-abyss-assets-flow.test.js')
           s=p.read_text(encoding='utf-8')
           old='''test("talisman and blueprint borders follow blue, purple, orange, magenta rarity order",()=>{\n    const expected={low:"#3ba7ff",mid:"#a855f7",high:"#ff9f38",perfect:"#ff4fa7"};\n    Object.entries(expected).forEach(([tier,color])=>{\n        assert.match(css,new RegExp("v169-(?:talisman|blueprint)-art\\\\.v169-rarity-"+tier+"[^}]+border-color:"+color));\n    });\n    assert.match(css,/\\.v169-item-art > img\\{[^}]*object-fit:contain/);\n});'''
           new='''test("talisman and blueprint borders follow formal white, blue, purple, orange rarity order",()=>{\n    const expected={low:"#D8D8D8",mid:"#42A5FF",high:"#B05CFF",perfect:"#FF9F38"};\n    Object.entries(expected).forEach(([tier,color])=>{\n        assert.match(css,new RegExp("v169-(?:talisman|blueprint)-art\\\\.v169-rarity-"+tier+"[^}]+border-color:"+color));\n    });\n    assert.match(css,/v169-rarity-pink[^}]+border-color:#FF4FA7/);\n    assert.match(css,/v169-rarity-four-symbol/);\n    assert.match(css,/\\.v169-item-art > img\\{[^}]*object-fit:contain/);\n});'''
           if s.count(old)!=1:
-              raise SystemExit(f'v169 expected exactly one rarity test anchor, found {s.count(old)}')
+              raise SystemExit(f'v169: expected one rarity test anchor, found {s.count(old)}')
           p.write_text(s.replace(old,new,1),encoding='utf-8')
 
+          # V173.50 inventory now understands all six formal equipment tiers.
           p=Path('tests/v173.50-inventory-qol.test.js')
           s=p.read_text(encoding='utf-8')
-          replacements=[
+          for old,new in [
               ('assert.match(qol,/QUALITY_ORDER=\\["white","blue","purple","orange"\\]/);','assert.match(qol,/QUALITY_ORDER=\\["white","blue","purple","orange","pink","four-symbol"\\]/);'),
               ('assert.match(qol,/橙裝售出後無法復原/);','assert.match(qol,/高階裝備售出後無法復原/);')
-          ]
-          for old,new in replacements:
+          ]:
               if s.count(old)!=1:
-                  raise SystemExit(f'v173.50 expected exactly one anchor: {old!r}; found {s.count(old)}')
+                  raise SystemExit(f'v173.50: expected one anchor {old!r}, found {s.count(old)}')
               s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+
+          # Real cache-busting fix: nested V173.51 QA assets must follow the release version.
+          p=Path('js/53-v173.50-inventory-qol.js')
+          s=p.read_text(encoding='utf-8')
+          expected=[
+              'css/53-v173.51-qa.css?v=173.58',
+              'js/54-v173.51-battle-qa.js?v=173.58',
+              'js/55-v173.51-inventory-qa.js?v=173.58',
+              'js/56-v173.51-shop-qa.js?v=173.58',
+              'js/57-v173.51-quest-qa.js?v=173.58'
+          ]
+          for old in expected:
+              if s.count(old)!=1:
+                  raise SystemExit(f'QA cache wiring: expected one {old}, found {s.count(old)}')
+              s=s.replace(old,old.replace('173.58','173.60'),1)
           p.write_text(s,encoding='utf-8')
           PY
       - name: Ensure asset-test dependency
@@ -64,11 +88,11 @@ jobs:
       - name: Run all Node test suites
         run: |
           node .github/scripts/ci.mjs tests
-      - name: Commit test compatibility
+      - name: Commit compatibility and cache wiring
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/v141-system-expansion.test.js tests/v169-abyss-assets-flow.test.js tests/v173.50-inventory-qol.test.js
+          git add tests/v141-system-expansion.test.js tests/v169-abyss-assets-flow.test.js tests/v173.50-inventory-qol.test.js js/53-v173.50-inventory-qol.js
           git diff --cached --check
-          git commit -m "V173.60 align legacy tests with formal tiers"
+          git commit -m "V173.60 align tier tests and nested QA cache wiring"
           git push origin HEAD:dev
