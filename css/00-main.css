@@ -1,1 +1,7110 @@
-TEMP
+
+
+/*
+   ★ 新增（依照使用者要求，「所有遊戲框、
+   視窗、按鈕、對話框都換成跟主城8大按鈕
+   同一色系」）：
+   統一定義成CSS變數，主城8大按鈕本身
+   的樣式（.home-card-icon深棕漸層+
+   .home-card-label深紅漸層+金色邊框）
+   當作全遊戲的標準色票，之後.card、
+   .menu-button、.main-button、彈出視窗
+   這些共用類別，統一改讀這幾個變數，
+   不用每個類別各自寫一次顏色值——以後
+   如果整體色系還要再調整，只要改這裡
+   幾個變數就好，不用一個個類別找過去改。
+*/
+
+:root{
+
+    --theme-box-bg:
+        linear-gradient(160deg,#241c12,#15100a);
+
+    --theme-accent-bg:
+        linear-gradient(180deg,#5a1a12,#2e0d09);
+
+    --theme-border:#8a6a3a;
+
+    --theme-border-bright:#f0b429;
+
+    --theme-text-gold:#ffe27a;
+
+}
+
+*{
+    box-sizing:border-box;
+}
+
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-right:env(safe-area-inset-right,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+    --safe-left:env(safe-area-inset-left,0px);
+
+    /*
+       ★ 真的找到根本問題了：
+       html,body原本用height:100%，
+       這是行動裝置網頁開發裡一個很有名的陷阱——
+       html/body的100%是根據瀏覽器的
+       「初始容納區塊」去計算，在手機瀏覽器上
+       （尤其網址列會隨滑動出現/收起的情況）
+       常常沒辦法正確對應到「真正看得到的
+       螢幕高度」，這正是vh/dvh這種單位
+       被發明出來的原因，就是為了解決
+       height:100%在手機上不可靠這個問題。
+
+       這裡從最一開始（html、body這個最上層）
+       就已經用了不可靠的100%，
+       後面不管#viewportOuter、#app、.content
+       怎麼調整，全部都是從這個不準確的基準
+       往下疊加百分比計算，等於每一層都在
+       一個有問題的地基上蓋房子——這才是
+       這麼多輪不管怎麼改都沒真正解決的
+       真正原因，不是下面哪一層的寫法錯，
+       是最上面這個地基從頭到尾就不可靠。
+
+       改成height:100dvh，直接使用
+       「動態視窗高度」這個專門為了解決
+       這個問題而生的單位，確保從最源頭開始，
+       這個高度就是真正、即時反映使用者
+       目前看得到的螢幕高度。
+    */
+
+    height:100dvh;
+    overflow:hidden;
+}
+
+/*
+   ★ 整體視覺重新設計：
+   原本是通用的深色管理後台配色（深灰藍+橘色），
+   完全沒有RPG遊戲的氛圍。
+   改成深紫夜空+金色鑲邊的奇幻風格，
+   標題用襯線字體（Noto Serif TC）營造正式感，
+   內文維持無襯線好閱讀，
+   金色是貫穿整個UI的主色調
+   （呼應「元素法師」「技能」「稀有裝備」這類RPG語彙）。
+*/
+
+body{
+    background:#0c0b0a;
+    color:#f2ead9;
+    font-family:"Noto Sans TC",Arial,sans-serif;
+}
+
+h1,h2,h3,
+.creation-title,
+.player-name,
+.map-title,
+.battle-title{
+    font-family:"Noto Serif TC","Noto Sans TC",serif;
+    letter-spacing:.5px;
+}
+
+/* =====================================================
+   ★ 1080 × 1920 固定虛擬遊戲舞台
+   這一層只負責「整體等比例縮放」。
+   既有 RPG 內容維持原本 CSS/JS，避免大幅重構。
+===================================================== */
+
+#game-stage{
+    position:fixed;
+    left:50%;
+    top:50%;
+    width:1080px;
+    height:1920px;
+    overflow:hidden;
+    background:#0c0b0a;
+    transform-origin:center center;
+    z-index:0;
+}
+
+#game-stage > #app{
+    /*
+       舊版遊戲 UI 目前以約 420px 寬的窄版版型設計。
+       先保留既有 UI 尺寸，讓整個 legacy layout 成為
+       stage 內的一張完整設計稿，再由 stage 統一縮放。
+    */
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:420px;
+    height:746.6666667px;
+    max-width:none;
+    transform:translate(-50%,-50%);
+    transform-origin:center center;
+}
+
+/* 舊 #app 的 fixed/100dvh 規則由本次覆寫，
+   其餘頁面、戰鬥、技能、巡怪等功能不改。 */
+
+#game-stage #creationPage,
+#game-stage .page,
+#game-stage .content{
+    /* 保持既有定位系統，只讓祖層統一縮放 */
+}
+
+@media (prefers-reduced-motion:reduce){
+    #game-stage{
+        scroll-behavior:auto;
+    }
+}
+
+button,
+select,
+input{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+button:disabled{
+    cursor:not-allowed;
+}
+
+/*
+   ★ 修正（改用「固定畫布＋整體縮放」的正確做法）：
+   之前是讓畫面裡每一塊區域各自「有彈性地」
+   試著縮小去塞進螢幕，這種做法很難完全預測，
+   不同手機、不同內容狀態，結果都可能不一樣，
+   才會一直卡在「這裡調好、那裡又跑版」的循環。
+
+   正確做法：把整個遊戲畫面當成一張「固定尺寸
+   的設計稿」（下面設定400×860這個參考尺寸），
+   不管實際螢幕多大多小，永遠用同一張設計稿，
+   只是整體等比例縮放去貼合實際螢幕——
+   裡面每個東西的相對位置、大小關係永遠不會跑掉，
+   不需要再猜測任何東西該不該縮小。
+
+   #viewportOuter是鋪滿整個真實瀏覽器視窗的
+   外層容器（黑色背景），#app維持固定的
+   400×860尺寸「畫布」，靠JS算出縮放比例，
+   讓這張畫布整體縮放後剛好完整塞進
+   #viewportOuter，四周多出來的空間
+   （例如手機螢幕比例跟參考尺寸不完全一樣）
+   就自然變成黑色留白，不會裁切、也不會捲動。
+*/
+
+/*
+   ★ 修正（真的簡化到底，不要再疊層）：
+   之前用#viewportOuter（固定滿版）包住
+   #app（用百分比對應父層），這兩層之間
+   還是有一次「百分比計算」在發生，
+   不管用flex置中還是絕對定位置中，
+   都還是多了一層「#app的高度要不要正確等於
+   #viewportOuter的高度」這個計算——
+   這幾輪的問題可能就出在這裡：
+   不管怎麼調整置中方式，只要還有這一層
+   百分比轉換，就有出錯的機會。
+
+   這次直接把兩層合併成一層：
+   #app自己就是position:fixed、
+   直接對應真實視窗（100dvh），
+   不再需要另外一個外層容器幫忙轉換高度，
+   中間完全不會有任何百分比計算的機會，
+   高度是多少就是多少，最直接、最不會出錯。
+   寬度上限、水平置中，用最基本、
+   最多網站都在用、最不會出錯的
+   left:50%+transform位移做法。
+*/
+
+#app{
+    position:fixed;
+
+    top:0;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:100%;
+    max-width:420px;
+
+    height:100dvh;
+
+    margin:0;
+    background:#0c0b0a;
+    overflow:hidden;
+
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
+    padding-left:env(safe-area-inset-left);
+    padding-right:env(safe-area-inset-right);
+}
+/* 1080×1920 stage compatibility override */
+#game-stage > #app{
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:420px;
+    max-width:none;
+    height:746.6666667px;
+    margin:0;
+    transform:translate(-50%,-50%);
+    overflow:hidden;
+    padding-top:0;
+    padding-bottom:0;
+    padding-left:0;
+    padding-right:0;
+}
+
+/* =====================================================
+   創建角色
+===================================================== */
+
+#creationPage{
+    position:absolute;
+    inset:0;
+    z-index:5000;
+
+    background:
+        radial-gradient(
+            circle at center top,
+            #221d16 0,
+            #0c0b0a 48%,
+            #050403 100%
+        );
+
+    overflow-y:auto;
+    padding:22px 16px 30px;
+}
+
+.creation-title{
+    text-align:center;
+    font-size:27px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.creation-subtitle{
+    text-align:center;
+    color:#b3a58c;
+    font-size:12px;
+    margin-top:7px;
+    margin-bottom:18px;
+}
+
+.creation-card{
+    background:#1a1613;
+    border:1px solid #4a3f2e;
+    border-radius:13px;
+    padding:14px;
+    margin-bottom:10px;
+}
+
+.creation-label{
+    font-size:13px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+
+.creation-input{
+    width:100%;
+    height:42px;
+    border-radius:8px;
+    border:1px solid var(--theme-border);
+    background:#100e0b;
+    color:#f2ead9;
+    padding:0 12px;
+    font-size:15px;
+    outline:none;
+}
+
+.creation-input:focus{
+    border-color:#d4941f;
+}
+
+.element-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:7px;
+}
+
+.element-option{
+    border:1px solid var(--theme-border);
+    border-radius:9px;
+    background:#100e0b;
+    color:#f2ead9;
+    padding:10px 3px;
+    text-align:center;
+}
+
+.element-option.selected{
+    border-color:var(--theme-border-bright);
+    box-shadow:0 0 8px rgba(240,180,41,.45);
+    background:var(--theme-box-bg);
+}
+
+.element-icon{
+    font-size:25px;
+}
+
+.element-name{
+    font-size:11px;
+    margin-top:4px;
+}
+
+.creation-stat{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:7px 0;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    font-size:13px;
+}
+
+.creation-stat:last-of-type{
+    border-bottom:0;
+}
+
+.creation-stat-right{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.creation-stat-button{
+    width:28px;
+    height:28px;
+    border:0;
+    border-radius:6px;
+    background:#2e2822;
+    color:#f2ead9;
+    font-size:16px;
+}
+
+.creation-stat-button:active{
+    transform:scale(.94);
+}
+
+.creation-points{
+    text-align:center;
+    color:#f0b429;
+    font-size:13px;
+    margin-top:10px;
+}
+
+.stat-explanation{
+    margin-top:12px;
+    padding:10px;
+    background:#100e0b;
+    border-radius:8px;
+    color:#d9cdb8;
+    font-size:10px;
+    line-height:17px;
+}
+
+.stat-explanation-title{
+    color:#f0b429;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.creation-start{
+    width:100%;
+    height:46px;
+    border:0;
+    border-radius:9px;
+    background:var(--theme-accent-bg);
+    color:var(--theme-text-gold);
+    font-size:15px;
+    font-weight:bold;
+    box-shadow:
+        0 2px 0 #8a5313,
+        0 3px 6px rgba(0,0,0,.4);
+}
+
+.creation-start:active{
+    transform:translateY(1px) scale(.98);
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header{
+    height:62px;
+    padding:9px 14px;
+    background:linear-gradient(180deg,#1c1712,#0e0c0a);
+    border-bottom:2px solid #8a6a3a;
+}
+
+/*
+   ★ 戰鬥時、以及背包頁面時，
+   把頂部資訊列藏起來，
+   釋放62px的空間給該頁面用
+   （這兩個頁面本身都已經有顯示
+   角色名/等級/HP/SP的地方，
+   頂部那條資訊列是重複的）。
+
+   ★ 修正：
+   除了個別頁面（例如#battlePage）自己的高度
+   要補回62px之外，.content 這個外層容器
+   本身的高度也要一起補，
+   不然 .content 還是維持原本扣掉62px的高度，
+   內層頁面就算自己設100dvh也會被外層截斷、
+   變成要滑動才看得到，實際上沒有真的把空間要回來。
+*/
+
+#app.no-header .header,
+#app:has(#homePage.active) #gameHeaderBar{
+    display:none;
+}
+
+/*
+   ★ 修正：
+   這條舊規則（height:100%）跟新的
+   .content（position:absolute配合top）
+   做法重複了，新規則已經統一移到
+   .content那個區塊旁邊用top:0處理，
+   #battlePage.active現在也統一用100%
+   （相對.content算好的高度），
+   這裡這條額外的no-header例外規則
+   已經不需要了，拿掉避免混淆。
+*/
+
+/*
+   ★ 新增（依照使用者要求）：
+   戰鬥中隱藏底部導覽列，把原本保留給導覽列的
+   底部留白也一併收回來，多出來的空間
+   讓戰鬥畫面更不容易需要捲動。
+*/
+
+#app.in-battle .bottom-nav{
+    display:none;
+}
+
+#app.in-battle .content{
+    /* V94：戰鬥頁不應繼承一般頁面的 10px/12px/78px 內距。
+       這些內距經 420→1080 放大後就會變成手機上可見的黑邊。 */
+    padding:0 !important;
+    overflow:hidden !important;
+}
+
+#app.in-battle #battlePage{
+    padding:4px 6px 2px;
+    width:100%;
+    height:100%;
+    margin:0;
+}
+
+/*
+   ★ 新增（依照使用者要求，地圖頁面
+   專屬的3按鈕導覽列）：
+   #mapPageNav預設隱藏（display:none，
+   蓋掉它從.bottom-nav繼承來的
+   display:grid），只有#app帶著
+   on-map-page這個class（showPage()
+   切到map頁面時才會加上）才會顯示，
+   同時把主城那套5按鈕的.bottom-nav
+   隱藏掉，兩套導覽列不會同時出現。
+   grid-template-columns改成3欄，
+   對應3個按鈕。
+*/
+
+#mapPageNav{
+    display:none;
+}
+
+#app.on-map-page .bottom-nav:not(.map-page-nav){
+    display:none;
+}
+
+/*
+   ★ 修正（依照使用者要求，「把自動戰鬥
+   放進下面導覽列最右邊」）：
+   從3個按鈕（角色/任務/返回）變成4個
+   （角色/任務/返回/自動戰鬥），
+   grid-template-columns改成4欄。
+*/
+
+#app.on-map-page #mapPageNav{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+}
+
+.player-name{
+    font-size:18px;
+    font-weight:bold;
+}
+
+/*
+   ★ 新增（依照使用者要求，「所有地圖
+   文字都置中」）：mapHeaderZoneName
+   本身繼承.player-name（天然縮排、
+   靠左），這裡額外讓它撐滿整個標題列
+   寬度、文字置中對齊。
+*/
+
+#mapHeaderZoneName{
+    display:block;
+    width:100%;
+    text-align:center;
+}
+
+.player-info{
+    margin-top:3px;
+    font-size:11px;
+    color:#b3a58c;
+}
+
+/*
+   ★ 修正（真的找到具體差異了，感謝提供兩種
+   開啟方式的對照）：
+   #creationPage一直都是用position:absolute
+   搭配inset:0（直接貼齊上下左右邊界），
+   完全不需要计算百分比；
+   而.content原本是用height:calc(100% - 62px)，
+   這是「百分比計算」，需要#app的高度先被
+   瀏覽器正確判定為一個明確的數字，才能算出來。
+
+   創角頁面能捲動、主城不能捲動，
+   兩者唯一的關鍵差異就是這裡——
+   不同瀏覽器/開啟方式對「百分比計算」的
+   穩定度不一致，但inset:0這種直接貼邊界的做法
+   幾乎不會有這個問題。
+
+   把.content也改成跟#creationPage同一招，
+   不再依賴百分比計算。
+*/
+
+.content{
+    position:absolute;
+
+    top:62px;
+    left:0;
+    right:0;
+    bottom:0;
+
+    overflow-y:auto;
+    padding:10px 12px 78px;
+}
+
+#app.no-header .content,
+#app:has(#homePage.active) .content{
+    top:0;
+}
+
+/*
+   ★ 新增（依照使用者要求，「黑框上下
+   可以再縮小一點」）：
+   .header這個標題列是全部頁面共用的
+   （戰鬥、狀態、技能、背包頁面都還是
+   會顯示完整兩行角色資訊，不能直接改
+   .header本身的固定高度，會把那些頁面
+   排版弄亂）。這裡另外做一個地圖頁面
+   專用的精簡模式，只有#app帶著
+   map-header-compact這個class時才會
+   生效，交給showPage()依照目前是不是
+   map頁面來切換，兩邊（.header的高度、
+   .content的頂部位移）要一起改才不會
+   內容跟標題重疊。
+*/
+
+/* V8: map/training gameplay page uses the full game viewport.
+   The old compact header was consuming 34px and appearing as a
+   black strip above the map. Keep the map title logic intact, but
+   do not reserve a separate vertical band for it. */
+#app.map-header-compact .header{
+    display:none !important;
+}
+
+#app.map-header-compact .content{
+    top:0 !important;
+}
+
+/*
+   ★ 新增（依照使用者要求，「主城選單
+   固定，不要捲動」「巡怪區的人物固定，
+   不要跟背景不同步」）：
+   .content原本是overflow-y:auto，
+   內容比較多時就會捲動。這裡在主城/
+   地圖頁面時關掉捲動——主城的卡片
+   grid另外調整成更緊湊的尺寸，確保
+   關掉捲動後8張卡片還是能完整塞進
+   畫面；地圖頁面本身內容不多，關掉
+   捲動後，巡怪角色的定位百分比（相對
+   #mapPage自身高度）就會穩定對應到
+   實際畫面高度，不會再因為捲動位移
+   跟固定背景/固定的戰鬥資訊面板對不上。
+*/
+
+#app.no-scroll-page .content{
+    overflow:hidden;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+/*
+   ★ 新增（依照使用者要求）：
+   巡邏／地圖頁面現在只留自動戰鬥、自動巡怪、
+   戰鬥資訊這三個面板（都在#mapBattleOverlay
+   裡，是mapPage以外的獨立元素，不受這裡影響），
+   原本的標題/說明文字/走格子地圖/怪物圖示/
+   離開地圖按鈕全部拿掉了，畫面會很空，
+   所以這裡直接把使用者提供的森林小徑圖片
+   當成這個頁面最底層的背景。
+
+   min-height:100vh確保就算內容很少（現在
+   幾乎沒有內容），背景圖還是能鋪滿整個
+   畫面高度，不會只蓋到內容那一小塊就結束、
+   下面露出一截黑底。
+*/
+
+#homePage{
+    position:relative;
+
+    /*
+       V89 ROOT FIX — 主城位於固定 420×746.67 的 #app/.content 裡，
+       不能再用 100vh（真實瀏覽器 viewport）當高度基準。
+       否則手機 viewport 高度會大於虛擬舞台，直接把 .content 撐出
+       scrollHeight。改為跟父層可視區同高，主城本身不再產生捲動。
+    */
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+
+    margin:-14px;
+    padding:14px;
+}
+
+.home-bg-fixed-layer{
+    position:fixed;
+    inset:0;
+    z-index:0;
+
+    background-image:url(../assets/ui/home-background.jpg);
+    background-size:cover;
+    background-position:center center;
+    background-repeat:no-repeat;
+
+    pointer-events:none;
+}
+
+#mapPage{
+    position:relative;
+    min-height:100vh;
+    margin:-14px;
+    padding:14px;
+}
+
+/*
+   ★ 修正（依照使用者回報，「背景沒有
+   固定，是程式碼還是Netlify的問題」）：
+   background-attachment:fixed在手機
+   瀏覽器上支援度一直不穩定（iOS Safari
+   長期不支援，Android上也常表現不一致），
+   這是CSS本身的相容性限制，跟部署在
+   哪裡（Netlify、本機檔案）完全無關，
+   同一份HTML在同一支手機的同一個瀏覽器
+   打開，行為一定一樣。
+
+   改用更可靠的做法：另外做一層
+   position:fixed的背景圖層，蓋滿整個
+   螢幕、墊在最底下（z-index:0），
+   前景內容正常在文件流裡捲動，但這層
+   背景完全不受捲動影響——position:fixed
+   這個屬性在手機上的支援度遠比
+   background-attachment:fixed可靠。
+*/
+
+.map-bg-fixed-layer{
+    position:fixed;
+    inset:0;
+    z-index:0;
+
+    background-size:cover;
+    background-position:center top;
+    background-repeat:no-repeat;
+
+    pointer-events:none;
+}
+
+/*
+   ★ 新增（依照使用者要求，「巡怪頁面
+   左上角新增小小的兩個快捷按鈕」）：
+   固定在左上角、小尺寸膠囊鈕，z-index
+   刻意設得夠高，確保蓋在地圖背景圖層
+   （z-index:0）之上，不會被蓋住。
+*/
+
+.map-quick-toggle-row{
+    position:fixed;
+    top:10px;
+    left:10px;
+    z-index:50;
+
+    display:flex;
+    flex-direction:row;
+    gap:8px;
+}
+
+.map-quick-toggle-btn{
+    padding:0;
+    margin:0;
+    border:none;
+    background:none;
+    line-height:0;
+
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;
+}
+
+.map-quick-toggle-btn img{
+    display:none;
+    width:64px;
+    height:auto;
+    pointer-events:none;
+
+    filter:drop-shadow(0 2px 5px rgba(0,0,0,.55));
+}
+
+.map-quick-toggle-btn .icon-off{
+    display:block;
+}
+
+.map-quick-toggle-btn.active .icon-off{
+    display:none;
+}
+
+.map-quick-toggle-btn.active .icon-on{
+    display:block;
+
+    /*
+       ★ 新增（依照使用者要求，「兩者若為ON
+       狀態麻煩用稍微抖動的感覺示意開啟中」）：
+       開啟狀態的圖示套用一個很輕微的左右
+       搖擺動畫，讓玩家一眼就能看出目前是
+       「開著」的，不用特別去看文字。
+    */
+
+    animation:quickToggleShake 1.1s ease-in-out infinite;
+}
+
+@keyframes quickToggleShake{
+    0%,100%{
+        transform:rotate(0deg);
+    }
+    25%{
+        transform:rotate(-4deg);
+    }
+    75%{
+        transform:rotate(4deg);
+    }
+}
+
+.card{
+    background:var(--theme-box-bg);
+    border:1px solid var(--theme-border);
+    border-radius:10px;
+    padding:11px;
+    margin-bottom:9px;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(240,180,41,.08);
+}
+
+/*
+   ★ 修正（依照使用者要求，主城改成純文字
+   選單、去掉毛玻璃特效）：
+   使用者準備自己重新佈置主城版面，
+   不需要卡片毛玻璃這層特效了，改用底下
+   這套「純文字選單」的樣式——標楷體、
+   白字黑框、沒有任何背景/邊框方塊，
+   點文字直接跳出對應的功能視窗。
+*/
+
+/*
+   ★ 修正（依照使用者要求，套用參考圖
+   「主頁」那種雕花標題框的質感）：
+   標題重新顯示出來，不再display:none，
+   改成金色雕花外框風格——上下兩條漸層
+   金線、左右兩側用CSS畫出裝飾用的葉紋
+   花飾（::before/::after，純幾何圖形
+   疊加漸層做出來，不是圖片），文字置中、
+   加金色光暈。
+*/
+
+/* Main-city lobby HUD: identity, resources and DEV tools without party duplication. */
+.home-city-hud{
+    position:relative;
+    z-index:3;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    gap:8px;
+    align-items:center;
+    min-height:48px;
+    margin:5px 10px 0;
+    padding:3px 7px;
+    border:1px solid rgba(191,139,57,.82);
+    border-radius:9px;
+    background:
+        linear-gradient(90deg,rgba(8,7,6,.95),rgba(31,19,11,.91) 52%,rgba(8,7,6,.94));
+    box-shadow:
+        0 5px 14px rgba(0,0,0,.52),
+        inset 0 0 0 1px rgba(255,222,143,.07),
+        inset 0 0 16px rgba(217,157,49,.1);
+}
+
+.home-hud-identity,
+.home-hud-side{
+    min-width:0;
+}
+
+.home-hud-identity{
+    position:relative;
+    display:flex;
+    align-items:center;
+    align-self:stretch;
+    inset-inline-start:7px;
+}
+
+.home-hud-kicker,
+.home-test-tools{
+    display:flex;
+    align-items:center;
+}
+
+.home-hud-kicker{
+    gap:8px;
+    color:#c99a43;
+    font-family:"Noto Serif TC",serif;
+    font-size:15px;
+    font-weight:900;
+    letter-spacing:.16em;
+    line-height:1.15;
+    white-space:nowrap;
+}
+
+.home-hud-side{
+    display:grid;
+    gap:3px;
+    justify-items:stretch;
+}
+
+.home-hud-resources{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:5px;
+}
+
+.home-hud-resources > span{
+    display:flex;
+    align-items:baseline;
+    justify-content:center;
+    gap:3px;
+    min-width:0;
+    min-height:20px;
+    padding:4px 6px;
+    border:1px solid rgba(191,139,57,.72);
+    border-radius:7px;
+    background:linear-gradient(180deg,rgba(30,21,12,.94),rgba(8,7,5,.92));
+    color:#ceb887;
+    font-size:8px;
+    line-height:10px;
+    box-shadow:inset 0 0 0 1px rgba(255,224,151,.05),0 2px 5px rgba(0,0,0,.3);
+    white-space:nowrap;
+}
+
+.home-hud-resources b{
+    display:inline-block;
+    color:#ffe093;
+    font-size:10px;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+}
+
+/* V92 DEV shortcuts remain functional but deliberately recede from the lobby. */
+.home-test-tools{
+    justify-content:center;
+    gap:4px;
+    max-width:none;
+    margin:0;
+}
+
+.home-test-label{
+    color:#8d816c;
+    font:700 7px/1 Arial,sans-serif;
+    letter-spacing:.12em;
+}
+
+.home-test-button{
+    min-width:0;
+    height:16px;
+    padding:0 4px;
+    border:1px solid rgba(114,92,58,.42);
+    border-radius:4px;
+    background:rgba(11,10,8,.72);
+    color:#9f947d;
+    font-size:6px;
+    font-weight:700;
+    line-height:14px;
+    box-shadow:none;
+    opacity:.78;
+}
+
+.home-test-button b{color:#bda66f;}
+.home-test-button:active,
+.home-test-button.active{
+    border-color:#b8893e;
+    color:#e1c989;
+    opacity:1;
+}
+
+/* RPG lobby hierarchy: two hero entrances, two side rails, two utilities. */
+.home-card-grid{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex:0 0 auto;
+    flex-direction:column;
+    gap:1px;
+    padding:1px 7px 0;
+}
+
+.home-primary-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,46%));
+    justify-content:space-between;
+    align-self:center;
+    width:100%;
+    gap:0;
+}
+
+.home-secondary-actions{
+    display:grid;
+    grid-template-columns:repeat(2,80px);
+    grid-template-rows:repeat(4,82px);
+    justify-content:space-between;
+    gap:5px 0;
+    min-height:343px;
+    padding:0;
+}
+
+.home-utility-actions{
+    position:absolute;
+    right:0;
+    bottom:0;
+    left:0;
+    z-index:4;
+    display:grid;
+    grid-template-columns:repeat(2,92px);
+    justify-content:space-between;
+    gap:0;
+    padding:0 74px;
+}
+
+.home-card{
+    position:relative;
+    min-width:0;
+    margin:0;
+    padding:0;
+    appearance:none;
+    color:inherit;
+    font:inherit;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;
+    transition:transform .12s ease,filter .12s ease;
+}
+
+.home-card:active{
+    filter:brightness(1.1);
+    transform:scale(.96);
+}
+
+.home-card:focus-visible{
+    outline:2px solid #f1c55e;
+    outline-offset:2px;
+}
+
+.home-card-icon{
+    display:block;
+    background-color:#080705;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-size:cover;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;
+}
+
+.home-card-label{
+    color:#f5d67f;
+    font-family:"Noto Serif TC","標楷體","BiauKai",serif;
+    font-weight:900;
+    text-align:center;
+    text-shadow:0 1px 3px #000,0 0 7px rgba(229,178,71,.2);
+    white-space:nowrap;
+}
+
+.home-card-primary{
+    height:90px;
+    overflow:hidden;
+    border:1px solid rgba(222,170,70,.9);
+    border-radius:11px;
+    background:#0b0906;
+    box-shadow:
+        0 5px 13px rgba(0,0,0,.55),
+        0 0 10px rgba(224,169,64,.14),
+        inset 0 0 0 1px rgba(255,225,151,.08);
+}
+
+.home-card-primary::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    background:linear-gradient(180deg,rgba(255,220,142,.04),transparent 58%,rgba(5,4,3,.18) 100%);
+    pointer-events:none;
+}
+
+.home-card-primary .home-card-icon{
+    position:absolute;
+    inset:0 0 19px;
+}
+
+.home-card-primary .home-card-label{
+    position:absolute;
+    right:0;
+    bottom:0;
+    left:0;
+    z-index:2;
+    height:19px;
+    padding:1px 4px;
+    border-top:1px solid rgba(218,165,66,.72);
+    background:linear-gradient(180deg,rgba(61,20,14,.98),rgba(20,10,7,.98));
+    font-size:14px;
+    line-height:16px;
+    letter-spacing:.12em;
+}
+
+.home-card-secondary{
+    display:grid;
+    grid-template-rows:59px 21px;
+    align-content:stretch;
+    justify-items:stretch;
+    width:80px;
+    height:82px;
+    overflow:hidden;
+    border:1px solid rgba(205,154,65,.82);
+    border-radius:11px;
+    background:linear-gradient(155deg,rgba(35,25,15,.96),rgba(8,7,5,.96));
+    box-shadow:0 4px 10px rgba(0,0,0,.52),inset 0 0 0 1px rgba(255,224,151,.06);
+}
+
+.home-card-secondary:nth-child(odd){justify-self:start;}
+.home-card-secondary:nth-child(even){justify-self:end;}
+.home-card-secondary:nth-child(3),
+.home-card-secondary:nth-child(5),
+.home-card-secondary:nth-child(7){margin-inline-start:0;}
+.home-card-secondary:nth-child(4),
+.home-card-secondary:nth-child(6),
+.home-card-secondary:nth-child(8){margin-inline-end:0;}
+
+.home-card-secondary .home-card-icon{
+    width:100%;
+    height:59px;
+    border:0;
+    border-bottom:1px solid rgba(198,151,65,.62);
+    border-radius:10px 10px 0 0;
+    box-shadow:inset 0 0 10px rgba(220,166,64,.08);
+}
+
+.home-card-secondary .home-card-label{
+    align-self:stretch;
+    padding:2px 3px 1px;
+    background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));
+    font-size:13px;
+    line-height:18px;
+}
+
+.home-card-utility{
+    display:grid;
+    grid-template-columns:1fr;
+    grid-template-rows:52px 24px;
+    align-items:stretch;
+    justify-items:stretch;
+    height:78px;
+    overflow:hidden;
+    border:1px solid rgba(186,137,57,.76);
+    border-radius:9px;
+    background:linear-gradient(180deg,rgba(38,26,15,.96),rgba(9,8,6,.96));
+    box-shadow:0 3px 8px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,224,151,.05);
+}
+
+.home-card-utility .home-card-icon{
+    width:100%;
+    height:52px;
+    margin:0;
+    border-radius:8px 8px 0 0;
+    border-right:0;
+    border-bottom:1px solid rgba(174,127,55,.55);
+}
+
+.home-card-utility .home-card-label{
+    align-self:stretch;
+    padding:0 4px;
+    background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));
+    font-size:15.5px;
+    line-height:23px;
+    text-align:center;
+    letter-spacing:.02em;
+}
+
+.home-gold-display{
+    font-family:
+        "標楷體",
+        "DFKai-SB",
+        "BiauKai",
+        "KaiTi",
+        serif;
+
+    font-size:19px;
+    font-weight:bold;
+
+    color:#8a8a8a;
+
+    text-shadow:
+        0 2px 3px rgba(0,0,0,.6);
+
+    position:relative;
+    z-index:2;
+
+    padding:14px 0 0 8px;
+}
+
+.main-button{
+    width:100%;
+    padding:10px;
+    border:1px solid var(--theme-border);
+    border-radius:9px;
+
+    /*
+       ★ 修正（依照使用者要求，統一色系）：
+       原本是金色實心漸層，改成跟主城
+       8大按鈕標籤同一種深紅漸層+金字。
+    */
+
+    background:var(--theme-accent-bg);
+    color:var(--theme-text-gold);
+
+    font-size:14px;
+    font-weight:bold;
+    box-shadow:
+        0 2px 0 #1a0806,
+        0 3px 6px rgba(0,0,0,.4);
+}
+
+.main-button:active{
+    transform:translateY(1px);
+    box-shadow:
+        0 1px 0 #1a0806,
+        0 2px 4px rgba(0,0,0,.4);
+}
+
+/* =====================================================
+   主城
+===================================================== */
+
+.home-castle{
+    font-size:60px;
+    text-align:center;
+    padding:10px;
+}
+
+.home-stat{
+    line-height:1.8;
+    font-size:20px;
+}
+
+/* =====================================================
+   地圖
+===================================================== */
+
+/*
+   ★ 修正（依照使用者要求，練功區改成
+   純文字列表）：
+   拿掉原本的卡片樣式（.map-card這一整組
+   不再使用，保留其他頁面如果還有引用
+   到.map-title/.map-level這種通用類名
+   不受影響，只是這裡改用全新的
+   .training-zone-item這組樣式）。
+
+   純文字、靠左對齊，跟主城的
+   .home-text-menu-item是同一種調性
+   （灰字+陰影，沒有任何方塊背景/邊框）。
+   未解鎖的地區用.locked調暗、
+   cursor改成not-allowed的視覺提示，
+   但還是可以點（點下去資訊框會告訴
+   玩家需要多少等級，不是完全點不動）。
+*/
+
+#trainingPage{
+    position:relative;
+    min-height:100%;
+}
+
+/*
+   ★ 修正（依照使用者回報，改用
+   position:fixed取代不可靠的
+   background-attachment:fixed，同時
+   把調暗遮罩直接疊進同一個
+   background-image裡的第一層漸層，
+   不用再另外一個::before元素）：
+   linear-gradient畫一層半透明黑色，
+   疊在url()這張圖片「上面」（CSS的
+   background-image多層語法，逗號前面
+   的先寫、視覺上蓋在後面那層的上方），
+   一次就同時做到「固定背景」+
+   「背景調暗」兩件事。
+*/
+
+.training-bg-fixed-layer{
+    position:absolute;
+    inset:0;
+    z-index:0;
+
+    background-image:
+        linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.4)),
+        url(../assets/ui/training-background.jpg);
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+
+    pointer-events:none;
+}
+
+.training-zone-list{
+    position:relative;
+    z-index:2;
+
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+
+    padding:16px 0 16px 14px;
+
+    text-align:left;
+}
+
+.training-zone-item{
+    font-size:17px;
+    font-weight:bold;
+
+    color:#e8ddc7;
+
+    /*
+       ★ 修正（依照使用者要求，「文字
+       不要有黑邊了，改成整個文字框加入
+       一點點灰色底框」）：
+       黑色描邊拿掉，改成用padding+
+       半透明灰色background做出一個貼合
+       文字的小底框，視覺上更乾淨、
+       比純黑邊柔和，同時因為背景圖也
+       調暗了，這個底框的對比度已經
+       足夠讓文字讀得清楚，不需要再靠
+       黑邊硬摳輪廓。
+    */
+
+    text-shadow:
+        0 2px 4px rgba(0,0,0,.8);
+
+    background:rgba(120,110,95,.35);
+
+    padding:4px 10px;
+    border-radius:6px;
+
+    cursor:pointer;
+
+    width:fit-content;
+
+    -webkit-tap-highlight-color:transparent;
+
+    transition:transform .12s ease;
+}
+
+.training-zone-item:active{
+    transform:scale(.96);
+}
+
+.training-zone-item.locked{
+    color:#c9bfa8;
+    opacity:.7;
+
+    /*
+       ★ 未解鎖的地區維持同一種灰底框，
+       只是透明度略低、文字色偏暗一點，
+       跟已解鎖的地區做出區別，但一樣
+       靠灰底框保持清楚可讀，不會糊進
+       背景裡。
+    */
+
+}
+
+.game-map{
+    width:100%;
+    height:calc(100% - 153px);
+    position:relative;
+    overflow:hidden;
+    border-radius:14px;
+
+    background:
+        repeating-linear-gradient(
+            45deg,
+            #245b2c 0,
+            #245b2c 20px,
+            #286532 20px,
+            #286532 40px
+        );
+
+    border:2px solid #3b7a3d;
+}
+
+.tree{
+    position:absolute;
+    font-size:30px;
+    pointer-events:none;
+}
+
+/*
+   ★ 修正（地圖重新設計）：
+   原本玩家移動是直接把left/top改成新座標，
+   完全沒有transition，等於是瞬間移動，
+   跟遊戲整體「有回合、有動畫」的質感很不搭。
+   現在玩家角色改成一步一步走過去
+   （JS那邊會把整段路徑拆成一格一格，
+   搭配下面這個0.22秒的transition，
+   每一步都會有明顯的位移動畫），
+   感覺上真的是「走」過去，不是瞬間貼過去。
+*/
+
+.map-player{
+    position:absolute;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    width:64px;
+
+    padding:3px 2px;
+
+    background:linear-gradient(160deg,#2e2822,#1a1613);
+    border:2px solid #f0b429;
+    border-radius:8px;
+
+    transform:translate(-50%,-50%);
+    z-index:10;
+
+    transition:left .22s linear,top .22s linear;
+
+    box-shadow:0 2px 6px rgba(0,0,0,.5);
+}
+
+.map-player-icon{
+    font-size:20px;
+}
+
+.map-player-name{
+    font-size:9px;
+    font-weight:bold;
+    color:#f2ead9;
+    white-space:nowrap;
+    max-width:60px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.map-player-level{
+    font-size:8px;
+    color:#f0b429;
+}
+
+/*
+   ★ 新增：第二角色的跟隨方塊。
+   不是獨立操作的角色，是「跟在第一角色後面」
+   的藍色小方塊，走過第一角色剛才走過的路徑，
+   有一點延遲，看起來像跟班跟著隊長走，
+   不是自己亂跑。
+*/
+
+.map-follower{
+    position:absolute;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    width:44px;
+
+    padding:2px;
+
+    background:linear-gradient(160deg,#2050c0,#123a8a);
+    border:2px solid #5b8fff;
+    border-radius:6px;
+
+    transform:translate(-50%,-50%);
+    z-index:9;
+
+    transition:left .22s linear,top .22s linear;
+
+    box-shadow:0 2px 5px rgba(0,0,0,.5);
+}
+
+.map-follower-id{
+    font-size:8px;
+    font-weight:bold;
+    color:#f2ead9;
+    white-space:nowrap;
+    max-width:40px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.map-follower-level{
+    font-size:7px;
+    color:#bcd4ff;
+}
+
+/*
+   ★ 修正：怪物原本只有一個emoji，
+   現在改成跟玩家一樣的小卡片樣式，
+   直接在地圖上就看得到名稱跟等級，
+   不用點下去才知道是什麼怪。
+*/
+
+.map-monster{
+    /*
+       ★ 修正（依照使用者要求）：
+       改成固定時間自動觸發戰鬥後，
+       地圖上不再需要顯示怪物圖示假裝巡邏，
+       直接整個隱藏，不用刪除HTML結構
+       （避免牽動其他還在參照這些id的地方），
+       單純讓它們永遠不顯示就好。
+    */
+
+    display:none;
+}
+
+.map-monster-icon{
+    font-size:16px;
+}
+
+.map-monster-name{
+    font-size:8px;
+    font-weight:bold;
+    color:#f2ead9;
+    white-space:nowrap;
+}
+
+.map-monster-level{
+    font-size:7px;
+    color:#f0a0a0;
+}
+
+/* =====================================================
+   戰鬥
+===================================================== */
+
+#battlePage{
+    /*
+       ★ V96：底部固定自動戰鬥面板已移除。
+       真正生效的 in-battle 規則會把底部 padding 收回，
+       讓戰鬥資訊可延伸到畫面最下方。
+    */
+
+    padding:4px 6px 90px;
+}
+
+#battlePage.active{
+    display:block;
+
+    /* V96 ROOT FIX：戰鬥頁本身不再當 scroll owner。
+       戰鬥紀錄 #battleInfo 才是唯一需要垂直捲動的區域，
+       避免 Samsung Browser 在可視高度變化時讓整頁重新捲動/重排。 */
+    height:100%;
+    overflow:hidden;
+}
+
+.battle-wrap{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+
+    /*
+       ★ 修正（真的抓到「自動戰鬥面板消失」的
+       原因，感謝提供地圖頁面的對照）：
+       這裡原本用overflow:hidden，代表「超出這個
+       容器範圍的東西，直接裁切消失，不會有
+       任何提示」。自動戰鬥面板現在排在整個
+       容器最後面，只要前面所有東西加起來的
+       總高度稍微超出容器本身高度一點點，
+       面板就會是第一個被默默裁掉、
+       變成「憑空消失」的——這正是問題所在。
+
+       之前為了徹底避免捲動才設成hidden，
+       但現在看來這個設定的代價太高：
+       只要高度計算有任何一點誤差，
+       就會讓整個功能區塊完全消失、
+       使用者連捲動都救不回來，
+       比「偶爾需要滑一下」嚴重得多。
+
+       改回overflow-y:auto，當作安全機制——
+       如果計算精準，畫面依然完全貼合、
+       不會捲動；但萬一計算有誤差，
+       使用者至少還能滑動看到、用到
+       被擠出去的部分，不會整個東西消失不見。
+    */
+
+    /* V96：外層固定，不讓整個戰鬥頁跟著戰鬥紀錄捲動。 */
+    overflow:hidden;
+
+    gap:4px;
+}
+
+.battle-title{
+    flex:0 0 21px;
+    height:21px;
+    text-align:center;
+    font-size:16px;
+    font-weight:bold;
+    line-height:21px;
+}
+
+.battle-monsters{
+    /*
+       ★ 修正（依照使用者指正，改回不主動長大）：
+       上一輪為了「按鈕區緊貼人物卡牌、不要留
+       一大段空白」，把這裡改成flex-grow吃掉
+       剩餘空間，但這樣做有風險：怪物最多可能
+       排到兩排（第一排放滿的話，第二排就會
+       跟著出現），這個容器帶著flex-shrink:1，
+       一旦被算成需要縮小，兩排怪物卡片就可能
+       被壓縮、跟下面的回合倒數框重疊。
+
+       改回不主動長大也不被動縮小
+       （flex:0 0 auto），單純依內容（怪物卡片）
+       自然決定高度，兩排怪物也不會被擠壓、
+       不會跟回合倒數框疊在一起。
+
+       「吸收剩餘空間、讓按鈕區貼齊人物卡牌」
+       這件事，改成交給下面新增的
+       .battle-monster-gap-filler負責，
+       這個spacer本身沒有任何內容，
+       不會有「兩排怪物卡片溢出」這種風險。
+    */
+
+    flex:0 0 auto;
+    min-height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+    width:270px;
+    max-width:100%;
+    margin-left:auto;
+    margin-right:auto;
+    overflow:visible;
+    padding:2px 0;
+}
+
+.battle-monster-gap-filler{
+    flex:1 1 0;
+    min-height:0;
+}
+
+
+.battle-monster{
+    position:relative;
+    width:82px;
+    height:90px;
+    padding:4px 3px;
+
+    background:#000;
+    border:1px solid #8a6a3a;
+    border-radius:7px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+
+    /*
+       ★ 修正：
+       原本overflow:hidden會把爆擊時
+       故意放大的傷害數字直接裁掉，
+       爆擊效果做了半天卻被卡片邊界吃掉一半。
+       拿掉之後數字可以真的「衝出」卡片，
+       蓋到旁邊的卡片也沒關係，
+       這樣才有爆擊該有的震撼感。
+    */
+
+    font-size:7px;
+
+    transition:
+        border-color .15s,
+        box-shadow .15s,
+        opacity .15s;
+}
+
+.battle-monster-icon{
+    width:30px;
+    height:30px;
+    flex:0 0 30px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:24px;
+}
+
+.battle-monster-name{
+    width:100%;
+    font-size:10px;
+    line-height:12px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.battle-monster-level{
+    font-size:9px;
+    line-height:11px;
+}
+
+.monster-status-badges{
+    display:flex;
+    justify-content:center;
+    gap:2px;
+    min-height:12px;
+    line-height:12px;
+    font-size:11px;
+}
+
+.monster-status-badge.burn{
+    animation:burnPulse 1s ease-in-out infinite;
+}
+
+.monster-status-badge.rage{
+    animation:ragePulse 1s ease-in-out infinite;
+}
+
+.monster-status-badge.freeze{
+    animation:freezeShiver 1.5s ease-in-out infinite;
+}
+
+@keyframes burnPulse{
+    0%,100%{opacity:1;}
+    50%{opacity:.5;}
+}
+
+@keyframes ragePulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.25);}
+}
+
+@keyframes freezeShiver{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-1px);}
+    75%{transform:translateX(1px);}
+}
+
+/*
+   ★ 新增：冰封/燃燒的卡片包覆效果。
+   之前只有一個小圖示提示，不夠直覺，
+   改成用一層半透明的顏色蓋住整張卡片，
+   像是真的被冰塊/火焰包住一樣，
+   一眼就能看出這隻正處在異常狀態，
+   不用細看小圖示才知道。
+   預設是透明看不到（opacity:0），
+   有對應狀態時才用show這個class顯示出來。
+*/
+
+.card-status-overlay{
+    position:absolute;
+    inset:0;
+
+    border-radius:inherit;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    z-index:3;
+
+    transition:opacity .2s ease;
+}
+
+.card-status-overlay.show{
+    opacity:1;
+}
+
+.freeze-overlay{
+    background:
+        linear-gradient(
+            160deg,
+            rgba(147,220,255,.45),
+            rgba(59,160,230,.3)
+        );
+
+    border:2px solid rgba(200,240,255,.75);
+
+    box-shadow:
+        inset 0 0 10px rgba(180,230,255,.6);
+}
+
+/*
+   ★ 真正抓到問題根源了（不是背景色、不是殘留狀態）：
+
+   這兩個動畫（閃爍效果）原本直接寫在
+   .burn-overlay / .freeze-overlay這個「基礎class」上，
+   沒有限定只在.show的時候才套用。
+
+   CSS動畫有個特性：只要animation屬性生效中，
+   它對opacity的控制權會蓋過同一個屬性的
+   靜態設定（不管那個靜態設定的優先權多高），
+   等於是.card-status-overlay原本設定的
+   「opacity:0，預設看不見」完全被這個動畫覆蓋掉，
+   變成不管有沒有加.show，
+   每一張怪物卡片都會一直在0.8~1.0之間閃爍——
+   這才是你一直看到「莫名燃燒效果」的真正原因，
+   從一開始這個功能做出來就帶著這個bug，
+   跟殘留狀態、背景色都沒有關係。
+
+   修正方式：把animation改成只在
+   .burn-overlay.show／.freeze-overlay.show
+   的時候才套用，沒有show這個class的時候，
+   完全不會有任何動畫在跑，
+   乖乖維持opacity:0的隱藏狀態。
+*/
+
+.freeze-overlay.show{
+    animation:freezeOverlayShimmer 2s ease-in-out infinite;
+}
+
+@keyframes freezeOverlayShimmer{
+    0%,100%{opacity:.85;}
+    50%{opacity:1;}
+}
+
+.burn-overlay{
+    background:
+        linear-gradient(
+            160deg,
+            rgba(255,120,20,.4),
+            rgba(255,50,0,.28)
+        );
+
+    border:2px solid rgba(255,160,60,.75);
+
+    box-shadow:
+        inset 0 0 10px rgba(255,120,30,.6);
+}
+
+.burn-overlay.show{
+    animation:burnOverlayFlicker 1s ease-in-out infinite;
+}
+
+@keyframes burnOverlayFlicker{
+    0%,100%{opacity:.8;}
+    50%{opacity:1;}
+}
+
+.monster-hp,
+.monster-sp{
+    position:relative;
+    width:72px;
+    height:12px;
+    margin-top:2px;
+    border-radius:5px;
+    overflow:hidden;
+}
+
+.monster-hp{
+    background:#3a1111;
+}
+
+.monster-sp{
+    background:#101f45;
+}
+
+.monster-hp-inner{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background:linear-gradient(180deg,#f0605c,#c81e1e);
+    transition:width .25s ease;
+}
+
+.monster-sp-inner{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background:linear-gradient(180deg,#5b8fff,#2050c0);
+    transition:width .25s ease;
+}
+
+.monster-bar-text{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    z-index:2;
+
+    color:#f2ead9;
+    font-size:8px;
+    font-weight:bold;
+
+    text-shadow:0 1px 2px #000;
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+.battle-monster.target{
+    border-color:#facc15;
+    box-shadow:0 0 7px rgba(250,204,21,.6);
+}
+
+/* V99 — 手動選擇攻擊目標時的準星放大為原本 2 倍。
+   只改視覺尺寸，不改可選目標、命中或攻擊判定。 */
+.battle-monster.targetable{
+    cursor:crosshair;
+}
+
+.battle-monster.targetable::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:60px;
+    height:60px;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    pointer-events:none;
+    z-index:40;
+    background:
+        linear-gradient(#ffd84d,#ffd84d) center/3px 100% no-repeat,
+        linear-gradient(90deg,#ffd84d,#ffd84d) center/100% 3px no-repeat,
+        radial-gradient(circle at center,transparent 0 26%,#ffd84d 29% 34%,transparent 37% 100%);
+    filter:drop-shadow(0 0 4px rgba(255,216,77,.9));
+    animation:battleTargetReticleFlash .38s ease-in-out infinite;
+}
+
+@keyframes battleTargetReticleFlash{
+    0%,100%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+        filter:drop-shadow(0 0 4px rgba(255,216,77,.9));
+    }
+    50%{
+        opacity:.35;
+        transform:translate(-50%,-50%) scale(1.14);
+        filter:drop-shadow(0 0 7px rgba(255,235,120,1));
+    }
+}
+
+.battle-monster.dying{
+    pointer-events:none;
+}
+
+.battle-monster.dead{
+    opacity:.16;
+    pointer-events:none;
+}
+
+.battle-middle{
+    flex:0 0 auto;
+
+    /*
+       ★ 真的抓到問題根源了（這次是綠框那個怪異空隙）：
+       這裡原本是flex:1 1 auto，代表這個容器會
+       主動把.battle-wrap裡「剩下的空間」全部佔滿，
+       但裡面唯一的子元素battleActionRegion
+       並沒有跟著撐滿到那個被撐大的高度
+       （它自己是用內容決定高度，不是flex:1），
+       結果.battle-middle自己被撐得比內容還高，
+       多出來的空間就變成按鈕/技能區跟
+       角色卡片之間那段沒人用的空白——
+       這正是「綠框跟人物卡片中間有一大段空隙」
+       的真正原因，不是角色卡片被推下去，
+       是這個容器自己先被撐大了。
+
+       改成flex:0 0 auto，讓這個容器
+       乖乖依內容多高就多高，不再主動吃掉
+       用不到的剩餘空間，空隙自然消失，
+       按鈕/技能區會直接貼著怪物區跟角色卡片，
+       不會再有中間那段莫名其妙的黑洞。
+    */
+
+    min-height:0;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:4px;
+
+    /* V99：battleInfo 才是戰鬥頁唯一的垂直捲動區。
+       這裡改回 visible，讓上下加高的技能覆蓋層不會被 battle-middle
+       裁切或產生第二個捲軸。 */
+    overflow:visible;
+}
+
+/* V99 — 回合倒數框改成內容多寬就多寬，置中顯示。
+   目標名稱不再放進這個框；#battleTarget 仍保留為隱藏狀態，
+   讓既有 JS 可以安全更新文字而不必改動戰鬥邏輯。 */
+.turn-target-row{
+    flex:0 0 46px;
+    height:46px;
+    width:max-content;
+    min-width:112px;
+    max-width:calc(100% - 24px);
+    align-self:center;
+    /* V101：依實機畫面再把回合倒數小框往上移，
+       只改視覺位置，不改原本佔位高度。 */
+    transform:translateY(-30px);
+    transition:transform .16s ease-out;
+
+    background:#1a1613;
+    border:1px solid #8a6a3a;
+    border-radius:8px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:7px;
+    padding:5px 13px;
+
+    overflow:hidden;
+}
+
+/* V104：技能選擇框打開時，回合倒數框同步上移，
+   讓它緊貼技能選擇框的上緣；關閉技能框後恢復原位。
+   只改視覺位置，不改倒數計時或戰鬥流程。 */
+.turn-target-row.skill-picker-open{
+    transform:translateY(-82px);
+}
+
+.turn-target-row .turn-number{
+    font-size:15px;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+.turn-target-row .timer{
+    font-size:26px;
+    line-height:1;
+    font-weight:bold;
+    color:#f0b429;
+}
+
+.turn-target-row .battle-target-inline{
+    display:none;
+}
+
+.turn-number{
+    font-size:13px;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+.timer{
+    font-size:21px;
+    line-height:22px;
+    font-weight:bold;
+    color:#f0b429;
+    min-width:28px;
+    text-align:center;
+}
+
+.timer.danger{
+    color:#ef4444;
+}
+
+/*
+   ★ 新增（依照使用者要求）：
+   每讀秒一次，數字放大再瞬間縮小回來，
+   製造「跳動」的視覺效果，
+   讓倒數計時更顯眼。
+*/
+
+.timer.timer-tick{
+    animation:timerTick .35s ease-out;
+}
+
+@keyframes timerTick{
+    0%{
+        transform:scale(1.55);
+    }
+    100%{
+        transform:scale(1);
+    }
+}
+
+.battle-target-inline{
+    flex:1;
+
+    font-size:12px;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    text-align:right;
+
+    color:#e8ddc7;
+}
+
+/* V99 — 選目標提示改成「文字需要多少寬就多少寬」的置中小框，
+   同時加入真正可取消本次誤選的返回鍵。外層仍保留 66px 行動區
+   佔位，所以切換到選目標狀態時角色卡與戰鬥資訊不會跳動。 */
+.battle-target-prompt{
+    flex:0 0 auto;
+    width:max-content;
+    max-width:calc(100% - 24px);
+    min-height:56px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:row;
+    gap:11px;
+    align-self:center;
+    padding:8px 11px 8px 15px;
+    transform:translateY(-8px);
+    border:2px solid #c79b45;
+    border-radius:8px;
+    background:linear-gradient(180deg,rgba(35,26,15,.97),rgba(14,10,7,.98));
+    box-shadow:inset 0 0 12px rgba(240,180,41,.08);
+    text-align:center;
+}
+
+.battle-target-prompt-copy{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1px;
+}
+
+.battle-target-prompt-action{
+    color:#ffe27a;
+    font-size:16px;
+    font-weight:900;
+    line-height:20px;
+    white-space:nowrap;
+}
+
+.battle-target-prompt-hint{
+    color:#fff4cf;
+    font-size:14px;
+    font-weight:700;
+    line-height:17px;
+    animation:battleTargetPromptFlash .55s ease-in-out infinite;
+}
+
+.battle-target-back{
+    flex:0 0 auto;
+    min-width:52px;
+    height:36px;
+    padding:0 9px;
+    border:1px solid #a78348;
+    border-radius:6px;
+    background:#2b2116;
+    color:#ffe7a6;
+    font-size:13px;
+    font-weight:900;
+}
+
+#battleActionRegion.target-selecting{
+    min-height:66px;
+    justify-content:center;
+}
+
+#battleActionRegion.target-selecting #battleCommandRow{
+    display:none!important;
+}
+
+#battleActionRegion.target-selecting .battle-target-prompt{
+    display:flex;
+}
+
+@keyframes battleTargetPromptFlash{
+    0%,100%{opacity:1;text-shadow:0 0 5px rgba(255,216,77,.55);}
+    50%{opacity:.45;text-shadow:0 0 12px rgba(255,216,77,1);}
+}
+
+/*
+   ★ 修正（依照使用者要求，版面清理）：
+   戰鬥資訊這個功能整個拿掉了，
+   之前為了它的展開/收合搞出一連串
+   絕對定位、佔位區塊、z-index疊放順序的補丁，
+   現在全部一起清掉，版面回歸單純。
+*/
+
+.battle-menu{
+    flex:0 0 66px;
+    height:66px;
+
+    display:grid;
+
+    /*
+       ★ 修正（依照使用者要求）：
+       原本2欄x2列（4顆按鈕），現在「技能」
+       變成跟其他按鈕一樣大小的第5顆按鈕，
+       改成3欄x2列（6格，5顆按鈕+1格留空），
+       這樣5顆按鈕大小完全一致。
+    */
+
+    grid-template-columns:1fr 1fr 1fr;
+    grid-template-rows:1fr 1fr;
+
+    gap:5px;
+}
+
+/*
+   ★ 修正（依照使用者要求，統一成同一套
+   金色/古銅色RPG風格）：
+   原本這五顆戰鬥指令按鈕（普通攻擊/防禦/
+   物品/逃脫/技能）分別用藍、綠、紫等
+   互不相干的顏色，跟遊戲其他地方（卡片、
+   邊框、主要按鈕main-button）統一使用的
+   金色系完全對不上，看起來像另一套介面。
+
+   現在全部改用同一種「深木底＋古銅色邊框＋
+   米白文字」的樣式，只留一個例外：技能鈕
+   （最主要、最常用的行動）用main-button
+   同一套金色漸層，當作視覺上的主要強調色，
+   其餘四顆維持一致的深色系，靠圖示（⚔️🛡️
+   🎒🏃）跟文字分辨用途，不再靠色相分辨。
+*/
+
+.menu-button{
+    min-width:0;
+    min-height:0;
+
+    border:1px solid var(--theme-border);
+    border-radius:7px;
+
+    color:var(--theme-text-gold);
+
+    font-size:13px;
+    font-weight:bold;
+
+    padding:3px;
+
+    /*
+       ★ 修正（依照使用者要求，統一色系）：
+       按鈕是「可以點的東西」，跟主城8大
+       按鈕裡「深紅色標籤（可點的文字）」
+       是同一種角色，改用--theme-accent-bg
+       （深紅漸層），不是圖示格那種深棕色。
+    */
+
+    background:var(--theme-accent-bg);
+
+    box-shadow:
+        0 2px 0 #1a0806,
+        0 3px 6px rgba(0,0,0,.35);
+}
+
+.menu-button:active{
+    transform:translateY(1px);
+    box-shadow:
+        0 1px 0 #1a0806,
+        0 2px 4px rgba(0,0,0,.35);
+}
+
+/*
+   ★ 新增（依照使用者要求）：
+   全部按鈕統一加上「按下瞬間光暈」+
+   「波紋擴散」這兩個動畫效果。
+
+   為了不用一個個去改95個按鈕各自的
+   HTML/CSS，這裡用兩個技巧：
+   1. button:active這個偽類別本身是
+      瀏覽器原生就會在「手指按著還沒放開」
+      的當下觸發，純CSS就能做「按下瞬間
+      閃一下光暈」，不用JS。
+   2. 波紋從觸碰點往外擴散，因為需要知道
+      「按在哪個座標」，純CSS做不到，
+      這部分用JS在document層級統一監聽
+      所有button的點擊，動態生成一個
+      會擴散消失的小圓點——好處是現在
+      95個按鈕、以後新增的按鈕，完全
+      不用另外寫一行程式碼就自動套用。
+*/
+
+button{
+    position:relative;
+    overflow:hidden;
+}
+
+button:active{
+    filter:brightness(1.25)
+        drop-shadow(0 0 6px rgba(240,180,41,.7));
+}
+
+.btn-ripple{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,.55);
+    transform:scale(0);
+    pointer-events:none;
+    animation:btnRippleExpand .5s ease-out forwards;
+}
+
+@keyframes btnRippleExpand{
+
+    0%{
+        transform:scale(0);
+        opacity:.6;
+    }
+
+    100%{
+        transform:scale(2.6);
+        opacity:0;
+    }
+
+}
+
+/*
+   ★ 新增（依照使用者要求）：
+   邊框呼吸發光動畫，套用在遊戲裡幾個
+   主要的「有邊框」容器類別上（卡片、
+   彈出視窗方塊），純CSS @keyframes，
+   不用碰任何HTML結構。
+*/
+
+@keyframes borderGlowBreathe{
+
+    0%,100%{
+        box-shadow:
+            0 2px 6px rgba(0,0,0,.35),
+            inset 0 1px 0 rgba(240,180,41,.08),
+            0 0 4px rgba(240,180,41,.15);
+        border-color:#8a6a3a;
+    }
+
+    50%{
+        box-shadow:
+            0 2px 6px rgba(0,0,0,.35),
+            inset 0 1px 0 rgba(240,180,41,.08),
+            0 0 12px rgba(240,180,41,.55);
+        border-color:#f0b429;
+    }
+
+}
+
+.card,
+.item-modal-box,
+.home-feature-modal:not(#trainingZoneModal) > .home-feature-modal-box{
+    animation:borderGlowBreathe 3.6s ease-in-out infinite;
+}
+
+/*
+   ★ 修正（依照使用者要求，統一色系）：
+   這三個原本是「重新指定」跟.menu-button
+   基礎樣式一樣的舊深棕色，現在.menu-button
+   本身已經改成統一色系的深紅漸層，這三行
+   等於在複寫一份過時的顏色，直接拿掉、
+   讓它們自然繼承.menu-button最新的
+   統一色系就好。「技能」按鈕（下面
+   .menu-button.skill）刻意保留原本的
+   金色高亮，那是功能性的設計（讓玩家
+   一眼認出戰鬥中最常用的技能按鈕），
+   不屬於這次「統一色系」要調整的範圍。
+*/
+
+.menu-button.skill{
+    background:linear-gradient(180deg,#f0b429,#c9791e);
+    color:#2a1706;
+    border-color:#f0b429;
+}
+
+/*
+   ★ 新增：常駐技能快捷列（取代原本的技能選單彈窗）。
+   4個技能格固定顯示在主要行動按鈕下方，
+   輪到新角色行動時內容會自動換成
+   那個角色裝備的技能。
+*/
+
+/*
+   ★ 修正（依照使用者要求，改成非常駐顯示的覆蓋層）：
+   技能格原本是常駐畫面上的一塊固定區域，
+   現在改成預設隱藏（display:none），
+   只有按「✨ 技能」按鈕（toggleSkillQuickBar()）
+   才會顯示出來，顯示時用position:absolute
+   蓋住上面那一整排戰鬥指令按鈕（普通攻擊/防禦/
+   技能/物品/逃脫），不再額外佔用版面高度、
+   不會把下面的角色卡片往下推。
+
+   父層（包住mainBattleMenu跟這個覆蓋層的
+   那個flex row）已經設定position:relative，
+   所以這裡inset:0就能精準蓋住那一排按鈕，
+   不多不少。
+*/
+
+/* V99 — 技能選擇框左右內縮、上下加高。
+   不改 battleCommandRow 的固定佔位，只讓技能覆蓋層向上下延伸，
+   因此開關技能選單不會推動角色卡或戰鬥資訊。 */
+.skill-quick-bar{
+    display:none;
+
+    position:absolute;
+    left:10px;
+    right:10px;
+    /* V101：技能選擇框整體往上移，同時保留足夠高度，
+       避免下緣壓到角色卡。 */
+    top:-76px;
+    bottom:0;
+
+    z-index:30;
+
+    background:#000;
+    border:1px solid #8a6a3a;
+    border-radius:8px;
+
+    padding:3px;
+    flex-direction:column;
+    gap:4px;
+}
+
+.skill-quick-bar.show{
+    display:flex;
+}
+
+/* V99：原本右上角的小 X 改成明確的「返回」。 */
+.skill-quick-close{
+    position:static;
+    align-self:flex-end;
+    flex:0 0 30px;
+    width:64px;
+    height:30px;
+    padding:0 10px;
+
+    border:1px solid #8a6a3a;
+    border-radius:5px;
+
+    background:#2b2116;
+    color:#ffe7a6;
+
+    font-size:13px;
+    font-weight:900;
+    line-height:28px;
+
+    z-index:31;
+}
+
+.skill-quick-grid{
+    width:100%;
+    min-height:0;
+    flex:1 1 auto;
+
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr 1fr;
+    gap:6px;
+}
+
+.skill-quick-button{
+    min-height:80px;
+    padding:6px 3px 5px;
+    border:1px solid #8a6a3a;
+    border-radius:6px;
+    background:#000;
+    color:#fff;
+    text-align:center;
+    font-size:12px;
+    line-height:1.18;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+}
+
+.skill-quick-button:disabled,
+.skill-quick-button.sp-insufficient{
+    background:#151412;
+    color:#77716a;
+    border-color:#4a3f2e;
+    opacity:1;
+}
+
+.skill-quick-button .sq-icon-wrap{
+    position:relative;
+    display:block;
+    width:40px;
+    height:40px;
+    flex:0 0 40px;
+    border:1px solid rgba(218,176,88,.72);
+    border-radius:5px;
+    overflow:hidden;
+    background:#100d09;
+}
+
+.skill-quick-button .sq-icon-image{
+    display:block;
+    width:100%;
+    height:100%;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+}
+
+.skill-quick-button .sq-icon-fallback{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transform:scale(.72);
+    transform-origin:center;
+}
+
+.skill-quick-button.sp-insufficient .sq-icon-image,
+.skill-quick-button.sp-insufficient .sq-icon-fallback{
+    filter:grayscale(1) brightness(.34);
+}
+
+.skill-quick-button .sq-sp-block{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.62);
+    color:#ffcf59;
+    font-size:11px;
+    line-height:13px;
+    font-weight:900;
+    text-shadow:0 1px 2px #000;
+    z-index:3;
+}
+
+.skill-quick-button .sq-name{
+    display:block;
+    width:100%;
+    font-size:11px;
+    line-height:15px;
+    font-weight:900;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.skill-quick-button .sq-cost{
+    display:block;
+    width:100%;
+    font-size:10px;
+    line-height:14px;
+    color:#9fd4ff;
+    white-space:nowrap;
+}
+
+.skill-quick-button.sp-insufficient .sq-cost{
+    color:#8a8177;
+}
+
+.sub-menu{
+    flex:0 0 158px;
+    height:158px;
+    max-height:158px;
+
+    display:none;
+    flex-direction:column;
+
+    gap:5px;
+
+    overflow-y:auto;
+
+    padding:2px;
+}
+
+.sub-menu.show{
+    display:flex;
+}
+
+/*
+   ★ 技能選單展開模式（新增）：
+   點「技能」按鈕之後，選單不再侷限在
+   原本那個小小的158px高度框框裡，
+   而是蓋住戰鬥畫面大部分空間
+   （怪物區、回合資訊、戰鬥紀錄那一塊），
+   讓玩家可以在比較大的版面上看清楚每個技能，
+   選完技能、或按下方的返回按鈕之後
+   就會自動收合回原本大小。
+*/
+
+.sub-menu.expanded{
+    position:absolute;
+    left:6px;
+    right:6px;
+    top:28px;
+    bottom:140px;
+
+    height:auto;
+    max-height:none;
+
+    z-index:500;
+
+    background:#0c0b0a;
+    border:2px solid #8a6a3a;
+    border-radius:12px;
+
+    padding:8px;
+
+    box-shadow:0 8px 24px rgba(0,0,0,.6);
+}
+
+.sub-menu.expanded .sub-button{
+    min-height:56px;
+    font-size:15px;
+}
+
+.sub-menu-pinned-back{
+    flex:0 0 auto;
+    width:100%;
+
+    padding:8px;
+    margin-bottom:4px;
+
+    border:0;
+    border-radius:7px;
+
+    background:#4a3f2e;
+    color:#f0b429;
+
+    font-size:14px;
+    font-weight:bold;
+
+    text-align:center;
+}
+
+.sub-button{
+    width:100%;
+    flex:0 0 auto;
+    min-height:40px;
+
+    border:0;
+    border-radius:7px;
+
+    padding:6px 10px;
+
+    background:#2e2822;
+    color:white;
+
+    font-size:13px;
+    line-height:17px;
+
+    text-align:left;
+    overflow:visible;
+}
+
+.sub-button.skill-sp-insufficient{
+    background:#3a332c!important;
+    color:#b3a58c!important;
+    opacity:.65;
+    cursor:not-allowed;
+}
+
+/* =====================================================
+   V106 — 戰鬥背包：只顯示「補品 / 符咒」
+
+   根本修正：
+   舊 itemMenu 共用 .sub-menu.expanded，會用 top/bottom 去量
+   battleActionRegion 的短高度。V105 又把五大指令改成固定 66px
+   圖像面板後，這套 expanded 幾何已經不再可靠，可能出現打開
+   背包卻看不到內容的情況。
+
+   V106 不再讓戰鬥背包共用那套舊 expanded overlay。
+   改成跟技能快捷框同樣的「固定錨定覆蓋層」：
+   - 不推動角色卡、元素匣、戰鬥資訊框。
+   - 補品直接讀共用 inventoryItems 的六種藥水庫存。
+   - 符咒保留獨立頁籤；目前沒有任何正式符咒物品資料，
+     所以不憑空新增冰封符/結界符，也不自行決定技能等級。
+   - 未來 type:"talisman" 的物品會自動出現在符咒頁籤。
+===================================================== */
+.battle-item-menu{
+    display:none;
+    position:absolute;
+    left:10px;
+    right:10px;
+    top:-116px;
+    height:182px;
+    z-index:35;
+    overflow:hidden;
+    padding:5px;
+    flex-direction:column;
+    gap:5px;
+    background:linear-gradient(180deg,rgba(10,8,6,.99),rgba(18,13,9,.99));
+    border:2px solid #8a6a3a;
+    border-radius:10px;
+    box-shadow:0 7px 20px rgba(0,0,0,.55),inset 0 0 12px rgba(240,180,41,.06);
+}
+
+.battle-item-menu.show{
+    display:flex;
+}
+
+.battle-item-menu-header{
+    flex:0 0 32px;
+    min-height:32px;
+    display:flex;
+    align-items:stretch;
+    gap:5px;
+}
+
+.battle-item-tabs{
+    min-width:0;
+    flex:1 1 auto;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+}
+
+.battle-item-tab,
+.battle-item-close{
+    min-width:0;
+    border:1px solid #8a6a3a;
+    border-radius:6px;
+    background:#251a10;
+    color:#e9dcc4;
+    font-size:12px;
+    font-weight:900;
+    line-height:1;
+}
+
+.battle-item-tab.active{
+    color:#2a1705;
+    background:linear-gradient(180deg,#ffc440,#d8860c);
+    border-color:#ffd86a;
+    box-shadow:inset 0 0 7px rgba(255,245,190,.38);
+}
+
+.battle-item-close{
+    flex:0 0 58px;
+    color:#ffe7a6;
+    background:#2b2116;
+}
+
+.battle-item-list{
+    flex:1 1 auto;
+    min-height:0;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-auto-rows:minmax(55px,1fr);
+    gap:5px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    padding:1px;
+}
+
+.battle-item-card{
+    min-width:0;
+    min-height:55px;
+    padding:5px 4px;
+    border:1px solid rgba(138,106,58,.78);
+    border-radius:7px;
+    background:#090807;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    text-align:center;
+}
+
+.battle-item-card:disabled{
+    opacity:.42;
+    cursor:not-allowed;
+}
+
+.battle-item-card:active:not(:disabled){
+    background:#20170d;
+    border-color:#f0b429;
+}
+
+.battle-item-badge{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:30px;
+    height:20px;
+    padding:0 5px;
+    border:1px solid rgba(255,255,255,.38);
+    border-radius:5px;
+    background:#24140e;
+    color:#ffb6b6;
+    font-size:10px;
+    font-weight:900;
+    line-height:18px;
+}
+
+.battle-item-card.sp .battle-item-badge{
+    background:#101a31;
+    color:#b9d7ff;
+}
+
+.battle-item-card.talisman .battle-item-badge{
+    background:#2a210f;
+    color:#ffe27a;
+}
+
+.battle-item-name{
+    display:block;
+    width:100%;
+    color:#ffe7a6;
+    font-size:10px;
+    font-weight:900;
+    line-height:12px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.battle-item-effect{
+    display:block;
+    width:100%;
+    color:#d8cbb5;
+    font-size:8px;
+    line-height:10px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.battle-item-count{
+    display:block;
+    color:#fff;
+    font-size:9px;
+    line-height:10px;
+    font-weight:900;
+}
+
+.battle-item-empty{
+    grid-column:1/-1;
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    padding:10px;
+    border:1px dashed rgba(138,106,58,.56);
+    border-radius:8px;
+    color:#b9aa91;
+    text-align:center;
+    font-size:11px;
+    line-height:15px;
+}
+
+.battle-item-empty strong{
+    color:#ffe27a;
+    font-size:13px;
+}
+
+/* 戰鬥背包比技能框更高；打開時把回合資訊同步上移，
+   避免被背包蓋住。只改 transform，不改倒數邏輯。 */
+.turn-target-row.battle-item-open{
+    transform:translateY(-122px);
+}
+
+.skill-sp-warning{
+    color:#b3a58c;
+    font-size:11px;
+    font-weight:bold;
+}
+
+/*
+   ★ 修正（依照使用者指定版面重新設計）：
+   自動戰鬥面板簡化成三個元件：
+   標籤（自動戰鬥／自動戰鬥中）、
+   啟動／停止切換鈕、設定鈕。
+   詳細設定（角色/技能/HP%/SP%/自動回城）
+   都收到點「設定」才展開的獨立面板裡，
+   平常這排只佔一小條，不會太擠。
+*/
+
+.auto-setting-panel{
+    flex:0 0 62px;
+    height:62px;
+
+    width:fit-content;
+
+    /*
+       ★ 真的抓到問題根源了：
+       battleActionRegion是display:flex;
+       flex-direction:column，
+       但沒有設定align-items，
+       瀏覽器預設值是stretch——
+       這代表「即使我在這個元素自己身上
+       設定width:fit-content」，
+       只要父層是預設的stretch，
+       子元素還是會被強制拉滿整個父層寬度，
+       width:fit-content完全不會生效，
+       這才是自動戰鬥面板一直「變形」
+       （看起來還是撐滿寬度、跟其他按鈕擠在一起）
+       的真正原因，跟寬度數字設多少都沒關係。
+
+       加上align-self:flex-start，
+       讓這個元素自己跳出stretch的預設行為，
+       這樣width:fit-content才會真正生效。
+    */
+
+    align-self:flex-start;
+
+    /*
+       ★ 修正（真的抓到問題根源了）：
+       這裡原本完全沒有設定z-index，
+       等於預設疊放順序（比0還低），
+       而戰鬥紀錄展開時是z-index:55。
+       只要兩者的版面位置有任何一點點重疊
+       （哪怕只是我算的138px高度稍微算多了
+       幾個像素），z-index比較高的戰鬥紀錄
+       一定會蓋在自動戰鬥面板上面，
+       把它整個「吃掉」看不見——這是疊放順序
+       的問題，不是位置算得準不準的問題，
+       就算位置算到完全精準，只要疊放順序
+       沒設好，未來只要有一丁點誤差
+       還是會被蓋住。
+
+       這裡直接給一個比戰鬥紀錄展開時
+       還高的z-index（99），確保自動戰鬥面板
+       永遠會浮在最上層、永遠看得到、按得到，
+       不管上面戰鬥紀錄展開的高度算得準不準，
+       都不會再被蓋住。
+    */
+
+    position:relative;
+
+    z-index:99;
+
+    background:#3d2e10;
+
+    border:2px solid #f0b429;
+    border-radius:8px;
+
+    padding:6px 8px;
+
+    display:grid;
+
+    /*
+       ★ 修正（依照使用者要求，這次連同
+       「啟動中」狀態的較長文字一起處理）：
+       原本中間兩欄用1fr 1fr，
+       會把兩個按鈕撐開填滿整個父層寬度，
+       導致整條面板看起來又寬又空。
+       改成固定寬度（各82px），
+       面板寬度=標籤欄+兩個按鈕欄+間距+padding，
+       剛好貼合內容，不會多留一大片空白，
+       搭配上面width:fit-content，
+       面板寬度會自動收縮到剛好裝得下這三個東西就好。
+
+       標籤欄之前只抓「自動戰鬥」（4個字）的寬度，
+       但啟動之後文字會變成「自動戰鬥中」（5個字），
+       多一個字就被原本的欄寬擠到裁掉，
+       這裡加寬到72px，兩種狀態的文字都能完整顯示。
+    */
+
+    grid-template-columns:76px 92px 92px;
+
+    gap:6px;
+
+    align-items:center;
+}
+
+.auto-title{
+    font-size:10px;
+    line-height:12px;
+    text-align:left;
+    font-weight:bold;
+    color:#f0b429;
+
+    /*
+       ★ 修正（依照使用者要求）：
+       標籤欄原本只有52px，「自動戰鬥」四個字
+       在這個寬度下常常被擠到換行，
+       欄位加寬到64px、字級稍微縮小，
+       再加上white-space:nowrap強制不換行，
+       確保「自動戰鬥」永遠是一行顯示。
+    */
+
+    white-space:nowrap;
+}
+
+.auto-settings-button{
+    height:46px;
+
+    padding:0 4px;
+
+    border:1px solid #f0b429;
+    border-radius:6px;
+
+    background:#2a1f10;
+    color:#f0b429;
+
+    font-size:11px;
+    font-weight:bold;
+
+    white-space:nowrap;
+}
+
+/*
+   ★ 新增：展開的詳細設定面板。
+   平常display:none，點「設定」才會展開，
+   高度足夠放下角色選擇/自動行動/HP%/SP%/
+   自動回城勾選/確定返回按鈕，
+   跟綠色參考框差不多大。
+*/
+
+/*
+   ★ 修正（依照使用者明確指正）：
+   這個設定面板原本是用一般的文件流排版，
+   展開時會在原本內容「下面多長出一塊」，
+   把整個畫面往下推，要滑動才看得到完整內容，
+   這不是使用者要的效果。
+
+   改成position:absolute蓋住整個
+   battleActionRegion（名字框+按鈕+技能快捷列+
+   自動戰鬥面板那一整塊），
+   展開的時候是「直接蓋在原本的位置上」，
+   不會多佔用任何額外空間、也不會把畫面往下推，
+   關閉之後底下的按鈕原封不動露出來。
+*/
+
+.auto-settings-expanded{
+    position:absolute;
+
+    top:0;
+    left:0;
+    right:0;
+
+    /*
+       ★ 修正（依照使用者指正）：
+       原本用inset:0，蓋住的高度
+       就等於battleActionRegion目前的高度
+       （大概196px左右），但這個設定面板
+       裡面塞了角色選擇/自動行動/HP%/SP%/
+       自動回城勾選/確定返回按鈕，六塊內容，
+       196px根本裝不下，確定/返回按鈕
+       被擠到看不見的地方，還要滑動才找得到。
+
+       改成給一個算好、明確更高的高度(360px)，
+       不再用inset:0跟父層高度綁死。
+       因為這是絕對定位，展開時只是「暫時」
+       蓋到下面角色卡片那一塊，不會讓
+       .battle-wrap整體變高、也不會產生捲軸，
+       關閉之後一樣完全恢復原狀。
+    */
+
+    height:360px;
+
+    /*
+       ★ 同樣的道理，這裡也調高z-index，
+       確保設定面板永遠蓋在戰鬥紀錄之上，
+       不會被蓋住看不到確定/返回按鈕。
+    */
+
+    z-index:98;
+
+    /*
+       ★ 修正（依照使用者要求，統一色系）：
+       原本是綠色邊框、跟遊戲整體金/紅色調
+       不搭，改成跟主城8大按鈕一致的
+       深棕底+金色邊框。
+    */
+
+    background:var(--theme-box-bg);
+
+    border:2px solid var(--theme-border-bright);
+    border-radius:8px;
+
+    padding:10px;
+
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+
+    overflow-y:auto;
+}
+
+.auto-settings-expanded select{
+    background:#17130f;
+    color:#f2ead9;
+    border:1px solid var(--theme-border);
+    border-radius:5px;
+    padding:4px 6px;
+    font-size:12px;
+}
+
+/*
+   ★ 新增（依照使用者要求，讓巡邏頁面的
+   「設定」按鈕也能用）：
+   這個面板原本用position:absolute，
+   定位是相對於battlePage裡面那個
+   固定佈局算出來的，在地圖頁面打開時
+   （面板被暫時搬到document.body底下，
+   見openAutoBattleSettings()）如果還是
+   套用原本的absolute定位，會整個跑版、
+   蓋住畫面奇怪的地方。
+
+   這個class專門給「在地圖頁面打開」這種
+   情境用，改用position:fixed、自己算好
+   一個貼底的浮動視窗位置，跟原本在戰鬥
+   頁面裡的樣子不用一樣，只要能正常操作
+   就好。
+*/
+
+.auto-settings-expanded.floating-modal{
+    position:fixed;
+
+    top:auto;
+    left:6px;
+    right:6px;
+    bottom:80px;
+
+    height:auto;
+    max-height:min(360px,70vh);
+
+    z-index:9999;
+
+    box-shadow:0 4px 16px rgba(0,0,0,.6);
+}
+
+.auto-setting{
+    width:100%;
+    height:26px;
+
+    background:#17130f;
+    color:#f2ead9;
+
+    border:1px solid var(--theme-border);
+    border-radius:5px;
+
+    font-size:9px;
+    padding:0 3px;
+}
+
+.battle-player-row{
+    flex:0 0 116px;
+    height:116px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:8px;
+
+    align-items:flex-end;
+
+    min-height:116px;
+
+    /*
+       ★ 修正（真的抓到問題根源了）：
+       上一輪加的margin-top:auto，是在「畫面高度
+       等於真實手機螢幕」的情況下，用來把一點點
+       剩餘空間平均分配、避免留白卡在中間的技巧。
+
+       但現在整個遊戲已經改成「固定400×860畫布，
+       整體縮放貼合螢幕」的做法，畫布本身的高度
+       不再跟著手機變化，永遠是860px——
+       如果實際內容用不到860px這麼高，
+       margin:auto這個技巧會把「所有剩餘空間」
+       整包吃掉、全部塞在角色卡片上方，
+       變成一大截很突兀的空白，
+       這正是這張截圖看到的狀況。
+
+       拿掉margin-top:auto，讓怪物卡片區、
+       戰鬥紀錄這兩塊本來就有flex:1（會主動長大
+       填滿空間）的區塊，負責很自然地把剩餘空間
+       分散開來，不會再集中變成一大塊突兀的空白。
+    */
+}
+
+/*
+   ★ 新增（依照使用者要求，重新設計，故意做得很陽春）：
+   單純的固定區塊，正常排在角色卡片下方，
+   不用position:absolute、不用z-index、
+   不會展開收合、不會被誰的高度變化影響、
+   也不會影響任何其他東西的位置。
+   就是一個普通的、永遠在文件流裡的方塊。
+*/
+
+/*
+   ★ 新增（依照使用者要求）：
+   結算階段（雙方正在行動）、或整場都是
+   自動戰鬥時，把回合資訊列跟戰鬥指令
+   按鈕區藏起來，減少畫面雜訊；
+   由updateActionHudVisibility()依照
+   battlePhase／autoBattle狀態切換，
+   不是寫死的，這裡只負責提供隱藏時的樣式。
+
+   ★ V98 修正：
+   過去用 display:none 隱藏回合列與指令列，
+   會把兩個固定高度區塊直接從 Flex 文件流移除，
+   因此一開自動戰鬥，角色列、元素匣與戰鬥資訊框
+   就整批往上補位；手動／自動畫面位置不一致。
+   現在改成 visibility:hidden + pointer-events:none，
+   元件看不到也不能點，但原本高度完整保留。
+   這同時避免手動戰鬥進入 resolve 階段時版面跳動。
+*/
+
+.battle-hud-hidden{
+    /* V98 ROOT FIX：自動戰鬥／結算階段只隱藏 HUD 視覺，
+       不再用 display:none 把 60px 回合列與 66px 指令列從 Flex
+       文件流抽掉。如此手動／自動兩種狀態會保留完全相同的
+       垂直佔位，角色列、元素匣與戰鬥資訊框不再上下跳動，
+       戰鬥資訊框的上緣與可用高度維持一致。 */
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+}
+
+.battle-info{
+    /* V96：戰鬥資訊改成唯一的剩餘空間填充區。
+       高度只由 .battle-wrap 的 Flex 決定，不再混用 JS viewport 量測。 */
+
+    /* V96 ROOT FIX：由 Flex 一次決定剩餘高度。
+       不再由 fillBattleInfoGap() 先清 height 再量測再寫回，
+       因此不會隨 visualViewport.resize 反覆跳動。 */
+    flex:1 1 0;
+    min-height:82px;
+    height:auto;
+
+    margin-top:0;
+
+    background:#100e0b;
+    border:1px solid #8a6a3a;
+    border-radius:8px;
+
+    padding:8px 10px;
+
+    overflow-y:auto;
+
+    font-size:13px;
+    line-height:18px;
+
+    color:#e8ddc7;
+}
+
+/* V96 — 戰鬥資訊頂列：元素匣取代底部大型自動戰鬥面板。 */
+/* V108 — 元素匣改成真正獨立的戰鬥頁懸浮按鈕。
+   按鈕不再用自己的寬度參與 header row 排版；
+   白框、黑色按鈕底與盒狀陰影全部移除。
+   仍保留原本 onclick，自動戰鬥設定功能完全不變。 */
+.battle-info-header-row{
+    /* V108：元素匣已脫離這一列，這裡只保留回合文字的必要高度。 */
+    flex:0 0 28px;
+    min-height:28px;
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:0;
+    margin-top:2px;
+    padding-left:0;
+}
+
+#battleTurnIndicator{
+    margin:0 !important;
+    font-size:12px;
+    color:#f0b429;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+/* V109：真正可重複拖曳的懸浮元素匣。
+   直接掛在 #battlePage 底下，完全脫離 battle-info-header-row 的文件流。
+   Pointer 拖曳只綁定這顆按鈕；單擊才開設定，拖曳不觸發設定。 */
+#battlePage > .battle-element-box-button{
+    position:absolute !important;
+    left:8px !important;
+    bottom:96px !important;
+    width:66px !important;
+    height:66px !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    outline:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    overflow:visible !important;
+    cursor:pointer;
+    z-index:80 !important;
+    -webkit-tap-highlight-color:transparent;
+    transform-origin:center;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-user-drag:none;
+}
+
+#battlePage > .battle-element-box-button.dragging{
+    cursor:grabbing;
+    transform:none !important;
+}
+
+
+#battlePage > .battle-element-box-button:active{
+    transform:scale(.92);
+}
+
+#battlePage > .battle-element-box-button img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,.62));
+    pointer-events:none;
+}
+
+.battle-line{
+    min-height:19px;
+    border-bottom:1px solid rgba(255,255,255,.04);
+    padding-bottom:1px;
+    margin-bottom:1px;
+}
+
+.battle-player{
+    position:relative;
+    width:116px;
+    height:112px;
+
+    padding:4px;
+
+    background:#000;
+    border:1px solid #8a6a3a;
+    border-radius:8px;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+
+    /*
+       ★ 修正（依照使用者明確要求，全部拿掉）：
+       之前試過調淡黑色遮罩、試過brightness
+       濾鏡調亮，使用者反應圖片看起來還是暗，
+       這裡直接把濾鏡拿掉——卡片現在顯示
+       角色圖片原始的樣子，不再疊加任何
+       brightness/漸層之類的效果。
+    */
+
+    /*
+       ★ 修正（更新過時的說明文字）：
+       這裡原本的理由是「戰鬥紀錄展開時會蓋住
+       技能快捷列，所以往上飄的技能名稱文字
+       不會蓋到還能點的按鈕」——但戰鬥紀錄的
+       展開/收合機制後來整個拿掉了，這個理由
+       已經不成立。
+
+       不過這裡的overflow:visible本身還是安全的：
+       角色卡片的父層battle-player-row用的是
+       flex:0 0 116px（完全不會縮小），所以
+       角色卡片永遠有固定116px高度可以待，
+       不會發生「容器被壓縮到比卡片還小、
+       卡片溢出去蓋到別的東西」這種情況
+       （跟怪物卡片區之前的bug不一樣，
+       這裡的父層從頭到尾就不會縮水）。
+       技能名稱飄出卡片外的疊放順序問題，
+       另外用z-index:150處理過了。
+    */
+
+    overflow:visible;
+}
+
+.battle-player.empty{
+    opacity:.22;
+}
+
+/*
+   ★ 新增：目前輪到誰行動的高亮效果。
+   金色發光邊框，一眼就能看出現在該點哪張卡的技能，
+   跟怪物的目標選取框（黃色）故意用不同顏色，
+   避免混淆「誰在攻擊」跟「攻擊誰」。
+*/
+
+.battle-player.active-turn{
+    position:relative;
+}
+
+/* V95 — 當前手動操作角色使用獨立外框層快速閃爍。
+   閃爍不再佔用卡片本身的 animation，因此不會蓋掉
+   攻擊前傾、受擊、MISS 後退等既有動畫。 */
+.battle-player.active-turn::after{
+    content:"";
+    position:absolute;
+    inset:-4px;
+    border:4px solid #ffd21f;
+    border-radius:11px;
+    pointer-events:none;
+    z-index:60;
+    animation:activeTurnFrameFlash .28s linear infinite;
+}
+
+.battle-player.active-turn.attacker-lunge-up{
+    animation:lungeUp .45s ease;
+}
+
+.battle-player.active-turn.hit{
+    animation:hitAnimation .3s ease;
+}
+
+.battle-player.active-turn.dodge-back{
+    animation:dodgeBack .45s ease;
+}
+
+@keyframes activeTurnFrameFlash{
+    0%,100%{
+        opacity:1;
+        box-shadow:
+            0 0 7px 2px rgba(255,210,31,1),
+            0 0 18px 5px rgba(255,196,0,.72);
+    }
+    50%{
+        opacity:.28;
+        box-shadow:
+            0 0 14px 4px rgba(255,240,130,1),
+            0 0 28px 8px rgba(255,210,31,.95);
+    }
+}
+
+
+/*
+   ★ 新增：第一角色（青墨東皇）戰鬥卡片
+   換成使用者指定的角色圖片，
+   血條/SP條/名字都疊在圖片上面顯示
+   （用漸層黑色從圖片底部往上罩一層，
+   確保文字/血條在圖片上還是看得清楚），
+   不再是原本的火焰emoji圖示。
+   只有第一角色套用這個特殊樣式，
+   第二角色跟怪物卡片維持原本的樣子。
+*/
+
+#battlePlayerCard0{
+    background-image:
+        url(../assets/characters/battle-player-0.png);
+
+    background-size:cover;
+    background-position:center top;
+}
+
+#battlePlayerCard0 .battle-player-icon{
+    display:none;
+}
+
+#battlePlayerCard0 .battle-player-status,
+#battlePlayerCard0 .battle-player-id{
+    text-shadow:
+        0 1px 3px rgba(0,0,0,.95),
+        0 0 5px rgba(0,0,0,.95);
+}
+
+/*
+   ★ 新增（依照使用者要求，血條遮住太多圖片）：
+   原本卡片內容是整體置中（justify-content:center），
+   拿掉圖示之後，血條/SP條反而因為置中
+   往中間靠，蓋住圖片中段。
+   改成內容整體貼齊卡片底部，
+   讓圖片上半部完整露出來，
+   血條/等級/名字集中變成貼底的一小條資訊列，
+   不會佔用圖片中間的視覺空間。
+*/
+
+#battlePlayerCard0{
+    justify-content:flex-end;
+    padding-bottom:2px;
+}
+
+/*
+   ★ 新增：第二角色（青水）戰鬥卡片
+   套用跟第一角色完全相同的圖片卡片樣式
+   （角色專屬圖片當背景、血條/SP條/名字疊在
+   圖片上方、底部對齊、漸層黑底確保可讀性）。
+   使用者明確要求「以後角色都比照這個做法」，
+   所以這裡完全複製battlePlayerCard0的規則，
+   只換圖片跟目標ID，日後若有更多角色，
+   同樣複製這個模式即可。
+*/
+
+#battlePlayerCard1{
+    background-image:
+        url(../assets/characters/battle-player-1.jpg);
+
+    background-size:cover;
+    background-position:center top;
+}
+
+#battlePlayerCard1 .battle-player-icon{
+    display:none;
+}
+
+#battlePlayerCard1 .battle-player-status,
+#battlePlayerCard1 .battle-player-id{
+    text-shadow:
+        0 1px 3px rgba(0,0,0,.95),
+        0 0 5px rgba(0,0,0,.95);
+}
+
+#battlePlayerCard1{
+    justify-content:flex-end;
+    padding-bottom:2px;
+}
+
+/*
+   ★ 新增（依照使用者要求）：
+   角色卡片預設維持原本的亮度（漸層黑底
+   只是為了讓血條/名字在圖片上看得清楚，
+   不代表「暗」）。只有角色HP歸零、真正
+   陣亡的時候，才額外疊上這層濾鏡讓卡片
+   明顯變暗＋去色，跟「還活著」的卡片
+   做出清楚的視覺區隔。
+
+   這個class由updateSingleCharacterBars()
+   依照character.hp<=0動態加上/移除，
+   跟怪物卡片的.dead（opacity:.16，直接
+   在killMonster()一次性觸發）是兩套獨立
+   機制，互不影響：怪物死亡是「永久」的，
+   角色陣亡在目前系統裡是回合制RPG常見的
+   「暫時倒下，戰鬥中可能被復活」，所以
+   用filter動態切換，一旦hp回正就會自動
+   移除變暗效果，不需要額外程式碼處理復活。
+*/
+
+.battle-player.down{
+    filter:
+        brightness(.4)
+        grayscale(55%);
+}
+
+.battle-player-icon{
+
+    width:30px;
+    height:30px;
+
+    flex:0 0 30px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:25px;
+}
+
+.battle-player-status{
+    width:100%;
+
+    font-size:9px;
+    line-height:11px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.battle-player-id{
+    width:100%;
+    height:12px;
+
+    flex:0 0 12px;
+
+    font-size:9px;
+    line-height:12px;
+
+    color:#f0b429;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.battle-player .hp-bar,
+.battle-player .sp-bar{
+    position:relative;
+
+    width:92px;
+    height:10px;
+
+    margin-top:2px;
+
+    border-radius:4px;
+    overflow:hidden;
+}
+
+.battle-player .hp-bar{
+    background:#3a1111;
+}
+
+.battle-player .sp-bar{
+    background:#101f45;
+}
+
+.battle-player .hp-bar-inner{
+    position:absolute;
+    left:0;
+    top:0;
+
+    height:100%;
+    width:100%;
+
+    background:linear-gradient(180deg,#f0605c,#c81e1e);
+}
+
+.battle-player .sp-bar-inner{
+    position:absolute;
+    left:0;
+    top:0;
+
+    height:100%;
+    width:100%;
+
+    background:linear-gradient(180deg,#5b8fff,#2050c0);
+}
+
+/*
+   ★ 新增（依照使用者要求，「護盾效果生成的話，我方
+   血量條要增加等值長度的白色血量條」）：
+   護盾不是真的HP，是額外的傷害吸收額度，用一段疊在
+   血條上、緊接在紅色血量後面的白色色塊表示「還有多少
+   吸收額度」，跟血條同一個容器、同一個座標系，
+   left由JS設成目前HP佔比（緊接血量右側開始），
+   寬度由JS設成護盾佔maxHP的比例。
+*/
+.battle-player .hp-bar-shield-overlay{
+    position:absolute;
+    top:0;
+    height:100%;
+    width:0;
+    background:rgba(255,255,255,.92);
+    box-shadow:inset 0 0 2px rgba(0,0,0,.35);
+    transition:left .25s ease,width .25s ease;
+}
+
+.battle-player .hp-bar-text,
+.battle-player .sp-bar-text{
+    position:absolute;
+    left:0;
+    top:0;
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    z-index:2;
+
+    color:#f2ead9;
+
+    font-size:8px;
+    font-weight:bold;
+
+    text-shadow:0 1px 2px #000;
+
+    pointer-events:none;
+}
+
+/*
+   ★ 修正（依照使用者要求，統一成同一套
+   金色/古銅色RPG風格）：
+   原本用鮮豔的材料設計藍（未啟動）/紅
+   （啟動中），跟遊戲整體的金色系完全無關。
+   改成跟main-button同一套金色漸層當作
+   「啟動」狀態（正面、可以按下去的動作），
+   啟動中則改用暗紅琥珀色系的漸層
+   （比材料設計紅更深、更接近熔岩/警示的
+   質感），不是突兀的鮮紅色。
+*/
+
+.auto-battle-button{
+    width:100%;
+    height:46px;
+
+    border:0;
+    border-radius:6px;
+
+    background:var(--theme-accent-bg);
+    color:var(--theme-text-gold);
+
+    font-size:11px;
+    font-weight:bold;
+
+    padding:0 4px;
+    white-space:nowrap;
+
+    box-shadow:
+        0 2px 0 #8a5313,
+        0 3px 6px rgba(0,0,0,.4);
+}
+
+/*
+   ★ 新增：啟動之後按鈕變成「停止」的樣式，
+   暗紅琥珀色底、文字換成停止，
+   一眼就能看出目前是開著還是關著，
+   但顏色調性仍跟遊戲整體的暗色系相容。
+*/
+
+.auto-battle-button.active{
+    background:linear-gradient(180deg,#a83a2a,#6b1f14);
+    color:#f2ead9;
+    box-shadow:
+        0 2px 0 #4a140c,
+        0 3px 6px rgba(0,0,0,.4);
+}
+
+.hit{
+    animation:hitAnimation .3s ease;
+}
+
+.red-hit{
+    border-color:#ef4444!important;
+    box-shadow:0 0 9px rgba(239,68,68,.9)!important;
+}
+
+@keyframes hitAnimation{
+    /*
+       ★ 修正（依照使用者要求，震動幅度加大）：
+       原本±3px太小，幾乎感覺不到，
+       這次明顯加大到±8px。
+    */
+    25%{transform:translateX(-8px);}
+    50%{transform:translateX(8px);}
+    75%{transform:translateX(-5px);}
+}
+
+/*
+   ★ 閃避動畫（新增）：
+   攻擊沒命中、或異常狀態沒生效時，
+   目標卡片會有一個「往旁邊躲一下」的動作，
+   跟被打中的hitAnimation（左右小震動）
+   跟攻擊方的lunge（往前頓一下）都不一樣，
+   一眼就能分辨「這下是打空/抵抗了」，
+   不是「打中但傷害很低」。
+*/
+
+.dodge-back{
+    animation:dodgeBack .45s ease;
+}
+
+@keyframes dodgeBack{
+    /*
+       ★ 修正（依照使用者要求，幅度加大）：
+       原本16px的後退位移加大到28px，
+       旋轉角度也加大，動作更明顯。
+    */
+    0%{transform:translateX(0);}
+    35%{transform:translateX(28px) rotate(8deg);}
+    65%{transform:translateX(-9px) rotate(-2deg);}
+    100%{transform:translateX(0) rotate(0deg);}
+}
+
+/* =====================================================
+   攻擊方前傾動作
+   （被打的用hitAnimation震動，
+   攻擊的這邊用lunge往對手方向頓一下，
+   這樣才看得出「這一下是誰打的」）
+===================================================== */
+
+.attacker-lunge-up{
+    animation:lungeUp .45s ease;
+}
+
+.attacker-lunge-down{
+    animation:lungeDown .45s ease;
+}
+
+@keyframes lungeUp{
+    /*
+       ★ 修正（依照使用者要求，幅度加大）：
+       原本-12px加大到-22px，前傾感更明顯。
+    */
+    0%{transform:translateY(0);}
+    30%{transform:translateY(-22px);}
+    60%{transform:translateY(4px);}
+    100%{transform:translateY(0);}
+}
+
+@keyframes lungeDown{
+    0%{transform:translateY(0);}
+    30%{transform:translateY(22px);}
+    60%{transform:translateY(-4px);}
+    100%{transform:translateY(0);}
+}
+
+/* =====================================================
+   冰旋一閃：技能專屬飛行動畫
+===================================================== */
+
+/*
+   ★ 新增（依照使用者要求）：
+   釋放冰旋一閃時，讓使用者上傳的冰旋圖示
+   從施法者卡片飛向被打中的怪物卡片，
+   當成這個技能專屬的攻擊動畫。
+
+   做法跟showSkillNameBadge()一樣，
+   直接掛在document.body底下、用position:fixed
+   +getBoundingClientRect()量出實際座標，
+   不當任何卡片的子元素——這樣才不會被
+   卡片自己的前傾/受擊動畫（會建立新的
+   transform疊放層）卡住，參考同一份檔案
+   裡「文字會先被蓋住」那次修正的教訓。
+
+   飛行本身用left/top的CSS transition做，
+   不是寫死的@keyframes，因為起點（施法者
+   卡片）跟終點（被打中的怪物卡片）每次
+   位置都不一樣，沒辦法用固定的關鍵影格
+   描述，要用JS量出實際座標再指定transition
+   目標值。
+*/
+
+.ice-spin-projectile{
+    position:fixed;
+
+    width:76px;
+    height:76px;
+
+    pointer-events:none;
+
+    z-index:260;
+
+    filter:
+        drop-shadow(
+            0 0 10px
+            rgba(120,200,255,.85)
+        );
+
+    transform:
+        translate(-50%,-50%)
+        rotate(0deg)
+        scale(.55);
+
+    opacity:1;
+
+    transition:
+        left .42s ease-in,
+        top .42s ease-in,
+        transform .42s ease-in,
+        opacity .16s ease .34s;
+}
+
+.ice-spin-projectile.arrived{
+    transform:
+        translate(-50%,-50%)
+        rotate(540deg)
+        scale(1.15);
+
+    opacity:0;
+}
+
+/* =====================================================
+   傷害／SP消耗浮動數字
+===================================================== */
+
+.damage-popup{
+    position:absolute;
+    left:50%;
+    top:26%;
+
+    transform:translate(-50%,0);
+
+    font-size:18px;
+    font-weight:900;
+
+    /* V99：通用 popup 不強制描邊；HP 傷害與爆擊在各自類別
+       明確套白色描邊，SP／治療／MISS 保留原本視覺。 */
+    -webkit-text-stroke:0;
+
+    pointer-events:none;
+
+    z-index:60;
+
+    animation:damageFloat 1.8s ease-out forwards;
+
+    white-space:nowrap;
+}
+
+/* V99 — HP 損傷數字取消螢光，改成紅字＋清楚白色描邊。 */
+.damage-popup.hp-popup{
+    color:#e32626;
+    -webkit-text-stroke:1.15px #fff;
+    paint-order:stroke fill;
+    text-shadow:1px 1px 0 #000;
+}
+
+.damage-popup.sp-popup{
+    color:#0090ff;
+    text-shadow:
+        0 0 1px #0090ff,
+        0 0 1px #0090ff,
+        0 0 8px rgba(0,144,255,1),
+        0 0 14px rgba(0,144,255,.8);
+}
+
+.damage-popup.heal-popup{
+    color:#00cc55;
+    text-shadow:
+        0 0 1px #00cc55,
+        0 0 1px #00cc55,
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 10px rgba(0,255,102,1);
+}
+
+/*
+   ★ 新增（依照使用者要求，「護盾傷害機制...顯示白色
+   數字扣除動畫」）：
+   護盾吸收的傷害用白色文字表示，跟HP掉血的紅字、
+   SP的藍字、回復的綠字都不一樣，一眼就能看出「這筆
+   傷害被護盾扛下來了，沒有真的扣到血」。
+*/
+.damage-popup.shield-popup{
+    color:#fff;
+    -webkit-text-stroke:1px #444;
+    paint-order:stroke fill;
+    text-shadow:
+        0 0 4px rgba(255,255,255,.85),
+        1px 1px 0 #000;
+}
+
+/* V100 — 爆擊顯示保留紅色傷害字、白框字與加強彈跳動畫；
+   浮動文字格式統一為「爆擊 123」，不顯示驚嘆號與 HP/SP 字樣。
+
+   ★ 修正（依照使用者要求，「爆擊字體再縮小一點，超出
+   人物框一點點即可」）：
+   原本font-size:27px，加上damageFloatCrit動畫在10%那個
+   關鍵影格還會再放大到scale(1.62)，兩個疊乘起來瞬間
+   峰值等於43.7px，「爆擊 1234」這種7個字的文字實際
+   寬度遠超過人物/怪物卡片本身的寬度（76~116px），
+   多張卡片同時爆擊時，好幾組文字疊在一起看起來像
+   一坨誇張的巨大色塊。改成font-size:17px，動畫峰值
+   scale也一併調降（見下面damageFloatCrit），兩者疊乘
+   後峰值約21px，只會比卡片邊界略寬一點點，不會整團
+   蓋過旁邊的卡片。
+*/
+.damage-popup.critical-popup{
+    font-size:17px;
+    letter-spacing:.5px;
+    -webkit-text-stroke:1.1px #fff;
+    paint-order:stroke fill;
+    text-shadow:2px 2px 0 #000;
+    animation:damageFloatCrit 1.8s cubic-bezier(.16,.88,.25,1.15) forwards;
+}
+
+/* 爆擊命中時額外出現一次清楚的金白衝擊環。
+   使用獨立 ::before，不佔用卡片本身的 animation/transform，
+   不會跟攻擊前傾、受擊震動、當前角色黃框互相搶動畫屬性。 */
+.battle-monster.critical-impact::before,
+.battle-player.critical-impact::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:45%;
+    width:24px;
+    height:24px;
+    border:4px solid #f5b51b;
+    border-radius:50%;
+    background:
+        linear-gradient(#fff,#fff) center/3px 100% no-repeat,
+        linear-gradient(90deg,#fff,#fff) center/100% 3px no-repeat;
+    transform:translate(-50%,-50%) scale(.35);
+    opacity:0;
+    pointer-events:none;
+    z-index:75;
+    animation:criticalImpactBurst .48s ease-out forwards;
+}
+
+@keyframes criticalImpactBurst{
+    0%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(.35) rotate(0deg);
+    }
+    45%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(2.2) rotate(18deg);
+    }
+    100%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(3.5) rotate(30deg);
+    }
+}
+
+/*
+   ★ MISS／抵抗 文字：
+   之前用灰白色，玩家反應太不明顯，
+   直接改成跟HP傷害同一種鮮紅、白邊風格，
+   字級再拉大一點，確保打空這件事
+   在畫面上一樣搶眼。
+*/
+
+.damage-popup.miss-popup{
+    color:#ff2020;
+    -webkit-text-stroke:0 !important;
+    font-size:19px;
+    text-shadow:
+        0 0 1px #ff2020,
+        0 0 1px #ff2020,
+        0 0 8px rgba(255,32,32,1),
+        0 0 14px rgba(255,32,32,.8);
+}
+
+@keyframes damageFloat{
+
+    0%{
+        opacity:0;
+        transform:translate(-50%,4px) scale(.75);
+    }
+
+    12%{
+        opacity:1;
+        transform:translate(-50%,-4px) scale(1.2);
+    }
+
+    65%{
+        opacity:1;
+        transform:translate(-50%,-14px) scale(1);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-26px) scale(1);
+    }
+
+}
+
+@keyframes damageFloatCrit{
+
+    0%{
+        opacity:0;
+        transform:translate(-50%,8px) scale(.45) rotate(-10deg);
+    }
+
+    10%{
+        opacity:1;
+        transform:translate(-50%,-12px) scale(1.25) rotate(7deg);
+    }
+
+    22%{
+        transform:translate(-50%,-7px) scale(1.08) rotate(-4deg);
+    }
+
+    36%{
+        transform:translate(-50%,-12px) scale(1.14) rotate(2deg);
+    }
+
+    68%{
+        opacity:1;
+        transform:translate(-50%,-22px) scale(1.05) rotate(0deg);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-38px) scale(1) rotate(0deg);
+    }
+
+}
+
+/* =====================================================
+   技能名稱標籤（施放技能時顯示在自己格子裡）
+===================================================== */
+
+/*
+   ★ 修正（依照使用者要求，整個重新設計）：
+   技能名稱原本是一個小小的實心背景徽章
+   （黑字、彩色底、黑框），
+   使用者希望改成跟爆擊數字一樣的呈現方式：
+   大字、白邊描邊、飄浮動畫，
+   只是不用爆擊那個💥圖案，
+   而且把「數字」換成「技能中文名稱」，
+   顏色依元素區分：
+   火=紅、水=水藍、土=金黃、風=淡綠。
+   文字範圍可以稍微超出卡片邊界沒關係，
+   停留時間也拉長一點，
+   讓玩家看得更清楚是誰放了什麼技能。
+*/
+
+.skill-name-badge{
+    /*
+       ★ 修正（真正解決根本原因，改用position:fixed）：
+       JS那邊已經改成用getBoundingClientRect()
+       量出卡片在畫面上的實際像素座標，
+       直接設定left/top為那個座標——
+       這裡改成position:fixed搭配
+       transform:translate(-50%,-100%)，
+       -50%把文字水平置中在那個座標上，
+       -100%把文字整個往上移到座標「上方」
+       （而不是座標本身的位置往下長），
+       效果等同之前的「貼著卡片正上方」，
+       但現在完全不是卡片的子元素了，
+       不會再被卡片自己的動畫（transform）
+       困住疊放順序。
+    */
+
+    position:fixed;
+
+    transform:translate(-50%,-100%);
+
+    font-size:22px;
+    font-weight:900;
+
+    -webkit-text-stroke:0 !important;
+
+    white-space:nowrap;
+
+    pointer-events:none;
+
+    z-index:9999;
+
+    animation:skillBadgePop var(--skill-name-display-duration,347ms) ease-out forwards;
+}
+
+/*
+   ★ 修正（依照使用者要求，技能/普攻/HP/SP
+   顯示文字本身的顏色再粗一點，白邊
+   （-webkit-text-stroke）維持不動）：
+   font-weight已經是900（CSS的最大值），
+   沒辦法再加粗；改用疊加同色系、極小模糊
+   半徑的text-shadow，把文字顏色本身的視覺
+   厚度加強，白邊完全沒有動到。
+*/
+
+.skill-name-badge.badge-normal{
+    color:#000;
+    text-shadow:
+        0 0 1px #000,
+        0 0 1px #000;
+}
+
+.skill-name-badge.badge-fire{
+    color:#ff3b30;
+    text-shadow:
+        0 0 1px #ff3b30,
+        0 0 1px #ff3b30;
+}
+
+.skill-name-badge.badge-water{
+    color:#38bdf8;
+    text-shadow:
+        0 0 1px #38bdf8,
+        0 0 1px #38bdf8;
+}
+
+.skill-name-badge.badge-wind{
+    color:#4ade80;
+    text-shadow:
+        0 0 1px #4ade80,
+        0 0 1px #4ade80;
+}
+
+.skill-name-badge.badge-earth{
+    color:#f0b429;
+    text-shadow:
+        0 0 1px #f0b429,
+        0 0 1px #f0b429;
+}
+
+@keyframes skillBadgePop{
+
+    0%{
+        opacity:0;
+        transform:translate(-50%,4px) scale(.7);
+    }
+
+    15%{
+        opacity:1;
+        transform:translate(-50%,-6px) scale(1.15);
+    }
+
+    30%{
+        transform:translate(-50%,-4px) scale(1);
+    }
+
+    70%{
+        opacity:1;
+        transform:translate(-50%,-12px) scale(1);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-22px) scale(1);
+    }
+
+}
+
+/* =====================================================
+   狀態
+===================================================== */
+
+.status-card{
+    padding:10px 10px;
+}
+
+/*
+   ★ 修正（依照使用者要求，「點數分配
+   的文字置中，可以再縮小一點」）：
+   原本吃瀏覽器預設h2樣式（靠左、字體
+   偏大），這裡只針對這個特定id調整，
+   不影響其他頁面的h2。
+*/
+
+#statusPageTitle{
+    text-align:center;
+    font-size:16px;
+    margin:6px 0;
+}
+
+/*
+   ★ 修正（依照使用者要求，「能力值頁面
+   不要滑動，一眼看完，文字可以再小」）：
+   原本每一列margin-bottom:16px、字體
+   17px，6列加起來很容易超出一個畫面
+   高度。全部縮小、間距收緊，確保整頁
+   能一次看完不用捲動。
+*/
+
+.status-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+    font-size:13px;
+    gap:6px;
+}
+
+/*
+   ★ 新增（依照使用者要求）：
+   自訂下拉選單元件，取代原生<select>——
+   原生選單展開後的清單樣式100%由手機
+   系統/瀏覽器決定，沒辦法套用自訂字體/
+   顏色/動畫，不同手機上長得完全不一樣。
+
+   做法：原本的<select>還是留在畫面上
+   （只是設成display:none，繼續當作
+   「真正的資料來源」，值/change事件
+   全部照舊，其他程式碼完全不用改），
+   在旁邊插入這一整套自己刻的假選單——
+   一個顯示目前選到什麼的按鈕，點下去
+   用CSS transition展開一個清單，選了
+   之後才把值同步寫回真正的<select>。
+*/
+
+/*
+   ★ 新增（依照使用者要求，火箭技能專屬
+   飛行特效，純CSS/JS動畫，不用任何圖片）：
+   火箭技能是targetType:"tri"（同時打中/
+   左/右三個目標），這裡設計成真的射出
+   三發火箭、各自飛向一個目標，命中後
+   在該處炸開火花——視覺上跟「三重目標」
+   這個技能設定本身互相呼應。
+*/
+
+.fire-rocket-projectile{
+    position:fixed;
+    z-index:6000;
+    pointer-events:none;
+
+    width:16px;
+    height:7px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #ffb347 30%,
+            #ff5a1f 65%,
+            #fff3c4
+        );
+
+    border-radius:0 50% 50% 0;
+
+    box-shadow:
+        0 0 10px 3px rgba(255,110,30,.75),
+        0 0 20px 6px rgba(255,60,10,.4);
+}
+
+.fire-rocket-spark{
+    position:fixed;
+    z-index:6001;
+    pointer-events:none;
+
+    width:6px;
+    height:6px;
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #fff3c4,
+            #ff5a1f 60%,
+            transparent
+        );
+}
+
+.custom-dropdown{
+    position:relative;
+
+    min-width:88px;
+}
+
+.custom-dropdown-label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    background:var(--theme-box-bg);
+    border:1px solid var(--theme-border);
+    border-radius:8px;
+
+    padding:6px 10px;
+
+    font-size:14px;
+    color:#e8ddc7;
+
+    cursor:pointer;
+
+    -webkit-tap-highlight-color:transparent;
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease;
+}
+
+.custom-dropdown.open .custom-dropdown-label{
+    border-color:#f0b429;
+    box-shadow:0 0 8px rgba(240,180,41,.4);
+}
+
+.custom-dropdown-arrow{
+    margin-left:8px;
+    font-size:11px;
+    color:#c9a35f;
+
+    transition:transform .2s ease;
+}
+
+.custom-dropdown.open .custom-dropdown-arrow{
+    transform:rotate(180deg);
+}
+
+.custom-dropdown-list{
+    position:absolute;
+    top:calc(100% + 4px);
+    left:0;
+    right:0;
+    z-index:400;
+
+    background:#1a140d;
+    border:1px solid #8a6a3a;
+    border-radius:8px;
+
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+
+    box-shadow:0 6px 16px rgba(0,0,0,.5);
+
+    transition:
+        max-height .22s ease,
+        opacity .18s ease;
+}
+
+.custom-dropdown.open .custom-dropdown-list{
+    max-height:220px;
+    opacity:1;
+    overflow-y:auto;
+}
+
+/*
+   ★ 修正（依照使用者回報，「按下去還是
+   沒反應」——這次真的挖到底了）：
+   上面那條規則是「.custom-dropdown.open
+   底下的.custom-dropdown-list」，一定要
+   清單還「留在」.custom-dropdown這個
+   外層容器裡面，這條CSS才會生效。
+
+   但moveDropdownListToBody()會把清單
+   整個搬到document.body底下（這是為了
+   逃出面板本身overflow:auto的裁切，
+   前幾輪修的那個問題），一旦搬走，清單
+   就不再是.custom-dropdown.open的子
+   元素，上面那條規則直接失效，清單
+   打回預設的max-height:0/opacity:0，
+   等於整個收合、看不到——這才是「箭頭
+   有反應（因為外層wrapper的open class
+   沒受影響），但清單完全展不開」的
+   真正原因。前一輪只修到z-index（清單
+   被彈窗背景蓋住），但清單其實從頭到尾
+   高度都收合成0，就算z-index對了也還是
+   看不到，兩個問題疊在一起，只修一個
+   當然還是沒用。
+
+   這裡直接讓清單自己身上也帶一個"open"
+   class（在moveDropdownListToBody()裡
+   加、closeCustomDropdown()裡拿掉），
+   不管清單現在人在哪裡（還在原本的
+   wrapper裡，或已經被搬到body），
+   只要它自己有open這個class就展開，
+   不用依賴「爸爸是誰」。
+*/
+
+.custom-dropdown-list.open{
+    max-height:220px;
+    opacity:1;
+    overflow-y:auto;
+}
+
+.custom-dropdown-item{
+    padding:9px 10px;
+
+    font-size:14px;
+    color:#e8ddc7;
+
+    cursor:pointer;
+
+    border-bottom:1px solid rgba(138,106,58,.25);
+
+    transition:background .12s ease;
+}
+
+.custom-dropdown-item:last-child{
+    border-bottom:0;
+}
+
+.custom-dropdown-item:active{
+    background:rgba(240,180,41,.15);
+}
+
+.custom-dropdown-item.selected{
+    color:#f0b429;
+    font-weight:bold;
+    background:rgba(240,180,41,.08);
+}
+
+.status-number{
+    flex:1;
+    text-align:center;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+.status-btn{
+    width:28px;
+    height:28px;
+
+    flex:0 0 28px;
+
+    border:0;
+    border-radius:6px;
+
+    background:#2e2822;
+    color:#f2ead9;
+
+    font-size:16px;
+
+    /*
+       ★ 新增（依照使用者要求，「加點要
+       新增長按快速加點」）：
+       選長按這個方案（不是雙箭頭+10），
+       因為不用多刻一顆按鈕、不用改版面，
+       單純在原本的+/-按鈕上加「按住不放
+       持續加點」的行為，對玩家來說操作
+       方式沒有變，只是多了一個「按久一點
+       會變快」的隱藏加速功能，學習成本
+       最低。
+    */
+
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;
+    user-select:none;
+}
+
+.status-points-line{
+    font-size:12px;
+    margin:4px 0;
+}
+
+/*
+   ★ 新增（依照使用者要求，「多一行註解
+   基本能力+裝備=總和」）：
+   純文字說明，放在六項屬性列表正上方，
+   解釋「9+0=9」這種格式的意思。
+*/
+
+.status-formula-hint{
+    font-size:11px;
+    color:#b3a58c;
+    text-align:center;
+    margin-bottom:6px;
+}
+
+/*
+   ★ 新增（依照使用者要求，「點數分配
+   顯示當前角色的HP、SP條，加點體質/
+   能量時可以預覽增加的動畫，血條會
+   合理縮短」）：
+   HP/SP各一條，上面是文字（目前值／
+   預覽後的上限），下面是實際的長條，
+   長條寬度＝目前HP÷預覽後上限的比例——
+   血量本身沒變、但上限變大了，比例
+   自然就會縮短，不用另外寫「縮短」的
+   特殊邏輯，純粹是比例計算的自然結果。
+*/
+
+.status-preview-bars{
+    margin-bottom:10px;
+}
+
+.status-preview-bar-row{
+    margin-bottom:6px;
+}
+
+.status-preview-bar-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    margin-bottom:2px;
+}
+
+.status-preview-bar-track{
+    height:10px;
+
+    background:#1a140c;
+
+    border:1px solid var(--theme-border);
+    border-radius:5px;
+
+    overflow:hidden;
+}
+
+.status-preview-bar-fill{
+    height:100%;
+
+    border-radius:5px;
+
+    transition:width .25s ease;
+}
+
+.status-preview-bar-fill.hp{
+    background:linear-gradient(90deg,#7f1d1d,#dc2626);
+}
+
+.status-preview-bar-fill.sp{
+    background:linear-gradient(90deg,#1d3a7f,#2563eb);
+}
+
+.status-confirm{
+    width:100%;
+
+    margin-top:6px;
+    padding:7px;
+
+    border:0;
+    border-radius:8px;
+
+    background:var(--theme-accent-bg);
+    color:var(--theme-text-gold);
+
+    font-weight:bold;
+
+    font-size:13px;
+}
+
+.status-confirm:disabled{
+    opacity:.4;
+}
+
+/* =====================================================
+   技能
+===================================================== */
+
+.skill-select{
+    width:100%;
+
+    margin-top:8px;
+    padding:10px;
+
+    background:#17130f;
+    color:#f2ead9;
+
+    border:1px solid var(--theme-border);
+    border-radius:7px;
+
+    font-size:14px;
+}
+
+.skill-loadout-list{
+    display:grid;
+    gap:6px;
+    margin-top:10px;
+}
+
+/*
+   ★ 修正（依照使用者要求，「技能配裝只
+   顯示icon跟名稱，一排四個排一起比較省
+   空間」）：
+   原本4個裝備格是2x2排列、內容包含
+   分類標籤/描述/SP/移除按鈕一大串。
+   改成一排四個橫向排列（grid-template-
+   columns:repeat(4,1fr)），每格只留
+   圖示+名稱，其餘全部省略，格子本身
+   也縮小到接近圖示的大小。
+*/
+
+.skill-loadout-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+    margin-top:10px;
+}
+
+.skill-loadout-slot{
+    padding:4px 2px;
+
+    background:#241a0c;
+
+    border:1px solid var(--theme-border);
+    border-radius:8px;
+
+    font-size:10px;
+
+    text-align:center;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+}
+
+.skill-loadout-slot-icon{
+    width:36px;
+    height:36px;
+
+    background:var(--theme-box-bg);
+
+    border:1px solid var(--theme-border);
+    border-radius:6px;
+
+    background-size:cover;
+    background-position:center;
+}
+
+.skill-loadout-slot-name{
+    font-size:10px;
+    font-weight:bold;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    width:100%;
+}
+
+/*
+   ★ 修正（依照使用者要求，技能列表改成
+   參考圖那種橫向排版：左邊圖示、中間名稱
+   +說明、最右邊學習/升級方框，延續主城
+   10大按鈕的框與配色）：
+   .learned-skill/.learnable-skill原本是
+   直向堆疊的方塊（標題在上、說明在中、
+   按鈕在最下面貼滿寬度），改成flex橫向
+   排列的一列。
+*/
+
+/*
+   ★ 新增：裝備欄的「移除」按鈕還在用這個
+   類別（4格快捷裝備區，不是這次改版的
+   技能清單列表本身），補回一個簡單的
+   按鈕樣式讓它不會沒有樣式可套用。
+*/
+
+.skill-action-button{
+    width:100%;
+
+    padding:8px;
+
+    border:1px solid var(--theme-border);
+    border-radius:5px;
+
+    background:var(--theme-accent-bg);
+    color:var(--theme-text-gold);
+
+    font-size:13px;
+}
+
+.skill-row{
+    display:flex;
+    align-items:stretch;
+    gap:6px;
+
+    padding:8px;
+
+    background:#241a0c;
+
+    border:1px solid var(--theme-border);
+    border-radius:8px;
+
+    /*
+       ★ 修正（依照使用者要求，「字體都
+       縮小」）：13px→11px，配合視窗放寬，
+       文字不會再被擠到整條換行。
+    */
+
+    font-size:11px;
+
+    line-height:1.5;
+}
+
+.skill-row-icon{
+    flex:0 0 44px;
+
+    width:44px;
+    height:44px;
+
+    background:var(--theme-box-bg);
+
+    border:1px solid var(--theme-border);
+    border-radius:6px;
+
+    background-size:cover;
+    background-position:center;
+}
+
+.skill-row-text{
+    flex:1 1 auto;
+
+    min-width:0;
+
+    text-align:left;
+}
+
+/*
+   ★ 學習/升級方框，刻意做成跟主城
+   .home-card同一種「上面圖示格、下面
+   紅底標籤」的兩層結構，只是尺寸縮小、
+   整塊當作可點擊的按鈕使用，延續同一套
+   視覺語言。
+*/
+
+.skill-action-card{
+    flex:0 0 46px;
+
+    width:46px;
+
+    display:flex;
+    flex-direction:column;
+
+    border-radius:5px;
+    overflow:hidden;
+
+    border:1px solid var(--theme-border);
+
+    cursor:pointer;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+.skill-action-card:active{
+    transform:scale(.95);
+}
+
+.skill-action-card.disabled{
+    opacity:.5;
+    pointer-events:none;
+}
+
+.skill-action-card-top{
+    flex:1 1 auto;
+
+    background:var(--theme-box-bg);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:13px;
+}
+
+.skill-action-card-label{
+    flex:0 0 auto;
+
+    padding:3px 1px;
+
+    text-align:center;
+
+    font-size:9px;
+    font-weight:bold;
+    line-height:1.2;
+
+    color:var(--theme-text-gold);
+
+    background:var(--theme-accent-bg);
+}
+
+/*
+   ★ 新增（依照使用者要求，「文字太多塞
+   不下，就精簡顯示，後面用……詳細讓玩家
+   點擊跳出完整介紹」）：
+   技能說明文字用CSS的-webkit-line-clamp
+   截斷到最多2行，超出的部分用刪節號
+   省略，後面貼一個可點擊的「詳細»」，
+   點下去呼叫showSkillDetail()跳出獨立
+   的技能詳細資訊彈窗（沿用跟主城彈窗
+   同一套.item-modal樣式）。
+*/
+
+.skill-row-desc{
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+
+.skill-row-detail-link{
+    color:#7fc7ff;
+    font-weight:bold;
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+/* =====================================================
+   背包
+===================================================== */
+
+.inventory-character-switch{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:8px;
+    margin-bottom:8px;
+}
+
+.character-arrow{
+    width:38px;
+    height:34px;
+
+    border:1px solid var(--theme-border);
+    border-radius:7px;
+
+    background:#2e2822;
+    color:#f2ead9;
+
+    font-size:18px;
+}
+
+.character-name-box{
+    flex:1;
+
+    text-align:center;
+
+    background:#0c0b0a;
+
+    border:1px solid var(--theme-border);
+    border-radius:7px;
+
+    padding:7px 5px;
+
+    font-size:13px;
+    font-weight:bold;
+}
+
+.inventory-stats{
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:3px 10px;
+
+    font-size:10px;
+
+    margin-bottom:8px;
+
+    color:#d1d5db;
+}
+
+.inventory-stat-item{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.equipment-title{
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.equipment-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:5px;
+}
+
+.equipment-slot{
+    min-height:58px;
+
+    background:#0c0b0a;
+
+    border:1px solid var(--theme-border);
+    border-radius:6px;
+
+    padding:4px;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+
+    overflow:hidden;
+}
+
+.equipment-icon{
+    font-size:22px;
+}
+
+.equipment-name{
+    font-size:8px;
+
+    width:100%;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.inventory-grid{
+    display:grid;
+
+    grid-template-columns:repeat(10,1fr);
+
+    gap:3px;
+
+    margin-top:7px;
+}
+
+.inventory-item{
+    width:100%;
+    aspect-ratio:1/1;
+
+    min-width:0;
+    min-height:0;
+
+    background:#0c0b0a;
+
+    border:1px solid #334155;
+    border-radius:4px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    position:relative;
+
+    padding:1px;
+}
+
+.inventory-item.empty{
+    opacity:.6;
+}
+
+.inventory-item.has-item{
+    cursor:pointer;
+}
+
+.inventory-icon{
+    font-size:21px;
+    line-height:1;
+}
+
+.inventory-count{
+    position:absolute;
+
+    right:1px;
+    bottom:0;
+
+    font-size:7px;
+
+    color:#f2ead9;
+
+    text-shadow:0 1px 2px #000;
+}
+
+.inventory-slot-number{
+    position:absolute;
+
+    left:2px;
+    top:1px;
+
+    color:#64748b;
+
+    font-size:6px;
+}
+
+/* =====================================================
+   Modal
+===================================================== */
+
+/*
+   ★ 新增（依照使用者要求，主城六個新功能
+   共用同一個彈出視窗）：
+   跟.item-modal是同一套「全螢幕深色遮罩+
+   置中方塊」的做法，獨立取名避免跟物品
+   詳細視窗的邏輯／樣式互相干擾。
+   內容（#homeFeatureModalBody）是空的，
+   由openHomeFeature()依照點的是哪個功能，
+   動態塞進對應內容，或者把主城頁面裡
+   本來就存在、只是被隱藏的功能區塊
+   （休息／經驗池分配）直接搬進來顯示，
+   跟之前搬動自動戰鬥設定面板是同一招。
+*/
+
+.home-feature-modal{
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.72);
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    /*
+       ★ 修正（測試時發現的隱藏風險，
+       順手一併加固）：
+       #creationPage（創角頁面）的
+       z-index是5000，比這裡原本的3200
+       還高。正常情況下創角完成/讀檔
+       成功後creationPage會被設成
+       display:none，不會有影響；但只要
+       任何一個角落漏改到，這個彈窗就會
+       整個被創角頁面蓋住、點什麼都沒
+       反應，卻在畫面上看起來一切正常
+       ——這種「z-index順序寫反」的問題
+       很難從外觀判斷出來。
+       這裡把彈窗z-index一次拉到6000，
+       確保不管其他全螢幕元素現在或
+       以後用到多高的z-index，主城六大
+       功能＋自動戰鬥設定這個共用彈窗
+       永遠蓋在最上面。
+    */
+
+    z-index:6000;
+
+    padding:20px;
+}
+
+.home-feature-modal.show{
+    display:flex;
+}
+
+/*
+   ★ 新增：跟.home-feature-modal-box.wide
+   搭配使用，讓內層100vw的視窗真的能貼齊
+   螢幕邊緣，不會被外層遮罩的padding卡住、
+   產生水平捲動。
+*/
+
+.home-feature-modal.no-padding{
+    padding:0;
+}
+
+/*
+   ★ 新增（依照使用者要求，「自動戰鬥的
+   設定頁面，緊貼戰鬥資訊框上緣，不然
+   現在靠上面很醜」）：
+   自動戰鬥設定視窗專用的貼底樣式——
+   不再置中顯示，改成貼齊畫面下緣
+   （戰鬥資訊框／導覽列上方一帶），
+   靠簡單的align-items:flex-end達成，
+   刻意不用JS量測戰鬥資訊框實際座標
+   （這套件之前為了「精準貼齊」自己算
+   position:fixed座標，反而是「按下去
+   沒反應」那個bug真正的來源，教訓
+   還在——見openHomeFeature()裡
+   autoBattleSettings那段的說明），
+   簡單、不會出錯的貼底效果優先於
+   像素級精準。
+*/
+
+/*
+   ★ 修正（依照使用者回報，「自動戰鬥
+   設定框的下緣，貼齊戰鬥資訊框的上緣，
+   要往上移」）：
+   之前的86px是隨便抓的數字，沒有真的
+   對齊。改成照#mapBattleOverlay／
+   #mapBattleInfo實際的CSS數字算出來的
+   精確值，而不是用JS去量測（量測那套
+   已經證實是「按下去沒反應」bug的來源，
+   這裡故意繼續用純CSS數字）：
+
+   導覽列高度70px（#mapBattleOverlay的
+   bottom:70px）
+   + 覆蓋層自己的下內距6px
+     （padding:0 6px 6px）
+   + 戰鬥資訊框高度96px
+     （#mapBattleInfo的flex:0 0 96px）
+   = 172px，
+
+   這就是戰鬥資訊框「上緣」距離畫面下緣
+   的實際距離，設定視窗的padding-bottom
+   設成一樣的172px，兩者下緣/上緣就會
+   剛好貼齊、不重疊也不留空隙。
+*/
+
+.home-feature-modal.dock-bottom{
+    align-items:flex-end;
+    padding-bottom:172px;
+}
+
+.home-feature-modal-box{
+    width:92%;
+    max-width:380px;
+
+    /*
+       ★ 修正（依照使用者回報，「技能頁面
+       超出那麼多，沒有自適應的功能嗎」）：
+       根本原因是vh這個單位——手機瀏覽器
+       （尤其Samsung Browser）網址列/
+       下方工具列會動態顯示/隱藏，vh在
+       很多手機瀏覽器上是抓「工具列全部
+       收起」時的最大可視高度去算，不是
+       抓「當下實際看得到」的高度，所以
+       80vh在網址列還顯示著的時候，實際
+       上會比畫面真正可視範圍還要高，
+       導致視窗被工具列擋住一截、也才會
+       感覺「沒有自適應」。
+
+       改用dvh（dynamic viewport height）
+       這個新單位，會跟著工具列顯示/隱藏
+       即時調整，才是真正「現在看得到
+       多高」。寫在vh後面一行，舊瀏覽器
+       看不懂dvh會直接忽略那行、繼續用
+       上面vh那行當備援，新瀏覽器
+       （Samsung Browser新版都支援）
+       則會套用dvh這行、真正修好貼齊
+       問題，兩邊都安全。
+    */
+
+    max-height:80vh;
+    max-height:80dvh;
+
+    overflow-y:auto;
+
+    /*
+       ★ 修正（依照使用者要求，統一色系）：
+       彈出視窗的底色改用跟主城圖示格
+       同一種深棕漸層，邊框統一用金色。
+    */
+
+    background:var(--theme-box-bg);
+
+    border:1px solid var(--theme-border);
+    border-radius:12px;
+
+    padding:16px;
+}
+
+/*
+   ★ 新增（依照使用者要求，角色頁面要能
+   在同一個視窗裡整合顯示裝備/能力值/
+   技能的完整內容，不是導去別的頁面）：
+   借進來的整頁內容（背包/狀態/技能）
+   本來就是為「全螢幕頁面」設計的，塞進
+   原本這個小彈窗的padding/寬度限制會
+   很擠，這個修飾用的class放寬到接近
+   滿版，只在顯示角色分頁內容時套用。
+*/
+
+/*
+   ★ 修正（依照使用者要求，「版面還可以
+   再放大，撐滿9:16」）：96vw還是留了一點
+   邊界，這次改成100vw（完全貼齊螢幕
+   兩側），padding也再收窄，把每一點
+   寬度都讓給技能列表本身使用。
+*/
+
+.home-feature-modal-box.wide{
+    max-width:100vw;
+    width:100vw;
+
+    /*
+       ★ 修正（依照使用者回報，「還是會
+       捲動，是我瀏覽器的問題嗎」）：
+       不是瀏覽器問題，是外層.home-feature-
+       modal-box本身寫死max-height:80vh，
+       角色視窗內容（頭像+分頁按鈕+HP/SP
+       預覽條+6項屬性+確認鈕）疊起來很
+       容易超過螢幕八成高度，不管哪種
+       瀏覽器都一樣會捲動。這裡放大到
+       96vh，把能用的螢幕高度都讓給
+       角色視窗內容使用。
+    */
+
+    max-height:96vh;
+    max-height:96dvh;
+
+    padding:6px;
+    border-radius:0;
+}
+
+.home-feature-modal-title{
+    font-size:18px;
+    font-weight:bold;
+    color:#f0b429;
+
+    margin-bottom:10px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.home-feature-close-btn{
+    background:none;
+    border:1px solid #8a6a3a;
+    border-radius:6px;
+    color:#e8ddc7;
+    font-size:14px;
+    padding:2px 10px;
+    cursor:pointer;
+}
+
+.home-feature-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 0;
+    border-bottom:1px solid rgba(138,106,58,.3);
+    font-size:13px;
+}
+
+.home-feature-row:last-child{
+    border-bottom:0;
+}
+
+.home-feature-buy-btn{
+    background:var(--theme-accent-bg);
+    color:var(--theme-text-gold);
+    border:1px solid var(--theme-border);
+    border-radius:6px;
+    padding:5px 12px;
+    font-size:12px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.home-feature-buy-btn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+/* V91 — 第 5 部分商店：只賣六種 HP/SP 藥水。 */
+.shop-potion-interface{
+    width:100%;
+}
+
+.shop-potion-note{
+    margin-bottom:8px;
+    color:#b9aa91;
+    font-size:11px;
+    text-align:center;
+}
+
+.shop-potion-list{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+}
+
+.shop-potion-card{
+    min-width:0;
+    padding:10px 9px;
+    border:1px solid rgba(138,106,58,.62);
+    border-radius:9px;
+    background:linear-gradient(160deg,#211a11,#120e09);
+}
+
+.shop-potion-card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    margin-bottom:5px;
+}
+
+.shop-potion-type{
+    color:#ffe27a;
+    font-size:11px;
+    font-weight:900;
+}
+
+.shop-potion-stock{
+    color:#9f927d;
+    font-size:9px;
+}
+
+.shop-potion-name{
+    min-height:34px;
+    color:#f5ead7;
+    font-size:12px;
+    font-weight:800;
+    line-height:17px;
+}
+
+.shop-potion-effect{
+    margin:4px 0 8px;
+    color:#b9aa91;
+    font-size:10px;
+    line-height:15px;
+}
+
+.shop-potion-buy{
+    width:100%;
+    min-height:34px;
+    padding:5px 6px;
+    text-align:center;
+}
+
+.item-modal{
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.72);
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    /*
+       ★ 修正（依照使用者提醒，「會不會
+       設定頁面被蓋在最底層」，順著這條
+       線索往下查）：
+       這個z-index本來是3000，比原本
+       .home-feature-modal的3200還低——
+       但物品詳細（#itemModal）是從
+       「角色」彈出視窗（openHomeFeature
+       ('character')借進去的背包分頁）
+       裡面點出來的，等於是疊在
+       .home-feature-modal「裡面」的
+       第二層彈窗，z-index卻比外層還低，
+       一樣會被蓋住看不到、點了沒反應。
+
+       這正是註解裡「技能詳細視窗好像被
+       顯示在最底層」那次修正在
+       #skillDetailModal上發生過的同一種
+       問題，只是這次換.itemModal（還沒
+       被修過）+ 這次.home-feature-modal
+       本身也從3200再往上調到6000
+       （見上面「設定頁面按鈕沒反應」那次
+       修正），如果不跟著調高，等於是把
+       同一個bug重新製造一次。
+
+       這裡直接把.item-modal這個共用
+       class本身的z-index提高到6050，
+       確保所有從.home-feature-modal
+       彈窗「裡面」再跳出來的第二層視窗
+       （物品詳細/技能詳細/屬性說明）
+       永遠疊在最外層那個彈窗之上。
+    */
+
+    z-index:6050;
+
+    padding:20px;
+}
+
+.item-modal.show{
+    display:flex;
+}
+
+/*
+   ★ 修正（依照使用者回報，「技能詳細
+   視窗好像被顯示在最底層」）：
+   找到真正原因了——技能詳細視窗是從
+   「角色」彈出視窗（.home-feature-modal）
+   裡面點「詳細」跳出來的，但當時
+   .item-modal本身z-index只有3000，
+   比角色視窗（當時3200）還低，疊在
+   角色視窗底下、完全被蓋住看不到，
+   不是沒有觸發，是疊層順序不對。
+
+   ★ 後續更新：.home-feature-modal
+   本身之後又調高到6000（見該class
+   旁邊的說明），.item-modal這個共用
+   class也一併調高到6050了，所以這裡
+   （skillDetailModal/statusHelpModal）
+   只要再疊在.item-modal之上即可，
+   不用再各自單獨處理。
+*/
+
+#skillDetailModal{
+    z-index:6060;
+}
+
+/* V94：技能「詳細」是技能頁內的第二層內容。
+   舊版 .item-modal-box 沒有有限高度，#skillDetailStats 也不是 scroll owner，
+   Android 上內容超出後只能被裁掉。現在只讓詳細資料區捲動，
+   標題與關閉鍵維持在視窗內。 */
+#skillDetailModal .item-modal-box{
+    max-height:680px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    touch-action:pan-y;
+}
+#skillDetailModal #skillDetailStats{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+}
+#skillDetailModal .close-item-button{
+    flex:0 0 auto;
+}
+
+/* V94：技能詳細視窗可能從獨立技能頁開啟，
+   此時角色視窗的 character-scroll-active 不一定存在。
+   只在技能詳細視窗開啟期間解除祖層 touch-action:none。 */
+html.skill-detail-scroll-active,
+body.skill-detail-scroll-active,
+#game-viewport.skill-detail-scroll-active,
+#game-stage.skill-detail-scroll-active{
+    touch-action:pan-y !important;
+}
+
+/*
+   ★ 新增：屬性說明彈窗也是從角色視窗裡
+   跳出來的，跟技能詳細彈窗同一個道理，
+   z-index要蓋過角色視窗（3200）。
+*/
+
+#statusHelpModal{
+    z-index:6060;
+}
+
+.item-modal-box{
+    width:90%;
+    max-width:340px;
+
+    background:var(--theme-box-bg);
+
+    border:1px solid var(--theme-border);
+    border-radius:12px;
+
+    padding:16px;
+}
+
+.item-modal-icon{
+    text-align:center;
+    font-size:50px;
+}
+
+.item-modal-name{
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+    margin:6px 0 12px;
+}
+
+.item-stat-list{
+    background:#100e0b;
+    border-radius:8px;
+    padding:10px;
+    font-size:12px;
+    line-height:20px;
+}
+
+.item-modal-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin-top:10px;
+}
+
+.item-modal-button{
+    height:38px;
+    border:0;
+    border-radius:7px;
+    color:#f2ead9;
+    font-weight:bold;
+}
+
+.equip-button,
+.sell-button{
+    background:linear-gradient(180deg,#8a2a1e,#5a160e);
+    color:#f2ead9;
+}
+
+.close-item-button{
+    width:100%;
+    margin-top:7px;
+    height:34px;
+    border:0;
+    border-radius:7px;
+    background:#2e2822;
+    color:#f2ead9;
+}
+
+
+/* =====================================================
+   V113 — 黑金導覽按鈕透明PNG＋主導覽重新排序
+   只替換對應導覽視覺；原 onclick / active / page 切換機制不變。
+   主導覽改為「背包／野怪區／主城／副本／BOSS」；地圖導覽的自動戰鬥改用透明元素匣圖示。
+===================================================== */
+.nav-button.nav-art-button-wrap{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    overflow:visible;
+    color:inherit;
+}
+.nav-art-button{
+    display:block;
+    width:auto;
+    height:66px;
+    max-width:96%;
+    object-fit:contain;
+    object-position:center;
+    pointer-events:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    transform:translateZ(0) scale(.96);
+    transform-origin:center;
+    filter:brightness(.88) saturate(.92);
+    transition:filter .14s ease, transform .14s ease;
+}
+.nav-button.nav-art-button-wrap.active .nav-art-button{
+    filter:brightness(1.12) saturate(1.08) drop-shadow(0 0 5px rgba(240,180,41,.58));
+    transform:translateZ(0) scale(1.02);
+}
+.nav-button.nav-art-button-wrap:active .nav-art-button{
+    filter:brightness(1.2) saturate(1.08);
+    transform:translateZ(0) scale(.92);
+}
+#mapPageNav .nav-art-button{
+    height:66px;
+    max-width:90%;
+}
+.nav-sr-only{
+    position:absolute!important;
+    width:1px!important;
+    height:1px!important;
+    padding:0!important;
+    margin:-1px!important;
+    overflow:hidden!important;
+    clip:rect(0,0,0,0)!important;
+    white-space:nowrap!important;
+    border:0!important;
+}
+
+
+
+/* =====================================================
+   V115 — 巡怪頁導覽 UI
+   下方固定：角色 / 背包 / 任務 / 元素匣
+   返回：右上角獨立透明 PNG 按鈕
+===================================================== */
+#app.on-map-page #mapPageNav{
+    grid-template-columns:repeat(4,1fr) !important;
+}
+
+.map-page-return-float{
+    position:fixed;
+    top:10px;
+    right:10px;
+    z-index:55;
+    width:68px;
+    height:68px;
+    padding:0;
+    margin:0;
+    border:0;
+    background:transparent;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    line-height:0;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;
+}
+.map-page-return-float img{
+    display:block;
+    width:68px;
+    height:68px;
+    object-fit:contain;
+    pointer-events:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    filter:drop-shadow(0 2px 5px rgba(0,0,0,.55));
+    transition:transform .12s ease,filter .12s ease;
+}
+.map-page-return-float:active img{
+    transform:scale(.92);
+    filter:brightness(1.12) drop-shadow(0 2px 6px rgba(0,0,0,.65));
+}
+
+/* =====================================================
+   V115 — 巡怪頁背包改為頁內浮層 + 左上快捷鈕放大
+   - 不再 showPage('inventory')，因此不離開巡怪頁。
+   - 直接重用既有 #inventoryPage / renderInventory() / itemModal，
+     不複製背包 DOM、不建立第二套物品或裝備系統。
+   - .inventory-grid-scroll 仍是唯一背包垂直 scroll owner。
+===================================================== */
+
+/* 左上角自動戰鬥 / 自動巡怪快捷鈕稍微放大。 */
+#game-stage > #app > #game-content .map-quick-toggle-row{
+    gap:10px !important;
+}
+#game-stage > #app > #game-content .map-quick-toggle-btn img{
+    width:78px !important;
+    height:auto !important;
+}
+
+/* 地圖頁內開啟的完整背包：保留 mapPage 在底下，不切換 page。 */
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open{
+    display:block !important;
+    position:absolute !important;
+    inset:8px 8px 76px 8px !important;
+    width:auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    z-index:260 !important;
+    margin:0 !important;
+    padding:9px !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+    touch-action:pan-y !important;
+    border:2px solid rgba(202,151,52,.92) !important;
+    border-radius:12px !important;
+    background:linear-gradient(180deg,rgba(20,16,11,.985),rgba(7,6,5,.99)) !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.72), inset 0 0 20px rgba(240,180,41,.05) !important;
+}
+
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.48);
+    pointer-events:none;
+    z-index:-1;
+}
+
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-classic-shell{
+    position:relative !important;
+    height:100% !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:8px !important;
+    overflow:hidden !important;
+}
+
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-panel{
+    flex:0 0 auto !important;
+    min-height:0 !important;
+}
+
+/*
+   ★ 修正（依照使用者回報，「背包介面的角色切換按鈕與
+   返回按鈕重疊了」，這是同一個問題的第二部分）：
+   把箭頭改成置中貼齊角色名稱兩側之後，名稱一長
+   （例如角色自訂名稱本身就比較長），整組「箭頭+名稱+
+   箭頭」置中出來的寬度還是可能大到讓右箭頭又頂到
+   絕對定位、貼右上角的「關閉」按鈕（只有從地圖頁開啟
+   的這個覆蓋層版本才有關閉按鈕，一般從下方導覽列
+   進背包沒有這個按鈕、不受影響）。這裡只在覆蓋層開啟
+   這個情境下，讓這條列的置中範圍往左讓出關閉按鈕的
+   寬度（56px按鈕+右邊5px留白+一點安全間距），
+   右箭頭不管名稱多長都不會再跑到關閉按鈕底下。
+*/
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-switch{
+    padding-right:64px !important;
+}
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-stage{
+    height:220px !important;
+    min-height:220px !important;
+    max-height:220px !important;
+}
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-right-panel{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    padding:8px 10px 10px !important;
+}
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-wallet-bar,
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-category-tabs{
+    flex:0 0 auto !important;
+}
+#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-grid-scroll{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    padding:0 1px 8px !important;
+}
+
+.map-inventory-overlay-close{
+    display:none;
+}
+#inventoryPage.map-inventory-overlay-open .map-inventory-overlay-close{
+    display:flex !important;
+    position:absolute;
+    top:4px;
+    right:5px;
+    z-index:8;
+    min-width:56px;
+    height:30px;
+    padding:0 10px;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #b98a3e;
+    border-radius:7px;
+    background:linear-gradient(180deg,#4a2d14,#23160c);
+    color:#ffe4a0;
+    font-size:12px;
+    font-weight:900;
+    line-height:1;
+    box-shadow:0 2px 8px rgba(0,0,0,.55);
+}
+#inventoryPage.map-inventory-overlay-open .map-inventory-overlay-close:active{
+    transform:scale(.95);
+    filter:brightness(1.12);
+}
+
+/* =====================================================
+   NAV
+===================================================== */
+
+.bottom-nav{
+    position:fixed;
+
+    left:50%;
+    transform:translateX(-50%);
+
+    bottom:0;
+
+    width:100%;
+    max-width:600px;
+
+    height:70px;
+
+    display:grid;
+
+    grid-template-columns:repeat(5,1fr);
+
+    background:linear-gradient(0deg,#0e0c0a,#1c1712);
+
+    border-top:2px solid #8a6a3a;
+
+    z-index:200;
+}
+
+.nav-button{
+    border:0;
+
+    background:transparent;
+    color:#b3a58c;
+
+    font-size:10px;
+
+    transition:color .15s;
+
+    /*
+       ★ 新增（依照使用者要求，「自動戰鬥」
+       放進地圖頁面導覽列）：
+       4個字比原本「角色」「任務」「返回」
+       這種2字標籤長，4欄變窄之後容易溢出
+       格子，加white-space:nowrap讓文字
+       保持一行，配合scale稍微縮小整個
+       按鈕的內距，確保4個字塞得下。
+    */
+
+    white-space:nowrap;
+    padding:0 2px;
+}
+
+.nav-button.active{
+    color:#f0b429;
+    text-shadow:0 0 8px rgba(240,180,41,.6);
+}
+
+.nav-icon{
+    display:block;
+    font-size:20px;
+    margin-bottom:3px;
+}
+
+/*
+   ★ 新增（依照使用者要求）：
+   把導覽列的5個emoji換成純CSS畫出來的
+   自訂圖示——emoji在不同手機/系統上
+   長相差很多（三星跟Google的emoji字型
+   完全不一樣），純CSS畫的圖形不管在
+   哪台手機上都會長得一模一樣。
+
+   統一用22×22px的畫布尺寸，色調跟遊戲
+   整體的金色/古銅色系一致。選中(.active)
+   時顏色會跟著.nav-button.active的
+   text-shadow金色主題連動（用currentColor
+   讓圖示的線條顏色直接繼承文字顏色，
+   不用另外寫一套選中配色）。
+*/
+
+.nav-icon-shape{
+    display:block;
+    position:relative;
+    width:22px;
+    height:22px;
+    margin:0 auto 3px;
+}
+
+/* ===== 主城：城堡 ===== */
+
+.nav-icon-castle{
+    background:currentColor;
+    clip-path:polygon(
+        0% 100%, 0% 45%,
+        0% 30%, 15% 30%, 15% 45%,
+        30% 45%, 30% 20%,
+        40% 20%, 40% 0%, 50% 20%, 60% 0%, 60% 20%,
+        70% 20%, 70% 45%,
+        85% 45%, 85% 30%, 100% 30%,
+        100% 45%, 100% 100%
+    );
+    opacity:.92;
+}
+
+/* ===== 練功區：指南針 ===== */
+
+.nav-icon-compass{
+    border-radius:50%;
+    border:2px solid currentColor;
+    box-sizing:border-box;
+}
+
+.nav-icon-compass::before{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:0;
+    height:0;
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-bottom:9px solid currentColor;
+    transform:translate(-50%,-50%) rotate(-20deg);
+    transform-origin:center 65%;
+}
+
+.nav-icon-compass::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    background:currentColor;
+    transform:translate(-50%,-50%);
+}
+
+/* ===== 狀態：長條圖 ===== */
+
+.nav-icon-chart{
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    gap:2px;
+}
+
+.nav-icon-chart span{
+    display:block;
+    width:4px;
+    background:currentColor;
+    border-radius:1px 1px 0 0;
+}
+
+.nav-icon-chart span:nth-child(1){
+    height:9px;
+}
+
+.nav-icon-chart span:nth-child(2){
+    height:16px;
+}
+
+.nav-icon-chart span:nth-child(3){
+    height:22px;
+}
+
+/* ===== 技能：火焰 ===== */
+
+.nav-icon-flame{
+    background:currentColor;
+    border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+    opacity:.95;
+}
+
+.nav-icon-flame::before{
+    content:"";
+    position:absolute;
+    top:22%;
+    left:22%;
+    width:56%;
+    height:56%;
+    background:#1a140d;
+    border-radius:50% 50% 50% 0;
+    opacity:.55;
+}
+
+/* ===== 副本：傳送門 ===== */
+
+.nav-icon-portal{
+    border:2px solid currentColor;
+    border-radius:50% 50% 45% 45%;
+    box-sizing:border-box;
+    opacity:.95;
+}
+
+.nav-icon-portal::before{
+    content:"";
+    position:absolute;
+    inset:22%;
+    border:1.5px solid currentColor;
+    border-radius:50%;
+    opacity:.6;
+}
+
+/* ===== BOSS：骷髏 ===== */
+
+.nav-icon-skull{
+    background:currentColor;
+    border-radius:50% 50% 45% 45%;
+    opacity:.95;
+}
+
+.nav-icon-skull::before,
+.nav-icon-skull::after{
+    content:"";
+    position:absolute;
+    top:32%;
+    width:22%;
+    height:22%;
+    background:#1a140d;
+    border-radius:50%;
+}
+
+.nav-icon-skull::before{
+    left:18%;
+}
+
+.nav-icon-skull::after{
+    right:18%;
+}
+
+/* ===== 背包：背包 ===== */
+
+.nav-icon-backpack{
+    width:18px;
+    height:16px;
+    margin:6px auto 3px;
+    background:currentColor;
+    border-radius:4px 4px 6px 6px;
+    opacity:.92;
+}
+
+.nav-icon-backpack::before{
+    content:"";
+    position:absolute;
+    top:-6px;
+    left:50%;
+    transform:translateX(-50%);
+    width:10px;
+    height:7px;
+    border:2px solid currentColor;
+    border-bottom:0;
+    border-radius:5px 5px 0 0;
+    box-sizing:border-box;
+}
+
+.nav-icon-backpack::after{
+    content:"";
+    position:absolute;
+    top:3px;
+    left:50%;
+    transform:translateX(-50%);
+    width:8px;
+    height:6px;
+    background:#1a140d;
+    border-radius:2px;
+    opacity:.5;
+}
+
+/*
+   ★ 新增（依照使用者要求）：
+   四個屬性（火/水/風/土）的圖示，改用純
+   CSS畫，取代原本的🔥💧🌪️🪨這四個emoji。
+   跟導覽列圖示同一套邏輯，不同手機顯示
+   emoji長相不一樣的問題，用CSS畫的圖形
+   完全不受影響。
+
+   刻意用width/height:1em、相對定位，
+   讓這個圖示可以直接嵌在文字行內使用
+   （跟原本"🔥 火法師"這種emoji+文字
+   混在一起的用法相容），字級多大、
+   圖示就跟著多大，不用每個使用場合
+   各自訂一次尺寸。
+
+   額外加了呼吸發光動畫（animation:
+   elementIconGlow），四種屬性用不同的
+   發光顏色，讓這幾個圖示本身有生命感，
+   不是靜態圖案。
+*/
+
+@keyframes elementIconGlow{
+
+    0%,100%{
+        filter:brightness(1)
+            drop-shadow(0 0 1px currentColor);
+    }
+
+    50%{
+        filter:brightness(1.35)
+            drop-shadow(0 0 4px currentColor);
+    }
+
+}
+
+.elem-icon{
+    display:inline-block;
+    position:relative;
+    width:1em;
+    height:1em;
+    vertical-align:-0.15em;
+
+    animation:elementIconGlow 2.2s ease-in-out infinite;
+}
+
+/* ===== 火：火焰 ===== */
+
+.elem-icon-fire{
+    color:#ff6a2e;
+}
+
+.elem-icon-fire::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:currentColor;
+    border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+}
+
+.elem-icon-fire::after{
+    content:"";
+    position:absolute;
+    top:22%;
+    left:22%;
+    width:56%;
+    height:56%;
+    background:#fff3c4;
+    border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+    opacity:.85;
+}
+
+/* ===== 水：水滴 ===== */
+
+.elem-icon-water{
+    color:#38bdf8;
+}
+
+.elem-icon-water::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:currentColor;
+    border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+    clip-path:polygon(
+        50% 0%, 85% 55%, 85% 70%,
+        70% 90%, 30% 90%, 15% 70%, 15% 55%
+    );
+}
+
+.elem-icon-water::after{
+    content:"";
+    position:absolute;
+    top:48%;
+    left:32%;
+    width:22%;
+    height:22%;
+    background:#e0f7ff;
+    border-radius:50%;
+    opacity:.75;
+}
+
+/* ===== 風：風漩 ===== */
+
+.elem-icon-wind{
+    color:#4ade80;
+}
+
+.elem-icon-wind::before,
+.elem-icon-wind::after{
+    content:"";
+    position:absolute;
+    border:2px solid currentColor;
+    border-radius:50%;
+    border-right-color:transparent;
+    border-bottom-color:transparent;
+    box-sizing:border-box;
+}
+
+.elem-icon-wind::before{
+    inset:0;
+}
+
+.elem-icon-wind::after{
+    inset:26%;
+    border-width:1.6px;
+}
+
+/* ===== 土：岩石 ===== */
+
+.elem-icon-earth{
+    color:#a8845a;
+}
+
+.elem-icon-earth::before{
+    content:"";
+    position:absolute;
+    inset:8% 0 0 0;
+    background:currentColor;
+    clip-path:polygon(
+        50% 0%, 90% 30%, 100% 75%,
+        75% 100%, 25% 100%, 0% 75%, 10% 30%
+    );
+}
+
+.elem-icon-earth::after{
+    content:"";
+    position:absolute;
+    top:28%;
+    left:28%;
+    width:26%;
+    height:20%;
+    background:#e8ddc7;
+    opacity:.5;
+    clip-path:polygon(0% 0%, 100% 30%, 60% 100%, 0% 60%);
+}
+
+/* =====================================================
+   升級
+===================================================== */
+
+.modal{
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.75);
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    z-index:1000;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:82%;
+    max-width:350px;
+
+    background:#1a1613;
+
+    border:1px solid var(--theme-border);
+    border-radius:14px;
+
+    padding:20px;
+
+    text-align:center;
+}
+
+/* =====================================================
+   V129 — SECOND CHARACTER CREATION READABILITY
+===================================================== */
+#secondCharacterModal .modal-box{
+    width:86%;
+    max-width:370px;
+    max-height:90% !important;
+    box-sizing:border-box;
+    padding:24px;
+}
+
+#secondCharacterModal h2{
+    margin:0 0 12px;
+    font-size:25px;
+    line-height:1.3;
+}
+
+#secondCharacterModal .second-character-subtitle{
+    margin-bottom:16px !important;
+    font-size:15px !important;
+    line-height:1.6;
+}
+
+#secondCharacterModal .creation-card{
+    padding:17px;
+    margin-bottom:13px;
+}
+
+#secondCharacterModal .creation-label{
+    margin-bottom:10px;
+    font-size:16px;
+    line-height:1.4;
+}
+
+#secondCharacterModal .creation-input{
+    height:48px;
+    padding:0 14px;
+    font-size:18px;
+}
+
+#secondCharacterModal .element-grid{
+    gap:8px;
+}
+
+#secondCharacterModal .element-option{
+    min-height:64px;
+    padding:12px 4px;
+}
+
+#secondCharacterModal .element-name{
+    margin-top:0;
+    font-size:16px;
+    line-height:1.25;
+}
+
+#secondCharacterModal .creation-stat{
+    padding:10px 0;
+    font-size:16px;
+    line-height:1.4;
+}
+
+#secondCharacterModal .creation-stat-right{
+    gap:8px;
+}
+
+#secondCharacterModal .creation-stat-right > b{
+    min-width:22px;
+    text-align:center;
+    font-size:17px;
+}
+
+#secondCharacterModal .creation-stat-button{
+    width:34px;
+    height:34px;
+    font-size:21px;
+    line-height:1;
+}
+
+#secondCharacterModal .creation-points{
+    margin-top:13px;
+    font-size:16px;
+    line-height:1.4;
+}
+
+#secondCharacterModal .creation-start{
+    height:52px;
+    font-size:18px;
+}
+
+/* =====================================================
+   經驗池
+===================================================== */
+
+.exp-pool-panel{
+    width:100%;
+    padding:0;
+    background:transparent;
+    border:0;
+    box-sizing:border-box;
+}
+
+.exp-pool-hero{
+    position:relative;
+    overflow:hidden;
+    padding:18px 16px 16px;
+    border:1px solid #9a7438;
+    border-radius:14px;
+    background:
+        radial-gradient(circle at 50% -15%,rgba(240,180,41,.24),transparent 52%),
+        linear-gradient(160deg,#2a2115 0%,#171109 52%,#0e0b07 100%);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,226,122,.06),
+        0 10px 24px rgba(0,0,0,.35);
+    text-align:center;
+}
+
+.exp-pool-hero::before,
+.exp-pool-hero::after{
+    content:"";
+    position:absolute;
+    top:14px;
+    width:52px;
+    height:1px;
+    background:linear-gradient(90deg,transparent,#b9914e);
+    opacity:.75;
+}
+.exp-pool-hero::before{left:12px;}
+.exp-pool-hero::after{right:12px;transform:scaleX(-1);}
+
+.exp-pool-kicker{
+    color:#a99572;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-size:8px;
+    letter-spacing:2px;
+}
+
+.exp-pool-title{
+    margin-top:4px;
+    color:#f4dfaa;
+    font-family:"Noto Serif TC",serif;
+    font-size:17px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.exp-pool-total{
+    display:flex;
+    align-items:baseline;
+    justify-content:center;
+    gap:6px;
+    margin-top:9px;
+}
+
+.exp-pool-value{
+    color:#ffe27a;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-weight:900;
+    font-size:27px;
+    line-height:1;
+    letter-spacing:.4px;
+    text-shadow:0 0 14px rgba(240,180,41,.26);
+}
+
+.exp-pool-unit{
+    color:#b99c61;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.exp-pool-caption{
+    max-width:310px;
+    margin:10px auto 0;
+    color:#a99b84;
+    font-size:10px;
+    line-height:1.55;
+}
+
+.exp-pool-section-head{
+    display:flex;
+    align-items:end;
+    justify-content:space-between;
+    margin:14px 3px 7px;
+    padding-bottom:6px;
+    border-bottom:1px solid rgba(154,116,56,.55);
+}
+.exp-pool-section-head span{
+    color:#ead5a5;
+    font-size:12px;
+    font-weight:900;
+}
+.exp-pool-section-head small{
+    color:#7f735f;
+    font-size:8px;
+}
+
+.exp-pool-character-list{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.exp-distribute-button{
+    width:100%;
+    min-height:58px;
+    margin:0;
+    padding:8px 10px;
+    display:grid;
+    grid-template-columns:34px minmax(0,1fr) auto;
+    align-items:center;
+    gap:9px;
+    border:1px solid #755a32;
+    border-radius:11px;
+    background:linear-gradient(160deg,#251c12,#120e09);
+    color:#ead9b5;
+    box-shadow:inset 0 0 0 1px rgba(255,226,122,.04);
+    text-align:left;
+}
+
+.exp-distribute-button:not(:disabled):active{
+    transform:translateY(1px);
+}
+
+.exp-character-icon{
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #8a6a3a;
+    border-radius:50%;
+    background:#0e0b07;
+    font-size:18px;
+}
+
+.exp-character-copy{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+.exp-character-copy strong{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#f0ddae;
+    font-size:12px;
+}
+.exp-character-copy small{
+    color:#8f826d;
+    font-size:9px;
+}
+
+.exp-character-cost{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    line-height:1;
+}
+.exp-character-cost b{
+    color:#ffe27a;
+    font-family:"Cinzel",sans-serif;
+    font-size:12px;
+}
+.exp-character-cost small{
+    margin-top:3px;
+    color:#947b4e;
+    font-size:7px;
+    letter-spacing:.8px;
+}
+
+.exp-distribute-button:disabled{
+    opacity:.38;
+    cursor:not-allowed;
+    filter:saturate(.55);
+}
+
+.exp-distribute-button.locked{
+    background:#2e2822;
+}
+
+.system-panel{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+}
+.system-panel-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:10px;
+    align-items:center;
+    padding:11px;
+    border:1px solid #6f542f;
+    border-radius:10px;
+    background:linear-gradient(160deg,#211910,#110d08);
+}
+.system-panel-row strong{
+    display:block;
+    color:#f0d9a4;
+    font-size:13px;
+}
+.system-panel-row small{
+    display:block;
+    margin-top:3px;
+    color:#948873;
+    font-size:9px;
+    line-height:1.45;
+}
+.system-panel-row.danger{
+    border-color:#6f3c31;
+}
+
+/* =====================================================
+   EXP 獲得提示（Toast）
+===================================================== */
+
+.exp-toast{
+    position:fixed;
+
+    left:50%;
+    top:14px;
+
+    transform:
+        translateX(-50%)
+        translateY(-30px);
+
+    background:#d4941f;
+    color:#0c0b0a;
+
+    font-weight:bold;
+    font-size:13px;
+
+    padding:9px 18px;
+    border-radius:20px;
+
+    box-shadow:0 4px 14px rgba(0,0,0,.4);
+
+    z-index:4000;
+
+    opacity:0;
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+.exp-toast.show{
+    opacity:1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+/*
+   ★ 新增（依照使用者要求，「升級的時候
+   可以跳出一個訊息框，顯示XXX升到XX級」）：
+   跟exp-toast同一種「輕量、不擋操作、
+   自動消失」的通知風格，不是要玩家按
+   確定才能關掉的那種彈窗（那種已經
+   照使用者要求拿掉了）。
+
+   z-index特別注意寫成6200，比目前彈窗
+   系統整套（.home-feature-modal是6000、
+   .item-modal是6050、skillDetailModal/
+   statusHelpModal是6060、下拉選單清單
+   是6100）都還高——因為升級這個動作
+   場景就是「在經驗池分配彈窗裡面按
+   分配」，觸發當下彈窗還開著，通知
+   一定要蓋得過彈窗背景才看得到，不然
+   又會重演「清單被彈窗蓋住看不到」
+   同一種bug。
+*/
+
+.level-up-toast{
+    position:fixed;
+
+    left:50%;
+    top:14px;
+
+    transform:
+        translateX(-50%)
+        translateY(-30px);
+
+    background:#f0b429;
+    color:#0c0b0a;
+
+    font-weight:900;
+    font-size:15px;
+
+    padding:11px 22px;
+    border-radius:20px;
+
+    box-shadow:0 4px 16px rgba(0,0,0,.5);
+
+    z-index:6200;
+
+    opacity:0;
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+.level-up-toast.show{
+    opacity:1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+/* =====================================================
+   自動存檔提示
+===================================================== */
+
+.autosave-indicator{
+    position:fixed;
+
+    right:10px;
+    bottom:78px;
+
+    background:rgba(17,24,39,.85);
+    color:#b3a58c;
+
+    font-size:10px;
+
+    padding:5px 10px;
+    border-radius:14px;
+
+    border:1px solid #2e2822;
+
+    z-index:3500;
+
+    opacity:0;
+
+    transform:translateY(6px);
+
+    transition:
+        opacity .3s ease,
+        transform .3s ease;
+
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+.autosave-indicator.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+/* =====================================================
+   小螢幕
+===================================================== */
+
+@media(max-height:700px){
+
+    .battle-title{
+        flex-basis:19px;
+        height:19px;
+        font-size:14px;
+        line-height:19px;
+    }
+
+    /*
+       ★ 修正（真的抓到問題根源了）：
+       這整塊@media(max-height:700px)是很早期
+       版面設計時寫的，那時候.battle-info、
+       .auto-setting-panel的「正常」大小
+       跟現在完全不一樣。
+       這裡設定的84px、40px是「早期版本」的
+       小螢幕修正值，但現在.battle-info的
+       基礎大小已經改成54px、.auto-setting-panel
+       已經改成62px——這個舊的媒體查詢完全沒有
+       跟著更新，導致在小螢幕（很多手機都符合
+       max-height:700px這個條件）上，
+       這裡的舊數值會蓋過我後來所有的調整，
+       戰鬥資訊變回84px（比現在的54px還大！）、
+       自動戰鬥面板被壓成40px（比按鈕自己的
+       46px高度還小，按鈕會被硬擠、文字被吃掉）。
+
+       這才是「自動戰鬥字被吃到」「面板跑版」
+       在小螢幕上特別明顯的真正原因——
+       不是我後來的CSS沒生效，
+       是這裡有一段沒人記得要同步更新的舊規則
+       一直在背後蓋掉新設定。
+
+       現在拿掉這兩條過時的規則，
+       讓小螢幕直接沿用.battle-info、
+       .auto-setting-panel目前的基礎大小
+       （已經比早期版本精簡很多，不需要再疊加
+       一層互相打架的小螢幕修正）。
+    */
+
+    .battle-menu,
+    .sub-menu{
+        flex-basis:58px;
+        height:58px;
+    }
+}
+
+@media(max-width:400px){
+
+    .battle-monsters{
+        gap:5px;
+    }
+
+    .battle-monster{
+        width:74px;
+    }
+
+    /*
+       ★ 修正（同一個問題的另一半）：
+       這裡原本把玩家卡片壓回92px，
+       直接跟我後來把卡片放大到116px
+       （讓角色圖片露出更多）的調整互相打架——
+       在400px以下的窄螢幕手機上，
+       這條規則會贏，卡片被硬壓小，
+       圖片又變成被血條蓋住一大塊，
+       等於前面那個修正在窄螢幕上完全失效。
+       改成104px，比主要設定的116px略小
+       （窄螢幕本來就要留一點餘裕），
+       但不會像92px壓得那麼誇張。
+    */
+
+    .battle-player{
+        width:104px;
+    }
+
+    /*
+       ★ 修正（真正的問題根源）：
+       這裡的5欄位版型（44px 1fr 1fr 1fr 46px）
+       是最早期、還沒重新設計面板時的舊樣式，
+       那時候中間有3個下拉選單。
+       現在面板已經改成「標籤+2個按鈕」
+       的3欄位版型，這條窄螢幕規則完全沒跟著改，
+       在400px以下的手機上會蓋掉正確的
+       64px 82px 82px設定，出現5欄位的空間分配，
+       導致標籤被壓太窄（文字被吃掉）、
+       整體又因為多出兩個不存在內容的1fr欄位
+       而變得比實際需要的還要寬（外框看起來很鬆散）。
+
+       這正是「自動戰鬥字被吃掉」跟
+       「外框為什麼這麼大」這兩個問題
+       在小螢幕手機上同時出現的真正原因。
+
+       改成貼合目前3欄位版型的窄螢幕版本，
+       欄寬整體再收窄一點，確保連最窄的手機
+       都放得下、不會被其他規則蓋掉。
+    */
+
+    .auto-setting-panel{
+        grid-template-columns:64px 68px 68px;
+    }
+
+    .inventory-icon{
+        font-size:18px;
+    }
+
+}
+
+/* =====================================================
+   ★ COMPLETE 1080×1920 GAME-STAGE OVERRIDE
+   The game coordinate surface is exactly 1080×1920.
+   Legacy 420×746.666 content is contained inside a
+   single transformed layer so existing selectors and
+   mechanics remain intact while the whole game scales
+   as one unit.
+===================================================== */
+html, body{
+    width:100%;
+    height:100%;
+    margin:0;
+    overflow:hidden;
+}
+
+#game-stage{
+    width:1080px !important;
+    height:1920px !important;
+    overflow:hidden !important;
+    transform-origin:center center !important;
+    background:#0c0b0a;
+}
+
+#game-stage > #app{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    max-width:none !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    transform:none !important;
+    transform-origin:top left !important;
+}
+
+/* The legacy game content is treated as one 420×746.6667
+   design surface and scaled exactly to the 1080×1920
+   virtual game coordinate surface. */
+#game-stage > #game-overlay-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    overflow:visible !important;
+    pointer-events:none !important;
+    z-index:2147483000 !important;
+}
+
+#game-stage > #app > #game-content{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    max-width:none !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    transform:scale(2.571428571428571) !important;
+    transform-origin:top left !important;
+    overflow:hidden !important;
+}
+
+/* Any direct fixed/viewport sizing on the legacy app itself
+   must not escape the fixed game-stage. */
+#game-stage > #app{
+    position:absolute !important;
+}
+
+/* Full-screen modal layers remain constrained to the stage. */
+#game-stage .home-feature-modal,
+#game-stage .map-feature-modal,
+#game-stage .modal-overlay,
+#game-stage .popup-overlay{
+    max-width:none;
+}
+
+/* Prevent legacy viewport-sized blocks from creating a page scroll. */
+#game-stage, #game-stage > #app, #game-stage > #app > #game-content{
+    box-sizing:border-box;
+}
+
+/*
+   COMPLETE SCALE FIX:
+   All legacy full-screen/fixed UI is now contained by the
+   transformed 420×746.6667 design surface. 100vw/100vh
+   would otherwise escape to the real browser viewport.
+*/
+#game-stage > #app > #game-content .home-bg-fixed-layer,
+#game-stage > #app > #game-content .map-bg-fixed-layer,
+#game-stage > #app > #game-content .training-bg-fixed-layer{
+    position:absolute !important;
+    inset:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+}
+
+#game-stage > #app > #game-content .map-quick-toggle-row{
+    position:absolute !important;
+    top:10px !important;
+    left:10px !important;
+}
+
+#game-stage > #app > #game-content .auto-settings-expanded.floating-modal{
+    position:absolute !important;
+    left:6px !important;
+    right:6px !important;
+    bottom:80px !important;
+    max-height:70% !important;
+}
+
+#game-stage > #app > #game-content .home-feature-modal,
+#game-stage > #app > #game-content .item-modal,
+#game-stage > #app > #game-content .modal,
+#game-stage > #app > #game-content .popup-overlay{
+    position:absolute !important;
+    inset:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+}
+
+#game-stage > #app > #game-content .home-feature-modal-box.wide{
+    width:1080px !important;
+    max-width:1080px !important;
+    max-height:96% !important;
+}
+
+#game-stage > #app > #game-content .bottom-nav{
+    position:absolute !important;
+    left:0 !important;
+    bottom:0 !important;
+    width:420px !important;
+    max-width:none !important;
+}
+
+#game-stage > #app > #game-content .exp-toast,
+#game-stage > #app > #game-content .level-up-toast{
+    position:absolute !important;
+    top:14px !important;
+}
+
+#game-stage > #app > #game-content .autosave-indicator{
+    position:absolute !important;
+    right:10px !important;
+    bottom:78px !important;
+}
+
+#game-stage > #app > #game-content #mapBattleOverlay{
+    position:absolute !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:70px !important;
+    width:420px !important;
+}
+
+#game-stage > #app > #game-content > div[style*="position:fixed"][style*="bottom:0"]{
+    position:absolute !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    width:420px !important;
+}
+
+#game-stage > #app > #game-content .ice-spin-projectile,
+#game-stage > #app > #game-content .fire-rocket-projectile,
+#game-stage > #app > #game-content .skill-name-badge{
+    /* These are migrated to #game-overlay-layer by JS below. */
+    position:absolute !important;
+}
+
+
+
+/* ============================================================
+   V9 — NATIVE 1080×1920 COORDINATE STANDARD
+
+   IMPORTANT:
+   - Existing #game-content remains the LEGACY 420×746.6667 layer.
+   - Do NOT migrate existing gameplay UI in bulk in this version.
+   - All NEW UI / VFX / Hotspot / Canvas overlays should use the
+     native 1080×1920 coordinate space.
+   - #game-overlay-layer is the native coordinate layer.
+
+   This is an incremental migration:
+   old content stays stable, new content uses the final standard.
+============================================================ */
+
+:root{
+    --game-native-width: 1080px;
+    --game-native-height: 1920px;
+    --game-legacy-width: 420px;
+    --game-legacy-height: 746.6666667px;
+}
+
+#game-stage > #game-overlay-layer{
+    width:1080px !important;
+    height:1920px !important;
+    left:0 !important;
+    top:0 !important;
+    transform:none !important;
+    transform-origin:top left !important;
+    box-sizing:border-box !important;
+}
+
+/* Explicit class for future native 1080×1920 UI.
+   Do not use vw/vh for game-internal positioning. */
+.game-native-ui{
+    position:absolute;
+    left:0;
+    top:0;
+    width:1080px;
+    height:1920px;
+    box-sizing:border-box;
+    transform:none;
+    transform-origin:top left;
+}
+
+/* Native elements must not accidentally inherit legacy 420px sizing. */
+#game-stage > #game-overlay-layer .game-native-element{
+    box-sizing:border-box;
+}
+
+/* =====================================================
+   V105 — 戰鬥五大指令改用使用者提供的整組圖像面板
+   - 使用原圖，不重新生成、不重畫。
+   - mainBattleMenu 保留原本 66px 文件流高度，避免角色列、元素匣、
+     戰鬥資訊框因 UI 改圖而位移。
+   - 圖像本身向上延伸，五個透明點擊區分別覆蓋：
+     技能／普通攻擊／背包(既有物品功能)／防禦／逃脫。
+   - 技能快捷列仍以較高 z-index 覆蓋此面板，原戰鬥函式不變。
+===================================================== */
+#mainBattleMenu{
+    position:relative !important;
+    display:block !important;
+    overflow:visible !important;
+    height:66px !important;
+    min-height:66px !important;
+    background:none !important;
+    border:0 !important;
+}
+
+#mainBattleMenu::before{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    top:-34px;
+    bottom:0;
+    z-index:1;
+    pointer-events:none;
+    background-image:url("../assets/battle/battle-command-panel.jpg");
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:100% auto;
+}
+
+#mainBattleMenu > .menu-button{
+    position:absolute !important;
+    top:-34px !important;
+    bottom:0 !important;
+    width:20% !important;
+    height:auto !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:12px !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:transparent !important;
+    font-size:0 !important;
+    line-height:0 !important;
+    text-shadow:none !important;
+    z-index:3 !important;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+}
+
+#mainBattleMenu > .menu-button.skill{
+    left:0 !important;
+}
+
+#mainBattleMenu > .menu-button:nth-of-type(2){
+    left:20% !important;
+}
+
+#mainBattleMenu > .menu-button.item{
+    left:40% !important;
+}
+
+#mainBattleMenu > .menu-button.defend{
+    left:60% !important;
+}
+
+#mainBattleMenu > .menu-button.run{
+    left:80% !important;
+}
+
+#mainBattleMenu > .menu-button::after{
+    content:"";
+    position:absolute;
+    left:9%;
+    right:9%;
+    top:8%;
+    bottom:12%;
+    border-radius:45%;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .08s linear;
+}
+
+#mainBattleMenu > .menu-button:active{
+    transform:none !important;
+    filter:none !important;
+    box-shadow:none !important;
+}
+
+#mainBattleMenu > .menu-button:active::after{
+    opacity:1;
+    background:radial-gradient(circle at 50% 43%,
+        rgba(255,226,118,.22) 0%,
+        rgba(255,180,30,.10) 48%,
+        rgba(255,180,30,0) 72%);
+    box-shadow:
+        inset 0 0 12px rgba(255,218,95,.45),
+        0 0 9px rgba(255,186,35,.34);
+}
+
+/* V105：技能選擇框必須永遠壓在新指令圖像上方。 */
+#skillQuickBar{
+    z-index:30 !important;
+}
+
+/* V173.61 — shared return icon center fill / patrol power saving / quest batch action */
+#game-stage img[src*="map-return.png"]{background:#050505;border-radius:50%;}
+#game-stage .map-quick-toggle-btn.v17361-power-save-toggle{
+    width:auto !important;min-width:64px;padding:0 9px !important;
+    border:1px solid rgba(205,160,82,.74) !important;border-radius:12px !important;
+    background:rgba(7,7,7,.9) !important;color:#d8c79f !important;
+    font-size:10px !important;font-weight:900 !important;letter-spacing:.04em;white-space:nowrap;
+}
+#game-stage .map-quick-toggle-btn.v17361-power-save-toggle.active{
+    border-color:#7ee0a9 !important;color:#aef1c9 !important;
+    box-shadow:inset 0 0 0 1px rgba(126,224,169,.2),0 0 9px rgba(80,194,128,.2) !important;
+}
+#game-stage .quest-batch-actions{display:flex;justify-content:flex-end;padding:8px 10px 4px;}
+#game-stage .quest-claim-all-btn{
+    min-width:108px;min-height:36px;padding:7px 12px;border:1px solid #b98a42;border-radius:8px;
+    background:linear-gradient(180deg,#4c3316,#211308);color:#ffe0a0;font-size:12px;font-weight:900;
+}
+#game-stage .quest-claim-all-btn:disabled{opacity:.42;filter:grayscale(.35);}
