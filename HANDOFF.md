@@ -3550,3 +3550,10 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Initial synthesis equipment art is resolved by `js/38-v143-system-fixes.js` directly from `assetPath` on first picker render, rather than waiting for a later repair pass.
 - Permanent UI rule: player-visible native `<select>/<option>` menus are forbidden; see `UI_GUIDELINES.md`.
 - Batch checklist: `release/requirement-batches/2026-09-07-synthesis-dungeon-equipment-ui.json`. Status remains IMPLEMENTED pending CI + dev visual verification; do not claim COMPLETE or bump version yet.
+
+
+## 2026-09-07 — Cloudflare DEV branch alias
+
+- Cloudflare 已由實際 deployment 證實：`dev` 分支固定 alias 為 `https://dev.four-symbols-dev.pages.dev`。
+- 現行 DEV 實機測試、release manifest 與 commit SHA read-back 一律使用此 branch alias；較早文件中出現的 `https://four-symbols-dev.pages.dev` 僅為歷史 root URL，不得再作為目前 `dev` SHA 驗證來源。
+- `.github/workflows/deploy-dev-cloudflare.yml` 已明確使用 `--branch=dev`，且部署後會從上述 branch alias 驗證 commit SHA、Game Version 與 Cache Version。

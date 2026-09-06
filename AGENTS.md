@@ -121,7 +121,7 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 ## DEV 發布與測試位置
 - `main` 仍是正式版來源，除非使用者明確要求，不得把開發修改直接推進 `main`。
 - `dev` 只能在 `Repository checks` 成功且 Release Gate 通過後，由 `.github/workflows/deploy-dev-cloudflare.yml` 部署到 Cloudflare Pages。
-- DEV 唯一固定測試網址：`https://four-symbols-dev.pages.dev`。
+- DEV 唯一固定測試／SHA 驗證網址：`https://dev.four-symbols-dev.pages.dev`。此網址為 Cloudflare `dev` 分支固定 alias；不得再以專案 root `https://four-symbols-dev.pages.dev` 作為 dev commit 驗證來源。
 - 不再使用 GitHack / RawCDN 作為 DEV 驗證來源。
 - `assets-library` 與 `assets-library/assets/inbox/` 仍維持 GitHub 素材工作流，不受 Cloudflare Pages 發布方式影響。
 - Game Version、Cache Version、主城 HUD、`index.html` 受管理 cache-busting 與 `V_ASSET_VERSION` 必須一致；部署流程禁止再用 `sed` 或其他方式在 `_deploy` 臨時補版本。
