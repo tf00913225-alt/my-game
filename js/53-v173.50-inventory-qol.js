@@ -446,35 +446,57 @@
             const link=document.createElement("link");
             link.id="v17351-qa-style";
             link.rel="stylesheet";
-            link.href="css/53-v173.51-qa.css?v=173.53";
+            link.href="css/53-v173.51-qa.css?v=173.54";
             document.head.appendChild(link);
         }
         const queue=[
-            ["v17351-battle-qa","js/54-v173.51-battle-qa.js?v=173.53"],
-            ["v17351-inventory-qa","js/55-v173.51-inventory-qa.js?v=173.53"],
-            ["v17351-shop-qa","js/56-v173.51-shop-qa.js?v=173.53"],
-            ["v17351-quest-qa","js/57-v173.51-quest-qa.js?v=173.53"]
+            ["v17351-battle-qa","js/54-v173.51-battle-qa.js?v=173.54"],
+            ["v17351-inventory-qa","js/55-v173.51-inventory-qa.js?v=173.54"],
+            ["v17351-shop-qa","js/56-v173.51-shop-qa.js?v=173.54"],
+            ["v17351-quest-qa","js/57-v173.51-quest-qa.js?v=173.54"]
         ];
         let index=0;
+        let readySent=false;
+        const finish=function(){
+            if(readySent){ return; }
+            readySent=true;
+            window.__v17351QaReady=true;
+            try{ document.dispatchEvent(new CustomEvent("v17351:qa-ready",{detail:{loaded:queue.length,total:queue.length}})); }catch(_){ }
+        };
+        const failed=function(pair){
+            if(typeof window.__v17347RuntimeGateFail==="function"){
+                window.__v17347RuntimeGateFail("功能模組載入失敗："+String(pair&&pair[0]||"未知模組")+"。請重新整理。");
+            }
+        };
+        const reportAndNext=function(pair,script){
+            if(script){ script.dataset.loaded="1"; }
+            if(typeof window.__v173ReportRuntimeProgress==="function"){
+                window.__v173ReportRuntimeProgress(pair[0],pair[1]);
+            }
+            next();
+        };
         const next=function(){
-            if(index>=queue.length){ return; }
+            if(index>=queue.length){ finish(); return; }
             const pair=queue[index++];
-            if(document.getElementById(pair[0])){ next(); return; }
+            const existing=document.getElementById(pair[0]);
+            if(existing){
+                if(existing.dataset.loaded==="1"){
+                    if(typeof window.__v173ReportRuntimeProgress==="function"){
+                        window.__v173ReportRuntimeProgress(pair[0],pair[1]);
+                    }
+                    next();
+                    return;
+                }
+                existing.addEventListener("load",()=>reportAndNext(pair,existing),{once:true});
+                existing.addEventListener("error",()=>failed(pair),{once:true});
+                return;
+            }
             const script=document.createElement("script");
             script.id=pair[0];
             script.src=pair[1];
             script.async=false;
-            script.onload=function(){
-                if(typeof window.__v173ReportRuntimeProgress==="function"){
-                    window.__v173ReportRuntimeProgress(pair[0],pair[1]);
-                }
-                next();
-            };
-            script.onerror=function(){
-                if(typeof window.__v17347RuntimeGateFail==="function"){
-                    window.__v17347RuntimeGateFail("V173.51 功能載入失敗，請重新整理。");
-                }
-            };
+            script.addEventListener("load",()=>reportAndNext(pair,script),{once:true});
+            script.addEventListener("error",()=>failed(pair),{once:true});
             document.head.appendChild(script);
         };
         next();

@@ -134,8 +134,8 @@ test("Fire Rocket travels from its caster to the real target group before bursti
 test("the current cache version publishes the repaired sheets and choreography",()=>{
     assert.match(animation,/dragon-slash-cast\.png\?v=165/);
     assert.match(animation,/rage-cast\.png\?v=165/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.53"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.53/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.54"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.54/);
 });
 
 console.log("\nV165 Fire VFX fixes suite: "+passed+" tests passed.");

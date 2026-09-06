@@ -506,7 +506,7 @@
             const link=document.createElement("link");
             link.id="v17350-inventory-qol-style";
             link.rel="stylesheet";
-            link.href="css/52-v173.50-inventory-qol.css?v=173.53";
+            link.href="css/52-v173.50-inventory-qol.css?v=173.54";
             link.onerror=function(){ failV17350RuntimeGate("背包介面樣式載入失敗，請重新整理。"); };
             document.head.appendChild(link);
         }
@@ -516,18 +516,33 @@
         }
         const script=document.createElement("script");
         script.id="v17350-inventory-qol-runtime";
-        script.src="js/53-v173.50-inventory-qol.js?v=173.53";
+        script.src="js/53-v173.50-inventory-qol.js?v=173.54";
         script.async=false;
         script.onload=function(){
         if(typeof window.__v173ReportRuntimeProgress==="function"){
             window.__v173ReportRuntimeProgress("v17350-inventory-qol-runtime","背包與批量操作系統");
         }
-        const startedAt=Date.now();
-        (function waitForV17351(){
-            if(window.__v17351QaReady){ releaseV17350RuntimeGate(); return; }
-            if(Date.now()-startedAt>5000){ failV17350RuntimeGate("V173.51 功能載入逾時，請重新整理。"); return; }
-            setTimeout(waitForV17351,25);
-        })();
+        if(window.__v17351QaReady){
+            releaseV17350RuntimeGate();
+            return;
+        }
+        let qaSettled=false;
+        const onQaReady=function(){
+            if(qaSettled){ return; }
+            qaSettled=true;
+            document.removeEventListener("v17351:qa-ready",onQaReady);
+            releaseV17350RuntimeGate();
+        };
+        document.addEventListener("v17351:qa-ready",onQaReady,{once:true});
+        setTimeout(function(){
+            if(qaSettled||window.__v17351QaReady){
+                if(!qaSettled){ onQaReady(); }
+                return;
+            }
+            qaSettled=true;
+            document.removeEventListener("v17351:qa-ready",onQaReady);
+            failV17350RuntimeGate("功能模組載入時間過長，請重新整理後再試。");
+        },30000);
     };
         script.onerror=function(){ failV17350RuntimeGate("背包與批量操作系統載入失敗，請重新整理。"); };
         document.head.appendChild(script);
