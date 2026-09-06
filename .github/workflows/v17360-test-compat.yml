@@ -42,6 +42,18 @@ jobs:
           if s.count(old)!=1:
               raise SystemExit(f'v169 expected exactly one rarity test anchor, found {s.count(old)}')
           p.write_text(s.replace(old,new,1),encoding='utf-8')
+
+          p=Path('tests/v173.50-inventory-qol.test.js')
+          s=p.read_text(encoding='utf-8')
+          replacements=[
+              ('assert.match(qol,/QUALITY_ORDER=\\["white","blue","purple","orange"\\]/);','assert.match(qol,/QUALITY_ORDER=\\["white","blue","purple","orange","pink","four-symbol"\\]/);'),
+              ('assert.match(qol,/橙裝售出後無法復原/);','assert.match(qol,/高階裝備售出後無法復原/);')
+          ]
+          for old,new in replacements:
+              if s.count(old)!=1:
+                  raise SystemExit(f'v173.50 expected exactly one anchor: {old!r}; found {s.count(old)}')
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
           PY
       - name: Ensure asset-test dependency
         run: |
@@ -56,7 +68,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/v141-system-expansion.test.js tests/v169-abyss-assets-flow.test.js
+          git add tests/v141-system-expansion.test.js tests/v169-abyss-assets-flow.test.js tests/v173.50-inventory-qol.test.js
           git diff --cached --check
           git commit -m "V173.60 align legacy tests with formal tiers"
           git push origin HEAD:dev
