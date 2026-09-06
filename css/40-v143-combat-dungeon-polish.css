@@ -680,13 +680,8 @@
     scroll-snap-align:start;
 }
 #game-stage .v143-item-picker button.selected{border-color:#f0bd59;color:#fff0c5;box-shadow:0 0 10px rgba(232,169,60,.5),inset 0 0 9px rgba(232,169,60,.15);}
-#game-stage .v143-item-picker i{
-    display:block;
-    width:48px;
-    height:48px;
-    flex:0 0 48px;
-}
-#game-stage .v143-item-picker i > svg,
+#game-stage .v143-item-picker i,
+#game-stage .v143-item-picker i > svg{display:block;width:48px;height:48px;flex:0 0 48px;}
 #game-stage .v143-item-picker i > .v169-item-art,
 #game-stage .v143-item-picker i > .v169-item-art > img,
 #game-stage .v143-item-picker i > .v169-item-art > svg{
