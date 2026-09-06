@@ -115,14 +115,14 @@
             bar.className="v17350-bulk-sell-bar";
             bar.setAttribute("aria-label","裝備一鍵售出");
             bar.innerHTML=
-                '<b>一鍵售出</b>'+ 
+                '<b>一鍵售出</b>'+
                 '<select id="v17350BulkSellQuality" aria-label="售出品質上限">'+
-                    '<option value="white">白裝以下</option>'+ 
-                    '<option value="blue">藍裝以下</option>'+ 
-                    '<option value="purple">紫裝以下</option>'+ 
-                    '<option value="orange">橙裝以下</option>'+ 
-                '</select>'+ 
-                '<button id="v17350BulkSellButton" type="button" onclick="v17350BulkSellEquipment()">售出 0 件</button>'+ 
+                    '<option value="white">白裝以下</option>'+
+                    '<option value="blue">藍裝以下</option>'+
+                    '<option value="purple">紫裝以下</option>'+
+                    '<option value="orange">橙裝以下</option>'+
+                '</select>'+
+                '<button id="v17350BulkSellButton" type="button" onclick="v17350BulkSellEquipment()">售出 0 件</button>'+
                 '<small id="v17350BulkSellMeta">僅售出背包內未穿戴裝備</small>';
             gridScroll.parentNode.insertBefore(bar,gridScroll);
             const select=bar.querySelector("#v17350BulkSellQuality");
@@ -235,9 +235,9 @@
         panel.dataset.itemId=String(item.id||"");
         panel.dataset.kind=descriptor.kind;
         panel.innerHTML=
-            '<label for="v17350BatchQuantity">數量</label>'+ 
-            '<input id="v17350BatchQuantity" type="number" inputmode="numeric" min="1" max="'+descriptor.total+'" value="'+descriptor.total+'" aria-label="批量數量">'+ 
-            '<span class="v17350-batch-max">/ '+descriptor.total+'</span>'+ 
+            '<label for="v17350BatchQuantity">數量</label>'+
+            '<input id="v17350BatchQuantity" type="number" inputmode="numeric" min="1" max="'+descriptor.total+'" value="'+descriptor.total+'" aria-label="批量數量">'+
+            '<span class="v17350-batch-max">/ '+descriptor.total+'</span>'+
             '<button type="button" onclick="v17350RunBatchAction()">'+descriptor.label+'</button>';
         buttons.parentNode.insertBefore(panel,buttons);
         const input=panel.querySelector("#v17350BatchQuantity");
