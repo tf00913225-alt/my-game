@@ -11,56 +11,40 @@
       "id": "UI-01",
       "status": "IMPLEMENTED",
       "requirement": "冶煉材料階級改為橫向捲軸排列",
-      "evidence": [
-        "css/38-v141-system-expansion.css",
-        "js/01-stage-v8-touch-lock.js"
-      ]
+      "evidence": ["css/38-v141-system-expansion.css", "js/01-stage-v8-touch-lock.js"]
     },
     {
       "id": "UI-02",
       "status": "IMPLEMENTED",
       "requirement": "副本獎勵預覽增加高度且文字不得穿出框",
-      "evidence": [
-        "css/33-v132-content-expansion.css",
-        "js/58-v173.63-functional-fixes.js"
-      ]
+      "evidence": ["css/33-v132-content-expansion.css", "js/58-v173.63-functional-fixes.js"]
     },
     {
       "id": "UI-03",
       "status": "IMPLEMENTED",
       "requirement": "背包装備比較依相同部位正確配對並重新排版",
-      "evidence": [
-        "js/55-v173.51-inventory-qa.js",
-        "css/53-v173.51-qa.css"
-      ]
+      "evidence": ["js/55-v173.51-inventory-qa.js", "css/53-v173.51-qa.css"]
     },
     {
       "id": "UI-04",
       "status": "IMPLEMENTED",
       "requirement": "材料合成使用遊戲風格自訂選單並縮小圖片版面",
-      "evidence": [
-        "js/58-v173.63-functional-fixes.js",
-        "UI_GUIDELINES.md"
-      ]
+      "evidence": ["js/58-v173.63-functional-fixes.js", "UI_GUIDELINES.md"]
     },
     {
       "id": "UI-05",
       "status": "IMPLEMENTED",
       "requirement": "裝備合成 picker 初始 render 即顯示正式裝備 icon",
-      "evidence": [
-        "js/38-v143-system-fixes.js"
-      ]
+      "evidence": ["js/38-v143-system-fixes.js"]
     },
     {
       "id": "UI-06",
       "status": "IMPLEMENTED",
       "requirement": "裝備比較採雙欄 icon／數值／操作區清楚分組",
-      "evidence": [
-        "js/55-v173.51-inventory-qa.js",
-        "css/53-v173.51-qa.css"
-      ]
+      "evidence": ["js/55-v173.51-inventory-qa.js", "css/53-v173.51-qa.css"]
     }
   ],
-  "automatedVerification": "PENDING_CI",
+  "automatedVerification": "TARGETED_TESTS_PASSED_ON_BRANCH",
+  "targetedVerificationRun": 34055981866,
   "visualVerification": "PENDING_DEV_PREVIEW"
 }
