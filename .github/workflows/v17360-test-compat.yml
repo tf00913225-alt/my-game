@@ -23,28 +23,17 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          def replace_exact(path, old, new, label, expected=1):
-              p=Path(path)
-              s=p.read_text(encoding='utf-8')
-              count=s.count(old)
-              if count!=expected:
-                  raise SystemExit(f'{label}: expected {expected} anchor(s), found {count}')
-              p.write_text(s.replace(old,new,expected),encoding='utf-8')
-
           # Real compatibility fixes in the synthesis/reforge owner.
           p=Path('js/36-v141-content-systems.js')
           s=p.read_text(encoding='utf-8')
-          source_replacements=[
-              ('const ore=definitions().ores.find(item=>item.tierKey===tier);',
-               'const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);'),
-              ('consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&candidate.tierKey===tier,cost)',
-               'consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&normalizeTierKey(candidate.tierKey)===tier,cost)'),
-          ]
-          for old,new in source_replacements:
-              if s.count(old)!=1:
-                  raise SystemExit(f'js/36 source compatibility: expected one {old!r}, found {s.count(old)}')
-              s=s.replace(old,new,1)
-          # Talisman upgrade cost must also accept hydrated legacy tier keys.
+          old='const ore=definitions().ores.find(item=>item.tierKey===tier);'
+          if s.count(old)!=2:
+              raise SystemExit(f'js/36 ore compatibility: expected 2 anchors, found {s.count(old)}')
+          s=s.replace(old,'const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);')
+          old='consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&candidate.tierKey===tier,cost)'
+          if s.count(old)!=1:
+              raise SystemExit(f'js/36 reforge consumption compatibility: expected 1 anchor, found {s.count(old)}')
+          s=s.replace(old,'consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&normalizeTierKey(candidate.tierKey)===tier,cost)',1)
           old='TALISMAN_GOLD[source.tierKey]'
           if s.count(old)!=4:
               raise SystemExit(f'js/36 talisman cost compatibility: expected 4 anchors, found {s.count(old)}')
@@ -84,16 +73,13 @@ jobs:
               s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8')
 
-          # V173.58 reforge behavior stays intact; formal tier names and normalized legacy consumption are now authoritative.
+          # V173.58 behavior remains; only formal tier names/compatibility semantics changed.
           p=Path('tests/v173.58-reforge-redesign.test.js')
           s=p.read_text(encoding='utf-8')
           replacements=[
-              ('assert.match(synthesis,/reforgeMaterialTier:"low",lockedReforgeKeys:\\[\\]/);',
-               'assert.match(synthesis,/reforgeMaterialTier:"white",lockedReforgeKeys:\\[\\]/);'),
-              ('assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&candidate\\.tierKey===tier,cost/);',
-               'assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&normalizeTierKey\\(candidate\\.tierKey\\)===tier,cost/);'),
-              ('assert.match(css,/V173\\.60 — FREE-MATERIAL REFORGE UI/);',
-               'assert.match(css,/V173\\.58 — FREE-MATERIAL REFORGE UI/);')
+              ('assert.match(synthesis,/reforgeMaterialTier:"low",lockedReforgeKeys:\\[\\]/);','assert.match(synthesis,/reforgeMaterialTier:"white",lockedReforgeKeys:\\[\\]/);'),
+              ('assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&candidate\\.tierKey===tier,cost/);','assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&normalizeTierKey\\(candidate\\.tierKey\\)===tier,cost/);'),
+              ('assert.match(css,/V173\\.60 — FREE-MATERIAL REFORGE UI/);','assert.match(css,/V173\\.58 — FREE-MATERIAL REFORGE UI/);')
           ]
           for old,new in replacements:
               if s.count(old)!=1:
