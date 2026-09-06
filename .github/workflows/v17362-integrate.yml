@@ -1,0 +1,52 @@
+name: V173.62 integration
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17362-integrate.yml
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Apply V173.62 patch
+        run: python3 .github/scripts/v17362_patch.py
+      - name: Ensure asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+      - name: JavaScript syntax
+        run: node .github/scripts/ci.mjs syntax
+      - name: Full Node suites
+        run: node .github/scripts/ci.mjs tests
+      - name: Static resources
+        run: node .github/scripts/ci.mjs resources
+      - name: Duplicate HTML IDs
+        run: node .github/scripts/ci.mjs html-ids
+      - name: Loader integrity
+        run: node .github/scripts/ci.mjs loader
+      - name: Whitespace
+        run: git diff --check
+      - name: Commit V173.62
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/scripts/v17362_patch.py .github/workflows/v17362-integrate.yml
+          git add index.html js tests css
+          git diff --cached --check
+          git commit -m "V173.62 fix inventory patrol VFX and starter gear"
+          git push origin HEAD:dev
