@@ -28,13 +28,10 @@ body.v17351-inventory-fullscreen #game-stage #characterPage,body.v17351-inventor
 body.v17351-inventory-fullscreen #game-stage #inventoryPage,body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-classic-shell{height:100%!important;max-height:none!important;min-height:0!important}
 body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scroll{flex:1 1 auto!important;min-height:0!important;max-height:none!important}
 
-#game-stage #homeFeatureModal .v17351-shop-card{display:grid!important;grid-template-columns:88px minmax(0,1fr)!important;grid-template-rows:auto auto!important;gap:8px 10px!important;align-items:center!important}
-#game-stage #homeFeatureModal .v17351-shop-card .v17345-equipment-icon{width:88px!important;height:88px!important}
 #game-stage #homeFeatureModal .v17351-shop-image{position:relative!important;display:grid!important;place-items:center!important;width:100%!important;height:100%!important;overflow:hidden!important}
 #game-stage #homeFeatureModal .v17351-shop-image img{position:relative!important;z-index:2!important;width:100%!important;height:100%!important;object-fit:contain!important}
-#game-stage #homeFeatureModal .v17351-shop-fallback{position:absolute!important;inset:0!important;z-index:1!important;display:grid!important;place-items:center!important;color:#dcb65f!important;font-size:25px!important;font-weight:900!important}.v17351-shop-image:not(.image-failed) .v17351-shop-fallback{opacity:.12!important}
-#game-stage #homeFeatureModal .v17351-shop-copy{min-width:0!important}.v17351-shop-copy b{display:block!important;color:#f1e3c4!important;font-size:14px!important}.v17351-shop-copy span{display:block!important;margin-top:3px!important;color:#b9a98d!important;font-size:11px!important}.v17351-shop-copy strong{display:block!important;margin-top:5px!important;color:#e7c26d!important;font-size:11px!important;line-height:1.3!important}
-#game-stage #homeFeatureModal .v17351-shop-card>button{grid-column:1/-1!important;min-height:36px!important}.v17351-shop-card.purchased>button{color:#b8ccb0!important;border-color:#586a4f!important;background:linear-gradient(180deg,#242d20,#11160f)!important;opacity:1!important}
+#game-stage #homeFeatureModal .v17351-shop-fallback{position:absolute!important;inset:0!important;z-index:1!important;display:grid!important;place-items:center!important;color:#dcb65f!important;font-size:20px!important;font-weight:900!important}.v17351-shop-image:not(.image-failed) .v17351-shop-fallback{opacity:.08!important}
+#game-stage #homeFeatureModal .v17346-shop-card.purchased .v17346-shop-buy.v17351-purchased-buy{color:#b8ccb0!important;border-color:#586a4f!important;background:linear-gradient(180deg,#242d20,#11160f)!important;box-shadow:none!important;opacity:1!important}
 #game-stage #homeFeatureModal .v17351-free-refresh button{color:#261704!important;border-color:#d4a44b!important;background:linear-gradient(180deg,#f2cd73,#c78930)!important}
 
 #game-stage #homeFeatureModal .v17351-achievement-shell{height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;gap:9px!important}
