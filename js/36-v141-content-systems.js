@@ -322,7 +322,7 @@
         const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
         const blueprintSeries=SERIES.find(item=>item.setId===blueprint.setId)||null;
         const series=blueprintSeries||SERIES.find(item=>item.setId===synthesisState.seriesId)||SERIES[0];
-        const ore=definitions().ores.find(item=>item.tierKey===tier);
+        const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);
         const blueprintCount=countItem(blueprint.id);
         const oreCount=ore?countItem(ore.id):0;
         const canCraft=blueprintCount>=50&&oreCount>=50&&gold>=meta.craftGold&&inventoryItems.length<120;
@@ -414,7 +414,7 @@
         const source=list.find(item=>item.id===synthesisState.talismanId);
         const target=nextTalisman(source);
         const owned=countItem(source.id);
-        const max=Math.min(Math.floor(owned/3),Math.floor(gold/TALISMAN_GOLD[source.tierKey]));
+        const max=Math.min(Math.floor(owned/3),Math.floor(gold/TALISMAN_GOLD[normalizeTierKey(source.tierKey)]));
         synthesisState.talismanQty=Math.max(1,Math.min(Math.max(1,max),synthesisState.talismanQty));
         const qty=synthesisState.talismanQty;
         const can=max>=qty&&target;
@@ -424,7 +424,7 @@
             ).join("")+'</select></label>'+
             '<div class="v141-upgrade-flow"><section>'+source.icon+'<b>'+escapeHtml(source.name)+' ×'+(qty*3)+'</b></section><i>→</i><section>'+target.icon+'<b>'+escapeHtml(target.name)+' ×'+qty+'</b></section></div>'+
             '<div class="v141-quantity"><button onclick="v141AdjustTalismanQty(-1)">－</button><strong>'+qty+'</strong><button onclick="v141AdjustTalismanQty(1)">＋</button><button onclick="v141AdjustTalismanQty(\'max\')">MAX</button></div>'+
-            '<div class="v141-material-lines"><span>持有 '+owned+'</span><span>消耗 '+(qty*3)+'</span><span>金幣 '+(TALISMAN_GOLD[source.tierKey]*qty).toLocaleString('zh-TW')+'</span></div>'+
+            '<div class="v141-material-lines"><span>持有 '+owned+'</span><span>消耗 '+(qty*3)+'</span><span>金幣 '+(TALISMAN_GOLD[normalizeTierKey(source.tierKey)]*qty).toLocaleString('zh-TW')+'</span></div>'+
             '<button class="v141-synthesis-primary" '+(can?'':'disabled')+' onclick="v141CraftTalismans()">開始合成</button></div>';
     }
 
@@ -493,7 +493,7 @@
     window.v141AdjustTalismanQty=function(change){
         const source=definitions().talismans.find(item=>item.id===synthesisState.talismanId);
         if(!source){ return; }
-        const max=Math.min(Math.floor(countItem(source.id)/3),Math.floor(gold/TALISMAN_GOLD[source.tierKey]));
+        const max=Math.min(Math.floor(countItem(source.id)/3),Math.floor(gold/TALISMAN_GOLD[normalizeTierKey(source.tierKey)]));
         synthesisState.talismanQty=change==="max"?Math.max(1,max):Math.max(1,Math.min(Math.max(1,max),synthesisState.talismanQty+Number(change)));
         renderSynthesis();
     };
@@ -521,7 +521,7 @@
         const tier=normalizeTierKey(blueprint.tierKey);
         const meta=TIER_META[tier];
         const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
-        const ore=definitions().ores.find(item=>item.tierKey===tier);
+        const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);
         if(!ore||countItem(blueprint.id)<50||countItem(ore.id)<50||gold<meta.craftGold){ alert("素材或金幣不足。"); return; }
         const stats=rollAffixes(tier,false);
         const item={
@@ -555,7 +555,7 @@
             return;
         }
         const success=runInventoryTransaction(()=>
-            consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&candidate.tierKey===tier,cost)&&
+            consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&normalizeTierKey(candidate.tierKey)===tier,cost)&&
             window.v132ConsumeStackItem(info.ore.id,cost)
         );
         if(!success){ alert("冶煉素材扣除失敗，已自動還原。"); return; }
@@ -591,7 +591,7 @@
         const target=nextTalisman(source);
         if(!source||!target){ return; }
         const qty=Math.max(1,synthesisState.talismanQty);
-        const cost=TALISMAN_GOLD[source.tierKey]*qty;
+        const cost=TALISMAN_GOLD[normalizeTierKey(source.tierKey)]*qty;
         if(countItem(source.id)<qty*3||gold<cost){ alert("符咒或金幣不足。"); return; }
         if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(target,qty)){ alert("背包空間不足。"); return; }
         const success=runInventoryTransaction(()=>window.v132ConsumeStackItem(source.id,qty*3)&&addItem(target,qty));

@@ -249,7 +249,7 @@ test("new blueprints encode part, tier and series while legacy saves remain sele
     assert.match(v132Source,/const BLUEPRINT_SERIES=\[/);
     assert.match(v132Source,/BLUEPRINT_SERIES\.forEach\(series/);
     assert.match(v132Source,/setId:series\.id/);
-    assert.equal(5*4*4,80);
+    assert.equal(5*6*4,120);
     assert.match(contentSource,/blueprint\.setId\|\|synthesisState\.seriesId/);
     assert.match(contentSource,/由圖紙決定/);
     assert.match(contentSource,/僅舊存檔既有圖紙沒有系列欄位/);
@@ -262,7 +262,8 @@ test("synthesis implements exact material costs, replacement-only reforge and pe
     assert.match(contentSource,/return locks===0\?50:\(locks===1\?100:150\)/);
     assert.match(contentSource,/consumeMatching\([^\n]+,cost\)/);
     assert.match(contentSource,/ConsumeStackItem\(info\.ore\.id,cost\)/);
-    assert.match(contentSource,/reforgeMaterialTier:"low"/);
+    assert.match(contentSource,/reforgeMaterialTier:"white"/);
+    assert.match(contentSource,/TIER_ALIASES=\{low:"white",mid:"blue",high:"purple",perfect:"orange"\}/);
     assert.match(contentSource,/裝備品質不限制材料階級/);
     assert.match(contentSource,/item\.reforgeStats=Object\.assign\(\{\},pending\.stats\)/);
     assert.match(contentSource,/Math\.random\(\)<\.10/);

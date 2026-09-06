@@ -13,9 +13,9 @@ const index=fs.readFileSync("index.html","utf8");
 
 assert.match(css,/\.v17342-element-box-use-notice\{[\s\S]*?font-size:27px !important/);
 assert.match(qol,/window\.v17350BulkSellEquipment=async function/);
-assert.match(qol,/QUALITY_ORDER=\["white","blue","purple","orange"\]/);
+assert.match(qol,/QUALITY_ORDER=\["white","blue","purple","orange","pink","four-symbol"\]/);
 assert.match(qol,/summary\.hasOrangeOrAbove[\s\S]*?window\.rpgConfirm/);
-assert.match(qol,/橙裝售出後無法復原/);
+assert.match(qol,/高階裝備售出後無法復原/);
 assert.match(qol,/id="v17350BulkSellQuality"/);
 assert.match(qol,/window\.v17350RunBatchAction=async function/);
 assert.match(qol,/id="v17350BatchQuantity"[\s\S]*?value="'\+descriptor\.total\+'"/);
