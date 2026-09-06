@@ -23,7 +23,15 @@ jobs:
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
       - name: Apply patch
-        run: python .github/scripts/apply-v17352-startup.py
+        run: |
+          python .github/scripts/apply-v17352-startup.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('js/20-anonymous-20.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('if(typeof window.__v173ReportRuntimeProgress==="function")','if(typeof window!=="undefined"&&typeof window.__v173ReportRuntimeProgress==="function")')
+          p.write_text(s,encoding='utf-8')
+          PY
       - name: Syntax and tests
         run: |
           node --check js/20-anonymous-20.js
