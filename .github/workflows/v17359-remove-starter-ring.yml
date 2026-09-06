@@ -25,22 +25,19 @@ jobs:
 
           path = Path('js/00-main.js')
           text = path.read_text(encoding='utf-8')
-          block = '''    {
-              id:"powerRing",
-              name:"力量戒指",
-              icon:"",
-              type:"accessory",
-              count:1,
-              price:200,
-              stats:{
-                  attack:5
-              }
-          },
-
-          '''
-          if text.count(block) != 1:
-              raise SystemExit(f'expected exactly one starter powerRing block, found {text.count(block)}')
-          path.write_text(text.replace(block, '', 1), encoding='utf-8')
+          marker = 'id:"powerRing"'
+          if text.count(marker) != 1:
+              raise SystemExit(f'expected exactly one powerRing marker, found {text.count(marker)}')
+          pos = text.index(marker)
+          start = text.rfind('    {\n', 0, pos)
+          separator = text.find('\n    },\n\n    {', pos)
+          if start < 0 or separator < 0:
+              raise SystemExit('could not isolate starter powerRing object')
+          block = text[start:separator + len('\n    },\n\n')]
+          for required in ('name:"力量戒指"', 'type:"accessory"', 'attack:5'):
+              if required not in block:
+                  raise SystemExit(f'unexpected powerRing object; missing {required}')
+          path.write_text(text[:start] + text[separator + len('\n    },\n\n'):], encoding='utf-8')
           PY
           node --check js/00-main.js
       - name: Commit patch
