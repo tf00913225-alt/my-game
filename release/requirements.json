@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "releaseVersion": "173.62",
+  "requirements": [
+    {"id":"REQ-01","title":"永久完成定義與多項需求逐項驗證規則","status":"IMPLEMENTED","evidence":{"files":["AGENTS.md","CLAUDE.md"],"verification":"文件內容與 release gate 規則交叉檢查","result":"待 Repository checks 驗證"}},
+    {"id":"REQ-02","title":"Requirement Checklist 與 Release Manifest 機制","status":"IMPLEMENTED","evidence":{"files":["release/requirements.json","release/release.json",".github/scripts/release-gate.mjs"],"verification":"CI schema/assertion","result":"待 Repository checks 驗證"}},
+    {"id":"REQ-03","title":"Game Version 與 Cache Version 一致性檢查","status":"IMPLEMENTED","evidence":{"files":["release/release.json",".github/scripts/release-gate.mjs",".github/workflows/ci.yml"],"verification":"release-gate ci","result":"待 Repository checks 驗證"}},
+    {"id":"REQ-04","title":"部署前舊版本殘留與部署產物版本檢查","status":"IMPLEMENTED","evidence":{"files":[".github/scripts/release-gate.mjs",".github/workflows/deploy-dev-cloudflare.yml"],"verification":"release-gate prepare-artifact","result":"待部署 gate 驗證"}},
+    {"id":"REQ-05","title":"dev branch HEAD、部署 Commit SHA 與 Cloudflare 實際內容核對","status":"IMPLEMENTED","evidence":{"files":[".github/scripts/release-gate.mjs",".github/workflows/deploy-dev-cloudflare.yml"],"verification":"branch HEAD preflight + deployed release-manifest fetch","result":"待下一次合法 dev deployment 驗證"}},
+    {"id":"REQ-06","title":"正式移除功能 deprecated-code assertion","status":"BLOCKED","evidence":{"files":["release/deprecated-code.json","index.html","js/34-v141-core-systems.js","css/00-main.css","css/43-v148-combat-dungeon-fixes.css"],"verification":"release-gate ci 搜尋正式 HTML/JS/CSS","result":"目前仍偵測到巡怪省電模式殘留；必須先真正移除，禁止部署"}},
+    {"id":"REQ-07","title":"CI SUCCESS / Deploy SUCCESS 不得等同需求完成","status":"IMPLEMENTED","evidence":{"files":["AGENTS.md","CLAUDE.md","release/requirements.json",".github/scripts/release-gate.mjs"],"verification":"release status + 100% VERIFIED gate","result":"待 Repository checks 驗證"}},
+    {"id":"REQ-08","title":"版本更新前 Requirement Checklist 必須 100% VERIFIED","status":"IMPLEMENTED","evidence":{"files":["AGENTS.md","CLAUDE.md",".github/scripts/release-gate.mjs"],"verification":"CI_BASE_SHA 比對 release/release.json 版本變更","result":"待 Repository checks 驗證"}},
+    {"id":"REQ-09","title":"Cache invalidation 與玩家 Save Data 完全分離規則","status":"IMPLEMENTED","evidence":{"files":["AGENTS.md","CLAUDE.md"],"verification":"文件規範檢查","result":"此項屬架構規範，需人工 code review 持續驗收"}},
+    {"id":"REQ-10","title":"main production 實際部署 SHA 自動核對","status":"BLOCKED","evidence":{"files":[".github/workflows/ci.yml"],"verification":"檢查 .github/workflows","result":"目前 repository 沒有 main production deployment workflow；不得假稱已自動化"}}
+  ]
+}
