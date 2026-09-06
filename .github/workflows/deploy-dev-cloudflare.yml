@@ -20,7 +20,7 @@ jobs:
       CLOUDFLARE_API_TOKEN_RAW: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID_RAW: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PROJECT_NAME: four-symbols-dev
-      DEV_BASE_URL: https://four-symbols-dev.pages.dev
+      DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
 
