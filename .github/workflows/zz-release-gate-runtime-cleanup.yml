@@ -1,0 +1,70 @@
+name: One-time late-runtime deprecated cleanup
+
+on:
+  push:
+    branches:
+      - release-gate-v17363
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: release-gate-v17363
+          fetch-depth: 0
+
+      - name: Remove late-runtime power-saving compatibility code
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('js/58-v173.63-functional-fixes.js')
+          text=p.read_text(encoding='utf-8')
+
+          text=text.replace('   - patrol power-save UI removal / automatic screen-awake policy\n','')
+
+          pattern=r'\n/\* ---------- 1\. Patrol power-save entry removed; awake policy is automatic\. ---------- \*/\nfunction removePatrolPowerSave\(\)\{[\s\S]*?\n\}\n\n'
+          text,count=re.subn(pattern,'\n',text,count=1)
+          if count != 1:
+              raise SystemExit(f'expected one removePatrolPowerSave owner, got {count}')
+
+          css_line='#game-stage #mapPage .v17361-power-save-toggle,#game-stage #quickPowerSavingToggle{display:none!important;}\n'
+          if text.count(css_line) != 1:
+              raise SystemExit('expected exactly one late-runtime hidden power-save CSS line')
+          text=text.replace(css_line,'',1)
+
+          old='repairQueued=false;removePatrolPowerSave();ensureFunctionalStyles();'
+          new='repairQueued=false;ensureFunctionalStyles();'
+          if text.count(old) != 1:
+              raise SystemExit('expected exactly one runRepairs power-save call')
+          text=text.replace(old,new,1)
+
+          p.write_text(text,encoding='utf-8')
+
+          t=Path('tests/v173.63-visible-ui-owner-repairs.test.js')
+          test=t.read_text(encoding='utf-8')
+          old='assert.match(functionalRepairs,/quickPowerSavingToggle/);\nassert.match(functionalRepairs,/v17361_patrol_power_saving/);'
+          new='assert.doesNotMatch(functionalRepairs,/quickPowerSavingToggle|v17361-power-save-toggle|v17361TogglePowerSaving|v17361_patrol_power_saving|v17361RequestWakeLock/);'
+          if old not in test:
+              raise SystemExit('V173.63 test power-save expectations not found')
+          t.write_text(test.replace(old,new,1),encoding='utf-8')
+          PY
+
+          git diff --check
+          node --check js/58-v173.63-functional-fixes.js
+
+      - name: Commit cleanup to integration branch
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add js/58-v173.63-functional-fixes.js tests/v173.63-visible-ui-owner-repairs.test.js
+          git commit -m "fix: remove late power-saving compatibility runtime"
+          git push origin HEAD:release-gate-v17363
