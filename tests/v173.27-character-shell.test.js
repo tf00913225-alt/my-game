@@ -93,10 +93,10 @@ test("long character tabs retain the canonical internal scroll owner",()=>{
 });
 
 test("the current released label remains V173.50 while this UI work stays on dev",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.56"/);
-    assert.match(index,/<title>四象江湖傳 V173\.56<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.56"/);
-    assert.match(index,/>V173\.56<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.57"/);
+    assert.match(index,/<title>四象江湖傳 V173\.57<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.57"/);
+    assert.match(index,/>V173\.57<\/div>/);
 });
 
 console.log("\n"+passed+" character-shell regression tests passed.");

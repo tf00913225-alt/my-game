@@ -103,15 +103,24 @@
         if(changed&&typeof saveGame==="function"){ saveGame(); }
     }
 
+    function canActuallyReforge(item){
+        if(!item||item.v17351Locked===true){ return false; }
+        if(typeof window.v17346RemainingReforgeSlots==="function"){
+            return window.v17346RemainingReforgeSlots(item)>0;
+        }
+        const slots=Math.max(0,Math.floor(Number(item.reforgeSlots)||0));
+        const used=Math.max(0,Math.floor(Number(item.reforgeUsed)||0));
+        return slots>used;
+    }
     function allRefinableEquipment(){
         ensureEquipmentUids();
         const results=[];
         inventoryItems.forEach(item=>{
-            if(item&&isEquipmentInventoryType(item.type)){ results.push({item,source:"背包"}); }
+            if(item&&isEquipmentInventoryType(item.type)&&canActuallyReforge(item)){ results.push({item,source:"背包"}); }
         });
         Object.keys(characterEquipment||{}).forEach(characterKey=>{
             Object.values(characterEquipment[characterKey]||{}).forEach(item=>{
-                if(item){ results.push({item,source:"已裝備"}); }
+                if(item&&canActuallyReforge(item)){ results.push({item,source:"已裝備"}); }
             });
         });
         return results;

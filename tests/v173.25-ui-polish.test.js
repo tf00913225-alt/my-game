@@ -88,9 +88,9 @@ test("status text sits below damage and stays fully visible for one second",()=>
 });
 
 test("development cache and visible build advance to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.56"/);
-    assert.match(index,/<title>四象江湖傳 V173\.56<\/title>/);
-    assert.match(index,/>V173\.56<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.57"/);
+    assert.match(index,/<title>四象江湖傳 V173\.57<\/title>/);
+    assert.match(index,/>V173\.57<\/div>/);
 });
 
 console.log("\n"+passed+" V173.39 UI polish tests passed.");

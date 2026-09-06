@@ -10,13 +10,13 @@ assert.match(qol,/const finish=function\(\)\{[\s\S]*?window\.__v17351QaReady=tru
 assert.match(qol,/existing\.dataset\.loaded==="1"/);
 assert.match(qol,/existing\.addEventListener\("load"/);
 assert.match(qol,/script\.dataset\.loaded="1"/);
-for(const name of ["54-v173.51-battle-qa.js","55-v173.51-inventory-qa.js","56-v173.51-shop-qa.js","57-v173.51-quest-qa.js"]){assert.ok(qol.includes(name+"?v=173.56"));}
+for(const name of ["54-v173.51-battle-qa.js","55-v173.51-inventory-qa.js","56-v173.51-shop-qa.js","57-v173.51-quest-qa.js"]){assert.ok(qol.includes(name+"?v=173.57"));}
 assert.doesNotMatch(equipment,/Date\.now\(\)-startedAt>5000/);
 assert.doesNotMatch(equipment,/V173\.51 功能載入逾時/);
 assert.match(equipment,/document\.addEventListener\("v17351:qa-ready",onQaReady,\{once:true\}\)/);
 assert.match(equipment,/30000/);
-assert.match(loader,/const V_ASSET_VERSION="173\.56"/);
-assert.match(loader,/dataset\.runtimeReady="173\.56"/);
-assert.match(ui,/equipment-progression\.js\?v=173\.56/);
-assert.match(index,/<title>四象江湖傳 V173\.56<\/title>/);
-console.log("✓ V173.56 explicit QA readiness without false 5s timeout");
+assert.match(loader,/const V_ASSET_VERSION="173\.57"/);
+assert.match(loader,/dataset\.runtimeReady="173\.57"/);
+assert.match(ui,/equipment-progression\.js\?v=173\.57/);
+assert.match(index,/<title>四象江湖傳 V173\.57<\/title>/);
+console.log("✓ V173.57 explicit QA readiness without false 5s timeout");
