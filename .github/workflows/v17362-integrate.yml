@@ -23,6 +23,15 @@ jobs:
           node-version: "24"
       - name: Apply V173.62 patch
         run: python3 .github/scripts/v17362_patch.py
+      - name: Update escaped current-version assertions
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for path in Path('tests').glob('*.js'):
+              text=path.read_text(encoding='utf-8')
+              text=text.replace(r'173\.61',r'173\.62')
+              path.write_text(text,encoding='utf-8')
+          PY
       - name: Ensure asset-test dependency
         run: |
           if ! command -v identify >/dev/null 2>&1; then
