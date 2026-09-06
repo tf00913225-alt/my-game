@@ -30,6 +30,6 @@ window.v17350BulkSellEquipment=async function(){const q=readQ(),s=summary(q);if(
 
 document.addEventListener("click",e=>{const p=document.getElementById("v17351BulkQualityPicker");if(p&&p.classList.contains("open")&&!p.contains(e.target))p.classList.remove("open")});
 function visible(el){if(!el)return false;const s=getComputedStyle(el);return s.display!=="none"&&s.visibility!=="hidden"}
-function fullscreen(){const inv=document.getElementById("inventoryPage"),shell=document.getElementById("characterPage")||document.getElementById("characterModal"),shellOpen=!shell||visible(shell),open=!!(inv&&visible(inv)&&(inv.classList.contains("map-inventory-overlay-open")||shellOpen));document.body.classList.toggle("v17351-inventory-fullscreen",open);if(open)picker();}
-const obs=new MutationObserver(()=>{fullscreen();picker();syncSellUi()});obs.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style"]});setInterval(()=>{fullscreen();picker();syncSellUi()},500);fullscreen();picker();
+function fullscreen(){const inv=document.getElementById("inventoryPage"),shell=document.getElementById("characterPage")||document.getElementById("characterModal"),shellOpen=!shell||visible(shell),open=!!(inv&&visible(inv)&&(inv.classList.contains("map-inventory-overlay-open")||shellOpen));if(document.body.classList.contains("v17351-inventory-fullscreen")!==open)document.body.classList.toggle("v17351-inventory-fullscreen",open);if(open)picker();}
+const obs=new MutationObserver(()=>{fullscreen();picker();syncSellUi()});obs.observe(document.body,{subtree:true,childList:true});setInterval(()=>{fullscreen();picker();syncSellUi()},500);fullscreen();picker();
 })();

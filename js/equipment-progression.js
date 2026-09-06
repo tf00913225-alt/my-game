@@ -506,7 +506,7 @@
             const link=document.createElement("link");
             link.id="v17350-inventory-qol-style";
             link.rel="stylesheet";
-            link.href="css/52-v173.50-inventory-qol.css?v=173.52";
+            link.href="css/52-v173.50-inventory-qol.css?v=173.53";
             link.onerror=function(){ failV17350RuntimeGate("背包介面樣式載入失敗，請重新整理。"); };
             document.head.appendChild(link);
         }
@@ -516,7 +516,7 @@
         }
         const script=document.createElement("script");
         script.id="v17350-inventory-qol-runtime";
-        script.src="js/53-v173.50-inventory-qol.js?v=173.52";
+        script.src="js/53-v173.50-inventory-qol.js?v=173.53";
         script.async=false;
         script.onload=function(){
         if(typeof window.__v173ReportRuntimeProgress==="function"){

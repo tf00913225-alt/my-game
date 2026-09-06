@@ -39,8 +39,8 @@ test("Canvas visits frames left-to-right, top-to-bottom once without per-target 
 });
 
 test("the published build label is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.52"/);
-    assert.match(index,/aria-label="目前版本 V173\.52"[\s\S]*?>V173\.52<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.53"/);
+    assert.match(index,/aria-label="目前版本 V173\.53"[\s\S]*?>V173\.53<\/div>/);
 });
 
 console.log("\nV173 Water Ball target-group VFX suite: "+passed+" tests passed.");

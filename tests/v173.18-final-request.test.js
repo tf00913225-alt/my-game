@@ -115,9 +115,9 @@ test("late runtime files no longer overwrite the four-element skill table",()=>{
 });
 
 test("the development cache release is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.52"/);
-    assert.match(index,/<title>四象江湖傳 V173\.52<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.52"[\s\S]*?>V173\.52<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.53"/);
+    assert.match(index,/<title>四象江湖傳 V173\.53<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.53"[\s\S]*?>V173\.53<\/div>/);
 });
 
 console.log("\n"+passed+" V173.39 final-request tests passed.");
