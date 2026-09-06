@@ -680,8 +680,27 @@
     scroll-snap-align:start;
 }
 #game-stage .v143-item-picker button.selected{border-color:#f0bd59;color:#fff0c5;box-shadow:0 0 10px rgba(232,169,60,.5),inset 0 0 9px rgba(232,169,60,.15);}
-#game-stage .v143-item-picker i,#game-stage .v143-item-picker svg{display:block;width:48px;height:48px;flex:0 0 48px;}
-#game-stage .v143-item-picker span{display:-webkit-box;overflow:hidden;font-size:10px;line-height:12px;text-align:center;-webkit-box-orient:vertical;-webkit-line-clamp:2;}
+#game-stage .v143-item-picker i{
+    display:block;
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+}
+#game-stage .v143-item-picker i > svg,
+#game-stage .v143-item-picker i > .v169-item-art,
+#game-stage .v143-item-picker i > .v169-item-art > img,
+#game-stage .v143-item-picker i > .v169-item-art > svg{
+    display:block;
+    width:100%;
+    height:100%;
+}
+#game-stage .v143-item-picker i > .v169-item-art{
+    box-sizing:border-box;
+}
+#game-stage .v143-item-picker i > .v169-item-art > img{
+    object-fit:contain;
+}
+#game-stage .v143-item-picker button > span:not(.v169-item-art){display:-webkit-box;overflow:hidden;font-size:10px;line-height:12px;text-align:center;-webkit-box-orient:vertical;-webkit-line-clamp:2;}
 #game-stage .v143-synthesis .v141-blueprint-series b{color:#f2d28c;}
 #game-stage .v143-synthesis .v141-craft-preview span{white-space:normal;line-height:1.35;}
 
