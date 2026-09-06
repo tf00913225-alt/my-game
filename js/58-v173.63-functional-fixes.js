@@ -240,18 +240,36 @@ function ensureFunctionalStyles(){
 #game-stage .v17363-preview-group em{position:absolute;right:12px;top:11px;color:#e5b966;font:900 11px/1.4 Cinzel,"Noto Sans TC",sans-serif;font-style:normal;}
 #game-stage .v17363-preview-group p{margin:6px 0 0;color:#cdbfa7;font-size:12px;line-height:1.72;}
 #game-stage .v17363-preview-note{margin:10px 1px 0;padding:8px 10px;border-left:2px solid #b98b45;color:#9f927d;background:rgba(184,134,62,.06);font-size:11px;line-height:1.6;text-align:left;}
-#game-stage .v17363-material-synthesis{display:grid;gap:10px;padding-bottom:10px;}
-#game-stage .v17363-material-card{padding:13px;border:1px solid rgba(154,112,58,.7);border-radius:11px;background:linear-gradient(180deg,#20170f,#0e0b08);}
-#game-stage .v17363-material-card h4{margin:0 0 4px;color:#f0ce85;font:900 16px/1.4 "Noto Serif TC",serif;}
-#game-stage .v17363-material-card>p{margin:0 0 10px;color:#9f927f;font-size:11px;line-height:1.55;}
-#game-stage .v17363-material-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;}
-#game-stage .v17363-material-controls label{display:grid;gap:4px;color:#bbaa8c;font-size:10px;}
-#game-stage .v17363-material-controls select{width:100%;min-height:38px;padding:5px 8px;border:1px solid #76572f;border-radius:7px;color:#ead9b5;background:#0b0907;font-size:12px;}
-#game-stage .v17363-material-flow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin:10px 0;padding:10px;border:1px solid rgba(116,87,49,.55);border-radius:9px;background:#090806;}
-#game-stage .v17363-material-flow section{display:grid;gap:3px;text-align:center;color:#cab996;font-size:11px;}
-#game-stage .v17363-material-flow section b{color:#f1d698;font-size:13px;}
-#game-stage .v17363-material-flow i{color:#d3a34f;font-size:19px;font-style:normal;}
-#game-stage .v17363-material-card .v17363-craft-button{width:100%;min-height:42px;border:1px solid #b88740;border-radius:8px;color:#1c1207;background:linear-gradient(180deg,#efd17f,#bd7d2c);font-weight:900;}
+#game-stage .v17363-material-synthesis{display:grid;gap:8px;padding-bottom:8px;}
+#game-stage .v17363-material-card{position:relative;padding:10px;border:1px solid rgba(154,112,58,.7);border-radius:11px;background:linear-gradient(180deg,#20170f,#0e0b08);overflow:visible;}
+#game-stage .v17363-material-card h4{margin:0 0 3px;color:#f0ce85;font:900 16px/1.35 "Noto Serif TC",serif;}
+#game-stage .v17363-material-card>p{margin:0 0 7px;color:#9f927f;font-size:10px;line-height:1.45;}
+#game-stage .v17363-material-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;position:relative;z-index:12;}
+#game-stage .v17363-material-controls.single{grid-template-columns:1fr;}
+#game-stage .v17363-material-controls:not(.single)>.v17363-material-field:last-child:nth-child(odd){grid-column:1/-1;}
+#game-stage .v17363-material-field{display:grid;gap:4px;min-width:0;color:#bbaa8c;font-size:10px;}
+#game-stage .v17363-material-field-label{color:#bbaa8c;font-size:10px;line-height:1.3;}
+#game-stage .v17363-game-select{position:relative;min-width:0;z-index:1;}
+#game-stage .v17363-game-select.open{z-index:80;}
+#game-stage .v17363-game-select-trigger{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;width:100%;min-height:36px;padding:5px 8px;border:1px solid #805e31;border-radius:7px;color:#ead9b5;background:linear-gradient(180deg,#21170e,#0b0907);font-size:11px;font-weight:800;text-align:left;box-shadow:inset 0 0 0 1px rgba(255,222,151,.03);}
+#game-stage .v17363-game-select-trigger>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#game-stage .v17363-game-select-trigger>b{color:#d7ab59;font-size:12px;}
+#game-stage .v17363-game-select.open .v17363-game-select-trigger{border-color:#d6a448;box-shadow:0 0 9px rgba(211,157,65,.2),inset 0 0 0 1px rgba(255,225,158,.14);}
+#game-stage .v17363-game-select-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);display:none;max-height:205px;padding:5px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;border:1px solid #a0783a;border-radius:8px;background:linear-gradient(170deg,#281b0f,#090705);box-shadow:0 12px 30px rgba(0,0,0,.82),inset 0 0 0 1px rgba(255,222,151,.05);}
+#game-stage .v17363-game-select.open .v17363-game-select-menu{display:grid;gap:3px;}
+#game-stage .v17363-game-select-option{display:grid;grid-template-columns:auto minmax(0,1fr) 16px;align-items:center;gap:7px;width:100%;min-height:34px;padding:6px 8px;border:1px solid transparent;border-radius:6px;color:#d7c6a4;background:transparent;font-size:11px;font-weight:800;text-align:left;}
+#game-stage .v17363-game-select-option.selected{border-color:#9d7336;background:linear-gradient(90deg,rgba(180,126,39,.2),rgba(72,46,16,.15));color:#ffe09a;}
+#game-stage .v17363-game-select-option>b{color:#efbd55;text-align:center;}
+#game-stage .v17363-menu-rarity-dot{display:block;width:10px;height:10px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:#9d7136;box-shadow:0 0 5px rgba(255,255,255,.08);}
+#game-stage .v17363-menu-rarity-dot.white{background:#d8d8d8;}#game-stage .v17363-menu-rarity-dot.blue{background:#42a5ff;}#game-stage .v17363-menu-rarity-dot.purple{background:#b05cff;}#game-stage .v17363-menu-rarity-dot.orange{background:#ff9f38;}#game-stage .v17363-menu-rarity-dot.pink{background:#ff4fa7;}#game-stage .v17363-menu-rarity-dot.neutral{background:#b68a48;}
+#game-stage .v17363-material-flow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;margin:7px 0;padding:7px;border:1px solid rgba(116,87,49,.55);border-radius:9px;background:#090806;}
+#game-stage .v17363-material-flow section{display:grid;gap:2px;justify-items:center;min-width:0;text-align:center;color:#cab996;font-size:10px;}
+#game-stage .v17363-material-flow section>.v169-item-art,#game-stage .v17363-material-flow section>svg{width:70px!important;height:70px!important;max-width:70px!important;max-height:70px!important;margin:0 auto!important;}
+#game-stage .v17363-material-flow section>.v169-item-art img{width:100%!important;height:100%!important;object-fit:contain!important;}
+#game-stage .v17363-material-flow section b{max-width:100%;color:#f1d698;font-size:12px;line-height:1.25;overflow-wrap:anywhere;}
+#game-stage .v17363-material-flow section span{font-size:10px;line-height:1.25;}
+#game-stage .v17363-material-flow>i{color:#d3a34f;font-size:18px;font-style:normal;}
+#game-stage .v17363-material-card .v17363-craft-button{width:100%;min-height:39px;border:1px solid #b88740;border-radius:8px;color:#1c1207;background:linear-gradient(180deg,#efd17f,#bd7d2c);font-weight:900;}
 #game-stage .v17363-material-card .v17363-craft-button:disabled{filter:grayscale(.7);opacity:.45;}
 `;
     document.head.appendChild(style);
@@ -371,8 +389,16 @@ function setOptions(){
     defs().blueprints.forEach(item=>{if(item&&item.setId&&!map.has(item.setId)){const prefix=String(item.name||"").replace(/(白階|藍階|紫階|橙階|桃紅階|四象階).*$/,'');map.set(item.setId,prefix||item.setId);}});
     return [...map.entries()];
 }
-function tierOptions(selected){
-    return TIER_ORDER.slice(0,-1).map(tier=>'<option value="'+tier+'" '+(tier===selected?'selected':'')+'>'+TIER_LABEL[tier]+' → '+TIER_LABEL[nextTier(tier)]+'</option>').join("");
+function tierChoices(){
+    return TIER_ORDER.slice(0,-1).map(tier=>({value:tier,label:TIER_LABEL[tier]+" → "+TIER_LABEL[nextTier(tier)],tier}));
+}
+function materialGameSelect(key,label,choices,selected){
+    const normalized=(choices||[]).map(choice=>Array.isArray(choice)?{value:String(choice[0]),label:String(choice[1])}:{value:String(choice.value),label:String(choice.label),tier:choice.tier});
+    const current=normalized.find(choice=>choice.value===String(selected))||normalized[0]||{value:"",label:"未設定"};
+    const dot=current.tier?'<i class="v17363-menu-rarity-dot '+esc(current.tier)+'"></i>':'';
+    return '<div class="v17363-material-field"><span class="v17363-material-field-label">'+esc(label)+'</span><div class="v17363-game-select" data-material-key="'+esc(key)+'">'+
+        '<button class="v17363-game-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="v17363ToggleMaterialMenu(this)">'+dot+'<span>'+esc(current.label)+'</span><b aria-hidden="true">▾</b></button>'+
+        '<div class="v17363-game-select-menu" role="listbox">'+normalized.map(choice=>'<button class="v17363-game-select-option'+(choice.value===current.value?' selected':'')+'" type="button" role="option" aria-selected="'+(choice.value===current.value?'true':'false')+'" data-material-key="'+esc(key)+'" data-material-value="'+esc(choice.value)+'" onclick="v17363ChooseMaterialOption(this.dataset.materialKey,this.dataset.materialValue)">'+(choice.tier?'<i class="v17363-menu-rarity-dot '+esc(choice.tier)+'"></i>':'<i class="v17363-menu-rarity-dot neutral"></i>')+'<span>'+esc(choice.label)+'</span><b aria-hidden="true">'+(choice.value===current.value?'✓':'')+'</b></button>').join("")+'</div></div></div>';
 }
 function renderMaterialSynthesis(){
     const body=document.querySelector("#homeFeatureModalBody .v141-synthesis-body");
@@ -381,24 +407,36 @@ function renderMaterialSynthesis(){
     const bpSource=blueprintDef(MATERIAL_STATE.blueprintTier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
     const bpTarget=blueprintDef(nextTier(MATERIAL_STATE.blueprintTier),MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
     const sets=setOptions();
+    const setChoices=sets.map(([value,label])=>({value,label}));
+    const slotChoices=BLUEPRINT_SLOTS.map(slot=>({value:slot,label:SLOT_LABEL[slot]}));
     body.innerHTML='<div class="v17363-material-synthesis">'+
-        '<section class="v17363-material-card"><h4>礦石升階</h4><p>同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。</p><div class="v17363-material-controls"><label>升階路線<select onchange="v17363SetMaterialOption(\'oreTier\',this.value)">'+tierOptions(MATERIAL_STATE.oreTier)+'</select></label></div>'+materialFlow(oreSource,oreTarget)+
-        '<button class="v17363-craft-button" type="button" '+(!oreSource||ownedCount(oreSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(\'ore\')">合成下一階礦石 ×10</button></section>'+
+        '<section class="v17363-material-card"><h4>礦石升階</h4><p>同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。</p><div class="v17363-material-controls single">'+materialGameSelect("oreTier","升階路線",tierChoices(),MATERIAL_STATE.oreTier)+'</div>'+materialFlow(oreSource,oreTarget)+
+        '<button class="v17363-craft-button" type="button" '+(!oreSource||ownedCount(oreSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;ore&quot;)">合成下一階礦石 ×10</button></section>'+
         '<section class="v17363-material-card"><h4>設計圖升階</h4><p>同系列、同部位、同階設計圖 50 張，可合成下一階同款設計圖 10 張。</p><div class="v17363-material-controls">'+
-        '<label>系列<select onchange="v17363SetMaterialOption(\'blueprintSet\',this.value)">'+sets.map(([id,label])=>'<option value="'+esc(id)+'" '+(id===MATERIAL_STATE.blueprintSet?'selected':'')+'>'+esc(label)+'</option>').join("")+'</select></label>'+
-        '<label>部位<select onchange="v17363SetMaterialOption(\'blueprintSlot\',this.value)">'+BLUEPRINT_SLOTS.map(slot=>'<option value="'+slot+'" '+(slot===MATERIAL_STATE.blueprintSlot?'selected':'')+'>'+SLOT_LABEL[slot]+'</option>').join("")+'</select></label>'+
-        '<label>升階路線<select onchange="v17363SetMaterialOption(\'blueprintTier\',this.value)">'+tierOptions(MATERIAL_STATE.blueprintTier)+'</select></label></div>'+materialFlow(bpSource,bpTarget)+
-        '<button class="v17363-craft-button" type="button" '+(!bpSource||ownedCount(bpSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(\'blueprint\')">合成下一階設計圖 ×10</button></section></div>';
+        materialGameSelect("blueprintSet","系列",setChoices,MATERIAL_STATE.blueprintSet)+
+        materialGameSelect("blueprintSlot","部位",slotChoices,MATERIAL_STATE.blueprintSlot)+
+        materialGameSelect("blueprintTier","升階路線",tierChoices(),MATERIAL_STATE.blueprintTier)+'</div>'+materialFlow(bpSource,bpTarget)+
+        '<button class="v17363-craft-button" type="button" '+(!bpSource||ownedCount(bpSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;blueprint&quot;)">合成下一階設計圖 ×10</button></section></div>';
     repairSynthesisIcons();
 }
 function materialFlow(source,target){
     const sourceCount=source?ownedCount(source.id):0;
     return '<div class="v17363-material-flow"><section>'+(source&&source.icon||'')+'<b>'+esc(source&&source.name||"來源未建立")+'</b><span>'+sourceCount+' / 50</span></section><i>→</i><section>'+(target&&target.icon||'')+'<b>'+esc(target&&target.name||"已達最高階")+'</b><span>×10</span></section></div>';
 }
-window.v17363SetMaterialOption=function(key,value){
+window.v17363ToggleMaterialMenu=function(trigger){
+    const root=trigger&&trigger.closest&&trigger.closest(".v17363-game-select");if(!root){return;}
+    const opening=!root.classList.contains("open");
+    document.querySelectorAll(".v17363-game-select.open").forEach(item=>{item.classList.remove("open");const button=item.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
+    root.classList.toggle("open",opening);trigger.setAttribute("aria-expanded",opening?"true":"false");
+};
+window.v17363ChooseMaterialOption=function(key,value){
     if(!Object.prototype.hasOwnProperty.call(MATERIAL_STATE,key)){return;}
     MATERIAL_STATE[key]=String(value||"");renderMaterialSynthesis();
 };
+window.v17363SetMaterialOption=window.v17363ChooseMaterialOption;
+document.addEventListener("click",event=>{
+    document.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
+});
 window.v17363CraftMaterial=function(kind){
     const isOre=kind==="ore";
     const tier=isOre?MATERIAL_STATE.oreTier:MATERIAL_STATE.blueprintTier;

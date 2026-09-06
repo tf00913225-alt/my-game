@@ -3537,3 +3537,16 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 3. 如果發現新的架構陷阱（像「V131 不是用 script 標籤載入」那種），
    補進「系統架構重點」，不要只留在對話紀錄裡，之後不同工具、不同視窗看不到那段對話
 4. 確認 `main` 分支已經是最新、可運作的狀態才算工作結束
+
+
+## 2026-09-07 — Synthesis / Dungeon / Equipment UI bugfix batch
+
+- Work branch: `bugfix/synthesis-dungeon-equipment-ui`, based on dev `ed1cd126d60f01fb7554b71e6fe54968adddd83b`. `main` untouched.
+- Official version/cache remain `173.62`; this batch is intentionally unversioned until every requirement is VERIFIED.
+- Reforge material tier layout owner remains `css/38-v141-system-expansion.css`; its tier picker is now a touch-whitelisted horizontal rail.
+- Dungeon text reward preview frame is body-mounted; the matching CSS owner is `css/33-v132-content-expansion.css`, not a `#game-stage`-prefixed selector.
+- Backpack equipment comparison owner remains `js/55-v173.51-inventory-qa.js` + `css/53-v173.51-qa.css`. Canonical equipment slots are `head / hand / shoulder / armor / shoes`; item type `weapon` maps to equipment slot `hand`.
+- Material synthesis remains owned by `js/58-v173.63-functional-fixes.js`; player-visible native browser selects are replaced with in-game listbox controls and the material artwork is compacted.
+- Initial synthesis equipment art is resolved by `js/38-v143-system-fixes.js` directly from `assetPath` on first picker render, rather than waiting for a later repair pass.
+- Permanent UI rule: player-visible native `<select>/<option>` menus are forbidden; see `UI_GUIDELINES.md`.
+- Batch checklist: `release/requirement-batches/2026-09-07-synthesis-dungeon-equipment-ui.json`. Status remains IMPLEMENTED pending CI + dev visual verification; do not claim COMPLETE or bump version yet.

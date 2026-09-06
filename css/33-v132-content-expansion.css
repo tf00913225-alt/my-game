@@ -524,3 +524,33 @@
     min-height:42px !important;
     padding:8px 12px !important;
 }
+
+
+/* 2026-09-07 — body-mounted text-only dungeon reward preview owner */
+.v132-reward-modal .v132-reward-modal-inner.v17363-text-reward-preview{
+    width:min(100%,392px) !important;
+    height:min(600px,calc(100dvh - 28px)) !important;
+    max-width:392px !important;
+    max-height:calc(100dvh - 28px) !important;
+    min-height:min(520px,calc(100dvh - 28px)) !important;
+    padding:18px !important;
+    border:1px solid rgba(213,164,82,.82) !important;
+    border-radius:15px !important;
+    background:radial-gradient(circle at 50% 0,rgba(232,177,77,.16),transparent 36%),linear-gradient(160deg,#22170e,#090807 76%) !important;
+    box-shadow:0 22px 52px rgba(0,0,0,.78),inset 0 0 0 1px rgba(255,231,171,.07) !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+}
+.v132-reward-modal .v17363-preview-heading{text-align:left;padding-bottom:11px;margin-bottom:11px;border-bottom:1px solid rgba(196,149,75,.4);}
+.v132-reward-modal .v17363-preview-heading small{display:block;color:#8f7956;font:700 9px/1.2 Cinzel,serif;letter-spacing:.2em;}
+.v132-reward-modal .v17363-preview-heading h3{position:static;margin:4px 0 0;padding:0;color:#f4d78f;background:none;font-family:"Noto Serif TC",serif;font-size:20px;line-height:1.35;letter-spacing:.04em;}
+.v132-reward-modal .v17363-preview-groups{display:grid;gap:8px;flex:0 0 auto;}
+.v132-reward-modal .v17363-preview-group{position:relative;padding:12px 13px;border:1px solid rgba(119,89,52,.7);border-radius:10px;background:linear-gradient(180deg,rgba(31,23,15,.96),rgba(13,10,8,.98));text-align:left;}
+.v132-reward-modal .v17363-preview-group b{display:block;padding-right:80px;color:#f0d39a;font-size:14px;line-height:1.4;}
+.v132-reward-modal .v17363-preview-group em{position:absolute;right:12px;top:11px;color:#e5b966;font:900 11px/1.4 Cinzel,"Noto Sans TC",sans-serif;font-style:normal;}
+.v132-reward-modal .v17363-preview-group p{margin:6px 0 0;color:#cdbfa7;font-size:12px;line-height:1.72;}
+.v132-reward-modal .v17363-preview-note{margin:10px 1px 0;padding:8px 10px;border-left:2px solid #b98b45;color:#9f927d;background:rgba(184,134,62,.06);font-size:11px;line-height:1.6;text-align:left;}
+.v132-reward-modal .v17363-text-reward-preview .v132-reward-actions{margin-top:auto;}
+@media (max-height:620px){
+    .v132-reward-modal .v132-reward-modal-inner.v17363-text-reward-preview{height:calc(100dvh - 20px) !important;min-height:0 !important;padding:13px !important;}
+}

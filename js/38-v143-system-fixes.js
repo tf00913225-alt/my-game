@@ -745,6 +745,10 @@
         const item=(inventoryItems||[]).find(candidate=>candidate&&(candidate.id===value||candidate.v141Uid===value))||
             allEquipment().find(candidate=>candidate.v141Uid===value)||
             (content.talismans||[]).find(candidate=>candidate.id===value);
+        if(item&&item.assetPath){
+            const rarity=escapeHtml(normalizeTierKey(item.rarityKey||item.quality||item.tierKey||"white"));
+            return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarity+'"><img src="'+escapeHtml(item.assetPath)+'" alt="" draggable="false" decoding="async"></span>';
+        }
         return item&&item.icon?item.icon:svgIcon("物","#caa461");
     }
 
