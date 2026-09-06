@@ -1,0 +1,33 @@
+name: V173.61 inspect
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17361-inspect.yml
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Inspect V173.61 owners
+        run: |
+          echo '=== QUEST OWNER ==='
+          grep -RInE 'claimDailyQuest|claimCommissionQuest|render.*Quest|dailyQuestState|commissionQuestState' js/00-main.js js/34-v141-core-systems.js js/35-v141-ui-battle.js js/57-v173.51-quest-qa.js | head -220 || true
+          echo '=== DAILY PREVIEW ==='
+          grep -RInE 'v141ShowDungeonRewardPreview|dungeonCoverData|reward:' js/35-v141-ui-battle.js js/42-v148-combat-dungeon-fixes.js js/equipment-progression.js | head -160 || true
+          echo '=== CSS CARD EFFECT ==='
+          grep -RInE 'v141PlayCardEffect|v141-once-|v141HealFlash|v141ReviveFlash|v141TalismanFlash' js/35-v141-ui-battle.js js/39-v143-skill-animation.js css/38-v141-system-expansion.css | head -160 || true
+          echo '=== VERSION 173.60 LIVE REFS ==='
+          grep -RIn '173.60' index.html js css tests | head -220 || true
+          echo '=== RETURN ICON USERS ==='
+          grep -RIn 'map-return.png' index.html js css | head -120 || true
+          echo '=== AUDIO MASTER ==='
+          grep -n 'master.gain.value' js/34-v141-core-systems.js || true
