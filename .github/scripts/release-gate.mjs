@@ -117,14 +117,14 @@ function checkVersionAdvanceGuard(config,summary){
   }
 }
 function ensureReleaseReady(config,summary){
-  if(config.release.status!=='READY') fail(`Release status is ${config.release.status}; deployment requires READY.`);
-  if(!summary.allVerified) fail(`Requirements ${summary.verified}/${summary.total} VERIFIED; deployment requires ${summary.total}/${summary.total}.`);
+  if(config.release.status!=='READY') fail(`Release status is ${config.release.status}; final release requires READY.`);
+  if(!summary.allVerified) fail(`Requirements ${summary.verified}/${summary.total} VERIFIED; final release requires ${summary.total}/${summary.total}.`);
 }
 function writeDeployManifest(root,config,summary){
   const commitSha=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'';
   if(!/^[0-9a-f]{40}$/i.test(commitSha)) fail('EXPECTED_COMMIT_SHA/GITHUB_SHA must be a 40-character commit SHA.');
   const branch=process.env.EXPECTED_BRANCH||process.env.GITHUB_REF_NAME||'';
-  const manifest={schemaVersion:1,version:`V${config.version}`,commitSha,branch,cacheVersion:config.cacheVersion,includedRequirements:summary.items.map(item=>({id:item.id,title:item.title,status:item.status})),verificationResult:`${summary.verified}/${summary.total} VERIFIED`,deployResult:'PENDING_VERIFICATION',deploymentShaVerified:false};
+  const manifest={schemaVersion:1,version:`V${config.version}`,commitSha,branch,cacheVersion:config.cacheVersion,includedRequirements:summary.items.map(item=>({id:item.id,title:item.title,status:item.status})),verificationResult:`${summary.verified}/${summary.total} VERIFIED`,releaseStatus:config.release.status,deployResult:'PENDING_VERIFICATION',deploymentShaVerified:false};
   fs.writeFileSync(path.join(root,'release-manifest.json'),JSON.stringify(manifest,null,2)+'\n');
   return manifest;
 }
@@ -163,8 +163,14 @@ async function main(){
     console.log(`✓ Requirements: ${summary.verified}/${summary.total} VERIFIED.`);
     return;
   }
-  if(mode==='prepare-artifact'){
+  if(mode==='release-ready'){
+    checkVersionMarkers(ROOT,config);
+    checkDeprecated(ROOT,config.deprecated);
     ensureReleaseReady(config,summary);
+    console.log(`✓ Final release gate: ${summary.total}/${summary.total} VERIFIED.`);
+    return;
+  }
+  if(mode==='prepare-artifact'){
     checkVersionMarkers(ROOT,config);
     checkDeprecated(ROOT,config.deprecated);
     const deployRoot=path.resolve(process.env.DEPLOY_DIR||path.join(ROOT,'_deploy'));
@@ -172,11 +178,10 @@ async function main(){
     checkDeprecated(deployRoot,config.deprecated);
     writeDeployManifest(deployRoot,config,summary);
     validateArtifactManifest(deployRoot,config,summary);
-    console.log(`✓ Deploy artifact bound to ${process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA}.`);
+    console.log(`✓ Dev preview artifact bound to ${process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA}; requirements ${summary.verified}/${summary.total} VERIFIED.`);
     return;
   }
   if(mode==='verify-deployed'){
-    ensureReleaseReady(config,summary);
     await verifyDeployed(config);
     return;
   }
