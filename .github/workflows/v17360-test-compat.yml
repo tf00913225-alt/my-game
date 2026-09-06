@@ -23,6 +23,34 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
+          def replace_exact(path, old, new, label, expected=1):
+              p=Path(path)
+              s=p.read_text(encoding='utf-8')
+              count=s.count(old)
+              if count!=expected:
+                  raise SystemExit(f'{label}: expected {expected} anchor(s), found {count}')
+              p.write_text(s.replace(old,new,expected),encoding='utf-8')
+
+          # Real compatibility fixes in the synthesis/reforge owner.
+          p=Path('js/36-v141-content-systems.js')
+          s=p.read_text(encoding='utf-8')
+          source_replacements=[
+              ('const ore=definitions().ores.find(item=>item.tierKey===tier);',
+               'const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);'),
+              ('consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&candidate.tierKey===tier,cost)',
+               'consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&normalizeTierKey(candidate.tierKey)===tier,cost)'),
+          ]
+          for old,new in source_replacements:
+              if s.count(old)!=1:
+                  raise SystemExit(f'js/36 source compatibility: expected one {old!r}, found {s.count(old)}')
+              s=s.replace(old,new,1)
+          # Talisman upgrade cost must also accept hydrated legacy tier keys.
+          old='TALISMAN_GOLD[source.tierKey]'
+          if s.count(old)!=4:
+              raise SystemExit(f'js/36 talisman cost compatibility: expected 4 anchors, found {s.count(old)}')
+          s=s.replace(old,'TALISMAN_GOLD[normalizeTierKey(source.tierKey)]')
+          p.write_text(s,encoding='utf-8')
+
           # V141: blueprint grid now has six formal tiers; reforge default is white.
           p=Path('tests/v141-system-expansion.test.js')
           s=p.read_text(encoding='utf-8')
@@ -56,13 +84,18 @@ jobs:
               s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8')
 
-          # V173.58 reforge rules stay intact; only the authoritative tier key changed to formal white.
+          # V173.58 reforge behavior stays intact; formal tier names and normalized legacy consumption are now authoritative.
           p=Path('tests/v173.58-reforge-redesign.test.js')
           s=p.read_text(encoding='utf-8')
-          for old,new in [
-              ('assert.match(synthesis,/reforgeMaterialTier:"low",lockedReforgeKeys:\\[\\]/);','assert.match(synthesis,/reforgeMaterialTier:"white",lockedReforgeKeys:\\[\\]/);'),
-              ('assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&candidate\\.tierKey===tier,cost/);','assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&normalizeTierKey\\(candidate\\.tierKey\\)===tier,cost/);')
-          ]:
+          replacements=[
+              ('assert.match(synthesis,/reforgeMaterialTier:"low",lockedReforgeKeys:\\[\\]/);',
+               'assert.match(synthesis,/reforgeMaterialTier:"white",lockedReforgeKeys:\\[\\]/);'),
+              ('assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&candidate\\.tierKey===tier,cost/);',
+               'assert.match(synthesis,/candidate&&candidate\\.blueprintSlot&&normalizeTierKey\\(candidate\\.tierKey\\)===tier,cost/);'),
+              ('assert.match(css,/V173\\.60 — FREE-MATERIAL REFORGE UI/);',
+               'assert.match(css,/V173\\.58 — FREE-MATERIAL REFORGE UI/);')
+          ]
+          for old,new in replacements:
               if s.count(old)!=1:
                   raise SystemExit(f'v173.58: expected one anchor {old!r}, found {s.count(old)}')
               s=s.replace(old,new,1)
@@ -97,7 +130,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/v141-system-expansion.test.js tests/v169-abyss-assets-flow.test.js tests/v173.50-inventory-qol.test.js tests/v173.58-reforge-redesign.test.js js/53-v173.50-inventory-qol.js
+          git add js/36-v141-content-systems.js js/53-v173.50-inventory-qol.js tests/v141-system-expansion.test.js tests/v169-abyss-assets-flow.test.js tests/v173.50-inventory-qol.test.js tests/v173.58-reforge-redesign.test.js
           git diff --cached --check
-          git commit -m "V173.60 align tier tests and nested QA cache wiring"
+          git commit -m "V173.60 finalize formal tier compatibility"
           git push origin HEAD:dev
