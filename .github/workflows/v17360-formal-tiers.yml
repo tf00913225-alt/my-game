@@ -20,6 +20,7 @@ jobs:
           fetch-depth: 0
       - name: Apply formal tier migration
         run: |
+          python .github/scripts/fix-v17360-patcher.py
           python .github/scripts/apply-v17360-formal-tiers.py
       - name: Syntax and focused tests
         run: |
