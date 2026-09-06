@@ -1,0 +1,114 @@
+name: V173.62 local patrol VFX browser QA
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/v17362-local-browser-qa.yml
+
+permissions:
+  contents: write
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install Playwright package only
+        run: npm install --no-save --ignore-scripts playwright@1.55.0
+      - name: Start local static server
+        run: |
+          python3 -m http.server 8899 --bind 127.0.0.1 >/tmp/v17362-http.log 2>&1 &
+          echo $! >/tmp/v17362-http.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8899/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/v17362-http.log
+          exit 1
+      - name: Verify patrol battle VFX remains visible
+        run: |
+          CHROME="$(command -v google-chrome-stable || command -v google-chrome || true)"
+          test -n "$CHROME"
+          export CHROME
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME,args:['--no-sandbox','--disable-dev-shm-usage']});
+            const page=await browser.newPage({viewport:{width:420,height:900}});
+            const pageErrors=[];
+            const failed=[];
+            page.on('pageerror',err=>pageErrors.push(String(err)));
+            page.on('requestfailed',req=>failed.push(req.url()+' :: '+(req.failure()?.errorText||'failed')));
+            page.on('response',res=>{ if(res.status()>=400) failed.push(res.status()+' '+res.url()); });
+            await page.goto('http://127.0.0.1:8899/?qa=v17362-local-patrol-vfx',{waitUntil:'domcontentloaded',timeout:60000});
+            try{
+              await page.waitForFunction(()=>document.documentElement.dataset.runtimeReady==='173.62',undefined,{timeout:60000});
+            }catch(err){
+              console.log('runtimeReady=',await page.evaluate(()=>document.documentElement.dataset.runtimeReady||''));
+              console.log('pageErrors=',JSON.stringify(pageErrors));
+              console.log('failed=',JSON.stringify(failed.slice(0,30)));
+              throw err;
+            }
+            const result=await page.evaluate(async()=>{
+              const tab=document.getElementById('characterTabContent');
+              const shell=document.getElementById('characterPage')||document.getElementById('characterModal');
+              if(!tab) throw new Error('characterTabContent missing');
+              tab.style.display='block';
+              tab.style.visibility='visible';
+              if(shell){ shell.style.display='block'; shell.style.visibility='visible'; }
+              if(typeof window.v17351SyncManagement!=='function') throw new Error('v17351SyncManagement missing');
+              if(!window.v142SkillAnimationDirector||typeof window.v142SkillAnimationDirector.play!=='function') throw new Error('animation director missing');
+              if(typeof window.v142GetSkillAnimationConfig!=='function') throw new Error('animation config helper missing');
+              battleActive=true;
+              window.v17351SyncManagement();
+              const config=window.v142GetSkillAnimationConfig('flameSlash');
+              const gate=window.v142SkillAnimationDirector.play(config,{side:'player',actorIndex:0,key:'v17362-local-browser-patrol'});
+              await new Promise(resolve=>setTimeout(resolve,160));
+              window.v17351SyncManagement();
+              const stage=document.getElementById('v143-skill-stage');
+              const snapshot={
+                stageExists:!!stage,
+                inlineVisibility:stage?stage.style.visibility:null,
+                computedVisibility:stage?getComputedStyle(stage).visibility:null,
+                computedDisplay:stage?getComputedStyle(stage).display:null,
+                bodyManagementOpen:document.body.classList.contains('v17351-management-open'),
+                stageSkill:stage?stage.getAttribute('data-skill'):null,
+                stageChildCount:stage?stage.childElementCount:0,
+                gateStarted:!!gate
+              };
+              if(gate&&typeof gate.complete==='function') gate.complete('browser-qa');
+              battleActive=false;
+              window.v17351SyncManagement();
+              return snapshot;
+            });
+            console.log(JSON.stringify(result));
+            console.log('pageErrors=',JSON.stringify(pageErrors));
+            console.log('failed=',JSON.stringify(failed.slice(0,30)));
+            assert.equal(result.stageExists,true,'V143 stage must exist after a real skill play');
+            assert.notEqual(result.computedVisibility,'hidden','Patrol/wild battle VFX stage must remain visible while battleActive');
+            assert.notEqual(result.computedDisplay,'none','Patrol/wild battle VFX stage must not be display:none while battleActive');
+            assert.equal(result.bodyManagementOpen,false,'Management-open class must be cleared during battle');
+            assert.equal(result.gateStarted,true,'Skill animation gate must start');
+            assert.ok(result.stageChildCount>0,'VFX stage must render visual nodes');
+            await browser.close();
+          })().catch(err=>{console.error(err);process.exit(1);});
+          NODE
+      - name: Remove temporary local browser QA workflow
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --ff-only origin dev
+          if test -f .github/workflows/v17362-local-browser-qa.yml; then
+            git rm .github/workflows/v17362-local-browser-qa.yml
+            git commit -m "clean V173.62 local browser QA workflow"
+            git push origin HEAD:dev
+          fi
