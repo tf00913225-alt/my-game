@@ -173,16 +173,19 @@
             const freezeTalisman=window.v132GetTalismanDefinition("freezeTalisman"+tier);
             if(freezeTalisman){
                 freezeTalisman.sharedSkillId="freeze";
+                freezeTalisman.talismanSkillLevel=Math.max(1,numeric(skillDatabase.freeze.maxLevel)||1);
                 freezeTalisman.talismanDuration=numeric(skillDatabase.freeze.freezeDuration);
             }
             const stealthTalisman=window.v132GetTalismanDefinition("stealthTalisman"+tier);
             if(stealthTalisman){
                 stealthTalisman.sharedSkillId="stealthSkill";
+                stealthTalisman.talismanSkillLevel=Math.max(1,numeric(skillDatabase.stealthSkill.maxLevel)||1);
                 stealthTalisman.talismanDuration=numeric(skillDatabase.stealthSkill.duration);
             }
             const barrierTalisman=window.v132GetTalismanDefinition("barrierTalisman"+tier);
             if(barrierTalisman){
                 barrierTalisman.sharedSkillId="barrier";
+                barrierTalisman.talismanSkillLevel=Math.max(1,numeric(skillDatabase.barrier.maxLevel)||1);
                 barrierTalisman.talismanDuration=numeric(skillDatabase.barrier.duration);
                 barrierTalisman.barrierBlockCount=numeric(skillDatabase.barrier.barrierBlockCount);
             }

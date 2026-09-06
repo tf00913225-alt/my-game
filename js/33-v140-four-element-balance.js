@@ -514,7 +514,7 @@
 
     /*
        符咒不另寫一份持續回合與結界規則：冰封符、隱身符、
-       結界符分別讀對應技能。階級命中率仍是符咒自己的屬性。
+       結界符分別讀對應技能。階級機率只負責畫符啟動；畫符成功後再依角色素質套用對應技能命中規則。
     */
     function syncV140TalismanDefinitions(){
         if(typeof window.v132GetTalismanDefinition!=="function"){ return; }
@@ -543,6 +543,7 @@
                 );
                 if(!definition){ return; }
                 definition.sharedSkillId=effect.skillId;
+                definition.talismanSkillLevel=Math.max(1,numeric(skillDatabase[effect.skillId]&&skillDatabase[effect.skillId].maxLevel)||1);
                 if(effect.duration>0){ definition.talismanDuration=effect.duration; }
                 if(effect.blockCount>0){ definition.barrierBlockCount=effect.blockCount; }
             });

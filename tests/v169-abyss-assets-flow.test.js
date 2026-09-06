@@ -26,11 +26,13 @@ test("supplied item art is mapped by effect, equipment slot and element",()=>{
     assert.match(items,/blueprintIcon\(slot\.key,tier\.key\)/);
 });
 
-test("talisman and blueprint borders follow blue, purple, orange, magenta rarity order",()=>{
-    const expected={low:"#3ba7ff",mid:"#a855f7",high:"#ff9f38",perfect:"#ff4fa7"};
+test("talisman and blueprint borders follow formal white, blue, purple, orange rarity order",()=>{
+    const expected={low:"#D8D8D8",mid:"#42A5FF",high:"#B05CFF",perfect:"#FF9F38"};
     Object.entries(expected).forEach(([tier,color])=>{
         assert.match(css,new RegExp("v169-(?:talisman|blueprint)-art\\.v169-rarity-"+tier+"[^}]+border-color:"+color));
     });
+    assert.match(css,/v169-rarity-pink[^}]+border-color:#FF4FA7/);
+    assert.match(css,/v169-rarity-four-symbol/);
     assert.match(css,/\.v169-item-art > img\{[^}]*object-fit:contain/);
 });
 

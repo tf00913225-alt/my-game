@@ -11,10 +11,12 @@
     window.__equipmentProgressionInstalled=true;
 
     const RARITIES=[
-        {key:"white",label:"白裝",chance:40,min:1,max:3,reforgeSlots:0,shopPrice:500,color:"#d8d8d8"},
-        {key:"blue",label:"藍裝",chance:40,min:4,max:6,reforgeSlots:0,shopPrice:1500,color:"#42a5ff"},
-        {key:"purple",label:"紫裝",chance:15,min:7,max:9,reforgeSlots:1,shopPrice:4000,color:"#b05cff"},
-        {key:"orange",label:"橙裝",chance:5,min:10,max:12,reforgeSlots:1,shopPrice:10000,color:"#ff9f38"}
+        {key:"white",label:"白階",chance:40,min:1,max:3,reforgeSlots:0,shopPrice:500,color:"#D8D8D8",available:true},
+        {key:"blue",label:"藍階",chance:40,min:4,max:6,reforgeSlots:0,shopPrice:1500,color:"#42A5FF",available:true},
+        {key:"purple",label:"紫階",chance:15,min:7,max:9,reforgeSlots:1,shopPrice:4000,color:"#B05CFF",available:true},
+        {key:"orange",label:"橙階",chance:5,min:10,max:12,reforgeSlots:1,shopPrice:10000,color:"#FF9F38",available:true},
+        {key:"pink",label:"桃紅階",chance:0,available:false,planned:true,color:"#FF4FA7"},
+        {key:"four-symbol",label:"四象階",chance:0,available:false,planned:true,fourSymbol:true,color:null}
     ];
     const RARITY_BY_KEY=Object.fromEntries(RARITIES.map(item=>[item.key,item]));
     const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",spirit:"精神",energy:"能量"};
@@ -160,7 +162,8 @@
         return item;
     }
     function generateEquipment(random=Math.random,forced={}){
-        const rarity=forced.rarity?RARITY_BY_KEY[forced.rarity]||rarityFromRandom(random):rarityFromRandom(random);
+        const forcedRarity=forced.rarity?RARITY_BY_KEY[forced.rarity]:null;
+        const rarity=forcedRarity&&forcedRarity.available!==false?forcedRarity:rarityFromRandom(random);
         const classType=forced.classType||(random()<.5?"warrior":"mage");
         const slots=Object.keys(SLOT_META);
         const slot=forced.slot||slots[Math.floor(random()*slots.length)%slots.length];
@@ -352,10 +355,13 @@
         const style=document.createElement("style");
         style.id="equipment-progression-style";
         style.textContent=`
-.v17346-rarity-white{border:2px solid #d8d8d8!important;box-shadow:0 0 7px rgba(216,216,216,.55)!important}
-.v17346-rarity-blue{border:2px solid #42a5ff!important;box-shadow:0 0 9px rgba(66,165,255,.7)!important}
-.v17346-rarity-purple{border:2px solid #b05cff!important;box-shadow:0 0 10px rgba(176,92,255,.75)!important}
-.v17346-rarity-orange{border:3px solid #ff8a1f!important;box-shadow:0 0 5px #ff7a16,0 0 14px rgba(255,136,31,.95),inset 0 0 8px rgba(255,159,56,.3)!important}
+.v17346-rarity-white{border:2px solid #D8D8D8!important;box-shadow:0 0 7px rgba(216,216,216,.55)!important}
+.v17346-rarity-blue{border:2px solid #42A5FF!important;box-shadow:0 0 9px rgba(66,165,255,.7)!important}
+.v17346-rarity-purple{border:2px solid #B05CFF!important;box-shadow:0 0 10px rgba(176,92,255,.75)!important}
+.v17346-rarity-orange{border:3px solid #FF9F38!important;box-shadow:0 0 5px #FF9F38,0 0 14px rgba(255,159,56,.9),inset 0 0 8px rgba(255,159,56,.3)!important}
+.v17346-rarity-pink{border:3px solid #FF4FA7!important;box-shadow:0 0 6px #FF4FA7,0 0 16px rgba(255,79,167,.88),inset 0 0 9px rgba(255,79,167,.42)!important}
+.v17346-rarity-four-symbol{border:3px solid transparent!important;background:linear-gradient(#090807,#090807) padding-box,conic-gradient(from 0deg,#42A5FF 0 25%,#47D6A3 25% 50%,#C89B45 50% 75%,#FF5A36 75% 100%) border-box!important;box-shadow:0 0 8px rgba(255,90,54,.34),0 0 12px rgba(66,165,255,.32),0 0 16px rgba(71,214,163,.26)!important;animation:v17360FourSymbolRarityBreath 2.8s ease-in-out infinite!important}
+@keyframes v17360FourSymbolRarityBreath{0%,100%{filter:brightness(.96)}50%{filter:brightness(1.14)}}
 .v17346-reforge-slot{margin-top:7px;color:#ffbf5b!important;font-weight:900;letter-spacing:.06em}
 #game-stage #itemModal.v17346-potion-detail .item-modal-box{height:auto!important;min-height:0!important;max-height:calc(100% - 28px)!important;flex:0 0 auto!important;align-self:center!important;justify-content:flex-start!important}
 #game-stage #itemModal.v17346-potion-detail #itemModalStats{flex:0 0 auto!important;min-height:0!important;max-height:180px!important}
@@ -448,7 +454,7 @@
     }
     function showEquipmentReward(){
         if(typeof window.v132ShowRewardModal!=="function"){ return; }
-        const html='<div class="v132-reward-modal-inner"><h3>裝備副本挑戰成功！</h3><p>獲得裝備寶箱 ×2，每個寶箱隨機掉落3件裝備。</p><p>白裝40%・藍裝40%・紫裝15%・橙裝5%</p><div class="v132-reward-actions"><button type="button" onclick="v17346ClaimEquipmentDungeon(false)">直接領取</button><button type="button" onclick="v17346ClaimEquipmentDungeon(true)">看廣告雙倍領取</button></div></div>';
+        const html='<div class="v132-reward-modal-inner"><h3>裝備副本挑戰成功！</h3><p>獲得裝備寶箱 ×2，每個寶箱隨機掉落3件裝備。</p><p>白階40%・藍階40%・紫階15%・橙階5%</p><div class="v132-reward-actions"><button type="button" onclick="v17346ClaimEquipmentDungeon(false)">直接領取</button><button type="button" onclick="v17346ClaimEquipmentDungeon(true)">看廣告雙倍領取</button></div></div>';
         window.v132ShowRewardModal(html);
     }
     window.v17346ClaimEquipmentDungeon=function(doubled){
@@ -544,7 +550,7 @@
             const link=document.createElement("link");
             link.id="v17350-inventory-qol-style";
             link.rel="stylesheet";
-            link.href="css/52-v173.50-inventory-qol.css?v=173.58";
+            link.href="css/52-v173.50-inventory-qol.css?v=173.60";
             link.onerror=function(){ failV17350RuntimeGate("背包介面樣式載入失敗，請重新整理。"); };
             document.head.appendChild(link);
         }
@@ -554,7 +560,7 @@
         }
         const script=document.createElement("script");
         script.id="v17350-inventory-qol-runtime";
-        script.src="js/53-v173.50-inventory-qol.js?v=173.58";
+        script.src="js/53-v173.50-inventory-qol.js?v=173.60";
         script.async=false;
         script.onload=function(){
         if(typeof window.__v173ReportRuntimeProgress==="function"){

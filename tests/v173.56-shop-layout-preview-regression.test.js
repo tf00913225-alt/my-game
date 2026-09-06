@@ -17,6 +17,6 @@ assert.ok(shop.includes("window.v17346PreviewEquipmentShopOffer=window.v17351Pre
 assert.ok(!shop.includes("v17345-equipment-card v17351-shop-card"));
 assert.ok(!css.includes(".v17351-shop-card{display:grid!important;grid-template-columns:88px"));
 assert.ok(css.includes(".v17346-shop-card.purchased .v17346-shop-buy.v17351-purchased-buy"));
-assert.match(loader,/const V_ASSET_VERSION="173\.58"/);
-assert.match(index,/<title>四象江湖傳 V173\.58<\/title>/);
-console.log("✓ V173.58 restores premium equipment shop layout and click preview");
+assert.match(loader,/const V_ASSET_VERSION="173\.60"/);
+assert.match(index,/<title>四象江湖傳 V173\.60<\/title>/);
+console.log("✓ V173.60 restores premium equipment shop layout and click preview");
