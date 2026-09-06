@@ -57,6 +57,121 @@
         return EQUIPMENT_TYPES.has(String(item.type||""));
     }
 
+    const V17362_STACK_LIMIT=999;
+
+    function inventoryQualityRank(item){
+        const quality=equipmentQuality(item);
+        const rank=QUALITY_ORDER.indexOf(quality);
+        return rank>=0?rank:-1;
+    }
+
+    function inventoryFamilyKey(item){
+        if(!item){ return "zz:unknown"; }
+        const id=String(item.id||"");
+        const type=String(item.type||"item");
+        if(isInventoryEquipment(item)){
+            const slot=type==="hand"?"weapon":type==="helmet"?"head":type;
+            return "equipment:"+String(item.classType||"any")+":"+slot;
+        }
+        if(item.blueprintSlot){ return "material:blueprint:"+String(item.blueprintSlot); }
+        if(/^ore/i.test(id)){ return "material:ore"; }
+        if(item.talismanEffect){ return "talisman:"+String(item.talismanEffect); }
+        if(type==="potion"){ return "potion:"+id; }
+        if(type==="chest"){ return "chest:"+id; }
+        if(type==="ticket"){ return "ticket:"+String(item.setId||id); }
+        return type+":"+(id||String(item.name||""));
+    }
+
+    function cloneInventoryStack(item,count){
+        const copy={...item,count};
+        if(item.stats&&typeof item.stats==="object"){ copy.stats={...item.stats}; }
+        if(item.reforgeStats&&typeof item.reforgeStats==="object"){ copy.reforgeStats={...item.reforgeStats}; }
+        return copy;
+    }
+
+    function normalizeInventoryStacksAndOrder(){
+        if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){ return false; }
+        const source=inventoryItems.filter(Boolean);
+        const familyOrder=new Map();
+        let nextFamily=0;
+        source.forEach(item=>{
+            const family=inventoryFamilyKey(item);
+            if(!familyOrder.has(family)){ familyOrder.set(family,nextFamily++); }
+        });
+
+        const exactStacks=new Map();
+        const output=[];
+        source.forEach((item,index)=>{
+            if(isInventoryEquipment(item)){
+                if(Number(item.count)!==1){ item.count=1; }
+                output.push(item);
+                return;
+            }
+            const id=String(item.id||"");
+            if(!id){
+                let remaining=Math.max(1,Math.floor(Number(item.count)||1));
+                while(remaining>0){
+                    const amount=Math.min(V17362_STACK_LIMIT,remaining);
+                    output.push(cloneInventoryStack(item,amount));
+                    remaining-=amount;
+                }
+                return;
+            }
+            const exactKey=String(item.type||"")+"::"+id;
+            let entry=exactStacks.get(exactKey);
+            if(!entry){
+                entry={template:item,total:0,first:index};
+                exactStacks.set(exactKey,entry);
+            }
+            entry.total+=Math.max(1,Math.floor(Number(item.count)||1));
+        });
+        exactStacks.forEach(entry=>{
+            let remaining=entry.total;
+            while(remaining>0){
+                const amount=Math.min(V17362_STACK_LIMIT,remaining);
+                output.push(cloneInventoryStack(entry.template,amount));
+                remaining-=amount;
+            }
+        });
+
+        output.sort((a,b)=>{
+            const familyA=inventoryFamilyKey(a);
+            const familyB=inventoryFamilyKey(b);
+            const familyDiff=(familyOrder.get(familyA)??999999)-(familyOrder.get(familyB)??999999);
+            if(familyDiff){ return familyDiff; }
+            const qualityDiff=inventoryQualityRank(b)-inventoryQualityRank(a);
+            if(qualityDiff){ return qualityDiff; }
+            const idDiff=String(a.id||"").localeCompare(String(b.id||""),"zh-Hant");
+            if(idDiff){ return idDiff; }
+            return String(a.name||"").localeCompare(String(b.name||""),"zh-Hant");
+        });
+
+        const changed=output.length!==inventoryItems.length||output.some((item,index)=>{
+            const previous=inventoryItems[index];
+            return previous!==item||Number(previous&&previous.count)!==Number(item.count);
+        });
+        if(changed){
+            inventoryItems.splice(0,inventoryItems.length,...output);
+        }
+        return changed;
+    }
+
+    window.v17362NormalizeInventoryStacksAndOrder=normalizeInventoryStacksAndOrder;
+    window.v17362InventoryFamilyKey=inventoryFamilyKey;
+
+    /* Normalize old saves immediately, then again whenever the inventory grid is rebuilt. */
+    normalizeInventoryStacksAndOrder();
+    if(typeof rebuildInventorySlots==="function"&&!rebuildInventorySlots.__v17362Normalized){
+        const previousRebuildInventorySlots=rebuildInventorySlots;
+        const normalizedRebuild=function(){
+            normalizeInventoryStacksAndOrder();
+            return previousRebuildInventorySlots.apply(this,arguments);
+        };
+        normalizedRebuild.__v17362Normalized=true;
+        rebuildInventorySlots=normalizedRebuild;
+        window.rebuildInventorySlots=normalizedRebuild;
+    }
+
     function readBulkSellThreshold(){
         let stored="white";
         try{ stored=localStorage.getItem(BULK_SELL_KEY)||"white"; }catch(_){ }
@@ -448,14 +563,14 @@
             const link=document.createElement("link");
             link.id="v17351-qa-style";
             link.rel="stylesheet";
-            link.href="css/53-v173.51-qa.css?v=173.61";
+            link.href="css/53-v173.51-qa.css?v=173.62";
             document.head.appendChild(link);
         }
         const queue=[
-            ["v17351-battle-qa","js/54-v173.51-battle-qa.js?v=173.61"],
-            ["v17351-inventory-qa","js/55-v173.51-inventory-qa.js?v=173.61"],
-            ["v17351-shop-qa","js/56-v173.51-shop-qa.js?v=173.61"],
-            ["v17351-quest-qa","js/57-v173.51-quest-qa.js?v=173.61"]
+            ["v17351-battle-qa","js/54-v173.51-battle-qa.js?v=173.62"],
+            ["v17351-inventory-qa","js/55-v173.51-inventory-qa.js?v=173.62"],
+            ["v17351-shop-qa","js/56-v173.51-shop-qa.js?v=173.62"],
+            ["v17351-quest-qa","js/57-v173.51-quest-qa.js?v=173.62"]
         ];
         let index=0;
         let readySent=false;

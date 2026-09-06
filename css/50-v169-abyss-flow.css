@@ -187,6 +187,14 @@
 .v141-reward-toast .v141-reward-item-icon{display:inline-flex;width:30px;height:30px;flex:0 0 30px;}
 .v141-reward-toast .v141-reward-item-icon .v169-item-art{width:100%;height:100%;padding:1px;border-width:1px;border-radius:6px;}
 
+/* V173.62 — all tiered item art, including ore/materials, uses the same formal rarity frame. */
+.v169-item-art.v169-rarity-white,.v169-item-art.v169-rarity-low{border-color:#D8D8D8;box-shadow:0 0 5px rgba(216,216,216,.7),inset 0 0 6px rgba(216,216,216,.24);}
+.v169-item-art.v169-rarity-blue,.v169-item-art.v169-rarity-mid{border-color:#42A5FF;box-shadow:0 0 5px #42A5FF,0 0 12px rgba(66,165,255,.72),inset 0 0 7px rgba(66,165,255,.38);}
+.v169-item-art.v169-rarity-purple,.v169-item-art.v169-rarity-high{border-color:#B05CFF;box-shadow:0 0 5px #B05CFF,0 0 13px rgba(176,92,255,.76),inset 0 0 7px rgba(176,92,255,.4);}
+.v169-item-art.v169-rarity-orange,.v169-item-art.v169-rarity-perfect{border-color:#FF9F38;box-shadow:0 0 6px #FF9F38,0 0 14px rgba(255,159,56,.8),inset 0 0 8px rgba(255,159,56,.42);}
+.v169-item-art.v169-rarity-pink{border-color:#FF4FA7;box-shadow:0 0 7px #FF4FA7,0 0 16px rgba(255,79,167,.88),inset 0 0 9px rgba(255,79,167,.48);}
+.v169-item-art.v169-rarity-four-symbol{border:2px solid transparent;background:linear-gradient(#090b0f,#090b0f) padding-box,conic-gradient(from 0deg,#42A5FF 0 25%,#47D6A3 25% 50%,#C89B45 50% 75%,#FF5A36 75% 100%) border-box;box-shadow:0 0 8px rgba(255,90,54,.28),0 0 12px rgba(66,165,255,.28),0 0 14px rgba(71,214,163,.24);animation:v169FourSymbolRarityBreath 2.8s ease-in-out infinite;}
+
 @media (max-height:720px){
     #game-stage .v141-abyss-map > .v143-abyss-dialogue{min-height:72px !important;padding:7px 11px !important;}
 }

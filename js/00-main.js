@@ -1186,11 +1186,11 @@ const shopItems=potionDefinitions;
 /* =====================================================
    V92 — 背包堆疊規則
    - 裝備類：每格最多 1 件。
-   - 其餘類型：每格最多 100 件。
+   - 其餘類型：每格最多 999 件。
    - 超過上限會自動建立下一個堆疊，不讓單格突破上限。
 ===================================================== */
 
-const INVENTORY_MAX_STACK_DEFAULT=100;
+const INVENTORY_MAX_STACK_DEFAULT=999;
 
 function isEquipmentInventoryType(type){
     return [
@@ -3885,7 +3885,7 @@ const inventoryItems = [
         count:1,
         price:120,
         stats:{
-            attack:10
+            attack:3
         }
     },
 
@@ -3897,8 +3897,7 @@ const inventoryItems = [
         count:1,
         price:100,
         stats:{
-            intelligence:12,
-            attack:3
+            intelligence:3
         }
     },
 
@@ -3922,8 +3921,7 @@ const inventoryItems = [
         count:1,
         price:150,
         stats:{
-            defense:10,
-            maxHP:20
+            vitality:2
         }
     },
 
@@ -3935,7 +3933,7 @@ const inventoryItems = [
         count:1,
         price:90,
         stats:{
-            agility:5
+            agility:2
         }
     },
 

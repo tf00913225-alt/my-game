@@ -29,6 +29,6 @@ assert.match(synthesis,/reforgeSlotCount\(item\)>0/);
 assert.match(synthesis,/isEquipmentInventoryType\(item\.type\)&&canActuallyReforge\(item\)/);
 assert.match(synthesis,/if\(item&&canActuallyReforge\(item\)\)\{ results\.push\(\{item,source:"已裝備"\}\); \}/);
 
-assert.match(loader,/const V_ASSET_VERSION="173\.61"/);
-assert.match(index,/<title>四象江湖傳 V173\.61<\/title>/);
-console.log("✓ V173.61 starter equipment icons and reforge eligibility filter");
+assert.match(loader,/const V_ASSET_VERSION="173\.62"/);
+assert.match(index,/<title>四象江湖傳 V173\.62<\/title>/);
+console.log("✓ V173.62 starter equipment icons and reforge eligibility filter");

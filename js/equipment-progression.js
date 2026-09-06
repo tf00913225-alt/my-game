@@ -111,6 +111,26 @@
         leatherShoes:{path:"assets/equipment/warrior/shoes-01.png"},
         powerRing:{ring:true}
     };
+    /* V173.62: starter whites obey the same 1–3 single-stat band as ordinary white drops/shop gear. */
+    const STARTER_WHITE_STATS={
+        ironSword:{attack:3},
+        woodStaff:{intelligence:3},
+        leatherHelmet:{vitality:1},
+        leatherArmor:{vitality:2},
+        leatherShoes:{agility:2}
+    };
+    function repairStarterWhiteStats(item){
+        if(!item){ return false; }
+        const expected=STARTER_WHITE_STATS[String(item.id||"")];
+        if(!expected){ return false; }
+        const current=item.stats&&typeof item.stats==="object"?item.stats:{};
+        const currentKeys=Object.keys(current);
+        const expectedKeys=Object.keys(expected);
+        const same=currentKeys.length===expectedKeys.length&&expectedKeys.every(key=>Number(current[key])===Number(expected[key]));
+        if(same){ return false; }
+        item.stats={...expected};
+        return true;
+    }
     function legacyStarterRingMarkup(){
         return '<span class="v169-item-art v169-equipment-art v17346-rarity-white v17357-starter-ring"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" style="width:100%;height:100%;display:block"><defs><radialGradient id="v17357RingGem" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#fff1a8"/><stop offset=".45" stop-color="#d49a36"/><stop offset="1" stop-color="#6f4517"/></radialGradient><linearGradient id="v17357RingGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8dd86"/><stop offset=".55" stop-color="#b97623"/><stop offset="1" stop-color="#674016"/></linearGradient></defs><ellipse cx="32" cy="38" rx="18" ry="15" fill="none" stroke="url(#v17357RingGold)" stroke-width="7"/><path d="M21 24l6-8h10l6 8-6 7H27z" fill="url(#v17357RingGem)" stroke="#f6d47a" stroke-width="2"/><circle cx="32" cy="22" r="3" fill="#fff6c8" opacity=".9"/></svg></span>';
     }
@@ -121,6 +141,7 @@
             if(!item){ return; }
             const spec=LEGACY_STARTER_EQUIPMENT_ART[String(item.id||"")];
             if(!spec){ return; }
+            if(repairStarterWhiteStats(item)){ changed=true; }
             const iconText=String(item.icon||"");
             const hasRealArt=/<(?:img|svg)\\b/i.test(iconText);
             if(!hasRealArt){
@@ -134,9 +155,19 @@
             if(Number(item.reforgeSlots)!==0){ item.reforgeSlots=0; changed=true; }
             if(Number(item.reforgeUsed)!==0){ item.reforgeUsed=0; changed=true; }
         });
+        /* Existing saves may already have a starter piece equipped rather than in inventory. */
+        if(typeof characterEquipment!=="undefined"&&characterEquipment&&typeof characterEquipment==="object"){
+            Object.values(characterEquipment).forEach(slots=>{
+                if(!slots||typeof slots!=="object"){ return; }
+                Object.values(slots).forEach(item=>{
+                    if(repairStarterWhiteStats(item)){ changed=true; }
+                });
+            });
+        }
         return changed;
     }
     window.v17357RepairLegacyStarterEquipmentIcons=repairLegacyStarterEquipmentIcons;
+    window.v17362StarterWhiteStats=Object.fromEntries(Object.entries(STARTER_WHITE_STATS).map(([id,stats])=>[id,{...stats}]));
     function makeUid(prefix){ return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8); }
     function assetVariant(classType,slot,random){
         const list=ASSETS[classType]&&ASSETS[classType][slot]||[];
@@ -560,7 +591,7 @@
             const link=document.createElement("link");
             link.id="v17350-inventory-qol-style";
             link.rel="stylesheet";
-            link.href="css/52-v173.50-inventory-qol.css?v=173.61";
+            link.href="css/52-v173.50-inventory-qol.css?v=173.62";
             link.onerror=function(){ failV17350RuntimeGate("背包介面樣式載入失敗，請重新整理。"); };
             document.head.appendChild(link);
         }
@@ -570,7 +601,7 @@
         }
         const script=document.createElement("script");
         script.id="v17350-inventory-qol-runtime";
-        script.src="js/53-v173.50-inventory-qol.js?v=173.61";
+        script.src="js/53-v173.50-inventory-qol.js?v=173.62";
         script.async=false;
         script.onload=function(){
         if(typeof window.__v173ReportRuntimeProgress==="function"){

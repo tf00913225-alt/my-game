@@ -223,13 +223,21 @@ test("successful potion purchases enqueue an RPG receipt only after inventory ch
     assert.match(uiSource,/window\.rpgAlert\([\s\S]*title:"購買成功"/);
 });
 
-test("dungeon backpack reuses the real inventory and rises above the dungeon nav",()=>{
+test("dungeon backpack reuses the real inventory and fills the dungeon canvas",()=>{
     assert.match(uiSource,/dungeonPage\.classList\.contains\("active"\)/);
     assert.match(uiSource,/mapPage\.classList\.add\("active"\)/);
     assert.match(uiSource,/previousOpenMapInventoryOverlay\.apply/);
     assert.match(uiSource,/classList\.add\("v169-dungeon-inventory-overlay"\)/);
-    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*inset:8px 8px 76px 8px !important/);
+    assert.match(css,/V173\.62 — character and dungeon backpack use the maximum mobile canvas/);
+    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*inset:0 !important/);
+    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*width:100% !important/);
     assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*z-index:900 !important/);
+});
+
+test("character panel fills the mobile canvas while preserving internal scroll",()=>{
+    assert.match(css,/#homeFeatureModal:has\(\.home-feature-modal-box\.wide\)\{[\s\S]*padding:4px !important/);
+    assert.match(css,/\.home-feature-modal-box\.wide\{[\s\S]*width:calc\(100% - 8px\) !important;[\s\S]*max-width:none !important;[\s\S]*height:calc\(100% - 8px\) !important/);
+    assert.match(css,/\.home-feature-modal-box\.wide #characterTabContent\{[\s\S]*overflow-y:auto !important/);
 });
 
 test("perpetual modal glow and skill-card compositing are static",()=>{
@@ -238,10 +246,10 @@ test("perpetual modal glow and skill-card compositing are static",()=>{
 });
 
 test("V169 styles and runtimes are deployed last under fresh cache keys",()=>{
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.61"/);
-    assert.match(indexSource,/js\/00-main\.js\?v=173\.61/);
-    assert.match(indexSource,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.61/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.61/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.62"/);
+    assert.match(indexSource,/js\/00-main\.js\?v=173\.62/);
+    assert.match(indexSource,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.62/);
+    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.62/);
 
     const styles=[
         "css/48-v169-element-box-settings.css",

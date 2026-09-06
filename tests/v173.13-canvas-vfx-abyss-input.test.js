@@ -216,9 +216,9 @@ test("Abyss dialogue is owned by the map and blank-area taps can advance it",()=
 });
 
 test("the published release is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.61"/);
-    assert.match(index,/<title>四象江湖傳 V173\.61<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.61"[\s\S]*?>V173\.61<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.62"/);
+    assert.match(index,/<title>四象江湖傳 V173\.62<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.62"[\s\S]*?>V173\.62<\/div>/);
 });
 
 console.log("\n"+passed+" V173.39 Canvas VFX and Abyss input tests passed.");
