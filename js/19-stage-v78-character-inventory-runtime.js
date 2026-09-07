@@ -280,6 +280,21 @@ function schedule(){
         );
 }
 
+function loadSkillProgressionRuntime(){
+    if(document.getElementById("v17364-skill-progression-runtime")){
+        return;
+    }
+
+    const script=document.createElement("script");
+    script.id="v17364-skill-progression-runtime";
+    script.src="js/60-v173.64-skill-progression-rebalance.js?v=173.64";
+    script.async=false;
+    script.onerror=function(){
+        console.warn("V173.64 skill progression runtime failed to load");
+    };
+    document.body.appendChild(script);
+}
+
 function loadAbyssTwoTierStyle(){
     if(document.getElementById("v174-abyss-two-tier-style")){
         return;
@@ -294,7 +309,14 @@ function loadAbyssTwoTierStyle(){
 
 function loadAbyssTwoTierRuntime(){
     loadAbyssTwoTierStyle();
-    if(document.getElementById("v174-abyss-two-tier-runtime")){
+    const existing=document.getElementById("v174-abyss-two-tier-runtime");
+    if(existing){
+        if(existing.dataset.loaded==="1"){
+            loadSkillProgressionRuntime();
+        }else{
+            existing.addEventListener("load",loadSkillProgressionRuntime,{once:true});
+            existing.addEventListener("error",loadSkillProgressionRuntime,{once:true});
+        }
         return;
     }
 
@@ -302,8 +324,13 @@ function loadAbyssTwoTierRuntime(){
     script.id="v174-abyss-two-tier-runtime";
     script.src="js/59-abyss-two-tier-runtime.js?v=173.64-abyss2";
     script.async=false;
+    script.onload=function(){
+        script.dataset.loaded="1";
+        loadSkillProgressionRuntime();
+    };
     script.onerror=function(){
         console.warn("Two-tier Abyss runtime failed to load");
+        loadSkillProgressionRuntime();
     };
     document.body.appendChild(script);
 }
@@ -343,6 +370,8 @@ function armV17363FunctionalFixes(){
        so V173.63 always attaches after the actual feature owners exist.
        The two-tier Abyss successor is chained after that late layer so the
        legacy V144/V155 five-emperor roster wrappers cannot retake ownership.
+       V173.64 skill progression is chained last, after the current Abyss owner,
+       so player learning gates never become prerequisites for monster skills.
     */
     if(document.documentElement.dataset.runtimeReady){
         loadV17363FunctionalFixes();

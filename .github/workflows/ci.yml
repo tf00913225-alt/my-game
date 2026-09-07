@@ -44,6 +44,7 @@ jobs:
         run: |
           node --check .github/scripts/ci.mjs
           node --check .github/scripts/release-gate.mjs
+          node --check .github/scripts/run-skill-progression-browser-qa.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
@@ -57,6 +58,9 @@ jobs:
 
       - name: Run all Node unit and integration suites
         run: node .github/scripts/ci.mjs tests
+
+      - name: Run skill progression mobile browser QA
+        run: node .github/scripts/run-skill-progression-browser-qa.mjs
 
       - name: Check static local resources
         run: node .github/scripts/ci.mjs resources
