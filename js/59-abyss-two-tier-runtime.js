@@ -598,13 +598,10 @@
         const atmosphere=config.id===20
             ?"前方感受到強大的"+region.elementLabel+"元素氣息。"+(region.displayEmperor||region.emperor)+"正在等待挑戰者。"
             :region.name+"天威壓境。"+(region.displayEmperor||region.emperor)+"已在王座前等待決戰。";
-        if(typeof window.rpgConfirm==="function"){
-            Promise.resolve(window.rpgConfirm(atmosphere,{title:region.name,confirmText:region.bossEntry,cancelText:"暫不進入"}))
-                .then(function(ok){ if(ok){ launchCurrentEncounter(); } });
-            return true;
-        }
-        if(typeof confirm==="function"&&!confirm(atmosphere)){ return false; }
-        return launchCurrentEncounter();
+        if(typeof window.rpgConfirm!=="function"){ return false; }
+        Promise.resolve(window.rpgConfirm(atmosphere,{title:region.name,confirmText:region.bossEntry,cancelText:"暫不進入"}))
+            .then(function(ok){ if(ok){ launchCurrentEncounter(); } });
+        return true;
     }
 
     function startEncounter(){
