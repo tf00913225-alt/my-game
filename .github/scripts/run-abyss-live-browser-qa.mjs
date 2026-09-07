@@ -9,7 +9,11 @@ const needle=`    await client.eval(seedPlayerExpression(20));
     await client.eval(\`(async()=>{
 `;
 const replacement=`    await client.eval(seedPlayerExpression(20));
-    await client.eval(\`(()=>{if(typeof saveGame==='function'){saveGame();return true;}return false;})()\`);
+    await client.eval(\`(()=>{
+        try{sessionStorage.setItem('sixiang_startup_session_ready_v1','1');}catch(_){}
+        if(typeof saveGame==='function'){saveGame();return true;}
+        return false;
+    })()\`);
     await client.send("Page.reload",{ignoreCache:true});
     await waitFor(client,"document.readyState==='complete'","saved player reload");
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime after saved player reload");
@@ -159,9 +163,9 @@ if(!patched.includes(bossLauncherNeedle)){
 patched=patched.replace(bossLauncherNeedle,bossLauncherReplacement);
 
 /* The user's regression was visual: skill text still appeared while the V143
-   effect did not. Exercise the real shared dungeon battle launcher, preserve a
-   realistic queued target through the production badge boundary, and require
-   an actually visible V143 stage + sprite with non-zero geometry. */
+   effect did not. Exercise a real formal Flame Slash cast in the production
+   dungeon battle engine (only learning eligibility is supplied by the fixture),
+   then require an actually visible V143 stage + Sprite with non-zero geometry. */
 const vfxNeedle=`    assert.equal(lv40.final.eliteCount,9);
 
     const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
@@ -172,6 +176,7 @@ const vfxReplacement=`    assert.equal(lv40.final.eliteCount,9);
         const launcher=typeof window.__abyssQaLiveLauncher==='function'?window.__abyssQaLiveLauncher:window.v132LaunchDungeonBattle;
         if(typeof launcher!=='function'){return {started:false,reason:'missing-shared-launcher'};}
         if(typeof battleActive!=='undefined'&&battleActive){return {started:false,reason:'battle-already-active'};}
+        if(typeof v132CloseRewardModal==='function'){try{v132CloseRewardModal();}catch(_){}}
         const roster=v174AbyssBuildRoster(20,0,0);
         const started=launcher(roster,()=>{});
         return {started:!!started};
@@ -180,16 +185,23 @@ const vfxReplacement=`    assert.equal(lv40.final.eliteCount,9);
     await waitFor(client,"document.getElementById('battlePage')?.classList.contains('active')&&document.getElementById('battlePlayerCard0')&&document.getElementById('battleMonster0')","real Abyss battle cards",15000);
     const vfxBefore=await client.eval(\`typeof v143GetAnimationDiagnostics==='function'?v143GetAnimationDiagnostics():null\`);
     assert.ok(vfxBefore,"V143 animation diagnostics are unavailable in the deployed battle runtime");
-    const badgeTriggered=await client.eval(\`(()=>{
-        if(typeof showSkillNameBadge!=='function')return false;
+    const castTriggered=await client.eval(\`(()=>{
+        if(typeof castDamageSkill!=='function'||typeof skillDatabase==='undefined'||!skillDatabase.flameSlash){return false;}
         if(typeof queuedPlayerActions!=='undefined'){
             queuedPlayerActions[0]={action:'flameSlash',target:0,targetAlly:null};
         }
         if(typeof selectedMonster!=='undefined'){selectedMonster=0;}
-        showSkillNameBadge('火焰斬','fire',0);
+        if(typeof activeBattleCharacterIndex!=='undefined'){activeBattleCharacterIndex=0;}
+        if(typeof player!=='undefined'&&player){player.sp=Math.max(999,Number(player.sp)||0);player.element='fire';}
+        if(typeof getSkillLevel==='function'&&!window.__abyssQaGetSkillLevelOriginal){
+            window.__abyssQaGetSkillLevelOriginal=getSkillLevel;
+            const original=getSkillLevel;
+            getSkillLevel=function(key,id){return id==='flameSlash'?1:original.apply(this,arguments);};
+        }
+        castDamageSkill('flameSlash');
         return true;
     })()\`);
-    assert.equal(badgeTriggered,true,"Production skill badge boundary is unavailable");
+    assert.equal(castTriggered,true,"Production Flame Slash action could not be invoked");
     await sleep(140);
     const vfx=await client.eval(\`(()=>{
         const stage=document.getElementById('v143-skill-stage');
