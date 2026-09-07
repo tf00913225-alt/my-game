@@ -41,8 +41,9 @@
       ]
     }
   ],
-  "automatedVerification": "TARGETED_TESTS_PASSED_ON_BRANCH",
+  "automatedVerification": "ALL_NODE_SUITES_AND_TARGETED_TESTS_PASSED_ON_BRANCH",
   "targetedVerificationRun": 34072313075,
-  "targetedVerificationNotes": "全域手勢／contextmenu／drag regression、V173.51 QA、火系 13 項、Fire repair 3 項、水系 18 項、風系 11 項、V173.62 回歸、release coherence 與 git diff check 均通過；完整 PR Repository checks 仍需以本 commit 重新執行。",
+  "fullRegressionRun": 34073073796,
+  "automatedVerificationNotes": "全域手勢／contextmenu／drag regression、V173.51 QA、火系 13 項、Fire repair 3 項、水系 18 項、風系 11 項、V173.62 回歸均通過；touchmove owner 已收斂為單一 handler；歷史 touch-lock cache assertions 與 V173.53 舊 VFX ownership assertion 已對齊現行契約；完整 105/105 Node suites、release coherence gate 與 git diff check 全部通過。正式 PR Repository checks 仍需以本 commit 執行。",
   "visualVerification": "PENDING_DEV_PHONE_TEST"
 }
