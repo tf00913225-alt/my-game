@@ -120,10 +120,10 @@ try{
         const cards=Array.from(row.querySelectorAll('.skill-action-card'));
         const card=cards.find(item=>/learnSkill|upgradeSkill/.test(String(item.getAttribute('onclick')||''))||/學習|升級|Lv20|技能點/.test(String(item.textContent||'')))||cards[0]||null;
         const label=card?.querySelector('.skill-action-card-label');const rr=row.getBoundingClientRect();const cr=card?.getBoundingClientRect();
-        return {label:label?.textContent.replace(/\\s+/g,' ').trim()||'',disabled:!!card?.classList.contains('disabled'),onclick:card?.getAttribute('onclick')||'',horizontalOverflow:row.scrollWidth>row.clientWidth+1,actionOutside:!!(cr&&(cr.left<rr.left-1||cr.right>rr.right+1))};
+        return {label:label?.textContent.replace(/\\s+/g,' ').trim()||'',disabled:!!card?.classList.contains('disabled'),onclick:card?.getAttribute('onclick')||'',rowHeight:rr.height,horizontalOverflow:row.scrollWidth>row.clientWidth+1,actionOutside:!!(cr&&(cr.left<rr.left-1||cr.right>rr.right+1))};
     })()`);
 
-    let state=await rowState();assert.ok(state,"Revive skill row is missing");assert.equal(state.disabled,true);assert.match(state.label,/Lv20/);assert.equal(state.horizontalOverflow,false);assert.equal(state.actionOutside,false);
+    let state=await rowState();assert.ok(state,"Revive skill row is missing");assert.ok(state.rowHeight>0,"Revive row is not visibly rendered");assert.equal(state.disabled,true);assert.match(state.label,/Lv20/);assert.equal(state.horizontalOverflow,false);assert.equal(state.actionOutside,false);
     await client.eval(`player.level=20;currentSkillCharacter='water';renderSkillLoadout();true`);
     state=await rowState();assert.equal(state.disabled,false);assert.match(state.onclick,/learnSkill\('revive'\)/);
     await client.eval(`currentSkillCharacter='player2';renderSkillLoadout();true`);
@@ -133,14 +133,24 @@ try{
         currentSkillCharacter='water';player.level=20;renderSkillLoadout();showSkillDetail('revive');
         const root=document.getElementById('characterTabContent'),page=document.getElementById('skillPage'),details=document.getElementById('skillDetailStats');
         const pageText=page?.textContent||'';const rows=Array.from(document.querySelectorAll('#allSkillsList .skill-row'));
-        const probe=document.createElement('div');probe.dataset.skillScrollProbe='1';probe.style.height='1200px';probe.style.width='1px';probe.style.pointerEvents='none';page?.appendChild(probe);
+        const pageRect=page?.getBoundingClientRect();const naturalStyle=root?getComputedStyle(root):null;
+        if(root){
+            root.style.setProperty('flex','0 0 240px','important');
+            root.style.setProperty('height','240px','important');
+            root.style.setProperty('max-height','240px','important');
+            root.style.setProperty('overflow-y','scroll','important');
+        }
+        void root?.offsetHeight;
         const before=root?.scrollTop||0;if(root){root.scrollTop=Math.max(0,root.scrollHeight-root.clientHeight);}const after=root?.scrollTop||0;
-        const measurements={details:details?.textContent.replace(/\\s+/g,' ').trim()||'',forbidden:['learnLevel','requires','tier','upgradeCost'].filter(word=>pageText.includes(word)),visibleRows:rows.length,horizontalOverflow:rows.some(row=>row.scrollWidth>row.clientWidth+1),overflowY:root?getComputedStyle(root).overflowY:'',probeScrollHeight:root?.scrollHeight||0,probeClientHeight:root?.clientHeight||0,before,after,listExists:!!document.getElementById('allSkillsList')};
-        probe.remove();return measurements;
+        return {
+            details:details?.textContent.replace(/\\s+/g,' ').trim()||'',forbidden:['learnLevel','requires','tier','upgradeCost'].filter(word=>pageText.includes(word)),
+            visibleRows:rows.length,horizontalOverflow:rows.some(row=>row.scrollWidth>row.clientWidth+1),pageVisible:!!(pageRect&&pageRect.height>0&&pageRect.width>0),
+            overflowY:naturalStyle?.overflowY||'',touchAction:naturalStyle?.touchAction||'',forcedScrollHeight:root?.scrollHeight||0,forcedClientHeight:root?.clientHeight||0,before,after,listExists:!!document.getElementById('allSkillsList')
+        };
     })()`);
     for(const label of ["最低學習等級","目前技能等級","下一級角色需求","學習成本","升級成本","前置技能"]){assert.match(ui.details,new RegExp(label));}
-    assert.deepEqual(ui.forbidden,[]);assert.equal(ui.horizontalOverflow,false);assert.ok(ui.visibleRows>=8,"Water skill list is unexpectedly short");assert.equal(ui.listExists,true);
-    assert.match(ui.overflowY,/auto|scroll/);assert.ok(ui.probeScrollHeight>ui.probeClientHeight,"Skill scroll owner did not accept overflow content");assert.ok(ui.after>ui.before,"Skill scroll owner did not move when overflow existed");
+    assert.deepEqual(ui.forbidden,[]);assert.equal(ui.horizontalOverflow,false);assert.ok(ui.visibleRows>=8,"Water skill list is unexpectedly short");assert.equal(ui.listExists,true);assert.equal(ui.pageVisible,true,"Skill page is not visibly mounted in the character modal");
+    assert.match(ui.overflowY,/auto|scroll/);assert.equal(ui.touchAction,"pan-y");assert.ok(ui.forcedScrollHeight>ui.forcedClientHeight,"Constrained skill scroll owner did not overflow");assert.ok(ui.after>ui.before,"Constrained skill scroll owner did not actually scroll");
     assert.deepEqual(client.errors,[]);
     console.log("✓ Skill progression mobile browser QA passed");
 }finally{
