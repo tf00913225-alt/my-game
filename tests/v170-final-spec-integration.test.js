@@ -1415,4 +1415,85 @@ test("damage safety, full pressure matrix and Abyss level brackets remain formal
     result.unsafe.forEach(value=>assert.ok(Number.isFinite(value)&&value>=1));
 });
 
+
+
+test("formal EXP chain couples actual patrol reward to target battles from Lv20",()=>{
+    const runtime=loadFinalRuntime();
+    const report=evaluateJson(runtime.context,`(function(){
+        const checkpoints=[20,30,40,50,60,70,80,90,95,98,99];
+        const profiles=[
+            {min:11,max:20,key:"desert",size:2},{min:21,max:30,key:"ice",size:4.5},
+            {min:31,max:40,key:"zone4",size:4.5},{min:41,max:50,key:"zone5",size:4.5},
+            {min:51,max:60,key:"zone6",size:4.5},{min:61,max:70,key:"zone7",size:4.5},
+            {min:71,max:80,key:"zone8",size:4.5},{min:81,max:90,key:"zone9",size:4.5},
+            {min:91,max:99,key:"zone10",size:4.5}
+        ];
+        function runtimeAverage(level){
+            const profile=profiles.find(value=>level>=value.min&&level<=value.max);
+            const source=zoneConfig[profile.key].monsters;
+            const roster=typeof source==="function"?source():source;
+            const expectedUnit=roster.reduce((sum,monster)=>{
+                if(Number.isFinite(Number(monster.v141CurveEliteRate))){
+                    const rate=Math.max(0,Math.min(1,Number(monster.v141CurveEliteRate)));
+                    const regular=Object.assign({},monster,{rank:"regular"});
+                    const elite=Object.assign({},monster,{rank:"elite"});
+                    return sum+v173CalculateStandardPatrolExp([regular],level)*(1-rate)+
+                        v173CalculateStandardPatrolExp([elite],level)*rate;
+                }
+                return sum+v173CalculateStandardPatrolExp([monster],level);
+            },0)/roster.length;
+            return Math.round(expectedUnit*profile.size);
+        }
+        const rows=checkpoints.map(level=>{
+            const averageBattleExp=v139GetTrainingZoneAverageExpForLevel(level);
+            const expNext=v133GetExpNextForLevel(level);
+            const targetBattles=v139GetTargetBattlesForLevel(level);
+            const theoreticalBattles=expNext/averageBattleExp;
+            return {level:level,expNext:expNext,averageBattleExp:averageBattleExp,
+                runtimeAverage:runtimeAverage(level),targetBattles:targetBattles,
+                theoreticalBattles:theoreticalBattles,
+                differencePercent:(theoreticalBattles-targetBattles)/targetBattles*100};
+        });
+        const rankMonster={level:20,element:"fire"};
+        const rank=["regular","elite","boss"].map(rank=>
+            v173CalculateStandardPatrolExp([Object.assign({},rankMonster,{rank:rank})],20)
+        );
+        const standard=rank[0];
+        const modes={
+            manual:v173ApplyPatrolExpMode(standard,{}),
+            elementBox:v173ApplyPatrolExpMode(standard,{elementBox:true}),
+            rested:v173ApplyPatrolExpMode(standard,{rested:true}),
+            blockedStack:v173ApplyPatrolExpMode(standard,{elementBox:true,rested:true})
+        };
+        const phase={level19:v173GetPatrolProgressionExpMultiplier(19),level20:v173GetPatrolProgressionExpMultiplier(20)};
+        const charge=[20,50,99].map(level=>[level,v173GetNaturalChargeLevelsPerDay(level)]);
+        const daily=[20,50,99].map(level=>{
+            const reward=v173GetDailyGrowthRewardBreakdown(level);
+            const levelsPerDay=v173GetDailyQuestLevelsPerDay(level);
+            return [level,reward.totalExp,Math.round(v133GetExpNextForLevel(level)*levelsPerDay),levelsPerDay];
+        });
+        Object.assign(player,{level:20,exp:0,expNext:v133GetExpNextForLevel(20)});player2=null;player3=null;
+        const dungeonNormal=v139GetExpDungeonRewardExp();
+        return {rows:rows,rank:rank,modes:modes,phase:phase,charge:charge,daily:daily,
+            dungeonNormal:dungeonNormal,dungeonRatio:dungeonNormal/player.expNext};
+    })()`);
+
+    report.rows.forEach(row=>{
+        assert.ok(Math.abs(row.theoreticalBattles-row.targetBattles)<0.001,"Lv"+row.level+" target battles");
+        assert.ok(Math.abs(row.differencePercent)<0.001,"Lv"+row.level+" difference");
+        assert.ok(Math.abs(row.runtimeAverage-row.averageBattleExp)/row.averageBattleExp<.01,"Lv"+row.level+" battle owner/audit mismatch");
+    });
+    assert.deepEqual(report.rank,[700,1050,2100]);
+    assert.deepEqual(report.modes,{manual:700,elementBox:490,rested:1400,blockedStack:490});
+    assert.deepEqual(report.phase,{level19:3,level20:1});
+    assert.deepEqual(report.charge,[[20,1.3],[50,1],[99,.32]]);
+    report.daily.forEach(([level,actual,expected])=>assert.equal(actual,expected,"Lv"+level+" daily Growth EXP"));
+    assert.ok(Math.abs(report.dungeonRatio-.33)<.001);
+    const dungeonSource=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
+    const dailyDungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+    assert.match(dungeonSource,/const DUNGEON_DAILY_LIMIT_ENABLED=false/);
+    assert.match(dailyDungeonSource,/showRewardedAd\(\(\)=>grant\(2\)/);
+    console.log("EXP_GROWTH_REPORT="+JSON.stringify(report));
+});
+
 console.log("\nV170 final integration suite: "+passed+" tests passed.");

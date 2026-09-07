@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-exp-growth-curve-convergence",
+  "baseBranch": "dev",
+  "baseCommit": "cb269fef7f28e54161b9abda9cfcb66bfbfbe74f",
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "EXP-CURVE-01",
+      "status": "VERIFIED",
+      "requirement": "Lv1→20維持約20～30分鐘新手快速期；Lv20→21起由正式練功區平均EXP×TARGET_BATTLE_ANCHORS決定expNext。",
+      "evidence": [
+        "js/28-v133-economy-rebalance.js",
+        "tests/v173.43-growth-charge.test.js",
+        "tests/v170-final-spec-integration.test.js",
+        "GitHub Actions run 34122235918"
+      ]
+    },
+    {
+      "id": "EXP-BATTLE-01",
+      "status": "VERIFIED",
+      "requirement": "Lv20+一般巡怪只使用基礎EXP×rank×3.5；V173.42×3僅限Lv1～19。",
+      "evidence": [
+        "js/25-v131-fix-batch.js",
+        "tests/v170-final-spec-integration.test.js",
+        "GitHub Actions run 34122235918"
+      ]
+    },
+    {
+      "id": "EXP-MODES-01",
+      "status": "VERIFIED",
+      "requirement": "手動100%、元素匣70%、休息200%，元素匣不得與休息經驗疊加；rank維持1/1.5/3。",
+      "evidence": [
+        "js/25-v131-fix-batch.js",
+        "js/32-v139-rested-experience.js",
+        "tests/v170-final-spec-integration.test.js",
+        "tests/v139-economy-rested-exp.test.js",
+        "GitHub Actions run 34122235918"
+      ]
+    },
+    {
+      "id": "EXP-GROWTH-01",
+      "status": "VERIFIED",
+      "requirement": "自然充能與每日Growth繼續以新expNext×既有levels/day計算，不重做比例。",
+      "evidence": [
+        "js/28-v133-economy-rebalance.js",
+        "tests/v173.43-growth-charge.test.js",
+        "tests/v170-final-spec-integration.test.js",
+        "GitHub Actions run 34122235918"
+      ]
+    },
+    {
+      "id": "EXP-DUNGEON-01",
+      "status": "VERIFIED",
+      "requirement": "經驗副本維持約33%，廣告雙倍約66%，DUNGEON_DAILY_LIMIT_ENABLED保持false。",
+      "evidence": [
+        "js/27-v132-content-expansion.js",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "tests/v170-final-spec-integration.test.js",
+        "GitHub Actions run 34122235918"
+      ]
+    },
+    {
+      "id": "EXP-OFFLINE-01",
+      "status": "VERIFIED",
+      "requirement": "傳統離線EXP完整檢查後維持現行基礎、最高等級倍率、V173.42×3與廣告雙倍，不因本次曲線修正擅改。",
+      "evidence": [
+        "js/00-main.js",
+        "js/34-v141-core-systems.js",
+        "HANDOFF.md",
+        "GitHub Actions run 34122235918"
+      ]
+    },
+    {
+      "id": "EXP-DOCS-01",
+      "status": "VERIFIED",
+      "requirement": "HANDOFF同步最新正式EXP owner與規則，禁止未來再把target battle audit與expNext拆成矛盾兩套。",
+      "evidence": [
+        "HANDOFF.md",
+        "GitHub Actions run 34122235918"
+      ]
+    }
+  ],
+  "automatedVerification": "BRANCH_RUNTIME_REGRESSION_AND_PR_REPOSITORY_CHECKS_PASS",
+  "verificationRun": 34122235918,
+  "targetedVerificationRun": 34121718971,
+  "finalDevVerificationRun": null,
+  "visualVerification": "NOT_REQUIRED_LOGIC_ONLY",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "verifiedOnDevVersion": null,
+  "releasedAs": null
+}
