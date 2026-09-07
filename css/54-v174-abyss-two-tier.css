@@ -3,7 +3,36 @@
    The formal 16:9 cover cards live inside a vertical flex list. They must keep
    their aspect-ratio-derived height instead of shrinking to zero on the
    1080x1920 virtual stage when the physical viewport is narrower.
+
+   Real-device regression note:
+   V154 leaves `align-items:center !important` on the legacy `.v141-abyss-intro`
+   shell.  The new two-tier selection reuses that shell, so an auto-width flex
+   child containing `width:100%` cards can collapse to only a few pixels wide on
+   Android Chrome even though desktop/headless Chrome still reports a non-zero
+   16:9 footprint.  Own the cross-axis sizing explicitly here.
 ===================================================== */
+#game-stage .v141-abyss-intro.v174-abyss-selection{
+    align-items:stretch !important;
+    box-sizing:border-box !important;
+}
+
+#game-stage .v141-abyss-intro.v174-abyss-selection::before{
+    display:none !important;
+    content:none !important;
+}
+
+#game-stage .v174-abyss-card-list{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    align-self:stretch !important;
+    box-sizing:border-box !important;
+}
+
 #game-stage .v174-abyss-card{
     flex:0 0 auto !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    box-sizing:border-box !important;
 }
