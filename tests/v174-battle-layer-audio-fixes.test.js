@@ -27,20 +27,21 @@ test("Element Box focus suppresses only the document-level skill presentation la
     assert.doesNotMatch(layerCss,/body\.v162-element-box-settings-open[\s\S]{0,180}\.v143-skill-stage[\s\S]{0,120}display:none/);
 });
 
-test("Skill SFX gain is exactly doubled without doubling general combat feedback",()=>{
+test("Skill SFX and general combat feedback are both exactly doubled",()=>{
     assert.match(audio,/const SKILL_VOLUME_SCALE=2;/);
+    assert.match(audio,/const COMBAT_FEEDBACK_VOLUME_SCALE=2;/);
     assert.match(audio,/function play\(kind,volumeScale\)/);
     assert.match(audio,/\(Number\(opts\.volume\)\|\|0\.16\)\*playbackGainScale/);
     assert.match(audio,/\(Number\(opts\.volume\)\|\|0\.14\)\*playbackGainScale/);
     assert.match(audio,/play\("heal",SKILL_VOLUME_SCALE\)/);
     assert.match(audio,/play\(elementKind,SKILL_VOLUME_SCALE\)/);
     assert.match(audio,/play\("explosion",SKILL_VOLUME_SCALE\)/);
-    assert.match(audio,/skillVolumeScale:SKILL_VOLUME_SCALE/);
-    assert.match(audio,/audioEngine\.play\("death"\)/);
-    assert.match(audio,/audioEngine\.play\("dodge"\)/);
-    assert.match(audio,/audioEngine\.play\(isCrit\?"crit":"damage"\)/);
-    assert.doesNotMatch(audio,/audioEngine\.play\("death",SKILL_VOLUME_SCALE\)/);
-    assert.doesNotMatch(audio,/audioEngine\.play\("dodge",SKILL_VOLUME_SCALE\)/);
+    assert.match(audio,/combatFeedbackVolumeScale:COMBAT_FEEDBACK_VOLUME_SCALE/);
+    assert.match(audio,/audioEngine\.play\("death",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
+    assert.match(audio,/audioEngine\.play\("dodge",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
+    assert.match(audio,/audioEngine\.play\("block",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
+    assert.match(audio,/audioEngine\.play\(isCrit\?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
+    assert.match(audio,/audioEngine\.play\("boss",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
 });
 
 console.log("\nV174 battle layer/audio fixes suite: "+passed+" tests passed.");
