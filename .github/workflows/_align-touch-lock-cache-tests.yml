@@ -18,6 +18,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Ensure existing asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
       - name: Align only touch-lock cache assertions
         run: |
           python - <<'PY'
