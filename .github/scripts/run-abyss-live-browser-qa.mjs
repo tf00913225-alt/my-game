@@ -37,6 +37,21 @@ if(!patched.includes(stageLoopNeedle)||!patched.includes(bossGateNeedle)){
 }
 patched=patched.replace(stageLoopNeedle,stageLoopReplacement).replace(bossGateNeedle,bossGateReplacement);
 
+const coverWaitNeedle=`    await waitFor(client,"document.querySelector('.v174-abyss-selection')&&getComputedStyle(document.querySelector('.v174-abyss-selection')).display!=='none'","visible Abyss selection");
+
+    const selection=await client.eval(\`(()=>{
+`;
+const coverWaitReplacement=`    await waitFor(client,"document.querySelector('.v174-abyss-selection')&&getComputedStyle(document.querySelector('.v174-abyss-selection')).display!=='none'","visible Abyss selection");
+    await waitFor(client,"Array.from(document.querySelectorAll('.v174-abyss-card-cover')).length===2&&Array.from(document.querySelectorAll('.v174-abyss-card-cover')).every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0)","Abyss cover image load",30000);
+
+    const selection=await client.eval(\`(()=>{
+`;
+
+if(!patched.includes(coverWaitNeedle)){
+    throw new Error("Live Abyss QA could not find the visible selection checkpoint.");
+}
+patched=patched.replace(coverWaitNeedle,coverWaitReplacement);
+
 const target=path.join(os.tmpdir(),`abyss-live-browser-qa-saved-${process.pid}.mjs`);
 fs.writeFileSync(target,patched,"utf8");
 await import(pathToFileURL(target).href+`?run=${Date.now()}`);
