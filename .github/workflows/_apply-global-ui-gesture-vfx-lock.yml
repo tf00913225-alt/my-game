@@ -51,6 +51,14 @@ jobs:
           p.write_text(s.replace(old,new,1),encoding='utf-8')
           PY
 
+      - name: Normalize generated documentation EOF
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('UI_GUIDELINES.md')
+          p.write_text(p.read_text(encoding='utf-8').rstrip()+'\n',encoding='utf-8')
+          PY
+
       - name: Check modified JavaScript syntax
         run: |
           node --check js/01-stage-v8-touch-lock.js
