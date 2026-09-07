@@ -314,6 +314,7 @@
     }
 
     let lastMonsterSkillByIndex=new Map();
+    const COMBAT_FEEDBACK_VOLUME_SCALE=2;
 
     /* =====================================================
        Procedural audio
