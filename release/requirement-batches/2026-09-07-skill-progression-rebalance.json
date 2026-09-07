@@ -5,85 +5,85 @@
   "baseCommit": "cb269fef7f28e54161b9abda9cfcb66bfbfbe74f",
   "officialVersion": "173.64",
   "officialVersionBumpAllowed": true,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "SKILL-PROG-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "玩家技能樹採用招式早見面、境界慢修成：learnLevel 控制初學，最高 Lv5 技能共用 Lv2～Lv5 角色門檻公式與 1/2/3/4 技能點升級成本，且只使用該角色本人 level、skillPoints、skillLevels。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","tests/skill-progression-rebalance.test.js"]
     },
     {
       "id": "SKILL-PROG-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "四元素攻擊技能依 Lv1/Lv7/Lv14/Lv30 節奏與 2/6/10/16 初學成本重整，角色升級每級 +2 技能點與既有初始技能點保持不變。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","js/00-main.js","tests/skill-progression-rebalance.test.js","tests/v170-final-spec-integration.test.js"]
     },
     {
       "id": "SKILL-FIRE-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "火系怒火 Lv18/10 點；新增炎魂共鳴 Lv25/14 點與焚血訣 Lv35/18 點，兩者為火戰士/法師共通主動戰術技並與四格技能競爭；戰術前置線為怒火→炎魂共鳴→焚血訣。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","tests/skill-progression-rebalance.test.js"]
     },
     {
       "id": "SKILL-FIRE-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "炎魂共鳴只在火元素主動技能爆擊或成功新增燃燒時產生不可疊加/刷新之炎勢；炎勢與焚血僅透過正式 additive damage bonus bucket 強化下一次主動主施放，不強化燃燒 DOT 或免費追擊。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","tests/skill-progression-rebalance.test.js","js/43-v149-skill-ui-rules.js","js/00-main.js"]
     },
     {
       "id": "SKILL-FIRE-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "焚血訣僅在目前 HP 高於最大 HP 20% 時可施放，直接支付最大 HP 10% 與 20 SP；HP 成本不是傷害事件，不觸發吸血、反傷或受擊效果。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","tests/skill-progression-rebalance.test.js"]
     },
     {
       "id": "SKILL-WATER-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "水系支援節奏為治療 Lv15、復活 Lv20、冰封 Lv25、淨心訣 Lv35；復活保留 20/40/60/80/100% HP 並以 Lv20/28/38/50/80 境界門檻控制。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","js/50-v169-water-skill-rules.js","tests/skill-progression-rebalance.test.js"]
     },
     {
       "id": "SKILL-WIND-EARTH-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "風系閃躲術改為最高 Lv5 並依 30/40/50/60/70% 成長；土系岩石壁壘與萬象土盾改最高 Lv5，分別依 15/20/25/30/35% 防禦與 20/30/35/40/50% 反傷成長，土系前置正式改為岩石壁壘→萬象土盾→結界且無循環。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","tests/skill-progression-rebalance.test.js"]
     },
     {
       "id": "SKILL-EX-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "火/水/風/土 EX 全部最低角色 Lv50、初學 20 技能點、最高 Lv1、不占四格技能欄，既有 EX 實際效果數值不修改。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","tests/skill-progression-rebalance.test.js"]
     },
     {
       "id": "SKILL-UI-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "技能頁提前顯示未來技能，鎖定按鈕同時呈現角色等級/前置/技能點原因；升級鎖定顯示下一境界角色等級；技能詳細頁顯示最低學習、目前等級、下一級角色需求、學習成本、升級成本、前置技能，玩家端只顯示繁體中文。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js",".github/scripts/run-skill-progression-browser-qa.mjs"]
     },
     {
       "id": "SKILL-ISOLATION-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "玩家 learnLevel/境界門檻不得進入普通怪、菁英、BOSS、深淵五帝固定技能或符咒共享技能；stormSpell/暴風術不得加入玩家技能池。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","js/59-abyss-two-tier-runtime.js","js/27-v132-content-expansion.js","tests/skill-progression-rebalance.test.js"]
     },
     {
       "id": "SKILL-SAVE-SLOT-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "舊存檔已學技能與技能等級/技能點不刪除、不降級、不扣點；之後升級才受新境界限制；DEV 加技能點不能繞過角色等級；主動技能仍最多裝備四招。",
       "evidence": ["js/60-v173.64-skill-progression-rebalance.js","js/00-main.js","tests/skill-progression-rebalance.test.js"]
     },
     {
       "id": "SKILL-QA-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "新增技能成長自動測試與 390×844 實際 Headless Chrome UI QA，並通過 Repository checks、技能/四元素/水系/戰鬥/深淵/存檔相關回歸。",
       "evidence": ["tests/skill-progression-rebalance.test.js",".github/scripts/run-skill-progression-browser-qa.mjs",".github/workflows/ci.yml"]
     }
   ],
-  "automatedVerification": "PENDING",
-  "verificationRun": null,
-  "targetedVerificationRun": null,
-  "visualVerification": "PENDING",
+  "automatedVerification": "REPOSITORY_CHECKS_AND_MOBILE_CHROME_VERIFIED",
+  "verificationRun": 34139665441,
+  "targetedVerificationRun": 34139665441,
+  "visualVerification": "AUTOMATED_390X844_HEADLESS_CHROME_PASS",
   "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
   "releasedAs": null
 }
