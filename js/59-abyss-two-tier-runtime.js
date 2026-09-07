@@ -15,6 +15,8 @@
     const LEGACY_STORAGE_KEY="v141_abyss_state";
     const STATE_VERSION=2;
     const PRE_STAGE_COUNT=4;
+    const PRE_STAGE_REGULAR_COUNT=5;
+    const PRE_STAGE_ELITE_COUNT=3;
     const STAGES_PER_REGION=5;
     const REGION_COUNT=5;
     const HP_DURABILITY_MULTIPLIER=1.875;
@@ -359,11 +361,11 @@
         const roster=[];
         if(stage<PRE_STAGE_COUNT){
             const hpMultiplier=config.stageHpMultipliers[stage];
-            for(let index=0;index<5;index++){
+            for(let index=0;index<PRE_STAGE_REGULAR_COUNT;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"regular",hpMultiplier,false);
                 monster.v141FormationRow=0;monster.v141FormationPosition=index;roster.push(monster);
             }
-            for(let index=0;index<5;index++){
+            for(let index=0;index<PRE_STAGE_ELITE_COUNT;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"elite",hpMultiplier,false);
                 monster.v141FormationRow=1;monster.v141FormationPosition=index;roster.push(monster);
             }
@@ -517,7 +519,6 @@
         setTimeout(finish,Math.round(duration*1000)+30);
         return true;
     }
-
     function resolveBattleResult(result){
         const run=currentRun();if(!run){ return false; }
         clearTransientActions();
