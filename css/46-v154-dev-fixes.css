@@ -20,6 +20,27 @@ body.v162-element-box-settings-open > #autoBattleSettingsPanel{
     z-index:2147483645 !important;
 }
 
+/* A document-level V143 skill stage is allowed to cover combat cards, but never
+   the Element Box / auto-combat settings surface. Hide only the presentation
+   layer while that settings surface owns focus; the V143 lifecycle keeps
+   running and cleans itself up normally. */
+body.v162-element-box-settings-open > .v143-skill-stage,
+body.v162-element-box-settings-open > .skill-name-badge.v143-caster-skill-label{
+    visibility:hidden !important;
+    opacity:0 !important;
+}
+
+/* HP/SP information is HUD, not status artwork. Persistent status loops remain
+   on the card but must stay behind both ally and enemy resource bars. */
+#game-stage #battlePage .battle-player .hp-bar,
+#game-stage #battlePage .battle-player .sp-bar,
+#game-stage #battlePage .battle-monster .monster-hp,
+#game-stage #battlePage .battle-monster .monster-sp{
+    position:relative !important;
+    z-index:20 !important;
+    isolation:isolate;
+}
+
 /* Element Box owns its available viewport instead of extending into the fixed bottom navigation. */
 body.v162-element-box-settings-open #homeFeatureModal.dock-bottom .home-feature-modal-box{
     max-height:calc(100% - 88px) !important;
