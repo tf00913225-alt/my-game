@@ -105,9 +105,15 @@ function maximizeSynthesisPanel(){
     setImp(box,"overflow","hidden");
     setImp(body,"flex","1 1 auto");
     setImp(body,"min-height","0");
-    setImp(body,"overflow-x","hidden");
-    setImp(body,"overflow-y","auto");
+    setImp(body,"overflow","hidden");
     setImp(body,"touch-action","pan-y");
+    const synthesisBody=body&&body.querySelector(".v141-synthesis-body");
+    setImp(synthesisBody,"flex","1 1 auto");
+    setImp(synthesisBody,"min-height","0");
+    setImp(synthesisBody,"overflow-x","hidden");
+    setImp(synthesisBody,"overflow-y","auto");
+    setImp(synthesisBody,"overscroll-behavior-y","contain");
+    setImp(synthesisBody,"touch-action","pan-y");
 }
 function maximizeDungeonBackpack(){
     const app=document.getElementById("app");

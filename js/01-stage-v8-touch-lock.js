@@ -57,7 +57,7 @@
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
-            ".home-feature-modal-box, #homeFeatureModalBody, #trainingZoneModalBody, .auto-settings-expanded, " +
+            ".home-feature-modal-box, #homeFeatureModalBody, .v141-synthesis-body, #trainingZoneModalBody, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .inventory-character-detail-grid, .item-modal-box, #itemModalStats, #skillDetailStats, " +
             "#statusHelpModal .item-stat-list, .skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .v17342-abyss-battle-log, .v143-item-picker, .v17358-reforge-tiers, .v17363-game-select-menu, .v17351-compare-stats, " +
             "textarea, select, input";

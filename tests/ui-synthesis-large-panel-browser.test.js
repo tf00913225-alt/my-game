@@ -49,7 +49,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  const body=document.getElementById('body');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};
  const shots=[];
- const record=name=>{void box.offsetHeight;shots.push({name,box:rect(box),wallet:rect(wallet),tabs:rect(tabs),body:rect(body),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,scrollWidth:body.scrollWidth,clientWidth:body.clientWidth});};
+ const record=name=>{void box.offsetHeight;const style=getComputedStyle(body);shots.push({name,box:rect(box),wallet:rect(wallet),tabs:rect(tabs),body:rect(body),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,scrollWidth:body.scrollWidth,clientWidth:body.clientWidth,overflowY:style.overflowY,touchAction:style.touchAction});};
  body.innerHTML='<div class="v141-synthesis-card"><p>短內容</p></div>';record('reforge');
  body.innerHTML='<div class="v141-synthesis-card">'+Array.from({length:40},(_,i)=>'<p>符咒內容 '+i+'</p>').join('')+'</div>';record('talisman');
  body.innerHTML='<div class="v141-synthesis-card">'+Array.from({length:24},(_,i)=>'<p>碎片內容 '+i+'</p>').join('')+'</div>';record('fragment');
@@ -79,6 +79,8 @@ try{
         }
     }
     assert.ok(shots[1].scrollHeight>shots[1].clientHeight,"long synthesis content must scroll only inside the synthesis body");
+    assert.equal(shots[1].overflowY,"auto","synthesis body must expose native vertical overflow");
+    assert.match(shots[1].touchAction,/pan-y/,"synthesis body must allow native vertical touch panning");
     assert.ok(shots[0].scrollHeight<=shots[0].clientHeight+1,"short synthesis content must not shrink the outer frame");
     const controls=shots.find(shot=>shot.name==="controls");
     assert.ok(controls.pickerScrollWidth>controls.pickerClientWidth,"equipment picker must retain real horizontal overflow");
