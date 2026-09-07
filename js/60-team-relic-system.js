@@ -178,6 +178,13 @@
         {id:"relic_all_returning_array",name:"萬象歸元盤",category:"special",tags:["adaptive"],rarity:"four-symbol",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合開始依全隊平均HP決定回血或攻防增益。",triggerText:"每第4回合開始",limitText:"一次只發動回血或攻防其中一種。"}
     ];
 
+    RELIC_CATALOG_LIST.forEach(def=>{
+        def.upgradeCost={
+            items:[],
+            goldCost:{base:RELIC_BALANCE_CONFIG.upgradeGoldBase,perLevel:RELIC_BALANCE_CONFIG.upgradeGoldPerLevel},
+            formalMaterialSource:null
+        };
+    });
     const relicCatalog=Object.freeze(Object.fromEntries(RELIC_CATALOG_LIST.map(item=>[item.id,Object.freeze(item)])));
     let playerRelics={};
     let teamLoadout={relicId:null,subRelicId:null};
@@ -268,7 +275,7 @@
             relicId:id||null,battleToken:currentBattleToken(),round:currentRound(),enemyActionCount:0,allyHitCount:0,
             totalTriggers:0,triggerCounts:{},roundTriggerCounts:{},lastTriggerRound:{},onceUsed:{},
             lastHpDamageEvent:{},damageEventSerial:0,playerMods:{},monsterRestores:[],reflectReady:{},
-            currentEnemyIndex:null,lastEvent:null
+            currentEnemyIndex:null,lastEvent:null,boundaryEvents:{}
         };
     }
     function activeBattleRelic(){ return relicBattleState&&relicBattleState.relicId?relicCatalog[relicBattleState.relicId]:null; }
@@ -366,7 +373,9 @@
             if(event!=="ally_hp_below"||!payload||!Number.isInteger(payload.targetIndex)){ return false; }
             if(relicBattleState.lastHpDamageEvent[key]===payload.damageEventId){ return false; }
             const character=characterAt(payload.targetIndex),stats=statsAt(payload.targetIndex);
-            return !!(character&&stats&&numeric(character.hp)>0&&numeric(character.hp)/Math.max(1,numeric(stats.maxHP))<numeric(triggerDef.hpThreshold));
+            const threshold=numeric(triggerDef.hpThreshold);
+            if(payload.previousHpPercent!==undefined&&numeric(payload.previousHpPercent)<threshold){ return false; }
+            return !!(character&&stats&&numeric(character.hp)>0&&numeric(character.hp)/Math.max(1,numeric(stats.maxHP))<threshold);
         }
         if(triggerDef.type==="ally_debuffed"){ return event==="ally_debuffed"; }
         if(triggerDef.type==="enemy_defeated"){ return event==="enemy_defeated"&&payload&&payload.sourceType!==SOURCE_RELIC; }
@@ -501,6 +510,11 @@
         if(!relicBattleState||!relicBattleState.relicId){ return false; }
         if(payload&&payload.sourceType===SOURCE_RELIC){ return false; }
         const def=activeBattleRelic(); if(!def||!def.runtimeReady){ return false; }
+        if(event==="battle_start"||event==="round_start"||event==="round_end"){
+            const boundaryKey=event+":"+String(currentRound());
+            if(relicBattleState.boundaryEvents[boundaryKey]){ return false; }
+            relicBattleState.boundaryEvents[boundaryKey]=true;
+        }
         relicBattleState.lastEvent={event:event,round:currentRound()};
         let triggered=false;
         def.triggers.forEach((triggerDef,index)=>{
@@ -530,10 +544,13 @@
     if(typeof startTurn==="function"){
         const previous=startTurn;
         startTurn=function(){
-            const result=previous.apply(this,arguments);
             if(typeof battleActive!=="undefined"&&battleActive){
                 if(pendingBattleInit||!relicBattleState||relicBattleState.battleToken!==currentBattleToken()){ initializeBattleRelic(); }
-                resetRoundCounters(); cleanupPlayerMods(); dispatchRelicEvent("round_start",{sourceType:"system"});
+                cleanupPlayerMods();
+            }
+            const result=previous.apply(this,arguments);
+            if(typeof battleActive!=="undefined"&&battleActive&&relicBattleState){
+                resetRoundCounters(); dispatchRelicEvent("round_start",{sourceType:"system"});
             }
             return result;
         };
@@ -557,11 +574,24 @@
         processSingleMonsterAttack=function(monsterIndex){
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
             const hardControlled=!!(monster&&((typeof isMonsterFrozen==="function"&&isMonsterFrozen(monster))||(typeof isMonsterPetrified==="function"&&isMonsterPetrified(monster))));
-            const before=partyIndexes().map(index=>({index:index,hp:numeric(characterAt(index)&&characterAt(index).hp)}));
+            const before=partyIndexes().map(index=>{
+                const character=characterAt(index);
+                const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
+                    buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
+                );
+                return {index:index,hp:numeric(character&&character.hp),shield:numeric(shield&&shield.remaining)};
+            });
             if(relicBattleState){ relicBattleState.currentEnemyIndex=monsterIndex; }
             const result=withSource("enemy",()=>previous.apply(this,arguments));
             const hitTargets=[];
-            before.forEach(entry=>{ const character=characterAt(entry.index); if(character&&numeric(character.hp)<entry.hp){ hitTargets.push(entry.index); } });
+            before.forEach(entry=>{
+                const character=characterAt(entry.index);
+                const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
+                    buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
+                );
+                const shieldAfter=numeric(shield&&shield.remaining);
+                if(character&&(numeric(character.hp)<entry.hp||shieldAfter<entry.shield)){ hitTargets.push(entry.index); }
+            });
             if(relicBattleState){
                 relicBattleState.currentEnemyIndex=null;
                 if(!hardControlled){ relicBattleState.enemyActionCount++; dispatchRelicEvent("after_enemy_action",{sourceType:"enemy",monsterIndex:monsterIndex}); }
@@ -593,11 +623,13 @@
                     }
                     relicBattleState.damageEventSerial++;
                     const eventId=relicBattleState.damageEventSerial;
+                    const previousHp=Math.min(numeric(stats.maxHP),numeric(character.hp)+displayAmount);
+                    const previousHpPercent=previousHp/Math.max(1,numeric(stats.maxHP));
                     if(numeric(character.hp)<=0){
                         dispatchRelicEvent("before_lethal_damage",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId,damage:displayAmount});
                     }
                     if(numeric(character.hp)>0){
-                        dispatchRelicEvent("ally_hp_below",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId,damage:displayAmount});
+                        dispatchRelicEvent("ally_hp_below",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId,damage:displayAmount,previousHpPercent:previousHpPercent});
                     }else{
                         dispatchRelicEvent("ally_down",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId});
                     }
@@ -612,6 +644,24 @@
         tickStatusEffects=function(){ return withSource("status",()=>previous.apply(this,arguments)); };
     }
 
+    function wrapAllyDebuffApplication(name){
+        const previous=window[name];
+        if(typeof previous!=="function"){ return; }
+        window[name]=function(entity){
+            const targetIndex=partyIndexes().find(index=>characterAt(index)===entity);
+            const before=targetIndex===undefined?0:(Array.isArray(entity&&entity.statusEffects)?entity.statusEffects.length:0);
+            const result=previous.apply(this,arguments);
+            if(targetIndex!==undefined&&relicBattleState&&(!sourceContext||sourceContext.sourceType!==SOURCE_RELIC)){
+                const after=Array.isArray(entity&&entity.statusEffects)?entity.statusEffects.length:0;
+                if(result!==false&&after>before){
+                    dispatchRelicEvent("ally_debuffed",{sourceType:sourceContext&&sourceContext.sourceType||"enemy",targetIndex:targetIndex});
+                }
+            }
+            return result;
+        };
+    }
+    ["applyBurnEffect","applyFreezeEffect","applyMonsterDebuff","applyPetrifyEffect","applyStunEffect"].forEach(wrapAllyDebuffApplication);
+
     if(typeof killMonster==="function"){
         const previous=killMonster;
         killMonster=function(index){
@@ -624,10 +674,14 @@
         };
     }
 
-    [["winBattle","victory"],["loseBattle","defeat"]].forEach(([name])=>{
-        const previous=window[name]; if(typeof previous!=="function"){ return; }
-        window[name]=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; return result; };
-    });
+    if(typeof winBattle==="function"){
+        const previous=winBattle;
+        winBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; return result; };
+    }
+    if(typeof loseBattle==="function"){
+        const previous=loseBattle;
+        loseBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; return result; };
+    }
 
     function rarityClass(def){ return "rarity-"+(def&&def.rarity||"white"); }
     function statusOf(id){ return playerRelics[id]||{unlocked:false,level:1,exp:0,seen:false}; }
@@ -665,7 +719,8 @@
     function unequipRelic(){ if(!equipmentAllowed()){ return false; } teamLoadout.relicId=null; saveRelics(); syncHomeRelicUi(); renderRelicPage(); return true; }
     function upgradeRelic(id){
         const def=relicCatalog[id],owned=statusOf(id); if(!def||!def.runtimeReady||!owned.unlocked||owned.level>=MAX_LEVEL){ return false; }
-        const next=owned.level+1,cost=RELIC_BALANCE_CONFIG.upgradeGoldBase+RELIC_BALANCE_CONFIG.upgradeGoldPerLevel*(next-1);
+        const next=owned.level+1,pricing=def.upgradeCost&&def.upgradeCost.goldCost||{};
+        const cost=numeric(pricing.base||RELIC_BALANCE_CONFIG.upgradeGoldBase)+numeric(pricing.perLevel||RELIC_BALANCE_CONFIG.upgradeGoldPerLevel)*(next-1);
         if(typeof gold==="undefined"||numeric(gold)<cost){ return false; }
         gold-=cost; owned.level=next; saveRelics(); if(typeof updateGoldDisplay==="function"){updateGoldDisplay();} syncHomeRelicUi(); renderRelicPage(id); return true;
     }
