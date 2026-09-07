@@ -151,10 +151,10 @@ const vfxNeedle=`    assert.equal(lv40.final.eliteCount,9);
 const vfxReplacement=`    assert.equal(lv40.final.eliteCount,9);
 
     const vfxLaunch=await client.eval(\`(()=>{
-        if(typeof window.__abyssQaOriginalLauncher!=='function'){return {started:false,reason:'missing-original-launcher'};}
+        if(typeof window.v132LaunchDungeonBattle!=='function'){return {started:false,reason:'missing-shared-launcher'};}
         if(typeof battleActive!=='undefined'&&battleActive){return {started:false,reason:'battle-already-active'};}
         const roster=v174AbyssBuildRoster(20,0,0);
-        const started=window.__abyssQaOriginalLauncher(roster,()=>{});
+        const started=window.v132LaunchDungeonBattle(roster,()=>{});
         return {started:!!started};
     })()\`);
     assert.equal(vfxLaunch.started,true,\`Real Abyss battle could not start for VFX QA: \${vfxLaunch.reason||'unknown'}\`);
