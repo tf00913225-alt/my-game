@@ -121,6 +121,20 @@ h1,h2,h3,
     z-index:0;
 }
 
+/*
+   全遊戲圖片／視覺媒體禁止瀏覽器原生長按、拖曳與選取。
+   不使用 pointer-events:none，避免破壞既有按鈕／圖片點擊行為。
+*/
+#game-stage img,
+#game-stage picture,
+#game-stage svg,
+#game-stage canvas{
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    -webkit-touch-callout:none;
+}
+
 #game-stage > #app{
     /*
        舊版遊戲 UI 目前以約 420px 寬的窄版版型設計。

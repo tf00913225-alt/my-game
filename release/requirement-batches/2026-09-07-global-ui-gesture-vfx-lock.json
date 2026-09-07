@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-global-ui-gesture-vfx-lock",
+  "baseBranch": "dev",
+  "baseCommit": "91eafa0b2efe9ac50f88787fa8d8dd60c7e9d61c",
+  "officialVersion": "173.62",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "GLOBAL-UI-01",
+      "status": "VERIFIED",
+      "requirement": "所有正式遊戲 UI 禁止瀏覽器 pinch zoom；單指合法捲動仍正常",
+      "evidence": [
+        "js/01-stage-v8-touch-lock.js",
+        "index.html",
+        "tests/ui-global-browser-interaction-lock.test.js",
+        "2026-09-07 使用者 DEV 手機實機確認正常"
+      ]
+    },
+    {
+      "id": "GLOBAL-UI-02",
+      "status": "VERIFIED",
+      "requirement": "所有正式遊戲圖片／視覺素材長按不出現另存、開新分頁、搜尋、分享等原生反應，且不得原生拖曳／選取",
+      "evidence": [
+        "js/01-stage-v8-touch-lock.js",
+        "css/00-main.css",
+        "UI_GUIDELINES.md",
+        "tests/ui-global-browser-interaction-lock.test.js",
+        "2026-09-07 使用者 DEV 手機實機確認正常"
+      ]
+    },
+    {
+      "id": "GLOBAL-UI-03",
+      "status": "VERIFIED",
+      "requirement": "技能 VFX 必須由正式技能 action 穩定觸發；不得因管理 QA visibility、部分初始化 sentinel 或後載入 badge wrapper 順序而失效，且終結一擊仍由 V142/V143 完整掌控演出",
+      "evidence": [
+        "js/00-main.js",
+        "js/37-v142-skill-animation.js",
+        "js/39-v143-skill-animation.js",
+        "js/54-v173.51-battle-qa.js",
+        "css/53-v173.51-qa.css",
+        "tests/v173.6-p0-runtime-recovery.test.js",
+        "tests/v173.62-direct-skill-animation-trigger.test.js",
+        "tests/v142-skill-animation.test.js",
+        "tests/v173.51-qa.test.js",
+        "2026-09-07 使用者 DEV 手機實機確認技能動畫正常"
+      ]
+    }
+  ],
+  "automatedVerification": "DEV_CI_DEPLOY_AND_TARGETED_ANIMATION_TESTS_PASSED",
+  "targetedVerificationRun": 34076893388,
+  "fullRegressionRun": 34077137049,
+  "verifiedDevCommit": "55d998751026996e045b076ac4002877c9c86f04",
+  "automatedVerificationNotes": "GLOBAL-UI-01、GLOBAL-UI-02 與 GLOBAL-UI-03 均已由使用者在 DEV 手機實機確認正常。技能動畫已恢復 direct badge action trigger 與 V142 partial-sentinel recovery 架構；P0 runtime recovery、V142、火／水／風 Sprite VFX targeted suites、全部 Node suites、release coherence gate、Cloudflare exact-SHA deploy 與部署後 Commit SHA / Game Version / Cache Version read-back 均通過。",
+  "visualVerification": "ALL_REQUIREMENTS_VERIFIED_BY_USER_ON_DEV_2026-09-07"
+}

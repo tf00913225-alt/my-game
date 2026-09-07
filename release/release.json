@@ -13,6 +13,7 @@
     "css/19-stage-v54-main-city-moderate-native-scale.css",
     "js/16-stage-v54-main-city-runtime.js",
     "js/19-stage-v78-character-inventory-runtime.js",
-    "js/20-anonymous-20.js"
+    "js/20-anonymous-20.js",
+    "js/01-stage-v8-touch-lock.js"
   ]
 }

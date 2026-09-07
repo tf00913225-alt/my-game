@@ -172,12 +172,12 @@ function createContext(options={}){
         assert.match(index,/js\/20-anonymous-20\.js\?v=173\.62/);
     });
 
-    await test("player and monster skill badges actually start animation gates",()=>{
+    await test("player and monster direct badge triggers actually start animation gates",()=>{
         const {context}=createContext();
-        context.showSkillNameBadge("火焰斬","fire",0);
+        context.v142PlaySkillAnimationFromBadge("player","火焰斬","fire",0);
         assert.equal(context.v142SkillAnimationDirector.getLatest().config.name,"火焰斬");
         assert.equal(context.v142GetAnimationDiagnostics().last.side,"player");
-        context.showMonsterSkillNameBadge("火焰斬","fire",0);
+        context.v142PlaySkillAnimationFromBadge("monster","火焰斬","fire",0);
         assert.equal(context.v142SkillAnimationDirector.getLatest().config.name,"火焰斬");
         assert.equal(context.v142GetAnimationDiagnostics().last.side,"monster");
     });
@@ -373,9 +373,9 @@ function createContext(options={}){
         assert.equal(completions,1);
     });
 
-    await test("player and monster badge hooks share one director and cleanup path",()=>{
-        assert.match(source,/showSkillNameBadge=function/);
-        assert.match(source,/showMonsterSkillNameBadge=function/);
+    await test("direct badge action trigger shares one director and cleanup path",()=>{
+        assert.match(source,/window\.v142PlaySkillAnimationFromBadge=function/);
+        assert.doesNotMatch(source,/const previous=showSkillNameBadge/);
         assert.match(source,/animationend/);
         assert.match(source,/cancelAnimationFrame/);
         assert.match(source,/removeEventListener\("visibilitychange"/);

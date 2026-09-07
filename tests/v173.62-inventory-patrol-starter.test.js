@@ -30,7 +30,8 @@ assert.doesNotMatch(main,/id:"leatherArmor"[\s\S]{0,240}defense:10/);
 assert.match(equipment,/const STARTER_WHITE_STATS=\{[\s\S]*?ironSword:\{attack:3\}[\s\S]*?woodStaff:\{intelligence:3\}[\s\S]*?leatherArmor:\{vitality:2\}/);
 assert.match(equipment,/Object\.values\(characterEquipment\)[\s\S]*?repairStarterWhiteStats\(item\)/);
 
-assert.match(battle,/const open=!inBattle\(\)&&!!\(tab&&visible\(tab\)&&\(!shell\|\|visible\(shell\)\)\);/);
+assert.doesNotMatch(battle,/stage\.style\.visibility/);
+assert.doesNotMatch(battle,/v17351-management-open.*toggle/);
 assert.match(animation,/stage\.className="v143-skill-stage";[\s\S]*?stage\.style\.visibility="visible";/);
 
 assert.ok(loader.includes('const V_ASSET_VERSION="173.62";'));

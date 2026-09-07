@@ -404,3 +404,12 @@ UI 與遊戲邏輯盡量分離。UI 任務若發現邏輯問題，應記錄並�
 - 需要單選／切換時，必須使用《四象江湖傳》既有黑金、古銅、階級色語言製作自訂按鈕、listbox／menu、頁籤或橫向選擇列，並具備清楚的 selected / pressed / disabled 狀態。
 - 舊系統若保留 native select 作為相容或語意 bridge，必須對玩家隱藏且不可成為正常可見操作面；一旦碰觸該功能進行 UI 維護，優先遷移到遊戲風格控制元件。
 - 新增自訂捲動選單或橫向選擇列時，必須同步確認 `js/01-stage-v8-touch-lock.js` 的 scroll whitelist，手機實機手勢不可只靠桌面滑鼠測試。
+
+## 瀏覽器原生手勢與圖片長按保護（永久規則）
+
+- 《四象江湖傳》正式遊戲區 `#game-stage` **禁止瀏覽器層級的 pinch zoom／雙指縮放**。`index.html` 的 viewport 鎖定只是第一層；`js/01-stage-v8-touch-lock.js` 必須在可捲動容器內也優先攔截兩指以上手勢，不能因 scroll whitelist 而放行瀏覽器縮放。
+- 單指垂直／水平捲動仍依既有 scroll whitelist 正常運作；禁止用全域 `touch-action:none` 粗暴鎖死，避免破壞背包、角色、合成、商店、任務與其他正式捲動區。
+- `#game-stage` 內的圖片、SVG、Canvas 與其他視覺素材不得出現瀏覽器原生「另存圖片／在新分頁開啟／搜尋圖片／分享圖片」長按選單，也不得被原生拖曳或選取。全域事件 owner 固定為 `js/01-stage-v8-touch-lock.js`；CSS 基礎保護固定由 `css/00-main.css` 提供。
+- 禁止為單一頁面新增第二套 contextmenu／pinch-zoom workaround。新增任何角色、背包、裝備、技能、商店、副本、地圖、彈窗或未來 UI，都必須自動繼承上述全域規則。
+- 文字輸入欄位（`input`／`textarea`／明確 `contenteditable=true`）可保留必要的文字編輯行為；不得為了禁止圖片長按而破壞創角輸入或其他正式文字輸入。
+- 手機 UI QA 必須實測：單指捲動仍可用、雙指不能縮放、長按圖片沒有任何瀏覽器原生反應、正常點擊／拖曳遊戲控制仍可用。
