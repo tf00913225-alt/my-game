@@ -108,6 +108,7 @@ try{
         characterSkillLoadouts.water={name:player.id,skillLevels:{healSpell:1},equippedSkills:[]};
         characterSkillLoadouts.player2={name:player2.id,skillLevels:{healSpell:1},equippedSkills:[]};
         currentSkillCharacter='water';
+        if(typeof showPage==='function'){showPage('home');}
         if(typeof openHomeFeature==='function'){openHomeFeature('character');}
         if(typeof switchCharacterTab==='function'){switchCharacterTab('skill');}
         renderSkillLoadout();return true;
