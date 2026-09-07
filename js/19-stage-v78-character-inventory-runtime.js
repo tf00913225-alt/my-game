@@ -1,4 +1,3 @@
-
 (function(){
 "use strict";
 
@@ -281,8 +280,43 @@ function schedule(){
         );
 }
 
+function loadAbyssTwoTierStyle(){
+    if(document.getElementById("v174-abyss-two-tier-style")){
+        return;
+    }
+
+    const link=document.createElement("link");
+    link.id="v174-abyss-two-tier-style";
+    link.rel="stylesheet";
+    link.href="css/54-v174-abyss-two-tier.css?v=173.64-abyss2";
+    document.head.appendChild(link);
+}
+
+function loadAbyssTwoTierRuntime(){
+    loadAbyssTwoTierStyle();
+    if(document.getElementById("v174-abyss-two-tier-runtime")){
+        return;
+    }
+
+    const script=document.createElement("script");
+    script.id="v174-abyss-two-tier-runtime";
+    script.src="js/59-abyss-two-tier-runtime.js?v=173.64-abyss2";
+    script.async=false;
+    script.onerror=function(){
+        console.warn("Two-tier Abyss runtime failed to load");
+    };
+    document.body.appendChild(script);
+}
+
 function loadV17363FunctionalFixes(){
-    if(document.getElementById("v17363-functional-fixes-runtime")){
+    const existing=document.getElementById("v17363-functional-fixes-runtime");
+    if(existing){
+        if(existing.dataset.loaded==="1"){
+            loadAbyssTwoTierRuntime();
+        }else{
+            existing.addEventListener("load",loadAbyssTwoTierRuntime,{once:true});
+            existing.addEventListener("error",loadAbyssTwoTierRuntime,{once:true});
+        }
         return;
     }
 
@@ -290,8 +324,13 @@ function loadV17363FunctionalFixes(){
     script.id="v17363-functional-fixes-runtime";
     script.src="js/58-v173.63-functional-fixes.js?v=173.63";
     script.async=false;
+    script.onload=function(){
+        script.dataset.loaded="1";
+        loadAbyssTwoTierRuntime();
+    };
     script.onerror=function(){
         console.warn("V173.63 functional fixes failed to load");
+        loadAbyssTwoTierRuntime();
     };
     document.body.appendChild(script);
 }
@@ -302,8 +341,10 @@ function armV17363FunctionalFixes(){
        equipment-progression. Loading it at DOMContentLoaded is too early and
        leaves those wrappers detached. Wait for the shared runtime-ready event
        so V173.63 always attaches after the actual feature owners exist.
+       The two-tier Abyss successor is chained after that late layer so the
+       legacy V144/V155 five-emperor roster wrappers cannot retake ownership.
     */
-    if(document.documentElement.dataset.runtimeReady==="173.62"){
+    if(document.documentElement.dataset.runtimeReady){
         loadV17363FunctionalFixes();
         return;
     }

@@ -69,10 +69,10 @@ test("floors one through four require their chest reward before portal travel",(
     assert.match(css,/portal\.png/);
 });
 
-test("supplied chest and portal art stays inside the previous compact footprint",()=>{
+test("supplied chest and ordinary portal art stays inside the previous compact footprint",()=>{
     assert.match(css,/\.v141-abyss-portal,\s*#game-stage[^\n]*\.v141-abyss-chest\{[^}]*width:94px !important;[^}]*height:62px !important;/);
     assert.match(css,/\.v141-abyss-portal i,\s*#game-stage[^\n]*\.v141-abyss-chest i\{[^}]*height:44px !important;/);
-    assert.doesNotMatch(css,/width:(?:106|112)px !important|height:(?:76|92)px !important/);
+    assert.match(css,/\.v174-abyss-portal\.boss-gate/);
 });
 
 test("guardian dialogue opens directly and remains a local boss-anchored bubble",()=>{
