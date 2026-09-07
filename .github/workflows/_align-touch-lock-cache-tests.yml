@@ -59,6 +59,14 @@ jobs:
           for p in sorted(Path('tests').glob('*.js')):
               if old in p.read_text(encoding='utf-8'):
                   raise SystemExit('stale assertion remains: '+str(p))
+
+          stall=Path('tests/v173.53-startup-stall-regression.test.js')
+          text=stall.read_text(encoding='utf-8')
+          old_vfx=r'assert.match(battle,/stage\.style\.visibility!==nextVisibility/);'
+          new_vfx=r'assert.doesNotMatch(battle,/stage\.style\.visibility/);'
+          if text.count(old_vfx)!=1:
+              raise SystemExit(f'expected one obsolete V173.53 VFX ownership assertion, found {text.count(old_vfx)}')
+          stall.write_text(text.replace(old_vfx,new_vfx,1),encoding='utf-8')
           PY
       - name: Check touch owner syntax
         run: node --check js/01-stage-v8-touch-lock.js
@@ -77,5 +85,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --check
-          git commit -m "fix: consolidate touchmove owner and align cache tests"
+          git commit -m "fix: consolidate touchmove owner and align VFX tests"
           git push origin HEAD:bugfix/global-ui-gesture-vfx-lock
