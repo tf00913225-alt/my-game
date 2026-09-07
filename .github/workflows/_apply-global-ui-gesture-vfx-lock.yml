@@ -1,0 +1,61 @@
+name: Apply global UI gesture and VFX owner fix
+
+on:
+  push:
+    branches:
+      - bugfix/global-ui-gesture-vfx-lock
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Apply owner-level fixes
+        run: python .github/scripts/_apply-global-ui-gesture-vfx-lock.py
+
+      - name: Check modified JavaScript syntax
+        run: |
+          node --check js/01-stage-v8-touch-lock.js
+          node --check js/54-v173.51-battle-qa.js
+          node --check js/39-v143-skill-animation.js
+
+      - name: Run targeted interaction and VFX regressions
+        run: |
+          node tests/ui-global-browser-interaction-lock.test.js
+          node tests/v173.51-qa.test.js
+          node tests/v153-fire-vfx.test.js
+          node tests/v165-fire-vfx-fixes.test.js
+          node tests/v166-water-vfx.test.js
+          node tests/v173.23-wind-vfx.test.js
+          node tests/v173.62-inventory-patrol-starter.test.js
+
+      - name: Run release coherence gate
+        env:
+          CI_BASE_SHA: 91eafa0b2efe9ac50f88787fa8d8dd60c7e9d61c
+        run: node .github/scripts/release-gate.mjs ci
+
+      - name: Check whitespace and conflict markers
+        run: git diff --check
+
+      - name: Commit verified fix and remove one-time migration
+        run: |
+          rm .github/workflows/_apply-global-ui-gesture-vfx-lock.yml
+          rm .github/scripts/_apply-global-ui-gesture-vfx-lock.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: lock browser gestures and restore skill VFX"
+          git push origin HEAD:bugfix/global-ui-gesture-vfx-lock
