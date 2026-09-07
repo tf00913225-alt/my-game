@@ -292,9 +292,41 @@ function loadAbyssTwoTierStyle(){
     document.head.appendChild(link);
 }
 
+function loadTeamRelicStyle(){
+    if(document.getElementById("team-relic-system-style")){
+        return;
+    }
+    const link=document.createElement("link");
+    link.id="team-relic-system-style";
+    link.rel="stylesheet";
+    link.href="css/55-team-relic-system.css?v=173.63-relic1";
+    document.head.appendChild(link);
+}
+
+function loadTeamRelicRuntime(){
+    loadTeamRelicStyle();
+    const existing=document.getElementById("team-relic-system-runtime");
+    if(existing){ return; }
+    const script=document.createElement("script");
+    script.id="team-relic-system-runtime";
+    script.src="js/60-team-relic-system.js?v=173.63-relic1";
+    script.async=false;
+    script.onerror=function(){
+        console.warn("Team Relic runtime failed to load");
+    };
+    document.body.appendChild(script);
+}
+
 function loadAbyssTwoTierRuntime(){
     loadAbyssTwoTierStyle();
-    if(document.getElementById("v174-abyss-two-tier-runtime")){
+    const existing=document.getElementById("v174-abyss-two-tier-runtime");
+    if(existing){
+        if(existing.dataset.loaded==="1"){
+            loadTeamRelicRuntime();
+        }else{
+            existing.addEventListener("load",loadTeamRelicRuntime,{once:true});
+            existing.addEventListener("error",loadTeamRelicRuntime,{once:true});
+        }
         return;
     }
 
@@ -302,8 +334,13 @@ function loadAbyssTwoTierRuntime(){
     script.id="v174-abyss-two-tier-runtime";
     script.src="js/59-abyss-two-tier-runtime.js?v=173.64-abyss2";
     script.async=false;
+    script.onload=function(){
+        script.dataset.loaded="1";
+        loadTeamRelicRuntime();
+    };
     script.onerror=function(){
         console.warn("Two-tier Abyss runtime failed to load");
+        loadTeamRelicRuntime();
     };
     document.body.appendChild(script);
 }
@@ -343,6 +380,8 @@ function armV17363FunctionalFixes(){
        so V173.63 always attaches after the actual feature owners exist.
        The two-tier Abyss successor is chained after that late layer so the
        legacy V144/V155 five-emperor roster wrappers cannot retake ownership.
+       Team Relic is chained last so its trigger hooks attach to the actual
+       final battle / save / home owners instead of stale historical wrappers.
     */
     if(document.documentElement.dataset.runtimeReady){
         loadV17363FunctionalFixes();
