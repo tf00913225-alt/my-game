@@ -3,8 +3,8 @@
   "batchId": "2026-09-07-global-ui-gesture-vfx-lock",
   "baseBranch": "dev",
   "baseCommit": "91eafa0b2efe9ac50f88787fa8d8dd60c7e9d61c",
-  "officialVersion": "173.62",
-  "officialVersionBumpAllowed": false,
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": true,
   "overallStatus": "VERIFIED",
   "requirements": [
     {
@@ -53,5 +53,7 @@
   "fullRegressionRun": 34077137049,
   "verifiedDevCommit": "55d998751026996e045b076ac4002877c9c86f04",
   "automatedVerificationNotes": "GLOBAL-UI-01、GLOBAL-UI-02 與 GLOBAL-UI-03 均已由使用者在 DEV 手機實機確認正常。技能動畫已恢復 direct badge action trigger 與 V142 partial-sentinel recovery 架構；P0 runtime recovery、V142、火／水／風 Sprite VFX targeted suites、全部 Node suites、release coherence gate、Cloudflare exact-SHA deploy 與部署後 Commit SHA / Game Version / Cache Version read-back 均通過。",
-  "visualVerification": "ALL_REQUIREMENTS_VERIFIED_BY_USER_ON_DEV_2026-09-07"
+  "visualVerification": "ALL_REQUIREMENTS_VERIFIED_BY_USER_ON_DEV_2026-09-07",
+  "verifiedOnDevVersion": "173.62",
+  "releasedAs": "V173.63"
 }

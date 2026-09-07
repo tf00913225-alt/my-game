@@ -30,6 +30,6 @@ assert.doesNotMatch(equipment,/item\.reforgeUsed=Math\.min/);
 assert.match(css,/V173\.58 — FREE-MATERIAL REFORGE UI/);
 assert.match(css,/\.v17358-reforge-tiers/);
 assert.match(css,/\.v17358-affix-lock\.locked/);
-assert.match(loader,/const V_ASSET_VERSION="173\.62"/);
-assert.match(index,/<title>四象江湖傳 V173\.62<\/title>/);
+assert.match(loader,/const V_ASSET_VERSION="173\.63"/);
+assert.match(index,/<title>四象江湖傳 V173\.63<\/title>/);
 console.log("✓ V173.62 unlimited free-material reforge redesign");

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "batchId": "2026-09-07-synthesis-vertical-scroll",
   "baseBranch": "dev",
-  "officialVersion": "173.62",
+  "officialVersion": "173.63",
   "officialVersionBumpAllowed": true,
   "overallStatus": "VERIFIED",
   "requirements": [
@@ -31,5 +31,7 @@
   "verificationRun": 34069316752,
   "finalDevVerificationRun": 34070123412,
   "visualVerification": "USER_CONFIRMED_DEV_2026-09-07",
-  "promotionApproval": "USER_APPROVED_MAIN_2026-09-07"
+  "promotionApproval": "USER_APPROVED_MAIN_2026-09-07",
+  "verifiedOnDevVersion": "173.62",
+  "releasedAs": "V173.63"
 }

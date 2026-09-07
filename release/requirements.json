@@ -1,16 +1,151 @@
 {
   "schemaVersion": 1,
-  "releaseVersion": "173.62",
+  "releaseVersion": "173.63",
   "requirements": [
-    {"id":"REQ-01","title":"永久完成定義與多項需求逐項驗證規則","status":"IMPLEMENTED","evidence":{"files":["AGENTS.md","CLAUDE.md"],"verification":"文件內容與 release gate 規則交叉檢查","result":"待 Repository checks 驗證"}},
-    {"id":"REQ-02","title":"Requirement Checklist 與 Release Manifest 機制","status":"IMPLEMENTED","evidence":{"files":["release/requirements.json","release/release.json",".github/scripts/release-gate.mjs"],"verification":"CI schema/assertion","result":"待 Repository checks 驗證"}},
-    {"id":"REQ-03","title":"Game Version 與 Cache Version 一致性檢查","status":"IMPLEMENTED","evidence":{"files":["release/release.json",".github/scripts/release-gate.mjs",".github/workflows/ci.yml"],"verification":"release-gate ci","result":"待 Repository checks 驗證"}},
-    {"id":"REQ-04","title":"部署前舊版本殘留與部署產物版本檢查","status":"IMPLEMENTED","evidence":{"files":[".github/scripts/release-gate.mjs",".github/workflows/deploy-dev-cloudflare.yml"],"verification":"release-gate prepare-artifact","result":"待部署 gate 驗證"}},
-    {"id":"REQ-05","title":"dev branch HEAD、部署 Commit SHA 與 Cloudflare 實際內容核對","status":"IMPLEMENTED","evidence":{"files":[".github/scripts/release-gate.mjs",".github/workflows/deploy-dev-cloudflare.yml"],"verification":"branch HEAD preflight + deployed release-manifest fetch","result":"待下一次合法 dev deployment 驗證"}},
-    {"id":"REQ-06","title":"正式移除功能 deprecated-code assertion","status":"BLOCKED","evidence":{"files":["release/deprecated-code.json","index.html","js/34-v141-core-systems.js","css/00-main.css","css/43-v148-combat-dungeon-fixes.css"],"verification":"release-gate ci 搜尋正式 HTML/JS/CSS","result":"目前仍偵測到巡怪省電模式殘留；必須先真正移除，禁止部署"}},
-    {"id":"REQ-07","title":"CI SUCCESS / Deploy SUCCESS 不得等同需求完成","status":"IMPLEMENTED","evidence":{"files":["AGENTS.md","CLAUDE.md","release/requirements.json",".github/scripts/release-gate.mjs"],"verification":"release status + 100% VERIFIED gate","result":"待 Repository checks 驗證"}},
-    {"id":"REQ-08","title":"版本更新前 Requirement Checklist 必須 100% VERIFIED","status":"IMPLEMENTED","evidence":{"files":["AGENTS.md","CLAUDE.md",".github/scripts/release-gate.mjs"],"verification":"CI_BASE_SHA 比對 release/release.json 版本變更","result":"待 Repository checks 驗證"}},
-    {"id":"REQ-09","title":"Cache invalidation 與玩家 Save Data 完全分離規則","status":"IMPLEMENTED","evidence":{"files":["AGENTS.md","CLAUDE.md"],"verification":"文件規範檢查","result":"此項屬架構規範，需人工 code review 持續驗收"}},
-    {"id":"REQ-10","title":"main production 實際部署 SHA 自動核對","status":"BLOCKED","evidence":{"files":[".github/workflows/ci.yml"],"verification":"檢查 .github/workflows","result":"目前 repository 沒有 main production deployment workflow；不得假稱已自動化"}}
+    {
+      "id": "REQ-01",
+      "title": "永久完成定義與多項需求逐項驗證規則",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "docs/RELEASE_VERIFICATION_RULES.md",
+          ".github/scripts/release-gate.mjs"
+        ],
+        "verification": "規範文件與 Release Gate 交叉檢查，且多批 Requirement Batch 實際依 IMPLEMENTED→VERIFIED 流程收尾",
+        "result": "PR #74/#78/#79/#82/#83/#84 均依逐項驗證流程執行；未以 commit/CI/deploy 單獨宣稱完成"
+      }
+    },
+    {
+      "id": "REQ-02",
+      "title": "Requirement Checklist 與 Release Manifest 機制",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "release/requirements.json",
+          "release/release.json",
+          ".github/scripts/release-gate.mjs",
+          ".github/workflows/deploy-dev-cloudflare.yml"
+        ],
+        "verification": "CI schema/assertion + dev artifact manifest + deployed manifest read-back",
+        "result": "DEV Run #768 成功產生 manifest、部署並讀回 Commit SHA / Game Version / Cache Version"
+      }
+    },
+    {
+      "id": "REQ-03",
+      "title": "Game Version 與 Cache Version 一致性檢查",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "release/release.json",
+          ".github/scripts/release-gate.mjs",
+          ".github/workflows/ci.yml"
+        ],
+        "verification": "release-gate ci + loader coherence",
+        "result": "DEV/main 多輪 Repository checks 均成功驗證 Game/Cache/loader/HUD 一致"
+      }
+    },
+    {
+      "id": "REQ-04",
+      "title": "部署前舊版本殘留與部署產物版本檢查",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          ".github/scripts/release-gate.mjs",
+          ".github/workflows/deploy-dev-cloudflare.yml"
+        ],
+        "verification": "release-gate prepare-artifact + immutable deploy package validation",
+        "result": "DEV Run #768 predeploy gate 與 artifact version validation 成功"
+      }
+    },
+    {
+      "id": "REQ-05",
+      "title": "dev branch HEAD、部署 Commit SHA 與 Cloudflare 實際內容核對",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          ".github/scripts/release-gate.mjs",
+          ".github/workflows/deploy-dev-cloudflare.yml"
+        ],
+        "verification": "remote dev HEAD preflight + deployed release-manifest fetch",
+        "result": "DEV Run #768 exact-SHA deploy 與 deployed SHA/version/cache read-back 全部 SUCCESS"
+      }
+    },
+    {
+      "id": "REQ-06",
+      "title": "正式移除功能 deprecated-code assertion",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "release/deprecated-code.json",
+          ".github/scripts/release-gate.mjs",
+          "index.html",
+          "js/34-v141-core-systems.js"
+        ],
+        "verification": "release-gate ci 掃描正式 HTML/JS/CSS",
+        "result": "巡怪省電模式舊 DOM/handler/key/WakeLock owner 已移除；deprecated-code gate 在 DEV/main CI 持續通過"
+      }
+    },
+    {
+      "id": "REQ-07",
+      "title": "CI SUCCESS / Deploy SUCCESS 不得等同需求完成",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "release/requirements.json",
+          ".github/scripts/release-gate.mjs",
+          "release/requirement-batches/2026-09-07-global-ui-gesture-vfx-lock.json"
+        ],
+        "verification": "Release status + Requirement Batch 實機驗證流程",
+        "result": "技能 VFX 在 CI/deploy 先成功但手機仍失敗時維持未 VERIFIED，直到使用者實機確認正常才收尾"
+      }
+    },
+    {
+      "id": "REQ-08",
+      "title": "版本更新前 Requirement Checklist 必須 100% VERIFIED",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          ".github/scripts/release-gate.mjs",
+          "release/requirements.json"
+        ],
+        "verification": "CI_BASE_SHA 版本變更 guard + 100% VERIFIED check",
+        "result": "V173.63 僅在四個 Requirement Batch 全數 VERIFIED 且本全域 checklist 10/10 VERIFIED 後進行"
+      }
+    },
+    {
+      "id": "REQ-09",
+      "title": "Cache invalidation 與玩家 Save Data 完全分離規則",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "docs/RELEASE_VERIFICATION_RULES.md",
+          "release/release.json"
+        ],
+        "verification": "release diff 與永久規範檢查",
+        "result": "V173.63 僅更新版本/cache key/release metadata；未修改玩家存檔 schema、key 或進度資料"
+      }
+    },
+    {
+      "id": "REQ-10",
+      "title": "main production 實際部署 SHA 自動核對",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          ".github/workflows/ci.yml",
+          "docs/RELEASE_VERIFICATION_RULES.md",
+          "release/requirements.json"
+        ],
+        "verification": "GitHub Pages platform-managed build/deploy head_sha 與 protected main HEAD 核對",
+        "result": "Production Pages Run #100 build/deploy 與 main CI Run #770 均綁定 main SHA ac735f17b5e9ed3526b689bffbf68a2a2c94860c"
+      }
+    }
   ]
 }
