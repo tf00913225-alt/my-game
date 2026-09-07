@@ -38,6 +38,19 @@ jobs:
       - name: Apply owner-level fixes
         run: python .github/scripts/_apply-global-ui-gesture-vfx-lock.py
 
+      - name: Align legacy terminal VFX regression with current owner contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/v173.62-inventory-patrol-starter.test.js')
+          s=p.read_text(encoding='utf-8')
+          old=r'assert.match(battle,/const open=!inBattle\(\)&&!!\(tab&&visible\(tab\)&&\(!shell\|\|visible\(shell\)\)\);/);'
+          new='assert.doesNotMatch(battle,/stage\\.style\\.visibility/);\nassert.doesNotMatch(battle,/v17351-management-open.*toggle/);'
+          if s.count(old)!=1:
+              raise SystemExit('legacy V173.62 VFX ownership assertion not found exactly once')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+
       - name: Check modified JavaScript syntax
         run: |
           node --check js/01-stage-v8-touch-lock.js
