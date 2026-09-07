@@ -5,7 +5,7 @@
   "baseCommit": "f94a00dacd82a55b576e76cb3197f728cc5c150d",
   "officialVersion": "173.63",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "ABYSS-01",
@@ -51,21 +51,22 @@
     },
     {
       "id": "ABYSS-08",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "dev 部署後以手機尺寸 Chrome 實際驗證封面、進度、前置勝利→寶箱→傳送點、BOSS→帝王寶箱→下一區、reload 恢復、Lv40 數值與圖片載入",
-      "evidence": [".github/scripts/abyss-live-browser-qa.mjs",".github/workflows/deploy-dev-cloudflare.yml"]
+      "evidence": [".github/scripts/abyss-live-browser-qa-v2.mjs",".github/scripts/run-abyss-live-browser-qa.mjs",".github/workflows/deploy-dev-cloudflare.yml","GitHub Actions run 34088504261"]
     },
     {
       "id": "ABYSS-09",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Repository checks、dev deployment、canonical dev alias SHA 與 main 未修改全部通過後才可宣稱完成",
-      "evidence": [".github/workflows/ci.yml",".github/workflows/deploy-dev-cloudflare.yml"]
+      "evidence": [".github/workflows/ci.yml",".github/workflows/deploy-dev-cloudflare.yml","GitHub Actions run 34088504261","main c0a5bf81f07e83ddfe6a0bc5ee394e5c598ed61e unchanged"]
     }
   ],
-  "automatedVerification": "PENDING_FINAL_DEV_CI_DEPLOY_AND_BROWSER_QA",
-  "targetedVerificationRun": null,
-  "finalDevVerificationRun": null,
-  "visualVerification": "PENDING_AUTOMATED_MOBILE_CHROME_DEV_QA",
+  "automatedVerification": "DEV_CI_DEPLOY_SHA_AND_LIVE_MOBILE_QA_VERIFIED",
+  "verificationRun": 34088504261,
+  "targetedVerificationRun": 34088504261,
+  "finalDevVerificationRun": 34088504261,
+  "visualVerification": "AUTOMATED_MOBILE_CHROME_DEV_QA_PASS",
   "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
   "verifiedOnDevVersion": "173.63",
   "releasedAs": null
