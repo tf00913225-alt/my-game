@@ -322,6 +322,7 @@
         let context=null;
         let master=null;
         const SKILL_VOLUME_SCALE=2;
+        const COMBAT_FEEDBACK_VOLUME_SCALE=2;
         let playbackGainScale=1;
 
         function ensure(){
@@ -432,7 +433,7 @@
             },65);
         }
 
-        return {ensure,play,playSkill,skillVolumeScale:SKILL_VOLUME_SCALE};
+        return {ensure,play,playSkill,skillVolumeScale:SKILL_VOLUME_SCALE,combatFeedbackVolumeScale:COMBAT_FEEDBACK_VOLUME_SCALE};
     })();
     window.v141Audio=audioEngine;
     document.addEventListener("pointerdown",()=>audioEngine.ensure(),{once:true,passive:true});
@@ -464,7 +465,7 @@
             audioEngine.playSkill(skillId?skillDatabase[skillId]:null,skillName);
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
             if(monster&&typeof getMonsterRank==="function"&&getMonsterRank(monster)==="boss"){
-                setTimeout(()=>audioEngine.play("boss"),28);
+                setTimeout(()=>audioEngine.play("boss",COMBAT_FEEDBACK_VOLUME_SCALE),28);
             }
             return originalShowMonsterSkillNameBadge.apply(this,arguments);
         };
@@ -473,7 +474,7 @@
     if(typeof showMissEffect==="function"){
         const originalShowMissEffect=showMissEffect;
         showMissEffect=function(){
-            audioEngine.play("dodge");
+            audioEngine.play("dodge",COMBAT_FEEDBACK_VOLUME_SCALE);
             return originalShowMissEffect.apply(this,arguments);
         };
     }
@@ -481,7 +482,7 @@
     if(typeof showShieldAbsorb==="function"){
         const originalShowShieldAbsorb=showShieldAbsorb;
         showShieldAbsorb=function(){
-            audioEngine.play("block");
+            audioEngine.play("block",COMBAT_FEEDBACK_VOLUME_SCALE);
             return originalShowShieldAbsorb.apply(this,arguments);
         };
     }
@@ -489,7 +490,7 @@
     if(typeof showMonsterHit==="function"){
         const originalShowMonsterHit=showMonsterHit;
         showMonsterHit=function(index,amount,type,isCrit){
-            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage"); }
+            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE); }
             return originalShowMonsterHit.apply(this,arguments);
         };
     }
@@ -497,7 +498,7 @@
     if(typeof showPlayerHit==="function"){
         const originalShowPlayerHit=showPlayerHit;
         showPlayerHit=function(amount,type,index,isPositive,isCrit){
-            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage"); }
+            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE); }
             return originalShowPlayerHit.apply(this,arguments);
         };
     }
@@ -688,7 +689,7 @@
                     persistAccountProgress();
                 }
                 if(isWildElite){ addEliteSpecialDrop(monster); }
-                audioEngine.play("death");
+                audioEngine.play("death",COMBAT_FEEDBACK_VOLUME_SCALE);
             }
             return result;
         };
