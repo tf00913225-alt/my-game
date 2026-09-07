@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-abyss-two-tier",
+  "baseBranch": "dev",
+  "baseCommit": "f94a00dacd82a55b576e76cb3197f728cc5c150d",
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "ABYSS-01",
+      "status": "VERIFIED",
+      "requirement": "虛空五帝只保留固定 Lv20 初境與固定 Lv40 真境，禁止依玩家等級、裝備或戰力動態同步怪物等級",
+      "evidence": ["js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js"]
+    },
+    {
+      "id": "ABYSS-02",
+      "status": "VERIFIED",
+      "requirement": "每區四個前置關皆為 5 regular + 5 elite；BOSS 關皆為 9 elite + 1 emperor；第五區只有極帝一名 BOSS",
+      "evidence": ["js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js"]
+    },
+    {
+      "id": "ABYSS-03",
+      "status": "VERIFIED",
+      "requirement": "Lv20/Lv40 使用既有 v132 怪物公式後只套指定 HP multiplier，不再疊舊 +2500/+5000/+3500/+10000 extraHP",
+      "evidence": ["js/27-v132-content-expansion.js","js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js"]
+    },
+    {
+      "id": "ABYSS-04",
+      "status": "VERIFIED",
+      "requirement": "Lv20 怪物技能固定 Lv1、Lv40 固定 Lv2，一般與菁英沿用正常技能率，帝王才保留較積極 AI",
+      "evidence": ["js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js"]
+    },
+    {
+      "id": "ABYSS-05",
+      "status": "VERIFIED",
+      "requirement": "每場勝利先生成寶箱，寶箱未領不得出現或使用傳送點；獎勵 stage claim 具 reload 防重領保護",
+      "evidence": ["js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js"]
+    },
+    {
+      "id": "ABYSS-06",
+      "status": "VERIFIED",
+      "requirement": "Lv20 與 Lv40 run state 完全分離並各自保存 25 場進度；舊五層 state 安全遷移到 Lv40",
+      "evidence": ["js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js"]
+    },
+    {
+      "id": "ABYSS-07",
+      "status": "VERIFIED",
+      "requirement": "深淵入口使用兩張一致 16:9 正式封面卡、鎖定/攻略中/已通關狀態，以及區域內 4 前置 + 1 BOSS 五節點 HUD",
+      "evidence": ["js/59-abyss-two-tier-runtime.js","css/50-v169-abyss-flow.css","tests/abyss-two-tier-refactor.test.js"]
+    },
+    {
+      "id": "ABYSS-08",
+      "status": "IMPLEMENTED",
+      "requirement": "dev 部署後以手機尺寸 Chrome 實際驗證封面、進度、前置勝利→寶箱→傳送點、BOSS→帝王寶箱→下一區、reload 恢復、Lv40 數值與圖片載入",
+      "evidence": [".github/scripts/abyss-live-browser-qa.mjs",".github/workflows/deploy-dev-cloudflare.yml"]
+    },
+    {
+      "id": "ABYSS-09",
+      "status": "IMPLEMENTED",
+      "requirement": "Repository checks、dev deployment、canonical dev alias SHA 與 main 未修改全部通過後才可宣稱完成",
+      "evidence": [".github/workflows/ci.yml",".github/workflows/deploy-dev-cloudflare.yml"]
+    }
+  ],
+  "automatedVerification": "PENDING_FINAL_DEV_CI_DEPLOY_AND_BROWSER_QA",
+  "targetedVerificationRun": null,
+  "finalDevVerificationRun": null,
+  "visualVerification": "PENDING_AUTOMATED_MOBILE_CHROME_DEV_QA",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "verifiedOnDevVersion": "173.63",
+  "releasedAs": null
+}
