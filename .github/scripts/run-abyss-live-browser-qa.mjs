@@ -140,6 +140,24 @@ patched=patched
     .replace(afterWinReturnNeedle,afterWinReturnReplacement)
     .replace(afterWinAssertNeedle,afterWinAssertReplacement);
 
+/* The boss-flow part of the QA stubs the shared dungeon launcher so it can
+   inspect the roster without entering combat. Preserve the real launcher first;
+   otherwise the later VFX regression would accidentally call the stub and wait
+   forever for battle cards that can never appear. */
+const bossLauncherNeedle=`    const bossLaunch=await client.eval(\`(async()=>{
+        window.__abyssQaLaunch=null;
+        window.v132LaunchDungeonBattle=(roster,settled)=>{window.__abyssQaLaunch={roster,settled};return true;};
+`;
+const bossLauncherReplacement=`    const bossLaunch=await client.eval(\`(async()=>{
+        window.__abyssQaLaunch=null;
+        window.__abyssQaLiveLauncher=window.v132LaunchDungeonBattle;
+        window.v132LaunchDungeonBattle=(roster,settled)=>{window.__abyssQaLaunch={roster,settled};return true;};
+`;
+if(!patched.includes(bossLauncherNeedle)){
+    throw new Error("Live Abyss QA could not preserve the production dungeon launcher before the boss roster stub.");
+}
+patched=patched.replace(bossLauncherNeedle,bossLauncherReplacement);
+
 /* The user's regression was visual: skill text still appeared while the V143
    effect did not. Exercise the real shared dungeon battle launcher, trigger a
    real formal Sprite skill through the production badge boundary, and require
@@ -151,10 +169,11 @@ const vfxNeedle=`    assert.equal(lv40.final.eliteCount,9);
 const vfxReplacement=`    assert.equal(lv40.final.eliteCount,9);
 
     const vfxLaunch=await client.eval(\`(()=>{
-        if(typeof window.v132LaunchDungeonBattle!=='function'){return {started:false,reason:'missing-shared-launcher'};}
+        const launcher=typeof window.__abyssQaLiveLauncher==='function'?window.__abyssQaLiveLauncher:window.v132LaunchDungeonBattle;
+        if(typeof launcher!=='function'){return {started:false,reason:'missing-shared-launcher'};}
         if(typeof battleActive!=='undefined'&&battleActive){return {started:false,reason:'battle-already-active'};}
         const roster=v174AbyssBuildRoster(20,0,0);
-        const started=window.v132LaunchDungeonBattle(roster,()=>{});
+        const started=launcher(roster,()=>{});
         return {started:!!started};
     })()\`);
     assert.equal(vfxLaunch.started,true,\`Real Abyss battle could not start for VFX QA: \${vfxLaunch.reason||'unknown'}\`);
