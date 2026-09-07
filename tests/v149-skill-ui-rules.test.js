@@ -73,7 +73,7 @@ function compact(skill){
 
 test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",()=>{
     assert.match(index,/js\/20-anonymous-20\.js\?v=173\.62/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.39/);
+assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.62/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
     assert.match(loader,/const V_ASSET_VERSION="173\.62"/);

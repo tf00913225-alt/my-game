@@ -113,6 +113,15 @@
 
             if(
                 gameSurface &&
+                event.touches &&
+                event.touches.length>1
+            ){
+                event.preventDefault();
+                return;
+            }
+
+            if(
+                gameSurface &&
                 !isInsideAllowedScroller(
                     event.target
                 )
@@ -139,6 +148,82 @@
             }
         },
         {passive:false}
+    );
+
+    /*
+       全遊戲瀏覽器原生互動鎖：
+       - 單指仍依既有 scroll whitelist 正常捲動。
+       - 兩指以上永遠不交給瀏覽器做 pinch zoom。
+       - 非文字輸入 UI 不開啟長按 context menu、不原生拖曳、不文字選取。
+       這是全域 owner，禁止各頁另疊長按／縮放補丁。
+    */
+    function isGameSurfaceTarget(target){
+        return !!(
+            target &&
+            target.closest &&
+            target.closest("#game-stage")
+        );
+    }
+
+    function isEditableGameControl(target){
+        return !!(
+            target &&
+            target.closest &&
+            target.closest('input, textarea, [contenteditable="true"]')
+        );
+    }
+
+
+    document.addEventListener(
+        "contextmenu",
+        function(event){
+            if(
+                isGameSurfaceTarget(event.target) &&
+                !isEditableGameControl(event.target)
+            ){
+                event.preventDefault();
+            }
+        },
+        {capture:true}
+    );
+
+    document.addEventListener(
+        "dragstart",
+        function(event){
+            if(
+                isGameSurfaceTarget(event.target) &&
+                !isEditableGameControl(event.target)
+            ){
+                event.preventDefault();
+            }
+        },
+        {capture:true}
+    );
+
+    document.addEventListener(
+        "selectstart",
+        function(event){
+            if(
+                isGameSurfaceTarget(event.target) &&
+                !isEditableGameControl(event.target)
+            ){
+                event.preventDefault();
+            }
+        },
+        {capture:true}
+    );
+
+    document.addEventListener(
+        "wheel",
+        function(event){
+            if(
+                event.ctrlKey &&
+                isGameSurfaceTarget(event.target)
+            ){
+                event.preventDefault();
+            }
+        },
+        {capture:true,passive:false}
     );
 
     window.addEventListener(

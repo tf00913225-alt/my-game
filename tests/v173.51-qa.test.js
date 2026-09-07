@@ -22,7 +22,8 @@ assert.match(battle,/window\.v173DecorateExpPoolDistributionUi\(\)/);
 assert.match(battle,/\.v173-exp-row-meta/);
 assert.match(battle,/window\.showRewardedAd=function/);
 assert.match(battle,/let remain=3/);
-assert.match(css,/v17351-management-open #v143-skill-stage\{visibility:hidden/);
+assert.doesNotMatch(css,/v17351-management-open #v143-skill-stage/);
+assert.doesNotMatch(battle,/stage\.style\.visibility/);
 assert.match(css,/v17342-element-box-use-notice[\s\S]*font-size:42px/);
 
 assert.match(animation,/fireRocket:\{[\s\S]*?assets\/vfx\/fire\/fire-rocket-cast\.png/);

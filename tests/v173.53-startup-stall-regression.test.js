@@ -8,7 +8,7 @@ const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 assert.doesNotMatch(battle,/observer\.observe\(document\.body,\{subtree:true,childList:true,attributes:true/);
 assert.match(battle,/observer\.observe\(document\.body,\{subtree:true,childList:true\}\)/);
-assert.match(battle,/stage\.style\.visibility!==nextVisibility/);
+assert.doesNotMatch(battle,/stage\.style\.visibility/);
 assert.doesNotMatch(inventory,/obs\.observe\(document\.body,\{subtree:true,childList:true,attributes:true/);
 assert.match(inventory,/obs\.observe\(document\.body,\{subtree:true,childList:true\}\)/);
 assert.match(inventory,/classList\.contains\("v17351-inventory-fullscreen"\)!==open/);
