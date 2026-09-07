@@ -24,8 +24,11 @@
       "requirement": "playerRelics 與 teamLoadout.relicId 必須嵌入既有 SAVE_KEY 同一份正式存檔；舊存檔安全 migration；禁止秘寶專屬 localStorage key",
       "evidence": [
         "js/60-team-relic-system.js",
+        "js/00-main.js",
         "tests/v174-team-relic-system.test.js",
-        "PR #94 Repository checks / save migration tests SUCCESS"
+        "tests/v174-team-relic-save-reload.test.js",
+        "CI run 34150502411 Repository checks / save-reload regression / exact-SHA dev deployment SUCCESS",
+        "DEV Cloud Browser QA on ee384218bfd4039d908d4ce6f2d74cf1585604dc: equip Qinglan Feather, full reload, ownership/loadout and Lv.1 UI remained present"
       ]
     },
     {
@@ -60,7 +63,9 @@
         "js/19-stage-v78-character-inventory-runtime.js",
         "PR #94 static resource / loader / Node checks SUCCESS",
         "DEV Cloud Browser QA on 051aa7ed016cf7f2db925992fbdd5735800cc7aa: 秘寶／元素匣入口不重疊；元素匣仍開啟既有 autoBattleSettings owner；隊伍唯一秘寶槽可選擇／更換",
-        "CI run 34148572586: tests/ui-team-relic-mobile-browser.test.js passed in Chrome at 390x844 and 412x915"
+        "CI run 34148572586: tests/ui-team-relic-mobile-browser.test.js passed in Chrome at 390x844 and 412x915",
+        "DEV Cloud Browser QA on f337d70ee6b9dbce3750a4cc60a990ca9c2edfe7: transparent utility container pointer-events:none; relic/element buttons retain pointer-events:auto; system and offline-exp center hit targets and actual clicks restored",
+        "CI run 34151818800 SUCCESS: 390x844 / 412x915 Chrome assertions cover transparent-container and real-button hit ownership"
       ]
     },
     {
@@ -82,11 +87,12 @@
       "evidence": [
         "DEV Cloud Browser QA after integration: 青嵐羽符 battle-start trigger emitted log/banner；banner stayed inside the battle stage and did not overlap the player row",
         "DEV Cloud Browser application-origin console errors/warnings: 0；broken images: 0；relic CSS/runtime, skill runtime and Abyss runtime loaded",
-        "CI run 34148572586 SUCCESS: Repository checks, exact-SHA deployment, 390/412px team relic Chrome QA, live mobile Abyss QA and live mobile battle/audio QA"
+        "CI run 34151818800 SUCCESS: Repository checks, exact-SHA deployment, 390/412px team relic Chrome QA, live mobile Abyss QA and live mobile battle/audio QA",
+        "Final DEV Cloud Browser QA: two full reloads retained Qinglan Feather; modal vertical scrollTop 0→520 and category scrollLeft 0→50; app-origin console errors/warnings 0; broken images 0"
       ]
     }
   ],
-  "automatedVerification": "CI_RUN_34148572586_SUCCESS; 112_OF_112_NODE_SUITES_PASSED; TEAM_RELIC_CHROME_QA_390X844_AND_412X915_PASSED; JAVASCRIPT_SYNTAX_STATIC_RESOURCES_HTML_IDS_LOADER_RELEASE_GATE_GIT_DIFF_ABYSS_LIVE_AND_BATTLE_AUDIO_LIVE_CHECKS_PASSED",
+  "automatedVerification": "CI_RUN_34151818800_SUCCESS; 115_OF_115_NODE_SUITES_PASSED; 239_OF_239_JAVASCRIPT_SYNTAX_PASSED; TEAM_RELIC_CHROME_QA_390X844_AND_412X915_PASSED; STATIC_RESOURCES_HTML_IDS_LOADER_RELEASE_GATE_GIT_DIFF_ABYSS_LIVE_AND_BATTLE_AUDIO_LIVE_CHECKS_PASSED",
   "visualVerification": "VERIFIED_ON_DEV_CLOUD_BROWSER_AND_HEADLESS_CHROME_390X844_412X915",
-  "notes": "官方 Game/Cache Version 維持 V173.63。整合後實際瀏覽器 QA 發現 legacy wide-modal overflow:hidden specificity 蓋過秘寶 body；已由 051aa7ed016cf7f2db925992fbdd5735800cc7aa 修正真正 scroll owner，並由 CI run 34148572586 與 DEV Cloud Browser 交叉驗證。RELIC-01～07 全部 VERIFIED。"
+  "notes": "官方 Game/Cache Version 維持 V173.63。整合後實際瀏覽器 QA 依序發現並修正三個 owner 問題：051aa7ed 修正 legacy wide-modal overflow:hidden 覆蓋；ee384218 讓核心 saveGame 在 late relic runtime 載入前保留同一 SAVE_KEY 的 playerRelics/teamLoadout；f337d70e 讓透明 utility grid 不再攔截既有系統／離線經驗 hitbox。CI runs 34150502411 / 34151818800 與 DEV Cloud Browser 均交叉驗證。RELIC-01～07 全部 VERIFIED。"
 }

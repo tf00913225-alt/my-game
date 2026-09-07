@@ -1,3 +1,13 @@
+## 2026-09-08 六分支安全整合與最終 QA（dev；main 未修改）
+
+- 起始 GitHub `dev` 為 `cb269fef7f28e54161b9abda9cfcb66bfbfbe74f`；逐條順序為 EXP 成長曲線 → 裝備副本寶箱 → 深淵前置編隊 → 技能成長 → 隊伍秘寶 → 黑金視窗。六條遠端分支 tip 均與指定 SHA 完全一致。
+- 唯一 merge conflict 位於 `js/19-stage-v78-character-inventory-runtime.js`。人工保留 Abyss → skill progression → team relic 的唯一 late-runtime chain；team relic 最後掛接正式 battle/save/showPage owner，沒有整份選 ours/theirs，也沒有重複 load/error listener。
+- 深淵改為正式 8 名（5+3）後，舊 live battle QA 仍硬寫 10 名；由 `b650978e` 更新 QA owner 後通過。不得把舊 10 名 assertion 恢復。
+- DEV Cloud Browser 找出並修正三個秘寶整合 owner 問題：`051aa7ed` 提高 `#homeFeatureModalBody` scroll owner specificity；`ee384218` 讓核心 `saveGame()` 在 late relic runtime 尚未載入時保留既有 `playerRelics/teamLoadout`；`f337d70e` 讓橫跨主城整列的透明 `.team-relic-home-tools` 不再攔截系統／離線經驗，只讓兩顆實際 utility button 接收 pointer。
+- 最終功能狀態 `f337d70ee6b9dbce3750a4cc60a990ca9c2edfe7` 已通過 CI run 34151818800、115/115 Node suites、239/239 JS syntax、462 resources、285 IDs、loader/release/git-diff、390×844／412×915 Chrome、live Abyss 與 battle/audio QA。DEV manifest exact SHA、V173.63／cache 173.63 相符。
+- 最終實際瀏覽器：青嵐羽符裝備後連續完整重載仍保留；20 卡兩欄；modal body 0→520、tabs 0→50；系統／離線經驗／秘寶／元素匣 hit target 與開啟均正常；app-origin console error/warning 0、broken image 0。
+- 本輪 Requirement Batch：`release/requirement-batches/2026-09-08-multi-branch-dev-integration.json`（9/9 VERIFIED）。官方 Game/Cache Version 維持 V173.63。`main` 全程維持 `d0b666e4eeae4cff8bb21dd877f4b95414b367d9`，禁止把本輪內容推入 main，除非使用者另行明確要求。
+
 ## 2026-09-07 全遊戲手勢／圖片長按／技能 VFX owner 收斂（dev）
 - `js/01-stage-v8-touch-lock.js` 是全遊戲瀏覽器手勢唯一 owner：既有單指 scroll whitelist 保留，但兩指以上在任何 `#game-stage` 內位置一律阻止瀏覽器 pinch zoom；非文字輸入 UI 的 contextmenu／dragstart／selectstart 亦全域阻止。
 - `css/00-main.css` 是圖片／SVG／Canvas 原生長按與拖曳的基礎 CSS owner；不使用 `pointer-events:none`，避免破壞正常遊戲點擊。
