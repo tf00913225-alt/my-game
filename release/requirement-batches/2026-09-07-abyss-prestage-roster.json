@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-abyss-prestage-roster",
+  "baseBranch": "dev",
+  "baseCommit": "cb269fef7f28e54161b9abda9cfcb66bfbfbe74f",
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "ABYSS-HP-03",
+      "status": "VERIFIED",
+      "requirement": "保留最新 dev 已驗證的 Lv20／Lv40 深淵全關卡怪物 HP 降低 25% 規格；耐久倍率維持 1.875，不得再次重複降低。",
+      "evidence": [
+        "release/requirement-batches/2026-09-07-combat-feedback-abyss-hp-adjustments.json",
+        "js/59-abyss-two-tier-runtime.js",
+        "tests/abyss-two-tier-refactor.test.js"
+      ]
+    },
+    {
+      "id": "ABYSS-ROSTER-03",
+      "status": "IMPLEMENTED",
+      "requirement": "本批取代舊 ABYSS-02 的前置關編成：Lv20／Lv40 所有區域四個前置小關固定 5 regular 前排 + 3 elite 後排，共 8 隻；所有帝王 BOSS 大關與 Lv40 最終戰編成維持不變。",
+      "evidence": [
+        "js/59-abyss-two-tier-runtime.js",
+        "tests/abyss-two-tier-refactor.test.js"
+      ]
+    }
+  ],
+  "automatedVerification": "PENDING",
+  "verificationRun": null,
+  "targetedVerificationRun": null,
+  "finalDevVerificationRun": null,
+  "visualVerification": "NOT_REQUIRED_PURE_ROSTER_LOGIC_STATIC_FORMATION_ASSERTED",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "verifiedOnDevVersion": null,
+  "releasedAs": null
+}
