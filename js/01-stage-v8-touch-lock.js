@@ -113,6 +113,15 @@
 
             if(
                 gameSurface &&
+                event.touches &&
+                event.touches.length>1
+            ){
+                event.preventDefault();
+                return;
+            }
+
+            if(
+                gameSurface &&
                 !isInsideAllowedScroller(
                     event.target
                 )
@@ -164,19 +173,6 @@
         );
     }
 
-    document.addEventListener(
-        "touchmove",
-        function(event){
-            if(
-                isGameSurfaceTarget(event.target) &&
-                event.touches &&
-                event.touches.length>1
-            ){
-                event.preventDefault();
-            }
-        },
-        {capture:true,passive:false}
-    );
 
     document.addEventListener(
         "contextmenu",
