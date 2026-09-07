@@ -24,32 +24,44 @@ jobs:
             sudo apt-get update
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
-      - name: Align only touch-lock cache assertions
+      - name: Consolidate touchmove owner and align stale assertions
         run: |
           python - <<'PY'
           from pathlib import Path
+
+          touch=Path('js/01-stage-v8-touch-lock.js')
+          s=touch.read_text(encoding='utf-8')
+          old_first='''    document.addEventListener(\n        "touchmove",\n        function(event){\n            const gameSurface =\n                event.target &&\n                event.target.closest &&\n                event.target.closest("#game-stage");\n\n            if(\n                gameSurface &&\n                !isInsideAllowedScroller(\n                    event.target\n                )\n            ){\n                event.preventDefault();\n            }\n        },\n        {passive:false}\n    );'''
+          new_first='''    document.addEventListener(\n        "touchmove",\n        function(event){\n            const gameSurface =\n                event.target &&\n                event.target.closest &&\n                event.target.closest("#game-stage");\n\n            if(\n                gameSurface &&\n                event.touches &&\n                event.touches.length>1\n            ){\n                event.preventDefault();\n                return;\n            }\n\n            if(\n                gameSurface &&\n                !isInsideAllowedScroller(\n                    event.target\n                )\n            ){\n                event.preventDefault();\n            }\n        },\n        {passive:false}\n    );'''
+          old_second='''\n    document.addEventListener(\n        "touchmove",\n        function(event){\n            if(\n                isGameSurfaceTarget(event.target) &&\n                event.touches &&\n                event.touches.length>1\n            ){\n                event.preventDefault();\n            }\n        },\n        {capture:true,passive:false}\n    );\n'''
+          if s.count(old_first)!=1:
+              raise SystemExit(f'expected one original touchmove owner, found {s.count(old_first)}')
+          if s.count(old_second)!=1:
+              raise SystemExit(f'expected one duplicate pinch touchmove owner, found {s.count(old_second)}')
+          s=s.replace(old_first,new_first,1).replace(old_second,'\n',1)
+          touch.write_text(s,encoding='utf-8')
+
           old=r'js\/01-stage-v8-touch-lock\.js\?v=173\.39'
           new=r'js\/01-stage-v8-touch-lock\.js\?v=173\.62'
           changed=[]
           replacements=0
           for p in sorted(Path('tests').glob('*.js')):
-              s=p.read_text(encoding='utf-8')
-              count=s.count(old)
+              text=p.read_text(encoding='utf-8')
+              count=text.count(old)
               if count:
-                  p.write_text(s.replace(old,new),encoding='utf-8')
+                  p.write_text(text.replace(old,new),encoding='utf-8')
                   changed.append(str(p))
                   replacements+=count
-          print('changed files:', changed)
-          print('replacements:', replacements)
-          if replacements < 1:
-              raise SystemExit('no stale touch-lock cache assertions found')
-          remaining=[]
+          print('changed cache assertion files:', changed)
+          print('cache assertion replacements:', replacements)
+          if replacements!=2:
+              raise SystemExit(f'expected exactly two stale touch-lock assertions, found {replacements}')
           for p in sorted(Path('tests').glob('*.js')):
               if old in p.read_text(encoding='utf-8'):
-                  remaining.append(str(p))
-          if remaining:
-              raise SystemExit('stale assertions remain: '+', '.join(remaining))
+                  raise SystemExit('stale assertion remains: '+str(p))
           PY
+      - name: Check touch owner syntax
+        run: node --check js/01-stage-v8-touch-lock.js
       - name: Run all Node suites
         run: node .github/scripts/ci.mjs tests
       - name: Run release coherence gate
@@ -58,12 +70,12 @@ jobs:
         run: node .github/scripts/release-gate.mjs ci
       - name: Check diff
         run: git diff --check
-      - name: Commit aligned historical assertions and remove workflow
+      - name: Commit verified owner cleanup and remove workflow
         run: |
           rm .github/workflows/_align-touch-lock-cache-tests.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --check
-          git commit -m "test: align historical touch-lock cache assertions"
+          git commit -m "fix: consolidate touchmove owner and align cache tests"
           git push origin HEAD:bugfix/global-ui-gesture-vfx-lock
