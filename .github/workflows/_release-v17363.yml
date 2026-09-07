@@ -39,7 +39,7 @@ jobs:
       - name: Check static local resources
         run: node .github/scripts/ci.mjs resources
       - name: Check duplicate HTML IDs
-        run: node .github/scripts/ci.mjs duplicate-ids
+        run: node .github/scripts/ci.mjs html-ids
       - name: Check release entries and loader integrity
         run: node .github/scripts/ci.mjs loader
       - name: Enforce V173.63 release gate
