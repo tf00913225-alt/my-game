@@ -25,13 +25,16 @@ jobs:
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
       - name: Apply known-good animation owner recovery
-        run: python .github/scripts/_restore-direct-skill-animation.py
+        run: |
+          python .github/scripts/_restore-direct-skill-animation.py
+          python .github/scripts/_align-v142-direct-trigger-test.py
       - name: Check modified JavaScript syntax
         run: |
           node --check js/00-main.js
           node --check js/37-v142-skill-animation.js
           node --check tests/v173.6-p0-runtime-recovery.test.js
           node --check tests/v173.62-direct-skill-animation-trigger.test.js
+          node --check tests/v142-skill-animation.test.js
       - name: Run targeted animation regressions
         run: |
           node tests/v173.6-p0-runtime-recovery.test.js
@@ -53,6 +56,7 @@ jobs:
         run: |
           rm .github/workflows/_restore-direct-skill-animation-trigger.yml
           rm .github/scripts/_restore-direct-skill-animation.py
+          rm .github/scripts/_align-v142-direct-trigger-test.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
