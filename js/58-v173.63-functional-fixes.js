@@ -2,8 +2,7 @@
    V173.63 — requested functional fixes (runtime authority)
    - maximum character, synthesis and dungeon-backpack canvases
    - canonical item art + formal rarity frames
-   - premium text-only dungeon reward previews
-   - equipment dungeon material drops
+   - premium text-only daily dungeon reward previews
    - material promotion synthesis through Four-Symbol tier
 ===================================================== */
 (function installV17363FunctionalFixes(){
@@ -14,19 +13,10 @@ window.__v17363FunctionalFixesInstalled=true;
 const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
 const TIER_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
 const TIER_ALIAS={low:"white",mid:"blue",high:"purple",perfect:"orange"};
-const DROP_TIER_LABEL={white:"低階（白階）",blue:"中階（藍階）",purple:"高階（紫階）",orange:"極品（橙階）"};
-const EQUIPMENT_DROP_TIERS=[
-    {tier:"white",chance:40},
-    {tier:"blue",chance:30},
-    {tier:"purple",chance:20},
-    {tier:"orange",chance:10}
-];
 const BLUEPRINT_SLOTS=["head","shoulder","armor","shoes","hand"];
 const SLOT_LABEL={head:"頭部",shoulder:"護腕",armor:"衣服",shoes:"腳",hand:"武器"};
 const MATERIAL_STATE={oreTier:"white",blueprintTier:"white",blueprintSet:"setFire",blueprintSlot:"head"};
 let materialTabActive=false;
-let equipmentDungeonRunning=false;
-let equipmentDungeonWaveIndex=-1;
 let repairQueued=false;
 
 function normalizeTier(value){
@@ -281,111 +271,13 @@ function ensureFunctionalStyles(){
     document.head.appendChild(style);
 }
 
-/* ---------- 9. Equipment dungeon drops: ore + blueprint material bundles. ---------- */
-function weightedDropTier(){
-    const roll=Math.random()*100;let cursor=0;
-    for(const entry of EQUIPMENT_DROP_TIERS){cursor+=entry.chance;if(roll<cursor){return entry.tier;}}
-    return "orange";
-}
+/* ---------- 9. Material synthesis helpers. ---------- */
 function oreByTier(tier){return defs().ores.find(item=>normalizeTier(item&&item.tierKey)===tier)||null;}
 function blueprintsBy(tier,setId,slot){
     return defs().blueprints.filter(item=>item&&normalizeTier(item.tierKey)===tier&&(!setId||item.setId===setId)&&(!slot||item.blueprintSlot===slot));
 }
-function randomBlueprintByTier(tier){
-    const slot=BLUEPRINT_SLOTS[Math.floor(Math.random()*BLUEPRINT_SLOTS.length)%BLUEPRINT_SLOTS.length];
-    let pool=blueprintsBy(tier,null,slot);
-    if(!pool.length){pool=blueprintsBy(tier,null,null);}
-    return pool.length?pool[Math.floor(Math.random()*pool.length)%pool.length]:null;
-}
 function canAdd(definition,amount){return !window.v132CanAddItemToInventory||window.v132CanAddItemToInventory(definition,amount);}
 function add(definition,amount){return !!(definition&&window.v132AddItemToInventory&&window.v132AddItemToInventory(definition,amount));}
-function equipmentRewardPreviewGroups(){
-    const odds=EQUIPMENT_DROP_TIERS.map(x=>DROP_TIER_LABEL[x.tier]+" "+x.chance+"%").join("　・　");
-    return [
-        {title:"第一種｜礦石",badge:"×10",text:odds+"。每次通關抽取一個階級。"},
-        {title:"第二種｜裝備設計圖",badge:"×20",text:odds+"。階級抽取後，頭、護腕、衣服、腳、武器部位隨機；四大系列同步隨機。"}
-    ];
-}
-window.v17346ShowEquipmentDungeonPreview=function(){
-    if(typeof window.v132ShowRewardModal!=="function"){return;}
-    window.v132ShowRewardModal(previewMarkup("裝備副本獎勵預覽","EQUIPMENT DUNGEON",equipmentRewardPreviewGroups(),"兩種材料獎勵各自獨立抽取；直接領取為礦石 ×10 ＋ 設計圖 ×20。"));
-};
-function showEquipmentClearReward(){
-    if(typeof window.v132ShowRewardModal!=="function"){return;}
-    const html='<div class="v132-reward-modal-inner v17363-text-reward-preview"><div class="v17363-preview-heading"><small>EQUIPMENT DUNGEON CLEAR</small><h3>裝備副本挑戰成功</h3></div><div class="v17363-preview-groups">'+
-        equipmentRewardPreviewGroups().map(group=>'<section class="v17363-preview-group"><b>'+esc(group.title)+'</b><em>'+esc(group.badge)+'</em><p>'+esc(group.text)+'</p></section>').join("")+
-        '</div><div class="v132-reward-actions"><button type="button" onclick="v17363ClaimEquipmentDungeon(false)">直接領取</button><button type="button" onclick="v17363ClaimEquipmentDungeon(true)">看廣告雙倍領取</button></div></div>';
-    window.v132ShowRewardModal(html);
-}
-function grantEquipmentMaterials(multiplier){
-    const multi=Math.max(1,Math.floor(Number(multiplier)||1));
-    const oreTier=weightedDropTier();
-    const blueprintTier=weightedDropTier();
-    const ore=oreByTier(oreTier);
-    const blueprint=randomBlueprintByTier(blueprintTier);
-    const oreQty=10*multi,blueprintQty=20*multi;
-    if(!ore||!blueprint){alert("裝備副本獎勵資料尚未就緒，請重新進入副本。");return false;}
-    if(!canAdd(ore,oreQty)||!canAdd(blueprint,blueprintQty)){alert("背包空間不足，請先整理背包。");return false;}
-    const transaction=window.v132RunInventoryTransaction||function(operation){return !!operation();};
-    const success=transaction(()=>add(ore,oreQty)&&add(blueprint,blueprintQty));
-    if(!success){alert("獎勵寫入失敗，背包已還原，請再試一次。");return false;}
-    refreshInventory();
-    if(typeof window.v132CloseRewardModal==="function"){window.v132CloseRewardModal();}
-    const message="獲得「"+ore.name+"」×"+oreQty+"\n獲得「"+blueprint.name+"」×"+blueprintQty;
-    if(typeof window.rpgAlert==="function"){void window.rpgAlert(message,{title:"裝備副本獎勵",confirmText:"知道了",tone:"success"});}
-    if(typeof showPage==="function"){showPage("dungeon");}
-    if(typeof switchDungeonTab==="function"){switchDungeonTab("daily");}
-    return true;
-}
-window.v17363ClaimEquipmentDungeon=function(doubled){
-    if(doubled&&typeof showRewardedAd==="function"){
-        showRewardedAd(()=>grantEquipmentMaterials(2),()=>alert("廣告未完成，未獲得雙倍獎勵。"));
-        return;
-    }
-    grantEquipmentMaterials(1);
-};
-/* Retain the old public name only as a forwarder so any cached button cannot
-   grant the obsolete six random-equipment reward. */
-window.v17346ClaimEquipmentDungeon=window.v17363ClaimEquipmentDungeon;
-
-if(typeof applyPostBattleAutoRecovery==="function"&&!applyPostBattleAutoRecovery.__v17363EquipmentDungeon){
-    const previousRecovery=applyPostBattleAutoRecovery;
-    const guardedRecovery=function(){
-        if(equipmentDungeonRunning&&equipmentDungeonWaveIndex>=0&&equipmentDungeonWaveIndex<2){return;}
-        return previousRecovery.apply(this,arguments);
-    };
-    guardedRecovery.__v17363EquipmentDungeon=true;
-    applyPostBattleAutoRecovery=guardedRecovery;
-    window.applyPostBattleAutoRecovery=guardedRecovery;
-}
-window.v17346BeginEquipmentDungeon=async function(){
-    if(equipmentDungeonRunning||typeof window.v148BuildDailyDungeonWaves!=="function"||typeof window.v132LaunchDungeonBattle!=="function"){return;}
-    const built=window.v148BuildDailyDungeonWaves("gold");
-    const waves=built&&Array.isArray(built.waves)?built.waves:[];
-    if(waves.length!==3){return;}
-    const accepted=typeof window.rpgConfirm==="function"?await window.rpgConfirm(
-        "裝備副本共3輪，每輪6名敵人。\n通關固定獲得兩種材料：礦石 ×10 與隨機部位裝備設計圖 ×20。\n是否開始挑戰？",
-        {title:"裝備副本",confirmText:"開始挑戰",cancelText:"取消"}
-    ):true;
-    if(!accepted){return;}
-    equipmentDungeonRunning=true;
-    const launch=index=>{
-        equipmentDungeonWaveIndex=index;
-        const started=window.v132LaunchDungeonBattle(waves[index],function(outcome){
-            const won=outcome&&outcome.result==="win";
-            if(!won){
-                equipmentDungeonRunning=false;equipmentDungeonWaveIndex=-1;
-                if(typeof showPage==="function"){showPage("dungeon");}
-                if(typeof switchDungeonTab==="function"){switchDungeonTab("daily");}
-                return;
-            }
-            if(index<2){setTimeout(()=>launch(index+1),320);return;}
-            equipmentDungeonRunning=false;equipmentDungeonWaveIndex=-1;showEquipmentClearReward();
-        });
-        if(started===false){equipmentDungeonRunning=false;equipmentDungeonWaveIndex=-1;}
-    };
-    launch(0);
-};
 
 /* ---------- 10. Material promotion: 50 same-tier -> 10 next-tier. ---------- */
 function nextTier(tier){const index=TIER_ORDER.indexOf(normalizeTier(tier));return index>=0&&index<TIER_ORDER.length-1?TIER_ORDER[index+1]:null;}
