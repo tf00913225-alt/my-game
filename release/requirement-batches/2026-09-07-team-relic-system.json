@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-team-relic-system",
+  "baseBranch": "dev",
+  "baseCommit": "cb269fef7f28e54161b9abda9cfcb66bfbfbe74f",
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "RELIC-01",
+      "status": "IMPLEMENTED",
+      "requirement": "建立隊伍共用單秘寶系統；20件 Catalog，前10件完整 runtime-ready，後10件 locked placeholder，不開放假功能",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "docs/TEAM_RELIC_SYSTEM_RULES.md",
+        "tests/v174-team-relic-system.test.js"
+      ]
+    },
+    {
+      "id": "RELIC-02",
+      "status": "IMPLEMENTED",
+      "requirement": "playerRelics 與 teamLoadout.relicId 必須嵌入既有 SAVE_KEY 同一份正式存檔；舊存檔安全 migration；禁止秘寶專屬 localStorage key",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "tests/v174-team-relic-system.test.js"
+      ]
+    },
+    {
+      "id": "RELIC-03",
+      "status": "IMPLEMENTED",
+      "requirement": "Trigger Engine 接入正式 startBattle/startTurn/processNextCombatant/processSingleMonsterAttack/showPlayerHit/killMonster runtime，支援奇偶回合、N回合、敵方行動、我方受擊、HP門檻、擊殺、致命傷害等事件並防止秘寶來源遞迴",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "tests/v174-team-relic-system.test.js"
+      ]
+    },
+    {
+      "id": "RELIC-04",
+      "status": "IMPLEMENTED",
+      "requirement": "乾坤玉壺、烈陽神珠、玄武靈印、鎮魂古鐘、天罡戰旗、九龍神火罩、寒泉玉珮、青嵐羽符、岩岳鎮印、回天寶輪必須真正可裝備並在正式戰鬥 owner 觸發",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "tests/v174-team-relic-system.test.js"
+      ]
+    },
+    {
+      "id": "RELIC-05",
+      "status": "IMPLEMENTED",
+      "requirement": "主城新增左秘寶／右元素匣入口；元素匣仍呼叫既有 openHomeFeature('autoBattleSettings') owner；冒險隊伍新增唯一隊伍秘寶槽",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "css/55-team-relic-system.css",
+        "js/19-stage-v78-character-inventory-runtime.js"
+      ]
+    },
+    {
+      "id": "RELIC-06",
+      "status": "IMPLEMENTED",
+      "requirement": "秘寶滿版手機 UI、兩欄列表、分類、詳情、裝備／卸下、Lv1-20金幣強化、正式六階顏色、placeholder iconPath 與短促戰鬥發動演出",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "css/55-team-relic-system.css"
+      ]
+    },
+    {
+      "id": "RELIC-07",
+      "status": "BLOCKED",
+      "requirement": "在實際瀏覽器／手機驗證主城入口不遮擋、元素匣入口正常、秘寶頁分類／Grid／詳情可滑動、按鈕可點、返回正常、戰鬥 banner 不遮角色與手機響應式版面",
+      "evidence": [
+        "功能分支不得自行 merge/push dev，因此目前沒有可供本分支 exact-SHA 驗證的 DEV 部署；PR CI 不等同手機視覺驗證"
+      ]
+    }
+  ],
+  "automatedVerification": "LOCAL_ISOLATED_RUNTIME_TESTS_PASSED_BEFORE_PUSH; PR_REPOSITORY_CHECKS_PENDING",
+  "visualVerification": "BLOCKED_UNTIL_BRANCH_CAN_BE_TESTED_IN_REAL_BROWSER_OR_DEV_AFTER_EXPLICIT_INTEGRATION",
+  "notes": "官方 Game/Cache Version 維持 V173.63；依永久規範，在 RELIC-07 尚未 VERIFIED 前不得用版本更新或 CI 綠燈宣稱整批需求正式完成。"
+}
