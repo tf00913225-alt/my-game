@@ -5,11 +5,11 @@
   "baseCommit": "cb269fef7f28e54161b9abda9cfcb66bfbfbe74f",
   "officialVersion": "173.63",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "EDCR-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "裝備副本通關直接領取裝備寶箱×2，寶箱實際寫入背包而非領獎時直接拆成裝備。",
       "evidence": [
         "js/equipment-progression.js",
@@ -18,7 +18,7 @@
     },
     {
       "id": "EDCR-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "每個裝備寶箱由玩家在背包自行開啟，且每箱固定隨機獲得3件裝備。",
       "evidence": [
         "js/equipment-progression.js",
@@ -27,7 +27,7 @@
     },
     {
       "id": "EDCR-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "裝備寶箱的單件裝備階級機率固定為白40%、藍40%、紫10%、橙10%，不改動一般裝備商店既有40/40/15/5機率。",
       "evidence": [
         "js/equipment-progression.js",
@@ -37,7 +37,7 @@
     },
     {
       "id": "EDCR-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "觀看獎勵廣告成功後裝備副本獎勵雙倍，從2個裝備寶箱變為4個。",
       "evidence": [
         "js/equipment-progression.js",
@@ -46,7 +46,7 @@
     },
     {
       "id": "EDCR-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "移除V173.63後段把裝備副本改成礦石與設計圖的衝突覆蓋，裝備副本最終runtime owner回到equipment-progression.js。",
       "evidence": [
         "js/58-v173.63-functional-fixes.js",
@@ -55,8 +55,8 @@
       ]
     }
   ],
-  "automatedVerification": "PENDING_REPOSITORY_CHECKS",
-  "visualVerification": "NOT_REQUIRED_LOGIC_AND_EXISTING_MODAL_FLOW",
+  "automatedVerification": "Repository checks SUCCESS on PR #90, CI run 34122093062, verified branch commit 2661580b5e23af9c2e6a17eb47a822843d6f877b",
+  "visualVerification": "NOT_REQUIRED_LOGIC_AND_EXISTING_MODAL_FLOW; browser UI regression suites passed in Repository checks",
   "promotionApproval": "NOT_REQUESTED",
   "verifiedOnDevVersion": null,
   "releasedAs": null
