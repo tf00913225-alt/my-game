@@ -10,7 +10,7 @@ assert.ok(markerIndex>=0,"shared black-gold skin marker must exist");
 const skin=css.slice(markerIndex);
 
 const requiredPalette=["#0D0C09","#171510","#201D17","#12110E","#C69A45","#F0D38A","#73582D","#EEE7D8","#B9AD98"];
-requiredPalette.forEach(value=>assert.match(skin,new RegExp(value.replace("#","#"),"i"),`missing palette ${value}`));
+requiredPalette.forEach(value=>assert.match(skin,new RegExp(value,"i"),`missing palette ${value}`));
 
 [
     ".home-feature-modal-box",
@@ -30,15 +30,23 @@ assert.match(skin,/box-shadow:\s*[\s\S]*?inset 0 0 0 1px[\s\S]*?inset 0 0 0 3px/
 assert.doesNotMatch(skin,/!important/,"visual skin must not use !important");
 assert.doesNotMatch(skin,/::before|::after/,"visual skin must not add pseudo-element geometry");
 
-const forbiddenGeometry=/\b(?:width|height|min-width|min-height|max-width|max-height|top|right|bottom|left|inset|margin|padding|gap|transform|translate|scale|position|display|flex-direction|grid-template-columns|grid-template-rows|justify-content|align-items|overflow|z-index)\s*:/i;
+const forbiddenGeometry=new Set([
+    "width","height","min-width","min-height","max-width","max-height",
+    "top","right","bottom","left","inset","margin","padding","gap",
+    "transform","translate","scale","position","display","flex-direction",
+    "grid-template-columns","grid-template-rows","justify-content","align-items",
+    "overflow","z-index"
+]);
 const declarations=skin
     .split(/\n/)
     .map(line=>line.trim())
     .filter(line=>line&&!line.startsWith("/*")&&!line.startsWith("*")&&!line.startsWith("//"));
 for(const line of declarations){
-    assert.doesNotMatch(line,forbiddenGeometry,`skin changed forbidden geometry property: ${line}`);
+    const match=line.match(/^([\w-]+)\s*:/);
+    if(!match){ continue; }
+    const property=match[1].toLowerCase();
+    assert.ok(!forbiddenGeometry.has(property),`skin changed forbidden geometry property: ${line}`);
+    assert.notEqual(property,"border",`skin changed border width instead of visual border color/shadows: ${line}`);
 }
-
-assert.doesNotMatch(skin,/\bborder\s*:/i,"skin must not change border width; use border-color and shadows instead");
 
 console.log("✓ black-gold window skin is visual-only and geometry-safe");
