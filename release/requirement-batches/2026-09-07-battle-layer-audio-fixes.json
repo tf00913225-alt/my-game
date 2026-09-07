@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-battle-layer-audio-fixes",
+  "baseBranch": "dev",
+  "baseCommit": "ffbd8c2bd0f0e8ba87c8f05081d3dab6ebe18efe",
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {"id":"BATTLE-LAYER-01","status":"IMPLEMENTED","requirement":"戰鬥中玩家與敵方的 HP／SP 資訊必須永遠顯示在持續狀態效果動畫之上，不得被怒火、燃燒、凍傷等卡牌狀態 VFX 遮住","evidence":["css/46-v154-dev-fixes.css","css/40-v143-combat-dungeon-polish.css","tests/v174-battle-layer-audio-fixes.test.js",".github/scripts/battle-layer-audio-live-qa.mjs"]},
+    {"id":"BATTLE-LAYER-02","status":"IMPLEMENTED","requirement":"戰鬥中開啟元素匣／自動戰鬥設定時，既有 V143 document-level 技能特效不得蓋住設定介面；只抑制特效顯示層並保留原 V142/V143 動畫生命週期，不新增第二套 VFX runtime","evidence":["css/46-v154-dev-fixes.css","js/45-v154-dev-fixes.js","js/37-v142-skill-animation.js","js/39-v143-skill-animation.js","tests/v174-battle-layer-audio-fixes.test.js",".github/scripts/battle-layer-audio-live-qa.mjs"]},
+    {"id":"BATTLE-AUDIO-01","status":"IMPLEMENTED","requirement":"技能施放特效音量在既有基準上提高 100%，即技能 SFX 為原本 2.0 倍；受傷、閃避、死亡等一般戰鬥回饋音效不得一起被整體放大","evidence":["js/34-v141-core-systems.js","tests/v174-battle-layer-audio-fixes.test.js",".github/scripts/battle-layer-audio-live-qa.mjs"]}
+  ],
+  "automatedVerification": "PENDING",
+  "verificationRun": null,
+  "targetedVerificationRun": null,
+  "finalDevVerificationRun": null,
+  "visualVerification": "PENDING_LIVE_MOBILE_CHROME_DEV_QA",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "verifiedOnDevVersion": null,
+  "releasedAs": null
+}
