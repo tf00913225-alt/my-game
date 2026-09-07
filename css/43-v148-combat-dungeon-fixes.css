@@ -197,7 +197,7 @@
     content:"共用經驗池  EXP\A━━━━━━━━━━━━\A通關經驗直接存入共用經驗池，不綁定單一角色。\A可用於後續角色分配與升級；結算可選擇廣告雙倍。";
 }
 #game-stage .v17361-reward-preview .v17361-reward-visual.equipment::before{
-    content:"裝備寶箱  ×2\A━━━━━━━━━━━━\A每個寶箱隨機取得 3 件裝備。\A白階 40%　・　藍階 40%\A紫階 15%　・　橙階 5%";
+    content:"裝備寶箱  ×2\A━━━━━━━━━━━━\A每個寶箱隨機取得 3 件裝備。\A白階 40%　・　藍階 40%\A紫階 10%　・　橙階 10%";
 }
 #game-stage .v17361-reward-preview .v132-reward-actions{
     margin-top:0 !important;

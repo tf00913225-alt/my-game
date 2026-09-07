@@ -11,6 +11,10 @@ const functionalRepairs=fs.readFileSync(
     "js/58-v173.63-functional-fixes.js",
     "utf8"
 );
+const equipmentProgression=fs.readFileSync(
+    "js/equipment-progression.js",
+    "utf8"
+);
 
 assert.match(
     characterRuntime,
@@ -41,10 +45,12 @@ assert.doesNotMatch(
 assert.doesNotMatch(functionalRepairs,/quickPowerSavingToggle|v17361-power-save-toggle|v17361TogglePowerSaving|v17361_patrol_power_saving|v17361RequestWakeLock/);
 assert.match(functionalRepairs,/v169-dungeon-inventory-overlay/);
 assert.match(functionalRepairs,/v148ShowDailyDungeonPreview/);
-assert.match(functionalRepairs,/v17346ShowEquipmentDungeonPreview/);
-assert.match(functionalRepairs,/EQUIPMENT_DROP_TIERS/);
-assert.match(functionalRepairs,/oreQty=10\*multi/);
-assert.match(functionalRepairs,/blueprintQty=20\*multi/);
+/* V173.63 must no longer override equipment-dungeon rewards with materials. */
+assert.doesNotMatch(functionalRepairs,/v17346ShowEquipmentDungeonPreview|v17363ClaimEquipmentDungeon|EQUIPMENT_DROP_TIERS|grantEquipmentMaterials|oreQty=10\*multi|blueprintQty=20\*multi/);
+assert.match(equipmentProgression,/window\.v17346ShowEquipmentDungeonPreview/);
+assert.match(equipmentProgression,/window\.v17346ClaimEquipmentDungeon/);
+assert.match(equipmentProgression,/EQUIPMENT_CHEST_DROP_TABLE/);
+assert.match(equipmentProgression,/id:"equipmentChest"/);
 assert.match(functionalRepairs,/v17363CraftMaterial/);
 assert.match(functionalRepairs,/v132ConsumeStackItem\(source\.id,50\)/);
 assert.match(functionalRepairs,/add\(target,10\)/);
@@ -52,4 +58,4 @@ assert.match(functionalRepairs,/equipment-v17363\.png/);
 assert.match(functionalRepairs,/assets\/ui\/map-return\.png/);
 assert.match(functionalRepairs,/v132GetContentItemDefinition|v132GetContentDefinitions/);
 
-console.log("✓ V173.63 repairs attach after runtime owners and cover the requested live features");
+console.log("✓ V173.63 repairs attach after runtime owners and preserve the equipment-dungeon reward authority");
