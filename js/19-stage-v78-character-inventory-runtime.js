@@ -281,7 +281,15 @@ function schedule(){
 }
 
 function loadSkillProgressionRuntime(){
-    if(document.getElementById("v17364-skill-progression-runtime")){
+    const existing=document.getElementById("v17364-skill-progression-runtime");
+    if(existing){
+        if(existing.dataset.loaded==="1"||window.__v17364SkillProgressionInstalled===true){
+            loadTeamRelicRuntime();
+        }else if(existing.dataset.teamRelicChainArmed!=="1"){
+            existing.dataset.teamRelicChainArmed="1";
+            existing.addEventListener("load",loadTeamRelicRuntime,{once:true});
+            existing.addEventListener("error",loadTeamRelicRuntime,{once:true});
+        }
         return;
     }
 
@@ -289,8 +297,13 @@ function loadSkillProgressionRuntime(){
     script.id="v17364-skill-progression-runtime";
     script.src="js/60-v173.64-skill-progression-rebalance.js?v=173.64";
     script.async=false;
+    script.onload=function(){
+        script.dataset.loaded="1";
+        loadTeamRelicRuntime();
+    };
     script.onerror=function(){
         console.warn("V173.64 skill progression runtime failed to load");
+        loadTeamRelicRuntime();
     };
     document.body.appendChild(script);
 }
@@ -307,13 +320,38 @@ function loadAbyssTwoTierStyle(){
     document.head.appendChild(link);
 }
 
+function loadTeamRelicStyle(){
+    if(document.getElementById("team-relic-system-style")){
+        return;
+    }
+    const link=document.createElement("link");
+    link.id="team-relic-system-style";
+    link.rel="stylesheet";
+    link.href="css/55-team-relic-system.css?v=173.63-relic1";
+    document.head.appendChild(link);
+}
+
+function loadTeamRelicRuntime(){
+    loadTeamRelicStyle();
+    if(document.getElementById("team-relic-system-runtime")){ return; }
+    const script=document.createElement("script");
+    script.id="team-relic-system-runtime";
+    script.src="js/60-team-relic-system.js?v=173.63-relic1";
+    script.async=false;
+    script.onerror=function(){
+        console.warn("Team Relic runtime failed to load");
+    };
+    document.body.appendChild(script);
+}
+
 function loadAbyssTwoTierRuntime(){
     loadAbyssTwoTierStyle();
     const existing=document.getElementById("v174-abyss-two-tier-runtime");
     if(existing){
         if(existing.dataset.loaded==="1"){
             loadSkillProgressionRuntime();
-        }else{
+        }else if(existing.dataset.skillProgressionChainArmed!=="1"){
+            existing.dataset.skillProgressionChainArmed="1";
             existing.addEventListener("load",loadSkillProgressionRuntime,{once:true});
             existing.addEventListener("error",loadSkillProgressionRuntime,{once:true});
         }
@@ -370,8 +408,11 @@ function armV17363FunctionalFixes(){
        so V173.63 always attaches after the actual feature owners exist.
        The two-tier Abyss successor is chained after that late layer so the
        legacy V144/V155 five-emperor roster wrappers cannot retake ownership.
-       V173.64 skill progression is chained last, after the current Abyss owner,
+       V173.64 skill progression is chained after the current Abyss owner,
        so player learning gates never become prerequisites for monster skills.
+       Team Relic is chained last so its trigger hooks attach to the actual
+       final battle / save / home owners, including skill progression wrappers,
+       instead of stale historical wrappers.
     */
     if(document.documentElement.dataset.runtimeReady){
         loadV17363FunctionalFixes();
