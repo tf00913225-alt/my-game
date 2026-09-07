@@ -26,6 +26,8 @@ jobs:
           fi
       - name: Apply V173.63 verified release migration
         run: python .github/scripts/_release-v17363.py
+      - name: Preserve historical test markers and align current release assertions
+        run: python .github/scripts/_align-v17363-current-version-tests.py
       - name: Check release tooling syntax
         run: |
           node --check .github/scripts/release-gate.mjs
@@ -58,6 +60,7 @@ jobs:
         run: |
           rm .github/workflows/_release-v17363.yml
           rm .github/scripts/_release-v17363.py
+          rm .github/scripts/_align-v17363-current-version-tests.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
