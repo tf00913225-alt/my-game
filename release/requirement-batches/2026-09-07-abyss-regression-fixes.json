@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-abyss-regression-fixes",
+  "baseBranch": "dev",
+  "baseCommit": "ee60d9256ce2f17ee60e599eae21721701ea6ddd",
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {"id":"ABYSS-FIX-01","status":"IMPLEMENTED","requirement":"火爆亂擊必須透過既有 V143 Sprite/Canvas renderer 正常顯示正式三目標技能特效，不新增第二套 VFX runtime","evidence":["js/59-abyss-two-tier-runtime.js",".github/scripts/run-abyss-live-browser-qa.mjs"]},
+    {"id":"ABYSS-FIX-02","status":"IMPLEMENTED","requirement":"寶箱與傳送點快速連點不得重複領獎或跨越多關，狀態機必須防重入","evidence":["js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js",".github/scripts/run-abyss-live-browser-qa.mjs"]},
+    {"id":"ABYSS-FIX-03","status":"IMPLEMENTED","requirement":"深淵地圖快速雙點不得造成角色瞬間移動；移動期間只接受第一個有效目的地，完成後才提交座標","evidence":["js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js",".github/scripts/run-abyss-live-browser-qa.mjs"]},
+    {"id":"ABYSS-FIX-04","status":"IMPLEMENTED","requirement":"Lv20 與 Lv40 深淵所有怪物現有血量增加 150%，即總 HP 為原設定的 2.5 倍；攻擊與其他既有強度不變","evidence":["js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js"]},
+    {"id":"ABYSS-FIX-05","status":"IMPLEMENTED","requirement":"Lv40 真境最後一關必須由東帝天尊、天帝天尊、極帝天尊、北帝天尊、南帝天尊五位天尊與五名精英共同降臨戰場，並沿用既有 v155 最終戰規則","evidence":["js/46-v155-dev-fixes.js","js/59-abyss-two-tier-runtime.js","tests/abyss-two-tier-refactor.test.js",".github/scripts/run-abyss-live-browser-qa.mjs"]}
+  ],
+  "automatedVerification": "PENDING_DEV_CI_DEPLOY_AND_LIVE_MOBILE_QA",
+  "verificationRun": null,
+  "visualVerification": "PENDING",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "verifiedOnDevVersion": null,
+  "releasedAs": null
+}
