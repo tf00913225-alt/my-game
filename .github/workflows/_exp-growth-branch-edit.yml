@@ -36,6 +36,13 @@ jobs:
           node tests/v173.43-growth-charge.test.js
           node tests/v170-final-spec-integration.test.js
 
+      - name: Install asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y imagemagick
+          fi
+
       - name: Run project syntax and all Node suites
         run: |
           node .github/scripts/ci.mjs syntax
