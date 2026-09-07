@@ -149,7 +149,7 @@
             if(!spec){ return; }
             if(repairStarterWhiteStats(item)){ changed=true; }
             const iconText=String(item.icon||"");
-            const hasRealArt=/<(?:img|svg)\b/i.test(iconText);
+            const hasRealArt=/<(?:img|svg)\\b/i.test(iconText);
             if(!hasRealArt){
                 item.icon=spec.ring?legacyStarterRingMarkup():artMarkup(spec.path,"white");
                 changed=true;
