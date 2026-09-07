@@ -3,12 +3,12 @@
   "batchId": "2026-09-07-synthesis-vertical-scroll",
   "baseBranch": "dev",
   "officialVersion": "173.62",
-  "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED_PENDING_DEV_VISUAL_VERIFICATION",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "SCROLL-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "裝備冶煉內頁可原生上下捲動到底，不再裁切底部內容",
       "evidence": [
         "css/38-v141-system-expansion.css",
@@ -18,7 +18,7 @@
     },
     {
       "id": "SCROLL-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "材料合成內頁可原生上下捲動到底，不再裁切設計圖升階內容",
       "evidence": [
         "css/38-v141-system-expansion.css",
@@ -27,6 +27,9 @@
       ]
     }
   ],
-  "automatedVerification": "PENDING_CI",
-  "visualVerification": "PENDING_DEV_PREVIEW"
+  "automatedVerification": "DEV_CI_AND_DEPLOY_SHA_VERIFIED",
+  "verificationRun": 34069316752,
+  "finalDevVerificationRun": 34070123412,
+  "visualVerification": "USER_CONFIRMED_DEV_2026-09-07",
+  "promotionApproval": "USER_APPROVED_MAIN_2026-09-07"
 }
