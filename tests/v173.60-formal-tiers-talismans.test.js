@@ -58,6 +58,6 @@ test("rarity visuals use the locked palette and four-symbol border",()=>{
 });
 
 test("release wiring is V173.62",()=>{
-  assert.ok(loader.includes('const V_ASSET_VERSION="173.62";'));
-  assert.ok(html.includes("四象江湖傳 V173.62"));
+  assert.ok(loader.includes('const V_ASSET_VERSION="173.63";'));
+  assert.ok(html.includes("四象江湖傳 V173.63"));
 });

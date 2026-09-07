@@ -107,6 +107,12 @@ function gitShowJson(baseSha,relative){
     return JSON.parse(text);
   }catch{return null;}
 }
+function checkReleaseNotes(config){
+  const relative=config.release.releaseNotesFile||'CHANGELOG.md';
+  const text=readText(ROOT,relative);
+  const pattern=new RegExp(`^##\\s+V${escapeRegex(config.version)}(?:\\s|$)`,'m');
+  if(!pattern.test(text)) fail(`Release notes missing V${config.version} entry in ${relative}.`);
+}
 function checkVersionAdvanceGuard(config,summary){
   const previous=gitShowJson(process.env.CI_BASE_SHA||'','release/release.json');
   if(!previous) return;
@@ -157,6 +163,7 @@ async function main(){
   const summary=validateRequirements(config.requirements);
   if(mode==='ci'){
     checkVersionMarkers(ROOT,config);
+    checkReleaseNotes(config);
     checkDeprecated(ROOT,config.deprecated);
     checkVersionAdvanceGuard(config,summary);
     console.log(`✓ Release source coherence: V${config.version}, cache ${config.cacheVersion}.`);
@@ -165,6 +172,7 @@ async function main(){
   }
   if(mode==='release-ready'){
     checkVersionMarkers(ROOT,config);
+    checkReleaseNotes(config);
     checkDeprecated(ROOT,config.deprecated);
     ensureReleaseReady(config,summary);
     console.log(`✓ Final release gate: ${summary.total}/${summary.total} VERIFIED.`);
@@ -172,6 +180,7 @@ async function main(){
   }
   if(mode==='prepare-artifact'){
     checkVersionMarkers(ROOT,config);
+    checkReleaseNotes(config);
     checkDeprecated(ROOT,config.deprecated);
     const deployRoot=path.resolve(process.env.DEPLOY_DIR||path.join(ROOT,'_deploy'));
     checkVersionMarkers(deployRoot,config);

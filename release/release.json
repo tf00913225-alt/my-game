@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "version": "173.62",
-  "cacheVersion": "173.62",
-  "status": "BLOCKED",
+  "version": "173.63",
+  "cacheVersion": "173.63",
+  "status": "READY",
   "loaderFile": "js/20-anonymous-20.js",
   "requirementsFile": "release/requirements.json",
   "deprecatedCodeFile": "release/deprecated-code.json",
@@ -15,5 +15,6 @@
     "js/19-stage-v78-character-inventory-runtime.js",
     "js/20-anonymous-20.js",
     "js/01-stage-v8-touch-lock.js"
-  ]
+  ],
+  "releaseNotesFile": "CHANGELOG.md"
 }

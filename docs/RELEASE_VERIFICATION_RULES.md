@@ -109,3 +109,12 @@ Cache、版本、Service Worker 更新只允許處理靜態資源 Cache。禁止
 ## 19. 人工驗收仍不可省略
 
 CI 無法取代所有 UI／手機實機、操作手感、視覺完整性、使用者主觀確認；這些項目需在 Requirement Checklist 中清楚標明驗證方式。遠端 GitHub CI 也無法看見開發者尚未 commit 的本機工作目錄，因此「功能改了但沒進 commit」仍必須由開發代理在 push 前以 `git status`／`git diff --cached`／commit diff 進行工作區驗證。
+
+
+## 正式版本與 CHANGELOG 對應規則
+
+- 正式 Game Version 只代表已完成 Requirement Verification、可對外辨識的發布批次。
+- 每次正式版本變更都必須同步更新 `CHANGELOG.md`，新增 `## V<版本號>` 條目。
+- 該條目必須說明本版本實際修正／新增內容，並列出對應 Requirement Batch。
+- 版本號不得只作為 cache busting 或畫面裝飾；若沒有對應 CHANGELOG，Release Gate 必須失敗。
+- Game Version 與 Cache Version 仍需同步，但兩者用途不同：Game Version 用於版本追蹤，Cache Version 用於資源失效。

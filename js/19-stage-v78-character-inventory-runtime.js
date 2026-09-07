@@ -288,7 +288,7 @@ function loadV17363FunctionalFixes(){
 
     const script=document.createElement("script");
     script.id="v17363-functional-fixes-runtime";
-    script.src="js/58-v173.63-functional-fixes.js?v=173.62";
+    script.src="js/58-v173.63-functional-fixes.js?v=173.63";
     script.async=false;
     script.onerror=function(){
         console.warn("V173.63 functional fixes failed to load");
