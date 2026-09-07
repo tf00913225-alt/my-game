@@ -128,12 +128,18 @@ try{
         if(typeof showPage==='function'){showPage('dungeon');}
         const roster=v174AbyssBuildRoster(40,0,0);
         const started=window.v132LaunchDungeonBattle(roster,()=>{});
-        return {started:!!started,rosterCount:roster.length,skillVolumeScale:window.v141Audio?.skillVolumeScale||null};
+        return {
+            started:!!started,
+            rosterCount:roster.length,
+            skillVolumeScale:window.v141Audio?.skillVolumeScale||null,
+            combatFeedbackVolumeScale:window.v141Audio?.combatFeedbackVolumeScale||null
+        };
     })()`);
     evidence.checks.bootstrap=bootstrap;
     assert.equal(bootstrap.started,true,"Shared dungeon launcher did not start a real battle");
     assert.equal(bootstrap.rosterCount,10,"Abyss QA roster must contain 10 enemies");
     assert.equal(bootstrap.skillVolumeScale,2,"Deployed skill SFX multiplier must be exactly 2.0 (+100%)");
+    assert.equal(bootstrap.combatFeedbackVolumeScale,2,"Deployed general battle feedback multiplier must be exactly 2.0 (+100%)");
 
     await waitFor(client,"document.getElementById('battlePage')?.classList.contains('active')&&document.getElementById('battlePlayerCard0')&&document.querySelector('#battlePlayerCard0 .hp-bar')&&document.querySelector('#battleMonster0 .monster-hp')","real battle resource bars",15000);
 
@@ -235,7 +241,8 @@ try{
             modalDisplay:modalStyle?.display||null,
             panelDisplay:panelStyle?.display||null,
             modalBodyConnected:!!modalBody?.isConnected,
-            skillVolumeScale:window.v141Audio?.skillVolumeScale||null
+            skillVolumeScale:window.v141Audio?.skillVolumeScale||null,
+            combatFeedbackVolumeScale:window.v141Audio?.combatFeedbackVolumeScale||null
         };
     })()`);
     evidence.checks.elementBoxLayers=elementBoxLayers;
@@ -252,6 +259,7 @@ try{
     assert.notEqual(elementBoxLayers.panelDisplay,"none","The real Element Box settings panel must not be display:none");
     assert.equal(elementBoxLayers.modalBodyConnected,true,"The shared modal body must remain connected");
     assert.equal(elementBoxLayers.skillVolumeScale,2,"Live audio engine must expose the 2.0 skill SFX scale");
+    assert.equal(elementBoxLayers.combatFeedbackVolumeScale,2,"Live audio engine must expose the 2.0 general combat feedback scale");
 
     const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
     if(screenshot.data){ fs.writeFileSync(path.join(artifactDir,"battle-layer-element-box-mobile.png"),Buffer.from(screenshot.data,"base64")); }
