@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import path from "node:path";
+import http from "node:http";
 import {spawn,spawnSync} from "node:child_process";
 
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -20,13 +21,28 @@ function chromeBinary(){
     if(!binary){ throw new Error("Headless Chrome/Chromium is required for skill progression browser QA."); }
     return binary;
 }
+function httpText(url){
+    return new Promise((resolve,reject)=>{
+        const request=http.get(url,{headers:{"cache-control":"no-cache"}},response=>{
+            let body="";
+            response.setEncoding("utf8");
+            response.on("data",chunk=>{ body+=chunk; });
+            response.on("end",()=>{
+                if(response.statusCode>=200&&response.statusCode<300){ resolve(body); }
+                else{ reject(new Error(`HTTP ${response.statusCode}`)); }
+            });
+        });
+        request.setTimeout(3000,()=>request.destroy(new Error("HTTP request timeout")));
+        request.on("error",reject);
+    });
+}
 async function waitForHttp(url,timeoutMs=15000){
     const started=Date.now();
     let lastError=null;
     while(Date.now()-started<timeoutMs){
         try{
-            const response=await fetch(url,{cache:"no-store"});
-            if(response.ok){ return; }
+            await httpText(url);
+            return;
         }catch(error){ lastError=error; }
         await sleep(120);
     }
@@ -37,8 +53,7 @@ async function waitForJson(url,timeoutMs=15000){
     let lastError=null;
     while(Date.now()-started<timeoutMs){
         try{
-            const response=await fetch(url,{cache:"no-store"});
-            if(response.ok){ return await response.json(); }
+            return JSON.parse(await httpText(url));
         }catch(error){ lastError=error; }
         await sleep(120);
     }
