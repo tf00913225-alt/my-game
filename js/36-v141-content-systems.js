@@ -652,7 +652,11 @@
             if(title){ title.textContent="合成"; }
             if(modal){ modal.classList.add("show","v141-synthesis-modal"); }
             ensureEquipmentUids();
-            renderSynthesis();
+            // Route the very first open through the current public renderer.
+            // Calling the closure directly bypasses later presentation owners
+            // and is why equipment/talisman art only appears after a click.
+            if(typeof window.v141RenderSynthesis==="function"){ window.v141RenderSynthesis(); }
+            else{ renderSynthesis(); }
         };
     }
     if(typeof closeHomeFeature==="function"){

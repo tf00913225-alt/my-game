@@ -479,8 +479,12 @@ window.v17363OpenMaterialSynthesis=function(){
 };
 if(originalRenderSynthesis){
     window.v141RenderSynthesis=function(){
+        // Presentation data must be hydrated before V143 builds the first icon picker.
+        if(typeof window.v17346SyncFourElementSets==="function"){try{window.v17346SyncFourElementSets();}catch(_){}}
+        syncCanonicalItemArt();
         const result=originalRenderSynthesis.apply(this,arguments);
-        ensureMaterialTab();if(materialTabActive){renderMaterialSynthesis();}scheduleRepairs();return result;
+        ensureMaterialTab();if(materialTabActive){renderMaterialSynthesis();}
+        repairSynthesisIcons();maximizeSynthesisPanel();scheduleRepairs();return result;
     };
 }
 if(originalSwitchSynthesis){
