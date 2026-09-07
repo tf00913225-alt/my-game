@@ -414,7 +414,7 @@
         if(!run.chestSpawned||run.chestClaimed||run.phase!=="chest"){ return ""; }
         const pos=BOSS_POSITIONS[run.regionIndex]||BOSS_POSITIONS[0];
         const title=isBossStage(run)?"帝王寶箱":"深淵寶箱";
-        return '<button type="button" class="v141-abyss-chest v174-abyss-chest" style="left:'+pos[0]+'%;top:'+Math.min(61,pos[1]+30)+'%" onclick="event.stopPropagation();v174AbyssClaimChest()"><i></i><span>'+title+'・待領</span></button>';
+        return '<button type="button" class="v141-abyss-chest v174-abyss-chest" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v174AbyssClaimChest()"><i></i><span>'+title+'・待領</span></button>';
     }
 
     function portalLabel(run,region){
@@ -607,13 +607,11 @@
     function startEncounter(){
         const run=currentRun();
         if(!run||run.phase!=="ready"){ return false; }
-        const pos=BOSS_POSITIONS[run.regionIndex]||BOSS_POSITIONS[0];
-        const approachY=Math.min(84,pos[1]+31);
-        movePlayer(pos[0],approachY,function(){
-            if(isBossStage(run)){ confirmBossAndLaunch(); }
-            else{ launchCurrentEncounter(); }
-        });
-        return true;
+        /* Clicking an encounter is an action, not a map-movement command.
+           The enemy marker itself already identifies the target, so launch the
+           battle directly instead of making the avatar take a cosmetic step. */
+        if(isBossStage(run)){ return confirmBossAndLaunch(); }
+        return launchCurrentEncounter();
     }
 
     function contentDefinitions(){
@@ -713,7 +711,7 @@
             return false;
         }
         const pos=BOSS_POSITIONS[run.regionIndex]||BOSS_POSITIONS[0];
-        movePlayer(pos[0],Math.min(84,pos[1]+32),function(){
+        movePlayer(pos[0],pos[1],function(){
             const reward=rewardDescriptor(run);
             if(!canStoreReward(reward)){
                 if(typeof alert==="function"){ alert("背包空間不足，寶箱尚未領取。請整理背包後再試一次。"); }
