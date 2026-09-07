@@ -204,41 +204,53 @@ try{
     })()`);
     evidence.checks.elementBoxOpenRoute=opened;
     assert.ok(opened,"No Element Box settings opener is available");
-    await waitFor(client,"document.body.classList.contains('v162-element-box-settings-open')","Element Box focus class",3000);
+    await waitFor(
+        client,
+        "document.body.classList.contains('v162-element-box-settings-open')&&document.getElementById('homeFeatureModal')?.classList.contains('show')&&document.getElementById('autoBattleSettingsPanel')?.parentElement?.id==='homeFeatureModalBody'",
+        "real Element Box modal ownership",
+        3000
+    );
 
     const elementBoxLayers=await client.eval(`(()=>{
         const stage=document.getElementById('v143-skill-stage');
+        const gameStage=document.getElementById('game-stage');
         const modal=document.getElementById('homeFeatureModal');
         const panel=document.getElementById('autoBattleSettingsPanel');
         const modalBody=document.getElementById('homeFeatureModalBody');
         const stageStyle=stage?getComputedStyle(stage):null;
+        const gameStageStyle=gameStage?getComputedStyle(gameStage):null;
         const modalStyle=modal?getComputedStyle(modal):null;
         const panelStyle=panel?getComputedStyle(panel):null;
-        const modalRect=modal?.getBoundingClientRect();
-        const panelRect=panel?.getBoundingClientRect();
-        const bodyRect=modalBody?.getBoundingClientRect();
-        const modalVisible=!!(modal&&modalStyle&&modalStyle.display!=='none'&&modalRect&&modalRect.width>0&&modalRect.height>0);
-        const panelVisible=!!(panel&&panelStyle&&panelStyle.display!=='none'&&panelRect&&panelRect.width>0&&panelRect.height>0);
         return {
             bodyFocus:document.body.classList.contains('v162-element-box-settings-open'),
             stageStillExists:!!stage,
             stageVisibility:stageStyle?.visibility||null,
             stageOpacity:stageStyle?.opacity||null,
+            stageZ:Number(stageStyle?.zIndex||0),
+            gameStageZ:Number(gameStageStyle?.zIndex||0),
+            modalShow:!!modal?.classList.contains('show'),
+            modalConnected:!!modal?.isConnected,
+            panelConnected:!!panel?.isConnected,
+            panelParent:panel?.parentElement?.id||null,
             modalDisplay:modalStyle?.display||null,
             panelDisplay:panelStyle?.display||null,
-            modalWidth:modalRect?.width||0,modalHeight:modalRect?.height||0,
-            panelWidth:panelRect?.width||0,panelHeight:panelRect?.height||0,
-            modalBodyWidth:bodyRect?.width||0,modalBodyHeight:bodyRect?.height||0,
-            visibleSurface:modalVisible?'homeFeatureModal':panelVisible?'autoBattleSettingsPanel':null,
+            modalBodyConnected:!!modalBody?.isConnected,
             skillVolumeScale:window.v141Audio?.skillVolumeScale||null
         };
     })()`);
     evidence.checks.elementBoxLayers=elementBoxLayers;
     assert.equal(elementBoxLayers.bodyFocus,true,"Element Box focus class must be active");
     assert.equal(elementBoxLayers.stageStillExists,true,"V143 lifecycle stage must remain mounted while its presentation is suppressed");
-    assert.equal(elementBoxLayers.stageVisibility,"hidden","Skill presentation must be hidden behind Element Box settings");
+    assert.equal(elementBoxLayers.stageVisibility,"hidden","Skill presentation must be hidden while Element Box settings owns focus");
     assert.equal(Number(elementBoxLayers.stageOpacity),0,"Skill presentation opacity must be zero while Element Box settings owns focus");
-    assert.ok(elementBoxLayers.visibleSurface,"The real Element Box settings surface must remain visibly rendered");
+    assert.ok(elementBoxLayers.gameStageZ>elementBoxLayers.stageZ,"Game/Element Box stacking context must be above the document-level V143 skill stage");
+    assert.equal(elementBoxLayers.modalShow,true,"The shared Element Box modal must be in its real open state");
+    assert.equal(elementBoxLayers.modalConnected,true,"The shared Element Box modal must remain connected to the document");
+    assert.equal(elementBoxLayers.panelConnected,true,"The real Element Box settings panel must remain connected to the document");
+    assert.equal(elementBoxLayers.panelParent,"homeFeatureModalBody","The real Element Box settings panel must be borrowed into the shared modal body");
+    assert.notEqual(elementBoxLayers.modalDisplay,"none","The shared Element Box modal must not be display:none");
+    assert.notEqual(elementBoxLayers.panelDisplay,"none","The real Element Box settings panel must not be display:none");
+    assert.equal(elementBoxLayers.modalBodyConnected,true,"The shared modal body must remain connected");
     assert.equal(elementBoxLayers.skillVolumeScale,2,"Live audio engine must expose the 2.0 skill SFX scale");
 
     const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
