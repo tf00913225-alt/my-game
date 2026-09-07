@@ -1,0 +1,9 @@
+/* =====================================================
+   V174 — two-tier Abyss mobile layout correction
+   The formal 16:9 cover cards live inside a vertical flex list. They must keep
+   their aspect-ratio-derived height instead of shrinking to zero on the
+   1080x1920 virtual stage when the physical viewport is narrower.
+===================================================== */
+#game-stage .v174-abyss-card{
+    flex:0 0 auto !important;
+}
