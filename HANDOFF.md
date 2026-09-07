@@ -1,3 +1,10 @@
+## 2026-09-07 全遊戲手勢／圖片長按／技能 VFX owner 收斂（dev）
+- `js/01-stage-v8-touch-lock.js` 是全遊戲瀏覽器手勢唯一 owner：既有單指 scroll whitelist 保留，但兩指以上在任何 `#game-stage` 內位置一律阻止瀏覽器 pinch zoom；非文字輸入 UI 的 contextmenu／dragstart／selectstart 亦全域阻止。
+- `css/00-main.css` 是圖片／SVG／Canvas 原生長按與拖曳的基礎 CSS owner；不使用 `pointer-events:none`，避免破壞正常遊戲點擊。
+- `index.html` 的直接 touch-lock 載入已跟現行 Cache Version 173.62 對齊，`release/release.json` 將該檔納入 managed cache references，避免之後修改 touch owner 卻仍載入舊 query。
+- 技能演出仍由 `js/37-v142-skill-animation.js`（gate／時序）＋ `js/39-v143-skill-animation.js`（Sprite/VFX renderer）唯一負責。`js/54-v173.51-battle-qa.js` 與 `css/53-v173.51-qa.css` 不再碰 `#v143-skill-stage` visibility，避免終結一擊時 battleActive 先切換而把尚未結束的 VFX 藏掉。
+- Game/Cache Version 維持 173.62；本批需經 Repository checks、DEV deployed SHA 驗證與手機實機長按／pinch／VFX 驗收後才可標 VERIFIED。
+
 ## 2026-09-07 合成首次開頁 Icon 時序修復（dev）
 - 使用者實機確認裝備／符咒 icon 在首次打開合成頁仍需點一下才顯示。根因是 `js/36-v141-content-systems.js` 的合成入口直接呼叫 closure `renderSynthesis()`，繞過 V143/V146/V173.63 的最終 public renderer。
 - 合成入口改為優先呼叫 `window.v141RenderSynthesis()`；`js/58-v173.63-functional-fixes.js` 在正式 render 前先同步 equipment/static item presentation，render 後立即 repair picker，不再把首次 icon 顯示依賴點擊或下一次 rerender。

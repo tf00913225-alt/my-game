@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-global-ui-gesture-vfx-lock",
+  "baseBranch": "dev",
+  "baseCommit": "91eafa0b2efe9ac50f88787fa8d8dd60c7e9d61c",
+  "officialVersion": "173.62",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED_PENDING_DEV_VISUAL_VERIFICATION",
+  "requirements": [
+    {
+      "id": "GLOBAL-UI-01",
+      "status": "IMPLEMENTED",
+      "requirement": "所有正式遊戲 UI 禁止瀏覽器 pinch zoom；單指合法捲動仍正常",
+      "evidence": [
+        "js/01-stage-v8-touch-lock.js",
+        "index.html",
+        "tests/ui-global-browser-interaction-lock.test.js"
+      ]
+    },
+    {
+      "id": "GLOBAL-UI-02",
+      "status": "IMPLEMENTED",
+      "requirement": "所有正式遊戲圖片／視覺素材長按不出現另存、開新分頁、搜尋、分享等原生反應，且不得原生拖曳／選取",
+      "evidence": [
+        "js/01-stage-v8-touch-lock.js",
+        "css/00-main.css",
+        "UI_GUIDELINES.md",
+        "tests/ui-global-browser-interaction-lock.test.js"
+      ]
+    },
+    {
+      "id": "GLOBAL-UI-03",
+      "status": "IMPLEMENTED",
+      "requirement": "技能 VFX 不再被角色管理 QA visibility 規則隱藏，終結一擊亦由 V142/V143 完整掌控演出",
+      "evidence": [
+        "js/54-v173.51-battle-qa.js",
+        "css/53-v173.51-qa.css",
+        "js/39-v143-skill-animation.js",
+        "tests/v173.51-qa.test.js",
+        "tests/ui-global-browser-interaction-lock.test.js"
+      ]
+    }
+  ],
+  "automatedVerification": "PENDING_CI",
+  "visualVerification": "PENDING_DEV_PHONE_TEST"
+}
