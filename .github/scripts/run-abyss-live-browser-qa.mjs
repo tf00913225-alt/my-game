@@ -159,8 +159,8 @@ if(!patched.includes(bossLauncherNeedle)){
 patched=patched.replace(bossLauncherNeedle,bossLauncherReplacement);
 
 /* The user's regression was visual: skill text still appeared while the V143
-   effect did not. Exercise the real shared dungeon battle launcher, trigger a
-   real formal Sprite skill through the production badge boundary, and require
+   effect did not. Exercise the real shared dungeon battle launcher, preserve a
+   realistic queued target through the production badge boundary, and require
    an actually visible V143 stage + sprite with non-zero geometry. */
 const vfxNeedle=`    assert.equal(lv40.final.eliteCount,9);
 
@@ -180,7 +180,16 @@ const vfxReplacement=`    assert.equal(lv40.final.eliteCount,9);
     await waitFor(client,"document.getElementById('battlePage')?.classList.contains('active')&&document.getElementById('battlePlayerCard0')&&document.getElementById('battleMonster0')","real Abyss battle cards",15000);
     const vfxBefore=await client.eval(\`typeof v143GetAnimationDiagnostics==='function'?v143GetAnimationDiagnostics():null\`);
     assert.ok(vfxBefore,"V143 animation diagnostics are unavailable in the deployed battle runtime");
-    await client.eval(\`(()=>{if(typeof showSkillNameBadge!=='function')return false;showSkillNameBadge('火焰斬','fire',0);return true;})()\`);
+    const badgeTriggered=await client.eval(\`(()=>{
+        if(typeof showSkillNameBadge!=='function')return false;
+        if(typeof queuedPlayerActions!=='undefined'){
+            queuedPlayerActions[0]={action:'flameSlash',target:0,targetAlly:null};
+        }
+        if(typeof selectedMonster!=='undefined'){selectedMonster=0;}
+        showSkillNameBadge('火焰斬','fire',0);
+        return true;
+    })()\`);
+    assert.equal(badgeTriggered,true,"Production skill badge boundary is unavailable");
     await sleep(140);
     const vfx=await client.eval(\`(()=>{
         const stage=document.getElementById('v143-skill-stage');
