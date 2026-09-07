@@ -9,7 +9,7 @@ const needle='    window.v133GetHighestCreatedCharacterLevel=()=>${Number(level)
 const replacement='    window.v133GetHighestCreatedCharacterLevel=()=>${Number(level)};\n'+
 '    const creationPage=document.getElementById("creationPage");\n'+
 '    if(creationPage){\n'+
-'        creationPage.style.display="none";\n'+
+'        creationPage.style.setProperty("display","none","important");\n'+
 '        creationPage.hidden=true;\n'+
 '        creationPage.setAttribute("aria-hidden","true");\n'+
 '    }\n'+
@@ -20,7 +20,15 @@ const replacement='    window.v133GetHighestCreatedCharacterLevel=()=>${Number(l
 '    const stage=document.getElementById("game-stage");\n'+
 '    if(stage){ stage.classList.remove("creation-native-active"); }\n'+
 '    const app=document.getElementById("app");\n'+
-'    if(app){ app.inert=false; app.removeAttribute("aria-hidden"); }\n'+
+'    if(app){\n'+
+'        app.inert=false;\n'+
+'        app.removeAttribute("aria-hidden");\n'+
+'        app.style.setProperty("display","block","important");\n'+
+'        app.style.removeProperty("visibility");\n'+
+'        app.style.removeProperty("opacity");\n'+
+'    }\n'+
+'    const gameContent=document.getElementById("game-content");\n'+
+'    if(gameContent){ gameContent.style.setProperty("display","block","important"); }\n'+
 '    return true;';
 
 if(!source.includes(needle)){
