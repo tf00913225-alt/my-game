@@ -88,6 +88,124 @@ patched=patched
     .replace(metricNeedle,metricReplacement)
     .replace(footprintNeedle,footprintReplacement);
 
+/* Encounter taps are actions, not pathing commands. Preserve the avatar's
+   exact map coordinates and remember the encounter marker position so the
+   victory chest can be verified at the same spot. */
+const encounterTapNeedle=`        v174AbyssSelectDifficulty(20);
+        v174AbyssStartEncounter();
+        await new Promise(resolve=>setTimeout(resolve,1800));
+`;
+const encounterTapReplacement=`        v174AbyssSelectDifficulty(20);
+        const beforeRun=v174AbyssGetRunState(20);
+        const encounter=document.querySelector('.v174-abyss-encounter');
+        const encounterPosition={left:encounter?.style.left||null,top:encounter?.style.top||null};
+        v174AbyssStartEncounter();
+        const afterRun=v174AbyssGetRunState(20);
+        window.__abyssQaEncounterTap={before:{x:beforeRun.x,y:beforeRun.y},after:{x:afterRun.x,y:afterRun.y},encounterPosition};
+        await new Promise(resolve=>setTimeout(resolve,1800));
+`;
+const preLaunchAssertNeedle=`    assert.deepEqual([preLaunch.hps[0],preLaunch.hps[5]],[386,1236]);
+
+    const afterWin=await client.eval(\`(()=>{
+`;
+const preLaunchAssertReplacement=`    assert.deepEqual([preLaunch.hps[0],preLaunch.hps[5]],[386,1236]);
+    const encounterTap=await client.eval(\`window.__abyssQaEncounterTap\`);
+    evidence.checks.encounterTap=encounterTap;
+    assert.deepEqual(encounterTap.after,encounterTap.before,"Tapping an Abyss encounter must not move the map avatar");
+    assert.ok(encounterTap.encounterPosition.left&&encounterTap.encounterPosition.top,"Encounter marker position must be measurable");
+
+    const afterWin=await client.eval(\`(()=>{
+`;
+const afterWinReturnNeedle=`        const run=v174AbyssGetRunState(20);
+        return {run,chest:!!document.querySelector('.v174-abyss-chest'),portal:!!document.querySelector('.v174-abyss-portal'),pending:!!document.querySelector('.v174-abyss-node.current.pending')};
+`;
+const afterWinReturnReplacement=`        const run=v174AbyssGetRunState(20);
+        const chest=document.querySelector('.v174-abyss-chest');
+        return {run,chest:!!chest,chestPosition:chest?{left:chest.style.left,top:chest.style.top}:null,portal:!!document.querySelector('.v174-abyss-portal'),pending:!!document.querySelector('.v174-abyss-node.current.pending')};
+`;
+const afterWinAssertNeedle=`    assert.equal(afterWin.chest,true,"Victory must spawn a chest");
+    assert.equal(afterWin.portal,false,"Portal must not render before chest claim");
+`;
+const afterWinAssertReplacement=`    assert.equal(afterWin.chest,true,"Victory must spawn a chest");
+    assert.deepEqual(afterWin.chestPosition,encounterTap.encounterPosition,"Victory chest must drop at the defeated encounter's exact map position");
+    assert.equal(afterWin.portal,false,"Portal must not render before chest claim");
+`;
+
+if(!patched.includes(encounterTapNeedle)||!patched.includes(preLaunchAssertNeedle)||!patched.includes(afterWinReturnNeedle)||!patched.includes(afterWinAssertNeedle)){
+    throw new Error("Live Abyss QA could not install encounter-tap/chest-position regression checks.");
+}
+patched=patched
+    .replace(encounterTapNeedle,encounterTapReplacement)
+    .replace(preLaunchAssertNeedle,preLaunchAssertReplacement)
+    .replace(afterWinReturnNeedle,afterWinReturnReplacement)
+    .replace(afterWinAssertNeedle,afterWinAssertReplacement);
+
+/* The user's regression was visual: skill text still appeared while the V143
+   effect did not. Exercise the real shared dungeon battle launcher, trigger a
+   real formal Sprite skill through the production badge boundary, and require
+   an actually visible V143 stage + sprite with non-zero geometry. */
+const vfxNeedle=`    assert.equal(lv40.final.eliteCount,9);
+
+    const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
+`;
+const vfxReplacement=`    assert.equal(lv40.final.eliteCount,9);
+
+    const vfxLaunch=await client.eval(\`(()=>{
+        if(typeof window.__abyssQaOriginalLauncher!=='function'){return {started:false,reason:'missing-original-launcher'};}
+        if(typeof battleActive!=='undefined'&&battleActive){return {started:false,reason:'battle-already-active'};}
+        const roster=v174AbyssBuildRoster(20,0,0);
+        const started=window.__abyssQaOriginalLauncher(roster,()=>{});
+        return {started:!!started};
+    })()\`);
+    assert.equal(vfxLaunch.started,true,\`Real Abyss battle could not start for VFX QA: \${vfxLaunch.reason||'unknown'}\`);
+    await waitFor(client,"document.getElementById('battlePage')?.classList.contains('active')&&document.getElementById('battlePlayerCard0')&&document.getElementById('battleMonster0')","real Abyss battle cards",15000);
+    const vfxBefore=await client.eval(\`typeof v143GetAnimationDiagnostics==='function'?v143GetAnimationDiagnostics():null\`);
+    assert.ok(vfxBefore,"V143 animation diagnostics are unavailable in the deployed battle runtime");
+    await client.eval(\`(()=>{if(typeof showSkillNameBadge!=='function')return false;showSkillNameBadge('火焰斬','fire',0);return true;})()\`);
+    await sleep(140);
+    const vfx=await client.eval(\`(()=>{
+        const stage=document.getElementById('v143-skill-stage');
+        const sprite=stage?.querySelector('.v143-vfx-sprite');
+        const stageStyle=stage?getComputedStyle(stage):null;
+        const spriteStyle=sprite?getComputedStyle(sprite):null;
+        const stageRect=stage?.getBoundingClientRect();
+        const spriteRect=sprite?.getBoundingClientRect();
+        return {
+            stage:!!stage,
+            display:stageStyle?.display||null,
+            visibility:stageStyle?.visibility||null,
+            opacity:stageStyle?.opacity||null,
+            stageWidth:stageRect?.width||0,stageHeight:stageRect?.height||0,
+            sprite:!!sprite,
+            spriteDisplay:spriteStyle?.display||null,
+            spriteVisibility:spriteStyle?.visibility||null,
+            spriteOpacity:spriteStyle?.opacity||null,
+            spriteWidth:spriteRect?.width||0,spriteHeight:spriteRect?.height||0,
+            diagnostics:typeof v143GetAnimationDiagnostics==='function'?v143GetAnimationDiagnostics():null
+        };
+    })()\`);
+    evidence.checks.liveSkillVfx=vfx;
+    assert.equal(vfx.stage,true,"Skill cast did not create the V143 stage");
+    assert.notEqual(vfx.display,"none","V143 stage is display:none during a real skill cast");
+    assert.equal(vfx.visibility,"visible","V143 stage is hidden during a real skill cast");
+    assert.ok(Number(vfx.opacity)>0,"V143 stage opacity is zero during a real skill cast");
+    assert.ok(vfx.stageWidth>0&&vfx.stageHeight>0,"V143 stage has no visible geometry");
+    assert.equal(vfx.sprite,true,"Flame Slash did not create its formal Sprite VFX");
+    assert.notEqual(vfx.spriteDisplay,"none","Formal skill Sprite is display:none");
+    assert.equal(vfx.spriteVisibility,"visible","Formal skill Sprite is hidden");
+    assert.ok(Number(vfx.spriteOpacity)>0,"Formal skill Sprite opacity is zero");
+    assert.ok(vfx.spriteWidth>0&&vfx.spriteHeight>0,"Formal skill Sprite has no visible geometry");
+    assert.ok((vfx.diagnostics?.started||0)>(vfxBefore.started||0),"V143 did not record the real skill animation start");
+    const vfxShot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
+    if(vfxShot.data){ fs.writeFileSync(path.join(artifactDir,"abyss-live-skill-vfx.png"),Buffer.from(vfxShot.data,"base64")); }
+
+    const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
+`;
+if(!patched.includes(vfxNeedle)){
+    throw new Error("Live Abyss QA could not install real-skill VFX verification.");
+}
+patched=patched.replace(vfxNeedle,vfxReplacement);
+
 const target=path.join(os.tmpdir(),`abyss-live-browser-qa-saved-${process.pid}.mjs`);
 fs.writeFileSync(target,patched,"utf8");
 await import(pathToFileURL(target).href+`?run=${Date.now()}`);
