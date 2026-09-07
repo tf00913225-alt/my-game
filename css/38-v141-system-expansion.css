@@ -926,8 +926,10 @@
 #game-stage .v141-synthesis-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;}
 #game-stage .v141-synthesis-tabs button{min-height:38px;padding:4px 2px;border:1px solid #69502e;border-radius:7px;color:#b5a58c;background:#17120d;font-size:12px;}
 #game-stage .v141-synthesis-tabs button.active{color:#231607;border-color:#d4a14d;background:linear-gradient(180deg,#f0ca79,#b97d2f);font-weight:900;}
-#game-stage .v141-synthesis-body{flex:1;min-height:0;overflow:hidden;}
-#game-stage .v141-synthesis-card,#game-stage .v141-synthesis-empty{height:100%;padding:10px;border:1px solid #785a31;border-radius:10px;background:linear-gradient(155deg,#21180f,#0e0b08);box-sizing:border-box;}
+#game-stage .v141-synthesis-body{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-gutter:stable;}
+#game-stage .v141-synthesis-card,#game-stage .v141-synthesis-empty{min-height:100%;padding:10px;border:1px solid #785a31;border-radius:10px;background:linear-gradient(155deg,#21180f,#0e0b08);box-sizing:border-box;}
+#game-stage .v141-synthesis-card{height:auto;}
+#game-stage .v141-synthesis-empty{height:100%;}
 #game-stage .v141-synthesis-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#d5c5a7;text-align:center;}
 #game-stage .v141-synthesis-empty small{margin-top:5px;color:#958871;}
 #game-stage .v141-synthesis-card label{display:grid;grid-template-columns:118px minmax(0,1fr);gap:5px;align-items:center;margin-bottom:7px;color:#d8c6a5;font-size:13px;}
@@ -1018,7 +1020,7 @@
 #game-stage .v141-abyss-intro p{max-width:330px;color:#ad9e85;font-size:14px;line-height:1.6;}
 #game-stage .v141-abyss-intro button{min-width:150px;border:1px solid #d1a04c;border-radius:8px;color:#261707;background:linear-gradient(180deg,#f0cb79,#b77a2d);font-weight:900;}
 
-/* ----- Small-height phones: compress, never introduce synthesis/shop scroll ----- */
+/* ----- Small-height phones: compress while the synthesis body remains the vertical scroll owner. ----- */
 @media (max-height:720px){
     #game-stage #inventoryPage .inventory-character-stage{--inventory-stage-height:205px !important;}
     #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{height:98dvh !important;max-height:98dvh !important;padding:8px !important;}
@@ -1058,7 +1060,7 @@
 #game-stage .v17358-section-title>span{color:#aa9a7e;font-size:10px;line-height:14px;}
 #game-stage .v17358-reforge-material,
 #game-stage .v17358-reforge-lock-panel{padding:8px;border:1px solid rgba(177,128,57,.62);border-radius:9px;background:linear-gradient(180deg,rgba(36,27,16,.82),rgba(13,10,7,.9));}
-#game-stage .v17358-reforge-tiers{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:0 0 4px;overscroll-behavior-x:contain;touch-action:pan-x;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:thin;}
+#game-stage .v17358-reforge-tiers{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:0 0 4px;overscroll-behavior-x:contain;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:thin;}
 #game-stage .v17358-reforge-tier{display:flex!important;flex:0 0 142px!important;min-width:142px!important;min-height:58px!important;flex-direction:column;align-items:flex-start!important;justify-content:center!important;gap:1px;padding:6px 8px!important;border:1px solid #72552d!important;border-radius:7px!important;background:linear-gradient(180deg,#291f13,#110d08)!important;color:#e8d6ae!important;text-align:left!important;scroll-snap-align:start;}
 #game-stage .v17358-reforge-tier.active{border-color:#efbd55!important;background:linear-gradient(180deg,#5b3d16,#231506)!important;box-shadow:inset 0 0 0 1px rgba(255,224,151,.32),0 0 9px rgba(224,161,56,.22)!important;}
 #game-stage .v17358-reforge-tier>b{font-size:12px;line-height:15px;}

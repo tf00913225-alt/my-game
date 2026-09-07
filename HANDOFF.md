@@ -3557,3 +3557,10 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Cloudflare 已由實際 deployment 證實：`dev` 分支固定 alias 為 `https://dev.four-symbols-dev.pages.dev`。
 - 現行 DEV 實機測試、release manifest 與 commit SHA read-back 一律使用此 branch alias；較早文件中出現的 `https://four-symbols-dev.pages.dev` 僅為歷史 root URL，不得再作為目前 `dev` SHA 驗證來源。
 - `.github/workflows/deploy-dev-cloudflare.yml` 已明確使用 `--branch=dev`，且部署後會從上述 branch alias 驗證 commit SHA、Game Version 與 Cache Version。
+
+
+## 2026-09-07 合成內頁垂直捲動 follow-up（dev）
+- 使用者手機驗收確認裝備冶煉與材料合成內容仍會在底部裁切；真正垂直 scroll owner 為 `.v141-synthesis-body`，不是外層 `#homeFeatureModalBody`。
+- `css/38-v141-system-expansion.css` 改為 `.v141-synthesis-body` 原生 `overflow-y:auto` + `touch-action:pan-y`，長內容卡片改 `height:auto; min-height:100%`；冶煉階級橫向 rail 允許 pan-x/pan-y。
+- `js/58-v173.63-functional-fixes.js` 的 `maximizeSynthesisPanel()` 同步把真正內容 body 設為垂直 scroll owner；`js/01-stage-v8-touch-lock.js` 白名單加入 `.v141-synthesis-body`。
+- 版本仍維持 V173.62；需等 DEV 實機確認兩頁都能滑到底後才可把本 follow-up 標成 VERIFIED。
