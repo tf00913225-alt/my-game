@@ -137,7 +137,7 @@ try{
     })()`);
     evidence.checks.bootstrap=bootstrap;
     assert.equal(bootstrap.started,true,"Shared dungeon launcher did not start a real battle");
-    assert.equal(bootstrap.rosterCount,10,"Abyss QA roster must contain 10 enemies");
+    assert.equal(bootstrap.rosterCount,8,"Abyss pre-stage QA roster must contain 5 regular plus 3 elite enemies");
     assert.equal(bootstrap.skillVolumeScale,2,"Deployed skill SFX multiplier must be exactly 2.0 (+100%)");
     assert.equal(bootstrap.combatFeedbackVolumeScale,2,"Deployed general battle feedback multiplier must be exactly 2.0 (+100%)");
 

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-08-multi-branch-dev-integration",
+  "baseBranch": "dev",
+  "baseCommit": "cb269fef7f28e54161b9abda9cfcb66bfbfbe74f",
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "INTEGRATION-01",
+      "status": "VERIFIED",
+      "requirement": "合併前必須從 GitHub 實際讀取 AGENTS.md、CLAUDE.md、最新 dev、六條指定分支／commit，並以各分支相對最新 dev 的真實 diff 分析，不以摘要代替",
+      "evidence": [
+        "Initial GitHub dev HEAD cb269fef7f28e54161b9abda9cfcb66bfbfbe74f",
+        "All six remote branch tips exactly matched the user-specified commit SHAs",
+        "AGENTS.md; CLAUDE.md; HANDOFF.md; UI_GUIDELINES.md; ARCHITECTURE_RULES.md; docs/ITEM_RARITY_UI_SPEC.md; docs/RELEASE_VERIFICATION_RULES.md",
+        "git merge-base / diff / changed-function / selector / listener / state-owner analysis performed against cb269fef7f28e54161b9abda9cfcb66bfbfbe74f"
+      ]
+    },
+    {
+      "id": "INTEGRATION-02",
+      "status": "VERIFIED",
+      "requirement": "六條分支須依實際依賴逐條合併、逐條測試；不得一次性合併或讓舊 runtime owner 覆蓋新功能",
+      "evidence": [
+        "Actual order: exp growth → equipment chest rewards → Abyss roster → skill progression → team relic → black-gold UI",
+        "Runtime chain retained as Abyss → skill progression → team relic, with team relic attached last to final battle/save/showPage owners",
+        "Each merge commit has the preceding integrated dev commit as first parent",
+        "No branch contained another branch; all six had the initial dev merge base and were integrated independently"
+      ]
+    },
+    {
+      "id": "INTEGRATION-03",
+      "status": "VERIFIED",
+      "requirement": "fix/exp-growth-curve-convergence@d7049b5e95d58e931e2368f011eb786ecdb515e5 完整進入 dev 且成長／EXP runtime 無回退",
+      "evidence": [
+        "Merge commit 14171bf708e21deadfb063b4c306454b0178b9b0",
+        "Post-merge 108/108 Node suites; 230 JavaScript syntax; 459 static resources",
+        "GitHub Actions run 34142012105 SUCCESS"
+      ]
+    },
+    {
+      "id": "INTEGRATION-04",
+      "status": "VERIFIED",
+      "requirement": "fix/equipment-dungeon-chest-rewards@e7839b803269a306a165a450d977422967ebcafc 完整進入 dev，裝備副本寶箱 reward owner 不被舊 js/58 邏輯覆蓋",
+      "evidence": [
+        "Merge commit d37fbe0af42ff48001471d6a48b2ce61b08ce085",
+        "Post-merge 108/108 Node suites; 230 JavaScript syntax; 459 static resources",
+        "GitHub Actions run 34142526675 SUCCESS"
+      ]
+    },
+    {
+      "id": "INTEGRATION-05",
+      "status": "VERIFIED",
+      "requirement": "fix/abyss-prestage-roster@f4ecff03affad16de8200d299fc3f31cfd0b9556 完整進入 dev，深淵前置戰固定 8 名且舊 10 名 QA／owner 不殘留",
+      "evidence": [
+        "Merge commit 5c8f9de081b744c1cbbc7ed8c8928117738292d0",
+        "Follow-up b650978e20f575b913e984955f637f146a5b0075 aligned live battle QA to the formal 5+3 roster",
+        "Post-merge 108/108 Node suites and targeted 12/12 Abyss tests",
+        "GitHub Actions run 34143513660 SUCCESS including live mobile Abyss and battle/audio QA"
+      ]
+    },
+    {
+      "id": "INTEGRATION-06",
+      "status": "VERIFIED",
+      "requirement": "feature/skill-progression-rebalance@fcc5f3287518e39a8b8564c35b7eaa28949ad5bc 完整進入 dev，技能學習 gate 與怪物技能 owner 分離且手機 UI 可操作",
+      "evidence": [
+        "Merge commit 326ed8da3af1da0f90c513adaded97de777c1203",
+        "Post-merge 109/109 Node suites; 232 JavaScript syntax; 460 static resources",
+        "GitHub Actions run 34144045201 SUCCESS including 390x844 Chrome skill progression QA"
+      ]
+    },
+    {
+      "id": "INTEGRATION-07",
+      "status": "VERIFIED",
+      "requirement": "feature/team-relic-system@fea10e0c0e13bb7ab46d1f4060e4ef93f707fbac 完整進入 dev，保留最終 runtime chain、同一 SAVE_KEY 持久化、既有主城 hitbox、手機捲動與戰鬥觸發",
+      "evidence": [
+        "Merge commit 1886f6fd5cda1f9b873925066a5b26e45a504949; js/19-stage-v78-character-inventory-runtime.js conflict manually integrated",
+        "Follow-ups 051aa7ed016cf7f2db925992fbdd5735800cc7aa, da6b20242fba86e8d80321cb65d97790488a244f, ee384218bfd4039d908d4ce6f2d74cf1585604dc, f337d70ee6b9dbce3750a4cc60a990ca9c2edfe7",
+        "tests/v174-team-relic-save-reload.test.js proves early core save cannot erase late-runtime relic fields",
+        "DEV Cloud Browser: equip → two full reloads retained Qinglan Feather; 20 cards / 2 columns; body 0→520; tabs 0→50; system/offline/relic/element hit targets and clicks all passed",
+        "GitHub Actions runs 34150502411 and 34151818800 SUCCESS; final 115/115 Node suites and 390x844 / 412x915 Chrome relic QA"
+      ]
+    },
+    {
+      "id": "INTEGRATION-08",
+      "status": "VERIFIED",
+      "requirement": "feature/ui-black-gold-window-skin@b9360d581ff93346ecab2edb9cbfe3f5cd993f7a 完整進入 dev，視窗尺寸／互動 owner 不變且黑金視覺套用到一般與秘寶 modal",
+      "evidence": [
+        "Merge commit 829571ec7f655e17ced17f8873e4908522c1b64d",
+        "Post-merge 114/114 Node suites; 238 JavaScript syntax; 462 static resources",
+        "GitHub Actions run 34149466118 SUCCESS including browser geometry regression suites",
+        "Final DEV Cloud Browser computed styles: black/bronze layered gradients, bronze border, multi-layer gold frame/shadow; system and relic modal geometry/interaction remained valid"
+      ]
+    },
+    {
+      "id": "INTEGRATION-09",
+      "status": "VERIFIED",
+      "requirement": "完成全體整合驗證、實際 dev 部署 SHA 核對與 main 保護；不得以 merge／push／CI 單一訊號代替完成",
+      "evidence": [
+        "Final functional GitHub Actions run 34151818800 SUCCESS: Repository checks, Chrome UI QA, live Abyss QA, live battle/audio QA and exact-SHA dev deployment",
+        "Local final functional checks: 115/115 Node suites, 239/239 JavaScript syntax, 462 static targets, 285 unique HTML IDs, 108 loader dependencies, release/deprecated/git-diff gates passed",
+        "Deployed release-manifest at dev alias returned commitSha f337d70ee6b9dbce3750a4cc60a990ca9c2edfe7, V173.63, cache 173.63",
+        "Final DEV Cloud Browser app-origin console errors/warnings 0; broken images 0; core/Abyss/skill/relic/black-gold runtime and CSS resources present",
+        "main remained d0b666e4eeae4cff8bb21dd877f4b95414b367d9 throughout; no main merge, push, PR or ref update"
+      ]
+    }
+  ],
+  "automatedVerification": "CI_RUNS_34142012105_34142526675_34143513660_34144045201_34145116294_34149466118_34150502411_34151818800_SUCCESS; FINAL_115_OF_115_NODE_SUITES; 239_OF_239_JS_SYNTAX; 462_STATIC_RESOURCES; 285_UNIQUE_HTML_IDS; 108_LOADER_DEPENDENCIES; RELEASE_AND_GIT_DIFF_GATES_PASSED",
+  "visualVerification": "VERIFIED_ON_DEV_CLOUD_BROWSER; CHROME_QA_390X844_AND_412X915; LIVE_ABYSS_AND_BATTLE_AUDIO_QA",
+  "notes": "Game/Cache Version intentionally remains V173.63. One merge conflict occurred in js/19-stage-v78-character-inventory-runtime.js and was manually integrated without whole-file ours/theirs. Browser QA discovered three additional integration defects (relic modal scroll specificity, reload persistence ordering, transparent utility hitbox); all were fixed at their actual owners and reverified. main was not modified."
+}

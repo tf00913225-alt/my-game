@@ -88,21 +88,25 @@ test("fixed difficulties remain Lv20/Lv40 and skill levels stay Lv1/Lv2 before f
         const {context}=load({playerLevel:80});
         for(let region=0;region<5;region++) for(let stage=0;stage<5;stage++){
             const roster=value(context,`v174AbyssBuildRoster(${level},${region},${stage})`);
-            assert.equal(roster.length,10);
+            assert.equal(roster.length,stage<4?8:10);
             assert.equal(roster.every(monster=>monster.level===level),true);
             assert.equal(roster.every(monster=>monster.v141ForceSkillLevel===(level===20?1:2)),true);
         }
     });
 });
 
-test("all pre-stages remain five regular plus five elite",()=>{
+test("all pre-stages are five regular in front plus three elite in back",()=>{
     const {context}=load();
     [20,40].forEach(level=>{
         for(let region=0;region<5;region++) for(let stage=0;stage<4;stage++){
             const roster=value(context,`v174AbyssBuildRoster(${level},${region},${stage})`);
             assert.deepEqual(roster.map(monster=>monster.rank),[
-                "regular","regular","regular","regular","regular","elite","elite","elite","elite","elite"
+                "regular","regular","regular","regular","regular","elite","elite","elite"
             ]);
+            assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationRow),[0,0,0,0,0]);
+            assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationPosition),[0,1,2,3,4]);
+            assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationRow),[1,1,1]);
+            assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationPosition),[0,1,2]);
         }
     });
 });
@@ -112,11 +116,13 @@ test("non-final boss stages and Lv20 final remain nine elite plus one emperor",(
     for(let region=0;region<4;region++){
         [20,40].forEach(level=>{
             const roster=value(context,`v174AbyssBuildRoster(${level},${region},4)`);
+            assert.equal(roster.length,10);
             assert.equal(roster.filter(monster=>monster.rank==="elite").length,9);
             assert.equal(roster.filter(monster=>monster.rank==="boss").length,1);
         });
     }
     const initialFinal=value(context,"v174AbyssBuildRoster(20,4,4)");
+    assert.equal(initialFinal.length,10);
     assert.deepEqual(initialFinal.filter(monster=>monster.rank==="boss").map(monster=>monster.name),["極帝天尊"]);
     assert.equal(initialFinal.filter(monster=>monster.rank==="elite").length,9);
 });
@@ -124,6 +130,7 @@ test("non-final boss stages and Lv20 final remain nine elite plus one emperor",(
 test("Lv40 final battle restores five Heavenly Emperors plus five elite in formal v155 order",()=>{
     const {context}=load();
     const roster=value(context,"v174AbyssBuildRoster(40,4,4)");
+    assert.equal(roster.length,10);
     assert.deepEqual(roster.slice(0,5).map(monster=>monster.name),["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"]);
     assert.equal(roster.slice(0,5).every(monster=>monster.rank==="boss"&&monster.v141FormationRow===0),true);
     assert.equal(roster.slice(5).every(monster=>monster.rank==="elite"&&monster.v141FormationRow===1),true);

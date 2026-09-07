@@ -1061,3 +1061,244 @@
     min-height:100% !important;
     margin:0 !important;
 }
+
+/* =====================================================
+   Shared Black-Gold Window Skin — visual-only owner
+   Geometry, stacking, overflow and interaction remain owned by existing rules.
+===================================================== */
+#game-stage{
+    --rpg-window-iron:#0D0C09;
+    --rpg-window-iron-soft:#171510;
+    --rpg-window-panel:#201D17;
+    --rpg-window-inset:#12110E;
+    --rpg-window-gold:#C69A45;
+    --rpg-window-gold-hi:#F0D38A;
+    --rpg-window-gold-dark:#73582D;
+    --rpg-window-text:#EEE7D8;
+    --rpg-window-muted:#B9AD98;
+}
+
+#game-stage .home-feature-modal-box,
+#game-stage .item-modal-box,
+#game-stage .inventory-classic-shell,
+#game-stage .creation-skill-detail-box,
+#game-stage .modal-box,
+.v169-rpg-dialog,
+.v132-reward-modal-inner,
+.v17351-ad-panel{
+    border-color:var(--rpg-window-gold-dark,#73582D);
+    border-radius:10px;
+    color:var(--rpg-window-text,#EEE7D8);
+    background:
+        radial-gradient(circle at 50% -12%,rgba(198,154,69,.14),transparent 34%),
+        linear-gradient(180deg,rgba(240,211,138,.045),transparent 14%),
+        linear-gradient(145deg,var(--rpg-window-panel,#201D17),var(--rpg-window-inset,#12110E) 58%,var(--rpg-window-iron,#0D0C09));
+    box-shadow:
+        0 16px 38px rgba(0,0,0,.58),
+        0 0 0 2px var(--rpg-window-iron,#0D0C09),
+        0 0 0 3px var(--rpg-window-gold-dark,#73582D),
+        0 0 0 4px rgba(240,211,138,.5),
+        inset 0 0 0 1px rgba(240,211,138,.36),
+        inset 0 0 0 2px var(--rpg-window-iron,#0D0C09),
+        inset 0 0 0 3px rgba(115,88,45,.82),
+        inset 0 0 30px rgba(0,0,0,.42);
+}
+
+#game-stage .home-feature-modal-title,
+#game-stage .item-modal-name,
+#game-stage .inventory-classic-title,
+#game-stage .creation-skill-detail-header,
+#game-stage .v132-reward-modal-title,
+.v169-rpg-dialog h2,
+.v17351-ad-panel h2{
+    border-color:var(--rpg-window-gold-dark,#73582D);
+    color:var(--rpg-window-text,#EEE7D8);
+    background:
+        linear-gradient(90deg,transparent,rgba(198,154,69,.08) 16%,rgba(240,211,138,.12) 50%,rgba(198,154,69,.08) 84%,transparent),
+        linear-gradient(180deg,#2A251C,var(--rpg-window-iron-soft,#171510) 58%,var(--rpg-window-iron,#0D0C09));
+    box-shadow:
+        inset 0 1px 0 rgba(240,211,138,.2),
+        inset 0 -2px 0 rgba(115,88,45,.8),
+        0 1px 0 rgba(0,0,0,.82);
+    text-shadow:0 1px 2px #000,0 0 6px rgba(198,154,69,.16);
+}
+
+#game-stage #homeFeatureModalBody,
+#game-stage .item-stat-list,
+#game-stage #itemModalStats,
+#game-stage #skillDetailStats,
+#game-stage .inventory-stats-panel,
+#game-stage .inventory-character-detail-row,
+#game-stage .system-panel,
+#game-stage .quest-card,
+#game-stage .v141-synthesis-card,
+#game-stage .v141-synthesis-empty,
+#game-stage .v17351-achievement-card,
+#game-stage .v17351-compare-pane,
+.v132-reward-modal-inner .v17363-text-reward-preview{
+    border-color:rgba(115,88,45,.76);
+    color:var(--rpg-window-text,#EEE7D8);
+    background:
+        linear-gradient(180deg,rgba(240,211,138,.025),transparent 22%),
+        linear-gradient(180deg,rgba(32,29,23,.97),rgba(18,17,14,.985));
+    box-shadow:
+        inset 0 0 0 1px rgba(115,88,45,.58),
+        inset 0 5px 16px rgba(0,0,0,.28);
+}
+
+#game-stage .home-feature-modal-box button,
+#game-stage .item-modal-box button,
+#game-stage .inventory-classic-shell button,
+#game-stage .creation-skill-detail-box button,
+#game-stage .modal-box button,
+.v132-reward-modal-inner button,
+.v169-rpg-dialog-button{
+    border-color:#876936;
+    border-radius:7px;
+    color:var(--rpg-window-text,#EEE7D8);
+    background:
+        linear-gradient(180deg,rgba(240,211,138,.07),transparent 34%),
+        linear-gradient(180deg,#302A20,#1A1712 56%,#0E0D0A);
+    box-shadow:
+        inset 0 1px 0 rgba(240,211,138,.13),
+        inset 0 -2px 0 rgba(0,0,0,.46),
+        0 2px 5px rgba(0,0,0,.32);
+    text-shadow:0 1px 2px rgba(0,0,0,.92);
+}
+
+#game-stage .home-feature-modal-box button:hover,
+#game-stage .item-modal-box button:hover,
+#game-stage .inventory-classic-shell button:hover,
+#game-stage .creation-skill-detail-box button:hover,
+#game-stage .modal-box button:hover,
+.v132-reward-modal-inner button:hover,
+.v169-rpg-dialog-button:hover{
+    border-color:var(--rpg-window-gold,#C69A45);
+    color:#FFF4CF;
+    background:
+        linear-gradient(180deg,rgba(240,211,138,.12),transparent 38%),
+        linear-gradient(180deg,#3B3225,#201B14 56%,#11100C);
+    box-shadow:
+        inset 0 1px 0 rgba(240,211,138,.2),
+        inset 0 -2px 0 rgba(0,0,0,.48),
+        0 0 0 1px rgba(198,154,69,.18),
+        0 3px 7px rgba(0,0,0,.36);
+}
+
+#game-stage .home-feature-modal-box button:active,
+#game-stage .item-modal-box button:active,
+#game-stage .inventory-classic-shell button:active,
+#game-stage .creation-skill-detail-box button:active,
+#game-stage .modal-box button:active,
+.v132-reward-modal-inner button:active,
+.v169-rpg-dialog-button:active{
+    border-color:var(--rpg-window-gold-hi,#F0D38A);
+    color:#FFF4CF;
+    background:linear-gradient(180deg,#15130F,#252018);
+    box-shadow:
+        inset 0 3px 8px rgba(0,0,0,.64),
+        inset 0 0 0 1px rgba(240,211,138,.12);
+}
+
+#game-stage .home-feature-modal-box button.active,
+#game-stage .home-feature-modal-box button.selected,
+#game-stage .home-feature-modal-box button[aria-selected="true"],
+#game-stage .home-feature-modal-box button[aria-pressed="true"],
+#game-stage .item-modal-box button.active,
+#game-stage .item-modal-box button.selected,
+#game-stage .inventory-classic-shell button.active,
+#game-stage .inventory-classic-shell button.selected,
+#game-stage .inventory-classic-shell button[aria-selected="true"],
+#game-stage .creation-skill-detail-box button.active,
+#game-stage .creation-skill-detail-box button.selected{
+    border-color:var(--rpg-window-gold-hi,#F0D38A);
+    color:#FFF0BE;
+    background:
+        linear-gradient(180deg,rgba(240,211,138,.18),transparent 38%),
+        linear-gradient(180deg,#5A4727,#2B2217 58%,#16120D);
+    box-shadow:
+        inset 0 1px 0 rgba(255,238,189,.28),
+        inset 0 -2px 0 rgba(0,0,0,.42),
+        0 0 0 1px rgba(198,154,69,.28),
+        0 3px 8px rgba(0,0,0,.34);
+    text-shadow:0 1px 2px #000,0 0 5px rgba(240,211,138,.12);
+}
+
+#game-stage .home-feature-modal-box button:disabled,
+#game-stage .item-modal-box button:disabled,
+#game-stage .inventory-classic-shell button:disabled,
+#game-stage .creation-skill-detail-box button:disabled,
+#game-stage .modal-box button:disabled,
+.v132-reward-modal-inner button:disabled,
+.v169-rpg-dialog-button:disabled{
+    border-color:#4C4232;
+    color:#807563;
+    background:linear-gradient(180deg,#1B1915,#100F0C);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+#game-stage .home-feature-modal-box .quest-tab,
+#game-stage .home-feature-modal-box .character-tab,
+#game-stage .home-feature-modal-box .v141-synthesis-tabs button,
+#game-stage .home-feature-modal-box .v17345-shop-tabs button,
+#game-stage .inventory-classic-shell .inventory-category-tab{
+    border-color:var(--rpg-window-gold-dark,#73582D);
+    color:var(--rpg-window-muted,#B9AD98);
+    background:linear-gradient(180deg,#242019,#12110E);
+    box-shadow:inset 0 1px 0 rgba(240,211,138,.08),inset 0 -2px 0 rgba(0,0,0,.42);
+}
+
+#game-stage .home-feature-modal-box .quest-tab.active,
+#game-stage .home-feature-modal-box .character-tab.active,
+#game-stage .home-feature-modal-box .v141-synthesis-tabs button.active,
+#game-stage .home-feature-modal-box .v17345-shop-tabs button.active,
+#game-stage .inventory-classic-shell .inventory-category-tab.active,
+#game-stage .inventory-classic-shell .inventory-category-tab.selected{
+    border-color:var(--rpg-window-gold-hi,#F0D38A);
+    color:#FFF0BE;
+    background:
+        linear-gradient(180deg,rgba(240,211,138,.17),transparent 40%),
+        linear-gradient(180deg,#594625,#2B2217);
+    box-shadow:
+        inset 0 1px 0 rgba(255,239,196,.25),
+        inset 0 -2px 0 rgba(0,0,0,.4),
+        0 0 0 1px rgba(198,154,69,.22);
+}
+
+#game-stage .home-feature-modal-box .home-feature-close-btn,
+#game-stage .item-modal-box .close-item-button,
+#game-stage .creation-skill-detail-box .creation-skill-detail-close,
+#game-stage .creation-skill-detail-box .creation-skill-detail-x,
+#game-stage .inventory-classic-shell .map-inventory-overlay-close{
+    border-color:#9B773B;
+    color:var(--rpg-window-text,#EEE7D8);
+    background:linear-gradient(180deg,#342C20,#171510 62%,#0D0C09);
+    box-shadow:
+        inset 0 1px 0 rgba(240,211,138,.14),
+        inset 0 -2px 0 rgba(0,0,0,.52),
+        0 2px 6px rgba(0,0,0,.36);
+}
+
+.v169-rpg-dialog[data-tone="danger"]{
+    border-color:#8E4C3E;
+    box-shadow:
+        0 16px 38px rgba(0,0,0,.6),
+        0 0 0 2px #0D0C09,
+        0 0 0 3px #68402D,
+        0 0 0 4px rgba(220,139,107,.3),
+        inset 0 0 0 1px rgba(240,211,138,.22),
+        inset 0 0 0 3px rgba(104,64,45,.7),
+        inset 0 0 28px rgba(75,20,15,.2);
+}
+
+.v169-rpg-dialog[data-tone="success"]{
+    border-color:#70805E;
+    box-shadow:
+        0 16px 38px rgba(0,0,0,.6),
+        0 0 0 2px #0D0C09,
+        0 0 0 3px #5A5735,
+        0 0 0 4px rgba(201,188,111,.25),
+        inset 0 0 0 1px rgba(240,211,138,.2),
+        inset 0 0 0 3px rgba(86,91,52,.62),
+        inset 0 0 28px rgba(32,55,28,.16);
+}

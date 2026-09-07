@@ -6243,6 +6243,49 @@ function saveGame(){
 
     try{
 
+        /*
+           Team Relic is intentionally loaded after the late runtime owner
+           chain.  During a page reload, loadGame() reaches the core
+           saveGame() once before that runtime is installed.  Preserve the
+           extension fields from the existing document for that early save;
+           after installation, the live window state remains authoritative.
+        */
+
+        let existingRelicSaveData=null;
+
+        try{
+
+            const existingRaw=
+                localStorage.getItem(
+                    SAVE_KEY
+                );
+
+            const existingData=
+                existingRaw
+                ?
+                JSON.parse(
+                    existingRaw
+                )
+                :
+                null;
+
+            if(
+                existingData &&
+                typeof existingData==="object"
+            ){
+
+                existingRelicSaveData=
+                    existingData;
+
+            }
+
+        }
+        catch(_){
+
+            existingRelicSaveData=null;
+
+        }
+
         normalizeInventoryStacks();
 
         const saveData = {
@@ -6340,6 +6383,41 @@ function saveGame(){
 
             autoConfig3:
                 autoConfig3,
+
+            /*
+               Team Relic persistence uses this same SAVE_KEY document.
+               On the first save during reload its late runtime does not
+               exist yet, so retain the previous values instead of silently
+               deleting them.  Later saves read the live runtime objects.
+            */
+
+            playerRelics:
+                (
+                    typeof window!=="undefined" &&
+                    window.playerRelics &&
+                    typeof window.playerRelics==="object"
+                )
+                ?
+                window.playerRelics
+                :
+                (
+                    existingRelicSaveData &&
+                    existingRelicSaveData.playerRelics
+                ),
+
+            teamLoadout:
+                (
+                    typeof window!=="undefined" &&
+                    window.teamLoadout &&
+                    typeof window.teamLoadout==="object"
+                )
+                ?
+                window.teamLoadout
+                :
+                (
+                    existingRelicSaveData &&
+                    existingRelicSaveData.teamLoadout
+                ),
 
             inventoryItems:
                 inventoryItems

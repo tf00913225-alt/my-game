@@ -194,8 +194,8 @@ try{
     })()`);
     evidence.checks.lv20PreLaunch=preLaunch;
     assert.ok(preLaunch,"Lv20 pre-stage did not reach shared v132LaunchDungeonBattle");
-    assert.equal(preLaunch.count,10);
-    assert.deepEqual(preLaunch.ranks,["regular","regular","regular","regular","regular","elite","elite","elite","elite","elite"]);
+    assert.equal(preLaunch.count,8);
+    assert.deepEqual(preLaunch.ranks,["regular","regular","regular","regular","regular","elite","elite","elite"]);
     assert.equal(preLaunch.levels.every(v=>v===20),true);
     assert.equal(preLaunch.skills.every(v=>v===1),true);
     assert.deepEqual([preLaunch.hps[0],preLaunch.hps[5]],[386,1236]);
@@ -312,7 +312,7 @@ try{
         };
     })()`);
     evidence.checks.lv40=lv40;
-    assert.equal(lv40.pre.count,10);
+    assert.equal(lv40.pre.count,8);
     assert.equal(lv40.pre.levels.every(v=>v===40),true);
     assert.equal(lv40.pre.skills.every(v=>v===2),true);
     assert.deepEqual([lv40.pre.regularHp,lv40.pre.eliteHp],[644,2059]);

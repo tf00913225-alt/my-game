@@ -1,3 +1,13 @@
+## 2026-09-08 六分支安全整合與最終 QA（dev；main 未修改）
+
+- 起始 GitHub `dev` 為 `cb269fef7f28e54161b9abda9cfcb66bfbfbe74f`；逐條順序為 EXP 成長曲線 → 裝備副本寶箱 → 深淵前置編隊 → 技能成長 → 隊伍秘寶 → 黑金視窗。六條遠端分支 tip 均與指定 SHA 完全一致。
+- 唯一 merge conflict 位於 `js/19-stage-v78-character-inventory-runtime.js`。人工保留 Abyss → skill progression → team relic 的唯一 late-runtime chain；team relic 最後掛接正式 battle/save/showPage owner，沒有整份選 ours/theirs，也沒有重複 load/error listener。
+- 深淵改為正式 8 名（5+3）後，舊 live battle QA 仍硬寫 10 名；由 `b650978e` 更新 QA owner 後通過。不得把舊 10 名 assertion 恢復。
+- DEV Cloud Browser 找出並修正三個秘寶整合 owner 問題：`051aa7ed` 提高 `#homeFeatureModalBody` scroll owner specificity；`ee384218` 讓核心 `saveGame()` 在 late relic runtime 尚未載入時保留既有 `playerRelics/teamLoadout`；`f337d70e` 讓橫跨主城整列的透明 `.team-relic-home-tools` 不再攔截系統／離線經驗，只讓兩顆實際 utility button 接收 pointer。
+- 最終功能狀態 `f337d70ee6b9dbce3750a4cc60a990ca9c2edfe7` 已通過 CI run 34151818800、115/115 Node suites、239/239 JS syntax、462 resources、285 IDs、loader/release/git-diff、390×844／412×915 Chrome、live Abyss 與 battle/audio QA。DEV manifest exact SHA、V173.63／cache 173.63 相符。
+- 最終實際瀏覽器：青嵐羽符裝備後連續完整重載仍保留；20 卡兩欄；modal body 0→520、tabs 0→50；系統／離線經驗／秘寶／元素匣 hit target 與開啟均正常；app-origin console error/warning 0、broken image 0。
+- 本輪 Requirement Batch：`release/requirement-batches/2026-09-08-multi-branch-dev-integration.json`（9/9 VERIFIED）。官方 Game/Cache Version 維持 V173.63。`main` 全程維持 `d0b666e4eeae4cff8bb21dd877f4b95414b367d9`，禁止把本輪內容推入 main，除非使用者另行明確要求。
+
 ## 2026-09-07 全遊戲手勢／圖片長按／技能 VFX owner 收斂（dev）
 - `js/01-stage-v8-touch-lock.js` 是全遊戲瀏覽器手勢唯一 owner：既有單指 scroll whitelist 保留，但兩指以上在任何 `#game-stage` 內位置一律阻止瀏覽器 pinch zoom；非文字輸入 UI 的 contextmenu／dragstart／selectstart 亦全域阻止。
 - `css/00-main.css` 是圖片／SVG／Canvas 原生長按與拖曳的基礎 CSS owner；不使用 `pointer-events:none`，避免破壞正常遊戲點擊。
@@ -3577,3 +3587,22 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - `css/38-v141-system-expansion.css` 改為 `.v141-synthesis-body` 原生 `overflow-y:auto` + `touch-action:pan-y`，長內容卡片改 `height:auto; min-height:100%`；冶煉階級橫向 rail 允許 pan-x/pan-y。
 - `js/58-v173.63-functional-fixes.js` 的 `maximizeSynthesisPanel()` 同步把真正內容 body 設為垂直 scroll owner；`js/01-stage-v8-touch-lock.js` 白名單加入 `.v141-synthesis-body`。
 - 版本仍維持 V173.62；需等 DEV 實機確認兩頁都能滑到底後才可把本 follow-up 標成 VERIFIED。
+
+
+## 2026-09-07 — EXP 成長曲線正式收斂
+
+本段為目前 EXP／成長規則的最新正式 owner 規格；若前文歷史版本敘述與本段衝突，以本段與實際 runtime owner 為準。
+
+- 升級需求唯一長期 owner：`js/28-v133-economy-rebalance.js` 的 `v133GetExpNextForLevel()`。
+- Lv1→20：新手快速期，保留既有 newcomer bonus／新手森林／新手任務節奏，正常流程目標約 20～30 分鐘到 Lv20。`v133GetExpNextForLevel(1..19)` 維持既有新手靜態需求。
+- 從 Lv20→21 開始：`expNext = 該等級練功區正式平均標準巡怪 EXP × TARGET_BATTLE_ANCHORS`，不得再用另一套高等級靜態 EXP anchors 覆蓋。
+- `TARGET_BATTLE_ANCHORS` 正式控制 expNext：Lv20=45、Lv30=100、Lv40=250、Lv50=400、Lv60=650、Lv70=900、Lv80=1200、Lv90=1700、Lv95=2600、Lv98=3500、Lv99=4000；中間等級平滑插值。
+- 一般巡怪正式 EXP owner：`js/25-v131-fix-batch.js`。Lv20+ 標準巡怪 = 怪物基礎 EXP（等級×10）× rank（普通1／精英1.5／BOSS3）× 練功倍率3.5；V173.42 全域 EXP ×3 僅保留 Lv1～19 快速期，不得在 Lv20+ 再疊加。
+- 元素匣：同條件正式巡怪 EXP 的 70%；不吃休息經驗。
+- 休息經驗：一般巡怪同條件 200%；每約離線2分鐘累積1場、最多300場；元素匣與休息經驗禁止疊加。
+- 自然充能：Lv20+ 仍依 `expNext × levelsPerDay`，既有 levels/day 意圖不重做（Lv20約1.30、Lv50約1.00、Lv99約0.32）。
+- 每日 Growth EXP：仍依新 `expNext × levelsPerDay` 動態計算，不得硬寫舊 EXP，也不得再額外乘全域 ×3。
+- 經驗副本：維持全隊當級 `expNext` 平均 ×33%，廣告雙倍約66%；`DUNGEON_DAILY_LIMIT_ENABLED=false` 是目前 DEV QA 刻意設定，禁止當成 Bug 恢復次數限制。
+- 傳統離線 EXP：仍由 `js/00-main.js` 基礎 10 EXP/分鐘（最多480分鐘）＋`js/34-v141-core-systems.js` 最高角色等級倍率與 V173.42 ×3 計算；本次評估相對新長期 expNext 並未破壞定位，因此不修改。廣告領取仍為雙倍。
+- EXP 場數健檢必須走真正 runtime：實際怪物／rank → 戰鬥 EXP → mode（手動／元素匣／休息）→ `expNext`，不得只比較 UI、註解、anchor array。
+- 回歸 owner：`tests/v170-final-spec-integration.test.js` 驗證完整最終 runtime；`tests/v139-economy-rested-exp.test.js` 驗證曲線與休息經驗；`tests/v173.43-growth-charge.test.js` 驗證自然充能／每日 Growth／新手期。

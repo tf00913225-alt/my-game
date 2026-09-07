@@ -6,6 +6,7 @@ const source=fs.readFileSync("js/equipment-progression.js","utf8");
 const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 
 assert.match(ui,/js\/equipment-progression\.js\?v=173\.63/);
+/* Ordinary equipment/shop odds remain unchanged; chest odds are independent. */
 assert.match(source,/\{key:"white",label:"白階",chance:40,min:1,max:3,reforgeSlots:0/);
 assert.match(source,/\{key:"blue",label:"藍階",chance:40,min:4,max:6,reforgeSlots:0/);
 assert.match(source,/\{key:"purple",label:"紫階",chance:15,min:7,max:9,reforgeSlots:1/);
@@ -38,12 +39,20 @@ assert.match(source,/window\.v148BuildDailyDungeonWaves\("gold"\)/);
 assert.match(source,/window\.v17346BeginEquipmentDungeon=beginEquipmentDungeon/);
 assert.doesNotMatch(source,/window\.v132BeginEquipmentDungeon=beginEquipmentDungeon/);
 assert.match(source,/onclick="v17346BeginEquipmentDungeon\(\)"/);
-assert.match(source,/const count=6\*Math\.max\(1/);
-assert.match(source,/inventoryItems\.length\+pendingEquipmentRewards\.length>120/);
-assert.match(source,/\["white","assets\/equipment\/warrior\/head-01\.png","40%"\]/);
-assert.match(source,/\["blue","assets\/equipment\/warrior\/armor-01\.png","40%"\]/);
-assert.match(source,/\["purple","assets\/equipment\/warrior\/shoes-01\.png","15%"\]/);
-assert.match(source,/\["orange","assets\/equipment\/warrior\/weapon-01\.png","5%"\]/);
+
+/* Equipment dungeon now grants real backpack chests; each chest opens into 3 gear. */
+assert.match(source,/const EQUIPMENT_CHEST_DROP_TABLE=\[[\s\S]*?\{key:"white",label:"白階",chance:40\}[\s\S]*?\{key:"blue",label:"藍階",chance:40\}[\s\S]*?\{key:"purple",label:"紫階",chance:10\}[\s\S]*?\{key:"orange",label:"橙階",chance:10\}/);
+assert.match(source,/id:"equipmentChest"[\s\S]*?name:"裝備寶箱"[\s\S]*?type:"chest"/);
+assert.match(source,/return Array\.from\(\{length:3\},\(\)=>\{/);
+assert.match(source,/generateEquipment\(random,\{rarity:rarity\.key\}\)/);
+assert.match(source,/v132ConsumeStackItem\(EQUIPMENT_CHEST_DEFINITION\.id,1\)/);
+assert.match(source,/rewards\.every\(item=>window\.v132AddItemToInventory\(item,1\)\)/);
+assert.match(source,/const chestCount=2\*Math\.max\(1,Math\.floor\(Number\(multiplier\)\|\|1\)\)/);
+assert.match(source,/showRewardedAd\(\(\)=>grant\(2\)/);
+assert.match(source,/獲得裝備寶箱×"\+chestCount\+"，請到背包自行開啟/);
+assert.match(source,/window\.v17346OpenEquipmentChest=openEquipmentChest/);
+assert.match(source,/window\.v17346ShowEquipmentChestPreview=showEquipmentChestPreview/);
+assert.doesNotMatch(source,/pendingEquipmentRewards|equipmentRewardItems/);
 assert.match(source,/assets\/items\/chests\/dungeon-chest\.png/);
 assert.match(source,/>×2<\/b>/);
 assert.match(source,/dungeon-equipment-v17346\.png/);

@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-team-relic-system",
+  "baseBranch": "dev",
+  "baseCommit": "cb269fef7f28e54161b9abda9cfcb66bfbfbe74f",
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "RELIC-01",
+      "status": "VERIFIED",
+      "requirement": "建立隊伍共用單秘寶系統；20件 Catalog，前10件完整 runtime-ready，後10件 locked placeholder，不開放假功能",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "docs/TEAM_RELIC_SYSTEM_RULES.md",
+        "tests/v174-team-relic-system.test.js",
+        "PR #94 Repository checks / Node suites SUCCESS"
+      ]
+    },
+    {
+      "id": "RELIC-02",
+      "status": "VERIFIED",
+      "requirement": "playerRelics 與 teamLoadout.relicId 必須嵌入既有 SAVE_KEY 同一份正式存檔；舊存檔安全 migration；禁止秘寶專屬 localStorage key",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "js/00-main.js",
+        "tests/v174-team-relic-system.test.js",
+        "tests/v174-team-relic-save-reload.test.js",
+        "CI run 34150502411 Repository checks / save-reload regression / exact-SHA dev deployment SUCCESS",
+        "DEV Cloud Browser QA on ee384218bfd4039d908d4ce6f2d74cf1585604dc: equip Qinglan Feather, full reload, ownership/loadout and Lv.1 UI remained present"
+      ]
+    },
+    {
+      "id": "RELIC-03",
+      "status": "VERIFIED",
+      "requirement": "Trigger Engine 接入正式 startBattle/startTurn/processNextCombatant/processSingleMonsterAttack/showPlayerHit/killMonster runtime，支援奇偶回合、N回合、敵方行動、我方受擊、HP門檻、擊殺、致命傷害等事件並防止秘寶來源遞迴",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "tests/v174-team-relic-system.test.js",
+        "tests/v174-team-relic-hardening.test.js",
+        "PR #94 Repository checks / 110 Node suites SUCCESS"
+      ]
+    },
+    {
+      "id": "RELIC-04",
+      "status": "VERIFIED",
+      "requirement": "乾坤玉壺、烈陽神珠、玄武靈印、鎮魂古鐘、天罡戰旗、九龍神火罩、寒泉玉珮、青嵐羽符、岩岳鎮印、回天寶輪必須真正可裝備並在正式戰鬥 owner 觸發",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "tests/v174-team-relic-system.test.js",
+        "tests/v174-team-relic-hardening.test.js",
+        "PR #94 Repository checks SUCCESS"
+      ]
+    },
+    {
+      "id": "RELIC-05",
+      "status": "VERIFIED",
+      "requirement": "主城新增左秘寶／右元素匣入口；元素匣仍呼叫既有 openHomeFeature('autoBattleSettings') owner；冒險隊伍新增唯一隊伍秘寶槽",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "css/55-team-relic-system.css",
+        "js/19-stage-v78-character-inventory-runtime.js",
+        "PR #94 static resource / loader / Node checks SUCCESS",
+        "DEV Cloud Browser QA on 051aa7ed016cf7f2db925992fbdd5735800cc7aa: 秘寶／元素匣入口不重疊；元素匣仍開啟既有 autoBattleSettings owner；隊伍唯一秘寶槽可選擇／更換",
+        "CI run 34148572586: tests/ui-team-relic-mobile-browser.test.js passed in Chrome at 390x844 and 412x915",
+        "DEV Cloud Browser QA on f337d70ee6b9dbce3750a4cc60a990ca9c2edfe7: transparent utility container pointer-events:none; relic/element buttons retain pointer-events:auto; system and offline-exp center hit targets and actual clicks restored",
+        "CI run 34151818800 SUCCESS: 390x844 / 412x915 Chrome assertions cover transparent-container and real-button hit ownership"
+      ]
+    },
+    {
+      "id": "RELIC-06",
+      "status": "VERIFIED",
+      "requirement": "秘寶滿版手機 UI、兩欄列表、分類、詳情、裝備／卸下、Lv1-20金幣強化、正式六階顏色、placeholder iconPath 與短促戰鬥發動演出",
+      "evidence": [
+        "js/60-team-relic-system.js",
+        "css/55-team-relic-system.css",
+        "PR #94 JavaScript / static resources / Node checks SUCCESS",
+        "DEV Cloud Browser QA: 20-card two-column Grid；category rail pan-x；body overflow-y:auto / pan-y and actual scrollTop 0→480；detail／equip／unequip／back／close all passed",
+        "CI run 34148572586: 390px and 412px modal bounds, two-column layout, vertical/horizontal actual scroll and safe-frame assertions passed"
+      ]
+    },
+    {
+      "id": "RELIC-07",
+      "status": "VERIFIED",
+      "requirement": "在實際瀏覽器／手機驗證主城入口不遮擋、元素匣入口正常、秘寶頁分類／Grid／詳情可滑動、按鈕可點、返回正常、戰鬥 banner 不遮角色與手機響應式版面",
+      "evidence": [
+        "DEV Cloud Browser QA after integration: 青嵐羽符 battle-start trigger emitted log/banner；banner stayed inside the battle stage and did not overlap the player row",
+        "DEV Cloud Browser application-origin console errors/warnings: 0；broken images: 0；relic CSS/runtime, skill runtime and Abyss runtime loaded",
+        "CI run 34151818800 SUCCESS: Repository checks, exact-SHA deployment, 390/412px team relic Chrome QA, live mobile Abyss QA and live mobile battle/audio QA",
+        "Final DEV Cloud Browser QA: two full reloads retained Qinglan Feather; modal vertical scrollTop 0→520 and category scrollLeft 0→50; app-origin console errors/warnings 0; broken images 0"
+      ]
+    }
+  ],
+  "automatedVerification": "CI_RUN_34151818800_SUCCESS; 115_OF_115_NODE_SUITES_PASSED; 239_OF_239_JAVASCRIPT_SYNTAX_PASSED; TEAM_RELIC_CHROME_QA_390X844_AND_412X915_PASSED; STATIC_RESOURCES_HTML_IDS_LOADER_RELEASE_GATE_GIT_DIFF_ABYSS_LIVE_AND_BATTLE_AUDIO_LIVE_CHECKS_PASSED",
+  "visualVerification": "VERIFIED_ON_DEV_CLOUD_BROWSER_AND_HEADLESS_CHROME_390X844_412X915",
+  "notes": "官方 Game/Cache Version 維持 V173.63。整合後實際瀏覽器 QA 依序發現並修正三個 owner 問題：051aa7ed 修正 legacy wide-modal overflow:hidden 覆蓋；ee384218 讓核心 saveGame 在 late relic runtime 載入前保留同一 SAVE_KEY 的 playerRelics/teamLoadout；f337d70e 讓透明 utility grid 不再攔截既有系統／離線經驗 hitbox。CI runs 34150502411 / 34151818800 與 DEV Cloud Browser 均交叉驗證。RELIC-01～07 全部 VERIFIED。"
+}
