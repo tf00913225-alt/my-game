@@ -1,5 +1,7 @@
-## 2026-09-08 六分支安全整合與最終 QA（dev；main 未修改）
+## 2026-09-08 六分支安全整合、最終 QA 與正式發布
 
+- 使用者於整合驗證完成後明確授權推進正式版；受保護 PR #96（`dev` → `main`）在 PR Repository checks run `34154431926` SUCCESS 後，以 merge commit `253962c539bdb62deaa1f80e4212bc306469ab0f` 合併。合併 tree `b257175b2cdaf13fc57a13f2767414d76236aa17` 與核准的 `dev` tree 完全相同，沒有衝突或額外功能差異。
+- 正式 `main` Repository checks run `34154526744` SUCCESS；GitHub Pages run `34154525713` 的 build／deploy 全部 SUCCESS，deployment `6314784680` 綁定同一 main SHA，正式網址 `https://tf00913225-alt.github.io/my-game/` 已讀回 V173.63 與本輪關鍵資源。Game／Cache Version 維持 173.63。
 - 起始 GitHub `dev` 為 `cb269fef7f28e54161b9abda9cfcb66bfbfbe74f`；逐條順序為 EXP 成長曲線 → 裝備副本寶箱 → 深淵前置編隊 → 技能成長 → 隊伍秘寶 → 黑金視窗。六條遠端分支 tip 均與指定 SHA 完全一致。
 - 唯一 merge conflict 位於 `js/19-stage-v78-character-inventory-runtime.js`。人工保留 Abyss → skill progression → team relic 的唯一 late-runtime chain；team relic 最後掛接正式 battle/save/showPage owner，沒有整份選 ours/theirs，也沒有重複 load/error listener。
 - 深淵改為正式 8 名（5+3）後，舊 live battle QA 仍硬寫 10 名；由 `b650978e` 更新 QA owner 後通過。不得把舊 10 名 assertion 恢復。
