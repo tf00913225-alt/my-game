@@ -5,45 +5,51 @@
   "baseCommit": "91eafa0b2efe9ac50f88787fa8d8dd60c7e9d61c",
   "officialVersion": "173.62",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED_PENDING_DEV_VISUAL_VERIFICATION",
+  "overallStatus": "IMPLEMENTED_PENDING_SKILL_VFX_PHONE_VERIFICATION",
   "requirements": [
     {
       "id": "GLOBAL-UI-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "所有正式遊戲 UI 禁止瀏覽器 pinch zoom；單指合法捲動仍正常",
       "evidence": [
         "js/01-stage-v8-touch-lock.js",
         "index.html",
-        "tests/ui-global-browser-interaction-lock.test.js"
+        "tests/ui-global-browser-interaction-lock.test.js",
+        "2026-09-07 使用者 DEV 手機實機確認正常"
       ]
     },
     {
       "id": "GLOBAL-UI-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "所有正式遊戲圖片／視覺素材長按不出現另存、開新分頁、搜尋、分享等原生反應，且不得原生拖曳／選取",
       "evidence": [
         "js/01-stage-v8-touch-lock.js",
         "css/00-main.css",
         "UI_GUIDELINES.md",
-        "tests/ui-global-browser-interaction-lock.test.js"
+        "tests/ui-global-browser-interaction-lock.test.js",
+        "2026-09-07 使用者 DEV 手機實機確認正常"
       ]
     },
     {
       "id": "GLOBAL-UI-03",
       "status": "IMPLEMENTED",
-      "requirement": "技能 VFX 不再被角色管理 QA visibility 規則隱藏，終結一擊亦由 V142/V143 完整掌控演出",
+      "requirement": "技能 VFX 必須由正式技能 action 穩定觸發；不得因管理 QA visibility、部分初始化 sentinel 或後載入 badge wrapper 順序而失效，且終結一擊仍由 V142/V143 完整掌控演出",
       "evidence": [
+        "js/00-main.js",
+        "js/37-v142-skill-animation.js",
+        "js/39-v143-skill-animation.js",
         "js/54-v173.51-battle-qa.js",
         "css/53-v173.51-qa.css",
-        "js/39-v143-skill-animation.js",
-        "tests/v173.51-qa.test.js",
-        "tests/ui-global-browser-interaction-lock.test.js"
+        "tests/v173.6-p0-runtime-recovery.test.js",
+        "tests/v173.62-direct-skill-animation-trigger.test.js",
+        "tests/v142-skill-animation.test.js",
+        "tests/v173.51-qa.test.js"
       ]
     }
   ],
-  "automatedVerification": "ALL_NODE_SUITES_AND_TARGETED_TESTS_PASSED_ON_BRANCH",
-  "targetedVerificationRun": 34072313075,
-  "fullRegressionRun": 34073073796,
-  "automatedVerificationNotes": "全域手勢／contextmenu／drag regression、V173.51 QA、火系 13 項、Fire repair 3 項、水系 18 項、風系 11 項、V173.62 回歸均通過；touchmove owner 已收斂為單一 handler；歷史 touch-lock cache assertions 與 V173.53 舊 VFX ownership assertion 已對齊現行契約；完整 105/105 Node suites、release coherence gate 與 git diff check 全部通過。正式 PR Repository checks 仍需以本 commit 執行。",
-  "visualVerification": "PENDING_DEV_PHONE_TEST"
+  "automatedVerification": "ALL_NODE_SUITES_AND_TARGETED_ANIMATION_TESTS_PASSED_ON_BRANCH",
+  "targetedVerificationRun": 34076893388,
+  "fullRegressionRun": 34076893388,
+  "automatedVerificationNotes": "GLOBAL-UI-01 與 GLOBAL-UI-02 已由使用者在 DEV 手機實機確認正常。技能動畫追查確認 V173.51 visibility 只是部分原因；目前已恢復 2026-08-31 曾驗證過的 direct badge action trigger 與 V142 partial-sentinel recovery 架構，並新增永久 regression 防止退回 wrapper-only。P0 runtime recovery、V142、火／水／風 Sprite VFX targeted suites、全部 Node suites、release coherence gate 與 git diff check 均通過。GLOBAL-UI-03 仍需 DEV 手機實機重測後才可 VERIFIED。",
+  "visualVerification": "GLOBAL-UI-01_VERIFIED; GLOBAL-UI-02_VERIFIED; GLOBAL-UI-03_PENDING_DEV_PHONE_RETEST"
 }
