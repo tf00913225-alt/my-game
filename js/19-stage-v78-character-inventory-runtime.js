@@ -303,29 +303,13 @@ function loadTeamRelicStyle(){
     document.head.appendChild(link);
 }
 
-function loadTeamRelicEventBridge(){
-    if(document.getElementById("team-relic-event-bridge-runtime")){return;}
-    const script=document.createElement("script");
-    script.id="team-relic-event-bridge-runtime";
-    script.src="js/61-team-relic-event-bridge.js?v=173.63-relic1";
-    script.async=false;
-    script.onerror=function(){console.warn("Team Relic event bridge failed to load");};
-    document.body.appendChild(script);
-}
-
 function loadTeamRelicRuntime(){
     loadTeamRelicStyle();
-    const existing=document.getElementById("team-relic-system-runtime");
-    if(existing){
-        if(existing.dataset.loaded==="1"){loadTeamRelicEventBridge();}
-        else{existing.addEventListener("load",loadTeamRelicEventBridge,{once:true});}
-        return;
-    }
+    if(document.getElementById("team-relic-system-runtime")){ return; }
     const script=document.createElement("script");
     script.id="team-relic-system-runtime";
     script.src="js/60-team-relic-system.js?v=173.63-relic1";
     script.async=false;
-    script.onload=function(){script.dataset.loaded="1";loadTeamRelicEventBridge();};
     script.onerror=function(){
         console.warn("Team Relic runtime failed to load");
     };
