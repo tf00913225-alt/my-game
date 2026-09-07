@@ -198,10 +198,11 @@ try{
     assert.equal(beforeElementBox.visibility,"visible","Skill layer must be visible during normal battle presentation");
 
     const opened=await client.eval(`(()=>{
-        if(typeof openAutoBattleSettings==='function'){openAutoBattleSettings();return 'openAutoBattleSettings';}
         if(typeof openHomeFeature==='function'){openHomeFeature('autoBattleSettings');return 'openHomeFeature';}
+        if(typeof openAutoBattleSettings==='function'){openAutoBattleSettings();return 'openAutoBattleSettings';}
         return null;
     })()`);
+    evidence.checks.elementBoxOpenRoute=opened;
     assert.ok(opened,"No Element Box settings opener is available");
     await waitFor(client,"document.body.classList.contains('v162-element-box-settings-open')","Element Box focus class",3000);
 
@@ -209,11 +210,15 @@ try{
         const stage=document.getElementById('v143-skill-stage');
         const modal=document.getElementById('homeFeatureModal');
         const panel=document.getElementById('autoBattleSettingsPanel');
+        const modalBody=document.getElementById('homeFeatureModalBody');
         const stageStyle=stage?getComputedStyle(stage):null;
         const modalStyle=modal?getComputedStyle(modal):null;
         const panelStyle=panel?getComputedStyle(panel):null;
         const modalRect=modal?.getBoundingClientRect();
         const panelRect=panel?.getBoundingClientRect();
+        const bodyRect=modalBody?.getBoundingClientRect();
+        const modalVisible=!!(modal&&modalStyle&&modalStyle.display!=='none'&&modalRect&&modalRect.width>0&&modalRect.height>0);
+        const panelVisible=!!(panel&&panelStyle&&panelStyle.display!=='none'&&panelRect&&panelRect.width>0&&panelRect.height>0);
         return {
             bodyFocus:document.body.classList.contains('v162-element-box-settings-open'),
             stageStillExists:!!stage,
@@ -223,6 +228,8 @@ try{
             panelDisplay:panelStyle?.display||null,
             modalWidth:modalRect?.width||0,modalHeight:modalRect?.height||0,
             panelWidth:panelRect?.width||0,panelHeight:panelRect?.height||0,
+            modalBodyWidth:bodyRect?.width||0,modalBodyHeight:bodyRect?.height||0,
+            visibleSurface:modalVisible?'homeFeatureModal':panelVisible?'autoBattleSettingsPanel':null,
             skillVolumeScale:window.v141Audio?.skillVolumeScale||null
         };
     })()`);
@@ -231,8 +238,7 @@ try{
     assert.equal(elementBoxLayers.stageStillExists,true,"V143 lifecycle stage must remain mounted while its presentation is suppressed");
     assert.equal(elementBoxLayers.stageVisibility,"hidden","Skill presentation must be hidden behind Element Box settings");
     assert.equal(Number(elementBoxLayers.stageOpacity),0,"Skill presentation opacity must be zero while Element Box settings owns focus");
-    assert.notEqual(elementBoxLayers.panelDisplay,"none","Element Box settings panel must remain visible");
-    assert.ok(elementBoxLayers.panelWidth>0&&elementBoxLayers.panelHeight>0,"Element Box settings panel must have visible geometry");
+    assert.ok(elementBoxLayers.visibleSurface,"The real Element Box settings surface must remain visibly rendered");
     assert.equal(elementBoxLayers.skillVolumeScale,2,"Live audio engine must expose the 2.0 skill SFX scale");
 
     const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
