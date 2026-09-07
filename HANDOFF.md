@@ -1,3 +1,9 @@
+## 2026-09-07 合成首次開頁 Icon 時序修復（dev）
+- 使用者實機確認裝備／符咒 icon 在首次打開合成頁仍需點一下才顯示。根因是 `js/36-v141-content-systems.js` 的合成入口直接呼叫 closure `renderSynthesis()`，繞過 V143/V146/V173.63 的最終 public renderer。
+- 合成入口改為優先呼叫 `window.v141RenderSynthesis()`；`js/58-v173.63-functional-fixes.js` 在正式 render 前先同步 equipment/static item presentation，render 後立即 repair picker，不再把首次 icon 顯示依賴點擊或下一次 rerender。
+- owner：`js/36-v141-content-systems.js`（合成入口）＋ `js/58-v173.63-functional-fixes.js`（最終 presentation/render wrapper）；不新增 runtime patch。
+- Game/Cache Version 維持 V173.62，待 DEV 手機實機確認首次打開裝備與符咒均直接顯示 icon 後才能標 VERIFIED。
+
 ## V173.61 返回圖示／道具圖／副本預覽／音效／常亮省電／任務即時領取（目前 dev）
 - V173.60 已通過受保護 Repository checks 並由 PR #70 正式合併 main；本輪新修改只在 dev。
 - `css/00-main.css` 是共用返回按鈕視覺 owner：所有實際使用 `assets/ui/map-return.png` 的入口統一補 `#050505` 圓形黑底。

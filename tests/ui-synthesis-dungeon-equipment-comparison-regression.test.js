@@ -38,4 +38,8 @@ assert.match(repairs,/\.v17363-game-select-menu/);
 assert.match(repairs,/section>\.v169-item-art[\s\S]*?width:70px/);
 assert.match(touch,/\.v17363-game-select-menu/);
 assert.match(guide,/禁止直接顯示瀏覽器原生 `<select>` \/ `<option>`/);
+const synthesisOwner=read("js/36-v141-content-systems.js");
+assert.match(synthesisOwner,/ensureEquipmentUids\(\);[\s\S]*?window\.v141RenderSynthesis\(\)/);
+assert.match(repairs,/window\.v141RenderSynthesis=function\(\)\{[\s\S]*?v17346SyncFourElementSets[\s\S]*?syncCanonicalItemArt\(\)[\s\S]*?originalRenderSynthesis\.apply[\s\S]*?repairSynthesisIcons\(\)/);
+
 console.log("✓ synthesis, dungeon preview and equipment comparison UI regression batch");

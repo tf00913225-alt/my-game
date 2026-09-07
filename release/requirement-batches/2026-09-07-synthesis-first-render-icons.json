@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-synthesis-first-render-icons",
+  "releaseVersion": "173.62",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "ICON-01",
+      "requirement": "裝備合成／冶煉的裝備 icon 首次打開頁面即顯示，不需要先點擊。",
+      "status": "IMPLEMENTED",
+      "evidence": {"files": ["js/36-v141-content-systems.js", "js/58-v173.63-functional-fixes.js", "tests/ui-synthesis-dungeon-equipment-comparison-regression.test.js"], "verification": "targeted + Repository checks + DEV visual pending"}
+    },
+    {
+      "id": "ICON-02",
+      "requirement": "符咒合成 icon 首次打開頁面即顯示，不需要先點擊。",
+      "status": "IMPLEMENTED",
+      "evidence": {"files": ["js/36-v141-content-systems.js", "js/58-v173.63-functional-fixes.js", "tests/ui-synthesis-dungeon-equipment-comparison-regression.test.js"], "verification": "targeted + Repository checks + DEV visual pending"}
+    }
+  ]
+}
