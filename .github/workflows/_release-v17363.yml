@@ -1,0 +1,66 @@
+name: Verify V173.63 release bump
+
+on:
+  push:
+    branches:
+      - release/v17363
+
+permissions:
+  contents: write
+
+jobs:
+  verify-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Ensure existing asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+      - name: Apply V173.63 verified release migration
+        run: python .github/scripts/_release-v17363.py
+      - name: Check release tooling syntax
+        run: |
+          node --check .github/scripts/release-gate.mjs
+          node --check js/20-anonymous-20.js
+      - name: Check all project JavaScript syntax
+        run: node .github/scripts/ci.mjs syntax
+      - name: Run all Node suites
+        run: node .github/scripts/ci.mjs tests
+      - name: Check static local resources
+        run: node .github/scripts/ci.mjs resources
+      - name: Check duplicate HTML IDs
+        run: node .github/scripts/ci.mjs duplicate-ids
+      - name: Check release entries and loader integrity
+        run: node .github/scripts/ci.mjs loader
+      - name: Enforce V173.63 release gate
+        env:
+          CI_BASE_SHA: fb5763943f7eef3ed8eb9e4c81950c7cc1f4a1d2
+        run: |
+          node .github/scripts/release-gate.mjs ci
+          node .github/scripts/release-gate.mjs release-ready
+      - name: Check stale V173.62 cache references
+        run: |
+          if grep -R -n --include='*.html' --include='*.js' --include='*.css' '?v=173.62' index.html js css tests; then
+            echo 'Found stale active V173.62 cache reference.' >&2
+            exit 1
+          fi
+      - name: Check diff
+        run: git diff --check
+      - name: Commit verified V173.63 release and remove one-time files
+        run: |
+          rm .github/workflows/_release-v17363.yml
+          rm .github/scripts/_release-v17363.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "release: V173.63 verified UI and VFX fixes"
+          git push origin HEAD:release/v17363
