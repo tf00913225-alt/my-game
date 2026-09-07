@@ -130,15 +130,15 @@ test("Lv40 final battle restores five Heavenly Emperors plus five elite in forma
     assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationPosition),[0,1,2,3,4]);
 });
 
-test("both Abyss difficulties increase every monster HP by 150 percent over previous values (x2.5 total)",()=>{
+test("both Abyss difficulties reduce current monster HP by 25 percent while preserving the same stage curve",()=>{
     const {context}=load();
-    const expected20=[[[965,3089],[1019,3261],[1073,3433],[1126,3604]],[3776,7724]];
-    const expected40=[[[1609,5148],[1698,5434],[1788,5720],[1877,6006]],[6292,12872]];
+    const expected20=[[[724,2317],[764,2446],[804,2574],[845,2703]],[2832,5793]];
+    const expected40=[[[1207,3861],[1274,4076],[1341,4290],[1408,4505]],[4719,9654]];
     [[20,expected20],[40,expected40]].forEach(([level,expected])=>{
         expected[0].forEach(([regularHp,eliteHp],stage)=>{
             const roster=value(context,`v174AbyssBuildRoster(${level},0,${stage})`);
             assert.deepEqual([roster[0].maxHP,roster[5].maxHP],[regularHp,eliteHp]);
-            assert.equal(roster.every(monster=>monster.v174AbyssDurabilityMultiplier===2.5),true);
+            assert.equal(roster.every(monster=>monster.v174AbyssDurabilityMultiplier===1.875),true);
         });
         const boss=value(context,`v174AbyssBuildRoster(${level},0,4)`);
         assert.deepEqual([

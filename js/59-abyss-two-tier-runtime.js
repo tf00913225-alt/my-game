@@ -17,7 +17,7 @@
     const PRE_STAGE_COUNT=4;
     const STAGES_PER_REGION=5;
     const REGION_COUNT=5;
-    const HP_DURABILITY_MULTIPLIER=2.5;
+    const HP_DURABILITY_MULTIPLIER=1.875;
 
     const ABYSS_DIFFICULTIES=Object.freeze({
         20:Object.freeze({

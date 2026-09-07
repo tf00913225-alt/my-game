@@ -97,7 +97,7 @@ patched=replaceRequired(patched,
 
     const afterWin=await client.eval(\`(()=>{
 `,
-`    assert.deepEqual([preLaunch.hps[0],preLaunch.hps[5]],[965,3089]);
+`    assert.deepEqual([preLaunch.hps[0],preLaunch.hps[5]],[724,2317]);
     const encounterTap=await client.eval(\`window.__abyssQaEncounterTap\`);
     evidence.checks.encounterTap=encounterTap;
     assert.deepEqual(encounterTap.after,encounterTap.before,"Tapping an Abyss encounter must not move the map avatar");
@@ -177,7 +177,7 @@ patched=replaceRequired(patched,
 patched=replaceRequired(patched,
 `    assert.deepEqual(bossLaunch.bosses,[{name:"東帝",hp:3090,level:20,skill:1}]);
 `,
-`    assert.deepEqual(bossLaunch.bosses,[{name:"東帝",hp:7724,level:20,skill:1}]);
+`    assert.deepEqual(bossLaunch.bosses,[{name:"東帝",hp:5793,level:20,skill:1}]);
 `,"Lv20 boss HP assertion");
 
 patched=replaceRequired(patched,
@@ -186,14 +186,14 @@ patched=replaceRequired(patched,
     assert.deepEqual(lv40.final.bosses,[{name:"極帝天尊",hp:5149,level:40,skill:2}]);
     assert.equal(lv40.final.eliteCount,9);
 `,
-`    assert.deepEqual([lv40.pre.regularHp,lv40.pre.eliteHp],[1609,5148]);
-    assert.deepEqual([lv40.boss.eliteHp,lv40.boss.bosses[0].hp],[6292,12872]);
+`    assert.deepEqual([lv40.pre.regularHp,lv40.pre.eliteHp],[1207,3861]);
+    assert.deepEqual([lv40.boss.eliteHp,lv40.boss.bosses[0].hp],[4719,9654]);
     assert.deepEqual(lv40.final.bosses,[
-        {name:"東帝天尊",hp:12872,level:40,skill:2},
-        {name:"天帝天尊",hp:12872,level:40,skill:2},
-        {name:"極帝天尊",hp:12872,level:40,skill:2},
-        {name:"北帝天尊",hp:12872,level:40,skill:2},
-        {name:"南帝天尊",hp:12872,level:40,skill:2}
+        {name:"東帝天尊",hp:9654,level:40,skill:2},
+        {name:"天帝天尊",hp:9654,level:40,skill:2},
+        {name:"極帝天尊",hp:9654,level:40,skill:2},
+        {name:"北帝天尊",hp:9654,level:40,skill:2},
+        {name:"南帝天尊",hp:9654,level:40,skill:2}
     ]);
     assert.equal(lv40.final.eliteCount,5);
 `,"Lv40 durability and five-emperor assertions");

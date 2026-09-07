@@ -125,6 +125,11 @@ jobs:
           node --check .github/scripts/run-abyss-live-browser-qa.mjs
           node .github/scripts/run-abyss-live-browser-qa.mjs
 
+      - name: Run live mobile battle layer/audio QA
+        run: |
+          node --check .github/scripts/battle-layer-audio-live-qa.mjs
+          node .github/scripts/battle-layer-audio-live-qa.mjs
+
       - name: Upload live mobile Abyss QA evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -148,6 +153,9 @@ jobs:
           echo "Commit SHA: $EXPECTED_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "Deployment SHA verified: YES" >> "$GITHUB_STEP_SUMMARY"
           echo "Live mobile Abyss browser QA: PASS" >> "$GITHUB_STEP_SUMMARY"
+          echo "Live mobile battle layer/audio QA: PASS" >> "$GITHUB_STEP_SUMMARY"
           cat release-manifest.final.json >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
           cat artifacts/browser-qa/abyss-live-qa.json >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/browser-qa/battle-layer-audio-live-qa.json >> "$GITHUB_STEP_SUMMARY"

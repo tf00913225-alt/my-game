@@ -314,6 +314,7 @@
     }
 
     let lastMonsterSkillByIndex=new Map();
+    const COMBAT_FEEDBACK_VOLUME_SCALE=2;
 
     /* =====================================================
        Procedural audio
@@ -321,6 +322,9 @@
     const audioEngine=(function(){
         let context=null;
         let master=null;
+        const SKILL_VOLUME_SCALE=2;
+        const COMBAT_FEEDBACK_VOLUME_SCALE=2;
+        let playbackGainScale=1;
 
         function ensure(){
             if(context){
@@ -347,7 +351,7 @@
             osc.frequency.setValueAtTime(Math.max(20,frequency),now);
             if(opts.to){ osc.frequency.exponentialRampToValueAtTime(Math.max(20,opts.to),now+duration); }
             gain.gain.setValueAtTime(0.0001,now);
-            gain.gain.exponentialRampToValueAtTime(Math.max(0.001,Number(opts.volume)||0.16),now+0.012);
+            gain.gain.exponentialRampToValueAtTime(Math.max(0.001,(Number(opts.volume)||0.16)*playbackGainScale),now+0.012);
             gain.gain.exponentialRampToValueAtTime(0.0001,now+duration);
             osc.connect(gain); gain.connect(master);
             osc.start(now); osc.stop(now+duration+0.02);
@@ -370,60 +374,67 @@
             filter.type=opts.filter||"bandpass";
             filter.frequency.value=Number(opts.frequency)||900;
             filter.Q.value=Number(opts.q)||0.8;
-            gain.gain.value=Number(opts.volume)||0.14;
+            gain.gain.value=(Number(opts.volume)||0.14)*playbackGainScale;
             source.buffer=buffer;
             source.connect(filter); filter.connect(gain); gain.connect(master);
             source.start(ctx.currentTime+(Number(opts.delay)||0));
         }
 
-        function play(kind){
-            switch(kind){
-                case "swing": noise(.14,{frequency:1200,volume:.15}); tone(520,.13,{to:180,wave:"sawtooth",volume:.07}); break;
-                case "hit": noise(.12,{frequency:260,volume:.22}); tone(110,.14,{to:55,wave:"triangle",volume:.18}); break;
-                case "damage": noise(.15,{frequency:340,volume:.2}); tone(145,.18,{to:62,wave:"triangle",volume:.14}); break;
-                case "heavy": noise(.28,{frequency:170,volume:.25}); tone(85,.32,{to:38,wave:"sine",volume:.25}); break;
-                case "crit": tone(780,.12,{to:1560,wave:"square",volume:.12}); noise(.22,{frequency:1800,volume:.22,delay:.05}); break;
-                case "block": tone(920,.11,{to:390,wave:"square",volume:.1}); noise(.13,{frequency:1900,volume:.13}); break;
-                case "dodge": noise(.2,{filter:"highpass",frequency:2200,volume:.1}); tone(1050,.15,{to:520,wave:"sine",volume:.05}); break;
-                case "magic": tone(240,.34,{to:920,wave:"sine",volume:.12}); tone(480,.28,{to:1280,wave:"triangle",volume:.08,delay:.04}); break;
-                case "charge": tone(95,.55,{to:620,wave:"sawtooth",volume:.08}); break;
-                case "explosion": noise(.38,{filter:"lowpass",frequency:480,volume:.26}); tone(92,.34,{to:35,wave:"square",volume:.18}); break;
-                case "fire": noise(.42,{frequency:620,volume:.18}); tone(120,.36,{to:45,wave:"sawtooth",volume:.12,delay:.06}); break;
-                case "ice": tone(1480,.25,{to:420,wave:"triangle",volume:.12}); noise(.25,{frequency:2300,volume:.16,delay:.06}); break;
-                case "water": noise(.48,{filter:"lowpass",frequency:1100,volume:.13}); tone(330,.42,{to:190,wave:"sine",volume:.09}); break;
-                case "wind": noise(.38,{filter:"highpass",frequency:1500,volume:.14}); tone(900,.25,{to:260,wave:"sine",volume:.06}); break;
-                case "earth": tone(72,.36,{to:38,wave:"triangle",volume:.23}); noise(.3,{frequency:210,volume:.22}); break;
-                case "buff": tone(390,.34,{to:760,wave:"sine",volume:.11}); tone(590,.32,{to:980,wave:"sine",volume:.08,delay:.08}); break;
-                case "debuff": tone(340,.38,{to:95,wave:"sawtooth",volume:.11}); break;
-                case "shield": tone(220,.38,{to:660,wave:"sine",volume:.12}); tone(880,.24,{to:440,wave:"triangle",volume:.08,delay:.08}); break;
-                case "heal": tone(440,.46,{to:880,wave:"sine",volume:.12}); tone(660,.38,{to:1100,wave:"sine",volume:.08,delay:.1}); break;
-                case "revive": tone(220,.65,{to:880,wave:"sine",volume:.14}); tone(440,.62,{to:1320,wave:"triangle",volume:.09,delay:.08}); break;
-                case "boss": tone(58,.38,{to:34,wave:"sawtooth",volume:.18}); break;
-                case "monster": tone(125,.19,{to:72,wave:"triangle",volume:.1}); break;
-                case "death": tone(160,.5,{to:42,wave:"sawtooth",volume:.18}); noise(.32,{frequency:190,volume:.16}); break;
+        function play(kind,volumeScale){
+            const previousScale=playbackGainScale;
+            const requestedScale=Number(volumeScale);
+            playbackGainScale=Number.isFinite(requestedScale)&&requestedScale>0?requestedScale:1;
+            try{
+                switch(kind){
+                    case "swing": noise(.14,{frequency:1200,volume:.15}); tone(520,.13,{to:180,wave:"sawtooth",volume:.07}); break;
+                    case "hit": noise(.12,{frequency:260,volume:.22}); tone(110,.14,{to:55,wave:"triangle",volume:.18}); break;
+                    case "damage": noise(.15,{frequency:340,volume:.2}); tone(145,.18,{to:62,wave:"triangle",volume:.14}); break;
+                    case "heavy": noise(.28,{frequency:170,volume:.25}); tone(85,.32,{to:38,wave:"sine",volume:.25}); break;
+                    case "crit": tone(780,.12,{to:1560,wave:"square",volume:.12}); noise(.22,{frequency:1800,volume:.22,delay:.05}); break;
+                    case "block": tone(920,.11,{to:390,wave:"square",volume:.1}); noise(.13,{frequency:1900,volume:.13}); break;
+                    case "dodge": noise(.2,{filter:"highpass",frequency:2200,volume:.1}); tone(1050,.15,{to:520,wave:"sine",volume:.05}); break;
+                    case "magic": tone(240,.34,{to:920,wave:"sine",volume:.12}); tone(480,.28,{to:1280,wave:"triangle",volume:.08,delay:.04}); break;
+                    case "charge": tone(95,.55,{to:620,wave:"sawtooth",volume:.08}); break;
+                    case "explosion": noise(.38,{filter:"lowpass",frequency:480,volume:.26}); tone(92,.34,{to:35,wave:"square",volume:.18}); break;
+                    case "fire": noise(.42,{frequency:620,volume:.18}); tone(120,.36,{to:45,wave:"sawtooth",volume:.12,delay:.06}); break;
+                    case "ice": tone(1480,.25,{to:420,wave:"triangle",volume:.12}); noise(.25,{frequency:2300,volume:.16,delay:.06}); break;
+                    case "water": noise(.48,{filter:"lowpass",frequency:1100,volume:.13}); tone(330,.42,{to:190,wave:"sine",volume:.09}); break;
+                    case "wind": noise(.38,{filter:"highpass",frequency:1500,volume:.14}); tone(900,.25,{to:260,wave:"sine",volume:.06}); break;
+                    case "earth": tone(72,.36,{to:38,wave:"triangle",volume:.23}); noise(.3,{frequency:210,volume:.22}); break;
+                    case "buff": tone(390,.34,{to:760,wave:"sine",volume:.11}); tone(590,.32,{to:980,wave:"sine",volume:.08,delay:.08}); break;
+                    case "debuff": tone(340,.38,{to:95,wave:"sawtooth",volume:.11}); break;
+                    case "shield": tone(220,.38,{to:660,wave:"sine",volume:.12}); tone(880,.24,{to:440,wave:"triangle",volume:.08,delay:.08}); break;
+                    case "heal": tone(440,.46,{to:880,wave:"sine",volume:.12}); tone(660,.38,{to:1100,wave:"sine",volume:.08,delay:.1}); break;
+                    case "revive": tone(220,.65,{to:880,wave:"sine",volume:.14}); tone(440,.62,{to:1320,wave:"triangle",volume:.09,delay:.08}); break;
+                    case "boss": tone(58,.38,{to:34,wave:"sawtooth",volume:.18}); break;
+                    case "monster": tone(125,.19,{to:72,wave:"triangle",volume:.1}); break;
+                    case "death": tone(160,.5,{to:42,wave:"sawtooth",volume:.18}); noise(.32,{frequency:190,volume:.16}); break;
+                }
+            }finally{
+                playbackGainScale=previousScale;
             }
         }
 
         function playSkill(skill,name){
             const label=String(name||skill&&skill.name||"");
-            if(label==="普通攻擊"){ play("swing"); setTimeout(()=>play("hit"),55); return; }
-            if(!skill){ play("hit"); return; }
-            if(skill.category==="heal"){ play("heal"); return; }
-            if(skill.category==="revive"){ play("revive"); return; }
+            if(label==="普通攻擊"){ play("swing",SKILL_VOLUME_SCALE); setTimeout(()=>play("hit",SKILL_VOLUME_SCALE),55); return; }
+            if(!skill){ play("hit",SKILL_VOLUME_SCALE); return; }
+            if(skill.category==="heal"){ play("heal",SKILL_VOLUME_SCALE); return; }
+            if(skill.category==="revive"){ play("revive",SKILL_VOLUME_SCALE); return; }
             if(skill.category==="buff"){
-                play(/盾|護體|結界/.test(label)?"shield":"buff");
+                play(/盾|護體|結界/.test(label)?"shield":"buff",SKILL_VOLUME_SCALE);
                 return;
             }
-            play(skill.category==="physical"?"swing":"magic");
+            play(skill.category==="physical"?"swing":"magic",SKILL_VOLUME_SCALE);
             setTimeout(()=>{
                 const elementKind={fire:"fire",water:"water",wind:"wind",earth:"earth",light:"buff"}[skill.element];
-                if(elementKind){ play(elementKind); }
-                if(/爆|炸|鳳|龍/.test(label)){ setTimeout(()=>play("explosion"),45); }
-                else{ play(/重|裂|猛|破/.test(label)?"heavy":"hit"); }
+                if(elementKind){ play(elementKind,SKILL_VOLUME_SCALE); }
+                if(/爆|炸|鳳|龍/.test(label)){ setTimeout(()=>play("explosion",SKILL_VOLUME_SCALE),45); }
+                else{ play(/重|裂|猛|破/.test(label)?"heavy":"hit",SKILL_VOLUME_SCALE); }
             },65);
         }
 
-        return {ensure,play,playSkill};
+        return {ensure,play,playSkill,skillVolumeScale:SKILL_VOLUME_SCALE,combatFeedbackVolumeScale:COMBAT_FEEDBACK_VOLUME_SCALE};
     })();
     window.v141Audio=audioEngine;
     document.addEventListener("pointerdown",()=>audioEngine.ensure(),{once:true,passive:true});
@@ -455,7 +466,7 @@
             audioEngine.playSkill(skillId?skillDatabase[skillId]:null,skillName);
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
             if(monster&&typeof getMonsterRank==="function"&&getMonsterRank(monster)==="boss"){
-                setTimeout(()=>audioEngine.play("boss"),28);
+                setTimeout(()=>audioEngine.play("boss",COMBAT_FEEDBACK_VOLUME_SCALE),28);
             }
             return originalShowMonsterSkillNameBadge.apply(this,arguments);
         };
@@ -464,7 +475,7 @@
     if(typeof showMissEffect==="function"){
         const originalShowMissEffect=showMissEffect;
         showMissEffect=function(){
-            audioEngine.play("dodge");
+            audioEngine.play("dodge",COMBAT_FEEDBACK_VOLUME_SCALE);
             return originalShowMissEffect.apply(this,arguments);
         };
     }
@@ -472,7 +483,7 @@
     if(typeof showShieldAbsorb==="function"){
         const originalShowShieldAbsorb=showShieldAbsorb;
         showShieldAbsorb=function(){
-            audioEngine.play("block");
+            audioEngine.play("block",COMBAT_FEEDBACK_VOLUME_SCALE);
             return originalShowShieldAbsorb.apply(this,arguments);
         };
     }
@@ -480,7 +491,7 @@
     if(typeof showMonsterHit==="function"){
         const originalShowMonsterHit=showMonsterHit;
         showMonsterHit=function(index,amount,type,isCrit){
-            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage"); }
+            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE); }
             return originalShowMonsterHit.apply(this,arguments);
         };
     }
@@ -488,7 +499,7 @@
     if(typeof showPlayerHit==="function"){
         const originalShowPlayerHit=showPlayerHit;
         showPlayerHit=function(amount,type,index,isPositive,isCrit){
-            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage"); }
+            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE); }
             return originalShowPlayerHit.apply(this,arguments);
         };
     }
@@ -679,7 +690,7 @@
                     persistAccountProgress();
                 }
                 if(isWildElite){ addEliteSpecialDrop(monster); }
-                audioEngine.play("death");
+                audioEngine.play("death",COMBAT_FEEDBACK_VOLUME_SCALE);
             }
             return result;
         };

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-07-combat-feedback-abyss-hp-adjustments",
+  "baseBranch": "dev",
+  "baseCommit": "f0809489009073de9a65b8fbd2e3e8bf2bffa7f5",
+  "officialVersion": "173.63",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "BATTLE-AUDIO-02",
+      "status": "VERIFIED",
+      "requirement": "受傷、爆擊受傷、閃避、格擋、死亡與 BOSS 戰鬥回饋等一般戰鬥音效，在既有基準上提高 100%，即一般戰鬥回饋 SFX 為原本 2.0 倍；既有技能 SFX 2.0 倍設定維持不變。",
+      "evidence": [
+        "js/34-v141-core-systems.js",
+        "tests/v174-battle-layer-audio-fixes.test.js",
+        ".github/scripts/battle-layer-audio-live-qa.mjs",
+        "GitHub Actions run 34116336687"
+      ]
+    },
+    {
+      "id": "ABYSS-BALANCE-01",
+      "status": "VERIFIED",
+      "requirement": "所有 Lv20／Lv40 深淵副本怪物血量以本批修改前的現行值為基準降低 25%；原深淵耐久倍率 2.5 調整為 1.875，攻擊、防禦、技能、編成與關卡流程不變。",
+      "evidence": [
+        "js/59-abyss-two-tier-runtime.js",
+        "tests/abyss-two-tier-refactor.test.js",
+        ".github/scripts/run-abyss-live-browser-qa.mjs",
+        "GitHub Actions run 34116336687"
+      ]
+    }
+  ],
+  "automatedVerification": "DEV_CI_DEPLOY_SHA_AND_LIVE_MOBILE_QA_VERIFIED",
+  "verificationRun": 34116336687,
+  "targetedVerificationRun": 34116336687,
+  "finalDevVerificationRun": 34116336687,
+  "visualVerification": "AUTOMATED_MOBILE_CHROME_DEV_QA_PASS",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "verifiedOnDevVersion": "173.63",
+  "releasedAs": null
+}
