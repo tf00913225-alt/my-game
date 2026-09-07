@@ -17,6 +17,7 @@
     const PRE_STAGE_COUNT=4;
     const STAGES_PER_REGION=5;
     const REGION_COUNT=5;
+    const HP_DURABILITY_MULTIPLIER=2.5;
 
     const ABYSS_DIFFICULTIES=Object.freeze({
         20:Object.freeze({
@@ -63,6 +64,14 @@
         })
     ]);
 
+    const FINAL_TRUE_REALM_EMPERORS=Object.freeze([
+        Object.freeze({name:"東帝天尊",regionIndex:0}),
+        Object.freeze({name:"天帝天尊",regionIndex:2}),
+        Object.freeze({name:"極帝天尊",regionIndex:4}),
+        Object.freeze({name:"北帝天尊",regionIndex:3}),
+        Object.freeze({name:"南帝天尊",regionIndex:1})
+    ]);
+
     const BOSS_POSITIONS=Object.freeze([[50,27],[50,27],[50,25],[50,27],[50,24]]);
     const FLOOR_MAPS=Object.freeze([
         "assets/dungeons/abyss/maps/floor-1.png",
@@ -79,12 +88,15 @@
     function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
     function escapeHtml(value){
         return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;")
-            .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+            .replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
     }
     function difficultyConfig(level){ return ABYSS_DIFFICULTIES[Number(level)===40?40:20]; }
     function stageKey(run){ return "d"+run.difficulty+"-r"+run.regionIndex+"-s"+run.encounterIndex; }
     function isBossStage(run){ return Number(run.encounterIndex)===PRE_STAGE_COUNT; }
     function isFinalBossStage(run){ return Number(run.regionIndex)===REGION_COUNT-1&&isBossStage(run); }
+    function isTrueRealmFinal(level,regionIndex,encounterIndex){
+        return Number(level)===40&&Number(regionIndex)===REGION_COUNT-1&&Number(encounterIndex)===PRE_STAGE_COUNT;
+    }
     function stageLabel(run){ return isBossStage(run)?"帝王 BOSS":"前置關 "+(Number(run.encounterIndex)+1)+" / 4"; }
     function fiveStageProgress(run){ return (Number(run.encounterIndex)+1)+" / 5"; }
 
@@ -176,27 +188,16 @@
             run.y=clamp(numeric(legacy.y,84),8,94);
             const legacyPhase=String(legacy.phase||"boss");
             if(legacyPhase==="complete"){
-                run.completed=true;
-                run.active=true;
-                run.phase="complete";
-                run.battleCompleted=true;
-                run.chestClaimed=true;
-                run.completedRegions=[true,true,true,true,true];
-                run.regionCompleted=true;
+                run.completed=true;run.active=true;run.phase="complete";run.battleCompleted=true;run.chestClaimed=true;
+                run.completedRegions=[true,true,true,true,true];run.regionCompleted=true;
             }else{
                 for(let index=0;index<run.regionIndex;index++){ run.completedRegions[index]=true; }
                 if(legacyPhase==="chest"){
-                    run.battleCompleted=true;
-                    run.chestSpawned=true;
-                    run.phase="chest";
+                    run.battleCompleted=true;run.chestSpawned=true;run.phase="chest";
                 }else if(legacyPhase==="portal"){
                     const key=stageKey(run);
-                    run.battleCompleted=true;
-                    run.chestClaimed=true;
-                    run.portalUnlocked=run.regionIndex<REGION_COUNT-1;
-                    run.completedStages[key]=true;
-                    run.completedRegions[run.regionIndex]=true;
-                    run.regionCompleted=true;
+                    run.battleCompleted=true;run.chestClaimed=true;run.portalUnlocked=run.regionIndex<REGION_COUNT-1;
+                    run.completedStages[key]=true;run.completedRegions[run.regionIndex]=true;run.regionCompleted=true;
                     run.rewardClaims[key]={status:"claimed",migrated:true};
                     run.phase=run.regionIndex<REGION_COUNT-1?"portal":"complete";
                     if(run.regionIndex===REGION_COUNT-1){ run.completed=true; }
@@ -225,6 +226,22 @@
     let rootState=loadRoot();
     let mapEntered=false;
     let battleStarting=false;
+    let movementState=null;
+    let interactionState=null;
+    let actionSequence=0;
+
+    function clearTransientActions(){
+        movementState=null;
+        interactionState=null;
+    }
+    function beginInteraction(kind,key){
+        if(interactionState||movementState){ return null; }
+        interactionState={id:++actionSequence,kind:String(kind||"action"),key:String(key||"")};
+        return interactionState;
+    }
+    function releaseInteraction(lock){
+        if(lock&&interactionState===lock){ interactionState=null; }
+    }
 
     function normalizeRunInPlace(level){
         const key=Number(level)===40?40:20;
@@ -246,6 +263,17 @@
     }
     persist();
 
+    function patchExistingV143ExplosiveFlurryRenderer(){
+        const manifest=window.v143SkillAnimationManifest;
+        const sprite=manifest&&manifest.explosiveFlurry&&manifest.explosiveFlurry.sprite;
+        if(!sprite){ return false; }
+        Object.assign(sprite,{
+            renderer:"canvas-crop",frameWidth:384,frameHeight:384,naturalGrid:true,alignToSlots:true
+        });
+        return true;
+    }
+    patchExistingV143ExplosiveFlurryRenderer();
+
     function highestCharacterLevel(){
         if(typeof window.v133GetHighestCreatedCharacterLevel==="function"){
             return Math.max(1,Math.floor(numeric(window.v133GetHighestCreatedCharacterLevel(),1)));
@@ -266,10 +294,11 @@
     function currentRegion(run){ return ABYSS_REGIONS[clamp(Math.floor(numeric(run&&run.regionIndex,0)),0,REGION_COUNT-1)]; }
 
     function applyHpMultiplier(monster,multiplier){
-        const scale=Math.max(0.01,numeric(multiplier,1));
+        const scale=Math.max(0.01,numeric(multiplier,1))*HP_DURABILITY_MULTIPLIER;
         monster.maxHP=Math.max(1,Math.round(numeric(monster.maxHP,1)*scale));
         monster.hp=monster.maxHP;
         monster.v174AbyssHpMultiplier=scale;
+        monster.v174AbyssDurabilityMultiplier=HP_DURABILITY_MULTIPLIER;
         delete monster.v141ExtraHP;
         return monster;
     }
@@ -302,38 +331,54 @@
         return monster;
     }
 
+    function buildTrueRealmFinalRoster(config){
+        const roster=[];
+        FINAL_TRUE_REALM_EMPERORS.forEach((definition,position)=>{
+            const emperorRegion=ABYSS_REGIONS[definition.regionIndex];
+            const boss=makeAbyssMonster(definition.name,config,emperorRegion,"boss",config.bossHpMultiplier,true);
+            boss.v141FormationRow=0;
+            boss.v141FormationPosition=position;
+            boss.v174TrueRealmFinal=true;
+            roster.push(boss);
+        });
+        for(let position=0;position<5;position++){
+            const elite=makeAbyssMonster("天兵天將",config,ABYSS_REGIONS[4],"elite",config.bossEliteHpMultiplier,false);
+            elite.v141FormationRow=1;
+            elite.v141FormationPosition=position;
+            elite.v174TrueRealmFinal=true;
+            roster.push(elite);
+        }
+        return roster;
+    }
+
     function buildRoster(level,regionIndex,encounterIndex){
         const config=difficultyConfig(level);
-        const region=ABYSS_REGIONS[clamp(Math.floor(numeric(regionIndex,0)),0,REGION_COUNT-1)];
+        const safeRegionIndex=clamp(Math.floor(numeric(regionIndex,0)),0,REGION_COUNT-1);
+        const region=ABYSS_REGIONS[safeRegionIndex];
         const stage=clamp(Math.floor(numeric(encounterIndex,0)),0,STAGES_PER_REGION-1);
         const roster=[];
         if(stage<PRE_STAGE_COUNT){
             const hpMultiplier=config.stageHpMultipliers[stage];
             for(let index=0;index<5;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"regular",hpMultiplier,false);
-                monster.v141FormationRow=0;
-                monster.v141FormationPosition=index;
-                roster.push(monster);
+                monster.v141FormationRow=0;monster.v141FormationPosition=index;roster.push(monster);
             }
             for(let index=0;index<5;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"elite",hpMultiplier,false);
-                monster.v141FormationRow=1;
-                monster.v141FormationPosition=index;
-                roster.push(monster);
+                monster.v141FormationRow=1;monster.v141FormationPosition=index;roster.push(monster);
             }
             return roster;
+        }
+        if(isTrueRealmFinal(config.id,safeRegionIndex,stage)){
+            return buildTrueRealmFinalRoster(config);
         }
         for(let index=0;index<10;index++){
             if(index===2){
                 const boss=makeAbyssMonster(region.emperor,config,region,"boss",config.bossHpMultiplier,true);
-                boss.v141FormationRow=0;
-                boss.v141FormationPosition=2;
-                roster.push(boss);
+                boss.v141FormationRow=0;boss.v141FormationPosition=2;roster.push(boss);
             }else{
                 const elite=makeAbyssMonster("天兵天將",config,region,"elite",config.bossEliteHpMultiplier,false);
-                elite.v141FormationRow=index<5?0:1;
-                elite.v141FormationPosition=index<5?index:index-5;
-                roster.push(elite);
+                elite.v141FormationRow=index<5?0:1;elite.v141FormationPosition=index<5?index:index-5;roster.push(elite);
             }
         }
         return roster;
@@ -354,69 +399,44 @@
         if(run.active){ return {label:"攻略中",action:"繼續探索",className:"active"}; }
         return {label:"可挑戰",action:"開始挑戰",className:"ready"};
     }
-
     function renderDifficultyCard(level){
-        const config=difficultyConfig(level);
-        const run=rootState.runs[level];
-        const locked=!isUnlocked(level);
-        const status=cardStatus(run,locked);
+        const config=difficultyConfig(level),run=rootState.runs[level],locked=!isUnlocked(level),status=cardStatus(run,locked);
         return '<article class="v174-abyss-card '+status.className+'" data-difficulty="'+level+'">'+
             '<img class="v174-abyss-card-cover" src="'+config.cover+'" alt="'+escapeHtml(config.title)+'副本封面">'+
-            '<div class="v174-abyss-card-shade"></div>'+
-            '<div class="v174-abyss-card-copy">'+
-                '<span class="v174-abyss-level">Lv'+level+'</span>'+
-                '<div class="v174-abyss-card-title"><b>虛空五帝</b><strong>'+escapeHtml(config.shortTitle)+'</strong></div>'+
-                '<span class="v174-abyss-state">'+escapeHtml(status.label)+'</span>'+
-                '<small>'+escapeHtml(cardProgress(run))+'</small>'+
-            '</div>'+
+            '<div class="v174-abyss-card-shade"></div><div class="v174-abyss-card-copy">'+
+            '<span class="v174-abyss-level">Lv'+level+'</span><div class="v174-abyss-card-title"><b>虛空五帝</b><strong>'+escapeHtml(config.shortTitle)+'</strong></div>'+
+            '<span class="v174-abyss-state">'+escapeHtml(status.label)+'</span><small>'+escapeHtml(cardProgress(run))+'</small></div>'+
             (locked?'<div class="v174-abyss-lock"><span aria-hidden="true">鎖</span><b>Lv'+level+' 解鎖</b></div>':'')+
-            '<button type="button" '+(locked?'disabled aria-disabled="true"':'onclick="v174AbyssSelectDifficulty('+level+')"')+'>'+escapeHtml(status.action)+'</button>'+
-        '</article>';
+            '<button type="button" '+(locked?'disabled aria-disabled="true"':'onclick="v174AbyssSelectDifficulty('+level+')"')+'>'+escapeHtml(status.action)+'</button></article>';
     }
-
     function renderSelection(){
-        return '<div class="v141-abyss-intro v174-abyss-selection">'+
-            '<header class="v174-abyss-selection-head"><span>深淵副本</span><b>虛空五帝</b><small>固定境界・力量成長不再被深淵同步追趕</small></header>'+
-            '<div class="v174-abyss-card-list">'+renderDifficultyCard(20)+renderDifficultyCard(40)+'</div>'+
-        '</div>';
+        return '<div class="v141-abyss-intro v174-abyss-selection"><header class="v174-abyss-selection-head"><span>深淵副本</span><b>虛空五帝</b><small>固定境界・力量成長不再被深淵同步追趕</small></header><div class="v174-abyss-card-list">'+renderDifficultyCard(20)+renderDifficultyCard(40)+'</div></div>';
     }
-
     function nodeClass(run,index){
         const key="d"+run.difficulty+"-r"+run.regionIndex+"-s"+index;
         if(run.completedStages[key]){ return "done"; }
-        if(index===run.encounterIndex){
-            if(run.battleCompleted&&!run.chestClaimed){ return "current pending"; }
-            return "current";
-        }
+        if(index===run.encounterIndex){ return run.battleCompleted&&!run.chestClaimed?"current pending":"current"; }
         return index<run.encounterIndex?"done":"locked";
     }
     function renderStageNodes(run){
         return '<div class="v174-abyss-nodes" aria-label="本區五關進度">'+Array.from({length:STAGES_PER_REGION},(_,index)=>{
             const boss=index===PRE_STAGE_COUNT;
-            const label=boss?"帝":String(index+1);
-            return '<span class="v174-abyss-node '+(boss?'boss ':'')+nodeClass(run,index)+'" title="'+(boss?'帝王 BOSS':'前置關 '+(index+1))+'"><i>'+label+'</i></span>';
+            return '<span class="v174-abyss-node '+(boss?'boss ':'')+nodeClass(run,index)+'" title="'+(boss?'帝王 BOSS':'前置關 '+(index+1))+'"><i>'+(boss?'帝':String(index+1))+'</i></span>';
         }).join('<em></em>')+'</div>';
     }
-
     function renderEncounterControl(run,region){
         if(run.phase!=="ready"||run.battleCompleted){ return ""; }
         const pos=BOSS_POSITIONS[run.regionIndex]||BOSS_POSITIONS[0];
         if(isBossStage(run)){
-            return '<button type="button" class="v174-abyss-encounter boss" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v174AbyssStartEncounter(event)">'+
-                '<span class="v174-abyss-boss-portrait" style="background-image:url(\''+region.bossArt+'\')"></span>'+
-                '<b>'+escapeHtml(region.displayEmperor||region.emperor)+'</b><small>帝王 BOSS・點擊挑戰</small></button>';
+            return '<button type="button" class="v174-abyss-encounter boss" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v174AbyssStartEncounter(event)"><span class="v174-abyss-boss-portrait" style="background-image:url(\''+region.bossArt+'\')"></span><b>'+escapeHtml(region.displayEmperor||region.emperor)+'</b><small>帝王 BOSS・點擊挑戰</small></button>';
         }
-        return '<button type="button" class="v174-abyss-encounter trial" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v174AbyssStartEncounter(event)">'+
-            '<i>'+String(run.encounterIndex+1)+'</i><b>領域試煉</b><small>前置關 '+String(run.encounterIndex+1)+' / 4</small></button>';
+        return '<button type="button" class="v174-abyss-encounter trial" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v174AbyssStartEncounter(event)"><i>'+String(run.encounterIndex+1)+'</i><b>領域試煉</b><small>前置關 '+String(run.encounterIndex+1)+' / 4</small></button>';
     }
-
     function renderChest(run){
         if(!run.chestSpawned||run.chestClaimed||run.phase!=="chest"){ return ""; }
         const pos=BOSS_POSITIONS[run.regionIndex]||BOSS_POSITIONS[0];
-        const title=isBossStage(run)?"帝王寶箱":"深淵寶箱";
-        return '<button type="button" class="v141-abyss-chest v174-abyss-chest" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v174AbyssClaimChest()"><i></i><span>'+title+'・待領</span></button>';
+        return '<button type="button" class="v141-abyss-chest v174-abyss-chest" style="left:'+pos[0]+'%;top:'+pos[1]+'%" onclick="event.stopPropagation();v174AbyssClaimChest()"><i></i><span>'+(isBossStage(run)?"帝王寶箱":"深淵寶箱")+'・待領</span></button>';
     }
-
     function portalLabel(run,region){
         if(run.encounterIndex===PRE_STAGE_COUNT-1){ return region.bossEntry; }
         if(isBossStage(run)&&run.regionIndex<REGION_COUNT-1){ return "前往"+ABYSS_REGIONS[run.regionIndex+1].name; }
@@ -427,31 +447,15 @@
         const bossGate=run.encounterIndex===PRE_STAGE_COUNT-1;
         return '<button type="button" class="v141-abyss-portal v174-abyss-portal '+(bossGate?'boss-gate':'')+'" style="left:50%;top:10%" onclick="event.stopPropagation();v174AbyssUsePortal()"><i></i><span>'+escapeHtml(portalLabel(run,region))+'</span></button>';
     }
-
     function renderCompletion(run){
         const config=difficultyConfig(run.difficulty);
-        return '<div class="v141-abyss-intro complete v174-abyss-complete">'+
-            '<div class="v174-abyss-complete-seal">破</div><h3>'+escapeHtml(config.title)+' 已通關</h3>'+
-            '<p>極帝寶箱已領取，本次 25 場深淵進度正式完成。</p>'+
-            '<div class="v174-abyss-complete-actions"><button type="button" onclick="v174AbyssReset('+run.difficulty+')">重新挑戰</button><button type="button" onclick="v174AbyssBackToSelection()">返回深淵選擇</button></div>'+
-        '</div>';
+        return '<div class="v141-abyss-intro complete v174-abyss-complete"><div class="v174-abyss-complete-seal">破</div><h3>'+escapeHtml(config.title)+' 已通關</h3><p>極帝寶箱已領取，本次 25 場深淵進度正式完成。</p><div class="v174-abyss-complete-actions"><button type="button" onclick="v174AbyssReset('+run.difficulty+')">重新挑戰</button><button type="button" onclick="v174AbyssBackToSelection()">返回深淵選擇</button></div></div>';
     }
-
     function renderMap(run){
-        const config=difficultyConfig(run.difficulty);
-        const region=currentRegion(run);
-        const map=FLOOR_MAPS[run.regionIndex];
+        const config=difficultyConfig(run.difficulty),region=currentRegion(run),map=FLOOR_MAPS[run.regionIndex];
         const message=run.message||(!run.battleCompleted?(isBossStage(run)?"帝王氣息逼近。前往王座發起挑戰。":"點擊試煉印記，進入本區前置戰。"):(run.chestClaimed?"寶箱已領取，傳送點已解鎖。":"戰鬥已完成，請走到寶箱領取獎勵。"));
-        return '<div class="v141-abyss-shell v174-abyss-shell" data-difficulty="'+run.difficulty+'" data-region="'+region.id+'">'+
-            '<div class="v174-abyss-hud"><div><small>'+escapeHtml(config.title)+'</small><b>'+escapeHtml(region.name)+'</b><span>'+escapeHtml(stageLabel(run))+'・'+escapeHtml(fiveStageProgress(run))+'</span></div>'+renderStageNodes(run)+'<button type="button" class="v174-abyss-back" onclick="v174AbyssBackToSelection()" aria-label="返回深淵選擇">返</button></div>'+
-            '<div id="v174AbyssMessage" class="v174-abyss-message">'+escapeHtml(message)+'</div>'+
-            '<div id="v141AbyssMap" class="v141-abyss-map v174-abyss-map floor-'+String(run.regionIndex+1)+'" style="--v174-abyss-map:url(\''+map+'\')" onclick="v174AbyssMoveByEvent(event)">'+
-                renderEncounterControl(run,region)+renderChest(run)+renderPortal(run,region)+
-                '<div id="v141AbyssPlayer" class="v141-abyss-player" style="left:'+run.x+'%;top:'+run.y+'%"><span></span><small>玩家</small></div>'+
-            '</div>'+
-        '</div>';
+        return '<div class="v141-abyss-shell v174-abyss-shell" data-difficulty="'+run.difficulty+'" data-region="'+region.id+'"><div class="v174-abyss-hud"><div><small>'+escapeHtml(config.title)+'</small><b>'+escapeHtml(region.name)+'</b><span>'+escapeHtml(stageLabel(run))+'・'+escapeHtml(fiveStageProgress(run))+'</span></div>'+renderStageNodes(run)+'<button type="button" class="v174-abyss-back" onclick="v174AbyssBackToSelection()" aria-label="返回深淵選擇">返</button></div><div id="v174AbyssMessage" class="v174-abyss-message">'+escapeHtml(message)+'</div><div id="v141AbyssMap" class="v141-abyss-map v174-abyss-map floor-'+String(run.regionIndex+1)+'" style="--v174-abyss-map:url(\''+map+'\')" onclick="v174AbyssMoveByEvent(event)">'+renderEncounterControl(run,region)+renderChest(run)+renderPortal(run,region)+'<div id="v141AbyssPlayer" class="v141-abyss-player" style="left:'+run.x+'%;top:'+run.y+'%"><span></span><small>玩家</small></div></div></div>';
     }
-
     function renderAbyss(){
         const run=currentRun();
         if(!mapEntered||!run){ return renderSelection(); }
@@ -459,326 +463,183 @@
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(syncPlayerArt); }
         return renderMap(run);
     }
-
     function syncPlayerArt(){
         const target=document&&document.querySelector?document.querySelector("#v141AbyssPlayer > span"):null;
         const source=document&&document.getElementById?document.getElementById("patrolCharacterImg"):null;
         if(target&&source){
             const src=source.currentSrc||source.src||"";
-            target.style.backgroundImage=src?'url("'+String(src).replace(/"/g,"%22")+'")':"none";
-            target.style.backgroundSize="contain";
-            target.style.backgroundPosition="center";
-            target.style.backgroundRepeat="no-repeat";
+            target.style.backgroundImage=src?'url("'+String(src).replace(/\"/g,"%22")+'")':"none";
+            target.style.backgroundSize="contain";target.style.backgroundPosition="center";target.style.backgroundRepeat="no-repeat";
         }
     }
     function refresh(){
         const content=document&&document.getElementById?document.getElementById("dungeonTabContent"):null;
-        if(content){
-            content.innerHTML=renderAbyss();
-            if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(syncPlayerArt); }
-        }
+        if(content){ content.innerHTML=renderAbyss();if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(syncPlayerArt); } }
     }
-
     function resetStageFlags(run){
-        run.isBoss=isBossStage(run);
-        run.phase="ready";
-        run.battleCompleted=false;
-        run.chestSpawned=false;
-        run.chestClaimed=false;
-        run.portalUnlocked=false;
-        run.regionCompleted=!!run.completedRegions[run.regionIndex];
-        run.x=50;
-        run.y=84;
-        run.message="";
+        run.isBoss=isBossStage(run);run.phase="ready";run.battleCompleted=false;run.chestSpawned=false;run.chestClaimed=false;
+        run.portalUnlocked=false;run.regionCompleted=!!run.completedRegions[run.regionIndex];run.x=50;run.y=84;run.message="";
     }
-
     function selectDifficulty(level){
         const config=difficultyConfig(level);
-        if(!isUnlocked(config.id)){
-            if(typeof alert==="function"){ alert("需要角色達到 Lv"+config.unlockLevel+" 才能挑戰"+config.title+"。"); }
-            return false;
-        }
-        rootState.selectedDifficulty=config.id;
-        const run=rootState.runs[config.id];
-        if(!run.active&&!run.completed){ run.active=true; }
-        mapEntered=true;
-        persist();
-        refresh();
-        return true;
+        if(!isUnlocked(config.id)){ if(typeof alert==="function"){ alert("需要角色達到 Lv"+config.unlockLevel+" 才能挑戰"+config.title+"。"); }return false; }
+        clearTransientActions();rootState.selectedDifficulty=config.id;
+        const run=rootState.runs[config.id];if(!run.active&&!run.completed){ run.active=true; }
+        mapEntered=true;persist();refresh();return true;
     }
-
     function resetDifficulty(level){
-        const config=difficultyConfig(level);
-        const clears=Math.max(0,Math.floor(numeric(rootState.runs[config.id]&&rootState.runs[config.id].clears,0)));
-        rootState.runs[config.id]=defaultRun(config.id);
-        rootState.runs[config.id].active=true;
-        rootState.runs[config.id].clears=clears;
-        rootState.selectedDifficulty=config.id;
-        mapEntered=true;
-        persist();
-        refresh();
+        const config=difficultyConfig(level),clears=Math.max(0,Math.floor(numeric(rootState.runs[config.id]&&rootState.runs[config.id].clears,0)));
+        clearTransientActions();rootState.runs[config.id]=defaultRun(config.id);rootState.runs[config.id].active=true;rootState.runs[config.id].clears=clears;
+        rootState.selectedDifficulty=config.id;mapEntered=true;persist();refresh();
     }
-
-    function backToSelection(){
-        mapEntered=false;
-        rootState.selectedDifficulty=null;
-        persist();
-        refresh();
-    }
+    function backToSelection(){ clearTransientActions();mapEntered=false;rootState.selectedDifficulty=null;persist();refresh(); }
 
     function movePlayer(x,y,callback){
         const run=currentRun();
-        if(!run){ if(callback){ callback(); } return; }
-        const targetX=clamp(numeric(x,run.x),4,96);
-        const targetY=clamp(numeric(y,run.y),8,94);
+        if(!run||movementState){ return false; }
+        const startX=numeric(run.x,50),startY=numeric(run.y,84);
+        const targetX=clamp(numeric(x,startX),4,96),targetY=clamp(numeric(y,startY),8,94);
         const playerEl=document&&document.getElementById?document.getElementById("v141AbyssPlayer"):null;
-        const distance=Math.hypot(targetX-run.x,targetY-run.y);
+        const distance=Math.hypot(targetX-startX,targetY-startY);
         const duration=Math.max(0.25,Math.min(1.45,distance/38));
-        run.x=targetX;
-        run.y=targetY;
-        persist();
-        if(!playerEl){ if(callback){ callback(); } return; }
-        playerEl.style.transition="left "+duration+"s cubic-bezier(.22,.61,.36,1),top "+duration+"s cubic-bezier(.22,.61,.36,1)";
-        playerEl.style.left=targetX+"%";
-        playerEl.style.top=targetY+"%";
-        playerEl.classList.add("walking");
-        setTimeout(function(){
-            playerEl.classList.remove("walking");
+        const movement={id:++actionSequence,run:run,startX:startX,startY:startY,targetX:targetX,targetY:targetY};
+        movementState=movement;
+        const finish=function(){
+            if(movementState!==movement){ return; }
+            run.x=targetX;run.y=targetY;persist();
+            if(playerEl&&playerEl.classList){ playerEl.classList.remove("walking"); }
+            movementState=null;
             if(callback){ callback(); }
-        },Math.round(duration*1000)+30);
+        };
+        if(!playerEl){ finish();return true; }
+        playerEl.style.transition="left "+duration+"s cubic-bezier(.22,.61,.36,1),top "+duration+"s cubic-bezier(.22,.61,.36,1)";
+        playerEl.style.left=targetX+"%";playerEl.style.top=targetY+"%";playerEl.classList.add("walking");
+        setTimeout(finish,Math.round(duration*1000)+30);
+        return true;
     }
 
     function resolveBattleResult(result){
-        const run=currentRun();
-        if(!run){ return false; }
-        if(result!=="win"){
-            run.message="挑戰失敗，本關進度未前進。整備後可再次挑戰。";
-            persist();
-            refresh();
-            return false;
-        }
-        run.battleCompleted=true;
-        run.chestSpawned=true;
-        run.chestClaimed=false;
-        run.portalUnlocked=false;
-        run.phase="chest";
-        run.message=(isBossStage(run)?"帝王已退場。":"試煉已通過。")+"請走到寶箱位置領取獎勵。";
-        persist();
-        refresh();
-        return true;
+        const run=currentRun();if(!run){ return false; }
+        clearTransientActions();
+        if(result!=="win"){ run.message="挑戰失敗，本關進度未前進。整備後可再次挑戰。";persist();refresh();return false; }
+        run.battleCompleted=true;run.chestSpawned=true;run.chestClaimed=false;run.portalUnlocked=false;run.phase="chest";
+        run.message=(isBossStage(run)?"帝王已退場。":"試煉已通過。")+"請走到寶箱位置領取獎勵。";persist();refresh();return true;
     }
-
     function launchCurrentEncounter(){
-        const run=currentRun();
-        if(!run||battleStarting||run.phase!=="ready"||run.battleCompleted){ return false; }
-        battleStarting=true;
-        const roster=buildRoster(run.difficulty,run.regionIndex,run.encounterIndex);
-        if(typeof window.v132LaunchDungeonBattle!=="function"){
-            battleStarting=false;
-            throw new Error("Abyss requires v132LaunchDungeonBattle runtime owner.");
-        }
+        const run=currentRun();if(!run||battleStarting||run.phase!=="ready"||run.battleCompleted||movementState||interactionState){ return false; }
+        battleStarting=true;const roster=buildRoster(run.difficulty,run.regionIndex,run.encounterIndex);
+        if(typeof window.v132LaunchDungeonBattle!=="function"){ battleStarting=false;throw new Error("Abyss requires v132LaunchDungeonBattle runtime owner."); }
         const started=window.v132LaunchDungeonBattle(roster,function(outcome){
-            battleStarting=false;
-            if(typeof showPage==="function"){ showPage("dungeon"); }
-            mapEntered=true;
-            rootState.selectedDifficulty=run.difficulty;
-            resolveBattleResult(outcome&&outcome.result);
-            if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }
-            else{ refresh(); }
+            battleStarting=false;if(typeof showPage==="function"){ showPage("dungeon"); }mapEntered=true;rootState.selectedDifficulty=run.difficulty;
+            resolveBattleResult(outcome&&outcome.result);if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }else{ refresh(); }
         });
-        if(!started){ battleStarting=false; }
-        return !!started;
+        if(!started){ battleStarting=false; }return !!started;
     }
-
     function confirmBossAndLaunch(){
-        const run=currentRun();
-        if(!run){ return false; }
-        const region=currentRegion(run);
-        const config=difficultyConfig(run.difficulty);
-        const atmosphere=config.id===20
-            ?"前方感受到強大的"+region.elementLabel+"元素氣息。"+(region.displayEmperor||region.emperor)+"正在等待挑戰者。"
-            :region.name+"天威壓境。"+(region.displayEmperor||region.emperor)+"已在王座前等待決戰。";
+        const run=currentRun();if(!run||battleStarting||movementState||interactionState){ return false; }
+        const region=currentRegion(run),config=difficultyConfig(run.difficulty);
+        const atmosphere=config.id===20?"前方感受到強大的"+region.elementLabel+"元素氣息。"+(region.displayEmperor||region.emperor)+"正在等待挑戰者。":region.name+"天威壓境。"+(isFinalBossStage(run)?"五位天尊已降臨戰場，等待最終決戰。":(region.displayEmperor||region.emperor)+"已在王座前等待決戰。");
         if(typeof window.rpgConfirm!=="function"){ return false; }
+        battleStarting=true;
         Promise.resolve(window.rpgConfirm(atmosphere,{title:region.name,confirmText:region.bossEntry,cancelText:"暫不進入"}))
-            .then(function(ok){ if(ok){ launchCurrentEncounter(); } });
+            .then(function(ok){ battleStarting=false;if(ok){ launchCurrentEncounter(); } },function(){ battleStarting=false; });
         return true;
     }
-
     function startEncounter(){
-        const run=currentRun();
-        if(!run||run.phase!=="ready"){ return false; }
-        /* Clicking an encounter is an action, not a map-movement command.
-           The enemy marker itself already identifies the target, so launch the
-           battle directly instead of making the avatar take a cosmetic step. */
-        if(isBossStage(run)){ return confirmBossAndLaunch(); }
-        return launchCurrentEncounter();
+        const run=currentRun();if(!run||run.phase!=="ready"||movementState||interactionState){ return false; }
+        if(isBossStage(run)){ return confirmBossAndLaunch(); }return launchCurrentEncounter();
     }
 
-    function contentDefinitions(){
-        return typeof window.v132GetContentDefinitions==="function"?window.v132GetContentDefinitions():{tickets:[]};
-    }
-    function ticketDefinition(ticketId){
-        return (contentDefinitions().tickets||[]).find(function(item){ return item&&item.id===ticketId; })||null;
-    }
+    function contentDefinitions(){ return typeof window.v132GetContentDefinitions==="function"?window.v132GetContentDefinitions():{tickets:[]}; }
+    function ticketDefinition(ticketId){ return (contentDefinitions().tickets||[]).find(item=>item&&item.id===ticketId)||null; }
     function rewardDescriptor(run){
-        const config=difficultyConfig(run.difficulty);
-        const region=currentRegion(run);
-        if(!isBossStage(run)){
-            return {kind:"normal",gold:config.normalGold,exp:0,ticket:null};
-        }
+        const config=difficultyConfig(run.difficulty),region=currentRegion(run);
+        if(!isBossStage(run)){ return {kind:"normal",gold:config.normalGold,exp:0,ticket:null}; }
         if(isFinalBossStage(run)){
-            const tickets=(contentDefinitions().tickets||[]).filter(function(item){ return item&&/^ticketSet/.test(String(item.id||"")); });
+            const tickets=(contentDefinitions().tickets||[]).filter(item=>item&&/^ticketSet/.test(String(item.id||"")));
             const ticket=tickets.length?tickets[Math.floor(Math.random()*tickets.length)]:null;
             return {kind:"emperor",gold:config.finalGold,exp:config.finalExp,ticket:ticket};
         }
         return {kind:"emperor",gold:config.emperorGold,exp:0,ticket:ticketDefinition(region.ticketId)};
     }
-    function canStoreReward(reward){
-        if(!reward.ticket){ return true; }
-        if(typeof window.v132CanAddItemToInventory==="function"){
-            return !!window.v132CanAddItemToInventory(reward.ticket,1);
-        }
-        return true;
-    }
-    function addRewardItem(reward){
-        if(!reward.ticket){ return true; }
-        return typeof window.v132AddItemToInventory==="function"?!!window.v132AddItemToInventory(reward.ticket,1):false;
-    }
+    function canStoreReward(reward){ return !reward.ticket||typeof window.v132CanAddItemToInventory!=="function"||!!window.v132CanAddItemToInventory(reward.ticket,1); }
+    function addRewardItem(reward){ return !reward.ticket||(typeof window.v132AddItemToInventory==="function"&&!!window.v132AddItemToInventory(reward.ticket,1)); }
     function applyCurrencyReward(reward){
-        if(reward.gold>0&&typeof gold!=="undefined"){ gold+=reward.gold; }
-        if(reward.exp>0&&typeof sharedExp!=="undefined"){ sharedExp+=reward.exp; }
-        if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
-        if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
-        if(typeof saveGame==="function"){ saveGame(); }
+        if(reward.gold>0&&typeof gold!=="undefined"){ gold+=reward.gold; }if(reward.exp>0&&typeof sharedExp!=="undefined"){ sharedExp+=reward.exp; }
+        if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }if(typeof saveGame==="function"){ saveGame(); }
     }
     function showReward(reward){
         const items=reward.ticket?[{name:reward.ticket.name||"裝備券",count:1}]:[];
-        if(typeof window.v141ShowBlackGoldReward==="function"){
-            window.v141ShowBlackGoldReward({exp:reward.exp||0,gold:reward.gold||0,items:items.map(function(item){ return {name:item.name,count:item.count}; })});
-            return;
-        }
+        if(typeof window.v141ShowBlackGoldReward==="function"){ window.v141ShowBlackGoldReward({exp:reward.exp||0,gold:reward.gold||0,items:items});return; }
         if(typeof window.v132ShowRewardModal==="function"){
-            const lines=[];
-            if(reward.gold){ lines.push("金幣 "+Number(reward.gold).toLocaleString("zh-TW")); }
-            if(reward.exp){ lines.push("EXP "+Number(reward.exp).toLocaleString("zh-TW")); }
-            if(reward.ticket){ lines.push(escapeHtml(reward.ticket.name||"裝備券")+" ×1"); }
+            const lines=[];if(reward.gold){ lines.push("金幣 "+Number(reward.gold).toLocaleString("zh-TW")); }if(reward.exp){ lines.push("EXP "+Number(reward.exp).toLocaleString("zh-TW")); }if(reward.ticket){ lines.push(escapeHtml(reward.ticket.name||"裝備券")+" ×1"); }
             window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>'+(reward.kind==="emperor"?'帝王寶箱':'深淵寶箱')+'</h3><p>'+lines.join("<br>")+'</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">收下</button></div></div>');
         }
     }
-
     function finalizeClaim(run,reward,key){
         run.rewardClaims[key]={status:"claimed",kind:reward.kind,gold:reward.gold,exp:reward.exp,ticketId:reward.ticket&&reward.ticket.id||null,claimedAt:Date.now()};
-        run.chestSpawned=false;
-        run.chestClaimed=true;
-        run.completedStages[key]=true;
-        if(isBossStage(run)){
-            run.completedRegions[run.regionIndex]=true;
-            run.regionCompleted=true;
-        }
+        run.chestSpawned=false;run.chestClaimed=true;run.completedStages[key]=true;
+        if(isBossStage(run)){ run.completedRegions[run.regionIndex]=true;run.regionCompleted=true; }
         if(isFinalBossStage(run)){
-            run.completed=true;
-            run.phase="complete";
-            run.portalUnlocked=false;
-            run.clears=Math.max(0,Math.floor(numeric(run.clears,0)))+1;
-            run.message="極帝寶箱已領取，虛空五帝全境通關。";
-        }else{
-            run.phase="portal";
-            run.portalUnlocked=true;
-            run.message="寶箱已領取，傳送點正式解鎖。";
-        }
+            run.completed=true;run.phase="complete";run.portalUnlocked=false;run.clears=Math.max(0,Math.floor(numeric(run.clears,0)))+1;run.message="極帝寶箱已領取，虛空五帝全境通關。";
+        }else{ run.phase="portal";run.portalUnlocked=true;run.message="寶箱已領取，傳送點正式解鎖。"; }
         persist();
     }
-
-    function claimChest(){
-        const run=currentRun();
-        if(!run||run.phase!=="chest"||!run.battleCompleted||!run.chestSpawned){ return false; }
-        const key=stageKey(run);
+    function reconcileExistingClaim(run,key){
         const existing=run.rewardClaims[key];
-        if(run.chestClaimed||(existing&&(existing.status==="granting"||existing.status==="claimed"))){
-            run.chestSpawned=false;
-            run.chestClaimed=true;
-            run.completedStages[key]=true;
-            if(isFinalBossStage(run)){
-                run.completed=true;
-                run.phase="complete";
-                run.portalUnlocked=false;
-            }else{
-                run.phase="portal";
-                run.portalUnlocked=true;
-            }
-            persist();
-            refresh();
-            return false;
-        }
+        if(!(existing&&(existing.status==="granting"||existing.status==="claimed"))&&!run.chestClaimed){ return false; }
+        run.chestSpawned=false;run.chestClaimed=true;run.completedStages[key]=true;
+        if(isFinalBossStage(run)){ run.completed=true;run.phase="complete";run.portalUnlocked=false; }
+        else{ run.phase="portal";run.portalUnlocked=true; }
+        persist();refresh();return true;
+    }
+    function claimChest(){
+        const run=currentRun();if(!run||run.phase!=="chest"||!run.battleCompleted||!run.chestSpawned){ return false; }
+        const key=stageKey(run);if(reconcileExistingClaim(run,key)){ return false; }
+        const lock=beginInteraction("chest",key);if(!lock){ return false; }
         const pos=BOSS_POSITIONS[run.regionIndex]||BOSS_POSITIONS[0];
-        movePlayer(pos[0],pos[1],function(){
-            const reward=rewardDescriptor(run);
-            if(!canStoreReward(reward)){
-                if(typeof alert==="function"){ alert("背包空間不足，寶箱尚未領取。請整理背包後再試一次。"); }
-                return;
-            }
-            run.rewardClaims[key]={status:"granting",kind:reward.kind,ticketId:reward.ticket&&reward.ticket.id||null,startedAt:Date.now()};
-            persist();
-            if(!addRewardItem(reward)){
-                delete run.rewardClaims[key];
-                persist();
-                if(typeof alert==="function"){ alert("背包空間不足，寶箱尚未領取。"); }
-                return;
-            }
-            applyCurrencyReward(reward);
-            finalizeClaim(run,reward,key);
-            refresh();
-            showReward(reward);
+        const started=movePlayer(pos[0],pos[1],function(){
+            const live=currentRun();
+            if(!live||live!==run||stageKey(live)!==key||live.phase!=="chest"||!live.chestSpawned||live.chestClaimed){ releaseInteraction(lock);return; }
+            const reward=rewardDescriptor(live);
+            if(!canStoreReward(reward)){ releaseInteraction(lock);if(typeof alert==="function"){ alert("背包空間不足，寶箱尚未領取。請整理背包後再試一次。"); }return; }
+            if(!addRewardItem(reward)){ releaseInteraction(lock);if(typeof alert==="function"){ alert("背包空間不足，寶箱尚未領取。"); }return; }
+            applyCurrencyReward(reward);finalizeClaim(live,reward,key);releaseInteraction(lock);refresh();showReward(reward);
         });
-        return true;
+        if(!started){ releaseInteraction(lock);return false; }return true;
     }
-
     function advanceThroughPortal(){
-        const run=currentRun();
-        if(!run||run.completed||run.phase!=="portal"||!run.portalUnlocked||!run.chestClaimed){ return false; }
-        movePlayer(50,17,function(){
-            if(run.encounterIndex<PRE_STAGE_COUNT){
-                run.encounterIndex++;
-            }else if(run.regionIndex<REGION_COUNT-1){
-                run.regionIndex++;
-                run.encounterIndex=0;
-            }else{
-                return;
-            }
-            resetStageFlags(run);
-            persist();
-            refresh();
+        const run=currentRun();if(!run||run.completed||run.phase!=="portal"||!run.portalUnlocked||!run.chestClaimed){ return false; }
+        const key=stageKey(run),lock=beginInteraction("portal",key);if(!lock){ return false; }
+        const started=movePlayer(50,17,function(){
+            const live=currentRun();
+            if(!live||live!==run||stageKey(live)!==key||live.completed||live.phase!=="portal"||!live.portalUnlocked||!live.chestClaimed){ releaseInteraction(lock);return; }
+            if(live.encounterIndex<PRE_STAGE_COUNT){ live.encounterIndex++; }
+            else if(live.regionIndex<REGION_COUNT-1){ live.regionIndex++;live.encounterIndex=0; }
+            else{ releaseInteraction(lock);return; }
+            resetStageFlags(live);persist();releaseInteraction(lock);refresh();
         });
-        return true;
+        if(!started){ releaseInteraction(lock);return false; }return true;
     }
-
     function moveByEvent(event){
-        const run=currentRun();
-        const map=document&&document.getElementById?document.getElementById("v141AbyssMap"):null;
-        if(!run||!map||!event){ return; }
-        if(event.target&&typeof event.target.closest==="function"&&event.target.closest("button")){ return; }
-        const rect=map.getBoundingClientRect();
-        if(!rect.width||!rect.height){ return; }
-        const x=clamp((numeric(event.clientX)-rect.left)/rect.width*100,4,96);
-        const y=clamp((numeric(event.clientY)-rect.top)/rect.height*100,8,94);
-        movePlayer(x,y);
+        const run=currentRun(),map=document&&document.getElementById?document.getElementById("v141AbyssMap"):null;
+        if(!run||!map||!event||movementState||interactionState){ return false; }
+        if(event.target&&typeof event.target.closest==="function"&&event.target.closest("button")){ return false; }
+        const rect=map.getBoundingClientRect();if(!rect.width||!rect.height){ return false; }
+        const x=clamp((numeric(event.clientX)-rect.left)/rect.width*100,4,96),y=clamp((numeric(event.clientY)-rect.top)/rect.height*100,8,94);
+        return movePlayer(x,y);
     }
 
     const previousRenderDungeonTabContent=typeof window.renderDungeonTabContent==="function"?window.renderDungeonTabContent:null;
-    window.renderDungeonTabContent=function(tabName){
-        if(tabName==="abyss"){ return renderAbyss(); }
-        return previousRenderDungeonTabContent?previousRenderDungeonTabContent.apply(this,arguments):"";
-    };
-    try{
-        if(typeof renderDungeonTabContent==="function"){ renderDungeonTabContent=window.renderDungeonTabContent; }
-    }catch(_){ }
+    window.renderDungeonTabContent=function(tabName){ if(tabName==="abyss"){ return renderAbyss(); }return previousRenderDungeonTabContent?previousRenderDungeonTabContent.apply(this,arguments):""; };
+    try{ if(typeof renderDungeonTabContent==="function"){ renderDungeonTabContent=window.renderDungeonTabContent; } }catch(_){ }
 
     window.v174AbyssDifficulties=ABYSS_DIFFICULTIES;
     window.v174AbyssRegions=ABYSS_REGIONS;
     window.v174AbyssBuildRoster=buildRoster;
-    window.v174AbyssGetRootState=function(){ return JSON.parse(JSON.stringify(rootState)); };
-    window.v174AbyssGetRunState=function(level){ return JSON.parse(JSON.stringify(rootState.runs[difficultyConfig(level).id])); };
-    window.v174AbyssReloadState=function(){ rootState=loadRoot(); persist(); return window.v174AbyssGetRootState(); };
+    window.v174AbyssGetRootState=()=>JSON.parse(JSON.stringify(rootState));
+    window.v174AbyssGetRunState=level=>JSON.parse(JSON.stringify(rootState.runs[difficultyConfig(level).id]));
+    window.v174AbyssReloadState=function(){ clearTransientActions();rootState=loadRoot();persist();return window.v174AbyssGetRootState(); };
     window.v174AbyssSelectDifficulty=selectDifficulty;
     window.v174AbyssReset=resetDifficulty;
     window.v174AbyssBackToSelection=backToSelection;
@@ -789,40 +650,31 @@
     window.v174AbyssUsePortal=advanceThroughPortal;
     window.v174RenderAbyss=renderAbyss;
     window.v174RefreshAbyss=refresh;
+    window.v174AbyssGetInteractionDiagnostics=function(){
+        return {moving:!!movementState,interaction:interactionState?{kind:interactionState.kind,key:interactionState.key}:null};
+    };
 
-    /* Compatibility aliases: old public entry points now route to this one owner.
-       The legacy private five-floor builder remains unreachable; the exported
-       roster always resolves to exactly one emperor boss stage for compatibility. */
     window.v141BuildAbyssRoster=function(floor){
         const level=Number(rootState.selectedDifficulty)===20?20:40;
         return buildRoster(level,clamp(Math.floor(numeric(floor,1))-1,0,REGION_COUNT-1),PRE_STAGE_COUNT);
     };
-    window.v141StartAbyss=function(){ return selectDifficulty(Number(rootState.selectedDifficulty)===40?40:20); };
-    window.v141ResetAbyss=function(){ return resetDifficulty(Number(rootState.selectedDifficulty)===40?40:20); };
+    window.v141StartAbyss=()=>selectDifficulty(Number(rootState.selectedDifficulty)===40?40:20);
+    window.v141ResetAbyss=()=>resetDifficulty(Number(rootState.selectedDifficulty)===40?40:20);
     window.v141OpenAbyssChest=claimChest;
     window.v141UseAbyssPortal=advanceThroughPortal;
     window.v141AbyssMoveByEvent=moveByEvent;
     window.v141ChallengeAbyssBoss=startEncounter;
-    window.v141HandleAbyssBossInteraction=function(event){
-        if(event&&event.preventDefault){ event.preventDefault(); }
-        if(event&&event.stopPropagation){ event.stopPropagation(); }
-        return startEncounter();
-    };
-    window.v141LeaveAbyssMap=function(){ mapEntered=false; };
+    window.v141HandleAbyssBossInteraction=function(event){ if(event&&event.preventDefault){ event.preventDefault(); }if(event&&event.stopPropagation){ event.stopPropagation(); }return startEncounter(); };
+    window.v141LeaveAbyssMap=function(){ clearTransientActions();mapEntered=false; };
     window.v141GetAbyssState=function(){
         const run=currentRun()||rootState.runs[20];
-        return Object.assign({},JSON.parse(JSON.stringify(run)),{
-            floor:run.regionIndex+1,
-            phase:run.completed?"complete":run.phase,
-            mapEntered:mapEntered
-        });
+        return Object.assign({},JSON.parse(JSON.stringify(run)),{floor:run.regionIndex+1,phase:run.completed?"complete":run.phase,mapEntered:mapEntered});
     };
 
     if(typeof document!=="undefined"){
         document.addEventListener("v173:runtime-ready",function(){
-            if(document.getElementById("dungeonTabContent")&&typeof window.currentDungeonTab!=="undefined"&&window.currentDungeonTab==="abyss"){
-                refresh();
-            }
+            patchExistingV143ExplosiveFlurryRenderer();
+            if(document.getElementById("dungeonTabContent")&&typeof window.currentDungeonTab!=="undefined"&&window.currentDungeonTab==="abyss"){ refresh(); }
         },{once:true});
     }
 })();
