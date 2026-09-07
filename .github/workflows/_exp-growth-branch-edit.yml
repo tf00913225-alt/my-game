@@ -24,7 +24,9 @@ jobs:
           node-version: "24"
 
       - name: Apply EXP owner convergence
-        run: python3 .github/scripts/_exp_growth_branch_edit.py
+        run: |
+          python3 .github/scripts/_exp_growth_branch_edit.py
+          python3 .github/scripts/_exp_growth_followup.py
 
       - name: Run targeted EXP regressions
         run: |
@@ -43,6 +45,7 @@ jobs:
         run: |
           rm -f .github/workflows/_exp-growth-branch-edit.yml
           rm -f .github/scripts/_exp_growth_branch_edit.py
+          rm -f .github/scripts/_exp_growth_followup.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
