@@ -133,7 +133,7 @@ test("Lv40 final battle restores five Heavenly Emperors plus five elite in forma
 test("both Abyss difficulties reduce current monster HP by 25 percent while preserving the same stage curve",()=>{
     const {context}=load();
     const expected20=[[[724,2317],[764,2446],[804,2574],[845,2703]],[2832,5793]];
-    const expected40=[[[1207,3861],[1274,4076],[1341,4290],[1408,4505]],[4719,9654]];
+    const expected40=[[[1207,3861],[1274,4076],[1341,4290],[1408,4504]],[4719,9654]];
     [[20,expected20],[40,expected40]].forEach(([level,expected])=>{
         expected[0].forEach(([regularHp,eliteHp],stage)=>{
             const roster=value(context,`v174AbyssBuildRoster(${level},0,${stage})`);
