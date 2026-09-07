@@ -52,6 +52,42 @@ if(!patched.includes(coverWaitNeedle)){
 }
 patched=patched.replace(coverWaitNeedle,coverWaitReplacement);
 
+/* Real-device regression guard: a legacy V154 align-items:center rule can make
+   the two-tier card list shrink to only a few pixels wide on Android Chrome.
+   Non-zero geometry and a correct 16:9 ratio are not enough to catch that, so
+   make the live QA verify substantial cross-axis width as well. */
+const geometryNeedle=`        const sr=selection?.getBoundingClientRect();
+        const stage=document.getElementById('game-stage')?.getBoundingClientRect();
+`;
+const geometryReplacement=`        const sr=selection?.getBoundingClientRect();
+        const list=document.querySelector('.v174-abyss-card-list');
+        const lr=list?.getBoundingClientRect();
+        const stage=document.getElementById('game-stage')?.getBoundingClientRect();
+`;
+const metricNeedle=`            selectionWidth:sr?.width||0,selectionHeight:sr?.height||0,
+            selectionOverflow:selection?(selection.scrollHeight-selection.clientHeight):999,
+`;
+const metricReplacement=`            selectionWidth:sr?.width||0,selectionHeight:sr?.height||0,
+            selectionAlignItems:selection?getComputedStyle(selection).alignItems:null,
+            cardListWidth:lr?.width||0,cardListHeight:lr?.height||0,
+            selectionOverflow:selection?(selection.scrollHeight-selection.clientHeight):999,
+`;
+const footprintNeedle=`    assert.ok(selection.w20>0&&selection.h20>0&&selection.w40>0&&selection.h40>0,"Abyss cards must have a real visible footprint");
+`;
+const footprintReplacement=`    assert.ok(selection.w20>0&&selection.h20>0&&selection.w40>0&&selection.h40>0,"Abyss cards must have a real visible footprint");
+    assert.equal(selection.selectionAlignItems,"stretch","Two-tier Abyss selection must override legacy centered cross-axis sizing");
+    assert.ok(selection.cardListWidth>=Math.max(250,selection.selectionWidth*0.80),\`Abyss card list collapsed horizontally: list=\${selection.cardListWidth}px selection=\${selection.selectionWidth}px\`);
+    assert.ok(selection.w20>=selection.cardListWidth*0.95&&selection.w40>=selection.cardListWidth*0.95,\`Abyss cover cards do not fill the card list: cards=\${selection.w20}/\${selection.w40}px list=\${selection.cardListWidth}px\`);
+`;
+
+if(!patched.includes(geometryNeedle)||!patched.includes(metricNeedle)||!patched.includes(footprintNeedle)){
+    throw new Error("Live Abyss QA could not install the Android card-width regression assertions.");
+}
+patched=patched
+    .replace(geometryNeedle,geometryReplacement)
+    .replace(metricNeedle,metricReplacement)
+    .replace(footprintNeedle,footprintReplacement);
+
 const target=path.join(os.tmpdir(),`abyss-live-browser-qa-saved-${process.pid}.mjs`);
 fs.writeFileSync(target,patched,"utf8");
 await import(pathToFileURL(target).href+`?run=${Date.now()}`);
