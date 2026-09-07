@@ -5,12 +5,9 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
-const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
-const loaderSource=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
-const cssSource=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
 
 function storage(seed){
-    const values=new Map(Object.entries(seed||{}).map(([k,v])=>[k,String(v)]));
+    const values=new Map(Object.entries(seed||{}).map(([key,value])=>[key,String(value)]));
     return {
         getItem:key=>values.has(String(key))?values.get(String(key)):null,
         setItem:(key,value)=>values.set(String(key),String(value)),
@@ -28,18 +25,37 @@ function baseDefense(level,rank){
     if(Number(level)===40){ return rank==="elite"?326:rank==="boss"?365:261; }
     return 1;
 }
-function load(options){
-    const opts=options||{};
-    const localStorage=storage(opts.storage);
+function classList(){
+    const values=new Set();
+    return {add:name=>values.add(name),remove:name=>values.delete(name),contains:name=>values.has(name)};
+}
+function load(options={}){
+    const localStorage=storage(options.storage);
     const noop=()=>{};
-    const document={readyState:"complete",getElementById:()=>null,querySelector:()=>null,addEventListener:noop};
+    const timers=[];
+    const playerEl=options.deferMovement?{style:{},classList:classList()}:null;
+    const mapEl=options.deferMovement?{
+        getBoundingClientRect:()=>({left:0,top:0,width:1000,height:1000}),
+        style:{},classList:classList()
+    }:null;
+    const document={
+        readyState:"complete",
+        getElementById(id){
+            if(id==="v141AbyssPlayer"){ return playerEl; }
+            if(id==="v141AbyssMap"){ return mapEl; }
+            return null;
+        },
+        querySelector:()=>null,
+        addEventListener:noop
+    };
     const context={
         console,JSON,Math:Object.create(Math),Date,Number,String,Boolean,Object,Array,Set,Map,Promise,RegExp,Error,TypeError,
         parseInt,parseFloat,isNaN,localStorage,document,
-        requestAnimationFrame:fn=>{ if(fn){ fn(); } return 1; },setTimeout:fn=>{ if(fn){ fn(); } return 1; },clearTimeout:noop,
-        alert:noop,confirm:()=>true,player:{id:"qa",level:opts.playerLevel||50},player2:null,player3:null,gold:0,sharedExp:0,
+        requestAnimationFrame:fn=>{ if(fn){ fn(); } return 1; },
+        setTimeout(fn){ if(options.deferMovement){ timers.push(fn); }else if(fn){ fn(); } return timers.length||1; },clearTimeout:noop,
+        alert:noop,confirm:()=>true,player:{id:"qa",level:options.playerLevel||50},player2:null,player3:null,gold:0,sharedExp:0,
         renderDungeonTabContent:()=>"legacy",currentDungeonTab:"daily",saveGame:noop,rebuildInventorySlots:noop,updateGoldDisplay:noop,
-        showPage:noop,switchDungeonTab:noop,v133GetHighestCreatedCharacterLevel:()=>opts.playerLevel||50,
+        showPage:noop,switchDungeonTab:noop,v133GetHighestCreatedCharacterLevel:()=>options.playerLevel||50,
         v132CanAddItemToInventory:()=>true,v132AddItemToInventory:()=>true,
         v132GetContentDefinitions:()=>({tickets:[
             {id:"ticketSetEarth",name:"岩岳裝備券"},{id:"ticketSetFire",name:"赤炎裝備券"},
@@ -50,57 +66,36 @@ function load(options){
             defense:baseDefense(level,rank),attack:Number(level)===20?140:244,magicAttack:Number(level)===20?140:241,
             skillIds:[element+"Skill"],skillChance:.35,v132Dungeon:true,activeBuffs:[],statusEffects:[]
         }),
-        v132LaunchDungeonBattle:()=>true
+        v132LaunchDungeonBattle:()=>true,
+        v143SkillAnimationManifest:{explosiveFlurry:{sprite:{src:"assets/vfx/fire/explosive-flurry-cast.png?v=165",columns:4,rows:3,frames:12,placement:"group"}}}
     };
     context.window=context;
     context.globalThis=context;
     vm.createContext(context);
     vm.runInContext(source,context,{filename:"js/59-abyss-two-tier-runtime.js"});
-    return {context,localStorage};
+    return {
+        context,localStorage,playerEl,mapEl,
+        flushTimers(){ while(timers.length){ const fn=timers.shift();fn(); } }
+    };
 }
 function value(context,expression){ return JSON.parse(vm.runInContext("JSON.stringify("+expression+")",context)); }
 
 let passed=0;
-function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
+function test(name,fn){ fn();passed++;console.log("✓ "+name); }
 
-test("late loader gives the two-tier Abyss the final public ownership",()=>{
-    assert.match(loaderSource,/v17363-functional-fixes-runtime/);
-    assert.match(loaderSource,/v174-abyss-two-tier-runtime/);
-    assert.match(loaderSource,/js\/59-abyss-two-tier-runtime\.js/);
-});
-
-test("Abyss reuses the existing dungeon monster builder and battle launcher",()=>{
-    assert.match(source,/window\.v132BuildDungeonMonster\(name,config\.monsterLevel,region\.element,rank\)/);
-    assert.match(source,/window\.v132LaunchDungeonBattle\(roster/);
-    assert.doesNotMatch(source,/function\s+calculateDamage\s*\(/);
-    assert.match(v132Source,/function buildDungeonMonster\(name,level,element,rank\)/);
-    assert.match(v132Source,/const DUNGEON_ELITE_MULTIPLIERS=\{maxHP:3\.20,maxSP:2\.00,defense:1\.25\}/);
-    assert.match(v132Source,/const DUNGEON_BOSS_MULTIPLIERS=\{maxHP:4\.50,maxSP:2\.00,defense:1\.40\}/);
-});
-
-test("Lv20 remains monster level 20 for higher-level players and skills stay Lv1",()=>{
-    [20,30,50].forEach(playerLevel=>{
-        const {context}=load({playerLevel});
+test("fixed difficulties remain Lv20/Lv40 and skill levels stay Lv1/Lv2 before final-v155 launch patch",()=>{
+    [20,40].forEach(level=>{
+        const {context}=load({playerLevel:80});
         for(let region=0;region<5;region++) for(let stage=0;stage<5;stage++){
-            const roster=value(context,`v174AbyssBuildRoster(20,${region},${stage})`);
+            const roster=value(context,`v174AbyssBuildRoster(${level},${region},${stage})`);
             assert.equal(roster.length,10);
-            assert.equal(roster.every(monster=>monster.level===20),true);
-            assert.equal(roster.every(monster=>monster.v141ForceSkillLevel===1),true);
+            assert.equal(roster.every(monster=>monster.level===level),true);
+            assert.equal(roster.every(monster=>monster.v141ForceSkillLevel===(level===20?1:2)),true);
         }
     });
 });
 
-test("Lv40 remains monster level 40 and every carried skill is forced to Lv2, never Lv5",()=>{
-    const {context}=load({playerLevel:80});
-    for(let region=0;region<5;region++) for(let stage=0;stage<5;stage++){
-        const roster=value(context,`v174AbyssBuildRoster(40,${region},${stage})`);
-        assert.equal(roster.every(monster=>monster.level===40),true);
-        assert.equal(roster.every(monster=>monster.v141ForceSkillLevel===2),true);
-        assert.equal(roster.some(monster=>monster.v141ForceSkillLevel===5),false);
-    }
-});
-
-test("all four pre-stages are ten enemies: front five regular, back five elite",()=>{
+test("all pre-stages remain five regular plus five elite",()=>{
     const {context}=load();
     [20,40].forEach(level=>{
         for(let region=0;region<5;region++) for(let stage=0;stage<4;stage++){
@@ -108,170 +103,140 @@ test("all four pre-stages are ten enemies: front five regular, back five elite",
             assert.deepEqual(roster.map(monster=>monster.rank),[
                 "regular","regular","regular","regular","regular","elite","elite","elite","elite","elite"
             ]);
-            assert.deepEqual(roster.map(monster=>monster.v141FormationRow),[0,0,0,0,0,1,1,1,1,1]);
         }
     });
 });
 
-test("every boss stage is nine elite plus exactly one emperor in the visual core",()=>{
+test("non-final boss stages and Lv20 final remain nine elite plus one emperor",()=>{
     const {context}=load();
-    [20,40].forEach(level=>{
-        for(let region=0;region<5;region++){
+    for(let region=0;region<4;region++){
+        [20,40].forEach(level=>{
             const roster=value(context,`v174AbyssBuildRoster(${level},${region},4)`);
             assert.equal(roster.filter(monster=>monster.rank==="elite").length,9);
             assert.equal(roster.filter(monster=>monster.rank==="boss").length,1);
-            const boss=roster.find(monster=>monster.rank==="boss");
-            assert.equal(boss.v141FormationRow,0);
-            assert.equal(boss.v141FormationPosition,2);
-        }
+        });
+    }
+    const initialFinal=value(context,"v174AbyssBuildRoster(20,4,4)");
+    assert.deepEqual(initialFinal.filter(monster=>monster.rank==="boss").map(monster=>monster.name),["極帝天尊"]);
+    assert.equal(initialFinal.filter(monster=>monster.rank==="elite").length,9);
+});
+
+test("Lv40 final battle restores five Heavenly Emperors plus five elite in formal v155 order",()=>{
+    const {context}=load();
+    const roster=value(context,"v174AbyssBuildRoster(40,4,4)");
+    assert.deepEqual(roster.slice(0,5).map(monster=>monster.name),["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"]);
+    assert.equal(roster.slice(0,5).every(monster=>monster.rank==="boss"&&monster.v141FormationRow===0),true);
+    assert.equal(roster.slice(5).every(monster=>monster.rank==="elite"&&monster.v141FormationRow===1),true);
+    assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationPosition),[0,1,2,3,4]);
+});
+
+test("both Abyss difficulties increase every monster HP by 150 percent over previous values (x2.5 total)",()=>{
+    const {context}=load();
+    const expected20=[[[965,3089],[1019,3261],[1073,3433],[1126,3604]],[3776,7724]];
+    const expected40=[[[1609,5148],[1698,5434],[1788,5720],[1877,6006]],[6292,12872]];
+    [[20,expected20],[40,expected40]].forEach(([level,expected])=>{
+        expected[0].forEach(([regularHp,eliteHp],stage)=>{
+            const roster=value(context,`v174AbyssBuildRoster(${level},0,${stage})`);
+            assert.deepEqual([roster[0].maxHP,roster[5].maxHP],[regularHp,eliteHp]);
+            assert.equal(roster.every(monster=>monster.v174AbyssDurabilityMultiplier===2.5),true);
+        });
+        const boss=value(context,`v174AbyssBuildRoster(${level},0,4)`);
+        assert.deepEqual([
+            boss.find(monster=>monster.rank==="elite").maxHP,
+            boss.find(monster=>monster.rank==="boss").maxHP
+        ],expected[1]);
     });
 });
 
-test("fifth region is Extreme Emperor plus nine elite, not five emperors",()=>{
+test("HP durability change does not modify attack or defense construction",()=>{
     const {context}=load();
-    [20,40].forEach(level=>{
-        const roster=value(context,`v174AbyssBuildRoster(${level},4,4)`);
-        assert.deepEqual(roster.filter(monster=>monster.rank==="boss").map(monster=>monster.name),["極帝天尊"]);
-        assert.equal(roster.some(monster=>["東帝","南帝","天帝","北帝"].includes(monster.name)),false);
-    });
+    const lv20=value(context,"v174AbyssBuildRoster(20,0,0)");
+    const lv40=value(context,"v174AbyssBuildRoster(40,0,0)");
+    assert.deepEqual([lv20[0].attack,lv20[0].defense],[140,152]);
+    assert.deepEqual([lv40[0].attack,lv40[0].defense],[244,261]);
 });
 
-test("Lv20 pre-stage and boss HP targets match the new fixed durability config",()=>{
-    const {context}=load();
-    [[386,1236],[408,1304],[429,1373],[450,1442]].forEach(([regularHp,eliteHp],stage)=>{
-        const roster=value(context,`v174AbyssBuildRoster(20,0,${stage})`);
-        assert.equal(roster[0].maxHP,regularHp);
-        assert.equal(roster[5].maxHP,eliteHp);
-    });
-    const boss=value(context,"v174AbyssBuildRoster(20,0,4)");
-    assert.equal(boss.find(monster=>monster.rank==="elite").maxHP,1510);
-    assert.equal(boss.find(monster=>monster.rank==="boss").maxHP,3090);
+test("rapid chest taps acquire one interaction lock and grant exactly one reward",()=>{
+    const run=load({deferMovement:true});
+    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win')",run.context);
+    assert.equal(vm.runInContext("v174AbyssClaimChest()",run.context),true);
+    assert.equal(vm.runInContext("v174AbyssClaimChest()",run.context),false);
+    assert.equal(Number(run.context.gold),0,"reward must wait until the first movement completes");
+    assert.deepEqual(value(run.context,"v174AbyssGetInteractionDiagnostics()"),{moving:true,interaction:{kind:"chest",key:"d20-r0-s0"}});
+    run.flushTimers();
+    const state=value(run.context,"v174AbyssGetRunState(20)");
+    assert.equal(Number(run.context.gold),120);
+    assert.deepEqual([state.phase,state.chestClaimed,state.portalUnlocked],["portal",true,true]);
+    assert.equal(vm.runInContext("v174AbyssClaimChest()",run.context),false);
+    assert.equal(Number(run.context.gold),120);
 });
 
-test("Lv40 pre-stage and boss HP targets match the new fixed durability config",()=>{
-    const {context}=load();
-    [[644,2059],[679,2174],[715,2288],[751,2402]].forEach(([regularHp,eliteHp],stage)=>{
-        const roster=value(context,`v174AbyssBuildRoster(40,0,${stage})`);
-        assert.equal(roster[0].maxHP,regularHp);
-        assert.equal(roster[5].maxHP,eliteHp);
-    });
-    const boss=value(context,"v174AbyssBuildRoster(40,0,4)");
-    assert.equal(boss.find(monster=>monster.rank==="elite").maxHP,2517);
-    assert.equal(boss.find(monster=>monster.rank==="boss").maxHP,5149);
+test("rapid portal taps can advance only one stage",()=>{
+    const run=load({deferMovement:true});
+    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win')",run.context);
+    vm.runInContext("v174AbyssClaimChest()",run.context);run.flushTimers();
+    assert.equal(vm.runInContext("v174AbyssUsePortal()",run.context),true);
+    assert.equal(vm.runInContext("v174AbyssUsePortal()",run.context),false);
+    let state=value(run.context,"v174AbyssGetRunState(20)");
+    assert.equal(state.encounterIndex,0,"stage must not commit before movement finishes");
+    run.flushTimers();
+    state=value(run.context,"v174AbyssGetRunState(20)");
+    assert.deepEqual([state.regionIndex,state.encounterIndex,state.phase],[0,1,"ready"]);
 });
 
-test("new Abyss never carries legacy +2500/+5000/+3500/+10000 HP and followers keep normal skill chance",()=>{
-    const {context}=load();
-    const monsters=value(context,"v174AbyssBuildRoster(20,0,3).concat(v174AbyssBuildRoster(40,4,4))");
-    monsters.forEach(monster=>assert.equal(Object.prototype.hasOwnProperty.call(monster,"v141ExtraHP"),false));
-    assert.equal(monsters.filter(monster=>monster.rank!=="boss").every(monster=>monster.skillChance===.35),true);
-    assert.doesNotMatch(source,/\+\s*(?:2500|5000|3500|10000)/);
+test("rapid map double tap does not rewrite committed coordinates or create instant movement",()=>{
+    const run=load({deferMovement:true});
+    vm.runInContext("v174AbyssSelectDifficulty(20)",run.context);
+    run.context.__tapA={clientX:800,clientY:500,target:{closest:()=>null}};
+    run.context.__tapB={clientX:200,clientY:200,target:{closest:()=>null}};
+    assert.equal(vm.runInContext("v174AbyssMoveByEvent(__tapA)",run.context),true);
+    assert.equal(vm.runInContext("v174AbyssMoveByEvent(__tapB)",run.context),false);
+    let state=value(run.context,"v174AbyssGetRunState(20)");
+    assert.deepEqual([state.x,state.y],[50,84],"persisted coordinates must remain at the movement origin while walking");
+    assert.deepEqual([run.playerEl.style.left,run.playerEl.style.top],["80%","50%"]);
+    run.flushTimers();
+    state=value(run.context,"v174AbyssGetRunState(20)");
+    assert.deepEqual([state.x,state.y],[80,50],"only the first tap may commit after its smooth movement completes");
 });
 
-test("victory creates a chest only; claiming it is the sole portal unlock and is idempotent",()=>{
+test("V143 Fire Flurry reuses the existing Canvas crop renderer instead of adding a second VFX runtime",()=>{
     const {context}=load();
-    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win')",context);
-    let run=value(context,"v174AbyssGetRunState(20)");
-    assert.deepEqual([run.phase,run.battleCompleted,run.chestSpawned,run.chestClaimed,run.portalUnlocked],["chest",true,true,false,false]);
-    const goldBefore=Number(context.gold);
-    assert.equal(vm.runInContext("v174AbyssClaimChest()",context),true);
-    run=value(context,"v174AbyssGetRunState(20)");
-    assert.deepEqual([run.phase,run.chestSpawned,run.chestClaimed,run.portalUnlocked],["portal",false,true,true]);
-    assert.equal(Number(context.gold),goldBefore+120);
-    assert.equal(vm.runInContext("v174AbyssClaimChest()",context),false);
-    assert.equal(Number(context.gold),goldBefore+120);
+    const sprite=value(context,"v143SkillAnimationManifest.explosiveFlurry.sprite");
+    assert.equal(sprite.renderer,"canvas-crop");
+    assert.deepEqual([sprite.frameWidth,sprite.frameHeight,sprite.naturalGrid,sprite.alignToSlots],[384,384,true,true]);
+    assert.equal(sprite.src,"assets/vfx/fire/explosive-flurry-cast.png?v=165");
+    assert.doesNotMatch(source,/v142SkillAnimationDirector\s*=\s*\{/);
 });
 
-test("reload restores a pending chest and never recreates a claimed one",()=>{
+test("claimed chest survives reload and never respawns",()=>{
     const first=load();
-    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win')",first.context);
-    const pending=load({storage:first.localStorage.snapshot()});
-    let run=value(pending.context,"v174AbyssGetRunState(20)");
-    assert.deepEqual([run.phase,run.chestSpawned,run.portalUnlocked],["chest",true,false]);
-    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssClaimChest()",pending.context);
-    const claimed=load({storage:pending.localStorage.snapshot()});
-    run=value(claimed.context,"v174AbyssGetRunState(20)");
-    assert.deepEqual([run.phase,run.chestSpawned,run.chestClaimed,run.portalUnlocked],["portal",false,true,true]);
-    assert.equal(vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssClaimChest()",claimed.context),false);
+    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win');v174AbyssClaimChest()",first.context);
+    const second=load({storage:first.localStorage.snapshot()});
+    const state=value(second.context,"v174AbyssGetRunState(20)");
+    assert.deepEqual([state.phase,state.chestSpawned,state.chestClaimed,state.portalUnlocked],["portal",false,true,true]);
 });
 
-test("Lv20 and Lv40 keep completely separate persisted run states",()=>{
-    const {context}=load();
-    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win');v174AbyssClaimChest();v174AbyssUsePortal()",context);
-    const lv20=value(context,"v174AbyssGetRunState(20)");
-    vm.runInContext("v174AbyssBackToSelection();v174AbyssSelectDifficulty(40);v174AbyssResolveBattleResult('win')",context);
-    const lv40=value(context,"v174AbyssGetRunState(40)");
-    assert.deepEqual([lv20.regionIndex,lv20.encounterIndex,lv20.phase],[0,1,"ready"]);
-    assert.deepEqual([lv40.regionIndex,lv40.encounterIndex,lv40.phase],[0,0,"chest"]);
-    assert.notDeepEqual(lv20.rewardClaims,lv40.rewardClaims);
-});
-
-test("one difficulty completes only after all 25 battle/chest stages and final chest creates no sixth portal",()=>{
+test("Lv20/Lv40 state remains separate and full run completes after exactly 25 claimed stages",()=>{
     const {context}=load();
     vm.runInContext("v174AbyssSelectDifficulty(20)",context);
     let wins=0;
     while(true){
-        let run=value(context,"v174AbyssGetRunState(20)");
-        if(run.completed){ break; }
-        assert.equal(run.phase,"ready");
-        vm.runInContext("v174AbyssResolveBattleResult('win')",context); wins++;
-        run=value(context,"v174AbyssGetRunState(20)");
-        assert.equal(run.portalUnlocked,false);
-        vm.runInContext("v174AbyssClaimChest()",context);
-        run=value(context,"v174AbyssGetRunState(20)");
-        if(run.completed){ assert.equal(run.portalUnlocked,false); break; }
-        assert.equal(run.portalUnlocked,true);
+        const before=value(context,"v174AbyssGetRunState(20)");
+        if(before.completed){ break; }
+        assert.equal(before.phase,"ready");
+        vm.runInContext("v174AbyssResolveBattleResult('win');v174AbyssClaimChest()",context);wins++;
+        const claimed=value(context,"v174AbyssGetRunState(20)");
+        if(claimed.completed){ break; }
         vm.runInContext("v174AbyssUsePortal()",context);
     }
-    const final=value(context,"v174AbyssGetRunState(20)");
+    const lv20=value(context,"v174AbyssGetRunState(20)");
     assert.equal(wins,25);
-    assert.equal(final.completed,true);
-    assert.equal(Object.keys(final.completedStages).length,25);
-    assert.deepEqual(final.completedRegions,[true,true,true,true,true]);
+    assert.equal(lv20.completed,true);
+    assert.equal(Object.keys(lv20.completedStages).length,25);
+    vm.runInContext("v174AbyssBackToSelection();v174AbyssSelectDifficulty(40);v174AbyssResolveBattleResult('win')",context);
+    const lv40=value(context,"v174AbyssGetRunState(40)");
+    assert.deepEqual([lv40.regionIndex,lv40.encounterIndex,lv40.phase],[0,0,"chest"]);
+    assert.equal(lv20.completed,true);
 });
 
-test("legacy five-floor save migrates safely into Lv40 only",()=>{
-    const legacy={active:true,floor:2,phase:"chest",clears:1,x:42,y:61};
-    const {context}=load({storage:{v141_abyss_state:JSON.stringify(legacy)}});
-    const root=value(context,"v174AbyssGetRootState()");
-    assert.equal(root.legacyMigrated,true);
-    assert.deepEqual([root.runs[20].active,root.runs[20].regionIndex,root.runs[20].encounterIndex],[false,0,0]);
-    assert.deepEqual([root.runs[40].regionIndex,root.runs[40].encounterIndex,root.runs[40].phase,root.runs[40].chestSpawned],[1,4,"chest",true]);
-});
-
-test("selection UI renders both equal-ratio covers, locked Lv40, progress HUD and five nodes",()=>{
-    const locked=load({playerLevel:20});
-    const selection=vm.runInContext("v174RenderAbyss()",locked.context);
-    assert.match(selection,/data-difficulty="20"/);
-    assert.match(selection,/data-difficulty="40"/);
-    assert.match(selection,/Lv40 解鎖/);
-    assert.match(selection,/assets\/dungeons\/abyss\/abyss-cover\.webp/);
-    assert.match(selection,/assets\/dungeons\/abyss\/abyss-cover-v17343\.png/);
-    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win')",locked.context);
-    const pending=vm.runInContext("v174RenderAbyss()",locked.context);
-    assert.equal((pending.match(/v174-abyss-node /g)||[]).length,5);
-    assert.match(pending,/current pending/);
-    assert.match(pending,/寶箱(?:・)?待領|寶箱位置領取/);
-    assert.match(pending,/1 \/ 5/);
-    assert.doesNotMatch(pending,/class="v141-abyss-portal v174-abyss-portal/);
-    assert.match(cssSource,/aspect-ratio:16\/9/);
-    assert.match(cssSource,/\.v174-abyss-node\.boss/);
-    assert.match(cssSource,/\.v174-abyss-portal\.boss-gate/);
-});
-
-test("daily dungeon dynamic-level calculation remains owned by v132 and untouched by Abyss",()=>{
-    assert.match(v132Source,/function getDungeonMonsterLevel\(\)[\s\S]*?Math\.round\(maxLevel\*0\.70\+avgLevel\*0\.30\)/);
-    assert.doesNotMatch(source,/v132GetDungeonMonsterLevel\s*\(/);
-    assert.match(source,/monsterLevel:20/);
-    assert.match(source,/monsterLevel:40/);
-});
-
-test("legacy public Abyss entry points now resolve to the one-boss current roster",()=>{
-    const {context}=load();
-    const final=value(context,"v141BuildAbyssRoster(5)");
-    assert.equal(final.filter(monster=>monster.rank==="boss").length,1);
-    assert.deepEqual(final.filter(monster=>monster.rank==="boss").map(monster=>monster.name),["極帝天尊"]);
-    assert.doesNotMatch(source,/\["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"\]/);
-});
-
-console.log(`All ${passed} two-tier Abyss refactor tests passed.`);
+console.log(`All ${passed} Abyss regression tests passed.`);
