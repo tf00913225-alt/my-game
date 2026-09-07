@@ -5,37 +5,24 @@ import {pathToFileURL} from "node:url";
 
 const sourcePath=path.resolve(".github/scripts/abyss-live-browser-qa-v2.mjs");
 const source=fs.readFileSync(sourcePath,"utf8");
-const needle='    window.v133GetHighestCreatedCharacterLevel=()=>${Number(level)};\n    return true;';
-const replacement='    window.v133GetHighestCreatedCharacterLevel=()=>${Number(level)};\n'+
-'    const creationPage=document.getElementById("creationPage");\n'+
-'    if(creationPage){\n'+
-'        creationPage.style.setProperty("display","none","important");\n'+
-'        creationPage.hidden=true;\n'+
-'        creationPage.setAttribute("aria-hidden","true");\n'+
-'    }\n'+
-'    [document.documentElement,document.body,document.getElementById("game-viewport"),document.getElementById("game-stage"),document.getElementById("game-overlay-layer")].forEach(node=>{\n'+
-'        if(!node){ return; }\n'+
-'        node.classList.remove("creation-scroll-active","creation-fixed-active");\n'+
-'    });\n'+
-'    const stage=document.getElementById("game-stage");\n'+
-'    if(stage){ stage.classList.remove("creation-native-active"); }\n'+
-'    const app=document.getElementById("app");\n'+
-'    if(app){\n'+
-'        app.inert=false;\n'+
-'        app.removeAttribute("aria-hidden");\n'+
-'        app.style.setProperty("display","block","important");\n'+
-'        app.style.removeProperty("visibility");\n'+
-'        app.style.removeProperty("opacity");\n'+
-'    }\n'+
-'    const gameContent=document.getElementById("game-content");\n'+
-'    if(gameContent){ gameContent.style.setProperty("display","block","important"); }\n'+
-'    return true;';
+const needle=`    await client.eval(seedPlayerExpression(20));
+    await client.eval(\`(async()=>{
+`;
+const replacement=`    await client.eval(seedPlayerExpression(20));
+    await client.eval(\`(()=>{if(typeof saveGame==='function'){saveGame();return true;}return false;})()\`);
+    await client.send("Page.reload",{ignoreCache:true});
+    await waitFor(client,"document.readyState==='complete'","saved player reload");
+    await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime after saved player reload");
+    await waitFor(client,"document.getElementById('v174-abyss-two-tier-style')&&document.getElementById('v174-abyss-two-tier-style').sheet","two-tier Abyss CSS after saved player reload");
+    await client.eval(seedPlayerExpression(20));
+    await client.eval(\`(async()=>{
+`;
 
 if(!source.includes(needle)){
-    throw new Error("Live Abyss QA bootstrap could not find the player-session seed hook.");
+    throw new Error("Live Abyss QA bootstrap could not find the first player-session entry hook.");
 }
 
 const patched=source.replace(needle,replacement);
-const target=path.join(os.tmpdir(),`abyss-live-browser-qa-visible-${process.pid}.mjs`);
+const target=path.join(os.tmpdir(),`abyss-live-browser-qa-saved-${process.pid}.mjs`);
 fs.writeFileSync(target,patched,"utf8");
 await import(pathToFileURL(target).href+`?run=${Date.now()}`);
