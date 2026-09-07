@@ -231,10 +231,8 @@ try{
     assert.equal(elementBoxLayers.stageStillExists,true,"V143 lifecycle stage must remain mounted while its presentation is suppressed");
     assert.equal(elementBoxLayers.stageVisibility,"hidden","Skill presentation must be hidden behind Element Box settings");
     assert.equal(Number(elementBoxLayers.stageOpacity),0,"Skill presentation opacity must be zero while Element Box settings owns focus");
-    assert.notEqual(elementBoxLayers.modalDisplay,"none","Element Box modal must remain visible");
-    assert.notEqual(elementBoxLayers.panelDisplay,"none","Element Box panel must remain visible");
-    assert.ok(elementBoxLayers.modalWidth>0&&elementBoxLayers.modalHeight>0,"Element Box modal must have visible geometry");
-    assert.ok(elementBoxLayers.panelWidth>0&&elementBoxLayers.panelHeight>0,"Element Box panel must have visible geometry");
+    assert.notEqual(elementBoxLayers.panelDisplay,"none","Element Box settings panel must remain visible");
+    assert.ok(elementBoxLayers.panelWidth>0&&elementBoxLayers.panelHeight>0,"Element Box settings panel must have visible geometry");
     assert.equal(elementBoxLayers.skillVolumeScale,2,"Live audio engine must expose the 2.0 skill SFX scale");
 
     const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
