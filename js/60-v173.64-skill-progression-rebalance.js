@@ -57,17 +57,17 @@
         rage:{learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical"},
         fireSoulResonance:{
             id:"fireSoulResonance",name:"炎魂共鳴",element:"fire",category:"buff",targetType:"self",
-            learnLevel:25,learnCost:14,maxLevel:5,spCost:35,duration:3,requires:[],progressionGroup:"tactical",
+            learnLevel:25,learnCost:14,maxLevel:5,spCost:35,duration:3,requires:["rage"],progressionGroup:"tactical",
             momentumBonusByLevel:FIRE_MOMENTUM_BY_LEVEL.slice(),icon:"炎",
             iconAssetPath:null,vfxAssetPath:null,
-            description:"自身進入炎魂共鳴3回合。期間火元素技能發生爆擊，或成功新增燃燒時，若尚未持有炎勢則獲得炎勢；炎勢使下一次玩家主動施放的火元素直接傷害主施放提高12%/15%/18%/21%/25%，使用後消失。炎勢不強化燃燒持續傷害與免費追擊。"
+            description:"需先學習怒火。自身進入炎魂共鳴3回合。期間火元素技能發生爆擊，或成功新增燃燒時，若尚未持有炎勢則獲得炎勢；炎勢使下一次玩家主動施放的火元素直接傷害主施放提高12%/15%/18%/21%/25%，使用後消失。炎勢不強化燃燒持續傷害與免費追擊。"
         },
         bloodBurnArt:{
             id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"buff",targetType:"self",
-            learnLevel:35,learnCost:18,maxLevel:5,spCost:20,duration:2,requires:[],progressionGroup:"tactical",
+            learnLevel:35,learnCost:18,maxLevel:5,spCost:20,duration:2,requires:["fireSoulResonance"],progressionGroup:"tactical",
             directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),icon:"血",
             iconAssetPath:null,vfxAssetPath:null,
-            description:"自身目前HP高於最大HP的20%時可施放，立即消耗最大HP的10%並獲得焚血，最多持續2回合。焚血使下一次玩家主動施放的火元素直接傷害主施放提高20%/25%/30%/35%/40%，使用後消失；不強化燃燒持續傷害與免費追擊。"
+            description:"需先學習炎魂共鳴。自身目前HP高於最大HP的20%時可施放，立即消耗最大HP的10%並獲得焚血，最多持續2回合。焚血使下一次玩家主動施放的火元素直接傷害主施放提高20%/25%/30%/35%/40%，使用後消失；不強化燃燒持續傷害與免費追擊。"
         },
         fireEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
@@ -105,11 +105,11 @@
         stoneBreakSky:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
         earthquakeCrush:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
         stoneThrow:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
-        rollingStone:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
+        sandWind:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
         flyingSandStrike:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        earthSpell:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
+        dustStorm:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
         rockWall:{
-            learnLevel:18,learnCost:10,maxLevel:5,requires:["petrifyFist","rollingStone"],progressionGroup:"tactical",
+            learnLevel:18,learnCost:10,maxLevel:5,requires:["petrifyFist","sandWind"],progressionGroup:"tactical",
             defenseBonusPercentByLevel:ROCK_WALL_BY_LEVEL.slice()
         },
         earthShield:{
@@ -132,6 +132,8 @@
             skill.id=skill.id||skillId;
             if(skill.maxLevel===5){
                 skill.upgradeCostByTargetLevel=SKILL_UPGRADE_COST_BY_TARGET_LEVEL;
+            }else{
+                delete skill.upgradeCostByTargetLevel;
             }
             skill.description=sanitizeDescription(skill.description);
         });
@@ -377,12 +379,18 @@
         const next=current>0&&current<numeric(skill.maxLevel,1)?current+1:null;
         const block=document.createElement("div");
         block.className="v17364-progression-detail";
+        let upgradeText="—";
+        if(numeric(skill.maxLevel,1)>1){
+            upgradeText=next
+                ?getUpgradeCostForTargetLevel(skill,next)+" 技能點"
+                :"Lv2 1・Lv3 2・Lv4 3・Lv5 4 技能點";
+        }
         const rows=[
             ["最低學習等級","Lv"+skill.learnLevel],
             ["目前技能等級",current>0?"Lv"+current:"尚未學習"],
             ["下一級角色需求",next?"角色 Lv"+getRequiredCharacterLevelForSkillLevel(skill,next):"—"],
             ["學習成本",skill.learnCost+" 技能點"],
-            ["升級成本",next?getUpgradeCostForTargetLevel(skill,next)+" 技能點":"—"],
+            ["升級成本",upgradeText],
             ["前置技能",prerequisiteLabel(skill)]
         ];
         rows.forEach(([label,value])=>{
@@ -533,7 +541,7 @@
     function createMomentum(actor,index,resonance){
         if(!resonance||activeBuff(actor,"fireMomentum")){ return null; }
         const level=clampLevel(resonance.skillLevel,5);
-        return addNamedBuff(actor,"fireMomentum",index,"炎勢",999,{skillLevel:level,bonusPercent:FIRE_MOMENTUM_BY_LEVEL[level-1],oneShot:true});
+        return addNamedBuff(actor,"fireMomentum",index,"炎勢",Number.MAX_SAFE_INTEGER,{skillLevel:level,bonusPercent:FIRE_MOMENTUM_BY_LEVEL[level-1],oneShot:true});
     }
     function withFireActiveCast(actorIndex,skillId,invoke){
         const skill=skillById(skillId);
