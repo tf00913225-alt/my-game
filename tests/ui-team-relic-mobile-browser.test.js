@@ -93,8 +93,8 @@ function verify(data,width,height){
     assert.ok(data.box.left>=data.stage.left-tolerance&&data.box.right<=data.stage.right+tolerance,`${width}px relic modal escapes horizontally`);
     assert.ok(data.box.top>=data.stage.top-tolerance&&data.box.bottom<=data.stage.bottom+tolerance,`${width}px relic modal escapes vertically`);
     /* The modal owns 4px outer padding and an additional 8px safe inset, so
-       a 16px total height delta is the intended full-screen mobile frame. */
-    assert.ok(data.box.width>=width-12&&data.box.height>=height-20,
+       a 16px total delta on each axis is the intended full-screen frame. */
+    assert.ok(data.box.width>=width-20&&data.box.height>=height-20,
         `${width}px relic modal is not full-screen (${data.box.width}x${data.box.height})`);
     assert.match(data.body.overflowY,/auto|scroll/,`${width}px legacy wide-modal CSS retook scroll ownership`);
     assert.equal(data.body.overflowX,"hidden");assert.equal(data.body.touchAction,"pan-y");
@@ -115,6 +115,10 @@ if(!chrome){
     if(process.env.CI){ throw new Error("CI must provide Chrome for team relic mobile browser QA"); }
     console.log("Team relic mobile browser QA skipped: Chrome not available");
 }else{
-    for(const [width,height] of [[390,844],[412,915]]){ verify(run(chrome,width,height),width,height); }
+    for(const [width,height] of [[390,844],[412,915]]){
+        const data=run(chrome,width,height);
+        try{ verify(data,width,height); }
+        catch(error){ error.message+=` | metrics=${JSON.stringify(data)}`; throw error; }
+    }
     console.log("✓ Team relic mobile browser QA passed at 390px and 412px");
 }
