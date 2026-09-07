@@ -122,7 +122,8 @@ jobs:
         run: |
           node --check .github/scripts/abyss-live-browser-qa.mjs
           node --check .github/scripts/abyss-live-browser-qa-v2.mjs
-          node .github/scripts/abyss-live-browser-qa-v2.mjs
+          node --check .github/scripts/run-abyss-live-browser-qa.mjs
+          node .github/scripts/run-abyss-live-browser-qa.mjs
 
       - name: Upload live mobile Abyss QA evidence
         if: always()
