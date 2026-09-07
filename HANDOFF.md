@@ -1,3 +1,9 @@
+## 2026-09-07 合成首次開頁 Icon 時序修復（dev）
+- 使用者實機確認裝備／符咒 icon 在首次打開合成頁仍需點一下才顯示。根因是 `js/36-v141-content-systems.js` 的合成入口直接呼叫 closure `renderSynthesis()`，繞過 V143/V146/V173.63 的最終 public renderer。
+- 合成入口改為優先呼叫 `window.v141RenderSynthesis()`；`js/58-v173.63-functional-fixes.js` 在正式 render 前先同步 equipment/static item presentation，render 後立即 repair picker，不再把首次 icon 顯示依賴點擊或下一次 rerender。
+- owner：`js/36-v141-content-systems.js`（合成入口）＋ `js/58-v173.63-functional-fixes.js`（最終 presentation/render wrapper）；不新增 runtime patch。
+- Game/Cache Version 維持 V173.62，待 DEV 手機實機確認首次打開裝備與符咒均直接顯示 icon 後才能標 VERIFIED。
+
 ## V173.61 返回圖示／道具圖／副本預覽／音效／常亮省電／任務即時領取（目前 dev）
 - V173.60 已通過受保護 Repository checks 並由 PR #70 正式合併 main；本輪新修改只在 dev。
 - `css/00-main.css` 是共用返回按鈕視覺 owner：所有實際使用 `assets/ui/map-return.png` 的入口統一補 `#050505` 圓形黑底。
@@ -3537,3 +3543,30 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 3. 如果發現新的架構陷阱（像「V131 不是用 script 標籤載入」那種），
    補進「系統架構重點」，不要只留在對話紀錄裡，之後不同工具、不同視窗看不到那段對話
 4. 確認 `main` 分支已經是最新、可運作的狀態才算工作結束
+
+
+## 2026-09-07 — Synthesis / Dungeon / Equipment UI bugfix batch
+
+- Work branch: `bugfix/synthesis-dungeon-equipment-ui`, based on dev `ed1cd126d60f01fb7554b71e6fe54968adddd83b`. `main` untouched.
+- Official version/cache remain `173.62`; this batch is intentionally unversioned until every requirement is VERIFIED.
+- Reforge material tier layout owner remains `css/38-v141-system-expansion.css`; its tier picker is now a touch-whitelisted horizontal rail.
+- Dungeon text reward preview frame is body-mounted; the matching CSS owner is `css/33-v132-content-expansion.css`, not a `#game-stage`-prefixed selector.
+- Backpack equipment comparison owner remains `js/55-v173.51-inventory-qa.js` + `css/53-v173.51-qa.css`. Canonical equipment slots are `head / hand / shoulder / armor / shoes`; item type `weapon` maps to equipment slot `hand`.
+- Material synthesis remains owned by `js/58-v173.63-functional-fixes.js`; player-visible native browser selects are replaced with in-game listbox controls and the material artwork is compacted.
+- Initial synthesis equipment art is resolved by `js/38-v143-system-fixes.js` directly from `assetPath` on first picker render, rather than waiting for a later repair pass.
+- Permanent UI rule: player-visible native `<select>/<option>` menus are forbidden; see `UI_GUIDELINES.md`.
+- Batch checklist: `release/requirement-batches/2026-09-07-synthesis-dungeon-equipment-ui.json`. Status remains IMPLEMENTED pending CI + dev visual verification; do not claim COMPLETE or bump version yet.
+
+
+## 2026-09-07 — Cloudflare DEV branch alias
+
+- Cloudflare 已由實際 deployment 證實：`dev` 分支固定 alias 為 `https://dev.four-symbols-dev.pages.dev`。
+- 現行 DEV 實機測試、release manifest 與 commit SHA read-back 一律使用此 branch alias；較早文件中出現的 `https://four-symbols-dev.pages.dev` 僅為歷史 root URL，不得再作為目前 `dev` SHA 驗證來源。
+- `.github/workflows/deploy-dev-cloudflare.yml` 已明確使用 `--branch=dev`，且部署後會從上述 branch alias 驗證 commit SHA、Game Version 與 Cache Version。
+
+
+## 2026-09-07 合成內頁垂直捲動 follow-up（dev）
+- 使用者手機驗收確認裝備冶煉與材料合成內容仍會在底部裁切；真正垂直 scroll owner 為 `.v141-synthesis-body`，不是外層 `#homeFeatureModalBody`。
+- `css/38-v141-system-expansion.css` 改為 `.v141-synthesis-body` 原生 `overflow-y:auto` + `touch-action:pan-y`，長內容卡片改 `height:auto; min-height:100%`；冶煉階級橫向 rail 允許 pan-x/pan-y。
+- `js/58-v173.63-functional-fixes.js` 的 `maximizeSynthesisPanel()` 同步把真正內容 body 設為垂直 scroll owner；`js/01-stage-v8-touch-lock.js` 白名單加入 `.v141-synthesis-body`。
+- 版本仍維持 V173.62；需等 DEV 實機確認兩頁都能滑到底後才可把本 follow-up 標成 VERIFIED。

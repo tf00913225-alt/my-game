@@ -39,7 +39,7 @@ function makeElement(){
     };
 }
 
-test("the V78 owner keeps every character tab inside one fixed Large Panel",()=>{
+test("the V78 owner now makes every character tab fill the mobile canvas",()=>{
     const body=makeElement();
     const root=makeElement();
     const inventory=makeElement();
@@ -59,10 +59,10 @@ test("the V78 owner keeps every character tab inside one fixed Large Panel",()=>
     vm.runInContext(extractFunction(runtime,"applyNow"),context);
     context.applyNow();
 
-    assert.equal(box.value("width"),"calc(100% - var(--ui-large-panel-safe-space,24px))");
-    assert.equal(box.value("max-width"),"var(--ui-large-panel-max-width,396px)");
-    assert.equal(box.value("height"),"min(var(--ui-large-panel-height,620px),calc(100% - var(--ui-large-panel-safe-space,24px)))");
-    assert.equal(box.value("max-height"),"calc(100% - var(--ui-large-panel-safe-space,24px))");
+    assert.equal(box.value("width"),"calc(100% - 8px)");
+    assert.equal(box.value("max-width"),"none");
+    assert.equal(box.value("height"),"calc(100% - 8px)");
+    assert.equal(box.value("max-height"),"calc(100% - 8px)");
     assert.equal(body.value("flex"),"1 1 auto");
     assert.equal(root.value("flex"),"1 1 auto");
     assert.equal(root.value("overflow-y"),"scroll");
@@ -70,10 +70,11 @@ test("the V78 owner keeps every character tab inside one fixed Large Panel",()=>
     assert.equal(root.priority("height"),"important");
 });
 
-test("the late shared design-system CSS is the authoritative character frame",()=>{
+test("the late shared design-system CSS retains the matching fullscreen character override",()=>{
     assert.match(sharedCss,/--ui-large-panel-max-width:396px/);
     assert.match(sharedCss,/--ui-large-panel-height:620px/);
-    assert.match(sharedCss,/\.home-feature-modal-box\.wide\{[\s\S]{0,460}width:calc\(100% - var\(--ui-large-panel-safe-space\)\) !important;[\s\S]{0,120}max-width:var\(--ui-large-panel-max-width\) !important;[\s\S]{0,180}height:min\(var\(--ui-large-panel-height\),calc\(100% - var\(--ui-large-panel-safe-space\)\)\) !important/);
+    assert.match(sharedCss,/V173\.62 — character and dungeon backpack use the maximum mobile canvas/);
+    assert.match(sharedCss,/#homeFeatureModal \.home-feature-modal-box\.wide\{[\s\S]*?width:calc\(100% - 8px\) !important;[\s\S]*?max-width:none !important;[\s\S]*?height:calc\(100% - 8px\) !important/);
     assert.match(sharedCss,/\.home-feature-modal-box\.wide #homeFeatureModalBody\{[\s\S]{0,220}flex:1 1 auto !important/);
     assert.match(sharedCss,/#characterTabContent\{[\s\S]{0,220}flex:1 1 auto !important/);
 });
@@ -86,13 +87,20 @@ test("historical character rules remain compatible fallbacks instead of a scale-
 });
 
 test("long character tabs retain the canonical internal scroll owner",()=>{
-    assert.match(runtime,/inventoryOwnsScroll\s*\? "hidden"\s*: "scroll"/);
+    assert.match(runtime,/inventoryOwnsScroll\s*\?\s*"hidden"\s*:\s*"scroll"/);
     assert.match(runtime,/"scrollbar-gutter",[\s\S]*?"stable"/);
     assert.match(coreCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
     assert.match(finalCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
 });
 
-test("the current released label remains V173.50 while this UI work stays on dev",()=>{
+test("the functional V173.63 repair runtime attaches after late runtime owners",()=>{
+    assert.match(runtime,/v17363-functional-fixes-runtime/);
+    assert.match(runtime,/js\/58-v173\.63-functional-fixes\.js\?v=173\.62/);
+    assert.match(runtime,/v173:runtime-ready/);
+    assert.doesNotMatch(runtime,/visible-ui-repairs/);
+});
+
+test("the repository source remains V173.62 and dev deployment keeps that source version",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.62"/);
     assert.match(index,/<title>四象江湖傳 V173\.62<\/title>/);
     assert.match(index,/aria-label="目前版本 V173\.62"/);

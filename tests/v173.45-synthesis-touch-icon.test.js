@@ -8,6 +8,7 @@ const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const itemCss=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
 
 assert.match(touchLock,/\.v143-item-picker/);
+assert.match(touchLock,/\.v141-synthesis-body/);
 assert.match(touchLock,/const canScrollX =[\s\S]*?overflowX==="auto"[\s\S]*?node\.scrollWidth >[\s\S]*?node\.clientWidth \+ 1/);
 assert.match(itemCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art\{[\s\S]*?width:92px;[\s\S]*?height:138px;/);
 
@@ -53,4 +54,20 @@ assert.equal(prevented,false,"horizontal equipment picker touchmove must remain 
 picker.scrollWidth=picker.clientWidth;
 assert.equal(window.isInsideAllowedScrollerV78(card),false,"picker is whitelisted only when horizontal overflow actually exists");
 
-console.log("Synthesis horizontal touch and compact talisman checks passed");
+const synthesisBody={
+    nodeType:1,parentElement:body,
+    scrollHeight:920,clientHeight:500,scrollWidth:300,clientWidth:300,
+    computedStyle:{overflowX:"hidden",overflowY:"auto"},
+    matches:selector=>selector.includes(".v141-synthesis-body"),
+    closest:selector=>selector==="#game-stage"?stage:null
+};
+const synthesisChild={
+    nodeType:1,parentElement:synthesisBody,matches:()=>false,
+    closest:selector=>selector==="#game-stage"?stage:null
+};
+prevented=false;
+listeners.get("touchmove")({target:synthesisChild,preventDefault(){ prevented=true; }});
+assert.equal(window.isInsideAllowedScrollerV78(synthesisChild),true,"synthesis content body must qualify as a vertical scroll owner");
+assert.equal(prevented,false,"vertical synthesis touchmove must remain native");
+
+console.log("Synthesis horizontal/vertical touch and compact talisman checks passed");

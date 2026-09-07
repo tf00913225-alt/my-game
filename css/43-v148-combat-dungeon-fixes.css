@@ -131,9 +131,6 @@
 #game-stage .v17361-chest-count b{font-size:14px;}
 
 /* V173.62 — patrol power-saving entry removed and dungeon previews become premium text summaries. */
-#game-stage #mapPage .v17361-power-save-toggle{
-    display:none !important;
-}
 #game-stage .v17361-reward-preview{
     width:min(360px,calc(100% - 24px)) !important;
     max-width:360px !important;

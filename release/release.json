@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "version": "173.62",
+  "cacheVersion": "173.62",
+  "status": "BLOCKED",
+  "loaderFile": "js/20-anonymous-20.js",
+  "requirementsFile": "release/requirements.json",
+  "deprecatedCodeFile": "release/deprecated-code.json",
+  "managedCacheReferences": [
+    "css/00-main.css",
+    "js/52-v173.20-startup-loader.js",
+    "js/00-main.js",
+    "css/19-stage-v54-main-city-moderate-native-scale.css",
+    "js/16-stage-v54-main-city-runtime.js",
+    "js/19-stage-v78-character-inventory-runtime.js",
+    "js/20-anonymous-20.js"
+  ]
+}

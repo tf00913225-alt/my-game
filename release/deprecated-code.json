@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "scanRoots": ["index.html", "js", "css"],
+  "extensions": [".html", ".js", ".css"],
+  "assertions": [
+    {
+      "id": "DEP-001-patrol-power-saving",
+      "description": "巡怪省電模式已正式廢除；DOM、class、handler、設定 key 與顯示文字不得留在正式程式碼。",
+      "enabled": true,
+      "forbidden": [
+        "quickPowerSavingToggle",
+        "v17361-power-save-toggle",
+        "v17361TogglePowerSaving",
+        "V17361_POWER_SAVE_KEY",
+        "v17361_patrol_power_saving",
+        "v17361PowerSavingEnabled",
+        "v17361RequestWakeLock",
+        "v17361ReleaseWakeLock",
+        "省電 OFF"
+      ]
+    }
+  ]
+}
