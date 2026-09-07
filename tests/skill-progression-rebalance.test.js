@@ -13,12 +13,12 @@ const names={
     waterKnife:"水刀斬",frostPunch:"冰霜拳",iceSpin:"冰旋一閃",frostCrush:"冰封重擊",waterBall:"水球術",floodBeast:"洪水猛獸",iceArrowRain:"冰霜箭雨",
     healSpell:"治療術",revive:"復活術",freeze:"冰封",purifyMind:"淨心訣",waterEX:"水元素EX",
     stormFist:"暴風拳",stormFlurry:"暴風亂擊",windCrossSlash:"風旋十字斬",dizzyFist:"暈眩猛擊",windSpell:"狂風術",stormCircle:"風焰術",windHowlLightning:"風哮電擊",stormRain:"風起雲湧",dodgeSkill:"閃躲術",stealthSkill:"隱身術",dinghaishenzhen:"氣定神閒",windEX:"風元素EX",
-    stoneSlash:"土石斬",petrifyFist:"石盾拳",stoneBreakSky:"石破天驚",earthquakeCrush:"地裂重拳",stoneThrow:"落石術",rollingStone:"滾石術",flyingSandStrike:"飛沙瞬擊",earthSpell:"地牛猛襲",rockWall:"岩石壁壘",earthShield:"萬象土盾",barrier:"結界",earthEX:"土元素EX",stormSpell:"暴風術"
+    stoneSlash:"土石斬",petrifyFist:"石盾拳",stoneBreakSky:"石破天驚",earthquakeCrush:"地裂重拳",stoneThrow:"落石術",sandWind:"滾石術",flyingSandStrike:"飛沙瞬擊",dustStorm:"地牛猛襲",rockWall:"岩石壁壘",earthShield:"萬象土盾",barrier:"結界",earthEX:"土元素EX",stormSpell:"暴風術"
 };
 const elementById=id=>{
     if(/^water|frost|ice|heal|revive|freeze|purify/.test(id)) return "water";
     if(/^storm|wind|dizzy|dodge|stealth|dinghai/.test(id)) return "wind";
-    if(/^stone|petrify|earth|rolling|flying|rock|barrier/.test(id)) return "earth";
+    if(/^stone|petrify|sand|flying|dust|earth|rock|barrier/.test(id)) return "earth";
     return "fire";
 };
 const categoryById=id=>{
@@ -26,7 +26,7 @@ const categoryById=id=>{
     if(["rage","dodgeSkill","stealthSkill","dinghaishenzhen","rockWall","earthShield","barrier","purifyMind"].includes(id)) return "buff";
     if(id==="healSpell") return "heal";
     if(id==="revive") return "revive";
-    if(["fireRocket","blazeSpell","flameTornado","phoenixCry","waterBall","floodBeast","iceArrowRain","freeze","windSpell","stormCircle","windHowlLightning","stormRain","stoneThrow","rollingStone","flyingSandStrike","earthSpell","stormSpell"].includes(id)) return "magic";
+    if(["fireRocket","blazeSpell","flameTornado","phoenixCry","waterBall","floodBeast","iceArrowRain","freeze","windSpell","stormCircle","windHowlLightning","stormRain","stoneThrow","sandWind","flyingSandStrike","dustStorm","stormSpell"].includes(id)) return "magic";
     return "physical";
 };
 
@@ -46,7 +46,7 @@ function makeSkillDatabase(){
     Object.assign(db.dodgeSkill,{spCost:20,duration:3,targetType:"allyTri",evasionBonusPercent:75});
     Object.assign(db.rockWall,{spCost:45,duration:4,targetType:"allyTri",defenseBonusPercent:35,requires:["barrier"]});
     Object.assign(db.earthShield,{spCost:66,duration:3,targetType:"allyTri",reflectPercent:50});
-    Object.assign(db.barrier,{spCost:40,duration:5,targetType:"allyTri",blockCount:5});
+    Object.assign(db.barrier,{spCost:40,duration:5,targetType:"ally",barrierBlockCount:5});
     return db;
 }
 
@@ -122,11 +122,15 @@ test("final progression data standardizes attack milestones, costs, EX and suppo
         fireRocket:[1,2],blazeSpell:[7,6],flameTornado:[14,10],phoenixCry:[30,16],
         waterKnife:[1,2],frostPunch:[7,6],iceSpin:[14,10],frostCrush:[30,16],waterBall:[1,2],floodBeast:[7,6],iceArrowRain:[14,10],
         stormFist:[1,2],stormFlurry:[7,6],windCrossSlash:[14,10],dizzyFist:[30,16],windSpell:[1,2],stormCircle:[7,6],windHowlLightning:[14,10],stormRain:[30,16],
-        stoneSlash:[1,2],petrifyFist:[7,6],stoneBreakSky:[14,10],earthquakeCrush:[30,16],stoneThrow:[1,2],rollingStone:[7,6],flyingSandStrike:[14,10],earthSpell:[30,16]
+        stoneSlash:[1,2],petrifyFist:[7,6],stoneBreakSky:[14,10],earthquakeCrush:[30,16],stoneThrow:[1,2],sandWind:[7,6],flyingSandStrike:[14,10],dustStorm:[30,16]
     };
     for(const [id,value] of Object.entries(expected)) assert.deepEqual([r.skills[id].learnLevel,r.skills[id].learnCost],value,id);
     for(const id of ["fireEX","waterEX","windEX","earthEX"]) assert.deepEqual([r.skills[id].learnLevel,r.skills[id].learnCost,r.skills[id].maxLevel],[50,20,1],id);
     assert.deepEqual([r.skills.rage.learnLevel,r.skills.rage.learnCost],[18,10]);
+    assert.deepEqual([r.skills.fireSoulResonance.learnLevel,r.skills.fireSoulResonance.learnCost,r.skills.fireSoulResonance.maxLevel],[25,14,5]);
+    assert.deepEqual(Array.from(r.skills.fireSoulResonance.requires),["rage"]);
+    assert.deepEqual([r.skills.bloodBurnArt.learnLevel,r.skills.bloodBurnArt.learnCost,r.skills.bloodBurnArt.maxLevel],[35,18,5]);
+    assert.deepEqual(Array.from(r.skills.bloodBurnArt.requires),["fireSoulResonance"]);
     assert.deepEqual([r.skills.healSpell.learnLevel,r.skills.healSpell.learnCost,r.skills.revive.learnLevel,r.skills.revive.learnCost],[15,8,20,10]);
     assert.deepEqual(Array.from(r.skills.healSpell.requires),["frostPunch","floodBeast"]);
     assert.deepEqual(Array.from(r.skills.revive.requires),["healSpell"]);
@@ -135,7 +139,7 @@ test("final progression data standardizes attack milestones, costs, EX and suppo
     assert.deepEqual([r.skills.dodgeSkill.learnLevel,r.skills.dodgeSkill.learnCost,r.skills.dodgeSkill.maxLevel],[18,10,5]);
     assert.deepEqual(Array.from(r.skills.dodgeSkill.evasionBonusPercentByLevel),[30,40,50,60,70]);
     assert.deepEqual([r.skills.rockWall.learnLevel,r.skills.rockWall.learnCost,r.skills.rockWall.maxLevel],[18,10,5]);
-    assert.deepEqual(Array.from(r.skills.rockWall.requires),["petrifyFist","rollingStone"]);
+    assert.deepEqual(Array.from(r.skills.rockWall.requires),["petrifyFist","sandWind"]);
     assert.deepEqual(Array.from(r.skills.rockWall.defenseBonusPercentByLevel),[15,20,25,30,35]);
     assert.deepEqual(Array.from(r.skills.earthShield.requires),["rockWall"]);
     assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,30,35,40,50]);
@@ -160,6 +164,10 @@ test("learning milestones use the selected character own level, prerequisites an
     resetForLearn(r,"fire",14); r.loadouts.fire.skillLevels.fireCritical=1; assert.equal(r.context.learnSkill("explosiveFlurry"),true);
     resetForLearn(r,"fire",17); r.loadouts.fire.skillLevels.explosiveFlurry=1; assert.equal(r.context.learnSkill("rage"),false);
     resetForLearn(r,"fire",18); r.loadouts.fire.skillLevels.explosiveFlurry=1; assert.equal(r.context.learnSkill("rage"),true);
+    resetForLearn(r,"fire",25); assert.equal(r.context.learnSkill("fireSoulResonance"),false,"炎魂共鳴不能跳過怒火");
+    resetForLearn(r,"fire",25); r.loadouts.fire.skillLevels.rage=1; assert.equal(r.context.learnSkill("fireSoulResonance"),true);
+    resetForLearn(r,"fire",35); assert.equal(r.context.learnSkill("bloodBurnArt"),false,"焚血訣不能跳過炎魂共鳴");
+    resetForLearn(r,"fire",35); r.loadouts.fire.skillLevels.fireSoulResonance=1; assert.equal(r.context.learnSkill("bloodBurnArt"),true);
     resetForLearn(r,"water",19); r.loadouts.water.skillLevels.healSpell=1; assert.equal(r.context.learnSkill("revive"),false);
     resetForLearn(r,"water",20); r.loadouts.water.skillLevels.healSpell=1; assert.equal(r.context.learnSkill("revive"),true);
     resetForLearn(r,"fire",29); r.loadouts.fire.skillLevels.explosiveFlurry=1; assert.equal(r.context.learnSkill("dragonSlash"),false);
@@ -278,10 +286,12 @@ test("player progression is isolated from Abyss fixed levels, talisman shared sk
     const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
     const talisman=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
     const main=fs.readFileSync("js/00-main.js","utf8");
+    const lateLoader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
     assert.match(abyss,/v132FixedSkillLoadout\s*=\s*true/);
     assert.match(abyss,/v141ForceSkillLevel\s*=\s*config\.skillLevel/);
     assert.doesNotMatch(abyss,/v17364GetRequiredCharacterLevelForSkillLevel|learnLevel/);
     assert.match(talisman,/sharedSkillId/);
     assert.doesNotMatch(talisman,/v17364GetRequiredCharacterLevelForSkillLevel/);
     assert.match(main,/equippedSkills\.length\s*>=\s*4/);
+    assert.match(lateLoader,/59-abyss-two-tier-runtime\.js[\s\S]*?60-v173\.64-skill-progression-rebalance\.js/);
 });
