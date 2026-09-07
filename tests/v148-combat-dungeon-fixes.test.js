@@ -66,7 +66,7 @@ test("V148 remains ordered under the current runtime and cache key",()=>{
     assert.match(index,/js\/20-anonymous-20\.js\?v=173\.62/);
     assert.match(loader,/const V_ASSET_VERSION="173\.62"/);
     assert.match(loader,/css\/43-v148-combat-dungeon-fixes\.css/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.39/);
+assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.62/);
     const v146=loader.indexOf("js/41-v146-system-polish.js");
     const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
     assert.ok(v146>=0&&v148>v146);
