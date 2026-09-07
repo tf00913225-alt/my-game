@@ -25,6 +25,8 @@ assert.doesNotMatch(source,/localStorage\.setItem\([^\n]*relic/i,"relics must no
 ].forEach(type=>assert.ok(source.includes('triggerDef.type==="'+type+'"'),"trigger schema supports "+type));
 assert.match(css,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 assert.match(css,/team-relic-tabs[\s\S]*overflow-x:auto/);
+assert.match(css,/#game-stage #homeFeatureModal\.team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important/,
+    "relic body scroll owner must outrank legacy wide-modal overflow:hidden rules");
 assert.match(css,/map-return\.png/);
 for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
     assert.ok(css.includes(hex),"team relic rarity CSS must preserve formal color "+hex);
