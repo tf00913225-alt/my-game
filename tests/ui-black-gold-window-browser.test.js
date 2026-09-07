@@ -118,7 +118,8 @@ try{
     }
     assert.notEqual(after.tabIdle.style.backgroundImage,after.tabActive.style.backgroundImage,"selected tab must be visually distinct");
     assert.notEqual(after.mediumClose.style.backgroundImage,before.mediumClose.style.backgroundImage,"medium popup button skin missing");
-    assert.notEqual(after.smallConfirm.style.backgroundImage,before.smallConfirm.style.backgroundImage,"small confirmation button skin missing");
+    assert.notEqual(after.smallCancel.style.backgroundImage,before.smallCancel.style.backgroundImage,"small confirmation secondary button skin missing");
+    assert.match(after.smallConfirm.style.backgroundImage,/241, 206, 122|240, 211, 138|198, 154, 69/,"small confirmation primary button must retain a gold primary treatment");
 
     console.log("Headless Chrome: large, tabbed, backpack/list, reward/medium and small confirm windows keep identical geometry with black-gold skin active");
 }finally{
