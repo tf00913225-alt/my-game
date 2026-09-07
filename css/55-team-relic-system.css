@@ -1,10 +1,14 @@
 /* Team Relic System — black/gold mobile UI. */
 #game-stage .team-relic-home-tools{
-    pointer-events:auto;
+    /* The absolute utility grid spans the whole row.  Only its two real
+       buttons may own hit testing; transparent gaps must pass through to the
+       existing offline-exp / system cards underneath. */
+    pointer-events:none;
     align-items:end;
     bottom:2px;
 }
 #game-stage .team-relic-home-tools .home-card-utility{
+    pointer-events:auto;
     position:relative;
     overflow:visible;
     border:1px solid rgba(211,161,70,.84);

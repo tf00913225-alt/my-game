@@ -33,6 +33,10 @@ for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
 }
 assert.match(css,/rarity-four-symbol[\s\S]*conic-gradient/);
 assert.match(css,/@keyframes teamRelicFourSymbolRarityBreath/);
+assert.match(css,/#game-stage \.team-relic-home-tools\{[\s\S]*?pointer-events:none/,
+    "transparent utility container must not block the existing home-card hitboxes");
+assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-utility\{[\s\S]*?pointer-events:auto/,
+    "relic and element-box buttons must retain their own hitboxes");
 
 function createRuntime(){
     const store=new Map();

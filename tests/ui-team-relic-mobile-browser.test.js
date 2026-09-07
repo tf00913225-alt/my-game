@@ -60,13 +60,14 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
   var rect=function(element){var r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
   var overlap=function(a,b){return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;};
   var stage=q("#game-stage"),box=q(".team-relic-modal .home-feature-modal-box"),body=q("#homeFeatureModalBody"),tabs=q(".team-relic-tabs"),grid=q(".team-relic-grid");
-  var entries=Array.from(document.querySelectorAll(".team-relic-home-tools button")).map(rect);
+  var tools=q(".team-relic-home-tools"),entryNodes=Array.from(tools.querySelectorAll("button"));
+  var entries=entryNodes.map(rect);
   var cards=Array.from(document.querySelectorAll(".team-relic-card")).map(rect);
   var bodyStyle=getComputedStyle(body),tabStyle=getComputedStyle(tabs),gridStyle=getComputedStyle(grid);
   var bodyBefore=body.scrollTop;body.scrollTop=Math.max(0,body.scrollHeight-body.clientHeight);var bodyAfter=body.scrollTop;
   var tabsBefore=tabs.scrollLeft;tabs.scrollLeft=Math.max(0,tabs.scrollWidth-tabs.clientWidth);var tabsAfter=tabs.scrollLeft;
   var bannerRect=rect(q("#teamRelicBattleBanner")),playerRect=rect(q(".qa-player-row")),stageRect=rect(stage);
-  q("#result").textContent=JSON.stringify({viewport:{width:innerWidth,height:innerHeight},stage:stageRect,box:rect(box),body:{overflowY:bodyStyle.overflowY,overflowX:bodyStyle.overflowX,touchAction:bodyStyle.touchAction,clientHeight:body.clientHeight,scrollHeight:body.scrollHeight,before:bodyBefore,after:bodyAfter},tabs:{overflowX:tabStyle.overflowX,touchAction:tabStyle.touchAction,clientWidth:tabs.clientWidth,scrollWidth:tabs.scrollWidth,before:tabsBefore,after:tabsAfter},grid:{columns:gridStyle.gridTemplateColumns,cards:cards},entries:entries,banner:{rect:bannerRect,playerRect:playerRect,overlapsPlayer:overlap(bannerRect,playerRect)}});
+  q("#result").textContent=JSON.stringify({viewport:{width:innerWidth,height:innerHeight},stage:stageRect,box:rect(box),body:{overflowY:bodyStyle.overflowY,overflowX:bodyStyle.overflowX,touchAction:bodyStyle.touchAction,clientHeight:body.clientHeight,scrollHeight:body.scrollHeight,before:bodyBefore,after:bodyAfter},tabs:{overflowX:tabStyle.overflowX,touchAction:tabStyle.touchAction,clientWidth:tabs.clientWidth,scrollWidth:tabs.scrollWidth,before:tabsBefore,after:tabsAfter},grid:{columns:gridStyle.gridTemplateColumns,cards:cards},entries:entries,hitTesting:{container:getComputedStyle(tools).pointerEvents,buttons:entryNodes.map(function(node){return getComputedStyle(node).pointerEvents;})},banner:{rect:bannerRect,playerRect:playerRect,overlapsPlayer:overlap(bannerRect,playerRect)}});
 })();
 </script></body></html>`;
 }
@@ -106,6 +107,8 @@ function verify(data,width,height){
     assert.ok(Math.abs(data.grid.cards[0].top-data.grid.cards[1].top)<=tolerance&&data.grid.cards[2].top>data.grid.cards[0].top,`${width}px relic cards do not form two-column rows`);
     for(const card of data.grid.cards){assert.ok(card.left>=data.box.left-tolerance&&card.right<=data.box.right+tolerance,`${width}px relic card escapes modal`);}
     assert.equal(data.entries.length,2);assert.ok(data.entries[0].right<data.entries[1].left,`${width}px relic and element-box entries overlap`);
+    assert.equal(data.hitTesting.container,"none",`${width}px transparent utility container blocks existing home buttons`);
+    assert.deepEqual(data.hitTesting.buttons,["auto","auto"],`${width}px actual utility buttons lost hit testing`);
     assert.equal(data.banner.overlapsPlayer,false,`${width}px relic battle banner covers the player row`);
     assert.ok(data.banner.rect.left>=data.stage.left-tolerance&&data.banner.rect.right<=data.stage.right+tolerance,`${width}px relic battle banner escapes horizontally`);
 }
