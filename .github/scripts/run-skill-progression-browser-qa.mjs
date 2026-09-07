@@ -1,160 +1,210 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import path from "node:path";
-import http from "node:http";
-import {spawn,spawnSync} from "node:child_process";
+import {spawnSync} from "node:child_process";
 
-const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-const port=8899,debugPort=9223;
-const baseUrl=`http://127.0.0.1:${port}`;
-const qaUrl=`${baseUrl}/?skill-progression-browser-qa=${Date.now()}`;
-
-function chromeBinary(){
+function findChrome(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }
     }
     throw new Error("Headless Chrome/Chromium is required for skill progression browser QA.");
 }
-function httpText(url){
-    return new Promise((resolve,reject)=>{
-        const request=http.get(url,{headers:{"cache-control":"no-cache"}},response=>{
-            let body="";
-            response.setEncoding("utf8");
-            response.on("data",chunk=>{ body+=chunk; });
-            response.on("end",()=>response.statusCode>=200&&response.statusCode<300
-                ?resolve(body):reject(new Error(`HTTP ${response.statusCode}`)));
-        });
-        request.setTimeout(3000,()=>request.destroy(new Error("HTTP request timeout")));
-        request.on("error",reject);
-    });
-}
-async function waitHttp(url,json=false,timeoutMs=15000){
-    const started=Date.now();let lastError=null;
-    while(Date.now()-started<timeoutMs){
-        try{ const text=await httpText(url);return json?JSON.parse(text):text; }
-        catch(error){ lastError=error;await sleep(120); }
-    }
-    throw new Error(`Timed out waiting for ${url}: ${lastError?.message||"no response"}`);
-}
 
-class Cdp{
-    constructor(url){this.url=url;this.nextId=1;this.pending=new Map();this.errors=[];}
-    async connect(){
-        this.socket=new WebSocket(this.url);
-        await new Promise((resolve,reject)=>{
-            const timeout=setTimeout(()=>reject(new Error("CDP connection timeout")),10000);
-            this.socket.onopen=()=>{clearTimeout(timeout);resolve();};
-            this.socket.onerror=()=>{clearTimeout(timeout);reject(new Error("CDP WebSocket error"));};
-        });
-        this.socket.onmessage=async event=>{
-            let raw=event.data;if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){raw=await raw.text();}
-            const message=JSON.parse(String(raw));
-            if(message.method==="Runtime.exceptionThrown"){
-                this.errors.push(message.params?.exceptionDetails?.exception?.description||message.params?.exceptionDetails?.text||"Runtime exception");return;
-            }
-            if(message.method==="Runtime.consoleAPICalled"&&message.params?.type==="error"){
-                this.errors.push((message.params.args||[]).map(arg=>arg.value??arg.description??"").join(" "));return;
-            }
-            if(!message.id){return;}
-            const request=this.pending.get(message.id);if(!request){return;}this.pending.delete(message.id);
-            if(message.error){request.reject(new Error(`${request.method}: ${message.error.message}`));}
-            else{request.resolve(message.result||{});}
-        };
-    }
-    send(method,params={}){
-        const id=this.nextId++;
-        return new Promise((resolve,reject)=>{this.pending.set(id,{resolve,reject,method});this.socket.send(JSON.stringify({id,method,params}));});
-    }
-    async eval(expression){
-        const response=await this.send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true,userGesture:true});
-        if(response.exceptionDetails){throw new Error(response.exceptionDetails.exception?.description||response.exceptionDetails.text||"Runtime evaluation failed");}
-        return response.result?.value;
-    }
-    close(){try{this.socket?.close();}catch{}}
-}
-async function waitFor(client,expression,label,timeoutMs=30000){
-    const started=Date.now();let last="";
-    while(Date.now()-started<timeoutMs){
-        try{if(await client.eval(`Boolean(${expression})`)){return;}}catch(error){last=error.message;}
-        await sleep(160);
-    }
-    throw new Error(`Timed out waiting for ${label}. ${last}`);
-}
+const fixture=path.join(process.cwd(),".skill-progression-browser-qa.html");
+const fileUrl="file://"+fixture.replace(/\\/g,"/");
+const skillIds=[
+    "waterKnife","frostPunch","iceSpin","frostCrush",
+    "waterBall","floodBeast","iceArrowRain","healSpell",
+    "revive","freeze","purifyMind","waterEX"
+];
+const names={
+    waterKnife:"水刀斬",frostPunch:"冰霜拳",iceSpin:"冰旋一閃",frostCrush:"冰封重擊",
+    waterBall:"水球術",floodBeast:"洪水猛獸",iceArrowRain:"冰霜箭雨",healSpell:"治療術",
+    revive:"復活術",freeze:"冰封",purifyMind:"淨心訣",waterEX:"水元素EX"
+};
 
-const server=spawn("python3",["-m","http.server",String(port),"--bind","127.0.0.1"],{cwd:process.cwd(),stdio:["ignore","ignore","pipe"]});
-let serverError="";server.stderr.on("data",chunk=>{serverError+=String(chunk);});
-let chrome=null,client=null;
+const html=`<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="css/00-main.css">
+<link rel="stylesheet" href="css/30-v130-requested-updates.css">
+<link rel="stylesheet" href="css/31-v131-fix-batch.css">
+<link rel="stylesheet" href="css/46-v154-dev-fixes.css">
+<link rel="stylesheet" href="css/49-v169-rpg-ui.css">
+<style>
+html,body{margin:0;width:390px;height:844px;overflow:hidden;background:#050505;}
+#game-stage{width:390px;height:844px;position:relative;transform:none!important;}
+#homeFeatureModal{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:absolute!important;inset:0!important;}
+#homeFeatureModal .home-feature-modal-box.wide{width:382px!important;height:836px!important;max-width:none!important;max-height:none!important;}
+#homeFeatureModalBody{display:flex!important;flex:1 1 auto!important;min-height:0!important;}
+#characterTabContent{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;touch-action:pan-y!important;}
+#skillPage{display:block!important;position:static!important;height:auto!important;min-height:0!important;padding:0 0 12px!important;}
+#allSkillsList{display:block!important;overflow:visible!important;padding-bottom:12px!important;}
+.skill-row{display:grid;grid-template-columns:42px minmax(0,1fr) minmax(96px,auto);gap:8px;align-items:center;width:100%;box-sizing:border-box;min-height:58px;margin:0 0 8px;padding:7px;border:1px solid rgba(210,170,90,.35);}
+.skill-row-text{min-width:0;overflow-wrap:anywhere;}
+.skill-action-card{min-width:0;max-width:132px;white-space:normal;overflow-wrap:anywhere;}
+</style>
+</head>
+<body>
+<div id="game-stage">
+  <div id="homeFeatureModal" class="home-feature-modal show no-padding">
+    <div class="home-feature-modal-box wide">
+      <div id="homeFeatureModalBody">
+        <div id="characterTabContent">
+          <section id="skillPage">
+            <div id="skillPoints">999</div>
+            <div id="allSkillsList"></div>
+            <div id="skillDetailStats"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<pre id="result"></pre>
+<script>
+var player={id:"寒泉一號",element:"water",level:19,skillPoints:999,hp:1000,sp:1000,activeBuffs:[],statusEffects:[]};
+var player2={id:"寒泉二號",element:"water",level:10,skillPoints:999,hp:1000,sp:1000,activeBuffs:[],statusEffects:[]};
+var player3=null;
+var currentSkillCharacter="water";
+var activeBattleCharacterIndex=0;
+var characterSkillLoadouts={
+  water:{name:"寒泉一號",skillLevels:{healSpell:1},equippedSkills:[]},
+  player2:{name:"寒泉二號",skillLevels:{healSpell:1},equippedSkills:[]}
+};
+var skillDatabase={};
+var fixtureSkillIds=${JSON.stringify(skillIds)};
+var fixtureSkillNames=${JSON.stringify(names)};
+fixtureSkillIds.forEach(function(id){
+  skillDatabase[id]={id:id,name:fixtureSkillNames[id],element:"water",category:"magic",targetType:"single",learnCost:99,maxLevel:5,requires:[],description:"技能說明"};
+});
+skillDatabase.healSpell.category="heal";skillDatabase.healSpell.targetType="allyTri";
+skillDatabase.revive.category="revive";skillDatabase.revive.targetType="deadAlly";
+skillDatabase.freeze.maxLevel=1;skillDatabase.purifyMind.maxLevel=1;skillDatabase.waterEX.maxLevel=1;
+function getSkillCharacterObject(key){return key==="player2"?player2:player;}
+function getPartyCharacterByIndex(index){return index===1?player2:player;}
+function getPartyCharacterKey(index){return index===1?"player2":"water";}
+function getCharacterSkillKey(actor){return actor===player2?"player2":"water";}
+function saveGame(){}
+function updateUI(){}
+function alert(message){window.__lastAlert=message;}
+function learnSkill(){return false;}
+function upgradeSkill(){return false;}
+function renderSkillLoadout(){
+  var list=document.getElementById("allSkillsList");
+  list.innerHTML=fixtureSkillIds.map(function(id){
+    return '<div class="skill-row">'+
+      '<div id="skillIcon_'+id+'" aria-hidden="true"></div>'+
+      '<div class="skill-row-text"><strong>'+fixtureSkillNames[id]+'</strong></div>'+
+      '<button class="skill-action-card" type="button"><span class="skill-action-card-label">學習</span></button>'+
+      '</div>';
+  }).join("");
+}
+function showSkillDetail(){document.getElementById("skillDetailStats").innerHTML="";}
+</script>
+<script src="js/60-v173.64-skill-progression-rebalance.js"></script>
+<script>
+(function(){
+  function reviveState(){
+    var row=Array.from(document.querySelectorAll("#allSkillsList .skill-row")).find(function(item){return !!item.querySelector("#skillIcon_revive");});
+    var card=row&&row.querySelector(".skill-action-card");
+    var label=card&&card.querySelector(".skill-action-card-label");
+    var rr=row&&row.getBoundingClientRect();
+    var cr=card&&card.getBoundingClientRect();
+    return {
+      exists:!!row,
+      rowHeight:rr?rr.height:0,
+      label:label?label.textContent.replace(/\\s+/g," ").trim():"",
+      disabled:!!(card&&card.classList.contains("disabled")),
+      onclick:card?card.getAttribute("onclick")||"":"",
+      overflow:!!(row&&row.scrollWidth>row.clientWidth+1),
+      actionOutside:!!(rr&&cr&&(cr.left<rr.left-1||cr.right>rr.right+1))
+    };
+  }
 
+  currentSkillCharacter="water";
+  player.level=19;
+  renderSkillLoadout();
+  var lv19=reviveState();
+
+  player.level=20;
+  renderSkillLoadout();
+  var lv20=reviveState();
+
+  currentSkillCharacter="player2";
+  renderSkillLoadout();
+  var second=reviveState();
+
+  currentSkillCharacter="water";
+  player.level=20;
+  renderSkillLoadout();
+  showSkillDetail("revive");
+  var detail=document.getElementById("skillDetailStats").textContent.replace(/\\s+/g," ").trim();
+  var pageText=document.getElementById("skillPage").textContent;
+  var rows=Array.from(document.querySelectorAll("#allSkillsList .skill-row"));
+  var root=document.getElementById("characterTabContent");
+  var natural={overflowY:getComputedStyle(root).overflowY,touchAction:getComputedStyle(root).touchAction};
+  root.style.setProperty("height","240px","important");
+  root.style.setProperty("max-height","240px","important");
+  root.style.setProperty("overflow-y","scroll","important");
+  void root.offsetHeight;
+  var before=root.scrollTop;
+  root.scrollTop=Math.max(0,root.scrollHeight-root.clientHeight);
+  var after=root.scrollTop;
+
+  document.getElementById("result").textContent=JSON.stringify({
+    installed:window.__v17364SkillProgressionInstalled===true,
+    lv19:lv19,lv20:lv20,second:second,detail:detail,
+    forbidden:["learnLevel","requires","tier","upgradeCost"].filter(function(word){return pageText.includes(word);}),
+    rowCount:rows.length,
+    horizontalOverflow:rows.some(function(row){return row.scrollWidth>row.clientWidth+1;}),
+    natural:natural,
+    scroll:{scrollHeight:root.scrollHeight,clientHeight:root.clientHeight,before:before,after:after}
+  });
+})();
+</script>
+</body>
+</html>`;
+
+fs.writeFileSync(fixture,html,"utf8");
 try{
-    await waitHttp(baseUrl+"/index.html");
-    chrome=spawn(chromeBinary(),[
-        "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--hide-scrollbars",
-        `--remote-debugging-port=${debugPort}`,`--user-data-dir=${path.join("/tmp",`four-symbols-skill-qa-${process.pid}`)}`,
-        "--window-size=390,844","about:blank"
-    ],{stdio:["ignore","ignore","pipe"]});
-    const targets=await waitHttp(`http://127.0.0.1:${debugPort}/json/list`,true);
-    const page=targets.find(target=>target.type==="page");assert.ok(page?.webSocketDebuggerUrl,"Chrome DevTools page target unavailable");
-    client=new Cdp(page.webSocketDebuggerUrl);await client.connect();
-    await client.send("Page.enable");await client.send("Runtime.enable");
-    await client.send("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:3,mobile:true,screenWidth:390,screenHeight:844});
-    await client.send("Page.navigate",{url:qaUrl});
-    await waitFor(client,"document.readyState==='complete'","page load");
-    await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&window.__v17364SkillProgressionInstalled===true","58→59→60 late runtime chain");
+    const chrome=findChrome();
+    const run=spawnSync(chrome,[
+        "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
+        "--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=390,844",
+        "--dump-dom",fileUrl
+    ],{encoding:"utf8",timeout:30000,maxBuffer:12*1024*1024});
+    assert.equal(run.status,0,run.stderr||"Skill progression browser fixture failed");
+    const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+    assert.ok(match,"Skill progression browser result missing");
+    const decoded=match[1]
+        .replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">")
+        .replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+    const data=JSON.parse(decoded);
 
-    await client.eval(`(()=>{
-        Object.assign(player,{id:'寒泉一號',element:'water',level:19,skillPoints:999,hp:1000,sp:1000,activeBuffs:[],statusEffects:[]});
-        player2={id:'寒泉二號',element:'water',level:10,skillPoints:999,hp:1000,sp:1000,activeBuffs:[],statusEffects:[],isDefending:false};
-        if(!characters.some(character=>character.id==='player2')){characters.push({id:'player2',name:player2.id});}
-        characterSkillLoadouts.water={name:player.id,skillLevels:{healSpell:1},equippedSkills:[]};
-        characterSkillLoadouts.player2={name:player2.id,skillLevels:{healSpell:1},equippedSkills:[]};
-        currentSkillCharacter='water';
-        if(typeof showPage==='function'){showPage('home');}
-        if(typeof openHomeFeature==='function'){openHomeFeature('character');}
-        if(typeof switchCharacterTab==='function'){switchCharacterTab('skill');}
-        renderSkillLoadout();return true;
-    })()`);
-    await sleep(120);
+    assert.equal(data.installed,true,"V173.64 skill progression owner did not install");
+    assert.equal(data.lv19.exists,true,"Revive row is missing");
+    assert.ok(data.lv19.rowHeight>0,"Revive row is not visibly rendered");
+    assert.equal(data.lv19.disabled,true);assert.match(data.lv19.label,/Lv20/);
+    assert.equal(data.lv19.overflow,false);assert.equal(data.lv19.actionOutside,false);
 
-    const rowState=()=>client.eval(`(()=>{
-        const row=Array.from(document.querySelectorAll('#allSkillsList .skill-row')).find(item=>item.querySelector('#skillIcon_revive'));
-        if(!row){return null;}
-        const cards=Array.from(row.querySelectorAll('.skill-action-card'));
-        const card=cards.find(item=>/learnSkill|upgradeSkill/.test(String(item.getAttribute('onclick')||''))||/學習|升級|Lv20|技能點/.test(String(item.textContent||'')))||cards[0]||null;
-        const label=card?.querySelector('.skill-action-card-label');const rr=row.getBoundingClientRect();const cr=card?.getBoundingClientRect();
-        return {label:label?.textContent.replace(/\\s+/g,' ').trim()||'',disabled:!!card?.classList.contains('disabled'),onclick:card?.getAttribute('onclick')||'',rowHeight:rr.height,horizontalOverflow:row.scrollWidth>row.clientWidth+1,actionOutside:!!(cr&&(cr.left<rr.left-1||cr.right>rr.right+1))};
-    })()`);
+    assert.equal(data.lv20.disabled,false);assert.match(data.lv20.onclick,/learnSkill\('revive'\)/);
+    assert.equal(data.second.disabled,true,"Second character must use its own Lv10 gate");assert.match(data.second.label,/Lv20/);
 
-    let state=await rowState();assert.ok(state,"Revive skill row is missing");assert.ok(state.rowHeight>0,"Revive row is not visibly rendered");assert.equal(state.disabled,true);assert.match(state.label,/Lv20/);assert.equal(state.horizontalOverflow,false);assert.equal(state.actionOutside,false);
-    await client.eval(`player.level=20;currentSkillCharacter='water';renderSkillLoadout();true`);
-    state=await rowState();assert.equal(state.disabled,false);assert.match(state.onclick,/learnSkill\('revive'\)/);
-    await client.eval(`currentSkillCharacter='player2';renderSkillLoadout();true`);
-    state=await rowState();assert.equal(state.disabled,true,"Second character must use its own Lv10 gate");assert.match(state.label,/Lv20/);
-
-    const ui=await client.eval(`(()=>{
-        currentSkillCharacter='water';player.level=20;renderSkillLoadout();showSkillDetail('revive');
-        const root=document.getElementById('characterTabContent'),page=document.getElementById('skillPage'),details=document.getElementById('skillDetailStats');
-        const pageText=page?.textContent||'';const rows=Array.from(document.querySelectorAll('#allSkillsList .skill-row'));
-        const pageRect=page?.getBoundingClientRect();const naturalStyle=root?getComputedStyle(root):null;
-        if(root){
-            root.style.setProperty('flex','0 0 240px','important');
-            root.style.setProperty('height','240px','important');
-            root.style.setProperty('max-height','240px','important');
-            root.style.setProperty('overflow-y','scroll','important');
-        }
-        void root?.offsetHeight;
-        const before=root?.scrollTop||0;if(root){root.scrollTop=Math.max(0,root.scrollHeight-root.clientHeight);}const after=root?.scrollTop||0;
-        return {
-            details:details?.textContent.replace(/\\s+/g,' ').trim()||'',forbidden:['learnLevel','requires','tier','upgradeCost'].filter(word=>pageText.includes(word)),
-            visibleRows:rows.length,horizontalOverflow:rows.some(row=>row.scrollWidth>row.clientWidth+1),pageVisible:!!(pageRect&&pageRect.height>0&&pageRect.width>0),
-            overflowY:naturalStyle?.overflowY||'',touchAction:naturalStyle?.touchAction||'',forcedScrollHeight:root?.scrollHeight||0,forcedClientHeight:root?.clientHeight||0,before,after,listExists:!!document.getElementById('allSkillsList')
-        };
-    })()`);
-    for(const label of ["最低學習等級","目前技能等級","下一級角色需求","學習成本","升級成本","前置技能"]){assert.match(ui.details,new RegExp(label));}
-    assert.deepEqual(ui.forbidden,[]);assert.equal(ui.horizontalOverflow,false);assert.ok(ui.visibleRows>=8,"Water skill list is unexpectedly short");assert.equal(ui.listExists,true);assert.equal(ui.pageVisible,true,"Skill page is not visibly mounted in the character modal");
-    assert.match(ui.overflowY,/auto|scroll/);assert.equal(ui.touchAction,"pan-y");assert.ok(ui.forcedScrollHeight>ui.forcedClientHeight,"Constrained skill scroll owner did not overflow");assert.ok(ui.after>ui.before,"Constrained skill scroll owner did not actually scroll");
-    assert.deepEqual(client.errors,[]);
+    for(const label of ["最低學習等級","目前技能等級","下一級角色需求","學習成本","升級成本","前置技能"]){
+        assert.match(data.detail,new RegExp(label));
+    }
+    assert.deepEqual(data.forbidden,[]);
+    assert.ok(data.rowCount>=8,"Water skill list is unexpectedly short");
+    assert.equal(data.horizontalOverflow,false,"Skill rows must not overflow horizontally at 390px");
+    assert.match(data.natural.overflowY,/auto|scroll/);
+    assert.equal(data.natural.touchAction,"pan-y");
+    assert.ok(data.scroll.scrollHeight>data.scroll.clientHeight,"Constrained skill content must overflow vertically");
+    assert.ok(data.scroll.after>data.scroll.before,"Skill scroll owner did not actually scroll");
     console.log("✓ Skill progression mobile browser QA passed");
 }finally{
-    client?.close();if(chrome){chrome.kill("SIGTERM");}server.kill("SIGTERM");
+    try{fs.unlinkSync(fixture);}catch(_){ }
 }
-if(serverError&&process.exitCode){console.error(serverError);}
