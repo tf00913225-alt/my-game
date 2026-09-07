@@ -95,16 +95,16 @@ test("long character tabs retain the canonical internal scroll owner",()=>{
 
 test("the functional V173.63 repair runtime attaches after late runtime owners",()=>{
     assert.match(runtime,/v17363-functional-fixes-runtime/);
-    assert.match(runtime,/js\/58-v173\.63-functional-fixes\.js\?v=173\.62/);
+    assert.match(runtime,/js\/58-v173\.63-functional-fixes\.js\?v=173\.63/);
     assert.match(runtime,/v173:runtime-ready/);
     assert.doesNotMatch(runtime,/visible-ui-repairs/);
 });
 
 test("the repository source remains V173.62 and dev deployment keeps that source version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.62"/);
-    assert.match(index,/<title>四象江湖傳 V173\.62<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.62"/);
-    assert.match(index,/>V173\.62<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.63"/);
+    assert.match(index,/<title>四象江湖傳 V173\.63<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.63"/);
+    assert.match(index,/>V173\.63<\/div>/);
 });
 
 console.log("\n"+passed+" character-shell regression tests passed.");

@@ -29,7 +29,7 @@ assert.match(
 );
 assert.match(
     characterRuntime,
-    /js\/58-v173\.63-functional-fixes\.js\?v=173\.62/,
+    /js\/58-v173\.63-functional-fixes\.js\?v=173\.63/,
     "late loader must attach the single V173.63 functional repair owner"
 );
 assert.doesNotMatch(
