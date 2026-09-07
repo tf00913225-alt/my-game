@@ -1,0 +1,40 @@
+name: Patch V148 touch-lock cache regression
+
+on:
+  push:
+    branches:
+      - bugfix/global-ui-gesture-vfx-lock
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Update historical cache assertion
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/v148-combat-dungeon-fixes.test.js')
+          s=p.read_text(encoding='utf-8')
+          old=r'assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.39/);'
+          new=r'assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.62/);'
+          if s.count(old)!=1:
+              raise SystemExit(f'expected one legacy touch-lock cache assertion, found {s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+          node tests/v148-combat-dungeon-fixes.test.js
+          git diff --check
+      - name: Commit test correction and remove one-time workflow
+        run: |
+          rm .github/workflows/_patch-v148-touch-cache-test.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "test: align touch-lock cache key with current release"
+          git push origin HEAD:bugfix/global-ui-gesture-vfx-lock
