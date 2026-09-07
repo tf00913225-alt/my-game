@@ -3577,3 +3577,22 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - `css/38-v141-system-expansion.css` 改為 `.v141-synthesis-body` 原生 `overflow-y:auto` + `touch-action:pan-y`，長內容卡片改 `height:auto; min-height:100%`；冶煉階級橫向 rail 允許 pan-x/pan-y。
 - `js/58-v173.63-functional-fixes.js` 的 `maximizeSynthesisPanel()` 同步把真正內容 body 設為垂直 scroll owner；`js/01-stage-v8-touch-lock.js` 白名單加入 `.v141-synthesis-body`。
 - 版本仍維持 V173.62；需等 DEV 實機確認兩頁都能滑到底後才可把本 follow-up 標成 VERIFIED。
+
+
+## 2026-09-07 — EXP 成長曲線正式收斂
+
+本段為目前 EXP／成長規則的最新正式 owner 規格；若前文歷史版本敘述與本段衝突，以本段與實際 runtime owner 為準。
+
+- 升級需求唯一長期 owner：`js/28-v133-economy-rebalance.js` 的 `v133GetExpNextForLevel()`。
+- Lv1→20：新手快速期，保留既有 newcomer bonus／新手森林／新手任務節奏，正常流程目標約 20～30 分鐘到 Lv20。`v133GetExpNextForLevel(1..19)` 維持既有新手靜態需求。
+- 從 Lv20→21 開始：`expNext = 該等級練功區正式平均標準巡怪 EXP × TARGET_BATTLE_ANCHORS`，不得再用另一套高等級靜態 EXP anchors 覆蓋。
+- `TARGET_BATTLE_ANCHORS` 正式控制 expNext：Lv20=45、Lv30=100、Lv40=250、Lv50=400、Lv60=650、Lv70=900、Lv80=1200、Lv90=1700、Lv95=2600、Lv98=3500、Lv99=4000；中間等級平滑插值。
+- 一般巡怪正式 EXP owner：`js/25-v131-fix-batch.js`。Lv20+ 標準巡怪 = 怪物基礎 EXP（等級×10）× rank（普通1／精英1.5／BOSS3）× 練功倍率3.5；V173.42 全域 EXP ×3 僅保留 Lv1～19 快速期，不得在 Lv20+ 再疊加。
+- 元素匣：同條件正式巡怪 EXP 的 70%；不吃休息經驗。
+- 休息經驗：一般巡怪同條件 200%；每約離線2分鐘累積1場、最多300場；元素匣與休息經驗禁止疊加。
+- 自然充能：Lv20+ 仍依 `expNext × levelsPerDay`，既有 levels/day 意圖不重做（Lv20約1.30、Lv50約1.00、Lv99約0.32）。
+- 每日 Growth EXP：仍依新 `expNext × levelsPerDay` 動態計算，不得硬寫舊 EXP，也不得再額外乘全域 ×3。
+- 經驗副本：維持全隊當級 `expNext` 平均 ×33%，廣告雙倍約66%；`DUNGEON_DAILY_LIMIT_ENABLED=false` 是目前 DEV QA 刻意設定，禁止當成 Bug 恢復次數限制。
+- 傳統離線 EXP：仍由 `js/00-main.js` 基礎 10 EXP/分鐘（最多480分鐘）＋`js/34-v141-core-systems.js` 最高角色等級倍率與 V173.42 ×3 計算；本次評估相對新長期 expNext 並未破壞定位，因此不修改。廣告領取仍為雙倍。
+- EXP 場數健檢必須走真正 runtime：實際怪物／rank → 戰鬥 EXP → mode（手動／元素匣／休息）→ `expNext`，不得只比較 UI、註解、anchor array。
+- 回歸 owner：`tests/v170-final-spec-integration.test.js` 驗證完整最終 runtime；`tests/v139-economy-rested-exp.test.js` 驗證曲線與休息經驗；`tests/v173.43-growth-charge.test.js` 驗證自然充能／每日 Growth／新手期。

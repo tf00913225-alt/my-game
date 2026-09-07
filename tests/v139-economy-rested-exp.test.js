@@ -99,35 +99,32 @@ function test(name,fn){
     console.log("✓ "+name);
 }
 
-test("formal growth curve keeps the legacy zone audit but uses the new fast/smooth EXP requirements",()=>{
+test("formal growth curve is owned by runtime zone EXP × target battle anchors from Lv20",()=>{
     const context=makeEconomyContext();
     const audit=vm.runInContext("v139GetExpCurveAudit()",context);
     assert.equal(audit.totalEffectiveBattles,69760);
     assert.equal(audit.beginnerTotalExp,37950);
 
-    const expectedExpNext={
-        10:1200,20:8000,30:60000,40:120000,49:200000,50:215000,
-        60:400000,70:650000,80:1000000,90:1500000,95:2000000,99:2800000
-    };
-    for(const checkpoint of audit.checkpoints){
-        assert.equal(checkpoint.expNext,expectedExpNext[checkpoint.level],"Lv"+checkpoint.level+" expNext");
-        assert.ok(checkpoint.averageBattleExp>0,"zone EXP audit remains available");
-        assert.ok(checkpoint.targetBattles>0,"legacy battle audit remains available");
+    const formalLevels=new Set([20,30,40,50,60,70,80,90,95,98,99]);
+    for(const checkpoint of audit.checkpoints.filter(row=>formalLevels.has(row.level))){
+        assert.ok(checkpoint.averageBattleExp>0,"zone EXP audit must be live");
+        assert.equal(checkpoint.expNext,Math.round(checkpoint.averageBattleExp*checkpoint.targetBattles),"Lv"+checkpoint.level+" expNext must be coupled");
+        assert.ok(Math.abs(checkpoint.theoreticalBattles-checkpoint.targetBattles)<0.001,"Lv"+checkpoint.level+" battle count");
+        assert.ok(Math.abs(checkpoint.differencePercent)<0.001,"Lv"+checkpoint.level+" difference");
     }
-    assert.ok(expectedExpNext[50]/expectedExpNext[49]<1.08,"Lv49→50 must not cliff");
+    assert.ok(vm.runInContext("v133GetExpNextForLevel(50)/v133GetExpNextForLevel(49)",context)<1.08,"Lv49→50 must not cliff");
     assert.equal(vm.runInContext("v173GetNaturalChargeLevelsPerDay(20)",context),1.30);
     assert.equal(vm.runInContext("v173GetNaturalChargeLevelsPerDay(50)",context),1.00);
     assert.equal(vm.runInContext("v173GetNaturalChargeLevelsPerDay(99)",context),0.32);
-    assert.equal(vm.runInContext("v173GetDailyTotalTarget(20)",context),3.00);
-    assert.equal(vm.runInContext("v173GetDailyTotalTarget(99)",context),1.00);
 });
 
-test("monster EXP keeps ×3.5, rank multipliers, and element-box 70%",()=>{
+test("monster EXP keeps ×3.5, rank multipliers, newcomer-only ×3, and element-box 70%",()=>{
     assert.match(v131Source,/const V131_EXP_MULTIPLIER=3\.5/);
     assert.match(v131Source,/const ELEMENT_BOX_EXP_RATIO=0\.70/);
     assert.match(v131Source,/rank==="boss"\)\{ return 3; \}/);
     assert.match(v131Source,/rank==="elite"\)\{ return 1\.5; \}/);
-    assert.match(v131Source,/finalExp=Math\.round\(finalExp\*ELEMENT_BOX_EXP_RATIO\)/);
+    assert.match(v131Source,/safeLevel<20 \? V17342_GLOBAL_EXP_REWARD_MULTIPLIER : 1/);
+    assert.match(v131Source,/finalExp=applyPatrolExpMode\(finalExp,\{elementBox:true\}\)/);
 });
 
 test("EXP dungeon grants 33% of the party's current average level requirement",()=>{
@@ -186,9 +183,9 @@ test("rested EXP accrues every two minutes, caps at 300, and consumes one battle
 test("rested multiplier is only called outside the element-box branch",()=>{
     assert.match(
         v131Source,
-        /if\(isElementBoxBattle\)\{[\s\S]*?finalExp=Math\.round\(finalExp\*ELEMENT_BOX_EXP_RATIO\);[\s\S]*?\}else if\(typeof window\.v139TryConsumeRestedBattle==="function"\)/
+        /if\(isElementBoxBattle\)\{[\s\S]*?finalExp=applyPatrolExpMode\(finalExp,\{elementBox:true\}\);[\s\S]*?\}else if\(typeof window\.v139TryConsumeRestedBattle==="function"\)/
     );
-    assert.match(v131Source,/finalExp=Math\.round\(finalExp\*2\)/);
+    assert.match(v131Source,/finalExp=applyPatrolExpMode\(finalExp,\{rested:true\}\)/);
     assert.match(v132Source,/if\(!run\)\{\s*return originalWinBattle/);
 });
 

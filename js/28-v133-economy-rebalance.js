@@ -31,13 +31,11 @@
         {level:99,battles:4000}
     ];
 
-    /* Lv1~20快速期；20後以少量錨點線性銜接，49→50只有約7.5%增加。 */
-    const EXP_REQUIREMENT_ANCHORS=[
+    /* Lv1→20 快速期維持既有靜態需求；從 Lv20→21 起，expNext 唯一依據
+       為「該級練功區正式平均戰鬥 EXP × TARGET_BATTLE_ANCHORS」。 */
+    const NEWCOMER_EXP_REQUIREMENT_ANCHORS=[
         {level:1,value:300},{level:5,value:600},{level:10,value:1200},
-        {level:15,value:2500},{level:20,value:8000},{level:30,value:60000},
-        {level:40,value:120000},{level:49,value:200000},{level:50,value:215000},
-        {level:60,value:400000},{level:70,value:650000},{level:80,value:1000000},
-        {level:90,value:1500000},{level:95,value:2000000},{level:99,value:2800000}
+        {level:15,value:2500},{level:20,value:8000}
     ];
     const NATURAL_CHARGE_LEVELS_PER_DAY=[
         {level:20,value:1.30},{level:39,value:1.25},{level:49,value:1.02},
@@ -124,7 +122,12 @@
     }
     function getExpNextForLevel(level){
         const safe=Math.min(99,Math.max(1,Math.floor(Number(level)||1)));
-        return Math.max(1,Math.round(interpolateAnchors(safe,EXP_REQUIREMENT_ANCHORS)));
+        if(safe<20){
+            return Math.max(1,Math.round(interpolateAnchors(safe,NEWCOMER_EXP_REQUIREMENT_ANCHORS)));
+        }
+        const averageBattleExp=getTrainingZoneAverageExpForLevel(safe);
+        const targetBattles=getTargetBattlesForLevel(safe);
+        return Math.max(1,Math.round(averageBattleExp*targetBattles));
     }
     window.v133GetExpNextForLevel=getExpNextForLevel;
     window.v139GetTrainingZoneAverageExpForLevel=getTrainingZoneAverageExpForLevel;
@@ -702,12 +705,19 @@
     }
 
     window.v139GetExpCurveAudit=function(){
-        const checkpoints=[10,20,30,40,49,50,60,70,80,90,95,99].map(level=>({
-            level:level,averageBattleExp:getTrainingZoneAverageExpForLevel(level),
-            targetBattles:getTargetBattlesForLevel(level),expNext:getExpNextForLevel(level),
-            naturalLevelsPerDay:getNaturalChargeLevelsPerDay(level),dailyQuestLevelsPerDay:getDailyQuestLevelsPerDay(level),
-            dailyTotalTarget:getDailyTotalTarget(level)
-        }));
+        const checkpoints=[10,20,30,40,49,50,60,70,80,90,95,98,99].map(level=>{
+            const averageBattleExp=getTrainingZoneAverageExpForLevel(level);
+            const targetBattles=getTargetBattlesForLevel(level);
+            const expNext=getExpNextForLevel(level);
+            const theoreticalBattles=averageBattleExp>0?expNext/averageBattleExp:0;
+            const differencePercent=targetBattles>0?((theoreticalBattles-targetBattles)/targetBattles)*100:0;
+            return {
+                level:level,averageBattleExp:averageBattleExp,targetBattles:targetBattles,expNext:expNext,
+                theoreticalBattles:theoreticalBattles,differencePercent:differencePercent,
+                naturalLevelsPerDay:getNaturalChargeLevelsPerDay(level),dailyQuestLevelsPerDay:getDailyQuestLevelsPerDay(level),
+                dailyTotalTarget:getDailyTotalTarget(level)
+            };
+        });
         let totalEffectiveBattles=0;
         for(let level=1;level<MAX_CHARACTER_LEVEL;level++){ totalEffectiveBattles+=getTargetBattlesForLevel(level); }
         let beginnerTotalExp=0;

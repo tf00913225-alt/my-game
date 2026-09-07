@@ -68,14 +68,14 @@ test("4. newcomer estimate sits in the 20–30 minute target",()=>{
     assert.ok(battles>=14&&battles<=20);assert.ok(minutes>=20&&minutes<=30);
 });
 test("5. online elapsed time accrues by timestamp difference",()=>{
-    const h=harness({levels:[20]});h.setNow(h.getNow()+DAY/2);assert.equal(h.context.v173PreviewExpPoolCharge().gain,5200);
+    const h=harness({levels:[20]});h.setNow(h.getNow()+DAY/2);assert.equal(h.context.v173PreviewExpPoolCharge().gain,Math.floor(h.context.v133GetExpNextForLevel(20)*h.context.v173GetNaturalChargeLevelsPerDay(20)*.5));
 });
 test("6. offline reopen settles timestamp-based charge",()=>{
     const base=2_000_000_000;const h=harness({levels:[20],now:base+DAY,state:{initialized:true,unlocked:true,lastAt:base,noticeShown:true,lastCapped:false,newcomerRewards:{}}});
-    assert.equal(h.context.sharedExp,10400);
+    assert.equal(h.context.sharedExp,Math.floor(h.context.v133GetExpNextForLevel(20)*h.context.v173GetNaturalChargeLevelsPerDay(20)));
 });
 test("7. charge accrues without entering the EXP page",()=>{
-    const h=harness({levels:[30]});h.setNow(h.getNow()+DAY);assert.equal(h.context.v173PreviewExpPoolCharge().gain,Math.floor(60000*h.context.v173GetNaturalChargeLevelsPerDay(30)));
+    const h=harness({levels:[30]});h.setNow(h.getNow()+DAY);assert.equal(h.context.v173PreviewExpPoolCharge().gain,Math.floor(h.context.v133GetExpNextForLevel(30)*h.context.v173GetNaturalChargeLevelsPerDay(30)));
 });
 test("8. the four-second UI timer never mutates authoritative sharedExp",()=>{
     const timer=growth.match(/setInterval\(\(\)=>\{[\s\S]*?\},4000\)/);assert.ok(timer);assert.doesNotMatch(timer[0],/sharedExp\s*[+\-]?=/);
@@ -83,17 +83,17 @@ test("8. the four-second UI timer never mutates authoritative sharedExp",()=>{
 test("9. reopen authority is persisted lastAt",()=>{assert.match(growth,/timestamp-growthState\.lastAt/);assert.match(growth,/persistGrowthState/);});
 test("10. natural charge caps at 72 hours",()=>{
     const h=harness({levels:[20]});h.setNow(h.getNow()+5*DAY);const p=h.context.v173PreviewExpPoolCharge();
-    assert.equal(p.elapsedMs,72*3600000);assert.equal(p.gain,31200);assert.equal(p.capped,true);
+    assert.equal(p.elapsedMs,72*3600000);assert.equal(p.gain,Math.floor(h.context.v133GetExpNextForLevel(20)*h.context.v173GetNaturalChargeLevelsPerDay(20)*3));assert.equal(p.capped,true);
 });
 test("11. 72h cap does not cap the shared pool itself",()=>{
-    const h=harness({levels:[20],sharedExp:9_999_999});h.setNow(h.getNow()+5*DAY);assert.equal(h.context.v173GetAvailableExpPool(),9_999_999+31200);
+    const h=harness({levels:[20],sharedExp:9_999_999});h.setNow(h.getNow()+5*DAY);assert.equal(h.context.v173GetAvailableExpPool(),9_999_999+Math.floor(h.context.v133GetExpNextForLevel(20)*h.context.v173GetNaturalChargeLevelsPerDay(20)*3));
 });
 test("12. clock rollback produces zero gain",()=>{
     const h=harness({levels:[20]});const base=h.getNow();h.setNow(base-3600000);assert.equal(h.context.v173SettleExpPoolCharge(h.getNow()),0);
 });
 test("13. clock rollback does not move the baseline backward",()=>{
     const h=harness({levels:[20]});const base=h.getNow();h.setNow(base-3600000);h.context.v173SettleExpPoolCharge(h.getNow());assert.equal(h.state().lastAt,base);
-    h.setNow(base+3600000);assert.equal(h.context.v173SettleExpPoolCharge(h.getNow()),Math.floor(10400/24));
+    h.setNow(base+3600000);assert.equal(h.context.v173SettleExpPoolCharge(h.getNow()),Math.floor(h.context.v133GetExpNextForLevel(20)*h.context.v173GetNaturalChargeLevelsPerDay(20)/24));
 });
 test("14. old save initializes at current time safely",()=>{
     const h=harness({levels:[20],sharedExp:777});assert.equal(h.context.sharedExp,777);assert.equal(h.state().lastAt,h.getNow());
@@ -115,11 +115,11 @@ test("18. Lv50+ slows progressively rather than halving",()=>{
     for(let i=1;i<rates.length;i++){assert.ok(rates[i]<rates[i-1]);assert.ok(rates[i]/rates[i-1]>.60);}
 });
 test("19. daily task package is 70% of added shared-pool growth EXP",()=>{
-    const b=harness({levels:[50]}).context.v173GetDailyGrowthRewardBreakdown(50);assert.equal(b.totalExp,148350);assert.equal(b.taskExp,103845);assert.equal(Number((b.taskExp/b.totalExp).toFixed(2)),.70);
+    const h=harness({levels:[50]});const b=h.context.v173GetDailyGrowthRewardBreakdown(50);assert.equal(b.totalExp,Math.round(h.context.v133GetExpNextForLevel(50)*h.context.v173GetDailyQuestLevelsPerDay(50)));assert.equal(b.taskExp,Math.round(b.totalExp*.70));assert.equal(Number((b.taskExp/b.totalExp).toFixed(2)),.70);
     assert.match(growth,/reward\.exp=lateState\.rewardBases\.get\(reward\)\+extra/);
 });
 test("20. final daily chest owns the remaining 30%",()=>{
-    const b=harness({levels:[50]}).context.v173GetDailyGrowthRewardBreakdown(50);assert.equal(b.chestExp,44505);assert.equal(b.taskExp+b.chestExp,b.totalExp);assert.match(growth,/type==="daily"&&Number\(threshold\)===100/);
+    const b=harness({levels:[50]}).context.v173GetDailyGrowthRewardBreakdown(50);assert.equal(b.chestExp,b.totalExp-b.taskExp);assert.equal(b.taskExp+b.chestExp,b.totalExp);assert.match(growth,/type==="daily"&&Number\(threshold\)===100/);
 });
 test("21. shared EXP remains freely allocatable, not auto-split",()=>{assert.match(growth,/getExistingPartyIndexes\(\)\.slice\(0,3\)/);assert.doesNotMatch(growth,/sharedExp\s*\/\s*3/);});
 test("22. allocation cost uses each character's current requirement",()=>{assert.match(growth,/expNext-exp/);assert.match(growth,/expNext=getExpNextForLevel\(level\)/);});
@@ -143,7 +143,7 @@ test("31. attribute, skill upgrade\/learn and unequipped-skill reminders coexist
 });
 test("32. existing offline EXP remains separate",()=>{assert.match(offline,/calculateOfflineExpSince/);assert.match(offline,/pendingOfflineExp/);assert.doesNotMatch(growth,/pendingOfflineExp\s*[+\-]?=/);});
 test("33. the same natural interval cannot settle twice",()=>{
-    const h=harness({levels:[20]});h.setNow(h.getNow()+DAY);assert.equal(h.context.v173SettleExpPoolCharge(h.getNow()),10400);assert.equal(h.context.v173SettleExpPoolCharge(h.getNow()),0);
+    const h=harness({levels:[20]});h.setNow(h.getNow()+DAY);const expected=Math.floor(h.context.v133GetExpNextForLevel(20)*h.context.v173GetNaturalChargeLevelsPerDay(20));assert.equal(h.context.v173SettleExpPoolCharge(h.getNow()),expected);assert.equal(h.context.v173SettleExpPoolCharge(h.getNow()),0);
 });
 test("34. +EXP float is visual only",()=>{
     const block=growth.match(/function syncChargeUi\(animate\)\{[\s\S]*?window\.v173SyncExpPoolChargeUi=syncChargeUi/);assert.ok(block);assert.match(block[0],/v173-exp-charge-float/);assert.doesNotMatch(block[0],/sharedExp\s*\+=/);

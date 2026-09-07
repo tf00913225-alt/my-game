@@ -72,6 +72,50 @@
         return 1;
     }
 
+    function getPatrolProgressionExpMultiplier(level){
+        const safeLevel=Math.max(1,Math.floor(Number(level)||1));
+        return safeLevel<20 ? V17342_GLOBAL_EXP_REWARD_MULTIPLIER : 1;
+    }
+
+    function getPatrolProgressionReferenceLevel(){
+        if(typeof window.v133GetHighestCreatedCharacterLevel==="function"){
+            return Math.max(1,Math.floor(Number(window.v133GetHighestCreatedCharacterLevel())||1));
+        }
+        if(typeof getExistingPartyIndexes==="function"&&typeof getPartyCharacterByIndex==="function"){
+            const indexes=getExistingPartyIndexes();
+            if(indexes&&indexes.length){
+                return indexes.reduce((highest,index)=>{
+                    const character=getPartyCharacterByIndex(index);
+                    return character?Math.max(highest,Math.floor(Number(character.level)||1)):highest;
+                },1);
+            }
+        }
+        return typeof player!=="undefined"&&player ? Math.max(1,Math.floor(Number(player.level)||1)) : 1;
+    }
+
+    function calculateStandardPatrolExp(monsterList,progressionLevel){
+        const rankAdjustedExp=(Array.isArray(monsterList)?monsterList:[]).reduce((total,monster)=>{
+            if(!monster){ return total; }
+            return total+(Number(monster.level)||0)*10*getMonsterExpRankMultiplier(monster);
+        },0);
+        return Math.max(0,Math.floor(
+            rankAdjustedExp*V131_EXP_MULTIPLIER*getPatrolProgressionExpMultiplier(progressionLevel)
+        ));
+    }
+
+    function applyPatrolExpMode(standardExp,options){
+        const safeExp=Math.max(0,Math.floor(Number(standardExp)||0));
+        const mode=options&&typeof options==="object"?options:{};
+        if(mode.elementBox){ return Math.round(safeExp*ELEMENT_BOX_EXP_RATIO); }
+        if(mode.rested){ return Math.round(safeExp*2); }
+        return safeExp;
+    }
+
+    window.v173GetPatrolProgressionExpMultiplier=getPatrolProgressionExpMultiplier;
+    window.v173GetPatrolProgressionReferenceLevel=getPatrolProgressionReferenceLevel;
+    window.v173CalculateStandardPatrolExp=calculateStandardPatrolExp;
+    window.v173ApplyPatrolExpMode=applyPatrolExpMode;
+
     function getFormationRankWeight(monsterIndex){
         const monster=monsters[monsterIndex];
         const rank=getMonsterRank(monster);
@@ -1173,21 +1217,13 @@
                 0
             );
 
-            /* rankAdjustedExp：這裡才是真正決定最終獎勵的基準，
-               每隻怪先各自套rank倍率（普通×1／精英×1.5／BOSS×3），
-               再統一乘上既有的3.5倍加成——兩個倍率是「疊乘」，
-               不是額外多加一次3.5。 */
-            const rankAdjustedExp=currentBattleMonsters.reduce(
-                (total,index)=>{
-                    const monster=monsters[index];
-                    if(!monster){ return total; }
-                    return total+(Number(monster.level)||0)*10*getMonsterExpRankMultiplier(monster);
-                },
-                0
-            );
-
-            let finalExp=Math.floor(
-                rankAdjustedExp*V131_EXP_MULTIPLIER*V17342_GLOBAL_EXP_REWARD_MULTIPLIER
+            /* 正式巡怪 EXP 只走 calculateStandardPatrolExp()：
+               怪物基礎 EXP × rank × 3.5；V173.42 ×3 僅保留 Lv1～19 快速期。
+               Lv20 起不再有第二個全域 ×3。 */
+            const progressionLevel=getPatrolProgressionReferenceLevel();
+            let finalExp=calculateStandardPatrolExp(
+                currentBattleMonsters.map(index=>monsters[index]).filter(Boolean),
+                progressionLevel
             );
 
             const isBeginnerForestBattle=
@@ -1216,14 +1252,14 @@
                 /* ★ 用Math.round不用Math.floor：700*0.7在浮點數運算下
                    會是489.999999...，Math.floor會誤差扣掉1點EXP，
                    Math.round才會正確算出490。 */
-                finalExp=Math.round(finalExp*ELEMENT_BOX_EXP_RATIO);
+                finalExp=applyPatrolExpMode(finalExp,{elementBox:true});
             }else if(typeof window.v139TryConsumeRestedBattle==="function"){
                 /* V139休息經驗只允許一般練功戰鬥使用。副本勝利由
                    js/27先攔截，不會走進這個一般winBattle wrapper；
                    元素匣則在上面的分支明確排除，不會消耗場數。 */
                 restedExpResult=window.v139TryConsumeRestedBattle();
                 if(restedExpResult && restedExpResult.applied){
-                    finalExp=Math.round(finalExp*2);
+                    finalExp=applyPatrolExpMode(finalExp,{rested:true});
                 }
             }
 
