@@ -1,0 +1,63 @@
+name: Align touch-lock cache assertions
+
+on:
+  push:
+    branches:
+      - bugfix/global-ui-gesture-vfx-lock
+
+permissions:
+  contents: write
+
+jobs:
+  align:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Align only touch-lock cache assertions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          old=r'js\/01-stage-v8-touch-lock\.js\?v=173\.39'
+          new=r'js\/01-stage-v8-touch-lock\.js\?v=173\.62'
+          changed=[]
+          replacements=0
+          for p in sorted(Path('tests').glob('*.js')):
+              s=p.read_text(encoding='utf-8')
+              count=s.count(old)
+              if count:
+                  p.write_text(s.replace(old,new),encoding='utf-8')
+                  changed.append(str(p))
+                  replacements+=count
+          print('changed files:', changed)
+          print('replacements:', replacements)
+          if replacements < 1:
+              raise SystemExit('no stale touch-lock cache assertions found')
+          remaining=[]
+          for p in sorted(Path('tests').glob('*.js')):
+              if old in p.read_text(encoding='utf-8'):
+                  remaining.append(str(p))
+          if remaining:
+              raise SystemExit('stale assertions remain: '+', '.join(remaining))
+          PY
+      - name: Run all Node suites
+        run: node .github/scripts/ci.mjs tests
+      - name: Run release coherence gate
+        env:
+          CI_BASE_SHA: 91eafa0b2efe9ac50f88787fa8d8dd60c7e9d61c
+        run: node .github/scripts/release-gate.mjs ci
+      - name: Check diff
+        run: git diff --check
+      - name: Commit aligned historical assertions and remove workflow
+        run: |
+          rm .github/workflows/_align-touch-lock-cache-tests.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "test: align historical touch-lock cache assertions"
+          git push origin HEAD:bugfix/global-ui-gesture-vfx-lock
