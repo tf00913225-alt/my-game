@@ -81,14 +81,12 @@
         return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;")
             .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
     }
-    function difficultyConfig(level){
-        const key=Number(level)===40?40:20;
-        return ABYSS_DIFFICULTIES[key];
-    }
+    function difficultyConfig(level){ return ABYSS_DIFFICULTIES[Number(level)===40?40:20]; }
     function stageKey(run){ return "d"+run.difficulty+"-r"+run.regionIndex+"-s"+run.encounterIndex; }
     function isBossStage(run){ return Number(run.encounterIndex)===PRE_STAGE_COUNT; }
     function isFinalBossStage(run){ return Number(run.regionIndex)===REGION_COUNT-1&&isBossStage(run); }
     function stageLabel(run){ return isBossStage(run)?"帝王 BOSS":"前置關 "+(Number(run.encounterIndex)+1)+" / 4"; }
+    function fiveStageProgress(run){ return (Number(run.encounterIndex)+1)+" / 5"; }
 
     function defaultRun(level){
         return {
@@ -105,9 +103,8 @@
     }
 
     function normalizeRun(raw,level){
-        const base=defaultRun(level);
         const source=raw&&typeof raw==="object"?raw:{};
-        const run=Object.assign(base,source);
+        const run=Object.assign(defaultRun(level),source);
         run.difficulty=Number(level)===40?40:20;
         run.regionIndex=clamp(Math.floor(numeric(run.regionIndex,0)),0,REGION_COUNT-1);
         run.encounterIndex=clamp(Math.floor(numeric(run.encounterIndex,0)),0,STAGES_PER_REGION-1);
@@ -189,11 +186,17 @@
             }else{
                 for(let index=0;index<run.regionIndex;index++){ run.completedRegions[index]=true; }
                 if(legacyPhase==="chest"){
-                    run.battleCompleted=true; run.chestSpawned=true; run.phase="chest";
+                    run.battleCompleted=true;
+                    run.chestSpawned=true;
+                    run.phase="chest";
                 }else if(legacyPhase==="portal"){
                     const key=stageKey(run);
-                    run.battleCompleted=true; run.chestClaimed=true; run.portalUnlocked=run.regionIndex<REGION_COUNT-1;
-                    run.completedStages[key]=true; run.completedRegions[run.regionIndex]=true; run.regionCompleted=true;
+                    run.battleCompleted=true;
+                    run.chestClaimed=true;
+                    run.portalUnlocked=run.regionIndex<REGION_COUNT-1;
+                    run.completedStages[key]=true;
+                    run.completedRegions[run.regionIndex]=true;
+                    run.regionCompleted=true;
                     run.rewardClaims[key]={status:"claimed",migrated:true};
                     run.phase=run.regionIndex<REGION_COUNT-1?"portal":"complete";
                     if(run.regionIndex===REGION_COUNT-1){ run.completed=true; }
@@ -223,10 +226,22 @@
     let mapEntered=false;
     let battleStarting=false;
 
+    function normalizeRunInPlace(level){
+        const key=Number(level)===40?40:20;
+        const current=rootState.runs[key]&&typeof rootState.runs[key]==="object"?rootState.runs[key]:defaultRun(key);
+        const normalized=normalizeRun(current,key);
+        Object.keys(current).forEach(function(property){
+            if(!Object.prototype.hasOwnProperty.call(normalized,property)){ delete current[property]; }
+        });
+        Object.assign(current,normalized);
+        rootState.runs[key]=current;
+        return current;
+    }
+
     function persist(){
         rootState.version=STATE_VERSION;
-        rootState.runs[20]=normalizeRun(rootState.runs[20],20);
-        rootState.runs[40]=normalizeRun(rootState.runs[40],40);
+        normalizeRunInPlace(20);
+        normalizeRunInPlace(40);
         try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(rootState)); }catch(_){ }
     }
     persist();
@@ -296,21 +311,23 @@
             const hpMultiplier=config.stageHpMultipliers[stage];
             for(let index=0;index<5;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"regular",hpMultiplier,false);
-                monster.v141FormationRow=0; monster.v141FormationPosition=index;
+                monster.v141FormationRow=0;
+                monster.v141FormationPosition=index;
                 roster.push(monster);
             }
             for(let index=0;index<5;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"elite",hpMultiplier,false);
-                monster.v141FormationRow=1; monster.v141FormationPosition=index;
+                monster.v141FormationRow=1;
+                monster.v141FormationPosition=index;
                 roster.push(monster);
             }
             return roster;
         }
         for(let index=0;index<10;index++){
             if(index===2){
-                const bossName=region.emperor;
-                const boss=makeAbyssMonster(bossName,config,region,"boss",config.bossHpMultiplier,true);
-                boss.v141FormationRow=0; boss.v141FormationPosition=2;
+                const boss=makeAbyssMonster(region.emperor,config,region,"boss",config.bossHpMultiplier,true);
+                boss.v141FormationRow=0;
+                boss.v141FormationPosition=2;
                 roster.push(boss);
             }else{
                 const elite=makeAbyssMonster("天兵天將",config,region,"elite",config.bossEliteHpMultiplier,false);
@@ -376,7 +393,7 @@
     function renderStageNodes(run){
         return '<div class="v174-abyss-nodes" aria-label="本區五關進度">'+Array.from({length:STAGES_PER_REGION},(_,index)=>{
             const boss=index===PRE_STAGE_COUNT;
-            const label=boss?"帝":""+(index+1);
+            const label=boss?"帝":String(index+1);
             return '<span class="v174-abyss-node '+(boss?'boss ':'')+nodeClass(run,index)+'" title="'+(boss?'帝王 BOSS':'前置關 '+(index+1))+'"><i>'+label+'</i></span>';
         }).join('<em></em>')+'</div>';
     }
@@ -426,7 +443,7 @@
         const map=FLOOR_MAPS[run.regionIndex];
         const message=run.message||(!run.battleCompleted?(isBossStage(run)?"帝王氣息逼近。前往王座發起挑戰。":"點擊試煉印記，進入本區前置戰。"):(run.chestClaimed?"寶箱已領取，傳送點已解鎖。":"戰鬥已完成，請走到寶箱領取獎勵。"));
         return '<div class="v141-abyss-shell v174-abyss-shell" data-difficulty="'+run.difficulty+'" data-region="'+region.id+'">'+
-            '<div class="v174-abyss-hud"><div><small>'+escapeHtml(config.title)+'</small><b>'+escapeHtml(region.name)+'</b><span>'+escapeHtml(stageLabel(run))+'</span></div>'+renderStageNodes(run)+'<button type="button" class="v174-abyss-back" onclick="v174AbyssBackToSelection()" aria-label="返回深淵選擇">返</button></div>'+
+            '<div class="v174-abyss-hud"><div><small>'+escapeHtml(config.title)+'</small><b>'+escapeHtml(region.name)+'</b><span>'+escapeHtml(stageLabel(run))+'・'+escapeHtml(fiveStageProgress(run))+'</span></div>'+renderStageNodes(run)+'<button type="button" class="v174-abyss-back" onclick="v174AbyssBackToSelection()" aria-label="返回深淵選擇">返</button></div>'+
             '<div id="v174AbyssMessage" class="v174-abyss-message">'+escapeHtml(message)+'</div>'+
             '<div id="v141AbyssMap" class="v141-abyss-map v174-abyss-map floor-'+String(run.regionIndex+1)+'" style="--v174-abyss-map:url(\''+map+'\')" onclick="v174AbyssMoveByEvent(event)">'+
                 renderEncounterControl(run,region)+renderChest(run)+renderPortal(run,region)+
@@ -456,7 +473,10 @@
     }
     function refresh(){
         const content=document&&document.getElementById?document.getElementById("dungeonTabContent"):null;
-        if(content){ content.innerHTML=renderAbyss(); if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(syncPlayerArt); } }
+        if(content){
+            content.innerHTML=renderAbyss();
+            if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(syncPlayerArt); }
+        }
     }
 
     function resetStageFlags(run){
@@ -467,7 +487,9 @@
         run.chestClaimed=false;
         run.portalUnlocked=false;
         run.regionCompleted=!!run.completedRegions[run.regionIndex];
-        run.x=50; run.y=84; run.message="";
+        run.x=50;
+        run.y=84;
+        run.message="";
     }
 
     function selectDifficulty(level){
@@ -493,13 +515,15 @@
         rootState.runs[config.id].clears=clears;
         rootState.selectedDifficulty=config.id;
         mapEntered=true;
-        persist(); refresh();
+        persist();
+        refresh();
     }
 
     function backToSelection(){
         mapEntered=false;
         rootState.selectedDifficulty=null;
-        persist(); refresh();
+        persist();
+        refresh();
     }
 
     function movePlayer(x,y,callback){
@@ -510,12 +534,18 @@
         const playerEl=document&&document.getElementById?document.getElementById("v141AbyssPlayer"):null;
         const distance=Math.hypot(targetX-run.x,targetY-run.y);
         const duration=Math.max(0.25,Math.min(1.45,distance/38));
-        run.x=targetX; run.y=targetY; persist();
+        run.x=targetX;
+        run.y=targetY;
+        persist();
         if(!playerEl){ if(callback){ callback(); } return; }
         playerEl.style.transition="left "+duration+"s cubic-bezier(.22,.61,.36,1),top "+duration+"s cubic-bezier(.22,.61,.36,1)";
-        playerEl.style.left=targetX+"%"; playerEl.style.top=targetY+"%";
+        playerEl.style.left=targetX+"%";
+        playerEl.style.top=targetY+"%";
         playerEl.classList.add("walking");
-        setTimeout(function(){ playerEl.classList.remove("walking"); if(callback){ callback(); } },Math.round(duration*1000)+30);
+        setTimeout(function(){
+            playerEl.classList.remove("walking");
+            if(callback){ callback(); }
+        },Math.round(duration*1000)+30);
     }
 
     function resolveBattleResult(result){
@@ -523,7 +553,8 @@
         if(!run){ return false; }
         if(result!=="win"){
             run.message="挑戰失敗，本關進度未前進。整備後可再次挑戰。";
-            persist(); refresh();
+            persist();
+            refresh();
             return false;
         }
         run.battleCompleted=true;
@@ -532,7 +563,8 @@
         run.portalUnlocked=false;
         run.phase="chest";
         run.message=(isBossStage(run)?"帝王已退場。":"試煉已通過。")+"請走到寶箱位置領取獎勵。";
-        persist(); refresh();
+        persist();
+        refresh();
         return true;
     }
 
@@ -668,10 +700,19 @@
         const key=stageKey(run);
         const existing=run.rewardClaims[key];
         if(run.chestClaimed||(existing&&(existing.status==="granting"||existing.status==="claimed"))){
-            run.chestSpawned=false; run.chestClaimed=true; run.completedStages[key]=true;
-            if(isFinalBossStage(run)){ run.completed=true; run.phase="complete"; run.portalUnlocked=false; }
-            else{ run.phase="portal"; run.portalUnlocked=true; }
-            persist(); refresh();
+            run.chestSpawned=false;
+            run.chestClaimed=true;
+            run.completedStages[key]=true;
+            if(isFinalBossStage(run)){
+                run.completed=true;
+                run.phase="complete";
+                run.portalUnlocked=false;
+            }else{
+                run.phase="portal";
+                run.portalUnlocked=true;
+            }
+            persist();
+            refresh();
             return false;
         }
         const pos=BOSS_POSITIONS[run.regionIndex]||BOSS_POSITIONS[0];
@@ -684,7 +725,8 @@
             run.rewardClaims[key]={status:"granting",kind:reward.kind,ticketId:reward.ticket&&reward.ticket.id||null,startedAt:Date.now()};
             persist();
             if(!addRewardItem(reward)){
-                delete run.rewardClaims[key]; persist();
+                delete run.rewardClaims[key];
+                persist();
                 if(typeof alert==="function"){ alert("背包空間不足，寶箱尚未領取。"); }
                 return;
             }
@@ -709,7 +751,8 @@
                 return;
             }
             resetStageFlags(run);
-            persist(); refresh();
+            persist();
+            refresh();
         });
         return true;
     }
