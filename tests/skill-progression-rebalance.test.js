@@ -76,6 +76,7 @@ function makeRuntime(options={}){
         getCharacterSkillKey:actor=>actor===owners.player2?"player2":"fire",
         getPartyBattleStats:()=>({maxHP:1000}),
         renderSkillLoadout(){},updateUI(){},saveGame(){},alert(message){ context.lastAlert=message; },
+        learnSkill(){},upgradeSkill(){},
         rollCritical(){ return {isCrit:critShouldHit}; },
         applyBurnEffect(){ return burnShouldAdd; },
         finishPlayerAction(){ finished++; },
@@ -293,5 +294,6 @@ test("player progression is isolated from Abyss fixed levels, talisman shared sk
     assert.match(talisman,/sharedSkillId/);
     assert.doesNotMatch(talisman,/v17364GetRequiredCharacterLevelForSkillLevel/);
     assert.match(main,/equippedSkills\.length\s*>=\s*4/);
-    assert.match(lateLoader,/59-abyss-two-tier-runtime\.js[\s\S]*?60-v173\.64-skill-progression-rebalance\.js/);
+    assert.match(lateLoader,/script\.src="js\/59-abyss-two-tier-runtime\.js\?v=173\.64-abyss2"[\s\S]*?script\.onload=function\(\)\{[\s\S]*?loadSkillProgressionRuntime\(\)/);
+    assert.match(lateLoader,/function loadSkillProgressionRuntime\(\)[\s\S]*?60-v173\.64-skill-progression-rebalance\.js\?v=173\.64/);
 });
