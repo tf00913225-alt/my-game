@@ -6,17 +6,20 @@
 
    Real-device regression note:
    V154 leaves `align-items:center !important` on the legacy `.v141-abyss-intro`
-   shell.  The new two-tier selection reuses that shell, so an auto-width flex
+   shell. The new two-tier selection reuses that shell, so an auto-width flex
    child containing `width:100%` cards can collapse to only a few pixels wide on
    Android Chrome even though desktop/headless Chrome still reports a non-zero
-   16:9 footprint.  Own the cross-axis sizing explicitly here.
+   16:9 footprint. Own the cross-axis sizing explicitly here with equal-or-higher
+   specificity than the legacy V154 rule.
 ===================================================== */
-#game-stage .v141-abyss-intro.v174-abyss-selection{
+#game-stage .v141-abyss-intro.v174-abyss-selection,
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro.v174-abyss-selection{
     align-items:stretch !important;
     box-sizing:border-box !important;
 }
 
-#game-stage .v141-abyss-intro.v174-abyss-selection::before{
+#game-stage .v141-abyss-intro.v174-abyss-selection::before,
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro.v174-abyss-selection::before{
     display:none !important;
     content:none !important;
 }
