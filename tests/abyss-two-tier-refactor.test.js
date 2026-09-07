@@ -162,11 +162,11 @@ test("boss stages are one emperor plus nine elite and final is only Extreme Empe
 test("Lv20 HP targets are exact after pre-stage and boss-only multipliers",()=>{
     const {context}=makeContext();
     const expected=[[386,1236],[408,1304],[429,1373],[450,1442]];
-    expected.forEach(([regularHp,eliteHp],stage=>{
+    expected.forEach(([regularHp,eliteHp],stage)=>{
         const roster=json(context,`v174AbyssBuildRoster(20,0,${stage})`);
         assert.equal(roster[0].maxHP,regularHp);
         assert.equal(roster[5].maxHP,eliteHp);
-    }));
+    });
     const boss=json(context,"v174AbyssBuildRoster(20,0,4)");
     assert.equal(boss.find(monster=>monster.rank==="elite").maxHP,1510);
     assert.equal(boss.find(monster=>monster.rank==="boss").maxHP,3090);
@@ -175,11 +175,11 @@ test("Lv20 HP targets are exact after pre-stage and boss-only multipliers",()=>{
 test("Lv40 HP targets are exact after pre-stage and boss-only multipliers",()=>{
     const {context}=makeContext();
     const expected=[[644,2059],[679,2174],[715,2288],[751,2402]];
-    expected.forEach(([regularHp,eliteHp],stage=>{
+    expected.forEach(([regularHp,eliteHp],stage)=>{
         const roster=json(context,`v174AbyssBuildRoster(40,0,${stage})`);
         assert.equal(roster[0].maxHP,regularHp);
         assert.equal(roster[5].maxHP,eliteHp);
-    }));
+    });
     const boss=json(context,"v174AbyssBuildRoster(40,0,4)");
     assert.equal(boss.find(monster=>monster.rank==="elite").maxHP,2517);
     assert.equal(boss.find(monster=>monster.rank==="boss").maxHP,5149);
