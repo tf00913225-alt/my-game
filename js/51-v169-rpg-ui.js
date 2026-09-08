@@ -55,7 +55,7 @@
 
         const confirmButton=document.createElement("button");
         confirmButton.type="button";
-        confirmButton.className="v169-rpg-dialog-button primary";
+        confirmButton.className="v169-rpg-dialog-button secondary";
 
         actions.append(cancelButton,confirmButton);
         panel.append(crest,title,message,actions);
@@ -114,6 +114,7 @@
         elements.cancelButton.textContent=options.cancelText;
         elements.confirmButton.textContent=options.confirmText;
         elements.cancelButton.hidden=activeDialog.kind!=="confirm";
+        elements.confirmButton.classList.toggle("primary",options.tone==="danger");
         elements.confirmButton.classList.toggle("danger",options.tone==="danger");
 
         elements.layer.classList.add("show");
