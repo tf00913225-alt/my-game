@@ -399,7 +399,7 @@
         const buttons=[
             ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],
             ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
-            ["商店","assets/ui/home-shop-v147.png","openHomeFeature('shop')"],
+            ["秘寶","assets/ui/nav-relic-v174.webp","openHomeFeature('relic')"],
             ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"]
         ];
         if(!abyssMapActive){
