@@ -100,7 +100,10 @@ function verify(data,width,height){
     assert.match(data.body.overflowY,/auto|scroll/,`${width}px legacy wide-modal CSS retook scroll ownership`);
     assert.equal(data.body.overflowX,"hidden");assert.equal(data.body.touchAction,"pan-y");
     assert.ok(data.body.scrollHeight>data.body.clientHeight&&data.body.after>data.body.before,`${width}px relic body cannot actually scroll`);
-    assert.equal(data.tabs.overflowX,"auto");assert.equal(data.tabs.touchAction,"pan-x");
+    /* Category tabs are horizontally scrollable, but pan-y must also remain
+       allowed so a vertical swipe that starts on the rail can bubble into the
+       relic body instead of feeling intermittently locked on mobile. */
+    assert.equal(data.tabs.overflowX,"auto");assert.equal(data.tabs.touchAction,"pan-x pan-y");
     assert.ok(data.tabs.scrollWidth>data.tabs.clientWidth&&data.tabs.after>data.tabs.before,`${width}px category rail cannot actually scroll`);
     assert.equal(data.grid.cards.length,20);
     assert.equal(data.grid.columns.trim().split(/\s+/).length,2,`${width}px relic grid is not two columns`);
