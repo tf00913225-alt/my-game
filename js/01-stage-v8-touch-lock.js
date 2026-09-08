@@ -53,11 +53,17 @@
 
            狀態／能力說明收斂成 Medium Modal 後，真正 scroll owner
            是 #statusHelpModal 內的 .item-stat-list；外框與返回鍵固定。
+
+           V174：秘寶頁的垂直 scroll owner 是
+           #homeFeatureModal.team-relic-mode #homeFeatureModalBody，分類列
+           .team-relic-tabs 則是水平 scroll owner。兩者都必須通過這個
+           全域觸控鎖；否則手勢從分類列或秘寶內容起始時會被
+           preventDefault()，造成「有時能滑、有時不能滑」的裝置差異。
         */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
-            ".home-feature-modal-box, #homeFeatureModalBody, .v141-synthesis-body, #trainingZoneModalBody, .auto-settings-expanded, " +
+            ".home-feature-modal-box, #homeFeatureModalBody, #homeFeatureModal.team-relic-mode #homeFeatureModalBody, .team-relic-tabs, .v141-synthesis-body, #trainingZoneModalBody, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .inventory-character-detail-grid, .item-modal-box, #itemModalStats, #skillDetailStats, " +
             "#statusHelpModal .item-stat-list, .skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .gameplay-panel-scroll, .v17342-abyss-battle-log, .v143-item-picker, .v17358-reforge-tiers, .v17363-game-select-menu, .v17351-compare-stats, " +
             "textarea, select, input";
