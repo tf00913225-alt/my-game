@@ -1,78 +1,84 @@
+const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
-const SKIP_DIRS = new Set(['.git', 'node_modules']);
-const EXTENSIONS = new Set(['.css', '.html', '.js', '.mjs']);
+const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
 
-function walk(dir) {
-  const out = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.isDirectory() && SKIP_DIRS.has(entry.name)) continue;
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...walk(full));
-    else if (EXTENSIONS.has(path.extname(entry.name))) out.push(full);
-  }
-  return out;
-}
+const owners = {
+  elementBox: 'css/48-v169-element-box-settings.css',
+  abyss: 'css/50-v169-abyss-flow.css',
+  inventory: 'css/52-v173.50-inventory-qol.css',
+  qa: 'css/53-v173.51-qa.css',
+  abyssLayout: 'css/54-v174-abyss-two-tier.css',
+  relic: 'css/55-team-relic-system.css',
+  gameplay: 'css/gameplay-boss-tower.css',
+};
 
-function rel(file) {
-  return path.relative(ROOT, file).split(path.sep).join('/');
-}
-
-function findContext(lines, index) {
-  for (let i = index; i >= Math.max(0, index - 12); i -= 1) {
-    const text = lines[i].trim();
-    if (!text || text.startsWith('/*') || text.startsWith('*') || text.startsWith('//')) continue;
-    if (text.includes('{') || text.includes('style=') || text.includes('cssText') || text.includes('fontSize')) {
-      return text.replace(/\s+/g, ' ').slice(0, 180);
-    }
-  }
-  return lines[index].trim().replace(/\s+/g, ' ').slice(0, 180);
-}
-
-const records = [];
-for (const file of walk(ROOT)) {
-  const fileRel = rel(file);
-  const text = fs.readFileSync(file, 'utf8');
-  const lines = text.split(/\r?\n/);
-  for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i];
+function below13(text) {
+  const hits = [];
+  for (const [index, line] of text.split(/\r?\n/).entries()) {
     const regex = /font-size\s*:\s*([0-9]*\.?[0-9]+)px\b/gi;
     let match;
     while ((match = regex.exec(line))) {
       const value = Number(match[1]);
-      if (value <= 14) {
-        records.push({
-          file: fileRel,
-          line: i + 1,
-          value,
-          context: findContext(lines, i),
-          source: line.trim().replace(/\s+/g, ' ').slice(0, 220),
-        });
-      }
+      if (value < 13) hits.push(`${index + 1}:${value}px:${line.trim()}`);
     }
   }
+  return hits;
 }
 
-const lt13 = records.filter((item) => item.value < 13);
-const eq13 = records.filter((item) => item.value === 13);
-const eq14 = records.filter((item) => item.value === 14);
-
-console.log('=== UI TYPOGRAPHY AUDIT (classification pass) ===');
-console.log(`font-size <13px: ${lt13.length}`);
-console.log(`font-size 13px: ${eq13.length}`);
-console.log(`font-size 14px: ${eq14.length}`);
-for (const group of [
-  ['<13px', lt13],
-  ['13px', eq13],
-  ['14px', eq14],
-]) {
-  console.log(`\n--- ${group[0]} (${group[1].length}) ---`);
-  for (const item of group[1]) {
-    console.log(`${item.value}px | ${item.file}:${item.line} | ${item.context} | ${item.source}`);
-  }
+function enforceNoTinyText(file, transform = (text) => text) {
+  const hits = below13(transform(read(file)));
+  assert.equal(hits.length, 0, `${file} has player-facing text below 13px:\n${hits.join('\n')}`);
 }
 
-console.error('\nAUDIT_ONLY_FAILURE: this first pass intentionally fails so Repository checks preserves the complete classification report.');
-process.exitCode = 1;
+// These are the formal player-facing owners touched by the typography migration.
+enforceNoTinyText(owners.elementBox);
+enforceNoTinyText(owners.abyss);
+enforceNoTinyText(owners.inventory);
+enforceNoTinyText(owners.abyssLayout);
+
+enforceNoTinyText(owners.qa, (text) => text.split('/* DEV-only ad simulator')[0]);
+enforceNoTinyText(owners.relic, (text) => text
+  .split('#game-stage .team-relic-battle-banner')[0]
+  // The real readable back label is ::after at 15px; the 0px hides the legacy text node.
+  .replace('font-size:0!important', ''));
+enforceNoTinyText(owners.gameplay, (text) => text.split('/* ---------- Boss mechanism slot ---------- */')[0]);
+
+const qa = read(owners.qa);
+const relic = read(owners.relic);
+const gameplay = read(owners.gameplay);
+const docs = read('UI_GUIDELINES.md');
+
+// Hierarchy: 13px is a floor, not a blanket replacement.
+assert.match(relic, /\.team-relic-card-name\{[^}]*font-size:16px/);
+assert.match(relic, /\.team-relic-detail section h3\{[^}]*font-size:18px/);
+assert.match(relic, /\.team-relic-tabs button\{[^}]*font-size:15px/);
+assert.match(gameplay, /\.gameplay-mode-copy h3\{[^}]*font-size:22px/);
+assert.match(gameplay, /\.gameplay-fixed-tabs button\{[^}]*font-size:16px/);
+assert.match(gameplay, /\.boss-detail-grid h4\{[^}]*font-size:18px/);
+assert.match(qa, /\.v17346-shop-name\{font-size:16px!important/);
+assert.match(qa, /\.v17346-shop-buy\{[^}]*font-size:15px!important/);
+assert.match(qa, /\.quest-card-desc\{font-size:15px!important/);
+assert.match(qa, /\.v17363-preview-group p\{font-size:15px!important/);
+assert.match(qa, /\.v17363-game-select-option\{[^}]*font-size:15px!important/);
+assert.match(qa, /\.v141-synthesis-tabs button\{[^}]*font-size:15px!important/);
+
+// Explicitly protect battle exclusions: these existing small battle values are intentional.
+assert.match(gameplay, /\.boss-mechanism-kind\{[\s\S]*?font-size:12px/);
+assert.match(gameplay, /\.boss-mechanism-name\{[\s\S]*?font-size:10px/);
+assert.match(gameplay, /\.boss-mechanism-hp,[\s\S]*?font-size:8px/);
+assert.match(gameplay, /\.boss-mechanism-toast\{[\s\S]*?font-size:11px/);
+assert.match(relic, /\.team-relic-battle-banner b\{[^}]*17px/);
+assert.match(relic, /#battlePage \.battle-player \.team-relic-sp-float\{[^}]*13px/);
+
+// Permanent documentation must describe both the floor and the battle carve-out.
+assert.match(docs, /## UI Typography \/ UI 文字尺寸規範（永久規則）/);
+assert.match(docs, /13px — 絕對最低值/);
+assert.match(docs, /15～16px — 一般 UI 主要標準/);
+assert.match(docs, /戰鬥介面排除/);
+assert.match(docs, /禁止全域 font-size hack/);
+assert.match(docs, /禁止用縮字解決版型問題/);
+
+console.log('UI typography standard: targeted non-battle owners >=13px; hierarchy and battle exclusions preserved.');
