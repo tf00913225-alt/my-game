@@ -1,7 +1,7 @@
 /* Team Relic System — black/gold mobile UI. */
 #game-stage .team-relic-home-tools{
-    /* Offline EXP / System already own the two outside slots of the fourth
-       secondary row. Relic / Element Box use the two empty middle slots. */
+    /* Offline EXP / System own the two outside slots of the fourth secondary
+       row. Relic leans left and Element Box leans right toward those owners. */
     position:absolute;
     left:50%;
     right:auto;
@@ -9,8 +9,8 @@
     z-index:5;
     display:grid;
     grid-template-columns:repeat(2,80px);
-    width:168px;
-    gap:8px;
+    width:192px;
+    gap:32px;
     padding:0;
     box-sizing:border-box;
     transform:translateX(-50%);
@@ -54,10 +54,11 @@
 #game-stage #v146HomeRoster .team-relic-loadout-slot>small{display:none;}
 #game-stage #v146HomeRoster .team-relic-loadout-slot>button{min-width:42px;min-height:24px;border:1px solid rgba(211,161,70,.7);border-radius:6px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:9px;font-weight:900;}
 #game-stage #homeFeatureModal.team-relic-modal{padding:4px!important;}
-#game-stage #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide{width:calc(100% - 8px)!important;max-width:none!important;height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:2px solid rgba(174,126,51,.86);background:linear-gradient(180deg,#17120d,#070706 78%);}
+#game-stage #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide{position:relative!important;width:calc(100% - 8px)!important;max-width:none!important;height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:2px solid rgba(174,126,51,.86);background:linear-gradient(180deg,#17120d,#070706 78%);}
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-modal-title{flex:0 0 auto;min-height:44px;border-bottom:1px solid rgba(206,154,61,.45);background:linear-gradient(180deg,rgba(45,31,15,.96),rgba(15,12,8,.96));}
 #game-stage #homeFeatureModal.team-relic-modal #homeFeatureModalTitle{font-family:"Noto Serif TC",serif;letter-spacing:.2em;color:#f0d28d;font-size:20px;}
-#game-stage #homeFeatureModal.team-relic-modal .home-feature-close-btn{width:34px!important;height:34px!important;min-width:34px!important;padding:0!important;font-size:0!important;border:0!important;border-radius:50%!important;background:#050505 url("../assets/ui/map-return.png") center/100% 100% no-repeat!important;box-shadow:0 0 8px rgba(0,0,0,.6)!important;}
+#game-stage #homeFeatureModal.team-relic-modal .home-feature-close-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;min-width:64px!important;height:34px!important;padding:0 12px!important;font-size:13px!important;line-height:32px!important;font-weight:900!important;border:1px solid #8a6a3a!important;border-radius:7px!important;background:linear-gradient(180deg,#2c2419,#0f0c09)!important;color:#f4ead4!important;text-shadow:0 1px 2px #000!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45)!important;}
+#game-stage #homeFeatureModal.team-relic-modal:has(.team-relic-detail) .home-feature-close-btn{display:none!important;}
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide #homeFeatureModalBody{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;padding:9px!important;box-sizing:border-box;}
 #game-stage .team-relic-page,#game-stage .team-relic-detail{min-height:100%;color:#e7dcc7;font-size:14px;box-sizing:border-box;}
 #game-stage .team-relic-resource-line{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;color:#b4a58c;font-size:12px;line-height:17px;}
@@ -107,7 +108,8 @@
     0%,100%{box-shadow:0 0 7px rgba(255,90,54,.24),0 0 10px rgba(66,165,255,.24),0 0 12px rgba(71,214,163,.2);}
     50%{box-shadow:0 0 11px rgba(255,90,54,.42),0 0 16px rgba(66,165,255,.4),0 0 18px rgba(71,214,163,.34),0 0 14px rgba(200,155,69,.3);}
 }
-#game-stage .team-relic-detail-back{min-height:36px;margin-bottom:8px;padding:5px 9px;border:1px solid #755b34;border-radius:7px;background:#17120d;color:#d8be83;font-size:13px;font-weight:800;}
+#game-stage .team-relic-detail-back{position:absolute;top:5px;right:8px;z-index:6;min-width:112px;height:34px;margin:0;padding:0 10px;border:1px solid #8a6a3a;border-radius:7px;background:linear-gradient(180deg,#2c2419,#0f0c09);color:#f4ead4;font-size:0;font-weight:900;text-shadow:0 1px 2px #000;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45);}
+#game-stage .team-relic-detail-back::after{content:"返回秘寶列表";font-size:13px;line-height:32px;white-space:nowrap;}
 #game-stage .team-relic-detail-hero{text-align:center;padding:13px 9px;margin-bottom:9px;border:1px solid #7d643d;border-radius:11px;background:radial-gradient(circle at 50% 25%,rgba(71,48,21,.9),rgba(8,8,7,.96) 68%);}
 #game-stage .team-relic-detail-art{display:flex;justify-content:center;margin-bottom:6px;}
 #game-stage .team-relic-detail-hero h2{margin:5px 0 3px;font:900 22px/27px "Noto Serif TC",serif;color:#f2dcaa;letter-spacing:.08em;}

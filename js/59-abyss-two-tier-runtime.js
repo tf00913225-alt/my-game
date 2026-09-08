@@ -374,14 +374,18 @@
         if(isTrueRealmFinal(config.id,safeRegionIndex,stage)){
             return buildTrueRealmFinalRoster(config);
         }
-        for(let index=0;index<10;index++){
-            if(index===2){
+        for(let position=0;position<5;position++){
+            if(position===2){
                 const boss=makeAbyssMonster(region.emperor,config,region,"boss",config.bossHpMultiplier,true);
                 boss.v141FormationRow=0;boss.v141FormationPosition=2;roster.push(boss);
             }else{
                 const elite=makeAbyssMonster("天兵天將",config,region,"elite",config.bossEliteHpMultiplier,false);
-                elite.v141FormationRow=index<5?0:1;elite.v141FormationPosition=index<5?index:index-5;roster.push(elite);
+                elite.v141FormationRow=0;elite.v141FormationPosition=position;roster.push(elite);
             }
+        }
+        for(let position=1;position<=3;position++){
+            const elite=makeAbyssMonster("天兵天將",config,region,"elite",config.bossEliteHpMultiplier,false);
+            elite.v141FormationRow=1;elite.v141FormationPosition=position;roster.push(elite);
         }
         return roster;
     }

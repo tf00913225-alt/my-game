@@ -30,14 +30,23 @@ assert.match(css,/#game-stage #homeFeatureModal\.team-relic-modal \.home-feature
     "larger relic typography must remain vertically scrollable");
 assert.match(css,/\.team-relic-detail section p\{[^}]*font-size:13px[^}]*line-height:20px/,
     "relic detail copy must remain comfortably readable on mobile");
-assert.match(css,/map-return\.png/);
+assert.doesNotMatch(css,/map-return\.png/,
+    "relic modal must use text return controls instead of the round image return icon");
+assert.match(css,/#game-stage #homeFeatureModal\.team-relic-modal \.home-feature-close-btn\{[^}]*min-width:64px!important;[^}]*font-size:13px!important;[^}]*background:linear-gradient\(180deg,#2c2419,#0f0c09\)!important;[^}]*color:#f4ead4!important/,
+    "relic list return control must be a readable dark-gradient text button");
+assert.match(css,/:has\(\.team-relic-detail\) \.home-feature-close-btn\{display:none!important;\}/,
+    "detail mode must remove the redundant modal return control");
+assert.match(css,/\.team-relic-detail-back\{[^}]*position:absolute;[^}]*top:5px;[^}]*right:8px;[^}]*background:linear-gradient\(180deg,#2c2419,#0f0c09\);[^}]*font-size:0/,
+    "detail back-to-list button must occupy the former header return position");
+assert.match(css,/\.team-relic-detail-back::after\{content:"返回秘寶列表";/,
+    "detail back button must expose only the requested text label");
 for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
     assert.ok(css.includes(hex),"team relic rarity CSS must preserve formal color "+hex);
 }
 assert.match(css,/rarity-four-symbol[\s\S]*conic-gradient/);
 assert.match(css,/@keyframes teamRelicFourSymbolRarityBreath/);
-assert.match(css,/#game-stage \.team-relic-home-tools\{[\s\S]*?left:50%;[\s\S]*?bottom:0;[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?width:168px;[\s\S]*?gap:8px;[\s\S]*?transform:translateX\(-50%\);[\s\S]*?pointer-events:none/,
-    "relic and element-box entrances must occupy the two middle bottom-row slots without covering Offline EXP or System");
+assert.match(css,/#game-stage \.team-relic-home-tools\{[\s\S]*?left:50%;[\s\S]*?bottom:0;[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?width:192px;[\s\S]*?gap:32px;[\s\S]*?transform:translateX\(-50%\);[\s\S]*?pointer-events:none/,
+    "relic must lean toward Offline EXP and Element Box toward System without changing their 80x82 cards");
 const utilityRule=(css.match(/#game-stage \.team-relic-home-tools \.home-card-utility\{([^}]*)\}/)||[])[1]||"";
 assert.match(utilityRule,/width:80px/);
 assert.match(utilityRule,/height:82px/);
