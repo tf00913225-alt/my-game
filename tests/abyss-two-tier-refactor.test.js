@@ -95,7 +95,7 @@ test("fixed difficulties remain Lv20/Lv40 and skill levels stay Lv1/Lv2 before f
     });
 });
 
-test("all pre-stages are five regular in front plus three elite in back",()=>{
+test("all pre-stages are three elite in front plus five regular in back",()=>{
     const {context}=load();
     [20,40].forEach(level=>{
         for(let region=0;region<5;region++) for(let stage=0;stage<4;stage++){
@@ -103,9 +103,9 @@ test("all pre-stages are five regular in front plus three elite in back",()=>{
             assert.deepEqual(roster.map(monster=>monster.rank),[
                 "regular","regular","regular","regular","regular","elite","elite","elite"
             ]);
-            assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationRow),[0,0,0,0,0]);
+            assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationRow),[1,1,1,1,1]);
             assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationPosition),[0,1,2,3,4]);
-            assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationRow),[1,1,1]);
+            assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationRow),[0,0,0]);
             assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationPosition),[0,1,2]);
         }
     });
