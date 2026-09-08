@@ -58,7 +58,7 @@ function fixture(width,height){
       <div class="team-relic-current-card"><div class="team-relic-current-art"><img src="${art}" alt=""></div><div class="team-relic-current-copy"><small>目前隊伍秘寶</small><b>天罡戰旗 <span>Lv.20</span></b><p>對敵方全體造成秘寶威力並降低攻擊。</p></div><div class="team-relic-current-actions"><button>卸下</button><button>詳情</button></div></div>
       <div class="team-relic-grid">${cards}</div><div class="qa-gap"></div>
       <div class="team-relic-detail"><div class="team-relic-detail-hero rarity-orange"><div class="team-relic-detail-art"><img src="${art}" alt=""></div><h2>天罡戰旗</h2><p>橙階・Lv.20 / 20</p><strong>防禦 / attack・defense・anti_swarm</strong></div><section><h3>觸發條件</h3><p>我方累積受到6次敵方有效攻擊後。</p></section></div>
-    </div></div><pre id="result"></pre><script>(function(){var q=function(s){return document.querySelector(s)},qa=function(s){return Array.from(document.querySelectorAll(s))},r=function(e){var x=e.getBoundingClientRect();return {left:x.left,top:x.top,right:x.right,bottom:x.bottom,width:x.width,height:x.height}};var currentArt=q('.team-relic-current-art'),currentCopy=q('.team-relic-current-copy'),currentActions=q('.team-relic-current-actions'),cardArts=qa('.team-relic-card-art'),cards=qa('.team-relic-card'),names=qa('.team-relic-card-name'),metas=qa('.team-relic-card-meta'),detailArt=q('.team-relic-detail-art'),detailTitle=q('.team-relic-detail-hero h2'),detailMeta=q('.team-relic-detail-hero p'),detailTags=q('.team-relic-detail-hero strong'),grid=q('.team-relic-grid');q('#result').textContent=JSON.stringify({viewport:{width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth},current:{art:r(currentArt),copy:r(currentCopy),actions:r(currentActions),fit:getComputedStyle(currentArt.querySelector('img')).objectFit},grid:{columns:getComputedStyle(grid).gridTemplateColumns,cards:cards.map(r),arts:cardArts.map(r),names:names.map(r),metas:metas.map(r),fits:cardArts.map(n=>getComputedStyle(n.querySelector('img')).objectFit)},detail:{art:r(detailArt),title:r(detailTitle),meta:r(detailMeta),tags:r(detailTags),fit:getComputedStyle(detailArt.querySelector('img')).objectFit}})})();</script></body></html>`;
+    </div></div><pre id="result"></pre><script>(function(){var q=function(s){return document.querySelector(s)},qa=function(s){return Array.from(document.querySelectorAll(s))},r=function(e){var x=e.getBoundingClientRect();return {left:x.left,top:x.top,right:x.right,bottom:x.bottom,width:x.width,height:x.height}};var stage=q('#game-stage'),currentArt=q('.team-relic-current-art'),currentCopy=q('.team-relic-current-copy'),currentActions=q('.team-relic-current-actions'),cardArts=qa('.team-relic-card-art'),cards=qa('.team-relic-card'),names=qa('.team-relic-card-name'),metas=qa('.team-relic-card-meta'),detailArt=q('.team-relic-detail-art'),detailTitle=q('.team-relic-detail-hero h2'),detailMeta=q('.team-relic-detail-hero p'),detailTags=q('.team-relic-detail-hero strong'),grid=q('.team-relic-grid');q('#result').textContent=JSON.stringify({viewport:{width:innerWidth,height:innerHeight},stage:{rect:r(stage),clientWidth:stage.clientWidth,scrollWidth:stage.scrollWidth},current:{art:r(currentArt),copy:r(currentCopy),actions:r(currentActions),fit:getComputedStyle(currentArt.querySelector('img')).objectFit},grid:{columns:getComputedStyle(grid).gridTemplateColumns,cards:cards.map(r),arts:cardArts.map(r),names:names.map(r),metas:metas.map(r),fits:cardArts.map(n=>getComputedStyle(n.querySelector('img')).objectFit)},detail:{art:r(detailArt),title:r(detailTitle),meta:r(detailMeta),tags:r(detailTags),fit:getComputedStyle(detailArt.querySelector('img')).objectFit}})})();</script></body></html>`;
 }
 
 function run(chrome,width,height){
@@ -81,18 +81,20 @@ function square(rect,label){
 
 function verify(data,width){
     const tolerance=1;
-    assert.ok(data.viewport.scrollWidth<=width+tolerance,`${width}px page has horizontal overflow (${data.viewport.scrollWidth})`);
+    const stage=data.stage.rect;
+    assert.ok(Math.abs(stage.width-width)<=tolerance,`${width}px stage width changed (${stage.width})`);
+    assert.ok(data.stage.scrollWidth<=data.stage.clientWidth+tolerance,`${width}px game stage has horizontal overflow (${data.stage.scrollWidth}/${data.stage.clientWidth})`);
     square(data.current.art,`${width}px current art`);
     assert.equal(data.current.fit,"contain");
     assert.ok(data.current.art.right<=data.current.copy.left+tolerance,`${width}px current art overlaps copy`);
-    assert.ok(data.current.actions.right<=width-tolerance,`${width}px current actions escape viewport`);
+    assert.ok(data.current.actions.right<=stage.right-tolerance,`${width}px current actions escape stage`);
 
     assert.equal(data.grid.columns.trim().split(/\s+/).length,2,`${width}px grid is not two columns`);
     assert.equal(data.grid.cards.length,8);
     assert.ok(Math.abs(data.grid.cards[0].height-data.grid.cards[1].height)<=tolerance,`${width}px card row heights differ`);
     for(let i=0;i<data.grid.cards.length;i++){
         const card=data.grid.cards[i],art=data.grid.arts[i],name=data.grid.names[i],meta=data.grid.metas[i];
-        assert.ok(card.left>=-tolerance&&card.right<=width+tolerance,`${width}px card ${i} escapes viewport`);
+        assert.ok(card.left>=stage.left-tolerance&&card.right<=stage.right+tolerance,`${width}px card ${i} escapes stage`);
         square(art,`${width}px card ${i} art`);
         assert.equal(data.grid.fits[i],"contain");
         assert.ok(art.right<=name.left+tolerance&&art.right<=meta.left+tolerance,`${width}px card ${i} art is not left of copy`);
@@ -103,7 +105,7 @@ function verify(data,width){
     assert.ok(data.detail.art.right<=data.detail.title.left+tolerance,`${width}px detail art is not left of title`);
     assert.ok(data.detail.art.right<=data.detail.meta.left+tolerance,`${width}px detail art is not left of rarity/level`);
     assert.ok(data.detail.art.right<=data.detail.tags.left+tolerance,`${width}px detail art is not left of tags`);
-    assert.ok(data.detail.tags.right<=width+tolerance,`${width}px detail tags escape viewport`);
+    assert.ok(data.detail.tags.right<=stage.right+tolerance,`${width}px detail tags escape stage`);
 }
 
 const chrome=findChrome();
@@ -112,7 +114,9 @@ if(!chrome){
     console.log("Relic square-art mobile browser QA skipped: Chrome not available");
 }else{
     for(const [width,height] of [[360,800],[390,844],[412,915],[430,932]]){
-        verify(run(chrome,width,height),width);
+        const data=run(chrome,width,height);
+        try{ verify(data,width); }
+        catch(error){ error.message+=` | metrics=${JSON.stringify(data)}`; throw error; }
     }
     console.log("✓ Relic square-art mobile browser QA passed at 360/390/412/430px");
 }
