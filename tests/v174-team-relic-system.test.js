@@ -7,8 +7,9 @@ const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
 
-assert.match(loader,/js\/60-team-relic-system\.js\?v=173\.63-relic1/);
-assert.match(loader,/css\/55-team-relic-system\.css\?v=173\.63-relic1/);
+assert.match(loader,/js\/60-team-relic-system\.js\?v=173\.63-relic2/);
+assert.match(loader,/css\/55-team-relic-system\.css\?v=173\.63-relic2/);
+assert.match(loader,/js\/59-abyss-two-tier-runtime\.js\?v=173\.64-abyss3/);
 assert.match(loader,/function loadSkillProgressionRuntime\(\)\{[\s\S]*?script\.src="js\/60-v173\.64-skill-progression-rebalance\.js\?v=173\.64"[\s\S]*?script\.onload=function\(\)\{[\s\S]*?loadTeamRelicRuntime\(\)/);
 assert.equal((loader.match(/addEventListener\("load",loadTeamRelicRuntime/g)||[]).length,1,"team relic load continuation listener must not be duplicated");
 assert.equal((loader.match(/addEventListener\("error",loadTeamRelicRuntime/g)||[]).length,1,"team relic error continuation listener must not be duplicated");
@@ -26,20 +27,34 @@ assert.doesNotMatch(source,/localStorage\.setItem\([^\n]*relic/i,"relics must no
 assert.match(css,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 assert.match(css,/team-relic-tabs[\s\S]*overflow-x:auto/);
 assert.match(css,/#game-stage #homeFeatureModal\.team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important/,
-    "relic body scroll owner must outrank legacy wide-modal overflow:hidden rules");
+    "larger relic typography must remain vertically scrollable");
+assert.match(css,/\.team-relic-detail section p\{[^}]*font-size:13px[^}]*line-height:20px/,
+    "relic detail copy must remain comfortably readable on mobile");
 assert.match(css,/map-return\.png/);
 for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
     assert.ok(css.includes(hex),"team relic rarity CSS must preserve formal color "+hex);
 }
 assert.match(css,/rarity-four-symbol[\s\S]*conic-gradient/);
 assert.match(css,/@keyframes teamRelicFourSymbolRarityBreath/);
-assert.match(css,/#game-stage \.team-relic-home-tools\{[\s\S]*?pointer-events:none/,
-    "transparent utility container must not block the existing home-card hitboxes");
+assert.match(css,/#game-stage \.team-relic-home-tools\{[\s\S]*?left:50%;[\s\S]*?grid-template-columns:repeat\(2,92px\);[\s\S]*?width:194px;[\s\S]*?transform:translateX\(-50%\);[\s\S]*?pointer-events:none/,
+    "relic and element-box entrances must occupy the centered utility lane instead of covering the left/right cards");
+const utilityRule=(css.match(/#game-stage \.team-relic-home-tools \.home-card-utility\{([^}]*)\}/)||[])[1]||"";
+assert.doesNotMatch(utilityRule,/background:|border:|box-shadow:/,
+    "relic and element-box entrances must inherit the canonical home utility card skin");
 assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-utility\{[\s\S]*?pointer-events:auto/,
     "relic and element-box buttons must retain their own hitboxes");
+assert.match(css,/\.team-relic-battle-banner\{[^}]*top:48%/,
+    "relic name banner must be centered in the battlefield");
+assert.match(css,/\.team-relic-sp-float\{[^}]*top:72%/,
+    "relic SP recovery text must be vertically separated below the normal HP recovery text");
+assert.match(source,/document\.getElementById\("battlePage"\)\|\|document\.getElementById\("game-content"\)/,
+    "battle relic banner must prefer the battlefield as its positioning host");
+assert.match(source,/battleLog\(def\.name\+"｜"\+currentEffectText/,
+    "battle log must describe the actual relic effect instead of only saying it activated");
 
 function createRuntime(){
     const store=new Map();
+    const battleLogs=[];
     const party=[
         {id:"甲",level:30,hp:1000,sp:200,activeBuffs:[],statusEffects:[]},
         {id:"乙",level:30,hp:1000,sp:200,activeBuffs:[],statusEffects:[]},
@@ -68,7 +83,7 @@ function createRuntime(){
         getPlayer3BattleStats:()=>({maxHP:1000,maxSP:200,attack:100,magicAttack:100,defense:100,evasion:0,resistance:0}),
         getMonsterRank:m=>m.rank||"regular",isMonsterFrozen:m=>!!m.frozen,isMonsterPetrified:m=>!!m.petrified,
         applyBurnEffect(m,d,p){if(m.statusEffects.some(s=>s.type==="burn"&&s.turnsLeft>0))return false;m.statusEffects.push({type:"burn",turnsLeft:d,percent:p});return true;},
-        showPlayerHit(){},showMonsterHit(){},addBattleLog(){},updateUI(){},updateGoldDisplay(){},showPage(){},openHomeFeature(){},closeHomeFeature(){},
+        showPlayerHit(){},showMonsterHit(){},addBattleLog(message){battleLogs.push(message);},updateUI(){},updateGoldDisplay(){},showPage(){},openHomeFeature(){},closeHomeFeature(){},
         killMonster(i){if(monsters[i])monsters[i].alive=false;},
         startTurn(){},
         startBattle(){this.battleActive=true;this.battleToken++;this.turn=1;this.startTurn(this.battleToken);},
@@ -82,14 +97,34 @@ function createRuntime(){
     store.set("game-save",JSON.stringify({player:{id:"甲"},gold:100000}));
     vm.createContext(context);
     vm.runInContext(source,context);
-    return {context,store,party,monsters,setEnemyDamage:value=>{enemyDamage=value;}};
+    return {context,store,party,monsters,battleLogs,setEnemyDamage:value=>{enemyDamage=value;}};
 }
 
 const runtime=createRuntime();
-const {context,store,party,monsters}=runtime;
+const {context,store,party,monsters,battleLogs}=runtime;
 assert.equal(Object.keys(context.v174RelicSystem.catalog).length,20,"catalog has 20 relics");
 assert.equal(Object.values(context.v174RelicSystem.catalog).filter(r=>r.runtimeReady).length,10,"first 10 relics are real runtime-ready relics");
 assert.equal(Object.values(context.v174RelicSystem.catalog).filter(r=>!r.runtimeReady).length,10,"relics 11-20 remain locked placeholders");
+
+const catalog=context.v174RelicSystem.catalog;
+assert.equal(catalog.relic_qiankun_flask.triggers[0].maxTriggersPerBattle,null,"Qiankun Flask has no hidden per-battle trigger cap");
+assert.match(catalog.relic_qiankun_flask.limitText,/無每場總次數限制/);
+const explicitBattleLimits=[];
+Object.values(catalog).filter(def=>def.runtimeReady).forEach(def=>{
+    def.triggers.forEach(triggerDef=>{
+        if(triggerDef.oncePerBattle||triggerDef.maxTriggersPerBattle!==null){
+            explicitBattleLimits.push(def.id+":"+triggerDef.id+":"+(triggerDef.oncePerBattle?"once":"max"+triggerDef.maxTriggersPerBattle));
+            assert.match(def.limitText,/每場|一次|開場/,def.name+" must expose its per-battle/once limit in player-facing copy");
+        }
+    });
+});
+assert.deepEqual(explicitBattleLimits.sort(),[
+    "relic_cold_spring_jade:hp_below_35:max2",
+    "relic_qinglan_feather:battle_start:once",
+    "relic_returning_wheel:before_lethal:once",
+    "relic_rock_mountain_seal:ally_hits_8:max2",
+    "relic_rock_mountain_seal:battle_start_defense:once"
+].sort(),"only relics with intentional design limits may have per-battle caps");
 
 assert.equal(context.v174EquipRelic("relic_qiankun_flask"),true);
 let saved=JSON.parse(store.get("game-save"));
@@ -97,11 +132,19 @@ assert.equal(saved.teamLoadout.relicId,"relic_qiankun_flask");
 assert.equal(saved.playerRelics.relic_qiankun_flask.unlocked,true);
 assert.equal(Object.keys(saved.teamLoadout).filter(key=>/relic/i.test(key)).length,2,"one primary relic truth plus reserved disabled sub-relic field");
 
-party.forEach(c=>c.hp=500);
+party.forEach(c=>c.hp=400);
 context.startBattle();
 assert.equal(context.v174EquipRelic("relic_sun_orb"),false,"hot swap is blocked during battle");
-context.v174RelicDebugDispatch("round_end",{sourceType:"system"});
-assert.ok(party.every(c=>c.hp>500),"Qiankun Flask heals on odd round end");
+for(const round of [1,3,5,7,9,11]){
+    context.turn=round;
+    if(round!==1){ context.startTurn(context.battleToken); }
+    context.v174RelicDebugDispatch("round_end",{sourceType:"system"});
+}
+const qiankunState=context.v174RelicDebugState();
+assert.equal(qiankunState.triggerCounts["relic_qiankun_flask:odd_end"],6,
+    "Qiankun Flask keeps triggering beyond three activations on later odd rounds");
+assert.ok(party.every(c=>c.hp>400),"Qiankun Flask heals on each eligible odd round end");
+assert.ok(battleLogs.some(line=>/【秘寶】乾坤玉壺｜恢復全隊/.test(line)),"relic battle log reports the concrete recovery effect");
 context.loseBattle();
 
 context.v174EquipRelic("relic_sun_orb");
