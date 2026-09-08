@@ -78,7 +78,7 @@
 #game-stage .team-relic-current-card.empty{grid-template-columns:60px minmax(0,1fr) auto;align-items:center;}
 #game-stage .team-relic-empty-slot{grid-row:1/3;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border:1px dashed #7d653d;border-radius:10px;color:#7f725c;font:900 24px "Noto Serif TC",serif;background:#0a0908;}
 #game-stage .team-relic-current-card.empty .team-relic-select-first{grid-column:3;grid-row:1/3;}
-#game-stage .team-relic-tabs{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:2px 1px 8px;margin:0 -1px 7px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x;scrollbar-width:none;}
+#game-stage .team-relic-tabs{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:2px 1px 8px;margin:0 -1px 7px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none;}
 #game-stage .team-relic-tabs::-webkit-scrollbar{display:none;}
 #game-stage .team-relic-tabs button{flex:0 0 auto;min-width:48px;min-height:36px;padding:6px 9px;border:1px solid rgba(123,95,53,.62);border-radius:18px;background:#15110d;color:#bcb09b;font-size:13px;font-weight:800;}
 #game-stage .team-relic-tabs button.active{border-color:#d6a24a;color:#f2d38c;background:linear-gradient(180deg,#4b3218,#20150b);box-shadow:0 0 8px rgba(208,153,62,.18);}
