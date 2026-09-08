@@ -135,6 +135,29 @@
     font-weight:900 !important;
 }
 
+/* Final inventory text owner: keep six-column geometry, but never shrink readable
+   equipment labels, category controls or slot metadata below the global floor. */
+#game-stage #inventoryPage .inventory-equipment-slot-label{
+    font-size:14px !important;
+    line-height:18px !important;
+}
+#game-stage #inventoryPage .inventory-category-tab{
+    min-height:40px !important;
+    font-size:15px !important;
+    line-height:1.2 !important;
+}
+#game-stage #inventoryPage .inventory-item-classic .inventory-count,
+#game-stage #inventoryPage .inventory-item-classic .inventory-slot-number{
+    min-width:14px;
+    font-size:13px !important;
+    line-height:14px !important;
+    text-shadow:0 1px 2px #000,0 0 3px #000;
+}
+#game-stage #app.on-inventory-page #inventoryPage .inventory-wallet-label{
+    font-size:14px !important;
+    line-height:18px !important;
+}
+
 @media (max-width:380px){
     #game-stage #inventoryPage .v17350-bulk-sell-bar{
         grid-template-columns:auto minmax(86px,1fr) minmax(96px,auto);
