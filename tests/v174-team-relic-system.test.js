@@ -36,11 +36,17 @@ for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
 }
 assert.match(css,/rarity-four-symbol[\s\S]*conic-gradient/);
 assert.match(css,/@keyframes teamRelicFourSymbolRarityBreath/);
-assert.match(css,/#game-stage \.team-relic-home-tools\{[\s\S]*?left:50%;[\s\S]*?grid-template-columns:repeat\(2,92px\);[\s\S]*?width:194px;[\s\S]*?transform:translateX\(-50%\);[\s\S]*?pointer-events:none/,
-    "relic and element-box entrances must occupy the centered utility lane instead of covering the left/right cards");
+assert.match(css,/#game-stage \.team-relic-home-tools\{[\s\S]*?left:50%;[\s\S]*?bottom:0;[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?width:168px;[\s\S]*?gap:8px;[\s\S]*?transform:translateX\(-50%\);[\s\S]*?pointer-events:none/,
+    "relic and element-box entrances must occupy the two middle bottom-row slots without covering Offline EXP or System");
 const utilityRule=(css.match(/#game-stage \.team-relic-home-tools \.home-card-utility\{([^}]*)\}/)||[])[1]||"";
-assert.doesNotMatch(utilityRule,/background:|border:|box-shadow:/,
-    "relic and element-box entrances must inherit the canonical home utility card skin");
+assert.match(utilityRule,/width:80px/);
+assert.match(utilityRule,/height:82px/);
+assert.match(utilityRule,/border:1px solid rgba\(205,154,65,\.82\)/);
+assert.match(utilityRule,/background:linear-gradient\(155deg,rgba\(35,25,15,\.96\),rgba\(8,7,5,\.96\)\)/);
+assert.match(utilityRule,/box-shadow:0 4px 10px rgba\(0,0,0,\.52\)/,
+    "relic and element-box entrances must mirror the canonical secondary-card dimensions and black-gold skin");
+assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-icon\{[^}]*width:100%;[^}]*height:59px/);
+assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-label\{[^}]*font-size:13px;[^}]*line-height:18px/);
 assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-utility\{[\s\S]*?pointer-events:auto/,
     "relic and element-box buttons must retain their own hitboxes");
 assert.match(css,/\.team-relic-battle-banner\{[^}]*top:48%/,
