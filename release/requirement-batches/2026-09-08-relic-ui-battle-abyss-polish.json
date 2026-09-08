@@ -1,0 +1,59 @@
+{
+  "date": "2026-09-08",
+  "title": "秘寶主城 UI、戰鬥回饋與深淵陣形修正",
+  "base_branch": "dev",
+  "base_sha": "0788ab32e6a34d51a81d495da7868a73c34fc644",
+  "work_branch": "fix/relic-ui-feedback-abyss-formation",
+  "status": "IMPLEMENTED_PENDING_CI_AND_BROWSER_QA",
+  "requirements": [
+    {
+      "id": 1,
+      "request": "元素匣與秘寶入口不得遮住既有按鈕，並與主城既有按鈕風格一致。",
+      "owner": ["css/55-team-relic-system.css", "js/60-team-relic-system.js"],
+      "implementation": "兩顆入口移至主城中央 utility lane，沿用正式 home-card-utility 外觀與尺寸，不再自建不同皮膚。"
+    },
+    {
+      "id": 2,
+      "request": "冒險隊伍資訊不得被底部導覽列遮住。",
+      "owner": ["css/42-v146-system-polish.css", "css/55-team-relic-system.css"],
+      "implementation": "整體隊伍列上移，並把隊伍秘寶列壓成單列資訊，保留三名角色 HP/SP 可讀性。"
+    },
+    {
+      "id": 3,
+      "request": "秘寶介面字體放大，必要時使用上下捲動。",
+      "owner": ["css/55-team-relic-system.css"],
+      "implementation": "列表、詳情、觸發條件、效果、限制、強化文字全面提高手機可讀尺寸，modal body 使用內部垂直捲動。"
+    },
+    {
+      "id": 4,
+      "request": "排查乾坤玉壺只觸發三次以及所有秘寶次數限制。",
+      "owner": ["js/60-team-relic-system.js", "tests/v174-team-relic-system.test.js"],
+      "implementation": "乾坤玉壺沒有每場三次上限，只在奇數回合結束觸發，因此六回合戰鬥正常為 1/3/5 共三次；回歸測試固定驗證 1/3/5/7/9/11 可連續觸發六次。所有 runtime-ready 秘寶的 once/maxTriggersPerBattle 限制均逐項稽核並要求玩家可見文案揭露。"
+    },
+    {
+      "id": 5,
+      "request": "秘寶觸發時戰場中間顯示秘寶名稱，戰鬥資訊顯示實際效果。",
+      "owner": ["js/60-team-relic-system.js", "css/55-team-relic-system.css"],
+      "implementation": "秘寶 banner 掛在 battlePage 中央；戰鬥紀錄改寫入秘寶名稱加 currentEffectText 實際效果。"
+    },
+    {
+      "id": 6,
+      "request": "HP/SP 回復浮字不得重疊，SP 往下。",
+      "owner": ["js/60-team-relic-system.js", "css/55-team-relic-system.css"],
+      "implementation": "SP 使用獨立 team-relic-sp-float，在角色戰鬥卡較低位置顯示，與既有 HP 回復字分離。"
+    },
+    {
+      "id": 7,
+      "request": "深淵副本小關卡前後排對調。",
+      "owner": ["js/59-abyss-two-tier-runtime.js", "tests/abyss-two-tier-refactor.test.js"],
+      "implementation": "前置關固定精英三名 row=0 前排、一般五名 row=1 後排；帝王 BOSS 與真境最終戰陣形不改。"
+    }
+  ],
+  "verification": [
+    "node tests/v174-team-relic-system.test.js",
+    "node tests/abyss-two-tier-refactor.test.js",
+    "node tests/v173.39-main-city-final-polish.test.js",
+    "browser UI: tests/ui-team-relic-mobile-browser.test.js",
+    "Repository checks"
+  ]
+}
