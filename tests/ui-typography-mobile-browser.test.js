@@ -43,12 +43,22 @@ html,body{margin:0;width:420px;min-height:900px;background:#050505;overflow-x:hi
 <div class="v169-rpg-dialog-layer show"><div class="v169-rpg-dialog"><h2>確認操作</h2><div class="v169-rpg-dialog-message">確定要進行這項操作嗎？</div><div class="v169-rpg-dialog-actions"><button class="v169-rpg-dialog-button primary">確認</button></div></div></div>
 <pre id="result"></pre><script>(function(){
  const q=s=>document.querySelector(s), px=s=>parseFloat(getComputedStyle(q(s)).fontSize), h=s=>q(s).getBoundingClientRect().height;
- const selectors={homeRoster:'#homePage .v146-home-character-main>div:first-child',homeLevel:'#homePage .v146-home-character-main span',inventoryTab:'#inventoryPage .inventory-category-tab',inventoryCount:'#inventoryPage .inventory-count',inventoryBack:'#inventoryPage .map-inventory-overlay-close',equipmentName:'#itemModal .v17351-compare-pane>strong',equipmentStat:'#itemModal .v17351-compare-stat span',shopName:'#homeFeatureModal .v17346-shop-name',shopBuy:'#homeFeatureModal .v17346-shop-buy',questDesc:'#homeFeatureModal .quest-card-desc',questClaim:'#homeFeatureModal .quest-claim-btn',synthTab:'#homeFeatureModal .v141-synthesis-tabs button',synthField:'#homeFeatureModal .v17363-material-field-label',skillLoadout:'#skillPage .skill-loadout-slot-name',skillHint:'#skillDetailStats .v17364-progression-hint',dungeonName:'#dungeonPage .v141-dungeon-cover-info b',dungeonInfo:'#dungeonPage .v141-dungeon-cover-info span',dungeonButton:'#dungeonPage .v141-dungeon-cover-actions button',relicName:'.team-relic-card-name',relicSection:'.team-relic-detail section h3',relicButton:'.team-relic-detail-actions button',rewardBody:'.v132-reward-modal .v17363-preview-group p',rewardButton:'.v132-reward-actions button',dialogBody:'.v169-rpg-dialog-message',dialogButton:'.v169-rpg-dialog-button'};
+ const selectors={homeRoster:'#homePage .v146-home-character-main>div:first-child',homeLevel:'#homePage .v146-home-character-main span',inventoryTab:'#inventoryPage .inventory-category-tab',inventoryCount:'#inventoryPage .inventory-count',inventoryBack:'#inventoryPage .map-inventory-overlay-close',equipmentName:'#itemModal .v17351-compare-pane>strong',equipmentStat:'#itemModal .v17351-compare-stat span',shopName:'#homeFeatureModal .v17346-shop-name',shopBuy:'#homeFeatureModal .v17346-shop-buy',questDesc:'#homeFeatureModal .quest-card-desc',questClaim:'#homeFeatureModal .quest-claim-btn',skillLoadout:'#skillPage .skill-loadout-slot-name',skillHint:'#skillDetailStats .v17364-progression-hint',dungeonName:'#dungeonPage .v141-dungeon-cover-info b',dungeonInfo:'#dungeonPage .v141-dungeon-cover-info span',dungeonButton:'#dungeonPage .v141-dungeon-cover-actions button',relicName:'.team-relic-card-name',relicSection:'.team-relic-detail section h3',relicButton:'.team-relic-detail-actions button',rewardBody:'.v132-reward-modal .v17363-preview-group p',rewardButton:'.v132-reward-actions button',dialogBody:'.v169-rpg-dialog-message',dialogButton:'.v169-rpg-dialog-button'};
  const fonts=Object.fromEntries(Object.entries(selectors).map(([k,s])=>[k,px(s)]));
- const heights={inventoryBack:h(selectors.inventoryBack),shopBuy:h(selectors.shopBuy),questClaim:h(selectors.questClaim),synthTab:h(selectors.synthTab),dungeonButton:h(selectors.dungeonButton),relicButton:h(selectors.relicButton),rewardButton:h(selectors.rewardButton),dialogButton:h(selectors.dialogButton)};
- const roots=[...document.querySelectorAll('.qa-section,.v132-reward-modal-inner,.v169-rpg-dialog')];
- const overflows=roots.filter(el=>el.scrollWidth>el.clientWidth+1).map(el=>el.id||el.className);
- document.getElementById('result').textContent=JSON.stringify({fonts,heights,overflows,bodyWidth:document.documentElement.scrollWidth});
+ const heights={inventoryBack:h(selectors.inventoryBack),shopBuy:h(selectors.shopBuy),questClaim:h(selectors.questClaim),dungeonButton:h(selectors.dungeonButton),relicButton:h(selectors.relicButton),rewardButton:h(selectors.rewardButton),dialogButton:h(selectors.dialogButton)};
+ const initialRoots=[...document.querySelectorAll('.qa-section,.v132-reward-modal-inner,.v169-rpg-dialog')];
+ const initialOverflows=initialRoots.filter(el=>el.scrollWidth>el.clientWidth+1).map(el=>el.id||el.className);
+ const modal=q('#homeFeatureModal');
+ modal.classList.remove('v131-shop-open','quest-mode');
+ modal.classList.add('v141-synthesis-modal');
+ q('#homeFeatureModal .v17346-shop-card').style.display='none';
+ q('#homeFeatureModal .quest-card').style.display='none';
+ fonts.synthTab=px('#homeFeatureModal .v141-synthesis-tabs button');
+ fonts.synthField=px('#homeFeatureModal .v17363-material-field-label');
+ heights.synthTab=h('#homeFeatureModal .v141-synthesis-tabs button');
+ const synthRoot=q('#homeFeatureModal .v141-synthesis');
+ const synthOverflow=synthRoot.scrollWidth>synthRoot.clientWidth+1;
+ document.getElementById('result').textContent=JSON.stringify({fonts,heights,initialOverflows,synthOverflow,bodyWidth:document.documentElement.scrollWidth});
 })();</script></body></html>`;
 
 fs.writeFileSync(fixture,html,"utf8");
@@ -61,7 +71,8 @@ try{
     Object.entries(data.fonts).forEach(([name,value])=>assert.ok(value>=13,`${name} computed font ${value}px is below 13px`));
     ["homeRoster","inventoryTab","inventoryBack","shopBuy","questClaim","synthTab","skillLoadout","dungeonButton","relicButton","rewardButton","dialogBody","dialogButton"].forEach(name=>assert.ok(data.fonts[name]>=15,`${name} should use normal actionable/body typography`));
     ["inventoryBack","shopBuy","questClaim","synthTab","dungeonButton","relicButton","rewardButton","dialogButton"].forEach(name=>assert.ok(data.heights[name]>=34,`${name} control is too short after typography growth`));
-    assert.deepEqual(data.overflows,[],`representative UI gained horizontal overflow: ${data.overflows.join(', ')}`);
+    assert.deepEqual(data.initialOverflows,[],`representative UI gained horizontal overflow: ${data.initialOverflows.join(', ')}`);
+    assert.equal(data.synthOverflow,false,"synthesis modal state gained horizontal overflow");
     assert.ok(data.bodyWidth<=420,"page-level horizontal overflow detected");
-    console.log("Headless Chrome 420x900: representative non-battle typography, controls and horizontal overflow verified");
+    console.log("Headless Chrome 420x900: representative non-battle typography, real modal states, controls and horizontal overflow verified");
 }finally{ try{fs.unlinkSync(fixture);}catch(_){ } }
