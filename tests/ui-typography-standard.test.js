@@ -24,9 +24,12 @@ const owners = {
 function below13(text) {
   const hits = [];
   for (const [index, line] of text.split(/\r?\n/).entries()) {
+    // Attribute selectors such as [style*="font-size:11px"] describe the legacy
+    // inline value being upgraded; they are not font-size declarations themselves.
+    const declarationLine=line.replace(/\[[^\]]*font-size\s*:[^\]]*\]/gi,'');
     const regex = /font-size\s*:\s*([0-9]*\.?[0-9]+)px\b/gi;
     let match;
-    while ((match = regex.exec(line))) {
+    while ((match = regex.exec(declarationLine))) {
       const value = Number(match[1]);
       if (value < 13) hits.push(`${index + 1}:${value}px:${line.trim()}`);
     }
