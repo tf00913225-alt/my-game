@@ -1,6 +1,6 @@
-## 2026-09-08 玩法中心／BOSS 機制卡／四象塔／深淵入口重整（feature，待 DEV 瀏覽器驗收）
+## 2026-09-08 V173.64 玩法中心／BOSS／四象塔／深淵正式發布候選
 
-- 基準為最新 `dev` `75cf90774d1d8a63818f65de999d044603e21a09`；工作分支 `feature/gameplay-boss-tower-hub`。依使用者要求未修改／合併 `dev` 或 `main`，Game／Cache Version 因 Requirement 尚未全數 VERIFIED 而維持 V173.63。
+- 功能基準為 `dev` `75cf90774d1d8a63818f65de999d044603e21a09`，實作 tip `6d7d136608711b616a02db726085bf9817a4068a` 已由使用者明確授權快轉至 `dev`；GitHub Actions run `34205400669` 的 Repository checks 與 Dev deployment gate 全數 SUCCESS，官方 DEV manifest exact SHA 與 `dev` 一致。
 - `js/gameplay-boss-tower-system.js` 是玩法中心、個人／世界 BOSS、五種機制卡與四象塔設定／進度的正式 owner；BOSS 與塔共用既有 `v132BuildDungeonMonster`／`v132LaunchDungeonBattle` 戰鬥 owner，機制卡使用不進入一般怪物陣列的 battle sidecar 專屬槽。
 - `index.html` 與 `css/gameplay-boss-tower.css` 建立獨立玩法中心、BOSS 雙標籤頁與四象塔固定大面板；底部保留五顆按鈕與 `bossNav` 相容 id，但玩家可見文字、aria、title、入口與 icon 均正式改為「玩法」。
 - 附件原圖經實際檢視後，只移除與畫面邊界連通的黑色背景；圖示 RGB 本體未重畫。輸出 `assets/ui/nav-gameplay.png` 為 320×320 RGBA 真透明 PNG，四角 alpha 均為 0，舊 `assets/ui/nav-boss.png` 保留。
@@ -8,7 +8,8 @@
 - 四象塔共 100 層，Lv30 開放，UTC 週一沿用現有日期基準，以火→土→水→風循環；週內樓層／首通 claims 保存，跨週只清週資料，歷史最高與已取得資產保留。第 50 層使用目前正式四件元素秘寶自選資料。
 - 深淵玩家入口已自副本頁移到玩法中心；`js/59-abyss-two-tier-runtime.js` 仍是 Lv20／Lv40、地圖、五帝、寶箱、傳送、戰鬥與進度 owner。新增永久 `firstClearClaims`，再戰跳過已領首通寶箱／最終特殊獎勵；所有退出／完成路徑回玩法中心。
 - 已通過：244/244 JavaScript syntax、119/119 Node suites、464 resources、291 unique HTML IDs、108 loader dependencies／26 ordered runtimes、Release Gate 10/10、git diff，以及 PNG RGBA／四角 alpha 自動檢查。Gameplay／BOSS／Tower 13/13、Abyss 15/15 均包含 reload 與防重複獎勵 regression。
-- 尚未 VERIFIED：390×844／412×915 官方 DEV 真實瀏覽器操作與遠端 Repository checks。官方預覽只部署 `dev`，feature branch 不觸發現有 checks；雲端瀏覽器安全政策亦拒絕未部署候選頁面。需在日後獲准整合 `dev` 後，依正式 `dev → CI → dev preview → Requirement Verification` 流程完成，禁止用 RawCDN／GitHack 或繞過政策代替。
+- 官方 DEV 實際操作已確認：底部玩法 icon／入口、玩法中心、BOSS 雙標籤、個人 BOSS 正式開戰、護盾機制卡生成、受保護 BOSS 點擊提示、四象塔首頁／樓層一覽／戰鬥及失敗返回均正常；固定 stage 無橫向 overflow、broken image 或新增 app-origin console error。遠端 mobile Chrome 與 live Abyss／battle-audio QA 同步通過。
+- 本批 `release/requirement-batches/2026-09-08-gameplay-boss-tower-hub.json` 已達 12/12 VERIFIED。使用者於 2026-09-08 明確要求推進 `main`，Game／Cache Version 正式推進 V173.64；發布須繼續走受保護 PR、main Repository checks、GitHub Pages deploy 與 production SHA 驗證。
 
 ## 2026-09-08 六分支安全整合、最終 QA 與正式發布
 

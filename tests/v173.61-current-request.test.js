@@ -48,6 +48,6 @@ assert.match(quest,/v17361RefreshOpenQuestPage/);
 assert.match(core,/v17361RefreshOpenQuestPage/);
 assert.match(questQa,/__v17361BulkQuestClaim/);
 assert.match(questQa,/v17351ClaimAllAchievements/);
-assert.ok(loader.includes('const V_ASSET_VERSION="173.63";'));
-assert.ok(html.includes('<title>四象江湖傳 V173.63</title>'));
+assert.ok(loader.includes('const V_ASSET_VERSION="173.64";'));
+assert.ok(html.includes('<title>四象江湖傳 V173.64</title>'));
 console.log("✓ V173.62 current request integration");

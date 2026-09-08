@@ -387,7 +387,7 @@
         if(document.getElementById("equipment-progression-runtime")){ return; }
         const script=document.createElement("script");
         script.id="equipment-progression-runtime";
-        script.src="js/equipment-progression.js?v=173.63";
+        script.src="js/equipment-progression.js?v=173.64";
         script.async=false;
         script.onload=function(){
             if(typeof window.__v173ReportRuntimeProgress==="function"){

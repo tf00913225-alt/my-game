@@ -84,6 +84,6 @@
   "verificationRun": 34139665441,
   "targetedVerificationRun": 34139665441,
   "visualVerification": "AUTOMATED_390X844_HEADLESS_CHROME_PASS",
-  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
-  "releasedAs": null
+  "promotionApproval": "使用者於 2026-09-08 明確要求推進 main",
+  "releasedAs": "V173.64"
 }

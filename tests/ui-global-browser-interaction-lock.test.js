@@ -13,7 +13,7 @@ const release=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const guide=fs.readFileSync("UI_GUIDELINES.md","utf8");
 
 assert.match(index,/maximum-scale=1\.0,user-scalable=no/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.63/);
+assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.64/);
 assert.ok(release.managedCacheReferences.includes("js/01-stage-v8-touch-lock.js"));
 assert.match(baseCss,/#game-stage img,[\s\S]*?-webkit-touch-callout:none/);
 assert.match(touchSource,/event\.touches[\s\S]*?event\.touches\.length>1[\s\S]*?event\.preventDefault\(\)/);

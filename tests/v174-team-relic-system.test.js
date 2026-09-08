@@ -7,8 +7,8 @@ const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
 
-assert.match(loader,/js\/60-team-relic-system\.js\?v=173\.63-relic2/);
-assert.match(loader,/css\/55-team-relic-system\.css\?v=173\.63-relic2/);
+assert.match(loader,/js\/60-team-relic-system\.js\?v=173\.64-relic2/);
+assert.match(loader,/css\/55-team-relic-system\.css\?v=173\.64-relic2/);
 assert.match(loader,/js\/59-abyss-two-tier-runtime\.js\?v=173\.64-abyss3/);
 assert.match(loader,/function loadSkillProgressionRuntime\(\)\{[\s\S]*?script\.src="js\/60-v173\.64-skill-progression-rebalance\.js\?v=173\.64"[\s\S]*?script\.onload=function\(\)\{[\s\S]*?loadTeamRelicRuntime\(\)/);
 assert.equal((loader.match(/addEventListener\("load",loadTeamRelicRuntime/g)||[]).length,1,"team relic load continuation listener must not be duplicated");

@@ -313,7 +313,7 @@ function loadGameplayBossTowerStyle(){
     const link=document.createElement("link");
     link.id="gameplay-boss-tower-style";
     link.rel="stylesheet";
-    link.href="css/gameplay-boss-tower.css?v=173.63";
+    link.href="css/gameplay-boss-tower.css?v=173.64";
     document.head.appendChild(link);
 }
 
@@ -332,7 +332,7 @@ function loadGameplayBossTowerRuntime(){
     }
     const script=document.createElement("script");
     script.id="gameplay-boss-tower-runtime";
-    script.src="js/gameplay-boss-tower-system.js?v=173.63";
+    script.src="js/gameplay-boss-tower-system.js?v=173.64";
     script.async=false;
     script.onload=function(){
         script.dataset.loaded="1";
@@ -364,7 +364,7 @@ function loadTeamRelicStyle(){
     const link=document.createElement("link");
     link.id="team-relic-system-style";
     link.rel="stylesheet";
-    link.href="css/55-team-relic-system.css?v=173.63-relic2";
+    link.href="css/55-team-relic-system.css?v=173.64-relic2";
     document.head.appendChild(link);
 }
 
@@ -373,7 +373,7 @@ function loadTeamRelicRuntime(){
     if(document.getElementById("team-relic-system-runtime")){ return; }
     const script=document.createElement("script");
     script.id="team-relic-system-runtime";
-    script.src="js/60-team-relic-system.js?v=173.63-relic2";
+    script.src="js/60-team-relic-system.js?v=173.64-relic2";
     script.async=false;
     script.onerror=function(){
         console.warn("Team Relic runtime failed to load");
@@ -424,7 +424,7 @@ function loadV17363FunctionalFixes(){
 
     const script=document.createElement("script");
     script.id="v17363-functional-fixes-runtime";
-    script.src="js/58-v173.63-functional-fixes.js?v=173.63";
+    script.src="js/58-v173.63-functional-fixes.js?v=173.64";
     script.async=false;
     script.onload=function(){
         script.dataset.loaded="1";
