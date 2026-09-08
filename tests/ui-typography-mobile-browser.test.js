@@ -48,6 +48,7 @@ html,body{margin:0;width:420px;min-height:900px;background:#050505;overflow-x:hi
  const heights={inventoryBack:h(selectors.inventoryBack),shopBuy:h(selectors.shopBuy),questClaim:h(selectors.questClaim),dungeonButton:h(selectors.dungeonButton),relicButton:h(selectors.relicButton),rewardButton:h(selectors.rewardButton),dialogButton:h(selectors.dialogButton)};
  const initialRoots=[...document.querySelectorAll('.qa-section,.v132-reward-modal-inner,.v169-rpg-dialog')];
  const initialOverflows=initialRoots.filter(el=>el.scrollWidth>el.clientWidth+1).map(el=>el.id||el.className);
+ const initialOversize=initialRoots.filter(el=>el.getBoundingClientRect().width>420.5).map(el=>el.id||el.className);
  const modal=q('#homeFeatureModal');
  modal.classList.remove('v131-shop-open','quest-mode');
  modal.classList.add('v141-synthesis-modal');
@@ -58,7 +59,8 @@ html,body{margin:0;width:420px;min-height:900px;background:#050505;overflow-x:hi
  heights.synthTab=h('#homeFeatureModal .v141-synthesis-tabs button');
  const synthRoot=q('#homeFeatureModal .v141-synthesis');
  const synthOverflow=synthRoot.scrollWidth>synthRoot.clientWidth+1;
- document.getElementById('result').textContent=JSON.stringify({fonts,heights,initialOverflows,synthOverflow,bodyWidth:document.documentElement.scrollWidth});
+ const synthOversize=synthRoot.getBoundingClientRect().width>420.5;
+ document.getElementById('result').textContent=JSON.stringify({fonts,heights,initialOverflows,initialOversize,synthOverflow,synthOversize,bodyWidth:document.documentElement.scrollWidth});
 })();</script></body></html>`;
 
 fs.writeFileSync(fixture,html,"utf8");
@@ -72,7 +74,8 @@ try{
     ["homeRoster","inventoryTab","inventoryBack","shopBuy","questClaim","synthTab","skillLoadout","dungeonButton","relicButton","rewardButton","dialogBody","dialogButton"].forEach(name=>assert.ok(data.fonts[name]>=15,`${name} should use normal actionable/body typography`));
     ["inventoryBack","shopBuy","questClaim","synthTab","dungeonButton","relicButton","rewardButton","dialogButton"].forEach(name=>assert.ok(data.heights[name]>=34,`${name} control is too short after typography growth`));
     assert.deepEqual(data.initialOverflows,[],`representative UI gained horizontal overflow: ${data.initialOverflows.join(', ')}`);
+    assert.deepEqual(data.initialOversize,[],`representative UI root exceeded 420px viewport: ${data.initialOversize.join(', ')}`);
     assert.equal(data.synthOverflow,false,"synthesis modal state gained horizontal overflow");
-    assert.ok(data.bodyWidth<=420,"page-level horizontal overflow detected");
-    console.log("Headless Chrome 420x900: representative non-battle typography, real modal states, controls and horizontal overflow verified");
+    assert.equal(data.synthOversize,false,"synthesis modal state exceeded 420px viewport");
+    console.log("Headless Chrome 420x900: representative non-battle typography, real modal states, controls and per-surface horizontal overflow verified");
 }finally{ try{fs.unlinkSync(fixture);}catch(_){ } }
