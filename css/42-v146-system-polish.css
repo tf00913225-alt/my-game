@@ -214,6 +214,92 @@
     white-space:nowrap;
 }
 
+/* Remaining non-battle mobile owners. These rules are intentionally scoped to
+   map/home/dungeon surfaces so battlePage typography remains untouched. */
+#game-stage > #app > #game-content #mapPageNav .nav-button{
+    font-size:15px !important;
+    line-height:1.2 !important;
+}
+#game-stage #mapPage .v141-task-tracker-title{
+    font-size:15px;
+    line-height:20px;
+}
+#game-stage #mapPage .v141-task-tracker-body > div{
+    font-size:14px;
+    line-height:1.4;
+}
+#game-stage #mapPage .v141-task-tracker-body b{
+    padding:2px 4px;
+    font-size:13px;
+    line-height:17px;
+}
+#game-stage #secondCharacterModal .second-character-subtitle{
+    font-size:15px !important;
+    line-height:1.5 !important;
+}
+#game-stage #homeRestCard > div{
+    font-size:15px !important;
+    line-height:1.55 !important;
+}
+#game-stage #patrolCharacterLabel{
+    font-size:14px !important;
+    line-height:18px !important;
+}
+#game-stage .autosave-indicator{
+    font-size:13px !important;
+    line-height:17px !important;
+}
+#game-stage #homeExpPoolCard .exp-pool-kicker{
+    font-size:13px !important;
+    line-height:17px !important;
+}
+#game-stage #homeExpPoolCard .exp-pool-unit{
+    font-size:14px !important;
+    line-height:18px !important;
+}
+#game-stage #homeExpPoolCard .exp-pool-section-head small{
+    font-size:14px !important;
+    line-height:18px !important;
+}
+#game-stage #homeExpPoolCard .exp-character-copy strong{
+    font-size:15px !important;
+    line-height:19px !important;
+}
+#game-stage #homeExpPoolCard .exp-character-copy small{
+    font-size:14px !important;
+    line-height:18px !important;
+}
+#game-stage #homeExpPoolCard .exp-character-cost b{
+    font-size:15px !important;
+    line-height:19px !important;
+}
+#game-stage #homeExpPoolCard .exp-character-cost small{
+    font-size:13px !important;
+    line-height:17px !important;
+}
+#game-stage .v141-dungeon-cover-art small{
+    font-size:13px;
+    line-height:17px;
+}
+#game-stage .v141-dungeon-cover-info b{
+    font-size:16px;
+    line-height:20px;
+}
+#game-stage .v141-dungeon-cover-info span{
+    font-size:14px;
+    line-height:18px;
+}
+#game-stage .v141-dungeon-cover-actions button{
+    min-height:38px;
+    font-size:15px;
+    line-height:1.2;
+}
+#game-stage .v141-dungeon-remaining{
+    padding-top:3px;
+    font-size:14px;
+    line-height:18px;
+}
+
 @media (max-height:720px){
     #game-stage #battlePage #battleMonsterArea{transform:translateY(12px);}
     #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
