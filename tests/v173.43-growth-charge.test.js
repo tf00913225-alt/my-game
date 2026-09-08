@@ -156,7 +156,7 @@ test("Element Box uses the modal body as its single scroll owner",()=>{
     assert.match(elementBoxCss,/body\.v162-element-box-settings-open #autoBattleSettingsPanel\.v131-element-box-panel\{[\s\S]*position:static !important;[\s\S]*overflow:visible !important/);
 });
 test("red dots stay fully bright",()=>{assert.match(polishCss,/\.v146-growth-attention-target\{[\s\S]*opacity:1 !important;[\s\S]*filter:none !important/);assert.match(polishCss,/\.v146-growth-guidance-dot\{[\s\S]*opacity:1 !important/);});
-test("three-character home HUD is enlarged but remains three columns",()=>{assert.match(polishCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(polishCss,/grid-template-columns:36px minmax\(0,1fr\)/);assert.match(polishCss,/height:64px/);assert.match(polishCss,/width:36px;height:36px/);});
+test("three-character home HUD grows with readable text but remains three columns",()=>{assert.match(polishCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(polishCss,/grid-template-columns:40px minmax\(0,1fr\)/);assert.match(polishCss,/min-height:84px/);assert.match(polishCss,/width:40px;height:40px/);assert.match(polishCss,/\.v146-home-character-main > div:first-child\{[\s\S]*font-size:15px/);assert.match(polishCss,/\.v146-home-resource strong\{[\s\S]*font-size:13px/);});
 test("ordinary daily dungeons use V173.43 dynamic party/level scaling and Abyss stays excluded",()=>{
     assert.match(dungeon,/const partyMultiplier=partySize===1\?\.40:partySize===2\?\.72:1/);
     assert.match(dungeon,/const levelMultiplier=highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05/);

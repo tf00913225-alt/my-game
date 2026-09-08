@@ -1,3 +1,16 @@
+## 2026-09-08 三分支 gameplay／秘寶方形圖／全域非戰鬥字級安全整合（dev）
+
+- 整合前 GitHub `dev` 為 `39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5`；三條遠端 branch tip 均精確等於使用者指定 SHA，且 merge base 都是該 dev、0 behind，沒有互相包含。實際順序依 owner／視覺層級為 gameplay regressions → relic square art → global non-battle typography。
+- `fix/gameplay-ui-battle-regressions-20260908@4a592dd4c41d7efb1a4849fbfe0cbf68598121bf` 以 merge commit `035845aa703a7a72c053ae9d0945b9f1f75d4be2` 合入；`js/01-stage-v8-touch-lock.js`、`js/41-v146-system-polish.js`、`js/53-v173.50-inventory-qol.js` 仍是觸控、地下城導航與背包 stack identity owner。CI run `34238583523` SUCCESS。
+- `fix/ui-relic-square-art@1788efe7bd20492014b75f1311ab2badde0e7ba0` 以 merge commit `9fae60e148f39782e3b09b71b4ade604243fea65` 合入；秘寶 current/list/detail 統一 1:1 `aspect-ratio`、`object-fit:contain`，保留單一 `def.iconPath` runtime 資料流。CI run `34239750357` SUCCESS。
+- `fix/global-ui-font-size-standard@58dfa219269c8d8a5f31675adbeceb5c920e5bfe` 以 merge commit `1ee3cc8fbfbced873080f21b0cc4c64f1f670875` 合入。只在 `css/52-v173.50-inventory-qol.css` 與 `css/55-team-relic-system.css` 發生 Git conflict；沒有 JS 函式、listener、state 或 runtime owner 衝突。
+- `css/52` 人工保留 gameplay 分支的黑金／danger 批量操作外觀，並合入 typography 分支的 15px 與 36～38px 控制尺寸；`css/55` 同時保留 gameplay 分支的入口 WebP／`pan-x pan-y`、square-art 分支的 1:1 圖區與 detail grid、typography 分支的 13～18px 層級及 390px responsive 高度。未使用整檔 ours/theirs，沒有重複 selector owner 或舊規則回退。
+- typography 的 battle-preservation 測試原本把整合前 dev 當唯一 BOSS 基準，會誤擋第一分支核准的 mechanism lifecycle 與 9px／charge 10px 修正；merge resolution 改為精確保護指定 gameplay commit。首次 CI run `34242410904` 另揭露 `fetch-depth:2` 缺少兩個固定歷史 tree，故由 `.github/workflows/ci.yml` 在既有 comparison-base step 精準 fetch，follow-up `ff5db2efabfff533a39724b16850a2169031f4f7` 修正；淺層 clone 重現與修復均已驗證。
+- 功能樹最終 CI run `34243622829` SUCCESS：250/250 JavaScript syntax、125/125 Node suites、467 static resources、291 unique HTML IDs、108 loader dependencies／26 ordered runtimes、Release Gate 10/10、git-diff、skill progression mobile Chrome、live Abyss 與 battle/audio 全部通過；部署 SHA 精確驗證為 `ff5db2efabfff533a39724b16850a2169031f4f7`，Game／Cache Version 維持 V173.64／173.64。
+- DEV Cloud Browser 實測：秘寶 20 卡、兩欄、current/list/detail 方形圖區 ratio=1、卡片 overflow=0、modal body 0→527、tabs 0→121、detail hero 無 overflow、返回列表正常；56 stylesheets、broken image 0、app-origin console error/warning 0。三張新增 UI WebP 均 HTTP 200／`image/webp`。
+- 三個工作分支指定 SHA 都是最終 dev 的 ancestor；本輪沒有新增 listener、沒有重複 inventory identity 函式、沒有失效 import/path。`main` 未 merge、未 push、未建立修改 main 的 PR；仍須明確授權才可把本輪推進 main。
+- 本輪 Requirement Batch：`release/requirement-batches/2026-09-08-three-branch-dev-integration.json`（8/8 VERIFIED）。
+
 ## 2026-09-08 V173.64 玩法中心／BOSS／四象塔／深淵正式發布候選
 
 - 功能基準為 `dev` `75cf90774d1d8a63818f65de999d044603e21a09`，實作 tip `6d7d136608711b616a02db726085bf9817a4068a` 已由使用者明確授權快轉至 `dev`；GitHub Actions run `34205400669` 的 Repository checks 與 Dev deployment gate 全數 SUCCESS，官方 DEV manifest exact SHA 與 `dev` 一致。

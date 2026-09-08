@@ -107,8 +107,8 @@
     border-radius:7px;
     background:rgba(18,14,10,.72);
     color:#cfc3ad;
-    font-size:11px;
-    line-height:1.45;
+    font-size:14px;
+    line-height:1.5;
 }
 
 .inventory-character-detail-row b{
@@ -153,6 +153,26 @@
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
     scrollbar-gutter:stable !important;
+    font-size:15px !important;
+    line-height:1.55 !important;
+}
+#game-stage #skillDetailModal #skillDetailStats span[style*="font-size:11px"]{
+    font-size:13px !important;
+    line-height:1.35 !important;
+}
+#game-stage #skillDetailModal #skillDetailStats div[style*="font-size:11px"],
+#game-stage #skillDetailModal #skillDetailStats div[style*="font-size:12px"]{
+    font-size:15px !important;
+    line-height:1.5 !important;
+}
+#game-stage #skillDetailModal #skillDetailStats .v17364-progression-hint{
+    font-size:14px !important;
+    line-height:1.45 !important;
+}
+#game-stage #skillDetailModal #skillDetailStats .v17364-progression-detail,
+#game-stage #skillDetailModal #skillDetailStats .v17364-progression-detail > div{
+    font-size:15px !important;
+    line-height:1.45 !important;
 }
 #game-stage #skillDetailModal .close-item-button{
     margin-top:0 !important;

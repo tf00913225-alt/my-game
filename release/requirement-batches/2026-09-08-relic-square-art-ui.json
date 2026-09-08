@@ -1,0 +1,61 @@
+{
+  "date": "2026-09-08",
+  "title": "秘寶單一 1:1 美術共用 UI",
+  "base_branch": "dev",
+  "base_sha": "39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5",
+  "work_branch": "fix/ui-relic-square-art",
+  "officialVersion": "173.64",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "每個秘寶只使用單一 1:1 正方形美術來源，秘寶列表、目前隊伍秘寶與詳情頁共用。",
+      "owner": ["js/60-team-relic-system.js", "css/55-team-relic-system.css"],
+      "implementation": "沿用既有單一 def.iconPath 與 relicIconMarkup(def, large) 圖片來源，不新增 detailImage/cardImage/iconImage；三個正式顯示容器統一 aspect-ratio:1/1，img 使用 object-fit:contain。"
+    },
+    {
+      "id": 2,
+      "status": "VERIFIED",
+      "request": "秘寶詳情頁改為左側 1:1 主圖、右側名稱／階級／等級／類型／tags，維持黑金武俠風格。",
+      "owner": ["css/55-team-relic-system.css", "js/60-team-relic-system.js"],
+      "implementation": "detail hero 改為兩欄 grid，左欄正方形 art、右欄沿用既有 h2/p/strong 資訊；正式圖片存在時顯示單一 iconPath，未配置圖片時仍安全 fallback 現有 placeholder。"
+    },
+    {
+      "id": 3,
+      "status": "VERIFIED",
+      "request": "目前隊伍秘寶區使用同一張 1:1 圖，且不影響名稱、Lv、效果、卸下與詳情操作。",
+      "owner": ["css/55-team-relic-system.css", "js/60-team-relic-system.js"],
+      "implementation": "current card 左欄固定正方形 art wrapper、右欄維持既有資訊與 actions；未改 equip/unequip/detail handler。"
+    },
+    {
+      "id": 4,
+      "status": "VERIFIED",
+      "request": "秘寶列表卡片改為左側 1:1 圖、右側名稱／等級／類型，保持雙欄、同高、階級框與已裝備角標。",
+      "owner": ["css/55-team-relic-system.css", "js/60-team-relic-system.js"],
+      "implementation": "card 由上圖下字改為 card 內部兩欄 grid；外層 team-relic-grid 仍維持 repeat(2,minmax(0,1fr))，rarity-* 與 equipped badge 規則未更動。"
+    },
+    {
+      "id": 5,
+      "status": "VERIFIED",
+      "request": "手機 360～430px 不橫向爆版、不拉伸圖片、不讓圖文互壓。",
+      "owner": ["css/55-team-relic-system.css", "tests/v174-relic-square-art-ui.test.js"],
+      "implementation": "新增 360/390/412/430px Chromium QA，驗證 game-stage 無水平 overflow、三處圖片容器皆為正方形且 contain、列表保持雙欄、圖在文字左側、操作與詳情資訊不逸出。"
+    },
+    {
+      "id": 6,
+      "status": "VERIFIED",
+      "request": "不修改秘寶功能邏輯、數值、觸發、效果、強化、裝備／卸下、篩選、戰鬥與其他遊戲頁面。",
+      "owner": ["js/60-team-relic-system.js", "css/55-team-relic-system.css"],
+      "implementation": "正式 runtime JS 與資料 catalog 零修改；本輪正式功能差異只位於秘寶 UI CSS，另新增針對此契約的 regression/browser test。PR diff 已確認未碰戰鬥 selector、數值或其他頁面 owner。"
+    }
+  ],
+  "verification": [
+    "tests/v174-relic-square-art-ui.test.js",
+    "tests/ui-team-relic-mobile-browser.test.js",
+    "tests/v174-team-relic-system.test.js",
+    "GitHub Actions Repository checks run 34218603178"
+  ],
+  "verificationResult": "6/6 VERIFIED；Repository checks run 34218603178 SUCCESS，包含全 Node suites、既有秘寶 mobile browser QA 與新增 360/390/412/430px Chromium 1:1 美術排版 QA。",
+  "releasedAs": null
+}

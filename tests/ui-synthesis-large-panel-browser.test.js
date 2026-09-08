@@ -28,6 +28,7 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/40-v143-combat-dungeon-polish.css">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <link rel="stylesheet" href="css/50-v169-abyss-flow.css">
+<link rel="stylesheet" href="css/53-v173.51-qa.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
 #game-stage{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;}
@@ -46,10 +47,11 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  const box=modal.querySelector('.home-feature-modal-box');
  const wallet=modal.querySelector('.v141-synthesis-wallet');
  const tabs=modal.querySelector('.v141-synthesis-tabs');
+ const tab=tabs.querySelector('button');
  const body=document.getElementById('body');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};
  const shots=[];
- const record=name=>{void box.offsetHeight;const style=getComputedStyle(body);shots.push({name,box:rect(box),wallet:rect(wallet),tabs:rect(tabs),body:rect(body),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,scrollWidth:body.scrollWidth,clientWidth:body.clientWidth,overflowY:style.overflowY,touchAction:style.touchAction});};
+ const record=name=>{void box.offsetHeight;const style=getComputedStyle(body);shots.push({name,box:rect(box),wallet:rect(wallet),tabs:rect(tabs),body:rect(body),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,scrollWidth:body.scrollWidth,clientWidth:body.clientWidth,overflowY:style.overflowY,touchAction:style.touchAction,tabFontSize:getComputedStyle(tab).fontSize,tabHeight:rect(tab).height});};
  body.innerHTML='<div class="v141-synthesis-card"><p>短內容</p></div>';record('reforge');
  body.innerHTML='<div class="v141-synthesis-card">'+Array.from({length:40},(_,i)=>'<p>符咒內容 '+i+'</p>').join('')+'</div>';record('talisman');
  body.innerHTML='<div class="v141-synthesis-card">'+Array.from({length:24},(_,i)=>'<p>碎片內容 '+i+'</p>').join('')+'</div>';record('fragment');
@@ -57,7 +59,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  void box.offsetHeight;
  const picker=document.getElementById('picker');
  const art=body.querySelector('.v169-talisman-art');
- shots.push({name:'controls',box:rect(box),wallet:rect(wallet),tabs:rect(tabs),body:rect(body),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,scrollWidth:body.scrollWidth,clientWidth:body.clientWidth,pickerScrollWidth:picker.scrollWidth,pickerClientWidth:picker.clientWidth,art:rect(art)});
+ shots.push({name:'controls',box:rect(box),wallet:rect(wallet),tabs:rect(tabs),body:rect(body),scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,scrollWidth:body.scrollWidth,clientWidth:body.clientWidth,pickerScrollWidth:picker.scrollWidth,pickerClientWidth:picker.clientWidth,art:rect(art),tabFontSize:getComputedStyle(tab).fontSize,tabHeight:rect(tab).height});
  document.getElementById('result').textContent=JSON.stringify(shots);
 })();
 </script></div></body></html>`;
@@ -77,6 +79,8 @@ try{
                 assert.ok(Math.abs(shot[part][key]-baseline[part][key])<0.25,`${shot.name} ${part}.${key} drifted`);
             }
         }
+        assert.equal(shot.tabFontSize,"15px","synthesis tab text must use the primary UI size");
+        assert.ok(shot.tabHeight>=42,"synthesis tab height must remain readable and tappable");
     }
     assert.ok(shots[1].scrollHeight>shots[1].clientHeight,"long synthesis content must scroll only inside the synthesis body");
     assert.equal(shots[1].overflowY,"auto","synthesis body must expose native vertical overflow");
@@ -86,7 +90,7 @@ try{
     assert.ok(controls.pickerScrollWidth>controls.pickerClientWidth,"equipment picker must retain real horizontal overflow");
     assert.ok(controls.art.width<=92.5&&controls.art.height<=138.5,"talisman art must stay compact inside synthesis flow");
     assert.ok(controls.scrollWidth<=controls.clientWidth+1,"synthesis content viewport must not gain page-level horizontal overflow");
-    console.log("Headless Chrome: synthesis frame, horizontal picker and compact talisman art verified");
+    console.log("Headless Chrome: synthesis frame, typography, horizontal picker and compact talisman art verified");
 }finally{
     try{fs.unlinkSync(fixture);}catch(_){ }
 }

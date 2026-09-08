@@ -58,7 +58,7 @@
     z-index:3;
     display:flex;
     flex:0 0 auto;
-    min-height:66px;
+    min-height:68px;
     box-sizing:border-box;
     align-items:center;
     justify-content:space-between;
@@ -72,8 +72,9 @@
     display:block;
     margin-bottom:1px;
     color:#a9987a;
-    font-size:10px;
+    font-size:14px;
     font-weight:800;
+    line-height:1.3;
     letter-spacing:1.4px;
 }
 
@@ -90,13 +91,13 @@
 
 #game-stage .gameplay-back-button{
     min-width:78px;
-    min-height:36px;
-    padding:7px 10px;
+    min-height:40px;
+    padding:8px 10px;
     border:1px solid #8d6937;
     border-radius:8px;
     color:#e8d9bd;
     background:linear-gradient(180deg,#332719,#17100a);
-    font-size:12px;
+    font-size:15px;
     font-weight:900;
     letter-spacing:.4px;
 }
@@ -132,7 +133,7 @@
     position:relative;
     display:grid;
     width:100%;
-    min-height:112px;
+    min-height:120px;
     box-sizing:border-box;
     grid-template-columns:minmax(0,1fr) 78px;
     gap:10px;
@@ -183,14 +184,14 @@
 #game-stage .gameplay-mode-copy p{
     margin:0 0 8px;
     color:#c6b99f;
-    font-size:12px;
-    line-height:1.35;
+    font-size:15px;
+    line-height:1.45;
 }
 
 #game-stage .gameplay-mode-status{
     display:block;
     color:#fff0bd;
-    font-size:11px;
+    font-size:14px;
     font-weight:800;
     line-height:1.45;
     overflow-wrap:anywhere;
@@ -217,7 +218,7 @@
 #game-stage .gameplay-mode-card.abyss .gameplay-mode-seal{ color:#b7c9ea; border-color:#5d7197; }
 #game-stage .gameplay-mode-card.tower .gameplay-mode-seal{ color:#e8875d; border-color:#9e5434; }
 #game-stage .gameplay-mode-card.coming-soon{
-    min-height:80px;
+    min-height:88px;
     opacity:.67;
     cursor:default;
 }
@@ -241,7 +242,7 @@
     border-radius:8px;
     color:#bfae91;
     background:linear-gradient(180deg,#2a2015,#130e09);
-    font-size:14px;
+    font-size:16px;
     font-weight:900;
 }
 
@@ -272,10 +273,11 @@
     border-radius:8px;
     color:#b8aa91;
     background:rgba(7,5,3,.48);
-    font-size:11px;
+    font-size:14px;
+    line-height:1.4;
 }
 
-#game-stage .boss-overview-line b{ color:#efcc7b; font-size:12px; }
+#game-stage .boss-overview-line b{ color:#efcc7b; font-size:15px; }
 
 #game-stage .boss-card-list{
     display:grid;
@@ -286,12 +288,12 @@
 #game-stage .boss-select-card{
     position:relative;
     display:flex;
-    min-height:126px;
+    min-height:146px;
     box-sizing:border-box;
     flex-direction:column;
     align-items:flex-start;
     justify-content:space-between;
-    gap:5px;
+    gap:6px;
     padding:11px 10px;
     overflow:hidden;
     border:1px solid #76572e;
@@ -306,12 +308,12 @@
 #game-stage .boss-select-card b{
     color:#f0cd7a;
     font-family:"Noto Serif TC",serif;
-    font-size:15px;
+    font-size:17px;
     line-height:1.25;
 }
 
 #game-stage .boss-select-card span,
-#game-stage .boss-select-card small{ font-size:10px; line-height:1.35; }
+#game-stage .boss-select-card small{ font-size:14px; line-height:1.4; }
 #game-stage .boss-select-card span{ color:#e9b95e; font-weight:900; }
 #game-stage .boss-select-card small{ color:#aa9a80; }
 #game-stage .boss-select-card.locked{ opacity:.47; filter:saturate(.55); }
@@ -325,7 +327,7 @@
     transform:rotate(35deg);
     color:#f8e4b0;
     background:#6b2a20;
-    font-size:9px;
+    font-size:13px;
     font-weight:900;
     text-align:center;
 }
@@ -341,18 +343,19 @@
 
 #game-stage .boss-detail-back{
     align-self:flex-start;
-    padding:4px 0;
+    min-height:36px;
+    padding:6px 0;
     border:0;
     color:#c9ae72;
     background:transparent;
-    font-size:12px;
+    font-size:15px;
     font-weight:900;
 }
 
 #game-stage .boss-hero{
     position:relative;
     display:grid;
-    min-height:154px;
+    min-height:162px;
     box-sizing:border-box;
     place-items:center;
     overflow:hidden;
@@ -377,9 +380,9 @@
 }
 
 #game-stage .boss-hero > *{ position:relative; z-index:1; }
-#game-stage .boss-hero small{ color:#bba57f; font-size:11px; }
+#game-stage .boss-hero small{ color:#bba57f; font-size:14px; }
 #game-stage .boss-hero h3{ margin:5px 0;color:#f3d287;font-size:24px;letter-spacing:1px; }
-#game-stage .boss-hero p{ margin:0;color:#d7c5a7;font-size:12px; }
+#game-stage .boss-hero p{ margin:0;color:#d7c5a7;font-size:15px;line-height:1.45; }
 
 #game-stage .boss-trait-tags{
     display:flex;
@@ -395,7 +398,7 @@
     border-radius:999px;
     color:#edcc82;
     background:rgba(16,10,6,.74);
-    font-size:10px;
+    font-size:13px;
     font-weight:800;
 }
 
@@ -413,16 +416,17 @@
 }
 
 #game-stage .boss-detail-grid h4{
-    margin:0 0 3px;
+    margin:0 0 4px;
     color:#d9b86e;
-    font-size:11px;
+    font-size:18px;
+    line-height:1.3;
     letter-spacing:.4px;
 }
 
 #game-stage .boss-detail-grid p{
     margin:0;
     color:#c2b39a;
-    font-size:11px;
+    font-size:15px;
     line-height:1.5;
 }
 
@@ -438,7 +442,7 @@
     border-radius:6px;
     color:#8f826d;
     background:#100c08;
-    font-size:9px;
+    font-size:13px;
     font-weight:800;
     text-align:center;
 }
@@ -480,7 +484,7 @@
 #game-stage .tower-element-hero{
     position:relative;
     display:grid;
-    min-height:176px;
+    min-height:184px;
     box-sizing:border-box;
     place-items:center;
     overflow:hidden;
@@ -504,10 +508,10 @@
 }
 
 #game-stage .tower-element-hero > *{ position:relative;z-index:1; }
-#game-stage .tower-element-hero small{ color:#bbaa8e;font-size:11px;letter-spacing:1px; }
+#game-stage .tower-element-hero small{ color:#bbaa8e;font-size:14px;letter-spacing:1px; }
 #game-stage .tower-element-hero h3{ margin:5px 0 3px;color:#f1d083;font-size:25px; }
 #game-stage .tower-element-hero strong{ color:#fff0bd;font-size:31px;line-height:1.1; }
-#game-stage .tower-element-hero p{ margin:5px 0 0;color:#c7b89f;font-size:11px; }
+#game-stage .tower-element-hero p{ margin:5px 0 0;color:#c7b89f;font-size:15px;line-height:1.45; }
 
 #game-stage .tower-summary-grid{
     display:grid;
@@ -522,16 +526,16 @@
     background:rgba(6,4,3,.52);
 }
 
-#game-stage .tower-summary-grid small{ display:block;color:#9f9078;font-size:9px; }
-#game-stage .tower-summary-grid b{ color:#e7c675;font-size:14px; }
+#game-stage .tower-summary-grid small{ display:block;color:#9f9078;font-size:13px;line-height:1.35; }
+#game-stage .tower-summary-grid b{ color:#e7c675;font-size:16px; }
 
 #game-stage .tower-actions{ display:grid;grid-template-columns:1fr;gap:8px; }
 #game-stage .tower-secondary-action{
-    min-height:40px;
+    min-height:42px;
     border-color:#72542e;
     color:#d9c7a8;
     background:linear-gradient(180deg,#2c2115,#15100b);
-    font-size:12px;
+    font-size:15px;
 }
 
 #game-stage .tower-floor-overview{
@@ -542,7 +546,7 @@
 
 #game-stage .tower-floor-band{
     position:relative;
-    min-height:72px;
+    min-height:82px;
     padding:9px;
     border:1px solid #604927;
     border-radius:8px;
@@ -551,8 +555,8 @@
     text-align:left;
 }
 
-#game-stage .tower-floor-band b{ display:block;color:#dfbd70;font-size:13px; }
-#game-stage .tower-floor-band small{ color:#8f836e;font-size:9px;line-height:1.35; }
+#game-stage .tower-floor-band b{ display:block;color:#dfbd70;font-size:16px;line-height:1.3; }
+#game-stage .tower-floor-band small{ color:#8f836e;font-size:13px;line-height:1.4; }
 #game-stage .tower-floor-band.done{ border-color:#8c6934;background:#24180d; }
 #game-stage .tower-floor-band.current{ border-color:#d0a151;box-shadow:0 0 8px rgba(214,154,51,.22); }
 #game-stage .tower-floor-band:disabled{ opacity:.4; }
@@ -564,10 +568,10 @@
     background:linear-gradient(145deg,#2c1d0e,#100b07);
 }
 
-#game-stage .tower-milestone-choice h3{ margin:0 0 4px;color:#f0cc79;font-size:16px; }
-#game-stage .tower-milestone-choice p{ margin:0 0 9px;color:#bdae94;font-size:10px;line-height:1.5; }
+#game-stage .tower-milestone-choice h3{ margin:0 0 4px;color:#f0cc79;font-size:18px;line-height:1.3; }
+#game-stage .tower-milestone-choice p{ margin:0 0 9px;color:#bdae94;font-size:15px;line-height:1.5; }
 #game-stage .tower-relic-options{ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px; }
-#game-stage .tower-relic-options button{ min-height:42px;border:1px solid #7e5e33;border-radius:7px;color:#e3cfaa;background:#1c140d;font-size:11px;font-weight:900; }
+#game-stage .tower-relic-options button{ min-height:44px;padding:7px;border:1px solid #7e5e33;border-radius:7px;color:#e3cfaa;background:#1c140d;font-size:15px;font-weight:900; }
 
 /* ---------- Boss mechanism slot ---------- */
 
@@ -632,7 +636,12 @@
     animation:gameplayMechanismBlocked .35s ease-out;
 }
 
+/* A resolved/destroyed card used to stay as an invisible flex item. When the
+   same BOSS spawned its next mechanism, that stale card still occupied the
+   first slot and pushed the visible card to the right of the BOSS. Keep the
+   destroy animation, but remove the stale node from flex layout immediately. */
 #game-stage #battleMonsterArea .boss-mechanism-card.destroying{
+    position:absolute;
     pointer-events:none;
     animation:gameplayMechanismDestroy .28s ease-in both;
 }
@@ -658,12 +667,23 @@
 
 #game-stage #battleMonsterArea .boss-mechanism-hp,
 #game-stage #battleMonsterArea .boss-mechanism-effect{
-    font-size:8px;
-    line-height:1.25;
+    font-size:9px;
+    line-height:1.3;
 }
 
 #game-stage #battleMonsterArea .boss-mechanism-hp{ color:#f1d388; }
 #game-stage #battleMonsterArea .boss-mechanism-effect{ color:#b9ad98; }
+
+/* Charge is the only mechanism with a lethal countdown. Keep the countdown in
+   the card itself (not only the battle log) and make that line readable at a
+   glance on a phone. */
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="charge"] .boss-mechanism-effect{
+    color:#ffd0c8;
+    font-size:10px;
+    font-weight:900;
+    line-height:1.3;
+    text-shadow:0 1px 2px #000,0 0 5px rgba(212,87,67,.42);
+}
 
 #game-stage #battlePage .battle-monster.gameplay-boss-protected{
     opacity:.58;

@@ -20,11 +20,11 @@
 #game-stage .team-relic-home-tools .home-card-utility{
     display:grid;
     grid-template-columns:1fr;
-    grid-template-rows:59px 21px;
+    grid-template-rows:58px 24px;
     align-content:stretch;
     justify-items:stretch;
     width:80px;
-    height:82px;
+    height:84px;
     pointer-events:auto;
     position:relative;
     overflow:hidden;
@@ -34,9 +34,13 @@
     box-shadow:0 4px 10px rgba(0,0,0,.52),inset 0 0 0 1px rgba(255,224,151,.06);
 }
 #game-stage .team-relic-home-tools .home-card-utility:active{transform:translateY(1px) scale(.97);filter:brightness(1.12);}
-#game-stage .team-relic-home-tools .home-card-icon{display:flex;align-items:center;justify-content:center;width:100%;height:59px;overflow:hidden;border:0;border-bottom:1px solid rgba(174,127,55,.55);border-radius:0;}
-#game-stage .team-relic-home-tools .home-card-label{align-self:stretch;padding:2px 3px 1px;background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));font-size:13px;line-height:18px;}
+#game-stage .team-relic-home-tools .home-card-icon{display:flex;align-items:center;justify-content:center;width:100%;height:58px;overflow:hidden;border:0;border-bottom:1px solid rgba(174,127,55,.55);border-radius:0;background-position:center;background-size:cover;background-repeat:no-repeat;}
+#game-stage .team-relic-home-tools .home-card-label{align-self:stretch;padding:2px 3px 1px;background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));font-size:15px;line-height:20px;}
 #game-stage .team-relic-home-tools .home-card-icon img{width:100%;height:100%;object-fit:cover;display:block;}
+#game-stage .team-relic-home-entry .home-card-icon{background-image:url("../assets/ui/home-relic-v174.webp");}
+#game-stage .team-relic-home-entry .team-relic-home-glyph{font-size:0;color:transparent;text-shadow:none;}
+#game-stage .team-element-box-home-entry .home-card-icon{background-image:url("../assets/ui/home-element-box-v174.webp");}
+#game-stage .team-element-box-home-entry .home-card-icon img{display:none;}
 #game-stage .team-relic-home-glyph{
     font-family:"Noto Serif TC",serif;
     font-size:29px;
@@ -46,56 +50,63 @@
 }
 #game-stage .team-relic-notice-dot{position:absolute;right:-2px;top:-2px;z-index:5;}
 #game-stage #v146HomeRoster .team-relic-loadout-slot{
-    grid-column:1/-1;min-height:30px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:7px;align-items:center;
-    padding:3px 5px;border:1px solid rgba(178,126,49,.52);border-radius:7px;background:linear-gradient(90deg,rgba(42,28,14,.84),rgba(10,9,7,.9));box-sizing:border-box;
+    grid-column:1/-1;min-height:40px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:7px;align-items:center;
+    padding:4px 5px;border:1px solid rgba(178,126,49,.52);border-radius:7px;background:linear-gradient(90deg,rgba(42,28,14,.84),rgba(10,9,7,.9));box-sizing:border-box;
 }
-#game-stage #v146HomeRoster .team-relic-loadout-slot>span{color:#bda46d;font-size:9px;font-weight:800;white-space:nowrap;}
-#game-stage #v146HomeRoster .team-relic-loadout-slot>b{color:#f2d696;font-size:10px;line-height:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#game-stage #v146HomeRoster .team-relic-loadout-slot>span{color:#bda46d;font-size:13px;font-weight:800;white-space:nowrap;}
+#game-stage #v146HomeRoster .team-relic-loadout-slot>b{color:#f2d696;font-size:16px;line-height:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #game-stage #v146HomeRoster .team-relic-loadout-slot>small{display:none;}
-#game-stage #v146HomeRoster .team-relic-loadout-slot>button{min-width:42px;min-height:24px;border:1px solid rgba(211,161,70,.7);border-radius:6px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:9px;font-weight:900;}
+#game-stage #v146HomeRoster .team-relic-loadout-slot>button{min-width:52px;min-height:34px;padding:4px 8px;border:1px solid rgba(211,161,70,.7);border-radius:6px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:15px;font-weight:900;}
 #game-stage #homeFeatureModal.team-relic-modal{padding:4px!important;}
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide{position:relative!important;width:calc(100% - 8px)!important;max-width:none!important;height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:2px solid rgba(174,126,51,.86);background:linear-gradient(180deg,#17120d,#070706 78%);}
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-modal-title{flex:0 0 auto;min-height:44px;border-bottom:1px solid rgba(206,154,61,.45);background:linear-gradient(180deg,rgba(45,31,15,.96),rgba(15,12,8,.96));}
 #game-stage #homeFeatureModal.team-relic-modal #homeFeatureModalTitle{font-family:"Noto Serif TC",serif;letter-spacing:.2em;color:#f0d28d;font-size:20px;}
-#game-stage #homeFeatureModal.team-relic-modal .home-feature-close-btn{align-items:center!important;justify-content:center!important;width:auto!important;min-width:64px!important;height:34px!important;padding:0 12px!important;font-size:13px!important;line-height:32px!important;font-weight:900!important;border:1px solid #8a6a3a!important;border-radius:7px!important;background:linear-gradient(180deg,#2c2419,#0f0c09)!important;color:#f4ead4!important;text-shadow:0 1px 2px #000!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45)!important;}
+#game-stage #homeFeatureModal.team-relic-modal .home-feature-close-btn{align-items:center!important;justify-content:center!important;width:auto!important;min-width:68px!important;height:38px!important;padding:0 12px!important;font-size:15px!important;line-height:36px!important;font-weight:900!important;border:1px solid #8a6a3a!important;border-radius:7px!important;background:linear-gradient(180deg,#2c2419,#0f0c09)!important;color:#f4ead4!important;text-shadow:0 1px 2px #000!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45)!important;}
 #game-stage #homeFeatureModal.team-relic-modal #statusHelpButton,
 #game-stage #homeFeatureModal.team-relic-modal #skillPreviewHeaderButton{display:none!important;}
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-close-btn:not(#statusHelpButton):not(#skillPreviewHeaderButton){display:inline-flex!important;}
 #game-stage #homeFeatureModal.team-relic-modal:has(.team-relic-detail) .home-feature-close-btn{display:none!important;}
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide #homeFeatureModalBody{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;padding:9px!important;box-sizing:border-box;}
-#game-stage .team-relic-page,#game-stage .team-relic-detail{min-height:100%;color:#e7dcc7;font-size:14px;box-sizing:border-box;}
-#game-stage .team-relic-resource-line{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;color:#b4a58c;font-size:12px;line-height:17px;}
+#game-stage .team-relic-page,#game-stage .team-relic-detail{min-height:100%;color:#e7dcc7;font-size:15px;line-height:1.5;box-sizing:border-box;}
+#game-stage .team-relic-resource-line{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;color:#b4a58c;font-size:14px;line-height:20px;}
 #game-stage .team-relic-resource-line b{color:#d2b878;font-weight:800;}
-#game-stage .team-relic-current-card{display:grid;grid-template-columns:72px minmax(0,1fr);grid-template-rows:auto auto;gap:6px 9px;padding:10px;margin-bottom:9px;border:1px solid rgba(193,143,58,.58);border-radius:10px;background:linear-gradient(135deg,rgba(42,29,14,.92),rgba(8,8,7,.95));box-shadow:inset 0 0 16px rgba(225,170,69,.04),0 5px 14px rgba(0,0,0,.33);}
-#game-stage .team-relic-current-art{grid-row:1/3;display:flex;align-items:center;justify-content:center;}
+#game-stage .team-relic-current-card{display:grid;grid-template-columns:76px minmax(0,1fr);grid-template-rows:auto auto;gap:6px 9px;align-items:start;padding:10px;margin-bottom:9px;border:1px solid rgba(193,143,58,.58);border-radius:10px;background:linear-gradient(135deg,rgba(42,29,14,.92),rgba(8,8,7,.95));box-shadow:inset 0 0 16px rgba(225,170,69,.04),0 5px 14px rgba(0,0,0,.33);}
+/* List, equipped and detail views all expose the same square art contract.
+   Runtime still resolves a single def.iconPath and the UI decides only size. */
+#game-stage .team-relic-current-art,
+#game-stage .team-relic-card-art,
+#game-stage .team-relic-detail-art{aspect-ratio:1/1;overflow:hidden;flex-shrink:0;box-sizing:border-box;background:radial-gradient(circle,#2c2114,#090807 70%);}
+#game-stage .team-relic-current-art img,
+#game-stage .team-relic-card-art img,
+#game-stage .team-relic-detail-art img{display:block;width:100%;height:100%;object-fit:contain;}
+#game-stage .team-relic-current-art{grid-row:1/3;width:76px;display:flex;align-items:center;justify-content:center;border-radius:10px;}
 #game-stage .team-relic-current-copy{min-width:0;}
-#game-stage .team-relic-current-copy small{display:block;color:#b7a786;font-size:11px;margin-bottom:2px;line-height:15px;}
-#game-stage .team-relic-current-copy b{display:block;color:#f4d48e;font-size:17px;line-height:21px;}
+#game-stage .team-relic-current-copy small{display:block;color:#b7a786;font-size:14px;margin-bottom:2px;line-height:19px;}
+#game-stage .team-relic-current-copy b{display:block;color:#f4d48e;font-size:17px;line-height:22px;}
 #game-stage .team-relic-current-copy b span{font-size:13px;color:#c7b27f;}
-#game-stage .team-relic-current-copy p{margin:4px 0 0;color:#d8ccb7;font-size:13px;line-height:19px;}
+#game-stage .team-relic-current-copy p{margin:4px 0 0;color:#d8ccb7;font-size:15px;line-height:21px;}
 #game-stage .team-relic-current-actions{display:flex;gap:6px;justify-content:flex-end;}
-#game-stage .team-relic-current-actions button,#game-stage .team-relic-select-first{min-width:62px;min-height:34px;padding:5px 9px;border:1px solid #9e7330;border-radius:6px;background:linear-gradient(180deg,#443018,#21150b);color:#f4d48e;font-size:13px;font-weight:900;}
+#game-stage .team-relic-current-actions button,#game-stage .team-relic-select-first{min-width:68px;min-height:38px;padding:6px 10px;border:1px solid #9e7330;border-radius:6px;background:linear-gradient(180deg,#443018,#21150b);color:#f4d48e;font-size:15px;font-weight:900;}
 #game-stage .team-relic-current-card.empty{grid-template-columns:60px minmax(0,1fr) auto;align-items:center;}
 #game-stage .team-relic-empty-slot{grid-row:1/3;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border:1px dashed #7d653d;border-radius:10px;color:#7f725c;font:900 24px "Noto Serif TC",serif;background:#0a0908;}
 #game-stage .team-relic-current-card.empty .team-relic-select-first{grid-column:3;grid-row:1/3;}
-#game-stage .team-relic-tabs{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:2px 1px 8px;margin:0 -1px 7px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x;scrollbar-width:none;}
+#game-stage .team-relic-tabs{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:2px 1px 8px;margin:0 -1px 7px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none;}
 #game-stage .team-relic-tabs::-webkit-scrollbar{display:none;}
-#game-stage .team-relic-tabs button{flex:0 0 auto;min-width:48px;min-height:36px;padding:6px 9px;border:1px solid rgba(123,95,53,.62);border-radius:18px;background:#15110d;color:#bcb09b;font-size:13px;font-weight:800;}
+#game-stage .team-relic-tabs button{flex:0 0 auto;min-width:52px;min-height:38px;padding:7px 10px;border:1px solid rgba(123,95,53,.62);border-radius:19px;background:#15110d;color:#bcb09b;font-size:15px;font-weight:800;}
 #game-stage .team-relic-tabs button.active{border-color:#d6a24a;color:#f2d38c;background:linear-gradient(180deg,#4b3218,#20150b);box-shadow:0 0 8px rgba(208,153,62,.18);}
 #game-stage .team-relic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding-bottom:14px;}
-#game-stage .team-relic-card{position:relative;min-width:0;min-height:142px;padding:8px;border:1px solid #66563f;border-radius:9px;background:linear-gradient(160deg,#1b1712,#090807);color:#ded3c0;display:flex;flex-direction:column;align-items:stretch;text-align:left;box-shadow:0 4px 10px rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent;}
+#game-stage .team-relic-card{position:relative;min-width:0;min-height:146px;padding:8px;border:1px solid #66563f;border-radius:9px;background:linear-gradient(160deg,#1b1712,#090807);color:#ded3c0;display:grid;grid-template-columns:68px minmax(0,1fr);grid-template-rows:min-content min-content;gap:3px 8px;align-content:center;align-items:center;text-align:left;box-shadow:0 4px 10px rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent;}
 #game-stage .team-relic-card:active{transform:scale(.98);filter:brightness(1.08);}
 #game-stage .team-relic-card.locked{filter:saturate(.35) brightness(.65);}
 #game-stage .team-relic-card.equipped{box-shadow:0 0 0 1px #d8aa55,0 0 12px rgba(214,166,75,.32),inset 0 0 12px rgba(214,166,75,.06);}
-#game-stage .team-relic-card-art{height:78px;display:flex;align-items:center;justify-content:center;margin-bottom:5px;border-radius:7px;background:radial-gradient(circle,#2c2114,#090807 70%);overflow:hidden;}
-#game-stage .team-relic-card-art img{width:100%;height:100%;object-fit:contain;}
-#game-stage .team-relic-card-name{font-family:"Noto Serif TC",serif;font-size:15px;line-height:20px;font-weight:900;color:#f0dfbd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#game-stage .team-relic-card-meta{font-size:12px;line-height:17px;color:#b0a38f;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#game-stage .team-relic-card em{position:absolute;right:5px;top:5px;padding:2px 6px;border:1px solid #d8aa55;border-radius:10px;background:#3c2710;color:#ffe19a;font-size:10px;line-height:14px;font-style:normal;font-weight:900;}
+#game-stage .team-relic-card-art{grid-column:1;grid-row:1/3;width:68px;display:flex;align-items:center;justify-content:center;margin:0;border-radius:7px;}
+#game-stage .team-relic-card-name{grid-column:2;grid-row:1;align-self:end;min-width:0;font-family:"Noto Serif TC",serif;font-size:16px;line-height:21px;font-weight:900;color:#f0dfbd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#game-stage .team-relic-card-meta{grid-column:2;grid-row:2;align-self:start;min-width:0;font-size:14px;line-height:19px;color:#b0a38f;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#game-stage .team-relic-card em{position:absolute;right:5px;top:5px;padding:2px 6px;border:1px solid #d8aa55;border-radius:10px;background:#3c2710;color:#ffe19a;font-size:13px;line-height:17px;font-style:normal;font-weight:900;}
 #game-stage .team-relic-placeholder{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;position:relative;border:2px solid #8b6a34;background:radial-gradient(circle at 50% 45%,#49331a,#0a0908 72%);box-shadow:inset 0 0 11px rgba(246,205,119,.09),0 0 8px rgba(0,0,0,.5);}
 #game-stage .team-relic-placeholder.large{width:66px;height:66px;}
 #game-stage .team-relic-placeholder i{font-style:normal;font:900 24px "Noto Serif TC",serif;color:#d8bd7b;text-shadow:0 1px 1px #000;}
-#game-stage .team-relic-placeholder b{position:absolute;right:-3px;bottom:-3px;min-width:18px;height:18px;line-height:18px;text-align:center;border-radius:50%;border:1px solid #8b6a34;background:#120e09;color:#bca46d;font-size:9px;}
+#game-stage .team-relic-placeholder b{position:absolute;right:-4px;bottom:-4px;min-width:21px;height:21px;line-height:21px;text-align:center;border-radius:50%;border:1px solid #8b6a34;background:#120e09;color:#bca46d;font-size:13px;}
 #game-stage .rarity-white{border-color:#d8d8d8!important;}
 #game-stage .rarity-blue{border-color:#42a5ff!important;}
 #game-stage .rarity-purple{border-color:#B05CFF!important;}
@@ -111,19 +122,19 @@
     0%,100%{box-shadow:0 0 7px rgba(255,90,54,.24),0 0 10px rgba(66,165,255,.24),0 0 12px rgba(71,214,163,.2);}
     50%{box-shadow:0 0 11px rgba(255,90,54,.42),0 0 16px rgba(66,165,255,.4),0 0 18px rgba(71,214,163,.34),0 0 14px rgba(200,155,69,.3);}
 }
-#game-stage #homeFeatureModal.team-relic-modal .team-relic-detail-back{position:absolute;top:5px;right:8px;z-index:6;min-width:112px;height:34px;margin:0;padding:0 10px;border:1px solid #8a6a3a;border-radius:7px;background:linear-gradient(180deg,#2c2419,#0f0c09);color:#f4ead4;font-size:0!important;font-weight:900;text-shadow:0 1px 2px #000;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45);}
-#game-stage #homeFeatureModal.team-relic-modal .team-relic-detail-back::after{content:"返回秘寶列表";font-size:13px;line-height:32px;white-space:nowrap;}
-#game-stage .team-relic-detail-hero{text-align:center;padding:13px 9px;margin-bottom:9px;border:1px solid #7d643d;border-radius:11px;background:radial-gradient(circle at 50% 25%,rgba(71,48,21,.9),rgba(8,8,7,.96) 68%);}
-#game-stage .team-relic-detail-art{display:flex;justify-content:center;margin-bottom:6px;}
-#game-stage .team-relic-detail-hero h2{margin:5px 0 3px;font:900 22px/27px "Noto Serif TC",serif;color:#f2dcaa;letter-spacing:.08em;}
-#game-stage .team-relic-detail-hero p{margin:0;color:#c3b493;font-size:13px;line-height:18px;}
-#game-stage .team-relic-detail-hero strong{display:block;margin-top:4px;color:#d0bd87;font-size:13px;line-height:18px;}
+#game-stage #homeFeatureModal.team-relic-modal .team-relic-detail-back{position:absolute;top:5px;right:8px;z-index:6;min-width:126px;height:38px;margin:0;padding:0 10px;border:1px solid #8a6a3a;border-radius:7px;background:linear-gradient(180deg,#2c2419,#0f0c09);color:#f4ead4;font-size:0!important;font-weight:900;text-shadow:0 1px 2px #000;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45);}
+#game-stage #homeFeatureModal.team-relic-modal .team-relic-detail-back::after{content:"返回秘寶列表";font-size:15px;line-height:36px;white-space:nowrap;}
+#game-stage .team-relic-detail-hero{display:grid;grid-template-columns:minmax(96px,34%) minmax(0,1fr);grid-template-rows:auto auto auto;gap:2px 12px;align-items:center;text-align:left;padding:13px 12px;margin-bottom:9px;border:1px solid #7d643d;border-radius:11px;background:radial-gradient(circle at 28% 50%,rgba(71,48,21,.9),rgba(8,8,7,.96) 72%);}
+#game-stage .team-relic-detail-art{grid-column:1;grid-row:1/4;width:100%;max-width:132px;display:flex;align-items:center;justify-content:center;justify-self:center;margin:0;border-radius:10px;}
+#game-stage .team-relic-detail-hero h2{grid-column:2;grid-row:1;align-self:end;min-width:0;margin:0 0 3px;font:900 22px/27px "Noto Serif TC",serif;color:#f2dcaa;letter-spacing:.08em;overflow-wrap:anywhere;}
+#game-stage .team-relic-detail-hero p{grid-column:2;grid-row:2;min-width:0;margin:0;color:#c3b493;font-size:15px;line-height:21px;}
+#game-stage .team-relic-detail-hero strong{grid-column:2;grid-row:3;align-self:start;min-width:0;display:block;margin-top:4px;color:#d0bd87;font-size:14px;line-height:20px;overflow-wrap:anywhere;}
 #game-stage .team-relic-detail section{margin-bottom:8px;padding:10px;border:1px solid rgba(127,99,57,.46);border-radius:8px;background:rgba(16,13,10,.78);}
-#game-stage .team-relic-detail section h3{margin:0 0 5px;color:#d4af67;font-size:14px;line-height:19px;letter-spacing:.05em;}
-#game-stage .team-relic-detail section p{margin:0;color:#ddd2bf;font-size:13px;line-height:20px;}
-#game-stage .team-relic-upgrade b{display:block;margin-top:5px;color:#f0d18a;font-size:14px;line-height:19px;}
+#game-stage .team-relic-detail section h3{margin:0 0 5px;color:#d4af67;font-size:18px;line-height:23px;letter-spacing:.05em;}
+#game-stage .team-relic-detail section p{margin:0;color:#ddd2bf;font-size:15px;line-height:21px;}
+#game-stage .team-relic-upgrade b{display:block;margin-top:5px;color:#f0d18a;font-size:16px;line-height:21px;}
 #game-stage .team-relic-detail-actions{position:sticky;bottom:-9px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:9px 0;background:linear-gradient(180deg,rgba(7,7,6,0),#070706 30%);}
-#game-stage .team-relic-detail-actions button{min-height:44px;border:1px solid #bc8a3e;border-radius:8px;background:linear-gradient(180deg,#543719,#24150a);color:#ffe09a;font-size:14px;font-weight:900;}
+#game-stage .team-relic-detail-actions button{min-height:44px;border:1px solid #bc8a3e;border-radius:8px;background:linear-gradient(180deg,#543719,#24150a);color:#ffe09a;font-size:15px;font-weight:900;}
 #game-stage .team-relic-detail-actions button:disabled{opacity:.42;filter:grayscale(.5);}
 #game-stage .team-relic-battle-banner{position:absolute;z-index:6100;left:50%;top:48%;transform:translate(-50%,-50%) scale(.94);display:flex;align-items:center;justify-content:center;gap:9px;min-width:210px;max-width:380px;padding:10px 16px;border:1px solid rgba(229,183,87,.9);border-radius:20px;background:linear-gradient(90deg,rgba(9,8,7,.97),rgba(65,43,17,.97),rgba(9,8,7,.97));color:#f7dda0;box-shadow:0 7px 22px rgba(0,0,0,.65),0 0 18px rgba(211,158,58,.2);opacity:0;pointer-events:none;transition:opacity .13s ease,transform .18s ease;}
 #game-stage .team-relic-battle-banner.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
@@ -145,4 +156,4 @@
     color:#FF9F38!important;
     text-shadow:0 1px 2px #000,0 0 7px rgba(255,159,56,.72)!important;
 }
-@media(max-width:390px){#game-stage .team-relic-current-card{grid-template-columns:64px minmax(0,1fr);padding:8px;}#game-stage .team-relic-card{min-height:136px;padding:7px;}#game-stage .team-relic-card-art{height:70px;}}
+@media(max-width:390px){#game-stage .team-relic-current-card{grid-template-columns:68px minmax(0,1fr);padding:8px;}#game-stage .team-relic-current-art{width:68px;}#game-stage .team-relic-card{grid-template-columns:62px minmax(0,1fr);min-height:140px;padding:7px;gap:3px 7px;}#game-stage .team-relic-card-art{width:62px;}#game-stage .team-relic-detail-hero{grid-template-columns:minmax(92px,34%) minmax(0,1fr);gap:2px 9px;padding:12px 10px;}}
