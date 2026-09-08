@@ -51,8 +51,10 @@ for(const record of records){
 
 assert.equal(records.length,345,"baseline <13px declaration count changed; audit base must stay reproducible");
 assert.equal(Object.values(buckets).reduce((sum,list)=>sum+list.length,0),records.length);
-console.log("BASELINE_UI_TYPOGRAPHY_CLASSIFICATION="+JSON.stringify(Object.fromEntries(Object.entries(buckets).map(([key,list])=>[key,list.length]))));
+const counts=Object.fromEntries(Object.entries(buckets).map(([key,list])=>[key,list.length]));
+console.log("BASELINE_UI_TYPOGRAPHY_CLASSIFICATION="+JSON.stringify(counts));
 for(const [key,list] of Object.entries(buckets)){
     console.log(`--- ${key} (${list.length}) ---`);
     list.slice(0,12).forEach(item=>console.log(`${item.value}px ${item.file}:${item.line} ${item.source}`));
 }
+assert.fail("CLASSIFICATION_CAPTURE="+JSON.stringify(counts));
