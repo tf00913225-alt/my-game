@@ -300,6 +300,38 @@
     line-height:18px;
 }
 
+/* Other formal non-battle mobile owners discovered by the full typography scan. */
+#game-stage #skillPage .skill-loadout-slot{min-height:60px!important;font-size:15px!important;line-height:1.25!important;}
+#game-stage #skillPage .skill-loadout-slot-name{font-size:15px!important;line-height:18px!important;}
+#game-stage #statusPage .status-points-line{font-size:14px!important;line-height:1.45!important;}
+#game-stage #statusPage .status-formula-hint,#game-stage #statusPage .status-preview-bar-label{font-size:14px!important;line-height:1.4!important;}
+#game-stage #mapPage .map-player-name{max-width:62px!important;font-size:13px!important;line-height:17px!important;}
+#game-stage #mapPage .map-player-level{font-size:13px!important;line-height:17px!important;}
+#game-stage #mapPage .map-follower{width:64px!important;padding:3px!important;}
+#game-stage #mapPage .map-follower-id{max-width:60px!important;font-size:13px!important;line-height:17px!important;}
+#game-stage #mapPage .map-follower-level{font-size:13px!important;line-height:17px!important;}
+#game-stage #homeFeatureModal [onclick*="selectCharacterForTabs"]>div[style*="font-size:11px"],#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:11px"]{font-size:15px!important;line-height:19px!important;}
+#game-stage #homeFeatureModal [id^="characterAvatarLevel"],#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:10px"]{font-size:14px!important;line-height:18px!important;}
+#game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody>div:first-child{font-size:15px!important;line-height:1.7!important;}
+#game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody div[style*="font-size:11px"]{font-size:14px!important;line-height:1.55!important;}
+#game-stage .v132-dungeon-list>div[style*="font-size:11px"]{font-size:14px!important;line-height:1.5!important;}
+#game-stage .v17361-reward-icon>em{font-size:13px!important;line-height:17px!important;}
+/* Native all-skill preview is scaled from 1080 design space; 34px is the real 13px floor at a 420px phone. */
+#game-stage #allElementSkillPreviewModal .skill-preview-card span{font-size:34px!important;}
+#game-stage #allElementSkillPreviewModal .skill-preview-heading button{font-size:39px!important;}
+
+/* Body-mounted reward dialogs are not descendants of #game-stage. */
+.v132-reward-note{font-size:14px!important;line-height:1.55!important;}
+.v132-ticket-preview-modal p,.v132-ticket-preview-modal .v132-preview-item{font-size:14px!important;line-height:1.45!important;}
+.v132-set-title{font-size:16px!important;line-height:1.35!important;}
+.v132-set-bonus{font-size:14px!important;line-height:1.5!important;}
+.v132-reward-modal .v17363-preview-heading small{font:700 13px/1.3 Cinzel,serif!important;letter-spacing:.16em!important;}
+.v132-reward-modal .v17363-preview-group b{font-size:16px!important;line-height:1.4!important;}
+.v132-reward-modal .v17363-preview-group em{font-size:13px!important;line-height:1.4!important;}
+.v132-reward-modal .v17363-preview-group p{font-size:15px!important;line-height:1.6!important;}
+.v132-reward-modal .v17363-preview-note{font-size:14px!important;line-height:1.55!important;}
+.v132-reward-modal .v132-reward-actions button{min-height:40px!important;font-size:15px!important;line-height:1.25!important;}
+
 @media (max-height:720px){
     #game-stage #battlePage #battleMonsterArea{transform:translateY(12px);}
     #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
