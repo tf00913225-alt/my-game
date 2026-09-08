@@ -1,0 +1,43 @@
+{
+  "date": "2026-09-08",
+  "title": "戰鬥動作與秘寶演出序列化",
+  "base_branch": "dev",
+  "base_sha": "556a156e3b40a82febc6a3c88e0251c36953885d",
+  "work_branch": "fix/battle-action-presentation-sequencing",
+  "status": "IMPLEMENTED_PENDING_CI_AND_LIVE_QA",
+  "requirements": [
+    {
+      "id": 1,
+      "request": "秘寶效果必須等上一個技能／傷害動畫結束後再開始，演出期間不得跳出下一回合資訊或下一個操作。",
+      "owner": ["js/60-team-relic-system.js", "js/37-v142-skill-animation.js"],
+      "implementation": "保留 V142 為技能與行動邊界唯一 owner；Team Relic 使用既有 startTurn/processNextCombatant 整合點建立單一 relic presentation queue，先等待目前 V142 gate，額外保留 500ms 視覺收尾，再播放秘寶並鎖住後續流程 2200ms。沒有新增 vXXX patch 或額外核心 wrapper。"
+    },
+    {
+      "id": 2,
+      "request": "秘寶與技能同時補 HP、SP 時，HP 綠字在上，SP 橘字在下，不得重疊。",
+      "owner": ["js/60-team-relic-system.js", "css/55-team-relic-system.css"],
+      "implementation": "秘寶 SP 移除獨立 DOM 浮字路徑，改走既有 showPlayerHit(...,'sp',...)；共用 recovery popup 將 heal 固定上層綠字、SP 固定下層橘字，故技能與秘寶使用同一視覺語言。"
+    },
+    {
+      "id": 3,
+      "request": "戰鬥中上一動作傷害／回復動畫未完成時，不得開始下一個指令或動作。",
+      "owner": ["js/37-v142-skill-animation.js", "css/55-team-relic-system.css"],
+      "implementation": "V142 現有 Promise.all(timeReady, animationReady) 行動 gate 保留不變；傷害／回復浮字動畫縮至 650ms，使其在既有 1600ms 普通節奏與長技能 gate 內完成，避免下一動作與舊浮字交疊。"
+    },
+    {
+      "id": 4,
+      "request": "回天寶輪等致命傷害攔截不能因演出延遲而失去保命效果。",
+      "owner": ["js/60-team-relic-system.js"],
+      "implementation": "before_lethal_damage 機械結算仍立即執行；HP/SP 視覺先收集，等上一動作動畫結束後才於秘寶演出時顯示，兼顧存活邏輯與畫面序列化。"
+    }
+  ],
+  "verification": [
+    "node tests/v174-battle-presentation-sequencing.test.js",
+    "node tests/v174-team-relic-system.test.js",
+    "node tests/v174-team-relic-hardening.test.js",
+    "node tests/v142-skill-animation.test.js",
+    "tests/ui-team-relic-mobile-browser.test.js",
+    "Repository checks",
+    "Dev deployment gate / live mobile QA"
+  ]
+}

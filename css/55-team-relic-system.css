@@ -131,4 +131,18 @@
 #game-stage .team-relic-battle-icon{width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:center;border:1px solid #c59643;border-radius:50%;background:#21150a;color:#f1d28d;font:900 15px "Noto Serif TC",serif;}
 #game-stage #battlePage .battle-player .team-relic-sp-float{position:absolute;z-index:6200;left:50%;top:72%;min-width:58px;padding:2px 6px;border-radius:999px;color:#8fc0ff;background:rgba(8,17,37,.72);font:900 13px/17px "Noto Sans TC",sans-serif;text-align:center;white-space:nowrap;text-shadow:0 1px 2px #000;pointer-events:none;animation:teamRelicSpFloat 1.05s ease-out both;}
 @keyframes teamRelicSpFloat{0%{opacity:0;transform:translate(-50%,4px) scale(.9)}15%{opacity:1;transform:translate(-50%,8px) scale(1)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px) scale(.98)}}
+
+/* Shared battle recovery presentation. Skills and relics both flow through
+   showPlayerHit(), so one visual language prevents stacked HP/SP from colliding. */
+#game-stage #battlePage .damage-popup{animation-duration:.65s!important;}
+#game-stage #battlePage .battle-player .damage-popup.heal-popup{
+    top:20%!important;
+    color:#19d85c!important;
+    text-shadow:0 1px 2px #000,0 0 7px rgba(25,216,92,.72)!important;
+}
+#game-stage #battlePage .battle-player .damage-popup.sp-popup{
+    top:48%!important;
+    color:#FF9F38!important;
+    text-shadow:0 1px 2px #000,0 0 7px rgba(255,159,56,.72)!important;
+}
 @media(max-width:390px){#game-stage .team-relic-current-card{grid-template-columns:64px minmax(0,1fr);padding:8px;}#game-stage .team-relic-card{min-height:136px;padding:7px;}#game-stage .team-relic-card-art{height:70px;}}
