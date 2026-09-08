@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-08-three-branch-dev-integration",
+  "baseBranch": "dev",
+  "baseCommit": "39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5",
+  "officialVersion": "173.64",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "INTEGRATION-01",
+      "status": "VERIFIED",
+      "requirement": "以 GitHub 最新 dev、三條實際遠端分支、指定 commit 與相對 diff 完成前置風險分析",
+      "evidence": [
+        "Initial dev 39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5; initial main 8e67335eaa8243225144416a7ad378cca2b03ddc",
+        "All specified remote branch tips matched exactly and shared the current dev merge base",
+        "AGENTS.md, CLAUDE.md, HANDOFF.md, UI_GUIDELINES.md, ARCHITECTURE_RULES.md, release rules and actual branch diffs were read"
+      ]
+    },
+    {
+      "id": "INTEGRATION-02",
+      "status": "VERIFIED",
+      "requirement": "gameplay/UI regression branch 必須先獨立合入並驗證，不得被後續 UI 修改回退",
+      "evidence": [
+        "fix/gameplay-ui-battle-regressions-20260908@4a592dd4c41d7efb1a4849fbfe0cbf68598121bf",
+        "Merge commit 035845aa703a7a72c053ae9d0945b9f1f75d4be2",
+        "GitHub Actions run 34238583523 SUCCESS with exact-SHA dev deployment"
+      ]
+    },
+    {
+      "id": "INTEGRATION-03",
+      "status": "VERIFIED",
+      "requirement": "秘寶方形圖 branch 必須在第一條之上獨立合入並保留入口、觸控與 runtime 資料流",
+      "evidence": [
+        "fix/ui-relic-square-art@1788efe7bd20492014b75f1311ab2badde0e7ba0",
+        "Merge commit 9fae60e148f39782e3b09b71b4ade604243fea65",
+        "GitHub Actions run 34239750357 SUCCESS with exact-SHA dev deployment"
+      ]
+    },
+    {
+      "id": "INTEGRATION-04",
+      "status": "VERIFIED",
+      "requirement": "全域非戰鬥字級 branch 必須在前兩條之上人工整合 CSS 衝突，戰鬥 carve-out 與前兩條功能均不得覆蓋",
+      "evidence": [
+        "fix/global-ui-font-size-standard@58dfa219269c8d8a5f31675adbeceb5c920e5bfe",
+        "Merge commit 1ee3cc8fbfbced873080f21b0cc4c64f1f670875",
+        "Manual conflicts: css/52-v173.50-inventory-qol.css and css/55-team-relic-system.css",
+        "Black-gold controls, 1:1 relic art, pan-x/pan-y, typography hierarchy and responsive geometry are all retained"
+      ]
+    },
+    {
+      "id": "INTEGRATION-05",
+      "status": "VERIFIED",
+      "requirement": "整合後不得存在重複函式、重複 listener、失效資源、conflict marker、舊 owner 回退或錯誤 battle baseline",
+      "evidence": [
+        "No JavaScript merge conflict; no addEventListener delta from the integration; inventoryStackIdentity has one declaration and one export",
+        "250/250 syntax, 125/125 Node suites, 467 resources, 291 IDs, 108 loader dependencies, git-diff and conflict-marker gates passed",
+        "Battle preservation protects the approved gameplay branch baseline including mechanism 9px and charge 10px"
+      ]
+    },
+    {
+      "id": "INTEGRATION-06",
+      "status": "VERIFIED",
+      "requirement": "GitHub shallow-checkout CI 失敗必須在真正 workflow owner 修正並重新完整驗證",
+      "evidence": [
+        "Run 34242410904 exposed missing historical tree objects under fetch-depth:2",
+        "Follow-up ff5db2efabfff533a39724b16850a2169031f4f7 fetches only the two fixed audit baselines",
+        "A separate depth-2 clone reproduced missing objects, fetched them, and passed both historical typography suites",
+        "Run 34243622829 Repository checks and Dev deployment gate SUCCESS"
+      ]
+    },
+    {
+      "id": "INTEGRATION-07",
+      "status": "VERIFIED",
+      "requirement": "完成實際 mobile/browser、捲動、modal、資源、console 與精確 dev 部署驗證",
+      "evidence": [
+        "GitHub mobile Chrome suites, skill progression QA, live Abyss QA and live battle/audio QA passed",
+        "Cloud Browser: 20 relic cards; 1:1 list/detail art; zero card/hero/page overflow; body scroll 0→527; tabs 0→121; return action passed",
+        "App-origin console errors/warnings 0; broken images 0; 56 stylesheets loaded; three new WebP assets returned HTTP 200 image/webp",
+        "Deployed manifest returned dev, commitSha ff5db2efabfff533a39724b16850a2169031f4f7, V173.64 and cache 173.64"
+      ]
+    },
+    {
+      "id": "INTEGRATION-08",
+      "status": "VERIFIED",
+      "requirement": "全程只推進 dev，main 不得修改",
+      "evidence": [
+        "Only refs/heads/dev was updated with force=false",
+        "No merge, push, PR or ref update targeted main",
+        "Main remained 8e67335eaa8243225144416a7ad378cca2b03ddc through functional validation"
+      ]
+    }
+  ],
+  "automatedVerification": "RUNS_34238583523_34239750357_34243622829_SUCCESS; 250_OF_250_JS_SYNTAX; 125_OF_125_NODE_SUITES; 467_STATIC_RESOURCES; 291_UNIQUE_HTML_IDS; 108_LOADER_DEPENDENCIES; RELEASE_10_OF_10; GIT_DIFF_PASSED",
+  "visualVerification": "DEV_CLOUD_BROWSER_VERIFIED; MOBILE_CHROME_SUITES; LIVE_ABYSS_AND_BATTLE_AUDIO_QA",
+  "notes": "Game/Cache Version intentionally remains V173.64. Two CSS conflicts were manually integrated. Initial third-merge CI failed only because a shallow checkout lacked fixed historical test objects; workflow owner was corrected and fully reverified. main was not modified."
+}
