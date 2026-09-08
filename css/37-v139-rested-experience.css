@@ -24,7 +24,8 @@
 
 .v139-rested-exp-heading{
     color:var(--ui-gold,#c89a48);
-    font-size:15px;
+    font-size:18px;
+    line-height:1.3;
     font-weight:800;
     letter-spacing:.08em;
 }
@@ -45,13 +46,13 @@
 .v139-rested-exp-count span,
 .v139-rested-exp-meta{
     color:var(--ui-text-muted,#a99b83);
-    font-size:12px;
+    font-size:14px;
 }
 
 .v139-rested-exp-panel p{
     margin:var(--space-sm,8px) 0;
-    font-size:13px;
-    line-height:1.55;
+    font-size:15px;
+    line-height:1.6;
 }
 
 .v139-rested-exp-meta{
