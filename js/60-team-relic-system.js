@@ -31,7 +31,9 @@
         shieldModifier:1,
         controlModifier:1,
         burnPercent:3,
-        bannerDurationMs:1100,
+        bannerDurationMs:1400,
+        presentationDurationMs:2200,
+        presentationLeadGapMs:500,
         upgradeGoldBase:650,
         upgradeGoldPerLevel:180
     });
@@ -193,9 +195,15 @@
     let currentFilter="all";
     let currentDetailId=null;
     let sourceContext=null;
+    let relicVisualCollector=null;
+    let relicPresentationTail=Promise.resolve();
+    let relicPresentationPending=0;
+    let relicPresentationGeneration=0;
+    const deferredStartTurns=new Set();
+    const deferredCombatants=new Set();
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
-    function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+    function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
     function currentRound(){ return Math.max(1,Math.floor(typeof turn!=="undefined"?numeric(turn):1)); }
     function currentBattleToken(){ return typeof battleToken!=="undefined"?battleToken:null; }
     function partyIndexes(){ return typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes().slice(0,3):[0,1,2].filter(i=>typeof getPartyCharacterByIndex==="function"&&getPartyCharacterByIndex(i)); }
@@ -209,6 +217,61 @@
         return !!(entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(s=>s&&s.type===type&&numeric(s.turnsLeft)>0));
     }
     function withSource(type,callback){ const previous=sourceContext; sourceContext={sourceType:type}; try{return callback();}finally{sourceContext=previous;} }
+    function waitMs(ms){ return new Promise(resolve=>setTimeout(resolve,Math.max(0,Math.floor(numeric(ms))))); }
+    function hasLiveBattlePresentationHost(){
+        return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
+    }
+    function resetRelicPresentationQueue(){
+        relicPresentationGeneration++;
+        relicPresentationTail=Promise.resolve();
+        relicPresentationPending=0;
+        relicVisualCollector=null;
+        deferredStartTurns.clear();
+        deferredCombatants.clear();
+    }
+    function currentAnimationGate(){
+        const director=window.v142SkillAnimationDirector;
+        return director&&typeof director.getActive==="function"?director.getActive():null;
+    }
+    function waitForAnimationRelease(gate){
+        if(!gate){ return Promise.resolve(); }
+        const ready=gate.done?Promise.resolve():gate.promise;
+        return Promise.resolve(ready).then(()=>waitMs(Math.max(0,numeric(gate.deadline)+RELIC_BALANCE_CONFIG.presentationLeadGapMs-Date.now())));
+    }
+    function queueRelicVisual(callback){
+        if(typeof callback!=="function"){ return; }
+        if(relicVisualCollector){ relicVisualCollector.push(callback); return; }
+        callback();
+    }
+    function flushRelicVisuals(list){ (list||[]).forEach(callback=>{ try{callback();}catch(error){console.error("秘寶視覺效果失敗：",error);} }); }
+    function queueRelicPresentation(def,onStart){
+        if(!hasLiveBattlePresentationHost()){
+            showBanner(def);
+            if(typeof onStart==="function"){ onStart(); }
+            return null;
+        }
+        const generation=relicPresentationGeneration;
+        const token=currentBattleToken();
+        const gate=currentAnimationGate();
+        const previousTail=relicPresentationTail;
+        relicPresentationPending++;
+        const job=Promise.resolve(previousTail).catch(()=>{}).then(()=>waitForAnimationRelease(gate)).then(()=>{
+            if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){ return; }
+            showBanner(def);
+            if(typeof onStart==="function"){ onStart(); }
+            return waitMs(RELIC_BALANCE_CONFIG.presentationDurationMs);
+        }).catch(error=>{ console.error("秘寶演出序列失敗：",error); }).then(()=>{
+            if(generation===relicPresentationGeneration){ relicPresentationPending=Math.max(0,relicPresentationPending-1); }
+        });
+        relicPresentationTail=job;
+        return job;
+    }
+    function waitForRelicPresentation(callback){
+        if(typeof callback!=="function"){ return; }
+        const tail=relicPresentationTail;
+        if(relicPresentationPending<=0){ callback(); return; }
+        Promise.resolve(tail).then(callback);
+    }
 
     function normalizeOwned(raw){
         const next={};
@@ -398,27 +461,24 @@
     }
     function battleLog(message){ if(typeof addBattleLog==="function"){ addBattleLog("【秘寶】"+message); } }
 
+    function emitRelicPlayerHit(amount,type,index,isPositive){
+        if(amount<=0||typeof showPlayerHit!=="function"){ return; }
+        queueRelicVisual(()=>withSource(SOURCE_RELIC,()=>showPlayerHit(amount,type,index,isPositive)));
+    }
+    function emitRelicMonsterHit(index,amount,type,isCrit){
+        if(amount<=0||typeof showMonsterHit!=="function"){ return; }
+        queueRelicVisual(()=>withSource(SOURCE_RELIC,()=>showMonsterHit(index,amount,type,isCrit)));
+    }
     function healAlly(index,percent){
         const character=characterAt(index),stats=statsAt(index); if(!character||!stats||numeric(character.hp)<=0||percent<=0){ return 0; }
         const amount=Math.max(1,Math.floor(numeric(stats.maxHP)*percent/100*RELIC_BALANCE_CONFIG.healModifier));
         const actual=Math.max(0,Math.min(amount,numeric(stats.maxHP)-numeric(character.hp))); character.hp+=actual;
-        if(actual>0&&typeof showPlayerHit==="function"){ withSource(SOURCE_RELIC,()=>showPlayerHit(actual,"heal",index,true)); }
+        if(actual>0){ emitRelicPlayerHit(actual,"heal",index,true); }
         return actual;
     }
     function showRelicSpFloat(index,amount){
         if(amount<=0){ return; }
-        if(typeof document!=="undefined"){
-            const card=document.getElementById("battlePlayerCard"+index);
-            if(card){
-                const node=document.createElement("span");
-                node.className="team-relic-sp-float";
-                node.textContent="+"+Math.floor(amount)+" SP";
-                card.appendChild(node);
-                setTimeout(()=>{ if(node&&node.parentNode){ node.parentNode.removeChild(node); } },1050);
-                return;
-            }
-        }
-        if(typeof showPlayerHit==="function"){ withSource(SOURCE_RELIC,()=>showPlayerHit(amount,"sp",index,true)); }
+        emitRelicPlayerHit(amount,"sp",index,true);
     }
     function restoreSp(index,percent){
         const character=characterAt(index),stats=statsAt(index); if(!character||!stats||numeric(character.hp)<=0||percent<=0){ return 0; }
@@ -449,7 +509,7 @@
         const monster=typeof monsters!=="undefined"?monsters[index]:null; if(!monster||!monster.alive||amount<=0){ return 0; }
         const final=Math.max(1,Math.floor(amount*(isBoss(monster)?RELIC_BALANCE_CONFIG.bossDamageModifier:1)));
         monster.hp=Math.max(0,numeric(monster.hp)-final);
-        if(typeof showMonsterHit==="function"){ withSource(SOURCE_RELIC,()=>showMonsterHit(index,final,"hp",false)); }
+        emitRelicMonsterHit(index,final,"hp",false);
         if(monster.hp<=0&&typeof killMonster==="function"){ withSource(SOURCE_RELIC,()=>killMonster(index)); }
         return final;
     }
@@ -521,6 +581,15 @@
         return prevented;
     }
 
+    function performRelicPresentation(def,triggerDef,payload,preResolvedVisuals){
+        queueRelicPresentation(def,()=>{
+            if(preResolvedVisuals){ flushRelicVisuals(preResolvedVisuals); }
+            else{ resolveEffects(triggerDef,def,payload||{}); }
+            battleLog(def.name+"｜"+currentEffectText(def,relicLevel(def.id)));
+            if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
+        });
+    }
+
     function dispatchRelicEvent(event,payload){
         if(!relicBattleState||!relicBattleState.relicId){ return false; }
         if(payload&&payload.sourceType===SOURCE_RELIC){ return false; }
@@ -537,12 +606,18 @@
             if(!canTrigger(triggerDef,key)||!triggerMatches(triggerDef,event,payload,key)){ return; }
             if(triggerDef.type==="ally_hp_below"&&payload){ relicBattleState.lastHpDamageEvent[key]=payload.damageEventId; }
             markTriggered(triggerDef,key);
-            showBanner(def);
-            resolveEffects(triggerDef,def,payload||{});
-            battleLog(def.name+"｜"+currentEffectText(def,relicLevel(def.id)));
+            if(triggerDef.type==="before_lethal_damage"&&hasLiveBattlePresentationHost()){
+                const visuals=[];
+                const previousCollector=relicVisualCollector;
+                relicVisualCollector=visuals;
+                try{ resolveEffects(triggerDef,def,payload||{}); }
+                finally{ relicVisualCollector=previousCollector; }
+                performRelicPresentation(def,triggerDef,payload||{},visuals);
+            }else{
+                performRelicPresentation(def,triggerDef,payload||{},null);
+            }
             triggered=true;
         });
-        if(triggered&&typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
         return triggered;
     }
 
@@ -554,31 +629,61 @@
 
     if(typeof startBattle==="function"){
         const previous=startBattle;
-        startBattle=function(){ relicBattleState=null; pendingBattleInit=true; const result=previous.apply(this,arguments); if(!battleActive){ pendingBattleInit=false; } return result; };
+        startBattle=function(){
+            resetRelicPresentationQueue();
+            relicBattleState=null; pendingBattleInit=true;
+            const result=previous.apply(this,arguments);
+            if(!battleActive){ pendingBattleInit=false; }
+            return result;
+        };
     }
     if(typeof startTurn==="function"){
         const previous=startTurn;
         startTurn=function(){
+            const token=arguments[0];
+            const key=String(token)+":"+String(typeof turn!=="undefined"?turn:0);
+            if(deferredStartTurns.has(key)){ return; }
             if(typeof battleActive!=="undefined"&&battleActive){
                 if(pendingBattleInit||!relicBattleState||relicBattleState.battleToken!==currentBattleToken()){ initializeBattleRelic(); }
                 cleanupPlayerMods();
+                resetRoundCounters();
+                dispatchRelicEvent("round_start",{sourceType:"system"});
             }
-            const result=previous.apply(this,arguments);
-            if(typeof battleActive!=="undefined"&&battleActive&&relicBattleState){
-                resetRoundCounters(); dispatchRelicEvent("round_start",{sourceType:"system"});
+            if(relicPresentationPending>0&&hasLiveBattlePresentationHost()){
+                deferredStartTurns.add(key);
+                const that=this,args=arguments,generation=relicPresentationGeneration;
+                waitForRelicPresentation(()=>{
+                    deferredStartTurns.delete(key);
+                    if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){ return; }
+                    previous.apply(that,args);
+                });
+                return;
             }
-            return result;
+            return previous.apply(this,arguments);
         };
     }
     if(typeof processNextCombatant==="function"){
         const previous=processNextCombatant;
         processNextCombatant=function(){
+            const token=arguments[0];
             if(
                 relicBattleState&&typeof battleActive!=="undefined"&&battleActive&&
                 typeof battlePhase!=="undefined"&&battlePhase==="resolve"&&
                 typeof initiativeIndex!=="undefined"&&typeof initiativeQueue!=="undefined"&&initiativeIndex>=initiativeQueue.length
             ){
                 dispatchRelicEvent("round_end",{sourceType:"system"});
+            }
+            if(relicPresentationPending>0&&hasLiveBattlePresentationHost()){
+                const key=String(token)+":"+String(typeof turn!=="undefined"?turn:0)+":"+String(typeof initiativeIndex!=="undefined"?initiativeIndex:0);
+                if(deferredCombatants.has(key)){ return; }
+                deferredCombatants.add(key);
+                const that=this,args=arguments,generation=relicPresentationGeneration;
+                waitForRelicPresentation(()=>{
+                    deferredCombatants.delete(key);
+                    if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){ return; }
+                    previous.apply(that,args);
+                });
+                return;
             }
             return previous.apply(this,arguments);
         };
@@ -614,7 +719,15 @@
                 const reflectedIndex=hitTargets.find(index=>relicBattleState.reflectReady[String(index)]);
                 if(reflectedIndex!==undefined&&monster&&monster.alive){
                     const reflect=relicBattleState.reflectReady[String(reflectedIndex)]; delete relicBattleState.reflectReady[String(reflectedIndex)];
-                    const def=activeBattleRelic(); if(def){ const damage=Math.max(1,Math.floor(getRelicPower(def.id)*numeric(reflect.multiplier))); damageEnemy(monsterIndex,damage,"earth"); battleLog(def.name+"反震"+damage+"點秘寶傷害。"); }
+                    const def=activeBattleRelic();
+                    if(def){
+                        queueRelicPresentation(def,()=>{
+                            const damage=Math.max(1,Math.floor(getRelicPower(def.id)*numeric(reflect.multiplier)));
+                            damageEnemy(monsterIndex,damage,"earth");
+                            battleLog(def.name+"反震"+damage+"點秘寶傷害。");
+                            if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
+                        });
+                    }
                 }
             }
             return result;
@@ -691,11 +804,11 @@
 
     if(typeof winBattle==="function"){
         const previous=winBattle;
-        winBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; return result; };
+        winBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; resetRelicPresentationQueue(); return result; };
     }
     if(typeof loseBattle==="function"){
         const previous=loseBattle;
-        loseBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; return result; };
+        loseBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; resetRelicPresentationQueue(); return result; };
     }
 
     function rarityClass(def){ return "rarity-"+(def&&def.rarity||"white"); }
@@ -838,6 +951,7 @@
     window.v174RelicDevUnlock=function(id){ if(!relicCatalog[id]){return false;} playerRelics[id].unlocked=true; playerRelics[id].seen=false; saveRelics(); syncHomeRelicUi(); return true; };
     window.v174RelicDebugDispatch=dispatchRelicEvent;
     window.v174RelicDebugState=function(){ return relicBattleState?JSON.parse(JSON.stringify(relicBattleState)):null; };
+    window.v174RelicPresentationState=function(){ return {pending:relicPresentationPending,generation:relicPresentationGeneration}; };
     window.v174RelicSystem=Object.freeze({
         catalog:relicCatalog,balance:RELIC_BALANCE_CONFIG,rarityLabels:RARITY_LABELS,categoryLabels:CATEGORY_LABELS,
         getRelicPower:getRelicPower,getOwnedState:()=>playerRelics,getTeamLoadout:()=>teamLoadout,
