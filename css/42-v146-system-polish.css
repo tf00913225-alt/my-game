@@ -289,7 +289,7 @@
     font-size:14px;
     line-height:18px;
 }
-#game-stage .v141-dungeon-cover-actions button{
+#game-stage #dungeonPage .v141-dungeon-cover-actions button{
     min-height:38px;
     font-size:15px;
     line-height:1.2;
