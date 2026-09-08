@@ -26,8 +26,8 @@ assert.match(qol,/descriptor\.kind==="ticket"/);
 /* 2026-09-08 regressions: legacy material ids must still collapse into one
    visible stack when they represent the same named material. */
 assert.match(qol,/function inventoryStackIdentity\(item\)/);
-assert.match(qol,/type==="material"[\s\S]*?name:"\+name/);
-assert.match(qol,/const exactKey=inventoryStackIdentity\(item\)/);
+assert.match(qol,/if\(type==="material"\)\{[\s\S]*?const name=String\(item\.name\|\|""\)\.trim\(\);[\s\S]*?return "material::name::"\+name;/);
+assert.match(qol,/const stackKey=inventoryStackIdentity\(item\)/);
 
 /* Quick-sell and batch actions keep the same black/gold readable button
    language instead of the former yellow background + black text treatment. */
