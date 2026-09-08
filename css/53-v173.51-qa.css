@@ -53,11 +53,11 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
 /* Final shop QA owner: typography and row geometry move together so readable
    text never gets forced back below the global 13px floor to fit one screen. */
 #game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card{grid-template-rows:20px 18px 20px 18px 36px!important}
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-name{font-size:16px!important;line-height:20px!important}
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-slot{font-size:13px!important;line-height:18px!important}
-#game-stage #homeFeatureModal.v131-shop-open .v17346-stat{font-size:14px!important;line-height:20px!important}
-#game-stage #homeFeatureModal.v131-shop-open .v17346-reforge-mini{min-height:18px!important;font-size:13px!important;line-height:18px!important}
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-buy{height:36px!important;min-height:36px!important;font-size:15px!important}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-name{font-size:16px!important;line-height:20px!important}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-slot{font-size:13px!important;line-height:18px!important}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-stat{font-size:14px!important;line-height:20px!important}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-reforge-mini{min-height:18px!important;font-size:13px!important;line-height:18px!important}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-buy{height:36px!important;min-height:36px!important;font-size:15px!important}
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-shop{grid-template-rows:minmax(0,1fr) 64px!important}
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh{height:64px!important;min-height:64px!important}
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh b{font-size:15px!important;line-height:20px!important}
