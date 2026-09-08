@@ -47,8 +47,10 @@ assert.match(relicCss,/team-relic-modal \.home-feature-modal-box\.wide #homeFeat
 
 /* Compact home functions size to content; large empty full-height windows are
    reserved for genuinely large features. */
-assert.match(compactModalCss,/#homeFeatureModal:has\(#restButton\) \.home-feature-modal-box\{[\s\S]*?height:auto !important;[\s\S]*?max-height:min\(/);
-assert.match(compactModalCss,/#homeFeatureModal:has\(#homeFeatureModalBody > \.system-panel\) \.home-feature-modal-box\{[\s\S]*?height:auto !important;[\s\S]*?max-height:min\(/);
+assert.match(compactModalCss,/#homeFeatureModal:has\(#restButton\) \.home-feature-modal-box\{[\s\S]*?height:auto !important;[\s\S]*?max-height:calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\) !important;/);
+assert.match(compactModalCss,/#homeFeatureModal:has\(#homeFeatureModalBody > \.system-panel\) \.home-feature-modal-box\{[\s\S]*?height:auto !important;[\s\S]*?max-height:calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\) !important;/);
+assert.match(compactModalCss,/#homeFeatureModal:has\(#restButton\) #homeFeatureModalBody\{[\s\S]*?max-height:calc\(100% - 62px\) !important;[\s\S]*?overflow-y:auto !important;/);
+assert.match(compactModalCss,/#homeFeatureModal:has\(#homeFeatureModalBody > \.system-panel\) #homeFeatureModalBody\{[\s\S]*?max-height:calc\(100% - 62px\) !important;[\s\S]*?overflow-y:auto !important;/);
 
 /* Dungeon navigation uses the formal relic entry instead of the old shop slot. */
 assert.match(dungeonNav,/\["秘寶","assets\/ui\/nav-relic-v174\.webp","openHomeFeature\('relic'\)"\]/);
