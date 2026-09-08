@@ -632,7 +632,12 @@
     animation:gameplayMechanismBlocked .35s ease-out;
 }
 
+/* A resolved/destroyed card used to stay as an invisible flex item. When the
+   same BOSS spawned its next mechanism, that stale card still occupied the
+   first slot and pushed the visible card to the right of the BOSS. Keep the
+   destroy animation, but remove the stale node from flex layout immediately. */
 #game-stage #battleMonsterArea .boss-mechanism-card.destroying{
+    position:absolute;
     pointer-events:none;
     animation:gameplayMechanismDestroy .28s ease-in both;
 }
@@ -658,12 +663,23 @@
 
 #game-stage #battleMonsterArea .boss-mechanism-hp,
 #game-stage #battleMonsterArea .boss-mechanism-effect{
-    font-size:8px;
-    line-height:1.25;
+    font-size:9px;
+    line-height:1.3;
 }
 
 #game-stage #battleMonsterArea .boss-mechanism-hp{ color:#f1d388; }
 #game-stage #battleMonsterArea .boss-mechanism-effect{ color:#b9ad98; }
+
+/* Charge is the only mechanism with a lethal countdown. Keep the countdown in
+   the card itself (not only the battle log) and make that line readable at a
+   glance on a phone. */
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="charge"] .boss-mechanism-effect{
+    color:#ffd0c8;
+    font-size:10px;
+    font-weight:900;
+    line-height:1.3;
+    text-shadow:0 1px 2px #000,0 0 5px rgba(212,87,67,.42);
+}
 
 #game-stage #battlePage .battle-monster.gameplay-boss-protected{
     opacity:.58;
