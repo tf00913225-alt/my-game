@@ -93,17 +93,21 @@
   ],
   "verification": {
     "completed": [
-      "node --check：本輪直接修改／新增 runtime 通過",
+      "node --check：本輪直接修改／新增 runtime 全數通過",
       "Gameplay / BOSS / Tower runtime：13/13 通過",
       "Abyss regression：15/15 通過",
-      "Gameplay hub / loader / true-alpha icon：通過",
-      "完整 Node suites：119/119 通過（瀏覽器 QA 前基線）",
-      "Repository resources / HTML IDs / loader / git-diff：通過（瀏覽器 QA 前基線）"
+      "Gameplay hub / loader / 320×320 RGBA true-alpha icon 與四角 alpha=0：通過",
+      "完整 JavaScript syntax：244/244 通過",
+      "完整 Node suites：119/119 通過；Playwright smoke 未安裝 Chromium，未列入通過數",
+      "Repository resources：464；HTML IDs：291 unique；loader：108 dependencies / 26 ordered runtimes；git-diff：通過",
+      "Release Gate：V173.63 / cache 173.63 coherent，既有正式 Requirements 10/10 VERIFIED"
     ],
     "pending": [
-      "390×844 與 412×915 真實瀏覽器操作／版面 QA",
-      "遠端 feature branch Repository checks",
-      "驗收完成後才推導並同步下一個正式 Game / Cache Version"
-    ]
+      "390×844 與 412×915 官方 DEV 真實瀏覽器操作／版面 QA；官方預覽只部署 dev，且雲端瀏覽器政策拒絕未部署候選頁面",
+      "遠端 feature branch Repository checks；現有 workflow 僅由 dev/main push 或目標為 dev/main 的 PR 觸發",
+      "獲准整合 dev 後完成 CI、DEV exact-SHA、手機操作驗收，再將 12 項需求逐項改為 VERIFIED",
+      "全數 VERIFIED 後才推導並同步下一個正式 Game / Cache Version"
+    ],
+    "blocker": "本次明令禁止自行合併 dev/main，因此無法建立正式 DEV preview；不得以 RawCDN、GitHack、替代 browser surface 或政策繞過冒充正式瀏覽器驗收。"
   }
 }

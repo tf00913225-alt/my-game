@@ -1,3 +1,15 @@
+## 2026-09-08 玩法中心／BOSS 機制卡／四象塔／深淵入口重整（feature，待 DEV 瀏覽器驗收）
+
+- 基準為最新 `dev` `75cf90774d1d8a63818f65de999d044603e21a09`；工作分支 `feature/gameplay-boss-tower-hub`。依使用者要求未修改／合併 `dev` 或 `main`，Game／Cache Version 因 Requirement 尚未全數 VERIFIED 而維持 V173.63。
+- `js/gameplay-boss-tower-system.js` 是玩法中心、個人／世界 BOSS、五種機制卡與四象塔設定／進度的正式 owner；BOSS 與塔共用既有 `v132BuildDungeonMonster`／`v132LaunchDungeonBattle` 戰鬥 owner，機制卡使用不進入一般怪物陣列的 battle sidecar 專屬槽。
+- `index.html` 與 `css/gameplay-boss-tower.css` 建立獨立玩法中心、BOSS 雙標籤頁與四象塔固定大面板；底部保留五顆按鈕與 `bossNav` 相容 id，但玩家可見文字、aria、title、入口與 icon 均正式改為「玩法」。
+- 附件原圖經實際檢視後，只移除與畫面邊界連通的黑色背景；圖示 RGB 本體未重畫。輸出 `assets/ui/nav-gameplay.png` 為 320×320 RGBA 真透明 PNG，四角 alpha 均為 0，舊 `assets/ui/nav-boss.png` 保留。
+- 個人 BOSS 固定 Lv20～100、可不限次再戰且特殊首通獎勵只發一次；世界 BOSS 為永久單人四階段討伐，逐階勝利立即存檔，失敗不回退。護盾會阻擋 BOSS 點選、單體／三體／全體新直接效果與新異常，同一技能破盾後剩餘段數仍維持該次 shield snapshot；auto 依護盾→蓄力→回復→增幅→封鎖處理。
+- 四象塔共 100 層，Lv30 開放，UTC 週一沿用現有日期基準，以火→土→水→風循環；週內樓層／首通 claims 保存，跨週只清週資料，歷史最高與已取得資產保留。第 50 層使用目前正式四件元素秘寶自選資料。
+- 深淵玩家入口已自副本頁移到玩法中心；`js/59-abyss-two-tier-runtime.js` 仍是 Lv20／Lv40、地圖、五帝、寶箱、傳送、戰鬥與進度 owner。新增永久 `firstClearClaims`，再戰跳過已領首通寶箱／最終特殊獎勵；所有退出／完成路徑回玩法中心。
+- 已通過：244/244 JavaScript syntax、119/119 Node suites、464 resources、291 unique HTML IDs、108 loader dependencies／26 ordered runtimes、Release Gate 10/10、git diff，以及 PNG RGBA／四角 alpha 自動檢查。Gameplay／BOSS／Tower 13/13、Abyss 15/15 均包含 reload 與防重複獎勵 regression。
+- 尚未 VERIFIED：390×844／412×915 官方 DEV 真實瀏覽器操作與遠端 Repository checks。官方預覽只部署 `dev`，feature branch 不觸發現有 checks；雲端瀏覽器安全政策亦拒絕未部署候選頁面。需在日後獲准整合 `dev` 後，依正式 `dev → CI → dev preview → Requirement Verification` 流程完成，禁止用 RawCDN／GitHack 或繞過政策代替。
+
 ## 2026-09-08 六分支安全整合、最終 QA 與正式發布
 
 - 使用者於整合驗證完成後明確授權推進正式版；受保護 PR #96（`dev` → `main`）在 PR Repository checks run `34154431926` SUCCESS 後，以 merge commit `253962c539bdb62deaa1f80e4212bc306469ab0f` 合併。合併 tree `b257175b2cdaf13fc57a13f2767414d76236aa17` 與核准的 `dev` tree 完全相同，沒有衝突或額外功能差異。
