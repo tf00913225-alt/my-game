@@ -175,6 +175,14 @@ patched=replaceRequired(patched,
 `,"rapid portal and movement regression");
 
 patched=replaceRequired(patched,
+`    assert.equal(bossLaunch.count,10);
+    assert.equal(bossLaunch.eliteCount,9);
+`,
+`    assert.equal(bossLaunch.count,8);
+    assert.equal(bossLaunch.eliteCount,7);
+`,"Lv20 boss roster count assertions");
+
+patched=replaceRequired(patched,
 `    assert.deepEqual(bossLaunch.bosses,[{name:"東帝",hp:3090,level:20,skill:1}]);
 `,
 `    assert.deepEqual(bossLaunch.bosses,[{name:"東帝",hp:5793,level:20,skill:1}]);
@@ -187,7 +195,9 @@ patched=replaceRequired(patched,
     assert.equal(lv40.final.eliteCount,9);
 `,
 `    assert.deepEqual([lv40.pre.regularHp,lv40.pre.eliteHp],[1207,3861]);
+    assert.equal(lv40.boss.count,8);
     assert.deepEqual([lv40.boss.eliteHp,lv40.boss.bosses[0].hp],[4719,9654]);
+    assert.equal(lv40.final.count,10);
     assert.deepEqual(lv40.final.bosses,[
         {name:"東帝天尊",hp:9654,level:40,skill:2},
         {name:"天帝天尊",hp:9654,level:40,skill:2},
@@ -196,7 +206,7 @@ patched=replaceRequired(patched,
         {name:"南帝天尊",hp:9654,level:40,skill:2}
     ]);
     assert.equal(lv40.final.eliteCount,5);
-`,"Lv40 durability and five-emperor assertions");
+`,"Lv40 durability, eight-enemy boss and five-emperor assertions");
 
 patched=replaceRequired(patched,
 `    const bossLaunch=await client.eval(\`(async()=>{
