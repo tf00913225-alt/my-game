@@ -22,6 +22,19 @@ assert.match(qol,/id="v17350BatchQuantity"[\s\S]*?value="'\+descriptor\.total\+'
 assert.match(qol,/descriptor\.kind==="potion"/);
 assert.match(qol,/descriptor\.kind==="chest"/);
 assert.match(qol,/descriptor\.kind==="ticket"/);
+
+/* 2026-09-08 regressions: legacy material ids must still collapse into one
+   visible stack when they represent the same named material. */
+assert.match(qol,/function inventoryStackIdentity\(item\)/);
+assert.match(qol,/if\(type==="material"\)\{[\s\S]*?const name=String\(item\.name\|\|""\)\.trim\(\);[\s\S]*?return "material::name::"\+name;/);
+assert.match(qol,/const stackKey=inventoryStackIdentity\(item\)/);
+
+/* Quick-sell and batch actions keep the same black/gold readable button
+   language instead of the former yellow background + black text treatment. */
+assert.match(css,/\.v17350-bulk-sell-bar button\{[\s\S]*?color:#f4d793;[\s\S]*?background:linear-gradient\(180deg,#332414,#15100a\)/);
+assert.match(css,/\.v17350-bulk-sell-bar button\.danger\{[\s\S]*?background:linear-gradient\(180deg,#8d3928,#4d1812\)/);
+assert.match(css,/\.v17350-batch-action button\{[\s\S]*?color:#f4d793;[\s\S]*?background:linear-gradient\(180deg,#332414,#15100a\)/);
+
 assert.match(recovery,/window\.rpgAlert\([\s\S]*?title:"補品不足"[\s\S]*?confirmText:"知道了"/);
 assert.doesNotMatch(recovery,/補品不足[\s\S]{0,180}setTimeout\(/);
 assert.match(equipment,/css\/52-v173\.50-inventory-qol\.css\?v=173\.64/);

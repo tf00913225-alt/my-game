@@ -20,7 +20,15 @@ assert.doesNotMatch(css,/#homeFeatureModal\.v131-shop-open[^{]*\{[^}]*transform:
 assert.match(guidelines,/A 級 — Large Panel/);
 assert.match(guidelines,/B 級 — Medium Modal/);
 assert.match(guidelines,/C 級 — Small Dialog/);
-assert.match(guidelines,/功能層級決定視窗尺寸；內容量不決定視窗尺寸；同一視窗 Tab 只換內容、不換框架/);
+/* The sizing rule is intentionally content-aware now: panel tiers still own
+   their shared frame language, but sparse content must not be stretched into a
+   full-height shell and dense content must remain readable before scrolling. */
+assert.match(guidelines,/文字優先可讀/);
+assert.match(guidelines,/內容少就用較小框/);
+assert.match(guidelines,/內容多才逐級放大/);
+assert.match(guidelines,/達到合理上限仍不足才捲動/);
+assert.match(guidelines,/先確保文字可讀與內容完整，再依內容密度選擇適合的 UI 框架；內容少不滿版，內容多可放大，超過合理上限才捲動/);
+assert.match(guidelines,/同一個功能視窗內切換 Tab 時，Panel、Header、Tab Bar、共用 Footer 與 Close Button 不得因 Tab 內容量不同而跳動/);
 
 const body={innerHTML:""};
 const storage=new Map();

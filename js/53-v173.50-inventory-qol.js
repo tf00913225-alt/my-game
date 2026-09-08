@@ -82,6 +82,26 @@
         return type+":"+(id||String(item.name||""));
     }
 
+    /*
+       Stack identity is intentionally stricter than the visual family key.
+       Equipment is never stackable. For materials, the displayed material
+       name is the durable semantic identity: older saves can carry a legacy
+       id while the current definition uses a newer stable id, which used to
+       leave two visually identical material stacks forever. Other item types
+       keep their stable id identity so tickets/chests/potions with different
+       behavior are never accidentally merged merely because labels match.
+    */
+    function inventoryStackIdentity(item){
+        if(!item||isInventoryEquipment(item)){ return null; }
+        const type=String(item.type||"item");
+        const id=String(item.id||"");
+        if(type==="material"){
+            const name=String(item.name||"").trim();
+            if(name){ return "material::name::"+name; }
+        }
+        return type+"::id::"+(id||String(item.name||""));
+    }
+
     function cloneInventoryStack(item,count){
         const copy={...item,count};
         if(item.stats&&typeof item.stats==="object"){ copy.stats={...item.stats}; }
@@ -107,8 +127,8 @@
                 output.push(item);
                 return;
             }
-            const id=String(item.id||"");
-            if(!id){
+            const stackKey=inventoryStackIdentity(item);
+            if(!stackKey){
                 let remaining=Math.max(1,Math.floor(Number(item.count)||1));
                 while(remaining>0){
                     const amount=Math.min(V17362_STACK_LIMIT,remaining);
@@ -117,11 +137,10 @@
                 }
                 return;
             }
-            const exactKey=String(item.type||"")+"::"+id;
-            let entry=exactStacks.get(exactKey);
+            let entry=exactStacks.get(stackKey);
             if(!entry){
                 entry={template:item,total:0,first:index};
-                exactStacks.set(exactKey,entry);
+                exactStacks.set(stackKey,entry);
             }
             entry.total+=Math.max(1,Math.floor(Number(item.count)||1));
         });
@@ -158,6 +177,7 @@
 
     window.v17362NormalizeInventoryStacksAndOrder=normalizeInventoryStacksAndOrder;
     window.v17362InventoryFamilyKey=inventoryFamilyKey;
+    window.v17362InventoryStackIdentity=inventoryStackIdentity;
 
     /* Normalize old saves immediately, then again whenever the inventory grid is rebuilt. */
     normalizeInventoryStacksAndOrder();
