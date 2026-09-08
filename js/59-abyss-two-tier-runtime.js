@@ -363,11 +363,11 @@
             const hpMultiplier=config.stageHpMultipliers[stage];
             for(let index=0;index<PRE_STAGE_REGULAR_COUNT;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"regular",hpMultiplier,false);
-                monster.v141FormationRow=0;monster.v141FormationPosition=index;roster.push(monster);
+                monster.v141FormationRow=1;monster.v141FormationPosition=index;roster.push(monster);
             }
             for(let index=0;index<PRE_STAGE_ELITE_COUNT;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"elite",hpMultiplier,false);
-                monster.v141FormationRow=1;monster.v141FormationPosition=index;roster.push(monster);
+                monster.v141FormationRow=0;monster.v141FormationPosition=index;roster.push(monster);
             }
             return roster;
         }
