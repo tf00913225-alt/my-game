@@ -31,7 +31,7 @@
         shieldModifier:1,
         controlModifier:1,
         burnPercent:3,
-        bannerDurationMs:760,
+        bannerDurationMs:1100,
         upgradeGoldBase:650,
         upgradeGoldPerLevel:180
     });
@@ -68,7 +68,7 @@
             triggers:[trigger("odd_end","odd_round_end",{maxTriggersPerRound:1},[
                 effect("heal_all_allies",{percentKey:"healHpPercent"}),effect("restore_sp_all",{percentKey:"spPercent",minLevel:10})
             ])],
-            triggerText:"奇數回合結束時",limitText:"每個符合條件的回合最多觸發一次。",
+            triggerText:"奇數回合結束時",limitText:"無每場總次數限制；每個符合條件的奇數回合最多觸發一次。",
             nextText:{5:"HP回復提高至4.5%",10:"HP回復5%，追加1%最大SP",15:"HP 6%＋SP 1.5%",20:"HP 7%＋SP 2%"}
         },
         {
@@ -390,7 +390,7 @@
         let node=document.getElementById("teamRelicBattleBanner");
         if(!node){
             node=document.createElement("div"); node.id="teamRelicBattleBanner"; node.className="team-relic-battle-banner";
-            const host=document.getElementById("game-content")||document.body; if(host){ host.appendChild(node); }
+            const host=document.getElementById("battlePage")||document.getElementById("game-content")||document.body; if(host){ host.appendChild(node); }
         }
         node.innerHTML='<span class="team-relic-battle-icon">寶</span><b>秘寶・'+esc(def.name)+'</b>';
         node.classList.remove("show"); void node.offsetWidth; node.classList.add("show");
@@ -405,11 +405,26 @@
         if(actual>0&&typeof showPlayerHit==="function"){ withSource(SOURCE_RELIC,()=>showPlayerHit(actual,"heal",index,true)); }
         return actual;
     }
+    function showRelicSpFloat(index,amount){
+        if(amount<=0){ return; }
+        if(typeof document!=="undefined"){
+            const card=document.getElementById("battlePlayerCard"+index);
+            if(card){
+                const node=document.createElement("span");
+                node.className="team-relic-sp-float";
+                node.textContent="+"+Math.floor(amount)+" SP";
+                card.appendChild(node);
+                setTimeout(()=>{ if(node&&node.parentNode){ node.parentNode.removeChild(node); } },1050);
+                return;
+            }
+        }
+        if(typeof showPlayerHit==="function"){ withSource(SOURCE_RELIC,()=>showPlayerHit(amount,"sp",index,true)); }
+    }
     function restoreSp(index,percent){
         const character=characterAt(index),stats=statsAt(index); if(!character||!stats||numeric(character.hp)<=0||percent<=0){ return 0; }
         const amount=Math.max(1,Math.floor(numeric(stats.maxSP)*percent/100));
         const actual=Math.max(0,Math.min(amount,numeric(stats.maxSP)-numeric(character.sp))); character.sp+=actual;
-        if(actual>0&&typeof showPlayerHit==="function"){ withSource(SOURCE_RELIC,()=>showPlayerHit(actual,"sp",index,true)); }
+        if(actual>0){ showRelicSpFloat(index,actual); }
         return actual;
     }
     function cleanseOne(index){
@@ -524,7 +539,7 @@
             markTriggered(triggerDef,key);
             showBanner(def);
             resolveEffects(triggerDef,def,payload||{});
-            battleLog(def.name+"發動。" );
+            battleLog(def.name+"｜"+currentEffectText(def,relicLevel(def.id)));
             triggered=true;
         });
         if(triggered&&typeof updateUI==="function"){ try{updateUI();}catch(_){ } }

@@ -294,6 +294,6 @@ test("player progression is isolated from Abyss fixed levels, talisman shared sk
     assert.match(talisman,/sharedSkillId/);
     assert.doesNotMatch(talisman,/v17364GetRequiredCharacterLevelForSkillLevel/);
     assert.match(main,/equippedSkills\.length\s*>=\s*4/);
-    assert.match(lateLoader,/script\.src="js\/59-abyss-two-tier-runtime\.js\?v=173\.64-abyss2"[\s\S]*?script\.onload=function\(\)\{[\s\S]*?loadSkillProgressionRuntime\(\)/);
+    assert.match(lateLoader,/script\.src="js\/59-abyss-two-tier-runtime\.js\?v=173\.64-abyss3"[\s\S]*?script\.onload=function\(\)\{[\s\S]*?loadSkillProgressionRuntime\(\)/);
     assert.match(lateLoader,/function loadSkillProgressionRuntime\(\)[\s\S]*?60-v173\.64-skill-progression-rebalance\.js\?v=173\.64/);
 });

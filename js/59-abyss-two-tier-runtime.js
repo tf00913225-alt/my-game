@@ -363,25 +363,29 @@
             const hpMultiplier=config.stageHpMultipliers[stage];
             for(let index=0;index<PRE_STAGE_REGULAR_COUNT;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"regular",hpMultiplier,false);
-                monster.v141FormationRow=0;monster.v141FormationPosition=index;roster.push(monster);
+                monster.v141FormationRow=1;monster.v141FormationPosition=index;roster.push(monster);
             }
             for(let index=0;index<PRE_STAGE_ELITE_COUNT;index++){
                 const monster=makeAbyssMonster("天兵天將",config,region,"elite",hpMultiplier,false);
-                monster.v141FormationRow=1;monster.v141FormationPosition=index;roster.push(monster);
+                monster.v141FormationRow=0;monster.v141FormationPosition=index;roster.push(monster);
             }
             return roster;
         }
         if(isTrueRealmFinal(config.id,safeRegionIndex,stage)){
             return buildTrueRealmFinalRoster(config);
         }
-        for(let index=0;index<10;index++){
-            if(index===2){
+        for(let position=0;position<5;position++){
+            if(position===2){
                 const boss=makeAbyssMonster(region.emperor,config,region,"boss",config.bossHpMultiplier,true);
                 boss.v141FormationRow=0;boss.v141FormationPosition=2;roster.push(boss);
             }else{
                 const elite=makeAbyssMonster("天兵天將",config,region,"elite",config.bossEliteHpMultiplier,false);
-                elite.v141FormationRow=index<5?0:1;elite.v141FormationPosition=index<5?index:index-5;roster.push(elite);
+                elite.v141FormationRow=0;elite.v141FormationPosition=position;roster.push(elite);
             }
+        }
+        for(let position=1;position<=3;position++){
+            const elite=makeAbyssMonster("天兵天將",config,region,"elite",config.bossEliteHpMultiplier,false);
+            elite.v141FormationRow=1;elite.v141FormationPosition=position;roster.push(elite);
         }
         return roster;
     }
