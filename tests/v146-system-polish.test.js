@@ -44,8 +44,8 @@ function baseContext(overrides={}){
 }
 
 test("V146 remains ordered before V149 under the current cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.63/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.63"/);
+    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -180,7 +180,8 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.match(css,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
     assert.match(source,/v146-home-roster/);
     assert.match(source,/root\.querySelectorAll\("\.v141-blueprint-series"\).*remove/);
-    assert.match(source,/buttons\.push\(\["返回"/);
+    assert.match(source,/abyssSelectionActive\?"返回玩法":"返回"/);
+    assert.match(source,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\('home'\)"/);
     assert.match(css,/#v141DungeonNav\[data-v146-columns="4"\]/);
     assert.match(css,/\.v146-abyss-return/);
     assert.match(rules,/"戰鬥失敗"/);

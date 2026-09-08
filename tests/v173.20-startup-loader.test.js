@@ -12,9 +12,9 @@ for(const file of ["assets/ui/startup-logo-v173.20.jpg","assets/ui/startup-main-
   assert.equal(details,"JPEG 864 1536",file);
 }
 assert.ok(html.indexOf('id="startupLoader"')<html.indexOf('id="app"'));
-assert.ok(html.indexOf("js/52-v173.20-startup-loader.js?v=173.63")<html.indexOf("js/00-main.js?v=173.63"));
-assert.match(html,/css\/51-v173\.20-startup-loader\.css\?v=173\.63/);
-assert.match(loader,/const V_ASSET_VERSION="173\.63"/);
+assert.ok(html.indexOf("js/52-v173.20-startup-loader.js?v=173.64")<html.indexOf("js/00-main.js?v=173.64"));
+assert.match(html,/css\/51-v173\.20-startup-loader\.css\?v=173\.64/);
+assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
 assert.match(loader,/TOTAL_RUNTIME_MODULES=32/);
 assert.match(loader,/__v173ReportRuntimeProgress/);
 assert.doesNotMatch(loader,/id="v17347RuntimeGate"/);

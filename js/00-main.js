@@ -6419,6 +6419,41 @@ function saveGame(){
                     existingRelicSaveData.teamLoadout
                 ),
 
+            /*
+               The formal Gameplay Center and current Abyss owners are loaded
+               after the core save document. Preserve their extension fields
+               during the early reload save, then use their live state once
+               those runtimes have hydrated. This keeps old saves compatible
+               without allowing a reload to erase first-clear progress.
+            */
+
+            gameplayProgress:
+                (
+                    typeof window!=="undefined" &&
+                    window.GameplaySystem &&
+                    typeof window.GameplaySystem.getSerializableState==="function"
+                )
+                ?
+                window.GameplaySystem.getSerializableState()
+                :
+                (
+                    existingRelicSaveData &&
+                    existingRelicSaveData.gameplayProgress
+                ),
+
+            abyssProgress:
+                (
+                    typeof window!=="undefined" &&
+                    typeof window.v174AbyssGetRootState==="function"
+                )
+                ?
+                window.v174AbyssGetRootState()
+                :
+                (
+                    existingRelicSaveData &&
+                    existingRelicSaveData.abyssProgress
+                ),
+
             inventoryItems:
                 inventoryItems
 
@@ -7334,6 +7369,12 @@ async function resetGame(){
         "battle_full_version_save_v3"
     );
 
+    /* Abyss keeps a compatibility sidecar for pre-V173.64 saves. It belongs
+       to the same single-player save and must be removed with the character. */
+    localStorage.removeItem(
+        "v174_abyss_state_v2"
+    );
+
     creationTargetSlot=1;
 
     if(typeof window.allowGameNavigation==="function"){
@@ -7513,7 +7554,9 @@ function showPage(page){
         "home",
         "training",
         "dungeon",
-        "boss"
+        "gameplay",
+        "boss",
+        "tower"
     ];
 
 
@@ -7586,7 +7629,10 @@ function showPage(page){
             "no-scroll-page",
 
             page==="map" ||
-            page==="home"
+            page==="home" ||
+            page==="gameplay" ||
+            page==="boss" ||
+            page==="tower"
 
         );
 
@@ -7822,7 +7868,11 @@ function showPage(page){
 
         dungeon:"dungeonNav",
 
+        gameplay:"bossNav",
+
         boss:"bossNav",
+
+        tower:"bossNav",
 
         inventory:"inventoryNav"
 

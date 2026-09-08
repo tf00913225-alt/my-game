@@ -18,6 +18,17 @@
         "v17361ReleaseWakeLock",
         "省電 OFF"
       ]
+    },
+    {
+      "id": "DEP-002-gameplay-center-navigation",
+      "description": "底部舊 BOSS 入口與副本頁深淵入口已正式廢除；玩家只能由玩法中心進入 BOSS、四象塔與深淵。",
+      "enabled": true,
+      "forbidden": [
+        "id=\"dungeonTabBtnAbyss\"",
+        "src=\"assets/ui/nav-boss.png\"",
+        "aria-label=\"BOSS\"",
+        "<span class=\"nav-sr-only\">BOSS</span>"
+      ]
     }
   ]
 }

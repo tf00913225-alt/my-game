@@ -1,0 +1,746 @@
+/* =====================================================
+   Gameplay Center / Boss / Four-Symbol Tower
+   Formal owner for the special-mode large panels and Boss mechanism cards.
+   The existing 420px game surface and 70px bottom navigation remain unchanged.
+===================================================== */
+
+#game-stage .gameplay-page{
+    width:100%;
+    height:100%;
+    min-height:0;
+    box-sizing:border-box;
+}
+
+#game-stage .gameplay-page.active{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#game-stage .gameplay-large-panel{
+    position:relative;
+    display:flex;
+    width:min(100%,var(--ui-large-panel-max-width,396px));
+    height:min(var(--ui-large-panel-height,620px),100%);
+    min-height:0;
+    box-sizing:border-box;
+    flex-direction:column;
+    overflow:hidden;
+    border:2px solid #a77a38;
+    border-radius:13px;
+    color:#eadfc9;
+    background:
+        radial-gradient(circle at 50% -12%,rgba(196,137,47,.22),transparent 38%),
+        linear-gradient(145deg,#24190f 0,#0d0906 52%,#171007 100%);
+    box-shadow:
+        0 16px 36px rgba(0,0,0,.7),
+        inset 0 0 0 1px rgba(255,225,151,.08),
+        inset 0 0 32px rgba(180,113,26,.08);
+}
+
+#game-stage .gameplay-large-panel::before,
+#game-stage .gameplay-large-panel::after{
+    content:"";
+    position:absolute;
+    z-index:2;
+    left:18px;
+    right:18px;
+    height:1px;
+    pointer-events:none;
+    background:linear-gradient(90deg,transparent,#d5a552,transparent);
+}
+
+#game-stage .gameplay-large-panel::before{ top:8px; }
+#game-stage .gameplay-large-panel::after{ bottom:8px; }
+
+#game-stage .gameplay-panel-header{
+    position:relative;
+    z-index:3;
+    display:flex;
+    flex:0 0 auto;
+    min-height:66px;
+    box-sizing:border-box;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:13px 14px 9px;
+    border-bottom:1px solid rgba(190,143,65,.5);
+    background:linear-gradient(180deg,rgba(51,35,18,.96),rgba(19,13,8,.9));
+}
+
+#game-stage .gameplay-panel-header small{
+    display:block;
+    margin-bottom:1px;
+    color:#a9987a;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.4px;
+}
+
+#game-stage .gameplay-panel-header h2{
+    margin:0;
+    color:#f2cf7b;
+    font-family:"Noto Serif TC",serif;
+    font-size:23px;
+    font-weight:900;
+    letter-spacing:3px;
+    line-height:1.15;
+    text-shadow:0 2px 2px #000,0 0 12px rgba(229,169,65,.25);
+}
+
+#game-stage .gameplay-back-button{
+    min-width:78px;
+    min-height:36px;
+    padding:7px 10px;
+    border:1px solid #8d6937;
+    border-radius:8px;
+    color:#e8d9bd;
+    background:linear-gradient(180deg,#332719,#17100a);
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.4px;
+}
+
+#game-stage .gameplay-back-button:active{
+    transform:translateY(1px);
+    filter:brightness(1.12);
+}
+
+#game-stage .gameplay-panel-scroll{
+    flex:1 1 auto;
+    min-height:0;
+    box-sizing:border-box;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+    scrollbar-gutter:stable;
+}
+
+/* ---------- Gameplay hub ---------- */
+
+#game-stage .gameplay-hub-grid{
+    display:grid;
+    align-content:start;
+    grid-template-columns:1fr;
+    gap:10px;
+    padding:12px;
+}
+
+#game-stage .gameplay-mode-card{
+    position:relative;
+    display:grid;
+    width:100%;
+    min-height:112px;
+    box-sizing:border-box;
+    grid-template-columns:minmax(0,1fr) 78px;
+    gap:10px;
+    align-items:center;
+    overflow:hidden;
+    padding:13px 12px 12px 15px;
+    border:1px solid #7f6034;
+    border-radius:11px;
+    color:#eadfc9;
+    background:
+        linear-gradient(90deg,rgba(33,22,12,.96),rgba(13,9,6,.88)),
+        radial-gradient(circle at 90% 10%,rgba(209,150,54,.2),transparent 46%);
+    box-shadow:inset 0 0 0 1px rgba(255,229,169,.045),0 6px 14px rgba(0,0,0,.36);
+    text-align:left;
+}
+
+#game-stage .gameplay-mode-card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    width:4px;
+    background:linear-gradient(180deg,#f1c86c,#6d4018);
+}
+
+#game-stage .gameplay-mode-card:active{
+    transform:translateY(1px);
+    border-color:#d2a356;
+    filter:brightness(1.08);
+}
+
+#game-stage .gameplay-mode-copy{
+    position:relative;
+    z-index:1;
+    min-width:0;
+}
+
+#game-stage .gameplay-mode-copy h3{
+    margin:0 0 2px;
+    color:#f4d487;
+    font-family:"Noto Serif TC",serif;
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+#game-stage .gameplay-mode-copy p{
+    margin:0 0 8px;
+    color:#c6b99f;
+    font-size:12px;
+    line-height:1.35;
+}
+
+#game-stage .gameplay-mode-status{
+    display:block;
+    color:#fff0bd;
+    font-size:11px;
+    font-weight:800;
+    line-height:1.45;
+    overflow-wrap:anywhere;
+}
+
+#game-stage .gameplay-mode-seal{
+    display:flex;
+    width:66px;
+    height:66px;
+    align-items:center;
+    justify-content:center;
+    justify-self:end;
+    border:2px solid #9a7139;
+    border-radius:50%;
+    color:#e9c266;
+    background:radial-gradient(circle,#342313 0,#120c08 66%,#050403 100%);
+    box-shadow:inset 0 0 0 3px #15100b,0 0 12px rgba(220,156,49,.15);
+    font-family:"Noto Serif TC",serif;
+    font-size:22px;
+    font-weight:900;
+    text-shadow:0 2px 2px #000;
+}
+
+#game-stage .gameplay-mode-card.abyss .gameplay-mode-seal{ color:#b7c9ea; border-color:#5d7197; }
+#game-stage .gameplay-mode-card.tower .gameplay-mode-seal{ color:#e8875d; border-color:#9e5434; }
+#game-stage .gameplay-mode-card.coming-soon{
+    min-height:80px;
+    opacity:.67;
+    cursor:default;
+}
+#game-stage .gameplay-mode-card.coming-soon .gameplay-mode-seal{ width:50px;height:50px;font-size:16px; }
+
+/* ---------- Shared BOSS tabs and lists ---------- */
+
+#game-stage .gameplay-fixed-tabs{
+    display:grid;
+    flex:0 0 auto;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    padding:9px 12px;
+    border-bottom:1px solid rgba(122,88,43,.55);
+    background:rgba(8,6,4,.72);
+}
+
+#game-stage .gameplay-fixed-tabs button{
+    min-height:var(--ui-large-panel-tab-height,42px);
+    border:1px solid #71532f;
+    border-radius:8px;
+    color:#bfae91;
+    background:linear-gradient(180deg,#2a2015,#130e09);
+    font-size:14px;
+    font-weight:900;
+}
+
+#game-stage .gameplay-fixed-tabs button.active,
+#game-stage .gameplay-fixed-tabs button[aria-selected="true"]{
+    border-color:#d0a353;
+    color:#241506;
+    background:linear-gradient(180deg,#f0ce7c,#bd7e31);
+    box-shadow:0 0 10px rgba(220,159,54,.22);
+}
+
+#game-stage .boss-browser{
+    display:flex;
+    min-height:100%;
+    box-sizing:border-box;
+    flex-direction:column;
+    gap:10px;
+    padding:11px 12px 15px;
+}
+
+#game-stage .boss-overview-line{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:8px 10px;
+    border:1px solid rgba(132,95,45,.55);
+    border-radius:8px;
+    color:#b8aa91;
+    background:rgba(7,5,3,.48);
+    font-size:11px;
+}
+
+#game-stage .boss-overview-line b{ color:#efcc7b; font-size:12px; }
+
+#game-stage .boss-card-list{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+}
+
+#game-stage .boss-select-card{
+    position:relative;
+    display:flex;
+    min-height:126px;
+    box-sizing:border-box;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:5px;
+    padding:11px 10px;
+    overflow:hidden;
+    border:1px solid #76572e;
+    border-radius:10px;
+    color:#decfaf;
+    background:
+        radial-gradient(circle at 50% 0,rgba(135,47,30,.2),transparent 48%),
+        linear-gradient(155deg,#25170e,#0d0906);
+    text-align:left;
+}
+
+#game-stage .boss-select-card b{
+    color:#f0cd7a;
+    font-family:"Noto Serif TC",serif;
+    font-size:15px;
+    line-height:1.25;
+}
+
+#game-stage .boss-select-card span,
+#game-stage .boss-select-card small{ font-size:10px; line-height:1.35; }
+#game-stage .boss-select-card span{ color:#e9b95e; font-weight:900; }
+#game-stage .boss-select-card small{ color:#aa9a80; }
+#game-stage .boss-select-card.locked{ opacity:.47; filter:saturate(.55); }
+#game-stage .boss-select-card.cleared::after{
+    content:"已首通";
+    position:absolute;
+    top:6px;
+    right:-25px;
+    width:86px;
+    padding:2px 0;
+    transform:rotate(35deg);
+    color:#f8e4b0;
+    background:#6b2a20;
+    font-size:9px;
+    font-weight:900;
+    text-align:center;
+}
+
+#game-stage .boss-detail{
+    display:flex;
+    min-height:100%;
+    box-sizing:border-box;
+    flex-direction:column;
+    gap:10px;
+    padding:11px 12px 15px;
+}
+
+#game-stage .boss-detail-back{
+    align-self:flex-start;
+    padding:4px 0;
+    border:0;
+    color:#c9ae72;
+    background:transparent;
+    font-size:12px;
+    font-weight:900;
+}
+
+#game-stage .boss-hero{
+    position:relative;
+    display:grid;
+    min-height:154px;
+    box-sizing:border-box;
+    place-items:center;
+    overflow:hidden;
+    padding:18px 14px;
+    border:2px solid #8d6331;
+    border-radius:12px;
+    background:
+        radial-gradient(circle at 50% 42%,rgba(153,51,30,.26),transparent 42%),
+        repeating-linear-gradient(135deg,rgba(255,255,255,.018) 0 2px,transparent 2px 7px),
+        linear-gradient(180deg,#21150c,#080604);
+    text-align:center;
+}
+
+#game-stage .boss-hero::before{
+    content:"災";
+    position:absolute;
+    color:rgba(188,122,52,.09);
+    font-family:"Noto Serif TC",serif;
+    font-size:116px;
+    font-weight:900;
+    line-height:1;
+}
+
+#game-stage .boss-hero > *{ position:relative; z-index:1; }
+#game-stage .boss-hero small{ color:#bba57f; font-size:11px; }
+#game-stage .boss-hero h3{ margin:5px 0;color:#f3d287;font-size:24px;letter-spacing:1px; }
+#game-stage .boss-hero p{ margin:0;color:#d7c5a7;font-size:12px; }
+
+#game-stage .boss-trait-tags{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:5px;
+    margin-top:9px;
+}
+
+#game-stage .boss-trait-tags span{
+    padding:3px 8px;
+    border:1px solid #78572f;
+    border-radius:999px;
+    color:#edcc82;
+    background:rgba(16,10,6,.74);
+    font-size:10px;
+    font-weight:800;
+}
+
+#game-stage .boss-detail-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:7px;
+}
+
+#game-stage .boss-detail-grid section{
+    padding:9px 10px;
+    border:1px solid rgba(121,88,48,.55);
+    border-radius:8px;
+    background:rgba(7,5,3,.5);
+}
+
+#game-stage .boss-detail-grid h4{
+    margin:0 0 3px;
+    color:#d9b86e;
+    font-size:11px;
+    letter-spacing:.4px;
+}
+
+#game-stage .boss-detail-grid p{
+    margin:0;
+    color:#c2b39a;
+    font-size:11px;
+    line-height:1.5;
+}
+
+#game-stage .boss-stage-track{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:5px;
+}
+
+#game-stage .boss-stage-track span{
+    padding:7px 2px;
+    border:1px solid #5f492b;
+    border-radius:6px;
+    color:#8f826d;
+    background:#100c08;
+    font-size:9px;
+    font-weight:800;
+    text-align:center;
+}
+
+#game-stage .boss-stage-track span.done{ color:#f0d28a;border-color:#9d7136;background:#30200f; }
+#game-stage .boss-stage-track span.current{ color:#fff1bf;border-color:#d1a250;box-shadow:0 0 8px rgba(227,165,60,.28); }
+
+#game-stage .gameplay-primary-action,
+#game-stage .tower-secondary-action{
+    width:100%;
+    min-height:46px;
+    padding:10px 14px;
+    border:1px solid #d1a052;
+    border-radius:9px;
+    color:#281706;
+    background:linear-gradient(180deg,#f3d184,#bd7c2e);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 5px 12px rgba(0,0,0,.38);
+    font-size:15px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+#game-stage .gameplay-primary-action:disabled{
+    opacity:.45;
+    filter:grayscale(.55);
+}
+
+/* ---------- Four-Symbol Tower ---------- */
+
+#game-stage .tower-home{
+    display:flex;
+    min-height:100%;
+    box-sizing:border-box;
+    flex-direction:column;
+    gap:10px;
+    padding:12px;
+}
+
+#game-stage .tower-element-hero{
+    position:relative;
+    display:grid;
+    min-height:176px;
+    box-sizing:border-box;
+    place-items:center;
+    overflow:hidden;
+    padding:17px;
+    border:2px solid var(--tower-color,#c15b39);
+    border-radius:12px;
+    background:
+        radial-gradient(circle at 50% 28%,var(--tower-glow,rgba(193,91,57,.28)),transparent 48%),
+        linear-gradient(180deg,#21150d,#090604);
+    text-align:center;
+}
+
+#game-stage .tower-element-hero::before{
+    content:"塔";
+    position:absolute;
+    color:var(--tower-mark,rgba(255,214,140,.09));
+    font-family:"Noto Serif TC",serif;
+    font-size:150px;
+    font-weight:900;
+    line-height:1;
+}
+
+#game-stage .tower-element-hero > *{ position:relative;z-index:1; }
+#game-stage .tower-element-hero small{ color:#bbaa8e;font-size:11px;letter-spacing:1px; }
+#game-stage .tower-element-hero h3{ margin:5px 0 3px;color:#f1d083;font-size:25px; }
+#game-stage .tower-element-hero strong{ color:#fff0bd;font-size:31px;line-height:1.1; }
+#game-stage .tower-element-hero p{ margin:5px 0 0;color:#c7b89f;font-size:11px; }
+
+#game-stage .tower-summary-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+}
+
+#game-stage .tower-summary-grid div{
+    padding:9px;
+    border:1px solid rgba(125,90,45,.58);
+    border-radius:8px;
+    background:rgba(6,4,3,.52);
+}
+
+#game-stage .tower-summary-grid small{ display:block;color:#9f9078;font-size:9px; }
+#game-stage .tower-summary-grid b{ color:#e7c675;font-size:14px; }
+
+#game-stage .tower-actions{ display:grid;grid-template-columns:1fr;gap:8px; }
+#game-stage .tower-secondary-action{
+    min-height:40px;
+    border-color:#72542e;
+    color:#d9c7a8;
+    background:linear-gradient(180deg,#2c2115,#15100b);
+    font-size:12px;
+}
+
+#game-stage .tower-floor-overview{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+}
+
+#game-stage .tower-floor-band{
+    position:relative;
+    min-height:72px;
+    padding:9px;
+    border:1px solid #604927;
+    border-radius:8px;
+    color:#c5b69d;
+    background:#100c08;
+    text-align:left;
+}
+
+#game-stage .tower-floor-band b{ display:block;color:#dfbd70;font-size:13px; }
+#game-stage .tower-floor-band small{ color:#8f836e;font-size:9px;line-height:1.35; }
+#game-stage .tower-floor-band.done{ border-color:#8c6934;background:#24180d; }
+#game-stage .tower-floor-band.current{ border-color:#d0a151;box-shadow:0 0 8px rgba(214,154,51,.22); }
+#game-stage .tower-floor-band:disabled{ opacity:.4; }
+
+#game-stage .tower-milestone-choice{
+    padding:11px;
+    border:1px solid #b18643;
+    border-radius:10px;
+    background:linear-gradient(145deg,#2c1d0e,#100b07);
+}
+
+#game-stage .tower-milestone-choice h3{ margin:0 0 4px;color:#f0cc79;font-size:16px; }
+#game-stage .tower-milestone-choice p{ margin:0 0 9px;color:#bdae94;font-size:10px;line-height:1.5; }
+#game-stage .tower-relic-options{ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px; }
+#game-stage .tower-relic-options button{ min-height:42px;border:1px solid #7e5e33;border-radius:7px;color:#e3cfaa;background:#1c140d;font-size:11px;font-weight:900; }
+
+/* ---------- Boss mechanism slot ---------- */
+
+#game-stage #battleMonsterArea .boss-mechanism-slot{
+    position:absolute;
+    z-index:18;
+    top:96px;
+    left:50%;
+    display:flex;
+    width:236px;
+    min-height:78px;
+    align-items:flex-start;
+    justify-content:center;
+    gap:7px;
+    transform:translateX(-50%);
+    pointer-events:none;
+}
+
+#game-stage #battleMonsterArea{
+    position:relative;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-card{
+    position:relative;
+    display:flex;
+    width:112px;
+    min-height:76px;
+    box-sizing:border-box;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    padding:6px 5px;
+    overflow:hidden;
+    border:2px solid var(--mechanism-color,#d5aa56);
+    border-radius:9px;
+    color:#eadbbd;
+    background:
+        radial-gradient(circle at 50% 0,var(--mechanism-glow,rgba(216,167,75,.22)),transparent 55%),
+        linear-gradient(180deg,rgba(37,27,17,.98),rgba(8,6,4,.98));
+    box-shadow:0 0 10px var(--mechanism-glow,rgba(216,167,75,.25)),inset 0 0 0 1px rgba(255,255,255,.07);
+    pointer-events:auto;
+    animation:gameplayMechanismEnter .24s ease-out both;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="shield"]{ --mechanism-color:#e1b957;--mechanism-glow:rgba(225,185,87,.32); }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="charge"]{ --mechanism-color:#d45743;--mechanism-glow:rgba(212,87,67,.34); }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="heal"]{ --mechanism-color:#58a986;--mechanism-glow:rgba(88,169,134,.3); }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="amplify"]{ --mechanism-color:#b66bd0;--mechanism-glow:rgba(182,107,208,.3); }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="seal"]{ --mechanism-color:#6d91ce;--mechanism-glow:rgba(109,145,206,.3); }
+
+#game-stage #battleMonsterArea .boss-mechanism-card.targetable{
+    cursor:crosshair;
+    animation:gameplayMechanismTarget 1s ease-in-out infinite;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-card.target{
+    box-shadow:0 0 0 2px #fff0b4,0 0 16px var(--mechanism-color);
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-card.blocked-pulse{
+    animation:gameplayMechanismBlocked .35s ease-out;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-card.destroying{
+    pointer-events:none;
+    animation:gameplayMechanismDestroy .28s ease-in both;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-kind{
+    color:var(--mechanism-color);
+    font-family:"Noto Serif TC",serif;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-name{
+    max-width:100%;
+    overflow:hidden;
+    color:#fff0c4;
+    font-size:10px;
+    font-weight:900;
+    line-height:1.25;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-hp,
+#game-stage #battleMonsterArea .boss-mechanism-effect{
+    font-size:8px;
+    line-height:1.25;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-hp{ color:#f1d388; }
+#game-stage #battleMonsterArea .boss-mechanism-effect{ color:#b9ad98; }
+
+#game-stage #battlePage .battle-monster.gameplay-boss-protected{
+    opacity:.58;
+    filter:saturate(.65) brightness(.72);
+    cursor:not-allowed;
+}
+
+#game-stage #battlePage .battle-monster.gameplay-boss-protected::after{
+    content:"鎖";
+    position:absolute;
+    z-index:9;
+    top:3px;
+    right:3px;
+    display:grid;
+    width:20px;
+    height:20px;
+    place-items:center;
+    border:1px solid #e2b85c;
+    border-radius:50%;
+    color:#ffe19a;
+    background:rgba(24,15,6,.9);
+    font-size:9px;
+    font-weight:900;
+}
+
+#game-stage #battlePage .boss-mechanism-toast{
+    position:absolute;
+    z-index:80;
+    top:74px;
+    left:50%;
+    padding:5px 11px;
+    transform:translateX(-50%);
+    border:1px solid #c79545;
+    border-radius:999px;
+    color:#ffe8aa;
+    background:rgba(13,9,5,.94);
+    box-shadow:0 0 12px rgba(219,158,53,.32);
+    font-size:11px;
+    font-weight:900;
+    pointer-events:none;
+    animation:gameplayMechanismToast .9s ease-out both;
+}
+
+@keyframes gameplayMechanismEnter{
+    from{ opacity:0;transform:translateY(-10px) scale(.76); }
+    to{ opacity:1;transform:translateY(0) scale(1); }
+}
+
+@keyframes gameplayMechanismTarget{
+    0%,100%{ box-shadow:0 0 7px var(--mechanism-glow); }
+    50%{ box-shadow:0 0 0 2px rgba(255,240,190,.64),0 0 15px var(--mechanism-color); }
+}
+
+@keyframes gameplayMechanismBlocked{
+    0%,100%{ filter:brightness(1);transform:scale(1); }
+    45%{ filter:brightness(1.7);transform:scale(1.06); }
+}
+
+@keyframes gameplayMechanismDestroy{
+    0%{ opacity:1;transform:scale(1);filter:brightness(1); }
+    55%{ opacity:.8;transform:scale(1.08) rotate(2deg);filter:brightness(1.8); }
+    100%{ opacity:0;transform:scale(.55) rotate(-4deg);filter:brightness(.5); }
+}
+
+@keyframes gameplayMechanismToast{
+    0%{ opacity:0;transform:translate(-50%,6px); }
+    18%,70%{ opacity:1;transform:translate(-50%,0); }
+    100%{ opacity:0;transform:translate(-50%,-5px); }
+}
+
+@media (prefers-reduced-motion:reduce){
+    #game-stage #battleMonsterArea .boss-mechanism-card,
+    #game-stage #battleMonsterArea .boss-mechanism-card.targetable,
+    #game-stage #battleMonsterArea .boss-mechanism-card.blocked-pulse,
+    #game-stage #battleMonsterArea .boss-mechanism-card.destroying,
+    #game-stage #battlePage .boss-mechanism-toast{
+        animation-duration:.01ms;
+        animation-iteration-count:1;
+    }
+}
