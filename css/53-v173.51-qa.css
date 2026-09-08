@@ -74,6 +74,30 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
 #game-stage #homeFeatureModal.v131-shop-open .v146-shop-total{font-size:13px!important;line-height:17px!important}
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{height:34px!important;min-height:34px!important;font-size:15px!important}
 
+/* Final synthesis/reward QA owner. js/58 injects late compatibility styling,
+   so these scoped declarations protect readable player text without touching battle UI. */
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet span{font-size:14px!important;line-height:19px!important}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet b{font-size:16px!important;line-height:21px!important}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs button{min-height:42px!important;font-size:15px!important;line-height:1.25!important}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card label,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card label small{font-size:14px!important;line-height:1.4!important}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-craft-preview span,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-material-lines span,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-affix-info,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-reforge-current small,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-reforge-current div,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-compare small,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-compare span{font-size:14px!important;line-height:1.45!important}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-material-lines b,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow b,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-reforge-current>b{font-size:16px!important;line-height:1.35!important}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-primary,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card button{min-height:42px!important;font-size:15px!important}
+#game-stage .v17363-preview-heading small{font-size:13px!important;line-height:1.3!important}
+#game-stage .v17363-preview-group b{font-size:16px!important;line-height:1.4!important}
+#game-stage .v17363-preview-group em{font-size:13px!important;line-height:1.4!important}
+#game-stage .v17363-preview-group p{font-size:15px!important;line-height:1.6!important}
+#game-stage .v17363-preview-note{font-size:14px!important;line-height:1.55!important}
+#game-stage .v17363-material-card>p{font-size:14px!important;line-height:1.45!important}
+#game-stage .v17363-material-field,#game-stage .v17363-material-field-label{font-size:14px!important;line-height:1.4!important}
+#game-stage .v17363-game-select-trigger{min-height:40px!important;font-size:15px!important;line-height:1.3!important}
+#game-stage .v17363-game-select-trigger>b{font-size:15px!important}
+#game-stage .v17363-game-select-option{min-height:40px!important;font-size:15px!important;line-height:1.35!important}
+#game-stage .v17363-material-flow section{font-size:14px!important;line-height:1.4!important}
+#game-stage .v17363-material-flow section b{font-size:16px!important;line-height:1.35!important}
+#game-stage .v17363-material-flow section span{font-size:13px!important;line-height:1.35!important}
+#game-stage .v17363-material-card .v17363-craft-button{min-height:42px!important;font-size:15px!important}
+
 #game-stage #homeFeatureModal .v17351-achievement-shell{height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;gap:9px!important}
 #game-stage #homeFeatureModal .v17351-achievement-toolbar{flex:0 0 42px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;color:#b9aa91!important;font-size:14px!important}
 #game-stage #homeFeatureModal .v17351-achievement-claim-all{min-height:38px!important;padding:6px 11px!important;border:1px solid #aa7d36!important;border-radius:7px!important;background:linear-gradient(180deg,#f0cb70,#bd7e2b)!important;color:#271804!important;font-size:15px!important;font-weight:900!important}.v17351-achievement-claim-all:disabled{opacity:.4!important}
