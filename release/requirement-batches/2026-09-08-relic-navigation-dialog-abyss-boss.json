@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-08",
+  "title": "秘寶返回、黑金按鈕與深淵帝王編成調整",
+  "base_branch": "dev",
+  "base_sha": "12c4ca55838196388c142d8519ac3ae4584b16a1",
+  "work_branch": "fix/relic-navigation-buttons-abyss-boss-roster",
+  "status": "IMPLEMENTED_PENDING_CI_AND_BROWSER_QA",
+  "requirements": [
+    {
+      "id": 1,
+      "request": "秘寶列表頁右上返回 icon 改成與黑金 UI 一致的文字方框返回。",
+      "owner": ["css/55-team-relic-system.css"],
+      "implementation": "保留既有 closeHomeFeature 點擊契約，只將秘寶 modal 的 close button 改為深色漸層文字返回按鈕，移除 map-return 圖像皮膚。"
+    },
+    {
+      "id": 2,
+      "request": "秘寶詳情頁移除重複返回 icon，讓返回秘寶列表按鈕取代其位置。",
+      "owner": ["css/55-team-relic-system.css", "js/60-team-relic-system.js"],
+      "implementation": "詳情模式隱藏 modal close；沿用既有 v174OpenRelicPage 返回契約，把既有返回秘寶列表按鈕移至標題列右側原返回位置，顯示純文字。"
+    },
+    {
+      "id": 3,
+      "request": "黃色底黑字的確認方框按鈕改成左側同款黑底漸層淺色字。",
+      "owner": ["js/51-v169-rpg-ui.js", "css/49-v169-rpg-ui.css"],
+      "implementation": "一般 RPG confirm 的確認鍵改用與取消鍵相同的 dark secondary 皮膚；danger 確認仍保留既有紅色警示樣式，不再出現黃色 primary。"
+    },
+    {
+      "id": 4,
+      "request": "主城秘寶按鈕靠近離線經驗，元素匣靠近系統。",
+      "owner": ["css/55-team-relic-system.css"],
+      "implementation": "兩顆 80x82 卡片尺寸不變，中央雙卡間距由 8px 增至 32px，使秘寶向左、元素匣向右，保持互不重疊與正式主城黑金卡片皮膚。"
+    },
+    {
+      "id": 5,
+      "request": "深淵帝王 BOSS 關改為七菁英加一 BOSS，移除後排左右最外兩隻怪。",
+      "owner": ["js/59-abyss-two-tier-runtime.js"],
+      "implementation": "一般帝王關與 Lv20 極帝關固定前排五格含中央 BOSS、後排只保留 position 1/2/3 三名菁英，總數 8；Lv40 真境最終五帝戰仍由獨立 buildTrueRealmFinalRoster owner 維持 5 BOSS + 5 菁英。"
+    }
+  ],
+  "verification": [
+    "node tests/v174-relic-navigation-button-polish.test.js",
+    "node tests/v174-team-relic-system.test.js",
+    "node tests/abyss-two-tier-refactor.test.js",
+    "tests/ui-team-relic-mobile-browser.test.js",
+    "Repository checks"
+  ]
+}
