@@ -16,8 +16,16 @@ assert.doesNotMatch(rpgUi,/confirmButton\.className="v169-rpg-dialog-button prim
 
 assert.doesNotMatch(relicCss,/map-return\.png/);
 assert.match(relicCss,/\.team-relic-home-tools\{[\s\S]*?width:192px;[\s\S]*?gap:32px;/);
-assert.match(relicCss,/:has\(\.team-relic-detail\) \.home-feature-close-btn\{display:none!important;\}/);
-assert.match(relicCss,/\.team-relic-detail-back::after\{content:"返回秘寶列表";/);
+assert.match(relicCss,/#statusHelpButton,\s*\n#game-stage #homeFeatureModal\.team-relic-modal #skillPreviewHeaderButton\{display:none!important;\}/,
+    "relic modal must never expose the character status-help or all-skill-preview header controls");
+assert.match(relicCss,/\.home-feature-close-btn:not\(#statusHelpButton\):not\(#skillPreviewHeaderButton\)\{display:inline-flex!important;\}/,
+    "only the real modal return button may be forced visible in relic list mode");
+assert.match(relicCss,/:has\(\.team-relic-detail\) \.home-feature-close-btn\{display:none!important;\}/,
+    "detail mode removes the redundant modal return control");
+assert.match(relicCss,/#game-stage #homeFeatureModal\.team-relic-modal \.team-relic-detail-back\{[^}]*font-size:0!important/,
+    "the original detail button text must be suppressed with enough specificity to beat shared button CSS");
+assert.match(relicCss,/#game-stage #homeFeatureModal\.team-relic-modal \.team-relic-detail-back::after\{content:"返回秘寶列表";[^}]*font-size:13px/,
+    "the detail return label must have exactly one visible source");
 
 assert.match(abyss,/for\(let position=0;position<5;position\+\+\)[\s\S]*?for\(let position=1;position<=3;position\+\+\)/,
     "normal emperor stages must keep the five-slot front row and only three centered rear elites");
