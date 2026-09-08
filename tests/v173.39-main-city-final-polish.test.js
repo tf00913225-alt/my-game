@@ -20,8 +20,8 @@ test("utility buttons use image-over-text cards and preserve the centre passage"
  assert.match(base,/#app\.no-header \.header,\s*#app:has\(#homePage\.active\) #gameHeaderBar\{[\s\S]*?display:none;/);
  assert.equal(396-(74*2)-(92*2),64);
 });
-test("roster uses the enlarged three-cell horizontal geometry while bottom nav remains fixed",()=>{
- assert.match(roster,/\.v146-home-roster\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?margin:45\.5px 10px 0;[\s\S]*?padding:3\.5px 7px 5px;/);
+test("roster keeps the enlarged three-cell geometry but is lifted clear of the bottom nav",()=>{
+ assert.match(roster,/\.v146-home-roster\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?margin:18px 10px 0;[\s\S]*?padding:3\.5px 7px 5px;/);
  assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?grid-column:1\/-1;[\s\S]*?min-height:15px;[\s\S]*?line-height:15px;/);
  assert.match(roster,/\.v146-home-character\{[\s\S]*?grid-template-columns:36px minmax\(0,1fr\);[\s\S]*?height:64px;[\s\S]*?padding:3px 4px 3px 3px;/);
  assert.match(roster,/\.v146-home-avatar\{[\s\S]*?width:36px;[\s\S]*?height:36px;[\s\S]*?transform:none/);
