@@ -10,7 +10,7 @@
       "id": 1,
       "request": "元素匣與秘寶入口不得遮住既有按鈕，並與主城既有按鈕風格一致。",
       "owner": ["css/55-team-relic-system.css", "js/60-team-relic-system.js"],
-      "implementation": "兩顆入口移至主城中央 utility lane，沿用正式 home-card-utility 外觀與尺寸，不再自建不同皮膚。"
+      "implementation": "離線經驗／系統保留第四排左右外側原位；秘寶／元素匣改為兩個 80×82px 中央槽位，與正式 home-card-secondary 黑金尺寸、框線、圖文比例一致，四顆按鈕彼此不重疊。"
     },
     {
       "id": 2,
