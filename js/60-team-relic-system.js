@@ -507,6 +507,9 @@
     }
     function damageEnemy(index,amount,element){
         const monster=typeof monsters!=="undefined"?monsters[index]:null; if(!monster||!monster.alive||amount<=0){ return 0; }
+        if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster,index)){
+            return 0;
+        }
         const final=Math.max(1,Math.floor(amount*(isBoss(monster)?RELIC_BALANCE_CONFIG.bossDamageModifier:1)));
         monster.hp=Math.max(0,numeric(monster.hp)-final);
         emitRelicMonsterHit(index,final,"hp",false);
@@ -515,6 +518,9 @@
     }
     function applyEnemyDebuff(monster,attackDown,accuracyDown,duration){
         if(!monster||!monster.alive||!relicBattleState){ return; }
+        if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster)){
+            return;
+        }
         const efficiency=isBoss(monster)?RELIC_BALANCE_CONFIG.bossDebuffEfficiency:1;
         const attack=Math.max(0,attackDown*efficiency),accuracy=Math.max(0,accuracyDown*efficiency);
         const restore={monster:monster,expiresRound:currentRound()+Math.max(1,Math.floor(duration||1))-1};
@@ -570,6 +576,7 @@
                 const chance=valueFor(def,eff.chanceKey,level);
                 (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>{
                     const monster=monsters[index]; if(!monster||!monster.alive||Math.random()>=chance){ return; }
+                    if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster,index)){ return; }
                     if(typeof applyBurnEffect==="function"){ withSource(SOURCE_RELIC,()=>applyBurnEffect(monster,eff.durationRounds||2,RELIC_BALANCE_CONFIG.burnPercent)); }
                 });
             }else if(eff.type==="prevent_death"){

@@ -231,6 +231,35 @@ test("claimed chest survives reload and never respawns",()=>{
     assert.deepEqual([state.phase,state.chestSpawned,state.chestClaimed,state.portalUnlocked],["portal",false,true,true]);
 });
 
+test("replay preserves permanent first-clear ledger and skips every claimed chest reward",()=>{
+    const run=load();
+    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win');v174AbyssClaimChest()",run.context);
+    assert.equal(Number(run.context.gold),120);
+    vm.runInContext("v174AbyssReset(20);v174AbyssResolveBattleResult('win')",run.context);
+    const replay=value(run.context,"v174AbyssGetRunState(20)");
+    assert.deepEqual([replay.phase,replay.chestSpawned,replay.chestClaimed,replay.portalUnlocked],["portal",false,true,true]);
+    assert.equal(vm.runInContext("v174AbyssClaimChest()",run.context),false);
+    assert.equal(Number(run.context.gold),120,"replay must never duplicate the first-clear chest");
+    assert.equal(replay.firstClearClaims["d20-r0-s0"].status,"claimed");
+});
+
+test("Abyss progress hydrates from the canonical main save when the compatibility sidecar is absent",()=>{
+    const mainSeed={"battle_full_version_save_v5":JSON.stringify({player:{id:"qa",level:50}})};
+    const first=load({storage:mainSeed});
+    vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win');v174AbyssClaimChest()",first.context);
+    const snapshot=first.localStorage.snapshot();delete snapshot.v174_abyss_state_v2;
+    const second=load({storage:snapshot});
+    const state=value(second.context,"v174AbyssGetRunState(20)");
+    assert.deepEqual([state.phase,state.chestClaimed,state.portalUnlocked],["portal",true,true]);
+    assert.equal(state.firstClearClaims["d20-r0-s0"].status,"claimed");
+});
+
+test("all player-facing Abyss exits are routed to the Gameplay Center owner",()=>{
+    assert.match(source,/v174AbyssLeaveToGameplay\(\)/);
+    assert.match(source,/window\.v141LeaveAbyssMap=leaveToGameplay/);
+    assert.doesNotMatch(source,/v174-abyss-complete[\s\S]{0,800}showPage\(["']dungeon["']\)/);
+});
+
 test("Lv20/Lv40 state remains separate and full run completes after exactly 25 claimed stages",()=>{
     const {context}=load();
     vm.runInContext("v174AbyssSelectDifficulty(20)",context);

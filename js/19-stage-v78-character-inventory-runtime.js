@@ -284,11 +284,11 @@ function loadSkillProgressionRuntime(){
     const existing=document.getElementById("v17364-skill-progression-runtime");
     if(existing){
         if(existing.dataset.loaded==="1"||window.__v17364SkillProgressionInstalled===true){
-            loadTeamRelicRuntime();
-        }else if(existing.dataset.teamRelicChainArmed!=="1"){
-            existing.dataset.teamRelicChainArmed="1";
-            existing.addEventListener("load",loadTeamRelicRuntime,{once:true});
-            existing.addEventListener("error",loadTeamRelicRuntime,{once:true});
+            loadGameplayBossTowerRuntime();
+        }else if(existing.dataset.gameplayChainArmed!=="1"){
+            existing.dataset.gameplayChainArmed="1";
+            existing.addEventListener("load",loadGameplayBossTowerRuntime,{once:true});
+            existing.addEventListener("error",loadGameplayBossTowerRuntime,{once:true});
         }
         return;
     }
@@ -299,10 +299,47 @@ function loadSkillProgressionRuntime(){
     script.async=false;
     script.onload=function(){
         script.dataset.loaded="1";
-        loadTeamRelicRuntime();
+        loadGameplayBossTowerRuntime();
     };
     script.onerror=function(){
         console.warn("V173.64 skill progression runtime failed to load");
+        loadGameplayBossTowerRuntime();
+    };
+    document.body.appendChild(script);
+}
+
+function loadGameplayBossTowerStyle(){
+    if(document.getElementById("gameplay-boss-tower-style")){ return; }
+    const link=document.createElement("link");
+    link.id="gameplay-boss-tower-style";
+    link.rel="stylesheet";
+    link.href="css/gameplay-boss-tower.css?v=173.63";
+    document.head.appendChild(link);
+}
+
+function loadGameplayBossTowerRuntime(){
+    loadGameplayBossTowerStyle();
+    const existing=document.getElementById("gameplay-boss-tower-runtime");
+    if(existing){
+        if(existing.dataset.loaded==="1"){
+            loadTeamRelicRuntime();
+        }else if(existing.dataset.teamRelicChainArmed!=="1"){
+            existing.dataset.teamRelicChainArmed="1";
+            existing.addEventListener("load",loadTeamRelicRuntime,{once:true});
+            existing.addEventListener("error",loadTeamRelicRuntime,{once:true});
+        }
+        return;
+    }
+    const script=document.createElement("script");
+    script.id="gameplay-boss-tower-runtime";
+    script.src="js/gameplay-boss-tower-system.js?v=173.63";
+    script.async=false;
+    script.onload=function(){
+        script.dataset.loaded="1";
+        loadTeamRelicRuntime();
+    };
+    script.onerror=function(){
+        console.warn("Gameplay / BOSS / Four-Symbol Tower runtime failed to load");
         loadTeamRelicRuntime();
     };
     document.body.appendChild(script);
@@ -410,9 +447,10 @@ function armV17363FunctionalFixes(){
        legacy V144/V155 five-emperor roster wrappers cannot retake ownership.
        V173.64 skill progression is chained after the current Abyss owner,
        so player learning gates never become prerequisites for monster skills.
-       Team Relic is chained last so its trigger hooks attach to the actual
-       final battle / save / home owners, including skill progression wrappers,
-       instead of stale historical wrappers.
+       Gameplay / BOSS / Four-Symbol Tower attaches after skill progression and
+       owns only its feature state plus mechanism-card integration. Team Relic
+       remains chained last so its trigger hooks attach to the actual final
+       battle / save / home owners instead of stale historical wrappers.
     */
     if(document.documentElement.dataset.runtimeReady){
         loadV17363FunctionalFixes();

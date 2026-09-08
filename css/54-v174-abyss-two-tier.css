@@ -39,3 +39,16 @@
     min-width:0 !important;
     box-sizing:border-box !important;
 }
+
+#game-stage .v174-abyss-selection-head .v174-abyss-leave{
+    align-self:center;
+    min-height:34px;
+    margin-top:5px;
+    padding:6px 14px;
+    border:1px solid #9d783f;
+    border-radius:999px;
+    color:#ead5a9;
+    background:linear-gradient(180deg,#332516,#17100a);
+    font-size:10px;
+    font-weight:900;
+}

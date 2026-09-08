@@ -1,0 +1,109 @@
+{
+  "date": "2026-09-08",
+  "title": "玩法中心、BOSS 機制卡、四象塔架構與深淵入口重整",
+  "base_branch": "dev",
+  "base_sha": "75cf90774d1d8a63818f65de999d044603e21a09",
+  "work_branch": "feature/gameplay-boss-tower-hub",
+  "status": "IMPLEMENTED_PENDING_BROWSER_QA",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "IMPLEMENTED",
+      "request": "底部 BOSS 正式改為玩法，保留五顆導覽與既有尺寸，並使用附件去背後的真透明 PNG。",
+      "owner": ["index.html", "assets/ui/nav-gameplay.png", "release/deprecated-code.json"],
+      "implementation": "保留 bossNav 相容 id，但玩家可見文字、aria-label、title 與點擊目的均改為玩法中心；新圖沿用 nav-art-button 規格，舊 nav-boss.png 保留。"
+    },
+    {
+      "id": 2,
+      "status": "IMPLEMENTED",
+      "request": "建立黑金武俠 RPG 玩法中心，集中 BOSS、四象塔、深淵與一張尚未開放卡。",
+      "owner": ["index.html", "css/gameplay-boss-tower.css", "js/gameplay-boss-tower-system.js"],
+      "implementation": "建立獨立 gameplayPage 與狀態型大型玩法卡；所有特殊玩法由同一 hub 進入，不增加底部按鈕。"
+    },
+    {
+      "id": 3,
+      "status": "IMPLEMENTED",
+      "request": "建立共用固定版型的個人 BOSS／世界 BOSS 頁與詳細資訊。",
+      "owner": ["index.html", "css/gameplay-boss-tower.css", "js/gameplay-boss-tower-system.js"],
+      "implementation": "同一 BOSS 頁上方兩標籤切換；集中定義固定等級、解鎖、元素、特性、機制提示、首通與重複獎勵，並直接接現有戰鬥 launcher。"
+    },
+    {
+      "id": 4,
+      "status": "IMPLEMENTED",
+      "request": "個人 BOSS 可不限次數刷取，固定等級、逐步解鎖、首通特殊獎勵只發一次。",
+      "owner": ["js/gameplay-boss-tower-system.js"],
+      "implementation": "以現有正式怪物名稱建立 Lv20～Lv100 九個節點；同級菁英為數值基準，Lv40 起加入 2～4 個戰鬥階段，首通狀態與 clears 寫入單一存檔。"
+    },
+    {
+      "id": 5,
+      "status": "IMPLEMENTED",
+      "request": "世界 BOSS 為永久單人災厄討伐，四個攻略階段逐階保存，首通特殊獎勵不可重複。",
+      "owner": ["js/gameplay-boss-tower-system.js"],
+      "implementation": "建立 Lv40／60／80／100 長期目標；每一階段使用不同技能層級與機制配置，勝利立即保存，失敗不回退，完成後可再戰最終階段但只給普通獎勵。"
+    },
+    {
+      "id": 6,
+      "status": "IMPLEMENTED",
+      "request": "建立真正可攻擊、可選取、有 HP 與破壞效果的 BOSS 專屬機制卡框架。",
+      "owner": ["js/gameplay-boss-tower-system.js", "css/gameplay-boss-tower.css", "js/60-team-relic-system.js"],
+      "implementation": "護盾、蓄力、回復、增幅、封鎖均存於 battle sidecar 專屬槽，不進 monsters/currentBattleMonsters、不占十人陣形、不觸發擊殺／經驗／掉落；最高同時一至兩張。"
+    },
+    {
+      "id": 7,
+      "status": "IMPLEMENTED",
+      "request": "護盾必須阻擋 BOSS 點選、單體／三體／全體直接傷害與新異常，舊 DOT 保留；同次多段破盾不得重定向。",
+      "owner": ["js/gameplay-boss-tower-system.js", "js/60-team-relic-system.js"],
+      "implementation": "目標解析與秘寶直接效果共用 canDirectlyAffectMonster；行動開始鎖定 shield snapshot，破盾後從下一次正式行動才恢復；點 BOSS 顯示護盾提示並閃動機制卡。"
+    },
+    {
+      "id": 8,
+      "status": "IMPLEMENTED",
+      "request": "自動戰鬥正確處理機制卡，不得空轉或持續攻擊受保護 BOSS。",
+      "owner": ["js/gameplay-boss-tower-system.js"],
+      "implementation": "正式優先序為護盾、蓄力、回復、增幅、封鎖；auto action 直接排入 sidecar target，無合法傷害技能時退回普通攻擊。"
+    },
+    {
+      "id": 9,
+      "status": "IMPLEMENTED",
+      "request": "四象塔 Lv30 開放、每週 100 層、火土水風輪替、週內續打、樓層首通獎勵與歷史紀錄。",
+      "owner": ["js/gameplay-boss-tower-system.js", "css/gameplay-boss-tower.css"],
+      "implementation": "沿用既有 UTC 日期基準，以單一設定表產生每 5 層精英、每 10 層 BOSS、25／50／75／100 里程碑；週 reset 只清週資料，歷史與已取得資產保留；第 50 層使用正式四件元素秘寶自選。"
+    },
+    {
+      "id": 10,
+      "status": "IMPLEMENTED",
+      "request": "深淵從副本玩家入口移至玩法中心，保留 Lv20／Lv40、地圖、五帝、戰鬥與既有 runtime owner。",
+      "owner": ["index.html", "js/41-v146-system-polish.js", "js/59-abyss-two-tier-runtime.js", "js/gameplay-boss-tower-system.js"],
+      "implementation": "副本頁移除深淵標籤；玩法卡進入原 v174 runtime；選擇、地圖退出、完成與殼層返回全部導回玩法中心，日常副本維持原入口。"
+    },
+    {
+      "id": 11,
+      "status": "IMPLEMENTED",
+      "request": "深淵首通寶箱與最終特殊獎勵每存檔只領一次，再戰不重複發放。",
+      "owner": ["js/59-abyss-two-tier-runtime.js", "js/00-main.js"],
+      "implementation": "新增永久 firstClearClaims ledger 並遷移歷史 claims；獎勵變更前先 reserve granting，replay 勝利直接完成關卡且略過寶箱，進度納入主存檔並保留相容 sidecar。"
+    },
+    {
+      "id": 12,
+      "status": "IMPLEMENTED",
+      "request": "新增進度存檔、舊存檔 migration、手機固定大面板與完整自動化／瀏覽器驗證。",
+      "owner": ["js/00-main.js", "js/gameplay-boss-tower-system.js", "tests/gameplay-boss-tower-system.test.js", "tests/gameplay-hub-ui-and-icon.test.js", "tests/abyss-two-tier-refactor.test.js"],
+      "implementation": "gameplayProgress 與 abyssProgress 均由主存檔保存；缺欄位自動正規化，不重置舊存檔；UI 使用固定 shell 與單一內部捲動區，無新增 !important。"
+    }
+  ],
+  "verification": {
+    "completed": [
+      "node --check：本輪直接修改／新增 runtime 通過",
+      "Gameplay / BOSS / Tower runtime：13/13 通過",
+      "Abyss regression：15/15 通過",
+      "Gameplay hub / loader / true-alpha icon：通過",
+      "完整 Node suites：119/119 通過（瀏覽器 QA 前基線）",
+      "Repository resources / HTML IDs / loader / git-diff：通過（瀏覽器 QA 前基線）"
+    ],
+    "pending": [
+      "390×844 與 412×915 真實瀏覽器操作／版面 QA",
+      "遠端 feature branch Repository checks",
+      "驗收完成後才推導並同步下一個正式 Game / Cache Version"
+    ]
+  }
+}

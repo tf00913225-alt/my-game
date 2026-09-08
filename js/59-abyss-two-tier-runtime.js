@@ -12,8 +12,9 @@
     window.__v174TwoTierAbyssInstalled=true;
 
     const STORAGE_KEY="v174_abyss_state_v2";
+    const MAIN_SAVE_KEY="battle_full_version_save_v5";
     const LEGACY_STORAGE_KEY="v141_abyss_state";
-    const STATE_VERSION=2;
+    const STATE_VERSION=3;
     const PRE_STAGE_COUNT=4;
     const PRE_STAGE_REGULAR_COUNT=5;
     const PRE_STAGE_ELITE_COUNT=3;
@@ -108,7 +109,7 @@
             active:false,regionIndex:0,encounterIndex:0,isBoss:false,
             phase:"ready",battleCompleted:false,chestSpawned:false,chestClaimed:false,
             portalUnlocked:false,regionCompleted:false,completed:false,clears:0,
-            completedRegions:[false,false,false,false,false],completedStages:{},rewardClaims:{},
+            completedRegions:[false,false,false,false,false],completedStages:{},rewardClaims:{},firstClearClaims:{},
             x:50,y:84,message:""
         };
     }
@@ -128,6 +129,17 @@
         run.completedRegions=Array.from({length:REGION_COUNT},(_,index)=>!!(Array.isArray(source.completedRegions)&&source.completedRegions[index]));
         run.completedStages=source.completedStages&&typeof source.completedStages==="object"?Object.assign({},source.completedStages):{};
         run.rewardClaims=source.rewardClaims&&typeof source.rewardClaims==="object"?Object.assign({},source.rewardClaims):{};
+        run.firstClearClaims=source.firstClearClaims&&typeof source.firstClearClaims==="object"
+            ?Object.assign({},source.firstClearClaims)
+            :{};
+        /* V173.64 migration: every historically claimed stage is a permanent
+           first-clear claim. Replay state may reset; this ledger never does. */
+        Object.keys(run.rewardClaims).forEach(function(claimKey){
+            const historic=run.rewardClaims[claimKey];
+            if(historic&&(historic.status==="granting"||historic.status==="claimed")){
+                run.firstClearClaims[claimKey]=Object.assign({},historic,{status:"claimed"});
+            }
+        });
         const key=stageKey(run);
         const claim=run.rewardClaims[key];
         if(claim&&(claim.status==="granting"||claim.status==="claimed")){
@@ -201,6 +213,7 @@
                     run.battleCompleted=true;run.chestClaimed=true;run.portalUnlocked=run.regionIndex<REGION_COUNT-1;
                     run.completedStages[key]=true;run.completedRegions[run.regionIndex]=true;run.regionCompleted=true;
                     run.rewardClaims[key]={status:"claimed",migrated:true};
+                    run.firstClearClaims[key]={status:"claimed",migrated:true};
                     run.phase=run.regionIndex<REGION_COUNT-1?"portal":"complete";
                     if(run.regionIndex===REGION_COUNT-1){ run.completed=true; }
                 }
@@ -212,9 +225,28 @@
         return root;
     }
 
+    function readMainSave(){
+        try{ return JSON.parse(localStorage.getItem(MAIN_SAVE_KEY)||"null"); }catch(_){ return null; }
+    }
     function loadRoot(){
         let parsed=null;
-        try{ parsed=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null"); }catch(_){ parsed=null; }
+        const mainSave=readMainSave();
+        if(mainSave&&mainSave.abyssProgress&&typeof mainSave.abyssProgress==="object"){
+            parsed=mainSave.abyssProgress;
+        }else if(mainSave){
+            /* One-time migration for saves created before Abyss joined the
+               canonical per-character save document. */
+            try{ parsed=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null"); }catch(_){ parsed=null; }
+        }else if(typeof player!=="undefined"&&player&&player.id){
+            /* Runtime/unit harnesses and a narrow legacy startup window can
+               already have a hydrated character before the core save document
+               becomes readable. The compatibility sidecar is valid there. */
+            try{ parsed=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null"); }catch(_){ parsed=null; }
+        }else{
+            /* A sidecar must never leak a former character's first clears into
+               a fresh save slot after that character is deleted. */
+            try{ localStorage.removeItem(STORAGE_KEY); }catch(_){ }
+        }
         const root=defaultRoot();
         if(parsed&&typeof parsed==="object"){
             root.selectedDifficulty=Number(parsed.selectedDifficulty)===20||Number(parsed.selectedDifficulty)===40?Number(parsed.selectedDifficulty):null;
@@ -262,6 +294,11 @@
         normalizeRunInPlace(20);
         normalizeRunInPlace(40);
         try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(rootState)); }catch(_){ }
+        const mainSave=readMainSave();
+        if(mainSave&&typeof mainSave==="object"){
+            mainSave.abyssProgress=JSON.parse(JSON.stringify(rootState));
+            try{ localStorage.setItem(MAIN_SAVE_KEY,JSON.stringify(mainSave)); }catch(_){ }
+        }
     }
     persist();
 
@@ -416,7 +453,7 @@
             '<button type="button" '+(locked?'disabled aria-disabled="true"':'onclick="v174AbyssSelectDifficulty('+level+')"')+'>'+escapeHtml(status.action)+'</button></article>';
     }
     function renderSelection(){
-        return '<div class="v141-abyss-intro v174-abyss-selection"><header class="v174-abyss-selection-head"><span>深淵副本</span><b>虛空五帝</b><small>固定境界・力量成長不再被深淵同步追趕</small></header><div class="v174-abyss-card-list">'+renderDifficultyCard(20)+renderDifficultyCard(40)+'</div></div>';
+        return '<div class="v141-abyss-intro v174-abyss-selection"><header class="v174-abyss-selection-head"><span>永久高難首通攻略</span><b>虛空五帝</b><small>固定境界・每個寶箱與最終特殊獎勵每份存檔僅可領取一次</small><button type="button" class="v174-abyss-leave" onclick="v174AbyssLeaveToGameplay()">返回玩法</button></header><div class="v174-abyss-card-list">'+renderDifficultyCard(20)+renderDifficultyCard(40)+'</div></div>';
     }
     function nodeClass(run,index){
         const key="d"+run.difficulty+"-r"+run.regionIndex+"-s"+index;
@@ -455,7 +492,7 @@
     }
     function renderCompletion(run){
         const config=difficultyConfig(run.difficulty);
-        return '<div class="v141-abyss-intro complete v174-abyss-complete"><div class="v174-abyss-complete-seal">破</div><h3>'+escapeHtml(config.title)+' 已通關</h3><p>極帝寶箱已領取，本次 25 場深淵進度正式完成。</p><div class="v174-abyss-complete-actions"><button type="button" onclick="v174AbyssReset('+run.difficulty+')">重新挑戰</button><button type="button" onclick="v174AbyssBackToSelection()">返回深淵選擇</button></div></div>';
+        return '<div class="v141-abyss-intro complete v174-abyss-complete"><div class="v174-abyss-complete-seal">破</div><h3>'+escapeHtml(config.title)+' 已通關</h3><p>本難度的永久首通紀錄已保存；再戰不會重複取得寶箱與特殊首通獎勵。</p><div class="v174-abyss-complete-actions"><button type="button" onclick="v174AbyssReset('+run.difficulty+')">重新挑戰</button><button type="button" onclick="v174AbyssLeaveToGameplay()">返回玩法中心</button></div></div>';
     }
     function renderMap(run){
         const config=difficultyConfig(run.difficulty),region=currentRegion(run),map=FLOOR_MAPS[run.regionIndex];
@@ -494,11 +531,24 @@
         mapEntered=true;persist();refresh();return true;
     }
     function resetDifficulty(level){
-        const config=difficultyConfig(level),clears=Math.max(0,Math.floor(numeric(rootState.runs[config.id]&&rootState.runs[config.id].clears,0)));
+        const config=difficultyConfig(level),previous=rootState.runs[config.id]||defaultRun(config.id);
+        const clears=Math.max(0,Math.floor(numeric(previous.clears,0)));
+        const firstClearClaims=previous.firstClearClaims&&typeof previous.firstClearClaims==="object"?Object.assign({},previous.firstClearClaims):{};
         clearTransientActions();rootState.runs[config.id]=defaultRun(config.id);rootState.runs[config.id].active=true;rootState.runs[config.id].clears=clears;
+        rootState.runs[config.id].firstClearClaims=firstClearClaims;
         rootState.selectedDifficulty=config.id;mapEntered=true;persist();refresh();
     }
-    function backToSelection(){ clearTransientActions();mapEntered=false;rootState.selectedDifficulty=null;persist();refresh(); }
+    function backToSelection(){
+        clearTransientActions();mapEntered=false;rootState.selectedDifficulty=null;persist();
+        if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }
+        else{ refresh(); }
+    }
+    function leaveToGameplay(){
+        clearTransientActions();mapEntered=false;rootState.selectedDifficulty=null;persist();
+        if(typeof window.vGameplayBackToHub==="function"){ window.vGameplayBackToHub();return true; }
+        if(typeof showPage==="function"){ showPage("gameplay");return true; }
+        return false;
+    }
 
     function movePlayer(x,y,callback){
         const run=currentRun();
@@ -527,6 +577,12 @@
         const run=currentRun();if(!run){ return false; }
         clearTransientActions();
         if(result!=="win"){ run.message="挑戰失敗，本關進度未前進。整備後可再次挑戰。";persist();refresh();return false; }
+        const key=stageKey(run);
+        if(run.firstClearClaims[key]&&(run.firstClearClaims[key].status==="granting"||run.firstClearClaims[key].status==="claimed")){
+            completeStageWithoutReward(run,key);
+            refresh();
+            return true;
+        }
         run.battleCompleted=true;run.chestSpawned=true;run.chestClaimed=false;run.portalUnlocked=false;run.phase="chest";
         run.message=(isBossStage(run)?"帝王已退場。":"試煉已通過。")+"請走到寶箱位置領取獎勵。";persist();refresh();return true;
     }
@@ -583,6 +639,7 @@
     }
     function finalizeClaim(run,reward,key){
         run.rewardClaims[key]={status:"claimed",kind:reward.kind,gold:reward.gold,exp:reward.exp,ticketId:reward.ticket&&reward.ticket.id||null,claimedAt:Date.now()};
+        run.firstClearClaims[key]=Object.assign({},run.rewardClaims[key]);
         run.chestSpawned=false;run.chestClaimed=true;run.completedStages[key]=true;
         if(isBossStage(run)){ run.completedRegions[run.regionIndex]=true;run.regionCompleted=true; }
         if(isFinalBossStage(run)){
@@ -590,13 +647,23 @@
         }else{ run.phase="portal";run.portalUnlocked=true;run.message="寶箱已領取，傳送點正式解鎖。"; }
         persist();
     }
+    function completeStageWithoutReward(run,key){
+        run.battleCompleted=true;run.chestSpawned=false;run.chestClaimed=true;run.completedStages[key]=true;
+        if(isBossStage(run)){ run.completedRegions[run.regionIndex]=true;run.regionCompleted=true; }
+        if(isFinalBossStage(run)){
+            run.completed=true;run.phase="complete";run.portalUnlocked=false;
+            run.clears=Math.max(0,Math.floor(numeric(run.clears,0)))+1;
+            run.message="再戰完成；永久首通獎勵不會重複發放。";
+        }else{
+            run.phase="portal";run.portalUnlocked=true;
+            run.message="本關再戰完成；首通寶箱已領取，本次不重複發放。";
+        }
+        persist();
+    }
     function reconcileExistingClaim(run,key){
-        const existing=run.rewardClaims[key];
-        if(!(existing&&(existing.status==="granting"||existing.status==="claimed"))&&!run.chestClaimed){ return false; }
-        run.chestSpawned=false;run.chestClaimed=true;run.completedStages[key]=true;
-        if(isFinalBossStage(run)){ run.completed=true;run.phase="complete";run.portalUnlocked=false; }
-        else{ run.phase="portal";run.portalUnlocked=true; }
-        persist();refresh();return true;
+        const existing=run.rewardClaims[key],permanent=run.firstClearClaims[key];
+        if(!(existing&&(existing.status==="granting"||existing.status==="claimed"))&&!(permanent&&(permanent.status==="granting"||permanent.status==="claimed"))&&!run.chestClaimed){ return false; }
+        completeStageWithoutReward(run,key);refresh();return true;
     }
     function claimChest(){
         const run=currentRun();if(!run||run.phase!=="chest"||!run.battleCompleted||!run.chestSpawned){ return false; }
@@ -608,7 +675,16 @@
             if(!live||live!==run||stageKey(live)!==key||live.phase!=="chest"||!live.chestSpawned||live.chestClaimed){ releaseInteraction(lock);return; }
             const reward=rewardDescriptor(live);
             if(!canStoreReward(reward)){ releaseInteraction(lock);if(typeof alert==="function"){ alert("背包空間不足，寶箱尚未領取。請整理背包後再試一次。"); }return; }
-            if(!addRewardItem(reward)){ releaseInteraction(lock);if(typeof alert==="function"){ alert("背包空間不足，寶箱尚未領取。"); }return; }
+            /* Reserve the permanent claim before granting. A reload between
+               currency/item mutation and final UI settlement can therefore
+               never duplicate a first-clear reward. */
+            live.rewardClaims[key]={status:"granting",reservedAt:Date.now()};
+            live.firstClearClaims[key]={status:"granting",reservedAt:Date.now()};
+            persist();
+            if(!addRewardItem(reward)){
+                delete live.rewardClaims[key];delete live.firstClearClaims[key];persist();
+                releaseInteraction(lock);if(typeof alert==="function"){ alert("背包空間不足，寶箱尚未領取。"); }return;
+            }
             applyCurrencyReward(reward);finalizeClaim(live,reward,key);releaseInteraction(lock);refresh();showReward(reward);
         });
         if(!started){ releaseInteraction(lock);return false; }return true;
@@ -648,6 +724,7 @@
     window.v174AbyssSelectDifficulty=selectDifficulty;
     window.v174AbyssReset=resetDifficulty;
     window.v174AbyssBackToSelection=backToSelection;
+    window.v174AbyssLeaveToGameplay=leaveToGameplay;
     window.v174AbyssMoveByEvent=moveByEvent;
     window.v174AbyssStartEncounter=startEncounter;
     window.v174AbyssResolveBattleResult=resolveBattleResult;
@@ -670,7 +747,7 @@
     window.v141AbyssMoveByEvent=moveByEvent;
     window.v141ChallengeAbyssBoss=startEncounter;
     window.v141HandleAbyssBossInteraction=function(event){ if(event&&event.preventDefault){ event.preventDefault(); }if(event&&event.stopPropagation){ event.stopPropagation(); }return startEncounter(); };
-    window.v141LeaveAbyssMap=function(){ clearTransientActions();mapEntered=false; };
+    window.v141LeaveAbyssMap=leaveToGameplay;
     window.v141GetAbyssState=function(){
         const run=currentRun()||rootState.runs[20];
         return Object.assign({},JSON.parse(JSON.stringify(run)),{floor:run.regionIndex+1,phase:run.completed?"complete":run.phase,mapEntered:mapEntered});

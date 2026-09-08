@@ -180,7 +180,8 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.match(css,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
     assert.match(source,/v146-home-roster/);
     assert.match(source,/root\.querySelectorAll\("\.v141-blueprint-series"\).*remove/);
-    assert.match(source,/buttons\.push\(\["返回"/);
+    assert.match(source,/abyssSelectionActive\?"返回玩法":"返回"/);
+    assert.match(source,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\('home'\)"/);
     assert.match(css,/#v141DungeonNav\[data-v146-columns="4"\]/);
     assert.match(css,/\.v146-abyss-return/);
     assert.match(rules,/"戰鬥失敗"/);

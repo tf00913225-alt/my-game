@@ -1134,15 +1134,6 @@
         日常副本
     </button>
 
-    <button
-        id="dungeonTabBtnAbyss"
-        class="home-feature-buy-btn"
-        style="flex:1;padding:8px 4px;font-size:13px;"
-        onclick="switchDungeonTab('abyss')"
-    >
-        深淵副本
-    </button>
-
 </div>
 
 <div
@@ -1154,42 +1145,92 @@
 
 
 <!-- =====================================================
-     BOSS
+     玩法中心
+===================================================== -->
+
+<div
+    id="gameplayPage"
+    class="page gameplay-page"
+>
+
+<section class="gameplay-large-panel" aria-labelledby="gameplayPageTitle">
+    <header class="gameplay-panel-header">
+        <div>
+            <small>特殊戰鬥總覽</small>
+            <h2 id="gameplayPageTitle">玩 法</h2>
+        </div>
+    </header>
+
+    <div
+        id="gameplayHubContent"
+        class="gameplay-panel-scroll gameplay-hub-grid"
+    ></div>
+</section>
+
+</div>
+
+
+<!-- =====================================================
+     BOSS 子玩法
 ===================================================== -->
 
 <div
     id="bossPage"
-    class="page"
+    class="page gameplay-page"
 >
 
-<h2>BOSS</h2>
+<section class="gameplay-large-panel gameplay-boss-panel" aria-labelledby="bossPageTitle">
+    <header class="gameplay-panel-header">
+        <div>
+            <small>永久單人討伐</small>
+            <h2 id="bossPageTitle">BOSS</h2>
+        </div>
+        <button type="button" class="gameplay-back-button" onclick="vGameplayBackToHub()">返回玩法</button>
+    </header>
 
-<div style="display:flex;gap:6px;margin:8px 10px;">
+    <div class="gameplay-fixed-tabs" role="tablist" aria-label="BOSS 類型">
+        <button
+            id="bossTabBtnPersonal"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            onclick="vGameplaySwitchBossTab('personal')"
+        >個人 BOSS</button>
+        <button
+            id="bossTabBtnWorld"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            onclick="vGameplaySwitchBossTab('world')"
+        >世界 BOSS</button>
+    </div>
 
-    <button
-        id="bossTabBtnPersonal"
-        class="home-feature-buy-btn"
-        style="flex:1;padding:8px 4px;font-size:13px;"
-        onclick="switchBossTab('personal')"
-    >
-        個人BOSS
-    </button>
-
-    <button
-        id="bossTabBtnHell"
-        class="home-feature-buy-btn"
-        style="flex:1;padding:8px 4px;font-size:13px;"
-        onclick="switchBossTab('hell')"
-    >
-        地獄BOSS
-    </button>
+    <div id="bossTabContent" class="gameplay-panel-scroll"></div>
+</section>
 
 </div>
 
+
+<!-- =====================================================
+     四象塔子玩法
+===================================================== -->
+
 <div
-    id="bossTabContent"
-    style="margin:0 10px;min-height:300px;"
-></div>
+    id="towerPage"
+    class="page gameplay-page"
+>
+
+<section class="gameplay-large-panel gameplay-tower-panel" aria-labelledby="towerPageTitle">
+    <header class="gameplay-panel-header">
+        <div>
+            <small>每週元素試煉</small>
+            <h2 id="towerPageTitle">四 象 塔</h2>
+        </div>
+        <button type="button" class="gameplay-back-button" onclick="vGameplayBackToHub()">返回玩法</button>
+    </header>
+
+    <div id="towerPageContent" class="gameplay-panel-scroll"></div>
+</section>
 
 </div>
 
@@ -2342,7 +2383,7 @@
 <button
     id="dungeonNav"
     class="nav-button nav-art-button-wrap"
-    onclick="showPage('dungeon')"
+    onclick="vGameplayOpenDailyDungeons()"
     aria-label="副本"
 >
 <img class="nav-art-button" src="assets/ui/nav-dungeon.png" alt="" aria-hidden="true">
@@ -2352,11 +2393,12 @@
 <button
     id="bossNav"
     class="nav-button nav-art-button-wrap"
-    onclick="showPage('boss')"
-    aria-label="BOSS"
+    onclick="showPage('gameplay')"
+    aria-label="玩法"
+    title="玩法"
 >
-<img class="nav-art-button" src="assets/ui/nav-boss.png" alt="" aria-hidden="true">
-<span class="nav-sr-only">BOSS</span>
+<img class="nav-art-button" src="assets/ui/nav-gameplay.png" alt="" aria-hidden="true">
+<span class="nav-sr-only">玩法</span>
 </button>
 
 </div>
