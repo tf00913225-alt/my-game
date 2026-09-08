@@ -36,7 +36,9 @@ for(const file of paths){
 }
 
 const battleRe=/(?:#battlePage|\.battle-|battleMonsterArea|battleTurnIndicator|battle-target|battle-item|skill-quick-button|\.sq-|#mainBattleMenu|v141-effect|v143-skill|v149-barrier|v149-reflect|v146-status-popup|boss-mechanism|team-relic-battle|abyss-battle|v135-sq-scope|monster-status-badges|monster-bar-text|auto-battle-button)/i;
-const exceptionRe=/(?:home-test-button|v17351-ad-|debug|dev-only|aria-hidden|REWARD PREVIEW|display\s*:\s*none|visibility\s*:\s*hidden|screen-reader|sr-only|assistive|::before|::after)/i;
+// Legal exceptions are narrow and explicit. Do not classify every pseudo-element as
+// decorative: e.g. the boss-card cleared ::after is meaningful player information.
+const exceptionRe=/(?:home-test-button|v17351-ad-|debug|dev-only|aria-hidden|REWARD PREVIEW|display\s*:\s*none|visibility\s*:\s*hidden|screen-reader|sr-only|assistive|v17361-reward-preview > h3::after)/i;
 
 const buckets={general_ui:[],battle_ui:[],decorative_exception:[],test_non_runtime:[]};
 for(const record of records){
@@ -54,9 +56,5 @@ for(const record of records){
 assert.equal(records.length,345,"baseline <13px declaration count changed; audit base must stay reproducible");
 assert.equal(Object.values(buckets).reduce((sum,list)=>sum+list.length,0),records.length);
 const counts=Object.fromEntries(Object.entries(buckets).map(([key,list])=>[key,list.length]));
+assert.deepEqual(counts,{general_ui:290,battle_ui:48,decorative_exception:4,test_non_runtime:3});
 console.log("BASELINE_UI_TYPOGRAPHY_CLASSIFICATION="+JSON.stringify(counts));
-for(const [key,list] of Object.entries(buckets)){
-    console.log(`--- ${key} (${list.length}) ---`);
-    list.slice(0,16).forEach(item=>console.log(`${item.value}px ${item.file}:${item.line} ${item.context} :: ${item.source}`));
-}
-assert.fail("CLASSIFICATION_CAPTURE="+JSON.stringify(counts));
