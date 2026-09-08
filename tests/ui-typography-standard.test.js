@@ -6,6 +6,7 @@ const ROOT = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
 
 const owners = {
+  homePolish: 'css/42-v146-system-polish.css',
   elementBox: 'css/48-v169-element-box-settings.css',
   abyss: 'css/50-v169-abyss-flow.css',
   inventory: 'css/52-v173.50-inventory-qol.css',
@@ -34,11 +35,16 @@ function enforceNoTinyText(file, transform = (text) => text) {
 }
 
 // These are the formal player-facing owners touched by the typography migration.
+const homePolish = read(owners.homePolish);
+const homeRegion = homePolish.split('/* Home party HUD:')[1].split('#game-stage .shop-potion-purchase-row')[0];
+const expRegion = homePolish.split('/* Lv20+ EXP pool charge / catch-up:')[1].split('@media (max-height:720px)')[0];
+assert.equal(below13(homeRegion).length, 0, 'Home party player-facing typography must stay >=13px');
+assert.equal(below13(expRegion).length, 0, 'EXP pool player-facing typography must stay >=13px');
+
 enforceNoTinyText(owners.elementBox);
 enforceNoTinyText(owners.abyss);
 enforceNoTinyText(owners.inventory);
 enforceNoTinyText(owners.abyssLayout);
-
 enforceNoTinyText(owners.qa, (text) => text.split('/* DEV-only ad simulator')[0]);
 enforceNoTinyText(owners.relic, (text) => text
   .split('#game-stage .team-relic-battle-banner')[0]
@@ -52,6 +58,11 @@ const gameplay = read(owners.gameplay);
 const docs = read('UI_GUIDELINES.md');
 
 // Hierarchy: 13px is a floor, not a blanket replacement.
+assert.match(homePolish, /\.v146-home-roster > header\{[^}]*font-size:15px/);
+assert.match(homePolish, /\.v146-home-character-main > div:first-child\{[^}]*font-size:15px/);
+assert.match(homePolish, /\.v146-home-resource strong\{[^}]*font-size:13px/);
+assert.match(homePolish, /\.v173-exp-charge-status b\{[^}]*font-size:16px/);
+assert.match(homePolish, /\.v173-exp-charge-status small\{[^}]*font-size:14px/);
 assert.match(relic, /\.team-relic-card-name\{[^}]*font-size:16px/);
 assert.match(relic, /\.team-relic-detail section h3\{[^}]*font-size:18px/);
 assert.match(relic, /\.team-relic-tabs button\{[^}]*font-size:15px/);
@@ -66,6 +77,7 @@ assert.match(qa, /\.v17363-game-select-option\{[^}]*font-size:15px!important/);
 assert.match(qa, /\.v141-synthesis-tabs button\{[^}]*font-size:15px!important/);
 
 // Explicitly protect battle exclusions: these existing small battle values are intentional.
+assert.match(homePolish, /#game-stage #battlePage[\s\S]*?\.v149|\.v146-status-popup|#battlePage \.v146-defeated/);
 assert.match(gameplay, /\.boss-mechanism-kind\{[\s\S]*?font-size:12px/);
 assert.match(gameplay, /\.boss-mechanism-name\{[\s\S]*?font-size:10px/);
 assert.match(gameplay, /\.boss-mechanism-hp,[\s\S]*?font-size:8px/);
