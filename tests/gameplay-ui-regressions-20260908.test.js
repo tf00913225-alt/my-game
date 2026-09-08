@@ -23,12 +23,14 @@ assert.match(bossCss,/\.boss-mechanism-card\[data-type="charge"\] \.boss-mechani
    pushes the next mechanism to the right of the BOSS. */
 assert.doesNotMatch(bossCss,/\.boss-mechanism-card\.destroying\{\s*pointer-events:none;/);
 
-/* Four-Symbol Tower weekly element is gameplay state, not just border color. */
+/* Four-Symbol Tower weekly element is gameplay state, not just border color.
+   Keep these assertions whitespace-safe so formatting changes do not create a
+   false CI failure while the actual combat behavior remains the same. */
 assert.match(bossRuntime,/const ELEMENT_ORDER=Object\.freeze\(\["fire","earth","water","wind"\]\)/);
-assert.match(bossRuntime,/if\(element==="fire"\)\{ monster\.skillChance=Math\.min\(\.82,monster\.skillChance\+\.08\);monster\.critChance/);
-assert.match(bossRuntime,/if\(element==="water"\)\{ monster\.v141SupportSkillIds=ELEMENTS\.water\.supports\.slice\(\);monster\.v141AbyssAi="support"; \}/);
-assert.match(bossRuntime,/if\(element==="wind"\)\{ monster\.evasion=.*monster\.agility=.*1\.12; \}/);
-assert.match(bossRuntime,/if\(element==="earth"\)\{ monster\.defense=.*monster\.maxHP=.*1\.12;monster\.hp=monster\.maxHP; \}/);
+assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.skillChance=Math\.min\(\.82,monster\.skillChance\+\.08\);[\s\S]*?monster\.critChance=[\s\S]*?\}/);
+assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.v141SupportSkillIds=ELEMENTS\.water\.supports\.slice\(\);[\s\S]*?monster\.v141AbyssAi="support";[\s\S]*?\}/);
+assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?monster\.agility=[\s\S]*?1\.12;[\s\S]*?\}/);
+assert.match(bossRuntime,/if\(element==="earth"\)\{[\s\S]*?monster\.defense=[\s\S]*?monster\.maxHP=[\s\S]*?1\.12;[\s\S]*?monster\.hp=monster\.maxHP;[\s\S]*?\}/);
 
 /* Official Sprite Sheets own their complete action where present. The retired
    V142 generic visual stage stays hidden, while its timing gate remains usable. */
