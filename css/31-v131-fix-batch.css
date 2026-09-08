@@ -95,7 +95,7 @@
 }
 
 #game-stage #battlePage .battle-monster.target{
-    border:2px solid var(--v138-element-color) !important;
+    border-color:var(--v138-element-color) !important;
     box-shadow:
         0 0 0 2px rgba(255,255,255,.86),
         0 0 12px var(--v138-element-glow) !important;
