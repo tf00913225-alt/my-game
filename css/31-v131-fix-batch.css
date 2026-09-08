@@ -200,9 +200,9 @@
     flex:0 0 auto !important;
     align-self:center !important;
     width:auto !important;
-    min-width:44px !important;
+    min-width:54px !important;
     height:auto !important;
-    min-height:0 !important;
+    min-height:36px !important;
 }
 
 #game-stage #allSkillsList .skill-row .skill-action-card-top:empty{
@@ -210,8 +210,8 @@
 }
 
 #game-stage #allSkillsList .skill-row .skill-action-card-label{
-    padding:6px 8px !important;
-    font-size:12px !important;
+    padding:7px 9px !important;
+    font-size:15px !important;
     line-height:1.3 !important;
 }
 
@@ -250,12 +250,12 @@
     max-width:100% !important;
     margin-top:4px !important;
     margin-right:6px !important;
-    padding:2px 7px !important;
+    padding:3px 7px !important;
     border:1px solid #d88a32 !important;
     border-radius:999px !important;
     background:#301b0a !important;
     color:#ffc46b !important;
-    font-size:11px !important;
+    font-size:13px !important;
     line-height:1.35 !important;
     font-weight:800 !important;
     white-space:nowrap !important;
@@ -267,11 +267,11 @@
     justify-content:center;
     width:max-content;
     margin:2px 4px 2px 0;
-    padding:2px 5px;
+    padding:3px 6px;
     border:1px solid #826536;
     border-radius:999px;
-    font-size:10px;
-    line-height:1.1;
+    font-size:13px;
+    line-height:1.2;
     font-weight:800;
     color:#eadfc8;
     background:#17120d;
@@ -407,7 +407,7 @@
 }
 
 .v131-exp-level{
-    font-size:13px;
+    font-size:14px;
     color:#b7a98e;
     text-align:right;
 }
@@ -421,19 +421,21 @@
 .v131-exp-preview-btn{
     grid-column:1 / -1;
     width:100%;
+    min-height:38px;
     padding:7px 8px;
     border:1px solid #8a6a3a;
     border-radius:6px;
     background:linear-gradient(180deg,#3b2a17,#21160d);
     color:#f4d690;
-    font-size:13px;
+    font-size:15px;
     font-weight:800;
 }
 
 .v131-exp-preview-summary{
     text-align:right;
     color:#cfbd98;
-    font-size:12px;
+    font-size:14px;
+    line-height:1.4;
     padding:3px 2px;
 }
 
@@ -444,9 +446,11 @@
 }
 
 .v131-exp-actions button{
+    min-height:40px;
     padding:9px 8px;
     border:1px solid #a77a35;
     border-radius:7px;
+    font-size:15px;
     font-weight:900;
 }
 
@@ -487,7 +491,7 @@
 
 .v131-element-box-title{
     color:#f0c866;
-    font-size:14px;
+    font-size:16px;
     font-weight:900;
     margin-bottom:2px;
 }
@@ -497,13 +501,14 @@
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    font-size:12px;
+    font-size:14px;
+    line-height:1.4;
     color:#b9aa8c;
 }
 
 .v131-element-box-stats strong{
     color:#f0dfb7;
-    font-size:13px;
+    font-size:15px;
     text-align:right;
 }
 
@@ -519,14 +524,14 @@
 #game-stage #homeExpPoolCard,
 #game-stage #statusPage,
 #game-stage #skillPage{
-    font-size:14px;
+    font-size:15px;
 }
 
 #game-stage #characterTabContent p,
 #game-stage #characterTabContent small,
 #game-stage #characterTabContent .description,
 #game-stage #homeExpPoolCard .exp-pool-caption{
-    font-size:12.5px !important;
+    font-size:14px !important;
     line-height:1.55 !important;
 }
 
@@ -547,12 +552,12 @@
 }
 
 #game-stage #allSkillsList .skill-row-desc{
-    font-size:13px !important;
+    font-size:15px !important;
     line-height:1.5 !important;
 }
 
 #game-stage #allSkillsList .skill-row-text b{
-    font-size:15px !important;
+    font-size:17px !important;
 }
 
 /*
@@ -604,7 +609,7 @@
 }
 
 #game-stage .stat-explanation{
-    font-size:12.5px !important;
+    font-size:14px !important;
     line-height:1.7 !important;
 }
 
@@ -618,3 +623,40 @@
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-card{
     background:linear-gradient(160deg,#17130e,#080706) !important;
 }
+
+/* V173 typography: the native creation canvas is 1080px wide and renders at
+   roughly 0.388889 on a 420px phone. Values here are design-space sizes chosen
+   from actual visible targets; the 13px floor therefore maps to about 34px. */
+#creationPage .creation-step-progress{font-size:34px !important;line-height:1.25 !important;}
+#creationPage .creation-portrait-caption{font-size:36px !important;line-height:1.35 !important;}
+#creationPage .creation-portrait-caption b{font-size:41px !important;line-height:1.25 !important;}
+#creationPage .creation-section-kicker{font-size:39px !important;line-height:1.3 !important;}
+#creationPage .creation-gender-option{font-size:39px !important;}
+#creationPage .element-option .element-name{font-size:41px !important;line-height:1.25 !important;}
+#creationPage .creation-role-subtitle{font-size:39px !important;line-height:1.35 !important;}
+#creationPage .creation-role-description{font-size:39px !important;line-height:1.5 !important;}
+#creationPage .creation-role-tag{font-size:34px !important;line-height:1.3 !important;}
+#creationPage .creation-card-index{font-size:34px !important;}
+#creationPage .creation-card-caption{font-size:36px !important;line-height:1.4 !important;}
+#creationPage .creation-next small,#creationPage .creation-back small{font-size:34px !important;line-height:1.25 !important;}
+#creationPage .creation-skill-lane-label{font-size:36px !important;line-height:1.3 !important;}
+#creationPage .creation-skill-chip{font-size:39px !important;line-height:1.3 !important;}
+#creationPage .creation-points-badge{font-size:36px !important;line-height:1.3 !important;}
+#creationPage .creation-points-badge b{font-size:41px !important;}
+#creationPage .creation-stats-card .creation-label{font-size:41px !important;line-height:1.3 !important;}
+#creationPage .creation-stats-card .creation-card-caption{font-size:36px !important;line-height:1.4 !important;}
+#creationPage .creation-stat-copy b{font-size:41px !important;line-height:1.25 !important;}
+#creationPage .creation-stat-copy small{font-size:36px !important;line-height:1.35 !important;}
+#creationPage .creation-stat-right > b{font-size:41px !important;}
+#creationPage .creation-stat-details summary{font-size:39px !important;line-height:1.4 !important;}
+#creationPage .creation-stat-details[open] .creation-stat-details-body,
+#creationPage .creation-stat-details-body{font-size:39px !important;line-height:1.6 !important;}
+#creationPage .creation-start small{font-size:34px !important;line-height:1.25 !important;}
+#creationSkillDetailModal .creation-skill-detail-path{font-size:36px !important;line-height:1.35 !important;}
+#creationSkillDetailModal .creation-skill-detail-tag{font-size:34px !important;line-height:1.3 !important;}
+#creationSkillDetailModal .creation-skill-detail-description{font-size:39px !important;line-height:1.6 !important;}
+#creationSkillDetailModal .creation-skill-detail-meta{font-size:36px !important;line-height:1.55 !important;}
+#creationSkillDetailModal .creation-skill-detail-section-title{font-size:46px !important;line-height:1.3 !important;}
+#creationSkillDetailModal .creation-skill-detail-level-row,
+#creationSkillDetailModal .creation-skill-detail-level-row b{font-size:39px !important;line-height:1.55 !important;}
+#creationSkillDetailModal .creation-skill-detail-close{font-size:39px !important;}

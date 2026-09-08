@@ -97,13 +97,14 @@ test("the roster renderer keeps all character details only in the adventure part
     assert.match(rosterRuntime,/homeHudExpValue/);
     assert.match(rosterRuntime,/隊伍 '\+partyIndexes\.length\+' \/ 3/);
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
-    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:3px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
-    assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1/);
+    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:4px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
+    assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1;[\s\S]*min-height:23px;[\s\S]*font-size:15px/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*border:1px solid rgba\(190,139,59,.54\);[\s\S]*inset 0 0 13px rgba\(214,158,63,.04\)/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:36px minmax\(0,1fr\);[\s\S]*height:64px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:40px minmax\(0,1fr\);[\s\S]*min-height:84px/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*border:1px solid rgba\(145,107,53,.38\);[\s\S]*inset 0 0 0 1px rgba\(255,222,146,.02\)/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:36px;[\s\S]*height:36px;[\s\S]*transform:none/);
-    assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:10px;[\s\S]*margin-inline:0/);
+    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:40px;[\s\S]*height:40px;[\s\S]*transform:none/);
+    assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:17px;[\s\S]*margin-inline:0/);
+    assert.match(rosterCss,/\.v146-home-resource strong\{[\s\S]*font-size:13px;[\s\S]*line-height:15px/);
     ["fire","water","wind","earth"].forEach(element=>assert.match(rosterCss,new RegExp('data-element="'+element+'"')));
 });
 
@@ -129,12 +130,12 @@ test("the enlarged three-character horizontal roster still fits above the unchan
     const safeHeight=746.6666667-10-78-(14*2);
     const hudHeight=5+48;
     const actionHeight=1+90+1+256;
-    const rosterHeight=45.5+3.5+15+3+64+5+2;
+    const rosterHeight=45.5+5+23+4+84+7+2;
     assert.ok(hudHeight+actionHeight+rosterHeight<=safeHeight);
     assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*height:64px/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:36px;[\s\S]*height:36px/);
+    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*min-height:84px/);
+    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:40px;[\s\S]*height:40px/);
 });
 
 test("development cache and visible version stay synchronized",()=>{

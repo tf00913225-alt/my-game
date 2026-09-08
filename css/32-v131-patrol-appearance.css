@@ -44,8 +44,8 @@
 }
 #game-stage #mapPage #v131PatrolAppearancePanel{
     display:none;
-    min-width:118px;
-    max-width:180px;
+    min-width:128px;
+    max-width:190px;
     padding:5px;
     border:1px solid #8a6a3a;
     border-radius:8px;
@@ -58,13 +58,14 @@
 }
 #game-stage #mapPage .v131-patrol-choice{
     width:100%;
-    min-height:30px;
-    padding:5px 8px;
+    min-height:38px;
+    padding:6px 9px;
     border:1px solid #66502d;
     border-radius:6px;
     background:linear-gradient(180deg,#2c2115,#161009);
     color:#f2e3bf;
-    font-size:12px;
+    font-size:15px;
+    line-height:1.25;
     font-weight:800;
     text-align:left;
 }

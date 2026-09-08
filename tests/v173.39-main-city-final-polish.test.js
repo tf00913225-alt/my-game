@@ -8,7 +8,7 @@ test("HUD uses the requested logical typography without growing its shell",()=>{
  assert.match(base,/\.home-city-hud\{[\s\S]*?min-height:48px;/);
  assert.match(base,/\.home-hud-identity\{[\s\S]*?align-items:center;[\s\S]*?align-self:stretch;/);
  assert.match(base,/\.home-hud-kicker\{[\s\S]*?gap:8px;[\s\S]*?font-size:15px;[\s\S]*?line-height:1\.15;/);
- assert.match(index,/#game-stage #homePage \.home-version-badge\{[\s\S]*?font-size:11px;/);
+ assert.match(roster,/#game-stage #homePage \.home-version-badge\{font-size:13px;line-height:17px;\}/);
  assert.match(base,/\.home-hud-resources\{[\s\S]*?grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.doesNotMatch(index,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
 });
@@ -20,12 +20,15 @@ test("utility buttons use image-over-text cards and preserve the centre passage"
  assert.match(base,/#app\.no-header \.header,\s*#app:has\(#homePage\.active\) #gameHeaderBar\{[\s\S]*?display:none;/);
  assert.equal(396-(74*2)-(92*2),64);
 });
-test("roster keeps the enlarged three-cell geometry but is lifted clear of the bottom nav",()=>{
- assert.match(roster,/\.v146-home-roster\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?margin:18px 10px 0;[\s\S]*?padding:3\.5px 7px 5px;/);
- assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?grid-column:1\/-1;[\s\S]*?min-height:15px;[\s\S]*?line-height:15px;/);
- assert.match(roster,/\.v146-home-character\{[\s\S]*?grid-template-columns:36px minmax\(0,1fr\);[\s\S]*?height:64px;[\s\S]*?padding:3px 4px 3px 3px;/);
- assert.match(roster,/\.v146-home-avatar\{[\s\S]*?width:36px;[\s\S]*?height:36px;[\s\S]*?transform:none/);
- assert.match(roster,/\.v146-home-resource\{[\s\S]*?height:10px/);
+test("roster keeps three cells while growing enough for the permanent typography floor",()=>{
+ assert.match(roster,/\.v146-home-roster\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?gap:4px;[\s\S]*?margin:18px 10px 0;padding:5px 7px 7px;/);
+ assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?grid-column:1\/-1;[\s\S]*?min-height:23px;[\s\S]*?font-size:15px;[\s\S]*?line-height:20px;/);
+ assert.match(roster,/\.v146-home-character\{[\s\S]*?grid-template-columns:40px minmax\(0,1fr\);[\s\S]*?min-height:84px;[\s\S]*?padding:5px 4px 5px 3px;/);
+ assert.match(roster,/\.v146-home-avatar\{[\s\S]*?width:40px;[\s\S]*?height:40px;[\s\S]*?transform:none/);
+ assert.match(roster,/\.v146-home-character-main > div:first-child\{[\s\S]*?font-size:15px;[\s\S]*?line-height:19px/);
+ assert.match(roster,/\.v146-home-character-main span\{[\s\S]*?font-size:13px;[\s\S]*?line-height:17px/);
+ assert.match(roster,/\.v146-home-resource\{[\s\S]*?height:17px/);
+ assert.match(roster,/\.v146-home-resource strong\{[\s\S]*?font-size:13px;[\s\S]*?line-height:15px/);
  assert.match(runtime,/function renderHomeRoster\(\)[\s\S]*?grid\.insertAdjacentElement\("afterend",roster\)/);
 });
 test("forbidden entry sizes and navigation remain untouched",()=>{

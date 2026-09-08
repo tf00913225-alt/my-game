@@ -24,8 +24,8 @@ assert.match(relicCss,/:has\(\.team-relic-detail\) \.home-feature-close-btn\{dis
     "detail mode removes the redundant modal return control");
 assert.match(relicCss,/#game-stage #homeFeatureModal\.team-relic-modal \.team-relic-detail-back\{[^}]*font-size:0!important/,
     "the original detail button text must be suppressed with enough specificity to beat shared button CSS");
-assert.match(relicCss,/#game-stage #homeFeatureModal\.team-relic-modal \.team-relic-detail-back::after\{content:"返回秘寶列表";[^}]*font-size:13px/,
-    "the detail return label must have exactly one visible source");
+assert.match(relicCss,/#game-stage #homeFeatureModal\.team-relic-modal \.team-relic-detail-back::after\{content:"返回秘寶列表";[^}]*font-size:15px/,
+    "the detail return label must have exactly one visible 15px action source");
 
 assert.match(abyss,/for\(let position=0;position<5;position\+\+\)[\s\S]*?for\(let position=1;position<=3;position\+\+\)/,
     "normal emperor stages must keep the five-slot front row and only three centered rear elites");

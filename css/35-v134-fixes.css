@@ -19,8 +19,9 @@
     top:4px;
     right:5px;
     z-index:8;
-    min-width:56px;
-    height:30px;
+    min-width:64px;
+    height:36px;
+    min-height:36px;
     padding:0 10px;
     align-items:center;
     justify-content:center;
@@ -28,9 +29,9 @@
     border-radius:7px;
     background:linear-gradient(180deg,#4a2d14,#23160c);
     color:#ffe4a0;
-    font-size:12px;
+    font-size:15px;
     font-weight:900;
-    line-height:1;
+    line-height:1.2;
     box-shadow:0 2px 8px rgba(0,0,0,.55);
 }
 
