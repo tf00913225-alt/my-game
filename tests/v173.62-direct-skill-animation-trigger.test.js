@@ -13,6 +13,8 @@ assert.doesNotMatch(v142,/showSkillNameBadge=function\(name,element,characterInd
 assert.match(main,/function showSkillNameBadge[\s\S]*?v142PlaySkillAnimationFromBadge\("player"/);
 assert.match(main,/function showMonsterSkillNameBadge[\s\S]*?v142PlaySkillAnimationFromBadge\("monster"/);
 assert.match(v143,/if\(!window\.v142SkillAnimationDirector\)\{ return; \}/);
-assert.match(v143,/director\.play=function\(config,meta\)/);
+assert.match(v143,/function officialPlay\(config,meta\)/);
+assert.match(v143,/Object\.defineProperty\(director,"play",\{[\s\S]*?get:function\(\)\{ return officialPlay; \}[\s\S]*?set:function\(\)\{ blockedDirectorOverrides\+\+; \}/);
+assert.doesNotMatch(v143,/director\.play=function\(config,meta\)/);
 
-console.log("✓ direct skill animation trigger survives later badge wrapper order");
+console.log("✓ direct skill animation trigger survives later badge wrapper order under the locked V143 raster owner");
