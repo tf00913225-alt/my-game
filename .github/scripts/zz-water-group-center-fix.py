@@ -52,6 +52,28 @@ new_return = '''        const width=anchor.rect.width+step*2;
 if old_return not in text:
     raise SystemExit("fixedTriLayoutBounds return block not found")
 text = text.replace(old_return, new_return, 1)
-
 path.write_text(text)
-print("Water/group tri Sprite centering patch staged.")
+
+# Migrate the remaining V166 renderer-specific assertions to the shared V143 raster owner.
+test_path = Path("tests/v166-water-vfx.test.js")
+test_text = test_path.read_text()
+old_keyframe = '    assert.match(css,/@keyframes v166WaterTargetTravel\\{/);'
+new_keyframe = '''    assert.match(css,/@keyframes v143RasterTravel\\{/);
+    assert.doesNotMatch(css,/v166WaterTargetTravel/);'''
+if old_keyframe not in test_text:
+    raise SystemExit("V166 Water target travel assertion not found")
+test_text = test_text.replace(old_keyframe, new_keyframe, 1)
+
+old_enemy = '''    assert.equal(sprites[0].style["--v143-sprite-target-left"],"379px");
+    assert.equal(sprites[0].style["--v143-sprite-target-top"],"418px");'''
+new_enemy = '''    assert.equal(sprites[0].dataset.travel,"true");
+    assert.equal(sprites[0].style.left,"338px");
+    assert.equal(sprites[0].style.top,"140px");
+    assert.equal(sprites[0].style["--v143-sprite-dx"],"41px");
+    assert.equal(sprites[0].style["--v143-sprite-dy"],"278px");'''
+if old_enemy not in test_text:
+    raise SystemExit("V166 enemy Tidal Beast legacy target coordinates not found")
+test_text = test_text.replace(old_enemy, new_enemy, 1)
+test_path.write_text(test_text)
+
+print("Water/group tri Sprite centering and V166 raster contract migration staged.")
