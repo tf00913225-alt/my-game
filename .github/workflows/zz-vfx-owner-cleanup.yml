@@ -5,12 +5,8 @@ on:
     branches:
       - fix/combat-vfx-owner-cleanup-20260909
 
-permissions:
-  contents: write
-
 jobs:
   verify:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,35 +15,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Refresh historical raster VFX assertions
+      - name: Source-level legacy VFX guard
         run: |
           python - <<'PY'
           from pathlib import Path
-          p=Path('tests/v153-fire-vfx.test.js')
-          s=p.read_text()
-          s=s.replace(
-              'assert.match(css,/v153FireCastFrames var\\(--v143-sprite-duration,1500ms\\) steps\\(1,end\\) 1 both/);',
-              'assert.match(css,/v143RasterCastFrames var\\(--v143-sprite-duration,1200ms\\) steps\\(1,end\\) var\\(--v143-sprite-delay,0ms\\) 1 both/);'
-          )
-          s=s.replace(
-              'assert.doesNotMatch(css,/v153FireCastFrames[^;]*infinite/);',
-              'assert.doesNotMatch(css,/v143RasterCastFrames[^;]*infinite/);'
-          )
-          s=s.replace(
-              'assert.match(css,/v153StatusSpriteFrames var\\(--v153-status-duration,800ms\\) steps\\(1,end\\) infinite/);',
-              'assert.match(css,/v143StatusRasterFrames var\\(--v153-status-duration,1000ms\\) steps\\(1,end\\) infinite/);'
-          )
-          p.write_text(s)
+          import re,sys
+          files=["js/35-v141-ui-battle.js","js/37-v142-skill-animation.js","js/39-v143-skill-animation.js","js/43-v149-skill-ui-rules.js","js/59-abyss-two-tier-runtime.js"]
+          banned=re.compile(r'playCanvasParticles|v141-effect-canvas|getContext\(|createElement\(["\']canvas["\']\)|installWordCircleDirector|v149-word-|v149-word-circle-stage|patchExistingV143ExplosiveFlurryRenderer|canvas-crop')
+          hits=[]
+          for path in files:
+              for no,line in enumerate(Path(path).read_text().splitlines(),1):
+                  if banned.search(line): hits.append(f"{path}:{no}:{line.strip()}")
+          if hits: print("\n".join(hits)); sys.exit(1)
           PY
-      - name: Save historical test refresh
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add tests/v153-fire-vfx.test.js
-          if ! git diff --cached --quiet; then
-            git commit -m "test: align Fire VFX assertions with raster owner"
-            git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
-          fi
       - name: Focused VFX regression tests
         run: |
           node tests/v174-raster-only-combat-vfx-owner.test.js
