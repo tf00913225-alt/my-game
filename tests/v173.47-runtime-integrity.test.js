@@ -18,8 +18,8 @@ assert.match(equipment,/weapon-\(\?:03\|04\).*?"法扇":"法杖"/s);
 assert.match(equipment,/normalizeGeneratedMageWeaponName/);
 assert.doesNotMatch(equipment,/mage:\{shoulder:"法環",head:"法冠",armor:"法袍",shoes:"法履",weapon:"法器"\}/);
 
-assert.match(animation,/fireRocket:\{[\s\S]*?src:"assets\/vfx\/fire\/fire-rocket-cast\.png\?v=165"/);
-assert.match(animation,/placement:"trajectory",travelToTargets:true/);
+assert.match(animation,/function castSheet\(src,placement,options\)\{[\s\S]*?renderer:"dom-sprite"/);
+assert.match(animation,/fireRocket:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/fire\/fire-rocket-cast\.png\?v=165","trajectory",\{travelToTargets:true/);
 assert.doesNotMatch(animation,/config\.id==="fireRocket"&&model\.sprite[\s\S]*?model\.sprite=null/);
 
 assert.match(equipment,/equipmentDungeonWaveIndex<2/);
