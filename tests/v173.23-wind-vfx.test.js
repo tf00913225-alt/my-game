@@ -414,7 +414,7 @@ test("frame seven releases resolved attack results once, while buffs never shake
     attack.setClock(600);
     runTimers(attack,600);
     assert.equal(attack.monsterHits.length,1,"damage result appears once at frame seven");
-    assert.equal(attack.cards.battleMonster2.classList.contains("v143-impact-target"),true);
+    assert.equal(attack.cards.battleMonster2.classList.contains("v143-impact-target"),false,"raster owner must not recreate the retired procedural impact class");
 
     const buff=loadRuntime();
     buff.context.v142SkillAnimationDirector.play(
@@ -491,10 +491,10 @@ test("wind sheets replace procedural wind effects and keep noninteractive status
     assert.doesNotMatch(css,/data-skill="windCrossSlash"/);
     assert.doesNotMatch(css,/data-skill="stormRain"/);
     assert.match(css,/#game-stage #battlePage \.v153-status-vfx\{[\s\S]*?z-index:4;[\s\S]*?pointer-events:none;/);
-    assert.match(css,/@keyframes v153StatusSpriteFrames\{[\s\S]*?87\.5%,100%\{background-position:100% 100%\}/);
-    assert.match(animation,/const frameX=frameIndex%columns;/);
-    assert.match(animation,/const frameY=Math\.floor\(frameIndex\/columns\);/);
-    assert.match(animation,/Object\.keys\(MANIFEST\)\.forEach[\s\S]*?getSpriteImage\(sprite\.src\)/);
+    assert.match(css,/@keyframes v143StatusRasterFrames\{[\s\S]*?87\.5%,100%\{background-position:100% 100%\}/);
+    assert.match(animation,/node\.dataset\.renderer="dom-sprite";/);
+    assert.match(animation,/node\.style\.backgroundSize=\(spec\.columns\*100\)\+"% "\+\(spec\.rows\*100\)\+"%";/);
+    assert.doesNotMatch(animation,/getSpriteImage|frameX=frameIndex|frameY=Math\.floor/);
     assert.doesNotMatch(animation,/assets\/inbox\/[\s\S]{0,80}(?:base64|blob:)/i);
 });
 
