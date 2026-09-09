@@ -16,6 +16,7 @@ const css143=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const v149=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
 const css149=fs.readFileSync("css/44-v149-skill-ui-rules.css","utf8");
+const liveAbyssQa=fs.readFileSync(".github/scripts/run-abyss-live-browser-qa.mjs","utf8");
 
 let passed=0;
 function test(name,handler){
@@ -120,6 +121,15 @@ test("V143 production VFX contains no procedural/Canvas/SVG fallback",()=>{
     ].forEach(pattern=>assert.doesNotMatch(v143,pattern));
     assert.match(v143,/renderer:"dom-sprite"/);
     assert.match(v143,/No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback/);
+});
+
+test("live Abyss QA follows the current V143 DOM raster Sprite contract",()=>{
+    assert.match(liveAbyssQa,/\.v143-vfx-sprite\[data-skill="explosiveFlurry"\]/);
+    assert.match(liveAbyssQa,/stageRenderer,"raster-only"/);
+    assert.match(liveAbyssQa,/vfx\.tag,"I"/);
+    assert.match(liveAbyssQa,/vfx\.renderer,"dom-sprite"/);
+    assert.match(liveAbyssQa,/vfx\.diagnostics\?\.renderer,"dom-sprite-only"/);
+    assert.doesNotMatch(liveAbyssQa,/v143-vfx-sprite-explosiveFlurry|canvas-crop/);
 });
 
 test("old procedural CSS choreography and word-circle CSS are gone",()=>{

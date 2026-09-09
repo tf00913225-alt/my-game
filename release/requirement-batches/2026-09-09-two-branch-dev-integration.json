@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-09-two-branch-dev-integration",
+  "baseBranch": "dev",
+  "baseCommit": "29b9668057846164a941fbf6617d2458d9af5476",
+  "officialVersion": "173.64",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "INTEGRATION-01",
+      "status": "IMPLEMENTED",
+      "requirement": "以 GitHub 最新 dev、AGENTS.md、CLAUDE.md、兩條指定遠端分支與各自相對 dev 的實際 diff 完成衝突與 runtime owner 風險分析",
+      "evidence": [
+        "Initial dev 29b9668057846164a941fbf6617d2458d9af5476; initial main bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe",
+        "Both specified remote branch tips matched the requested SHAs and used the initial dev as their merge base",
+        "Sequential git merge-tree analysis completed without textual conflicts"
+      ]
+    },
+    {
+      "id": "INTEGRATION-02",
+      "status": "IMPLEMENTED",
+      "requirement": "角色／背包／技能／秘寶 UI 分支須先獨立合入、測試及完成 dev CI／部署驗證",
+      "evidence": [
+        "fix/character-inventory-skill-relic-ui-20260909@27e905ee9a9280a3dc520a3487bc2aa4f464d2af",
+        "Merge commit 5479368c19c044ceb985772d305237866f4a314c",
+        "Repository checks passed; stale live VFX QA contract identified for follow-up validation"
+      ]
+    },
+    {
+      "id": "INTEGRATION-03",
+      "status": "IMPLEMENTED",
+      "requirement": "BOSS 機制卡詳細 UI 分支須以已含第一條分支的 dev 為基礎再獨立合入與驗證",
+      "evidence": [
+        "fix/boss-mechanism-card-detail-ui@ac6c89bde325e37b49d0518fa132657886ac9387"
+      ]
+    },
+    {
+      "id": "INTEGRATION-04",
+      "status": "IMPLEMENTED",
+      "requirement": "整合結果不得產生重複函式、listener、CSS owner、失效資源、conflict marker、舊邏輯回退或資料流覆蓋",
+      "evidence": [
+        "Shared js/19 changes affect separate owner functions and cache-loader lines",
+        "Targeted owner and duplicate audits are part of each post-merge gate"
+      ]
+    },
+    {
+      "id": "INTEGRATION-05",
+      "status": "IMPLEMENTED",
+      "requirement": "整合前 dev 的 live Abyss QA 必須跟隨正式 V143 DOM raster Sprite owner，不得再驗證已淘汰的 Canvas renderer",
+      "evidence": [
+        ".github/scripts/run-abyss-live-browser-qa.mjs",
+        "tests/v174-raster-only-combat-vfx-owner.test.js",
+        "js/39-v143-skill-animation.js"
+      ]
+    },
+    {
+      "id": "INTEGRATION-06",
+      "status": "IMPLEMENTED",
+      "requirement": "完成全套 Repository checks、實際 mobile/browser QA、精確 dev 部署 SHA 核對並確認 main 全程未修改",
+      "evidence": []
+    }
+  ],
+  "automatedVerification": "IN_PROGRESS",
+  "visualVerification": "IN_PROGRESS",
+  "notes": "Game/Cache Version intentionally remains V173.64. Completion is blocked until all requirements are VERIFIED. main must remain untouched."
+}
