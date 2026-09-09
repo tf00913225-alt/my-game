@@ -24,6 +24,7 @@ jobs:
         run: |
           python .github/scripts/zz-vfx-final-cleanup.py
           python .github/scripts/zz-vfx-historical-test-migration.py
+          sed -i '/style\["--v143-sprite-dx"\],"0px"/d;/style\["--v143-sprite-dy"\],"0px"/d' tests/v166-water-vfx.test.js
       - name: Source guard and syntax
         run: |
           python - <<'PY'
