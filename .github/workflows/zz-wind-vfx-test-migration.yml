@@ -1,0 +1,55 @@
+name: Wind VFX contract migration
+
+on:
+  push:
+    branches:
+      - fix/combat-vfx-owner-cleanup-20260909
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Migrate Wind raster contracts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('tests/v173.23-wind-vfx.test.js')
+          text=path.read_text()
+          replacements={
+          '    assert.equal(attack.cards.battleMonster2.classList.contains("v143-impact-target"),true);':'''    assert.equal(attack.cards.battleMonster2.classList.contains("v143-impact-target"),false,"raster owner must not recreate the retired procedural impact class");''',
+          '    assert.match(css,/@keyframes v153StatusSpriteFrames\\{[\\s\\S]*?87\\.5%,100%\\{background-position:100% 100%\\}/);':'''    assert.match(css,/@keyframes v143StatusRasterFrames\\{[\\s\\S]*?87\\.5%,100%\\{background-position:100% 100%\\}/);''',
+          '    assert.match(animation,/const frameX=frameIndex%columns;/);':'''    assert.match(animation,/node\\.dataset\\.renderer="dom-sprite";/);''',
+          '    assert.match(animation,/const frameY=Math\\.floor\\(frameIndex\\/columns\\);/);':'''    assert.match(animation,/node\\.style\\.backgroundSize=\\(spec\\.columns\\*100\\)\\+"% "\\+\\(spec\\.rows\\*100\\)\\+"%";/);''',
+          '    assert.match(animation,/Object\\.keys\\(MANIFEST\\)\\.forEach[\\s\\S]*?getSpriteImage\\(sprite\\.src\\)/);':'''    assert.doesNotMatch(animation,/getSpriteImage|frameX=frameIndex|frameY=Math\\.floor/);'''
+          }
+          for old,new in replacements.items():
+              if old not in text:
+                  raise SystemExit('Wind contract pattern not found: '+old)
+              text=text.replace(old,new,1)
+          path.write_text(text)
+          print('Wind VFX historical contracts migrated to raster-only owner.')
+          PY
+      - name: Verify Wind and owner regressions
+        run: |
+          node tests/v173.23-wind-vfx.test.js
+          node tests/v174-raster-only-combat-vfx-owner.test.js
+          node --check tests/v173.23-wind-vfx.test.js
+      - name: Commit migration and remove helper
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          rm .github/workflows/zz-wind-vfx-test-migration.yml
+          git add tests/v173.23-wind-vfx.test.js .github/workflows/zz-wind-vfx-test-migration.yml
+          git commit -m "test: migrate Wind VFX contracts to raster owner"
+          git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
