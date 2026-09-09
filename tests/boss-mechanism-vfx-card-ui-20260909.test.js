@@ -29,8 +29,12 @@ assert.match(v143,/\.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-
 assert.match(boss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?--v143-monster-card-width:166px;[\s\S]*?--v143-monster-card-height:295px;[\s\S]*?aspect-ratio:9 \/ 16;/);
 assert.match(runtime,/bossCard\.classList\.add\("gameplay-boss-card"\)/);
 
-// The redundant battle heading no longer reserves height above the BOSS.
-assert.match(boss,/#battlePage \.battle-title\{[\s\S]*?display:none !important;[\s\S]*?height:0 !important;/);
+// The redundant battle heading is hidden only while a Gameplay BOSS is active.
+// Its historical V15 geometry is reclaimed by the formation without introducing
+// a new priority patch in the formal Gameplay stylesheet.
+assert.match(boss,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
+assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-23px;/);
+assert.doesNotMatch(boss,/!important/);
 
 // The function/mechanism card is portrait 9:16 and its face is deliberately
 // limited to mechanism name, kind and HP. Combat targeting remains on the
