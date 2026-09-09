@@ -456,6 +456,7 @@
         if(current&&!current.done&&current.targetSide===side){
             const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
             if(types.indexOf(type)>=0){
+                registerTarget(side,index,false);
                 let tracked=current.deferredStatusTargets.get(type);
                 if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
                 tracked.add(index);
@@ -547,6 +548,16 @@
             }
             return area;
         }
+        /* Explicit resolved targets are authoritative for VFX centering.  A queued
+           tri target can point at the first surviving slot (for example 0 while
+           the real hit set is [0,2]); keeping that slot as the visual center
+           shifts a group Sprite off the actual targets.  Preserve the fixed tri
+           coverage width below, but center it on the resolved target geometry. */
+        const explicitBounds=Array.isArray(current.targetIds)&&current.targetIds.length
+            ?fieldBounds(indexes.map(i=>cardFor(current.targetSide,i)).filter(Boolean))
+            :null;
+        const layoutCenterX=explicitBounds?explicitBounds.left+explicitBounds.width/2:anchor.x;
+        const layoutCenterY=explicitBounds?explicitBounds.top+explicitBounds.height/2:anchor.y;
         let step=Math.max(1,anchor.rect.width+3);
         if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
             const rows=formationRowsForVfx(currentBattleMonsters);
@@ -565,8 +576,8 @@
         }
         const width=anchor.rect.width+step*2;
         return {
-            left:anchor.x-width/2,top:anchor.rect.top,width:width,height:anchor.rect.height,
-            centerX:anchor.x,centerY:anchor.y,id:"fixed-tri-slots"
+            left:layoutCenterX-width/2,top:anchor.rect.top,width:width,height:anchor.rect.height,
+            centerX:layoutCenterX,centerY:layoutCenterY,id:"fixed-tri-slots"
         };
     }
 

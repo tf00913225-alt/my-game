@@ -450,7 +450,8 @@ test("Water Ball renders one sheet centered on the actual living target group",(
     assert.equal(beastSprites.length,1);
     assert.equal(beastSprites[0].dataset.targetIndex,"1");
     assert.ok(beastSprites[0].style["--v143-sprite-dx"]);
-    assert.match(css,/@keyframes v166WaterTargetTravel\{/);
+    assert.match(css,/@keyframes v143RasterTravel\{/);
+    assert.doesNotMatch(css,/v166WaterTargetTravel/);
 });
 
 test("enemy Water Ball keeps one live-target group while endpoints resolve",()=>{
@@ -529,8 +530,11 @@ test("enemy Tidal Beast discovers one real player endpoint even when damage is a
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetIndex,"2");
-    assert.equal(sprites[0].style["--v143-sprite-target-left"],"379px");
-    assert.equal(sprites[0].style["--v143-sprite-target-top"],"418px");
+    assert.equal(sprites[0].dataset.travel,"true");
+    assert.equal(sprites[0].style.left,"338px");
+    assert.equal(sprites[0].style.top,"140px");
+    assert.equal(sprites[0].style["--v143-sprite-dx"],"41px");
+    assert.equal(sprites[0].style["--v143-sprite-dy"],"278px");
 });
 
 test("late callbacks cannot expand a single-target Tidal Beast cast",()=>{
