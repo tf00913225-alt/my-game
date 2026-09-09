@@ -9,12 +9,12 @@ export const FIREBASE_SDK_VERSION = "12.18.0";
 export const FIREBASE_APP_NAME = "four-symbols-jianghu-client";
 
 export const FIREBASE_CONFIG = Object.freeze({
-    apiKey: "",
+    apiKey: "AIzaSyBx3fyM5Xb38shAVLBMFjV-nMyPWIH5jaA",
     authDomain: "four-symbols-jianghu.firebaseapp.com",
     projectId: "four-symbols-jianghu",
-    storageBucket: "",
+    storageBucket: "four-symbols-jianghu.firebasestorage.app",
     messagingSenderId: "86885650222",
-    appId: "",
+    appId: "1:86885650222:web:8ffcbb5c07dc2a691b34bf",
     measurementId: "G-4PZCMLJC8L"
 });
 
