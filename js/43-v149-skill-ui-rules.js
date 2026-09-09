@@ -910,7 +910,7 @@
     }
 
     /* ----- Procedural word-circle fallback retired; V143 raster owner is authoritative. ----- */
-    
+
     function refreshSkillText(){
         try{
             if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
