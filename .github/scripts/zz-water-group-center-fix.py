@@ -3,6 +3,7 @@ from pathlib import Path
 path = Path("js/39-v143-skill-animation.js")
 text = path.read_text()
 
+# 1) Group/tri raster sprites must center on the resolved target geometry, not a stale queued slot.
 old = '''        const anchor=Number.isInteger(center)?cardCenter(cardFor(current.targetSide,center)):null;
         if(!anchor){
             const area=sideAreaBounds(current.targetSide);
@@ -52,9 +53,37 @@ new_return = '''        const width=anchor.rect.width+step*2;
 if old_return not in text:
     raise SystemExit("fixedTriLayoutBounds return block not found")
 text = text.replace(old_return, new_return, 1)
+
+# 2) A successfully applied deferred status is an authoritative runtime endpoint.
+# Enemy casts often do not know their target before resolution; register it here so
+# the formal raster cast sheet appears for monster -> player debuffs as well.
+old_status = '''        if(current&&!current.done&&current.targetSide===side){
+            const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
+            if(types.indexOf(type)>=0){
+                let tracked=current.deferredStatusTargets.get(type);
+                if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
+                tracked.add(index);
+                syncStatusSprite(side,index,type);
+                return;
+            }
+        }'''
+new_status = '''        if(current&&!current.done&&current.targetSide===side){
+            const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
+            if(types.indexOf(type)>=0){
+                registerTarget(side,index,false);
+                let tracked=current.deferredStatusTargets.get(type);
+                if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
+                tracked.add(index);
+                syncStatusSprite(side,index,type);
+                return;
+            }
+        }'''
+if old_status not in text:
+    raise SystemExit("syncAppliedStatusSprite deferred-status block not found")
+text = text.replace(old_status, new_status, 1)
 path.write_text(text)
 
-# Migrate the remaining V166 renderer-specific assertions to the shared V143 raster owner.
+# 3) Migrate the remaining V166 renderer-specific assertions to the shared V143 raster owner.
 test_path = Path("tests/v166-water-vfx.test.js")
 test_text = test_path.read_text()
 old_keyframe = '    assert.match(css,/@keyframes v166WaterTargetTravel\\{/);'
@@ -76,4 +105,4 @@ if old_enemy not in test_text:
 test_text = test_text.replace(old_enemy, new_enemy, 1)
 test_path.write_text(test_text)
 
-print("Water/group tri Sprite centering and V166 raster contract migration staged.")
+print("Water target geometry, deferred-status endpoint registration, and V166 raster contracts staged.")
