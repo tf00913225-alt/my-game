@@ -45,7 +45,7 @@
         blazeSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/blaze-spell-cast.png?v=165","single",{scale:2.15,maxSize:260})},
         flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast.png?v=165","single",{scale:2.35,maxSize:300})},
         phoenixCry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/phoenix-cry-cast.png?v=165","battlefield",{scale:1.12,minSize:280})},
-        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","group",{scale:1.08,minSize:190,alignToSlots:true})},
+        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},
         fireEX:{hit:.74,noVisual:true,passive:true},
 
         waterKnife:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-blade-slash-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
@@ -194,7 +194,7 @@
     function purgeLegacyCardVfx(){
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
         let removed=0;
-        document.querySelectorAll(".v141-effect-canvas,.v141-card-effects,#v142-skill-stage").forEach(node=>{
+        document.querySelectorAll(".v141-card-effects,#v142-skill-stage").forEach(node=>{
             if(node&&typeof node.remove==="function"){ node.remove(); removed++; }
         });
         state.metrics.legacyNodesPurged+=removed;
@@ -600,6 +600,7 @@
                 Number(sprite.minSize)||96,Number(sprite.maxSize)||184
             );
             node.dataset.targetIndex=String(index);
+            node.dataset.targetIndexes=String(index);
             node.style.left=target.x+"px";
             node.style.top=target.y+"px";
             node.style.width=size+"px";
@@ -615,7 +616,9 @@
                 Number(sprite.minSize)||140,Number(sprite.maxSize)||240
             );
             node.dataset.targetIndex=String(index);
+            node.dataset.targetIndexes=String(index);
             node.dataset.travel="true";
+            node.dataset.travelToTargets="true";
             node.style.left=actor.x+"px";
             node.style.top=actor.y+"px";
             node.style.width=size+"px";
@@ -640,6 +643,10 @@
                 Number(sprite.maxHeight)||Math.max(240,viewportHeight*.92)
             );
             node.dataset.areaId=bounds.id;
+            node.dataset.targetIndexes=emittedSpriteTargets(current).join(",");
+            if(sprite.fixedFormation){ node.dataset.fixedFormation="true"; }
+            node.dataset.coverageScale=String(coverageScale);
+            node.style.clipPath="none";
             node.style.left=(bounds.left+bounds.width/2)+"px";
             node.style.top=(bounds.top+bounds.height/2)+"px";
             node.style.width=width+"px";
@@ -658,6 +665,7 @@
         const viewportHeight=Number(window.innerHeight)||720;
         const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
         const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);
+        node.dataset.targetIndexes=indexes.join(",");
         node.style.width=size+"px";
         node.style.height=size+"px";
         const destination={
@@ -667,10 +675,12 @@
         const actor=placement==="trajectory"?cardCenter(current.actorCard):null;
         if(placement==="trajectory"&&sprite.travelToTargets&&actor){
             node.dataset.travel="true";
+            node.dataset.travelToTargets="true";
             node.style.left=actor.x+"px";
             node.style.top=actor.y+"px";
             node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");
+            node.style.setProperty("--v143-sprite-angle",Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI+"deg");
         }else{
             node.style.left=(Number.isFinite(targetBounds.centerX)?targetBounds.centerX:coverage.left+coverage.width/2)+"px";
             node.style.top=(Number.isFinite(targetBounds.centerY)?targetBounds.centerY:coverage.top+coverage.height/2)+"px";
@@ -884,6 +894,8 @@
         showMonsterHit=function(index){
             const args=Array.prototype.slice.call(arguments);
             const wait=delayFor("monster",index,true);
+            const current=state.current;
+            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="monster"){ args[3]=true; }
             if(wait>8){
                 state.metrics.delayedNumbers++;
                 setTimer(()=>previous.apply(this,args),wait);
@@ -898,6 +910,8 @@
         showPlayerHit=function(amount,type,index){
             const args=Array.prototype.slice.call(arguments);
             const wait=delayFor("player",Number(index)||0,true);
+            const current=state.current;
+            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="player"&&!args[3]){ args[4]=true; }
             if(wait>8){
                 state.metrics.delayedNumbers++;
                 setTimer(()=>previous.apply(this,args),wait);

@@ -344,7 +344,7 @@
     }
 
     /* =====================================================
-       Card effects (persistent CSS layers + short Canvas particles)
+       Card effects (legacy visual renderer retired; data/status only)
     ===================================================== */
     function cardFor(side,index){
         return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
@@ -385,82 +385,15 @@
         ].includes(type));
     }
 
-    function syncCardEffects(card,entity){
-        const layer=ensureEffectLayer(card);
+    function syncCardEffects(card){
+        if(!card||typeof card.querySelector!=="function"){ return; }
+        const layer=card.querySelector(":scope > .v141-card-effects");
         if(!layer){ return; }
-        const types=activeEffectTypes(entity);
-        const signature=types.sort().join("|");
-        if(layer.dataset.signature===signature){ return; }
-        layer.dataset.signature=signature;
-        layer.innerHTML=types.map(type=>'<span class="v141-effect v141-effect-'+type+'"></span>').join("");
+        layer.querySelectorAll(":scope > .v141-effect").forEach(node=>node.remove());
+        if(!layer.children.length){ layer.remove(); }
     }
 
-    function playCanvasParticles(card,type){
-        if(!card||typeof requestAnimationFrame!=="function"){ return; }
-        let canvas=card.querySelector(":scope > canvas.v141-effect-canvas");
-        if(!canvas){
-            canvas=document.createElement("canvas");
-            canvas.className="v141-effect-canvas";
-            canvas.setAttribute("aria-hidden","true");
-            card.appendChild(canvas);
-        }
-        const rect=card.getBoundingClientRect();
-        const width=Math.max(80,Math.round(rect.width||120));
-        const height=Math.max(80,Math.round(rect.height||140));
-        canvas.width=width*2;
-        canvas.height=height*2;
-        const context=canvas.getContext&&canvas.getContext("2d");
-        if(!context){ return; }
-        context.setTransform(2,0,0,2,0,0);
-        const color={
-            heal:"#75ff9d",revive:"#fff7a6",potion:"#62e9ff",talisman:"#ffd26a",
-            shield:"#ffffff",barrier:"#ffd878",buff:"#8fffc1",debuff:"#c58cff"
-        }[type]||"#ffffff";
-        const particles=Array.from({length:18},(_,index)=>({
-            x:width*(.2+Math.random()*.6),
-            y:height*(.65+Math.random()*.25),
-            vx:(Math.random()-.5)*1.2,
-            vy:-(.7+Math.random()*1.7),
-            r:1.5+Math.random()*3,
-            delay:index*12
-        }));
-        const started=performance.now();
-        canvas.classList.add("show");
-        function frame(now){
-            const elapsed=now-started;
-            context.clearRect(0,0,width,height);
-            particles.forEach(particle=>{
-                const local=Math.max(0,elapsed-particle.delay);
-                if(local<=0||local>650){ return; }
-                const alpha=1-local/650;
-                context.globalAlpha=alpha;
-                context.fillStyle=color;
-                context.shadowColor=color;
-                context.shadowBlur=8;
-                context.beginPath();
-                context.arc(
-                    particle.x+particle.vx*local/12,
-                    particle.y+particle.vy*local/12,
-                    particle.r*alpha+.5,0,Math.PI*2
-                );
-                context.fill();
-            });
-            context.globalAlpha=1;
-            if(elapsed<760){ requestAnimationFrame(frame); }
-            else{
-                context.clearRect(0,0,width,height);
-                canvas.classList.remove("show");
-            }
-        }
-        requestAnimationFrame(frame);
-    }
-
-    window.v141PlayCardEffect=function(side,index,type){
-        const card=cardFor(side,index);
-        if(!card){ return; }
-        // V173.61: CSS skill flashes retired; non-CSS Canvas particles remain.
-        playCanvasParticles(card,type);
-    };
+        window.v141PlayCardEffect=function(){ return false; };
 
     function executeAdditionalSupportAction(characterIndex,queued,skill){
         const character=getPartyCharacterByIndex(characterIndex);

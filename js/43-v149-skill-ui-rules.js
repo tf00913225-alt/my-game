@@ -929,45 +929,8 @@
         };
     }
 
-    /* ----- Every skill uses one circle per displayed character. ----- */
-    function installWordCircleDirector(){
-        const director=window.v142SkillAnimationDirector;
-        const manifest=window.v143SkillAnimationManifest;
-        if(!director||typeof director.play!=="function"||!manifest){ return; }
-        const previousPlay=director.play.bind(director);
-        director.play=function(config,meta){
-            if(!config||config.id==="normal"||config.name==="普通攻擊"){
-                return previousPlay(config,meta);
-            }
-            const existing=manifest[config.id];
-            if(existing&&existing.sprite){
-                return previousPlay(config,meta);
-            }
-            const characters=Array.from(String(config.name||"技能").replace(/\s+/g,""));
-            const syntheticId="v149-word-"+String(config.id||"skill");
-            manifest[syntheticId]={
-                glyph:characters[0]||"技",sequence:characters.join(""),motion:"tempest",
-                impact:"storm-domain",hit:.75,pulses:Math.max(4,characters.length+2),
-                spread:110,flightCount:characters.length
-            };
-            const wordConfig=Object.assign({},config,{id:syntheticId,v149OriginalSkillId:config.id});
-            const gate=previousPlay(wordConfig,meta);
-            if(typeof document!=="undefined"){
-                const stage=document.querySelector('.v143-skill-stage[data-skill="'+syntheticId+'"]');
-                if(stage){
-                    stage.classList.add("v149-word-circle-stage");
-                    stage.querySelectorAll(".v143-skill-flight").forEach(flight=>{
-                        const order=Math.max(0,numeric(flight.dataset.order));
-                        const current=parseFloat(flight.style.getPropertyValue("--v143-flight-delay"))||0;
-                        flight.style.setProperty("--v143-flight-delay",Math.round(current+order*20)+"ms");
-                    });
-                }
-            }
-            return gate;
-        };
-    }
-    installWordCircleDirector();
-
+    /* ----- Procedural word-circle fallback retired; V143 raster owner is authoritative. ----- */
+    
     function refreshSkillText(){
         try{
             if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
@@ -1009,7 +972,7 @@
     window.v149Diagnostics=function(){
         return {
             version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:true,
-            sameNameStateMiss:true,barrierCornerCount:true,wordCirclePerCharacter:true,
+            sameNameStateMiss:true,barrierCornerCount:true,proceduralSkillFallback:false,
             mainShopIcon:"assets/ui/home-shop.png",navShopIcon:"assets/ui/home-shop-v147.png"
         };
     };

@@ -302,17 +302,6 @@
     }
     persist();
 
-    function patchExistingV143ExplosiveFlurryRenderer(){
-        const manifest=window.v143SkillAnimationManifest;
-        const sprite=manifest&&manifest.explosiveFlurry&&manifest.explosiveFlurry.sprite;
-        if(!sprite){ return false; }
-        Object.assign(sprite,{
-            renderer:"canvas-crop",frameWidth:384,frameHeight:384,naturalGrid:true,alignToSlots:true
-        });
-        return true;
-    }
-    patchExistingV143ExplosiveFlurryRenderer();
-
     function highestCharacterLevel(){
         if(typeof window.v133GetHighestCreatedCharacterLevel==="function"){
             return Math.max(1,Math.floor(numeric(window.v133GetHighestCreatedCharacterLevel(),1)));
@@ -755,7 +744,7 @@
 
     if(typeof document!=="undefined"){
         document.addEventListener("v173:runtime-ready",function(){
-            patchExistingV143ExplosiveFlurryRenderer();
+
             if(document.getElementById("dungeonTabContent")&&typeof window.currentDungeonTab!=="undefined"&&window.currentDungeonTab==="abyss"){ refresh(); }
         },{once:true});
     }

@@ -4,10 +4,13 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
+const v141=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const v143=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const css142=fs.readFileSync("css/39-v142-skill-animation.css","utf8");
 const css143=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
+const v149=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
+const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
 const css149=fs.readFileSync("css/44-v149-skill-ui-rules.css","utf8");
 
 let passed=0;
@@ -179,3 +182,7 @@ test("the same raster owner dispatches player-to-enemy and enemy-to-player",()=>
 });
 
 console.log("\nV174 raster-only combat VFX owner suite: "+passed+" tests passed.");
+
+assert.doesNotMatch(v141,/playCanvasParticles|v141-effect-canvas|getContext\(|createElement\(["']canvas["']\)/);
+assert.doesNotMatch(v149,/installWordCircleDirector|v149-word-|v149-word-circle-stage/);
+assert.doesNotMatch(abyss,/v143SkillAnimationManifest|patchExistingV143ExplosiveFlurryRenderer|canvas-crop/);
