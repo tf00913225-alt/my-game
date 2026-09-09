@@ -89,8 +89,8 @@ test("every known battle skill has an explicit raster-owner manifest contract",(
 
 test("skill names are brief caster labels and hit numbers wait for the target frame",()=>{
     assert.doesNotMatch(css,/#v142-skill-stage/);
-    assert.match(animation,/font-size","15px","important/);
-    assert.match(css,/animation:v143CasterLabel var\(--skill-name-display-duration,347ms\)/);
+    assert.match(css,/\.skill-name-badge\.v143-caster-skill-label\{[\s\S]*?z-index:16020 !important;[\s\S]*?text-overflow:ellipsis !important;/);
+    assert.doesNotMatch(css,/v143CasterLabel|--skill-name-display-duration/);
     assert.doesNotMatch(animation,/badge\.remove\(\); \} \},650/);
     assert.match(animation,/state\.metrics\.delayedNumbers\+\+/);
     assert.match(animation,/targetHitTime\(current,index\)-Date\.now\(\)/);
