@@ -44,7 +44,7 @@ test("enemy identity starts at 16px, never drops below 12px and bars use 12px bo
     assert.match(css,/\.monster-hp,[\s\S]*\.monster-sp\{[\s\S]*width:var\(--v143-monster-bar-width,68px\) !important;/);
 });
 
-test("every known battle skill has its own animation choreography",()=>{
+test("every known battle skill has an explicit raster-owner manifest contract",()=>{
     const context={
         window:null,navigator:{deviceMemory:4,hardwareConcurrency:4},
         document:{querySelectorAll:()=>[],body:{},getElementById:()=>null},
@@ -64,9 +64,27 @@ test("every known battle skill has its own animation choreography",()=>{
         "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush","stoneThrow","sandWind","flyingSandStrike","dustStorm","earthShield","rockWall","barrier","earthEX",
         "stormSpell","yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing","windArrow"
     ];
-    expected.forEach(id=>assert.ok(context.v143SkillAnimationManifest[id],id+" needs a manifest entry"));
-    const choreographies=expected.map(id=>JSON.stringify(context.v143SkillAnimationManifest[id]));
-    assert.equal(new Set(choreographies).size,expected.length,"known skills may not share an identical choreography");
+    const manifest=context.v143SkillAnimationManifest;
+    expected.forEach(id=>assert.ok(manifest[id],id+" needs a manifest entry"));
+
+    // Every skill that actually renders must still own a distinct formal raster
+    // choreography. Passive EX entries and Light skills without finished art are
+    // intentionally visual-less and may therefore share identical metadata.
+    const visual=expected.filter(id=>manifest[id].sprite);
+    visual.forEach(id=>{
+        assert.equal(manifest[id].sprite.renderer,"dom-sprite",id);
+        assert.match(manifest[id].sprite.src,/\.(?:png|webp)(?:\?|$)/i,id);
+    });
+    const visualChoreographies=visual.map(id=>JSON.stringify(manifest[id]));
+    assert.equal(new Set(visualChoreographies).size,visual.length,"rendered skills may not share an identical choreography contract");
+    ["fireEX","waterEX","windEX","earthEX"].forEach(id=>{
+        assert.equal(manifest[id].passive,true,id);
+        assert.equal(manifest[id].sprite,undefined,id);
+    });
+    ["yuanXiangGuangMing","yuanGuangShield"].forEach(id=>{
+        assert.equal(manifest[id].missingDedicatedAsset,true,id);
+        assert.equal(manifest[id].sprite,undefined,id);
+    });
 });
 
 test("skill names are brief caster labels and hit numbers wait for the target frame",()=>{
@@ -76,7 +94,7 @@ test("skill names are brief caster labels and hit numbers wait for the target fr
     assert.doesNotMatch(animation,/badge\.remove\(\); \} \},650/);
     assert.match(animation,/state\.metrics\.delayedNumbers\+\+/);
     assert.match(animation,/targetHitTime\(current,index\)-Date\.now\(\)/);
-    assert.match(animation,/gate\.complete\(reason\|\|"v143-animation-complete"\)/);
+    assert.match(animation,/gate\.complete\(reason\|\|"v143-raster-complete"\)/);
     assert.doesNotMatch(animation,/font-size","72px/);
 });
 
@@ -178,12 +196,10 @@ test("synthesis is icon-first and creates ordinary random gear without a set ID"
     assert.match(css,/\.v143-item-picker i,[\s\S]*width:48px;height:48px/);
 });
 
-test("earth shield, ally targeting and both-side Barrier use their distinct rules",()=>{
-    assert.match(system,/effect\.innerHTML="<i><\/i><i><\/i><i><\/i><i><\/i><b>象<\/b>"/);
-    assert.match(css,/border-color:#ff4e48/);
-    assert.match(css,/border-color:#ffe15b/);
-    assert.match(css,/border-color:#65ed7e/);
-    assert.match(css,/border-color:#5ba8ff/);
+test("earth shield is raster-owned while ally targeting and Barrier rules remain intact",()=>{
+    assert.doesNotMatch(system,/v143-earth-shield-effect|effect\.innerHTML=.*象/);
+    assert.doesNotMatch(css,/v143-earth-shield-effect|v143EarthCornerBreath/);
+    assert.match(animation,/earthShield:statusSheet\("assets\/vfx\/earth\/earth-shield-loop\.png\?v=173\.39",1000,"activeBuffs"/);
     assert.match(css,/\.battle-player\.ally-targetable::after/);
     assert.match(system,/targetAlly:index/);
     assert.match(system,/monster\.v141Shield\.remainingBlocks=5/);
