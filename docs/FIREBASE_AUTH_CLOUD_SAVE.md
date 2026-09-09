@@ -9,32 +9,66 @@ Owners:
 - `js/firebase/firebase-config.js`: Firebase Web client configuration and readiness validation.
 - `js/firebase/firebase-auth.js`: Firebase Authentication initialization and providers.
 - `js/firebase/firebase-cloud-save.js`: authenticated read-only access to the player's cloud-save document.
-- `js/firebase/firebase-bootstrap.js`: narrow browser bridge (`window.FourSymbolsFirebase`) for future login UI/runtime integration.
+- `js/firebase/firebase-auth-ui.js`: native-stage login/account overlay for Google, Email/password and anonymous sign-in.
+- `js/firebase/firebase-bootstrap.js`: narrow browser bridge (`window.FourSymbolsFirebase`) and auth/cloud-read state coordination.
+- `js/52-v173.20-startup-loader.js`: startup entry that dynamically imports the Firebase bootstrap as optional infrastructure. Firebase is deliberately not counted as a core runtime-readiness module.
 
 ## Firebase project
 
-Confirmed project identity:
+Confirmed Web App configuration copied from Firebase Console:
 
-- projectId: `four-symbols-jianghu`
 - authDomain: `four-symbols-jianghu.firebaseapp.com`
+- projectId: `four-symbols-jianghu`
+- storageBucket: `four-symbols-jianghu.firebasestorage.app`
 - messagingSenderId: `86885650222`
+- appId: `1:86885650222:web:8ffcbb5c07dc2a691b34bf`
 - measurementId: `G-4PZCMLJC8L`
+- Firebase Web SDK: `12.18.0`
 
-The console screenshot did not expose the complete `apiKey`, `appId`, or `storageBucket`, so those fields remain intentionally blank. Do not guess them. Copy the exact Web App config values from Firebase Console before enabling runtime integration.
+The Firebase Web `apiKey` is stored in `firebase-config.js` with the rest of the public Web App identifiers. This is not an Admin SDK credential. Service-account keys, private server secrets and privileged credentials must never be committed to this repository.
+
+Firebase Analytics is not initialized by this phase. The `measurementId` is retained only as part of the Console-provided Web App config.
+
+## Authentication behavior
+
+The account overlay is installed inside `#game-stage`, so it follows the official 1080×1920 stage transform without changing game page dimensions.
+
+Available flows:
+
+- Google sign-in.
+- Email/password sign-in.
+- Email/password account creation.
+- Anonymous guest sign-in.
+- Sign-out.
+- Local-only fallback so an Authentication provider/configuration problem cannot block the existing single-player local save.
+
+A signed-in account displays its Firebase UID and then attempts a read of the current cloud-save document.
+
+Google, Email/password and Anonymous providers must also be enabled in Firebase Console Authentication. Any deployed custom game domain used by Google sign-in must be present in Authentication → Settings → Authorized domains.
 
 ## Security boundary
 
 The browser is allowed to authenticate and read only the signed-in player's own Firestore tree. The browser must not authoritatively create, update, or delete official game progression.
 
-Current cloud save read path reserved by this foundation:
+Current cloud-save read path:
 
 `/users/{uid}/saves/current`
 
-Authoritative cloud-save writes will be implemented through a trusted backend (Cloud Functions/Cloud Run/Admin SDK) and must keep the current client-write-deny Firestore policy intact.
+Authoritative cloud-save writes will be implemented through a trusted backend (Cloud Functions/Cloud Run/Admin SDK) and must keep the client-write-deny Firestore policy intact.
 
-## Runtime integration status
+A successful read does **not** automatically hydrate or overwrite the current local game save in this phase. Cross-device save selection/conflict handling must be designed explicitly before hydration is enabled.
 
-The modules are intentionally not loaded by `index.html` yet. This prevents an incomplete Firebase Web config from changing game startup or local-save behavior. After the exact Web App config is filled, the next phase should load only `firebase-bootstrap.js` from the game entry point and then add the login UI against the public bridge.
+## Runtime integration
+
+`js/52-v173.20-startup-loader.js` dynamically imports `js/firebase/firebase-bootstrap.js`.
+
+Firebase initialization is intentionally optional infrastructure:
+
+- failure does not alter the existing `DEFAULT_RUNTIME_TOTAL=32` gate;
+- failure does not block the normal local game;
+- `saveGame()` / `loadGame()` are untouched;
+- the local `SAVE_KEY` and save schema are untouched;
+- no Firestore browser write API is imported.
 
 ## Public bridge
 
@@ -50,5 +84,16 @@ When `firebase-bootstrap.js` is loaded, it exposes `window.FourSymbolsFirebase` 
 - `signInAsAnonymous()`
 - `signOut()`
 - `readCurrentCloudSave()`
+- `openAuth()`
+- `closeAuth()`
+- `cloudSaveWritePolicy` (`trusted-backend-only`)
+
+Browser events:
+
+- `four-symbols:firebase-ready`
+- `four-symbols:firebase-auth-state`
+- `four-symbols:firebase-cloud-save-read`
+- `four-symbols:firebase-config-missing`
+- `four-symbols:firebase-bootstrap-failed`
 
 No local save function is wrapped by this layer.
