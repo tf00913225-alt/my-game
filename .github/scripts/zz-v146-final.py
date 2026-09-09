@@ -19,7 +19,7 @@ if start >= 0:
     end = s.find(end_marker, start)
     if end < 0:
         raise RuntimeError("V146 legacy VFX CSS end marker missing")
-    s = s[:start] + "/* Legacy skill-flight / field / hit-impact renderer retired in V174; V143 raster owner only. */\n\n" + s[end:]
+    s = s[:start] + s[end:]
 elif any(token in s for token in ("v143-skill-flight", "v143-skill-field", "v143-hit-impact", "v146-flight-art")):
     raise RuntimeError("V146 legacy VFX CSS exists outside expected block")
 p.write_text(s)
