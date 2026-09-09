@@ -94,9 +94,12 @@ test("trusted backend does not wrap the existing local save owner",()=>{
     assert.doesNotMatch(functionsIndex,/localStorage/);
 });
 
-test("Cloudflare static artifact excludes Firebase backend deployment sources",()=>{
+test("Cloudflare deploy is isolated from Firebase backend sources",()=>{
     assert.match(deployWorkflow,/--exclude='functions\/'/);
     assert.match(deployWorkflow,/--exclude='\.firebaserc'/);
     assert.match(deployWorkflow,/--exclude='firebase\.json'/);
     assert.match(deployWorkflow,/--exclude='firestore\.rules'/);
+    assert.match(deployWorkflow,/working-directory:\s*_deploy/);
+    assert.match(deployWorkflow,/pages deploy \. \\/);
+    assert.doesNotMatch(deployWorkflow,/pages deploy _deploy/);
 });
