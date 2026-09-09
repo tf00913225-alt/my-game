@@ -7,6 +7,7 @@ const vfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const v141=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
 const v143=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const boss=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
+const runtime=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const core=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 
@@ -21,23 +22,48 @@ assert.match(vfx,/if\(mechanismTarget\)\{ return \[mechanismTarget\]; \}/);
 assert.match(vfx,/if\(mechanismTarget\)\{ validTargets\.add\(mechanismTarget\); \}/);
 assert.match(vfx,/isMechanismTarget\(index\)\)\{ return mechanismCardFor\(index\); \}/);
 
-// BOSS grows independently; ordinary monster defaults stay 76x100.
+// Generic battle card sizes remain untouched. Only a runtime-tagged Gameplay
+// BOSS receives the large portrait 9:16 variables requested for this screen.
 assert.match(v141,/flex:0 0 var\(--v143-monster-card-width,76px\) !important;/);
 assert.match(v143,/\.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:82px;[\s\S]*?--v143-monster-card-height:106px;/);
-assert.match(v143,/--v143-monster-bar-width:74px;/);
+assert.match(boss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?--v143-monster-card-width:166px;[\s\S]*?--v143-monster-card-height:295px;[\s\S]*?aspect-ratio:9 \/ 16;/);
+assert.match(runtime,/bossCard\.classList\.add\("gameplay-boss-card"\)/);
 
-// Player cards gain height without widening the established 118px card.
-assert.match(v141,/\.battle-player-row\{[\s\S]*?flex-basis:144px !important;[\s\S]*?height:144px !important;/);
-assert.match(v141,/\.battle-player\{[\s\S]*?width:118px !important;[\s\S]*?height:122px !important;/);
+// The redundant battle heading no longer reserves height above the BOSS.
+assert.match(boss,/#battlePage \.battle-title\{[\s\S]*?display:none !important;[\s\S]*?height:0 !important;/);
 
-// Function card and HP treatment must keep their increased visual weight.
-assert.match(boss,/\.boss-mechanism-slot\{[\s\S]*?top:104px;[\s\S]*?width:252px;[\s\S]*?min-height:86px;/);
-assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:120px;[\s\S]*?min-height:84px;/);
-assert.match(boss,/\.boss-mechanism-hp\{[\s\S]*?min-height:18px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
+// The function/mechanism card is portrait 9:16 and its face is deliberately
+// limited to mechanism name, kind and HP. Combat targeting remains on the
+// mechanism card itself and is not reused by the information button.
+assert.match(boss,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
+assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:78px;[\s\S]*?aspect-ratio:9 \/ 16;/);
+assert.match(boss,/\.boss-mechanism-hp\{[\s\S]*?min-height:19px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
+const renderStart=runtime.indexOf("function renderMechanisms()");
+const renderEnd=runtime.indexOf("function showMechanismToast",renderStart);
+assert.ok(renderStart>=0&&renderEnd>renderStart,"renderMechanisms owner must exist");
+const renderBlock=runtime.slice(renderStart,renderEnd);
+assert.match(renderBlock,/node\.onclick=function\(\)\{ selectMechanism\(card\.id\); \};/);
+assert.match(renderBlock,/boss-mechanism-name/);
+assert.match(renderBlock,/boss-mechanism-kind/);
+assert.match(renderBlock,/boss-mechanism-hp/);
+assert.doesNotMatch(renderBlock,/boss-mechanism-effect/);
 
-// Changed dynamic owners receive scoped cache keys without changing the two
-// release-owned entrypoint URLs in index.html (the loader gate owns those).
-assert.match(core,/gameplay-boss-tower\.css\?v=173\.64&patch=boss-card-ui-20260909/);
+// Detailed explanation is owned by a separate right-side alert/panel. The
+// alert rapidly flashes red, opens the live detail and 返回 collapses it.
+assert.match(runtime,/class="boss-mechanism-info-alert"[^>]*>!<\/button>/);
+assert.match(runtime,/class="boss-mechanism-info-back">‹ 返回<\/button>/);
+assert.match(runtime,/ui\.body\.innerHTML=alive\.map\(mechanismInfoMarkup\)\.join\(""\)/);
+assert.match(runtime,/boss-mechanism-info-effect/);
+assert.match(runtime,/mechanismEffectText\(card\)/);
+assert.match(boss,/\.boss-mechanism-info-alert\{[\s\S]*?border-radius:50%;[\s\S]*?animation:gameplayMechanismInfoAlert \.48s ease-in-out infinite;/);
+assert.match(boss,/\.boss-mechanism-info-panel\{[\s\S]*?width:170px;[\s\S]*?height:302px;[\s\S]*?aspect-ratio:9 \/ 16;/);
+assert.match(boss,/@keyframes gameplayMechanismInfoAlert/);
+assert.match(boss,/prefers-reduced-motion:reduce[\s\S]*?boss-mechanism-info-alert/);
+
+// Dynamic owner URLs receive a new scoped cache key. Existing shared V141/V143
+// and VFX cache keys remain intentionally unchanged.
+assert.match(core,/gameplay-boss-tower\.css\?v=173\.64&patch=boss-card-detail-ui-20260909/);
+assert.match(core,/gameplay-boss-tower-system\.js\?v=173\.64&patch=boss-card-detail-ui-20260909/);
 assert.match(loader,/38-v141-system-expansion\.css"\)\+"&patch=boss-card-ui-20260909"/);
 assert.match(loader,/40-v143-combat-dungeon-polish\.css"\)\+"&patch=boss-card-ui-20260909"/);
 assert.match(loader,/cacheKey:"boss-mechanism-vfx-20260909"/);
