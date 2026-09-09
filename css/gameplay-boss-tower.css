@@ -575,17 +575,17 @@
 
 /* ---------- Boss battle portrait / mechanism UI ---------- */
 
-/* The battle heading is redundant on the battle scene. Removing its reserved
-   flex height lets the enemy/BOSS formation use the top of the playfield. */
-#game-stage #battlePage .battle-title{
-    display:none !important;
-    flex:0 0 0 !important;
-    width:0 !important;
-    height:0 !important;
-    min-height:0 !important;
-    margin:0 !important;
-    padding:0 !important;
-    overflow:hidden !important;
+/* The historical V15 battle title has priority-sized geometry. Rather than
+   add another priority patch here, hide its text only while a Gameplay BOSS
+   is active and reclaim the exact 23px title row from the following formation. */
+#game-stage #battlePage:has(#battleMonsterArea.gameplay-boss-active) .battle-title{
+    visibility:hidden;
+    opacity:0;
+    pointer-events:none;
+}
+
+#game-stage #battleMonsterArea.gameplay-boss-active{
+    margin-top:-23px;
 }
 
 /* Only Gameplay Center BOSSes receive the portrait treatment. Generic daily,
@@ -600,7 +600,7 @@
 }
 
 #game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon{
-    border-radius:8px !important;
+    border-radius:8px;
 }
 
 #game-stage #battleMonsterArea{
@@ -815,8 +815,8 @@
     display:flex;
     flex:0 0 auto;
     flex-direction:column;
-    gap:6px;
-    padding:9px 8px;
+    gap:3px;
+    padding:6px 7px;
     border:1px solid #836238;
     border-radius:8px;
     background:rgba(11,8,5,.72);
@@ -845,9 +845,9 @@
 #game-stage #battlePage .boss-mechanism-info-effect{
     margin:0;
     color:#c9bda7;
-    font-size:14px;
+    font-size:13px;
     font-weight:700;
-    line-height:1.5;
+    line-height:1.35;
 }
 
 @keyframes gameplayMechanismInfoAlert{
