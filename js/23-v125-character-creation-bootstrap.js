@@ -12,7 +12,6 @@
     "use strict";
 
     const SAVE_KEY="battle_full_version_save_v5";
-    const PRIMARY_CREATED_MARKER_KEY="sixiang_primary_created_v1";
     const page=document.getElementById("creationPage");
     const overlay=document.getElementById("game-overlay-layer");
 
@@ -38,19 +37,15 @@
 
     function readPersistedPrimaryCharacter(){
         let raw="";
-        let createdMarker="";
         try{
             raw=localStorage.getItem(SAVE_KEY)||"";
-            createdMarker=localStorage.getItem(PRIMARY_CREATED_MARKER_KEY)||"";
         }catch(_){
             /* Storage being unreadable must never turn into permission to
-               overwrite slot 1. This is intentionally fail-closed. */
+               overwrite character data. This is intentionally fail-closed. */
             return primaryState("unsafe",null,"storage-unreadable");
         }
 
         if(!raw){
-            /* A stale marker alone must not lock out a deliberate fresh start
-               after the canonical save has been removed. */
             return primaryState("empty",null,"no-save");
         }
 
@@ -68,21 +63,26 @@
         const primary=saved.player;
         if(primary===undefined||primary===null){
             /* An empty object is a valid pre-character state in historical
-               tests/startup flows. */
+               startup/test flows. */
             return primaryState("empty",null,"no-primary");
         }
         if(typeof primary!=="object"||Array.isArray(primary)){
             return primaryState("unsafe",null,"primary-shape-invalid");
         }
 
+        /* Character ID is the canonical creation identity. Once it exists,
+           slot 1 is occupied regardless of whether another field (for example
+           level) has become malformed. Never require level to be healthy in
+           order to protect an existing character. */
         const id=String(primary.id||"").trim();
         if(id){
             return primaryState("occupied",primary,"primary-id-present");
         }
 
         /* The canonical uncreated template is id:"", level:1, exp:0.
-           Anything beyond that is evidence of progress or corruption and must
-           be protected instead of being treated as an empty slot. */
+           If identity is missing but progress/secondary-character evidence is
+           present, treat the save as unsafe instead of assuming the slot is
+           free. This prevents a partially damaged save from being overwritten. */
         const level=Number(primary.level);
         const exp=Number(primary.exp);
         const progressed=(Number.isFinite(level)&&level>1)||(Number.isFinite(exp)&&exp>0);
@@ -92,8 +92,8 @@
             saved.player3&&typeof saved.player3==="object"&&String(saved.player3.id||"").trim()
         );
 
-        if(createdMarker==="1"||progressed||hasSecondary){
-            return primaryState("unsafe",primary,"created-primary-identity-missing");
+        if(progressed||hasSecondary){
+            return primaryState("unsafe",primary,"primary-identity-missing");
         }
 
         return primaryState("empty",primary,"blank-primary-template");
@@ -107,21 +107,12 @@
         const message=occupied
             ?("偵測到既有主角色存檔「"+id+"」"+
                 (Number.isFinite(level)&&level>=1?"Lv."+Math.floor(level):"")+"。為避免覆寫原角色，本次創建已取消；請重新整理後繼續遊戲。")
-            :"偵測到主角色存檔讀取異常或既有角色痕跡。為避免任何角色資料被覆寫，本次創建已取消；請先重新整理，若仍出現此訊息請保留存檔並停止建立角色。";
+            :"偵測到角色存檔讀取異常或既有角色痕跡。為避免任何角色資料被覆寫，本次創建已取消；請先重新整理，若仍出現此訊息請保留存檔並停止建立角色。";
         if(typeof window.rpgAlert==="function"){
             void window.rpgAlert(message,{title:"角色存檔保護",confirmText:"知道了",danger:true});
         }else if(typeof window.alert==="function"){
             window.alert(message);
         }
-    }
-
-    function markPrimaryCreatedIfPresent(){
-        try{
-            const runtimePrimary=typeof player!=="undefined"&&player?player:null;
-            if(runtimePrimary&&String(runtimePrimary.id||"").trim()){
-                localStorage.setItem(PRIMARY_CREATED_MARKER_KEY,"1");
-            }
-        }catch(_){ }
     }
 
     function installPrimaryCreationSaveGuard(){
@@ -138,17 +129,21 @@
                 }
             }catch(_){ }
 
-            const persisted=targetSlot===1?readPersistedPrimaryCharacter():null;
-            if(persisted&&(persisted.state==="occupied"||persisted.state==="unsafe")){
+            const persisted=readPersistedPrimaryCharacter();
+
+            /* An unreadable/corrupt canonical save blocks every character
+               creation path, because createAdditionalCharacter eventually
+               saves through the same canonical key. A healthy occupied primary
+               blocks only slot 1; slot 2/3 remain legitimate additions. */
+            if(
+                persisted.state==="unsafe"||
+                (targetSlot===1&&persisted.state==="occupied")
+            ){
                 showPrimaryProtection(persisted);
                 return false;
             }
 
-            const result=current.apply(this,arguments);
-            if(targetSlot===1){
-                markPrimaryCreatedIfPresent();
-            }
-            return result;
+            return current.apply(this,arguments);
         }
 
         guardedCreateCharacter.__v174PersistedPrimaryGuard=true;
