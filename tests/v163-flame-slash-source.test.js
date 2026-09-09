@@ -23,8 +23,9 @@ test("the verified inbox PNG is preserved in the normalized Fire Slash asset",()
     assert.equal(asset[25],6);
 });
 
-test("Fire Slash keeps the requested target, timing, and frame-eight hit",()=>{
-    assert.match(animation,/flameSlash:\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,placement:"single"/);
+test("Fire Slash keeps the requested target, timing, and frame-eight hit under the raster owner",()=>{
+    assert.match(animation,/function castSheet\(src,placement,options\)\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?placement:placement\|\|"single",renderer:"dom-sprite"/);
+    assert.match(animation,/flameSlash:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/fire\/flame-slash-cast\.png","single",\{scale:1\.85,maxSize:220\}\)\}/);
     assert.match(timing,/flameSlash:\[760,"basic","slash"\]/);
 });
 
