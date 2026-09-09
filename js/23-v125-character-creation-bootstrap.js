@@ -3,16 +3,17 @@
    The creation page starts inside #app for legacy HTML
    compatibility. Move it while it is still visibility:hidden,
    before js/00-main.js builds the 420px legacy wrapper.
-   This prevents the legacy layer from painting and locks Chrome's
-   document gestures before the main runtime is ready.
+
+   IMPORTANT: this bootstrap only prepares the DOM location. It must never
+   decide that character creation is active, because persisted characters
+   have not been restored yet at this point. The runtime showCreation()
+   remains the sole owner of creation visibility / touch isolation.
 ===================================================== */
 (function bootstrapNativeCreationPage(){
     "use strict";
 
     const page=document.getElementById("creationPage");
     const overlay=document.getElementById("game-overlay-layer");
-    const stage=document.getElementById("game-stage");
-    const app=document.getElementById("app");
 
     if(!page || !overlay){
         return;
@@ -22,29 +23,5 @@
         overlay.appendChild(page);
     }
 
-    /* Keep the whole legacy app out of the paint tree while creation is
-       visible. Samsung Browser must never have old city/nav tiles available
-       to composite underneath the native scrolling page. */
-    if(stage){
-        stage.classList.add("creation-native-active");
-    }
-
-    [
-        document.documentElement,
-        document.body,
-        document.getElementById("game-viewport"),
-        stage,
-        overlay
-    ].forEach(function(node){
-        if(node){
-            node.classList.add("creation-fixed-active");
-        }
-    });
-    if(app){
-        app.inert=true;
-        app.setAttribute("aria-hidden","true");
-    }
-
     page.dataset.nativePrepaint="v128-fixed-two-step";
-    overlay.removeAttribute("aria-hidden");
 })();
