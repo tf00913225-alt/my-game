@@ -33,30 +33,29 @@ test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path"
     );
 });
 
-test("Water trajectories start only after real actor and target coordinates exist",()=>{
+test("Water trajectories use resolved actor-target geometry before raster activation",()=>{
     const addSprite=animation.indexOf("function addSprite(current,index,target)");
-    const append=animation.indexOf("node=appendNode(",addSprite);
-    const appendEnd=animation.indexOf(");",append);
+    const append=animation.indexOf("node=appendSpriteNode(current);",addSprite);
     const place=animation.indexOf("placeSprite(current,node,index,target);",addSprite);
-    const start=animation.indexOf("startSpriteAnimation(node);",place);
-    assert.ok(addSprite>=0&&append>addSprite&&appendEnd>append&&place>appendEnd&&start>place);
-    assert.doesNotMatch(animation.slice(append,appendEnd+2),/v166-water-cast-sprite/);
-    [
-        "--v143-sprite-start-left","--v143-sprite-start-top",
-        "--v143-sprite-target-left","--v143-sprite-target-top"
-    ].forEach(property=>assert.ok(animation.includes(property),property));
-    assert.match(
-        css,
-        /@keyframes v166WaterTargetTravel\{[\s\S]*?33\.333%\{[\s\S]*?left:var\(--v143-sprite-start-left\)[\s\S]*?58\.332%\{[\s\S]*?left:var\(--v143-sprite-target-left\)/
-    );
+    const activate=animation.indexOf('node.classList.add("v143-vfx-sprite-active")',place);
+    assert.ok(addSprite>=0&&append>addSprite&&place>append&&activate>place);
+    assert.match(animation,/if\(placement==="targetTrajectory"\)\{[\s\S]*?node\.style\.left=actor\.x\+"px";[\s\S]*?node\.style\.top=actor\.y\+"px";[\s\S]*?--v143-sprite-dx",target\.x-actor\.x\+"px"[\s\S]*?--v143-sprite-dy",target\.y-actor\.y\+"px"/);
+    assert.match(animation,/if\(placement==="trajectory"&&sprite\.travelToTargets&&actor\)\{[\s\S]*?--v143-sprite-dx",destination\.x-actor\.x\+"px"[\s\S]*?--v143-sprite-dy",destination\.y-actor\.y\+"px"/);
+    assert.doesNotMatch(animation,/--v143-sprite-start-left|--v143-sprite-start-top|--v143-sprite-target-left|--v143-sprite-target-top/);
+    assert.match(css,/\.v143-vfx-sprite\.v143-vfx-sprite-active\[data-travel="true"\][\s\S]*?v143RasterTravel/);
+    assert.match(css,/@keyframes v143RasterTravel\{/);
+    assert.doesNotMatch(css,/v166WaterTargetTravel/);
 });
 
-test("Ice Arrow Rain uses one centered full-field sheet without tiles",()=>{
+test("Ice Arrow Rain uses one centered full-field raster sheet without tiles",()=>{
     const battlefield=animation.match(/if\(placement==="battlefield"\)\{[\s\S]*?\n\s*return;\n\s*\}/);
     assert.ok(battlefield);
-    assert.match(battlefield[0],/Math\.max\(bounds\.width,bounds\.height\)/);
-    assert.match(battlefield[0],/node\.style\.width=size\+"px"/);
-    assert.match(battlefield[0],/node\.style\.height=size\+"px"/);
+    assert.match(battlefield[0],/const bounds=sideAreaBounds\(current\.targetSide\)/);
+    assert.match(battlefield[0],/const coverageScale=clamp\(Number\(sprite\.coverageScale\)\|\|Number\(sprite\.scale\)\|\|1,1,1\.4\)/);
+    assert.match(battlefield[0],/Math\.round\(bounds\.width\*coverageScale\)/);
+    assert.match(battlefield[0],/Math\.round\(bounds\.height\*coverageScale\)/);
+    assert.match(battlefield[0],/node\.style\.width=width\+"px"/);
+    assert.match(battlefield[0],/node\.style\.height=height\+"px"/);
     assert.match(battlefield[0],/node\.style\.left=\(bounds\.left\+bounds\.width\/2\)\+"px"/);
     assert.match(battlefield[0],/node\.style\.top=\(bounds\.top\+bounds\.height\/2\)\+"px"/);
     assert.match(battlefield[0],/node\.style\.clipPath="none"/);
