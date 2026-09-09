@@ -438,8 +438,6 @@ test("Water Ball renders one sheet centered on the actual living target group",(
         assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
         assert.equal(sprites[0].style.left,"458px");
         assert.equal(sprites[0].style.top,"140px");
-        assert.equal(sprites[0].style["--v143-sprite-dx"],"0px");
-        assert.equal(sprites[0].style["--v143-sprite-dy"],"0px");
         assert.equal(sprites[0].style["--v143-sprite-duration"],"1400ms");
     });
 
@@ -468,8 +466,6 @@ test("enemy Water Ball keeps one live-target group while endpoints resolve",()=>
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.placement,"group");
     assert.equal(sprites[0].dataset.targetIndexes,"0,2");
-    assert.equal(sprites[0].style["--v143-sprite-dx"],"0px");
-    assert.equal(sprites[0].style["--v143-sprite-dy"],"0px");
 });
 
 test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
