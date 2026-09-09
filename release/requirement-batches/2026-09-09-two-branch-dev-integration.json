@@ -5,63 +5,81 @@
   "baseCommit": "29b9668057846164a941fbf6617d2458d9af5476",
   "officialVersion": "173.64",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "INTEGRATION-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "以 GitHub 最新 dev、AGENTS.md、CLAUDE.md、兩條指定遠端分支與各自相對 dev 的實際 diff 完成衝突與 runtime owner 風險分析",
       "evidence": [
         "Initial dev 29b9668057846164a941fbf6617d2458d9af5476; initial main bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe",
         "Both specified remote branch tips matched the requested SHAs and used the initial dev as their merge base",
-        "Sequential git merge-tree analysis completed without textual conflicts"
+        "Sequential git merge-tree analysis completed without textual conflicts",
+        "Only shared path was js/19-stage-v78-character-inventory-runtime.js; the branches changed separate ownership and cache-loader hunks"
       ]
     },
     {
       "id": "INTEGRATION-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "角色／背包／技能／秘寶 UI 分支須先獨立合入、測試及完成 dev CI／部署驗證",
       "evidence": [
         "fix/character-inventory-skill-relic-ui-20260909@27e905ee9a9280a3dc520a3487bc2aa4f464d2af",
         "Merge commit 5479368c19c044ceb985772d305237866f4a314c",
-        "Repository checks passed; stale live VFX QA contract identified for follow-up validation"
+        "Repository checks and exact-SHA dev deployment passed in GitHub Actions run 34344546671",
+        "QA owner repair commit c5885c2486f29738947dc642d60162be0bdd24d7 updated the live Abyss assertion to the formal V143 DOM raster Sprite owner"
       ]
     },
     {
       "id": "INTEGRATION-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "BOSS 機制卡詳細 UI 分支須以已含第一條分支的 dev 為基礎再獨立合入與驗證",
       "evidence": [
-        "fix/boss-mechanism-card-detail-ui@ac6c89bde325e37b49d0518fa132657886ac9387"
+        "fix/boss-mechanism-card-detail-ui@ac6c89bde325e37b49d0518fa132657886ac9387",
+        "Merge commit 6f387ea1fc9183b4e476db281558923627fe3d32",
+        "Updated-base PR Repository checks passed in GitHub Actions run 34345008744",
+        "Post-merge Repository checks, exact-SHA dev deployment and live browser gates passed in GitHub Actions run 34345787199",
+        "Shallow-checkout baseline repair commit aae6b2d9a095ecb00329a24e7f068f3f37f945dd preserved the typography regression baseline in CI"
       ]
     },
     {
       "id": "INTEGRATION-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "整合結果不得產生重複函式、listener、CSS owner、失效資源、conflict marker、舊邏輯回退或資料流覆蓋",
       "evidence": [
         "Shared js/19 changes affect separate owner functions and cache-loader lines",
-        "Targeted owner and duplicate audits are part of each post-merge gate"
+        "Targeted owner and duplicate audits passed after each merge",
+        "Final local Node test sweep passed 131/131 suites",
+        "Static resource, duplicate ID, loader, release and Git conflict-marker gates passed"
       ]
     },
     {
       "id": "INTEGRATION-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "整合前 dev 的 live Abyss QA 必須跟隨正式 V143 DOM raster Sprite owner，不得再驗證已淘汰的 Canvas renderer",
       "evidence": [
         ".github/scripts/run-abyss-live-browser-qa.mjs",
         "tests/v174-raster-only-combat-vfx-owner.test.js",
-        "js/39-v143-skill-animation.js"
+        "js/39-v143-skill-animation.js",
+        "GitHub Actions runs 34344546671 and 34345787199 live mobile Abyss QA"
       ]
     },
     {
       "id": "INTEGRATION-06",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "完成全套 Repository checks、實際 mobile/browser QA、精確 dev 部署 SHA 核對並確認 main 全程未修改",
-      "evidence": []
+      "evidence": [
+        "GitHub Actions run 34345787199: Repository checks SUCCESS and Dev deployment gate SUCCESS",
+        "Exact deployed commit aae6b2d9a095ecb00329a24e7f068f3f37f945dd, Game/Cache V173.64",
+        "Live browser QA on https://dev.four-symbols-dev.pages.dev verified creation, character skills, inventory scrolling, relic modal scrolling/tabs, and the Lv20 BOSS mechanism card/detail/back flow",
+        "Initial and final-read main bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe; no main ref update was issued"
+      ]
     }
   ],
-  "automatedVerification": "IN_PROGRESS",
-  "visualVerification": "IN_PROGRESS",
-  "notes": "Game/Cache Version intentionally remains V173.64. Completion is blocked until all requirements are VERIFIED. main must remain untouched."
+  "automatedVerification": "DEV_CI_DEPLOY_SHA_AND_LIVE_MOBILE_QA_VERIFIED",
+  "verificationRuns": [34344546671, 34345008744, 34345787199],
+  "visualVerification": "LIVE_DEV_BROWSER_AND_AUTOMATED_MOBILE_CHROME_PASS",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "verifiedOnDevVersion": "173.64",
+  "releasedAs": null,
+  "notes": "Game/Cache Version intentionally remains V173.64. Both requested branch tips are integrated sequentially on dev; main remains untouched."
 }
