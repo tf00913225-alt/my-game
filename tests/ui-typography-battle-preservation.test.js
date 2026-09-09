@@ -93,7 +93,9 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
         `${file} protected-BOSS/toast/legacy mechanism animations changed outside this UI requirement`
     );
 
-    assert.match(now,/#battlePage \.battle-title\{[\s\S]*?display:none !important;[\s\S]*?height:0 !important;/);
+    assert.match(now,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
+    assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-23px;/);
+    assert.doesNotMatch(now,/!important/);
     assert.match(now,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?--v143-monster-card-width:166px;[\s\S]*?--v143-monster-card-height:295px;[\s\S]*?aspect-ratio:9 \/ 16;/);
     assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?position:relative;[\s\S]*?display:none;[\s\S]*?width:100%;[\s\S]*?pointer-events:none;/);
     assert.match(now,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
