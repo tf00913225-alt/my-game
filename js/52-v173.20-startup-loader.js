@@ -183,3 +183,25 @@
     window.setTimeout(tick,120);
     renderProgress(0);
 })();
+
+/* =====================================================
+   Firebase infrastructure bootstrap
+   - Optional infrastructure: it must never block the core runtime readiness gate.
+   - Uses the dedicated js/firebase owners and keeps official game save writes out
+     of the browser.
+===================================================== */
+(function loadFirebaseInfrastructure(){
+    "use strict";
+    if(typeof window==="undefined"||window.__fourSymbolsFirebaseBootstrapRequested){ return; }
+    window.__fourSymbolsFirebaseBootstrapRequested=true;
+
+    try{
+        const url=new URL("js/firebase/firebase-bootstrap.js?v=173.64",document.baseURI).href;
+        import(url).catch((error)=>{
+            console.error("Firebase infrastructure bootstrap failed:",error);
+            window.dispatchEvent(new CustomEvent("four-symbols:firebase-bootstrap-failed",{detail:{error}}));
+        });
+    }catch(error){
+        console.error("Firebase infrastructure bootstrap failed:",error);
+    }
+})();

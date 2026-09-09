@@ -59,13 +59,17 @@
            .team-relic-tabs 則是水平 scroll owner。兩者都必須通過這個
            全域觸控鎖；否則手勢從分類列或秘寶內容起始時會被
            preventDefault()，造成「有時能滑、有時不能滑」的裝置差異。
+
+           Firebase 帳號視窗使用 native stage overlay，真正的垂直
+           scroll owner 是 .firebase-auth-dialog；同樣只在這份全域
+           白名單登記一次，不為登入頁另加 touchmove 補丁。
         */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
             ".home-feature-modal-box, #homeFeatureModalBody, #homeFeatureModal.team-relic-mode #homeFeatureModalBody, .team-relic-tabs, .v141-synthesis-body, #trainingZoneModalBody, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .inventory-character-detail-grid, .item-modal-box, #itemModalStats, #skillDetailStats, " +
-            "#statusHelpModal .item-stat-list, .skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .gameplay-panel-scroll, .v17342-abyss-battle-log, .v143-item-picker, .v17358-reforge-tiers, .v17363-game-select-menu, .v17351-compare-stats, " +
+            "#statusHelpModal .item-stat-list, .skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .gameplay-panel-scroll, .v17342-abyss-battle-log, .v143-item-picker, .v17358-reforge-tiers, .v17363-game-select-menu, .v17351-compare-stats, .firebase-auth-dialog, " +
             "textarea, select, input";
 
         let node =
