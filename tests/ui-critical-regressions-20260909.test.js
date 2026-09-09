@@ -14,7 +14,12 @@ const touch=read("js/01-stage-v8-touch-lock.js");
 
 assert.match(bootstrap,/battle_full_version_save_v5/);
 assert.match(bootstrap,/readPersistedPrimaryCharacter/);
-assert.match(bootstrap,/targetSlot===1\?readPersistedPrimaryCharacter\(\):null/);
+assert.match(bootstrap,/const persisted=readPersistedPrimaryCharacter\(\)/);
+assert.match(bootstrap,/persisted\.state==="unsafe"/);
+assert.match(bootstrap,/targetSlot===1&&persisted\.state==="occupied"/);
+assert.match(bootstrap,/const id=String\(primary\.id\|\|""\)\.trim\(\);[\s\S]*?if\(id\)\{[\s\S]*?"occupied"/);
+assert.match(bootstrap,/save-json-invalid/);
+assert.match(bootstrap,/storage-unreadable/);
 assert.match(bootstrap,/角色存檔保護/);
 assert.doesNotMatch(bootstrap,/creation-native-active[\s\S]*classList\.add/);
 
