@@ -43,7 +43,7 @@ function harness(saved,targetSlot=1){
     const h=harness({player:{id:"火測試",level:40,element:"fire"}},1);
     assert.equal(h.context.window.createCharacter(),false);
     assert.equal(h.calls,0,"existing primary must never delegate to destructive creation owner");
-    assert.match(h.alerts.join("\n"),/角色存檔保護/);
+    assert.match(h.alerts.join("\n"),/既有主角色存檔/);
     assert.match(h.alerts.join("\n"),/Lv\.40/);
 }
 {
