@@ -15,8 +15,11 @@ import {
     signOutFirebase
 } from "./firebase-auth.js";
 import {
+    CLOUD_FUNCTIONS_REGION,
     CLOUD_SAVE_WRITE_POLICY,
-    readCurrentCloudSave
+    bootstrapTrustedCloudSave,
+    readCurrentCloudSave,
+    submitLegacyMigrationCandidate
 } from "./firebase-cloud-save.js";
 import {
     closeFirebaseAuthUi,
@@ -85,8 +88,11 @@ const api = Object.freeze({
     signInAsAnonymous,
     signOut: signOutFirebase,
     readCurrentCloudSave,
+    bootstrapTrustedCloudSave,
+    submitLegacyMigrationCandidate,
     openAuth: openFirebaseAuthUi,
     closeAuth: closeFirebaseAuthUi,
+    cloudFunctionsRegion: CLOUD_FUNCTIONS_REGION,
     cloudSaveWritePolicy: CLOUD_SAVE_WRITE_POLICY
 });
 
@@ -125,7 +131,8 @@ if(!configStatus.ready){
         .then(()=>dispatch(EVENT_READY,{
             projectId: configStatus.projectId,
             sdkVersion: configStatus.sdkVersion,
-            cloudSaveWritePolicy: CLOUD_SAVE_WRITE_POLICY
+            cloudSaveWritePolicy: CLOUD_SAVE_WRITE_POLICY,
+            cloudFunctionsRegion: CLOUD_FUNCTIONS_REGION
         }))
         .catch((error)=>{
             console.error("Firebase Auth initialization failed:", error);
