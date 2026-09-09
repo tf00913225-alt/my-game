@@ -301,7 +301,7 @@
 
     function syncEarthShieldCard(){ return; }
 
-                    function syncEarthShieldEffects(){
+                        function syncEarthShieldEffects(){
         if(typeof document==="undefined"){ return; }
         for(let index=0;index<3;index++){
             const entity=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
