@@ -27,6 +27,40 @@ function getStageScale(){
         : 1;
 }
 
+function releaseCharacterLayoutOwnership(modal,body,root,inventory){
+    if(!modal || modal.dataset.v78CharacterLayoutActive!=="1"){
+        return;
+    }
+
+    const box=modal.querySelector(".home-feature-modal-box.wide");
+    if(box){
+        [
+            "display","flex-direction","width","max-width","height",
+            "max-height","min-height","overflow"
+        ].forEach(property=>box.style.removeProperty(property));
+    }
+
+    if(body){
+        [
+            "display","flex-direction","flex","height","min-height","overflow"
+        ].forEach(property=>body.style.removeProperty(property));
+    }
+
+    if(root){
+        [
+            "flex","height","max-height","min-height","overflow-y","overflow-x",
+            "-webkit-overflow-scrolling","overscroll-behavior-y","touch-action",
+            "scrollbar-gutter"
+        ].forEach(property=>root.style.removeProperty(property));
+    }
+
+    if(inventory){
+        ["overflow","transform"].forEach(property=>inventory.style.removeProperty(property));
+    }
+
+    delete modal.dataset.v78CharacterLayoutActive;
+}
+
 function applyNow(){
     const modal=
         document.getElementById(
@@ -57,6 +91,20 @@ function applyNow(){
         return;
     }
 
+    /*
+       This owner is only valid while the character/status/skill/inventory
+       shell is actually mounted inside the shared modal body. The same modal
+       is reused by shop, quests, synthesis and Team Relic. Previously this
+       function kept writing inline !important overflow:hidden to the shared
+       body even after another feature took ownership, which could override
+       Team Relic's legitimate overflow-y:auto and produce intermittent mobile
+       scrolling depending on MutationObserver timing.
+    */
+    if(!body.contains(root)){
+        releaseCharacterLayoutOwnership(modal,body,root,inventory);
+        return;
+    }
+
     const box=
         modal.querySelector(
             ".home-feature-modal-box.wide"
@@ -65,6 +113,8 @@ function applyNow(){
     if(!box){
         return;
     }
+
+    modal.dataset.v78CharacterLayoutActive="1";
 
     box.style.setProperty(
         "display",
