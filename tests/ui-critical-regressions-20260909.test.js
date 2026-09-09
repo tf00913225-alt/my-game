@@ -40,7 +40,8 @@ assert.match(guard,/max-width","104px","important/);
 assert.match(relicCss,/team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important/);
 assert.match(touch,/#homeFeatureModal\.team-relic-mode #homeFeatureModalBody, \.team-relic-tabs/);
 assert.match(layout,/modal\.dataset\.v78CharacterLayoutActive="1"/);
-assert.match(layout,/if\(!root \|\| !body\.contains\(root\)\)\{[\s\S]*?releaseCharacterLayoutOwnership/);
+assert.match(layout,/const characterRootMounted=!!root/);
+assert.match(layout,/if\(!characterRootMounted\)\{[\s\S]*?releaseCharacterLayoutOwnership/);
 assert.match(layout,/body\.style\.removeProperty\(property\)/);
 
 console.log("✓ 2026-09-09 critical UI regression guards");
