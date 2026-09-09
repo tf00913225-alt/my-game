@@ -123,7 +123,23 @@ jobs:
           PY
       - name: Source-level legacy VFX guard
         run: |
-          ! grep -nE 'playCanvasParticles|v141-effect-canvas|getContext\(|createElement\(["'"']canvas["'"']\)|installWordCircleDirector|v149-word-|v149-word-circle-stage|patchExistingV143ExplosiveFlurryRenderer|canvas-crop' js/35-v141-ui-battle.js js/37-v142-skill-animation.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/59-abyss-two-tier-runtime.js
+          python - <<'PY'
+          from pathlib import Path
+          import re, sys
+          files=[
+              "js/35-v141-ui-battle.js","js/37-v142-skill-animation.js",
+              "js/39-v143-skill-animation.js","js/43-v149-skill-ui-rules.js",
+              "js/59-abyss-two-tier-runtime.js"
+          ]
+          banned=re.compile(r'playCanvasParticles|v141-effect-canvas|getContext\(|createElement\(["\']canvas["\']\)|installWordCircleDirector|v149-word-|v149-word-circle-stage|patchExistingV143ExplosiveFlurryRenderer|canvas-crop')
+          hits=[]
+          for path in files:
+              for no,line in enumerate(Path(path).read_text().splitlines(),1):
+                  if banned.search(line): hits.append(f"{path}:{no}:{line.strip()}")
+          if hits:
+              print("\n".join(hits))
+              sys.exit(1)
+          PY
           node --check js/35-v141-ui-battle.js
           node --check js/37-v142-skill-animation.js
           node --check js/39-v143-skill-animation.js
