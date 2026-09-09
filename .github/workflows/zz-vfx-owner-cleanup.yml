@@ -88,6 +88,11 @@ jobs:
           p = Path("js/39-v143-skill-animation.js")
           s = p.read_text()
           s = s.replace('.v141-effect-canvas,.v141-card-effects,#v142-skill-stage','.v141-card-effects,#v142-skill-stage')
+          old_rage_manifest = '        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","group",{scale:1.08,minSize:190,alignToSlots:true})},'
+          new_rage_manifest = '        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},'
+          if old_rage_manifest not in s:
+              raise RuntimeError("Rage raster manifest anchor missing")
+          s = s.replace(old_rage_manifest,new_rage_manifest,1)
           s = s.replace('            node.dataset.targetIndex=String(index);\n            node.style.left=target.x+"px";', '            node.dataset.targetIndex=String(index);\n            node.dataset.targetIndexes=String(index);\n            node.style.left=target.x+"px";', 1)
           marker = '            node.dataset.targetIndex=String(index);\n            node.dataset.travel="true";'
           if marker in s:
@@ -132,14 +137,6 @@ jobs:
           s, n = pattern.subn(replacement, s, count=1)
           if n != 1:
               raise RuntimeError("Abyss VFX regression test block mismatch")
-          p.write_text(s)
-
-          p = Path("tests/v153-fire-vfx.test.js")
-          s = p.read_text()
-          old_rage = '        rage:["rage-cast.png","single"]'
-          if old_rage not in s:
-              raise RuntimeError("V153 Rage placement expectation not found")
-          s = s.replace(old_rage, '        rage:["rage-cast.png","group"]', 1)
           p.write_text(s)
 
           guard = Path("tests/v174-raster-only-combat-vfx-owner.test.js")
@@ -196,7 +193,7 @@ jobs:
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add js/35-v141-ui-battle.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/59-abyss-two-tier-runtime.js tests/abyss-two-tier-refactor.test.js tests/v153-fire-vfx.test.js tests/v174-raster-only-combat-vfx-owner.test.js
+          git add js/35-v141-ui-battle.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/59-abyss-two-tier-runtime.js tests/abyss-two-tier-refactor.test.js tests/v174-raster-only-combat-vfx-owner.test.js
           git diff --cached --quiet && exit 0
           git commit -m "refactor: remove legacy procedural combat VFX sources"
           git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
