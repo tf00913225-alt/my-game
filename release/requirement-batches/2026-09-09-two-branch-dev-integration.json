@@ -70,16 +70,17 @@
       "evidence": [
         "GitHub Actions run 34345787199: Repository checks SUCCESS and Dev deployment gate SUCCESS",
         "Exact deployed commit aae6b2d9a095ecb00329a24e7f068f3f37f945dd, Game/Cache V173.64",
+        "Final dev closeout run 34347853294: Repository checks, exact-SHA deployment, live Abyss QA and live battle/audio QA SUCCESS for ade22629ddaa7f8451dc3aaa8b4696f8d67cc92b",
         "Live browser QA on https://dev.four-symbols-dev.pages.dev verified creation, character skills, inventory scrolling, relic modal scrolling/tabs, and the Lv20 BOSS mechanism card/detail/back flow",
         "Initial and final-read main bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe; no main ref update was issued"
       ]
     }
   ],
   "automatedVerification": "DEV_CI_DEPLOY_SHA_AND_LIVE_MOBILE_QA_VERIFIED",
-  "verificationRuns": [34344546671, 34345008744, 34345787199],
+  "verificationRuns": [34344546671, 34345008744, 34345787199, 34347853294],
   "visualVerification": "LIVE_DEV_BROWSER_AND_AUTOMATED_MOBILE_CHROME_PASS",
-  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "promotionApproval": "USER_APPROVED_MAIN_2026-09-09",
   "verifiedOnDevVersion": "173.64",
-  "releasedAs": null,
-  "notes": "Game/Cache Version intentionally remains V173.64. Both requested branch tips are integrated sequentially on dev; main remains untouched."
+  "releasedAs": "V173.64",
+  "notes": "Game/Cache Version intentionally remains V173.64. Both requested branch tips are integrated sequentially on dev. The user explicitly approved dev-to-main promotion on 2026-09-09."
 }
