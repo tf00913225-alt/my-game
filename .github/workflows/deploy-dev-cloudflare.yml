@@ -77,6 +77,10 @@ jobs:
             --exclude='.github/' \
             --exclude='tests/' \
             --exclude='node_modules/' \
+            --exclude='functions/' \
+            --exclude='.firebaserc' \
+            --exclude='firebase.json' \
+            --exclude='firestore.rules' \
             --exclude='_deploy/' \
             --exclude='release-manifest.final.json' \
             ./ _deploy/
