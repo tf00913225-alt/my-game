@@ -313,7 +313,7 @@ function loadGameplayBossTowerStyle(){
     const link=document.createElement("link");
     link.id="gameplay-boss-tower-style";
     link.rel="stylesheet";
-    link.href="css/gameplay-boss-tower.css?v=173.64&patch=boss-card-ui-20260909";
+    link.href="css/gameplay-boss-tower.css?v=173.64&patch=boss-card-detail-ui-20260909";
     document.head.appendChild(link);
 }
 
@@ -332,7 +332,7 @@ function loadGameplayBossTowerRuntime(){
     }
     const script=document.createElement("script");
     script.id="gameplay-boss-tower-runtime";
-    script.src="js/gameplay-boss-tower-system.js?v=173.64";
+    script.src="js/gameplay-boss-tower-system.js?v=173.64&patch=boss-card-detail-ui-20260909";
     script.async=false;
     script.onload=function(){
         script.dataset.loaded="1";
