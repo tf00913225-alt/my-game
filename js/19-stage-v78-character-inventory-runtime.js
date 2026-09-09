@@ -27,8 +27,11 @@ function getStageScale(){
         : 1;
 }
 
-function releaseCharacterLayoutOwnership(modal,body,root,inventory){
-    if(!modal || modal.dataset.v78CharacterLayoutActive!=="1"){
+function releaseCharacterLayoutOwnership(modal,body,root,inventory,force){
+    if(
+        !modal ||
+        (!force && modal.dataset.v78CharacterLayoutActive!=="1")
+    ){
         return;
     }
 
@@ -87,6 +90,29 @@ function applyNow(){
         !body ||
         !modal.classList.contains("show")
     ){
+        return;
+    }
+
+    /*
+       Team Relic owns the shared modal body as its vertical scroll container.
+       Its class can be applied before #characterTabContent is physically
+       replaced, so containment alone is not a sufficient ownership test.
+       Relinquish the character layout synchronously as soon as the relic modal
+       class appears; force also clears any stale inline !important styles left
+       by an older character view even if the dataset marker was lost.
+    */
+    const relicOwnsSharedModal=
+        modal.classList.contains("team-relic-modal") ||
+        modal.classList.contains("team-relic-mode");
+
+    if(relicOwnsSharedModal){
+        releaseCharacterLayoutOwnership(
+            modal,
+            body,
+            root,
+            inventory,
+            true
+        );
         return;
     }
 
