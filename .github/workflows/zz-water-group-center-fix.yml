@@ -1,0 +1,38 @@
+name: Water group VFX center fix
+
+on:
+  push:
+    branches:
+      - fix/combat-vfx-owner-cleanup-20260909
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply group-center fix
+        run: python .github/scripts/zz-water-group-center-fix.py
+      - name: Verify Water and owner regressions
+        run: |
+          node tests/v166-water-vfx.test.js
+          node tests/v174-raster-only-combat-vfx-owner.test.js
+          node --check js/39-v143-skill-animation.js
+      - name: Commit fix and remove temporary helper
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          rm .github/scripts/zz-water-group-center-fix.py
+          rm .github/workflows/zz-water-group-center-fix.yml
+          git add js/39-v143-skill-animation.js .github/scripts/zz-water-group-center-fix.py .github/workflows/zz-water-group-center-fix.yml
+          git commit -m "fix: center group VFX on resolved targets"
+          git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
