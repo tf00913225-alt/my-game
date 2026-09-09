@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-09-firebase-auth-foundation",
+  "baseBranch": "dev",
+  "baseCommit": "293a1b6c0f0139ee567ba4b7010f1c7fe031519c",
+  "officialVersion": "173.64",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "FIREBASE-01",
+      "status": "IMPLEMENTED",
+      "requirement": "Firebase Web SDK 與專案設定必須有單一 owner，缺少完整 Console config 時 fail closed，不得猜值",
+      "evidence": [
+        "js/firebase/firebase-config.js",
+        "tests/firebase-auth-foundation.test.mjs"
+      ]
+    },
+    {
+      "id": "FIREBASE-02",
+      "status": "IMPLEMENTED",
+      "requirement": "Authentication owner 提供 Google、Email/密碼、匿名、登出與登入狀態監聽，不修改遊戲存檔",
+      "evidence": [
+        "js/firebase/firebase-auth.js",
+        "js/firebase/firebase-bootstrap.js",
+        "tests/firebase-auth-foundation.test.mjs"
+      ]
+    },
+    {
+      "id": "FIREBASE-03",
+      "status": "IMPLEMENTED",
+      "requirement": "Cloud save client 僅允許讀取 users/{uid}/saves/current，瀏覽器端不得加入 Firestore 正式寫入 API",
+      "evidence": [
+        "js/firebase/firebase-cloud-save.js",
+        "tests/firebase-auth-foundation.test.mjs"
+      ]
+    },
+    {
+      "id": "FIREBASE-04",
+      "status": "BLOCKED",
+      "requirement": "完成實際 Firebase 登入與 UID／雲端讀取實機驗證",
+      "evidence": [
+        "缺少 Firebase Console Web App 完整 apiKey / appId / storageBucket；目前不得猜值，也尚未將 bootstrap 接入 index.html"
+      ]
+    }
+  ],
+  "automatedVerification": "TARGETED_STATIC_TEST_READY",
+  "automatedVerificationNotes": "本階段不變更版本、不變更 index.html、不變更 saveGame/loadGame、不放寬 Firestore Rules。完整 Firebase Web App config 補齊後再接遊戲入口並做實機登入驗證。",
+  "visualVerification": "NOT_REQUIRED_FOR_FOUNDATION_ONLY",
+  "verifiedDevCommit": null,
+  "releasedAs": null
+}
