@@ -1,5 +1,6 @@
 /* =====================================================
-   V149 — shop alignment, skill word circles and combat state feedback
+   V149 — shop alignment and non-VFX combat state feedback
+   V174 cleanup: word-circle fallback removed; Barrier count is static UI.
 ===================================================== */
 
 /* The shop modal stays centred inside the 420px game canvas. */
@@ -52,29 +53,8 @@
     text-overflow:ellipsis !important;
 }
 
-/* One readable circle for every character in the displayed skill name. */
-.v143-skill-stage.v149-word-circle-stage .v143-skill-flight{
-    width:38px !important;
-    height:38px !important;
-    margin:-19px 0 0 -19px !important;
-    border:2px solid var(--v143-soft) !important;
-    border-radius:50% !important;
-    clip-path:none !important;
-    color:#fff !important;
-    background:
-        radial-gradient(circle,rgba(255,255,255,.5) 0 10%,var(--v143-color) 24%,color-mix(in srgb,var(--v143-color) 52%,transparent) 48%,transparent 72%) !important;
-    box-shadow:0 0 10px var(--v143-color),inset 0 0 7px var(--v143-soft) !important;
-    filter:drop-shadow(0 0 8px var(--v143-color)) !important;
-    font-family:"Noto Serif TC",serif !important;
-    font-size:20px !important;
-    font-style:normal !important;
-    font-weight:900 !important;
-    line-height:34px !important;
-    text-align:center !important;
-    text-shadow:0 1px 3px #000,0 0 5px #000 !important;
-}
-
-/* Barrier: four deep-yellow corners, each showing the remaining block count. */
+/* Barrier remaining-block count is gameplay information only.
+   The animated Barrier appearance is owned by the formal status Sprite Sheet. */
 #game-stage #battlePage .v149-barrier-corners{
     position:absolute;
     inset:0;
@@ -95,20 +75,18 @@
     border-style:solid;
     border-width:0;
     color:#ffe49b;
-    background:radial-gradient(circle,rgba(72,45,3,.88),rgba(34,22,3,.58) 52%,transparent 70%);
-    filter:drop-shadow(0 0 5px rgba(218,169,45,.9));
+    background:rgba(34,22,3,.72);
     font-family:Arial,sans-serif;
     font-size:11px;
     font-style:normal;
     font-weight:900;
     line-height:1;
     text-shadow:0 1px 2px #000;
-    animation:v149BarrierCornerPulse 1.2s ease-in-out infinite alternate;
 }
 #game-stage #battlePage .v149-barrier-corners i:nth-child(1){left:0;top:0;border-left-width:4px;border-top-width:4px;}
-#game-stage #battlePage .v149-barrier-corners i:nth-child(2){right:0;top:0;border-right-width:4px;border-top-width:4px;animation-delay:-.3s;}
-#game-stage #battlePage .v149-barrier-corners i:nth-child(3){right:0;bottom:0;border-right-width:4px;border-bottom-width:4px;animation-delay:-.6s;}
-#game-stage #battlePage .v149-barrier-corners i:nth-child(4){left:0;bottom:0;border-left-width:4px;border-bottom-width:4px;animation-delay:-.9s;}
+#game-stage #battlePage .v149-barrier-corners i:nth-child(2){right:0;top:0;border-right-width:4px;border-top-width:4px;}
+#game-stage #battlePage .v149-barrier-corners i:nth-child(3){right:0;bottom:0;border-right-width:4px;border-bottom-width:4px;}
+#game-stage #battlePage .v149-barrier-corners i:nth-child(4){left:0;bottom:0;border-left-width:4px;border-bottom-width:4px;}
 #game-stage #battlePage .v149-has-barrier .v141-effect-barrier,
 #game-stage #battlePage .v149-has-barrier .v141-effect-barrier::before{
     display:none !important;
@@ -116,10 +94,6 @@
 }
 #game-stage #battlePage .battle-monster.v149-has-barrier .v141-monster-shield-bar{
     display:none !important;
-}
-@keyframes v149BarrierCornerPulse{
-    from{opacity:.58;filter:drop-shadow(0 0 2px rgba(218,169,45,.65));}
-    to{opacity:1;filter:drop-shadow(0 0 8px rgba(255,209,88,1));}
 }
 
 /* A revived enemy must immediately return to the normal living-card brightness. */
@@ -180,7 +154,6 @@
 }
 
 @media (prefers-reduced-motion:reduce){
-    #game-stage #battlePage .v149-barrier-corners i,
     #game-stage #battlePage .v149-reflect-popup{
         animation-duration:.01ms !important;
         animation-iteration-count:1 !important;
