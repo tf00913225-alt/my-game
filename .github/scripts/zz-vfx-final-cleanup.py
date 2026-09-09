@@ -147,16 +147,22 @@ s = s.replace(
 )
 p.write_text(s)
 
-# Remove V149 barrier corner art/keyframes; retain the non-animated shield-bar presentation rule.
+# Remove V149 barrier-corner CSS by the actual selector, regardless of historical comment changes.
 p = Path("css/44-v149-skill-ui-rules.css")
 s = p.read_text()
-start_marker = "/* Barrier: four deep-yellow corners, each showing the remaining block count. */"
-end_marker = "/* A revived enemy must immediately return to the normal living-card brightness. */"
-start = s.find(start_marker)
+selector = '#game-stage #battlePage .v149-barrier-corners{'
+start = s.find(selector)
 if start >= 0:
+    comment_start = s.rfind('/*', 0, start)
+    if comment_start >= 0 and start - comment_start < 240:
+        start = comment_start
+    end_marker = "/* A revived enemy must immediately return to the normal living-card brightness. */"
     end = s.find(end_marker, start)
     if end < 0:
-        raise RuntimeError("V149 barrier CSS end marker missing")
+        living_selector = '#game-stage #battlePage .battle-monster.v149-living-monster{'
+        end = s.find(living_selector, start)
+    if end < 0:
+        raise RuntimeError("V149 barrier CSS end boundary missing")
     keep = '''#game-stage #battlePage .battle-monster.v149-has-barrier .v141-monster-shield-bar{
     display:none !important;
 }
@@ -214,7 +220,7 @@ if start >= 0:
     s = s[:start] + block + s[end:]
 p.write_text(s)
 
-# Permanent owner regression extended to secondary status owners.
+# Permanent owner regression extended to secondary status owners and WebGL/Shader paths.
 p = Path("tests/v174-raster-only-combat-vfx-owner.test.js")
 s = p.read_text()
 decl = '''const v143fixes=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
@@ -232,6 +238,7 @@ test("secondary status owners cannot recreate procedural combat VFX",()=>{
     assert.doesNotMatch(css143,/v143-earth-shield-effect|v143EarthCornerBreath/);
     assert.doesNotMatch(css146,/v143-earth-shield-effect/);
     assert.doesNotMatch(css149,/v149-barrier-corners|v149BarrierCornerPulse/);
+    assert.doesNotMatch([v141,v142,v143,v143fixes,v149,v155,abyss].join("\\n"),/WebGLRenderingContext|createShader|shaderSource|getContext\\(["']webgl/i);
 });
 '''
 if 'secondary status owners cannot recreate procedural combat VFX' not in s:
