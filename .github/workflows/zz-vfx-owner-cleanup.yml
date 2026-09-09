@@ -1,0 +1,154 @@
+name: VFX owner cleanup
+
+on:
+  push:
+    branches:
+      - fix/combat-vfx-owner-cleanup-20260909
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Remove legacy combat VFX sources
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def remove_function(text, name):
+              marker = f"function {name}("
+              start = text.find(marker)
+              if start < 0:
+                  return text, False
+              brace = text.find("{", start)
+              if brace < 0:
+                  raise RuntimeError(f"missing brace for {name}")
+              depth = 0
+              i = brace
+              quote = None
+              escape = False
+              while i < len(text):
+                  ch = text[i]
+                  if quote:
+                      if escape:
+                          escape = False
+                      elif ch == "\\":
+                          escape = True
+                      elif ch == quote:
+                          quote = None
+                  else:
+                      if ch in ("'", '"', '`'):
+                          quote = ch
+                      elif ch == "{":
+                          depth += 1
+                      elif ch == "}":
+                          depth -= 1
+                          if depth == 0:
+                              end = i + 1
+                              while end < len(text) and text[end] in " \t":
+                                  end += 1
+                              if end < len(text) and text[end] == ";":
+                                  end += 1
+                              while end < len(text) and text[end] in "\r\n":
+                                  end += 1
+                              return text[:start] + text[end:], True
+                  i += 1
+              raise RuntimeError(f"unterminated function {name}")
+
+          p = Path("js/35-v141-ui-battle.js")
+          s = p.read_text()
+          s, ok = remove_function(s, "playCanvasParticles")
+          if not ok:
+              raise RuntimeError("playCanvasParticles not found")
+          old = '''    function syncCardEffects(card,entity){\n        const layer=ensureEffectLayer(card);\n        if(!layer){ return; }\n        const types=activeEffectTypes(entity);\n        const signature=types.sort().join("|");\n        if(layer.dataset.signature===signature){ return; }\n        layer.dataset.signature=signature;\n        layer.innerHTML=types.map(type=>'<span class="v141-effect v141-effect-'+type+'"></span>').join("");\n    }\n'''
+          new = '''    function syncCardEffects(card){\n        if(!card||typeof card.querySelector!=="function"){ return; }\n        const layer=card.querySelector(":scope > .v141-card-effects");\n        if(!layer){ return; }\n        layer.querySelectorAll(":scope > .v141-effect").forEach(node=>node.remove());\n        if(!layer.children.length){ layer.remove(); }\n    }\n'''
+          if old not in s:
+              raise RuntimeError("syncCardEffects block mismatch")
+          s = s.replace(old, new, 1)
+          s = re.sub(
+              r'    window\.v141PlayCardEffect=function\(side,index,type\)\{[\s\S]*?\n    \};',
+              '    window.v141PlayCardEffect=function(){ return false; };',
+              s,
+              count=1
+          )
+          s = s.replace('Card effects (persistent CSS layers + short Canvas particles)','Card effects (legacy visual renderer retired; data/status only)')
+          p.write_text(s)
+
+          p = Path("js/43-v149-skill-ui-rules.js")
+          s = p.read_text()
+          s, ok = remove_function(s, "installWordCircleDirector")
+          if not ok:
+              raise RuntimeError("installWordCircleDirector not found")
+          s = s.replace('    installWordCircleDirector();\n','',1)
+          s = s.replace('wordCirclePerCharacter:true,','proceduralSkillFallback:false,',1)
+          s = s.replace('Every skill uses one circle per displayed character.','Procedural word-circle fallback retired; V143 raster owner is authoritative.')
+          p.write_text(s)
+
+          p = Path("js/59-abyss-two-tier-runtime.js")
+          s = p.read_text()
+          s, ok = remove_function(s, "patchExistingV143ExplosiveFlurryRenderer")
+          if not ok:
+              raise RuntimeError("patchExistingV143ExplosiveFlurryRenderer not found")
+          s = re.sub(r'^\s*patchExistingV143ExplosiveFlurryRenderer\(\);\s*$', '', s, flags=re.M)
+          p.write_text(s)
+
+          p = Path("tests/abyss-two-tier-refactor.test.js")
+          s = p.read_text()
+          pattern = re.compile(r'test\("V143 Fire Flurry reuses the existing Canvas crop renderer instead of adding a second VFX runtime",\(\)=>\{[\s\S]*?\n\}\);')
+          replacement = '''test("Abyss runtime never mutates the shared V143 VFX manifest",()=>{\n    assert.doesNotMatch(source,/patchExistingV143ExplosiveFlurryRenderer/);\n    assert.doesNotMatch(source,/v143SkillAnimationManifest/);\n    assert.doesNotMatch(source,/canvas-crop/);\n});'''
+          s, n = pattern.subn(replacement, s, count=1)
+          if n != 1:
+              raise RuntimeError("Abyss VFX regression test block mismatch")
+          p.write_text(s)
+
+          guard = Path("tests/v174-raster-only-combat-vfx-owner.test.js")
+          g = guard.read_text()
+          insertion = '''\nassert.doesNotMatch(v141,/playCanvasParticles|v141-effect-canvas|getContext\\(|createElement\\(["']canvas["']\\)/);\nassert.doesNotMatch(v149,/installWordCircleDirector|v149-word-|v149-word-circle-stage/);\nassert.doesNotMatch(abyss,/v143SkillAnimationManifest|patchExistingV143ExplosiveFlurryRenderer|canvas-crop/);\n'''
+          if 'const abyss=' not in g:
+              g = g.replace('const v149=', 'const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");\nconst v149=', 1)
+          if 'playCanvasParticles|v141-effect-canvas' not in g:
+              g += insertion
+          guard.write_text(g)
+          PY
+      - name: Source-level legacy VFX guard
+        run: |
+          ! grep -nE 'playCanvasParticles|v141-effect-canvas|getContext\(|createElement\(["'"']canvas["'"']\)|installWordCircleDirector|v149-word-|v149-word-circle-stage|patchExistingV143ExplosiveFlurryRenderer|canvas-crop' js/35-v141-ui-battle.js js/37-v142-skill-animation.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/59-abyss-two-tier-runtime.js
+          node --check js/35-v141-ui-battle.js
+          node --check js/37-v142-skill-animation.js
+          node --check js/39-v143-skill-animation.js
+          node --check js/43-v149-skill-ui-rules.js
+          node --check js/59-abyss-two-tier-runtime.js
+      - name: Focused VFX regression tests
+        run: |
+          node tests/v174-raster-only-combat-vfx-owner.test.js
+          node tests/abyss-two-tier-refactor.test.js
+          node tests/boss-mechanism-vfx-card-ui-20260909.test.js
+          node tests/v153-fire-vfx.test.js
+          node tests/v166-water-vfx.test.js
+          node tests/v173.23-wind-vfx.test.js
+          node tests/v173.39-earth-light-vfx.test.js
+      - name: Full repository tests
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then sudo apt-get update && sudo apt-get install -y imagemagick; fi
+          git fetch origin 39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 4a592dd4c41d7efb1a4849fbfe0cbf68598121bf --depth=1 || true
+          for test in tests/*.test.js; do node "$test"; done
+          node .github/scripts/ci.mjs
+      - name: Commit cleanup
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add js/35-v141-ui-battle.js js/43-v149-skill-ui-rules.js js/59-abyss-two-tier-runtime.js tests/abyss-two-tier-refactor.test.js tests/v174-raster-only-combat-vfx-owner.test.js
+          git diff --cached --quiet && exit 0
+          git commit -m "refactor: remove legacy procedural combat VFX sources"
+          git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
