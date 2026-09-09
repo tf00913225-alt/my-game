@@ -12,6 +12,7 @@ Owners:
 - `js/firebase/firebase-auth-ui.js`: native-stage login/account overlay for Google, Email/password and anonymous sign-in.
 - `js/firebase/firebase-bootstrap.js`: narrow browser bridge (`window.FourSymbolsFirebase`) and auth/cloud-read state coordination.
 - `js/52-v173.20-startup-loader.js`: startup entry that dynamically imports the Firebase bootstrap as optional infrastructure. Firebase is deliberately not counted as a core runtime-readiness module.
+- `js/01-stage-v8-touch-lock.js`: global gesture owner; `.firebase-auth-dialog` is registered there as the only authentication vertical scroll owner.
 
 ## Firebase project
 
@@ -31,7 +32,7 @@ Firebase Analytics is not initialized by this phase. The `measurementId` is reta
 
 ## Authentication behavior
 
-The account overlay is installed inside `#game-stage`, so it follows the official 1080×1920 stage transform without changing game page dimensions.
+The account overlay is installed inside `#game-stage`, so it follows the official 1080×1920 stage transform without changing game page dimensions. Its content scrolls inside `.firebase-auth-dialog`, which is explicitly registered in the existing global touch-lock whitelist instead of adding another page-specific touch handler.
 
 Available flows:
 
