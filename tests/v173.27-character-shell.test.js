@@ -28,15 +28,26 @@ function extractFunction(source,name){
 
 function makeElement(){
     const values=new Map();
-    return {
+    const element={
         clientHeight:520,
         parentElement:null,
+        dataset:{},
         style:{
-            setProperty(name,value,priority){ values.set(name,{value,priority}); }
+            setProperty(name,value,priority){ values.set(name,{value,priority}); },
+            removeProperty(name){ values.delete(name); }
+        },
+        contains(node){
+            let current=node;
+            while(current){
+                if(current===element){ return true; }
+                current=current.parentElement;
+            }
+            return false;
         },
         value(name){ return values.get(name)?.value; },
         priority(name){ return values.get(name)?.priority; }
     };
+    return element;
 }
 
 test("the V78 owner now makes every character tab fill the mobile canvas",()=>{
@@ -45,6 +56,7 @@ test("the V78 owner now makes every character tab fill the mobile canvas",()=>{
     const inventory=makeElement();
     const box=makeElement();
     const modal=makeElement();
+    root.parentElement=body;
     modal.classList={contains:name=>name==="show"};
     modal.querySelector=selector=>selector===".home-feature-modal-box.wide"?box:null;
 
