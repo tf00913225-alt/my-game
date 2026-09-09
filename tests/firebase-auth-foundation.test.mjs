@@ -10,6 +10,7 @@ const cloud = read("js/firebase/firebase-cloud-save.js");
 const ui = read("js/firebase/firebase-auth-ui.js");
 const bootstrap = read("js/firebase/firebase-bootstrap.js");
 const startup = read("js/52-v173.20-startup-loader.js");
+const touch = read("js/01-stage-v8-touch-lock.js");
 const css = read("css/firebase-auth.css");
 
 test("Firebase project identity, complete Web config and pinned SDK owner are explicit", ()=>{
@@ -60,6 +61,8 @@ test("authentication UI supports Google, email, anonymous and local-only fallbac
     assert.match(ui, /UID：/);
     assert.match(css, /\.firebase-auth-overlay/);
     assert.match(css, /z-index:999998/);
+    assert.match(css, /\.firebase-auth-dialog\{[\s\S]*overflow-y:auto/);
+    assert.match(touch, /\.firebase-auth-dialog/);
 });
 
 test("startup owner loads Firebase as optional infrastructure without changing runtime module totals", ()=>{
