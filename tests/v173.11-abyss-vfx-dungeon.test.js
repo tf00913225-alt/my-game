@@ -22,15 +22,17 @@ assert.match(dungeon,/if\(!DUNGEON_DAILY_LIMIT_ENABLED\)\{ return false; \}/);
 
 assert.match(
     animation,
-    /waterBall:\{[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,\s*placement:"group",renderer:"canvas-crop"/
+    /waterBall:\{[\s\S]*?castSheet\("assets\/vfx\/water\/water-orb-vfx\.png\?v=173\.19","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)/
 );
 assert.match(
     animation,
-    /iceArrowRain:\{[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,\s*placement:"battlefield",renderer:"canvas-crop",fixedFormation:true,coverageScale:1\.22/
+    /iceArrowRain:\{[\s\S]*?castSheet\("assets\/vfx\/water\/frost-arrow-rain-vfx\.png\?v=173\.19","battlefield",\{fixedFormation:true,coverageScale:1\.22,minWidth:140,minHeight:140\}\)/
 );
+assert.match(animation,/function castSheet\(src,placement,options\)[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?renderer:"dom-sprite"/);
 assert.match(
     animation,
-    /const targetCards=indexes\.map\(targetIndex=>cardFor\(current\.targetSide,targetIndex\)\)[\s\S]*?const bounds=fieldBounds\(targetCards\);/
+    /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\);[\s\S]*?groupLayoutBounds\(current,indexes\):fieldBounds\(targetCards\)/
 );
+assert.doesNotMatch(animation,/canvas-crop|getContext\(|drawImage\(|createElement\(["']canvas["']\)/);
 
-console.log("V173.39 Abyss, VFX, and daily-dungeon regression checks passed.");
+console.log("V173.39 Abyss, raster VFX, and daily-dungeon regression checks passed.");
