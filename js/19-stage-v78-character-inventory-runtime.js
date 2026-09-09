@@ -102,9 +102,17 @@ function applyNow(){
        The root can be completely removed when another feature replaces the
        modal body, so release must also run when #characterTabContent no longer
        exists at all; returning early on !root would leave the stale inline
-       styles behind indefinitely.
+       styles behind indefinitely. DOM test doubles used by the repository do
+       not all implement Element.contains(), so the real containment check is
+       used when available and otherwise falls back to the historical mounted
+       assumption for those isolated fixtures.
     */
-    if(!root || !body.contains(root)){
+    const characterRootMounted=!!root&&(
+        typeof body.contains==="function"
+            ?body.contains(root)
+            :true
+    );
+    if(!characterRootMounted){
         releaseCharacterLayoutOwnership(modal,body,root,inventory);
         return;
     }
