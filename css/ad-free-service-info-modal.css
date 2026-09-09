@@ -1,0 +1,245 @@
+/* Paid-service disclosure inside the existing shared homeFeatureModal. */
+#game-stage #homeFeatureModal.ad-free-service-info-mode{
+    z-index:12000;
+    box-sizing:border-box;
+    padding:14px;
+    overflow:hidden;
+    overscroll-behavior:contain;
+    background:
+        radial-gradient(circle at 50% 28%,rgba(143,98,30,.14),transparent 44%),
+        rgba(2,2,2,.84);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-box{
+    display:flex;
+    width:calc(100% - var(--ui-medium-modal-safe-space,28px));
+    max-width:var(--ui-medium-modal-max-width,360px);
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px));
+    min-height:0;
+    box-sizing:border-box;
+    flex-direction:column;
+    overflow:hidden;
+    border:2px solid #b98a3f;
+    border-radius:13px;
+    background:
+        linear-gradient(145deg,rgba(37,27,17,.98),rgba(9,8,7,.99) 58%,rgba(18,13,9,.99));
+    box-shadow:
+        0 18px 46px rgba(0,0,0,.72),
+        inset 0 0 0 1px rgba(255,225,151,.07),
+        inset 0 0 28px rgba(186,128,43,.08);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title{
+    flex:0 0 auto;
+    min-height:52px;
+    box-sizing:border-box;
+    padding:12px 14px 10px;
+    border-bottom:1px solid rgba(194,147,68,.52);
+    background:
+        linear-gradient(180deg,rgba(53,37,20,.96),rgba(18,13,9,.96));
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > span{
+    color:#f0cf83;
+    font-family:"Noto Serif TC",serif;
+    font-size:20px;
+    font-weight:900;
+    letter-spacing:1px;
+    line-height:1.35;
+    text-shadow:0 1px 2px #000,0 0 10px rgba(229,173,66,.18);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > div{
+    display:none;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode #homeFeatureModalBody{
+    flex:1 1 auto;
+    min-height:0;
+    box-sizing:border-box;
+    padding:14px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+    scrollbar-gutter:stable;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-panel{
+    display:flex;
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    flex-direction:column;
+    gap:12px;
+    color:#ddd2bd;
+    font-size:15px;
+    line-height:1.65;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-hero{
+    display:flex;
+    box-sizing:border-box;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    padding:12px 10px 11px;
+    border:1px solid rgba(193,145,65,.58);
+    border-radius:10px;
+    background:
+        radial-gradient(circle at 50% 0,rgba(211,159,70,.12),transparent 58%),
+        rgba(20,15,10,.86);
+    box-shadow:inset 0 0 18px rgba(213,159,60,.04);
+    text-align:center;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-subtitle{
+    color:#ead7ad;
+    font-family:"Noto Serif TC",serif;
+    font-size:17px;
+    font-weight:900;
+    letter-spacing:.5px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-price{
+    color:#f2c769;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-size:28px;
+    font-weight:900;
+    line-height:1.25;
+    letter-spacing:.4px;
+    text-shadow:0 0 12px rgba(233,176,62,.16);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-badge{
+    color:#ae9a77;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.3px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy{
+    box-sizing:border-box;
+    padding:11px 12px;
+    border:1px solid rgba(137,104,57,.44);
+    border-radius:9px;
+    background:rgba(8,7,6,.62);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p{
+    margin:0 0 8px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p:last-child{
+    margin-bottom:0;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support{
+    display:flex;
+    box-sizing:border-box;
+    flex-direction:column;
+    gap:9px;
+    padding:11px;
+    border:1px solid rgba(154,116,60,.48);
+    border-radius:9px;
+    background:rgba(15,11,8,.72);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row{
+    display:flex;
+    min-width:0;
+    align-items:flex-start;
+    gap:6px;
+    color:#cabd9f;
+    overflow-wrap:anywhere;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > span{
+    flex:0 0 auto;
+    color:#a99572;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > b{
+    min-width:0;
+    color:#ead4a4;
+    font-weight:800;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > b[data-todo="true"]{
+    color:#9c907c;
+    font-weight:700;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:7px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button,
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button{
+    min-height:44px;
+    box-sizing:border-box;
+    padding:8px 10px;
+    border:1px solid #806439;
+    border-radius:8px;
+    background:linear-gradient(180deg,#302519,#17110c);
+    color:#dfd1b6;
+    font-family:"Noto Sans TC",sans-serif;
+    font-size:14px;
+    font-weight:800;
+    line-height:1.35;
+    letter-spacing:.2px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:disabled,
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button:disabled{
+    border-color:#51483c;
+    background:#171512;
+    color:#777065;
+    cursor:not-allowed;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:focus-visible,
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button:focus-visible{
+    outline:2px solid #f0d289;
+    outline-offset:2px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-todo-note{
+    margin:0;
+    color:#8f8574;
+    font-size:12px;
+    line-height:1.55;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+    padding-top:2px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions .ad-free-service-acknowledge{
+    border-color:#c09243;
+    background:linear-gradient(180deg,#e8c66e,#b9792c);
+    color:#261707;
+    font-weight:900;
+    box-shadow:inset 0 1px 0 rgba(255,248,213,.24),0 3px 10px rgba(0,0,0,.3);
+}
+
+@media (max-width:360px){
+    #game-stage #homeFeatureModal.ad-free-service-info-mode{
+        padding:10px;
+    }
+
+    #game-stage #homeFeatureModal.ad-free-service-info-mode #homeFeatureModalBody{
+        padding:11px;
+    }
+
+    #game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-panel{
+        gap:10px;
+        font-size:14px;
+    }
+}
