@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-09-firebase-trusted-cloud-save-backend",
+  "baseBranch": "dev",
+  "baseCommit": "88be57ce1fa5f8ed50b8aa72c993f012b9be7c0c",
+  "officialVersion": "173.64",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "CLOUDSAVE-BE-01",
+      "status": "IMPLEMENTED",
+      "requirement": "建立 Firebase Functions v2 可信後端，所有 callable 必須要求 Firebase Authentication UID",
+      "evidence": [
+        "functions/index.js",
+        "tests/firebase-trusted-cloud-save-backend.test.mjs"
+      ]
+    },
+    {
+      "id": "CLOUDSAVE-BE-02",
+      "status": "IMPLEMENTED",
+      "requirement": "瀏覽器 Firestore 維持 owner-read-only，正式 create/update/delete 不得直接由前端執行",
+      "evidence": [
+        "firestore.rules",
+        "js/firebase/firebase-cloud-save.js",
+        "tests/firebase-trusted-cloud-save-backend.test.mjs"
+      ]
+    },
+    {
+      "id": "CLOUDSAVE-BE-03",
+      "status": "IMPLEMENTED",
+      "requirement": "既有 localStorage 存檔只能送成未信任 migration candidate，不得直接升格為正式金幣、EXP、裝備、背包或進度",
+      "evidence": [
+        "functions/src/cloud-save-policy.js",
+        "functions/index.js",
+        "docs/FIREBASE_TRUSTED_CLOUD_SAVE_BACKEND.md"
+      ]
+    },
+    {
+      "id": "CLOUDSAVE-BE-04",
+      "status": "IMPLEMENTED",
+      "requirement": "Migration candidate 必須具備欄位、資料型別、尺寸、角色等級、金幣/EXP 範圍、prototype pollution 與 fingerprint 驗證",
+      "evidence": [
+        "functions/src/cloud-save-policy.js",
+        "tests/firebase-trusted-cloud-save-backend.test.mjs"
+      ]
+    },
+    {
+      "id": "CLOUDSAVE-BE-05",
+      "status": "BLOCKED",
+      "requirement": "Firebase Functions 與 firestore.rules 實際部署到 four-symbols-jianghu，並完成真實 callable + Firestore 寫入/read-back 驗證",
+      "evidence": [
+        "目前 Repository 沒有 Firebase deployment credentials/workflow；合併程式碼不等於後端已部署。"
+      ]
+    }
+  ],
+  "automatedVerification": "REPOSITORY_TESTS_REQUIRED_BEFORE_MERGE",
+  "automatedVerificationNotes": "本批不修改 saveGame/loadGame，不修改 localStorage SAVE_KEY/schema，不把 migration candidate 當 authoritative state，不改 Game/Cache Version。",
+  "visualVerification": "NOT_REQUIRED_FOR_BACKEND_FOUNDATION",
+  "verifiedDevCommit": null,
+  "releasedAs": null
+}
