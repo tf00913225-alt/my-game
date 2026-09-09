@@ -1,0 +1,32 @@
+name: Final whitespace cleanup
+
+on:
+  push:
+    branches:
+      - fix/combat-vfx-owner-cleanup-20260909
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove the single trailing-whitespace line
+        run: |
+          sed -i '913s/[[:blank:]]*$//' js/43-v149-skill-ui-rules.js
+          git diff --check
+          node --check js/43-v149-skill-ui-rules.js
+      - name: Commit cleanup and remove helper
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          rm .github/workflows/zz-whitespace-cleanup.yml
+          git add js/43-v149-skill-ui-rules.js .github/workflows/zz-whitespace-cleanup.yml
+          git commit -m "style: remove trailing whitespace from V149 rules"
+          git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
