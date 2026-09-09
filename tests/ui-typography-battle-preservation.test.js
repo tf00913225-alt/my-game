@@ -54,6 +54,14 @@ function retireV143EarthShieldSelector(text){
     ));
 }
 
+function retireV146LegacySkillVfx(text){
+    const start=text.indexOf(".v143-skill-flight{offset-anchor:50% 50%;transform-origin:50% 50%;}");
+    if(start<0){ return normalize(text); }
+    const end=text.indexOf(".v146-area-impact{",start);
+    assert.ok(end>start,"retired V146 VFX block end missing");
+    return normalize(text.slice(0,start)+text.slice(end));
+}
+
 // V131 starts with battle formation/element-card rules. Typography work begins only
 // after the character/home-feature shell, so the entire battle prefix must be byte-equivalent.
 sameSegment(
@@ -70,14 +78,15 @@ sameSegment(
     const start="#game-stage #battlePage #battleMonsterArea";
     const end="#game-stage #inventoryPage .inventory-grid-scroll";
     assert.equal(
-        retireV143EarthShieldSelector(segment(current(file),start,end)),
-        retireV143EarthShieldSelector(segment(at(BASE,file),start,end)),
-        `${file} battle-owned segment changed outside retired V143 Earth Shield selector`
+        retireV146LegacySkillVfx(retireV143EarthShieldSelector(segment(current(file),start,end))),
+        retireV146LegacySkillVfx(retireV143EarthShieldSelector(segment(at(BASE,file),start,end))),
+        `${file} battle-owned segment changed outside retired V143 Earth Shield selector and V146 legacy skill VFX block`
     );
 }
-assert.ok(base("css/42-v146-system-polish.css").includes("#game-stage #battlePage #battleMonsterArea{transform:translateY(12px);}"));
-assert.ok(current("css/42-v146-system-polish.css").includes("#game-stage #battlePage #battleMonsterArea{transform:translateY(12px);}"));
+assert.match(base("css/42-v146-system-polish.css"),/#game-stage #battlePage #battleMonsterArea\{[\s\S]*?transform:translateY\(16px\);[\s\S]*?\}/);
+assert.match(current("css/42-v146-system-polish.css"),/#game-stage #battlePage #battleMonsterArea\{[\s\S]*?transform:translateY\(16px\);[\s\S]*?\}/);
 assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-earth-shield-effect/);
+assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|v143-skill-field|v143-hit-impact|v146-flight-art/);
 
 // Gameplay has a clean battle-only tail. The 2026-09-09 BOSS-card readability
 // requirement intentionally owns only the mechanism slot/base-card/HP presentation.

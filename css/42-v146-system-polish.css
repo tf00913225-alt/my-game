@@ -31,26 +31,6 @@
     -webkit-text-fill-color:#fff !important;
 }
 
-.v143-skill-flight{offset-anchor:50% 50%;transform-origin:50% 50%;}
-.v146-flight-art{display:block;width:100%;height:100%;overflow:visible;color:inherit;filter:drop-shadow(0 0 8px var(--v143-color));}
-.v143-skill-stage[data-skill="dragonSlash"] .v143-skill-flight{width:92px;height:52px;margin:-26px 0 0 -46px;background:transparent;}
-.v143-skill-stage[data-skill="phoenixCry"] .v143-skill-flight{width:108px;height:66px;margin:-33px 0 0 -54px;background:transparent;}
-.v143-skill-stage[data-skill="iceArrowRain"] .v143-skill-flight,
-.v143-skill-stage[data-skill="fireRocket"] .v143-skill-flight,
-.v143-skill-stage[data-skill="windArrow"] .v143-skill-flight{width:58px;height:26px;margin:-13px 0 0 -29px;border-radius:0;clip-path:none;background:transparent;}
-.v143-skill-stage[data-skill="stoneThrow"] .v143-skill-flight,
-.v143-skill-stage[data-skill="stoneBreakSky"] .v143-skill-flight,
-.v143-skill-stage[data-skill="sandWind"] .v143-skill-flight,
-.v143-skill-stage[data-skill="flyingSandStrike"] .v143-skill-flight,
-.v143-skill-stage[data-skill="dustStorm"] .v143-skill-flight{width:48px;height:48px;margin:-24px;background:transparent;}
-.v143-skill-stage[data-skill="iceArrowRain"] .v143-skill-field{
-    background:repeating-linear-gradient(112deg,transparent 0 17px,rgba(145,229,255,.42) 19px 21px,transparent 23px 39px),radial-gradient(ellipse at center,rgba(65,180,255,.28),transparent 68%);
-}
-.v143-skill-stage[data-skill="phoenixCry"] .v143-skill-field,
-.v143-skill-stage[data-skill="dragonSlash"] .v143-skill-field{box-shadow:inset 0 0 48px rgba(255,70,22,.55),0 0 34px rgba(255,95,25,.62);}
-.v143-hit-impact{width:92px;height:92px;margin:-46px 0 0 -46px;box-shadow:0 0 32px var(--v143-color),inset 0 0 23px var(--v143-soft);}
-.v143-skill-field{filter:drop-shadow(0 0 12px var(--v143-color));}
-
 .v146-area-impact{animation:v146AreaImpact .66s cubic-bezier(.2,.72,.25,1) both !important;}
 @keyframes v146AreaImpact{
     0%,100%{transform:translate(0,0) rotate(0)}

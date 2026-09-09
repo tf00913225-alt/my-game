@@ -191,7 +191,7 @@ test("secondary status owners cannot recreate procedural combat VFX",()=>{
     assert.doesNotMatch(v155,/v143SkillAnimationManifest/);
     assert.doesNotMatch(css141,/\.v141-effect-canvas|\.v141-effect-burn|v141BurnFlicker|v141StunOrbit/);
     assert.doesNotMatch(css143,/v143-earth-shield-effect|v143EarthCornerBreath/);
-    assert.doesNotMatch(css146,/v143-earth-shield-effect/);
+    assert.doesNotMatch(css146,/v143-earth-shield-effect|v143-skill-flight|v143-skill-field|v143-hit-impact|v146-flight-art/);
     assert.doesNotMatch(css149,/v149-barrier-corners|v149BarrierCornerPulse/);
     assert.doesNotMatch([v141,v142,v143,v143fixes,v149,v155,abyss].join("\n"),/WebGLRenderingContext|createShader|shaderSource|getContext\(["']webgl/i);
 });
