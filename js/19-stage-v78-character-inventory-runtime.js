@@ -85,7 +85,6 @@ function applyNow(){
     if(
         !modal ||
         !body ||
-        !root ||
         !modal.classList.contains("show")
     ){
         return;
@@ -99,8 +98,13 @@ function applyNow(){
        body even after another feature took ownership, which could override
        Team Relic's legitimate overflow-y:auto and produce intermittent mobile
        scrolling depending on MutationObserver timing.
+
+       The root can be completely removed when another feature replaces the
+       modal body, so release must also run when #characterTabContent no longer
+       exists at all; returning early on !root would leave the stale inline
+       styles behind indefinitely.
     */
-    if(!body.contains(root)){
+    if(!root || !body.contains(root)){
         releaseCharacterLayoutOwnership(modal,body,root,inventory);
         return;
     }
