@@ -45,7 +45,8 @@ jobs:
           # not retain those fixed historical objects after the integration merge.
           for typography_baseline_sha in \
             39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
-            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf; do
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
             if ! git cat-file -e "$typography_baseline_sha^{commit}" 2>/dev/null; then
               git fetch --no-tags --depth=1 origin "$typography_baseline_sha"
             fi
