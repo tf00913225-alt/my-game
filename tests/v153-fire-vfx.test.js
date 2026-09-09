@@ -488,11 +488,11 @@ test("a newly applied Burn starts its loop on the exact target hit frame",()=>{
 });
 
 test("cast sheets are one-shot, status sheets loop, and cache version is V165",()=>{
-    assert.match(css,/v153FireCastFrames var\(--v143-sprite-duration,1500ms\) steps\(1,end\) 1 both/);
-    assert.doesNotMatch(css,/v153FireCastFrames[^;]*infinite/);
-    assert.match(css,/v153StatusSpriteFrames var\(--v153-status-duration,800ms\) steps\(1,end\) infinite/);
-    assert.match(animation,/burn:\{src:"assets\/vfx\/fire\/burn-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:800,collection:"statusEffects"\}/);
-    assert.match(animation,/rage:\{src:"assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",columns:4,rows:2,frames:8,duration:1000,collection:"activeBuffs"\}/);
+    assert.match(css,/v143RasterCastFrames var\(--v143-sprite-duration,1200ms\) steps\(1,end\) var\(--v143-sprite-delay,0ms\) 1 both/);
+    assert.doesNotMatch(css,/v143RasterCastFrames[^;]*infinite/);
+    assert.match(css,/v143StatusRasterFrames var\(--v153-status-duration,1000ms\) steps\(1,end\) infinite/);
+    assert.match(animation,/burn:statusSheet\("assets\/vfx\/fire\/burn-loop\.png\?v=165",800,"statusEffects"\)/);
+    assert.match(animation,/rage:statusSheet\("assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",1000,"activeBuffs"\)/);
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
     assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
 });

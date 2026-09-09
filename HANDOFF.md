@@ -3634,3 +3634,11 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 傳統離線 EXP：仍由 `js/00-main.js` 基礎 10 EXP/分鐘（最多480分鐘）＋`js/34-v141-core-systems.js` 最高角色等級倍率與 V173.42 ×3 計算；本次評估相對新長期 expNext 並未破壞定位，因此不修改。廣告領取仍為雙倍。
 - EXP 場數健檢必須走真正 runtime：實際怪物／rank → 戰鬥 EXP → mode（手動／元素匣／休息）→ `expNext`，不得只比較 UI、註解、anchor array。
 - 回歸 owner：`tests/v170-final-spec-integration.test.js` 驗證完整最終 runtime；`tests/v139-economy-rested-exp.test.js` 驗證曲線與休息經驗；`tests/v173.43-growth-charge.test.js` 驗證自然充能／每日 Growth／新手期。
+
+
+## 2026-09-09 — 戰鬥 VFX 單一 owner 收斂
+- `js/39-v143-skill-animation.js` 是巡怪、日常／深淵副本、玩法／活動與 BOSS 戰鬥的唯一技能 VFX 與持續狀態 Sprite Sheet owner。
+- 正式戰鬥視覺只允許 PNG／WebP Sprite Sheet 與狀態循環圖；V142 僅保留 action gate／時序相容，不再繪製視覺。
+- 禁止 CSS／JavaScript 程序式技能替代動畫、Canvas、SVG、WebGL／Shader fallback；正式素材缺失時只記錄 missing visual，不得退回舊 renderer。
+- `js/43-v149-skill-ui-rules.js`、`js/46-v155-dev-fixes.js`、`js/59-abyss-two-tier-runtime.js` 等後載入規則／副本模組不得改寫 `v143SkillAnimationManifest` 或 `v142SkillAnimationDirector.play`。
+- 萬象土盾、結界與其他 Buff／Debuff 視覺由 V143 `RAW_STATUS_SPRITES` 正式循環圖呈現，不再建立舊四角／粒子 CSS 視覺。

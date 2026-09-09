@@ -26,9 +26,10 @@ function makeNode(rect){
     return {
         id:"",className:"",dataset:{},style:{
             setProperty(name,value){ this[name]=String(value); },
-            getPropertyValue(name){ return this[name]||""; }
+            getPropertyValue(name){ return this[name]||""; },
+            removeProperty(name){ delete this[name]; }
         },
-        children:[],parentNode:null,offsetParent:{},width:0,height:0,
+        children:[],parentNode:null,offsetParent:{},
         classList:{
             add(...names){ names.forEach(name=>classes.add(name)); },
             remove(...names){ names.forEach(name=>classes.delete(name)); },
@@ -56,10 +57,8 @@ function makeNode(rect){
     };
 }
 
-function loadCanvasRuntime(skillId,targetType,targetIds,duration){
-    let clock=0;
-    const drawCalls=[];
-    const raf=[];
+function loadRasterRuntime(skillId,targetType,targetIds,duration){
+    const timers=[];
     const body=makeNode();
     const nodes={};
     const monsterArea=makeNode({left:240,top:30,right:680,bottom:300,width:440,height:270});
@@ -86,43 +85,23 @@ function loadCanvasRuntime(skillId,targetType,targetIds,duration){
         body.appendChild(card);
     });
     class FakeImage{
-        constructor(){ this.complete=false; this.naturalWidth=0; this.naturalHeight=0; }
-        set src(value){
-            this._src=value;
-            this.complete=true;
-            this.naturalWidth=1536;
-            this.naturalHeight=1152;
-            if(this.onload){ this.onload(); }
-        }
+        set src(value){ this._src=value; this.complete=true; this.naturalWidth=1536; this.naturalHeight=1152; }
     }
     const document={
-        body,
-        createElement(tag){
-            const node=makeNode();
-            if(tag==="canvas"){
-                node.width=384;
-                node.height=384;
-                node.getContext=()=>({
-                    clearRect(){},
-                    drawImage(...args){ drawCalls.push(args); }
-                });
-            }
-            return node;
-        },
+        body,readyState:"complete",
+        createElement(){ return makeNode(); },
         getElementById(id){ return nodes[id]||null; },
-        querySelectorAll(selector){ return body.querySelectorAll(selector); }
+        querySelectorAll(selector){ return body.querySelectorAll(selector); },
+        addEventListener(){}
     };
     const context={
-        window:null,document,console,Math,Number,Object,Array,Set,Map,Promise,Image:FakeImage,
-        Date:{now:()=>clock},navigator:{deviceMemory:4,hardwareConcurrency:4},
-        innerWidth:900,innerHeight:700,
-        requestAnimationFrame(callback){ raf.push(callback); return raf.length; },
-        cancelAnimationFrame(){},
-        setTimeout(){ return 1; },clearTimeout(){},
+        window:null,document,console,Math,Number,Object,Array,Set,Map,Promise,Proxy,Image:FakeImage,
+        Date,navigator:{deviceMemory:4,hardwareConcurrency:4},innerWidth:900,innerHeight:700,
+        setTimeout(callback,delay){ timers.push({callback,delay}); return timers.length; },clearTimeout(){},
         monsters:[0,1,2].map(()=>({alive:true,hp:100,statusEffects:[],activeBuffs:[]})),
         currentBattleMonsters:[0,1,2],
         getPartyCharacterByIndex(){ return {hp:100,statusEffects:[],activeBuffs:[]}; },
-        showMonsterHit(){},showPlayerHit(){},v141PlayCardEffect(){}
+        showMonsterHit(){},showPlayerHit(){},v141PlayCardEffect(){},addEventListener(){}
     };
     context.window=context;
     context.v142SkillAnimationDirector={
@@ -144,66 +123,70 @@ function loadCanvasRuntime(skillId,targetType,targetIds,duration){
         targetType,duration,resolveDuration:duration
     },{side:"player",actorIndex:0,targetIds});
     return {
-        drawCalls,
+        context,
         stage:body.children.find(node=>node.id==="v143-skill-stage"),
-        tick(nextClock){
-            clock=nextClock;
-            const callback=raf.shift();
-            assert.ok(callback,"scheduled Canvas frame");
-            callback();
-        }
+        timers
     };
 }
 
-test("the selected inbox sheets are both 1536×1152 4×3 sources",()=>{
+test("the selected Water sheets are both 1536×1152 4×3 sources",()=>{
     assert.deepEqual(pngDimensions("assets/vfx/water/water-orb-vfx.png"),[1536,1152]);
     assert.deepEqual(pngDimensions("assets/vfx/water/frost-arrow-rain-vfx.png"),[1536,1152]);
 });
 
-test("Water Ball and Ice Arrow Rain own Canvas-crop manifests",()=>{
+test("Water Ball and Ice Arrow Rain own DOM-raster manifests",()=>{
+    const runtime=loadRasterRuntime("waterBall","tri",[0,1,2],1400);
     ["waterBall","iceArrowRain"].forEach(id=>{
-        const block=animation.slice(animation.indexOf(id+":{"),animation.indexOf("},",animation.indexOf(id+":{"))+2);
-        assert.match(block,/renderer:"canvas-crop"/,id);
-        assert.match(block,/columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7/,id);
+        const model=runtime.context.v143SkillAnimationManifest[id];
+        assert.ok(model&&model.sprite,id);
+        assert.equal(model.sprite.renderer,"dom-sprite",id);
+        assert.deepEqual(
+            Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
+            [4,3,12,7],id
+        );
     });
 });
 
-test("the Canvas renderer crops only one exact source cell at runtime",()=>{
-    const water=loadCanvasRuntime("waterBall","tri",[0,1,2],1400);
-    const waterCanvas=water.stage.children.find(node=>node.dataset.renderer==="canvas-crop");
-    assert.ok(waterCanvas);
-    assert.equal(water.stage.children.filter(node=>node.dataset.renderer==="canvas-crop").length,1);
-    assert.deepEqual(water.drawCalls[0].slice(1),[0,0,384,384,0,0,384,384]);
-    water.tick(817);
-    assert.deepEqual(water.drawCalls.at(-1).slice(1),[1152,384,384,384,0,0,384,384]);
-
-    const rain=loadCanvasRuntime("iceArrowRain","all",[0,1,2],1600);
-    const rainCanvas=rain.stage.children.find(node=>node.dataset.renderer==="canvas-crop");
-    assert.ok(rainCanvas);
-    assert.equal(rain.stage.children.filter(node=>node.dataset.renderer==="canvas-crop").length,1);
-    assert.equal(rainCanvas.dataset.areaId,"battleMonsterArea");
-    assert.equal(rainCanvas.dataset.fixedFormation,"true");
-    assert.equal(rainCanvas.dataset.targetIndexes,"0,1,2");
-    assert.equal(rainCanvas.style.left,"460px");
-    assert.equal(rainCanvas.style.top,"165px");
+test("the raster renderer creates one shared Water Ball Sprite Sheet node without Canvas",()=>{
+    const water=loadRasterRuntime("waterBall","tri",[0,1,2],1400);
+    const sprites=water.stage.children.filter(node=>node.dataset.renderer==="dom-sprite");
+    assert.equal(sprites.length,1);
+    const sprite=sprites[0];
+    assert.equal(sprite.dataset.columns,"4");
+    assert.equal(sprite.dataset.rows,"3");
+    assert.equal(sprite.dataset.frames,"12");
+    assert.match(sprite.style.backgroundImage,/water-orb-vfx\.png\?v=173\.19/);
+    assert.equal(sprite.style.left,"438px");
+    assert.equal(sprite.style.top,"130px");
+    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|requestAnimationFrame\(/);
 });
 
-test("the Canvas renderer crops one fixed cell in row-major order",()=>{
-    assert.match(animation,/const frameIndex=Math\.min\(11,Math\.floor\(progress\*12\)\);/);
-    assert.match(animation,/const column=frameIndex%4;[\s\S]*?const row=Math\.floor\(frameIndex\/4\);/);
-    assert.match(animation,/const sourceX=column\*384;[\s\S]*?const sourceY=row\*384;/);
-    assert.match(
-        animation,
-        /context\.drawImage\([\s\S]*?image,[\s\S]*?sourceX,[\s\S]*?sourceY,[\s\S]*?384,[\s\S]*?384,[\s\S]*?0,[\s\S]*?0,[\s\S]*?node\.width,[\s\S]*?node\.height/
-    );
-    assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
-    assert.doesNotMatch(css,/data-skill="iceArrowRain"[\s\S]*?v166-water-cast-sprite/);
+test("Ice Arrow Rain stays centered on the full monster battlefield",()=>{
+    const rain=loadRasterRuntime("iceArrowRain","all",[0,1,2],1600);
+    const sprites=rain.stage.children.filter(node=>node.dataset.renderer==="dom-sprite");
+    assert.equal(sprites.length,1);
+    const sprite=sprites[0];
+    assert.equal(sprite.dataset.placement,"battlefield");
+    assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+    assert.equal(sprite.style.left,"460px");
+    assert.equal(sprite.style.top,"165px");
+    assert.match(sprite.style.backgroundImage,/frost-arrow-rain-vfx\.png\?v=173\.19/);
 });
 
-test("shared target geometry excludes dead cards and keeps one VFX node",()=>{
-    assert.match(animation,/const key=placement==="single"\|\|placement==="targetTrajectory"\?index:"main";/);
+test("CSS advances the formal 4×3 sheet row-major without procedural fallback nodes",()=>{
+    assert.match(css,/@keyframes v143RasterCastFrames/);
+    assert.match(css,/0%\{background-position:0 0\}/);
+    assert.match(css,/25%\{background-position:100% 0\}/);
+    assert.match(css,/33\.333333%\{background-position:0 50%\}/);
+    assert.match(css,/66\.666667%\{background-position:0 100%\}/);
+    assert.match(css,/91\.666667%,100%\{background-position:100% 100%\}/);
+    assert.doesNotMatch(css,/\.v143-cast-charge|\.v143-skill-flight|\.v143-hit-impact|\.v143-hit-particle|\.v143-skill-field/);
+});
+
+test("shared target geometry keeps one group VFX node and excludes invalid targets",()=>{
+    assert.match(animation,/const key=placement==="single"\|\|placement==="targetTrajectory"\?String\(index\):"main";/);
     assert.match(animation,/function emittedSpriteTargets\(current\)\{[\s\S]*?canReceive\(current\.config,current\.targetSide,index\)/);
-    assert.match(animation,/const coverageScale=clamp\(Number\(sprite\.coverageScale\)\|\|1\.22,1\.15,1\.3\);/);
+    assert.match(animation,/const coverageScale=clamp\(Number\(sprite\.coverageScale\)\|\|Number\(sprite\.scale\)\|\|1,1,1\.4\);/);
 });
 
 test("Abyss dialogue is owned by the map and blank-area taps can advance it",()=>{
@@ -215,10 +198,10 @@ test("Abyss dialogue is owned by the map and blank-area taps can advance it",()=
     assert.doesNotMatch(legacyAbyssPatch,/v141ChallengeAbyssBoss=function/);
 });
 
-test("the published release is V173.39",()=>{
+test("the published release metadata is still internally aligned before this branch version bump",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
     assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
     assert.match(index,/aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
 });
 
-console.log("\n"+passed+" V173.39 Canvas VFX and Abyss input tests passed.");
+console.log("\n"+passed+" V173.39 raster VFX and Abyss input tests passed.");

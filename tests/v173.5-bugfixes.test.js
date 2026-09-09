@@ -1,7 +1,6 @@
 "use strict";
 
 const assert=require("node:assert/strict");
-const crypto=require("node:crypto");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
@@ -43,15 +42,17 @@ test("new Water Orb sheet is the supplied 1536×1152 four-by-three asset",()=>{
     const asset=fs.readFileSync("assets/vfx/water/water-orb-vfx.png");
     assert.equal(asset.toString("ascii",12,16),"IHDR");
     assert.deepEqual([asset.readUInt32BE(16),asset.readUInt32BE(20)],[1536,1152]);
-    assert.match(animation,/water-orb-vfx\.png\?v=173\.19[\s\S]*?columns:4,rows:3,frames:12,frameWidth:384,frameHeight:384,hitFrame:7,[\s\S]*?renderer:"canvas-crop"/);
+    assert.match(animation,/function castSheet\(src,placement,options\)\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?renderer:"dom-sprite"/);
+    assert.match(animation,/waterBall:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/water\/water-orb-vfx\.png\?v=173\.19","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)\}/);
+    assert.doesNotMatch(animation,/canvas-crop|createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
 });
 
-test("Phoenix Cry and Ice Arrow Rain use one centered battlefield sheet",()=>{
-    assert.match(animation,/phoenixCry:\{[\s\S]*?placement:"battlefield",scale:1\.12,minSize:280/);
-    assert.match(animation,/iceArrowRain:\{[\s\S]*?placement:"battlefield",renderer:"canvas-crop",fixedFormation:true,coverageScale:1\.22,[\s\S]*?minWidth:140,minHeight:140/);
+test("Phoenix Cry and Ice Arrow Rain use one centered battlefield raster sheet",()=>{
+    assert.match(animation,/phoenixCry:\{[\s\S]*?phoenix-cry-cast\.png\?v=165[\s\S]*?"battlefield"[\s\S]*?minSize:280/);
+    assert.match(animation,/iceArrowRain:\{[\s\S]*?frost-arrow-rain-vfx\.png\?v=173\.19[\s\S]*?"battlefield"[\s\S]*?fixedFormation:true,coverageScale:1\.22,[\s\S]*?minWidth:140,minHeight:140/);
     const placement=sourceFunction(animation,"function placeSprite(current,node,index,target){");
-    assert.match(placement,/if\(placement==="battlefield"\)[\s\S]*?node\.style\.width=size\+"px";[\s\S]*?node\.style\.height=size\+"px";/);
-    assert.doesNotMatch(placement,/buildBattlefieldSpriteTiles\(/);
+    assert.match(placement,/if\(placement==="battlefield"\)[\s\S]*?node\.style\.width=width\+"px";[\s\S]*?node\.style\.height=height\+"px";/);
+    assert.doesNotMatch(placement,/buildBattlefieldSpriteTiles\(|getContext\(|drawImage\(/);
 });
 
 test("Frostbite expires once from its final monster and player status owner",()=>{

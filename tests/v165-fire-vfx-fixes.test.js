@@ -123,11 +123,14 @@ test("Rage and Dragon Slash preserve all twelve normalized source frames",()=>{
 });
 
 test("Fire Rocket travels from its caster to the real target group before bursting",()=>{
-    assert.match(animation,/fireRocket:\{[\s\S]*?hit:\.5833333333[\s\S]*?hitFrame:7,placement:"trajectory",travelToTargets:true/);
+    assert.match(animation,/const DEFAULT_HIT=\.5833333333/);
+    assert.match(animation,/function castSheet\(src,placement,options\)\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?renderer:"dom-sprite"/);
+    assert.match(animation,/fireRocket:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/fire\/fire-rocket-cast\.png\?v=165","trajectory",\{travelToTargets:true,scale:\.72,minSize:180,maxSize:280\}\)\}/);
     assert.match(animation,/node\.style\.left=actor\.x\+"px";[\s\S]*?--v143-sprite-dx",destination\.x-actor\.x\+"px"/);
     assert.match(animation,/--v143-sprite-dy",destination\.y-actor\.y\+"px"/);
-    assert.match(css,/v165FireRocketTravel var\(--v143-sprite-duration,900ms\) linear 1 both/);
-    assert.match(css,/@keyframes v165FireRocketTravel\{[\s\S]*?3%,24\.999%[\s\S]*?25%[\s\S]*?49\.999%[\s\S]*?50%,95%/);
+    assert.match(css,/\.v143-vfx-sprite\.v143-vfx-sprite-active\[data-travel="true"\]\{[\s\S]*?v143RasterTravel var\(--v143-sprite-duration,1200ms\) linear var\(--v143-sprite-delay,0ms\) 1 both/);
+    assert.match(css,/@keyframes v143RasterTravel\{[\s\S]*?2%,24\.999%[\s\S]*?25%[\s\S]*?58\.333%,97%[\s\S]*?--v143-sprite-dx[\s\S]*?--v143-sprite-dy/);
+    assert.doesNotMatch(css,/v165FireRocketTravel/);
     assert.match(timing,/fireRocket:\[900/);
 });
 

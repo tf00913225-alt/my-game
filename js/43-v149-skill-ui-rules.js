@@ -609,30 +609,10 @@
 
     function syncBarrierCard(card,entity){
         if(!card){ return; }
-        const barrier=barrierState(entity);
-        card.classList.toggle("v149-has-barrier",!!barrier);
-        let layer=card.querySelector(":scope > .v141-card-effects");
-        if(!layer&&barrier){
-            layer=document.createElement("div");
-            layer.className="v141-card-effects";
-            layer.setAttribute("aria-hidden","true");
-            card.appendChild(layer);
-        }
-        if(!layer){ return; }
-        layer.querySelectorAll(":scope > .v141-effect-barrier").forEach(node=>node.remove());
-        let effect=layer.querySelector(":scope > .v149-barrier-corners");
-        if(!barrier){ if(effect){ effect.remove(); } return; }
-        const count=Math.max(0,Math.floor(numeric(barrier.remainingBlocks)));
-        if(!effect){
-            effect=document.createElement("span");
-            effect.className="v149-barrier-corners";
-            effect.innerHTML="<i></i><i></i><i></i><i></i>";
-            layer.appendChild(effect);
-        }
-        Array.from(effect.children).forEach(corner=>{ corner.textContent=String(count); });
+        card.classList.toggle("v149-has-barrier",!!barrierState(entity));
     }
 
-    function rankFor(monster){
+                            function rankFor(monster){
         const rank=typeof getMonsterRank==="function"?getMonsterRank(monster):(monster&&monster.v141BattleRank);
         return rank==="boss"?"boss":rank==="elite"?"elite":"regular";
     }
@@ -929,44 +909,7 @@
         };
     }
 
-    /* ----- Every skill uses one circle per displayed character. ----- */
-    function installWordCircleDirector(){
-        const director=window.v142SkillAnimationDirector;
-        const manifest=window.v143SkillAnimationManifest;
-        if(!director||typeof director.play!=="function"||!manifest){ return; }
-        const previousPlay=director.play.bind(director);
-        director.play=function(config,meta){
-            if(!config||config.id==="normal"||config.name==="普通攻擊"){
-                return previousPlay(config,meta);
-            }
-            const existing=manifest[config.id];
-            if(existing&&existing.sprite){
-                return previousPlay(config,meta);
-            }
-            const characters=Array.from(String(config.name||"技能").replace(/\s+/g,""));
-            const syntheticId="v149-word-"+String(config.id||"skill");
-            manifest[syntheticId]={
-                glyph:characters[0]||"技",sequence:characters.join(""),motion:"tempest",
-                impact:"storm-domain",hit:.75,pulses:Math.max(4,characters.length+2),
-                spread:110,flightCount:characters.length
-            };
-            const wordConfig=Object.assign({},config,{id:syntheticId,v149OriginalSkillId:config.id});
-            const gate=previousPlay(wordConfig,meta);
-            if(typeof document!=="undefined"){
-                const stage=document.querySelector('.v143-skill-stage[data-skill="'+syntheticId+'"]');
-                if(stage){
-                    stage.classList.add("v149-word-circle-stage");
-                    stage.querySelectorAll(".v143-skill-flight").forEach(flight=>{
-                        const order=Math.max(0,numeric(flight.dataset.order));
-                        const current=parseFloat(flight.style.getPropertyValue("--v143-flight-delay"))||0;
-                        flight.style.setProperty("--v143-flight-delay",Math.round(current+order*20)+"ms");
-                    });
-                }
-            }
-            return gate;
-        };
-    }
-    installWordCircleDirector();
+    /* ----- Procedural word-circle fallback retired; V143 raster owner is authoritative. ----- */
 
     function refreshSkillText(){
         try{
@@ -1009,7 +952,7 @@
     window.v149Diagnostics=function(){
         return {
             version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:true,
-            sameNameStateMiss:true,barrierCornerCount:true,wordCirclePerCharacter:true,
+            sameNameStateMiss:true,barrierCornerCount:false,proceduralSkillFallback:false,
             mainShopIcon:"assets/ui/home-shop.png",navShopIcon:"assets/ui/home-shop-v147.png"
         };
     };

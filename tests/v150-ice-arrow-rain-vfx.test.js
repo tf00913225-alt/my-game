@@ -14,7 +14,7 @@ const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
-function test(name,handler){ handler(); passed++; console.log("\u2713 "+name); }
+function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 function decodePng(buffer){
     assert.equal(buffer.subarray(0,8).toString("hex"),"89504e470d0a1a0a");
@@ -53,7 +53,8 @@ function makeNode(rect){
         id:"",className:"",dataset:{},children:[],parentNode:null,offsetParent:{},
         style:{
             setProperty(name,value){ this[name]=String(value); },
-            getPropertyValue(name){ return this[name]||""; }
+            getPropertyValue(name){ return this[name]||""; },
+            removeProperty(name){ delete this[name]; }
         },
         classList:{
             add(...names){ names.forEach(name=>classes.add(name)); },
@@ -164,12 +165,13 @@ test("official Ice Arrow Rain sheet is a complete 4x3 RGBA PNG",()=>{
     assert.equal(info.height/3,384);
 });
 
-test("manifest keeps one 4x3 sheet and frame-eight hit",()=>{
+test("manifest keeps one formal 4x3 DOM Sprite Sheet and frame-eight hit",()=>{
     const runtime=loadRuntime([0,1,2]);
     const model=runtime.context.v143SkillAnimationManifest.iceArrowRain;
     assert.equal(model.sprite.src,assetPath+"?v=173.19");
-    assert.equal(model.sprite.renderer,"canvas-crop");
-    assert.deepEqual([model.sprite.frameWidth,model.sprite.frameHeight],[384,384]);
+    assert.equal(model.sprite.renderer,"dom-sprite");
+    assert.equal(model.sprite.frameWidth,undefined);
+    assert.equal(model.sprite.frameHeight,undefined);
     assert.deepEqual(
         [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
         [4,3,12,7]
@@ -183,18 +185,18 @@ test("manifest keeps one 4x3 sheet and frame-eight hit",()=>{
     assert.match(timing,/iceArrowRain:\[1600/);
 });
 
-test("Canvas crops exactly one 384×384 frame left-to-right, top-to-bottom, once",()=>{
-    assert.match(animation,/const frameIndex=Math\.min\(11,Math\.floor\(progress\*12\)\);/);
-    assert.match(animation,/const column=frameIndex%4;[\s\S]*?const row=Math\.floor\(frameIndex\/4\);/);
-    assert.match(animation,/const sourceX=column\*384;[\s\S]*?const sourceY=row\*384;/);
-    assert.match(
-        animation,
-        /context\.drawImage\([\s\S]*?image,[\s\S]*?sourceX,[\s\S]*?sourceY,[\s\S]*?384,[\s\S]*?384,[\s\S]*?0,[\s\S]*?0,[\s\S]*?node\.width,[\s\S]*?node\.height/
-    );
+test("CSS advances one formal 4x3 sheet row-major without Canvas fallback",()=>{
+    assert.match(css,/@keyframes v143RasterCastFrames/);
+    assert.match(css,/0%\{background-position:0 0\}/);
+    assert.match(css,/25%\{background-position:100% 0\}/);
+    assert.match(css,/33\.333333%\{background-position:0 50%\}/);
+    assert.match(css,/66\.666667%\{background-position:0 100%\}/);
+    assert.match(css,/91\.666667%,100%\{background-position:100% 100%\}/);
+    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|requestAnimationFrame\(/);
     assert.doesNotMatch(css,/data-skill="iceArrowRain"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("one shared sheet stays locked to the complete enemy formation after casualties",()=>{
+test("one shared raster sheet stays locked to the complete enemy formation after casualties",()=>{
     const placements=[];
     [[1],[0,1,2]].forEach(indexes=>{
         const runtime=loadRuntime(indexes);
@@ -214,8 +216,9 @@ test("one shared sheet stays locked to the complete enemy formation after casual
         assert.equal(sprite.style.left,"460px");
         assert.equal(sprite.style.top,"165px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
-        assert.equal(sprite.dataset.renderer,"canvas-crop");
-        assert.equal(sprite.style.backgroundImage,"none","the sheet is never a CSS background");
+        assert.equal(sprite.dataset.renderer,"dom-sprite");
+        assert.equal(sprite.style.backgroundImage,'url("'+assetPath+'?v=173.19")');
+        assert.equal(sprite.style.backgroundSize,"400% 300%");
         assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0,"no tiled copies");
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
         assert.ok(runtime.scheduled.some(timer=>timer.delay>=1590),"full 1.6 second action gate");
