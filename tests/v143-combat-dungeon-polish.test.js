@@ -36,7 +36,12 @@ test("enemy identity starts at 16px, never drops below 12px and bars use 12px bo
     assert.match(system,/while\(size>12/);
     assert.match(css,/\.battle-monster-name\.v143-monster-identity[\s\S]*font-size:16px !important/);
     assert.match(css,/\.monster-bar-text[\s\S]*font-size:12px !important;[\s\S]*font-weight:900/);
-    assert.match(css,/width:76px !important;[\s\S]*height:100px !important/);
+    // Ordinary monster cards keep the V143 76x100 contract through fallback values;
+    // only rank=boss may opt into the larger scoped geometry.
+    assert.match(css,/width:var\(--v143-monster-card-width,76px\) !important;[\s\S]*height:var\(--v143-monster-card-height,100px\) !important/);
+    assert.match(css,/\.battle-monster\[data-rank="boss"\]\{[\s\S]*--v143-monster-card-width:82px;[\s\S]*--v143-monster-card-height:106px;[\s\S]*--v143-monster-icon-width:30px;[\s\S]*--v143-monster-icon-height:27px;[\s\S]*--v143-monster-bar-width:74px;/);
+    assert.match(css,/\.battle-monster-icon\{[\s\S]*width:var\(--v143-monster-icon-width,25px\) !important;[\s\S]*height:var\(--v143-monster-icon-height,22px\) !important/);
+    assert.match(css,/\.monster-hp,[\s\S]*\.monster-sp\{[\s\S]*width:var\(--v143-monster-bar-width,68px\) !important;/);
 });
 
 test("every known battle skill has its own animation choreography",()=>{

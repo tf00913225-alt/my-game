@@ -313,7 +313,7 @@ function loadGameplayBossTowerStyle(){
     const link=document.createElement("link");
     link.id="gameplay-boss-tower-style";
     link.rel="stylesheet";
-    link.href="css/gameplay-boss-tower.css?v=173.64";
+    link.href="css/gameplay-boss-tower.css?v=173.64&patch=boss-card-ui-20260909";
     document.head.appendChild(link);
 }
 

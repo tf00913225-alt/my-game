@@ -496,7 +496,24 @@
         state.pendingUpdates.clear();
     }
 
+    const MECHANISM_TARGET_PREFIX="mechanism:";
+
+    function isMechanismTarget(index){
+        return typeof index==="string"&&index.indexOf(MECHANISM_TARGET_PREFIX)===0&&index.length>MECHANISM_TARGET_PREFIX.length;
+    }
+
+    function mechanismCardFor(index){
+        if(typeof document==="undefined"||!isMechanismTarget(index)){ return null; }
+        const slot=document.getElementById("bossMechanismSlot");
+        if(!slot||typeof slot.querySelectorAll!=="function"){ return null; }
+        const mechanismId=index.slice(MECHANISM_TARGET_PREFIX.length);
+        return Array.from(slot.querySelectorAll(".boss-mechanism-card")).find(card=>
+            card&&card.dataset&&card.dataset.id===mechanismId
+        )||null;
+    }
+
     function cardFor(side,index){
+        if(side==="monster"&&isMechanismTarget(index)){ return mechanismCardFor(index); }
         return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
     }
 
@@ -508,6 +525,10 @@
     }
 
     function canReceive(config,side,index){
+        if(side==="monster"&&isMechanismTarget(index)){
+            const card=cardFor(side,index);
+            return !!(card&&(!card.classList||!card.classList.contains("destroying")));
+        }
         const entity=entityFor(side,index);
         if(!entity){ return false; }
         if(String(config&&config.category||"")==="revive"){
@@ -538,6 +559,16 @@
         return ally?side:(side==="player"?"monster":"player");
     }
 
+    function queuedMechanismTarget(config,meta,targetSide){
+        if(
+            targetSide!=="monster"||!meta||meta.side!=="player"||
+            typeof queuedPlayerActions==="undefined"
+        ){ return null; }
+        const queued=queuedPlayerActions&&queuedPlayerActions[meta.actorIndex];
+        const target=queued&&queued.target;
+        return isMechanismTarget(target)&&canReceive(config,targetSide,target)?target:null;
+    }
+
     function initialTargetIndexes(config,meta,targetSide){
         const targetType=String(config.targetType||"");
         const all=targetType==="all"||targetType==="allyAll";
@@ -550,6 +581,8 @@
                 Number.isInteger(index)&&canReceive(config,targetSide,index)
             )));
         }
+        const mechanismTarget=queuedMechanismTarget(config,meta,targetSide);
+        if(mechanismTarget){ return [mechanismTarget]; }
         const cards=activeCards(targetSide,config);
         if(all){ return cards.map(entry=>entry.index); }
         if(meta.side==="player"&&typeof queuedPlayerActions!=="undefined"){
@@ -1587,6 +1620,8 @@
         const validTargets=new Set(
             activeCards(targetSide,config).map(entry=>entry.index)
         );
+        const mechanismTarget=queuedMechanismTarget(config,meta,targetSide);
+        if(mechanismTarget){ validTargets.add(mechanismTarget); }
         const current={
             sequence:++sequence,config:config,model:model,gate:gate,
             side:meta.side||"player",actorIndex:Number.isInteger(meta.actorIndex)?meta.actorIndex:0,

@@ -4,17 +4,25 @@
 
 /* 1. Enemy identity and resource numbers use the existing card width. */
 #game-stage > #app > #game-content #battlePage .battle-monster{
-    width:76px !important;
-    max-width:76px !important;
-    height:100px !important;
-    min-height:100px !important;
+    width:var(--v143-monster-card-width,76px) !important;
+    max-width:var(--v143-monster-card-width,76px) !important;
+    height:var(--v143-monster-card-height,100px) !important;
+    min-height:var(--v143-monster-card-height,100px) !important;
     padding:3px !important;
 }
 
+#game-stage > #app > #game-content #battlePage .battle-monster[data-rank="boss"]{
+    --v143-monster-card-width:82px;
+    --v143-monster-card-height:106px;
+    --v143-monster-icon-width:30px;
+    --v143-monster-icon-height:27px;
+    --v143-monster-bar-width:74px;
+}
+
 #game-stage > #app > #game-content #battlePage .battle-monster-icon{
-    width:25px !important;
-    height:22px !important;
-    flex:0 0 22px !important;
+    width:var(--v143-monster-icon-width,25px) !important;
+    height:var(--v143-monster-icon-height,22px) !important;
+    flex:0 0 var(--v143-monster-icon-height,22px) !important;
     font-size:20px !important;
 }
 
@@ -51,7 +59,7 @@
 
 #game-stage #battlePage .battle-monster .monster-hp,
 #game-stage #battlePage .battle-monster .monster-sp{
-    width:68px !important;
+    width:var(--v143-monster-bar-width,68px) !important;
     height:13px !important;
     min-height:13px !important;
     flex:0 0 13px !important;

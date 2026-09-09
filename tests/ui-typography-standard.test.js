@@ -113,7 +113,8 @@ for (const designPx of [34,36,39,41,46]) {
 // Explicitly protect battle exclusions: these integrated battle values are intentional.
 assert.match(gameplay, /\.boss-mechanism-kind\{[\s\S]*?font-size:12px/);
 assert.match(gameplay, /\.boss-mechanism-name\{[\s\S]*?font-size:10px/);
-assert.match(gameplay, /\.boss-mechanism-hp,[\s\S]*?font-size:9px/);
+// 2026-09-09: mechanism HP is intentionally heavier than the surrounding battle copy.
+assert.match(gameplay, /\.boss-mechanism-hp\{[\s\S]*?font-size:11px[\s\S]*?font-weight:900/);
 assert.match(gameplay, /\.boss-mechanism-card\[data-type="charge"\] \.boss-mechanism-effect\{[\s\S]*?font-size:10px/);
 assert.match(gameplay, /\.boss-mechanism-toast\{[\s\S]*?font-size:11px/);
 assert.match(relic, /\.team-relic-battle-banner b\{[^}]*17px/);

@@ -275,11 +275,11 @@
 
 #game-stage #battleMonsterArea .v131-monster-row .battle-monster,
 #game-stage > #app > #game-content #battlePage .battle-monster{
-    flex:0 0 76px !important;
-    width:76px !important;
-    max-width:76px !important;
-    height:100px !important;
-    min-height:100px !important;
+    flex:0 0 var(--v143-monster-card-width,76px) !important;
+    width:var(--v143-monster-card-width,76px) !important;
+    max-width:var(--v143-monster-card-width,76px) !important;
+    height:var(--v143-monster-card-height,100px) !important;
+    min-height:var(--v143-monster-card-height,100px) !important;
     padding:3px 3px 4px !important;
     justify-content:flex-start !important;
     box-sizing:border-box !important;
@@ -351,9 +351,9 @@
 }
 
 #game-stage > #app > #game-content #battlePage .battle-player-row{
-    flex-basis:138px !important;
-    height:138px !important;
-    min-height:138px !important;
+    flex-basis:144px !important;
+    height:144px !important;
+    min-height:144px !important;
     padding-bottom:18px !important;
     box-sizing:border-box;
     overflow:visible !important;
@@ -361,7 +361,7 @@
 
 #game-stage > #app > #game-content #battlePage .battle-player{
     width:118px !important;
-    height:116px !important;
+    height:122px !important;
     overflow:visible !important;
 }
 
