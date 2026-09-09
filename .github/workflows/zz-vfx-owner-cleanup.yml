@@ -91,15 +91,20 @@ jobs:
           s = s.replace('            node.dataset.targetIndex=String(index);\n            node.style.left=target.x+"px";', '            node.dataset.targetIndex=String(index);\n            node.dataset.targetIndexes=String(index);\n            node.style.left=target.x+"px";', 1)
           marker = '            node.dataset.targetIndex=String(index);\n            node.dataset.travel="true";'
           if marker in s:
-              s = s.replace(marker, '            node.dataset.targetIndex=String(index);\n            node.dataset.targetIndexes=String(index);\n            node.dataset.travel="true";', 1)
+              s = s.replace(marker, '            node.dataset.targetIndex=String(index);\n            node.dataset.targetIndexes=String(index);\n            node.dataset.travel="true";\n            node.dataset.travelToTargets="true";', 1)
           battlefield = '            node.dataset.areaId=bounds.id;\n            node.style.left=(bounds.left+bounds.width/2)+"px";'
           if battlefield not in s:
               raise RuntimeError("battlefield target metadata anchor missing")
-          s = s.replace(battlefield, '            node.dataset.areaId=bounds.id;\n            node.dataset.targetIndexes=emittedSpriteTargets(current).join(",");\n            node.style.left=(bounds.left+bounds.width/2)+"px";', 1)
+          s = s.replace(battlefield, '            node.dataset.areaId=bounds.id;\n            node.dataset.targetIndexes=emittedSpriteTargets(current).join(",");\n            if(sprite.fixedFormation){ node.dataset.fixedFormation="true"; }\n            node.dataset.coverageScale=String(coverageScale);\n            node.style.clipPath="none";\n            node.style.left=(bounds.left+bounds.width/2)+"px";', 1)
           group = '        const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);\n        node.style.width=size+"px";'
           if group not in s:
               raise RuntimeError("group target metadata anchor missing")
           s = s.replace(group, '        const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);\n        node.dataset.targetIndexes=indexes.join(",");\n        node.style.width=size+"px";', 1)
+          travel = '''        if(placement==="trajectory"&&sprite.travelToTargets&&actor){\n            node.dataset.travel="true";\n            node.style.left=actor.x+"px";\n            node.style.top=actor.y+"px";\n            node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");\n            node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");\n        }else{'''
+          travel_new = '''        if(placement==="trajectory"&&sprite.travelToTargets&&actor){\n            node.dataset.travel="true";\n            node.dataset.travelToTargets="true";\n            node.style.left=actor.x+"px";\n            node.style.top=actor.y+"px";\n            node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");\n            node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");\n            node.style.setProperty("--v143-sprite-angle",Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI+"deg");\n        }else{'''
+          if travel not in s:
+              raise RuntimeError("trajectory metadata anchor missing")
+          s = s.replace(travel, travel_new, 1)
           p.write_text(s)
 
           p = Path("js/43-v149-skill-ui-rules.js")
