@@ -1,0 +1,175 @@
+/* V174 critical UI regressions — focused successor styling for the 2026-09-09 batch.
+   This file only owns the creation-page reflow, element-counter hints and the
+   compact skill action geometry requested in this batch. */
+
+/* Character creation: give the portrait more of the showcase and make every
+   descriptive block fit inside the fixed 1080 x 1920 native canvas. */
+#creationPage .creation-premium-header{
+    padding:4px 0 12px;
+}
+#creationPage .creation-header-ornament{
+    height:34px;
+    margin-bottom:2px;
+    font-size:32px;
+    line-height:34px;
+}
+#creationPage .creation-title{
+    font-size:58px;
+    line-height:1.14;
+}
+#creationPage .creation-subtitle{
+    margin-top:5px;
+    font-size:32px;
+}
+#creationPage .creation-step-progress{
+    margin-top:10px;
+    font-size:25px;
+}
+#creationPage .creation-showcase{
+    grid-template-columns:52% 48%;
+    flex-basis:900px;
+    height:900px;
+    min-height:900px;
+    margin-bottom:18px;
+}
+#creationPage .creation-portrait-panel{
+    min-height:900px;
+}
+#creationPage .creation-portrait-image{
+    bottom:0;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    object-position:center bottom;
+}
+#creationPage .creation-choice-panel{
+    padding:12px 24px 12px;
+}
+#creationPage .creation-section-kicker{
+    margin-bottom:5px;
+    font-size:28px;
+}
+#creationPage .creation-gender-grid{
+    gap:14px;
+}
+#creationPage .creation-gender-option{
+    height:78px;
+    font-size:32px;
+}
+#creationPage .creation-element-kicker{
+    margin-top:6px;
+}
+#creationPage .creation-element-grid{
+    gap:9px;
+}
+#creationPage .element-option{
+    height:112px;
+}
+#creationPage .creation-element-glyph{
+    width:56px;
+    height:56px;
+    margin-bottom:3px;
+    font-size:30px;
+}
+#creationPage .element-option .element-name{
+    font-size:26px;
+}
+#creationPage .creation-role-card{
+    margin-top:8px;
+    padding:12px 14px;
+    overflow:visible;
+}
+#creationPage .creation-role-title-row{
+    gap:10px;
+}
+#creationPage .creation-element-badge{
+    flex-basis:68px;
+    width:68px;
+    height:68px;
+    font-size:34px;
+}
+#creationPage .creation-role-title{
+    font-size:39px;
+    line-height:1.2;
+}
+#creationPage .creation-role-subtitle{
+    font-size:29px;
+    line-height:1.3;
+}
+#creationPage .creation-role-description{
+    margin-top:7px;
+    font-size:30px;
+    line-height:1.42;
+}
+#creationPage .creation-role-tags{
+    gap:5px;
+    margin-top:6px;
+}
+#creationPage .creation-role-tag{
+    padding:3px 10px;
+    font-size:24px;
+}
+#creationPage .creation-role-card::after{
+    content:"元素克制｜土剋水・水剋火・火剋風・風剋土";
+    display:block;
+    margin-top:8px;
+    padding:7px 10px;
+    border:2px solid rgba(218,166,76,.30);
+    border-radius:14px;
+    background:rgba(216,164,72,.08);
+    color:#d9c28f;
+    font-size:24px;
+    line-height:1.35;
+    font-weight:800;
+    text-align:center;
+}
+#creationPage .creation-card{
+    margin-bottom:16px;
+    padding:26px;
+}
+#creationPage .creation-card-heading{
+    margin-bottom:18px;
+}
+#creationPage .creation-input{
+    height:100px;
+}
+#creationPage .creation-next,
+#creationPage .creation-back{
+    height:124px;
+}
+
+/* All-element skill preview: the hint sits inside the real scroll owner so it
+   is visible without stealing gestures from the preview body. */
+#allElementSkillPreviewModal .skill-preview-body::before{
+    content:"元素克制提示｜土剋水・水剋火・火剋風・風剋土";
+    display:block;
+    position:relative;
+    z-index:1;
+    margin:0 0 18px;
+    padding:16px 20px;
+    box-sizing:border-box;
+    border:2px solid rgba(218,166,76,.42);
+    border-radius:18px;
+    background:linear-gradient(180deg,rgba(78,53,21,.68),rgba(24,18,11,.86));
+    color:#f0d89c;
+    font-size:34px;
+    line-height:1.35;
+    font-weight:900;
+    text-align:center;
+    letter-spacing:1px;
+}
+
+/* The runtime shortens state labels. Keep the action column bounded so it can
+   no longer consume the skill-description column on narrow phones. */
+#game-stage #allSkillsList .skill-row .skill-action-card{
+    max-width:108px;
+}
+#game-stage #allSkillsList .skill-row .skill-action-card-label{
+    white-space:normal;
+    overflow-wrap:normal;
+    word-break:keep-all;
+    text-align:center;
+}
+#game-stage #allSkillsList .skill-row .skill-row-text{
+    min-width:0;
+}

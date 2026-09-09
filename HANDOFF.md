@@ -3642,3 +3642,24 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 禁止 CSS／JavaScript 程序式技能替代動畫、Canvas、SVG、WebGL／Shader fallback；正式素材缺失時只記錄 missing visual，不得退回舊 renderer。
 - `js/43-v149-skill-ui-rules.js`、`js/46-v155-dev-fixes.js`、`js/59-abyss-two-tier-runtime.js` 等後載入規則／副本模組不得改寫 `v143SkillAnimationManifest` 或 `v142SkillAnimationDirector.play`。
 - 萬象土盾、結界與其他 Buff／Debuff 視覺由 V143 `RAW_STATUS_SPRITES` 正式循環圖呈現，不再建立舊四角／粒子 CSS 視覺。
+
+
+## 2026-09-09 — 兩條 UI 維修分支安全整合（dev only）
+
+- 整合前遠端 `dev`：`29b9668057846164a941fbf6617d2458d9af5476`；整合前及收尾前遠端 `main` 均為 `bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe`。本批未對 `main` 建立 merge、push 或更新 ref。
+- 實際順序依 runtime owner 判定：先合入 `fix/character-inventory-skill-relic-ui-20260909@27e905ee9a9280a3dc520a3487bc2aa4f464d2af`（merge `5479368c19c044ceb985772d305237866f4a314c`），完成獨立 CI／部署驗證後，再以已含第一條的最新 `dev` 合入 `fix/boss-mechanism-card-detail-ui@ac6c89bde325e37b49d0518fa132657886ac9387`（merge `6f387ea1fc9183b4e476db281558923627fe3d32`）。
+- 兩條分支都存在且指定 SHA 就是遠端分支 tip；兩者相對初始 `dev` 都不落後。唯一共同檔案是 `js/19-stage-v78-character-inventory-runtime.js`，但第一條只改 `releaseCharacterLayoutOwnership()`／`applyNow`，第二條只改 Gameplay BOSS CSS／JS 動態載入 URL，沒有同函式、selector、listener、state、資料結構或 runtime owner 重疊；兩次實際 merge 都沒有 conflict。
+- 第一條合入後，live Abyss QA 暴露初始 `dev` 已存在的過時 Canvas assertion；正式 runtime 已由 `js/39-v143-skill-animation.js` 擁有 DOM raster Sprite。修復 `.github/scripts/run-abyss-live-browser-qa.mjs` 與 `tests/v174-raster-only-combat-vfx-owner.test.js` 的真正 QA owner，commit `c5885c2486f29738947dc642d60162be0bdd24d7`；GitHub Actions run `34344546671` 的 Repository checks、精確 SHA 部署與 live mobile QA 全部 SUCCESS。
+- 第二條合入後，push checkout depth 2 未包含其 typography regression 寫死的初始基準 SHA；`.github/workflows/ci.yml` 已明確抓取 `29b9668057846164a941fbf6617d2458d9af5476`，commit `aae6b2d9a095ecb00329a24e7f068f3f37f945dd`。GitHub Actions run `34345787199` 的 Repository checks、精確 SHA 部署、live Abyss 與 battle/audio QA 全部 SUCCESS。
+- 最終本機 `node .github/scripts/ci.mjs tests`：131/131 suites 通過；語法、靜態資源、重複 HTML ID、loader、V173.64 release gate、whitespace／conflict marker，以及重複函式／listener／CSS owner 稽核均通過。
+- `https://dev.four-symbols-dev.pages.dev` 實際瀏覽器 QA：完成男性水系創角與配點，開啟角色技能、背包、秘寶；確認背包 `pan-y`、秘寶內容垂直捲動與分類橫向捲動。另以 DEV 工具升至 Lv20，實際進入熾焰狼王戰鬥；第二回合生成「金剛護體」9:16 卡，BOSS battle title 只在該 runtime 隱藏，紅色 `!` 可開啟 9:16 詳情、顯示完整效果並由「返回」收合。頁面來源沒有 console error；觀察到的 error 只來自測試瀏覽器的 `chrome-extension://` metadata extension。
+- Requirement batch：`release/requirement-batches/2026-09-09-two-branch-dev-integration.json`，全部標記 VERIFIED。Game／Cache Version 刻意維持 V173.64；沒有 main promotion approval。
+- 尚未做實體 Android 裝置 QA；既有 Android 合成層真機待驗項目仍保留。本批已用 390×844／412×915 CI Chrome、live mobile QA 與實際雲端瀏覽器交叉驗證，未發現兩分支互相覆蓋。
+
+
+## 2026-09-09 — 兩條 UI 維修分支 main promotion 授權
+
+- 使用者於 2026-09-09 明確要求「推到 dev 再推到 main」，取代上一段當時尚未取得 main promotion approval 的狀態；本批 promotion approval 已記錄於 `release/requirement-batches/2026-09-09-two-branch-dev-integration.json`。
+- Promotion 前重新讀取遠端：`dev=ade22629ddaa7f8451dc3aaa8b4696f8d67cc92b`、`main=bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe`。兩者 history 因歷次 main promotion commit 分岔，但 main tree `80baa9b133252950283ff37ea95b32e0911de63d` 與本輪整合前 `dev@29b9668057846164a941fbf6617d2458d9af5476` tree 完全相同。
+- 已建立 ancestry reconciliation commit `6d9273d014ca7c2c746bccbc453eeb1b00a86780`，雙親為已驗證 dev 與現行 main，tree 保持 dev `686eec88a0d9ac2a08f0631876e68f1d1e47baa5` 不變；這只收斂歷史，不回退或覆蓋任何 runtime／CSS／測試內容。
+- 後續固定走 `dev CI／精確 SHA 部署 → dev-to-main PR → main Repository checks → merge → production Pages SHA 核對`，禁止 force-push main。

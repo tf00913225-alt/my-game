@@ -368,12 +368,83 @@
         if(card.type==="charge"){ return "倒數 "+card.countdown+" 回合・歸零發動大型技能"; }
         return card.effect;
     }
+    function mechanismInfoMarkup(card){
+        return '<article class="boss-mechanism-info-card" data-type="'+escapeHtml(card.type)+'">'+
+            '<b class="boss-mechanism-info-name">'+escapeHtml(card.name)+'</b>'+
+            '<span class="boss-mechanism-info-kind">'+escapeHtml(card.kind)+'</span>'+
+            '<span class="boss-mechanism-info-hp">HP '+Math.max(0,Math.ceil(card.hp))+' / '+card.maxHP+'</span>'+
+            '<p class="boss-mechanism-info-effect">'+escapeHtml(mechanismEffectText(card))+'</p></article>';
+    }
+    function ensureMechanismInfoUI(){
+        const page=document.getElementById("battlePage");
+        if(!page){ return null; }
+        let host=document.getElementById("bossMechanismInfoHost");
+        if(!host){
+            host=document.createElement("div");
+            host.id="bossMechanismInfoHost";
+            host.className="boss-mechanism-info-host";
+            host.innerHTML='<button type="button" class="boss-mechanism-info-alert" aria-label="查看 BOSS 機制說明" aria-expanded="false">!</button>'+
+                '<section class="boss-mechanism-info-panel" aria-label="BOSS 機制說明">'+
+                '<button type="button" class="boss-mechanism-info-back">‹ 返回</button>'+
+                '<div class="boss-mechanism-info-body"></div></section>';
+            page.appendChild(host);
+            host.querySelector(".boss-mechanism-info-alert").onclick=openMechanismInfoPanel;
+            host.querySelector(".boss-mechanism-info-back").onclick=closeMechanismInfoPanel;
+        }
+        return {
+            host:host,
+            alert:host.querySelector(".boss-mechanism-info-alert"),
+            panel:host.querySelector(".boss-mechanism-info-panel"),
+            body:host.querySelector(".boss-mechanism-info-body")
+        };
+    }
+    function openMechanismInfoPanel(){
+        const ui=ensureMechanismInfoUI(),alive=aliveMechanisms();
+        if(!ui||!alive.length){ return false; }
+        ui.host.classList.add("open");
+        ui.alert.setAttribute("aria-expanded","true");
+        ui.body.innerHTML=alive.map(mechanismInfoMarkup).join("");
+        return true;
+    }
+    function closeMechanismInfoPanel(){
+        const host=document.getElementById("bossMechanismInfoHost");
+        if(!host){ return false; }
+        host.classList.remove("open");
+        const alert=host.querySelector(".boss-mechanism-info-alert");
+        if(alert){ alert.setAttribute("aria-expanded","false"); }
+        return true;
+    }
+    function syncMechanismInfoUI(alive){
+        const ui=ensureMechanismInfoUI();
+        if(!ui){ return; }
+        const hasMechanism=alive.length>0;
+        ui.host.classList.toggle("has-mechanism",hasMechanism);
+        if(!hasMechanism){
+            ui.host.classList.remove("open");
+            ui.alert.setAttribute("aria-expanded","false");
+            ui.body.innerHTML="";
+            return;
+        }
+        if(ui.host.classList.contains("open")){ ui.body.innerHTML=alive.map(mechanismInfoMarkup).join(""); }
+    }
+    function cleanupMechanismPresentation(){
+        const area=document.getElementById("battleMonsterArea");
+        if(area){
+            area.classList.remove("gameplay-boss-active");
+            area.querySelectorAll(".battle-monster.gameplay-boss-card").forEach(node=>node.classList.remove("gameplay-boss-card","gameplay-boss-protected"));
+            const slot=area.querySelector("#bossMechanismSlot");
+            if(slot){ slot.remove(); }
+        }
+        const host=document.getElementById("bossMechanismInfoHost");
+        if(host){ host.remove(); }
+    }
     function renderMechanisms(){
         const area=document.getElementById("battleMonsterArea");
         if(!area){ return; }
         let slot=document.getElementById("bossMechanismSlot");
         if(!slot){ slot=document.createElement("div");slot.id="bossMechanismSlot";slot.className="boss-mechanism-slot";slot.setAttribute("aria-label","BOSS 機制卡槽");area.appendChild(slot); }
         const alive=aliveMechanisms();
+        slot.classList.toggle("active",alive.length>0);
         Array.from(slot.querySelectorAll(".boss-mechanism-card")).forEach(node=>{
             if(!alive.some(card=>card.id===node.dataset.id)&&!node.classList.contains("destroying")){ node.remove(); }
         });
@@ -384,11 +455,19 @@
                 node.onclick=function(){ selectMechanism(card.id); };slot.appendChild(node);
             }
             node.classList.toggle("targetable",!!(typeof actionReady!=="undefined"&&actionReady&&typeof pendingAction!=="undefined"&&pendingAction));
-            node.innerHTML='<span class="boss-mechanism-kind">【'+escapeHtml(card.kind)+'】</span><b class="boss-mechanism-name">'+escapeHtml(card.name)+'</b><span class="boss-mechanism-hp">HP '+Math.max(0,Math.ceil(card.hp))+' / '+card.maxHP+'</span><small class="boss-mechanism-effect">'+escapeHtml(mechanismEffectText(card))+'</small>';
+            node.setAttribute("aria-label",card.name+"，"+card.kind+"，HP "+Math.max(0,Math.ceil(card.hp))+" / "+card.maxHP+"，點擊可作為攻擊目標");
+            node.innerHTML='<b class="boss-mechanism-name">'+escapeHtml(card.name)+'</b><span class="boss-mechanism-kind">'+escapeHtml(card.kind)+'</span><span class="boss-mechanism-hp">HP '+Math.max(0,Math.ceil(card.hp))+' / '+card.maxHP+'</span>';
         });
         const boss=activeBoss(),bossIndex=boss&&typeof monsters!=="undefined"?monsters.indexOf(boss):-1;
         const bossCard=bossIndex>=0?document.getElementById("battleMonster"+bossIndex):null;
-        if(bossCard){ bossCard.classList.toggle("gameplay-boss-protected",!!blockingShield());bossCard.setAttribute("aria-disabled",blockingShield()?"true":"false"); }
+        area.querySelectorAll(".battle-monster.gameplay-boss-card").forEach(node=>{ if(node!==bossCard){ node.classList.remove("gameplay-boss-card","gameplay-boss-protected"); } });
+        area.classList.toggle("gameplay-boss-active",!!bossCard);
+        if(bossCard){
+            bossCard.classList.add("gameplay-boss-card");
+            bossCard.classList.toggle("gameplay-boss-protected",!!blockingShield());
+            bossCard.setAttribute("aria-disabled",blockingShield()?"true":"false");
+        }
+        syncMechanismInfoUI(alive);
     }
     function showMechanismToast(message){
         const page=document.getElementById("battlePage");if(!page){ return; }
@@ -573,7 +652,7 @@
         if(outcome&&outcome.result==="win"){
             const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.clears++;persist();
         }
-        activeBattleContext=null;bossDetail={type:"personal",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
+        cleanupMechanismPresentation();activeBattleContext=null;bossDetail={type:"personal",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
     }
     function completeWorldStage(definition,stage,outcome){
         const progress=state.world[definition.id];
@@ -583,7 +662,7 @@
                 const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.completedStages=4;progress.clears++;persist();
             }
         }
-        activeBattleContext=null;bossDetail={type:"world",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
+        cleanupMechanismPresentation();activeBattleContext=null;bossDetail={type:"world",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
     }
     function startBoss(type,id){
         if(battleStarting||typeof battleActive!=="undefined"&&battleActive){ return false; }
@@ -595,7 +674,7 @@
         activeBattleContext={mode:world?"world":"personal",definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:0,mechanisms:[],mechanismPlan:(world?stageProfile.mechanisms:definition.mechanisms).map(item=>Object.assign({},item)),spawnedPlans:{},maxMechanisms:definition.level>=70?2:1};
         battleStarting=true;
         const started=window.v132LaunchDungeonBattle([boss],outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome));
-        battleStarting=false;if(!started){ activeBattleContext=null; }return !!started;
+        battleStarting=false;if(!started){ cleanupMechanismPresentation();activeBattleContext=null; }return !!started;
     }
 
     function towerReward(floor){
@@ -615,7 +694,7 @@
             state.tower.historicalHighest=Math.max(state.tower.historicalHighest,floor);
             towerReward(floor);persist();
         }
-        activeBattleContext=null;if(typeof showPage==="function"){ showPage("tower"); }renderTowerPage();
+        cleanupMechanismPresentation();activeBattleContext=null;if(typeof showPage==="function"){ showPage("tower"); }renderTowerPage();
     }
     function startTowerFloor(floor){
         ensureCurrentTowerWeek();
@@ -625,7 +704,7 @@
         const towerPhases=boss?(target===100?4:(target>=70?3:(target>=40?2:1))):1;
         activeBattleContext={mode:"tower",floor:target,boss:boss,bossIndex:boss?0:null,combatPhase:1,totalPhases:towerPhases,mechanisms:[],mechanismPlan:towerMechanismPlan(target),spawnedPlans:{},maxMechanisms:target>=70?2:1};
         battleStarting=true;const started=window.v132LaunchDungeonBattle(roster,outcome=>completeTowerFloor(target,outcome));
-        battleStarting=false;if(!started){ activeBattleContext=null; }return !!started;
+        battleStarting=false;if(!started){ cleanupMechanismPresentation();activeBattleContext=null; }return !!started;
     }
     function chooseTowerRelic(id){
         const choice=TOWER_CONFIG.relicChoices.find(item=>item.id===id);if(!choice||!state.tower.pendingRelicChoice){ return false; }

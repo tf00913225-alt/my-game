@@ -257,13 +257,13 @@ patched=replaceRequired(patched,
     await sleep(180);
     const vfx=await client.eval(\`(()=>{
         const stage=document.getElementById('v143-skill-stage');
-        const sprite=stage?.querySelector('.v143-vfx-sprite-explosiveFlurry');
+        const sprite=stage?.querySelector('.v143-vfx-sprite[data-skill="explosiveFlurry"]');
         const stageStyle=stage?getComputedStyle(stage):null;
         const spriteStyle=sprite?getComputedStyle(sprite):null;
         const stageRect=stage?.getBoundingClientRect();
         const spriteRect=sprite?.getBoundingClientRect();
         return {
-            stage:!!stage,skill:stage?.dataset.skill||null,display:stageStyle?.display||null,visibility:stageStyle?.visibility||null,
+            stage:!!stage,skill:stage?.dataset.skill||null,stageRenderer:stage?.dataset.renderer||null,display:stageStyle?.display||null,visibility:stageStyle?.visibility||null,
             opacity:stageStyle?.opacity||null,stageWidth:stageRect?.width||0,stageHeight:stageRect?.height||0,
             sprite:!!sprite,tag:sprite?.tagName||null,renderer:sprite?.dataset.renderer||null,
             targets:(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
@@ -275,19 +275,21 @@ patched=replaceRequired(patched,
     evidence.checks.liveExplosiveFlurryVfx=vfx;
     assert.equal(vfx.stage,true,"Fire Flurry did not create the V143 stage");
     assert.equal(vfx.skill,"explosiveFlurry","Wrong VFX skill is active");
+    assert.equal(vfx.stageRenderer,"raster-only","Fire Flurry stage is not owned by the raster-only V143 runtime");
     assert.notEqual(vfx.display,"none","V143 stage is display:none during Fire Flurry");
     assert.equal(vfx.visibility,"visible","V143 stage is hidden during Fire Flurry");
     assert.ok(Number(vfx.opacity)>0,"V143 stage opacity is zero during Fire Flurry");
     assert.ok(vfx.stageWidth>0&&vfx.stageHeight>0,"V143 stage has no geometry");
     assert.equal(vfx.sprite,true,"Fire Flurry did not create its formal Sprite VFX");
-    assert.equal(vfx.tag,"CANVAS","Fire Flurry must use the existing V143 Canvas crop renderer");
-    assert.equal(vfx.renderer,"canvas-crop","Fire Flurry renderer is not Canvas crop");
+    assert.equal(vfx.tag,"I","Fire Flurry must use the V143 DOM raster Sprite node");
+    assert.equal(vfx.renderer,"dom-sprite","Fire Flurry renderer is not the formal DOM raster Sprite owner");
     assert.equal(vfx.targets.length,3,"Fire Flurry must visually cover the three formal tri targets");
     assert.notEqual(vfx.spriteDisplay,"none","Fire Flurry Sprite is display:none");
     assert.equal(vfx.spriteVisibility,"visible","Fire Flurry Sprite is hidden");
     assert.ok(Number(vfx.spriteOpacity)>0,"Fire Flurry Sprite opacity is zero");
     assert.ok(vfx.spriteWidth>0&&vfx.spriteHeight>0,"Fire Flurry Sprite has no visible geometry");
     assert.ok((vfx.diagnostics?.started||0)>(vfxBefore.started||0),"V143 did not record the formal Fire Flurry animation start");
+    assert.equal(vfx.diagnostics?.renderer,"dom-sprite-only","V143 diagnostics report a stale VFX renderer");
     const vfxShot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
     if(vfxShot.data){ fs.writeFileSync(path.join(artifactDir,"abyss-live-explosive-flurry-vfx.png"),Buffer.from(vfxShot.data,"base64")); }
 
