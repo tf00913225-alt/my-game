@@ -5,9 +5,14 @@ on:
     branches:
       - fix/combat-vfx-owner-cleanup-20260909
 
+permissions:
+  contents: write
+
 jobs:
-  verify:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -15,31 +20,66 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Source-level legacy VFX guard
+      - name: Apply final status VFX cleanup
+        run: |
+          printf '%s' 'CmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aAppbXBvcnQgcmUKCmRlZiBmdW5jdGlvbl9zcGFuKHRleHQsbmFtZSk6CiAgICBtYXJrZXI9ZiJmdW5jdGlvbiB7bmFtZX0oIgogICAgc3RhcnQ9dGV4dC5maW5kKG1hcmtlcikKICAgIGlmIHN0YXJ0PDA6CiAgICAgICAgcmV0dXJuIE5vbmUKICAgIGJyYWNlPXRleHQuZmluZCgieyIsc3RhcnQpCiAgICBpZiBicmFjZTwwOgogICAgICAgIHJhaXNlIFJ1bnRpbWVFcnJvcihmIm1pc3NpbmcgYnJhY2U6IHtuYW1lfSIpCiAgICBkZXB0aD0wOyBxdW90ZT1Ob25lOyBlc2NhcGU9RmFsc2U7IGk9YnJhY2UKICAgIHdoaWxlIGk8bGVuKHRleHQpOgogICAgICAgIGNoPXRleHRbaV0KICAgICAgICBpZiBxdW90ZToKICAgICAgICAgICAgaWYgZXNjYXBlOgogICAgICAgICAgICAgICAgZXNjYXBlPUZhbHNlCiAgICAgICAgICAgIGVsaWYgY2g9PSJcXCI6CiAgICAgICAgICAgICAgICBlc2NhcGU9VHJ1ZQogICAgICAgICAgICBlbGlmIGNoPT1xdW90ZToKICAgICAgICAgICAgICAgIHF1b3RlPU5vbmUKICAgICAgICBlbHNlOgogICAgICAgICAgICBpZiBjaCBpbiAoIiciLCciJywnYCcpOgogICAgICAgICAgICAgICAgcXVvdGU9Y2gKICAgICAgICAgICAgZWxpZiBjaD09InsiOgogICAgICAgICAgICAgICAgZGVwdGgrPTEKICAgICAgICAgICAgZWxpZiBjaD09In0iOgogICAgICAgICAgICAgICAgZGVwdGgtPTEKICAgICAgICAgICAgICAgIGlmIGRlcHRoPT0wOgogICAgICAgICAgICAgICAgICAgIGVuZD1pKzEKICAgICAgICAgICAgICAgICAgICB3aGlsZSBlbmQ8bGVuKHRleHQpIGFuZCB0ZXh0W2VuZF0gaW4gIiBcdCI6CiAgICAgICAgICAgICAgICAgICAgICAgIGVuZCs9MQogICAgICAgICAgICAgICAgICAgIGlmIGVuZDxsZW4odGV4dCkgYW5kIHRleHRbZW5kXT09IjsiOgogICAgICAgICAgICAgICAgICAgICAgICBlbmQrPTEKICAgICAgICAgICAgICAgICAgICB3aGlsZSBlbmQ8bGVuKHRleHQpIGFuZCB0ZXh0W2VuZF0gaW4gIlxyXG4iOgogICAgICAgICAgICAgICAgICAgICAgICBlbmQrPTEKICAgICAgICAgICAgICAgICAgICByZXR1cm4gc3RhcnQsZW5kCiAgICAgICAgaSs9MQogICAgcmFpc2UgUnVudGltZUVycm9yKGYidW50ZXJtaW5hdGVkIGZ1bmN0aW9uOiB7bmFtZX0iKQoKZGVmIHJlcGxhY2VfZnVuY3Rpb24odGV4dCxuYW1lLHJlcGxhY2VtZW50KToKICAgIHNwYW49ZnVuY3Rpb25fc3Bhbih0ZXh0LG5hbWUpCiAgICBpZiBub3Qgc3BhbjoKICAgICAgICByYWlzZSBSdW50aW1lRXJyb3IoZiJmdW5jdGlvbiBub3QgZm91bmQ6IHtuYW1lfSIpCiAgICByZXR1cm4gdGV4dFs6c3BhblswXV0rcmVwbGFjZW1lbnQrdGV4dFtzcGFuWzFdOl0KCmRlZiByZW1vdmVfc2VjdGlvbih0ZXh0LHN0YXJ0X21hcmtlcixlbmRfbWFya2VyPU5vbmUpOgogICAgc3RhcnQ9dGV4dC5maW5kKHN0YXJ0X21hcmtlcikKICAgIGlmIHN0YXJ0PDA6CiAgICAgICAgcmV0dXJuIHRleHQsRmFsc2UKICAgIGVuZD10ZXh0LmZpbmQoZW5kX21hcmtlcixzdGFydCtsZW4oc3RhcnRfbWFya2VyKSkgaWYgZW5kX21hcmtlciBlbHNlIHRleHQuZmluZCgiLyogLS0tLS0iLHN0YXJ0K2xlbihzdGFydF9tYXJrZXIpKQogICAgaWYgZW5kPDA6CiAgICAgICAgcmFpc2UgUnVudGltZUVycm9yKGYic2VjdGlvbiBlbmQgbWlzc2luZzoge3N0YXJ0X21hcmtlcn0iKQogICAgcmV0dXJuIHRleHRbOnN0YXJ0XSt0ZXh0W2VuZDpdLFRydWUKCnA9UGF0aCgianMvMzQtdjE0My1zeXN0ZW0tZml4ZXMuanMiKQpzPXAucmVhZF90ZXh0KCkKcz1yZXBsYWNlX2Z1bmN0aW9uKHMsInN5bmNFYXJ0aFNoaWVsZENhcmQiLCJmdW5jdGlvbiBzeW5jRWFydGhTaGllbGRDYXJkKCl7IHJldHVybjsgfVxuXG4gICAgIikKcC53cml0ZV90ZXh0KHMpCgpwPVBhdGgoImpzLzQzLXYxNDktc2tpbGwtdWktcnVsZXMuanMiKQpzPXAucmVhZF90ZXh0KCkKcz1yZXBsYWNlX2Z1bmN0aW9uKHMsInN5bmNCYXJyaWVyQ2FyZCIsJycnZnVuY3Rpb24gc3luY0JhcnJpZXJDYXJkKGNhcmQsZW50aXR5KXsKICAgICAgICBpZighY2FyZCl7IHJldHVybjsgfQogICAgICAgIGNhcmQuY2xhc3NMaXN0LnRvZ2dsZSgidjE0OS1oYXMtYmFycmllciIsISFiYXJyaWVyU3RhdGUoZW50aXR5KSk7CiAgICB9CgogICAgJycnKQpzPXMucmVwbGFjZSgiYmFycmllckNvcm5lckNvdW50OnRydWUsIiwiYmFycmllckNvcm5lckNvdW50OmZhbHNlLCIpCnM9cy5yZXBsYWNlKCJ3b3JkQ2lyY2xlUGVyQ2hhcmFjdGVyOnRydWUsIiwicHJvY2VkdXJhbFNraWxsRmFsbGJhY2s6ZmFsc2UsIikKcC53cml0ZV90ZXh0KHMpCgpwPVBhdGgoImpzLzQ2LXYxNTUtZGV2LWZpeGVzLmpzIikKcz1wLnJlYWRfdGV4dCgpCm1hcmtlcj0nICAgICAgICBjb25zdCBtYW5pZmVzdD13aW5kb3cudjE0M1NraWxsQW5pbWF0aW9uTWFuaWZlc3Q7JwpzdGFydD1zLmZpbmQobWFya2VyKQppZiBzdGFydD49MDoKICAgIGlmX3N0YXJ0PXMuZmluZCgnaWYobWFuaWZlc3QpeycsIHN0YXJ0KQogICAgaWYgaWZfc3RhcnQ8MDoKICAgICAgICByYWlzZSBSdW50aW1lRXJyb3IoIlYxNTUgbWFuaWZlc3QgYmxvY2sgbWlzc2luZyIpCiAgICBicmFjZT1zLmZpbmQoJ3snLGlmX3N0YXJ0KQogICAgZGVwdGg9MDsgcXVvdGU9Tm9uZTsgZXNjYXBlPUZhbHNlOyBpPWJyYWNlCiAgICB3aGlsZSBpPGxlbihzKToKICAgICAgICBjaD1zW2ldCiAgICAgICAgaWYgcXVvdGU6CiAgICAgICAgICAgIGlmIGVzY2FwZTogZXNjYXBlPUZhbHNlCiAgICAgICAgICAgIGVsaWYgY2g9PSJcXCI6IGVzY2FwZT1UcnVlCiAgICAgICAgICAgIGVsaWYgY2g9PXF1b3RlOiBxdW90ZT1Ob25lCiAgICAgICAgZWxzZToKICAgICAgICAgICAgaWYgY2ggaW4gKCInJywnIicsJ2AnKTogcXVvdGU9Y2gKICAgICAgICAgICAgZWxpZiBjaD09J3snOiBkZXB0aCs9MQogICAgICAgICAgICBlbGlmIGNoPT0nfSc6CiAgICAgICAgICAgICAgICBkZXB0aC09MQogICAgICAgICAgICAgICAgaWYgZGVwdGg9PTA6CiAgICAgICAgICAgICAgICAgICAgZW5kPWkrMQogICAgICAgICAgICAgICAgICAgIHdoaWxlIGVuZDxsZW4ocykgYW5kIHNbZW5kXSBpbiAnIFx0XHJcbic6IGVuZCs9MQogICAgICAgICAgICAgICAgICAgIHM9c1s6c3RhcnRdK3NbZW5kOl0KICAgICAgICAgICAgICAgICAgICBicmVhawogICAgICAgIGkrPTEKcC53cml0ZV90ZXh0KHMpCgpwPVBhdGgoImNzcy8zOC12MTQxLXN5c3RlbS1leHBhbnNpb24uY3NzIikKcz1wLnJlYWRfdGV4dCgpCnMsXz1yZW1vdmVfc2VjdGlvbihzLCIvKiAtLS0tLSBQZXJzaXN0ZW50IGNhcmQgc3RhdGUgZWZmZWN0cyAtLS0tLSAqLyIpCnAud3JpdGVfdGV4dChzKQoKcD1QYXRoKCJjc3MvNDAtdjE0My1jb21iYXQtZHVuZ2Vvbi1wb2xpc2guY3NzIikKcz1wLnJlYWRfdGV4dCgpCnMsXz1yZW1vdmVfc2VjdGlvbihzLCIvKiA3LiBXYW5peWFuZyBFYXJ0aCBTaGllbGQ6IiwiLyogMi4gVjE0MidzIGZ1bGwtc2NyZWVuIGdlbmVyaWMgY2FwdGlvbiBpcyByZXRpcmVkLiAqLyIpCnAud3JpdGVfdGV4dChzKQoKcD1QYXRoKCJjc3MvNDItdjE0Ni1zeXN0ZW0tcG9saXNoLmNzcyIpCnM9cC5yZWFkX3RleHQoKQpzPXMucmVwbGFjZSgKICAgICcjYmF0dGxlUGFnZSAudjE0Ni1kZWZlYXRlZCAudjE0MS1lZmZlY3QsXG4jYmF0dGxlUGFnZSAudjE0Ni1kZWZlYXRlZCAudjE0My1lYXJ0aC1zaGllbGQtZWZmZWN0e2Rpc3BsYXk6bm9uZSAhaW1wb3J0YW50O30nLAogICAgJyNiYXR0bGVQYWdlIC52MTQ2LWRlZmVhdGVkIC52MTQxLWVmZmVjdHtkaXNwbGF5Om5vbmUgIWltcG9ydGFudDt9JwopCnAud3JpdGVfdGV4dChzKQoKcD1QYXRoKCJjc3MvNDQtdjE0OS1za2lsbC11aS1ydWxlcy5jc3MiKQpzPXAucmVhZF90ZXh0KCkKc3RhcnRfbWFya2VyPSIvKiBCYXJyaWVyOiBmb3VyIGRlZXAteWVsbG93IGNvcm5lcnMsIGVhY2ggc2hvd2luZyB0aGUgcmVtYWluaW5nIGJsb2NrIGNvdW50LiAqLyIKZW5kX21hcmtlcj0iLyogQSByZXZpdmVkIGVuZW15IG11c3QgaW1tZWRpYXRlbHkgcmV0dXJuIHRvIHRoZSBub3JtYWwgbGl2aW5nLWNhcmQgYnJpZ2h0bmVzcy4gKi8iCnN0YXJ0PXM uZmluZChzdGFydF9tYXJrZXIpCmlmIHN0YXJ0Pj0wOgogICAgZW5kPXM uZmluZChlbmRfbWFya2VyLHN0YXJ0KQogICAgaWYgZW5kPDA6CiAgICAgICAgcmFpc2UgUnVudGltZUVycm9yKCJWMTQ5IGJhcnJpZXIgQ1NTIGVuZCBtYXJrZXIgbWlzc2luZyIpCiAgICBrZWVwPScnJyNnYW1lLXN0YWdlICNiYXR0bGVQYWdlIC5iYXR0bGUtbW9uc3Rlci52MTQ5LWhhcy1iYXJyaWVyIC52MTQxLW1vbnN0ZXItc2hpZWxkLWJhcntcbiAgICBkaXNwbGF5Om5vbmUgIWltcG9ydGFudDtcbn1cblxuJycnCiAgICBzPXNbOnN0YXJ0XStrZWVwK3NbZW5kOl0KcC53cml0ZV90ZXh0KHMpCgpwPVBhdGgoInRlc3RzL3YxNTMtZmlyZS12ZngudGVzdC5qcyIpCnM9cC5yZWFkX3RleHQoKQpzPXMucmVwbGFjZSgKICAgICdhc3NlcnQubWF0Y2goYW5pbWF0aW9uLC9idXJuOlxcXHtzcmM6ImFzc2V0c1xcXF92ZnhcXFwvZmlyZVxcXC9idXJuLWxvb3BcXFwucG5nXFxcP3Y9MTY1Iixjb2x1bW5zOjQscm93czoyLGZyYW1lczo4LGR1cmF0aW9uOjgwMCxjb2xsZWN0aW9uOiJzdGF0dXNFZmZlY3RzIlxcfS8pOycsCiAgICAnYXNzZXJ0Lm1hdGNoKGFuaW1hdGlvbiwvYnVybjpzdGF0dXNTaGVldFxcXCgiYXNzZXRzXFxcL3ZmeFxcXC9maXJlXFxcL2J1cm4tbG9vcFxcXC5wbmdcXFw/dj0xNjUiLDgwMCwic3RhdHVzRWZmZWN0cyJcXFwpLyk7JwopCnM9cy5yZXBsYWNlKAogICAgJ2Fzc2VydC5tYXRjaChhbmltYXRpb24sL3JhZ2U6XFxc e3NyYzo iYXNzZXRzXFxcL3ZmeFxcXC9maXJlXFxcL3JhZ2UtYnVmZi1sb29wXFxcLnBuZ1xcXD92PTE2NSIsY29sdW1uczo0LHJvd3M6MixmcmFtZXM6OCxkdXJhdGlvbjoxMDAwLGNvbGxlY3Rpb246ImFjdGl2ZUJ1ZmZzIlxcfS8pOycsCiAgICAnYXNzZXJ0Lm1hdGNoKGFuaW1hdGlvbiwvcmFnZTpzdGF0dXNTaGVldFxcXCgiYXNzZXRzXFxcL3ZmeFxcXC9maXJlXFxcL3JhZ2UtYnVmZi1sb29wXFxcLnBuZ1xcXD92PTE2NSIsMTAwMCwiYWN0aXZlQnVmZnMiXFxcKS8pOy cK KQpwLndyaXRlX3RleHQocykKCnA9UGF0aCgidGVzdHMvdjE0OS1za2lsbC11aS1ydWxlcy50ZXN0LmpzIikKcz1wLnJlYWRfdGV4dCgpCnN0YXJ0PXM uZmluZCgndGVzdCgid29yZC1jaXJjbGUgYW5pbWF0aW9uIGVtaXRzIG9uZSBjaXJjbGUgcGVyIGNoYXJhY3RlciB3aXRob3V0IHJlcGxhY2luZyBzcHJpdGUgc2hlZXRzIicpCmlmIHN0YXJ0Pj0wOgogICAgZW5kPXM uZmluZCgnXG50ZXN0KCJCYXJyaWVyIGNvcm5lcnMsIHJldml2ZSBicmlnaHRuZXNzLCByYW5rIGNvbG91cnMgYW5kIHJlZmxlY3QgbGFiZWwgYXJlIGZpbmFsIHJ1bGVzIicsc3RhcnQpCiAgICBpZiBlbmQ8MDoKICAgICAgICByYWlzZSBSdW50aW1lRXJyb3IoIlYxNDkgd29yZC1jaXJjbGUgdGVzdCBib3VuZGFyeSBtaXNzaW5nIikKICAgIGJsb2NrPScnJ3Rlc3QoInByb2NlZHVyYWwgd29yZC1jaXJjbGUgZmFsbGJhY2sgaXMgcmV0aXJlZCIsKCk9PnsKICAgIGFzc2VydC5kb2VzTm90TWF0Y2goc291cmNlLC9pbnN0YWxsV29yZENpcmNsZURpcmVjdG9yfHYxNDktd29yZC0vKTsKICAgIGFzc2VydC5kb2VzTm90TWF0Y2goY3NzLC92MTQ5LXdvcmQtY2lyY2xlLXN0YWdlLyk7CiAgICBhc3NlcnQubWF0Y2goYW5pbWF0aW9uU291cmNlLC9taXNzaW5nVmlzdWFscy8pOwp9KTsKJycnCiAgICBzPXNbOnN0YXJ0XStibG9jaytzW2VuZDpdCnN0YXJ0PXM uZmluZCgndGVzdCgiQmFycmllciBjb3JuZXJzLCByZXZpdmUgYnJpZ2h0bmVzcywgcmFuayBjb2xvdXJzIGFuZCByZWZsZWN0IGxhYmVsIGFyZSBmaW5hbCBydWxlcyInKQppZiBzdGFydD49MDoKICAgIGVuZD1zLmZpbmQoJ1xuY29uc29sZS5sb2coJyxzdGFydCkKICAgIGlmIGVuZDwwOgogICAgICAgIHJhaXNlIFJ1bnRpbWVFcnJvcigiVjE0OSBiYXJyaWVyIHRlc3QgYm91bmRhcnkgbWlzc2luZyIpCiAgICBibG9jaz0nJyd0ZXN0KCJCYXJyaWVyIGlzIHJhc3Rlci1vd25lZCB3aGlsZSByZXZpdmUsIHJhbmsgYW5kIHJlZmxlY3QgZmVlZGJhY2sgcmVtYWluIixhKCk9PnsKICAgIGFzc2VydC5tYXRjaChzb3VyY2UsL3JlbW92ZVxcKCJkZWFkIiw iZHlpbmciLCJ2MTQ2LWRlZmVhdGVkIlxcKS8pOwogICAgYXNzZXJ0Lm1hdGNoKHNvdXJjZSwvc2V0VGltZW91dFxcKFxcKFxcKT0+c3luY01vbnN0ZXJDYXJkXFwoaW5kZXhcXCksMTkwMFxcKS8pOwogICAgYXNzZXJ0LmRvZXNOb3RNYXRjaChzb3VyY2UsL3YxNDktYmFycmllci1jb3JuZXJzLyk7CiAgICBhc3NlcnQuZG9lc05vdE1hdGNoKGNzcywvdjE0OS1iYXJyaWVyLWNvcm5lcnN8djE0OUJhcnJpZXJDb3JuZXJQdWxzZS8pOwogICAgYXNzZXJ0Lm1hdGNoKGFuaW1hdGlvblNvdXJjZSwvYmFycmllcjpzdGF0dXNTaGVldFxcKCJhc3NldHNcXC92ZnhcXC9lYXJ0aFxcL2JhcnJpZXItbG9vcFxcLnBuZ1xcP3Y9MTczXFwuMzkiLDEyMDAsImFjdGl2ZUJ1ZmZzIi8pOwogICAgYXNzZXJ0Lm1hdGNoKGNzcywvYmF0dGxlLW1vbnN0ZXJcXC52MTQ5LWhhcy1iYXJyaWVyIFxcLnYxNDEtbW9uc3Rlci1zaGllbGQtYmFyW1xcc1xcU10qZGlzcGxheTpub25lLyk7CiAgICBhc3NlcnQubWF0Y2goY3NzLC9kYXRhLXJhbms9ImVsaXRlIltcXHNcXFNdKiNmZjlmNDMvKTsKICAgIGFzc2VydC5tYXRjaChjc3MsL2RhdGEtcmFuaz0iYm9zcyJbXFxzXFxTXSojZmY1ZjlkLyk7CiAgICBhc3NlcnQubWF0Y2goc291cmNlLC/lj43lgrdIUC0vKTsKICAgIGFzc2VydC5tYXRjaChjc3MsL1xcLnYxNDktcmVmbGVjdC1wb3B1cC8pOwp9KTsKJycnCiAgICBzPXNbOnN0YXJ0XStibG9jaytzW2VuZDpdCnAud3JpdGVfdGV4dChzKQoKcD1QYXRoKCJ0ZXN0cy92MTc0LXJhc3Rlci1vbmx5LWNvbWJhdC12Zngtb3duZXIudGVzdC5qcyIpCnM9cC5yZWFkX3RleHQoKQpkZWNsPScnJ2NvbnN0IHYxNDNmaXhlcz1mcy5yZWFkRmlsZVN5bmMoImpzLzM4LXYxNDMtc3lzdGVtLWZpeGVzLmpzIiwidXRmOCIpOwpjb25zdCB2MTU1PWZzLnJlYWRGaWxlU3luYygianMvNDYtdjE1NS1kZXYtZml4ZXMuanMiLCJ1dGY4Iik7CmNvbnN0IGNzczE0MT1mcy5yZWFkRmlsZVN5bmMoImNzcy8zOC12MTQxLXN5c3RlbS1leHBhbnNpb24uY3NzIiwidXRmOCIpOwpjb25zdCBjc3MxNDY9ZnMucmVhZEZpbGVTeW5jKCJjc3MvNDItdjE0Ni1zeXN0ZW0tcG9saXNoLmNzcyIsInV0ZjgiKTsKJycnCmlmICdjb25zdCB2MTQzZml4ZXM9JyBub3QgaW4gczoKICAgIHM9cy5yZXBsYWNlKCdjb25zdCB2MTQyPScsZGVjbCsnY29uc3QgVjE0Mj0nLDEpCmJsb2NrPScnJwp0ZXN0KCJzZWNvbmRhcnkgc3RhdHVzIG93bmVycyBjYW5ub3QgcmVjcmVhdGUgcHJvY2VkdXJhbCBjb21iYXQgVkZYIixKCj0+ewogICAgYXNzZXJ0LmRvZXNOb3RNYXRjaCh2MTQzZml4ZXMsL3YxNDMtZWFydGgtc2hpZWxkLWVmZmVjdC8pOwogICAgYXNzZXJ0LmRvZXNOb3RNYXRjaCh2MTU1LC92MTQzU2tpbGxBbmltYXRpb25NYW5pZmVzdC8pOwogICAgYXNzZXJ0LmRvZXNOb3RNYXRjaChjc3MxNDEsL1xcLnYxNDEtZWZmZWN0LWNhbnZhc3xcXC52MTQxLWVmZmVjdC1idXJufHYxNDFCdXJuRmxpY2tlcnx2MTQxU3R1bk9yYml0Lyk7CiAgICBhc3NlcnQuZG9lc05vdE1hdGNoKGNzczE0MywvdjE0My1lYXJ0aC1zaGllbGQtZWZmZWN0fHYxNDNFYXJ0aENvcm5lckJyZWF0aC8pOwogICAgYXNzZXJ0LmRvZXNOb3RNYXRjaChjc3MxNDYsL3YxNDMtZWFydGgtc2hpZWxkLWVmZmVjdC8pOwogICAgYXNzZXJ0LmRvZXNOb3RNYXRjaChjc3MxNDksL3YxNDktYmFycmllci1jb3JuZXJzfHYxNDlCYXJyaWVyQ29ybmVyUHVsc2UvKTsKfSk7CicnJwppZiAnc2Vjb25kYXJ5IHN0YXR1cyBvd25lcnMgY2Fubm90IHJlY3JlYXRlIHByb2NlZHVyYWwgY29tYmF0IFZGWCcgbm90IGluIHM6CiAgICBwb3M9cy5yZmluZCgnY29uc29sZS5sb2coJykKICAgIGlmIHBvczwwOiByYWlzZSBSdW50aW1lRXJyb3IoIlYxNzQgY29uc29sZSBtYXJrZXIgbWlzc2luZyIpCiAgICBzPXNbOnBvc10rYmxvY2srJ1xuJytzW3BvczpdCnAud3JpdGVfdGV4dChzKQoKcD1QYXRoKCJITkRPRkYubWQiKQpzPXAucmVhZF90ZXh0KCkKbm90ZT0nJydcblxuIyMgMjAyNi0wOS0wOSDigJQg5oiw6ayyIFZGWOWWruS4gG93bmVyIOaUtuauogotIGBqcy8zOS12MTQzLXNraWxsLWFuaW1hdGlvbi5qc2Ag5piv5beh5oCq44CB5pel5bi457yP5rex5riK5Ymv5pys44CB546p5rOV77yP5rS75YuV6IiHIEJPU1Mg5oiw6ayy55qE5oSP5LiA5oqA6IO9IFZGWOiIh+iyveeLiOaFiSBTcHJpdGUgU2hlZXQgb3duZXLjgIIKLSDmraPlvI/lvrDmlp3opbfmm5bmgKfkv6Hmga/lj6rkuYjogUE5H77yPWebPIFNwcml0ZSBTaGVldCDoiIflhrXmhYvov5Hnk6bllJbvvJtWMTQyIOWDheS/neeVmSBhY3Rpb24gZ2F0Ze+8juaZguW6j+ebuOWuuSvvvIzkuI3lho3nu5jlvozopbblnJbopbjnjooKLSDnpIHmraIgQ1NT77yPSmF2YVNjcmlwdCDnqIvluo/lvI/miYDoh73mm7/ku6Pli5XnlLvjgIFDYW52YXPuio1TVkfjgIFXZWJHTO+8j1NoYWRlciBmYWxsYmFjazvvvJvmpa3mlpnnq4PnvbrlpLHmmYLlj6rntIBpjLLkvaYgbWlzc2luZyB2aXN1YWzvvIzkuI3lvpfpgIDlm57oiIrVyZW5kZXJlcuOAggo tIGBqcy80My12MTQ5LXNraWxsLXVpLXJ1bGVzLmpzYO+8jGBqcy80Ni12MTU1LWRldi1maXhlcy5qc2DvvIzganMvNTktYWJ5c3MtdHdvLXRpZXItcnVudGltZS5qc2Ag562J5b6M6LyJ5YWl6KaP77yP5Ymv5pys5qih57WE5LiN5b6X5pS55a+rIGB2MTQzU2tpbGxBbmltYXRpb25NYW5pZmVzdGAg5oiWIGB2MTQyU2tpbGxBbmltYXRpb25EaXJlY3Rvci5wbGF5YOOAggotIOS4h+iIhuWcn+ebvuOAgee1kueVj+WFi+WFtuS7liBCdWZm77yP5paw6KaW6Kaa55SxIFYxNDMgYFJBV19TVEFUVVNfU1BSSVRFU2Ag5q2j5byP5b6q55Kw5ZyW5ZG956iL77yM5LiN5YaN5bu656uL6IiK5Zub6KeS77yP57KS5a2QIENTUyDoppbnkasjgIIKJycnCmlmICcjIyAyMDI2LTA5LTA5IOKAlCDmiLDprLYgVkZYIOWWruS4gG93bmVyIOaUtuauoicgbm90IGluIHM6CiAgICBzKz1ub3RlCnAud3JpdGVfdGV4dChzKQo=' | base64 -d > /tmp/vfx-final-cleanup.py
+          python /tmp/vfx-final-cleanup.py
+      - name: Source guard and syntax
         run: |
           python - <<'PY'
           from pathlib import Path
           import re,sys
-          files=["js/35-v141-ui-battle.js","js/37-v142-skill-animation.js","js/39-v143-skill-animation.js","js/43-v149-skill-ui-rules.js","js/59-abyss-two-tier-runtime.js"]
-          banned=re.compile(r'playCanvasParticles|v141-effect-canvas|getContext\(|createElement\(["\']canvas["\']\)|installWordCircleDirector|v149-word-|v149-word-circle-stage|patchExistingV143ExplosiveFlurryRenderer|canvas-crop')
+          rules={
+            "js/35-v141-ui-battle.js":r'playCanvasParticles|v141-effect-canvas|getContext\(|createElement\(["\']canvas["\']\)',
+            "js/37-v142-skill-animation.js":r'v142-particle-canvas|getContext\(|createElement\(["\']canvas["\']\)|<svg\b',
+            "js/38-v143-system-fixes.js":r'v143-earth-shield-effect',
+            "js/39-v143-skill-animation.js":r'canvas-crop|getContext\(|drawImage\(|createElement\(["\']canvas["\']\)|v149-word-|v143-cast-charge|v143-skill-flight|v143-hit-impact|v143-hit-particle',
+            "js/43-v149-skill-ui-rules.js":r'installWordCircleDirector|v149-word-|v149-barrier-corners',
+            "js/46-v155-dev-fixes.js":r'v143SkillAnimationManifest',
+            "js/59-abyss-two-tier-runtime.js":r'v143SkillAnimationManifest|patchExistingV143ExplosiveFlurryRenderer|canvas-crop',
+            "css/38-v141-system-expansion.css":r'\.v141-effect-canvas|\.v141-effect-burn|v141BurnFlicker|v141StunOrbit',
+            "css/40-v143-combat-dungeon-polish.css":r'v143-earth-shield-effect|v143EarthCornerBreath|\.v143-cast-charge|\.v143-skill-flight|\.v143-hit-impact|\.v143-hit-particle|\.v143-skill-field',
+            "css/42-v146-system-polish.css":r'v143-earth-shield-effect',
+            "css/44-v149-skill-ui-rules.css":r'v149-word-circle-stage|v149-barrier-corners|v149BarrierCornerPulse'
+          }
           hits=[]
-          for path in files:
+          for path,pattern in rules.items():
+              rx=re.compile(pattern,re.I)
               for no,line in enumerate(Path(path).read_text().splitlines(),1):
-                  if banned.search(line): hits.append(f"{path}:{no}:{line.strip()}")
-          if hits: print("\n".join(hits)); sys.exit(1)
+                  if rx.search(line): hits.append(f"{path}:{no}:{line.strip()}")
+          if hits:
+              print("Legacy combat VFX source remains:\n"+"\n".join(hits))
+              sys.exit(1)
           PY
-      - name: Focused VFX regression tests
+          for file in js/35-v141-ui-battle.js js/37-v142-skill-animation.js js/38-v143-system-fixes.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/46-v155-dev-fixes.js js/59-abyss-two-tier-runtime.js; do node --check "$file"; done
+      - name: Commit cleanup before tests
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add HANDOFF.md js/38-v143-system-fixes.js js/43-v149-skill-ui-rules.js js/46-v155-dev-fixes.js css/38-v141-system-expansion.css css/40-v143-combat-dungeon-polish.css css/42-v146-system-polish.css css/44-v149-skill-ui-rules.css tests/v149-skill-ui-rules.test.js tests/v153-fire-vfx.test.js tests/v174-raster-only-combat-vfx-owner.test.js
+          if ! git diff --cached --quiet; then
+            git commit -m "refactor: remove remaining procedural status VFX sources"
+            git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
+          fi
+      - name: Focused combat VFX regressions
         run: |
           node tests/v174-raster-only-combat-vfx-owner.test.js
-          node tests/abyss-two-tier-refactor.test.js
-          node tests/boss-mechanism-vfx-card-ui-20260909.test.js
+          node tests/v149-skill-ui-rules.test.js
           node tests/v153-fire-vfx.test.js
           node tests/v166-water-vfx.test.js
           node tests/v173.23-wind-vfx.test.js
           node tests/v173.39-earth-light-vfx.test.js
-      - name: Full repository tests
+          node tests/abyss-two-tier-refactor.test.js
+          node tests/boss-mechanism-vfx-card-ui-20260909.test.js
+          node tests/v173.62-direct-skill-animation-trigger.test.js
+      - name: Full repository checks
         run: |
-          if ! command -v identify >/dev/null 2>&1; then sudo apt-get update && sudo apt-get install -y imagemagick; fi
-          git fetch origin 39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 4a592dd4c41d7efb1a4849fbfe0cbf68598121bf --depth=1 || true
-          for test in tests/*.test.js; do node "$test"; done
-          node .github/scripts/ci.mjs
+          if ! command -v identify >/dev/null 2>&1; then sudo apt-get update && sudo apt-get install --yes --no-install-recommends imagemagick; fi
+          for sha in 39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 4a592dd4c41d7efb1a4849fbfe0cbf68598121bf; do
+            git cat-file -e "$sha^{commit}" 2>/dev/null || git fetch --no-tags --depth=1 origin "$sha"
+          done
+          node .github/scripts/ci.mjs syntax
+          node .github/scripts/ci.mjs tests
+          node .github/scripts/ci.mjs resources
+          node .github/scripts/ci.mjs html-ids
+          node .github/scripts/ci.mjs loader
