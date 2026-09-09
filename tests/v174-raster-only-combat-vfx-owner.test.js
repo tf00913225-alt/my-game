@@ -5,6 +5,10 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const v141=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
+const v143fixes=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
+const v155=fs.readFileSync("js/46-v155-dev-fixes.js","utf8");
+const css141=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
+const css146=fs.readFileSync("css/42-v146-system-polish.css","utf8");
 const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const v143=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const css142=fs.readFileSync("css/39-v142-skill-animation.css","utf8");
@@ -179,6 +183,17 @@ test("the same raster owner dispatches player-to-enemy and enemy-to-player",()=>
     assert.equal(context.v143SkillAnimationState.current.side,"monster");
     assert.equal(context.v143SkillAnimationState.current.targetSide,"player");
     context.v142SkillAnimationDirector.dispose();
+});
+
+
+test("secondary status owners cannot recreate procedural combat VFX",()=>{
+    assert.doesNotMatch(v143fixes,/v143-earth-shield-effect/);
+    assert.doesNotMatch(v155,/v143SkillAnimationManifest/);
+    assert.doesNotMatch(css141,/\.v141-effect-canvas|\.v141-effect-burn|v141BurnFlicker|v141StunOrbit/);
+    assert.doesNotMatch(css143,/v143-earth-shield-effect|v143EarthCornerBreath/);
+    assert.doesNotMatch(css146,/v143-earth-shield-effect/);
+    assert.doesNotMatch(css149,/v149-barrier-corners|v149BarrierCornerPulse/);
+    assert.doesNotMatch([v141,v142,v143,v143fixes,v149,v155,abyss].join("\n"),/WebGLRenderingContext|createShader|shaderSource|getContext\(["']webgl/i);
 });
 
 console.log("\nV174 raster-only combat VFX owner suite: "+passed+" tests passed.");

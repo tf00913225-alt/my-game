@@ -70,13 +70,7 @@
                 value:skill,writable:true,configurable:true,enumerable:false
             });
         }catch(_){ skillDatabase.fireBurstStrike=skill; }
-        const manifest=window.v143SkillAnimationManifest;
-        if(manifest){
-            manifest.fireBurstStrike=Object.assign({},manifest.fireCritical||{}, {
-                glyph:"爆",motion:"dash",impact:"burst-knuckle",hit:.65,pulses:3,spread:46
-            });
-        }
-    }
+}
     installMonsterOnlyFireBurst();
 
     function rosterMonsters(roster){

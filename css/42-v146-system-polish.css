@@ -97,8 +97,7 @@
 
 #battlePage .v146-defeated.targetable::after,
 #battlePage .v146-defeated.ally-targetable::after,
-#battlePage .v146-defeated .v141-effect,
-#battlePage .v146-defeated .v143-earth-shield-effect{display:none !important;}
+#battlePage .v146-defeated .v141-effect{display:none !important;}
 #battlePage .v146-defeated{pointer-events:none !important;}
 
 #game-stage #inventoryPage .inventory-grid-scroll{flex:0 0 auto !important;overflow:hidden !important;touch-action:none !important;}

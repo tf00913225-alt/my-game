@@ -609,30 +609,10 @@
 
     function syncBarrierCard(card,entity){
         if(!card){ return; }
-        const barrier=barrierState(entity);
-        card.classList.toggle("v149-has-barrier",!!barrier);
-        let layer=card.querySelector(":scope > .v141-card-effects");
-        if(!layer&&barrier){
-            layer=document.createElement("div");
-            layer.className="v141-card-effects";
-            layer.setAttribute("aria-hidden","true");
-            card.appendChild(layer);
-        }
-        if(!layer){ return; }
-        layer.querySelectorAll(":scope > .v141-effect-barrier").forEach(node=>node.remove());
-        let effect=layer.querySelector(":scope > .v149-barrier-corners");
-        if(!barrier){ if(effect){ effect.remove(); } return; }
-        const count=Math.max(0,Math.floor(numeric(barrier.remainingBlocks)));
-        if(!effect){
-            effect=document.createElement("span");
-            effect.className="v149-barrier-corners";
-            effect.innerHTML="<i></i><i></i><i></i><i></i>";
-            layer.appendChild(effect);
-        }
-        Array.from(effect.children).forEach(corner=>{ corner.textContent=String(count); });
+        card.classList.toggle("v149-has-barrier",!!barrierState(entity));
     }
 
-    function rankFor(monster){
+        function rankFor(monster){
         const rank=typeof getMonsterRank==="function"?getMonsterRank(monster):(monster&&monster.v141BattleRank);
         return rank==="boss"?"boss":rank==="elite"?"elite":"regular";
     }
@@ -972,7 +952,7 @@
     window.v149Diagnostics=function(){
         return {
             version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:true,
-            sameNameStateMiss:true,barrierCornerCount:true,proceduralSkillFallback:false,
+            sameNameStateMiss:true,barrierCornerCount:false,proceduralSkillFallback:false,
             mainShopIcon:"assets/ui/home-shop.png",navShopIcon:"assets/ui/home-shop-v147.png"
         };
     };

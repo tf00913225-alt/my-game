@@ -53,45 +53,6 @@
     text-overflow:ellipsis !important;
 }
 
-/* Barrier remaining-block count is gameplay information only.
-   The animated Barrier appearance is owned by the formal status Sprite Sheet. */
-#game-stage #battlePage .v149-barrier-corners{
-    position:absolute;
-    inset:0;
-    z-index:18;
-    display:block;
-    border-radius:inherit;
-    pointer-events:none;
-}
-#game-stage #battlePage .v149-barrier-corners i{
-    position:absolute;
-    display:flex;
-    width:24px;
-    height:24px;
-    align-items:center;
-    justify-content:center;
-    box-sizing:border-box;
-    border-color:#c79520;
-    border-style:solid;
-    border-width:0;
-    color:#ffe49b;
-    background:rgba(34,22,3,.72);
-    font-family:Arial,sans-serif;
-    font-size:11px;
-    font-style:normal;
-    font-weight:900;
-    line-height:1;
-    text-shadow:0 1px 2px #000;
-}
-#game-stage #battlePage .v149-barrier-corners i:nth-child(1){left:0;top:0;border-left-width:4px;border-top-width:4px;}
-#game-stage #battlePage .v149-barrier-corners i:nth-child(2){right:0;top:0;border-right-width:4px;border-top-width:4px;}
-#game-stage #battlePage .v149-barrier-corners i:nth-child(3){right:0;bottom:0;border-right-width:4px;border-bottom-width:4px;}
-#game-stage #battlePage .v149-barrier-corners i:nth-child(4){left:0;bottom:0;border-left-width:4px;border-bottom-width:4px;}
-#game-stage #battlePage .v149-has-barrier .v141-effect-barrier,
-#game-stage #battlePage .v149-has-barrier .v141-effect-barrier::before{
-    display:none !important;
-    content:none !important;
-}
 #game-stage #battlePage .battle-monster.v149-has-barrier .v141-monster-shield-bar{
     display:none !important;
 }
