@@ -25,6 +25,7 @@
         "js/firebase/firebase-auth.js",
         "js/firebase/firebase-auth-ui.js",
         "css/firebase-auth.css",
+        "js/01-stage-v8-touch-lock.js",
         "js/firebase/firebase-bootstrap.js",
         "tests/firebase-auth-foundation.test.mjs"
       ]
@@ -59,7 +60,7 @@
     }
   ],
   "automatedVerification": "TARGETED_STATIC_AND_REPOSITORY_CI_PENDING_LATEST_HEAD",
-  "automatedVerificationNotes": "本階段不變更版本、不修改 saveGame/loadGame、不改 localStorage SAVE_KEY/schema、不放寬 Firestore Rules。Firebase 由 startup owner 以 optional infrastructure 方式載入；登入後只讀取 own UID 的 current cloud save，不自動覆蓋本機進度。",
+  "automatedVerificationNotes": "本階段不變更版本、不修改 saveGame/loadGame、不改 localStorage SAVE_KEY/schema、不放寬 Firestore Rules。Firebase 由 startup owner 以 optional infrastructure 方式載入；登入後只讀取 own UID 的 current cloud save，不自動覆蓋本機進度。Firebase 登入視窗若內容超高，僅在全域 touch-lock owner 登記 .firebase-auth-dialog 為合法 scroll owner，沒有另加 touchmove 補丁。",
   "visualVerification": "PENDING_DEV_AUTH_AND_CLOUD_READ_VERIFICATION",
   "verifiedDevCommit": null,
   "releasedAs": null
