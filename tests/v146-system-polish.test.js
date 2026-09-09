@@ -69,15 +69,17 @@ test("latest skill table contains every exact requested value",()=>{
     ].forEach(pattern=>assert.match(rules,pattern));
 });
 
-test("battle timing, dead-target filtering and named choreography are enforced",()=>{
+test("battle timing, dead-target filtering and raster-only choreography are enforced",()=>{
     assert.match(timing,/earliestAt:Math\.max\([\s\S]*boundaryGate\?boundaryGate\.deadline:0/);
     assert.match(animation,/function canReceive\(config,side,index\)/);
     assert.match(animation,/entity\.hp\)>0/);
-    assert.match(animation,/getSkillTargets\(queued\.target,targetType\)/);
-    assert.match(animation,/sequence:"風起雲湧"/);
-    assert.match(animation,/id==="dragonSlash"[\s\S]*<svg class="v146-flight-art"/);
-    assert.match(animation,/id==="phoenixCry"[\s\S]*<svg class="v146-flight-art"/);
-    assert.match(animation,/id==="iceArrowRain"\|\|id==="fireRocket"/);
+    assert.match(animation,/dragonSlash:\{[\s\S]*dragon-slash-cast\.png/);
+    assert.match(animation,/phoenixCry:\{[\s\S]*phoenix-cry-cast\.png/);
+    assert.match(animation,/iceArrowRain:\{[\s\S]*frost-arrow-rain-vfx\.png/);
+    assert.match(animation,/fireRocket:\{[\s\S]*fire-rocket-cast\.png/);
+    assert.match(animation,/renderer:"dom-sprite"/);
+    assert.doesNotMatch(animation,/<svg\b|v146-flight-art|v143-skill-flight|v143-skill-field|v143-hit-impact/);
+    assert.doesNotMatch(css,/v146-flight-art|v143-skill-flight|v143-skill-field|v143-hit-impact/);
     assert.match(css,/background:transparent !important/);
     assert.match(css,/\.badge-normal[\s\S]*color:#fff !important/);
     assert.match(css,/@keyframes v146AreaImpact/);

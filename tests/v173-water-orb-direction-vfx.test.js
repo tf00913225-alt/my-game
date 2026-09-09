@@ -11,18 +11,20 @@ const index=fs.readFileSync("index.html","utf8");
 let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
-test("Water Ball owns a 12-frame, 4x3 group sprite with the frame-eight hit",()=>{
+test("Water Ball owns a 12-frame, 4x3 group raster sprite with the frame-eight hit",()=>{
+    assert.match(animation,/function castSheet\(src,placement,options\)[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?renderer:"dom-sprite"/);
     assert.match(
         animation,
-        /waterBall:\{[\s\S]*?hit:\.5833333333[\s\S]*?frames:12,frameWidth:384,frameHeight:384,hitFrame:7,\s*placement:"group",renderer:"canvas-crop"/
+        /waterBall:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/water\/water-orb-vfx\.png\?v=173\.19","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)\}/
     );
+    assert.match(animation,/const DEFAULT_HIT=\.5833333333;/);
 });
 
 test("the single group VFX is centered on actual live targets rather than the caster",()=>{
     const placement=animation.slice(animation.indexOf("function placeSprite(current,node,index,target){"));
     assert.match(
         placement,
-        /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(targetIndex=>cardFor\(current\.targetSide,targetIndex\)\)/
+        /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\)/
     );
     assert.match(
         placement,
@@ -31,16 +33,20 @@ test("the single group VFX is centered on actual live targets rather than the ca
     assert.doesNotMatch(placement,/waterBall.*targetTrajectory/);
 });
 
-test("Canvas visits frames left-to-right, top-to-bottom once without per-target travel",()=>{
-    assert.match(animation,/const column=frameIndex%4;[\s\S]*?const row=Math\.floor\(frameIndex\/4\);/);
-    assert.match(animation,/const sourceX=column\*384;[\s\S]*?const sourceY=row\*384;/);
-    assert.match(animation,/if\(progress<1\)\{ scheduleCanvasCropSprite\(runtime\); \}/);
+test("CSS advances the formal 4x3 sheet once without Canvas or per-target travel",()=>{
+    assert.match(css,/@keyframes v143RasterCastFrames/);
+    assert.match(css,/0%\{background-position:0 0\}/);
+    assert.match(css,/25%\{background-position:100% 0\}/);
+    assert.match(css,/33\.333333%\{background-position:0 50%\}/);
+    assert.match(css,/66\.666667%\{background-position:0 100%\}/);
+    assert.match(css,/91\.666667%,100%\{background-position:100% 100%\}/);
+    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|scheduleCanvasCropSprite|canvas-crop/);
     assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("the published build label is V173.39",()=>{
+test("the published build label is V173.64",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
     assert.match(index,/aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
 });
 
-console.log("\nV173 Water Ball target-group VFX suite: "+passed+" tests passed.");
+console.log("\nV173 Water Ball target-group raster VFX suite: "+passed+" tests passed.");

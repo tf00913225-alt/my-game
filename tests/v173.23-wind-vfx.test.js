@@ -267,12 +267,11 @@ test("all eleven casts and six loops use the requested mapping, timing and share
         assert.ok(model&&model.sprite,id);
         assert.equal(model.sprite.src,"assets/inbox/"+spec.file+"?v=173.24",id);
         assert.deepEqual(
-            Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.frameWidth,model.sprite.frameHeight,model.sprite.hitFrame]),
-            [4,3,12,384,384,7],id
+            Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
+            [4,3,12,7],id
         );
         assert.equal(model.sprite.placement,spec.placement,id);
-        assert.equal(model.sprite.renderer,"canvas-crop",id);
-        assert.equal(model.sprite.naturalGrid,true,id);
+        assert.equal(model.sprite.renderer,"dom-sprite",id);
         assert.equal(model.hit,.5,id+" seventh-frame hit");
         assert.deepEqual(Array.from(model.deferredStatusTypes),[spec.status],id);
         assert.match(timing,new RegExp(id+":\\["+spec.duration+"(?:,|\\])"),id+" duration");
@@ -282,38 +281,31 @@ test("all eleven casts and six loops use the requested mapping, timing and share
         const sprite=statuses[type];
         assert.equal(sprite.src,"assets/inbox/"+spec.file+"?v=173.24",type);
         assert.deepEqual(
-            Array.from([sprite.columns,sprite.rows,sprite.frames,sprite.frameWidth,sprite.frameHeight]),
-            [4,2,8,256,256],type
+            Array.from([sprite.columns,sprite.rows,sprite.frames]),
+            [4,2,8],type
         );
+        assert.equal(sprite.renderer,"dom-sprite",type);
         assert.equal(sprite.duration,spec.duration,type);
         assert.equal(sprite.collection,spec.collection,type);
     });
 });
 
-test("natural-grid Canvas crops exactly one row-major frame and reuses the preload cache",()=>{
+test("Wind casts use one DOM Sprite Sheet node and never invoke Canvas drawing",()=>{
     const runtime=loadRuntime();
-    const preloaded=runtime.imageCount();
     runtime.context.v142SkillAnimationDirector.play(
         config("stormFist","single","physical"),
         {side:"player",actorIndex:0,targetId:2}
     );
     const {stage,sprites}=stageSprites(runtime);
-    assert.equal(runtime.imageCount(),preloaded,"cast reuses the warmed image record");
     assert.equal(sprites.length,1);
     const sprite=sprites[0];
-    assert.equal(sprite.dataset.renderer,"canvas-crop");
+    assert.equal(sprite.dataset.renderer,"dom-sprite");
     assert.equal(sprite.dataset.targetIndex,"2");
     assert.equal(sprite.style.left,"578px");
     assert.equal(sprite.style.top,"140px");
-    assert.equal(sprite.width,384);
-    assert.equal(sprite.height,384);
+    assert.match(sprite.style.backgroundImage,/暴風拳-技能動態圖\.png\?v=173\.24/);
     assert.equal(stage.children.length,1,"no procedural charge, flight, field or hit node");
-    assert.deepEqual(runtime.drawCalls[0].args.slice(1),[0,0,384,1024/3,0,0,384,384]);
-    runtime.tick(600);
-    assert.equal(sprite.dataset.frameIndex,"6");
-    assert.equal(sprite.dataset.frameX,"2");
-    assert.equal(sprite.dataset.frameY,"1");
-    assert.deepEqual(runtime.drawCalls.at(-1).args.slice(1),[768,1024/3,384,1024/3,0,0,384,384]);
+    assert.equal(runtime.drawCalls.length,0,"DOM Sprite renderer must never call Canvas drawImage");
 });
 
 test("single, three-lane and battlefield casts each own one correctly positioned sheet",()=>{
@@ -422,7 +414,7 @@ test("frame seven releases resolved attack results once, while buffs never shake
     attack.setClock(600);
     runTimers(attack,600);
     assert.equal(attack.monsterHits.length,1,"damage result appears once at frame seven");
-    assert.equal(attack.cards.battleMonster2.classList.contains("v143-impact-target"),true);
+    assert.equal(attack.cards.battleMonster2.classList.contains("v143-impact-target"),false,"raster owner must not recreate the retired procedural impact class");
 
     const buff=loadRuntime();
     buff.context.v142SkillAnimationDirector.play(
@@ -499,10 +491,10 @@ test("wind sheets replace procedural wind effects and keep noninteractive status
     assert.doesNotMatch(css,/data-skill="windCrossSlash"/);
     assert.doesNotMatch(css,/data-skill="stormRain"/);
     assert.match(css,/#game-stage #battlePage \.v153-status-vfx\{[\s\S]*?z-index:4;[\s\S]*?pointer-events:none;/);
-    assert.match(css,/@keyframes v153StatusSpriteFrames\{[\s\S]*?87\.5%,100%\{background-position:100% 100%\}/);
-    assert.match(animation,/const frameX=frameIndex%columns;/);
-    assert.match(animation,/const frameY=Math\.floor\(frameIndex\/columns\);/);
-    assert.match(animation,/Object\.keys\(MANIFEST\)\.forEach[\s\S]*?getSpriteImage\(sprite\.src\)/);
+    assert.match(css,/@keyframes v143StatusRasterFrames\{[\s\S]*?87\.5%,100%\{background-position:100% 100%\}/);
+    assert.match(animation,/node\.dataset\.renderer="dom-sprite";/);
+    assert.match(animation,/node\.style\.backgroundSize=\(spec\.columns\*100\)\+"% "\+\(spec\.rows\*100\)\+"%";/);
+    assert.doesNotMatch(animation,/getSpriteImage|frameX=frameIndex|frameY=Math\.floor/);
     assert.doesNotMatch(animation,/assets\/inbox\/[\s\S]{0,80}(?:base64|blob:)/i);
 });
 

@@ -356,10 +356,7 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
         assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+filename,id);
         const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.19":"?v=166";
         assert.ok(model.sprite.src.endsWith(cacheVersion),id+" cache version");
-        if(["waterBall","iceArrowRain"].includes(id)){
-            assert.equal(model.sprite.renderer,"canvas-crop",id+" Canvas renderer");
-            assert.deepEqual([model.sprite.frameWidth,model.sprite.frameHeight],[384,384],id+" fixed source crop");
-        }
+        assert.equal(model.sprite.renderer,"dom-sprite",id+" DOM Sprite renderer");
         assert.deepEqual(
             [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
             [4,3,12,7],id
@@ -441,8 +438,6 @@ test("Water Ball renders one sheet centered on the actual living target group",(
         assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
         assert.equal(sprites[0].style.left,"458px");
         assert.equal(sprites[0].style.top,"140px");
-        assert.equal(sprites[0].style["--v143-sprite-dx"],"0px");
-        assert.equal(sprites[0].style["--v143-sprite-dy"],"0px");
         assert.equal(sprites[0].style["--v143-sprite-duration"],"1400ms");
     });
 
@@ -455,7 +450,8 @@ test("Water Ball renders one sheet centered on the actual living target group",(
     assert.equal(beastSprites.length,1);
     assert.equal(beastSprites[0].dataset.targetIndex,"1");
     assert.ok(beastSprites[0].style["--v143-sprite-dx"]);
-    assert.match(css,/@keyframes v166WaterTargetTravel\{/);
+    assert.match(css,/@keyframes v143RasterTravel\{/);
+    assert.doesNotMatch(css,/v166WaterTargetTravel/);
 });
 
 test("enemy Water Ball keeps one live-target group while endpoints resolve",()=>{
@@ -471,8 +467,6 @@ test("enemy Water Ball keeps one live-target group while endpoints resolve",()=>
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.placement,"group");
     assert.equal(sprites[0].dataset.targetIndexes,"0,2");
-    assert.equal(sprites[0].style["--v143-sprite-dx"],"0px");
-    assert.equal(sprites[0].style["--v143-sprite-dy"],"0px");
 });
 
 test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
@@ -536,8 +530,11 @@ test("enemy Tidal Beast discovers one real player endpoint even when damage is a
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetIndex,"2");
-    assert.equal(sprites[0].style["--v143-sprite-target-left"],"379px");
-    assert.equal(sprites[0].style["--v143-sprite-target-top"],"418px");
+    assert.equal(sprites[0].dataset.travel,"true");
+    assert.equal(sprites[0].style.left,"338px");
+    assert.equal(sprites[0].style.top,"140px");
+    assert.equal(sprites[0].style["--v143-sprite-dx"],"41px");
+    assert.equal(sprites[0].style["--v143-sprite-dy"],"278px");
 });
 
 test("late callbacks cannot expand a single-target Tidal Beast cast",()=>{

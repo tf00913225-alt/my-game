@@ -373,17 +373,13 @@ function createContext(options={}){
         assert.equal(completions,1);
     });
 
-    await test("direct badge action trigger shares one director and cleanup path",()=>{
+    await test("direct badge trigger shares one gate-only director while V143 owns rendering",()=>{
         assert.match(source,/window\.v142PlaySkillAnimationFromBadge=function/);
         assert.doesNotMatch(source,/const previous=showSkillNameBadge/);
-        assert.match(source,/animationend/);
-        assert.match(source,/cancelAnimationFrame/);
         assert.match(source,/removeEventListener\("visibilitychange"/);
-        assert.match(source,/registerRenderer/);
-        assert.match(css,/v142ActionClock/);
-        assert.match(css,/data-style="dragon"/);
-        assert.match(css,/data-style="phoenix"/);
-        assert.match(css,/data-style="earthquake"/);
+        assert.doesNotMatch(source,/animationend|cancelAnimationFrame|registerRenderer|createElement\(/);
+        assert.match(css,/visual renderer retired in V174/);
+        assert.doesNotMatch(css,/@keyframes|animation\s*:|v142ActionClock|data-style=/);
     });
 
     await test("元相光明 heals 350 HP and restores 95 SP to every living ally",()=>{

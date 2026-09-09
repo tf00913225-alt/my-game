@@ -214,13 +214,10 @@ test("rapid map double tap does not rewrite committed coordinates or create inst
     assert.deepEqual([state.x,state.y],[80,50],"only the first tap may commit after its smooth movement completes");
 });
 
-test("V143 Fire Flurry reuses the existing Canvas crop renderer instead of adding a second VFX runtime",()=>{
-    const {context}=load();
-    const sprite=value(context,"v143SkillAnimationManifest.explosiveFlurry.sprite");
-    assert.equal(sprite.renderer,"canvas-crop");
-    assert.deepEqual([sprite.frameWidth,sprite.frameHeight,sprite.naturalGrid,sprite.alignToSlots],[384,384,true,true]);
-    assert.equal(sprite.src,"assets/vfx/fire/explosive-flurry-cast.png?v=165");
-    assert.doesNotMatch(source,/v142SkillAnimationDirector\s*=\s*\{/);
+test("Abyss runtime never mutates the shared V143 VFX manifest",()=>{
+    assert.doesNotMatch(source,/patchExistingV143ExplosiveFlurryRenderer/);
+    assert.doesNotMatch(source,/v143SkillAnimationManifest/);
+    assert.doesNotMatch(source,/canvas-crop/);
 });
 
 test("claimed chest survives reload and never respawns",()=>{

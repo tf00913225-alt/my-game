@@ -66,11 +66,12 @@ test("ticket equipment icons open the canonical item detail and return to previe
     assert.match(content,/returningToTicketPreview[\s\S]*rewardModal\.classList\.remove\("v132-detail-paused"\)/);
 });
 
-test("skill labels use exactly two thirds of the owning animation",()=>{
+test("skill labels keep the two-thirds lifetime but remain text-only UI",()=>{
     assert.match(animationTiming,/Math\.round\(config\.duration\*2\/3\)/);
     assert.match(main,/v142GetSkillNameDisplayDuration/);
     assert.match(main,/--skill-name-display-duration/);
-    assert.match(badgeCss,/animation:v143CasterLabel var\(--skill-name-display-duration,347ms\)/);
+    assert.match(badgeCss,/\.skill-name-badge\.v143-caster-skill-label\{[\s\S]*?text-align:center !important;[\s\S]*?text-overflow:ellipsis !important;/);
+    assert.doesNotMatch(badgeCss,/v143CasterLabel|animation\s*:\s*v143CasterLabel/);
     assert.doesNotMatch(oldBadgeFix,/V134_SKILL_BADGE_MS|trimSkillBadgeLifetime/);
     assert.doesNotMatch(animationUi,/badge\.remove\(\); \} \},650/);
 });

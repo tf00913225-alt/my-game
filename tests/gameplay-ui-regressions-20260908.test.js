@@ -5,6 +5,8 @@ const fs=require("node:fs");
 
 const bossRuntime=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const bossCss=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
+const v142Runtime=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
+const v142Css=fs.readFileSync("css/39-v142-skill-animation.css","utf8");
 const vfxRuntime=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
@@ -32,12 +34,15 @@ assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.v141SupportS
 assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?monster\.agility=[\s\S]*?1\.12;[\s\S]*?\}/);
 assert.match(bossRuntime,/if\(element==="earth"\)\{[\s\S]*?monster\.defense=[\s\S]*?monster\.maxHP=[\s\S]*?1\.12\);[\s\S]*?monster\.hp=monster\.maxHP;[\s\S]*?\}/);
 
-/* Official Sprite Sheets own their complete action where present. The retired
-   V142 generic visual stage stays hidden, while its timing gate remains usable. */
-assert.match(vfxCss,/#v142-skill-stage\{display:none !important;\}/);
-assert.match(vfxRuntime,/current\.config\.id==="fireRocket"&&current\.model\.sprite\)\{ return; \}/);
-assert.match(vfxRuntime,/current\.config\.id==="iceSpin"&&current\.model\.sprite\)\{ return; \}/);
-assert.match(vfxRuntime,/if\(current\.model\.sprite\)\{\s*addSprite\(current,index,target\);[\s\S]*?return;\s*\}/);
+/* Formal Sprite Sheets own the complete battle action. V142 is now timing-only:
+   there is no hidden legacy stage to resurrect and no projectile fallback. */
+assert.doesNotMatch(v142Runtime,/createElement\(["']canvas["']\)|getContext\(|requestAnimationFrame\(|<svg\b|v142-skill-stage/);
+assert.doesNotMatch(v142Css,/#v142-skill-stage|@keyframes|animation\s*:/);
+assert.match(vfxRuntime,/if\(typeof playFireRocketAnimation==="function"\)\{ playFireRocketAnimation=function\(\)\{ return; \}; \}/);
+assert.match(vfxRuntime,/if\(typeof playIceSpinProjectile==="function"\)\{ playIceSpinProjectile=function\(\)\{ return; \}; \}/);
+assert.match(vfxRuntime,/if\(current\.model\.sprite\)\{ addSprite\(current,index,target\); \}/);
+assert.doesNotMatch(vfxRuntime,/v149-word-|createElement\(["']canvas["']\)|getContext\(|drawImage\(|<svg\b/);
+assert.match(vfxCss,/@keyframes v143RasterCastFrames/);
 
 /* Relic scrolling must pass the global touch lock from both the body and the
    horizontal category strip. */

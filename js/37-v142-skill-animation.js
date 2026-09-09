@@ -1,26 +1,21 @@
 /* =====================================================
-   V142 — reusable skill-animation director and action gate
-   Visuals are isolated from damage, AI and initiative logic.
+   V142 — combat action timing gate only
+   Visual rendering was retired in V174. V143 owns all battle VFX.
 ===================================================== */
 (function installV142SkillAnimationSystem(){
     "use strict";
 
     if(typeof window==="undefined"){ return; }
-    /* Recover if an earlier runtime load set only the sentinel before it failed. */
     if(window.__v142SkillAnimationInstalled && window.v142SkillAnimationDirector &&
         typeof window.v142PlaySkillAnimationFromBadge==="function"){ return; }
     window.__v142SkillAnimationInstalled=true;
 
-    const VERSION="142";
+    const VERSION="142-gate-only";
     const NORMAL_ANIMATION_MS=520;
     const CURRENT_DECLARE_DELAY_MS=90;
     const CURRENT_RESOLVE_DELAY_MS=1600;
     const CURRENT_ROUND_HANDOFF_MS=400;
 
-    /*
-       Each skill owns presentation timing. The combat engine keeps its existing
-       delay; V142 only waits for the longer of that delay and this animation.
-    */
     const SPECS={
         flameSlash:[760,"basic","slash"],fireCritical:[1050,"medium","impact"],
         explosiveFlurry:[1450,"medium","barrage"],dragonSlash:[2800,"ultimate","dragon"],
@@ -55,13 +50,6 @@
         yuanZuBlessing:[2000,"high","holy-blessing"]
     };
 
-    const COLORS={
-        fire:["#ff5d2e","#ffc05c"],water:["#43c8ff","#d9f6ff"],
-        wind:["#57f3b4","#e6fff5"],earth:["#d7a651","#fff0a3"],
-        light:["#ffe68a","#ffffff"],dark:["#b98cff","#f0dbff"],
-        normal:["#f1e7d3","#ffffff"]
-    };
-
     function patchExtremeEmperorSkills(){
         if(typeof skillDatabase==="undefined"){ return; }
         const heal=skillDatabase.yuanXiangGuangMing;
@@ -80,15 +68,8 @@
         }
         if(!skillDatabase.yuanZuBlessing){
             skillDatabase.yuanZuBlessing={
-                id:"yuanZuBlessing",
-                name:"元祖賜福",
-                element:"light",
-                category:"buff",
-                targetType:"allyAll",
-                maxLevel:1,
-                spCost:45,
-                agilityBonusPercent:75,
-                duration:2,
+                id:"yuanZuBlessing",name:"元祖賜福",element:"light",category:"buff",
+                targetType:"allyAll",maxLevel:1,spCost:45,agilityBonusPercent:75,duration:2,
                 description:"我方全體解除所有負面狀態，並增加敏捷75%，持續2回合。"
             };
         }
@@ -168,185 +149,14 @@
     patchExtremeEmperorSkills();
     applyMetadata();
 
-    function qualityLevel(){
-        const nav=typeof navigator!=="undefined"?navigator:{};
-        const memory=Number(nav.deviceMemory)||4;
-        const cores=Number(nav.hardwareConcurrency)||4;
-        let quality=(memory<=2||cores<=2)?"low":(memory<=4||cores<=4)?"medium":"high";
-        try{
-            if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){
-                quality="low";
-            }
-        }catch(_){}
-        return quality;
-    }
-
     const state={
-        sequence:0,
-        active:null,
-        latest:null,
-        rafId:0,
-        fallbackTimer:0,
-        visibilityHandler:null,
-        targetCards:[],
-        tickets:{declare:null,resolve:null},
-        roundGate:null,
-        completedBoundaries:[],
+        sequence:0,active:null,latest:null,fallbackTimer:0,visibilityHandler:null,
+        tickets:{declare:null,resolve:null},roundGate:null,completedBoundaries:[],
         metrics:{
-            version:VERSION,quality:qualityLevel(),started:0,completed:0,
-            superseded:0,boundariesAdvanced:0,duplicateBoundariesBlocked:0,
-            peakParticles:0,last:null
+            version:VERSION,started:0,completed:0,superseded:0,
+            boundariesAdvanced:0,duplicateBoundariesBlocked:0,last:null
         }
     };
-
-    function ensureStage(){
-        if(typeof document==="undefined"||!document.createElement){ return null; }
-        let stage=document.getElementById("v142-skill-stage");
-        if(stage){ return stage; }
-        stage=document.createElement("div");
-        stage.id="v142-skill-stage";
-        stage.className="v142-skill-stage v142-quality-"+state.metrics.quality;
-        stage.setAttribute("aria-hidden","true");
-        stage.innerHTML=
-            '<canvas class="v142-particle-canvas"></canvas>'+
-            '<div class="v142-vignette"></div><div class="v142-ground"></div>'+
-            '<svg class="v142-vector-stage" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">'+
-                '<circle class="v142-energy-ring" cx="50" cy="50" r="24"></circle>'+
-                '<path class="v142-vector-slash v142-vector-slash-a" d="M15 72 Q48 18 86 32"></path>'+
-                '<path class="v142-vector-slash v142-vector-slash-b" d="M22 24 Q54 82 88 62"></path>'+
-                '<path class="v142-wave-line" d="M3 63 Q18 43 34 63 T66 63 T98 63"></path>'+
-            '</svg>'+
-            '<div class="v142-cast-core"></div><div class="v142-projectile"></div>'+
-            '<div class="v142-summon"></div><div class="v142-impact"></div>'+
-            '<div class="v142-skill-caption"><b></b><span></span></div>'+
-            '<i class="v142-animation-clock"></i>';
-        const host=document.getElementById("battlePage")||document.body||document.documentElement;
-        if(host&&host.appendChild){ host.appendChild(stage); }
-        return stage;
-    }
-
-    function canvasData(canvas){
-        if(!canvas||!canvas.getContext){ return null; }
-        const rect=canvas.getBoundingClientRect?canvas.getBoundingClientRect():{width:0,height:0};
-        const width=Math.max(1,Math.round(rect.width||window.innerWidth||360));
-        const height=Math.max(1,Math.round(rect.height||window.innerHeight||640));
-        const dpr=Math.min(state.metrics.quality==="low"?1:1.5,Number(window.devicePixelRatio)||1);
-        const pixelWidth=Math.round(width*dpr);
-        const pixelHeight=Math.round(height*dpr);
-        if(canvas.width!==pixelWidth||canvas.height!==pixelHeight){
-            canvas.width=pixelWidth;
-            canvas.height=pixelHeight;
-        }
-        const context=canvas.getContext("2d");
-        if(!context){ return null; }
-        context.setTransform(dpr,0,0,dpr,0,0);
-        return {context:context,width:width,height:height};
-    }
-
-    function stopCanvas(){
-        if(state.rafId&&typeof cancelAnimationFrame==="function"){ cancelAnimationFrame(state.rafId); }
-        state.rafId=0;
-        const stage=typeof document!=="undefined"?document.getElementById("v142-skill-stage"):null;
-        const canvas=stage&&stage.querySelector?stage.querySelector(".v142-particle-canvas"):null;
-        const data=canvasData(canvas);
-        if(data){ data.context.clearRect(0,0,data.width,data.height); }
-    }
-
-    function startCanvas(stage,config,startedAt){
-        if(!stage||!stage.querySelector||typeof requestAnimationFrame!=="function"){ return; }
-        stopCanvas();
-        const data=canvasData(stage.querySelector(".v142-particle-canvas"));
-        if(!data){ return; }
-        const colors=COLORS[config.element]||COLORS.normal;
-        const count=state.metrics.quality==="low"?18:state.metrics.quality==="medium"?34:52;
-        const particles=Array.from({length:count},(_,index)=>({
-            x:data.width*(.18+Math.random()*.64),
-            y:data.height*(.3+Math.random()*.48),
-            vx:(Math.random()-.5)*(config.tier==="ultimate"?3.2:1.9),
-            vy:-(.6+Math.random()*2.4),
-            radius:1.5+Math.random()*(config.tier==="ultimate"?5:3),
-            delay:(index%7)/6*config.duration*.38,
-            life:config.duration*(.32+Math.random()*.42)
-        }));
-        state.metrics.peakParticles=Math.max(state.metrics.peakParticles,particles.length);
-        const shadow=state.metrics.quality==="low"?0:state.metrics.quality==="medium"?7:12;
-
-        function frame(){
-            if(!state.active||state.active.startedAt!==startedAt){ return; }
-            const elapsed=Date.now()-startedAt;
-            const context=data.context;
-            context.clearRect(0,0,data.width,data.height);
-            context.globalCompositeOperation="lighter";
-            particles.forEach((particle,index)=>{
-                const local=elapsed-particle.delay;
-                if(local<0||local>particle.life){ return; }
-                const progress=local/particle.life;
-                const spiral=/tornado|tempest|sandstorm/.test(config.style);
-                context.globalAlpha=Math.sin(Math.PI*progress)*.88;
-                context.fillStyle=index%2?colors[0]:colors[1];
-                context.shadowColor=colors[0];
-                context.shadowBlur=shadow;
-                context.beginPath();
-                context.arc(
-                    particle.x+particle.vx*local/12+(spiral?Math.sin(progress*Math.PI*5)*35*(1-progress):0),
-                    particle.y+particle.vy*local/12+(config.style==="earthquake"?Math.sin(index*2.7+elapsed/45)*8:0),
-                    Math.max(.4,particle.radius*(1-progress)),0,Math.PI*2
-                );
-                context.fill();
-            });
-            if(config.tier==="ultimate"||config.style==="earthquake"){
-                const progress=Math.min(1,elapsed/config.duration);
-                context.globalAlpha=Math.max(0,.55-progress*.5);
-                context.strokeStyle=colors[1];
-                context.lineWidth=2+progress*5;
-                context.beginPath();
-                context.arc(data.width/2,data.height*.56,20+progress*Math.min(data.width,data.height)*.38,0,Math.PI*2);
-                context.stroke();
-            }
-            context.globalAlpha=1;
-            context.globalCompositeOperation="source-over";
-            if(elapsed<config.duration){ state.rafId=requestAnimationFrame(frame); }
-            else{ context.clearRect(0,0,data.width,data.height); state.rafId=0; }
-        }
-        state.rafId=requestAnimationFrame(frame);
-    }
-
-    function clearTargets(){
-        state.targetCards.forEach(card=>{
-            if(card&&card.classList){ card.classList.remove("v142-target-hit","v142-target-heavy"); }
-            if(card&&card.style){
-                card.style.removeProperty("--v142-duration");
-                card.style.removeProperty("--v142-color");
-            }
-        });
-        state.targetCards=[];
-    }
-
-    function markTargets(side,actorIndex,config){
-        if(typeof document==="undefined"||!document.getElementById){ return; }
-        clearTargets();
-        const targetSide=side==="monster"?"player":"monster";
-        const wide=/all|row|tri/i.test(String(config.targetType||""))||
-            /barrage|rain|tempest|earthquake|tornado|phoenix|blessing|shield/.test(config.style);
-        let preferred=null;
-        if(side==="player"&&typeof queuedPlayerActions!=="undefined"){
-            const queued=queuedPlayerActions&&queuedPlayerActions[actorIndex];
-            if(queued&&Number.isInteger(queued.target)){ preferred=queued.target; }
-            if(queued&&Number.isInteger(queued.targetAlly)){ preferred=queued.targetAlly; }
-        }
-        const max=targetSide==="monster"?10:3;
-        for(let index=0;index<max;index++){
-            if(!wide&&preferred!==null&&index!==preferred){ continue; }
-            if(!wide&&preferred===null&&index>0){ continue; }
-            const card=document.getElementById(targetSide==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
-            if(!card){ continue; }
-            card.style.setProperty("--v142-duration",config.duration+"ms");
-            card.style.setProperty("--v142-color",(COLORS[config.element]||COLORS.normal)[0]);
-            card.classList.add("v142-target-hit");
-            if(config.tier==="high"||config.tier==="ultimate"){ card.classList.add("v142-target-heavy"); }
-            state.targetCards.push(card);
-        }
-    }
 
     function removeVisibilityHandler(){
         if(state.visibilityHandler&&typeof document!=="undefined"&&document.removeEventListener){
@@ -355,15 +165,9 @@
         state.visibilityHandler=null;
     }
 
-    function cleanup(stage){
-        stopCanvas();
-        clearTargets();
+    function cleanup(){
         removeVisibilityHandler();
         if(state.fallbackTimer){ clearTimeout(state.fallbackTimer); state.fallbackTimer=0; }
-        if(stage){
-            stage.className="v142-skill-stage v142-quality-"+state.metrics.quality;
-            ["data-element","data-tier","data-style","data-side"].forEach(name=>stage.removeAttribute(name));
-        }
     }
 
     function identity(side,name,actorIndex){
@@ -380,17 +184,10 @@
     function createGate(config,key,onComplete){
         let resolvePromise=null;
         const gate={
-            id:++state.sequence,
-            key:key,
+            id:++state.sequence,key:key,
             battleToken:typeof battleToken!=="undefined"?battleToken:null,
-            config:config,
-            startedAt:Date.now(),
-            deadline:0,
-            done:false,
-            reason:null,
-            completionCount:0,
-            promise:null,
-            complete:null
+            config:config,startedAt:Date.now(),deadline:0,done:false,reason:null,
+            completionCount:0,promise:null,complete:null
         };
         gate.deadline=gate.startedAt+Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0);
         gate.promise=new Promise(resolve=>{ resolvePromise=resolve; });
@@ -401,7 +198,7 @@
             gate.completionCount++;
             if(state.active===gate){ state.active=null; }
             state.metrics.completed++;
-            cleanup(typeof document!=="undefined"?document.getElementById("v142-skill-stage"):null);
+            cleanup();
             resolvePromise(gate);
             return true;
         };
@@ -426,51 +223,22 @@
             resolveDuration:config.resolveDuration,tier:config.tier,
             style:config.style,element:config.element,side:meta.side||"player"
         };
-        if(meta.render===false){ return gate; }
 
-        const stage=ensureStage();
-        if(!stage){
-            state.fallbackTimer=setTimeout(()=>gate.complete("headless-fallback"),config.resolveDuration);
-            return gate;
+        /* V142 is intentionally visual-free. V143 replaces director.play and
+           passes render:false while it renders the formal image Sprite Sheet.
+           If V143 is unavailable, timing still completes without a substitute VFX. */
+        if(meta.render!==false){
+            state.fallbackTimer=setTimeout(
+                ()=>gate.complete("v142-timing-only"),
+                Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
+            );
+            if(typeof document!=="undefined"&&document.addEventListener){
+                state.visibilityHandler=function(){
+                    if(!document.hidden&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
+                };
+                document.addEventListener("visibilitychange",state.visibilityHandler);
+            }
         }
-        const colors=COLORS[config.element]||COLORS.normal;
-        stage.style.setProperty("--v142-duration",config.duration+"ms");
-        stage.style.setProperty("--v142-color",colors[0]);
-        stage.style.setProperty("--v142-color-soft",colors[1]);
-        stage.setAttribute("data-element",config.element);
-        stage.setAttribute("data-tier",config.tier);
-        stage.setAttribute("data-style",config.style);
-        stage.setAttribute("data-side",meta.side||"player");
-
-        const caption=stage.querySelector(".v142-skill-caption");
-        if(caption){
-            caption.querySelector("b").textContent=config.name;
-            caption.querySelector("span").textContent=
-                config.tier==="ultimate"?"終極演出":config.tier==="high"?"高階技能":
-                config.element==="normal"?"一般行動":"元素技能";
-        }
-        const clock=stage.querySelector(".v142-animation-clock");
-        stage.classList.remove("v142-active");
-        if(clock){ clock.classList.remove("v142-clock-running"); }
-        void stage.offsetWidth;
-        stage.classList.add("v142-active");
-        stage.classList.add(config.tier==="ultimate"?"v142-screen-shake-heavy":"v142-screen-shake");
-        if(clock){
-            clock.classList.add("v142-clock-running");
-            clock.addEventListener("animationend",event=>{
-                if(event.target===clock&&event.animationName==="v142ActionClock"){
-                    gate.complete("animationend");
-                }
-            },{once:true});
-        }
-        markTargets(meta.side||"player",meta.actorIndex,config);
-        startCanvas(stage,config,gate.startedAt);
-
-        state.fallbackTimer=setTimeout(()=>gate.complete("fallback"),config.resolveDuration+450);
-        state.visibilityHandler=function(){
-            if(!document.hidden&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
-        };
-        document.addEventListener("visibilitychange",state.visibilityHandler);
         return gate;
     }
 
@@ -484,19 +252,14 @@
             state.tickets.resolve=null;
             state.roundGate=null;
             if(state.active&&!state.active.done){ state.active.complete("dispose"); }
-            else{ cleanup(typeof document!=="undefined"?document.getElementById("v142-skill-stage"):null); }
+            else{ cleanup(); }
         },
         notifyVisibilityReturn:function(){
             const gate=state.active;
             if(gate&&!gate.done&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
-        },
-        registerRenderer:function(name,renderer){
-            if(typeof name!=="string"||typeof renderer!=="function"){ return false; }
-            director.renderers[name]=renderer;
-            return true;
-        },
-        renderers:Object.create(null)
+        }
     };
+
     window.v142SkillAnimationDirector=director;
     window.v142GetSkillAnimationConfig=function(skillId){
         const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
@@ -519,15 +282,10 @@
         const config=animationConfig(null,name,element);
         if(config.category==="passive"||config.targetType==="none"){ return null; }
         return director.play(config,{
-            side:side,
-            actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
+            side:side,actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
             key:identity(side,name,actorIndex)
         });
     }
-
-    /* Battle's source badge functions own the action boundary. Export one
-       direct trigger there instead of depending on a wrapper chain that later
-       runtimes can temporarily replace. */
     window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex){
         return startFromBadge(side,name,element,actorIndex);
     };
@@ -541,7 +299,9 @@
 
     function rememberBoundary(key){
         state.completedBoundaries.push(key);
-        if(state.completedBoundaries.length>48){ state.completedBoundaries.splice(0,state.completedBoundaries.length-48); }
+        if(state.completedBoundaries.length>48){
+            state.completedBoundaries.splice(0,state.completedBoundaries.length-48);
+        }
     }
 
     function runTicket(kind,ticket,invoke){
@@ -572,8 +332,7 @@
 
     function partyDefeated(){
         if(typeof getPartyCharacterByIndex!=="function"){ return false; }
-        let found=false;
-        let alive=false;
+        let found=false,alive=false;
         for(let index=0;index<3;index++){
             const character=getPartyCharacterByIndex(index);
             if(character){ found=true; if(character.hp>0){ alive=true; } }
@@ -595,8 +354,7 @@
                 const lock="terminal|"+gate.id;
                 if(terminalLocks.has(lock)){ return; }
                 terminalLocks.add(lock);
-                const that=this;
-                const args=arguments;
+                const that=this,args=arguments;
                 gate.promise.then(()=>{
                     terminalLocks.delete(lock);
                     if(typeof battleActive!=="undefined"&&!battleActive){ return; }
@@ -628,17 +386,10 @@
                 };
             }else if(phase==="resolve"&&typeof initiativeIndex!=="undefined"&&initiativeIndex!==beforeResolve){
                 const roundEnded=typeof initiativeQueue!=="undefined"&&initiativeIndex>=initiativeQueue.length;
-                state.roundGate=roundEnded&&boundaryGate
-                    ?{token:token,gate:boundaryGate,consumed:false}
-                    :null;
+                state.roundGate=roundEnded&&boundaryGate?{token:token,gate:boundaryGate,consumed:false}:null;
                 state.tickets.resolve={
                     token:token,round:typeof turn!=="undefined"?turn:0,index:initiativeIndex,
-                    /* The last combatant must also hold processNextCombatant.
-                       Waiting only inside beginCharacterTurn was too late:
-                       startTurn had already switched to declare and exposed
-                       the manual HUD while the last animation was playing. */
-                    gate:boundaryGate,
-                    gateId:boundaryGate?boundaryGate.id:"none",
+                    gate:boundaryGate,gateId:boundaryGate?boundaryGate.id:"none",
                     earliestAt:Math.max(
                         calledAt+(delayOverride===null?resolveDelay(initiativeIndex):delayOverride),
                         boundaryGate?boundaryGate.deadline:0
@@ -655,8 +406,7 @@
         beginCharacterTurn=function(token){
             const ticket=state.tickets.declare;
             if(ticket&&ticket.token===token&&typeof activeBattleCharacterIndex!=="undefined"&&ticket.index===activeBattleCharacterIndex){
-                const that=this;
-                const args=arguments;
+                const that=this,args=arguments;
                 runTicket("declare",ticket,()=>previous.apply(that,args));
                 return;
             }
@@ -671,8 +421,7 @@
                     return;
                 }
                 roundGate.consumed=true;
-                const that=this;
-                const args=arguments;
+                const that=this,args=arguments;
                 roundGate.gate.promise.then(()=>{
                     if(state.roundGate!==roundGate){ return; }
                     state.roundGate=null;
@@ -691,8 +440,7 @@
         processNextCombatant=function(token){
             const ticket=state.tickets.resolve;
             if(ticket&&ticket.token===token&&typeof initiativeIndex!=="undefined"&&ticket.index===initiativeIndex){
-                const that=this;
-                const args=arguments;
+                const that=this,args=arguments;
                 runTicket("resolve",ticket,()=>previous.apply(that,args));
                 return;
             }
@@ -704,37 +452,32 @@
         if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
         return currentBattleMonsters.map(index=>monsters[index]).filter(monster=>monster&&monster.alive);
     }
-
     function baseMaxHp(monster){
         return monster&&monster.v141Shield
             ?Number(monster.v141Shield.baseMaxHP)||Number(monster.maxHP)||0
             :Number(monster&&monster.maxHP)||0;
     }
-
     function baseHp(monster){
         const shield=monster&&monster.v141Shield?Math.max(0,Number(monster.v141Shield.remaining)||0):0;
         return Math.max(0,(Number(monster&&monster.hp)||0)-shield);
     }
-
     function restoreSp(monster,amount){
         const max=Math.max(0,Number(monster&&monster.maxSP)||Number(monster&&monster.sp)||0);
         const before=Math.max(0,Number(monster&&monster.sp)||0);
         monster.sp=Math.min(max,before+amount);
         return monster.sp-before;
     }
-
     function clearNegativeStates(monster){
         const removed=Array.isArray(monster&&monster.statusEffects)?monster.statusEffects.length:0;
         if(monster){ monster.statusEffects=[]; }
         return removed;
     }
-
     function applyBlessing(monster){
         if(!monster||!monster.alive){ return; }
         let blessing=monster.v142AgilityBlessing;
         if(!blessing){
             const original=Math.max(0,Number(monster.agility)||0);
-            const display={type:"v141TeamBuff",v141BuffType:"agility",turnsLeft:2};
+            const display={type:"v141TeamBuff",v141BuffType:"agility",turnsLeft:2,statusName:"元祖賜福"};
             blessing={originalAgility:original,turnsLeft:2,displayBuff:display};
             monster.v142AgilityBlessing=blessing;
             monster.agility=Math.round(original*1.75);
@@ -780,8 +523,7 @@
         }
 
         if(skillId==="yuanXiangGuangMing"){
-            let hpTotal=0;
-            let spTotal=0;
+            let hpTotal=0,spTotal=0;
             allies.forEach(ally=>{
                 const healed=typeof window.v141HealMonsterPreservingShield==="function"
                     ?window.v141HealMonsterPreservingShield(ally,350)

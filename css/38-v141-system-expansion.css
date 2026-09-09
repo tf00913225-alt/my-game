@@ -275,11 +275,11 @@
 
 #game-stage #battleMonsterArea .v131-monster-row .battle-monster,
 #game-stage > #app > #game-content #battlePage .battle-monster{
-    flex:0 0 76px !important;
-    width:76px !important;
-    max-width:76px !important;
-    height:100px !important;
-    min-height:100px !important;
+    flex:0 0 var(--v143-monster-card-width,76px) !important;
+    width:var(--v143-monster-card-width,76px) !important;
+    max-width:var(--v143-monster-card-width,76px) !important;
+    height:var(--v143-monster-card-height,100px) !important;
+    min-height:var(--v143-monster-card-height,100px) !important;
     padding:3px 3px 4px !important;
     justify-content:flex-start !important;
     box-sizing:border-box !important;
@@ -351,9 +351,9 @@
 }
 
 #game-stage > #app > #game-content #battlePage .battle-player-row{
-    flex-basis:138px !important;
-    height:138px !important;
-    min-height:138px !important;
+    flex-basis:144px !important;
+    height:144px !important;
+    min-height:144px !important;
     padding-bottom:18px !important;
     box-sizing:border-box;
     overflow:visible !important;
@@ -361,7 +361,7 @@
 
 #game-stage > #app > #game-content #battlePage .battle-player{
     width:118px !important;
-    height:116px !important;
+    height:122px !important;
     overflow:visible !important;
 }
 
@@ -395,143 +395,6 @@
     0%,100%{opacity:1;box-shadow:0 0 0 2px #fff0aa,0 0 15px 6px rgba(255,178,43,.95);}
     50%{opacity:.5;box-shadow:0 0 0 4px #ffe491,0 0 29px 11px rgba(255,145,22,.86);}
 }
-
-/* ----- Persistent card state effects ----- */
-#game-stage #battlePage .v141-card-effects,
-#game-stage #battlePage .v141-effect-canvas{
-    position:absolute;
-    inset:0;
-    z-index:42;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    border-radius:inherit;
-    pointer-events:none;
-}
-
-#game-stage #battlePage .v141-effect-canvas{z-index:48;}
-
-#game-stage #battlePage .v141-effect{
-    position:absolute;
-    inset:0;
-    display:block;
-    border-radius:inherit;
-    pointer-events:none;
-}
-
-#game-stage #battlePage .v141-effect-burn{
-    top:35%;
-    background:
-        radial-gradient(ellipse at 20% 100%,rgba(255,228,84,.9) 0 7%,rgba(255,74,18,.7) 9%,transparent 26%),
-        radial-gradient(ellipse at 55% 100%,rgba(255,236,106,.85) 0 8%,rgba(255,56,15,.65) 10%,transparent 31%),
-        radial-gradient(ellipse at 82% 100%,rgba(255,203,58,.8) 0 6%,rgba(238,40,10,.55) 9%,transparent 25%);
-    mix-blend-mode:screen;
-    animation:v141BurnFlicker .55s ease-in-out infinite alternate;
-}
-
-#game-stage #battlePage .v141-effect-stun::before{
-    content:"✦　✧　✦";
-    position:absolute;
-    left:3px;
-    right:3px;
-    top:2px;
-    color:#fff58b;
-    font-size:12px;
-    letter-spacing:1px;
-    text-shadow:0 0 6px #ffdc38;
-    animation:v141StunOrbit 1.15s linear infinite;
-}
-
-#game-stage #battlePage .v141-effect-freeze{
-    border:2px solid rgba(154,226,255,.85);
-    background:
-        linear-gradient(55deg,transparent 40%,rgba(218,249,255,.45) 42% 44%,transparent 46%),
-        linear-gradient(125deg,transparent 52%,rgba(161,224,255,.4) 54% 57%,transparent 59%),
-        rgba(74,172,235,.18);
-    box-shadow:inset 0 0 14px rgba(170,234,255,.65),0 0 8px rgba(114,210,255,.7);
-    animation:v141FrozenGleam 1.7s ease-in-out infinite;
-}
-
-#game-stage #battlePage .v141-effect-petrify{
-    background:
-        repeating-linear-gradient(145deg,rgba(161,151,130,.12) 0 7px,rgba(79,74,65,.25) 8px 11px),
-        rgba(91,88,79,.28);
-    box-shadow:inset 0 0 0 2px rgba(195,184,156,.48),inset 0 0 18px rgba(33,32,29,.72);
-    filter:saturate(.35);
-}
-
-#game-stage #battlePage .v141-effect-shield{
-    inset:2px;
-    border:2px solid rgba(243,252,255,.92);
-    box-shadow:inset 0 0 13px rgba(200,239,255,.34),0 0 9px rgba(225,246,255,.75);
-    animation:v141ShieldPulse 1.25s ease-in-out infinite;
-}
-
-#game-stage #battlePage .v141-effect-barrier{
-    inset:-2px;
-    border:2px double #ffe48f;
-    box-shadow:inset 0 0 15px rgba(255,193,46,.26),0 0 12px rgba(255,198,66,.75);
-    animation:v141BarrierSpin 2.2s ease-in-out infinite;
-}
-
-#game-stage #battlePage .v141-effect-barrier::before{
-    content:"界";
-    position:absolute;
-    right:3px;
-    top:2px;
-    width:19px;
-    height:19px;
-    border:1px solid #ffe6a4;
-    border-radius:50%;
-    color:#fff0b6;
-    background:rgba(74,45,8,.65);
-    font-size:12px;
-    line-height:18px;
-    text-align:center;
-}
-
-#game-stage #battlePage .v141-effect-defenseDown::before,
-#game-stage #battlePage .v141-effect-agilityDown::before,
-#game-stage #battlePage .v141-effect-damageDown::before,
-#game-stage #battlePage .v141-effect-statDown::before{
-    position:absolute;
-    right:4px;
-    bottom:15px;
-    padding:1px 3px;
-    border-radius:4px;
-    color:#fff;
-    background:rgba(90,11,18,.82);
-    font-size:9px;
-    font-weight:900;
-    line-height:13px;
-    box-shadow:0 0 6px rgba(255,63,77,.6);
-    animation:v141DebuffDrop .95s ease-in-out infinite;
-}
-
-#game-stage #battlePage .v141-effect-defenseDown::before{content:"防↓";}
-#game-stage #battlePage .v141-effect-agilityDown::before{content:"敏↓";background:rgba(83,30,112,.86);}
-#game-stage #battlePage .v141-effect-damageDown::before{content:"傷↓";}
-#game-stage #battlePage .v141-effect-statDown::before{content:"弱↓";}
-
-#game-stage #battlePage .v141-effect-buff::before{
-    content:"✦";
-    position:absolute;
-    left:5px;
-    top:4px;
-    color:#b5ffad;
-    font-size:16px;
-    text-shadow:0 0 7px #60e96f;
-    animation:v141BuffSpark 1.1s ease-in-out infinite;
-}
-
-
-@keyframes v141BurnFlicker{from{opacity:.58;transform:scaleY(.92)}to{opacity:1;transform:scaleY(1.06)}}
-@keyframes v141StunOrbit{0%{transform:translateX(-2px) rotate(-4deg)}50%{transform:translateX(2px) rotate(4deg)}100%{transform:translateX(-2px) rotate(-4deg)}}
-@keyframes v141FrozenGleam{50%{filter:brightness(1.35);box-shadow:inset 0 0 22px rgba(205,246,255,.8),0 0 12px #7ed7ff}}
-@keyframes v141ShieldPulse{50%{opacity:.62;transform:scale(.97)}}
-@keyframes v141BarrierSpin{50%{filter:hue-rotate(15deg) brightness(1.25);transform:scale(1.025)}}
-@keyframes v141DebuffDrop{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}
-@keyframes v141BuffSpark{0%,100%{opacity:.45;transform:scale(.7) rotate(0)}50%{opacity:1;transform:scale(1.25) rotate(45deg)}}
 
 /* ----- One-second battle transitions + directional card staging ----- */
 #game-stage #battlePage .v141-battle-transition{

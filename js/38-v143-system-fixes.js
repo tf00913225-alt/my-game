@@ -299,38 +299,9 @@
         ));
     }
 
-    function syncEarthShieldCard(card,entity){
-        if(!card){ return; }
-        if(card.classList.contains("v143-effects-pending")){ return; }
-        let layer=card.querySelector(":scope > .v141-card-effects");
-        if(!layer){
-            layer=document.createElement("div");
-            layer.className="v141-card-effects";
-            layer.setAttribute("aria-hidden","true");
-            card.appendChild(layer);
-        }
-        const active=hasActiveBuffType(entity,"earthShield");
-        const spriteOwnsEarthShield=!!(
-            window.v143StatusSpriteManifest&&window.v143StatusSpriteManifest.earthShield
-        );
-        let effect=layer.querySelector(":scope > .v143-earth-shield-effect");
-        if(active&&!spriteOwnsEarthShield&&!effect){
-            effect=document.createElement("span");
-            effect.className="v143-earth-shield-effect";
-            effect.innerHTML="<i></i><i></i><i></i><i></i><b>象</b>";
-            layer.appendChild(effect);
-        }else if((!active||spriteOwnsEarthShield)&&effect){ effect.remove(); }
-        const realBarrier=hasActiveBuffType(entity,"barrier")||!!(entity&&entity.v141Shield&&entity.v141Shield.isBarrier);
-        const oldBarrier=layer.querySelector(":scope > .v141-effect-barrier");
-        if(active&&!realBarrier&&oldBarrier){ oldBarrier.remove(); }
-        if(realBarrier&&!oldBarrier){
-            const barrier=document.createElement("span");
-            barrier.className="v141-effect v141-effect-barrier";
-            layer.insertBefore(barrier,layer.firstChild||null);
-        }
-    }
+    function syncEarthShieldCard(){ return; }
 
-    function syncEarthShieldEffects(){
+                            function syncEarthShieldEffects(){
         if(typeof document==="undefined"){ return; }
         for(let index=0;index<3;index++){
             const entity=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;

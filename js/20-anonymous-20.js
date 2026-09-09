@@ -453,7 +453,7 @@ function vAssetUrl(path){
         const link=document.createElement("link");
         link.id="v141-system-expansion-style";
         link.rel="stylesheet";
-        link.href=vAssetUrl("css/38-v141-system-expansion.css");
+        link.href=vAssetUrl("css/38-v141-system-expansion.css")+"&patch=boss-card-ui-20260909";
         document.head.appendChild(link);
     }
 
@@ -489,7 +489,7 @@ function vAssetUrl(path){
         const link=document.createElement("link");
         link.id="v143-combat-dungeon-polish-style";
         link.rel="stylesheet";
-        link.href=vAssetUrl("css/40-v143-combat-dungeon-polish.css");
+        link.href=vAssetUrl("css/40-v143-combat-dungeon-polish.css")+"&patch=boss-card-ui-20260909";
         document.head.appendChild(link);
     }
 
@@ -678,7 +678,7 @@ function vAssetUrl(path){
         {id:"v141-content-systems-runtime",src:"js/36-v141-content-systems.js"},
         {id:"v142-skill-animation-runtime",src:"js/37-v142-skill-animation.js"},
         {id:"v143-system-fixes-runtime",src:"js/38-v143-system-fixes.js"},
-        {id:"v143-skill-animation-runtime",src:"js/39-v143-skill-animation.js"},
+        {id:"v143-skill-animation-runtime",src:"js/39-v143-skill-animation.js",cacheKey:"boss-mechanism-vfx-20260909"},
         {id:"v144-rules-and-abyss-runtime",src:"js/40-v144-rules-and-abyss.js"},
         {id:"v146-system-polish-runtime",src:"js/41-v146-system-polish.js"},
         {id:"v148-combat-dungeon-fixes-runtime",src:"js/42-v148-combat-dungeon-fixes.js"},
@@ -719,7 +719,7 @@ function vAssetUrl(path){
         const script=document.createElement("script");
         script.id=runtime.id;
         script.async=false;
-        script.src=vAssetUrl(runtime.src);
+        script.src=vAssetUrl(runtime.src)+(runtime.cacheKey?"&patch="+runtime.cacheKey:"");
         script.addEventListener("load",function(){
             script.dataset.loaded="1";
             if(typeof window!=="undefined"&&typeof window.__v173ReportRuntimeProgress==="function"){ window.__v173ReportRuntimeProgress(runtime.id,runtime.src); }

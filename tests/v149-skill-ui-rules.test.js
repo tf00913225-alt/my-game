@@ -331,54 +331,19 @@ test("enemy Dragon Slash adds a second repeat after a critical first repeat",()=
     assert.equal(finishes,1);
 });
 
-test("word-circle animation emits one circle per character without replacing sprite sheets",()=>{
-    const delays=[];
-    const flights=Array.from({length:4},(_,index)=>({
-        dataset:{order:String(index)},style:{
-            value:"100ms",getPropertyValue(){ return this.value; },
-            setProperty(name,value){ this.value=value; delays[index]=value; }
-        }
-    }));
-    const stage={classList:{add(){}},querySelectorAll:()=>flights};
-    let played=null;
-    const director={play(config){ played=config; return {done:true,promise:Promise.resolve()}; }};
-    const context=load({
-        v142SkillAnimationDirector:director,
-        v143SkillAnimationManifest:{flameSlash:{sprite:{frames:12}}},
-        document:bareDocument({
-            querySelector:selector=>selector.includes("v149-word-phoenixCry")?stage:null
-        })
-    });
-    context.v142SkillAnimationDirector.play({
-        id:"phoenixCry",name:"火鳳天鳴",element:"fire",category:"magic",targetType:"all",duration:3200
-    },{side:"player",actorIndex:0});
-    assert.equal(played.id,"v149-word-phoenixCry");
-    assert.equal(context.v143SkillAnimationManifest[played.id].sequence,"火鳳天鳴");
-    assert.equal(context.v143SkillAnimationManifest[played.id].flightCount,4);
-    assert.deepEqual(delays,["100ms","120ms","140ms","160ms"]);
-    context.v142SkillAnimationDirector.play({
-        id:"flameSlash",name:"火焰斬",element:"fire",category:"physical",targetType:"single",duration:760
-    },{side:"player",actorIndex:0});
-    assert.equal(played.id,"flameSlash");
-    assert.equal(context.v143SkillAnimationManifest["v149-word-flameSlash"],undefined);
-    context.v143SkillAnimationManifest.iceArrowRain={sprite:{frames:12}};
-    context.v142SkillAnimationDirector.play({
-        id:"iceArrowRain",name:"冰霜箭雨",element:"water",category:"magic",targetType:"all",duration:2500
-    },{side:"player",actorIndex:0});
-    assert.equal(played.id,"iceArrowRain");
-    assert.equal(context.v143SkillAnimationManifest["v149-word-iceArrowRain"],undefined);
-    assert.match(animationSource,/const repeats=Math\.max\(1,requested\)/);
-    assert.match(css,/v149-word-circle-stage \.v143-skill-flight/);
-    assert.doesNotMatch(css,/data-skill="v149-word-flameSlash"/);
+test("procedural word-circle fallback is retired",()=>{
+    assert.doesNotMatch(source,/installWordCircleDirector|v149-word-/);
+    assert.doesNotMatch(css,/v149-word-circle-stage/);
+    assert.match(animationSource,/missingVisuals/);
 });
 
-test("Barrier corners, revive brightness, rank colours and reflect label are final rules",()=>{
+test("Barrier is raster-owned while revive, rank and reflect feedback remain",()=>{
     assert.match(source,/remove\("dead","dying","v146-defeated"\)/);
     assert.match(source,/setTimeout\(\(\)=>syncMonsterCard\(index\),1900\)/);
-    assert.match(css,/\.v149-barrier-corners i:nth-child\(4\)/);
-    assert.match(css,/border-color:#c79520/);
+    assert.doesNotMatch(source,/v149-barrier-corners/);
+    assert.doesNotMatch(css,/v149-barrier-corners|v149BarrierCornerPulse/);
+    assert.match(animationSource,/barrier:statusSheet\("assets\/vfx\/earth\/barrier-loop\.png\?v=173\.39",1200,"activeBuffs"/);
     assert.match(css,/battle-monster\.v149-has-barrier \.v141-monster-shield-bar[\s\S]*display:none/);
-    assert.doesNotMatch(css,/v149-barrier-corners[\s\S]{0,1000}content:"界"/);
     assert.match(css,/data-rank="elite"[\s\S]*#ff9f43/);
     assert.match(css,/data-rank="boss"[\s\S]*#ff5f9d/);
     assert.match(source,/反傷HP-/);
