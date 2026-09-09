@@ -64,7 +64,7 @@ enforceNoTinyText(owners.qa, (text) => text.split('/* DEV-only ad simulator')[0]
 enforceNoTinyText(owners.relic, (text) => text
   .split('#game-stage .team-relic-battle-banner')[0]
   .replace('font-size:0!important', ''));
-enforceNoTinyText(owners.gameplay, (text) => text.split('/* ---------- Boss mechanism slot ---------- */')[0]);
+enforceNoTinyText(owners.gameplay, (text) => text.split('/* ---------- Boss battle portrait / mechanism UI ---------- */')[0]);
 
 // Mixed V146 owner: only its non-battle region is governed by this task.
 const nonBattlePolish = homePolish
@@ -111,11 +111,12 @@ for (const designPx of [34,36,39,41,46]) {
 }
 
 // Explicitly protect battle exclusions: these integrated battle values are intentional.
-assert.match(gameplay, /\.boss-mechanism-kind\{[\s\S]*?font-size:12px/);
-assert.match(gameplay, /\.boss-mechanism-name\{[\s\S]*?font-size:10px/);
-// 2026-09-09: mechanism HP is intentionally heavier than the surrounding battle copy.
+// The new mechanism face is more legible (14/13) but its compact HP remains an
+// intentional battle-only 11px exception; detailed copy lives in the 13px+ panel.
+assert.match(gameplay, /\.boss-mechanism-kind\{[\s\S]*?font-size:13px/);
+assert.match(gameplay, /\.boss-mechanism-name\{[\s\S]*?font-size:14px/);
 assert.match(gameplay, /\.boss-mechanism-hp\{[\s\S]*?font-size:11px[\s\S]*?font-weight:900/);
-assert.match(gameplay, /\.boss-mechanism-card\[data-type="charge"\] \.boss-mechanism-effect\{[\s\S]*?font-size:10px/);
+assert.match(gameplay, /\.boss-mechanism-info-effect\{[\s\S]*?font-size:13px/);
 assert.match(gameplay, /\.boss-mechanism-toast\{[\s\S]*?font-size:11px/);
 assert.match(relic, /\.team-relic-battle-banner b\{[^}]*17px/);
 assert.match(relic, /#battlePage \.battle-player \.team-relic-sp-float\{[^}]*13px/);

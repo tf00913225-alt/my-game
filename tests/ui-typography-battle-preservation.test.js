@@ -6,6 +6,7 @@ const cp=require("node:child_process");
 
 const BASE="39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5";
 const GAMEPLAY_BATTLE_BASE="4a592dd4c41d7efb1a4849fbfe0cbf68598121bf";
+const WORK_BASE="29b9668057846164a941fbf6617d2458d9af5476";
 const current=file=>fs.readFileSync(file,"utf8");
 const at=(ref,file)=>cp.execFileSync("git",["show",`${ref}:${file}`],{encoding:"utf8",maxBuffer:16*1024*1024});
 const base=file=>at(BASE,file);
@@ -21,30 +22,6 @@ function segment(text,start,end){
 
 function sameSegment(file,start,end,reference=BASE){
     assert.equal(segment(current(file),start,end),segment(at(reference,file),start,end),`${file} battle-owned segment changed`);
-}
-
-function removeExactCssRules(text,selectors){
-    let result=text;
-    for(const selector of selectors){
-        const needle=selector+"{";
-        for(;;){
-            const start=result.indexOf(needle);
-            if(start<0){ break; }
-            const open=result.indexOf("{",start);
-            let depth=0;
-            let end=-1;
-            for(let i=open;i<result.length;i+=1){
-                if(result[i]==="{"){ depth+=1; }
-                else if(result[i]==="}"){
-                    depth-=1;
-                    if(depth===0){ end=i+1;break; }
-                }
-            }
-            assert.ok(end>open,`unterminated CSS rule: ${selector}`);
-            result=result.slice(0,start)+result.slice(end);
-        }
-    }
-    return normalize(result);
 }
 
 function retireV143EarthShieldSelector(text){
@@ -88,34 +65,47 @@ assert.match(current("css/42-v146-system-polish.css"),/#game-stage #battlePage #
 assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-earth-shield-effect/);
 assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|v143-skill-field|v143-hit-impact|v146-flight-art/);
 
-// Gameplay has a clean battle-only tail. The 2026-09-09 BOSS-card readability
-// requirement intentionally owns only the mechanism slot/base-card/HP presentation.
-// Keep every other BOSS battle rule byte-equivalent to the approved gameplay base
-// instead of weakening this guard for the whole tail.
+// This requirement intentionally expands the Gameplay BOSS battle UI owner: the
+// redundant title is removed, the active Gameplay BOSS becomes a large 9:16 card,
+// the mechanism target card becomes 9:16, and detail moves to a right-side alert.
+// Preserve every pre-battle Gameplay panel rule against the exact dev work base,
+// while the existing protected-BOSS / toast / animation tail remains anchored to
+// the previously approved Gameplay battle baseline.
 {
     const file="css/gameplay-boss-tower.css";
-    const start="/* ---------- Boss mechanism slot ---------- */";
-    const ownedSelectors=[
-        "#game-stage #battleMonsterArea .boss-mechanism-slot",
-        "#game-stage #battleMonsterArea .boss-mechanism-card",
-        "#game-stage #battleMonsterArea .boss-mechanism-hp,\n#game-stage #battleMonsterArea .boss-mechanism-effect",
-        "#game-stage #battleMonsterArea .boss-mechanism-hp",
-        "#game-stage #battleMonsterArea .boss-mechanism-effect"
-    ];
-    const now=segment(current(file),start,null);
-    const approved=segment(at(GAMEPLAY_BATTLE_BASE,file),start,null);
+    const now=current(file);
+    const workBase=at(WORK_BASE,file);
+    const approved=at(GAMEPLAY_BATTLE_BASE,file);
+    const newMarker="/* ---------- Boss battle portrait / mechanism UI ---------- */";
+    const oldMarker="/* ---------- Boss mechanism slot ---------- */";
+    const nowMarker=now.indexOf(newMarker);
+    const workBaseMarker=workBase.indexOf(oldMarker);
+    assert.ok(nowMarker>0,"new Gameplay BOSS battle owner marker missing");
+    assert.ok(workBaseMarker>0,"work-base Gameplay BOSS battle owner marker missing");
     assert.equal(
-        removeExactCssRules(now,ownedSelectors),
-        removeExactCssRules(approved,ownedSelectors),
-        `${file} non-owned BOSS battle rules changed`
+        normalize(now.slice(0,nowMarker)),
+        normalize(workBase.slice(0,workBaseMarker)),
+        `${file} non-battle Gameplay panel rules changed from work base`
     );
 
-    // The carved-out rules still keep their established positioning/interaction
-    // contract while allowing only the requested size and HP-weight changes.
-    assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?position:absolute;[\s\S]*?z-index:18;[\s\S]*?top:104px;[\s\S]*?left:50%;[\s\S]*?width:252px;[\s\S]*?min-height:86px;[\s\S]*?pointer-events:none;/);
-    assert.match(now,/\.boss-mechanism-card\{[\s\S]*?width:120px;[\s\S]*?min-height:84px;[\s\S]*?border:2px solid var\(--mechanism-color,#d5aa56\);[\s\S]*?pointer-events:auto;[\s\S]*?animation:gameplayMechanismEnter \.24s ease-out both;/);
-    assert.match(now,/\.boss-mechanism-hp\{[\s\S]*?min-height:18px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
-    assert.match(now,/\.boss-mechanism-effect\{ color:#b9ad98; \}/);
+    const protectedStart="#game-stage #battlePage .battle-monster.gameplay-boss-protected{";
+    const motionStart="@media (prefers-reduced-motion:reduce){";
+    assert.equal(
+        segment(now,protectedStart,motionStart),
+        segment(approved,protectedStart,motionStart),
+        `${file} protected-BOSS/toast/legacy mechanism animations changed outside this UI requirement`
+    );
+
+    assert.match(now,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
+    assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-23px;/);
+    assert.doesNotMatch(now,/!important/);
+    assert.match(now,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?--v143-monster-card-width:166px;[\s\S]*?--v143-monster-card-height:295px;[\s\S]*?aspect-ratio:9 \/ 16;/);
+    assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?position:relative;[\s\S]*?display:none;[\s\S]*?width:100%;[\s\S]*?pointer-events:none;/);
+    assert.match(now,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
+    assert.match(now,/\.boss-mechanism-card\{[\s\S]*?width:78px;[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?pointer-events:auto;[\s\S]*?animation:gameplayMechanismEnter \.24s ease-out both;/);
+    assert.match(now,/\.boss-mechanism-hp\{[\s\S]*?min-height:19px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
+    assert.match(now,/\.boss-mechanism-info-alert\{[\s\S]*?border-radius:50%;[\s\S]*?animation:gameplayMechanismInfoAlert \.48s ease-in-out infinite;/);
+    assert.match(now,/\.boss-mechanism-info-panel\{[\s\S]*?width:170px;[\s\S]*?height:302px;[\s\S]*?aspect-ratio:9 \/ 16;/);
 }
 
 // Relic battle rules are followed by a small-screen media block that owns the
@@ -127,4 +117,4 @@ sameSegment(
     "@media(max-width:390px)"
 );
 
-console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside explicit BOSS mechanism UI ownership and retired procedural VFX selectors.");
+console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS portrait/mechanism owner and retired procedural VFX selectors.");

@@ -14,12 +14,15 @@ const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const compactModalCss=fs.readFileSync("css/37-v139-rested-experience.css","utf8");
 const dungeonNav=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 
-/* BOSS mechanism cards remain sidecar targets and the lethal charge countdown
-   stays visible on the card itself. */
+/* BOSS mechanism cards remain sidecar attack targets. Detailed text, including
+   the lethal charge countdown, now lives in the separate mechanism info panel
+   instead of crowding the small portrait target card. */
 assert.match(bossRuntime,/Mechanism cards are real attackable sidecar targets, never monsters/);
 assert.match(bossRuntime,/if\(card\.type==="charge"\)\{ return "倒數 "\+card\.countdown\+" 回合・歸零發動大型技能"; \}/);
+assert.match(bossRuntime,/boss-mechanism-info-effect/);
+assert.match(bossRuntime,/ui\.body\.innerHTML=alive\.map\(mechanismInfoMarkup\)\.join\(""\)/);
 assert.match(bossCss,/\.boss-mechanism-card\.destroying\{[\s\S]*?position:absolute;[\s\S]*?pointer-events:none;/);
-assert.match(bossCss,/\.boss-mechanism-card\[data-type="charge"\] \.boss-mechanism-effect\{[\s\S]*?font-size:10px;[\s\S]*?font-weight:900;/);
+assert.match(bossCss,/\.boss-mechanism-info-panel\{[\s\S]*?aspect-ratio:9 \/ 16;/);
 
 /* The stale destroyed card must not remain as an invisible flex item that
    pushes the next mechanism to the right of the BOSS. */
