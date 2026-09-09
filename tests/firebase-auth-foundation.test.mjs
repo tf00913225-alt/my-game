@@ -38,11 +38,14 @@ test("cloud-save browser module remains read-only", ()=>{
 
 test("Firebase layer does not wrap or mutate the existing local save owner", ()=>{
     const combined = [config, auth, cloud, ui, bootstrap].join("\n");
+    const nonMigrationModules = [config, auth, ui, bootstrap].join("\n");
     assert.equal(combined.includes("saveGame="), false);
     assert.equal(combined.includes("saveGame ="), false);
     assert.equal(combined.includes("loadGame="), false);
     assert.equal(combined.includes("localStorage.setItem"), false);
-    assert.equal(combined.includes("battle_full_version_save_v5"), false);
+    assert.equal(nonMigrationModules.includes("battle_full_version_save_v5"), false);
+    assert.match(cloud, /LEGACY_LOCAL_SAVE_KEY\s*=\s*"battle_full_version_save_v5"/);
+    assert.match(cloud, /localStorage\.getItem\(LEGACY_LOCAL_SAVE_KEY\)/);
 });
 
 test("bootstrap exposes the narrow Firebase bridge and cloud-read events", ()=>{
