@@ -12,6 +12,8 @@ const bootstrap = read("js/firebase/firebase-bootstrap.js");
 const startup = read("js/52-v173.20-startup-loader.js");
 const touch = read("js/01-stage-v8-touch-lock.js");
 const css = read("css/firebase-auth.css");
+const docs = read("docs/FIREBASE_AUTH_CLOUD_SAVE.md");
+const batch = read("release/requirement-batches/2026-09-09-firebase-auth-foundation.json");
 
 test("Firebase project identity, complete Web config and pinned SDK owner are explicit", ()=>{
     assert.match(config, /apiKey:\s*"AIzaSyBx3fyM5Xb38shAVLBMFjV-nMyPWIH5jaA"/);
@@ -70,4 +72,11 @@ test("startup owner loads Firebase as optional infrastructure without changing r
     assert.match(startup, /js\/firebase\/firebase-bootstrap\.js\?v=173\.64/);
     assert.match(startup, /DEFAULT_RUNTIME_TOTAL=32/);
     assert.doesNotMatch(startup, /__v173ReportRuntimeProgress\([^\n]*firebase/i);
+});
+
+test("documentation and Requirement Batch preserve the live-verification boundary", ()=>{
+    assert.match(docs, /Authorized domains/);
+    assert.match(docs, /does \*\*not\*\* automatically hydrate/);
+    assert.match(batch, /"id": "FIREBASE-05"/);
+    assert.match(batch, /"visualVerification": "PENDING_DEV_AUTH_AND_CLOUD_READ_VERIFICATION"/);
 });
