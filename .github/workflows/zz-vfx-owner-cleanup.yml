@@ -117,6 +117,14 @@ jobs:
               raise RuntimeError("Abyss VFX regression test block mismatch")
           p.write_text(s)
 
+          p = Path("tests/v153-fire-vfx.test.js")
+          s = p.read_text()
+          old_rage = '        rage:["rage-cast.png","single"]'
+          if old_rage not in s:
+              raise RuntimeError("V153 Rage placement expectation not found")
+          s = s.replace(old_rage, '        rage:["rage-cast.png","group"]', 1)
+          p.write_text(s)
+
           guard = Path("tests/v174-raster-only-combat-vfx-owner.test.js")
           g = guard.read_text()
           if 'const v141=' not in g:
@@ -171,7 +179,7 @@ jobs:
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add js/35-v141-ui-battle.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/59-abyss-two-tier-runtime.js tests/abyss-two-tier-refactor.test.js tests/v174-raster-only-combat-vfx-owner.test.js
+          git add js/35-v141-ui-battle.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/59-abyss-two-tier-runtime.js tests/abyss-two-tier-refactor.test.js tests/v153-fire-vfx.test.js tests/v174-raster-only-combat-vfx-owner.test.js
           git diff --cached --quiet && exit 0
           git commit -m "refactor: remove legacy procedural combat VFX sources"
           git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
