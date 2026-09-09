@@ -33,6 +33,6 @@ jobs:
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           rm .github/scripts/zz-water-group-center-fix.py
           rm .github/workflows/zz-water-group-center-fix.yml
-          git add js/39-v143-skill-animation.js .github/scripts/zz-water-group-center-fix.py .github/workflows/zz-water-group-center-fix.yml
+          git add js/39-v143-skill-animation.js tests/v166-water-vfx.test.js .github/scripts/zz-water-group-center-fix.py .github/workflows/zz-water-group-center-fix.yml
           git commit -m "fix: center group VFX on resolved targets"
           git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
