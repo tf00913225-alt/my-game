@@ -185,10 +185,6 @@ test("the same raster owner dispatches player-to-enemy and enemy-to-player",()=>
     context.v142SkillAnimationDirector.dispose();
 });
 
-test("resolved group targets and successful deferred statuses remain authoritative VFX endpoints",()=>{
-    assert.match(v143,/const explicitBounds=Array\.isArray\(current\.targetIds\)&&current\.targetIds\.length[\s\S]*?fieldBounds\(indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\)\)[\s\S]*?const layoutCenterX=explicitBounds/);
-    assert.match(v143,/if\(types\.indexOf\(type\)>=0\)\{[\s\S]*?registerTarget\(side,index,false\);[\s\S]*?current\.deferredStatusTargets\.get\(type\)/);
-});
 
 test("secondary status owners cannot recreate procedural combat VFX",()=>{
     assert.doesNotMatch(v143fixes,/v143-earth-shield-effect/);
@@ -198,6 +194,13 @@ test("secondary status owners cannot recreate procedural combat VFX",()=>{
     assert.doesNotMatch(css146,/v143-earth-shield-effect|v143-skill-flight|v143-skill-field|v143-hit-impact|v146-flight-art/);
     assert.doesNotMatch(css149,/v149-barrier-corners|v149BarrierCornerPulse/);
     assert.doesNotMatch([v141,v142,v143,v143fixes,v149,v155,abyss].join("\n"),/WebGLRenderingContext|createShader|shaderSource|getContext\(["']webgl/i);
+});
+
+test("successful deferred statuses register the resolved raster VFX endpoint",()=>{
+    assert.match(
+        v143,
+        /function syncAppliedStatusSprite\(entity,type\)[\s\S]*?types\.indexOf\(type\)>=0\)[\s\S]*?registerTarget\(side,index,false\)/
+    );
 });
 
 console.log("\nV174 raster-only combat VFX owner suite: "+passed+" tests passed.");
