@@ -56,124 +56,116 @@ jobs:
                           depth -= 1
                           if depth == 0:
                               end = i + 1
-                              while end < len(text) and text[end] in " \t":
-                                  end += 1
-                              if end < len(text) and text[end] == ";":
-                                  end += 1
-                              while end < len(text) and text[end] in "\r\n":
-                                  end += 1
+                              while end < len(text) and text[end] in " \t": end += 1
+                              if end < len(text) and text[end] == ";": end += 1
+                              while end < len(text) and text[end] in "\r\n": end += 1
                               return text[:start] + text[end:], True
                   i += 1
               raise RuntimeError(f"unterminated function {name}")
 
-          p = Path("js/35-v141-ui-battle.js")
-          s = p.read_text()
-          s, ok = remove_function(s, "playCanvasParticles")
-          if not ok:
-              raise RuntimeError("playCanvasParticles not found")
-          old = '''    function syncCardEffects(card,entity){\n        const layer=ensureEffectLayer(card);\n        if(!layer){ return; }\n        const types=activeEffectTypes(entity);\n        const signature=types.sort().join("|");\n        if(layer.dataset.signature===signature){ return; }\n        layer.dataset.signature=signature;\n        layer.innerHTML=types.map(type=>'<span class="v141-effect v141-effect-'+type+'"></span>').join("");\n    }\n'''
-          new = '''    function syncCardEffects(card){\n        if(!card||typeof card.querySelector!=="function"){ return; }\n        const layer=card.querySelector(":scope > .v141-card-effects");\n        if(!layer){ return; }\n        layer.querySelectorAll(":scope > .v141-effect").forEach(node=>node.remove());\n        if(!layer.children.length){ layer.remove(); }\n    }\n'''
-          if old not in s:
-              raise RuntimeError("syncCardEffects block mismatch")
-          s = s.replace(old, new, 1)
-          s = re.sub(
-              r'    window\.v141PlayCardEffect=function\(side,index,type\)\{[\s\S]*?\n    \};',
-              '    window.v141PlayCardEffect=function(){ return false; };',
-              s,
-              count=1
-          )
-          s = s.replace('Card effects (persistent CSS layers + short Canvas particles)','Card effects (legacy visual renderer retired; data/status only)')
+          p=Path("js/35-v141-ui-battle.js")
+          s=p.read_text()
+          s,ok=remove_function(s,"playCanvasParticles")
+          if not ok: raise RuntimeError("playCanvasParticles not found")
+          old='''    function syncCardEffects(card,entity){\n        const layer=ensureEffectLayer(card);\n        if(!layer){ return; }\n        const types=activeEffectTypes(entity);\n        const signature=types.sort().join("|");\n        if(layer.dataset.signature===signature){ return; }\n        layer.dataset.signature=signature;\n        layer.innerHTML=types.map(type=>'<span class="v141-effect v141-effect-'+type+'"></span>').join("");\n    }\n'''
+          new='''    function syncCardEffects(card){\n        if(!card||typeof card.querySelector!=="function"){ return; }\n        const layer=card.querySelector(":scope > .v141-card-effects");\n        if(!layer){ return; }\n        layer.querySelectorAll(":scope > .v141-effect").forEach(node=>node.remove());\n        if(!layer.children.length){ layer.remove(); }\n    }\n'''
+          if old not in s: raise RuntimeError("syncCardEffects block mismatch")
+          s=s.replace(old,new,1)
+          s=re.sub(r'    window\.v141PlayCardEffect=function\(side,index,type\)\{[\s\S]*?\n    \};','    window.v141PlayCardEffect=function(){ return false; };',s,count=1)
+          s=s.replace('Card effects (persistent CSS layers + short Canvas particles)','Card effects (legacy visual renderer retired; data/status only)')
           p.write_text(s)
 
-          p = Path("js/39-v143-skill-animation.js")
-          s = p.read_text()
-          s = s.replace('.v141-effect-canvas,.v141-card-effects,#v142-skill-stage','.v141-card-effects,#v142-skill-stage')
-          old_rage_manifest = '        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","group",{scale:1.08,minSize:190,alignToSlots:true})},'
-          new_rage_manifest = '        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},'
-          if old_rage_manifest not in s:
-              raise RuntimeError("Rage raster manifest anchor missing")
-          s = s.replace(old_rage_manifest,new_rage_manifest,1)
-          s = s.replace('            node.dataset.targetIndex=String(index);\n            node.style.left=target.x+"px";', '            node.dataset.targetIndex=String(index);\n            node.dataset.targetIndexes=String(index);\n            node.style.left=target.x+"px";', 1)
-          marker = '            node.dataset.targetIndex=String(index);\n            node.dataset.travel="true";'
+          p=Path("js/39-v143-skill-animation.js")
+          s=p.read_text()
+          s=s.replace('.v141-effect-canvas,.v141-card-effects,#v142-skill-stage','.v141-card-effects,#v142-skill-stage')
+          old_rage='        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","group",{scale:1.08,minSize:190,alignToSlots:true})},'
+          new_rage='        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},'
+          if old_rage not in s: raise RuntimeError("Rage raster manifest anchor missing")
+          s=s.replace(old_rage,new_rage,1)
+          s=s.replace('            node.dataset.targetIndex=String(index);\n            node.style.left=target.x+"px";','            node.dataset.targetIndex=String(index);\n            node.dataset.targetIndexes=String(index);\n            node.style.left=target.x+"px";',1)
+          marker='            node.dataset.targetIndex=String(index);\n            node.dataset.travel="true";'
           if marker in s:
-              s = s.replace(marker, '            node.dataset.targetIndex=String(index);\n            node.dataset.targetIndexes=String(index);\n            node.dataset.travel="true";\n            node.dataset.travelToTargets="true";', 1)
-          battlefield = '            node.dataset.areaId=bounds.id;\n            node.style.left=(bounds.left+bounds.width/2)+"px";'
-          if battlefield not in s:
-              raise RuntimeError("battlefield target metadata anchor missing")
-          s = s.replace(battlefield, '            node.dataset.areaId=bounds.id;\n            node.dataset.targetIndexes=emittedSpriteTargets(current).join(",");\n            if(sprite.fixedFormation){ node.dataset.fixedFormation="true"; }\n            node.dataset.coverageScale=String(coverageScale);\n            node.style.clipPath="none";\n            node.style.left=(bounds.left+bounds.width/2)+"px";', 1)
-          group = '        const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);\n        node.style.width=size+"px";'
-          if group not in s:
-              raise RuntimeError("group target metadata anchor missing")
-          s = s.replace(group, '        const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);\n        node.dataset.targetIndexes=indexes.join(",");\n        node.style.width=size+"px";', 1)
-          travel = '''        if(placement==="trajectory"&&sprite.travelToTargets&&actor){\n            node.dataset.travel="true";\n            node.style.left=actor.x+"px";\n            node.style.top=actor.y+"px";\n            node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");\n            node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");\n        }else{'''
-          travel_new = '''        if(placement==="trajectory"&&sprite.travelToTargets&&actor){\n            node.dataset.travel="true";\n            node.dataset.travelToTargets="true";\n            node.style.left=actor.x+"px";\n            node.style.top=actor.y+"px";\n            node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");\n            node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");\n            node.style.setProperty("--v143-sprite-angle",Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI+"deg");\n        }else{'''
-          if travel not in s:
-              raise RuntimeError("trajectory metadata anchor missing")
-          s = s.replace(travel, travel_new, 1)
+              s=s.replace(marker,'            node.dataset.targetIndex=String(index);\n            node.dataset.targetIndexes=String(index);\n            node.dataset.travel="true";\n            node.dataset.travelToTargets="true";',1)
+          battlefield='            node.dataset.areaId=bounds.id;\n            node.style.left=(bounds.left+bounds.width/2)+"px";'
+          if battlefield not in s: raise RuntimeError("battlefield target metadata anchor missing")
+          s=s.replace(battlefield,'            node.dataset.areaId=bounds.id;\n            node.dataset.targetIndexes=emittedSpriteTargets(current).join(",");\n            if(sprite.fixedFormation){ node.dataset.fixedFormation="true"; }\n            node.dataset.coverageScale=String(coverageScale);\n            node.style.clipPath="none";\n            node.style.left=(bounds.left+bounds.width/2)+"px";',1)
+          group='        const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);\n        node.style.width=size+"px";'
+          if group not in s: raise RuntimeError("group target metadata anchor missing")
+          s=s.replace(group,'        const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);\n        node.dataset.targetIndexes=indexes.join(",");\n        node.style.width=size+"px";',1)
+          travel='''        if(placement==="trajectory"&&sprite.travelToTargets&&actor){\n            node.dataset.travel="true";\n            node.style.left=actor.x+"px";\n            node.style.top=actor.y+"px";\n            node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");\n            node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");\n        }else{'''
+          travel_new='''        if(placement==="trajectory"&&sprite.travelToTargets&&actor){\n            node.dataset.travel="true";\n            node.dataset.travelToTargets="true";\n            node.style.left=actor.x+"px";\n            node.style.top=actor.y+"px";\n            node.style.setProperty("--v143-sprite-dx",destination.x-actor.x+"px");\n            node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");\n            node.style.setProperty("--v143-sprite-angle",Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI+"deg");\n        }else{'''
+          if travel not in s: raise RuntimeError("trajectory metadata anchor missing")
+          s=s.replace(travel,travel_new,1)
+
+          monster_hit='''        showMonsterHit=function(index){\n            const args=Array.prototype.slice.call(arguments);\n            const wait=delayFor("monster",index,true);'''
+          monster_hit_new='''        showMonsterHit=function(index){\n            const args=Array.prototype.slice.call(arguments);\n            const wait=delayFor("monster",index,true);\n            const current=state.current;\n            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="monster"){ args[3]=true; }'''
+          if monster_hit not in s: raise RuntimeError("showMonsterHit wrapper anchor missing")
+          s=s.replace(monster_hit,monster_hit_new,1)
+          player_hit='''        showPlayerHit=function(amount,type,index){\n            const args=Array.prototype.slice.call(arguments);\n            const wait=delayFor("player",Number(index)||0,true);'''
+          player_hit_new='''        showPlayerHit=function(amount,type,index){\n            const args=Array.prototype.slice.call(arguments);\n            const wait=delayFor("player",Number(index)||0,true);\n            const current=state.current;\n            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="player"&&!args[3]){ args[4]=true; }'''
+          if player_hit not in s: raise RuntimeError("showPlayerHit wrapper anchor missing")
+          s=s.replace(player_hit,player_hit_new,1)
           p.write_text(s)
 
-          p = Path("js/43-v149-skill-ui-rules.js")
-          s = p.read_text()
-          s, ok = remove_function(s, "installWordCircleDirector")
-          if not ok:
-              raise RuntimeError("installWordCircleDirector not found")
-          s = s.replace('    installWordCircleDirector();\n','',1)
-          s = s.replace('wordCirclePerCharacter:true,','proceduralSkillFallback:false,',1)
-          s = s.replace('Every skill uses one circle per displayed character.','Procedural word-circle fallback retired; V143 raster owner is authoritative.')
+          p=Path("js/43-v149-skill-ui-rules.js")
+          s=p.read_text()
+          s,ok=remove_function(s,"installWordCircleDirector")
+          if not ok: raise RuntimeError("installWordCircleDirector not found")
+          s=s.replace('    installWordCircleDirector();\n','',1)
+          s=s.replace('wordCirclePerCharacter:true,','proceduralSkillFallback:false,',1)
+          s=s.replace('Every skill uses one circle per displayed character.','Procedural word-circle fallback retired; V143 raster owner is authoritative.')
           p.write_text(s)
 
-          p = Path("js/59-abyss-two-tier-runtime.js")
-          s = p.read_text()
-          s, ok = remove_function(s, "patchExistingV143ExplosiveFlurryRenderer")
-          if not ok:
-              raise RuntimeError("patchExistingV143ExplosiveFlurryRenderer not found")
-          s = re.sub(r'^\s*patchExistingV143ExplosiveFlurryRenderer\(\);\s*$', '', s, flags=re.M)
+          p=Path("js/59-abyss-two-tier-runtime.js")
+          s=p.read_text()
+          s,ok=remove_function(s,"patchExistingV143ExplosiveFlurryRenderer")
+          if not ok: raise RuntimeError("patchExistingV143ExplosiveFlurryRenderer not found")
+          s=re.sub(r'^\s*patchExistingV143ExplosiveFlurryRenderer\(\);\s*$','',s,flags=re.M)
           p.write_text(s)
 
-          p = Path("tests/abyss-two-tier-refactor.test.js")
-          s = p.read_text()
-          pattern = re.compile(r'test\("V143 Fire Flurry reuses the existing Canvas crop renderer instead of adding a second VFX runtime",\(\)=>\{[\s\S]*?\n\}\);')
-          replacement = '''test("Abyss runtime never mutates the shared V143 VFX manifest",()=>{\n    assert.doesNotMatch(source,/patchExistingV143ExplosiveFlurryRenderer/);\n    assert.doesNotMatch(source,/v143SkillAnimationManifest/);\n    assert.doesNotMatch(source,/canvas-crop/);\n});'''
-          s, n = pattern.subn(replacement, s, count=1)
-          if n != 1:
-              raise RuntimeError("Abyss VFX regression test block mismatch")
+          p=Path("tests/abyss-two-tier-refactor.test.js")
+          s=p.read_text()
+          pattern=re.compile(r'test\("V143 Fire Flurry reuses the existing Canvas crop renderer instead of adding a second VFX runtime",\(\)=>\{[\s\S]*?\n\}\);')
+          replacement='''test("Abyss runtime never mutates the shared V143 VFX manifest",()=>{\n    assert.doesNotMatch(source,/patchExistingV143ExplosiveFlurryRenderer/);\n    assert.doesNotMatch(source,/v143SkillAnimationManifest/);\n    assert.doesNotMatch(source,/canvas-crop/);\n});'''
+          s,n=pattern.subn(replacement,s,count=1)
+          if n!=1: raise RuntimeError("Abyss VFX regression test block mismatch")
           p.write_text(s)
 
-          guard = Path("tests/v174-raster-only-combat-vfx-owner.test.js")
-          g = guard.read_text()
-          if 'const v141=' not in g:
-              g = g.replace('const v142=', 'const v141=fs.readFileSync("js/35-v141-ui-battle.js","utf8");\nconst v142=', 1)
-          if 'const v149=' not in g:
-              g = g.replace('const css149=', 'const v149=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");\nconst abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");\nconst css149=', 1)
-          insertion = '''\nassert.doesNotMatch(v141,/playCanvasParticles|v141-effect-canvas|getContext\\(|createElement\\(["']canvas["']\\)/);\nassert.doesNotMatch(v149,/installWordCircleDirector|v149-word-|v149-word-circle-stage/);\nassert.doesNotMatch(abyss,/v143SkillAnimationManifest|patchExistingV143ExplosiveFlurryRenderer|canvas-crop/);\n'''
-          if 'assert.doesNotMatch(v141,/playCanvasParticles' not in g:
-              g += insertion
+          guard=Path("tests/v174-raster-only-combat-vfx-owner.test.js")
+          g=guard.read_text()
+          if 'const v141=' not in g: g=g.replace('const v142=','const v141=fs.readFileSync("js/35-v141-ui-battle.js","utf8");\nconst v142=',1)
+          if 'const v149=' not in g: g=g.replace('const css149=','const v149=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");\nconst abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");\nconst css149=',1)
+          insertion='''\nassert.doesNotMatch(v141,/playCanvasParticles|v141-effect-canvas|getContext\\(|createElement\\(["']canvas["']\\)/);\nassert.doesNotMatch(v149,/installWordCircleDirector|v149-word-|v149-word-circle-stage/);\nassert.doesNotMatch(abyss,/v143SkillAnimationManifest|patchExistingV143ExplosiveFlurryRenderer|canvas-crop/);\n'''
+          if 'assert.doesNotMatch(v141,/playCanvasParticles' not in g: g+=insertion
           guard.write_text(g)
           PY
       - name: Source-level legacy VFX guard
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re, sys
-          files=[
-              "js/35-v141-ui-battle.js","js/37-v142-skill-animation.js",
-              "js/39-v143-skill-animation.js","js/43-v149-skill-ui-rules.js",
-              "js/59-abyss-two-tier-runtime.js"
-          ]
+          import re,sys
+          files=["js/35-v141-ui-battle.js","js/37-v142-skill-animation.js","js/39-v143-skill-animation.js","js/43-v149-skill-ui-rules.js","js/59-abyss-two-tier-runtime.js"]
           banned=re.compile(r'playCanvasParticles|v141-effect-canvas|getContext\(|createElement\(["\']canvas["\']\)|installWordCircleDirector|v149-word-|v149-word-circle-stage|patchExistingV143ExplosiveFlurryRenderer|canvas-crop')
           hits=[]
           for path in files:
               for no,line in enumerate(Path(path).read_text().splitlines(),1):
                   if banned.search(line): hits.append(f"{path}:{no}:{line.strip()}")
-          if hits:
-              print("\n".join(hits))
-              sys.exit(1)
+          if hits: print("\n".join(hits)); sys.exit(1)
           PY
           node --check js/35-v141-ui-battle.js
           node --check js/37-v142-skill-animation.js
           node --check js/39-v143-skill-animation.js
           node --check js/43-v149-skill-ui-rules.js
           node --check js/59-abyss-two-tier-runtime.js
+      - name: Save transformed work branch
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add js/35-v141-ui-battle.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/59-abyss-two-tier-runtime.js tests/abyss-two-tier-refactor.test.js tests/v174-raster-only-combat-vfx-owner.test.js
+          if ! git diff --cached --quiet; then
+            git commit -m "refactor: remove legacy procedural combat VFX sources"
+            git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
+          fi
       - name: Focused VFX regression tests
         run: |
           node tests/v174-raster-only-combat-vfx-owner.test.js
@@ -189,11 +181,3 @@ jobs:
           git fetch origin 39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 4a592dd4c41d7efb1a4849fbfe0cbf68598121bf --depth=1 || true
           for test in tests/*.test.js; do node "$test"; done
           node .github/scripts/ci.mjs
-      - name: Commit cleanup
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add js/35-v141-ui-battle.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/59-abyss-two-tier-runtime.js tests/abyss-two-tier-refactor.test.js tests/v174-raster-only-combat-vfx-owner.test.js
-          git diff --cached --quiet && exit 0
-          git commit -m "refactor: remove legacy procedural combat VFX sources"
-          git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
