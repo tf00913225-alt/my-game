@@ -6,6 +6,7 @@ const cp=require("node:child_process");
 
 const BASE="39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5";
 const GAMEPLAY_BATTLE_BASE="4a592dd4c41d7efb1a4849fbfe0cbf68598121bf";
+const WORK_BASE="29b9668057846164a941fbf6617d2458d9af5476";
 const current=file=>fs.readFileSync(file,"utf8");
 const at=(ref,file)=>cp.execFileSync("git",["show",`${ref}:${file}`],{encoding:"utf8",maxBuffer:16*1024*1024});
 const base=file=>at(BASE,file);
@@ -67,22 +68,24 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
 // This requirement intentionally expands the Gameplay BOSS battle UI owner: the
 // redundant title is removed, the active Gameplay BOSS becomes a large 9:16 card,
 // the mechanism target card becomes 9:16, and detail moves to a right-side alert.
-// Preserve every pre-battle Gameplay panel rule and the existing protected-BOSS /
-// toast / animation tail around that newly owned section.
+// Preserve every pre-battle Gameplay panel rule against the exact dev work base,
+// while the existing protected-BOSS / toast / animation tail remains anchored to
+// the previously approved Gameplay battle baseline.
 {
     const file="css/gameplay-boss-tower.css";
     const now=current(file);
+    const workBase=at(WORK_BASE,file);
     const approved=at(GAMEPLAY_BATTLE_BASE,file);
     const newMarker="/* ---------- Boss battle portrait / mechanism UI ---------- */";
     const oldMarker="/* ---------- Boss mechanism slot ---------- */";
     const nowMarker=now.indexOf(newMarker);
-    const approvedMarker=approved.indexOf(oldMarker);
+    const workBaseMarker=workBase.indexOf(oldMarker);
     assert.ok(nowMarker>0,"new Gameplay BOSS battle owner marker missing");
-    assert.ok(approvedMarker>0,"approved Gameplay BOSS battle owner marker missing");
+    assert.ok(workBaseMarker>0,"work-base Gameplay BOSS battle owner marker missing");
     assert.equal(
         normalize(now.slice(0,nowMarker)),
-        normalize(approved.slice(0,approvedMarker)),
-        `${file} non-battle Gameplay panel rules changed`
+        normalize(workBase.slice(0,workBaseMarker)),
+        `${file} non-battle Gameplay panel rules changed from work base`
     );
 
     const protectedStart="#game-stage #battlePage .battle-monster.gameplay-boss-protected{";
