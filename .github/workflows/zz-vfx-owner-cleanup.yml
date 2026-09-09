@@ -20,8 +20,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Apply final status VFX cleanup
-        run: python .github/scripts/zz-vfx-final-cleanup.py
+      - name: Apply raster-only cleanup and historical contract migration
+        run: |
+          python .github/scripts/zz-vfx-final-cleanup.py
+          python .github/scripts/zz-vfx-historical-test-migration.py
       - name: Source guard and syntax
         run: |
           python - <<'PY'
@@ -31,7 +33,7 @@ jobs:
             "js/35-v141-ui-battle.js":r'playCanvasParticles|v141-effect-canvas|getContext\(|createElement\(["\']canvas["\']\)',
             "js/37-v142-skill-animation.js":r'v142-particle-canvas|getContext\(|createElement\(["\']canvas["\']\)|<svg\b',
             "js/38-v143-system-fixes.js":r'v143-earth-shield-effect',
-            "js/39-v143-skill-animation.js":r'canvas-crop|getContext\(|drawImage\(|createElement\(["\']canvas["\']\)|v149-word-|v143-cast-charge|v143-skill-flight|v143-hit-impact|v143-hit-particle',
+            "js/39-v143-skill-animation.js":r'canvas-crop|getContext\(|drawImage\(|createElement\(["\']canvas["\']\)|v149-word-|v143-cast-charge|v143-skill-flight|v143-hit-impact|v143-hit-particle|WebGLRenderingContext|createShader|shaderSource|getContext\(["\']webgl',
             "js/43-v149-skill-ui-rules.js":r'installWordCircleDirector|v149-word-|v149-barrier-corners',
             "js/46-v155-dev-fixes.js":r'v143SkillAnimationManifest',
             "js/59-abyss-two-tier-runtime.js":r'v143SkillAnimationManifest|patchExistingV143ExplosiveFlurryRenderer|canvas-crop',
@@ -50,13 +52,13 @@ jobs:
               sys.exit(1)
           PY
           for file in js/35-v141-ui-battle.js js/37-v142-skill-animation.js js/38-v143-system-fixes.js js/39-v143-skill-animation.js js/43-v149-skill-ui-rules.js js/46-v155-dev-fixes.js js/59-abyss-two-tier-runtime.js; do node --check "$file"; done
-      - name: Commit cleanup before tests
+      - name: Commit verified contract migration before tests
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add HANDOFF.md js/38-v143-system-fixes.js js/43-v149-skill-ui-rules.js js/46-v155-dev-fixes.js css/38-v141-system-expansion.css css/40-v143-combat-dungeon-polish.css css/42-v146-system-polish.css css/44-v149-skill-ui-rules.css tests/v149-skill-ui-rules.test.js tests/v153-fire-vfx.test.js tests/v174-raster-only-combat-vfx-owner.test.js
+          git add HANDOFF.md js/38-v143-system-fixes.js js/43-v149-skill-ui-rules.js js/46-v155-dev-fixes.js css/38-v141-system-expansion.css css/40-v143-combat-dungeon-polish.css css/42-v146-system-polish.css css/44-v149-skill-ui-rules.css tests/v149-skill-ui-rules.test.js tests/v153-fire-vfx.test.js tests/v166-water-vfx.test.js tests/v173.23-wind-vfx.test.js tests/v173.39-earth-light-vfx.test.js tests/v174-raster-only-combat-vfx-owner.test.js
           if ! git diff --cached --quiet; then
-            git commit -m "refactor: remove remaining procedural status VFX sources"
+            git commit -m "test: align historical suites with raster-only VFX owner"
             git push origin HEAD:fix/combat-vfx-owner-cleanup-20260909
           fi
       - name: Focused combat VFX regressions
