@@ -612,7 +612,7 @@
         card.classList.toggle("v149-has-barrier",!!barrierState(entity));
     }
 
-            function rankFor(monster){
+                function rankFor(monster){
         const rank=typeof getMonsterRank==="function"?getMonsterRank(monster):(monster&&monster.v141BattleRank);
         return rank==="boss"?"boss":rank==="elite"?"elite":"regular";
     }

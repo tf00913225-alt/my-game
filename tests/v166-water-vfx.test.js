@@ -356,10 +356,7 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
         assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+filename,id);
         const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.19":"?v=166";
         assert.ok(model.sprite.src.endsWith(cacheVersion),id+" cache version");
-        if(["waterBall","iceArrowRain"].includes(id)){
-            assert.equal(model.sprite.renderer,"canvas-crop",id+" Canvas renderer");
-            assert.deepEqual([model.sprite.frameWidth,model.sprite.frameHeight],[384,384],id+" fixed source crop");
-        }
+        assert.equal(model.sprite.renderer,"dom-sprite",id+" DOM Sprite renderer");
         assert.deepEqual(
             [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
             [4,3,12,7],id

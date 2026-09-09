@@ -129,7 +129,7 @@ test("persistent sheets keep the supplied production dimensions and natural 4x2 
     });
 });
 
-test("all casts use row-major canvas cropping, frame seven impact and the requested placement/timing",()=>{
+test("all casts use DOM Sprite Sheets, frame seven impact and the requested placement/timing",()=>{
     const runtime=statusRuntime();
     const manifest=runtime.context.v143SkillAnimationManifest;
     Object.entries(CASTS).forEach(([id,spec])=>{
@@ -137,11 +137,9 @@ test("all casts use row-major canvas cropping, frame seven impact and the reques
         assert.ok(model&&model.sprite,id);
         assert.equal(model.sprite.src,spec.file+"?v=173.39",id);
         assert.deepEqual(Array.from([
-            model.sprite.columns,model.sprite.rows,model.sprite.frames,
-            model.sprite.frameWidth,model.sprite.frameHeight,model.sprite.hitFrame
-        ]),[4,3,12,384,384,7],id);
-        assert.equal(model.sprite.renderer,"canvas-crop",id);
-        assert.equal(model.sprite.naturalGrid,true,id);
+            model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame
+        ]),[4,3,12,7],id);
+        assert.equal(model.sprite.renderer,"dom-sprite",id);
         assert.equal(model.sprite.placement,spec.placement,id);
         if(id==="sandWind"){ assert.equal(model.sprite.preserveSourceAspect,true,id); }
         assert.equal(model.hit,.5,id);
@@ -172,14 +170,15 @@ test("all seven persistent effects use 4x2 runtime cropping with the requested l
         const model=manifest[type];
         assert.ok(model,type);
         assert.equal(model.src,spec.file+"?v=173.39",type);
-        assert.deepEqual(Array.from([model.columns,model.rows,model.frames,model.frameWidth,model.frameHeight]),[4,2,8,256,256],type);
+        assert.deepEqual(Array.from([model.columns,model.rows,model.frames]),[4,2,8],type);
+        assert.equal(model.renderer,"dom-sprite",type);
         assert.equal(model.duration,spec.duration,type);
         assert.equal(model.collection,spec.collection,type);
         if(spec.statusName){ assert.equal(model.statusName,spec.statusName,type); }
         if(type==="barrier"){ assert.equal(model.cellAspect,.75,type); }
     });
-    assert.match(animation,/sprite\.preserveSourceAspect&&sourceWidth>0&&sourceHeight>0/);
     assert.match(animation,/const cellAspect=Math\.max\(\.1,Number\(spec\.cellAspect\)\|\|1\)/);
+    assert.doesNotMatch(animation,/drawImage\(|getContext\(|canvas-crop/);
 });
 
 test("persistent earth states and Yuan Zu blessing bind to their real combat state owners",()=>{
@@ -207,10 +206,9 @@ test("rock shield on the attacking caster is deferred until its cast sheet finis
     assert.match(animation,/current\.statusAtStart&&current\.statusAtStart\.has\(side\+":"\+index\+":"\+type\)/);
 });
 
-test("the new Wanxiang loop retires the old procedural text/frame effect instead of stacking both",()=>{
-    assert.match(legacyEarth,/spriteOwnsEarthShield/);
-    assert.match(legacyEarth,/window\.v143StatusSpriteManifest&&window\.v143StatusSpriteManifest\.earthShield/);
-    assert.match(legacyEarth,/\(!active\|\|spriteOwnsEarthShield\)&&effect/);
+test("the Wanxiang loop is raster-owned and the old procedural corner effect is absent",()=>{
+    assert.doesNotMatch(legacyEarth,/v143-earth-shield-effect/);
+    assert.match(animation,/earthShield:statusSheet\("assets\/vfx\/earth\/earth-shield-loop\.png\?v=173\.39",1000,"activeBuffs"/);
 });
 
 test("V173.39 cache version loads the new owner code without stale V173.38 browser assets",()=>{
