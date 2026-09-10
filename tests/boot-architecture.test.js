@@ -9,6 +9,7 @@ const intent=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const authUi=fs.readFileSync("js/firebase/firebase-auth-ui.js","utf8");
 const headers=fs.readFileSync("_headers","utf8");
 const abyssLiveQa=fs.readFileSync(".github/scripts/abyss-live-browser-qa-v2.mjs","utf8");
+const abyssLiveQaRunner=fs.readFileSync(".github/scripts/run-abyss-live-browser-qa.mjs","utf8");
 const boot=JSON.parse(fs.readFileSync("config/boot-manifest.json","utf8"));
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
@@ -50,6 +51,10 @@ assert.match(abyssLiveQa,/link\[data-feature-style=[^\]]*feature-abyss/,
     "live QA must verify the hashed feature stylesheet owner");
 assert.ok((abyssLiveQa.match(/prepareAccountFirstRuntime\(client,\["abyss"\]\)/g)||[]).length>=3,
     "each live Abyss reload must re-enter through the account-first feature loader");
+assert.doesNotMatch(abyssLiveQaRunner,/client\.eval\([^\n]*FourSymbolsFeatures\.ensure/,
+    "the generated live QA must not call the feature loader before Boot Core exists");
+assert.match(abyssLiveQaRunner,/saved player reload[\s\S]*prepareAccountFirstRuntime\(client,\["abyss"\]\)/,
+    "the generated saved-player reload must wait for account-first startup before loading Abyss");
 
 const jsFiles=[];
 function walk(directory){
