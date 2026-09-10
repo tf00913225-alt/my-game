@@ -7,7 +7,7 @@ const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const legacyRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const finalWaterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -15,8 +15,8 @@ function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V171 cache-busts every changed combat asset",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.64/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path",()=>{

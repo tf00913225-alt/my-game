@@ -6,7 +6,7 @@ const zlib=require("node:zlib");
 
 const html=fs.readFileSync("index.html","utf8");
 const css=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
-const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
+const loader=fs.readFileSync("scripts/build-production.mjs","utf8");
 const runtime=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const dungeonShell=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 

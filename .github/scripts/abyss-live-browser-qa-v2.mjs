@@ -87,6 +87,20 @@ async function waitFor(client,expression,label,timeoutMs=30000){
     throw new Error(`Timed out waiting for ${label}. Last result: ${String(last)}`);
 }
 
+async function prepareAccountFirstRuntime(client,features){
+    await waitFor(client,"window.FourSymbolsStartupPolicy&&['AUTH_REQUIRED','NEED_CHARACTER','READY','OFFLINE_READY','ERROR'].includes(FourSymbolsStartupPolicy.getState())","account-first startup destination",30000);
+    let state=await client.eval("FourSymbolsStartupPolicy.getState()");
+    if(state==="ERROR"){ throw new Error("Live Firebase startup failed before feature QA"); }
+    if(state==="AUTH_REQUIRED"){
+        await client.eval("document.getElementById('firebaseGuestButton').click();true");
+        await waitFor(client,"['NEED_CHARACTER','READY','OFFLINE_READY','ERROR'].includes(FourSymbolsStartupPolicy.getState())","anonymous UID save resolution",60000);
+        state=await client.eval("FourSymbolsStartupPolicy.getState()");
+        if(state==="ERROR"){ throw new Error("Live anonymous UID/save resolution failed"); }
+    }
+    await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
+    return state;
+}
+
 function approx(actual,expected,tolerance,label){
     assert.ok(Number.isFinite(Number(actual)),`${label}: value is not finite (${actual})`);
     assert.ok(Math.abs(Number(actual)-Number(expected))<=tolerance,`${label}: expected about ${expected}, received ${actual}`);
@@ -129,6 +143,7 @@ try{
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
     await client.send("Page.navigate",{url:qaUrl});
     await waitFor(client,"document.readyState==='complete'","page load");
+    await prepareAccountFirstRuntime(client,["abyss"]);
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
     await waitFor(client,"document.getElementById('v174-abyss-two-tier-style')&&document.getElementById('v174-abyss-two-tier-style').sheet","two-tier Abyss CSS");
 

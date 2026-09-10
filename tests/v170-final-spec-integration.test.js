@@ -12,14 +12,12 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
-const MAIN_BASELINE_SHA="9115b66988feb992822826eb5397e9515b4d795e";
+const MAIN_BASELINE_SHA="70df66e8cb371ff6193a7f70609cf9aad7bd15ac";
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
-const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 
 const EXPECTED_DIRECT_SCRIPT_PATHS=[
-    "js/23-v125-character-creation-bootstrap.js",
-    "js/52-v173.20-startup-loader.js",
     "js/00-main.js",
     "js/01-stage-v8-touch-lock.js",
     "js/02-stage-v9-native-coordinate-api.js",
@@ -40,8 +38,11 @@ const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "js/17-stage-v60-training-render-guard.js",
     "js/18-stage-v64-character-touch-action-runtime.js",
     "js/19-stage-v78-character-inventory-runtime.js",
+    "js/22-v124-character-creation-native-runtime.js",
+    "js/23-v125-character-creation-bootstrap.js",
+    "js/24-v125-character-creation-native-runtime.js",
     "js/20-anonymous-20.js",
-    "js/24-v125-character-creation-native-runtime.js"
+    "js/61-v174-ui-regression-guards.js"
 ];
 
 const EXPECTED_RUNTIME_PATHS=[
@@ -146,9 +147,14 @@ const FINAL_DAMAGE_SKILL_ROLES={
 };
 
 function extractRuntimePaths(){
-    const block=loaderSource.match(/const runtimes=\[([\s\S]*?)\n\s*\];/);
-    assert.ok(block,"js/20 runtime list must exist");
-    return Array.from(block[1].matchAll(/src:"([^"]+\.js)"/g),match=>match[1]);
+    const build=fs.readFileSync("scripts/build-production.mjs","utf8");
+    let cursor=-1;
+    for(const file of EXPECTED_RUNTIME_PATHS){
+        const next=build.indexOf('"'+file+'"');
+        assert.ok(next>cursor,file+" must retain deterministic bundle order");
+        cursor=next;
+    }
+    return [...EXPECTED_RUNTIME_PATHS];
 }
 
 function makeUniversalNode(){
@@ -181,7 +187,14 @@ function makeUniversalNode(){
 function makeContext(){
     const noop=()=>{};
     const dummy=makeUniversalNode();
-    const storage=()=>({getItem:()=>null,setItem:noop,removeItem:noop,clear:noop});
+    const storage=()=>{
+        const values=new Map();
+        return {
+            getItem:key=>values.has(String(key))?values.get(String(key)):null,
+            setItem:(key,value)=>values.set(String(key),String(value)),
+            removeItem:key=>values.delete(String(key)),clear:()=>values.clear()
+        };
+    };
     const document={
         readyState:"loading",hidden:false,body:dummy,head:dummy,documentElement:dummy,
         activeElement:null,getElementById:()=>dummy,querySelector:()=>null,querySelectorAll:()=>[],
@@ -218,6 +231,8 @@ function makeContext(){
 function loadFinalRuntime(){
     const context=makeContext();
     const loaded=[];
+    vm.runInContext(fs.readFileSync("js/startup/account-save-repository.js","utf8"),context,{filename:"js/startup/account-save-repository.js"});
+    vm.runInContext('FourSymbolsAccountSave.activate("v170-test-uid")',context);
     EXPECTED_DIRECT_SCRIPT_PATHS.forEach(path=>{
         vm.runInContext(fs.readFileSync(path,"utf8"),context,{filename:path,timeout:2000});
         loaded.push(path);
@@ -295,11 +310,15 @@ function executeFullWaterCast(skillId){
 }
 
 test("the baseline and the real index/js20 runtime order are pinned",()=>{
-    assert.equal(MAIN_BASELINE_SHA,"9115b66988feb992822826eb5397e9515b4d795e");
+    assert.equal(MAIN_BASELINE_SHA,"70df66e8cb371ff6193a7f70609cf9aad7bd15ac");
     const directScripts=Array.from(indexSource.matchAll(/<script\b[^>]*\bsrc="([^"?]+)(?:\?[^\"]*)?"/g),match=>match[1]);
-    assert.deepEqual(directScripts,EXPECTED_DIRECT_SCRIPT_PATHS);
+    assert.equal(directScripts.length,1);
+    assert.match(directScripts[0],/^build\/boot-core\.[0-9a-f]{12}\.js$/);
+    const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
+    assert.equal(manifest.featureManifest.features.home,"app-shell");
+    assert.equal(manifest.featureManifest.features.battle,"gameplay-core");
     assert.deepEqual(extractRuntimePaths(),EXPECTED_RUNTIME_PATHS);
-    EXPECTED_RUNTIME_PATHS.forEach(path=>assert.equal(fs.existsSync(path),true,path));
+    EXPECTED_DIRECT_SCRIPT_PATHS.concat(EXPECTED_RUNTIME_PATHS).forEach(path=>assert.equal(fs.existsSync(path),true,path));
 });
 
 test("all formal runtimes execute once in production order",()=>{

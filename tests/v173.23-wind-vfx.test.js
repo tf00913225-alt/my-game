@@ -8,7 +8,7 @@ const vm=require("node:vm");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -501,7 +501,7 @@ test("wind sheets replace procedural wind effects and keep noninteractive status
 test("the development cache release is V173.39",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
     assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");

@@ -7,7 +7,7 @@ const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const rules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -494,7 +494,7 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V165",(
     assert.match(animation,/burn:statusSheet\("assets\/vfx\/fire\/burn-loop\.png\?v=165",800,"statusEffects"\)/);
     assert.match(animation,/rage:statusSheet\("assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",1000,"activeBuffs"\)/);
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

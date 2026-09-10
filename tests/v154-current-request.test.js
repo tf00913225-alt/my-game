@@ -7,7 +7,7 @@ const {execFileSync}=require("node:child_process");
 
 const source=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const css=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const characterRuntime=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 
@@ -98,8 +98,8 @@ function loadRuntime(overrides={}){
 
 test("V154 remains ordered immediately before V155",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.64/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.ok(loader.indexOf("js/45-v154-dev-fixes.js")>loader.indexOf("js/44-v152-dev-fixes.js"));
     assert.ok(loader.indexOf("js/46-v155-dev-fixes.js")>loader.indexOf("js/45-v154-dev-fixes.js"));

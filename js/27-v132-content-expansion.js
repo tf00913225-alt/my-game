@@ -1657,7 +1657,7 @@
            元素匣state同一套慣例，date跟今天不同就重置）
     ===================================================== */
 
-    const DUNGEON_STATE_KEY="v132_daily_dungeon_state";
+    const DUNGEON_STATE_KEY=window.FourSymbolsAccountSave.accountKey("daily-dungeon-state");
     const DUNGEON_TYPES=["exp","material","equipment"];
 
     function loadDungeonState(){
@@ -1758,7 +1758,7 @@
 
         try{
             localStorage.removeItem(DUNGEON_STATE_KEY);
-            localStorage.removeItem("v131_element_box_state");
+            localStorage.removeItem(window.FourSymbolsAccountSave.accountKey("element-box-state"));
         }catch(_){ }
 
         dungeonState={date:todayString(),used:{exp:false,material:false,equipment:false}};

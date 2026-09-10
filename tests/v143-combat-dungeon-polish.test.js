@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const index=fs.readFileSync("index.html","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const rules=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
 const dungeon=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const system=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
@@ -16,7 +16,7 @@ let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
 test("V143 assets stay ordered before later patches under the current cache version",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
     assert.match(loader,/css\/40-v143-combat-dungeon-polish\.css/);
     const order=[

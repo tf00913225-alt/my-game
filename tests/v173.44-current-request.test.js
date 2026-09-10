@@ -12,7 +12,7 @@ const economy=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const main=fs.readFileSync("js/00-main.js","utf8");
 const water=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const v132=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 assert.match(battle,/REFERENCE_TARGET_ORDER_6=\[4,1,3,6,2,5\]/);

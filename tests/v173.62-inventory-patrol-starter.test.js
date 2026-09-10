@@ -7,7 +7,7 @@ const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
 const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
 const battle=fs.readFileSync("js/54-v173.51-battle-qa.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 assert.match(main,/const INVENTORY_MAX_STACK_DEFAULT=999;/);

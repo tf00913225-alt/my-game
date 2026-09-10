@@ -1,27 +1,25 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
-const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
-const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
-const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
+const featureLoader=fs.readFileSync("js/startup/feature-loader.js","utf8");
+const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
-assert.match(loader,/TOTAL_RUNTIME_MODULES=32/);
-assert.match(loader,/__v173ReportRuntimeProgress\(runtime\.id,runtime\.src\)/);
-assert.match(loader,/dispatch\("v173:runtime-ready"/);
-assert.match(loader,/dispatch\("v173:runtime-failed"/);
-assert.doesNotMatch(loader,/正在同步最新遊戲系統/);
-assert.doesNotMatch(loader,/v17347RuntimeGateStatus/);
-assert.match(startup,/進度 0~90% 直接來自實際 runtime 模組 load 事件/);
-assert.match(startup,/runtimeReady/);
-assert.match(startup,/totalDuration/);
-assert.match(ui,/equipment-progression\.js\?v=173\.64/);
-assert.match(ui,/__v173ReportRuntimeProgress\("equipment-progression-runtime"/);
-assert.match(equipment,/53-v173\.50-inventory-qol\.js\?v=173\.64/);
-assert.match(equipment,/__v173ReportRuntimeProgress\("v17350-inventory-qol-runtime"/);
-assert.match(qol,/54-v173\.51-battle-qa\.js\?v=173\.64/);
-assert.match(qol,/57-v173\.51-quest-qa\.js\?v=173\.64/);
-assert.match(qol,/__v173ReportRuntimeProgress\(pair\[0\],pair\[1\]\)/);
+
+assert.doesNotMatch(loader,/TOTAL_RUNTIME_MODULES|runtime-ready|runtime-failed|createElement\(["']script["']\)/);
+assert.doesNotMatch(startup,/MIN_DURATION|totalDuration|runtimeReady|12000|15000|\*\s*90/);
+for(const state of ["AUTH_RESOLVING","AUTH_REQUIRED","SAVE_LOADING","NEED_CHARACTER","READY","ERROR"]){
+    assert.ok(startup.includes(state),"startup owner declares "+state);
+}
+assert.match(startup,/render\(100,"帳號資料已確認"/);
+assert.match(startup,/render\(100,"載入完成"/);
+assert.match(featureLoader,/Promise\.all\(order\.map\(name=>prepareBundle/);
+assert.match(featureLoader,/script\.async=false/);
+assert.equal((featureLoader.match(/createElement\("script"\)/g)||[]).length,1);
+assert.match(build,/"js\/equipment-progression\.js"[\s\S]*?"js\/53-v173\.50-inventory-qol\.js"[\s\S]*?"js\/54-v173\.51-battle-qa\.js"/);
+assert.equal((index.match(/<script\b[^>]*\bsrc=/g)||[]).length,1);
+assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
-console.log("✓ V173.62 real startup progress integration");
+console.log("✓ real critical-task progress and deterministic feature loading");

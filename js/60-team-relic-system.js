@@ -292,8 +292,11 @@
     }
     function readSaveDocument(){
         try{
-            if(typeof SAVE_KEY==="undefined"||!window.localStorage){ return null; }
-            const raw=localStorage.getItem(SAVE_KEY); return raw?JSON.parse(raw):null;
+            const repository=window.FourSymbolsAccountSave;
+            const uid=repository&&repository.getActiveUid();
+            if(!uid){ return null; }
+            const result=repository.readForUid(uid);
+            return result.status==="ready"?result.save:null;
         }catch(_){ return null; }
     }
     function hydrateFromSave(){
@@ -305,13 +308,15 @@
     }
     function persistIntoSaveDocument(){
         try{
-            if(typeof SAVE_KEY==="undefined"||!window.localStorage){ return false; }
-            const raw=localStorage.getItem(SAVE_KEY);
-            if(!raw){ return false; }
-            const data=JSON.parse(raw);
+            const repository=window.FourSymbolsAccountSave;
+            const uid=repository&&repository.getActiveUid();
+            if(!uid){ return false; }
+            const current=repository.readForUid(uid);
+            if(current.status!=="ready"){ return false; }
+            const data=current.save;
             data.playerRelics=playerRelics;
             data.teamLoadout={relicId:teamLoadout.relicId,subRelicId:null};
-            localStorage.setItem(SAVE_KEY,JSON.stringify(data));
+            repository.writeForUid(uid,data,{source:"team-relic"});
             return true;
         }catch(error){ console.error("秘寶存檔整合失敗：",error); return false; }
     }

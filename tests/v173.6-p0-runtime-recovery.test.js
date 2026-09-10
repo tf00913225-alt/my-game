@@ -6,7 +6,7 @@ const fs=require("node:fs");
 const main=fs.readFileSync("js/00-main.js","utf8");
 const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 assert.match(v142,/__v142SkillAnimationInstalled && window\.v142SkillAnimationDirector &&[\s\S]*?v142PlaySkillAnimationFromBadge/);

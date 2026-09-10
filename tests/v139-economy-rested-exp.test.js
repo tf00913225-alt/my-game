@@ -9,7 +9,7 @@ const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const v133Source=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const v139Source=fs.readFileSync("js/32-v139-rested-experience.js","utf8");
-const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 const uiGuidelines=fs.readFileSync("UI_GUIDELINES.md","utf8");
 
@@ -82,6 +82,7 @@ function makeEconomyContext(){
             getItem:key=>storage.has(key)?storage.get(key):null,
             setItem:(key,value)=>storage.set(key,String(value))
         },
+        FourSymbolsAccountSave:{accountKey:name=>"four_symbols_account:test-uid:"+name},
         setTimeout:()=>0,
         setInterval:()=>0,
         alert:()=>{},
@@ -152,6 +153,7 @@ test("rested EXP accrues every two minutes, caps at 300, and consumes one battle
             setItem:(key,value)=>storage.set(key,String(value)),
             removeItem:key=>storage.delete(key)
         },
+        FourSymbolsAccountSave:{accountKey:name=>"four_symbols_account:test-uid:"+name},
         renderOfflineExpContent:()=>"<div>既有離線經驗</div>",
         setInterval:()=>1
     });
@@ -218,7 +220,7 @@ test("modular item art is permanent guidance and current assets are cache-versio
     assert.match(loaderSource,/js\/32-v139-rested-experience\.js/);
     assert.match(loaderSource,/css\/37-v139-rested-experience\.css/);
     assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log("\nV139 economy/rested EXP suite: "+passed+" tests passed.");

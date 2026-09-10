@@ -4,7 +4,7 @@ const fs=require("node:fs");
 const synthesis=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
 const css=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 assert.match(synthesis,/reforgeMaterialTier:"white",lockedReforgeKeys:\[\]/);

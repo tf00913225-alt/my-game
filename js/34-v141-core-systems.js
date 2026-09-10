@@ -14,7 +14,7 @@
     const VALID_RANKS=new Set(["regular","elite","boss"]);
     const WILD_ELITE_RATE=0.10;
     const WILD_ZONE_STRENGTHS=window.v173WildZoneStrengthMultipliers;
-    const V141_PROGRESS_KEY="v141_account_progress";
+    const V141_PROGRESS_KEY=window.FourSymbolsAccountSave.accountKey("progress");
 
     window.V141_INVENTORY_CAPACITY=INVENTORY_CAPACITY;
     window.v141SystemConfig=Object.freeze({

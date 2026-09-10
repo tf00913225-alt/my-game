@@ -123,6 +123,11 @@ jobs:
           done
           test "$success" = "1" || { echo "Deployed release manifest did not converge to expected SHA/version"; exit 1; }
 
+      - name: Run live account-first cold-start QA
+        run: |
+          node --check .github/scripts/boot-live-browser-qa.mjs
+          node .github/scripts/boot-live-browser-qa.mjs
+
       - name: Run live mobile Abyss browser QA
         run: |
           node --check .github/scripts/abyss-live-browser-qa.mjs
@@ -157,6 +162,7 @@ jobs:
           echo "Branch: dev" >> "$GITHUB_STEP_SUMMARY"
           echo "Commit SHA: $EXPECTED_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "Deployment SHA verified: YES" >> "$GITHUB_STEP_SUMMARY"
+          echo "Live account-first boot QA: PASS" >> "$GITHUB_STEP_SUMMARY"
           echo "Live mobile Abyss browser QA: PASS" >> "$GITHUB_STEP_SUMMARY"
           echo "Live mobile battle layer/audio QA: PASS" >> "$GITHUB_STEP_SUMMARY"
           cat release-manifest.final.json >> "$GITHUB_STEP_SUMMARY"
@@ -164,3 +170,5 @@ jobs:
           cat artifacts/browser-qa/abyss-live-qa.json >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
           cat artifacts/browser-qa/battle-layer-audio-live-qa.json >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/browser-qa/boot-live-qa.json >> "$GITHUB_STEP_SUMMARY"

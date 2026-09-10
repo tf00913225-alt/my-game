@@ -5,6 +5,8 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
+const accountRepositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const TEST_UID="abyss-test-uid";
 
 function storage(seed){
     const values=new Map(Object.entries(seed||{}).map(([key,value])=>[key,String(value)]));
@@ -72,6 +74,13 @@ function load(options={}){
     context.window=context;
     context.globalThis=context;
     vm.createContext(context);
+    vm.runInContext(accountRepositorySource,context,{filename:"js/startup/account-save-repository.js"});
+    context.FourSymbolsAccountSave.activate(TEST_UID);
+    const oldMain=localStorage.getItem("battle_full_version_save_v5");
+    if(oldMain){
+        context.FourSymbolsAccountSave.writeForUid(TEST_UID,JSON.parse(oldMain),{source:"test-fixture"});
+        localStorage.removeItem("battle_full_version_save_v5");
+    }
     vm.runInContext(source,context,{filename:"js/59-abyss-two-tier-runtime.js"});
     return {
         context,localStorage,playerEl,mapEl,
@@ -244,7 +253,7 @@ test("Abyss progress hydrates from the canonical main save when the compatibilit
     const mainSeed={"battle_full_version_save_v5":JSON.stringify({player:{id:"qa",level:50}})};
     const first=load({storage:mainSeed});
     vm.runInContext("v174AbyssSelectDifficulty(20);v174AbyssResolveBattleResult('win');v174AbyssClaimChest()",first.context);
-    const snapshot=first.localStorage.snapshot();delete snapshot.v174_abyss_state_v2;
+    const snapshot=first.localStorage.snapshot();delete snapshot[first.context.FourSymbolsAccountSave.accountKey("abyss-state")];
     const second=load({storage:snapshot});
     const state=value(second.context,"v174AbyssGetRunState(20)");
     assert.deepEqual([state.phase,state.chestClaimed,state.portalUnlocked],["portal",true,true]);

@@ -25,6 +25,7 @@ html,body{margin:0;width:420px;height:747px;background:#000;overflow:hidden}#gam
 </style></head><body><div id="game-stage"><div id="itemModal" class="item-modal"><div class="item-modal-box"><div id="itemModalIcon">◇</div><div id="itemModalName"></div><div id="itemModalStats"></div><div class="item-modal-buttons"><button id="v17342InventoryPotionUse">使用</button><button id="itemEquipButton" disabled>不可裝備</button><button>售出</button></div><button class="close-item-button">返回</button></div></div></div><div id="rewardLayer"></div><pre id="result"></pre>
 <script>
 window.inventorySlots=[{id:'sp10',type:'potion',name:'回復10%SP藥水',stats:{},reforgeSlots:0}];window.inventoryItems=[];window.characterEquipment={};
+window.__accountKeys=[];window.FourSymbolsAccountSave={accountKey:function(suffix){window.__accountKeys.push(suffix);return 'four_symbols_account:fixture-uid:'+suffix;}};
 window.openItemModal=function(index){const item=inventorySlots[index];document.getElementById('itemModalName').textContent=item.name;document.getElementById('itemModalStats').innerHTML='<div>效果：<b>回復最大SP的10%</b></div><div>售價：25 金幣</div>';};
 window.closeItemModal=function(){};
 window.v132ShowRewardModal=function(markup){document.getElementById('rewardLayer').innerHTML='<div class="v132-reward-modal">'+markup+'</div>';};
@@ -37,7 +38,7 @@ const potion={box:rect(box),stats:rect(stats),buttons:rect(buttons),gap:rect(but
 v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>材料寶箱 開啟預覽</h3><div class="v132-preview-list-scroll">'+Array.from({length:8},(_,i)=>'<div style="height:70px">獎勵 '+i+'</div>').join('')+'</div><div class="v132-reward-actions"><button>關閉</button></div></div>');
 const preview=document.querySelector('.v17346-preview-modal'),title=preview.querySelector('h3'),list=preview.querySelector('.v132-preview-list-scroll'),actions=preview.querySelector('.v132-reward-actions');
 const previewShot={box:rect(preview),title:rect(title),list:rect(list),actions:rect(actions),overflow:getComputedStyle(preview).overflow,listOverflow:getComputedStyle(list).overflowY};
-document.getElementById('result').textContent=JSON.stringify({potion,previewShot});
+document.getElementById('result').textContent=JSON.stringify({potion,previewShot,accountKeys:window.__accountKeys});
 </script></body></html>`;
 fs.writeFileSync(fixture,html,"utf8");
 try{
@@ -46,6 +47,7 @@ try{
     const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);assert.ok(match,"result missing");
     const data=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
     assert.ok(data.potion.box.height<360,"potion detail must not retain the 540px equipment inspector height");
+    assert.deepEqual(data.accountKeys,["equipment-shop-daily"],"equipment browser fixture must honor the account-scoped storage dependency");
     assert.ok(data.potion.gap<24,"potion details must not leave a large blank spacer above actions");
     assert.equal(data.potion.buttonMargin,"0px");
     assert.equal(data.previewShot.overflow,"hidden","preview outer frame must clip its own content");

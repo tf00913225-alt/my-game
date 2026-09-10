@@ -7,7 +7,7 @@ const economy=read("js/28-v133-economy-rebalance.js");
 const main=read("js/00-main.js");
 const water=read("js/50-v169-water-skill-rules.js");
 const index=read("index.html");
-const loader=read("js/20-anonymous-20.js");
+const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
 const agents=read("AGENTS.md");
 assert.match(dungeon,/material:\{title:"材料副本",requirement:"任一角色達到10級"/);
 assert.match(dungeon,/gold:\{title:"金幣副本",requirement:"任一角色達到10級"/);

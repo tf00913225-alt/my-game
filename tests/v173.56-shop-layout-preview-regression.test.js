@@ -3,7 +3,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const shop=fs.readFileSync("js/56-v173.51-shop-qa.js","utf8");
 const css=fs.readFileSync("css/53-v173.51-qa.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 assert.ok(shop.includes("v17345-equipment-card v17346-shop-card"));
 assert.ok(shop.includes("v17345-equipment-icon v17346-gear-art"));

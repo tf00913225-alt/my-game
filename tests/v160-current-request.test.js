@@ -5,7 +5,7 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const balance=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
@@ -17,7 +17,7 @@ function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V160 corrections remain published under the current cache version",()=>{
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 test("Ice Arrow Rain follows the current thirty-five percent Frostbite for two rounds",()=>{

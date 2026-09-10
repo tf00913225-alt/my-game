@@ -5,7 +5,7 @@ const vm=require("node:vm");
 
 const main=fs.readFileSync("js/00-main.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 
 const keyIndex=main.indexOf('const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";');
 const start=main.lastIndexOf("/* =====================================================",keyIndex);
@@ -59,6 +59,6 @@ function harness(initialReady){
 
 assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
 assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
-assert.match(index,/js\/00-main\.js\?v=173\.64/);
-assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 console.log("✓ V173.50 same-session resume and background save regression passed");

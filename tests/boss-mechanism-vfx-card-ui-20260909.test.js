@@ -8,8 +8,8 @@ const v141=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
 const v143=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const boss=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
 const runtime=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
-const core=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
+const featureManifest=JSON.parse(fs.readFileSync("config/feature-manifest.json","utf8"));
+const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 
 // Gameplay mechanism targets are sidecar string keys. The final V143 Sprite
 // owner must preserve the exact mechanism:* key through card resolution.
@@ -64,13 +64,11 @@ assert.match(boss,/\.boss-mechanism-info-panel\{[\s\S]*?width:170px;[\s\S]*?heig
 assert.match(boss,/@keyframes gameplayMechanismInfoAlert/);
 assert.match(boss,/prefers-reduced-motion:reduce[\s\S]*?boss-mechanism-info-alert/);
 
-// Dynamic owner URLs receive a new scoped cache key. Existing shared V141/V143
-// and VFX cache keys remain intentionally unchanged.
-assert.match(core,/gameplay-boss-tower\.css\?v=173\.64&patch=boss-card-detail-ui-20260909/);
-assert.match(core,/gameplay-boss-tower-system\.js\?v=173\.64&patch=boss-card-detail-ui-20260909/);
-assert.match(loader,/38-v141-system-expansion\.css"\)\+"&patch=boss-card-ui-20260909"/);
-assert.match(loader,/40-v143-combat-dungeon-polish\.css"\)\+"&patch=boss-card-ui-20260909"/);
-assert.match(loader,/cacheKey:"boss-mechanism-vfx-20260909"/);
-assert.match(loader,/runtime\.cacheKey\?"&patch="\+runtime\.cacheKey/);
+// Production owns these sources in a content-hashed feature bundle. No runtime
+// HTTP chain or global cache-busting query is allowed to retake ownership.
+assert.equal(featureManifest.features["boss-tower"],"feature-boss-relic");
+assert.deepEqual(featureManifest.bundles["feature-boss-relic"].dependencies,["gameplay-core"]);
+assert.match(build,/const bossRelicScripts=\["js\/gameplay-boss-tower-system\.js","js\/60-team-relic-system\.js"\]/);
+assert.match(build,/const bossRelicStyles=\["css\/gameplay-boss-tower\.css","css\/55-team-relic-system\.css"\]/);
 
 console.log("Boss mechanism VFX/card UI regression checks passed.");
