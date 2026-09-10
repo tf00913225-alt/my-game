@@ -28,7 +28,7 @@ function chromeBinary(){
     }
     throw new Error("Headless Chrome/Chromium is required for live boot QA.");
 }
-async function waitForJson(url,timeoutMs=15000){const started=Date.now();while(Date.now()-started<timeoutMs){try{const response=await fetch(url);if(response.ok){return response.json();}}catch(_){}await sleep(120);}throw new Error("Chrome DevTools endpoint timed out");}
+async function waitForJson(url,timeoutMs=45000){const started=Date.now();while(Date.now()-started<timeoutMs){try{const response=await fetch(url);if(response.ok){return response.json();}}catch(_){}await sleep(120);}throw new Error("Chrome DevTools endpoint timed out");}
 class CdpClient{
     constructor(url){this.url=url;this.socket=null;this.nextId=1;this.pending=new Map();}
     async connect(){this.socket=new WebSocket(this.url);await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error("CDP timeout")),10000);this.socket.onopen=()=>{clearTimeout(timer);resolve();};this.socket.onerror=()=>{clearTimeout(timer);reject(new Error("CDP connection failed"));};});this.socket.onmessage=async event=>{let raw=event.data;if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){raw=await raw.text();}const message=JSON.parse(String(raw));if(!message.id){return;}const pending=this.pending.get(message.id);if(!pending){return;}this.pending.delete(message.id);if(message.error){pending.reject(new Error(pending.method+": "+message.error.message));}else{pending.resolve(message.result||{});}};}

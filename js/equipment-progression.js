@@ -670,16 +670,14 @@
 
     window.v17346ShowEquipmentDungeonPreview=function(){
         if(typeof window.v132ShowRewardModal!=="function"){ return; }
-        const previewAssets={
-            white:"assets/equipment/warrior/head-01.png",
-            blue:"assets/equipment/warrior/armor-01.png",
-            purple:"assets/equipment/warrior/shoes-01.png",
-            orange:"assets/equipment/warrior/weapon-01.png"
-        };
-        const tiles=EQUIPMENT_CHEST_DROP_TABLE.map(entry=>'<div class="v17361-reward-icon rarity-'+entry.key+'"><img src="'+previewAssets[entry.key]+'" alt=""><em>'+entry.chance+'%</em></div>').join("");
-        const html='<div class="v132-reward-modal-inner v17346-preview-modal v17361-reward-preview"><h3>裝備副本獎勵預覽</h3>'+
-            '<div class="v17361-reward-visual equipment">'+tiles+'</div>'+
-            '<div class="v17361-chest-count" aria-label="兩個裝備寶箱"><img src="assets/items/chests/dungeon-chest.png" alt=""><b>×2</b></div>'+
+        const odds=equipmentChestOddsText("　・　");
+        const html='<div class="v132-reward-modal-inner v17361-reward-preview v17363-text-reward-preview">'+
+            '<div class="v17363-preview-heading"><small>DAILY DUNGEON</small><h3>裝備副本獎勵預覽</h3></div>'+
+            '<div class="v17363-preview-groups">'+
+                '<section class="v17363-preview-group"><b>裝備寶箱</b><em>×2</em><p>勝利後取得 2 個裝備寶箱；每個寶箱固定隨機取得 3 件裝備。</p></section>'+
+                '<section class="v17363-preview-group"><b>裝備品階機率</b><p>'+escapeHtml(odds)+'</p></section>'+
+            '</div>'+
+            '<div class="v17363-preview-note">機率直接取自正式裝備寶箱掉落表，不載入大型裝備預覽圖。</div>'+
             '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };

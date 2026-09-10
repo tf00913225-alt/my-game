@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.d1b27c187d4b.js"
+      "build/boot-core.da5a24648490.js"
     ],
     "styles": [
       "build/boot-core.71f7ecfc4e95.css"
@@ -12,7 +12,7 @@
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg"
     ],
-    "firebaseBootstrap": "build/firebase/firebase-bootstrap.ab033d255445.js"
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.597a85e95aec.js"
   },
   "featureManifest": {
     "schemaVersion": 1,
@@ -22,16 +22,16 @@
           "build/app-shell.4121e7bf3a8e.js"
         ],
         "styles": [
-          "build/app-shell.37d5b9f36840.css"
+          "build/app-shell.eb72b9ca5a99.css"
         ],
         "dependencies": []
       },
       "gameplay-core": {
         "scripts": [
-          "build/gameplay-core.c8bdbe557965.js"
+          "build/gameplay-core.eab9b555eb24.js"
         ],
         "styles": [
-          "build/gameplay-core.13dae8d242bf.css"
+          "build/gameplay-core.3e9f850dc2ef.css"
         ],
         "dependencies": [
           "app-shell"
@@ -88,10 +88,12 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.af3d3cea8249.js"
+          "build/feature-boss-relic.af3d3cea8249.js",
+          "build/feature-relic-progression.66dc0818b8ae.js"
         ],
         "styles": [
-          "build/feature-boss-relic.ca9df1f107f3.css"
+          "build/feature-boss-relic.0298e2f4a6fd.css",
+          "build/feature-relic-progression.8844d5eb6e81.css"
         ],
         "dependencies": [
           "gameplay-core"
@@ -119,17 +121,17 @@
     ]
   },
   "assets": {
-    "build/boot-core.d1b27c187d4b.js": {
-      "sha256": "d1b27c187d4b",
-      "bytes": 40214
+    "build/boot-core.da5a24648490.js": {
+      "sha256": "da5a24648490",
+      "bytes": 43156
     },
     "build/app-shell.4121e7bf3a8e.js": {
       "sha256": "4121e7bf3a8e",
       "bytes": 923465
     },
-    "build/gameplay-core.c8bdbe557965.js": {
-      "sha256": "c8bdbe557965",
-      "bytes": 1158641
+    "build/gameplay-core.eab9b555eb24.js": {
+      "sha256": "eab9b555eb24",
+      "bytes": 1158597
     },
     "build/feature-patrol.5e57b7df47ae.js": {
       "sha256": "5e57b7df47ae",
@@ -147,17 +149,21 @@
       "sha256": "af3d3cea8249",
       "bytes": 138290
     },
+    "build/feature-relic-progression.66dc0818b8ae.js": {
+      "sha256": "66dc0818b8ae",
+      "bytes": 65339
+    },
     "build/boot-core.71f7ecfc4e95.css": {
       "sha256": "71f7ecfc4e95",
       "bytes": 219878
     },
-    "build/app-shell.37d5b9f36840.css": {
-      "sha256": "37d5b9f36840",
-      "bytes": 110537
+    "build/app-shell.eb72b9ca5a99.css": {
+      "sha256": "eb72b9ca5a99",
+      "bytes": 110538
     },
-    "build/gameplay-core.13dae8d242bf.css": {
-      "sha256": "13dae8d242bf",
-      "bytes": 312966
+    "build/gameplay-core.3e9f850dc2ef.css": {
+      "sha256": "3e9f850dc2ef",
+      "bytes": 314255
     },
     "build/feature-patrol.0db7cba8da88.css": {
       "sha256": "0db7cba8da88",
@@ -167,29 +173,33 @@
       "sha256": "3d298c2d78c2",
       "bytes": 25629
     },
-    "build/feature-boss-relic.ca9df1f107f3.css": {
-      "sha256": "ca9df1f107f3",
-      "bytes": 43944
+    "build/feature-boss-relic.0298e2f4a6fd.css": {
+      "sha256": "0298e2f4a6fd",
+      "bytes": 47707
+    },
+    "build/feature-relic-progression.8844d5eb6e81.css": {
+      "sha256": "8844d5eb6e81",
+      "bytes": 5535
     },
     "build/firebase/firebase-config.4314d6321ba1.js": {
       "sha256": "4314d6321ba1",
       "bytes": 1681
     },
-    "build/firebase/firebase-auth.04b69a7bf734.js": {
-      "sha256": "04b69a7bf734",
-      "bytes": 4066
+    "build/firebase/firebase-auth.a53b9f4c06d7.js": {
+      "sha256": "a53b9f4c06d7",
+      "bytes": 4354
     },
-    "build/firebase/firebase-cloud-save.eb404e143334.js": {
-      "sha256": "eb404e143334",
+    "build/firebase/firebase-cloud-save.e1ab7e7f2119.js": {
+      "sha256": "e1ab7e7f2119",
       "bytes": 4070
     },
-    "build/firebase/firebase-auth-ui.9fb5cf2ad237.js": {
-      "sha256": "9fb5cf2ad237",
-      "bytes": 9974
+    "build/firebase/firebase-auth-ui.e6a76e6cf3a7.js": {
+      "sha256": "e6a76e6cf3a7",
+      "bytes": 10574
     },
-    "build/firebase/firebase-bootstrap.ab033d255445.js": {
-      "sha256": "ab033d255445",
-      "bytes": 4015
+    "build/firebase/firebase-bootstrap.597a85e95aec.js": {
+      "sha256": "597a85e95aec",
+      "bytes": 4053
     },
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {
       "sha256": "4631c0bc3f2b",

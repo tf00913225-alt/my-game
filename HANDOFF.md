@@ -1,3 +1,24 @@
+## 2026-09-10 四分支安全整合：Boss 9:16 手機版面（dev integration）
+
+- 指定工作分支 `fix/boss-ui-9x16-mobile-20260910@0865bbaef3e8c1ee5f054bf4774bc800db9f7ec2` 的 Boss 與機制卡 9:16 CSS 已整合到正式 owner `css/gameplay-boss-tower.css`。
+- 與秘寶分支共同修改 `asset-manifest.json`、`build/asset-manifest.json` 與 `feature-boss-relic` bundle；人工整合保留 Boss CSS 新版、秘寶標籤／雜湊素材、以及其後載入的 `feature-relic-progression` CSS/JS。
+- Boss 分支建立於舊 dev；未帶回舊 manifest、舊資源路徑或其他 runtime。測試涵蓋 360×800、393×873、412×915，並使用長 HP `5601 / 5601` 驗證卡片不溢位。
+- CSS 品質檢查先移除註解再掃描全檔 `!important` 宣告；註解中的詞彙不會造成誤判，實際 Boss owner 仍無優先權補丁。
+
+## 2026-09-10 Facebook Firebase 登入補齊（PR #152）
+
+- 工作分支 `feature/facebook-login`；整合基準收斂到 `dev@2f3dc7d13df8e3c629b0544b52c494416a6f6ab1`。Firebase Console 已啟用 Email/Password、Google、Facebook、Anonymous；本次補齊既有 Authentication owner 缺少的 Facebook provider。
+- `js/firebase/firebase-auth.js` 新增 `FacebookAuthProvider` / `signInWithFacebook()`；`js/firebase/firebase-auth-ui.js` 在既有 account-first responsive dialog 加入「Facebook 登入」、busy/error handling；`js/firebase/firebase-bootstrap.js` 透過既有 `FourSymbolsFirebaseLifecycle` 暴露同一登入方法。沒有新增第二套 Auth owner、modal wrapper 或 runtime patch。
+- deterministic build 已重新產生 content-hashed Firebase/Boot assets 與 manifests；`.github/scripts/run-boot-architecture-browser-qa.mjs` 的 Firebase Auth test double 同步補 `signInWithFacebook()`，並擴充 Auth source contract 與 390×844、360×640、844×390 responsive fixture。
+- 不修改 `saveGame()` / `loadGame()`、UID local ownership、Startup State Machine、Firestore browser write policy、雲端/本機存檔 schema、Game/Cache Version；`main` 不在本工作修改。
+- Meta live 前提：Valid OAuth Redirect URIs 必須包含 `https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`。合入 dev 後仍需手機實測 Facebook popup、Firebase UID 與同 UID 存檔解析。
+
+## 2026-09-10 四分支安全整合：Screen Wake Lock owner 收斂（dev integration）
+
+- 指定工作分支 `feature/screen-wake-lock-runtime-20260910@55054cb18c93d319653922541b343079cc41eb19` 的可見頁面常亮需求保留；整合時移除 `index.html` 內未登記的 inline runtime，改由 `js/startup/screen-wake-lock-runtime.js` 作唯一 owner，並納入既有單一 hashed Boot Core。它只安裝生命週期並 fire-and-forget 呼叫 Wake Lock API，不等待、不阻塞 Auth／存檔／首個可操作畫面。
+- `visibilitychange` hidden 與 `pagehide` 會主動釋放；visible／`pageshow` 會恢復。`requestGeneration` 使 release 後才完成的 pending request 失效並立即釋放，避免頁面已離開仍重新持鎖；全域 guard 保證不會重複安裝 listener。公開診斷仍為 `window.FourSymbolsScreenWakeLock`。
+- `tests/screen-wake-lock.test.js` 覆蓋 unsupported／拒絕、重複 acquire、hidden release、pageshow/pagehide、pending race 與重複安裝；`tests/boot-architecture.test.js` 永久禁止 `index.html` 再出現未登記 inline executable script。正式裝置是否確實不休眠仍需在 HTTPS dev 與支援 Screen Wake Lock 的手機驗證。
+
 ## 2026-09-10 V173.65 登入自適應與共用客服信箱（MAIN RELEASED）
 
 - 基準為 `dev@2bd79fb3c0133101caa3ba7a0345b7e39277f94d`，工作分支 `fix/v17365-auth-responsive-support`。使用者回報 Android／內嵌瀏覽器的未登入畫面只露出 1080×1920 stage 右下角，並要求登入頁、系統頁與免廣告服務資訊統一顯示客服信箱 `tf00913225@gmail.com`。
@@ -3697,3 +3718,21 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Promotion 前重新讀取遠端：`dev=ade22629ddaa7f8451dc3aaa8b4696f8d67cc92b`、`main=bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe`。兩者 history 因歷次 main promotion commit 分岔，但 main tree `80baa9b133252950283ff37ea95b32e0911de63d` 與本輪整合前 `dev@29b9668057846164a941fbf6617d2458d9af5476` tree 完全相同。
 - 已建立 ancestry reconciliation commit `6d9273d014ca7c2c746bccbc453eeb1b00a86780`，雙親為已驗證 dev 與現行 main，tree 保持 dev `686eec88a0d9ac2a08f0631876e68f1d1e47baa5` 不變；這只收斂歷史，不回退或覆蓋任何 runtime／CSS／測試內容。
 - 後續固定走 `dev CI／精確 SHA 部署 → dev-to-main PR → main Repository checks → merge → production Pages SHA 核對`，禁止 force-push main。
+
+## 2026-09-10 — 秘寶養成／掉落系統安全整合（dev only）
+
+- 指定來源為 `feature/relic-progression-drop-system@7125580afa5d1c89d6cae0a2d986c71a6f22d916`；本次僅整合至 `dev`，`main` 受保護且不得修改。
+- `js/relic-progression-drop-system.js` 是碎片合成、通用碎片替代、秘寶精華／突破石、Boss 定向掉落、塔里程碑自選箱與 pending receipt 的唯一 owner；狀態沿用 UID 主存檔內的 `player.relicProgression` 與既有 inventory transaction，不建立 sidecar storage。
+- Loader 順序必須維持 `feature-boss-relic` 基礎 runtime 在前、`feature-relic-progression` 在後。singleton installed flag 只可在 `v174RelicSystem`、`GameplaySystem`、`FourSymbolsAccountSave` 三個 owner 都存在後設定，避免依賴順序異常時永久停用且無法重試。
+- 本 owner 不得接管 `winBattle`、`loseBattle`、`v132LaunchDungeonBattle` 或 `saveGame`；它只包裝公開 Boss／塔入口並依既有進度 state 對帳 exact-once receipt。理論上的同 ID 並行物品異動、UTC 跨週邊界與滿 120 格選擇箱仍需列為已知邊界，不得以 CI 綠燈宣稱已消除。
+- Game／Cache Version 維持 V173.65；本批最終驗證與未驗證項目統一記錄於 `release/requirement-batches/2026-09-10-four-branch-dev-integration.json`。
+
+## 2026-09-10 — 裝備／玩法／主城 UI owner 收斂（dev only）
+
+- 指定來源為 `fix/ui-equipment-gameplay-city-polish-continued@26a67473128674c91fa363cefbd33e5f3f1c8034`；本次只允許進入 `dev`，不得修改 `main`。
+- 原分支的 `body #game-stage .v17361-reward-preview` 與 `body #game-stage #allElementSkillPreviewModal` 都不符合正式 DOM：reward modal 與全元素技能 modal 會直接掛在 `document.body`。整合時改由 `js/equipment-progression.js` 產生正式文字預覽、`css/33-v132-content-expansion.css` 持有 body modal 版面，並直接調整 `css/56-v174-critical-ui-regressions.css` 的 body selector。
+- 固定「返回主城」控制直接由 `index.html#gameplayPage` 持有；不保留 `js/62-v174-current-ui-fixes.js`、永久 `four-symbols:feature-ready` listener 或 app-ui-fixes bundle。
+- 裝備格、短螢幕隊伍 HUD、秘寶／元素匣標籤分別收斂至 `css/38-v141-system-expansion.css`、`css/42-v146-system-polish.css`、`css/55-team-relic-system.css`。未保留含大量 `!important` 的 `css/57-v174-current-ui-fixes.css`。
+- 新秘寶主城圖使用 content-hashed 路徑 `assets/ui/home-relic-v174.eed14e806044.webp`；舊無 hash URL 不覆寫，避免既有客戶端快取沿用錯誤內容。
+- 裝備副本品階機率由 `EQUIPMENT_CHEST_DROP_TABLE` 經 `equipmentChestOddsText()` 產生，不再把 40/40/10/10 複製到 CSS 偽元素。
+- CI 的窄螢幕 fixture 證實文字獎勵框原本仍可因 392px 上限溢出；正式 owner 已改用 `calc(100vw - 32px)`／`calc(100dvh - 32px)`。QA 以明確 390×844／412×915 overlay surface 驗證四邊 containment，不把 CI Chrome 的 500px 最小 `innerWidth` 誤稱為手機 viewport。

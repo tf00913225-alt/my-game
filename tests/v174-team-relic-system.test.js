@@ -58,7 +58,7 @@ assert.match(utilityRule,/background:linear-gradient\(155deg,rgba\(35,25,15,\.96
 assert.match(utilityRule,/box-shadow:0 4px 10px rgba\(0,0,0,\.52\)/,
     "relic and element-box entrances must retain their black-gold skin while accommodating readable labels");
 assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-icon\{[^}]*width:100%;[^}]*height:58px/);
-assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-label\{[^}]*font-size:15px;[^}]*line-height:20px/);
+assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-label\{[^}]*font-size:13px;[^}]*line-height:18px;[^}]*font-weight:900/);
 assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-utility\{[\s\S]*?pointer-events:auto/,
     "relic and element-box buttons must retain their own hitboxes");
 assert.match(css,/\.team-relic-battle-banner\{[^}]*top:48%/,

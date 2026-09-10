@@ -2,12 +2,13 @@
  * Firebase Authentication owner.
  *
  * Scope: initialize Firebase Auth, keep durable browser auth state, and expose
- * Google / email-password / anonymous sign-in plus sign-out and state observation.
+ * Google / Facebook / email-password / anonymous sign-in plus sign-out and state observation.
  * This module intentionally does not touch game saves or Firestore writes.
  */
 
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 import {
+    FacebookAuthProvider,
     GoogleAuthProvider,
     browserLocalPersistence,
     createUserWithEmailAndPassword,
@@ -92,6 +93,13 @@ export function getSignedInUser(){
 export async function signInWithGoogle(){
     const { auth } = await initializeFirebaseAuth();
     const provider = new GoogleAuthProvider();
+    const credential = await signInWithPopup(auth, provider);
+    return publicUser(credential.user);
+}
+
+export async function signInWithFacebook(){
+    const { auth } = await initializeFirebaseAuth();
+    const provider = new FacebookAuthProvider();
     const credential = await signInWithPopup(auth, provider);
     return publicUser(credential.user);
 }

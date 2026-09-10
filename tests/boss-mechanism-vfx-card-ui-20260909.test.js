@@ -11,6 +11,15 @@ const runtime=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const featureManifest=JSON.parse(fs.readFileSync("config/feature-manifest.json","utf8"));
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 
+function cssRule(source,selector){
+    const start=source.indexOf(selector);
+    assert.ok(start>=0,`missing CSS selector: ${selector}`);
+    const open=source.indexOf("{",start);
+    const close=source.indexOf("}",open);
+    assert.ok(open>=0&&close>open,`malformed CSS selector: ${selector}`);
+    return source.slice(start,close+1);
+}
+
 // Gameplay mechanism targets are sidecar string keys. The final V143 Sprite
 // owner must preserve the exact mechanism:* key through card resolution.
 assert.match(vfx,/const MECHANISM_TARGET_PREFIX="mechanism:";/);
@@ -25,23 +34,53 @@ assert.match(vfx,/isMechanismTarget\(index\)\)\{ return mechanismCardFor\(index\
 // Generic battle card sizes remain untouched. Only a runtime-tagged Gameplay
 // BOSS receives the large portrait 9:16 variables requested for this screen.
 assert.match(v141,/flex:0 0 var\(--v143-monster-card-width,76px\) !important;/);
-assert.match(v143,/\.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:82px;[\s\S]*?--v143-monster-card-height:106px;/);
-assert.match(boss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?--v143-monster-card-width:166px;[\s\S]*?--v143-monster-card-height:295px;[\s\S]*?aspect-ratio:9 \/ 16;/);
+assert.match(v143,/#game-stage > #app > #game-content #battlePage \.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:82px;[\s\S]*?--v143-monster-card-height:106px;/);
+assert.match(boss,/#game-stage > #app > #game-content #battlePage \.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:clamp\(154px,38\.1%,166px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:9 \/ 16;/);
 assert.match(runtime,/bossCard\.classList\.add\("gameplay-boss-card"\)/);
 
-// The redundant battle heading is hidden only while a Gameplay BOSS is active.
-// Its historical V15 geometry is reclaimed by the formation without introducing
-// a new priority patch in the formal Gameplay stylesheet.
-assert.match(boss,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
-assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-23px;/);
-assert.doesNotMatch(boss,/!important/);
+// The old V131 row has a hard flex sizing path. Gameplay BOSS mode switches
+// only that runtime row to grid so the real card width variable can own geometry;
+// this avoids a later !important or transform-based visual enlargement.
+assert.match(boss,/#battleMonsterArea\.gameplay-boss-active \.v131-monster-row\{[\s\S]*?display:grid;[\s\S]*?grid-template-columns:1fr;[\s\S]*?place-items:start center;/);
+const bossCardSelector="#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank=\"boss\"]{";
+const bossCardRule=cssRule(boss,bossCardSelector);
+assert.doesNotMatch(bossCardRule,/!important/);
+assert.doesNotMatch(bossCardRule,/transform\s*:/);
+assert.doesNotMatch(bossCardRule,/zoom\s*:/);
+assert.doesNotMatch(bossCardRule,/scale\(/);
 
-// The function/mechanism card is portrait 9:16 and its face is deliberately
-// limited to mechanism name, kind and HP. Combat targeting remains on the
-// mechanism card itself and is not reused by the information button.
+// The redundant battle heading is hidden only while a Gameplay BOSS is active.
+// Its historical geometry is reclaimed by the formation without introducing
+// a new priority patch in the new Boss-specific sizing rules.
+assert.match(boss,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
+assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-32px;/);
+const activeBossAreaRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active{");
+const activeBossRowRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{");
+assert.doesNotMatch(activeBossAreaRule,/!important/);
+assert.doesNotMatch(activeBossRowRule,/!important/);
+
+// The function/mechanism card is an independent portrait 9:16 battlefield
+// component. Its face is type -> name -> HP -> concise effect. Combat targeting
+// remains on the mechanism button itself; the separate detail panel keeps the
+// full dynamic explanation available.
 assert.match(boss,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
-assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:78px;[\s\S]*?aspect-ratio:9 \/ 16;/);
-assert.match(boss,/\.boss-mechanism-hp\{[\s\S]*?min-height:19px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
+assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:clamp\(82px,20%,96px\);[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?flex:0 0 clamp\(82px,20%,96px\);/);
+assert.match(boss,/\.boss-mechanism-kind\{[\s\S]*?order:1;[\s\S]*?font-size:13px;/);
+assert.match(boss,/\.boss-mechanism-name\{[\s\S]*?order:2;[\s\S]*?font-size:14px;[\s\S]*?-webkit-line-clamp:2;/);
+assert.match(boss,/\.boss-mechanism-hp\{[\s\S]*?order:3;[\s\S]*?min-height:20px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
+assert.match(boss,/\.boss-mechanism-card::after\{[\s\S]*?order:4;[\s\S]*?-webkit-line-clamp:4;/);
+assert.match(boss,/data-type="shield"\]::after\{ content:"護體中・優先擊破"; \}/);
+assert.match(boss,/data-type="charge"\]::after\{ content:"倒數重擊・擊破可取消"; \}/);
+assert.match(boss,/data-type="heal"\]::after\{ content:"每回合回復 BOSS 4%"; \}/);
+assert.match(boss,/data-type="amplify"\]::after\{ content:"BOSS 傷害提高25%"; \}/);
+assert.match(boss,/data-type="seal"\]::after\{ content:"治療／SP 回復 -40%"; \}/);
+const mechanismCardRule=cssRule(boss,"#game-stage #battleMonsterArea .boss-mechanism-card{");
+assert.doesNotMatch(mechanismCardRule,/!important/);
+assert.doesNotMatch(mechanismCardRule,/transform\s*:/);
+assert.doesNotMatch(mechanismCardRule,/zoom\s*:/);
+assert.doesNotMatch(mechanismCardRule,/scale\(/);
+ assert.doesNotMatch(boss.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Boss stylesheet declarations must remain free of priority patches");
+
 const renderStart=runtime.indexOf("function renderMechanisms()");
 const renderEnd=runtime.indexOf("function showMechanismToast",renderStart);
 assert.ok(renderStart>=0&&renderEnd>renderStart,"renderMechanisms owner must exist");
