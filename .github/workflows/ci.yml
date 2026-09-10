@@ -14,6 +14,40 @@ permissions:
   contents: read
 
 jobs:
+  patch_facebook_auth_qa:
+    name: Patch Facebook auth QA double
+    if: github.event_name == 'pull_request' && github.head_ref == 'feature/facebook-login'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out PR head branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+      - name: Extend boot QA Firebase Auth test double
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/scripts/run-boot-architecture-browser-qa.mjs')
+          s=p.read_text()
+          old='export async function signInWithGoogle(){return remember("uid-google");}\nexport async function signInWithEmail(email)'
+          new='export async function signInWithGoogle(){return remember("uid-google");}\nexport async function signInWithFacebook(){return remember("uid-facebook");}\nexport async function signInWithEmail(email)'
+          if old not in s:
+              if 'export async function signInWithFacebook()' in s:
+                  raise SystemExit(0)
+              raise SystemExit('expected fakeAuth anchor not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+          git add .github/scripts/run-boot-architecture-browser-qa.mjs
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "test(auth): extend boot QA double for Facebook"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+
   verify:
     name: Repository checks
     runs-on: ubuntu-latest
