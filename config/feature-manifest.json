@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "bundles": {
     "app-shell": {
-      "scripts": ["__BUILD_APP_SHELL__"],
-      "styles": ["__BUILD_APP_SHELL_STYLE__"],
+      "scripts": ["__BUILD_APP_SHELL__", "__BUILD_UI_FIXES__"],
+      "styles": ["__BUILD_APP_SHELL_STYLE__", "__BUILD_UI_FIXES_STYLE__"],
       "dependencies": []
     },
     "gameplay-core": {
