@@ -17,6 +17,7 @@ const featureTemplate=JSON.parse(read("config/feature-manifest.json"));
 const criticalLogoPath="assets/ui/startup-logo.4631c0bc3f2b.jpg";
 
 const bootScripts=[
+    "js/startup/support-contact.js",
     "js/startup/account-save-repository.js",
     "js/startup/feature-loader.js",
     "js/startup/startup-contract.js",

@@ -46,6 +46,7 @@ function markup(){
             <button id="firebaseEmailCreateButton" class="firebase-auth-button secondary" type="button">建立 Email 帳號</button>
           </div>
           <p class="firebase-auth-note">訪客仍會透過 Firebase Anonymous Auth 取得專屬 UID；沒有 UID 時不能建立角色。</p>
+          <button id="firebaseSupportButton" class="firebase-auth-button firebase-auth-support-button" type="button">聯絡客服</button>
         </div>
         <div id="firebaseSignedInPanel" class="firebase-auth-account">
           <div class="firebase-auth-account-card">
@@ -116,10 +117,13 @@ function bind(){
     byId("firebaseMigrationConfirmButton").addEventListener("click",()=>dispatchAction("confirm-migration"));
     byId("firebaseMigrationCancelButton").addEventListener("click",()=>dispatchAction("cancel-migration"));
     byId("firebaseRetryButton").addEventListener("click",()=>dispatchAction("retry"));
+    byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
 }
 export function installFirebaseAuthUi(){
     if(installed){ return true; }
-    const host=document.getElementById("game-stage")||document.body;
+    /* Authentication must remain usable before app-shell installs the scaled
+       1080x1920 game stage. Keep this responsive surface outside #game-stage. */
+    const host=document.body;
     if(!host){ return false; }
     if(!byId(OVERLAY_ID)){ host.appendChild(markup()); }
     installed=true; bind(); state={...state,user:getSignedInUser()}; render(); return true;

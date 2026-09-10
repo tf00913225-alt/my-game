@@ -28,10 +28,12 @@
     }
 
     function ensureAdFreeConfig(){
+        const formalSupportEmail=String(window.FourSymbolsSupport&&window.FourSymbolsSupport.email||"").trim();
         const existing=window[AD_FREE_CONFIG_KEY]&&typeof window[AD_FREE_CONFIG_KEY]==="object"
             ? window[AD_FREE_CONFIG_KEY]
             : {};
         const config=Object.assign({},DEFAULT_AD_FREE_CONFIG,existing);
+        if(formalSupportEmail){ config.supportEmail=formalSupportEmail; }
         window[AD_FREE_CONFIG_KEY]=config;
         return config;
     }
@@ -75,6 +77,7 @@
 
     function renderAdFreeServiceBody(body){
         const config=ensureAdFreeConfig();
+        const configuredEmail=String(config.supportEmail||"").trim();
         body.innerHTML=[
             '<section class="ad-free-service-panel" data-ad-free-service-info="true">',
                 '<div class="ad-free-service-hero">',
@@ -91,14 +94,14 @@
                 '<section class="ad-free-service-support" aria-label="客服與條款">',
                     '<div class="ad-free-service-support-row">',
                         '<span>客服 Email：</span>',
-                        '<b id="adFreeSupportEmail">尚未設定</b>',
+                        '<b id="adFreeSupportEmail">'+configuredEmail+'</b>',
                     '</div>',
                     '<div class="ad-free-service-policy-actions">',
                         '<button id="adFreeRefundPolicyButton" type="button">查看退款規則</button>',
                         '<button id="adFreeTermsButton" type="button">查看服務條款</button>',
                         '<button id="adFreePrivacyButton" type="button">查看隱私權政策</button>',
                     '</div>',
-                    '<p class="ad-free-service-todo-note">正式客服與條款頁面尚待設定；未設定前不會導向不存在的網址。</p>',
+                    '<p class="ad-free-service-todo-note">退款規則、服務條款與隱私權政策頁面尚待設定；未設定前不會導向不存在的網址。</p>',
                 '</section>',
                 '<div class="ad-free-service-actions">',
                     '<button id="adFreePurchaseButton" class="ad-free-service-purchase" type="button" disabled aria-label="購買 30 天免廣告 NT$99，目前付款服務準備中">付款服務準備中</button>',
@@ -108,10 +111,9 @@
         ].join("");
 
         const supportEmail=document.getElementById("adFreeSupportEmail");
-        const configuredEmail=String(config.supportEmail||"").trim();
         if(supportEmail){
-            supportEmail.textContent=configuredEmail||"尚未設定";
-            supportEmail.dataset.todo=configuredEmail?"false":"true";
+            supportEmail.textContent=configuredEmail;
+            supportEmail.dataset.todo="false";
         }
 
         configurePolicyButton("adFreeRefundPolicyButton",config.refundPolicyUrl,"退款規則");
@@ -134,7 +136,7 @@
             acknowledgeButton.addEventListener("click",closeAdFreeServiceInfoModal);
         }
 
-        // TODO(ECPay): 填入正式客服 Email、退款規則、服務條款、隱私權政策網址。
+        // TODO(ECPay): 填入正式退款規則、服務條款、隱私權政策網址。
         // TODO(ECPay): 完成綠界付款與付款結果驗證後，才可設定 purchaseEnabled=true 與 purchaseUrl。
     }
 

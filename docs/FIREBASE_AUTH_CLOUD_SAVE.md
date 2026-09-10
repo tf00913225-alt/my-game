@@ -9,6 +9,7 @@ Firebase Authentication is a required identity gate for production character own
 - `js/firebase/firebase-auth-ui.js`: account-first player UI.
 - `js/firebase/firebase-cloud-save.js`: authenticated cloud read and trusted callable boundary.
 - `js/firebase/firebase-bootstrap.js`: identity lifecycle followed by UID cloud-save resolution.
+- `js/startup/support-contact.js`: the single customer-support email and shared contact dialog used before and after sign-in.
 - `js/startup/account-save-repository.js`: UID-namespaced local save, metadata, sidecars and legacy migration.
 - `js/52-v173.20-startup-loader.js`: sole startup state machine and destination decision.
 
@@ -22,6 +23,8 @@ Fresh production sessions stop at the account UI until one of these Firebase ide
 - `訪客開始遊戲`, implemented with Firebase Anonymous Auth.
 
 There is no production `先使用本機存檔` path. No UID means no save lookup and no first-character creation. Test doubles are confined to the local QA HTTP server in `.github/scripts/run-boot-architecture-browser-qa.mjs`; the deployed runtime contains no DEV auth bypass.
+
+The account surface is mounted directly under `document.body`, outside the fixed 1080×1920 game stage. It sizes against the real viewport (`100dvh` plus safe-area insets), so signed-out users do not depend on the authenticated app-shell stage scaler. Its `聯絡客服` button and the in-game system page both open `FourSymbolsSupport`, which displays `tf00913225@gmail.com` from one Critical Boot owner.
 
 Google, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup sign-in must also be listed under Authentication → Settings → Authorized domains.
 
