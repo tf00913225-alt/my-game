@@ -193,8 +193,13 @@ try{
     assert.equal(resourceLayers.playerHpVisible,"visible","Player HP bar must remain visible");
     assert.equal(resourceLayers.monsterHpVisible,"visible","Enemy HP bar must remain visible");
 
-    const castTriggered=await client.eval(`(()=>{
-        if(typeof castDamageSkill!=='function'||typeof skillDatabase==='undefined'||!skillDatabase.explosiveFlurry){return false;}
+    /* Capture the production cast and the stage it creates in the same browser
+       task. The battle remains live, so a later CDP poll may observe the next
+       action after this 1.45s presentation has legitimately been superseded. */
+    const productionCastSnapshot=await client.eval(`(()=>{
+        if(typeof castDamageSkill!=='function'||typeof skillDatabase==='undefined'||!skillDatabase.explosiveFlurry){
+            return {triggered:false,skill:null,visibility:null,opacity:null};
+        }
         if(typeof queuedPlayerActions!=='undefined'){queuedPlayerActions[0]={action:'explosiveFlurry',target:2,targetAlly:null};}
         if(typeof selectedMonster!=='undefined'){selectedMonster=2;}
         if(typeof activeBattleCharacterIndex!=='undefined'){activeBattleCharacterIndex=0;}
@@ -205,18 +210,19 @@ try{
             getSkillLevel=function(key,id){return id==='explosiveFlurry'?1:original.apply(this,arguments);};
         }
         castDamageSkill('explosiveFlurry');
-        return true;
-    })()`);
-    assert.equal(castTriggered,true,"Production Fire Explosive Flurry action could not be invoked");
-    await waitFor(client,"document.getElementById('v143-skill-stage')&&getComputedStyle(document.getElementById('v143-skill-stage')).visibility==='visible'","visible V143 skill layer",3000);
-
-    const beforeElementBox=await client.eval(`(()=>{
         const stage=document.getElementById('v143-skill-stage');
-        return {skill:stage?.dataset.skill||null,visibility:stage?getComputedStyle(stage).visibility:null,opacity:stage?getComputedStyle(stage).opacity:null};
+        const style=stage?getComputedStyle(stage):null;
+        return {
+            triggered:true,
+            skill:stage?.dataset.skill||null,
+            visibility:style?.visibility||null,
+            opacity:style?.opacity||null
+        };
     })()`);
-    evidence.checks.skillLayerBeforeElementBox=beforeElementBox;
-    assert.equal(beforeElementBox.skill,"explosiveFlurry","Expected real Fire Flurry V143 layer before Element Box opens");
-    assert.equal(beforeElementBox.visibility,"visible","Skill layer must be visible during normal battle presentation");
+    evidence.checks.skillLayerBeforeElementBox=productionCastSnapshot;
+    assert.equal(productionCastSnapshot.triggered,true,"Production Fire Explosive Flurry action could not be invoked");
+    assert.equal(productionCastSnapshot.skill,"explosiveFlurry","Expected real Fire Flurry V143 layer before Element Box opens");
+    assert.equal(productionCastSnapshot.visibility,"visible","Skill layer must be visible during normal battle presentation");
 
     /* The production cast above proves that a real battle action reaches V143.
        A live battle keeps advancing between CDP round trips, so another formal
