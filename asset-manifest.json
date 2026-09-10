@@ -4,22 +4,22 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.5c427ac9f8a4.js"
+      "build/boot-core.d1b27c187d4b.js"
     ],
     "styles": [
-      "build/boot-core.ebcef3e27424.css"
+      "build/boot-core.71f7ecfc4e95.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg"
     ],
-    "firebaseBootstrap": "build/firebase/firebase-bootstrap.1f1b4586f554.js"
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.ab033d255445.js"
   },
   "featureManifest": {
     "schemaVersion": 1,
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.1576a6b9dc08.js"
+          "build/app-shell.4121e7bf3a8e.js"
         ],
         "styles": [
           "build/app-shell.37d5b9f36840.css"
@@ -119,13 +119,13 @@
     ]
   },
   "assets": {
-    "build/boot-core.5c427ac9f8a4.js": {
-      "sha256": "5c427ac9f8a4",
+    "build/boot-core.d1b27c187d4b.js": {
+      "sha256": "d1b27c187d4b",
       "bytes": 40214
     },
-    "build/app-shell.1576a6b9dc08.js": {
-      "sha256": "1576a6b9dc08",
-      "bytes": 919848
+    "build/app-shell.4121e7bf3a8e.js": {
+      "sha256": "4121e7bf3a8e",
+      "bytes": 923465
     },
     "build/gameplay-core.c8bdbe557965.js": {
       "sha256": "c8bdbe557965",
@@ -147,9 +147,9 @@
       "sha256": "af3d3cea8249",
       "bytes": 138290
     },
-    "build/boot-core.ebcef3e27424.css": {
-      "sha256": "ebcef3e27424",
-      "bytes": 219116
+    "build/boot-core.71f7ecfc4e95.css": {
+      "sha256": "71f7ecfc4e95",
+      "bytes": 219878
     },
     "build/app-shell.37d5b9f36840.css": {
       "sha256": "37d5b9f36840",
@@ -183,12 +183,12 @@
       "sha256": "eb404e143334",
       "bytes": 4070
     },
-    "build/firebase/firebase-auth-ui.0980a19565ee.js": {
-      "sha256": "0980a19565ee",
-      "bytes": 9281
+    "build/firebase/firebase-auth-ui.9fb5cf2ad237.js": {
+      "sha256": "9fb5cf2ad237",
+      "bytes": 9974
     },
-    "build/firebase/firebase-bootstrap.1f1b4586f554.js": {
-      "sha256": "1f1b4586f554",
+    "build/firebase/firebase-bootstrap.ab033d255445.js": {
+      "sha256": "ab033d255445",
       "bytes": 4015
     },
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {

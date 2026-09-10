@@ -68,12 +68,23 @@ test("authentication UI supports Google, email and Firebase anonymous identity w
     assert.match(ui, /沒有 UID 時不能建立角色/);
     assert.match(ui, /UID：/);
     assert.match(ui, /id="firebaseSupportButton"/);
+    assert.match(ui, /id="firebaseAuthBackButton"[^>]*hidden>返回系統/);
+    assert.match(ui, /<label for="firebaseEmailInput">Email 帳號<\/label>/);
+    assert.match(ui, /id="firebaseEmailSignInButton"[^>]*>Email 登入<\/button>/);
+    assert.match(ui, /id="firebaseEmailCreateButton"[^>]*>建立帳號<\/button>/);
+    assert.match(ui, /第一次使用 Email？請選「建立帳號」。/);
+    assert.match(ui, /state\.mode==="READY"\|\|state\.mode==="OFFLINE_READY"/);
+    assert.match(ui, /closeFirebaseAuthUi\(\)/);
     assert.match(ui, /const host=document\.body/);
     assert.doesNotMatch(ui, /const host=document\.getElementById\("game-stage"\)/);
     assert.match(css, /\.firebase-auth-overlay/);
     assert.match(css, /\.firebase-auth-overlay\{[\s\S]*position:fixed;[\s\S]*height:100dvh;[\s\S]*overflow-y:auto/);
     assert.match(css, /z-index:2147483500/);
-    assert.match(css, /\.firebase-auth-dialog\{[\s\S]*width:min\(100%,560px\);[\s\S]*max-height:100%;[\s\S]*overflow-y:auto/);
+    assert.match(css, /\.firebase-auth-dialog\{[\s\S]*width:min\(100%,480px\);[\s\S]*max-height:100%;[\s\S]*overflow-y:auto/);
+    assert.match(css, /\.firebase-auth-button\{[\s\S]*min-height:44px/);
+    assert.match(css, /\.firebase-auth-field input\{[\s\S]*min-height:44px/);
+    assert.match(css, /@media \(max-width:320px\)/);
+    assert.doesNotMatch(css, /@media \(max-width:360px\)[\s\S]*grid-template-columns:1fr/);
     assert.match(touch, /\.firebase-auth-dialog/);
 });
 
