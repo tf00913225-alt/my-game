@@ -27751,6 +27751,10 @@ function renderSystemContent(){
                 '<div><strong>帳號管理</strong><small>查看目前 Firebase UID、登出或切換帳號。</small></div>'+
                 '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">開啟帳號</button>'+
             '</div>'+
+            '<div class="system-panel-row">'+
+                '<div><strong>客服信箱</strong><small>查看《四象江湖傳》客服聯絡方式。</small></div>'+
+                '<button id="systemSupportEmailButton" class="home-feature-buy-btn" onclick="window.FourSymbolsSupport.show()">查看信箱</button>'+
+            '</div>'+
             '<div class="system-panel-row danger">'+
                 '<div><strong>刪除角色</strong><small>刪除全部角色與遊戲進度，返回初始創角頁面。</small></div>'+
                 '<button class="home-feature-buy-btn" onclick="resetGame()">刪除角色</button>'+
@@ -33801,9 +33805,9 @@ catch(error){
            全域觸控鎖；否則手勢從分類列或秘寶內容起始時會被
            preventDefault()，造成「有時能滑、有時不能滑」的裝置差異。
 
-           Firebase 帳號視窗使用 native stage overlay，真正的垂直
-           scroll owner 是 .firebase-auth-dialog；同樣只在這份全域
-           白名單登記一次，不為登入頁另加 touchmove 補丁。
+           Firebase 帳號視窗使用獨立於 game stage 的 responsive viewport
+           overlay，真正的垂直 scroll owner 是 .firebase-auth-dialog；
+           同樣只在這份全域白名單登記一次，不為登入頁另加 touchmove 補丁。
         */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
@@ -34846,10 +34850,12 @@ catch(error){
     }
 
     function ensureAdFreeConfig(){
+        const formalSupportEmail=String(window.FourSymbolsSupport&&window.FourSymbolsSupport.email||"").trim();
         const existing=window[AD_FREE_CONFIG_KEY]&&typeof window[AD_FREE_CONFIG_KEY]==="object"
             ? window[AD_FREE_CONFIG_KEY]
             : {};
         const config=Object.assign({},DEFAULT_AD_FREE_CONFIG,existing);
+        if(formalSupportEmail){ config.supportEmail=formalSupportEmail; }
         window[AD_FREE_CONFIG_KEY]=config;
         return config;
     }
@@ -34893,6 +34899,7 @@ catch(error){
 
     function renderAdFreeServiceBody(body){
         const config=ensureAdFreeConfig();
+        const configuredEmail=String(config.supportEmail||"").trim();
         body.innerHTML=[
             '<section class="ad-free-service-panel" data-ad-free-service-info="true">',
                 '<div class="ad-free-service-hero">',
@@ -34909,14 +34916,14 @@ catch(error){
                 '<section class="ad-free-service-support" aria-label="客服與條款">',
                     '<div class="ad-free-service-support-row">',
                         '<span>客服 Email：</span>',
-                        '<b id="adFreeSupportEmail">尚未設定</b>',
+                        '<b id="adFreeSupportEmail">'+configuredEmail+'</b>',
                     '</div>',
                     '<div class="ad-free-service-policy-actions">',
                         '<button id="adFreeRefundPolicyButton" type="button">查看退款規則</button>',
                         '<button id="adFreeTermsButton" type="button">查看服務條款</button>',
                         '<button id="adFreePrivacyButton" type="button">查看隱私權政策</button>',
                     '</div>',
-                    '<p class="ad-free-service-todo-note">正式客服與條款頁面尚待設定；未設定前不會導向不存在的網址。</p>',
+                    '<p class="ad-free-service-todo-note">退款規則、服務條款與隱私權政策頁面尚待設定；未設定前不會導向不存在的網址。</p>',
                 '</section>',
                 '<div class="ad-free-service-actions">',
                     '<button id="adFreePurchaseButton" class="ad-free-service-purchase" type="button" disabled aria-label="購買 30 天免廣告 NT$99，目前付款服務準備中">付款服務準備中</button>',
@@ -34926,10 +34933,9 @@ catch(error){
         ].join("");
 
         const supportEmail=document.getElementById("adFreeSupportEmail");
-        const configuredEmail=String(config.supportEmail||"").trim();
         if(supportEmail){
-            supportEmail.textContent=configuredEmail||"尚未設定";
-            supportEmail.dataset.todo=configuredEmail?"false":"true";
+            supportEmail.textContent=configuredEmail;
+            supportEmail.dataset.todo="false";
         }
 
         configurePolicyButton("adFreeRefundPolicyButton",config.refundPolicyUrl,"退款規則");
@@ -34952,7 +34958,7 @@ catch(error){
             acknowledgeButton.addEventListener("click",closeAdFreeServiceInfoModal);
         }
 
-        // TODO(ECPay): 填入正式客服 Email、退款規則、服務條款、隱私權政策網址。
+        // TODO(ECPay): 填入正式退款規則、服務條款、隱私權政策網址。
         // TODO(ECPay): 完成綠界付款與付款結果驗證後，才可設定 purchaseEnabled=true 與 purchaseUrl。
     }
 

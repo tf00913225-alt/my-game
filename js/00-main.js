@@ -27751,6 +27751,10 @@ function renderSystemContent(){
                 '<div><strong>帳號管理</strong><small>查看目前 Firebase UID、登出或切換帳號。</small></div>'+
                 '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">開啟帳號</button>'+
             '</div>'+
+            '<div class="system-panel-row">'+
+                '<div><strong>客服信箱</strong><small>查看《四象江湖傳》客服聯絡方式。</small></div>'+
+                '<button id="systemSupportEmailButton" class="home-feature-buy-btn" onclick="window.FourSymbolsSupport.show()">查看信箱</button>'+
+            '</div>'+
             '<div class="system-panel-row danger">'+
                 '<div><strong>刪除角色</strong><small>刪除全部角色與遊戲進度，返回初始創角頁面。</small></div>'+
                 '<button class="home-feature-buy-btn" onclick="resetGame()">刪除角色</button>'+
