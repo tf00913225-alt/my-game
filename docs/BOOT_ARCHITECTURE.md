@@ -133,7 +133,7 @@ Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK�
 
 執行 `node scripts/build-production.mjs` 產生 deterministic bundles、`asset-manifest.json` 與 hashed filenames；`--check` 只驗證，不改檔。source array 的順序就是 legacy execution contract，調整前必須先驗證 wrapper/override dependency。
 
-- `index.html` 與 `asset-manifest.json`：`no-cache, no-store, must-revalidate`。
+- `/`、`index.html` 與 `asset-manifest.json`：要求每次重新驗證（設定為 `no-cache, no-store, must-revalidate`；Cloudflare 若正規化為語意等價的 `max-age=0, must-revalidate` 亦可接受，但絕不可為 `immutable`）。
 - `build/*`、hashed patrol WebP、hashed startup logo：`max-age=31536000, immutable`。
 - Cache invalidation 只靠內容 hash；`V_ASSET_VERSION` 不再讓未變更 bundle 全部失效。
 - 不使用 Service Worker。若未來導入，必須另有 versioned cache、activation、cleanup、rollback 與跨版本測試。
