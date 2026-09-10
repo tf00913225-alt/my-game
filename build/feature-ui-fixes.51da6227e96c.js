@@ -33,4 +33,3 @@
     }
     window.addEventListener("four-symbols:feature-ready",ensureGameplayHomeBack,{passive:true});
 })();
-
