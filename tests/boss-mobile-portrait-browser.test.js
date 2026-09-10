@@ -180,7 +180,7 @@ function runViewport(chrome,width,height){
     const result=spawnSync(chrome,[
         "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
         "--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=1200,1100",
-        "--dump-dom",fileUrl
+        "--virtual-time-budget=5000","--dump-dom",fileUrl
     ],{encoding:"utf8",timeout:30000,maxBuffer:20*1024*1024});
     assert.equal(result.status,0,result.stderr||`Boss mobile browser fixture failed at ${width}x${height}`);
     const match=result.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
