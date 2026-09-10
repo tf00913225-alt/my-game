@@ -127,11 +127,11 @@ async function waitForJson(url,timeoutMs=10000){
 }
 
 class CdpClient{
-    constructor(url){this.url=url;this.socket=null;this.nextId=1;this.pending=new Map();}
+    constructor(url){this.url=url;this.socket=null;this.nextId=1;this.pending=new Map();this.events=[];}
     async connect(){
         this.socket=new WebSocket(this.url);
         await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error("CDP connection timeout")),10000);this.socket.onopen=()=>{clearTimeout(timer);resolve();};this.socket.onerror=()=>{clearTimeout(timer);reject(new Error("CDP connection failed"));};});
-        this.socket.onmessage=async event=>{let raw=event.data;if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){raw=await raw.text();}const message=JSON.parse(String(raw));if(!message.id){return;}const request=this.pending.get(message.id);if(!request){return;}this.pending.delete(message.id);if(message.error){request.reject(new Error(request.method+": "+message.error.message));}else{request.resolve(message.result||{});}};
+        this.socket.onmessage=async event=>{let raw=event.data;if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){raw=await raw.text();}const message=JSON.parse(String(raw));if(!message.id){if(["Runtime.exceptionThrown","Log.entryAdded","Network.loadingFailed"].includes(message.method)){this.events.push(message);}return;}const request=this.pending.get(message.id);if(!request){return;}this.pending.delete(message.id);if(message.error){request.reject(new Error(request.method+": "+message.error.message));}else{request.resolve(message.result||{});}};
         this.socket.onclose=()=>{for(const request of this.pending.values()){request.reject(new Error("CDP closed during "+request.method));}this.pending.clear();};
     }
     send(method,params={}){const id=this.nextId++;return new Promise((resolve,reject)=>{this.pending.set(id,{resolve,reject,method});this.socket.send(JSON.stringify({id,method,params}));});}
@@ -173,14 +173,20 @@ try{
     const page=targets.find(target=>target.type==="page");
     assert.ok(page?.webSocketDebuggerUrl,"Chrome page target unavailable");
     client=new CdpClient(page.webSocketDebuggerUrl);await client.connect();
-    await client.send("Page.enable");await client.send("Runtime.enable");await client.send("Network.enable");
+    await client.send("Page.enable");await client.send("Runtime.enable");await client.send("Network.enable");await client.send("Log.enable");
     await client.send("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:3,mobile:true,screenWidth:390,screenHeight:844});
     await client.send("Emulation.setTouchEmulationEnabled",{enabled:true,maxTouchPoints:5});
     const clear=()=>client.send("Storage.clearDataForOrigin",{origin,storageTypes:"all"});
     const navigate=async scenario=>{await client.send("Page.navigate",{url:`${origin}/?scenario=${encodeURIComponent(scenario)}&run=${Date.now()}`});await waitFor(client,"document.readyState==='complete'","document load");};
 
     await client.send("Network.setCacheDisabled",{cacheDisabled:true});await clear();await navigate("signed-out");
-    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'&&document.getElementById('firebaseAuthOverlay')?.classList.contains('show')","signed-out auth UI");
+    try{
+        await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'&&document.getElementById('firebaseAuthOverlay')?.classList.contains('show')","signed-out auth UI");
+    }catch(error){
+        const diagnostic=await client.eval(`(()=>({readyState:document.readyState,state:window.FourSymbolsStartupPolicy?.getState?.()||null,loaderState:document.getElementById("startupLoader")?.dataset?.state||null,title:document.getElementById("startupStatusTitle")?.textContent||null,detail:document.getElementById("startupStatusDetail")?.textContent||null,overlayExists:!!document.getElementById("firebaseAuthOverlay"),overlayClass:document.getElementById("firebaseAuthOverlay")?.className||null,build:window.__FOUR_SYMBOLS_BUILD__||null,resources:performance.getEntriesByType("resource").map(entry=>({name:entry.name,initiatorType:entry.initiatorType,transferSize:entry.transferSize}))}))()`);
+        error.message+=" Diagnostic="+JSON.stringify({page:diagnostic,cdpEvents:client.events.slice(-20)});
+        throw error;
+    }
     const signedOut=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),creation:getComputedStyle(document.getElementById("creationPage")).display,labels:[...document.querySelectorAll("#firebaseSignedOutPanel button")].map(button=>button.textContent.trim()),uid:FourSymbolsStartupPolicy.getUid(),featureResources:performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>/app-shell|gameplay-core|feature-/.test(name))}))()`);
     assert.equal(signedOut.state,"AUTH_REQUIRED");assert.equal(signedOut.creation,"none");assert.equal(signedOut.uid,null);
     for(const label of ["Google 登入","訪客開始遊戲","Email 登入","建立 Email 帳號"]){assert.ok(signedOut.labels.includes(label),"Missing auth action: "+label);}
