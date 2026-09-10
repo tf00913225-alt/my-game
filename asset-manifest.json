@@ -149,6 +149,10 @@
       "sha256": "af3d3cea8249",
       "bytes": 138290
     },
+    "build/feature-relic-progression.c448dc8aea83.js": {
+      "sha256": "c448dc8aea83",
+      "bytes": 65339
+    },
     "build/boot-core.71f7ecfc4e95.css": {
       "sha256": "71f7ecfc4e95",
       "bytes": 219878
@@ -173,6 +177,10 @@
       "sha256": "ca9df1f107f3",
       "bytes": 43944
     },
+    "build/feature-relic-progression.8844d5eb6e81.css": {
+      "sha256": "8844d5eb6e81",
+      "bytes": 5535
+    },
     "build/firebase/firebase-config.4314d6321ba1.js": {
       "sha256": "4314d6321ba1",
       "bytes": 1681
@@ -196,14 +204,6 @@
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {
       "sha256": "4631c0bc3f2b",
       "bytes": 231951
-    },
-    "build/feature-relic-progression.c448dc8aea83.js": {
-      "sha256": "c448dc8aea83",
-      "bytes": 65339
-    },
-    "build/feature-relic-progression.8844d5eb6e81.css": {
-      "sha256": "8844d5eb6e81",
-      "bytes": 5535
     }
   }
 }
