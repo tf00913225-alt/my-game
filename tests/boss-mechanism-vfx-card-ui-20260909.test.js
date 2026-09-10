@@ -43,16 +43,20 @@ assert.match(runtime,/bossCard\.classList\.add\("gameplay-boss-card"\)/);
 // this avoids a later !important or transform-based visual enlargement.
 assert.match(boss,/#battleMonsterArea\.gameplay-boss-active \.v131-monster-row\{[\s\S]*?display:grid;[\s\S]*?grid-template-columns:1fr;[\s\S]*?place-items:start center;/);
 const bossCardRule=cssRule(boss,"#game-stage #battlePage .battle-monster.gameplay-boss-card{");
+assert.doesNotMatch(bossCardRule,/!important/);
 assert.doesNotMatch(bossCardRule,/transform\s*:/);
 assert.doesNotMatch(bossCardRule,/zoom\s*:/);
 assert.doesNotMatch(bossCardRule,/scale\(/);
 
 // The redundant battle heading is hidden only while a Gameplay BOSS is active.
 // Its historical geometry is reclaimed by the formation without introducing
-// a new priority patch in the formal Gameplay stylesheet.
+// a new priority patch in the new Boss-specific sizing rules.
 assert.match(boss,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
 assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-23px;/);
-assert.doesNotMatch(boss,/!important/);
+const activeBossAreaRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active{");
+const activeBossRowRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{");
+assert.doesNotMatch(activeBossAreaRule,/!important/);
+assert.doesNotMatch(activeBossRowRule,/!important/);
 
 // The function/mechanism card is an independent portrait 9:16 battlefield
 // component. Its face is type -> name -> HP -> concise effect. Combat targeting
@@ -70,6 +74,7 @@ assert.match(boss,/data-type="heal"\]::after\{ content:"每回合恢復 BOSS 4% 
 assert.match(boss,/data-type="amplify"\]::after\{ content:"BOSS 傷害提高 25%"; \}/);
 assert.match(boss,/data-type="seal"\]::after\{ content:"我方治療與 SP 回復降低 40%"; \}/);
 const mechanismCardRule=cssRule(boss,"#game-stage #battleMonsterArea .boss-mechanism-card{");
+assert.doesNotMatch(mechanismCardRule,/!important/);
 assert.doesNotMatch(mechanismCardRule,/transform\s*:/);
 assert.doesNotMatch(mechanismCardRule,/zoom\s*:/);
 assert.doesNotMatch(mechanismCardRule,/scale\(/);
