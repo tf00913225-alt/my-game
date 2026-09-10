@@ -52,7 +52,7 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
 <div id="inventoryPage"><div class="inventory-grid-classic"><button class="inventory-item-classic"><span class="inventory-icon"><span id="equipmentArt" class="v169-item-art v169-equipment-art v169-rarity-blue"><img id="equipmentImg" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23c88f30'/%3E%3C/svg%3E"></span></span></button></div></div>
 <div class="v17361-reward-preview"><div id="rewardVisual" class="v17361-reward-visual equipment"><div id="rewardIcon" class="v17361-reward-icon rarity-white"><img alt=""><em>40%</em></div></div><div id="chestCount" class="v17361-chest-count">×2</div></div>
 <pre id="result"></pre></div><script>window.showPage=function(name){window.__qaPage=name;};</script><script src="js/62-v174-current-ui-fixes.js"></script><script>
-(function(){
+document.addEventListener("DOMContentLoaded",function(){
  var q=function(s){return document.querySelector(s);};var rect=function(el){var r=el.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
  var back=q('.v174-gameplay-home-back');if(back){back.click();}
  var art=q('#equipmentArt'),img=q('#equipmentImg'),header=q('#gameplayPage .gameplay-panel-header');
@@ -64,7 +64,7 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
   equipment:{art:rect(art),img:rect(img),objectFit:getComputedStyle(img).objectFit,transform:getComputedStyle(img).transform},
   preview:{icon:getComputedStyle(q('#rewardIcon')).display,chest:getComputedStyle(q('#chestCount')).display,content:getComputedStyle(q('#rewardVisual'),'::before').content}
  });
-})();
+},{once:true});
 </script></body></html>`;
 }
 function run(chrome,width,height){
