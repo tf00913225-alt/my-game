@@ -88,10 +88,12 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.af3d3cea8249.js"
+          "build/feature-boss-relic.af3d3cea8249.js",
+          "build/feature-relic-progression.c448dc8aea83.js"
         ],
         "styles": [
-          "build/feature-boss-relic.ca9df1f107f3.css"
+          "build/feature-boss-relic.ca9df1f107f3.css",
+          "build/feature-relic-progression.8844d5eb6e81.css"
         ],
         "dependencies": [
           "gameplay-core"
@@ -194,6 +196,14 @@
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {
       "sha256": "4631c0bc3f2b",
       "bytes": 231951
+    },
+    "build/feature-relic-progression.c448dc8aea83.js": {
+      "sha256": "c448dc8aea83",
+      "bytes": 65339
+    },
+    "build/feature-relic-progression.8844d5eb6e81.css": {
+      "sha256": "8844d5eb6e81",
+      "bytes": 5535
     }
   }
 }

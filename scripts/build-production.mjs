@@ -89,6 +89,7 @@ const patrolScripts=["js/26-v131-patrol-appearance.js"];
 const abyssScripts=["js/59-abyss-two-tier-runtime.js"];
 const skillScripts=["js/60-v173.64-skill-progression-rebalance.js"];
 const bossRelicScripts=["js/gameplay-boss-tower-system.js","js/60-team-relic-system.js"];
+const relicProgressionScripts=["js/relic-progression-drop-system.js"];
 
 const criticalStyles=["css/00-main.css","css/29-v125-character-creation-native.css","css/51-v173.20-startup-loader.css","css/firebase-auth.css"];
 const appStyles=[
@@ -138,6 +139,7 @@ const gameplayStyles=[
 const patrolStyles=["css/32-v131-patrol-appearance.css"];
 const abyssStyles=["css/50-v169-abyss-flow.css","css/54-v174-abyss-two-tier.css"];
 const bossRelicStyles=["css/gameplay-boss-tower.css","css/55-team-relic-system.css"];
+const relicProgressionStyles=["css/relic-progression-drop-system.css"];
 
 function combineScripts(files,prefix=""){
     return prefix+files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
@@ -189,7 +191,8 @@ const scriptOutputs={
     patrol:target("feature-patrol","js",combineScripts(patrolScripts)),
     abyss:target("feature-abyss","js",combineScripts(abyssScripts)),
     skill:target("feature-skill","js",combineScripts(skillScripts)),
-    bossRelic:target("feature-boss-relic","js",combineScripts(bossRelicScripts))
+    bossRelic:target("feature-boss-relic","js",combineScripts(bossRelicScripts)),
+    relicProgression:target("feature-relic-progression","js",read(relicProgressionScripts[0]))
 };
 const styleOutputs={
     critical:target("boot-core","css",combineStyles(criticalStyles)),
@@ -197,7 +200,8 @@ const styleOutputs={
     gameplay:target("gameplay-core","css",combineStyles(gameplayStyles)),
     patrol:target("feature-patrol","css",combineStyles(patrolStyles)),
     abyss:target("feature-abyss","css",combineStyles(abyssStyles)),
-    bossRelic:target("feature-boss-relic","css",combineStyles(bossRelicStyles))
+    bossRelic:target("feature-boss-relic","css",combineStyles(bossRelicStyles)),
+    relicProgression:target("feature-relic-progression","css",read(relicProgressionStyles[0]))
 };
 Object.values(scriptOutputs).forEach(writeTarget); Object.values(styleOutputs).forEach(writeTarget);
 
@@ -209,7 +213,8 @@ const replacements={
     __BUILD_PATROL__:scriptOutputs.patrol.path,__BUILD_PATROL_STYLE__:styleOutputs.patrol.path,
     __BUILD_ABYSS__:scriptOutputs.abyss.path,__BUILD_ABYSS_STYLE__:styleOutputs.abyss.path,
     __BUILD_SKILL__:scriptOutputs.skill.path,
-    __BUILD_BOSS_RELIC__:scriptOutputs.bossRelic.path,__BUILD_BOSS_RELIC_STYLE__:styleOutputs.bossRelic.path
+    __BUILD_BOSS_RELIC__:scriptOutputs.bossRelic.path,__BUILD_BOSS_RELIC_STYLE__:styleOutputs.bossRelic.path,
+    __BUILD_RELIC_PROGRESSION__:scriptOutputs.relicProgression.path,__BUILD_RELIC_PROGRESSION_STYLE__:styleOutputs.relicProgression.path
 };
 const featureManifest=JSON.parse(JSON.stringify(featureTemplate).replace(/__PATROL_ASSETS__/g,patrolAssets.join('\",\"')).replace(/__[A-Z0-9_]+__/g,key=>{
     if(!replacements[key]){ throw new Error(`Unresolved feature manifest token ${key}`); }
