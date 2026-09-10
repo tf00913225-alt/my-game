@@ -8,7 +8,7 @@ const read=path=>fs.readFileSync(path,"utf8");
 const main=read("js/00-main.js");
 const v131Css=read("css/31-v131-fix-batch.css");
 const statusPopup=read("js/41-v146-system-polish.js");
-const loader=read("js/20-anonymous-20.js");
+const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
 const index=read("index.html");
 
 let passed=0;

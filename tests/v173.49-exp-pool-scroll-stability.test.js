@@ -5,7 +5,7 @@ const fs=require("node:fs");
 
 const growth=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 assert.match(growth,/function v173CaptureExpPoolViewport\(\)/);

@@ -55,7 +55,9 @@ jobs:
       - name: Check CI script syntax
         run: |
           node --check .github/scripts/ci.mjs
+          node --check .github/scripts/boot-live-browser-qa.mjs
           node --check .github/scripts/release-gate.mjs
+          node --check .github/scripts/run-boot-architecture-browser-qa.mjs
           node --check .github/scripts/run-skill-progression-browser-qa.mjs
 
       - name: Check all project JavaScript syntax
@@ -70,6 +72,18 @@ jobs:
 
       - name: Run all Node unit and integration suites
         run: node .github/scripts/ci.mjs tests
+
+      - name: Run account-first cold/warm mobile browser QA
+        run: node .github/scripts/run-boot-architecture-browser-qa.mjs
+
+      - name: Upload boot architecture browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-architecture-browser-qa-${{ github.sha }}
+          path: artifacts/browser-qa/boot-architecture-browser-qa.json
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Run skill progression mobile browser QA
         run: node .github/scripts/run-skill-progression-browser-qa.mjs

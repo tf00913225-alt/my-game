@@ -15,6 +15,7 @@ const equipmentProgression=fs.readFileSync(
     "js/equipment-progression.js",
     "utf8"
 );
+const productionBuild=fs.readFileSync("scripts/build-production.mjs","utf8");
 
 assert.match(
     characterRuntime,
@@ -26,16 +27,11 @@ assert.doesNotMatch(
     /396px[\s\S]*620px|620px[\s\S]*396px/,
     "legacy medium-panel inline size must not return"
 );
-assert.match(
-    characterRuntime,
-    /v173:runtime-ready/,
-    "V173.63 functional repairs must wait for the shared late-runtime ready signal"
+assert.ok(
+    productionBuild.indexOf('"js/53-v173.50-inventory-qol.js"')<productionBuild.indexOf('"js/58-v173.63-functional-fixes.js"'),
+    "V173.63 functional repairs must follow their owners inside gameplay-core"
 );
-assert.match(
-    characterRuntime,
-    /js\/58-v173\.63-functional-fixes\.js\?v=173\.64/,
-    "late loader must attach the single V173.63 functional repair owner"
-);
+assert.doesNotMatch(characterRuntime,/v173:runtime-ready|createElement\(["']script["']\)/);
 assert.doesNotMatch(
     characterRuntime,
     /visible-ui-repairs/,

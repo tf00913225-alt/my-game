@@ -12,7 +12,8 @@ const uiCss=read("css/56-v174-critical-ui-regressions.css");
 const relicCss=read("css/55-team-relic-system.css");
 const touch=read("js/01-stage-v8-touch-lock.js");
 
-assert.match(bootstrap,/battle_full_version_save_v5/);
+assert.match(bootstrap,/FourSymbolsAccountSave/);
+assert.doesNotMatch(bootstrap,/battle_full_version_save_v5/);
 assert.match(bootstrap,/readPersistedPrimaryCharacter/);
 assert.match(bootstrap,/const persisted=readPersistedPrimaryCharacter\(\)/);
 assert.match(bootstrap,/persisted\.state==="unsafe"/);

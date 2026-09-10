@@ -8,7 +8,7 @@ const vm=require("node:vm");
 
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const patchSource=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
-const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 
 function clone(value){
@@ -590,7 +590,7 @@ test("V140 remains before the ordered V141/V142 layers and both cache keys are b
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
     assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log("\nV140 four-element balance suite: "+passed+" tests passed.");

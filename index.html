@@ -7,10 +7,6 @@
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap"rel="stylesheet">
-
-<link rel="stylesheet" href="css/00-main.css?v=173.64">
-
 <style id="v173.64-home-version-badge-style">
 #game-stage #homePage .home-version-badge{
     position:static;
@@ -35,24 +31,14 @@
 }
 </style>
 
-<link id="stage-v8-map-page-fix" rel="stylesheet" href="css/01-stage-v8-map-page-fix.css">
-
-<link id="stage-v3-layout-fix" rel="stylesheet" href="css/02-stage-v3-layout-fix.css">
-
-
-<link id="stage-v4-viewport-lock" rel="stylesheet" href="css/03-stage-v4-viewport-lock.css">
-
-
 <!-- V12: Automatic browser Fullscreen API is intentionally disabled.
      Game viewport/scaling remains unchanged. -->
 
 
-<link id="v119-ally-target-style" rel="stylesheet" href="css/04-v119-ally-target-style.css">
-<link rel="preload" as="image" href="assets/ui/startup-logo-v173.20.jpg?v=173.20">
-<link rel="preload" as="image" href="assets/ui/startup-main-city-v173.20.jpg?v=173.20">
-<link id="v173.20-startup-loader-style" rel="stylesheet" href="css/51-v173.20-startup-loader.css?v=173.64">
-<link id="v129-character-creation-native" rel="stylesheet" href="css/29-v125-character-creation-native.css?v=173.39">
-
+<link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg">
+<!-- build:critical-style -->
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.83625fb1541f.css">
+<!-- /build:critical-style -->
 </head>
 
 <body>
@@ -66,24 +52,15 @@
 >
     <div id="startupLogoScene" class="startup-scene startup-logo-scene is-active" aria-hidden="false">
         <img
-            class="startup-scene-image"
-            src="assets/ui/startup-logo-v173.20.jpg?v=173.20"
+            class="startup-scene-image startup-logo-image"
+            src="assets/ui/startup-logo.4631c0bc3f2b.jpg"
             alt=""
             draggable="false"
-        >
+         fetchpriority="high">
         <i class="startup-element-light fire" aria-hidden="true"></i>
         <i class="startup-element-light water" aria-hidden="true"></i>
         <i class="startup-element-light wind" aria-hidden="true"></i>
         <i class="startup-element-light earth" aria-hidden="true"></i>
-    </div>
-
-    <div id="startupCityScene" class="startup-scene startup-city-scene" aria-hidden="true">
-        <img
-            class="startup-scene-image"
-            src="assets/ui/startup-main-city-v173.20.jpg?v=173.20"
-            alt=""
-            draggable="false"
-        >
     </div>
 
     <div class="startup-vignette" aria-hidden="true"></div>
@@ -170,7 +147,7 @@
                     src="assets/characters/female_fire.jpg"
                     alt="火元素女性角色立繪"
                     draggable="false"
-                >
+                 loading="lazy" decoding="async">
                 <div class="creation-portrait-shade" aria-hidden="true"></div>
                 <div class="creation-portrait-caption">
                     <span id="creationPortraitElement">火元素</span>
@@ -441,9 +418,6 @@
 
 <!-- V129: move the still-hidden creation page into the native layer before
      the legacy 420px wrapper is built or the browser can paint its portrait. -->
-<script id="v129-character-creation-bootstrap" src="js/23-v125-character-creation-bootstrap.js?v=129a"></script>
-
-
 <!-- =====================================================
      第二角色創建（Lv.10解鎖）
 ===================================================== -->
@@ -1285,8 +1259,8 @@
         onclick="toggleAutoBattle()"
         aria-label="自動戰鬥"
     >
-        <img class="icon-off" src="assets/battle/auto-battle-off.png" alt="自動戰鬥（關閉）">
-        <img class="icon-on" src="assets/battle/auto-battle-on.png" alt="自動戰鬥（開啟中）">
+        <img class="icon-off" src="assets/battle/auto-battle-off.png" alt="自動戰鬥（關閉）" loading="lazy" decoding="async">
+        <img class="icon-on" src="assets/battle/auto-battle-on.png" alt="自動戰鬥（開啟中）" loading="lazy" decoding="async">
     </button>
 
     <button
@@ -1295,8 +1269,8 @@
         onclick="toggleAutoPatrol()"
         aria-label="自動巡怪"
     >
-        <img class="icon-off" src="assets/battle/auto-patrol-off.png" alt="自動巡怪（關閉）">
-        <img class="icon-on" src="assets/battle/auto-patrol-on.png" alt="自動巡怪（開啟中）">
+        <img class="icon-off" src="assets/battle/auto-patrol-off.png" alt="自動巡怪（關閉）" loading="lazy" decoding="async">
+        <img class="icon-on" src="assets/battle/auto-patrol-on.png" alt="自動巡怪（開啟中）" loading="lazy" decoding="async">
     </button>
 
 </div>
@@ -1308,7 +1282,7 @@
     onclick="leaveMap()"
     aria-label="返回"
 >
-    <img src="assets/ui/map-return.png" alt="" aria-hidden="true">
+    <img src="assets/ui/map-return.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
     <span class="nav-sr-only">返回</span>
 </button>
 
@@ -1383,7 +1357,7 @@
         filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));
         transition:width .2s ease;
     "
->
+ loading="lazy" decoding="async">
 
 </div>
 
@@ -1405,7 +1379,7 @@
     aria-label="元素匣／自動戰鬥設定"
     title="元素匣／自動戰鬥設定"
 >
-    <img draggable="false" src="assets/battle/element-box.png" alt="元素匣">
+    <img draggable="false" src="assets/battle/element-box.png" alt="元素匣" loading="lazy" decoding="async">
 </button>
 
 <div class="battle-wrap">
@@ -2356,7 +2330,7 @@
     onclick="showPage('inventory')"
     aria-label="背包"
 >
-<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true">
+<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 <span class="nav-sr-only">背包</span>
 </button>
 
@@ -2366,7 +2340,7 @@
     onclick="showPage('training')"
     aria-label="野怪區"
 >
-<img class="nav-art-button" src="assets/ui/nav-training.png" alt="" aria-hidden="true">
+<img class="nav-art-button" src="assets/ui/nav-training.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 <span class="nav-sr-only">野怪區</span>
 </button>
 
@@ -2376,7 +2350,7 @@
     onclick="showPage('home')"
     aria-label="主城"
 >
-<img class="nav-art-button" src="assets/ui/nav-home.png" alt="" aria-hidden="true">
+<img class="nav-art-button" src="assets/ui/nav-home.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 <span class="nav-sr-only">主城</span>
 </button>
 
@@ -2386,7 +2360,7 @@
     onclick="vGameplayOpenDailyDungeons()"
     aria-label="副本"
 >
-<img class="nav-art-button" src="assets/ui/nav-dungeon.png" alt="" aria-hidden="true">
+<img class="nav-art-button" src="assets/ui/nav-dungeon.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 <span class="nav-sr-only">副本</span>
 </button>
 
@@ -2397,7 +2371,7 @@
     aria-label="玩法"
     title="玩法"
 >
-<img class="nav-art-button" src="assets/ui/nav-gameplay.png" alt="" aria-hidden="true">
+<img class="nav-art-button" src="assets/ui/nav-gameplay.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 <span class="nav-sr-only">玩法</span>
 </button>
 
@@ -2428,7 +2402,7 @@
     onclick="openHomeFeature('character')"
     aria-label="角色"
 >
-<img class="nav-art-button" src="assets/ui/nav-character.png" alt="" aria-hidden="true">
+<img class="nav-art-button" src="assets/ui/nav-character.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 <span class="nav-sr-only">角色</span>
 </button>
 
@@ -2437,7 +2411,7 @@
     onclick="openMapInventoryOverlay()"
     aria-label="背包"
 >
-<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true">
+<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 <span class="nav-sr-only">背包</span>
 </button>
 
@@ -2446,7 +2420,7 @@
     onclick="openHomeFeature('quest')"
     aria-label="任務"
 >
-<img class="nav-art-button" src="assets/ui/nav-quest.png" alt="" aria-hidden="true">
+<img class="nav-art-button" src="assets/ui/nav-quest.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 <span class="nav-sr-only">任務</span>
 </button>
 
@@ -2455,7 +2429,7 @@
     onclick="openHomeFeature('autoBattleSettings')"
     aria-label="元素匣／自動戰鬥設定"
 >
-<img class="nav-art-button" src="assets/ui/nav-element-box.png" alt="" aria-hidden="true">
+<img class="nav-art-button" src="assets/ui/nav-element-box.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 <span class="nav-sr-only">元素匣／自動戰鬥設定</span>
 </button>
 
@@ -2799,135 +2773,10 @@
 </div>
 
 
-<script id="v173.20-startup-loader-runtime" src="js/52-v173.20-startup-loader.js?v=173.64"></script>
-<script src="js/00-main.js?v=173.64"></script>
-
 </div>
 </div>
 </div>
 <!-- V86: inventory-grid-scroll is now recognized by the existing V8 touch lock as the sole inventory scroll owner. -->
-<script id="stage-v8-touch-lock" src="js/01-stage-v8-touch-lock.js?v=173.64"></script>
-
-
-<script id="stage-v9-native-coordinate-api" src="js/02-stage-v9-native-coordinate-api.js"></script>
-
-
-<link id="stage-v10-battle-log-scroll-fix" rel="stylesheet" href="css/05-stage-v10-battle-log-scroll-fix.css">
-
-
-<script id="stage-v10-battle-log-scroll-runtime" src="js/03-stage-v10-battle-log-scroll-runtime.js"></script>
-
-
-<link id="stage-v11-native-bottom-nav" rel="stylesheet" href="css/06-stage-v11-native-bottom-nav.css">
-
-
-<script id="stage-v11-native-bottom-nav-runtime" src="js/04-stage-v11-native-bottom-nav-runtime.js"></script>
-
-
-<link id="stage-v13-native-map-nav" rel="stylesheet" href="css/07-stage-v13-native-map-nav.css">
-
-
-<script id="stage-v13-native-map-nav-runtime" src="js/05-stage-v13-native-map-nav-runtime.js"></script>
-
-
-<link id="stage-v14-character-scroll-fix" rel="stylesheet" href="css/08-stage-v14-character-scroll-fix.css?v=135">
-<link id="stage-v15-native-character-shell" rel="stylesheet" href="css/09-stage-v15-native-character-shell.css">
-
-
-<script id="stage-v39-battle-map-background-runtime" src="js/06-stage-v39-battle-map-background-runtime.js"></script>
-
-
-<link id="stage-v40-root-battle-background-and-cast-size" rel="stylesheet" href="css/10-stage-v40-root-battle-background-and-cast-size.css">
-
-
-<script id="stage-v40-root-battle-background-runtime" src="js/07-stage-v40-root-battle-background-runtime.js"></script>
-
-
-<link id="stage-v41-cast-text-and-player-alpha" rel="stylesheet" href="css/11-stage-v41-cast-text-and-player-alpha.css">
-
-
-<script id="stage-v41-runtime" src="js/08-stage-v41-runtime.js"></script>
-
-
-<link id="stage-v45-battle-black-overlay-skill-text" rel="stylesheet" href="css/12-stage-v45-battle-black-overlay-skill-text.css">
-
-
-<script id="stage-v45-runtime" src="js/09-stage-v45-runtime.js"></script>
-
-
-<link id="stage-v46-battle-frame-and-giant-skill-text" rel="stylesheet" href="css/13-stage-v46-battle-frame-and-giant-skill-text.css">
-
-
-<script id="stage-v46-runtime" src="js/10-stage-v46-runtime.js"></script>
-
-
-<link id="stage-v47-root-cause-skill-size" rel="stylesheet" href="css/14-stage-v47-root-cause-skill-size.css">
-
-
-<script id="stage-v47-runtime" src="js/11-stage-v47-runtime.js"></script>
-
-
-<link id="stage-v48-skill-text-final" rel="stylesheet" href="css/15-stage-v48-skill-text-final.css">
-
-
-<script id="stage-v48-runtime" src="js/12-stage-v48-runtime.js"></script>
-
-
-<link id="stage-v49-remove-all-skill-white-strokes" rel="stylesheet" href="css/16-stage-v49-remove-all-skill-white-strokes.css">
-
-
-<script id="stage-v49-runtime" src="js/13-stage-v49-runtime.js"></script>
-
-
-<link id="stage-v50-remove-battle-right-edge" rel="stylesheet" href="css/17-stage-v50-remove-battle-right-edge.css">
-
-
-<script id="stage-v50-runtime" src="js/14-stage-v50-runtime.js"></script>
-
-
-<link id="stage-v51-combat-result-white-stroke" rel="stylesheet" href="css/18-stage-v51-combat-result-white-stroke.css">
-
-
-<script id="stage-v51-runtime" src="js/15-stage-v51-runtime.js"></script>
-
-
-<link id="stage-v54-main-city-moderate-native-scale" rel="stylesheet" href="css/19-stage-v54-main-city-moderate-native-scale.css?v=173.64">
-
-
-<script id="stage-v54-main-city-runtime" src="js/16-stage-v54-main-city-runtime.js?v=173.64"></script>
-
-
-<link id="stage-v60-training-only-safety" rel="stylesheet" href="css/20-stage-v60-training-only-safety.css">
-
-
-<script id="stage-v60-training-render-guard" src="js/17-stage-v60-training-render-guard.js"></script>
-
-
-<link id="stage-v64-character-touch-action-bridge" rel="stylesheet" href="css/21-stage-v64-character-touch-action-bridge.css">
-
-<script id="stage-v64-character-touch-action-runtime" src="js/18-stage-v64-character-touch-action-runtime.js"></script>
-<link id="stage-v78-character-inventory-core" rel="stylesheet" href="css/22-stage-v78-character-inventory-core.css">
-
-
-
-
-
-<script id="stage-v78-character-inventory-runtime" src="js/19-stage-v78-character-inventory-runtime.js?v=173.64"></script>
-
-
-
-
-
-<link id="stage-v77-inventory-detail-ui" rel="stylesheet" href="css/23-stage-v77-inventory-detail-ui.css">
-
-
-<link id="stage-v85-inventory-inner-grid-scroll-root" rel="stylesheet" href="css/24-stage-v85-inventory-inner-grid-scroll-root.css">
-
-
-
-
-<link id="stage-v90-quest-interface-core" rel="stylesheet" href="css/25-stage-v90-quest-interface-core.css?v=173.39">
-
 <!-- =========================================================
      V146 — INVENTORY CATEGORY CAPACITY 120
      - Core inventorySlots: 120
@@ -2942,11 +2791,8 @@
      No damage/SP/initiative/skill formulas changed. -->
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
-<script src="js/20-anonymous-20.js?v=173.64"></script>
-<script id="v129-character-creation-native-runtime" src="js/24-v125-character-creation-native-runtime.js?v=129a"></script>
-
-
-<link id="v110-auto-settings-premium" rel="stylesheet" href="css/26-v110-auto-settings-premium.css">
-<link id="v130-requested-updates" rel="stylesheet" href="css/30-v130-requested-updates.css?v=130">
+<!-- build:critical-script -->
+<script id="boot-core-runtime" src="build/boot-core.6484509305bf.js"></script>
+<!-- /build:critical-script -->
 </body>
 </html>

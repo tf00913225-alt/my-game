@@ -1,100 +1,97 @@
-# Firebase Authentication + Cloud Save Foundation
+# Firebase Authentication + Account Save
 
-## Scope
+Firebase Authentication is a required identity gate for production character ownership. It is not optional telemetry and it does not run after character creation. The full boot contract is defined in `docs/BOOT_ARCHITECTURE.md`.
 
-This phase adds a dedicated Firebase client boundary without changing the current local-save owner or Firestore write rules.
+## Owners
 
-Owners:
+- `js/firebase/firebase-config.js`: public Firebase Web App configuration validation.
+- `js/firebase/firebase-auth.js`: durable Auth session, Google, Email/password, Anonymous Auth and sign-out.
+- `js/firebase/firebase-auth-ui.js`: account-first player UI.
+- `js/firebase/firebase-cloud-save.js`: authenticated cloud read and trusted callable boundary.
+- `js/firebase/firebase-bootstrap.js`: identity lifecycle followed by UID cloud-save resolution.
+- `js/startup/account-save-repository.js`: UID-namespaced local save, metadata, sidecars and legacy migration.
+- `js/52-v173.20-startup-loader.js`: sole startup state machine and destination decision.
 
-- `js/firebase/firebase-config.js`: Firebase Web client configuration and readiness validation.
-- `js/firebase/firebase-auth.js`: Firebase Authentication initialization and providers.
-- `js/firebase/firebase-cloud-save.js`: authenticated read-only access to the player's cloud-save document.
-- `js/firebase/firebase-auth-ui.js`: native-stage login/account overlay for Google, Email/password and anonymous sign-in.
-- `js/firebase/firebase-bootstrap.js`: narrow browser bridge (`window.FourSymbolsFirebase`) and auth/cloud-read state coordination.
-- `js/52-v173.20-startup-loader.js`: startup entry that dynamically imports the Firebase bootstrap as optional infrastructure. Firebase is deliberately not counted as a core runtime-readiness module.
-- `js/01-stage-v8-touch-lock.js`: global gesture owner; `.firebase-auth-dialog` is registered there as the only authentication vertical scroll owner.
+## Authentication contract
 
-## Firebase project
-
-Confirmed Web App configuration copied from Firebase Console:
-
-- authDomain: `four-symbols-jianghu.firebaseapp.com`
-- projectId: `four-symbols-jianghu`
-- storageBucket: `four-symbols-jianghu.firebasestorage.app`
-- messagingSenderId: `86885650222`
-- appId: `1:86885650222:web:8ffcbb5c07dc2a691b34bf`
-- measurementId: `G-4PZCMLJC8L`
-- Firebase Web SDK: `12.18.0`
-
-The Firebase Web `apiKey` is stored in `firebase-config.js` with the rest of the public Web App identifiers. This is not an Admin SDK credential. Service-account keys, private server secrets and privileged credentials must never be committed to this repository.
-
-Firebase Analytics is not initialized by this phase. The `measurementId` is retained only as part of the Console-provided Web App config.
-
-## Authentication behavior
-
-The account overlay is installed inside `#game-stage`, so it follows the official 1080×1920 stage transform without changing game page dimensions. Its content scrolls inside `.firebase-auth-dialog`, which is explicitly registered in the existing global touch-lock whitelist instead of adding another page-specific touch handler.
-
-Available flows:
+Fresh production sessions stop at the account UI until one of these Firebase identities exists:
 
 - Google sign-in.
 - Email/password sign-in.
 - Email/password account creation.
-- Anonymous guest sign-in.
-- Sign-out.
-- Local-only fallback so an Authentication provider/configuration problem cannot block the existing single-player local save.
+- `訪客開始遊戲`, implemented with Firebase Anonymous Auth.
 
-A signed-in account displays its Firebase UID and then attempts a read of the current cloud-save document.
+There is no production `先使用本機存檔` path. No UID means no save lookup and no first-character creation. Test doubles are confined to the local QA HTTP server in `.github/scripts/run-boot-architecture-browser-qa.mjs`; the deployed runtime contains no DEV auth bypass.
 
-Google, Email/password and Anonymous providers must also be enabled in Firebase Console Authentication. Any deployed custom game domain used by Google sign-in must be present in Authentication → Settings → Authorized domains.
+Google, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup sign-in must also be listed under Authentication → Settings → Authorized domains.
 
-## Security boundary
+## Account and character order
 
-The browser is allowed to authenticate and read only the signed-in player's own Firestore tree. The browser must not authoritatively create, update, or delete official game progression.
+1. Initialize Firebase Auth and restore persistence.
+2. Resolve the current user.
+3. If signed out, show account UI and wait.
+4. After sign-in, capture the UID and activate only that UID's local repository.
+5. Read `/users/{uid}/saves/current` and the UID-namespaced local save.
+6. Resolve cloud/local/legacy status without silently overwriting any source.
+7. Existing character → hydrate and enter the city. A successful authenticated read of the same UID returning a missing document (or an explicit same-UID empty sentinel) proves an empty account and permits creation. Error or conflict → fail closed.
 
-Current cloud-save read path:
+Character creation is authorized only by `FourSymbolsStartupPolicy.canCreateCharacter()` while the state machine is in `NEED_CHARACTER`.
+
+## Cloud security boundary
+
+Current read path:
 
 `/users/{uid}/saves/current`
 
-Authoritative cloud-save writes will be implemented through a trusted backend (Cloud Functions/Cloud Run/Admin SDK) and must keep the client-write-deny Firestore policy intact.
+The browser may authenticate and read only the signed-in player's own tree. It must not authoritatively create, update or delete official progression through Firestore client APIs. `CLOUD_SAVE_WRITE_POLICY` remains `trusted-backend-only`.
 
-A successful read does **not** automatically hydrate or overwrite the current local game save in this phase. Cross-device save selection/conflict handling must be designed explicitly before hydration is enabled.
+The existing callable backend may bootstrap account metadata or accept an untrusted legacy migration candidate for server-side review. Startup does not require a bootstrap write: a successful authenticated `getDoc` returning a missing same-UID document is already an authoritative empty read. A submitted legacy payload is not authoritative merely because the callable accepted it. If the trusted backend is unavailable, this client refactor does not weaken Firestore rules to simulate cloud write support.
 
-## Runtime integration
+A successful cloud read does **not** automatically hydrate or overwrite local gameplay state. The Startup owner first validates UID ownership, authoritative payload shape, local metadata, legacy state and conflicts; only that resolver may select a payload for hydration.
 
-`js/52-v173.20-startup-loader.js` dynamically imports `js/firebase/firebase-bootstrap.js`.
+## Local ownership
 
-Firebase initialization is intentionally optional infrastructure:
+The canonical gameplay payload schema remains unchanged. Ownership is stored separately:
 
-- failure does not alter the existing `DEFAULT_RUNTIME_TOTAL=32` gate;
-- failure does not block the normal local game;
-- `saveGame()` / `loadGame()` are untouched;
-- the local `SAVE_KEY` and save schema are untouched;
-- no Firestore browser write API is imported.
+- `four_symbols_save:{uid}` — gameplay save.
+- `four_symbols_save_meta:{uid}` — `ownerUid`, ownership schema and source.
+- `four_symbols_account:{uid}:{suffix}` — inventory/equipment/abyss and other sidecar state.
+- `four_symbols_active_uid` — active account pointer, never a substitute for Auth identity.
 
-## Public bridge
+Payload and metadata must both exist and match the requested UID. An incomplete pair, corrupt JSON or owner mismatch raises an error. Account switching deactivates the old owner and reloads the document before the new UID can hydrate globals.
 
-When `firebase-bootstrap.js` is loaded, it exposes `window.FourSymbolsFirebase` with:
+## Legacy key
 
-- `initialize()`
-- `getConfigStatus()`
-- `getUser()`
-- `observeAuthState(listener)`
-- `signInWithGoogle()`
-- `signInWithEmail(email, password)`
-- `createAccountWithEmail(email, password)`
-- `signInAsAnonymous()`
-- `signOut()`
-- `readCurrentCloudSave()`
-- `openAuth()`
-- `closeAuth()`
-- `cloudSaveWritePolicy` (`trusted-backend-only`)
+`battle_full_version_save_v5` is unowned legacy data. Sign-in never automatically binds it. Migration requires explicit confirmation, creates timestamped backups, preserves the original key, refuses any existing local/cloud character conflict and rolls back incomplete account writes. Cloud/legacy and local/cloud conflicts remain visible and blocked until explicitly resolved; they are never silently overwritten.
 
-Browser events:
+## Failure behavior
 
-- `four-symbols:firebase-ready`
+- Auth network/config error: `ERROR`; creation remains hidden.
+- A successful same-UID cloud read returning a missing document: safe empty account; creation may proceed only after local/legacy checks also pass.
+- Cloud read error with a verified, complete same-UID local save: `OFFLINE_READY`.
+- Cloud read error without such a local save: `ERROR`.
+- Cloud says authoritative but has no valid character payload: `ERROR`.
+- Corrupt local or legacy storage: `ERROR`; original bytes are retained.
+- Account changes during cloud read: discard the result and reload under the new identity.
+
+## Firebase project
+
+- Auth domain: `four-symbols-jianghu.firebaseapp.com`
+- Project ID: `four-symbols-jianghu`
+- Firebase Web SDK: `12.18.0`
+- Cloud Functions region: `us-central1`
+
+Firebase Web configuration values are public client identifiers, not Admin credentials. Service-account keys and privileged secrets must never be committed.
+
+## Browser events and API
+
+`window.FourSymbolsFirebaseLifecycle` exposes identity, cloud-read, sign-in/out and account UI methods. Important events are:
+
 - `four-symbols:firebase-auth-state`
 - `four-symbols:firebase-cloud-save-read`
-- `four-symbols:firebase-config-missing`
-- `four-symbols:firebase-bootstrap-failed`
+- `four-symbols:firebase-module-ready`
+- `four-symbols:startup-state`
+- `four-symbols:startup-ready`
+- `four-symbols:startup-error`
 
-No local save function is wrapped by this layer.
+Firebase does not own `saveGame()` or `loadGame()`. It supplies identity and cloud read results to the startup owner; `FourSymbolsAccountSave` owns local selection, and the gameplay save owner serializes only under the active UID.

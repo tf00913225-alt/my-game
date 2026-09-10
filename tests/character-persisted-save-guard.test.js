@@ -3,7 +3,8 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 const source=fs.readFileSync("js/23-v125-character-creation-bootstrap.js","utf8");
-const SAVE_KEY="battle_full_version_save_v5";
+const accountSource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const TEST_UID="creation-guard-test";
 
 function harness(options={}){
     let domReady=null;
@@ -23,11 +24,6 @@ function harness(options={}){
         addEventListener(name,fn){if(name==="DOMContentLoaded")domReady=fn;}
     };
     const storage=new Map();
-    if(Object.prototype.hasOwnProperty.call(options,"raw")){
-        storage.set(SAVE_KEY,String(options.raw));
-    }else if(Object.prototype.hasOwnProperty.call(options,"saved")){
-        storage.set(SAVE_KEY,JSON.stringify(options.saved));
-    }
     const localStorage={
         getItem(key){
             if(options.throwOnGet){ throw new Error("storage unavailable"); }
@@ -38,7 +34,7 @@ function harness(options={}){
     };
     const context={
         document,localStorage,creationTargetSlot:targetSlot,player:runtimePlayer,
-        window:{
+        window:{localStorage,
             createCharacter(){calls++;return "created";},
             rpgAlert(message){alerts.push(String(message));return Promise.resolve();},
             alert(message){alerts.push(String(message));}
@@ -46,6 +42,16 @@ function harness(options={}){
         console
     };
     vm.createContext(context);
+    vm.runInContext(accountSource,context);
+    context.window.FourSymbolsAccountSave.activate(TEST_UID);
+    const saveKey=context.window.FourSymbolsAccountSave.saveKey(TEST_UID);
+    const metadataKey=context.window.FourSymbolsAccountSave.metadataKey(TEST_UID);
+    if(Object.prototype.hasOwnProperty.call(options,"raw")){
+        storage.set(saveKey,String(options.raw));
+        storage.set(metadataKey,JSON.stringify({schemaVersion:1,ownerUid:TEST_UID}));
+    }else if(Object.prototype.hasOwnProperty.call(options,"saved")){
+        context.window.FourSymbolsAccountSave.writeForUid(TEST_UID,options.saved,{source:"test"});
+    }
     vm.runInContext(source,context);
     assert.equal(typeof domReady,"function");
     domReady();

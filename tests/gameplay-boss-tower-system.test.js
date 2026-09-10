@@ -5,6 +5,8 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
+const accountSource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const TEST_UID="boss-tower-test";
 
 function storage(seed){
     const values=new Map(Object.entries(seed||{}).map(([key,value])=>[key,String(value)]));
@@ -61,10 +63,11 @@ function load(options={}){
         autoActionForCharacter:()=>{ context.baseAutoCalled=(context.baseAutoCalled||0)+1; },
         castHealSkill:()=>{ context.player.hp=Math.min(10000,context.player.hp+1000);context.player.sp=Math.min(2000,context.player.sp+100); },
         renderBattle:undefined,showPage:noop,saveGame:()=>{
-            const previous=JSON.parse(localStorage.getItem("battle_full_version_save_v5")||"{}");
+            const current=context.FourSymbolsAccountSave.readForUid(TEST_UID);
+            const previous=current.status==="ready"?current.save:{};
             if(context.GameplaySystem){ previous.gameplayProgress=context.GameplaySystem.getSerializableState(); }
             previous.player={id:context.player.id,level:context.player.level};
-            localStorage.setItem("battle_full_version_save_v5",JSON.stringify(previous));
+            context.FourSymbolsAccountSave.writeForUid(TEST_UID,previous,{source:"test"});
         },
         rebuildInventorySlots:noop,updateGoldDisplay:noop,addBattleLog:message=>{ (context.logs||(context.logs=[])).push(message); },
         showPlayerHit:noop,checkBattleEnd:()=>false,
@@ -83,6 +86,8 @@ function load(options={}){
     };
     context.window=context;context.globalThis=context;
     vm.createContext(context);
+    vm.runInContext(accountSource,context,{filename:"js/startup/account-save-repository.js"});
+    context.FourSymbolsAccountSave.activate(TEST_UID);
     vm.runInContext(source,context,{filename:"js/gameplay-boss-tower-system.js"});
     return {context,localStorage};
 }

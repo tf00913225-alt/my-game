@@ -8,7 +8,7 @@ const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const legacyAbyssPatch=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;

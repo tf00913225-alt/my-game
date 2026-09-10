@@ -9,7 +9,7 @@
 (function installV139RestedExperience(){
     "use strict";
 
-    const RESTED_EXP_STORAGE_KEY="v139_rested_exp_state";
+    const RESTED_EXP_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("rested-exp-state");
     const RESTED_EXP_MAX_BATTLES=300;
     const RESTED_EXP_MINUTES_PER_BATTLE=2;
     const RESTED_EXP_MS_PER_BATTLE=RESTED_EXP_MINUTES_PER_BATTLE*60*1000;

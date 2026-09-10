@@ -6,7 +6,8 @@ const vm=require("node:vm");
 
 const source=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const css=fs.readFileSync("css/44-v149-skill-ui-rules.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
+const buildSource=fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const animationSource=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 
@@ -72,14 +73,14 @@ function compact(skill){
 }
 
 test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.64/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(buildSource,/"js\/01-stage-v8-touch-lock\.js"/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(loader,/css\/44-v149-skill-ui-rules\.css/);
-    const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
-    const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");
+    assert.match(buildSource,/"css\/44-v149-skill-ui-rules\.css"/);
+    const v148=buildSource.indexOf("js/42-v148-combat-dungeon-fixes.js");
+    const v149=buildSource.indexOf("js/43-v149-skill-ui-rules.js");
     assert.ok(v148>=0&&v149>v148);
     assert.match(css,/grid-template-columns:auto 46px minmax\(0,1fr\)/);
     assert.match(css,/shop-potion-buy[\s\S]*grid-column:1 \/ -1/);

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "bundles": {
+    "app-shell": {
+      "scripts": ["__BUILD_APP_SHELL__"],
+      "styles": ["__BUILD_APP_SHELL_STYLE__"],
+      "dependencies": []
+    },
+    "gameplay-core": {
+      "scripts": ["__BUILD_GAMEPLAY_CORE__"],
+      "styles": ["__BUILD_GAMEPLAY_CORE_STYLE__"],
+      "dependencies": ["app-shell"]
+    },
+    "feature-patrol": {
+      "scripts": ["__BUILD_PATROL__"],
+      "styles": ["__BUILD_PATROL_STYLE__"],
+      "assets": ["__PATROL_ASSETS__"],
+      "dependencies": ["gameplay-core"]
+    },
+    "feature-abyss": {
+      "scripts": ["__BUILD_ABYSS__"],
+      "styles": ["__BUILD_ABYSS_STYLE__"],
+      "dependencies": ["gameplay-core"]
+    },
+    "feature-skill": {
+      "scripts": ["__BUILD_SKILL__"],
+      "styles": [],
+      "dependencies": ["gameplay-core"]
+    },
+    "feature-boss-relic": {
+      "scripts": ["__BUILD_BOSS_RELIC__"],
+      "styles": ["__BUILD_BOSS_RELIC_STYLE__"],
+      "dependencies": ["gameplay-core"]
+    }
+  },
+  "features": {
+    "home": "app-shell",
+    "character-creation": "app-shell",
+    "patrol": "feature-patrol",
+    "battle": "gameplay-core",
+    "inventory": "gameplay-core",
+    "equipment": "gameplay-core",
+    "dungeon": "feature-boss-relic",
+    "shop": "gameplay-core",
+    "synthesis": "gameplay-core",
+    "abyss": "feature-abyss",
+    "skill": "feature-skill",
+    "relic": "feature-boss-relic",
+    "boss-tower": "feature-boss-relic"
+  },
+  "idlePreload": ["gameplay-core", "feature-patrol"]
+}

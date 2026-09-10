@@ -16,7 +16,7 @@ const questQa=read("js/57-v173.51-quest-qa.js");
 const daily=read("js/42-v148-combat-dungeon-fixes.js");
 const content=read("js/27-v132-content-expansion.js");
 const equipment=read("js/equipment-progression.js");
-const loader=read("js/20-anonymous-20.js");
+const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
 assert.ok(fs.existsSync(path.join(root,"assets/items/materials/ore.png")));
 assert.ok(fs.existsSync(path.join(root,"assets/items/chests/dungeon-chest.png")));
 assert.match(content,/assets\/items\/materials\/ore\.png/);

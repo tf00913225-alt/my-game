@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "states": [
+    "BOOT_LOADING",
+    "AUTH_RESOLVING",
+    "AUTH_REQUIRED",
+    "SAVE_LOADING",
+    "MIGRATION_REQUIRED",
+    "NEED_CHARACTER",
+    "READY",
+    "OFFLINE_READY",
+    "ERROR"
+  ],
+  "criticalTasks": [
+    { "id": "boot-shell", "weight": 15 },
+    { "id": "account-ui", "weight": 15 },
+    { "id": "auth-sdk", "weight": 20 },
+    { "id": "auth-state", "weight": 20 },
+    { "id": "save-resolution", "weight": 20 },
+    { "id": "initial-destination", "weight": 10 }
+  ],
+  "maximumReadyTransitionMs": 500
+}

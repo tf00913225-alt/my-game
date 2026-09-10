@@ -7,7 +7,7 @@ const {execFileSync}=require("child_process");
 
 const source=fs.readFileSync("js/44-v152-dev-fixes.js","utf8");
 const css=fs.readFileSync("css/45-v152-dev-fixes.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const v140=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
 const v143=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
@@ -66,7 +66,7 @@ function load(overrides={}){
 }
 
 test("V152 remains ordered before V154 under the current cache version",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
     assert.match(loader,/css\/45-v152-dev-fixes\.css/);
     const v149=loader.indexOf("js/43-v149-skill-ui-rules.js");

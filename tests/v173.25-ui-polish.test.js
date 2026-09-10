@@ -20,7 +20,7 @@ const animationTiming=read("js/37-v142-skill-animation.js");
 const animationUi=read("js/39-v143-skill-animation.js");
 const statusUi=read("js/41-v146-system-polish.js");
 const frostbiteUi=read("js/44-v152-dev-fixes.js");
-const loader=read("js/20-anonymous-20.js");
+const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
 
 let passed=0;
 function test(name,callback){
