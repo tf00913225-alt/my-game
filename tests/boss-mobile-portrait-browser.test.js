@@ -93,8 +93,15 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403;}
 (function(){
   var stage=document.getElementById("game-stage");
   var stageScale=Math.min(innerWidth/1080,innerHeight/1920);
-  stage.style.setProperty("transform","translate(-50%,-50%) scale("+stageScale+")","important");
-  stage.style.setProperty("transform-origin","center center","important");
+  var stageLeft=(innerWidth-1080*stageScale)/2;
+  var stageTop=(innerHeight-1920*stageScale)/2;
+  stage.style.setProperty("position","fixed","important");
+  stage.style.setProperty("left",stageLeft+"px","important");
+  stage.style.setProperty("top",stageTop+"px","important");
+  stage.style.setProperty("width","1080px","important");
+  stage.style.setProperty("height","1920px","important");
+  stage.style.setProperty("transform","scale("+stageScale+")","important");
+  stage.style.setProperty("transform-origin","top left","important");
 
   function rect(selector){
     var node=document.querySelector(selector),r=node.getBoundingClientRect();
