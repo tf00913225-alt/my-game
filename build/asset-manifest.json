@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.b67304f932ae.js"
+      "build/boot-core.3539578c5bf7.js"
     ],
     "styles": [
       "build/boot-core.83625fb1541f.css"
@@ -19,7 +19,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.cc88dd1a06ea.js"
+          "build/app-shell.972e2333ea94.js"
         ],
         "styles": [
           "build/app-shell.37d5b9f36840.css"
@@ -119,13 +119,13 @@
     ]
   },
   "assets": {
-    "build/boot-core.b67304f932ae.js": {
-      "sha256": "b67304f932ae",
-      "bytes": 33099
+    "build/boot-core.3539578c5bf7.js": {
+      "sha256": "3539578c5bf7",
+      "bytes": 37742
     },
-    "build/app-shell.cc88dd1a06ea.js": {
-      "sha256": "cc88dd1a06ea",
-      "bytes": 919459
+    "build/app-shell.972e2333ea94.js": {
+      "sha256": "972e2333ea94",
+      "bytes": 919765
     },
     "build/gameplay-core.c8bdbe557965.js": {
       "sha256": "c8bdbe557965",

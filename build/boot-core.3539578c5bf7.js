@@ -11,7 +11,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstr
     const META_PREFIX="four_symbols_save_meta:";
     const BACKUP_PREFIX="four_symbols_legacy_backup:";
     const ACTIVE_UID_KEY="four_symbols_active_uid";
-    const SCHEMA_VERSION=1;
+    const SCHEMA_VERSION=2;
     const LEGACY_SIDECARS=Object.freeze({
         v131_element_box_state:"element-box-state",
         v132_daily_dungeon_state:"daily-dungeon-state",
@@ -51,6 +51,41 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstr
             }
             return value;
         }catch(cause){ throw coded(code||"account-save-corrupt","Stored save is not valid JSON.",cause); }
+    }
+    function canonicalValue(value,seen){
+        if(value===null||typeof value!=="object"){ return value; }
+        if(seen.has(value)){ throw coded("account-save-cyclic","Save cannot contain cyclic values."); }
+        seen.add(value);
+        let output;
+        if(Array.isArray(value)){
+            output=value.map(item=>item===undefined||typeof item==="function"||typeof item==="symbol"?null:canonicalValue(item,seen));
+        }else{
+            output={};
+            Object.keys(value).sort().forEach(key=>{
+                const item=value[key];
+                if(item===undefined||typeof item==="function"||typeof item==="symbol"){ return; }
+                output[key]=canonicalValue(item,seen);
+            });
+        }
+        seen.delete(value); return output;
+    }
+    function fingerprint(save){
+        let serialized;
+        try{ serialized=JSON.stringify(canonicalValue(save,new WeakSet())); }
+        catch(cause){ if(cause&&cause.code){ throw cause; } throw coded("account-save-fingerprint-failed","Save fingerprint could not be calculated.",cause); }
+        if(!serialized){ throw coded("account-save-fingerprint-failed","Save fingerprint requires a JSON payload."); }
+        let a=0x243f6a88,b=0x85a308d3,c=0x13198a2e,d=0x03707344;
+        for(let index=0;index<serialized.length;index++){
+            const code=serialized.charCodeAt(index);
+            a=Math.imul(a^code,0x9e3779b1); b=Math.imul(b^code,0x85ebca77);
+            c=Math.imul(c^code,0xc2b2ae3d); d=Math.imul(d^code,0x27d4eb2f);
+        }
+        function finish(hash,other){
+            hash^=serialized.length; hash^=other>>>13; hash=Math.imul(hash^(hash>>>16),0x85ebca6b);
+            hash=Math.imul(hash^(hash>>>13),0xc2b2ae35); return (hash^(hash>>>16))>>>0;
+        }
+        const hashes=[finish(a,c),finish(b,d),finish(c,a),finish(d,b)];
+        return "v1:"+serialized.length.toString(16)+":"+hashes.map(value=>value.toString(16).padStart(8,"0")).join("");
     }
     function saveKey(uid){ return PREFIX+validUid(uid); }
     function metadataKey(uid){ return META_PREFIX+validUid(uid); }
@@ -94,11 +129,39 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstr
         const metaKey=metadataKey(uid);
         const previousRaw=storage().getItem(key);
         const previousMeta=storage().getItem(metaKey);
+        let previousMetadata=null;
+        if(previousMeta){
+            try{ previousMetadata=JSON.parse(previousMeta); }
+            catch(cause){ throw coded("account-metadata-corrupt","Account save metadata is corrupt.",cause); }
+            if(!previousMetadata||previousMetadata.ownerUid!==uid){
+                throw coded("account-owner-mismatch","Existing local save ownership cannot be verified.");
+            }
+        }
         const raw=JSON.stringify(save);
+        const source=String(options.source||"local");
+        const explicitBase=Object.prototype.hasOwnProperty.call(options,"cloudBaseFingerprint");
+        const cloudBaseFingerprint=explicitBase
+            ? (options.cloudBaseFingerprint===null?null:String(options.cloudBaseFingerprint||""))
+            : (previousMetadata&&previousMetadata.cloudBaseFingerprint||null);
+        if(cloudBaseFingerprint!==null&&!/^v1:[0-9a-f]+:[0-9a-f]{32}$/.test(cloudBaseFingerprint)){
+            throw coded("account-cloud-base-invalid","Cloud save provenance fingerprint is invalid.");
+        }
+        let localDirty;
+        if(typeof options.localDirty==="boolean"){
+            localDirty=options.localDirty;
+        }else if(source==="authoritative-cloud-read"){
+            localDirty=false;
+        }else if(source==="hydration-normalization"){
+            localDirty=previousMetadata?previousMetadata.localDirty===true:true;
+        }else{
+            localDirty=true;
+        }
         const metadata=JSON.stringify({
             schemaVersion:SCHEMA_VERSION,
             ownerUid:uid,
-            source:String(options.source||"local"),
+            source,
+            cloudBaseFingerprint,
+            localDirty,
             updatedAt:Date.now()
         });
         try{
@@ -172,7 +235,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstr
     global.FourSymbolsAccountSave=Object.freeze({
         SCHEMA_VERSION,LEGACY_KEY,ACTIVE_UID_KEY,activate,deactivate,getActiveUid,
         saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,
-        migrateLegacyToUid,removeActive,accountKey,LEGACY_SIDECARS
+        migrateLegacyToUid,removeActive,accountKey,fingerprint,LEGACY_SIDECARS
     });
 })(typeof window!=="undefined"?window:globalThis);
 
@@ -513,12 +576,32 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstr
         if(authoritative&&legacy.status==="available"){
             return migration("雲端已有角色，同時偵測到未綁定舊版角色。系統禁止自動覆寫；請保留資料並由後續衝突處理流程處理。",true);
         }
-        if(authoritative&&local.status==="ready"&&JSON.stringify(authoritative)!==JSON.stringify(local.save)){
-            return migration("雲端角色與此 UID 的本機角色不同。系統禁止靜默選邊或覆寫。",true);
+        let selectedSave=authoritative;
+        if(authoritative&&local.status==="ready"){
+            try{
+                const cloudFingerprint=repo.fingerprint(authoritative);
+                const localFingerprint=repo.fingerprint(local.save);
+                const localBase=local.metadata&&local.metadata.cloudBaseFingerprint||null;
+                if(localFingerprint===cloudFingerprint){
+                    if(localBase!==cloudFingerprint||local.metadata.localDirty!==false){
+                        repo.writeForUid(user.uid,local.save,{source:"authoritative-cloud-read",cloudBaseFingerprint:cloudFingerprint,localDirty:false});
+                    }
+                    selectedSave=local.save;
+                }else if(localBase===cloudFingerprint){
+                    // The cloud snapshot is unchanged and this UID's local save is
+                    // a verified descendant (normalization or later local play).
+                    selectedSave=local.save;
+                }else{
+                    return migration("雲端角色與此 UID 的本機角色沒有共同的已驗證基底。系統禁止靜默選邊或覆寫。",true);
+                }
+            }catch(error){ return fail(error,"無法驗證雲端與本機存檔的來源關係；未覆寫任何資料。",token); }
         }
         if(authoritative){
-            if(local.status==="empty"){ repo.writeForUid(user.uid,authoritative,{source:"authoritative-cloud-read"}); }
-            saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(authoritative,false,token).catch(error=>fail(error,"角色載入失敗。",token));
+            if(local.status==="empty"){
+                const cloudFingerprint=repo.fingerprint(authoritative);
+                repo.writeForUid(user.uid,authoritative,{source:"authoritative-cloud-read",cloudBaseFingerprint:cloudFingerprint,localDirty:false});
+            }
+            saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(selectedSave,false,token).catch(error=>fail(error,"角色載入失敗。",token));
         }
         if(local.status==="ready"){
             saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(local.save,false,token).catch(error=>fail(error,"角色載入失敗。",token));

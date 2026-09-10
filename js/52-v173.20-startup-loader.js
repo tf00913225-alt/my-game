@@ -170,12 +170,32 @@
         if(authoritative&&legacy.status==="available"){
             return migration("雲端已有角色，同時偵測到未綁定舊版角色。系統禁止自動覆寫；請保留資料並由後續衝突處理流程處理。",true);
         }
-        if(authoritative&&local.status==="ready"&&JSON.stringify(authoritative)!==JSON.stringify(local.save)){
-            return migration("雲端角色與此 UID 的本機角色不同。系統禁止靜默選邊或覆寫。",true);
+        let selectedSave=authoritative;
+        if(authoritative&&local.status==="ready"){
+            try{
+                const cloudFingerprint=repo.fingerprint(authoritative);
+                const localFingerprint=repo.fingerprint(local.save);
+                const localBase=local.metadata&&local.metadata.cloudBaseFingerprint||null;
+                if(localFingerprint===cloudFingerprint){
+                    if(localBase!==cloudFingerprint||local.metadata.localDirty!==false){
+                        repo.writeForUid(user.uid,local.save,{source:"authoritative-cloud-read",cloudBaseFingerprint:cloudFingerprint,localDirty:false});
+                    }
+                    selectedSave=local.save;
+                }else if(localBase===cloudFingerprint){
+                    // The cloud snapshot is unchanged and this UID's local save is
+                    // a verified descendant (normalization or later local play).
+                    selectedSave=local.save;
+                }else{
+                    return migration("雲端角色與此 UID 的本機角色沒有共同的已驗證基底。系統禁止靜默選邊或覆寫。",true);
+                }
+            }catch(error){ return fail(error,"無法驗證雲端與本機存檔的來源關係；未覆寫任何資料。",token); }
         }
         if(authoritative){
-            if(local.status==="empty"){ repo.writeForUid(user.uid,authoritative,{source:"authoritative-cloud-read"}); }
-            saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(authoritative,false,token).catch(error=>fail(error,"角色載入失敗。",token));
+            if(local.status==="empty"){
+                const cloudFingerprint=repo.fingerprint(authoritative);
+                repo.writeForUid(user.uid,authoritative,{source:"authoritative-cloud-read",cloudBaseFingerprint:cloudFingerprint,localDirty:false});
+            }
+            saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(selectedSave,false,token).catch(error=>fail(error,"角色載入失敗。",token));
         }
         if(local.status==="ready"){
             saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(local.save,false,token).catch(error=>fail(error,"角色載入失敗。",token));

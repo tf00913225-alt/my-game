@@ -54,11 +54,13 @@ A successful cloud read does **not** automatically hydrate or overwrite local ga
 The canonical gameplay payload schema remains unchanged. Ownership is stored separately:
 
 - `four_symbols_save:{uid}` — gameplay save.
-- `four_symbols_save_meta:{uid}` — `ownerUid`, ownership schema and source.
+- `four_symbols_save_meta:{uid}` — `ownerUid`, ownership schema, source, local-dirty state and the verified cloud-base fingerprint.
 - `four_symbols_account:{uid}:{suffix}` — inventory/equipment/abyss and other sidecar state.
 - `four_symbols_active_uid` — active account pointer, never a substitute for Auth identity.
 
 Payload and metadata must both exist and match the requested UID. An incomplete pair, corrupt JSON or owner mismatch raises an error. Account switching deactivates the old owner and reloads the document before the new UID can hydrate globals.
+
+When a cloud character is first cached, the local metadata records a deterministic fingerprint of that authoritative snapshot. Hydration may add backward-compatible defaults without turning the save into an unrelated conflict, and later same-device gameplay remains a local descendant of that fingerprint. A warm start may select that UID-owned local descendant only while the freshly read cloud fingerprint is unchanged. If the cloud base changed, is absent from metadata, or cannot be verified, startup displays a conflict and refuses to choose or overwrite either copy.
 
 ## Legacy key
 

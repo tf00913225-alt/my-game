@@ -290,7 +290,7 @@ window.FourSymbolsGameSave=Object.freeze({
     deactivate:deactivateAccountSaveOwner,
     getKey:()=>SAVE_KEY,
     load:()=>loadGame(),
-    save:()=>saveGame(),
+    save:options=>saveGame(options),
     showCreation:()=>showCreation()
 });
 
@@ -6242,7 +6242,7 @@ function createCharacter(){
    存檔
 ===================================================== */
 
-function saveGame(){
+function saveGame(options={}){
 
     if(deleteAllCharactersInProgress){
         return false;
@@ -6463,7 +6463,11 @@ function saveGame(){
         };
 
 
-        repository.writeForUid(activeUid,saveData,{source:"gameplay"});
+        const persistenceOptions=options&&typeof options==="object"?options:{};
+        repository.writeForUid(activeUid,saveData,{
+            source:String(persistenceOptions.source||"gameplay"),
+            ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
+        });
         return true;
 
     }
@@ -7254,7 +7258,7 @@ function loadGame(){
            讓舊資料完成升級。
         */
 
-        saveGame();
+        saveGame({source:"hydration-normalization"});
 
 
         return true;

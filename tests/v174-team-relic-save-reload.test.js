@@ -7,7 +7,7 @@ const vm=require("vm");
 const coreSource=fs.readFileSync("js/00-main.js","utf8");
 const relicSource=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
-const saveStart=coreSource.indexOf("function saveGame(){");
+const saveStart=coreSource.indexOf("function saveGame(options={}){");
 const saveEnd=coreSource.indexOf("function loadGame(){",saveStart);
 
 assert.ok(saveStart>=0&&saveEnd>saveStart,"core saveGame source must be extractable");

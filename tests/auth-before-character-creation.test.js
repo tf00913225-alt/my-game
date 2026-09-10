@@ -34,7 +34,7 @@ assert.doesNotMatch(firebaseBootstrap,/bootstrapTrustedCloudSave/,
 assert.match(startup,/catch\(error\)\{[\s\S]*?禁止創角/);
 assert.doesNotMatch(startup,/async function enterReady[\s\S]{0,160}\+\+transitionToken/,
     "destination hydration must retain the active save-resolution token");
-assert.match(startup,/enterReady\(authoritative,false,token\)\.catch\(error=>fail\(error,"角色載入失敗。",token\)\)/,
+assert.match(startup,/enterReady\(selectedSave,false,token\)\.catch\(error=>fail\(error,"角色載入失敗。",token\)\)/,
     "hydration failure must reach the fail-closed state for the same resolution token");
 assert.match(startup,/Promise\.all\(\[requireAppShell\(\),domReady\(\)\]\)/,
     "automatic session restore must not hydrate before the DOM is ready");
@@ -42,6 +42,10 @@ assert.match(startup,/await Promise\.all\(\[requireAppShell\(\),domReady\(\)\]\)
     "the resolved Firebase UID must activate the gameplay save owner after app-shell installation and before hydration");
 assert.match(startup,/async function enterCreation\(token=transitionToken\)[\s\S]{0,220}activateGameplaySaveOwner\(\);[\s\S]{0,100}transition\(STATES\.NEED_CHARACTER/,
     "new-character persistence must bind the gameplay save owner before creation is exposed");
+assert.match(startup,/localBase===cloudFingerprint[\s\S]{0,220}selectedSave=local\.save/,
+    "same-UID local progress may resume only while its verified cloud base is unchanged");
+assert.doesNotMatch(startup,/JSON\.stringify\(authoritative\)!==JSON\.stringify\(local\.save\)/,
+    "normalized same-origin saves must not be treated as conflicts by raw JSON comparison");
 assert.match(startup,/action==="cancel-migration"[\s\S]*?firebase\.signOut\(\)/);
 assert.match(authUi,/訪客開始遊戲/);
 assert.match(authUi,/signInAsAnonymous/);

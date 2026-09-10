@@ -92,7 +92,7 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 4. 只有使用者明確確認、該 UID 尚無 local save、cloud 也沒有角色時才可 migration。
 5. 先建立 timestamped 原文備份，再寫 account namespace；原 legacy key 保留。
 6. Sidecar 逐項備份後才遷移；任何失敗會移除本次不完整 account write，但保留 legacy 與備份。
-7. Cloud 已有角色或 local/cloud 不一致時進 blocked conflict，不自動選邊、不覆寫；玩家可暫不處理並登出。
+7. Cloud 已有角色且 local 沒有相同的已驗證 cloud-base fingerprint 時進 blocked conflict，不自動選邊、不覆寫；同 UID local 只有在 cloud 基底未變時才可作為該 snapshot 的本機後代續玩。
 
 正式 cloud write 仍只允許 trusted backend。瀏覽器不得直接 create/update/delete Firestore authoritative progression。
 

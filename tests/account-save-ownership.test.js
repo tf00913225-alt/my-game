@@ -41,6 +41,25 @@ function code(expected){ return error=>error&&error.code===expected; }
 }
 
 {
+    const cloud={player:{id:"來源角色",level:5},inventoryItems:[{id:"seed",count:1}]};
+    const sameWithDifferentKeyOrder={inventoryItems:[{count:1,id:"seed"}],player:{level:5,id:"來源角色"}};
+    const normalized={...cloud,version:6,gold:0};
+    const {repo}=repository();
+    repo.activate("uid-provenance");
+    const base=repo.fingerprint(cloud);
+    assert.equal(repo.fingerprint(sameWithDifferentKeyOrder),base,"fingerprints must ignore object key order");
+    repo.writeForUid("uid-provenance",cloud,{source:"authoritative-cloud-read",cloudBaseFingerprint:base,localDirty:false});
+    repo.writeForUid("uid-provenance",normalized,{source:"hydration-normalization"});
+    let read=repo.readForUid("uid-provenance");
+    assert.equal(read.metadata.cloudBaseFingerprint,base,"hydration normalization must retain its cloud base");
+    assert.equal(read.metadata.localDirty,false,"deterministic hydration normalization is not player progress");
+    repo.writeForUid("uid-provenance",{...normalized,gold:10},{source:"gameplay"});
+    read=repo.readForUid("uid-provenance");
+    assert.equal(read.metadata.cloudBaseFingerprint,base,"local gameplay must remain attributable to the same cloud base");
+    assert.equal(read.metadata.localDirty,true,"gameplay mutation must be recorded as local progress");
+}
+
+{
     const {repo,store}=repository();
     store.setItem(repo.saveKey("uid-corrupt"),"{broken");
     store.setItem(repo.metadataKey("uid-corrupt"),JSON.stringify({ownerUid:"uid-corrupt"}));
