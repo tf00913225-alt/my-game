@@ -219,7 +219,7 @@ try{
     }
     const signedOut=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),creation:getComputedStyle(document.getElementById("creationPage")).display,labels:[...document.querySelectorAll("#firebaseSignedOutPanel button")].map(button=>button.textContent.trim()),uid:FourSymbolsStartupPolicy.getUid(),featureResources:performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>/app-shell|gameplay-core|feature-/.test(name))}))()`);
     assert.equal(signedOut.state,"AUTH_REQUIRED");assert.equal(signedOut.creation,"none");assert.equal(signedOut.uid,null);
-    for(const label of ["Google 登入","訪客開始遊戲","Email 登入","建立 Email 帳號"]){assert.ok(signedOut.labels.includes(label),"Missing auth action: "+label);}
+    for(const label of ["Google 登入","訪客開始遊戲","Email 登入","建立帳號"]){assert.ok(signedOut.labels.includes(label),"Missing auth action: "+label);}
     assert.deepEqual(signedOut.featureResources,[],"Signed-out Critical Boot fetched an authenticated/gameplay feature");
     evidence.checks.authFirst=signedOut;evidence.performance.coldAuth=await metrics(client,"four-symbols:auth-ui-interactive");
     assert.ok(evidence.performance.coldAuth.readyMs>0&&evidence.performance.coldAuth.readyMs<=5000,"Controlled cold auth UI budget exceeded");
