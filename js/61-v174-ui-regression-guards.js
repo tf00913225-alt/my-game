@@ -1,9 +1,9 @@
 /* =====================================================
    V174 — dynamic UI regression guards
-   Owner for two cross-cutting visual invariants that are created by multiple
-   late runtimes:
+   Owner for cross-cutting UI invariants created by multiple late runtimes:
    1) skill learn/upgrade action cards must stay compact;
-   2) dark text on bright gold/yellow buttons must not have a text shadow.
+   2) dark text on bright gold/yellow buttons must not have a text shadow;
+   3) system save/delete subflows must always offer an explicit return path.
 
    No gameplay, save, battle, skill-cost or equipment business rules live here.
 ===================================================== */
@@ -126,9 +126,87 @@
         }
     }
 
+    function systemRowTitle(button){
+        const row=button&&button.closest&&button.closest(".system-panel-row");
+        const title=row&&row.querySelector("strong");
+        return String(title&&title.textContent||"").trim();
+    }
+
+    async function ensureRpgDialogOwner(reason){
+        if(typeof window.rpgAlert==="function"&&typeof window.rpgConfirm==="function"){ return true; }
+        if(window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensure==="function"){
+            try{ await window.FourSymbolsFeatures.ensure("gameplay-core",reason||"system-dialog"); }
+            catch(error){ console.error("System dialog owner failed to load:",error); }
+        }
+        return typeof window.rpgAlert==="function"&&typeof window.rpgConfirm==="function";
+    }
+
+    async function runSystemSaveAction(button){
+        if(button.dataset.v174SystemBusy==="1"){ return; }
+        button.dataset.v174SystemBusy="1";
+        button.disabled=true;
+        try{
+            const saved=typeof window.saveGame==="function"?window.saveGame():false;
+            const ready=await ensureRpgDialogOwner("system-save-feedback");
+            const success=saved!==false;
+            if(ready){
+                await window.rpgAlert(
+                    success?"已完成手動存檔。":"目前無法完成手動存檔。",
+                    {title:"遊戲存檔",confirmText:"返回系統",tone:success?"success":"normal"}
+                );
+            }else if(typeof window.alert==="function"){
+                window.alert(success?"已完成手動存檔。":"目前無法完成手動存檔。");
+            }
+        }finally{
+            delete button.dataset.v174SystemBusy;
+            button.disabled=false;
+        }
+    }
+
+    async function runSystemDeleteAction(button){
+        if(button.dataset.v174SystemBusy==="1"){ return; }
+        button.dataset.v174SystemBusy="1";
+        button.disabled=true;
+        try{
+            const ready=await ensureRpgDialogOwner("system-delete-confirm");
+            if(ready&&typeof window.resetGame==="function"){
+                await window.resetGame();
+            }
+        }finally{
+            delete button.dataset.v174SystemBusy;
+            button.disabled=false;
+        }
+    }
+
+    function interceptSystemAction(event){
+        const button=event.target&&event.target.closest&&event.target.closest(".system-panel-row .home-feature-buy-btn");
+        if(!button){ return; }
+        const title=systemRowTitle(button);
+        if(title!=="遊戲存檔"&&title!=="刪除角色"){ return; }
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        if(title==="遊戲存檔"){ void runSystemSaveAction(button); }
+        else{ void runSystemDeleteAction(button); }
+    }
+
+    function normalizeSystemDialogNavigation(){
+        const layer=document.getElementById("v169RpgDialogLayer");
+        if(!layer||!layer.classList.contains("show")){ return; }
+        const title=layer.querySelector("#v169RpgDialogTitle");
+        if(String(title&&title.textContent||"").trim()!=="刪除角色"){ return; }
+        const cancel=layer.querySelector(".v169-rpg-dialog-actions .v169-rpg-dialog-button.secondary");
+        if(cancel&&!cancel.hidden&&cancel.textContent!=="返回系統"){
+            cancel.textContent="返回系統";
+            cancel.setAttribute("aria-label","返回系統，不刪除角色");
+        }
+    }
+
     function apply(){
         normalizeSkillActionCards();
         normalizeGoldButtonTextShadows();
+        normalizeSystemDialogNavigation();
         ensureStylesheetLast();
     }
 
@@ -149,6 +227,7 @@
         attributeFilter:["class","style","disabled"]
     });
 
+    document.addEventListener("click",interceptSystemAction,true);
     document.addEventListener("click",schedule,{passive:true});
     document.addEventListener("v173:runtime-ready",schedule,{passive:true});
     window.addEventListener("resize",schedule,{passive:true});
