@@ -92,7 +92,7 @@
           "build/feature-relic-progression.66dc0818b8ae.js"
         ],
         "styles": [
-          "build/feature-boss-relic.a725389ada23.css",
+          "build/feature-boss-relic.0298e2f4a6fd.css",
           "build/feature-relic-progression.8844d5eb6e81.css"
         ],
         "dependencies": [
@@ -173,9 +173,9 @@
       "sha256": "3d298c2d78c2",
       "bytes": 25629
     },
-    "build/feature-boss-relic.a725389ada23.css": {
-      "sha256": "a725389ada23",
-      "bytes": 43973
+    "build/feature-boss-relic.0298e2f4a6fd.css": {
+      "sha256": "0298e2f4a6fd",
+      "bytes": 47707
     },
     "build/feature-relic-progression.8844d5eb6e81.css": {
       "sha256": "8844d5eb6e81",
