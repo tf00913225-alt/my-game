@@ -57,7 +57,7 @@ const catalog={
  relic_returning_wheel:{id:"relic_returning_wheel",name:"回天寶輪",rarity:"pink",runtimeReady:true,maxLevel:20},
  relic_all_returning_array:{id:"relic_all_returning_array",name:"萬象歸元盤",rarity:"four-symbol",runtimeReady:false,maxLevel:20}
 };
-const owned={};Object.values(catalog).forEach(function(def){owned[def.id]={unlocked:def.id==="relic_nine_dragon_fire",level:1,seen:true};});
+const owned={};Object.values(catalog).forEach(function(def){owned[def.id]={unlocked:false,level:1,seen:true};});
 const loadout={relicId:null,subRelicId:null};
 window.v174RelicSystem={catalog:catalog,getOwnedState:function(){return owned;},getTeamLoadout:function(){return loadout;}};
 const state={personal:{},world:{},tower:{weekKey:"2026-09-07",completedFloor:24,highestThisWeek:24,historicalHighest:24,claimedFloors:{},pendingRelicChoice:false}};
@@ -66,7 +66,7 @@ const state={personal:{},world:{},tower:{weekKey:"2026-09-07",completedFloor:24,
 const personal=[20,30,40,50,60,70,80,90,100].map(function(level){return {id:"personal-"+level,name:level===30?"烈焰巨魔王":"個人王"+level,level:level,firstReward:"首通獎勵",repeatReward:"重複獎勵"};});
 const world=[40,60,80,100].map(function(level){return {id:"world-"+level,name:"世界王"+level,level:level,firstReward:"首通獎勵",repeatReward:"重複獎勵"};});
 window.GameplaySystem={personalBosses:personal,worldBosses:world,towerConfig:{floorCount:100,relicChoices:[{id:"relic_nine_dragon_fire",name:"九龍神火罩"}]},getSerializableState:function(){return state;},getActiveBattleState:function(){return null;}};
-window.FourSymbolsAccountSave={getActiveUid:function(){return "qa-uid";},readForUid:function(){return {status:"ready",save:{player:player,playerRelics:{relic_nine_dragon_fire:{unlocked:true,level:1,seen:true}}}};}};
+window.FourSymbolsAccountSave={getActiveUid:function(){return "qa-uid";},readForUid:function(){return {status:"ready",save:{player:player,playerRelics:{relic_nine_dragon_fire:{unlocked:false,level:1,seen:true}}}};}};
 function itemCount(id){return inventoryItems.reduce(function(sum,item){return sum+(item.id===id?Number(item.count)||0:0);},0)}
 window.v132CanAddItemToInventory=function(){return true};
 window.v132AddItemToInventory=function(def,count){var found=inventoryItems.find(function(item){return item.id===def.id});if(found){found.count=(Number(found.count)||0)+count;Object.assign(found,def)}else{inventoryItems.push(Object.assign({},def,{count:count}))}return true};
