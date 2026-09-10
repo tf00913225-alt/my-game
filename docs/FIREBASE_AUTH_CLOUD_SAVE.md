@@ -27,7 +27,7 @@ There is no production `先使用本機存檔` path. No UID means no save lookup
 
 The account surface is mounted directly under `document.body`, outside the fixed 1080×1920 game stage. It sizes against the real viewport (`100dvh` plus safe-area insets), so signed-out users do not depend on the authenticated app-shell stage scaler. Its `聯絡客服` button and the in-game system page both open `FourSymbolsSupport`, which displays `tf00913225@gmail.com` from one Critical Boot owner.
 
-Google, Facebook, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup sign-in must also be listed under Authentication → Settings → Authorized domains. Facebook additionally requires the same Meta App ID/App Secret configured in Firebase Authentication and the Firebase OAuth redirect URI (`https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`) listed as a valid OAuth redirect URI in the Meta app.
+Google, Facebook, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup sign-in must also be listed under Authentication → Settings → Authorized domains. Facebook additionally requires the same Meta App ID/App Secret configured in Firebase Authentication and the Firebase OAuth redirect URI (`https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`) listed as a valid OAuth redirect URI in the Meta app. If Firebase reports `auth/account-exists-with-different-credential`, the UI asks the player to use the original provider; it never silently links identities or reassigns an existing UID.
 
 ## Account and character order
 
