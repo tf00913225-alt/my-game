@@ -16,7 +16,7 @@ const boot=JSON.parse(fs.readFileSync("config/boot-manifest.json","utf8"));
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
 const directScripts=[...index.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].map(match=>match[1]);
-const scriptTags=[...index.matchAll(/<script\\b[^>]*>/g)];
+const scriptTags=[...index.matchAll(/<script\b[^>]*>/g)];
 const directStyles=[...index.matchAll(/<link\b[^>]*\brel="stylesheet"[^>]*\bhref="([^"]+)"/g)].map(match=>match[1]);
 assert.deepEqual(directScripts,manifest.critical.scripts);
 assert.deepEqual(directStyles,manifest.critical.styles);
