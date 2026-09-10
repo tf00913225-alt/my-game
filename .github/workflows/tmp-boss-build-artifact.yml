@@ -6,7 +6,7 @@ on:
       - fix/boss-ui-9x16-mobile-20260910
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -18,6 +18,21 @@ jobs:
           node-version: "24"
       - name: Rebuild deterministic production assets
         run: node scripts/build-production.mjs
+      - name: Verify Boss UI against rebuilt assets
+        run: |
+          node tests/boss-mechanism-vfx-card-ui-20260909.test.js
+          node tests/boss-mobile-portrait-browser.test.js
+      - name: Commit rebuilt production assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A build asset-manifest.json index.html
+          if git diff --cached --quiet; then
+            echo "Deterministic production assets are already current."
+            exit 0
+          fi
+          git commit -m "build: refresh deterministic boss bundle"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
       - name: Upload rebuilt Boss bundle and manifests
         uses: actions/upload-artifact@v4
         with:
