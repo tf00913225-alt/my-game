@@ -35,7 +35,7 @@ assert.match(vfx,/isMechanismTarget\(index\)\)\{ return mechanismCardFor\(index\
 // BOSS receives the large portrait 9:16 variables requested for this screen.
 assert.match(v141,/flex:0 0 var\(--v143-monster-card-width,76px\) !important;/);
 assert.match(v143,/#game-stage > #app > #game-content #battlePage \.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:82px;[\s\S]*?--v143-monster-card-height:106px;/);
-assert.match(boss,/#game-stage > #app > #game-content #battlePage \.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:clamp\(176px,44%,190px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:9 \/ 16;/);
+assert.match(boss,/#game-stage > #app > #game-content #battlePage \.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:clamp\(154px,38\.1%,166px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:9 \/ 16;/);
 assert.match(runtime,/bossCard\.classList\.add\("gameplay-boss-card"\)/);
 
 // The old V131 row has a hard flex sizing path. Gameplay BOSS mode switches
@@ -53,7 +53,7 @@ assert.doesNotMatch(bossCardRule,/scale\(/);
 // Its historical geometry is reclaimed by the formation without introducing
 // a new priority patch in the new Boss-specific sizing rules.
 assert.match(boss,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
-assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-23px;/);
+assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-32px;/);
 const activeBossAreaRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active{");
 const activeBossRowRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{");
 assert.doesNotMatch(activeBossAreaRule,/!important/);
@@ -64,7 +64,7 @@ assert.doesNotMatch(activeBossRowRule,/!important/);
 // remains on the mechanism button itself; the separate detail panel keeps the
 // full dynamic explanation available.
 assert.match(boss,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
-assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:clamp\(88px,23%,106px\);[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?flex:0 0 clamp\(88px,23%,106px\);/);
+assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:clamp\(82px,20%,96px\);[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?flex:0 0 clamp\(82px,20%,96px\);/);
 assert.match(boss,/\.boss-mechanism-kind\{[\s\S]*?order:1;/);
 assert.match(boss,/\.boss-mechanism-name\{[\s\S]*?order:2;[\s\S]*?-webkit-line-clamp:2;/);
 assert.match(boss,/\.boss-mechanism-hp\{[\s\S]*?order:3;[\s\S]*?min-height:20px;[\s\S]*?font-size:10px;[\s\S]*?font-weight:900;/);

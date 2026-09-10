@@ -587,7 +587,7 @@
 }
 
 #game-stage #battleMonsterArea.gameplay-boss-active{
-    margin-top:-23px;
+    margin-top:-32px;
     max-width:100%;
     overflow:visible;
 }
@@ -604,11 +604,12 @@
     width:100%;
 }
 
-/* Only Gameplay Center BOSSes receive the portrait treatment. The card width
-   is a real 44% of the battle row (clamped for the 420px legacy surface), and
-   height is derived from the card's own 9:16 aspect ratio. */
-#game-stage #battlePage .battle-monster.gameplay-boss-card{
-    --v143-monster-card-width:clamp(176px,44%,190px);
+/* Only Gameplay Center BOSSes receive the portrait treatment. The selector
+   deliberately mirrors the shared V143 battle namespace, then adds the live
+   Gameplay-BOSS marker so these variables outrank the generic 82x106 rank rule
+   without another !important. Height is derived from the card's own 9:16 ratio. */
+#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{
+    --v143-monster-card-width:clamp(154px,38.1%,166px);
     --v143-monster-card-height:auto;
     --v143-monster-icon-width:calc(100% - 12px);
     --v143-monster-icon-height:auto;
@@ -670,7 +671,7 @@
     align-items:flex-start;
     justify-content:center;
     gap:8px;
-    margin:8px auto 0;
+    margin:3px auto 0;
     pointer-events:none;
 }
 
@@ -679,17 +680,17 @@
 }
 
 /* Mechanism cards are independent 9:16 battlefield components. Their real
-   flex-basis and width are both 23% of the battle area, with bounds chosen for
+   flex-basis and width are both 20% of the battle area, with bounds chosen for
    the supported portrait phones; no transform/zoom is used for sizing. */
 #game-stage #battleMonsterArea .boss-mechanism-card{
     position:relative;
     display:flex;
-    width:clamp(88px,23%,106px);
-    min-width:88px;
+    width:clamp(82px,20%,96px);
+    min-width:82px;
     min-height:0;
     aspect-ratio:9 / 16;
     box-sizing:border-box;
-    flex:0 0 clamp(88px,23%,106px);
+    flex:0 0 clamp(82px,20%,96px);
     flex-direction:column;
     align-items:center;
     justify-content:flex-start;

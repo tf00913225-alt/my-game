@@ -91,7 +91,7 @@
           "build/feature-boss-relic.af3d3cea8249.js"
         ],
         "styles": [
-          "build/feature-boss-relic.4d11b95d1a9e.css"
+          "build/feature-boss-relic.a3925b72f668.css"
         ],
         "dependencies": [
           "gameplay-core"
@@ -167,9 +167,9 @@
       "sha256": "3d298c2d78c2",
       "bytes": 25629
     },
-    "build/feature-boss-relic.4d11b95d1a9e.css": {
-      "sha256": "4d11b95d1a9e",
-      "bytes": 47589
+    "build/feature-boss-relic.a3925b72f668.css": {
+      "sha256": "a3925b72f668",
+      "bytes": 47727
     },
     "build/firebase/firebase-config.4314d6321ba1.js": {
       "sha256": "4314d6321ba1",
