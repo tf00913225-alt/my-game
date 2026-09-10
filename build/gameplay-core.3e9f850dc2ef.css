@@ -3182,11 +3182,11 @@ body.quest-scroll-active,
 
 /* 2026-09-07 — body-mounted text-only dungeon reward preview owner */
 .v132-reward-modal .v132-reward-modal-inner.v17363-text-reward-preview{
-    width:min(100%,392px) !important;
-    height:min(600px,calc(100dvh - 28px)) !important;
-    max-width:392px !important;
-    max-height:calc(100dvh - 28px) !important;
-    min-height:min(520px,calc(100dvh - 28px)) !important;
+    width:min(calc(100vw - 32px),392px) !important;
+    height:min(600px,calc(100dvh - 32px)) !important;
+    max-width:calc(100vw - 32px) !important;
+    max-height:calc(100dvh - 32px) !important;
+    min-height:min(520px,calc(100dvh - 32px)) !important;
     padding:18px !important;
     border:1px solid rgba(213,164,82,.82) !important;
     border-radius:15px !important;

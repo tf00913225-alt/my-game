@@ -3720,3 +3720,4 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 裝備格、短螢幕隊伍 HUD、秘寶／元素匣標籤分別收斂至 `css/38-v141-system-expansion.css`、`css/42-v146-system-polish.css`、`css/55-team-relic-system.css`。未保留含大量 `!important` 的 `css/57-v174-current-ui-fixes.css`。
 - 新秘寶主城圖使用 content-hashed 路徑 `assets/ui/home-relic-v174.eed14e806044.webp`；舊無 hash URL 不覆寫，避免既有客戶端快取沿用錯誤內容。
 - 裝備副本品階機率由 `EQUIPMENT_CHEST_DROP_TABLE` 經 `equipmentChestOddsText()` 產生，不再把 40/40/10/10 複製到 CSS 偽元素。
+- CI 的 390px fixture 證實文字獎勵框原本仍可因 392px 上限溢出；正式 owner 已改用 `calc(100vw - 32px)`／`calc(100dvh - 32px)`，QA 同時驗證 left/top/right/bottom 均在實際 viewport 內。

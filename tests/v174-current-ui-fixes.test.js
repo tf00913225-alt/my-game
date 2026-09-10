@@ -22,6 +22,7 @@ assert.match(relicCss,/team-relic-home-tools \.home-card-label\{[^}]*font-size:1
 assert.match(relicCss,/home-relic-v174\.eed14e806044\.webp/);
 assert.match(rewardCss,/\.v132-reward-modal \.v132-reward-modal-inner\.v17363-text-reward-preview/);
 assert.doesNotMatch(rewardCss,/#game-stage \.v17363-text-reward-preview/);
+assert.match(rewardCss,/width:min\(calc\(100vw - 32px\),392px\) !important;[\s\S]*max-width:calc\(100vw - 32px\) !important;/);
 const start=equipmentJs.indexOf("window.v17346ShowEquipmentDungeonPreview"),end=equipmentJs.indexOf("if(typeof renderDungeonTabContent",start),preview=equipmentJs.slice(start,end);
 assert.match(preview,/equipmentChestOddsText/);assert.match(preview,/v17363-text-reward-preview/);assert.match(preview,/裝備品階機率/);
 assert.doesNotMatch(preview,/previewAssets|v17361-reward-icon|<img/);
