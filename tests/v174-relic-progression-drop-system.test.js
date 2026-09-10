@@ -30,6 +30,17 @@ assert.match(buildSource,/css\/relic-progression-drop-system\.css/);
 assert.match(featureManifest,/__BUILD_RELIC_PROGRESSION__/);
 assert.match(ciSource,/run-relic-progression-browser-qa\.mjs/);
 
+const dependencyGuardIndex=source.indexOf("if(!relicRuntime||!gameplayRuntime||!accountRepository)");
+const installedFlagIndex=source.indexOf("window.__relicProgressionDropSystemInstalled=true;");
+assert.ok(dependencyGuardIndex>=0&&installedFlagIndex>dependencyGuardIndex,
+    "the singleton flag must only be claimed after all runtime owners are available");
+{
+    const retryContext={window:{},console:{error(){}}};
+    vm.runInNewContext(source,retryContext);
+    assert.equal(retryContext.window.__relicProgressionDropSystemInstalled,undefined,
+        "a dependency-order miss must stay retryable instead of permanently claiming the owner");
+}
+
 function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null}={}){
     const store=new Map();
     const saveDoc={player:JSON.parse(JSON.stringify(savedPlayer||{id:"QA"})),inventoryItems:JSON.parse(JSON.stringify(inventoryItems||[]))};

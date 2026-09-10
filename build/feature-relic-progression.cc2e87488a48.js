@@ -15,8 +15,6 @@
     "use strict";
 
     if(typeof window==="undefined"||window.__relicProgressionDropSystemInstalled){ return; }
-    window.__relicProgressionDropSystemInstalled=true;
-
     const relicRuntime=window.v174RelicSystem;
     const gameplayRuntime=window.GameplaySystem;
     const accountRepository=window.FourSymbolsAccountSave;
@@ -26,6 +24,7 @@
         });
         return;
     }
+    window.__relicProgressionDropSystemInstalled=true;
 
     const catalog=relicRuntime.catalog||{};
     const RARITY_ORDER=Object.freeze({white:0,blue:1,purple:2,orange:3,pink:4,"four-symbol":5});
