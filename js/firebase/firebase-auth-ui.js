@@ -29,7 +29,10 @@ function markup(){
     node.id=OVERLAY_ID; node.className="firebase-auth-overlay"; node.setAttribute("aria-hidden","true");
     node.innerHTML=`
       <div class="firebase-auth-dialog" role="dialog" aria-modal="true" aria-labelledby="firebaseAuthTitle">
-        <div class="firebase-auth-eyebrow">FOUR SYMBOLS ACCOUNT</div>
+        <div class="firebase-auth-topbar">
+          <div class="firebase-auth-eyebrow">FOUR SYMBOLS ACCOUNT</div>
+          <button id="firebaseAuthBackButton" class="firebase-auth-back-button" type="button" hidden>返回系統</button>
+        </div>
         <h2 id="firebaseAuthTitle" class="firebase-auth-title">帳號與角色</h2>
         <p class="firebase-auth-subtitle">先確認 Firebase UID，再讀取此帳號的角色資料。</p>
         <div id="firebaseAuthStatus" class="firebase-auth-status"></div>
@@ -38,12 +41,13 @@ function markup(){
             <button id="firebaseGoogleButton" class="firebase-auth-button" type="button">Google 登入</button>
             <button id="firebaseGuestButton" class="firebase-auth-button secondary" type="button">訪客開始遊戲</button>
           </div>
-          <div class="firebase-auth-divider">或使用 Email</div>
-          <div class="firebase-auth-field"><label for="firebaseEmailInput">Email</label><input id="firebaseEmailInput" type="email" autocomplete="email" inputmode="email"></div>
+          <div class="firebase-auth-divider">或使用 Email 帳號</div>
+          <div class="firebase-auth-field"><label for="firebaseEmailInput">Email 帳號</label><input id="firebaseEmailInput" type="email" autocomplete="email" inputmode="email"></div>
           <div class="firebase-auth-field"><label for="firebasePasswordInput">密碼</label><input id="firebasePasswordInput" type="password" autocomplete="current-password" minlength="6"></div>
-          <div class="firebase-auth-actions">
+          <p class="firebase-auth-email-help">第一次使用 Email？請選「建立帳號」。</p>
+          <div class="firebase-auth-actions firebase-auth-email-actions">
             <button id="firebaseEmailSignInButton" class="firebase-auth-button" type="button">Email 登入</button>
-            <button id="firebaseEmailCreateButton" class="firebase-auth-button secondary" type="button">建立 Email 帳號</button>
+            <button id="firebaseEmailCreateButton" class="firebase-auth-button secondary" type="button">建立帳號</button>
           </div>
           <p class="firebase-auth-note">訪客仍會透過 Firebase Anonymous Auth 取得專屬 UID；沒有 UID 時不能建立角色。</p>
           <button id="firebaseSupportButton" class="firebase-auth-button firebase-auth-support-button" type="button">聯絡客服</button>
@@ -72,7 +76,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function render(){
     if(!installed){ return; }
@@ -80,6 +84,8 @@ function render(){
     status.textContent=state.message||""; status.classList.toggle("is-error",state.error===true);
     const signedOut=byId("firebaseSignedOutPanel"); const signedIn=byId("firebaseSignedInPanel");
     signedOut.hidden=!!state.user; signedIn.classList.toggle("show",!!state.user);
+    const back=byId("firebaseAuthBackButton");
+    if(back){ back.hidden=!(state.user&&(state.mode==="READY"||state.mode==="OFFLINE_READY")); }
     if(state.user){
         byId("firebaseAccountName").textContent=state.user.displayName||state.user.email||(state.user.isAnonymous?"訪客帳號":"Firebase 帳號");
         byId("firebaseAccountMeta").textContent=state.user.isAnonymous?"Firebase 匿名登入":"已驗證帳號";
@@ -118,6 +124,10 @@ function bind(){
     byId("firebaseMigrationCancelButton").addEventListener("click",()=>dispatchAction("cancel-migration"));
     byId("firebaseRetryButton").addEventListener("click",()=>dispatchAction("retry"));
     byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
+    byId("firebaseAuthBackButton").addEventListener("click",()=>{
+        if(!state.user||(state.mode!=="READY"&&state.mode!=="OFFLINE_READY")){ return; }
+        closeFirebaseAuthUi();
+    });
 }
 export function installFirebaseAuthUi(){
     if(installed){ return true; }
@@ -128,6 +138,6 @@ export function installFirebaseAuthUi(){
     if(!byId(OVERLAY_ID)){ host.appendChild(markup()); }
     installed=true; bind(); state={...state,user:getSignedInUser()}; render(); return true;
 }
-export function openFirebaseAuthUi(){ const node=byId(OVERLAY_ID); if(!node){ return false; } node.classList.add("show"); node.setAttribute("aria-hidden","false"); return true; }
+export function openFirebaseAuthUi(){ const node=byId(OVERLAY_ID); if(!node){ return false; } render(); node.classList.add("show"); node.setAttribute("aria-hidden","false"); return true; }
 export function closeFirebaseAuthUi(){ const node=byId(OVERLAY_ID); if(!node){ return false; } node.classList.remove("show"); node.setAttribute("aria-hidden","true"); return true; }
 export function setFirebaseAuthUiState(next={}){ state={...state,...next}; render(); }
