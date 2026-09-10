@@ -3703,3 +3703,11 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Promotion 前重新讀取遠端：`dev=ade22629ddaa7f8451dc3aaa8b4696f8d67cc92b`、`main=bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe`。兩者 history 因歷次 main promotion commit 分岔，但 main tree `80baa9b133252950283ff37ea95b32e0911de63d` 與本輪整合前 `dev@29b9668057846164a941fbf6617d2458d9af5476` tree 完全相同。
 - 已建立 ancestry reconciliation commit `6d9273d014ca7c2c746bccbc453eeb1b00a86780`，雙親為已驗證 dev 與現行 main，tree 保持 dev `686eec88a0d9ac2a08f0631876e68f1d1e47baa5` 不變；這只收斂歷史，不回退或覆蓋任何 runtime／CSS／測試內容。
 - 後續固定走 `dev CI／精確 SHA 部署 → dev-to-main PR → main Repository checks → merge → production Pages SHA 核對`，禁止 force-push main。
+
+## 2026-09-10 — 秘寶養成／掉落系統安全整合（dev only）
+
+- 指定來源為 `feature/relic-progression-drop-system@7125580afa5d1c89d6cae0a2d986c71a6f22d916`；本次僅整合至 `dev`，`main` 受保護且不得修改。
+- `js/relic-progression-drop-system.js` 是碎片合成、通用碎片替代、秘寶精華／突破石、Boss 定向掉落、塔里程碑自選箱與 pending receipt 的唯一 owner；狀態沿用 UID 主存檔內的 `player.relicProgression` 與既有 inventory transaction，不建立 sidecar storage。
+- Loader 順序必須維持 `feature-boss-relic` 基礎 runtime 在前、`feature-relic-progression` 在後。singleton installed flag 只可在 `v174RelicSystem`、`GameplaySystem`、`FourSymbolsAccountSave` 三個 owner 都存在後設定，避免依賴順序異常時永久停用且無法重試。
+- 本 owner 不得接管 `winBattle`、`loseBattle`、`v132LaunchDungeonBattle` 或 `saveGame`；它只包裝公開 Boss／塔入口並依既有進度 state 對帳 exact-once receipt。理論上的同 ID 並行物品異動、UTC 跨週邊界與滿 120 格選擇箱仍需列為已知邊界，不得以 CI 綠燈宣稱已消除。
+- Game／Cache Version 維持 V173.65；本批最終驗證與未驗證項目統一記錄於 `release/requirement-batches/2026-09-10-four-branch-dev-integration.json`。

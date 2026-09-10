@@ -28,8 +28,8 @@
       "dependencies": ["gameplay-core"]
     },
     "feature-boss-relic": {
-      "scripts": ["__BUILD_BOSS_RELIC__"],
-      "styles": ["__BUILD_BOSS_RELIC_STYLE__"],
+      "scripts": ["__BUILD_BOSS_RELIC__", "__BUILD_RELIC_PROGRESSION__"],
+      "styles": ["__BUILD_BOSS_RELIC_STYLE__", "__BUILD_RELIC_PROGRESSION_STYLE__"],
       "dependencies": ["gameplay-core"]
     }
   },

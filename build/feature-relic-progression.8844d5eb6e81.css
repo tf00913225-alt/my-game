@@ -1,0 +1,163 @@
+/* Relic progression / acquisition UI additions.
+   Keeps the existing black-gold relic/Boss/Tower surfaces and only adds
+   progression information required by the acquisition loop. */
+
+#game-stage .relic-progression-box-strip{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    margin:8px 0 10px;
+    padding:9px 10px;
+    border:1px solid rgba(200,154,72,.4);
+    border-radius:10px;
+    background:linear-gradient(180deg,rgba(33,27,19,.92),rgba(17,14,10,.94));
+}
+#game-stage .relic-progression-box-strip>span{
+    color:#d9c59b;
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:.04em;
+}
+#game-stage .relic-progression-box-strip button{
+    min-height:40px;
+    padding:7px 10px;
+    border:1px solid rgba(230,187,96,.5);
+    border-radius:8px;
+    background:rgba(77,57,30,.8);
+    color:#f3dfad;
+    font:700 14px/1.25 "Noto Serif TC",serif;
+}
+
+#game-stage .relic-progression-detail-panel{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    margin:10px 0;
+    padding:11px;
+    border:1px solid rgba(215,172,84,.46);
+    border-radius:11px;
+    background:radial-gradient(circle at 50% 0,rgba(131,91,36,.18),transparent 58%),rgba(16,13,10,.94);
+    box-shadow:inset 0 0 0 1px rgba(255,226,164,.06);
+}
+#game-stage .relic-progression-detail-panel>div{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    min-width:0;
+    padding:8px 9px;
+    border:1px solid rgba(194,157,88,.22);
+    border-radius:8px;
+    background:rgba(255,255,255,.025);
+}
+#game-stage .relic-progression-detail-panel span{
+    color:#b9aa90;
+    font-size:14px;
+    line-height:1.25;
+}
+#game-stage .relic-progression-detail-panel b{
+    color:#f2d489;
+    font-size:16px;
+    white-space:nowrap;
+}
+#game-stage .relic-progression-detail-panel p,
+#game-stage .relic-progression-detail-panel small,
+#game-stage .relic-progression-detail-panel em{
+    grid-column:1/-1;
+    margin:0;
+    color:#d4c4a8;
+    font-size:14px;
+    line-height:1.5;
+    font-style:normal;
+}
+#game-stage .relic-progression-detail-panel small{ color:#b7a789; }
+#game-stage .relic-progression-detail-panel em{
+    color:#e2bd70;
+    padding-top:5px;
+    border-top:1px solid rgba(200,154,72,.2);
+}
+
+#game-stage .relic-choice-page{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-height:0;
+}
+#game-stage .relic-choice-back{
+    align-self:flex-start;
+    min-height:42px;
+    padding:7px 12px;
+    border:1px solid rgba(202,161,82,.4);
+    border-radius:8px;
+    background:rgba(43,33,22,.86);
+    color:#e9d3a0;
+    font-size:15px;
+    font-weight:800;
+}
+#game-stage .relic-choice-page header{
+    padding:11px 12px;
+    border:1px solid rgba(202,161,82,.32);
+    border-radius:11px;
+    background:rgba(17,14,10,.92);
+}
+#game-stage .relic-choice-page header small{ color:#b6a789;font-size:14px; }
+#game-stage .relic-choice-page header h3{ margin:4px 0;color:#f0cf7d;font-size:20px;line-height:1.3; }
+#game-stage .relic-choice-page header p{ margin:0;color:#d1c1a5;font-size:14px;line-height:1.5; }
+#game-stage .relic-choice-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+    min-height:0;
+}
+#game-stage .relic-choice-grid button{
+    min-height:76px;
+    padding:10px;
+    border:2px solid rgba(216,216,216,.45);
+    border-radius:10px;
+    background:linear-gradient(180deg,rgba(39,32,23,.96),rgba(17,14,11,.96));
+    color:#f1e4ca;
+    text-align:left;
+}
+#game-stage .relic-choice-grid button b{ display:block;font-size:16px;line-height:1.3; }
+#game-stage .relic-choice-grid button span{ display:block;margin-top:5px;color:#bdae94;font-size:13px;line-height:1.3; }
+#game-stage .relic-choice-grid button.rarity-blue{ border-color:#42A5FF; }
+#game-stage .relic-choice-grid button.rarity-purple{ border-color:#B05CFF; }
+#game-stage .relic-choice-grid button.rarity-orange{ border-color:#FF9F38; }
+#game-stage .relic-choice-grid button.rarity-pink{ border-color:#FF4FA7; }
+#game-stage .relic-choice-grid button.rarity-four-symbol{
+    border-color:#E5C06B;
+    box-shadow:inset 3px 3px 0 #FF5A36,inset -3px 3px 0 #42A5FF,inset -3px -3px 0 #47D6A3,inset 3px -3px 0 #C89B45;
+}
+
+#game-stage .boss-detail-grid .relic-progression-boss-preview{
+    border-color:rgba(226,177,76,.48);
+    background:linear-gradient(180deg,rgba(54,39,20,.82),rgba(20,16,11,.9));
+}
+#game-stage .boss-detail-grid .relic-progression-boss-preview h4{ color:#f0cd79; }
+#game-stage .boss-detail-grid .relic-progression-boss-preview small{
+    display:block;
+    margin-top:6px;
+    color:#bdae94;
+    font-size:13px;
+    line-height:1.45;
+}
+
+#game-stage .tower-relic-reward-guide{
+    margin:10px 0;
+    padding:10px 11px;
+    border:1px solid rgba(205,162,77,.42);
+    border-radius:10px;
+    background:linear-gradient(180deg,rgba(50,37,21,.86),rgba(18,15,11,.94));
+}
+#game-stage .tower-relic-reward-guide h3{ margin:0 0 5px;color:#f0cc79;font-size:18px;line-height:1.3; }
+#game-stage .tower-relic-reward-guide p{ margin:0;color:#d2c2a5;font-size:14px;line-height:1.48; }
+#game-stage .tower-relic-reward-guide small{ display:block;margin-top:5px;color:#ab9c83;font-size:13px;line-height:1.45; }
+
+@media (max-width:390px){
+    #game-stage .relic-choice-grid{ grid-template-columns:1fr; }
+    #game-stage .relic-progression-detail-panel{ grid-template-columns:1fr; }
+    #game-stage .relic-progression-detail-panel p,
+    #game-stage .relic-progression-detail-panel small,
+    #game-stage .relic-progression-detail-panel em{ grid-column:1; }
+}
