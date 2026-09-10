@@ -747,7 +747,7 @@
     color:var(--mechanism-color);
     background:rgba(6,5,4,.62);
     font-family:"Noto Serif TC",serif;
-    font-size:12px;
+    font-size:13px;
     font-weight:900;
     line-height:1.25;
     letter-spacing:1px;
@@ -762,7 +762,7 @@
     overflow:hidden;
     color:#fff0c4;
     font-family:"Noto Serif TC",serif;
-    font-size:13px;
+    font-size:14px;
     font-weight:900;
     line-height:1.25;
     text-align:center;
@@ -787,7 +787,7 @@
     color:#ffe3a0;
     background:linear-gradient(180deg,rgba(107,29,20,.92),rgba(47,10,8,.92));
     box-shadow:inset 0 1px 0 rgba(255,239,183,.18),0 0 7px rgba(177,50,34,.18);
-    font-size:10px;
+    font-size:11px;
     font-weight:900;
     line-height:1.2;
     letter-spacing:-.25px;
@@ -802,7 +802,7 @@
     min-height:0;
     overflow:hidden;
     color:#cbbda2;
-    font-size:10px;
+    font-size:11px;
     font-weight:700;
     line-height:1.35;
     text-align:center;
@@ -811,11 +811,11 @@
     -webkit-line-clamp:4;
 }
 
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="shield"]::after{ content:"BOSS 受護體保護，優先擊破"; }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="charge"]::after{ content:"倒數歸零發動重擊，擊破可取消"; }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="heal"]::after{ content:"每回合恢復 BOSS 4% 最大生命"; }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="amplify"]::after{ content:"BOSS 傷害提高 25%"; }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="seal"]::after{ content:"我方治療與 SP 回復降低 40%"; }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="shield"]::after{ content:"護體中・優先擊破"; }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="charge"]::after{ content:"倒數重擊・擊破可取消"; }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="heal"]::after{ content:"每回合回復 BOSS 4%"; }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="amplify"]::after{ content:"BOSS 傷害提高25%"; }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="seal"]::after{ content:"治療／SP 回復 -40%"; }
 
 /* Information is deliberately separate from attack targeting: the battlefield
    mechanism card remains the combat target; this right-side control opens the
