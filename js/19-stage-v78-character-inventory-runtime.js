@@ -416,4 +416,3 @@ window.addEventListener(
 window.v78ApplyCharacterInventoryLayout=
     schedule;
 })();
-

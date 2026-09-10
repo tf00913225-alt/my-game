@@ -23894,7 +23894,7 @@ function showSkillNameBadge(skillName,elementType,characterIndex){
     );
 
 
-    
+
     /* V38 SOURCE-LEVEL UI SIZE FIX:
        The badge gets its final visual size at creation time.
        This is deliberately inline + !important so later CSS cannot
@@ -24015,7 +24015,7 @@ function showMonsterSkillNameBadge(
     );
 
 
-    
+
     /* V38 SOURCE-LEVEL UI SIZE FIX:
        The badge gets its final visual size at creation time.
        This is deliberately inline + !important so later CSS cannot

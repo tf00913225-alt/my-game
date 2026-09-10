@@ -19,7 +19,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.972e2333ea94.js"
+          "build/app-shell.55350dc56053.js"
         ],
         "styles": [
           "build/app-shell.37d5b9f36840.css"
@@ -123,9 +123,9 @@
       "sha256": "3539578c5bf7",
       "bytes": 37742
     },
-    "build/app-shell.972e2333ea94.js": {
-      "sha256": "972e2333ea94",
-      "bytes": 919765
+    "build/app-shell.55350dc56053.js": {
+      "sha256": "55350dc56053",
+      "bytes": 919757
     },
     "build/gameplay-core.c8bdbe557965.js": {
       "sha256": "c8bdbe557965",
