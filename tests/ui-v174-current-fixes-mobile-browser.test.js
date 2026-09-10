@@ -39,9 +39,9 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
 #gameplayPage{display:block!important;width:100%;height:180px;}
 .gameplay-large-panel{height:160px!important;}
 #inventoryPage{display:block!important;width:390px!important;height:160px!important;padding:0!important;}
-.inventory-grid-classic{width:72px!important;display:grid!important;grid-template-columns:72px!important;}
-.inventory-item-classic{width:72px!important;height:72px!important;aspect-ratio:auto!important;}
-.inventory-icon{width:100%!important;height:100%!important;}
+#game-stage #inventoryPage .inventory-grid-classic{width:72px!important;height:72px!important;display:grid!important;grid-template-columns:72px!important;grid-template-rows:72px!important;}
+#game-stage #inventoryPage .inventory-item-classic{width:72px!important;height:72px!important;aspect-ratio:auto!important;}
+#game-stage #inventoryPage .inventory-item-classic .inventory-icon{width:100%!important;height:100%!important;}
 #allElementSkillPreviewModal{display:block!important;}
 #allElementSkillPreviewModal .skill-preview-body{width:350px;}
 .v17361-reward-preview{width:350px;}
