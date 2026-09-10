@@ -39,7 +39,7 @@ html,body{margin:0;width:390px;height:844px;background:#050505;overflow:hidden}
 <button id="goldTest">黃底黑字</button>
 <div id="homeFeatureModal" class="home-feature-modal show team-relic-modal team-relic-mode"><section class="home-feature-modal-box wide"><div id="homeFeatureModalBody"><div id="characterTabContent"><div style="height:1000px">角色頁</div></div></div></section></div>
 </div><pre id="result"></pre>
-<script>window.requestAnimationFrame=window.requestAnimationFrame||function(cb){return setTimeout(cb,0)};</script>
+<script>window.requestAnimationFrame=function(cb){return setTimeout(cb,0)};</script>
 <script src="js/19-stage-v78-character-inventory-runtime.js"></script>
 <script src="js/61-v174-ui-regression-guards.js"></script>
 <script>
@@ -60,7 +60,7 @@ setTimeout(function(){
       skill:{label:label.textContent,title:action.title,width:actionStyle.width},
       gold:{shadow:goldStyle.textShadow,marker:gold.dataset.v174DarkGoldShadow||''}
     });
-  },800);
+  },120);
 },80);
 </script></body></html>`;
 fs.writeFileSync(fixture,html,"utf8");
