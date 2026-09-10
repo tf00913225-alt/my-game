@@ -14,6 +14,40 @@ permissions:
   contents: read
 
 jobs:
+  generate_facebook_auth_build:
+    name: Generate Facebook auth build
+    if: github.event_name == 'pull_request' && github.head_ref == 'feature/facebook-login'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out PR head branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Regenerate deterministic production assets
+        run: node scripts/build-production.mjs
+
+      - name: Commit generated assets to PR branch
+        shell: bash
+        run: |
+          git add index.html asset-manifest.json build/
+          if git diff --cached --quiet; then
+            echo "Generated assets are already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: regenerate Facebook auth assets"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+
   verify:
     name: Repository checks
     runs-on: ubuntu-latest

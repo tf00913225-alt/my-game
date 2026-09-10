@@ -13,6 +13,7 @@ const main=read("js/00-main.js");
 const service=read("js/16-stage-v54-main-city-runtime.js");
 const build=read("scripts/build-production.mjs");
 
+assert.match(authUi,/id="firebaseFacebookButton"[^>]*>Facebook 登入</);
 assert.match(authUi,/id="firebaseSupportButton"[^>]*>聯絡客服</);
 assert.match(authUi,/firebaseSupportButton[\s\S]*FourSymbolsSupport\.show\(\)/);
 assert.match(authUi,/const host=document\.body/,
@@ -61,7 +62,8 @@ const html=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
   <h2 class="firebase-auth-title">帳號與角色</h2>
   <p class="firebase-auth-subtitle">先確認 Firebase UID，再讀取此帳號的角色資料。</p>
   <div class="firebase-auth-status">請先登入、註冊或使用訪客開始遊戲。沒有 UID 時不能建立角色。</div>
-  <div class="firebase-auth-actions"><button class="firebase-auth-button">Google 登入</button><button class="firebase-auth-button secondary">訪客開始遊戲</button></div>
+  <div class="firebase-auth-actions"><button class="firebase-auth-button">Google 登入</button><button class="firebase-auth-button">Facebook 登入</button></div>
+  <div class="firebase-auth-footer"><button class="firebase-auth-button secondary">訪客開始遊戲</button></div>
   <div class="firebase-auth-divider">或使用 Email</div>
   <div class="firebase-auth-field"><label>Email</label><input type="email"></div>
   <div class="firebase-auth-field"><label>密碼</label><input type="password"></div>

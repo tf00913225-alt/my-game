@@ -5,7 +5,7 @@ Firebase Authentication is a required identity gate for production character own
 ## Owners
 
 - `js/firebase/firebase-config.js`: public Firebase Web App configuration validation.
-- `js/firebase/firebase-auth.js`: durable Auth session, Google, Email/password, Anonymous Auth and sign-out.
+- `js/firebase/firebase-auth.js`: durable Auth session, Google, Facebook, Email/password, Anonymous Auth and sign-out.
 - `js/firebase/firebase-auth-ui.js`: account-first player UI.
 - `js/firebase/firebase-cloud-save.js`: authenticated cloud read and trusted callable boundary.
 - `js/firebase/firebase-bootstrap.js`: identity lifecycle followed by UID cloud-save resolution.
@@ -18,6 +18,7 @@ Firebase Authentication is a required identity gate for production character own
 Fresh production sessions stop at the account UI until one of these Firebase identities exists:
 
 - Google sign-in.
+- Facebook sign-in.
 - Email/password sign-in.
 - Email/password account creation.
 - `訪客開始遊戲`, implemented with Firebase Anonymous Auth.
@@ -26,7 +27,7 @@ There is no production `先使用本機存檔` path. No UID means no save lookup
 
 The account surface is mounted directly under `document.body`, outside the fixed 1080×1920 game stage. It sizes against the real viewport (`100dvh` plus safe-area insets), so signed-out users do not depend on the authenticated app-shell stage scaler. Its `聯絡客服` button and the in-game system page both open `FourSymbolsSupport`, which displays `tf00913225@gmail.com` from one Critical Boot owner.
 
-Google, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup sign-in must also be listed under Authentication → Settings → Authorized domains.
+Google, Facebook, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup sign-in must also be listed under Authentication → Settings → Authorized domains. Facebook additionally requires the same Meta App ID/App Secret configured in Firebase Authentication and the Firebase OAuth redirect URI (`https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`) listed as a valid OAuth redirect URI in the Meta app.
 
 ## Account and character order
 
@@ -90,7 +91,7 @@ Firebase Web configuration values are public client identifiers, not Admin crede
 
 ## Browser events and API
 
-`window.FourSymbolsFirebaseLifecycle` exposes identity, cloud-read, sign-in/out and account UI methods. Important events are:
+`window.FourSymbolsFirebaseLifecycle` exposes identity, cloud-read, Google/Facebook/Email/Anonymous sign-in, sign-out and account UI methods. Important events are:
 
 - `four-symbols:firebase-auth-state`
 - `four-symbols:firebase-cloud-save-read`

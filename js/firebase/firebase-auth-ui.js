@@ -1,7 +1,7 @@
 /* Account UI owner. Signed-out production flow cannot be dismissed without Firebase identity. */
 import {
     createAccountWithEmail,getSignedInUser,signInAsAnonymous,signInWithEmail,
-    signInWithGoogle,signOutFirebase
+    signInWithFacebook,signInWithGoogle,signOutFirebase
 } from "./firebase-auth.js";
 
 const OVERLAY_ID="firebaseAuthOverlay";
@@ -14,7 +14,9 @@ function errorText(error){
     const code=String(error&&error.code||"");
     const messages={
         "auth/popup-closed-by-user":"登入視窗已關閉，尚未完成登入。",
+        "auth/popup-blocked":"瀏覽器阻擋了登入視窗，請允許彈出式視窗後再試。",
         "auth/operation-not-allowed":"Firebase Console 尚未啟用這個登入方式。",
+        "auth/account-exists-with-different-credential":"這個 Email 已使用其他登入方式建立帳號，請改用原本的登入方式。",
         "auth/invalid-credential":"Email 或密碼不正確。",
         "auth/email-already-in-use":"這個 Email 已註冊，請直接登入。",
         "auth/invalid-email":"Email 格式不正確。",
@@ -39,6 +41,9 @@ function markup(){
         <div id="firebaseSignedOutPanel">
           <div class="firebase-auth-actions">
             <button id="firebaseGoogleButton" class="firebase-auth-button" type="button">Google 登入</button>
+            <button id="firebaseFacebookButton" class="firebase-auth-button" type="button">Facebook 登入</button>
+          </div>
+          <div class="firebase-auth-footer">
             <button id="firebaseGuestButton" class="firebase-auth-button secondary" type="button">訪客開始遊戲</button>
           </div>
           <div class="firebase-auth-divider">或使用 Email 帳號</div>
@@ -76,7 +81,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseFacebookButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function render(){
     if(!installed){ return; }
@@ -116,6 +121,7 @@ async function perform(message,action){
 function dispatchAction(action){ window.dispatchEvent(new CustomEvent("four-symbols:account-ui-action",{detail:{action}})); }
 function bind(){
     byId("firebaseGoogleButton").addEventListener("click",()=>perform("正在開啟 Google 登入…",signInWithGoogle));
+    byId("firebaseFacebookButton").addEventListener("click",()=>perform("正在開啟 Facebook 登入…",signInWithFacebook));
     byId("firebaseGuestButton").addEventListener("click",()=>perform("正在建立 Firebase 訪客 UID…",signInAsAnonymous));
     byId("firebaseEmailSignInButton").addEventListener("click",()=>perform("正在登入 Email 帳號…",()=>{ const value=credentials(); return signInWithEmail(value.email,value.password); }));
     byId("firebaseEmailCreateButton").addEventListener("click",()=>perform("正在建立 Email 帳號…",()=>{ const value=credentials(); return createAccountWithEmail(value.email,value.password); }));
