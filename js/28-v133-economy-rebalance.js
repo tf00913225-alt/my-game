@@ -9,7 +9,7 @@
     const TRAINING_EXP_MULTIPLIER=3.5;
     const DAY_MS=24*60*60*1000;
     const CHARGE_MAX_MS=72*60*60*1000;
-    const GROWTH_STATE_KEY="v173_exp_pool_growth_state";
+    const GROWTH_STATE_KEY=window.FourSymbolsAccountSave.accountKey("exp-pool-growth-state");
 
     const TRAINING_ZONE_EXP_PROFILES=[
         {minLevel:1,maxLevel:10,key:"forest",averageGroupSize:2,fallbackAverageExp:175},

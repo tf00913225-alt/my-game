@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
-const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const v133Source=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
@@ -92,80 +92,28 @@ function test(name,fn){
     }
 }
 
-test("runtime patch loader strictly waits for each prior script",()=>{
-    const start=loaderSource.indexOf("(function loadVersionedRuntimePatchesInOrder()");
-    assert.notEqual(start,-1);
-    const runtimeLoader=loaderSource.slice(start);
-    const appended=[];
-    const byId=new Map();
-
-    function createElement(tagName){
-        return {
-            tagName,
-            id:"",
-            src:"",
-            async:true,
-            dataset:{},
-            listeners:{},
-            addEventListener(type,handler){ this.listeners[type]=handler; }
-        };
-    }
-
-    const document={
-        readyState:"complete",
-        getElementById(id){ return byId.get(id)||null; },
-        createElement,
-        body:{
-            appendChild(element){
-                appended.push(element);
-                byId.set(element.id,element);
-            }
-        }
-    };
-    const context=makeContext({
-        document,
-        V_ASSET_VERSION:"154",
-        vAssetUrl:path=>path+"?v=154",
-        setTimeout:handler=>handler()
-    });
-
-    vm.runInContext(runtimeLoader,context);
+test("runtime patches keep deterministic execution order without an HTTP waterfall",()=>{
+    const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
+    const gameplayUrl=manifest.featureManifest.bundles["gameplay-core"].scripts[0];
+    const bundle=fs.readFileSync(gameplayUrl,"utf8");
     const expected=[
-        "v131-fix-batch-runtime",
-        "v132-content-expansion-runtime",
-        "v133-economy-rebalance-runtime",
-        "v134-fixes-runtime",
-        "v135-fixes-runtime",
-        "v136-auto-battle-fix-runtime",
-        "v139-rested-experience-runtime",
-        "v140-four-element-balance-runtime",
-        "v141-core-systems-runtime",
-        "v141-ui-battle-runtime",
-        "v141-content-systems-runtime",
-        "v142-skill-animation-runtime",
-        "v143-system-fixes-runtime",
-        "v143-skill-animation-runtime",
-        "v144-rules-and-abyss-runtime",
-        "v146-system-polish-runtime",
-        "v148-combat-dungeon-fixes-runtime",
-        "v149-skill-ui-rules-runtime",
-        "v152-dev-fixes-runtime",
-        "v154-dev-fixes-runtime",
-        "v155-dev-fixes-runtime",
-        "v158-combat-tuning-runtime",
-        "v159-abyss-battle-portraits-runtime",
-        "v169-element-box-settings-runtime",
-        "v169-water-skill-rules-runtime",
-        "v169-rpg-ui-runtime"
+        "js/25-v131-fix-batch.js","js/27-v132-content-expansion.js","js/28-v133-economy-rebalance.js",
+        "js/29-v134-fixes.js","js/30-v135-fixes.js","js/31-v136-auto-battle-fix.js",
+        "js/32-v139-rested-experience.js","js/33-v140-four-element-balance.js","js/34-v141-core-systems.js",
+        "js/35-v141-ui-battle.js","js/36-v141-content-systems.js","js/37-v142-skill-animation.js",
+        "js/38-v143-system-fixes.js","js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js",
+        "js/41-v146-system-polish.js","js/42-v148-combat-dungeon-fixes.js","js/43-v149-skill-ui-rules.js",
+        "js/44-v152-dev-fixes.js","js/45-v154-dev-fixes.js","js/46-v155-dev-fixes.js",
+        "js/47-v158-combat-tuning.js","js/48-v159-abyss-battle-portraits.js",
+        "js/49-v169-element-box-settings.js","js/50-v169-water-skill-rules.js","js/51-v169-rpg-ui.js"
     ];
-
-    assert.equal(appended.length,1,"第一支完成前不可先插入後續補丁");
-    expected.forEach((id,index)=>{
-        assert.equal(appended[index].id,id);
-        assert.equal(appended[index].async,false);
-        appended[index].listeners.load();
-        assert.equal(appended.length,Math.min(index+2,expected.length));
-    });
+    let cursor=-1;
+    for(const file of expected){
+        const next=bundle.indexOf("bundled source: "+file);
+        assert.ok(next>cursor,file+" must execute after its predecessor inside one bundle");
+        cursor=next;
+    }
+    assert.doesNotMatch(loaderSource,/loadVersionedRuntimePatchesInOrder|createElement\(["']script["']\)/);
 });
 
 test("EXP preview uses the V133 curve and refuses levels above 100",()=>{
@@ -378,9 +326,12 @@ test("auto battle keeps a valid selected skill instead of silently queuing norma
 });
 
 test("V137 regressions remain wired through the current deployed entry points",()=>{
-    assert.match(indexSource,/js\/00-main\.js\?v=173\.64/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.64/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
+    const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
+    const appBundle=fs.readFileSync(manifest.featureManifest.bundles["app-shell"].scripts[0],"utf8");
+    assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(appBundle,/bundled source: js\/00-main\.js/);
+    assert.match(appBundle,/bundled source: js\/20-anonymous-20\.js/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.65"/);
     assert.match(v133Source,/const MAX_CHARACTER_LEVEL=100/);
     assert.doesNotMatch(mainSource,/safeBind\(\s*["'](?:autoEnabled|autoSkillHome|hpUsePctHome|spUsePctHome)/);
     assert.doesNotMatch(v132Source,/const result=originalLoseBattle\.apply/);

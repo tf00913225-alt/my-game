@@ -7,7 +7,7 @@ const fs=require("node:fs");
 const asset=fs.readFileSync("assets/vfx/fire/flame-slash-cast.png");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -30,8 +30,8 @@ test("Fire Slash keeps the requested target, timing, and frame-eight hit under t
 });
 
 test("the current cache version publishes the replacement asset",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log("\nV163 Fire Slash source suite: "+passed+" tests passed.");

@@ -29,6 +29,23 @@
         "aria-label=\"BOSS\"",
         "<span class=\"nav-sr-only\">BOSS</span>"
       ]
+    },
+    {
+      "id": "DEP-003-legacy-boot-runtime-and-patrol-loaders",
+      "description": "舊 artificial startup gate、full-runtime input gate、未登入本機繞過與 Base64 巡怪 chunk 已正式退役，不得回到 production HTML/JS/CSS。",
+      "enabled": true,
+      "forbidden": [
+        "MIN_DURATION_MS",
+        "MAX_DURATION_MS",
+        "TOTAL_RUNTIME_MODULES",
+        "__v173ReportRuntimeProgress",
+        "__v17347RuntimeGate",
+        "loadVersionedRuntimePatchesInOrder",
+        "v131-patrol-sprite-",
+        "data:image/webp;base64",
+        "先使用本機存檔",
+        "DEV_AUTH_BYPASS"
+      ]
     }
   ]
 }

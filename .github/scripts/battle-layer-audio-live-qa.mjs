@@ -87,6 +87,20 @@ async function waitFor(client,expression,label,timeoutMs=30000){
     throw new Error(`Timed out waiting for ${label}. Last result: ${String(last)}`);
 }
 
+async function prepareAccountFirstRuntime(client,features){
+    await waitFor(client,"window.FourSymbolsStartupPolicy&&['AUTH_REQUIRED','NEED_CHARACTER','READY','OFFLINE_READY','ERROR'].includes(FourSymbolsStartupPolicy.getState())","account-first startup destination",30000);
+    let state=await client.eval("FourSymbolsStartupPolicy.getState()");
+    if(state==="ERROR"){ throw new Error("Live Firebase startup failed before feature QA"); }
+    if(state==="AUTH_REQUIRED"){
+        await client.eval("document.getElementById('firebaseGuestButton').click();true");
+        await waitFor(client,"['NEED_CHARACTER','READY','OFFLINE_READY','ERROR'].includes(FourSymbolsStartupPolicy.getState())","anonymous UID save resolution",60000);
+        state=await client.eval("FourSymbolsStartupPolicy.getState()");
+        if(state==="ERROR"){ throw new Error("Live anonymous UID/save resolution failed"); }
+    }
+    await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
+    return state;
+}
+
 const evidence={status:"RUNNING",expectedSha,devUrl:baseUrl,checks:{}};
 const chrome=chromeBinary();
 const debugPort=9223;
@@ -111,6 +125,7 @@ try{
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
     await client.send("Page.navigate",{url:qaUrl});
     await waitFor(client,"document.readyState==='complete'","page load");
+    await prepareAccountFirstRuntime(client,["abyss"]);
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
     await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
 
@@ -178,8 +193,13 @@ try{
     assert.equal(resourceLayers.playerHpVisible,"visible","Player HP bar must remain visible");
     assert.equal(resourceLayers.monsterHpVisible,"visible","Enemy HP bar must remain visible");
 
-    const castTriggered=await client.eval(`(()=>{
-        if(typeof castDamageSkill!=='function'||typeof skillDatabase==='undefined'||!skillDatabase.explosiveFlurry){return false;}
+    /* Capture the production cast and the stage it creates in the same browser
+       task. The battle remains live, so a later CDP poll may observe the next
+       action after this 1.45s presentation has legitimately been superseded. */
+    const productionCastSnapshot=await client.eval(`(()=>{
+        if(typeof castDamageSkill!=='function'||typeof skillDatabase==='undefined'||!skillDatabase.explosiveFlurry){
+            return {triggered:false,skill:null,visibility:null,opacity:null};
+        }
         if(typeof queuedPlayerActions!=='undefined'){queuedPlayerActions[0]={action:'explosiveFlurry',target:2,targetAlly:null};}
         if(typeof selectedMonster!=='undefined'){selectedMonster=2;}
         if(typeof activeBattleCharacterIndex!=='undefined'){activeBattleCharacterIndex=0;}
@@ -190,34 +210,39 @@ try{
             getSkillLevel=function(key,id){return id==='explosiveFlurry'?1:original.apply(this,arguments);};
         }
         castDamageSkill('explosiveFlurry');
-        return true;
-    })()`);
-    assert.equal(castTriggered,true,"Production Fire Explosive Flurry action could not be invoked");
-    await waitFor(client,"document.getElementById('v143-skill-stage')&&getComputedStyle(document.getElementById('v143-skill-stage')).visibility==='visible'","visible V143 skill layer",3000);
-
-    const beforeElementBox=await client.eval(`(()=>{
         const stage=document.getElementById('v143-skill-stage');
-        return {skill:stage?.dataset.skill||null,visibility:stage?getComputedStyle(stage).visibility:null,opacity:stage?getComputedStyle(stage).opacity:null};
+        const style=stage?getComputedStyle(stage):null;
+        return {
+            triggered:true,
+            skill:stage?.dataset.skill||null,
+            visibility:style?.visibility||null,
+            opacity:style?.opacity||null
+        };
     })()`);
-    evidence.checks.skillLayerBeforeElementBox=beforeElementBox;
-    assert.equal(beforeElementBox.skill,"explosiveFlurry","Expected real Fire Flurry V143 layer before Element Box opens");
-    assert.equal(beforeElementBox.visibility,"visible","Skill layer must be visible during normal battle presentation");
+    evidence.checks.skillLayerBeforeElementBox=productionCastSnapshot;
+    assert.equal(productionCastSnapshot.triggered,true,"Production Fire Explosive Flurry action could not be invoked");
+    assert.equal(productionCastSnapshot.skill,"explosiveFlurry","Expected real Fire Flurry V143 layer before Element Box opens");
+    assert.equal(productionCastSnapshot.visibility,"visible","Skill layer must be visible during normal battle presentation");
 
-    const opened=await client.eval(`(()=>{
-        if(typeof openHomeFeature==='function'){openHomeFeature('autoBattleSettings');return 'openHomeFeature';}
-        if(typeof openAutoBattleSettings==='function'){openAutoBattleSettings();return 'openAutoBattleSettings';}
-        return null;
-    })()`);
-    evidence.checks.elementBoxOpenRoute=opened;
-    assert.ok(opened,"No Element Box settings opener is available");
-    await waitFor(
-        client,
-        "document.body.classList.contains('v162-element-box-settings-open')&&document.getElementById('homeFeatureModal')?.classList.contains('show')&&document.getElementById('autoBattleSettingsPanel')?.parentElement?.id==='homeFeatureModalBody'",
-        "real Element Box modal ownership",
-        3000
-    );
-
-    const elementBoxLayers=await client.eval(`(()=>{
+    /* The production cast above proves that a real battle action reaches V143.
+       A live battle keeps advancing between CDP round trips, so another formal
+       action may legitimately supersede any presentation started by the QA.
+       Start the bounded presentation, open the real modal and snapshot the same
+       DOM node in one browser task. This isolates the overlap contract without
+       pausing combat or requiring an expired/superseded stage to stay mounted. */
+    const modalOverlapSnapshot=await client.eval(`(()=>{
+        const director=window.v142SkillAnimationDirector;
+        const getConfig=window.v142GetSkillAnimationConfig;
+        if(!director||typeof director.play!=='function'||typeof getConfig!=='function'){return null;}
+        const config=Object.assign({},getConfig('explosiveFlurry'),{duration:4000,resolveDuration:4000});
+        const gate=director.play(config,{
+            side:'player',actorIndex:0,targetId:2,
+            key:'battle-layer-modal-overlap-'+Date.now()
+        });
+        const stageBefore=document.getElementById('v143-skill-stage');
+        let opened=null;
+        if(typeof openHomeFeature==='function'){openHomeFeature('autoBattleSettings');opened='openHomeFeature';}
+        else if(typeof openAutoBattleSettings==='function'){openAutoBattleSettings();opened='openAutoBattleSettings';}
         const stage=document.getElementById('v143-skill-stage');
         const gameStage=document.getElementById('game-stage');
         const modal=document.getElementById('homeFeatureModal');
@@ -228,26 +253,44 @@ try{
         const modalStyle=modal?getComputedStyle(modal):null;
         const panelStyle=panel?getComputedStyle(panel):null;
         return {
-            bodyFocus:document.body.classList.contains('v162-element-box-settings-open'),
-            stageStillExists:!!stage,
-            stageVisibility:stageStyle?.visibility||null,
-            stageOpacity:stageStyle?.opacity||null,
-            stageZ:Number(stageStyle?.zIndex||0),
-            gameStageZ:Number(gameStageStyle?.zIndex||0),
-            modalShow:!!modal?.classList.contains('show'),
-            modalConnected:!!modal?.isConnected,
-            panelConnected:!!panel?.isConnected,
-            panelParent:panel?.parentElement?.id||null,
-            modalDisplay:modalStyle?.display||null,
-            panelDisplay:panelStyle?.display||null,
-            modalBodyConnected:!!modalBody?.isConnected,
-            skillVolumeScale:window.v141Audio?.skillVolumeScale||null,
-            combatFeedbackVolumeScale:window.v141Audio?.combatFeedbackVolumeScale||null
+            presentation:{skill:config.id,duration:config.duration,gateId:gate?.id||null},
+            opened,
+            layers:{
+                bodyFocus:document.body.classList.contains('v162-element-box-settings-open'),
+                stageWasMountedBeforeOpen:!!stageBefore,
+                stageStillExists:!!stage,
+                sameStage:stage===stageBefore,
+                stageSkill:stage?.dataset.skill||null,
+                stageVisibility:stageStyle?.visibility||null,
+                stageOpacity:stageStyle?.opacity||null,
+                stageZ:Number(stageStyle?.zIndex||0),
+                gameStageZ:Number(gameStageStyle?.zIndex||0),
+                modalShow:!!modal?.classList.contains('show'),
+                modalConnected:!!modal?.isConnected,
+                panelConnected:!!panel?.isConnected,
+                panelParent:panel?.parentElement?.id||null,
+                modalDisplay:modalStyle?.display||null,
+                panelDisplay:panelStyle?.display||null,
+                modalBodyConnected:!!modalBody?.isConnected,
+                skillVolumeScale:window.v141Audio?.skillVolumeScale||null,
+                combatFeedbackVolumeScale:window.v141Audio?.combatFeedbackVolumeScale||null
+            }
         };
     })()`);
+    const modalOverlapPresentation=modalOverlapSnapshot?.presentation||null;
+    const opened=modalOverlapSnapshot?.opened||null;
+    const elementBoxLayers=modalOverlapSnapshot?.layers||{};
+    evidence.checks.modalOverlapPresentation=modalOverlapPresentation;
+    evidence.checks.elementBoxOpenRoute=opened;
     evidence.checks.elementBoxLayers=elementBoxLayers;
+    assert.equal(modalOverlapPresentation?.skill,"explosiveFlurry","Modal overlap QA must use the formal Fire Flurry V143 presentation");
+    assert.equal(modalOverlapPresentation?.duration,4000,"Modal overlap QA must start a bounded production V143 presentation");
+    assert.ok(opened,"No Element Box settings opener is available");
     assert.equal(elementBoxLayers.bodyFocus,true,"Element Box focus class must be active");
+    assert.equal(elementBoxLayers.stageWasMountedBeforeOpen,true,"Modal overlap QA must start from a mounted V143 stage");
     assert.equal(elementBoxLayers.stageStillExists,true,"V143 lifecycle stage must remain mounted while its presentation is suppressed");
+    assert.equal(elementBoxLayers.sameStage,true,"Opening Element Box must preserve the active V143 stage node");
+    assert.equal(elementBoxLayers.stageSkill,"explosiveFlurry","Element Box overlap must inspect the intended V143 skill stage");
     assert.equal(elementBoxLayers.stageVisibility,"hidden","Skill presentation must be hidden while Element Box settings owns focus");
     assert.equal(Number(elementBoxLayers.stageOpacity),0,"Skill presentation opacity must be zero while Element Box settings owns focus");
     assert.ok(elementBoxLayers.gameStageZ>elementBoxLayers.stageZ,"Game/Element Box stacking context must be above the document-level V143 skill stage");

@@ -11,7 +11,7 @@ const characterCoreCss=fs.readFileSync("css/22-stage-v78-character-inventory-cor
 const baseCss=fs.readFileSync("css/00-main.css","utf8");
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const layoutSource=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
-const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 const confirmSources=[
     "js/00-main.js",
@@ -81,7 +81,8 @@ function loadDialogRuntime(){
     document.body.isConnected=true;
 
     const context={
-        window:null,document,console,Promise,String,Object,Array,Set,Map,Number
+        window:null,document,console,Promise,String,Object,Array,Set,Map,Number,
+        FourSymbolsAccountSave:{accountKey:name=>"four_symbols_account:test-uid:"+name}
     };
     context.window=context;
     vm.createContext(context);
@@ -124,7 +125,8 @@ function runFlatShopArrangement(resources){
             return template;
         }
     };
-    const context={window:null,document,console,Promise,String,Object,Array,Set,Map,Number};
+    const context={window:null,document,console,Promise,String,Object,Array,Set,Map,Number,
+        FourSymbolsAccountSave:{accountKey:name=>"four_symbols_account:test-uid:"+name}};
     context.window=context;
     vm.createContext(context);
     vm.runInContext(uiSource,context);
@@ -246,10 +248,10 @@ test("perpetual modal glow and skill-card compositing are static",()=>{
 });
 
 test("V169 styles and runtimes are deployed last under fresh cache keys",()=>{
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(indexSource,/js\/00-main\.js\?v=173\.64/);
-    assert.match(indexSource,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.64/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
 
     const styles=[
         "css/48-v169-element-box-settings.css",

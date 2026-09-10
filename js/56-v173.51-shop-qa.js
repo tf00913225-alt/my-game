@@ -3,7 +3,7 @@
 "use strict";
 if(typeof window==="undefined"||window.__v17351ShopQaInstalled)return;
 window.__v17351ShopQaInstalled=true;
-const STATE="v169_equipment_shop_daily",BOUGHT="v17351_equipment_shop_purchases",SIZE=6;
+const STATE=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily"),BOUGHT=window.FourSymbolsAccountSave.accountKey("equipment-shop-purchases"),SIZE=6;
 const safe=v=>Math.max(0,Math.floor(Number(v)||0)),alertRpg=(m,o)=>typeof rpgAlert==="function"?rpgAlert(m,o||{}):Promise.resolve(),confirmRpg=(m,o)=>typeof rpgConfirm==="function"?rpgConfirm(m,o||{}):Promise.resolve(false);
 function day(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function loadState(){const date=day();let x={date,refreshCount:0};try{const r=JSON.parse(localStorage.getItem(STATE)||"{}");if(r.date===date)x.refreshCount=safe(r.refreshCount)}catch(_){}return x}function saveState(x){try{localStorage.setItem(STATE,JSON.stringify(x))}catch(_){}}

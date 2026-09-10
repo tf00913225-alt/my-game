@@ -6,7 +6,7 @@ const vm=require("node:vm");
 
 const css=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");
 const index=fs.readFileSync("index.html","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 
 let passed=0;
@@ -146,10 +146,10 @@ test("Creation step one keeps native geometry while using the larger readable ty
 });
 
 test("The published mobile fix remains covered in the V173.39 cache release",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/css\/29-v125-character-creation-native\.css\?v=173\.39/);
-    assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.64/);
-    assert.match(index,/aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.css/);
+    assert.match(fs.readFileSync("scripts/build-production.mjs","utf8"),/"js\/01-stage-v8-touch-lock\.js"/);
+    assert.match(index,/aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
 });
 
 console.log("\nV173.2 mobile touch and scroll suite: "+passed+" tests passed.");

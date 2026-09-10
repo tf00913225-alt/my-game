@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/48-v159-abyss-battle-portraits.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -30,8 +30,8 @@ function load(overrides={}){
 }
 
 test("V159 remains ordered immediately before the final V169 runtimes",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
     const v159=loader.indexOf("js/48-v159-abyss-battle-portraits.js");
     const v169ElementBox=loader.indexOf("js/49-v169-element-box-settings.js");

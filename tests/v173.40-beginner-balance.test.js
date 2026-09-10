@@ -5,7 +5,7 @@ const main=fs.readFileSync("js/00-main.js","utf8");
 const rewards=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const curve=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 let passed=0;function test(name,fn){fn();passed++;console.log("✓ "+name);}
 
@@ -60,9 +60,9 @@ test("range VFX fixes remain fixed-size and centered after casualties",()=>{
 });
 
 test("release/cache advances to V173.40",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
-    assert.match(index,/js\/00-main\.js\?v=173\.64/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 console.log("\n"+passed+" V173.40 beginner balance and patrol tests passed.");

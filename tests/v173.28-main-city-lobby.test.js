@@ -10,7 +10,7 @@ const v54Css=read("css/19-stage-v54-main-city-moderate-native-scale.css");
 const v54Runtime=read("js/16-stage-v54-main-city-runtime.js");
 const rosterCss=read("css/42-v146-system-polish.css");
 const rosterRuntime=read("js/41-v146-system-polish.js");
-const loader=read("js/20-anonymous-20.js");
+const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
 
 const actionStart=index.indexOf('<div class="home-card-grid"');
 const actionEnd=index.indexOf('<div\n    id="homeRestCard"',actionStart);
@@ -139,14 +139,13 @@ test("the enlarged three-character horizontal roster still fits above the unchan
 });
 
 test("development cache and visible version stay synchronized",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
-    assert.match(index,/css\/00-main\.css\?v=173\.64/);
-    assert.match(index,/css\/19-stage-v54-main-city-moderate-native-scale\.css\?v=173\.64/);
-    assert.match(index,/js\/00-main\.js\?v=173\.64/);
-    assert.match(index,/js\/16-stage-v54-main-city-runtime\.js\?v=173\.64/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.css/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log("\n"+passed+" V173.39 main-city lobby tests passed.");

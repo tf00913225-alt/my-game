@@ -30,6 +30,7 @@ function loadRuntime(options={}){
             getItem:key=>values.get(key)||null,
             setItem:(key,value)=>{ values.set(key,String(value)); }
         },
+        FourSymbolsAccountSave:{accountKey:name=>"four_symbols_account:test-uid:"+name},
         document:{
             getElementById:id=>id==="v131EbGold"?goldNode:null,
             addEventListener(){},createElement(){ return {}; }
@@ -45,7 +46,7 @@ function loadRuntime(options={}){
             return amount;
         }
     };
-    values.set("v131_element_box_state",JSON.stringify({
+    values.set("four_symbols_account:test-uid:element-box-state",JSON.stringify({
         remainingMs:options.remainingMs===undefined?1000:options.remainingMs
     }));
     context.window=context;

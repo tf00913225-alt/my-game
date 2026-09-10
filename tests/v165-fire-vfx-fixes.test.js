@@ -8,7 +8,7 @@ const zlib=require("node:zlib");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -137,8 +137,8 @@ test("Fire Rocket travels from its caster to the real target group before bursti
 test("the current cache version publishes the repaired sheets and choreography",()=>{
     assert.match(animation,/dragon-slash-cast\.png\?v=165/);
     assert.match(animation,/rage-cast\.png\?v=165/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log("\nV165 Fire VFX fixes suite: "+passed+" tests passed.");

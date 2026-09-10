@@ -1,0 +1,104 @@
+
+/* bundled source: css/32-v131-patrol-appearance.css */
+/* V131 — 巡怪形象切換與透明 Q 版 sprite。 */
+#game-stage #mapPage #v131PatrolAppearanceSwitchWrap{
+    position:absolute;
+    right:12px;
+    top:92px;
+    z-index:96;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+    pointer-events:auto;
+}
+/*
+   ★ 修正（依照使用者要求，「形象切換鈕小一點，與
+   上面返回鍵同一個大小」）：
+   上一輪為了「按鈕太小」把它從58px放大到76px，這次
+   使用者進一步要求跟正上方的返回鍵（.map-page-
+   return-float，68x68px）統一大小，改成68px。
+*/
+#game-stage #mapPage #v131PatrolAppearanceSwitch{
+    width:68px;
+    height:68px;
+    padding:0;
+    border:0;
+    border-radius:50%;
+    background:transparent;
+    box-shadow:none;
+    overflow:hidden;
+}
+#game-stage #mapPage .v131-switch-icon-viewport{
+    position:relative;
+    display:block;
+    width:68px;
+    height:68px;
+    overflow:hidden;
+    border-radius:50%;
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,.72));
+}
+#game-stage #mapPage .v131-switch-icon-sprite{
+    position:absolute;
+    inset:0;
+    display:block;
+    background-repeat:no-repeat;
+}
+#game-stage #mapPage #v131PatrolAppearancePanel{
+    display:none;
+    min-width:128px;
+    max-width:190px;
+    padding:5px;
+    border:1px solid #8a6a3a;
+    border-radius:8px;
+    background:rgba(12,9,6,.94);
+    box-shadow:0 6px 18px rgba(0,0,0,.65);
+}
+#game-stage #mapPage #v131PatrolAppearancePanel.show{
+    display:grid;
+    gap:4px;
+}
+#game-stage #mapPage .v131-patrol-choice{
+    width:100%;
+    min-height:38px;
+    padding:6px 9px;
+    border:1px solid #66502d;
+    border-radius:6px;
+    background:linear-gradient(180deg,#2c2115,#161009);
+    color:#f2e3bf;
+    font-size:15px;
+    line-height:1.25;
+    font-weight:800;
+    text-align:left;
+}
+#game-stage #mapPage .v131-patrol-choice.active{
+    border-color:#f0b429;
+    color:#fff1b8;
+    box-shadow:0 0 0 1px rgba(240,180,41,.25) inset;
+}
+/*
+   ★ 修正（巡怪空白方塊 bug）：
+   這張img的實際畫面內容全部來自CSS
+   background-image（元素/正背面用
+   background-position切換），img自己的
+   src只是一個1x1透明GIF佔位，本來就不需要
+   object-fit。但保留object-fit:contain時，
+   Chromium在「img有intrinsic content（哪怕
+   只是1x1透明像素）+ object-fit + CSS
+   background-image」這個組合下，會把背景圖
+   大部分區域畫成不透明白色（用最小重現案例
+   驗證過：同樣的background-image/size/position
+   套在<div>上完全正常，只有套在<img>+
+   object-fit時才會出現這塊白色，
+   跟background-image本身、素材本身都無關）。
+   拿掉object-fit直接解決，因為這裡從來
+   沒有用到它原本的功能（縮放img自身的src內容）。
+*/
+#game-stage #mapPage #patrolCharacterImg.v131-patrol-q-art{
+    width:70px !important;
+    height:105px !important;
+    display:block !important;
+    margin:0 auto !important;
+    background-color:transparent !important;
+    filter:drop-shadow(0 4px 5px rgba(0,0,0,.6));
+}

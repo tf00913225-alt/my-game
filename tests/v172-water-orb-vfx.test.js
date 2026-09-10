@@ -6,7 +6,7 @@ const fs=require("node:fs");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -53,9 +53,9 @@ test("Water Ball lasts 1.4 seconds and the 4×3 Sprite Sheet advances through CS
 });
 
 test("the current cache version publishes the grouped Water Ball choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/00-main\.js\?v=173\.64/);
-    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
 });
 
 console.log("\nV172 Water Ball VFX suite: "+passed+" tests passed.");

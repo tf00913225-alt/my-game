@@ -4,7 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 
 const index=fs.readFileSync("index.html","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const polish=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 const css=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
@@ -17,8 +17,8 @@ function test(name,handler){
 }
 
 test("the current cache key delivers the Abyss tap correction",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 test("Abyss map portraits use the reduced mobile size and keep a full button hit area",()=>{

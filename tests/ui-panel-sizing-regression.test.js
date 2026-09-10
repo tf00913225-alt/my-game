@@ -49,14 +49,14 @@ const context={
         getItem(key){ return storage.has(key)?storage.get(key):null; },
         setItem(key,value){ storage.set(key,String(value)); }
     },
+    FourSymbolsAccountSave:{accountKey(name){ return "four_symbols_account:test-uid:"+name; }},
     renderShopContent(){ return '<div class="shop-potion-interface">POTION</div>'; }
 };
 context.window=context;
 vm.createContext(context);
 vm.runInContext(ui,context);
 
-assert.equal(injectedScripts.length,1,"equipment progression bootstrap should inject one script");
-assert.match(injectedScripts[0].src,/js\/equipment-progression\.js\?v=173\.64$/);
+assert.equal(injectedScripts.length,0,"bundled shop runtime must not inject an HTTP execution chain");
 
 const pages=["equipment","potion","equipment","potion","equipment"];
 pages.forEach(page=>{

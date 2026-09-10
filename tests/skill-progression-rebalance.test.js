@@ -287,13 +287,13 @@ test("player progression is isolated from Abyss fixed levels, talisman shared sk
     const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
     const talisman=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
     const main=fs.readFileSync("js/00-main.js","utf8");
-    const lateLoader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
+    const lateLoader=fs.readFileSync("scripts/build-production.mjs","utf8");
     assert.match(abyss,/v132FixedSkillLoadout\s*=\s*true/);
     assert.match(abyss,/v141ForceSkillLevel\s*=\s*config\.skillLevel/);
     assert.doesNotMatch(abyss,/v17364GetRequiredCharacterLevelForSkillLevel|learnLevel/);
     assert.match(talisman,/sharedSkillId/);
     assert.doesNotMatch(talisman,/v17364GetRequiredCharacterLevelForSkillLevel/);
     assert.match(main,/equippedSkills\.length\s*>=\s*4/);
-    assert.match(lateLoader,/script\.src="js\/59-abyss-two-tier-runtime\.js\?v=173\.64-abyss3"[\s\S]*?script\.onload=function\(\)\{[\s\S]*?loadSkillProgressionRuntime\(\)/);
-    assert.match(lateLoader,/function loadSkillProgressionRuntime\(\)[\s\S]*?60-v173\.64-skill-progression-rebalance\.js\?v=173\.64/);
+    assert.match(lateLoader,/const abyssScripts=\["js\/59-abyss-two-tier-runtime\.js"\]/);
+    assert.match(lateLoader,/const skillScripts=\["js\/60-v173\.64-skill-progression-rebalance\.js"\]/);
 });

@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 const ROOT=process.cwd();
@@ -19,6 +20,7 @@ function readText(root,relative){
 }
 function normalizeVersion(value){return String(value??'').replace(/^V/i,'').trim();}
 function escapeRegex(value){return String(value).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function hash12(file){return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex').slice(0,12);}
 function getConfig(){
   const release=readJson(RELEASE_PATH);
   const requirements=readJson(REQUIREMENTS_PATH);
@@ -66,12 +68,36 @@ function checkVersionMarkers(root,config){
   for(const [label,pattern] of requiredIndexPatterns){if(!pattern.test(index)) fail(`${label} is not V${version}.`);}
   const cachePattern=new RegExp(`const\\s+V_ASSET_VERSION=["']${escapeRegex(cacheVersion)}["']`);
   if(!cachePattern.test(loader)) fail(`V_ASSET_VERSION is not ${cacheVersion}.`);
-  const readyPattern=new RegExp(`dataset\\.runtimeReady=["']${escapeRegex(version)}["']`);
-  if(!readyPattern.test(loader)) fail(`runtimeReady is not ${version}.`);
-  for(const relative of release.managedCacheReferences||[]){
-    const pattern=new RegExp(`${escapeRegex(relative)}\\?v=${escapeRegex(cacheVersion)}(?:["'&#]|$)`);
-    if(!pattern.test(index)) fail(`Managed cache reference is not ${cacheVersion}: ${relative}`);
+  if((release.managedCacheReferences||[]).length){
+    fail('managedCacheReferences must be empty: production cache invalidation is owned by content-hashed filenames.');
   }
+  checkBuildManifest(root,config,index);
+}
+function checkBuildManifest(root,config,index){
+  const manifestPath=path.join(root,'asset-manifest.json');
+  const manifest=readJson(manifestPath);
+  if(manifest.schemaVersion!==1) fail('asset-manifest.json schemaVersion must be 1.');
+  if(normalizeVersion(manifest.release)!==config.version) fail(`Asset manifest release ${manifest.release} != V${config.version}.`);
+  const directScripts=Array.from(index.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi),match=>match[1]);
+  const directStyles=Array.from(index.matchAll(/<link\b(?=[^>]*\brel=["']stylesheet["'])[^>]*\bhref=["']([^"']+)["'][^>]*>/gi),match=>match[1]);
+  if(JSON.stringify(directScripts)!==JSON.stringify(manifest.critical?.scripts||[])) fail('Index scripts do not match the Critical Boot manifest.');
+  if(JSON.stringify(directStyles)!==JSON.stringify(manifest.critical?.styles||[])) fail('Index styles do not match the Critical Boot manifest.');
+  if(directScripts.length!==1||directStyles.length!==1) fail('Critical Boot must expose exactly one hashed script and one hashed stylesheet.');
+  const referenced=new Set([...directScripts,...directStyles,...(manifest.critical?.images||[]),manifest.critical?.firebaseBootstrap]);
+  for(const bundle of Object.values(manifest.featureManifest?.bundles||{})){
+    for(const relative of [...(bundle.scripts||[]),...(bundle.styles||[])]) referenced.add(relative);
+  }
+  for(const [relative,metadata] of Object.entries(manifest.assets||{})){
+    if(!/\.[0-9a-f]{12}\.(?:js|css|webp|png|jpe?g)$/.test(relative)) fail(`Asset is not content hashed: ${relative}`);
+    const file=path.join(root,relative);
+    if(!fs.existsSync(file)) fail(`Asset manifest target is missing: ${relative}`);
+    const digest=hash12(file);
+    if(digest!==metadata.sha256||!relative.includes(`.${digest}.`)) fail(`Asset digest mismatch: ${relative}`);
+    if(fs.statSync(file).size!==metadata.bytes) fail(`Asset byte count mismatch: ${relative}`);
+  }
+  for(const relative of referenced){if(relative&&!manifest.assets?.[relative]) fail(`Referenced build asset is undeclared: ${relative}`);}
+  const builtCopy=path.join(root,'build','asset-manifest.json');
+  if(!fs.existsSync(builtCopy)||fs.readFileSync(builtCopy,'utf8')!==fs.readFileSync(manifestPath,'utf8')) fail('build/asset-manifest.json is stale.');
 }
 function walkFiles(root,relative,extensions,out=[]){
   const full=path.join(root,relative);

@@ -17,9 +17,9 @@
     ]);
     const INVENTORY_PAGE_SIZE=18;
     const INVENTORY_PAGE_COUNT=7;
-    const ANNOUNCEMENT_READ_KEY="v141_announcement_read";
-    const QUEST_MILESTONE_KEY="v141_quest_milestones";
-    const TASK_TRACKER_KEY="v141_task_tracker";
+    const ANNOUNCEMENT_READ_KEY=window.FourSymbolsAccountSave.accountKey("announcement-read");
+    const QUEST_MILESTONE_KEY=window.FourSymbolsAccountSave.accountKey("quest-milestones");
+    const TASK_TRACKER_KEY=window.FourSymbolsAccountSave.accountKey("task-tracker");
     let inventoryPageIndex=0;
     let battleSnapshot=null;
     let lastWildRankToken=null;

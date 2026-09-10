@@ -10,7 +10,7 @@ const read=relative=>fs.readFileSync(path.join(root,relative),"utf8");
 const main=read("js/00-main.js");
 const content=read("js/27-v132-content-expansion.js");
 const polish=read("js/41-v146-system-polish.js");
-const loader=read("js/20-anonymous-20.js");
+const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
 const index=read("index.html");
 
 let passed=0;
@@ -135,10 +135,10 @@ test("既有存檔與已穿戴套裝會同步取得新版圖示",()=>{
 });
 
 test("開發版本與快取版本更新為 V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
-    assert.match(index,/js\/00-main\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log("\n"+passed+" V173.39 skill and equipment icon tests passed.");

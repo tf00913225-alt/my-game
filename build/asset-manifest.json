@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "release": "173.65",
+  "generatedAt": "deterministic",
+  "critical": {
+    "scripts": [
+      "build/boot-core.46539aba8ff7.js"
+    ],
+    "styles": [
+      "build/boot-core.83625fb1541f.css"
+    ],
+    "images": [
+      "assets/ui/startup-logo.4631c0bc3f2b.jpg"
+    ],
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.b9c60c39820a.js"
+  },
+  "featureManifest": {
+    "schemaVersion": 1,
+    "bundles": {
+      "app-shell": {
+        "scripts": [
+          "build/app-shell.3860cc7c4523.js"
+        ],
+        "styles": [
+          "build/app-shell.37d5b9f36840.css"
+        ],
+        "dependencies": []
+      },
+      "gameplay-core": {
+        "scripts": [
+          "build/gameplay-core.c8bdbe557965.js"
+        ],
+        "styles": [
+          "build/gameplay-core.13dae8d242bf.css"
+        ],
+        "dependencies": [
+          "app-shell"
+        ]
+      },
+      "feature-patrol": {
+        "scripts": [
+          "build/feature-patrol.5e57b7df47ae.js"
+        ],
+        "styles": [
+          "build/feature-patrol.0db7cba8da88.css"
+        ],
+        "assets": [
+          "assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp",
+          "assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp",
+          "assets/characters/patrol/patrol-female-fire-back.c12817139add.webp",
+          "assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp",
+          "assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp",
+          "assets/characters/patrol/patrol-female-water-front.5269ab380524.webp",
+          "assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp",
+          "assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp",
+          "assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp",
+          "assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp",
+          "assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp",
+          "assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp",
+          "assets/characters/patrol/patrol-male-water-back.db1078669837.webp",
+          "assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp",
+          "assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp",
+          "assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp"
+        ],
+        "dependencies": [
+          "gameplay-core"
+        ]
+      },
+      "feature-abyss": {
+        "scripts": [
+          "build/feature-abyss.cffedb56ecac.js"
+        ],
+        "styles": [
+          "build/feature-abyss.3d298c2d78c2.css"
+        ],
+        "dependencies": [
+          "gameplay-core"
+        ]
+      },
+      "feature-skill": {
+        "scripts": [
+          "build/feature-skill.83c9aace100a.js"
+        ],
+        "styles": [],
+        "dependencies": [
+          "gameplay-core"
+        ]
+      },
+      "feature-boss-relic": {
+        "scripts": [
+          "build/feature-boss-relic.af3d3cea8249.js"
+        ],
+        "styles": [
+          "build/feature-boss-relic.ca9df1f107f3.css"
+        ],
+        "dependencies": [
+          "gameplay-core"
+        ]
+      }
+    },
+    "features": {
+      "home": "app-shell",
+      "character-creation": "app-shell",
+      "patrol": "feature-patrol",
+      "battle": "gameplay-core",
+      "inventory": "gameplay-core",
+      "equipment": "gameplay-core",
+      "dungeon": "feature-boss-relic",
+      "shop": "gameplay-core",
+      "synthesis": "gameplay-core",
+      "abyss": "feature-abyss",
+      "skill": "feature-skill",
+      "relic": "feature-boss-relic",
+      "boss-tower": "feature-boss-relic"
+    },
+    "idlePreload": [
+      "gameplay-core",
+      "feature-patrol"
+    ]
+  },
+  "assets": {
+    "build/boot-core.46539aba8ff7.js": {
+      "sha256": "46539aba8ff7",
+      "bytes": 37742
+    },
+    "build/app-shell.3860cc7c4523.js": {
+      "sha256": "3860cc7c4523",
+      "bytes": 919312
+    },
+    "build/gameplay-core.c8bdbe557965.js": {
+      "sha256": "c8bdbe557965",
+      "bytes": 1158641
+    },
+    "build/feature-patrol.5e57b7df47ae.js": {
+      "sha256": "5e57b7df47ae",
+      "bytes": 7485
+    },
+    "build/feature-abyss.cffedb56ecac.js": {
+      "sha256": "cffedb56ecac",
+      "bytes": 47285
+    },
+    "build/feature-skill.83c9aace100a.js": {
+      "sha256": "83c9aace100a",
+      "bytes": 36096
+    },
+    "build/feature-boss-relic.af3d3cea8249.js": {
+      "sha256": "af3d3cea8249",
+      "bytes": 138290
+    },
+    "build/boot-core.83625fb1541f.css": {
+      "sha256": "83625fb1541f",
+      "bytes": 216294
+    },
+    "build/app-shell.37d5b9f36840.css": {
+      "sha256": "37d5b9f36840",
+      "bytes": 110537
+    },
+    "build/gameplay-core.13dae8d242bf.css": {
+      "sha256": "13dae8d242bf",
+      "bytes": 312966
+    },
+    "build/feature-patrol.0db7cba8da88.css": {
+      "sha256": "0db7cba8da88",
+      "bytes": 3157
+    },
+    "build/feature-abyss.3d298c2d78c2.css": {
+      "sha256": "3d298c2d78c2",
+      "bytes": 25629
+    },
+    "build/feature-boss-relic.ca9df1f107f3.css": {
+      "sha256": "ca9df1f107f3",
+      "bytes": 43944
+    },
+    "build/firebase/firebase-config.4314d6321ba1.js": {
+      "sha256": "4314d6321ba1",
+      "bytes": 1681
+    },
+    "build/firebase/firebase-auth.04b69a7bf734.js": {
+      "sha256": "04b69a7bf734",
+      "bytes": 4066
+    },
+    "build/firebase/firebase-cloud-save.eb404e143334.js": {
+      "sha256": "eb404e143334",
+      "bytes": 4070
+    },
+    "build/firebase/firebase-auth-ui.dd10362aee46.js": {
+      "sha256": "dd10362aee46",
+      "bytes": 8923
+    },
+    "build/firebase/firebase-bootstrap.b9c60c39820a.js": {
+      "sha256": "b9c60c39820a",
+      "bytes": 4015
+    },
+    "assets/ui/startup-logo.4631c0bc3f2b.jpg": {
+      "sha256": "4631c0bc3f2b",
+      "bytes": 231951
+    }
+  }
+}

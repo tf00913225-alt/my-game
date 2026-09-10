@@ -25,7 +25,7 @@
     ]);
     const V131_EXP_MULTIPLIER=3.5;
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;
-    const ELEMENT_BOX_KEY="v131_element_box_state";
+    const ELEMENT_BOX_KEY=window.FourSymbolsAccountSave.accountKey("element-box-state");
 
     /*
        ★ 新增（依照使用者要求，經濟／養成重新設計第一輪）：

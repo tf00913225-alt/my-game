@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const index=fs.readFileSync("index.html","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const ui=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const fixes=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
@@ -44,8 +44,8 @@ function baseContext(overrides={}){
 }
 
 test("V146 remains ordered before V149 under the current cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"

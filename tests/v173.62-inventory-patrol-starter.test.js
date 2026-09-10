@@ -7,7 +7,7 @@ const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
 const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
 const battle=fs.readFileSync("js/54-v173.51-battle-qa.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 assert.match(main,/const INVENTORY_MAX_STACK_DEFAULT=999;/);
@@ -34,6 +34,6 @@ assert.doesNotMatch(battle,/stage\.style\.visibility/);
 assert.doesNotMatch(battle,/v17351-management-open.*toggle/);
 assert.match(animation,/stage\.className="v143-skill-stage";[\s\S]*?stage\.style\.visibility="visible";/);
 
-assert.ok(loader.includes('const V_ASSET_VERSION="173.64";'));
-assert.ok(index.includes('<title>四象江湖傳 V173.64</title>'));
+assert.ok(loader.includes('const V_ASSET_VERSION="173.65";'));
+assert.ok(index.includes('<title>四象江湖傳 V173.65</title>'));
 console.log("✓ V173.62 inventory / patrol VFX / starter gear regressions");

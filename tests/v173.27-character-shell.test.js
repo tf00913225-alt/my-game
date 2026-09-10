@@ -9,7 +9,7 @@ const runtime=read("js/19-stage-v78-character-inventory-runtime.js");
 const coreCss=read("css/22-stage-v78-character-inventory-core.css");
 const finalCss=read("css/31-v131-fix-batch.css");
 const sharedCss=read("css/49-v169-rpg-ui.css");
-const loader=read("js/20-anonymous-20.js");
+const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
 const index=read("index.html");
 
 let passed=0;
@@ -105,18 +105,18 @@ test("long character tabs retain the canonical internal scroll owner",()=>{
     assert.match(finalCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
 });
 
-test("the functional V173.63 repair runtime attaches after late runtime owners",()=>{
-    assert.match(runtime,/v17363-functional-fixes-runtime/);
-    assert.match(runtime,/js\/58-v173\.63-functional-fixes\.js\?v=173\.64/);
-    assert.match(runtime,/v173:runtime-ready/);
+test("the functional V173.63 repair runtime follows late owners inside gameplay-core",()=>{
+    const build=read("scripts/build-production.mjs");
+    assert.ok(build.indexOf('"js/53-v173.50-inventory-qol.js"')<build.indexOf('"js/58-v173.63-functional-fixes.js"'));
+    assert.doesNotMatch(runtime,/createElement\(["']script["']\)|v173:runtime-ready/);
     assert.doesNotMatch(runtime,/visible-ui-repairs/);
 });
 
 test("the repository source remains V173.62 and dev deployment keeps that source version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.64"/);
-    assert.match(index,/>V173\.64<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.65"/);
+    assert.match(index,/>V173\.65<\/div>/);
 });
 
 console.log("\n"+passed+" character-shell regression tests passed.");

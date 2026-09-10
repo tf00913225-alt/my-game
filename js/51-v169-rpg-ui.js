@@ -224,7 +224,7 @@
     }
     window.v169ArrangeShopColumns=arrangeShopColumns;
 
-    const SHOP_REFRESH_STORAGE_KEY="v169_equipment_shop_daily";
+    const SHOP_REFRESH_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily");
     const SHOP_FREE_REFRESHES=5;
     const SHOP_MAX_REFRESHES=10;
     let shopPage="potion";
@@ -380,32 +380,7 @@
         };
     }
 
-    /* V173.46 equipment progression is a first-class feature module. It is
-       deliberately loaded after the shared RPG UI so it can reuse the final
-       shop/dungeon/modal authorities without creating another legacy wrapper chain. */
-    function loadEquipmentProgression(){
-        if(document.getElementById("equipment-progression-runtime")){ return; }
-        const script=document.createElement("script");
-        script.id="equipment-progression-runtime";
-        script.src="js/equipment-progression.js?v=173.64";
-        script.async=false;
-        script.onload=function(){
-            if(typeof window.__v173ReportRuntimeProgress==="function"){
-                window.__v173ReportRuntimeProgress("equipment-progression-runtime","裝備與商店系統");
-            }
-        };
-        script.onerror=function(){
-            if(typeof window.__v17347RuntimeGateFail==="function"){
-                window.__v17347RuntimeGateFail("裝備與商店系統載入失敗，請重新整理。");
-            }
-        };
-        document.head.appendChild(script);
-    }
-    if(document.readyState==="loading"){
-        document.addEventListener("DOMContentLoaded",loadEquipmentProgression,{once:true});
-    }else{
-        loadEquipmentProgression();
-    }
+    /* equipment-progression follows this source inside gameplay-core's fixed execution order. */
 
     /* ----- Dungeon backpack: reuse the one inventory DOM above the map. ----- */
     if(typeof openMapInventoryOverlay==="function"){

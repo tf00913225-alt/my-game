@@ -1,0 +1,17 @@
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/asset-manifest.json
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/build/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/characters/patrol/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/ui/startup-logo.4631c0bc3f2b.jpg
+  Cache-Control: public, max-age=31536000, immutable

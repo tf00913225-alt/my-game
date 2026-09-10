@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-09-cold-start-auth-boot-architecture",
+  "baseBranch": "dev",
+  "baseCommit": "70df66e8cb371ff6193a7f70609cf9aad7bd15ac",
+  "workBranch": "perf/cold-start-auth-boot-architecture",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "BOOT-01",
+      "status": "VERIFIED",
+      "requirement": "移除 12～15 秒 artificial minimum、fake 90→100 進度與 full-runtime 全域輸入 gate",
+      "evidence": ["js/52-v173.20-startup-loader.js", "js/20-anonymous-20.js", "tests/boot-architecture.test.js"]
+    },
+    {
+      "id": "BOOT-02",
+      "status": "VERIFIED",
+      "requirement": "建立唯一 StartupStateMachine，Auth 與 UID save resolution 必須先於第一角色創建",
+      "evidence": ["js/startup/startup-contract.js", "js/52-v173.20-startup-loader.js", "tests/auth-before-character-creation.test.js"]
+    },
+    {
+      "id": "BOOT-03",
+      "status": "VERIFIED",
+      "requirement": "正式帳號 UI 只提供 Google、Email 與 Firebase Anonymous guest，移除未登入 local-only bypass",
+      "evidence": ["js/firebase/firebase-auth.js", "js/firebase/firebase-auth-ui.js", "js/firebase/firebase-bootstrap.js", "tests/boot-architecture.test.js"]
+    },
+    {
+      "id": "BOOT-04",
+      "status": "VERIFIED",
+      "requirement": "Canonical save 與所有相關 sidecar 使用 UID namespace，帳號切換不得洩漏角色、背包、裝備或進度",
+      "evidence": ["js/startup/account-save-repository.js", "js/00-main.js", "js/equipment-progression.js", "js/53-v173.50-inventory-qol.js", "tests/account-save-ownership.test.js"]
+    },
+    {
+      "id": "BOOT-05",
+      "status": "VERIFIED",
+      "requirement": "Legacy local save migration 必須明確確認、先備份、可 rollback，且 local/cloud conflict 不得 silent overwrite",
+      "evidence": ["js/startup/account-save-repository.js", "js/52-v173.20-startup-loader.js", "tests/account-save-ownership.test.js"]
+    },
+    {
+      "id": "BOOT-06",
+      "status": "VERIFIED",
+      "requirement": "Critical Boot 與 feature bundles 正式分離；非 Critical feature 不阻塞帳號、創角或主城",
+      "evidence": ["config/boot-manifest.json", "config/feature-manifest.json", "scripts/build-production.mjs", "asset-manifest.json", "tests/critical-feature-budget.test.js"]
+    },
+    {
+      "id": "BOOT-07",
+      "status": "VERIFIED",
+      "requirement": "Feature network preparation 可並行但 dependency 與 legacy source execution order 必須 deterministic；只顯示局部 loading",
+      "evidence": ["js/startup/feature-loader.js", "js/20-anonymous-20.js", "tests/feature-loader-runtime.test.js"]
+    },
+    {
+      "id": "BOOT-08",
+      "status": "VERIFIED",
+      "requirement": "61 個巡怪 Base64 JavaScript chunk 正式退役，改用 lazy content-hashed WebP 與一般 HTTP cache",
+      "evidence": ["js/26-v131-patrol-appearance.js", "assets/characters/patrol", "tests/boot-architecture.test.js"]
+    },
+    {
+      "id": "BOOT-09",
+      "status": "VERIFIED",
+      "requirement": "Production assets 使用 deterministic build、content hash、manifest 與安全 cache header，不導入 Service Worker",
+      "evidence": ["scripts/build-production.mjs", "asset-manifest.json", "_headers", ".github/scripts/ci.mjs", ".github/scripts/release-gate.mjs"]
+    },
+    {
+      "id": "BOOT-10",
+      "status": "VERIFIED",
+      "requirement": "Firebase read-only / trusted-backend-only policy保持，不以 client Firestore write 假裝完成 cloud save",
+      "evidence": ["firestore.rules", "js/firebase/firebase-cloud-save.js", "docs/FIREBASE_AUTH_CLOUD_SAVE.md"]
+    },
+    {
+      "id": "BOOT-11",
+      "status": "VERIFIED",
+      "requirement": "建立 cold/warm browser benchmark、account scenarios、feature lazy loading 與 permanent CI regression gates",
+      "evidence": [".github/scripts/run-boot-architecture-browser-qa.mjs", ".github/scripts/boot-live-browser-qa.mjs", ".github/workflows/ci.yml", ".github/workflows/deploy-dev-cloudflare.yml", "docs/BOOT_PERFORMANCE_BASELINE.md"]
+    },
+    {
+      "id": "BOOT-12",
+      "status": "VERIFIED",
+      "requirement": "更新永久架構文件並完成 work branch → dev exact-SHA preview 驗證；main production promotion 由 release gate 另行執行",
+      "evidence": ["ARCHITECTURE_RULES.md", "docs/BOOT_ARCHITECTURE.md", "HANDOFF.md", "CHANGELOG.md"]
+    }
+  ],
+  "automatedVerification": "DEV_CI_CONTROLLED_BROWSER_EXACT_SHA_DEPLOY_AND_LIVE_MOBILE_QA_VERIFIED",
+  "verificationRuns": [34424990928, 34428020728],
+  "verificationArtifacts": [
+    "boot-architecture-browser-qa-08d23ecbf38ab74a6b1ef4ced43fefcded02901a",
+    "abyss-mobile-qa-08d23ecbf38ab74a6b1ef4ced43fefcded02901a",
+    "release-manifest-08d23ecbf38ab74a6b1ef4ced43fefcded02901a"
+  ],
+  "visualVerification": "LIVE_DEV_MOBILE_CHROME_ACCOUNT_BOOT_ABYSS_BATTLE_AND_LOCAL_FEATURE_LOADING_PASS",
+  "verifiedDevCommit": "08d23ecbf38ab74a6b1ef4ced43fefcded02901a",
+  "verifiedOnDevVersion": "173.64",
+  "promotionApproval": "USER_APPROVED_DEV_THEN_MAIN_2026-09-10",
+  "releasedAs": "V173.65"
+}

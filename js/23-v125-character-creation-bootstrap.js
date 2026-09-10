@@ -11,7 +11,6 @@
 (function bootstrapNativeCreationPage(){
     "use strict";
 
-    const SAVE_KEY="battle_full_version_save_v5";
     const page=document.getElementById("creationPage");
     const overlay=document.getElementById("game-overlay-layer");
 
@@ -23,12 +22,8 @@
     }
 
     function loadCriticalUiStyle(){
-        if(document.getElementById("v174-critical-ui-regression-style")){ return; }
-        const link=document.createElement("link");
-        link.id="v174-critical-ui-regression-style";
-        link.rel="stylesheet";
-        link.href="css/56-v174-critical-ui-regressions.css";
-        document.head.appendChild(link);
+        /* Production app-shell CSS owns this style; no runtime stylesheet request. */
+        return true;
     }
 
     function primaryState(state,primary,reason){
@@ -38,7 +33,11 @@
     function readPersistedPrimaryCharacter(){
         let raw="";
         try{
-            raw=localStorage.getItem(SAVE_KEY)||"";
+            const repository=window.FourSymbolsAccountSave;
+            const active=repository&&repository.readActive();
+            if(!active||active.status==="inactive"){ return primaryState("unsafe",null,"account-unresolved"); }
+            if(active.status==="empty"){ return primaryState("empty",null,"no-account-save"); }
+            raw=JSON.stringify(active.save);
         }catch(_){
             /* Storage being unreadable must never turn into permission to
                overwrite character data. This is intentionally fail-closed. */
@@ -151,18 +150,8 @@
         window.createCharacter=guardedCreateCharacter;
     }
 
-    function loadUiRegressionRuntime(){
-        if(document.getElementById("v174-ui-regression-guards-runtime")){ return; }
-        const script=document.createElement("script");
-        script.id="v174-ui-regression-guards-runtime";
-        script.src="js/61-v174-ui-regression-guards.js";
-        script.async=false;
-        (document.body||document.documentElement).appendChild(script);
-    }
-
     function finalizeBootstrap(){
         installPrimaryCreationSaveGuard();
-        loadUiRegressionRuntime();
     }
 
     loadCriticalUiStyle();

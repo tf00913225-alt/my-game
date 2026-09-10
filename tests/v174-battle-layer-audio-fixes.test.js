@@ -6,6 +6,7 @@ const fs=require("node:fs");
 const layerCss=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
 const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const audio=fs.readFileSync("js/34-v141-core-systems.js","utf8");
+const liveQa=fs.readFileSync(".github/scripts/battle-layer-audio-live-qa.mjs","utf8");
 
 let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
@@ -25,6 +26,27 @@ test("Element Box focus suppresses only the document-level skill presentation la
         /body\.v162-element-box-settings-open > \.v143-skill-stage,[\s\S]*?\.skill-name-badge\.v143-caster-skill-label\{[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important;/
     );
     assert.doesNotMatch(layerCss,/body\.v162-element-box-settings-open[\s\S]{0,180}\.v143-skill-stage[\s\S]{0,120}display:none/);
+});
+
+test("Live modal overlap QA snapshots one V143 stage without a CDP timing race",()=>{
+    const start=liveQa.indexOf("const modalOverlapSnapshot=await client.eval");
+    const end=liveQa.indexOf("const modalOverlapPresentation=",start);
+    assert.ok(start>=0&&end>start,"live QA must own one atomic modal-overlap browser task");
+    const snapshot=liveQa.slice(start,end);
+    assert.match(snapshot,/director\.play\(config/);
+    assert.match(snapshot,/openHomeFeature\('autoBattleSettings'\)/);
+    assert.match(snapshot,/sameStage:stage===stageBefore/);
+    assert.doesNotMatch(liveQa,/modal-overlap V143 presentation/);
+});
+
+test("Live production cast QA captures its V143 stage in the casting browser task",()=>{
+    const start=liveQa.indexOf("const productionCastSnapshot=await client.eval");
+    const end=liveQa.indexOf("evidence.checks.skillLayerBeforeElementBox=",start);
+    assert.ok(start>=0&&end>start,"live QA must own one atomic production-cast browser task");
+    const snapshot=liveQa.slice(start,end);
+    assert.match(snapshot,/castDamageSkill\('explosiveFlurry'\)/);
+    assert.match(snapshot,/document\.getElementById\('v143-skill-stage'\)/);
+    assert.doesNotMatch(liveQa,/visible V143 skill layer/);
 });
 
 test("Skill SFX and general combat feedback are both exactly doubled",()=>{

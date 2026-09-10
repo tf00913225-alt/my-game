@@ -13,7 +13,7 @@ const elementBox=fs.readFileSync("js/49-v169-element-box-settings.js","utf8");
 const elementBoxCss=fs.readFileSync("css/48-v169-element-box-settings.css","utf8");
 const polishCss=fs.readFileSync("css/42-v146-system-polish.css","utf8");
 
-const KEY="v173_exp_pool_growth_state";
+const KEY="four_symbols_account:test-uid:exp-pool-growth-state";
 const DAY=86400000;
 
 function harness(options={}){
@@ -35,6 +35,7 @@ function harness(options={}){
             setItem:(key,value)=>store.set(key,String(value)),
             removeItem:key=>store.delete(key)
         },
+        FourSymbolsAccountSave:{accountKey:name=>"four_symbols_account:test-uid:"+name},
         player:players[0]||blank,player2:players[1]||null,player3:players[2]||null,
         sharedExp:Number(options.sharedExp)||0,zoneConfig:{},
         getMonsterRank:monster=>monster&&monster.rank||"regular",

@@ -269,14 +269,36 @@ window.eventToGamePoint = getGamePointFromEvent;
    基本設定
 ===================================================== */
 
-const SAVE_KEY =
-    "battle_full_version_save_v5";
+let SAVE_KEY=null;
+
+function activateAccountSaveOwner(uid){
+    const repository=window.FourSymbolsAccountSave;
+    if(!repository){ throw new Error("Account save repository is unavailable."); }
+    const activeUid=repository.activate(uid);
+    SAVE_KEY=repository.saveKey(activeUid);
+    return SAVE_KEY;
+}
+
+function deactivateAccountSaveOwner(){
+    const repository=window.FourSymbolsAccountSave;
+    if(repository){ repository.deactivate(); }
+    SAVE_KEY=null;
+}
+
+window.FourSymbolsGameSave=Object.freeze({
+    activate:activateAccountSaveOwner,
+    deactivate:deactivateAccountSaveOwner,
+    getKey:()=>SAVE_KEY,
+    load:()=>loadGame(),
+    save:options=>saveGame(options),
+    showCreation:()=>showCreation()
+});
 
 
 /* =====================================================
    V173.41 — MOBILE SESSION RESUME / BACKGROUND SAVE
-   - The 12~15 second startup sequence remains first-entry only.
-   - A reload inside the same browser tab session skips the long overlay.
+   - Startup readiness is always owned by the account-first state machine.
+   - A reload inside the same browser tab preserves only non-authoritative UI context.
    - Android background/page suspension saves immediately before eviction.
 ===================================================== */
 const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
@@ -6122,6 +6144,12 @@ function createCharacter(){
     });
 
 
+    if(!window.FourSymbolsStartupPolicy||!window.FourSymbolsStartupPolicy.canCreateCharacter()){
+        console.error("Character creation refused before account/save resolution.");
+        return false;
+    }
+
+    const previousPlayer=JSON.parse(JSON.stringify(player));
     player.id=id;
 
     player.element =
@@ -6152,26 +6180,6 @@ function createCharacter(){
 
     player.skillPoints =
         INITIAL_CHARACTER_SKILL_POINTS;
-
-
-    /*
-       ★ 重要防呆：
-       畫面切換必須放在最前面，
-       確保「開始冒險」按下去後
-       畫面一定會切換到遊戲介面，
-       就算底下任何一行（例如存檔）
-       在某些瀏覽器上出錯，
-       也不會讓玩家卡在創角畫面。
-    */
-
-    $("creationPage")
-        .style.display =
-        "none";
-
-
-    $("gameInterface")
-        .style.display =
-        "block";
 
 
     /*
@@ -6214,19 +6222,18 @@ function createCharacter(){
     }
 
 
-    try{
-
-        saveGame();
-
+    if(saveGame()!==true){
+        Object.keys(player).forEach(key=>delete player[key]);
+        Object.assign(player,previousPlayer);
+        console.error("創角存檔失敗；角色未建立。",
+            new Error("Account save commit failed."));
+        return false;
     }
-    catch(error){
 
-        console.error(
-            "創角存檔發生錯誤：",
-            error
-        );
-
-    }
+    window.FourSymbolsStartupPolicy.notifyCharacterCreated();
+    $("creationPage").style.display="none";
+    $("gameInterface").style.display="block";
+    return true;
 
 }
 
@@ -6235,10 +6242,17 @@ function createCharacter(){
    存檔
 ===================================================== */
 
-function saveGame(){
+function saveGame(options={}){
 
     if(deleteAllCharactersInProgress){
-        return;
+        return false;
+    }
+
+    const repository=window.FourSymbolsAccountSave;
+    const activeUid=repository&&repository.getActiveUid();
+    if(!repository||!activeUid||SAVE_KEY!==repository.saveKey(activeUid)){
+        console.error("存檔失敗：尚未建立可驗證的 UID owner。");
+        return false;
     }
 
     try{
@@ -6255,19 +6269,8 @@ function saveGame(){
 
         try{
 
-            const existingRaw=
-                localStorage.getItem(
-                    SAVE_KEY
-                );
-
-            const existingData=
-                existingRaw
-                ?
-                JSON.parse(
-                    existingRaw
-                )
-                :
-                null;
+            const existingRead=repository.readForUid(activeUid);
+            const existingData=existingRead.status==="ready"?existingRead.save:null;
 
             if(
                 existingData &&
@@ -6460,12 +6463,12 @@ function saveGame(){
         };
 
 
-        localStorage.setItem(
-            SAVE_KEY,
-            JSON.stringify(
-                saveData
-            )
-        );
+        const persistenceOptions=options&&typeof options==="object"?options:{};
+        repository.writeForUid(activeUid,saveData,{
+            source:String(persistenceOptions.source||"gameplay"),
+            ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
+        });
+        return true;
 
     }
     catch(error){
@@ -6474,6 +6477,8 @@ function saveGame(){
             "存檔失敗：",
             error
         );
+
+        return false;
 
     }
 
@@ -6492,33 +6497,14 @@ function loadGame(){
            先讀新版。
         */
 
-        let raw =
-            localStorage.getItem(
-                SAVE_KEY
-            );
-
-
-        /*
-           如果沒有新版，
-           嘗試讀舊版存檔。
-        */
-
-        if(!raw){
-
-            raw =
-                localStorage.getItem(
-                    "battle_full_version_save_v4"
-                )||
-                localStorage.getItem(
-                    "battle_full_version_save_v3"
-                );
-
-        }
+        const repository=window.FourSymbolsAccountSave;
+        const activeUid=repository&&repository.getActiveUid();
+        if(!repository||!activeUid||SAVE_KEY!==repository.saveKey(activeUid)){ return false; }
+        const accountSave=repository.readForUid(activeUid);
+        const raw=accountSave.status==="ready"?JSON.stringify(accountSave.save):null;
 
 
         if(!raw){
-
-            showCreation();
 
             return false;
 
@@ -6534,8 +6520,6 @@ function loadGame(){
             !data.player ||
             !data.player.id
         ){
-
-            showCreation();
 
             return false;
 
@@ -7274,7 +7258,7 @@ function loadGame(){
            讓舊資料完成升級。
         */
 
-        saveGame();
+        saveGame({source:"hydration-normalization"});
 
 
         return true;
@@ -7286,21 +7270,6 @@ function loadGame(){
             "讀取存檔失敗：",
             error
         );
-
-
-        /*
-           不讓錯誤把整個遊戲卡死。
-           讀檔失敗就回創角畫面。
-        */
-
-        $("gameInterface")
-            .style.display =
-            "none";
-
-
-        $("creationPage")
-            .style.display =
-            "block";
 
 
         return false;
@@ -7357,23 +7326,15 @@ async function resetGame(){
         autosaveIntervalId=null;
     }
 
-    localStorage.removeItem(
-        SAVE_KEY
-    );
-
-    localStorage.removeItem(
-        "battle_full_version_save_v4"
-    );
-
-    localStorage.removeItem(
-        "battle_full_version_save_v3"
-    );
+    if(window.FourSymbolsAccountSave){ window.FourSymbolsAccountSave.removeActive(); }
 
     /* Abyss keeps a compatibility sidecar for pre-V173.64 saves. It belongs
        to the same single-player save and must be removed with the character. */
-    localStorage.removeItem(
-        "v174_abyss_state_v2"
-    );
+    try{
+        const repository=window.FourSymbolsAccountSave;
+        const uid=repository&&repository.getActiveUid();
+        if(uid){ localStorage.removeItem(repository.accountKey("abyss-state",uid)); }
+    }catch(_){ }
 
     creationTargetSlot=1;
 
@@ -23933,7 +23894,7 @@ function showSkillNameBadge(skillName,elementType,characterIndex){
     );
 
 
-    
+
     /* V38 SOURCE-LEVEL UI SIZE FIX:
        The badge gets its final visual size at creation time.
        This is deliberately inline + !important so later CSS cannot
@@ -24054,7 +24015,7 @@ function showMonsterSkillNameBadge(
     );
 
 
-    
+
     /* V38 SOURCE-LEVEL UI SIZE FIX:
        The badge gets its final visual size at creation time.
        This is deliberately inline + !important so later CSS cannot
@@ -27785,6 +27746,10 @@ function renderSystemContent(){
             '<div class="system-panel-row">'+
                 '<div><strong>遊戲存檔</strong><small>目前遊戲會自動存檔，也可以立即手動保存。</small></div>'+
                 '<button class="home-feature-buy-btn" onclick="saveGame();alert(\'已完成手動存檔。\')">立即存檔</button>'+
+            '</div>'+
+            '<div class="system-panel-row">'+
+                '<div><strong>帳號管理</strong><small>查看目前 Firebase UID、登出或切換帳號。</small></div>'+
+                '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">開啟帳號</button>'+
             '</div>'+
             '<div class="system-panel-row danger">'+
                 '<div><strong>刪除角色</strong><small>刪除全部角色與遊戲進度，返回初始創角頁面。</small></div>'+
@@ -33747,29 +33712,7 @@ catch(error){
 }
 
 
-try{
-
-    loadGame();
-
-}
-catch(error){
-
-    console.error(
-        "讀檔流程發生未預期錯誤：",
-        error
-    );
-
-
-    $("gameInterface")
-        .style.display =
-        "none";
-
-
-    $("creationPage")
-        .style.display =
-        "block";
-
-}
+/* StartupStateMachine is the only owner allowed to select and load an account save. */
 
 
 /*

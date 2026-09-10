@@ -3,7 +3,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const eq=fs.readFileSync("js/equipment-progression.js","utf8");
 const synthesis=fs.readFileSync("js/36-v141-content-systems.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 [
@@ -29,6 +29,6 @@ assert.match(synthesis,/reforgeSlotCount\(item\)>0/);
 assert.match(synthesis,/isEquipmentInventoryType\(item\.type\)&&canActuallyReforge\(item\)/);
 assert.match(synthesis,/if\(item&&canActuallyReforge\(item\)\)\{ results\.push\(\{item,source:"已裝備"\}\); \}/);
 
-assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
+assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
 console.log("✓ V173.62 starter equipment icons and reforge eligibility filter");

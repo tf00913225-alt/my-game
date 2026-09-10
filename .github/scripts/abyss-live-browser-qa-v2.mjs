@@ -9,6 +9,7 @@ const qaUrl=`${baseUrl}/?abyss-live-qa-v2=${encodeURIComponent(expectedSha||Date
 const artifactDir=path.resolve("artifacts/browser-qa");
 fs.mkdirSync(artifactDir,{recursive:true});
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const abyssStyleReady="document.querySelector('link[data-feature-style=\"feature-abyss\"]')?.sheet";
 
 function chromeBinary(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
@@ -87,6 +88,20 @@ async function waitFor(client,expression,label,timeoutMs=30000){
     throw new Error(`Timed out waiting for ${label}. Last result: ${String(last)}`);
 }
 
+async function prepareAccountFirstRuntime(client,features){
+    await waitFor(client,"window.FourSymbolsStartupPolicy&&['AUTH_REQUIRED','NEED_CHARACTER','READY','OFFLINE_READY','ERROR'].includes(FourSymbolsStartupPolicy.getState())","account-first startup destination",30000);
+    let state=await client.eval("FourSymbolsStartupPolicy.getState()");
+    if(state==="ERROR"){ throw new Error("Live Firebase startup failed before feature QA"); }
+    if(state==="AUTH_REQUIRED"){
+        await client.eval("document.getElementById('firebaseGuestButton').click();true");
+        await waitFor(client,"['NEED_CHARACTER','READY','OFFLINE_READY','ERROR'].includes(FourSymbolsStartupPolicy.getState())","anonymous UID save resolution",60000);
+        state=await client.eval("FourSymbolsStartupPolicy.getState()");
+        if(state==="ERROR"){ throw new Error("Live anonymous UID/save resolution failed"); }
+    }
+    await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
+    return state;
+}
+
 function approx(actual,expected,tolerance,label){
     assert.ok(Number.isFinite(Number(actual)),`${label}: value is not finite (${actual})`);
     assert.ok(Math.abs(Number(actual)-Number(expected))<=tolerance,`${label}: expected about ${expected}, received ${actual}`);
@@ -129,8 +144,9 @@ try{
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
     await client.send("Page.navigate",{url:qaUrl});
     await waitFor(client,"document.readyState==='complete'","page load");
+    await prepareAccountFirstRuntime(client,["abyss"]);
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
-    await waitFor(client,"document.getElementById('v174-abyss-two-tier-style')&&document.getElementById('v174-abyss-two-tier-style').sheet","two-tier Abyss CSS");
+    await waitFor(client,abyssStyleReady,"hashed feature Abyss CSS");
 
     await client.eval(`localStorage.removeItem('v174_abyss_state_v2');localStorage.removeItem('v141_abyss_state');true`);
     await client.eval(seedPlayerExpression(20));
@@ -227,6 +243,7 @@ try{
     await client.eval(`v174AbyssResolveBattleResult('win');true`);
     await client.send("Page.reload",{ignoreCache:true});
     await waitFor(client,"document.readyState==='complete'","reload after pending chest");
+    await prepareAccountFirstRuntime(client,["abyss"]);
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true","Abyss after pending reload");
     await client.eval(seedPlayerExpression(20));
     const pendingReload=await client.eval(`(async()=>{
@@ -244,6 +261,7 @@ try{
     await sleep(1900);
     await client.send("Page.reload",{ignoreCache:true});
     await waitFor(client,"document.readyState==='complete'","reload after claimed chest");
+    await prepareAccountFirstRuntime(client,["abyss"]);
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true","Abyss after claimed reload");
     await client.eval(seedPlayerExpression(20));
     const claimedReload=await client.eval(`(async()=>{

@@ -7,7 +7,7 @@ const vm=require("node:vm");
 const source=fs.readFileSync("js/46-v155-dev-fixes.js","utf8");
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v142Source=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -56,9 +56,9 @@ function load(overrides={}){
 }
 
 test("V155 remains ordered before V158 under the current cache version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
-    assert.match(index,/js\/19-stage-v78-character-inventory-runtime\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     const v154=loader.indexOf("js/45-v154-dev-fixes.js");
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");

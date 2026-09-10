@@ -8,7 +8,7 @@ const read=path=>fs.readFileSync(path,"utf8");
 const main=read("js/00-main.js");
 const v131Css=read("css/31-v131-fix-batch.css");
 const statusPopup=read("js/41-v146-system-polish.js");
-const loader=read("js/20-anonymous-20.js");
+const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
 const index=read("index.html");
 
 let passed=0;
@@ -109,10 +109,10 @@ test("status popup stays below the HP damage lane",()=>{
 });
 
 test("development release advances to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.64"/);
-    assert.match(index,/>V173\.64<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.65"/);
+    assert.match(index,/>V173\.65<\/div>/);
 });
 
 console.log("\n"+passed+" V173.39 follow-up regression tests passed.");

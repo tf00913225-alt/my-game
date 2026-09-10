@@ -9,7 +9,7 @@ const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
 const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
 const rarityCss=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
 const spec=fs.readFileSync("docs/ITEM_RARITY_UI_SPEC.md","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const html=fs.readFileSync("index.html","utf8");
 
 test("formal item tiers are six, while talismans stop at orange",()=>{
@@ -58,6 +58,6 @@ test("rarity visuals use the locked palette and four-symbol border",()=>{
 });
 
 test("release wiring is V173.62",()=>{
-  assert.ok(loader.includes('const V_ASSET_VERSION="173.64";'));
-  assert.ok(html.includes("四象江湖傳 V173.64"));
+  assert.ok(loader.includes('const V_ASSET_VERSION="173.65";'));
+  assert.ok(html.includes("四象江湖傳 V173.65"));
 });

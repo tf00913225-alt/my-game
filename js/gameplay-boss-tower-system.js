@@ -10,7 +10,9 @@
     if(typeof window==="undefined"||window.__gameplayBossTowerInstalled){ return; }
     window.__gameplayBossTowerInstalled=true;
 
-    const MAIN_SAVE_KEY="battle_full_version_save_v5";
+    const ACCOUNT_REPOSITORY=window.FourSymbolsAccountSave;
+    const ACTIVE_UID=ACCOUNT_REPOSITORY.getActiveUid();
+    const MAIN_SAVE_KEY=ACCOUNT_REPOSITORY.saveKey(ACTIVE_UID);
     const STATE_VERSION=1;
     const TOWER_UNLOCK_LEVEL=30;
     const TOWER_FLOORS=100;
@@ -128,7 +130,7 @@
         return normalized;
     }
     function readMainSave(){
-        try{ return JSON.parse(localStorage.getItem(MAIN_SAVE_KEY)||"null"); }catch(_){ return null; }
+        try{ const result=ACCOUNT_REPOSITORY.readForUid(ACTIVE_UID); return result.status==="ready"?result.save:null; }catch(_){ return null; }
     }
 
     const initialMainSave=readMainSave();
@@ -159,7 +161,7 @@
         const save=readMainSave();
         if(save&&typeof save==="object"){
             save.gameplayProgress=serializableState();
-            try{ localStorage.setItem(MAIN_SAVE_KEY,JSON.stringify(save)); }catch(_){ }
+            try{ ACCOUNT_REPOSITORY.writeForUid(ACTIVE_UID,save,{source:"boss-tower"}); }catch(_){ }
         }
     }
     function highestCharacterLevel(){

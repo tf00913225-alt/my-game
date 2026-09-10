@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
-const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const v133Source=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
@@ -79,9 +79,9 @@ test("V141 assets remain ordered before later patches with the current cache ver
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(indexSource,/js\/00-main\.js\?v=173\.64/);
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or slot numbers",()=>{

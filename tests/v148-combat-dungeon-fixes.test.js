@@ -5,10 +5,11 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const index=fs.readFileSync("index.html","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const source=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const css=fs.readFileSync("css/43-v148-combat-dungeon-fixes.css","utf8");
+const buildSource=fs.readFileSync("scripts/build-production.mjs","utf8");
 
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
@@ -62,13 +63,13 @@ function baseContext(overrides={}){
     return context;
 }
 
-test("V148 remains ordered under the current runtime and cache key",()=>{
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(loader,/css\/43-v148-combat-dungeon-fixes\.css/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.64/);
-    const v146=loader.indexOf("js/41-v146-system-polish.js");
-    const v148=loader.indexOf("js/42-v148-combat-dungeon-fixes.js");
+test("V148 remains ordered inside the deterministic gameplay bundle",()=>{
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(buildSource,/"js\/01-stage-v8-touch-lock\.js"/);
+    assert.match(buildSource,/"css\/43-v148-combat-dungeon-fixes\.css"/);
+    const v146=buildSource.indexOf("js/41-v146-system-polish.js");
+    const v148=buildSource.indexOf("js/42-v148-combat-dungeon-fixes.js");
     assert.ok(v146>=0&&v148>v146);
     assert.match(touchLock,/\.skill-preview-body, \.creation-skill-detail-levels, #dungeonTabContent/);
     assert.match(css,/touch-action:pan-y !important/);

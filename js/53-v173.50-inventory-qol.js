@@ -10,7 +10,7 @@
     if(typeof window==="undefined"||typeof document==="undefined"||window.__v17350InventoryQolInstalled){ return; }
     window.__v17350InventoryQolInstalled=true;
 
-    const BULK_SELL_KEY="v17350_bulk_sell_quality";
+    const BULK_SELL_KEY=window.FourSymbolsAccountSave.accountKey("bulk-sell-quality");
     const EQUIPMENT_TYPES=new Set(["head","shoulder","shoes","weapon","hand","armor"]);
     const QUALITY_ORDER=["white","blue","purple","orange","pink","four-symbol"];
     const QUALITY_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
@@ -577,67 +577,6 @@
 
     ensureBulkSellBar();
 
-    function loadV17351Qa(){
-        if(typeof document==="undefined"||!document.head){ return; }
-        if(!document.getElementById("v17351-qa-style")){
-            const link=document.createElement("link");
-            link.id="v17351-qa-style";
-            link.rel="stylesheet";
-            link.href="css/53-v173.51-qa.css?v=173.64";
-            document.head.appendChild(link);
-        }
-        const queue=[
-            ["v17351-battle-qa","js/54-v173.51-battle-qa.js?v=173.64"],
-            ["v17351-inventory-qa","js/55-v173.51-inventory-qa.js?v=173.64"],
-            ["v17351-shop-qa","js/56-v173.51-shop-qa.js?v=173.64"],
-            ["v17351-quest-qa","js/57-v173.51-quest-qa.js?v=173.64"]
-        ];
-        let index=0;
-        let readySent=false;
-        const finish=function(){
-            if(readySent){ return; }
-            readySent=true;
-            window.__v17351QaReady=true;
-            try{ document.dispatchEvent(new CustomEvent("v17351:qa-ready",{detail:{loaded:queue.length,total:queue.length}})); }catch(_){ }
-        };
-        const failed=function(pair){
-            if(typeof window.__v17347RuntimeGateFail==="function"){
-                window.__v17347RuntimeGateFail("功能模組載入失敗："+String(pair&&pair[0]||"未知模組")+"。請重新整理。");
-            }
-        };
-        const reportAndNext=function(pair,script){
-            if(script){ script.dataset.loaded="1"; }
-            if(typeof window.__v173ReportRuntimeProgress==="function"){
-                window.__v173ReportRuntimeProgress(pair[0],pair[1]);
-            }
-            next();
-        };
-        const next=function(){
-            if(index>=queue.length){ finish(); return; }
-            const pair=queue[index++];
-            const existing=document.getElementById(pair[0]);
-            if(existing){
-                if(existing.dataset.loaded==="1"){
-                    if(typeof window.__v173ReportRuntimeProgress==="function"){
-                        window.__v173ReportRuntimeProgress(pair[0],pair[1]);
-                    }
-                    next();
-                    return;
-                }
-                existing.addEventListener("load",()=>reportAndNext(pair,existing),{once:true});
-                existing.addEventListener("error",()=>failed(pair),{once:true});
-                return;
-            }
-            const script=document.createElement("script");
-            script.id=pair[0];
-            script.src=pair[1];
-            script.async=false;
-            script.addEventListener("load",()=>reportAndNext(pair,script),{once:true});
-            script.addEventListener("error",()=>failed(pair),{once:true});
-            document.head.appendChild(script);
-        };
-        next();
-    }
-    loadV17351Qa();
+    /* QA compatibility owners follow this source inside gameplay-core. */
 
 })();

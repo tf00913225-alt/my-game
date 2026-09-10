@@ -4,8 +4,10 @@ const fs=require("node:fs");
 
 const source=fs.readFileSync("js/equipment-progression.js","utf8");
 const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
+const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 
-assert.match(ui,/js\/equipment-progression\.js\?v=173\.64/);
+assert.match(build,/"js\/51-v169-rpg-ui\.js"[\s\S]*?"js\/equipment-progression\.js"/);
+assert.doesNotMatch(ui,/createElement\(["']script["']\)|equipment-progression\.js\?v=/);
 /* Ordinary equipment/shop odds remain unchanged; chest odds are independent. */
 assert.match(source,/\{key:"white",label:"白階",chance:40,min:1,max:3,reforgeSlots:0/);
 assert.match(source,/\{key:"blue",label:"藍階",chance:40,min:4,max:6,reforgeSlots:0/);

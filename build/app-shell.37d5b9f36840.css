@@ -1,0 +1,3749 @@
+
+/* bundled source: css/01-stage-v8-map-page-fix.css */
+/* =====================================================
+   V8 — MAP / TRAINING GAMEPLAY PAGE FIX
+   - Remove the legacy 34px compact header band.
+   - Make the map page occupy the complete legacy design surface.
+   - Prevent page-level vertical overflow.
+   - Keep internal map coordinates and gameplay logic unchanged.
+===================================================== */
+
+#game-stage > #app > #game-content #mapPage,
+#game-stage > #app > #game-content #trainingPage{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+}
+
+/* The background layer belongs to the map/training surface,
+   not to the real browser viewport. */
+#game-stage > #app > #game-content .training-bg-fixed-layer,
+#game-stage > #app > #game-content .map-bg-fixed-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    margin:0 !important;
+}
+
+/* Map navigation remains anchored to the bottom of the virtual surface. */
+#game-stage > #app > #game-content #mapPageNav{
+    bottom:0 !important;
+}
+
+/* Never allow the map/training page itself to become the scrolling layer. */
+#game-stage > #app > #game-content #mapPage,
+#game-stage > #app > #game-content #trainingPage{
+    overscroll-behavior:none !important;
+    touch-action:none !important;
+}
+
+
+/* bundled source: css/02-stage-v3-layout-fix.css */
+/* =====================================================
+   V3 FIX — ALL LEGACY UI MUST STAY INSIDE THE 420×746.6667
+   DESIGN SURFACE, WHICH IS THEN SCALED TO 1080×1920.
+   This specifically fixes bottom navigation escaping/clipping
+   outside the scaled game surface.
+===================================================== */
+#game-stage > #app > #game-content{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    margin:0 !important;
+    padding:0 !important;
+    transform:scale(2.571428571428571) !important;
+    transform-origin:top left !important;
+    overflow:hidden !important;
+}
+
+/* Main navigation: never use viewport centering inside the stage. */
+#game-stage > #app > #game-content .bottom-nav,
+#game-stage > #app > #game-content #mapPageNav{
+    position:absolute !important;
+    left:0 !important;
+    right:auto !important;
+    bottom:0 !important;
+    width:420px !important;
+    max-width:none !important;
+    height:70px !important;
+    margin:0 !important;
+    transform:none !important;
+    box-sizing:border-box !important;
+}
+
+/* Full-screen overlays must use the virtual design surface,
+   not the real browser viewport. */
+#game-stage > #app > #game-content .home-bg-fixed-layer,
+#game-stage > #app > #game-content .map-bg-fixed-layer,
+#game-stage > #app > #game-content .training-bg-fixed-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:420px !important;
+    height:746.6666667px !important;
+}
+
+#game-stage > #app > #game-content .home-feature-modal,
+#game-stage > #app > #game-content .item-modal,
+#game-stage > #app > #game-content .modal,
+#game-stage > #app > #game-content .popup-overlay{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:420px !important;
+    height:746.6666667px !important;
+}
+
+#game-stage > #app > #game-content #mapBattleOverlay{
+    position:absolute !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:70px !important;
+    width:420px !important;
+    box-sizing:border-box !important;
+}
+
+/* Any direct full-width bottom-fixed element created by existing
+   game code is constrained to the legacy surface. */
+#game-stage > #app > #game-content > div[style*="position:fixed"][style*="bottom:0"]{
+    position:absolute !important;
+    left:0 !important;
+    right:auto !important;
+    bottom:0 !important;
+    width:420px !important;
+}
+
+
+/* bundled source: css/03-stage-v4-viewport-lock.css */
+/* =====================================================
+   V5 — REAL VIEWPORT LOCK + LAYOUT-VIEWPORT CENTERING
+   The browser viewport is a fixed clipping surface.
+   The 1080×1920 stage is scaled inside it and can never
+   enlarge the document's scrollable area.
+===================================================== */
+html, body{
+    width:100%;
+    height:100%;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+    position:fixed !important;
+    inset:0 !important;
+}
+
+#game-viewport{
+    position:fixed !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+    background:#0c0b0a !important;
+    contain:strict !important;
+    isolation:isolate !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+}
+
+#game-stage{
+    position:relative !important;
+    flex:0 0 1080px !important;
+    width:1080px !important;
+    height:1920px !important;
+    left:auto !important;
+    top:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    transform-origin:center center !important;
+    z-index:0 !important;
+    contain:layout paint size !important;
+    will-change:transform;
+}
+
+#game-stage > #app{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+}
+
+/* No descendant may create a document-level horizontal overflow. */
+#game-viewport #game-stage,
+#game-viewport #game-stage > #app,
+#game-viewport #game-stage > #app > #game-content{
+    max-width:none !important;
+}
+
+/* Overlay remains inside the clipped game viewport. */
+#game-stage > #game-overlay-layer{
+    overflow:hidden !important;
+}
+
+/* V5 viewport surface: the game itself occupies the browser layout viewport. */
+html, body, #game-viewport{
+    width:100%;
+    height:100%;
+    min-width:0;
+    min-height:0;
+}
+#game-viewport{
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+}
+
+
+/* bundled source: css/04-v119-ally-target-style.css */
+/* V119：我方單體技能選人，只在目標選擇階段顯示，不改原玩家卡尺寸/排版。 */
+#game-stage > #app > #game-content #battlePage .battle-player.ally-targetable{
+    cursor:pointer;
+    outline:3px solid rgba(224,186,92,.95);
+    outline-offset:2px;
+    box-shadow:0 0 12px rgba(224,186,92,.75);
+}
+#game-stage > #app > #game-content #battlePage .battle-player.ally-targetable:active{
+    transform:scale(.98);
+}
+#game-stage > #app > #game-content #battlePage .battle-player.ally-target{
+    outline:3px solid rgba(255,225,126,1);
+}
+
+
+/* bundled source: css/06-stage-v11-native-bottom-nav.css */
+/* ============================================================
+   V11 — FIRST REAL NATIVE UI MIGRATION: BOTTOM NAVIGATION
+
+   The existing bottom navigation is visually preserved.
+   Its final placement is now expressed in the native 1080×1920
+   coordinate system, rather than being tied to browser viewport
+   positioning.
+
+   Legacy gameplay remains untouched.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-bottom-nav-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-bottom-nav-layer .native-bottom-nav{
+    position:absolute !important;
+
+    /* Legacy 420px design translated to native 1080px space */
+    left:0 !important;
+    bottom:0 !important;
+
+    width:1080px !important;
+
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+
+    display:flex !important;
+    justify-content:center !important;
+    align-items:flex-end !important;
+}
+
+
+/* bundled source: css/07-stage-v13-native-map-nav.css */
+/* ============================================================
+   V13 — NATIVE MIGRATION: MAP / TRAINING BOTTOM NAV
+
+   V11 migrated the main bottom navigation.
+   V13 gives the map/training navigation the same native 1080×1920
+   coordinate standard. Existing visual appearance and handlers
+   are preserved.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-map-nav-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-map-nav-layer .native-map-nav{
+    position:absolute !important;
+    left:0 !important;
+    bottom:0 !important;
+    width:1080px !important;
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+}
+
+
+/* bundled source: css/08-stage-v14-character-scroll-fix.css */
+/* ============================================================
+   V14 — CHARACTER / SKILL / STATUS / AUTO-BATTLE SCROLL FIX
+
+   These are intentional internal scroll areas. The game surface itself
+   remains locked against page dragging.
+============================================================ */
+
+#characterTabContent{
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior:contain !important;
+    touch-action:pan-y !important;
+    min-height:0 !important;
+    box-sizing:border-box !important;
+}
+
+#characterTabContent > #statusPage,
+#characterTabContent > #skillPage,
+#characterTabContent > #inventoryPage{
+    min-height:0 !important;
+    overflow:visible !important;
+}
+
+#homeFeatureModal .home-feature-modal-box{
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior:contain !important;
+    touch-action:pan-y !important;
+}
+
+/*
+   ★ 修正（依照使用者回報「自動戰鬥設定不用又有一個內框，
+   直接一個框就好，然後把框放大，讓所有按鈕文字一次就呈現，
+   無需捲動」）：
+   這裡原本的max-height:70dvh把面板單獨鎖死在比外層
+   .home-feature-modal-box（max-height:96dvh）矮很多的高度，
+   造成「外層框還有空間、內層框卻先被截斷還要自己捲動」的
+   雙框+內部捲動怪象。拿掉這個獨立的高度上限跟自己的
+   overflow-y:auto，讓這個面板單純隨內容長高，捲動完全交給
+   外層.home-feature-modal-box（本來就有overflow-y:auto+
+   96dvh）一個人負責，視覺上也不會再有兩層邊框疊在一起。
+*/
+#homeFeatureModal .auto-settings-expanded{
+    overflow:visible !important;
+    touch-action:pan-y !important;
+    max-height:none !important;
+}
+
+/*
+   ★ 同一輪修正：面板本身的金色邊框/深底/圓角/padding
+   （.auto-settings-expanded基礎樣式，00-main.css）在借進
+   #homeFeatureModal之後，會疊在外層.home-feature-modal-box
+   自己的邊框/底色上，變成「一個框裡面又一個框」。這裡拿掉
+   面板自己的視覺框，只留外層那一個，padding也拿掉——外層
+   本來就有16px padding，內容不會貼邊。
+*/
+#homeFeatureModal #autoBattleSettingsPanel.auto-settings-expanded{
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    padding:0 !important;
+}
+
+/* When the status/skill pages are borrowed into the character modal,
+   their old full-page layout must not create a second competing scroll. */
+#characterTabContent #statusPage,
+#characterTabContent #skillPage,
+#characterTabContent #inventoryPage{
+    height:auto !important;
+    max-height:none !important;
+}
+
+
+/* bundled source: css/09-stage-v15-native-character-shell.css */
+/* ============================================================
+   V15 — NATIVE MIGRATION: CHARACTER PAGE SHELL
+
+   The character page shell now lives in the native 1080×1920
+   overlay coordinate system. Its internal scrolling/content
+   behavior from V14 is preserved.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-character-shell-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-character-shell-layer .native-character-shell{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+}
+
+
+<script id="stage-v15-native-character-shell-runtime">
+(function(){
+    "use strict";
+
+    function migrateCharacterShell(){
+        const overlay = document.getElementById("game-overlay-layer");
+        if(!overlay) return;
+
+        /*
+         * Locate the existing character page by stable semantic IDs/classes.
+         * Do not assume a new game mechanic or replace its DOM.
+         */
+        const candidates = [
+            document.getElementById("characterPage"),
+            document.getElementById("characterModal"),
+            document.querySelector("#game-content .character-page"),
+            document.querySelector("#game-content .character-modal")
+        ].filter(Boolean);
+
+        const shell = candidates.find(function(el){
+            return el.dataset && el.dataset.nativeV15 !== "true";
+        });
+
+        if(!shell) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "native-character-shell-layer";
+        wrapper.dataset.nativeV15 = "true";
+
+        const nativeShell = document.createElement("div");
+        nativeShell.className = "native-character-shell";
+        nativeShell.dataset.nativeV15 = "true";
+
+        shell.parentNode.insertBefore(wrapper, shell);
+        wrapper.appendChild(nativeShell);
+        nativeShell.appendChild(shell);
+
+        /*
+         * Remove viewport-dependent positioning from the outer shell only.
+         * Internal content, scrolling containers, buttons, tabs and handlers
+         * remain untouched.
+         */
+        shell.style.position = "absolute";
+        shell.style.left = "0";
+        shell.style.top = "0";
+        shell.style.right = "auto";
+        shell.style.bottom = "auto";
+        shell.style.transform = "none";
+        shell.style.margin = "0";
+
+        shell.dataset.nativeV15 = "true";
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", migrateCharacterShell, {once:true});
+    }else{
+        migrateCharacterShell();
+    }
+
+    const observer = new MutationObserver(function(){
+        migrateCharacterShell();
+    });
+
+    observer.observe(document.body, {
+        childList:true,
+        subtree:true
+    });
+
+    window.migrateCharacterShellToNative1080 = migrateCharacterShell;
+})();
+</script>
+
+
+<style id="stage-v16-native-inventory-quest">
+/* ============================================================
+   V16 — NATIVE MIGRATION: INVENTORY/EQUIPMENT + QUEST/ACHIEVEMENT
+
+   Only the outer panel shells are migrated. Existing internal
+   scrolling, data rendering, tabs, buttons and event handlers
+   remain untouched.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-panel-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-panel-shell{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+}
+
+
+<script id="stage-v16-native-inventory-quest-runtime">
+(function(){
+    "use strict";
+
+    function alreadyMigrated(el){
+        return el && el.dataset && el.dataset.nativeV16 === "true";
+    }
+
+    function migratePanel(el, family){
+        if(!el || alreadyMigrated(el)) return;
+
+        const overlay = document.getElementById("game-overlay-layer");
+        if(!overlay) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "native-panel-layer native-" + family + "-layer";
+        wrapper.dataset.nativeV16 = "true";
+        wrapper.dataset.nativeFamily = family;
+
+        const shell = document.createElement("div");
+        shell.className = "native-panel-shell native-" + family + "-shell";
+        shell.dataset.nativeV16 = "true";
+
+        el.parentNode.insertBefore(wrapper, el);
+        wrapper.appendChild(shell);
+        shell.appendChild(el);
+
+        /*
+         * Strip only viewport-level positioning from the outer panel.
+         * Internal content and existing handlers are not rewritten.
+         */
+        el.style.position = "absolute";
+        el.style.left = "0";
+        el.style.top = "0";
+        el.style.right = "auto";
+        el.style.bottom = "auto";
+        el.style.transform = "none";
+        el.style.margin = "0";
+
+        el.dataset.nativeV16 = "true";
+    }
+
+    function migrateInventoryEquipment(){
+        const candidates = [
+            /* V81: #inventoryPage MUST remain under #game-content .content.
+               Direct inventory uses .content as its single native scroll owner;
+               migrating it into #game-overlay-layer breaks clipping against
+               the bottom navigation and makes .content sizing ineffective. */
+            document.getElementById("equipmentPage"),
+            document.getElementById("inventoryModal"),
+            document.getElementById("equipmentModal"),
+            document.querySelector("#game-content .inventory-page"),
+            document.querySelector("#game-content .equipment-page"),
+            document.querySelector("#game-content .inventory-modal"),
+            document.querySelector("#game-content .equipment-modal")
+        ].filter(Boolean);
+
+        candidates.forEach(function(el){
+            migratePanel(el, "inventory-equipment");
+        });
+    }
+
+    function migrateQuestAchievement(){
+        const candidates = [
+            document.getElementById("questPage"),
+            document.getElementById("missionPage"),
+            document.getElementById("achievementPage"),
+            document.getElementById("questModal"),
+            document.getElementById("missionModal"),
+            document.getElementById("achievementModal"),
+            document.querySelector("#game-content .quest-page"),
+            document.querySelector("#game-content .mission-page"),
+            document.querySelector("#game-content .achievement-page"),
+            document.querySelector("#game-content .quest-modal"),
+            document.querySelector("#game-content .mission-modal"),
+            document.querySelector("#game-content .achievement-modal")
+        ].filter(Boolean);
+
+        candidates.forEach(function(el){
+            migratePanel(el, "quest-achievement");
+        });
+    }
+
+    function migrateV16Panels(){
+        migrateInventoryEquipment();
+        migrateQuestAchievement();
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", migrateV16Panels, {once:true});
+    }else{
+        migrateV16Panels();
+    }
+
+    const observer = new MutationObserver(function(){
+        migrateV16Panels();
+    });
+
+    observer.observe(document.body, {
+        childList:true,
+        subtree:true
+    });
+
+    window.migrateV16PanelsToNative1080 = migrateV16Panels;
+})();
+</script>
+
+
+<style id="stage-v17-native-home-settings">
+/* ============================================================
+   V17 — NATIVE MIGRATION: HOME FEATURE + SETTINGS/SYSTEM PANELS
+
+   Outer shells move to native 1080×1920 coordinates.
+   Existing content, buttons, data, scroll containers and event
+   handlers remain untouched.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-v17-panel-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-v17-panel-shell{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+}
+
+/* V94 ROOT FIX — V17把homeFeatureModal／trainingZoneModal搬到1080 overlay後，
+   必須明確恢復它們原本的420×746.6667邏輯畫布尺寸。
+   V27後續再統一scale(1080/420)，如此遮罩與內容從第一幀
+   就有固定幾何，不再由absolute auto size反覆重算。 */
+#game-stage > #game-overlay-layer
+.native-v17-home-feature-shell > #homeFeatureModal,
+#game-stage > #game-overlay-layer
+.native-v17-home-feature-shell > #trainingZoneModal{
+    width:420px !important;
+    height:746.6666667px !important;
+    min-width:420px !important;
+    min-height:746.6666667px !important;
+    max-width:none !important;
+    max-height:none !important;
+    right:auto !important;
+    bottom:auto !important;
+    box-sizing:border-box !important;
+}
+
+
+<script id="stage-v17-native-home-settings-runtime">
+(function(){
+    "use strict";
+
+    function migratePanel(el, family){
+        if(!el || (el.dataset && el.dataset.nativeV17 === "true")) return;
+
+        const overlay = document.getElementById("game-overlay-layer");
+        if(!overlay) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "native-v17-panel-layer native-v17-" + family + "-layer";
+        wrapper.dataset.nativeV17 = "true";
+        wrapper.dataset.nativeFamily = family;
+
+        const shell = document.createElement("div");
+        shell.className = "native-v17-panel-shell native-v17-" + family + "-shell";
+        shell.dataset.nativeV17 = "true";
+
+        el.parentNode.insertBefore(wrapper, el);
+        wrapper.appendChild(shell);
+        shell.appendChild(el);
+
+        el.style.position = "absolute";
+        el.style.left = "0";
+        el.style.top = "0";
+        el.style.right = "auto";
+        el.style.bottom = "auto";
+        el.style.transform = "none";
+        el.style.margin = "0";
+
+        el.dataset.nativeV17 = "true";
+    }
+
+    function migrateHomeFeaturePanels(){
+        const candidates = [
+            document.getElementById("homeFeatureModal"),
+            document.getElementById("home-feature-modal"),
+            document.querySelector("#game-content .home-feature-modal"),
+            document.querySelector("#game-content .feature-modal")
+        ].filter(Boolean);
+
+        candidates.forEach(function(el){
+            migratePanel(el, "home-feature");
+        });
+    }
+
+    function migrateSettingsPanels(){
+        const candidates = [
+            document.getElementById("settingsPage"),
+            document.getElementById("systemSettingsPage"),
+            document.getElementById("settingsModal"),
+            document.getElementById("systemSettingsModal"),
+            document.querySelector("#game-content .settings-page"),
+            document.querySelector("#game-content .system-settings-page"),
+            document.querySelector("#game-content .settings-modal")
+        ].filter(Boolean);
+
+        candidates.forEach(function(el){
+            migratePanel(el, "settings");
+        });
+    }
+
+    function migrateV17(){
+        migrateHomeFeaturePanels();
+        migrateSettingsPanels();
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", migrateV17, {once:true});
+    }else{
+        migrateV17();
+    }
+
+    const observer = new MutationObserver(function(){
+        migrateV17();
+    });
+
+    observer.observe(document.body, {
+        childList:true,
+        subtree:true
+    });
+
+    window.migrateV17HomeSettingsToNative1080 = migrateV17;
+})();
+</script>
+
+
+<style id="stage-v18-native-detail-modals">
+/* ============================================================
+   V18 — NATIVE MIGRATION: DETAIL / UTILITY MODALS
+
+   Migrated together because these are independent overlay panels:
+   - item detail
+   - skill detail
+   - status help
+   - level-up
+   - second-character creation
+
+   Their internal content and existing handlers are preserved.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-v18-modal-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-v18-modal-layer > .native-v18-modal{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+    margin:0 !important;
+}
+
+/* These were previously fixed to the legacy 420px design surface.
+   Now their backdrop itself belongs to the native stage. */
+#game-stage > #game-overlay-layer .native-v18-modal-layer .item-modal,
+#game-stage > #game-overlay-layer .native-v18-modal-layer .modal{
+    position:absolute !important;
+    inset:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    box-sizing:border-box !important;
+    margin:0 !important;
+}
+
+/* Preserve modal inner proportions while allowing the native outer
+   coordinate system to determine the final on-screen scale. */
+#game-stage > #game-overlay-layer .native-v18-modal-layer .item-modal-box,
+#game-stage > #game-overlay-layer .native-v18-modal-layer .modal-box{
+    box-sizing:border-box;
+}
+
+
+<script id="stage-v18-native-detail-modals-runtime">
+(function(){
+    "use strict";
+
+    const MODAL_IDS = [
+        ["itemModal", "item-detail"],
+        ["skillDetailModal", "skill-detail"],
+        ["statusHelpModal", "status-help"],
+        ["levelModal", "level-up"],
+        ["secondCharacterModal", "second-character"]
+    ];
+
+    function migrateModal(id, family){
+        const modal = document.getElementById(id);
+        const overlay = document.getElementById("game-overlay-layer");
+
+        if(!modal || !overlay || modal.dataset.nativeV18 === "true"){
+            return;
+        }
+
+        const wrapper = document.createElement("div");
+        wrapper.className =
+            "native-v18-modal-layer native-v18-" + family + "-layer";
+        wrapper.dataset.nativeV18 = "true";
+        wrapper.dataset.nativeV18Family = family;
+
+        const nativeModal = document.createElement("div");
+        nativeModal.className = "native-v18-modal";
+        nativeModal.dataset.nativeV18 = "true";
+
+        /*
+         * Move the existing modal without cloning it.
+         * Existing IDs, inline onclick handlers and JS references remain valid.
+         */
+        modal.parentNode.insertBefore(wrapper, modal);
+        wrapper.appendChild(nativeModal);
+        nativeModal.appendChild(modal);
+
+        /*
+         * The modal itself is now positioned relative to the native stage,
+         * not the browser viewport.
+         */
+        modal.style.position = "absolute";
+        modal.style.left = "0";
+        modal.style.top = "0";
+        modal.style.right = "auto";
+        modal.style.bottom = "auto";
+        modal.style.margin = "0";
+        modal.style.transform = "none";
+
+        modal.dataset.nativeV18 = "true";
+    }
+
+    function migrateV18(){
+        MODAL_IDS.forEach(function(pair){
+            migrateModal(pair[0], pair[1]);
+        });
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", migrateV18, {once:true});
+    }else{
+        migrateV18();
+    }
+
+    const observer = new MutationObserver(function(){
+        migrateV18();
+    });
+
+    observer.observe(document.body, {
+        childList:true,
+        subtree:true
+    });
+
+    window.migrateV18DetailModalsToNative1080 = migrateV18;
+})();
+</script>
+
+
+<style id="stage-v19-native-utility-overlays">
+/* ============================================================
+   V19 — NATIVE MIGRATION: NOTIFICATION / CONFIRM / TOAST / HELP
+
+   These lightweight overlays are migrated together. Their existing
+   DOM, IDs, handlers and visual content remain intact.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-v19-overlay-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-v19-overlay-shell{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+}
+
+
+<script id="stage-v19-native-utility-overlays-runtime">
+(function(){
+    "use strict";
+
+    /*
+     * V19 deliberately uses semantic/class discovery instead of assuming
+     * one exact ID for every utility overlay. Only overlays whose names
+     * clearly identify them as notification/confirm/toast/help/info UI
+     * are migrated.
+     */
+    const ID_FAMILIES = [
+        ["notificationModal", "notification"],
+        ["confirmModal", "confirm"],
+        ["helpModal", "help"],
+        ["infoModal", "info"],
+        ["toastModal", "toast"]
+    ];
+
+    const CLASS_FAMILIES = [
+        [".notification-modal", "notification"],
+        [".confirm-modal", "confirm"],
+        [".help-modal", "help"],
+        [".info-modal", "info"],
+        [".toast-modal", "toast"]
+    ];
+
+    function migrate(el, family){
+        if(!el || (el.dataset && el.dataset.nativeV19 === "true")) return;
+
+        const overlay = document.getElementById("game-overlay-layer");
+        if(!overlay || !el.parentNode) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.className =
+            "native-v19-overlay-layer native-v19-" + family + "-layer";
+        wrapper.dataset.nativeV19 = "true";
+        wrapper.dataset.nativeV19Family = family;
+
+        const shell = document.createElement("div");
+        shell.className =
+            "native-v19-overlay-shell native-v19-" + family + "-shell";
+        shell.dataset.nativeV19 = "true";
+
+        el.parentNode.insertBefore(wrapper, el);
+        wrapper.appendChild(shell);
+        shell.appendChild(el);
+
+        /*
+         * Preserve the element itself. Only remove viewport-level positioning
+         * from its outermost node.
+         */
+        el.style.position = "absolute";
+        el.style.left = "0";
+        el.style.top = "0";
+        el.style.right = "auto";
+        el.style.bottom = "auto";
+        el.style.transform = "none";
+        el.style.margin = "0";
+
+        el.dataset.nativeV19 = "true";
+    }
+
+    function migrateAll(){
+        ID_FAMILIES.forEach(function(pair){
+            const el = document.getElementById(pair[0]);
+            if(el) migrate(el, pair[1]);
+        });
+
+        CLASS_FAMILIES.forEach(function(pair){
+            document.querySelectorAll(
+                "#game-content " + pair[0] +
+                ", #game-stage " + pair[0]
+            ).forEach(function(el){
+                migrate(el, pair[1]);
+            });
+        });
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", migrateAll, {once:true});
+    }else{
+        migrateAll();
+    }
+
+    const observer = new MutationObserver(function(){
+        migrateAll();
+    });
+
+    observer.observe(document.body, {
+        childList:true,
+        subtree:true
+    });
+
+    window.migrateV19UtilityOverlaysToNative1080 = migrateAll;
+})();
+</script>
+
+
+<style id="stage-v20-native-battle-shell">
+/* ============================================================
+   V20 — NATIVE MIGRATION: BATTLE UI OUTER SHELL
+
+   IMPORTANT:
+   This version migrates ONLY the outer battle UI shell.
+   Character/enemy combat logic, formulas, turn order, skills,
+   auto-battle, patrol, VFX and battle-log scrolling are untouched.
+
+   Existing inner battle elements remain in their original DOM.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-v20-battle-layer{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    pointer-events:none !important;
+}
+
+#game-stage > #game-overlay-layer .native-v20-battle-shell{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    box-sizing:border-box !important;
+    pointer-events:auto !important;
+}
+
+/* Do not allow an accidentally inherited viewport transform on the
+   migrated battle outer container. */
+#game-stage > #game-overlay-layer .native-v20-battle-shell > *{
+    box-sizing:border-box;
+}
+
+
+<script id="stage-v20-native-battle-shell-runtime">
+(function(){
+    "use strict";
+
+    /*
+     * Battle shell migration is deliberately conservative.
+     * We first identify the existing battle container using stable
+     * semantic IDs/classes. If the current file does not expose a
+     * matching container, nothing is moved.
+     *
+     * This avoids guessing and accidentally moving a gameplay element.
+     */
+    const ID_CANDIDATES = [
+        ["battlePage", "battle"],
+        ["battleScreen", "battle"],
+        ["battleContainer", "battle"],
+        ["battleArea", "battle"]
+    ];
+
+    const CLASS_CANDIDATES = [
+        [".battle-page", "battle"],
+        [".battle-screen", "battle"],
+        [".battle-container", "battle"],
+        [".battle-area", "battle"]
+    ];
+
+    function isAlreadyMigrated(el){
+        return el && el.dataset && el.dataset.nativeV20 === "true";
+    }
+
+    function migrateBattleShell(el){
+        if(!el || isAlreadyMigrated(el)) return;
+
+        const overlay = document.getElementById("game-overlay-layer");
+        if(!overlay || !el.parentNode) return;
+
+        /*
+         * Safety: do not migrate a generic element that contains the
+         * whole game. Only a semantically named battle container qualifies.
+         */
+        const wrapper = document.createElement("div");
+        wrapper.className = "native-v20-battle-layer";
+        wrapper.dataset.nativeV20 = "true";
+
+        const shell = document.createElement("div");
+        shell.className = "native-v20-battle-shell";
+        shell.dataset.nativeV20 = "true";
+
+        el.parentNode.insertBefore(wrapper, el);
+        wrapper.appendChild(shell);
+        shell.appendChild(el);
+
+        /*
+         * Only outer positioning is normalized. Children retain their
+         * current sizes, IDs, transforms, handlers and combat behavior.
+         */
+        el.style.position = "absolute";
+        el.style.left = "0";
+        el.style.top = "0";
+        el.style.right = "auto";
+        el.style.bottom = "auto";
+        el.style.transform = "none";
+        el.style.margin = "0";
+
+        el.dataset.nativeV20 = "true";
+    }
+
+    function findBattleShell(){
+        for(const pair of ID_CANDIDATES){
+            const el = document.getElementById(pair[0]);
+            if(el) return el;
+        }
+
+        for(const pair of CLASS_CANDIDATES){
+            const el = document.querySelector(
+                "#game-content " + pair[0] +
+                ", #game-stage " + pair[0]
+            );
+            if(el) return el;
+        }
+
+        return null;
+    }
+
+    function migrateV20(){
+        const battle = findBattleShell();
+        if(battle) migrateBattleShell(battle);
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", migrateV20, {once:true});
+    }else{
+        migrateV20();
+    }
+
+    const observer = new MutationObserver(function(){
+        migrateV20();
+    });
+
+    observer.observe(document.body, {
+        childList:true,
+        subtree:true
+    });
+
+    window.migrateBattleShellToNative1080 = migrateV20;
+})();
+</script>
+
+
+<style id="stage-v21-native-design-system">
+/* ============================================================
+   V21 — NATIVE 1080×1920 DESIGN SYSTEM
+
+   IMPORTANT:
+   This version establishes the final native sizing standard without
+   globally multiplying every existing legacy px value.
+
+   Legacy content remains visually stable.
+   New / explicitly migrated components can use:
+       --native-*
+   or class:
+       .native-design-element
+
+   Conversion:
+       native = legacy * 1080 / 420
+       native = legacy * 1920 / 746.6666667
+
+   Both ratios are intentionally identical.
+============================================================ */
+
+:root{
+    --game-native-width:1080px;
+    --game-native-height:1920px;
+
+    --game-legacy-width:420px;
+    --game-legacy-height:746.6666667px;
+
+    --legacy-to-native:2.5714285714285714;
+}
+
+/* Native design surface. */
+#game-stage > #game-overlay-layer .native-design-surface{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:1080px !important;
+    height:1920px !important;
+    box-sizing:border-box !important;
+    transform:none !important;
+    transform-origin:top left !important;
+}
+
+/* Explicit native element. */
+#game-stage > #game-overlay-layer .native-design-element{
+    box-sizing:border-box;
+}
+
+/*
+ * Useful native text sizes.
+ * These are variables, not global overrides, so existing UI is untouched.
+ */
+.native-text-xs{font-size:28px !important;}
+.native-text-sm{font-size:34px !important;}
+.native-text-md{font-size:41px !important;}
+.native-text-lg{font-size:46px !important;}
+.native-text-xl{font-size:51px !important;}
+.native-text-xxl{font-size:62px !important;}
+
+/*
+ * Utility: a component can opt into native sizing while remaining inside
+ * the already-working stage scale.
+ */
+.native-size-1px{
+    width:2.5714285714px !important;
+    height:2.5714285714px !important;
+}
+
+
+<script id="stage-v21-native-design-api">
+(function(){
+    "use strict";
+
+    const LEGACY_W = 420;
+    const NATIVE_W = 1080;
+    const RATIO = NATIVE_W / LEGACY_W;
+
+    function legacyToNative(value){
+        return Number(value) * RATIO;
+    }
+
+    function nativeToLegacy(value){
+        return Number(value) / RATIO;
+    }
+
+    function legacyRectToNative(x, y, width, height){
+        return {
+            x: legacyToNative(x),
+            y: legacyToNative(y),
+            width: legacyToNative(width),
+            height: legacyToNative(height)
+        };
+    }
+
+    function setNativeStyle(el, style){
+        if(!el || !style) return;
+
+        Object.keys(style).forEach(function(key){
+            let value = style[key];
+
+            /*
+             * Explicit numeric values are interpreted as native pixels.
+             * Strings are left untouched for cases such as calc(), colors,
+             * percentages that are intentionally component-local, etc.
+             */
+            if(typeof value === "number"){
+                value = value + "px";
+            }
+
+            el.style[key] = value;
+        });
+
+        el.classList.add("native-design-element");
+    }
+
+    window.GAME_NATIVE_DESIGN = Object.freeze({
+        width: NATIVE_W,
+        height: 1920,
+        ratio: RATIO,
+        legacyToNative,
+        nativeToLegacy,
+        legacyRectToNative,
+        setNativeStyle
+    });
+})();
+</script>
+
+
+<style id="stage-v22-native-size-normalization">
+/* ============================================================
+   V22 — NATIVE SIZE NORMALIZATION BASE
+
+   The native stage is 1080×1920. Existing legacy child UI is not
+   globally multiplied. Instead, already-migrated UI families get
+   an explicit native visual-size context.
+
+   This avoids changing battle/core systems while we gradually
+   normalize UI text/icon/button dimensions.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-bottom-nav-layer,
+#game-stage > #game-overlay-layer .native-map-nav-layer,
+#game-stage > #game-overlay-layer .native-character-shell-layer,
+#game-stage > #game-overlay-layer .native-panel-layer,
+#game-stage > #game-overlay-layer .native-v17-panel-layer,
+#game-stage > #game-overlay-layer .native-v18-modal-layer,
+#game-stage > #game-overlay-layer .native-v19-overlay-layer,
+#game-stage > #game-overlay-layer .native-v20-battle-layer{
+    --native-ui-ratio:2.5714285714;
+    --native-font-ratio:2.5714285714;
+    --native-icon-ratio:2.5714285714;
+}
+
+/*
+ * Utility classes for components explicitly converted to native sizes.
+ * Nothing in the existing game automatically receives these classes.
+ */
+.native-ui-text-legacy{
+    font-size:calc(var(--legacy-font-size, 16px) * 2.5714285714) !important;
+}
+
+.native-ui-icon-legacy{
+    width:calc(var(--legacy-icon-size, 40px) * 2.5714285714) !important;
+    height:calc(var(--legacy-icon-size, 40px) * 2.5714285714) !important;
+}
+
+.native-ui-button-legacy{
+    width:calc(var(--legacy-button-width, 80px) * 2.5714285714) !important;
+    min-height:calc(var(--legacy-button-height, 50px) * 2.5714285714) !important;
+    box-sizing:border-box !important;
+}
+
+
+<script id="stage-v22-native-size-api">
+(function(){
+    "use strict";
+
+    const RATIO = 1080 / 420;
+
+    /*
+     * Convert legacy design dimensions to the final native design dimensions.
+     * These helpers are opt-in: they do not modify existing UI automatically.
+     */
+    function nativePx(legacyPx){
+        return Number(legacyPx) * RATIO;
+    }
+
+    function applyNativeFont(el, legacyPx){
+        if(!el) return;
+        el.style.fontSize = nativePx(legacyPx) + "px";
+        el.classList.add("native-ui-text-legacy");
+        el.style.setProperty("--legacy-font-size", legacyPx + "px");
+    }
+
+    function applyNativeIcon(el, legacyPx){
+        if(!el) return;
+        const size = nativePx(legacyPx);
+        el.style.width = size + "px";
+        el.style.height = size + "px";
+        el.classList.add("native-ui-icon-legacy");
+        el.style.setProperty("--legacy-icon-size", legacyPx + "px");
+    }
+
+    function applyNativeButton(el, legacyWidth, legacyHeight){
+        if(!el) return;
+        el.style.width = nativePx(legacyWidth) + "px";
+        el.style.minHeight = nativePx(legacyHeight) + "px";
+        el.classList.add("native-ui-button-legacy");
+        el.style.setProperty("--legacy-button-width", legacyWidth + "px");
+        el.style.setProperty("--legacy-button-height", legacyHeight + "px");
+    }
+
+    window.GAME_NATIVE_DESIGN.nativePx = nativePx;
+    window.GAME_NATIVE_DESIGN.applyNativeFont = applyNativeFont;
+    window.GAME_NATIVE_DESIGN.applyNativeIcon = applyNativeIcon;
+    window.GAME_NATIVE_DESIGN.applyNativeButton = applyNativeButton;
+})();
+</script>
+
+
+<style id="stage-v23-native-character-ui">
+/* ============================================================
+   V23 — REAL NATIVE SIZE MIGRATION: CHARACTER UI
+
+   Character page was already migrated structurally in V15.
+   This pass normalizes only its text/icon/button sizing.
+   Existing gameplay data, tabs and scrolling remain untouched.
+============================================================ */
+
+/* Native character text scale.
+   These selectors are intentionally scoped to the character page. */
+#game-stage > #game-overlay-layer .native-character-shell{
+    --native-character-ratio:2.5714285714;
+}
+
+/* Explicitly migrated text elements */
+#game-stage > #game-overlay-layer .native-character-shell .native-character-text{
+    font-size:calc(var(--legacy-font-size, 16px) * 2.5714285714) !important;
+    line-height:1.25;
+}
+
+/* Explicitly migrated icons */
+#game-stage > #game-overlay-layer .native-character-shell .native-character-icon{
+    width:calc(var(--legacy-icon-size, 40px) * 2.5714285714) !important;
+    height:calc(var(--legacy-icon-size, 40px) * 2.5714285714) !important;
+}
+
+/* Explicitly migrated buttons */
+#game-stage > #game-overlay-layer .native-character-shell .native-character-button{
+    box-sizing:border-box !important;
+}
+
+
+<script id="stage-v23-native-character-size-runtime">
+(function(){
+    "use strict";
+
+    const RATIO = 1080 / 420;
+
+    function setNativeCharacterText(el, legacyPx){
+        if(!el) return;
+        el.style.setProperty("--legacy-font-size", Number(legacyPx) + "px");
+        el.classList.add("native-character-text");
+    }
+
+    function setNativeCharacterIcon(el, legacyPx){
+        if(!el) return;
+        el.style.setProperty("--legacy-icon-size", Number(legacyPx) + "px");
+        el.classList.add("native-character-icon");
+    }
+
+    function setNativeCharacterButton(el, legacyWidth, legacyHeight){
+        if(!el) return;
+        el.style.width = (Number(legacyWidth) * RATIO) + "px";
+        el.style.minHeight = (Number(legacyHeight) * RATIO) + "px";
+        el.classList.add("native-character-button");
+    }
+
+    /*
+     * Expose opt-in helpers only. We do not automatically multiply every
+     * character-page element because the existing layout contains mixed
+     * legacy sizes and that could cause overlap.
+     */
+    window.GAME_NATIVE_CHARACTER_UI = Object.freeze({
+        ratio:RATIO,
+        setTextSize:setNativeCharacterText,
+        setIconSize:setNativeCharacterIcon,
+        setButtonSize:setNativeCharacterButton
+    });
+})();
+</script>
+
+
+<style id="stage-v24-native-inventory-quest-size">
+/* ============================================================
+   V24 — REAL NATIVE SIZE MIGRATION:
+   INVENTORY/EQUIPMENT + QUEST/ACHIEVEMENT
+
+   Structure was migrated in V16. This pass establishes the
+   explicit native size context for their text/icons/buttons.
+   Existing scroll and data logic remain untouched.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-inventory-equipment-shell,
+#game-stage > #game-overlay-layer .native-quest-achievement-shell{
+    --native-panel-ratio:2.5714285714;
+}
+
+.native-panel-text{
+    font-size:calc(var(--legacy-font-size, 16px) * 2.5714285714) !important;
+    line-height:1.25;
+}
+
+.native-panel-icon{
+    width:calc(var(--legacy-icon-size, 40px) * 2.5714285714) !important;
+    height:calc(var(--legacy-icon-size, 40px) * 2.5714285714) !important;
+}
+
+.native-panel-button{
+    box-sizing:border-box !important;
+}
+
+
+<script id="stage-v24-native-inventory-quest-size-runtime">
+(function(){
+    "use strict";
+
+    const RATIO = 1080 / 420;
+
+    function setPanelTextSize(el, legacyPx){
+        if(!el) return;
+        el.style.setProperty("--legacy-font-size", Number(legacyPx) + "px");
+        el.classList.add("native-panel-text");
+    }
+
+    function setPanelIconSize(el, legacyPx){
+        if(!el) return;
+        el.style.setProperty("--legacy-icon-size", Number(legacyPx) + "px");
+        el.classList.add("native-panel-icon");
+    }
+
+    function setPanelButtonSize(el, legacyWidth, legacyHeight){
+        if(!el) return;
+        el.style.width = (Number(legacyWidth) * RATIO) + "px";
+        el.style.minHeight = (Number(legacyHeight) * RATIO) + "px";
+        el.classList.add("native-panel-button");
+    }
+
+    window.GAME_NATIVE_PANEL_UI = Object.freeze({
+        ratio:RATIO,
+        setTextSize:setPanelTextSize,
+        setIconSize:setPanelIconSize,
+        setButtonSize:setPanelButtonSize
+    });
+})();
+</script>
+
+
+<style id="stage-v25-native-home-settings-size">
+/* ============================================================
+   V25 — REAL NATIVE SIZE MIGRATION:
+   HOME FEATURE + SETTINGS/SYSTEM PANELS
+
+   V17 migrated their structure. This pass adds an explicit native
+   visual-size context for text/icons/buttons without globally
+   scaling legacy CSS.
+============================================================ */
+
+#game-stage > #game-overlay-layer .native-v17-home-feature-shell,
+#game-stage > #game-overlay-layer .native-v17-settings-shell{
+    --native-panel-ratio:2.5714285714;
+}
+
+.native-home-settings-text{
+    font-size:calc(var(--legacy-font-size, 16px) * 2.5714285714) !important;
+    line-height:1.25;
+}
+
+.native-home-settings-icon{
+    width:calc(var(--legacy-icon-size, 40px) * 2.5714285714) !important;
+    height:calc(var(--legacy-icon-size, 40px) * 2.5714285714) !important;
+}
+
+.native-home-settings-button{
+    box-sizing:border-box !important;
+}
+
+
+<script id="stage-v25-native-home-settings-size-runtime">
+(function(){
+    "use strict";
+
+    const RATIO = 1080 / 420;
+
+    function setTextSize(el, legacyPx){
+        if(!el) return;
+        el.style.setProperty("--legacy-font-size", Number(legacyPx) + "px");
+        el.classList.add("native-home-settings-text");
+    }
+
+    function setIconSize(el, legacyPx){
+        if(!el) return;
+        el.style.setProperty("--legacy-icon-size", Number(legacyPx) + "px");
+        el.classList.add("native-home-settings-icon");
+    }
+
+    function setButtonSize(el, legacyWidth, legacyHeight){
+        if(!el) return;
+        el.style.width = (Number(legacyWidth) * RATIO) + "px";
+        el.style.minHeight = (Number(legacyHeight) * RATIO) + "px";
+        el.classList.add("native-home-settings-button");
+    }
+
+    window.GAME_NATIVE_HOME_SETTINGS_UI = Object.freeze({
+        ratio:RATIO,
+        setTextSize,
+        setIconSize,
+        setButtonSize
+    });
+})();
+</script>
+
+
+<style id="stage-v26-real-native-scale">
+/* ============================================================
+   V26 — REAL VISUAL SCALE: LEGACY PANELS -> 1080×1920
+
+   V25 is the confirmed working baseline.
+   This version starts the actual visual-size conversion on
+   already-migrated, low-risk panels.
+
+   Legacy panel design width = 420px.
+   Native stage width = 1080px.
+   Scale = 1080 / 420 = 2.5714285714.
+
+   The wrapper remains 1080×1920. Only the legacy content inside
+   the wrapper is visually scaled, so the native stage itself is
+   not enlarged beyond the viewport.
+============================================================ */
+
+:root{
+    --native-legacy-scale:2.5714285714;
+}
+
+/*
+ * Character page.
+ * The page itself is a legacy 420px design surface. Scaling this
+ * inner surface makes its existing text/icons/buttons return to
+ * their correct native visual size without changing their internal
+ * relative layout.
+ */
+#game-stage > #game-overlay-layer
+.native-character-shell-layer
+.native-character-shell > .character-page,
+#game-stage > #game-overlay-layer
+.native-character-shell-layer
+.native-character-shell > .character-modal,
+#game-stage > #game-overlay-layer
+.native-character-shell-layer
+.native-character-shell > .character-page-root{
+    transform:scale(var(--native-legacy-scale)) !important;
+    transform-origin:top left !important;
+}
+
+/*
+ * Inventory / equipment and quest / achievement panels use the same
+ * legacy 420px design surface. Only their inner legacy panel is scaled.
+ */
+#game-stage > #game-overlay-layer
+.native-inventory-equipment-layer
+.native-panel-shell > .inventory-page,
+#game-stage > #game-overlay-layer
+.native-inventory-equipment-layer
+.native-panel-shell > .equipment-page,
+#game-stage > #game-overlay-layer
+.native-inventory-equipment-layer
+.native-panel-shell > .inventory-modal,
+#game-stage > #game-overlay-layer
+.native-inventory-equipment-layer
+.native-panel-shell > .equipment-modal,
+#game-stage > #game-overlay-layer
+.native-quest-achievement-layer
+.native-panel-shell > .quest-page,
+#game-stage > #game-overlay-layer
+.native-quest-achievement-layer
+.native-panel-shell > .mission-page,
+#game-stage > #game-overlay-layer
+.native-quest-achievement-layer
+.native-panel-shell > .achievement-page,
+#game-stage > #game-overlay-layer
+.native-quest-achievement-layer
+.native-panel-shell > .quest-modal,
+#game-stage > #game-overlay-layer
+.native-quest-achievement-layer
+.native-panel-shell > .mission-modal,
+#game-stage > #game-overlay-layer
+.native-quest-achievement-layer
+.native-panel-shell > .achievement-modal{
+    transform:scale(var(--native-legacy-scale)) !important;
+    transform-origin:top left !important;
+}
+
+
+<script id="stage-v26-native-scale-runtime">
+(function(){
+    "use strict";
+
+    window.GAME_NATIVE_VISUAL_SCALE = 1080 / 420;
+    window.GAME_NATIVE_BASELINE_VERSION = "V25";
+
+    /*
+     * Do not mutate game logic here.
+     * This function is intentionally diagnostic so later versions can
+     * verify whether a migrated legacy surface is using the correct
+     * visual scale.
+     */
+    window.getNativeVisualScale = function(){
+        return window.GAME_NATIVE_VISUAL_SCALE;
+    };
+})();
+</script>
+
+
+<style id="stage-v27-native-home-settings-visual">
+/* ============================================================
+   V27 — REAL VISUAL SCALE:
+   HOME FEATURE + SETTINGS/SYSTEM PANELS
+
+   Baseline: V26 (confirmed working by user).
+   This pass applies the same 420 -> 1080 visual scale to the
+   already-migrated home feature/settings surfaces only.
+
+   Core gameplay is untouched.
+============================================================ */
+
+:root{
+    --native-visual-ratio:2.5714285714;
+}
+
+/* Main legacy surface inside the V17 native shells. */
+#game-stage > #game-overlay-layer
+.native-v17-home-feature-layer
+.native-v17-home-feature-shell > .home-feature-modal,
+#game-stage > #game-overlay-layer
+.native-v17-home-feature-layer
+.native-v17-home-feature-shell > .feature-modal,
+#game-stage > #game-overlay-layer
+.native-v17-settings-layer
+.native-v17-settings-shell > .settings-page,
+#game-stage > #game-overlay-layer
+.native-v17-settings-layer
+.native-v17-settings-shell > .system-settings-page,
+#game-stage > #game-overlay-layer
+.native-v17-settings-layer
+.native-v17-settings-shell > .settings-modal,
+#game-stage > #game-overlay-layer
+.native-v17-settings-layer
+.native-v17-settings-shell > .system-settings-modal{
+    transform:scale(var(--native-visual-ratio)) !important;
+    transform-origin:top left !important;
+}
+
+
+<script id="stage-v27-native-home-settings-runtime">
+(function(){
+    "use strict";
+
+    /* V26 is the confirmed baseline for this branch. */
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V26";
+    window.GAME_NATIVE_CURRENT_VERSION = "V27";
+
+    /* Diagnostic only; no gameplay state is changed. */
+    window.getNativeVisualRatio = function(){
+        return 1080 / 420;
+    };
+})();
+</script>
+
+
+<style id="stage-v28-native-detail-modals-visual">
+/* ============================================================
+   V28 — REAL VISUAL SCALE:
+   DETAIL / UTILITY MODALS
+
+   Baseline: V27 (confirmed working by user).
+   These are already structurally native from V18. This pass
+   applies the 420 -> 1080 visual scale to their legacy inner
+   surfaces only.
+============================================================ */
+
+:root{
+    --native-v28-ratio:2.5714285714;
+}
+
+#game-stage > #game-overlay-layer
+.native-v18-item-detail-layer
+.native-v18-modal > #itemModal,
+#game-stage > #game-overlay-layer
+.native-v18-skill-detail-layer
+.native-v18-modal > #skillDetailModal,
+#game-stage > #game-overlay-layer
+.native-v18-status-help-layer
+.native-v18-modal > #statusHelpModal,
+#game-stage > #game-overlay-layer
+.native-v18-level-up-layer
+.native-v18-modal > #levelModal,
+#game-stage > #game-overlay-layer
+.native-v18-second-character-layer
+.native-v18-modal > #secondCharacterModal{
+    transform:scale(var(--native-v28-ratio)) !important;
+    transform-origin:top left !important;
+}
+
+
+<script id="stage-v28-native-detail-modals-runtime">
+(function(){
+    "use strict";
+
+    /* V27 is the confirmed working baseline for this branch. */
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V27";
+    window.GAME_NATIVE_CURRENT_VERSION = "V28";
+
+    /* Diagnostic only; no gameplay state or modal behavior is changed. */
+    window.getNativeDetailModalRatio = function(){
+        return 1080 / 420;
+    };
+})();
+</script>
+
+
+<style id="stage-v29-native-utility-overlays-visual">
+/* ============================================================
+   V29 — REAL VISUAL SCALE:
+   NOTIFICATION / CONFIRM / HELP / INFO / TOAST
+
+   Baseline: V28 (confirmed working by user).
+   Only the already-migrated utility overlay surfaces are scaled.
+============================================================ */
+
+:root{
+    --native-v29-ratio:2.5714285714;
+}
+
+#game-stage > #game-overlay-layer
+.native-v19-notification-layer
+.native-v19-notification-shell > #notificationModal,
+#game-stage > #game-overlay-layer
+.native-v19-confirm-layer
+.native-v19-confirm-shell > #confirmModal,
+#game-stage > #game-overlay-layer
+.native-v19-help-layer
+.native-v19-help-shell > #helpModal,
+#game-stage > #game-overlay-layer
+.native-v19-info-layer
+.native-v19-info-shell > #infoModal,
+#game-stage > #game-overlay-layer
+.native-v19-toast-layer
+.native-v19-toast-shell > #toastModal{
+    transform:scale(var(--native-v29-ratio)) !important;
+    transform-origin:top left !important;
+}
+
+/* Also cover class-based utility overlays migrated by V19. */
+#game-stage > #game-overlay-layer
+[class*="native-v19-"] .notification-modal,
+#game-stage > #game-overlay-layer
+[class*="native-v19-"] .confirm-modal,
+#game-stage > #game-overlay-layer
+[class*="native-v19-"] .help-modal,
+#game-stage > #game-overlay-layer
+[class*="native-v19-"] .info-modal,
+#game-stage > #game-overlay-layer
+[class*="native-v19-"] .toast-modal{
+    transform:scale(var(--native-v29-ratio)) !important;
+    transform-origin:top left !important;
+}
+
+
+<script id="stage-v29-native-utility-overlays-runtime">
+(function(){
+    "use strict";
+
+    /* V28 is the confirmed working baseline for this branch. */
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V28";
+    window.GAME_NATIVE_CURRENT_VERSION = "V29";
+
+    /* Diagnostic only. No game state, event, or modal behavior is changed. */
+    window.getNativeUtilityOverlayRatio = function(){
+        return 1080 / 420;
+    };
+})();
+</script>
+
+
+<style id="stage-v30-native-nav-visual">
+/* ============================================================
+   V30 — REAL VISUAL SCALE: BOTTOM NAVIGATION
+
+   Baseline: V29 (confirmed working by user).
+   Main navigation and map/training navigation were structurally
+   migrated earlier. This pass normalizes their legacy visual size
+   to the Native 1080×1920 design scale.
+
+   No navigation handlers or game logic are changed.
+============================================================ */
+
+:root{
+    --native-v30-ratio:2.5714285714;
+}
+
+/*
+ * Scale the existing navigation surface itself rather than rebuilding
+ * its buttons. This preserves button DOM, icons, labels and click events.
+ */
+#game-stage > #game-overlay-layer
+.native-bottom-nav-layer
+.native-bottom-nav-shell > #bottomNav,
+#game-stage > #game-overlay-layer
+.native-bottom-nav-layer
+.native-bottom-nav-shell > .bottom-nav,
+#game-stage > #game-overlay-layer
+.native-map-nav-layer
+.native-map-nav > #mapPageNav{
+    transform:scale(var(--native-v30-ratio)) !important;
+    transform-origin:bottom left !important;
+}
+
+/*
+ * If the map/training navigation is itself wrapped in another native
+ * surface, apply the same visual scale to that concrete nav element.
+ */
+#game-stage > #game-overlay-layer
+.native-map-nav-layer .native-map-nav > .map-page-nav,
+#game-stage > #game-overlay-layer
+.native-map-nav-layer .native-map-nav > .map-nav{
+    transform:scale(var(--native-v30-ratio)) !important;
+    transform-origin:bottom left !important;
+}
+
+
+<script id="stage-v30-native-nav-runtime">
+(function(){
+    "use strict";
+
+    /* V29 is the confirmed working baseline for this branch. */
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V29";
+    window.GAME_NATIVE_CURRENT_VERSION = "V30";
+
+    /*
+     * Diagnostic only. Navigation DOM and event handlers are untouched.
+     */
+    window.getNativeNavigationVisualRatio = function(){
+        return 1080 / 420;
+    };
+})();
+</script>
+
+
+<style id="stage-v31r2-real-bottom-nav-size">
+/* ============================================================
+   V31R2 — ACTUAL BOTTOM NAV VISUAL SIZE
+   Baseline: V30 (confirmed working).
+
+   IMPORTANT:
+   The existing .bottom-nav is ALREADY inside the 420×746.67
+   game-content which is scaled to the 1080×1920 native stage.
+   Therefore another 2.5714 transform is WRONG and was the reason
+   previous attempts did not produce the intended result.
+
+   This pass intentionally changes the DESIGN SIZE of the nav:
+   70px -> 84px legacy height (20% larger),
+   22px -> 27px icon base (about 23% larger),
+   10px -> 12px label text (20% larger).
+
+   This is a visual UI adjustment only. Navigation logic remains intact.
+============================================================ */
+
+#game-stage > #app > #game-content .bottom-nav,
+#game-stage > #app > #game-content #mapPageNav{
+    height:84px !important;
+    box-sizing:border-box !important;
+}
+
+#game-stage > #app > #game-content .bottom-nav .nav-button,
+#game-stage > #app > #game-content #mapPageNav .nav-button{
+    font-size:12px !important;
+    line-height:1.15 !important;
+    padding:0 2px !important;
+}
+
+#game-stage > #app > #game-content .bottom-nav .nav-icon-shape,
+#game-stage > #app > #game-content #mapPageNav .nav-icon-shape{
+    width:27px !important;
+    height:27px !important;
+    margin-bottom:4px !important;
+}
+
+/* Preserve the backpack's intentionally different proportions. */
+#game-stage > #app > #game-content .bottom-nav .nav-icon-backpack,
+#game-stage > #app > #game-content #mapPageNav .nav-icon-backpack{
+    width:22px !important;
+    height:20px !important;
+    margin:7px auto 4px !important;
+}
+
+/* The chart's bars scale with the larger native icon box. */
+#game-stage > #app > #game-content .bottom-nav .nav-icon-chart span,
+#game-stage > #app > #game-content #mapPageNav .nav-icon-chart span{
+    width:5px !important;
+}
+
+#game-stage > #app > #game-content .bottom-nav .nav-icon-chart span:nth-child(1),
+#game-stage > #app > #game-content #mapPageNav .nav-icon-chart span:nth-child(1){
+    height:11px !important;
+}
+
+#game-stage > #app > #game-content .bottom-nav .nav-icon-chart span:nth-child(2),
+#game-stage > #app > #game-content #mapPageNav .nav-icon-chart span:nth-child(2){
+    height:19px !important;
+}
+
+#game-stage > #app > #game-content .bottom-nav .nav-icon-chart span:nth-child(3),
+#game-stage > #app > #game-content #mapPageNav .nav-icon-chart span:nth-child(3){
+    height:27px !important;
+}
+
+
+<script id="stage-v31r2-nav-runtime">
+(function(){
+    "use strict";
+
+    /*
+     * V30 is the last confirmed-good baseline.
+     * This version intentionally changes only navigation presentation.
+     */
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V30";
+    window.GAME_NATIVE_CURRENT_VERSION = "V31R2";
+    window.GAME_NATIVE_NAV_VISUAL_MULTIPLIER = 1.2;
+
+    /*
+     * Diagnostic helper: returns the actual CSS geometry of the nav
+     * after the browser applies all cascading rules.
+     */
+    window.getActualBottomNavGeometry = function(){
+        const nodes = Array.from(document.querySelectorAll(
+            "#game-stage > #app > #game-content .bottom-nav"
+        ));
+        return nodes.map(function(el){
+            const r = el.getBoundingClientRect();
+            return {
+                id: el.id || null,
+                width: r.width,
+                height: r.height,
+                left: r.left,
+                top: r.top,
+                right: r.right,
+                bottom: r.bottom
+            };
+        });
+    };
+})();
+</script>
+
+
+<style id="stage-v32-real-battle-ui-size">
+/* ============================================================
+   V32 — REAL BATTLE UI SIZE MIGRATION
+   Baseline: V31R2 (confirmed working).
+
+   This is NOT a second stage scale.
+   The battle UI already lives inside the 420px design surface,
+   which is globally scaled by the 1080×1920 stage.
+   We therefore change the actual legacy design dimensions.
+============================================================ */
+
+/* Battle title */
+#game-stage > #app > #game-content #battlePage .battle-title{
+    flex-basis:23px !important;
+    height:23px !important;
+    font-size:17px !important;
+    line-height:23px !important;
+}
+
+/* Monster cards */
+#game-stage > #app > #game-content #battlePage .battle-monster{
+    width:88px !important;
+    height:104px !important;
+    padding:5px 4px !important;
+    font-size:8px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-monster-icon{
+    width:36px !important;
+    height:36px !important;
+    flex-basis:36px !important;
+    font-size:28px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-monster-name,
+#game-stage > #app > #game-content #battlePage .battle-monster-level{
+    font-size:10px !important;
+    line-height:12px !important;
+}
+
+/* Player cards */
+#game-stage > #app > #game-content #battlePage .battle-player-row{
+    flex-basis:124px !important;
+    height:124px !important;
+    min-height:124px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player{
+    width:124px !important;
+    height:120px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player-icon{
+    width:36px !important;
+    height:36px !important;
+    flex-basis:36px !important;
+    font-size:29px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player-status,
+#game-stage > #app > #game-content #battlePage .battle-player-id{
+    font-size:10px !important;
+    line-height:12px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player .hp-bar,
+#game-stage > #app > #game-content #battlePage .battle-player .sp-bar{
+    width:100px !important;
+    height:11px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player .hp-bar-text,
+#game-stage > #app > #game-content #battlePage .battle-player .sp-bar-text{
+    font-size:9px !important;
+}
+
+/* Battle menu / action buttons */
+#game-stage > #app > #game-content #battlePage .battle-menu,
+#game-stage > #app > #game-content #battlePage .sub-menu:not(.expanded){
+    flex-basis:70px !important;
+    height:70px !important;
+    gap:5px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .auto-battle-button{
+    height:52px !important;
+    font-size:12px !important;
+}
+
+/* Battle information */
+#game-stage > #app > #game-content #battlePage .battle-info{
+    /* V96：移除 V32 舊的 110px 固定高度，讓紀錄填滿元素匣列以下的剩餘空間。 */
+    flex:1 1 0 !important;
+    min-height:82px !important;
+    height:auto !important;
+    padding:9px 11px !important;
+    font-size:14px !important;
+    line-height:19px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-line{
+    min-height:20px !important;
+}
+
+/* Quick skill overlay */
+#game-stage > #app > #game-content #battlePage .skill-quick-button{
+    min-height:72px !important;
+    padding:5px 4px !important;
+    font-size:11px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .skill-quick-button .sq-name{
+    font-size:11px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .skill-quick-button .sq-level,
+#game-stage > #app > #game-content #battlePage .skill-quick-button .sq-cost{
+    font-size:10px !important;
+}
+
+
+<script id="stage-v32-battle-ui-runtime">
+(function(){
+    "use strict";
+
+    /* V31R2 is the confirmed working baseline. */
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V31R2";
+    window.GAME_NATIVE_CURRENT_VERSION = "V32";
+
+    /*
+     * Presentation-only marker.
+     * No battle formulas, damage, turns, AI, patrol, skills or values
+     * are changed by this version.
+     */
+    window.GAME_BATTLE_UI_NATIVE_SIZE_MULTIPLIER = 1.2;
+})();
+</script>
+
+
+<script id="stage-v38-source-skill-badge-runtime">
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V32";
+    window.GAME_NATIVE_CURRENT_VERSION = "V38";
+
+    window.getActualCastSkillBadgeStyle = function(){
+        const badge = document.querySelector(
+            "#game-stage #game-overlay-layer .skill-name-badge"
+        );
+        if(!badge) return null;
+        const cs = getComputedStyle(badge);
+        const r = badge.getBoundingClientRect();
+        return {
+            text: badge.textContent || "",
+            inlineFontSize: badge.style.fontSize,
+            computedFontSize: cs.fontSize,
+            computedLineHeight: cs.lineHeight,
+            width: r.width,
+            height: r.height,
+            transform: cs.transform,
+            animationName: cs.animationName
+        };
+    };
+})();
+</script>
+
+
+<style id="stage-v39-three-part-fix">
+/* ============================================================
+   V39
+   1. Cast skill name: larger, target width comparable to a
+      character card.
+   2. Remove player character card outer border only.
+   3. Battle background is synchronized with the current patrol/
+      map background, per map, instead of using one global image.
+============================================================ */
+
+/* Skill-cast floating name: intentionally large enough to read
+   across the width of a player card. */
+#game-stage #game-overlay-layer .skill-name-badge{
+    font-size:48px !important;
+    font-weight:900 !important;
+    min-width:124px !important;
+    width:max-content !important;
+    max-width:260px !important;
+    text-align:center !important;
+    padding:2px 8px !important;
+    box-sizing:border-box !important;
+}
+
+/* Remove only the visual outer frame from player cards.
+   Keep the card's layout/background/status elements intact. */
+#game-stage > #app > #game-content #battlePage .battle-player{
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+}
+
+/* Do NOT remove internal HP/SP bars or their borders. */
+#game-stage > #app > #game-content #battlePage .battle-player .hp-bar,
+#game-stage > #app > #game-content #battlePage .battle-player .sp-bar{
+    border:1px solid rgba(255,255,255,.28) !important;
+}
+
+
+/* bundled source: css/19-stage-v54-main-city-moderate-native-scale.css */
+/* V54 historical city scale bridge.
+   V173.33 keeps the lobby's explicit primary, secondary and utility typography
+   in css/00-main.css, so this file must not flatten every entrance back to one
+   inline-equivalent size. Bottom navigation and battle remain untouched. */
+
+#game-stage #homePage button img,
+#game-stage #homePage a img,
+#game-stage #homePage [role="button"] img,
+#game-stage #homePage .menu-item img,
+#game-stage #homePage .menu-card img,
+#game-stage #homePage .home-menu-item img,
+#game-stage #homePage .home-card img{
+    object-fit:cover !important;
+}
+
+
+/* bundled source: css/20-stage-v60-training-only-safety.css */
+/* V60/V97 training popup safety.
+   V97 root cause: transformed stage + fixed large base64 background +
+   animated box-shadow forced Samsung Browser compositor tile repaints.
+   The training background is now page-local absolute, background-image
+   no longer transitions, and this modal uses a static glow.
+
+   V173.45 UI convergence: region information is a local information/action
+   surface, so it belongs to the shared Medium Modal tier. The frame stays
+   fixed; only #trainingZoneModalBody owns vertical scrolling. */
+#game-stage #trainingZoneModal .home-feature-modal-box{
+    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    max-width:var(--ui-medium-modal-max-width,360px) !important;
+    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    padding:18px !important;
+    box-sizing:border-box !important;
+    animation:none !important;
+    border-color:#f0b429 !important;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(240,180,41,.08),
+        0 0 10px rgba(240,180,41,.35) !important;
+}
+#game-stage #trainingZoneModal .home-feature-modal-title{
+    flex:0 0 auto !important;
+    font-size:22px !important;
+    margin-bottom:12px !important;
+}
+#game-stage #trainingZoneModal #trainingZoneModalBody{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    padding-right:2px !important;
+    padding-bottom:6px !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
+    font-size:16px !important;
+    line-height:1.9 !important;
+}
+#game-stage #trainingZoneModal .home-feature-buy-btn{
+    font-size:16px !important;
+    min-height:46px !important;
+    padding:10px 12px !important;
+}
+
+
+/* bundled source: css/21-stage-v64-character-touch-action-bridge.css */
+/*
+ V64 ROOT-CAUSE FIX:
+ The game viewport intentionally locks touch-action:none on html/body/#game-viewport.
+ That ancestor lock wins over a descendant scroll container on Android WebView, so
+ #characterTabContent could have overflow-y:scroll and still never receive native scrolling.
+ Only while the character modal is open do we relax the ancestor gesture policy to pan-y.
+ The existing V8 touch-lock still blocks page dragging everywhere that is not an allowed scroller.
+*/
+html.character-scroll-active,
+body.character-scroll-active,
+#game-viewport.character-scroll-active,
+#game-stage.character-scroll-active{
+    touch-action:pan-y !important;
+}
+
+
+/* bundled source: css/28-v124-character-creation-native.css */
+/* =====================================================
+   V124 — TRUE NATIVE 1080 × 1920 CHARACTER CREATION
+   Every component uses native design dimensions.
+   No 420 → 1080 migration transform is used.
+   Existing stat formulas / element mechanics are untouched.
+===================================================== */
+
+/* Root-cause Android Chrome scroll bridge.
+   #game-viewport intentionally uses touch-action:none globally.
+   Creation page is the only scroll owner while it is visible. */
+html.creation-scroll-active,
+body.creation-scroll-active,
+#game-viewport.creation-scroll-active,
+#game-stage.creation-scroll-active,
+#game-overlay-layer.creation-scroll-active{
+    touch-action:pan-y !important;
+}
+
+#creationPage.creation-page-scroll:not(.native-creation-page){
+    visibility:hidden !important;
+}
+
+#creationPage.creation-page-scroll.native-creation-page{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    right:auto !important;
+    bottom:auto !important;
+    z-index:2147483600 !important;
+    width:1080px !important;
+    height:1920px !important;
+    min-width:1080px !important;
+    min-height:1920px !important;
+    max-width:none !important;
+    max-height:none !important;
+    margin:0 !important;
+    box-sizing:border-box !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y !important;
+    pointer-events:auto !important;
+    transform:none !important;
+    transform-origin:top left !important;
+    padding:0 !important;
+    scrollbar-width:none;
+    isolation:isolate;
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+    background:
+        radial-gradient(circle at 50% -10%, rgba(177,128,47,.24), transparent 34%),
+        radial-gradient(circle at 12% 24%, rgba(91,57,131,.18), transparent 38%),
+        linear-gradient(180deg,#171123 0%,#0c0912 42%,#050407 100%);
+    color:#f5ead5;
+}
+
+#creationPage.creation-page-scroll.native-creation-page::-webkit-scrollbar{
+    width:0;
+    height:0;
+}
+
+#creationPage .creation-premium-shell{
+    position:relative;
+    width:1080px;
+    min-height:100%;
+    padding:41.143px 36px 61.714px;
+    box-sizing:border-box;
+}
+
+#creationPage .creation-premium-shell::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    opacity:.28;
+    background-image:
+        linear-gradient(rgba(255,255,255,.02) 2.571px,transparent 2.571px),
+        linear-gradient(90deg,rgba(255,255,255,.015) 2.571px,transparent 2.571px);
+    background-size:56.571px 56.571px;
+    mask-image:linear-gradient(to bottom,black,transparent 82%);
+}
+
+#creationPage .creation-premium-header{
+    position:relative;
+    text-align:center;
+    padding:20.571px 0 36px;
+}
+
+#creationPage .creation-header-ornament{
+    width:87.429px;
+    height:46.286px;
+    margin:0 auto 7.714px;
+    color:#e4b453;
+    font-size:41.143px;
+    line-height:46.286px;
+    text-shadow:0 0 36px rgba(255,187,64,.42);
+}
+
+#creationPage .creation-title{
+    margin:0;
+    font-family:"Noto Serif TC",serif;
+    font-size:66.857px;
+    line-height:1.18;
+    font-weight:900;
+    letter-spacing:7.714px;
+    color:#fff3d8;
+    text-shadow:0 5.143px 0 #503415,0 0 46.286px rgba(222,160,58,.22);
+}
+
+#creationPage .creation-subtitle{
+    margin:18px 0 0;
+    font-size:25.714px;
+    letter-spacing:2.571px;
+    color:#aa987d;
+}
+
+#creationPage .creation-showcase{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns:46% 54%;
+    min-height:714.857px;
+    margin-bottom:28.286px;
+    overflow:hidden;
+    border:2.571px solid rgba(198,146,68,.58);
+    border-radius:41.143px;
+    background:
+        linear-gradient(135deg,rgba(38,27,49,.98),rgba(9,7,12,.99));
+    box-shadow:
+        inset 0 0 0 2.571px rgba(255,232,178,.035),
+        0 25.714px 77.143px rgba(0,0,0,.35);
+}
+
+#creationPage .creation-showcase::before,
+#creationPage .creation-showcase::after{
+    content:"";
+    position:absolute;
+    z-index:3;
+    pointer-events:none;
+    width:141.429px;
+    height:141.429px;
+    border-color:rgba(244,188,83,.65);
+}
+
+#creationPage .creation-showcase::before{
+    left:20.571px;
+    top:20.571px;
+    border-left:2.571px solid;
+    border-top:2.571px solid;
+}
+
+#creationPage .creation-showcase::after{
+    right:20.571px;
+    bottom:20.571px;
+    border-right:2.571px solid;
+    border-bottom:2.571px solid;
+}
+
+#creationPage .creation-portrait-panel{
+    position:relative;
+    min-width:0;
+    min-height:714.857px;
+    overflow:hidden;
+    background:#030303;
+    border-right:2.571px solid rgba(211,157,73,.28);
+}
+
+#creationPage .creation-portrait-aura{
+    position:absolute;
+    z-index:0;
+    left:50%;
+    top:38%;
+    width:385.714px;
+    height:385.714px;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    filter:blur(20.571px);
+    opacity:.56;
+    transition:background .18s ease,box-shadow .18s ease;
+}
+
+#creationPage .creation-portrait-image{
+    position:absolute;
+    z-index:1;
+    left:50%;
+    bottom:-5.143px;
+    width:108%;
+    max-width:none;
+    height:104%;
+    object-fit:contain;
+    object-position:center bottom;
+    transform:translateX(-50%);
+    user-select:none;
+    -webkit-user-drag:none;
+    pointer-events:none;
+}
+
+#creationPage .creation-portrait-shade{
+    position:absolute;
+    z-index:2;
+    inset:0;
+    pointer-events:none;
+    background:
+        linear-gradient(to right,transparent 52%,rgba(0,0,0,.16)),
+        linear-gradient(to top,rgba(0,0,0,.86) 0%,transparent 30%);
+}
+
+#creationPage .creation-portrait-caption{
+    position:absolute;
+    z-index:4;
+    left:25.714px;
+    right:25.714px;
+    bottom:23.143px;
+    display:flex;
+    align-items:end;
+    justify-content:space-between;
+    gap:12.857px;
+    font-size:23.143px;
+    color:#cdbb9d;
+}
+
+#creationPage .creation-portrait-caption b{
+    font-size:28.286px;
+    color:#fff4dc;
+    letter-spacing:2.571px;
+}
+
+#creationPage .creation-choice-panel{
+    position:relative;
+    z-index:4;
+    display:flex;
+    flex-direction:column;
+    padding:36px 30.857px 30.857px;
+    min-width:0;
+}
+
+#creationPage .creation-section-kicker{
+    margin-bottom:15.429px;
+    color:#c8b28e;
+    font-size:23.143px;
+    font-weight:700;
+    letter-spacing:4.114px;
+}
+
+#creationPage .creation-element-kicker{
+    margin-top:28.286px;
+}
+
+#creationPage .creation-gender-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+#creationPage .creation-gender-option{
+    height:90px;
+    border:2.571px solid #5d4930;
+    border-radius:23.143px;
+    background:linear-gradient(180deg,#191510,#0e0c09);
+    color:#b9aa93;
+    font-size:28.286px;
+    font-weight:700;
+}
+
+#creationPage .creation-gender-option.selected{
+    color:#fff3d7;
+    border-color:#d89d39;
+    background:linear-gradient(180deg,#3c2b16,#17110a);
+    box-shadow:inset 0 0 30.857px rgba(238,165,45,.12),0 0 25.714px rgba(217,149,43,.14);
+}
+
+#creationPage .creation-gender-symbol{
+    display:inline-block;
+    width:41.143px;
+    margin-right:5.143px;
+    color:#efbc61;
+    font-size:33.429px;
+}
+
+#creationPage .creation-element-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12.857px;
+}
+
+#creationPage .element-option{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-width:0;
+    height:133.714px;
+    padding:7.714px 2.571px;
+    border:2.571px solid #4d3d2a;
+    border-radius:23.143px;
+    background:linear-gradient(180deg,#15120e,#0c0a08);
+    color:#b9a98d;
+    box-shadow:none;
+    transition:filter .12s ease,border-color .12s ease,box-shadow .12s ease,background .12s ease;
+}
+
+#creationPage .element-option:active{
+    filter:brightness(.86);
+}
+
+#creationPage .creation-element-glyph{
+    display:grid;
+    place-items:center;
+    width:64.286px;
+    height:64.286px;
+    margin-bottom:5.143px;
+    border-radius:50%;
+    font-family:"Noto Serif TC",serif;
+    font-size:33.429px;
+    font-weight:900;
+    background:#211b14;
+    border:2.571px solid rgba(255,255,255,.08);
+}
+
+#creationPage .element-option .element-name{
+    margin:0;
+    font-size:20.571px;
+    white-space:nowrap;
+}
+
+#creationPage .element-option[data-element="fire"] .creation-element-glyph{color:#ff846f;}
+#creationPage .element-option[data-element="water"] .creation-element-glyph{color:#7ebcff;}
+#creationPage .element-option[data-element="wind"] .creation-element-glyph{color:#7fe0a4;}
+#creationPage .element-option[data-element="earth"] .creation-element-glyph{color:#e6bd69;}
+
+#creationPage .element-option.selected{
+    color:#fff6e8;
+    border-color:var(--creation-accent,#d89d39);
+    background:linear-gradient(180deg,var(--creation-accent-soft,rgba(218,157,57,.20)),#110e0a 82%);
+    box-shadow:0 0 30.857px var(--creation-glow,rgba(218,157,57,.24)),inset 0 0 30.857px rgba(255,255,255,.035);
+}
+
+#creationPage .creation-role-card{
+    margin-top:25.714px;
+    padding:23.143px;
+    border:2.571px solid rgba(214,163,80,.22);
+    border-radius:25.714px;
+    background:rgba(3,3,3,.34);
+}
+
+#creationPage .creation-role-title-row{
+    display:flex;
+    align-items:center;
+    gap:20.571px;
+}
+
+#creationPage .creation-element-badge{
+    display:grid;
+    place-items:center;
+    flex:0 0 79.714px;
+    width:79.714px;
+    height:79.714px;
+    border-radius:23.143px;
+    border:2.571px solid var(--creation-accent,#d89d39);
+    color:var(--creation-accent-light,#f4c775);
+    font-family:"Noto Serif TC",serif;
+    font-size:38.571px;
+    font-weight:900;
+    background:var(--creation-accent-soft,rgba(218,157,57,.12));
+}
+
+#creationPage .creation-role-title{
+    color:#fff2d8;
+    font-family:"Noto Serif TC",serif;
+    font-size:30.857px;
+    font-weight:900;
+}
+
+#creationPage .creation-role-subtitle{
+    margin-top:5.143px;
+    color:var(--creation-accent-light,#e7b85e);
+    font-size:20.571px;
+    font-weight:700;
+    letter-spacing:0.771px;
+}
+
+#creationPage .creation-role-description{
+    margin-top:18px;
+    color:#b9aa93;
+    font-size:20.571px;
+    line-height:1.55;
+}
+
+#creationPage .creation-role-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10.286px;
+    margin-top:18px;
+}
+
+#creationPage .creation-role-tag{
+    padding:7.714px 15.429px;
+    border-radius:2568.857px;
+    border:2.571px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.035);
+    color:#d7c8b0;
+    font-size:18px;
+}
+
+#creationPage .creation-card{
+    position:relative;
+    z-index:1;
+    margin:0 0 25.714px;
+    padding:33.429px;
+    border:2.571px solid rgba(129,96,55,.62);
+    border-radius:36px;
+    background:
+        linear-gradient(145deg,rgba(31,24,38,.96),rgba(13,10,17,.98));
+    box-shadow:
+        inset 0 2.571px 0 rgba(255,255,255,.025),
+        0 18px 48.857px rgba(0,0,0,.18);
+}
+
+#creationPage .creation-card-heading{
+    display:flex;
+    align-items:center;
+    gap:23.143px;
+    margin-bottom:25.714px;
+}
+
+#creationPage .creation-card-index{
+    display:grid;
+    place-items:center;
+    flex:0 0 69.429px;
+    width:69.429px;
+    height:69.429px;
+    border-radius:20.571px;
+    color:#e9bb67;
+    font-family:"Cinzel",serif;
+    font-size:23.143px;
+    font-weight:900;
+    border:2.571px solid rgba(210,157,72,.42);
+    background:#12100d;
+}
+
+#creationPage .creation-label{
+    margin:0;
+    color:#f4e8d4;
+    font-size:30.857px;
+    font-weight:900;
+}
+
+#creationPage .creation-card-caption{
+    margin-top:5.143px;
+    color:#8f806c;
+    font-size:20.571px;
+}
+
+#creationPage .creation-input{
+    width:100%;
+    height:110.571px;
+    box-sizing:border-box;
+    border:2.571px solid #72552f;
+    border-radius:25.714px;
+    background:#0b0a08;
+    color:#fff0d8;
+    padding:0 30.857px;
+    outline:none;
+    font-size:33.429px;
+    box-shadow:inset 0 0 36px rgba(0,0,0,.25);
+}
+
+#creationPage .creation-input:focus{
+    border-color:#e4a840;
+    box-shadow:0 0 0 5.143px rgba(228,168,64,.10),inset 0 0 36px rgba(0,0,0,.25);
+}
+
+#creationPage .creation-preview-heading{
+    margin-bottom:20.571px;
+}
+
+#creationPage .creation-skill-lane{
+    display:grid;
+    grid-template-columns:97.714px 1fr;
+    align-items:start;
+    gap:18px;
+    padding:18px 0;
+    border-top:2.571px solid rgba(255,255,255,.055);
+}
+
+#creationPage .creation-skill-lane:first-of-type{
+    border-top:0;
+}
+
+#creationPage .creation-skill-lane-label{
+    margin-top:5.143px;
+    color:#a89374;
+    font-size:20.571px;
+    font-weight:900;
+    letter-spacing:2.571px;
+}
+
+#creationPage .creation-skill-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10.286px;
+}
+
+#creationPage .creation-skill-chip{
+    padding:10.286px 15.429px;
+    border-radius:18px;
+    border:2.571px solid rgba(255,255,255,.07);
+    background:#0e0c09;
+    color:#d9cbb6;
+    font-size:19.286px;
+    line-height:1.25;
+}
+
+#creationPage .creation-skill-chip.signature{
+    color:var(--creation-accent-light,#efc371);
+    border-color:var(--creation-accent-border,rgba(220,160,65,.28));
+    background:var(--creation-accent-soft,rgba(220,160,65,.09));
+}
+
+#creationPage .creation-points-badge{
+    margin-left:auto;
+    flex:0 0 auto;
+    padding:15.429px 20.571px;
+    border-radius:20.571px;
+    border:2.571px solid rgba(225,168,68,.34);
+    background:#0d0b08;
+    color:#a99576;
+    font-size:20.571px;
+}
+
+#creationPage .creation-points-badge b{
+    margin-left:5.143px;
+    color:#ffc85e;
+    font-size:33.429px;
+}
+
+#creationPage .creation-stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15.429px;
+}
+
+#creationPage .creation-stat{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    min-width:0;
+    min-height:126px;
+    padding:18px 18px 18px 23.143px;
+    box-sizing:border-box;
+    border:2.571px solid rgba(255,255,255,.055);
+    border-radius:23.143px;
+    background:#100e0b;
+    font-size:25.714px;
+}
+
+#creationPage .creation-stat-copy{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+
+#creationPage .creation-stat-copy b{
+    color:#eee1cc;
+    font-size:25.714px;
+}
+
+#creationPage .creation-stat-copy small{
+    margin-top:5.143px;
+    overflow:hidden;
+    color:#776b5b;
+    font-size:16.714px;
+    line-height:1.2;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+#creationPage .creation-stat-right{
+    display:flex;
+    align-items:center;
+    gap:10.286px;
+    flex:0 0 auto;
+}
+
+#creationPage .creation-stat-right > b{
+    min-width:38.571px;
+    text-align:center;
+    color:#fff0d4;
+    font-size:28.286px;
+}
+
+#creationPage .creation-stat-button{
+    width:64.286px;
+    height:64.286px;
+    padding:0;
+    border:2.571px solid rgba(255,255,255,.055);
+    border-radius:18px;
+    background:linear-gradient(180deg,#302920,#211c16);
+    color:#efe0c7;
+    font-size:36px;
+    line-height:59.143px;
+}
+
+#creationPage .creation-stat-button:active{
+    filter:brightness(.86);
+    background:#3d3020;
+}
+
+#creationPage .creation-stat-details{
+    margin-top:25.714px;
+    padding:0;
+    border:2.571px solid rgba(255,255,255,.055);
+    border-radius:23.143px;
+    background:#0b0a08;
+    color:#cfc0aa;
+}
+
+#creationPage .creation-stat-details summary{
+    list-style:none;
+    cursor:pointer;
+    padding:23.143px 25.714px;
+    color:#d6b46f;
+    font-size:20.571px;
+    font-weight:700;
+}
+
+#creationPage .creation-stat-details summary::-webkit-details-marker{
+    display:none;
+}
+
+#creationPage .creation-stat-details summary::after{
+    content:"＋";
+    float:right;
+    color:#8f7a57;
+}
+
+#creationPage .creation-stat-details[open] summary::after{
+    content:"－";
+}
+
+#creationPage .creation-stat-details-body{
+    padding:0 25.714px 23.143px;
+    color:#aa9b87;
+    font-size:19.286px;
+    line-height:1.65;
+}
+
+#creationPage .creation-stat-details-body > div + div{
+    margin-top:10.286px;
+}
+
+#creationPage .creation-stat-details-body b{
+    color:#ead9bd;
+}
+
+#creationPage .creation-start{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:141.429px;
+    border:2.571px solid #e1a541;
+    border-radius:30.857px;
+    background:
+        linear-gradient(180deg,#4c3518,#2b1c0d 55%,#1a1109);
+    color:#fff0ce;
+    box-shadow:
+        inset 0 2.571px 0 rgba(255,236,184,.18),
+        inset 0 -25.714px 46.286px rgba(0,0,0,.18),
+        0 18px 46.286px rgba(0,0,0,.28),
+        0 0 41.143px rgba(218,157,55,.12);
+}
+
+#creationPage .creation-start span{
+    font-family:"Noto Serif TC",serif;
+    font-size:38.571px;
+    font-weight:900;
+    letter-spacing:7.714px;
+}
+
+#creationPage .creation-start small{
+    margin-top:5.143px;
+    color:#b99c6a;
+    font-family:"Cinzel",serif;
+    font-size:15.429px;
+    letter-spacing:5.143px;
+}
+
+#creationPage .creation-start:active{
+    filter:brightness(.92);
+}
+
+#creationPage .creation-bottom-space{
+    height:20.571px;
+}
+
+/* Element themes */
+#creationPage[data-element="fire"]{
+    --creation-accent:#d95a38;
+    --creation-accent-light:#ff9a79;
+    --creation-accent-soft:rgba(217,90,56,.15);
+    --creation-accent-border:rgba(224,96,61,.34);
+    --creation-glow:rgba(229,76,39,.24);
+}
+#creationPage[data-element="water"]{
+    --creation-accent:#4d8fd7;
+    --creation-accent-light:#91c6ff;
+    --creation-accent-soft:rgba(77,143,215,.15);
+    --creation-accent-border:rgba(95,157,224,.34);
+    --creation-glow:rgba(66,139,225,.24);
+}
+#creationPage[data-element="wind"]{
+    --creation-accent:#53a978;
+    --creation-accent-light:#8ee6ae;
+    --creation-accent-soft:rgba(83,169,120,.15);
+    --creation-accent-border:rgba(92,184,130,.34);
+    --creation-glow:rgba(70,183,115,.22);
+}
+#creationPage[data-element="earth"]{
+    --creation-accent:#bd8a3d;
+    --creation-accent-light:#efc46f;
+    --creation-accent-soft:rgba(189,138,61,.15);
+    --creation-accent-border:rgba(205,154,71,.34);
+    --creation-glow:rgba(197,145,55,.22);
+}
+
+#creationPage[data-element="fire"] .creation-portrait-aura{
+    background:radial-gradient(circle,rgba(255,83,35,.44),rgba(255,83,35,0) 68%);
+    box-shadow:0 0 108px rgba(255,75,32,.18);
+}
+#creationPage[data-element="water"] .creation-portrait-aura{
+    background:radial-gradient(circle,rgba(57,140,255,.42),rgba(57,140,255,0) 68%);
+    box-shadow:0 0 108px rgba(57,140,255,.18);
+}
+#creationPage[data-element="wind"] .creation-portrait-aura{
+    background:radial-gradient(circle,rgba(65,205,113,.38),rgba(65,205,113,0) 68%);
+    box-shadow:0 0 108px rgba(65,205,113,.16);
+}
+#creationPage[data-element="earth"] .creation-portrait-aura{
+    background:radial-gradient(circle,rgba(222,167,66,.40),rgba(222,167,66,0) 68%);
+    box-shadow:0 0 108px rgba(222,167,66,.16);
+}
+
+
+/* bundled source: css/30-v130-requested-updates.css */
+/* V130 — Requested character, skill, shop and battle refinements. */
+
+/* Character skill tab: this is the single native scroll owner. */
+#game-stage #homeFeatureModal #characterTabContent{
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    min-height:0 !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+}
+
+#game-stage #homeFeatureModal #characterTabContent > #skillPage{
+    display:block !important;
+    position:static !important;
+    height:max-content !important;
+    min-height:max-content !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding-bottom:220px !important;
+    touch-action:pan-y !important;
+}
+
+#game-stage #homeFeatureModal #allSkillsList{
+    overflow:visible !important;
+    padding-bottom:80px !important;
+}
+
+/* All battle portraits now use the selected character's inline artwork. */
+#game-stage > #app > #game-content #battlePage .battle-player{
+    flex:1 1 0 !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:116px !important;
+    background-color:transparent !important;
+    background-repeat:no-repeat !important;
+    background-size:cover !important;
+    background-position:center 18% !important;
+    justify-content:flex-end !important;
+    padding-bottom:2px !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player .battle-player-icon{
+    display:none !important;
+}
+
+#game-stage > #app > #game-content #battlePage .battle-player .battle-player-id,
+#game-stage > #app > #game-content #battlePage .battle-player .battle-player-status{
+    text-shadow:0 1px 3px rgba(0,0,0,.98),0 0 5px #000 !important;
+}
+
+/* Fallen monsters stay readable because revival can return them to battle. */
+#game-stage > #app > #game-content #battlePage .battle-monster.dead{
+    opacity:.34 !important;
+}
+
+.shop-potion-purchase-row{
+    display:grid;
+    grid-template-columns:auto 70px minmax(0,1fr);
+    align-items:center;
+    gap:7px;
+    margin-top:8px;
+}
+
+.shop-potion-purchase-row label{
+    color:#b3a58c;
+    font-size:12px;
+}
+
+.shop-potion-quantity{
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    padding:8px 6px;
+    border:1px solid #8a6a3a;
+    border-radius:6px;
+    background:#17120d;
+    color:#f7e8c1;
+    text-align:center;
+    font:inherit;
+}
+
+.shop-potion-purchase-row .shop-potion-buy{
+    width:100%;
+    margin:0;
+}
+
+.skill-page-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+}
+
+.skill-page-heading h2{
+    margin:0;
+}
+
+.skill-preview-modal{
+    position:absolute;
+    inset:0;
+    z-index:600;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    box-sizing:border-box;
+    background:rgba(0,0,0,.82);
+}
+
+.skill-preview-modal.show{
+    display:flex;
+}
+
+.skill-preview-dialog{
+    width:min(92%,760px);
+    max-height:88%;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border:2px solid #a77a35;
+    border-radius:12px;
+    background:linear-gradient(180deg,#22190f,#100d0a);
+    box-shadow:0 14px 40px rgba(0,0,0,.75);
+}
+
+.skill-preview-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:13px 14px;
+    border-bottom:1px solid #6f5228;
+}
+
+.skill-preview-heading h2{
+    margin:0;
+    color:#f4d690;
+    font-size:20px;
+}
+
+.skill-preview-heading button,
+.skill-preview-tabs button{
+    border:1px solid #8a6a3a;
+    border-radius:6px;
+    padding:8px 10px;
+    background:#21180f;
+    color:#e8d4aa;
+    font-weight:800;
+}
+
+.skill-preview-tabs{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:5px;
+    padding:9px;
+}
+
+.skill-preview-tabs button.active{
+    border-color:#f0b429;
+    background:#5a3512;
+    color:#fff0ba;
+}
+
+.skill-preview-body{
+    min-height:0;
+    overflow-y:auto;
+    touch-action:pan-y;
+    -webkit-overflow-scrolling:touch;
+    padding:0 10px 22px;
+}
+
+.skill-preview-card{
+    margin:7px 0;
+    padding:10px;
+    border:1px solid #594424;
+    border-radius:8px;
+    background:rgba(255,255,255,.035);
+}
+
+.skill-preview-card > div{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+}
+
+.skill-preview-card strong{
+    color:#f1cf82;
+}
+
+.skill-preview-card span{
+    color:#9f9178;
+    font-size:12px;
+}
+
+.skill-preview-card p{
+    margin:6px 0 0;
+    color:#ded5c5;
+    font-size:13px;
+    line-height:1.55;
+}
+
+.creation-cancel-additional[hidden]{
+    display:none !important;
+}
+
+@media (max-width:520px){
+    .shop-potion-purchase-row{
+        grid-template-columns:auto 62px minmax(0,1fr);
+    }
+
+    .skill-preview-tabs button{
+        padding:8px 2px;
+        font-size:12px;
+    }
+}
+
+/*
+   Unified Large Panel ownership for the all-element skill preview.
+   V141 reparents this modal to <body>, so it cannot inherit the stage-scoped
+   design tokens. Use the shared token names with their current canonical
+   fallbacks, keep heading/tabs fixed, and let only the skill list scroll.
+*/
+html body .skill-preview-modal.v141-body-preview .skill-preview-dialog{
+    width:min(var(--ui-large-panel-max-width,396px),calc(100vw - var(--ui-large-panel-safe-space,24px))) !important;
+    max-width:var(--ui-large-panel-max-width,396px) !important;
+    height:min(var(--ui-large-panel-height,620px),calc(100dvh - var(--ui-large-panel-safe-space,24px))) !important;
+    max-height:calc(100dvh - var(--ui-large-panel-safe-space,24px)) !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+
+html body .skill-preview-modal.v141-body-preview .skill-preview-heading,
+html body .skill-preview-modal.v141-body-preview .skill-preview-tabs{
+    flex:0 0 auto !important;
+}
+
+html body .skill-preview-modal.v141-body-preview .skill-preview-tabs button{
+    min-height:var(--ui-large-panel-tab-height,42px) !important;
+}
+
+html body .skill-preview-modal.v141-body-preview .skill-preview-body{
+    flex:1 1 auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    padding-bottom:12px !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable !important;
+}
+
+
+/* bundled source: css/56-v174-critical-ui-regressions.css */
+/* V174 critical UI regressions — focused successor styling for the 2026-09-09 batch.
+   This file only owns the creation-page reflow, element-counter hints and the
+   compact skill action geometry requested in this batch. */
+
+/* Character creation: give the portrait more of the showcase and make every
+   descriptive block fit inside the fixed 1080 x 1920 native canvas. */
+#creationPage .creation-premium-header{
+    padding:4px 0 12px;
+}
+#creationPage .creation-header-ornament{
+    height:34px;
+    margin-bottom:2px;
+    font-size:32px;
+    line-height:34px;
+}
+#creationPage .creation-title{
+    font-size:58px;
+    line-height:1.14;
+}
+#creationPage .creation-subtitle{
+    margin-top:5px;
+    font-size:32px;
+}
+#creationPage .creation-step-progress{
+    margin-top:10px;
+    font-size:25px;
+}
+#creationPage .creation-showcase{
+    grid-template-columns:52% 48%;
+    flex-basis:900px;
+    height:900px;
+    min-height:900px;
+    margin-bottom:18px;
+}
+#creationPage .creation-portrait-panel{
+    min-height:900px;
+}
+#creationPage .creation-portrait-image{
+    bottom:0;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    object-position:center bottom;
+}
+#creationPage .creation-choice-panel{
+    padding:12px 24px 12px;
+}
+#creationPage .creation-section-kicker{
+    margin-bottom:5px;
+    font-size:28px;
+}
+#creationPage .creation-gender-grid{
+    gap:14px;
+}
+#creationPage .creation-gender-option{
+    height:78px;
+    font-size:32px;
+}
+#creationPage .creation-element-kicker{
+    margin-top:6px;
+}
+#creationPage .creation-element-grid{
+    gap:9px;
+}
+#creationPage .element-option{
+    height:112px;
+}
+#creationPage .creation-element-glyph{
+    width:56px;
+    height:56px;
+    margin-bottom:3px;
+    font-size:30px;
+}
+#creationPage .element-option .element-name{
+    font-size:26px;
+}
+#creationPage .creation-role-card{
+    margin-top:8px;
+    padding:12px 14px;
+    overflow:visible;
+}
+#creationPage .creation-role-title-row{
+    gap:10px;
+}
+#creationPage .creation-element-badge{
+    flex-basis:68px;
+    width:68px;
+    height:68px;
+    font-size:34px;
+}
+#creationPage .creation-role-title{
+    font-size:39px;
+    line-height:1.2;
+}
+#creationPage .creation-role-subtitle{
+    font-size:29px;
+    line-height:1.3;
+}
+#creationPage .creation-role-description{
+    margin-top:7px;
+    font-size:30px;
+    line-height:1.42;
+}
+#creationPage .creation-role-tags{
+    gap:5px;
+    margin-top:6px;
+}
+#creationPage .creation-role-tag{
+    padding:3px 10px;
+    font-size:24px;
+}
+#creationPage .creation-role-card::after{
+    content:"元素克制｜土剋水・水剋火・火剋風・風剋土";
+    display:block;
+    margin-top:8px;
+    padding:7px 10px;
+    border:2px solid rgba(218,166,76,.30);
+    border-radius:14px;
+    background:rgba(216,164,72,.08);
+    color:#d9c28f;
+    font-size:24px;
+    line-height:1.35;
+    font-weight:800;
+    text-align:center;
+}
+#creationPage .creation-card{
+    margin-bottom:16px;
+    padding:26px;
+}
+#creationPage .creation-card-heading{
+    margin-bottom:18px;
+}
+#creationPage .creation-input{
+    height:100px;
+}
+#creationPage .creation-next,
+#creationPage .creation-back{
+    height:124px;
+}
+
+/* All-element skill preview: the hint sits inside the real scroll owner so it
+   is visible without stealing gestures from the preview body. */
+#allElementSkillPreviewModal .skill-preview-body::before{
+    content:"元素克制提示｜土剋水・水剋火・火剋風・風剋土";
+    display:block;
+    position:relative;
+    z-index:1;
+    margin:0 0 18px;
+    padding:16px 20px;
+    box-sizing:border-box;
+    border:2px solid rgba(218,166,76,.42);
+    border-radius:18px;
+    background:linear-gradient(180deg,rgba(78,53,21,.68),rgba(24,18,11,.86));
+    color:#f0d89c;
+    font-size:34px;
+    line-height:1.35;
+    font-weight:900;
+    text-align:center;
+    letter-spacing:1px;
+}
+
+/* The runtime shortens state labels. Keep the action column bounded so it can
+   no longer consume the skill-description column on narrow phones. */
+#game-stage #allSkillsList .skill-row .skill-action-card{
+    max-width:108px;
+}
+#game-stage #allSkillsList .skill-row .skill-action-card-label{
+    white-space:normal;
+    overflow-wrap:normal;
+    word-break:keep-all;
+    text-align:center;
+}
+#game-stage #allSkillsList .skill-row .skill-row-text{
+    min-width:0;
+}
+
+
+/* bundled source: css/ad-free-service-info-modal.css */
+/* Paid-service disclosure inside the existing shared homeFeatureModal. */
+#game-stage #homeFeatureModal.ad-free-service-info-mode{
+    z-index:12000;
+    box-sizing:border-box;
+    padding:14px;
+    overflow:hidden;
+    overscroll-behavior:contain;
+    background:
+        radial-gradient(circle at 50% 28%,rgba(143,98,30,.14),transparent 44%),
+        rgba(2,2,2,.84);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-box{
+    display:flex;
+    width:calc(100% - var(--ui-medium-modal-safe-space,28px));
+    max-width:var(--ui-medium-modal-max-width,360px);
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px));
+    min-height:0;
+    box-sizing:border-box;
+    flex-direction:column;
+    overflow:hidden;
+    border:2px solid #b98a3f;
+    border-radius:13px;
+    background:
+        linear-gradient(145deg,rgba(37,27,17,.98),rgba(9,8,7,.99) 58%,rgba(18,13,9,.99));
+    box-shadow:
+        0 18px 46px rgba(0,0,0,.72),
+        inset 0 0 0 1px rgba(255,225,151,.07),
+        inset 0 0 28px rgba(186,128,43,.08);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title{
+    flex:0 0 auto;
+    min-height:52px;
+    box-sizing:border-box;
+    padding:12px 14px 10px;
+    border-bottom:1px solid rgba(194,147,68,.52);
+    background:
+        linear-gradient(180deg,rgba(53,37,20,.96),rgba(18,13,9,.96));
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > span{
+    color:#f0cf83;
+    font-family:"Noto Serif TC",serif;
+    font-size:20px;
+    font-weight:900;
+    letter-spacing:1px;
+    line-height:1.35;
+    text-shadow:0 1px 2px #000,0 0 10px rgba(229,173,66,.18);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > div{
+    display:none;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode #homeFeatureModalBody{
+    flex:1 1 auto;
+    min-height:0;
+    box-sizing:border-box;
+    padding:14px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+    scrollbar-gutter:stable;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-panel{
+    display:flex;
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    flex-direction:column;
+    gap:12px;
+    color:#ddd2bd;
+    font-size:15px;
+    line-height:1.65;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-hero{
+    display:flex;
+    box-sizing:border-box;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    padding:12px 10px 11px;
+    border:1px solid rgba(193,145,65,.58);
+    border-radius:10px;
+    background:
+        radial-gradient(circle at 50% 0,rgba(211,159,70,.12),transparent 58%),
+        rgba(20,15,10,.86);
+    box-shadow:inset 0 0 18px rgba(213,159,60,.04);
+    text-align:center;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-subtitle{
+    color:#ead7ad;
+    font-family:"Noto Serif TC",serif;
+    font-size:17px;
+    font-weight:900;
+    letter-spacing:.5px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-price{
+    color:#f2c769;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-size:28px;
+    font-weight:900;
+    line-height:1.25;
+    letter-spacing:.4px;
+    text-shadow:0 0 12px rgba(233,176,62,.16);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-badge{
+    color:#ae9a77;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.3px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy{
+    box-sizing:border-box;
+    padding:11px 12px;
+    border:1px solid rgba(137,104,57,.44);
+    border-radius:9px;
+    background:rgba(8,7,6,.62);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p{
+    margin:0 0 8px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p:last-child{
+    margin-bottom:0;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support{
+    display:flex;
+    box-sizing:border-box;
+    flex-direction:column;
+    gap:9px;
+    padding:11px;
+    border:1px solid rgba(154,116,60,.48);
+    border-radius:9px;
+    background:rgba(15,11,8,.72);
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row{
+    display:flex;
+    min-width:0;
+    align-items:flex-start;
+    gap:6px;
+    color:#cabd9f;
+    overflow-wrap:anywhere;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > span{
+    flex:0 0 auto;
+    color:#a99572;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > b{
+    min-width:0;
+    color:#ead4a4;
+    font-weight:800;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > b[data-todo="true"]{
+    color:#9c907c;
+    font-weight:700;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:7px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button,
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button{
+    min-height:44px;
+    box-sizing:border-box;
+    padding:8px 10px;
+    border:1px solid #806439;
+    border-radius:8px;
+    background:linear-gradient(180deg,#302519,#17110c);
+    color:#dfd1b6;
+    font-family:"Noto Sans TC",sans-serif;
+    font-size:14px;
+    font-weight:800;
+    line-height:1.35;
+    letter-spacing:.2px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:disabled,
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button:disabled{
+    border-color:#51483c;
+    background:#171512;
+    color:#777065;
+    cursor:not-allowed;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:focus-visible,
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button:focus-visible{
+    outline:2px solid #f0d289;
+    outline-offset:2px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-todo-note{
+    margin:0;
+    color:#8f8574;
+    font-size:12px;
+    line-height:1.55;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+    padding-top:2px;
+}
+
+#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions .ad-free-service-acknowledge{
+    border-color:#c09243;
+    background:linear-gradient(180deg,#e8c66e,#b9792c);
+    color:#261707;
+    font-weight:900;
+    box-shadow:inset 0 1px 0 rgba(255,248,213,.24),0 3px 10px rgba(0,0,0,.3);
+}
+
+@media (max-width:360px){
+    #game-stage #homeFeatureModal.ad-free-service-info-mode{
+        padding:10px;
+    }
+
+    #game-stage #homeFeatureModal.ad-free-service-info-mode #homeFeatureModalBody{
+        padding:11px;
+    }
+
+    #game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-panel{
+        gap:10px;
+        font-size:14px;
+    }
+}

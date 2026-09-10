@@ -1,3 +1,27 @@
+## 2026-09-10 V173.65 battle/audio live QA race follow-up（DEV REMOTE VERIFIED／MAIN PENDING）
+
+- Work branches：`fix/v17365-battle-live-qa-race` 與 `fix/v17365-battle-live-qa-cast-race`，基準鏈自 release merge 後的 `dev@1783d3847ef7e2835915d763c4d517268e5a6098` 開始；PR #129 與 #131 均在 Repository checks 成功後合入，最終驗證 tip 為 `dev@e47a0ca8d1d39363640abb4e9d4755f73c809a73`，`main` 尚未修改。
+- Release merge 的 Actions run `34430685287` 已通過 Repository checks、Cloudflare exact-SHA／V173.65 驗證、live account-first cold-start 與 live Abyss QA；唯一失敗為 `.github/scripts/battle-layer-audio-live-qa.mjs` 的 V143／元素匣疊層檢查。原始 attempt 在開 modal 後讀到已結束的 stage，重跑 attempt 2 則在開 modal 前等待測試 stage 時已被下一個真實戰鬥動作 supersede，證明失敗來自跨 CDP round-trip 的 live battle 時序競態，不是正式疊層或 VFX owner 回歸。
+- QA owner 改為兩個各自 atomic 的 browser task：第一個在正式 `castDamageSkill('explosiveFlurry')` 返回前立即擷取其 V143 raster stage，證明真實戰鬥施放會到達 V143；第二個依序呼叫正式 `v142SkillAnimationDirector.play()`、取得 stage、呼叫正式 `openHomeFeature('autoBattleSettings')` wrapper chain，並立即驗證前後為同一 DOM node、stage 仍 mounted、presentation 已 hidden／opacity 0、modal ownership 與 audio scale 正確。
+- `js/37-v142-skill-animation.js`（gate／supersede）、`js/39-v143-skill-animation.js`（raster stage lifecycle）、`js/45-v154-dev-fixes.js` 與 `css/46-v154-dev-fixes.css`（元素匣 focus／presentation suppression）均未修改；沒有暫停戰鬥、延長正式動畫、保留 idle stage、增加 wrapper 或新增 runtime patch。
+- `tests/v174-battle-layer-audio-fixes.test.js` 新增 regression，固定正式 cast 證據與 modal overlap 證據各自在單一 atomic browser snapshot 內完成，涵蓋 production cast、director、正式元素匣 opener 與 stage identity，禁止恢復會與持續戰鬥競速的等待式檢查。
+- 本機已通過：139/139 Node suites、212/212 JavaScript syntax、303 static resources、249 unique HTML IDs、deterministic build、loader、V173.65 release gate（10/10）、git-diff／conflict-marker gates。Game／Cache Version 維持 V173.65／173.65。
+- GitHub Actions push run `34434007783` 的 Repository checks 與 Dev deployment gate 全部 SUCCESS：Cloudflare 已讀回 exact SHA `1a3b5a35942e9821f3fad2c933afe198126597b0`，live account-first auth UI 1253.6 ms（5 秒目標達成），live Abyss 與修正後 battle/audio mobile QA 均 PASS。使用者已明確授權驗證完成後以受保護 PR 推進 main；main Repository checks、GitHub Pages deploy 與 production exact-SHA／version 驗證完成前仍不得宣稱正式發布完成。
+- 後續純文件 deploy run `34434554334` 揭露正式 Fire Flurry cast 的證據仍跨越 wait/read CDP round-trip，1.45 秒 stage 在讀值前合法結束而得到 `skill:null`；PR #131 將這一段也改為 atomic snapshot。最終 push run `34435227337` 的 Repository checks 與 Dev deployment gate 全部 SUCCESS：Cloudflare exact SHA `e47a0ca8d1d39363640abb4e9d4755f73c809a73`、live account-first auth UI 2014.9 ms（5 秒目標達成）、live Abyss 與 live battle/audio mobile QA 全數 PASS。
+
+## 2026-09-10 V173.65 Account-first Boot Architecture（DEV VERIFIED／已授權推進 main）
+
+- 基準為 GitHub `dev@70df66e8cb371ff6193a7f70609cf9aad7bd15ac`；原工作分支 `perf/cold-start-auth-boot-architecture` 經 PR #123 合入 dev，後續僅以 PR #124～#127 修復部署 header 與既有 Live QA 對新 lazy owner 的舊假設。使用者已明確授權依序完成 dev preview 後推進 main。
+- `js/startup/startup-contract.js` + `js/52-v173.20-startup-loader.js` 是唯一 StartupStateMachine owner。正式狀態為 `BOOT_LOADING / AUTH_RESOLVING / AUTH_REQUIRED / SAVE_LOADING / MIGRATION_REQUIRED / NEED_CHARACTER / READY / OFFLINE_READY / ERROR`；創角只有 `NEED_CHARACTER` 且 Auth UID/resolved UID/active UID 一致時可見。
+- `js/startup/account-save-repository.js` 是 UID local ownership 與 legacy migration owner。Canonical key 為 `four_symbols_save:{uid}`，metadata 與 sidecar 亦依 UID 隔離；`battle_full_version_save_v5` 不自動綁定，migration 必須確認、先備份、衝突 fail closed。
+- `scripts/build-production.mjs` 產生 deterministic content-hashed boot/app/gameplay/feature bundles；`asset-manifest.json` 是實際 Critical/Feature deploy manifest。Execution order 固定在 bundle source list，網路 preparation 並行，不再用大量 sequential HTTP request 維持 wrapper 順序。
+- `js/startup/feature-loader.js` 是唯一動態 script owner；`js/20-anonymous-20.js` 只負責 pointer/touch prefetch、feature-local loading 與 idle preload，不再有 32-runtime 全域 input lock。已有帳號到主城只等 app shell；gameplay/patrol/abyss/skill/boss/relic 等不阻塞 Auth／創角／主城。
+- 61 個 `v131-patrol-sprite-*.js` chunk 已刪除；`js/26-v131-patrol-appearance.js` 改用 16 個 `assets/characters/patrol/*.webp` content-hashed 正常資產。Critical logo 亦改為 `assets/ui/startup-logo.4631c0bc3f2b.jpg`。
+- Firebase 正式順序改為 identity → UID → cloud/local read → destination；訪客使用 Anonymous Auth。正式帳號 UI 已移除「先使用本機存檔」。Firestore browser write 仍禁止，trusted-backend-only policy 未放寬。
+- 永久規格見 `docs/BOOT_ARCHITECTURE.md`；before static baseline 與實測 browser evidence 見 `docs/BOOT_PERFORMANCE_BASELINE.md`。新增 account/auth/boot/feature/budget Node gates、controlled mobile Chrome QA 與 deployed live cold-start QA。
+- DEV verification commit `08d23ecbf38ab74a6b1ef4ced43fefcded02901a`、Actions run `34428020728`：139/139 Node suites、controlled account-first browser QA、Cloudflare exact-SHA deploy、live auth-first cold boot、Abyss 與 battle/audio mobile QA 全數 SUCCESS。Live signed-out auth UI 693.3 ms、first paint 448 ms、10 requests／356,374 B；controlled warm existing-user city interactive 475 ms。
+- Requirement Batch：`release/requirement-batches/2026-09-09-cold-start-auth-boot-architecture.json`，12/12 VERIFIED；發布候選 V173.65。正式 main promotion 仍須受保護 PR、main CI、GitHub Pages deploy 與 production exact-SHA/version 驗證後才能宣稱完成。
+
 ## 2026-09-08 三分支 gameplay／秘寶方形圖／全域非戰鬥字級安全整合（dev）
 
 - 整合前 GitHub `dev` 為 `39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5`；三條遠端 branch tip 均精確等於使用者指定 SHA，且 merge base 都是該 dev、0 behind，沒有互相包含。實際順序依 owner／視覺層級為 gameplay regressions → relic square art → global non-battle typography。

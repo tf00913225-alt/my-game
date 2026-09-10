@@ -9,7 +9,7 @@ const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const wordRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const css=fs.readFileSync("css/44-v149-skill-ui-rules.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -65,8 +65,8 @@ test("the official Sprite has no word-circle or procedural fallback",()=>{
 });
 
 test("the current cache version publishes the corrected source asset and metadata",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log("\nV161 Fire Slash VFX suite: "+passed+" tests passed.");

@@ -4,15 +4,18 @@ const vm=require("vm");
 const assert=require("node:assert/strict");
 
 const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
+const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const build=fs.readFileSync("scripts/build-production.mjs","utf8");
+const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
-assert.match(loader,/js\/60-team-relic-system\.js\?v=173\.64-relic2/);
-assert.match(loader,/css\/55-team-relic-system\.css\?v=173\.64-relic2/);
-assert.match(loader,/js\/59-abyss-two-tier-runtime\.js\?v=173\.64-abyss3/);
-assert.match(loader,/function loadSkillProgressionRuntime\(\)\{[\s\S]*?script\.src="js\/60-v173\.64-skill-progression-rebalance\.js\?v=173\.64"[\s\S]*?script\.onload=function\(\)\{[\s\S]*?loadTeamRelicRuntime\(\)/);
-assert.equal((loader.match(/addEventListener\("load",loadTeamRelicRuntime/g)||[]).length,1,"team relic load continuation listener must not be duplicated");
-assert.equal((loader.match(/addEventListener\("error",loadTeamRelicRuntime/g)||[]).length,1,"team relic error continuation listener must not be duplicated");
+assert.match(build,/const bossRelicScripts=\["js\/gameplay-boss-tower-system\.js","js\/60-team-relic-system\.js"\]/);
+assert.match(build,/"css\/55-team-relic-system\.css"/);
+assert.match(build,/const abyssScripts=\["js\/59-abyss-two-tier-runtime\.js"\]/);
+assert.equal(manifest.featureManifest.features.relic,"feature-boss-relic");
+assert.equal(manifest.featureManifest.features["boss-tower"],"feature-boss-relic");
+assert.doesNotMatch(loader,/createElement\(["']script["']\)|\.onload\s*=/);
 assert.match(source,/const RELIC_BALANCE_CONFIG=Object\.freeze/);
 assert.match(source,/playerRelics/);
 assert.match(source,/teamLoadout=\{relicId:null,subRelicId:null\}/);
@@ -69,6 +72,8 @@ assert.match(source,/battleLog\(def\.name\+"｜"\+currentEffectText/,
 
 function createRuntime(){
     const store=new Map();
+    const accountUid="relic-system-uid";
+    const accountSaveKey="four_symbols_save:"+accountUid;
     const battleLogs=[];
     const party=[
         {id:"甲",level:30,hp:1000,sp:200,activeBuffs:[],statusEffects:[]},
@@ -108,15 +113,21 @@ function createRuntime(){
         winBattle(){this.battleActive=false;},loseBattle(){this.battleActive=false;}
     };
     context.window=context;
-    context.saveGame=function(){store.set("game-save",JSON.stringify({player:{id:"甲"},gold:context.gold}));};
-    store.set("game-save",JSON.stringify({player:{id:"甲"},gold:100000}));
     vm.createContext(context);
+    vm.runInContext(repositorySource,context);
+    context.FourSymbolsAccountSave.activate(accountUid);
+    context.FourSymbolsAccountSave.writeForUid(accountUid,{player:{id:"甲"},gold:100000},{source:"fixture"});
+    context.saveGame=function(){
+        const data=context.FourSymbolsAccountSave.readForUid(accountUid).save;
+        data.gold=context.gold;
+        context.FourSymbolsAccountSave.writeForUid(accountUid,data,{source:"test-core"});
+    };
     vm.runInContext(source,context);
-    return {context,store,party,monsters,battleLogs,setEnemyDamage:value=>{enemyDamage=value;}};
+    return {context,store,accountSaveKey,party,monsters,battleLogs,setEnemyDamage:value=>{enemyDamage=value;}};
 }
 
 const runtime=createRuntime();
-const {context,store,party,monsters,battleLogs}=runtime;
+const {context,store,accountSaveKey,party,monsters,battleLogs}=runtime;
 assert.equal(Object.keys(context.v174RelicSystem.catalog).length,20,"catalog has 20 relics");
 assert.equal(Object.values(context.v174RelicSystem.catalog).filter(r=>r.runtimeReady).length,10,"first 10 relics are real runtime-ready relics");
 assert.equal(Object.values(context.v174RelicSystem.catalog).filter(r=>!r.runtimeReady).length,10,"relics 11-20 remain locked placeholders");
@@ -142,7 +153,7 @@ assert.deepEqual(explicitBattleLimits.sort(),[
 ].sort(),"only relics with intentional design limits may have per-battle caps");
 
 assert.equal(context.v174EquipRelic("relic_qiankun_flask"),true);
-let saved=JSON.parse(store.get("game-save"));
+let saved=JSON.parse(store.get(accountSaveKey));
 assert.equal(saved.teamLoadout.relicId,"relic_qiankun_flask");
 assert.equal(saved.playerRelics.relic_qiankun_flask.unlocked,true);
 assert.equal(Object.keys(saved.teamLoadout).filter(key=>/relic/i.test(key)).length,2,"one primary relic truth plus reserved disabled sub-relic field");
@@ -225,11 +236,11 @@ assert.equal(context.v174RelicDebugState().lastEvent.event,"enemy_defeated","cha
 const beforeLevel=context.v174RelicSystem.getOwnedState().relic_qiankun_flask.level;
 assert.equal(context.v174UpgradeRelic("relic_qiankun_flask"),true);
 assert.equal(context.v174RelicSystem.getOwnedState().relic_qiankun_flask.level,beforeLevel+1);
-saved=JSON.parse(store.get("game-save"));
+saved=JSON.parse(store.get(accountSaveKey));
 assert.equal(saved.playerRelics.relic_qiankun_flask.level,beforeLevel+1,"upgrade persists in the existing SAVE_KEY document");
 
 assert.equal(context.v174EquipRelic("relic_origin_talisman"),false,"locked/non-runtime relic can never become a fake usable relic");
 context.v174UnequipRelic();
-saved=JSON.parse(store.get("game-save"));assert.equal(saved.teamLoadout.relicId,null,"unequip persists relicId=null");
+saved=JSON.parse(store.get(accountSaveKey));assert.equal(saved.teamLoadout.relicId,null,"unequip persists relicId=null");
 
 console.log("✓ V174 team relic system integration tests passed.");

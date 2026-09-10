@@ -3,7 +3,7 @@
 "use strict";
 if(typeof window==="undefined"||window.__v17351InventoryQaInstalled)return;
 window.__v17351InventoryQaInstalled=true;
-const TYPES=new Set(["head","shoulder","shoes","weapon","hand","armor"]),Q=["white","blue","purple","orange"],QL={white:"白裝",blue:"藍裝",purple:"紫裝",orange:"橙裝"},KEY="v17350_bulk_sell_quality";
+const TYPES=new Set(["head","shoulder","shoes","weapon","hand","armor"]),Q=["white","blue","purple","orange"],QL={white:"白裝",blue:"藍裝",purple:"紫裝",orange:"橙裝"},KEY=window.FourSymbolsAccountSave.accountKey("bulk-sell-quality");
 const num=v=>Number.isFinite(Number(v))?Number(v):0,integer=(v,f=0)=>Math.max(0,Math.floor(Number.isFinite(Number(v))?Number(v):f));
 const alertRpg=(m,o)=>typeof window.rpgAlert==="function"?window.rpgAlert(m,o||{}):Promise.resolve(),confirmRpg=(m,o)=>typeof window.rpgConfirm==="function"?window.rpgConfirm(m,o||{}):Promise.resolve(false);
 function equipment(i){if(!i)return false;try{if(typeof isEquipmentInventoryType==="function")return !!isEquipmentInventoryType(i.type)}catch(_){}return TYPES.has(String(i.type||""));}

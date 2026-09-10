@@ -56,13 +56,14 @@ test("bootstrap exposes the narrow Firebase bridge and cloud-read events", ()=>{
     assert.match(bootstrap, /cloudSaveWritePolicy:\s*CLOUD_SAVE_WRITE_POLICY/);
 });
 
-test("authentication UI supports Google, email, anonymous and local-only fallback", ()=>{
+test("authentication UI supports Google, email and Firebase anonymous identity without production bypass", ()=>{
     assert.match(ui, /signInWithGoogle/);
     assert.match(ui, /signInWithEmail/);
     assert.match(ui, /createAccountWithEmail/);
     assert.match(ui, /signInAsAnonymous/);
     assert.match(ui, /signOutFirebase/);
-    assert.match(ui, /先使用本機存檔/);
+    assert.doesNotMatch(ui, /先使用本機存檔/);
+    assert.match(ui, /沒有 UID 時不能建立角色/);
     assert.match(ui, /UID：/);
     assert.match(css, /\.firebase-auth-overlay/);
     assert.match(css, /z-index:999998/);
@@ -70,11 +71,12 @@ test("authentication UI supports Google, email, anonymous and local-only fallbac
     assert.match(touch, /\.firebase-auth-dialog/);
 });
 
-test("startup owner loads Firebase as optional infrastructure without changing runtime module totals", ()=>{
-    assert.match(startup, /Firebase infrastructure bootstrap/);
-    assert.match(startup, /js\/firebase\/firebase-bootstrap\.js\?v=173\.64/);
-    assert.match(startup, /DEFAULT_RUNTIME_TOTAL=32/);
-    assert.doesNotMatch(startup, /__v173ReportRuntimeProgress\([^\n]*firebase/i);
+test("startup owner makes Firebase identity mandatory without a full-runtime gate", ()=>{
+    assert.match(startup, /installStartupStateMachine/);
+    assert.match(startup, /AUTH_RESOLVING/);
+    assert.match(startup, /SAVE_LOADING/);
+    assert.match(startup, /NEED_CHARACTER/);
+    assert.doesNotMatch(startup, /DEFAULT_RUNTIME_TOTAL|TOTAL_RUNTIME_MODULES|__v17347RuntimeGate/);
 });
 
 test("documentation and Requirement Batch preserve the live-verification boundary", ()=>{

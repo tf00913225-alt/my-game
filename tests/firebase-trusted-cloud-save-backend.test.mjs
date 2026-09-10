@@ -12,6 +12,7 @@ const functionsIndex=read("functions/index.js");
 const functionsPackage=JSON.parse(read("functions/package.json"));
 const rules=read("firestore.rules");
 const client=read("js/firebase/firebase-cloud-save.js");
+const deployWorkflow=read(".github/workflows/deploy-dev-cloudflare.yml");
 
 function validSave(){
     return {
@@ -91,4 +92,14 @@ test("trusted backend does not wrap the existing local save owner",()=>{
     assert.doesNotMatch(combined,/saveGame\s*=/);
     assert.doesNotMatch(combined,/loadGame\s*=/);
     assert.doesNotMatch(functionsIndex,/localStorage/);
+});
+
+test("Cloudflare deploy is isolated from Firebase backend sources",()=>{
+    assert.match(deployWorkflow,/--exclude='functions\/'/);
+    assert.match(deployWorkflow,/--exclude='\.firebaserc'/);
+    assert.match(deployWorkflow,/--exclude='firebase\.json'/);
+    assert.match(deployWorkflow,/--exclude='firestore\.rules'/);
+    assert.match(deployWorkflow,/working-directory:\s*_deploy/);
+    assert.match(deployWorkflow,/pages deploy \. \\/);
+    assert.doesNotMatch(deployWorkflow,/pages deploy _deploy/);
 });

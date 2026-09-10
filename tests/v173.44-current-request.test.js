@@ -12,7 +12,7 @@ const economy=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const main=fs.readFileSync("js/00-main.js","utf8");
 const water=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const v132=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 assert.match(battle,/REFERENCE_TARGET_ORDER_6=\[4,1,3,6,2,5\]/);
@@ -57,7 +57,7 @@ assert.match(main,/function learnSkill\(skillId\)[\s\S]*?isSkillPrereqMet\([\s\S
 assert.match(water,/applyFinalSkillData\(\);[\s\S]*?renderSkillLoadout\(\)/);
 assert.match(abyssCss,/home-background-v17344\.png/);
 assert.equal(fs.existsSync("assets/ui/home-background-v17344.png"),true,"assets/ui/home-background-v17344.png");
-assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
+assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
 
 console.log("✓ V173.50 current request regression passed");

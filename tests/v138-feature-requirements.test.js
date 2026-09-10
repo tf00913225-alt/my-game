@@ -6,7 +6,7 @@ const vm=require("node:vm");
 
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
-const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 const battleCss=fs.readFileSync("css/31-v131-fix-batch.css","utf8");
 
@@ -179,9 +179,12 @@ test("set bonuses and skill costs are visible before extra detail clicks",()=>{
     assert.match(indexSource,/剩餘技能點：/);
 });
 
-test("current cache version reaches the loader and all dynamic assets",()=>{
-    assert.match(indexSource,/js\/20-anonymous-20\.js\?v=173\.64/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
+test("current release uses a hashed boot entry and feature manifest",()=>{
+    const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
+    assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.65"/);
+    assert.equal(manifest.release,"173.65");
+    assert.ok(manifest.featureManifest.bundles["gameplay-core"]);
 });
 
 console.log("\nV138 feature suite: "+passed+" tests passed.");

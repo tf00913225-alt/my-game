@@ -6,7 +6,7 @@
 (function installV141ContentSystems(){
     "use strict";
 
-    const ABYSS_STORAGE_KEY="v141_abyss_state";
+    const ABYSS_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("legacy-abyss-state");
     const TIER_ALIASES={low:"white",mid:"blue",high:"purple",perfect:"orange"};
     const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
     const TALISMAN_TIER_ORDER=["white","blue","purple","orange"];

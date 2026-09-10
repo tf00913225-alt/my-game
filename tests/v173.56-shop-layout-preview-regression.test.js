@@ -3,7 +3,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const shop=fs.readFileSync("js/56-v173.51-shop-qa.js","utf8");
 const css=fs.readFileSync("css/53-v173.51-qa.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 assert.ok(shop.includes("v17345-equipment-card v17346-shop-card"));
 assert.ok(shop.includes("v17345-equipment-icon v17346-gear-art"));
@@ -17,6 +17,6 @@ assert.ok(shop.includes("window.v17346PreviewEquipmentShopOffer=window.v17351Pre
 assert.ok(!shop.includes("v17345-equipment-card v17351-shop-card"));
 assert.ok(!css.includes(".v17351-shop-card{display:grid!important;grid-template-columns:88px"));
 assert.ok(css.includes(".v17346-shop-card.purchased .v17346-shop-buy.v17351-purchased-buy"));
-assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
+assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
 console.log("✓ V173.62 restores premium equipment shop layout and click preview");

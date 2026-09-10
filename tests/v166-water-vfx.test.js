@@ -14,7 +14,7 @@ const support=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const waterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const finalRules=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
@@ -692,8 +692,8 @@ test("final combat targeting and Frostbite rules use the Water owner",()=>{
 });
 
 test("the current cache version publishes the water sheets, choreography and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/js\/20-anonymous-20\.js\?v=173\.64/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
 });

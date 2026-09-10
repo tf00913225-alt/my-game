@@ -11,9 +11,11 @@
     if(typeof window==="undefined"||window.__v174TwoTierAbyssInstalled){ return; }
     window.__v174TwoTierAbyssInstalled=true;
 
-    const STORAGE_KEY="v174_abyss_state_v2";
-    const MAIN_SAVE_KEY="battle_full_version_save_v5";
-    const LEGACY_STORAGE_KEY="v141_abyss_state";
+    const ACCOUNT_REPOSITORY=window.FourSymbolsAccountSave;
+    const ACTIVE_UID=ACCOUNT_REPOSITORY.getActiveUid();
+    const STORAGE_KEY=ACCOUNT_REPOSITORY.accountKey("abyss-state",ACTIVE_UID);
+    const MAIN_SAVE_KEY=ACCOUNT_REPOSITORY.saveKey(ACTIVE_UID);
+    const LEGACY_STORAGE_KEY=ACCOUNT_REPOSITORY.accountKey("legacy-abyss-state",ACTIVE_UID);
     const STATE_VERSION=3;
     const PRE_STAGE_COUNT=4;
     const PRE_STAGE_REGULAR_COUNT=5;
@@ -226,7 +228,7 @@
     }
 
     function readMainSave(){
-        try{ return JSON.parse(localStorage.getItem(MAIN_SAVE_KEY)||"null"); }catch(_){ return null; }
+        try{ const result=ACCOUNT_REPOSITORY.readForUid(ACTIVE_UID); return result.status==="ready"?result.save:null; }catch(_){ return null; }
     }
     function loadRoot(){
         let parsed=null;
@@ -297,7 +299,7 @@
         const mainSave=readMainSave();
         if(mainSave&&typeof mainSave==="object"){
             mainSave.abyssProgress=JSON.parse(JSON.stringify(rootState));
-            try{ localStorage.setItem(MAIN_SAVE_KEY,JSON.stringify(mainSave)); }catch(_){ }
+            try{ ACCOUNT_REPOSITORY.writeForUid(ACTIVE_UID,mainSave,{source:"abyss"}); }catch(_){ }
         }
     }
     persist();

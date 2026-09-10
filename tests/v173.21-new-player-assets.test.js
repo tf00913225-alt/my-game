@@ -7,8 +7,9 @@ const main=fs.readFileSync("js/00-main.js","utf8");
 const patrol=fs.readFileSync("js/26-v131-patrol-appearance.js","utf8");
 const quests=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const questCss=fs.readFileSync("css/25-stage-v90-quest-interface-core.css","utf8");
-const loader=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
+const assetManifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
 let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
@@ -61,13 +62,15 @@ test("quest milestones keep claimable chests bright while unavailable and claime
 test("male patrol art switches front and back images for every element",()=>{
     ["fire","water","wind","earth"].forEach(element=>{
         ["front","back"].forEach(facing=>{
-            const path="assets/characters/patrol-male-"+element+"-"+facing+"-v173.21.webp";
+            const prefix="assets/characters/patrol/patrol-male-"+element+"-"+facing+".";
+            const path=assetManifest.featureManifest.bundles["feature-patrol"].assets.find(value=>value.startsWith(prefix));
+            assert.ok(path,"manifest maps "+prefix);
             assertAsset(path,"RIFF");
             assert.match(patrol,new RegExp(element+':[\\s\\S]*?'+facing+':"'+path.replaceAll(".","\\.")+'"'));
         });
     });
-    assert.match(patrol,/const maleArt=isMaleCharacter\(character\)[\s\S]*?malePatrolArtUrls\[element\]\[facing\]/);
-    assert.match(patrol,/if\(maleArt\)\{\s*img\.src=maleArt;/);
+    assert.match(patrol,/function artFor\(character,facing\)[\s\S]*?ART\[gender\]\[element\]/);
+    assert.match(patrol,/image\.src=artFor\(character,facing\)/);
 });
 
 test("both patrol fight frames point to the newly supplied images",()=>{
@@ -80,10 +83,10 @@ test("both patrol fight frames point to the newly supplied images",()=>{
 });
 
 test("the development release and cache advance to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
-    assert.match(index,/css\/25-stage-v90-quest-interface-core\.css\?v=173\.39/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
+    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.css/);
 });
 
 console.log("\n"+passed+" V173.39 new-player and supplied-asset tests passed.");

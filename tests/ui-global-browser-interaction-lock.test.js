@@ -10,11 +10,15 @@ const qaCss=fs.readFileSync("css/53-v173.51-qa.css","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const release=JSON.parse(fs.readFileSync("release/release.json","utf8"));
+const buildSource=fs.readFileSync("scripts/build-production.mjs","utf8");
+const assets=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 const guide=fs.readFileSync("UI_GUIDELINES.md","utf8");
 
 assert.match(index,/maximum-scale=1\.0,user-scalable=no/);
-assert.match(index,/js\/01-stage-v8-touch-lock\.js\?v=173\.64/);
-assert.ok(release.managedCacheReferences.includes("js/01-stage-v8-touch-lock.js"));
+assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+assert.match(buildSource,/"js\/01-stage-v8-touch-lock\.js"/);
+assert.equal(assets.featureManifest.features.home,"app-shell");
+assert.ok(Array.isArray(release.managedCacheReferences));
 assert.match(baseCss,/#game-stage img,[\s\S]*?-webkit-touch-callout:none/);
 assert.match(touchSource,/event\.touches[\s\S]*?event\.touches\.length>1[\s\S]*?event\.preventDefault\(\)/);
 assert.match(touchSource,/"contextmenu"[\s\S]*?event\.preventDefault\(\)/);

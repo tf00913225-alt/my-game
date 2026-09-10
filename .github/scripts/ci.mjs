@@ -2,6 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import {spawnSync} from "node:child_process";
 import {fileURLToPath} from "node:url";
 
@@ -487,118 +488,72 @@ function escapeRegExp(value){
     return value.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
 }
 
-function versionForIndexReference(indexSource,resource){
-    const re=new RegExp(`\\b(?:src|href)\\s*=\\s*["']${escapeRegExp(resource)}\\?v=([^"'&#\\s]+)["']`,"gi");
-    return Array.from(indexSource.matchAll(re),match=>match[1]);
-}
-
 function checkLoader(){
     const indexFile=path.join(ROOT,"index.html");
     const loaderFile=path.join(ROOT,"js/20-anonymous-20.js");
     const indexSource=fs.readFileSync(indexFile,"utf8");
     const loaderSource=fs.readFileSync(loaderFile,"utf8");
     const errors=[];
+    const buildCheck=commandResult(process.execPath,["scripts/build-production.mjs","--check"]);
+    if(buildCheck.status!==0){
+        renderProcessFailure(buildCheck);
+        errors.push("Production build outputs are stale or non-deterministic.");
+    }
+    let manifest;
+    try{ manifest=JSON.parse(fs.readFileSync(path.join(ROOT,"asset-manifest.json"),"utf8")); }
+    catch(error){ errors.push(`asset-manifest.json is invalid: ${error.message}`); manifest={critical:{scripts:[],styles:[]},featureManifest:{bundles:{},features:{}},assets:{}}; }
 
-    const versionMatches=Array.from(loaderSource.matchAll(/\bconst\s+V_ASSET_VERSION\s*=\s*["']([^"']+)["']/g));
-    if(versionMatches.length!==1){
-        errors.push(`js/20-anonymous-20.js must define exactly one V_ASSET_VERSION; found ${versionMatches.length}.`);
-    }
-    const release=versionMatches[0]?.[1];
-    if(release && !/^[A-Za-z0-9._-]+$/.test(release)){
-        errors.push(`V_ASSET_VERSION contains unsupported characters: ${release}`);
-    }
+    const localAttributes=(tag,attribute)=>Array.from(indexSource.matchAll(new RegExp(`<${tag}\\b[^>]*\\b${attribute}\\s*=\\s*(?:"([^"]+)"|'([^']+)'|([^\\s"'=<>]+))[^>]*>`,"gi")),match=>cleanReference(match[1]??match[2]??match[3])).filter(value=>!isExternalReference(value));
+    const directScripts=localAttributes("script","src");
+    const directStyles=Array.from(indexSource.matchAll(/<link\b(?=[^>]*\brel\s*=\s*["']stylesheet["'])[^>]*\bhref\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))[^>]*>/gi),match=>cleanReference(match[1]??match[2]??match[3])).filter(value=>!isExternalReference(value));
+    if(JSON.stringify(directScripts)!==JSON.stringify(manifest.critical?.scripts||[])){ errors.push("index.html scripts do not exactly match asset-manifest critical scripts."); }
+    if(JSON.stringify(directStyles)!==JSON.stringify(manifest.critical?.styles||[])){ errors.push("index.html styles do not exactly match asset-manifest critical styles."); }
+    if(directScripts.length!==1 || directStyles.length!==1){ errors.push(`Critical HTML must contain one JavaScript and one stylesheet; found ${directScripts.length}/${directStyles.length}.`); }
 
-    const releaseEntries=[
-        "css/00-main.css",
-        "css/19-stage-v54-main-city-moderate-native-scale.css",
-        "js/00-main.js",
-        "js/16-stage-v54-main-city-runtime.js",
-        "js/19-stage-v78-character-inventory-runtime.js",
-        "js/20-anonymous-20.js"
-    ];
-    for(const entry of releaseEntries){
-        const versions=versionForIndexReference(indexSource,entry);
-        if(versions.length!==1){
-            errors.push(`index.html must reference ${entry}?v=... exactly once; found ${versions.length}.`);
-        }else if(release && versions[0]!==release){
-            errors.push(`index.html uses ${entry}?v=${versions[0]}, but Loader uses V_ASSET_VERSION=${release}.`);
-        }
-        const target=path.join(ROOT,entry);
-        if(!fs.existsSync(target) || !fs.statSync(target).isFile()){
-            errors.push(`Required release entry is missing: ${entry}`);
-        }
+    const digest=file=>crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex").slice(0,12);
+    for(const [resource,metadata] of Object.entries(manifest.assets||{})){
+        const target=path.join(ROOT,resource);
+        if(!/\.[0-9a-f]{12}\.(?:js|css|webp|png|jpe?g)$/.test(resource)){ errors.push(`Build asset is not content hashed: ${resource}`); continue; }
+        if(!fs.existsSync(target)){ errors.push(`Manifest build asset is missing: ${resource}`); continue; }
+        const actualDigest=digest(target);
+        const actualBytes=fs.statSync(target).size;
+        if(actualDigest!==metadata.sha256 || !resource.includes(`.${actualDigest}.`)){ errors.push(`Build asset hash mismatch: ${resource}`); }
+        if(actualBytes!==metadata.bytes){ errors.push(`Build asset byte count mismatch: ${resource}`); }
     }
+    const referenced=new Set([...(manifest.critical?.scripts||[]),...(manifest.critical?.styles||[]),...(manifest.critical?.images||[]),manifest.critical?.firebaseBootstrap]);
+    for(const bundle of Object.values(manifest.featureManifest?.bundles||{})){
+        for(const resource of [...(bundle.scripts||[]),...(bundle.styles||[])]){ referenced.add(resource); }
+    }
+    for(const resource of referenced){ if(resource&&!manifest.assets?.[resource]){ errors.push(`Manifest reference is undeclared: ${resource}`); } }
 
-    if(release){
-        const badgeRe=/<([a-z][\w:-]*)\b([^>]*\bid\s*=\s*["']homeVersionBadge["'][^>]*)>([\s\S]*?)<\/\1\s*>/i;
-        const badge=indexSource.match(badgeRe);
-        if(!badge){
-            errors.push("index.html is missing #homeVersionBadge.");
-        }else{
-            const aria=badge[2].match(/\baria-label\s*=\s*["']([^"']+)["']/i)?.[1]||"";
-            const text=badge[3].replace(/<[^>]+>/g,"").replace(/\s+/g," ").trim();
-            if(aria!==`目前版本 V${release}`){ errors.push(`#homeVersionBadge aria-label is "${aria}", expected "目前版本 V${release}".`); }
-            if(text!==`V${release}`){ errors.push(`#homeVersionBadge text is "${text}", expected "V${release}".`); }
-        }
-        const styleId=`v${release}-home-version-badge-style`;
-        const styleMatches=indexSource.match(new RegExp(`\\bid\\s*=\\s*["']${escapeRegExp(styleId)}["']`,"g"))||[];
-        if(styleMatches.length!==1){ errors.push(`index.html must contain exactly one release badge style id ${styleId}; found ${styleMatches.length}.`); }
+    const criticalText=JSON.stringify(manifest.critical||{});
+    for(const name of ["patrol","battle","inventory","equipment","dungeon","abyss","relic","shop","synthesis","boss-tower"]){
+        const bundle=manifest.featureManifest?.features?.[name];
+        if(!bundle){ errors.push(`Non-critical feature has no feature mapping: ${name}`); }
+        else if(criticalText.includes(bundle)){ errors.push(`Non-critical feature escaped into Critical Boot: ${name}`); }
     }
-
-    const directScripts=[];
-    const scriptRe=/<script\b[^>]*\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))[^>]*>/gi;
-    for(const match of indexSource.matchAll(scriptRe)){
-        const raw=match[1]??match[2]??match[3];
-        if(isExternalReference(raw)){ continue; }
-        directScripts.push(cleanReference(raw));
+    const scriptCreators=walk("js",file=>path.extname(file)===".js" && /createElement\(["']script["']\)/.test(fs.readFileSync(file,"utf8"))).map(relative);
+    if(JSON.stringify(scriptCreators)!==JSON.stringify(["js/startup/feature-loader.js"])){ errors.push(`Dynamic script ownership escaped FeatureLoader: ${scriptCreators.join(", ")||"none"}`); }
+    const startupSource=fs.readFileSync(path.join(ROOT,"js/52-v173.20-startup-loader.js"),"utf8");
+    const intentSource=fs.readFileSync(path.join(ROOT,"js/20-anonymous-20.js"),"utf8");
+    const authUiSource=fs.readFileSync(path.join(ROOT,"js/firebase/firebase-auth-ui.js"),"utf8");
+    if(/MIN_DURATION|MAX_DURATION|12000|15000|totalDuration|runtimeReady|\*\s*90/.test(startupSource)){ errors.push("Startup contains an artificial or legacy full-runtime gate."); }
+    if(/TOTAL_RUNTIME_MODULES|runtimeGate/i.test(intentSource)){ errors.push("Application intent owner still contains the global runtime gate."); }
+    if(/先使用本機存檔|DEV_AUTH_BYPASS/i.test(authUiSource)){ errors.push("Production account UI exposes an unauthenticated local-save bypass."); }
+    if(fs.existsSync(path.join(ROOT,"js")) && walk("js",file=>/^v131-patrol-sprite-(?:male-)?\d+\.js$/.test(path.basename(file))).length){ errors.push("Retired patrol Base64 chunks returned."); }
+    for(const file of walk("js",file=>path.extname(file)===".js")){
+        const source=fs.readFileSync(file,"utf8");
+        if(/data:image\/(?:webp|png|jpeg);base64,/i.test(source)||(source.match(/[A-Za-z0-9+/]{8192,}={0,2}/g)||[]).length){ errors.push(`Large image/Base64 payload is embedded in ${relative(file)}.`); }
     }
-    for(const required of ["js/00-main.js","js/20-anonymous-20.js"]){
-        const count=directScripts.filter(item=>item===required).length;
-        if(count!==1){ errors.push(`index.html must load ${required} exactly once; found ${count}.`); }
-    }
-    const directDuplicates=directScripts.filter((item,index)=>directScripts.indexOf(item)!==index);
-    if(directDuplicates.length){ errors.push(`index.html has duplicate script loads: ${[...new Set(directDuplicates)].join(", ")}`); }
-
-    const loaderDependencies=[];
-    for(const literal of extractJsStringLiterals(loaderSource)){
-        for(const found of extractResourcePaths(literal.value)){
-            const clean=cleanReference(found.raw);
-            if(/\.(?:js|mjs|cjs|css)$/i.test(clean)){ loaderDependencies.push(clean); }
-        }
-    }
-    const uniqueDependencies=[...new Set(loaderDependencies)];
-    if(!uniqueDependencies.length){ errors.push("Loader has no discoverable local JavaScript/CSS dependencies."); }
-    for(const dependency of uniqueDependencies){
-        const target=path.join(ROOT,dependency);
-        if(!fs.existsSync(target) || !fs.statSync(target).isFile()){
-            errors.push(`Loader dependency is missing: ${dependency}`);
-        }
-    }
-    const duplicateDependencies=loaderDependencies.filter((item,index)=>loaderDependencies.indexOf(item)!==index);
-    if(duplicateDependencies.length){ errors.push(`Loader repeats dependencies: ${[...new Set(duplicateDependencies)].join(", ")}`); }
-    const overlap=uniqueDependencies.filter(item=>directScripts.includes(item));
-    if(overlap.length){ errors.push(`Scripts are loaded both directly and by Loader: ${overlap.join(", ")}`); }
-
-    const runtimeRows=[];
-    const runtimeRe=/\{\s*id\s*:\s*["']([^"']+)["']\s*,\s*src\s*:\s*["']([^"']+)["']\s*\}/g;
-    for(const match of loaderSource.matchAll(runtimeRe)){ runtimeRows.push({id:match[1],src:match[2]}); }
-    if(!runtimeRows.length){ errors.push("Loader ordered runtime list is empty or cannot be parsed."); }
-    for(const field of ["id","src"]){
-        const values=runtimeRows.map(row=>row[field]);
-        const duplicates=values.filter((value,index)=>values.indexOf(value)!==index);
-        if(duplicates.length){ errors.push(`Loader runtime ${field} values are duplicated: ${[...new Set(duplicates)].join(", ")}`); }
-    }
-    const missingRuntimeDependency=runtimeRows.map(row=>row.src).filter(src=>!uniqueDependencies.includes(src));
-    if(missingRuntimeDependency.length){ errors.push(`Ordered runtime sources escaped dependency validation: ${missingRuntimeDependency.join(", ")}`); }
 
     if(errors.length){
         console.error(errors.map(error=>"  - "+error).join("\n"));
-        fail(`${errors.length} release/Loader integrity problem(s) found.`);
+        fail(`${errors.length} production boot/build integrity problem(s) found.`);
         return;
     }
-    console.log(`✓ Release version coherence: V${release}.`);
-    console.log(`✓ Index entries: ${directScripts.length} direct scripts exist without duplicate loads.`);
-    console.log(`✓ Loader dependencies: ${uniqueDependencies.length} JavaScript/CSS files exist, including ${runtimeRows.length} ordered runtimes.`);
+    console.log(`✓ Production build is deterministic and all ${Object.keys(manifest.assets).length} build assets match their content hashes.`);
+    console.log("✓ Critical Boot contains exactly one hashed script and one hashed stylesheet; gameplay features stay non-critical.");
+    console.log("✓ FeatureLoader is the sole dynamic script owner; no artificial gate, local auth bypass or Base64 patrol chunks remain.");
 }
 
 function gitFiles(includeUntracked=false){
@@ -615,6 +570,10 @@ function gitFiles(includeUntracked=false){
 function checkConflictMarkers(){
     const failures=[];
     for(const file of gitFiles(true)){
+        // A dirty-tree build may legitimately replace a tracked content-hash
+        // artifact before the deletion is staged. Deleted paths have no text
+        // to inspect and must not turn the whitespace gate into ENOENT.
+        if(!fs.existsSync(file)){ continue; }
         if(!TEXT_EXTENSIONS.has(path.extname(file).toLowerCase())){ continue; }
         const source=fs.readFileSync(file,"utf8");
         const lines=source.split(/\r?\n/);
