@@ -9,6 +9,7 @@ const qaUrl=`${baseUrl}/?abyss-live-qa-v2=${encodeURIComponent(expectedSha||Date
 const artifactDir=path.resolve("artifacts/browser-qa");
 fs.mkdirSync(artifactDir,{recursive:true});
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const abyssStyleReady="document.querySelector('link[data-feature-style=\"feature-abyss\"]')?.sheet";
 
 function chromeBinary(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
@@ -145,7 +146,7 @@ try{
     await waitFor(client,"document.readyState==='complete'","page load");
     await prepareAccountFirstRuntime(client,["abyss"]);
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
-    await waitFor(client,"document.getElementById('v174-abyss-two-tier-style')&&document.getElementById('v174-abyss-two-tier-style').sheet","two-tier Abyss CSS");
+    await waitFor(client,abyssStyleReady,"hashed feature Abyss CSS");
 
     await client.eval(`localStorage.removeItem('v174_abyss_state_v2');localStorage.removeItem('v141_abyss_state');true`);
     await client.eval(seedPlayerExpression(20));
@@ -242,6 +243,7 @@ try{
     await client.eval(`v174AbyssResolveBattleResult('win');true`);
     await client.send("Page.reload",{ignoreCache:true});
     await waitFor(client,"document.readyState==='complete'","reload after pending chest");
+    await prepareAccountFirstRuntime(client,["abyss"]);
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true","Abyss after pending reload");
     await client.eval(seedPlayerExpression(20));
     const pendingReload=await client.eval(`(async()=>{
@@ -259,6 +261,7 @@ try{
     await sleep(1900);
     await client.send("Page.reload",{ignoreCache:true});
     await waitFor(client,"document.readyState==='complete'","reload after claimed chest");
+    await prepareAccountFirstRuntime(client,["abyss"]);
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true","Abyss after claimed reload");
     await client.eval(seedPlayerExpression(20));
     const claimedReload=await client.eval(`(async()=>{
