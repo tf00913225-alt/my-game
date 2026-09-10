@@ -16,22 +16,53 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
+      - name: Apply scoped Boss portrait tuning
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p=Path(path)
+              text=p.read_text()
+              if old in text:
+                  text=text.replace(old,new,1)
+                  p.write_text(text)
+                  return
+              if new not in text:
+                  raise SystemExit(f"Expected token missing in {path}: {old!r}")
+
+          css="css/gameplay-boss-tower.css"
+          replace_once(css,"margin-top:-23px;","margin-top:-30px;")
+          replace_once(css,"is a real 44% of the battle row","is a real 38% of the battle row")
+          replace_once(css,"--v143-monster-card-width:clamp(176px,44%,190px);","--v143-monster-card-width:clamp(154px,38%,166px);")
+          replace_once(css,"margin:8px auto 0;","margin:3px auto 0;")
+          replace_once(css,"flex-basis and width are both 23% of the battle area","flex-basis and width are both 20% of the battle area")
+          replace_once(css,"width:clamp(88px,23%,106px);","width:clamp(82px,20%,96px);")
+          replace_once(css,"min-width:88px;","min-width:82px;")
+          replace_once(css,"flex:0 0 clamp(88px,23%,106px);","flex:0 0 clamp(82px,20%,96px);")
+
+          test="tests/boss-mechanism-vfx-card-ui-20260909.test.js"
+          replace_once(test,"clamp\\(176px,44%,190px\\)","clamp\\(154px,38%,166px\\)")
+          replace_once(test,"margin-top:-23px","margin-top:-30px")
+          replace_once(test,"clamp\\(88px,23%,106px\\)","clamp\\(82px,20%,96px\\)")
+          replace_once(test,"clamp\\(88px,23%,106px\\)","clamp\\(82px,20%,96px\\)")
+          PY
       - name: Rebuild deterministic production assets
         run: node scripts/build-production.mjs
       - name: Verify Boss UI against rebuilt assets
         run: |
           node tests/boss-mechanism-vfx-card-ui-20260909.test.js
           node tests/boss-mobile-portrait-browser.test.js
-      - name: Commit rebuilt production assets
+      - name: Commit verified Boss UI and production assets
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A build asset-manifest.json index.html
+          git add -A css/gameplay-boss-tower.css tests/boss-mechanism-vfx-card-ui-20260909.test.js build asset-manifest.json index.html
           if git diff --cached --quiet; then
-            echo "Deterministic production assets are already current."
+            echo "Verified Boss UI and deterministic production assets are already current."
             exit 0
           fi
-          git commit -m "build: refresh deterministic boss bundle"
+          git commit -m "fix: fit 9x16 boss UI above battle log"
           git push origin "HEAD:${GITHUB_REF_NAME}"
       - name: Upload rebuilt Boss bundle and manifests
         uses: actions/upload-artifact@v4
