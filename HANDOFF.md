@@ -1,12 +1,13 @@
 ## 2026-09-10 V173.65 battle/audio live QA race follow-up（DEV REMOTE VERIFIED／MAIN PENDING）
 
-- Work branch：`fix/v17365-battle-live-qa-race`，基準為 release merge 後的 `dev@1783d3847ef7e2835915d763c4d517268e5a6098`；PR #129 的 Repository checks 成功後已合入 `dev@1a3b5a35942e9821f3fad2c933afe198126597b0`，`main` 尚未修改。
+- Work branches：`fix/v17365-battle-live-qa-race` 與 `fix/v17365-battle-live-qa-cast-race`，基準鏈自 release merge 後的 `dev@1783d3847ef7e2835915d763c4d517268e5a6098` 開始；PR #129 與 #131 均在 Repository checks 成功後合入，最終驗證 tip 為 `dev@e47a0ca8d1d39363640abb4e9d4755f73c809a73`，`main` 尚未修改。
 - Release merge 的 Actions run `34430685287` 已通過 Repository checks、Cloudflare exact-SHA／V173.65 驗證、live account-first cold-start 與 live Abyss QA；唯一失敗為 `.github/scripts/battle-layer-audio-live-qa.mjs` 的 V143／元素匣疊層檢查。原始 attempt 在開 modal 後讀到已結束的 stage，重跑 attempt 2 則在開 modal 前等待測試 stage 時已被下一個真實戰鬥動作 supersede，證明失敗來自跨 CDP round-trip 的 live battle 時序競態，不是正式疊層或 VFX owner 回歸。
-- QA owner 改為在同一個 browser task 內依序呼叫正式 `v142SkillAnimationDirector.play()`、取得 V143 raster stage、呼叫正式 `openHomeFeature('autoBattleSettings')` wrapper chain，並立即驗證前後為同一 DOM node、stage 仍 mounted、presentation 已 hidden／opacity 0、modal ownership 與 audio scale 正確。真實 Fire Flurry cast 仍先獨立證明正式戰鬥會到達 V143。
+- QA owner 改為兩個各自 atomic 的 browser task：第一個在正式 `castDamageSkill('explosiveFlurry')` 返回前立即擷取其 V143 raster stage，證明真實戰鬥施放會到達 V143；第二個依序呼叫正式 `v142SkillAnimationDirector.play()`、取得 stage、呼叫正式 `openHomeFeature('autoBattleSettings')` wrapper chain，並立即驗證前後為同一 DOM node、stage 仍 mounted、presentation 已 hidden／opacity 0、modal ownership 與 audio scale 正確。
 - `js/37-v142-skill-animation.js`（gate／supersede）、`js/39-v143-skill-animation.js`（raster stage lifecycle）、`js/45-v154-dev-fixes.js` 與 `css/46-v154-dev-fixes.css`（元素匣 focus／presentation suppression）均未修改；沒有暫停戰鬥、延長正式動畫、保留 idle stage、增加 wrapper 或新增 runtime patch。
-- `tests/v174-battle-layer-audio-fixes.test.js` 新增 regression，固定 live QA 必須在單一 atomic browser snapshot 內涵蓋 production director、正式元素匣 opener 與 stage identity，禁止恢復會與持續戰鬥競速的等待式檢查。
+- `tests/v174-battle-layer-audio-fixes.test.js` 新增 regression，固定正式 cast 證據與 modal overlap 證據各自在單一 atomic browser snapshot 內完成，涵蓋 production cast、director、正式元素匣 opener 與 stage identity，禁止恢復會與持續戰鬥競速的等待式檢查。
 - 本機已通過：139/139 Node suites、212/212 JavaScript syntax、303 static resources、249 unique HTML IDs、deterministic build、loader、V173.65 release gate（10/10）、git-diff／conflict-marker gates。Game／Cache Version 維持 V173.65／173.65。
 - GitHub Actions push run `34434007783` 的 Repository checks 與 Dev deployment gate 全部 SUCCESS：Cloudflare 已讀回 exact SHA `1a3b5a35942e9821f3fad2c933afe198126597b0`，live account-first auth UI 1253.6 ms（5 秒目標達成），live Abyss 與修正後 battle/audio mobile QA 均 PASS。使用者已明確授權驗證完成後以受保護 PR 推進 main；main Repository checks、GitHub Pages deploy 與 production exact-SHA／version 驗證完成前仍不得宣稱正式發布完成。
+- 後續純文件 deploy run `34434554334` 揭露正式 Fire Flurry cast 的證據仍跨越 wait/read CDP round-trip，1.45 秒 stage 在讀值前合法結束而得到 `skill:null`；PR #131 將這一段也改為 atomic snapshot。最終 push run `34435227337` 的 Repository checks 與 Dev deployment gate 全部 SUCCESS：Cloudflare exact SHA `e47a0ca8d1d39363640abb4e9d4755f73c809a73`、live account-first auth UI 2014.9 ms（5 秒目標達成）、live Abyss 與 live battle/audio mobile QA 全數 PASS。
 
 ## 2026-09-10 V173.65 Account-first Boot Architecture（DEV VERIFIED／已授權推進 main）
 
