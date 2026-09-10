@@ -97,7 +97,7 @@ function loadRuntime(overrides={}){
 }
 
 test("V154 remains ordered immediately before V155",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);

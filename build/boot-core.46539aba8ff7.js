@@ -1,4 +1,4 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstrap":"build/firebase/firebase-bootstrap.b9c60c39820a.js"});
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstrap":"build/firebase/firebase-bootstrap.b9c60c39820a.js"});
 
 /* bundled source: js/startup/account-save-repository.js */
 /* Account-aware local save owner. Gameplay schema stays unchanged; ownership lives beside it. */

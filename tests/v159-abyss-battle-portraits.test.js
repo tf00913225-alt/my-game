@@ -30,7 +30,7 @@ function load(overrides={}){
 }
 
 test("V159 remains ordered immediately before the final V169 runtimes",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     const v158=loader.indexOf("js/47-v158-combat-tuning.js");
     const v159=loader.indexOf("js/48-v159-abyss-battle-portraits.js");

@@ -30,7 +30,7 @@ test("Fire Slash keeps the requested target, timing, and frame-eight hit under t
 });
 
 test("the current cache version publishes the replacement asset",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

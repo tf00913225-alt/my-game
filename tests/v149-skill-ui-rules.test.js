@@ -77,7 +77,7 @@ test("V149 remains ordered, cache-busted, and keeps city/nav shop art distinct",
     assert.match(buildSource,/"js\/01-stage-v8-touch-lock\.js"/);
     assert.match(index,/id="homeIconShop"[\s\S]*assets\/ui\/home-shop\.png/);
     assert.doesNotMatch(index,/id="homeIconShop"[\s\S]{0,180}home-shop-v147\.png/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(buildSource,/"css\/44-v149-skill-ui-rules\.css"/);
     const v148=buildSource.indexOf("js/42-v148-combat-dungeon-fixes.js");
     const v149=buildSource.indexOf("js/43-v149-skill-ui-rules.js");

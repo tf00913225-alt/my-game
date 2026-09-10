@@ -34,13 +34,14 @@ The byte groups sum exactly to the 2,786,891-byte local JavaScript graph; they a
 | Signed-out local JS | 6 | 95.3% fewer than 128 |
 | Direct HTML JS / CSS | 1 / 1 | Previously 24 / 30 |
 | Signed-out uncompressed local critical source | 584,798 B | 95.4% below the old 12,829,113 B envelope |
-| Boot JS | about 31 KB | Guarded at ≤45 KB |
+| Boot JS | 37,742 B | Guarded at ≤45 KB |
 | Boot CSS | 216,294 B | Guarded at ≤250 KB |
 | Patrol image payload | 16 WebP / 223,598 B | 0 Base64 JS; fetched only with `feature-patrol` |
 | Sprite JS requests | 0 | Previously 61 sequential requests |
 | Artificial wait / fake 90→100 | 0 / 0 | Removed |
 | Ready fade | 360 ms | Previously 760 ms after a 12–15 second gate |
 | Global input lock awaiting full runtime | 0 | Feature-local `aria-busy` only |
+| Redundant unhashed app-shell CSS request | 0 | `ad-free-service-info-modal.css` is part of the hashed app-shell stylesheet |
 
 An authenticated existing user adds `asset-manifest.json` plus one app-shell JavaScript and one app-shell stylesheet before city hydration. `gameplay-core`, patrol, Abyss, skills, BOSS/relic and other feature bundles remain outside that critical interval.
 
@@ -50,4 +51,20 @@ An authenticated existing user adds `asset-manifest.json` plus one app-shell Jav
 
 `.github/scripts/boot-live-browser-qa.mjs` separately records the deployed Cloudflare/Firebase cold path and response cache headers. Output: `artifacts/browser-qa/boot-live-qa.json`.
 
-The controlled browser budgets are ≤5 seconds to an interactive signed-out account UI and a 3-second CI ceiling for warm city restore, with a product target of ≤2 seconds. Live timing is reported as measured; CDN/Firebase variance is never converted into a fabricated pass. Browser values are added to the release report only after the corresponding CI/deployment artifacts exist.
+The controlled browser budgets are ≤5 seconds to an interactive signed-out account UI and a 3-second CI ceiling for warm city restore, with a product target of ≤2 seconds. Live timing is reported as measured; CDN/Firebase variance is never converted into a fabricated pass.
+
+### Verified DEV measurements
+
+GitHub Actions run `34428020728` verified deployed `dev@08d23ecbf38ab74a6b1ef4ced43fefcded02901a` on 2026-09-10. The controlled QA used fresh mobile contexts and deterministic Firebase doubles; the live QA used the deployed Cloudflare/Firebase path.
+
+| Path | Interactive | First paint | Requests | JS / CSS / image | Transferred |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Controlled cold, signed out | 283.9 ms | 284 ms | 10 (9 critical) | 5 / 1 / 2 | 1,095,669 B (1,095,362 B critical) |
+| Controlled guest → creation | 1,238.5 ms | 284 ms | 14 | 6 / 3 / 2 | 2,140,168 B |
+| Controlled cold, existing UID → city | 550 ms | 164 ms | 28 | 6 / 3 / 17 | 5,756,787 B |
+| Controlled warm, existing UID → city | 475 ms | 132 ms | 28 | 6 / 3 / 17 | 4,192,379 B |
+| Live Cloudflare/Firebase, signed out | 693.3 ms | 448 ms | 10 | 6 / 1 / 1 | 356,374 B |
+
+The live signed-out run loaded no feature resources and met the five-second target. Mutable `/` and `asset-manifest.json` returned `no-cache, no-store, must-revalidate`; sampled hashed JS/CSS/image assets returned `public, max-age=31536000, immutable`. The controlled byte totals include full browser transfer accounting from the test server and are not directly interchangeable with the CDN-compressed live total.
+
+There is no honest browser-timing delta for the old commit because the baseline environment had neither a browser binary nor instrumentation. The exact architectural delta is therefore reported separately above. V173.65 additionally removes the measured 7,462-byte redundant raw ad-free stylesheet request after app-shell load; no unmeasured timing estimate is substituted for a browser result.

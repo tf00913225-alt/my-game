@@ -1,5 +1,27 @@
 # 四象江湖傳版本紀錄
 
+## V173.65 — 2026-09-10
+
+本版本正式發布 Account-first 啟動架構、Critical Boot／Feature Lazy Loading、UID 存檔歸屬與可量測的效能防回歸基線；不變更戰鬥公式、EXP、掉落、裝備或技能數值。
+
+### 啟動與帳號
+- 移除 12～15 秒人工最低等待、fake 90→100% 進度與等待完整 late runtime 的全域輸入鎖。
+- 建立唯一 Startup State Machine；Firebase Auth／session restore、UID 與 UID save resolution 完成後，才可能進入創角。
+- 帳號畫面提供 Google、Email／建立帳號與 Firebase Anonymous 訪客；正式環境移除未登入 local-only bypass。
+
+### 存檔歸屬與安全
+- Canonical local save、背包／裝備／進度 sidecar 全部依 UID namespace 隔離；帳號切換會清除前一帳號 active memory，不共享角色資料。
+- `battle_full_version_save_v5` 只作為未綁定 legacy candidate；需使用者確認、先備份、衝突 fail closed，雲端已有角色時不會被本機資料靜默覆蓋。
+- Firestore browser client 維持 owner-read-only；正式寫入仍限定可信後端，不因登入流程重構而放寬安全規則。
+
+### 效能、資產與 CI
+- Production build 產生 content-hashed boot/app/gameplay/feature bundles；Critical Boot 只載帳號與下一階段必要程式，其他功能以 feature-local loading 與 idle/pointer prefetch 載入。
+- 61 個 Base64 巡怪 JavaScript chunk 已移除，改為 16 個可 HTTP cache 的 hashed WebP，僅在巡怪 feature 需要時載入。
+- 移除 app-shell 已打包 CSS 的重複 unhashed runtime request；mutable entry/manifest revalidate，hashed assets 使用 immutable cache。
+- 新增 139 套 Node／架構回歸 suites、fresh/warm mobile browser benchmark、帳號切換、migration、功能 lazy loading、巡怪資產與部署 Live QA。
+
+Requirement Batch：`release/requirement-batches/2026-09-09-cold-start-auth-boot-architecture.json`（12/12 VERIFIED）。
+
 ## V173.64 — 2026-09-08
 
 本版本將已完成 DEV exact-SHA 部署、Repository checks 與實際操作驗收的技能成長、秘寶戰鬥整合及全新玩法中心正式發布。

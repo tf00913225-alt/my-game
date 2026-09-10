@@ -44,9 +44,9 @@ test("CSS advances the formal 4x3 sheet once without Canvas or per-target travel
     assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("the published build label is V173.64",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
-    assert.match(index,/aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
+test("the published build label is V173.65",()=>{
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(index,/aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
 });
 
 console.log("\nV173 Water Ball target-group raster VFX suite: "+passed+" tests passed.");

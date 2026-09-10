@@ -11,6 +11,7 @@ const runtime=read("js/16-stage-v54-main-city-runtime.js");
 const css=read("css/ad-free-service-info-modal.css");
 const index=read("index.html");
 const touchLock=read("js/01-stage-v8-touch-lock.js");
+const productionBuild=read("scripts/build-production.mjs");
 
 let passed=0;
 function test(name,callback){
@@ -26,6 +27,10 @@ test("the feature reuses the existing shared home modal and keeps the original m
     assert.match(runtime,/getElementById\("homeFeatureModalBody"\)/);
     assert.match(runtime,/window\.closeHomeFeature/);
     assert.doesNotMatch(runtime,/createTreeWalker|setProperty\(/);
+    assert.doesNotMatch(runtime,/createElement\(["']link["']\)|ad-free-service-info-modal\.css/);
+    const appStyles=productionBuild.slice(productionBuild.indexOf("const appStyles="),productionBuild.indexOf("const gameplayStyles="));
+    assert.match(appStyles,/css\/ad-free-service-info-modal\.css/,
+        "the hashed app-shell stylesheet must own the ad-free modal CSS");
 });
 
 test("all paid-service disclosure copy and controls are present",()=>{
@@ -189,7 +194,8 @@ test("the owner runtime opens once on a ready home screen and closes through the
     assert.equal(elements.get("adFreeTermsButton").disabled,true);
     assert.equal(elements.get("adFreePrivacyButton").disabled,true);
     assert.equal(elements.get("adFreeSupportEmail").textContent,"尚未設定");
-    assert.ok(document.head.children.some(element=>element.id==="ad-free-service-info-style"));
+    assert.equal((document.head.children||[]).some(element=>element.id==="ad-free-service-info-style"),false,
+        "the bundled stylesheet must not be downloaded again through a raw runtime link");
 
     elements.get("adFreeAcknowledgeButton").click();
     assert.equal(closeCalls,1);

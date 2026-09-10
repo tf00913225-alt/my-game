@@ -17,7 +17,7 @@ function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
 
 test("V143 assets stay ordered before later patches under the current cache version",()=>{
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(loader,/css\/40-v143-combat-dungeon-polish\.css/);
     const order=[
         "js/37-v142-skill-animation.js",

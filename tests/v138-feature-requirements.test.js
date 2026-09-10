@@ -182,8 +182,8 @@ test("set bonuses and skill costs are visible before extra detail clicks",()=>{
 test("current release uses a hashed boot entry and feature manifest",()=>{
     const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
-    assert.equal(manifest.release,"173.64");
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.65"/);
+    assert.equal(manifest.release,"173.65");
     assert.ok(manifest.featureManifest.bundles["gameplay-core"]);
 });
 

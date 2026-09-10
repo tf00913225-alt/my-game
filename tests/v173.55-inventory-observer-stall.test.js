@@ -11,8 +11,8 @@ assert.match(inv,/if\(meta\.textContent!==text\)meta\.textContent=text/);
 assert.match(inv,/let inventorySyncQueued=false/);
 assert.match(inv,/new MutationObserver\(scheduleInventorySync\)/);
 assert.doesNotMatch(inv,/new MutationObserver\(\(\)=>\{fullscreen\(\);picker\(\);syncSellUi\(\)\}\)/);
-assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
 for(const name of ["54-v173.51-battle-qa.js","55-v173.51-inventory-qa.js","56-v173.51-shop-qa.js","57-v173.51-quest-qa.js"]){assert.ok(build.includes('"js/'+name+'"'));}
 assert.doesNotMatch(qol,/createElement\(["']script["']\)|\.onload\s*=/);
-assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
+assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
 console.log("✓ V173.62 inventory observer no longer self-triggers at module 30");

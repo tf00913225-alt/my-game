@@ -10,6 +10,8 @@ const authUi=fs.readFileSync("js/firebase/firebase-auth-ui.js","utf8");
 const headers=fs.readFileSync("_headers","utf8");
 const abyssLiveQa=fs.readFileSync(".github/scripts/abyss-live-browser-qa-v2.mjs","utf8");
 const abyssLiveQaRunner=fs.readFileSync(".github/scripts/run-abyss-live-browser-qa.mjs","utf8");
+const mainCityRuntime=fs.readFileSync("js/16-stage-v54-main-city-runtime.js","utf8");
+const productionBuild=fs.readFileSync("scripts/build-production.mjs","utf8");
 const boot=JSON.parse(fs.readFileSync("config/boot-manifest.json","utf8"));
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
@@ -55,6 +57,11 @@ assert.doesNotMatch(abyssLiveQaRunner,/client\.eval\([^\n]*FourSymbolsFeatures\.
     "the generated live QA must not call the feature loader before Boot Core exists");
 assert.match(abyssLiveQaRunner,/saved player reload[\s\S]*prepareAccountFirstRuntime\(client,\["abyss"\]\)/,
     "the generated saved-player reload must wait for account-first startup before loading Abyss");
+const appStyles=productionBuild.slice(productionBuild.indexOf("const appStyles="),productionBuild.indexOf("const gameplayStyles="));
+assert.match(appStyles,/css\/ad-free-service-info-modal\.css/,
+    "app-shell must include the ad-free modal style in its hashed stylesheet");
+assert.doesNotMatch(mainCityRuntime,/createElement\(["']link["']\)|ad-free-service-info-modal\.css/,
+    "app-shell runtime must not redownload bundled CSS through an unhashed URL");
 
 const jsFiles=[];
 function walk(directory){

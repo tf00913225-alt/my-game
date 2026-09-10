@@ -79,7 +79,7 @@ test("V141 assets remain ordered before later patches with the current cache ver
     assert.ok(paths.every(index=>index>=0));
     assert.deepEqual(paths.slice().sort((a,b)=>a-b),paths);
     assert.match(loaderSource,/css\/38-v141-system-expansion\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.65"/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });

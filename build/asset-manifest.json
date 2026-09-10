@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "release": "173.64",
+  "release": "173.65",
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.3539578c5bf7.js"
+      "build/boot-core.46539aba8ff7.js"
     ],
     "styles": [
       "build/boot-core.83625fb1541f.css"
@@ -19,7 +19,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.55350dc56053.js"
+          "build/app-shell.3860cc7c4523.js"
         ],
         "styles": [
           "build/app-shell.37d5b9f36840.css"
@@ -119,13 +119,13 @@
     ]
   },
   "assets": {
-    "build/boot-core.3539578c5bf7.js": {
-      "sha256": "3539578c5bf7",
+    "build/boot-core.46539aba8ff7.js": {
+      "sha256": "46539aba8ff7",
       "bytes": 37742
     },
-    "build/app-shell.55350dc56053.js": {
-      "sha256": "55350dc56053",
-      "bytes": 919757
+    "build/app-shell.3860cc7c4523.js": {
+      "sha256": "3860cc7c4523",
+      "bytes": 919312
     },
     "build/gameplay-core.c8bdbe557965.js": {
       "sha256": "c8bdbe557965",

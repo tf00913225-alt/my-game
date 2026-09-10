@@ -65,7 +65,7 @@ test("the official Sprite has no word-circle or procedural fallback",()=>{
 });
 
 test("the current cache version publishes the corrected source asset and metadata",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

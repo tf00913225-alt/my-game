@@ -248,7 +248,7 @@ test("perpetual modal glow and skill-card compositing are static",()=>{
 });
 
 test("V169 styles and runtimes are deployed last under fresh cache keys",()=>{
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.65"/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
