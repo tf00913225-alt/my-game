@@ -50,6 +50,7 @@ const appScripts=[
     "js/20-anonymous-20.js",
     "js/61-v174-ui-regression-guards.js"
 ];
+const uiFixScripts=["js/62-v174-current-ui-fixes.js"];
 const gameplayScripts=[
     "js/25-v131-fix-batch.js",
     "js/27-v132-content-expansion.js",
@@ -99,6 +100,7 @@ const appStyles=[
     "css/21-stage-v64-character-touch-action-bridge.css","css/28-v124-character-creation-native.css",
     "css/30-v130-requested-updates.css","css/56-v174-critical-ui-regressions.css","css/ad-free-service-info-modal.css"
 ];
+const uiFixStyles=["css/57-v174-current-ui-fixes.css"];
 const gameplayStyles=[
     "css/05-stage-v10-battle-log-scroll-fix.css",
     "css/10-stage-v40-root-battle-background-and-cast-size.css",
@@ -185,6 +187,7 @@ for(const name of ["firebase-config.js","firebase-auth.js","firebase-cloud-save.
 
 const scriptOutputs={
     app:target("app-shell","js",combineScripts(appScripts)),
+    uiFixes:target("feature-ui-fixes","js",combineScripts(uiFixScripts)),
     gameplay:target("gameplay-core","js",combineScripts(gameplayScripts)),
     patrol:target("feature-patrol","js",combineScripts(patrolScripts)),
     abyss:target("feature-abyss","js",combineScripts(abyssScripts)),
@@ -194,6 +197,7 @@ const scriptOutputs={
 const styleOutputs={
     critical:target("boot-core","css",combineStyles(criticalStyles)),
     app:target("app-shell","css",combineStyles(appStyles)),
+    uiFixes:target("feature-ui-fixes","css",combineStyles(uiFixStyles)),
     gameplay:target("gameplay-core","css",combineStyles(gameplayStyles)),
     patrol:target("feature-patrol","css",combineStyles(patrolStyles)),
     abyss:target("feature-abyss","css",combineStyles(abyssStyles)),
@@ -205,6 +209,7 @@ const patrolAssets=fs.readdirSync(path.join(ROOT,"assets/characters/patrol"))
     .filter(name=>/\.[0-9a-f]{12}\.webp$/.test(name)).sort().map(name=>`assets/characters/patrol/${name}`);
 const replacements={
     __BUILD_APP_SHELL__:scriptOutputs.app.path,__BUILD_APP_SHELL_STYLE__:styleOutputs.app.path,
+    __BUILD_UI_FIXES__:scriptOutputs.uiFixes.path,__BUILD_UI_FIXES_STYLE__:styleOutputs.uiFixes.path,
     __BUILD_GAMEPLAY_CORE__:scriptOutputs.gameplay.path,__BUILD_GAMEPLAY_CORE_STYLE__:styleOutputs.gameplay.path,
     __BUILD_PATROL__:scriptOutputs.patrol.path,__BUILD_PATROL_STYLE__:styleOutputs.patrol.path,
     __BUILD_ABYSS__:scriptOutputs.abyss.path,__BUILD_ABYSS_STYLE__:styleOutputs.abyss.path,

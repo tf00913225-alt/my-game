@@ -19,10 +19,12 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.4121e7bf3a8e.js"
+          "build/app-shell.4121e7bf3a8e.js",
+          "build/feature-ui-fixes.7aa2ae26f321.js"
         ],
         "styles": [
-          "build/app-shell.37d5b9f36840.css"
+          "build/app-shell.37d5b9f36840.css",
+          "build/feature-ui-fixes.0c5d2b31a415.css"
         ],
         "dependencies": []
       },
@@ -127,6 +129,10 @@
       "sha256": "4121e7bf3a8e",
       "bytes": 923465
     },
+    "build/feature-ui-fixes.7aa2ae26f321.js": {
+      "sha256": "7aa2ae26f321",
+      "bytes": 1558
+    },
     "build/gameplay-core.c8bdbe557965.js": {
       "sha256": "c8bdbe557965",
       "bytes": 1158641
@@ -154,6 +160,10 @@
     "build/app-shell.37d5b9f36840.css": {
       "sha256": "37d5b9f36840",
       "bytes": 110537
+    },
+    "build/feature-ui-fixes.0c5d2b31a415.css": {
+      "sha256": "0c5d2b31a415",
+      "bytes": 4729
     },
     "build/gameplay-core.13dae8d242bf.css": {
       "sha256": "13dae8d242bf",
