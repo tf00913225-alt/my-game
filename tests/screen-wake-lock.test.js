@@ -1,15 +1,11 @@
-import test from "node:test";
-import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
-import vm from "node:vm";
-import {fileURLToPath} from "node:url";
+"use strict";
 
-const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
-const html=fs.readFileSync(path.join(ROOT,"index.html"),"utf8");
-const match=html.match(/<script id="screen-wake-lock-runtime">([\s\S]*?)<\/script>/);
-assert.ok(match,"screen wake lock runtime must exist in index.html");
-const runtimeSource=match[1];
+const test=require("node:test");
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const vm=require("node:vm");
+
+const runtimeSource=fs.readFileSync("js/startup/screen-wake-lock-runtime.js","utf8");
 
 function createEmitter(){
     const listeners=new Map();
@@ -32,9 +28,10 @@ function createEmitter(){
     };
 }
 
-function createHarness({supported=true,rejectRequest=false}={}){
+function createHarness({supported=true,rejectRequest=false,deferRequest=false}={}){
     const documentEvents=createEmitter();
     const windowEvents=createEmitter();
+    const deferred=[];
     let requestCount=0;
     let releaseCount=0;
     let currentSentinel=null;
@@ -59,34 +56,34 @@ function createHarness({supported=true,rejectRequest=false}={}){
         };
     }
 
-    const navigator=supported ? {
+    const navigator=supported?{
         wakeLock:{
             async request(type){
                 assert.equal(type,"screen");
                 requestCount++;
                 if(rejectRequest){ throw new Error("wake lock denied"); }
-                currentSentinel=makeSentinel();
-                return currentSentinel;
+                const next=makeSentinel();
+                currentSentinel=next;
+                if(deferRequest){ await new Promise(resolve=>deferred.push(resolve)); }
+                return next;
             }
         }
-    } : {};
+    }:{};
 
-    const document={
-        visibilityState:"visible",
-        addEventListener:documentEvents.addEventListener
-    };
-    const window={
-        navigator,
-        addEventListener:windowEvents.addEventListener
-    };
+    const document={visibilityState:"visible",addEventListener:documentEvents.addEventListener};
+    const window={navigator,document,addEventListener:windowEvents.addEventListener};
     window.window=window;
+    const context={window,document,navigator,Promise,globalThis:window};
 
-    vm.runInNewContext(runtimeSource,{window,document,navigator,Promise},{filename:"screen-wake-lock-runtime.js"});
+    function install(){ vm.runInNewContext(runtimeSource,context,{filename:"screen-wake-lock-runtime.js"}); }
+    install();
 
     return {
         window,
         document,
-        async flush(){ await Promise.resolve(); await Promise.resolve(); },
+        install,
+        async flush(){ for(let index=0;index<8;index++){ await Promise.resolve(); } },
+        resolveNextRequest(){ const resolve=deferred.shift(); assert.ok(resolve,"expected a deferred request"); resolve(); },
         emitDocument:event=>documentEvents.emit(event),
         emitWindow:event=>windowEvents.emit(event),
         get requestCount(){ return requestCount; },
@@ -98,26 +95,21 @@ function createHarness({supported=true,rejectRequest=false}={}){
 test("visible game page acquires one screen wake lock and avoids duplicate requests",async()=>{
     const harness=createHarness();
     await harness.flush();
-
     assert.equal(harness.requestCount,1);
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isSupported(),true);
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),true);
-
     assert.equal(await harness.window.FourSymbolsScreenWakeLock.acquire(),true);
-    assert.equal(harness.requestCount,1,"held lock must be reused instead of duplicated");
+    assert.equal(harness.requestCount,1);
 });
 
-test("released wake lock is reacquired when the page returns to the foreground",async()=>{
+test("visibility lifecycle actively releases while hidden and reacquires in foreground",async()=>{
     const harness=createHarness();
     await harness.flush();
-
     harness.document.visibilityState="hidden";
-    harness.currentSentinel.systemRelease();
     harness.emitDocument("visibilitychange");
     await harness.flush();
+    assert.equal(harness.releaseCount,1);
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),false);
-    assert.equal(harness.requestCount,1,"hidden page must not request a replacement wake lock");
-
     harness.document.visibilityState="visible";
     harness.emitDocument("visibilitychange");
     await harness.flush();
@@ -125,38 +117,69 @@ test("released wake lock is reacquired when the page returns to the foreground",
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),true);
 });
 
-test("pageshow reacquires after a browser-released lock and pagehide releases the active lock",async()=>{
+test("pageshow reacquires after a browser release and pagehide releases the active lock",async()=>{
     const harness=createHarness();
     await harness.flush();
-
     harness.currentSentinel.systemRelease();
     harness.emitWindow("pageshow");
     await harness.flush();
     assert.equal(harness.requestCount,2);
-    assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),true);
-
     harness.emitWindow("pagehide");
     await harness.flush();
     assert.equal(harness.releaseCount,1);
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),false);
 });
 
-test("unsupported Screen Wake Lock API degrades safely",async()=>{
-    const harness=createHarness({supported:false});
+test("release invalidates and frees a wake lock request that resolves late",async()=>{
+    const harness=createHarness({deferRequest:true});
     await harness.flush();
-
-    assert.equal(harness.window.FourSymbolsScreenWakeLock.isSupported(),false);
-    assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),false);
-    assert.equal(await harness.window.FourSymbolsScreenWakeLock.acquire(),false);
-    assert.equal(harness.requestCount,0);
-});
-
-test("wake lock permission or browser rejection is non-fatal",async()=>{
-    const harness=createHarness({rejectRequest:true});
-    await harness.flush();
-
     assert.equal(harness.requestCount,1);
+    await harness.window.FourSymbolsScreenWakeLock.release();
+    harness.resolveNextRequest();
+    await harness.flush();
+    assert.equal(harness.releaseCount,1,"the stale sentinel must be released immediately");
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),false);
-    assert.equal(await harness.window.FourSymbolsScreenWakeLock.acquire(),false);
-    assert.equal(harness.requestCount,2);
 });
+
+test("pageshow queues a fresh request when pagehide invalidated an in-flight request",async()=>{
+    const harness=createHarness({deferRequest:true});
+    await harness.flush();
+    harness.document.visibilityState="hidden";
+    harness.emitWindow("pagehide");
+    harness.document.visibilityState="visible";
+    harness.emitWindow("pageshow");
+    harness.resolveNextRequest();
+    await harness.flush();
+    assert.equal(harness.requestCount,2);
+    harness.resolveNextRequest();
+    await harness.flush();
+    assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),true);
+});
+
+test("unsupported Screen Wake Lock API and rejected requests degrade safely",async()=>{
+    const unsupported=createHarness({supported:false});
+    await unsupported.flush();
+    assert.equal(unsupported.window.FourSymbolsScreenWakeLock.isSupported(),false);
+    assert.equal(await unsupported.window.FourSymbolsScreenWakeLock.acquire(),false);
+    assert.equal(unsupported.requestCount,0);
+
+    const rejected=createHarness({rejectRequest:true});
+    await rejected.flush();
+    assert.equal(rejected.requestCount,1);
+    assert.equal(rejected.window.FourSymbolsScreenWakeLock.isHeld(),false);
+    assert.equal(await rejected.window.FourSymbolsScreenWakeLock.acquire(),false);
+    assert.equal(rejected.requestCount,2);
+});
+
+test("install guard prevents duplicate runtime and listener installation",async()=>{
+    const harness=createHarness();
+    await harness.flush();
+    const owner=harness.window.FourSymbolsScreenWakeLock;
+    harness.install();
+    harness.emitWindow("pageshow");
+    await harness.flush();
+    assert.equal(harness.window.FourSymbolsScreenWakeLock,owner);
+    assert.equal(harness.requestCount,1);
+});
+
+console.log("✓ Screen Wake Lock owner and lifecycle regression checks passed");

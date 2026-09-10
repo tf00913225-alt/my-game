@@ -1,3 +1,9 @@
+## 2026-09-10 四分支安全整合：Screen Wake Lock owner 收斂（dev integration）
+
+- 指定工作分支 `feature/screen-wake-lock-runtime-20260910@55054cb18c93d319653922541b343079cc41eb19` 的可見頁面常亮需求保留；整合時移除 `index.html` 內未登記的 inline runtime，改由 `js/startup/screen-wake-lock-runtime.js` 作唯一 owner，並納入既有單一 hashed Boot Core。它只安裝生命週期並 fire-and-forget 呼叫 Wake Lock API，不等待、不阻塞 Auth／存檔／首個可操作畫面。
+- `visibilitychange` hidden 與 `pagehide` 會主動釋放；visible／`pageshow` 會恢復。`requestGeneration` 使 release 後才完成的 pending request 失效並立即釋放，避免頁面已離開仍重新持鎖；全域 guard 保證不會重複安裝 listener。公開診斷仍為 `window.FourSymbolsScreenWakeLock`。
+- `tests/screen-wake-lock.test.js` 覆蓋 unsupported／拒絕、重複 acquire、hidden release、pageshow/pagehide、pending race 與重複安裝；`tests/boot-architecture.test.js` 永久禁止 `index.html` 再出現未登記 inline executable script。正式裝置是否確實不休眠仍需在 HTTPS dev 與支援 Screen Wake Lock 的手機驗證。
+
 ## 2026-09-10 V173.65 登入自適應與共用客服信箱（MAIN RELEASED）
 
 - 基準為 `dev@2bd79fb3c0133101caa3ba7a0345b7e39277f94d`，工作分支 `fix/v17365-auth-responsive-support`。使用者回報 Android／內嵌瀏覽器的未登入畫面只露出 1080×1920 stage 右下角，並要求登入頁、系統頁與免廣告服務資訊統一顯示客服信箱 `tf00913225@gmail.com`。
