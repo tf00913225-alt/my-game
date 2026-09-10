@@ -2790,6 +2790,74 @@
 <!-- V95: manual battle interaction UI overhaul.
      No damage/SP/initiative/skill formulas changed. -->
 
+<!-- Screen Wake Lock owner: keep the visible game page awake without blocking boot. -->
+<script id="screen-wake-lock-runtime">
+(function installScreenWakeLock(global){
+    "use strict";
+    if(!global || global.FourSymbolsScreenWakeLock){ return; }
+
+    let sentinel=null;
+    let requestInFlight=null;
+
+    function supported(){
+        return !!(global.navigator && global.navigator.wakeLock && typeof global.navigator.wakeLock.request==="function");
+    }
+
+    async function acquire(){
+        if(!supported() || document.visibilityState!=="visible"){ return false; }
+        if(sentinel && !sentinel.released){ return true; }
+        if(requestInFlight){ return requestInFlight; }
+
+        requestInFlight=(async()=>{
+            try{
+                const next=await global.navigator.wakeLock.request("screen");
+                if(document.visibilityState!=="visible"){
+                    try{ if(next && typeof next.release==="function"){ await next.release(); } }catch(_){ }
+                    return false;
+                }
+                sentinel=next;
+                if(next && typeof next.addEventListener==="function"){
+                    next.addEventListener("release",()=>{
+                        if(sentinel===next){ sentinel=null; }
+                    },{once:true});
+                }
+                return !!next;
+            }catch(_){
+                return false;
+            }finally{
+                requestInFlight=null;
+            }
+        })();
+        return requestInFlight;
+    }
+
+    async function release(){
+        const current=sentinel;
+        sentinel=null;
+        if(current && !current.released && typeof current.release==="function"){
+            try{ await current.release(); }catch(_){ }
+        }
+    }
+
+    function resumeIfVisible(){
+        if(document.visibilityState==="visible"){ void acquire(); }
+    }
+
+    document.addEventListener("visibilitychange",resumeIfVisible);
+    global.addEventListener("pageshow",resumeIfVisible);
+    global.addEventListener("pagehide",()=>{ void release(); });
+
+    global.FourSymbolsScreenWakeLock=Object.freeze({
+        acquire,
+        release,
+        isSupported:supported,
+        isHeld:()=>!!(sentinel && !sentinel.released)
+    });
+
+    void acquire();
+})(window);
+</script>
+
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
 <!-- build:critical-script -->
 <script id="boot-core-runtime" src="build/boot-core.d1b27c187d4b.js"></script>
