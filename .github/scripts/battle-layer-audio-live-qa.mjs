@@ -219,11 +219,12 @@ try{
     assert.equal(beforeElementBox.visibility,"visible","Skill layer must be visible during normal battle presentation");
 
     /* The production cast above proves that a real battle action reaches V143.
-       Its 1.45s lifecycle may legitimately finish while CDP performs the next
-       round trips, so start a bounded V143 presentation specifically for the
-       modal-overlap assertion.  This exercises the production director and
-       raster renderer; it does not require an idle stage to remain mounted. */
-    const modalOverlapPresentation=await client.eval(`(()=>{
+       A live battle keeps advancing between CDP round trips, so another formal
+       action may legitimately supersede any presentation started by the QA.
+       Start the bounded presentation, open the real modal and snapshot the same
+       DOM node in one browser task. This isolates the overlap contract without
+       pausing combat or requiring an expired/superseded stage to stay mounted. */
+    const modalOverlapSnapshot=await client.eval(`(()=>{
         const director=window.v142SkillAnimationDirector;
         const getConfig=window.v142GetSkillAnimationConfig;
         if(!director||typeof director.play!=='function'||typeof getConfig!=='function'){return null;}
@@ -232,28 +233,10 @@ try{
             side:'player',actorIndex:0,targetId:2,
             key:'battle-layer-modal-overlap-'+Date.now()
         });
-        return {skill:config.id,duration:config.duration,gateId:gate?.id||null};
-    })()`);
-    evidence.checks.modalOverlapPresentation=modalOverlapPresentation;
-    assert.equal(modalOverlapPresentation?.skill,"explosiveFlurry","Modal overlap QA must use the formal Fire Flurry V143 presentation");
-    assert.equal(modalOverlapPresentation?.duration,4000,"Modal overlap QA must hold a bounded V143 presentation across CDP round trips");
-    await waitFor(client,"document.getElementById('v143-skill-stage')?.dataset.skill==='explosiveFlurry'&&getComputedStyle(document.getElementById('v143-skill-stage')).visibility==='visible'","modal-overlap V143 presentation",1000);
-
-    const opened=await client.eval(`(()=>{
-        if(typeof openHomeFeature==='function'){openHomeFeature('autoBattleSettings');return 'openHomeFeature';}
-        if(typeof openAutoBattleSettings==='function'){openAutoBattleSettings();return 'openAutoBattleSettings';}
-        return null;
-    })()`);
-    evidence.checks.elementBoxOpenRoute=opened;
-    assert.ok(opened,"No Element Box settings opener is available");
-    await waitFor(
-        client,
-        "document.body.classList.contains('v162-element-box-settings-open')&&document.getElementById('homeFeatureModal')?.classList.contains('show')&&document.getElementById('autoBattleSettingsPanel')?.parentElement?.id==='homeFeatureModalBody'",
-        "real Element Box modal ownership",
-        3000
-    );
-
-    const elementBoxLayers=await client.eval(`(()=>{
+        const stageBefore=document.getElementById('v143-skill-stage');
+        let opened=null;
+        if(typeof openHomeFeature==='function'){openHomeFeature('autoBattleSettings');opened='openHomeFeature';}
+        else if(typeof openAutoBattleSettings==='function'){openAutoBattleSettings();opened='openAutoBattleSettings';}
         const stage=document.getElementById('v143-skill-stage');
         const gameStage=document.getElementById('game-stage');
         const modal=document.getElementById('homeFeatureModal');
@@ -264,26 +247,44 @@ try{
         const modalStyle=modal?getComputedStyle(modal):null;
         const panelStyle=panel?getComputedStyle(panel):null;
         return {
-            bodyFocus:document.body.classList.contains('v162-element-box-settings-open'),
-            stageStillExists:!!stage,
-            stageVisibility:stageStyle?.visibility||null,
-            stageOpacity:stageStyle?.opacity||null,
-            stageZ:Number(stageStyle?.zIndex||0),
-            gameStageZ:Number(gameStageStyle?.zIndex||0),
-            modalShow:!!modal?.classList.contains('show'),
-            modalConnected:!!modal?.isConnected,
-            panelConnected:!!panel?.isConnected,
-            panelParent:panel?.parentElement?.id||null,
-            modalDisplay:modalStyle?.display||null,
-            panelDisplay:panelStyle?.display||null,
-            modalBodyConnected:!!modalBody?.isConnected,
-            skillVolumeScale:window.v141Audio?.skillVolumeScale||null,
-            combatFeedbackVolumeScale:window.v141Audio?.combatFeedbackVolumeScale||null
+            presentation:{skill:config.id,duration:config.duration,gateId:gate?.id||null},
+            opened,
+            layers:{
+                bodyFocus:document.body.classList.contains('v162-element-box-settings-open'),
+                stageWasMountedBeforeOpen:!!stageBefore,
+                stageStillExists:!!stage,
+                sameStage:stage===stageBefore,
+                stageSkill:stage?.dataset.skill||null,
+                stageVisibility:stageStyle?.visibility||null,
+                stageOpacity:stageStyle?.opacity||null,
+                stageZ:Number(stageStyle?.zIndex||0),
+                gameStageZ:Number(gameStageStyle?.zIndex||0),
+                modalShow:!!modal?.classList.contains('show'),
+                modalConnected:!!modal?.isConnected,
+                panelConnected:!!panel?.isConnected,
+                panelParent:panel?.parentElement?.id||null,
+                modalDisplay:modalStyle?.display||null,
+                panelDisplay:panelStyle?.display||null,
+                modalBodyConnected:!!modalBody?.isConnected,
+                skillVolumeScale:window.v141Audio?.skillVolumeScale||null,
+                combatFeedbackVolumeScale:window.v141Audio?.combatFeedbackVolumeScale||null
+            }
         };
     })()`);
+    const modalOverlapPresentation=modalOverlapSnapshot?.presentation||null;
+    const opened=modalOverlapSnapshot?.opened||null;
+    const elementBoxLayers=modalOverlapSnapshot?.layers||{};
+    evidence.checks.modalOverlapPresentation=modalOverlapPresentation;
+    evidence.checks.elementBoxOpenRoute=opened;
     evidence.checks.elementBoxLayers=elementBoxLayers;
+    assert.equal(modalOverlapPresentation?.skill,"explosiveFlurry","Modal overlap QA must use the formal Fire Flurry V143 presentation");
+    assert.equal(modalOverlapPresentation?.duration,4000,"Modal overlap QA must start a bounded production V143 presentation");
+    assert.ok(opened,"No Element Box settings opener is available");
     assert.equal(elementBoxLayers.bodyFocus,true,"Element Box focus class must be active");
+    assert.equal(elementBoxLayers.stageWasMountedBeforeOpen,true,"Modal overlap QA must start from a mounted V143 stage");
     assert.equal(elementBoxLayers.stageStillExists,true,"V143 lifecycle stage must remain mounted while its presentation is suppressed");
+    assert.equal(elementBoxLayers.sameStage,true,"Opening Element Box must preserve the active V143 stage node");
+    assert.equal(elementBoxLayers.stageSkill,"explosiveFlurry","Element Box overlap must inspect the intended V143 skill stage");
     assert.equal(elementBoxLayers.stageVisibility,"hidden","Skill presentation must be hidden while Element Box settings owns focus");
     assert.equal(Number(elementBoxLayers.stageOpacity),0,"Skill presentation opacity must be zero while Element Box settings owns focus");
     assert.ok(elementBoxLayers.gameStageZ>elementBoxLayers.stageZ,"Game/Element Box stacking context must be above the document-level V143 skill stage");
