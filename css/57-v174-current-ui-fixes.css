@@ -10,14 +10,13 @@
 body #game-stage #inventoryPage .v169-item-art.v169-equipment-art{
     position:relative !important;
     isolation:isolate !important;
-    display:grid !important;
+    display:block !important;
     width:100% !important;
     height:100% !important;
     min-width:0 !important;
     min-height:0 !important;
     max-width:100% !important;
     max-height:100% !important;
-    place-items:center !important;
     padding:3px !important;
     overflow:hidden !important;
     border-radius:8px !important;
@@ -45,6 +44,7 @@ body #game-stage #inventoryPage .v169-item-art.v169-equipment-art > img{
     max-height:100% !important;
     margin:0 !important;
     padding:0 !important;
+    box-sizing:border-box !important;
     object-fit:contain !important;
     object-position:center !important;
     transform:none !important;
