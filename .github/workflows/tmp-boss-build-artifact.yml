@@ -33,7 +33,6 @@ jobs:
 
           css="css/gameplay-boss-tower.css"
           replace_once(css,"margin-top:-23px;","margin-top:-30px;")
-          replace_once(css,"is a real 44% of the battle row","is a real 38% of the battle row")
           replace_once(css,"--v143-monster-card-width:clamp(176px,44%,190px);","--v143-monster-card-width:clamp(154px,38%,166px);")
           replace_once(css,"margin:8px auto 0;","margin:3px auto 0;")
           replace_once(css,"flex-basis and width are both 23% of the battle area","flex-basis and width are both 20% of the battle area")
