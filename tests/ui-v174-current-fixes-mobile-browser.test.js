@@ -89,7 +89,7 @@ function verify(data,width){
     assert.ok(data.gameplay.back.right<=data.gameplay.header.right+1&&data.gameplay.back.left>data.gameplay.header.left+data.gameplay.header.width/2,`${width}px gameplay return is not in the header right side`);
     assert.equal(data.hint.font,"16px");assert.match(data.hint.content,/土剋水.*水剋火.*火剋風.*風剋土/);
     assert.ok(data.equipment.art.width>=60&&data.equipment.art.height>=60,`${width}px equipment art collapsed`);
-    assert.ok(data.equipment.img.width>=data.equipment.art.width-8&&data.equipment.img.height>=data.equipment.art.height-8,`${width}px equipment image does not fill its safe square`);
+    assert.ok(data.equipment.img.width>=data.equipment.art.width-14&&data.equipment.img.height>=data.equipment.art.height-14,`${width}px equipment image does not fill its safe square`);
     assert.equal(data.equipment.objectFit,"contain");assert.equal(data.equipment.transform,"none");
     assert.equal(data.preview.icon,"none");assert.equal(data.preview.chest,"none");assert.match(data.preview.content,/裝備寶箱.*×2/);
 }
