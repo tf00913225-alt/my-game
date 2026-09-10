@@ -8,6 +8,7 @@ const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
 const authUi=fs.readFileSync("js/firebase/firebase-auth-ui.js","utf8");
 const auth=fs.readFileSync("js/firebase/firebase-auth.js","utf8");
 const firebaseBootstrap=fs.readFileSync("js/firebase/firebase-bootstrap.js","utf8");
+const browserQa=fs.readFileSync(".github/scripts/run-boot-architecture-browser-qa.mjs","utf8");
 const context=vm.createContext({window:null,Object,String});
 context.window=context;
 vm.runInContext(contractSource,context);
@@ -35,6 +36,9 @@ assert.match(startup,/action==="cancel-migration"[\s\S]*?firebase\.signOut\(\)/)
 assert.match(authUi,/訪客開始遊戲/);
 assert.match(authUi,/signInAsAnonymous/);
 assert.match(auth,/signInAnonymously/);
+assert.match(browserQa,/export async function signInAsAnonymous\(\)/,
+    "browser QA auth double must implement the production bridge name");
+assert.doesNotMatch(browserQa,/export async function signInAnonymously\(\)/);
 assert.doesNotMatch(authUi+startup,/先使用本機存檔|DEV_AUTH_BYPASS|local-only bypass/i);
 
 console.log("✓ auth and save resolution are runtime prerequisites for character creation");

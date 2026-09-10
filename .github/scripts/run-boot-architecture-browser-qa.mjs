@@ -42,7 +42,7 @@ export function getFirebaseAuth(){return {currentUser:current};}
 export function getSignedInUser(){return current;}
 export async function observeFirebaseAuthState(listener){listeners.add(listener);queueMicrotask(()=>{if(scenario==="auth-error"){const error=new Error("simulated auth network failure");error.code="auth/network-request-failed";listener(null,error);}else{listener(current,null);}});return ()=>listeners.delete(listener);}
 function remember(uid){try{localStorage.setItem("__qa_auth_uid",uid);localStorage.removeItem("__qa_signed_out");}catch(_){}const user=publicUser(uid);publish(user);return user;}
-export async function signInAnonymously(){return remember("uid-guest");}
+export async function signInAsAnonymous(){return remember("uid-guest");}
 export async function signInWithGoogle(){return remember("uid-google");}
 export async function signInWithEmail(email){return remember(String(email).toLowerCase().startsWith("b")?"uid-B":"uid-A");}
 export async function createAccountWithEmail(email){return signInWithEmail(email);}
