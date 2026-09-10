@@ -58,12 +58,19 @@ test("bootstrap exposes the narrow Firebase bridge and cloud-read events", ()=>{
     assert.match(bootstrap, /cloudSaveWritePolicy:\s*CLOUD_SAVE_WRITE_POLICY/);
 });
 
-test("authentication UI supports Google, email and Firebase anonymous identity without production bypass", ()=>{
+test("authentication UI supports Google, Facebook, email and Firebase anonymous identity without production bypass", ()=>{
+    assert.match(auth, /FacebookAuthProvider/);
+    assert.match(auth, /export async function signInWithFacebook\(\)/);
+    assert.match(auth, /new FacebookAuthProvider\(\)/);
     assert.match(ui, /signInWithGoogle/);
+    assert.match(ui, /signInWithFacebook/);
     assert.match(ui, /signInWithEmail/);
     assert.match(ui, /createAccountWithEmail/);
     assert.match(ui, /signInAsAnonymous/);
     assert.match(ui, /signOutFirebase/);
+    assert.match(ui, /id="firebaseFacebookButton"[^>]*>Facebook 登入<\/button>/);
+    assert.match(ui, /firebaseFacebookButton[\s\S]*signInWithFacebook/);
+    assert.match(bootstrap, /signInWithGoogle,signInWithFacebook,signInWithEmail/);
     assert.doesNotMatch(ui, /先使用本機存檔/);
     assert.match(ui, /沒有 UID 時不能建立角色/);
     assert.match(ui, /UID：/);

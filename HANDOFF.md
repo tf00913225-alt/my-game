@@ -1,3 +1,11 @@
+## 2026-09-10 Facebook Firebase 登入補齊（PR #152）
+
+- 工作分支 `feature/facebook-login`；整合基準收斂到 `dev@2f3dc7d13df8e3c629b0544b52c494416a6f6ab1`。Firebase Console 已啟用 Email/Password、Google、Facebook、Anonymous；本次補齊既有 Authentication owner 缺少的 Facebook provider。
+- `js/firebase/firebase-auth.js` 新增 `FacebookAuthProvider` / `signInWithFacebook()`；`js/firebase/firebase-auth-ui.js` 在既有 account-first responsive dialog 加入「Facebook 登入」、busy/error handling；`js/firebase/firebase-bootstrap.js` 透過既有 `FourSymbolsFirebaseLifecycle` 暴露同一登入方法。沒有新增第二套 Auth owner、modal wrapper 或 runtime patch。
+- deterministic build 已重新產生 content-hashed Firebase/Boot assets 與 manifests；`.github/scripts/run-boot-architecture-browser-qa.mjs` 的 Firebase Auth test double 同步補 `signInWithFacebook()`，並擴充 Auth source contract 與 390×844、360×640、844×390 responsive fixture。
+- 不修改 `saveGame()` / `loadGame()`、UID local ownership、Startup State Machine、Firestore browser write policy、雲端/本機存檔 schema、Game/Cache Version；`main` 不在本工作修改。
+- Meta live 前提：Valid OAuth Redirect URIs 必須包含 `https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`。合入 dev 後仍需手機實測 Facebook popup、Firebase UID 與同 UID 存檔解析。
+
 ## 2026-09-10 四分支安全整合：Screen Wake Lock owner 收斂（dev integration）
 
 - 指定工作分支 `feature/screen-wake-lock-runtime-20260910@55054cb18c93d319653922541b343079cc41eb19` 的可見頁面常亮需求保留；整合時移除 `index.html` 內未登記的 inline runtime，改由 `js/startup/screen-wake-lock-runtime.js` 作唯一 owner，並納入既有單一 hashed Boot Core。它只安裝生命週期並 fire-and-forget 呼叫 Wake Lock API，不等待、不阻塞 Auth／存檔／首個可操作畫面。

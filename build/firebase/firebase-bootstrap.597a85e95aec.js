@@ -1,13 +1,13 @@
 /* Firebase lifecycle owner: identity resolution is a separate phase from cloud-save resolution. */
 import {
     createAccountWithEmail,getFirebaseAuthConfigStatus,getSignedInUser,initializeFirebaseAuth,
-    observeFirebaseAuthState,signInAsAnonymous,signInWithEmail,signInWithGoogle,signOutFirebase
-} from "./firebase-auth.04b69a7bf734.js";
+    observeFirebaseAuthState,signInAsAnonymous,signInWithEmail,signInWithFacebook,signInWithGoogle,signOutFirebase
+} from "./firebase-auth.a53b9f4c06d7.js";
 import {
     CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,
     submitLegacyMigrationCandidate
-} from "./firebase-cloud-save.eb404e143334.js";
-import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.9fb5cf2ad237.js";
+} from "./firebase-cloud-save.e1ab7e7f2119.js";
+import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.e6a76e6cf3a7.js";
 
 const AUTH_EVENT="four-symbols:firebase-auth-state";
 let lifecyclePromise=null;
@@ -63,7 +63,7 @@ async function resolveCloudSave(user){
 }
 const api=Object.freeze({
     initialize:initializeLifecycle,resolveIdentity,resolveCloudSave,getUser:getSignedInUser,
-    signInWithGoogle,signInWithEmail,createAccountWithEmail,signInAsAnonymous,signOut:signOutFirebase,
+    signInWithGoogle,signInWithFacebook,signInWithEmail,createAccountWithEmail,signInAsAnonymous,signOut:signOutFirebase,
     submitLegacyMigrationCandidate,openAuth:openFirebaseAuthUi,closeAuth:closeFirebaseAuthUi,
     setUiState:setFirebaseAuthUiState,cloudSaveWritePolicy:CLOUD_SAVE_WRITE_POLICY,
     cloudFunctionsRegion:CLOUD_FUNCTIONS_REGION,dispose:()=>{ if(unsubscribe){ unsubscribe(); unsubscribe=null; } }

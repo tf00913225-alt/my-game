@@ -44,6 +44,7 @@ export async function observeFirebaseAuthState(listener){listeners.add(listener)
 function remember(uid){try{localStorage.setItem("__qa_auth_uid",uid);localStorage.removeItem("__qa_signed_out");}catch(_){}const user=publicUser(uid);publish(user);return user;}
 export async function signInAsAnonymous(){return remember("uid-guest");}
 export async function signInWithGoogle(){return remember("uid-google");}
+export async function signInWithFacebook(){return remember("uid-facebook");}
 export async function signInWithEmail(email){return remember(String(email).toLowerCase().startsWith("b")?"uid-B":"uid-A");}
 export async function createAccountWithEmail(email){return signInWithEmail(email);}
 export async function signOutFirebase(){try{localStorage.removeItem("__qa_auth_uid");localStorage.setItem("__qa_signed_out","1");}catch(_){}publish(null);}
