@@ -14,6 +14,7 @@
 | Gameplay save serialization | `js/00-main.js` 的 `FourSymbolsGameSave`／`saveGame()`／`loadGame()` |
 | Firebase identity | `js/firebase/firebase-auth.js` |
 | 帳號 UI | `js/firebase/firebase-auth-ui.js` |
+| 客服聯絡資料與共用顯示視窗 | `js/startup/support-contact.js` |
 | 雲端 read／trusted callable | `js/firebase/firebase-cloud-save.js` |
 | Firebase lifecycle | `js/firebase/firebase-bootstrap.js` |
 | 功能意圖、局部 loading、idle preload | `js/20-anonymous-20.js` |
@@ -67,6 +68,8 @@ stateDiagram-v2
 
 訪客不是離線 bypass。`訪客開始遊戲` 固定呼叫 Firebase Anonymous Auth，先取得匿名 UID，再解析該 UID 的存檔。
 
+帳號 UI 在 `app-shell` 與 1080×1920 stage scaler 尚未載入前就必須可操作，因此固定掛在 `document.body`，以實際 browser viewport、`100dvh` 與 safe-area inset 自適應；不得再掛入 `#game-stage` 或依賴登入後才存在的縮放 runtime。登入頁與遊戲內系統頁的「聯絡客服」皆呼叫 Critical Boot 的 `FourSymbolsSupport`，客服信箱唯一來源為 `js/startup/support-contact.js`。
+
 ## Save ownership
 
 Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位。
@@ -100,7 +103,7 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 
 `asset-manifest.json` 是部署時的實際清單。未登入的 Critical Boot 只包含：
 
-- 一個 hashed `boot-core.*.js`：account repository、feature loader、startup contract、state machine。
+- 一個 hashed `boot-core.*.js`：客服聯絡 owner、account repository、feature loader、startup contract、state machine。
 - 一個 hashed `boot-core.*.css`：viewport/base、startup、account UI 與創角必要樣式。
 - hashed startup logo。
 - 五個 hashed Firebase lifecycle modules，加上 Firebase 官方 SDK 的必要 ESM dependency。

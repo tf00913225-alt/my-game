@@ -10,6 +10,8 @@ const cloud = read("js/firebase/firebase-cloud-save.js");
 const ui = read("js/firebase/firebase-auth-ui.js");
 const bootstrap = read("js/firebase/firebase-bootstrap.js");
 const startup = read("js/52-v173.20-startup-loader.js");
+const support = read("js/startup/support-contact.js");
+const productionBuild = read("scripts/build-production.mjs");
 const touch = read("js/01-stage-v8-touch-lock.js");
 const css = read("css/firebase-auth.css");
 const docs = read("docs/FIREBASE_AUTH_CLOUD_SAVE.md");
@@ -65,10 +67,24 @@ test("authentication UI supports Google, email and Firebase anonymous identity w
     assert.doesNotMatch(ui, /先使用本機存檔/);
     assert.match(ui, /沒有 UID 時不能建立角色/);
     assert.match(ui, /UID：/);
+    assert.match(ui, /id="firebaseSupportButton"/);
+    assert.match(ui, /const host=document\.body/);
+    assert.doesNotMatch(ui, /const host=document\.getElementById\("game-stage"\)/);
     assert.match(css, /\.firebase-auth-overlay/);
-    assert.match(css, /z-index:999998/);
-    assert.match(css, /\.firebase-auth-dialog\{[\s\S]*overflow-y:auto/);
+    assert.match(css, /\.firebase-auth-overlay\{[\s\S]*position:fixed;[\s\S]*height:100dvh;[\s\S]*overflow-y:auto/);
+    assert.match(css, /z-index:2147483500/);
+    assert.match(css, /\.firebase-auth-dialog\{[\s\S]*width:min\(100%,560px\);[\s\S]*max-height:100%;[\s\S]*overflow-y:auto/);
     assert.match(touch, /\.firebase-auth-dialog/);
+});
+
+test("one Critical Boot support owner serves login and in-game contact surfaces", ()=>{
+    assert.match(support, /const EMAIL="tf00913225@gmail\.com"/);
+    assert.match(support, /global\.FourSymbolsSupport=Object\.freeze/);
+    assert.match(support, /id="supportContactTitle">聯絡客服/);
+    assert.match(support, /href="mailto:/);
+    assert.match(css, /\.support-contact-overlay\{[\s\S]*position:fixed/);
+    const bootScripts=productionBuild.slice(productionBuild.indexOf("const bootScripts="),productionBuild.indexOf("const appScripts="));
+    assert.match(bootScripts,/js\/startup\/support-contact\.js/);
 });
 
 test("startup owner makes Firebase identity mandatory without a full-runtime gate", ()=>{

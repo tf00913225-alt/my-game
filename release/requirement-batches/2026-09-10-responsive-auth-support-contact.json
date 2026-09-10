@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-10-responsive-auth-support-contact",
+  "baseBranch": "dev",
+  "baseCommit": "2bd79fb3c0133101caa3ba7a0345b7e39277f94d",
+  "workBranch": "fix/v17365-auth-responsive-support",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "AUTH-SUPPORT-01",
+      "status": "IMPLEMENTED",
+      "requirement": "登入介面必須脫離尚未初始化的 1080×1920 game stage，直接依手機 viewport、安全區、直向與橫向尺寸自適應，且不得水平裁切",
+      "evidence": [
+        "js/firebase/firebase-auth-ui.js",
+        "css/firebase-auth.css",
+        "tests/v174-auth-responsive-support.test.js"
+      ]
+    },
+    {
+      "id": "AUTH-SUPPORT-02",
+      "status": "IMPLEMENTED",
+      "requirement": "登入頁與系統頁都要提供聯絡客服入口，並由同一個客服 owner 顯示 tf00913225@gmail.com",
+      "evidence": [
+        "js/startup/support-contact.js",
+        "js/firebase/firebase-auth-ui.js",
+        "js/00-main.js",
+        "scripts/build-production.mjs",
+        "tests/v174-auth-responsive-support.test.js"
+      ]
+    },
+    {
+      "id": "AUTH-SUPPORT-03",
+      "status": "IMPLEMENTED",
+      "requirement": "免廣告服務資訊的客服 Email 不得顯示尚未設定，必須直接顯示 tf00913225@gmail.com",
+      "evidence": [
+        "js/16-stage-v54-main-city-runtime.js",
+        "tests/ad-free-service-info-modal.test.js"
+      ]
+    }
+  ],
+  "automatedVerification": "LOCAL_140_OF_140_NODE_TESTS_214_OF_214_SYNTAX_303_RESOURCES_249_HTML_IDS_BUILD_LOADER_RELEASE_GIT_DIFF_PASS; REMOTE_CI_BROWSER_PENDING",
+  "visualVerification": "PENDING_DEV_MOBILE_BROWSER",
+  "verifiedDevCommit": "",
+  "promotionApproval": "PENDING_USER_CONFIRMATION"
+}

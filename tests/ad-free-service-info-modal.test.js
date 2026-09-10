@@ -51,8 +51,11 @@ test("all paid-service disclosure copy and controls are present",()=>{
     ].forEach(text=>assert.ok(runtime.includes(text),"missing disclosure text: "+text));
 });
 
-test("unconfigured support, policy and ECPay fields stay explicit TODOs without fake destinations",()=>{
+test("the shared support email is configured while policy and ECPay fields stay explicit TODOs",()=>{
     assert.match(runtime,/supportEmail:""/);
+    assert.match(runtime,/formalSupportEmail=String\(window\.FourSymbolsSupport/);
+    assert.match(runtime,/config\.supportEmail=formalSupportEmail/);
+    assert.doesNotMatch(runtime,/尚未設定/);
     assert.match(runtime,/refundPolicyUrl:""/);
     assert.match(runtime,/termsUrl:""/);
     assert.match(runtime,/privacyPolicyUrl:""/);
@@ -118,7 +121,7 @@ test("the owner runtime opens once on a ready home screen and closes through the
         set innerHTML(value){
             this._innerHTML=String(value);
             const ids=[
-                ["adFreeSupportEmail","尚未設定",false],
+                ["adFreeSupportEmail","tf00913225@gmail.com",false],
                 ["adFreeRefundPolicyButton","查看退款規則",false],
                 ["adFreeTermsButton","查看服務條款",false],
                 ["adFreePrivacyButton","查看隱私權政策",false],
@@ -171,6 +174,7 @@ test("the owner runtime opens once on a ready home screen and closes through the
     const window={
         document,
         location:{href:"https://game.example.test/"},
+        FourSymbolsSupport:{email:"tf00913225@gmail.com"},
         getComputedStyle(element){
             if(element===game)return {display:"block",visibility:"visible"};
             return {display:"block",visibility:"visible"};
@@ -193,7 +197,8 @@ test("the owner runtime opens once on a ready home screen and closes through the
     assert.equal(elements.get("adFreeRefundPolicyButton").disabled,true);
     assert.equal(elements.get("adFreeTermsButton").disabled,true);
     assert.equal(elements.get("adFreePrivacyButton").disabled,true);
-    assert.equal(elements.get("adFreeSupportEmail").textContent,"尚未設定");
+    assert.equal(elements.get("adFreeSupportEmail").textContent,"tf00913225@gmail.com");
+    assert.equal(elements.get("adFreeSupportEmail").dataset.todo,"false");
     assert.equal((document.head.children||[]).some(element=>element.id==="ad-free-service-info-style"),false,
         "the bundled stylesheet must not be downloaded again through a raw runtime link");
 

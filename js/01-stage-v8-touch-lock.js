@@ -60,9 +60,9 @@
            全域觸控鎖；否則手勢從分類列或秘寶內容起始時會被
            preventDefault()，造成「有時能滑、有時不能滑」的裝置差異。
 
-           Firebase 帳號視窗使用 native stage overlay，真正的垂直
-           scroll owner 是 .firebase-auth-dialog；同樣只在這份全域
-           白名單登記一次，不為登入頁另加 touchmove 補丁。
+           Firebase 帳號視窗使用獨立於 game stage 的 responsive viewport
+           overlay，真正的垂直 scroll owner 是 .firebase-auth-dialog；
+           同樣只在這份全域白名單登記一次，不為登入頁另加 touchmove 補丁。
         */
         const allowedSelector =
             ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
