@@ -59,6 +59,7 @@ jobs:
           node --check .github/scripts/release-gate.mjs
           node --check .github/scripts/run-boot-architecture-browser-qa.mjs
           node --check .github/scripts/run-skill-progression-browser-qa.mjs
+          node --check .github/scripts/run-relic-progression-browser-qa.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
@@ -87,6 +88,9 @@ jobs:
 
       - name: Run skill progression mobile browser QA
         run: node .github/scripts/run-skill-progression-browser-qa.mjs
+
+      - name: Run relic progression mobile browser QA
+        run: node .github/scripts/run-relic-progression-browser-qa.mjs
 
       - name: Check static local resources
         run: node .github/scripts/ci.mjs resources
