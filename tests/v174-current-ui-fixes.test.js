@@ -18,7 +18,7 @@ assert.match(css,/v17361-reward-preview[\s\S]*v17361-reward-icon[\s\S]*display:n
 assert.match(css,/裝備寶箱  ×2/);
 assert.match(css,/allElementSkillPreviewModal[\s\S]*font-size:16px !important/);
 assert.match(css,/土剋水・水剋火・火剋風・風剋土/);
-assert.match(css,/team-relic-home-tools \.home-card-label[\s\S]*font-size:15\.5px !important[\s\S]*line-height:23px !important/);
+assert.match(css,/team-relic-home-tools \.home-card-label[\s\S]*font-size:13px !important[\s\S]*line-height:18px !important/);
 assert.match(css,/v146-home-roster[\s\S]*margin-top:4px !important/);
 assert.match(js,/className="gameplay-back-button v174-gameplay-home-back"/);
 assert.match(js,/window\.showPage\("home"\)/);
