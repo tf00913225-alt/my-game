@@ -3711,3 +3711,12 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Loader 順序必須維持 `feature-boss-relic` 基礎 runtime 在前、`feature-relic-progression` 在後。singleton installed flag 只可在 `v174RelicSystem`、`GameplaySystem`、`FourSymbolsAccountSave` 三個 owner 都存在後設定，避免依賴順序異常時永久停用且無法重試。
 - 本 owner 不得接管 `winBattle`、`loseBattle`、`v132LaunchDungeonBattle` 或 `saveGame`；它只包裝公開 Boss／塔入口並依既有進度 state 對帳 exact-once receipt。理論上的同 ID 並行物品異動、UTC 跨週邊界與滿 120 格選擇箱仍需列為已知邊界，不得以 CI 綠燈宣稱已消除。
 - Game／Cache Version 維持 V173.65；本批最終驗證與未驗證項目統一記錄於 `release/requirement-batches/2026-09-10-four-branch-dev-integration.json`。
+
+## 2026-09-10 — 裝備／玩法／主城 UI owner 收斂（dev only）
+
+- 指定來源為 `fix/ui-equipment-gameplay-city-polish-continued@26a67473128674c91fa363cefbd33e5f3f1c8034`；本次只允許進入 `dev`，不得修改 `main`。
+- 原分支的 `body #game-stage .v17361-reward-preview` 與 `body #game-stage #allElementSkillPreviewModal` 都不符合正式 DOM：reward modal 與全元素技能 modal 會直接掛在 `document.body`。整合時改由 `js/equipment-progression.js` 產生正式文字預覽、`css/33-v132-content-expansion.css` 持有 body modal 版面，並直接調整 `css/56-v174-critical-ui-regressions.css` 的 body selector。
+- 固定「返回主城」控制直接由 `index.html#gameplayPage` 持有；不保留 `js/62-v174-current-ui-fixes.js`、永久 `four-symbols:feature-ready` listener 或 app-ui-fixes bundle。
+- 裝備格、短螢幕隊伍 HUD、秘寶／元素匣標籤分別收斂至 `css/38-v141-system-expansion.css`、`css/42-v146-system-polish.css`、`css/55-team-relic-system.css`。未保留含大量 `!important` 的 `css/57-v174-current-ui-fixes.css`。
+- 新秘寶主城圖使用 content-hashed 路徑 `assets/ui/home-relic-v174.eed14e806044.webp`；舊無 hash URL 不覆寫，避免既有客戶端快取沿用錯誤內容。
+- 裝備副本品階機率由 `EQUIPMENT_CHEST_DROP_TABLE` 經 `equipmentChestOddsText()` 產生，不再把 40/40/10/10 複製到 CSS 偽元素。
