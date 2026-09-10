@@ -15,6 +15,7 @@
     "use strict";
 
     if(typeof window==="undefined"||window.__relicProgressionDropSystemInstalled){ return; }
+
     const relicRuntime=window.v174RelicSystem;
     const gameplayRuntime=window.GameplaySystem;
     const accountRepository=window.FourSymbolsAccountSave;

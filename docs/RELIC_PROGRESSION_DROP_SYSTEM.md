@@ -7,6 +7,7 @@
 - `js/60-team-relic-system.js`：秘寶戰鬥效果、秘寶目錄、裝備中的秘寶、秘寶頁基礎 UI。
 - `js/gameplay-boss-tower-system.js`：玩法中心、個人／世界 BOSS、四象塔 100 層與其既有進度。
 - `js/relic-progression-drop-system.js`：本文件涵蓋的唯一 owner，負責秘寶專屬碎片、通用碎片、秘寶精華、突破石、Boss 定向掉落、塔養成／保底、碎片合成與素材強化。
+- 安裝 guard 只在 `v174RelicSystem`、`GameplaySystem`、`FourSymbolsAccountSave` 三個必要 runtime owner 齊備後設為完成；依賴尚未就緒時必須保留後續重試能力。
 - 背包沿用 `v132AddItemToInventory / v132ConsumeStackItem / v132RunInventoryTransaction`，不建立第二套庫存。
 - 持久化沿用目前 UID 主存檔；新進度記錄放在 `player.relicProgression`。不新增秘寶專用 localStorage save key。
 - 不包裝 `winBattle / loseBattle / v132LaunchDungeonBattle / saveGame`。Boss／塔完成以現有公開玩法進度狀態與安全 pending receipt 對帳。
