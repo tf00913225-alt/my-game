@@ -1,0 +1,30 @@
+name: Temporary Boss Build Artifact
+
+on:
+  push:
+    branches:
+      - fix/boss-ui-9x16-mobile-20260910
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Rebuild deterministic production assets
+        run: node scripts/build-production.mjs
+      - name: Upload rebuilt Boss bundle and manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: boss-deterministic-build
+          path: |
+            build/feature-boss-relic.*.css
+            asset-manifest.json
+            build/asset-manifest.json
+          if-no-files-found: error
+          retention-days: 1
