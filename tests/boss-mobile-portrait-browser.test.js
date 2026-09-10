@@ -32,6 +32,7 @@ const html=`<!doctype html>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403;}
 body{position:relative;}
 #qaViewport{position:absolute;inset:0;overflow:hidden;}
+#result{display:none;}
 #game-stage{position:absolute!important;left:50%!important;top:50%!important;width:420px!important;height:746.6667px!important;min-width:420px!important;min-height:746.6667px!important;transform:translate(-50%,-50%) scale(var(--qa-scale))!important;transform-origin:center center!important;}
 #game-stage>#app{position:relative!important;width:420px!important;height:746.6667px!important;min-width:420px!important;min-height:746.6667px!important;transform:none!important;}
 #game-stage>#app>#game-content{position:relative!important;width:420px!important;height:746.6667px!important;min-height:746.6667px!important;padding-bottom:0!important;overflow:hidden!important;}
@@ -41,6 +42,7 @@ body{position:relative;}
 #battleCommandRow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;min-height:62px;}
 #battleCommandRow button{min-width:0;min-height:52px;}
 #battleInfo{display:block;}
+#bossMechanismSlot .boss-mechanism-card{animation:none!important;}
 </style>
 </head>
 <body>
