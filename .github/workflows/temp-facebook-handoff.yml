@@ -1,0 +1,36 @@
+name: Temp Facebook handoff
+
+on:
+  pull_request:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.head_ref == 'feature/facebook-login'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+      - name: Record handoff and remove temporary workflow
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('HANDOFF.md')
+          s=p.read_text()
+          marker='## 2026-09-10 Facebook Firebase 登入補齊（PR #152）'
+          if marker not in s:
+              entry='''## 2026-09-10 Facebook Firebase 登入補齊（PR #152）\n\n- 工作分支 `feature/facebook-login`；整合基準收斂到當時最新 `dev@2f3dc7d13df8e3c629b0544b52c494416a6f6ab1`。Firebase Console 已啟用 Email/Password、Google、Facebook、Anonymous；本次只補前端既有 Authentication owner 缺少的 Facebook provider。\n- `js/firebase/firebase-auth.js` 新增 `FacebookAuthProvider` 與 `signInWithFacebook()`；`js/firebase/firebase-auth-ui.js` 在既有 account-first responsive dialog 加入「Facebook 登入」按鈕、busy/error handling；`js/firebase/firebase-bootstrap.js` 透過既有 `FourSymbolsFirebaseLifecycle` 暴露同一登入方法。沒有新增第二套 Auth owner、modal wrapper 或 runtime patch。\n- `scripts/build-production.mjs` 已重新產生 deterministic content-hashed Firebase/Boot 資產與 manifests；`.github/scripts/run-boot-architecture-browser-qa.mjs` 的 Firebase Auth test double 同步補 `signInWithFacebook()`，避免 QA fake module 與正式 export contract 不一致。測試亦擴充 Firebase source contract 與 390×844、360×640、844×390 responsive account UI fixture。\n- 不修改 `saveGame()` / `loadGame()`、UID local ownership、Startup State Machine、Firestore browser write policy、雲端/本機存檔 schema、Game/Cache Version；`main` 不在本工作直接修改。\n- 外部 live 前提：Meta App 與 Firebase 使用同一 Facebook App ID/Secret，Meta Valid OAuth Redirect URIs 必須包含 `https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`。合入 dev 後仍需手機實測 Facebook popup、Firebase UID 與同 UID 存檔解析。\n\n'''
+              p.write_text(entry+s)
+          PY
+          rm .github/workflows/temp-facebook-handoff.yml
+          git add HANDOFF.md .github/workflows/temp-facebook-handoff.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: record Facebook login handoff"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
