@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-10-four-branch-dev-integration",
+  "baseBranch": "dev",
+  "baseCommit": "08f6f8e8ad251d3968aceace68d0e675ff2ecdde",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "INTEGRATION-01",
+      "status": "VERIFIED",
+      "requirement": "合併前以 GitHub 實際內容讀取 AGENTS.md、CLAUDE.md、最新 dev、四條指定分支與各自相對最新 dev 的 diff，完成 owner／state／listener／selector／重複實作與過舊基底風險分析",
+      "evidence": [
+        "Initial dev HEAD 08f6f8e8ad251d3968aceace68d0e675ff2ecdde; initial main HEAD 957732345f0b566a13b86d8114102fd60f6d23e5",
+        "All four remote branch tips exactly matched the user-specified SHAs; all four originally shared merge base 08f6f8e8ad251d3968aceace68d0e675ff2ecdde",
+        "AGENTS.md; CLAUDE.md; HANDOFF.md; UI_GUIDELINES.md; ARCHITECTURE_RULES.md; docs/ITEM_RARITY_UI_SPEC.md; docs/RELEASE_VERIFICATION_RULES.md"
+      ]
+    },
+    {
+      "id": "INTEGRATION-02",
+      "status": "VERIFIED",
+      "requirement": "四條分支依實際 owner 逐條合併與逐條驗證，不一次性合併，不讓過舊分支覆蓋前序整合",
+      "evidence": [
+        "Actual order: Wake Lock runtime → relic progression/drop system → equipment/gameplay/city UI polish → Boss 9:16 mobile UI",
+        "Each manual source merge uses the then-current verified dev as first parent and the exact specified work commit as second parent",
+        "Wake dev b675b4cc575f41140423f1f7edaa414098203a46; relic dev fa133615e69b6f1788aa90a7b5fc89e4de94b854; UI dev 2f3dc7d13df8e3c629b0544b52c494416a6f6ab1; Boss integration PR head 5b1901978edad4dcc6bc078d5207a5f3b6ec1853"
+      ]
+    },
+    {
+      "id": "WAKE-01",
+      "status": "VERIFIED",
+      "requirement": "feature/screen-wake-lock-runtime-20260910@55054cb18c93d319653922541b343079cc41eb19 以正式 startup owner 整合，hidden release、pending request race 與重複 listener 均受控",
+      "evidence": [
+        "Manual merge/dev commit b675b4cc575f41140423f1f7edaa414098203a46",
+        "7 lifecycle/race/guard tests; PR CI run 34486190264 SUCCESS",
+        "Dev Repository checks job 102903940609 and Dev deployment job 102903940408 SUCCESS"
+      ]
+    },
+    {
+      "id": "WAKE-02",
+      "status": "BLOCKED",
+      "requirement": "以實體支援 Wake Lock 的手機驗證螢幕逾時期間仍維持常亮，切換背景後釋放，回前景後重新取得",
+      "evidence": [
+        "Headless/mock lifecycle verification passed but cannot prove physical display power behavior",
+        "Requires manual supported-device QA with normal screen timeout and page visibility transitions"
+      ]
+    },
+    {
+      "id": "RELIC-01",
+      "status": "VERIFIED",
+      "requirement": "feature/relic-progression-drop-system@7125580afa5d1c89d6cae0a2d986c71a6f22d916 的 Boss／塔掉落、碎片合成與秘寶進度資料流完整進入 dev，保留原 Boss/relic runtime owner 與 save flow",
+      "evidence": [
+        "Manual source merge 13c3602612316fff20a4cadbce59c822c2556143; actual dev merge fa133615e69b6f1788aa90a7b5fc89e4de94b854",
+        "PR CI run 34490910187 SUCCESS; dev CI/deploy run 34491370855 SUCCESS",
+        "Progression JS build/feature-relic-progression.66dc0818b8ae.js loads after base Boss/relic owner"
+      ]
+    },
+    {
+      "id": "UI-01",
+      "status": "VERIFIED",
+      "requirement": "fix/ui-equipment-gameplay-city-polish-continued@26a67473128674c91fa363cefbd33e5f3f1c8034 收斂至既有 UI/CSS owner，裝備預覽、返回、主城秘寶與手機 modal 不建立重複 listener／runtime",
+      "evidence": [
+        "Manual source merge 426618fb639c83ab79efe8ac68d1e5b546f89bd7; actual dev merge 2f3dc7d13df8e3c629b0544b52c494416a6f6ab1",
+        "PR CI run 34497275328 attempt 2 SUCCESS; dev CI/deploy run 34497806854 SUCCESS",
+        "390x844 and 412x915 modal/inventory/relic browser regressions corrected at actual CSS owners"
+      ]
+    },
+    {
+      "id": "BOSS-01",
+      "status": "VERIFIED",
+      "requirement": "fix/boss-ui-9x16-mobile-20260910@0865bbaef3e8c1ee5f054bf4774bc800db9f7ec2 的 Boss 與機制卡 9:16 UI 安全整合，長 HP 不溢位且不引入 priority patch",
+      "evidence": [
+        "Manual two-parent source merge 5b1901978edad4dcc6bc078d5207a5f3b6ec1853 based on dev 2f3dc7d13df8e3c629b0544b52c494416a6f6ab1",
+        "Boss PR #153 CI run 34499949570 SUCCESS; 146/146 Node suites; boss-mobile-portrait-browser passed",
+        "360x800, 393x873 and 412x915 viewports; long HP 5601 / 5601; declaration-level !important count 0"
+      ]
+    },
+    {
+      "id": "INTEGRATION-03",
+      "status": "VERIFIED",
+      "requirement": "整合後保留 Wake Lock、秘寶、UI 與 Boss 各自正式 owner，manifest/build 無舊路徑回退、重複函式、重複 listener、conflict marker 或資源失效",
+      "evidence": [
+        "Boss PR #153 Repository checks job 102947917591 SUCCESS",
+        "222/222 JavaScript syntax; 146/146 Node suites; 298 static resources; 21 deterministic build assets",
+        "Boot/account, skill and relic mobile browser QA passed; release V173.65/cache 173.65 coherent"
+      ]
+    },
+    {
+      "id": "INTEGRATION-04",
+      "status": "VERIFIED",
+      "requirement": "整個流程只推進 dev，main 不合併、不 push、不建立以 main 為 target 的 PR",
+      "evidence": [
+        "All integration PRs target dev only",
+        "Initial/main checkpoint 957732345f0b566a13b86d8114102fd60f6d23e5; final main HEAD must be re-read after dev deployment before completion report"
+      ]
+    }
+  ],
+  "automatedVerification": "WAKE_PR_34486190264_SUCCESS; RELIC_PR_34490910187_SUCCESS; RELIC_DEV_34491370855_SUCCESS; UI_PR_34497275328_ATTEMPT_2_SUCCESS; UI_DEV_34497806854_SUCCESS; BOSS_PR_34499949570_SUCCESS; FINAL_146_OF_146_NODE_SUITES; 222_OF_222_JS_SYNTAX; 298_STATIC_RESOURCES; 21_DETERMINISTIC_BUILD_ASSETS; RELEASE_AND_GIT_DIFF_GATES_PASSED",
+  "visualVerification": "AUTOMATED_MOBILE_BROWSER_QA_PASSED_FOR_BOOT_ACCOUNT_SKILL_RELIC_UI_AND_BOSS_360X800_393X873_390X844_412X915; FINAL_DEV_LIVE_BROWSER_QA_PENDING_DEPLOY",
+  "notes": "Game/Cache Version intentionally remains V173.65. Boss and relic both changed asset manifests and feature-boss-relic CSS; manual integration retained the Boss CSS replacement plus the relic progression CSS/JS ordering and hashed relic art. UI integration corrected actual selector/runtime owners instead of importing duplicate bundles. One requirement remains BLOCKED: physical device display sleep behavior for Screen Wake Lock cannot be proven by headless/mock CI. The release gate does not currently consume release/requirement-batches/*.json, so this record is evidence rather than an enforced gate. main was not modified."
+}

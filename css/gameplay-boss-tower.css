@@ -585,22 +585,73 @@
 }
 
 #game-stage #battleMonsterArea.gameplay-boss-active{
-    margin-top:-23px;
+    margin-top:-32px;
+    max-width:100%;
+    overflow:visible;
 }
 
-/* Only Gameplay Center BOSSes receive the portrait treatment. Generic daily,
-   abyss and elite cards keep the shared V143 dimensions. */
-#game-stage #battlePage .battle-monster.gameplay-boss-card{
-    --v143-monster-card-width:166px;
-    --v143-monster-card-height:295px;
-    --v143-monster-icon-width:150px;
-    --v143-monster-icon-height:210px;
-    --v143-monster-bar-width:156px;
+/* V131 fixes regular monster rows with a hard 76px flex-basis. A Gameplay
+   BOSS must opt out of that flex sizing without another !important override;
+   switching the active one-BOSS row to grid makes the real card width owner
+   the V143 width variable below. Player cards and ordinary monster rows stay
+   on the existing flex layout. */
+#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{
+    display:grid;
+    grid-template-columns:1fr;
+    place-items:start center;
+    width:100%;
+}
+
+/* Only Gameplay Center BOSSes receive the portrait treatment. The selector
+   deliberately mirrors the shared V143 battle namespace, then adds the live
+   Gameplay-BOSS marker so these variables outrank the generic 82x106 rank rule
+   without another !important. Height is derived from the card's own 9:16 ratio. */
+#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{
+    --v143-monster-card-width:clamp(154px,38.1%,166px);
+    --v143-monster-card-height:auto;
+    --v143-monster-icon-width:calc(100% - 12px);
+    --v143-monster-icon-height:auto;
+    --v143-monster-bar-width:calc(100% - 10px);
     aspect-ratio:9 / 16;
+    box-sizing:border-box;
+    align-self:start;
 }
 
+/* The portrait owns most of the vertical card. Background portraits and real
+   img children both fill the same crop box without distortion. */
 #game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon{
+    aspect-ratio:3 / 4;
+    overflow:hidden;
     border-radius:8px;
+    background-position:center 18%;
+    background-repeat:no-repeat;
+    background-size:cover;
+}
+
+#game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon > img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 18%;
+}
+
+#game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-name,
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-status-badges,
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-hp,
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-sp{
+    max-width:100%;
+    box-sizing:border-box;
+}
+
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-status-badges{
+    width:100%;
+    justify-content:center;
+}
+
+#game-stage #battlePage .battle-monster.gameplay-boss-card .damage-popup{
+    max-width:calc(100% + 40px);
+    text-align:center;
 }
 
 #game-stage #battleMonsterArea{
@@ -618,7 +669,7 @@
     align-items:flex-start;
     justify-content:center;
     gap:8px;
-    margin:7px auto 0;
+    margin:3px auto 0;
     pointer-events:none;
 }
 
@@ -626,20 +677,23 @@
     display:flex;
 }
 
+/* Mechanism cards are independent 9:16 battlefield components. Their real
+   flex-basis and width are both 20% of the battle area, with bounds chosen for
+   the supported portrait phones; no transform/zoom is used for sizing. */
 #game-stage #battleMonsterArea .boss-mechanism-card{
     position:relative;
     display:flex;
-    width:78px;
-    min-width:78px;
+    width:clamp(82px,20%,96px);
+    min-width:82px;
     min-height:0;
     aspect-ratio:9 / 16;
     box-sizing:border-box;
-    flex:0 0 auto;
+    flex:0 0 clamp(82px,20%,96px);
     flex-direction:column;
     align-items:center;
-    justify-content:center;
-    gap:8px;
-    padding:10px 6px;
+    justify-content:flex-start;
+    gap:5px;
+    padding:8px 6px 7px;
     overflow:hidden;
     border:2px solid var(--mechanism-color,#d5aa56);
     border-radius:9px;
@@ -648,6 +702,7 @@
         radial-gradient(circle at 50% 0,var(--mechanism-glow,rgba(216,167,75,.22)),transparent 55%),
         linear-gradient(180deg,rgba(37,27,17,.98),rgba(8,6,4,.98));
     box-shadow:0 0 10px var(--mechanism-glow,rgba(216,167,75,.25)),inset 0 0 0 1px rgba(255,255,255,.07);
+    text-align:center;
     pointer-events:auto;
     animation:gameplayMechanismEnter .24s ease-out both;
 }
@@ -678,8 +733,30 @@
     animation:gameplayMechanismDestroy .28s ease-in both;
 }
 
-#game-stage #battleMonsterArea .boss-mechanism-name{
+/* DOM order stays stable for targeting; CSS order turns it into a portrait
+   mechanism-card hierarchy: type -> name -> HP -> concise battlefield effect. */
+#game-stage #battleMonsterArea .boss-mechanism-kind{
+    order:1;
+    display:block;
     max-width:100%;
+    padding:2px 6px;
+    border:1px solid color-mix(in srgb,var(--mechanism-color) 62%,transparent);
+    border-radius:999px;
+    color:var(--mechanism-color);
+    background:rgba(6,5,4,.62);
+    font-family:"Noto Serif TC",serif;
+    font-size:13px;
+    font-weight:900;
+    line-height:1.25;
+    letter-spacing:1px;
+    white-space:nowrap;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-name{
+    order:2;
+    display:-webkit-box;
+    max-width:100%;
+    min-height:32px;
     overflow:hidden;
     color:#fff0c4;
     font-family:"Noto Serif TC",serif;
@@ -687,23 +764,18 @@
     font-weight:900;
     line-height:1.25;
     text-align:center;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-kind{
-    color:var(--mechanism-color);
-    font-family:"Noto Serif TC",serif;
-    font-size:13px;
-    font-weight:900;
-    line-height:1.25;
-    letter-spacing:1px;
+    text-overflow:clip;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
 }
 
 #game-stage #battleMonsterArea .boss-mechanism-hp{
+    order:3;
     display:flex;
     width:100%;
-    min-height:19px;
+    min-height:20px;
     box-sizing:border-box;
     align-items:center;
     justify-content:center;
@@ -716,14 +788,36 @@
     font-size:11px;
     font-weight:900;
     line-height:1.2;
-    letter-spacing:-.2px;
+    letter-spacing:-.25px;
     text-shadow:0 1px 2px #000;
     white-space:nowrap;
 }
 
-/* Information is deliberately separate from attack targeting: the small 9:16
-   mechanism card remains the combat target; this right-side control only opens
-   the detailed explanation and can be collapsed with 返回. */
+#game-stage #battleMonsterArea .boss-mechanism-card::after{
+    order:4;
+    display:-webkit-box;
+    width:100%;
+    min-height:0;
+    overflow:hidden;
+    color:#cbbda2;
+    font-size:11px;
+    font-weight:700;
+    line-height:1.35;
+    text-align:center;
+    overflow-wrap:anywhere;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:4;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="shield"]::after{ content:"護體中・優先擊破"; }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="charge"]::after{ content:"倒數重擊・擊破可取消"; }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="heal"]::after{ content:"每回合回復 BOSS 4%"; }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="amplify"]::after{ content:"BOSS 傷害提高25%"; }
+#game-stage #battleMonsterArea .boss-mechanism-card[data-type="seal"]::after{ content:"治療／SP 回復 -40%"; }
+
+/* Information is deliberately separate from attack targeting: the battlefield
+   mechanism card remains the combat target; this right-side control opens the
+   full explanation and can be collapsed with 返回. */
 #game-stage #battlePage .boss-mechanism-info-host{
     position:absolute;
     z-index:74;

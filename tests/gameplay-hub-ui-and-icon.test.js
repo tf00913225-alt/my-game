@@ -10,6 +10,14 @@ const loader=fs.readFileSync("scripts/build-production.mjs","utf8");
 const runtime=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const dungeonShell=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 
+function cssRule(source,selector){
+    const start=source.indexOf(selector);
+    assert.ok(start>=0,`missing CSS rule: ${selector}`);
+    const open=source.indexOf("{",start),end=source.indexOf("}",open);
+    assert.ok(open>=0&&end>open,`invalid CSS rule: ${selector}`);
+    return source.slice(start,end+1);
+}
+
 function pngRgba(path){
     const file=fs.readFileSync(path);
     assert.deepEqual(Array.from(file.subarray(0,8)),[137,80,78,71,13,10,26,10]);
@@ -51,7 +59,21 @@ assert.match(runtime,/vGameplayOpenBoss/);assert.match(runtime,/vGameplayOpenTow
 assert.equal((html.match(/id="dungeonTabBtnAbyss"/g)||[]).length,0,"daily dungeon page must not expose a duplicate Abyss entry");
 assert.match(dungeonShell,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\('home'\)"/);
 assert.match(dungeonShell,/page\.classList\.toggle\("v146-abyss-active",abyssActive\)/,"Abyss selection must hide the old dungeon shell as well as the map");
-assert.doesNotMatch(css,/!important/,"new gameplay stylesheet must not use priority patches");
+
+// The Gameplay stylesheet predates this Boss portrait change and still owns a
+// few intentional priority rules in unrelated panel/detail UI. Keep the
+// regression focused on the Boss battlefield geometry changed here: these
+// sizing/placement owners must stay specificity-driven instead of adding new
+// !important patches.
+const bossBattlePriorityScope=[
+    cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active{"),
+    cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{"),
+    cssRule(css,'#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{'),
+    cssRule(css,"#game-stage #battleMonsterArea .boss-mechanism-slot{"),
+    cssRule(css,"#game-stage #battleMonsterArea .boss-mechanism-card{")
+].join("\n");
+assert.doesNotMatch(bossBattlePriorityScope,/!important/,"Boss battlefield sizing must not introduce priority patches");
+ assert.doesNotMatch(css.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
 
 const gameplayIndex=loader.indexOf("js/gameplay-boss-tower-system.js");
 const relicIndex=loader.indexOf("js/60-team-relic-system.js");

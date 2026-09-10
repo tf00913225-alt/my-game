@@ -24,6 +24,14 @@ function sameSegment(file,start,end,reference=BASE){
     assert.equal(segment(current(file),start,end),segment(at(reference,file),start,end),`${file} battle-owned segment changed`);
 }
 
+function cssRule(text,selector){
+    const start=text.indexOf(selector);
+    assert.ok(start>=0,`missing CSS rule: ${selector}`);
+    const open=text.indexOf("{",start),end=text.indexOf("}",open);
+    assert.ok(open>=0&&end>open,`invalid CSS rule: ${selector}`);
+    return text.slice(start,end+1);
+}
+
 function retireV143EarthShieldSelector(text){
     return normalize(text.replace(
         "#battlePage .v146-defeated .v141-effect,\n#battlePage .v146-defeated .v143-earth-shield-effect{display:none !important;}",
@@ -97,15 +105,24 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
     );
 
     assert.match(now,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
-    assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-23px;/);
-    assert.doesNotMatch(now,/!important/);
-    assert.match(now,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?--v143-monster-card-width:166px;[\s\S]*?--v143-monster-card-height:295px;[\s\S]*?aspect-ratio:9 \/ 16;/);
-    assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?position:relative;[\s\S]*?display:none;[\s\S]*?width:100%;[\s\S]*?pointer-events:none;/);
+    assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-32px;/);
+    assert.match(now,/\.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:clamp\(154px,38\.1%,166px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?aspect-ratio:9 \/ 16;/);
+    assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?position:relative;[\s\S]*?display:none;[\s\S]*?width:100%;[\s\S]*?margin:3px auto 0;[\s\S]*?pointer-events:none;/);
     assert.match(now,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
-    assert.match(now,/\.boss-mechanism-card\{[\s\S]*?width:78px;[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?pointer-events:auto;[\s\S]*?animation:gameplayMechanismEnter \.24s ease-out both;/);
-    assert.match(now,/\.boss-mechanism-hp\{[\s\S]*?min-height:19px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
+    assert.match(now,/\.boss-mechanism-card\{[\s\S]*?width:clamp\(82px,20%,96px\);[\s\S]*?min-width:82px;[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?flex:0 0 clamp\(82px,20%,96px\);[\s\S]*?pointer-events:auto;[\s\S]*?animation:gameplayMechanismEnter \.24s ease-out both;/);
+    assert.match(now,/\.boss-mechanism-hp\{[\s\S]*?min-height:20px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
     assert.match(now,/\.boss-mechanism-info-alert\{[\s\S]*?border-radius:50%;[\s\S]*?animation:gameplayMechanismInfoAlert \.48s ease-in-out infinite;/);
     assert.match(now,/\.boss-mechanism-info-panel\{[\s\S]*?width:170px;[\s\S]*?height:302px;[\s\S]*?aspect-ratio:9 \/ 16;/);
+
+    const bossSizingPriorityScope=[
+        cssRule(now,"#game-stage #battleMonsterArea.gameplay-boss-active{"),
+        cssRule(now,"#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{"),
+        cssRule(now,'#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{'),
+        cssRule(now,"#game-stage #battleMonsterArea .boss-mechanism-slot{"),
+        cssRule(now,"#game-stage #battleMonsterArea .boss-mechanism-card{")
+    ].join("\n");
+    assert.doesNotMatch(bossSizingPriorityScope,/!important/,"Gameplay BOSS portrait sizing must stay specificity-driven");
+     assert.doesNotMatch(now.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
 }
 
 // Relic battle rules are followed by a small-screen media block that owns the
