@@ -26,7 +26,7 @@ assert.equal(contract.canCreateCharacter({state:S.NEED_CHARACTER,userUid:"uid-A"
 assert.equal(contract.canCreateCharacter({state:S.NEED_CHARACTER,userUid:"uid-A",resolvedUid:"uid-A",activeSaveUid:"uid-A",saveResolved:false}),false);
 
 assert.equal((startup.match(/creation\.style\.display="block"/g)||[]).length,1,"startup owner has one creation reveal point");
-assert.match(startup,/safeCloudEmpty\(cloud,user\.uid\)[\s\S]*?enterCreation\(\)/);
+assert.match(startup,/safeCloudEmpty\(cloud,user\.uid\)[\s\S]*?enterCreation\(token\)/);
 assert.match(startup,/result&&result\.exists===false&&result\.uid===uid/,
     "a successful same-UID missing-document read is a proven empty account");
 assert.doesNotMatch(firebaseBootstrap,/bootstrapTrustedCloudSave/,
@@ -38,6 +38,10 @@ assert.match(startup,/enterReady\(authoritative,false,token\)\.catch\(error=>fai
     "hydration failure must reach the fail-closed state for the same resolution token");
 assert.match(startup,/Promise\.all\(\[requireAppShell\(\),domReady\(\)\]\)/,
     "automatic session restore must not hydrate before the DOM is ready");
+assert.match(startup,/await Promise\.all\(\[requireAppShell\(\),domReady\(\)\]\);[\s\S]{0,100}activateGameplaySaveOwner\(\);[\s\S]{0,100}FourSymbolsGameSave\.load\(\)/,
+    "the resolved Firebase UID must activate the gameplay save owner after app-shell installation and before hydration");
+assert.match(startup,/async function enterCreation\(token=transitionToken\)[\s\S]{0,220}activateGameplaySaveOwner\(\);[\s\S]{0,100}transition\(STATES\.NEED_CHARACTER/,
+    "new-character persistence must bind the gameplay save owner before creation is exposed");
 assert.match(startup,/action==="cancel-migration"[\s\S]*?firebase\.signOut\(\)/);
 assert.match(authUi,/訪客開始遊戲/);
 assert.match(authUi,/signInAsAnonymous/);

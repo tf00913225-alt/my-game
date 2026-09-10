@@ -90,10 +90,20 @@
         if(document.readyState!=="loading"){ return Promise.resolve(); }
         return new Promise(resolve=>document.addEventListener("DOMContentLoaded",resolve,{once:true}));
     }
+    function activateGameplaySaveOwner(){
+        if(!resolvedUid||!global.FourSymbolsGameSave||typeof global.FourSymbolsGameSave.activate!=="function"){
+            throw new Error("Gameplay save owner is unavailable after app-shell installation.");
+        }
+        global.FourSymbolsGameSave.activate(resolvedUid);
+        if(global.FourSymbolsAccountSave.getActiveUid()!==resolvedUid){
+            throw new Error("Gameplay save owner refused the resolved Firebase UID.");
+        }
+    }
     async function enterReady(save,offline=false,token=transitionToken){
         showLoader(); render(92,"載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
         await Promise.all([requireAppShell(),domReady()]);
         if(token!==transitionToken){ return; }
+        activateGameplaySaveOwner();
         const loaded=global.FourSymbolsGameSave&&global.FourSymbolsGameSave.load();
         if(!loaded){ throw new Error("Account save passed resolution but gameplay hydration failed."); }
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
@@ -104,8 +114,10 @@
         emit("four-symbols:startup-ready",{uid:resolvedUid,offline});
         document.dispatchEvent(new CustomEvent("v173.20:startup-entered"));
     }
-    async function enterCreation(){
-        await requireAppShell();
+    async function enterCreation(token=transitionToken){
+        await Promise.all([requireAppShell(),domReady()]);
+        if(token!==transitionToken){ return; }
+        activateGameplaySaveOwner();
         transition(STATES.NEED_CHARACTER,{uid:resolvedUid});
         firebase.closeAuth(); render(100,"帳號資料已確認","此 UID 尚無角色，可以建立角色");
         mark("four-symbols:critical-ready");
@@ -175,7 +187,7 @@
             return migration("雲端狀態仍在遷移或無法證明為空；禁止把它當成新帳號。",true);
         }
         saveResolved=true; mark("four-symbols:save-resolved"); render(90,"帳號資料已確認","此 UID 沒有角色");
-        return enterCreation().catch(error=>fail(error,"創角介面載入失敗。",token));
+        return enterCreation(token).catch(error=>fail(error,"創角介面載入失敗。",token));
     }
     function requireAuth(){
         activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null;
