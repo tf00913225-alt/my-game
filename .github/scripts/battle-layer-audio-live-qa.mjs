@@ -218,6 +218,27 @@ try{
     assert.equal(beforeElementBox.skill,"explosiveFlurry","Expected real Fire Flurry V143 layer before Element Box opens");
     assert.equal(beforeElementBox.visibility,"visible","Skill layer must be visible during normal battle presentation");
 
+    /* The production cast above proves that a real battle action reaches V143.
+       Its 1.45s lifecycle may legitimately finish while CDP performs the next
+       round trips, so start a bounded V143 presentation specifically for the
+       modal-overlap assertion.  This exercises the production director and
+       raster renderer; it does not require an idle stage to remain mounted. */
+    const modalOverlapPresentation=await client.eval(`(()=>{
+        const director=window.v142SkillAnimationDirector;
+        const getConfig=window.v142GetSkillAnimationConfig;
+        if(!director||typeof director.play!=='function'||typeof getConfig!=='function'){return null;}
+        const config=Object.assign({},getConfig('explosiveFlurry'),{duration:4000,resolveDuration:4000});
+        const gate=director.play(config,{
+            side:'player',actorIndex:0,targetId:2,
+            key:'battle-layer-modal-overlap-'+Date.now()
+        });
+        return {skill:config.id,duration:config.duration,gateId:gate?.id||null};
+    })()`);
+    evidence.checks.modalOverlapPresentation=modalOverlapPresentation;
+    assert.equal(modalOverlapPresentation?.skill,"explosiveFlurry","Modal overlap QA must use the formal Fire Flurry V143 presentation");
+    assert.equal(modalOverlapPresentation?.duration,4000,"Modal overlap QA must hold a bounded V143 presentation across CDP round trips");
+    await waitFor(client,"document.getElementById('v143-skill-stage')?.dataset.skill==='explosiveFlurry'&&getComputedStyle(document.getElementById('v143-skill-stage')).visibility==='visible'","modal-overlap V143 presentation",1000);
+
     const opened=await client.eval(`(()=>{
         if(typeof openHomeFeature==='function'){openHomeFeature('autoBattleSettings');return 'openHomeFeature';}
         if(typeof openAutoBattleSettings==='function'){openAutoBattleSettings();return 'openAutoBattleSettings';}
