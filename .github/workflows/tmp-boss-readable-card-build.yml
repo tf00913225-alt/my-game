@@ -55,7 +55,7 @@ jobs:
           replace_once(css,'content:"BOSS 受護體保護，優先擊破";','content:"護體中・優先擊破";')
           replace_once(css,'content:"倒數歸零發動重擊，擊破可取消";','content:"倒數重擊・擊破可取消";')
           replace_once(css,'content:"每回合恢復 BOSS 4% 最大生命";','content:"每回合回復 BOSS 4%";')
-          replace_once(css,'content:"BOSS 傷害提高 25%";','content:"BOSS 傷害 +25%";')
+          replace_once(css,'content:"BOSS 傷害提高 25%";','content:"BOSS 傷害提高25%";')
           replace_once(css,'content:"我方治療與 SP 回復降低 40%";','content:"治療／SP 回復 -40%";')
 
           static="tests/boss-mechanism-vfx-card-ui-20260909.test.js"
@@ -63,9 +63,8 @@ jobs:
           replace_once(static,'content:"BOSS 受護體保護，優先擊破"','content:"護體中・優先擊破"')
           replace_once(static,'content:"倒數歸零發動重擊，擊破可取消"','content:"倒數重擊・擊破可取消"')
           replace_once(static,'content:"每回合恢復 BOSS 4% 最大生命"','content:"每回合回復 BOSS 4%"')
-          replace_once(static,'content:"BOSS 傷害提高 25%"','content:"BOSS 傷害 +25%"')
+          replace_once(static,'content:"BOSS 傷害提高 25%"','content:"BOSS 傷害提高25%"')
           replace_once(static,'content:"我方治療與 SP 回復降低 40%"','content:"治療／SP 回復 -40%"')
-          marker='assert.match(boss,/\\.boss-mechanism-kind\\{[\\s\\S]*?order:1;/);'
           extra='''assert.match(boss,/\\.boss-mechanism-kind\\{[\\s\\S]*?order:1;[\\s\\S]*?font-size:13px;/);\nassert.match(boss,/\\.boss-mechanism-name\\{[\\s\\S]*?order:2;[\\s\\S]*?font-size:14px;[\\s\\S]*?-webkit-line-clamp:2;/);'''
           p=Path(static); text=p.read_text()
           old_pair='''assert.match(boss,/\\.boss-mechanism-kind\\{[\\s\\S]*?order:1;/);\nassert.match(boss,/\\.boss-mechanism-name\\{[\\s\\S]*?order:2;[\\s\\S]*?-webkit-line-clamp:2;/);'''
