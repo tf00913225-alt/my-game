@@ -3471,18 +3471,18 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     display:block;
     position:relative;
     z-index:1;
-    margin:0 0 18px;
-    padding:16px 20px;
+    margin:0 0 10px;
+    padding:9px 12px;
     box-sizing:border-box;
     border:2px solid rgba(218,166,76,.42);
-    border-radius:18px;
+    border-radius:10px;
     background:linear-gradient(180deg,rgba(78,53,21,.68),rgba(24,18,11,.86));
     color:#f0d89c;
-    font-size:34px;
-    line-height:1.35;
+    font-size:16px;
+    line-height:1.45;
     font-weight:900;
     text-align:center;
-    letter-spacing:1px;
+    letter-spacing:.02em;
 }
 
 /* The runtime shortens state labels. Keep the action column bounded so it can

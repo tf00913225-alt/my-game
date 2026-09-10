@@ -56,7 +56,8 @@ assert.match(source,/window\.v17346OpenEquipmentChest=openEquipmentChest/);
 assert.match(source,/window\.v17346ShowEquipmentChestPreview=showEquipmentChestPreview/);
 assert.doesNotMatch(source,/pendingEquipmentRewards|equipmentRewardItems/);
 assert.match(source,/assets\/items\/chests\/dungeon-chest\.png/);
-assert.match(source,/>×2<\/b>/);
+assert.match(source,/<section class="v17363-preview-group"><b>裝備寶箱<\/b><em>×2<\/em>/);
+assert.match(source,/const odds=equipmentChestOddsText\("　・　"\)/);
 assert.match(source,/dungeon-equipment-v17346\.png/);
 
 assert.match(source,/v17346-potion-detail/);
