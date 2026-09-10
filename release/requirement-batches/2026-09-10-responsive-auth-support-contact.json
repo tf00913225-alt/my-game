@@ -6,11 +6,11 @@
   "workBranch": "fix/v17365-auth-responsive-support",
   "officialVersion": "173.65",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "AUTH-SUPPORT-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "登入介面必須脫離尚未初始化的 1080×1920 game stage，直接依手機 viewport、安全區、直向與橫向尺寸自適應，且不得水平裁切",
       "evidence": [
         "js/firebase/firebase-auth-ui.js",
@@ -20,7 +20,7 @@
     },
     {
       "id": "AUTH-SUPPORT-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "登入頁與系統頁都要提供聯絡客服入口，並由同一個客服 owner 顯示 tf00913225@gmail.com",
       "evidence": [
         "js/startup/support-contact.js",
@@ -32,7 +32,7 @@
     },
     {
       "id": "AUTH-SUPPORT-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "免廣告服務資訊的客服 Email 不得顯示尚未設定，必須直接顯示 tf00913225@gmail.com",
       "evidence": [
         "js/16-stage-v54-main-city-runtime.js",
@@ -40,8 +40,8 @@
       ]
     }
   ],
-  "automatedVerification": "LOCAL_140_OF_140_NODE_TESTS_214_OF_214_SYNTAX_303_RESOURCES_249_HTML_IDS_BUILD_LOADER_RELEASE_GIT_DIFF_PASS; REMOTE_CI_BROWSER_PENDING",
-  "visualVerification": "PENDING_DEV_MOBILE_BROWSER",
-  "verifiedDevCommit": "",
+  "automatedVerification": "LOCAL_140_OF_140_NODE_TESTS_214_OF_214_SYNTAX_303_RESOURCES_249_HTML_IDS_BUILD_LOADER_RELEASE_GIT_DIFF_PASS; PR_136_REPOSITORY_CHECKS_RUN_34440677556_RERUN_PASS; DEV_RUN_34441228608_REPOSITORY_CHECKS_AND_DEPLOY_PASS",
+  "visualVerification": "REMOTE_CI_CHROME_390X844_360X640_844X390_PASS; DEV_LIVE_AUTH_VIEWPORT_AND_SHARED_SUPPORT_DIALOG_PASS",
+  "verifiedDevCommit": "ed0aaab9d8f1d0f39edab5cbe6bdf02089cd6f66",
   "promotionApproval": "PENDING_USER_CONFIRMATION"
 }

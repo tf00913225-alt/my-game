@@ -1,10 +1,10 @@
-## 2026-09-10 V173.65 登入自適應與共用客服信箱（IMPLEMENTED／DEV VERIFICATION PENDING）
+## 2026-09-10 V173.65 登入自適應與共用客服信箱（DEV VERIFIED／MAIN APPROVAL PENDING）
 
 - 基準為 `dev@2bd79fb3c0133101caa3ba7a0345b7e39277f94d`，工作分支 `fix/v17365-auth-responsive-support`。使用者回報 Android／內嵌瀏覽器的未登入畫面只露出 1080×1920 stage 右下角，並要求登入頁、系統頁與免廣告服務資訊統一顯示客服信箱 `tf00913225@gmail.com`。
 - 根因是 `js/firebase/firebase-auth-ui.js` 在使用者尚未登入、`app-shell`／`js/00-main.js` stage scaler 尚未載入時，就把 account overlay 掛入固定 `#game-stage`。登入 UI 現改掛 `document.body`；`css/firebase-auth.css` 以 fixed real viewport、`100dvh`、safe-area、clamp 字級、內部垂直 scroll 與窄幅／橫向 breakpoint 負責自適應，不再依賴登入後 runtime 才縮放。
 - `js/startup/support-contact.js` 是唯一客服資料與共用聯絡視窗 owner，納入 Critical Boot，固定信箱為 `tf00913225@gmail.com`。登入頁的「聯絡客服」與系統頁的「客服信箱／查看信箱」呼叫同一 `FourSymbolsSupport.show()`；免廣告服務資訊亦讀取同一 owner，不再出現「客服 Email：尚未設定」。
-- 新增 `tests/v174-auth-responsive-support.test.js`，固定 390×844、360×640、844×390 三種 viewport 的 auth overlay／dialog 邊界、水平 overflow、共用客服視窗與 email；同步擴充 Firebase、ad-free regression。Requirement Batch：`release/requirement-batches/2026-09-10-responsive-auth-support-contact.json`（3 項目前 IMPLEMENTED；遠端 CI Chrome 與 DEV 實頁驗證後才可改為 VERIFIED）。
-- 本機完整驗證已通過：Node tests 140/140、JavaScript syntax 214/214、static resources 303、HTML IDs 249，以及 deterministic build、loader、release、git diff gates；本機容器無 Chrome，browser geometry gate 將由 Repository checks 的 Chrome 執行。Game／Cache Version 維持 V173.65／173.65；尚未 push／merge dev，亦未修改 main。
+- 新增 `tests/v174-auth-responsive-support.test.js`，固定 390×844、360×640、844×390 三種 viewport 的 auth overlay／dialog 邊界、水平 overflow、共用客服視窗與 email；同步擴充 Firebase、ad-free regression。Requirement Batch：`release/requirement-batches/2026-09-10-responsive-auth-support-contact.json`，3/3 已 VERIFIED。
+- PR #136（head `72cfd90b8377a51ad391e90dbf63d11fdb3c6df3`）Repository checks run `34440677556` 重跑成功後合入 `dev@ed0aaab9d8f1d0f39edab5cbe6bdf02089cd6f66`；dev run `34441228608` 的 Repository checks 與 Cloudflare deployment 均成功，deployed manifest SHA 亦精確吻合。實頁 `https://dev.four-symbols-dev.pages.dev/` 顯示 V173.65，登入 overlay 為 `BODY` 下的 fixed viewport surface、dialog 完整位於 viewport 內；點擊「聯絡客服」顯示 `tf00913225@gmail.com`。本機完整驗證：Node tests 140/140、JavaScript syntax 214/214、static resources 303、HTML IDs 249，加上 deterministic build、loader、release、git diff gates 全數通過。Game／Cache Version 維持 V173.65／173.65；main 未修改，等待使用者明確核准受保護 promotion PR。
 
 ## 2026-09-10 V173.65 battle/audio live QA race follow-up（MAIN RELEASED）
 
