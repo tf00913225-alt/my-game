@@ -602,10 +602,11 @@
     width:100%;
 }
 
-/* Only Gameplay Center BOSSes receive the portrait treatment. The card width
-   is a real 44% of the battle row (clamped for the 420px legacy surface), and
-   height is derived from the card's own 9:16 aspect ratio. */
-#game-stage #battlePage .battle-monster.gameplay-boss-card{
+/* Only Gameplay Center BOSSes receive the portrait treatment. The selector
+   deliberately mirrors the shared V143 battle namespace, then adds the live
+   Gameplay-BOSS marker so these variables outrank the generic 82x106 rank rule
+   without another !important. Height is derived from the card's own 9:16 ratio. */
+#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{
     --v143-monster-card-width:clamp(176px,44%,190px);
     --v143-monster-card-height:auto;
     --v143-monster-icon-width:calc(100% - 12px);
