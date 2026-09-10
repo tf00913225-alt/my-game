@@ -24,7 +24,7 @@
         ],
         "styles": [
           "build/app-shell.37d5b9f36840.css",
-          "build/feature-ui-fixes.0c5d2b31a415.css"
+          "build/feature-ui-fixes.6af88b1e46d9.css"
         ],
         "dependencies": []
       },
@@ -161,9 +161,9 @@
       "sha256": "37d5b9f36840",
       "bytes": 110537
     },
-    "build/feature-ui-fixes.0c5d2b31a415.css": {
-      "sha256": "0c5d2b31a415",
-      "bytes": 4729
+    "build/feature-ui-fixes.6af88b1e46d9.css": {
+      "sha256": "6af88b1e46d9",
+      "bytes": 4727
     },
     "build/gameplay-core.13dae8d242bf.css": {
       "sha256": "13dae8d242bf",

@@ -80,10 +80,10 @@ function run(chrome,width,height){
     }finally{ try{fs.unlinkSync(file);}catch(_){ } }
 }
 function verify(data,width){
-    assert.equal(data.labels.normal,"15.5px");
+    assert.equal(data.labels.normal,"13px");
     assert.equal(data.labels.relic,data.labels.normal,`${width}px relic label differs from normal home label`);
     assert.equal(data.labels.element,data.labels.normal,`${width}px element-box label differs from normal home label`);
-    assert.equal(data.labels.relicLine,"23px");
+    assert.equal(data.labels.relicLine,"18px");
     assert.equal(data.roster.marginTop,"4px");assert.equal(data.roster.gap,"2px");assert.ok(data.roster.charHeight<=78.5);
     assert.equal(data.gameplay.count,1);assert.equal(data.gameplay.page,"home");
     assert.ok(data.gameplay.back.right<=data.gameplay.header.right+1&&data.gameplay.back.left>data.gameplay.header.left+data.gameplay.header.width/2,`${width}px gameplay return is not in the header right side`);

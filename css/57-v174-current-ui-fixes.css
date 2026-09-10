@@ -96,8 +96,8 @@ body #game-stage #allElementSkillPreviewModal .skill-preview-body::before{
 /* Main-city special utility entries use the exact same label typography as
    the ordinary secondary facility cards. */
 body #game-stage #homePage .team-relic-home-tools .home-card-label{
-    font-size:15.5px !important;
-    line-height:23px !important;
+    font-size:13px !important;
+    line-height:18px !important;
     font-weight:900 !important;
 }
 
