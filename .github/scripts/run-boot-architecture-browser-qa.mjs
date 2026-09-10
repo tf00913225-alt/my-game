@@ -145,6 +145,32 @@ async function waitFor(client,expression,label,timeoutMs=15000){
     throw new Error(`Timed out waiting for ${label}. ${last}`);
 }
 
+async function browserDiagnostic(client){
+    if(!client){ return null; }
+    let page=null;
+    try{
+        page=await client.eval(`(()=>({
+          href:location.href,
+          readyState:document.readyState,
+          startupState:window.FourSymbolsStartupPolicy?.getState?.()||null,
+          startupUid:window.FourSymbolsStartupPolicy?.getUid?.()||null,
+          loaderState:document.getElementById("startupLoader")?.dataset?.state||null,
+          loaderHidden:document.getElementById("startupLoader")?.hidden??null,
+          title:document.getElementById("startupStatusTitle")?.textContent||null,
+          detail:document.getElementById("startupStatusDetail")?.textContent||null,
+          authOverlayClass:document.getElementById("firebaseAuthOverlay")?.className||null,
+          creationDisplay:document.getElementById("creationPage")?getComputedStyle(document.getElementById("creationPage")).display:null,
+          gameDisplay:document.getElementById("gameInterface")?getComputedStyle(document.getElementById("gameInterface")).display:null,
+          activeUid:window.FourSymbolsAccountSave?.getActiveUid?.()||null,
+          localKeys:Object.keys(localStorage),
+          lastError:(()=>{const value=window.FourSymbolsStartupPolicy?.getLastError?.();return value?{name:value.name||null,code:value.code||null,message:value.message||String(value),stack:value.stack||null}:null;})(),
+          marks:performance.getEntriesByType("mark").map(entry=>({name:entry.name,startTime:entry.startTime})),
+          resources:performance.getEntriesByType("resource").map(entry=>({name:entry.name,initiatorType:entry.initiatorType,transferSize:entry.transferSize}))
+        }))()`);
+    }catch(error){ page={captureError:error?.stack||String(error)}; }
+    return {page,cdpEvents:client.events.slice(-50)};
+}
+
 async function metrics(client,readyMark){
     return client.eval(`(()=>{
       const resources=performance.getEntriesByType("resource").filter(entry=>{try{return new URL(entry.name).origin===location.origin;}catch(_){return false;}});
@@ -255,7 +281,7 @@ try{
     evidence.status="PASS";evidence.finishedAt=new Date().toISOString();fs.writeFileSync(evidenceFile,JSON.stringify(evidence,null,2)+"\n");
     console.log(`✓ Boot architecture mobile browser QA passed (cold auth ${evidence.performance.coldAuth.readyMs}ms; warm city ${evidence.performance.warmExisting.readyMs}ms)`);
 }catch(error){
-    evidence.status="FAIL";evidence.error=error?.stack||String(error);evidence.chromeStderr=chromeStderr.slice(-6000);evidence.finishedAt=new Date().toISOString();fs.writeFileSync(evidenceFile,JSON.stringify(evidence,null,2)+"\n");console.error(error);process.exitCode=1;
+    evidence.status="FAIL";evidence.error=error?.stack||String(error);evidence.failureDiagnostic=await browserDiagnostic(client);evidence.chromeStderr=chromeStderr.slice(-6000);evidence.finishedAt=new Date().toISOString();fs.writeFileSync(evidenceFile,JSON.stringify(evidence,null,2)+"\n");console.error(error);process.exitCode=1;
 }finally{
     client?.close();chrome.kill("SIGTERM");await new Promise(resolve=>server.close(resolve));
     try{fs.rmSync(profile,{recursive:true,force:true});}catch(_){}
