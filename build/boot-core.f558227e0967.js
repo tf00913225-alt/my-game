@@ -429,10 +429,13 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstr
         }
         return payload;
     }
-    async function enterReady(save,offline=false){
-        const token=++transitionToken;
+    function domReady(){
+        if(document.readyState!=="loading"){ return Promise.resolve(); }
+        return new Promise(resolve=>document.addEventListener("DOMContentLoaded",resolve,{once:true}));
+    }
+    async function enterReady(save,offline=false,token=transitionToken){
         showLoader(); render(92,"載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
-        await requireAppShell();
+        await Promise.all([requireAppShell(),domReady()]);
         if(token!==transitionToken){ return; }
         const loaded=global.FourSymbolsGameSave&&global.FourSymbolsGameSave.load();
         if(!loaded){ throw new Error("Account save passed resolution but gameplay hydration failed."); }
@@ -481,7 +484,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstr
             if(token!==transitionToken){ return; }
             if(local.status==="ready"){
                 saveResolved=true; cloudResult={error}; mark("four-symbols:save-resolved");
-                try{ await enterReady(local.save,true); }catch(readyError){ fail(readyError,"離線存檔載入失敗。",token); }
+                try{ await enterReady(local.save,true,token); }catch(readyError){ fail(readyError,"離線存檔載入失敗。",token); }
                 return;
             }
             return fail(error,"雲端存檔尚未確認；為避免誤判新玩家，禁止創角。",token);
@@ -503,10 +506,10 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstr
         }
         if(authoritative){
             if(local.status==="empty"){ repo.writeForUid(user.uid,authoritative,{source:"authoritative-cloud-read"}); }
-            saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(authoritative,false).catch(error=>fail(error,"角色載入失敗。",token));
+            saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(authoritative,false,token).catch(error=>fail(error,"角色載入失敗。",token));
         }
         if(local.status==="ready"){
-            saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(local.save,false).catch(error=>fail(error,"角色載入失敗。",token));
+            saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(local.save,false,token).catch(error=>fail(error,"角色載入失敗。",token));
         }
         if(legacy.status==="available"){
             return migration("偵測到此裝置存在舊版角色資料。請確認是否備份並作為目前 UID 的本機角色；原始 legacy key 會保留。",false);
@@ -565,7 +568,9 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.64","firebaseBootstr
                         const cloudHas=!!(data&&data.authoritativeStateReady===true);
                         global.FourSymbolsAccountSave.migrateLegacyToUid(activeUser.uid,{confirmed:true,cloudHasCharacter:cloudHas});
                         const migrated=global.FourSymbolsAccountSave.readForUid(activeUser.uid);
-                        saveResolved=true; void enterReady(migrated.save,false);
+                        const token=transitionToken;
+                        saveResolved=true; void enterReady(migrated.save,false,token)
+                            .catch(error=>fail(error,"migration 後角色載入失敗；原始 legacy 與備份均已保留。",token));
                     }catch(error){ fail(error,"舊版存檔 migration 失敗；原檔與備份均未刪除。"); }
                 }
                 if(action==="cancel-migration"&&state===STATES.MIGRATION_REQUIRED&&activeUser){

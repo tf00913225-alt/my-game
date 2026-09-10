@@ -131,7 +131,7 @@ class CdpClient{
     async connect(){
         this.socket=new WebSocket(this.url);
         await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error("CDP connection timeout")),10000);this.socket.onopen=()=>{clearTimeout(timer);resolve();};this.socket.onerror=()=>{clearTimeout(timer);reject(new Error("CDP connection failed"));};});
-        this.socket.onmessage=async event=>{let raw=event.data;if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){raw=await raw.text();}const message=JSON.parse(String(raw));if(!message.id){if(["Runtime.exceptionThrown","Log.entryAdded","Network.loadingFailed"].includes(message.method)){this.events.push(message);}return;}const request=this.pending.get(message.id);if(!request){return;}this.pending.delete(message.id);if(message.error){request.reject(new Error(request.method+": "+message.error.message));}else{request.resolve(message.result||{});}};
+        this.socket.onmessage=async event=>{let raw=event.data;if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){raw=await raw.text();}const message=JSON.parse(String(raw));if(!message.id){if(["Runtime.exceptionThrown","Runtime.consoleAPICalled","Log.entryAdded","Network.loadingFailed"].includes(message.method)){this.events.push(message);}return;}const request=this.pending.get(message.id);if(!request){return;}this.pending.delete(message.id);if(message.error){request.reject(new Error(request.method+": "+message.error.message));}else{request.resolve(message.result||{});}};
         this.socket.onclose=()=>{for(const request of this.pending.values()){request.reject(new Error("CDP closed during "+request.method));}this.pending.clear();};
     }
     send(method,params={}){const id=this.nextId++;return new Promise((resolve,reject)=>{this.pending.set(id,{resolve,reject,method});this.socket.send(JSON.stringify({id,method,params}));});}
@@ -162,6 +162,10 @@ async function browserDiagnostic(client){
           creationDisplay:document.getElementById("creationPage")?getComputedStyle(document.getElementById("creationPage")).display:null,
           gameDisplay:document.getElementById("gameInterface")?getComputedStyle(document.getElementById("gameInterface")).display:null,
           activeUid:window.FourSymbolsAccountSave?.getActiveUid?.()||null,
+          appShellReady:window.FourSymbolsFeatures?.isReady?.("app-shell")??null,
+          gameSaveInstalled:!!window.FourSymbolsGameSave,
+          featureScripts:[...document.querySelectorAll("script[data-feature-bundle]")].map(script=>({src:script.src,bundle:script.dataset.featureBundle})),
+          featureLinks:[...document.querySelectorAll("link[data-feature-style],link[data-feature-preload]")].map(link=>({rel:link.rel,href:link.href,style:link.dataset.featureStyle||null,preload:link.dataset.featurePreload||null})),
           localKeys:Object.keys(localStorage),
           lastError:(()=>{const value=window.FourSymbolsStartupPolicy?.getLastError?.();return value?{name:value.name||null,code:value.code||null,message:value.message||String(value),stack:value.stack||null}:null;})(),
           marks:performance.getEntriesByType("mark").map(entry=>({name:entry.name,startTime:entry.startTime})),

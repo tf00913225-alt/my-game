@@ -32,6 +32,12 @@ assert.match(startup,/result&&result\.exists===false&&result\.uid===uid/,
 assert.doesNotMatch(firebaseBootstrap,/bootstrapTrustedCloudSave/,
     "first-use read resolution must not depend on an optional trusted write deployment");
 assert.match(startup,/catch\(error\)\{[\s\S]*?禁止創角/);
+assert.doesNotMatch(startup,/async function enterReady[\s\S]{0,160}\+\+transitionToken/,
+    "destination hydration must retain the active save-resolution token");
+assert.match(startup,/enterReady\(authoritative,false,token\)\.catch\(error=>fail\(error,"角色載入失敗。",token\)\)/,
+    "hydration failure must reach the fail-closed state for the same resolution token");
+assert.match(startup,/Promise\.all\(\[requireAppShell\(\),domReady\(\)\]\)/,
+    "automatic session restore must not hydrate before the DOM is ready");
 assert.match(startup,/action==="cancel-migration"[\s\S]*?firebase\.signOut\(\)/);
 assert.match(authUi,/訪客開始遊戲/);
 assert.match(authUi,/signInAsAnonymous/);
