@@ -7,6 +7,7 @@ const index=fs.readFileSync("index.html","utf8");
 const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
 const intent=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const authUi=fs.readFileSync("js/firebase/firebase-auth-ui.js","utf8");
+const headers=fs.readFileSync("_headers","utf8");
 const boot=JSON.parse(fs.readFileSync("config/boot-manifest.json","utf8"));
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
@@ -36,6 +37,12 @@ assert.doesNotMatch(startup,/MIN_DURATION|MAX_DURATION|12000|15000|totalDuration
 assert.doesNotMatch(intent,/TOTAL_RUNTIME_MODULES|runtimeGate|createElement\(["']script["']\)/i);
 assert.doesNotMatch(authUi,/先使用本機存檔|DEV_AUTH_BYPASS/i);
 assert.ok(boot.maximumReadyTransitionMs<=800);
+assert.match(headers,/^\/\s*\n\s+Cache-Control:\s*no-cache, no-store, must-revalidate$/m,
+    "the root HTML route must always revalidate");
+assert.match(headers,/^\/asset-manifest\.json\s*\n\s+Cache-Control:\s*no-cache, no-store, must-revalidate$/m,
+    "the mutable asset manifest must always revalidate");
+assert.match(headers,/^\/build\/\*\s*\n\s+Cache-Control:\s*public, max-age=31536000, immutable$/m,
+    "content-hashed build assets must be immutable");
 
 const jsFiles=[];
 function walk(directory){

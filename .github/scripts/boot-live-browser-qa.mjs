@@ -13,6 +13,14 @@ const artifactFile=path.join(artifactDir,"boot-live-qa.json");
 fs.mkdirSync(artifactDir,{recursive:true});
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 
+function assertRevalidatedEntry(cacheControl,label){
+    const value=String(cacheControl||"");
+    assert.doesNotMatch(value,/immutable/i,`${label} must not be immutable`);
+    const explicitlyUncached=/no-(?:cache|store)/i.test(value);
+    const immediatelyStale=/max-age\s*=\s*0/i.test(value)&&/must-revalidate/i.test(value);
+    assert.ok(explicitlyUncached||immediatelyStale,`${label} must be uncached or immediately revalidated; received: ${value||"<missing>"}`);
+}
+
 function chromeBinary(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
@@ -38,11 +46,11 @@ let chromeStderr="";child.stderr.on("data",chunk=>{chromeStderr+=String(chunk);}
 try{
     const manifestResponse=await fetch(`${baseUrl}/asset-manifest.json?sha=${encodeURIComponent(expectedSha)}`,{cache:"no-store"});
     assert.equal(manifestResponse.ok,true,"Deployed asset manifest is unavailable");
-    assert.match(manifestResponse.headers.get("cache-control")||"",/no-(?:cache|store)/i,"Asset manifest must be revalidated");
+    assertRevalidatedEntry(manifestResponse.headers.get("cache-control"),"Asset manifest");
     const manifest=await manifestResponse.json();
     const indexResponse=await fetch(`${baseUrl}/index.html?sha=${encodeURIComponent(expectedSha)}`,{cache:"no-store"});
     assert.equal(indexResponse.ok,true,"Deployed index is unavailable");
-    assert.match(indexResponse.headers.get("cache-control")||"",/no-(?:cache|store)/i,"Index must not be immutable");
+    assertRevalidatedEntry(indexResponse.headers.get("cache-control"),"Index");
     evidence.checks.mutableEntryHeaders={index:indexResponse.headers.get("cache-control"),manifest:manifestResponse.headers.get("cache-control")};
     const immutableChecks={};
     for(const resource of [...manifest.critical.scripts,...manifest.critical.styles,...(manifest.critical.images||[]),manifest.critical.firebaseBootstrap]){
