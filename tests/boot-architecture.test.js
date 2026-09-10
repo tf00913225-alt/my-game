@@ -8,6 +8,7 @@ const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
 const intent=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const authUi=fs.readFileSync("js/firebase/firebase-auth-ui.js","utf8");
 const headers=fs.readFileSync("_headers","utf8");
+const abyssLiveQa=fs.readFileSync(".github/scripts/abyss-live-browser-qa-v2.mjs","utf8");
 const boot=JSON.parse(fs.readFileSync("config/boot-manifest.json","utf8"));
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
@@ -43,6 +44,12 @@ assert.match(headers,/^\/asset-manifest\.json\s*\n\s+Cache-Control:\s*no-cache, 
     "the mutable asset manifest must always revalidate");
 assert.match(headers,/^\/build\/\*\s*\n\s+Cache-Control:\s*public, max-age=31536000, immutable$/m,
     "content-hashed build assets must be immutable");
+assert.doesNotMatch(abyssLiveQa,/v174-abyss-two-tier-style/,
+    "live QA must not depend on the retired inline Abyss style owner");
+assert.match(abyssLiveQa,/link\[data-feature-style=[^\]]*feature-abyss/,
+    "live QA must verify the hashed feature stylesheet owner");
+assert.ok((abyssLiveQa.match(/prepareAccountFirstRuntime\(client,\["abyss"\]\)/g)||[]).length>=3,
+    "each live Abyss reload must re-enter through the account-first feature loader");
 
 const jsFiles=[];
 function walk(directory){

@@ -26,7 +26,7 @@ patched=replaceRequired(patched,
     await waitFor(client,"document.readyState==='complete'","saved player reload");
     await client.eval(\`FourSymbolsFeatures.ensure('abyss','live-browser-qa-reload')\`);
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime after saved player reload");
-    await waitFor(client,"document.getElementById('v174-abyss-two-tier-style')&&document.getElementById('v174-abyss-two-tier-style').sheet","two-tier Abyss CSS after saved player reload");
+    await waitFor(client,abyssStyleReady,"hashed feature Abyss CSS after saved player reload");
     await client.eval(seedPlayerExpression(20));
     await client.eval(\`(async()=>{
 `,"saved-player reload bootstrap");
