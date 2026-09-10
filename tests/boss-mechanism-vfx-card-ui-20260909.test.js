@@ -34,15 +34,16 @@ assert.match(vfx,/isMechanismTarget\(index\)\)\{ return mechanismCardFor\(index\
 // Generic battle card sizes remain untouched. Only a runtime-tagged Gameplay
 // BOSS receives the large portrait 9:16 variables requested for this screen.
 assert.match(v141,/flex:0 0 var\(--v143-monster-card-width,76px\) !important;/);
-assert.match(v143,/\.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:82px;[\s\S]*?--v143-monster-card-height:106px;/);
-assert.match(boss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?--v143-monster-card-width:clamp\(176px,44%,190px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:9 \/ 16;/);
+assert.match(v143,/#game-stage > #app > #game-content #battlePage \.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:82px;[\s\S]*?--v143-monster-card-height:106px;/);
+assert.match(boss,/#game-stage > #app > #game-content #battlePage \.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:clamp\(176px,44%,190px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:9 \/ 16;/);
 assert.match(runtime,/bossCard\.classList\.add\("gameplay-boss-card"\)/);
 
 // The old V131 row has a hard flex sizing path. Gameplay BOSS mode switches
 // only that runtime row to grid so the real card width variable can own geometry;
 // this avoids a later !important or transform-based visual enlargement.
 assert.match(boss,/#battleMonsterArea\.gameplay-boss-active \.v131-monster-row\{[\s\S]*?display:grid;[\s\S]*?grid-template-columns:1fr;[\s\S]*?place-items:start center;/);
-const bossCardRule=cssRule(boss,"#game-stage #battlePage .battle-monster.gameplay-boss-card{");
+const bossCardSelector="#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank=\"boss\"]{";
+const bossCardRule=cssRule(boss,bossCardSelector);
 assert.doesNotMatch(bossCardRule,/!important/);
 assert.doesNotMatch(bossCardRule,/transform\s*:/);
 assert.doesNotMatch(bossCardRule,/zoom\s*:/);
