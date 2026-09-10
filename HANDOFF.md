@@ -1,3 +1,12 @@
+## 2026-09-10 V173.65 battle/audio live QA race follow-up（LOCAL VERIFIED／REMOTE PENDING）
+
+- Work branch：`fix/v17365-battle-live-qa-race`，基準為 release merge 後的 `dev@1783d3847ef7e2835915d763c4d517268e5a6098`；`main` 尚未修改。
+- Release merge 的 Actions run `34430685287` 已通過 Repository checks、Cloudflare exact-SHA／V173.65 驗證、live account-first cold-start 與 live Abyss QA；唯一失敗為 `.github/scripts/battle-layer-audio-live-qa.mjs` 的 V143／元素匣疊層檢查。原始 attempt 在開 modal 後讀到已結束的 stage，重跑 attempt 2 則在開 modal 前等待測試 stage 時已被下一個真實戰鬥動作 supersede，證明失敗來自跨 CDP round-trip 的 live battle 時序競態，不是正式疊層或 VFX owner 回歸。
+- QA owner 改為在同一個 browser task 內依序呼叫正式 `v142SkillAnimationDirector.play()`、取得 V143 raster stage、呼叫正式 `openHomeFeature('autoBattleSettings')` wrapper chain，並立即驗證前後為同一 DOM node、stage 仍 mounted、presentation 已 hidden／opacity 0、modal ownership 與 audio scale 正確。真實 Fire Flurry cast 仍先獨立證明正式戰鬥會到達 V143。
+- `js/37-v142-skill-animation.js`（gate／supersede）、`js/39-v143-skill-animation.js`（raster stage lifecycle）、`js/45-v154-dev-fixes.js` 與 `css/46-v154-dev-fixes.css`（元素匣 focus／presentation suppression）均未修改；沒有暫停戰鬥、延長正式動畫、保留 idle stage、增加 wrapper 或新增 runtime patch。
+- `tests/v174-battle-layer-audio-fixes.test.js` 新增 regression，固定 live QA 必須在單一 atomic browser snapshot 內涵蓋 production director、正式元素匣 opener 與 stage identity，禁止恢復會與持續戰鬥競速的等待式檢查。
+- 本機已通過：139/139 Node suites、212/212 JavaScript syntax、303 static resources、249 unique HTML IDs、deterministic build、loader、V173.65 release gate（10/10）、git-diff／conflict-marker gates。Game／Cache Version 維持 V173.65／173.65；因無本機 Chromium，remote Repository checks、Cloudflare exact-SHA deploy 與 live battle/audio rerun 完成前不得標成 REMOTE VERIFIED 或推進 main。
+
 ## 2026-09-10 V173.65 Account-first Boot Architecture（DEV VERIFIED／已授權推進 main）
 
 - 基準為 GitHub `dev@70df66e8cb371ff6193a7f70609cf9aad7bd15ac`；原工作分支 `perf/cold-start-auth-boot-architecture` 經 PR #123 合入 dev，後續僅以 PR #124～#127 修復部署 header 與既有 Live QA 對新 lazy owner 的舊假設。使用者已明確授權依序完成 dev preview 後推進 main。
