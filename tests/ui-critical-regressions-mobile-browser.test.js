@@ -60,7 +60,7 @@ setTimeout(function(){
       skill:{label:label.textContent,title:action.title,width:actionStyle.width},
       gold:{shadow:goldStyle.textShadow,marker:gold.dataset.v174DarkGoldShadow||''}
     });
-  },120);
+  },800);
 },80);
 </script></body></html>`;
 fs.writeFileSync(fixture,html,"utf8");
