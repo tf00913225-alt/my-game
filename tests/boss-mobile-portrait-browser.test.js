@@ -15,40 +15,42 @@ function findChrome(){
 
 const fixture=path.join(process.cwd(),".boss-mobile-portrait-browser-qa.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const html=`<!doctype html>
+const manifest=JSON.parse(fs.readFileSync(path.join(process.cwd(),"asset-manifest.json"),"utf8"));
+const bundles=manifest.featureManifest&&manifest.featureManifest.bundles||{};
+const stylePaths=[
+    ...(manifest.critical&&manifest.critical.styles||[]),
+    ...(bundles["app-shell"]&&bundles["app-shell"].styles||[]),
+    ...(bundles["gameplay-core"]&&bundles["gameplay-core"].styles||[]),
+    ...(bundles["feature-boss-relic"]&&bundles["feature-boss-relic"].styles||[])
+].filter(Boolean);
+
+function escapeAttribute(value){
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/"/g,"&quot;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
+}
+
+function innerHtml(){
+    const links=stylePaths.map(href=>`<link rel="stylesheet" href="${href}">`).join("\n");
+    return `<!doctype html>
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="css/00-main.css">
-<link rel="stylesheet" href="css/09-stage-v15-native-character-shell.css">
-<link rel="stylesheet" href="css/31-v131-fix-batch.css">
-<link rel="stylesheet" href="css/38-v141-system-expansion.css">
-<link rel="stylesheet" href="css/40-v143-combat-dungeon-polish.css">
-<link rel="stylesheet" href="css/45-v152-dev-fixes.css">
-<link rel="stylesheet" href="css/46-v154-dev-fixes.css">
-<link rel="stylesheet" href="css/gameplay-boss-tower.css">
+${links}
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403;}
-body{position:relative;}
-#qaViewport{position:absolute;inset:0;overflow:hidden;}
-#result{display:none;}
-#game-stage{position:absolute!important;left:50%!important;top:50%!important;width:420px!important;height:746.6667px!important;min-width:420px!important;min-height:746.6667px!important;transform:translate(-50%,-50%) scale(var(--qa-scale))!important;transform-origin:center center!important;}
-#game-stage>#app{position:relative!important;width:420px!important;height:746.6667px!important;min-width:420px!important;min-height:746.6667px!important;transform:none!important;}
-#game-stage>#app>#game-content{position:relative!important;width:420px!important;height:746.6667px!important;min-height:746.6667px!important;padding-bottom:0!important;overflow:hidden!important;}
-#game-stage #battlePage{display:block!important;position:relative!important;width:420px!important;height:746.6667px!important;min-height:0!important;padding:4px 6px!important;overflow:hidden!important;box-sizing:border-box!important;}
-#game-stage #battlePage>.battle-wrap{height:100%!important;min-height:0!important;}
-#battleActionRegion{position:relative;display:flex;min-height:66px;flex-direction:column;gap:4px;}
-#battleCommandRow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;min-height:62px;}
-#battleCommandRow button{min-width:0;min-height:52px;}
-#battleInfo{display:block;}
 #bossMechanismSlot .boss-mechanism-card{animation:none!important;}
 </style>
 </head>
 <body>
-<div id="qaViewport">
+<div id="game-viewport">
 <div id="game-stage">
-<div id="app"><div id="game-content"><section id="battlePage" class="active">
+<div id="app" class="in-battle">
+<div id="game-content" class="content">
+<div id="battlePage" class="page active">
 <div class="battle-wrap">
 <div class="battle-title">戰鬥</div>
 <div id="battleMonsterArea" class="battle-monsters v131-formation gameplay-boss-active">
@@ -76,55 +78,90 @@ body{position:relative;}
   <div id="battleActionRegion"><div id="battleCommandRow"><button>攻擊</button><button>技能</button><button>防禦</button><button>元素匣</button></div></div>
 </div>
 <div id="battlePlayerRow" class="battle-player-row">
-  <div class="battle-player" data-element="fire"></div><div class="battle-player" data-element="water"></div><div class="battle-player" data-element="wind"></div>
+  <div class="battle-player" data-element="fire"></div>
+  <div class="battle-player" data-element="water"></div>
+  <div class="battle-player" data-element="wind"></div>
 </div>
 <div id="battleInfo" class="battle-info">戰鬥紀錄<br>BOSS 展開機制卡【金剛護體】<br>玩家造成 12688 傷害</div>
 </div>
-</section></div></div>
 </div>
 </div>
-<pre id="result"></pre>
+</div>
+</div>
+</div>
 <script>
 (function(){
-  var legacyWidth=420,legacyHeight=746.6667;
-  var scale=Math.min(innerWidth/legacyWidth,innerHeight/legacyHeight);
-  document.documentElement.style.setProperty("--qa-scale",String(scale));
+  var stage=document.getElementById("game-stage");
+  var stageScale=Math.min(innerWidth/1080,innerHeight/1920);
+  stage.style.setProperty("transform","translate(-50%,-50%) scale("+stageScale+")","important");
+  stage.style.setProperty("transform-origin","center center","important");
+
   function rect(selector){
     var node=document.querySelector(selector),r=node.getBoundingClientRect();
     return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};
   }
-  var boss=document.querySelector(".gameplay-boss-card"),mech=document.querySelector(".boss-mechanism-card");
-  var slot=document.getElementById("bossMechanismSlot"),area=document.getElementById("battleMonsterArea");
-  var bossRect=rect(".gameplay-boss-card"),mechRect=rect(".boss-mechanism-card");
-  var slotRect=rect("#bossMechanismSlot"),areaRect=rect("#battleMonsterArea");
-  var playerRect=rect("#battlePlayerRow"),logRect=rect("#battleInfo"),pageRect=rect("#battlePage");
+  function contained(outer,inner,tolerance){
+    var t=tolerance||1;
+    return inner.left>=outer.left-t&&inner.right<=outer.right+t&&inner.top>=outer.top-t&&inner.bottom<=outer.bottom+t;
+  }
+
+  var boss=document.querySelector(".gameplay-boss-card");
+  var mech=document.querySelector(".boss-mechanism-card");
+  var area=document.getElementById("battleMonsterArea");
+  var page=document.getElementById("battlePage");
+  var wrap=page.querySelector(".battle-wrap");
+  var bossRect=rect(".gameplay-boss-card");
+  var mechRect=rect(".boss-mechanism-card");
+  var areaRect=rect("#battleMonsterArea");
+  var actionRect=rect("#battleActionRegion");
+  var playerRect=rect("#battlePlayerRow");
+  var logRect=rect("#battleInfo");
+  var pageRect=rect("#battlePage");
+  var stageRect=rect("#game-stage");
+  var bossStyle=getComputedStyle(boss),mechStyle=getComputedStyle(mech),areaStyle=getComputedStyle(area);
   var name=document.querySelector(".gameplay-boss-card .battle-monster-name");
-  var hp=document.querySelector(".gameplay-boss-card .monster-hp"),sp=document.querySelector(".gameplay-boss-card .monster-sp");
-  var bossStyle=getComputedStyle(boss),mechStyle=getComputedStyle(mech),slotStyle=getComputedStyle(slot),areaStyle=getComputedStyle(area);
-  document.getElementById("result").textContent=JSON.stringify({
-    viewport:{width:innerWidth,height:innerHeight},scale:scale,
-    boss:bossRect,mechanism:mechRect,slot:slotRect,area:areaRect,player:playerRect,log:logRect,page:pageRect,
-    bossWidthShare:bossRect.width/innerWidth,mechanismWidthShare:mechRect.width/innerWidth,
-    bossRatio:bossRect.height/bossRect.width,mechanismRatio:mechRect.height/mechRect.width,
-    bossComputed:{width:bossStyle.width,height:bossStyle.height,minWidth:bossStyle.minWidth,maxWidth:bossStyle.maxWidth,flexBasis:bossStyle.flexBasis,aspectRatio:bossStyle.aspectRatio,boxSizing:bossStyle.boxSizing},
-    mechanismComputed:{width:mechStyle.width,height:mechStyle.height,minWidth:mechStyle.minWidth,maxWidth:mechStyle.maxWidth,flexBasis:mechStyle.flexBasis,aspectRatio:mechStyle.aspectRatio,boxSizing:mechStyle.boxSizing,display:mechStyle.display},
-    slotComputed:{width:slotStyle.width,display:slotStyle.display,flexDirection:slotStyle.flexDirection},
-    areaComputed:{width:areaStyle.width,display:areaStyle.display,flexDirection:areaStyle.flexDirection,flexWrap:areaStyle.flexWrap},
-    mechanismCount:document.querySelectorAll(".boss-mechanism-card").length,
+  var hp=document.querySelector(".gameplay-boss-card .monster-hp");
+  var sp=document.querySelector(".gameplay-boss-card .monster-sp");
+
+  parent.document.getElementById("result").textContent=JSON.stringify({
+    viewport:{width:innerWidth,height:innerHeight},
+    stageScale:stageScale,stage:stageRect,page:pageRect,area:areaRect,boss:bossRect,mechanism:mechRect,action:actionRect,player:playerRect,log:logRect,
+    bossBattleWidthShare:bossRect.width/areaRect.width,
+    mechanismBattleWidthShare:mechRect.width/areaRect.width,
+    bossViewportWidthShare:bossRect.width/innerWidth,
+    mechanismViewportWidthShare:mechRect.width/innerWidth,
+    bossRatio:bossRect.height/bossRect.width,
+    mechanismRatio:mechRect.height/mechRect.width,
+    bossComputed:{width:bossStyle.width,height:bossStyle.height,aspectRatio:bossStyle.aspectRatio,maxWidth:bossStyle.maxWidth,flexBasis:bossStyle.flexBasis},
+    mechanismComputed:{width:mechStyle.width,height:mechStyle.height,aspectRatio:mechStyle.aspectRatio,minWidth:mechStyle.minWidth,flexBasis:mechStyle.flexBasis},
+    areaComputed:{width:areaStyle.width,height:areaStyle.height},
     textOverflow:name.scrollWidth>name.clientWidth+1,
     hpOverflow:hp.scrollWidth>hp.clientWidth+1,
     spOverflow:sp.scrollWidth>sp.clientWidth+1,
-    pageHorizontalOverflow:document.getElementById("battlePage").scrollWidth>document.getElementById("battlePage").clientWidth+1,
-    documentHorizontalOverflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1,
-    bossBeforeMechanism:mechRect.top>=bossRect.bottom+scale*4,
+    mechanismOverflow:mech.scrollWidth>mech.clientWidth+1||mech.scrollHeight>mech.clientHeight+1,
+    pageHorizontalOverflow:page.scrollWidth>page.clientWidth+1,
+    wrapHorizontalOverflow:wrap.scrollWidth>wrap.clientWidth+1,
+    pageVerticalOverflow:page.scrollHeight>page.clientHeight+1,
+    wrapVerticalOverflow:wrap.scrollHeight>wrap.clientHeight+1,
+    bossBeforeMechanism:mechRect.top>=bossRect.bottom+stageScale*2.571428571428571*4,
+    mechanismBeforeAction:mechRect.bottom<=actionRect.top+1,
     mechanismBeforePlayer:mechRect.bottom<=playerRect.top+1,
     playerBeforeLog:playerRect.bottom<=logRect.top+1,
-    visibleLog:logRect.height>1&&logRect.top<innerHeight&&logRect.bottom>0,
-    visiblePlayer:playerRect.height>1&&playerRect.top<innerHeight&&playerRect.bottom>0
+    stageContainsBoss:contained(stageRect,bossRect,1),
+    stageContainsMechanism:contained(stageRect,mechRect,1),
+    stageContainsPlayer:contained(stageRect,playerRect,1),
+    stageContainsLog:contained(stageRect,logRect,1),
+    visiblePlayer:playerRect.height>1&&playerRect.top<innerHeight&&playerRect.bottom>0,
+    visibleLog:logRect.height>1&&logRect.top<innerHeight&&logRect.bottom>0
   });
 })();
 </script>
 </body></html>`;
+}
+
+function outerHtml(width,height){
+    return `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#111;}iframe{display:block;border:0;width:${width}px;height:${height}px;}#result{display:none;}</style></head><body><iframe srcdoc="${escapeAttribute(innerHtml())}"></iframe><pre id="result"></pre></body></html>`;
+}
 
 function decode(text){
     return text.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">")
@@ -132,19 +169,25 @@ function decode(text){
 }
 
 function runViewport(chrome,width,height){
+    fs.writeFileSync(fixture,outerHtml(width,height),"utf8");
     const result=spawnSync(chrome,[
         "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
-        "--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,
+        "--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=1200,1100",
         "--dump-dom",fileUrl
-    ],{encoding:"utf8",timeout:30000,maxBuffer:16*1024*1024});
+    ],{encoding:"utf8",timeout:30000,maxBuffer:20*1024*1024});
     assert.equal(result.status,0,result.stderr||`Boss mobile browser fixture failed at ${width}x${height}`);
     const match=result.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,`Boss mobile browser result missing at ${width}x${height}`);
     const data=JSON.parse(decode(match[1]));
     console.log(`Boss portrait browser geometry ${width}x${height}:`,JSON.stringify(data));
+
     const ratio=16/9;
-    assert.ok(data.bossWidthShare>=.38&&data.bossWidthShare<=.46,`Boss width share ${data.bossWidthShare} is outside 38%-46% at ${width}x${height}`);
-    assert.ok(data.mechanismWidthShare>=.20&&data.mechanismWidthShare<=.26,`Mechanism width share ${data.mechanismWidthShare} is outside 20%-26% at ${width}x${height}`);
+    assert.equal(data.viewport.width,width,`Iframe viewport width drifted at ${width}x${height}`);
+    assert.equal(data.viewport.height,height,`Iframe viewport height drifted at ${width}x${height}`);
+    assert.ok(data.bossBattleWidthShare>=.38&&data.bossBattleWidthShare<=.46,`Boss battle width share ${data.bossBattleWidthShare} is outside 38%-46% at ${width}x${height}`);
+    assert.ok(data.mechanismBattleWidthShare>=.20&&data.mechanismBattleWidthShare<=.26,`Mechanism battle width share ${data.mechanismBattleWidthShare} is outside 20%-26% at ${width}x${height}`);
+    assert.ok(data.bossViewportWidthShare>=.38&&data.bossViewportWidthShare<=.46,`Boss viewport width share ${data.bossViewportWidthShare} is outside 38%-46% at ${width}x${height}`);
+    assert.ok(data.mechanismViewportWidthShare>=.20&&data.mechanismViewportWidthShare<=.26,`Mechanism viewport width share ${data.mechanismViewportWidthShare} is outside 20%-26% at ${width}x${height}`);
     assert.ok(Math.abs(data.bossRatio-ratio)<.025,`Boss is not 9:16 at ${width}x${height}: ${data.bossRatio}`);
     assert.ok(Math.abs(data.mechanismRatio-ratio)<.025,`Mechanism card is not 9:16 at ${width}x${height}: ${data.mechanismRatio}`);
     assert.equal(data.bossComputed.aspectRatio,"9 / 16");
@@ -152,26 +195,33 @@ function runViewport(chrome,width,height){
     assert.equal(data.textOverflow,false,`Boss name overflows at ${width}x${height}`);
     assert.equal(data.hpOverflow,false,`Boss HP bar overflows at ${width}x${height}`);
     assert.equal(data.spOverflow,false,`Boss SP bar overflows at ${width}x${height}`);
+    assert.equal(data.mechanismOverflow,false,`Mechanism content overflows its 9:16 card at ${width}x${height}`);
     assert.equal(data.pageHorizontalOverflow,false,`Battle page overflows horizontally at ${width}x${height}`);
-    assert.equal(data.documentHorizontalOverflow,false,`Document overflows horizontally at ${width}x${height}`);
+    assert.equal(data.wrapHorizontalOverflow,false,`Battle wrap overflows horizontally at ${width}x${height}`);
     assert.equal(data.bossBeforeMechanism,true,`Mechanism card is not below the Boss at ${width}x${height}`);
+    assert.equal(data.mechanismBeforeAction,true,`Mechanism card overlaps battle actions at ${width}x${height}`);
     assert.equal(data.mechanismBeforePlayer,true,`Mechanism card overlaps the player row at ${width}x${height}`);
     assert.equal(data.playerBeforeLog,true,`Player row overlaps battle log at ${width}x${height}`);
+    assert.equal(data.stageContainsBoss,true,`Boss card escapes the game stage at ${width}x${height}`);
+    assert.equal(data.stageContainsMechanism,true,`Mechanism card escapes the game stage at ${width}x${height}`);
+    assert.equal(data.stageContainsPlayer,true,`Player row escapes the game stage at ${width}x${height}`);
+    assert.equal(data.stageContainsLog,true,`Battle log escapes the game stage at ${width}x${height}`);
+    assert.equal(data.pageVerticalOverflow,false,`Battle page vertically overflows at ${width}x${height}`);
+    assert.equal(data.wrapVerticalOverflow,false,`Battle wrap vertically overflows at ${width}x${height}`);
     assert.equal(data.visiblePlayer,true,`Player row is not visible at ${width}x${height}`);
     assert.equal(data.visibleLog,true,`Battle log is not visible at ${width}x${height}`);
     return data;
 }
 
-fs.writeFileSync(fixture,html,"utf8");
 try{
     const chrome=findChrome();
     const results=[[360,800],[393,873],[412,915]].map(([width,height])=>runViewport(chrome,width,height));
     console.log("Boss portrait mobile browser QA passed:",JSON.stringify(results.map(data=>({
         viewport:data.viewport,
         bossPx:[Number(data.boss.width.toFixed(2)),Number(data.boss.height.toFixed(2))],
-        bossShare:Number((data.bossWidthShare*100).toFixed(2)),
+        bossBattleShare:Number((data.bossBattleWidthShare*100).toFixed(2)),
         mechanismPx:[Number(data.mechanism.width.toFixed(2)),Number(data.mechanism.height.toFixed(2))],
-        mechanismShare:Number((data.mechanismWidthShare*100).toFixed(2)),
+        mechanismBattleShare:Number((data.mechanismBattleWidthShare*100).toFixed(2)),
         logVisible:data.visibleLog,
         playerVisible:data.visiblePlayer
     }))));
