@@ -37,7 +37,7 @@ for(const type of ["scripts","styles"]){
     const entries=manifest.featureManifest.bundles["app-shell"][type];
     assert.equal(entries.length,2,`app-shell ${type} must include the V174 patch after the existing bundle`);
     const patch=entries[1];
-    assert.match(patch,/^build\/feature-ui-fixes\.[0-9a-f]{12}\.(?:js|css)$/);
+    assert.match(patch,/^build\/app-ui-fixes\.[0-9a-f]{12}\.(?:js|css)$/);
     const bytes=fs.readFileSync(patch);
     const digest=crypto.createHash("sha256").update(bytes).digest("hex").slice(0,12);
     assert.ok(patch.includes(`.${digest}.`),`${patch} filename must match content hash`);

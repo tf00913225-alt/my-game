@@ -171,7 +171,7 @@ function firebaseModule(source,mapping){
 if(!checkOnly){
     fs.mkdirSync(BUILD,{recursive:true});
     for(const file of fs.readdirSync(BUILD)){
-        if(/^(?:boot-core|app-shell|gameplay-core|feature-|asset-manifest\.)/.test(file)){
+        if(/^(?:boot-core|app-shell|app-ui-fixes|gameplay-core|feature-|asset-manifest\.)/.test(file)){
             fs.rmSync(path.join(BUILD,file),{recursive:true,force:true});
         }
     }
@@ -187,7 +187,7 @@ for(const name of ["firebase-config.js","firebase-auth.js","firebase-cloud-save.
 
 const scriptOutputs={
     app:target("app-shell","js",combineScripts(appScripts)),
-    uiFixes:target("feature-ui-fixes","js",combineScripts(uiFixScripts)),
+    uiFixes:target("app-ui-fixes","js",combineScripts(uiFixScripts)),
     gameplay:target("gameplay-core","js",combineScripts(gameplayScripts)),
     patrol:target("feature-patrol","js",combineScripts(patrolScripts)),
     abyss:target("feature-abyss","js",combineScripts(abyssScripts)),
@@ -197,7 +197,7 @@ const scriptOutputs={
 const styleOutputs={
     critical:target("boot-core","css",combineStyles(criticalStyles)),
     app:target("app-shell","css",combineStyles(appStyles)),
-    uiFixes:target("feature-ui-fixes","css",combineStyles(uiFixStyles)),
+    uiFixes:target("app-ui-fixes","css",combineStyles(uiFixStyles)),
     gameplay:target("gameplay-core","css",combineStyles(gameplayStyles)),
     patrol:target("feature-patrol","css",combineStyles(patrolStyles)),
     abyss:target("feature-abyss","css",combineStyles(abyssStyles)),
