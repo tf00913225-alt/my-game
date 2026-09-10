@@ -93,37 +93,35 @@ body{position:relative;}
     var node=document.querySelector(selector),r=node.getBoundingClientRect();
     return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};
   }
-  requestAnimationFrame(function(){requestAnimationFrame(function(){
-    var boss=document.querySelector(".gameplay-boss-card"),mech=document.querySelector(".boss-mechanism-card");
-    var slot=document.getElementById("bossMechanismSlot"),area=document.getElementById("battleMonsterArea");
-    var bossRect=rect(".gameplay-boss-card"),mechRect=rect(".boss-mechanism-card");
-    var slotRect=rect("#bossMechanismSlot"),areaRect=rect("#battleMonsterArea");
-    var playerRect=rect("#battlePlayerRow"),logRect=rect("#battleInfo"),pageRect=rect("#battlePage");
-    var name=document.querySelector(".gameplay-boss-card .battle-monster-name");
-    var hp=document.querySelector(".gameplay-boss-card .monster-hp"),sp=document.querySelector(".gameplay-boss-card .monster-sp");
-    var bossStyle=getComputedStyle(boss),mechStyle=getComputedStyle(mech),slotStyle=getComputedStyle(slot),areaStyle=getComputedStyle(area);
-    document.getElementById("result").textContent=JSON.stringify({
-      viewport:{width:innerWidth,height:innerHeight},scale:scale,
-      boss:bossRect,mechanism:mechRect,slot:slotRect,area:areaRect,player:playerRect,log:logRect,page:pageRect,
-      bossWidthShare:bossRect.width/innerWidth,mechanismWidthShare:mechRect.width/innerWidth,
-      bossRatio:bossRect.height/bossRect.width,mechanismRatio:mechRect.height/mechRect.width,
-      bossComputed:{width:bossStyle.width,height:bossStyle.height,minWidth:bossStyle.minWidth,maxWidth:bossStyle.maxWidth,flexBasis:bossStyle.flexBasis,aspectRatio:bossStyle.aspectRatio,boxSizing:bossStyle.boxSizing},
-      mechanismComputed:{width:mechStyle.width,height:mechStyle.height,minWidth:mechStyle.minWidth,maxWidth:mechStyle.maxWidth,flexBasis:mechStyle.flexBasis,aspectRatio:mechStyle.aspectRatio,boxSizing:mechStyle.boxSizing,display:mechStyle.display},
-      slotComputed:{width:slotStyle.width,display:slotStyle.display,flexDirection:slotStyle.flexDirection},
-      areaComputed:{width:areaStyle.width,display:areaStyle.display,flexDirection:areaStyle.flexDirection,flexWrap:areaStyle.flexWrap},
-      mechanismCount:document.querySelectorAll(".boss-mechanism-card").length,
-      textOverflow:name.scrollWidth>name.clientWidth+1,
-      hpOverflow:hp.scrollWidth>hp.clientWidth+1,
-      spOverflow:sp.scrollWidth>sp.clientWidth+1,
-      pageHorizontalOverflow:document.getElementById("battlePage").scrollWidth>document.getElementById("battlePage").clientWidth+1,
-      documentHorizontalOverflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1,
-      bossBeforeMechanism:mechRect.top>=bossRect.bottom+scale*4,
-      mechanismBeforePlayer:mechRect.bottom<=playerRect.top+1,
-      playerBeforeLog:playerRect.bottom<=logRect.top+1,
-      visibleLog:logRect.height>1&&logRect.top<innerHeight&&logRect.bottom>0,
-      visiblePlayer:playerRect.height>1&&playerRect.top<innerHeight&&playerRect.bottom>0
-    });
-  });});
+  var boss=document.querySelector(".gameplay-boss-card"),mech=document.querySelector(".boss-mechanism-card");
+  var slot=document.getElementById("bossMechanismSlot"),area=document.getElementById("battleMonsterArea");
+  var bossRect=rect(".gameplay-boss-card"),mechRect=rect(".boss-mechanism-card");
+  var slotRect=rect("#bossMechanismSlot"),areaRect=rect("#battleMonsterArea");
+  var playerRect=rect("#battlePlayerRow"),logRect=rect("#battleInfo"),pageRect=rect("#battlePage");
+  var name=document.querySelector(".gameplay-boss-card .battle-monster-name");
+  var hp=document.querySelector(".gameplay-boss-card .monster-hp"),sp=document.querySelector(".gameplay-boss-card .monster-sp");
+  var bossStyle=getComputedStyle(boss),mechStyle=getComputedStyle(mech),slotStyle=getComputedStyle(slot),areaStyle=getComputedStyle(area);
+  document.getElementById("result").textContent=JSON.stringify({
+    viewport:{width:innerWidth,height:innerHeight},scale:scale,
+    boss:bossRect,mechanism:mechRect,slot:slotRect,area:areaRect,player:playerRect,log:logRect,page:pageRect,
+    bossWidthShare:bossRect.width/innerWidth,mechanismWidthShare:mechRect.width/innerWidth,
+    bossRatio:bossRect.height/bossRect.width,mechanismRatio:mechRect.height/mechRect.width,
+    bossComputed:{width:bossStyle.width,height:bossStyle.height,minWidth:bossStyle.minWidth,maxWidth:bossStyle.maxWidth,flexBasis:bossStyle.flexBasis,aspectRatio:bossStyle.aspectRatio,boxSizing:bossStyle.boxSizing},
+    mechanismComputed:{width:mechStyle.width,height:mechStyle.height,minWidth:mechStyle.minWidth,maxWidth:mechStyle.maxWidth,flexBasis:mechStyle.flexBasis,aspectRatio:mechStyle.aspectRatio,boxSizing:mechStyle.boxSizing,display:mechStyle.display},
+    slotComputed:{width:slotStyle.width,display:slotStyle.display,flexDirection:slotStyle.flexDirection},
+    areaComputed:{width:areaStyle.width,display:areaStyle.display,flexDirection:areaStyle.flexDirection,flexWrap:areaStyle.flexWrap},
+    mechanismCount:document.querySelectorAll(".boss-mechanism-card").length,
+    textOverflow:name.scrollWidth>name.clientWidth+1,
+    hpOverflow:hp.scrollWidth>hp.clientWidth+1,
+    spOverflow:sp.scrollWidth>sp.clientWidth+1,
+    pageHorizontalOverflow:document.getElementById("battlePage").scrollWidth>document.getElementById("battlePage").clientWidth+1,
+    documentHorizontalOverflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1,
+    bossBeforeMechanism:mechRect.top>=bossRect.bottom+scale*4,
+    mechanismBeforePlayer:mechRect.bottom<=playerRect.top+1,
+    playerBeforeLog:playerRect.bottom<=logRect.top+1,
+    visibleLog:logRect.height>1&&logRect.top<innerHeight&&logRect.bottom>0,
+    visiblePlayer:playerRect.height>1&&playerRect.top<innerHeight&&playerRect.bottom>0
+  });
 })();
 </script>
 </body></html>`;
