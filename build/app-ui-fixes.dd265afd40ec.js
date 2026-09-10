@@ -2,7 +2,7 @@
 /* bundled source: js/62-v174-current-ui-fixes.js */
 /* =====================================================
    V174 — current UI regression repairs
-   DOM-only owner for missing static navigation controls.
+   DOM-only owner for missing static navigation controls and main-city art.
    No gameplay state, save data or reward logic is changed here.
 ===================================================== */
 (function installV174CurrentUiFixes(){
@@ -26,10 +26,33 @@
         header.appendChild(button);
     }
 
-    if(document.readyState==="loading"){
-        document.addEventListener("DOMContentLoaded",ensureGameplayHomeBack,{once:true});
-    }else{
-        ensureGameplayHomeBack();
+    function ensureRelicHomeArt(){
+        const glyph=document.querySelector("#homePage .team-relic-home-entry .team-relic-home-glyph");
+        if(!glyph){ return; }
+        let image=glyph.querySelector("img.v174-relic-home-art");
+        if(!image){
+            glyph.textContent="";
+            image=document.createElement("img");
+            image.className="v174-relic-home-art";
+            image.alt="";
+            image.draggable=false;
+            image.decoding="async";
+            glyph.appendChild(image);
+        }
+        if(image.getAttribute("src")!=="assets/ui/home-relic-v174.webp"){
+            image.setAttribute("src","assets/ui/home-relic-v174.webp");
+        }
     }
-    window.addEventListener("four-symbols:feature-ready",ensureGameplayHomeBack,{passive:true});
+
+    function apply(){
+        ensureGameplayHomeBack();
+        ensureRelicHomeArt();
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",apply,{once:true});
+    }else{
+        apply();
+    }
+    window.addEventListener("four-symbols:feature-ready",apply,{passive:true});
 })();

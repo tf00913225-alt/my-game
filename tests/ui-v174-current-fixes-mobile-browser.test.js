@@ -46,7 +46,7 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
 #allElementSkillPreviewModal .skill-preview-body{width:350px;}
 .v17361-reward-preview{width:350px;}
 </style></head><body><div id="game-stage">
-<div id="homePage"><div class="home-card-grid"><button class="home-card home-card-secondary qa-normal-card"><span class="home-card-icon"></span><span id="normalLabel" class="home-card-label">系統</span></button><div class="home-utility-actions team-relic-home-tools"><button class="home-card home-card-utility team-relic-home-entry"><span class="home-card-icon"></span><span id="relicLabel" class="home-card-label">秘寶</span></button><button class="home-card home-card-utility team-element-box-home-entry"><span class="home-card-icon"></span><span id="elementLabel" class="home-card-label">元素匣</span></button></div></div><section id="v146HomeRoster" class="v146-home-roster"><header>冒險隊伍</header><div class="v146-home-character">角色</div></section></div>
+<div id="homePage"><div class="home-card-grid"><button class="home-card home-card-secondary qa-normal-card"><span class="home-card-icon"></span><span id="normalLabel" class="home-card-label">系統</span></button><div class="home-utility-actions team-relic-home-tools"><button class="home-card home-card-utility team-relic-home-entry"><span class="home-card-icon team-relic-home-glyph">寶</span><span id="relicLabel" class="home-card-label">秘寶</span></button><button class="home-card home-card-utility team-element-box-home-entry"><span class="home-card-icon"></span><span id="elementLabel" class="home-card-label">元素匣</span></button></div></div><section id="v146HomeRoster" class="v146-home-roster"><header>冒險隊伍</header><div class="v146-home-character">角色</div></section></div>
 <div id="gameplayPage" class="gameplay-page"><section class="gameplay-large-panel"><header class="gameplay-panel-header"><div><small>特殊戰鬥總覽</small><h2>玩法</h2></div></header></section></div>
 <div id="allElementSkillPreviewModal"><div id="skillBody" class="skill-preview-body"></div></div>
 <div id="inventoryPage"><div class="inventory-grid-classic"><button class="inventory-item-classic"><span class="inventory-icon"><span id="equipmentArt" class="v169-item-art v169-equipment-art v169-rarity-blue"><img id="equipmentImg" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23c88f30'/%3E%3C/svg%3E"></span></span></button></div></div>
@@ -55,11 +55,12 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
 document.addEventListener("DOMContentLoaded",function(){
  var q=function(s){return document.querySelector(s);};var rect=function(el){var r=el.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
  var back=q('.v174-gameplay-home-back');if(back){back.click();}
- var art=q('#equipmentArt'),img=q('#equipmentImg'),header=q('#gameplayPage .gameplay-panel-header');
+ var art=q('#equipmentArt'),img=q('#equipmentImg'),header=q('#gameplayPage .gameplay-panel-header'),relicGlyph=q('.team-relic-home-glyph'),relicArt=q('.team-relic-home-glyph img.v174-relic-home-art');
  q('#result').textContent=JSON.stringify({
   labels:{normal:getComputedStyle(q('#normalLabel')).fontSize,relic:getComputedStyle(q('#relicLabel')).fontSize,element:getComputedStyle(q('#elementLabel')).fontSize,relicLine:getComputedStyle(q('#relicLabel')).lineHeight},
   roster:{marginTop:getComputedStyle(q('#v146HomeRoster')).marginTop,gap:getComputedStyle(q('#v146HomeRoster')).gap,charHeight:rect(q('.v146-home-character')).height},
   gameplay:{count:document.querySelectorAll('.v174-gameplay-home-back').length,back:back?rect(back):null,header:rect(header),page:window.__qaPage||''},
+  relicArt:{count:document.querySelectorAll('.team-relic-home-glyph img.v174-relic-home-art').length,src:relicArt?relicArt.getAttribute('src'):'',text:relicGlyph?relicGlyph.textContent.trim():''},
   hint:{font:getComputedStyle(q('#skillBody'),'::before').fontSize,content:getComputedStyle(q('#skillBody'),'::before').content},
   equipment:{art:rect(art),img:rect(img),objectFit:getComputedStyle(img).objectFit,transform:getComputedStyle(img).transform},
   preview:{icon:getComputedStyle(q('#rewardIcon')).display,chest:getComputedStyle(q('#chestCount')).display,content:getComputedStyle(q('#rewardVisual'),'::before').content}
@@ -87,6 +88,9 @@ function verify(data,width){
     assert.equal(data.roster.marginTop,"4px");assert.equal(data.roster.gap,"2px");assert.ok(data.roster.charHeight<=78.5);
     assert.equal(data.gameplay.count,1);assert.equal(data.gameplay.page,"home");
     assert.ok(data.gameplay.back.right<=data.gameplay.header.right+1&&data.gameplay.back.left>data.gameplay.header.left+data.gameplay.header.width/2,`${width}px gameplay return is not in the header right side`);
+    assert.equal(data.relicArt.count,1,`${width}px relic entry did not receive the supplied art`);
+    assert.equal(data.relicArt.src,"assets/ui/home-relic-v174.webp");
+    assert.equal(data.relicArt.text,"");
     assert.equal(data.hint.font,"16px");assert.match(data.hint.content,/土剋水.*水剋火.*火剋風.*風剋土/);
     assert.ok(data.equipment.art.width>=60&&data.equipment.art.height>=60,`${width}px equipment art collapsed`);
     assert.ok(data.equipment.img.width>=data.equipment.art.width-14&&data.equipment.img.height>=data.equipment.art.height-14,`${width}px equipment image does not fill its safe square`);

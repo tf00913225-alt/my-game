@@ -22,6 +22,8 @@ assert.match(css,/team-relic-home-tools \.home-card-label[\s\S]*font-size:13px !
 assert.match(css,/v146-home-roster[\s\S]*margin-top:4px !important/);
 assert.match(js,/className="gameplay-back-button v174-gameplay-home-back"/);
 assert.match(js,/window\.showPage\("home"\)/);
+assert.match(js,/team-relic-home-glyph/);
+assert.match(js,/assets\/ui\/home-relic-v174\.webp/);
 assert.match(build,/uiFixScripts=\["js\/62-v174-current-ui-fixes\.js"\]/);
 assert.match(build,/uiFixStyles=\["css\/57-v174-current-ui-fixes\.css"\]/);
 assert.match(build,/__BUILD_UI_FIXES__/);

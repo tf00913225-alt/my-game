@@ -20,7 +20,7 @@
       "app-shell": {
         "scripts": [
           "build/app-shell.4121e7bf3a8e.js",
-          "build/app-ui-fixes.51da6227e96c.js"
+          "build/app-ui-fixes.dd265afd40ec.js"
         ],
         "styles": [
           "build/app-shell.37d5b9f36840.css",
@@ -129,9 +129,9 @@
       "sha256": "4121e7bf3a8e",
       "bytes": 923465
     },
-    "build/app-ui-fixes.51da6227e96c.js": {
-      "sha256": "51da6227e96c",
-      "bytes": 1557
+    "build/app-ui-fixes.dd265afd40ec.js": {
+      "sha256": "dd265afd40ec",
+      "bytes": 2313
     },
     "build/gameplay-core.c8bdbe557965.js": {
       "sha256": "c8bdbe557965",
