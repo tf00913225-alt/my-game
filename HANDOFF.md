@@ -1,3 +1,10 @@
+## 2026-09-10 四分支安全整合：Boss 9:16 手機版面（dev integration）
+
+- 指定工作分支 `fix/boss-ui-9x16-mobile-20260910@0865bbaef3e8c1ee5f054bf4774bc800db9f7ec2` 的 Boss 與機制卡 9:16 CSS 已整合到正式 owner `css/gameplay-boss-tower.css`。
+- 與秘寶分支共同修改 `asset-manifest.json`、`build/asset-manifest.json` 與 `feature-boss-relic` bundle；人工整合保留 Boss CSS 新版、秘寶標籤／雜湊素材、以及其後載入的 `feature-relic-progression` CSS/JS。
+- Boss 分支建立於舊 dev；未帶回舊 manifest、舊資源路徑或其他 runtime。測試涵蓋 360×800、393×873、412×915，並使用長 HP `5601 / 5601` 驗證卡片不溢位。
+- CSS 品質檢查先移除註解再掃描全檔 `!important` 宣告；註解中的詞彙不會造成誤判，實際 Boss owner 仍無優先權補丁。
+
 ## 2026-09-10 四分支安全整合：Screen Wake Lock owner 收斂（dev integration）
 
 - 指定工作分支 `feature/screen-wake-lock-runtime-20260910@55054cb18c93d319653922541b343079cc41eb19` 的可見頁面常亮需求保留；整合時移除 `index.html` 內未登記的 inline runtime，改由 `js/startup/screen-wake-lock-runtime.js` 作唯一 owner，並納入既有單一 hashed Boot Core。它只安裝生命週期並 fire-and-forget 呼叫 Wake Lock API，不等待、不阻塞 Auth／存檔／首個可操作畫面。
