@@ -35,11 +35,11 @@ assert.match(vfx,/isMechanismTarget\(index\)\)\{ return mechanismCardFor\(index\
 // BOSS receives the large portrait 9:16 variables requested for this screen.
 assert.match(v141,/flex:0 0 var\(--v143-monster-card-width,76px\) !important;/);
 assert.match(v143,/\.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:82px;[\s\S]*?--v143-monster-card-height:106px;/);
-assert.match(boss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?--v143-monster-card-width:clamp\(160px,40%,176px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:9 \/ 16;/);
+assert.match(boss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?--v143-monster-card-width:clamp\(176px,44%,190px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:9 \/ 16;/);
 assert.match(runtime,/bossCard\.classList\.add\("gameplay-boss-card"\)/);
 
-// The old V131 row has a hard 76px flex basis. Gameplay BOSS mode switches
-// only that runtime row to grid so the real width variable can own geometry;
+// The old V131 row has a hard flex sizing path. Gameplay BOSS mode switches
+// only that runtime row to grid so the real card width variable can own geometry;
 // this avoids a later !important or transform-based visual enlargement.
 assert.match(boss,/#battleMonsterArea\.gameplay-boss-active \.v131-monster-row\{[\s\S]*?display:grid;[\s\S]*?grid-template-columns:1fr;[\s\S]*?place-items:start center;/);
 const bossCardRule=cssRule(boss,"#game-stage #battlePage .battle-monster.gameplay-boss-card{");
@@ -48,7 +48,7 @@ assert.doesNotMatch(bossCardRule,/zoom\s*:/);
 assert.doesNotMatch(bossCardRule,/scale\(/);
 
 // The redundant battle heading is hidden only while a Gameplay BOSS is active.
-// Its historical V15 geometry is reclaimed by the formation without introducing
+// Its historical geometry is reclaimed by the formation without introducing
 // a new priority patch in the formal Gameplay stylesheet.
 assert.match(boss,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
 assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-23px;/);
@@ -59,16 +59,16 @@ assert.doesNotMatch(boss,/!important/);
 // remains on the mechanism button itself; the separate detail panel keeps the
 // full dynamic explanation available.
 assert.match(boss,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
-assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:clamp\(84px,22%,102px\);[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?flex:0 0 clamp\(84px,22%,102px\);/);
+assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:clamp\(88px,23%,106px\);[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?flex:0 0 clamp\(88px,23%,106px\);/);
 assert.match(boss,/\.boss-mechanism-kind\{[\s\S]*?order:1;/);
 assert.match(boss,/\.boss-mechanism-name\{[\s\S]*?order:2;[\s\S]*?-webkit-line-clamp:2;/);
 assert.match(boss,/\.boss-mechanism-hp\{[\s\S]*?order:3;[\s\S]*?min-height:20px;[\s\S]*?font-size:10px;[\s\S]*?font-weight:900;/);
 assert.match(boss,/\.boss-mechanism-card::after\{[\s\S]*?order:4;[\s\S]*?-webkit-line-clamp:4;/);
-assert.match(boss,/data-type="shield"\]\::after\{ content:"BOSS 受護體保護，優先擊破"; \}/);
-assert.match(boss,/data-type="charge"\]\::after\{ content:"倒數歸零發動重擊，擊破可取消"; \}/);
-assert.match(boss,/data-type="heal"\]\::after\{ content:"每回合恢復 BOSS 4% 最大生命"; \}/);
-assert.match(boss,/data-type="amplify"\]\::after\{ content:"BOSS 傷害提高 25%"; \}/);
-assert.match(boss,/data-type="seal"\]\::after\{ content:"我方治療與 SP 回復降低 40%"; \}/);
+assert.match(boss,/data-type="shield"\]::after\{ content:"BOSS 受護體保護，優先擊破"; \}/);
+assert.match(boss,/data-type="charge"\]::after\{ content:"倒數歸零發動重擊，擊破可取消"; \}/);
+assert.match(boss,/data-type="heal"\]::after\{ content:"每回合恢復 BOSS 4% 最大生命"; \}/);
+assert.match(boss,/data-type="amplify"\]::after\{ content:"BOSS 傷害提高 25%"; \}/);
+assert.match(boss,/data-type="seal"\]::after\{ content:"我方治療與 SP 回復降低 40%"; \}/);
 const mechanismCardRule=cssRule(boss,"#game-stage #battleMonsterArea .boss-mechanism-card{");
 assert.doesNotMatch(mechanismCardRule,/transform\s*:/);
 assert.doesNotMatch(mechanismCardRule,/zoom\s*:/);
