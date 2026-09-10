@@ -17,7 +17,7 @@ assert.ok(html.indexOf('id="startupLoader"')<html.indexOf('id="app"'));
 assert.equal((html.match(/<script\b[^>]*\bsrc=/g)||[]).length,1);
 assert.match(html,/build\/boot-core\.[0-9a-f]{12}\.js/);
 assert.match(html,/build\/boot-core\.[0-9a-f]{12}\.css/);
-assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
 assert.doesNotMatch(loader,/TOTAL_RUNTIME_MODULES|__v173ReportRuntimeProgress|createElement\(["']script["']\)/);
 assert.match(source,/Sole StartupStateMachine owner/);
 for(const state of ["BOOT_LOADING","AUTH_RESOLVING","AUTH_REQUIRED","SAVE_LOADING","MIGRATION_REQUIRED","NEED_CHARACTER","READY","OFFLINE_READY","ERROR"]){

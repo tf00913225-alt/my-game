@@ -1,14 +1,15 @@
-## 2026-09-09 Account-first Boot Architecture（工作分支，待 DEV 驗證）
+## 2026-09-10 V173.65 Account-first Boot Architecture（DEV VERIFIED／已授權推進 main）
 
-- 基準為 GitHub `dev@70df66e8cb371ff6193a7f70609cf9aad7bd15ac`；工作分支 `perf/cold-start-auth-boot-architecture`。使用者已明確授權完成後依序推進 dev、驗證 preview，再推進 main；在所有 gate 完成前不得提前宣稱發布完成。
+- 基準為 GitHub `dev@70df66e8cb371ff6193a7f70609cf9aad7bd15ac`；原工作分支 `perf/cold-start-auth-boot-architecture` 經 PR #123 合入 dev，後續僅以 PR #124～#127 修復部署 header 與既有 Live QA 對新 lazy owner 的舊假設。使用者已明確授權依序完成 dev preview 後推進 main。
 - `js/startup/startup-contract.js` + `js/52-v173.20-startup-loader.js` 是唯一 StartupStateMachine owner。正式狀態為 `BOOT_LOADING / AUTH_RESOLVING / AUTH_REQUIRED / SAVE_LOADING / MIGRATION_REQUIRED / NEED_CHARACTER / READY / OFFLINE_READY / ERROR`；創角只有 `NEED_CHARACTER` 且 Auth UID/resolved UID/active UID 一致時可見。
 - `js/startup/account-save-repository.js` 是 UID local ownership 與 legacy migration owner。Canonical key 為 `four_symbols_save:{uid}`，metadata 與 sidecar 亦依 UID 隔離；`battle_full_version_save_v5` 不自動綁定，migration 必須確認、先備份、衝突 fail closed。
 - `scripts/build-production.mjs` 產生 deterministic content-hashed boot/app/gameplay/feature bundles；`asset-manifest.json` 是實際 Critical/Feature deploy manifest。Execution order 固定在 bundle source list，網路 preparation 並行，不再用大量 sequential HTTP request 維持 wrapper 順序。
 - `js/startup/feature-loader.js` 是唯一動態 script owner；`js/20-anonymous-20.js` 只負責 pointer/touch prefetch、feature-local loading 與 idle preload，不再有 32-runtime 全域 input lock。已有帳號到主城只等 app shell；gameplay/patrol/abyss/skill/boss/relic 等不阻塞 Auth／創角／主城。
 - 61 個 `v131-patrol-sprite-*.js` chunk 已刪除；`js/26-v131-patrol-appearance.js` 改用 16 個 `assets/characters/patrol/*.webp` content-hashed 正常資產。Critical logo 亦改為 `assets/ui/startup-logo.4631c0bc3f2b.jpg`。
 - Firebase 正式順序改為 identity → UID → cloud/local read → destination；訪客使用 Anonymous Auth。正式帳號 UI 已移除「先使用本機存檔」。Firestore browser write 仍禁止，trusted-backend-only policy 未放寬。
-- 永久規格見 `docs/BOOT_ARCHITECTURE.md`；before static baseline 與 browser evidence 定義見 `docs/BOOT_PERFORMANCE_BASELINE.md`。新增 account/auth/boot/feature/budget Node gates、controlled mobile Chrome QA 與 deployed live cold-start QA。
-- Requirement Batch：`release/requirement-batches/2026-09-09-cold-start-auth-boot-architecture.json`，目前 `IMPLEMENTED`；尚待 full repository CI、browser artifact、dev exact-SHA deployment/live Firebase QA，完成後才可標 VERIFIED 與升版。
+- 永久規格見 `docs/BOOT_ARCHITECTURE.md`；before static baseline 與實測 browser evidence 見 `docs/BOOT_PERFORMANCE_BASELINE.md`。新增 account/auth/boot/feature/budget Node gates、controlled mobile Chrome QA 與 deployed live cold-start QA。
+- DEV verification commit `08d23ecbf38ab74a6b1ef4ced43fefcded02901a`、Actions run `34428020728`：139/139 Node suites、controlled account-first browser QA、Cloudflare exact-SHA deploy、live auth-first cold boot、Abyss 與 battle/audio mobile QA 全數 SUCCESS。Live signed-out auth UI 693.3 ms、first paint 448 ms、10 requests／356,374 B；controlled warm existing-user city interactive 475 ms。
+- Requirement Batch：`release/requirement-batches/2026-09-09-cold-start-auth-boot-architecture.json`，12/12 VERIFIED；發布候選 V173.65。正式 main promotion 仍須受保護 PR、main CI、GitHub Pages deploy 與 production exact-SHA/version 驗證後才能宣稱完成。
 
 ## 2026-09-08 三分支 gameplay／秘寶方形圖／全域非戰鬥字級安全整合（dev）
 

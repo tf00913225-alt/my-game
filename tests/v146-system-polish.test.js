@@ -45,7 +45,7 @@ function baseContext(overrides={}){
 
 test("V146 remains ordered before V149 under the current cache key",()=>{
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"

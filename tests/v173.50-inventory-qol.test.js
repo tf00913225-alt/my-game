@@ -41,8 +41,8 @@ assert.doesNotMatch(recovery,/補品不足[\s\S]{0,180}setTimeout\(/);
 assert.match(build,/"css\/52-v173\.50-inventory-qol\.css"/);
 assert.match(build,/"js\/equipment-progression\.js"[\s\S]*?"js\/53-v173\.50-inventory-qol\.js"/);
 assert.doesNotMatch(equipment,/createElement\(["']script["']\)|script\.onload/);
-assert.ok(loader.includes('const V_ASSET_VERSION="173.64";'));
+assert.ok(loader.includes('const V_ASSET_VERSION="173.65";'));
 assert.doesNotMatch(ui,/equipment-progression\.js\?v=|createElement\(["']script["']\)/);
-assert.ok(index.includes('<title>四象江湖傳 V173.64</title>'));
+assert.ok(index.includes('<title>四象江湖傳 V173.65</title>'));
 
 console.log("✓ V173.50 inventory QoL and persistent no-potion warning");

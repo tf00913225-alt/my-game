@@ -493,7 +493,7 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V165",(
     assert.match(css,/v143StatusRasterFrames var\(--v153-status-duration,1000ms\) steps\(1,end\) infinite/);
     assert.match(animation,/burn:statusSheet\("assets\/vfx\/fire\/burn-loop\.png\?v=165",800,"statusEffects"\)/);
     assert.match(animation,/rage:statusSheet\("assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",1000,"activeBuffs"\)/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

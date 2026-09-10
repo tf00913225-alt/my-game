@@ -331,7 +331,7 @@ test("V137 regressions remain wired through the current deployed entry points",(
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(appBundle,/bundled source: js\/00-main\.js/);
     assert.match(appBundle,/bundled source: js\/20-anonymous-20\.js/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.65"/);
     assert.match(v133Source,/const MAX_CHARACTER_LEVEL=100/);
     assert.doesNotMatch(mainSource,/safeBind\(\s*["'](?:autoEnabled|autoSkillHome|hpUsePctHome|spUsePctHome)/);
     assert.doesNotMatch(v132Source,/const result=originalLoseBattle\.apply/);

@@ -166,7 +166,7 @@ function createContext(options={}){
 
 (async()=>{
     await test("V142 assets are versioned and loaded after V141",()=>{
-        assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+        assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
         assert.match(loader,/css\/39-v142-skill-animation\.css/);
         assert.match(loader,/js\/36-v141-content-systems\.js[\s\S]*js\/37-v142-skill-animation\.js/);
         assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);

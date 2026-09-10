@@ -53,9 +53,9 @@ test("Water Ball lasts 1.4 seconds and the 4×3 Sprite Sheet advances through CS
 });
 
 test("the current cache version publishes the grouped Water Ball choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.64"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.64"[\s\S]*?>V173\.64<\/div>/);
+    assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
 });
 
 console.log("\nV172 Water Ball VFX suite: "+passed+" tests passed.");

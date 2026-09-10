@@ -16,11 +16,11 @@ assert.match(css,/\.v17346-shop-card \.v17346-reforge-mini\{[\s\S]*?grid-row:4 !
 assert.match(css,/\.v17345-equipment-refresh\{[\s\S]*?grid-template-columns:minmax\(0,1fr\) 128px !important;[\s\S]*?height:58px !important;/);
 assert.match(css,/\.shop-potion-list\{[\s\S]*?grid-template-rows:repeat\(3,minmax\(0,1fr\)\) !important;[\s\S]*?overflow:hidden !important;/);
 assert.ok(equip.includes("前5次免費；第6～10次尚未開放。"));
-assert.ok(loader.includes('const V_ASSET_VERSION="173.64";'));
+assert.ok(loader.includes('const V_ASSET_VERSION="173.65";'));
 assert.ok(build.indexOf('"js/51-v169-rpg-ui.js"')<build.indexOf('"js/equipment-progression.js"'));
 assert.doesNotMatch(ui,/createElement\(["']script["']\)/);
-assert.ok(index.includes('<title>四象江湖傳 V173.64</title>'));
-assert.ok(index.includes('>V173.64</div>'));
+assert.ok(index.includes('<title>四象江湖傳 V173.65</title>'));
+assert.ok(index.includes('>V173.65</div>'));
 assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 
 console.log("✓ V173.50 premium one-screen shop layout");

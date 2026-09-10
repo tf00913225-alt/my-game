@@ -21,5 +21,5 @@ assert.equal((featureLoader.match(/createElement\("script"\)/g)||[]).length,1);
 assert.match(build,/"js\/equipment-progression\.js"[\s\S]*?"js\/53-v173\.50-inventory-qol\.js"[\s\S]*?"js\/54-v173\.51-battle-qa\.js"/);
 assert.equal((index.match(/<script\b[^>]*\bsrc=/g)||[]).length,1);
 assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-assert.match(index,/<title>四象江湖傳 V173\.64<\/title>/);
+assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
 console.log("✓ real critical-task progress and deterministic feature loading");

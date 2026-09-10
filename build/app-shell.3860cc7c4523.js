@@ -34822,7 +34822,6 @@ catch(error){
     window.GAME_NATIVE_CURRENT_VERSION = "V54";
     window.GAME_NATIVE_LAST_SCOPE = "main-city-moderate-scale";
 
-    const AD_FREE_STYLE_ID="ad-free-service-info-style";
     const AD_FREE_MODE_CLASS="ad-free-service-info-mode";
     const AD_FREE_CONFIG_KEY="SIXIANG_AD_FREE_SERVICE_CONFIG";
     const AD_FREE_DISPLAY_POLICY=Object.freeze({mode:"every-entry"});
@@ -34853,15 +34852,6 @@ catch(error){
         const config=Object.assign({},DEFAULT_AD_FREE_CONFIG,existing);
         window[AD_FREE_CONFIG_KEY]=config;
         return config;
-    }
-
-    function loadAdFreeStyle(){
-        if(document.getElementById(AD_FREE_STYLE_ID)){ return; }
-        const link=document.createElement("link");
-        link.id=AD_FREE_STYLE_ID;
-        link.rel="stylesheet";
-        link.href="css/ad-free-service-info-modal.css?v=173.64-adfree1";
-        document.head.appendChild(link);
     }
 
     function getModalParts(){
@@ -34982,7 +34972,6 @@ catch(error){
             return false;
         }
 
-        loadAdFreeStyle();
         parts.title.textContent="《四象江湖傳》";
         renderAdFreeServiceBody(parts.body);
         parts.body.scrollTop=0;
@@ -35054,7 +35043,6 @@ catch(error){
         if(adFreeState.armed){ return; }
         adFreeState.armed=true;
         ensureAdFreeConfig();
-        loadAdFreeStyle();
 
         document.addEventListener("v173.20:startup-entered",scheduleAutoShowAdFreeServiceInfo);
         window.addEventListener("pageshow",scheduleAutoShowAdFreeServiceInfo);
@@ -36887,7 +36875,7 @@ window.v78ApplyCharacterInventoryLayout=
 
 /* bundled source: js/20-anonymous-20.js */
 /* Critical/feature boundary owner. No global input lock and no network-order patch chain. */
-const V_ASSET_VERSION="173.64";
+const V_ASSET_VERSION="173.65";
 
 (function installFeatureIntentBoundary(){
     "use strict";
