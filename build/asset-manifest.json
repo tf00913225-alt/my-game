@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.d1b27c187d4b.js"
+      "build/boot-core.b492134efb9f.js"
     ],
     "styles": [
       "build/boot-core.71f7ecfc4e95.css"
@@ -119,9 +119,9 @@
     ]
   },
   "assets": {
-    "build/boot-core.d1b27c187d4b.js": {
-      "sha256": "d1b27c187d4b",
-      "bytes": 40214
+    "build/boot-core.b492134efb9f.js": {
+      "sha256": "b492134efb9f",
+      "bytes": 43156
     },
     "build/app-shell.4121e7bf3a8e.js": {
       "sha256": "4121e7bf3a8e",

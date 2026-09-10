@@ -15,6 +15,7 @@
 | Firebase identity | `js/firebase/firebase-auth.js` |
 | 帳號 UI | `js/firebase/firebase-auth-ui.js` |
 | 客服聯絡資料與共用顯示視窗 | `js/startup/support-contact.js` |
+| 可見頁面 Screen Wake Lock 生命週期 | `js/startup/screen-wake-lock-runtime.js` |
 | 雲端 read／trusted callable | `js/firebase/firebase-cloud-save.js` |
 | Firebase lifecycle | `js/firebase/firebase-bootstrap.js` |
 | 功能意圖、局部 loading、idle preload | `js/20-anonymous-20.js` |
@@ -103,7 +104,7 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 
 `asset-manifest.json` 是部署時的實際清單。未登入的 Critical Boot 只包含：
 
-- 一個 hashed `boot-core.*.js`：客服聯絡 owner、account repository、feature loader、startup contract、state machine。
+- 一個 hashed `boot-core.*.js`：客服聯絡 owner、非阻塞 Screen Wake Lock 生命週期、account repository、feature loader、startup contract、state machine。
 - 一個 hashed `boot-core.*.css`：viewport/base、startup、account UI 與創角必要樣式。
 - hashed startup logo。
 - 五個 hashed Firebase lifecycle modules，加上 Firebase 官方 SDK 的必要 ESM dependency。
