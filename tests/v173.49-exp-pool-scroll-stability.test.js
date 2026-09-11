@@ -12,7 +12,7 @@ assert.match(growth,/function v173CaptureExpPoolViewport\(\)/);
 assert.match(growth,/function v173RestoreExpPoolViewport\(snapshot\)/);
 assert.match(growth,/requestAnimationFrame\(function\(\)\{[\s\S]*?requestAnimationFrame\(restore\)/);
 assert.match(growth,/window\.v131PreviewExpLevel=function\(index\)\{[\s\S]*?v173CaptureExpPoolViewport\(\)[\s\S]*?v173ScheduleExpPoolDecoration\(viewport\)/);
-assert.match(growth,/window\.v131ConfirmExpPreview=function\(\)\{[\s\S]*?v173CaptureExpPoolViewport\(\)[\s\S]*?v173ScheduleExpPoolDecoration\(viewport\)/);
+assert.match(growth,/window\.v131ConfirmExpPreview=async function\(\)\{[\s\S]*?v173CaptureExpPoolViewport\(\)[\s\S]*?v173ScheduleExpPoolDecoration\(viewport\)/);
 assert.match(growth,/window\.v131CancelExpPreview=function\(\)\{[\s\S]*?v173CaptureExpPoolViewport\(\)[\s\S]*?v173ScheduleExpPoolDecoration\(viewport\)/);
 assert.match(css,/V173\.49 — EXP POOL TAP \/ SCROLL STABILITY/);
 assert.match(css,/#homeExpPoolCard #expDistributeList \*\{[\s\S]*?overflow-anchor:none !important;/);
