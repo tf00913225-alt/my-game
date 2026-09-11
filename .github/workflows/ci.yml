@@ -14,11 +14,11 @@ permissions:
   contents: write
 
 jobs:
-  patch_boot_qa_expression:
-    name: Diagnose First Play manifest-update hold
+  patch_boot_qa:
+    name: Repair First Play browser QA scenario routing
     if: github.event_name == 'pull_request' && github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Patch expression, print hold state, and run boot QA
+      - name: Patch and verify First Play QA, then restore standard CI
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
@@ -37,19 +37,35 @@ jobs:
           from pathlib import Path
           path=Path('.github/scripts/run-boot-architecture-browser-qa.mjs')
           text=path.read_text()
-          replacements={
+
+          expr={
               'resources.some(p=>/\\/app-shell\\./.test(p))':'resources.some(p=>p.includes("/app-shell."))',
               'resources.some(p=>/\\/gameplay-core\\./.test(p))':'resources.some(p=>p.includes("/gameplay-core."))',
               'resources.some(p=>/\\/feature-patrol\\./.test(p))':'resources.some(p=>p.includes("/feature-patrol."))',
           }
-          for old,new in replacements.items():
+          for old,new in expr.items():
               if old not in text:
                   raise SystemExit('expected CDP expression fragment not found: '+old)
               text=text.replace(old,new,1)
-          needle='    assert.equal(updateHold.scene,"city");'
-          if needle not in text:
-              raise SystemExit('manifest-update assertion not found')
-          text=text.replace(needle,'    console.log("QA manifestUpdateHold",JSON.stringify(updateHold));\n'+needle,1)
+
+          old='''            const url=new URL(request.url,"http://127.0.0.1");\n            const fetchDest=String(request.headers["sec-fetch-dest"]||"");'''
+          new='''            const url=new URL(request.url,"http://127.0.0.1");\n            let refererScenario="";\n            try{ refererScenario=new URL(String(request.headers.referer||""),"http://127.0.0.1").searchParams.get("scenario")||""; }catch(_){}\n            const requestScenario=refererScenario||activeScenario;\n            const fetchDest=String(request.headers["sec-fetch-dest"]||"");'''
+          if old not in text:
+              raise SystemExit('QA server request prelude not found')
+          text=text.replace(old,new,1)
+
+          old404='''            if(activeScenario==="resource-404"&&relative==="assets/ui/nav-home.png"&&!injected404){ injected404=true; response.writeHead(404,{"cache-control":"no-store"}); response.end("qa missing first-play asset"); return; }'''
+          new404='''            if(requestScenario==="resource-404"&&relative==="assets/ui/nav-home.png"&&!injected404){ injected404=true; response.writeHead(404,{"cache-control":"no-store"}); response.end("qa missing first-play asset"); return; }'''
+          if old404 not in text:
+              raise SystemExit('resource-404 scenario condition not found')
+          text=text.replace(old404,new404,1)
+
+          oldSlow='''            if(activeScenario==="manifest-update"&&relative==="assets/ui/nav-home.png"){ await sleep(10800); }'''
+          newSlow='''            if(requestScenario==="manifest-update"&&relative==="assets/ui/nav-home.png"){ await sleep(15000); }'''
+          if oldSlow not in text:
+              raise SystemExit('manifest-update delay condition not found')
+          text=text.replace(oldSlow,newSlow,1)
+
           path.write_text(text)
           PY
           node --check .github/scripts/run-boot-architecture-browser-qa.mjs
@@ -59,7 +75,7 @@ jobs:
           git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
           git add -A
           git status --short
-          git commit -m "test: fix First Play browser QA CDP expression [generated]"
+          git commit -m "test: make First Play browser QA scenario routing deterministic [generated]"
           git push origin HEAD:${GITHUB_HEAD_REF}
 
   verify:
