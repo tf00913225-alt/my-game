@@ -14,11 +14,11 @@ permissions:
   contents: write
 
 jobs:
-  patch_boot_qa:
-    name: Repair deterministic First Play browser fault injection
+  patch_first_play_hold:
+    name: Repair returning First Play update hold
     if: github.event_name == 'pull_request' && github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -29,15 +29,29 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Patch and verify First Play QA, then restore standard CI
+      - name: Patch startup owner and deterministic browser QA
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           python - <<'PY'
           from pathlib import Path
-          path=Path('.github/scripts/run-boot-architecture-browser-qa.mjs')
-          text=path.read_text()
 
+          startup=Path('js/52-v173.20-startup-loader.js')
+          text=startup.read_text()
+          old='''    let introTimer=0;\n    let citySceneShown=false;'''
+          new='''    let introTimer=0;\n    let citySceneShown=false;\n    let returningPresentationComplete=false;'''
+          if old not in text:
+              raise SystemExit('startup state declaration block not found')
+          text=text.replace(old,new,1)
+
+          old='''    async function runOpeningPresentation(returning,retryOnly){\n        if(retryOnly){ showCityScene("resource-retry"); return; }\n        if(root){ root.dataset.audience=returning?"returning":"first-boot"; }\n        await delay(returning?5000:1800);\n        showCityScene(returning?"returning-logo-complete":"first-boot-logo-complete");\n        if(returning){ await delay(5000); }\n    }\n    function renderFirstPlayProgress(value){\n        render(value.percent,value.title,value.detail);\n        if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }\n    }'''
+          new='''    async function runOpeningPresentation(returning,retryOnly){\n        returningPresentationComplete=false;\n        if(retryOnly){ showCityScene("resource-retry"); return; }\n        if(root){ root.dataset.audience=returning?"returning":"first-boot"; }\n        await delay(returning?5000:1800);\n        showCityScene(returning?"returning-logo-complete":"first-boot-logo-complete");\n        if(returning){\n            await delay(5000);\n            returningPresentationComplete=true;\n            const readyPercent=Number(progress&&progress.getAttribute("aria-valuenow")||0);\n            if(readyPercent<100){ status("正在更新必要資源","第二幕將維持顯示，完成後才進入帳號系統"); }\n        }\n    }\n    function renderFirstPlayProgress(value){\n        const holdReturningUpdate=returningPresentationComplete&&root&&root.dataset.audience==="returning"&&Number(value.percent)<100;\n        render(value.percent,holdReturningUpdate?"正在更新必要資源":value.title,value.detail);\n        if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }\n    }'''
+          if old not in text:
+              raise SystemExit('opening presentation/progress block not found')
+          startup.write_text(text.replace(old,new,1))
+
+          qa=Path('.github/scripts/run-boot-architecture-browser-qa.mjs')
+          text=qa.read_text()
           replacements={
               'resources.some(p=>/\\/app-shell\\./.test(p))':'resources.some(p=>p.includes("/app-shell."))',
               'resources.some(p=>/\\/gameplay-core\\./.test(p))':'resources.some(p=>p.includes("/gameplay-core."))',
@@ -63,18 +77,24 @@ jobs:
           newReady='''    const updatedRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready"))`);assert.equal(updatedRecord.manifestHash,manifest.firstPlay.manifestHash);const delayApplied=await client.eval(`window.__qaManifestDelayApplied||0`);assert.ok(delayApplied>=1,"manifest-update QA did not delay the changed First Play asset");evidence.checks.manifestUpdateReady={manifestHash:updatedRecord.manifestHash,delayApplied};'''
           if oldReady not in text:
               raise SystemExit('manifest update completion assertion not found')
-          text=text.replace(oldReady,newReady,1)
-
-          path.write_text(text)
+          qa.write_text(text.replace(oldReady,newReady,1))
           PY
+
+          node --check js/52-v173.20-startup-loader.js
           node --check .github/scripts/run-boot-architecture-browser-qa.mjs
+          npm run build
+          npm run build:check
+          node tests/v173.20-startup-loader.test.js
+          node tests/v173.52-real-startup-progress.test.js
+          node tests/boot-architecture.test.js
           node .github/scripts/run-boot-architecture-browser-qa.mjs
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
           git add -A
           git status --short
-          git commit -m "test: make First Play browser fault injection deterministic [generated]"
+          git commit -m "fix: hold returning launch on scene two until First Play update is ready [generated]"
           git push origin HEAD:${GITHUB_HEAD_REF}
 
   verify:
