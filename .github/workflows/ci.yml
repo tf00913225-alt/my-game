@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -30,33 +30,6 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Finalize monster portrait registry for generated assets
-        if: github.event_name == 'pull_request' && github.head_ref == 'feature/monster-portrait-pipeline-v1-20260911'
-        env:
-          FEATURE_BRANCH: ${{ github.head_ref }}
-        run: |
-          git fetch --no-tags --depth=2 origin "$FEATURE_BRANCH"
-          git checkout -B "$FEATURE_BRANCH" "origin/$FEATURE_BRANCH"
-          node scripts/finalize-monster-portrait-registry.mjs
-          node <<'NODE'
-          const fs=require('node:fs');
-          const file='tests/v169-abyss-assets-flow.test.js';
-          let source=fs.readFileSync(file,'utf8');
-          const oldBlock=`    assert.equal(report.portraitTargets,107);\n    assert.equal(report.existingTargets,9);\n    assert.equal(report.plannedTargets,98);\n    assert.equal(report.missingPlanned,98);`;
-          const newBlock=`    const registry=JSON.parse(fs.readFileSync("config/monster-portrait-registry.json","utf8"));\n    assert.equal(report.portraitTargets,registry.snapshot.portraitTargets);\n    assert.equal(report.existingTargets,registry.snapshot.existingTargets);\n    assert.equal(report.plannedTargets,registry.snapshot.plannedTargets);\n    assert.equal(report.missingPlanned,registry.snapshot.plannedTargets);`;
-          if(source.includes(oldBlock)){
-            source=source.replace(oldBlock,newBlock);
-            fs.writeFileSync(file,source);
-          }
-          NODE
-          if ! git diff --quiet -- config/monster-portrait-registry.json tests/v169-abyss-assets-flow.test.js; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add config/monster-portrait-registry.json tests/v169-abyss-assets-flow.test.js
-            git commit -m "config: activate generated monster portrait assets"
-            git push origin "HEAD:$FEATURE_BRANCH"
-          fi
-
       - name: Prepare Git comparison base
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -66,6 +39,10 @@ jobs:
              ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then
             git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
           fi
+
+          # Typography regression suites audit the pre-change baseline and the
+          # approved gameplay battle baseline byte-for-byte. fetch-depth: 2 does
+          # not retain those fixed historical objects after the integration merge.
           for typography_baseline_sha in \
             39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
             4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
