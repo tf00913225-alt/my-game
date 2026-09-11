@@ -107,6 +107,22 @@ test("Facebook auth uses redirect on mobile and consumes redirect result before 
     assert.match(docs, /mobile browsers use Firebase redirect/i);
 });
 
+test("DEV Facebook diagnostic isolates public_profile and exchanges the Meta token through the same Firebase UID owner", ()=>{
+    assert.match(auth, /FACEBOOK_DIAGNOSTIC_APP_ID\s*=\s*"1712957419809925"/);
+    assert.match(auth, /FACEBOOK_DIAGNOSTIC_API_VERSION\s*=\s*"v26\.0"/);
+    assert.match(auth, /function isFacebookDiagnosticHost\(\)/);
+    assert.match(auth, /host === "four-symbols-dev\.pages\.dev" \|\| host\.endsWith\("\.four-symbols-dev\.pages\.dev"\)/);
+    assert.doesNotMatch(auth, /tf00913225-alt\.github\.io/);
+    assert.match(auth, /connect\.facebook\.net\/zh_TW\/sdk\.js/);
+    assert.match(auth, /scope:"public_profile"/);
+    assert.doesNotMatch(auth, /addScope\(["']email["']\)/);
+    assert.match(auth, /FacebookAuthProvider\.credential\(accessToken\)/);
+    assert.match(auth, /signInWithCredential\(auth,credential\)/);
+    assert.match(auth, /if\(isFacebookDiagnosticHost\(\)\)\{[\s\S]*signInWithFacebookPublicProfileDiagnostic\(auth\)/);
+    assert.match(ui, /auth\/facebook-diagnostic-no-token/);
+    assert.match(ui, /使用 JavaScript SDK 登入/);
+});
+
 test("one Critical Boot support owner serves login and in-game contact surfaces", ()=>{
     assert.match(support, /const EMAIL="tf00913225@gmail\.com"/);
     assert.match(support, /global\.FourSymbolsSupport=Object\.freeze/);
