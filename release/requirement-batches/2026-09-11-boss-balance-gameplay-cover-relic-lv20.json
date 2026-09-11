@@ -1,0 +1,51 @@
+{
+  "date": "2026-09-11",
+  "title": "BOSS 強度、玩法封面、元素克制說明與 Lv20 秘寶保底",
+  "base_branch": "dev",
+  "base_sha": "eb9e9d78911ca5d72693c33aaab6002238291494",
+  "work_branch": "feature/boss-balance-gameplay-cover-skill-preview-relic-20260911",
+  "officialVersion": "173.65",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "IMPLEMENTED",
+      "request": "依 BOSS 顯示等級與合理同級隊伍人數重新推算強度；提高機制卡耐久；高階 BOSS 視情況帶兩名精英援軍；BOSS/援軍元素與技能一致；BOSS 名稱不得與既有野怪／精英雷同。",
+      "owner": ["js/gameplay-boss-tower-system.js"],
+      "implementation": "以 bossBalanceProfile() 將 Lv20～50 固定按兩名同級角色、Lv60+ 按三名同級角色推算 HP/攻擊倍率；個人 Lv60+、世界第3～4階段與高層塔 BOSS 加兩名同元素精英；configureBossSkills() 固定同元素技能池並寫入 v144LegalSkillPool；機制卡 HP 取 BOSS 比例與等級×隊伍下限較高值；個人／世界／塔 BOSS 全部改用獨立稱號。"
+    },
+    {
+      "id": 2,
+      "status": "IMPLEMENTED",
+      "request": "玩法頁各活動封面改為 16:9，方便統一生成圖片。",
+      "owner": ["css/gameplay-boss-tower.css"],
+      "implementation": "玩法中心 .gameplay-mode-card 統一 aspect-ratio:16/9；整合時保留較新 dev 已核准的戰鬥 BOSS／機制卡 4:3 owner，不混用玩法封面比例。"
+    },
+    {
+      "id": 3,
+      "status": "IMPLEMENTED",
+      "request": "全屬性技能預覽的元素克制介紹重新排版，並說清楚克制與被克制的差異。",
+      "owner": ["css/56-v174-critical-ui-regressions.css"],
+      "implementation": "在 body-mounted #allElementSkillPreviewModal 正式 owner 中改為三行說明：固定克制鏈、我方克制對方＝優勢、對方克制我方＝劣勢；保留 16px/1.45 可讀性並使用 pre-line 排版。"
+    },
+    {
+      "id": 4,
+      "status": "IMPLEMENTED",
+      "request": "玩家第一隻角色 Lv20 時至少開放兩件藍階秘寶可直接使用。",
+      "owner": ["js/relic-progression-drop-system.js", "js/60-team-relic-system.js"],
+      "implementation": "沿用既有正式藍階且 runtimeReady 的乾坤玉壺與玄武靈印；player.relicProgression 新增 firstCharacterLevel20Grant 一次性里程碑，Lv20+ 新／舊存檔均可補發，低於 Lv20 不發，存檔失敗會回滾；不新增 sidecar、不改稀有度、不包 checkLevelUp/saveGame。"
+    }
+  ],
+  "verification": {
+    "completed": [
+      "tests/v174-boss-balance-gameplay-cover-relic-lv20.test.js、既有 Boss/Tower 與 relic progression 專項回歸在整合樹通過",
+      "226/226 JavaScript syntax、304 static resources、250 unique HTML IDs、22 deterministic build assets 與 release/git-diff gates 在整合樹通過",
+      "正式 Game/Cache Version 刻意維持 V173.65，未以版本號冒充功能完成"
+    ],
+    "pending": [
+      "整合 PR 與 dev Repository checks / exact-SHA deployment",
+      "主要手機 viewport 的玩法 16:9 與元素克制說明實際瀏覽器驗收"
+    ],
+    "result": "0/4 VERIFIED — local integration checks passed; remote CI/deploy and browser verification pending"
+  }
+}
