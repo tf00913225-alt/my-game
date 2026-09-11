@@ -3793,3 +3793,12 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 本輪兩張附件與既有 V173.20 使用者啟動素材位元組一致；Logo=`assets/ui/startup-logo.4631c0bc3f2b.jpg`，第二幕新增 content-addressed alias `assets/ui/startup-main-city.d43e67af1c1c.jpg`，沒有重新生成圖片。
 - `js/52-v173.20-startup-loader.js` 仍是唯一 StartupStateMachine owner；900ms 僅控制 Logo→第二幕，真實 Firebase/Auth/save 全程並行且 readiness 不等待動畫。
 - `css/firebase-auth.css` 將登入框縮至最多 390px、縮小文字但保留 44px 觸控高度，登入背景持續使用第二幕慢推。兩張圖均進 Critical preload/immutable cache；非必要 gameplay 資產仍維持 lazy。
+
+
+## 2026-09-11 隱私權政策同意 gate
+
+- `privacy-consent.html` 是隱私權政策首次同意與後續查看的唯一 owner；正式政策本文仍由 `privacy.html` 單一維護。
+- `index.html` 只掛一個最高層級同源 iframe gate，不新增第二套 Auth／Startup State Machine。首次未同意時必須把政策滑到底才開始 5 秒倒數，倒數完畢才可按「我同意」；同意版本以 `four_symbols_privacy_consent_version` 儲存在同源 localStorage。
+- 「不同意」先嘗試關閉視窗；因一般瀏覽器通常禁止網頁自行關閉使用者開啟的分頁，失敗時改導向 `privacy-declined.html` 並終止遊戲介面。
+- 同意 gate 持續以隱藏 iframe 作 owner，動態為登入頁插入「隱私權政策」入口，並在主城「系統」的客服列後插入同一入口；兩者皆重新開啟相同政策 viewer，不複製政策本文。
+- 本功能不修改 Firebase UID、登入 provider、存檔、角色資料、戰鬥、掉落或遊戲數值。
