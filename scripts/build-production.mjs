@@ -14,7 +14,7 @@ const slash=value=>value.split(path.sep).join("/");
 
 const release=JSON.parse(read("release/release.json"));
 const featureTemplate=JSON.parse(read("config/feature-manifest.json"));
-const criticalLogoPath="assets/ui/startup-logo.4631c0bc3f2b.jpg";
+const criticalImagePaths=["assets/ui/startup-logo.4631c0bc3f2b.jpg","assets/ui/startup-main-city.d43e67af1c1c.jpg"];
 
 const bootScripts=[
     "js/startup/support-contact.js",
@@ -45,7 +45,6 @@ const appScripts=[
     "js/17-stage-v60-training-render-guard.js",
     "js/18-stage-v64-character-touch-action-runtime.js",
     "js/19-stage-v78-character-inventory-runtime.js",
-    "js/22-v124-character-creation-native-runtime.js",
     "js/23-v125-character-creation-bootstrap.js",
     "js/24-v125-character-creation-native-runtime.js",
     "js/20-anonymous-20.js",
@@ -98,7 +97,7 @@ const appStyles=[
     "css/04-v119-ally-target-style.css","css/06-stage-v11-native-bottom-nav.css","css/07-stage-v13-native-map-nav.css",
     "css/08-stage-v14-character-scroll-fix.css","css/09-stage-v15-native-character-shell.css",
     "css/19-stage-v54-main-city-moderate-native-scale.css","css/20-stage-v60-training-only-safety.css",
-    "css/21-stage-v64-character-touch-action-bridge.css","css/28-v124-character-creation-native.css",
+    "css/21-stage-v64-character-touch-action-bridge.css",
     "css/30-v130-requested-updates.css","css/56-v174-critical-ui-regressions.css","css/ad-free-service-info-modal.css"
 ];
 const gameplayStyles=[
@@ -229,12 +228,12 @@ const bootPrefix=`window.__FOUR_SYMBOLS_BUILD__=Object.freeze(${JSON.stringify({
 const bootOutput=target("boot-core","js",combineScripts(bootScripts,bootPrefix));
 writeTarget(bootOutput);
 
-const criticalLogo={path:criticalLogoPath,content:bytes(criticalLogoPath),digest:hash(bytes(criticalLogoPath))};
-if(!criticalLogoPath.includes(`.${criticalLogo.digest}.`)){ throw new Error("Critical logo filename is not content-addressed."); }
-const declared=[bootOutput,...Object.values(scriptOutputs),...Object.values(styleOutputs),...firebaseOutputs,criticalLogo];
+const criticalImages=criticalImagePaths.map(file=>({path:file,content:bytes(file),digest:hash(bytes(file))}));
+for(const asset of criticalImages){ if(!asset.path.includes(`.${asset.digest}.`)){ throw new Error(`Critical image filename is not content-addressed: ${asset.path}`); } }
+const declared=[bootOutput,...Object.values(scriptOutputs),...Object.values(styleOutputs),...firebaseOutputs,...criticalImages];
 const assetManifest={
     schemaVersion:1,release:release.version,generatedAt:"deterministic",
-    critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[criticalLogoPath],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},
+    critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[...criticalImagePaths],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},
     featureManifest,
     assets:Object.fromEntries(declared.map(item=>[item.path,{sha256:item.digest,bytes:Buffer.byteLength(item.content)}]))
 };
@@ -258,7 +257,7 @@ function normalizedIndex(source){
         source=source.replace("</body>",scriptBlock+"\n</body>");
     }
     source=source.replace(/<img\b[^>]*>/gi,tag=>{
-        if(/startup-logo-image/.test(tag)){
+        if(/startup-(?:logo|city)-image/.test(tag)){
             return /fetchpriority=/.test(tag)?tag:tag.replace(/>$/,' fetchpriority="high">');
         }
         let value=tag;

@@ -1,3 +1,12 @@
+## 2026-09-11 多對話 dev 分支稽核與 ancestry 收斂
+
+- 稽核基準為 GitHub `dev@fa21dc23971909556d65357c4e8e012c97b413d9`、`main@3d3e529e8e74dcced3dfcf8f82bac772a588d4a7`；稽核時遠端共有 100 個 branch heads，其中 76 個工作／整合分支已是 dev ancestor，沒有任何 branch 是建立在最新 dev 之上的未合併 descendant。
+- 2026-09-11 同時多對話產生的有效工作已依序存在於同一條 dev：冷啟動創角 lifecycle、創角第 2 步底部 actions、兩幕 boot intro 與 compact auth overlay、privacy policy，以及 Facebook mobile redirect；最新 dev 的 Repository checks 與 Cloudflare exact-SHA deployment 均為 SUCCESS，不存在三套互相競爭的程式碼。
+- 唯一需要收斂的是 protected main release merges 的 ancestry。`git merge-tree --write-tree dev main` 產生 tree `8d06fde7d9442b8f0c14562822ec7fef421a055e`，與合併前 dev tree 完全相同；整合 commit `6ae1b494f5c24858bed329cabe4a33eacc5983a6` 因此只增加 main parent，不改任何遊戲、UI、build、release metadata、Firebase、存檔或玩家資料。
+- 舊草稿 PR #146／`fix/ui-equipment-gameplay-city-polish` 已由 `fix/ui-equipment-gameplay-city-polish-continued@26a67473128674c91fa363cefbd33e5f3f1c8034` 的安全 owner-converged 版本取代，並早已透過 `2f3dc7d13df8e3c629b0544b52c494416a6f6ab1` 合入 dev；PR #146 已留下 superseded 說明後關閉，禁止再次合入舊 manifest／build。
+- `feature/facebook-login` 的 branch aggregate patch 與 dev integration commit `2d713dd08bee8efa7abf0ad18b61c950c9af9fa8` patch-id 完全相同，後續 mobile redirect 亦已在 dev；此舊分支不需再 merge。`noop`／`noop3`／`noop4` 只新增占位檔，`assets-library` 仍為素材專用，其餘 divergent branches 均是已取代的舊基底或歷史 release／verification branch，皆不得直接合入目前 dev。
+- 本次只以 PR #162 整理 ancestry 與本交接紀錄；Game／Cache Version 維持 V173.65／173.65，`main` 不修改。Repository checks 成功且 PR 合入後，必須再次確認 dev HEAD、Cloudflare deployed manifest SHA 與版本一致，才可回報完成。
+
 ## 2026-09-10 四分支安全整合：Boss 9:16 手機版面（dev integration）
 
 - 指定工作分支 `fix/boss-ui-9x16-mobile-20260910@0865bbaef3e8c1ee5f054bf4774bc800db9f7ec2` 的 Boss 與機制卡 9:16 CSS 已整合到正式 owner `css/gameplay-boss-tower.css`。
@@ -3736,3 +3745,30 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 新秘寶主城圖使用 content-hashed 路徑 `assets/ui/home-relic-v174.eed14e806044.webp`；舊無 hash URL 不覆寫，避免既有客戶端快取沿用錯誤內容。
 - 裝備副本品階機率由 `EQUIPMENT_CHEST_DROP_TABLE` 經 `equipmentChestOddsText()` 產生，不再把 40/40/10/10 複製到 CSS 偽元素。
 - CI 的窄螢幕 fixture 證實文字獎勵框原本仍可因 392px 上限溢出；正式 owner 已改用 `calc(100vw - 32px)`／`calc(100dvh - 32px)`。QA 以明確 390×844／412×915 overlay surface 驗證四邊 containment，不把 CI Chrome 的 500px 最小 `innerWidth` 誤稱為手機 viewport。
+
+
+## 2026-09-11 — Cold-start 創角 Native lifecycle 修復（PR #157）
+
+- 基準：`dev@29f83030d6427f2641952745243291b35731659a`；工作分支 `fix/cold-start-character-creation-lifecycle-20260911`。`main` 未修改。
+- 根因：account-first Startup State Machine 在 `NEED_CHARACTER` 直接把 `#creationPage` 設成 `display:block`，繞過 `FourSymbolsGameSave.showCreation()` 與 `js/24-v125-character-creation-native-runtime.js` 的 Native 啟用流程；Android Chrome 因而可能在第一個可見 frame 缺少 `creation-fixed-active` / `creation-native-active`，讓 legacy `#app` / overlay 仍參與 paint/compositing。
+- 修正：`js/52-v173.20-startup-loader.js` 新增 fail-closed 的 `showCharacterCreationSurface()`，只透過 canonical `FourSymbolsGameSave.showCreation()` 進入創角，並在 startup loader 尚覆蓋舞台時先完成 Native layer migration / isolation，再淡出 loader。禁止再由 startup owner 直接 `display:block`。
+- 清理：production `app-shell` 不再打包退役的 `js/22-v124-character-creation-native-runtime.js` 與 `css/28-v124-character-creation-native.css`；保留 `js/23` bootstrap + `js/24` runtime + critical `css/29` 為目前創角 owner，避免舊版 `overflow-y:auto` / `touch-action:pan-y` / isolation 規則在新版固定 canvas 後方重新覆寫。
+- Browser QA：390×844、DPR 3、touch emulation 的 account-first 新 UID 冷啟動現在必須驗證 `#creationPage` 位於 `#game-overlay-layer`、`native-creation-page`、`creation-fixed-active`、`creation-native-active`、legacy `#app` inert 且不 paint、創角 canvas `overflow-y:clip` / `touch-action:none`，並以 `elementFromPoint()` 驗證「下一步」按鈕右側沒有被其他 layer 蓋住；Boot QA 不再強制 `--disable-gpu`。
+- Production build 仍由 `scripts/build-production.mjs` 產生 content-hash bundle / manifest；本輪不得用 query version 或臨時 CSS/JS patch 規避 owner。
+
+
+## 2026-09-11 — 創角第二頁底部操作列裁切修復
+
+- 基準：`dev@daf724a10802b6074fdcce3f0f9bee2e7f404ac4`；工作分支 `fix/creation-step2-bottom-actions-20260911`，`main` 不修改。
+- `css/29-v125-character-creation-native.css` 仍是固定 1080×1920 創角版面 owner；`js/24-v125-character-creation-native-runtime.js::applyCreationStep()` 只負責步驟切換，不新增 wrapper。
+- 根因：第二頁 `.creation-action-row` 是 fixed canvas 內的 flex child，但未鎖定 shrink；在真機字體／可用高度吃滿時，action row 可被壓縮到接近 0，而其 124～132px 子按鈕又被 `.creation-step{overflow:clip}` 裁掉，畫面只剩按鈕上緣。
+- 修正：step two 預留 154px 底部安全區，操作列改為在 step 內 `position:absolute; bottom:0`，並保留至少 132px row 高度；不開放整頁捲動、不改配點／建角邏輯。
+- 390×844、DPR 3、touch QA 會實際切到第二頁，驗證「上一步／開始冒險」高度至少 44px、完整落在 step/stage 內，且左右 hit-test 都由按鈕本身取得。
+
+
+## 2026-09-11 — 雙段啟動畫面＋第二幕登入覆蓋
+
+- 基準 `dev@f859f747301941f346f4d2b9590d3f3d87a06cd8`，分支 `feature/boot-intro-auth-overlay-20260911`；`main` 不修改。
+- 本輪兩張附件與既有 V173.20 使用者啟動素材位元組一致；Logo=`assets/ui/startup-logo.4631c0bc3f2b.jpg`，第二幕新增 content-addressed alias `assets/ui/startup-main-city.d43e67af1c1c.jpg`，沒有重新生成圖片。
+- `js/52-v173.20-startup-loader.js` 仍是唯一 StartupStateMachine owner；900ms 僅控制 Logo→第二幕，真實 Firebase/Auth/save 全程並行且 readiness 不等待動畫。
+- `css/firebase-auth.css` 將登入框縮至最多 390px、縮小文字但保留 44px 觸控高度，登入背景持續使用第二幕慢推。兩張圖均進 Critical preload/immutable cache；非必要 gameplay 資產仍維持 lazy。

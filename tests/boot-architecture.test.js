@@ -5,14 +5,18 @@ const path=require("node:path");
 
 const index=fs.readFileSync("index.html","utf8");
 const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
+const creationCss=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");
 const intent=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const authUi=fs.readFileSync("js/firebase/firebase-auth-ui.js","utf8");
 const headers=fs.readFileSync("_headers","utf8");
+const bootBrowserQa=fs.readFileSync(".github/scripts/run-boot-architecture-browser-qa.mjs","utf8");
 const abyssLiveQa=fs.readFileSync(".github/scripts/abyss-live-browser-qa-v2.mjs","utf8");
 const abyssLiveQaRunner=fs.readFileSync(".github/scripts/run-abyss-live-browser-qa.mjs","utf8");
 const mainCityRuntime=fs.readFileSync("js/16-stage-v54-main-city-runtime.js","utf8");
 const productionBuild=fs.readFileSync("scripts/build-production.mjs","utf8");
 const boot=JSON.parse(fs.readFileSync("config/boot-manifest.json","utf8"));
+assert.doesNotMatch(productionBuild,/js\/22-v124-character-creation-native-runtime\.js|css\/28-v124-character-creation-native\.css/,
+    "retired V124 creation owners must not re-enter the production app-shell");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
 const directScripts=[...index.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].map(match=>match[1]);
@@ -33,6 +37,25 @@ for(const name of forbiddenCritical){
 }
 assert.doesNotMatch(startup,/ensure\("gameplay-core"/);
 assert.match(startup,/async function resolveSaveFor\(user\)[\s\S]*?activeUser=user;[\s\S]*?startAppShell\(\);/);
+assert.match(startup,/function showCharacterCreationSurface\(\)[\s\S]*?saveOwner\.showCreation\(\);/,
+    "startup must enter creation through the app-shell creation lifecycle");
+const enterCreationPath=startup.slice(startup.indexOf("async function enterCreation"),startup.indexOf("function migration"));
+assert.match(enterCreationPath,/showCharacterCreationSurface\(\);/,
+    "NEED_CHARACTER must activate the canonical creation surface before becoming interactive");
+assert.doesNotMatch(enterCreationPath,/creation\.style\.display\s*=\s*["']block["']/,
+    "startup must not bypass the native creation lifecycle with direct display mutation");
+assert.match(bootBrowserQa,/creation-native-active/,
+    "mobile boot QA must verify native creation stage isolation");
+assert.match(bootBrowserQa,/creation-fixed-active/,
+    "mobile boot QA must verify fixed creation lifecycle activation");
+assert.match(bootBrowserQa,/hitInsideNext/,
+    "mobile boot QA must verify the visible CTA remains the hit target across its right side");
+assert.match(creationCss,/#creationPage \.creation-step-two\{[\s\S]*?padding-bottom:154px;/,
+    "fixed step two must reserve bottom space for its action row");
+assert.match(creationCss,/#creationPage \.creation-step-two > \.creation-action-row\{[\s\S]*?position:absolute;[\s\S]*?bottom:0;/,
+    "step-two actions must stay anchored inside the fixed creation canvas");
+assert.match(bootBrowserQa,/stepTwoBottomActions/,
+    "mobile boot QA must verify the second-step bottom actions are visible and hittable");
 const requireAuthPath=startup.slice(startup.indexOf("function requireAuth"),startup.indexOf("function fail"));
 const bootPath=startup.slice(startup.indexOf("async function boot"),startup.indexOf("global.FourSymbolsStartupPolicy"));
 assert.doesNotMatch(requireAuthPath,/startAppShell\(\);/,
@@ -83,4 +106,4 @@ for(const file of jsFiles){
     assert.equal((source.match(/[A-Za-z0-9+/]{8192,}={0,2}/g)||[]).length,0,file+" contains a large Base64-like payload");
 }
 
-console.log("✓ critical boot boundary, loader ownership, real progress and sprite retirement");
+console.log("✓ critical boot boundary, creation lifecycle, loader ownership, real progress and sprite retirement");

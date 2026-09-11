@@ -95,6 +95,18 @@ test("authentication UI supports Google, Facebook, email and Firebase anonymous 
     assert.match(touch, /\.firebase-auth-dialog/);
 });
 
+test("Facebook auth uses redirect on mobile and consumes redirect result before identity observation", ()=>{
+    assert.match(auth, /getRedirectResult/);
+    assert.match(auth, /signInWithRedirect/);
+    assert.match(auth, /function isMobileBrowser\(\)/);
+    assert.match(auth, /navigator\.userAgentData/);
+    assert.match(auth, /Android\|webOS\|iPhone\|iPad\|iPod/);
+    assert.match(auth, /await getRedirectResult\(firebaseAuth\)/);
+    assert.match(auth, /if\(isMobileBrowser\(\)\)\{[\s\S]*await signInWithRedirect\(auth, provider\);[\s\S]*return null;/);
+    assert.match(auth, /const credential = await signInWithPopup\(auth, provider\)/);
+    assert.match(docs, /mobile browsers use Firebase redirect/i);
+});
+
 test("one Critical Boot support owner serves login and in-game contact surfaces", ()=>{
     assert.match(support, /const EMAIL="tf00913225@gmail\.com"/);
     assert.match(support, /global\.FourSymbolsSupport=Object\.freeze/);

@@ -4,25 +4,26 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.da5a24648490.js"
+      "build/boot-core.c762ea2a274a.js"
     ],
     "styles": [
-      "build/boot-core.71f7ecfc4e95.css"
+      "build/boot-core.016dc8529603.css"
     ],
     "images": [
-      "assets/ui/startup-logo.4631c0bc3f2b.jpg"
+      "assets/ui/startup-logo.4631c0bc3f2b.jpg",
+      "assets/ui/startup-main-city.d43e67af1c1c.jpg"
     ],
-    "firebaseBootstrap": "build/firebase/firebase-bootstrap.597a85e95aec.js"
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.b2f21cfad05a.js"
   },
   "featureManifest": {
     "schemaVersion": 1,
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.4121e7bf3a8e.js"
+          "build/app-shell.a887e992c1b2.js"
         ],
         "styles": [
-          "build/app-shell.eb72b9ca5a99.css"
+          "build/app-shell.708fde4d340b.css"
         ],
         "dependencies": []
       },
@@ -121,13 +122,13 @@
     ]
   },
   "assets": {
-    "build/boot-core.da5a24648490.js": {
-      "sha256": "da5a24648490",
-      "bytes": 43156
+    "build/boot-core.c762ea2a274a.js": {
+      "sha256": "c762ea2a274a",
+      "bytes": 44849
     },
-    "build/app-shell.4121e7bf3a8e.js": {
-      "sha256": "4121e7bf3a8e",
-      "bytes": 923465
+    "build/app-shell.a887e992c1b2.js": {
+      "sha256": "a887e992c1b2",
+      "bytes": 911496
     },
     "build/gameplay-core.eab9b555eb24.js": {
       "sha256": "eab9b555eb24",
@@ -153,13 +154,13 @@
       "sha256": "66dc0818b8ae",
       "bytes": 65339
     },
-    "build/boot-core.71f7ecfc4e95.css": {
-      "sha256": "71f7ecfc4e95",
-      "bytes": 219878
+    "build/boot-core.016dc8529603.css": {
+      "sha256": "016dc8529603",
+      "bytes": 222833
     },
-    "build/app-shell.eb72b9ca5a99.css": {
-      "sha256": "eb72b9ca5a99",
-      "bytes": 110538
+    "build/app-shell.708fde4d340b.css": {
+      "sha256": "708fde4d340b",
+      "bytes": 91836
     },
     "build/gameplay-core.3e9f850dc2ef.css": {
       "sha256": "3e9f850dc2ef",
@@ -185,25 +186,29 @@
       "sha256": "4314d6321ba1",
       "bytes": 1681
     },
-    "build/firebase/firebase-auth.a53b9f4c06d7.js": {
-      "sha256": "a53b9f4c06d7",
-      "bytes": 4354
+    "build/firebase/firebase-auth.c080d52b8d1b.js": {
+      "sha256": "c080d52b8d1b",
+      "bytes": 5299
     },
-    "build/firebase/firebase-cloud-save.e1ab7e7f2119.js": {
-      "sha256": "e1ab7e7f2119",
+    "build/firebase/firebase-cloud-save.726bc485129e.js": {
+      "sha256": "726bc485129e",
       "bytes": 4070
     },
-    "build/firebase/firebase-auth-ui.e6a76e6cf3a7.js": {
-      "sha256": "e6a76e6cf3a7",
+    "build/firebase/firebase-auth-ui.0fe250470a5b.js": {
+      "sha256": "0fe250470a5b",
       "bytes": 10574
     },
-    "build/firebase/firebase-bootstrap.597a85e95aec.js": {
-      "sha256": "597a85e95aec",
+    "build/firebase/firebase-bootstrap.b2f21cfad05a.js": {
+      "sha256": "b2f21cfad05a",
       "bytes": 4053
     },
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {
       "sha256": "4631c0bc3f2b",
       "bytes": 231951
+    },
+    "assets/ui/startup-main-city.d43e67af1c1c.jpg": {
+      "sha256": "d43e67af1c1c",
+      "bytes": 363193
     }
   }
 }

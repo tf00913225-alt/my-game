@@ -38,7 +38,6 @@ const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "js/17-stage-v60-training-render-guard.js",
     "js/18-stage-v64-character-touch-action-runtime.js",
     "js/19-stage-v78-character-inventory-runtime.js",
-    "js/22-v124-character-creation-native-runtime.js",
     "js/23-v125-character-creation-bootstrap.js",
     "js/24-v125-character-creation-native-runtime.js",
     "js/20-anonymous-20.js",

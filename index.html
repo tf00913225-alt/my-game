@@ -35,9 +35,10 @@
      Game viewport/scaling remains unchanged. -->
 
 
-<link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg">
+<link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.71f7ecfc4e95.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.016dc8529603.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -49,6 +50,7 @@
     aria-label="四象江湖傳正在載入"
     aria-live="polite"
     data-scene="logo"
+    data-logo-target-ms="900"
 >
     <div id="startupLogoScene" class="startup-scene startup-logo-scene is-active" aria-hidden="false">
         <img
@@ -61,6 +63,10 @@
         <i class="startup-element-light water" aria-hidden="true"></i>
         <i class="startup-element-light wind" aria-hidden="true"></i>
         <i class="startup-element-light earth" aria-hidden="true"></i>
+    </div>
+
+    <div id="startupCityScene" class="startup-scene startup-city-scene" aria-hidden="true">
+        <img class="startup-scene-image startup-city-image" src="assets/ui/startup-main-city.d43e67af1c1c.jpg" alt="" draggable="false" fetchpriority="high">
     </div>
 
     <div class="startup-vignette" aria-hidden="true"></div>
@@ -2793,7 +2799,7 @@
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
 <!-- build:critical-script -->
-<script id="boot-core-runtime" src="build/boot-core.da5a24648490.js"></script>
+<script id="boot-core-runtime" src="build/boot-core.c762ea2a274a.js"></script>
 <!-- /build:critical-script -->
 </body>
 </html>

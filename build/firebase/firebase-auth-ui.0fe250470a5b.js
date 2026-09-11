@@ -2,7 +2,7 @@
 import {
     createAccountWithEmail,getSignedInUser,signInAsAnonymous,signInWithEmail,
     signInWithFacebook,signInWithGoogle,signOutFirebase
-} from "./firebase-auth.a53b9f4c06d7.js";
+} from "./firebase-auth.c080d52b8d1b.js";
 
 const OVERLAY_ID="firebaseAuthOverlay";
 let installed=false;

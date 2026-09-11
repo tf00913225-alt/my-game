@@ -183,9 +183,12 @@ async function metrics(client,readyMark){
       const marks=Object.fromEntries(performance.getEntriesByType("mark").map(entry=>[entry.name,Math.round(entry.startTime*10)/10]));
       const ready=performance.getEntriesByName(${JSON.stringify(readyMark)}).at(-1)?.startTime||0;
       const ext=entry=>new URL(entry.name).pathname.toLowerCase();
+      const isJs=entry=>ext(entry).endsWith(".js")||ext(entry).endsWith(".mjs");
+      const isCss=entry=>ext(entry).endsWith(".css");
+      const isImage=entry=>[".png",".jpg",".jpeg",".webp",".svg",".gif",".avif"].some(suffix=>ext(entry).endsWith(suffix));
       const beforeReady=resources.filter(entry=>entry.startTime<=ready);
       const sum=entries=>entries.reduce((total,entry)=>total+(entry.transferSize||0),0);
-      return {readyMs:Math.round(ready*10)/10,firstPaintMs:Math.round((performance.getEntriesByName("first-paint")[0]?.startTime||0)*10)/10,firstContentfulPaintMs:Math.round((performance.getEntriesByName("first-contentful-paint")[0]?.startTime||0)*10)/10,requestCount:resources.length+1,criticalRequestCount:beforeReady.length+1,jsRequestCount:resources.filter(entry=>/\\.(?:js|mjs)$/.test(ext(entry))).length,cssRequestCount:resources.filter(entry=>/\\.css$/.test(ext(entry))).length,imageRequestCount:resources.filter(entry=>/\\.(?:png|jpe?g|webp|svg|gif|avif)$/.test(ext(entry))).length,totalTransferredBytes:(navigation?.transferSize||0)+sum(resources),criticalTransferredBytes:(navigation?.transferSize||0)+sum(beforeReady),resources:resources.map(entry=>({path:new URL(entry.name).pathname,startMs:Math.round(entry.startTime*10)/10,endMs:Math.round(entry.responseEnd*10)/10,transferBytes:entry.transferSize||0,initiatorType:entry.initiatorType})),marks};
+      return {readyMs:Math.round(ready*10)/10,firstPaintMs:Math.round((performance.getEntriesByName("first-paint")[0]?.startTime||0)*10)/10,firstContentfulPaintMs:Math.round((performance.getEntriesByName("first-contentful-paint")[0]?.startTime||0)*10)/10,requestCount:resources.length+1,criticalRequestCount:beforeReady.length+1,jsRequestCount:resources.filter(isJs).length,cssRequestCount:resources.filter(isCss).length,imageRequestCount:resources.filter(isImage).length,totalTransferredBytes:(navigation?.transferSize||0)+sum(resources),criticalTransferredBytes:(navigation?.transferSize||0)+sum(beforeReady),resources:resources.map(entry=>({path:new URL(entry.name).pathname,startMs:Math.round(entry.startTime*10)/10,endMs:Math.round(entry.responseEnd*10)/10,transferBytes:entry.transferSize||0,initiatorType:entry.initiatorType})),marks};
     })()`);
 }
 
@@ -195,7 +198,7 @@ const address=server.address();
 const origin=`http://127.0.0.1:${address.port}`;
 const debugPort=9400+(process.pid%400);
 const profile=path.join("/tmp","four-symbols-boot-qa-"+process.pid);
-const chrome=spawn(chromeBinary(),["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--hide-scrollbars",`--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,"--window-size=390,844","about:blank"],{stdio:["ignore","pipe","pipe"]});
+const chrome=spawn(chromeBinary(),["--headless=new","--no-sandbox","--disable-dev-shm-usage","--hide-scrollbars",`--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,"--window-size=390,844","about:blank"],{stdio:["ignore","pipe","pipe"]});
 let chromeStderr="";chrome.stderr.on("data",chunk=>{chromeStderr+=String(chunk);});
 let client=null;
 
@@ -224,12 +227,80 @@ try{
     assert.deepEqual(signedOut.featureResources,[],"Signed-out Critical Boot fetched an authenticated/gameplay feature");
     evidence.checks.authFirst=signedOut;evidence.performance.coldAuth=await metrics(client,"four-symbols:auth-ui-interactive");
     assert.ok(evidence.performance.coldAuth.readyMs>0&&evidence.performance.coldAuth.readyMs<=5000,"Controlled cold auth UI budget exceeded");
+    const authPresentation=await client.eval(`(()=>{const o=document.getElementById("firebaseAuthOverlay"),d=o.querySelector(".firebase-auth-dialog"),t=o.querySelector(".firebase-auth-title"),r=d.getBoundingClientRect(),bg=getComputedStyle(o,"::before").backgroundImage;return {backdrop:bg,dialogWidth:r.width,titleFont:parseFloat(getComputedStyle(t).fontSize),cityRequested:performance.getEntriesByType("resource").some(e=>new URL(e.name).pathname.endsWith("/assets/ui/startup-main-city.d43e67af1c1c.jpg"))};})()`);
+    assert.match(authPresentation.backdrop,/startup-main-city\.d43e67af1c1c\.jpg/);assert.ok(authPresentation.dialogWidth<=390);assert.ok(authPresentation.titleFont<=27);assert.equal(authPresentation.cityRequested,true);evidence.checks.authPresentation=authPresentation;
 
     await client.eval(`document.getElementById("firebaseGuestButton").click()`);
-    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='NEED_CHARACTER'&&getComputedStyle(document.getElementById('creationPage')).display!=='none'","guest character creation");
-    const guest=await client.eval(`(()=>({uid:FourSymbolsStartupPolicy.getUid(),activeUid:FourSymbolsAccountSave.getActiveUid(),state:FourSymbolsStartupPolicy.getState(),canCreate:FourSymbolsStartupPolicy.canCreateCharacter(),accountSave:localStorage.getItem("four_symbols_save:uid-guest"),legacy:localStorage.getItem("battle_full_version_save_v5")}))()`);
+    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='NEED_CHARACTER'&&performance.getEntriesByName('four-symbols:character-creation-interactive').length>0&&getComputedStyle(document.getElementById('creationPage')).display!=='none'","guest character creation");
+    const guest=await client.eval(`(()=>{
+      const creation=document.getElementById("creationPage");
+      const stage=document.getElementById("game-stage");
+      const app=document.getElementById("app");
+      const next=document.getElementById("creationPrimaryNextButton");
+      const nextRect=next.getBoundingClientRect();
+      const stageRect=stage.getBoundingClientRect();
+      const hit=document.elementFromPoint(Math.max(nextRect.left+1,nextRect.right-2),nextRect.top+nextRect.height/2);
+      return {
+        uid:FourSymbolsStartupPolicy.getUid(),
+        activeUid:FourSymbolsAccountSave.getActiveUid(),
+        state:FourSymbolsStartupPolicy.getState(),
+        canCreate:FourSymbolsStartupPolicy.canCreateCharacter(),
+        accountSave:localStorage.getItem("four_symbols_save:uid-guest"),
+        legacy:localStorage.getItem("battle_full_version_save_v5"),
+        creationParent:creation.parentElement?.id||null,
+        nativeCreation:creation.classList.contains("native-creation-page"),
+        fixedMode:document.documentElement.classList.contains("creation-fixed-active")&&document.body.classList.contains("creation-fixed-active"),
+        stageActive:stage.classList.contains("creation-native-active"),
+        appInert:app.inert,
+        appDisplay:getComputedStyle(app).display,
+        creationOverflowY:getComputedStyle(creation).overflowY,
+        creationTouchAction:getComputedStyle(creation).touchAction,
+        hitInsideNext:!!hit&&next.contains(hit),
+        nextRect:{left:nextRect.left,right:nextRect.right,top:nextRect.top,bottom:nextRect.bottom,width:nextRect.width,height:nextRect.height},
+        stageRect:{left:stageRect.left,right:stageRect.right,top:stageRect.top,bottom:stageRect.bottom,width:stageRect.width,height:stageRect.height}
+      };
+    })()`);
     assert.equal(guest.uid,"uid-guest");assert.equal(guest.activeUid,"uid-guest");assert.equal(guest.canCreate,true);assert.equal(guest.accountSave,null);assert.equal(guest.legacy,null);
+    assert.equal(guest.creationParent,"game-overlay-layer","Cold-start creation page did not migrate to the native overlay");
+    assert.equal(guest.nativeCreation,true,"Cold-start creation page missed native geometry activation");
+    assert.equal(guest.fixedMode,true,"Cold-start creation page missed fixed mobile lifecycle activation");
+    assert.equal(guest.stageActive,true,"Cold-start creation page did not isolate the native stage");
+    assert.equal(guest.appInert,true,"Legacy app remained interactive behind character creation");
+    assert.equal(guest.appDisplay,"none","Legacy app remained painted behind character creation");
+    assert.equal(guest.creationOverflowY,"clip","Retired V124 scroll CSS is still overriding the fixed creation canvas");
+    assert.equal(guest.creationTouchAction,"none","Retired V124 pan-y CSS is still overriding the fixed creation canvas");
+    assert.equal(guest.hitInsideNext,true,"Right side of the creation CTA is covered by another paint/hit-test layer");
+    assert.ok(guest.nextRect.left>=guest.stageRect.left-1&&guest.nextRect.right<=guest.stageRect.right+1&&guest.nextRect.top>=guest.stageRect.top-1&&guest.nextRect.bottom<=guest.stageRect.bottom+1,"Creation CTA escaped the rendered stage");
     evidence.checks.anonymousBeforeCreation=guest;evidence.performance.guestCreation=await metrics(client,"four-symbols:character-creation-interactive");
+
+
+    await client.eval(`document.getElementById("creationPrimaryNextButton").click()`);
+    await waitFor(client,"document.getElementById('creationStepTwo')?.classList.contains('is-active')&&!document.getElementById('creationStepTwo')?.hidden","creation step two");
+    const stepTwoActions=await client.eval(`(()=>{
+      const stage=document.getElementById("game-stage");
+      const step=document.getElementById("creationStepTwo");
+      const row=step.querySelector(":scope > .creation-action-row");
+      const back=row.querySelector(".creation-back:not([hidden])");
+      const submit=document.getElementById("creationSubmitButton");
+      const rect=node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
+      const stageRect=rect(stage),stepRect=rect(step),rowRect=rect(row),backRect=rect(back),submitRect=rect(submit);
+      const backHit=document.elementFromPoint(backRect.left+backRect.width/2,backRect.top+backRect.height/2);
+      const submitHit=document.elementFromPoint(Math.max(submitRect.left+1,submitRect.right-2),submitRect.top+submitRect.height/2);
+      return {
+        rowPosition:getComputedStyle(row).position,
+        rowRect,backRect,submitRect,stepRect,stageRect,
+        backHit:!!backHit&&back.contains(backHit),
+        submitHit:!!submitHit&&submit.contains(submitHit)
+      };
+    })()`);
+    assert.equal(stepTwoActions.rowPosition,"absolute","Step-two actions are not pinned to the fixed canvas");
+    assert.ok(stepTwoActions.backRect.height>=44,"Step-two back button collapsed below the mobile touch target floor");
+    assert.ok(stepTwoActions.submitRect.height>=44,"Step-two submit button collapsed below the mobile touch target floor");
+    assert.ok(stepTwoActions.rowRect.top>=stepTwoActions.stepRect.top-1&&stepTwoActions.rowRect.bottom<=stepTwoActions.stepRect.bottom+1,"Step-two action row escaped the visible creation step");
+    assert.ok(stepTwoActions.backRect.left>=stepTwoActions.stageRect.left-1&&stepTwoActions.submitRect.right<=stepTwoActions.stageRect.right+1,"Step-two buttons escaped the rendered stage horizontally");
+    assert.equal(stepTwoActions.backHit,true,"Step-two back button is covered by another layer");
+    assert.equal(stepTwoActions.submitHit,true,"Step-two submit button right side is covered or clipped");
+    evidence.checks.stepTwoBottomActions=stepTwoActions;
 
     for(const failure of [{scenario:"auth-error",code:"auth"},{scenario:"cloud-error",code:"cloud"},{scenario:"corrupt",code:"corrupt"}]){
         await clear();await navigate(failure.scenario);await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='ERROR'",failure.code+" fail-closed");
@@ -261,13 +332,13 @@ try{
     await waitFor(client,"FourSymbolsFeatures.isReady('dungeon')&&document.getElementById('dungeonPage').classList.contains('active')","lazy dungeon entry",15000);
     evidence.checks.dungeonEntry=await client.eval(`(()=>({ready:FourSymbolsFeatures.isReady("dungeon"),active:document.getElementById("dungeonPage").classList.contains("active"),startupState:FourSymbolsStartupPolicy.getState()}))()`);
 
-    const beforePatrol=await client.eval(`performance.getEntriesByType("resource").filter(entry=>/assets\\/characters\\/patrol\\/patrol-/.test(entry.name)).length`);assert.equal(beforePatrol,0,"Patrol art loaded before patrol feature");
+    const beforePatrol=await client.eval(`performance.getEntriesByType("resource").filter(entry=>new URL(entry.name).pathname.includes("/assets/characters/patrol/patrol-")).length`);assert.equal(beforePatrol,0,"Patrol art loaded before patrol feature");
     const idle=await client.eval(`(()=>{const callback=window.__qaIdleCallbacks.shift();if(callback){callback({didTimeout:false,timeRemaining:()=>50});}return {released:!!callback,remaining:window.__qaIdleCallbacks.length};})()`);assert.equal(idle.released,true,"Background idle preload was not scheduled");
-    await waitFor(client,"performance.getEntriesByType('resource').some(entry=>/feature-patrol\\.[0-9a-f]{12}\\.js/.test(entry.name))","idle patrol preload",10000);
+    await waitFor(client,"performance.getEntriesByType('resource').some(entry=>{const path=new URL(entry.name).pathname;return path.includes('/feature-patrol.')&&path.endsWith('.js');})","idle patrol preload",10000);
     assert.equal(await client.eval(`FourSymbolsFeatures.isReady("patrol")`),false,"Idle preload executed patrol code instead of only fetching it");
     const patrol=await client.eval(`(()=>{const button=document.createElement("button");button.id="qaPatrolFeature";button.dataset.feature="patrol";button.textContent="patrol";button.onclick=()=>{const page=document.getElementById("mapPage");page.classList.add("active");page.style.display="block";document.getElementById("patrolCharacterImg").loading="eager";};document.body.appendChild(button);button.dispatchEvent(new PointerEvent("pointerdown",{bubbles:true,pointerType:"touch",pointerId:9}));button.click();return true;})()`);assert.equal(patrol,true);
-    await waitFor(client,"FourSymbolsFeatures.isReady('patrol')&&performance.getEntriesByType('resource').some(entry=>/assets\\/characters\\/patrol\\/patrol-.*\\.[0-9a-f]{12}\\.webp/.test(entry.name))","lazy patrol art",15000);
-    evidence.checks.patrolLazy=await client.eval(`(()=>({ready:FourSymbolsFeatures.isReady("patrol"),assetRequests:performance.getEntriesByType("resource").map(entry=>new URL(entry.name).pathname).filter(path=>/assets\\/characters\\/patrol\\/patrol-/.test(path)),startupState:FourSymbolsStartupPolicy.getState()}))()`);
+    await waitFor(client,"FourSymbolsFeatures.isReady('patrol')&&performance.getEntriesByType('resource').some(entry=>{const path=new URL(entry.name).pathname;return path.includes('/assets/characters/patrol/patrol-')&&path.endsWith('.webp');})","lazy patrol art",15000);
+    evidence.checks.patrolLazy=await client.eval(`(()=>({ready:FourSymbolsFeatures.isReady("patrol"),assetRequests:performance.getEntriesByType("resource").map(entry=>new URL(entry.name).pathname).filter(path=>path.includes("/assets/characters/patrol/patrol-")),startupState:FourSymbolsStartupPolicy.getState()}))()`);
 
     await client.eval(`FourSymbolsStartupPolicy.openAccountManager();document.getElementById("firebaseSignOutButton").click()`);
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","signed-out state after account A",15000);

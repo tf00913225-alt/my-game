@@ -1,4 +1,4 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstrap":"build/firebase/firebase-bootstrap.597a85e95aec.js"});
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstrap":"build/firebase/firebase-bootstrap.b2f21cfad05a.js"});
 
 /* bundled source: js/startup/support-contact.js */
 /* =====================================================
@@ -562,6 +562,8 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     if(!contract){ throw new Error("Startup contract must load before its state-machine owner."); }
     const STATES=contract.STATES;
     const root=document.getElementById("startupLoader");
+    const logoScene=document.getElementById("startupLogoScene");
+    const cityScene=document.getElementById("startupCityScene");
     const title=document.getElementById("startupStatusTitle");
     const detail=document.getElementById("startupStatusDetail");
     const percent=document.getElementById("startupPercent");
@@ -570,6 +572,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     const creation=document.getElementById("creationPage");
     const game=document.getElementById("gameInterface");
     const build=global.__FOUR_SYMBOLS_BUILD__||{};
+    const introLogoTargetMs=Math.max(350,Math.min(1800,Number(root&&root.dataset.logoTargetMs)||900));
     let state=STATES.BOOT_LOADING;
     let activeUser=null;
     let resolvedUid=null;
@@ -578,6 +581,8 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     let transitionToken=0;
     let firebase=null;
     let lastError=null;
+    let introTimer=0;
+    let citySceneShown=false;
 
     function mark(name){
         try{ if(global.performance&&typeof global.performance.mark==="function"){ global.performance.mark(name); } }catch(_){ }
@@ -587,6 +592,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     if(game){ game.style.display="none"; }
     if(root){ root.hidden=false; root.dataset.owner="StartupStateMachine"; root.dataset.state=state; }
     mark("four-symbols:boot-core-ready");
+    scheduleCityScene();
 
     // Signed-out players need only the account surface. Start the application
     // shell after Firebase has produced a UID, then overlap it with save I/O.
@@ -617,9 +623,23 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         state=next; if(root){ root.dataset.state=state; }
         emit("four-symbols:startup-state",payload); return state;
     }
+    function showCityScene(reason="boot-progress"){
+        if(citySceneShown){ return; }
+        citySceneShown=true;
+        if(introTimer){ global.clearTimeout(introTimer); introTimer=0; }
+        if(logoScene){ logoScene.classList.remove("is-active"); logoScene.setAttribute("aria-hidden","true"); }
+        if(cityScene){ cityScene.classList.add("is-active"); cityScene.setAttribute("aria-hidden","false"); }
+        if(root){ root.dataset.scene="city"; root.dataset.sceneReason=reason; }
+        mark("four-symbols:intro-city-visible");
+    }
+    function scheduleCityScene(){
+        if(!root||citySceneShown||introTimer){ return; }
+        introTimer=global.setTimeout(()=>showCityScene("logo-target"),introLogoTargetMs);
+    }
     function showLoader(){ if(root){ root.hidden=false; root.classList.remove("is-leaving"); root.setAttribute("aria-hidden","false"); } }
     function hideLoader(){
         if(!root){ return Promise.resolve(); }
+        showCityScene("destination-ready");
         root.classList.add("is-leaving");
         return new Promise(resolve=>global.setTimeout(()=>{ root.hidden=true; root.setAttribute("aria-hidden","true"); resolve(); },360));
     }
@@ -656,6 +676,17 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
             throw new Error("Gameplay save owner refused the resolved Firebase UID.");
         }
     }
+    function showCharacterCreationSurface(){
+        const saveOwner=global.FourSymbolsGameSave;
+        if(!saveOwner||typeof saveOwner.showCreation!=="function"){
+            throw new Error("Character creation surface is unavailable after app-shell installation.");
+        }
+        saveOwner.showCreation();
+        if(!creation||global.getComputedStyle(creation).display==="none"){
+            throw new Error("Character creation surface did not become visible.");
+        }
+        creation.setAttribute("aria-hidden","false");
+    }
     async function enterReady(save,offline=false,token=transitionToken){
         showLoader(); render(92,"載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
         await Promise.all([requireAppShell(),domReady()]);
@@ -677,11 +708,11 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         activateGameplaySaveOwner();
         transition(STATES.NEED_CHARACTER,{uid:resolvedUid});
         firebase.closeAuth(); render(100,"帳號資料已確認","此 UID 尚無角色，可以建立角色");
+        showCharacterCreationSurface();
+        if(game){ game.style.display="none"; }
         mark("four-symbols:critical-ready");
         await hideLoader();
         if(state!==STATES.NEED_CHARACTER){ return; }
-        if(creation){ creation.style.display="block"; creation.setAttribute("aria-hidden","false"); }
-        if(game){ game.style.display="none"; }
         mark("four-symbols:character-creation-interactive");
         emit("four-symbols:character-creation-allowed",{uid:resolvedUid});
     }
@@ -693,6 +724,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         mark("four-symbols:critical-ready"); mark("four-symbols:migration-ui-interactive");
     }
     async function resolveSaveFor(user){
+        showCityScene("identity-resolved");
         const token=++transitionToken;
         activeUser=user; resolvedUid=user.uid; saveResolved=false; cloudResult=null; lastError=null;
         startAppShell();
@@ -767,6 +799,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         return enterCreation(token).catch(error=>fail(error,"創角介面載入失敗。",token));
     }
     function requireAuth(){
+        showCityScene("auth-required");
         activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null;
         if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }else{ global.FourSymbolsAccountSave.deactivate(); }
         transition(STATES.AUTH_REQUIRED); render(100,"帳號服務已就緒","請登入、註冊或以 Firebase 訪客 UID 開始");
@@ -776,6 +809,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     }
     function fail(error,message,token=transitionToken){
         if(token!==transitionToken){ return; }
+        showCityScene("startup-error");
         lastError=error; saveResolved=false;
         if(state!==STATES.ERROR){ transition(STATES.ERROR,{error}); }
         showLoader(); render(Math.min(99,Number(progress&&progress.getAttribute("aria-valuenow"))||0),"啟動失敗",message);

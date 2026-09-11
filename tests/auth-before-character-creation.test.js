@@ -25,7 +25,9 @@ assert.equal(contract.canCreateCharacter({state:S.NEED_CHARACTER,userUid:"uid-A"
 assert.equal(contract.canCreateCharacter({state:S.NEED_CHARACTER,userUid:"uid-A",resolvedUid:"uid-B",activeSaveUid:"uid-A",saveResolved:true}),false);
 assert.equal(contract.canCreateCharacter({state:S.NEED_CHARACTER,userUid:"uid-A",resolvedUid:"uid-A",activeSaveUid:"uid-A",saveResolved:false}),false);
 
-assert.equal((startup.match(/creation\.style\.display="block"/g)||[]).length,1,"startup owner has one creation reveal point");
+assert.equal((startup.match(/creation\.style\.display="block"/g)||[]).length,0,"startup must not directly reveal character creation");
+assert.match(startup,/function showCharacterCreationSurface\(\)[\s\S]*?saveOwner\.showCreation\(\)/,
+    "startup must enter creation through the canonical app-shell lifecycle");
 assert.match(startup,/safeCloudEmpty\(cloud,user\.uid\)[\s\S]*?enterCreation\(token\)/);
 assert.match(startup,/result&&result\.exists===false&&result\.uid===uid/,
     "a successful same-UID missing-document read is a proven empty account");
@@ -42,6 +44,8 @@ assert.match(startup,/await Promise\.all\(\[requireAppShell\(\),domReady\(\)\]\)
     "the resolved Firebase UID must activate the gameplay save owner after app-shell installation and before hydration");
 assert.match(startup,/async function enterCreation\(token=transitionToken\)[\s\S]{0,220}activateGameplaySaveOwner\(\);[\s\S]{0,100}transition\(STATES\.NEED_CHARACTER/,
     "new-character persistence must bind the gameplay save owner before creation is exposed");
+assert.match(startup,/async function enterCreation\(token=transitionToken\)[\s\S]{0,420}showCharacterCreationSurface\(\)/,
+    "the first visible creation frame must pass through native creation activation");
 assert.match(startup,/localBase===cloudFingerprint[\s\S]{0,220}selectedSave=local\.save/,
     "same-UID local progress may resume only while its verified cloud base is unchanged");
 assert.doesNotMatch(startup,/JSON\.stringify\(authoritative\)!==JSON\.stringify\(local\.save\)/,

@@ -941,6 +941,24 @@ body.creation-fixed-active{
     grid-template-columns:330px minmax(0,1fr);
     gap:22px;
     margin-top:auto;
+    flex:0 0 132px;
+    min-height:132px;
+}
+
+/* Step two is a fixed, non-scrollable 1080x1920 canvas. Keep its final
+   actions anchored inside the safe area instead of letting flex-shrink
+   collapse the row when typography or browser metrics consume more room. */
+#creationPage .creation-step-two{
+    padding-bottom:154px;
+}
+
+#creationPage .creation-step-two > .creation-action-row{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:40;
+    margin-top:0;
 }
 
 #creationPage .creation-start span{
