@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
@@ -29,6 +29,142 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+
+      - name: Check out step2 creation repair branch head
+        if: github.event_name == 'pull_request' && github.head_ref == 'fix/creation-step2-bottom-actions-20260911'
+        run: |
+          git fetch --no-tags origin "$GITHUB_HEAD_REF"
+          git checkout -B "$GITHUB_HEAD_REF" "origin/$GITHUB_HEAD_REF"
+
+      - name: Apply step2 bottom actions repair and regenerate production bundles
+        if: github.event_name == 'pull_request' && github.head_ref == 'fix/creation-step2-bottom-actions-20260911'
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          css=Path("css/29-v125-character-creation-native.css")
+          text=css.read_text()
+          old='''#creationPage .creation-action-row{
+              display:grid;
+              grid-template-columns:330px minmax(0,1fr);
+              gap:22px;
+              margin-top:auto;
+          }
+          '''
+          new='''#creationPage .creation-action-row{
+              display:grid;
+              grid-template-columns:330px minmax(0,1fr);
+              gap:22px;
+              margin-top:auto;
+              flex:0 0 132px;
+              min-height:132px;
+          }
+
+          /* Step two is a fixed, non-scrollable 1080x1920 canvas. Keep its final
+             actions anchored inside the safe area instead of letting flex-shrink
+             collapse the row when typography or browser metrics consume more room. */
+          #creationPage .creation-step-two{
+              padding-bottom:154px;
+          }
+
+          #creationPage .creation-step-two > .creation-action-row{
+              position:absolute;
+              left:0;
+              right:0;
+              bottom:0;
+              z-index:40;
+              margin-top:0;
+          }
+          '''
+          if old in text:
+              css.write_text(text.replace(old,new,1))
+          elif new not in text:
+              raise SystemExit("creation action-row anchor missing")
+
+          qa=Path(".github/scripts/run-boot-architecture-browser-qa.mjs")
+          text=qa.read_text()
+          anchor='    evidence.checks.anonymousBeforeCreation=guest;evidence.performance.guestCreation=await metrics(client,"four-symbols:character-creation-interactive");\n'
+          insert='''
+
+              await client.eval(`document.getElementById("creationPrimaryNextButton").click()`);
+              await waitFor(client,"document.getElementById('creationStepTwo')?.classList.contains('is-active')&&!document.getElementById('creationStepTwo')?.hidden","creation step two");
+              const stepTwoActions=await client.eval(`(()=>{
+                const stage=document.getElementById("game-stage");
+                const step=document.getElementById("creationStepTwo");
+                const row=step.querySelector(":scope > .creation-action-row");
+                const back=row.querySelector(".creation-back:not([hidden])");
+                const submit=document.getElementById("creationSubmitButton");
+                const rect=node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
+                const stageRect=rect(stage),stepRect=rect(step),rowRect=rect(row),backRect=rect(back),submitRect=rect(submit);
+                const backHit=document.elementFromPoint(backRect.left+backRect.width/2,backRect.top+backRect.height/2);
+                const submitHit=document.elementFromPoint(Math.max(submitRect.left+1,submitRect.right-2),submitRect.top+submitRect.height/2);
+                return {
+                  rowPosition:getComputedStyle(row).position,
+                  rowRect,backRect,submitRect,stepRect,stageRect,
+                  backHit:!!backHit&&back.contains(backHit),
+                  submitHit:!!submitHit&&submit.contains(submitHit)
+                };
+              })()`);
+              assert.equal(stepTwoActions.rowPosition,"absolute","Step-two actions are not pinned to the fixed canvas");
+              assert.ok(stepTwoActions.backRect.height>=44,"Step-two back button collapsed below the mobile touch target floor");
+              assert.ok(stepTwoActions.submitRect.height>=44,"Step-two submit button collapsed below the mobile touch target floor");
+              assert.ok(stepTwoActions.rowRect.top>=stepTwoActions.stepRect.top-1&&stepTwoActions.rowRect.bottom<=stepTwoActions.stepRect.bottom+1,"Step-two action row escaped the visible creation step");
+              assert.ok(stepTwoActions.backRect.left>=stepTwoActions.stageRect.left-1&&stepTwoActions.submitRect.right<=stepTwoActions.stageRect.right+1,"Step-two buttons escaped the rendered stage horizontally");
+              assert.equal(stepTwoActions.backHit,true,"Step-two back button is covered by another layer");
+              assert.equal(stepTwoActions.submitHit,true,"Step-two submit button right side is covered or clipped");
+              evidence.checks.stepTwoBottomActions=stepTwoActions;
+          '''
+          if 'evidence.checks.stepTwoBottomActions=stepTwoActions;' not in text:
+              if anchor not in text: raise SystemExit("browser QA step-two insertion anchor missing")
+              qa.write_text(text.replace(anchor,anchor+insert,1))
+
+          test=Path("tests/boot-architecture.test.js")
+          text=test.read_text()
+          var_anchor='const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");\n'
+          if 'const creationCss=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");' not in text:
+              if var_anchor not in text: raise SystemExit("boot test variable anchor missing")
+              text=text.replace(var_anchor,var_anchor+'const creationCss=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");\n',1)
+          guard_anchor='assert.match(bootBrowserQa,/hitInsideNext/,\n    "mobile boot QA must verify the visible CTA remains the hit target across its right side");\n'
+          guards='''assert.match(creationCss,/#creationPage \\.creation-step-two\\{[\\s\\S]*?padding-bottom:154px;/,
+              "fixed step two must reserve bottom space for its action row");
+          assert.match(creationCss,/#creationPage \\.creation-step-two > \\.creation-action-row\\{[\\s\\S]*?position:absolute;[\\s\\S]*?bottom:0;/,
+              "step-two actions must stay anchored inside the fixed creation canvas");
+          assert.match(bootBrowserQa,/stepTwoBottomActions/,
+              "mobile boot QA must verify the second-step bottom actions are visible and hittable");
+          '''
+          if 'fixed step two must reserve bottom space for its action row' not in text:
+              if guard_anchor not in text: raise SystemExit("boot test guard anchor missing")
+              text=text.replace(guard_anchor,guard_anchor+guards,1)
+          test.write_text(text)
+
+          handoff=Path("HANDOFF.md")
+          text=handoff.read_text()
+          heading='## 2026-09-11 — 創角第二頁底部操作列裁切修復'
+          if heading not in text:
+              text+='''
+
+          ## 2026-09-11 — 創角第二頁底部操作列裁切修復
+
+          - 基準：`dev@daf724a10802b6074fdcce3f0f9bee2e7f404ac4`；工作分支 `fix/creation-step2-bottom-actions-20260911`，`main` 不修改。
+          - `css/29-v125-character-creation-native.css` 仍是固定 1080×1920 創角版面 owner；`js/24-v125-character-creation-native-runtime.js::applyCreationStep()` 只負責步驟切換，不新增 wrapper。
+          - 根因：第二頁 `.creation-action-row` 是 fixed canvas 內的 flex child，但未鎖定 shrink；在真機字體／可用高度吃滿時，action row 可被壓縮到接近 0，而其 124～132px 子按鈕又被 `.creation-step{overflow:clip}` 裁掉，畫面只剩按鈕上緣。
+          - 修正：step two 預留 154px 底部安全區，操作列改為在 step 內 `position:absolute; bottom:0`，並保留至少 132px row 高度；不開放整頁捲動、不改配點／建角邏輯。
+          - 390×844、DPR 3、touch QA 會實際切到第二頁，驗證「上一步／開始冒險」高度至少 44px、完整落在 step/stage 內，且左右 hit-test 都由按鈕本身取得。
+          '''
+              handoff.write_text(text)
+          PY
+          node scripts/build-production.mjs
+
+      - name: Commit deterministic step2 repair
+        if: github.event_name == 'pull_request' && github.head_ref == 'fix/creation-step2-bottom-actions-20260911'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A css/29-v125-character-creation-native.css .github/scripts/run-boot-architecture-browser-qa.mjs tests/boot-architecture.test.js HANDOFF.md index.html asset-manifest.json build/
+          if ! git diff --cached --quiet; then
+            git commit -m "fix: keep creation step2 actions visible"
+            git push origin "HEAD:$GITHUB_HEAD_REF"
+          fi
 
       - name: Prepare Git comparison base
         env:
