@@ -74,6 +74,14 @@ jobs:
       - name: Run all Node unit and integration suites
         run: node .github/scripts/ci.mjs tests
 
+      - name: Upload temporary deterministic build capture
+        uses: actions/upload-artifact@v4
+        with:
+          name: temporary-build-capture-${{ github.sha }}
+          path: artifacts/build-capture
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Run account-first cold/warm mobile browser QA
         run: node .github/scripts/run-boot-architecture-browser-qa.mjs
 
