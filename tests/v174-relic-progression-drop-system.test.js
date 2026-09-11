@@ -157,6 +157,23 @@ function add(context,id,count){
     const {owned}=makeContext({explicitRelics:true});
     assert.equal(owned.relic_qiankun_flask.unlocked,true,"existing explicit relic ownership must never be revoked");
 }
+{
+    const {context,owned,saveDoc}=makeContext({savedPlayer:{id:"QA",level:19}});
+    assert.equal(Object.values(owned).filter(entry=>entry.unlocked).length,0,"Lv19 must remain on fragment acquisition only");
+    assert.equal(context.RelicProgressionSystem.getProgressionState().starterLv20Granted,false);
+    assert.equal(saveDoc.player.level,19);
+}
+{
+    const {context,owned,saveDoc}=makeContext({savedPlayer:{id:"QA",level:20}});
+    const catalog=context.v174RelicSystem.catalog;
+    const blueUnlocked=Object.values(catalog).filter(def=>def.rarity==="blue"&&def.runtimeReady&&owned[def.id].unlocked);
+    assert.equal(blueUnlocked.length,2,"the first character reaching Lv20 must have at least two blue relics ready to use");
+    assert.equal(owned.relic_qiankun_flask.unlocked,true);
+    assert.equal(owned.relic_xuanwu_seal.unlocked,true);
+    assert.equal(owned.relic_qinglan_feather.unlocked,false,"starter guarantee must stop after the minimum two relics");
+    assert.equal(context.RelicProgressionSystem.getProgressionState().starterLv20Granted,true);
+    assert.equal(saveDoc.player.relicProgression.starterLv20Granted,true,"starter claim must persist inside the UID main save player object");
+}
 
 /* 100 specific; 99 specific; 50 specific + 100 universal; 49 cannot bypass. */
 {

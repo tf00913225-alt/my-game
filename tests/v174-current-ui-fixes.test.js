@@ -15,7 +15,7 @@ const html=read("index.html");
 const manifest=JSON.parse(read("asset-manifest.json"));
 assert.match(inventoryCss,/#game-stage #inventoryPage \.v169-item-art\.v169-equipment-art\{[\s\S]*place-items:center;[\s\S]*object-fit:contain;/);
 assert.doesNotMatch(inventoryCss,/#game-stage #inventoryPage \.v169-item-art\.v169-equipment-art\{[^}]*!important/s);
-assert.match(hintCss,/#allElementSkillPreviewModal \.skill-preview-body::before\{[\s\S]*font-size:16px;[\s\S]*line-height:1\.45;/);
+assert.match(hintCss,/#allElementSkillPreviewModal \.skill-preview-body::before\{[\s\S]*克制：你的元素對目標有優勢。[\s\S]*被克制：目標元素對你有優勢。[\s\S]*土剋水｜水剋火｜火剋風｜風剋土[\s\S]*font-size:16px;[\s\S]*line-height:1\.55;[\s\S]*text-align:left;[\s\S]*white-space:pre-line;/);
 assert.doesNotMatch(hintCss,/body #game-stage #allElementSkillPreviewModal/);
 assert.match(rosterCss,/@media \(max-height:920px\)[\s\S]*v146-home-roster[\s\S]*margin-top:4px;[\s\S]*v146-home-character[\s\S]*min-height:78px;/);
 assert.match(relicCss,/team-relic-home-tools \.home-card-label\{[^}]*font-size:13px;[^}]*line-height:18px;[^}]*font-weight:900;/);

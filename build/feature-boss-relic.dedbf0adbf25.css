@@ -135,7 +135,8 @@
     position:relative;
     display:grid;
     width:100%;
-    min-height:120px;
+    aspect-ratio:16 / 9;
+    min-height:0;
     box-sizing:border-box;
     grid-template-columns:minmax(0,1fr) 78px;
     gap:10px;
@@ -220,7 +221,7 @@
 #game-stage .gameplay-mode-card.abyss .gameplay-mode-seal{ color:#b7c9ea; border-color:#5d7197; }
 #game-stage .gameplay-mode-card.tower .gameplay-mode-seal{ color:#e8875d; border-color:#9e5434; }
 #game-stage .gameplay-mode-card.coming-soon{
-    min-height:88px;
+    min-height:0;
     opacity:.67;
     cursor:default;
 }

@@ -1,3 +1,11 @@
+## 2026-09-11 Boss 強度／玩法 16:9／元素克制／Lv20 秘寶（工作分支實作）
+
+- 基準：`dev@eb9e9d78911ca5d72693c33aaab6002238291494`；工作分支 `feature/boss-balance-ui-relic-lv20-20260911`；`main` 不修改。
+- Boss owner 維持 `js/gameplay-boss-tower-system.js`：Boss 耐久以同級預期隊伍反推，Lv20～49 以 2 人、Lv50+ 以 3 人為基準；機制卡耐久／防禦提高；個人、世界與塔 Boss 依難度配置 0～2 名同元素真實菁英援軍，技能仍只由 Boss/援軍自身元素的 `ELEMENTS[element]` 清單產生。Boss 名稱改為玩法專屬稱號，避免沿用野怪／既有精英式命名。
+- 玩法中心活動卡正式 CSS owner `css/gameplay-boss-tower.css` 改為 16:9；全屬性技能預覽的 body-mounted 提示 owner `css/56-v174-critical-ui-regressions.css` 改為多行『克制／被克制／關係』說明。
+- 秘寶 acquisition owner `js/relic-progression-drop-system.js` 新增第一角色 Lv20 starter guarantee：至少兩件藍階 runtime-ready 秘寶，優先乾坤玉壺／玄武靈印；沿用既有 UID 主存檔與 `playerRelics`，不新增 storage sidecar、不新增 `checkLevelUp`／`saveGame` wrapper。
+- Requirement batch：`release/requirement-batches/2026-09-11-boss-balance-ui-relic-lv20.json` 已達 4/4 VERIFIED。隔離 build run `34569758633` 通過 deterministic build、Boss／秘寶 targeted tests，並以 Headless Chrome 驗證 390／412 寬活動卡 16:9、無 overflow、元素克制說明多行可讀；PR #169 Repository checks run `34570318795` 通過 223/223 JS syntax、147/147 Node suites、account-first／skill／relic mobile browser QA、resources、IDs、loader/release gate 與 git diff。Game／Cache Version 維持 V173.65；工作分支未合併 dev，main 未修改。
+
 ## 2026-09-11 Facebook public_profile DEV 診斷（TEMP）
 
 - 工作分支 `fix/facebook-public-profile-diagnostic`，基準為當時最新 `dev@8e1a2d9cf5f2a0f6b4551b2d42fddae419eb505f`。Android DEV 已反覆重現 Meta `Invalid Scopes: email` 與 `Error Facebook / 無法載入`；Firebase Authorized Domains、Meta App Domains、Firebase handler redirect、App ID、管理員角色，以及 Firebase mobile redirect 均已逐項排除。
