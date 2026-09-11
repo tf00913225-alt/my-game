@@ -88,7 +88,8 @@ test("authentication UI supports Google, Facebook, email and Firebase anonymous 
     assert.match(css, /\.firebase-auth-overlay/);
     assert.match(css, /\.firebase-auth-overlay\{[\s\S]*position:fixed;[\s\S]*height:100dvh;[\s\S]*overflow-y:auto/);
     assert.match(css, /z-index:2147483500/);
-    assert.match(css, /\.firebase-auth-dialog\{[\s\S]*width:min\(100%,480px\);[\s\S]*max-height:100%;[\s\S]*overflow-y:auto/);
+    assert.match(css, /\.firebase-auth-dialog\{[\s\S]*width:min\(92vw,420px\);[\s\S]*max-height:100%;[\s\S]*overflow-y:auto/);
+    assert.match(css, /V174 compact auth over second startup scene[\s\S]*startup-main-city\.[0-9a-f]{12}\.jpg[\s\S]*width:min\(calc\(100% - 20px\),390px\)/);
     assert.match(css, /\.firebase-auth-button\{[\s\S]*min-height:44px/);
     assert.match(css, /\.firebase-auth-field input\{[\s\S]*min-height:44px/);
     assert.match(css, /@media \(max-width:320px\)/);
