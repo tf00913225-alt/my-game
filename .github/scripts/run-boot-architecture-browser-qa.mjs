@@ -82,6 +82,7 @@ window.__qaIdleCallbacks=[];
 window.requestIdleCallback=function(callback){window.__qaIdleCallbacks.push(callback);return window.__qaIdleCallbacks.length;};
 (function(){
   var scenario=new URL(location.href).searchParams.get("scenario")||"";
+  localStorage.setItem("four_symbols_privacy_consent_version","2026-09-11-v1");
   var legacy={player:{id:"舊版角色",element:"water",level:8}};
   if(scenario==="legacy-empty"||scenario==="legacy-cloud"){localStorage.setItem("battle_full_version_save_v5",JSON.stringify(legacy));}
   if(scenario==="corrupt"){
