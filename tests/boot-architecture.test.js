@@ -5,6 +5,7 @@ const path=require("node:path");
 
 const index=fs.readFileSync("index.html","utf8");
 const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
+const creationCss=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");
 const intent=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const authUi=fs.readFileSync("js/firebase/firebase-auth-ui.js","utf8");
 const headers=fs.readFileSync("_headers","utf8");
@@ -49,6 +50,12 @@ assert.match(bootBrowserQa,/creation-fixed-active/,
     "mobile boot QA must verify fixed creation lifecycle activation");
 assert.match(bootBrowserQa,/hitInsideNext/,
     "mobile boot QA must verify the visible CTA remains the hit target across its right side");
+assert.match(creationCss,/#creationPage \.creation-step-two\{[\s\S]*?padding-bottom:154px;/,
+    "fixed step two must reserve bottom space for its action row");
+assert.match(creationCss,/#creationPage \.creation-step-two > \.creation-action-row\{[\s\S]*?position:absolute;[\s\S]*?bottom:0;/,
+    "step-two actions must stay anchored inside the fixed creation canvas");
+assert.match(bootBrowserQa,/stepTwoBottomActions/,
+    "mobile boot QA must verify the second-step bottom actions are visible and hittable");
 const requireAuthPath=startup.slice(startup.indexOf("function requireAuth"),startup.indexOf("function fail"));
 const bootPath=startup.slice(startup.indexOf("async function boot"),startup.indexOf("global.FourSymbolsStartupPolicy"));
 assert.doesNotMatch(requireAuthPath,/startAppShell\(\);/,

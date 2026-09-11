@@ -3746,3 +3746,12 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 清理：production `app-shell` 不再打包退役的 `js/22-v124-character-creation-native-runtime.js` 與 `css/28-v124-character-creation-native.css`；保留 `js/23` bootstrap + `js/24` runtime + critical `css/29` 為目前創角 owner，避免舊版 `overflow-y:auto` / `touch-action:pan-y` / isolation 規則在新版固定 canvas 後方重新覆寫。
 - Browser QA：390×844、DPR 3、touch emulation 的 account-first 新 UID 冷啟動現在必須驗證 `#creationPage` 位於 `#game-overlay-layer`、`native-creation-page`、`creation-fixed-active`、`creation-native-active`、legacy `#app` inert 且不 paint、創角 canvas `overflow-y:clip` / `touch-action:none`，並以 `elementFromPoint()` 驗證「下一步」按鈕右側沒有被其他 layer 蓋住；Boot QA 不再強制 `--disable-gpu`。
 - Production build 仍由 `scripts/build-production.mjs` 產生 content-hash bundle / manifest；本輪不得用 query version 或臨時 CSS/JS patch 規避 owner。
+
+
+## 2026-09-11 — 創角第二頁底部操作列裁切修復
+
+- 基準：`dev@daf724a10802b6074fdcce3f0f9bee2e7f404ac4`；工作分支 `fix/creation-step2-bottom-actions-20260911`，`main` 不修改。
+- `css/29-v125-character-creation-native.css` 仍是固定 1080×1920 創角版面 owner；`js/24-v125-character-creation-native-runtime.js::applyCreationStep()` 只負責步驟切換，不新增 wrapper。
+- 根因：第二頁 `.creation-action-row` 是 fixed canvas 內的 flex child，但未鎖定 shrink；在真機字體／可用高度吃滿時，action row 可被壓縮到接近 0，而其 124～132px 子按鈕又被 `.creation-step{overflow:clip}` 裁掉，畫面只剩按鈕上緣。
+- 修正：step two 預留 154px 底部安全區，操作列改為在 step 內 `position:absolute; bottom:0`，並保留至少 132px row 高度；不開放整頁捲動、不改配點／建角邏輯。
+- 390×844、DPR 3、touch QA 會實際切到第二頁，驗證「上一步／開始冒險」高度至少 44px、完整落在 step/stage 內，且左右 hit-test 都由按鈕本身取得。
