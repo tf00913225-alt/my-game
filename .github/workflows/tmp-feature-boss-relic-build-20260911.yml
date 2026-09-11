@@ -62,21 +62,7 @@ jobs:
         run: node tests/v174-relic-progression-drop-system.test.js
 
       - name: Gameplay mobile browser test
-        run: |
-          set +e
-          node tests/gameplay-ui-mobile-browser.test.js > gameplay-mobile-browser-test.log 2>&1
-          code=$?
-          cat gameplay-mobile-browser-test.log
-          exit $code
-
-      - name: Upload mobile browser failure log
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gameplay-mobile-browser-test-log-${{ github.run_id }}
-          path: gameplay-mobile-browser-test.log
-          if-no-files-found: ignore
-          retention-days: 1
+        run: node tests/gameplay-ui-mobile-browser.test.js
 
       - name: Regenerate production assets
         run: |
@@ -86,14 +72,22 @@ jobs:
       - name: Verify repository loader after rebuild
         run: node .github/scripts/ci.mjs loader
 
-      - name: Remove temporary automation and commit feature changes
+      - name: Remove temporary automation files and stage
         run: |
           git rm scripts/tmp-apply-boss-relic-lv20-20260911.mjs
           git rm scripts/tmp-feature-build-trigger.txt
           git rm .github/workflows/tmp-feature-boss-relic-build-20260911.yml
           git add -A
-          git diff --cached --check
+          git status --short
+
+      - name: Check staged diff whitespace
+        run: git diff --cached --check
+
+      - name: Commit clean feature result
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "feat: rebalance boss gameplay and guarantee Lv20 starter relics"
-          git push origin HEAD:feature/boss-balance-gameplay-relic-lv20-20260911
+
+      - name: Push clean feature result
+        run: git push origin HEAD:feature/boss-balance-gameplay-relic-lv20-20260911
