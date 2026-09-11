@@ -1,3 +1,15 @@
+## 2026-09-11 三分支手機 UI／BOSS 秘寶／無卡牌戰鬥安全整合（DEV VERIFIED）
+
+- 整合前 GitHub `dev@34c5603b2ac7c062813489d5ddd1fef95fb20590`、`main@4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`；三條遠端 tip 都精確等於指定 SHA。實際順序為既存 mobile UI／EXP guards → BOSS／四象塔平衡、玩法封面、技能預覽與 Lv20 秘寶 → 無卡牌戰鬥呈現。
+- `fix/mobile-ui-exp-guards-20260911@1dcff7dbfcad1837ce8399857861a41909eaf523` 已是起始 dev merge `34c5603b2ac7c062813489d5ddd1fef95fb20590` 的第二 parent，因此沒有重複合併；既有 PR #165 與 run `34575775811` 已成功，後續回歸測試仍通過。
+- `feature/boss-balance-gameplay-cover-skill-preview-relic-20260911@7751692d9df4afba08a5ce7058661ca3ede682c4` 以雙親 source merge `548e3a76697810af91c27f8c748eff694f50c393` 經 PR #172 合入 `dev@6de0d00d413362fd5e860698b1fa0ec76addc55d`。衝突為兩份 manifest、app-shell／feature-boss-relic hashed build rename、`css/56-v174-critical-ui-regressions.css` 與 `tests/ui-typography-battle-preservation.test.js`；人工保留較新 dev 的 4:3 BOSS／機關 owner、mobile guards 與 battle baseline，同時加入玩法 16:9、元素克制、BOSS／援軍與秘寶需求，再由 combined source 重建 generated assets。
+- `fix/battle-cardless-motion-ui@d802f846d80301fe96b97dea1c6055a1e13377c4` 以雙親 source merge `3e98aace46d86f1dab73f25856b4d92801fe60a7` 經 PR #173 合入 `dev@d7ce985768399eb4b3071976e86805ee3f8b8fba`。衝突只在兩份 manifest 與 gameplay-core hashed build rename，均以 combined source deterministic rebuild 解決；`js/54-v173.51-battle-qa.js` 只擴充既有單一 observer callback，沒有第二 observer／listener／state owner，V142/V143 技能 VFX、戰鬥席位、action／turn UI owner 均未改。
+- 交叉稽核另發現前一工作分支留下的 BOSS／機關 9:16 舊註解與會跨 CSS rule 誤匹配的過寬 regex；已改成精確鎖定目前 dev 核准的 4:3 owning rule，避免假陽性與舊規格回流。
+- 分支 2：PR run `34578585776`、dev run `34578810848` SUCCESS；BOSS/Tower 13/13、relic、mechanism、typography、mobile guards 與 390×844／412×915／420×747 Chrome suites 通過，Cloudflare exact-SHA deployment 與 live QA 成功。
+- 分支 3：PR run `34580597818`、dev run `34580804490` SUCCESS；228/228 JS syntax、152/152 Node/browser suites、299 resources、242 static IDs、22 deterministic build assets、release／loader／git-diff gates 全數通過。Chrome 的 cardless battle 360×800／412×915、玩法封面、mobile guards、boot／skill／relic QA，以及部署後 account-first、Abyss、battle-layer/audio live QA 全部 PASS。
+- Cloudflare `https://dev.four-symbols-dev.pages.dev` 已驗證部署 manifest exact SHA `d7ce985768399eb4b3071976e86805ee3f8b8fba`，Game／Cache Version 刻意維持 V173.65／173.65。額外 signed-out 實頁檢查無 broken image、水平 overflow 或 app-origin console warning/error；未建立匿名訪客帳號。
+- Requirement Batch：`release/requirement-batches/2026-09-11-three-branch-dev-integration.json`，7/7 VERIFIED。全程沒有以 `main` 為 base 的 PR、merge 或 push；完成 feature deployment 後 `main` 仍為 `4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`。
+
 ## 2026-09-11 Facebook public_profile DEV 診斷（TEMP）
 
 - 工作分支 `fix/facebook-public-profile-diagnostic`，基準為當時最新 `dev@8e1a2d9cf5f2a0f6b4551b2d42fddae419eb505f`。Android DEV 已反覆重現 Meta `Invalid Scopes: email` 與 `Error Facebook / 無法載入`；Firebase Authorized Domains、Meta App Domains、Firebase handler redirect、App ID、管理員角色，以及 Firebase mobile redirect 均已逐項排除。
