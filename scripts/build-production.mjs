@@ -45,7 +45,6 @@ const appScripts=[
     "js/17-stage-v60-training-render-guard.js",
     "js/18-stage-v64-character-touch-action-runtime.js",
     "js/19-stage-v78-character-inventory-runtime.js",
-    "js/22-v124-character-creation-native-runtime.js",
     "js/23-v125-character-creation-bootstrap.js",
     "js/24-v125-character-creation-native-runtime.js",
     "js/20-anonymous-20.js",
@@ -98,7 +97,7 @@ const appStyles=[
     "css/04-v119-ally-target-style.css","css/06-stage-v11-native-bottom-nav.css","css/07-stage-v13-native-map-nav.css",
     "css/08-stage-v14-character-scroll-fix.css","css/09-stage-v15-native-character-shell.css",
     "css/19-stage-v54-main-city-moderate-native-scale.css","css/20-stage-v60-training-only-safety.css",
-    "css/21-stage-v64-character-touch-action-bridge.css","css/28-v124-character-creation-native.css",
+    "css/21-stage-v64-character-touch-action-bridge.css",
     "css/30-v130-requested-updates.css","css/56-v174-critical-ui-regressions.css","css/ad-free-service-info-modal.css"
 ];
 const gameplayStyles=[

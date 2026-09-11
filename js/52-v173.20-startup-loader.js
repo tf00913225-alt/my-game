@@ -99,6 +99,17 @@
             throw new Error("Gameplay save owner refused the resolved Firebase UID.");
         }
     }
+    function showCharacterCreationSurface(){
+        const saveOwner=global.FourSymbolsGameSave;
+        if(!saveOwner||typeof saveOwner.showCreation!=="function"){
+            throw new Error("Character creation surface is unavailable after app-shell installation.");
+        }
+        saveOwner.showCreation();
+        if(!creation||global.getComputedStyle(creation).display==="none"){
+            throw new Error("Character creation surface did not become visible.");
+        }
+        creation.setAttribute("aria-hidden","false");
+    }
     async function enterReady(save,offline=false,token=transitionToken){
         showLoader(); render(92,"載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
         await Promise.all([requireAppShell(),domReady()]);
@@ -120,11 +131,11 @@
         activateGameplaySaveOwner();
         transition(STATES.NEED_CHARACTER,{uid:resolvedUid});
         firebase.closeAuth(); render(100,"帳號資料已確認","此 UID 尚無角色，可以建立角色");
+        showCharacterCreationSurface();
+        if(game){ game.style.display="none"; }
         mark("four-symbols:critical-ready");
         await hideLoader();
         if(state!==STATES.NEED_CHARACTER){ return; }
-        if(creation){ creation.style.display="block"; creation.setAttribute("aria-hidden","false"); }
-        if(game){ game.style.display="none"; }
         mark("four-symbols:character-creation-interactive");
         emit("four-symbols:character-creation-allowed",{uid:resolvedUid});
     }
