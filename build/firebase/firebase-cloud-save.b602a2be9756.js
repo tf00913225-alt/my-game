@@ -21,7 +21,7 @@ import {
     getFirebaseApp,
     getFirebaseAuth,
     initializeFirebaseAuth
-} from "./firebase-auth.e1d85dd20c4e.js";
+} from "./firebase-auth.1a91b0527c4e.js";
 
 export const CLOUD_SAVE_WRITE_POLICY = "trusted-backend-only";
 export const CLOUD_FUNCTIONS_REGION = "us-central1";

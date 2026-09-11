@@ -2,7 +2,7 @@
 import {
     createAccountWithEmail,getSignedInUser,signInAsAnonymous,signInWithEmail,
     signInWithFacebook,signInWithGoogle,signOutFirebase
-} from "./firebase-auth.e1d85dd20c4e.js";
+} from "./firebase-auth.1a91b0527c4e.js";
 
 const OVERLAY_ID="firebaseAuthOverlay";
 let installed=false;
@@ -22,12 +22,11 @@ function errorText(error){
         "auth/invalid-email":"Email 格式不正確。",
         "auth/weak-password":"密碼至少需要 6 個字元。",
         "auth/network-request-failed":"網路連線失敗；身份未確認，不會建立新角色。",
-        "auth/facebook-diagnostic-sdk-unavailable":"Facebook DEV 診斷：Meta JavaScript SDK 尚未就緒。",
-        "auth/facebook-diagnostic-sdk-load-failed":"Facebook DEV 診斷：Meta JavaScript SDK 載入失敗。",
-        "auth/facebook-diagnostic-sdk-timeout":"Facebook DEV 診斷：Meta JavaScript SDK 載入逾時。",
-        "auth/facebook-diagnostic-login-timeout":"Facebook DEV 診斷：Meta 沒有在 60 秒內回傳登入結果。",
-        "auth/facebook-diagnostic-no-token":"Facebook DEV 診斷：Meta 沒有回傳 access token。請確認 Meta 的「使用 JavaScript SDK 登入」已開啟，且 dev 網域已加入 JavaScript SDK 允許網域。",
-        "auth/facebook-diagnostic-login-failed":"Facebook DEV 診斷：Meta JavaScript SDK 無法啟動登入。",
+        "auth/facebook-diagnostic-unavailable":"Facebook DEV 診斷只能在瀏覽器執行。",
+        "auth/facebook-diagnostic-storage-unavailable":"Facebook DEV 診斷無法使用安全的暫存狀態，請確認瀏覽器沒有封鎖網站工作階段儲存。",
+        "auth/facebook-diagnostic-state-mismatch":"Facebook DEV 診斷的 OAuth state 驗證失敗，這次登入已拒絕。",
+        "auth/facebook-diagnostic-oauth-error":"Facebook DEV 診斷被 Meta 拒絕；請依畫面上的 Meta 錯誤繼續排查。",
+        "auth/facebook-diagnostic-no-token":"Facebook DEV 診斷：Meta 沒有回傳 access token。",
         "permission-denied":"雲端存檔讀取被拒絕；不會覆寫任何角色。"
     };
     return messages[code]||String(error&&error.message||"帳號服務發生錯誤，請稍後再試。");
