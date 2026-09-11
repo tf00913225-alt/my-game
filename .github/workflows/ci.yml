@@ -1,10 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - dev
-      - main
   pull_request:
     branches:
       - dev
@@ -16,11 +12,11 @@ permissions:
 jobs:
   patch_first_play_hold:
     name: Repair returning First Play update hold
-    if: github.event_name == 'pull_request' && github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
+    if: github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Check out repository
+      - name: Check out work branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
@@ -29,7 +25,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Patch startup owner and deterministic browser QA
+      - name: Ensure existing asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+      - name: Patch, build, verify, restore standard CI and push
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
@@ -89,6 +91,7 @@ jobs:
           node tests/boot-architecture.test.js
           node .github/scripts/run-boot-architecture-browser-qa.mjs
 
+          rm -rf artifacts/browser-qa
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
@@ -96,106 +99,3 @@ jobs:
           git status --short
           git commit -m "fix: hold returning launch on scene two until First Play update is ready [generated]"
           git push origin HEAD:${GITHUB_HEAD_REF}
-
-  verify:
-    name: Repository checks
-    if: github.event_name != 'pull_request' || github.head_ref != 'feature/first-play-resource-preload-privacy-boot'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: Use current Node.js LTS
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      - name: Prepare Git comparison base
-        env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: |
-          if [[ "$CI_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] && \
-             [[ ! "$CI_BASE_SHA" =~ ^0{40}$ ]] && \
-             ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then
-            git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
-          fi
-
-          for typography_baseline_sha in \
-            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
-            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
-            29b9668057846164a941fbf6617d2458d9af5476; do
-            if ! git cat-file -e "$typography_baseline_sha^{commit}" 2>/dev/null; then
-              git fetch --no-tags --depth=1 origin "$typography_baseline_sha"
-            fi
-          done
-
-      - name: Check CI script syntax
-        run: |
-          node --check .github/scripts/ci.mjs
-          node --check .github/scripts/boot-live-browser-qa.mjs
-          node --check .github/scripts/release-gate.mjs
-          node --check .github/scripts/run-boot-architecture-browser-qa.mjs
-          node --check .github/scripts/run-skill-progression-browser-qa.mjs
-          node --check .github/scripts/run-relic-progression-browser-qa.mjs
-
-      - name: Check all project JavaScript syntax
-        run: node .github/scripts/ci.mjs syntax
-
-      - name: Ensure existing asset-test dependency
-        run: |
-          if ! command -v identify >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends imagemagick
-          fi
-
-      - name: Run all Node unit and integration suites
-        run: node .github/scripts/ci.mjs tests
-
-      - name: Run account-first cold/warm mobile browser QA
-        run: node .github/scripts/run-boot-architecture-browser-qa.mjs
-
-      - name: Upload boot architecture browser evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: boot-architecture-browser-qa-${{ github.sha }}
-          path: artifacts/browser-qa/boot-architecture-browser-qa.json
-          if-no-files-found: error
-          retention-days: 90
-
-      - name: Run skill progression mobile browser QA
-        run: node .github/scripts/run-skill-progression-browser-qa.mjs
-
-      - name: Run relic progression mobile browser QA
-        run: node .github/scripts/run-relic-progression-browser-qa.mjs
-
-      - name: Check static local resources
-        run: node .github/scripts/ci.mjs resources
-
-      - name: Check duplicate HTML IDs
-        run: node .github/scripts/ci.mjs html-ids
-
-      - name: Check release entries and loader integrity
-        run: node .github/scripts/ci.mjs loader
-
-      - name: Enforce release, cache, checklist and deprecated-code gates
-        env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: node .github/scripts/release-gate.mjs ci
-
-      - name: Check Git whitespace and conflict markers
-        env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: node .github/scripts/ci.mjs git-diff
-
-  deploy_dev:
-    name: Dev deployment gate
-    needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
-    uses: ./.github/workflows/deploy-dev-cloudflare.yml
-    secrets: inherit
