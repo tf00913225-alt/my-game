@@ -135,8 +135,8 @@
         await Promise.all([requireAppShell(),domReady()]);
         if(token!==transitionToken){ return; }
         activateGameplaySaveOwner();
-        const loaded=global.FourSymbolsGameSave&&global.FourSymbolsGameSave.load();
-        if(!loaded){ throw new Error("Account save passed resolution but gameplay hydration failed."); }
+        const loaded=global.FourSymbolsGameSave&&typeof global.FourSymbolsGameSave.hydrate==="function"&&global.FourSymbolsGameSave.hydrate(save);
+        if(!loaded){ throw new Error("Resolved account save could not hydrate gameplay state."); }
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
         firebase.closeAuth(); render(100,"載入完成","主城已可操作");
         mark("four-symbols:critical-ready");
