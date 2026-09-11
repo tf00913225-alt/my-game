@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   finalize_first_play_boot:
-    name: Finalize First Play returning path
+    name: Finalize First Play browser fault cases
     if: github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -68,10 +68,15 @@ jobs:
               text=text.replace(old,new,1)
 
           scenario='''  var scenario=new URL(location.href).searchParams.get("scenario")||"";'''
-          injected='''  var scenario=new URL(location.href).searchParams.get("scenario")||"";\n  if(scenario==="manifest-update"){\n    var nativeFetch=window.fetch.bind(window);\n    window.__qaManifestDelayApplied=0;\n    window.fetch=function(input,init){\n      var target=typeof input==="string"?input:String(input&&input.url||"");\n      var pathname="";\n      try{pathname=new URL(target,location.href).pathname;}catch(_){}\n      if(pathname.endsWith("/assets/ui/nav-home.png")){\n        window.__qaManifestDelayApplied++;\n        return new Promise(function(resolve,reject){setTimeout(function(){nativeFetch(input,init).then(resolve,reject);},15000);});\n      }\n      return nativeFetch(input,init);\n    };\n  }'''
+          injected='''  var scenario=new URL(location.href).searchParams.get("scenario")||"";\n  if(scenario==="manifest-update"){\n    var nativeFetch=window.fetch.bind(window);\n    window.__qaManifestDelayApplied=0;\n    window.fetch=function(input,init){\n      var target=typeof input==="string"?input:String(input&&input.url||"");\n      var pathname="";\n      try{pathname=new URL(target,location.href).pathname;}catch(_){}\n      if(pathname.endsWith("/assets/ui/nav-home.png")){\n        window.__qaManifestDelayApplied++;\n        return new Promise(function(resolve,reject){setTimeout(function(){nativeFetch(input,init).then(resolve,reject);},15000);});\n      }\n      return nativeFetch(input,init);\n    };\n  }\n  if(scenario==="resource-404"){\n    var qa404Fetch=window.fetch.bind(window);\n    window.__qa404Injected=0;\n    window.fetch=function(input,init){\n      var target=typeof input==="string"?input:String(input&&input.url||"");\n      var pathname="";\n      try{pathname=new URL(target,location.href).pathname;}catch(_){}\n      if(pathname.endsWith("/assets/ui/nav-home.png")&&window.__qa404Injected===0){\n        window.__qa404Injected=1;\n        return Promise.resolve(new Response("qa missing first-play asset",{status:404,statusText:"Not Found",headers:{"content-type":"text/plain"}}));\n      }\n      return qa404Fetch(input,init);\n    };\n  }'''
           if scenario not in text:
               raise SystemExit('qaPrelude scenario declaration not found')
           text=text.replace(scenario,injected,1)
+
+          old404='''            if(activeScenario==="resource-404"&&relative==="assets/ui/nav-home.png"&&!injected404){ injected404=true; response.writeHead(404,{"cache-control":"no-store"}); response.end("qa missing first-play asset"); return; }'''
+          if old404 not in text:
+              raise SystemExit('legacy server 404 injection not found')
+          text=text.replace(old404,'            // resource-404 is injected in-page so retry behavior is deterministic per navigation.',1)
 
           oldSlow='''            if(activeScenario==="manifest-update"&&relative==="assets/ui/nav-home.png"){ await sleep(10800); }'''
           if oldSlow not in text:
@@ -82,7 +87,13 @@ jobs:
           newReady='''    const updatedRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready"))`);assert.equal(updatedRecord.manifestHash,manifest.firstPlay.manifestHash);const delayApplied=await client.eval(`window.__qaManifestDelayApplied||0`);assert.ok(delayApplied>=1,"manifest-update QA did not delay the changed First Play asset");evidence.checks.manifestUpdateReady={manifestHash:updatedRecord.manifestHash,delayApplied};'''
           if oldReady not in text:
               raise SystemExit('manifest update completion assertion not found')
-          qa.write_text(text.replace(oldReady,newReady,1))
+          text=text.replace(oldReady,newReady,1)
+
+          oldHttp='''    const httpFail=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),title:document.getElementById("startupStatusTitle").textContent,failed:FourSymbolsFirstPlay.getLastFailed(),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false}))()`);assert.equal(httpFail.state,"BOOT_LOADING");assert.match(httpFail.title,/部分必要資源載入失敗/);assert.equal(httpFail.authShown,false);assert.equal(httpFail.failed.length,1);assert.match(httpFail.failed[0].path,/nav-home\\.png$/);evidence.checks.resource404=httpFail;'''
+          newHttp='''    const httpFail=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),title:document.getElementById("startupStatusTitle").textContent,failed:FourSymbolsFirstPlay.getLastFailed(),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false,injected:window.__qa404Injected||0}))()`);assert.equal(httpFail.state,"BOOT_LOADING");assert.match(httpFail.title,/部分必要資源載入失敗/);assert.equal(httpFail.authShown,false);assert.equal(httpFail.failed.length,1);assert.match(httpFail.failed[0].path,/nav-home\\.png$/);assert.equal(httpFail.injected,1);evidence.checks.resource404=httpFail;'''
+          if oldHttp not in text:
+              raise SystemExit('resource 404 assertion block not found')
+          qa.write_text(text.replace(oldHttp,newHttp,1))
           PY
 
           node --check js/52-v173.20-startup-loader.js
@@ -100,5 +111,5 @@ jobs:
           git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
           git add -A
           git status --short
-          git commit -m "fix: finalize First Play returning readiness flow [generated]"
+          git commit -m "fix: finalize First Play readiness and browser QA [generated]"
           git push origin HEAD:${GITHUB_HEAD_REF}
