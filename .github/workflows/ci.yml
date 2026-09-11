@@ -59,6 +59,7 @@ jobs:
               'resources.some(p=>/\\/gameplay-core\\./.test(p))':'resources.some(p=>p.includes("/gameplay-core."))',
               'resources.some(p=>/\\/feature-patrol\\./.test(p))':'resources.some(p=>p.includes("/feature-patrol."))',
               'async function waitForJson(url,timeoutMs=10000){':'async function waitForJson(url,timeoutMs=30000){',
+              'if(!noReady){localStorage.setItem("four_symbols_first_play_ready",scenario==="manifest-update"?${stale}:${ready});}':'if(!noReady){localStorage.setItem("four_symbols_first_play_ready",JSON.stringify(scenario==="manifest-update"?${stale}:${ready}));}',
           }
           for old,new in replacements.items():
               if old not in text:
