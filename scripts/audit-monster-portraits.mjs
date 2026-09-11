@@ -3,6 +3,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import {execFileSync} from "node:child_process";
 
 const args=new Set(process.argv.slice(2));
 const strict=args.has("--strict");
@@ -40,6 +41,8 @@ const wildCore=read("js/34-v141-core-systems.js");
 const daily=read("js/42-v148-combat-dungeon-fixes.js");
 const bossTower=read("js/gameplay-boss-tower-system.js");
 const abyss=read("js/59-abyss-two-tier-runtime.js");
+const portraitRuntime=read("js/45-v154-dev-fixes.js");
+const portraitTiming=read("js/48-v159-abyss-battle-portraits.js");
 
 const errors=[];
 const warnings=[];
@@ -129,11 +132,65 @@ const existingTargets=targets.filter(target=>target.status==="existing");
 const plannedTargets=targets.filter(target=>target.status==="planned");
 const missingExisting=existingTargets.filter(target=>!fs.existsSync(path.join(root,target.path)));
 const missingPlanned=plannedTargets.filter(target=>!fs.existsSync(path.join(root,target.path)));
+const presentPlanned=plannedTargets.filter(target=>fs.existsSync(path.join(root,target.path)));
 if(missingExisting.length){
     errors.push("registered existing portrait files missing: "+missingExisting.map(t=>t.path).join(", "));
 }
+if(presentPlanned.length){
+    errors.push("portrait files exist but registry status is still planned: "+presentPlanned.map(t=>t.portraitKey).join(", "));
+}
 if(strict&&missingPlanned.length){
     errors.push("strict mode: planned portrait files missing: "+missingPlanned.length);
+}
+
+const invalidGeneratedAssets=[];
+const generatedExisting=existingTargets.filter(target=>String(target.path||"").startsWith("assets/monsters/"));
+generatedExisting.forEach(target=>{
+    const expected=registry.dimensions&&registry.dimensions[target.sizeClass];
+    const absolute=path.join(root,target.path);
+    if(!fs.existsSync(absolute)){ return; }
+    if(path.extname(target.path).toLowerCase()!==".png"){
+        invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:"new portrait is not PNG"});
+        return;
+    }
+    if(!expected){
+        invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:"unknown sizeClass "+target.sizeClass});
+        return;
+    }
+    try{
+        const meta=execFileSync("identify",["-format","%wx%h|%[channels]|%[opaque]",absolute],{encoding:"utf8"}).trim();
+        const [geometry,channels,opaque]=meta.split("|");
+        const expectedGeometry=expected.width+"x"+expected.height;
+        if(geometry!==expectedGeometry){
+            invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:`geometry ${geometry} != ${expectedGeometry}`});
+        }
+        if(!/a/i.test(channels||"")){
+            invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:"PNG has no alpha channel"});
+        }else if(String(opaque||"").toLowerCase()==="true"){
+            invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:"PNG has alpha but no transparent pixels"});
+        }
+    }catch(error){
+        invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:"ImageMagick identify failed: "+String(error&&error.message||error)});
+    }
+});
+if(invalidGeneratedAssets.length){
+    errors.push("invalid generated portrait assets: "+invalidGeneratedAssets.map(item=>item.portraitKey+" ("+item.reason+")").join(", "));
+}
+
+if(!portraitRuntime.includes('MONSTER_PORTRAIT_REGISTRY_URL="config/monster-portrait-registry.json"')){
+    errors.push("V154 portrait owner is not wired to canonical monster portrait registry");
+}
+if(!portraitRuntime.includes('target.status!=="existing"')){
+    errors.push("V154 portrait resolver must reject planned/non-existing registry targets");
+}
+if(!portraitRuntime.includes('monsterPortraitByKey.get("soldier."+element)')){
+    errors.push("V154 portrait resolver is missing element-keyed heavenly soldier resolution");
+}
+if(!portraitRuntime.includes("window.resolveMonsterPortrait")){
+    errors.push("V154 portrait owner does not expose resolveMonsterPortrait(monster)");
+}
+if(!portraitTiming.includes("v154SyncMonsterPortraits")){
+    errors.push("V159 timing bridge is not synchronized with the authoritative V154 portrait owner");
 }
 
 const soldiers=targets.filter(target=>target.group==="heavenly-soldier");
@@ -152,7 +209,7 @@ if(JSON.stringify(registry.policy.trueRealmFinalDisplayOrder)!==JSON.stringify([
 if(registry.policy.extremePrestageDisplayRule!=="unresolved-do-not-invent-light-soldier"){
     errors.push("extreme prestage light-soldier guard changed");
 }else{
-    warnings.push("極帝領域前置四關仍是 light：未授權新增第五張光天兵，接線前需使用者決定顯示規則。");
+    warnings.push("極帝領域前置四關仍是 light：未授權新增第五張光天兵，保持既有通用深淵天兵 fallback，等待顯示規則決策。");
 }
 
 const snapshot={
@@ -176,7 +233,12 @@ const report={
     portraitTargets:targets.length,
     existingTargets:existingTargets.length,
     plannedTargets:plannedTargets.length,
+    missingExisting:missingExisting.length,
     missingPlanned:missingPlanned.length,
+    presentPlanned:presentPlanned.length,
+    generatedExisting:generatedExisting.length,
+    invalidGeneratedAssets,
+    brokenReferenceCount:missingExisting.length+invalidGeneratedAssets.length,
     missingPlannedTargets:missingPlanned.map(target=>({
         portraitKey:target.portraitKey,
         name:target.name,
@@ -197,6 +259,7 @@ if(jsonMode){
     console.log(`runtime names: ${report.runtimeUniqueNames}`);
     console.log(`portrait targets: ${report.portraitTargets} (existing ${report.existingTargets}, planned ${report.plannedTargets})`);
     console.log(`planned files still missing: ${report.missingPlanned}`);
+    console.log(`generated existing assets validated: ${report.generatedExisting}; broken references: ${report.brokenReferenceCount}`);
     warnings.forEach(message=>console.warn("WARN: "+message));
     errors.forEach(message=>console.error("ERROR: "+message));
     console.log(report.ok?"RESULT: PASS":"RESULT: FAIL");
