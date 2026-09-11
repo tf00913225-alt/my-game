@@ -15,8 +15,9 @@
         "js/gameplay-boss-tower-system.js"
       ],
       "verification": [
-        "tests/gameplay-boss-tower-system.test.js",
-        "Repository checks / CI pending"
+        "tests/gameplay-boss-tower-system.test.js: PASS",
+        "Focused feature workflow syntax/runtime verification: PASS",
+        "PR #167 Repository checks on final clean HEAD: pending"
       ]
     },
     {
@@ -27,8 +28,9 @@
         "css/gameplay-boss-tower.css"
       ],
       "verification": [
-        "tests/gameplay-ui-mobile-browser.test.js",
-        "Repository checks / CI pending"
+        "tests/gameplay-ui-mobile-browser.test.js at 390x844: PASS",
+        "Focused production build --check: PASS",
+        "PR #167 Repository checks on final clean HEAD: pending"
       ]
     },
     {
@@ -39,8 +41,10 @@
         "css/56-v174-critical-ui-regressions.css"
       ],
       "verification": [
-        "tests/gameplay-ui-mobile-browser.test.js",
-        "Repository checks / CI pending"
+        "tests/gameplay-ui-mobile-browser.test.js at 390x844: PASS",
+        "tests/ui-v174-current-fixes-mobile-browser.test.js at 390x844 and 412x915: PASS",
+        "Focused production build --check and loader: PASS",
+        "PR #167 Repository checks on final clean HEAD: pending"
       ]
     },
     {
@@ -51,8 +55,9 @@
         "js/relic-progression-drop-system.js"
       ],
       "verification": [
-        "tests/v174-relic-progression-drop-system.test.js",
-        "Repository checks / CI pending"
+        "tests/v174-relic-progression-drop-system.test.js: PASS",
+        "Focused feature workflow persistence verification: PASS",
+        "PR #167 Repository checks on final clean HEAD: pending"
       ]
     }
   ],
