@@ -23,7 +23,7 @@
           "build/app-shell.a887e992c1b2.js"
         ],
         "styles": [
-          "build/app-shell.708fde4d340b.css"
+          "build/app-shell.b1893086452b.css"
         ],
         "dependencies": []
       },
@@ -89,11 +89,11 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.af3d3cea8249.js",
-          "build/feature-relic-progression.66dc0818b8ae.js"
+          "build/feature-boss-relic.97db792605f3.js",
+          "build/feature-relic-progression.bca131411034.js"
         ],
         "styles": [
-          "build/feature-boss-relic.0298e2f4a6fd.css",
+          "build/feature-boss-relic.1a31e9a60ba2.css",
           "build/feature-relic-progression.8844d5eb6e81.css"
         ],
         "dependencies": [
@@ -146,21 +146,21 @@
       "sha256": "83c9aace100a",
       "bytes": 36096
     },
-    "build/feature-boss-relic.af3d3cea8249.js": {
-      "sha256": "af3d3cea8249",
-      "bytes": 138290
+    "build/feature-boss-relic.97db792605f3.js": {
+      "sha256": "97db792605f3",
+      "bytes": 143840
     },
-    "build/feature-relic-progression.66dc0818b8ae.js": {
-      "sha256": "66dc0818b8ae",
-      "bytes": 65339
+    "build/feature-relic-progression.bca131411034.js": {
+      "sha256": "bca131411034",
+      "bytes": 67567
     },
     "build/boot-core.016dc8529603.css": {
       "sha256": "016dc8529603",
       "bytes": 222833
     },
-    "build/app-shell.708fde4d340b.css": {
-      "sha256": "708fde4d340b",
-      "bytes": 91836
+    "build/app-shell.b1893086452b.css": {
+      "sha256": "b1893086452b",
+      "bytes": 92048
     },
     "build/gameplay-core.3e9f850dc2ef.css": {
       "sha256": "3e9f850dc2ef",
@@ -174,9 +174,9 @@
       "sha256": "3d298c2d78c2",
       "bytes": 25629
     },
-    "build/feature-boss-relic.0298e2f4a6fd.css": {
-      "sha256": "0298e2f4a6fd",
-      "bytes": 47707
+    "build/feature-boss-relic.1a31e9a60ba2.css": {
+      "sha256": "1a31e9a60ba2",
+      "bytes": 47859
     },
     "build/feature-relic-progression.8844d5eb6e81.css": {
       "sha256": "8844d5eb6e81",

@@ -131,11 +131,14 @@
     padding:12px;
 }
 
+/* Gameplay activity covers use the same 16:9 production ratio as dungeon
+   covers. Combat BOSS/mechanism cards remain independent 9:16 components. */
 #game-stage .gameplay-mode-card{
     position:relative;
     display:grid;
     width:100%;
-    min-height:120px;
+    min-height:0;
+    aspect-ratio:16 / 9;
     box-sizing:border-box;
     grid-template-columns:minmax(0,1fr) 78px;
     gap:10px;
@@ -220,7 +223,6 @@
 #game-stage .gameplay-mode-card.abyss .gameplay-mode-seal{ color:#b7c9ea; border-color:#5d7197; }
 #game-stage .gameplay-mode-card.tower .gameplay-mode-seal{ color:#e8875d; border-color:#9e5434; }
 #game-stage .gameplay-mode-card.coming-soon{
-    min-height:88px;
     opacity:.67;
     cursor:default;
 }
