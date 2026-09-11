@@ -47,6 +47,23 @@ function retireV146LegacySkillVfx(text){
     return normalize(text.slice(0,start)+text.slice(end));
 }
 
+function normalizeApprovedGameplayCover16By9(text){
+    return normalize(text
+        .replace(
+            "    width:100%;\n    min-height:0;\n    aspect-ratio:16 / 9;\n    box-sizing:border-box;",
+            "    width:100%;\n    min-height:120px;\n    box-sizing:border-box;"
+        )
+        .replace(
+            "        radial-gradient(circle at 90% 10%,rgba(209,150,54,.2),transparent 46%);\n    background-position:center;\n    background-size:cover;\n    box-shadow:",
+            "        radial-gradient(circle at 90% 10%,rgba(209,150,54,.2),transparent 46%);\n    box-shadow:"
+        )
+        .replace(
+            "#game-stage .gameplay-mode-card.coming-soon{\n    min-height:0;",
+            "#game-stage .gameplay-mode-card.coming-soon{\n    min-height:88px;"
+        )
+    );
+}
+
 // V131 starts with battle formation/element-card rules. Typography work begins only
 // after the character/home-feature shell, so the entire battle prefix must be byte-equivalent.
 sameSegment(
@@ -77,8 +94,9 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
 // redundant title is removed, the active Gameplay BOSS becomes a large 9:16 card,
 // the mechanism target card becomes 9:16, and detail moves to a right-side alert.
 // Preserve every pre-battle Gameplay panel rule against the exact dev work base,
-// while the existing protected-BOSS / toast / animation tail remains anchored to
-// the previously approved Gameplay battle baseline.
+// except this batch's explicitly approved 16:9 Gameplay activity-cover geometry.
+// The existing protected-BOSS / toast / animation tail remains anchored to the
+// previously approved Gameplay battle baseline.
 {
     const file="css/gameplay-boss-tower.css";
     const now=current(file);
@@ -90,10 +108,13 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
     const workBaseMarker=workBase.indexOf(oldMarker);
     assert.ok(nowMarker>0,"new Gameplay BOSS battle owner marker missing");
     assert.ok(workBaseMarker>0,"work-base Gameplay BOSS battle owner marker missing");
+    const nowPreBattle=now.slice(0,nowMarker);
+    assert.match(nowPreBattle,/#game-stage \.gameplay-mode-card\{[\s\S]*?aspect-ratio:16 \/ 9;[\s\S]*?background-position:center;[\s\S]*?background-size:cover;/);
+    assert.match(nowPreBattle,/#game-stage \.gameplay-mode-card\.coming-soon\{[\s\S]*?min-height:0;/);
     assert.equal(
-        normalize(now.slice(0,nowMarker)),
+        normalizeApprovedGameplayCover16By9(nowPreBattle),
         normalize(workBase.slice(0,workBaseMarker)),
-        `${file} non-battle Gameplay panel rules changed from work base`
+        `${file} non-battle Gameplay panel rules changed outside approved 16:9 activity covers`
     );
 
     const protectedStart="#game-stage #battlePage .battle-monster.gameplay-boss-protected{";
@@ -122,7 +143,7 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
         cssRule(now,"#game-stage #battleMonsterArea .boss-mechanism-card{")
     ].join("\n");
     assert.doesNotMatch(bossSizingPriorityScope,/!important/,"Gameplay BOSS portrait sizing must stay specificity-driven");
-     assert.doesNotMatch(now.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
+    assert.doesNotMatch(now.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
 }
 
 // Relic battle rules are followed by a small-screen media block that owns the
@@ -134,4 +155,4 @@ sameSegment(
     "@media(max-width:390px)"
 );
 
-console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS portrait/mechanism owner and retired procedural VFX selectors.");
+console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS portrait/mechanism owner, approved 16:9 Gameplay covers, and retired procedural VFX selectors.");

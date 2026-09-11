@@ -157,6 +157,18 @@ function add(context,id,count){
     const {owned}=makeContext({explicitRelics:true});
     assert.equal(owned.relic_qiankun_flask.unlocked,true,"existing explicit relic ownership must never be revoked");
 }
+{
+    const {context,owned,saveDoc}=makeContext({savedPlayer:{id:"QA",level:20}});
+    assert.equal(context.RelicProgressionSystem.starterRelicLevel,20);
+    assert.deepEqual(Array.from(context.RelicProgressionSystem.starterRelicIds),["relic_qiankun_flask","relic_xuanwu_seal"]);
+    assert.equal(owned.relic_qiankun_flask.unlocked,true,"Lv20 must guarantee the first blue starter relic");
+    assert.equal(owned.relic_xuanwu_seal.unlocked,true,"Lv20 must guarantee the second blue starter relic");
+    assert.equal(owned.relic_qinglan_feather.unlocked,false,"the Lv20 guarantee must not silently unlock every blue relic");
+    assert.equal(context.v174RelicSystem.catalog.relic_qiankun_flask.rarity,"blue");
+    assert.equal(context.v174RelicSystem.catalog.relic_xuanwu_seal.rarity,"blue");
+    assert.equal(saveDoc.playerRelics.relic_qiankun_flask.unlocked,true,"starter relic ownership must persist through the existing main save");
+    assert.equal(saveDoc.playerRelics.relic_xuanwu_seal.unlocked,true);
+}
 
 /* 100 specific; 99 specific; 50 specific + 100 universal; 49 cannot bypass. */
 {

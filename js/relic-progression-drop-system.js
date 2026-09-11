@@ -102,6 +102,8 @@
     const ACTIVE_UID=accountRepository.getActiveUid();
     const STATE_VERSION=1;
     const RECEIPT_STALE_MS=6*60*60*1000;
+    const STARTER_RELIC_LEVEL=20;
+    const STARTER_RELIC_IDS=Object.freeze(["relic_qiankun_flask","relic_xuanwu_seal"]);
 
     function numeric(value,fallback=0){
         const number=Number(value);
@@ -298,6 +300,33 @@
             const result=accountRepository.readForUid(ACTIVE_UID);
             return result.status==="ready"?result.save:null;
         }catch(_){ return null; }
+    }
+    function firstCharacterLevel(){
+        const host=progressionHost();
+        return Math.max(1,integer(host&&host.level,1));
+    }
+    function ensureStarterRelics(){
+        if(firstCharacterLevel()<STARTER_RELIC_LEVEL){ return false; }
+        const owned=relicRuntime.getOwnedState&&relicRuntime.getOwnedState();
+        if(!owned||typeof owned!=="object"){ return false; }
+        const changed=[];
+        STARTER_RELIC_IDS.forEach(id=>{
+            const def=catalog[id],entry=owned[id];
+            if(!def||def.runtimeReady!==true||def.rarity!=="blue"||!entry||entry.unlocked===true){ return; }
+            changed.push({entry:entry,unlocked:entry.unlocked,level:entry.level,seen:entry.seen});
+            entry.unlocked=true;
+            entry.level=Math.max(1,integer(entry.level,1));
+            entry.seen=false;
+        });
+        if(!changed.length){ return false; }
+        if(persistCore()){ return true; }
+        changed.forEach(snapshot=>{
+            snapshot.entry.unlocked=snapshot.unlocked;
+            snapshot.entry.level=snapshot.level;
+            snapshot.entry.seen=snapshot.seen;
+        });
+        console.error("Lv20 初始藍階秘寶解鎖寫入失敗，已還原本次變更。");
+        return false;
     }
 
     function initializeOwnershipPolicy(){
@@ -916,7 +945,7 @@
     const originalOpenRelicPage=typeof window.v174OpenRelicPage==="function"?window.v174OpenRelicPage:null;
     const originalOpenRelicDetail=typeof window.v174OpenRelicDetail==="function"?window.v174OpenRelicDetail:null;
     if(originalOpenRelicPage){
-        window.v174OpenRelicPage=function(){ currentRelicDetailId=null;const result=originalOpenRelicPage.apply(this,arguments);decorateRelicSurface();return result; };
+        window.v174OpenRelicPage=function(){ ensureStarterRelics();currentRelicDetailId=null;const result=originalOpenRelicPage.apply(this,arguments);decorateRelicSurface();return result; };
     }
     if(originalOpenRelicDetail){
         window.v174OpenRelicDetail=function(id){ currentRelicDetailId=id;const result=originalOpenRelicDetail.apply(this,arguments);decorateRelicSurface();return result; };
@@ -924,6 +953,7 @@
     if(typeof window.openHomeFeature==="function"){
         const original=window.openHomeFeature;
         window.openHomeFeature=function(type){
+            if(type==="relic"){ ensureStarterRelics(); }
             const result=original.apply(this,arguments);
             if(type==="relic"){ currentRelicDetailId=null;decorateRelicSurface(); }
             return result;
@@ -1094,7 +1124,7 @@
         }
     }
 
-    function decorateAllSurfaces(){ decorateRelicSurface();decorateBossSurface();decorateTowerSurface(); }
+    function decorateAllSurfaces(){ ensureStarterRelics();decorateRelicSurface();decorateBossSurface();decorateTowerSurface(); }
 
     /* The previous Team Relic owner exposed a gold-only public upgrade action.
        Keep its battle/runtime owner intact, but replace the public progression
@@ -1107,6 +1137,9 @@
 
     window.RelicProgressionSystem=Object.freeze({
         stateVersion:STATE_VERSION,
+        starterRelicLevel:STARTER_RELIC_LEVEL,
+        starterRelicIds:STARTER_RELIC_IDS,
+        ensureStarterRelics:ensureStarterRelics,
         materialConfig:MATERIAL_CONFIG,
         bossDifficultyConfig:BOSS_DIFFICULTY_CONFIG,
         bossDropTable:RELIC_BOSS_DROP_TABLE,
@@ -1134,6 +1167,7 @@
 
     hydrateOwnedItemPresentation();
     initializeOwnershipPolicy();
+    ensureStarterRelics();
     reconcilePending();
     if(progressionState.pending){ ensureReceiptMonitor(); }
 

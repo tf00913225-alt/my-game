@@ -133,7 +133,8 @@
     position:relative;
     display:grid;
     width:100%;
-    min-height:120px;
+    min-height:0;
+    aspect-ratio:16 / 9;
     box-sizing:border-box;
     grid-template-columns:minmax(0,1fr) 78px;
     gap:10px;
@@ -146,6 +147,8 @@
     background:
         linear-gradient(90deg,rgba(33,22,12,.96),rgba(13,9,6,.88)),
         radial-gradient(circle at 90% 10%,rgba(209,150,54,.2),transparent 46%);
+    background-position:center;
+    background-size:cover;
     box-shadow:inset 0 0 0 1px rgba(255,229,169,.045),0 6px 14px rgba(0,0,0,.36);
     text-align:left;
 }
@@ -218,7 +221,7 @@
 #game-stage .gameplay-mode-card.abyss .gameplay-mode-seal{ color:#b7c9ea; border-color:#5d7197; }
 #game-stage .gameplay-mode-card.tower .gameplay-mode-seal{ color:#e8875d; border-color:#9e5434; }
 #game-stage .gameplay-mode-card.coming-soon{
-    min-height:88px;
+    min-height:0;
     opacity:.67;
     cursor:default;
 }
