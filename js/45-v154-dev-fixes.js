@@ -1,5 +1,5 @@
 /* =====================================================
-   V154 — current dev battle, element box and Abyss fixes
+   V154 — current dev battle, element box and monster portrait fixes
 ===================================================== */
 (function installV154DevFixes(){
     "use strict";
@@ -7,6 +7,8 @@
     if(typeof window==="undefined"||window.__v154DevFixesInstalled){ return; }
     window.__v154DevFixesInstalled=true;
 
+    const MONSTER_PORTRAIT_REGISTRY_URL="config/monster-portrait-registry.json";
+    const HEAVENLY_SOLDIER_ELEMENTS=new Set(["fire","water","wind","earth"]);
     const EARLY_ABYSS_PORTRAITS={
         東帝:"assets/dungeons/abyss/east-emperor.webp",
         天帝:"assets/dungeons/abyss/heaven-emperor.webp",
@@ -22,6 +24,10 @@
         極帝天尊:"assets/dungeons/abyss/floor5-extreme-emperor.webp",
         天兵天將:"assets/dungeons/abyss/floor5-soldier.webp"
     };
+    let monsterPortraitRegistry=null;
+    let monsterPortraitRegistryPromise=null;
+    let monsterPortraitByKey=new Map();
+    let monsterPortraitByUniqueName=new Map();
 
     function currentAbyssRoster(){
         if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
@@ -30,7 +36,112 @@
             .filter(entry=>entry.monster&&entry.monster.v141Abyss);
     }
 
-    function syncAbyssPortraitArt(card,portrait){
+    function isFinalAbyssRoster(roster){
+        return roster.some(entry=>Object.prototype.hasOwnProperty.call(
+            FINAL_ABYSS_PORTRAITS,
+            entry.monster.name
+        )&&entry.monster.name!=="天兵天將");
+    }
+
+    function registryTargets(registry){
+        if(!registry||!registry.groups||!Array.isArray(registry.tupleSchema)){ return []; }
+        const fields=registry.tupleSchema;
+        return Object.entries(registry.groups).flatMap(([group,rows])=>(rows||[]).map(row=>{
+            const target={group:group};
+            fields.forEach((field,index)=>{ target[field]=row[index]; });
+            return target;
+        }));
+    }
+
+    function installMonsterPortraitRegistry(registry){
+        const byKey=new Map();
+        const byName=new Map();
+        const duplicateNames=new Set();
+        registryTargets(registry).forEach(target=>{
+            if(target.status!=="existing"||!target.portraitKey||!target.path){ return; }
+            byKey.set(target.portraitKey,target);
+            if(byName.has(target.name)){ duplicateNames.add(target.name); }
+            else{ byName.set(target.name,target); }
+        });
+        duplicateNames.forEach(name=>byName.delete(name));
+        monsterPortraitRegistry=registry;
+        monsterPortraitByKey=byKey;
+        monsterPortraitByUniqueName=byName;
+        syncMonsterPortraits();
+        return registry;
+    }
+    window.v154InstallMonsterPortraitRegistry=installMonsterPortraitRegistry;
+
+    function requestMonsterPortraitRegistry(){
+        if(monsterPortraitRegistryPromise||typeof fetch!=="function"){ return monsterPortraitRegistryPromise; }
+        monsterPortraitRegistryPromise=fetch(MONSTER_PORTRAIT_REGISTRY_URL,{cache:"no-cache"})
+            .then(response=>{
+                if(!response||!response.ok){ throw new Error("HTTP "+(response&&response.status)); }
+                return response.json();
+            })
+            .then(installMonsterPortraitRegistry)
+            .catch(error=>{
+                console.warn("[monster-portrait] registry load failed; existing battle art remains active.",error);
+                return null;
+            });
+        return monsterPortraitRegistryPromise;
+    }
+    window.v154RequestMonsterPortraitRegistry=requestMonsterPortraitRegistry;
+
+    function legacyAbyssPortrait(monster,finalFloor){
+        if(!monster||!monster.v141Abyss){ return null; }
+        const portraits=finalFloor?FINAL_ABYSS_PORTRAITS:EARLY_ABYSS_PORTRAITS;
+        return portraits[monster.name]||null;
+    }
+
+    function resolveMonsterPortraitRecord(monster,options){
+        if(!monster){ return null; }
+        const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||"").trim();
+        if(explicitKey&&monsterPortraitByKey.has(explicitKey)){
+            return monsterPortraitByKey.get(explicitKey);
+        }
+        if(monster.name==="天兵天將"){
+            const element=String(monster.portraitElement||monster.element||"").toLowerCase();
+            if(HEAVENLY_SOLDIER_ELEMENTS.has(element)){
+                const soldier=monsterPortraitByKey.get("soldier."+element);
+                if(soldier){ return soldier; }
+            }
+        }
+        const byName=monsterPortraitByUniqueName.get(monster.name);
+        if(byName){ return byName; }
+        const legacy=legacyAbyssPortrait(monster,!!(options&&options.finalAbyss));
+        return legacy?{
+            portraitKey:"legacy.abyss."+String(monster.name||"unknown"),
+            name:monster.name,
+            element:monster.element||"dynamic",
+            rank:monster.rank||"regular",
+            sizeClass:"boss",
+            path:legacy,
+            status:"existing",
+            legacy:true
+        }:null;
+    }
+    window.v154ResolveMonsterPortraitRecord=resolveMonsterPortraitRecord;
+    window.resolveMonsterPortrait=function(monster){
+        const roster=currentAbyssRoster();
+        const record=resolveMonsterPortraitRecord(monster,{finalAbyss:isFinalAbyssRoster(roster)});
+        return record?record.path:null;
+    };
+
+    function installMonsterPortraitPresentationStyle(){
+        if(typeof document==="undefined"||typeof document.createElement!=="function"){ return; }
+        if(document.getElementById&&document.getElementById("v154MonsterPortraitStyle")){ return; }
+        const style=document.createElement("style");
+        style.id="v154MonsterPortraitStyle";
+        style.textContent=
+            '#game-stage #battlePage .battle-monster.v174-cardless-unit.v154-monster-portrait>.v174-battle-art{'+
+            'inset:-8px -5px 2px!important;background-size:contain!important;background-position:center bottom!important;'+
+            'background-repeat:no-repeat!important;}';
+        const host=document.head||document.body;
+        if(host&&typeof host.appendChild==="function"){ host.appendChild(style); }
+    }
+
+    function syncMonsterPortraitArt(card,portrait){
         if(!card){ return; }
         const selector=".v162-abyss-battle-portrait-art";
         const art=typeof card.querySelector==="function"?card.querySelector(selector):null;
@@ -44,7 +155,7 @@
         let portraitArt=art;
         if(!portraitArt&&typeof document.createElement==="function"){
             portraitArt=document.createElement("img");
-            portraitArt.className="v162-abyss-battle-portrait-art";
+            portraitArt.className="v162-abyss-battle-portrait-art v154-monster-portrait-art";
             portraitArt.alt="";
             portraitArt.draggable=false;
             portraitArt.decoding="async";
@@ -55,20 +166,43 @@
                 card.appendChild(portraitArt);
             }
         }
-        if(portraitArt&&portraitArt.dataset.abyssPortraitSrc!==portrait){
+        if(portraitArt&&portraitArt.dataset.monsterPortraitSrc!==portrait){
             portraitArt.src=portrait;
+            portraitArt.dataset.monsterPortraitSrc=portrait;
             portraitArt.dataset.abyssPortraitSrc=portrait;
         }
     }
 
-    function syncAbyssPortraits(){
+    function syncCardlessPresentation(card,record){
+        if(!card){ return; }
+        const previousManaged=!!card.dataset.monsterPortraitKey;
+        const art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
+        if(record){
+            const cssValue='url("'+record.path+'")';
+            if(!previousManaged&&card.dataset.v174BattleArtwork){
+                card.dataset.v154BaseBattleArtwork=card.dataset.v174BattleArtwork;
+            }
+            card.dataset.v174BattleArtwork=cssValue;
+            if(art&&art.style){ art.style.backgroundImage=cssValue; }
+            return;
+        }
+        if(!previousManaged){ return; }
+        const base=card.dataset.v154BaseBattleArtwork||"";
+        if(base){ card.dataset.v174BattleArtwork=base; }
+        else{ delete card.dataset.v174BattleArtwork; }
+        delete card.dataset.v154BaseBattleArtwork;
+        if(art&&art.style){
+            if(base){ art.style.backgroundImage=base; }
+            else if(typeof art.style.removeProperty==="function"){ art.style.removeProperty("background-image"); }
+            else{ art.style.backgroundImage=""; }
+        }
+    }
+
+    function syncMonsterPortraits(){
         if(typeof document==="undefined"){ return; }
+        installMonsterPortraitPresentationStyle();
         const roster=currentAbyssRoster();
-        const finalFloor=roster.some(entry=>Object.prototype.hasOwnProperty.call(
-            FINAL_ABYSS_PORTRAITS,
-            entry.monster.name
-        )&&entry.monster.name!=="天兵天將");
-        const portraits=finalFloor?FINAL_ABYSS_PORTRAITS:EARLY_ABYSS_PORTRAITS;
+        const finalFloor=isFinalAbyssRoster(roster);
         const battlePage=document.getElementById("battlePage");
         if(battlePage){
             battlePage.classList.toggle("v154-abyss-battle",roster.length>0);
@@ -80,26 +214,36 @@
             const monster=typeof monsters!=="undefined"?monsters[index]:null;
             const card=document.getElementById("battleMonster"+index);
             if(!card){ return; }
-            const portrait=monster&&monster.v141Abyss?portraits[monster.name]:null;
-            card.classList.toggle("v152-abyss-portrait",!!portrait);
-            card.classList.toggle("v154-abyss-portrait",!!portrait);
+            const record=resolveMonsterPortraitRecord(monster,{finalAbyss:finalFloor});
+            const portrait=record&&record.path;
+            const abyssPortrait=!!(portrait&&monster&&monster.v141Abyss);
+            syncCardlessPresentation(card,record);
+            card.classList.toggle("v152-abyss-portrait",abyssPortrait);
+            card.classList.toggle("v154-abyss-portrait",abyssPortrait);
+            card.classList.toggle("v154-monster-portrait",!!portrait);
             if(portrait){
                 card.style.setProperty("--v152-abyss-portrait",'url("'+portrait+'")');
-                card.dataset.abyssPortrait=finalFloor?"floor5":"floor1-4";
+                card.dataset.monsterPortraitKey=record.portraitKey;
+                card.dataset.monsterPortraitPath=portrait;
+                if(abyssPortrait){ card.dataset.abyssPortrait=finalFloor?"floor5":"floor1-4"; }
+                else{ delete card.dataset.abyssPortrait; }
             }else{
                 card.style.removeProperty("--v152-abyss-portrait");
+                delete card.dataset.monsterPortraitKey;
+                delete card.dataset.monsterPortraitPath;
                 delete card.dataset.abyssPortrait;
             }
-            syncAbyssPortraitArt(card,portrait);
+            syncMonsterPortraitArt(card,portrait);
         });
     }
-    window.v154SyncAbyssPortraits=syncAbyssPortraits;
+    window.v154SyncMonsterPortraits=syncMonsterPortraits;
+    window.v154SyncAbyssPortraits=syncMonsterPortraits;
 
     if(typeof renderBattle==="function"){
         const previousRenderBattle=renderBattle;
         renderBattle=function(){
             const result=previousRenderBattle.apply(this,arguments);
-            syncAbyssPortraits();
+            syncMonsterPortraits();
             return result;
         };
     }
@@ -107,7 +251,7 @@
         const previousUpdateMonsterUI=updateMonsterUI;
         updateMonsterUI=function(){
             const result=previousUpdateMonsterUI.apply(this,arguments);
-            syncAbyssPortraits();
+            syncMonsterPortraits();
             return result;
         };
     }
@@ -374,5 +518,6 @@
         },1000);
     }
     syncElementBoxPrimaryButton();
-    syncAbyssPortraits();
+    requestMonsterPortraitRegistry();
+    syncMonsterPortraits();
 })();
