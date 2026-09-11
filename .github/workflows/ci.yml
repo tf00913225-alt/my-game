@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -73,22 +73,6 @@ jobs:
 
       - name: Run all Node unit and integration suites
         run: node .github/scripts/ci.mjs tests
-
-      - name: Sync deterministic build outputs to this work branch
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'feature/boss-balance-gameplay-cover-skill-preview-relic-20260911'
-        env:
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
-        run: |
-          git fetch --no-tags origin "$HEAD_REF"
-          git checkout -B build-sync FETCH_HEAD
-          node scripts/build-production.mjs
-          git add -A asset-manifest.json build
-          if ! git diff --cached --quiet; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -m "build: refresh deterministic bundles"
-            git push origin HEAD:"$HEAD_REF"
-          fi
 
       - name: Run account-first cold/warm mobile browser QA
         run: node .github/scripts/run-boot-architecture-browser-qa.mjs
