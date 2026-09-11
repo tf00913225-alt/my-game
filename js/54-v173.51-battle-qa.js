@@ -27,13 +27,13 @@ function ensureBattlePresentationStyles(){
     const style=document.createElement("style");
     style.id="v174-cardless-battle-style";
     style.textContent=`
-#game-stage #battlePage .battle-player.v174-cardless-unit,
-#game-stage #battlePage .battle-monster.v174-cardless-unit{
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit,
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{
     border:0!important;outline:0!important;box-shadow:none!important;
     background-color:transparent!important;background-image:none!important;
     isolation:isolate!important;
 }
-#game-stage #battlePage .v174-cardless-unit>.v174-battle-art{
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
     position:absolute!important;inset:0!important;z-index:1!important;
     display:block!important;pointer-events:none!important;
     background-repeat:no-repeat!important;background-color:transparent!important;
@@ -41,47 +41,47 @@ function ensureBattlePresentationStyles(){
     animation:v174BattleIdle 3.4s ease-in-out infinite!important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
 }
-#game-stage #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
     background-size:cover!important;background-position:center 18%!important;
 }
-#game-stage #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
     background-size:cover!important;background-position:center center!important;
 }
-#game-stage #battlePage .v174-cardless-unit>.v174-battle-art::after{
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
     content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;
     border-radius:50%;background:rgba(0,0,0,.42);filter:blur(2px);
     transform:translateX(-50%);pointer-events:none;
 }
-#game-stage #battlePage .v174-cardless-unit>.v174-battle-art~*{z-index:6;}
-#game-stage #battlePage .v174-cardless-unit .hp-bar,
-#game-stage #battlePage .v174-cardless-unit .sp-bar,
-#game-stage #battlePage .v174-cardless-unit .monster-hp,
-#game-stage #battlePage .v174-cardless-unit .monster-sp{z-index:20!important;}
-#game-stage #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art~*{z-index:6;}
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit .hp-bar,
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit .sp-bar,
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-hp,
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-sp{z-index:20!important;}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{
     opacity:0!important;pointer-events:none!important;
 }
-#game-stage #battlePage .battle-player.v174-cardless-unit.active-turn::after{
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{
     border:0!important;background:none!important;box-shadow:none!important;
 }
-#game-stage #battlePage .battle-player.v174-cardless-unit.ally-targetable{box-shadow:none!important;}
-#game-stage #battlePage .battle-monster.v174-cardless-unit.target{
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.ally-targetable{box-shadow:none!important;}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target{
     border:0!important;box-shadow:none!important;
 }
-#game-stage #battlePage .battle-player.v174-cardless-unit.active-turn>.v174-battle-art,
-#game-stage #battlePage .battle-monster.v174-cardless-unit.target>.v174-battle-art{
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn>.v174-battle-art,
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target>.v174-battle-art{
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7)));
 }
-#game-stage #battlePage .v174-cardless-unit.attacker-lunge-up{animation:none!important;}
-#game-stage #battlePage .v174-cardless-unit.attacker-lunge-down{animation:none!important;}
-#game-stage #battlePage .v174-cardless-unit.attacker-lunge-up>.v174-battle-art{animation:v174BattleLungeUp .45s ease!important;}
-#game-stage #battlePage .v174-cardless-unit.attacker-lunge-down>.v174-battle-art{animation:v174BattleLungeDown .45s ease!important;}
-#game-stage #battlePage .v174-cardless-unit>.v174-battle-art.v174-hit-shake{animation:v174BattleHitShake .28s ease!important;}
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up{animation:none!important;}
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down{animation:none!important;}
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up>.v174-battle-art{animation:v174BattleLungeUp .45s ease!important;}
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down>.v174-battle-art{animation:v174BattleLungeDown .45s ease!important;}
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art.v174-hit-shake{animation:v174BattleHitShake .28s ease!important;}
 @keyframes v174BattleIdle{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.015)}}
 @keyframes v174BattleLungeUp{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(-13px) scale(1.035)}68%{transform:translateY(-5px) scale(1.015)}}
 @keyframes v174BattleLungeDown{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(13px) scale(1.035)}68%{transform:translateY(5px) scale(1.015)}}
 @keyframes v174BattleHitShake{0%,100%{transform:translate(0,0)}18%{transform:translate(-4px,1px)}36%{transform:translate(4px,-1px)}54%{transform:translate(-3px,0)}72%{transform:translate(2px,1px)}}
 @media (prefers-reduced-motion:reduce){
-    #game-stage #battlePage .v174-cardless-unit>.v174-battle-art{animation:none!important;}
+    #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{animation:none!important;}
 }
 `;
     document.head.appendChild(style);
