@@ -4564,16 +4564,15 @@
             }
             const levelCount=Object.values(counts).reduce((sum,value)=>sum+Math.max(0,Math.floor(Number(value)||0)),0);
             const confirmMessage="確定要消耗 "+discounted.toLocaleString("zh-TW")+" EXP，完成 "+levelCount+" 次升級嗎？";
-            let approved=true;
-            if(typeof window.rpgConfirm==="function"){
-                approved=await window.rpgConfirm(confirmMessage,{
-                    title:"確認經驗池升級",
-                    confirmText:"確定升級",
-                    cancelText:"返回"
-                });
-            }else if(typeof window.confirm==="function"){
-                approved=window.confirm(confirmMessage);
+            if(typeof window.rpgConfirm!=="function"){
+                v173ScheduleExpPoolDecoration(viewport);
+                return false;
             }
+            const approved=await window.rpgConfirm(confirmMessage,{
+                title:"確認經驗池升級",
+                confirmText:"確定升級",
+                cancelText:"返回"
+            });
             if(!approved){
                 v173ScheduleExpPoolDecoration(viewport);
                 return false;
