@@ -32,10 +32,10 @@ assert.match(vfx,/if\(mechanismTarget\)\{ validTargets\.add\(mechanismTarget\); 
 assert.match(vfx,/isMechanismTarget\(index\)\)\{ return mechanismCardFor\(index\); \}/);
 
 // Generic battle card sizes remain untouched. Only a runtime-tagged Gameplay
-// BOSS receives the large portrait 9:16 variables requested for this screen.
+// BOSS receives the paired 4:3 geometry requested for this screen.
 assert.match(v141,/flex:0 0 var\(--v143-monster-card-width,76px\) !important;/);
 assert.match(v143,/#game-stage > #app > #game-content #battlePage \.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:82px;[\s\S]*?--v143-monster-card-height:106px;/);
-assert.match(boss,/#game-stage > #app > #game-content #battlePage \.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:clamp\(154px,38\.1%,166px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:9 \/ 16;/);
+assert.match(boss,/#game-stage > #app > #game-content #battlePage \.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:var\(--gameplay-boss-card-width\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:4 \/ 3;/);
 assert.match(runtime,/bossCard\.classList\.add\("gameplay-boss-card"\)/);
 
 // The old V131 row has a hard flex sizing path. Gameplay BOSS mode switches
@@ -51,24 +51,25 @@ assert.doesNotMatch(bossCardRule,/scale\(/);
 
 // The redundant battle heading is hidden only while a Gameplay BOSS is active.
 // Its historical geometry is reclaimed by the formation without introducing
-// a new priority patch in the new Boss-specific sizing rules.
+// a new priority patch in the Boss-specific sizing rules. The same owner also
+// defines both card widths so compact screens shrink the pair together.
 assert.match(boss,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
-assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-32px;/);
+assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(148px,36\.5%,160px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(82px,20%,92px\);[\s\S]*?margin-top:-16px;/);
+assert.match(boss,/@media \(max-height:840px\)\{[\s\S]*?#game-stage #battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(138px,34%,150px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(78px,19\.5%,88px\);/);
 const activeBossAreaRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active{");
 const activeBossRowRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{");
 assert.doesNotMatch(activeBossAreaRule,/!important/);
 assert.doesNotMatch(activeBossRowRule,/!important/);
 
-// The function/mechanism card is an independent portrait 9:16 battlefield
-// component. Its face is type -> name -> HP -> concise effect. Combat targeting
-// remains on the mechanism button itself; the separate detail panel keeps the
-// full dynamic explanation available.
+// The function/mechanism card is the paired 4:3 battlefield component. Its
+// face is compact type -> name -> HP; the separate detail panel owns the full
+// dynamic explanation and the battlefield card never uses transform sizing.
 assert.match(boss,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
-assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:clamp\(82px,20%,96px\);[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?flex:0 0 clamp\(82px,20%,96px\);/);
-assert.match(boss,/\.boss-mechanism-kind\{[\s\S]*?order:1;[\s\S]*?font-size:13px;/);
-assert.match(boss,/\.boss-mechanism-name\{[\s\S]*?order:2;[\s\S]*?font-size:14px;[\s\S]*?-webkit-line-clamp:2;/);
-assert.match(boss,/\.boss-mechanism-hp\{[\s\S]*?order:3;[\s\S]*?min-height:20px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
-assert.match(boss,/\.boss-mechanism-card::after\{[\s\S]*?order:4;[\s\S]*?-webkit-line-clamp:4;/);
+assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:var\(--gameplay-mechanism-card-width\);[\s\S]*?aspect-ratio:4 \/ 3;[\s\S]*?flex:0 0 var\(--gameplay-mechanism-card-width\);/);
+assert.match(boss,/\.boss-mechanism-kind\{[\s\S]*?order:1;[\s\S]*?font-size:10px;/);
+assert.match(boss,/\.boss-mechanism-name\{[\s\S]*?order:2;[\s\S]*?font-size:11px;[\s\S]*?-webkit-line-clamp:1;/);
+assert.match(boss,/\.boss-mechanism-hp\{[\s\S]*?order:3;[\s\S]*?min-height:12px;[\s\S]*?font-size:9\.5px;[\s\S]*?font-weight:900;/);
+assert.match(boss,/\.boss-mechanism-card::after\{\s*display:none;/);
 assert.match(boss,/data-type="shield"\]::after\{ content:"護體中・優先擊破"; \}/);
 assert.match(boss,/data-type="charge"\]::after\{ content:"倒數重擊・擊破可取消"; \}/);
 assert.match(boss,/data-type="heal"\]::after\{ content:"每回合回復 BOSS 4%"; \}/);
@@ -79,7 +80,7 @@ assert.doesNotMatch(mechanismCardRule,/!important/);
 assert.doesNotMatch(mechanismCardRule,/transform\s*:/);
 assert.doesNotMatch(mechanismCardRule,/zoom\s*:/);
 assert.doesNotMatch(mechanismCardRule,/scale\(/);
- assert.doesNotMatch(boss.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Boss stylesheet declarations must remain free of priority patches");
+assert.doesNotMatch(boss.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Boss stylesheet declarations must remain free of priority patches");
 
 const renderStart=runtime.indexOf("function renderMechanisms()");
 const renderEnd=runtime.indexOf("function showMechanismToast",renderStart);

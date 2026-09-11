@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-11-three-branch-dev-integration",
+  "baseBranch": "dev",
+  "baseCommit": "34c5603b2ac7c062813489d5ddd1fef95fb20590",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "INTEGRATION-01",
+      "status": "VERIFIED",
+      "requirement": "以 GitHub 實際內容讀取規範、最新 dev/main、三條指定分支與相對 diff，並先完成 owner、state、listener、selector、重複實作與舊基底風險分析",
+      "evidence": [
+        "Initial dev HEAD 34c5603b2ac7c062813489d5ddd1fef95fb20590; initial main HEAD 4989000c1034a6ca05a26dbdcf1ff36ed92e7d37",
+        "All three branch tips exactly matched the user-specified SHAs",
+        "AGENTS.md; CLAUDE.md; HANDOFF.md; UI_GUIDELINES.md; ARCHITECTURE_RULES.md; docs/ITEM_RARITY_UI_SPEC.md; docs/RELEASE_VERIFICATION_RULES.md"
+      ]
+    },
+    {
+      "id": "MOBILE-01",
+      "status": "VERIFIED",
+      "requirement": "fix/mobile-ui-exp-guards-20260911@1dcff7dbfcad1837ce8399857861a41909eaf523 已存在於起始 dev 且既有手機 UI／EXP safeguards 未被後續整合回退",
+      "evidence": [
+        "Existing dev merge 34c5603b2ac7c062813489d5ddd1fef95fb20590 has exact work commit as second parent",
+        "GitHub CI run 34575775811 Repository checks and exact-SHA dev deployment SUCCESS",
+        "Local v174 mobile UI/EXP guards and EXP scroll-stability regressions passed"
+      ]
+    },
+    {
+      "id": "BOSS-01",
+      "status": "VERIFIED",
+      "requirement": "feature/boss-balance-gameplay-cover-skill-preview-relic-20260911@7751692d9df4afba08a5ce7058661ca3ede682c4 安全合入目前 dev，保留現有 Boss 4:3 手機修正並納入平衡、援軍、16:9 玩法封面、克制說明與 Lv20 秘寶里程碑",
+      "evidence": [
+        "Manual merge preserved the newer dev 4:3 Boss/mechanism owner while adding the 16:9 gameplay cover and expanded body-mounted element-counter hint",
+        "Boss/Tower 13/13 runtime tests, relic progression, integration source contracts and battle-preservation tests passed locally",
+        "Integration PR #172 run 34578585776 and dev run 34578810848 Repository checks SUCCESS",
+        "Actual dev merge 6de0d00d413362fd5e860698b1fa0ec76addc55d; exact-SHA deployment and live QA SUCCESS"
+      ]
+    },
+    {
+      "id": "CARDLESS-01",
+      "status": "VERIFIED",
+      "requirement": "fix/battle-cardless-motion-ui@d802f846d80301fe96b97dea1c6055a1e13377c4 以已含前兩條工作的 dev 為基底整合，且不改變戰鬥席位、action/turn UI、技能 VFX owner 或增加重複 observer",
+      "evidence": [
+        "Two-parent source merge 3e98aace46d86f1dab73f25856b4d92801fe60a7 integrates the exact work commit after verified dev 6de0d00d413362fd5e860698b1fa0ec76addc55d",
+        "Existing single MutationObserver callback is extended; no second observer, listener, battle state owner or VFX owner is introduced",
+        "PR #173 run 34580597818 passed 152/152 suites including actual Chrome cardless battle QA at 360x800 and 412x915",
+        "Actual dev merge d7ce985768399eb4b3071976e86805ee3f8b8fba; run 34580804490 Repository checks, exact-SHA deployment and live QA SUCCESS"
+      ]
+    },
+    {
+      "id": "INTEGRATION-02",
+      "status": "VERIFIED",
+      "requirement": "最終來源、deterministic build、manifest、共用 state 與 runtime owner 不互相覆蓋，無衝突標記、重複函式/listener、失效路徑或舊邏輯回流",
+      "evidence": [
+        "Generated manifest and hashed-bundle conflicts were resolved by rebuilding the combined source; final build has 22 deterministic content-hashed assets",
+        "Final source has one cardless presentation style owner, one MutationObserver and one 300ms sync interval; V142/V143 skill VFX, battle state, turn/action and seat geometry owners remain untouched",
+        "Stale 9:16 BOSS/mechanism comments and an over-broad cross-rule regex were corrected to enforce the current dev-approved 4:3 owner",
+        "Run 34580804490 confirmed 299 unique resources, 242 unique static IDs, no conflict markers, deterministic manifests and sole FeatureLoader ownership"
+      ]
+    },
+    {
+      "id": "QA-01",
+      "status": "VERIFIED",
+      "requirement": "最終 Repository checks、必要自動化、手機瀏覽器 QA、console/resource 檢查與 Cloudflare dev exact-SHA deployment 全部驗證",
+      "evidence": [
+        "Final feature merge run 34580804490: Repository checks job 103203640737 and Dev deployment job 103204149203 SUCCESS",
+        "228/228 JavaScript syntax checks and 152/152 Node/browser suites passed; mobile cover, cardless battle, UI guards, boot, skill and relic browser QA passed",
+        "Cloudflare dev manifest verified exact SHA d7ce985768399eb4b3071976e86805ee3f8b8fba with V173.65/cache 173.65; live account-first, Abyss and battle-layer/audio QA PASS",
+        "Independent live dev top-level inspection found no broken images, no horizontal overflow and no app-origin console warning/error; only a browser-extension metadata error was present"
+      ]
+    },
+    {
+      "id": "MAIN-01",
+      "status": "VERIFIED",
+      "requirement": "全程只修改 dev；main 不 merge、不 push、不建立以 main 為 target 的 PR，完成時 main HEAD 不變",
+      "evidence": [
+        "All integration PRs targeted dev only",
+        "main remained 4989000c1034a6ca05a26dbdcf1ff36ed92e7d37 after the final feature deployment"
+      ]
+    }
+  ],
+  "automatedVerification": "PASS — PR runs 34575775811, 34578585776 and 34580597818 plus dev runs 34578810848 and 34580804490 succeeded",
+  "visualVerification": "PASS — actual Chrome mobile suites plus deployed account-first, Abyss and battle-layer/audio live QA passed; independent signed-out dev inspection found no broken image, horizontal overflow or app-origin console error",
+  "notes": "7/7 VERIFIED. Game/Cache Version intentionally remains V173.65/cache 173.65. This integration checklist does not replace the enforced release/requirements.json gate."
+}

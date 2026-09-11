@@ -129,11 +129,14 @@
     padding:12px;
 }
 
+/* Gameplay activity covers use the same 16:9 production ratio as dungeon
+   covers. Combat BOSS/mechanism cards remain independent 4:3 components. */
 #game-stage .gameplay-mode-card{
     position:relative;
     display:grid;
     width:100%;
-    min-height:120px;
+    min-height:0;
+    aspect-ratio:16 / 9;
     box-sizing:border-box;
     grid-template-columns:minmax(0,1fr) 78px;
     gap:10px;
@@ -218,7 +221,6 @@
 #game-stage .gameplay-mode-card.abyss .gameplay-mode-seal{ color:#b7c9ea; border-color:#5d7197; }
 #game-stage .gameplay-mode-card.tower .gameplay-mode-seal{ color:#e8875d; border-color:#9e5434; }
 #game-stage .gameplay-mode-card.coming-soon{
-    min-height:88px;
     opacity:.67;
     cursor:default;
 }
@@ -585,7 +587,9 @@
 }
 
 #game-stage #battleMonsterArea.gameplay-boss-active{
-    margin-top:-32px;
+    --gameplay-boss-card-width:clamp(148px,36.5%,160px);
+    --gameplay-mechanism-card-width:clamp(82px,20%,92px);
+    margin-top:-16px;
     max-width:100%;
     overflow:visible;
 }
@@ -605,22 +609,23 @@
 /* Only Gameplay Center BOSSes receive the portrait treatment. The selector
    deliberately mirrors the shared V143 battle namespace, then adds the live
    Gameplay-BOSS marker so these variables outrank the generic 82x106 rank rule
-   without another !important. Height is derived from the card's own 9:16 ratio. */
+   without another !important. Height is derived from the card's current 4:3 ratio. */
 #game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{
-    --v143-monster-card-width:clamp(154px,38.1%,166px);
+    --v143-monster-card-width:var(--gameplay-boss-card-width);
     --v143-monster-card-height:auto;
     --v143-monster-icon-width:calc(100% - 12px);
     --v143-monster-icon-height:auto;
     --v143-monster-bar-width:calc(100% - 10px);
-    aspect-ratio:9 / 16;
+    aspect-ratio:4 / 3;
     box-sizing:border-box;
     align-self:start;
+    overflow:hidden;
 }
 
 /* The portrait owns most of the vertical card. Background portraits and real
    img children both fill the same crop box without distortion. */
 #game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon{
-    aspect-ratio:3 / 4;
+    aspect-ratio:3 / 1;
     overflow:hidden;
     border-radius:8px;
     background-position:center 18%;
@@ -683,17 +688,17 @@
 #game-stage #battleMonsterArea .boss-mechanism-card{
     position:relative;
     display:flex;
-    width:clamp(82px,20%,96px);
-    min-width:82px;
+    width:var(--gameplay-mechanism-card-width);
+    min-width:0;
     min-height:0;
-    aspect-ratio:9 / 16;
+    aspect-ratio:4 / 3;
     box-sizing:border-box;
-    flex:0 0 clamp(82px,20%,96px);
+    flex:0 0 var(--gameplay-mechanism-card-width);
     flex-direction:column;
     align-items:center;
     justify-content:flex-start;
-    gap:5px;
-    padding:8px 6px 7px;
+    gap:1px;
+    padding:2px 3px;
     overflow:hidden;
     border:2px solid var(--mechanism-color,#d5aa56);
     border-radius:9px;
@@ -739,16 +744,16 @@
     order:1;
     display:block;
     max-width:100%;
-    padding:2px 6px;
+    padding:0 4px;
     border:1px solid color-mix(in srgb,var(--mechanism-color) 62%,transparent);
     border-radius:999px;
     color:var(--mechanism-color);
     background:rgba(6,5,4,.62);
     font-family:"Noto Serif TC",serif;
-    font-size:13px;
+    font-size:10px;
     font-weight:900;
-    line-height:1.25;
-    letter-spacing:1px;
+    line-height:11px;
+    letter-spacing:.5px;
     white-space:nowrap;
 }
 
@@ -756,57 +761,45 @@
     order:2;
     display:-webkit-box;
     max-width:100%;
-    min-height:32px;
+    min-height:12px;
     overflow:hidden;
     color:#fff0c4;
     font-family:"Noto Serif TC",serif;
-    font-size:14px;
+    font-size:11px;
     font-weight:900;
-    line-height:1.25;
+    line-height:12px;
     text-align:center;
     text-overflow:clip;
     white-space:normal;
     overflow-wrap:anywhere;
     -webkit-box-orient:vertical;
-    -webkit-line-clamp:2;
+    -webkit-line-clamp:1;
 }
 
 #game-stage #battleMonsterArea .boss-mechanism-hp{
     order:3;
     display:flex;
     width:100%;
-    min-height:20px;
+    min-height:12px;
     box-sizing:border-box;
     align-items:center;
     justify-content:center;
-    padding:2px 3px;
+    padding:0 2px;
     border:1px solid rgba(248,199,101,.55);
     border-radius:999px;
     color:#ffe3a0;
     background:linear-gradient(180deg,rgba(107,29,20,.92),rgba(47,10,8,.92));
     box-shadow:inset 0 1px 0 rgba(255,239,183,.18),0 0 7px rgba(177,50,34,.18);
-    font-size:11px;
+    font-size:9.5px;
     font-weight:900;
-    line-height:1.2;
-    letter-spacing:-.25px;
+    line-height:1.05;
+    letter-spacing:-.45px;
     text-shadow:0 1px 2px #000;
     white-space:nowrap;
 }
 
 #game-stage #battleMonsterArea .boss-mechanism-card::after{
-    order:4;
-    display:-webkit-box;
-    width:100%;
-    min-height:0;
-    overflow:hidden;
-    color:#cbbda2;
-    font-size:11px;
-    font-weight:700;
-    line-height:1.35;
-    text-align:center;
-    overflow-wrap:anywhere;
-    -webkit-box-orient:vertical;
-    -webkit-line-clamp:4;
+    display:none;
 }
 
 #game-stage #battleMonsterArea .boss-mechanism-card[data-type="shield"]::after{ content:"護體中・優先擊破"; }
@@ -1027,5 +1020,14 @@
     #game-stage #battlePage .boss-mechanism-toast{
         animation-duration:.01ms;
         animation-iteration-count:1;
+    }
+}
+
+/* If the physical viewport is short, both battlefield cards shrink together.
+   Never solve a collision by changing only one member of the pair. */
+@media (max-height:840px){
+    #game-stage #battleMonsterArea.gameplay-boss-active{
+        --gameplay-boss-card-width:clamp(138px,34%,150px);
+        --gameplay-mechanism-card-width:clamp(78px,19.5%,88px);
     }
 }

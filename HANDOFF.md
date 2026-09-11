@@ -1,3 +1,24 @@
+## 2026-09-11 三分支手機 UI／BOSS 秘寶／無卡牌戰鬥安全整合（DEV VERIFIED）
+
+- 整合前 GitHub `dev@34c5603b2ac7c062813489d5ddd1fef95fb20590`、`main@4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`；三條遠端 tip 都精確等於指定 SHA。實際順序為既存 mobile UI／EXP guards → BOSS／四象塔平衡、玩法封面、技能預覽與 Lv20 秘寶 → 無卡牌戰鬥呈現。
+- `fix/mobile-ui-exp-guards-20260911@1dcff7dbfcad1837ce8399857861a41909eaf523` 已是起始 dev merge `34c5603b2ac7c062813489d5ddd1fef95fb20590` 的第二 parent，因此沒有重複合併；既有 PR #165 與 run `34575775811` 已成功，後續回歸測試仍通過。
+- `feature/boss-balance-gameplay-cover-skill-preview-relic-20260911@7751692d9df4afba08a5ce7058661ca3ede682c4` 以雙親 source merge `548e3a76697810af91c27f8c748eff694f50c393` 經 PR #172 合入 `dev@6de0d00d413362fd5e860698b1fa0ec76addc55d`。衝突為兩份 manifest、app-shell／feature-boss-relic hashed build rename、`css/56-v174-critical-ui-regressions.css` 與 `tests/ui-typography-battle-preservation.test.js`；人工保留較新 dev 的 4:3 BOSS／機關 owner、mobile guards 與 battle baseline，同時加入玩法 16:9、元素克制、BOSS／援軍與秘寶需求，再由 combined source 重建 generated assets。
+- `fix/battle-cardless-motion-ui@d802f846d80301fe96b97dea1c6055a1e13377c4` 以雙親 source merge `3e98aace46d86f1dab73f25856b4d92801fe60a7` 經 PR #173 合入 `dev@d7ce985768399eb4b3071976e86805ee3f8b8fba`。衝突只在兩份 manifest 與 gameplay-core hashed build rename，均以 combined source deterministic rebuild 解決；`js/54-v173.51-battle-qa.js` 只擴充既有單一 observer callback，沒有第二 observer／listener／state owner，V142/V143 技能 VFX、戰鬥席位、action／turn UI owner 均未改。
+- 交叉稽核另發現前一工作分支留下的 BOSS／機關 9:16 舊註解與會跨 CSS rule 誤匹配的過寬 regex；已改成精確鎖定目前 dev 核准的 4:3 owning rule，避免假陽性與舊規格回流。
+- 分支 2：PR run `34578585776`、dev run `34578810848` SUCCESS；BOSS/Tower 13/13、relic、mechanism、typography、mobile guards 與 390×844／412×915／420×747 Chrome suites 通過，Cloudflare exact-SHA deployment 與 live QA 成功。
+- 分支 3：PR run `34580597818`、dev run `34580804490` SUCCESS；228/228 JS syntax、152/152 Node/browser suites、299 resources、242 static IDs、22 deterministic build assets、release／loader／git-diff gates 全數通過。Chrome 的 cardless battle 360×800／412×915、玩法封面、mobile guards、boot／skill／relic QA，以及部署後 account-first、Abyss、battle-layer/audio live QA 全部 PASS。
+- Cloudflare `https://dev.four-symbols-dev.pages.dev` 已驗證部署 manifest exact SHA `d7ce985768399eb4b3071976e86805ee3f8b8fba`，Game／Cache Version 刻意維持 V173.65／173.65。額外 signed-out 實頁檢查無 broken image、水平 overflow 或 app-origin console warning/error；未建立匿名訪客帳號。
+- Requirement Batch：`release/requirement-batches/2026-09-11-three-branch-dev-integration.json`，7/7 VERIFIED。全程沒有以 `main` 為 base 的 PR、merge 或 push；完成 feature deployment 後 `main` 仍為 `4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`。
+
+## 2026-09-11 Facebook public_profile DEV 診斷（TEMP）
+
+- 工作分支 `fix/facebook-public-profile-diagnostic`，基準為當時最新 `dev@8e1a2d9cf5f2a0f6b4551b2d42fddae419eb505f`。Android DEV 已反覆重現 Meta `Invalid Scopes: email` 與 `Error Facebook / 無法載入`；Firebase Authorized Domains、Meta App Domains、Firebase handler redirect、App ID、管理員角色，以及 Firebase mobile redirect 均已逐項排除。
+- 官方 Firebase JS SDK 原始碼顯示 `FacebookAuthProvider` 本身不預載 `email` scope，`BaseOAuthProvider` scopes 預設為空；專案也沒有 `addScope('email')`。因此診斷目標是隔離 Firebase hosted Facebook OAuth 下游是否額外要求 `email`。
+- 最終診斷不載入 Meta JavaScript SDK、不新增外部 runtime script、不放寬 production manifest/release gate。僅 `https://dev.four-symbols-dev.pages.dev/` 由唯一 Auth owner `js/firebase/firebase-auth.js` 直接導向 Meta OAuth dialog，明確只要求 `public_profile` 與 `response_type=token`；callback 使用 `sessionStorage` 隨機 state 驗證、防 CSRF，取得 token 後立刻清除 URL fragment，再以 Firebase 官方 `FacebookAuthProvider.credential(token)` + `signInWithCredential()` 回到既有同一 Firebase UID owner。
+- DEV 直接 OAuth callback 固定為 `https://dev.four-symbols-dev.pages.dev/`，Meta → Facebook 登入 → 設定 →「有效的 OAuth 重新導向 URI」必須額外加入這個完整網址；原 Firebase handler `https://four-symbols-jianghu.firebaseapp.com/__/auth/handler` 保留不刪。
+- 這是明確 TEMP patch：若 public_profile-only 實機成功，根因集中到 Firebase hosted Facebook OAuth / email scope；下一輪必須選擇正式修正 Meta/Firebase scope 或將已驗證 token exchange 收斂成正式 owner。若仍失敗，移除此診斷並把根因集中到 Meta App/OAuth 層。禁止再往 `signInWithFacebook()` 疊第三層 workaround。
+- 不修改 `saveGame()` / `loadGame()`、UID ownership、Firestore Rules、雲端/本機 schema、Game/Cache Version；`main` 不修改。
+
 ## 2026-09-11 多對話 dev 分支稽核與 ancestry 收斂
 
 - 稽核基準為 GitHub `dev@fa21dc23971909556d65357c4e8e012c97b413d9`、`main@3d3e529e8e74dcced3dfcf8f82bac772a588d4a7`；稽核時遠端共有 100 個 branch heads，其中 76 個工作／整合分支已是 dev ancestor，沒有任何 branch 是建立在最新 dev 之上的未合併 descendant。

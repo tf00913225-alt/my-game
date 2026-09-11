@@ -513,12 +513,17 @@
         const body=document.getElementById("homeFeatureModalBody");
         if(!body){ return; }
         const title=document.getElementById("homeFeatureModalTitle");
-        if(title && title.textContent!=="角色"){ return; }
-        const row=body.firstElementChild;
-        if(!row || !row.children){ return; }
+        if(title && String(title.textContent||"").trim()!=="角色"){ return; }
+        const legacyRow=body.firstElementChild;
+        const cardsBySlot=new Map();
+        Array.from(body.querySelectorAll('[onclick*="openCharacterCreation"]')).forEach(card=>{
+            const match=String(card.getAttribute("onclick")||"").match(/openCharacterCreation\(\s*(2|3)\s*\)/);
+            if(match){ cardsBySlot.set(Number(match[1]),card); }
+        });
 
         [1,2].forEach(slotIndex=>{
-            const card=row.children[slotIndex];
+            const slotNumber=slotIndex+1;
+            const card=cardsBySlot.get(slotNumber) || (legacyRow&&legacyRow.children?legacyRow.children[slotIndex]:null);
             if(!card){ return; }
             const character=slotIndex===1 ? player2 : player3;
             if(character){
@@ -531,7 +536,6 @@
                 ? player.level>=10
                 : isThirdCharacterUnlocked();
             if(!eligible){ return; }
-            const slotNumber=slotIndex+1;
             card.style.opacity="1";
             card.style.position="relative";
             card.style.cursor="pointer";
