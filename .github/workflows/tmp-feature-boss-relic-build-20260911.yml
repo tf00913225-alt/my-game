@@ -74,9 +74,9 @@ jobs:
 
       - name: Remove temporary automation files and stage
         run: |
-          git rm scripts/tmp-apply-boss-relic-lv20-20260911.mjs
-          git rm scripts/tmp-feature-build-trigger.txt
-          git rm .github/workflows/tmp-feature-boss-relic-build-20260911.yml
+          rm -f scripts/tmp-apply-boss-relic-lv20-20260911.mjs
+          rm -f scripts/tmp-feature-build-trigger.txt
+          rm -f .github/workflows/tmp-feature-boss-relic-build-20260911.yml
           git add -A
           git status --short
 
