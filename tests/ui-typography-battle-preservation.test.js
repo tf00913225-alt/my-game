@@ -74,11 +74,11 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-earth-shield-
 assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|v143-skill-field|v143-hit-impact|v146-flight-art/);
 
 // This requirement intentionally expands the Gameplay BOSS battle UI owner: the
-// redundant title is removed, the active Gameplay BOSS becomes a large 9:16 card,
-// the mechanism target card becomes 9:16, and detail moves to a right-side alert.
-// Preserve every pre-battle Gameplay panel rule against the exact dev work base,
-// while the existing protected-BOSS / toast / animation tail remains anchored to
-// the previously approved Gameplay battle baseline.
+// redundant title is removed, both BOSS and mechanism target cards use 4:3,
+// compact screens shrink both through the same owner, and detail stays in the
+// existing right-side alert. Preserve every pre-battle Gameplay panel rule against
+// the exact dev work base, while the existing protected-BOSS / toast / animation
+// tail remains anchored to the previously approved Gameplay battle baseline.
 {
     const file="css/gameplay-boss-tower.css";
     const now=current(file);
@@ -105,12 +105,13 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
     );
 
     assert.match(now,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
-    assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?margin-top:-32px;/);
-    assert.match(now,/\.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:clamp\(154px,38\.1%,166px\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?aspect-ratio:9 \/ 16;/);
+    assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(148px,36\.5%,160px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(82px,20%,92px\);[\s\S]*?margin-top:-16px;/);
+    assert.match(now,/\.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:var\(--gameplay-boss-card-width\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?aspect-ratio:4 \/ 3;/);
     assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?position:relative;[\s\S]*?display:none;[\s\S]*?width:100%;[\s\S]*?margin:3px auto 0;[\s\S]*?pointer-events:none;/);
     assert.match(now,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
-    assert.match(now,/\.boss-mechanism-card\{[\s\S]*?width:clamp\(82px,20%,96px\);[\s\S]*?min-width:82px;[\s\S]*?aspect-ratio:9 \/ 16;[\s\S]*?flex:0 0 clamp\(82px,20%,96px\);[\s\S]*?pointer-events:auto;[\s\S]*?animation:gameplayMechanismEnter \.24s ease-out both;/);
-    assert.match(now,/\.boss-mechanism-hp\{[\s\S]*?min-height:20px;[\s\S]*?font-size:11px;[\s\S]*?font-weight:900;/);
+    assert.match(now,/\.boss-mechanism-card\{[\s\S]*?width:var\(--gameplay-mechanism-card-width\);[\s\S]*?min-width:0;[\s\S]*?aspect-ratio:4 \/ 3;[\s\S]*?flex:0 0 var\(--gameplay-mechanism-card-width\);[\s\S]*?pointer-events:auto;[\s\S]*?animation:gameplayMechanismEnter \.24s ease-out both;/);
+    assert.match(now,/\.boss-mechanism-hp\{[\s\S]*?min-height:12px;[\s\S]*?font-size:9\.5px;[\s\S]*?font-weight:900;/);
+    assert.match(now,/@media \(max-height:840px\)\{[\s\S]*?--gameplay-boss-card-width:clamp\(138px,34%,150px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(78px,19\.5%,88px\);/);
     assert.match(now,/\.boss-mechanism-info-alert\{[\s\S]*?border-radius:50%;[\s\S]*?animation:gameplayMechanismInfoAlert \.48s ease-in-out infinite;/);
     assert.match(now,/\.boss-mechanism-info-panel\{[\s\S]*?width:170px;[\s\S]*?height:302px;[\s\S]*?aspect-ratio:9 \/ 16;/);
 
@@ -121,8 +122,8 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
         cssRule(now,"#game-stage #battleMonsterArea .boss-mechanism-slot{"),
         cssRule(now,"#game-stage #battleMonsterArea .boss-mechanism-card{")
     ].join("\n");
-    assert.doesNotMatch(bossSizingPriorityScope,/!important/,"Gameplay BOSS portrait sizing must stay specificity-driven");
-     assert.doesNotMatch(now.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
+    assert.doesNotMatch(bossSizingPriorityScope,/!important/,"Gameplay BOSS 4:3 sizing must stay specificity-driven");
+    assert.doesNotMatch(now.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
 }
 
 // Relic battle rules are followed by a small-screen media block that owns the
@@ -134,4 +135,4 @@ sameSegment(
     "@media(max-width:390px)"
 );
 
-console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS portrait/mechanism owner and retired procedural VFX selectors.");
+console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS 4:3/mechanism owner and retired procedural VFX selectors.");
