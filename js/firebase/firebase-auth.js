@@ -13,11 +13,13 @@ import {
     browserLocalPersistence,
     createUserWithEmailAndPassword,
     getAuth,
+    getRedirectResult,
     onAuthStateChanged,
     setPersistence,
     signInAnonymously,
     signInWithEmailAndPassword,
     signInWithPopup,
+    signInWithRedirect,
     signOut
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
@@ -34,6 +36,22 @@ let initializePromise = null;
 
 function findExistingApp(){
     return getApps().find((app)=>app && app.name === FIREBASE_APP_NAME) || null;
+}
+
+function isMobileBrowser(){
+    try{
+        if(typeof navigator === "undefined"){ return false; }
+        if(navigator.userAgentData && typeof navigator.userAgentData.mobile === "boolean"){
+            return navigator.userAgentData.mobile;
+        }
+        const userAgent=String(navigator.userAgent || "");
+        if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)){
+            return true;
+        }
+        return /Macintosh/i.test(userAgent) && Number(navigator.maxTouchPoints || 0) > 1;
+    }catch(_){
+        return false;
+    }
 }
 
 function publicUser(user){
@@ -63,6 +81,9 @@ export async function initializeFirebaseAuth(){
         firebaseApp = findExistingApp() || initializeApp(FIREBASE_CONFIG, FIREBASE_APP_NAME);
         firebaseAuth = getAuth(firebaseApp);
         await setPersistence(firebaseAuth, browserLocalPersistence);
+        /* Complete any mobile OAuth redirect before startup observes the identity.
+           On ordinary boots this resolves to null and does not change the session. */
+        await getRedirectResult(firebaseAuth);
         return Object.freeze({ app: firebaseApp, auth: firebaseAuth });
     })();
 
@@ -100,6 +121,10 @@ export async function signInWithGoogle(){
 export async function signInWithFacebook(){
     const { auth } = await initializeFirebaseAuth();
     const provider = new FacebookAuthProvider();
+    if(isMobileBrowser()){
+        await signInWithRedirect(auth, provider);
+        return null;
+    }
     const credential = await signInWithPopup(auth, provider);
     return publicUser(credential.user);
 }
