@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.524e6cc8a94f.js"
+      "build/boot-core.95e00aaf27b6.js"
     ],
     "styles": [
       "build/boot-core.016dc8529603.css"
@@ -13,7 +13,7 @@
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
       "assets/ui/startup-main-city.d43e67af1c1c.jpg"
     ],
-    "firebaseBootstrap": "build/firebase/firebase-bootstrap.5c544293719d.js"
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.514c9039a560.js"
   },
   "featureManifest": {
     "schemaVersion": 1,
@@ -99,6 +99,13 @@
         "dependencies": [
           "gameplay-core"
         ]
+      },
+      "facebook-diagnostic-sdk": {
+        "scripts": [
+          "https://connect.facebook.net/zh_TW/sdk.js"
+        ],
+        "styles": [],
+        "dependencies": []
       }
     },
     "features": {
@@ -114,7 +121,8 @@
       "abyss": "feature-abyss",
       "skill": "feature-skill",
       "relic": "feature-boss-relic",
-      "boss-tower": "feature-boss-relic"
+      "boss-tower": "feature-boss-relic",
+      "facebook-diagnostic-sdk": "facebook-diagnostic-sdk"
     },
     "idlePreload": [
       "gameplay-core",
@@ -122,8 +130,8 @@
     ]
   },
   "assets": {
-    "build/boot-core.524e6cc8a94f.js": {
-      "sha256": "524e6cc8a94f",
+    "build/boot-core.95e00aaf27b6.js": {
+      "sha256": "95e00aaf27b6",
       "bytes": 44849
     },
     "build/app-shell.a887e992c1b2.js": {
@@ -186,20 +194,20 @@
       "sha256": "4314d6321ba1",
       "bytes": 1681
     },
-    "build/firebase/firebase-auth.64e6d0cd646a.js": {
-      "sha256": "64e6d0cd646a",
-      "bytes": 11352
+    "build/firebase/firebase-auth.e1d85dd20c4e.js": {
+      "sha256": "e1d85dd20c4e",
+      "bytes": 10570
     },
-    "build/firebase/firebase-cloud-save.08ce0e5bd9d3.js": {
-      "sha256": "08ce0e5bd9d3",
+    "build/firebase/firebase-cloud-save.6a75c1569d18.js": {
+      "sha256": "6a75c1569d18",
       "bytes": 4070
     },
-    "build/firebase/firebase-auth-ui.3a4d5d4c7006.js": {
-      "sha256": "3a4d5d4c7006",
+    "build/firebase/firebase-auth-ui.5a81e02d000b.js": {
+      "sha256": "5a81e02d000b",
       "bytes": 11362
     },
-    "build/firebase/firebase-bootstrap.5c544293719d.js": {
-      "sha256": "5c544293719d",
+    "build/firebase/firebase-bootstrap.514c9039a560.js": {
+      "sha256": "514c9039a560",
       "bytes": 4053
     },
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {

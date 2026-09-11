@@ -41,7 +41,7 @@ let facebookDiagnosticSdkPromise = null;
    Meta accepts a bare public_profile login without the downstream email scope. */
 const FACEBOOK_DIAGNOSTIC_APP_ID = "1712957419809925";
 const FACEBOOK_DIAGNOSTIC_API_VERSION = "v26.0";
-const FACEBOOK_DIAGNOSTIC_SDK_ID = "fourSymbolsFacebookDiagnosticSdk";
+const FACEBOOK_DIAGNOSTIC_FEATURE = "facebook-diagnostic-sdk";
 
 function findExistingApp(){
     return getApps().find((app)=>app && app.name === FIREBASE_APP_NAME) || null;
@@ -81,7 +81,7 @@ function facebookDiagnosticError(code,message,customData={}){
 }
 
 function initFacebookDiagnosticSdk(){
-    if(typeof window === "undefined" || typeof document === "undefined"){
+    if(typeof window === "undefined"){
         return Promise.reject(facebookDiagnosticError(
             "auth/facebook-diagnostic-sdk-unavailable",
             "Facebook DEV 診斷只能在瀏覽器執行。"
@@ -108,53 +108,30 @@ function initFacebookDiagnosticSdk(){
     }
     if(facebookDiagnosticSdkPromise){ return facebookDiagnosticSdkPromise; }
 
-    facebookDiagnosticSdkPromise=new Promise((resolve,reject)=>{
-        let settled=false;
-        const settle=(fn,value)=>{
-            if(settled){ return; }
-            settled=true;
-            clearTimeout(timeoutId);
-            fn(value);
-        };
-        const ready=()=>{
-            try{ settle(resolve,initialize()); }
-            catch(error){ settle(reject,error); }
-        };
-        const previousAsyncInit=window.fbAsyncInit;
-        window.fbAsyncInit=()=>{
-            if(typeof previousAsyncInit === "function"){
-                try{ previousAsyncInit(); }catch(error){ console.warn("Previous fbAsyncInit failed:",error); }
-            }
-            ready();
-        };
-        const timeoutId=setTimeout(()=>{
-            settle(reject,facebookDiagnosticError(
-                "auth/facebook-diagnostic-sdk-timeout",
-                "Meta JavaScript SDK 載入逾時。"
-            ));
-        },15000);
-
-        let script=document.getElementById(FACEBOOK_DIAGNOSTIC_SDK_ID);
-        if(!script){
-            script=document.createElement("script");
-            script.id=FACEBOOK_DIAGNOSTIC_SDK_ID;
-            script.async=true;
-            script.defer=true;
-            script.crossOrigin="anonymous";
-            script.src="https://connect.facebook.net/zh_TW/sdk.js";
-            script.onerror=()=>settle(reject,facebookDiagnosticError(
-                "auth/facebook-diagnostic-sdk-load-failed",
-                "Meta JavaScript SDK 載入失敗。"
-            ));
-            (document.head || document.documentElement).appendChild(script);
-        }else{
-            script.addEventListener("load",ready,{once:true});
-            script.addEventListener("error",()=>settle(reject,facebookDiagnosticError(
-                "auth/facebook-diagnostic-sdk-load-failed",
-                "Meta JavaScript SDK 載入失敗。"
-            )),{once:true});
+    facebookDiagnosticSdkPromise=(async()=>{
+        const featureOwner=window.FourSymbolsFeatures;
+        if(!featureOwner || typeof featureOwner.ensure !== "function"){
+            throw facebookDiagnosticError(
+                "auth/facebook-diagnostic-sdk-unavailable",
+                "FeatureLoader 尚未就緒，無法載入 Meta JavaScript SDK。"
+            );
         }
-    }).catch(error=>{
+        const loadPromise=featureOwner.ensure(FACEBOOK_DIAGNOSTIC_FEATURE,"facebook-auth-diagnostic");
+        const timeoutPromise=new Promise((_,reject)=>setTimeout(()=>reject(facebookDiagnosticError(
+            "auth/facebook-diagnostic-sdk-timeout",
+            "Meta JavaScript SDK 載入逾時。"
+        )),15000));
+        try{
+            await Promise.race([loadPromise,timeoutPromise]);
+        }catch(error){
+            if(error && String(error.code||"").startsWith("auth/facebook-diagnostic-")){ throw error; }
+            throw facebookDiagnosticError(
+                "auth/facebook-diagnostic-sdk-load-failed",
+                String(error && error.message || "Meta JavaScript SDK 載入失敗。")
+            );
+        }
+        return initialize();
+    })().catch(error=>{
         facebookDiagnosticSdkPromise=null;
         throw error;
     });
