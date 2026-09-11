@@ -1,0 +1,63 @@
+{
+  "date": "2026-09-11",
+  "title": "Boss balance, Gameplay 16:9 covers, element-counter copy, Lv20 starter relics",
+  "base_branch": "dev",
+  "base_sha": "eb9e9d78911ca5d72693c33aaab6002238291494",
+  "work_branch": "feature/boss-balance-gameplay-relic-lv20-20260911",
+  "officialVersion": "173.65",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "boss-balance",
+      "status": "IMPLEMENTED",
+      "request": "Recalibrate all BOSS strength to same-level party size, raise mechanism durability, allow selected encounters to summon two same-element elites, enforce Boss element/skill consistency, and use distinctive Boss names.",
+      "owner": [
+        "js/gameplay-boss-tower-system.js"
+      ],
+      "verification": [
+        "tests/gameplay-boss-tower-system.test.js",
+        "Repository checks / CI pending"
+      ]
+    },
+    {
+      "id": "gameplay-cover-16-9",
+      "status": "IMPLEMENTED",
+      "request": "Change Gameplay activity covers to 16:9.",
+      "owner": [
+        "css/gameplay-boss-tower.css"
+      ],
+      "verification": [
+        "tests/gameplay-ui-mobile-browser.test.js",
+        "Repository checks / CI pending"
+      ]
+    },
+    {
+      "id": "element-counter-preview-copy",
+      "status": "IMPLEMENTED",
+      "request": "Improve all-element skill preview counter layout and explain countering versus being countered.",
+      "owner": [
+        "css/56-v174-critical-ui-regressions.css"
+      ],
+      "verification": [
+        "tests/gameplay-ui-mobile-browser.test.js",
+        "Repository checks / CI pending"
+      ]
+    },
+    {
+      "id": "lv20-starter-relics",
+      "status": "IMPLEMENTED",
+      "request": "When the first character reaches Lv20, guarantee at least two blue relics are unlocked and usable.",
+      "owner": [
+        "js/relic-progression-drop-system.js"
+      ],
+      "verification": [
+        "tests/v174-relic-progression-drop-system.test.js",
+        "Repository checks / CI pending"
+      ]
+    }
+  ],
+  "pending": [
+    "Do not merge this branch into dev in this task.",
+    "DEV deployment/live verification is intentionally pending until an explicit later integration request."
+  ]
+}

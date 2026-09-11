@@ -31,11 +31,11 @@
     });
 
     const MECHANISM_DEFINITIONS=Object.freeze({
-        shield:Object.freeze({type:"shield",kind:"護盾",name:"金剛護體",hpRatio:.18,defenseRatio:.85,priority:100,effect:"存在期間 BOSS 無法被指定或受到新的直接傷害／異常。"}),
-        charge:Object.freeze({type:"charge",kind:"蓄力",name:"滅魂陣",hpRatio:.14,defenseRatio:.72,priority:90,countdown:2,effect:"倒數歸零時發動有預告的大型攻擊；破壞可取消。"}),
-        heal:Object.freeze({type:"heal",kind:"圖騰",name:"血祭圖騰",hpRatio:.13,defenseRatio:.68,priority:80,healRatio:.04,effect:"存在期間，每回合恢復 BOSS 4% 最大生命。"}),
-        amplify:Object.freeze({type:"amplify",kind:"法陣",name:"煞氣法陣",hpRatio:.12,defenseRatio:.72,priority:70,damageMultiplier:1.25,effect:"存在期間，BOSS 造成傷害提高 25%。"}),
-        seal:Object.freeze({type:"seal",kind:"封鎖",name:"鎖脈禁制",hpRatio:.12,defenseRatio:.72,priority:60,healingMultiplier:.6,effect:"存在期間，我方治療與 SP 回復效果降低 40%。"})
+        shield:Object.freeze({type:"shield",kind:"護盾",name:"金剛護體",hpRatio:.32,defenseRatio:.95,priority:100,effect:"存在期間 BOSS 無法被指定或受到新的直接傷害／異常。"}),
+        charge:Object.freeze({type:"charge",kind:"蓄力",name:"滅魂陣",hpRatio:.26,defenseRatio:.88,priority:90,countdown:2,effect:"倒數歸零時發動有預告的大型攻擊；破壞可取消。"}),
+        heal:Object.freeze({type:"heal",kind:"圖騰",name:"血祭圖騰",hpRatio:.24,defenseRatio:.82,priority:80,healRatio:.04,effect:"存在期間，每回合恢復 BOSS 4% 最大生命。"}),
+        amplify:Object.freeze({type:"amplify",kind:"法陣",name:"煞氣法陣",hpRatio:.22,defenseRatio:.85,priority:70,damageMultiplier:1.25,effect:"存在期間，BOSS 造成傷害提高 25%。"}),
+        seal:Object.freeze({type:"seal",kind:"封鎖",name:"鎖脈禁制",hpRatio:.22,defenseRatio:.85,priority:60,healingMultiplier:.6,effect:"存在期間，我方治療與 SP 回復效果降低 40%。"})
     });
 
     const PERSONAL_BOSSES=Object.freeze([

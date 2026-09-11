@@ -39,7 +39,23 @@ function load(options={}){
         activeBattleCharacterIndex:0,queuedPlayerActions:{},autoBattle:true,
         skillDatabase:{
             blast:{id:"blast",name:"全域破陣",element:"fire",category:"magic",targetType:"all",baseDamage:100,spCost:10},
-            strike:{id:"strike",name:"破陣斬",element:"fire",category:"physical",targetType:"single",baseDamage:100,spCost:5}
+            strike:{id:"strike",name:"破陣斬",element:"fire",category:"physical",targetType:"single",baseDamage:100,spCost:5},
+            fireRocket:{id:"fireRocket",element:"fire",category:"magic"},
+            explosiveFlurry:{id:"explosiveFlurry",element:"fire",category:"physical"},
+            dragonSlash:{id:"dragonSlash",element:"fire",category:"physical"},
+            rage:{id:"rage",element:"fire",category:"buff"},
+            stoneSlash:{id:"stoneSlash",element:"earth",category:"physical"},
+            flyingSandStrike:{id:"flyingSandStrike",element:"earth",category:"magic"},
+            dustStorm:{id:"dustStorm",element:"earth",category:"magic"},
+            rockWall:{id:"rockWall",element:"earth",category:"buff"},
+            waterKnife:{id:"waterKnife",element:"water",category:"physical"},
+            frostPunch:{id:"frostPunch",element:"water",category:"physical"},
+            floodBeast:{id:"floodBeast",element:"water",category:"magic"},
+            healSpell:{id:"healSpell",element:"water",category:"heal"},
+            stormFlurry:{id:"stormFlurry",element:"wind",category:"physical"},
+            windCrossSlash:{id:"windCrossSlash",element:"wind",category:"physical"},
+            windHowlLightning:{id:"windHowlLightning",element:"wind",category:"magic"},
+            dodgeSkill:{id:"dodgeSkill",element:"wind",category:"buff"}
         },
         getExistingPartyIndexes:()=>[0],
         getPartyCharacterByIndex:index=>index===0?context.player:null,
@@ -270,6 +286,73 @@ test("Tower floor 50 grants one weekly choice and replay cannot recreate it",()=
     assert.equal(first.context.vGameplaySelectTowerBand(50),true);finishBattle(first.context,"win");
     assert.equal(first.context.gold,goldAfterFirst);
     assert.equal(value(first.context,"GameplaySystem.getSerializableState().tower.pendingRelicChoice"),false);
+});
+
+
+test("Boss balance is calibrated to same-level two-character early teams and three-character late teams",()=>{
+    const {context}=load();
+    const personal=value(context,"GameplaySystem.personalBosses");
+    const world=value(context,"GameplaySystem.worldBosses");
+    assert.deepEqual(personal.slice(0,4).map(item=>item.recommendedParty),[2,2,2,2]);
+    assert.ok(personal.slice(4).every(item=>item.recommendedParty===3));
+    assert.equal(world[0].recommendedParty,2);
+    assert.ok(world.slice(1).every(item=>item.recommendedParty===3));
+    assert.ok(personal.every(item=>item.hpMultiplier>=7.2&&item.defenseMultiplier>=1.28));
+    assert.ok(world.every(item=>item.hpMultiplier>=10&&item.defenseMultiplier>=1.5));
+    const names=[...personal,...world].map(item=>item.name);
+    assert.equal(new Set(names).size,names.length,"all fixed Boss names must be distinct");
+    assert.ok(names.every(name=>name.includes("・")&&!/天兵天將|野怪|精英/.test(name)),"Boss names must stay visually distinct from generic monster naming");
+    assert.equal(context.vGameplayStartBoss("personal","personal-20"),true);
+    assert.equal(context.monsters[0].maxHP,7200);
+    assert.equal(context.monsters[0].attack,122);
+    assert.equal(context.monsters[0].defense,128);
+});
+
+test("every Boss action loadout is filtered to the Boss element",()=>{
+    for(const type of ["personal","world"]){
+        const probe=load();
+        const ids=value(probe.context,type==="personal"?"GameplaySystem.personalBosses.map(item=>item.id)":"GameplaySystem.worldBosses.map(item=>item.id)");
+        for(const id of ids){
+            const {context}=load();
+            assert.equal(context.vGameplayStartBoss(type,id),true);
+            const boss=context.monsters[0];
+            for(const skillId of [...boss.skillIds,...(boss.v141SupportSkillIds||[])]){
+                assert.equal(context.skillDatabase[skillId].element,boss.element,id+" contains cross-element skill "+skillId);
+            }
+        }
+    }
+    const {context}=load();
+    const towerBoss=context.GameplaySystem.buildTowerRoster(100)[0];
+    for(const skillId of [...towerBoss.skillIds,...(towerBoss.v141SupportSkillIds||[])]){
+        assert.equal(context.skillDatabase[skillId].element,towerBoss.element);
+    }
+});
+
+test("mechanism cards have meaningful durability instead of one-token HP",()=>{
+    const {context}=load();
+    context.vGameplayStartBoss("personal","personal-20");
+    context.turn=2;context.startTurn(context.battleToken);
+    const boss=context.monsters[0];
+    const shield=value(context,"GameplaySystem.getActiveBattleState().mechanisms[0]");
+    assert.equal(shield.type,"shield");
+    assert.ok(shield.maxHP>=Math.round(boss.maxHP*.31));
+    assert.ok(shield.defense>=Math.round(boss.defense*.9));
+});
+
+test("selected Boss encounters summon two real same-element elite reinforcements",()=>{
+    const {context}=load();
+    context.vGameplayStartBoss("personal","personal-30");
+    const boss=context.monsters[0];
+    boss.hp=Math.floor(boss.maxHP*.49);
+    context.turn=2;context.startTurn(context.battleToken);
+    assert.equal(context.monsters.length,3);
+    assert.deepEqual(value(context,"currentBattleMonsters"),[0,1,2]);
+    const guards=context.monsters.slice(1);
+    assert.ok(guards.every(unit=>unit.vGameplayBossSummon===true&&unit.rank==="elite"&&unit.element===boss.element));
+    assert.equal(new Set(guards.map(unit=>unit.name)).size,2);
+    guards.forEach(unit=>[...unit.skillIds,...(unit.v141SupportSkillIds||[])].forEach(skillId=>{
+        assert.equal(context.skillDatabase[skillId].element,boss.element);
+    }));
 });
 
 console.log(`All ${passed} Gameplay / BOSS / Tower runtime tests passed.`);
