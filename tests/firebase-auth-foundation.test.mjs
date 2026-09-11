@@ -108,25 +108,29 @@ test("Facebook auth uses redirect on mobile and consumes redirect result before 
     assert.match(docs, /mobile browsers use Firebase redirect/i);
 });
 
-test("DEV Facebook diagnostic isolates public_profile through the sole feature-loader script owner", ()=>{
+test("DEV Facebook diagnostic isolates public_profile through direct Meta OAuth without another runtime loader", ()=>{
     assert.match(auth, /FACEBOOK_DIAGNOSTIC_APP_ID\s*=\s*"1712957419809925"/);
     assert.match(auth, /FACEBOOK_DIAGNOSTIC_API_VERSION\s*=\s*"v26\.0"/);
-    assert.match(auth, /FACEBOOK_DIAGNOSTIC_FEATURE\s*=\s*"facebook-diagnostic-sdk"/);
+    assert.match(auth, /FACEBOOK_DIAGNOSTIC_REDIRECT_URI\s*=\s*"https:\/\/dev\.four-symbols-dev\.pages\.dev\/"/);
+    assert.match(auth, /FACEBOOK_DIAGNOSTIC_STATE_KEY/);
     assert.match(auth, /function isFacebookDiagnosticHost\(\)/);
-    assert.match(auth, /host === "four-symbols-dev\.pages\.dev" \|\| host\.endsWith\("\.four-symbols-dev\.pages\.dev"\)/);
+    assert.match(auth, /location\.hostname[\s\S]*dev\.four-symbols-dev\.pages\.dev/);
     assert.doesNotMatch(auth, /tf00913225-alt\.github\.io/);
-    assert.match(auth, /FourSymbolsFeatures/);
-    assert.match(auth, /featureOwner\.ensure\(FACEBOOK_DIAGNOSTIC_FEATURE,"facebook-auth-diagnostic"\)/);
-    assert.doesNotMatch(auth, /createElement\(["']script["']\)/);
-    assert.match(featureManifest, /"facebook-diagnostic-sdk"/);
-    assert.match(featureManifest, /https:\/\/connect\.facebook\.net\/zh_TW\/sdk\.js/);
+    assert.match(auth, /https:\/\/www\.facebook\.com\/\$\{FACEBOOK_DIAGNOSTIC_API_VERSION\}\/dialog\/oauth/);
+    assert.match(auth, /response_type:"token"/);
     assert.match(auth, /scope:"public_profile"/);
     assert.doesNotMatch(auth, /addScope\(["']email["']\)/);
+    assert.doesNotMatch(auth, /connect\.facebook\.net|createElement\(["']script["']\)/);
+    assert.doesNotMatch(featureManifest, /facebook-diagnostic-sdk|connect\.facebook\.net/);
+    assert.match(auth, /sessionStorage\.setItem/);
+    assert.match(auth, /expectedState[\s\S]*returnedState[\s\S]*expectedState !== returnedState/);
+    assert.match(auth, /clearFacebookDiagnosticHash\(\)/);
     assert.match(auth, /FacebookAuthProvider\.credential\(accessToken\)/);
     assert.match(auth, /signInWithCredential\(auth,credential\)/);
-    assert.match(auth, /if\(isFacebookDiagnosticHost\(\)\)\{[\s\S]*signInWithFacebookPublicProfileDiagnostic\(auth\)/);
-    assert.match(ui, /auth\/facebook-diagnostic-no-token/);
-    assert.match(ui, /使用 JavaScript SDK 登入/);
+    assert.match(auth, /await consumeFacebookDiagnosticCallback\(firebaseAuth\)/);
+    assert.match(auth, /if\(isFacebookDiagnosticHost\(\)\)\{[\s\S]*startFacebookPublicProfileDiagnostic\(\)/);
+    assert.match(ui, /auth\/facebook-diagnostic-state-mismatch/);
+    assert.match(ui, /auth\/facebook-diagnostic-oauth-error/);
 });
 
 test("one Critical Boot support owner serves login and in-game contact surfaces", ()=>{
