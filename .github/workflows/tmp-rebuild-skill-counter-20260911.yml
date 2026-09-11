@@ -20,16 +20,16 @@ jobs:
           ref: feature/boss-balance-gameplay-relic-lv20-20260911
           fetch-depth: 0
 
+      - name: Rebuild production assets
+        run: |
+          node scripts/build-production.mjs
+          node scripts/build-production.mjs --check
+
       - name: Verify counter owner and mobile UI
         run: |
           node tests/v174-current-ui-fixes.test.js
           node tests/ui-v174-current-fixes-mobile-browser.test.js
           node tests/gameplay-ui-mobile-browser.test.js
-
-      - name: Rebuild production assets
-        run: |
-          node scripts/build-production.mjs
-          node scripts/build-production.mjs --check
 
       - name: Verify loader
         run: node .github/scripts/ci.mjs loader
