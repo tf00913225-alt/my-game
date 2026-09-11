@@ -121,7 +121,7 @@ window.__qaBefore=qaRects();
       enemySp:enemy.querySelector('.monster-sp .monster-bar-text').textContent
     };
     parent.document.getElementById('result').textContent=JSON.stringify(result);
-  },60);
+  },260);
 })();
 </script>
 </body></html>`;
