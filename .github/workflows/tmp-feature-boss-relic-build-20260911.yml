@@ -36,6 +36,13 @@ jobs:
               if old not in source:
                   raise SystemExit('temporary patch-script compatibility anchor missing: '+old)
               source=source.replace(old,new,1)
+          lines=source.splitlines()
+          for i,line in enumerate(lines):
+              if '"<style>html,body{margin:0;width:390px;min-height:844px;background:#000}#game-stage{width:390px;height:844px}"+css.replace' in line:
+                  lines[i]='"<style>html,body{margin:0;width:390px;min-height:844px;background:#000}#game-stage{width:390px;height:844px}"+css+"</style>"+'
+              if '"<script>(function(){var card=document.querySelector' in line:
+                  lines[i]='"<script>(function(){var card=document.querySelector(\'.gameplay-mode-card\');var r=card.getBoundingClientRect();var hint=getComputedStyle(document.querySelector(\'.skill-preview-body\'),\'::before\');var out={width:r.width,height:r.height,ratio:r.width/r.height,content:hint.content,whiteSpace:hint.whiteSpace,textAlign:hint.textAlign,fontSize:parseFloat(hint.fontSize),overflowX:document.documentElement.scrollWidth-window.innerWidth};document.body.setAttribute(\'data-qa\',encodeURIComponent(JSON.stringify(out)));})();</scr"+"ipt>";'
+          source='\n'.join(lines)+'\n'
           path.write_text(source)
           PY
 
