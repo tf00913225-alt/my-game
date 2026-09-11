@@ -2,27 +2,31 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const path=require("node:path");
 const cp=require("node:child_process");
-const zlib=require("node:zlib");
 
 const run=cp.spawnSync(process.execPath,["scripts/build-production.mjs"],{encoding:"utf8",maxBuffer:32*1024*1024});
 assert.equal(run.status,0,run.stderr||run.stdout||"deterministic build failed");
 
-const status=cp.execFileSync("git",["status","--porcelain"],{encoding:"utf8",maxBuffer:4*1024*1024})
-    .split(/\r?\n/).filter(Boolean);
-const paths=[];
+const statusText=cp.execFileSync("git",["status","--porcelain"],{encoding:"utf8",maxBuffer:4*1024*1024});
+const status=statusText.split(/\r?\n/).filter(Boolean);
+const outRoot="artifacts/build-capture";
+fs.rmSync(outRoot,{recursive:true,force:true});
+fs.mkdirSync(path.join(outRoot,"files"),{recursive:true});
+fs.writeFileSync(path.join(outRoot,"status.txt"),statusText,"utf8");
+
+const copied=[];
 for(const line of status){
     const code=line.slice(0,2);
     let file=line.slice(3);
     if(file.includes(" -> ")){ file=file.split(" -> ").pop(); }
-    if(code.includes("D")){ continue; }
+    if(code.includes("D")||!fs.existsSync(file)){ continue; }
     if(file==="index.html"||file==="asset-manifest.json"||file==="build/asset-manifest.json"||/^build\/.+\.(?:js|css)$/.test(file)){
-        paths.push(file);
+        const dest=path.join(outRoot,"files",file);
+        fs.mkdirSync(path.dirname(dest),{recursive:true});
+        fs.copyFileSync(file,dest);
+        copied.push(file);
     }
 }
-const payload={status,files:{}};
-for(const file of paths){
-    if(fs.existsSync(file)){ payload.files[file]=fs.readFileSync(file,"utf8"); }
-}
-const encoded=zlib.gzipSync(Buffer.from(JSON.stringify(payload),"utf8"),{level:9}).toString("base64");
-throw new Error("BUILD_CAPTURE_BEGIN"+encoded+"BUILD_CAPTURE_END");
+fs.writeFileSync(path.join(outRoot,"copied.json"),JSON.stringify(copied,null,2)+"\n","utf8");
+console.log("✓ temporary deterministic-build artifact captured "+copied.length+" generated text files");
