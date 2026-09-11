@@ -1,0 +1,51 @@
+name: Privacy consent branch patch
+
+on:
+  push:
+    branches:
+      - feature/privacy-consent-gate-20260911
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, '[privacy-gate-patched]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/privacy-consent-gate-20260911
+          fetch-depth: 1
+      - name: Wire privacy gate into index and record owner
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          index = Path('index.html')
+          text = index.read_text(encoding='utf-8')
+          gate = '<iframe id="privacyConsentGate" src="privacy-consent.html" title="《四象江湖傳》隱私權政策確認" aria-hidden="false" style="position:fixed;inset:0;width:100%;height:100%;border:0;z-index:2147483647;background:#0b0907;"></iframe>'
+          if 'id="privacyConsentGate"' not in text:
+              needle = '<body>\n'
+              if needle not in text:
+                  raise SystemExit('index.html body marker not found')
+              text = text.replace(needle, needle + gate + '\n', 1)
+              index.write_text(text, encoding='utf-8')
+
+          handoff = Path('HANDOFF.md')
+          h = handoff.read_text(encoding='utf-8')
+          marker = '## 2026-09-11 隱私權政策同意 gate'
+          if marker not in h:
+              h += '''\n\n## 2026-09-11 隱私權政策同意 gate\n\n- `privacy-consent.html` 是隱私權政策首次同意與後續查看的唯一 owner；正式政策本文仍由 `privacy.html` 單一維護。\n- `index.html` 只掛一個最高層級同源 iframe gate，不新增第二套 Auth／Startup State Machine。首次未同意時必須把政策滑到底才開始 5 秒倒數，倒數完畢才可按「我同意」；同意版本以 `four_symbols_privacy_consent_version` 儲存在同源 localStorage。\n- 「不同意」先嘗試關閉視窗；因一般瀏覽器通常禁止網頁自行關閉使用者開啟的分頁，失敗時改導向 `privacy-declined.html` 並終止遊戲介面。\n- 同意 gate 持續以隱藏 iframe 作 owner，動態為登入頁插入「隱私權政策」入口，並在主城「系統」的客服列後插入同一入口；兩者皆重新開啟相同政策 viewer，不複製政策本文。\n- 本功能不修改 Firebase UID、登入 provider、存檔、角色資料、戰鬥、掉落或遊戲數值。\n'''
+              handoff.write_text(h, encoding='utf-8')
+          PY
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html HANDOFF.md
+          if git diff --cached --quiet; then
+            echo "No patch needed"
+            exit 0
+          fi
+          git commit -m "feat: wire privacy consent gate [privacy-gate-patched]"
+          git push origin HEAD:feature/privacy-consent-gate-20260911
