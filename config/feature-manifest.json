@@ -31,6 +31,11 @@
       "scripts": ["__BUILD_BOSS_RELIC__", "__BUILD_RELIC_PROGRESSION__"],
       "styles": ["__BUILD_BOSS_RELIC_STYLE__", "__BUILD_RELIC_PROGRESSION_STYLE__"],
       "dependencies": ["gameplay-core"]
+    },
+    "facebook-diagnostic-sdk": {
+      "scripts": ["https://connect.facebook.net/zh_TW/sdk.js"],
+      "styles": [],
+      "dependencies": []
     }
   },
   "features": {
@@ -46,7 +51,8 @@
     "abyss": "feature-abyss",
     "skill": "feature-skill",
     "relic": "feature-boss-relic",
-    "boss-tower": "feature-boss-relic"
+    "boss-tower": "feature-boss-relic",
+    "facebook-diagnostic-sdk": "facebook-diagnostic-sdk"
   },
   "idlePreload": ["gameplay-core", "feature-patrol"]
 }
