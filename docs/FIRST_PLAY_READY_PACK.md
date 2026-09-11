@@ -11,7 +11,7 @@
 - Privacy policy gate: `privacy-consent.html`
 - Feature bundle dependency graph: `config/feature-manifest.json` → generated `asset-manifest.json`
 
-Do not add First Play URLs ad hoc in startup JavaScript. Add a bundle or asset to `config/first-play-manifest.json`; the production build must resolve its content digest and byte size into `asset-manifest.json.firstPlay`.
+Do not add First Play URLs ad hoc in startup JavaScript. Add a bundle or asset to `config/first-play-manifest.json`; the production build must resolve its content digest and byte size into `asset-manifest.json.firstPlay`. The generated pack size, resource count and fingerprint are authoritative build outputs rather than duplicated constants in QA or runtime source.
 
 ## Readiness contract
 
