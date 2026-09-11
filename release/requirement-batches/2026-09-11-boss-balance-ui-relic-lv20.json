@@ -54,6 +54,7 @@
       "Final diff audit preserves canonical Boss/relic owners and contains no temporary helper/workflow in the finished tree."
     ],
     "pending": [],
-    "result": "4/4 VERIFIED"
+    "result": "4/4 VERIFIED",
+    "completionPolicy": "External completion reporting must use a successful Repository checks run for the latest work-branch head. This batch does not merge dev or modify main."
   }
 }
