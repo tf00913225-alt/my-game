@@ -1,17 +1,14 @@
 {
   "schemaVersion": 1,
   "id": "first-play-core",
-  "manifestVersion": "2026-09-11.2",
-  "assetPackVersion": "2026-09-11.2",
+  "manifestVersion": "2026-09-11.1",
+  "assetPackVersion": "2026-09-11.1",
   "concurrency": 5,
   "bundles": [
     {"id": "critical", "priority": "P0"},
     {"id": "app-shell", "priority": "P1"},
     {"id": "gameplay-core", "priority": "P2"},
-    {"id": "feature-patrol", "priority": "P2"},
-    {"id": "feature-abyss", "priority": "P2"},
-    {"id": "feature-skill", "priority": "P2"},
-    {"id": "feature-boss-relic", "priority": "P2"}
+    {"id": "feature-patrol", "priority": "P2"}
   ],
   "assets": [
     {"path": "privacy-consent.html", "priority": "P0", "type": "html"},
