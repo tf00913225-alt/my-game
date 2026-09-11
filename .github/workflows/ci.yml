@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -30,75 +30,27 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Check out boot-intro branch head
-        if: github.event_name == 'pull_request' && github.head_ref == 'feature/boot-intro-auth-overlay-20260911'
-        run: |
-          git fetch --no-tags origin "$GITHUB_HEAD_REF"
-          git checkout -B "$GITHUB_HEAD_REF" "origin/$GITHUB_HEAD_REF"
-
-      - name: Apply two-scene boot and compact auth overlay
-        if: github.event_name == 'pull_request' && github.head_ref == 'feature/boot-intro-auth-overlay-20260911'
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          L='assets/ui/startup-logo.4631c0bc3f2b.jpg'; C='assets/ui/startup-main-city.d43e67af1c1c.jpg'
-          def r(f,a,b):
-              p=Path(f);s=p.read_text()
-              if b in s:return
-              if a not in s:raise SystemExit(f'anchor missing {f}: {a[:60]!r}')
-              p.write_text(s.replace(a,b,1))
-          r('index.html',f'<link rel="preload" as="image" href="{L}">',f'<link rel="preload" as="image" href="{L}" fetchpriority="high">\n<link rel="preload" as="image" href="{C}" fetchpriority="high">')
-          r('index.html','    data-scene="logo"\n>','    data-scene="logo"\n    data-logo-target-ms="900"\n>')
-          city=f'    <div id="startupCityScene" class="startup-scene startup-city-scene" aria-hidden="true">\n        <img class="startup-scene-image startup-city-image" src="{C}" alt="" draggable="false" fetchpriority="high">\n    </div>\n\n'
-          r('index.html','    </div>\n\n    <div class="startup-vignette" aria-hidden="true"></div>','    </div>\n\n'+city+'    <div class="startup-vignette" aria-hidden="true"></div>')
-          r('js/52-v173.20-startup-loader.js','    const root=document.getElementById("startupLoader");\n    const title=','    const root=document.getElementById("startupLoader");\n    const logoScene=document.getElementById("startupLogoScene");\n    const cityScene=document.getElementById("startupCityScene");\n    const title=')
-          r('js/52-v173.20-startup-loader.js','    const build=global.__FOUR_SYMBOLS_BUILD__||{};\n    let state=','    const build=global.__FOUR_SYMBOLS_BUILD__||{};\n    const introLogoTargetMs=Math.max(350,Math.min(1800,Number(root&&root.dataset.logoTargetMs)||900));\n    let state=')
-          r('js/52-v173.20-startup-loader.js','    let firebase=null;\n    let lastError=null;','    let firebase=null;\n    let lastError=null;\n    let introTimer=0;\n    let citySceneShown=false;')
-          fn='''    function showCityScene(reason="boot-progress"){\n        if(citySceneShown){ return; }\n        citySceneShown=true;\n        if(introTimer){ global.clearTimeout(introTimer); introTimer=0; }\n        if(logoScene){ logoScene.classList.remove("is-active"); logoScene.setAttribute("aria-hidden","true"); }\n        if(cityScene){ cityScene.classList.add("is-active"); cityScene.setAttribute("aria-hidden","false"); }\n        if(root){ root.dataset.scene="city"; root.dataset.sceneReason=reason; }\n        mark("four-symbols:intro-city-visible");\n    }\n    function scheduleCityScene(){\n        if(!root||citySceneShown||introTimer){ return; }\n        introTimer=global.setTimeout(()=>showCityScene("logo-target"),introLogoTargetMs);\n    }\n'''
-          r('js/52-v173.20-startup-loader.js','    function showLoader(){ if(root){ root.hidden=false;',fn+'    function showLoader(){ if(root){ root.hidden=false;')
-          r('js/52-v173.20-startup-loader.js','    mark("four-symbols:boot-core-ready");','    mark("four-symbols:boot-core-ready");\n    scheduleCityScene();')
-          r('js/52-v173.20-startup-loader.js','    function hideLoader(){\n        if(!root){ return Promise.resolve(); }','    function hideLoader(){\n        if(!root){ return Promise.resolve(); }\n        showCityScene("destination-ready");')
-          r('js/52-v173.20-startup-loader.js','    async function resolveSaveFor(user){\n        const token=','    async function resolveSaveFor(user){\n        showCityScene("identity-resolved");\n        const token=')
-          r('js/52-v173.20-startup-loader.js','    function requireAuth(){\n        activeUser=null;','    function requireAuth(){\n        showCityScene("auth-required");\n        activeUser=null;')
-          r('js/52-v173.20-startup-loader.js','    function fail(error,message,token=transitionToken){\n        if(token!==transitionToken){ return; }','    function fail(error,message,token=transitionToken){\n        if(token!==transitionToken){ return; }\n        showCityScene("startup-error");')
-
-          p=Path('css/firebase-auth.css');s=p.read_text();m='/* V174 compact auth over second startup scene */'
-          if m not in s:
-              s+=f'''\n\n{m}\n.firebase-auth-overlay{{align-items:center;overflow:hidden;background:#050506;}}\n.firebase-auth-overlay::before{{content:"";position:fixed;inset:-2%;z-index:0;pointer-events:none;background:url("../{C}") center/cover no-repeat;transform:scale(1.04);animation:firebaseAuthCityDrift 12s ease-out both;}}\n.firebase-auth-overlay::after{{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,4,5,.18),rgba(4,4,5,.46) 58%,rgba(4,4,5,.72)),radial-gradient(circle at 50% 38%,transparent 0 24%,rgba(0,0,0,.28) 74%,rgba(0,0,0,.55));}}\n.firebase-auth-dialog{{position:relative;z-index:1;width:min(calc(100% - 20px),390px);max-height:calc(100dvh - 24px);padding:16px 18px 15px;border-width:1px;border-radius:14px;background:linear-gradient(180deg,rgba(31,25,17,.86),rgba(8,8,10,.88) 24%,rgba(6,6,8,.92));box-shadow:0 16px 42px rgba(0,0,0,.62),inset 0 0 0 1px rgba(255,224,154,.10);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);}}\n.firebase-auth-eyebrow{{font-size:clamp(10px,2.7vw,12px);}}\n.firebase-auth-title{{font-size:clamp(21px,5.4vw,27px);}}\n.firebase-auth-subtitle{{font-size:clamp(12px,3.1vw,13px);line-height:1.38;}}\n.firebase-auth-status{{min-height:40px;padding:7px 9px;font-size:clamp(12px,3.05vw,13px);}}\n.firebase-auth-button{{min-height:44px;padding:7px 9px;font-size:clamp(12px,3.1vw,14px);}}\n.firebase-auth-back-button{{font-size:clamp(12px,3.1vw,14px);}}\n.firebase-auth-divider{{font-size:clamp(11px,2.9vw,12px);margin:5px 0 7px;}}\n.firebase-auth-field{{gap:4px;margin-bottom:6px;}} .firebase-auth-field label{{font-size:clamp(12px,3.05vw,13px);}}\n.firebase-auth-field input{{min-height:44px;padding:7px 10px;font-size:15px;}}\n.firebase-auth-email-help,.firebase-auth-note{{font-size:clamp(11px,2.9vw,12px);line-height:1.36;}}\n.firebase-auth-email-help{{margin-bottom:5px;}} .firebase-auth-note{{margin-top:6px;}}\n.firebase-auth-actions{{gap:7px;margin-bottom:8px;}} .firebase-auth-footer{{margin-top:8px;}} .firebase-auth-support-button{{margin-top:7px;}}\n.firebase-auth-account-name{{font-size:clamp(18px,4.6vw,22px);}} .firebase-auth-account-meta,.firebase-auth-cloud-state{{font-size:clamp(12px,3.05vw,13px);}} .firebase-auth-uid{{font-size:clamp(11px,2.85vw,12px);}}\n@keyframes firebaseAuthCityDrift{{from{{transform:scale(1.055) translate3d(0,-.7%,0);filter:brightness(.90) saturate(.94);}}to{{transform:scale(1.015);filter:brightness(1) saturate(1);}}}}\n''';p.write_text(s)
-          r('scripts/build-production.mjs','const criticalLogoPath="assets/ui/startup-logo.4631c0bc3f2b.jpg";',f'const criticalImagePaths=["{L}","{C}"];')
-          r('scripts/build-production.mjs','const criticalLogo={path:criticalLogoPath,content:bytes(criticalLogoPath),digest:hash(bytes(criticalLogoPath))};\nif(!criticalLogoPath.includes(`.${criticalLogo.digest}.`)){ throw new Error("Critical logo filename is not content-addressed."); }\nconst declared=[bootOutput,...Object.values(scriptOutputs),...Object.values(styleOutputs),...firebaseOutputs,criticalLogo];','const criticalImages=criticalImagePaths.map(file=>({path:file,content:bytes(file),digest:hash(bytes(file))}));\nfor(const asset of criticalImages){ if(!asset.path.includes(`.${asset.digest}.`)){ throw new Error(`Critical image filename is not content-addressed: ${asset.path}`); } }\nconst declared=[bootOutput,...Object.values(scriptOutputs),...Object.values(styleOutputs),...firebaseOutputs,...criticalImages];')
-          r('scripts/build-production.mjs','critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[criticalLogoPath],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},','critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[...criticalImagePaths],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},')
-          r('scripts/build-production.mjs','        if(/startup-logo-image/.test(tag)){','        if(/startup-(?:logo|city)-image/.test(tag)){')
-          p=Path('_headers');s=p.read_text();h=f'/{C}\n  Cache-Control: public, max-age=31536000, immutable\n';a=f'/{L}\n  Cache-Control: public, max-age=31536000, immutable\n'
-          if h not in s:
-              if a not in s:raise SystemExit('header anchor missing')
-              p.write_text(s.replace(a,a+'\n'+h,1))
-          p=Path('tests/v173.20-startup-loader.test.js');s=p.read_text();s=s.replace('for(const file of ["assets/ui/startup-logo.4631c0bc3f2b.jpg","assets/ui/startup-main-city-v173.20.jpg"])',f'for(const file of ["{L}","{C}"])').replace('assert.doesNotMatch(html,/startup-main-city-v173\\.20\\.jpg/);','assert.match(html,/startupCityScene/);\nassert.match(html,/startup-main-city\\.d43e67af1c1c\\.jpg/);\nassert.match(source,/showCityScene/);\nassert.match(source,/introLogoTargetMs/);\nassert.doesNotMatch(source,/await[^;]*introLogoTargetMs|MIN_DURATION|totalDuration/);');p.write_text(s)
-          p=Path('.github/scripts/run-boot-architecture-browser-qa.mjs');s=p.read_text();a='    assert.ok(evidence.performance.coldAuth.readyMs>0&&evidence.performance.coldAuth.readyMs<=5000,"Controlled cold auth UI budget exceeded");\n';b='''    const authPresentation=await client.eval(`(()=>{const o=document.getElementById("firebaseAuthOverlay"),d=o.querySelector(".firebase-auth-dialog"),t=o.querySelector(".firebase-auth-title"),r=d.getBoundingClientRect(),bg=getComputedStyle(o,"::before").backgroundImage;return {backdrop:bg,dialogWidth:r.width,titleFont:parseFloat(getComputedStyle(t).fontSize),cityRequested:performance.getEntriesByType("resource").some(e=>new URL(e.name).pathname.endsWith("/assets/ui/startup-main-city.d43e67af1c1c.jpg"))};})()`);\n    assert.match(authPresentation.backdrop,/startup-main-city\\.d43e67af1c1c\\.jpg/);assert.ok(authPresentation.dialogWidth<=390);assert.ok(authPresentation.titleFont<=27);assert.equal(authPresentation.cityRequested,true);evidence.checks.authPresentation=authPresentation;\n'''
-          if 'evidence.checks.authPresentation=authPresentation;' not in s:
-              if a not in s:raise SystemExit('qa anchor missing')
-              p.write_text(s.replace(a,a+b,1))
-          p=Path('docs/BOOT_ARCHITECTURE.md');s=p.read_text();h='## Two-scene boot presentation (2026-09-11)'
-          if h not in s:p.write_text(s+f'''\n\n{h}\n\n- Critical Boot preloads `{L}` then `{C}`.\n- Scene 1 uses configurable `#startupLoader[data-logo-target-ms]` (default 900 ms). This timer only advances presentation; it is never awaited and never delays Firebase/Auth/save readiness.\n- Scene 2 remains the signed-out Firebase account background. Firebase bootstrap/session restore continue concurrently; non-critical gameplay features remain lazy.\n''')
-          p=Path('HANDOFF.md');s=p.read_text();h='## 2026-09-11 — 雙段啟動畫面＋第二幕登入覆蓋'
-          if h not in s:p.write_text(s+f'''\n\n{h}\n\n- 基準 `dev@f859f747301941f346f4d2b9590d3f3d87a06cd8`，分支 `feature/boot-intro-auth-overlay-20260911`；`main` 不修改。\n- 本輪兩張附件與既有 V173.20 使用者啟動素材位元組一致；Logo=`{L}`，第二幕新增 content-addressed alias `{C}`，沒有重新生成圖片。\n- `js/52-v173.20-startup-loader.js` 仍是唯一 StartupStateMachine owner；900ms 僅控制 Logo→第二幕，真實 Firebase/Auth/save 全程並行且 readiness 不等待動畫。\n- `css/firebase-auth.css` 將登入框縮至最多 390px、縮小文字但保留 44px 觸控高度，登入背景持續使用第二幕慢推。兩張圖均進 Critical preload/immutable cache；非必要 gameplay 資產仍維持 lazy。\n''')
-          PY
-          node scripts/build-production.mjs
-
-      - name: Commit boot-intro implementation
-        if: github.event_name == 'pull_request' && github.head_ref == 'feature/boot-intro-auth-overlay-20260911'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A index.html js/52-v173.20-startup-loader.js css/firebase-auth.css scripts/build-production.mjs _headers tests/v173.20-startup-loader.test.js .github/scripts/run-boot-architecture-browser-qa.mjs docs/BOOT_ARCHITECTURE.md HANDOFF.md asset-manifest.json build/
-          if ! git diff --cached --quiet; then git commit -m "feat: animate two-stage boot into compact auth overlay"; git push origin "HEAD:$GITHUB_HEAD_REF"; fi
-
       - name: Prepare Git comparison base
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          if [[ "$CI_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] && [[ ! "$CI_BASE_SHA" =~ ^0{40}$ ]] && ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"; fi
-          for typography_baseline_sha in 39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 4a592dd4c41d7efb1a4849fbfe0cbf68598121bf 29b9668057846164a941fbf6617d2458d9af5476; do if ! git cat-file -e "$typography_baseline_sha^{commit}" 2>/dev/null; then git fetch --no-tags --depth=1 origin "$typography_baseline_sha"; fi; done
+          if [[ "$CI_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] && \
+             [[ ! "$CI_BASE_SHA" =~ ^0{40}$ ]] && \
+             ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
+          fi
+
+          # Typography regression suites audit the pre-change baseline and the
+          # approved gameplay battle baseline byte-for-byte. fetch-depth: 2 does
+          # not retain those fixed historical objects after the integration merge.
+          for typography_baseline_sha in \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            if ! git cat-file -e "$typography_baseline_sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$typography_baseline_sha"
+            fi
+          done
 
       - name: Check CI script syntax
         run: |
@@ -114,7 +66,10 @@ jobs:
 
       - name: Ensure existing asset-test dependency
         run: |
-          if ! command -v identify >/dev/null 2>&1; then sudo apt-get update; sudo apt-get install --yes --no-install-recommends imagemagick; fi
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
 
       - name: Run all Node unit and integration suites
         run: node .github/scripts/ci.mjs tests
