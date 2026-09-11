@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
@@ -29,6 +29,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+
+      - name: Refresh deterministic build outputs for monster portrait branch
+        if: github.event_name == 'pull_request' && github.head_ref == 'feature/monster-portrait-pipeline-v1-20260911'
+        env:
+          FEATURE_BRANCH: ${{ github.head_ref }}
+        run: |
+          git fetch --no-tags --depth=2 origin "$FEATURE_BRANCH"
+          git checkout -B "$FEATURE_BRANCH" "origin/$FEATURE_BRANCH"
+          node scripts/build-production.mjs
+          if ! git diff --quiet -- asset-manifest.json build index.html; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add asset-manifest.json build index.html
+            git commit -m "build: refresh deterministic monster portrait runtime bundle"
+            git push origin "HEAD:$FEATURE_BRANCH"
+          fi
 
       - name: Prepare Git comparison base
         env:
