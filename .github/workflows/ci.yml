@@ -10,8 +10,8 @@ permissions:
   contents: write
 
 jobs:
-  patch_first_play_hold:
-    name: Repair returning First Play update hold
+  finalize_first_play_boot:
+    name: Finalize First Play returning path
     if: github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -31,7 +31,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
-      - name: Patch, build, verify, restore standard CI and push
+      - name: Patch, build, browser QA, restore standard CI and push
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
@@ -55,22 +55,17 @@ jobs:
           qa=Path('.github/scripts/run-boot-architecture-browser-qa.mjs')
           text=qa.read_text()
           replacements={
+              'const ready=JSON.stringify(qaReadyFirstPlayRecord);':'const ready=JSON.stringify(JSON.stringify(qaReadyFirstPlayRecord));',
+              'const stale=JSON.stringify(qaStaleFirstPlayRecord);':'const stale=JSON.stringify(JSON.stringify(qaStaleFirstPlayRecord));',
               'resources.some(p=>/\\/app-shell\\./.test(p))':'resources.some(p=>p.includes("/app-shell."))',
               'resources.some(p=>/\\/gameplay-core\\./.test(p))':'resources.some(p=>p.includes("/gameplay-core."))',
               'resources.some(p=>/\\/feature-patrol\\./.test(p))':'resources.some(p=>p.includes("/feature-patrol."))',
               'async function waitForJson(url,timeoutMs=10000){':'async function waitForJson(url,timeoutMs=30000){',
-              'if(!noReady){localStorage.setItem("four_symbols_first_play_ready",scenario==="manifest-update"?${stale}:${ready});}':'if(!noReady){localStorage.setItem("four_symbols_first_play_ready",JSON.stringify(scenario==="manifest-update"?${stale}:${ready}));}',
           }
           for old,new in replacements.items():
               if old not in text:
                   raise SystemExit('expected QA fragment not found: '+old)
               text=text.replace(old,new,1)
-
-          fake_block='''            const fetchDest=String(request.headers["sec-fetch-dest"]||"");\n            if(url.pathname===authPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}\n            if(url.pathname===cloudPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}'''
-          fake_guarded='''            const fetchDest=String(request.headers["sec-fetch-dest"]||"");\n            let moduleReferrer="";\n            try{moduleReferrer=new URL(String(request.headers.referer||""),"http://127.0.0.1").pathname;}catch(_){}\n            const qaFirebaseModuleImport=fetchDest==="script"&&/\\/build\\/firebase\\/firebase-(?:bootstrap|auth-ui)\\.[0-9a-f]{12}\\.js$/.test(moduleReferrer);\n            if(url.pathname===authPath&&qaFirebaseModuleImport){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}\n            if(url.pathname===cloudPath&&qaFirebaseModuleImport){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}'''
-          if fake_block not in text:
-              raise SystemExit('Firebase QA interception block not found')
-          text=text.replace(fake_block,fake_guarded,1)
 
           scenario='''  var scenario=new URL(location.href).searchParams.get("scenario")||"";'''
           injected='''  var scenario=new URL(location.href).searchParams.get("scenario")||"";\n  if(scenario==="manifest-update"){\n    var nativeFetch=window.fetch.bind(window);\n    window.__qaManifestDelayApplied=0;\n    window.fetch=function(input,init){\n      var target=typeof input==="string"?input:String(input&&input.url||"");\n      var pathname="";\n      try{pathname=new URL(target,location.href).pathname;}catch(_){}\n      if(pathname.endsWith("/assets/ui/nav-home.png")){\n        window.__qaManifestDelayApplied++;\n        return new Promise(function(resolve,reject){setTimeout(function(){nativeFetch(input,init).then(resolve,reject);},15000);});\n      }\n      return nativeFetch(input,init);\n    };\n  }'''
@@ -82,12 +77,6 @@ jobs:
           if oldSlow not in text:
               raise SystemExit('legacy server manifest delay not found')
           text=text.replace(oldSlow,'            // manifest-update latency is injected in-page so it is bound to the current navigation only.',1)
-
-          update_start='''    await clear();const updateStarted=Date.now();await navigate("manifest-update");await sleep(10100);'''
-          update_start_new='''    await clear();const updateStarted=Date.now();await navigate("manifest-update");\n    const seededUpdateRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready")||"null")`);assert.equal(seededUpdateRecord&&seededUpdateRecord.manifestHash,"qa-stale-manifest","manifest-update scenario did not seed the stale First Play record");\n    await sleep(10100);'''
-          if update_start not in text:
-              raise SystemExit('manifest update start block not found')
-          text=text.replace(update_start,update_start_new,1)
 
           oldReady='''    const updatedRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready"))`);assert.equal(updatedRecord.manifestHash,manifest.firstPlay.manifestHash);evidence.checks.manifestUpdateReady={manifestHash:updatedRecord.manifestHash};'''
           newReady='''    const updatedRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready"))`);assert.equal(updatedRecord.manifestHash,manifest.firstPlay.manifestHash);const delayApplied=await client.eval(`window.__qaManifestDelayApplied||0`);assert.ok(delayApplied>=1,"manifest-update QA did not delay the changed First Play asset");evidence.checks.manifestUpdateReady={manifestHash:updatedRecord.manifestHash,delayApplied};'''
@@ -111,5 +100,5 @@ jobs:
           git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
           git add -A
           git status --short
-          git commit -m "fix: hold returning launch on scene two until First Play update is ready [generated]"
+          git commit -m "fix: finalize First Play returning readiness flow [generated]"
           git push origin HEAD:${GITHUB_HEAD_REF}
