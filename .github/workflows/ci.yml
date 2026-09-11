@@ -30,6 +30,23 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Generate production assets for cold-start repair
+        if: github.event_name == 'pull_request' && github.head_ref == 'fix/cold-start-character-creation-lifecycle-20260911'
+        run: node scripts/build-production.mjs
+
+      - name: Upload generated cold-start production assets
+        if: github.event_name == 'pull_request' && github.head_ref == 'fix/cold-start-character-creation-lifecycle-20260911'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-start-production-build-${{ github.event.pull_request.head.sha }}
+          path: |
+            index.html
+            asset-manifest.json
+            build/asset-manifest.json
+            build/boot-core.*.js
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Prepare Git comparison base
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
