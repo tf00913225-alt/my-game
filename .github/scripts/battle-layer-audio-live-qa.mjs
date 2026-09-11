@@ -88,8 +88,17 @@ async function waitFor(client,expression,label,timeoutMs=30000){
 }
 
 async function prepareAccountFirstRuntime(client,features){
-    await waitFor(client,"window.FourSymbolsStartupPolicy&&['AUTH_REQUIRED','NEED_CHARACTER','READY','OFFLINE_READY','ERROR'].includes(FourSymbolsStartupPolicy.getState())","account-first startup destination",30000);
+    await waitFor(client,"window.FourSymbolsStartupPolicy&&(FourSymbolsStartupPolicy.getState()==='ERROR'||['AUTH_REQUIRED','NEED_CHARACTER','READY','OFFLINE_READY'].includes(FourSymbolsStartupPolicy.getState())||(document.getElementById('privacyConsentGate')&&!document.getElementById('privacyConsentGate').hidden&&document.getElementById('startupProgress')?.getAttribute('aria-valuenow')==='100'))","First Play/privacy/account startup destination",120000);
     let state=await client.eval("FourSymbolsStartupPolicy.getState()");
+    const privacyVisible=state!=="ERROR"&&await client.eval("Boolean(document.getElementById('privacyConsentGate')&&!document.getElementById('privacyConsentGate').hidden)");
+    if(privacyVisible){
+        await waitFor(client,"(()=>{const gate=document.getElementById('privacyConsentGate');const policy=gate?.contentWindow?.document?.getElementById('policyFrame');return !!(policy&&policy.contentDocument&&policy.contentDocument.readyState==='complete');})()","privacy policy document",15000);
+        await client.eval("(()=>{const gate=document.getElementById('privacyConsentGate');const consent=gate.contentWindow.document;const policy=consent.getElementById('policyFrame');const root=policy.contentDocument.scrollingElement||policy.contentDocument.documentElement;policy.contentWindow.scrollTo(0,root.scrollHeight);policy.contentWindow.dispatchEvent(new Event('scroll'));return true;})()");
+        await waitFor(client,"document.getElementById('privacyConsentGate').contentWindow.document.getElementById('agreeButton').disabled===false","privacy agree enabled",10000);
+        await client.eval("document.getElementById('privacyConsentGate').contentWindow.document.getElementById('agreeButton').click();true");
+        await waitFor(client,"window.FourSymbolsStartupPolicy&&['AUTH_REQUIRED','NEED_CHARACTER','READY','OFFLINE_READY','ERROR'].includes(FourSymbolsStartupPolicy.getState())","account-first startup destination after privacy consent",60000);
+        state=await client.eval("FourSymbolsStartupPolicy.getState()");
+    }
     if(state==="ERROR"){ throw new Error("Live Firebase startup failed before feature QA"); }
     if(state==="AUTH_REQUIRED"){
         await client.eval("document.getElementById('firebaseGuestButton').click();true");
