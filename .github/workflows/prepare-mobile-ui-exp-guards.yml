@@ -1,0 +1,52 @@
+name: Prepare mobile UI EXP guards
+
+on:
+  push:
+    branches:
+      - fix/mobile-ui-exp-guards-20260911
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out work branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/mobile-ui-exp-guards-20260911
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Apply scoped source and test changes
+        run: node .tmp/apply-mobile-ui-exp-guards.mjs
+
+      - name: Rebuild deterministic production bundles
+        run: node scripts/build-production.mjs
+
+      - name: Run focused regression checks
+        run: |
+          node --check js/01-stage-v8-touch-lock.js
+          node --check js/25-v131-fix-batch.js
+          node --check js/28-v133-economy-rebalance.js
+          node --check js/60-v173.64-skill-progression-rebalance.js
+          node tests/v174-mobile-ui-exp-guards.test.js
+          node tests/v174-mobile-ui-guards-browser.test.js
+          node tests/boss-mobile-portrait-browser.test.js
+          node .github/scripts/run-skill-progression-browser-qa.mjs
+
+      - name: Commit final work branch state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git status --short
+          git commit -m "fix: mobile UI regressions and EXP safeguards"
+          git push origin HEAD:fix/mobile-ui-exp-guards-20260911
