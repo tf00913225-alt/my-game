@@ -6,180 +6,57 @@
 <meta name="color-scheme" content="dark">
 <title>《四象江湖傳》隱私權政策確認</title>
 <style>
-:root{color-scheme:dark;--bg:#0b0907;--panel:#17120e;--gold:#d5a64e;--gold2:#8f6c34;--text:#f4ead4;--muted:#b8aa91;--danger:#9d3939}
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:rgba(5,4,3,.98);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--text)}
+:root{color-scheme:dark;--bg:#0b0907;--panel:#17120e;--gold:#d5a64e;--text:#f4ead4;--muted:#b8aa91}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:rgba(5,4,3,.96);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--text)}
 body{display:flex;align-items:stretch;justify-content:center;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))}
-.consent-shell{width:min(760px,100%);height:100%;display:flex;flex-direction:column;background:linear-gradient(180deg,#21180f,#120f0c);border:1px solid rgba(213,166,78,.42);border-radius:16px;box-shadow:0 20px 70px rgba(0,0,0,.56);overflow:hidden}
-.consent-head{flex:0 0 auto;padding:14px 16px 10px;text-align:center;border-bottom:1px solid rgba(213,166,78,.2)}
-.consent-kicker{font-size:11px;letter-spacing:.18em;color:#a88c58;font-weight:800}.consent-head h1{font-size:clamp(21px,5vw,28px);margin:4px 0 3px;color:#f2cc7c}.consent-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
-.policy-wrap{position:relative;flex:1 1 auto;min-height:0;background:#0d0b09}.policy-frame{display:block;width:100%;height:100%;border:0;background:#0d0b09}
-.consent-status{flex:0 0 auto;min-height:42px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 14px;color:#d8c7a7;font-size:13px;border-top:1px solid rgba(213,166,78,.16);background:#15100c}.consent-status.ready{color:#f2cc7c;font-weight:800}
-.consent-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:0 0 auto;padding:10px 12px 12px;background:#15100c}.consent-actions button{min-height:48px;border-radius:10px;border:1px solid rgba(213,166,78,.48);font-weight:800;font-size:16px;cursor:pointer}.agree{background:linear-gradient(180deg,#c79a45,#8f672b);color:#140e06}.agree:disabled{cursor:not-allowed;filter:grayscale(.8);opacity:.38}.decline{background:#2a1715;border-color:rgba(205,91,82,.5)!important;color:#f0c4bd}.close-view{grid-column:1/-1;background:linear-gradient(180deg,#3b3023,#231c15);color:#f3dfb8}
-.viewer-mode .consent-status,.viewer-mode .agree,.viewer-mode .decline{display:none}.required-mode .close-view{display:none}
-@media (max-width:420px){body{padding:max(6px,env(safe-area-inset-top)) 6px max(6px,env(safe-area-inset-bottom))}.consent-shell{border-radius:12px}.consent-head{padding:10px 12px 8px}.consent-head h1{font-size:20px}.consent-head p{font-size:12px}.consent-actions{gap:8px;padding:8px}.consent-actions button{min-height:46px;font-size:15px}}
+.consent-shell{width:min(720px,100%);height:100%;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(33,24,15,.96),rgba(18,15,12,.96));border:1px solid rgba(213,166,78,.42);border-radius:16px;box-shadow:0 20px 70px rgba(0,0,0,.56);overflow:hidden}
+.consent-head{flex:0 0 auto;padding:14px 16px 10px;text-align:center;border-bottom:1px solid rgba(213,166,78,.2)}.consent-kicker{font-size:11px;letter-spacing:.18em;color:#a88c58;font-weight:800}.consent-head h1{font-size:clamp(21px,5vw,28px);margin:4px 0 3px;color:#f2cc7c}.consent-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.policy-wrap{position:relative;flex:1 1 auto;min-height:0;background:#0d0b09}.policy-frame{display:block;width:100%;height:100%;border:0;background:#0d0b09}.consent-status{flex:0 0 auto;min-height:42px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 14px;color:#d8c7a7;font-size:13px;border-top:1px solid rgba(213,166,78,.16);background:#15100c}.consent-status.ready{color:#f2cc7c;font-weight:800}
+.consent-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:0 0 auto;padding:10px 12px 12px;background:#15100c}.consent-actions button{min-height:48px;border-radius:10px;border:1px solid rgba(213,166,78,.48);font-weight:800;font-size:16px;cursor:pointer}.agree{background:linear-gradient(180deg,#c79a45,#8f672b);color:#140e06}.agree:disabled{cursor:not-allowed;filter:grayscale(.8);opacity:.38}.decline{background:#2a1715;border-color:rgba(205,91,82,.5)!important;color:#f0c4bd}.close-view{grid-column:1/-1;background:linear-gradient(180deg,#3b3023,#231c15);color:#f3dfb8}.viewer-mode .consent-status,.viewer-mode .agree,.viewer-mode .decline{display:none}.required-mode .close-view{display:none}
+@media(max-width:420px){body{padding:max(6px,env(safe-area-inset-top)) 6px max(6px,env(safe-area-inset-bottom))}.consent-shell{border-radius:12px}.consent-head{padding:10px 12px 8px}.consent-head h1{font-size:20px}.consent-head p{font-size:12px}.consent-actions{gap:8px;padding:8px}.consent-actions button{min-height:46px;font-size:15px}}
 </style>
 </head>
 <body class="required-mode">
 <main class="consent-shell" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
-  <header class="consent-head">
-    <div class="consent-kicker">FOUR SYMBOLS PRIVACY</div>
-    <h1 id="consentTitle">隱私權政策</h1>
-    <p id="consentSubtitle">請完整閱讀至最底部；到達底部後將開始 5 秒倒數。</p>
-  </header>
-  <div class="policy-wrap">
-    <iframe id="policyFrame" class="policy-frame" src="privacy.html" title="《四象江湖傳》隱私權政策"></iframe>
-  </div>
-  <div id="consentStatus" class="consent-status" aria-live="polite">請向下滑動閱讀完整政策</div>
-  <div class="consent-actions">
-    <button id="agreeButton" class="agree" type="button" disabled>我同意</button>
-    <button id="declineButton" class="decline" type="button">不同意</button>
-    <button id="closeViewButton" class="close-view" type="button">關閉</button>
-  </div>
+<header class="consent-head"><div class="consent-kicker">FOUR SYMBOLS PRIVACY</div><h1 id="consentTitle">隱私權政策</h1><p id="consentSubtitle">請閱讀至接近最底部後，再選擇是否同意並繼續。</p></header>
+<div class="policy-wrap"><iframe id="policyFrame" class="policy-frame" src="privacy.html" title="《四象江湖傳》隱私權政策"></iframe></div>
+<div id="consentStatus" class="consent-status" aria-live="polite">請向下滑動閱讀完整政策</div>
+<div class="consent-actions"><button id="declineButton" class="decline" type="button">不同意</button><button id="agreeButton" class="agree" type="button" disabled>同意並繼續</button><button id="closeViewButton" class="close-view" type="button">關閉</button></div>
 </main>
 <script>
 (function(){
-  'use strict';
-  const CONSENT_KEY='four_symbols_privacy_consent_version';
-  const CONSENT_VERSION='2026-09-11-v1';
-  const frameElementInParent=window.frameElement;
-  const policyFrame=document.getElementById('policyFrame');
-  const status=document.getElementById('consentStatus');
-  const agree=document.getElementById('agreeButton');
-  const decline=document.getElementById('declineButton');
-  const closeView=document.getElementById('closeViewButton');
-  let required=true;
-  let countdownStarted=false;
-  let countdownTimer=0;
-  let remaining=5;
-
-  function hasConsent(){
-    try{return localStorage.getItem(CONSENT_KEY)===CONSENT_VERSION;}catch(_){return false;}
-  }
-  function setConsent(){
-    try{localStorage.setItem(CONSENT_KEY,CONSENT_VERSION);}catch(_){}
-  }
-  function setGateVisible(visible){
-    if(!frameElementInParent)return;
-    frameElementInParent.style.display=visible?'block':'none';
-    frameElementInParent.hidden=!visible;
-    frameElementInParent.setAttribute('aria-hidden',visible?'false':'true');
-  }
-  function resetPolicyScroll(){
-    try{policyFrame.contentWindow.scrollTo(0,0);}catch(_){}
-  }
-  function showViewer(){
-    required=false;
-    document.body.className='viewer-mode';
-    document.getElementById('consentSubtitle').textContent='你可以隨時重新查看目前生效的《四象江湖傳》隱私權政策。';
-    setGateVisible(true);
-    resetPolicyScroll();
-    closeView.focus({preventScroll:true});
-  }
-  function hideViewer(){
-    if(required)return;
-    setGateVisible(false);
-  }
-  function beginCountdown(){
-    if(!required||countdownStarted)return;
-    countdownStarted=true;
-    remaining=5;
-    status.textContent='已閱讀至底部，'+remaining+' 秒後可選擇「我同意」';
-    countdownTimer=window.setInterval(function(){
-      remaining-=1;
-      if(remaining<=0){
-        window.clearInterval(countdownTimer);
-        countdownTimer=0;
-        agree.disabled=false;
-        status.textContent='閱讀確認完成，可以選擇「我同意」';
-        status.classList.add('ready');
-        return;
-      }
-      status.textContent='已閱讀至底部，'+remaining+' 秒後可選擇「我同意」';
-    },1000);
-  }
-  function checkBottom(){
-    if(!required||countdownStarted)return;
-    try{
-      const win=policyFrame.contentWindow;
-      const doc=policyFrame.contentDocument;
-      const root=doc.scrollingElement||doc.documentElement;
-      if(win.scrollY+win.innerHeight>=root.scrollHeight-8)beginCountdown();
-    }catch(_){}
-  }
-  function bindPolicyScroll(){
-    try{
-      const win=policyFrame.contentWindow;
-      win.addEventListener('scroll',checkBottom,{passive:true});
-      win.addEventListener('resize',checkBottom,{passive:true});
-      window.setTimeout(checkBottom,60);
-    }catch(_){}
-  }
-  function stopGame(){
-    try{window.top.close();}catch(_){}
-    window.setTimeout(function(){
-      try{window.top.location.replace('privacy-declined.html');}catch(_){location.replace('privacy-declined.html');}
-    },120);
-  }
-  function injectPrivacyEntries(){
-    if(!window.parent||window.parent===window)return;
-    let doc;
-    try{doc=window.parent.document;}catch(_){return;}
-    const support=doc.getElementById('firebaseSupportButton');
-    if(support&&!doc.getElementById('firebasePrivacyPolicyButton')){
-      const button=doc.createElement('button');
-      button.id='firebasePrivacyPolicyButton';
-      button.className='firebase-auth-button firebase-auth-support-button';
-      button.type='button';
-      button.textContent='隱私權政策';
-      button.addEventListener('click',showViewer);
-      support.insertAdjacentElement('beforebegin',button);
-    }
-    const systemSupport=doc.getElementById('systemSupportEmailButton');
-    if(systemSupport&&!doc.getElementById('systemPrivacyPolicyButton')){
-      const sourceRow=systemSupport.closest('.system-panel-row');
-      if(sourceRow){
-        const row=doc.createElement('div');
-        row.className='system-panel-row';
-        row.innerHTML='<div><strong>隱私權政策</strong><small>查看《四象江湖傳》目前生效的隱私權政策。</small></div><button id="systemPrivacyPolicyButton" class="home-feature-buy-btn" type="button">查看政策</button>';
-        row.querySelector('#systemPrivacyPolicyButton').addEventListener('click',showViewer);
-        sourceRow.insertAdjacentElement('afterend',row);
-      }
-    }
-  }
-  function installParentObserver(){
-    if(!window.parent||window.parent===window)return;
-    try{
-      const doc=window.parent.document;
-      injectPrivacyEntries();
-      new MutationObserver(injectPrivacyEntries).observe(doc.documentElement,{childList:true,subtree:true});
-      window.parent.FourSymbolsPrivacy=Object.freeze({show:showViewer,version:CONSENT_VERSION,hasConsent:hasConsent});
-    }catch(_){}
-  }
-
-  policyFrame.addEventListener('load',bindPolicyScroll);
-  agree.addEventListener('click',function(){
-    if(agree.disabled)return;
-    setConsent();
-    required=false;
-    setGateVisible(false);
-    installParentObserver();
-  });
-  decline.addEventListener('click',stopGame);
-  closeView.addEventListener('click',hideViewer);
-  document.addEventListener('keydown',function(event){
-    if(event.key==='Escape'&&!required)hideViewer();
-  });
-
-  installParentObserver();
-  if(hasConsent()){
-    required=false;
-    document.body.className='viewer-mode';
-    setGateVisible(false);
-  }else{
-    document.body.className='required-mode';
-    setGateVisible(true);
-  }
+'use strict';
+const CONSENT_KEY='four_symbols_privacy_consent';
+const LEGACY_KEY='four_symbols_privacy_consent_version';
+const CONSENT_VERSION='2026-09-11-v2';
+const frameInParent=window.frameElement;
+const policyFrame=document.getElementById('policyFrame');
+const status=document.getElementById('consentStatus');
+const agree=document.getElementById('agreeButton');
+const decline=document.getElementById('declineButton');
+const closeView=document.getElementById('closeViewButton');
+let required=false;
+let consentWaiters=[];
+function readConsent(){try{const raw=localStorage.getItem(CONSENT_KEY);if(!raw)return null;const value=JSON.parse(raw);return value&&typeof value==='object'?value:null}catch(_){return null}}
+function hasConsent(){const value=readConsent();return !!(value&&value.privacyPolicyVersion===CONSENT_VERSION&&value.acceptedAt)}
+function saveConsent(){const value={privacyPolicyVersion:CONSENT_VERSION,acceptedAt:new Date().toISOString()};try{localStorage.setItem(CONSENT_KEY,JSON.stringify(value));localStorage.removeItem(LEGACY_KEY)}catch(_){}return value}
+function setGateVisible(visible){if(!frameInParent)return;frameInParent.hidden=!visible;frameInParent.style.display=visible?'block':'none';frameInParent.setAttribute('aria-hidden',visible?'false':'true')}
+function resetScroll(){try{policyFrame.contentWindow.scrollTo(0,0)}catch(_){}agree.disabled=true;status.classList.remove('ready');status.textContent='請向下滑動閱讀完整政策'}
+function showRequired(){required=true;document.body.className='required-mode';document.getElementById('consentSubtitle').textContent='請閱讀至接近最底部後，再選擇是否同意並繼續。';resetScroll();setGateVisible(true)}
+function showViewer(){required=false;document.body.className='viewer-mode';document.getElementById('consentSubtitle').textContent='你可以隨時重新查看目前生效的《四象江湖傳》隱私權政策。';setGateVisible(true);try{policyFrame.contentWindow.scrollTo(0,0)}catch(_){}}
+function hideViewer(){if(!required)setGateVisible(false)}
+function checkBottom(){if(!required||!agree.disabled)return;try{const win=policyFrame.contentWindow,doc=policyFrame.contentDocument,root=doc.scrollingElement||doc.documentElement;const threshold=Math.max(24,win.innerHeight*.12);if(win.scrollY+win.innerHeight>=root.scrollHeight-threshold){agree.disabled=false;status.textContent='已閱讀至政策底部，可以同意並繼續';status.classList.add('ready')}}catch(_){}}
+function bindScroll(){try{const win=policyFrame.contentWindow;win.addEventListener('scroll',checkBottom,{passive:true});win.addEventListener('resize',checkBottom,{passive:true});setTimeout(checkBottom,60)}catch(_){}}
+function requireConsent(){if(hasConsent()){setGateVisible(false);return Promise.resolve(readConsent())}showRequired();return new Promise((resolve,reject)=>consentWaiters.push({resolve,reject}))}
+function rejectWaiters(error){const waiters=consentWaiters.splice(0);waiters.forEach(item=>item.reject(error))}
+function resolveWaiters(value){const waiters=consentWaiters.splice(0);waiters.forEach(item=>item.resolve(value))}
+function stopGame(){const error=new Error('Privacy policy was declined.');error.code='privacy-declined';rejectWaiters(error);try{window.parent.dispatchEvent(new CustomEvent('four-symbols:privacy-declined'))}catch(_){}setTimeout(()=>{try{window.top.location.replace('privacy-declined.html')}catch(_){location.replace('privacy-declined.html')}},120)}
+function injectEntries(){if(!window.parent||window.parent===window)return;let doc;try{doc=window.parent.document}catch(_){return}const support=doc.getElementById('firebaseSupportButton');if(support&&!doc.getElementById('firebasePrivacyPolicyButton')){const button=doc.createElement('button');button.id='firebasePrivacyPolicyButton';button.className='firebase-auth-button firebase-auth-support-button';button.type='button';button.textContent='隱私權政策';button.addEventListener('click',showViewer);support.insertAdjacentElement('beforebegin',button)}const systemSupport=doc.getElementById('systemSupportEmailButton');if(systemSupport&&!doc.getElementById('systemPrivacyPolicyButton')){const sourceRow=systemSupport.closest('.system-panel-row');if(sourceRow){const row=doc.createElement('div');row.className='system-panel-row';row.innerHTML='<div><strong>隱私權政策</strong><small>查看《四象江湖傳》目前生效的隱私權政策。</small></div><button id="systemPrivacyPolicyButton" class="home-feature-buy-btn" type="button">查看政策</button>';row.querySelector('#systemPrivacyPolicyButton').addEventListener('click',showViewer);sourceRow.insertAdjacentElement('afterend',row)}}}
+function installParent(){if(!window.parent||window.parent===window)return;try{const api=Object.freeze({show:showViewer,requireConsent,version:CONSENT_VERSION,hasConsent,readConsent});window.parent.FourSymbolsPrivacy=api;injectEntries();new MutationObserver(injectEntries).observe(window.parent.document.documentElement,{childList:true,subtree:true});window.parent.dispatchEvent(new CustomEvent('four-symbols:privacy-ready',{detail:{version:CONSENT_VERSION,accepted:hasConsent()}}))}catch(_){}}
+policyFrame.addEventListener('load',bindScroll);
+agree.addEventListener('click',()=>{if(agree.disabled)return;const value=saveConsent();required=false;setGateVisible(false);resolveWaiters(value);try{window.parent.dispatchEvent(new CustomEvent('four-symbols:privacy-accepted',{detail:value}))}catch(_){}});
+decline.addEventListener('click',stopGame);closeView.addEventListener('click',hideViewer);document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!required)hideViewer()});
+installParent();setGateVisible(false);
 })();
 </script>
 </body>

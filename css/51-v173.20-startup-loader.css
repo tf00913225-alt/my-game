@@ -278,3 +278,6 @@
     0%,100%{opacity:.38;transform:scale(.985);}
     50%{opacity:1;transform:scale(1);}
 }
+
+#startupRetryButton.startup-retry-button{display:block;min-width:148px;min-height:44px;margin:10px auto 0;padding:9px 18px;border:1px solid rgba(224,181,92,.72);border-radius:10px;background:linear-gradient(180deg,rgba(72,51,22,.96),rgba(31,22,11,.96));color:#ffe8b1;font-size:15px;font-weight:900;letter-spacing:.04em;box-shadow:0 5px 18px rgba(0,0,0,.35);}
+#startupRetryButton.startup-retry-button[hidden]{display:none;}
