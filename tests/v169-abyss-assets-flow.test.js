@@ -106,4 +106,36 @@ test("all supplied icons and Abyss portraits carry real transparency",()=>{
     });
 });
 
+test("monster portrait v1 spec and registry lock the shared generation rules",()=>{
+    const spec=fs.readFileSync("docs/MONSTER_PORTRAIT_SPEC_V1.md","utf8");
+    const entry=fs.readFileSync("MONSTER_PORTRAIT_SPEC.md","utf8");
+    const registry=JSON.parse(fs.readFileSync("config/monster-portrait-registry.json","utf8"));
+    assert.match(spec,/自動盤點 → 自動生成 → 自動放置 → 自動接線 → 驗證/);
+    assert.match(spec,/1024 × 1536/);
+    assert.match(spec,/1536 × 2048/);
+    assert.match(entry,/docs\/MONSTER_PORTRAIT_SPEC_V1\.md/);
+    assert.equal(registry.dimensions.standard.width,1024);
+    assert.equal(registry.dimensions.standard.height,1536);
+    assert.equal(registry.dimensions.boss.width,1536);
+    assert.equal(registry.dimensions.boss.height,2048);
+    assert.equal(registry.policy.normalEliteSharePortrait,true);
+    assert.deepEqual(registry.policy.trueRealmFinalDisplayOrder,["water","earth","fire","wind","water"]);
+    assert.equal(registry.policy.extremePrestageDisplayRule,"unresolved-do-not-invent-light-soldier");
+    const soldiers=registry.groups["heavenly-soldier"];
+    assert.equal(soldiers.length,4);
+    assert.deepEqual(soldiers.map(row=>row[2]).sort(),["earth","fire","water","wind"]);
+});
+
+test("monster portrait audit covers current runtime definitions without hiding planned missing art",()=>{
+    const report=JSON.parse(execFileSync(process.execPath,["scripts/audit-monster-portraits.mjs","--json"],{encoding:"utf8"}));
+    assert.equal(report.ok,true,report.errors.join("\n"));
+    assert.equal(report.unregistered.length,0);
+    assert.equal(report.orphaned.length,0);
+    assert.equal(report.runtimeUniqueNames,report.registeredUniqueNames);
+    assert.equal(report.portraitTargets,107);
+    assert.equal(report.existingTargets,9);
+    assert.equal(report.plannedTargets,98);
+    assert.equal(report.missingPlanned,98);
+});
+
 console.log(`V169 Abyss/assets flow tests passed: ${passed}`);
