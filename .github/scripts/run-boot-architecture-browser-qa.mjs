@@ -126,8 +126,9 @@ async function createQaServer(){
     const server=http.createServer(async(request,response)=>{
         try{
             const url=new URL(request.url,"http://127.0.0.1");
-            if(url.pathname===authPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}
-            if(url.pathname===cloudPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
+            const fetchDest=String(request.headers["sec-fetch-dest"]||"");
+            if(url.pathname===authPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}
+            if(url.pathname===cloudPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
             const relative=decodeURIComponent(url.pathname==="/"?"index.html":url.pathname.slice(1));
             if(relative==="index.html"){ activeScenario=url.searchParams.get("scenario")||""; injected404=false; }
             if(activeScenario==="resource-404"&&relative==="assets/ui/nav-home.png"&&!injected404){ injected404=true; response.writeHead(404,{"cache-control":"no-store"}); response.end("qa missing first-play asset"); return; }
