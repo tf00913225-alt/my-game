@@ -159,6 +159,7 @@ function showSkillDetail(){document.getElementById("skillDetailStats").innerHTML
     installed:window.__v17364SkillProgressionInstalled===true,
     lv19:lv19,lv20:lv20,second:second,detail:detail,
     forbidden:["learnLevel","requires","tier","upgradeCost"].filter(function(word){return pageText.includes(word);}),
+    progressionHints:document.querySelectorAll("#allSkillsList .v17364-progression-hint").length,
     rowCount:rows.length,
     horizontalOverflow:rows.some(function(row){return row.scrollWidth>row.clientWidth+1;}),
     natural:natural,
@@ -198,6 +199,7 @@ try{
         assert.match(data.detail,new RegExp(label));
     }
     assert.deepEqual(data.forbidden,[]);
+    assert.equal(data.progressionHints,0,"Verbose progression text must live in skill details, not summary rows");
     assert.ok(data.rowCount>=8,"Water skill list is unexpectedly short");
     assert.equal(data.horizontalOverflow,false,"Skill rows must not overflow horizontally at 390px");
     assert.match(data.natural.overflowY,/auto|scroll/);

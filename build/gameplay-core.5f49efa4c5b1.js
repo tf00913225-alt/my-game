@@ -515,12 +515,17 @@
         const body=document.getElementById("homeFeatureModalBody");
         if(!body){ return; }
         const title=document.getElementById("homeFeatureModalTitle");
-        if(title && title.textContent!=="角色"){ return; }
-        const row=body.firstElementChild;
-        if(!row || !row.children){ return; }
+        if(title && String(title.textContent||"").trim()!=="角色"){ return; }
+        const legacyRow=body.firstElementChild;
+        const cardsBySlot=new Map();
+        Array.from(body.querySelectorAll('[onclick*="openCharacterCreation"]')).forEach(card=>{
+            const match=String(card.getAttribute("onclick")||"").match(/openCharacterCreation\(\s*(2|3)\s*\)/);
+            if(match){ cardsBySlot.set(Number(match[1]),card); }
+        });
 
         [1,2].forEach(slotIndex=>{
-            const card=row.children[slotIndex];
+            const slotNumber=slotIndex+1;
+            const card=cardsBySlot.get(slotNumber) || (legacyRow&&legacyRow.children?legacyRow.children[slotIndex]:null);
             if(!card){ return; }
             const character=slotIndex===1 ? player2 : player3;
             if(character){
@@ -533,7 +538,6 @@
                 ? player.level>=10
                 : isThirdCharacterUnlocked();
             if(!eligible){ return; }
-            const slotNumber=slotIndex+1;
             card.style.opacity="1";
             card.style.position="relative";
             card.style.cursor="pointer";
@@ -4547,7 +4551,7 @@
                 v173ScheduleExpPoolDecoration(viewport);
             }
         };
-        window.v131ConfirmExpPreview=function(){
+        window.v131ConfirmExpPreview=async function(){
             const viewport=v173CaptureExpPoolViewport();
             v173BlurExpPoolAction();
             settleExpPoolCharge(Date.now());
@@ -4556,6 +4560,22 @@
             const actual=Math.max(0,Number(sharedExp)||0);
             if(discounted<=0||discounted>actual){
                 if(discounted>actual){ alert("經驗池不足，無法完成本次分配。"); }
+                return false;
+            }
+            const levelCount=Object.values(counts).reduce((sum,value)=>sum+Math.max(0,Math.floor(Number(value)||0)),0);
+            const confirmMessage="確定要消耗 "+discounted.toLocaleString("zh-TW")+" EXP，完成 "+levelCount+" 次升級嗎？";
+            let approved=true;
+            if(typeof window.rpgConfirm==="function"){
+                approved=await window.rpgConfirm(confirmMessage,{
+                    title:"確認經驗池升級",
+                    confirmText:"確定升級",
+                    cancelText:"返回"
+                });
+            }else if(typeof window.confirm==="function"){
+                approved=window.confirm(confirmMessage);
+            }
+            if(!approved){
+                v173ScheduleExpPoolDecoration(viewport);
                 return false;
             }
             let completed=false;

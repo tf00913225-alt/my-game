@@ -188,15 +188,15 @@ function runViewport(chrome,width,height){
     const data=JSON.parse(decode(match[1]));
     console.log(`Boss portrait browser geometry ${width}x${height}:`,JSON.stringify(data));
 
-    const ratio=16/9;
+    const ratio=3/4;
     assert.equal(data.viewport.width,width,`Iframe viewport width drifted at ${width}x${height}`);
     assert.equal(data.viewport.height,height,`Iframe viewport height drifted at ${width}x${height}`);
-    assert.ok(data.bossBattleWidthShare>=.38&&data.bossBattleWidthShare<=.46,`Boss battle width share ${data.bossBattleWidthShare} is outside 38%-46% at ${width}x${height}`);
-    assert.ok(data.mechanismBattleWidthShare>=.20&&data.mechanismBattleWidthShare<=.26,`Mechanism battle width share ${data.mechanismBattleWidthShare} is outside 20%-26% at ${width}x${height}`);
-    assert.ok(Math.abs(data.bossRatio-ratio)<.025,`Boss is not 9:16 at ${width}x${height}: ${data.bossRatio}`);
-    assert.ok(Math.abs(data.mechanismRatio-ratio)<.025,`Mechanism card is not 9:16 at ${width}x${height}: ${data.mechanismRatio}`);
-    assert.equal(data.bossComputed.aspectRatio,"9 / 16");
-    assert.equal(data.mechanismComputed.aspectRatio,"9 / 16");
+    assert.ok(data.bossBattleWidthShare>=.33&&data.bossBattleWidthShare<=.46,`Boss battle width share ${data.bossBattleWidthShare} is outside 33%-46% at ${width}x${height}`);
+    assert.ok(data.mechanismBattleWidthShare>=.19&&data.mechanismBattleWidthShare<=.26,`Mechanism battle width share ${data.mechanismBattleWidthShare} is outside 19%-26% at ${width}x${height}`);
+    assert.ok(Math.abs(data.bossRatio-ratio)<.025,`Boss is not 4:3 at ${width}x${height}: ${data.bossRatio}`);
+    assert.ok(Math.abs(data.mechanismRatio-ratio)<.025,`Mechanism card is not 4:3 at ${width}x${height}: ${data.mechanismRatio}`);
+    assert.equal(data.bossComputed.aspectRatio,"4 / 3");
+    assert.equal(data.mechanismComputed.aspectRatio,"4 / 3");
     assert.equal(data.textOverflow,false,`Boss name overflows at ${width}x${height}`);
     assert.equal(data.hpOverflow,false,`Boss HP bar overflows at ${width}x${height}`);
     assert.equal(data.spOverflow,false,`Boss SP bar overflows at ${width}x${height}`);

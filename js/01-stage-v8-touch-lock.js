@@ -65,7 +65,7 @@
            同樣只在這份全域白名單登記一次，不為登入頁另加 touchmove 補丁。
         */
         const allowedSelector =
-            ".content, .content-scrollable, .creation-page-scroll, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
+            ".content, .content-scrollable, .creation-page-scroll, .creation-role-card, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
             ".characterTabContent, #characterTabContent, #inventoryPage, " +
             ".home-feature-modal-box, #homeFeatureModalBody, #homeFeatureModal.team-relic-mode #homeFeatureModalBody, .team-relic-tabs, .v141-synthesis-body, #trainingZoneModalBody, .auto-settings-expanded, " +
             ".inventory-character-detail-box, .inventory-character-detail-grid, .item-modal-box, #itemModalStats, #skillDetailStats, " +

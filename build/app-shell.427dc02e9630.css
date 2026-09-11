@@ -2751,6 +2751,72 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     min-width:0;
 }
 
+/* V174.1 mobile regression follow-up — scoped to the five reported regressions. */
+
+/* Main-city roster: preserve the three equal slots, but return enough horizontal
+   room to the HP/SP labels and reduce the two bars instead of letting them bleed. */
+#game-stage #homePage #v146HomeRoster .v146-home-character{
+    grid-template-columns:32px minmax(0,1fr) !important;
+    gap:3px !important;
+    min-height:70px !important;
+    padding:3px 2px !important;
+}
+#game-stage #homePage #v146HomeRoster .v146-home-avatar{
+    width:32px !important;
+    height:32px !important;
+}
+#game-stage #homePage #v146HomeRoster .v146-home-character-main{
+    gap:2px !important;
+}
+#game-stage #homePage #v146HomeRoster .v146-home-resource{
+    height:14px !important;
+}
+#game-stage #homePage #v146HomeRoster .v146-home-resource strong{
+    font-size:11px !important;
+    line-height:12px !important;
+    letter-spacing:-.45px !important;
+}
+
+/* Character creation keeps the portrait fixed while the element explanation
+   alone becomes a native vertical scroller.  The global touch owner explicitly
+   whitelists .creation-role-card; no page-local touch listener is introduced. */
+#creationPage .creation-choice-panel{
+    min-height:0 !important;
+    overflow:hidden !important;
+}
+#creationPage .creation-role-card{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important;
+    scrollbar-gutter:stable !important;
+}
+
+/* Skill rows keep only the short summary/action state.  Long progression data
+   lives in the existing skill detail modal, so the right action column cannot
+   consume or escape the description column. */
+#game-stage #allSkillsList .skill-row{
+    grid-template-columns:minmax(42px,auto) minmax(0,1fr) minmax(84px,104px) !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    overflow:hidden !important;
+}
+#game-stage #allSkillsList .skill-row .skill-row-text{
+    min-width:0 !important;
+    max-width:100% !important;
+    overflow:hidden !important;
+}
+#game-stage #allSkillsList .skill-row .skill-action-card{
+    width:104px !important;
+    min-width:84px !important;
+    max-width:104px !important;
+    overflow:hidden !important;
+}
+
 
 /* bundled source: css/ad-free-service-info-modal.css */
 /* Paid-service disclosure inside the existing shared homeFeatureModal. */

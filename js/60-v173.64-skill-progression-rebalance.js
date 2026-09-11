@@ -278,26 +278,6 @@
         const icon=row&&row.querySelector?row.querySelector("[id^='skillIcon_']"):null;
         return icon?icon.id.slice("skillIcon_".length):"";
     }
-    function addProgressionHint(row,skill,context,current){
-        const host=row.querySelector(".skill-row-text");
-        if(!host){ return; }
-        let hint=host.querySelector(".v17364-progression-hint");
-        if(!hint){
-            hint=document.createElement("small");
-            hint.className="v17364-progression-hint";
-            host.appendChild(hint);
-        }
-        if(current<=0){
-            hint.textContent="最低學習 Lv"+skill.learnLevel+"・學習 "+skill.learnCost+" 技能點"+
-                ((skill.requires&&skill.requires.length)?"・前置："+prerequisiteLabel(skill):"");
-        }else if(current<numeric(skill.maxLevel,1)){
-            const target=current+1;
-            hint.textContent="目前 Lv"+current+"・下一境界 角色 Lv"+
-                getRequiredCharacterLevelForSkillLevel(skill,target)+"・升級 "+getUpgradeCostForTargetLevel(skill,target)+" 技能點";
-        }else{
-            hint.textContent="目前 Lv"+current+"・已修至最高境界";
-        }
-    }
     function decorateSkillProgressionUi(){
         if(typeof document==="undefined"){ return; }
         const list=document.getElementById("allSkillsList");
@@ -343,7 +323,6 @@
                     setActionCard(card,true,"升至 Lv"+target+"・"+cost+"點","upgradeSkill('"+skillId+"')");
                 }
             }
-            addProgressionHint(row,skill,context,current);
         });
         const sorted=Array.from(list.querySelectorAll(".skill-row")).sort((left,right)=>{
             const a=skillById(rowSkillId(left))||{};
