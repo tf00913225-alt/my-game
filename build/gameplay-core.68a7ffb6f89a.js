@@ -22616,7 +22616,19 @@ function ensureBattlePresentationStyles(){
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
-    background-size:cover!important;background-position:center 18%!important;
+    inset:0 0 30px!important;
+    background-size:contain!important;background-position:center bottom!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
+    position:absolute!important;left:50%!important;bottom:13px!important;
+    margin:0!important;transform:translateX(-50%)!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.sp-bar{
+    position:absolute!important;left:50%!important;bottom:0!important;
+    margin:0!important;transform:translateX(-50%)!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{
+    z-index:20!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
     background-size:cover!important;background-position:center center!important;

@@ -39,7 +39,7 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
 <pre id="result"></pre>
 <script>
 const cards=[...document.querySelectorAll('.gameplay-mode-card')];
-const rows=cards.map(card=>{const r=card.getBoundingClientRect(),s=getComputedStyle(card);return {width:r.width,height:r.height,ratio:r.width/r.height,aspectRatio:s.aspectRatio,minHeight:s.minHeight,overflowX:card.scrollWidth-card.clientWidth,overflowY:card.scrollHeight-card.clientHeight};});
+const rows=cards.map(card=>{const r=card.getBoundingClientRect(),s=getComputedStyle(card);return {top:r.top,bottom:r.bottom,width:r.width,height:r.height,ratio:r.width/r.height,aspectRatio:s.aspectRatio,minHeight:s.minHeight,overflowX:card.scrollWidth-card.clientWidth,overflowY:card.scrollHeight-card.clientHeight};});
 document.getElementById('result').textContent=JSON.stringify(rows);
 </script></body></html>`;
     fs.writeFileSync(fixture,html,"utf8");
@@ -56,6 +56,9 @@ document.getElementById('result').textContent=JSON.stringify(rows);
             assert.equal(row.minHeight,"0px","legacy per-card min-height must not distort 16:9 cover geometry");
             assert.ok(row.overflowX<=1,`card ${index} must not overflow horizontally`);
             assert.ok(row.overflowY<=1,`card ${index} text must fit its 16:9 cover`);
+            if(index>0){
+                assert.ok(row.top>=rows[index-1].bottom+9,`card ${index} must stack below card ${index-1} without overlap`);
+            }
         });
         return rows;
     }finally{
