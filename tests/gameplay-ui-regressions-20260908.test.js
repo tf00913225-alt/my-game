@@ -33,7 +33,7 @@ assert.doesNotMatch(bossCss,/\.boss-mechanism-card\.destroying\{\s*pointer-event
    false CI failure while the actual combat behavior remains the same. */
 assert.match(bossRuntime,/const ELEMENT_ORDER=Object\.freeze\(\["fire","earth","water","wind"\]\)/);
 assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.skillChance=Math\.min\(\.82,monster\.skillChance\+\.08\);[\s\S]*?monster\.critChance=[\s\S]*?\}/);
-assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.v141SupportSkillIds=ELEMENTS\.water\.supports\.slice\(\);[\s\S]*?monster\.v141AbyssAi="support";[\s\S]*?\}/);
+assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.v141SupportSkillIds=sameElementSkills\(ELEMENTS\.water\.supports,"water"\);[\s\S]*?monster\.v141AbyssAi="support";[\s\S]*?\}/);
 assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?monster\.agility=[\s\S]*?1\.12;[\s\S]*?\}/);
 assert.match(bossRuntime,/if\(element==="earth"\)\{[\s\S]*?monster\.defense=[\s\S]*?monster\.maxHP=[\s\S]*?1\.12\);[\s\S]*?monster\.hp=monster\.maxHP;[\s\S]*?\}/);
 
