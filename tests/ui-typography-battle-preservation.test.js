@@ -47,6 +47,14 @@ function retireV146LegacySkillVfx(text){
     return normalize(text.slice(0,start)+text.slice(end));
 }
 
+function restoreGameplayCoverBaseline(text){
+    return normalize(text
+        .replace(/\/\* Gameplay activity covers use the same 16:9 production ratio as dungeon\n   covers\. Combat BOSS\/mechanism cards remain independent 9:16 components\. \*\/\n/,"")
+        .replace("    min-height:0;\n    aspect-ratio:16 / 9;\n    box-sizing:border-box;","    min-height:120px;\n    box-sizing:border-box;")
+        .replace("#game-stage .gameplay-mode-card.coming-soon{\n    opacity:.67;","#game-stage .gameplay-mode-card.coming-soon{\n    min-height:88px;\n    opacity:.67;")
+    );
+}
+
 // V131 starts with battle formation/element-card rules. Typography work begins only
 // after the character/home-feature shell, so the entire battle prefix must be byte-equivalent.
 sameSegment(
@@ -76,9 +84,11 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
 // This requirement intentionally expands the Gameplay BOSS battle UI owner: the
 // redundant title is removed, both BOSS and mechanism target cards use 4:3,
 // compact screens shrink both through the same owner, and detail stays in the
-// existing right-side alert. Preserve every pre-battle Gameplay panel rule against
-// the exact dev work base, while the existing protected-BOSS / toast / animation
-// tail remains anchored to the previously approved Gameplay battle baseline.
+// existing right-side alert. This batch is additionally allowed to change only
+// the Gameplay activity
+// cover geometry from legacy min-heights to one explicit 16:9 ratio. Normalize
+// precisely that approved change back to the work base before byte-comparing the
+// rest of the pre-battle panel CSS.
 {
     const file="css/gameplay-boss-tower.css";
     const now=current(file);
@@ -91,10 +101,12 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
     assert.ok(nowMarker>0,"new Gameplay BOSS battle owner marker missing");
     assert.ok(workBaseMarker>0,"work-base Gameplay BOSS battle owner marker missing");
     assert.equal(
-        normalize(now.slice(0,nowMarker)),
+        restoreGameplayCoverBaseline(now.slice(0,nowMarker)),
         normalize(workBase.slice(0,workBaseMarker)),
-        `${file} non-battle Gameplay panel rules changed from work base`
+        `${file} non-battle Gameplay panel rules changed outside the approved 16:9 activity-cover geometry`
     );
+    assert.match(now,/#game-stage \.gameplay-mode-card\{[\s\S]*?width:100%;[\s\S]*?min-height:0;[\s\S]*?aspect-ratio:16 \/ 9;/);
+    assert.doesNotMatch(cssRule(now,"#game-stage .gameplay-mode-card.coming-soon{"),/min-height:/,"coming-soon activity uses the same 16:9 cover geometry");
 
     const protectedStart="#game-stage #battlePage .battle-monster.gameplay-boss-protected{";
     const motionStart="@media (prefers-reduced-motion:reduce){";
@@ -135,4 +147,4 @@ sameSegment(
     "@media(max-width:390px)"
 );
 
-console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS 4:3/mechanism owner and retired procedural VFX selectors.");
+console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS 4:3/mechanism owner, approved 16:9 activity covers and retired procedural VFX selectors.");

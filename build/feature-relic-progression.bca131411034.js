@@ -102,6 +102,8 @@
     const ACTIVE_UID=accountRepository.getActiveUid();
     const STATE_VERSION=1;
     const RECEIPT_STALE_MS=6*60*60*1000;
+    const FIRST_CHARACTER_RELIC_UNLOCK_LEVEL=20;
+    const FIRST_CHARACTER_BLUE_RELICS=Object.freeze(["relic_qiankun_flask","relic_xuanwu_seal"]);
 
     function numeric(value,fallback=0){
         const number=Number(value);
@@ -252,6 +254,7 @@
             version:STATE_VERSION,
             initialized:false,
             ownershipMigration:null,
+            firstCharacterLevel20Grant:false,
             legacyTowerChoiceHandled:null,
             majorMilestoneClaims:{},
             pending:null
@@ -262,6 +265,7 @@
         if(raw&&typeof raw==="object"){
             state.initialized=raw.initialized===true;
             state.ownershipMigration=typeof raw.ownershipMigration==="string"?raw.ownershipMigration:null;
+            state.firstCharacterLevel20Grant=raw.firstCharacterLevel20Grant===true;
             state.legacyTowerChoiceHandled=typeof raw.legacyTowerChoiceHandled==="boolean"?raw.legacyTowerChoiceHandled:null;
             state.majorMilestoneClaims=raw.majorMilestoneClaims&&typeof raw.majorMilestoneClaims==="object"
                 ?Object.assign({},raw.majorMilestoneClaims)
@@ -336,6 +340,40 @@
             if(historicalHighest>=integer(floor)){ progressionState.majorMilestoneClaims[String(floor)]=true; }
         });
         writeProgressionState();
+    }
+
+    function firstCharacterLevel(){
+        const host=progressionHost();
+        return host&&host.id?integer(host.level,1):0;
+    }
+    function ensureFirstCharacterLevel20Relics(){
+        if(progressionState.firstCharacterLevel20Grant===true||firstCharacterLevel()<FIRST_CHARACTER_RELIC_UNLOCK_LEVEL){ return false; }
+        const owned=relicRuntime.getOwnedState&&relicRuntime.getOwnedState();
+        if(!owned||typeof owned!=="object"){ return false; }
+        const snapshots={};
+        let eligible=0;
+        let changed=false;
+        FIRST_CHARACTER_BLUE_RELICS.forEach(id=>{
+            const def=catalog[id],state=owned[id];
+            if(!def||def.rarity!=="blue"||def.runtimeReady!==true||!state){ return; }
+            eligible++;
+            snapshots[id]={unlocked:!!state.unlocked,level:state.level,seen:state.seen};
+            if(!state.unlocked){
+                state.unlocked=true;
+                state.level=Math.max(1,integer(state.level,1));
+                state.seen=false;
+                changed=true;
+            }
+        });
+        if(eligible<FIRST_CHARACTER_BLUE_RELICS.length){
+            Object.entries(snapshots).forEach(([id,snapshot])=>Object.assign(owned[id],snapshot));
+            return false;
+        }
+        progressionState.firstCharacterLevel20Grant=true;
+        if(writeProgressionState()){ return changed; }
+        Object.entries(snapshots).forEach(([id,snapshot])=>Object.assign(owned[id],snapshot));
+        persistCore();
+        return false;
     }
 
     function difficultyForBoss(type,definition,stage){
@@ -916,14 +954,15 @@
     const originalOpenRelicPage=typeof window.v174OpenRelicPage==="function"?window.v174OpenRelicPage:null;
     const originalOpenRelicDetail=typeof window.v174OpenRelicDetail==="function"?window.v174OpenRelicDetail:null;
     if(originalOpenRelicPage){
-        window.v174OpenRelicPage=function(){ currentRelicDetailId=null;const result=originalOpenRelicPage.apply(this,arguments);decorateRelicSurface();return result; };
+        window.v174OpenRelicPage=function(){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=null;const result=originalOpenRelicPage.apply(this,arguments);decorateRelicSurface();return result; };
     }
     if(originalOpenRelicDetail){
-        window.v174OpenRelicDetail=function(id){ currentRelicDetailId=id;const result=originalOpenRelicDetail.apply(this,arguments);decorateRelicSurface();return result; };
+        window.v174OpenRelicDetail=function(id){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=id;const result=originalOpenRelicDetail.apply(this,arguments);decorateRelicSurface();return result; };
     }
     if(typeof window.openHomeFeature==="function"){
         const original=window.openHomeFeature;
         window.openHomeFeature=function(type){
+            if(type==="relic"){ ensureFirstCharacterLevel20Relics(); }
             const result=original.apply(this,arguments);
             if(type==="relic"){ currentRelicDetailId=null;decorateRelicSurface(); }
             return result;
@@ -974,6 +1013,7 @@
     }
     function decorateRelicSurface(){
         if(typeof document==="undefined"){ return; }
+        ensureFirstCharacterLevel20Relics();
         reconcilePending();
         const body=document.getElementById("homeFeatureModalBody");
         if(!body){ return; }
@@ -1111,6 +1151,7 @@
         bossDifficultyConfig:BOSS_DIFFICULTY_CONFIG,
         bossDropTable:RELIC_BOSS_DROP_TABLE,
         towerRewardConfig:RELIC_TOWER_REWARD_CONFIG,
+        firstCharacterRelicUnlock:Object.freeze({level:FIRST_CHARACTER_RELIC_UNLOCK_LEVEL,relicIds:FIRST_CHARACTER_BLUE_RELICS.slice()}),
         rarityWeights:RARITY_WEIGHTS,
         rarityFragmentDropChance:RARITY_FRAGMENT_DROP_CHANCE,
         itemDefinitions:itemDefinitions,
@@ -1128,12 +1169,14 @@
         getEligibleChoiceRelics:eligibleChoiceRelics,
         chooseChoiceBox:chooseChoiceBox,
         estimateBossTarget:bossTargetEstimate,
+        reconcileLevelMilestones:ensureFirstCharacterLevel20Relics,
         reconcilePending:reconcilePending,
         getProgressionState:()=>clone(progressionState)
     });
 
     hydrateOwnedItemPresentation();
     initializeOwnershipPolicy();
+    ensureFirstCharacterLevel20Relics();
     reconcilePending();
     if(progressionState.pending){ ensureReceiptMonitor(); }
 
