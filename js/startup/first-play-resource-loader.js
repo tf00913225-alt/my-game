@@ -155,7 +155,7 @@
     }
     function normalizedProgress(state){
         if(state.totalBytes>0){ return Math.min(99,(state.loadedBytes/state.totalBytes)*100); }
-        return Math.min(99,(state.completedTasks/Math.max(1,state.totalTasks))*100); }
+        return Math.min(99,(state.completedTasks/Math.max(1,state.totalTasks))*100);
     }
     async function run(options={}){
         const {manifest,pack}=await fetchManifest();
