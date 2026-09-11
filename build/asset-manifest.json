@@ -4,13 +4,14 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.f178d922589b.js"
+      "build/boot-core.d3fafe22b054.js"
     ],
     "styles": [
-      "build/boot-core.729e88902773.css"
+      "build/boot-core.016dc8529603.css"
     ],
     "images": [
-      "assets/ui/startup-logo.4631c0bc3f2b.jpg"
+      "assets/ui/startup-logo.4631c0bc3f2b.jpg",
+      "assets/ui/startup-main-city.d43e67af1c1c.jpg"
     ],
     "firebaseBootstrap": "build/firebase/firebase-bootstrap.597a85e95aec.js"
   },
@@ -121,9 +122,9 @@
     ]
   },
   "assets": {
-    "build/boot-core.f178d922589b.js": {
-      "sha256": "f178d922589b",
-      "bytes": 43635
+    "build/boot-core.d3fafe22b054.js": {
+      "sha256": "d3fafe22b054",
+      "bytes": 44849
     },
     "build/app-shell.a887e992c1b2.js": {
       "sha256": "a887e992c1b2",
@@ -153,9 +154,9 @@
       "sha256": "66dc0818b8ae",
       "bytes": 65339
     },
-    "build/boot-core.729e88902773.css": {
-      "sha256": "729e88902773",
-      "bytes": 220360
+    "build/boot-core.016dc8529603.css": {
+      "sha256": "016dc8529603",
+      "bytes": 222833
     },
     "build/app-shell.708fde4d340b.css": {
       "sha256": "708fde4d340b",
@@ -204,6 +205,10 @@
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {
       "sha256": "4631c0bc3f2b",
       "bytes": 231951
+    },
+    "assets/ui/startup-main-city.d43e67af1c1c.jpg": {
+      "sha256": "d43e67af1c1c",
+      "bytes": 363193
     }
   }
 }

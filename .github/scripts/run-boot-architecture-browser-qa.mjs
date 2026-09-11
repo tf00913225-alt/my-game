@@ -227,6 +227,8 @@ try{
     assert.deepEqual(signedOut.featureResources,[],"Signed-out Critical Boot fetched an authenticated/gameplay feature");
     evidence.checks.authFirst=signedOut;evidence.performance.coldAuth=await metrics(client,"four-symbols:auth-ui-interactive");
     assert.ok(evidence.performance.coldAuth.readyMs>0&&evidence.performance.coldAuth.readyMs<=5000,"Controlled cold auth UI budget exceeded");
+    const authPresentation=await client.eval(`(()=>{const o=document.getElementById("firebaseAuthOverlay"),d=o.querySelector(".firebase-auth-dialog"),t=o.querySelector(".firebase-auth-title"),r=d.getBoundingClientRect(),bg=getComputedStyle(o,"::before").backgroundImage;return {backdrop:bg,dialogWidth:r.width,titleFont:parseFloat(getComputedStyle(t).fontSize),cityRequested:performance.getEntriesByType("resource").some(e=>new URL(e.name).pathname.endsWith("/assets/ui/startup-main-city.d43e67af1c1c.jpg"))};})()`);
+    assert.match(authPresentation.backdrop,/startup-main-city\.d43e67af1c1c\.jpg/);assert.ok(authPresentation.dialogWidth<=390);assert.ok(authPresentation.titleFont<=27);assert.equal(authPresentation.cityRequested,true);evidence.checks.authPresentation=authPresentation;
 
     await client.eval(`document.getElementById("firebaseGuestButton").click()`);
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='NEED_CHARACTER'&&performance.getEntriesByName('four-symbols:character-creation-interactive').length>0&&getComputedStyle(document.getElementById('creationPage')).display!=='none'","guest character creation");

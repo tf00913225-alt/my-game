@@ -9,7 +9,7 @@ const contract=fs.readFileSync("js/startup/startup-contract.js","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
-for(const file of ["assets/ui/startup-logo.4631c0bc3f2b.jpg","assets/ui/startup-main-city-v173.20.jpg"]){
+for(const file of ["assets/ui/startup-logo.4631c0bc3f2b.jpg","assets/ui/startup-main-city.d43e67af1c1c.jpg"]){
     const details=execFileSync("identify",["-format","%m %w %h",file],{encoding:"utf8"});
     assert.equal(details,"JPEG 864 1536",file);
 }
@@ -30,5 +30,9 @@ assert.match(source,/canShowCharacterCreation:\(\)=>contract\.canCreateCharacter
 assert.match(source,/global\.setTimeout\(\(\)=>\{ root\.hidden=true;[\s\S]*?\},360\)/);
 assert.doesNotMatch(source,/12000|15000|MIN_DURATION|totalDuration|runtimeReady/);
 assert.equal(manifest.featureManifest.features.patrol,"feature-patrol");
-assert.doesNotMatch(html,/startup-main-city-v173\.20\.jpg/);
+assert.match(html,/startupCityScene/);
+assert.match(html,/startup-main-city\.d43e67af1c1c\.jpg/);
+assert.match(source,/showCityScene/);
+assert.match(source,/introLogoTargetMs/);
+assert.doesNotMatch(source,/await[^;]*introLogoTargetMs|MIN_DURATION|totalDuration/);
 console.log("✓ account-first startup state machine with real readiness");

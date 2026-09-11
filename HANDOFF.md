@@ -3755,3 +3755,11 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 根因：第二頁 `.creation-action-row` 是 fixed canvas 內的 flex child，但未鎖定 shrink；在真機字體／可用高度吃滿時，action row 可被壓縮到接近 0，而其 124～132px 子按鈕又被 `.creation-step{overflow:clip}` 裁掉，畫面只剩按鈕上緣。
 - 修正：step two 預留 154px 底部安全區，操作列改為在 step 內 `position:absolute; bottom:0`，並保留至少 132px row 高度；不開放整頁捲動、不改配點／建角邏輯。
 - 390×844、DPR 3、touch QA 會實際切到第二頁，驗證「上一步／開始冒險」高度至少 44px、完整落在 step/stage 內，且左右 hit-test 都由按鈕本身取得。
+
+
+## 2026-09-11 — 雙段啟動畫面＋第二幕登入覆蓋
+
+- 基準 `dev@f859f747301941f346f4d2b9590d3f3d87a06cd8`，分支 `feature/boot-intro-auth-overlay-20260911`；`main` 不修改。
+- 本輪兩張附件與既有 V173.20 使用者啟動素材位元組一致；Logo=`assets/ui/startup-logo.4631c0bc3f2b.jpg`，第二幕新增 content-addressed alias `assets/ui/startup-main-city.d43e67af1c1c.jpg`，沒有重新生成圖片。
+- `js/52-v173.20-startup-loader.js` 仍是唯一 StartupStateMachine owner；900ms 僅控制 Logo→第二幕，真實 Firebase/Auth/save 全程並行且 readiness 不等待動畫。
+- `css/firebase-auth.css` 將登入框縮至最多 390px、縮小文字但保留 44px 觸控高度，登入背景持續使用第二幕慢推。兩張圖均進 Critical preload/immutable cache；非必要 gameplay 資產仍維持 lazy。
