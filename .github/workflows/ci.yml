@@ -1,115 +1,120 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - dev
+      - main
   pull_request:
     branches:
       - dev
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  finalize_first_play_boot:
-    name: Finalize First Play browser fault cases
-    if: github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
+  verify:
+    name: Repository checks
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+
     steps:
-      - name: Check out work branch
+      - name: Check out repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
+          fetch-depth: 2
+
       - name: Use current Node.js LTS
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+
+      - name: Prepare Git comparison base
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ "$CI_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] && \
+             [[ ! "$CI_BASE_SHA" =~ ^0{40}$ ]] && \
+             ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
+          fi
+
+          # Typography regression suites audit the pre-change baseline and the
+          # approved gameplay battle baseline byte-for-byte. fetch-depth: 2 does
+          # not retain those fixed historical objects after the integration merge.
+          for typography_baseline_sha in \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            if ! git cat-file -e "$typography_baseline_sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$typography_baseline_sha"
+            fi
+          done
+
+      - name: Check CI script syntax
+        run: |
+          node --check .github/scripts/ci.mjs
+          node --check .github/scripts/boot-live-browser-qa.mjs
+          node --check .github/scripts/release-gate.mjs
+          node --check .github/scripts/run-boot-architecture-browser-qa.mjs
+          node --check .github/scripts/run-skill-progression-browser-qa.mjs
+          node --check .github/scripts/run-relic-progression-browser-qa.mjs
+
+      - name: Check all project JavaScript syntax
+        run: node .github/scripts/ci.mjs syntax
+
       - name: Ensure existing asset-test dependency
         run: |
           if ! command -v identify >/dev/null 2>&1; then
             sudo apt-get update
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
-      - name: Patch, build, browser QA, restore standard CI and push
+
+      - name: Run all Node unit and integration suites
+        run: node .github/scripts/ci.mjs tests
+
+      - name: Run account-first cold/warm mobile browser QA
+        run: node .github/scripts/run-boot-architecture-browser-qa.mjs
+
+      - name: Upload boot architecture browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-architecture-browser-qa-${{ github.sha }}
+          path: artifacts/browser-qa/boot-architecture-browser-qa.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Run skill progression mobile browser QA
+        run: node .github/scripts/run-skill-progression-browser-qa.mjs
+
+      - name: Run relic progression mobile browser QA
+        run: node .github/scripts/run-relic-progression-browser-qa.mjs
+
+      - name: Check static local resources
+        run: node .github/scripts/ci.mjs resources
+
+      - name: Check duplicate HTML IDs
+        run: node .github/scripts/ci.mjs html-ids
+
+      - name: Check release entries and loader integrity
+        run: node .github/scripts/ci.mjs loader
+
+      - name: Enforce release, cache, checklist and deprecated-code gates
         env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          python - <<'PY'
-          from pathlib import Path
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node .github/scripts/release-gate.mjs ci
 
-          startup=Path('js/52-v173.20-startup-loader.js')
-          text=startup.read_text()
-          old='''    let introTimer=0;\n    let citySceneShown=false;'''
-          new='''    let introTimer=0;\n    let citySceneShown=false;\n    let returningPresentationComplete=false;'''
-          if old not in text:
-              raise SystemExit('startup state declaration block not found')
-          text=text.replace(old,new,1)
+      - name: Check Git whitespace and conflict markers
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node .github/scripts/ci.mjs git-diff
 
-          old='''    async function runOpeningPresentation(returning,retryOnly){\n        if(retryOnly){ showCityScene("resource-retry"); return; }\n        if(root){ root.dataset.audience=returning?"returning":"first-boot"; }\n        await delay(returning?5000:1800);\n        showCityScene(returning?"returning-logo-complete":"first-boot-logo-complete");\n        if(returning){ await delay(5000); }\n    }\n    function renderFirstPlayProgress(value){\n        render(value.percent,value.title,value.detail);\n        if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }\n    }'''
-          new='''    async function runOpeningPresentation(returning,retryOnly){\n        returningPresentationComplete=false;\n        if(retryOnly){ showCityScene("resource-retry"); return; }\n        if(root){ root.dataset.audience=returning?"returning":"first-boot"; }\n        await delay(returning?5000:1800);\n        showCityScene(returning?"returning-logo-complete":"first-boot-logo-complete");\n        if(returning){\n            await delay(5000);\n            returningPresentationComplete=true;\n            const readyPercent=Number(progress&&progress.getAttribute("aria-valuenow")||0);\n            if(readyPercent<100){ status("正在更新必要資源","第二幕將維持顯示，完成後才進入帳號系統"); }\n        }\n    }\n    function renderFirstPlayProgress(value){\n        const holdReturningUpdate=returningPresentationComplete&&root&&root.dataset.audience==="returning"&&Number(value.percent)<100;\n        render(value.percent,holdReturningUpdate?"正在更新必要資源":value.title,value.detail);\n        if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }\n    }'''
-          if old not in text:
-              raise SystemExit('opening presentation/progress block not found')
-          startup.write_text(text.replace(old,new,1))
-
-          qa=Path('.github/scripts/run-boot-architecture-browser-qa.mjs')
-          text=qa.read_text()
-          replacements={
-              'const ready=JSON.stringify(qaReadyFirstPlayRecord);':'const ready=JSON.stringify(JSON.stringify(qaReadyFirstPlayRecord));',
-              'const stale=JSON.stringify(qaStaleFirstPlayRecord);':'const stale=JSON.stringify(JSON.stringify(qaStaleFirstPlayRecord));',
-              'resources.some(p=>/\\/app-shell\\./.test(p))':'resources.some(p=>p.includes("/app-shell."))',
-              'resources.some(p=>/\\/gameplay-core\\./.test(p))':'resources.some(p=>p.includes("/gameplay-core."))',
-              'resources.some(p=>/\\/feature-patrol\\./.test(p))':'resources.some(p=>p.includes("/feature-patrol."))',
-              'async function waitForJson(url,timeoutMs=10000){':'async function waitForJson(url,timeoutMs=30000){',
-          }
-          for old,new in replacements.items():
-              if old not in text:
-                  raise SystemExit('expected QA fragment not found: '+old)
-              text=text.replace(old,new,1)
-
-          scenario='''  var scenario=new URL(location.href).searchParams.get("scenario")||"";'''
-          injected='''  var scenario=new URL(location.href).searchParams.get("scenario")||"";\n  if(scenario==="manifest-update"){\n    var nativeFetch=window.fetch.bind(window);\n    window.__qaManifestDelayApplied=0;\n    window.fetch=function(input,init){\n      var target=typeof input==="string"?input:String(input&&input.url||"");\n      var pathname="";\n      try{pathname=new URL(target,location.href).pathname;}catch(_){}\n      if(pathname.endsWith("/assets/ui/nav-home.png")){\n        window.__qaManifestDelayApplied++;\n        return new Promise(function(resolve,reject){setTimeout(function(){nativeFetch(input,init).then(resolve,reject);},15000);});\n      }\n      return nativeFetch(input,init);\n    };\n  }\n  if(scenario==="resource-404"){\n    var qa404Fetch=window.fetch.bind(window);\n    window.__qa404Injected=0;\n    window.fetch=function(input,init){\n      var target=typeof input==="string"?input:String(input&&input.url||"");\n      var pathname="";\n      try{pathname=new URL(target,location.href).pathname;}catch(_){}\n      if(pathname.endsWith("/assets/ui/nav-home.png")&&window.__qa404Injected===0){\n        window.__qa404Injected=1;\n        return Promise.resolve(new Response("qa missing first-play asset",{status:404,statusText:"Not Found",headers:{"content-type":"text/plain"}}));\n      }\n      return qa404Fetch(input,init);\n    };\n  }'''
-          if scenario not in text:
-              raise SystemExit('qaPrelude scenario declaration not found')
-          text=text.replace(scenario,injected,1)
-
-          old404='''            if(activeScenario==="resource-404"&&relative==="assets/ui/nav-home.png"&&!injected404){ injected404=true; response.writeHead(404,{"cache-control":"no-store"}); response.end("qa missing first-play asset"); return; }'''
-          if old404 not in text:
-              raise SystemExit('legacy server 404 injection not found')
-          text=text.replace(old404,'            // resource-404 is injected in-page so retry behavior is deterministic per navigation.',1)
-
-          oldSlow='''            if(activeScenario==="manifest-update"&&relative==="assets/ui/nav-home.png"){ await sleep(10800); }'''
-          if oldSlow not in text:
-              raise SystemExit('legacy server manifest delay not found')
-          text=text.replace(oldSlow,'            // manifest-update latency is injected in-page so it is bound to the current navigation only.',1)
-
-          oldReady='''    const updatedRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready"))`);assert.equal(updatedRecord.manifestHash,manifest.firstPlay.manifestHash);evidence.checks.manifestUpdateReady={manifestHash:updatedRecord.manifestHash};'''
-          newReady='''    const updatedRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready"))`);assert.equal(updatedRecord.manifestHash,manifest.firstPlay.manifestHash);const delayApplied=await client.eval(`window.__qaManifestDelayApplied||0`);assert.ok(delayApplied>=1,"manifest-update QA did not delay the changed First Play asset");evidence.checks.manifestUpdateReady={manifestHash:updatedRecord.manifestHash,delayApplied};'''
-          if oldReady not in text:
-              raise SystemExit('manifest update completion assertion not found')
-          text=text.replace(oldReady,newReady,1)
-
-          oldHttp='''    const httpFail=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),title:document.getElementById("startupStatusTitle").textContent,failed:FourSymbolsFirstPlay.getLastFailed(),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false}))()`);assert.equal(httpFail.state,"BOOT_LOADING");assert.match(httpFail.title,/部分必要資源載入失敗/);assert.equal(httpFail.authShown,false);assert.equal(httpFail.failed.length,1);assert.match(httpFail.failed[0].path,/nav-home\\.png$/);evidence.checks.resource404=httpFail;'''
-          newHttp='''    const httpFail=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),title:document.getElementById("startupStatusTitle").textContent,failed:FourSymbolsFirstPlay.getLastFailed(),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false,injected:window.__qa404Injected||0}))()`);assert.equal(httpFail.state,"BOOT_LOADING");assert.match(httpFail.title,/部分必要資源載入失敗/);assert.equal(httpFail.authShown,false);assert.equal(httpFail.failed.length,1);assert.match(httpFail.failed[0].path,/nav-home\\.png$/);assert.equal(httpFail.injected,1);evidence.checks.resource404=httpFail;'''
-          if oldHttp not in text:
-              raise SystemExit('resource 404 assertion block not found')
-          qa.write_text(text.replace(oldHttp,newHttp,1))
-          PY
-
-          node --check js/52-v173.20-startup-loader.js
-          node --check .github/scripts/run-boot-architecture-browser-qa.mjs
-          npm run build
-          npm run build:check
-          node tests/v173.20-startup-loader.test.js
-          node tests/v173.52-real-startup-progress.test.js
-          node tests/boot-architecture.test.js
-          node .github/scripts/run-boot-architecture-browser-qa.mjs
-
-          rm -rf artifacts/browser-qa
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
-          git add -A
-          git status --short
-          git commit -m "fix: finalize First Play readiness and browser QA [generated]"
-          git push origin HEAD:${GITHUB_HEAD_REF}
+  deploy_dev:
+    name: Dev deployment gate
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    uses: ./.github/workflows/deploy-dev-cloudflare.yml
+    secrets: inherit

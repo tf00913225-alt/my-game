@@ -86,13 +86,41 @@ export async function submitLegacyMigrationCandidate(){throw new Error("QA never
 `;
 
 function qaPrelude(){
-    const ready=JSON.stringify(qaReadyFirstPlayRecord);
-    const stale=JSON.stringify(qaStaleFirstPlayRecord);
+    const ready=JSON.stringify(JSON.stringify(qaReadyFirstPlayRecord));
+    const stale=JSON.stringify(JSON.stringify(qaStaleFirstPlayRecord));
     return `<script>
 window.__qaIdleCallbacks=[];
 window.requestIdleCallback=function(callback){window.__qaIdleCallbacks.push(callback);return window.__qaIdleCallbacks.length;};
 (function(){
   var scenario=new URL(location.href).searchParams.get("scenario")||"";
+  if(scenario==="manifest-update"){
+    var nativeFetch=window.fetch.bind(window);
+    window.__qaManifestDelayApplied=0;
+    window.fetch=function(input,init){
+      var target=typeof input==="string"?input:String(input&&input.url||"");
+      var pathname="";
+      try{pathname=new URL(target,location.href).pathname;}catch(_){}
+      if(pathname.endsWith("/assets/ui/nav-home.png")){
+        window.__qaManifestDelayApplied++;
+        return new Promise(function(resolve,reject){setTimeout(function(){nativeFetch(input,init).then(resolve,reject);},15000);});
+      }
+      return nativeFetch(input,init);
+    };
+  }
+  if(scenario==="resource-404"){
+    var qa404Fetch=window.fetch.bind(window);
+    window.__qa404Injected=0;
+    window.fetch=function(input,init){
+      var target=typeof input==="string"?input:String(input&&input.url||"");
+      var pathname="";
+      try{pathname=new URL(target,location.href).pathname;}catch(_){}
+      if(pathname.endsWith("/assets/ui/nav-home.png")&&window.__qa404Injected===0){
+        window.__qa404Injected=1;
+        return Promise.resolve(new Response("qa missing first-play asset",{status:404,statusText:"Not Found",headers:{"content-type":"text/plain"}}));
+      }
+      return qa404Fetch(input,init);
+    };
+  }
   var noConsent=scenario==="first-play-fresh"||scenario==="privacy-update";
   var noReady=scenario==="first-play-fresh"||scenario==="resource-404"||scenario==="decode-fail";
   if(!noConsent){localStorage.setItem("four_symbols_privacy_consent",JSON.stringify({privacyPolicyVersion:"2026-09-11-v2",acceptedAt:"2026-09-11T00:00:00.000Z"}));}
@@ -131,8 +159,8 @@ async function createQaServer(){
             if(url.pathname===cloudPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
             const relative=decodeURIComponent(url.pathname==="/"?"index.html":url.pathname.slice(1));
             if(relative==="index.html"){ activeScenario=url.searchParams.get("scenario")||""; injected404=false; }
-            if(activeScenario==="resource-404"&&relative==="assets/ui/nav-home.png"&&!injected404){ injected404=true; response.writeHead(404,{"cache-control":"no-store"}); response.end("qa missing first-play asset"); return; }
-            if(activeScenario==="manifest-update"&&relative==="assets/ui/nav-home.png"){ await sleep(10800); }
+            // resource-404 is injected in-page so retry behavior is deterministic per navigation.
+            // manifest-update latency is injected in-page so it is bound to the current navigation only.
             const file=path.resolve(ROOT,relative);
             if(file!==ROOT&&!file.startsWith(ROOT+path.sep)){response.writeHead(403);response.end("forbidden");return;}
             if(!fs.existsSync(file)||!fs.statSync(file).isFile()){response.writeHead(404);response.end("missing");return;}
@@ -150,7 +178,7 @@ async function createQaServer(){
     return server;
 }
 
-async function waitForJson(url,timeoutMs=10000){
+async function waitForJson(url,timeoutMs=30000){
     const started=Date.now();let last;
     while(Date.now()-started<timeoutMs){try{const response=await fetch(url);if(response.ok){return response.json();}}catch(error){last=error;}await sleep(100);}
     throw new Error("Timed out waiting for Chrome DevTools: "+String(last&&last.message||last||"no response"));
@@ -248,7 +276,7 @@ try{
     // cannot initialize Firebase while privacy has not been accepted.
     await clear();await navigate("first-play-fresh");
     await waitFor(client,"document.getElementById('privacyConsentGate')&&!document.getElementById('privacyConsentGate').hidden&&document.getElementById('startupProgress').getAttribute('aria-valuenow')==='100'","fresh First Play privacy gate",30000);
-    const freshPack=await client.eval(`(()=>{const gate=document.getElementById("privacyConsentGate");const rec=JSON.parse(localStorage.getItem("four_symbols_first_play_ready")||"null");const portrait=document.getElementById("creationPortrait");const resources=performance.getEntriesByType("resource").map(e=>new URL(e.name).pathname);return {state:FourSymbolsStartupPolicy.getState(),percent:document.getElementById("startupProgress").getAttribute("aria-valuenow"),privacyVisible:!gate.hidden,authInstalled:!!window.FourSymbolsFirebaseLifecycle,authOverlay:!!document.getElementById("firebaseAuthOverlay"),recordHash:rec&&rec.manifestHash,recordBytes:window.FourSymbolsFirstPlay.getManifest().totalBytes,portraitReady:portrait.complete&&portrait.naturalWidth>0,hasAppShell:resources.some(p=>/\/app-shell\./.test(p)),hasGameplay:resources.some(p=>/\/gameplay-core\./.test(p)),hasPatrol:resources.some(p=>/\/feature-patrol\./.test(p))};})()`);
+    const freshPack=await client.eval(`(()=>{const gate=document.getElementById("privacyConsentGate");const rec=JSON.parse(localStorage.getItem("four_symbols_first_play_ready")||"null");const portrait=document.getElementById("creationPortrait");const resources=performance.getEntriesByType("resource").map(e=>new URL(e.name).pathname);return {state:FourSymbolsStartupPolicy.getState(),percent:document.getElementById("startupProgress").getAttribute("aria-valuenow"),privacyVisible:!gate.hidden,authInstalled:!!window.FourSymbolsFirebaseLifecycle,authOverlay:!!document.getElementById("firebaseAuthOverlay"),recordHash:rec&&rec.manifestHash,recordBytes:window.FourSymbolsFirstPlay.getManifest().totalBytes,portraitReady:portrait.complete&&portrait.naturalWidth>0,hasAppShell:resources.some(p=>p.includes("/app-shell.")),hasGameplay:resources.some(p=>p.includes("/gameplay-core.")),hasPatrol:resources.some(p=>p.includes("/feature-patrol."))};})()`);
     assert.equal(freshPack.state,"BOOT_LOADING");assert.equal(freshPack.percent,"100");assert.equal(freshPack.privacyVisible,true);assert.equal(freshPack.authInstalled,false,"Firebase initialized before privacy consent");assert.equal(freshPack.authOverlay,false);assert.equal(freshPack.recordHash,manifest.firstPlay.manifestHash);assert.equal(freshPack.recordBytes,manifest.firstPlay.totalBytes);assert.equal(freshPack.portraitReady,true,"Creation portrait was not render-ready before account flow");assert.equal(freshPack.hasAppShell,true);assert.equal(freshPack.hasGameplay,true);assert.equal(freshPack.hasPatrol,true);evidence.checks.firstPlayFresh=freshPack;
     await client.eval(`(()=>{const gate=document.getElementById("privacyConsentGate");const consent=gate.contentWindow.document;const policy=consent.getElementById("policyFrame");const root=policy.contentDocument.scrollingElement||policy.contentDocument.documentElement;policy.contentWindow.scrollTo(0,root.scrollHeight);policy.contentWindow.dispatchEvent(new Event("scroll"));})()`);
     await waitFor(client,"document.getElementById('privacyConsentGate').contentWindow.document.getElementById('agreeButton').disabled===false","privacy agree enabled");
@@ -264,11 +292,11 @@ try{
     const updateHold=await client.eval(`(()=>({scene:document.getElementById("startupLoader").dataset.scene,hidden:document.getElementById("startupLoader").hidden,title:document.getElementById("startupStatusTitle").textContent,percent:Number(document.getElementById("startupProgress").getAttribute("aria-valuenow")),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false}))()`);
     assert.equal(updateHold.scene,"city");assert.equal(updateHold.hidden,false);assert.match(updateHold.title,/更新必要資源/);assert.ok(updateHold.percent<100);assert.equal(updateHold.authShown,false);evidence.checks.manifestUpdateHold={...updateHold,elapsedMs:Date.now()-updateStarted};
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","manifest update completion",30000);
-    const updatedRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready"))`);assert.equal(updatedRecord.manifestHash,manifest.firstPlay.manifestHash);evidence.checks.manifestUpdateReady={manifestHash:updatedRecord.manifestHash};
+    const updatedRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready"))`);assert.equal(updatedRecord.manifestHash,manifest.firstPlay.manifestHash);const delayApplied=await client.eval(`window.__qaManifestDelayApplied||0`);assert.ok(delayApplied>=1,"manifest-update QA did not delay the changed First Play asset");evidence.checks.manifestUpdateReady={manifestHash:updatedRecord.manifestHash,delayApplied};
 
     // CASE 4a: HTTP failure blocks auth and exposes a failed-only retry.
     await clear();await navigate("resource-404");await waitFor(client,"!document.getElementById('startupRetryButton').hidden","First Play HTTP retry",30000);
-    const httpFail=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),title:document.getElementById("startupStatusTitle").textContent,failed:FourSymbolsFirstPlay.getLastFailed(),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false}))()`);assert.equal(httpFail.state,"BOOT_LOADING");assert.match(httpFail.title,/部分必要資源載入失敗/);assert.equal(httpFail.authShown,false);assert.equal(httpFail.failed.length,1);assert.match(httpFail.failed[0].path,/nav-home\.png$/);evidence.checks.resource404=httpFail;
+    const httpFail=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),title:document.getElementById("startupStatusTitle").textContent,failed:FourSymbolsFirstPlay.getLastFailed(),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false,injected:window.__qa404Injected||0}))()`);assert.equal(httpFail.state,"BOOT_LOADING");assert.match(httpFail.title,/部分必要資源載入失敗/);assert.equal(httpFail.authShown,false);assert.equal(httpFail.failed.length,1);assert.match(httpFail.failed[0].path,/nav-home\.png$/);assert.equal(httpFail.injected,1);evidence.checks.resource404=httpFail;
     await client.eval(`document.getElementById("startupRetryButton").click()`);await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","HTTP failed-only retry completion",30000);
 
     // CASE 4b: actual Image.decode() rejection is also fatal until retried.

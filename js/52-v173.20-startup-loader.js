@@ -27,6 +27,7 @@
     let lastError=null;
     let introTimer=0;
     let citySceneShown=false;
+    let returningPresentationComplete=false;
 
     function mark(name){
         try{ if(global.performance&&typeof global.performance.mark==="function"){ global.performance.mark(name); } }catch(_){ }
@@ -286,14 +287,21 @@
         });
     }
     async function runOpeningPresentation(returning,retryOnly){
+        returningPresentationComplete=false;
         if(retryOnly){ showCityScene("resource-retry"); return; }
         if(root){ root.dataset.audience=returning?"returning":"first-boot"; }
         await delay(returning?5000:1800);
         showCityScene(returning?"returning-logo-complete":"first-boot-logo-complete");
-        if(returning){ await delay(5000); }
+        if(returning){
+            await delay(5000);
+            returningPresentationComplete=true;
+            const readyPercent=Number(progress&&progress.getAttribute("aria-valuenow")||0);
+            if(readyPercent<100){ status("正在更新必要資源","第二幕將維持顯示，完成後才進入帳號系統"); }
+        }
     }
     function renderFirstPlayProgress(value){
-        render(value.percent,value.title,value.detail);
+        const holdReturningUpdate=returningPresentationComplete&&root&&root.dataset.audience==="returning"&&Number(value.percent)<100;
+        render(value.percent,holdReturningUpdate?"正在更新必要資源":value.title,value.detail);
         if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }
     }
     function showResourceFailure(error){
