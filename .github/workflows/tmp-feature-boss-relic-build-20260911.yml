@@ -1,0 +1,51 @@
+name: Temporary feature patch and production rebuild
+
+on:
+  push:
+    branches:
+      - feature/boss-balance-gameplay-relic-lv20-20260911
+
+permissions:
+  contents: write
+
+jobs:
+  apply-build-commit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/boss-balance-gameplay-relic-lv20-20260911
+          fetch-depth: 0
+
+      - name: Apply focused source and test patches
+        run: node scripts/tmp-apply-boss-relic-lv20-20260911.mjs
+
+      - name: Syntax and focused runtime tests
+        run: |
+          node --check js/gameplay-boss-tower-system.js
+          node --check js/relic-progression-drop-system.js
+          node tests/gameplay-boss-tower-system.test.js
+          node tests/v174-relic-progression-drop-system.test.js
+          node tests/gameplay-ui-mobile-browser.test.js
+
+      - name: Regenerate production assets
+        run: |
+          node scripts/build-production.mjs
+          node scripts/build-production.mjs --check
+
+      - name: Verify repository loader after rebuild
+        run: node .github/scripts/ci.mjs loader
+
+      - name: Remove temporary automation and commit feature changes
+        run: |
+          git rm scripts/tmp-apply-boss-relic-lv20-20260911.mjs
+          git rm .github/workflows/tmp-feature-boss-relic-build-20260911.yml
+          git add -A
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat: rebalance boss gameplay and guarantee Lv20 starter relics"
+          git push origin HEAD:feature/boss-balance-gameplay-relic-lv20-20260911
