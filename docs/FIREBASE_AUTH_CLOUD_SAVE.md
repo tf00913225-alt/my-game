@@ -27,17 +27,18 @@ There is no production `先使用本機存檔` path. No UID means no save lookup
 
 The account surface is mounted directly under `document.body`, outside the fixed 1080×1920 game stage. It sizes against the real viewport (`100dvh` plus safe-area insets), so signed-out users do not depend on the authenticated app-shell stage scaler. Its `聯絡客服` button and the in-game system page both open `FourSymbolsSupport`, which displays `tf00913225@gmail.com` from one Critical Boot owner.
 
-Google, Facebook, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup sign-in must also be listed under Authentication → Settings → Authorized domains. Facebook additionally requires the same Meta App ID/App Secret configured in Firebase Authentication and the Firebase OAuth redirect URI (`https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`) listed as a valid OAuth redirect URI in the Meta app. If Firebase reports `auth/account-exists-with-different-credential`, the UI asks the player to use the original provider; it never silently links identities or reassigns an existing UID.
+Google, Facebook, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup or redirect sign-in must also be listed under Authentication → Settings → Authorized domains. Facebook additionally requires the same Meta App ID/App Secret configured in Firebase Authentication and the Firebase OAuth redirect URI (`https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`) listed as a valid OAuth redirect URI in the Meta app. Mobile browsers use Firebase redirect for Facebook sign-in and consume `getRedirectResult()` before identity observation; desktop browsers keep popup sign-in. If Firebase reports `auth/account-exists-with-different-credential`, the UI asks the player to use the original provider; it never silently links identities or reassigns an existing UID.
 
 ## Account and character order
 
 1. Initialize Firebase Auth and restore persistence.
-2. Resolve the current user.
-3. If signed out, show account UI and wait.
-4. After sign-in, capture the UID and activate only that UID's local repository.
-5. Read `/users/{uid}/saves/current` and the UID-namespaced local save.
-6. Resolve cloud/local/legacy status without silently overwriting any source.
-7. Existing character → hydrate and enter the city. A successful authenticated read of the same UID returning a missing document (or an explicit same-UID empty sentinel) proves an empty account and permits creation. Error or conflict → fail closed.
+2. Complete any pending mobile OAuth redirect result.
+3. Resolve the current user.
+4. If signed out, show account UI and wait.
+5. After sign-in, capture the UID and activate only that UID's local repository.
+6. Read `/users/{uid}/saves/current` and the UID-namespaced local save.
+7. Resolve cloud/local/legacy status without silently overwriting any source.
+8. Existing character → hydrate and enter the city. A successful authenticated read of the same UID returning a missing document (or an explicit same-UID empty sentinel) proves an empty account and permits creation. Error or conflict → fail closed.
 
 Character creation is authorized only by `FourSymbolsStartupPolicy.canCreateCharacter()` while the state machine is in `NEED_CHARACTER`.
 
