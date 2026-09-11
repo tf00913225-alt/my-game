@@ -47,6 +47,18 @@ function retireV146LegacySkillVfx(text){
     return normalize(text.slice(0,start)+text.slice(end));
 }
 
+function normalizeApprovedGameplayCoverRatio(text){
+    const ratioRule="    width:100%;\n    aspect-ratio:16 / 9;\n    min-height:0;\n    box-sizing:border-box;";
+    const oldRule="    width:100%;\n    min-height:120px;\n    box-sizing:border-box;";
+    const currentComingSoon="#game-stage .gameplay-mode-card.coming-soon{\n    min-height:0;";
+    const oldComingSoon="#game-stage .gameplay-mode-card.coming-soon{\n    min-height:88px;";
+    const ratioCount=text.split(ratioRule).length-1;
+    const comingSoonCount=text.split(currentComingSoon).length-1;
+    assert.ok(ratioCount<=1,"approved Gameplay 16:9 ratio rule must be unique");
+    assert.ok(comingSoonCount<=1,"approved Gameplay coming-soon ratio rule must be unique");
+    return normalize(text.replace(ratioRule,oldRule).replace(currentComingSoon,oldComingSoon));
+}
+
 // V131 starts with battle formation/element-card rules. Typography work begins only
 // after the character/home-feature shell, so the entire battle prefix must be byte-equivalent.
 sameSegment(
@@ -76,9 +88,11 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
 // This requirement intentionally expands the Gameplay BOSS battle UI owner: the
 // redundant title is removed, the active Gameplay BOSS becomes a large 9:16 card,
 // the mechanism target card becomes 9:16, and detail moves to a right-side alert.
-// Preserve every pre-battle Gameplay panel rule against the exact dev work base,
-// while the existing protected-BOSS / toast / animation tail remains anchored to
-// the previously approved Gameplay battle baseline.
+// The current request additionally changes only the non-battle Gameplay hub cover
+// cards to 16:9. Normalize exactly those two declarations back to the work-base form
+// before comparison so every other pre-battle panel rule remains byte-protected.
+// The existing protected-BOSS / toast / animation tail remains anchored to the
+// previously approved Gameplay battle baseline.
 {
     const file="css/gameplay-boss-tower.css";
     const now=current(file);
@@ -90,10 +104,15 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
     const workBaseMarker=workBase.indexOf(oldMarker);
     assert.ok(nowMarker>0,"new Gameplay BOSS battle owner marker missing");
     assert.ok(workBaseMarker>0,"work-base Gameplay BOSS battle owner marker missing");
+    const nowNonBattle=now.slice(0,nowMarker);
+    const workBaseNonBattle=workBase.slice(0,workBaseMarker);
+    assert.match(nowNonBattle,/#game-stage \.gameplay-mode-card\{[\s\S]*?width:100%;[\s\S]*?aspect-ratio:16 \/ 9;[\s\S]*?min-height:0;[\s\S]*?box-sizing:border-box;/);
+    assert.match(nowNonBattle,/#game-stage \.gameplay-mode-card\.coming-soon\{\s*min-height:0;/);
+    assert.doesNotMatch(nowNonBattle,/#game-stage \.gameplay-mode-card\{[\s\S]*?min-height:120px;/);
     assert.equal(
-        normalize(now.slice(0,nowMarker)),
-        normalize(workBase.slice(0,workBaseMarker)),
-        `${file} non-battle Gameplay panel rules changed from work base`
+        normalizeApprovedGameplayCoverRatio(nowNonBattle),
+        normalize(workBaseNonBattle),
+        `${file} non-battle Gameplay panel rules changed outside the approved 16:9 activity-cover declarations`
     );
 
     const protectedStart="#game-stage #battlePage .battle-monster.gameplay-boss-protected{";
@@ -122,7 +141,7 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
         cssRule(now,"#game-stage #battleMonsterArea .boss-mechanism-card{")
     ].join("\n");
     assert.doesNotMatch(bossSizingPriorityScope,/!important/,"Gameplay BOSS portrait sizing must stay specificity-driven");
-     assert.doesNotMatch(now.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
+    assert.doesNotMatch(now.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
 }
 
 // Relic battle rules are followed by a small-screen media block that owns the
@@ -134,4 +153,4 @@ sameSegment(
     "@media(max-width:390px)"
 );
 
-console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS portrait/mechanism owner and retired procedural VFX selectors.");
+console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines while allowing only the explicitly approved 16:9 Gameplay hub cover declarations, scoped Gameplay BOSS portrait/mechanism owner, and retired procedural VFX selectors.");
