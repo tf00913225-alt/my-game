@@ -1,1 +1,1 @@
-trigger final skill counter production rebuild 2026-09-11
+trigger final skill counter production rebuild after build-order fix 2026-09-11
