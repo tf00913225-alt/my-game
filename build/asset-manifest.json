@@ -23,7 +23,7 @@
           "build/app-shell.a887e992c1b2.js"
         ],
         "styles": [
-          "build/app-shell.8c069e2259ba.css"
+          "build/app-shell.36f23ed11461.css"
         ],
         "dependencies": []
       },
@@ -158,9 +158,9 @@
       "sha256": "016dc8529603",
       "bytes": 222833
     },
-    "build/app-shell.8c069e2259ba.css": {
-      "sha256": "8c069e2259ba",
-      "bytes": 92141
+    "build/app-shell.36f23ed11461.css": {
+      "sha256": "36f23ed11461",
+      "bytes": 92172
     },
     "build/gameplay-core.3e9f850dc2ef.css": {
       "sha256": "3e9f850dc2ef",
