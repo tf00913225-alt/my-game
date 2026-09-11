@@ -36,13 +36,19 @@ jobs:
       - name: Apply focused source and test patches
         run: node scripts/tmp-apply-boss-relic-lv20-20260911.mjs
 
-      - name: Syntax and focused runtime tests
+      - name: Syntax check changed runtime owners
         run: |
           node --check js/gameplay-boss-tower-system.js
           node --check js/relic-progression-drop-system.js
-          node tests/gameplay-boss-tower-system.test.js
-          node tests/v174-relic-progression-drop-system.test.js
-          node tests/gameplay-ui-mobile-browser.test.js
+
+      - name: Boss runtime tests
+        run: node tests/gameplay-boss-tower-system.test.js
+
+      - name: Relic progression tests
+        run: node tests/v174-relic-progression-drop-system.test.js
+
+      - name: Gameplay mobile browser test
+        run: node tests/gameplay-ui-mobile-browser.test.js
 
       - name: Regenerate production assets
         run: |
