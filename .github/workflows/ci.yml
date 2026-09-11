@@ -11,44 +11,11 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  bootstrap_first_play_build:
-    name: Regenerate First Play production manifest
-    if: github.event_name == 'pull_request' && github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: Use current Node.js LTS
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-      - name: Preserve hashed production assets and rebuild
-        env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          node scripts/fix-first-play-manifest-assets.mjs
-          npm run build
-          npm run build:check
-          node tests/critical-feature-budget.test.js
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
-          git rm -f scripts/fix-first-play-manifest-assets.mjs
-          git add -A
-          git status --short
-          git commit -m "fix: preserve hashed production asset manifest [generated]"
-          git push origin HEAD:${GITHUB_HEAD_REF}
-
   verify:
     name: Repository checks
-    if: github.event_name != 'pull_request' || github.head_ref != 'feature/first-play-resource-preload-privacy-boot'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -141,7 +108,7 @@ jobs:
 
       - name: Check Git whitespace and conflict markers
         env:
-          CI_BASE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node .github/scripts/ci.mjs git-diff
 

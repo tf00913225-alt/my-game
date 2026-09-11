@@ -278,7 +278,7 @@ const assetManifest={
     critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[...criticalImagePaths],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},
     featureManifest,
     firstPlay:firstPlayPack,
-    assets:Object.fromEntries([...declared.map(item=>[item.path,{sha256:item.digest,bytes:Buffer.byteLength(item.content)}]),...firstPlayResources.map(item=>[item.path,{sha256:item.sha256,bytes:item.bytes}])])
+    assets:Object.fromEntries(declared.map(item=>[item.path,{sha256:item.digest,bytes:Buffer.byteLength(item.content)}]))
 };
 const manifestContent=JSON.stringify(assetManifest,null,2)+"\n";
 const manifestOutput=target("asset-manifest","json",manifestContent);
