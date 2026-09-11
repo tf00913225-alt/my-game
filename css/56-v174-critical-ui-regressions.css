@@ -241,3 +241,41 @@
     max-width:104px !important;
     overflow:hidden !important;
 }
+
+/* 2026-09-11 reported mobile regressions.
+   Equipment comparison must never inherit an inventory-slot crop/zoom rule. */
+#game-stage #itemModal .v17351-compare-art > .v169-item-art{
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    background-position:center !important;
+    background-size:contain !important;
+}
+#game-stage #itemModal .v17351-compare-art > .v169-item-art > img{
+    position:static !important;
+    inset:auto !important;
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    transform:none !important;
+}
+
+/* Make combat artwork visibly larger without changing the established seat,
+   HP/SP, targeting or turn geometry. Player art remains contain; monsters keep
+   their existing cover treatment but gain a larger visual bleed. */
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit > .v174-battle-art{
+    inset:-24px -20px 30px !important;
+}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit > .v174-battle-art{
+    inset:-16px !important;
+}
