@@ -1,0 +1,58 @@
+{
+  "date": "2026-09-11",
+  "title": "Boss 強度、玩法 16:9、元素克制說明與 Lv20 秘寶保底",
+  "base_branch": "dev",
+  "base_sha": "eb9e9d78911ca5d72693c33aaab6002238291494",
+  "work_branch": "feature/boss-balance-ui-relic-lv20-20260911",
+  "officialVersion": "173.65",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "IMPLEMENTED",
+      "request": "依同級預期隊伍重算所有玩法 Boss 強度，提高機制卡耐久，依難度配置最多兩名同元素菁英援軍，Boss 元素與技能一致且使用獨立名稱。",
+      "owner": [
+        "js/gameplay-boss-tower-system.js"
+      ],
+      "implementation": "Lv20-49 以兩名同級角色、Lv50+ 以三名同級角色作耐久預算；Boss HP 額外 ×1.60/×2.00，攻擊僅 ×1.08/×1.12；機制卡提高為 Boss HP 18%-28% 並使用 65% Boss 防禦；Boss/塔依等級配置 0-2 名同元素菁英援軍。"
+    },
+    {
+      "id": 2,
+      "status": "IMPLEMENTED",
+      "request": "玩法各活動封面改為 16:9。",
+      "owner": [
+        "css/gameplay-boss-tower.css"
+      ],
+      "implementation": "玩法中心 .gameplay-mode-card 使用 aspect-ratio:16/9，保留既有單一 scroll owner 與內容事件。"
+    },
+    {
+      "id": 3,
+      "status": "IMPLEMENTED",
+      "request": "全屬性技能預覽的元素克制文字重新排版，說清楚克制與被克制。",
+      "owner": [
+        "css/56-v174-critical-ui-regressions.css"
+      ],
+      "implementation": "body-mounted modal 的正式 ::before owner 改為四行 pre-line 說明，清楚區分『克制』與『被克制』並保留正式四元素循環。"
+    },
+    {
+      "id": 4,
+      "status": "IMPLEMENTED",
+      "request": "第一隻角色 Lv20 時至少開放兩件藍階秘寶。",
+      "owner": [
+        "js/relic-progression-drop-system.js",
+        "js/60-team-relic-system.js"
+      ],
+      "implementation": "在後載 acquisition owner 內加入一次性 Lv20 starter guarantee；優先乾坤玉壺、玄武靈印，再以青嵐羽符補足，僅保證至少兩件藍階，不包 checkLevelUp/saveGame，不新增 sidecar。"
+    }
+  ],
+  "verification": {
+    "completed": [
+      "implementation owner audit complete"
+    ],
+    "pending": [
+      "targeted Node/Chrome verification",
+      "Repository checks PR run"
+    ],
+    "result": "0/4 VERIFIED"
+  }
+}

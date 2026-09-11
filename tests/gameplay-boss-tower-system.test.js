@@ -108,6 +108,36 @@ test("central definitions own nine fixed personal bosses, four permanent world b
     assert.deepEqual(value(context,"GameplaySystem.towerConfig.elementOrder"),["fire","earth","water","wind"]);
 });
 
+test("Boss tuning budgets durability by expected same-level party, keeps same-element skills and uses 0-2 elite escorts",()=>{
+    const expectedPersonalNames=["赤曜焚心侯","鎮岳玄甲君","寒淵鏡魄使","青霄裂空君","燼天赤煞王","萬壑鎮界尊","玄霜滄溟皇","九霄斷嵐帝","焚世赤曜帝"];
+    const expectedPersonalElements=["fire","earth","water","wind","fire","earth","water","wind","fire"];
+    const first=load({level:20}).context;
+    assert.deepEqual(value(first,"GameplaySystem.personalBosses.map(item=>item.name)"),expectedPersonalNames);
+    assert.deepEqual(value(first,"GameplaySystem.personalBosses.map(item=>item.element)"),expectedPersonalElements);
+    assert.equal(new Set(expectedPersonalNames).size,expectedPersonalNames.length);
+    assert.equal(first.GameplaySystem.getExpectedPartySize(20),2);
+    assert.equal(first.GameplaySystem.getExpectedPartySize(49),2);
+    assert.equal(first.GameplaySystem.getExpectedPartySize(50),3);
+    assert.equal(first.vGameplayStartBoss("personal","personal-20"),true);
+    assert.equal(first.monsters.length,1);
+    assert.equal(first.monsters[0].maxHP,6720,"Lv20 Boss must scale from one elite baseline to a two-character durability budget");
+    first.turn=2;first.startTurn(first.battleToken);
+    const shield=value(first,"GameplaySystem.getActiveBattleState().mechanisms[0]");
+    assert.ok(shield.maxHP>=Math.round(first.monsters[0].maxHP*.27),"mechanism card should require meaningful focused damage");
+    assert.equal(shield.defense,65,"mechanism defense should use 65% of Boss defense");
+
+    const mid=load({level:40}).context;mid.vGameplayStartBoss("personal","personal-40");
+    assert.equal(mid.monsters.length,2);assert.ok(mid.monsters.every(monster=>monster.element==="water"));
+    const late=load({level:70}).context;late.vGameplayStartBoss("personal","personal-70");
+    assert.equal(late.monsters.length,3);assert.ok(late.monsters.every(monster=>monster.element==="earth"));
+    const world=load({level:100}).context;world.vGameplayStartBoss("world","world-80");
+    assert.equal(world.monsters.length,3);assert.ok(world.monsters.every(monster=>monster.element==="wind"));
+    const skillElements={fireRocket:"fire",explosiveFlurry:"fire",dragonSlash:"fire",stoneSlash:"earth",flyingSandStrike:"earth",dustStorm:"earth",waterKnife:"water",frostPunch:"water",floodBeast:"water",stormFlurry:"wind",windCrossSlash:"wind",windHowlLightning:"wind"};
+    for(const monster of [...mid.monsters,...late.monsters,...world.monsters]){
+        assert.ok(monster.skillIds.every(id=>skillElements[id]===monster.element),monster.name+" must only use skills matching its element");
+    }
+});
+
 test("Tower owner produces 100 floors with elite, boss and milestone cadence",()=>{
     const {context}=load();
     const kind=floor=>context.GameplaySystem.getTowerFloorKind(floor);

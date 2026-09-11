@@ -21,6 +21,24 @@
     const WEEK_MS=7*24*60*60*1000;
     const UTC_WEEK_ANCHOR=Date.UTC(1970,0,5);
 
+    /* Boss durability is budgeted against the party size a same-level player is
+       expected to have reached. Lv20-49 assumes two same-level characters;
+       Lv50+ assumes the full three-character party. Attack pressure rises only
+       slightly so the rebalance creates longer decisions rather than one-shots. */
+    const BOSS_BALANCE_CONFIG=Object.freeze({
+        partyScale:Object.freeze({
+            2:Object.freeze({hp:1.60,attack:1.08}),
+            3:Object.freeze({hp:2.00,attack:1.12})
+        }),
+        mechanismDefenseRatio:.65
+    });
+    const BOSS_ESCORT_NAMES=Object.freeze({
+        fire:Object.freeze(["赤曜焚衛","炎獄侍將"]),
+        water:Object.freeze(["玄霜冰衛","滄溟侍將"]),
+        wind:Object.freeze(["青罡風衛","裂空侍將"]),
+        earth:Object.freeze(["鎮岳岩衛","玄甲侍將"])
+    });
+
     const ELEMENT_ORDER=Object.freeze(["fire","earth","water","wind"]);
     const ELEMENTS=Object.freeze({
         fire:Object.freeze({label:"火",style:"高爆發・爆擊・燃燒・追擊",color:"#c85a3d",glow:"rgba(200,90,61,.3)",skills:Object.freeze(["fireRocket","explosiveFlurry","dragonSlash"]),supports:Object.freeze(["rage"])}),
@@ -30,23 +48,23 @@
     });
 
     const MECHANISM_DEFINITIONS=Object.freeze({
-        shield:Object.freeze({type:"shield",kind:"護盾",name:"金剛護體",hpRatio:.12,priority:100,effect:"存在期間 BOSS 無法被指定或受到新的直接傷害／異常。"}),
-        charge:Object.freeze({type:"charge",kind:"蓄力",name:"滅魂陣",hpRatio:.08,priority:90,countdown:2,effect:"倒數歸零時發動有預告的大型攻擊；破壞可取消。"}),
-        heal:Object.freeze({type:"heal",kind:"圖騰",name:"血祭圖騰",hpRatio:.07,priority:80,healRatio:.04,effect:"存在期間，每回合恢復 BOSS 4% 最大生命。"}),
-        amplify:Object.freeze({type:"amplify",kind:"法陣",name:"煞氣法陣",hpRatio:.07,priority:70,damageMultiplier:1.25,effect:"存在期間，BOSS 造成傷害提高 25%。"}),
-        seal:Object.freeze({type:"seal",kind:"封鎖",name:"鎖脈禁制",hpRatio:.06,priority:60,healingMultiplier:.6,effect:"存在期間，我方治療與 SP 回復效果降低 40%。"})
+        shield:Object.freeze({type:"shield",kind:"護盾",name:"金剛護體",hpRatio:.28,priority:100,effect:"存在期間 BOSS 無法被指定或受到新的直接傷害／異常。"}),
+        charge:Object.freeze({type:"charge",kind:"蓄力",name:"滅魂陣",hpRatio:.22,priority:90,countdown:2,effect:"倒數歸零時發動有預告的大型攻擊；破壞可取消。"}),
+        heal:Object.freeze({type:"heal",kind:"圖騰",name:"血祭圖騰",hpRatio:.20,priority:80,healRatio:.04,effect:"存在期間，每回合恢復 BOSS 4% 最大生命。"}),
+        amplify:Object.freeze({type:"amplify",kind:"法陣",name:"煞氣法陣",hpRatio:.18,priority:70,damageMultiplier:1.25,effect:"存在期間，BOSS 造成傷害提高 25%。"}),
+        seal:Object.freeze({type:"seal",kind:"封鎖",name:"鎖脈禁制",hpRatio:.18,priority:60,healingMultiplier:.6,effect:"存在期間，我方治療與 SP 回復效果降低 40%。"})
     });
 
     const PERSONAL_BOSSES=Object.freeze([
-        Object.freeze({id:"personal-20",name:"熾焰狼王",level:20,element:"fire",phases:1,hpMultiplier:4.2,attackMultiplier:1.15,traits:Object.freeze(["護盾","燃燒"]),mechanisms:Object.freeze([{round:2,type:"shield"}]),firstReward:"首通金幣 1,200・藍階礦石 ×2",repeatReward:"金幣 260・白階礦石",firstGold:1200,repeatGold:260,ore:"oreLow",firstOre:2}),
-        Object.freeze({id:"personal-30",name:"烈焰巨魔王",level:30,element:"fire",phases:1,hpMultiplier:5.2,attackMultiplier:1.24,traits:Object.freeze(["蓄力","燃燒"]),mechanisms:Object.freeze([{round:2,type:"charge"},{round:6,type:"charge"}]),firstReward:"首通金幣 1,800・藍階礦石 ×2",repeatReward:"金幣 380・藍階礦石",firstGold:1800,repeatGold:380,ore:"oreMid",firstOre:2}),
-        Object.freeze({id:"personal-40",name:"深淵水靈王",level:40,element:"water",phases:2,hpMultiplier:6.1,attackMultiplier:1.27,traits:Object.freeze(["回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"heal"},{hpBelow:.5,type:"charge"}]),firstReward:"首通金幣 2,600・紫階礦石 ×2",repeatReward:"金幣 520・紫階礦石",firstGold:2600,repeatGold:520,ore:"oreHigh",firstOre:2}),
-        Object.freeze({id:"personal-50",name:"寒潮巨獸王",level:50,element:"water",phases:2,hpMultiplier:7,attackMultiplier:1.34,traits:Object.freeze(["護盾","回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"shield"},{hpBelow:.45,type:"heal"}]),firstReward:"首通金幣 3,400・紫階礦石 ×3",repeatReward:"金幣 660・紫階礦石",firstGold:3400,repeatGold:660,ore:"oreHigh",firstOre:3}),
-        Object.freeze({id:"personal-60",name:"玄冰修羅王",level:60,element:"water",phases:3,hpMultiplier:7.6,attackMultiplier:1.38,traits:Object.freeze(["護盾","蓄力","凍傷"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 4,300・橙階礦石 ×2",repeatReward:"金幣 820・紫階礦石",firstGold:4300,repeatGold:820,ore:"orePerfect",firstOre:2}),
-        Object.freeze({id:"personal-70",name:"絕冰魔君王",level:70,element:"water",phases:3,hpMultiplier:8.4,attackMultiplier:1.43,traits:Object.freeze(["回復","增幅","控制"]),mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 5,200・橙階礦石 ×2",repeatReward:"金幣 980・橙階礦石",firstGold:5200,repeatGold:980,ore:"orePerfect",firstOre:2}),
-        Object.freeze({id:"personal-80",name:"極寒龍獄皇",level:80,element:"water",phases:3,hpMultiplier:9.1,attackMultiplier:1.48,traits:Object.freeze(["護盾","蓄力","回復"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.4,type:"heal"}]),firstReward:"首通回天寶輪・金幣 6,200",repeatReward:"金幣 1,160・橙階礦石",firstGold:6200,repeatGold:1160,ore:"orePerfect",firstOre:1,relic:"relic_returning_wheel"}),
-        Object.freeze({id:"personal-90",name:"永凍深淵皇",level:90,element:"water",phases:4,hpMultiplier:9.7,attackMultiplier:1.53,traits:Object.freeze(["封鎖","護盾","蓄力"]),mechanisms:Object.freeze([{round:2,type:"seal"},{round:4,type:"shield"},{round:7,type:"charge"},{hpBelow:.3,type:"amplify"}]),firstReward:"首通金幣 7,500・橙階礦石 ×3",repeatReward:"金幣 1,360・橙階礦石",firstGold:7500,repeatGold:1360,ore:"orePerfect",firstOre:3}),
-        Object.freeze({id:"personal-100",name:"末世寒神皇",level:100,element:"water",phases:4,hpMultiplier:10.2,attackMultiplier:1.58,traits:Object.freeze(["護盾","蓄力","回復","封鎖"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"seal"}]),firstReward:"首通金幣 10,000・橙階礦石 ×4",repeatReward:"金幣 1,600・橙階礦石",firstGold:10000,repeatGold:1600,ore:"orePerfect",firstOre:4})
+        Object.freeze({id:"personal-20",name:"赤曜焚心侯",level:20,element:"fire",phases:1,assistCount:0,hpMultiplier:4.2,attackMultiplier:1.15,traits:Object.freeze(["護盾","燃燒"]),mechanisms:Object.freeze([{round:2,type:"shield"}]),firstReward:"首通金幣 1,200・藍階礦石 ×2",repeatReward:"金幣 260・白階礦石",firstGold:1200,repeatGold:260,ore:"oreLow",firstOre:2}),
+        Object.freeze({id:"personal-30",name:"鎮岳玄甲君",level:30,element:"earth",phases:1,assistCount:1,hpMultiplier:5.2,attackMultiplier:1.24,traits:Object.freeze(["蓄力","破防"]),mechanisms:Object.freeze([{round:2,type:"charge"},{round:6,type:"charge"}]),firstReward:"首通金幣 1,800・藍階礦石 ×2",repeatReward:"金幣 380・藍階礦石",firstGold:1800,repeatGold:380,ore:"oreMid",firstOre:2}),
+        Object.freeze({id:"personal-40",name:"寒淵鏡魄使",level:40,element:"water",phases:2,assistCount:1,hpMultiplier:6.1,attackMultiplier:1.27,traits:Object.freeze(["回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"heal"},{hpBelow:.5,type:"charge"}]),firstReward:"首通金幣 2,600・紫階礦石 ×2",repeatReward:"金幣 520・紫階礦石",firstGold:2600,repeatGold:520,ore:"oreHigh",firstOre:2}),
+        Object.freeze({id:"personal-50",name:"青霄裂空君",level:50,element:"wind",phases:2,assistCount:1,hpMultiplier:7,attackMultiplier:1.34,traits:Object.freeze(["護盾","閃避","命中干擾"]),mechanisms:Object.freeze([{round:2,type:"shield"},{hpBelow:.45,type:"heal"}]),firstReward:"首通金幣 3,400・紫階礦石 ×3",repeatReward:"金幣 660・紫階礦石",firstGold:3400,repeatGold:660,ore:"oreHigh",firstOre:3}),
+        Object.freeze({id:"personal-60",name:"燼天赤煞王",level:60,element:"fire",phases:3,assistCount:1,hpMultiplier:7.6,attackMultiplier:1.38,traits:Object.freeze(["護盾","蓄力","燃燒"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 4,300・橙階礦石 ×2",repeatReward:"金幣 820・紫階礦石",firstGold:4300,repeatGold:820,ore:"orePerfect",firstOre:2}),
+        Object.freeze({id:"personal-70",name:"萬壑鎮界尊",level:70,element:"earth",phases:3,assistCount:2,hpMultiplier:8.4,attackMultiplier:1.43,traits:Object.freeze(["回復","增幅","控制"]),mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 5,200・橙階礦石 ×2",repeatReward:"金幣 980・橙階礦石",firstGold:5200,repeatGold:980,ore:"orePerfect",firstOre:2}),
+        Object.freeze({id:"personal-80",name:"玄霜滄溟皇",level:80,element:"water",phases:3,assistCount:2,hpMultiplier:9.1,attackMultiplier:1.48,traits:Object.freeze(["護盾","蓄力","回復"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.4,type:"heal"}]),firstReward:"首通回天寶輪・金幣 6,200",repeatReward:"金幣 1,160・橙階礦石",firstGold:6200,repeatGold:1160,ore:"orePerfect",firstOre:1,relic:"relic_returning_wheel"}),
+        Object.freeze({id:"personal-90",name:"九霄斷嵐帝",level:90,element:"wind",phases:4,assistCount:2,hpMultiplier:9.7,attackMultiplier:1.53,traits:Object.freeze(["封鎖","護盾","暈眩"]),mechanisms:Object.freeze([{round:2,type:"seal"},{round:4,type:"shield"},{round:7,type:"charge"},{hpBelow:.3,type:"amplify"}]),firstReward:"首通金幣 7,500・橙階礦石 ×3",repeatReward:"金幣 1,360・橙階礦石",firstGold:7500,repeatGold:1360,ore:"orePerfect",firstOre:3}),
+        Object.freeze({id:"personal-100",name:"焚世赤曜帝",level:100,element:"fire",phases:4,assistCount:2,hpMultiplier:10.2,attackMultiplier:1.58,traits:Object.freeze(["護盾","蓄力","燃燒","封鎖"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"seal"}]),firstReward:"首通金幣 10,000・橙階礦石 ×4",repeatReward:"金幣 1,600・橙階礦石",firstGold:10000,repeatGold:1600,ore:"orePerfect",firstOre:4})
     ]);
 
     const WORLD_STAGE_PROFILES=Object.freeze([
@@ -57,10 +75,10 @@
     ]);
 
     const WORLD_BOSSES=Object.freeze([
-        Object.freeze({id:"world-40",name:"熔岩巨獸王",level:40,element:"fire",hpMultiplier:6.2,attackMultiplier:1.26,traits:Object.freeze(["四階段","護盾","蓄力"]),firstReward:"特殊首通：回天寶輪・金幣 6,000",repeatReward:"最終階段再戰：金幣 700",firstGold:6000,repeatGold:700,relic:"relic_returning_wheel"}),
-        Object.freeze({id:"world-60",name:"玄冰修羅王",level:60,element:"water",hpMultiplier:7.2,attackMultiplier:1.36,traits:Object.freeze(["四階段","回復","凍傷"]),firstReward:"特殊首通：橙階礦石 ×4・金幣 9,000",repeatReward:"最終階段再戰：金幣 1,000",firstGold:9000,repeatGold:1000,ore:"orePerfect",firstOre:4}),
-        Object.freeze({id:"world-80",name:"焚天龍獄皇",level:80,element:"fire",hpMultiplier:8.4,attackMultiplier:1.47,traits:Object.freeze(["四階段","增幅","蓄力"]),firstReward:"特殊首通：橙階礦石 ×6・金幣 13,000",repeatReward:"最終階段再戰：金幣 1,400",firstGold:13000,repeatGold:1400,ore:"orePerfect",firstOre:6}),
-        Object.freeze({id:"world-100",name:"終焉神魔皇",level:100,element:"fire",hpMultiplier:9.6,attackMultiplier:1.57,traits:Object.freeze(["四階段","封鎖","護盾","蓄力"]),firstReward:"特殊首通：橙階礦石 ×8・金幣 20,000",repeatReward:"最終階段再戰：金幣 2,000",firstGold:20000,repeatGold:2000,ore:"orePerfect",firstOre:8})
+        Object.freeze({id:"world-40",name:"天災・焚城赤魘",level:40,element:"fire",assistCount:1,hpMultiplier:6.2,attackMultiplier:1.26,traits:Object.freeze(["四階段","護盾","蓄力"]),firstReward:"特殊首通：回天寶輪・金幣 6,000",repeatReward:"最終階段再戰：金幣 700",firstGold:6000,repeatGold:700,relic:"relic_returning_wheel"}),
+        Object.freeze({id:"world-60",name:"天災・無盡寒淵",level:60,element:"water",assistCount:2,hpMultiplier:7.2,attackMultiplier:1.36,traits:Object.freeze(["四階段","回復","凍傷"]),firstReward:"特殊首通：橙階礦石 ×4・金幣 9,000",repeatReward:"最終階段再戰：金幣 1,000",firstGold:9000,repeatGold:1000,ore:"orePerfect",firstOre:4}),
+        Object.freeze({id:"world-80",name:"天災・裂界青罡",level:80,element:"wind",assistCount:2,hpMultiplier:8.4,attackMultiplier:1.47,traits:Object.freeze(["四階段","增幅","閃避"]),firstReward:"特殊首通：橙階礦石 ×6・金幣 13,000",repeatReward:"最終階段再戰：金幣 1,400",firstGold:13000,repeatGold:1400,ore:"orePerfect",firstOre:6}),
+        Object.freeze({id:"world-100",name:"天災・鎮世玄岳",level:100,element:"earth",assistCount:2,hpMultiplier:9.6,attackMultiplier:1.57,traits:Object.freeze(["四階段","封鎖","護盾","控制"]),firstReward:"特殊首通：橙階礦石 ×8・金幣 20,000",repeatReward:"最終階段再戰：金幣 2,000",firstGold:20000,repeatGold:2000,ore:"orePerfect",firstOre:8})
     ]);
 
     const TOWER_CONFIG=Object.freeze({
@@ -79,6 +97,14 @@
         return Number.isFinite(result)?result:(fallback===undefined?0:fallback);
     }
     function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
+    function expectedPartySizeForLevel(level){ return numeric(level,1)>=50?3:2; }
+    function bossPartyScale(level){
+        return BOSS_BALANCE_CONFIG.partyScale[expectedPartySizeForLevel(level)]||BOSS_BALANCE_CONFIG.partyScale[2];
+    }
+    function bossAssistCount(definition,profile){
+        const value=profile&&profile.assistCount!==undefined?profile.assistCount:definition&&definition.assistCount;
+        return clamp(Math.floor(numeric(value,0)),0,2);
+    }
     function escapeHtml(value){
         return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;")
             .replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
@@ -228,10 +254,12 @@
         const progress=type==="world"?state.world[definition.id]:state.personal[definition.id];
         const stage=type==="world"?(progress.firstClear?4:Math.min(4,progress.completedStages+1)):null;
         const mechanismText=type==="world"?WORLD_STAGE_PROFILES[stage-1].summary:definition.traits.join("・");
+        const expectedParty=expectedPartySizeForLevel(definition.level),assistCount=bossAssistCount(definition,{stage:stage||1});
+        const rosterText="以 "+expectedParty+" 名 Lv."+definition.level+" 同級角色作為耐久基準"+(assistCount?"；另有 "+assistCount+" 名"+elementLabel(definition.element)+"元素菁英援軍。":"；本戰不配置菁英援軍。");
         return '<div class="boss-detail"><button type="button" class="boss-detail-back" onclick="vGameplayCloseBossDetail()">‹ 返回 BOSS 列表</button>'+
             '<section class="boss-hero"><small>'+(type==="world"?'世界觀災厄級・永久單人攻略':'個人挑戰・固定等級')+'</small><h3>'+escapeHtml(definition.name)+'</h3><p>Lv.'+definition.level+'・'+escapeHtml(elementLabel(definition.element))+'元素</p><div class="boss-trait-tags">'+definition.traits.map(item=>'<span>'+escapeHtml(item)+'</span>').join("")+'</div></section>'+
             (type==="world"?worldStageTrack(progress):'')+
-            '<div class="boss-detail-grid"><section><h4>戰鬥特性</h4><p>'+escapeHtml(type==="world"?'四個永久攻略階段；失敗只重打目前階段。':definition.phases+' 個戰鬥階段；可不限次數挑戰，固定等級保留角色成長感。')+'</p></section><section><h4>機制簡介</h4><p>'+escapeHtml(mechanismText)+'</p></section><section><h4>首次擊敗獎勵</h4><p>'+escapeHtml(definition.firstReward)+'・'+(progress.firstClear?'已領取':'尚未領取')+'</p></section><section><h4>重複掉落</h4><p>'+escapeHtml(definition.repeatReward)+'</p></section></div>'+
+            '<div class="boss-detail-grid"><section><h4>戰鬥特性</h4><p>'+escapeHtml(type==="world"?'四個永久攻略階段；失敗只重打目前階段。':definition.phases+' 個戰鬥階段；可不限次數挑戰，固定等級保留角色成長感。')+'</p></section><section><h4>建議編隊</h4><p>'+escapeHtml(rosterText)+'</p></section><section><h4>機制簡介</h4><p>'+escapeHtml(mechanismText)+'</p></section><section><h4>首次擊敗獎勵</h4><p>'+escapeHtml(definition.firstReward)+'・'+(progress.firstClear?'已領取':'尚未領取')+'</p></section><section><h4>重複掉落</h4><p>'+escapeHtml(definition.repeatReward)+'</p></section></div>'+
             '<button type="button" class="gameplay-primary-action" onclick="vGameplayStartBoss(\''+type+'\',\''+definition.id+'\')">'+(type==="world"?'挑戰'+WORLD_STAGE_PROFILES[stage-1].label:'開始挑戰')+'</button></div>';
     }
     function renderBossPage(){
@@ -310,8 +338,9 @@
     function buildBossMonster(definition,options){
         const profile=options||{};
         const monster=buildBaseMonster(definition.name,definition.level,definition.element,"elite");
-        const hpMultiplier=definition.hpMultiplier*numeric(profile.hpFactor,1);
-        const attackMultiplier=definition.attackMultiplier*numeric(profile.attackFactor,1);
+        const partyScale=bossPartyScale(definition.level);
+        const hpMultiplier=definition.hpMultiplier*numeric(profile.hpFactor,1)*partyScale.hp;
+        const attackMultiplier=definition.attackMultiplier*numeric(profile.attackFactor,1)*partyScale.attack;
         monster.maxHP=Math.max(1,Math.round(numeric(monster.maxHP,1)*hpMultiplier));
         monster.hp=monster.maxHP;
         monster.attack=Math.max(1,Math.round(numeric(monster.attack,1)*attackMultiplier));
@@ -321,8 +350,24 @@
         monster.vGameplayBoss=true;
         monster.vGameplayBossId=definition.id;
         monster.vGameplayStage=numeric(profile.stage,1);
+        monster.vGameplayExpectedPartySize=expectedPartySizeForLevel(definition.level);
         configureBossSkills(monster,definition.element,monster.vGameplayStage);
         return monster;
+    }
+    function buildBossAssistMonster(definition,index,stage){
+        const names=BOSS_ESCORT_NAMES[definition.element]||BOSS_ESCORT_NAMES.fire;
+        const monster=buildBaseMonster(names[index%names.length],definition.level,definition.element,"elite");
+        monster.vGameplayBossAssist=true;
+        monster.vGameplayBossId=definition.id;
+        monster.unitKind="elite";
+        configureBossSkills(monster,definition.element,Math.max(1,Math.min(3,Math.floor(numeric(stage,1)))));
+        return monster;
+    }
+    function buildBossRoster(definition,options){
+        const profile=options||{};
+        const boss=buildBossMonster(definition,profile);
+        const assists=Array.from({length:bossAssistCount(definition,profile)},(_,index)=>buildBossAssistMonster(definition,index,profile.stage));
+        return {boss:boss,roster:[boss].concat(assists)};
     }
     function towerBossName(element,floor){
         const map={fire:floor>=80?"焚天龍獄皇":"熔岩巨獸王",water:floor>=80?"極寒龍獄皇":"深淵水靈王",earth:"東帝天尊",wind:"天帝天尊"};
@@ -341,8 +386,9 @@
     function buildTowerRoster(floor){
         const element=state.tower.element,level=towerMonsterLevel(floor);
         if(floor%10===0){
-            const definition={id:"tower-"+floor,name:towerBossName(element,floor),level:level,element:element,hpMultiplier:clamp(3.2+floor*.035,3.5,6.7),attackMultiplier:clamp(1.06+floor*.0034,1.08,1.4)};
-            return [buildBossMonster(definition,{stage:1})];
+            const assistCount=floor>=70?2:(floor>=30?1:0);
+            const definition={id:"tower-"+floor,name:towerBossName(element,floor),level:level,element:element,assistCount:assistCount,hpMultiplier:clamp(3.2+floor*.035,3.5,6.7),attackMultiplier:clamp(1.06+floor*.0034,1.08,1.4)};
+            return buildBossRoster(definition,{stage:1,assistCount:assistCount}).roster;
         }
         const elite=floor%5===0,count=elite?2:Math.min(4,2+Math.floor(floor/35));
         return Array.from({length:count},()=>{
@@ -495,7 +541,7 @@
         const card={
             id:"mechanism-"+(++mechanismSerial),sourceKey:sourceKey||"manual-"+mechanismSerial,
             type:definition.type,unitKind:"mechanism",rank:"mechanism",kind:definition.kind,name:definition.name,
-            maxHP:Math.max(1,Math.round(boss.maxHP*definition.hpRatio)),hp:0,defense:Math.max(0,Math.round(numeric(boss.defense,0)*.4)),
+            maxHP:Math.max(1,Math.round(boss.maxHP*definition.hpRatio)),hp:0,defense:Math.max(0,Math.round(numeric(boss.defense,0)*BOSS_BALANCE_CONFIG.mechanismDefenseRatio)),
             level:boss.level,element:boss.element,effect:definition.effect,priority:definition.priority,
             countdown:definition.countdown||null,spawnedRound:typeof turn!=="undefined"?turn:1,destroyed:false
         };
@@ -674,10 +720,11 @@
         const progress=world?state.world[definition.id]:state.personal[definition.id];
         const stage=world?(progress.firstClear?4:Math.min(4,progress.completedStages+1)):1;
         const stageProfile=world?WORLD_STAGE_PROFILES[stage-1]:{stage:1,hpFactor:1,attackFactor:1,mechanisms:definition.mechanisms};
-        const boss=buildBossMonster(definition,{stage:stage,hpFactor:stageProfile.hpFactor,attackFactor:stageProfile.attackFactor});
+        const encounter=buildBossRoster(definition,{stage:stage,hpFactor:stageProfile.hpFactor,attackFactor:stageProfile.attackFactor});
+        const boss=encounter.boss;
         activeBattleContext={mode:world?"world":"personal",definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:0,mechanisms:[],mechanismPlan:(world?stageProfile.mechanisms:definition.mechanisms).map(item=>Object.assign({},item)),spawnedPlans:{},maxMechanisms:definition.level>=70?2:1};
         battleStarting=true;
-        const started=window.v132LaunchDungeonBattle([boss],outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome));
+        const started=window.v132LaunchDungeonBattle(encounter.roster,outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome));
         battleStarting=false;if(!started){ cleanupMechanismPresentation();activeBattleContext=null; }return !!started;
     }
 
@@ -841,6 +888,10 @@
         worldBosses:WORLD_BOSSES,
         worldStageProfiles:WORLD_STAGE_PROFILES,
         mechanisms:MECHANISM_DEFINITIONS,
+        bossBalance:BOSS_BALANCE_CONFIG,
+        getExpectedPartySize:expectedPartySizeForLevel,
+        getBossAssistCount:function(definition){ return bossAssistCount(definition,{}); },
+        buildBossRoster:buildBossRoster,
         towerConfig:TOWER_CONFIG,
         getSerializableState:serializableState,
         normalizeState:normalizeState,
