@@ -5,11 +5,11 @@
   "base_sha": "eb9e9d78911ca5d72693c33aaab6002238291494",
   "work_branch": "feature/boss-balance-ui-relic-lv20-20260911",
   "officialVersion": "173.65",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": 1,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "依同級預期隊伍重算所有玩法 Boss 強度，提高機制卡耐久，依難度配置最多兩名同元素菁英援軍，Boss 元素與技能一致且使用獨立名稱。",
       "owner": [
         "js/gameplay-boss-tower-system.js"
@@ -18,7 +18,7 @@
     },
     {
       "id": 2,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "玩法各活動封面改為 16:9。",
       "owner": [
         "css/gameplay-boss-tower.css"
@@ -27,7 +27,7 @@
     },
     {
       "id": 3,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "全屬性技能預覽的元素克制文字重新排版，說清楚克制與被克制。",
       "owner": [
         "css/56-v174-critical-ui-regressions.css"
@@ -36,7 +36,7 @@
     },
     {
       "id": 4,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "第一隻角色 Lv20 時至少開放兩件藍階秘寶。",
       "owner": [
         "js/relic-progression-drop-system.js",
@@ -47,12 +47,13 @@
   ],
   "verification": {
     "completed": [
-      "implementation owner audit complete"
+      "Temporary isolated build run 34569758633: deterministic production build + --check succeeded; targeted Boss/Relic tests succeeded; Headless Chrome verified 390px/412px activity cards at 16:9 with no overflow and multi-line element-counter explanation.",
+      "PR #169 Repository checks run 34570318795: 223/223 JavaScript syntax and 147/147 Node unit/integration suites passed.",
+      "PR #169 browser QA: account-first cold/warm mobile, skill progression mobile and relic progression mobile all SUCCESS.",
+      "Static resources, duplicate HTML IDs, release/loader integrity, Release Gate and git whitespace/conflict checks all SUCCESS.",
+      "Final diff audit preserves canonical Boss/relic owners and contains no temporary helper/workflow in the finished tree."
     ],
-    "pending": [
-      "targeted Node/Chrome verification",
-      "Repository checks PR run"
-    ],
-    "result": "0/4 VERIFIED"
+    "pending": [],
+    "result": "4/4 VERIFIED"
   }
 }
