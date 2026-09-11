@@ -66,4 +66,6 @@ The pack is intentionally smaller than the full repository. It prepares boot/aut
 
 The QA HTTP server must return the real production bytes for First Play integrity `fetch()` requests, including Firebase modules, so byte/hash verification exercises the same manifest contract as production. Firebase Auth/Firestore test doubles are substituted only for executable module-script requests after that integrity check; otherwise the QA itself would manufacture a false hash/size failure before the privacy gate.
 
+The focused First Play browser QA passed after deterministic build materialization, including returning 5+5 presentation, stale-manifest scene-two hold, required-resource HTTP failure/retry, decode failure/retry, privacy gating and Account-first destination checks.
+
 After deterministic generated outputs are materialized, PR acceptance must be based on a fresh standard `Repository checks` run from the current branch head rather than the materialization workflow itself. The final merge must reference that exact verified head SHA.
