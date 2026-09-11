@@ -143,7 +143,7 @@
    copy makes the direction of advantage explicit instead of showing only a
    compact cycle that can be read in either direction. */
 #allElementSkillPreviewModal .skill-preview-body::before{
-    content:"元素克制關係\A 克制：你的元素 → 對方元素，代表你壓制對方。\A 被克制：對方元素 → 你的元素，代表你受到對方壓制。\A 土 → 水 → 火 → 風 → 土";
+    content:"元素克制關係\A 克制：你的元素 → 對方元素，代表你壓制對方。\A 被克制：對方元素 → 你的元素，代表你受到對方壓制。\A 克制循環：土剋水 → 水剋火 → 火剋風 → 風剋土";
     display:block;
     position:relative;
     z-index:1;
@@ -154,7 +154,7 @@
     border-radius:10px;
     background:linear-gradient(180deg,rgba(78,53,21,.68),rgba(24,18,11,.86));
     color:#f0d89c;
-    font-size:15px;
+    font-size:16px;
     line-height:1.55;
     font-weight:800;
     text-align:left;
