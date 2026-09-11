@@ -38,12 +38,12 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.016dc8529603.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.54057d3bf209.css">
 <!-- /build:critical-style -->
 </head>
 
 <body>
-<iframe id="privacyConsentGate" src="privacy-consent.html" title="《四象江湖傳》隱私權政策確認" aria-hidden="false" style="position:fixed;inset:0;width:100%;height:100%;border:0;z-index:2147483647;background:#0b0907;"></iframe>
+<iframe id="privacyConsentGate" src="privacy-consent.html" title="《四象江湖傳》隱私權政策確認" aria-hidden="true" hidden style="display:none;position:fixed;inset:0;width:100%;height:100%;border:0;z-index:2147483647;background:#0b0907;"></iframe>
 <div id="game-viewport">
 <div id="game-stage">
 <section
@@ -51,7 +51,7 @@
     aria-label="四象江湖傳正在載入"
     aria-live="polite"
     data-scene="logo"
-    data-logo-target-ms="900"
+    data-logo-target-ms="5000"
 >
     <div id="startupLogoScene" class="startup-scene startup-logo-scene is-active" aria-hidden="false">
         <img
@@ -59,7 +59,7 @@
             src="assets/ui/startup-logo.4631c0bc3f2b.jpg"
             alt=""
             draggable="false"
-         fetchpriority="high">
+         fetchpriority="high" loading="eager" decoding="async">
         <i class="startup-element-light fire" aria-hidden="true"></i>
         <i class="startup-element-light water" aria-hidden="true"></i>
         <i class="startup-element-light wind" aria-hidden="true"></i>
@@ -67,7 +67,7 @@
     </div>
 
     <div id="startupCityScene" class="startup-scene startup-city-scene" aria-hidden="true">
-        <img class="startup-scene-image startup-city-image" src="assets/ui/startup-main-city.d43e67af1c1c.jpg" alt="" draggable="false" fetchpriority="high">
+        <img class="startup-scene-image startup-city-image" src="assets/ui/startup-main-city.d43e67af1c1c.jpg" alt="" draggable="false" fetchpriority="high" loading="eager" decoding="async">
     </div>
 
     <div class="startup-vignette" aria-hidden="true"></div>
@@ -96,6 +96,7 @@
         <div id="startupEnterPrompt" class="startup-enter-prompt" hidden>
             〔點擊空白處 進入遊戲〕
         </div>
+        <button id="startupRetryButton" class="startup-retry-button" type="button" hidden>重新下載</button>
     </div>
 </section>
 <div id="game-overlay-layer" aria-hidden="true"></div>
@@ -154,7 +155,7 @@
                     src="assets/characters/female_fire.jpg"
                     alt="火元素女性角色立繪"
                     draggable="false"
-                 loading="lazy" decoding="async">
+                 fetchpriority="high" loading="eager" decoding="async">
                 <div class="creation-portrait-shade" aria-hidden="true"></div>
                 <div class="creation-portrait-caption">
                     <span id="creationPortraitElement">火元素</span>
@@ -2338,7 +2339,7 @@
     onclick="showPage('inventory')"
     aria-label="背包"
 >
-<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">背包</span>
 </button>
 
@@ -2348,7 +2349,7 @@
     onclick="showPage('training')"
     aria-label="野怪區"
 >
-<img class="nav-art-button" src="assets/ui/nav-training.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+<img class="nav-art-button" src="assets/ui/nav-training.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">野怪區</span>
 </button>
 
@@ -2358,7 +2359,7 @@
     onclick="showPage('home')"
     aria-label="主城"
 >
-<img class="nav-art-button" src="assets/ui/nav-home.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+<img class="nav-art-button" src="assets/ui/nav-home.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">主城</span>
 </button>
 
@@ -2368,7 +2369,7 @@
     onclick="vGameplayOpenDailyDungeons()"
     aria-label="副本"
 >
-<img class="nav-art-button" src="assets/ui/nav-dungeon.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+<img class="nav-art-button" src="assets/ui/nav-dungeon.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">副本</span>
 </button>
 
@@ -2379,7 +2380,7 @@
     aria-label="玩法"
     title="玩法"
 >
-<img class="nav-art-button" src="assets/ui/nav-gameplay.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+<img class="nav-art-button" src="assets/ui/nav-gameplay.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">玩法</span>
 </button>
 
@@ -2410,7 +2411,7 @@
     onclick="openHomeFeature('character')"
     aria-label="角色"
 >
-<img class="nav-art-button" src="assets/ui/nav-character.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+<img class="nav-art-button" src="assets/ui/nav-character.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">角色</span>
 </button>
 
@@ -2419,7 +2420,7 @@
     onclick="openMapInventoryOverlay()"
     aria-label="背包"
 >
-<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">背包</span>
 </button>
 
@@ -2428,7 +2429,7 @@
     onclick="openHomeFeature('quest')"
     aria-label="任務"
 >
-<img class="nav-art-button" src="assets/ui/nav-quest.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+<img class="nav-art-button" src="assets/ui/nav-quest.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">任務</span>
 </button>
 
@@ -2437,7 +2438,7 @@
     onclick="openHomeFeature('autoBattleSettings')"
     aria-label="元素匣／自動戰鬥設定"
 >
-<img class="nav-art-button" src="assets/ui/nav-element-box.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+<img class="nav-art-button" src="assets/ui/nav-element-box.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">元素匣／自動戰鬥設定</span>
 </button>
 
@@ -2800,7 +2801,7 @@
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
 <!-- build:critical-script -->
-<script id="boot-core-runtime" src="build/boot-core.c46246778013.js"></script>
+<script id="boot-core-runtime" src="build/boot-core.05ad3ef25602.js"></script>
 <!-- /build:critical-script -->
 </body>
 </html>

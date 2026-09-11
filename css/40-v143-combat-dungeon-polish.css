@@ -197,9 +197,9 @@
 }
 
 @keyframes v143RasterTravel{
-    0%{opacity:0;transform:translate(-50%,-50%) scale(.98)}
-    2%,24.999%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-    25%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(.98)}
+    2%,24.999%{opacity:1;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(1)}
+    25%{opacity:1;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(1)}
     58.333%,97%{
         opacity:1;
         transform:
@@ -207,6 +207,7 @@
                 calc(-50% + var(--v143-sprite-dx,0px)),
                 calc(-50% + var(--v143-sprite-dy,0px))
             )
+            rotate(var(--v143-sprite-angle,0deg))
             scale(1);
     }
     100%{
@@ -216,6 +217,7 @@
                 calc(-50% + var(--v143-sprite-dx,0px)),
                 calc(-50% + var(--v143-sprite-dy,0px))
             )
+            rotate(var(--v143-sprite-angle,0deg))
             scale(1);
     }
 }

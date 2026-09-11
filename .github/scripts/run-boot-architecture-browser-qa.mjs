@@ -82,7 +82,7 @@ window.__qaIdleCallbacks=[];
 window.requestIdleCallback=function(callback){window.__qaIdleCallbacks.push(callback);return window.__qaIdleCallbacks.length;};
 (function(){
   var scenario=new URL(location.href).searchParams.get("scenario")||"";
-  localStorage.setItem("four_symbols_privacy_consent_version","2026-09-11-v1");
+  localStorage.setItem("four_symbols_privacy_consent",JSON.stringify({privacyPolicyVersion:"2026-09-11-v2",acceptedAt:"2026-09-11T00:00:00.000Z"}));
   var legacy={player:{id:"舊版角色",element:"water",level:8}};
   if(scenario==="legacy-empty"||scenario==="legacy-cloud"){localStorage.setItem("battle_full_version_save_v5",JSON.stringify(legacy));}
   if(scenario==="corrupt"){
@@ -227,7 +227,7 @@ try{
     for(const label of ["Google 登入","訪客開始遊戲","Email 登入","建立帳號"]){assert.ok(signedOut.labels.includes(label),"Missing auth action: "+label);}
     assert.deepEqual(signedOut.featureResources,[],"Signed-out Critical Boot fetched an authenticated/gameplay feature");
     evidence.checks.authFirst=signedOut;evidence.performance.coldAuth=await metrics(client,"four-symbols:auth-ui-interactive");
-    assert.ok(evidence.performance.coldAuth.readyMs>0&&evidence.performance.coldAuth.readyMs<=5000,"Controlled cold auth UI budget exceeded");
+    assert.ok(evidence.performance.coldAuth.readyMs>=9800&&evidence.performance.coldAuth.readyMs<=13000,"Returning auth UI must respect the deliberate 5s + 5s brand opening");
     const authPresentation=await client.eval(`(()=>{const o=document.getElementById("firebaseAuthOverlay"),d=o.querySelector(".firebase-auth-dialog"),t=o.querySelector(".firebase-auth-title"),r=d.getBoundingClientRect(),bg=getComputedStyle(o,"::before").backgroundImage;return {backdrop:bg,dialogWidth:r.width,titleFont:parseFloat(getComputedStyle(t).fontSize),cityRequested:performance.getEntriesByType("resource").some(e=>new URL(e.name).pathname.endsWith("/assets/ui/startup-main-city.d43e67af1c1c.jpg"))};})()`);
     assert.match(authPresentation.backdrop,/startup-main-city\.d43e67af1c1c\.jpg/);assert.ok(authPresentation.dialogWidth<=390);assert.ok(authPresentation.titleFont<=27);assert.equal(authPresentation.cityRequested,true);evidence.checks.authPresentation=authPresentation;
 

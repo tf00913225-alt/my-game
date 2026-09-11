@@ -34,7 +34,7 @@ function ensureBattlePresentationStyles(){
     isolation:isolate!important;
     transition-property:opacity!important;transition-duration:.15s!important;
 }
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit{width:172px!important;max-width:172px!important;min-height:218px!important;}\n#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{width:88px!important;max-width:88px!important;height:116px!important;min-height:116px!important;}\n#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
     position:absolute!important;inset:0!important;z-index:1!important;
     display:block!important;pointer-events:none!important;
     background-repeat:no-repeat!important;background-color:transparent!important;

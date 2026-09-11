@@ -43,6 +43,8 @@
     inset:0;
     display:block;
     background-repeat:no-repeat;
+    background-size:contain;
+    background-position:center;
 }
 #game-stage #mapPage #v131PatrolAppearancePanel{
     display:none;
@@ -95,8 +97,8 @@
    沒有用到它原本的功能（縮放img自身的src內容）。
 */
 #game-stage #mapPage #patrolCharacterImg.v131-patrol-q-art{
-    width:70px !important;
-    height:105px !important;
+    width:84px !important;
+    height:126px !important;
     display:block !important;
     margin:0 auto !important;
     background-color:transparent !important;

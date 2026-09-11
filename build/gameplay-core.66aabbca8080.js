@@ -22607,7 +22607,7 @@ function ensureBattlePresentationStyles(){
     isolation:isolate!important;
     transition-property:opacity!important;transition-duration:.15s!important;
 }
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit{width:172px!important;max-width:172px!important;min-height:218px!important;}\n#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{width:88px!important;max-width:88px!important;height:116px!important;min-height:116px!important;}\n#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
     position:absolute!important;inset:0!important;z-index:1!important;
     display:block!important;pointer-events:none!important;
     background-repeat:no-repeat!important;background-color:transparent!important;
@@ -22817,7 +22817,7 @@ clearEquipmentComparison();
 if(!equipment(item))return;
 const worn=equippedFor(item),targetSlot=slot(item.type),box=document.createElement("section");
 const sourceIcon=modal.querySelector("#itemModalIcon"),sourceName=modal.querySelector("#itemModalName"),sourceStats=modal.querySelector("#itemModalStats");
-const selectedArt=sourceIcon&&sourceIcon.innerHTML?sourceIcon.innerHTML:itemArt(item);
+const selectedArt=itemArt(item);
 const selectedName=sourceName&&sourceName.textContent?sourceName.textContent:String(item.name||"背包装備");
 const selectedStats=sourceStats&&sourceStats.innerHTML?sourceStats.innerHTML:compareStats(item);
 box.id="v17351EquipmentCompare";box.className="v17351-equipment-compare";

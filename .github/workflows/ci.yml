@@ -11,43 +11,11 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  bootstrap_refactor:
-    name: Materialize First Play refactor
-    if: github.event_name == 'pull_request' && github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: Use current Node.js LTS
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-      - name: Apply refactor and deterministic build
-        env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          node scripts/apply-first-play-refactor.mjs
-          npm run build
-          npm run build:check
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
-          git rm -f .github/workflows/first-play-refactor-build.yml scripts/apply-first-play-refactor.mjs
-          git add -A
-          git status --short
-          git commit -m "feat: implement first play resource preparation [generated]"
-          git push origin HEAD:${GITHUB_HEAD_REF}
-
   verify:
     name: Repository checks
-    if: github.event_name != 'pull_request' || github.head_ref != 'feature/first-play-resource-preload-privacy-boot'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -72,6 +40,9 @@ jobs:
             git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
           fi
 
+          # Typography regression suites audit the pre-change baseline and the
+          # approved gameplay battle baseline byte-for-byte. fetch-depth: 2 does
+          # not retain those fixed historical objects after the integration merge.
           for typography_baseline_sha in \
             39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
             4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \

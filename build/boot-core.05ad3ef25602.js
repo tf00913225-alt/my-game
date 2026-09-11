@@ -512,6 +512,253 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
 })(typeof window!=="undefined"?window:globalThis);
 
 
+/* bundled source: js/startup/first-play-resource-loader.js */
+/* First Play Ready Pack owner: real download/verify/decode progress and cache fingerprinting. */
+(function installFirstPlayResourceLoader(global){
+    "use strict";
+    const STORAGE_KEY="four_symbols_first_play_ready";
+    const MANIFEST_URL="asset-manifest.json";
+    const PRIORITY_ORDER={P0:0,P1:1,P2:2,P3:3};
+    let activePromise=null;
+    let lastManifest=null;
+    let lastFailed=[];
+    let sessionCompleted=new Map();
+
+    function readRecord(){
+        try{
+            const raw=global.localStorage&&global.localStorage.getItem(STORAGE_KEY);
+            if(!raw){ return null; }
+            const value=JSON.parse(raw);
+            return value&&typeof value==="object"&&!Array.isArray(value)?value:null;
+        }catch(_){ return null; }
+    }
+    function writeRecord(value){
+        try{ global.localStorage&&global.localStorage.setItem(STORAGE_KEY,JSON.stringify(value)); }
+        catch(error){ console.warn("[FirstPlay] completion record could not be stored",error); }
+    }
+    function hasCompletedRecord(){ return !!readRecord(); }
+    function mimeFor(path,responseType){
+        if(responseType){ return responseType.split(";")[0].trim(); }
+        const lower=String(path||"").toLowerCase();
+        if(lower.endsWith(".png")){ return "image/png"; }
+        if(lower.endsWith(".webp")){ return "image/webp"; }
+        if(lower.endsWith(".jpg")||lower.endsWith(".jpeg")){ return "image/jpeg"; }
+        if(lower.endsWith(".svg")){ return "image/svg+xml"; }
+        if(lower.endsWith(".css")){ return "text/css"; }
+        if(lower.endsWith(".js")||lower.endsWith(".mjs")){ return "text/javascript"; }
+        if(lower.endsWith(".json")){ return "application/json"; }
+        return "application/octet-stream";
+    }
+    function hex(buffer){
+        return Array.from(new Uint8Array(buffer),value=>value.toString(16).padStart(2,"0")).join("");
+    }
+    async function digest(bytes){
+        if(!global.crypto||!global.crypto.subtle){ throw new Error("SubtleCrypto is unavailable; asset verification cannot continue."); }
+        return hex(await global.crypto.subtle.digest("SHA-256",bytes));
+    }
+    async function decodeImage(bytes,type,path){
+        const blob=new Blob([bytes],{type:mimeFor(path,type)});
+        const url=URL.createObjectURL(blob);
+        try{
+            const image=new Image();
+            image.decoding="async";
+            image.src=url;
+            if(typeof image.decode==="function"){
+                await image.decode();
+            }else{
+                await new Promise((resolve,reject)=>{
+                    image.onload=resolve;
+                    image.onerror=()=>reject(new Error("Image decode failed: "+path));
+                });
+            }
+            if(!image.naturalWidth||!image.naturalHeight){ throw new Error("Decoded image has no renderable dimensions: "+path); }
+        }finally{ URL.revokeObjectURL(url); }
+    }
+    function warmResource(resource){
+        const lower=resource.path.toLowerCase();
+        let as="";
+        if(lower.endsWith(".css")){ as="style"; }
+        else if(lower.endsWith(".js")||lower.endsWith(".mjs")){ as="script"; }
+        else if(/\.(?:png|jpe?g|webp|svg|avif)$/.test(lower)){ as="image"; }
+        if(!as){ return; }
+        const selector=`link[data-first-play-preload="${CSS.escape(resource.path)}"]`;
+        if(document.querySelector(selector)){ return; }
+        const link=document.createElement("link");
+        link.rel="preload";
+        link.as=as;
+        link.href=resource.path;
+        link.dataset.firstPlayPreload=resource.path;
+        document.head.appendChild(link);
+    }
+    async function fetchManifest(){
+        const response=await fetch(MANIFEST_URL,{cache:"no-store",credentials:"same-origin"});
+        if(!response.ok){ throw new Error(`First Play manifest request failed (${response.status}).`); }
+        const manifest=await response.json();
+        if(!manifest||!manifest.firstPlay||!Array.isArray(manifest.firstPlay.resources)){
+            throw new Error("asset-manifest.json does not contain a valid firstPlay pack.");
+        }
+        const pack=manifest.firstPlay;
+        if(!pack.manifestHash||!pack.assetPackVersion||!pack.manifestVersion){ throw new Error("First Play manifest metadata is incomplete."); }
+        return {manifest,pack};
+    }
+    function describe(resource){
+        if(resource.priority==="P0"){ return "正在載入核心介面"; }
+        if(/characters\/(?:female|male)_/.test(resource.path)){ return "正在準備角色資料"; }
+        if(/home-|nav-|map-return/.test(resource.path)){ return "正在下載主城素材"; }
+        if(resource.decode){ return "正在驗證圖片"; }
+        if(/gameplay-core/.test(resource.path)){ return "正在準備戰鬥資源"; }
+        return "正在建立遊戲快取";
+    }
+    async function readResponse(response,resource,onChunk){
+        const expected=Number(resource.bytes)||0;
+        if(!response.body||typeof response.body.getReader!=="function"){
+            const buffer=await response.arrayBuffer();
+            onChunk(buffer.byteLength,expected);
+            return buffer;
+        }
+        const reader=response.body.getReader();
+        const chunks=[];
+        let total=0;
+        while(true){
+            const {done,value}=await reader.read();
+            if(done){ break; }
+            chunks.push(value);
+            total+=value.byteLength;
+            onChunk(value.byteLength,expected);
+        }
+        const bytes=new Uint8Array(total);
+        let offset=0;
+        for(const chunk of chunks){ bytes.set(chunk,offset); offset+=chunk.byteLength; }
+        return bytes.buffer;
+    }
+    async function processResource(resource,state,record,onProgress,forceNetwork){
+        const previousDigest=record&&record.assets&&record.assets[resource.path];
+        const unchanged=previousDigest===resource.sha256;
+        const response=await fetch(resource.path,{
+            cache:forceNetwork||!unchanged?"reload":"force-cache",
+            credentials:"same-origin"
+        });
+        if(!response.ok){
+            const error=new Error(`${resource.path} HTTP ${response.status}`);
+            error.code="first-play-http-failed";
+            throw error;
+        }
+        let accounted=0;
+        const buffer=await readResponse(response,resource,(delta)=>{
+            const limit=Number(resource.bytes)||Number.POSITIVE_INFINITY;
+            const available=Math.max(0,limit-accounted);
+            const applied=Math.min(delta,available);
+            accounted+=applied;
+            state.loadedBytes+=applied;
+            onProgress(resource,state,false);
+        });
+        if(resource.bytes&&buffer.byteLength!==resource.bytes){
+            throw new Error(`${resource.path} size mismatch (${buffer.byteLength}/${resource.bytes}).`);
+        }
+        const actual=await digest(buffer);
+        if(!actual.startsWith(String(resource.sha256||""))){ throw new Error(`${resource.path} SHA-256 verification failed.`); }
+        if(resource.decode){ await decodeImage(buffer,response.headers.get("content-type"),resource.path); }
+        warmResource(resource);
+        if(resource.bytes&&accounted<resource.bytes){
+            state.loadedBytes+=resource.bytes-accounted;
+            accounted=resource.bytes;
+        }
+        state.completedTasks+=1;
+        sessionCompleted.set(resource.path,resource.sha256);
+        onProgress(resource,state,true);
+        return {path:resource.path,sha256:resource.sha256,unchanged};
+    }
+    function normalizedProgress(state){
+        if(state.totalBytes>0){ return Math.min(99,(state.loadedBytes/state.totalBytes)*100); }
+        return Math.min(99,(state.completedTasks/Math.max(1,state.totalTasks))*100); }
+    }
+    async function run(options={}){
+        const {manifest,pack}=await fetchManifest();
+        lastManifest=pack;
+        const record=readRecord();
+        const returning=!!record;
+        const current=!!(record&&record.manifestHash===pack.manifestHash&&record.assetPackVersion===pack.assetPackVersion);
+        const resources=pack.resources.slice().sort((a,b)=>(PRIORITY_ORDER[a.priority]??9)-(PRIORITY_ORDER[b.priority]??9)||a.path.localeCompare(b.path));
+        const retryOnly=!!options.retryFailedOnly&&lastFailed.length>0;
+        const retrySet=new Set(lastFailed.map(item=>item.path));
+        const queue=retryOnly?resources.filter(item=>retrySet.has(item.path)):resources;
+        const baseCompleted=retryOnly?resources.filter(item=>!retrySet.has(item.path)&&sessionCompleted.get(item.path)===item.sha256):[];
+        const state={
+            totalBytes:resources.reduce((sum,item)=>sum+(Number(item.bytes)||0),0),
+            loadedBytes:baseCompleted.reduce((sum,item)=>sum+(Number(item.bytes)||0),0),
+            totalTasks:resources.length,
+            completedTasks:baseCompleted.length
+        };
+        const emit=(resource,progressState,complete)=>{
+            const percent=complete&&progressState.completedTasks===progressState.totalTasks?100:normalizedProgress(progressState);
+            if(typeof options.onProgress==="function"){
+                options.onProgress(Object.freeze({
+                    percent,loadedBytes:progressState.loadedBytes,totalBytes:progressState.totalBytes,
+                    completed:progressState.completedTasks,total:progressState.totalTasks,
+                    path:resource&&resource.path||null,priority:resource&&resource.priority||null,
+                    title:returning&&!current?"正在更新必要資源":"正在準備遊戲資源",
+                    detail:resource?describe(resource):"正在驗證 First Play Ready Pack"
+                }));
+            }
+        };
+        emit(null,state,false);
+        const failures=[];
+        let cursor=0;
+        const workers=Array.from({length:Math.max(1,Math.min(6,Number(pack.concurrency)||5))},async()=>{
+            while(cursor<queue.length){
+                const index=cursor++;
+                const resource=queue[index];
+                try{ await processResource(resource,state,record,emit,!current&&(!record||record.assets?.[resource.path]!==resource.sha256)); }
+                catch(error){ failures.push({path:resource.path,error}); }
+            }
+        });
+        await Promise.all(workers);
+        if(failures.length){
+            lastFailed=failures;
+            const error=new Error("部分必要資源載入失敗");
+            error.code="first-play-resource-failed";
+            error.failures=failures;
+            error.retryable=true;
+            throw error;
+        }
+        lastFailed=[];
+        const assets=Object.fromEntries(resources.map(item=>[item.path,item.sha256]));
+        const completion={
+            gameVersion:String(manifest.release||""),
+            manifestVersion:pack.manifestVersion,
+            assetPackVersion:pack.assetPackVersion,
+            manifestHash:pack.manifestHash,
+            completedAt:new Date().toISOString(),
+            assets
+        };
+        writeRecord(completion);
+        state.loadedBytes=state.totalBytes;
+        state.completedTasks=state.totalTasks;
+        emit(resources.at(-1)||null,state,true);
+        return Object.freeze({
+            returning,currentBeforePrepare:current,manifestChanged:returning&&!current,
+            totalBytes:state.totalBytes,totalTasks:state.totalTasks,completion,pack
+        });
+    }
+    function prepare(options={}){
+        if(activePromise&&!options.retryFailedOnly){ return activePromise; }
+        const promise=run(options).finally(()=>{ if(activePromise===promise){ activePromise=null; } });
+        if(!options.retryFailedOnly){ activePromise=promise; }
+        return promise;
+    }
+
+    global.FourSymbolsFirstPlay=Object.freeze({
+        storageKey:STORAGE_KEY,
+        prepare,
+        retryFailed:(options={})=>prepare({...options,retryFailedOnly:true}),
+        hasCompletedRecord,
+        getStoredRecord:readRecord,
+        getLastFailed:()=>lastFailed.map(item=>({path:item.path,message:String(item.error&&item.error.message||item.error)})),
+        getManifest:()=>lastManifest
+    });
+})(typeof window!=="undefined"?window:globalThis);
+
+
 /* bundled source: js/startup/startup-contract.js */
 /* Declarative startup contract shared by the state-machine owner and tests. */
 (function installStartupContract(global){
@@ -569,6 +816,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     const percent=document.getElementById("startupPercent");
     const progress=document.getElementById("startupProgress");
     const fill=document.getElementById("startupProgressFill");
+    const retryButton=document.getElementById("startupRetryButton");
     const creation=document.getElementById("creationPage");
     const game=document.getElementById("gameInterface");
     const build=global.__FOUR_SYMBOLS_BUILD__||{};
@@ -592,7 +840,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     if(game){ game.style.display="none"; }
     if(root){ root.hidden=false; root.dataset.owner="StartupStateMachine"; root.dataset.state=state; }
     mark("four-symbols:boot-core-ready");
-    scheduleCityScene();
+    // Opening-scene timing is controlled by boot(); readiness never races a timer.
 
     // Signed-out players need only the account surface. Start the application
     // shell after Firebase has produced a UID, then overlap it with save I/O.
@@ -618,6 +866,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         if(title){ title.textContent=nextTitle; }
         if(detail){ detail.textContent=nextDetail; }
     }
+    function status(nextTitle,nextDetail){ if(title){ title.textContent=nextTitle; } if(detail){ detail.textContent=nextDetail; } }
     function transition(next,payload={}){
         if(!contract.canTransition(state,next)){ throw new Error("Invalid startup transition "+state+" -> "+next); }
         state=next; if(root){ root.dataset.state=state; }
@@ -688,14 +937,14 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         creation.setAttribute("aria-hidden","false");
     }
     async function enterReady(save,offline=false,token=transitionToken){
-        showLoader(); render(92,"載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
+        showLoader(); status("載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
         await Promise.all([requireAppShell(),domReady()]);
         if(token!==transitionToken){ return; }
         activateGameplaySaveOwner();
         const loaded=global.FourSymbolsGameSave&&typeof global.FourSymbolsGameSave.hydrate==="function"&&global.FourSymbolsGameSave.hydrate(save);
         if(!loaded){ throw new Error("Resolved account save could not hydrate gameplay state."); }
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
-        firebase.closeAuth(); render(100,"載入完成","主城已可操作");
+        firebase.closeAuth(); status("載入完成","主城已可操作");
         mark("four-symbols:critical-ready");
         await hideLoader();
         mark("four-symbols:main-city-interactive");
@@ -707,7 +956,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         if(token!==transitionToken){ return; }
         activateGameplaySaveOwner();
         transition(STATES.NEED_CHARACTER,{uid:resolvedUid});
-        firebase.closeAuth(); render(100,"帳號資料已確認","此 UID 尚無角色，可以建立角色");
+        firebase.closeAuth(); status("帳號資料已確認","此 UID 尚無角色，可以建立角色");
         showCharacterCreationSurface();
         if(game){ game.style.display="none"; }
         mark("four-symbols:critical-ready");
@@ -718,7 +967,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     }
     function migration(message,blocked=false){
         transition(STATES.MIGRATION_REQUIRED,{uid:resolvedUid,blocked});
-        render(100,"需要確認舊存檔","未確認前不會綁定、覆寫或建立角色");
+        status("需要確認舊存檔","未確認前不會綁定、覆寫或建立角色");
         accountUi("MIGRATION_REQUIRED",message,false,{message,blocked});
         void hideLoader();
         mark("four-symbols:critical-ready"); mark("four-symbols:migration-ui-interactive");
@@ -729,7 +978,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         activeUser=user; resolvedUid=user.uid; saveResolved=false; cloudResult=null; lastError=null;
         startAppShell();
         transition(STATES.SAVE_LOADING,{uid:user.uid}); showLoader();
-        render(70,"讀取帳號角色","正在解析 UID 雲端與本機存檔"); accountUi("SAVE_LOADING","正在讀取此 UID 的角色資料…");
+        status("讀取帳號角色","正在解析 UID 雲端與本機存檔"); accountUi("SAVE_LOADING","正在讀取此 UID 的角色資料…");
         const repo=global.FourSymbolsAccountSave;
         repo.activate(user.uid);
         if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.activate(user.uid); }
@@ -795,14 +1044,14 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         if(!safeCloudEmpty(cloud,user.uid)){
             return migration("雲端狀態仍在遷移或無法證明為空；禁止把它當成新帳號。",true);
         }
-        saveResolved=true; mark("four-symbols:save-resolved"); render(90,"帳號資料已確認","此 UID 沒有角色");
+        saveResolved=true; mark("four-symbols:save-resolved"); status("帳號資料已確認","此 UID 沒有角色");
         return enterCreation(token).catch(error=>fail(error,"創角介面載入失敗。",token));
     }
     function requireAuth(){
         showCityScene("auth-required");
         activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null;
         if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }else{ global.FourSymbolsAccountSave.deactivate(); }
-        transition(STATES.AUTH_REQUIRED); render(100,"帳號服務已就緒","請登入、註冊或以 Firebase 訪客 UID 開始");
+        transition(STATES.AUTH_REQUIRED); status("帳號服務已就緒","請登入、註冊或以 Firebase 訪客 UID 開始");
         accountUi("AUTH_REQUIRED","請先登入、註冊或使用訪客開始遊戲。沒有 UID 時不能建立角色。");
         void hideLoader();
         mark("four-symbols:critical-ready"); mark("four-symbols:auth-ui-interactive");
@@ -812,7 +1061,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         showCityScene("startup-error");
         lastError=error; saveResolved=false;
         if(state!==STATES.ERROR){ transition(STATES.ERROR,{error}); }
-        showLoader(); render(Math.min(99,Number(progress&&progress.getAttribute("aria-valuenow"))||0),"啟動失敗",message);
+        showLoader(); status("啟動失敗",message);
         if(firebase){ accountUi("ERROR",message+" "+String(error&&error.message||""),true); }
         emit("four-symbols:startup-error",{error,message});
     }
@@ -831,9 +1080,37 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         if(activeUser&&activeUser.uid!==user.uid){ global.FourSymbolsAccountSave.deactivate(); global.location.reload(); return; }
         if(state===STATES.AUTH_RESOLVING||state===STATES.AUTH_REQUIRED){ void resolveSaveFor(user); }
     }
-    async function boot(){
-        try{
-            render(15,"建立啟動環境","載入最小 Boot Core"); transition(STATES.AUTH_RESOLVING); render(30,"初始化帳號服務","恢復 Firebase Authentication session");
+    let firebaseBootPromise=null;
+    const delay=ms=>new Promise(resolve=>global.setTimeout(resolve,ms));
+    async function waitForPrivacyApi(){
+        if(global.FourSymbolsPrivacy){ return global.FourSymbolsPrivacy; }
+        return new Promise((resolve,reject)=>{
+            const timer=global.setTimeout(()=>reject(new Error("Privacy policy gate did not initialize.")),8000);
+            global.addEventListener("four-symbols:privacy-ready",()=>{ global.clearTimeout(timer); resolve(global.FourSymbolsPrivacy); },{once:true});
+        });
+    }
+    async function runOpeningPresentation(returning,retryOnly){
+        if(retryOnly){ showCityScene("resource-retry"); return; }
+        if(root){ root.dataset.audience=returning?"returning":"first-boot"; }
+        await delay(returning?5000:1800);
+        showCityScene(returning?"returning-logo-complete":"first-boot-logo-complete");
+        if(returning){ await delay(5000); }
+    }
+    function renderFirstPlayProgress(value){
+        render(value.percent,value.title,value.detail);
+        if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }
+    }
+    function showResourceFailure(error){
+        lastError=error; showCityScene("resource-error"); showLoader();
+        const failed=global.FourSymbolsFirstPlay&&global.FourSymbolsFirstPlay.getLastFailed?global.FourSymbolsFirstPlay.getLastFailed():[];
+        const summary=failed.slice(0,2).map(item=>item.path).join("、");
+        status("部分必要資源載入失敗",summary?"失敗："+summary:"請檢查網路後重新下載失敗項目");
+        if(retryButton){ retryButton.hidden=false; retryButton.disabled=false; }
+        emit("four-symbols:first-play-error",{error,failed});
+    }
+    async function startFirebaseLifecycle(){
+        if(firebaseBootPromise){ return firebaseBootPromise; }
+        firebaseBootPromise=(async()=>{
             const url=new URL(build.firebaseBootstrap,document.baseURI).href;
             await import(url);
             firebase=global.FourSymbolsFirebaseLifecycle;
@@ -849,19 +1126,57 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
                         global.FourSymbolsAccountSave.migrateLegacyToUid(activeUser.uid,{confirmed:true,cloudHasCharacter:cloudHas});
                         const migrated=global.FourSymbolsAccountSave.readForUid(activeUser.uid);
                         const token=transitionToken;
-                        saveResolved=true; void enterReady(migrated.save,false,token)
-                            .catch(error=>fail(error,"migration 後角色載入失敗；原始 legacy 與備份均已保留。",token));
+                        saveResolved=true; void enterReady(migrated.save,false,token).catch(error=>fail(error,"migration 後角色載入失敗；原始 legacy 與備份均已保留。",token));
                     }catch(error){ fail(error,"舊版存檔 migration 失敗；原檔與備份均未刪除。"); }
                 }
-                if(action==="cancel-migration"&&state===STATES.MIGRATION_REQUIRED&&activeUser){
-                    firebase.signOut().catch(error=>fail(error,"無法安全退出 migration 流程；資料未被修改。"));
-                }
+                if(action==="cancel-migration"&&state===STATES.MIGRATION_REQUIRED&&activeUser){ firebase.signOut().catch(error=>fail(error,"無法安全退出 migration 流程；資料未被修改。")); }
             });
-            await firebase.initialize(); mark("four-symbols:auth-initialized"); render(50,"確認登入狀態","等待 Firebase 回復身份");
-            const user=await firebase.resolveIdentity(); mark("four-symbols:auth-resolved"); render(65,"身份確認完成",user?"已取得 UID":"需要玩家選擇登入方式");
-            onAuth({user,error:null});
-        }catch(error){ fail(error,"Firebase Authentication 無法初始化；禁止 fail-open 創角。"); }
+            await firebase.initialize(); mark("four-symbols:auth-initialized");
+            const user=await firebase.resolveIdentity(); mark("four-symbols:auth-resolved");
+            return user;
+        })().catch(error=>{ firebaseBootPromise=null; throw error; });
+        return firebaseBootPromise;
     }
+    async function boot(retryFailedOnly=false){
+        try{
+            if(retryButton){ retryButton.hidden=true; retryButton.disabled=false; }
+            showLoader();
+            const firstPlay=global.FourSymbolsFirstPlay;
+            if(!firstPlay){ throw new Error("First Play resource loader is unavailable."); }
+            const privacy=await waitForPrivacyApi();
+            const returning=firstPlay.hasCompletedRecord();
+            const presentation=runOpeningPresentation(returning,retryFailedOnly);
+            let firebasePromise=null;
+            if(returning&&privacy.hasConsent()){
+                firebasePromise=startFirebaseLifecycle();
+                firebasePromise.then(user=>{if(user&&user.uid){try{global.FourSymbolsAccountSave.readForUid(user.uid);}catch(_){}}}).catch(()=>{});
+            }
+            render(0,returning?"正在驗證遊戲資源":"正在準備遊戲資源","正在驗證 First Play Ready Pack");
+            let packResult;
+            try{
+                const prepare=retryFailedOnly?firstPlay.retryFailed:firstPlay.prepare;
+                packResult=await prepare({onProgress:renderFirstPlayProgress});
+            }catch(error){ await presentation; showResourceFailure(error); return; }
+            await presentation;
+            render(100,"遊戲資源準備完成","First Play Ready Pack 已下載、驗證並可渲染");
+            mark("four-symbols:first-play-ready");
+            emit("four-symbols:first-play-ready",{returning,manifestChanged:packResult.manifestChanged,totalBytes:packResult.totalBytes});
+            if(!privacy.hasConsent()){
+                status("遊戲資源準備完成","請閱讀隱私權政策後繼續");
+                await privacy.requireConsent();
+                mark("four-symbols:privacy-accepted");
+            }
+            transition(STATES.AUTH_RESOLVING);
+            status("初始化帳號服務","恢復 Firebase Authentication session");
+            const user=await (firebasePromise||startFirebaseLifecycle());
+            status("身份確認完成",user?"已取得 UID":"需要玩家選擇登入方式");
+            onAuth({user,error:null});
+        }catch(error){
+            if(error&&error.code==="privacy-declined"){ return; }
+            fail(error,"Firebase Authentication 無法初始化；禁止 fail-open 創角。");
+        }
+    }
+    if(retryButton){ retryButton.addEventListener("click",()=>{ retryButton.disabled=true; void boot(true); }); }
     global.FourSymbolsStartupPolicy=Object.freeze({
         states:STATES,getState:()=>state,getUid:()=>resolvedUid,
         canShowCharacterCreation:()=>contract.canCreateCharacter({state,userUid:activeUser&&activeUser.uid,resolvedUid,saveResolved,activeSaveUid:global.FourSymbolsAccountSave.getActiveUid()}),
