@@ -279,3 +279,24 @@
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit > .v174-battle-art{
     inset:-16px !important;
 }
+
+/* The formal fire-rocket sheet is authored pointing upward.  The shared travel
+   owner calculates 0deg as screen-right, so this one source needs a +90deg
+   basis correction.  Other directional skills keep their existing basis. */
+.v143-vfx-sprite.v143-vfx-sprite-active[data-travel="true"][data-skill="fireRocket"]{
+    animation:
+        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        v174FireRocketTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both !important;
+}
+@keyframes v174FireRocketTravel{
+    0%{opacity:0;transform:translate(-50%,-50%) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(.98)}
+    2%,24.999%,25%{opacity:1;transform:translate(-50%,-50%) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(1)}
+    58.333%,97%{
+        opacity:1;
+        transform:translate(calc(-50% + var(--v143-sprite-dx,0px)),calc(-50% + var(--v143-sprite-dy,0px))) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(1);
+    }
+    100%{
+        opacity:0;
+        transform:translate(calc(-50% + var(--v143-sprite-dx,0px)),calc(-50% + var(--v143-sprite-dy,0px))) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(1);
+    }
+}
