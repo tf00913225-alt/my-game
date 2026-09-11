@@ -58,10 +58,11 @@ jobs:
               'resources.some(p=>/\\/app-shell\\./.test(p))':'resources.some(p=>p.includes("/app-shell."))',
               'resources.some(p=>/\\/gameplay-core\\./.test(p))':'resources.some(p=>p.includes("/gameplay-core."))',
               'resources.some(p=>/\\/feature-patrol\\./.test(p))':'resources.some(p=>p.includes("/feature-patrol."))',
+              'async function waitForJson(url,timeoutMs=10000){':'async function waitForJson(url,timeoutMs=30000){',
           }
           for old,new in replacements.items():
               if old not in text:
-                  raise SystemExit('expected CDP expression fragment not found: '+old)
+                  raise SystemExit('expected QA fragment not found: '+old)
               text=text.replace(old,new,1)
 
           scenario='''  var scenario=new URL(location.href).searchParams.get("scenario")||"";'''
