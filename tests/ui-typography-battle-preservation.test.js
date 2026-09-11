@@ -49,7 +49,7 @@ function retireV146LegacySkillVfx(text){
 
 function restoreGameplayCoverBaseline(text){
     return normalize(text
-        .replace(/\/\* Gameplay activity covers use the same 16:9 production ratio as dungeon\n   covers\. Combat BOSS\/mechanism cards remain independent 9:16 components\. \*\/\n/,"")
+        .replace(/\/\* Gameplay activity covers use the same 16:9 production ratio as dungeon\n   covers\. Combat BOSS\/mechanism cards remain independent 4:3 components\. \*\/\n/,"")
         .replace("    min-height:0;\n    aspect-ratio:16 / 9;\n    box-sizing:border-box;","    min-height:120px;\n    box-sizing:border-box;")
         .replace("#game-stage .gameplay-mode-card.coming-soon{\n    opacity:.67;","#game-stage .gameplay-mode-card.coming-soon{\n    min-height:88px;\n    opacity:.67;")
     );
