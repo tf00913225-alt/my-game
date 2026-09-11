@@ -1,0 +1,16 @@
+"use strict";
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const battle=fs.readFileSync("js/54-v173.51-battle-qa.js","utf8");
+const css=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
+const boss=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
+const relic=fs.readFileSync("js/relic-progression-drop-system.js","utf8");
+assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?inset:0 0 30px!important;[\s\S]*?background-size:contain!important/);
+assert.match(battle,/battle-player\.v174-cardless-unit>\.hp-bar\{[\s\S]*?bottom:13px!important/);
+assert.match(battle,/battle-player\.v174-cardless-unit>\.sp-bar\{[\s\S]*?bottom:0!important/);
+assert.match(css,/\.gameplay-hub-grid\{[\s\S]*?display:flex;[\s\S]*?flex-direction:column;/);
+assert.match(css,/\.gameplay-mode-card\{[\s\S]*?flex:0 0 auto;[\s\S]*?aspect-ratio:16 \/ 9;/);
+const detail=boss.slice(boss.indexOf("function bossDetailMarkup"),boss.indexOf("function renderBossPage"));
+assert.ok(detail.indexOf("gameplay-primary-action")<detail.indexOf("boss-detail-grid"),"BOSS challenge action must render above recommended-party grid");
+assert.match(relic,/grid\.insertBefore\(section,grid\.firstElementChild\)/,"relic preview must be first detail section");
+console.log("V174.1 battle/gameplay layout ordering regression checks passed");

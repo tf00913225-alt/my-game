@@ -122,9 +122,9 @@
 /* ---------- Gameplay hub ---------- */
 
 #game-stage .gameplay-hub-grid{
-    display:grid;
-    align-content:start;
-    grid-template-columns:1fr;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
     gap:10px;
     padding:12px;
 }
@@ -136,6 +136,7 @@
     display:grid;
     width:100%;
     min-height:0;
+    flex:0 0 auto;
     aspect-ratio:16 / 9;
     box-sizing:border-box;
     grid-template-columns:minmax(0,1fr) 78px;
