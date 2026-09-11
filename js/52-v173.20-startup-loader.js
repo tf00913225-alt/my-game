@@ -12,6 +12,7 @@
     const percent=document.getElementById("startupPercent");
     const progress=document.getElementById("startupProgress");
     const fill=document.getElementById("startupProgressFill");
+    const retryButton=document.getElementById("startupRetryButton");
     const creation=document.getElementById("creationPage");
     const game=document.getElementById("gameInterface");
     const build=global.__FOUR_SYMBOLS_BUILD__||{};
@@ -26,6 +27,7 @@
     let lastError=null;
     let introTimer=0;
     let citySceneShown=false;
+    let returningPresentationComplete=false;
 
     function mark(name){
         try{ if(global.performance&&typeof global.performance.mark==="function"){ global.performance.mark(name); } }catch(_){ }
@@ -35,7 +37,7 @@
     if(game){ game.style.display="none"; }
     if(root){ root.hidden=false; root.dataset.owner="StartupStateMachine"; root.dataset.state=state; }
     mark("four-symbols:boot-core-ready");
-    scheduleCityScene();
+    // Opening-scene timing is controlled by boot(); readiness never races a timer.
 
     // Signed-out players need only the account surface. Start the application
     // shell after Firebase has produced a UID, then overlap it with save I/O.
@@ -61,6 +63,7 @@
         if(title){ title.textContent=nextTitle; }
         if(detail){ detail.textContent=nextDetail; }
     }
+    function status(nextTitle,nextDetail){ if(title){ title.textContent=nextTitle; } if(detail){ detail.textContent=nextDetail; } }
     function transition(next,payload={}){
         if(!contract.canTransition(state,next)){ throw new Error("Invalid startup transition "+state+" -> "+next); }
         state=next; if(root){ root.dataset.state=state; }
@@ -131,14 +134,14 @@
         creation.setAttribute("aria-hidden","false");
     }
     async function enterReady(save,offline=false,token=transitionToken){
-        showLoader(); render(92,"載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
+        showLoader(); status("載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
         await Promise.all([requireAppShell(),domReady()]);
         if(token!==transitionToken){ return; }
         activateGameplaySaveOwner();
         const loaded=global.FourSymbolsGameSave&&typeof global.FourSymbolsGameSave.hydrate==="function"&&global.FourSymbolsGameSave.hydrate(save);
         if(!loaded){ throw new Error("Resolved account save could not hydrate gameplay state."); }
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
-        firebase.closeAuth(); render(100,"載入完成","主城已可操作");
+        firebase.closeAuth(); status("載入完成","主城已可操作");
         mark("four-symbols:critical-ready");
         await hideLoader();
         mark("four-symbols:main-city-interactive");
@@ -150,7 +153,7 @@
         if(token!==transitionToken){ return; }
         activateGameplaySaveOwner();
         transition(STATES.NEED_CHARACTER,{uid:resolvedUid});
-        firebase.closeAuth(); render(100,"帳號資料已確認","此 UID 尚無角色，可以建立角色");
+        firebase.closeAuth(); status("帳號資料已確認","此 UID 尚無角色，可以建立角色");
         showCharacterCreationSurface();
         if(game){ game.style.display="none"; }
         mark("four-symbols:critical-ready");
@@ -161,7 +164,7 @@
     }
     function migration(message,blocked=false){
         transition(STATES.MIGRATION_REQUIRED,{uid:resolvedUid,blocked});
-        render(100,"需要確認舊存檔","未確認前不會綁定、覆寫或建立角色");
+        status("需要確認舊存檔","未確認前不會綁定、覆寫或建立角色");
         accountUi("MIGRATION_REQUIRED",message,false,{message,blocked});
         void hideLoader();
         mark("four-symbols:critical-ready"); mark("four-symbols:migration-ui-interactive");
@@ -172,7 +175,7 @@
         activeUser=user; resolvedUid=user.uid; saveResolved=false; cloudResult=null; lastError=null;
         startAppShell();
         transition(STATES.SAVE_LOADING,{uid:user.uid}); showLoader();
-        render(70,"讀取帳號角色","正在解析 UID 雲端與本機存檔"); accountUi("SAVE_LOADING","正在讀取此 UID 的角色資料…");
+        status("讀取帳號角色","正在解析 UID 雲端與本機存檔"); accountUi("SAVE_LOADING","正在讀取此 UID 的角色資料…");
         const repo=global.FourSymbolsAccountSave;
         repo.activate(user.uid);
         if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.activate(user.uid); }
@@ -238,14 +241,14 @@
         if(!safeCloudEmpty(cloud,user.uid)){
             return migration("雲端狀態仍在遷移或無法證明為空；禁止把它當成新帳號。",true);
         }
-        saveResolved=true; mark("four-symbols:save-resolved"); render(90,"帳號資料已確認","此 UID 沒有角色");
+        saveResolved=true; mark("four-symbols:save-resolved"); status("帳號資料已確認","此 UID 沒有角色");
         return enterCreation(token).catch(error=>fail(error,"創角介面載入失敗。",token));
     }
     function requireAuth(){
         showCityScene("auth-required");
         activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null;
         if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }else{ global.FourSymbolsAccountSave.deactivate(); }
-        transition(STATES.AUTH_REQUIRED); render(100,"帳號服務已就緒","請登入、註冊或以 Firebase 訪客 UID 開始");
+        transition(STATES.AUTH_REQUIRED); status("帳號服務已就緒","請登入、註冊或以 Firebase 訪客 UID 開始");
         accountUi("AUTH_REQUIRED","請先登入、註冊或使用訪客開始遊戲。沒有 UID 時不能建立角色。");
         void hideLoader();
         mark("four-symbols:critical-ready"); mark("four-symbols:auth-ui-interactive");
@@ -255,7 +258,7 @@
         showCityScene("startup-error");
         lastError=error; saveResolved=false;
         if(state!==STATES.ERROR){ transition(STATES.ERROR,{error}); }
-        showLoader(); render(Math.min(99,Number(progress&&progress.getAttribute("aria-valuenow"))||0),"啟動失敗",message);
+        showLoader(); status("啟動失敗",message);
         if(firebase){ accountUi("ERROR",message+" "+String(error&&error.message||""),true); }
         emit("four-symbols:startup-error",{error,message});
     }
@@ -274,9 +277,44 @@
         if(activeUser&&activeUser.uid!==user.uid){ global.FourSymbolsAccountSave.deactivate(); global.location.reload(); return; }
         if(state===STATES.AUTH_RESOLVING||state===STATES.AUTH_REQUIRED){ void resolveSaveFor(user); }
     }
-    async function boot(){
-        try{
-            render(15,"建立啟動環境","載入最小 Boot Core"); transition(STATES.AUTH_RESOLVING); render(30,"初始化帳號服務","恢復 Firebase Authentication session");
+    let firebaseBootPromise=null;
+    const delay=ms=>new Promise(resolve=>global.setTimeout(resolve,ms));
+    async function waitForPrivacyApi(){
+        if(global.FourSymbolsPrivacy){ return global.FourSymbolsPrivacy; }
+        return new Promise((resolve,reject)=>{
+            const timer=global.setTimeout(()=>reject(new Error("Privacy policy gate did not initialize.")),8000);
+            global.addEventListener("four-symbols:privacy-ready",()=>{ global.clearTimeout(timer); resolve(global.FourSymbolsPrivacy); },{once:true});
+        });
+    }
+    async function runOpeningPresentation(returning,retryOnly){
+        returningPresentationComplete=false;
+        if(retryOnly){ showCityScene("resource-retry"); return; }
+        if(root){ root.dataset.audience=returning?"returning":"first-boot"; }
+        await delay(returning?5000:1800);
+        showCityScene(returning?"returning-logo-complete":"first-boot-logo-complete");
+        if(returning){
+            await delay(5000);
+            returningPresentationComplete=true;
+            const readyPercent=Number(progress&&progress.getAttribute("aria-valuenow")||0);
+            if(readyPercent<100){ status("正在更新必要資源","第二幕將維持顯示，完成後才進入帳號系統"); }
+        }
+    }
+    function renderFirstPlayProgress(value){
+        const holdReturningUpdate=returningPresentationComplete&&root&&root.dataset.audience==="returning"&&Number(value.percent)<100;
+        render(value.percent,holdReturningUpdate?"正在更新必要資源":value.title,value.detail);
+        if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }
+    }
+    function showResourceFailure(error){
+        lastError=error; showCityScene("resource-error"); showLoader();
+        const failed=global.FourSymbolsFirstPlay&&global.FourSymbolsFirstPlay.getLastFailed?global.FourSymbolsFirstPlay.getLastFailed():[];
+        const summary=failed.slice(0,2).map(item=>item.path).join("、");
+        status("部分必要資源載入失敗",summary?"失敗："+summary:"請檢查網路後重新下載失敗項目");
+        if(retryButton){ retryButton.hidden=false; retryButton.disabled=false; }
+        emit("four-symbols:first-play-error",{error,failed});
+    }
+    async function startFirebaseLifecycle(){
+        if(firebaseBootPromise){ return firebaseBootPromise; }
+        firebaseBootPromise=(async()=>{
             const url=new URL(build.firebaseBootstrap,document.baseURI).href;
             await import(url);
             firebase=global.FourSymbolsFirebaseLifecycle;
@@ -292,19 +330,57 @@
                         global.FourSymbolsAccountSave.migrateLegacyToUid(activeUser.uid,{confirmed:true,cloudHasCharacter:cloudHas});
                         const migrated=global.FourSymbolsAccountSave.readForUid(activeUser.uid);
                         const token=transitionToken;
-                        saveResolved=true; void enterReady(migrated.save,false,token)
-                            .catch(error=>fail(error,"migration 後角色載入失敗；原始 legacy 與備份均已保留。",token));
+                        saveResolved=true; void enterReady(migrated.save,false,token).catch(error=>fail(error,"migration 後角色載入失敗；原始 legacy 與備份均已保留。",token));
                     }catch(error){ fail(error,"舊版存檔 migration 失敗；原檔與備份均未刪除。"); }
                 }
-                if(action==="cancel-migration"&&state===STATES.MIGRATION_REQUIRED&&activeUser){
-                    firebase.signOut().catch(error=>fail(error,"無法安全退出 migration 流程；資料未被修改。"));
-                }
+                if(action==="cancel-migration"&&state===STATES.MIGRATION_REQUIRED&&activeUser){ firebase.signOut().catch(error=>fail(error,"無法安全退出 migration 流程；資料未被修改。")); }
             });
-            await firebase.initialize(); mark("four-symbols:auth-initialized"); render(50,"確認登入狀態","等待 Firebase 回復身份");
-            const user=await firebase.resolveIdentity(); mark("four-symbols:auth-resolved"); render(65,"身份確認完成",user?"已取得 UID":"需要玩家選擇登入方式");
-            onAuth({user,error:null});
-        }catch(error){ fail(error,"Firebase Authentication 無法初始化；禁止 fail-open 創角。"); }
+            await firebase.initialize(); mark("four-symbols:auth-initialized");
+            const user=await firebase.resolveIdentity(); mark("four-symbols:auth-resolved");
+            return user;
+        })().catch(error=>{ firebaseBootPromise=null; throw error; });
+        return firebaseBootPromise;
     }
+    async function boot(retryFailedOnly=false){
+        try{
+            if(retryButton){ retryButton.hidden=true; retryButton.disabled=false; }
+            showLoader();
+            const firstPlay=global.FourSymbolsFirstPlay;
+            if(!firstPlay){ throw new Error("First Play resource loader is unavailable."); }
+            const privacy=await waitForPrivacyApi();
+            const returning=firstPlay.hasCompletedRecord();
+            const presentation=runOpeningPresentation(returning,retryFailedOnly);
+            let firebasePromise=null;
+            if(returning&&privacy.hasConsent()){
+                firebasePromise=startFirebaseLifecycle();
+                firebasePromise.then(user=>{if(user&&user.uid){try{global.FourSymbolsAccountSave.readForUid(user.uid);}catch(_){}}}).catch(()=>{});
+            }
+            render(0,returning?"正在驗證遊戲資源":"正在準備遊戲資源","正在驗證 First Play Ready Pack");
+            let packResult;
+            try{
+                const prepare=retryFailedOnly?firstPlay.retryFailed:firstPlay.prepare;
+                packResult=await prepare({onProgress:renderFirstPlayProgress});
+            }catch(error){ await presentation; showResourceFailure(error); return; }
+            await presentation;
+            render(100,"遊戲資源準備完成","First Play Ready Pack 已下載、驗證並可渲染");
+            mark("four-symbols:first-play-ready");
+            emit("four-symbols:first-play-ready",{returning,manifestChanged:packResult.manifestChanged,totalBytes:packResult.totalBytes});
+            if(!privacy.hasConsent()){
+                status("遊戲資源準備完成","請閱讀隱私權政策後繼續");
+                await privacy.requireConsent();
+                mark("four-symbols:privacy-accepted");
+            }
+            transition(STATES.AUTH_RESOLVING);
+            status("初始化帳號服務","恢復 Firebase Authentication session");
+            const user=await (firebasePromise||startFirebaseLifecycle());
+            status("身份確認完成",user?"已取得 UID":"需要玩家選擇登入方式");
+            onAuth({user,error:null});
+        }catch(error){
+            if(error&&error.code==="privacy-declined"){ return; }
+            fail(error,"Firebase Authentication 無法初始化；禁止 fail-open 創角。");
+        }
+    }
+    if(retryButton){ retryButton.addEventListener("click",()=>{ retryButton.disabled=true; void boot(true); }); }
     global.FourSymbolsStartupPolicy=Object.freeze({
         states:STATES,getState:()=>state,getUid:()=>resolvedUid,
         canShowCharacterCreation:()=>contract.canCreateCharacter({state,userUid:activeUser&&activeUser.uid,resolvedUid,saveResolved,activeSaveUid:global.FourSymbolsAccountSave.getActiveUid()}),

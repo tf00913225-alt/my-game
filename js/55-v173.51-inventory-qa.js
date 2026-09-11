@@ -27,7 +27,7 @@ clearEquipmentComparison();
 if(!equipment(item))return;
 const worn=equippedFor(item),targetSlot=slot(item.type),box=document.createElement("section");
 const sourceIcon=modal.querySelector("#itemModalIcon"),sourceName=modal.querySelector("#itemModalName"),sourceStats=modal.querySelector("#itemModalStats");
-const selectedArt=sourceIcon&&sourceIcon.innerHTML?sourceIcon.innerHTML:itemArt(item);
+const selectedArt=itemArt(item);
 const selectedName=sourceName&&sourceName.textContent?sourceName.textContent:String(item.name||"背包装備");
 const selectedStats=sourceStats&&sourceStats.innerHTML?sourceStats.innerHTML:compareStats(item);
 box.id="v17351EquipmentCompare";box.className="v17351-equipment-compare";

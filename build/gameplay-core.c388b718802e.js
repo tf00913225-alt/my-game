@@ -22616,7 +22616,7 @@ function ensureBattlePresentationStyles(){
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
-    inset:0 0 30px!important;
+    inset:-8px -8px 30px!important;
     background-size:contain!important;background-position:center bottom!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
@@ -22631,6 +22631,7 @@ function ensureBattlePresentationStyles(){
     z-index:20!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
+    inset:-5px!important;
     background-size:cover!important;background-position:center center!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
@@ -22817,7 +22818,7 @@ clearEquipmentComparison();
 if(!equipment(item))return;
 const worn=equippedFor(item),targetSlot=slot(item.type),box=document.createElement("section");
 const sourceIcon=modal.querySelector("#itemModalIcon"),sourceName=modal.querySelector("#itemModalName"),sourceStats=modal.querySelector("#itemModalStats");
-const selectedArt=sourceIcon&&sourceIcon.innerHTML?sourceIcon.innerHTML:itemArt(item);
+const selectedArt=itemArt(item);
 const selectedName=sourceName&&sourceName.textContent?sourceName.textContent:String(item.name||"背包装備");
 const selectedStats=sourceStats&&sourceStats.innerHTML?sourceStats.innerHTML:compareStats(item);
 box.id="v17351EquipmentCompare";box.className="v17351-equipment-compare";

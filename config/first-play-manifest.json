@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "first-play-core",
+  "manifestVersion": "2026-09-11.1",
+  "assetPackVersion": "2026-09-11.1",
+  "concurrency": 5,
+  "bundles": [
+    {"id": "critical", "priority": "P0"},
+    {"id": "app-shell", "priority": "P1"},
+    {"id": "gameplay-core", "priority": "P2"},
+    {"id": "feature-patrol", "priority": "P2"}
+  ],
+  "assets": [
+    {"path": "privacy-consent.html", "priority": "P0", "type": "html"},
+    {"path": "privacy.html", "priority": "P0", "type": "html"},
+
+    {"path": "assets/characters/female_fire.jpg", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/characters/female_water.jpg", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/characters/female_wind.jpg", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/characters/female_earth.jpg", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/characters/male_fire.jpg", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/characters/male_water.jpg", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/characters/male_wind.jpg", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/characters/male_earth.jpg", "priority": "P1", "type": "image", "decode": true},
+
+    {"path": "assets/ui/home-background-v17344.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-character.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-shop.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-rest.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-synthesis.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-quest.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-bestiary.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-achievement.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-announcement.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-offline-exp.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-system.png", "priority": "P1", "type": "image", "decode": true},
+
+    {"path": "assets/ui/nav-home.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/nav-dungeon.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/nav-boss.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/nav-character.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/nav-backpack.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/nav-quest.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/nav-element-box.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/map-return.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/patrol-appearance-switch-icon.png", "priority": "P1", "type": "image", "decode": true},
+
+    {"path": "assets/characters/battle_female_fire.png", "priority": "P2", "type": "image", "decode": true},
+    {"path": "assets/characters/battle_female_water.png", "priority": "P2", "type": "image", "decode": true},
+    {"path": "assets/characters/battle_female_wind.png", "priority": "P2", "type": "image", "decode": true},
+    {"path": "assets/characters/battle_female_earth.png", "priority": "P2", "type": "image", "decode": true},
+    {"path": "assets/characters/battle_male_fire.png", "priority": "P2", "type": "image", "decode": true},
+    {"path": "assets/characters/battle_male_water.png", "priority": "P2", "type": "image", "decode": true},
+    {"path": "assets/characters/battle_male_wind.png", "priority": "P2", "type": "image", "decode": true},
+    {"path": "assets/characters/battle_male_earth.png", "priority": "P2", "type": "image", "decode": true},
+    {"path": "assets/ui/training-background.jpg", "priority": "P2", "type": "image", "decode": true}
+  ]
+}

@@ -14,6 +14,7 @@ const slash=value=>value.split(path.sep).join("/");
 
 const release=JSON.parse(read("release/release.json"));
 const featureTemplate=JSON.parse(read("config/feature-manifest.json"));
+const firstPlayTemplate=JSON.parse(read("config/first-play-manifest.json"));
 const criticalImagePaths=["assets/ui/startup-logo.4631c0bc3f2b.jpg","assets/ui/startup-main-city.d43e67af1c1c.jpg"];
 
 const bootScripts=[
@@ -21,6 +22,7 @@ const bootScripts=[
     "js/startup/screen-wake-lock-runtime.js",
     "js/startup/account-save-repository.js",
     "js/startup/feature-loader.js",
+    "js/startup/first-play-resource-loader.js",
     "js/startup/startup-contract.js",
     "js/52-v173.20-startup-loader.js"
 ];
@@ -231,10 +233,51 @@ writeTarget(bootOutput);
 const criticalImages=criticalImagePaths.map(file=>({path:file,content:bytes(file),digest:hash(bytes(file))}));
 for(const asset of criticalImages){ if(!asset.path.includes(`.${asset.digest}.`)){ throw new Error(`Critical image filename is not content-addressed: ${asset.path}`); } }
 const declared=[bootOutput,...Object.values(scriptOutputs),...Object.values(styleOutputs),...firebaseOutputs,...criticalImages];
+const priorityRank={P0:0,P1:1,P2:2,P3:3};
+function firstPlayType(pathName){
+    const lower=pathName.toLowerCase();
+    if(/\.(?:png|jpe?g|webp|svg|avif)$/.test(lower)){ return "image"; }
+    if(lower.endsWith(".css")){ return "style"; }
+    if(lower.endsWith(".js")||lower.endsWith(".mjs")){ return "script"; }
+    if(lower.endsWith(".json")){ return "json"; }
+    if(lower.endsWith(".html")){ return "html"; }
+    if(/\.(?:woff2?|ttf|otf)$/.test(lower)){ return "font"; }
+    return "asset";
+}
+const declaredByPath=new Map(declared.map(item=>[item.path,item]));
+const firstPlayByPath=new Map();
+function addFirstPlay(pathName,meta={}){
+    const generated=declaredByPath.get(pathName);
+    const content=generated?generated.content:bytes(pathName);
+    const type=meta.type||firstPlayType(pathName);
+    const next={path:pathName,sha256:generated?generated.digest:hash(content),bytes:Buffer.byteLength(content),priority:meta.priority||"P2",type,decode:meta.decode===true||(meta.decode!==false&&type==="image")};
+    const current=firstPlayByPath.get(pathName);
+    if(!current||(priorityRank[next.priority]??9)<(priorityRank[current.priority]??9)){ firstPlayByPath.set(pathName,next); }
+}
+for(const request of firstPlayTemplate.bundles||[]){
+    const priority=request.priority||"P2";
+    if(request.id==="critical"){
+        addFirstPlay(bootOutput.path,{priority,type:"script"});
+        addFirstPlay(styleOutputs.critical.path,{priority,type:"style"});
+        for(const output of firebaseOutputs){ addFirstPlay(output.path,{priority,type:"script"}); }
+        for(const pathName of criticalImagePaths){ addFirstPlay(pathName,{priority,type:"image",decode:true}); }
+        continue;
+    }
+    const bundle=featureManifest.bundles[request.id];
+    if(!bundle){ throw new Error("Unknown First Play bundle: "+request.id); }
+    for(const pathName of bundle.scripts||[]){ addFirstPlay(pathName,{priority,type:"script"}); }
+    for(const pathName of bundle.styles||[]){ addFirstPlay(pathName,{priority,type:"style"}); }
+    for(const pathName of bundle.assets||[]){ addFirstPlay(pathName,{priority}); }
+}
+for(const asset of firstPlayTemplate.assets||[]){ addFirstPlay(asset.path,asset); }
+const firstPlayResources=[...firstPlayByPath.values()].sort((a,b)=>(priorityRank[a.priority]??9)-(priorityRank[b.priority]??9)||a.path.localeCompare(b.path));
+const firstPlayBase={schemaVersion:firstPlayTemplate.schemaVersion||1,id:firstPlayTemplate.id,manifestVersion:firstPlayTemplate.manifestVersion,assetPackVersion:firstPlayTemplate.assetPackVersion,concurrency:firstPlayTemplate.concurrency||5,resources:firstPlayResources};
+const firstPlayPack={...firstPlayBase,manifestHash:hash(JSON.stringify(firstPlayBase)),totalBytes:firstPlayResources.reduce((sum,item)=>sum+item.bytes,0),totalResources:firstPlayResources.length};
 const assetManifest={
     schemaVersion:1,release:release.version,generatedAt:"deterministic",
     critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[...criticalImagePaths],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},
     featureManifest,
+    firstPlay:firstPlayPack,
     assets:Object.fromEntries(declared.map(item=>[item.path,{sha256:item.digest,bytes:Buffer.byteLength(item.content)}]))
 };
 const manifestContent=JSON.stringify(assetManifest,null,2)+"\n";
@@ -257,10 +300,16 @@ function normalizedIndex(source){
         source=source.replace("</body>",scriptBlock+"\n</body>");
     }
     source=source.replace(/<img\b[^>]*>/gi,tag=>{
-        if(/startup-(?:logo|city)-image/.test(tag)){
-            return /fetchpriority=/.test(tag)?tag:tag.replace(/>$/,' fetchpriority="high">');
-        }
+        const startup=/startup-(?:logo|city)-image/.test(tag);
+        const firstPlayImage=startup||/\bid=["']creationPortrait["']/.test(tag)||/\bclass=["'][^"']*nav-art-button/.test(tag);
         let value=tag;
+        if(firstPlayImage){
+            value=value.replace(/\sloading=["'][^"']*["']/i,"").replace(/\sdecoding=["'][^"']*["']/i,"");
+            if(!/\bloading=/.test(value)){ value=value.replace(/>$/,' loading="eager">'); }
+            if(!/\bdecoding=/.test(value)){ value=value.replace(/>$/,' decoding="async">'); }
+            if((startup||/creationPortrait/.test(value))&&!/fetchpriority=/.test(value)){ value=value.replace(/>$/,' fetchpriority="high">'); }
+            return value;
+        }
         if(!/\bloading=/.test(value)){ value=value.replace(/>$/,' loading="lazy">'); }
         if(!/\bdecoding=/.test(value)){ value=value.replace(/>$/,' decoding="async">'); }
         return value;
@@ -275,6 +324,10 @@ if(checkOnly){
     for(const output of declared){
         const absolute=path.join(ROOT,output.path);
         if(!fs.existsSync(absolute)||hash(bytes(slash(output.path)))!==output.digest){ throw new Error(`Stale build asset: ${output.path}`); }
+    }
+    for(const resource of firstPlayResources){
+        const absolute=path.join(ROOT,resource.path);
+        if(!fs.existsSync(absolute)||hash(bytes(resource.path))!==resource.sha256){ throw new Error(`Stale First Play asset: ${resource.path}`); }
     }
 }else{
     fs.writeFileSync(path.join(ROOT,"index.html"),nextIndex);
