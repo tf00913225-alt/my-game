@@ -271,6 +271,35 @@ try{
     assert.ok(guest.nextRect.left>=guest.stageRect.left-1&&guest.nextRect.right<=guest.stageRect.right+1&&guest.nextRect.top>=guest.stageRect.top-1&&guest.nextRect.bottom<=guest.stageRect.bottom+1,"Creation CTA escaped the rendered stage");
     evidence.checks.anonymousBeforeCreation=guest;evidence.performance.guestCreation=await metrics(client,"four-symbols:character-creation-interactive");
 
+
+    await client.eval(`document.getElementById("creationPrimaryNextButton").click()`);
+    await waitFor(client,"document.getElementById('creationStepTwo')?.classList.contains('is-active')&&!document.getElementById('creationStepTwo')?.hidden","creation step two");
+    const stepTwoActions=await client.eval(`(()=>{
+      const stage=document.getElementById("game-stage");
+      const step=document.getElementById("creationStepTwo");
+      const row=step.querySelector(":scope > .creation-action-row");
+      const back=row.querySelector(".creation-back:not([hidden])");
+      const submit=document.getElementById("creationSubmitButton");
+      const rect=node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
+      const stageRect=rect(stage),stepRect=rect(step),rowRect=rect(row),backRect=rect(back),submitRect=rect(submit);
+      const backHit=document.elementFromPoint(backRect.left+backRect.width/2,backRect.top+backRect.height/2);
+      const submitHit=document.elementFromPoint(Math.max(submitRect.left+1,submitRect.right-2),submitRect.top+submitRect.height/2);
+      return {
+        rowPosition:getComputedStyle(row).position,
+        rowRect,backRect,submitRect,stepRect,stageRect,
+        backHit:!!backHit&&back.contains(backHit),
+        submitHit:!!submitHit&&submit.contains(submitHit)
+      };
+    })()`);
+    assert.equal(stepTwoActions.rowPosition,"absolute","Step-two actions are not pinned to the fixed canvas");
+    assert.ok(stepTwoActions.backRect.height>=44,"Step-two back button collapsed below the mobile touch target floor");
+    assert.ok(stepTwoActions.submitRect.height>=44,"Step-two submit button collapsed below the mobile touch target floor");
+    assert.ok(stepTwoActions.rowRect.top>=stepTwoActions.stepRect.top-1&&stepTwoActions.rowRect.bottom<=stepTwoActions.stepRect.bottom+1,"Step-two action row escaped the visible creation step");
+    assert.ok(stepTwoActions.backRect.left>=stepTwoActions.stageRect.left-1&&stepTwoActions.submitRect.right<=stepTwoActions.stageRect.right+1,"Step-two buttons escaped the rendered stage horizontally");
+    assert.equal(stepTwoActions.backHit,true,"Step-two back button is covered by another layer");
+    assert.equal(stepTwoActions.submitHit,true,"Step-two submit button right side is covered or clipped");
+    evidence.checks.stepTwoBottomActions=stepTwoActions;
+
     for(const failure of [{scenario:"auth-error",code:"auth"},{scenario:"cloud-error",code:"cloud"},{scenario:"corrupt",code:"corrupt"}]){
         await clear();await navigate(failure.scenario);await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='ERROR'",failure.code+" fail-closed");
         const result=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),creation:getComputedStyle(document.getElementById("creationPage")).display,legacy:localStorage.getItem("battle_full_version_save_v5"),corrupt:localStorage.getItem("four_symbols_save:uid-corrupt")}))()`);
