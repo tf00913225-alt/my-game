@@ -1,3 +1,12 @@
+## 2026-09-11 多對話 dev 分支稽核與 ancestry 收斂
+
+- 稽核基準為 GitHub `dev@fa21dc23971909556d65357c4e8e012c97b413d9`、`main@3d3e529e8e74dcced3dfcf8f82bac772a588d4a7`；稽核時遠端共有 100 個 branch heads，其中 76 個工作／整合分支已是 dev ancestor，沒有任何 branch 是建立在最新 dev 之上的未合併 descendant。
+- 2026-09-11 同時多對話產生的有效工作已依序存在於同一條 dev：冷啟動創角 lifecycle、創角第 2 步底部 actions、兩幕 boot intro 與 compact auth overlay、privacy policy，以及 Facebook mobile redirect；最新 dev 的 Repository checks 與 Cloudflare exact-SHA deployment 均為 SUCCESS，不存在三套互相競爭的程式碼。
+- 唯一需要收斂的是 protected main release merges 的 ancestry。`git merge-tree --write-tree dev main` 產生 tree `8d06fde7d9442b8f0c14562822ec7fef421a055e`，與合併前 dev tree 完全相同；整合 commit `6ae1b494f5c24858bed329cabe4a33eacc5983a6` 因此只增加 main parent，不改任何遊戲、UI、build、release metadata、Firebase、存檔或玩家資料。
+- 舊草稿 PR #146／`fix/ui-equipment-gameplay-city-polish` 已由 `fix/ui-equipment-gameplay-city-polish-continued@26a67473128674c91fa363cefbd33e5f3f1c8034` 的安全 owner-converged 版本取代，並早已透過 `2f3dc7d13df8e3c629b0544b52c494416a6f6ab1` 合入 dev；PR #146 已留下 superseded 說明後關閉，禁止再次合入舊 manifest／build。
+- `feature/facebook-login` 的 branch aggregate patch 與 dev integration commit `2d713dd08bee8efa7abf0ad18b61c950c9af9fa8` patch-id 完全相同，後續 mobile redirect 亦已在 dev；此舊分支不需再 merge。`noop`／`noop3`／`noop4` 只新增占位檔，`assets-library` 仍為素材專用，其餘 divergent branches 均是已取代的舊基底或歷史 release／verification branch，皆不得直接合入目前 dev。
+- 本次只以 PR #162 整理 ancestry 與本交接紀錄；Game／Cache Version 維持 V173.65／173.65，`main` 不修改。Repository checks 成功且 PR 合入後，必須再次確認 dev HEAD、Cloudflare deployed manifest SHA 與版本一致，才可回報完成。
+
 ## 2026-09-10 四分支安全整合：Boss 9:16 手機版面（dev integration）
 
 - 指定工作分支 `fix/boss-ui-9x16-mobile-20260910@0865bbaef3e8c1ee5f054bf4774bc800db9f7ec2` 的 Boss 與機制卡 9:16 CSS 已整合到正式 owner `css/gameplay-boss-tower.css`。
