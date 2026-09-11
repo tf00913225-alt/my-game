@@ -64,4 +64,4 @@ The pack is intentionally smaller than the full repository. It prepares boot/aut
 
 `.github/scripts/run-boot-architecture-browser-qa.mjs` covers fresh First Play, current returning 5+5 timing, stale-manifest continuation on scene 2, required-resource HTTP failure and retry, image decode failure and retry, privacy blocking before acceptance, policy-version re-consent, Account-first save isolation and the existing mobile creation/city regression checks.
 
-After deterministic generated outputs are materialized, PR acceptance must be based on a fresh standard `Repository checks` run from the current branch head rather than the materialization workflow itself.
+After deterministic generated outputs are materialized, PR acceptance must be based on a fresh standard `Repository checks` run from the current branch head rather than the materialization workflow itself. The final merge must reference that exact verified head SHA.
