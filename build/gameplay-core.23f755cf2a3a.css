@@ -2352,8 +2352,9 @@ body.quest-scroll-active,
 
 .v131-unlock-dot{
     position:absolute;
-    right:2px;
-    top:-3px;
+    right:4px;
+    top:4px;
+    z-index:8;
     width:10px;
     height:10px;
     border-radius:50%;

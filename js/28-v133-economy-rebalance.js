@@ -532,7 +532,7 @@
                 v173ScheduleExpPoolDecoration(viewport);
             }
         };
-        window.v131ConfirmExpPreview=function(){
+        window.v131ConfirmExpPreview=async function(){
             const viewport=v173CaptureExpPoolViewport();
             v173BlurExpPoolAction();
             settleExpPoolCharge(Date.now());
@@ -541,6 +541,21 @@
             const actual=Math.max(0,Number(sharedExp)||0);
             if(discounted<=0||discounted>actual){
                 if(discounted>actual){ alert("經驗池不足，無法完成本次分配。"); }
+                return false;
+            }
+            const levelCount=Object.values(counts).reduce((sum,value)=>sum+Math.max(0,Math.floor(Number(value)||0)),0);
+            const confirmMessage="確定要消耗 "+discounted.toLocaleString("zh-TW")+" EXP，完成 "+levelCount+" 次升級嗎？";
+            if(typeof window.rpgConfirm!=="function"){
+                v173ScheduleExpPoolDecoration(viewport);
+                return false;
+            }
+            const approved=await window.rpgConfirm(confirmMessage,{
+                title:"確認經驗池升級",
+                confirmText:"確定升級",
+                cancelText:"返回"
+            });
+            if(!approved){
+                v173ScheduleExpPoolDecoration(viewport);
                 return false;
             }
             let completed=false;
