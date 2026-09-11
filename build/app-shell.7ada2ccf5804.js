@@ -290,6 +290,7 @@ window.FourSymbolsGameSave=Object.freeze({
     deactivate:deactivateAccountSaveOwner,
     getKey:()=>SAVE_KEY,
     load:()=>loadGame(),
+    hydrate:save=>loadGame(save),
     save:options=>saveGame(options),
     showCreation:()=>showCreation()
 });
@@ -6491,18 +6492,27 @@ function saveGame(options={}){
 
 function loadGame(){
 
+    const resolvedSave=arguments[0]||null;
+
     try{
 
         /*
-           先讀新版。
+           Startup may already have resolved and verified the exact UID save.
+           Hydrate that payload directly so READY cannot race a second repository read.
+           Ordinary load callers still read the active UID repository as before.
         */
 
         const repository=window.FourSymbolsAccountSave;
         const activeUid=repository&&repository.getActiveUid();
         if(!repository||!activeUid||SAVE_KEY!==repository.saveKey(activeUid)){ return false; }
-        const accountSave=repository.readForUid(activeUid);
-        const raw=accountSave.status==="ready"?JSON.stringify(accountSave.save):null;
 
+        let raw=null;
+        if(resolvedSave&&typeof resolvedSave==="object"&&!Array.isArray(resolvedSave)){
+            raw=JSON.stringify(resolvedSave);
+        }else{
+            const accountSave=repository.readForUid(activeUid);
+            raw=accountSave.status==="ready"?JSON.stringify(accountSave.save):null;
+        }
 
         if(!raw){
 

@@ -1,3 +1,10 @@
+## 2026-09-11 Facebook UID 存檔 hydration 修正
+
+- 症狀：Facebook OAuth 已成功取得 Firebase UID，但 Account UI 顯示 `Account save passed resolution but gameplay hydration failed.`。
+- 根因：Startup State Machine 已在 `resolveSaveFor()` 解析出該 UID 的確切 save payload，`enterReady(save)` 卻忽略參數並再次呼叫 `FourSymbolsGameSave.load()` 重讀 repository；第二次讀取可能與已解析狀態不同步而回傳 false。
+- 修正：`FourSymbolsGameSave` 新增 `hydrate(save)`，沿用既有 `loadGame()` hydration/normalization 邏輯但直接使用已解析 payload；一般 `load()` 行為維持原本從 active UID repository 讀取。真正 verified-empty UID 仍只走 `enterCreation()`，不會誤進 READY。
+- 不修改 save schema、UID ownership、Firestore Rules、Game/Cache Version；`main` 不修改。
+
 ## 2026-09-11 三分支手機 UI／BOSS 秘寶／無卡牌戰鬥安全整合（DEV VERIFIED）
 
 - 整合前 GitHub `dev@34c5603b2ac7c062813489d5ddd1fef95fb20590`、`main@4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`；三條遠端 tip 都精確等於指定 SHA。實際順序為既存 mobile UI／EXP guards → BOSS／四象塔平衡、玩法封面、技能預覽與 Lv20 秘寶 → 無卡牌戰鬥呈現。
@@ -3793,3 +3800,12 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 本輪兩張附件與既有 V173.20 使用者啟動素材位元組一致；Logo=`assets/ui/startup-logo.4631c0bc3f2b.jpg`，第二幕新增 content-addressed alias `assets/ui/startup-main-city.d43e67af1c1c.jpg`，沒有重新生成圖片。
 - `js/52-v173.20-startup-loader.js` 仍是唯一 StartupStateMachine owner；900ms 僅控制 Logo→第二幕，真實 Firebase/Auth/save 全程並行且 readiness 不等待動畫。
 - `css/firebase-auth.css` 將登入框縮至最多 390px、縮小文字但保留 44px 觸控高度，登入背景持續使用第二幕慢推。兩張圖均進 Critical preload/immutable cache；非必要 gameplay 資產仍維持 lazy。
+
+
+## 2026-09-11 隱私權政策同意 gate
+
+- `privacy-consent.html` 是隱私權政策首次同意與後續查看的唯一 owner；正式政策本文仍由 `privacy.html` 單一維護。
+- `index.html` 只掛一個最高層級同源 iframe gate，不新增第二套 Auth／Startup State Machine。首次未同意時必須把政策滑到底才開始 5 秒倒數，倒數完畢才可按「我同意」；同意版本以 `four_symbols_privacy_consent_version` 儲存在同源 localStorage。
+- 「不同意」先嘗試關閉視窗；因一般瀏覽器通常禁止網頁自行關閉使用者開啟的分頁，失敗時改導向 `privacy-declined.html` 並終止遊戲介面。
+- 同意 gate 持續以隱藏 iframe 作 owner，動態為登入頁插入「隱私權政策」入口，並在主城「系統」的客服列後插入同一入口；兩者皆重新開啟相同政策 viewer，不複製政策本文。
+- 本功能不修改 Firebase UID、登入 provider、存檔、角色資料、戰鬥、掉落或遊戲數值。

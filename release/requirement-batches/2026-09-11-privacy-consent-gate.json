@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-11-privacy-consent-gate",
+  "baseBranch": "dev",
+  "requirements": [
+    {
+      "requirement": "首次進入遊戲時顯示隱私權政策；玩家必須滑到政策底部後才開始 5 秒倒數，倒數完成前『我同意』維持 disabled",
+      "evidence": ["index.html", "privacy-consent.html", "tests/privacy-consent-gate.test.js"]
+    },
+    {
+      "requirement": "『我同意』旁提供『不同意』；不同意時先嘗試關閉遊戲，瀏覽器禁止自行關閉時改進入停止頁且不顯示遊戲",
+      "evidence": ["privacy-consent.html", "privacy-declined.html", "tests/privacy-consent-gate.test.js"]
+    },
+    {
+      "requirement": "登入頁與主城系統頁皆提供隱私權政策入口，並共用 privacy.html 作為唯一政策本文",
+      "evidence": ["privacy-consent.html", "privacy.html", "tests/privacy-consent-gate.test.js"]
+    }
+  ]
+}

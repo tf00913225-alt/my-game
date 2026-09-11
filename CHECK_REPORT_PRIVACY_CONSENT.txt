@@ -1,0 +1,8 @@
+Privacy consent gate verification scope
+- Unique policy text: privacy.html
+- Gate owner: privacy-consent.html
+- Decline fallback: privacy-declined.html
+- index.html change: one top-level same-origin iframe only
+- No Firebase UID/save/battle/economy changes
+- Regression contract: tests/privacy-consent-gate.test.js
+- Repository checks and browser QA: pending PR execution
