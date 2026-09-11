@@ -1,1 +1,1 @@
-trigger 2026-09-11 boss/relic feature build
+trigger 2026-09-11 boss/relic feature build — split verification
