@@ -132,10 +132,11 @@ test("monster portrait audit covers current runtime definitions without hiding p
     assert.equal(report.unregistered.length,0);
     assert.equal(report.orphaned.length,0);
     assert.equal(report.runtimeUniqueNames,report.registeredUniqueNames);
-    assert.equal(report.portraitTargets,107);
-    assert.equal(report.existingTargets,9);
-    assert.equal(report.plannedTargets,98);
-    assert.equal(report.missingPlanned,98);
+    const registry=JSON.parse(fs.readFileSync("config/monster-portrait-registry.json","utf8"));
+    assert.equal(report.portraitTargets,registry.snapshot.portraitTargets);
+    assert.equal(report.existingTargets,registry.snapshot.existingTargets);
+    assert.equal(report.plannedTargets,registry.snapshot.plannedTargets);
+    assert.equal(report.missingPlanned,registry.snapshot.plannedTargets);
 });
 
 console.log(`V169 Abyss/assets flow tests passed: ${passed}`);
