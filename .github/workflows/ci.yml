@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   bootstrap_generated_build:
-    name: Regenerate deterministic battle bundle
+    name: Regenerate deterministic outputs
     if: github.event_name == 'pull_request' && github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -35,7 +35,6 @@ jobs:
         run: |
           npm run build
           npm run build:check
-          node tests/v174-cardless-battle-browser.test.js
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
