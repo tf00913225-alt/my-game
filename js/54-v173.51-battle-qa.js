@@ -17,7 +17,7 @@ if(typeof window.v148GetAutoTargetPriority==="function"){const old=window.v148Ge
 window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 
 /* V174 battle presentation owner.
-   Keep the proven 10-seat geometry and action/turn UI untouched.  Only the
+   Keep the proven 10-seat geometry and action/turn UI untouched. Only the
    visual shell inside each existing combat slot changes: the card frame is
    transparent, artwork gets its own presentation layer, HP/SP text shows the
    current value only, and the already-existing lunge classes animate artwork
@@ -52,11 +52,14 @@ function ensureBattlePresentationStyles(){
     border-radius:50%;background:rgba(0,0,0,.42);filter:blur(2px);
     transform:translateX(-50%);pointer-events:none;
 }
-#game-stage #battlePage .v174-cardless-unit>.v174-battle-art~*{position:relative;z-index:6;}
+#game-stage #battlePage .v174-cardless-unit>.v174-battle-art~*{z-index:6;}
 #game-stage #battlePage .v174-cardless-unit .hp-bar,
 #game-stage #battlePage .v174-cardless-unit .sp-bar,
 #game-stage #battlePage .v174-cardless-unit .monster-hp,
 #game-stage #battlePage .v174-cardless-unit .monster-sp{z-index:20!important;}
+#game-stage #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{
+    opacity:0!important;pointer-events:none!important;
+}
 #game-stage #battlePage .battle-player.v174-cardless-unit.active-turn::after{
     border:0!important;background:none!important;box-shadow:none!important;
 }
@@ -84,6 +87,7 @@ function ensureBattlePresentationStyles(){
     document.head.appendChild(style);
 }
 function numericValue(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0;}
+function setTextIfChanged(node,value){if(node&&node.textContent!==value)node.textContent=value;}
 function battleArtworkSource(card,kind){
     if(!card)return "";
     const computed=getComputedStyle(card);
@@ -110,8 +114,8 @@ function syncResourceNumbers(){
         try{if(Number.isInteger(index)&&typeof getPartyCharacterByIndex==="function")character=getPartyCharacterByIndex(index);}catch(_){}
         if(!character)return;
         const hp=card.querySelector(".hp-bar-text"),sp=card.querySelector(".sp-bar-text");
-        if(hp)hp.textContent=String(numericValue(character.hp));
-        if(sp)sp.textContent=String(numericValue(character.sp));
+        setTextIfChanged(hp,String(numericValue(character.hp)));
+        setTextIfChanged(sp,String(numericValue(character.sp)));
     });
     document.querySelectorAll("#battlePage .battle-monster[id^='battleMonster']").forEach(card=>{
         const index=Number(String(card.id).replace("battleMonster",""));
@@ -119,8 +123,8 @@ function syncResourceNumbers(){
         try{if(Number.isInteger(index)&&typeof monsters!=="undefined")monster=monsters[index];}catch(_){}
         if(!monster)return;
         const hp=card.querySelector(".monster-hp .monster-bar-text"),sp=card.querySelector(".monster-sp .monster-bar-text");
-        if(hp)hp.textContent=String(numericValue(monster.hp));
-        if(sp)sp.textContent=String(numericValue(monster.sp));
+        setTextIfChanged(hp,String(numericValue(monster.hp)));
+        setTextIfChanged(sp,String(numericValue(monster.sp)));
     });
 }
 function syncBattlePresentation(){
@@ -171,9 +175,9 @@ decorateExpRows();
 
 function syncManagement(){
     /*
-       VFX lifecycle belongs exclusively to V142/V143.  This management QA
+       VFX lifecycle belongs exclusively to V142/V143. This management QA
        observer used to hide #v143-skill-stage every 300ms when its broad
-       non-battle heuristic became true.  During a terminal hit battleActive
+       non-battle heuristic became true. During a terminal hit battleActive
        can change before the last visual finishes, which made the final skill
        name/damage appear while the actual Sprite/VFX vanished.
        Never write VFX visibility from this subsystem.
