@@ -1,3 +1,10 @@
+## 2026-09-11 Facebook UID 存檔 hydration 修正
+
+- 症狀：Facebook OAuth 已成功取得 Firebase UID，但 Account UI 顯示 `Account save passed resolution but gameplay hydration failed.`。
+- 根因：Startup State Machine 已在 `resolveSaveFor()` 解析出該 UID 的確切 save payload，`enterReady(save)` 卻忽略參數並再次呼叫 `FourSymbolsGameSave.load()` 重讀 repository；第二次讀取可能與已解析狀態不同步而回傳 false。
+- 修正：`FourSymbolsGameSave` 新增 `hydrate(save)`，沿用既有 `loadGame()` hydration/normalization 邏輯但直接使用已解析 payload；一般 `load()` 行為維持原本從 active UID repository 讀取。真正 verified-empty UID 仍只走 `enterCreation()`，不會誤進 READY。
+- 不修改 save schema、UID ownership、Firestore Rules、Game/Cache Version；`main` 不修改。
+
 ## 2026-09-11 三分支手機 UI／BOSS 秘寶／無卡牌戰鬥安全整合（DEV VERIFIED）
 
 - 整合前 GitHub `dev@34c5603b2ac7c062813489d5ddd1fef95fb20590`、`main@4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`；三條遠端 tip 都精確等於指定 SHA。實際順序為既存 mobile UI／EXP guards → BOSS／四象塔平衡、玩法封面、技能預覽與 Lv20 秘寶 → 無卡牌戰鬥呈現。
