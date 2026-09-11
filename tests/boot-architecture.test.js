@@ -8,6 +8,7 @@ const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
 const intent=fs.readFileSync("js/20-anonymous-20.js","utf8");
 const authUi=fs.readFileSync("js/firebase/firebase-auth-ui.js","utf8");
 const headers=fs.readFileSync("_headers","utf8");
+const bootBrowserQa=fs.readFileSync(".github/scripts/run-boot-architecture-browser-qa.mjs","utf8");
 const abyssLiveQa=fs.readFileSync(".github/scripts/abyss-live-browser-qa-v2.mjs","utf8");
 const abyssLiveQaRunner=fs.readFileSync(".github/scripts/run-abyss-live-browser-qa.mjs","utf8");
 const mainCityRuntime=fs.readFileSync("js/16-stage-v54-main-city-runtime.js","utf8");
@@ -33,6 +34,19 @@ for(const name of forbiddenCritical){
 }
 assert.doesNotMatch(startup,/ensure\("gameplay-core"/);
 assert.match(startup,/async function resolveSaveFor\(user\)[\s\S]*?activeUser=user;[\s\S]*?startAppShell\(\);/);
+assert.match(startup,/function showCharacterCreationSurface\(\)[\s\S]*?saveOwner\.showCreation\(\);/,
+    "startup must enter creation through the app-shell creation lifecycle");
+const enterCreationPath=startup.slice(startup.indexOf("async function enterCreation"),startup.indexOf("function migration"));
+assert.match(enterCreationPath,/showCharacterCreationSurface\(\);/,
+    "NEED_CHARACTER must activate the canonical creation surface before becoming interactive");
+assert.doesNotMatch(enterCreationPath,/creation\.style\.display\s*=\s*["']block["']/,
+    "startup must not bypass the native creation lifecycle with direct display mutation");
+assert.match(bootBrowserQa,/creation-native-active/,
+    "mobile boot QA must verify native creation stage isolation");
+assert.match(bootBrowserQa,/creation-fixed-active/,
+    "mobile boot QA must verify fixed creation lifecycle activation");
+assert.match(bootBrowserQa,/hitInsideNext/,
+    "mobile boot QA must verify the visible CTA remains the hit target across its right side");
 const requireAuthPath=startup.slice(startup.indexOf("function requireAuth"),startup.indexOf("function fail"));
 const bootPath=startup.slice(startup.indexOf("async function boot"),startup.indexOf("global.FourSymbolsStartupPolicy"));
 assert.doesNotMatch(requireAuthPath,/startAppShell\(\);/,
@@ -83,4 +97,4 @@ for(const file of jsFiles){
     assert.equal((source.match(/[A-Za-z0-9+/]{8192,}={0,2}/g)||[]).length,0,file+" contains a large Base64-like payload");
 }
 
-console.log("✓ critical boot boundary, loader ownership, real progress and sprite retirement");
+console.log("✓ critical boot boundary, creation lifecycle, loader ownership, real progress and sprite retirement");
