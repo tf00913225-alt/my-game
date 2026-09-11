@@ -12,6 +12,7 @@ const bootstrap = read("js/firebase/firebase-bootstrap.js");
 const startup = read("js/52-v173.20-startup-loader.js");
 const support = read("js/startup/support-contact.js");
 const productionBuild = read("scripts/build-production.mjs");
+const featureManifest = read("config/feature-manifest.json");
 const touch = read("js/01-stage-v8-touch-lock.js");
 const css = read("css/firebase-auth.css");
 const docs = read("docs/FIREBASE_AUTH_CLOUD_SAVE.md");
@@ -107,13 +108,18 @@ test("Facebook auth uses redirect on mobile and consumes redirect result before 
     assert.match(docs, /mobile browsers use Firebase redirect/i);
 });
 
-test("DEV Facebook diagnostic isolates public_profile and exchanges the Meta token through the same Firebase UID owner", ()=>{
+test("DEV Facebook diagnostic isolates public_profile through the sole feature-loader script owner", ()=>{
     assert.match(auth, /FACEBOOK_DIAGNOSTIC_APP_ID\s*=\s*"1712957419809925"/);
     assert.match(auth, /FACEBOOK_DIAGNOSTIC_API_VERSION\s*=\s*"v26\.0"/);
+    assert.match(auth, /FACEBOOK_DIAGNOSTIC_FEATURE\s*=\s*"facebook-diagnostic-sdk"/);
     assert.match(auth, /function isFacebookDiagnosticHost\(\)/);
     assert.match(auth, /host === "four-symbols-dev\.pages\.dev" \|\| host\.endsWith\("\.four-symbols-dev\.pages\.dev"\)/);
     assert.doesNotMatch(auth, /tf00913225-alt\.github\.io/);
-    assert.match(auth, /connect\.facebook\.net\/zh_TW\/sdk\.js/);
+    assert.match(auth, /FourSymbolsFeatures/);
+    assert.match(auth, /featureOwner\.ensure\(FACEBOOK_DIAGNOSTIC_FEATURE,"facebook-auth-diagnostic"\)/);
+    assert.doesNotMatch(auth, /createElement\(["']script["']\)/);
+    assert.match(featureManifest, /"facebook-diagnostic-sdk"/);
+    assert.match(featureManifest, /https:\/\/connect\.facebook\.net\/zh_TW\/sdk\.js/);
     assert.match(auth, /scope:"public_profile"/);
     assert.doesNotMatch(auth, /addScope\(["']email["']\)/);
     assert.match(auth, /FacebookAuthProvider\.credential\(accessToken\)/);
