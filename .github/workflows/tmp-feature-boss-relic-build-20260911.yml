@@ -20,6 +20,19 @@ jobs:
           ref: feature/boss-balance-gameplay-relic-lv20-20260911
           fetch-depth: 0
 
+      - name: Normalize temporary patch-script template literal
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('scripts/tmp-apply-boss-relic-lv20-20260911.mjs')
+          source=path.read_text()
+          old='assert.equal(context.skillDatabase[skillId].element,boss.element,`${id} contains cross-element skill ${skillId}`);'
+          new='assert.equal(context.skillDatabase[skillId].element,boss.element,id+" contains cross-element skill "+skillId);'
+          if old not in source:
+              raise SystemExit('temporary patch-script interpolation anchor missing')
+          path.write_text(source.replace(old,new,1))
+          PY
+
       - name: Apply focused source and test patches
         run: node scripts/tmp-apply-boss-relic-lv20-20260911.mjs
 
