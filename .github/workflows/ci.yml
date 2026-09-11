@@ -11,42 +11,11 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  bootstrap_first_play_qa:
-    name: Materialize First Play browser QA
-    if: github.event_name == 'pull_request' && github.head_ref == 'feature/first-play-resource-preload-privacy-boot'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: Use current Node.js LTS
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-      - name: Materialize QA and restore standard CI
-        env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          node scripts/apply-first-play-browser-qa.mjs
-          node --check .github/scripts/run-boot-architecture-browser-qa.mjs
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git show "$CI_BASE_SHA:.github/workflows/ci.yml" > .github/workflows/ci.yml
-          git rm -f scripts/apply-first-play-browser-qa.mjs
-          git add -A
-          git status --short
-          git commit -m "test: cover first play boot and privacy browser cases [generated]"
-          git push origin HEAD:${GITHUB_HEAD_REF}
-
   verify:
     name: Repository checks
-    if: github.event_name != 'pull_request' || github.head_ref != 'feature/first-play-resource-preload-privacy-boot'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 

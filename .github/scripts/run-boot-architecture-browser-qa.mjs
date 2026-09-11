@@ -13,6 +13,8 @@ const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 const authPath="/"+Object.keys(manifest.assets).find(file=>/build\/firebase\/firebase-auth\.[0-9a-f]{12}\.js$/.test(file));
 const cloudPath="/"+Object.keys(manifest.assets).find(file=>/build\/firebase\/firebase-cloud-save\.[0-9a-f]{12}\.js$/.test(file));
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const qaReadyFirstPlayRecord={"gameVersion":"173.65","manifestVersion":"2026-09-11.1","assetPackVersion":"2026-09-11.1","manifestHash":"53ab7bd5ba67","completedAt":"2026-09-11T00:00:00.000Z","assets":{"assets/ui/startup-logo.4631c0bc3f2b.jpg":"4631c0bc3f2b","assets/ui/startup-main-city.d43e67af1c1c.jpg":"d43e67af1c1c","build/boot-core.05ad3ef25602.js":"05ad3ef25602","build/boot-core.54057d3bf209.css":"54057d3bf209","build/firebase/firebase-auth-ui.e5782923d110.js":"e5782923d110","build/firebase/firebase-auth.1a91b0527c4e.js":"1a91b0527c4e","build/firebase/firebase-bootstrap.f7dfc587a007.js":"f7dfc587a007","build/firebase/firebase-cloud-save.b602a2be9756.js":"b602a2be9756","build/firebase/firebase-config.4314d6321ba1.js":"4314d6321ba1","privacy-consent.html":"6e020241563c","privacy.html":"51d283f1479a","assets/characters/female_earth.jpg":"263cdadc095c","assets/characters/female_fire.jpg":"9bf0580e1c04","assets/characters/female_water.jpg":"d1a903b2cbd6","assets/characters/female_wind.jpg":"6600198db569","assets/characters/male_earth.jpg":"3fc06609e539","assets/characters/male_fire.jpg":"a269c72a396d","assets/characters/male_water.jpg":"31696971afef","assets/characters/male_wind.jpg":"6f5127957346","assets/ui/home-achievement.png":"9d77024c2fe9","assets/ui/home-announcement.png":"d4d06b9405cb","assets/ui/home-background-v17344.png":"f3a448df2058","assets/ui/home-bestiary.png":"9631707e882a","assets/ui/home-character.png":"fb72a8ab72d1","assets/ui/home-offline-exp.png":"88c0e7411f06","assets/ui/home-quest.png":"2f9b27f3230b","assets/ui/home-rest.png":"e07d0d493a8b","assets/ui/home-shop.png":"a71615a15b05","assets/ui/home-synthesis.png":"bef0960124ff","assets/ui/home-system.png":"c635d5034a57","assets/ui/map-return.png":"76ddbda2af53","assets/ui/nav-backpack.png":"b844fbc20b91","assets/ui/nav-boss.png":"fc2901eceb74","assets/ui/nav-character.png":"37d272be0dd7","assets/ui/nav-dungeon.png":"2cbc2354ffc5","assets/ui/nav-element-box.png":"862a6bfbcd6d","assets/ui/nav-home.png":"692c58ebc556","assets/ui/nav-quest.png":"5bdcf6f56ace","assets/ui/patrol-appearance-switch-icon.png":"69d9f711bb31","build/app-shell.7ada2ccf5804.js":"7ada2ccf5804","build/app-shell.90b2d060c1ab.css":"90b2d060c1ab","assets/characters/battle_female_earth.png":"7add06d9c47c","assets/characters/battle_female_fire.png":"cf43645eb6fd","assets/characters/battle_female_water.png":"cd8f1b74be9f","assets/characters/battle_female_wind.png":"ef5be3d2f6cb","assets/characters/battle_male_earth.png":"2f120e082c78","assets/characters/battle_male_fire.png":"058712570f01","assets/characters/battle_male_water.png":"3ef9a794f903","assets/characters/battle_male_wind.png":"07454a11ee08","assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp":"18f5c279c47f","assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp":"cc9b1898e7c0","assets/characters/patrol/patrol-female-fire-back.c12817139add.webp":"c12817139add","assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp":"6cb6c8d514b1","assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp":"67b1492aecc7","assets/characters/patrol/patrol-female-water-front.5269ab380524.webp":"5269ab380524","assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp":"bf0f5c5067c9","assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp":"75dc64898d71","assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp":"a421cb635062","assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp":"0677960124f5","assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp":"e987b7a8e45f","assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp":"e8288d5dfe71","assets/characters/patrol/patrol-male-water-back.db1078669837.webp":"db1078669837","assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp":"67d1d8aebfc8","assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp":"cb339ccc0db5","assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp":"ee42171e1658","assets/ui/training-background.jpg":"46a37ac81760","build/feature-patrol.5e57b7df47ae.js":"5e57b7df47ae","build/feature-patrol.cfd1c32784cf.css":"cfd1c32784cf","build/gameplay-core.66aabbca8080.js":"66aabbca8080","build/gameplay-core.6c6d798d188e.css":"6c6d798d188e"}};
+const qaStaleFirstPlayRecord={"gameVersion":"173.65","manifestVersion":"2026-09-11.1","assetPackVersion":"2026-09-11.1","manifestHash":"qa-stale-manifest","completedAt":"2026-09-11T00:00:00.000Z","assets":{"assets/ui/startup-logo.4631c0bc3f2b.jpg":"4631c0bc3f2b","assets/ui/startup-main-city.d43e67af1c1c.jpg":"d43e67af1c1c","build/boot-core.05ad3ef25602.js":"05ad3ef25602","build/boot-core.54057d3bf209.css":"54057d3bf209","build/firebase/firebase-auth-ui.e5782923d110.js":"e5782923d110","build/firebase/firebase-auth.1a91b0527c4e.js":"1a91b0527c4e","build/firebase/firebase-bootstrap.f7dfc587a007.js":"f7dfc587a007","build/firebase/firebase-cloud-save.b602a2be9756.js":"b602a2be9756","build/firebase/firebase-config.4314d6321ba1.js":"4314d6321ba1","privacy-consent.html":"6e020241563c","privacy.html":"51d283f1479a","assets/characters/female_earth.jpg":"263cdadc095c","assets/characters/female_fire.jpg":"9bf0580e1c04","assets/characters/female_water.jpg":"d1a903b2cbd6","assets/characters/female_wind.jpg":"6600198db569","assets/characters/male_earth.jpg":"3fc06609e539","assets/characters/male_fire.jpg":"a269c72a396d","assets/characters/male_water.jpg":"31696971afef","assets/characters/male_wind.jpg":"6f5127957346","assets/ui/home-achievement.png":"9d77024c2fe9","assets/ui/home-announcement.png":"d4d06b9405cb","assets/ui/home-background-v17344.png":"f3a448df2058","assets/ui/home-bestiary.png":"9631707e882a","assets/ui/home-character.png":"fb72a8ab72d1","assets/ui/home-offline-exp.png":"88c0e7411f06","assets/ui/home-quest.png":"2f9b27f3230b","assets/ui/home-rest.png":"e07d0d493a8b","assets/ui/home-shop.png":"a71615a15b05","assets/ui/home-synthesis.png":"bef0960124ff","assets/ui/home-system.png":"c635d5034a57","assets/ui/map-return.png":"76ddbda2af53","assets/ui/nav-backpack.png":"b844fbc20b91","assets/ui/nav-boss.png":"fc2901eceb74","assets/ui/nav-character.png":"37d272be0dd7","assets/ui/nav-dungeon.png":"2cbc2354ffc5","assets/ui/nav-element-box.png":"862a6bfbcd6d","assets/ui/nav-home.png":"qa-stale-asset","assets/ui/nav-quest.png":"5bdcf6f56ace","assets/ui/patrol-appearance-switch-icon.png":"69d9f711bb31","build/app-shell.7ada2ccf5804.js":"7ada2ccf5804","build/app-shell.90b2d060c1ab.css":"90b2d060c1ab","assets/characters/battle_female_earth.png":"7add06d9c47c","assets/characters/battle_female_fire.png":"cf43645eb6fd","assets/characters/battle_female_water.png":"cd8f1b74be9f","assets/characters/battle_female_wind.png":"ef5be3d2f6cb","assets/characters/battle_male_earth.png":"2f120e082c78","assets/characters/battle_male_fire.png":"058712570f01","assets/characters/battle_male_water.png":"3ef9a794f903","assets/characters/battle_male_wind.png":"07454a11ee08","assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp":"18f5c279c47f","assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp":"cc9b1898e7c0","assets/characters/patrol/patrol-female-fire-back.c12817139add.webp":"c12817139add","assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp":"6cb6c8d514b1","assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp":"67b1492aecc7","assets/characters/patrol/patrol-female-water-front.5269ab380524.webp":"5269ab380524","assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp":"bf0f5c5067c9","assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp":"75dc64898d71","assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp":"a421cb635062","assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp":"0677960124f5","assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp":"e987b7a8e45f","assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp":"e8288d5dfe71","assets/characters/patrol/patrol-male-water-back.db1078669837.webp":"db1078669837","assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp":"67d1d8aebfc8","assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp":"cb339ccc0db5","assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp":"ee42171e1658","assets/ui/training-background.jpg":"46a37ac81760","build/feature-patrol.5e57b7df47ae.js":"5e57b7df47ae","build/feature-patrol.cfd1c32784cf.css":"cfd1c32784cf","build/gameplay-core.66aabbca8080.js":"66aabbca8080","build/gameplay-core.6c6d798d188e.css":"6c6d798d188e"}};
 
 function chromeBinary(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
@@ -77,12 +79,25 @@ export async function submitLegacyMigrationCandidate(){throw new Error("QA never
 `;
 
 function qaPrelude(){
+    const ready=JSON.stringify(qaReadyFirstPlayRecord);
+    const stale=JSON.stringify(qaStaleFirstPlayRecord);
     return `<script>
 window.__qaIdleCallbacks=[];
 window.requestIdleCallback=function(callback){window.__qaIdleCallbacks.push(callback);return window.__qaIdleCallbacks.length;};
 (function(){
   var scenario=new URL(location.href).searchParams.get("scenario")||"";
-  localStorage.setItem("four_symbols_privacy_consent",JSON.stringify({privacyPolicyVersion:"2026-09-11-v2",acceptedAt:"2026-09-11T00:00:00.000Z"}));
+  var noConsent=scenario==="first-play-fresh"||scenario==="privacy-update";
+  var noReady=scenario==="first-play-fresh"||scenario==="resource-404"||scenario==="decode-fail";
+  if(!noConsent){localStorage.setItem("four_symbols_privacy_consent",JSON.stringify({privacyPolicyVersion:"2026-09-11-v2",acceptedAt:"2026-09-11T00:00:00.000Z"}));}
+  if(scenario==="privacy-update"){localStorage.setItem("four_symbols_privacy_consent",JSON.stringify({privacyPolicyVersion:"2026-09-10-v1",acceptedAt:"2026-09-10T00:00:00.000Z"}));}
+  if(!noReady){localStorage.setItem("four_symbols_first_play_ready",scenario==="manifest-update"?${stale}:${ready});}
+  if(scenario==="decode-fail"&&Image.prototype.decode){
+    var nativeDecode=Image.prototype.decode;
+    Image.prototype.decode=function(){
+      if(!window.__qaDecodeFailed&&String(this.src||"").indexOf("blob:")===0){window.__qaDecodeFailed=true;return Promise.reject(new Error("QA simulated image decode failure"));}
+      return nativeDecode.call(this);
+    };
+  }
   var legacy={player:{id:"舊版角色",element:"water",level:8}};
   if(scenario==="legacy-empty"||scenario==="legacy-cloud"){localStorage.setItem("battle_full_version_save_v5",JSON.stringify(legacy));}
   if(scenario==="corrupt"){
@@ -99,12 +114,17 @@ function mime(file){
 }
 
 async function createQaServer(){
+    let activeScenario="";
+    let injected404=false;
     const server=http.createServer(async(request,response)=>{
         try{
             const url=new URL(request.url,"http://127.0.0.1");
             if(url.pathname===authPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}
             if(url.pathname===cloudPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
             const relative=decodeURIComponent(url.pathname==="/"?"index.html":url.pathname.slice(1));
+            if(relative==="index.html"){ activeScenario=url.searchParams.get("scenario")||""; injected404=false; }
+            if(activeScenario==="resource-404"&&relative==="assets/ui/nav-home.png"&&!injected404){ injected404=true; response.writeHead(404,{"cache-control":"no-store"}); response.end("qa missing first-play asset"); return; }
+            if(activeScenario==="manifest-update"&&relative==="assets/ui/nav-home.png"){ await sleep(10800); }
             const file=path.resolve(ROOT,relative);
             if(file!==ROOT&&!file.startsWith(ROOT+path.sep)){response.writeHead(403);response.end("forbidden");return;}
             if(!fs.existsSync(file)||!fs.statSync(file).isFile()){response.writeHead(404);response.end("missing");return;}
@@ -141,7 +161,7 @@ class CdpClient{
     close(){try{this.socket&&this.socket.close();}catch(_){}}
 }
 
-async function waitFor(client,expression,label,timeoutMs=15000){
+async function waitFor(client,expression,label,timeoutMs=22000){
     const started=Date.now();let last="";
     while(Date.now()-started<timeoutMs){try{if(await client.eval(`Boolean(${expression})`)){return;}}catch(error){last=error.message;}await sleep(100);}
     throw new Error(`Timed out waiting for ${label}. ${last}`);
@@ -193,7 +213,7 @@ async function metrics(client,readyMark){
     })()`);
 }
 
-const evidence={schemaVersion:1,status:"RUNNING",release:manifest.release,environment:"local HTTP, mobile emulation, deterministic Firebase Auth/Firestore test doubles; production bundles unchanged",checks:{},performance:{}};
+const evidence={schemaVersion:2,status:"RUNNING",release:manifest.release,firstPlay:{manifestHash:manifest.firstPlay.manifestHash,totalBytes:manifest.firstPlay.totalBytes,totalResources:manifest.firstPlay.totalResources,concurrency:manifest.firstPlay.concurrency},environment:"local HTTP, mobile emulation, deterministic Firebase Auth/Firestore test doubles; production bundles unchanged",checks:{},performance:{}};
 const server=await createQaServer();
 const address=server.address();
 const origin=`http://127.0.0.1:${address.port}`;
@@ -214,7 +234,47 @@ try{
     const clear=()=>client.send("Storage.clearDataForOrigin",{origin,storageTypes:"all"});
     const navigate=async scenario=>{await client.send("Page.navigate",{url:`${origin}/?scenario=${encodeURIComponent(scenario)}&run=${Date.now()}`});await waitFor(client,"document.readyState==='complete'","document load");};
 
-    await client.send("Network.setCacheDisabled",{cacheDisabled:true});await clear();await navigate("signed-out");
+    await client.send("Network.setCacheDisabled",{cacheDisabled:true});
+
+    // CASE 1 + CASE 5: a truly fresh device prepares the real pack first and
+    // cannot initialize Firebase while privacy has not been accepted.
+    await clear();await navigate("first-play-fresh");
+    await waitFor(client,"document.getElementById('privacyConsentGate')&&!document.getElementById('privacyConsentGate').hidden&&document.getElementById('startupProgress').getAttribute('aria-valuenow')==='100'","fresh First Play privacy gate",30000);
+    const freshPack=await client.eval(`(()=>{const gate=document.getElementById("privacyConsentGate");const rec=JSON.parse(localStorage.getItem("four_symbols_first_play_ready")||"null");const portrait=document.getElementById("creationPortrait");const resources=performance.getEntriesByType("resource").map(e=>new URL(e.name).pathname);return {state:FourSymbolsStartupPolicy.getState(),percent:document.getElementById("startupProgress").getAttribute("aria-valuenow"),privacyVisible:!gate.hidden,authInstalled:!!window.FourSymbolsFirebaseLifecycle,authOverlay:!!document.getElementById("firebaseAuthOverlay"),recordHash:rec&&rec.manifestHash,recordBytes:window.FourSymbolsFirstPlay.getManifest().totalBytes,portraitReady:portrait.complete&&portrait.naturalWidth>0,hasAppShell:resources.some(p=>/\/app-shell\./.test(p)),hasGameplay:resources.some(p=>/\/gameplay-core\./.test(p)),hasPatrol:resources.some(p=>/\/feature-patrol\./.test(p))};})()`);
+    assert.equal(freshPack.state,"BOOT_LOADING");assert.equal(freshPack.percent,"100");assert.equal(freshPack.privacyVisible,true);assert.equal(freshPack.authInstalled,false,"Firebase initialized before privacy consent");assert.equal(freshPack.authOverlay,false);assert.equal(freshPack.recordHash,manifest.firstPlay.manifestHash);assert.equal(freshPack.recordBytes,manifest.firstPlay.totalBytes);assert.equal(freshPack.portraitReady,true,"Creation portrait was not render-ready before account flow");assert.equal(freshPack.hasAppShell,true);assert.equal(freshPack.hasGameplay,true);assert.equal(freshPack.hasPatrol,true);evidence.checks.firstPlayFresh=freshPack;
+    await client.eval(`(()=>{const gate=document.getElementById("privacyConsentGate");const consent=gate.contentWindow.document;const policy=consent.getElementById("policyFrame");const root=policy.contentDocument.scrollingElement||policy.contentDocument.documentElement;policy.contentWindow.scrollTo(0,root.scrollHeight);policy.contentWindow.dispatchEvent(new Event("scroll"));})()`);
+    await waitFor(client,"document.getElementById('privacyConsentGate').contentWindow.document.getElementById('agreeButton').disabled===false","privacy agree enabled");
+    await client.eval(`document.getElementById("privacyConsentGate").contentWindow.document.getElementById("agreeButton").click()`);
+    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","fresh privacy acceptance opens auth");
+    evidence.checks.firstPlayPrivacyAccepted=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_privacy_consent"))`);
+    assert.equal(evidence.checks.firstPlayPrivacyAccepted.privacyPolicyVersion,"2026-09-11-v2");
+
+    // CASE 3: a stale manifest gets a differential update. The 5+5 branding
+    // finishes first, but scene 2 remains visible until the deliberately slow
+    // changed asset completes.
+    await clear();const updateStarted=Date.now();await navigate("manifest-update");await sleep(10100);
+    const updateHold=await client.eval(`(()=>({scene:document.getElementById("startupLoader").dataset.scene,hidden:document.getElementById("startupLoader").hidden,title:document.getElementById("startupStatusTitle").textContent,percent:Number(document.getElementById("startupProgress").getAttribute("aria-valuenow")),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false}))()`);
+    assert.equal(updateHold.scene,"city");assert.equal(updateHold.hidden,false);assert.match(updateHold.title,/更新必要資源/);assert.ok(updateHold.percent<100);assert.equal(updateHold.authShown,false);evidence.checks.manifestUpdateHold={...updateHold,elapsedMs:Date.now()-updateStarted};
+    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","manifest update completion",30000);
+    const updatedRecord=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_first_play_ready"))`);assert.equal(updatedRecord.manifestHash,manifest.firstPlay.manifestHash);evidence.checks.manifestUpdateReady={manifestHash:updatedRecord.manifestHash};
+
+    // CASE 4a: HTTP failure blocks auth and exposes a failed-only retry.
+    await clear();await navigate("resource-404");await waitFor(client,"!document.getElementById('startupRetryButton').hidden","First Play HTTP retry",30000);
+    const httpFail=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),title:document.getElementById("startupStatusTitle").textContent,failed:FourSymbolsFirstPlay.getLastFailed(),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false}))()`);assert.equal(httpFail.state,"BOOT_LOADING");assert.match(httpFail.title,/部分必要資源載入失敗/);assert.equal(httpFail.authShown,false);assert.equal(httpFail.failed.length,1);assert.match(httpFail.failed[0].path,/nav-home\.png$/);evidence.checks.resource404=httpFail;
+    await client.eval(`document.getElementById("startupRetryButton").click()`);await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","HTTP failed-only retry completion",30000);
+
+    // CASE 4b: actual Image.decode() rejection is also fatal until retried.
+    await clear();await navigate("decode-fail");await waitFor(client,"!document.getElementById('startupRetryButton').hidden","First Play decode retry",30000);
+    const decodeFail=await client.eval(`(()=>({failed:FourSymbolsFirstPlay.getLastFailed(),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false,record:localStorage.getItem("four_symbols_first_play_ready")}))()`);assert.equal(decodeFail.authShown,false);assert.equal(decodeFail.record,null);assert.ok(decodeFail.failed.some(item=>/decode/i.test(item.message)),"Decode failure was not surfaced");evidence.checks.decodeFailure=decodeFail;
+    await client.eval(`document.getElementById("startupRetryButton").click()`);await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","decode failed-only retry completion",30000);
+
+    // CASE 6: an older privacy version is not accepted for this release.
+    await clear();await navigate("privacy-update");await waitFor(client,"document.getElementById('privacyConsentGate')&&!document.getElementById('privacyConsentGate').hidden","updated privacy gate",30000);
+    const privacyUpdate=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),authInstalled:!!window.FourSymbolsFirebaseLifecycle,stored:JSON.parse(localStorage.getItem("four_symbols_privacy_consent"))}))()`);assert.equal(privacyUpdate.state,"BOOT_LOADING");assert.equal(privacyUpdate.authInstalled,false);assert.equal(privacyUpdate.stored.privacyPolicyVersion,"2026-09-10-v1");evidence.checks.privacyVersionUpdate=privacyUpdate;
+    await client.eval(`(()=>{const consent=document.getElementById("privacyConsentGate").contentWindow.document;const policy=consent.getElementById("policyFrame");const root=policy.contentDocument.scrollingElement||policy.contentDocument.documentElement;policy.contentWindow.scrollTo(0,root.scrollHeight);policy.contentWindow.dispatchEvent(new Event("scroll"));})()`);await waitFor(client,"document.getElementById('privacyConsentGate').contentWindow.document.getElementById('agreeButton').disabled===false","updated privacy agreement enabled");await client.eval(`document.getElementById("privacyConsentGate").contentWindow.document.getElementById("agreeButton").click()`);await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","updated privacy accepted");
+
+    // CASE 2 / normal regression matrix starts from a current First Play record.
+    await clear();await navigate("signed-out");
     try{
         await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'&&document.getElementById('firebaseAuthOverlay')?.classList.contains('show')","signed-out auth UI");
     }catch(error){
@@ -225,7 +285,7 @@ try{
     const signedOut=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),creation:getComputedStyle(document.getElementById("creationPage")).display,labels:[...document.querySelectorAll("#firebaseSignedOutPanel button")].map(button=>button.textContent.trim()),uid:FourSymbolsStartupPolicy.getUid(),featureResources:performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>/app-shell|gameplay-core|feature-/.test(name))}))()`);
     assert.equal(signedOut.state,"AUTH_REQUIRED");assert.equal(signedOut.creation,"none");assert.equal(signedOut.uid,null);
     for(const label of ["Google 登入","訪客開始遊戲","Email 登入","建立帳號"]){assert.ok(signedOut.labels.includes(label),"Missing auth action: "+label);}
-    assert.deepEqual(signedOut.featureResources,[],"Signed-out Critical Boot fetched an authenticated/gameplay feature");
+    assert.ok(signedOut.featureResources.some(name=>/app-shell/.test(name)),"First Play did not warm app-shell");assert.ok(signedOut.featureResources.some(name=>/gameplay-core/.test(name)),"First Play did not warm gameplay-core");assert.ok(signedOut.featureResources.some(name=>/feature-patrol/.test(name)),"First Play did not warm patrol");assert.equal(signedOut.featureResources.some(name=>/feature-(?:abyss|skill|boss-relic)/.test(name)),false,"First Play eagerly fetched a deep optional feature");
     evidence.checks.authFirst=signedOut;evidence.performance.coldAuth=await metrics(client,"four-symbols:auth-ui-interactive");
     assert.ok(evidence.performance.coldAuth.readyMs>=9800&&evidence.performance.coldAuth.readyMs<=13000,"Returning auth UI must respect the deliberate 5s + 5s brand opening");
     const authPresentation=await client.eval(`(()=>{const o=document.getElementById("firebaseAuthOverlay"),d=o.querySelector(".firebase-auth-dialog"),t=o.querySelector(".firebase-auth-title"),r=d.getBoundingClientRect(),bg=getComputedStyle(o,"::before").backgroundImage;return {backdrop:bg,dialogWidth:r.width,titleFont:parseFloat(getComputedStyle(t).fontSize),cityRequested:performance.getEntriesByType("resource").some(e=>new URL(e.name).pathname.endsWith("/assets/ui/startup-main-city.d43e67af1c1c.jpg"))};})()`);
@@ -321,7 +381,7 @@ try{
 
     await clear();await navigate("existing-a");await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","existing account main city",20000);
     const accountA=await client.eval(`(()=>({uid:FourSymbolsStartupPolicy.getUid(),playerId:player.id,gold:gold,sharedExp:sharedExp,item:inventoryItems[0]?.id,equipment:characterEquipment.fire.hand?.id,creation:getComputedStyle(document.getElementById("creationPage")).display,game:getComputedStyle(document.getElementById("gameInterface")).display,gameplayBeforeCity:performance.getEntriesByType("resource").filter(entry=>/gameplay-core|feature-/.test(entry.name)&&entry.startTime<performance.getEntriesByName("four-symbols:main-city-interactive")[0].startTime).map(entry=>new URL(entry.name).pathname)}))()`);
-    assert.equal(accountA.uid,"uid-A");assert.equal(accountA.playerId,"角色-A");assert.equal(accountA.gold,1111);assert.equal(accountA.sharedExp,111);assert.equal(accountA.item,"qa-token-A");assert.equal(accountA.equipment,"qa-blade-A");assert.equal(accountA.creation,"none");assert.notEqual(accountA.game,"none");assert.deepEqual(accountA.gameplayBeforeCity,[]);
+    assert.equal(accountA.uid,"uid-A");assert.equal(accountA.playerId,"角色-A");assert.equal(accountA.gold,1111);assert.equal(accountA.sharedExp,111);assert.equal(accountA.item,"qa-token-A");assert.equal(accountA.equipment,"qa-blade-A");assert.equal(accountA.creation,"none");assert.notEqual(accountA.game,"none");assert.ok(accountA.gameplayBeforeCity.some(path=>/gameplay-core/.test(path)),"First Play gameplay core was not warmed before city");assert.equal(accountA.gameplayBeforeCity.some(path=>/feature-(?:abyss|skill|boss-relic)/.test(path)),false,"Deep optional feature loaded before city");
     evidence.checks.existingUser=accountA;evidence.performance.coldExisting=await metrics(client,"four-symbols:main-city-interactive");
 
     const localLoading=await client.eval(`(()=>{const feature=document.createElement("button");feature.id="qaInventoryFeature";feature.dataset.feature="inventory";feature.textContent="inventory";const control=document.createElement("button");control.id="qaControl";control.textContent="control";window.__qaControlClicks=0;control.addEventListener("click",()=>window.__qaControlClicks++);document.body.append(feature,control);feature.dispatchEvent(new PointerEvent("pointerdown",{bubbles:true,pointerType:"touch",pointerId:7}));feature.click();control.click();return {busy:feature.getAttribute("aria-busy"),localClass:feature.classList.contains("is-feature-loading"),controlClicks:window.__qaControlClicks,startupState:FourSymbolsStartupPolicy.getState(),startupHidden:document.getElementById("startupLoader").hidden};})()`);
@@ -333,7 +393,7 @@ try{
     await waitFor(client,"FourSymbolsFeatures.isReady('dungeon')&&document.getElementById('dungeonPage').classList.contains('active')","lazy dungeon entry",15000);
     evidence.checks.dungeonEntry=await client.eval(`(()=>({ready:FourSymbolsFeatures.isReady("dungeon"),active:document.getElementById("dungeonPage").classList.contains("active"),startupState:FourSymbolsStartupPolicy.getState()}))()`);
 
-    const beforePatrol=await client.eval(`performance.getEntriesByType("resource").filter(entry=>new URL(entry.name).pathname.includes("/assets/characters/patrol/patrol-")).length`);assert.equal(beforePatrol,0,"Patrol art loaded before patrol feature");
+    const beforePatrol=await client.eval(`performance.getEntriesByType("resource").filter(entry=>new URL(entry.name).pathname.includes("/assets/characters/patrol/patrol-")).length`);assert.ok(beforePatrol>0,"First Play did not prepare immediate patrol art");
     const idle=await client.eval(`(()=>{const callback=window.__qaIdleCallbacks.shift();if(callback){callback({didTimeout:false,timeRemaining:()=>50});}return {released:!!callback,remaining:window.__qaIdleCallbacks.length};})()`);assert.equal(idle.released,true,"Background idle preload was not scheduled");
     await waitFor(client,"performance.getEntriesByType('resource').some(entry=>{const path=new URL(entry.name).pathname;return path.includes('/feature-patrol.')&&path.endsWith('.js');})","idle patrol preload",10000);
     assert.equal(await client.eval(`FourSymbolsFeatures.isReady("patrol")`),false,"Idle preload executed patrol code instead of only fetching it");
@@ -351,12 +411,12 @@ try{
     await client.send("Network.setCacheDisabled",{cacheDisabled:false});await client.send("Page.reload",{ignoreCache:false});
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","warm account restore",15000);
     evidence.performance.warmExisting=await metrics(client,"four-symbols:main-city-interactive");
-    assert.ok(evidence.performance.warmExisting.readyMs>0&&evidence.performance.warmExisting.readyMs<=3000,"Controlled warm main-city budget exceeded");
+    assert.ok(evidence.performance.warmExisting.readyMs>=9800&&evidence.performance.warmExisting.readyMs<=15000,"Warm returning main city did not respect the deliberate 5s + 5s brand opening");
     evidence.checks.warmRestore=await client.eval(`(()=>({uid:FourSymbolsStartupPolicy.getUid(),playerId:player.id,creation:getComputedStyle(document.getElementById("creationPage")).display,game:getComputedStyle(document.getElementById("gameInterface")).display}))()`);
     assert.equal(evidence.checks.warmRestore.uid,"uid-B");assert.equal(evidence.checks.warmRestore.playerId,"角色-B");assert.equal(evidence.checks.warmRestore.creation,"none");assert.notEqual(evidence.checks.warmRestore.game,"none");
 
     evidence.status="PASS";evidence.finishedAt=new Date().toISOString();fs.writeFileSync(evidenceFile,JSON.stringify(evidence,null,2)+"\n");
-    console.log(`✓ Boot architecture mobile browser QA passed (cold auth ${evidence.performance.coldAuth.readyMs}ms; warm city ${evidence.performance.warmExisting.readyMs}ms)`);
+    console.log(`✓ Boot / First Play mobile browser QA passed (pack ${manifest.firstPlay.totalResources} resources / ${manifest.firstPlay.totalBytes} bytes; returning auth ${evidence.performance.coldAuth.readyMs}ms; warm city ${evidence.performance.warmExisting.readyMs}ms)`);
 }catch(error){
     evidence.status="FAIL";evidence.error=error?.stack||String(error);evidence.failureDiagnostic=await browserDiagnostic(client);evidence.chromeStderr=chromeStderr.slice(-6000);evidence.finishedAt=new Date().toISOString();fs.writeFileSync(evidenceFile,JSON.stringify(evidence,null,2)+"\n");console.error(error);process.exitCode=1;
 }finally{
