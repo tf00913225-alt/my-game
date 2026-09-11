@@ -17,6 +17,7 @@
       "verification": [
         "tests/gameplay-boss-tower-system.test.js: PASS",
         "Focused feature workflow syntax/runtime verification: PASS",
+        "Final clean production rebuild d5bb01f363bf1f2d8078d102e498fbf15e976776: PASS",
         "PR #167 Repository checks on final clean HEAD: pending"
       ]
     },
@@ -30,6 +31,7 @@
       "verification": [
         "tests/gameplay-ui-mobile-browser.test.js at 390x844: PASS",
         "Focused production build --check: PASS",
+        "Final clean production rebuild d5bb01f363bf1f2d8078d102e498fbf15e976776: PASS",
         "PR #167 Repository checks on final clean HEAD: pending"
       ]
     },
@@ -43,7 +45,9 @@
       "verification": [
         "tests/gameplay-ui-mobile-browser.test.js at 390x844: PASS",
         "tests/ui-v174-current-fixes-mobile-browser.test.js at 390x844 and 412x915: PASS",
+        "tests/v174-current-ui-fixes.test.js owner convergence: PASS",
         "Focused production build --check and loader: PASS",
+        "Final clean production rebuild d5bb01f363bf1f2d8078d102e498fbf15e976776: PASS",
         "PR #167 Repository checks on final clean HEAD: pending"
       ]
     },
@@ -57,6 +61,7 @@
       "verification": [
         "tests/v174-relic-progression-drop-system.test.js: PASS",
         "Focused feature workflow persistence verification: PASS",
+        "Final clean production rebuild d5bb01f363bf1f2d8078d102e498fbf15e976776: PASS",
         "PR #167 Repository checks on final clean HEAD: pending"
       ]
     }
