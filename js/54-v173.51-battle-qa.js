@@ -32,6 +32,7 @@ function ensureBattlePresentationStyles(){
     border:0!important;outline:0!important;box-shadow:none!important;
     background-color:transparent!important;background-image:none!important;
     isolation:isolate!important;
+    transition-property:opacity!important;transition-duration:.15s!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
     position:absolute!important;inset:0!important;z-index:1!important;
