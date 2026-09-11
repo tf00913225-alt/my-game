@@ -1105,7 +1105,8 @@
             }
         });
         let section=grid.querySelector(".relic-progression-boss-preview");
-        if(!section){ section=document.createElement("section");section.className="relic-progression-boss-preview";grid.appendChild(section); }
+        if(!section){ section=document.createElement("section");section.className="relic-progression-boss-preview"; }
+        if(grid.firstElementChild!==section){ grid.insertBefore(section,grid.firstElementChild); }
         const fragments=preview.pool.length?preview.pool.map(entry=>entry.name+"碎片（單場約 "+Math.max(1,Math.round(entry.chance*100))+"%）").join("、"):"目前沒有可用的專屬碎片池";
         const u=Math.round(preview.universalChance*100),b=Math.round(preview.breakthroughChance*100);
         section.innerHTML='<h4>秘寶可能獲得</h4><p>'+esc(fragments)+'</p><small>抽中專屬碎片時：×'+preview.fragmentRange[0]+'～'+preview.fragmentRange[1]+'；秘寶精華：×'+preview.essenceRange[0]+'～'+preview.essenceRange[1]+'（必得）。'+

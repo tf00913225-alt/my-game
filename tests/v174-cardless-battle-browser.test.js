@@ -108,6 +108,11 @@ window.__qaBefore=qaRects();
       playerShadow:getComputedStyle(player).boxShadow,
       enemyShadow:getComputedStyle(enemy).boxShadow,
       playerArt:!!art,
+      playerArtBackgroundSize:getComputedStyle(art).backgroundSize,
+      playerArtRect:qaRect('#battlePlayerCard0 > .v174-battle-art'),
+      playerHpRect:qaRect('#battlePlayerCard0 > .hp-bar'),
+      playerSpRect:qaRect('#battlePlayerCard0 > .sp-bar'),
+      playerNameRect:qaRect('#battlePlayerCard0 > .battle-player-id'),
       enemyArt:!!enemyArt,
       playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,
       lungeAnimation:lungeAnimation,
@@ -150,6 +155,10 @@ function runViewport(chrome,width,height){
     assert.equal(data.playerShadow,"none");
     assert.equal(data.enemyShadow,"none");
     assert.equal(data.playerArt,true);
+    assert.equal(data.playerArtBackgroundSize,"contain");
+    assert.ok(data.playerArtRect.bottom<=data.playerHpRect.top,"player artwork must end above HP bar");
+    assert.ok(data.playerHpRect.bottom<=data.playerSpRect.top+1,"HP bar must sit above SP bar without portrait overlap");
+    assert.ok(data.playerSpRect.bottom<=data.playerNameRect.top+1,"player name must sit below both resource bars");
     assert.equal(data.enemyArt,true);
     assert.equal(data.playerIdle,"v174BattleIdle");
     assert.equal(data.lungeAnimation,"v174BattleLungeUp");
