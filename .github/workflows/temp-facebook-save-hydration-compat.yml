@@ -1,0 +1,52 @@
+name: Temp Facebook save hydration compatibility
+
+on:
+  pull_request:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  patch-build:
+    if: github.head_ref == 'fix/facebook-save-hydration-20260911'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Preserve legacy loadGame extraction contract
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          main=Path('js/00-main.js')
+          text=main.read_text(encoding='utf-8')
+          old='function loadGame(resolvedSave=null){\n\n    try{'
+          new='function loadGame(){\n\n    const resolvedSave=arguments[0]||null;\n\n    try{'
+          if old not in text:
+              raise SystemExit('loadGame signature anchor not found')
+          main.write_text(text.replace(old,new,1),encoding='utf-8')
+
+          test=Path('tests/facebook-save-hydration.test.mjs')
+          t=test.read_text(encoding='utf-8')
+          old='assert.match(core,/function loadGame\\(resolvedSave=null\\)/);'
+          new='assert.match(core,/function loadGame\\(\\)\\{[\\s\\S]*?const resolvedSave=arguments\\[0\\]\\|\\|null;/);'
+          if old not in t:
+              raise SystemExit('hydration test signature anchor not found')
+          test.write_text(t.replace(old,new,1),encoding='utf-8')
+          PY
+      - name: Regenerate deterministic production assets
+        run: node scripts/build-production.mjs
+      - name: Commit compatibility fix
+        shell: bash
+        run: |
+          git add js/00-main.js tests/facebook-save-hydration.test.mjs index.html asset-manifest.json build/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix(auth): preserve loadGame extraction contract"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
