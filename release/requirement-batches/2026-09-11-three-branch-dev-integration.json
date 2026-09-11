@@ -29,19 +29,24 @@
     },
     {
       "id": "BOSS-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "feature/boss-balance-gameplay-cover-skill-preview-relic-20260911@7751692d9df4afba08a5ce7058661ca3ede682c4 安全合入目前 dev，保留現有 Boss 4:3 手機修正並納入平衡、援軍、16:9 玩法封面、克制說明與 Lv20 秘寶里程碑",
       "evidence": [
         "Manual merge preserved the newer dev 4:3 Boss/mechanism owner while adding the 16:9 gameplay cover and expanded body-mounted element-counter hint",
         "Boss/Tower 13/13 runtime tests, relic progression, integration source contracts and battle-preservation tests passed locally",
-        "Remote integration PR Repository checks and dev exact-SHA deployment pending"
+        "Integration PR #172 run 34578585776 and dev run 34578810848 Repository checks SUCCESS",
+        "Actual dev merge 6de0d00d413362fd5e860698b1fa0ec76addc55d; exact-SHA deployment and live QA SUCCESS"
       ]
     },
     {
       "id": "CARDLESS-01",
-      "status": "TODO",
+      "status": "IMPLEMENTED",
       "requirement": "fix/battle-cardless-motion-ui@d802f846d80301fe96b97dea1c6055a1e13377c4 以已含前兩條工作的 dev 為基底整合，且不改變戰鬥席位、action/turn UI、技能 VFX owner 或增加重複 observer",
-      "evidence": []
+      "evidence": [
+        "Merged exact work commit into verified dev 6de0d00d413362fd5e860698b1fa0ec76addc55d; only generated manifests/gameplay-core rename conflicted",
+        "Existing single MutationObserver callback is extended; no second observer, listener, battle state owner or VFX owner is introduced",
+        "Local cardless presentation/browser and final remote CI/deployment verification pending"
+      ]
     },
     {
       "id": "INTEGRATION-02",

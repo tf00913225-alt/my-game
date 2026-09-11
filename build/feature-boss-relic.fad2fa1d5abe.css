@@ -132,7 +132,7 @@
 }
 
 /* Gameplay activity covers use the same 16:9 production ratio as dungeon
-   covers. Combat BOSS/mechanism cards remain independent 9:16 components. */
+   covers. Combat BOSS/mechanism cards remain independent 4:3 components. */
 #game-stage .gameplay-mode-card{
     position:relative;
     display:grid;
@@ -611,7 +611,7 @@
 /* Only Gameplay Center BOSSes receive the portrait treatment. The selector
    deliberately mirrors the shared V143 battle namespace, then adds the live
    Gameplay-BOSS marker so these variables outrank the generic 82x106 rank rule
-   without another !important. Height is derived from the card's own 9:16 ratio. */
+   without another !important. Height is derived from the card's current 4:3 ratio. */
 #game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{
     --v143-monster-card-width:var(--gameplay-boss-card-width);
     --v143-monster-card-height:auto;
