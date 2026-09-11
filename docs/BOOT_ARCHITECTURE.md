@@ -168,3 +168,10 @@ Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK�
 | Controlled warm existing-user city | ≤ 3 s CI hard ceiling；產品目標 ≤ 2 s |
 
 `tests/boot-architecture.test.js`、`auth-before-character-creation.test.js`、`account-save-ownership.test.js`、`feature-loader-runtime.test.js`、`critical-feature-budget.test.js` 與 `.github/scripts/run-boot-architecture-browser-qa.mjs` 是永久 gate。部署後另由 `boot-live-browser-qa.mjs` 記錄實際 CDN/Firebase cold auth 數據；超過 5 秒必須報告實值與瓶頸，不得竄改或宣稱達標。
+
+
+## Two-scene boot presentation (2026-09-11)
+
+- Critical Boot preloads `assets/ui/startup-logo.4631c0bc3f2b.jpg` then `assets/ui/startup-main-city.d43e67af1c1c.jpg`.
+- Scene 1 uses configurable `#startupLoader[data-logo-target-ms]` (default 900 ms). This timer only advances presentation; it is never awaited and never delays Firebase/Auth/save readiness.
+- Scene 2 remains the signed-out Firebase account background. Firebase bootstrap/session restore continue concurrently; non-critical gameplay features remain lazy.
