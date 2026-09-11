@@ -6490,7 +6490,9 @@ function saveGame(options={}){
    ★ 舊存檔修復 / 讀檔
 ===================================================== */
 
-function loadGame(resolvedSave=null){
+function loadGame(){
+
+    const resolvedSave=arguments[0]||null;
 
     try{
 

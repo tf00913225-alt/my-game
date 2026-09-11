@@ -7,7 +7,7 @@ const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
 
 test("resolved UID save hydrates the exact resolved payload without a second repository read",()=>{
   assert.match(core,/hydrate:save=>loadGame\(save\)/);
-  assert.match(core,/function loadGame\(resolvedSave=null\)/);
+  assert.match(core,/function loadGame\(\)\{[\s\S]*?const resolvedSave=arguments\[0\]\|\|null;/);
   assert.match(core,/if\(resolvedSave&&typeof resolvedSave==="object"&&!Array\.isArray\(resolvedSave\)\)\{[\s\S]*?raw=JSON\.stringify\(resolvedSave\);/);
   assert.match(startup,/FourSymbolsGameSave\.hydrate\(save\)/);
   assert.doesNotMatch(startup,/const loaded=global\.FourSymbolsGameSave&&global\.FourSymbolsGameSave\.load\(\);/);
