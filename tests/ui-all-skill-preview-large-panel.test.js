@@ -6,11 +6,13 @@ const path=require("node:path");
 const cp=require("node:child_process");
 
 const owner=fs.readFileSync("css/30-v130-requested-updates.css","utf8");
+const hintOwner=fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8");
 
 assert.match(owner,/html body \.skill-preview-modal\.v141-body-preview \.skill-preview-dialog\{[\s\S]*?max-width:var\(--ui-large-panel-max-width,396px\) !important;[\s\S]*?height:min\(var\(--ui-large-panel-height,620px\),calc\(100dvh - var\(--ui-large-panel-safe-space,24px\)\)\) !important;/);
 assert.match(owner,/html body \.skill-preview-modal\.v141-body-preview \.skill-preview-heading,[\s\S]*?\.skill-preview-tabs\{[\s\S]*?flex:0 0 auto !important;/);
 assert.match(owner,/html body \.skill-preview-modal\.v141-body-preview \.skill-preview-tabs button\{[\s\S]*?min-height:var\(--ui-large-panel-tab-height,42px\) !important;/);
 assert.match(owner,/html body \.skill-preview-modal\.v141-body-preview \.skill-preview-body\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
+assert.match(hintOwner,/#allElementSkillPreviewModal \.skill-preview-body::before\{[\s\S]*?克制：你的元素剋對方＝你佔優勢[\s\S]*?被克制：對方元素剋你＝你處於劣勢[\s\S]*?white-space:pre-line;/);
 
 function findChrome(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
@@ -34,6 +36,7 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/31-v131-fix-batch.css">
 <link rel="stylesheet" href="css/38-v141-system-expansion.css">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
+<link rel="stylesheet" href="css/56-v174-critical-ui-regressions.css">
 <style>html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}</style>
 </head><body>
 <div id="allElementSkillPreviewModal" class="skill-preview-modal v141-body-preview show" aria-hidden="false">
@@ -51,7 +54,7 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
  const tabs=document.querySelector('.skill-preview-tabs');
  const body=document.getElementById('body');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};
- const snap=()=>({dialog:rect(dialog),heading:rect(heading),tabs:rect(tabs),body:rect(body),dialogStyle:{width:getComputedStyle(dialog).width,height:getComputedStyle(dialog).height,maxWidth:getComputedStyle(dialog).maxWidth},bodyStyle:{overflowY:getComputedStyle(body).overflowY,gutter:getComputedStyle(body).scrollbarGutter},scrollHeight:body.scrollHeight,clientHeight:body.clientHeight});
+ const snap=()=>{const hint=getComputedStyle(body,'::before');return {dialog:rect(dialog),heading:rect(heading),tabs:rect(tabs),body:rect(body),dialogStyle:{width:getComputedStyle(dialog).width,height:getComputedStyle(dialog).height,maxWidth:getComputedStyle(dialog).maxWidth},bodyStyle:{overflowY:getComputedStyle(body).overflowY,gutter:getComputedStyle(body).scrollbarGutter},hintStyle:{content:hint.content,fontSize:hint.fontSize,lineHeight:hint.lineHeight,whiteSpace:hint.whiteSpace,textAlign:hint.textAlign},scrollHeight:body.scrollHeight,clientHeight:body.clientHeight};};
  body.innerHTML='<div class="skill-preview-card"><strong>短內容</strong><p>技能說明</p></div>'; void dialog.offsetHeight; const short=snap();
  body.innerHTML=Array.from({length:40},(_,i)=>'<div class="skill-preview-card"><strong>技能 '+i+'</strong><p>這是一段較長的技能說明，用來確認只有技能列表區可以上下捲動。</p></div>').join(''); void dialog.offsetHeight; const long=snap();
  document.getElementById('result').textContent=JSON.stringify({short,long});
@@ -71,6 +74,12 @@ try{
         assert.equal(shot.dialogStyle.height,"620px","all-skill preview must use Large Panel height");
         assert.equal(shot.bodyStyle.overflowY,"auto","skill list must own vertical scrolling");
         assert.equal(shot.bodyStyle.gutter,"stable","skill list must reserve stable scrollbar space");
+        assert.match(shot.hintStyle.content,/土剋水・水剋火・火剋風・風剋土/);
+        assert.match(shot.hintStyle.content,/克制：你的元素剋對方＝你佔優勢/);
+        assert.match(shot.hintStyle.content,/被克制：對方元素剋你＝你處於劣勢/);
+        assert.ok(parseFloat(shot.hintStyle.fontSize)>=13,"counter guidance must remain readable on mobile");
+        assert.equal(shot.hintStyle.whiteSpace,"pre-line","counter guidance must preserve its three-line hierarchy");
+        assert.equal(shot.hintStyle.textAlign,"left","counter guidance must use readable left alignment");
     }
     for(const part of ["dialog","heading","tabs","body"]){
         for(const key of ["left","top","width","height"]){
@@ -79,7 +88,7 @@ try{
     }
     assert.ok(data.long.scrollHeight>data.long.clientHeight,"long skill preview content must scroll internally");
     assert.ok(data.short.scrollHeight<=data.short.clientHeight+1,"short skill preview content must leave stable empty space");
-    console.log("Headless Chrome: all-element skill preview uses one fixed Large Panel frame");
+    console.log("Headless Chrome: all-element skill preview keeps its Large Panel and clearly separates advantage/disadvantage guidance");
 }finally{
     try{fs.unlinkSync(fixture);}catch(_){ }
 }
