@@ -198,7 +198,7 @@ const address=server.address();
 const origin=`http://127.0.0.1:${address.port}`;
 const debugPort=9400+(process.pid%400);
 const profile=path.join("/tmp","four-symbols-boot-qa-"+process.pid);
-const chrome=spawn(chromeBinary(),["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--hide-scrollbars",`--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,"--window-size=390,844","about:blank"],{stdio:["ignore","pipe","pipe"]});
+const chrome=spawn(chromeBinary(),["--headless=new","--no-sandbox","--disable-dev-shm-usage","--hide-scrollbars",`--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,"--window-size=390,844","about:blank"],{stdio:["ignore","pipe","pipe"]});
 let chromeStderr="";chrome.stderr.on("data",chunk=>{chromeStderr+=String(chunk);});
 let client=null;
 
@@ -251,6 +251,8 @@ try{
         stageActive:stage.classList.contains("creation-native-active"),
         appInert:app.inert,
         appDisplay:getComputedStyle(app).display,
+        creationOverflowY:getComputedStyle(creation).overflowY,
+        creationTouchAction:getComputedStyle(creation).touchAction,
         hitInsideNext:!!hit&&next.contains(hit),
         nextRect:{left:nextRect.left,right:nextRect.right,top:nextRect.top,bottom:nextRect.bottom,width:nextRect.width,height:nextRect.height},
         stageRect:{left:stageRect.left,right:stageRect.right,top:stageRect.top,bottom:stageRect.bottom,width:stageRect.width,height:stageRect.height}
@@ -263,6 +265,8 @@ try{
     assert.equal(guest.stageActive,true,"Cold-start creation page did not isolate the native stage");
     assert.equal(guest.appInert,true,"Legacy app remained interactive behind character creation");
     assert.equal(guest.appDisplay,"none","Legacy app remained painted behind character creation");
+    assert.equal(guest.creationOverflowY,"clip","Retired V124 scroll CSS is still overriding the fixed creation canvas");
+    assert.equal(guest.creationTouchAction,"none","Retired V124 pan-y CSS is still overriding the fixed creation canvas");
     assert.equal(guest.hitInsideNext,true,"Right side of the creation CTA is covered by another paint/hit-test layer");
     assert.ok(guest.nextRect.left>=guest.stageRect.left-1&&guest.nextRect.right<=guest.stageRect.right+1&&guest.nextRect.top>=guest.stageRect.top-1&&guest.nextRect.bottom<=guest.stageRect.bottom+1,"Creation CTA escaped the rendered stage");
     evidence.checks.anonymousBeforeCreation=guest;evidence.performance.guestCreation=await metrics(client,"four-symbols:character-creation-interactive");

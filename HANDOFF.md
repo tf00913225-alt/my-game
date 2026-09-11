@@ -3736,3 +3736,13 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 新秘寶主城圖使用 content-hashed 路徑 `assets/ui/home-relic-v174.eed14e806044.webp`；舊無 hash URL 不覆寫，避免既有客戶端快取沿用錯誤內容。
 - 裝備副本品階機率由 `EQUIPMENT_CHEST_DROP_TABLE` 經 `equipmentChestOddsText()` 產生，不再把 40/40/10/10 複製到 CSS 偽元素。
 - CI 的窄螢幕 fixture 證實文字獎勵框原本仍可因 392px 上限溢出；正式 owner 已改用 `calc(100vw - 32px)`／`calc(100dvh - 32px)`。QA 以明確 390×844／412×915 overlay surface 驗證四邊 containment，不把 CI Chrome 的 500px 最小 `innerWidth` 誤稱為手機 viewport。
+
+
+## 2026-09-11 — Cold-start 創角 Native lifecycle 修復（PR #157）
+
+- 基準：`dev@29f83030d6427f2641952745243291b35731659a`；工作分支 `fix/cold-start-character-creation-lifecycle-20260911`。`main` 未修改。
+- 根因：account-first Startup State Machine 在 `NEED_CHARACTER` 直接把 `#creationPage` 設成 `display:block`，繞過 `FourSymbolsGameSave.showCreation()` 與 `js/24-v125-character-creation-native-runtime.js` 的 Native 啟用流程；Android Chrome 因而可能在第一個可見 frame 缺少 `creation-fixed-active` / `creation-native-active`，讓 legacy `#app` / overlay 仍參與 paint/compositing。
+- 修正：`js/52-v173.20-startup-loader.js` 新增 fail-closed 的 `showCharacterCreationSurface()`，只透過 canonical `FourSymbolsGameSave.showCreation()` 進入創角，並在 startup loader 尚覆蓋舞台時先完成 Native layer migration / isolation，再淡出 loader。禁止再由 startup owner 直接 `display:block`。
+- 清理：production `app-shell` 不再打包退役的 `js/22-v124-character-creation-native-runtime.js` 與 `css/28-v124-character-creation-native.css`；保留 `js/23` bootstrap + `js/24` runtime + critical `css/29` 為目前創角 owner，避免舊版 `overflow-y:auto` / `touch-action:pan-y` / isolation 規則在新版固定 canvas 後方重新覆寫。
+- Browser QA：390×844、DPR 3、touch emulation 的 account-first 新 UID 冷啟動現在必須驗證 `#creationPage` 位於 `#game-overlay-layer`、`native-creation-page`、`creation-fixed-active`、`creation-native-active`、legacy `#app` inert 且不 paint、創角 canvas `overflow-y:clip` / `touch-action:none`，並以 `elementFromPoint()` 驗證「下一步」按鈕右側沒有被其他 layer 蓋住；Boot QA 不再強制 `--disable-gpu`。
+- Production build 仍由 `scripts/build-production.mjs` 產生 content-hash bundle / manifest；本輪不得用 query version 或臨時 CSS/JS patch 規避 owner。

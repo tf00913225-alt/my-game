@@ -14,6 +14,8 @@ const abyssLiveQaRunner=fs.readFileSync(".github/scripts/run-abyss-live-browser-
 const mainCityRuntime=fs.readFileSync("js/16-stage-v54-main-city-runtime.js","utf8");
 const productionBuild=fs.readFileSync("scripts/build-production.mjs","utf8");
 const boot=JSON.parse(fs.readFileSync("config/boot-manifest.json","utf8"));
+assert.doesNotMatch(productionBuild,/js\/22-v124-character-creation-native-runtime\.js|css\/28-v124-character-creation-native\.css/,
+    "retired V124 creation owners must not re-enter the production app-shell");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
 const directScripts=[...index.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].map(match=>match[1]);
