@@ -1,0 +1,59 @@
+name: Fix EXP confirm runtime
+
+on:
+  push:
+    branches:
+      - fix/mobile-ui-exp-guards-20260911
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out work branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/mobile-ui-exp-guards-20260911
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Replace native-confirm fallback with fail-closed RPG confirm
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('js/28-v133-economy-rebalance.js')
+          s=p.read_text()
+          before='''            let approved=true;\n            if(typeof window.rpgConfirm==="function"){\n                approved=await window.rpgConfirm(confirmMessage,{\n                    title:"確認經驗池升級",\n                    confirmText:"確定升級",\n                    cancelText:"返回"\n                });\n            }else if(typeof window.confirm==="function"){\n                approved=window.confirm(confirmMessage);\n            }\n            if(!approved){'''
+          after='''            if(typeof window.rpgConfirm!=="function"){\n                v173ScheduleExpPoolDecoration(viewport);\n                return false;\n            }\n            const approved=await window.rpgConfirm(confirmMessage,{\n                title:"確認經驗池升級",\n                confirmText:"確定升級",\n                cancelText:"返回"\n            });\n            if(!approved){'''
+          if s.count(before)!=1:
+              raise SystemExit(f'expected one EXP confirm fallback block, got {s.count(before)}')
+          p.write_text(s.replace(before,after))
+          PY
+
+      - name: Rebuild deterministic production bundles
+        run: node scripts/build-production.mjs
+
+      - name: Run focused RPG confirm and EXP guard checks
+        run: |
+          node --check js/28-v133-economy-rebalance.js
+          node tests/v169-rpg-ui.test.js
+          node tests/v174-mobile-ui-exp-guards.test.js
+          git diff --check
+
+      - name: Remove staging workflow and commit final branch state
+        run: |
+          rm -f .github/workflows/fix-exp-confirm-runtime.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git status --short
+          git commit -m "fix: keep EXP upgrade guard on RPG dialog queue"
+          git push origin HEAD:fix/mobile-ui-exp-guards-20260911
