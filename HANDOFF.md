@@ -1,3 +1,12 @@
+## 2026-09-11 Facebook public_profile DEV 診斷（TEMP）
+
+- 工作分支 `fix/facebook-public-profile-diagnostic`，基準為當時最新 `dev@8e1a2d9cf5f2a0f6b4551b2d42fddae419eb505f`。Android DEV 已反覆重現 Meta `Invalid Scopes: email` 與 `Error Facebook / 無法載入`；Firebase Authorized Domains、Meta App Domains、Firebase handler redirect、App ID、管理員角色，以及 Firebase mobile redirect 均已逐項排除。
+- 官方 Firebase JS SDK 原始碼顯示 `FacebookAuthProvider` 本身不預載 `email` scope，`BaseOAuthProvider` scopes 預設為空；專案也沒有 `addScope('email')`。因此診斷目標是隔離 Firebase hosted Facebook OAuth 下游是否額外要求 `email`。
+- 最終診斷不載入 Meta JavaScript SDK、不新增外部 runtime script、不放寬 production manifest/release gate。僅 `https://dev.four-symbols-dev.pages.dev/` 由唯一 Auth owner `js/firebase/firebase-auth.js` 直接導向 Meta OAuth dialog，明確只要求 `public_profile` 與 `response_type=token`；callback 使用 `sessionStorage` 隨機 state 驗證、防 CSRF，取得 token 後立刻清除 URL fragment，再以 Firebase 官方 `FacebookAuthProvider.credential(token)` + `signInWithCredential()` 回到既有同一 Firebase UID owner。
+- DEV 直接 OAuth callback 固定為 `https://dev.four-symbols-dev.pages.dev/`，Meta → Facebook 登入 → 設定 →「有效的 OAuth 重新導向 URI」必須額外加入這個完整網址；原 Firebase handler `https://four-symbols-jianghu.firebaseapp.com/__/auth/handler` 保留不刪。
+- 這是明確 TEMP patch：若 public_profile-only 實機成功，根因集中到 Firebase hosted Facebook OAuth / email scope；下一輪必須選擇正式修正 Meta/Firebase scope 或將已驗證 token exchange 收斂成正式 owner。若仍失敗，移除此診斷並把根因集中到 Meta App/OAuth 層。禁止再往 `signInWithFacebook()` 疊第三層 workaround。
+- 不修改 `saveGame()` / `loadGame()`、UID ownership、Firestore Rules、雲端/本機 schema、Game/Cache Version；`main` 不修改。
+
 ## 2026-09-11 多對話 dev 分支稽核與 ancestry 收斂
 
 - 稽核基準為 GitHub `dev@fa21dc23971909556d65357c4e8e012c97b413d9`、`main@3d3e529e8e74dcced3dfcf8f82bac772a588d4a7`；稽核時遠端共有 100 個 branch heads，其中 76 個工作／整合分支已是 dev ancestor，沒有任何 branch 是建立在最新 dev 之上的未合併 descendant。
