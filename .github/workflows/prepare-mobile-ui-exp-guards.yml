@@ -25,7 +25,11 @@ jobs:
           node-version: 20
 
       - name: Apply scoped source and test changes
-        run: node .tmp/apply-mobile-ui-exp-guards.mjs
+        run: |
+          node .tmp/apply-mobile-ui-exp-guards.mjs
+          node .tmp/post-apply-fix.mjs
+          rm -f .tmp/post-apply-fix.mjs
+          rmdir .tmp 2>/dev/null || true
 
       - name: Rebuild deterministic production bundles
         run: node scripts/build-production.mjs
