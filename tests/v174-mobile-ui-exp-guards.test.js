@@ -20,6 +20,7 @@ assert.doesNotMatch(skill,/function addProgressionHint|addProgressionHint\(/);
 assert.match(skill,/renderSkillDetailProgression[\s\S]*最低學習等級[\s\S]*前置技能/);
 assert.match(exp,/v131ConfirmExpPreview=async function/);
 assert.match(exp,/await window\.rpgConfirm\(confirmMessage,[\s\S]*title:"確認經驗池升級"/);
+assert.doesNotMatch(exp,/\b(?:window\.)?confirm\s*\(/,"EXP guard must not bypass the serial RPG dialog queue");
 assert.match(exp,/if\(!approved\)\{[\s\S]*return false;[\s\S]*sharedExp=Number\.MAX_SAFE_INTEGER/);
 assert.ok(slots.includes("querySelectorAll('[onclick*=\"openCharacterCreation\"]')"),"current character creation slot selector missing");
 assert.match(slots,/cardsBySlot\.get\(slotNumber\)/);
