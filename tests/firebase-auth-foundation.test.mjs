@@ -104,7 +104,7 @@ test("Facebook auth uses redirect on mobile and consumes redirect result before 
     assert.match(auth, /await getRedirectResult\(firebaseAuth\)/);
     assert.match(auth, /if\(isMobileBrowser\(\)\)\{[\s\S]*await signInWithRedirect\(auth, provider\);[\s\S]*return null;/);
     assert.match(auth, /const credential = await signInWithPopup\(auth, provider\)/);
-    assert.match(docs, /mobile browsers use Firebase redirect/);
+    assert.match(docs, /mobile browsers use Firebase redirect/i);
 });
 
 test("one Critical Boot support owner serves login and in-game contact surfaces", ()=>{
