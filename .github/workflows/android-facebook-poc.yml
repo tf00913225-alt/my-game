@@ -96,8 +96,25 @@ jobs:
           console.log('Firebase Android config validated for PoC package.');
           NODE
 
+      - name: Validate Meta client token
+        shell: bash
+        env:
+          META_FACEBOOK_CLIENT_TOKEN: ${{ secrets.META_FACEBOOK_CLIENT_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${META_FACEBOOK_CLIENT_TOKEN:-}" ]; then
+            echo "Missing required Actions secret: META_FACEBOOK_CLIENT_TOKEN" >&2
+            exit 1
+          fi
+
+          echo "::add-mask::$META_FACEBOOK_CLIENT_TOKEN"
+          echo "Meta client token is available for the Android build."
+
       - name: Build debug APK
         working-directory: android/facebook-login-poc
+        env:
+          META_FACEBOOK_CLIENT_TOKEN: ${{ secrets.META_FACEBOOK_CLIENT_TOKEN }}
         run: ./gradlew :app:assembleDebug --stacktrace
 
       - name: Generate Facebook debug key hash from built APK
