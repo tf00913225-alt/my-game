@@ -12,7 +12,7 @@ const manifest = JSON.parse(read("asset-manifest.json"));
 test("web Android Facebook path uses trusted native handoff instead of Web OAuth", () => {
     assert.match(auth, /isAndroidBrowser\(\)/);
     assert.match(auth, /foursymbols/);
-    assert.match(auth, /getFunctions\(firebaseApp,"us-central1"\)/);
+    assert.match(auth, /getFunctions\(firebaseApp,FUNCTIONS_REGION\)/);
     assert.match(auth, /httpsCallable\(functions,"redeemNativeAuthHandoff"/);
     assert.match(auth, /signInWithCustomToken\(auth,customToken\)/);
     assert.match(auth, /window\.history\.replaceState/);
