@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#10100F</color>
+    <color name="title_text">#F3D58A</color>
+    <color name="body_text">#E8E1D1</color>
+    <color name="status_ok">#92D6AA</color>
+    <color name="status_error">#FF9A94</color>
+    <color name="uid_text">#F9EED3</color>
+    <color name="uid_panel">#221D16</color>
+    <color name="uid_panel_stroke">#876E39</color>
+</resources>
