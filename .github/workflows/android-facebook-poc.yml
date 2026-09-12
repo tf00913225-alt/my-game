@@ -1,0 +1,81 @@
+name: Android Facebook Login PoC
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/android-native-facebook-login-poc-20260912
+    paths:
+      - "android/facebook-login-poc/**"
+      - ".github/workflows/android-facebook-poc.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-poc:
+    name: Build PoC APK and Facebook key hash
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 35
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Make Gradle wrapper executable
+        working-directory: android/facebook-login-poc
+        run: chmod +x gradlew
+
+      - name: Build debug APK
+        working-directory: android/facebook-login-poc
+        run: ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Generate Facebook debug key hash
+        shell: bash
+        run: |
+          KEYSTORE="$HOME/.android/debug.keystore"
+          if [ ! -f "$KEYSTORE" ]; then
+            echo "Debug keystore not found at $KEYSTORE" >&2
+            exit 1
+          fi
+
+          HASH="$(keytool -exportcert \
+            -alias androiddebugkey \
+            -keystore "$KEYSTORE" \
+            -storepass android \
+            -keypass android 2>/dev/null \
+            | openssl sha1 -binary \
+            | openssl base64)"
+
+          mkdir -p android/facebook-login-poc/build/poc-output
+          printf '%s\n' "$HASH" | tee android/facebook-login-poc/build/poc-output/facebook-debug-key-hash.txt
+          echo "FACEBOOK_DEBUG_KEY_HASH=$HASH" >> "$GITHUB_ENV"
+          echo "### Facebook debug Key Hash" >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          echo "$HASH" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Collect APK
+        run: |
+          cp android/facebook-login-poc/app/build/outputs/apk/debug/app-debug.apk \
+             android/facebook-login-poc/build/poc-output/facebook-login-poc-debug.apk
+
+      - name: Upload PoC APK and key hash
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-facebook-login-poc-${{ github.sha }}
+          path: android/facebook-login-poc/build/poc-output/
+          if-no-files-found: error
+          retention-days: 14
