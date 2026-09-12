@@ -38,6 +38,31 @@ jobs:
         working-directory: android/facebook-login-poc
         run: chmod +x gradlew
 
+      - name: Ensure Android debug keystore
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEYSTORE="$HOME/.android/debug.keystore"
+          mkdir -p "$(dirname "$KEYSTORE")"
+
+          if [ ! -f "$KEYSTORE" ]; then
+            keytool -genkeypair \
+              -keystore "$KEYSTORE" \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -noprompt
+          fi
+
+          keytool -list \
+            -keystore "$KEYSTORE" \
+            -storepass android \
+            -alias androiddebugkey >/dev/null
+
       - name: Build debug APK
         working-directory: android/facebook-login-poc
         run: ./gradlew :app:assembleDebug --stacktrace
@@ -45,11 +70,8 @@ jobs:
       - name: Generate Facebook debug key hash
         shell: bash
         run: |
+          set -euo pipefail
           KEYSTORE="$HOME/.android/debug.keystore"
-          if [ ! -f "$KEYSTORE" ]; then
-            echo "Debug keystore not found at $KEYSTORE" >&2
-            exit 1
-          fi
 
           HASH="$(keytool -exportcert \
             -alias androiddebugkey \
@@ -58,6 +80,11 @@ jobs:
             -keypass android 2>/dev/null \
             | openssl sha1 -binary \
             | openssl base64)"
+
+          if [ -z "$HASH" ]; then
+            echo "Facebook debug key hash is empty" >&2
+            exit 1
+          fi
 
           mkdir -p android/facebook-login-poc/build/poc-output
           printf '%s\n' "$HASH" | tee android/facebook-login-poc/build/poc-output/facebook-debug-key-hash.txt
