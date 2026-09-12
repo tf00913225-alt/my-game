@@ -97,41 +97,23 @@ test("authentication UI supports Google, Facebook, email and Firebase anonymous 
     assert.match(touch, /\.firebase-auth-dialog/);
 });
 
-test("Facebook auth uses redirect on mobile and consumes redirect result before identity observation", ()=>{
+test("Facebook auth stays in the Firebase popup flow on mobile and desktop", ()=>{
     assert.match(auth, /getRedirectResult/);
-    assert.match(auth, /signInWithRedirect/);
-    assert.match(auth, /function isMobileBrowser\(\)/);
-    assert.match(auth, /navigator\.userAgentData/);
-    assert.match(auth, /Android\|webOS\|iPhone\|iPad\|iPod/);
     assert.match(auth, /await getRedirectResult\(firebaseAuth\)/);
-    assert.match(auth, /if\(isMobileBrowser\(\)\)\{[\s\S]*await signInWithRedirect\(auth, provider\);[\s\S]*return null;/);
+    assert.match(auth, /provider\.setCustomParameters\(\{ display:"popup" \}\)/);
     assert.match(auth, /const credential = await signInWithPopup\(auth, provider\)/);
-    assert.match(docs, /mobile browsers use Firebase redirect/i);
+    assert.doesNotMatch(auth, /signInWithRedirect/);
+    assert.doesNotMatch(auth, /function isMobileBrowser\(\)/);
+    assert.match(docs, /Facebook sign-in uses Firebase popup/i);
 });
 
-test("DEV Facebook diagnostic isolates public_profile through direct Meta OAuth without another runtime loader", ()=>{
-    assert.match(auth, /FACEBOOK_DIAGNOSTIC_APP_ID\s*=\s*"1712957419809925"/);
-    assert.match(auth, /FACEBOOK_DIAGNOSTIC_API_VERSION\s*=\s*"v26\.0"/);
-    assert.match(auth, /FACEBOOK_DIAGNOSTIC_REDIRECT_URI\s*=\s*"https:\/\/dev\.four-symbols-dev\.pages\.dev\/"/);
-    assert.match(auth, /FACEBOOK_DIAGNOSTIC_STATE_KEY/);
-    assert.match(auth, /function isFacebookDiagnosticHost\(\)/);
-    assert.match(auth, /location\.hostname[\s\S]*dev\.four-symbols-dev\.pages\.dev/);
-    assert.doesNotMatch(auth, /tf00913225-alt\.github\.io/);
-    assert.match(auth, /https:\/\/www\.facebook\.com\/\$\{FACEBOOK_DIAGNOSTIC_API_VERSION\}\/dialog\/oauth/);
-    assert.match(auth, /response_type:"token"/);
-    assert.match(auth, /scope:"public_profile"/);
-    assert.doesNotMatch(auth, /addScope\(["']email["']\)/);
-    assert.doesNotMatch(auth, /connect\.facebook\.net|createElement\(["']script["']\)/);
+test("temporary direct-Meta Facebook diagnostic is fully removed", ()=>{
+    assert.doesNotMatch(auth, /FACEBOOK_DIAGNOSTIC_/);
+    assert.doesNotMatch(auth, /isFacebookDiagnosticHost|startFacebookPublicProfileDiagnostic|consumeFacebookDiagnosticCallback/);
+    assert.doesNotMatch(auth, /dialog\/oauth|location\.assign\(/);
+    assert.doesNotMatch(auth, /response_type:"token"|signInWithCredential/);
     assert.doesNotMatch(featureManifest, /facebook-diagnostic-sdk|connect\.facebook\.net/);
-    assert.match(auth, /sessionStorage\.setItem/);
-    assert.match(auth, /expectedState[\s\S]*returnedState[\s\S]*expectedState !== returnedState/);
-    assert.match(auth, /clearFacebookDiagnosticHash\(\)/);
-    assert.match(auth, /FacebookAuthProvider\.credential\(accessToken\)/);
-    assert.match(auth, /signInWithCredential\(auth,credential\)/);
-    assert.match(auth, /await consumeFacebookDiagnosticCallback\(firebaseAuth\)/);
-    assert.match(auth, /if\(isFacebookDiagnosticHost\(\)\)\{[\s\S]*startFacebookPublicProfileDiagnostic\(\)/);
-    assert.match(ui, /auth\/facebook-diagnostic-state-mismatch/);
-    assert.match(ui, /auth\/facebook-diagnostic-oauth-error/);
+    assert.doesNotMatch(ui, /auth\/facebook-diagnostic-/);
 });
 
 test("one Critical Boot support owner serves login and in-game contact surfaces", ()=>{
