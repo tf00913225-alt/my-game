@@ -15,10 +15,13 @@
         android:theme="@style/Theme.FourSymbolsFacebookLoginPoc"
         android:usesCleartextTraffic="false">
 
-        <!-- App ID is a public Meta identifier. App Secret and client secrets never belong here. -->
+        <!-- App ID is public. Client Token is injected at build time; App Secret never belongs here. -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" />
         <meta-data
             android:name="com.facebook.sdk.AutoLogAppEventsEnabled"
             android:value="false" />
