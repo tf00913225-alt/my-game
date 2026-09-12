@@ -1,3 +1,14 @@
+## 2026-09-12 Facebook Android 原生登入 PoC（工作分支，未合併）
+
+- 工作分支 `feature/android-native-facebook-login-poc-20260912`，基準為已重新核對的 GitHub `dev@f4fc2f78d704a6019252b52345cb6f66a74133ce`；`main` 沒有修改、沒有建立 promotion。
+- 實際掃描 repository 後確認：現有遊戲沒有 Android、Capacitor、Cordova、TWA、WebView 或其他原生 host。既有唯一 Web Auth owner 仍為 `js/firebase/firebase-auth.js::signInWithFacebook()`，維持 Firebase Web `signInWithPopup()`；本輪完全沒有修改它，也沒有再新增 Web OAuth workaround。
+- 新增獨立 owner `android/facebook-login-poc/app/src/main/java/com/foursymbols/jianghu/authpoc/MainActivity.kt`。它只走 Meta Android `LoginManager`／`CallbackManager` → Facebook AccessToken → Firebase Android `FacebookAuthProvider.getCredential()` → `FirebaseAuth.signInWithCredential()`，最後只顯示 Firebase UID。沒有 WebView、Firestore、localStorage、遊戲存檔、UID ownership、角色、migration 或 bridge 實作。
+- 固定 PoC package 為 `com.foursymbols.jianghu.authpoc`，Default Activity 為 `com.foursymbols.jianghu.authpoc.MainActivity`，Meta App ID 為 `1712957419809925`。Manifest 包含 FacebookActivity、CustomTab callback scheme 與 Android package visibility；Meta App Secret／client secret 沒有寫入程式、文件或 Git。
+- `android/facebook-login-poc/app/google-services.json`、簽章檔與 local properties 被 `.gitignore` 排除。PoC 在缺少 Google Services config 時會明確停用登入；配置檔必須由 Firebase `four-symbols-jianghu` 註冊同一 Android package 後下載並僅放在本機。README 已列出 Meta/Firebase Console 精確欄位、debug/release Key Hash 命令、APK 建置與 S23 Ultra 驗收。
+- 安全橋接僅記錄設計選項，未實作：原生 Firebase session 不會自動共享到 Web SDK；建議未來使用 trusted backend 驗證 native ID token，再給同源網頁一次性 handoff/custom token。禁止把 Facebook token、UID query 或 localStorage 當 bridge。
+- 驗證：`node --test tests/android-facebook-native-poc.test.mjs` 6/6 PASS；Gradle 8.9 `:app:tasks` PASS；含一次性 synthetic non-secret `google-services.json` 的 `:app:processDebugGoogleServices` PASS，測後已刪除 synthetic config。嘗試 `:app:assembleDebug` 的唯一失敗是此執行環境沒有 Android SDK（`SDK location not found`），因此尚無可聲稱的 debug APK／S23 實測。
+- Requirement batch：`release/requirement-batches/2026-09-12-android-native-facebook-login-poc.json`；4/5 VERIFIED，最後一項保留為 Meta/Firebase Console 設定、實際 APK 與 Samsung S23 Ultra（Facebook App 支援連結保持開啟）驗證。Game/Cache Version 維持 V173.65／173.65。
+
 ## 2026-09-12 Facebook 登入 owner 收斂：移除 DEV direct OAuth
 
 - 工作分支 `fix/facebook-login-standard-flow-20260912`，基準為當時最新 `dev@fb316e564fb72e521df3d363b8bde81445c2dc15`；`main` 不修改。
