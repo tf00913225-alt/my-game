@@ -27,7 +27,7 @@ There is no production `先使用本機存檔` path. No UID means no save lookup
 
 The account surface is mounted directly under `document.body`, outside the fixed 1080×1920 game stage. It sizes against the real viewport (`100dvh` plus safe-area insets), so signed-out users do not depend on the authenticated app-shell stage scaler. Its `聯絡客服` button and the in-game system page both open `FourSymbolsSupport`, which displays `tf00913225@gmail.com` from one Critical Boot owner.
 
-Google, Facebook, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup or redirect sign-in must also be listed under Authentication → Settings → Authorized domains. Facebook additionally requires the same Meta App ID/App Secret configured in Firebase Authentication and the Firebase OAuth redirect URI (`https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`) listed as a valid OAuth redirect URI in the Meta app. Facebook sign-in uses Firebase popup on both mobile and desktop so the OAuth flow remains in the browser instead of handing a full-page `facebook.com` navigation to an installed Android Facebook app. `getRedirectResult()` remains during initialization only to safely finish any older in-flight redirect session. If Firebase reports `auth/account-exists-with-different-credential`, the UI asks the player to use the original provider; it never silently links identities or reassigns an existing UID.
+Google, Facebook, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup or redirect sign-in must also be listed under Authentication → Settings → Authorized domains. Facebook additionally requires the same Meta App ID/App Secret configured in Firebase Authentication and the Firebase OAuth redirect URI (`https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`) listed as a valid OAuth redirect URI in the Meta app. Desktop/non-Android browser Facebook sign-in continues to use Firebase popup. Android browser Facebook sign-in uses the native Facebook helper handoff described below, so the browser no longer navigates directly to a full-page `facebook.com` login that can be intercepted by the Facebook app. `getRedirectResult()` remains during initialization only to safely finish any older in-flight redirect session. If Firebase reports `auth/account-exists-with-different-credential`, the UI asks the player to use the original provider; it never silently links identities or reassigns an existing UID.
 
 ## Account and character order
 
@@ -102,3 +102,16 @@ Firebase Web configuration values are public client identifiers, not Admin crede
 - `four-symbols:startup-error`
 
 Firebase does not own `saveGame()` or `loadGame()`. It supplies identity and cloud read results to the startup owner; `FourSymbolsAccountSave` owns local selection, and the gameplay save owner serializes only under the active UID.
+
+
+## Android native Facebook handoff
+
+Android browser flow:
+
+`Web Facebook button → foursymbols://auth/facebook → native Meta Login → Firebase Android Auth → authenticated callable `createNativeAuthHandoff` → one-time code → HTTPS game URL fragment → callable `redeemNativeAuthHandoff` → Firebase Web `signInWithCustomToken` → existing UID/cloud-save lifecycle`
+
+The native helper never puts the Facebook access token into the web URL. The backend accepts the create request only from an authenticated Firebase Facebook session, stores a high-entropy handoff code for two minutes, and deletes it transactionally when redeemed before minting the Firebase custom token. The web client removes the fragment before continuing the normal Auth lifecycle.
+
+The Android helper accepts only the allow-listed HTTPS game origins defined in `MainActivity.kt`. Firestore Rules, save schema, UID ownership and gameplay save owners remain unchanged.
+
+**Deployment requirement:** repository changes alone do not deploy `createNativeAuthHandoff` / `redeemNativeAuthHandoff`. The Firebase Functions backend in project `four-symbols-jianghu` must be deployed before the live Android handoff can succeed.
