@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - feature/android-native-facebook-login-poc-20260912
+      - feature/android-native-auth-handoff-20260912
     paths:
       - "android/facebook-login-poc/**"
       - ".github/workflows/android-facebook-poc.yml"
