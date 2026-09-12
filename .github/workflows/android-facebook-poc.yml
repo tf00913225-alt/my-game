@@ -76,7 +76,7 @@ jobs:
           fi
 
           DEST="android/facebook-login-poc/app/google-services.json"
-          printf '%s' "$FIREBASE_GOOGLE_SERVICES_JSON" > "$DEST"
+          printf '%s' "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 --decode > "$DEST"
 
           node <<'NODE'
           const fs = require('node:fs');
