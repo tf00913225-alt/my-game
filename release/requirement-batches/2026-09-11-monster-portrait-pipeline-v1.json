@@ -1,0 +1,55 @@
+{
+  "date": "2026-09-11",
+  "title": "怪物立繪生成規格與自動盤點基礎 v1",
+  "base_branch": "dev",
+  "base_sha": "845d5b011352d09763a7f1d5560487ffaba65bfa",
+  "work_branch": "feature/monster-portrait-pipeline-v1-20260911",
+  "status": "IN_PROGRESS",
+  "scope": "建立自動盤點 → 自動生成 → 自動放置 → 自動接線 → 驗證的正式規格、目標註冊表與盤點工具；本批不先把不存在的 PNG 接入 runtime。",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "IMPLEMENTED",
+      "request": "建立《四象江湖傳》怪物立繪生成規格書 v1，固定尺寸、命名、路徑、構圖與普通怪／精英／BOSS／深淵／天兵統一規則。",
+      "owner": ["docs/MONSTER_PORTRAIT_SPEC_V1.md", "MONSTER_PORTRAIT_SPEC.md"],
+      "implementation": "新增根目錄入口與專項正式規格；一般／精英／天兵採 1024×1536 透明 PNG，BOSS 類採 1536×2048 透明 PNG；固定安全區、主體佔比、3/4 構圖與四象天兵共用規則。"
+    },
+    {
+      "id": 2,
+      "status": "IMPLEMENTED",
+      "request": "把目前 runtime 的怪物立繪目標整理成機器可讀清單，避免其他對話靠名稱或舊摘要猜路徑。",
+      "owner": ["config/monster-portrait-registry.json"],
+      "implementation": "建立 107 個 portrait targets：9 個既有深淵帝王 target、98 個 planned target；以 portraitKey／系統 ID／元素規則作為正式識別，禁止中文名稱直接猜檔名。"
+    },
+    {
+      "id": 3,
+      "status": "IMPLEMENTED",
+      "request": "建立自動盤點工具，檢查 runtime 名稱、registry、既有檔案、缺圖與四象天兵規則。",
+      "owner": ["scripts/audit-monster-portraits.mjs", "tests/v169-abyss-assets-flow.test.js"],
+      "implementation": "audit 會掃描十區野怪、V141 風土追加怪、日常副本、個人／世界 BOSS、BOSS 援軍、塔 BOSS、深淵帝王與天兵，並比對 registry；normal mode 允許 planned 缺圖，--strict 只在全部素材齊備後使用。"
+    },
+    {
+      "id": 4,
+      "status": "PENDING",
+      "request": "依 registry 自動生成並放置缺少的透明 PNG 立繪。",
+      "owner": ["assets/monsters/**"],
+      "implementation": "本批刻意未偽造或先放空白圖。planned targets 需由後續實際圖像生成批次逐張完成。"
+    },
+    {
+      "id": 5,
+      "status": "PENDING",
+      "request": "素材存在後，把全怪物立繪接入真正 runtime owner，並讓深淵／四象塔天兵按元素使用同一組四象天兵圖。",
+      "owner": ["js/45-v154-dev-fixes.js", "js/48-v159-abyss-battle-portraits.js", "js/59-abyss-two-tier-runtime.js"],
+      "implementation": "目前不把不存在的路徑接入戰鬥，避免 404。後續必須收斂既有 V154/V159 portrait 邏輯，不得再新增第三層 renderBattle/updateUI wrapper；極帝前置關 light 的顯示規則仍待使用者決定。"
+    }
+  ],
+  "verification": {
+    "completed": [],
+    "pending": [
+      "工作分支專項測試與 Repository checks",
+      "98 個 planned target 的實際圖片生成與尺寸／透明度驗證",
+      "素材完成後的 runtime 接線與首次載入／換波／換層瀏覽器驗證"
+    ],
+    "result": "IN_PROGRESS — 規格／registry／audit 已寫入，尚未把不存在的圖片誤接到正式 runtime"
+  }
+}

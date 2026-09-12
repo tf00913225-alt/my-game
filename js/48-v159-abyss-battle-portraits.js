@@ -1,5 +1,5 @@
 /* =====================================================
-   V159 — deterministic Abyss battle portrait synchronization
+   V159 — deterministic battle portrait synchronization
 ===================================================== */
 (function installV159AbyssBattlePortraits(){
     "use strict";
@@ -8,6 +8,10 @@
     window.__v159AbyssBattlePortraitsInstalled=true;
 
     function syncPortraits(){
+        if(typeof window.v154SyncMonsterPortraits==="function"){
+            window.v154SyncMonsterPortraits();
+            return;
+        }
         if(typeof window.v154SyncAbyssPortraits==="function"){
             window.v154SyncAbyssPortraits();
         }
