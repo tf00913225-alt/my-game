@@ -2,7 +2,7 @@
 import {
     createAccountWithEmail,getSignedInUser,signInAsAnonymous,signInWithEmail,
     signInWithFacebook,signInWithGoogle,signOutFirebase
-} from "./firebase-auth.86313ff8c064.js";
+} from "./firebase-auth.a35e767ad16c.js";
 
 const OVERLAY_ID="firebaseAuthOverlay";
 let installed=false;
@@ -15,6 +15,9 @@ function errorText(error){
     const messages={
         "auth/popup-closed-by-user":"登入視窗已關閉，尚未完成登入。",
         "auth/popup-blocked":"瀏覽器阻擋了登入視窗，請允許彈出式視窗後再試。",
+        "auth/native-helper-unavailable":"找不到四象江湖傳 Android 原生登入元件，請先安裝最新版 APK。",
+        "auth/native-facebook-cancelled":"Facebook 原生登入已取消。",
+        "auth/native-handoff-failed":"Android 原生 Facebook 登入回傳失敗，請重新登入一次。",
         "auth/operation-not-allowed":"Firebase Console 尚未啟用這個登入方式。",
         "auth/account-exists-with-different-credential":"這個 Email 已使用其他登入方式建立帳號，請改用原本的登入方式。",
         "auth/invalid-credential":"Email 或密碼不正確。",

@@ -2,12 +2,12 @@
 import {
     createAccountWithEmail,getFirebaseAuthConfigStatus,getSignedInUser,initializeFirebaseAuth,
     observeFirebaseAuthState,signInAsAnonymous,signInWithEmail,signInWithFacebook,signInWithGoogle,signOutFirebase
-} from "./firebase-auth.86313ff8c064.js";
+} from "./firebase-auth.a35e767ad16c.js";
 import {
     CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,
     submitLegacyMigrationCandidate
-} from "./firebase-cloud-save.8fdb0b3fd0b4.js";
-import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.b6d38506d15b.js";
+} from "./firebase-cloud-save.1d73cfc92bc7.js";
+import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.3ce8552154d5.js";
 
 const AUTH_EVENT="four-symbols:firebase-auth-state";
 let lifecyclePromise=null;
