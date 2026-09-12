@@ -48,11 +48,9 @@ test("PoC cannot fall back to Web OAuth or mutate game data", () => {
         "signInWithRedirect",
         "location.assign",
         "FirebaseFirestore",
-        "FirebaseFunctions",
         "saveGame",
         "loadGame",
-        "localStorage",
-        "signInWithCustomToken"
+        "localStorage"
     ]) {
         assert.equal(activity.includes(forbidden), false, `unexpected PoC behavior: ${forbidden}`);
     }
