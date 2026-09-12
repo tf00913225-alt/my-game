@@ -63,6 +63,39 @@ jobs:
             -storepass android \
             -alias androiddebugkey >/dev/null
 
+      - name: Restore Firebase Android config
+        shell: bash
+        env:
+          FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${FIREBASE_GOOGLE_SERVICES_JSON:-}" ]; then
+            echo "Missing required Actions secret: FIREBASE_GOOGLE_SERVICES_JSON" >&2
+            exit 1
+          fi
+
+          DEST="android/facebook-login-poc/app/google-services.json"
+          printf '%s' "$FIREBASE_GOOGLE_SERVICES_JSON" > "$DEST"
+
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'android/facebook-login-poc/app/google-services.json';
+          const data = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const clients = Array.isArray(data.client) ? data.client : [];
+          const packages = clients
+            .map((client) => client?.client_info?.android_client_info?.package_name)
+            .filter(Boolean);
+
+          if (data?.project_info?.project_id !== 'four-symbols-jianghu') {
+            throw new Error('google-services.json belongs to the wrong Firebase project');
+          }
+          if (!packages.includes('com.foursymbols.jianghu.authpoc')) {
+            throw new Error('google-services.json does not contain com.foursymbols.jianghu.authpoc');
+          }
+          console.log('Firebase Android config validated for PoC package.');
+          NODE
+
       - name: Build debug APK
         working-directory: android/facebook-login-poc
         run: ./gradlew :app:assembleDebug --stacktrace
