@@ -100,17 +100,19 @@ jobs:
         working-directory: android/facebook-login-poc
         run: ./gradlew :app:assembleDebug --stacktrace
 
-      - name: Generate Facebook debug key hash
+      - name: Generate Facebook debug key hash from built APK
         shell: bash
         run: |
           set -euo pipefail
-          KEYSTORE="$HOME/.android/debug.keystore"
+          APK="android/facebook-login-poc/app/build/outputs/apk/debug/app-debug.apk"
 
-          HASH="$(keytool -exportcert \
-            -alias androiddebugkey \
-            -keystore "$KEYSTORE" \
-            -storepass android \
-            -keypass android 2>/dev/null \
+          if [ ! -f "$APK" ]; then
+            echo "Built debug APK is missing: $APK" >&2
+            exit 1
+          fi
+
+          HASH="$(keytool -printcert -rfc -jarfile "$APK" 2>/dev/null \
+            | openssl x509 -outform der \
             | openssl sha1 -binary \
             | openssl base64)"
 
@@ -122,7 +124,7 @@ jobs:
           mkdir -p android/facebook-login-poc/build/poc-output
           printf '%s\n' "$HASH" | tee android/facebook-login-poc/build/poc-output/facebook-debug-key-hash.txt
           echo "FACEBOOK_DEBUG_KEY_HASH=$HASH" >> "$GITHUB_ENV"
-          echo "### Facebook debug Key Hash" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Facebook debug Key Hash (from built APK certificate)" >> "$GITHUB_STEP_SUMMARY"
           echo '```text' >> "$GITHUB_STEP_SUMMARY"
           echo "$HASH" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
