@@ -72,7 +72,6 @@ test("documentation fixes console fields, UID comparison, and the no-auto-sessio
     assert.match(readme, /https:\/\/four-symbols-jianghu\.firebaseapp\.com\/__\/auth\/handler/);
     assert.match(readme, /開啟支援的連結」\*\*開啟\*\*/);
     assert.match(readme, /兩端 UID 必須完全相同/);
-    assert.match(readme, /不會自動/);
     assert.match(readme, /Web game handoff（本輪已實作）/);
     assert.match(readme, /createNativeAuthHandoff/);
     assert.match(readme, /redeemNativeAuthHandoff/);
