@@ -112,22 +112,28 @@ Firebase 官方文件要求 Android 專案先註冊 Firebase app、啟用 Facebo
 
 同一 Firebase project 內，使用相同 Facebook provider subject 進行 Firebase Auth 時，Android 與 Web 應解析為同一 Firebase UID。若 UID 不同，先核對 Android 的 `google-services.json` 是否屬於 `four-symbols-jianghu`、Meta App ID 是否相同、以及 Web 端是否真的是同一個 Facebook 帳號；不要藉由改寫 UID 或存檔來「修正」結果。
 
-## WebView / 網頁遊戲橋接（本輪不實作）
+## Web game handoff（本輪已實作）
 
-Firebase Android 與 Firebase Web 的 session persistence 分別位於 app sandbox 與瀏覽器／WebView storage，原生登入**不會自動**讓 Web Firebase SDK 變成已登入。未來正式接入前，建議先決定其中一種安全橋接：
+目前正式接法採用 **C. 外部瀏覽器 one-time handoff**：
 
-| 選項 | 流程 | 安全邊界 |
-| --- | --- | --- |
-| A. Trusted backend one-time handoff（建議） | Native 端取得短效 Firebase ID token → trusted backend 驗證 → 產生一次性、短效 handoff code／Firebase custom token → 同源遊戲 Web SDK 以 custom token 登入同一 UID | Backend 必須驗證 native ID token、nonce、期限、單次使用與目標 origin；網頁不得取得 Facebook access token。 |
-| B. Host-controlled WebView bridge | WebView 僅載入 allowlist 遊戲 origin；native 把一次性 handoff code 傳給載入完成的可信頁面，頁面向 backend 兌換 custom token | 禁止任意 `addJavascriptInterface`、任意 URL 與可重放 token；需有 origin/導航驗證。 |
-| C. 外部瀏覽器 one-time handoff | Native 成功後經 HTTPS app link 開啟遊戲 handoff endpoint，遊戲頁由 backend 兌換一次性 code | 適合不內嵌 WebView 的原生殼；仍需要 backend 驗證與 token 只用一次。 |
+`Android browser → foursymbols://auth/facebook → native Meta Login → Firebase Android Auth → createNativeAuthHandoff → HTTPS game URL fragment → redeemNativeAuthHandoff → Web Firebase signInWithCustomToken`
 
-不可接受的做法：假設 session 自動共享、把 Facebook access token 放入 URL/localStorage、以 UID query parameter 偽造登入、或直接寫入／遷移遊戲存檔。本 repo 的 Firestore progression write policy 仍為 `trusted-backend-only`。
+安全邊界：
+
+- Facebook Access Token 只存在 Android native SDK / Firebase Android Auth 流程，不會放進 URL、localStorage 或 Web JavaScript。
+- Android 端只接受 allow-listed HTTPS return origins。
+- handoff code 為 32-byte random base64url、固定 43 字元、兩分鐘過期、單次交易兌換。
+- backend 只有在 Firebase callable 已驗證目前 session 的 provider 為 `facebook.com` 時才建立 handoff。
+- redeem 會以 Firestore transaction 原子刪除 handoff，再由 Firebase Admin SDK 產生 custom token。
+- Web 端兌換後立即移除 URL fragment，接著沿用既有 `onAuthStateChanged`、UID resolution、cloud-save hydration。
+- 不改 Firestore Rules、遊戲存檔 schema、UID ownership 或角色資料。
+
+不可接受的做法仍包括：假設 native/Web session 自動共享、把 Facebook access token 放入 URL/localStorage、以 UID query parameter 偽造登入、或直接寫入／遷移遊戲存檔。
+
+**Live deployment prerequisite:** `functions/index.js` 的 `createNativeAuthHandoff` 與 `redeemNativeAuthHandoff` 必須實際部署到 Firebase project `four-symbols-jianghu`。Repository merge 本身不等於 Cloud Functions 已部署。
 
 ## 正式接入前需要決定
 
-1. 正式 Android package name 是否沿用本 PoC，或另定不可變的 production package。
-2. 遊戲正式宿主：純 native、受控 WebView、Capacitor/TWA，或維持外部瀏覽器。
-3. 是否建立 trusted backend 來驗證 native Firebase ID token 並發出一次性 handoff/custom token。
-4. 既有帳號遇到不同 provider 但相同 email 時的顯式帳號連結流程；不得 silent link。
-5. production signing keystore 的管理方式與 release Key Hash；不能沿用 debug hash 發布。
+1. 正式 Android package name 是否沿用本 PoC，或另定 production package。
+2. 如果未來改成真正的 WebView/原生殼，可把同一個 trusted one-time handoff 改為 host-controlled bridge；目前不需要再建立第二套登入 owner。
+3. production signing keystore 的管理方式與 release Key Hash；不能沿用 debug hash 發布。
