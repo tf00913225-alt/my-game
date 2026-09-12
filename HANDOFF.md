@@ -3809,3 +3809,9 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 「不同意」先嘗試關閉視窗；因一般瀏覽器通常禁止網頁自行關閉使用者開啟的分頁，失敗時改導向 `privacy-declined.html` 並終止遊戲介面。
 - 同意 gate 持續以隱藏 iframe 作 owner，動態為登入頁插入「隱私權政策」入口，並在主城「系統」的客服列後插入同一入口；兩者皆重新開啟相同政策 viewer，不複製政策本文。
 - 本功能不修改 Firebase UID、登入 provider、存檔、角色資料、戰鬥、掉落或遊戲數值。
+## 2026-09-12 怪物立繪基礎與首次遊玩手機修復整合（待 DEV CI）
+
+- 使用者授權整合 `feature/monster-portrait-pipeline-v1-20260911@bfab950abc32726d72c65eb75006475e499c4148` 與 `fix/mobile-first-play-ui-vfx-20260911@b22065175f514ea1f93ecb020cbb0c3ae2d38b25` 到最新 `dev@7d5f841f237c5dc02e79767972f95516df575e3f`；整合分支為 `integrate/monster-portrait-mobile-first-play-20260912`，`main` 未修改。
+- 巡怪形象切換／角色圖 owner 維持 `js/26-v131-patrol-appearance.js` + `css/32-v131-patrol-appearance.css`；首次遊玩兩幕與創角預備 owner 維持 `js/52-v173.20-startup-loader.js`；卡牌立繪／火箭方向的既有最終 CSS owner 為 `css/56-v174-critical-ui-regressions.css`。本輪未新增 runtime wrapper。
+- 怪物立繪基礎 owner 為 `config/monster-portrait-registry.json`、`js/45-v154-dev-fixes.js` resolver 與 `js/48-v159-abyss-battle-portraits.js` 同步橋接。四張已合入但損毀的天兵 PNG 已以既有透明母圖重新置入 1024×1536 RGBA 檔，非重新生成。
+- 已通過 monster audit（13 existing／94 planned，4 張 generated assets 均可解碼）、專項測試、124/124 非瀏覽器 Node suites、233/233 JS syntax、build deterministic、resources／IDs／loader／release gate／git diff。此環境沒有 Chromium；29 個既有瀏覽器測試留待 GitHub Actions 驗證後才可標示完整完成。

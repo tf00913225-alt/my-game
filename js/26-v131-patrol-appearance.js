@@ -16,6 +16,7 @@
             earth:{front:"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp",back:"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp"}
         }
     };
+    const SWITCH_ICON="assets/ui/patrol-appearance-switch-icon.png";
     const localKey=()=>{
         try{
             const repo=window.FourSymbolsAccountSave;
@@ -59,8 +60,8 @@
         if(!character){ return; }
         const facing=facingBack?"back":"front";
         image.classList.add("v131-patrol-q-art");
-        image.style.setProperty("width","70px","important");
-        image.style.setProperty("height","105px","important");
+        image.style.removeProperty("width");
+        image.style.removeProperty("height");
         image.src=artFor(character,facing);
         image.alt=(character.id||("角色"+(index+1)))+"巡怪形象";
         image.dataset.v131PatrolCharacter=String(index);
@@ -104,8 +105,14 @@
         const button=document.createElement("button"); button.id="v131PatrolAppearanceSwitch"; button.type="button";
         button.setAttribute("aria-label","形象切換"); button.title="形象切換";
         const viewport=document.createElement("span"); viewport.className="v131-switch-icon-viewport";
-        const icon=document.createElement("span"); icon.className="v131-switch-icon-sprite";
-        icon.style.backgroundImage='url("assets/ui/patrol-appearance-switch-icon.png")';
+        const icon=document.createElement("img");
+        icon.className="v131-switch-icon-image";
+        icon.src=SWITCH_ICON;
+        icon.alt="";
+        icon.draggable=false;
+        icon.decoding="async";
+        icon.addEventListener("error",()=>{ button.classList.add("v131-switch-icon-failed"); },{once:true});
+        icon.addEventListener("load",()=>{ button.classList.remove("v131-switch-icon-failed"); },{once:true});
         viewport.appendChild(icon); button.appendChild(viewport);
         const panel=document.createElement("div"); panel.id="v131PatrolAppearancePanel";
         panel.setAttribute("aria-label","選擇巡怪角色形象");

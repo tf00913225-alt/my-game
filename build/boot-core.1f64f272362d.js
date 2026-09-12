@@ -820,7 +820,14 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     const creation=document.getElementById("creationPage");
     const game=document.getElementById("gameInterface");
     const build=global.__FOUR_SYMBOLS_BUILD__||{};
-    const introLogoTargetMs=Math.max(350,Math.min(1800,Number(root&&root.dataset.logoTargetMs)||900));
+    const introLogoTargetMs=Math.max(5000,Number(root&&root.dataset.logoTargetMs)||5000);
+    const introCityTargetMs=5000;
+    const CREATION_PORTRAITS=[
+        "assets/characters/female_fire.jpg","assets/characters/female_water.jpg",
+        "assets/characters/female_wind.jpg","assets/characters/female_earth.jpg",
+        "assets/characters/male_fire.jpg","assets/characters/male_water.jpg",
+        "assets/characters/male_wind.jpg","assets/characters/male_earth.jpg"
+    ];
     let state=STATES.BOOT_LOADING;
     let activeUser=null;
     let resolvedUid=null;
@@ -831,7 +838,8 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     let lastError=null;
     let introTimer=0;
     let citySceneShown=false;
-    let returningPresentationComplete=false;
+    let openingPresentationComplete=false;
+    let creationRenderPromise=null;
 
     function mark(name){
         try{ if(global.performance&&typeof global.performance.mark==="function"){ global.performance.mark(name); } }catch(_){ }
@@ -841,10 +849,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     if(game){ game.style.display="none"; }
     if(root){ root.hidden=false; root.dataset.owner="StartupStateMachine"; root.dataset.state=state; }
     mark("four-symbols:boot-core-ready");
-    // Opening-scene timing is controlled by boot(); readiness never races a timer.
 
-    // Signed-out players need only the account surface. Start the application
-    // shell after Firebase has produced a UID, then overlap it with save I/O.
     let appShellPromise=null;
     function startAppShell(){
         if(!appShellPromise){
@@ -897,8 +902,6 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         firebase.setUiState({mode,user:activeUser,message,error,migration}); firebase.openAuth();
     }
     function safeCloudEmpty(result,uid){
-        // A successful authenticated read of this UID's missing document is an
-        // authoritative empty result. Read errors never reach this function.
         if(result&&result.exists===false&&result.uid===uid){ return true; }
         const data=result&&result.data;
         return !!(result&&result.exists&&data&&data.ownerUid===uid&&data.authoritativeStateReady===false&&
@@ -916,6 +919,32 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
     function domReady(){
         if(document.readyState!=="loading"){ return Promise.resolve(); }
         return new Promise(resolve=>document.addEventListener("DOMContentLoaded",resolve,{once:true}));
+    }
+    function nextPaint(){
+        return new Promise(resolve=>global.requestAnimationFrame(()=>global.requestAnimationFrame(resolve)));
+    }
+    function decodeUrl(url){
+        return new Promise((resolve,reject)=>{
+            const image=new Image();
+            image.decoding="async";
+            image.onload=()=>resolve();
+            image.onerror=()=>reject(new Error("Character creation image failed to render: "+url));
+            image.src=url;
+            if(image.complete&&image.naturalWidth){
+                if(typeof image.decode==="function"){ image.decode().then(resolve,reject); }else{ resolve(); }
+            }
+        });
+    }
+    function prepareCreationRender(){
+        if(creationRenderPromise){ return creationRenderPromise; }
+        creationRenderPromise=(async()=>{
+            status("準備創角介面","正在完成角色立繪、字型與版面渲染");
+            const fontReady=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve();
+            await Promise.all([fontReady,...CREATION_PORTRAITS.map(decodeUrl)]);
+            await nextPaint();
+            mark("four-symbols:character-creation-render-ready");
+        })().catch(error=>{ creationRenderPromise=null; throw error; });
+        return creationRenderPromise;
     }
     function activateGameplaySaveOwner(){
         if(!resolvedUid||!global.FourSymbolsGameSave||typeof global.FourSymbolsGameSave.activate!=="function"){
@@ -956,11 +985,14 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         await Promise.all([requireAppShell(),domReady()]);
         if(token!==transitionToken){ return; }
         activateGameplaySaveOwner();
+        await prepareCreationRender();
+        if(token!==transitionToken){ return; }
         transition(STATES.NEED_CHARACTER,{uid:resolvedUid});
         firebase.closeAuth(); status("帳號資料已確認","此 UID 尚無角色，可以建立角色");
         showCharacterCreationSurface();
         if(game){ game.style.display="none"; }
         mark("four-symbols:critical-ready");
+        await nextPaint();
         await hideLoader();
         if(state!==STATES.NEED_CHARACTER){ return; }
         mark("four-symbols:character-creation-interactive");
@@ -1021,8 +1053,6 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
                     }
                     selectedSave=local.save;
                 }else if(localBase===cloudFingerprint){
-                    // The cloud snapshot is unchanged and this UID's local save is
-                    // a verified descendant (normalization or later local play).
                     selectedSave=local.save;
                 }else{
                     return migration("雲端角色與此 UID 的本機角色沒有共同的已驗證基底。系統禁止靜默選邊或覆寫。",true);
@@ -1072,7 +1102,6 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         if(!user){
             if(activeUser){
                 global.FourSymbolsAccountSave.deactivate();
-                // A full reload clears player/inventory/equipment globals before another UID can hydrate.
                 global.location.reload(); return;
             }
             if(state===STATES.AUTH_RESOLVING){ requireAuth(); }
@@ -1091,21 +1120,19 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         });
     }
     async function runOpeningPresentation(returning,retryOnly){
-        returningPresentationComplete=false;
+        openingPresentationComplete=false;
         if(retryOnly){ showCityScene("resource-retry"); return; }
         if(root){ root.dataset.audience=returning?"returning":"first-boot"; }
-        await delay(returning?5000:1800);
+        await delay(introLogoTargetMs);
         showCityScene(returning?"returning-logo-complete":"first-boot-logo-complete");
-        if(returning){
-            await delay(5000);
-            returningPresentationComplete=true;
-            const readyPercent=Number(progress&&progress.getAttribute("aria-valuenow")||0);
-            if(readyPercent<100){ status("正在更新必要資源","第二幕將維持顯示，完成後才進入帳號系統"); }
-        }
+        await delay(introCityTargetMs);
+        openingPresentationComplete=true;
+        const readyPercent=Number(progress&&progress.getAttribute("aria-valuenow")||0);
+        if(readyPercent<100){ status(returning?"正在更新必要資源":"正在準備必要資源","載入完成前將維持第二幕，不會提前進入帳號或創角畫面"); }
     }
     function renderFirstPlayProgress(value){
-        const holdReturningUpdate=returningPresentationComplete&&root&&root.dataset.audience==="returning"&&Number(value.percent)<100;
-        render(value.percent,holdReturningUpdate?"正在更新必要資源":value.title,value.detail);
+        const holdOnSecondScene=openingPresentationComplete&&Number(value.percent)<100;
+        render(value.percent,holdOnSecondScene?(root&&root.dataset.audience==="returning"?"正在更新必要資源":"正在準備必要資源"):value.title,value.detail);
         if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }
     }
     function showResourceFailure(error){
@@ -1166,7 +1193,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
                 packResult=await prepare({onProgress:renderFirstPlayProgress});
             }catch(error){ await presentation; showResourceFailure(error); return; }
             await presentation;
-            render(100,"遊戲資源準備完成","First Play Ready Pack 已下載、驗證並可渲染");
+            render(100,"遊戲資源準備完成","必要資源已下載、驗證並可渲染");
             mark("four-symbols:first-play-ready");
             emit("four-symbols:first-play-ready",{returning,manifestChanged:packResult.manifestChanged,totalBytes:packResult.totalBytes});
             if(!privacy.hasConsent()){
