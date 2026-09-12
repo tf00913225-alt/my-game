@@ -1,0 +1,52 @@
+name: Temp Facebook Standard Flow Build
+
+on:
+  push:
+    branches: [fix/facebook-login-standard-flow-20260912]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/facebook-login-standard-flow-20260912
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Converge stale diagnostic UI text and HANDOFF
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          ui=Path('js/firebase/firebase-auth-ui.js')
+          text=ui.read_text(encoding='utf-8')
+          stale='''        "auth/facebook-diagnostic-unavailable":"Facebook DEV 診斷只能在瀏覽器執行。",\n        "auth/facebook-diagnostic-storage-unavailable":"Facebook DEV 診斷無法使用安全的暫存狀態，請確認瀏覽器沒有封鎖網站工作階段儲存。",\n        "auth/facebook-diagnostic-state-mismatch":"Facebook DEV 診斷的 OAuth state 驗證失敗，這次登入已拒絕。",\n        "auth/facebook-diagnostic-oauth-error":"Facebook DEV 診斷被 Meta 拒絕；請依畫面上的 Meta 錯誤繼續排查。",\n        "auth/facebook-diagnostic-no-token":"Facebook DEV 診斷：Meta 沒有回傳 access token。",\n'''
+          if stale not in text:
+              raise SystemExit('stale Facebook diagnostic error-map block not found')
+          ui.write_text(text.replace(stale,'',1),encoding='utf-8')
+
+          handoff=Path('HANDOFF.md')
+          h=handoff.read_text(encoding='utf-8')
+          section='''## 2026-09-12 Facebook 登入 owner 收斂：移除 DEV direct OAuth\n\n- 工作分支 `fix/facebook-login-standard-flow-20260912`，基準為當時最新 `dev@fb316e564fb72e521df3d363b8bde81445c2dc15`；`main` 不修改。\n- Android 實機確認：玩家保留 Facebook App 正常「開啟支援連結」時，DEV direct `location.assign(facebook.com)` 會被外部 Facebook App 接管並停在 `Error Facebook`；只有關閉支援連結、由 Chrome 接手時才可完成 OAuth。因此問題不是玩家手機需額外設定，而是 DEV TEMP direct-OAuth/full-page navigation 不可作為正式玩家流程。\n- 唯一 Auth owner `js/firebase/firebase-auth.js` 已移除整套 `FACEBOOK_DIAGNOSTIC_*`、`location.assign()`、manual access-token callback、`signInWithCredential()` 與 mobile `signInWithRedirect()` 分支；不得再疊第三層 workaround。\n- `signInWithFacebook()` 現在單一路徑使用 Firebase `FacebookAuthProvider` + `signInWithPopup()`，並設定 `display=popup`，讓手機與桌機都維持瀏覽器 popup 流程；初始化僅保留 `getRedirectResult()` 以相容修正前已啟動但尚未結束的舊 redirect session。\n- `js/firebase/firebase-auth-ui.js` 移除已不存在的 DEV diagnostic 錯誤文案；`docs/FIREBASE_AUTH_CLOUD_SAVE.md` 與 Auth regression test 同步改為 popup contract。\n- 不修改 UID ownership、存檔 schema、Firestore Rules、Startup State Machine、Game/Cache Version。實機驗收條件：Facebook App 保持正常支援連結設定，不要求玩家關閉 App link；點「Facebook 登入」不得再出現舊 DEV direct-OAuth `Error Facebook`。\n\n'''
+          if not h.startswith('## 2026-09-12 Facebook 登入 owner 收斂'):
+              handoff.write_text(section+h,encoding='utf-8')
+          PY
+      - name: Regenerate deterministic production assets
+        run: node scripts/build-production.mjs
+      - name: Run focused auth test
+        run: node tests/firebase-auth-foundation.test.mjs
+      - name: Commit generated convergence
+        shell: bash
+        run: |
+          git add js/firebase/firebase-auth-ui.js HANDOFF.md asset-manifest.json index.html build/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build(auth): regenerate Facebook standard-flow assets"
+          git push origin HEAD:fix/facebook-login-standard-flow-20260912
