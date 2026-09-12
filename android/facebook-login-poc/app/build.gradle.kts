@@ -4,6 +4,10 @@ plugins {
 }
 
 val hasGoogleServicesJson = file("google-services.json").isFile
+val metaFacebookClientToken = providers.environmentVariable("META_FACEBOOK_CLIENT_TOKEN")
+    .orNull
+    ?.trim()
+    .orEmpty()
 
 if (hasGoogleServicesJson) {
     // Firebase Console generates this file for this exact Android package. It is
@@ -25,6 +29,8 @@ android {
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("boolean", "HAS_GOOGLE_SERVICES_JSON", hasGoogleServicesJson.toString())
+        buildConfigField("boolean", "HAS_META_FACEBOOK_CLIENT_TOKEN", metaFacebookClientToken.isNotBlank().toString())
+        resValue("string", "facebook_client_token", metaFacebookClientToken)
     }
 
     buildTypes {
