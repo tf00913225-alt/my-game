@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-12-android-native-facebook-login-poc",
+  "baseBranch": "dev",
+  "baseCommit": "f4fc2f78d704a6019252b52345cb6f66a74133ce",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "NATIVE-FB-01",
+      "status": "VERIFIED",
+      "requirement": "建立獨立 Android 原生 PoC，使用 Meta LoginManager/CallbackManager 取得 AccessToken，再以 Firebase Android FacebookAuthProvider credential 登入。不得使用 WebView、Web popup、redirect 或 direct Meta OAuth workaround。",
+      "evidence": [
+        "android/facebook-login-poc/app/src/main/java/com/foursymbols/jianghu/authpoc/MainActivity.kt",
+        "android/facebook-login-poc/app/src/main/AndroidManifest.xml",
+        "tests/android-facebook-native-poc.test.mjs",
+        "2026-09-12: Node targeted static test 6/6 PASS; Gradle 8.9 :app:tasks PASS; Google Services :app:processDebugGoogleServices PASS with a temporary synthetic non-secret config"
+      ]
+    },
+    {
+      "id": "NATIVE-FB-02",
+      "status": "VERIFIED",
+      "requirement": "PoC 只讀取並顯示 Firebase UID，不讀寫存檔、Firestore Rules、UID ownership、角色資料或 Web auth owner。",
+      "evidence": [
+        "android/facebook-login-poc/app/src/main/java/com/foursymbols/jianghu/authpoc/MainActivity.kt",
+        "tests/android-facebook-native-poc.test.mjs",
+        "2026-09-12: Node targeted static test asserts no WebView, Web OAuth, Firestore, save, localStorage or custom-token bridge behavior"
+      ]
+    },
+    {
+      "id": "NATIVE-FB-03",
+      "status": "VERIFIED",
+      "requirement": "文件必須列出 Meta Android platform、Firebase Android app registration、google-services.json 本機放置、debug/release Key Hash、可重現 APK 建置與安全 bridge 選項。",
+      "evidence": [
+        "android/facebook-login-poc/README.md",
+        "android/facebook-login-poc/scripts/print-facebook-key-hash.sh",
+        ".gitignore",
+        "tests/android-facebook-native-poc.test.mjs",
+        "2026-09-12: Node targeted static test verifies exact package/activity/redirect/bridge documentation and ignored local configuration paths"
+      ]
+    },
+    {
+      "id": "NATIVE-FB-04",
+      "status": "VERIFIED",
+      "requirement": "在未提供 Firebase Android config 時，PoC 必須明確停用登入且不得以假設定、App Secret 或 source literal 取代 google-services.json。",
+      "evidence": [
+        "android/facebook-login-poc/app/build.gradle.kts",
+        "android/facebook-login-poc/app/src/main/java/com/foursymbols/jianghu/authpoc/MainActivity.kt",
+        ".gitignore",
+        "tests/android-facebook-native-poc.test.mjs",
+        "2026-09-12: Gradle 8.9 verifies both absent-config source-only mode and conditional Google Services processing using a temporary synthetic config; the synthetic file was removed afterwards"
+      ]
+    },
+    {
+      "id": "NATIVE-FB-05",
+      "status": "IMPLEMENTED",
+      "requirement": "在 Samsung S23 Ultra、Facebook App『開啟支援的連結』保持開啟時完成 Meta/Firebase Console 設定、建置並實測 native app-switch 回到 MainActivity，顯示 Firebase UID 且與 Web 相同。",
+      "evidence": [
+        "android/facebook-login-poc/README.md：實機驗證步驟已完成，等待 Meta/Firebase Console 設定、實機 APK 與同帳號 UID 比對。"
+      ]
+    }
+  ],
+  "automatedVerification": "TARGETED_STATIC_TEST_6_OF_6_AND_GRADLE_8_9_PROJECT_CONFIGURATION_VERIFIED; DEBUG_ASSEMBLE_BLOCKED_BY_MISSING_ANDROID_SDK",
+  "automatedVerificationNotes": "本 PoC 不改 Web Firebase owner、存檔 schema、UID ownership、角色、Firestore Rules、Game/Cache Version 或 release source。Gradle 8.9 的 :app:tasks 與 :app:processDebugGoogleServices 已通過；本執行環境沒有 Android SDK，:app:assembleDebug 的唯一失敗原因是 SDK location not found。google-services.json 與簽章檔被 Git 忽略。",
+  "visualVerification": "PENDING_META_FIREBASE_CONSOLE_AND_S23_ULTRA_VERIFICATION",
+  "verifiedDevCommit": null,
+  "releasedAs": null
+}

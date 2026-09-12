@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">四象江湖傳 Facebook 原生登入 PoC</string>
+    <string name="facebook_app_id">1712957419809925</string>
+    <string name="fb_login_protocol_scheme">fb1712957419809925</string>
+
+    <string name="poc_title">Facebook Android 原生登入 PoC</string>
+    <string name="poc_description">本畫面只驗證 Meta Android SDK → Firebase Android Auth → Firebase UID。它不載入遊戲網頁，也不讀寫任何遊戲存檔。</string>
+    <string name="facebook_login_action">以 Facebook 原生登入</string>
+    <string name="initializing">正在初始化 Firebase PoC…</string>
+    <string name="firebase_uid_label">Firebase UID（僅供比對）</string>
+    <string name="uid_not_signed_in">尚未登入</string>
+    <string name="clear_poc_session">清除 PoC 登入工作階段</string>
+    <string name="poc_data_boundary">僅顯示 Firebase UID；不會讀取、寫入、遷移或綁定遊戲存檔、角色資料與 Firestore。</string>
+    <string name="missing_google_services_json">尚未放入 Firebase Console 下載的 google-services.json，已停用登入。</string>
+    <string name="firebase_initialization_failed">Firebase Android 設定無法初始化，請確認 google-services.json 的專案與套件名稱。</string>
+    <string name="ready_for_native_login">已就緒。請以 Facebook 原生登入。</string>
+    <string name="firebase_not_ready">Firebase 尚未就緒，無法開始登入。</string>
+    <string name="opening_native_facebook_login">正在開啟 Facebook 原生登入…</string>
+    <string name="facebook_login_cancelled">Facebook 登入已取消。</string>
+    <string name="facebook_login_failed">Facebook 原生登入失敗，請檢查 Meta 的 Android 平台設定與 Key Hash。</string>
+    <string name="exchanging_facebook_credential">已取得 Facebook 權杖，正在以 Firebase 驗證…</string>
+    <string name="firebase_sign_in_failed">Firebase 無法接受 Facebook credential，請檢查 Firebase Facebook provider 與 google-services.json。</string>
+    <string name="firebase_user_missing">Firebase 驗證完成但沒有可讀取的使用者。</string>
+    <string name="firebase_uid_ready">原生 Firebase Auth 成功；下方 UID 可與 Web 端比對。</string>
+    <string name="poc_session_cleared">PoC 登入工作階段已清除；沒有變更任何遊戲資料。</string>
+</resources>

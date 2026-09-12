@@ -27,7 +27,7 @@ import {
     FIREBASE_CONFIG,
     assertFirebaseConfigReady,
     getFirebaseConfigStatus
-} from "./firebase-config.js";
+} from "./firebase-config.4314d6321ba1.js";
 
 let firebaseApp = null;
 let firebaseAuth = null;

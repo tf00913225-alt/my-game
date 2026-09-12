@@ -1,0 +1,11 @@
+# Android native Facebook Login PoC: local Firebase configuration, signing material,
+# Gradle outputs, and generated APKs must never enter source control.
+/android/facebook-login-poc/local.properties
+/android/facebook-login-poc/app/google-services.json
+/android/facebook-login-poc/keystore.properties
+/android/facebook-login-poc/**/*.jks
+/android/facebook-login-poc/**/*.keystore
+/android/facebook-login-poc/.gradle/
+/android/facebook-login-poc/build/
+/android/facebook-login-poc/app/build/
+/android/facebook-login-poc/*.apk
