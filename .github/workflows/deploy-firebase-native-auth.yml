@@ -1,0 +1,93 @@
+name: Deploy Firebase Native Auth Backend
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type DEPLOY_NATIVE_AUTH to deploy the two Android Facebook auth bridge functions from dev"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firebase-native-auth-backend
+  cancel-in-progress: false
+
+env:
+  FIREBASE_PROJECT_ID: four-symbols-jianghu
+  FIREBASE_TOOLS_VERSION: 15.30.0
+
+jobs:
+  deploy:
+    name: Deploy native auth bridge
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Confirm explicit deployment
+        shell: bash
+        run: |
+          if [[ "${{ inputs.confirm }}" != "DEPLOY_NATIVE_AUTH" ]]; then
+            echo "::error::Deployment confirmation did not match DEPLOY_NATIVE_AUTH."
+            exit 1
+          fi
+
+      - name: Check deployment credential is configured
+        shell: bash
+        env:
+          FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [[ -z "$FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON" ]]; then
+            echo "::error::Missing GitHub Actions secret FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON."
+            echo "This must be a Google Cloud service-account JSON key with permission to deploy Firebase Functions for project $FIREBASE_PROJECT_ID."
+            echo "Do not use the Android google-services.json client configuration here."
+            exit 1
+          fi
+
+      - name: Check out current dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 1
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON }}
+          project_id: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: functions/package.json
+
+      - name: Install Functions dependencies
+        shell: bash
+        run: npm --prefix functions install --no-audit --no-fund
+
+      - name: Show deployment source
+        shell: bash
+        run: |
+          echo "dev commit: $(git rev-parse HEAD)"
+          echo "Firebase project: $FIREBASE_PROJECT_ID"
+          echo "Functions: createNativeAuthHandoff, redeemNativeAuthHandoff"
+
+      - name: Deploy native auth bridge functions only
+        shell: bash
+        run: |
+          npx --yes firebase-tools@${FIREBASE_TOOLS_VERSION} deploy \
+            --only "functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff" \
+            --project "$FIREBASE_PROJECT_ID" \
+            --non-interactive
+
+      - name: Verify deployed functions are listed
+        shell: bash
+        run: |
+          LIST_OUTPUT="$(npx --yes firebase-tools@${FIREBASE_TOOLS_VERSION} functions:list --project "$FIREBASE_PROJECT_ID")"
+          printf '%s\n' "$LIST_OUTPUT"
+          grep -q "createNativeAuthHandoff" <<<"$LIST_OUTPUT"
+          grep -q "redeemNativeAuthHandoff" <<<"$LIST_OUTPUT"
