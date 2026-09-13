@@ -1,0 +1,73 @@
+name: V173.65 final validation pass 7
+
+on:
+  push:
+    branches:
+      - fix/v17365-ui-battle-auth-polish-20260913
+    paths:
+      - .github/workflows/v17365-validation-pass7.yml
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/v17365-ui-battle-auth-polish-20260913
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Ensure image dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y imagemagick
+          fi
+      - name: Stabilize temporary patch driver
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('scripts/apply-v17365-ui-battle-auth-polish.mjs')
+          s=p.read_text(encoding='utf-8')
+          s='\n'.join(line for line in s.splitlines() if 's=s.replace(/mechanismCardRule,' not in line)+'\n'
+          s=s.replace('const eagerAnchor="    apply();\\n\\n})();";', 'const eagerAnchor="    function boot(){";')
+          s=s.replace('eager=replaceOnce(eager,eagerAnchor,"    apply();\\n"+addition+"\\n})();","eager main-city roster owner");', 'eager=replaceOnce(eager,eagerAnchor,addition+"\\n"+eagerAnchor,"eager main-city roster owner");')
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check scripts/apply-v17365-ui-battle-auth-polish.mjs
+          python3 -m py_compile scripts/align-v17365-regressions.py
+      - name: Apply product fixes and align intentional tests
+        run: |
+          node scripts/apply-v17365-ui-battle-auth-polish.mjs
+          python3 scripts/align-v17365-regressions.py
+      - name: Syntax checks
+        run: |
+          node --check js/16-stage-v54-main-city-runtime.js
+          node --check js/41-v146-system-polish.js
+          node --check js/52-v173.20-startup-loader.js
+          node --check js/54-v173.51-battle-qa.js
+          node --check js/60-team-relic-system.js
+          node --check js/firebase/firebase-auth-ui.js
+      - name: Build
+        run: npm run build
+      - name: Focused eight-issue regression
+        run: node tests/v173.65-ui-battle-auth-polish.test.js
+      - name: Cardless battle browser regression
+        run: node tests/v174-cardless-battle-browser.test.js
+      - name: BOSS mobile geometry regression
+        run: node tests/boss-mobile-portrait-browser.test.js
+      - name: Full repository tests
+        run: npm test
+      - name: Production build check
+        run: npm run build:check
+      - name: Commit product fixes and generated bundles
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: polish battle city skill auth and relic UI"
+          git push origin HEAD:fix/v17365-ui-battle-auth-polish-20260913
