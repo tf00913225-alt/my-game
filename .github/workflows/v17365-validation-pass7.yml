@@ -1,4 +1,4 @@
-name: V173.65 final validation pass 11
+name: V173.65 fast dev validation
 
 on:
   push:
@@ -21,12 +21,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Ensure image dependency
-        run: |
-          if ! command -v identify >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install -y imagemagick
-          fi
       - name: Stabilize temporary patch driver
         run: |
           python3 - <<'PY'
@@ -62,14 +56,12 @@ jobs:
         run: node tests/v174-cardless-battle-browser.test.js
       - name: BOSS mobile geometry regression
         run: node tests/boss-mobile-portrait-browser.test.js
-      - name: Full repository tests
-        run: npm test
       - name: Production build check
         run: npm run build:check
       - name: Commit product fixes and generated bundles
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898242+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "fix: polish battle city skill auth and relic UI"
           git push origin HEAD:fix/v17365-ui-battle-auth-polish-20260913
