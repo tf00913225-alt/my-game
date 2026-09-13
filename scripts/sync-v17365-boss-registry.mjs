@@ -1,4 +1,4 @@
-// One-off V173.65 registry synchronization for final CI gate.
+// One-off V173.65 synchronization for the final CI gate.
 import fs from "node:fs";
 
 const file="config/monster-portrait-registry.json";
@@ -30,4 +30,17 @@ if(changed===0){
 // The downstream monster portrait audit is authoritative for runtime/registry parity;
 // not every renamed runtime label is required to have its own portrait target.
 fs.writeFileSync(file,JSON.stringify(registry));
-console.log(`Synchronized ${changed} simplified boss names into monster portrait registry.`);
+
+// Character creation deliberately shrinks the showcase from 820 to 760 native pixels
+// to remove the nested Android compositor/scroll pressure while keeping the 1080x1920 canvas.
+const creationTest="tests/v173.2-mobile-touch-scroll.test.js";
+let creationText=fs.readFileSync(creationTest,"utf8");
+const oldGeometry='assert.match(css,/#creationPage \\.creation-showcase\\{[\\s\\S]*height:820px;[\\s\\S]*min-height:820px;/);';
+const newGeometry='assert.match(css,/#creationPage \\.creation-showcase\\{[\\s\\S]*height:760px;[\\s\\S]*min-height:760px;/);';
+if(!creationText.includes(oldGeometry)){
+  throw new Error("Expected historical 820px creation showcase assertion was not found");
+}
+creationText=creationText.replace(oldGeometry,newGeometry);
+fs.writeFileSync(creationTest,creationText);
+
+console.log(`Synchronized ${changed} simplified boss names and aligned the 760px creation showcase regression.`);
