@@ -7,6 +7,7 @@ on:
     paths:
       - scripts/apply-v17365-polish.mjs
       - scripts/fix-v17365-ci-followup.mjs
+      - scripts/sync-v17365-boss-registry.mjs
 
 permissions:
   contents: write
@@ -27,6 +28,7 @@ jobs:
         run: |
           node scripts/apply-v17365-polish.mjs
           node scripts/fix-v17365-ci-followup.mjs
+          node scripts/sync-v17365-boss-registry.mjs
       - name: Ensure image validation dependency
         run: |
           if ! command -v identify >/dev/null 2>&1; then
