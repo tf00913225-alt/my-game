@@ -41,7 +41,7 @@ jobs:
       - name: Run targeted EXP safety regression
         run: node tests/v173.49-exp-pool-scroll-stability.test.js
 
-      - name: Recheck unrelated Element Box browser geometry
+      - name: Recheck Element Box browser geometry
         run: node tests/ui-element-box-medium-modal.test.js
 
       - name: Run repository test suite
