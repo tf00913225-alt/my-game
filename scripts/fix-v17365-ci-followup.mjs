@@ -19,6 +19,12 @@ if(!boss.includes(priorityHide)){
   throw new Error("Expected temporary priority damage-popup hide was not produced by the scoped polish script.");
 }
 boss=boss.replace(priorityHide,ownerHide);
+const staleGeometryComment=`/* Gameplay activity covers use the same 16:9 production ratio as dungeon\n   covers. Combat BOSS/mechanism cards remain independent 4:3 components. */`;
+const finalGeometryComment=`/* Gameplay activity covers use the same 16:9 production ratio as dungeon\n   covers. Combat BOSS/mechanism cards remain independent 9:16 components. */`;
+if(!boss.includes(staleGeometryComment)){
+  throw new Error("Expected historical Gameplay BOSS 4:3 comment was not found.");
+}
+boss=boss.replace(staleGeometryComment,finalGeometryComment);
 fs.writeFileSync(bossFile,boss);
 
 const authTestFile="tests/firebase-auth-foundation.test.mjs";
@@ -46,4 +52,4 @@ portraitTest=portraitTest.replace(
 );
 fs.writeFileSync(portraitTestFile,portraitTest);
 
-console.log("Restored canonical creation actions, kept Boss CSS priority-free, aligned auth tests, and covered the temporary all-monster portrait switch.");
+console.log("Restored canonical creation actions, kept Boss CSS priority-free, aligned 9:16 preservation comments, aligned auth tests, and covered the temporary all-monster portrait switch.");
