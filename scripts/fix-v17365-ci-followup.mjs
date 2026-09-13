@@ -20,4 +20,15 @@ if(!boss.includes(priorityHide)){
 boss=boss.replace(priorityHide,ownerHide);
 fs.writeFileSync(bossFile,boss);
 
-console.log("Restored canonical creation actions and kept Boss owner CSS free of priority patches before repository tests.");
+const authTestFile="tests/firebase-auth-foundation.test.mjs";
+let authTest=fs.readFileSync(authTestFile,"utf8");
+const oldDialogAssertion='    assert.match(css, /\\.firebase-auth-dialog\\{[\\s\\S]*width:min\\(92vw,420px\\);[\\s\\S]*max-height:100%;[\\s\\S]*overflow-y:auto/);';
+const oldCompactAssertion='    assert.match(css, /V174 compact auth over second startup scene[\\s\\S]*startup-main-city\\.[0-9a-f]{12}\\.jpg[\\s\\S]*width:min\\(calc\\(100% - 20px\\),390px\\)/);';
+const newDialogAssertions=`    assert.match(css, /\\.firebase-auth-dialog\\{[\\s\\S]*width:min\\(calc\\(100% - 20px\\),390px\\);[\\s\\S]*max-height:calc\\(100dvh - 24px\\);[\\s\\S]*overflow-y:auto/);\n    assert.match(css, /startup-main-city\\.[0-9a-f]{12}\\.jpg/);\n    assert.doesNotMatch(css, /backdrop-filter\\s*:/);`;
+if(!authTest.includes(oldDialogAssertion)||!authTest.includes(oldCompactAssertion)){
+  throw new Error("Expected historical auth geometry assertions were not found.");
+}
+authTest=authTest.replace(oldDialogAssertion,newDialogAssertions).replace(oldCompactAssertion,"");
+fs.writeFileSync(authTestFile,authTest);
+
+console.log("Restored canonical creation actions, kept Boss CSS priority-free, and aligned auth tests with the compact Android-safe owner geometry.");
