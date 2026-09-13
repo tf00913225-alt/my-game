@@ -20,8 +20,17 @@ const V_ASSET_VERSION="173.65";
         {pattern:/battle/i,feature:"battle",label:"戰鬥"}
     ];
     function target(event){ return event.target&&event.target.closest&&event.target.closest("button,a,[data-feature]"); }
+    function isExpPoolInteraction(element){
+        return !!(element&&element.closest&&element.closest("#homeExpPoolCard"));
+    }
     function descriptor(element){
         if(!element){ return null; }
+        /* 經驗池本身屬於主城 app-shell，但「預覽升級＋二次確認」owner 在
+           gameplay-core。自從 gameplay-core 改成 lazy 後，若不先載入 owner，
+           舊的即時分配按鈕就可能在防呆安裝前被點到。 */
+        if(isExpPoolInteraction(element)){
+            return {feature:"battle",label:"經驗池安全升級",expPool:true};
+        }
         const explicit=element.dataset&&element.dataset.feature;
         if(explicit){ return {feature:explicit,label:element.getAttribute("aria-label")||element.textContent||explicit}; }
         const signature=[element.id,element.className,element.getAttribute&&element.getAttribute("onclick"),element.textContent].join(" ");
@@ -35,6 +44,36 @@ const V_ASSET_VERSION="173.65";
         if(active){ element.dataset.featureLoadingLabel="正在載入"+(label||"功能")+"…"; }
         else{ delete element.dataset.featureLoadingLabel; }
     }
+    function refreshExpPoolSafetyUi(){
+        if(typeof window.renderExpDistributeList==="function"){
+            window.renderExpDistributeList();
+        }
+        if(typeof window.v173DecorateExpPoolDistributionUi==="function"){
+            window.v173DecorateExpPoolDistributionUi();
+        }
+    }
+    let expPoolPrimePromise=null;
+    function primeExpPoolSafety(){
+        const pool=document.getElementById("homeExpPoolCard");
+        const api=loader();
+        if(!pool||!api){ return; }
+        const visible=!pool.hidden&&window.getComputedStyle(pool).display!=="none"&&pool.getClientRects().length>0;
+        if(!visible){ return; }
+        if(api.isReady("battle")){
+            refreshExpPoolSafetyUi();
+            return;
+        }
+        if(expPoolPrimePromise){ return; }
+        setLocalLoading(pool,true,"經驗池安全升級");
+        expPoolPrimePromise=api.ensure("battle","exp-pool-safety").then(()=>{
+            setLocalLoading(pool,false);
+            refreshExpPoolSafetyUi();
+        }).catch(error=>{
+            setLocalLoading(pool,false);
+            console.error("EXP pool safety owner failed to load:",error);
+            document.dispatchEvent(new CustomEvent("four-symbols:feature-local-error",{detail:{feature:"battle",error}}));
+        }).finally(()=>{ expPoolPrimePromise=null; });
+    }
     function prefetch(event){
         const element=target(event); const info=descriptor(element); const api=loader();
         if(info&&api&&!api.isReady(info.feature)){ void api.prefetch(info.feature,event.type); }
@@ -45,8 +84,14 @@ const V_ASSET_VERSION="173.65";
         event.preventDefault(); event.stopImmediatePropagation();
         if(element.dataset.featureLoading==="1"){ return; }
         element.dataset.featureLoading="1"; setLocalLoading(element,true,info.label);
-        api.ensure(info.feature,"navigation").then(()=>{
+        api.ensure(info.feature,info.expPool?"exp-pool-safety":"navigation").then(()=>{
             delete element.dataset.featureLoading; setLocalLoading(element,false);
+            if(info.expPool){
+                /* 不 replay 舊 DOM 上可能仍指向 immediate distribute 的 handler。
+                   先由正式 owner 重繪成「預覽 → 確認」UI，玩家再點一次才會花 EXP。 */
+                refreshExpPoolSafetyUi();
+                return;
+            }
             element.dataset.featureReplay="1"; element.click(); delete element.dataset.featureReplay;
         }).catch(error=>{
             delete element.dataset.featureLoading; setLocalLoading(element,false);
@@ -57,7 +102,24 @@ const V_ASSET_VERSION="173.65";
     document.addEventListener("pointerdown",prefetch,{capture:true,passive:true});
     document.addEventListener("touchstart",prefetch,{capture:true,passive:true});
     document.addEventListener("click",enter,true);
-    document.addEventListener("four-symbols:startup-ready",()=>loader()&&loader().idle(),{once:true});
+    document.addEventListener("click",()=>setTimeout(primeExpPoolSafety,0),true);
+    document.addEventListener("four-symbols:startup-ready",()=>{
+        const api=loader();
+        if(api){ api.idle(); }
+        primeExpPoolSafety();
+    },{once:true});
+
+    function installExpPoolVisibilityObserver(){
+        if(!document.body||typeof MutationObserver==="undefined"){ return; }
+        const observer=new MutationObserver(primeExpPoolSafety);
+        observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
+        primeExpPoolSafety();
+    }
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",installExpPoolVisibilityObserver,{once:true});
+    }else{
+        installExpPoolVisibilityObserver();
+    }
 })();
 
 (function initBattleElementBoxDrag(){
