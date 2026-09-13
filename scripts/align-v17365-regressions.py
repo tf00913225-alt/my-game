@@ -86,13 +86,17 @@ s = s.replace('const source=fs.readFileSync("js/41-v146-system-polish.js","utf8"
 s = s.replace("assert.match(source,/v146-home-roster/);", "assert.match(eagerSource,/v146-home-roster/);")
 p.write_text(s, encoding="utf-8")
 
-# V173.43 keeps its growth/red-dot rules in V146 CSS, but the main-city roster
-# geometry moved to the eager app-shell owner so it is ready before game entry.
+# V173.43 keeps growth/red-dot rules in V146 CSS, while main-city roster geometry
+# and typography now live in the eager app-shell owner.
 p = Path("tests/v173.43-growth-charge.test.js")
 s = p.read_text(encoding="utf-8")
 s = s.replace('const polishCss=fs.readFileSync("css/42-v146-system-polish.css","utf8");', 'const polishCss=fs.readFileSync("css/42-v146-system-polish.css","utf8");\nconst homeRosterCss=fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8");')
 s = s.replace('test("three-character home HUD grows with readable text but remains three columns",()=>{assert.match(polishCss,/grid-template-columns:repeat\\(3,minmax\\(0,1fr\\)\\)/);', 'test("three-character home HUD grows with readable text but remains three columns",()=>{assert.match(homeRosterCss,/grid-template-columns:repeat\\(3,minmax\\(0,1fr\\)\\)/);')
-s = s.replace('assert.match(polishCss,/grid-template-columns:40px minmax\\(0,1fr\\)/);assert.match(polishCss,/min-height:84px/);assert.match(polishCss,/width:40', 'assert.match(homeRosterCss,/grid-template-columns:40px minmax\\(0,1fr\\)/);assert.match(homeRosterCss,/min-height:84px/);assert.match(homeRosterCss,/width:40')
+s = s.replace('assert.match(polishCss,/grid-template-columns:40px minmax\\(0,1fr\\)/);', 'assert.match(homeRosterCss,/grid-template-columns:40px minmax\\(0,1fr\\)/);')
+s = s.replace('assert.match(polishCss,/min-height:84px/);', 'assert.match(homeRosterCss,/min-height:84px/);')
+s = s.replace('assert.match(polishCss,/width:40px;height:40px/);', 'assert.match(homeRosterCss,/width:40px;height:40px/);')
+s = s.replace('assert.match(polishCss,/\\.v146-home-character-main > div:first-child\\{[\\s\\S]*font-size:15px/);', 'assert.match(homeRosterCss,/\\.v146-home-character-main > div:first-child\\{[\\s\\S]*font-size:15px/);')
+s = s.replace('assert.match(polishCss,/\\.v146-home-resource strong\\{[\\s\\S]*font-size:13px/);', 'assert.match(homeRosterCss,/\\.v146-home-resource strong\\{[\\s\\S]*font-size:13px/);')
 p.write_text(s, encoding="utf-8")
 
 print("Aligned V173.65 intentional regression owners.")
