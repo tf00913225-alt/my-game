@@ -1,3 +1,4 @@
+// One-off V173.65 registry synchronization for final CI gate.
 import fs from "node:fs";
 
 const file="config/monster-portrait-registry.json";
