@@ -59,3 +59,15 @@ assert.match(css,/Main-city persistent utility shell/);
 assert.match(css,/\.team-relic-home-tools\{[\s\S]*grid-template-columns:repeat\(2,80px\)/);
 console.log("V173.65 dev-deploy home utility regression checks passed.");
 ''')
+
+# Existing lobby regression intentionally prohibited the former runtime-injected
+# utility layer. The contract is now static app-shell UI, while the original ten
+# city entrances remain unchanged. Update only that expectation.
+p=Path('tests/v173.28-main-city-lobby.test.js')
+s=p.read_text()
+old='''test("offline experience and system join the existing side rails",()=>{\n    assert.equal(count(actions,/openHomeFeature\\('offlineExp'\\)/g),1);\n    assert.equal(count(actions,/openHomeFeature\\('system'\\)/g),1);\n    assert.equal(count(actions,/class="home-card home-card-utility"/g),0);\n    assert.doesNotMatch(actions,/home-utility-actions/);\n    assert.match(actions,/homeIconOfflineExp/);\n    assert.match(actions,/homeIconSystem/);\n});'''
+new='''test("offline/system stay on the side rails while relic and element box are persistent shell utilities",()=>{\n    assert.equal(count(actions,/openHomeFeature\\('offlineExp'\\)/g),1);\n    assert.equal(count(actions,/openHomeFeature\\('system'\\)/g),1);\n    assert.equal(count(actions,/class="home-card home-card-utility/g),2);\n    assert.match(actions,/home-utility-actions team-relic-home-tools/);\n    assert.match(actions,/team-relic-home-entry[^>]*data-feature="relic"/);\n    assert.match(actions,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);\n    assert.match(actions,/homeIconOfflineExp/);\n    assert.match(actions,/homeIconSystem/);\n});'''
+assert old in s, 'old lobby utility expectation not found'
+s=s.replace(old,new,1)
+s=s.replace('assert.equal(count(actions,/<button type="button" class="home-card /g),10);','assert.equal(count(actions,/<button type="button" class="home-card /g),12);',1)
+p.write_text(s)
