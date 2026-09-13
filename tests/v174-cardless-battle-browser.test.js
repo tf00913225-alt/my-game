@@ -155,7 +155,7 @@ function runViewport(chrome,width,height){
     assert.equal(data.playerShadow,"none");
     assert.equal(data.enemyShadow,"none");
     assert.equal(data.playerArt,true);
-    assert.equal(data.playerArtBackgroundSize,"contain");
+    assert.equal(data.playerArtBackgroundSize,"150% auto");
     assert.ok(data.playerArtRect.bottom<=data.playerHpRect.top,"player artwork must end above HP bar");
     assert.ok(data.playerHpRect.bottom<=data.playerSpRect.top+1,"HP bar must sit above SP bar without portrait overlap");
     assert.ok(data.playerSpRect.bottom<=data.playerNameRect.top+1,"player name must sit below both resource bars");

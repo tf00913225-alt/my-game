@@ -151,45 +151,27 @@ test("automatic recovery keeps using potions until the configured threshold is c
     assert.equal(potions,5);
 });
 
-test("Abyss floors 1 to 4 and floor 5 receive their exact portrait sets",()=>{
-    const earlyBosses={
-        東帝:"east-emperor.webp",南帝:"south-emperor.webp",
-        天帝:"heaven-emperor.webp",北帝:"north-emperor.webp"
-    };
-    Object.entries(earlyBosses).forEach(([bossName,asset])=>{
+test("temporary portrait switch uses the Boss reference for Abyss emperors and Heavenly Soldier art for soldiers",()=>{
+    ["東帝","南帝","天帝","北帝"].forEach(bossName=>{
         const names=[bossName,"天兵天將","天兵天將","天兵天將","天兵天將"];
-        const early=loadRuntime({
-            currentBattleMonsters:[0,1,2,3,4],
-            monsters:names.map(name=>({name,v141Abyss:true}))
-        });
+        const early=loadRuntime({currentBattleMonsters:[0,1,2,3,4],monsters:names.map(name=>({name,v141Abyss:true}))});
         early.context.v154SyncAbyssPortraits();
-        assert.ok(early.cards[0].style.getPropertyValue("--v152-abyss-portrait").endsWith(asset+'")'));
+        assert.ok(early.cards[0].style.getPropertyValue("--v152-abyss-portrait").endsWith('boss-placeholder-fire-demon.webp")'));
         assert.match(early.cards[1].style.getPropertyValue("--v152-abyss-portrait"),/soldier\.webp/);
-        assert.ok(early.cards[0].querySelector(".v162-abyss-battle-portrait-art").src.endsWith(asset));
+        assert.ok(early.cards[0].querySelector(".v162-abyss-battle-portrait-art").src.endsWith("boss-placeholder-fire-demon.webp"));
         assert.ok(early.cards[1].querySelector(".v162-abyss-battle-portrait-art").src.endsWith("soldier.webp"));
         assert.equal(early.cards[0].dataset.abyssPortrait,"floor1-4");
     });
 
-    const finalNames=[
-        "東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊",
-        "天兵天將","天兵天將","天兵天將","天兵天將","天兵天將"
-    ];
-    const final=loadRuntime({
-        currentBattleMonsters:finalNames.map((_,index)=>index),
-        monsters:finalNames.map(name=>({name,v141Abyss:true}))
-    });
+    const finalNames=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊","天兵天將","天兵天將","天兵天將","天兵天將","天兵天將"];
+    const final=loadRuntime({currentBattleMonsters:finalNames.map((_,index)=>index),monsters:finalNames.map(name=>({name,v141Abyss:true}))});
     final.context.v154SyncAbyssPortraits();
-    const expected=[
-        "floor5-east-emperor.webp","floor5-heaven-emperor.webp",
-        "floor5-extreme-emperor.webp","floor5-north-emperor.webp",
-        "floor5-south-emperor.webp","floor5-soldier.webp"
-    ];
-    expected.forEach((asset,index)=>assert.ok(
-        final.cards[index].style.getPropertyValue("--v152-abyss-portrait").endsWith(asset+'")')
-    ));
-    expected.forEach((asset,index)=>assert.ok(
-        final.cards[index].querySelector(".v162-abyss-battle-portrait-art").src.endsWith(asset)
-    ));
+    for(let index=0;index<5;index++){
+        assert.ok(final.cards[index].style.getPropertyValue("--v152-abyss-portrait").endsWith('boss-placeholder-fire-demon.webp")'));
+        assert.ok(final.cards[index].querySelector(".v162-abyss-battle-portrait-art").src.endsWith("boss-placeholder-fire-demon.webp"));
+    }
+    assert.match(final.cards[5].style.getPropertyValue("--v152-abyss-portrait"),/soldier\.webp/);
+    assert.ok(final.cards[5].querySelector(".v162-abyss-battle-portrait-art").src.endsWith("soldier.webp"));
     assert.equal(final.cards[0].dataset.abyssPortrait,"floor5");
     assert.equal(final.battlePage.classList.contains("v154-abyss-final"),true);
 });

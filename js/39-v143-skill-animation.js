@@ -414,7 +414,7 @@
             card.appendChild(node);
         }
         const rect=card.getBoundingClientRect?card.getBoundingClientRect():null;
-        const scale=Number(spec.scale)||1.18;
+        const scale=(Number(spec.scale)||1.18)*1.28;
         const size=Math.max(96,Math.max(Number(rect&&rect.width)||0,Number(rect&&rect.height)||0)*scale);
         const cellAspect=Math.max(.1,Number(spec.cellAspect)||1);
         if(cellAspect>=1){

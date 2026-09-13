@@ -113,10 +113,12 @@
             highestLevel:highestLevel,
             partyMultiplier:partyMultiplier,
             levelMultiplier:levelMultiplier,
-            factor:partyMultiplier*levelMultiplier
+            difficultyMultiplier:DAILY_DUNGEON_DIFFICULTY_MULTIPLIER,
+            factor:partyMultiplier*levelMultiplier*DAILY_DUNGEON_DIFFICULTY_MULTIPLIER
         };
     }
 
+    const DAILY_DUNGEON_DIFFICULTY_MULTIPLIER=.5;
     const FORMAL_DAILY_DUNGEON_TYPES=new Set(["exp","material","gold"]);
 
     function isFormalDailyDungeonMonster(monster){

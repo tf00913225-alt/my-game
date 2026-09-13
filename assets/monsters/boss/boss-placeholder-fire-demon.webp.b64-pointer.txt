@@ -1,3 +1,0 @@
-blob-sha: 5492a3021c29190b8535425215365dbf0f9fcb2f
-source: user-supplied reference
-expected: lossless WebP 864x1536

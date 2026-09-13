@@ -102,10 +102,10 @@ const registry={
     const runtime=loadRuntime([{name:"哥布林",element:"fire"},{name:"史萊姆",element:"water"}]);
     runtime.context.v154InstallMonsterPortraitRegistry(registry);
     runtime.context.v154SyncMonsterPortraits();
-    assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[0]),"assets/monsters/wild/zone-01/fire-01.png");
-    assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[1]),null);
-    assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"wild.zone-01.fire-01");
-    assert.equal(runtime.cards[1].style.getPropertyValue("--v152-abyss-portrait"),"");
+    assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[0]),"assets/dungeons/abyss/soldier.webp");
+    assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[1]),"assets/dungeons/abyss/soldier.webp");
+    assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"temporary.heavenly-soldier");
+    assert.equal(runtime.cards[1].dataset.monsterPortraitKey,"temporary.heavenly-soldier");
 }
 
 {
@@ -116,7 +116,7 @@ const registry={
     runtime.context.v154SyncMonsterPortraits();
     assert.deepEqual(
         runtime.cards.slice(0,5).map(card=>card.dataset.monsterPortraitKey),
-        ["soldier.water","soldier.earth","soldier.fire","soldier.wind","soldier.water"]
+        Array(5).fill("temporary.heavenly-soldier")
     );
 }
 
@@ -125,10 +125,12 @@ const registry={
     runtime.context.v154InstallMonsterPortraitRegistry(registry);
     runtime.context.v154SyncMonsterPortraits();
     assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[0]),"assets/dungeons/abyss/soldier.webp");
-    assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"legacy.abyss.天兵天將");
+    assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"temporary.heavenly-soldier");
 }
 
 assert.match(source,/MONSTER_PORTRAIT_REGISTRY_URL="config\/monster-portrait-registry\.json"/);
+assert.match(source,/TEMPORARY_MONSTER_PORTRAIT="assets\/dungeons\/abyss\/soldier\.webp"/);
+assert.match(source,/TEMPORARY_BOSS_PORTRAIT="assets\/monsters\/boss\/boss-placeholder-fire-demon\.webp"/);
 assert.match(source,/target\.status!=="existing"/);
 assert.match(source,/background-size:contain!important/);
 assert.equal((source.match(/renderBattle=function/g)||[]).length,1);

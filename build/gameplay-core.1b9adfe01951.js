@@ -12673,7 +12673,7 @@
             card.appendChild(node);
         }
         const rect=card.getBoundingClientRect?card.getBoundingClientRect():null;
-        const scale=Number(spec.scale)||1.18;
+        const scale=(Number(spec.scale)||1.18)*1.28;
         const size=Math.max(96,Math.max(Number(rect&&rect.width)||0,Number(rect&&rect.height)||0)*scale);
         const cellAspect=Math.max(.1,Number(spec.cellAspect)||1);
         if(cellAspect>=1){
@@ -18180,6 +18180,8 @@
 
     const MONSTER_PORTRAIT_REGISTRY_URL="config/monster-portrait-registry.json";
     const HEAVENLY_SOLDIER_ELEMENTS=new Set(["fire","water","wind","earth"]);
+    const TEMPORARY_MONSTER_PORTRAIT="assets/dungeons/abyss/soldier.webp";
+    const TEMPORARY_BOSS_PORTRAIT="assets/monsters/boss/boss-placeholder-fire-demon.webp";
     const EARLY_ABYSS_PORTRAITS={
         東帝:"assets/dungeons/abyss/east-emperor.webp",
         天帝:"assets/dungeons/abyss/heaven-emperor.webp",
@@ -18267,6 +18269,19 @@
 
     function resolveMonsterPortraitRecord(monster,options){
         if(!monster){ return null; }
+        const temporaryBoss=monster.rank==="boss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.v141BattleRank==="boss"||(monster.v141Abyss===true&&monster.name!=="天兵天將"&&(Object.prototype.hasOwnProperty.call(EARLY_ABYSS_PORTRAITS,monster.name)||Object.prototype.hasOwnProperty.call(FINAL_ABYSS_PORTRAITS,monster.name)));
+        return {
+            portraitKey:temporaryBoss?"temporary.boss-reference":"temporary.heavenly-soldier",
+            name:monster.name||"",
+            element:monster.element||"dynamic",
+            rank:temporaryBoss?"boss":(monster.rank||"regular"),
+            sizeClass:temporaryBoss?"boss":"regular",
+            path:temporaryBoss?TEMPORARY_BOSS_PORTRAIT:TEMPORARY_MONSTER_PORTRAIT,
+            status:"existing",
+            temporary:true
+        };
+        /* Dedicated registry resolution is intentionally retained below for the
+           later removal of this temporary all-monster presentation switch. */
         const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||"").trim();
         if(explicitKey&&monsterPortraitByKey.has(explicitKey)){
             return monsterPortraitByKey.get(explicitKey);
@@ -19790,10 +19805,12 @@
             highestLevel:highestLevel,
             partyMultiplier:partyMultiplier,
             levelMultiplier:levelMultiplier,
-            factor:partyMultiplier*levelMultiplier
+            difficultyMultiplier:DAILY_DUNGEON_DIFFICULTY_MULTIPLIER,
+            factor:partyMultiplier*levelMultiplier*DAILY_DUNGEON_DIFFICULTY_MULTIPLIER
         };
     }
 
+    const DAILY_DUNGEON_DIFFICULTY_MULTIPLIER=.5;
     const FORMAL_DAILY_DUNGEON_TYPES=new Set(["exp","material","gold"]);
 
     function isFormalDailyDungeonMonster(monster){
@@ -22766,7 +22783,7 @@ function ensureBattlePresentationStyles(){
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
     inset:-8px -8px 30px!important;
-    background-size:contain!important;background-position:center bottom!important;
+    background-size:150% auto!important;background-position:center bottom!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
     position:absolute!important;left:50%!important;bottom:13px!important;
