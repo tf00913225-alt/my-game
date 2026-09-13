@@ -54,4 +54,19 @@ if(!cardlessText.includes(oldPlayerArt)){
 cardlessText=cardlessText.replace(oldPlayerArt,newPlayerArt);
 fs.writeFileSync(cardlessTest,cardlessText);
 
-console.log(`Synchronized ${changed} simplified boss names and aligned creation/player-art regressions.`);
+// Gameplay BOSS and mechanism cards now use the approved 9:16 portrait geometry.
+const bossBrowserTest="tests/boss-mobile-portrait-browser.test.js";
+let bossBrowserText=fs.readFileSync(bossBrowserTest,"utf8");
+for(const [before,after] of [
+  ["    const ratio=3/4;","    const ratio=16/9;"],
+  ["Boss is not 4:3","Boss is not 9:16"],
+  ["Mechanism card is not 4:3","Mechanism card is not 9:16"],
+  ['    assert.equal(data.bossComputed.aspectRatio,"4 / 3");','    assert.equal(data.bossComputed.aspectRatio,"9 / 16");'],
+  ['    assert.equal(data.mechanismComputed.aspectRatio,"4 / 3");','    assert.equal(data.mechanismComputed.aspectRatio,"9 / 16");']
+]){
+  if(!bossBrowserText.includes(before)) throw new Error(`Expected historical Boss browser assertion was not found: ${before}`);
+  bossBrowserText=bossBrowserText.replace(before,after);
+}
+fs.writeFileSync(bossBrowserTest,bossBrowserText);
+
+console.log(`Synchronized ${changed} simplified boss names and aligned creation/player/BOSS geometry regressions.`);
