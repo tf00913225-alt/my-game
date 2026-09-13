@@ -1,4 +1,4 @@
-name: V173.65 final validation pass 9
+name: V173.65 final validation pass 10
 
 on:
   push:
@@ -39,10 +39,11 @@ jobs:
           p.write_text(s,encoding='utf-8')
           PY
           node --check scripts/apply-v17365-ui-battle-auth-polish.mjs
-          python3 -m py_compile scripts/align-v17365-regressions.py scripts/align-v17365-regressions-2.py
+          python3 -m py_compile scripts/align-v17365-regressions.py scripts/align-v17365-regressions-2.py scripts/fix-v17365-eager-roster-compact.py
       - name: Apply product fixes and align intentional tests
         run: |
           node scripts/apply-v17365-ui-battle-auth-polish.mjs
+          python3 scripts/fix-v17365-eager-roster-compact.py
           python3 scripts/align-v17365-regressions.py
           python3 scripts/align-v17365-regressions-2.py
       - name: Syntax checks
