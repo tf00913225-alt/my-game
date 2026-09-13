@@ -57,11 +57,13 @@ test("eight secondary entrances form two substantial vertical button rails",()=>
     assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
 });
 
-test("offline experience and system join the existing side rails",()=>{
+test("offline/system stay on the side rails while relic and element box are persistent shell utilities",()=>{
     assert.equal(count(actions,/openHomeFeature\('offlineExp'\)/g),1);
     assert.equal(count(actions,/openHomeFeature\('system'\)/g),1);
-    assert.equal(count(actions,/class="home-card home-card-utility"/g),0);
-    assert.doesNotMatch(actions,/home-utility-actions/);
+    assert.equal(count(actions,/class="home-card home-card-utility/g),2);
+    assert.match(actions,/home-utility-actions team-relic-home-tools/);
+    assert.match(actions,/team-relic-home-entry[^>]*data-feature="relic"/);
+    assert.match(actions,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
     assert.match(actions,/homeIconOfflineExp/);
     assert.match(actions,/homeIconSystem/);
 });
@@ -72,7 +74,7 @@ test("all ten existing entry IDs and click contracts remain intact",()=>{
         assert.equal(count(actions,new RegExp('id="homeIcon'+id+'"','g')),1);
         assert.equal(count(actions,new RegExp("openHomeFeature\\('"+type+"'\\)",'g')),1);
     });
-    assert.equal(count(actions,/<button type="button" class="home-card /g),10);
+    assert.equal(count(actions,/<button type="button" class="home-card /g),12);
 });
 
 test("DEV gold and EXP shortcuts remain direct but visually recessive",()=>{

@@ -1,0 +1,13 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const index=fs.readFileSync("index.html","utf8");
+const app=fs.readFileSync("js/20-anonymous-20.js","utf8");
+const css=fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8");
+assert.match(index,/team-relic-home-entry[^>]*data-feature="relic"/);
+assert.match(index,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
+assert.match(index,/aria-label="主城常駐功能"/);
+assert.doesNotMatch(app,/ensure\("relic","home-utilities"\)/);
+assert.match(app,/four-symbols:startup-ready[\s\S]{0,120}\.idle\(\)/);
+assert.match(css,/Main-city persistent utility shell/);
+assert.match(css,/\.team-relic-home-tools\{[\s\S]*grid-template-columns:repeat\(2,80px\)/);
+console.log("V173.65 dev-deploy home utility regression checks passed.");

@@ -20,10 +20,10 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.97cb3c789fec.js"
+          "build/app-shell.7ada2ccf5804.js"
         ],
         "styles": [
-          "build/app-shell.72c924239e36.css"
+          "build/app-shell.bcf1eed2c2a4.css"
         ],
         "dependencies": []
       },
@@ -441,19 +441,19 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.72c924239e36.css",
-        "sha256": "72c924239e36",
-        "bytes": 96557,
+        "path": "build/app-shell.7ada2ccf5804.js",
+        "sha256": "7ada2ccf5804",
+        "bytes": 911998,
         "priority": "P1",
-        "type": "style",
+        "type": "script",
         "decode": false
       },
       {
-        "path": "build/app-shell.97cb3c789fec.js",
-        "sha256": "97cb3c789fec",
-        "bytes": 912454,
+        "path": "build/app-shell.bcf1eed2c2a4.css",
+        "sha256": "bcf1eed2c2a4",
+        "bytes": 98567,
         "priority": "P1",
-        "type": "script",
+        "type": "style",
         "decode": false
       },
       {
@@ -689,8 +689,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "5ae1fa9869dc",
-    "totalBytes": 20752329,
+    "manifestHash": "3ec68afd484b",
+    "totalBytes": 20753883,
     "totalResources": 70
   },
   "assets": {
@@ -698,9 +698,9 @@
       "sha256": "24b56cebf959",
       "bytes": 62930
     },
-    "build/app-shell.97cb3c789fec.js": {
-      "sha256": "97cb3c789fec",
-      "bytes": 912454
+    "build/app-shell.7ada2ccf5804.js": {
+      "sha256": "7ada2ccf5804",
+      "bytes": 911998
     },
     "build/gameplay-core.1b9adfe01951.js": {
       "sha256": "1b9adfe01951",
@@ -730,9 +730,9 @@
       "sha256": "189964fd7198",
       "bytes": 222408
     },
-    "build/app-shell.72c924239e36.css": {
-      "sha256": "72c924239e36",
-      "bytes": 96557
+    "build/app-shell.bcf1eed2c2a4.css": {
+      "sha256": "bcf1eed2c2a4",
+      "bytes": 98567
     },
     "build/gameplay-core.a31fbc35a484.css": {
       "sha256": "a31fbc35a484",
