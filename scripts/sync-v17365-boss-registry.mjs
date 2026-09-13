@@ -43,4 +43,15 @@ if(!creationText.includes(oldGeometry)){
 creationText=creationText.replace(oldGeometry,newGeometry);
 fs.writeFileSync(creationTest,creationText);
 
-console.log(`Synchronized ${changed} simplified boss names and aligned the 760px creation showcase regression.`);
+// Player battle art is intentionally 150% of the previous contain presentation.
+const cardlessTest="tests/v174-cardless-battle-browser.test.js";
+let cardlessText=fs.readFileSync(cardlessTest,"utf8");
+const oldPlayerArt='    assert.equal(data.playerArtBackgroundSize,"contain");';
+const newPlayerArt='    assert.equal(data.playerArtBackgroundSize,"150% auto");';
+if(!cardlessText.includes(oldPlayerArt)){
+  throw new Error("Expected historical cardless player-art background-size assertion was not found");
+}
+cardlessText=cardlessText.replace(oldPlayerArt,newPlayerArt);
+fs.writeFileSync(cardlessTest,cardlessText);
+
+console.log(`Synchronized ${changed} simplified boss names and aligned creation/player-art regressions.`);
