@@ -97,23 +97,20 @@ test("authentication UI supports Google, Facebook, email and Firebase anonymous 
     assert.match(touch, /\.firebase-auth-dialog/);
 });
 
-test("Facebook auth uses desktop Web popup and Android native handoff", ()=>{
+test("Facebook auth stays in the Firebase popup flow on mobile and desktop", ()=>{
     assert.match(auth, /getRedirectResult/);
     assert.match(auth, /await getRedirectResult\(firebaseAuth\)/);
-    assert.match(auth, /isAndroidBrowser\(\)/);
-    assert.match(auth, /startNativeFacebookHandoff\(\)/);
     assert.match(auth, /provider\.setCustomParameters\(\{ display:"popup" \}\)/);
     assert.match(auth, /const credential = await signInWithPopup\(auth, provider\)/);
     assert.doesNotMatch(auth, /signInWithRedirect/);
     assert.doesNotMatch(auth, /function isMobileBrowser\(\)/);
-    assert.match(docs, /Android browser Facebook sign-in uses the native Facebook helper handoff/i);
+    assert.match(docs, /Facebook sign-in uses Firebase popup/i);
 });
 
 test("temporary direct-Meta Facebook diagnostic is fully removed", ()=>{
     assert.doesNotMatch(auth, /FACEBOOK_DIAGNOSTIC_/);
     assert.doesNotMatch(auth, /isFacebookDiagnosticHost|startFacebookPublicProfileDiagnostic|consumeFacebookDiagnosticCallback/);
-    assert.doesNotMatch(auth, /dialog\/oauth/);
-    assert.doesNotMatch(auth, /location\.assign\([^)]*facebook\.com/);
+    assert.doesNotMatch(auth, /dialog\/oauth|location\.assign\(/);
     assert.doesNotMatch(auth, /response_type:"token"|signInWithCredential/);
     assert.doesNotMatch(featureManifest, /facebook-diagnostic-sdk|connect\.facebook\.net/);
     assert.doesNotMatch(ui, /auth\/facebook-diagnostic-/);
