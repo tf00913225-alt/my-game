@@ -5,6 +5,7 @@ const fs=require("node:fs");
 
 const rpgUi=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const relicRuntime=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
 
 assert.match(rpgUi,/confirmButton\.className="v169-rpg-dialog-button secondary"/,
@@ -18,10 +19,14 @@ assert.doesNotMatch(relicCss,/map-return\.png/);
 assert.match(relicCss,/\.team-relic-home-tools\{[\s\S]*?width:192px;[\s\S]*?gap:32px;/);
 assert.match(relicCss,/#statusHelpButton,\s*\n#game-stage #homeFeatureModal\.team-relic-modal #skillPreviewHeaderButton\{display:none!important;\}/,
     "relic modal must never expose the character status-help or all-skill-preview header controls");
-assert.match(relicCss,/\.home-feature-close-btn:not\(#statusHelpButton\):not\(#skillPreviewHeaderButton\)\{display:inline-flex!important;\}/,
+assert.match(relicCss,/\.team-relic-modal:not\(\.team-relic-detail-mode\) \.home-feature-close-btn:not\(#statusHelpButton\):not\(#skillPreviewHeaderButton\)\{display:inline-flex!important;\}/,
     "only the real modal return button may be forced visible in relic list mode");
-assert.match(relicCss,/:has\(\.team-relic-detail\) \.home-feature-close-btn\{display:none!important;\}/,
-    "detail mode removes the redundant modal return control");
+assert.match(relicCss,/\.team-relic-modal\.team-relic-detail-mode \.home-feature-close-btn\{display:none!important;\}/,
+    "explicit detail mode removes the redundant modal return control");
+assert.match(relicRuntime,/classList\.add\("team-relic-detail-mode"\)/,
+    "detail runtime must explicitly enter relic detail mode before rendering the detail view");
+assert.match(relicRuntime,/classList\.remove\("team-relic-detail-mode"\)/,
+    "returning to the list must explicitly leave relic detail mode");
 assert.match(relicCss,/#game-stage #homeFeatureModal\.team-relic-modal \.team-relic-detail-back\{[^}]*font-size:0!important/,
     "the original detail button text must be suppressed with enough specificity to beat shared button CSS");
 assert.match(relicCss,/#game-stage #homeFeatureModal\.team-relic-modal \.team-relic-detail-back::after\{content:"返回秘寶列表";[^}]*font-size:15px/,
