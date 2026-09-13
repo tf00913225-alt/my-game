@@ -44,15 +44,21 @@ const V_ASSET_VERSION="173.65";
         if(active){ element.dataset.featureLoadingLabel="正在載入"+(label||"功能")+"…"; }
         else{ delete element.dataset.featureLoadingLabel; }
     }
-    function refreshExpPoolSafetyUi(){
+
+    let expPoolPrimePromise=null;
+    let expPoolSafetyUiReady=false;
+    function refreshExpPoolSafetyUiOnce(){
+        if(expPoolSafetyUiReady){ return; }
+        expPoolSafetyUiReady=true;
         if(typeof window.renderExpDistributeList==="function"){
             window.renderExpDistributeList();
         }
         if(typeof window.v173DecorateExpPoolDistributionUi==="function"){
             window.v173DecorateExpPoolDistributionUi();
         }
+        const pool=document.getElementById("homeExpPoolCard");
+        if(pool){ pool.dataset.expSafetyOwner="ready"; }
     }
-    let expPoolPrimePromise=null;
     function primeExpPoolSafety(){
         const pool=document.getElementById("homeExpPoolCard");
         const api=loader();
@@ -60,14 +66,14 @@ const V_ASSET_VERSION="173.65";
         const visible=!pool.hidden&&window.getComputedStyle(pool).display!=="none"&&pool.getClientRects().length>0;
         if(!visible){ return; }
         if(api.isReady("battle")){
-            refreshExpPoolSafetyUi();
+            refreshExpPoolSafetyUiOnce();
             return;
         }
         if(expPoolPrimePromise){ return; }
         setLocalLoading(pool,true,"經驗池安全升級");
         expPoolPrimePromise=api.ensure("battle","exp-pool-safety").then(()=>{
             setLocalLoading(pool,false);
-            refreshExpPoolSafetyUi();
+            refreshExpPoolSafetyUiOnce();
         }).catch(error=>{
             setLocalLoading(pool,false);
             console.error("EXP pool safety owner failed to load:",error);
@@ -89,7 +95,7 @@ const V_ASSET_VERSION="173.65";
             if(info.expPool){
                 /* 不 replay 舊 DOM 上可能仍指向 immediate distribute 的 handler。
                    先由正式 owner 重繪成「預覽 → 確認」UI，玩家再點一次才會花 EXP。 */
-                refreshExpPoolSafetyUi();
+                refreshExpPoolSafetyUiOnce();
                 return;
             }
             element.dataset.featureReplay="1"; element.click(); delete element.dataset.featureReplay;
@@ -111,7 +117,10 @@ const V_ASSET_VERSION="173.65";
 
     function installExpPoolVisibilityObserver(){
         if(!document.body||typeof MutationObserver==="undefined"){ return; }
-        const observer=new MutationObserver(primeExpPoolSafety);
+        const observer=new MutationObserver(()=>{
+            if(expPoolSafetyUiReady){ return; }
+            primeExpPoolSafety();
+        });
         observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
         primeExpPoolSafety();
     }
