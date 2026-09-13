@@ -1,5 +1,6 @@
 import fs from "node:fs";
 
+// This one-off follow-up runs only on the repair branch; the workflow checks out full history for baseline-regression suites.
 const creationFile="css/29-v125-character-creation-native.css";
 let creation=fs.readFileSync(creationFile,"utf8");
 const temporary=`/* Step two remains fixed and non-scrollable, but its actions stay in normal\n   flow so Android does not promote a second oversized compositing tile. */\n#creationPage .creation-step-two{\n    padding-bottom:0;\n}\n\n#creationPage .creation-step-two > .creation-action-row{\n    position:static;\n    z-index:40;\n    margin-top:auto;\n}`;
