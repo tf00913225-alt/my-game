@@ -1,0 +1,59 @@
+name: Apply V173.65 polish patch
+
+on:
+  push:
+    branches:
+      - fix/v17365-auth-battle-ui-polish-20260913
+    paths:
+      - scripts/apply-v17365-polish.mjs
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/v17365-auth-battle-ui-polish-20260913
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Apply scoped owner fixes
+        run: node scripts/apply-v17365-polish.mjs
+      - name: Ensure image validation dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+      - name: Check modified JavaScript syntax
+        run: |
+          node --check js/20-anonymous-20.js
+          node --check js/39-v143-skill-animation.js
+          node --check js/45-v154-dev-fixes.js
+          node --check js/47-v158-combat-tuning.js
+          node --check js/54-v173.51-battle-qa.js
+          node --check js/firebase/firebase-auth-ui.js
+          node --check js/gameplay-boss-tower-system.js
+      - name: Run repository tests
+        run: npm test
+      - name: Rebuild production bundles
+        run: npm run build
+      - name: Verify generated build
+        run: npm run build:check
+      - name: Commit scoped fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "fix: repair auth creation battle and daily dungeon UI"
+          git push origin HEAD:fix/v17365-auth-battle-ui-polish-20260913
