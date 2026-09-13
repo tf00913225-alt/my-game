@@ -6,6 +6,7 @@ on:
       - fix/v17365-auth-battle-ui-polish-20260913
     paths:
       - scripts/apply-v17365-polish.mjs
+      - scripts/fix-v17365-ci-followup.mjs
 
 permissions:
   contents: write
@@ -23,7 +24,9 @@ jobs:
         with:
           node-version: "24"
       - name: Apply scoped owner fixes
-        run: node scripts/apply-v17365-polish.mjs
+        run: |
+          node scripts/apply-v17365-polish.mjs
+          node scripts/fix-v17365-ci-followup.mjs
       - name: Ensure image validation dependency
         run: |
           if ! command -v identify >/dev/null 2>&1; then
