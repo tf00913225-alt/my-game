@@ -69,4 +69,22 @@ for(const [before,after] of [
 }
 fs.writeFileSync(bossBrowserTest,bossBrowserText);
 
+// 9:16 cards need the compact pair sizing on common 873px-tall phone viewports too.
+const bossCssFile="css/gameplay-boss-tower.css";
+let bossCss=fs.readFileSync(bossCssFile,"utf8");
+if(!bossCss.includes("@media (max-height:840px){")){
+  throw new Error("Expected historical 840px compact BOSS breakpoint was not found");
+}
+bossCss=bossCss.replace("@media (max-height:840px){","@media (max-height:900px){");
+fs.writeFileSync(bossCssFile,bossCss);
+for(const name of fs.readdirSync("tests")){
+  if(!name.endsWith(".js")&&!name.endsWith(".mjs")) continue;
+  const testFile="tests/"+name;
+  let text=fs.readFileSync(testFile,"utf8");
+  if(text.includes("max-height:840px")){
+    text=text.split("max-height:840px").join("max-height:900px");
+    fs.writeFileSync(testFile,text);
+  }
+}
+
 console.log(`Synchronized ${changed} simplified boss names and aligned creation/player/BOSS geometry regressions.`);
