@@ -1,0 +1,41 @@
+name: Align relic detail test contract
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - .github/workflows/fix-v174-relic-test-contract.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+      - name: Align stale relic detail selector contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tests/v174-team-relic-system.test.js')
+          s=p.read_text(encoding='utf-8')
+          old='assert.match(css,/:has\\(\\.team-relic-detail\\) \\.home-feature-close-btn\\{display:none!important;\\}/,'
+          new='assert.match(css,/team-relic-modal\\.team-relic-detail-mode \\.home-feature-close-btn\\{display:none!important;\\}/,'
+          if old not in s:
+              raise SystemExit('stale relic selector assertion not found')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+          node tests/v174-team-relic-system.test.js
+      - name: Commit patch and remove one-off workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/fix-v174-relic-test-contract.yml
+          git add tests/v174-team-relic-system.test.js
+          git commit -m "test: align relic detail mode contract"
+          git push origin HEAD:dev
