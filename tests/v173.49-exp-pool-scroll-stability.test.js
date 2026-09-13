@@ -24,9 +24,11 @@ assert.match(css,/\.v131-exp-preview-btn,[\s\S]*?\.v131-exp-confirm,[\s\S]*?\.v1
 assert.match(featureBoundary,/closest\("#homeExpPoolCard"\)/);
 assert.match(featureBoundary,/feature:"battle",label:"經驗池安全升級",expPool:true/);
 assert.match(featureBoundary,/api\.ensure\("battle","exp-pool-safety"\)/);
-assert.match(featureBoundary,/refreshExpPoolSafetyUi\(\)/);
-assert.match(featureBoundary,/if\(info\.expPool\)\{[\s\S]*?refreshExpPoolSafetyUi\(\);[\s\S]*?return;/);
-assert.doesNotMatch(featureBoundary,/if\(info\.expPool\)[\s\S]{0,240}element\.click\(\)/,"old EXP-pool DOM must never be replayed after lazy owner install");
+assert.match(featureBoundary,/let expPoolSafetyUiReady=false/);
+assert.match(featureBoundary,/function refreshExpPoolSafetyUiOnce\(\)\{[\s\S]*?if\(expPoolSafetyUiReady\)\{ return; \}[\s\S]*?expPoolSafetyUiReady=true/);
+assert.match(featureBoundary,/if\(info\.expPool\)\{[\s\S]*?refreshExpPoolSafetyUiOnce\(\);[\s\S]*?return;/);
+assert.match(featureBoundary,/new MutationObserver\(\(\)=>\{[\s\S]*?if\(expPoolSafetyUiReady\)\{ return; \}/);
+assert.doesNotMatch(featureBoundary,/if\(info\.expPool\)[\s\S]{0,260}element\.click\(\)/,"old EXP-pool DOM must never be replayed after lazy owner install");
 
 assert.ok(loader.includes('const V_ASSET_VERSION="173.65";'));
 assert.ok(index.includes('<title>四象江湖傳 V173.65</title>'));
