@@ -42,7 +42,7 @@ jobs:
       - name: Run remaining repository gates
         run: |
           node .github/scripts/ci.mjs resources
-          node .github/scripts/ci.mjs ids
+          node .github/scripts/ci.mjs html-ids
           node .github/scripts/ci.mjs loader
           node .github/scripts/release-gate.mjs
           node .github/scripts/ci.mjs git-diff
