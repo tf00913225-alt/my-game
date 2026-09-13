@@ -5,6 +5,7 @@ on:
     branches:
       - fix/v17365-auth-battle-ui-polish-20260913
     paths:
+      - .github/workflows/apply-v17365-polish.yml
       - scripts/apply-v17365-polish.mjs
       - scripts/fix-v17365-ci-followup.mjs
       - scripts/sync-v17365-boss-registry.mjs
@@ -44,10 +45,10 @@ jobs:
           node --check js/54-v173.51-battle-qa.js
           node --check js/firebase/firebase-auth-ui.js
           node --check js/gameplay-boss-tower-system.js
-      - name: Run repository tests
-        run: npm test
       - name: Rebuild production bundles
         run: npm run build
+      - name: Run repository tests
+        run: npm test
       - name: Verify generated build
         run: npm run build:check
       - name: Commit scoped fixes
