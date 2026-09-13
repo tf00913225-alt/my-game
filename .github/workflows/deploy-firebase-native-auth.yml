@@ -82,7 +82,8 @@ jobs:
           npx --yes firebase-tools@${FIREBASE_TOOLS_VERSION} deploy \
             --only "functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff" \
             --project "$FIREBASE_PROJECT_ID" \
-            --non-interactive
+            --non-interactive \
+            --force
 
       - name: Verify deployed functions are listed
         shell: bash
