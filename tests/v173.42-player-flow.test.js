@@ -18,6 +18,7 @@ const baseCss=fs.readFileSync("css/00-main.css","utf8");
 const questCss=fs.readFileSync("css/25-stage-v90-quest-interface-core.css","utf8");
 const creationCss=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");
 const homeCss=fs.readFileSync("css/42-v146-system-polish.css","utf8");
+const homeRosterCss=fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8");
 const abyssCss=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
 const core=fs.readFileSync("js/00-main.js","utf8");
 
@@ -155,7 +156,7 @@ assert.doesNotMatch(dungeonPolish,/\["返回","assets\/ui\/map-return\.png"/);
 assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
 assert.match(dungeonPolish,/nav\.dataset\.v146Columns="5"/);
 
-assert.match(homeCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:32px/);
 assert.match(questCss,/quest-milestone\.reached:not\(\.claimed\) \.quest-milestone-slot::after/);
 assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !important/);
