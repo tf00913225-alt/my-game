@@ -57,18 +57,7 @@ const V_ASSET_VERSION="173.65";
     document.addEventListener("pointerdown",prefetch,{capture:true,passive:true});
     document.addEventListener("touchstart",prefetch,{capture:true,passive:true});
     document.addEventListener("click",enter,true);
-    document.addEventListener("four-symbols:startup-ready",()=>{
-        const api=loader();
-        if(!api){ return; }
-        /* 秘寶／元素匣是主城常駐入口。啟動完成後非阻塞預載 owner，
-           讓首次進入主城就同步插入按鈕，不必靠切頁才觸發 feature。 */
-        if(!api.isReady("relic")){
-            void api.ensure("relic","home-utilities").catch(error=>{
-                console.error("Home utility feature failed to preload:",error);
-            });
-        }
-        api.idle();
-    },{once:true});
+    document.addEventListener("four-symbols:startup-ready",()=>loader()&&loader().idle(),{once:true});
 })();
 
 (function initBattleElementBoxDrag(){
