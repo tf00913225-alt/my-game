@@ -958,9 +958,9 @@ test("all daily dungeons share three six-enemy waves and Gold replaces Equipment
         run.positions.forEach(row=>assert.deepEqual(row,[0,1,2,0,1,2]));
         run.orders.forEach(row=>assert.deepEqual(row,[4,1,3,6,2,5]));
     });
-    assert.equal(result.one40.factor,.40);
-    assert.equal(result.two40.factor,.72);
-    assert.equal(result.three80.factor,1.05);
+    assert.equal(result.one40.factor,.20);
+    assert.equal(result.two40.factor,.36);
+    assert.equal(result.three80.factor,.525);
     const dungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
     assert.match(dungeonSource,/showDailyGoldReward\(goldDungeonReward\(active\.level\)\)/);
     assert.match(dungeonSource,/金幣副本/);

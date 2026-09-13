@@ -195,9 +195,9 @@ body.creation-fixed-active{
     z-index:1;
     display:grid;
     grid-template-columns:46% 54%;
-    flex:0 0 820px;
-    height:820px;
-    min-height:820px;
+    flex:0 0 760px;
+    height:760px;
+    min-height:760px;
     margin-bottom:24px;
     overflow:hidden;
     border:2.571px solid rgba(198,146,68,.58);
@@ -237,9 +237,9 @@ body.creation-fixed-active{
 #creationPage .creation-portrait-panel{
     position:relative;
     min-width:0;
-    min-height:820px;
+    min-height:760px;
     overflow:hidden;
-    background:#030303;
+    background:linear-gradient(180deg,#0c0912,#030303);
     border-right:2.571px solid rgba(211,157,73,.28);
 }
 
@@ -667,7 +667,7 @@ body.creation-fixed-active{
 }
 
 #creationPage .creation-step-two{
-    padding-top:34px;
+    padding-top:18px;
     box-sizing:border-box;
 }
 

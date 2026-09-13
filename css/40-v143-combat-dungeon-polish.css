@@ -61,9 +61,9 @@
 #game-stage #battlePage .battle-monster .monster-hp,
 #game-stage #battlePage .battle-monster .monster-sp{
     width:var(--v143-monster-bar-width,68px) !important;
-    height:13px !important;
-    min-height:13px !important;
-    flex:0 0 13px !important;
+    height:11px !important;
+    min-height:11px !important;
+    flex:0 0 11px !important;
     margin-top:1px !important;
     border-radius:4px !important;
 }
@@ -72,11 +72,11 @@
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
-    height:13px !important;
+    height:11px !important;
     color:#fff !important;
     font-size:12px !important;
     font-weight:900 !important;
-    line-height:13px !important;
+    line-height:11px !important;
     letter-spacing:-.35px !important;
     text-align:center !important;
     text-shadow:0 1px 2px #000,0 0 2px #000 !important;
@@ -226,7 +226,7 @@
 #game-stage #battlePage .v153-status-vfx{
     position:absolute;
     left:50%;
-    top:50%;
+    top:44%;
     z-index:4;
     display:block;
     box-sizing:border-box;

@@ -44,7 +44,7 @@ function ensureBattlePresentationStyles(){
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
     inset:-8px -8px 30px!important;
-    background-size:contain!important;background-position:center bottom!important;
+    background-size:150% auto!important;background-position:center bottom!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
     position:absolute!important;left:50%!important;bottom:13px!important;

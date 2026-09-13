@@ -60,15 +60,15 @@
     });
 
     const PERSONAL_BOSSES=Object.freeze([
-        Object.freeze({id:"personal-20",name:"赤曜焚牙君",level:20,element:"fire",phases:1,traits:Object.freeze(["護盾","燃燒"]),mechanisms:Object.freeze([{round:2,type:"shield"}]),firstReward:"首通金幣 1,200・藍階礦石 ×2",repeatReward:"金幣 260・白階礦石",firstGold:1200,repeatGold:260,ore:"oreLow",firstOre:2}),
-        Object.freeze({id:"personal-30",name:"燼天獄火侯",level:30,element:"fire",phases:1,traits:Object.freeze(["蓄力","燃燒"]),mechanisms:Object.freeze([{round:2,type:"charge"},{round:6,type:"charge"}]),firstReward:"首通金幣 1,800・藍階礦石 ×2",repeatReward:"金幣 380・藍階礦石",firstGold:1800,repeatGold:380,ore:"oreMid",firstOre:2}),
-        Object.freeze({id:"personal-40",name:"玄瀾凍海君",level:40,element:"water",phases:2,traits:Object.freeze(["回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"heal"},{hpBelow:.5,type:"charge"}]),firstReward:"首通金幣 2,600・紫階礦石 ×2",repeatReward:"金幣 520・紫階礦石",firstGold:2600,repeatGold:520,ore:"oreHigh",firstOre:2}),
-        Object.freeze({id:"personal-50",name:"寒魄霜淵侯",level:50,element:"water",phases:2,traits:Object.freeze(["護盾","回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"shield"},{hpBelow:.45,type:"heal"}]),firstReward:"首通金幣 3,400・紫階礦石 ×3",repeatReward:"金幣 660・紫階礦石",firstGold:3400,repeatGold:660,ore:"oreHigh",firstOre:3}),
-        Object.freeze({id:"personal-60",name:"冥冰雪獄尊",level:60,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","凍傷","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 4,300・橙階礦石 ×2",repeatReward:"金幣 820・紫階礦石",firstGold:4300,repeatGold:820,ore:"orePerfect",firstOre:2}),
-        Object.freeze({id:"personal-70",name:"太陰寒劫尊",level:70,element:"water",phases:3,traits:Object.freeze(["回復","增幅","控制","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 5,200・橙階礦石 ×2",repeatReward:"金幣 980・橙階礦石",firstGold:5200,repeatGold:980,ore:"orePerfect",firstOre:2}),
-        Object.freeze({id:"personal-80",name:"玄冥凍界皇",level:80,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","回復","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.4,type:"heal"}]),firstReward:"首通回天寶輪・金幣 6,200",repeatReward:"金幣 1,160・橙階礦石",firstGold:6200,repeatGold:1160,ore:"orePerfect",firstOre:1,relic:"relic_returning_wheel"}),
-        Object.freeze({id:"personal-90",name:"永夜霜天皇",level:90,element:"water",phases:4,traits:Object.freeze(["封鎖","護盾","蓄力","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"seal"},{round:4,type:"shield"},{round:7,type:"charge"},{hpBelow:.3,type:"amplify"}]),firstReward:"首通金幣 7,500・橙階礦石 ×3",repeatReward:"金幣 1,360・橙階礦石",firstGold:7500,repeatGold:1360,ore:"orePerfect",firstOre:3}),
-        Object.freeze({id:"personal-100",name:"無極寒獄帝",level:100,element:"water",phases:4,traits:Object.freeze(["護盾","蓄力","回復","封鎖","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"seal"}]),firstReward:"首通金幣 10,000・橙階礦石 ×4",repeatReward:"金幣 1,600・橙階礦石",firstGold:10000,repeatGold:1600,ore:"orePerfect",firstOre:4})
+        Object.freeze({id:"personal-20",name:"赤焰君",level:20,element:"fire",phases:1,traits:Object.freeze(["護盾","燃燒"]),mechanisms:Object.freeze([{round:2,type:"shield"}]),firstReward:"首通金幣 1,200・藍階礦石 ×2",repeatReward:"金幣 260・白階礦石",firstGold:1200,repeatGold:260,ore:"oreLow",firstOre:2}),
+        Object.freeze({id:"personal-30",name:"獄火侯",level:30,element:"fire",phases:1,traits:Object.freeze(["蓄力","燃燒"]),mechanisms:Object.freeze([{round:2,type:"charge"},{round:6,type:"charge"}]),firstReward:"首通金幣 1,800・藍階礦石 ×2",repeatReward:"金幣 380・藍階礦石",firstGold:1800,repeatGold:380,ore:"oreMid",firstOre:2}),
+        Object.freeze({id:"personal-40",name:"凍海君",level:40,element:"water",phases:2,traits:Object.freeze(["回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"heal"},{hpBelow:.5,type:"charge"}]),firstReward:"首通金幣 2,600・紫階礦石 ×2",repeatReward:"金幣 520・紫階礦石",firstGold:2600,repeatGold:520,ore:"oreHigh",firstOre:2}),
+        Object.freeze({id:"personal-50",name:"霜淵侯",level:50,element:"water",phases:2,traits:Object.freeze(["護盾","回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"shield"},{hpBelow:.45,type:"heal"}]),firstReward:"首通金幣 3,400・紫階礦石 ×3",repeatReward:"金幣 660・紫階礦石",firstGold:3400,repeatGold:660,ore:"oreHigh",firstOre:3}),
+        Object.freeze({id:"personal-60",name:"雪獄尊",level:60,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","凍傷","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 4,300・橙階礦石 ×2",repeatReward:"金幣 820・紫階礦石",firstGold:4300,repeatGold:820,ore:"orePerfect",firstOre:2}),
+        Object.freeze({id:"personal-70",name:"寒劫尊",level:70,element:"water",phases:3,traits:Object.freeze(["回復","增幅","控制","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 5,200・橙階礦石 ×2",repeatReward:"金幣 980・橙階礦石",firstGold:5200,repeatGold:980,ore:"orePerfect",firstOre:2}),
+        Object.freeze({id:"personal-80",name:"凍界皇",level:80,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","回復","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.4,type:"heal"}]),firstReward:"首通回天寶輪・金幣 6,200",repeatReward:"金幣 1,160・橙階礦石",firstGold:6200,repeatGold:1160,ore:"orePerfect",firstOre:1,relic:"relic_returning_wheel"}),
+        Object.freeze({id:"personal-90",name:"霜天皇",level:90,element:"water",phases:4,traits:Object.freeze(["封鎖","護盾","蓄力","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"seal"},{round:4,type:"shield"},{round:7,type:"charge"},{hpBelow:.3,type:"amplify"}]),firstReward:"首通金幣 7,500・橙階礦石 ×3",repeatReward:"金幣 1,360・橙階礦石",firstGold:7500,repeatGold:1360,ore:"orePerfect",firstOre:3}),
+        Object.freeze({id:"personal-100",name:"寒獄帝",level:100,element:"water",phases:4,traits:Object.freeze(["護盾","蓄力","回復","封鎖","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"seal"}]),firstReward:"首通金幣 10,000・橙階礦石 ×4",repeatReward:"金幣 1,600・橙階礦石",firstGold:10000,repeatGold:1600,ore:"orePerfect",firstOre:4})
     ]);
 
     const WORLD_STAGE_PROFILES=Object.freeze([
@@ -79,10 +79,10 @@
     ]);
 
     const WORLD_BOSSES=Object.freeze([
-        Object.freeze({id:"world-40",name:"赤劫熔天災君",level:40,element:"fire",traits:Object.freeze(["四階段","護盾","蓄力"]),firstReward:"特殊首通：回天寶輪・金幣 6,000",repeatReward:"最終階段再戰：金幣 700",firstGold:6000,repeatGold:700,relic:"relic_returning_wheel"}),
-        Object.freeze({id:"world-60",name:"玄劫冰海災皇",level:60,element:"water",traits:Object.freeze(["四階段","回復","凍傷"]),firstReward:"特殊首通：橙階礦石 ×4・金幣 9,000",repeatReward:"最終階段再戰：金幣 1,000",firstGold:9000,repeatGold:1000,ore:"orePerfect",firstOre:4}),
-        Object.freeze({id:"world-80",name:"焚世九曜龍皇",level:80,element:"fire",traits:Object.freeze(["四階段","增幅","蓄力"]),firstReward:"特殊首通：橙階礦石 ×6・金幣 13,000",repeatReward:"最終階段再戰：金幣 1,400",firstGold:13000,repeatGold:1400,ore:"orePerfect",firstOre:6}),
-        Object.freeze({id:"world-100",name:"終劫滅世天魔",level:100,element:"fire",traits:Object.freeze(["四階段","封鎖","護盾","蓄力"]),firstReward:"特殊首通：橙階礦石 ×8・金幣 20,000",repeatReward:"最終階段再戰：金幣 2,000",firstGold:20000,repeatGold:2000,ore:"orePerfect",firstOre:8})
+        Object.freeze({id:"world-40",name:"熔天君",level:40,element:"fire",traits:Object.freeze(["四階段","護盾","蓄力"]),firstReward:"特殊首通：回天寶輪・金幣 6,000",repeatReward:"最終階段再戰：金幣 700",firstGold:6000,repeatGold:700,relic:"relic_returning_wheel"}),
+        Object.freeze({id:"world-60",name:"冰海皇",level:60,element:"water",traits:Object.freeze(["四階段","回復","凍傷"]),firstReward:"特殊首通：橙階礦石 ×4・金幣 9,000",repeatReward:"最終階段再戰：金幣 1,000",firstGold:9000,repeatGold:1000,ore:"orePerfect",firstOre:4}),
+        Object.freeze({id:"world-80",name:"九曜龍皇",level:80,element:"fire",traits:Object.freeze(["四階段","增幅","蓄力"]),firstReward:"特殊首通：橙階礦石 ×6・金幣 13,000",repeatReward:"最終階段再戰：金幣 1,400",firstGold:13000,repeatGold:1400,ore:"orePerfect",firstOre:6}),
+        Object.freeze({id:"world-100",name:"滅世天魔",level:100,element:"fire",traits:Object.freeze(["四階段","封鎖","護盾","蓄力"]),firstReward:"特殊首通：橙階礦石 ×8・金幣 20,000",repeatReward:"最終階段再戰：金幣 2,000",firstGold:20000,repeatGold:2000,ore:"orePerfect",firstOre:8})
     ]);
 
     const TOWER_CONFIG=Object.freeze({
@@ -407,12 +407,12 @@
     function towerBossName(element,floor){
         const high=floor>=80;
         const map={
-            fire:high?"炎極鎮天尊":"赤曜鎮塔使",
-            water:high?"玄冥鎮天尊":"寒泉鎮塔使",
-            earth:high?"坤嶽鎮天尊":"岩岳鎮塔使",
-            wind:high?"巽嵐鎮天尊":"青嵐鎮塔使"
+            fire:high?"炎天尊":"赤焰使",
+            water:high?"玄冥尊":"寒泉使",
+            earth:high?"坤嶽尊":"岩岳使",
+            wind:high?"巽風尊":"青嵐使"
         };
-        return map[element]||"四象鎮塔尊";
+        return map[element]||"四象尊";
     }
     function towerMonsterLevel(floor){ return clamp(Math.round(29+floor*.71),30,100); }
     function towerMechanismPlan(floor){

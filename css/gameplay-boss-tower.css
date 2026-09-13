@@ -130,7 +130,7 @@
 }
 
 /* Gameplay activity covers use the same 16:9 production ratio as dungeon
-   covers. Combat BOSS/mechanism cards remain independent 4:3 components. */
+   covers. Combat BOSS/mechanism cards remain independent 9:16 components. */
 #game-stage .gameplay-mode-card{
     position:relative;
     display:grid;
@@ -610,14 +610,14 @@
 /* Only Gameplay Center BOSSes receive the portrait treatment. The selector
    deliberately mirrors the shared V143 battle namespace, then adds the live
    Gameplay-BOSS marker so these variables outrank the generic 82x106 rank rule
-   without another !important. Height is derived from the card's current 4:3 ratio. */
+   without another !important. Height is derived from the card's current 9:16 ratio. */
 #game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{
     --v143-monster-card-width:var(--gameplay-boss-card-width);
     --v143-monster-card-height:auto;
     --v143-monster-icon-width:calc(100% - 12px);
     --v143-monster-icon-height:auto;
     --v143-monster-bar-width:calc(100% - 10px);
-    aspect-ratio:4 / 3;
+    aspect-ratio:9 / 16;
     box-sizing:border-box;
     align-self:start;
     overflow:hidden;
@@ -626,7 +626,7 @@
 /* The portrait owns most of the vertical card. Background portraits and real
    img children both fill the same crop box without distortion. */
 #game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon{
-    aspect-ratio:3 / 1;
+    aspect-ratio:9 / 11;
     overflow:hidden;
     border-radius:8px;
     background-position:center 18%;
@@ -656,8 +656,7 @@
 }
 
 #game-stage #battlePage .battle-monster.gameplay-boss-card .damage-popup{
-    max-width:calc(100% + 40px);
-    text-align:center;
+    display:none;
 }
 
 #game-stage #battleMonsterArea{
@@ -692,7 +691,7 @@
     width:var(--gameplay-mechanism-card-width);
     min-width:0;
     min-height:0;
-    aspect-ratio:4 / 3;
+    aspect-ratio:9 / 16;
     box-sizing:border-box;
     flex:0 0 var(--gameplay-mechanism-card-width);
     flex-direction:column;
@@ -1026,7 +1025,7 @@
 
 /* If the physical viewport is short, both battlefield cards shrink together.
    Never solve a collision by changing only one member of the pair. */
-@media (max-height:840px){
+@media (max-height:920px){
     #game-stage #battleMonsterArea.gameplay-boss-active{
         --gameplay-boss-card-width:clamp(138px,34%,150px);
         --gameplay-mechanism-card-width:clamp(78px,19.5%,88px);

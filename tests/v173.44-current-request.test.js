@@ -20,6 +20,8 @@ assert.match(battle,/REFERENCE_TARGET_ORDER_10=\[7,2,6,1,5,10,4,9,3,8\]/);
 assert.match(battle,/monster\.v148TargetOrder=REFERENCE_TARGET_ORDER_6\[slot\]/);
 assert.match(tuning,/partySize===1\?\.40:partySize===2\?\.72:1/);
 assert.match(tuning,/highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05/);
+assert.match(tuning,/DAILY_DUNGEON_DIFFICULTY_MULTIPLIER=\.5/);
+assert.match(tuning,/factor:partyMultiplier\*levelMultiplier\*DAILY_DUNGEON_DIFFICULTY_MULTIPLIER/);
 assert.match(tuning,/FORMAL_DAILY_DUNGEON_TYPES=new Set\(\["exp","material","gold"\]\)/);
 assert.match(tuning,/v173DailySoloProtected=context\.partySize===1&&context\.highestLevel<=20/);
 assert.match(tuning,/Number\(monster\.v141DungeonStage\)===1\?0:Math\.min\(\.45,baseSkillChance\*\.60\)/);

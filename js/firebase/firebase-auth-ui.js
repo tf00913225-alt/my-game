@@ -5,8 +5,14 @@ import {
 } from "./firebase-auth.js";
 
 const OVERLAY_ID="firebaseAuthOverlay";
+const RESUME_GRACE_MS=5000;
 let installed=false;
 let busy=false;
+let interactiveAuthThisPage=false;
+let resumeGraceUsed=false;
+let resumeActive=false;
+let resumeDeadline=0;
+let resumeInterval=0;
 let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null};
 
 const byId=id=>document.getElementById(id);
@@ -26,6 +32,15 @@ function errorText(error){
     };
     return messages[code]||String(error&&error.message||"帳號服務發生錯誤，請稍後再試。");
 }
+function providerLabel(user){
+    if(!user){ return "帳號"; }
+    if(user.isAnonymous){ return "訪客"; }
+    const ids=(user.providerData||[]).map(item=>String(item&&item.providerId||""));
+    if(ids.includes("google.com")){ return "Google"; }
+    if(ids.includes("facebook.com")){ return "Facebook"; }
+    if(ids.includes("password")){ return "Email"; }
+    return "Firebase";
+}
 function markup(){
     const node=document.createElement("section");
     node.id=OVERLAY_ID; node.className="firebase-auth-overlay"; node.setAttribute("aria-hidden","true");
@@ -38,21 +53,27 @@ function markup(){
         <h2 id="firebaseAuthTitle" class="firebase-auth-title">帳號與角色</h2>
         <p class="firebase-auth-subtitle">先確認 Firebase UID，再讀取此帳號的角色資料。</p>
         <div id="firebaseAuthStatus" class="firebase-auth-status"></div>
+        <div id="firebaseAuthResumePanel" class="firebase-auth-resume-panel" hidden>
+          <small>偵測到上次登入帳號</small>
+          <strong id="firebaseAuthResumeProvider">使用帳號登入</strong>
+          <p><b id="firebaseAuthResumeCountdown">5</b> 秒後進入遊戲</p>
+          <button id="firebaseSwitchAccountButton" class="firebase-auth-button secondary" type="button">切換帳號</button>
+        </div>
         <div id="firebaseSignedOutPanel">
-          <div class="firebase-auth-actions">
-            <button id="firebaseGoogleButton" class="firebase-auth-button" type="button">Google 登入</button>
-            <button id="firebaseFacebookButton" class="firebase-auth-button" type="button">Facebook 登入</button>
-          </div>
-          <div class="firebase-auth-footer">
-            <button id="firebaseGuestButton" class="firebase-auth-button secondary" type="button">訪客開始遊戲</button>
-          </div>
-          <div class="firebase-auth-divider">或使用 Email 帳號</div>
           <div class="firebase-auth-field"><label for="firebaseEmailInput">Email 帳號</label><input id="firebaseEmailInput" type="email" autocomplete="email" inputmode="email"></div>
           <div class="firebase-auth-field"><label for="firebasePasswordInput">密碼</label><input id="firebasePasswordInput" type="password" autocomplete="current-password" minlength="6"></div>
           <p class="firebase-auth-email-help">第一次使用 Email？請選「建立帳號」。</p>
           <div class="firebase-auth-actions firebase-auth-email-actions">
             <button id="firebaseEmailSignInButton" class="firebase-auth-button" type="button">Email 登入</button>
             <button id="firebaseEmailCreateButton" class="firebase-auth-button secondary" type="button">建立帳號</button>
+          </div>
+          <div class="firebase-auth-divider">其他登入方式</div>
+          <div class="firebase-auth-actions">
+            <button id="firebaseGoogleButton" class="firebase-auth-button" type="button">Google 登入</button>
+            <button id="firebaseFacebookButton" class="firebase-auth-button" type="button">Facebook 登入</button>
+          </div>
+          <div class="firebase-auth-footer">
+            <button id="firebaseGuestButton" class="firebase-auth-button secondary" type="button">訪客開始遊戲</button>
           </div>
           <p class="firebase-auth-note">訪客仍會透過 Firebase Anonymous Auth 取得專屬 UID；沒有 UID 時不能建立角色。</p>
           <button id="firebaseSupportButton" class="firebase-auth-button firebase-auth-support-button" type="button">聯絡客服</button>
@@ -81,16 +102,27 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseFacebookButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseFacebookButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+}
+function renderResumeCountdown(){
+    if(!resumeActive){ return; }
+    const remaining=Math.max(0,Math.ceil((resumeDeadline-Date.now())/1000));
+    const countdown=byId("firebaseAuthResumeCountdown");
+    if(countdown){ countdown.textContent=String(remaining); }
+    const provider=byId("firebaseAuthResumeProvider");
+    if(provider){ provider.textContent="使用 "+providerLabel(state.user)+" 登入"; }
 }
 function render(){
     if(!installed){ return; }
     const status=byId("firebaseAuthStatus");
     status.textContent=state.message||""; status.classList.toggle("is-error",state.error===true);
     const signedOut=byId("firebaseSignedOutPanel"); const signedIn=byId("firebaseSignedInPanel");
-    signedOut.hidden=!!state.user; signedIn.classList.toggle("show",!!state.user);
+    const resume=byId("firebaseAuthResumePanel");
+    if(resume){ resume.hidden=!resumeActive; }
+    signedOut.hidden=!!state.user||resumeActive;
+    signedIn.classList.toggle("show",!!state.user&&!resumeActive);
     const back=byId("firebaseAuthBackButton");
-    if(back){ back.hidden=!(state.user&&(state.mode==="READY"||state.mode==="OFFLINE_READY")); }
+    if(back){ back.hidden=resumeActive||!(state.user&&(state.mode==="READY"||state.mode==="OFFLINE_READY")); }
     if(state.user){
         byId("firebaseAccountName").textContent=state.user.displayName||state.user.email||(state.user.isAnonymous?"訪客帳號":"Firebase 帳號");
         byId("firebaseAccountMeta").textContent=state.user.isAnonymous?"Firebase 匿名登入":"已驗證帳號";
@@ -104,6 +136,7 @@ function render(){
         byId("firebaseMigrationConfirmButton").disabled=busy||!!(state.migration&&state.migration.blocked);
     }
     byId("firebaseRetryButton").hidden=!state.error;
+    renderResumeCountdown();
 }
 function credentials(){
     const email=String(byId("firebaseEmailInput")?.value||"").trim();
@@ -118,21 +151,52 @@ async function perform(message,action){
     catch(error){ console.error("Firebase account action failed:",error); setFirebaseAuthUiState({message:errorText(error),error:true}); }
     finally{ setBusy(false); render(); }
 }
+function performInteractive(message,action){
+    interactiveAuthThisPage=true;
+    return perform(message,action);
+}
 function dispatchAction(action){ window.dispatchEvent(new CustomEvent("four-symbols:account-ui-action",{detail:{action}})); }
+function clearResumeTimer(){
+    if(resumeInterval){ window.clearInterval(resumeInterval); resumeInterval=0; }
+}
+function finishClose(){
+    clearResumeTimer(); resumeActive=false;
+    const node=byId(OVERLAY_ID); if(!node){ return false; }
+    node.classList.remove("show"); node.setAttribute("aria-hidden","true"); render(); return true;
+}
+function gameplayIsReadyBehindAuth(){
+    const game=byId("gameInterface");
+    return !!(game&&window.getComputedStyle(game).display!=="none");
+}
+function startResumeGrace(){
+    if(resumeActive){ return true; }
+    resumeGraceUsed=true; resumeActive=true; resumeDeadline=Date.now()+RESUME_GRACE_MS;
+    setFirebaseAuthUiState({message:"已讀取上次登入帳號。你可以在倒數結束前切換帳號。",error:false});
+    renderResumeCountdown();
+    resumeInterval=window.setInterval(()=>{
+        renderResumeCountdown();
+        if(Date.now()>=resumeDeadline){ finishClose(); }
+    },200);
+    return true;
+}
 function bind(){
-    byId("firebaseGoogleButton").addEventListener("click",()=>perform("正在開啟 Google 登入…",signInWithGoogle));
-    byId("firebaseFacebookButton").addEventListener("click",()=>perform("正在開啟 Facebook 登入…",signInWithFacebook));
-    byId("firebaseGuestButton").addEventListener("click",()=>perform("正在建立 Firebase 訪客 UID…",signInAsAnonymous));
-    byId("firebaseEmailSignInButton").addEventListener("click",()=>perform("正在登入 Email 帳號…",()=>{ const value=credentials(); return signInWithEmail(value.email,value.password); }));
-    byId("firebaseEmailCreateButton").addEventListener("click",()=>perform("正在建立 Email 帳號…",()=>{ const value=credentials(); return createAccountWithEmail(value.email,value.password); }));
+    byId("firebaseGoogleButton").addEventListener("click",()=>performInteractive("正在開啟 Google 登入…",signInWithGoogle));
+    byId("firebaseFacebookButton").addEventListener("click",()=>performInteractive("正在開啟 Facebook 登入…",signInWithFacebook));
+    byId("firebaseGuestButton").addEventListener("click",()=>performInteractive("正在建立 Firebase 訪客 UID…",signInAsAnonymous));
+    byId("firebaseEmailSignInButton").addEventListener("click",()=>performInteractive("正在登入 Email 帳號…",()=>{ const value=credentials(); return signInWithEmail(value.email,value.password); }));
+    byId("firebaseEmailCreateButton").addEventListener("click",()=>performInteractive("正在建立 Email 帳號…",()=>{ const value=credentials(); return createAccountWithEmail(value.email,value.password); }));
     byId("firebaseSignOutButton").addEventListener("click",()=>perform("正在登出…",signOutFirebase));
+    byId("firebaseSwitchAccountButton").addEventListener("click",()=>{
+        clearResumeTimer(); resumeActive=false; render();
+        void perform("正在切換帳號…",signOutFirebase);
+    });
     byId("firebaseMigrationConfirmButton").addEventListener("click",()=>dispatchAction("confirm-migration"));
     byId("firebaseMigrationCancelButton").addEventListener("click",()=>dispatchAction("cancel-migration"));
     byId("firebaseRetryButton").addEventListener("click",()=>dispatchAction("retry"));
     byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
     byId("firebaseAuthBackButton").addEventListener("click",()=>{
         if(!state.user||(state.mode!=="READY"&&state.mode!=="OFFLINE_READY")){ return; }
-        closeFirebaseAuthUi();
+        finishClose();
     });
 }
 export function installFirebaseAuthUi(){
@@ -145,5 +209,11 @@ export function installFirebaseAuthUi(){
     installed=true; bind(); state={...state,user:getSignedInUser()}; render(); return true;
 }
 export function openFirebaseAuthUi(){ const node=byId(OVERLAY_ID); if(!node){ return false; } render(); node.classList.add("show"); node.setAttribute("aria-hidden","false"); return true; }
-export function closeFirebaseAuthUi(){ const node=byId(OVERLAY_ID); if(!node){ return false; } node.classList.remove("show"); node.setAttribute("aria-hidden","true"); return true; }
+export function closeFirebaseAuthUi(){
+    const node=byId(OVERLAY_ID); if(!node){ return false; }
+    if(!interactiveAuthThisPage&&!resumeGraceUsed&&state.user&&gameplayIsReadyBehindAuth()){
+        return startResumeGrace();
+    }
+    return finishClose();
+}
 export function setFirebaseAuthUiState(next={}){ state={...state,...next}; render(); }
