@@ -1,0 +1,68 @@
+name: V173.65 UI battle auth polish
+
+on:
+  push:
+    branches:
+      - fix/v17365-ui-battle-auth-polish-20260913
+    paths:
+      - .github/workflows/v17365-ui-battle-auth-polish.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/v17365-ui-battle-auth-polish-20260913
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Ensure image test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y imagemagick
+          fi
+
+      - name: Apply owner-source fixes
+        run: node scripts/apply-v17365-ui-battle-auth-polish.mjs
+
+      - name: Syntax check touched JavaScript
+        run: |
+          node --check js/16-stage-v54-main-city-runtime.js
+          node --check js/41-v146-system-polish.js
+          node --check js/52-v173.20-startup-loader.js
+          node --check js/54-v173.51-battle-qa.js
+          node --check js/60-team-relic-system.js
+          node --check js/firebase/firebase-auth-ui.js
+
+      - name: Build synchronized production bundles
+        run: npm run build
+
+      - name: Run focused eight-issue regression
+        run: node tests/v173.65-ui-battle-auth-polish.test.js
+
+      - name: Run cardless battle browser regression
+        run: node tests/v174-cardless-battle-browser.test.js
+
+      - name: Run repository test suite
+        run: npm test
+
+      - name: Verify production build
+        run: npm run build:check
+
+      - name: Commit repair and generated bundles
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: polish battle city skill auth and relic UI"
+          git push origin HEAD:fix/v17365-ui-battle-auth-polish-20260913
