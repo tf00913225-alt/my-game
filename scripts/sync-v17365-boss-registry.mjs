@@ -87,4 +87,16 @@ for(const name of fs.readdirSync("tests")){
   }
 }
 
+// Creation role content now expands in normal flow; it must not create a nested
+// Android scroll/compositor layer inside the fixed creation canvas.
+const mobileGuardBrowser="tests/v174-mobile-ui-guards-browser.test.js";
+let guardText=fs.readFileSync(mobileGuardBrowser,"utf8");
+const oldGuard='assert.match(d.roleOverflow,/auto|scroll/); assert.equal(d.touch,"pan-y"); assert.ok(d.scrollHeight>d.clientHeight&&d.after>d.before,"creation element explanation is not actually scrollable");';
+const newGuard='assert.equal(d.roleOverflow,"visible"); assert.equal(d.touch,"auto"); assert.equal(d.after,d.before,"creation role card must not own nested scrolling");';
+if(!guardText.includes(oldGuard)){
+  throw new Error("Expected historical creation nested-scroll browser assertion was not found");
+}
+guardText=guardText.replace(oldGuard,newGuard);
+fs.writeFileSync(mobileGuardBrowser,guardText);
+
 console.log(`Synchronized ${changed} simplified boss names and aligned creation/player/BOSS geometry regressions.`);
