@@ -65,13 +65,17 @@ jobs:
         run: node .github/scripts/ci.mjs syntax
 
       - name: Ensure existing asset-test dependency
+        if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
         run: |
           if ! command -v identify >/dev/null 2>&1; then
             sudo apt-get update
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
 
+      # Full repository tests are formal-release gates. Dev stays fast and relies
+      # on change-focused tests before merge plus the static/build/release gates below.
       - name: Run all Node unit and integration suites
+        if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
         run: node .github/scripts/ci.mjs tests
 
       - name: Verify production build is synchronized
