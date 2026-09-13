@@ -50,7 +50,7 @@ jobs:
       - name: Apply owner-source fixes
         run: node scripts/apply-v17365-ui-battle-auth-polish.mjs
 
-      - name: Align intentional BOSS mechanism 4:3 tests
+      - name: Align intentional owner and 4:3 regression tests
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -77,6 +77,39 @@ jobs:
           s=s.replace('`Mechanism card is not 9:16 at ${width}x${height}: ${data.mechanismRatio}`', '`Mechanism card is not 4:3 at ${width}x${height}: ${data.mechanismRatio}`')
           s=s.replace('assert.equal(data.mechanismComputed.aspectRatio,"9 / 16");', 'assert.equal(data.mechanismComputed.aspectRatio,"4 / 3");')
           s=s.replace('`Mechanism content overflows its 9:16 card at ${width}x${height}`', '`Mechanism content overflows its 4:3 card at ${width}x${height}`')
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/ui-typography-standard.test.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("const homePolish = read(owners.homePolish);", "const homePolish = read(owners.homePolish);\nconst homeRoster = read('css/19-stage-v54-main-city-moderate-native-scale.css');")
+          s=s.replace('assert.match(homePolish, /\\.v146-home-roster > header\\{[^}]*font-size:15px/);', 'assert.match(homeRoster, /\\.v146-home-roster > header\\{[^}]*font-size:15px/);')
+          s=s.replace('assert.match(homePolish, /\\.v146-home-character-main > div:first-child\\{[^}]*font-size:15px/);', 'assert.match(homeRoster, /\\.v146-home-character-main > div:first-child\\{[^}]*font-size:15px/);')
+          s=s.replace('assert.match(homePolish, /\\.v146-home-resource strong\\{[^}]*font-size:13px/);', 'assert.match(homeRoster, /\\.v146-home-resource strong\\{[^}]*font-size:13px/);')
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/v174-current-ui-fixes.test.js')
+          s=p.read_text(encoding='utf-8').replace('const rosterCss=read("css/42-v146-system-polish.css");','const rosterCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");')
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/v173.39-main-city-final-polish.test.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('roster=read("css/42-v146-system-polish.css"),runtime=read("js/41-v146-system-polish.js")','roster=read("css/19-stage-v54-main-city-moderate-native-scale.css"),runtime=read("js/16-stage-v54-main-city-runtime.js")')
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/v173.28-main-city-lobby.test.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('const rosterCss=read("css/42-v146-system-polish.css");','const rosterCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");')
+          s=s.replace('const rosterRuntime=read("js/41-v146-system-polish.js");','const rosterRuntime=read("js/16-stage-v54-main-city-runtime.js");')
+          s=s.replace('function numeric\\(value\\)', 'function rosterNumber\\(value\\)')
+          s=s.replace('function formatHomeResourceValue\\(value\\)', 'function rosterResourceText\\(value\\)')
+          s=s.replace('formatHomeResourceValue(12485243),formatHomeResourceValue(104852430),formatHomeResourceValue(1248524300)', 'rosterResourceText(12485243),rosterResourceText(104852430),rosterResourceText(1248524300)')
+          s=s.replace('syncHomeResourceValue\\(hudGold,[^\\n]+\\);[\\s\\S]*syncHomeResourceValue\\(hudExp,[^\\n]+\\);', 'syncRosterResource\\(document.getElementById\\("homeHudGoldValue"\\),[^\\n]+\\);[\\s\\S]*syncRosterResource\\(document.getElementById\\("homeHudExpValue"\\),[^\\n]+\\);')
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/v146-system-polish.test.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('const source=fs.readFileSync("js/41-v146-system-polish.js","utf8");', 'const source=fs.readFileSync("js/41-v146-system-polish.js","utf8");\nconst eagerSource=fs.readFileSync("js/16-stage-v54-main-city-runtime.js","utf8");')
+          s=s.replace('assert.match(source,/v146-home-roster/);','assert.match(eagerSource,/v146-home-roster/);')
           p.write_text(s,encoding='utf-8')
           PY
 
