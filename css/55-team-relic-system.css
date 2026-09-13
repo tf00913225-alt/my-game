@@ -64,8 +64,8 @@
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-close-btn{align-items:center!important;justify-content:center!important;width:auto!important;min-width:68px!important;height:38px!important;padding:0 12px!important;font-size:15px!important;line-height:36px!important;font-weight:900!important;border:1px solid #8a6a3a!important;border-radius:7px!important;background:linear-gradient(180deg,#2c2419,#0f0c09)!important;color:#f4ead4!important;text-shadow:0 1px 2px #000!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45)!important;}
 #game-stage #homeFeatureModal.team-relic-modal #statusHelpButton,
 #game-stage #homeFeatureModal.team-relic-modal #skillPreviewHeaderButton{display:none!important;}
-#game-stage #homeFeatureModal.team-relic-modal .home-feature-close-btn:not(#statusHelpButton):not(#skillPreviewHeaderButton){display:inline-flex!important;}
-#game-stage #homeFeatureModal.team-relic-modal:has(.team-relic-detail) .home-feature-close-btn{display:none!important;}
+#game-stage #homeFeatureModal.team-relic-modal:not(.team-relic-detail-mode) .home-feature-close-btn:not(#statusHelpButton):not(#skillPreviewHeaderButton){display:inline-flex!important;}
+#game-stage #homeFeatureModal.team-relic-modal.team-relic-detail-mode .home-feature-close-btn{display:none!important;}
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide #homeFeatureModalBody{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;padding:9px!important;box-sizing:border-box;}
 #game-stage .team-relic-page,#game-stage .team-relic-detail{min-height:100%;color:#e7dcc7;font-size:15px;line-height:1.5;box-sizing:border-box;}
 #game-stage .team-relic-resource-line{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;color:#b4a58c;font-size:14px;line-height:20px;}

@@ -1846,3 +1846,8 @@
 #game-stage > #app > #game-content #battlePage .battle-player .sp-bar{
     border:1px solid rgba(255,255,255,.28) !important;
 }
+
+
+/* Skill detail is a child dialog of the skill page and must paint above its V17 home-feature owner. */
+#game-stage > #game-overlay-layer .native-v18-skill-detail-layer{z-index:13000!important;}
+#game-stage > #game-overlay-layer .native-v18-status-help-layer{z-index:13010!important;}

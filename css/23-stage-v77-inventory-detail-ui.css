@@ -293,3 +293,14 @@
     height:124px !important;
     min-height:124px !important;
 }
+
+
+/* Skill detail icon is an icon, not a full-width repeating banner. */
+#game-stage #skillDetailModal #skillDetailIcon{
+    width:88px!important;height:88px!important;min-height:88px!important;
+    align-self:center!important;margin:0 auto 8px!important;overflow:hidden!important;
+    border-radius:12px!important;background-position:center!important;
+    background-size:contain!important;background-repeat:no-repeat!important;
+    background-color:rgba(9,8,6,.88)!important;
+}
+#game-stage #skillDetailModal #skillDetailIcon img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;}

@@ -1,4 +1,4 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstrap":"build/firebase/firebase-bootstrap.98b2490e490c.js"});
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstrap":"build/firebase/firebase-bootstrap.33635ae6e8a1.js"});
 
 /* bundled source: js/startup/support-contact.js */
 /* =====================================================
@@ -973,6 +973,8 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         activateGameplaySaveOwner();
         const loaded=global.FourSymbolsGameSave&&typeof global.FourSymbolsGameSave.hydrate==="function"&&global.FourSymbolsGameSave.hydrate(save);
         if(!loaded){ throw new Error("Resolved account save could not hydrate gameplay state."); }
+        if(typeof global.v54RenderHomeRoster==="function"){ global.v54RenderHomeRoster(); }
+        await nextPaint();
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
         firebase.closeAuth(); status("載入完成","主城已可操作");
         mark("four-symbols:critical-ready");
@@ -1101,13 +1103,24 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.65","firebaseBootstr
         if(error){ fail(error,"Firebase 身份解析失敗；不會顯示創角。"); return; }
         if(!user){
             if(activeUser){
-                global.FourSymbolsAccountSave.deactivate();
-                global.location.reload(); return;
+                ++transitionToken;
+                activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null; lastError=null;
+                if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }else{ global.FourSymbolsAccountSave.deactivate(); }
+                if(state!==STATES.AUTH_REQUIRED){ transition(STATES.AUTH_REQUIRED,{reason:"account-switch"}); }
+                status("帳號服務已就緒","請選擇登入或綁定的帳號");
+                accountUi("AUTH_REQUIRED","請選擇登入、建立帳號或使用訪客開始遊戲。");
+                return;
             }
             if(state===STATES.AUTH_RESOLVING){ requireAuth(); }
             return;
         }
-        if(activeUser&&activeUser.uid!==user.uid){ global.FourSymbolsAccountSave.deactivate(); global.location.reload(); return; }
+        if(activeUser&&activeUser.uid!==user.uid){
+            ++transitionToken;
+            if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }else{ global.FourSymbolsAccountSave.deactivate(); }
+            activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null; lastError=null;
+            if(state!==STATES.AUTH_REQUIRED){ transition(STATES.AUTH_REQUIRED,{reason:"account-switch"}); }
+            void resolveSaveFor(user); return;
+        }
         if(state===STATES.AUTH_RESOLVING||state===STATES.AUTH_REQUIRED){ void resolveSaveFor(user); }
     }
     let firebaseBootPromise=null;

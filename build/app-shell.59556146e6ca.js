@@ -27759,7 +27759,7 @@ function renderSystemContent(){
             '</div>'+
             '<div class="system-panel-row">'+
                 '<div><strong>帳號管理</strong><small>查看目前 Firebase UID、登出或切換帳號。</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">開啟帳號</button>'+
+                '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">切換帳號／綁定帳號</button>'+
             '</div>'+
             '<div class="system-panel-row">'+
                 '<div><strong>客服信箱</strong><small>查看《四象江湖傳》客服聯絡方式。</small></div>'+
@@ -35082,6 +35082,71 @@ catch(error){
         return openAdFreeServiceInfoModal({manual:true});
     };
     window.closeAdFreeServiceInfoModal=closeAdFreeServiceInfoModal;
+
+
+    function rosterNumber(value){
+        const number=Number(value);
+        return Number.isFinite(number)?number:0;
+    }
+    function rosterEscape(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+    function rosterResourceText(value){
+        const whole=Math.max(0,Math.floor(rosterNumber(value)));
+        if(whole>=100000000){
+            const compact=whole/100000000;
+            return compact.toFixed(compact>=10?1:2).replace(/\.?0+$/g,"")+"億";
+        }
+        if(whole>=10000){ return Math.floor(whole/10000)+"萬"; }
+        return whole.toLocaleString("zh-TW");
+    }
+    function syncRosterResource(node,value){
+        if(!node){ return; }
+        const whole=Math.max(0,Math.floor(rosterNumber(value)));
+        const full=whole.toLocaleString("zh-TW");
+        node.textContent=rosterResourceText(whole);
+        node.title=full; node.setAttribute("aria-label",full);
+    }
+    function renderHomeRoster(){
+        const page=document.getElementById("homePage");
+        const grid=page&&page.querySelector(".home-card-grid");
+        if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return false; }
+        const partyIndexes=getExistingPartyIndexes().slice(0,3);
+        const availableExp=typeof window.v173GetAvailableExpPool==="function"
+            ?window.v173GetAvailableExpPool(Date.now())
+            :(typeof sharedExp!=="undefined"?sharedExp:0);
+        syncRosterResource(document.getElementById("homeHudGoldValue"),typeof gold!=="undefined"?gold:0);
+        syncRosterResource(document.getElementById("homeHudExpValue"),availableExp);
+        let roster=document.getElementById("v146HomeRoster");
+        if(!roster){
+            roster=document.createElement("section");
+            roster.id="v146HomeRoster"; roster.className="v146-home-roster";
+            roster.setAttribute("aria-label","冒險隊伍");
+            grid.insertAdjacentElement("afterend",roster);
+        }
+        const cards=partyIndexes.map(index=>{
+            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+            const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+            if(!character||!stats){ return ""; }
+            const hp=Math.max(0,Math.min(rosterNumber(stats.maxHP),rosterNumber(character.hp)));
+            const sp=Math.max(0,Math.min(rosterNumber(stats.maxSP),rosterNumber(character.sp)));
+            const hpPercent=rosterNumber(stats.maxHP)>0?hp/rosterNumber(stats.maxHP)*100:0;
+            const spPercent=rosterNumber(stats.maxSP)>0?sp/rosterNumber(stats.maxSP)*100:0;
+            const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
+            return '<article class="v146-home-character" data-element="'+rosterEscape(character.element||"fire")+'">'+
+                '<div class="v146-home-avatar"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id||"角色")+'頭像"></div>'+
+                '<div class="v146-home-character-main"><div><b>'+rosterEscape(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'</span></div>'+
+                '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(rosterNumber(stats.maxHP))+'</strong></div>'+
+                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'</strong></div></div></article>';
+        }).join("");
+        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 3</span></header>'+cards;
+        roster.dataset.ready="true";
+        return true;
+    }
+    window.v54RenderHomeRoster=renderHomeRoster;
+    document.addEventListener("four-symbols:startup-ready",renderHomeRoster);
 
     function boot(){
         apply();
