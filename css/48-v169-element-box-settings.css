@@ -16,9 +16,13 @@
     overflow:visible;
 }
 
+/* Active mode must remain a single compact status row beside the stop action.
+   Keep the helper readable but deterministic across Chrome font metrics. */
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active .auto-premium-status-copy small{
-    white-space:normal;
-    overflow:visible;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 /*
