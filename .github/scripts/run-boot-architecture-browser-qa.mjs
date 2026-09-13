@@ -444,7 +444,9 @@ try{
     const accountB=await client.eval(`(()=>({uid:FourSymbolsStartupPolicy.getUid(),activeUid:FourSymbolsAccountSave.getActiveUid(),playerId:player.id,gold:gold,sharedExp:sharedExp,item:inventoryItems[0]?.id,equipment:characterEquipment.fire.hand?.id,saveA:JSON.parse(localStorage.getItem("four_symbols_save:uid-A")).player.id,saveB:JSON.parse(localStorage.getItem("four_symbols_save:uid-B")).player.id,metaA:JSON.parse(localStorage.getItem("four_symbols_save_meta:uid-A")).ownerUid,metaB:JSON.parse(localStorage.getItem("four_symbols_save_meta:uid-B")).ownerUid}))()`);
     assert.deepEqual(accountB,{uid:"uid-B",activeUid:"uid-B",playerId:"角色-B",gold:2222,sharedExp:222,item:"qa-token-B",equipment:"qa-blade-B",saveA:"角色-A",saveB:"角色-B",metaA:"uid-A",metaB:"uid-B"});evidence.checks.accountSwitch=accountB;
 
+    const warmPreviousTimeOrigin=await client.eval(`performance.timeOrigin`);
     await client.send("Network.setCacheDisabled",{cacheDisabled:false});await client.send("Page.reload",{ignoreCache:false});
+    await waitFor(client,`performance.timeOrigin!==${JSON.stringify(warmPreviousTimeOrigin)}&&document.readyState==='complete'`,"warm reload new document",15000);
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","warm account restore",15000);
     evidence.performance.warmExisting=await metrics(client,"four-symbols:main-city-interactive");
     assert.ok(evidence.performance.warmExisting.readyMs>=9800&&evidence.performance.warmExisting.readyMs<=15000,"Warm returning main city did not respect the deliberate 5s + 5s brand opening");
