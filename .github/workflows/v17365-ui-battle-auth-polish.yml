@@ -32,6 +32,17 @@ jobs:
             sudo apt-get install -y imagemagick
           fi
 
+      - name: Repair temporary patch driver syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('scripts/apply-v17365-ui-battle-auth-polish.mjs')
+          lines=path.read_text(encoding='utf-8').splitlines()
+          lines=[line for line in lines if 's=s.replace(/mechanismCardRule,' not in line]
+          path.write_text('\n'.join(lines)+'\n',encoding='utf-8')
+          PY
+          node --check scripts/apply-v17365-ui-battle-auth-polish.mjs
+
       - name: Apply owner-source fixes
         run: node scripts/apply-v17365-ui-battle-auth-polish.mjs
 
