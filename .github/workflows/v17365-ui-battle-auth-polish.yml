@@ -50,6 +50,36 @@ jobs:
       - name: Apply owner-source fixes
         run: node scripts/apply-v17365-ui-battle-auth-polish.mjs
 
+      - name: Align intentional BOSS mechanism 4:3 tests
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p=Path('tests/boss-mechanism-vfx-card-ui-20260909.test.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('// The function/mechanism card is the paired 9:16 battlefield component. Its', '// The function/mechanism card is the paired 4:3 battlefield component. Its')
+          s=s.replace('aspect-ratio:9 \\/ 16;[\\s\\S]*?flex:0 0 var\\(--gameplay-mechanism-card-width\\);', 'aspect-ratio:4 \\/ 3;[\\s\\S]*?flex:0 0 var\\(--gameplay-mechanism-card-width\\);')
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/ui-typography-battle-preservation.test.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('// redundant title is removed, both BOSS and mechanism target cards use 9:16,', '// redundant title is removed, the BOSS target stays 9:16 while the mechanism target uses 4:3,')
+          s=s.replace('assert.match(now,/\\.boss-mechanism-card\\{[\\s\\S]*?width:var\\(--gameplay-mechanism-card-width\\);[\\s\\S]*?min-width:0;[\\s\\S]*?aspect-ratio:9 \\/ 16;', 'assert.match(now,/\\.boss-mechanism-card\\{[\\s\\S]*?width:var\\(--gameplay-mechanism-card-width\\);[\\s\\S]*?min-width:0;[\\s\\S]*?aspect-ratio:4 \\/ 3;')
+          s=s.replace('"Gameplay BOSS 9:16 sizing must stay specificity-driven"', '"Gameplay BOSS/mechanism sizing must stay specificity-driven"')
+          s=s.replace('approved non-overlapping 16:9 activity-cover stack', 'approved non-overlapping 16:9 activity-cover stack and 4:3 mechanism target')
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/boss-mobile-portrait-browser.test.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('const ratio=16/9;', 'const bossRatio=16/9;\n    const mechanismRatio=3/4;')
+          s=s.replace('Math.abs(data.bossRatio-ratio)<.025', 'Math.abs(data.bossRatio-bossRatio)<.025')
+          s=s.replace('Math.abs(data.mechanismRatio-ratio)<.025', 'Math.abs(data.mechanismRatio-mechanismRatio)<.025')
+          s=s.replace('`Mechanism card is not 9:16 at ${width}x${height}: ${data.mechanismRatio}`', '`Mechanism card is not 4:3 at ${width}x${height}: ${data.mechanismRatio}`')
+          s=s.replace('assert.equal(data.mechanismComputed.aspectRatio,"9 / 16");', 'assert.equal(data.mechanismComputed.aspectRatio,"4 / 3");')
+          s=s.replace('`Mechanism content overflows its 9:16 card at ${width}x${height}`', '`Mechanism content overflows its 4:3 card at ${width}x${height}`')
+          p.write_text(s,encoding='utf-8')
+          PY
+
       - name: Syntax check touched JavaScript
         run: |
           node --check js/16-stage-v54-main-city-runtime.js
@@ -67,6 +97,9 @@ jobs:
 
       - name: Run cardless battle browser regression
         run: node tests/v174-cardless-battle-browser.test.js
+
+      - name: Run BOSS mobile geometry regression
+        run: node tests/boss-mobile-portrait-browser.test.js
 
       - name: Run repository test suite
         run: npm test
