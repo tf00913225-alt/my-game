@@ -52,7 +52,8 @@ s = s.replace("`Mechanism content overflows its 9:16 card at ${width}x${height}`
 p.write_text(s, encoding="utf-8")
 
 p = Path("tests/ui-typography-standard.test.js")
-s = p.read_text(encoding="utf-8")ns = s.replace("const homePolish = read(owners.homePolish);", "const homePolish = read(owners.homePolish);\nconst homeRoster = read('css/19-stage-v54-main-city-moderate-native-scale.css');")
+s = p.read_text(encoding="utf-8")
+s = s.replace("const homePolish = read(owners.homePolish);", "const homePolish = read(owners.homePolish);\nconst homeRoster = read('css/19-stage-v54-main-city-moderate-native-scale.css');")
 s = s.replace("assert.match(homePolish, /\\.v146-home-roster > header\\{[^}]*font-size:15px/);", "assert.match(homeRoster, /\\.v146-home-roster > header\\{[^}]*font-size:15px/);")
 s = s.replace("assert.match(homePolish, /\\.v146-home-character-main > div:first-child\\{[^}]*font-size:15px/);", "assert.match(homeRoster, /\\.v146-home-character-main > div:first-child\\{[^}]*font-size:15px/);")
 s = s.replace("assert.match(homePolish, /\\.v146-home-resource strong\\{[^}]*font-size:13px/);", "assert.match(homeRoster, /\\.v146-home-resource strong\\{[^}]*font-size:13px/);")
