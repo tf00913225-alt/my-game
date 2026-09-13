@@ -488,43 +488,9 @@
         };
     }
 
-    /* ----- Main city: deduplicated HUD resources and complete party roster. ----- */
+    /* Main-city roster is first-screen UI and is owned by the eager V54 city runtime. */
     function renderHomeRoster(){
-        const page=document.getElementById("homePage");
-        const grid=page&&page.querySelector(".home-card-grid");
-        if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return; }
-        const partyIndexes=getExistingPartyIndexes().slice(0,3);
-        const hudGold=document.getElementById("homeHudGoldValue");
-        const hudExp=document.getElementById("homeHudExpValue");
-        const availableExp=typeof window.v173GetAvailableExpPool==="function"
-            ?window.v173GetAvailableExpPool(Date.now())
-            :(typeof sharedExp!=="undefined"?sharedExp:0);
-        syncHomeResourceValue(hudGold,typeof gold!=="undefined"?gold:0);
-        syncHomeResourceValue(hudExp,availableExp);
-        let roster=document.getElementById("v146HomeRoster");
-        if(!roster){
-            roster=document.createElement("section");
-            roster.id="v146HomeRoster";
-            roster.className="v146-home-roster";
-            roster.setAttribute("aria-label","冒險隊伍");
-            grid.insertAdjacentElement("afterend",roster);
-        }
-        const cards=partyIndexes.map(index=>{
-            const character=getPartyCharacterByIndex(index);
-            const stats=getPartyBattleStats(index);
-            if(!character||!stats){ return ""; }
-            const hp=Math.max(0,Math.min(numeric(stats.maxHP),numeric(character.hp)));
-            const sp=Math.max(0,Math.min(numeric(stats.maxSP),numeric(character.sp)));
-            const hpPercent=numeric(stats.maxHP)>0?hp/numeric(stats.maxHP)*100:0;
-            const spPercent=numeric(stats.maxSP)>0?sp/numeric(stats.maxSP)*100:0;
-            const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
-            return '<article class="v146-home-character" data-element="'+escapeHtml(character.element||"fire")+'">'+
-                '<div class="v146-home-avatar"><img src="'+escapeHtml(artwork)+'" alt="'+escapeHtml(character.id||"角色")+'頭像"></div>'+
-                '<div class="v146-home-character-main"><div><b>'+escapeHtml(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(numeric(character.level)||1))+'</span></div>'+
-                '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(numeric(stats.maxHP))+'</strong></div>'+
-                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(numeric(stats.maxSP))+'</strong></div></div></article>';
-        }).join("");
-        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 3</span></header>'+cards;
+        return typeof window.v54RenderHomeRoster==="function"?window.v54RenderHomeRoster():undefined;
     }
 
     /* ----- Progressive character growth guidance. ----- */

@@ -123,7 +123,10 @@ window.__qaBefore=qaRects();
       playerHp:player.querySelector('.hp-bar-text').textContent,
       playerSp:player.querySelector('.sp-bar-text').textContent,
       enemyHp:enemy.querySelector('.monster-hp .monster-bar-text').textContent,
-      enemySp:enemy.querySelector('.monster-sp .monster-bar-text').textContent
+      enemySp:enemy.querySelector('.monster-sp .monster-bar-text').textContent,
+      enemyHpRect:qaRect('#battleMonster0 > .monster-hp'),
+      enemySpRect:qaRect('#battleMonster0 > .monster-sp'),
+      enemyHpDisplay:getComputedStyle(enemy.querySelector('.monster-hp')).display
     };
     parent.document.getElementById('result').textContent=JSON.stringify(result);
   },260);
@@ -155,7 +158,7 @@ function runViewport(chrome,width,height){
     assert.equal(data.playerShadow,"none");
     assert.equal(data.enemyShadow,"none");
     assert.equal(data.playerArt,true);
-    assert.equal(data.playerArtBackgroundSize,"150% auto");
+    assert.equal(data.playerArtBackgroundSize,"contain");
     assert.ok(data.playerArtRect.bottom<=data.playerHpRect.top,"player artwork must end above HP bar");
     assert.ok(data.playerHpRect.bottom<=data.playerSpRect.top+1,"HP bar must sit above SP bar without portrait overlap");
     assert.ok(data.playerSpRect.bottom<=data.playerNameRect.top+1,"player name must sit below both resource bars");
@@ -170,6 +173,9 @@ function runViewport(chrome,width,height){
     assert.equal(data.playerSp,"412");
     assert.equal(data.enemyHp,"1380");
     assert.equal(data.enemySp,"630");
+    assert.equal(data.enemyHpDisplay,"block");
+    assert.ok(data.enemyHpRect.height>0&&data.enemySpRect.height>0,"enemy HP/SP bars must remain visible");
+    assert.ok(data.enemyHpRect.bottom<=data.enemySpRect.top+1,"enemy HP must sit above SP");
     console.log(`V174 cardless battle browser QA ${width}x${height}:`,JSON.stringify(data));
 }
 

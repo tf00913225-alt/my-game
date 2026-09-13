@@ -14,7 +14,7 @@ assert.match(touch,/\.creation-page-scroll, \.creation-role-card, \.inventory-gr
 assert.match(css,/#v146HomeRoster \.v146-home-resource\{[\s\S]*height:14px !important;/);
 assert.match(css,/#v146HomeRoster \.v146-home-resource strong\{[\s\S]*font-size:11px !important;/);
 assert.match(boss,/gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*aspect-ratio:9 \/ 16;/);
-assert.match(boss,/\.boss-mechanism-card\{[\s\S]*aspect-ratio:9 \/ 16;/);
+assert.match(boss,/\.boss-mechanism-card\{[\s\S]*aspect-ratio:4 \/ 3;/);
 assert.match(boss,/max-height:920px[\s\S]*--gameplay-boss-card-width[\s\S]*--gameplay-mechanism-card-width/);
 assert.doesNotMatch(skill,/function addProgressionHint|addProgressionHint\(/);
 assert.match(skill,/renderSkillDetailProgression[\s\S]*最低學習等級[\s\S]*前置技能/);

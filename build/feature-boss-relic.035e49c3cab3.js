@@ -1875,9 +1875,9 @@
     }
     function openRelicPage(){
         currentDetailId=null; Object.values(playerRelics).forEach(state=>{ if(state.unlocked){state.seen=true;} }); saveRelics();
-        const nodes=prepareRelicModal(); if(!nodes){ return false; } nodes.body.innerHTML=renderRelicList(); syncHomeRelicUi(); return true;
+        const nodes=prepareRelicModal(); if(!nodes){ return false; } nodes.modal.classList.remove("team-relic-detail-mode"); nodes.body.innerHTML=renderRelicList(); syncHomeRelicUi(); return true;
     }
-    function openRelicDetail(id){ const def=relicCatalog[id]; if(!def){ return false; } currentDetailId=id; const nodes=prepareRelicModal(); if(!nodes){return false;} nodes.body.innerHTML=detailMarkup(def); return true; }
+    function openRelicDetail(id){ const def=relicCatalog[id]; if(!def){ return false; } currentDetailId=id; const nodes=prepareRelicModal(); if(!nodes){return false;} nodes.modal.classList.add("team-relic-detail-mode"); nodes.body.innerHTML=detailMarkup(def); return true; }
     function renderRelicPage(preferred){ if(!document||!document.getElementById("homeFeatureModal")?.classList.contains("team-relic-modal")){return;} if(preferred||currentDetailId){openRelicDetail(preferred||currentDetailId);}else{openRelicPage();} }
 
     function syncHomeRelicUi(){

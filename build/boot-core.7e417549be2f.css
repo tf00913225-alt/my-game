@@ -5391,7 +5391,7 @@ button:active{
 */
 
 #skillDetailModal{
-    z-index:6060;
+    z-index:13000;
 }
 
 /* V94：技能「詳細」是技能頁內的第二層內容。

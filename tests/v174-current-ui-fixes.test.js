@@ -7,7 +7,7 @@ const {spawnSync}=require("node:child_process");
 const read=file=>fs.readFileSync(file,"utf8");
 const inventoryCss=read("css/38-v141-system-expansion.css");
 const hintCss=read("css/56-v174-critical-ui-regressions.css");
-const rosterCss=read("css/42-v146-system-polish.css");
+const rosterCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");
 const relicCss=read("css/55-team-relic-system.css");
 const rewardCss=read("css/33-v132-content-expansion.css");
 const equipmentJs=read("js/equipment-progression.js");

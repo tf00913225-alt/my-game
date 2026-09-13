@@ -32,14 +32,15 @@ function errorText(error){
     };
     return messages[code]||String(error&&error.message||"帳號服務發生錯誤，請稍後再試。");
 }
-function providerLabel(user){
-    if(!user){ return "帳號"; }
-    if(user.isAnonymous){ return "訪客"; }
-    const ids=(user.providerData||[]).map(item=>String(item&&item.providerId||""));
-    if(ids.includes("google.com")){ return "Google"; }
-    if(ids.includes("facebook.com")){ return "Facebook"; }
-    if(ids.includes("password")){ return "Email"; }
-    return "Firebase";
+function resumeLoginText(user){
+    if(!user){ return "正在登入帳號"; }
+    if(user.isAnonymous){ return "使用訪客帳號登入中"; }
+    const ids=Array.isArray(user.providerIds)?user.providerIds:[];
+    if(ids.includes("google.com")){ return "使用 Google 登入中"; }
+    if(ids.includes("facebook.com")){ return "使用 Facebook 登入中"; }
+    if(ids.includes("password")){ return user.email?"使用 "+user.email+" 信箱登入中":"使用 Email 登入中"; }
+    if(user.email){ return "使用 "+user.email+" 信箱登入中"; }
+    return "正在登入帳號";
 }
 function markup(){
     const node=document.createElement("section");
@@ -55,7 +56,7 @@ function markup(){
         <div id="firebaseAuthStatus" class="firebase-auth-status"></div>
         <div id="firebaseAuthResumePanel" class="firebase-auth-resume-panel" hidden>
           <small>偵測到上次登入帳號</small>
-          <strong id="firebaseAuthResumeProvider">使用帳號登入</strong>
+          <strong id="firebaseAuthResumeProvider">正在登入帳號</strong>
           <p><b id="firebaseAuthResumeCountdown">5</b> 秒後進入遊戲</p>
           <button id="firebaseSwitchAccountButton" class="firebase-auth-button secondary" type="button">切換帳號</button>
         </div>
@@ -110,7 +111,7 @@ function renderResumeCountdown(){
     const countdown=byId("firebaseAuthResumeCountdown");
     if(countdown){ countdown.textContent=String(remaining); }
     const provider=byId("firebaseAuthResumeProvider");
-    if(provider){ provider.textContent="使用 "+providerLabel(state.user)+" 登入"; }
+    if(provider){ provider.textContent=resumeLoginText(state.user); }
 }
 function render(){
     if(!installed){ return; }
@@ -187,8 +188,15 @@ function bind(){
     byId("firebaseEmailCreateButton").addEventListener("click",()=>performInteractive("正在建立 Email 帳號…",()=>{ const value=credentials(); return createAccountWithEmail(value.email,value.password); }));
     byId("firebaseSignOutButton").addEventListener("click",()=>perform("正在登出…",signOutFirebase));
     byId("firebaseSwitchAccountButton").addEventListener("click",()=>{
-        clearResumeTimer(); resumeActive=false; render();
-        void perform("正在切換帳號…",signOutFirebase);
+        if(busy){ return; }
+        const previousState={...state};
+        clearResumeTimer(); resumeActive=false; resumeGraceUsed=true; interactiveAuthThisPage=true;
+        state={...state,user:null,mode:"AUTH_REQUIRED",message:"請選擇登入或綁定的帳號。",error:false};
+        render(); setBusy(true);
+        void signOutFirebase().catch(error=>{
+            console.error("Firebase account switch failed:",error);
+            state={...previousState,message:errorText(error),error:true};
+        }).finally(()=>{ setBusy(false); render(); });
     });
     byId("firebaseMigrationConfirmButton").addEventListener("click",()=>dispatchAction("confirm-migration"));
     byId("firebaseMigrationCancelButton").addEventListener("click",()=>dispatchAction("cancel-migration"));
