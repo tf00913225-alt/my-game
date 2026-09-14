@@ -63,7 +63,7 @@ function launchHarness(){
 }
 
 test("talisman artwork is border-box constrained to the inventory cell",()=>{
-    const iconRule=inventoryCss.match(/#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon\{[\s\S]*?\}/);
+    const iconRule=inventoryCss.match(/#game-stage #inventoryPage \.inventory-grid-classic \.inventory-item-classic \.inventory-icon\{[\s\S]*?\}/);
     assert.ok(iconRule);
     assert.match(iconRule[0],/width:100%;/);
     assert.match(iconRule[0],/height:100%;/);
@@ -71,7 +71,7 @@ test("talisman artwork is border-box constrained to the inventory cell",()=>{
     assert.match(iconRule[0],/min-height:0;/);
     assert.match(iconRule[0],/overflow:hidden;/);
     assert.match(iconRule[0],/box-sizing:border-box;/);
-    const artRule=itemCss.match(/#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{[\s\S]*?\}/);
+    const artRule=inventoryCss.match(/#game-stage #inventoryPage \.inventory-grid-classic \.inventory-item-classic \.inventory-icon > \.v169-item-art\{[\s\S]*?\}/);
     assert.ok(artRule);
     assert.match(artRule[0],/width:100%;[\s\S]*?height:100%;/);
     assert.match(artRule[0],/max-width:100%;[\s\S]*?max-height:100%;/);
