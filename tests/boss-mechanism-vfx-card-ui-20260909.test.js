@@ -54,8 +54,8 @@ assert.doesNotMatch(bossCardRule,/scale\(/);
 // a new priority patch in the Boss-specific sizing rules. The same owner also
 // defines both card widths so compact screens shrink the pair together.
 assert.match(boss,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
-assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(118px,29%,132px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(222px,58%,252px\);[\s\S]*?margin-top:-16px;/);
-assert.match(boss,/@media \(max-height:920px\)\{[\s\S]*?#game-stage #battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(108px,27%,122px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(198px,53%,224px\);/);
+assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(118px,29%,132px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(123px,30%,138px\);[\s\S]*?margin-top:-16px;/);
+assert.match(boss,/@media \(max-height:920px\)\{[\s\S]*?#game-stage #battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(108px,27%,122px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(117px,29\.25%,132px\);/);
 const activeBossAreaRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active{");
 const activeBossRowRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{");
 assert.doesNotMatch(activeBossAreaRule,/!important/);
