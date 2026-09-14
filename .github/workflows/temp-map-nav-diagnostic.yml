@@ -1,0 +1,20 @@
+name: Temporary map/nav diagnostic
+on:
+  push:
+    branches:
+      - fix/map-avatar-nav-size-player-scale-20260914
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locate map avatar and nav owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '=== MAP PLAYER REFERENCES ==='
+          grep -RInE 'map-player|mapPlayer|map-follower|renderMap|updateMap' js index.html css --exclude='*.min.*' | head -n 300 || true
+          echo '=== GAMEPLAY/NAV REFERENCES ==='
+          grep -RInE 'gameplayPage|v141DungeonNav|v148-context-nav|v141-dungeon-active|context-nav-active' js index.html css --exclude='*.min.*' | head -n 400 || true
+          echo '=== BATTLE PLAYER PRESENTATION ==='
+          grep -nE 'battle-player\.v174-cardless-unit|v174-battle-art|syncUnitArtwork|battleArtworkSource' js/54-v173.51-battle-qa.js | head -n 160 || true
