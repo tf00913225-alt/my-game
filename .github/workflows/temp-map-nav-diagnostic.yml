@@ -8,24 +8,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Diagnose patrol asset and nav cascade
+      - name: Inspect runtime with Chrome
         shell: bash
         run: |
           set -euo pipefail
-          echo '=== PATROL FUNCTIONS ==='
-          grep -RInE 'resetPatrolCharacterToIdle|startPatrolCharacterWalking|stopPatrolCharacterWalking|movePatrolCharacterRandomly' js | head -n 250 || true
-          echo '=== PATROL IMAGE MUTATIONS ==='
-          grep -RInE 'patrolCharacterImg|patrolCharacterWrap' js css index.html | head -n 350 || true
-          echo '=== PATROL ASSETS ==='
-          file assets/characters/patrol/* assets/characters/patrol-character.png || true
-          if command -v identify >/dev/null 2>&1; then
-            identify -verbose assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp | grep -E 'Geometry:|Alpha:|mean:|min:|max:' | head -n 30 || true
-            identify -verbose assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp | grep -E 'Geometry:|Alpha:|mean:|min:|max:' | head -n 30 || true
-            identify -verbose assets/characters/patrol-character.png | grep -E 'Geometry:|Alpha:|mean:|min:|max:' | head -n 30 || true
-          fi
-          echo '=== MANIFEST PATROL ASSETS ==='
-          grep -n 'patrol-.*front\|patrol-character' asset-manifest.json | head -n 80 || true
-          echo '=== NAV CASCADE ==='
-          grep -RInE '#game-stage .*#v141DungeonNav|#game-stage #v141DungeonNav|v148-context-nav-active.*v141DungeonNav|v141-dungeon-active.*v141DungeonNav' css | head -n 400 || true
-          echo '=== PLAYER SCALE ==='
-          grep -nA8 -B2 'battle-player.v174-cardless-unit>.v174-battle-art' js/54-v173.51-battle-qa.js | head -n 40 || true
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/map-nav-http.log 2>&1 &
+          SERVER_PID=$!
+          CHROME=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --remote-allow-origins='*' --remote-debugging-port=9222 --user-data-dir=/tmp/map-nav-chrome http://127.0.0.1:8000/ >/tmp/map-nav-chrome.log 2>&1 &
+          CHROME_PID=$!
+          cleanup(){ kill "$CHROME_PID" "$SERVER_PID" 2>/dev/null || true; }
+          trap cleanup EXIT
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:9222/json >/tmp/tabs.json && break || sleep .25; done
+          cat >/tmp/runtime-diag.mjs <<'NODE'
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const tabs=await (await fetch('http://127.0.0.1:9222/json')).json();
+          const tab=tabs.find(x=>String(x.url||'').includes('127.0.0.1:8000'))||tabs[0];
+          if(!tab)throw new Error('no chrome tab');
+          const ws=new WebSocket(tab.webSocketDebuggerUrl);await new Promise((r,j)=>{ws.onopen=r;ws.onerror=j});
+          let id=0;const pending=new Map();ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id&&pending.has(m.id)){const p=pending.get(m.id);pending.delete(m.id);m.error?p.reject(m.error):p.resolve(m.result)}};
+          const send=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;pending.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}))});
+          const evaljs=async expr=>{const r=await send('Runtime.evaluate',{expression:expr,awaitPromise:true,returnByValue:true});return r.result?.value};
+          await send('Runtime.enable'); await sleep(5000);
+          const snapshot=async label=>{
+            const value=await evaljs(`(()=>{const img=document.getElementById('patrolCharacterImg'),wrap=document.getElementById('patrolCharacterWrap');if(!img||!wrap)return {missing:true};const r=img.getBoundingClientRect(),w=wrap.getBoundingClientRect(),s=getComputedStyle(img),sw=getComputedStyle(wrap);return {label:${JSON.stringify(label)},src:img.currentSrc||img.src,complete:img.complete,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,rect:{x:r.x,y:r.y,width:r.width,height:r.height},display:s.display,visibility:s.visibility,opacity:s.opacity,zIndex:s.zIndex,wrapRect:{x:w.x,y:w.y,width:w.width,height:w.height},wrapDisplay:sw.display,wrapVisibility:sw.visibility,wrapOpacity:sw.opacity,wrapZ:sw.zIndex,className:img.className,apply:typeof window.v131ApplyPatrolArt,partyFn:typeof getPartyCharacterByIndex,resetFn:typeof resetPatrolCharacterToIdle}})()`);
+            console.log('PATROL',JSON.stringify(value));
+          };
+          await snapshot('loaded');
+          console.log('PARTY0',JSON.stringify(await evaljs(`(()=>{try{return typeof getPartyCharacterByIndex==='function'?getPartyCharacterByIndex(0):null}catch(e){return {error:String(e)}}})()`)));
+          console.log('RESET',JSON.stringify(await evaljs(`(()=>{try{if(typeof resetPatrolCharacterToIdle==='function')resetPatrolCharacterToIdle();return true}catch(e){return String(e)}})()`)));
+          await sleep(500);await snapshot('after-reset');
+          console.log('APPLY',JSON.stringify(await evaljs(`(()=>{try{if(typeof window.v131ApplyPatrolArt==='function')window.v131ApplyPatrolArt(false);return true}catch(e){return String(e)}})()`)));
+          await sleep(500);await snapshot('after-appearance');
+          const nav=await evaljs(`(()=>{const app=document.getElementById('app'),d=document.getElementById('dungeonPage'),g=document.getElementById('gameplayPage');let n=document.getElementById('v141DungeonNav');if(!n){n=document.createElement('div');n.id='v141DungeonNav';n.className='bottom-nav map-page-nav v141-dungeon-nav v148-context-nav';n.dataset.v146Columns='5';n.innerHTML='<button class="nav-button"><img class="nav-art-button" src="assets/ui/nav-character.png"></button>'.repeat(5);(document.getElementById('game-content')||app).appendChild(n)}const snap=mode=>{app.classList.remove('v141-dungeon-active','v148-context-nav-active');if(mode==='dungeon')app.classList.add('v141-dungeon-active','v148-context-nav-active');else app.classList.add('v148-context-nav-active');const s=getComputedStyle(n),b=n.querySelector('img'),sb=getComputedStyle(b),r=n.getBoundingClientRect(),rb=b.getBoundingClientRect();return {mode,display:s.display,width:s.width,height:s.height,grid:s.gridTemplateColumns,rect:{w:r.width,h:r.height},img:{w:rb.width,h:rb.height,cssW:sb.width,cssH:sb.height}}};return [snap('dungeon'),snap('gameplay')]})()`);
+          console.log('NAV',JSON.stringify(nav));
+          ws.close();
+          NODE
+          node /tmp/runtime-diag.mjs
+      - name: Static owner diagnostics
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -RInE 'resetPatrolCharacterToIdle|startPatrolCharacterWalking|movePatrolCharacterRandomly' js | head -n 150 || true
+          grep -RInE '#game-stage .*#v141DungeonNav|#game-stage #v141DungeonNav|v148-context-nav-active.*v141DungeonNav|v141-dungeon-active.*v141DungeonNav' css | head -n 300 || true
