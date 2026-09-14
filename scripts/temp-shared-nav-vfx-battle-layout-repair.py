@@ -117,3 +117,12 @@ lines[i:i+1] = [
     shared_return_assert,
 ]
 hub_test_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+# The 2026-09-08 regression only verifies that the formal relic button is present;
+# its owner moved from V146 to the final shared V148 context-nav renderer.
+ui_reg_path = Path("tests/gameplay-ui-regressions-20260908.test.js")
+ui_reg = ui_reg_path.read_text(encoding="utf-8")
+old_nav_source = 'const dungeonNav=fs.readFileSync("js/41-v146-system-polish.js","utf8");'
+new_nav_source = 'const dungeonNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");'
+assert old_nav_source in ui_reg, "2026-09-08 dungeon nav source import not found"
+ui_reg_path.write_text(ui_reg.replace(old_nav_source, new_nav_source, 1), encoding="utf-8")
