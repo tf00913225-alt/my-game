@@ -56,12 +56,12 @@ function ensureBattlePresentationStyles(){
     margin:0!important;transform:translateX(-50%)!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp{
-    position:absolute!important;left:50%!important;bottom:13px!important;
+    position:absolute!important;left:50%!important;bottom:29px!important;
     display:block!important;visibility:visible!important;opacity:1!important;
     margin:0!important;transform:translateX(-50%)!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp{
-    position:absolute!important;left:50%!important;bottom:0!important;
+    position:absolute!important;left:50%!important;bottom:16px!important;
     display:block!important;visibility:visible!important;opacity:1!important;
     margin:0!important;transform:translateX(-50%)!important;
 }
@@ -69,18 +69,18 @@ function ensureBattlePresentationStyles(){
     z-index:20!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
-    position:absolute!important;left:-4px!important;right:-4px!important;top:calc(100% + 3px)!important;
+    position:absolute!important;left:-4px!important;right:-4px!important;top:auto!important;bottom:0!important;
     display:flex!important;align-items:center!important;justify-content:center!important;
     min-height:16px!important;height:16px!important;margin:0!important;padding:0 2px!important;
     white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
     z-index:24!important;pointer-events:none!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
-    inset:2px 2px 26px!important;
+    inset:2px 2px 42px!important;
     background-size:contain!important;background-position:center center!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card.v174-cardless-unit>.v174-battle-art{
-    inset:2px 2px 26px!important;
+    inset:2px 2px 42px!important;
     background-size:contain!important;background-position:center center!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp,
@@ -148,12 +148,15 @@ function battleArtworkSource(card,kind){
 }
 function syncUnitArtwork(card,kind){
     if(!card)return;
+    /* Capture CSS-owned artwork before v174-cardless-unit masks the card background. */
+    const source=battleArtworkSource(card,kind);
     card.classList.add("v174-cardless-unit");
     let art=card.querySelector(":scope > .v174-battle-art");
     if(!art){art=document.createElement("div");art.className="v174-battle-art";card.insertBefore(art,card.firstChild);}
-    const source=battleArtworkSource(card,kind);
-    if(source)art.style.backgroundImage=source;
-    card.style.setProperty("background-image","none","important");
+    if(source){
+        art.style.backgroundImage=source;
+        card.style.setProperty("background-image","none","important");
+    }
 }
 function syncResourceNumbers(){
     document.querySelectorAll("#battlePage .battle-player[id^='battlePlayerCard']").forEach(card=>{

@@ -691,7 +691,7 @@
         node.dataset.placement=placement;
 
         if(placement==="single"){
-            const targetSize=Math.max(target.rect.width,target.rect.height);
+            const targetSize=Math.max(1,Number(target.rect.width)||0);
             const configuredMin=Number(sprite.minSize)||96;
             const configuredMax=Number(sprite.maxSize)||184;
             const minSize=Math.min(configuredMin,targetSize*1.18);
@@ -710,7 +710,7 @@
         if(placement==="targetTrajectory"){
             const actor=cardCenter(current.actorCard);
             if(!actor){ return; }
-            const targetSize=Math.max(target.rect.width,target.rect.height);
+            const targetSize=Math.max(1,Number(target.rect.width)||0);
             const configuredMin=Number(sprite.minSize)||140;
             const configuredMax=Number(sprite.maxSize)||240;
             const minSize=Math.min(configuredMin,targetSize*1.12);

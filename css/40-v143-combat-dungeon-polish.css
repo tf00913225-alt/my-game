@@ -14,12 +14,6 @@
 }
 
 
-#game-stage #battleMonsterArea .v131-monster-row{
-    min-height:120px;
-    padding-bottom:18px;
-    box-sizing:border-box;
-    overflow:visible;
-}
 
 #game-stage > #app > #game-content #battlePage .battle-monster[data-rank="boss"]{
     --v143-monster-card-width:82px;

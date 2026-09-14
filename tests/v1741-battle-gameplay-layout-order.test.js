@@ -16,7 +16,9 @@ assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:contain!important[\s\S]*?background-position:center center!important/);
 assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:cover!important/);
 assert.match(battle,/battle-monster\.gameplay-boss-card\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:contain!important/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*?top:calc\(100% \+ 3px\)!important/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*?top:auto!important;bottom:0!important/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-hp\{[\s\S]*?bottom:29px!important/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-sp\{[\s\S]*?bottom:16px!important/);
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-hp,[\s\S]*?height:11px!important;min-height:11px!important/);
 assert.match(battle,/monster-hp>\.monster-bar-text,[\s\S]*?font-size:9px!important;line-height:11px!important/);
 assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit\{[^}]*?(?:width|max-width|min-height|height):/s,"art sizing must not resize player combat slots");

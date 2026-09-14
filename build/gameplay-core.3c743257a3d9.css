@@ -4547,12 +4547,6 @@ body.quest-scroll-active,
 }
 
 
-#game-stage #battleMonsterArea .v131-monster-row{
-    min-height:120px;
-    padding-bottom:18px;
-    box-sizing:border-box;
-    overflow:visible;
-}
 
 #game-stage > #app > #game-content #battlePage .battle-monster[data-rank="boss"]{
     --v143-monster-card-width:82px;
@@ -5723,9 +5717,9 @@ body.quest-scroll-active,
 }
 
 /* Daily and Abyss share one undistorted five-slot bottom navigation. */
-#game-stage #app.v141-dungeon-active #v141DungeonNav,
-#game-stage #app.v141-dungeon-active #v141DungeonNav[data-v146-columns="4"],
-#game-stage #app.v141-dungeon-active #v141DungeonNav[data-v146-columns="5"]{
+#game-stage #v141DungeonNav.v148-context-nav,
+#game-stage #v141DungeonNav.v148-context-nav[data-v146-columns="4"],
+#game-stage #v141DungeonNav.v148-context-nav[data-v146-columns="5"]{
     position:absolute !important;
     left:0 !important;
     right:0 !important;
@@ -5895,7 +5889,7 @@ body > .damage-popup.v152-top-damage{
     #game-stage #app.v141-dungeon-active #dungeonPage.active{
         padding-bottom:80px !important;
     }
-    #game-stage #app.v141-dungeon-active #v141DungeonNav{
+    #game-stage #v141DungeonNav.v148-context-nav{
         height:80px !important;
     }
     #game-stage #v141DungeonNav .nav-art-button{
