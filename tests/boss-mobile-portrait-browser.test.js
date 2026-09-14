@@ -192,8 +192,8 @@ function runViewport(chrome,width,height){
     const mechanismRatio=3/4;
     assert.equal(data.viewport.width,width,`Iframe viewport width drifted at ${width}x${height}`);
     assert.equal(data.viewport.height,height,`Iframe viewport height drifted at ${width}x${height}`);
-    assert.ok(data.bossBattleWidthShare>=.33&&data.bossBattleWidthShare<=.46,`Boss battle width share ${data.bossBattleWidthShare} is outside 33%-46% at ${width}x${height}`);
-    assert.ok(data.mechanismBattleWidthShare>=.19&&data.mechanismBattleWidthShare<=.26,`Mechanism battle width share ${data.mechanismBattleWidthShare} is outside 19%-26% at ${width}x${height}`);
+    assert.ok(data.bossBattleWidthShare>=.25&&data.bossBattleWidthShare<=.31,`Boss battle width share ${data.bossBattleWidthShare} is outside 25%-31% at ${width}x${height}`);
+    assert.ok(data.mechanismBattleWidthShare>=.50&&data.mechanismBattleWidthShare<=.60,`Mechanism battle width share ${data.mechanismBattleWidthShare} is outside 50%-60% at ${width}x${height}`);
     assert.ok(Math.abs(data.bossRatio-bossRatio)<.025,`Boss is not 9:16 at ${width}x${height}: ${data.bossRatio}`);
     assert.ok(Math.abs(data.mechanismRatio-mechanismRatio)<.025,`Mechanism card is not 4:3 at ${width}x${height}: ${data.mechanismRatio}`);
     assert.equal(data.bossComputed.aspectRatio,"9 / 16");
