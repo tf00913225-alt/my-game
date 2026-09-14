@@ -107,6 +107,7 @@ jobs:
           node tests/v173.23-wind-vfx.test.js
           node tests/v174-raster-only-combat-vfx-owner.test.js
           node tests/boss-vfx-reliability-20260914.test.js
+          node scripts/build-production.mjs
           node scripts/build-production.mjs --check
 
       - name: Commit verified cleanup and remove one-time workflow
