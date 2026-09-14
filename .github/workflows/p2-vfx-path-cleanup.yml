@@ -80,6 +80,7 @@ jobs:
               if old not in text:
                   raise SystemExit(f'missing test filename: {old}')
               text = text.replace(old, new)
+              text = text.replace(old[:-4], new[:-4])
           text = text.replace('assets/inbox/', 'assets/vfx/wind/')
           test.write_text(text, encoding='utf-8')
           PY
