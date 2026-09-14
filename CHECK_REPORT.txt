@@ -1,115 +1,58 @@
-V173.4 元素匣金幣統計檢查報告
+《my-game 專案檢查報告》
 
-產生日期：2026-08-31
-起始基準：main/dev 同步點 8c7ceea1643a519b110ffab95a50d2de3cb69adf
-發布標示：V173.4
+版本：V173.65
+更新日期：2026-09-14
+基線分支：dev
+更新起點：e0e8fe0fe4c65a6262f6e88674f5c058adeeb799
+Game / Cache Version：V173.65 / 173.65
 
-一、目前檔案與資產統計
+本文件是目前專案測試與資產數字的快速判讀基線。
+V173.4 與更早版本的數字已失效；需要歷史資料時請查 Git history，不得再把舊報告中的數字當成目前專案現況。
 
-- Git 追蹤檔案：351 個。
-- HTML：1 個（index.html）。
-- CSS：50 個（css/）。
-- 正式 JavaScript：112 個（js/）。
-- tests/ JavaScript：38 個，其中 37 個 *.test.js Node suite，另 1 個
-  tests/v138-browser-smoke.js 需要 Playwright／Chromium，不列入 Node suite。
-- JavaScript 語法檢查總數：150 個（js/ 112 + tests/ 38）。
-- assets/：142 個檔案，共 128,596,711 bytes（122.64 MiB）。
-  其中圖片 141 個，共 128,587,355 bytes（122.63 MiB）：47 JPG、78 PNG、
-  16 WEBP；另有 assets/ASSET_MAP.txt 1 個。
+一、目前 V173.65 測試基線
 
-二、HTML、資源與 Loader 基線
+最近一次已建立並完整驗證的 V173.65 基線：
+- JavaScript syntax：228 / 228 通過。
+- Node / browser suites：152 / 152 通過。
+- release / loader / git-diff gates：通過。
+- 相關手機尺寸 Chrome QA、boot／skill／relic QA 與部署後 live QA：通過（完整驗證基線建立於 2026-09-11 的 dev 整合）。
 
-- 靜態 HTML ID：272 個；重複 ID：0。
-- 靜態資源檢查：300 個唯一的本地引用目標均存在。
-- 資源掃描範圍：1 個 HTML、50 個 CSS、51 個非內嵌型 JavaScript。
-- index.html 直接載入：29 個本地 CSS、23 個本地 script，沒有重複載入；
-  外部 Google Fonts stylesheet 不計入本地 CSS。
-- js/20-anonymous-20.js 動態 Loader：108 個唯一 JavaScript／CSS 相依檔；
-  其中 20 個 CSS、88 個 JavaScript，並有 26 個依正式順序串行載入的
-  gameplay runtime。
-- 正式 release entry：js/00-main.js、
-  js/19-stage-v78-character-inventory-runtime.js、js/20-anonymous-20.js；
-  index query、首頁版本標示與 Loader 版本皆一致為 V173.4。
+目前 dev HEAD（e0e8fe0fe4c65a6262f6e88674f5c058adeeb799）：
+- GitHub Actions CI：SUCCESS。
+- CI 已有 diff-scope / guard 優化；若某次 HEAD 只修改不影響特定 suite 的檔案，該 suite 可以被 skip。
+- 因此「最新一次 CI 成功」不等於「該次 run 重新執行全部 152 suites」。需要宣稱全量測試時，必須確認該 run 實際執行範圍，或執行完整測試基線。
 
-三、本次實際執行的檢查
+二、目前 V173.65 資產／build 基線
 
-靜態檢查：
+最近一次完整 V173.65 deterministic build 驗證基線：
+- resources：299。
+- static IDs：242。
+- deterministic build assets：22。
+- deterministic build、release 與 loader gate：通過。
 
-- .github/scripts/ci.mjs 語法檢查：通過。
-- js/ 與 tests/ JavaScript 語法：150 / 150 通過。
-- 本地 HTML／CSS／JavaScript／圖片等資源引用：通過，0 缺檔。
-- HTML 重複 ID：通過，0 組重複。
-- 正式版本、index entry、Loader 相依檔與 runtime 順序完整性：通過。
-- Git whitespace 與未解決 conflict marker：通過。
+上述數字是目前用來判斷資產／build 是否異常的權威基線；不得再使用 V173.4 的 assets、靜態引用、Loader 或舊檔案數量做比較。
 
-Node 測試：
+三、已淘汰的 V173.4 數字
 
-- 37 / 37 套 Node unit／integration suite 通過。
-- 新增 tests/v173.4-element-box-gold.test.js：驗證怪物實際入帳金額、未啟用、
-  既有／非怪物金幣、停止／時數耗盡、切角／重載、副本排除及舊 normal 設定不變。
-- 測試包含 V170 最終整合規格；歷史版本 suite 仍保留作版本紀錄。
+以下 V173.4 舊值只代表 2026-08-31 當時狀態，已全部淘汰，不得用於目前專案判讀：
+- Git 追蹤檔案 351。
+- JavaScript syntax 150 / 150。
+- Node suites 37 / 37。
+- assets/ 142 個檔案。
+- 靜態本地引用 300 個。
+- 以及舊報告中所有 V173.4 HTML／CSS／JS／Loader／圖片格式與檔案數量。
 
-四、本次沒有執行的驗證
+四、後續 AI／維護者判讀規則
 
-- V173.4 本輪沒有執行 Samsung／Android 或其他手機真機測試。
-- V173.4 本輪沒有執行完整 Playwright／Chromium 網站操作、視覺、Console
-  或完整戰鬥流程驗證。
-- tests/v138-browser-smoke.js 未由正式 CI 執行，也沒有計入 37 套 Node 測試；
-  不得把它的 skip 或未執行狀態宣稱為瀏覽器測試通過。
-- V173.2 曾完成的 Samsung 真機觸控／捲動驗證屬前一版紀錄，不能代替
-  V173.4 本輪的真機驗證。
+1. 判斷目前專案狀態時，先以最新 dev HEAD、最新 CI 與本文件 V173.65 基線為準。
+2. 不得因歷史 test 檔、舊 HANDOFF 段落或 Git history 中的 V173.4 數字，回退目前基線。
+3. CI 若因 diff-scope 顯示 skipped，必須區分「本次未受影響而略過」與「測試失敗／不存在」。
+4. 若新增／刪除正式 script、test suite、resource、static ID 或 deterministic build asset，使基線數字永久改變，必須在同一輪更新本文件。
+5. Game / Cache Version 若仍為 V173.65，但結構基線已改變，也必須更新本文件的日期與新數字，不能只看版本號判斷。
+6. 若本文件與最新 dev 的實際 CI／build 輸出衝突，以最新 dev 的可重現檢查結果為準，並立即修正本文件。
 
-五、本次變更邊界
-
-- 元素匣「本次上線獲得金幣」改在 awardMonsterGoldDrop() 成功入帳並回傳實際
-  amount 後直接累加；移除以全域 gold 戰前／戰後差額推算的路徑。
-- 只在元素匣正常巡怪啟用時統計，排除副本；野外精英保留既有巡怪涵蓋範圍。
-- 更新 V173.4 HTML title、首頁標示、發布 entry query、Loader 快取版本及相應測試斷言。
-- 未修改帳號總 gold、掉落公式、副本獎勵、戰鬥數值、技能、存檔、動畫、美術或舊存檔
-  autoConfig.skill="normal"。
-
-============================================================
-V121_SPLIT 歷史檢查報告（僅保留拆檔歷史，不是目前專案基線）
-============================================================
-
-母版：V120
-拆檔目的：只做外部化，不改遊戲機制。
-
-當時的靜態檢查：
-- 原始實際 CSS 區塊：27
-- 拆出 CSS 檔案：27
-- CSS 原始載入順序：完全保留
-- CSS parser：0 錯誤
-- 原始實際 JavaScript 區塊：21
-- 拆出 JavaScript 檔案：21
-- JavaScript 原始執行順序：完全保留
-- Node.js --check：21 / 21 通過
-- 原始 DOM ID：242
-- 拆檔後 DOM ID：242
-- ID 集合：完全一致
-- 重複 DOM ID：0
-- Base64/data:image 殘留：0
-- 外部圖片資產：57 個
-- 未被引用圖片：0
-- 本地資源路徑檢查：0 缺檔
-
-當時的大小：
-- V120 單檔：約 15.14 MB
-- V121_SPLIT 全部檔案：約 11.13 MB
-- index.html：約 74 KB
-- Base64 膨脹已移除，圖片改為獨立檔案。
-
-當時的架構保護：
-- 沒有把 21 個 script 強制合成單一 game.js。
-- 原因：V120 有多個歷史 runtime/migration 區塊；合併會改變錯誤邊界與
-  top-level let/const 初始化時機。
-- V121_SPLIT 保持每個 script 為獨立 classic script，避免因拆檔而改變
-  舊系統執行語意。
-
-當時的執行環境驗證：
-- 曾做桌面 Chromium 的重組／解析 smoke test，函式與 V120 行為基線一致。
-- 當時容器環境禁止直接導覽 localhost／file URL，無法做真正的外部檔案 URL
-  載入 Chromium 導覽測試。
-- 當時 Android Chrome 實機仍需使用者驗證。
-
-以上 V121 數字與驗證只代表當時拆檔成果，不可用來判定 V173.3 現況。
+結論：
+- 目前發布版本基線為 V173.65。
+- 已知完整測試基線：228 / 228 JavaScript syntax、152 / 152 Node / browser suites。
+- 已知資產／build 基線：299 resources、242 static IDs、22 deterministic build assets。
+- V173.4 與更早的數字僅屬歷史紀錄，不再代表目前專案。
