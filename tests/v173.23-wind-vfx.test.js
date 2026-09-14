@@ -15,26 +15,26 @@ let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 const CASTS={
-    stormFist:{file:"暴風拳-技能動態圖.png",duration:1200,placement:"single",status:"agilityDown",size:[1536,1024],hash:"89e7ce2b0b79c75ad3213b71f7a6350a2e9ffd79f66ad3ef671c19a30dfbc3f6"},
-    stormFlurry:{file:"暴風亂擊-技能動態圖.png",duration:1500,placement:"group",status:"damageDown",size:[1448,1086],hash:"3a6268f354f4fb4b2542adf4eb716f639bfba754c63bb1c75ab1548a36df41f9"},
-    windCrossSlash:{file:"風旋十字斬-技能動態圖.png",duration:1700,placement:"single",status:"damageDown",size:[1448,1086],hash:"b60928d85d758321bc147d0ea68b7f6de89875d83512a6a614063cb4e5e68d0a"},
-    dizzyFist:{file:"暈眩猛擊-技能動態圖.png",duration:1800,placement:"single",status:"stun",size:[1448,1086],hash:"e2e7142956c54b8d8f8e3a1c7b8a2b9a4896b527df42b64cd1923cec6ed8c453"},
-    windSpell:{file:"狂風術-技能動態圖.png",duration:1400,placement:"group",status:"agilityDown",size:[1448,1086],hash:"84679f1561dfa36f47f3efc805e4c5f082a7808c54b987946d09b4155fa01973"},
-    stormCircle:{file:"風焰術-技能動態圖.png",duration:1600,placement:"group",status:"damageDown",size:[1536,1024],hash:"a9e24871d2ac32cc03e3d76529cf87389dc0d063f4833a074e105fd23953521a"},
-    windHowlLightning:{file:"風哮電擊-技能動態圖.png",duration:1900,placement:"single",status:"damageDown",size:[1448,1086],hash:"6593627d59d8330cd756d2b21123f662fa8e472b08111c37938f49aaa17a7a36"},
-    stormRain:{file:"風起雲湧-技能動態圖.png",duration:2600,placement:"battlefield",status:"stun",size:[1448,1086],hash:"da41b91ae4bdd5540f3b0288240f89aef7ab8791f383318d01c993979d08668c"},
-    dodgeSkill:{file:"閃躲術-技能動態圖.png",duration:1600,placement:"group",status:"dodgeSkill",size:[1448,1086],hash:"6bc6caf956b211295901bf17d191f0773117ef34672763df75296edf62549a88"},
-    stealthSkill:{file:"隱身術-技能動態圖.png",duration:1700,placement:"single",status:"stealthSkill",size:[1448,1086],hash:"d0d45604e25455a8a66823c547b94b7114e80d20159e131c90cee65b2fab0ee9"},
-    dinghaishenzhen:{file:"氣定神閒-技能動態圖.png",duration:2200,placement:"battlefield",status:"dinghaishenzhen",size:[1448,1086],hash:"a5318a3a4dea702203b30cb06221df086004caacc2aa8162fe17076195f535b7"}
+    stormFist:{file:"storm-fist-cast.png",duration:1200,placement:"single",status:"agilityDown",size:[1536,1024],hash:"89e7ce2b0b79c75ad3213b71f7a6350a2e9ffd79f66ad3ef671c19a30dfbc3f6"},
+    stormFlurry:{file:"storm-flurry-cast.png",duration:1500,placement:"group",status:"damageDown",size:[1448,1086],hash:"3a6268f354f4fb4b2542adf4eb716f639bfba754c63bb1c75ab1548a36df41f9"},
+    windCrossSlash:{file:"wind-cross-slash-cast.png",duration:1700,placement:"single",status:"damageDown",size:[1448,1086],hash:"b60928d85d758321bc147d0ea68b7f6de89875d83512a6a614063cb4e5e68d0a"},
+    dizzyFist:{file:"dizzy-fist-cast.png",duration:1800,placement:"single",status:"stun",size:[1448,1086],hash:"e2e7142956c54b8d8f8e3a1c7b8a2b9a4896b527df42b64cd1923cec6ed8c453"},
+    windSpell:{file:"wind-spell-cast.png",duration:1400,placement:"group",status:"agilityDown",size:[1448,1086],hash:"84679f1561dfa36f47f3efc805e4c5f082a7808c54b987946d09b4155fa01973"},
+    stormCircle:{file:"storm-circle-cast.png",duration:1600,placement:"group",status:"damageDown",size:[1536,1024],hash:"a9e24871d2ac32cc03e3d76529cf87389dc0d063f4833a074e105fd23953521a"},
+    windHowlLightning:{file:"wind-howl-lightning-cast.png",duration:1900,placement:"single",status:"damageDown",size:[1448,1086],hash:"6593627d59d8330cd756d2b21123f662fa8e472b08111c37938f49aaa17a7a36"},
+    stormRain:{file:"storm-rain-cast.png",duration:2600,placement:"battlefield",status:"stun",size:[1448,1086],hash:"da41b91ae4bdd5540f3b0288240f89aef7ab8791f383318d01c993979d08668c"},
+    dodgeSkill:{file:"dodge-skill-cast.png",duration:1600,placement:"group",status:"dodgeSkill",size:[1448,1086],hash:"6bc6caf956b211295901bf17d191f0773117ef34672763df75296edf62549a88"},
+    stealthSkill:{file:"stealth-skill-cast.png",duration:1700,placement:"single",status:"stealthSkill",size:[1448,1086],hash:"d0d45604e25455a8a66823c547b94b7114e80d20159e131c90cee65b2fab0ee9"},
+    dinghaishenzhen:{file:"dinghaishenzhen-cast.png",duration:2200,placement:"battlefield",status:"dinghaishenzhen",size:[1448,1086],hash:"a5318a3a4dea702203b30cb06221df086004caacc2aa8162fe17076195f535b7"}
 };
 
 const STATUSES={
-    agilityDown:{file:"重力-狀態循環圖.png",duration:1000,collection:"statusEffects",hash:"fb1b42d3c0c87ab4e93b4fd495657852268cb15e9234bfefdeb2edf0546e7d7a"},
-    damageDown:{file:"殤風-狀態循環圖.png",duration:1100,collection:"statusEffects",hash:"25e984ef5973616bc6f37cfc5842d445ff484f981a98902894febca59a92ae34"},
-    stun:{file:"暈眩-狀態循環圖.png",duration:900,collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
-    dodgeSkill:{file:"風行-狀態循環圖.png",duration:850,collection:"activeBuffs",hash:"397338dc6fc01967de860e285c1f65febe5248f0a111c01f789dfb676c141c5b"},
-    stealthSkill:{file:"隱身-狀態循環圖.png",duration:1200,collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
-    dinghaishenzhen:{file:"氣定神閒-狀態循環圖.png",duration:1200,collection:"activeBuffs",hash:"3607d280f4ff4092d80b8ead216e410425815a4996b22437af556bf28673f31b"}
+    agilityDown:{file:"agility-down-loop.png",duration:1000,collection:"statusEffects",hash:"fb1b42d3c0c87ab4e93b4fd495657852268cb15e9234bfefdeb2edf0546e7d7a"},
+    damageDown:{file:"damage-down-loop.png",duration:1100,collection:"statusEffects",hash:"25e984ef5973616bc6f37cfc5842d445ff484f981a98902894febca59a92ae34"},
+    stun:{file:"stun-loop.png",duration:900,collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
+    dodgeSkill:{file:"dodge-skill-loop.png",duration:850,collection:"activeBuffs",hash:"397338dc6fc01967de860e285c1f65febe5248f0a111c01f789dfb676c141c5b"},
+    stealthSkill:{file:"stealth-skill-loop.png",duration:1200,collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
+    dinghaishenzhen:{file:"dinghaishenzhen-loop.png",duration:1200,collection:"activeBuffs",hash:"3607d280f4ff4092d80b8ead216e410425815a4996b22437af556bf28673f31b"}
 };
 
 function pngInfo(path){
@@ -248,12 +248,12 @@ function runTimers(runtime,delay){
 
 test("the supplied wind PNG files remain byte-identical and keep their actual source dimensions",()=>{
     Object.values(CASTS).forEach(spec=>{
-        const info=pngInfo("assets/inbox/"+spec.file);
+        const info=pngInfo("assets/vfx/wind/"+spec.file);
         assert.deepEqual(info.size,spec.size,spec.file);
         assert.equal(info.hash,spec.hash,spec.file);
     });
     Object.values(STATUSES).forEach(spec=>{
-        const info=pngInfo("assets/inbox/"+spec.file);
+        const info=pngInfo("assets/vfx/wind/"+spec.file);
         assert.deepEqual(info.size,[1774,887],spec.file);
         assert.equal(info.hash,spec.hash,spec.file);
     });
@@ -265,7 +265,7 @@ test("all eleven casts and six loops use the requested mapping, timing and share
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        assert.equal(model.sprite.src,"assets/inbox/"+spec.file+"?v=173.24",id);
+        assert.equal(model.sprite.src,"assets/vfx/wind/"+spec.file+"?v=173.24",id);
         assert.deepEqual(
             Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
             [4,3,12,7],id
@@ -279,7 +279,7 @@ test("all eleven casts and six loops use the requested mapping, timing and share
     const statuses=runtime.context.v143StatusSpriteManifest;
     Object.entries(STATUSES).forEach(([type,spec])=>{
         const sprite=statuses[type];
-        assert.equal(sprite.src,"assets/inbox/"+spec.file+"?v=173.24",type);
+        assert.equal(sprite.src,"assets/vfx/wind/"+spec.file+"?v=173.24",type);
         assert.deepEqual(
             Array.from([sprite.columns,sprite.rows,sprite.frames]),
             [4,2,8],type
@@ -303,7 +303,7 @@ test("Wind casts use one DOM Sprite Sheet node and never invoke Canvas drawing",
     assert.equal(sprite.dataset.targetIndex,"2");
     assert.equal(sprite.style.left,"578px");
     assert.equal(sprite.style.top,"140px");
-    assert.match(sprite.style.backgroundImage,/暴風拳-技能動態圖\.png\?v=173\.24/);
+    assert.match(sprite.style.backgroundImage,/storm-fist-cast\.png\?v=173\.24/);
     assert.equal(stage.children.length,1,"no procedural charge, flight, field or hit node");
     assert.equal(runtime.drawCalls.length,0,"DOM Sprite renderer must never call Canvas drawImage");
 });
@@ -446,7 +446,7 @@ test("status loops start only on success, never restart on duplicate MISS, and c
     runTimers(applied,1200);
     const gravity=applied.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown");
     assert.ok(gravity,"successful status starts its loop");
-    assert.ok(gravity.style.backgroundImage.includes("重力-狀態循環圖.png?v=173.24"));
+    assert.ok(gravity.style.backgroundImage.includes("agility-down-loop.png?v=173.24"));
     assert.equal(gravity.style["--v153-status-duration"],"1000ms");
 
     applied.monsters[0].statusEffects.push({type:"damageDown",turnsLeft:1});
