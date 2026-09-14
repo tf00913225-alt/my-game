@@ -51,7 +51,8 @@ jobs:
               ),
               (
                   r'''assert.match(css,/#v141DungeonNav\[data-v146-columns="4"\]/);''',
-                  r'''assert.match(css,/#v141DungeonNav\[data-v146-columns="5"\]/);'''
+                  r'''assert.match(source,/nav\.dataset\.v146Columns="5"/);
+    assert.match(css,/#game-stage #v141DungeonNav\{[\s\S]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\) !important/);'''
               ),
               (
                   r'''assert.match(source,/\["秘寶","assets\/ui\/nav-relic-v174\.webp","openHomeFeature\('relic'\)"\]/);''',
