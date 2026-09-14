@@ -43,17 +43,21 @@ jobs:
           script=script[:mechanism_start]+'# Mechanism/browser QA patches are applied below against current source.\n\n'+script[static_start:]
           exec(compile(script,'<remaining-ui-repair>','exec'),{'__name__':'__main__'})
 
-          # Current mechanism source already has popup support; insert hit confirmation by stable code token.
+          # Current mechanism source already has popup support; patch only damageMechanism().
           path=Path('js/gameplay-boss-tower-system.js')
           text=path.read_text(encoding='utf-8')
+          function_start=text.index('    function damageMechanism(')
+          function_end=text.index('\n    function partyIndexes()',function_start)
+          section=text[function_start:function_end]
           needle='const node=document.querySelector(\'#bossMechanismSlot [data-id="\'+card.id+\'"]\');'
           insertion='''const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
               if(typeof window.v143RunAtTargetHit==="function"){
                   window.v143RunAtTargetHit("monster","mechanism:"+card.id,function(){},true);
               }'''
-          if text.count(needle)!=1:
-              raise SystemExit(f'current mechanism insertion token: expected one match, got {text.count(needle)}')
-          path.write_text(text.replace(needle,insertion,1),encoding='utf-8')
+          if section.count(needle)!=1:
+              raise SystemExit(f'damageMechanism insertion token: expected one match, got {section.count(needle)}')
+          section=section.replace(needle,insertion,1)
+          path.write_text(text[:function_start]+section+text[function_end:],encoding='utf-8')
 
           # Current browser fixture: mark player 2 active and record real geometry/computed style.
           path=Path('tests/v174-cardless-battle-browser.test.js')
