@@ -61,7 +61,7 @@ function innerHtml(){
     const links=stylePaths.map(href=>`<link rel="stylesheet" href="${href}">`).join("\n");
     return `<!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${links}
-<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#17120d}*{animation-duration:.5s}</style></head><body>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#17120d}*{animation-duration:.5s}#battlePlayerCard0,#battlePlayerCard1,#battlePlayerCard2{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'/%3E%3C/svg%3E")}</style></head><body>
 <div id="game-viewport"><div id="game-stage"><div id="app" class="in-battle"><div id="game-content" class="content">
 <div id="battlePage" class="page active v154-abyss-battle"><div class="battle-wrap">
 <div class="battle-title">戰鬥</div>
@@ -82,12 +82,16 @@ var qaParty=[{hp:835,sp:412},{hp:798,sp:468},{hp:752,sp:506}];
 function getPartyCharacterByIndex(index){return qaParty[index]||null;}
 function qaRect(selector){var r=document.querySelector(selector).getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom};}
 function qaRects(){return {enemy0:qaRect('#battleMonster0'),enemy5:qaRect('#battleMonster5'),player0:qaRect('#battlePlayerCard0'),player2:qaRect('#battlePlayerCard2'),turn:qaRect('#turnTargetRow'),actions:qaRect('#battleActionRegion')};}
+document.querySelectorAll('.battle-player').forEach(function(card){card.style.removeProperty('background-image');});
+window.__qaPlayerCssSource=getComputedStyle(document.getElementById('battlePlayerCard0')).backgroundImage;
 window.__qaBefore=qaRects();
 </script>
 <script>${runtimeSource}</script>
 <script>
 (function(){
   var player=document.getElementById('battlePlayerCard0');
+  window.v17351SyncManagement();
+  window.v17351SyncManagement();
   var art=player.querySelector(':scope > .v174-battle-art');
   player.classList.add('attacker-lunge-up');
   var lungeAnimation=getComputedStyle(art).animationName;
@@ -108,6 +112,9 @@ window.__qaBefore=qaRects();
       playerShadow:getComputedStyle(player).boxShadow,
       enemyShadow:getComputedStyle(enemy).boxShadow,
       playerArt:!!art,
+      playerCssSourceBefore:window.__qaPlayerCssSource,
+      playerInlineBackground:player.style.backgroundImage,
+      playerArtBackground:getComputedStyle(art).backgroundImage,
       playerArtBackgroundSize:getComputedStyle(art).backgroundSize,
       playerArtRect:qaRect('#battlePlayerCard0 > .v174-battle-art'),
       playerHpRect:qaRect('#battlePlayerCard0 > .hp-bar'),
@@ -164,6 +171,9 @@ function runViewport(chrome,width,height){
     assert.equal(data.playerShadow,"none");
     assert.equal(data.enemyShadow,"none");
     assert.equal(data.playerArt,true);
+    assert.match(data.playerCssSourceBefore,/data:image\/svg\+xml/);
+    assert.equal(data.playerInlineBackground,"","presentation must not overwrite the formal player background owner");
+    assert.match(data.playerArtBackground,/data:image\/svg\+xml/);
     assert.equal(data.playerArtBackgroundSize,"contain");
     assert.ok(data.playerArtRect.bottom<=data.playerHpRect.top,"player artwork must end above HP bar");
     assert.ok(data.playerHpRect.bottom<=data.playerSpRect.top+1,"HP bar must sit above SP bar without portrait overlap");

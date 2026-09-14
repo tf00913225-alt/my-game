@@ -22906,7 +22906,9 @@ function ensureBattlePresentationStyles(){
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit,
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{
     border:0!important;outline:0!important;box-shadow:none!important;
-    background-color:transparent!important;background-image:none!important;
+    /* Keep the formal portrait source readable; suppress only the card's own paint. */
+    background-color:transparent!important;background-size:0 0!important;
+    background-repeat:no-repeat!important;
     isolation:isolate!important;
     transition-property:opacity!important;transition-duration:.15s!important;
 }
@@ -23012,12 +23014,6 @@ function ensureBattlePresentationStyles(){
 }
 function numericValue(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0;}
 function setTextIfChanged(node,value){if(node&&node.textContent!==value)node.textContent=value;}
-function portraitImageSource(card){
-    if(!card||typeof card.querySelector!=="function")return "";
-    const image=card.querySelector(":scope > img.v162-abyss-battle-portrait-art, :scope > img.v154-monster-portrait-art");
-    const raw=image&&String(image.currentSrc||image.src||image.dataset?.monsterPortraitSrc||"").trim();
-    return raw?'url("'+raw.replace(/["\\\r\n]/g,"\\$&")+'")':"";
-}
 function battleArtworkSource(card,kind){
     if(!card)return "";
     const computed=getComputedStyle(card);
@@ -23025,26 +23021,20 @@ function battleArtworkSource(card,kind){
     if(kind==="monster")source=String(computed.getPropertyValue("--v152-abyss-portrait")||"").trim();
     if(!source||source==="none")source=String(card.style.backgroundImage||"").trim();
     if(!source||source==="none")source=String(computed.backgroundImage||"").trim();
-    if(!source||source==="none")source=portraitImageSource(card);
-    if(!source||source==="none"){
-        const path=String(card.dataset?.monsterPortraitPath||"").trim();
-        source=path?'url("'+path.replace(/["\\\r\n]/g,"\\$&")+'")':"";
-    }
-    if(source&&source!=="none"&&!/^linear-gradient/i.test(source))card.dataset.v174BattleArtwork=source;
-    return card.dataset.v174BattleArtwork||"";
+    return source&&source!=="none"&&!/^linear-gradient/i.test(source)?source:"";
 }
 function syncUnitArtwork(card,kind){
     if(!card)return;
     const source=battleArtworkSource(card,kind);
+    let art=card.querySelector(":scope > .v174-battle-art");
     if(!source){
         card.classList.remove("v174-cardless-unit");
+        if(art)art.style.removeProperty("background-image");
         return;
     }
     card.classList.add("v174-cardless-unit");
-    let art=card.querySelector(":scope > .v174-battle-art");
     if(!art){art=document.createElement("div");art.className="v174-battle-art";card.insertBefore(art,card.firstChild);}
     art.style.backgroundImage=source;
-    card.style.setProperty("background-image","none","important");
 }
 function syncResourceNumbers(){
     document.querySelectorAll("#battlePage .battle-player[id^='battlePlayerCard']").forEach(card=>{
