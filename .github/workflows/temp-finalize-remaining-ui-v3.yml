@@ -43,23 +43,17 @@ jobs:
           script=script[:mechanism_start]+'# Mechanism/browser QA patches are applied below against current source.\n\n'+script[static_start:]
           exec(compile(script,'<remaining-ui-repair>','exec'),{'__name__':'__main__'})
 
-          # Current mechanism source already has popup support; add V143 hit confirmation in place.
+          # Current mechanism source already has popup support; insert hit confirmation by stable code token.
           path=Path('js/gameplay-boss-tower-system.js')
           text=path.read_text(encoding='utf-8')
-          old='''        const final=Math.max(1,Math.round(numeric(damage,1)));
-              const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
-              if(node&&typeof showDamagePopup==="function"){
-          '''
-          new='''        const final=Math.max(1,Math.round(numeric(damage,1)));
-              const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
+          needle='const node=document.querySelector(\'#bossMechanismSlot [data-id="\'+card.id+\'"]\');'
+          insertion='''const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
               if(typeof window.v143RunAtTargetHit==="function"){
                   window.v143RunAtTargetHit("monster","mechanism:"+card.id,function(){},true);
-              }
-              if(node&&typeof showDamagePopup==="function"){
-          '''
-          if text.count(old)!=1:
-              raise SystemExit(f'current mechanism insertion: expected one match, got {text.count(old)}')
-          path.write_text(text.replace(old,new,1),encoding='utf-8')
+              }'''
+          if text.count(needle)!=1:
+              raise SystemExit(f'current mechanism insertion token: expected one match, got {text.count(needle)}')
+          path.write_text(text.replace(needle,insertion,1),encoding='utf-8')
 
           # Current browser fixture: mark player 2 active and record real geometry/computed style.
           path=Path('tests/v174-cardless-battle-browser.test.js')
@@ -70,34 +64,14 @@ jobs:
               raise SystemExit(f'browser active fixture: expected one match, got {text.count(old)}')
           text=text.replace(old,new,1)
 
-          old='''      enemyArt:!!enemyArt,
-              playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,
-          '''
-          new='''      enemyArt:!!enemyArt,
-              enemyArtRect:qaRect('#battleMonster0 > .v174-battle-art'),
-              enemyNameRect:qaRect('#battleMonster0 > .battle-monster-name'),
-              enemyNameDisplay:getComputedStyle(enemy.querySelector('.battle-monster-name')).display,
-              activeOutlineWidth:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineWidth,
-              activeOutlineColor:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineColor,
-              activeShadow:getComputedStyle(document.getElementById('battlePlayerCard1')).boxShadow,
-              playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,
-          '''
+          old="      enemyArt:!!enemyArt,\n      playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,\n"
+          new="      enemyArt:!!enemyArt,\n      enemyArtRect:qaRect('#battleMonster0 > .v174-battle-art'),\n      enemyNameRect:qaRect('#battleMonster0 > .battle-monster-name'),\n      enemyNameDisplay:getComputedStyle(enemy.querySelector('.battle-monster-name')).display,\n      activeOutlineWidth:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineWidth,\n      activeOutlineColor:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineColor,\n      activeShadow:getComputedStyle(document.getElementById('battlePlayerCard1')).boxShadow,\n      playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,\n"
           if text.count(old)!=1:
               raise SystemExit(f'browser result fields: expected one match, got {text.count(old)}')
           text=text.replace(old,new,1)
 
-          old='''    assert.equal(data.enemyArt,true);
-              assert.equal(data.playerIdle,"v174BattleIdle");
-          '''
-          new='''    assert.equal(data.enemyArt,true);
-              assert.equal(data.enemyNameDisplay,"flex");
-              assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");
-              assert.ok(data.enemyNameRect.bottom<=data.enemyArtRect.top+1,"monster name must sit above monster artwork");
-              assert.equal(data.activeOutlineWidth,"2px");
-              assert.notEqual(data.activeOutlineColor,"rgba(0, 0, 0, 0)");
-              assert.notEqual(data.activeShadow,"none");
-              assert.equal(data.playerIdle,"v174BattleIdle");
-          '''
+          old='    assert.equal(data.enemyArt,true);\n    assert.equal(data.playerIdle,"v174BattleIdle");\n'
+          new='    assert.equal(data.enemyArt,true);\n    assert.equal(data.enemyNameDisplay,"flex");\n    assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");\n    assert.ok(data.enemyNameRect.bottom<=data.enemyArtRect.top+1,"monster name must sit above monster artwork");\n    assert.equal(data.activeOutlineWidth,"2px");\n    assert.notEqual(data.activeOutlineColor,"rgba(0, 0, 0, 0)");\n    assert.notEqual(data.activeShadow,"none");\n    assert.equal(data.playerIdle,"v174BattleIdle");\n'
           if text.count(old)!=1:
               raise SystemExit(f'browser assertions: expected one match, got {text.count(old)}')
           path.write_text(text.replace(old,new,1),encoding='utf-8')
