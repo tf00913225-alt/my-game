@@ -7,7 +7,8 @@ const source=fs.readFileSync(path.join(__dirname,'..','js','54-v173.51-battle-qa
 
 test('cardless battle presentation keeps slot geometry and HUD owners untouched',()=>{
     assert.match(source,/\.battle-player\.v174-cardless-unit,[\s\S]*?\.battle-monster\.v174-cardless-unit\{[\s\S]*?border:0!important;[\s\S]*?box-shadow:none!important;/);
-    assert.match(source,/background-image:none!important/);
+    assert.match(source,/background-size:0 0!important/);
+    assert.doesNotMatch(source,/card\.style\.setProperty\("background-image","none","important"\)/);
     assert.match(source,/\.v174-battle-art~\*\{z-index:6;\}/);
     assert.doesNotMatch(source,/\.v174-battle-art~\*\{[^}]*position:/);
     assert.doesNotMatch(source,/battleMonsterArea\.style/);
@@ -39,12 +40,15 @@ test('portrait motion reuses existing lunge and damage-popup lifecycle',()=>{
     assert.match(source,/\.v174-battle-art::after/);
 });
 
-test('cardless artwork mirrors every formal portrait source before hiding the original owner',()=>{
-    assert.match(source,/function portraitImageSource\(card\)/);
-    assert.match(source,/v162-abyss-battle-portrait-art, :scope > img\.v154-monster-portrait-art/);
-    assert.match(source,/monsterPortraitPath/);
-    assert.match(source,/if\(!source\)\{[\s\S]*?classList\.remove\("v174-cardless-unit"\);[\s\S]*?return;/);
-    assert.match(source,/art\.style\.backgroundImage=source;[\s\S]*?setProperty\("background-image","none","important"\)/);
+test('cardless artwork keeps one formal source owner and removes failed fallback patches',()=>{
+    assert.doesNotMatch(source,/function portraitImageSource\(card\)/);
+    assert.doesNotMatch(source,/monsterPortraitPath/);
+    assert.doesNotMatch(source,/dataset\.v174BattleArtwork/);
+    assert.doesNotMatch(source,/setProperty\("background-image","none","important"\)/);
+    assert.match(source,/function battleArtworkSource\(card,kind\)[\s\S]*?getComputedStyle\(card\)[\s\S]*?computed\.backgroundImage/);
+    assert.match(source,/if\(!source\)\{[\s\S]*?classList\.remove\("v174-cardless-unit"\);[\s\S]*?removeProperty\("background-image"\);[\s\S]*?return;/);
+    assert.match(source,/art\.style\.backgroundImage=source;/);
+    assert.match(source,/background-size:0 0!important/);
     assert.match(source,/img\.v162-abyss-battle-portrait-art\{[\s\S]*?opacity:0!important;[\s\S]*?pointer-events:none!important;/);
     assert.doesNotMatch(source,/removeChild\([^)]*v162-abyss-battle-portrait-art/);
 });
