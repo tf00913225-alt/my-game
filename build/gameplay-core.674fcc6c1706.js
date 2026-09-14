@@ -12276,6 +12276,9 @@
     let blockedDirectorOverrides=0;
     let blockedCardEffectOverrides=0;
     const failedAssets=new Set();
+    const SPRITE_SCALE_MULTIPLIER=3;
+    const spriteFrameAspectCache=new Map();
+    const spriteFrameAspectLoading=new Set();
 
     function castSheet(src,placement,options){
         return Object.assign({
@@ -12499,9 +12502,24 @@
         return Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false);
     }
 
+    function visualRectForCard(card){
+        const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+        if(!rect){ return null; }
+        if(typeof card.querySelector==="function"){
+            try{
+                const art=card.querySelector(":scope > .v174-battle-art");
+                const artRect=art&&art.getBoundingClientRect?art.getBoundingClientRect():null;
+                if(artRect&&artRect.width>0&&artRect.height>0){ return artRect; }
+            }catch(_){ }
+        }
+        return rect;
+    }
+
     function cardCenter(card){
         const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-        return rect?{x:rect.left+rect.width/2,y:rect.top+rect.height/2,rect:rect}:null;
+        if(!rect){ return null; }
+        const visualRect=visualRectForCard(card)||rect;
+        return {x:visualRect.left+visualRect.width/2,y:visualRect.top+visualRect.height/2,rect:rect,visualRect:visualRect};
     }
 
     function activeCards(side,config){
@@ -12563,7 +12581,7 @@
     }
 
     function fieldBounds(cards){
-        const rects=cards.map(card=>card&&card.getBoundingClientRect?card.getBoundingClientRect():null)
+        const rects=cards.map(card=>visualRectForCard(card))
             .filter(rect=>rect&&rect.width&&rect.height);
         if(!rects.length){ return null; }
         const left=Math.min.apply(null,rects.map(rect=>rect.left));
@@ -12715,7 +12733,8 @@
         if(current&&!current.done&&current.targetSide===side){
             const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
             if(types.indexOf(type)>=0){
-                registerTarget(side,index,false);
+            registerTarget(side,index,false);
+            confirmTargetVisual(current,index);
                 let tracked=current.deferredStatusTargets.get(type);
                 if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
                 tracked.add(index);
@@ -12759,11 +12778,51 @@
         node.dataset.skill=current.config.id||"unknown";
         node.dataset.targetSide=current.targetSide;
         node.dataset.renderer="dom-sprite";
+        node.dataset.confirmedHit="false";
+        node.style.visibility="hidden";
         state.stage.appendChild(node);
         return node;
     }
 
     function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
+
+    function frameAspectFor(sprite){
+        const key=String(sprite&&sprite.src||"");
+        const cached=key?spriteFrameAspectCache.get(key):null;
+        return Math.max(.1,Number(cached)||Number(sprite&&sprite.cellAspect)||1);
+    }
+
+    function applySpriteBox(node,width,height,sprite){
+        const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER;
+        const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER;
+        const aspect=frameAspectFor(sprite);
+        let renderWidth=boxWidth,renderHeight=boxHeight;
+        if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
+        else{ renderHeight=renderWidth/aspect; }
+        node.style.width=Math.round(renderWidth)+"px";
+        node.style.height=Math.round(renderHeight)+"px";
+        node.dataset.frameAspect=String(Number(aspect.toFixed(4)));
+    }
+
+    function requestSpriteAspect(sprite,current,node,index,target){
+        const key=String(sprite&&sprite.src||"");
+        if(!key||spriteFrameAspectCache.has(key)||spriteFrameAspectLoading.has(key)){ return; }
+        const ImageCtor=typeof window!=="undefined"&&typeof window.Image==="function"?window.Image:(typeof Image==="function"?Image:null);
+        if(!ImageCtor){ return; }
+        spriteFrameAspectLoading.add(key);
+        const image=new ImageCtor();
+        image.onload=function(){
+            spriteFrameAspectLoading.delete(key);
+            const columns=Math.max(1,Number(sprite.columns)||1);
+            const rows=Math.max(1,Number(sprite.rows)||1);
+            const cellWidth=Number(image.naturalWidth||image.width||0)/columns;
+            const cellHeight=Number(image.naturalHeight||image.height||0)/rows;
+            if(cellWidth>0&&cellHeight>0){ spriteFrameAspectCache.set(key,cellWidth/cellHeight); }
+            if(state.current===current&&!current.done){ placeSprite(current,node,index,target); }
+        };
+        image.onerror=function(){ spriteFrameAspectLoading.delete(key); };
+        image.src=key;
+    }
 
     function emittedSpriteTargets(current){
         return current.targetIndexes.filter(index=>
@@ -12876,9 +12935,8 @@
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
             node.style.left=target.x+"px";
-            node.style.top=target.y+"px";
-            node.style.width=size+"px";
-            node.style.height=size+"px";
+        node.style.top=target.y+"px";
+        applySpriteBox(node,size,size,sprite);
             return;
         }
 
@@ -12898,10 +12956,9 @@
             node.dataset.travel="true";
             node.dataset.travelToTargets="true";
             node.style.left=actor.x+"px";
-            node.style.top=actor.y+"px";
-            node.style.width=size+"px";
-            node.style.height=size+"px";
-            node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
+        node.style.top=actor.y+"px";
+        applySpriteBox(node,size,size,sprite);
+        node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
             node.style.setProperty("--v143-sprite-angle",Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI+"deg");
             return;
@@ -12927,9 +12984,8 @@
             node.dataset.coverageScale=String(coverageScale);
             node.style.clipPath="none";
             node.style.left=(bounds.left+bounds.width/2)+"px";
-            node.style.top=(bounds.top+bounds.height/2)+"px";
-            node.style.width=width+"px";
-            node.style.height=height+"px";
+        node.style.top=(bounds.top+bounds.height/2)+"px";
+        applySpriteBox(node,width,height,sprite);
             return;
         }
 
@@ -12945,9 +13001,8 @@
         const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
         const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);
         node.dataset.targetIndexes=indexes.join(",");
-        node.style.width=size+"px";
-        node.style.height=size+"px";
-        const destination={
+    applySpriteBox(node,size,size,sprite);
+    const destination={
             x:targetBounds.left+targetBounds.width/2,
             y:targetBounds.top+targetBounds.height/2
         };
@@ -12988,8 +13043,18 @@
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);
-        if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
+    requestSpriteAspect(sprite,current,node,index,target);
+    if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
     }
+
+    function confirmTargetVisual(current,index){
+    if(!current||current.done||!current.model||!current.model.sprite){ return; }
+    current.confirmedTargets.add(index);
+    const placement=String(current.model.sprite.placement||"single");
+    const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
+    const node=current.spriteNodes.get(key);
+    if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
+}
 
     function targetHitTime(current,index){
         return Math.min(
@@ -13074,7 +13139,7 @@
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
-            spriteNodes:new Map(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
+            spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),duration:duration,hitReached:false,done:false
         };
@@ -13152,6 +13217,14 @@
     function delayFor(targetSide,index,allowDefeated){
         const current=registerTarget(targetSide,index,allowDefeated);
         if(!current){ return 0; }
+        confirmTargetVisual(current,index);
+        return Math.max(0,targetHitTime(current,index)-Date.now());
+    }
+
+    function missDelayFor(targetSide,index){
+        const current=state.current;
+        if(!current||current.done||current.targetSide!==targetSide){ return 0; }
+        if(current.targetIndexes.indexOf(index)<0&&!current.validTargets.has(index)){ return 0; }
         return Math.max(0,targetHitTime(current,index)-Date.now());
     }
 
@@ -13210,11 +13283,29 @@
 
     if(typeof showMissEffect==="function"){
         const previous=showMissEffect;
-        showMissEffect=function(isPlayerTarget,index){
-            const args=arguments;
-            const wait=delayFor(isPlayerTarget?"player":"monster",index,true);
-            if(wait>8){ setTimer(()=>previous.apply(this,args),wait); return; }
-            return previous.apply(this,args);
+        showMissEffect=function(isPlayerTarget,index,label){
+            const args=Array.prototype.slice.call(arguments);
+            const targetSide=isPlayerTarget?"player":"monster";
+            const isMiss=String(label||"MISS").trim().toUpperCase()==="MISS";
+            const wait=isMiss?missDelayFor(targetSide,index):delayFor(targetSide,index,true);
+            const invoke=()=>{
+                const result=previous.apply(this,args);
+                const card=cardFor(targetSide,index);
+                if(card&&typeof card.querySelectorAll==="function"&&typeof document!=="undefined"&&document.body){
+                    const popups=card.querySelectorAll(":scope > .damage-popup.miss-popup");
+                    const popup=popups.length?popups[popups.length-1]:null;
+                    const rect=popup&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+                    if(popup&&rect){
+                        popup.classList.add("v152-top-damage");
+                        popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
+                        popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
+                        document.body.appendChild(popup);
+                    }
+                }
+                return result;
+            };
+            if(wait>8){ setTimer(invoke,wait); return; }
+            return invoke();
         };
     }
 
@@ -14576,16 +14667,13 @@
         const buttons=[
             ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],
             ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
-            ["秘寶","assets/ui/nav-relic-v174.webp","openHomeFeature('relic')"],
+            ["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"],
             ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"]
         ];
-        if(!abyssMapActive){
-            buttons.push([
-                abyssSelectionActive?"返回玩法":"返回",
-                "assets/ui/map-return.png",
-                abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')"
-            ]);
-        }
+        const returnAction=abyssMapActive
+            ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")
+            :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')");
+        buttons.push(["返回","assets/ui/map-return.png",returnAction]);
         return buttons.map(button=>
             '<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'">'+
             '<img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>'
@@ -14623,7 +14711,7 @@
                 nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);
                 nav.dataset.v146Mode=mode;
             }
-            nav.dataset.v146Columns=abyssMapActive?"4":"5";
+            nav.dataset.v146Columns="5";
         }
         const oldReturn=document.getElementById("v141DungeonReturn");
         if(oldReturn){ oldReturn.remove(); }
@@ -22144,6 +22232,7 @@
     const QUALITY_ORDER=["white","blue","purple","orange","pink","four-symbol"];
     const QUALITY_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
     const TIER_TO_QUALITY={white:"white",blue:"blue",purple:"purple",orange:"orange",pink:"pink","four-symbol":"four-symbol",low:"white",mid:"blue",high:"purple",perfect:"orange"};
+    const SUPPORTED_BATCH_CHEST_IDS=new Set(["materialChest","equipmentChest"]);
 
     function escapeHtml(value){
         return String(value==null?"":value)
@@ -22168,9 +22257,9 @@
         if(!item){ return null; }
         const direct=String(item.rarityKey||item.quality||"").toLowerCase();
         if(QUALITY_ORDER.includes(direct)){ return direct; }
-        if(item.setId){ return "orange"; }
         const tier=String(item.tierKey||"").toLowerCase();
         if(TIER_TO_QUALITY[tier]){ return TIER_TO_QUALITY[tier]; }
+        if(isInventoryEquipment(item)&&item.setId){ return "orange"; }
         const icon=String(item.icon||"");
         for(const quality of QUALITY_ORDER){
             if(icon.includes("rarity-"+quality)){ return quality; }
@@ -22475,7 +22564,7 @@
             const definition=getPotionDefinition(item.id);
             if(definition){ return {kind:"potion",label:"批量使用",total,definition}; }
         }
-        if(item.type==="chest"&&getChestOpenOnce(item)){
+        if(item.type==="chest"&&SUPPORTED_BATCH_CHEST_IDS.has(String(item.id||""))){
             return {kind:"chest",label:"批量開啟",total};
         }
         if(item.type==="ticket"&&typeof window.useEquipmentTicket==="function"){
@@ -22799,8 +22888,15 @@ function ensureBattlePresentationStyles(){
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{
     z-index:20!important;
 }
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
+    position:absolute!important;left:0!important;right:0!important;top:0!important;
+    display:flex!important;min-height:14px!important;align-items:center!important;justify-content:center!important;
+    margin:0!important;padding:0 2px!important;line-height:14px!important;text-align:center!important;
+    white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
+    z-index:24!important;pointer-events:none!important;
+}
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
-    inset:-5px!important;
+    inset:15px -5px 26px!important;
     background-size:cover!important;background-position:center center!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
@@ -22818,6 +22914,10 @@ function ensureBattlePresentationStyles(){
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{
     border:0!important;background:none!important;box-shadow:none!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn{
+    outline:2px solid #f1c96d!important;outline-offset:1px!important;border-radius:8px!important;
+    box-shadow:0 0 0 1px rgba(255,232,163,.34),0 0 14px rgba(241,201,109,.82)!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.ally-targetable{box-shadow:none!important;}
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target{

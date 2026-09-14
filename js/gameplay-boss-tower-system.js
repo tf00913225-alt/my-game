@@ -604,6 +604,9 @@
         if(!card||card.destroyed||card.hp<=0){ return 0; }
         const final=Math.max(1,Math.round(numeric(damage,1)));
         const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
+    if(typeof window.v143RunAtTargetHit==="function"){
+        window.v143RunAtTargetHit("monster","mechanism:"+card.id,function(){},true);
+    }
         if(node&&typeof showDamagePopup==="function"){
             showDamagePopup(node,"HP-"+final,"hp",!!isCrit);
         }
