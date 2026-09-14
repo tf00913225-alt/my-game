@@ -1,0 +1,476 @@
+name: Temporary finalize remaining UI repairs
+
+on:
+  push:
+    branches:
+      - fix/inventory-battle-nav-runtime-20260914
+    paths:
+      - .github/workflows/temp-finalize-remaining-ui.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/inventory-battle-nav-runtime-20260914
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Apply remaining owner-level repairs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def load(path):
+              return Path(path).read_text(encoding='utf-8')
+
+          def save(path,text):
+              Path(path).write_text(text,encoding='utf-8')
+
+          def regex1(path,pattern,replacement,label):
+              text=load(path)
+              out,n=re.subn(pattern,lambda _m: replacement,text,count=1,flags=re.S)
+              if n!=1:
+                  raise SystemExit(f'{label}: expected one match, got {n}')
+              save(path,out)
+
+          # Backpack: one owner for all item-art geometry.
+          path='css/38-v141-system-expansion.css'
+          text=load(path)
+          marker='''/* Inventory is the owner of equipment-card geometry. It must not depend on
+             the lazy Abyss stylesheet before equipment artwork can fit its slot. */'''
+          block='''/* Inventory owns every backpack item-art box, regardless of filter or lazy feature CSS. */
+          #game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon{
+              display:grid;
+              width:100%;
+              height:100%;
+              min-width:0;
+              min-height:0;
+              place-items:center;
+              overflow:hidden;
+              box-sizing:border-box;
+          }
+          #game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art{
+              position:relative;
+              isolation:isolate;
+              display:grid;
+              width:100%;
+              height:100%;
+              max-width:100%;
+              max-height:100%;
+              min-width:0;
+              min-height:0;
+              margin:0;
+              padding:3px;
+              place-items:center;
+              overflow:hidden;
+              box-sizing:border-box;
+          }
+          #game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art > img{
+              position:relative;
+              inset:auto;
+              display:block;
+              width:100%;
+              height:100%;
+              max-width:100%;
+              max-height:100%;
+              object-fit:contain;
+              object-position:center;
+              transform:none;
+          }
+
+          '''
+          if block not in text:
+              if marker not in text:
+                  raise SystemExit('inventory owner marker missing')
+              save(path,text.replace(marker,block+marker,1))
+
+          path='css/50-v169-abyss-flow.css'
+          text=load(path)
+          cross=re.compile(r'\n?#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{\s*width:100%;\s*height:100%;\s*max-width:100%;\s*max-height:100%;\s*\}\s*',re.S)
+          text,n=cross.subn('\n',text,count=1)
+          if n!=1:
+              raise SystemExit(f'Abyss inventory cross-owner: expected one match, got {n}')
+          save(path,text)
+
+          # Battle presentation: monster name above art + clear current-turn gold frame.
+          path='js/54-v173.51-battle-qa.js'
+          text=load(path)
+          old='''#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{
+              z-index:20!important;
+          }
+          #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
+              inset:-5px!important;
+              background-size:cover!important;background-position:center center!important;
+          }
+          '''
+          new='''#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{
+              z-index:20!important;
+          }
+          #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
+              position:absolute!important;left:0!important;right:0!important;top:0!important;
+              display:flex!important;min-height:14px!important;align-items:center!important;justify-content:center!important;
+              margin:0!important;padding:0 2px!important;line-height:14px!important;text-align:center!important;
+              white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
+              z-index:24!important;pointer-events:none!important;
+          }
+          #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
+              inset:15px -5px 26px!important;
+              background-size:cover!important;background-position:center center!important;
+          }
+          '''
+          if text.count(old)!=1:
+              raise SystemExit('battle monster name/art owner mismatch')
+          text=text.replace(old,new,1)
+          old='''#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{
+              border:0!important;background:none!important;box-shadow:none!important;
+          }
+          '''
+          new='''#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{
+              border:0!important;background:none!important;box-shadow:none!important;
+          }
+          #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn{
+              outline:2px solid #f1c96d!important;outline-offset:1px!important;border-radius:8px!important;
+              box-shadow:0 0 0 1px rgba(255,232,163,.34),0 0 14px rgba(241,201,109,.82)!important;
+          }
+          '''
+          if text.count(old)!=1:
+              raise SystemExit('active-turn owner mismatch')
+          save(path,text.replace(old,new,1))
+
+          # VFX: center on visible art, retain source frame aspect, approved 3x size,
+          # hide until a real hit/effect confirms it so MISS never plays a skill VFX.
+          path='js/39-v143-skill-animation.js'
+          text=load(path)
+          if 'const SPRITE_SCALE_MULTIPLIER=3;' in text:
+              raise SystemExit('VFX repair unexpectedly already present')
+          text=text.replace(
+              '    const failedAssets=new Set();\n',
+              '    const failedAssets=new Set();\n    const SPRITE_SCALE_MULTIPLIER=3;\n    const spriteFrameAspectCache=new Map();\n    const spriteFrameAspectLoading=new Set();\n',
+              1
+          )
+          save(path,text)
+
+          regex1(path,
+              r'    function cardCenter\(card\)\{\s*const rect=card&&card\.getBoundingClientRect\?card\.getBoundingClientRect\(\):null;\s*return rect\?\{x:rect\.left\+rect\.width/2,y:rect\.top\+rect\.height/2,rect:rect\}:null;\s*\}',
+              '''    function visualRectForCard(card){
+                  const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+                  if(!rect){ return null; }
+                  if(typeof card.querySelector==="function"){
+                      try{
+                          const art=card.querySelector(":scope > .v174-battle-art");
+                          const artRect=art&&art.getBoundingClientRect?art.getBoundingClientRect():null;
+                          if(artRect&&artRect.width>0&&artRect.height>0){ return artRect; }
+                      }catch(_){ }
+                  }
+                  return rect;
+              }
+
+              function cardCenter(card){
+                  const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+                  if(!rect){ return null; }
+                  const visualRect=visualRectForCard(card)||rect;
+                  return {x:visualRect.left+visualRect.width/2,y:visualRect.top+visualRect.height/2,rect:rect,visualRect:visualRect};
+              }''',
+              'VFX visual card center')
+
+          regex1(path,
+              r'    function fieldBounds\(cards\)\{\s*const rects=cards\.map\(card=>card&&card\.getBoundingClientRect\?card\.getBoundingClientRect\(\):null\)\s*\.filter\(rect=>rect&&rect\.width&&rect\.height\);',
+              '''    function fieldBounds(cards){
+                  const rects=cards.map(card=>visualRectForCard(card))
+                      .filter(rect=>rect&&rect.width&&rect.height);''',
+              'VFX visual field bounds')
+
+          regex1(path,
+              r'    function appendSpriteNode\(current\)\{\s*const node=document\.createElement\("i"\);\s*node\.className="v143-vfx-sprite";\s*node\.dataset\.skill=current\.config\.id\|\|"unknown";\s*node\.dataset\.targetSide=current\.targetSide;\s*node\.dataset\.renderer="dom-sprite";\s*state\.stage\.appendChild\(node\);\s*return node;\s*\}\s*\n\s*function clamp\(value,min,max\)\{ return Math\.max\(min,Math\.min\(max,value\)\); \}',
+              '''    function appendSpriteNode(current){
+                  const node=document.createElement("i");
+                  node.className="v143-vfx-sprite";
+                  node.dataset.skill=current.config.id||"unknown";
+                  node.dataset.targetSide=current.targetSide;
+                  node.dataset.renderer="dom-sprite";
+                  node.dataset.confirmedHit="false";
+                  node.style.visibility="hidden";
+                  state.stage.appendChild(node);
+                  return node;
+              }
+
+              function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
+
+              function frameAspectFor(sprite){
+                  const key=String(sprite&&sprite.src||"");
+                  const cached=key?spriteFrameAspectCache.get(key):null;
+                  return Math.max(.1,Number(cached)||Number(sprite&&sprite.cellAspect)||1);
+              }
+
+              function applySpriteBox(node,width,height,sprite){
+                  const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER;
+                  const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER;
+                  const aspect=frameAspectFor(sprite);
+                  let renderWidth=boxWidth,renderHeight=boxHeight;
+                  if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
+                  else{ renderHeight=renderWidth/aspect; }
+                  node.style.width=Math.round(renderWidth)+"px";
+                  node.style.height=Math.round(renderHeight)+"px";
+                  node.dataset.frameAspect=String(Number(aspect.toFixed(4)));
+              }
+
+              function requestSpriteAspect(sprite,current,node,index,target){
+                  const key=String(sprite&&sprite.src||"");
+                  if(!key||spriteFrameAspectCache.has(key)||spriteFrameAspectLoading.has(key)){ return; }
+                  const ImageCtor=typeof window!=="undefined"&&typeof window.Image==="function"?window.Image:(typeof Image==="function"?Image:null);
+                  if(!ImageCtor){ return; }
+                  spriteFrameAspectLoading.add(key);
+                  const image=new ImageCtor();
+                  image.onload=function(){
+                      spriteFrameAspectLoading.delete(key);
+                      const columns=Math.max(1,Number(sprite.columns)||1);
+                      const rows=Math.max(1,Number(sprite.rows)||1);
+                      const cellWidth=Number(image.naturalWidth||image.width||0)/columns;
+                      const cellHeight=Number(image.naturalHeight||image.height||0)/rows;
+                      if(cellWidth>0&&cellHeight>0){ spriteFrameAspectCache.set(key,cellWidth/cellHeight); }
+                      if(state.current===current&&!current.done){ placeSprite(current,node,index,target); }
+                  };
+                  image.onerror=function(){ spriteFrameAspectLoading.delete(key); };
+                  image.src=key;
+              }''',
+              'VFX sprite helpers')
+
+          regex1(path,
+              r'node\.style\.left=target\.x\+"px";\s*node\.style\.top=target\.y\+"px";\s*node\.style\.width=size\+"px";\s*node\.style\.height=size\+"px";',
+              '''node.style.left=target.x+"px";
+                  node.style.top=target.y+"px";
+                  applySpriteBox(node,size,size,sprite);''',
+              'single VFX box')
+
+          regex1(path,
+              r'node\.style\.left=actor\.x\+"px";\s*node\.style\.top=actor\.y\+"px";\s*node\.style\.width=size\+"px";\s*node\.style\.height=size\+"px";\s*node\.style\.setProperty\("--v143-sprite-dx",target\.x-actor\.x\+"px"\);',
+              '''node.style.left=actor.x+"px";
+                  node.style.top=actor.y+"px";
+                  applySpriteBox(node,size,size,sprite);
+                  node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");''',
+              'target trajectory VFX box')
+
+          regex1(path,
+              r'node\.style\.left=\(bounds\.left\+bounds\.width/2\)\+"px";\s*node\.style\.top=\(bounds\.top\+bounds\.height/2\)\+"px";\s*node\.style\.width=width\+"px";\s*node\.style\.height=height\+"px";',
+              '''node.style.left=(bounds.left+bounds.width/2)+"px";
+                  node.style.top=(bounds.top+bounds.height/2)+"px";
+                  applySpriteBox(node,width,height,sprite);''',
+              'battlefield VFX box')
+
+          regex1(path,
+              r'node\.dataset\.targetIndexes=indexes\.join\(","\);\s*node\.style\.width=size\+"px";\s*node\.style\.height=size\+"px";\s*const destination=',
+              '''node.dataset.targetIndexes=indexes.join(",");
+              applySpriteBox(node,size,size,sprite);
+              const destination=''',
+              'group VFX box')
+
+          regex1(path,
+              r'        placeSprite\(current,node,index,target\);\s*if\(!node\.classList\.contains\("v143-vfx-sprite-active"\)\)\{ node\.classList\.add\("v143-vfx-sprite-active"\); \}',
+              '''        placeSprite(current,node,index,target);
+              requestSpriteAspect(sprite,current,node,index,target);
+              if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }''',
+              'VFX sprite aspect load')
+
+          regex1(path,
+              r'spriteNodes:new Map\(\),deferredStatusTargets:new Map\(\),statusAtStart:snapshotTimedEffects\(\),',
+              'spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),',
+              'VFX confirmation state')
+
+          text=load(path)
+          marker='    function targetHitTime(current,index){\n'
+          confirm='''    function confirmTargetVisual(current,index){
+              if(!current||current.done||!current.model||!current.model.sprite){ return; }
+              current.confirmedTargets.add(index);
+              const placement=String(current.model.sprite.placement||"single");
+              const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
+              const node=current.spriteNodes.get(key);
+              if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
+          }
+
+          '''
+          if text.count(marker)!=1:
+              raise SystemExit('targetHitTime marker mismatch')
+          save(path,text.replace(marker,confirm+marker,1))
+
+          regex1(path,
+              r'    function delayFor\(targetSide,index,allowDefeated\)\{\s*const current=registerTarget\(targetSide,index,allowDefeated\);\s*if\(!current\)\{ return 0; \}\s*return Math\.max\(0,targetHitTime\(current,index\)-Date\.now\(\)\);\s*\}',
+              '''    function delayFor(targetSide,index,allowDefeated){
+                  const current=registerTarget(targetSide,index,allowDefeated);
+                  if(!current){ return 0; }
+                  confirmTargetVisual(current,index);
+                  return Math.max(0,targetHitTime(current,index)-Date.now());
+              }
+
+              function missDelayFor(targetSide,index){
+                  const current=state.current;
+                  if(!current||current.done||current.targetSide!==targetSide){ return 0; }
+                  if(current.targetIndexes.indexOf(index)<0&&!current.validTargets.has(index)){ return 0; }
+                  return Math.max(0,targetHitTime(current,index)-Date.now());
+              }''',
+              'VFX hit/miss timing')
+
+          regex1(path,
+              r'(if\(types\.indexOf\(type\)>=0\)\{\s*registerTarget\(side,index,false\);)',
+              '''if(types.indexOf(type)>=0){
+                      registerTarget(side,index,false);
+                      confirmTargetVisual(current,index);''',
+              'status confirms VFX')
+
+          regex1(path,
+              r'    if\(typeof showMissEffect==="function"\)\{\s*const previous=showMissEffect;\s*showMissEffect=function\(isPlayerTarget,index\)\{\s*const args=arguments;\s*const wait=delayFor\(isPlayerTarget\?"player":"monster",index,true\);\s*if\(wait>8\)\{ setTimer\(\(\)=>previous\.apply\(this,args\),wait\); return; \}\s*return previous\.apply\(this,args\);\s*\};\s*\}',
+              '''    if(typeof showMissEffect==="function"){
+                  const previous=showMissEffect;
+                  showMissEffect=function(isPlayerTarget,index,label){
+                      const args=Array.prototype.slice.call(arguments);
+                      const targetSide=isPlayerTarget?"player":"monster";
+                      const isMiss=String(label||"MISS").trim().toUpperCase()==="MISS";
+                      const wait=isMiss?missDelayFor(targetSide,index):delayFor(targetSide,index,true);
+                      const invoke=()=>{
+                          const result=previous.apply(this,args);
+                          const card=cardFor(targetSide,index);
+                          if(card&&typeof card.querySelectorAll==="function"&&typeof document!=="undefined"&&document.body){
+                              const popups=card.querySelectorAll(":scope > .damage-popup.miss-popup");
+                              const popup=popups.length?popups[popups.length-1]:null;
+                              const rect=popup&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+                              if(popup&&rect){
+                                  popup.classList.add("v152-top-damage");
+                                  popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
+                                  popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
+                                  document.body.appendChild(popup);
+                              }
+                          }
+                          return result;
+                      };
+                      if(wait>8){ setTimer(invoke,wait); return; }
+                      return invoke();
+                  };
+              }''',
+              'MISS VFX suppression')
+
+          # Mechanism cards also need to confirm hidden-until-hit VFX.
+          path='js/gameplay-boss-tower-system.js'
+          text=load(path)
+          needle='''        const final=Math.max(1,Math.round(numeric(damage,1)));
+              const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
+          '''
+          replacement='''        const final=Math.max(1,Math.round(numeric(damage,1)));
+              const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
+              if(typeof window.v143RunAtTargetHit==="function"){
+                  window.v143RunAtTargetHit("monster","mechanism:"+card.id,function(){},true);
+              }
+          '''
+          if text.count(needle)!=1:
+              raise SystemExit('mechanism VFX confirmation insertion mismatch')
+          save(path,text.replace(needle,replacement,1))
+
+          # Browser geometry acceptance for monster name and active player highlight.
+          path='tests/v174-cardless-battle-browser.test.js'
+          text=load(path)
+          old='<div id="battlePlayerCard${index}" class="battle-player"'
+          new='<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}"'
+          if text.count(old)!=1:
+              raise SystemExit('browser fixture active-turn mismatch')
+          text=text.replace(old,new,1)
+          old='''      enemyArt:!!enemyArt,
+                  playerIdle:'''
+          new='''      enemyArt:!!enemyArt,
+                  enemyArtRect:qaRect('#battleMonster0 > .v174-battle-art'),
+                  enemyNameRect:qaRect('#battleMonster0 > .battle-monster-name'),
+                  enemyNameDisplay:getComputedStyle(enemy.querySelector('.battle-monster-name')).display,
+                  activeOutlineWidth:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineWidth,
+                  activeOutlineColor:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineColor,
+                  activeShadow:getComputedStyle(document.getElementById('battlePlayerCard1')).boxShadow,
+                  playerIdle:'''
+          if text.count(old)!=1:
+              raise SystemExit('browser result insertion mismatch')
+          text=text.replace(old,new,1)
+          old='''    assert.equal(data.enemyArt,true);
+              assert.equal(data.playerIdle,"v174BattleIdle");'''
+          new='''    assert.equal(data.enemyArt,true);
+              assert.equal(data.enemyNameDisplay,"flex");
+              assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");
+              assert.ok(data.enemyNameRect.bottom<=data.enemyArtRect.top+1,"monster name must sit above monster artwork");
+              assert.equal(data.activeOutlineWidth,"2px");
+              assert.notEqual(data.activeOutlineColor,"rgba(0, 0, 0, 0)");
+              assert.notEqual(data.activeShadow,"none");
+              assert.equal(data.playerIdle,"v174BattleIdle");'''
+          if text.count(old)!=1:
+              raise SystemExit('browser assertions insertion mismatch')
+          save(path,text.replace(old,new,1))
+
+          Path('tests/remaining-ui-regressions-20260914.test.js').write_text(r'''"use strict";
+          const assert=require("node:assert/strict");
+          const fs=require("node:fs");
+          const read=p=>fs.readFileSync(p,"utf8");
+          const inventoryCss=read("css/38-v141-system-expansion.css");
+          const abyssCss=read("css/50-v169-abyss-flow.css");
+          const inventoryJs=read("js/35-v141-ui-battle.js");
+          const battle=read("js/54-v173.51-battle-qa.js");
+          const vfx=read("js/39-v143-skill-animation.js");
+          const bossCss=read("css/gameplay-boss-tower.css");
+          const bossJs=read("js/gameplay-boss-tower-system.js");
+          const fireCss=read("css/56-v174-critical-ui-regressions.css");
+          assert.match(inventoryJs,/const INVENTORY_PAGE_SIZE=18;/);
+          assert.match(inventoryJs,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/);
+          assert.match(inventoryCss,/inventory-grid-classic[\s\S]*grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
+          assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inventory-icon > \.v169-item-art[\s\S]*object-fit:contain/);
+          assert.doesNotMatch(abyssCss,/#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{/);
+          assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:0!important;[\s\S]*z-index:24!important/);
+          assert.match(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*inset:15px -5px 26px!important/);
+          assert.match(battle,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:2px solid #f1c96d!important/);
+          assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=3;/);
+          assert.match(vfx,/function visualRectForCard\(card\)[\s\S]*:scope > \.v174-battle-art/);
+          assert.match(vfx,/function applySpriteBox\([\s\S]*SPRITE_SCALE_MULTIPLIER/);
+          assert.match(vfx,/naturalWidth[\s\S]*columns[\s\S]*naturalHeight[\s\S]*rows/);
+          assert.match(vfx,/node\.style\.visibility="hidden"/);
+          assert.match(vfx,/function confirmTargetVisual/);
+          assert.match(vfx,/isMiss\?missDelayFor\(targetSide,index\):delayFor\(targetSide,index,true\)/);
+          assert.match(vfx,/popup\.classList\.add\("v152-top-damage"\)/);
+          assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(123px,30%,138px\)/);
+          assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(117px,29\.25%,132px\)/);
+          assert.match(bossJs,/showDamagePopup\(node,"HP-"\+final,"hp",!!isCrit\)/);
+          assert.match(fireCss,/rotate\(calc\(var\(--v143-sprite-angle,0deg\) \+ 90deg\)\)/);
+          console.log("✓ remaining UI regressions guarded");
+          ''',encoding='utf-8')
+          PY
+
+      - name: Validate source and canonical build
+        run: |
+          git diff --check
+          node --check js/39-v143-skill-animation.js
+          node --check js/54-v173.51-battle-qa.js
+          node --check js/gameplay-boss-tower-system.js
+          node tests/remaining-ui-regressions-20260914.test.js
+          npm run build
+          npm run build:check
+
+      - name: Focused runtime and browser regressions
+        run: |
+          node tests/v153-fire-vfx.test.js
+          node tests/v174-raster-only-combat-vfx-owner.test.js
+          node tests/v152-dev-fixes.test.js
+          node tests/v174-cardless-battle-browser.test.js
+          node tests/remaining-ui-regressions-20260914.test.js
+          git diff --check
+
+      - name: Commit repaired source and build, remove temporary workflows
+        shell: bash
+        run: |
+          rm -f .github/workflows/temp-remaining-ui-repair.yml
+          rm -f .github/workflows/temp-finalize-remaining-ui.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: finish remaining inventory battle and VFX regressions"
+          git push origin HEAD:fix/inventory-battle-nav-runtime-20260914
