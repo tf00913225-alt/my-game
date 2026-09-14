@@ -589,7 +589,7 @@
 
 #game-stage #battleMonsterArea.gameplay-boss-active{
     --gameplay-boss-card-width:clamp(118px,29%,132px);
-    --gameplay-mechanism-card-width:clamp(123px,30%,138px);
+    --gameplay-mechanism-card-width:clamp(222px,58%,252px);
     margin-top:-16px;
     max-width:100%;
     overflow:visible;
