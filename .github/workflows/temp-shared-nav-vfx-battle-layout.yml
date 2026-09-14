@@ -30,6 +30,23 @@ jobs:
           end=old.index("\n          PY",start)
           raw=old[start:end]
           code="\n".join(line[10:] if line.startswith("          ") else line for line in raw.splitlines())
+          original='''def replace_once(path, old, new):
+    text=read(path)
+    assert text.count(old)==1, f'{path}: expected exactly one occurrence of {old[:80]!r}, got {text.count(old)}'
+    write(path,text.replace(old,new,1))'''
+          tolerant='''def replace_once(path, old, new):
+    text=read(path)
+    count=text.count(old)
+    if count==0 and path=="js/39-v143-skill-animation.js" and "node.dataset.frames=String(sprite.frames);" in old:
+        pattern=r'            node\\.dataset\\.frames=String\\(sprite\\.frames\\);\\n            node\\.style\\.backgroundImage=.*?\\n            node\\.style\\.backgroundSize=.*?\\n            node\\.style\\.setProperty\\("--v143-sprite-duration",current\\.duration\\+"ms"\\);'
+        patched,n=__import__("re").subn(pattern,new,text,count=1,flags=__import__("re").S)
+        assert n==1, f"{path}: flexible VFX assignment match failed"
+        write(path,patched)
+        return
+    assert count==1, f'{path}: expected exactly one occurrence of {old[:80]!r}, got {count}'
+    write(path,text.replace(old,new,1))'''
+          assert original in code
+          code=code.replace(original,tolerant,1)
           exec(compile(code,"temp-shared-nav-vfx-battle-layout.py","exec"))
           PY
       - name: Focused regression tests
