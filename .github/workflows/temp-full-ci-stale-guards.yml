@@ -1,0 +1,59 @@
+name: Temporary full CI stale-guard cleanup
+on:
+  push:
+    branches:
+      - fix/full-ci-stale-guards-20260914
+permissions:
+  contents: write
+jobs:
+  full-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Prepare fixed historical baselines and image dependency
+        shell: bash
+        run: |
+          for sha in \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            git fetch --no-tags --depth=1 origin "$sha"
+          done
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+      - name: Patch confirmed stale guards
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/v143-combat-dungeon-polish.test.js')
+          s=p.read_text(encoding='utf-8')
+          old=r'''assert.match(css,/\.monster-bar-text[\s\S]*font-size:12px !important;[\s\S]*font-weight:900/);'''
+          new=r'''assert.match(css,/\.monster-bar-text[\s\S]*font-size:var\(--v143-monster-bar-font-size,12px\) !important;[\s\S]*font-weight:900/);'''
+          if old not in s:
+              raise SystemExit('V143 fixed 12px bar assertion anchor not found')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+      - name: Run all 162 Node suites
+        shell: bash
+        run: |
+          node .github/scripts/ci.mjs tests
+          git diff --check
+      - name: Commit all validated guard corrections and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/temp-full-ci-stale-guards.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tests
+          git add -u
+          git diff --cached --check
+          git commit -m 'test: align full CI guards with approved runtime contracts'
+          git push origin HEAD:fix/full-ci-stale-guards-20260914
