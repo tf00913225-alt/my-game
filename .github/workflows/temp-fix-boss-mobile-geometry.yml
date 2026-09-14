@@ -1,0 +1,71 @@
+name: Temporary boss mobile geometry follow-up
+on:
+  push:
+    branches:
+      - fix/boss-mobile-geometry-gate-20260914
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Patch approved mechanism width gate and real Boss HP overflow
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          test = Path('tests/boss-mobile-portrait-browser.test.js')
+          s = test.read_text(encoding='utf-8')
+          old = 'assert.ok(data.mechanismBattleWidthShare>=.50&&data.mechanismBattleWidthShare<=.60,`Mechanism battle width share ${data.mechanismBattleWidthShare} is outside 50%-60% at ${width}x${height}`);'
+          new = 'assert.ok(data.mechanismBattleWidthShare>=.28&&data.mechanismBattleWidthShare<=.32,`Mechanism battle width share ${data.mechanismBattleWidthShare} is outside 28%-32% at ${width}x${height}`);'
+          if old not in s:
+              raise SystemExit('stale mechanism width assertion not found')
+          test.write_text(s.replace(old, new, 1), encoding='utf-8')
+
+          css = Path('css/gameplay-boss-tower.css')
+          c = css.read_text(encoding='utf-8')
+          anchor = '''#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-hp,
+          #game-stage #battlePage .battle-monster.gameplay-boss-card .monster-sp{
+              width:calc(100% - 10px);
+              min-width:0;
+          }
+          '''
+          addition = anchor + '''
+          /* Gameplay BOSS HP/SP values can reach six digits. The shared V143 12px
+             label is wider than the portrait bar on compact phones, so keep the
+             adjustment local to the Boss owner instead of shrinking every monster. */
+          #game-stage #battlePage .battle-monster.gameplay-boss-card .monster-bar-text{
+              font-size:9.5px !important;
+              letter-spacing:-.45px !important;
+          }
+          '''
+          if anchor not in c:
+              raise SystemExit('Boss resource-bar owner anchor not found')
+          css.write_text(c.replace(anchor, addition, 1), encoding='utf-8')
+          PY
+      - name: Build and focused mobile browser QA
+        shell: bash
+        run: |
+          npm run build
+          npm run build:check
+          node tests/boss-mechanism-vfx-card-ui-20260909.test.js
+          node tests/boss-mobile-portrait-browser.test.js
+          git diff --check
+      - name: Commit formal fix and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/temp-fix-boss-mobile-geometry.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add css/gameplay-boss-tower.css tests/boss-mobile-portrait-browser.test.js build asset-manifest.json index.html config 2>/dev/null || true
+          git add -u
+          git diff --cached --check
+          git commit -m 'fix: align boss mobile geometry and HP label'
+          git push origin HEAD:fix/boss-mobile-geometry-gate-20260914
