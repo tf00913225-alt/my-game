@@ -8,22 +8,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Locate map avatar and nav owners
+      - name: Diagnose patrol asset and nav cascade
         shell: bash
         run: |
           set -euo pipefail
-          echo '=== ALL mapPlayer REFERENCES ==='
-          grep -RIn 'mapPlayer' . --exclude-dir=.git --exclude='*.map' | head -n 300 || true
-          echo '=== MAP PAGE HTML CONTEXT ==='
-          line=$(grep -n 'id="mapPage"' index.html | head -1 | cut -d: -f1 || true)
-          if [ -n "${line:-}" ]; then start=$((line-20)); [ "$start" -lt 1 ] && start=1; end=$((line+220)); sed -n "${start},${end}p" index.html; fi
-          echo '=== MAP PLAYER UPDATE CONTEXT ==='
-          sed -n '9635,9745p' js/00-main.js
-          echo '=== MAP PLAYER CSS ==='
-          sed -n '1395,1498p' css/00-main.css
-          echo '=== CONTEXT NAV OWNER ==='
-          sed -n '1325,1445p' js/42-v148-combat-dungeon-fixes.js
-          echo '=== ALL NAV CSS OWNERS ==='
+          echo '=== PATROL FUNCTIONS ==='
+          grep -RInE 'resetPatrolCharacterToIdle|startPatrolCharacterWalking|stopPatrolCharacterWalking|movePatrolCharacterRandomly' js | head -n 250 || true
+          echo '=== PATROL IMAGE MUTATIONS ==='
+          grep -RInE 'patrolCharacterImg|patrolCharacterWrap' js css index.html | head -n 350 || true
+          echo '=== PATROL ASSETS ==='
+          file assets/characters/patrol/* assets/characters/patrol-character.png || true
+          if command -v identify >/dev/null 2>&1; then
+            identify -verbose assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp | grep -E 'Geometry:|Alpha:|mean:|min:|max:' | head -n 30 || true
+            identify -verbose assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp | grep -E 'Geometry:|Alpha:|mean:|min:|max:' | head -n 30 || true
+            identify -verbose assets/characters/patrol-character.png | grep -E 'Geometry:|Alpha:|mean:|min:|max:' | head -n 30 || true
+          fi
+          echo '=== MANIFEST PATROL ASSETS ==='
+          grep -n 'patrol-.*front\|patrol-character' asset-manifest.json | head -n 80 || true
+          echo '=== NAV CASCADE ==='
           grep -RInE '#game-stage .*#v141DungeonNav|#game-stage #v141DungeonNav|v148-context-nav-active.*v141DungeonNav|v141-dungeon-active.*v141DungeonNav' css | head -n 400 || true
-          echo '=== BATTLE PLAYER PRESENTATION ==='
-          sed -n '25,175p' js/54-v173.51-battle-qa.js
+          echo '=== PLAYER SCALE ==='
+          grep -nA8 -B2 'battle-player.v174-cardless-unit>.v174-battle-art' js/54-v173.51-battle-qa.js | head -n 40 || true
