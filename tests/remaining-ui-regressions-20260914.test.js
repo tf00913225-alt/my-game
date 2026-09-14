@@ -31,7 +31,7 @@ assert.match(vfx,/popup\.classList\.add\("v152-top-damage"\)/);
 assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(123px,30%,138px\)/);
 assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(117px,29\.25%,132px\)/);
 assert.match(bossJs,/showDamagePopup\(node,"HP-"\+final,"hp",!!isCrit\)/);
-assert.match(fireCss,/rotate\(calc\(var\(--v143-sprite-angle,0deg\) \+ 90deg\)\)/);
+assert.match(fireCss,/rotate\(var\(--v143-sprite-angle,0deg\)\)/);
 assert.doesNotMatch(legacyNav,/function fixDungeonNavigation\(\)\{[\s\S]*?nav\.innerHTML=/);
 assert.match(legacyNav,/v148SyncDungeonShell/);
 assert.match(finalNav,/function dungeonNavMatches\(nav,abyssMapActive,abyssSelectionActive\)/);
