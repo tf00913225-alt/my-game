@@ -1,0 +1,232 @@
+name: Temporary nav owner and VFX original-size repair
+
+on:
+  push:
+    branches:
+      - fix/nav-stale-owner-vfx-original-size-20260914
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/nav-stale-owner-vfx-original-size-20260914
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Apply root-cause repair
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def write(path, text):
+              Path(path).write_text(text, encoding='utf-8')
+
+          # 1) Restore the exact pre-enlargement raster box scale.
+          p='js/39-v143-skill-animation.js'
+          s=Path(p).read_text(encoding='utf-8')
+          old='const SPRITE_SCALE_MULTIPLIER=1.5;'
+          assert old in s, 'expected current 1.5 VFX multiplier not found'
+          s=s.replace(old,'const SPRITE_SCALE_MULTIPLIER=1;',1)
+          write(p,s)
+
+          # 2) Retire V143 as a dungeon-nav markup owner. It may keep shell placement
+          #    compatibility, but the later V148 contract owns the actual five buttons.
+          p='js/38-v143-system-fixes.js'
+          s=Path(p).read_text(encoding='utf-8')
+          pattern=r'''    function fixDungeonNavigation\(\)\{.*?\n    \}\n\n\n    /\* ----- 6\. Synthesis'''
+          replacement='''    function fixDungeonNavigation(){
+              const nav=document.getElementById("v141DungeonNav");
+              const content=document.getElementById("game-content");
+              if(!nav||!content){ return; }
+              if(nav.parentElement!==content){ content.appendChild(nav); }
+              nav.dataset.v143Fixed="1";
+              const oldReturn=document.getElementById("v141DungeonReturn");
+              if(oldReturn){ oldReturn.remove(); }
+              if(typeof window.v148SyncDungeonShell==="function"){
+                  window.v148SyncDungeonShell();
+              }
+          }
+
+
+          /* ----- 6. Synthesis'''
+          s2,count=re.subn(pattern,replacement,s,count=1,flags=re.S)
+          assert count==1, f'failed to replace V143 nav owner, count={count}'
+          write(p,s2)
+
+          # 3) Make V148 validate actual semantics, not merely mode + five children.
+          p='js/42-v148-combat-dungeon-fixes.js'
+          s=Path(p).read_text(encoding='utf-8')
+          pattern=r'''    function dungeonNavMarkup\(abyssMapActive,abyssSelectionActive\)\{.*?\n    \}\n\n    function syncDungeonShell\(\)\{'''
+          replacement='''    function dungeonReturnAction(abyssMapActive,abyssSelectionActive){
+              return abyssMapActive
+                  ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")
+                  :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')");
+          }
+
+          function dungeonNavMarkup(abyssMapActive,abyssSelectionActive){
+              const buttons=[
+                  ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],
+                  ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
+                  ["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"],
+                  ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"]
+              ];
+              buttons.push(["返回","assets/ui/map-return.png",dungeonReturnAction(abyssMapActive,abyssSelectionActive)]);
+              return buttons.map(button=>
+                  '<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'">'+
+                  '<img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>'
+              ).join("");
+          }
+
+          function dungeonNavMatches(nav,abyssMapActive,abyssSelectionActive){
+              const buttons=Array.from(nav&&nav.children||[]);
+              if(buttons.length!==5){ return false; }
+              const labels=buttons.map(button=>
+                  button&&typeof button.getAttribute==="function"?button.getAttribute("aria-label"):""
+              ).join("|");
+              if(labels!=="角色|背包|秘寶|元素匣|返回"){ return false; }
+              const relicImage=buttons[2]&&typeof buttons[2].querySelector==="function"?buttons[2].querySelector("img"):null;
+              if(!relicImage||relicImage.getAttribute("src")!=="assets/ui/nav-relic-v175.webp"){ return false; }
+              const returnAction=buttons[4]&&typeof buttons[4].getAttribute==="function"?buttons[4].getAttribute("onclick"):"";
+              return returnAction===dungeonReturnAction(abyssMapActive,abyssSelectionActive);
+          }
+
+          function syncDungeonShell(){'''
+          s2,count=re.subn(pattern,replacement,s,count=1,flags=re.S)
+          assert count==1, f'failed to replace V148 nav helpers, count={count}'
+          old='''            if(nav.dataset.v148Mode!==mode||nav.children.length!==5){
+                  nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);
+                  nav.dataset.v148Mode=mode;
+              }'''
+          new='''            if(nav.dataset.v148Mode!==mode||!dungeonNavMatches(nav,abyssMapActive,abyssSelectionActive)){
+                  nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);
+                  nav.dataset.v148Mode=mode;
+              }'''
+          assert old in s2, 'expected V148 mode/count guard not found'
+          s2=s2.replace(old,new,1)
+          write(p,s2)
+
+          # 4) Align focused regression guards to the restored original VFX size and
+          #    single-owner dungeon-nav architecture.
+          p='tests/remaining-ui-regressions-20260914.test.js'
+          s=Path(p).read_text(encoding='utf-8')
+          s=s.replace('const finalNav=read("js/42-v148-combat-dungeon-fixes.js");',
+                      'const legacyNav=read("js/38-v143-system-fixes.js");\nconst finalNav=read("js/42-v148-combat-dungeon-fixes.js");',1)
+          s=s.replace('assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1\\.5;/);',
+                      'assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1;/);',1)
+          marker='assert.match(finalNav,/\\["秘寶","assets\\/ui\\/nav-relic-v175\\.webp","openHomeFeature\\(\\\'relic\\\'\\)"\\]/);'
+          assert marker in s, 'remaining-ui final nav marker not found'
+          addition='''assert.doesNotMatch(legacyNav,/function fixDungeonNavigation\\(\\)\\{[\\s\\S]*?nav\\.innerHTML=/);
+          assert.match(legacyNav,/v148SyncDungeonShell/);
+          assert.match(finalNav,/function dungeonNavMatches\\(nav,abyssMapActive,abyssSelectionActive\\)/);
+          assert.match(finalNav,/labels!=="角色\\|背包\\|秘寶\\|元素匣\\|返回"/);
+          '''
+          s=s.replace(marker,addition+marker,1)
+          write(p,s)
+
+          p='tests/v153-fire-vfx.test.js'
+          s=Path(p).read_text(encoding='utf-8')
+          replacements={
+              'assert.equal(sprites[0].style.width,"420px","mobile VFX scale is 1.5x the previous 280px box");':
+                  'assert.equal(sprites[0].style.width,"280px","VFX box is restored to the original pre-enlargement size");',
+              'assert.ok(parseFloat(sprites[0].style.width)<=330,"single-target VFX keeps the mobile 1.5x scale ceiling");':
+                  'assert.ok(parseFloat(sprites[0].style.width)<=220,"single-target VFX keeps the original scale ceiling");',
+              'assert.ok(parseFloat(node.style.width)>=180);':
+                  'assert.ok(parseFloat(node.style.width)>=120);',
+              'assert.ok(parseFloat(node.style.width)<=222);':
+                  'assert.ok(parseFloat(node.style.width)<=148);'
+          }
+          for old,new in replacements.items():
+              assert old in s, f'v153 expected text not found: {old}'
+              s=s.replace(old,new,1)
+          write(p,s)
+
+          p='tests/v143-combat-dungeon-polish.test.js'
+          s=Path(p).read_text(encoding='utf-8')
+          pattern=r'''test\("dungeon nav is in the scaled shell with exactly the five requested destinations",\(\)=>\{.*?\n\}\);'''
+          replacement='''test("V143 keeps shell compatibility but delegates dungeon destinations to the final owner",()=>{
+              const navBlock=system.slice(system.indexOf("function fixDungeonNavigation"),system.indexOf("/* ----- 6. Synthesis"));
+              assert.match(navBlock,/content\\.appendChild\\(nav\\)/);
+              assert.match(navBlock,/oldReturn\\.remove\\(\\)/);
+              assert.match(navBlock,/v148SyncDungeonShell/);
+              assert.doesNotMatch(navBlock,/nav\\.innerHTML=/);
+              assert.match(css,/grid-template-columns:repeat\\(5,minmax\\(0,1fr\\)\\)/);
+          });'''
+          s2,count=re.subn(pattern,replacement,s,count=1,flags=re.S)
+          assert count==1, f'failed to update V143 nav guard, count={count}'
+          write(p,s2)
+
+          p='tests/v148-combat-dungeon-fixes.test.js'
+          s=Path(p).read_text(encoding='utf-8')
+          pattern=r'''test\("Abyss keeps a top return while the fifth bottom-nav button goes to the city",\(\)=>\{.*?\n\}\);'''
+          replacement='''test("Abyss final nav heals stale five-button markup even when mode and count did not change",()=>{
+              let html="";
+              const staleLabels=["角色","背包","商店","元素匣","返回"];
+              const staleButtons=staleLabels.map((label,index)=>element({
+                  getAttribute:name=>name==="aria-label"?label:(name==="onclick"?(index===4?"showPage('home')":"legacy()") : ""),
+                  querySelector:()=>index===2?{getAttribute:()=>"assets/ui/home-shop-v147.png"}:null
+              }));
+              const nav=element({dataset:{v148Mode:"abyss-map"},children:staleButtons});
+              Object.defineProperty(nav,"innerHTML",{get:()=>html,set:value=>{ html=value; nav.children=[1,2,3,4,5]; }});
+              const page=element({querySelector:selector=>selector===".v141-abyss-shell"?{}:null});
+              const topReturn=element();
+              const context=baseContext({
+                  document:{
+                      readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],
+                      getElementById:id=>id==="dungeonPage"?page:id==="v141DungeonNav"?nav:id==="v146AbyssReturn"?topReturn:null
+                  }
+              });
+              context.v148SyncDungeonShell();
+              assert.equal((html.match(/<button/g)||[]).length,5);
+              assert.match(html,/aria-label="秘寶"/);
+              assert.match(html,/src="assets\\/ui\\/nav-relic-v175\\.webp"/);
+              assert.match(html,/aria-label="返回"/);
+              assert.doesNotMatch(html,/aria-label="商店"|aria-label="主城"/);
+              assert.equal(nav.dataset.v146Columns,"5");
+              assert.notEqual(topReturn.removed,true);
+              assert.match(source,/function dungeonNavMatches\\(nav,abyssMapActive,abyssSelectionActive\\)/);
+              assert.match(source,/topReturn\\.setAttribute\\("aria-label","返回上一層"\\)/);
+              assert.match(css,/data-rank="elite"[\\s\\S]*color:#ff9f43 !important/);
+              assert.match(css,/#mapPage \\.map-monster\\[data-rank="elite"\\]/);
+              assert.match(source,/card\\.dataset\\.rank=rank==="boss"\\?"boss":rank==="elite"\\?"elite":"regular"/);
+              assert.match(source,/event\\.stopImmediatePropagation\\(\\)/);
+          });'''
+          s2,count=re.subn(pattern,replacement,s,count=1,flags=re.S)
+          assert count==1, f'failed to update V148 nav regression, count={count}'
+          write(p,s2)
+          PY
+
+      - name: Build canonical production output
+        run: |
+          npm run build
+          npm run build:check
+
+      - name: Run focused regressions
+        run: |
+          node tests/v153-fire-vfx.test.js
+          node tests/v148-combat-dungeon-fixes.test.js
+          node tests/remaining-ui-regressions-20260914.test.js
+          node --check js/38-v143-system-fixes.js
+          node --check js/39-v143-skill-animation.js
+          node --check js/42-v148-combat-dungeon-fixes.js
+          git diff --check
+          ! grep -RIn --include='*.js' 'SPRITE_SCALE_MULTIPLIER=1\.5' js tests
+          ! grep -RIn --include='*.js' 'mobile VFX scale is 1.5x' tests
+
+      - name: Commit validated repair and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/temp-nav-owner-vfx-original-size.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add js/38-v143-system-fixes.js js/39-v143-skill-animation.js js/42-v148-combat-dungeon-fixes.js tests/v143-combat-dungeon-polish.test.js tests/v148-combat-dungeon-fixes.test.js tests/v153-fire-vfx.test.js tests/remaining-ui-regressions-20260914.test.js build asset-manifest.json .github/workflows/temp-nav-owner-vfx-original-size.yml
+          git diff --cached --check
+          git commit -m 'fix: restore original VFX size and enforce final dungeon nav owner'
+          git push origin HEAD:fix/nav-stale-owner-vfx-original-size-20260914
