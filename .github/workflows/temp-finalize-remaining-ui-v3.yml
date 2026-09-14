@@ -43,7 +43,6 @@ jobs:
           script=script[:mechanism_start]+'# Mechanism/browser QA patches are applied below against current source.\n\n'+script[static_start:]
           exec(compile(script,'<remaining-ui-repair>','exec'),{'__name__':'__main__'})
 
-          # Current mechanism source already has popup support; patch only damageMechanism().
           path=Path('js/gameplay-boss-tower-system.js')
           text=path.read_text(encoding='utf-8')
           function_start=text.index('    function damageMechanism(')
@@ -59,7 +58,6 @@ jobs:
           section=section.replace(needle,insertion,1)
           path.write_text(text[:function_start]+section+text[function_end:],encoding='utf-8')
 
-          # Current browser fixture: mark player 2 active and record real geometry/computed style.
           path=Path('tests/v174-cardless-battle-browser.test.js')
           text=path.read_text(encoding='utf-8')
           old='return `<div id="battlePlayerCard${index}" class="battle-player" style='
@@ -91,6 +89,12 @@ jobs:
           node tests/remaining-ui-regressions-20260914.test.js
           npm run build
           npm run build:check
+
+      - name: Install ImageMagick for existing asset QA
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          identify -version
 
       - name: Run focused runtime and mobile browser regressions
         run: |
