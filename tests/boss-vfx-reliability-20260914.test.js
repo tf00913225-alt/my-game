@@ -134,7 +134,7 @@ function config(id,targetType="single",duration=760){
     const [sprite]=spriteNodes(current);
     assert.ok(sprite,"multi-target group skill must create its shared Sprite");
     assert.equal(sprite.style.visibility,"visible");
-    assert.deepEqual(current.targetIndexes,[0,1]);
+    assert.deepEqual(Array.from(current.targetIndexes),[0,1]);
 }
 
 {

@@ -13038,8 +13038,16 @@
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);
-    requestSpriteAspect(sprite,current,node,index,target);
-    if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
+        requestSpriteAspect(sprite,current,node,index,target);
+        /* A formal cast Sprite represents the attempted skill, not only a landed hit.
+           Reveal it as soon as the official owner has a real target position.
+           Outcome confirmation still marks the node and controls hit feedback, but
+           MISS/status/custom Boss paths must not make the cast animation disappear. */
+        if(node.style.left&&node.style.top){
+            node.style.visibility="visible";
+            node.dataset.emittedVisual="true";
+        }
+        if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
     }
 
     function confirmTargetVisual(current,index){
@@ -13216,13 +13224,6 @@
         return Math.max(0,targetHitTime(current,index)-Date.now());
     }
 
-    function missDelayFor(targetSide,index){
-        const current=state.current;
-        if(!current||current.done||current.targetSide!==targetSide){ return 0; }
-        if(current.targetIndexes.indexOf(index)<0&&!current.validTargets.has(index)){ return 0; }
-        return Math.max(0,targetHitTime(current,index)-Date.now());
-    }
-
     function existingTargetDelay(targetSide,index){
         const current=state.current;
         if(!current||current.done||current.targetSide!==targetSide||!current.emitted.has(index)){ return 0; }
@@ -13281,8 +13282,10 @@
         showMissEffect=function(isPlayerTarget,index,label){
             const args=Array.prototype.slice.call(arguments);
             const targetSide=isPlayerTarget?"player":"monster";
-            const isMiss=String(label||"MISS").trim().toUpperCase()==="MISS";
-            const wait=isMiss?missDelayFor(targetSide,index):delayFor(targetSide,index,true);
+            /* MISS is still an attempted cast. Register the resolved target through
+               the same formal V143 path so late-known monster/Boss targets get
+               their real Sprite Sheet while the MISS popup keeps hit timing. */
+            const wait=delayFor(targetSide,index,true);
             const invoke=()=>{
                 const result=previous.apply(this,args);
                 const card=cardFor(targetSide,index);

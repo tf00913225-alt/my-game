@@ -373,7 +373,7 @@ test("Fire Slash plays one sheet on the selected target and reaches damage at fr
     assert.ok(damageTimer.delay>=425&&damageTimer.delay<=450);
 });
 
-test("MISS keeps the skill Sprite hidden and shows only MISS feedback",()=>{
+test("MISS still plays the formal skill Sprite and keeps MISS feedback on hit timing",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("flameSlash",760,"single"),{side:"player",actorIndex:0}
@@ -381,13 +381,14 @@ test("MISS keeps the skill Sprite hidden and shows only MISS feedback",()=>{
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
     const sprite=stage.children.find(node=>node.className.includes("v143-vfx-sprite"));
     assert.ok(sprite);
-    assert.equal(sprite.style.visibility,"hidden","unconfirmed skill VFX starts hidden");
+    assert.equal(sprite.style.visibility,"visible","a positioned cast Sprite is visible before outcome resolution");
     const before=runtime.scheduled.length;
     runtime.context.showMissEffect(false,1,"MISS");
-    assert.equal(sprite.style.visibility,"hidden","MISS must not reveal the skill VFX");
+    assert.equal(sprite.style.visibility,"visible","MISS must not suppress the attempted skill animation");
+    assert.equal(sprite.dataset.confirmedHit,"true","MISS resolves the target through the formal V143 endpoint");
     assert.equal(runtime.scheduled.length,before+1);
     runtime.scheduled[runtime.scheduled.length-1].callback();
-    assert.equal(sprite.style.visibility,"hidden","skill VFX remains hidden after MISS text appears");
+    assert.equal(sprite.style.visibility,"visible","skill VFX remains visible while MISS feedback resolves");
     assert.equal(runtime.misses.length,1);
     assert.equal(runtime.misses[0][2],"MISS");
 });
