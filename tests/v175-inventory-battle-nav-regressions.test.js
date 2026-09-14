@@ -24,7 +24,7 @@ assert.match(main,/choice\.classList\.toggle\("is-current-character",selected\)/
 
 const bossCss=read("css/gameplay-boss-tower.css");
 assert.match(bossCss,/--gameplay-boss-card-width:clamp\(118px,29%,132px\)/);
-assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(222px,58%,252px\)/);
+assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(123px,30%,138px\)/);
 assert.doesNotMatch(bossCss,/gameplay-boss-card \.damage-popup\{\s*display:none/);
 
 const vfx=read("js/39-v143-skill-animation.js");
