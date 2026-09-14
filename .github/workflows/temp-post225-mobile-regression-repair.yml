@@ -8,6 +8,9 @@ on:
 permissions:
   contents: write
 
+env:
+  REPAIR_LOG: post225-repair-test.log
+
 jobs:
   repair:
     runs-on: ubuntu-latest
@@ -39,15 +42,33 @@ jobs:
           node tests/boss-mobile-portrait-browser.test.js
       - name: Build production bundles
         run: npm run build
-      - name: Validate build and full suite
+      - name: Verify production build
+        run: npm run build:check
+      - name: Run full test suite
+        shell: bash
         run: |
-          npm run build:check
-          npm test
-          git diff --check
+          set +e
+          npm test > "$REPAIR_LOG" 2>&1
+          status=$?
+          cat "$REPAIR_LOG"
+          exit $status
+      - name: Check whitespace
+        if: success()
+        run: git diff --check
+      - name: Upload full-suite log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post225-repair-test-log-${{ github.sha }}
+          path: post225-repair-test.log
+          if-no-files-found: ignore
+          retention-days: 2
       - name: Commit repair and remove temporary tools
+        if: success()
         run: |
           rm -f .github/workflows/temp-post225-mobile-regression-repair.yml
           rm -f scripts/temp-post225-repair.py
+          rm -f post225-repair-test.log
           git diff --check
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
