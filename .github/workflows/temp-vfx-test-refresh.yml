@@ -1,0 +1,70 @@
+name: Temporary VFX test refresh
+
+on:
+  push:
+    branches:
+      - fix/inventory-battle-nav-runtime-20260914
+    paths:
+      - .github/workflows/temp-vfx-test-refresh.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/inventory-battle-nav-runtime-20260914
+          fetch-depth: 0
+      - name: Align tests with approved 3x VFX rule
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/v153-fire-vfx.test.js')
+          text=p.read_text(encoding='utf-8')
+
+          def one(old,new,label):
+              global text
+              count=text.count(old)
+              if count!=1:
+                  raise SystemExit(f'{label}: expected 1 match, got {count}')
+              text=text.replace(old,new,1)
+
+          one('    assert.equal(sprites[0].style.width,"280px");',
+              '    assert.equal(sprites[0].style.width,"840px","approved VFX scale is exactly 3x the previous 280px box");',
+              'fire rocket 3x expectation')
+          one('    assert.ok(parseFloat(sprites[0].style.width)<=220);',
+              '    assert.ok(parseFloat(sprites[0].style.width)<=660,"single-target VFX keeps the approved 3x scale ceiling");',
+              'single VFX ceiling')
+          one('        assert.ok(parseFloat(node.style.width)>=120);\n        assert.ok(parseFloat(node.style.width)<=148);',
+              '        assert.ok(parseFloat(node.style.width)>=360);\n        assert.ok(parseFloat(node.style.width)<=444);',
+              'rage 3x range')
+
+          one('    const monsterHits=[];\n    let legacyRocketCalls=0;',
+              '    const monsterHits=[];\n    const misses=[];\n    let legacyRocketCalls=0;',
+              'miss fixture array')
+          one('        showMonsterHit(){ monsterHits.push(Array.from(arguments)); },\n        applyBurnEffect',
+              '        showMonsterHit(){ monsterHits.push(Array.from(arguments)); },\n        showMissEffect(){ misses.push(Array.from(arguments)); },\n        applyBurnEffect',
+              'miss fixture function')
+          one('        context,body,cards,monsters,party,scheduled,monsterHits,\n        legacyRocketCalls:()=>legacyRocketCalls',
+              '        context,body,cards,monsters,party,scheduled,monsterHits,misses,\n        legacyRocketCalls:()=>legacyRocketCalls',
+              'miss fixture return')
+
+          marker='''test("Rage creates one cast sheet inside every affected card",()=>{'''
+          if text.count(marker)!=1:
+              raise SystemExit('MISS regression insertion marker mismatch')
+          miss_test='''test("MISS keeps the skill Sprite hidden and shows only MISS feedback",()=>{\n    const runtime=loadRuntime();\n    runtime.context.v142SkillAnimationDirector.play(\n        castConfig("flameSlash",760,"single"),{side:"player",actorIndex:0}\n    );\n    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");\n    const sprite=stage.children.find(node=>node.className.includes("v143-vfx-sprite"));\n    assert.ok(sprite);\n    assert.equal(sprite.style.visibility,"hidden","unconfirmed skill VFX starts hidden");\n    const before=runtime.scheduled.length;\n    runtime.context.showMissEffect(false,1,"MISS");\n    assert.equal(sprite.style.visibility,"hidden","MISS must not reveal the skill VFX");\n    assert.equal(runtime.scheduled.length,before+1);\n    runtime.scheduled[runtime.scheduled.length-1].callback();\n    assert.equal(sprite.style.visibility,"hidden","skill VFX remains hidden after MISS text appears");\n    assert.equal(runtime.misses.length,1);\n    assert.equal(runtime.misses[0][2],"MISS");\n});\n\n'''
+          text=text.replace(marker,miss_test+marker,1)
+          p.write_text(text,encoding='utf-8')
+          PY
+          git diff --check
+          node --check tests/v153-fire-vfx.test.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/temp-vfx-test-refresh.yml
+          git add tests/v153-fire-vfx.test.js .github/workflows/temp-vfx-test-refresh.yml
+          git commit -m "test: align VFX regressions with approved 3x scale"
+          git push origin HEAD:fix/inventory-battle-nav-runtime-20260914
