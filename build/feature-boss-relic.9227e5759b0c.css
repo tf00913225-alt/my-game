@@ -652,6 +652,12 @@
     box-sizing:border-box;
 }
 
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-hp,
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-sp{
+    width:calc(100% - 10px);
+    min-width:0;
+}
+
 #game-stage #battlePage .battle-monster.gameplay-boss-card .monster-status-badges{
     width:100%;
     justify-content:center;
