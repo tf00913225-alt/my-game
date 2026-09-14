@@ -16,6 +16,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Install ImageMagick for asset tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
       - name: Patch true owners
         run: python scripts/temp-shared-nav-vfx-battle-layout-repair.py
       - name: Focused regression tests
