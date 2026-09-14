@@ -37,7 +37,7 @@ assert.doesNotMatch(css,/map-return\.png/,
     "relic modal must use text return controls instead of the round image return icon");
 assert.match(css,/#game-stage #homeFeatureModal\.team-relic-modal \.home-feature-close-btn\{[^}]*min-width:68px!important;[^}]*font-size:15px!important;[^}]*background:linear-gradient\(180deg,#2c2419,#0f0c09\)!important;[^}]*color:#f4ead4!important/,
     "relic list return control must be a readable 15px dark-gradient text button");
-assert.match(css,/:has\(\.team-relic-detail\) \.home-feature-close-btn\{display:none!important;\}/,
+assert.match(css,/team-relic-modal\.team-relic-detail-mode \.home-feature-close-btn\{display:none!important;\}/,
     "detail mode must remove the redundant modal return control");
 assert.match(css,/\.team-relic-detail-back\{[^}]*position:absolute;[^}]*top:5px;[^}]*right:8px;[^}]*background:linear-gradient\(180deg,#2c2419,#0f0c09\);[^}]*font-size:0/,
     "detail back-to-list button must occupy the former header return position");

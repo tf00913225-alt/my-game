@@ -27,13 +27,13 @@
 }
 #creationPage .creation-showcase{
     grid-template-columns:52% 48%;
-    flex-basis:900px;
-    height:900px;
-    min-height:900px;
+    flex-basis:760px;
+    height:760px;
+    min-height:760px;
     margin-bottom:18px;
 }
 #creationPage .creation-portrait-panel{
-    min-height:900px;
+    min-height:760px;
 }
 #creationPage .creation-portrait-image{
     bottom:0;
@@ -202,23 +202,21 @@
     letter-spacing:-.45px !important;
 }
 
-/* Character creation keeps the portrait fixed while the element explanation
-   alone becomes a native vertical scroller.  The global touch owner explicitly
-   whitelists .creation-role-card; no page-local touch listener is introduced. */
+/* Character creation now fits the fixed canvas without a nested scroll layer.
+   This avoids Android/WebView black compositor tiles inside the scaled stage. */
 #creationPage .creation-choice-panel{
     min-height:0 !important;
-    overflow:hidden !important;
+    overflow:visible !important;
 }
 #creationPage .creation-role-card{
-    flex:1 1 auto !important;
-    min-height:0 !important;
-    max-height:100% !important;
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
-    touch-action:pan-y !important;
-    -webkit-overflow-scrolling:touch !important;
-    overscroll-behavior-y:contain !important;
-    scrollbar-gutter:stable !important;
+    flex:0 0 auto !important;
+    min-height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+    touch-action:auto !important;
+    -webkit-overflow-scrolling:auto !important;
+    overscroll-behavior-y:auto !important;
+    scrollbar-gutter:auto !important;
 }
 
 /* Skill rows keep only the short summary/action state.  Long progression data
@@ -270,33 +268,26 @@
     transform:none !important;
 }
 
-/* Make combat artwork visibly larger without changing the established seat,
-   HP/SP, targeting or turn geometry. Player art remains contain; monsters keep
-   their existing cover treatment but gain a larger visual bleed. */
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit > .v174-battle-art{
-    inset:-24px -20px 30px !important;
-}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit > .v174-battle-art{
-    inset:-16px !important;
-}
+/* Battle artwork sizing is owned by js/54-v173.51-battle-qa.js. */
 
-/* The formal fire-rocket sheet is authored pointing upward.  The shared travel
-   owner calculates 0deg as screen-right, so this one source needs a +90deg
-   basis correction.  Other directional skills keep their existing basis. */
-.v143-vfx-sprite.v143-vfx-sprite-active[data-travel="true"][data-skill="fireRocket"]{
-    animation:
-        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
-        v174FireRocketTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both !important;
+/* Main-city persistent utility shell: boot-visible before relic gameplay executes. */
+#game-stage .team-relic-home-tools{
+    position:absolute;left:50%;right:auto;bottom:0;z-index:5;display:grid;
+    grid-template-columns:repeat(2,80px);width:192px;gap:32px;padding:0;
+    box-sizing:border-box;transform:translateX(-50%);pointer-events:none;align-items:end;
 }
-@keyframes v174FireRocketTravel{
-    0%{opacity:0;transform:translate(-50%,-50%) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(.98)}
-    2%,24.999%,25%{opacity:1;transform:translate(-50%,-50%) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(1)}
-    58.333%,97%{
-        opacity:1;
-        transform:translate(calc(-50% + var(--v143-sprite-dx,0px)),calc(-50% + var(--v143-sprite-dy,0px))) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(1);
-    }
-    100%{
-        opacity:0;
-        transform:translate(calc(-50% + var(--v143-sprite-dx,0px)),calc(-50% + var(--v143-sprite-dy,0px))) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(1);
-    }
+#game-stage .team-relic-home-tools .home-card-utility{
+    display:grid;grid-template-columns:1fr;grid-template-rows:58px 24px;align-content:stretch;
+    justify-items:stretch;width:80px;height:84px;pointer-events:auto;position:relative;overflow:hidden;
+    border:1px solid rgba(205,154,65,.82);border-radius:11px;
+    background:linear-gradient(155deg,rgba(35,25,15,.96),rgba(8,7,5,.96));
+    box-shadow:0 4px 10px rgba(0,0,0,.52),inset 0 0 0 1px rgba(255,224,151,.06);
 }
+#game-stage .team-relic-home-tools .home-card-utility:active{transform:translateY(1px) scale(.97);filter:brightness(1.12);}
+#game-stage .team-relic-home-tools .home-card-icon{display:flex;align-items:center;justify-content:center;width:100%;height:58px;overflow:hidden;border:0;border-bottom:1px solid rgba(174,127,55,.55);border-radius:0;background-position:center;background-size:cover;background-repeat:no-repeat;}
+#game-stage .team-relic-home-tools .home-card-label{align-self:stretch;padding:2px 3px 1px;background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));font-size:13px;line-height:18px;font-weight:900;}
+#game-stage .team-relic-home-tools .home-card-icon img{width:100%;height:100%;object-fit:cover;display:block;}
+#game-stage .team-relic-home-entry .home-card-icon{background-image:url("../assets/ui/home-relic-v174.eed14e806044.webp");}
+#game-stage .team-relic-home-entry .team-relic-home-glyph{font-size:0;color:transparent;text-shadow:none;}
+#game-stage .team-element-box-home-entry .home-card-icon{background-image:url("../assets/ui/home-element-box-v174.webp");}
+#game-stage .team-element-box-home-entry .home-card-icon img{display:none;}

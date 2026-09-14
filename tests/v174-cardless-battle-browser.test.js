@@ -48,7 +48,7 @@ function enemyCard(index){
 }
 
 function playerCard(index,hp,sp){
-    return `<div id="battlePlayerCard${index}" class="battle-player" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'/%3E%3C/svg%3E&quot;)">
+    return `<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'/%3E%3C/svg%3E&quot;)">
       <div class="battle-player-icon"></div>
       <div id="battlePlayerStatus${index}" class="monster-status-badges"></div>
       <div class="hp-bar"><div id="battlePlayerHPBar${index}" class="hp-bar-inner"></div><div id="battlePlayerShieldBar${index}" class="hp-bar-shield-overlay"></div><div class="hp-bar-text">${hp}/1000</div></div>
@@ -114,6 +114,12 @@ window.__qaBefore=qaRects();
       playerSpRect:qaRect('#battlePlayerCard0 > .sp-bar'),
       playerNameRect:qaRect('#battlePlayerCard0 > .battle-player-id'),
       enemyArt:!!enemyArt,
+      enemyArtRect:qaRect('#battleMonster0 > .v174-battle-art'),
+      enemyNameRect:qaRect('#battleMonster0 > .battle-monster-name'),
+      enemyNameDisplay:getComputedStyle(enemy.querySelector('.battle-monster-name')).display,
+      activeOutlineWidth:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineWidth,
+      activeOutlineColor:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineColor,
+      activeShadow:getComputedStyle(document.getElementById('battlePlayerCard1')).boxShadow,
       playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,
       lungeAnimation:lungeAnimation,
       hitAnimation:getComputedStyle(art).animationName,
@@ -123,7 +129,10 @@ window.__qaBefore=qaRects();
       playerHp:player.querySelector('.hp-bar-text').textContent,
       playerSp:player.querySelector('.sp-bar-text').textContent,
       enemyHp:enemy.querySelector('.monster-hp .monster-bar-text').textContent,
-      enemySp:enemy.querySelector('.monster-sp .monster-bar-text').textContent
+      enemySp:enemy.querySelector('.monster-sp .monster-bar-text').textContent,
+      enemyHpRect:qaRect('#battleMonster0 > .monster-hp'),
+      enemySpRect:qaRect('#battleMonster0 > .monster-sp'),
+      enemyHpDisplay:getComputedStyle(enemy.querySelector('.monster-hp')).display
     };
     parent.document.getElementById('result').textContent=JSON.stringify(result);
   },260);
@@ -160,6 +169,12 @@ function runViewport(chrome,width,height){
     assert.ok(data.playerHpRect.bottom<=data.playerSpRect.top+1,"HP bar must sit above SP bar without portrait overlap");
     assert.ok(data.playerSpRect.bottom<=data.playerNameRect.top+1,"player name must sit below both resource bars");
     assert.equal(data.enemyArt,true);
+    assert.equal(data.enemyNameDisplay,"flex");
+    assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");
+    assert.ok(data.enemyNameRect.bottom<=data.enemyArtRect.top+1,"monster name must sit above monster artwork");
+    assert.equal(data.activeOutlineWidth,"2px");
+    assert.notEqual(data.activeOutlineColor,"rgba(0, 0, 0, 0)");
+    assert.notEqual(data.activeShadow,"none");
     assert.equal(data.playerIdle,"v174BattleIdle");
     assert.equal(data.lungeAnimation,"v174BattleLungeUp");
     assert.equal(data.hitAnimation,"v174BattleHitShake");
@@ -170,6 +185,9 @@ function runViewport(chrome,width,height){
     assert.equal(data.playerSp,"412");
     assert.equal(data.enemyHp,"1380");
     assert.equal(data.enemySp,"630");
+    assert.equal(data.enemyHpDisplay,"block");
+    assert.ok(data.enemyHpRect.height>0&&data.enemySpRect.height>0,"enemy HP/SP bars must remain visible");
+    assert.ok(data.enemyHpRect.bottom<=data.enemySpRect.top+1,"enemy HP must sit above SP");
     console.log(`V174 cardless battle browser QA ${width}x${height}:`,JSON.stringify(data));
 }
 

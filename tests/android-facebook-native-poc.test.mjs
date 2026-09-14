@@ -48,11 +48,9 @@ test("PoC cannot fall back to Web OAuth or mutate game data", () => {
         "signInWithRedirect",
         "location.assign",
         "FirebaseFirestore",
-        "FirebaseFunctions",
         "saveGame",
         "loadGame",
-        "localStorage",
-        "signInWithCustomToken"
+        "localStorage"
     ]) {
         assert.equal(activity.includes(forbidden), false, `unexpected PoC behavior: ${forbidden}`);
     }
@@ -74,9 +72,10 @@ test("documentation fixes console fields, UID comparison, and the no-auto-sessio
     assert.match(readme, /https:\/\/four-symbols-jianghu\.firebaseapp\.com\/__\/auth\/handler/);
     assert.match(readme, /開啟支援的連結」\*\*開啟\*\*/);
     assert.match(readme, /兩端 UID 必須完全相同/);
-    assert.match(readme, /不會自動/);
-    assert.match(readme, /Trusted backend one-time handoff/);
-    assert.match(readme, /不實作/);
+    assert.match(readme, /Web game handoff（本輪已實作）/);
+    assert.match(readme, /createNativeAuthHandoff/);
+    assert.match(readme, /redeemNativeAuthHandoff/);
+    assert.match(readme, /signInWithCustomToken/);
 });
 
 test("requirement batch preserves the manual Meta/Firebase and S23 verification boundary", () => {

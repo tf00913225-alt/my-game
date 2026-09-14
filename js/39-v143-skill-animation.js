@@ -17,6 +17,9 @@
     let blockedDirectorOverrides=0;
     let blockedCardEffectOverrides=0;
     const failedAssets=new Set();
+    const SPRITE_SCALE_MULTIPLIER=1;
+    const spriteFrameAspectCache=new Map();
+    const spriteFrameAspectLoading=new Set();
 
     function castSheet(src,placement,options){
         return Object.assign({
@@ -240,9 +243,24 @@
         return Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false);
     }
 
+    function visualRectForCard(card){
+        const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+        if(!rect){ return null; }
+        if(typeof card.querySelector==="function"){
+            try{
+                const art=card.querySelector(":scope > .v174-battle-art");
+                const artRect=art&&art.getBoundingClientRect?art.getBoundingClientRect():null;
+                if(artRect&&artRect.width>0&&artRect.height>0){ return artRect; }
+            }catch(_){ }
+        }
+        return rect;
+    }
+
     function cardCenter(card){
         const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-        return rect?{x:rect.left+rect.width/2,y:rect.top+rect.height/2,rect:rect}:null;
+        if(!rect){ return null; }
+        const visualRect=visualRectForCard(card)||rect;
+        return {x:visualRect.left+visualRect.width/2,y:visualRect.top+visualRect.height/2,rect:rect,visualRect:visualRect};
     }
 
     function activeCards(side,config){
@@ -304,7 +322,7 @@
     }
 
     function fieldBounds(cards){
-        const rects=cards.map(card=>card&&card.getBoundingClientRect?card.getBoundingClientRect():null)
+        const rects=cards.map(card=>visualRectForCard(card))
             .filter(rect=>rect&&rect.width&&rect.height);
         if(!rects.length){ return null; }
         const left=Math.min.apply(null,rects.map(rect=>rect.left));
@@ -312,6 +330,18 @@
         const right=Math.max.apply(null,rects.map(rect=>rect.right));
         const bottom=Math.max.apply(null,rects.map(rect=>rect.bottom));
         return {left:left,top:top,width:right-left,height:bottom-top};
+    }
+
+    function mechanismTargetBounds(current,indexes){
+        if(!current||current.targetSide!=="monster"){ return null; }
+        const cards=(indexes||[]).filter(isMechanismTarget)
+            .map(index=>cardFor("monster",index)).filter(Boolean);
+        const bounds=fieldBounds(cards);
+        if(!bounds){ return null; }
+        bounds.centerX=bounds.left+bounds.width/2;
+        bounds.centerY=bounds.top+bounds.height/2;
+        bounds.id="bossMechanismSlot";
+        return bounds;
     }
 
     function sideAreaBounds(side){
@@ -414,7 +444,7 @@
             card.appendChild(node);
         }
         const rect=card.getBoundingClientRect?card.getBoundingClientRect():null;
-        const scale=Number(spec.scale)||1.18;
+        const scale=(Number(spec.scale)||1.18)*1.28;
         const size=Math.max(96,Math.max(Number(rect&&rect.width)||0,Number(rect&&rect.height)||0)*scale);
         const cellAspect=Math.max(.1,Number(spec.cellAspect)||1);
         if(cellAspect>=1){
@@ -456,7 +486,8 @@
         if(current&&!current.done&&current.targetSide===side){
             const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
             if(types.indexOf(type)>=0){
-                registerTarget(side,index,false);
+            registerTarget(side,index,false);
+            confirmTargetVisual(current,index);
                 let tracked=current.deferredStatusTargets.get(type);
                 if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
                 tracked.add(index);
@@ -500,11 +531,51 @@
         node.dataset.skill=current.config.id||"unknown";
         node.dataset.targetSide=current.targetSide;
         node.dataset.renderer="dom-sprite";
+        node.dataset.confirmedHit="false";
+        node.style.visibility="hidden";
         state.stage.appendChild(node);
         return node;
     }
 
     function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
+
+    function frameAspectFor(sprite){
+        const key=String(sprite&&sprite.src||"");
+        const cached=key?spriteFrameAspectCache.get(key):null;
+        return Math.max(.1,Number(cached)||Number(sprite&&sprite.cellAspect)||1);
+    }
+
+    function applySpriteBox(node,width,height,sprite){
+        const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER;
+        const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER;
+        const aspect=frameAspectFor(sprite);
+        let renderWidth=boxWidth,renderHeight=boxHeight;
+        if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
+        else{ renderHeight=renderWidth/aspect; }
+        node.style.width=Math.round(renderWidth)+"px";
+        node.style.height=Math.round(renderHeight)+"px";
+        node.dataset.frameAspect=String(Number(aspect.toFixed(4)));
+    }
+
+    function requestSpriteAspect(sprite,current,node,index,target){
+        const key=String(sprite&&sprite.src||"");
+        if(!key||spriteFrameAspectCache.has(key)||spriteFrameAspectLoading.has(key)){ return; }
+        const ImageCtor=typeof window!=="undefined"&&typeof window.Image==="function"?window.Image:(typeof Image==="function"?Image:null);
+        if(!ImageCtor){ return; }
+        spriteFrameAspectLoading.add(key);
+        const image=new ImageCtor();
+        image.onload=function(){
+            spriteFrameAspectLoading.delete(key);
+            const columns=Math.max(1,Number(sprite.columns)||1);
+            const rows=Math.max(1,Number(sprite.rows)||1);
+            const cellWidth=Number(image.naturalWidth||image.width||0)/columns;
+            const cellHeight=Number(image.naturalHeight||image.height||0)/rows;
+            if(cellWidth>0&&cellHeight>0){ spriteFrameAspectCache.set(key,cellWidth/cellHeight); }
+            if(state.current===current&&!current.done){ placeSprite(current,node,index,target); }
+        };
+        image.onerror=function(){ spriteFrameAspectLoading.delete(key); };
+        image.src=key;
+    }
 
     function emittedSpriteTargets(current){
         return current.targetIndexes.filter(index=>
@@ -523,6 +594,8 @@
     }
 
     function fixedTriLayoutBounds(current,indexes){
+        const mechanismBounds=mechanismTargetBounds(current,indexes);
+        if(mechanismBounds){ return mechanismBounds; }
         if(String(current.config.targetType||"")==="allyTri"&&current.targetSide==="player"){
             const playerArea=sideAreaBounds("player");
             if(playerArea){
@@ -582,6 +655,8 @@
     }
 
     function groupLayoutBounds(current,indexes){
+        const mechanismBounds=mechanismTargetBounds(current,indexes);
+        if(mechanismBounds){ return mechanismBounds; }
         if(/tri/i.test(String(current.config.targetType||""))){ return fixedTriLayoutBounds(current,indexes); }
         if(current.targetSide==="player"){ return sideAreaBounds("player"); }
         if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
@@ -606,41 +681,48 @@
         node.dataset.placement=placement;
 
         if(placement==="single"){
+            const targetSize=Math.max(target.rect.width,target.rect.height);
+            const configuredMin=Number(sprite.minSize)||96;
+            const configuredMax=Number(sprite.maxSize)||184;
+            const minSize=Math.min(configuredMin,targetSize*1.18);
+            const maxSize=Math.max(minSize,Math.min(configuredMax,targetSize*1.68));
             const size=clamp(
-                Math.max(target.rect.width,target.rect.height)*(Number(sprite.scale)||1.8),
-                Number(sprite.minSize)||96,Number(sprite.maxSize)||184
+                targetSize*(Number(sprite.scale)||1.8),minSize,maxSize
             );
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
             node.style.left=target.x+"px";
-            node.style.top=target.y+"px";
-            node.style.width=size+"px";
-            node.style.height=size+"px";
+        node.style.top=target.y+"px";
+        applySpriteBox(node,size,size,sprite);
             return;
         }
 
         if(placement==="targetTrajectory"){
             const actor=cardCenter(current.actorCard);
             if(!actor){ return; }
+            const targetSize=Math.max(target.rect.width,target.rect.height);
+            const configuredMin=Number(sprite.minSize)||140;
+            const configuredMax=Number(sprite.maxSize)||240;
+            const minSize=Math.min(configuredMin,targetSize*1.12);
+            const maxSize=Math.max(minSize,Math.min(configuredMax,targetSize*1.56));
             const size=clamp(
-                Math.max(target.rect.width,target.rect.height)*(Number(sprite.scale)||1.7),
-                Number(sprite.minSize)||140,Number(sprite.maxSize)||240
+                targetSize*(Number(sprite.scale)||1.7),minSize,maxSize
             );
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
             node.dataset.travel="true";
             node.dataset.travelToTargets="true";
             node.style.left=actor.x+"px";
-            node.style.top=actor.y+"px";
-            node.style.width=size+"px";
-            node.style.height=size+"px";
-            node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
+        node.style.top=actor.y+"px";
+        applySpriteBox(node,size,size,sprite);
+        node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
+            node.style.setProperty("--v143-sprite-angle",Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI+"deg");
             return;
         }
 
         if(placement==="battlefield"){
-            const bounds=sideAreaBounds(current.targetSide);
+            const bounds=mechanismTargetBounds(current,emittedSpriteTargets(current))||sideAreaBounds(current.targetSide);
             if(!bounds){ return; }
             const viewportWidth=Number(window.innerWidth)||960;
             const viewportHeight=Number(window.innerHeight)||720;
@@ -659,9 +741,8 @@
             node.dataset.coverageScale=String(coverageScale);
             node.style.clipPath="none";
             node.style.left=(bounds.left+bounds.width/2)+"px";
-            node.style.top=(bounds.top+bounds.height/2)+"px";
-            node.style.width=width+"px";
-            node.style.height=height+"px";
+        node.style.top=(bounds.top+bounds.height/2)+"px";
+        applySpriteBox(node,width,height,sprite);
             return;
         }
 
@@ -677,9 +758,8 @@
         const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
         const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);
         node.dataset.targetIndexes=indexes.join(",");
-        node.style.width=size+"px";
-        node.style.height=size+"px";
-        const destination={
+    applySpriteBox(node,size,size,sprite);
+    const destination={
             x:targetBounds.left+targetBounds.width/2,
             y:targetBounds.top+targetBounds.height/2
         };
@@ -720,8 +800,26 @@
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);
+        requestSpriteAspect(sprite,current,node,index,target);
+        /* A formal cast Sprite represents the attempted skill, not only a landed hit.
+           Reveal it as soon as the official owner has a real target position.
+           Outcome confirmation still marks the node and controls hit feedback, but
+           MISS/status/custom Boss paths must not make the cast animation disappear. */
+        if(node.style.left&&node.style.top){
+            node.style.visibility="visible";
+            node.dataset.emittedVisual="true";
+        }
         if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
     }
+
+    function confirmTargetVisual(current,index){
+    if(!current||current.done||!current.model||!current.model.sprite){ return; }
+    current.confirmedTargets.add(index);
+    const placement=String(current.model.sprite.placement||"single");
+    const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
+    const node=current.spriteNodes.get(key);
+    if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
+}
 
     function targetHitTime(current,index){
         return Math.min(
@@ -806,7 +904,7 @@
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
-            spriteNodes:new Map(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
+            spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),duration:duration,hitReached:false,done:false
         };
@@ -884,6 +982,7 @@
     function delayFor(targetSide,index,allowDefeated){
         const current=registerTarget(targetSide,index,allowDefeated);
         if(!current){ return 0; }
+        confirmTargetVisual(current,index);
         return Math.max(0,targetHitTime(current,index)-Date.now());
     }
 
@@ -942,11 +1041,31 @@
 
     if(typeof showMissEffect==="function"){
         const previous=showMissEffect;
-        showMissEffect=function(isPlayerTarget,index){
-            const args=arguments;
-            const wait=delayFor(isPlayerTarget?"player":"monster",index,true);
-            if(wait>8){ setTimer(()=>previous.apply(this,args),wait); return; }
-            return previous.apply(this,args);
+        showMissEffect=function(isPlayerTarget,index,label){
+            const args=Array.prototype.slice.call(arguments);
+            const targetSide=isPlayerTarget?"player":"monster";
+            /* MISS is still an attempted cast. Register the resolved target through
+               the same formal V143 path so late-known monster/Boss targets get
+               their real Sprite Sheet while the MISS popup keeps hit timing. */
+            const wait=delayFor(targetSide,index,true);
+            const invoke=()=>{
+                const result=previous.apply(this,args);
+                const card=cardFor(targetSide,index);
+                if(card&&typeof card.querySelectorAll==="function"&&typeof document!=="undefined"&&document.body){
+                    const popups=card.querySelectorAll(":scope > .damage-popup.miss-popup");
+                    const popup=popups.length?popups[popups.length-1]:null;
+                    const rect=popup&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+                    if(popup&&rect){
+                        popup.classList.add("v152-top-damage");
+                        popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
+                        popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
+                        document.body.appendChild(popup);
+                    }
+                }
+                return result;
+            };
+            if(wait>8){ setTimer(invoke,wait); return; }
+            return invoke();
         };
     }
 

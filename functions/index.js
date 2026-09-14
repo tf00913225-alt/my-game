@@ -1,7 +1,9 @@
 "use strict";
 
+const {createHash,randomBytes}=require("node:crypto");
 const {initializeApp}=require("firebase-admin/app");
-const {FieldValue,getFirestore}=require("firebase-admin/firestore");
+const {getAuth:getAdminAuth}=require("firebase-admin/auth");
+const {FieldValue,Timestamp,getFirestore}=require("firebase-admin/firestore");
 const {setGlobalOptions}=require("firebase-functions/v2");
 const {HttpsError,onCall}=require("firebase-functions/v2/https");
 
@@ -17,6 +19,9 @@ initializeApp();
 const REGION="us-central1";
 const PUBLIC_SAVE_PATH_SEGMENTS=["saves","current"];
 const MIGRATION_RATE_LIMIT_MS=60*1000;
+const NATIVE_AUTH_HANDOFF_COLLECTION="nativeAuthHandoffs";
+const NATIVE_AUTH_HANDOFF_TTL_MS=2*60*1000;
+const NATIVE_AUTH_CODE_PATTERN=/^[A-Za-z0-9_-]{43}$/;
 
 setGlobalOptions({
     region:REGION,
@@ -53,8 +58,8 @@ function asHttpsError(error){
     if(error instanceof CloudSavePolicyError){
         return new HttpsError(error.code||"invalid-argument",error.message);
     }
-    console.error("Trusted cloud-save backend failed:",error);
-    return new HttpsError("internal","Trusted cloud-save backend failed.");
+    console.error("Trusted Firebase backend failed:",error);
+    return new HttpsError("internal","Trusted Firebase backend failed.");
 }
 
 function publicSaveRef(db,uid){
@@ -66,6 +71,93 @@ function publicSaveRef(db,uid){
 function serverUserRef(db,uid){
     return db.collection("serverUsers").doc(uid);
 }
+
+function nativeAuthCodeHash(code){
+    return createHash("sha256").update(code,"utf8").digest("hex");
+}
+
+function nativeAuthHandoffRef(db,code){
+    return db.collection(NATIVE_AUTH_HANDOFF_COLLECTION).doc(nativeAuthCodeHash(code));
+}
+
+exports.createNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
+    const uid=requireUid(request);
+    const provider=authProvider(request);
+    if(provider!=="facebook.com"){
+        throw new HttpsError(
+            "permission-denied",
+            "Native auth handoff requires a Firebase Facebook-authenticated session."
+        );
+    }
+
+    try{
+        const code=randomBytes(32).toString("base64url");
+        const db=getFirestore();
+        const now=Date.now();
+        const reference=nativeAuthHandoffRef(db,code);
+        await reference.set({
+            uid,
+            provider,
+            createdAt:Timestamp.fromMillis(now),
+            expiresAt:Timestamp.fromMillis(now+NATIVE_AUTH_HANDOFF_TTL_MS),
+            used:false
+        });
+        return {
+            ok:true,
+            code,
+            expiresInSeconds:Math.floor(NATIVE_AUTH_HANDOFF_TTL_MS/1000)
+        };
+    }catch(error){
+        throw asHttpsError(error);
+    }
+});
+
+exports.redeemNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
+    const data=request && request.data && typeof request.data==="object"
+        ? request.data
+        : {};
+    const code=String(data.code||"").trim();
+    if(!NATIVE_AUTH_CODE_PATTERN.test(code)){
+        throw new HttpsError("invalid-argument","Native auth handoff code is invalid.");
+    }
+
+    try{
+        const db=getFirestore();
+        const reference=nativeAuthHandoffRef(db,code);
+        const uid=await db.runTransaction(async(transaction)=>{
+            const snapshot=await transaction.get(reference);
+            if(!snapshot.exists){
+                throw new HttpsError("not-found","Native auth handoff is missing or already used.");
+            }
+            const expiresAt=snapshot.get("expiresAt");
+            const expiresMillis=expiresAt && typeof expiresAt.toMillis==="function"
+                ? expiresAt.toMillis()
+                : 0;
+            if(!expiresMillis || expiresMillis<Date.now()){
+                transaction.delete(reference);
+                throw new HttpsError("deadline-exceeded","Native auth handoff has expired.");
+            }
+            if(snapshot.get("used")===true){
+                transaction.delete(reference);
+                throw new HttpsError("already-exists","Native auth handoff was already used.");
+            }
+            const ownerUid=String(snapshot.get("uid")||"");
+            if(!ownerUid){
+                transaction.delete(reference);
+                throw new HttpsError("data-loss","Native auth handoff has no Firebase UID.");
+            }
+            transaction.delete(reference);
+            return ownerUid;
+        });
+
+        const customToken=await getAdminAuth().createCustomToken(uid,{
+            authBridge:"android-facebook"
+        });
+        return {ok:true,uid,customToken};
+    }catch(error){
+        throw asHttpsError(error);
+    }
+});
 
 exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
     const uid=requireUid(request);

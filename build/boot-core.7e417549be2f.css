@@ -5391,7 +5391,7 @@ button:active{
 */
 
 #skillDetailModal{
-    z-index:6060;
+    z-index:13000;
 }
 
 /* V94：技能「詳細」是技能頁內的第二層內容。
@@ -7312,9 +7312,9 @@ body.creation-fixed-active{
     z-index:1;
     display:grid;
     grid-template-columns:46% 54%;
-    flex:0 0 820px;
-    height:820px;
-    min-height:820px;
+    flex:0 0 760px;
+    height:760px;
+    min-height:760px;
     margin-bottom:24px;
     overflow:hidden;
     border:2.571px solid rgba(198,146,68,.58);
@@ -7354,9 +7354,9 @@ body.creation-fixed-active{
 #creationPage .creation-portrait-panel{
     position:relative;
     min-width:0;
-    min-height:820px;
+    min-height:760px;
     overflow:hidden;
-    background:#030303;
+    background:linear-gradient(180deg,#0c0912,#030303);
     border-right:2.571px solid rgba(211,157,73,.28);
 }
 
@@ -7784,7 +7784,7 @@ body.creation-fixed-active{
 }
 
 #creationPage .creation-step-two{
-    padding-top:34px;
+    padding-top:18px;
     box-sizing:border-box;
 }
 
@@ -8450,15 +8450,19 @@ body.creation-fixed-active{
 /* bundled source: css/51-v173.20-startup-loader.css */
 /* =====================================================
    V173.20 — 開場載入動畫
-   唯一 owner：#startupLoader（1080 × 1920 native stage）
+   唯一 owner：#startupLoader
+   Critical Boot 尚未載入 1080×1920 stage scaler，因此此層必須直接使用
+   browser viewport；不能再以 #game-stage 的 50%/50% 原點顯示原生尺寸。
 ===================================================== */
 
 #game-stage > #startupLoader{
-    position:absolute;
+    position:fixed;
     inset:0;
     z-index:2147483646;
-    width:1080px;
-    height:1920px;
+    width:100vw;
+    height:100dvh;
+    max-width:none;
+    max-height:none;
     overflow:hidden;
     background:#000;
     color:#f7e7bd;
@@ -8523,13 +8527,13 @@ body.creation-fixed-active{
 #startupLoader .startup-element-light{
     position:absolute;
     z-index:2;
-    width:390px;
-    height:390px;
+    width:clamp(120px,38vw,390px);
+    height:clamp(120px,38vw,390px);
     border-radius:50%;
     opacity:0;
     transform:translate(-50%,-50%) scale(.72);
     mix-blend-mode:screen;
-    filter:blur(8px);
+    filter:blur(clamp(3px,1vw,8px));
     pointer-events:none;
     animation:startupElementCycle 3.8s ease-in-out infinite both;
 }
@@ -8579,42 +8583,43 @@ body.creation-fixed-active{
 
 #startupLoader .startup-loading-panel{
     position:absolute;
-    left:74px;
-    right:74px;
-    bottom:82px;
+    left:50%;
+    right:auto;
+    bottom:max(18px,env(safe-area-inset-bottom));
     z-index:4;
-    min-height:242px;
-    padding:38px 44px 34px;
-    border:2px solid rgba(229,190,103,.72);
-    border-radius:14px;
-    background:linear-gradient(180deg,rgba(13,11,8,.68),rgba(3,3,3,.9));
+    width:min(calc(100% - 28px),680px);
+    min-height:0;
+    box-sizing:border-box;
+    padding:clamp(15px,4.4vw,30px) clamp(16px,5vw,34px) clamp(14px,4vw,26px);
+    border:1px solid rgba(229,190,103,.72);
+    border-radius:clamp(10px,3vw,14px);
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,rgba(13,11,8,.88),rgba(3,3,3,.96));
     box-shadow:
-        0 14px 46px rgba(0,0,0,.7),
-        inset 0 0 32px rgba(225,174,72,.08),
-        0 0 22px rgba(224,175,76,.12);
-    backdrop-filter:blur(5px);
-    -webkit-backdrop-filter:blur(5px);
+        0 12px 36px rgba(0,0,0,.72),
+        inset 0 0 26px rgba(225,174,72,.07),
+        0 0 18px rgba(224,175,76,.1);
 }
 
 #startupLoader .startup-loading-panel::before,
 #startupLoader .startup-loading-panel::after{
     content:"◆";
     position:absolute;
-    top:-20px;
+    top:-10px;
     color:#f2cc73;
-    font-size:30px;
+    font-size:clamp(14px,4vw,24px);
     line-height:1;
-    text-shadow:0 0 12px rgba(255,201,91,.75);
+    text-shadow:0 0 10px rgba(255,201,91,.75);
 }
 
-#startupLoader .startup-loading-panel::before{left:24px;}
-#startupLoader .startup-loading-panel::after{right:24px;}
+#startupLoader .startup-loading-panel::before{left:18px;}
+#startupLoader .startup-loading-panel::after{right:18px;}
 
 #startupLoader .startup-status-row{
     display:flex;
     align-items:flex-end;
     justify-content:space-between;
-    gap:28px;
+    gap:clamp(10px,3vw,22px);
 }
 
 #startupLoader .startup-status-copy{
@@ -8625,24 +8630,24 @@ body.creation-fixed-active{
 #startupLoader .startup-status-title{
     overflow:hidden;
     color:#fff4d2;
-    font-size:41px;
+    font-size:clamp(18px,5.2vw,29px);
     font-weight:900;
     line-height:1.28;
-    letter-spacing:.06em;
+    letter-spacing:.04em;
     text-overflow:ellipsis;
     white-space:nowrap;
     text-shadow:0 2px 5px #000,0 0 10px rgba(255,202,102,.25);
 }
 
 #startupLoader .startup-status-detail{
-    margin-top:10px;
+    margin-top:6px;
     overflow:hidden;
     color:rgba(224,213,187,.8);
     font-family:"Noto Sans TC",sans-serif;
-    font-size:29px;
+    font-size:clamp(11px,3.25vw,17px);
     font-weight:500;
     line-height:1.35;
-    letter-spacing:.035em;
+    letter-spacing:.02em;
     text-overflow:ellipsis;
     white-space:nowrap;
 }
@@ -8651,20 +8656,20 @@ body.creation-fixed-active{
     flex:0 0 auto;
     color:#f8d879;
     font-family:"Cinzel","Noto Serif TC",serif;
-    font-size:47px;
+    font-size:clamp(21px,6vw,34px);
     font-weight:900;
     line-height:1;
-    letter-spacing:.035em;
+    letter-spacing:.025em;
     text-shadow:0 2px 4px #000,0 0 14px rgba(255,195,67,.32);
 }
 
 #startupLoader .startup-progress-track{
     position:relative;
     width:100%;
-    height:18px;
-    margin-top:25px;
+    height:clamp(9px,2.7vw,14px);
+    margin-top:clamp(11px,3.5vw,20px);
     overflow:hidden;
-    border:2px solid rgba(223,183,92,.78);
+    border:1px solid rgba(223,183,92,.78);
     border-radius:999px;
     background:rgba(0,0,0,.64);
     box-shadow:inset 0 2px 7px rgba(0,0,0,.9),0 0 8px rgba(224,176,75,.16);
@@ -8680,12 +8685,12 @@ body.creation-fixed-active{
 }
 
 #startupLoader .startup-enter-prompt{
-    margin-top:28px;
+    margin-top:clamp(12px,3.5vw,22px);
     color:#fff0bd;
-    font-size:50px;
+    font-size:clamp(21px,6vw,34px);
     font-weight:900;
     line-height:1.25;
-    letter-spacing:.1em;
+    letter-spacing:.08em;
     text-align:center;
     text-shadow:0 3px 6px #000,0 0 15px rgba(255,210,111,.5);
     animation:startupEnterBlink 1.15s ease-in-out infinite;
@@ -8760,20 +8765,42 @@ body.creation-fixed-active{
     overflow-y:auto;
     overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
-    background:
-        radial-gradient(circle at 50% 22%,rgba(197,156,73,.12),transparent 38%),
-        linear-gradient(180deg,rgba(3,5,8,.22),rgba(3,5,8,.48));
+    background:#050506;
     font-family:"Noto Sans TC",sans-serif;
     color:#f3ead7;
+    isolation:isolate;
 }
 
 .firebase-auth-overlay.show{
     display:flex;
 }
 
+/* Keep the startup city visible without fixed+transform+backdrop-filter compositor
+   layers. Those layers produced large black tiles on Android Chrome/WebView. */
+.firebase-auth-overlay::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:url("../assets/ui/startup-main-city.d43e67af1c1c.jpg") center/cover no-repeat;
+}
+.firebase-auth-overlay::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+        linear-gradient(180deg,rgba(4,4,5,.28),rgba(4,4,5,.56) 58%,rgba(4,4,5,.82)),
+        radial-gradient(circle at 50% 38%,transparent 0 22%,rgba(0,0,0,.32) 74%,rgba(0,0,0,.62));
+}
+
 .firebase-auth-dialog{
-    width:min(92vw,420px);
-    max-height:100%;
+    position:relative;
+    z-index:1;
+    width:min(calc(100% - 20px),390px);
+    max-height:calc(100dvh - 24px);
     min-width:0;
     margin:auto;
     box-sizing:border-box;
@@ -8781,12 +8808,11 @@ body.creation-fixed-active{
     overflow-y:auto;
     overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
-    padding:clamp(14px,3.6vw,24px);
-    border:2px solid #b88a3b;
-    border-radius:clamp(14px,3.5vw,20px);
-    background:
-        linear-gradient(180deg,rgba(38,31,20,.90),rgba(10,10,12,.88) 24%,rgba(7,7,9,.90));
-    box-shadow:0 18px 56px rgba(0,0,0,.76),inset 0 0 0 1px rgba(255,224,154,.14);
+    padding:16px 18px 15px;
+    border:1px solid #b88a3b;
+    border-radius:14px;
+    background:linear-gradient(180deg,#241d13 0%,#0d0c0d 25%,#08080a 100%);
+    box-shadow:0 16px 42px rgba(0,0,0,.72),inset 0 0 0 1px rgba(255,224,154,.10);
     scrollbar-gutter:stable;
     touch-action:pan-y;
 }
@@ -8803,7 +8829,7 @@ body.creation-fixed-active{
     min-width:0;
     color:#c9a762;
     font-family:"Cinzel","Noto Serif TC",serif;
-    font-size:clamp(11px,3vw,14px);
+    font-size:clamp(10px,2.7vw,12px);
     font-weight:800;
     letter-spacing:.1em;
 }
@@ -8817,7 +8843,7 @@ body.creation-fixed-active{
     border-radius:9px;
     background:linear-gradient(180deg,#332817,#17130d);
     color:#f4e7c4;
-    font:800 clamp(13px,3.4vw,15px)/1.2 "Noto Sans TC",sans-serif;
+    font:800 clamp(12px,3.1vw,14px)/1.2 "Noto Sans TC",sans-serif;
     touch-action:manipulation;
 }
 
@@ -8828,7 +8854,7 @@ body.creation-fixed-active{
 .firebase-auth-title{
     margin:2px 0 0;
     font-family:"Noto Serif TC",serif;
-    font-size:clamp(22px,5.4vw,28px);
+    font-size:clamp(21px,5.4vw,27px);
     line-height:1.16;
     letter-spacing:.05em;
     color:#fff3cf;
@@ -8837,20 +8863,20 @@ body.creation-fixed-active{
 .firebase-auth-subtitle{
     margin:6px 0 10px;
     color:#c7bdab;
-    font-size:clamp(13px,3.45vw,15px);
-    line-height:1.42;
+    font-size:clamp(12px,3.1vw,13px);
+    line-height:1.38;
 }
 
 .firebase-auth-status{
     box-sizing:border-box;
-    min-height:44px;
+    min-height:40px;
     margin-bottom:10px;
-    padding:9px 11px;
+    padding:7px 9px;
     border:1px solid rgba(202,165,92,.42);
     border-radius:9px;
-    background:rgba(0,0,0,.30);
+    background:#09090b;
     color:#dfd4c0;
-    font-size:clamp(13px,3.4vw,15px);
+    font-size:clamp(12px,3.05vw,13px);
     line-height:1.4;
 }
 
@@ -8867,20 +8893,20 @@ body.creation-fixed-active{
 .firebase-auth-actions{
     display:grid;
     grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    gap:8px;
-    margin-bottom:10px;
+    gap:7px;
+    margin-bottom:8px;
 }
 
 .firebase-auth-button{
     min-width:0;
     min-height:44px;
     box-sizing:border-box;
-    padding:8px 10px;
+    padding:7px 9px;
     border:1px solid rgba(202,165,92,.66);
     border-radius:9px;
     background:linear-gradient(180deg,#342816,#17130d);
     color:#fff1c7;
-    font:800 clamp(13px,3.45vw,15px)/1.28 "Noto Sans TC",sans-serif;
+    font:800 clamp(12px,3.1vw,14px)/1.28 "Noto Sans TC",sans-serif;
     letter-spacing:.015em;
     box-shadow:inset 0 0 0 1px rgba(255,234,180,.10);
     touch-action:manipulation;
@@ -8904,7 +8930,7 @@ body.creation-fixed-active{
 
 .firebase-auth-support-button{
     width:100%;
-    margin-top:9px;
+    margin-top:7px;
     border-color:rgba(202,165,92,.48);
     background:linear-gradient(180deg,#2d261a,#16120d);
 }
@@ -8913,9 +8939,9 @@ body.creation-fixed-active{
     display:flex;
     align-items:center;
     gap:9px;
-    margin:7px 0 9px;
+    margin:5px 0 7px;
     color:#8f8576;
-    font-size:clamp(12px,3.15vw,14px);
+    font-size:clamp(11px,2.9vw,12px);
 }
 
 .firebase-auth-divider::before,
@@ -8928,13 +8954,13 @@ body.creation-fixed-active{
 
 .firebase-auth-field{
     display:grid;
-    gap:5px;
-    margin-bottom:8px;
+    gap:4px;
+    margin-bottom:6px;
 }
 
 .firebase-auth-field label{
     color:#d9c8a6;
-    font-size:clamp(13px,3.4vw,15px);
+    font-size:clamp(12px,3.05vw,13px);
     font-weight:700;
 }
 
@@ -8942,13 +8968,13 @@ body.creation-fixed-active{
     width:100%;
     min-height:44px;
     box-sizing:border-box;
-    padding:8px 11px;
+    padding:7px 10px;
     border:1px solid rgba(181,151,92,.40);
     border-radius:9px;
     outline:none;
     background:#0c0c0f;
     color:#f8f4ea;
-    font:500 16px/1.25 "Noto Sans TC",sans-serif;
+    font:500 15px/1.25 "Noto Sans TC",sans-serif;
 }
 
 .firebase-auth-field input:focus{
@@ -8957,10 +8983,10 @@ body.creation-fixed-active{
 }
 
 .firebase-auth-email-help{
-    margin:0 0 7px;
+    margin:0 0 5px;
     color:#b8ad9b;
-    font-size:clamp(12px,3.15vw,14px);
-    line-height:1.4;
+    font-size:clamp(11px,2.9vw,12px);
+    line-height:1.36;
 }
 
 .firebase-auth-email-actions{
@@ -8981,18 +9007,18 @@ body.creation-fixed-active{
     padding:13px;
     border:1px solid rgba(202,165,92,.38);
     border-radius:10px;
-    background:rgba(0,0,0,.28);
+    background:#09090b;
 }
 
 .firebase-auth-account-name{
     color:#fff0c5;
-    font:800 clamp(20px,5vw,26px)/1.3 "Noto Serif TC",serif;
+    font:800 clamp(18px,4.6vw,22px)/1.3 "Noto Serif TC",serif;
 }
 
 .firebase-auth-account-meta{
     margin-top:6px;
     color:#c7bdad;
-    font-size:clamp(13px,3.4vw,15px);
+    font-size:clamp(12px,3.05vw,13px);
     line-height:1.42;
 }
 
@@ -9004,32 +9030,72 @@ body.creation-fixed-active{
     border-radius:8px;
     background:#08080a;
     color:#b9d6ff;
-    font:600 clamp(12px,3.05vw,14px)/1.42 monospace;
+    font:600 clamp(11px,2.85vw,12px)/1.42 monospace;
 }
 
 .firebase-auth-cloud-state{
     margin-top:8px;
     color:#d4c9b4;
-    font-size:clamp(13px,3.4vw,15px);
+    font-size:clamp(12px,3.05vw,13px);
     line-height:1.42;
 }
 
 .firebase-auth-note{
-    margin:8px 0 0;
+    margin:6px 0 0;
     color:#9e9587;
-    font-size:clamp(12px,3.1vw,14px);
-    line-height:1.42;
+    font-size:clamp(11px,2.9vw,12px);
+    line-height:1.36;
 }
 
 .firebase-auth-footer{
     display:flex;
     gap:8px;
-    margin-top:10px;
+    margin-top:8px;
 }
 
 .firebase-auth-footer .firebase-auth-button{
     flex:1;
 }
+
+.firebase-auth-resume-panel{
+    display:grid;
+    gap:9px;
+    margin:2px 0 4px;
+    padding:18px 14px;
+    border:1px solid rgba(202,165,92,.52);
+    border-radius:11px;
+    background:linear-gradient(180deg,#1b160f,#09090b);
+    text-align:center;
+}
+.firebase-auth-resume-panel[hidden]{display:none;}
+.firebase-auth-resume-panel small{
+    color:#a89b86;
+    font-size:12px;
+    font-weight:700;
+}
+.firebase-auth-resume-panel strong{
+    color:#ffe4a4;
+    font:900 clamp(20px,5vw,25px)/1.25 "Noto Serif TC",serif;
+}
+.firebase-auth-resume-panel p{
+    margin:0;
+    color:#d8cbb4;
+    font-size:15px;
+    line-height:1.4;
+}
+.firebase-auth-resume-panel p b{
+    display:inline-grid;
+    width:32px;
+    height:32px;
+    place-items:center;
+    margin-right:3px;
+    border:1px solid rgba(224,181,92,.58);
+    border-radius:50%;
+    color:#ffd06d;
+    background:#0b0a08;
+    font-size:18px;
+}
+.firebase-auth-resume-panel .firebase-auth-button{width:100%;}
 
 /* Shared support dialog: login and the in-game system page call the same owner. */
 .support-contact-overlay{
@@ -9116,24 +9182,3 @@ body.creation-fixed-active{
         margin:0 auto;
     }
 }
-
-
-/* V174 compact auth over second startup scene */
-.firebase-auth-overlay{align-items:center;overflow:hidden;background:#050506;}
-.firebase-auth-overlay::before{content:"";position:fixed;inset:-2%;z-index:0;pointer-events:none;background:url("../assets/ui/startup-main-city.d43e67af1c1c.jpg") center/cover no-repeat;transform:scale(1.04);animation:firebaseAuthCityDrift 12s ease-out both;}
-.firebase-auth-overlay::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,4,5,.18),rgba(4,4,5,.46) 58%,rgba(4,4,5,.72)),radial-gradient(circle at 50% 38%,transparent 0 24%,rgba(0,0,0,.28) 74%,rgba(0,0,0,.55));}
-.firebase-auth-dialog{position:relative;z-index:1;width:min(calc(100% - 20px),390px);max-height:calc(100dvh - 24px);padding:16px 18px 15px;border-width:1px;border-radius:14px;background:linear-gradient(180deg,rgba(31,25,17,.86),rgba(8,8,10,.88) 24%,rgba(6,6,8,.92));box-shadow:0 16px 42px rgba(0,0,0,.62),inset 0 0 0 1px rgba(255,224,154,.10);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);}
-.firebase-auth-eyebrow{font-size:clamp(10px,2.7vw,12px);}
-.firebase-auth-title{font-size:clamp(21px,5.4vw,27px);}
-.firebase-auth-subtitle{font-size:clamp(12px,3.1vw,13px);line-height:1.38;}
-.firebase-auth-status{min-height:40px;padding:7px 9px;font-size:clamp(12px,3.05vw,13px);}
-.firebase-auth-button{min-height:44px;padding:7px 9px;font-size:clamp(12px,3.1vw,14px);}
-.firebase-auth-back-button{font-size:clamp(12px,3.1vw,14px);}
-.firebase-auth-divider{font-size:clamp(11px,2.9vw,12px);margin:5px 0 7px;}
-.firebase-auth-field{gap:4px;margin-bottom:6px;} .firebase-auth-field label{font-size:clamp(12px,3.05vw,13px);}
-.firebase-auth-field input{min-height:44px;padding:7px 10px;font-size:15px;}
-.firebase-auth-email-help,.firebase-auth-note{font-size:clamp(11px,2.9vw,12px);line-height:1.36;}
-.firebase-auth-email-help{margin-bottom:5px;} .firebase-auth-note{margin-top:6px;}
-.firebase-auth-actions{gap:7px;margin-bottom:8px;} .firebase-auth-footer{margin-top:8px;} .firebase-auth-support-button{margin-top:7px;}
-.firebase-auth-account-name{font-size:clamp(18px,4.6vw,22px);} .firebase-auth-account-meta,.firebase-auth-cloud-state{font-size:clamp(12px,3.05vw,13px);} .firebase-auth-uid{font-size:clamp(11px,2.85vw,12px);}
-@keyframes firebaseAuthCityDrift{from{transform:scale(1.055) translate3d(0,-.7%,0);filter:brightness(.90) saturate(.94);}to{transform:scale(1.015);filter:brightness(1) saturate(1);}}

@@ -399,16 +399,13 @@
         const buttons=[
             ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],
             ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
-            ["秘寶","assets/ui/nav-relic-v174.webp","openHomeFeature('relic')"],
+            ["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"],
             ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"]
         ];
-        if(!abyssMapActive){
-            buttons.push([
-                abyssSelectionActive?"返回玩法":"返回",
-                "assets/ui/map-return.png",
-                abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')"
-            ]);
-        }
+        const returnAction=abyssMapActive
+            ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")
+            :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')");
+        buttons.push(["返回","assets/ui/map-return.png",returnAction]);
         return buttons.map(button=>
             '<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'">'+
             '<img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>'
@@ -446,7 +443,7 @@
                 nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);
                 nav.dataset.v146Mode=mode;
             }
-            nav.dataset.v146Columns=abyssMapActive?"4":"5";
+            nav.dataset.v146Columns="5";
         }
         const oldReturn=document.getElementById("v141DungeonReturn");
         if(oldReturn){ oldReturn.remove(); }
@@ -488,43 +485,9 @@
         };
     }
 
-    /* ----- Main city: deduplicated HUD resources and complete party roster. ----- */
+    /* Main-city roster is first-screen UI and is owned by the eager V54 city runtime. */
     function renderHomeRoster(){
-        const page=document.getElementById("homePage");
-        const grid=page&&page.querySelector(".home-card-grid");
-        if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return; }
-        const partyIndexes=getExistingPartyIndexes().slice(0,3);
-        const hudGold=document.getElementById("homeHudGoldValue");
-        const hudExp=document.getElementById("homeHudExpValue");
-        const availableExp=typeof window.v173GetAvailableExpPool==="function"
-            ?window.v173GetAvailableExpPool(Date.now())
-            :(typeof sharedExp!=="undefined"?sharedExp:0);
-        syncHomeResourceValue(hudGold,typeof gold!=="undefined"?gold:0);
-        syncHomeResourceValue(hudExp,availableExp);
-        let roster=document.getElementById("v146HomeRoster");
-        if(!roster){
-            roster=document.createElement("section");
-            roster.id="v146HomeRoster";
-            roster.className="v146-home-roster";
-            roster.setAttribute("aria-label","冒險隊伍");
-            grid.insertAdjacentElement("afterend",roster);
-        }
-        const cards=partyIndexes.map(index=>{
-            const character=getPartyCharacterByIndex(index);
-            const stats=getPartyBattleStats(index);
-            if(!character||!stats){ return ""; }
-            const hp=Math.max(0,Math.min(numeric(stats.maxHP),numeric(character.hp)));
-            const sp=Math.max(0,Math.min(numeric(stats.maxSP),numeric(character.sp)));
-            const hpPercent=numeric(stats.maxHP)>0?hp/numeric(stats.maxHP)*100:0;
-            const spPercent=numeric(stats.maxSP)>0?sp/numeric(stats.maxSP)*100:0;
-            const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
-            return '<article class="v146-home-character" data-element="'+escapeHtml(character.element||"fire")+'">'+
-                '<div class="v146-home-avatar"><img src="'+escapeHtml(artwork)+'" alt="'+escapeHtml(character.id||"角色")+'頭像"></div>'+
-                '<div class="v146-home-character-main"><div><b>'+escapeHtml(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(numeric(character.level)||1))+'</span></div>'+
-                '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(numeric(stats.maxHP))+'</strong></div>'+
-                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(numeric(stats.maxSP))+'</strong></div></div></article>';
-        }).join("");
-        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 3</span></header>'+cards;
+        return typeof window.v54RenderHomeRoster==="function"?window.v54RenderHomeRoster():undefined;
     }
 
     /* ----- Progressive character growth guidance. ----- */

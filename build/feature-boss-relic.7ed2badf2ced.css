@@ -132,7 +132,7 @@
 }
 
 /* Gameplay activity covers use the same 16:9 production ratio as dungeon
-   covers. Combat BOSS/mechanism cards remain independent 4:3 components. */
+   covers. Combat BOSS/mechanism cards remain independent battlefield components. */
 #game-stage .gameplay-mode-card{
     position:relative;
     display:grid;
@@ -590,8 +590,8 @@
 }
 
 #game-stage #battleMonsterArea.gameplay-boss-active{
-    --gameplay-boss-card-width:clamp(148px,36.5%,160px);
-    --gameplay-mechanism-card-width:clamp(82px,20%,92px);
+    --gameplay-boss-card-width:clamp(118px,29%,132px);
+    --gameplay-mechanism-card-width:clamp(123px,30%,138px);
     margin-top:-16px;
     max-width:100%;
     overflow:visible;
@@ -612,36 +612,38 @@
 /* Only Gameplay Center BOSSes receive the portrait treatment. The selector
    deliberately mirrors the shared V143 battle namespace, then adds the live
    Gameplay-BOSS marker so these variables outrank the generic 82x106 rank rule
-   without another !important. Height is derived from the card's current 4:3 ratio. */
+   without another !important. Height is derived from the card's current 9:16 ratio. */
 #game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{
     --v143-monster-card-width:var(--gameplay-boss-card-width);
     --v143-monster-card-height:auto;
     --v143-monster-icon-width:calc(100% - 12px);
     --v143-monster-icon-height:auto;
     --v143-monster-bar-width:calc(100% - 10px);
-    aspect-ratio:4 / 3;
+    --v143-monster-bar-font-size:9.5px;
+    --v143-monster-bar-letter-spacing:-.45px;
+    aspect-ratio:9 / 16;
     box-sizing:border-box;
     align-self:start;
     overflow:hidden;
 }
 
 /* The portrait owns most of the vertical card. Background portraits and real
-   img children both fill the same crop box without distortion. */
+   img children both fit inside the card without distortion or horizontal crop. */
 #game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon{
-    aspect-ratio:3 / 1;
+    aspect-ratio:9 / 11;
     overflow:hidden;
     border-radius:8px;
-    background-position:center 18%;
+    background-position:center;
     background-repeat:no-repeat;
-    background-size:cover;
+    background-size:contain;
 }
 
 #game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon > img{
     display:block;
     width:100%;
     height:100%;
-    object-fit:cover;
-    object-position:center 18%;
+    object-fit:contain;
+    object-position:center;
 }
 
 #game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-name,
@@ -652,14 +654,28 @@
     box-sizing:border-box;
 }
 
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-hp,
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-sp{
+    width:calc(100% - 10px);
+    min-width:0;
+}
+
+/* Boss resource labels are non-wrapping overlays. Keep their rendered text
+   inside the narrower portrait bar so large HP values cannot produce hidden
+   horizontal scroll overflow on mobile. */
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-bar-text{
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:clip;
+}
+
 #game-stage #battlePage .battle-monster.gameplay-boss-card .monster-status-badges{
     width:100%;
     justify-content:center;
 }
 
 #game-stage #battlePage .battle-monster.gameplay-boss-card .damage-popup{
-    max-width:calc(100% + 40px);
-    text-align:center;
+    display:block;
 }
 
 #game-stage #battleMonsterArea{
@@ -685,9 +701,8 @@
     display:flex;
 }
 
-/* Mechanism cards are independent 9:16 battlefield components. Their real
-   flex-basis and width are both 20% of the battle area, with bounds chosen for
-   the supported portrait phones; no transform/zoom is used for sizing. */
+/* Mechanism cards are 50% larger than their original 82–92px owner size.
+   Width/flex-basis stay paired so no transform/zoom distorts targeting. */
 #game-stage #battleMonsterArea .boss-mechanism-card{
     position:relative;
     display:flex;
@@ -1028,10 +1043,10 @@
 
 /* If the physical viewport is short, both battlefield cards shrink together.
    Never solve a collision by changing only one member of the pair. */
-@media (max-height:840px){
+@media (max-height:920px){
     #game-stage #battleMonsterArea.gameplay-boss-active{
-        --gameplay-boss-card-width:clamp(138px,34%,150px);
-        --gameplay-mechanism-card-width:clamp(78px,19.5%,88px);
+        --gameplay-boss-card-width:clamp(108px,27%,122px);
+        --gameplay-mechanism-card-width:clamp(117px,29.25%,132px);
     }
 }
 
@@ -1103,8 +1118,8 @@
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-close-btn{align-items:center!important;justify-content:center!important;width:auto!important;min-width:68px!important;height:38px!important;padding:0 12px!important;font-size:15px!important;line-height:36px!important;font-weight:900!important;border:1px solid #8a6a3a!important;border-radius:7px!important;background:linear-gradient(180deg,#2c2419,#0f0c09)!important;color:#f4ead4!important;text-shadow:0 1px 2px #000!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45)!important;}
 #game-stage #homeFeatureModal.team-relic-modal #statusHelpButton,
 #game-stage #homeFeatureModal.team-relic-modal #skillPreviewHeaderButton{display:none!important;}
-#game-stage #homeFeatureModal.team-relic-modal .home-feature-close-btn:not(#statusHelpButton):not(#skillPreviewHeaderButton){display:inline-flex!important;}
-#game-stage #homeFeatureModal.team-relic-modal:has(.team-relic-detail) .home-feature-close-btn{display:none!important;}
+#game-stage #homeFeatureModal.team-relic-modal:not(.team-relic-detail-mode) .home-feature-close-btn:not(#statusHelpButton):not(#skillPreviewHeaderButton){display:inline-flex!important;}
+#game-stage #homeFeatureModal.team-relic-modal.team-relic-detail-mode .home-feature-close-btn{display:none!important;}
 #game-stage #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide #homeFeatureModalBody{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;padding:9px!important;box-sizing:border-box;}
 #game-stage .team-relic-page,#game-stage .team-relic-detail{min-height:100%;color:#e7dcc7;font-size:15px;line-height:1.5;box-sizing:border-box;}
 #game-stage .team-relic-resource-line{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;color:#b4a58c;font-size:14px;line-height:20px;}

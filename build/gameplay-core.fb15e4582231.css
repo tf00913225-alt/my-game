@@ -1071,6 +1071,17 @@
 }
 
 
+/* Skill detail icon is an icon, not a full-width repeating banner. */
+#game-stage #skillDetailModal #skillDetailIcon{
+    width:88px!important;height:88px!important;min-height:88px!important;
+    align-self:center!important;margin:0 auto 8px!important;overflow:hidden!important;
+    border-radius:12px!important;background-position:center!important;
+    background-size:contain!important;background-repeat:no-repeat!important;
+    background-color:rgba(9,8,6,.88)!important;
+}
+#game-stage #skillDetailModal #skillDetailIcon img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;}
+
+
 /* bundled source: css/24-stage-v85-inventory-inner-grid-scroll-root.css */
 /* =========================================================
    V85 — FIXED INVENTORY SHELL + INNER 102-SLOT SCROLL OWNER
@@ -3550,6 +3561,46 @@ body.quest-scroll-active,
     box-sizing:border-box;
 }
 
+/* Inventory owns every backpack item-art box, regardless of filter or lazy feature CSS. */
+#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon{
+    display:grid;
+    width:100%;
+    height:100%;
+    min-width:0;
+    min-height:0;
+    place-items:center;
+    overflow:hidden;
+    box-sizing:border-box;
+}
+#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art{
+    position:relative;
+    isolation:isolate;
+    display:grid;
+    width:100%;
+    height:100%;
+    max-width:100%;
+    max-height:100%;
+    min-width:0;
+    min-height:0;
+    margin:0;
+    padding:3px;
+    place-items:center;
+    overflow:hidden;
+    box-sizing:border-box;
+}
+#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art > img{
+    position:relative;
+    inset:auto;
+    display:block;
+    width:100%;
+    height:100%;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    object-position:center;
+    transform:none;
+}
+
 /* Inventory is the owner of equipment-card geometry. It must not depend on
    the lazy Abyss stylesheet before equipment artwork can fit its slot. */
 #game-stage #inventoryPage .v169-item-art.v169-equipment-art{
@@ -3680,6 +3731,28 @@ body.quest-scroll-active,
     flex:0 0 auto;
     max-height:240px;
     overflow:hidden;
+}
+
+#itemModal .item-modal-icon > .v169-item-art{
+    display:grid;
+    place-items:center;
+    width:min(42vw,180px);
+    height:min(42vw,180px);
+    max-width:180px;
+    max-height:180px;
+    overflow:hidden;
+    flex:0 0 auto;
+}
+
+#itemModal .item-modal-icon > .v169-item-art > img,
+#itemModal .item-modal-icon > .v169-item-art > svg{
+    display:block;
+    width:100%;
+    height:100%;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    object-position:center;
 }
 
 /* Equipment artwork used to inherit width/height:100% from .v169-item-art
@@ -4519,9 +4592,9 @@ body.quest-scroll-active,
 #game-stage #battlePage .battle-monster .monster-hp,
 #game-stage #battlePage .battle-monster .monster-sp{
     width:var(--v143-monster-bar-width,68px) !important;
-    height:13px !important;
-    min-height:13px !important;
-    flex:0 0 13px !important;
+    height:11px !important;
+    min-height:11px !important;
+    flex:0 0 11px !important;
     margin-top:1px !important;
     border-radius:4px !important;
 }
@@ -4530,12 +4603,12 @@ body.quest-scroll-active,
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
-    height:13px !important;
+    height:11px !important;
     color:#fff !important;
-    font-size:12px !important;
+    font-size:var(--v143-monster-bar-font-size,12px) !important;
     font-weight:900 !important;
-    line-height:13px !important;
-    letter-spacing:-.35px !important;
+    line-height:11px !important;
+    letter-spacing:var(--v143-monster-bar-letter-spacing,-.35px) !important;
     text-align:center !important;
     text-shadow:0 1px 2px #000,0 0 2px #000 !important;
     transform:scaleX(.94);
@@ -4684,7 +4757,7 @@ body.quest-scroll-active,
 #game-stage #battlePage .v153-status-vfx{
     position:absolute;
     left:50%;
-    top:50%;
+    top:44%;
     z-index:4;
     display:block;
     box-sizing:border-box;
@@ -4996,36 +5069,6 @@ body.quest-scroll-active,
 #game-stage #inventoryPage .v141-inventory-pager{grid-template-columns:44px minmax(62px,auto) 44px !important;}
 #game-stage #inventoryPage .v141-inventory-pager button{font-family:Arial,sans-serif !important;font-size:24px !important;line-height:29px !important;}
 
-/* Home party HUD: three equal horizontal cells, with typography sized for real phone reading. */
-#game-stage #homePage .home-version-badge{font-size:13px;line-height:17px;}
-#game-stage #homePage .v146-home-roster{
-    position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:0 0 auto;gap:4px;
-    margin:18px 10px 0;padding:5px 7px 7px;border:1px solid rgba(190,139,59,.54);border-radius:11px;color:#f4e7c8;
-    background:linear-gradient(155deg,rgba(29,19,11,.91),rgba(5,5,4,.86));box-shadow:0 5px 13px rgba(0,0,0,.46),inset 0 0 13px rgba(214,158,63,.04);
-}
-#game-stage #homePage .v146-home-roster > header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;min-height:23px;color:#f0cb70;font-size:15px;line-height:20px;letter-spacing:.04em;}
-#game-stage #homePage .v146-home-roster > header span{color:#c7ad76;font-size:13px;line-height:18px;font-weight:800;}
-#game-stage #homePage .v146-home-character{
-    display:grid;grid-template-columns:40px minmax(0,1fr);gap:5px;align-items:center;min-width:0;min-height:84px;padding:5px 4px 5px 3px;
-    border:1px solid rgba(145,107,53,.38);border-radius:8px;background:linear-gradient(90deg,rgba(29,19,12,.9),rgba(8,8,7,.82));
-    box-shadow:inset 0 0 0 1px rgba(255,222,146,.02),0 2px 5px rgba(0,0,0,.3);
-}
-#game-stage #homePage .v146-home-avatar{width:40px;height:40px;overflow:hidden;transform:none;border:1px solid rgba(220,174,86,.84);border-radius:50%;background:#090806;box-shadow:0 2px 7px rgba(0,0,0,.58);}
-#game-stage #homePage .v146-home-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 22%;}
-#game-stage #homePage .v146-home-character[data-element="fire"] .v146-home-avatar{box-shadow:0 0 8px rgba(177,64,38,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-stage #homePage .v146-home-character[data-element="water"] .v146-home-avatar{box-shadow:0 0 8px rgba(66,129,184,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-stage #homePage .v146-home-character[data-element="wind"] .v146-home-avatar{box-shadow:0 0 8px rgba(58,151,110,.3),0 2px 7px rgba(0,0,0,.58);}
-#game-stage #homePage .v146-home-character[data-element="earth"] .v146-home-avatar{box-shadow:0 0 8px rgba(186,142,63,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-stage #homePage .v146-home-character-main{display:grid;gap:4px;min-width:0;}
-#game-stage #homePage .v146-home-character-main > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:3px;min-width:0;font-size:15px;line-height:19px;}
-#game-stage #homePage .v146-home-character-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-stage #homePage .v146-home-character-main span{color:#e2c58b;font-size:13px;line-height:17px;font-weight:800;white-space:nowrap;}
-#game-stage #homePage .v146-home-resource{position:relative;height:17px;margin-inline:0;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(36,16,16,.88);}
-#game-stage #homePage .v146-home-resource.sp{background:rgba(12,23,48,.78);}
-#game-stage #homePage .v146-home-resource i{position:absolute;inset:0 auto 0 0;background:linear-gradient(#f26763,#b91e20);}
-#game-stage #homePage .v146-home-resource.sp i{background:linear-gradient(#659bff,#2455bd);}
-#game-stage #homePage .v146-home-resource strong{position:absolute;inset:0;z-index:2;color:#fff;font-size:13px;line-height:15px;text-align:center;text-shadow:0 1px 2px #000;white-space:nowrap;}
-
 #game-stage .shop-potion-purchase-row{display:grid !important;grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;gap:5px !important;align-items:center !important;}
 #game-stage .v146-shop-total{min-width:0;color:#f3cf79;font-size:13px;line-height:17px;font-weight:900;text-align:right;white-space:nowrap;}
 
@@ -5202,6 +5245,9 @@ body.quest-scroll-active,
 #game-stage #mapPage .map-follower-level{font-size:13px!important;line-height:17px!important;}
 #game-stage #homeFeatureModal [onclick*="selectCharacterForTabs"]>div[style*="font-size:11px"],#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:11px"]{font-size:15px!important;line-height:19px!important;}
 #game-stage #homeFeatureModal [id^="characterAvatarLevel"],#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:10px"]{font-size:14px!important;line-height:18px!important;}
+#game-stage #homeFeatureModal .character-showcase-choice{position:relative;padding:5px 3px 4px;border:2px solid transparent;border-radius:12px;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+#game-stage #homeFeatureModal .character-showcase-choice.is-current-character{border-color:#ffe08a;background:linear-gradient(180deg,rgba(158,104,24,.35),rgba(18,12,7,.16));box-shadow:0 0 0 2px rgba(255,186,58,.22),0 0 15px rgba(255,166,32,.48);}
+#game-stage #homeFeatureModal .character-showcase-avatar.is-current-character{border-color:#fff0ab!important;box-shadow:0 0 0 3px rgba(255,176,42,.55),0 0 16px rgba(255,130,28,.9)!important;}
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody>div:first-child{font-size:15px!important;line-height:1.7!important;}
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody div[style*="font-size:11px"]{font-size:14px!important;line-height:1.55!important;}
 #game-stage .v132-dungeon-list>div[style*="font-size:11px"]{font-size:14px!important;line-height:1.5!important;}
@@ -5234,21 +5280,6 @@ body.quest-scroll-active,
 }
 @media (prefers-reduced-motion:reduce){
     .v146-area-impact,.v146-status-popup,#game-stage .v141-abyss-map.v146-too-far,.v173-exp-charge-float{animation-duration:.01ms !important;animation-iteration-count:1 !important;}
-}
-
-/* Keep the complete three-character roster plus relic loadout above the fixed
-   bottom navigation on short phone viewports. */
-@media (max-height:920px){
-    #game-stage #homePage .v146-home-roster{
-        gap:2px;
-        margin-top:4px;
-        padding:4px 7px;
-    }
-    #game-stage #homePage .v146-home-character{
-        min-height:78px;
-        padding-top:3px;
-        padding-bottom:3px;
-    }
 }
 
 
@@ -6243,9 +6274,13 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     overflow:visible;
 }
 
+/* Active mode must remain a single compact status row beside the stop action.
+   Keep the helper readable but deterministic across Chrome font metrics. */
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active .auto-premium-status-copy small{
-    white-space:normal;
-    overflow:visible;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 /*

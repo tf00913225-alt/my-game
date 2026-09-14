@@ -18,6 +18,7 @@ const baseCss=fs.readFileSync("css/00-main.css","utf8");
 const questCss=fs.readFileSync("css/25-stage-v90-quest-interface-core.css","utf8");
 const creationCss=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");
 const homeCss=fs.readFileSync("css/42-v146-system-polish.css","utf8");
+const homeRosterCss=fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8");
 const abyssCss=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
 const core=fs.readFileSync("js/00-main.js","utf8");
 
@@ -44,7 +45,9 @@ assert.match(core,/pendingElementBoxNotices/);
 assert.match(abyss,/v17342-abyss-battle-info/);
 assert.match(abyssCss,/aspect-ratio:9\/16/);
 assert.match(v141,/hasExpLevelUp/);
-assert.doesNotMatch(index,/home-utility-actions/);
+assert.match(index,/home-utility-actions team-relic-home-tools/);
+assert.match(index,/team-relic-home-entry[^>]*data-feature="relic"/);
+assert.match(index,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
 assert.match(baseCss,/grid-template-rows:repeat\(4,82px\)/);
 assert.match(v131,/V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3/);
 assert.match(v131,/V17342_GLOBAL_GOLD_REWARD_MULTIPLIER=5/);
@@ -148,12 +151,13 @@ assert.match(waterRules,/FROSTBITE_REMAINING_RATE=\.75/);
 assert.match(waterRules,/previousTryMonsterSpecialAction/);
 assert.match(waterRules,/frostbitePenaltyPercent:25/);
 
-assert.match(dungeonPolish,/\["主城","assets\/ui\/nav-home\.png","showPage\('home'\)"\]/);
-assert.doesNotMatch(dungeonPolish,/\["返回","assets\/ui\/map-return\.png"/);
+assert.match(dungeonPolish,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","openHomeFeature\('relic'\)"\]/);
+assert.match(dungeonPolish,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);
+assert.match(dungeonPolish,/\["返回","assets\/ui\/map-return\.png"/);
 assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
 assert.match(dungeonPolish,/nav\.dataset\.v146Columns="5"/);
 
-assert.match(homeCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:32px/);
 assert.match(questCss,/quest-milestone\.reached:not\(\.claimed\) \.quest-milestone-slot::after/);
 assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !important/);

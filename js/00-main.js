@@ -22474,14 +22474,6 @@ function renderBattle(){
                 ${icon}
             </div>
 
-            <div class="battle-monster-name">
-                ${monster.name}
-            </div>
-
-            <div class="battle-monster-level">
-                Lv.${monster.level}
-            </div>
-
             <div
                 id="battleMonsterStatus${index}"
                 class="monster-status-badges"
@@ -22513,6 +22505,14 @@ function renderBattle(){
                     class="monster-bar-text"
                 ></div>
 
+            </div>
+
+            <div class="battle-monster-name">
+                ${monster.name}
+            </div>
+
+            <div class="battle-monster-level">
+                Lv.${monster.level}
             </div>
             `;
 
@@ -25931,15 +25931,11 @@ function selectCharacterForTabs(targetIndex){
 
 
             if(avatarEl){
-
-                avatarEl.style.opacity=
-
-                    i===targetIndex
-                    ?
-                    "1"
-                    :
-                    ".5";
-
+                const selected=i===targetIndex;
+                avatarEl.style.opacity=selected ? "1" : ".5";
+                avatarEl.classList.toggle("is-current-character",selected);
+                const choice=avatarEl.closest(".character-showcase-choice");
+                if(choice){ choice.classList.toggle("is-current-character",selected); }
             }
 
         }
@@ -26279,14 +26275,14 @@ function renderCharacterShowcaseContent(){
             if(character){
                 html+=
 
-                    '<div style="width:86px;text-align:center;'+
+                    '<div class="character-showcase-choice" style="width:86px;text-align:center;'+
                     'cursor:pointer;" onclick="selectCharacterForTabs('+
                     slotIndex+
                     ');">'+
 
                     '<div id="characterAvatar'+
                     slotIndex+
-                    '" style="width:56px;height:56px;margin:0 auto;'+
+                    '" class="character-showcase-avatar" style="width:56px;height:56px;margin:0 auto;'+
                     'border-radius:50%;background-color:#15100a;background-image:url(\''+
                     getCharacterArtworkPath(character)+
                     '\');background-size:cover;background-position:center 18%;'+
@@ -27759,7 +27755,7 @@ function renderSystemContent(){
             '</div>'+
             '<div class="system-panel-row">'+
                 '<div><strong>帳號管理</strong><small>查看目前 Firebase UID、登出或切換帳號。</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">開啟帳號</button>'+
+                '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">切換帳號／綁定帳號</button>'+
             '</div>'+
             '<div class="system-panel-row">'+
                 '<div><strong>客服信箱</strong><small>查看《四象江湖傳》客服聯絡方式。</small></div>'+

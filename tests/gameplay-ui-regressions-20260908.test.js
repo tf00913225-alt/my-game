@@ -61,9 +61,9 @@ assert.match(compactModalCss,/#homeFeatureModal:has\(#restButton\) #homeFeatureM
 assert.match(compactModalCss,/#homeFeatureModal:has\(#homeFeatureModalBody > \.system-panel\) #homeFeatureModalBody\{[\s\S]*?max-height:calc\(100% - 62px\) !important;[\s\S]*?overflow-y:auto !important;/);
 
 /* Dungeon navigation uses the formal relic entry instead of the old shop slot. */
-assert.match(dungeonNav,/\["秘寶","assets\/ui\/nav-relic-v174\.webp","openHomeFeature\('relic'\)"\]/);
+assert.match(dungeonNav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","openHomeFeature\('relic'\)"\]/);
 assert.ok(fs.existsSync("assets/ui/home-relic-v174.webp"));
 assert.ok(fs.existsSync("assets/ui/home-element-box-v174.webp"));
-assert.ok(fs.existsSync("assets/ui/nav-relic-v174.webp"));
+assert.ok(fs.existsSync("assets/ui/nav-relic-v175.webp"));
 
 console.log("✓ 2026-09-08 gameplay/UI regression guards");

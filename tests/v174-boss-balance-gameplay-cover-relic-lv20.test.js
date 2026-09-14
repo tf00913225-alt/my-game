@@ -141,9 +141,9 @@ function relicContext(level){
 }
 
 /* Requirement 2: activity cover art uses 16:9 while battlefield Boss and
-   mechanism cards retain the newer dev-approved 4:3 combat geometry. */
+   BOSS card retains 9:16 while the mechanism card uses the requested 4:3 combat geometry. */
 assert.match(gameplayCss,/\.gameplay-mode-card\{[\s\S]*?aspect-ratio:16\s*\/\s*9;/);
-assert.match(gameplayCss,/gameplay-boss-card\[data-rank="boss"\]\{[^}]*aspect-ratio:4\s*\/\s*3;/);
+assert.match(gameplayCss,/gameplay-boss-card\[data-rank="boss"\]\{[^}]*aspect-ratio:9\s*\/\s*16;/);
 assert.match(gameplayCss,/\.boss-mechanism-card\{[^}]*aspect-ratio:4\s*\/\s*3;/);
 
 /* Requirement 3: all-element preview explicitly distinguishes advantage from

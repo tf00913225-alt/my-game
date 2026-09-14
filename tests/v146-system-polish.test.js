@@ -12,6 +12,7 @@ const fixes=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
 const rules=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const source=fs.readFileSync("js/41-v146-system-polish.js","utf8");
+const eagerSource=fs.readFileSync("js/16-stage-v54-main-city-runtime.js","utf8");
 const css=fs.readFileSync("css/42-v146-system-polish.css","utf8");
 
 let passed=0;
@@ -180,22 +181,22 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.match(ui,/←/); assert.match(ui,/→/);
     assert.match(ui,/\},2700\)/);
     assert.match(css,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
-    assert.match(source,/v146-home-roster/);
+    assert.match(eagerSource,/v146-home-roster/);
     assert.match(source,/root\.querySelectorAll\("\.v141-blueprint-series"\).*remove/);
-    assert.match(source,/abyssSelectionActive\?"返回玩法":"返回"/);
+    assert.ok(source.includes('buttons.push(["返回","assets/ui/map-return.png",returnAction]);'));
     assert.match(source,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\('home'\)"/);
     assert.match(css,/#v141DungeonNav\[data-v146-columns="4"\]/);
     assert.match(css,/\.v146-abyss-return/);
     assert.match(rules,/"戰鬥失敗"/);
     assert.match(index,/assets\/ui\/home-shop\.png/);
-    /* V147 shop art remains the home/shop asset, but the dungeon fourth nav
-       slot was intentionally replaced by the formal V174 relic entry. */
-    assert.match(fixes,/assets\/ui\/home-shop-v147\.png/);
-    assert.match(source,/\["秘寶","assets\/ui\/nav-relic-v174\.webp","openHomeFeature\('relic'\)"\]/);
+    /* The dungeon utility slot is now the requested 元素匣 entry; 秘寶 remains
+       the third slot and uses the transparent V175 WebP asset. */
+    assert.match(source,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","openHomeFeature\('relic'\)"\]/);
+    assert.match(source,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);
     const shopIcon=fs.readFileSync("assets/ui/home-shop-v147.png");
     assert.equal(shopIcon.subarray(1,4).toString(),"PNG");
     assert.equal(shopIcon[25],6,"shop icon must retain an RGBA alpha channel");
-    const relicIcon=fs.readFileSync("assets/ui/nav-relic-v174.webp");
+    const relicIcon=fs.readFileSync("assets/ui/nav-relic-v175.webp");
     assert.ok(relicIcon.length>16,"relic nav icon must exist as a non-empty WebP asset");
 });
 

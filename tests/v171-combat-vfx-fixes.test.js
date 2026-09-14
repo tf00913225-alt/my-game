@@ -50,12 +50,11 @@ test("Water trajectories use resolved actor-target geometry before raster activa
 test("Ice Arrow Rain uses one centered full-field raster sheet without tiles",()=>{
     const battlefield=animation.match(/if\(placement==="battlefield"\)\{[\s\S]*?\n\s*return;\n\s*\}/);
     assert.ok(battlefield);
-    assert.match(battlefield[0],/const bounds=sideAreaBounds\(current\.targetSide\)/);
+    assert.match(battlefield[0],/const bounds=mechanismTargetBounds\(current,emittedSpriteTargets\(current\)\)\|\|sideAreaBounds\(current\.targetSide\)/);
     assert.match(battlefield[0],/const coverageScale=clamp\(Number\(sprite\.coverageScale\)\|\|Number\(sprite\.scale\)\|\|1,1,1\.4\)/);
     assert.match(battlefield[0],/Math\.round\(bounds\.width\*coverageScale\)/);
     assert.match(battlefield[0],/Math\.round\(bounds\.height\*coverageScale\)/);
-    assert.match(battlefield[0],/node\.style\.width=width\+"px"/);
-    assert.match(battlefield[0],/node\.style\.height=height\+"px"/);
+    assert.match(battlefield[0],/applySpriteBox\(node,width,height,sprite\)/);
     assert.match(battlefield[0],/node\.style\.left=\(bounds\.left\+bounds\.width\/2\)\+"px"/);
     assert.match(battlefield[0],/node\.style\.top=\(bounds\.top\+bounds\.height\/2\)\+"px"/);
     assert.match(battlefield[0],/node\.style\.clipPath="none"/);

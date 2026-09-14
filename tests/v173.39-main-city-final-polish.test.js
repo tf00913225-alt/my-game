@@ -2,7 +2,7 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const read=p=>fs.readFileSync(p,"utf8");
-const base=read("css/00-main.css"),index=read("index.html"),roster=read("css/42-v146-system-polish.css"),runtime=read("js/41-v146-system-polish.js");
+const base=read("css/00-main.css"),index=read("index.html"),roster=read("css/19-stage-v54-main-city-moderate-native-scale.css"),runtime=read("js/16-stage-v54-main-city-runtime.js");
 let passed=0;function test(n,f){f();passed++;console.log("✓ "+n);}
 test("HUD uses the requested logical typography without growing its shell",()=>{
  assert.match(base,/\.home-city-hud\{[\s\S]*?min-height:48px;/);

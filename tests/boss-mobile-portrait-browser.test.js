@@ -188,19 +188,20 @@ function runViewport(chrome,width,height){
     const data=JSON.parse(decode(match[1]));
     console.log(`Boss portrait browser geometry ${width}x${height}:`,JSON.stringify(data));
 
-    const ratio=3/4;
+    const bossRatio=16/9;
+    const mechanismRatio=3/4;
     assert.equal(data.viewport.width,width,`Iframe viewport width drifted at ${width}x${height}`);
     assert.equal(data.viewport.height,height,`Iframe viewport height drifted at ${width}x${height}`);
-    assert.ok(data.bossBattleWidthShare>=.33&&data.bossBattleWidthShare<=.46,`Boss battle width share ${data.bossBattleWidthShare} is outside 33%-46% at ${width}x${height}`);
-    assert.ok(data.mechanismBattleWidthShare>=.19&&data.mechanismBattleWidthShare<=.26,`Mechanism battle width share ${data.mechanismBattleWidthShare} is outside 19%-26% at ${width}x${height}`);
-    assert.ok(Math.abs(data.bossRatio-ratio)<.025,`Boss is not 4:3 at ${width}x${height}: ${data.bossRatio}`);
-    assert.ok(Math.abs(data.mechanismRatio-ratio)<.025,`Mechanism card is not 4:3 at ${width}x${height}: ${data.mechanismRatio}`);
-    assert.equal(data.bossComputed.aspectRatio,"4 / 3");
+    assert.ok(data.bossBattleWidthShare>=.25&&data.bossBattleWidthShare<=.31,`Boss battle width share ${data.bossBattleWidthShare} is outside 25%-31% at ${width}x${height}`);
+    assert.ok(data.mechanismBattleWidthShare>=.28&&data.mechanismBattleWidthShare<=.32,`Mechanism battle width share ${data.mechanismBattleWidthShare} is outside 28%-32% at ${width}x${height}`);
+    assert.ok(Math.abs(data.bossRatio-bossRatio)<.025,`Boss is not 9:16 at ${width}x${height}: ${data.bossRatio}`);
+    assert.ok(Math.abs(data.mechanismRatio-mechanismRatio)<.025,`Mechanism card is not 4:3 at ${width}x${height}: ${data.mechanismRatio}`);
+    assert.equal(data.bossComputed.aspectRatio,"9 / 16");
     assert.equal(data.mechanismComputed.aspectRatio,"4 / 3");
     assert.equal(data.textOverflow,false,`Boss name overflows at ${width}x${height}`);
     assert.equal(data.hpOverflow,false,`Boss HP bar overflows at ${width}x${height}`);
     assert.equal(data.spOverflow,false,`Boss SP bar overflows at ${width}x${height}`);
-    assert.equal(data.mechanismOverflow,false,`Mechanism content overflows its 9:16 card at ${width}x${height}`);
+    assert.equal(data.mechanismOverflow,false,`Mechanism content overflows its 4:3 card at ${width}x${height}`);
     assert.equal(data.pageHorizontalOverflow,false,`Battle page overflows horizontally at ${width}x${height}`);
     assert.equal(data.wrapHorizontalOverflow,false,`Battle wrap overflows horizontally at ${width}x${height}`);
     assert.equal(data.bossBeforeMechanism,true,`Mechanism card is not below the Boss at ${width}x${height}`);

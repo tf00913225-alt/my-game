@@ -145,6 +145,7 @@ function loadRuntime(options={}){
     let timerId=0;
     const scheduled=[];
     const monsterHits=[];
+    const misses=[];
     let legacyRocketCalls=0;
     const context={
         window:null,console,Promise,Date,Math,Number,Object,Array,Set,Map,
@@ -157,6 +158,7 @@ function loadRuntime(options={}){
         },
         clearTimeout(){},
         showMonsterHit(){ monsterHits.push(Array.from(arguments)); },
+        showMissEffect(){ misses.push(Array.from(arguments)); },
         applyBurnEffect(entity,duration,percent){
             entity.statusEffects=Array.isArray(entity.statusEffects)?entity.statusEffects:[];
             const existing=entity.statusEffects.find(effect=>effect&&effect.type==="burn");
@@ -193,7 +195,7 @@ function loadRuntime(options={}){
     vm.createContext(context);
     vm.runInContext(animation,context);
     return {
-        context,body,cards,monsters,party,scheduled,monsterHits,
+        context,body,cards,monsters,party,scheduled,monsterHits,misses,
         legacyRocketCalls:()=>legacyRocketCalls
     };
 }
@@ -330,7 +332,7 @@ test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main
     assert.equal(sprites[0].style["--v143-sprite-dy"],"-258px");
     assert.notEqual(sprites[0].style["--v143-sprite-angle"],"0deg");
     assert.equal(sprites[0].style.width,sprites[0].style.height);
-    assert.equal(sprites[0].style.width,"280px");
+    assert.equal(sprites[0].style.width,"280px","VFX box is restored to the original pre-enlargement size");
     assert.equal(runtime.legacyRocketCalls(),0);
 });
 
@@ -361,7 +363,7 @@ test("Fire Slash plays one sheet on the selected target and reaches damage at fr
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.placement,"single");
     assert.equal(sprites[0].dataset.targetIndex,"1");
-    assert.ok(parseFloat(sprites[0].style.width)<=220);
+    assert.ok(parseFloat(sprites[0].style.width)<=220,"single-target VFX keeps the original scale ceiling");
     assert.equal(stage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     const before=runtime.scheduled.length;
     runtime.context.showMonsterHit(1,17,"hp",false);
@@ -369,6 +371,26 @@ test("Fire Slash plays one sheet on the selected target and reaches damage at fr
     assert.equal(runtime.scheduled.length,before+1);
     const damageTimer=runtime.scheduled[runtime.scheduled.length-1];
     assert.ok(damageTimer.delay>=425&&damageTimer.delay<=450);
+});
+
+test("MISS still plays the formal skill Sprite and keeps MISS feedback on hit timing",()=>{
+    const runtime=loadRuntime();
+    runtime.context.v142SkillAnimationDirector.play(
+        castConfig("flameSlash",760,"single"),{side:"player",actorIndex:0}
+    );
+    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    const sprite=stage.children.find(node=>node.className.includes("v143-vfx-sprite"));
+    assert.ok(sprite);
+    assert.equal(sprite.style.visibility,"visible","a positioned cast Sprite is visible before outcome resolution");
+    const before=runtime.scheduled.length;
+    runtime.context.showMissEffect(false,1,"MISS");
+    assert.equal(sprite.style.visibility,"visible","MISS must not suppress the attempted skill animation");
+    assert.equal(sprite.dataset.confirmedHit,"true","MISS resolves the target through the formal V143 endpoint");
+    assert.equal(runtime.scheduled.length,before+1);
+    runtime.scheduled[runtime.scheduled.length-1].callback();
+    assert.equal(sprite.style.visibility,"visible","skill VFX remains visible while MISS feedback resolves");
+    assert.equal(runtime.misses.length,1);
+    assert.equal(runtime.misses[0][2],"MISS");
 });
 
 test("Rage creates one cast sheet inside every affected card",()=>{

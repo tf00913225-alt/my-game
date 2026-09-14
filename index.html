@@ -38,7 +38,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.54057d3bf209.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.7e417549be2f.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -835,6 +835,15 @@
         </button>
     </div>
 
+    <div class="home-utility-actions team-relic-home-tools" aria-label="主城常駐功能">
+        <button type="button" class="home-card home-card-utility team-relic-home-entry" data-feature="relic" onclick="openHomeFeature('relic')" aria-label="秘寶">
+            <span class="home-card-icon team-relic-home-glyph">寶</span><span class="home-card-label">秘寶</span>
+        </button>
+        <button type="button" class="home-card home-card-utility team-element-box-home-entry" data-feature="gameplay-core" onclick="openHomeFeature('autoBattleSettings')" aria-label="元素匣">
+            <span class="home-card-icon"><img src="assets/ui/nav-element-box.png" alt="" draggable="false" loading="lazy" decoding="async"></span><span class="home-card-label">元素匣</span>
+        </button>
+    </div>
+
 </div>
 
 <div
@@ -1141,7 +1150,6 @@
             <small>特殊戰鬥總覽</small>
             <h2 id="gameplayPageTitle">玩 法</h2>
         </div>
-        <button type="button" class="gameplay-back-button v174-gameplay-home-back" onclick="showPage('home')" aria-label="返回主城">返回</button>
     </header>
 
     <div
@@ -2426,20 +2434,25 @@
 
 <button
     class="nav-button nav-art-button-wrap"
-    onclick="openHomeFeature('quest')"
-    aria-label="任務"
+    onclick="openHomeFeature('relic')"
+    aria-label="秘寶"
 >
-<img class="nav-art-button" src="assets/ui/nav-quest.png" alt="" aria-hidden="true" loading="eager" decoding="async">
-<span class="nav-sr-only">任務</span>
+<img class="nav-art-button" src="assets/ui/nav-relic-v175.webp" alt="" aria-hidden="true" loading="eager" decoding="async">
+<span class="nav-sr-only">秘寶</span>
 </button>
 
 <button
     class="nav-button nav-art-button-wrap"
     onclick="openHomeFeature('autoBattleSettings')"
-    aria-label="元素匣／自動戰鬥設定"
+    aria-label="元素匣"
 >
 <img class="nav-art-button" src="assets/ui/nav-element-box.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">元素匣／自動戰鬥設定</span>
+</button>
+
+<button class="nav-button nav-art-button-wrap" onclick="leaveMap()" aria-label="返回">
+<img class="nav-art-button" src="assets/ui/map-return.png" alt="" aria-hidden="true" loading="eager" decoding="async">
+<span class="nav-sr-only">返回</span>
 </button>
 
 </div>
@@ -2801,7 +2814,7 @@
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
 <!-- build:critical-script -->
-<script id="boot-core-runtime" src="build/boot-core.fd083af1353a.js"></script>
+<script id="boot-core-runtime" src="build/boot-core.c60fd6f40514.js"></script>
 <!-- /build:critical-script -->
 </body>
 </html>

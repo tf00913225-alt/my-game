@@ -8,8 +8,8 @@ const index=read("index.html");
 const baseCss=read("css/00-main.css");
 const v54Css=read("css/19-stage-v54-main-city-moderate-native-scale.css");
 const v54Runtime=read("js/16-stage-v54-main-city-runtime.js");
-const rosterCss=read("css/42-v146-system-polish.css");
-const rosterRuntime=read("js/41-v146-system-polish.js");
+const rosterCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");
+const rosterRuntime=read("js/16-stage-v54-main-city-runtime.js");
 const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
 
 const actionStart=index.indexOf('<div class="home-card-grid"');
@@ -57,11 +57,13 @@ test("eight secondary entrances form two substantial vertical button rails",()=>
     assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
 });
 
-test("offline experience and system join the existing side rails",()=>{
+test("offline/system stay on the side rails while relic and element box are persistent shell utilities",()=>{
     assert.equal(count(actions,/openHomeFeature\('offlineExp'\)/g),1);
     assert.equal(count(actions,/openHomeFeature\('system'\)/g),1);
-    assert.equal(count(actions,/class="home-card home-card-utility"/g),0);
-    assert.doesNotMatch(actions,/home-utility-actions/);
+    assert.equal(count(actions,/class="home-card home-card-utility/g),2);
+    assert.match(actions,/home-utility-actions team-relic-home-tools/);
+    assert.match(actions,/team-relic-home-entry[^>]*data-feature="relic"/);
+    assert.match(actions,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
     assert.match(actions,/homeIconOfflineExp/);
     assert.match(actions,/homeIconSystem/);
 });
@@ -72,7 +74,7 @@ test("all ten existing entry IDs and click contracts remain intact",()=>{
         assert.equal(count(actions,new RegExp('id="homeIcon'+id+'"','g')),1);
         assert.equal(count(actions,new RegExp("openHomeFeature\\('"+type+"'\\)",'g')),1);
     });
-    assert.equal(count(actions,/<button type="button" class="home-card /g),10);
+    assert.equal(count(actions,/<button type="button" class="home-card /g),12);
 });
 
 test("DEV gold and EXP shortcuts remain direct but visually recessive",()=>{
@@ -109,11 +111,11 @@ test("the roster renderer keeps all character details only in the adventure part
 });
 
 test("gold and EXP share one compact formatter without ellipsis",()=>{
-    const numericSource=rosterRuntime.match(/function numeric\(value\)\{[\s\S]*?\n    \}/)[0];
-    const formatterSource=rosterRuntime.match(/function formatHomeResourceValue\(value\)\{[\s\S]*?\n    \}/)[0];
-    const formatValues=Function(numericSource+"\n"+formatterSource+"\nreturn [formatHomeResourceValue(12485243),formatHomeResourceValue(104852430),formatHomeResourceValue(1248524300)];");
+    const numericSource=rosterRuntime.match(/function rosterNumber\(value\)\{[\s\S]*?\n    \}/)[0];
+    const formatterSource=rosterRuntime.match(/function rosterResourceText\(value\)\{[\s\S]*?\n    \}/)[0];
+    const formatValues=Function(numericSource+"\n"+formatterSource+"\nreturn [rosterResourceText(12485243),rosterResourceText(104852430),rosterResourceText(1248524300)];");
     assert.deepEqual(formatValues(),["1248萬","1.05億","12.5億"]);
-    assert.match(rosterRuntime,/syncHomeResourceValue\(hudGold,[^\n]+\);[\s\S]*syncHomeResourceValue\(hudExp,[^\n]+\);/);
+    assert.match(rosterRuntime,/syncRosterResource\(document.getElementById\("homeHudGoldValue"\),[^\n]+\);[\s\S]*syncRosterResource\(document.getElementById\("homeHudExpValue"\),[^\n]+\);/);
     assert.doesNotMatch(formatterSource,/\.\.\./);
     assert.doesNotMatch(baseCss,/\.home-hud-resources b\{[\s\S]{0,180}text-overflow:ellipsis/);
 });

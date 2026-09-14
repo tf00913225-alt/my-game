@@ -32,10 +32,10 @@ assert.match(vfx,/if\(mechanismTarget\)\{ validTargets\.add\(mechanismTarget\); 
 assert.match(vfx,/isMechanismTarget\(index\)\)\{ return mechanismCardFor\(index\); \}/);
 
 // Generic battle card sizes remain untouched. Only a runtime-tagged Gameplay
-// BOSS receives the paired 4:3 geometry requested for this screen.
+// BOSS receives the paired 9:16 geometry requested for this screen.
 assert.match(v141,/flex:0 0 var\(--v143-monster-card-width,76px\) !important;/);
 assert.match(v143,/#game-stage > #app > #game-content #battlePage \.battle-monster\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:82px;[\s\S]*?--v143-monster-card-height:106px;/);
-assert.match(boss,/#game-stage > #app > #game-content #battlePage \.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:var\(--gameplay-boss-card-width\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:4 \/ 3;/);
+assert.match(boss,/#game-stage > #app > #game-content #battlePage \.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:var\(--gameplay-boss-card-width\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?--v143-monster-icon-width:calc\(100% - 12px\);[\s\S]*?--v143-monster-bar-width:calc\(100% - 10px\);[\s\S]*?aspect-ratio:9 \/ 16;/);
 assert.match(runtime,/bossCard\.classList\.add\("gameplay-boss-card"\)/);
 
 // The old V131 row has a hard flex sizing path. Gameplay BOSS mode switches
@@ -54,8 +54,8 @@ assert.doesNotMatch(bossCardRule,/scale\(/);
 // a new priority patch in the Boss-specific sizing rules. The same owner also
 // defines both card widths so compact screens shrink the pair together.
 assert.match(boss,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
-assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(148px,36\.5%,160px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(82px,20%,92px\);[\s\S]*?margin-top:-16px;/);
-assert.match(boss,/@media \(max-height:840px\)\{[\s\S]*?#game-stage #battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(138px,34%,150px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(78px,19\.5%,88px\);/);
+assert.match(boss,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(118px,29%,132px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(123px,30%,138px\);[\s\S]*?margin-top:-16px;/);
+assert.match(boss,/@media \(max-height:920px\)\{[\s\S]*?#game-stage #battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(108px,27%,122px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(117px,29\.25%,132px\);/);
 const activeBossAreaRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active{");
 const activeBossRowRule=cssRule(boss,"#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{");
 assert.doesNotMatch(activeBossAreaRule,/!important/);

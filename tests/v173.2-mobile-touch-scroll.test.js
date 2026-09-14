@@ -129,7 +129,7 @@ test("A touch inside skill levels is allowed once, while the modal background re
 });
 
 test("Creation step one keeps native geometry while using the larger readable typography",()=>{
-    assert.match(css,/#creationPage \.creation-showcase\{[\s\S]*height:820px;[\s\S]*min-height:820px;/);
+    assert.match(css,/#creationPage \.creation-showcase\{[\s\S]*height:760px;[\s\S]*min-height:760px;/);
     assert.match(css,/#creationPage \.creation-portrait-image\{[\s\S]*width:108%;[\s\S]*height:104%;/);
     assert.match(css,/#creationPage \.creation-choice-panel\{[\s\S]*padding:12px 30\.857px 8px;/);
     assert.match(css,/#creationPage \.creation-subtitle\{[\s\S]*font-size:36px;/);

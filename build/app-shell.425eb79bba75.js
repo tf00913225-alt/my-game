@@ -22474,14 +22474,6 @@ function renderBattle(){
                 ${icon}
             </div>
 
-            <div class="battle-monster-name">
-                ${monster.name}
-            </div>
-
-            <div class="battle-monster-level">
-                Lv.${monster.level}
-            </div>
-
             <div
                 id="battleMonsterStatus${index}"
                 class="monster-status-badges"
@@ -22513,6 +22505,14 @@ function renderBattle(){
                     class="monster-bar-text"
                 ></div>
 
+            </div>
+
+            <div class="battle-monster-name">
+                ${monster.name}
+            </div>
+
+            <div class="battle-monster-level">
+                Lv.${monster.level}
             </div>
             `;
 
@@ -25931,15 +25931,11 @@ function selectCharacterForTabs(targetIndex){
 
 
             if(avatarEl){
-
-                avatarEl.style.opacity=
-
-                    i===targetIndex
-                    ?
-                    "1"
-                    :
-                    ".5";
-
+                const selected=i===targetIndex;
+                avatarEl.style.opacity=selected ? "1" : ".5";
+                avatarEl.classList.toggle("is-current-character",selected);
+                const choice=avatarEl.closest(".character-showcase-choice");
+                if(choice){ choice.classList.toggle("is-current-character",selected); }
             }
 
         }
@@ -26279,14 +26275,14 @@ function renderCharacterShowcaseContent(){
             if(character){
                 html+=
 
-                    '<div style="width:86px;text-align:center;'+
+                    '<div class="character-showcase-choice" style="width:86px;text-align:center;'+
                     'cursor:pointer;" onclick="selectCharacterForTabs('+
                     slotIndex+
                     ');">'+
 
                     '<div id="characterAvatar'+
                     slotIndex+
-                    '" style="width:56px;height:56px;margin:0 auto;'+
+                    '" class="character-showcase-avatar" style="width:56px;height:56px;margin:0 auto;'+
                     'border-radius:50%;background-color:#15100a;background-image:url(\''+
                     getCharacterArtworkPath(character)+
                     '\');background-size:cover;background-position:center 18%;'+
@@ -27759,7 +27755,7 @@ function renderSystemContent(){
             '</div>'+
             '<div class="system-panel-row">'+
                 '<div><strong>帳號管理</strong><small>查看目前 Firebase UID、登出或切換帳號。</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">開啟帳號</button>'+
+                '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">切換帳號／綁定帳號</button>'+
             '</div>'+
             '<div class="system-panel-row">'+
                 '<div><strong>客服信箱</strong><small>查看《四象江湖傳》客服聯絡方式。</small></div>'+
@@ -35083,6 +35079,71 @@ catch(error){
     };
     window.closeAdFreeServiceInfoModal=closeAdFreeServiceInfoModal;
 
+
+    function rosterNumber(value){
+        const number=Number(value);
+        return Number.isFinite(number)?number:0;
+    }
+    function rosterEscape(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+    function rosterResourceText(value){
+        const whole=Math.max(0,Math.floor(rosterNumber(value)));
+        if(whole>=100000000){
+            const compact=whole/100000000;
+            return compact.toFixed(compact>=10?1:2).replace(/\.?0+$/g,"")+"億";
+        }
+        if(whole>=10000){ return Math.floor(whole/10000)+"萬"; }
+        return whole.toLocaleString("zh-TW");
+    }
+    function syncRosterResource(node,value){
+        if(!node){ return; }
+        const whole=Math.max(0,Math.floor(rosterNumber(value)));
+        const full=whole.toLocaleString("zh-TW");
+        node.textContent=rosterResourceText(whole);
+        node.title=full; node.setAttribute("aria-label",full);
+    }
+    function renderHomeRoster(){
+        const page=document.getElementById("homePage");
+        const grid=page&&page.querySelector(".home-card-grid");
+        if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return false; }
+        const partyIndexes=getExistingPartyIndexes().slice(0,3);
+        const availableExp=typeof window.v173GetAvailableExpPool==="function"
+            ?window.v173GetAvailableExpPool(Date.now())
+            :(typeof sharedExp!=="undefined"?sharedExp:0);
+        syncRosterResource(document.getElementById("homeHudGoldValue"),typeof gold!=="undefined"?gold:0);
+        syncRosterResource(document.getElementById("homeHudExpValue"),availableExp);
+        let roster=document.getElementById("v146HomeRoster");
+        if(!roster){
+            roster=document.createElement("section");
+            roster.id="v146HomeRoster"; roster.className="v146-home-roster";
+            roster.setAttribute("aria-label","冒險隊伍");
+            grid.insertAdjacentElement("afterend",roster);
+        }
+        const cards=partyIndexes.map(index=>{
+            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+            const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+            if(!character||!stats){ return ""; }
+            const hp=Math.max(0,Math.min(rosterNumber(stats.maxHP),rosterNumber(character.hp)));
+            const sp=Math.max(0,Math.min(rosterNumber(stats.maxSP),rosterNumber(character.sp)));
+            const hpPercent=rosterNumber(stats.maxHP)>0?hp/rosterNumber(stats.maxHP)*100:0;
+            const spPercent=rosterNumber(stats.maxSP)>0?sp/rosterNumber(stats.maxSP)*100:0;
+            const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
+            return '<article class="v146-home-character" data-element="'+rosterEscape(character.element||"fire")+'">'+
+                '<div class="v146-home-avatar"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id||"角色")+'頭像"></div>'+
+                '<div class="v146-home-character-main"><div><b>'+rosterEscape(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'</span></div>'+
+                '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(rosterNumber(stats.maxHP))+'</strong></div>'+
+                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'</strong></div></div></article>';
+        }).join("");
+        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 3</span></header>'+cards;
+        roster.dataset.ready="true";
+        return true;
+    }
+    window.v54RenderHomeRoster=renderHomeRoster;
+    document.addEventListener("four-symbols:startup-ready",renderHomeRoster);
+
     function boot(){
         apply();
         armAdFreeServiceInfo();
@@ -36608,8 +36669,17 @@ const V_ASSET_VERSION="173.65";
         {pattern:/battle/i,feature:"battle",label:"戰鬥"}
     ];
     function target(event){ return event.target&&event.target.closest&&event.target.closest("button,a,[data-feature]"); }
+    function isExpPoolInteraction(element){
+        return !!(element&&element.closest&&element.closest("#homeExpPoolCard"));
+    }
     function descriptor(element){
         if(!element){ return null; }
+        /* 經驗池本身屬於主城 app-shell，但「預覽升級＋二次確認」owner 在
+           gameplay-core。自從 gameplay-core 改成 lazy 後，若不先載入 owner，
+           舊的即時分配按鈕就可能在防呆安裝前被點到。 */
+        if(isExpPoolInteraction(element)){
+            return {feature:"battle",label:"經驗池安全升級",expPool:true};
+        }
         const explicit=element.dataset&&element.dataset.feature;
         if(explicit){ return {feature:explicit,label:element.getAttribute("aria-label")||element.textContent||explicit}; }
         const signature=[element.id,element.className,element.getAttribute&&element.getAttribute("onclick"),element.textContent].join(" ");
@@ -36623,6 +36693,42 @@ const V_ASSET_VERSION="173.65";
         if(active){ element.dataset.featureLoadingLabel="正在載入"+(label||"功能")+"…"; }
         else{ delete element.dataset.featureLoadingLabel; }
     }
+
+    let expPoolPrimePromise=null;
+    let expPoolSafetyUiReady=false;
+    function refreshExpPoolSafetyUiOnce(){
+        if(expPoolSafetyUiReady){ return; }
+        expPoolSafetyUiReady=true;
+        if(typeof window.renderExpDistributeList==="function"){
+            window.renderExpDistributeList();
+        }
+        if(typeof window.v173DecorateExpPoolDistributionUi==="function"){
+            window.v173DecorateExpPoolDistributionUi();
+        }
+        const pool=document.getElementById("homeExpPoolCard");
+        if(pool){ pool.dataset.expSafetyOwner="ready"; }
+    }
+    function primeExpPoolSafety(){
+        const pool=document.getElementById("homeExpPoolCard");
+        const api=loader();
+        if(!pool||!api){ return; }
+        const visible=!pool.hidden&&window.getComputedStyle(pool).display!=="none"&&pool.getClientRects().length>0;
+        if(!visible){ return; }
+        if(api.isReady("battle")){
+            refreshExpPoolSafetyUiOnce();
+            return;
+        }
+        if(expPoolPrimePromise){ return; }
+        setLocalLoading(pool,true,"經驗池安全升級");
+        expPoolPrimePromise=api.ensure("battle","exp-pool-safety").then(()=>{
+            setLocalLoading(pool,false);
+            refreshExpPoolSafetyUiOnce();
+        }).catch(error=>{
+            setLocalLoading(pool,false);
+            console.error("EXP pool safety owner failed to load:",error);
+            document.dispatchEvent(new CustomEvent("four-symbols:feature-local-error",{detail:{feature:"battle",error}}));
+        }).finally(()=>{ expPoolPrimePromise=null; });
+    }
     function prefetch(event){
         const element=target(event); const info=descriptor(element); const api=loader();
         if(info&&api&&!api.isReady(info.feature)){ void api.prefetch(info.feature,event.type); }
@@ -36633,8 +36739,14 @@ const V_ASSET_VERSION="173.65";
         event.preventDefault(); event.stopImmediatePropagation();
         if(element.dataset.featureLoading==="1"){ return; }
         element.dataset.featureLoading="1"; setLocalLoading(element,true,info.label);
-        api.ensure(info.feature,"navigation").then(()=>{
+        api.ensure(info.feature,info.expPool?"exp-pool-safety":"navigation").then(()=>{
             delete element.dataset.featureLoading; setLocalLoading(element,false);
+            if(info.expPool){
+                /* 不 replay 舊 DOM 上可能仍指向 immediate distribute 的 handler。
+                   先由正式 owner 重繪成「預覽 → 確認」UI，玩家再點一次才會花 EXP。 */
+                refreshExpPoolSafetyUiOnce();
+                return;
+            }
             element.dataset.featureReplay="1"; element.click(); delete element.dataset.featureReplay;
         }).catch(error=>{
             delete element.dataset.featureLoading; setLocalLoading(element,false);
@@ -36645,7 +36757,27 @@ const V_ASSET_VERSION="173.65";
     document.addEventListener("pointerdown",prefetch,{capture:true,passive:true});
     document.addEventListener("touchstart",prefetch,{capture:true,passive:true});
     document.addEventListener("click",enter,true);
-    document.addEventListener("four-symbols:startup-ready",()=>loader()&&loader().idle(),{once:true});
+    document.addEventListener("click",()=>setTimeout(primeExpPoolSafety,0),true);
+    document.addEventListener("four-symbols:startup-ready",()=>{
+        const api=loader();
+        if(api){ api.idle(); }
+        primeExpPoolSafety();
+    },{once:true});
+
+    function installExpPoolVisibilityObserver(){
+        if(!document.body||typeof MutationObserver==="undefined"){ return; }
+        const observer=new MutationObserver(()=>{
+            if(expPoolSafetyUiReady){ return; }
+            primeExpPoolSafety();
+        });
+        observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
+        primeExpPoolSafety();
+    }
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",installExpPoolVisibilityObserver,{once:true});
+    }else{
+        installExpPoolVisibilityObserver();
+    }
 })();
 
 (function initBattleElementBoxDrag(){
