@@ -21,7 +21,7 @@ assert.doesNotMatch(abyssCss,/#game-stage #inventoryPage \.inventory-item-classi
 /* Monster identity stays below its own thin HP/SP HUD without inflating the fixed formation rows; art remains fully contained. */
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:auto!important;bottom:0!important;[\s\S]*z-index:24!important/);
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*inset:2px 2px 42px!important;[\s\S]*background-size:contain!important/);
-assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*inset:-49px -33px 30px!important;[\s\S]*background-size:contain!important/);
+assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*inset:-2px -2px 30px!important;[\s\S]*background-size:contain!important/);
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-hp,[\s\S]*battle-monster\.v174-cardless-unit>\.monster-sp\{[\s\S]*height:11px!important/);
 assert.match(battle,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:2px solid #f1c96d!important/);
 assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1;/);

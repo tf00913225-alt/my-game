@@ -9,10 +9,10 @@ const finalNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const vfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 
-// Approved 2026-09-14 battle presentation contract: player art is ~1.5x,
+// Approved 2026-09-14 battle presentation contract: player art keeps its original footprint,
 // enemy/BOSS art preserves the complete portrait, enemy identity sits below
 // its HP/SP lanes, and enemy resource bars use the thin HUD treatment.
-assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?inset:-49px -33px 30px!important;[\s\S]*?background-size:contain!important/);
+assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?inset:-2px -2px 30px!important;[\s\S]*?background-size:contain!important/);
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:contain!important[\s\S]*?background-position:center center!important/);
 assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:cover!important/);
 assert.match(battle,/battle-monster\.gameplay-boss-card\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:contain!important/);

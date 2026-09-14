@@ -43,8 +43,8 @@ function ensureBattlePresentationStyles(){
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
-    /* 122×94 legacy art box -> ~183×141 visual box: exact 1.5x presentation. */
-    inset:-49px -33px 30px!important;
+    /* Restore the original player-art footprint; enemy/BOSS contain rules stay unchanged. */
+    inset:-2px -2px 30px!important;
     background-size:contain!important;background-position:center bottom!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{

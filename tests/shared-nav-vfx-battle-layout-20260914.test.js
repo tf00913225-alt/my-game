@@ -23,7 +23,7 @@ assert.match(finalNav,/\["元素匣","assets\/ui\/nav-element-box\.png"/);
 assert.match(finalNav,/buttons\.push\(\["返回","assets\/ui\/map-return\.png",returnAction\]\)/);
 assert.match(finalNav,/\["gameplayPage","bossPage","towerPage"\]/);
 assert.match(finalNav,/v148-context-nav-active/);
-assert.match(navCss,/\.v148-context-nav-active #v141DungeonNav\{display:flex !important;\}/);
+assert.match(navCss,/\.v148-context-nav-active #v141DungeonNav\{display:grid !important;\}/);
 assert.match(navCss,/\.v148-context-nav-active #bottomNav\{display:none !important;\}/);
 assert.match(finalNav,/classList\.add\("v148-context-nav"\)/);
 assert.match(finalNavCss,/#v141DungeonNav\.v148-context-nav,[\s\S]*?width:420px !important;[\s\S]*?height:84px !important;/);
@@ -36,7 +36,7 @@ assert.match(vfxCss,/\.v143-vfx-sprite\{[\s\S]*?overflow:visible;[\s\S]*?backgro
 assert.match(vfxCss,/\.v143-vfx-frame\{[\s\S]*?overflow:hidden;/);
 assert.match(vfxCss,/v143-vfx-sprite-active > \.v143-vfx-frame[\s\S]*?v143RasterCastFrames/);
 
-assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?inset:-49px -33px 30px!important;[\s\S]*?background-size:contain!important/);
+assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?inset:-2px -2px 30px!important;[\s\S]*?background-size:contain!important/);
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*?top:auto!important;bottom:0!important/);
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:contain!important/);
 assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:cover!important/);
