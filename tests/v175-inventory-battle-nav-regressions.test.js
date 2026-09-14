@@ -31,10 +31,11 @@ const vfx=read("js/39-v143-skill-animation.js");
 assert.match(vfx,/const maxSize=Math\.max\(minSize,Math\.min\(configuredMax,targetSize\*1\.68\)\);/);
 assert.match(vfx,/const maxSize=Math\.max\(minSize,Math\.min\(configuredMax,targetSize\*1\.56\)\);/);
 assert.match(vfx,/placement==="targetTrajectory"[\s\S]*?--v143-sprite-angle/);
+const vfxCss=read("css/40-v143-combat-dungeon-polish.css");
 const fireCss=read("css/56-v174-critical-ui-regressions.css");
-const fireKeyframes=fireCss.slice(fireCss.indexOf("@keyframes v174FireRocketTravel"));
-assert.match(fireKeyframes,/rotate\(var\(--v143-sprite-angle,0deg\)\)/);
-assert.doesNotMatch(fireKeyframes,/sprite-angle,0deg\) \+ 90deg/);
+assert.match(vfxCss,/@keyframes v143RasterTravel\{[\s\S]*?rotate\(var\(--v143-sprite-angle,0deg\)\)/);
+assert.doesNotMatch(fireCss,/v174FireRocketTravel/);
+assert.doesNotMatch(fireCss,/data-skill="fireRocket"/);
 
 const html=read("index.html");
 const mapNav=html.slice(html.indexOf('id="mapPageNav"'),html.indexOf('id="mapFeatureModal"'));
