@@ -1,0 +1,136 @@
+name: Temporary nav and VFX user-video fix
+on:
+  push:
+    branches:
+      - fix/nav-final-owner-vfx-scale-20260914
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Apply final-owner fixes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('js/39-v143-skill-animation.js')
+          s=p.read_text(encoding='utf-8')
+          old='const SPRITE_SCALE_MULTIPLIER=3;'
+          new='const SPRITE_SCALE_MULTIPLIER=1.5;'
+          if old not in s:
+              raise SystemExit('3x VFX multiplier anchor not found')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+
+          p=Path('js/42-v148-combat-dungeon-fixes.js')
+          s=p.read_text(encoding='utf-8')
+          start=s.index('    function dungeonNavMarkup(isAbyss){')
+          end=s.index('\n    function syncDungeonShell(){',start)
+          nav='\n'.join([
+              '    function dungeonNavMarkup(abyssMapActive,abyssSelectionActive){',
+              '        const buttons=[',
+              '            ["角色","assets/ui/nav-character.png","openHomeFeature(\'character\')"],',
+              '            ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],',
+              '            ["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature(\'relic\')"],',
+              '            ["元素匣","assets/ui/nav-element-box.png","openHomeFeature(\'autoBattleSettings\')"]',
+              '        ];',
+              '        const returnAction=abyssMapActive',
+              '            ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")',
+              '            :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage(\'home\')");',
+              '        buttons.push(["返回","assets/ui/map-return.png",returnAction]);',
+              '        return buttons.map(button=>',
+              '            \'<button class="nav-button nav-art-button-wrap" onclick="\'+button[2]+\'" aria-label="\'+button[0]+\'">\'+',
+              '            \'<img class="nav-art-button" src="\'+button[1]+\'" alt=""><span class="nav-sr-only">\'+button[0]+\'</span></button>\'',
+              '        ).join("");',
+              '    }',
+              ''
+          ])
+          s=s[:start]+nav+s[end:]
+          old='        const isAbyss=!!page.querySelector(".v141-abyss-shell,.v141-abyss-intro");'
+          new='\n'.join([
+              '        const abyssMapActive=!!page.querySelector(".v141-abyss-shell");',
+              '        const abyssSelectionActive=!!page.querySelector(".v174-abyss-selection,.v174-abyss-complete,.v141-abyss-intro");',
+              '        const isAbyss=abyssMapActive||abyssSelectionActive;'
+          ])
+          if old not in s:
+              raise SystemExit('V148 abyss mode anchor not found')
+          s=s.replace(old,new,1)
+          s=s.replace('        if(isAbyss&&!topReturn){','        if(abyssMapActive&&!topReturn){',1)
+          s=s.replace('        }else if(!isAbyss&&topReturn){','        }else if(!abyssMapActive&&topReturn){',1)
+          old='\n'.join([
+              '            const mode=isAbyss?"abyss":"daily";',
+              '            if(nav.dataset.v148Mode!==mode||nav.children.length!==5){',
+              '                nav.innerHTML=dungeonNavMarkup(isAbyss);'
+          ])
+          new='\n'.join([
+              '            const mode=abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily");',
+              '            if(nav.dataset.v148Mode!==mode||nav.children.length!==5){',
+              '                nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);'
+          ])
+          if old not in s:
+              raise SystemExit('V148 final nav sync anchor not found')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/v153-fire-vfx.test.js')
+          s=p.read_text(encoding='utf-8')
+          replacements={
+              'assert.equal(sprites[0].style.width,"840px","approved VFX scale is exactly 3x the previous 280px box");':'assert.equal(sprites[0].style.width,"420px","mobile VFX scale is 1.5x the previous 280px box");',
+              'assert.ok(parseFloat(sprites[0].style.width)<=660,"single-target VFX keeps the approved 3x scale ceiling");':'assert.ok(parseFloat(sprites[0].style.width)<=330,"single-target VFX keeps the mobile 1.5x scale ceiling");',
+              'assert.ok(parseFloat(node.style.width)>=360);':'assert.ok(parseFloat(node.style.width)>=180);',
+              'assert.ok(parseFloat(node.style.width)<=444);':'assert.ok(parseFloat(node.style.width)<=222);'
+          }
+          for old,new in replacements.items():
+              if old not in s:
+                  raise SystemExit('V153 scale assertion anchor not found: '+old)
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tests/remaining-ui-regressions-20260914.test.js')
+          s=p.read_text(encoding='utf-8')
+          if 'const finalNav=read("js/42-v148-combat-dungeon-fixes.js");' not in s:
+              s=s.replace('const fireCss=read("css/56-v174-critical-ui-regressions.css");','const fireCss=read("css/56-v174-critical-ui-regressions.css");\nconst finalNav=read("js/42-v148-combat-dungeon-fixes.js");',1)
+          s=s.replace('assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=3;/);','assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1\\.5;/);',1)
+          marker='assert.match(fireCss,/rotate\\(calc\\(var\\(--v143-sprite-angle,0deg\\) \\+ 90deg\\)\\)/);'
+          extra='\n'.join([
+              'assert.match(finalNav,/\\["秘寶","assets\\/ui\\/nav-relic-v175\\.webp","openHomeFeature\\(\\\'relic\\\'\\)"\\]/);',
+              'assert.match(finalNav,/buttons\\.push\\(\\["返回","assets\\/ui\\/map-return\\.png",returnAction\\]\\)/);',
+              'assert.match(finalNav,/const mode=abyssMapActive\\?"abyss-map":\\(abyssSelectionActive\\?"abyss-selection":"daily"\\)/);',
+              'assert.doesNotMatch(finalNav,/\\["商店","assets\\/ui\\/home-shop-v147\\.png"/);'
+          ])
+          if marker not in s:
+              raise SystemExit('remaining UI insertion marker not found')
+          s=s.replace(marker,marker+'\n'+extra,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Build canonical production output
+        shell: bash
+        run: |
+          npm run build
+          npm run build:check
+      - name: Run focused regressions and mobile browser QA
+        shell: bash
+        run: |
+          node tests/v153-fire-vfx.test.js
+          node tests/v174-raster-only-combat-vfx-owner.test.js
+          node tests/remaining-ui-regressions-20260914.test.js
+          node tests/v174-cardless-battle-browser.test.js
+          node tests/ui-team-relic-mobile-browser.test.js
+          git diff --check
+      - name: Commit validated repair and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/temp-nav-vfx-user-video-fix.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'fix: make final dungeon nav owner authoritative and normalize VFX scale'
+          git push origin HEAD:fix/nav-final-owner-vfx-scale-20260914
