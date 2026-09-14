@@ -399,16 +399,13 @@
         const buttons=[
             ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],
             ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
-            ["秘寶","assets/ui/nav-relic-v174.webp","openHomeFeature('relic')"],
+            ["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"],
             ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"]
         ];
-        if(!abyssMapActive){
-            buttons.push([
-                abyssSelectionActive?"返回玩法":"返回",
-                "assets/ui/map-return.png",
-                abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')"
-            ]);
-        }
+        const returnAction=abyssMapActive
+            ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")
+            :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')");
+        buttons.push(["返回","assets/ui/map-return.png",returnAction]);
         return buttons.map(button=>
             '<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'">'+
             '<img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>'
@@ -446,7 +443,7 @@
                 nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);
                 nav.dataset.v146Mode=mode;
             }
-            nav.dataset.v146Columns=abyssMapActive?"4":"5";
+            nav.dataset.v146Columns="5";
         }
         const oldReturn=document.getElementById("v141DungeonReturn");
         if(oldReturn){ oldReturn.remove(); }
