@@ -7,7 +7,7 @@ const read=path=>fs.readFileSync(path,"utf8");
 const inventory=read("js/53-v173.50-inventory-qol.js");
 const normalize=inventory.slice(inventory.indexOf("function normalizeInventoryStacksAndOrder"),inventory.indexOf("window.v17362NormalizeInventoryStacksAndOrder"));
 assert.ok(normalize.indexOf("const qualityDiff=inventoryQualityRank(b)-inventoryQualityRank(a);")<normalize.indexOf("const familyDiff=(familyOrder.get"),"inventory must sort quality before family in every tab");
-assert.match(inventory,/item\.type==="chest"&&getChestOpenOnce\(item\)/);
+assert.match(inventory,/const openOnce=getChestOpenOnce\(item\);/);
 assert.match(inventory,/item\.id==="equipmentChest"[\s\S]*?window\.v17346OpenEquipmentChest/);
 
 const inventoryCss=read("css/38-v141-system-expansion.css");
