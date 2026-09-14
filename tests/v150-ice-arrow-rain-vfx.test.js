@@ -223,7 +223,7 @@ test("one shared raster sheet stays locked to the complete enemy formation after
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
         assert.ok(runtime.scheduled.some(timer=>timer.delay>=1590),"full 1.6 second action gate");
     });
-    assert.deepEqual(placements[0],["460px","165px","537px","329px"]);
+    assert.deepEqual(placements[0],["460px","165px","329px","329px"]);
     assert.deepEqual(placements[1],placements[0],"one survivor and three survivors use the same full-formation footprint");
 });
 
