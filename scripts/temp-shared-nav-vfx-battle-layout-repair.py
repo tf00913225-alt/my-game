@@ -18,7 +18,6 @@ code = "\n".join(
     for line in raw.splitlines()
 )
 
-# Make the original replace helper tolerant of the current VFX assignment formatting.
 original = (
     "def replace_once(path, old, new):\n"
     "    text=read(path)\n"
@@ -41,7 +40,6 @@ tolerant = (
 assert original in code
 code = code.replace(original, tolerant, 1)
 
-# The embedded workflow lost indentation inside one triple-quoted matcher. Restore it.
 bad_old = (
     "old='''            node.style.setProperty(\"font-size\",\"13px\",\"important\");\n"
     "  const available=Math.max(1,node.clientWidth||68);\n"
@@ -71,9 +69,6 @@ assert bad_new in code
 code = code.replace(bad_old, good_old, 1)
 code = code.replace(bad_new, good_new, 1)
 
-# Current V173.51 name rule has the same semantics but a slightly different property
-# order than the original repair matcher. Normalize only this owner block so the
-# original owner-level patch can apply deterministically.
 battle_path = Path("js/54-v173.51-battle-qa.js")
 battle = battle_path.read_text(encoding="utf-8")
 pattern = re.compile(
@@ -98,8 +93,6 @@ battle_path.write_text(battle, encoding="utf-8")
 
 exec(compile(code, "temp-shared-nav-vfx-battle-layout.py", "exec"))
 
-# Historical tests now assert the single shared V148 context-nav owner instead
-# of the retired dungeon-only/V146 markup owners.
 test_path = Path("tests/v148-combat-dungeon-fixes.test.js")
 test_text = test_path.read_text(encoding="utf-8")
 old_assert = r'assert.match(source,/function dungeonNavMatches\(nav,abyssMapActive,abyssSelectionActive\)/);'
@@ -113,12 +106,14 @@ old_import = 'const dungeonShell=fs.readFileSync("js/41-v146-system-polish.js","
 new_import = old_import + '\nconst finalContextNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");'
 assert old_import in hub_test, "gameplay hub dungeon shell import not found"
 hub_test = hub_test.replace(old_import, new_import, 1)
-old_owner_assert = r'assert.match(dungeonShell,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\(\'home\'\)"/);'
-new_owner_assert = (
-    r'assert.doesNotMatch(dungeonShell,/function dungeonNavMarkup\(/,"V146 must not own navigation markup");' + '\n' +
-    r'assert.match(dungeonShell,/v148SyncContextNavigation/,"V146 must delegate navigation rendering to V148");' + '\n' +
-    r'assert.match(finalContextNav,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\(\'home\'\)"/);'
-)
-assert old_owner_assert in hub_test, "gameplay hub stale V146 return assertion not found"
-hub_test = hub_test.replace(old_owner_assert, new_owner_assert, 1)
-hub_test_path.write_text(hub_test, encoding="utf-8")
+lines = hub_test.splitlines()
+match_indexes = [i for i,line in enumerate(lines) if line.startswith("assert.match(dungeonShell,/abyssSelectionActive")]
+assert len(match_indexes) == 1, f"expected one stale gameplay owner assertion, got {len(match_indexes)}"
+i = match_indexes[0]
+shared_return_assert = lines[i].replace("assert.match(dungeonShell,", "assert.match(finalContextNav,", 1)
+lines[i:i+1] = [
+    'assert.doesNotMatch(dungeonShell,/function dungeonNavMarkup\\(/,"V146 must not own navigation markup");',
+    'assert.match(dungeonShell,/v148SyncContextNavigation/,"V146 must delegate navigation rendering to V148");',
+    shared_return_assert,
+]
+hub_test_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
