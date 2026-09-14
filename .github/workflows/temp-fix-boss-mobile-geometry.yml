@@ -29,26 +29,24 @@ jobs:
               raise SystemExit('stale mechanism width assertion not found')
           test.write_text(s.replace(old, new, 1), encoding='utf-8')
 
-          css = Path('css/gameplay-boss-tower.css')
-          c = css.read_text(encoding='utf-8')
-          anchor = '''#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-hp,
-          #game-stage #battlePage .battle-monster.gameplay-boss-card .monster-sp{
-              width:calc(100% - 10px);
-              min-width:0;
-          }
-          '''
-          addition = anchor + '''
-          /* Gameplay BOSS HP/SP values can reach six digits. The shared V143 12px
-             label is wider than the portrait bar on compact phones, so keep the
-             adjustment local to the Boss owner instead of shrinking every monster. */
-          #game-stage #battlePage .battle-monster.gameplay-boss-card .monster-bar-text{
-              font-size:9.5px !important;
-              letter-spacing:-.45px !important;
-          }
-          '''
-          if anchor not in c:
-              raise SystemExit('Boss resource-bar owner anchor not found')
-          css.write_text(c.replace(anchor, addition, 1), encoding='utf-8')
+          shared = Path('css/40-v143-combat-dungeon-polish.css')
+          c = shared.read_text(encoding='utf-8')
+          old_font = '    font-size:12px !important;'
+          new_font = '    font-size:var(--v143-monster-bar-font-size,12px) !important;'
+          old_spacing = '    letter-spacing:-.35px !important;'
+          new_spacing = '    letter-spacing:var(--v143-monster-bar-letter-spacing,-.35px) !important;'
+          if old_font not in c or old_spacing not in c:
+              raise SystemExit('shared V143 monster-bar typography owner not found')
+          c = c.replace(old_font, new_font, 1).replace(old_spacing, new_spacing, 1)
+          shared.write_text(c, encoding='utf-8')
+
+          boss = Path('css/gameplay-boss-tower.css')
+          b = boss.read_text(encoding='utf-8')
+          anchor = '    --v143-monster-bar-width:calc(100% - 10px);\n'
+          replacement = anchor + '    --v143-monster-bar-font-size:9.5px;\n    --v143-monster-bar-letter-spacing:-.45px;\n'
+          if anchor not in b:
+              raise SystemExit('Boss bar variable owner not found')
+          boss.write_text(b.replace(anchor, replacement, 1), encoding='utf-8')
           PY
       - name: Build and focused mobile browser QA
         shell: bash
@@ -64,7 +62,7 @@ jobs:
           rm .github/workflows/temp-fix-boss-mobile-geometry.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add css/gameplay-boss-tower.css tests/boss-mobile-portrait-browser.test.js build asset-manifest.json index.html config 2>/dev/null || true
+          git add css/40-v143-combat-dungeon-polish.css css/gameplay-boss-tower.css tests/boss-mobile-portrait-browser.test.js build asset-manifest.json index.html config 2>/dev/null || true
           git add -u
           git diff --cached --check
           git commit -m 'fix: align boss mobile geometry and HP label'
