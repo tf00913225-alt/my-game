@@ -12,9 +12,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo '=== MAP PLAYER REFERENCES ==='
-          grep -RInE 'map-player|mapPlayer|map-follower|renderMap|updateMap' js index.html css --exclude='*.min.*' | head -n 300 || true
-          echo '=== GAMEPLAY/NAV REFERENCES ==='
-          grep -RInE 'gameplayPage|v141DungeonNav|v148-context-nav|v141-dungeon-active|context-nav-active' js index.html css --exclude='*.min.*' | head -n 400 || true
+          echo '=== ALL mapPlayer REFERENCES ==='
+          grep -RIn 'mapPlayer' . --exclude-dir=.git --exclude='*.map' | head -n 300 || true
+          echo '=== MAP PAGE HTML CONTEXT ==='
+          line=$(grep -n 'id="mapPage"' index.html | head -1 | cut -d: -f1 || true)
+          if [ -n "${line:-}" ]; then start=$((line-20)); [ "$start" -lt 1 ] && start=1; end=$((line+220)); sed -n "${start},${end}p" index.html; fi
+          echo '=== MAP PLAYER UPDATE CONTEXT ==='
+          sed -n '9635,9745p' js/00-main.js
+          echo '=== MAP PLAYER CSS ==='
+          sed -n '1395,1498p' css/00-main.css
+          echo '=== CONTEXT NAV OWNER ==='
+          sed -n '1325,1445p' js/42-v148-combat-dungeon-fixes.js
+          echo '=== ALL NAV CSS OWNERS ==='
+          grep -RInE '#game-stage .*#v141DungeonNav|#game-stage #v141DungeonNav|v148-context-nav-active.*v141DungeonNav|v141-dungeon-active.*v141DungeonNav' css | head -n 400 || true
           echo '=== BATTLE PLAYER PRESENTATION ==='
-          grep -nE 'battle-player\.v174-cardless-unit|v174-battle-art|syncUnitArtwork|battleArtworkSource' js/54-v173.51-battle-qa.js | head -n 160 || true
+          sed -n '25,175p' js/54-v173.51-battle-qa.js
