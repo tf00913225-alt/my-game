@@ -69,26 +69,47 @@ assert bad_new in code
 code = code.replace(bad_old, good_old, 1)
 code = code.replace(bad_new, good_new, 1)
 
+# The monster shell follows the requested visual order:
+# full portrait -> HP -> SP -> monster identity.  Do not crop the portrait.
 battle_path = Path("js/54-v173.51-battle-qa.js")
 battle = battle_path.read_text(encoding="utf-8")
-pattern = re.compile(
+resource_pattern = re.compile(
+    r'#game-stage > #app > #game-content #battlePage \.battle-monster\.v174-cardless-unit>\.monster-hp\{.*?\n\}\n'
+    r'#game-stage > #app > #game-content #battlePage \.battle-monster\.v174-cardless-unit>\.monster-sp\{.*?\n\}',
+    re.S,
+)
+resources = '''#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp{
+    position:absolute!important;left:50%!important;bottom:27px!important;
+    display:block!important;visibility:visible!important;opacity:1!important;
+    margin:0!important;transform:translateX(-50%)!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp{
+    position:absolute!important;left:50%!important;bottom:14px!important;
+    display:block!important;visibility:visible!important;opacity:1!important;
+    margin:0!important;transform:translateX(-50%)!important;
+}'''
+battle, resource_count = resource_pattern.subn(resources, battle, count=1)
+assert resource_count == 1, "battle monster resource owner block not found"
+
+identity_pattern = re.compile(
     r'#game-stage > #app > #game-content #battlePage \.battle-monster\.v174-cardless-unit>\.battle-monster-name\{.*?\n\}\n'
     r'#game-stage > #app > #game-content #battlePage \.battle-monster\.v174-cardless-unit>\.v174-battle-art\{.*?\n\}',
     re.S,
 )
-normalized = '''#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
-    position:absolute!important;left:0!important;right:0!important;top:0!important;
+identity = '''#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
+    position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;
     display:flex!important;align-items:center!important;justify-content:center!important;
     min-height:14px!important;height:14px!important;margin:0!important;padding:0 2px!important;
-    white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
+    line-height:14px!important;text-align:center!important;white-space:nowrap!important;
+    overflow:visible!important;visibility:visible!important;opacity:1!important;
     z-index:24!important;pointer-events:none!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
-    inset:15px -5px 26px!important;
-    background-size:cover!important;background-position:center center!important;
+    inset:0 -5px 40px!important;
+    background-size:contain!important;background-position:center bottom!important;
 }'''
-battle, count = pattern.subn(normalized, battle, count=1)
-assert count == 1, "battle monster identity/art owner block not found"
+battle, identity_count = identity_pattern.subn(identity, battle, count=1)
+assert identity_count == 1, "battle monster identity/art owner block not found"
 battle_path.write_text(battle, encoding="utf-8")
 
 exec(compile(code, "temp-shared-nav-vfx-battle-layout.py", "exec"))
