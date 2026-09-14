@@ -1,115 +1,73 @@
-V173.4 元素匣金幣統計檢查報告
+《my-game 專案檢查報告》
 
-產生日期：2026-08-31
-起始基準：main/dev 同步點 8c7ceea1643a519b110ffab95a50d2de3cb69adf
-發布標示：V173.4
+版本：V173.65
+更新日期：2026-09-14
+基線分支：dev
+測試／資源核對來源：dev@0b747b12ab4d2fed1aeeb44900760afca4c924cd
+Game / Cache Version：V173.65 / 173.65
 
-一、目前檔案與資產統計
+本文件是目前專案「測試結構、靜態資源與 deterministic build」的快速判讀基線。
+本次修正只修改 CHECK_REPORT.txt，不修改程式、測試、資產、build 產物或版本，因此以下 js／tests／assets tree 可作為本次可追溯基線：
+- js tree：9654a94516c6fc2e06d6e05b96098fa4cd3b142a
+- tests tree：97ad5c4d78c283725810d3526036a8de876f7739
+- assets tree：fdd37be4af1b6169bca3401abfafd3bdd9ee2e7a
 
-- Git 追蹤檔案：351 個。
-- HTML：1 個（index.html）。
-- CSS：50 個（css/）。
-- 正式 JavaScript：112 個（js/）。
-- tests/ JavaScript：38 個，其中 37 個 *.test.js Node suite，另 1 個
-  tests/v138-browser-smoke.js 需要 Playwright／Chromium，不列入 Node suite。
-- JavaScript 語法檢查總數：150 個（js/ 112 + tests/ 38）。
-- assets/：142 個檔案，共 128,596,711 bytes（122.64 MiB）。
-  其中圖片 141 個，共 128,587,355 bytes（122.63 MiB）：47 JPG、78 PNG、
-  16 WEBP；另有 assets/ASSET_MAP.txt 1 個。
+V173.4、V121 與其他歷史版本的數字全部只屬歷史紀錄，不得再拿來判斷目前 dev。為避免後續 AI 誤讀，本文件不再重列那些舊數字。
 
-二、HTML、資源與 Loader 基線
+一、目前 V173.65 測試基線（2026-09-14）
 
-- 靜態 HTML ID：272 個；重複 ID：0。
-- 靜態資源檢查：300 個唯一的本地引用目標均存在。
-- 資源掃描範圍：1 個 HTML、50 個 CSS、51 個非內嵌型 JavaScript。
-- index.html 直接載入：29 個本地 CSS、23 個本地 script，沒有重複載入；
-  外部 Google Fonts stylesheet 不計入本地 CSS。
-- js/20-anonymous-20.js 動態 Loader：108 個唯一 JavaScript／CSS 相依檔；
-  其中 20 個 CSS、88 個 JavaScript，並有 26 個依正式順序串行載入的
-  gameplay runtime。
-- 正式 release entry：js/00-main.js、
-  js/19-stage-v78-character-inventory-runtime.js、js/20-anonymous-20.js；
-  index query、首頁版本標示與 Loader 版本皆一致為 V173.4。
+目前 repository 結構：
+- js/：76 個 JavaScript 檔案。
+- tests/：165 個 JavaScript／MJS 檔案。
+- 其中 164 個符合 *.test.js／*.test.cjs／*.test.mjs，屬 Node unit／integration suite inventory。
+- 另 1 個 tests/v138-browser-smoke.js 為 browser smoke，不計入上述 164 個 Node suite。
 
-三、本次實際執行的檢查
+目前 dev GitHub Actions（run 34836479707）實際輸出：
+- JavaScript syntax：241 / 241 通過（js/ + tests/）。
+- npm run build:check：通過。
+- Release source coherence：V173.65，cache 173.65。
+- Requirements：10 / 10 VERIFIED。
+- Git diff whitespace：通過。
+- unresolved conflict markers：0。
 
-靜態檢查：
+重要：這次 dev 變更屬 documentation-only diff，CI 的 Node unit／integration suites、mobile browser QA 等步驟依 diff-scope 規則為 skipped。
+因此：
+- 「164」是目前 Node suite 的實際檔案 inventory，不代表這次 run 有重新執行 164 / 164。
+- 「CI SUCCESS」也不得被解讀成此次 run 已重新跑完所有 browser／mobile suites。
+- 若需要宣稱完整 suite PASS，必須引用實際執行該 suite 的 run，或重新執行完整測試。
 
-- .github/scripts/ci.mjs 語法檢查：通過。
-- js/ 與 tests/ JavaScript 語法：150 / 150 通過。
-- 本地 HTML／CSS／JavaScript／圖片等資源引用：通過，0 缺檔。
-- HTML 重複 ID：通過，0 組重複。
-- 正式版本、index entry、Loader 相依檔與 runtime 順序完整性：通過。
-- Git whitespace 與未解決 conflict marker：通過。
+二、目前 V173.65 靜態資源／asset／build 基線（2026-09-14）
 
-Node 測試：
+目前 dev GitHub Actions（run 34836479707）實際輸出：
+- Static resources：302 個 unique local targets，全部存在。
+- 靜態資源掃描範圍：4 HTML、60 CSS、76 non-embedded JavaScript。
+- HTML IDs：251 個 static IDs，跨 4 個 HTML 全部唯一。
+- Deterministic production build：22 個 build assets 全部符合 content hash。
+- Critical Boot：exactly 1 hashed script + 1 hashed stylesheet；gameplay features 維持 non-critical。
+- FeatureLoader：仍為唯一 dynamic script owner。
+- release／loader／build gates：通過。
 
-- 37 / 37 套 Node unit／integration suite 通過。
-- 新增 tests/v173.4-element-box-gold.test.js：驗證怪物實際入帳金額、未啟用、
-  既有／非怪物金幣、停止／時數耗盡、切角／重載、副本排除及舊 normal 設定不變。
-- 測試包含 V170 最終整合規格；歷史版本 suite 仍保留作版本紀錄。
+資產判讀注意：
+- 上述 302 是 CI 實際驗證的「unique local resource targets」，不是 assets/ 資料夾的 raw file count，兩者不可混用。
+- assets/ raw file inventory 若未重新由目前 tree 計數，不得沿用任何歷史總數。
+- 目前 assets/monsters tree 實際只有 5 個 image blobs；過去怪物立繪 Pipeline 的 98 張 queue／工作區產物／規劃數量，不等於目前 dev 已存在 98 張怪物資產。
+- 若要判斷某批美術是否已合入 dev，必須直接查目前 assets tree／registry，不得只引用 HANDOFF、queue 或本機工作區紀錄。
 
-四、本次沒有執行的驗證
+三、後續 AI／維護者判讀規則
 
-- V173.4 本輪沒有執行 Samsung／Android 或其他手機真機測試。
-- V173.4 本輪沒有執行完整 Playwright／Chromium 網站操作、視覺、Console
-  或完整戰鬥流程驗證。
-- tests/v138-browser-smoke.js 未由正式 CI 執行，也沒有計入 37 套 Node 測試；
-  不得把它的 skip 或未執行狀態宣稱為瀏覽器測試通過。
-- V173.2 曾完成的 Samsung 真機觸控／捲動驗證屬前一版紀錄，不能代替
-  V173.4 本輪的真機驗證。
+1. 判斷目前專案時，優先使用最新 dev 的實際 CI／build 輸出與本文件；不得回退使用 V173.4、V121 或其他舊版數字。
+2. 241 / 241 是本次實際執行並通過的 JavaScript syntax 數；164 是目前 Node suite inventory，兩者意義不同。
+3. CI 顯示 skipped 時，必須解讀為「依 diff-scope 未執行」，不能寫成 PASS，也不能寫成 FAIL／不存在。
+4. 302 resources、251 static IDs、22 deterministic build assets 是 2026-09-14 此基線的可重現 CI 數字；未來 dev 結構改變後必須以新 CI 輸出更新，不得永久硬套。
+5. assets/ raw file count、圖片格式分布、某類素材數量若沒有從最新 tree 重新計數，就不要填舊數字。
+6. 若新增／刪除正式 script、test suite、resource、static ID、asset 或 deterministic build asset，使基線永久改變，應在同一輪更新本文件。
+7. Game / Cache Version 即使仍為 V173.65，也不能代表測試／資產結構數字一定沒有改變。
+8. 若本文件與最新 dev 的可重現 CI／build／tree 結果衝突，以最新實際結果為準，並立即修正本文件。
 
-五、本次變更邊界
-
-- 元素匣「本次上線獲得金幣」改在 awardMonsterGoldDrop() 成功入帳並回傳實際
-  amount 後直接累加；移除以全域 gold 戰前／戰後差額推算的路徑。
-- 只在元素匣正常巡怪啟用時統計，排除副本；野外精英保留既有巡怪涵蓋範圍。
-- 更新 V173.4 HTML title、首頁標示、發布 entry query、Loader 快取版本及相應測試斷言。
-- 未修改帳號總 gold、掉落公式、副本獎勵、戰鬥數值、技能、存檔、動畫、美術或舊存檔
-  autoConfig.skill="normal"。
-
-============================================================
-V121_SPLIT 歷史檢查報告（僅保留拆檔歷史，不是目前專案基線）
-============================================================
-
-母版：V120
-拆檔目的：只做外部化，不改遊戲機制。
-
-當時的靜態檢查：
-- 原始實際 CSS 區塊：27
-- 拆出 CSS 檔案：27
-- CSS 原始載入順序：完全保留
-- CSS parser：0 錯誤
-- 原始實際 JavaScript 區塊：21
-- 拆出 JavaScript 檔案：21
-- JavaScript 原始執行順序：完全保留
-- Node.js --check：21 / 21 通過
-- 原始 DOM ID：242
-- 拆檔後 DOM ID：242
-- ID 集合：完全一致
-- 重複 DOM ID：0
-- Base64/data:image 殘留：0
-- 外部圖片資產：57 個
-- 未被引用圖片：0
-- 本地資源路徑檢查：0 缺檔
-
-當時的大小：
-- V120 單檔：約 15.14 MB
-- V121_SPLIT 全部檔案：約 11.13 MB
-- index.html：約 74 KB
-- Base64 膨脹已移除，圖片改為獨立檔案。
-
-當時的架構保護：
-- 沒有把 21 個 script 強制合成單一 game.js。
-- 原因：V120 有多個歷史 runtime/migration 區塊；合併會改變錯誤邊界與
-  top-level let/const 初始化時機。
-- V121_SPLIT 保持每個 script 為獨立 classic script，避免因拆檔而改變
-  舊系統執行語意。
-
-當時的執行環境驗證：
-- 曾做桌面 Chromium 的重組／解析 smoke test，函式與 V120 行為基線一致。
-- 當時容器環境禁止直接導覽 localhost／file URL，無法做真正的外部檔案 URL
-  載入 Chromium 導覽測試。
-- 當時 Android Chrome 實機仍需使用者驗證。
-
-以上 V121 數字與驗證只代表當時拆檔成果，不可用來判定 V173.3 現況。
+結論：
+- 目前版本基線：V173.65／cache 173.65。
+- 目前實際 syntax 基線：241 / 241 PASS。
+- 目前 Node suite inventory：164；本次 documentation-only CI 未重新執行全套 Node suites。
+- 目前靜態資源基線：302 unique local targets、251 static IDs。
+- 目前 deterministic build 基線：22 build assets，全數 content-hash match。
+- V173.4 與更早版本的數字已退出現行判讀，不得再作為目前專案基線。
