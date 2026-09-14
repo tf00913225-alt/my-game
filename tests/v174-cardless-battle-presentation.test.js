@@ -39,8 +39,12 @@ test('portrait motion reuses existing lunge and damage-popup lifecycle',()=>{
     assert.match(source,/\.v174-battle-art::after/);
 });
 
-test('Abyss keeps its existing portrait owner but avoids double-rendering artwork',()=>{
-    assert.match(source,/--v152-abyss-portrait/);
+test('cardless artwork mirrors every formal portrait source before hiding the original owner',()=>{
+    assert.match(source,/function portraitImageSource\(card\)/);
+    assert.match(source,/v162-abyss-battle-portrait-art, :scope > img\.v154-monster-portrait-art/);
+    assert.match(source,/monsterPortraitPath/);
+    assert.match(source,/if\(!source\)\{[\s\S]*?classList\.remove\("v174-cardless-unit"\);[\s\S]*?return;/);
+    assert.match(source,/art\.style\.backgroundImage=source;[\s\S]*?setProperty\("background-image","none","important"\)/);
     assert.match(source,/img\.v162-abyss-battle-portrait-art\{[\s\S]*?opacity:0!important;[\s\S]*?pointer-events:none!important;/);
     assert.doesNotMatch(source,/removeChild\([^)]*v162-abyss-battle-portrait-art/);
 });
