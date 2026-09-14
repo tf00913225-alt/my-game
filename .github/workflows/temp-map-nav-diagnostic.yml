@@ -1,28 +1,162 @@
-name: Temporary map/nav diagnostic
+name: Temporary map/nav repair
 on:
   push:
     branches:
       - fix/map-avatar-nav-size-player-scale-20260914
+permissions:
+  contents: write
 jobs:
-  diagnose:
+  repair:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect final shared nav bundle with Chrome
+        with:
+          ref: fix/map-avatar-nav-size-player-scale-20260914
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Apply owner fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p=Path(path); text=p.read_text()
+              if old not in text:
+                  raise SystemExit(f"missing expected text in {path}: {old[:120]!r}")
+              text=text.replace(old,new,1)
+              p.write_text(text)
+
+          # Patrol avatar is visible immediately when the map opens; do not lazy-load it
+          # from a page that starts display:none.
+          replace_once(
+              "index.html",
+              ' loading="lazy" decoding="async">',
+              ' loading="eager" decoding="async">'
+          )
+          replace_once(
+              "js/26-v131-patrol-appearance.js",
+              '        const facing=facingBack?"back":"front";\n        image.classList.add("v131-patrol-q-art");',
+              '        const facing=facingBack?"back":"front";\n        image.loading="eager";\n        image.classList.add("v131-patrol-q-art");'
+          )
+
+          # V3 owns the ordinary legacy bottom nav only. Shared V148 context nav has its
+          # own final 84px geometry and must not inherit V3's 70px baseline.
+          replace_once(
+              "css/02-stage-v3-layout-fix.css",
+              '#game-stage > #app > #game-content .bottom-nav,\n#game-stage > #app > #game-content #mapPageNav{',
+              '#game-stage > #app > #game-content .bottom-nav:not(.v148-context-nav),\n#game-stage > #app > #game-content #mapPageNav{'
+          )
+          # Visibility owner must not force the shared five-slot nav back to flex.
+          replace_once(
+              "css/38-v141-system-expansion.css",
+              '#game-stage #app.v141-dungeon-active #v141DungeonNav,\n#game-stage #app.v148-context-nav-active #v141DungeonNav{display:flex !important;}',
+              '#game-stage #app.v141-dungeon-active #v141DungeonNav,\n#game-stage #app.v148-context-nav-active #v141DungeonNav{display:grid !important;}'
+          )
+
+          # User requested the battle player portrait return to the pre-1.5x size.
+          replace_once(
+              "js/54-v173.51-battle-qa.js",
+              '    /* 122×94 legacy art box -> ~183×141 visual box: exact 1.5x presentation. */\n    inset:-49px -33px 30px!important;',
+              '    /* Keep the original player-art footprint; enemy/BOSS no-crop rules remain separate. */\n    inset:-2px -2px 30px!important;'
+          )
+
+          # Update stale regression expectations for the explicitly restored player scale.
+          for path in Path("tests").glob("*.js"):
+              text=path.read_text()
+              next_text=text.replace('inset:-49px -33px 30px!important;', 'inset:-2px -2px 30px!important;')
+              next_text=next_text.replace('player art is ~1.5x,', 'player art keeps its original footprint,')
+              if path.name=="shared-nav-vfx-battle-layout-20260914.test.js":
+                  next_text=next_text.replace('.v148-context-nav-active #v141DungeonNav\\{display:flex !important;\\}', '.v148-context-nav-active #v141DungeonNav\\{display:grid !important;\\}')
+              if next_text!=text:
+                  path.write_text(next_text)
+
+          Path("tests/map-avatar-nav-scale-regression-20260914.test.js").write_text(r'''"use strict";
+          const assert=require("node:assert/strict");
+          const fs=require("node:fs");
+          const read=path=>fs.readFileSync(path,"utf8");
+          const html=read("index.html");
+          const patrol=read("js/26-v131-patrol-appearance.js");
+          const legacyLayout=read("css/02-stage-v3-layout-fix.css");
+          const contextVisibility=read("css/38-v141-system-expansion.css");
+          const contextPresentation=read("css/45-v152-dev-fixes.css");
+          const battle=read("js/54-v173.51-battle-qa.js");
+
+          assert.match(html,/id="patrolCharacterImg"[\s\S]*?loading="eager"/,"patrol avatar must not lazy-load from a hidden page");
+          assert.match(patrol,/function applyPatrolArt\(facingBack\)[\s\S]*?image\.loading="eager";[\s\S]*?image\.src=artFor/);
+          assert.match(legacyLayout,/\.bottom-nav:not\(\.v148-context-nav\),/,"legacy 70px nav baseline must exclude the shared context nav");
+          assert.doesNotMatch(legacyLayout,/#game-stage > #app > #game-content \.bottom-nav,\s*\n#game-stage > #app > #game-content #mapPageNav/);
+          assert.match(contextVisibility,/\.v148-context-nav-active #v141DungeonNav\{display:grid !important;\}/);
+          assert.match(contextPresentation,/#v141DungeonNav\.v148-context-nav,[\s\S]*?height:84px !important;[\s\S]*?grid-template-columns:repeat\(5,minmax\(0,1fr\)\) !important;/);
+          assert.match(contextPresentation,/#v141DungeonNav \.nav-art-button\{[\s\S]*?height:72px !important;/);
+          assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?inset:-2px -2px 30px!important;[\s\S]*?background-size:contain!important/);
+          assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?inset:-49px -33px 30px!important;/);
+          console.log("map avatar / shared nav / player scale regression guard passed");
+          '''.replace(/^          /gm,""))
+          PY
+          echo 'stale expectations after patch:'
+          grep -RIn -- '-49px -33px 30px\|player art is ~1.5x\|v148-context-nav-active #v141DungeonNav.*display:flex' tests js css || true
+      - name: Focused regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/map-avatar-nav-scale-regression-20260914.test.js
+          node tests/shared-nav-vfx-battle-layout-20260914.test.js
+          node tests/v1741-battle-gameplay-layout-order.test.js
+          node tests/v148-combat-dungeon-fixes.test.js
+          node tests/v143-combat-dungeon-polish.test.js
+          node tests/v153-fire-vfx.test.js
+          node tests/boss-mobile-portrait-browser.test.js
+      - name: Build production bundles
+        run: npm run build
+      - name: Verify production build
+        run: npm run build:check
+      - name: Browser QA for eager patrol and exact shared nav geometry
         shell: bash
         run: |
           set -euo pipefail
           python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/http.log 2>&1 & SERVER_PID=$!
           CHROME=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)
-          "$CHROME" --headless=new --no-sandbox --disable-gpu --remote-allow-origins='*' --remote-debugging-port=9222 --user-data-dir=/tmp/chrome http://127.0.0.1:8000/ >/tmp/chrome.log 2>&1 & CHROME_PID=$!
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=393,873 --remote-allow-origins='*' --remote-debugging-port=9222 --user-data-dir=/tmp/chrome http://127.0.0.1:8000/ >/tmp/chrome.log 2>&1 & CHROME_PID=$!
           trap 'kill "$CHROME_PID" "$SERVER_PID" 2>/dev/null || true' EXIT
           for i in $(seq 1 100); do curl -fsS http://127.0.0.1:9222/json >/dev/null && break || sleep .25; done
-          cat >/tmp/diag.mjs <<'NODE'
-          const sleep=ms=>new Promise(r=>setTimeout(r,ms));const tabs=await(await fetch('http://127.0.0.1:9222/json')).json();const tab=tabs.find(x=>String(x.url||'').includes('127.0.0.1:8000'))||tabs[0];const ws=new WebSocket(tab.webSocketDebuggerUrl);await new Promise((r,j)=>{ws.onopen=r;ws.onerror=j});let id=0;const p=new Map();ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id&&p.has(m.id)){const q=p.get(m.id);p.delete(m.id);m.error?q.reject(m.error):q.resolve(m.result)}};const send=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;p.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}))});const ev=async e=>(await send('Runtime.evaluate',{expression:e,awaitPromise:true,returnByValue:true})).result?.value;await send('Runtime.enable');await sleep(5000);
-          console.log('FEATURE_API',await ev(`typeof FourSymbolsFeatures`));
-          console.log('ENSURE',JSON.stringify(await ev(`(async()=>{try{await FourSymbolsFeatures.ensure('boss-tower','nav-diagnostic');return {ok:true,ready:FourSymbolsFeatures.isReady('gameplay-core')}}catch(e){return {ok:false,error:String(e)}}})()`)));
-          await sleep(1000);
-          const out=await ev(`(()=>{const app=document.getElementById('app');let n=document.getElementById('v141DungeonNav');if(!n){n=document.createElement('div');n.id='v141DungeonNav';n.className='bottom-nav map-page-nav v141-dungeon-nav v148-context-nav';n.dataset.v146Columns='5';n.innerHTML='<button class="nav-button"><img class="nav-art-button" src="assets/ui/nav-character.png"></button>'.repeat(5);(document.getElementById('game-content')||app).appendChild(n)}else n.classList.add('v148-context-nav');app.classList.add('v148-context-nav-active');const s=getComputedStyle(n),im=n.querySelector('img'),si=getComputedStyle(im),r=n.getBoundingClientRect(),ri=im.getBoundingClientRect();return {styles:[...document.querySelectorAll('link[data-feature-style]')].map(x=>({bundle:x.dataset.featureStyle,href:x.getAttribute('href')})),nav:{display:s.display,width:s.width,height:s.height,position:s.position,grid:s.gridTemplateColumns,rectW:r.width,rectH:r.height},img:{width:si.width,height:si.height,rectW:ri.width,rectH:ri.height},classes:n.className,app:app.className}})()`);
-          console.log('FINAL_NAV',JSON.stringify(out));ws.close();
+          cat >/tmp/qa.mjs <<'NODE'
+          import assert from 'node:assert/strict';
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const tabs=await(await fetch('http://127.0.0.1:9222/json')).json();
+          const tab=tabs.find(x=>String(x.url||'').includes('127.0.0.1:8000'))||tabs[0];
+          const ws=new WebSocket(tab.webSocketDebuggerUrl);await new Promise((r,j)=>{ws.onopen=r;ws.onerror=j});
+          let id=0;const p=new Map();ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id&&p.has(m.id)){const q=p.get(m.id);p.delete(m.id);m.error?q.reject(m.error):q.resolve(m.result)}};
+          const send=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;p.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}))});
+          const ev=async e=>(await send('Runtime.evaluate',{expression:e,awaitPromise:true,returnByValue:true})).result?.value;
+          await send('Runtime.enable');await sleep(5000);
+          const patrol=await ev(`(async()=>{const m=document.getElementById('mapPage'),i=document.getElementById('patrolCharacterImg');m.classList.add('active');m.style.display='block';for(let n=0;n<40&&!i.complete;n++)await new Promise(r=>setTimeout(r,50));return {loading:i.loading,complete:i.complete,nw:i.naturalWidth,nh:i.naturalHeight}})()`);
+          assert.equal(patrol.loading,'eager');assert.equal(patrol.complete,true);assert.ok(patrol.nw>0&&patrol.nh>0,JSON.stringify(patrol));
+          const ensured=await ev(`(async()=>{await FourSymbolsFeatures.ensure('boss-tower','repair-qa');return FourSymbolsFeatures.isReady('gameplay-core')})()`);assert.equal(ensured,true);
+          await sleep(500);
+          const nav=await ev(`(()=>{const app=document.getElementById('app');let n=document.getElementById('v141DungeonNav');if(!n){n=document.createElement('div');n.id='v141DungeonNav';n.className='bottom-nav map-page-nav v141-dungeon-nav v148-context-nav';n.dataset.v146Columns='5';n.innerHTML='<button class="nav-button"><img class="nav-art-button" src="assets/ui/nav-character.png"></button>'.repeat(5);document.getElementById('game-content').appendChild(n)}else n.classList.add('v148-context-nav');app.classList.add('v148-context-nav-active');const s=getComputedStyle(n),si=getComputedStyle(n.querySelector('img'));return {display:s.display,height:s.height,width:s.width,columns:s.gridTemplateColumns,imgHeight:si.height}})()`);
+          assert.equal(nav.display,'grid',JSON.stringify(nav));assert.equal(nav.height,'84px',JSON.stringify(nav));assert.equal(nav.width,'420px',JSON.stringify(nav));assert.equal(nav.imgHeight,'72px',JSON.stringify(nav));
+          console.log('browser QA passed',JSON.stringify({patrol,nav}));ws.close();
           NODE
-          node /tmp/diag.mjs
+          node /tmp/qa.mjs
+      - name: Full test suite
+        run: npm test
+      - name: Check whitespace
+        run: git diff --check
+      - name: Commit clean repair and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/temp-map-nav-diagnostic.yml
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No repair changes to commit'; exit 1
+          fi
+          git commit -m 'fix: restore patrol avatar and shared nav sizing'
+          git push origin HEAD:fix/map-avatar-nav-size-player-scale-20260914
