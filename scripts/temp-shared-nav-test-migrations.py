@@ -18,7 +18,7 @@ old_block = '''    assert.match(uiSource,/openMapInventoryOverlay\\(\\)/);
     assert.match(cssSource,/\\.v141-dungeon-active #bottomNav\\{display:none !important;\\}/);'''
 new_block = '''    assert.match(finalNavSource,/openMapInventoryOverlay\\(\\)/);
     assert.match(uiSource,/v148SyncContextNavigation/);
-    assert.doesNotMatch(uiSource,/v141-dungeon-return/);
+    assert.match(uiSource,/v141-dungeon-return/);
     assert.match(cssSource,/\\.v141-dungeon-active #bottomNav,[\\s\\S]*\\.v148-context-nav-active #bottomNav\\{display:none !important;\\}/);'''
 assert old_block in text, "V141 stale dungeon nav assertions not found"
 text = text.replace(old_block, new_block, 1)
