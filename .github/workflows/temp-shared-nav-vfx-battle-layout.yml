@@ -31,6 +31,9 @@ jobs:
           tolerant="def replace_once(path, old, new):\n    text=read(path)\n    count=text.count(old)\n    if count==0 and path=='js/39-v143-skill-animation.js' and 'node.dataset.frames=String(sprite.frames);' in old:\n        pattern=r'            node\\.dataset\\.frames=String\\(sprite\\.frames\\);\\n            node\\.style\\.backgroundImage=.*?\\n            node\\.style\\.backgroundSize=.*?\\n            node\\.style\\.setProperty\\(\"--v143-sprite-duration\",current\\.duration\\+\"ms\"\\);'\n        patched,n=re.subn(pattern,new,text,count=1,flags=re.S)\n        assert n==1, f'{path}: flexible VFX assignment match failed'\n        write(path,patched)\n        return\n    assert count==1, f'{path}: expected exactly one occurrence of {old[:80]!r}, got {count}'\n    write(path,text.replace(old,new,1))"
           assert original in code
           code=code.replace(original,tolerant,1)
+          for lineno,line in enumerate(code.splitlines(),1):
+              if 345 <= lineno <= 362:
+                  print(f"PATCH[{lineno}] {line}")
           exec(compile(code,"temp-shared-nav-vfx-battle-layout.py","exec"))
           PY
       - name: Focused regression tests
