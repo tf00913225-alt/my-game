@@ -31,14 +31,14 @@ jobs:
           node tests/v143-combat-dungeon-polish.test.js
           node tests/v153-fire-vfx.test.js
           node tests/boss-mobile-portrait-browser.test.js
-      - name: Full test suite
-        run: npm test
       - name: Rebuild production bundles
         run: npm run build
       - name: Validate built tree
         run: |
           npm run build:check
           git diff --check
+      - name: Full test suite
+        run: npm test
       - name: Commit repaired owners and remove temporary runner
         run: |
           rm -f .github/workflows/temp-shared-nav-vfx-battle-layout.yml
