@@ -8,27 +8,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect patrol lazy-load transition with Chrome
+      - name: Inspect final shared nav bundle with Chrome
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/map-nav-http.log 2>&1 & SERVER_PID=$!
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/http.log 2>&1 & SERVER_PID=$!
           CHROME=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)
-          "$CHROME" --headless=new --no-sandbox --disable-gpu --remote-allow-origins='*' --remote-debugging-port=9222 --user-data-dir=/tmp/map-nav-chrome http://127.0.0.1:8000/ >/tmp/map-nav-chrome.log 2>&1 & CHROME_PID=$!
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --remote-allow-origins='*' --remote-debugging-port=9222 --user-data-dir=/tmp/chrome http://127.0.0.1:8000/ >/tmp/chrome.log 2>&1 & CHROME_PID=$!
           trap 'kill "$CHROME_PID" "$SERVER_PID" 2>/dev/null || true' EXIT
-          for i in $(seq 1 80); do curl -fsS http://127.0.0.1:9222/json >/dev/null && break || sleep .25; done
-          cat >/tmp/runtime-diag.mjs <<'NODE'
-          const sleep=ms=>new Promise(r=>setTimeout(r,ms)); const tabs=await (await fetch('http://127.0.0.1:9222/json')).json(); const tab=tabs.find(x=>String(x.url||'').includes('127.0.0.1:8000'))||tabs[0];
-          const ws=new WebSocket(tab.webSocketDebuggerUrl); await new Promise((r,j)=>{ws.onopen=r;ws.onerror=j}); let id=0; const p=new Map(); ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id&&p.has(m.id)){const q=p.get(m.id);p.delete(m.id);m.error?q.reject(m.error):q.resolve(m.result)}};
-          const send=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;p.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}))}); const ev=async e=>(await send('Runtime.evaluate',{expression:e,awaitPromise:true,returnByValue:true})).result?.value; await send('Runtime.enable'); await sleep(3000);
-          const snap=async label=>console.log(label,JSON.stringify(await ev(`(()=>{const i=document.getElementById('patrolCharacterImg'),w=document.getElementById('patrolCharacterWrap'),m=document.getElementById('mapPage');const r=i.getBoundingClientRect(),s=getComputedStyle(i);return {mapClass:m.className,mapDisplay:getComputedStyle(m).display,loading:i.loading,complete:i.complete,nw:i.naturalWidth,nh:i.naturalHeight,src:i.currentSrc||i.src,rect:{w:r.width,h:r.height,x:r.x,y:r.y},display:s.display,visibility:s.visibility,opacity:s.opacity,wrap:getComputedStyle(w).display}})()`)));
-          await snap('INACTIVE');
-          await ev(`(()=>{document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const m=document.getElementById('mapPage');m.classList.add('active');m.style.display='block';m.style.position='absolute';m.style.inset='0';document.getElementById('patrolCharacterImg').scrollIntoView({block:'center'});return true})()`); await sleep(2000); await snap('ACTIVE_LAZY');
-          await ev(`(()=>{const i=document.getElementById('patrolCharacterImg');i.loading='eager';const src=i.getAttribute('src');i.removeAttribute('src');void i.offsetWidth;i.setAttribute('src',src);return true})()`); await sleep(2000); await snap('ACTIVE_EAGER'); ws.close();
+          for i in $(seq 1 100); do curl -fsS http://127.0.0.1:9222/json >/dev/null && break || sleep .25; done
+          cat >/tmp/diag.mjs <<'NODE'
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));const tabs=await(await fetch('http://127.0.0.1:9222/json')).json();const tab=tabs.find(x=>String(x.url||'').includes('127.0.0.1:8000'))||tabs[0];const ws=new WebSocket(tab.webSocketDebuggerUrl);await new Promise((r,j)=>{ws.onopen=r;ws.onerror=j});let id=0;const p=new Map();ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id&&p.has(m.id)){const q=p.get(m.id);p.delete(m.id);m.error?q.reject(m.error):q.resolve(m.result)}};const send=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;p.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}))});const ev=async e=>(await send('Runtime.evaluate',{expression:e,awaitPromise:true,returnByValue:true})).result?.value;await send('Runtime.enable');await sleep(5000);
+          console.log('FEATURE_API',await ev(`typeof FourSymbolsFeatures`));
+          console.log('ENSURE',JSON.stringify(await ev(`(async()=>{try{await FourSymbolsFeatures.ensure('boss-tower','nav-diagnostic');return {ok:true,ready:FourSymbolsFeatures.isReady('gameplay-core')}}catch(e){return {ok:false,error:String(e)}}})()`)));
+          await sleep(1000);
+          const out=await ev(`(()=>{const app=document.getElementById('app');let n=document.getElementById('v141DungeonNav');if(!n){n=document.createElement('div');n.id='v141DungeonNav';n.className='bottom-nav map-page-nav v141-dungeon-nav v148-context-nav';n.dataset.v146Columns='5';n.innerHTML='<button class="nav-button"><img class="nav-art-button" src="assets/ui/nav-character.png"></button>'.repeat(5);(document.getElementById('game-content')||app).appendChild(n)}else n.classList.add('v148-context-nav');app.classList.add('v148-context-nav-active');const s=getComputedStyle(n),im=n.querySelector('img'),si=getComputedStyle(im),r=n.getBoundingClientRect(),ri=im.getBoundingClientRect();return {styles:[...document.querySelectorAll('link[data-feature-style]')].map(x=>({bundle:x.dataset.featureStyle,href:x.getAttribute('href')})),nav:{display:s.display,width:s.width,height:s.height,position:s.position,grid:s.gridTemplateColumns,rectW:r.width,rectH:r.height},img:{width:si.width,height:si.height,rectW:ri.width,rectH:ri.height},classes:n.className,app:app.className}})()`);
+          console.log('FINAL_NAV',JSON.stringify(out));ws.close();
           NODE
-          node /tmp/runtime-diag.mjs
-      - name: Static nav cascade
-        shell: bash
-        run: |
-          set -euo pipefail
-          grep -RInE '#game-stage .*#v141DungeonNav|#game-stage #v141DungeonNav|v148-context-nav-active.*v141DungeonNav|v141-dungeon-active.*v141DungeonNav' css | head -n 300 || true
+          node /tmp/diag.mjs
