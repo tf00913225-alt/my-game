@@ -55,6 +55,7 @@
     function applyPatrolArt(facingBack){
         const image=document.getElementById("patrolCharacterImg");
         if(!image){ return; }
+        image.loading="eager";
         const index=normalize();
         const character=getCharacter(index);
         if(!character){ return; }

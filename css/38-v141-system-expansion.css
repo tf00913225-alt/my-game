@@ -804,7 +804,7 @@
 
 #game-stage #app:not(.v141-dungeon-active):not(.v148-context-nav-active) #v141DungeonNav{display:none !important;}
 #game-stage #app.v141-dungeon-active #v141DungeonNav,
-#game-stage #app.v148-context-nav-active #v141DungeonNav{display:flex !important;}
+#game-stage #app.v148-context-nav-active #v141DungeonNav{display:grid !important;}
 #game-stage #app.v141-dungeon-active #bottomNav,
 #game-stage #app.v148-context-nav-active #bottomNav{display:none !important;}
 #game-stage #v141DungeonNav{z-index:790 !important;}

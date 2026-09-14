@@ -1,0 +1,17 @@
+"use strict";
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const read=path=>fs.readFileSync(path,"utf8");
+const patrol=read("js/26-v131-patrol-appearance.js");
+const legacy=read("css/02-stage-v3-layout-fix.css");
+const nav=read("css/38-v141-system-expansion.css");
+const finalNav=read("css/45-v152-dev-fixes.css");
+const battle=read("js/54-v173.51-battle-qa.js");
+assert.match(patrol,/patrolCharacterImg[\s\S]*?image\.loading="eager";[\s\S]*?image\.src=artFor/);
+assert.match(legacy,/\.bottom-nav:not\(\.v148-context-nav\),/);
+assert.match(nav,/\.v148-context-nav-active #v141DungeonNav\{display:grid !important;\}/);
+assert.match(finalNav,/#v141DungeonNav\.v148-context-nav,[\s\S]*?height:84px !important;[\s\S]*?grid-template-columns:repeat\(5,minmax\(0,1fr\)\) !important;/);
+assert.match(finalNav,/#v141DungeonNav \.nav-art-button\{[\s\S]*?height:72px !important;/);
+assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?inset:-2px -2px 30px!important;[\s\S]*?background-size:contain!important/);
+assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?inset:-49px -33px 30px!important;/);
+console.log("map/nav/patrol/player regression guard passed");

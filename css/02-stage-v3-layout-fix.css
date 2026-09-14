@@ -19,7 +19,7 @@
 }
 
 /* Main navigation: never use viewport centering inside the stage. */
-#game-stage > #app > #game-content .bottom-nav,
+#game-stage > #app > #game-content .bottom-nav:not(.v148-context-nav),
 #game-stage > #app > #game-content #mapPageNav{
     position:absolute !important;
     left:0 !important;
