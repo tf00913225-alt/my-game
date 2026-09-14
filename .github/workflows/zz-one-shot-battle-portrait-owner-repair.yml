@@ -3,14 +3,13 @@ name: One-shot battle portrait owner repair
 on:
   push:
     branches:
-      - fix/battle-portrait-owner-root-cause-20260915
+      - "fix/battle-portrait-owner-root-cause-20260915"
 
 permissions:
   contents: write
 
 jobs:
   repair:
-    if: ${{ !contains(github.event.head_commit.message, '[portrait-owner-repaired]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -25,7 +24,7 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Repair the existing battle presentation owner and regression tests
+      - name: Repair owner and regressions
         shell: bash
         run: |
           python3 - <<'PY'
@@ -39,15 +38,14 @@ jobs:
 
           source_path = "js/54-v173.51-battle-qa.js"
           source = read(source_path)
-          old_mask = """    background-color:transparent!important;background-image:none!important;\n    isolation:isolate!important;\n"""
-          new_mask = """    /* Keep the formal portrait source readable; suppress only the card's own paint. */\n    background-color:transparent!important;background-size:0 0!important;\n    background-repeat:no-repeat!important;\n    isolation:isolate!important;\n"""
+          old_mask = "    background-color:transparent!important;background-image:none!important;\n    isolation:isolate!important;\n"
+          new_mask = "    /* Keep the formal portrait source readable; suppress only the card's own paint. */\n    background-color:transparent!important;background-size:0 0!important;\n    background-repeat:no-repeat!important;\n    isolation:isolate!important;\n"
           if source.count(old_mask) != 1:
               raise SystemExit("battle presentation mask owner changed; refusing blind patch")
           source = source.replace(old_mask, new_mask, 1)
-
           start = source.index("function portraitImageSource(card){")
           end = source.index("function syncResourceNumbers(){", start)
-          owner = r'''function battleArtworkSource(card,kind){
+          owner = '''function battleArtworkSource(card,kind){
     if(!card)return "";
     const computed=getComputedStyle(card);
     let source="";
@@ -78,23 +76,19 @@ function syncUnitArtwork(card,kind){
           old_assert = "    assert.match(source,/background-image:none!important/);"
           if old_assert not in presentation:
               raise SystemExit("presentation mask assertion changed")
-          presentation = presentation.replace(
-              old_assert,
-              "    assert.match(source,/background-size:0 0!important/);\n    assert.doesNotMatch(source,/card\\.style\\.setProperty\\(\"background-image\",\"none\",\"important\"\\)/);",
-              1,
-          )
+          presentation = presentation.replace(old_assert, "    assert.match(source,/background-size:0 0!important/);\n    assert.doesNotMatch(source,/card\\.style\\.setProperty\\(\"background-image\",\"none\",\"important\"\\)/);", 1)
           test_start = presentation.index("test('cardless artwork mirrors every formal portrait source before hiding the original owner'")
-          presentation = presentation[:test_start] + r'''test('cardless artwork keeps one formal source owner and removes failed fallback patches',()=>{
-    assert.doesNotMatch(source,/function portraitImageSource\(card\)/);
+          presentation = presentation[:test_start] + '''test('cardless artwork keeps one formal source owner and removes failed fallback patches',()=>{
+    assert.doesNotMatch(source,/function portraitImageSource\\(card\\)/);
     assert.doesNotMatch(source,/monsterPortraitPath/);
-    assert.doesNotMatch(source,/dataset\.v174BattleArtwork/);
-    assert.doesNotMatch(source,/setProperty\("background-image","none","important"\)/);
-    assert.match(source,/function battleArtworkSource\(card,kind\)[\s\S]*?getComputedStyle\(card\)[\s\S]*?computed\.backgroundImage/);
-    assert.match(source,/if\(!source\)\{[\s\S]*?classList\.remove\("v174-cardless-unit"\);[\s\S]*?removeProperty\("background-image"\);[\s\S]*?return;/);
-    assert.match(source,/art\.style\.backgroundImage=source;/);
+    assert.doesNotMatch(source,/dataset\\.v174BattleArtwork/);
+    assert.doesNotMatch(source,/setProperty\\(\"background-image\",\"none\",\"important\"\\)/);
+    assert.match(source,/function battleArtworkSource\\(card,kind\\)[\\s\\S]*?getComputedStyle\\(card\\)[\\s\\S]*?computed\\.backgroundImage/);
+    assert.match(source,/if\\(!source\\)\\{[\\s\\S]*?classList\\.remove\\(\"v174-cardless-unit\"\\);[\\s\\S]*?removeProperty\\(\"background-image\"\\);[\\s\\S]*?return;/);
+    assert.match(source,/art\\.style\\.backgroundImage=source;/);
     assert.match(source,/background-size:0 0!important/);
-    assert.match(source,/img\.v162-abyss-battle-portrait-art\{[\s\S]*?opacity:0!important;[\s\S]*?pointer-events:none!important;/);
-    assert.doesNotMatch(source,/removeChild\([^)]*v162-abyss-battle-portrait-art/);
+    assert.match(source,/img\\.v162-abyss-battle-portrait-art\\{[\\s\\S]*?opacity:0!important;[\\s\\S]*?pointer-events:none!important;/);
+    assert.doesNotMatch(source,/removeChild\\([^)]*v162-abyss-battle-portrait-art/);
 });
 '''
           write(presentation_path, presentation)
@@ -107,37 +101,33 @@ function syncUnitArtwork(card,kind){
           if browser.count(old_style) != 1:
               raise SystemExit("browser fixture style owner changed")
           browser = browser.replace(old_style, new_style, 1)
-
-          before_marker = "window.__qaBefore=qaRects();"
-          before_replacement = "document.querySelectorAll('.battle-player').forEach(function(card){card.style.removeProperty('background-image');});\nwindow.__qaPlayerCssSource=getComputedStyle(document.getElementById('battlePlayerCard0')).backgroundImage;\nwindow.__qaBefore=qaRects();"
-          if browser.count(before_marker) != 1:
+          marker = "window.__qaBefore=qaRects();"
+          replacement = "document.querySelectorAll('.battle-player').forEach(function(card){card.style.removeProperty('background-image');});\nwindow.__qaPlayerCssSource=getComputedStyle(document.getElementById('battlePlayerCard0')).backgroundImage;\nwindow.__qaBefore=qaRects();"
+          if browser.count(marker) != 1:
               raise SystemExit("browser before marker changed")
-          browser = browser.replace(before_marker, before_replacement, 1)
-
-          iife_marker = "  var player=document.getElementById('battlePlayerCard0');\n  var art=player.querySelector(':scope > .v174-battle-art');"
-          iife_replacement = "  var player=document.getElementById('battlePlayerCard0');\n  window.v17351SyncManagement();\n  window.v17351SyncManagement();\n  var art=player.querySelector(':scope > .v174-battle-art');"
-          if browser.count(iife_marker) != 1:
+          browser = browser.replace(marker, replacement, 1)
+          marker = "  var player=document.getElementById('battlePlayerCard0');\n  var art=player.querySelector(':scope > .v174-battle-art');"
+          replacement = "  var player=document.getElementById('battlePlayerCard0');\n  window.v17351SyncManagement();\n  window.v17351SyncManagement();\n  var art=player.querySelector(':scope > .v174-battle-art');"
+          if browser.count(marker) != 1:
               raise SystemExit("browser runtime marker changed")
-          browser = browser.replace(iife_marker, iife_replacement, 1)
-
-          result_marker = "      playerArt:!!art,\n      playerArtBackgroundSize:getComputedStyle(art).backgroundSize,"
-          result_replacement = "      playerArt:!!art,\n      playerCssSourceBefore:window.__qaPlayerCssSource,\n      playerInlineBackground:player.style.backgroundImage,\n      playerArtBackground:getComputedStyle(art).backgroundImage,\n      playerArtBackgroundSize:getComputedStyle(art).backgroundSize,"
-          if browser.count(result_marker) != 1:
+          browser = browser.replace(marker, replacement, 1)
+          marker = "      playerArt:!!art,\n      playerArtBackgroundSize:getComputedStyle(art).backgroundSize,"
+          replacement = "      playerArt:!!art,\n      playerCssSourceBefore:window.__qaPlayerCssSource,\n      playerInlineBackground:player.style.backgroundImage,\n      playerArtBackground:getComputedStyle(art).backgroundImage,\n      playerArtBackgroundSize:getComputedStyle(art).backgroundSize,"
+          if browser.count(marker) != 1:
               raise SystemExit("browser result marker changed")
-          browser = browser.replace(result_marker, result_replacement, 1)
-
-          assertion_marker = "    assert.equal(data.playerArt,true);\n    assert.equal(data.playerArtBackgroundSize,\"contain\");"
-          assertion_replacement = "    assert.equal(data.playerArt,true);\n    assert.match(data.playerCssSourceBefore,/data:image\\/svg\\+xml/);\n    assert.equal(data.playerInlineBackground,\"\",\"presentation must not overwrite the formal player background owner\");\n    assert.match(data.playerArtBackground,/data:image\\/svg\\+xml/);\n    assert.equal(data.playerArtBackgroundSize,\"contain\");"
-          if browser.count(assertion_marker) != 1:
+          browser = browser.replace(marker, replacement, 1)
+          marker = "    assert.equal(data.playerArt,true);\n    assert.equal(data.playerArtBackgroundSize,\"contain\");"
+          replacement = "    assert.equal(data.playerArt,true);\n    assert.match(data.playerCssSourceBefore,/data:image\\/svg\\+xml/);\n    assert.equal(data.playerInlineBackground,\"\",\"presentation must not overwrite the formal player background owner\");\n    assert.match(data.playerArtBackground,/data:image\\/svg\\+xml/);\n    assert.equal(data.playerArtBackgroundSize,\"contain\");"
+          if browser.count(marker) != 1:
               raise SystemExit("browser assertion marker changed")
-          browser = browser.replace(assertion_marker, assertion_replacement, 1)
+          browser = browser.replace(marker, replacement, 1)
           write(browser_path, browser)
           PY
 
       - name: Rebuild deterministic production assets
         run: node scripts/build-production.mjs
 
-      - name: Run focused owner and real-browser regressions
+      - name: Run focused owner and browser regressions
         shell: bash
         run: |
           node --test tests/v174-cardless-battle-presentation.test.js
@@ -152,5 +142,5 @@ function syncUnitArtwork(card,kind){
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git rm .github/workflows/zz-one-shot-battle-portrait-owner-repair.yml
           git add js/54-v173.51-battle-qa.js tests/v174-cardless-battle-presentation.test.js tests/v174-cardless-battle-browser.test.js asset-manifest.json build/asset-manifest.json build/
-          git commit -m "fix: restore battle portrait owner at source [portrait-owner-repaired]"
+          git commit -m "fix: restore battle portrait owner at source"
           git push origin HEAD:fix/battle-portrait-owner-root-cause-20260915
