@@ -15,6 +15,7 @@
     const QUALITY_ORDER=["white","blue","purple","orange","pink","four-symbol"];
     const QUALITY_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
     const TIER_TO_QUALITY={white:"white",blue:"blue",purple:"purple",orange:"orange",pink:"pink","four-symbol":"four-symbol",low:"white",mid:"blue",high:"purple",perfect:"orange"};
+    const SUPPORTED_BATCH_CHEST_IDS=new Set(["materialChest","equipmentChest"]);
 
     function escapeHtml(value){
         return String(value==null?"":value)
@@ -39,9 +40,9 @@
         if(!item){ return null; }
         const direct=String(item.rarityKey||item.quality||"").toLowerCase();
         if(QUALITY_ORDER.includes(direct)){ return direct; }
-        if(item.setId){ return "orange"; }
         const tier=String(item.tierKey||"").toLowerCase();
         if(TIER_TO_QUALITY[tier]){ return TIER_TO_QUALITY[tier]; }
+        if(isInventoryEquipment(item)&&item.setId){ return "orange"; }
         const icon=String(item.icon||"");
         for(const quality of QUALITY_ORDER){
             if(icon.includes("rarity-"+quality)){ return quality; }
@@ -346,7 +347,7 @@
             const definition=getPotionDefinition(item.id);
             if(definition){ return {kind:"potion",label:"批量使用",total,definition}; }
         }
-        if(item.type==="chest"&&getChestOpenOnce(item)){
+        if(item.type==="chest"&&SUPPORTED_BATCH_CHEST_IDS.has(String(item.id||""))){
             return {kind:"chest",label:"批量開啟",total};
         }
         if(item.type==="ticket"&&typeof window.useEquipmentTicket==="function"){
