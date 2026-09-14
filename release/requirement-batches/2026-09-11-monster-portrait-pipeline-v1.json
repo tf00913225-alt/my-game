@@ -19,21 +19,21 @@
       "status": "IMPLEMENTED",
       "request": "把目前 runtime 的怪物立繪目標整理成機器可讀清單，避免其他對話靠名稱或舊摘要猜路徑。",
       "owner": ["config/monster-portrait-registry.json"],
-      "implementation": "建立 107 個 portrait targets：9 個既有深淵帝王 target、98 個 planned target；以 portraitKey／系統 ID／元素規則作為正式識別，禁止中文名稱直接猜檔名。"
+      "implementation": "建立 107 個 portrait targets；以 portraitKey／系統 ID／元素規則作為正式識別，禁止中文名稱直接猜檔名。最初基線為 9 existing／98 planned；後續只能由實際素材批次逐步升級，不得把 planned 當成已存在。"
     },
     {
       "id": 3,
       "status": "IMPLEMENTED",
       "request": "建立自動盤點工具，檢查 runtime 名稱、registry、既有檔案、缺圖與四象天兵規則。",
-      "owner": ["scripts/audit-monster-portraits.mjs", "tests/v169-abyss-assets-flow.test.js"],
-      "implementation": "audit 會掃描十區野怪、V141 風土追加怪、日常副本、個人／世界 BOSS、BOSS 援軍、塔 BOSS、深淵帝王與天兵，並比對 registry；normal mode 允許 planned 缺圖，--strict 只在全部素材齊備後使用。"
+      "owner": ["scripts/audit-monster-portraits.mjs", "scripts/audit-monster-portrait-batch.mjs", "tests/v169-abyss-assets-flow.test.js", "tests/monster-portrait-batch-workflow.test.js"],
+      "implementation": "全域 audit 掃描 runtime 與 registry；normal mode 允許 planned 缺圖。2026-09-14 P2 修正後，每批以 release/monster-portrait-batches/*.json 為唯一邊界，完成一批即跑 audit-monster-portrait-batch.mjs --strict；其他批尚未完成的 planned 不會讓已完成批次失敗。只有全部批次完成後才跑全域 audit-monster-portraits.mjs --strict。"
     },
     {
       "id": 4,
-      "status": "PENDING",
-      "request": "依 registry 自動生成並放置缺少的透明 PNG 立繪。",
-      "owner": ["assets/monsters/**"],
-      "implementation": "本批刻意未偽造或先放空白圖。planned targets 需由後續實際圖像生成批次逐張完成。"
+      "status": "IN_PROGRESS",
+      "request": "依 registry 分批生成並放置缺少的透明 PNG 立繪。",
+      "owner": ["assets/monsters/**", "release/monster-portrait-batches/*.json", "scripts/finalize-monster-portrait-registry.mjs"],
+      "implementation": "禁止一次硬接所有 planned target。finalize 必須帶 --batch，只處理該 manifest 列出的 registry keys；檔案實際存在才升為 existing，缺圖維持 planned/pending。每批 pending 清空並 strict PASS 後才進下一批。"
     },
     {
       "id": 5,
@@ -47,9 +47,10 @@
     "completed": [],
     "pending": [
       "工作分支專項測試與 Repository checks",
-      "98 個 planned target 的實際圖片生成與尺寸／透明度驗證",
+      "剩餘 planned target 依 batch 的實際圖片生成與尺寸／透明度驗證",
+      "每個 COMPLETE batch 的 strict audit",
       "素材完成後的 runtime 接線與首次載入／換波／換層瀏覽器驗證"
     ],
-    "result": "IN_PROGRESS — 規格／registry／audit 已寫入，尚未把不存在的圖片誤接到正式 runtime"
+    "result": "IN_PROGRESS — 已禁止 unscoped finalize，並建立 per-batch strict gate；不存在的圖片仍不得誤接到正式 runtime"
   }
 }
