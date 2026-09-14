@@ -614,6 +614,11 @@
 #game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{
     --v143-monster-card-width:var(--gameplay-boss-card-width);
     --v143-monster-card-height:auto;
+    /* The shared combat stylesheet deliberately owns the bar width with an
+       important declaration. Feed it the card-relative width through its
+       existing custom property so the HP/SP text can never extend past this
+       narrower portrait card. */
+    --v143-monster-bar-width:calc(100% - 10px);
     --v143-monster-icon-width:calc(100% - 12px);
     --v143-monster-icon-height:auto;
     --v143-monster-bar-width:calc(100% - 10px);
@@ -654,6 +659,15 @@
 #game-stage #battlePage .battle-monster.gameplay-boss-card .monster-sp{
     width:calc(100% - 10px);
     min-width:0;
+}
+
+/* Long boss values are rendered as a non-wrapping overlay.  Constrain that
+   overlay to the bar itself; otherwise its glyphs increase the bar scroll
+   width even though the visible background has the correct width. */
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-bar-text{
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:clip;
 }
 
 #game-stage #battlePage .battle-monster.gameplay-boss-card .monster-status-badges{
