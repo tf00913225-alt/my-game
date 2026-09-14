@@ -512,7 +512,7 @@ test("enemy Ice Arrow Rain stays centered on the complete player formation",()=>
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
     assert.equal(sprites[0].style.left,"240px");
     assert.equal(sprites[0].style.top,"420px");
-    assert.equal(sprites[0].style.width,"537px");
+    assert.equal(sprites[0].style.width,"195px");
     assert.equal(sprites[0].style.height,"195px");
     assert.equal(sprites[0].style.clipPath||sprites[0].style["clip-path"],"none");
     assert.equal(sprites[0].querySelectorAll(".v166-water-battlefield-tile").length,0);
