@@ -279,15 +279,15 @@
         v174FireRocketTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both !important;
 }
 @keyframes v174FireRocketTravel{
-    0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(.98)}
-    2%,24.999%,25%{opacity:1;transform:translate(-50%,-50%) rotate(var(--v143-sprite-angle,0deg)) scale(1)}
+    0%{opacity:0;transform:translate(-50%,-50%) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(.98)}
+    2%,24.999%,25%{opacity:1;transform:translate(-50%,-50%) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(1)}
     58.333%,97%{
         opacity:1;
-        transform:translate(calc(-50% + var(--v143-sprite-dx,0px)),calc(-50% + var(--v143-sprite-dy,0px))) rotate(var(--v143-sprite-angle,0deg)) scale(1);
+        transform:translate(calc(-50% + var(--v143-sprite-dx,0px)),calc(-50% + var(--v143-sprite-dy,0px))) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(1);
     }
     100%{
         opacity:0;
-        transform:translate(calc(-50% + var(--v143-sprite-dx,0px)),calc(-50% + var(--v143-sprite-dy,0px))) rotate(var(--v143-sprite-angle,0deg)) scale(1);
+        transform:translate(calc(-50% + var(--v143-sprite-dx,0px)),calc(-50% + var(--v143-sprite-dy,0px))) rotate(calc(var(--v143-sprite-angle,0deg) + 90deg)) scale(1);
     }
 }
 

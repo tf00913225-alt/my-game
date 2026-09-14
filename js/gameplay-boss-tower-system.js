@@ -600,9 +600,17 @@
         }
         setTimeout(()=>{ if(activeBattleContext){ activeBattleContext.mechanisms=activeBattleContext.mechanisms.filter(item=>item!==card);renderMechanisms(); } },290);
     }
-    function damageMechanism(card,damage,sourceName){
+    function damageMechanism(card,damage,sourceName,isCrit){
         if(!card||card.destroyed||card.hp<=0){ return 0; }
-        const final=Math.max(1,Math.round(numeric(damage,1)));card.hp=Math.max(0,card.hp-final);
+        const final=Math.max(1,Math.round(numeric(damage,1)));
+        const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
+    if(typeof window.v143RunAtTargetHit==="function"){
+        window.v143RunAtTargetHit("monster","mechanism:"+card.id,function(){},true);
+    }
+        if(node&&typeof showDamagePopup==="function"){
+            showDamagePopup(node,"HP-"+final,"hp",!!isCrit);
+        }
+        card.hp=Math.max(0,card.hp-final);
         if(typeof addBattleLog==="function"){ addBattleLog((sourceName||"攻擊")+"命中【"+card.name+"】，造成"+final+"傷害。"); }
         if(card.hp<=0){ destroyMechanism(card,"destroyed"); }else{ renderMechanisms(); }
         return final;
@@ -712,7 +720,7 @@
             }
         }
         const result=calculateMechanismActionDamage(characterIndex,queued.action,card);
-        if(result.damage>0){ damageMechanism(card,result.damage,(character&&character.id?character.id+"的":"")+result.name); }
+        if(result.damage>0){ damageMechanism(card,result.damage,(character&&character.id?character.id+"的":"")+result.name,result.crit); }
         else if(typeof addBattleLog==="function"){ addBattleLog(result.name+"無法直接破壞機制卡。需要使用傷害技能。"); }
         if(spreads){
             const fallback=currentBattleMonsters.find(index=>monsters[index]&&monsters[index].alive);
