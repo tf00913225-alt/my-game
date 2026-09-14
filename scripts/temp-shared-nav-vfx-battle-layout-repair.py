@@ -1,5 +1,4 @@
 import subprocess
-import re
 
 OLD_WORKFLOW_COMMIT = "d2a9f08b773bccff0af712d0e904599f62f448f0"
 OLD_WORKFLOW_PATH = ".github/workflows/temp-shared-nav-vfx-battle-layout.yml"
@@ -40,31 +39,35 @@ tolerant = (
 assert original in code
 code = code.replace(original, tolerant, 1)
 
-# The original embedded patch accidentally lost indentation inside this triple-quoted
-# matcher. Replace that one patch block with a regex against the actual owner source.
-block_pattern = re.compile(
-    r"p='js/38-v143-system-fixes\.js'; s=read\(p\)\n"
-    r"old='''            node\.style\.setProperty\(\"font-size\",\"13px\",\"important\"\);\n"
-    r"\s*const available=Math\.max\(1,node\.clientWidth\|\|68\);\n"
-    r"\s*let size=13;\n"
-    r"\s*while\(size>11&&node\.scrollWidth>available\)\{'''\n"
-    r"new='''            node\.style\.setProperty\(\"font-size\",\"9px\",\"important\"\);\n"
-    r"\s*const available=Math\.max\(1,node\.clientWidth\|\|68\);\n"
-    r"\s*let size=9;\n"
-    r"\s*while\(size>8&&node\.scrollWidth>available\)\{'''\n"
-    r"assert s\.count\(old\)==1\n"
-    r"write\(p,s\.replace\(old,new,1\)\)"
+# The embedded workflow lost indentation inside one triple-quoted matcher. Restore
+# the indentation in the generated Python source before executing it.
+bad_old = (
+    "old='''            node.style.setProperty(\"font-size\",\"13px\",\"important\");\n"
+    "  const available=Math.max(1,node.clientWidth||68);\n"
+    "  let size=13;\n"
+    "  while(size>11&&node.scrollWidth>available){'''"
 )
-replacement = '''p='js/38-v143-system-fixes.js'; s=read(p)
-pattern=r'            node\\.style\\.setProperty\\("font-size","13px","important"\\);\\n            const available=Math\\.max\\(1,node\\.clientWidth\\|\\|68\\);\\n            let size=13;\\n            while\\(size>11&&node\\.scrollWidth>available\\)\\{'
-replacement=''' + "'''" + '''            node.style.setProperty("font-size","9px","important");
-            const available=Math.max(1,node.clientWidth||68);
-            let size=9;
-            while(size>8&&node.scrollWidth>available){''' + "'''" + '''
-s,n=re.subn(pattern,replacement,s,count=1)
-assert n==1, 'js/38 enemy bar font patch not found'
-write(p,s)'''
-code, count = block_pattern.subn(replacement, code, count=1)
-assert count == 1, "failed to replace js/38 enemy bar patch block"
+good_old = (
+    "old='''            node.style.setProperty(\"font-size\",\"13px\",\"important\");\n"
+    "            const available=Math.max(1,node.clientWidth||68);\n"
+    "            let size=13;\n"
+    "            while(size>11&&node.scrollWidth>available){'''"
+)
+bad_new = (
+    "new='''            node.style.setProperty(\"font-size\",\"9px\",\"important\");\n"
+    "  const available=Math.max(1,node.clientWidth||68);\n"
+    "  let size=9;\n"
+    "  while(size>8&&node.scrollWidth>available){'''"
+)
+good_new = (
+    "new='''            node.style.setProperty(\"font-size\",\"9px\",\"important\");\n"
+    "            const available=Math.max(1,node.clientWidth||68);\n"
+    "            let size=9;\n"
+    "            while(size>8&&node.scrollWidth>available){'''"
+)
+assert bad_old in code
+assert bad_new in code
+code = code.replace(bad_old, good_old, 1)
+code = code.replace(bad_new, good_new, 1)
 
 exec(compile(code, "temp-shared-nav-vfx-battle-layout.py", "exec"))
