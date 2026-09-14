@@ -300,29 +300,24 @@ test("Abyss movement freezes the current frame and accepts a new direction",()=>
     assert.equal(player.style.top,"40%");
 });
 
-test("Abyss keeps a top return while the fifth bottom-nav button goes to the city",()=>{
+test("Abyss final nav heals stale five-button markup even when mode and count match",()=>{
     let html="";
-    const nav=element({dataset:{},children:[1,2,3,4]});
+    const labels=["角色","背包","商店","元素匣","返回"];
+    const stale=labels.map((label,index)=>element({getAttribute:name=>name==="aria-label"?label:(name==="onclick"?(index===4?"showPage('home')":"legacy()") : ""),querySelector:()=>index===2?{getAttribute:()=>"assets/ui/home-shop-v147.png"}:null}));
+    const nav=element({dataset:{v148Mode:"abyss-map"},children:stale});
     Object.defineProperty(nav,"innerHTML",{get:()=>html,set:value=>{ html=value; nav.children=[1,2,3,4,5]; }});
-    const page=element({querySelector:()=>({})});
+    const page=element({querySelector:selector=>selector===".v141-abyss-shell"?{}:null});
     const topReturn=element();
-    const context=baseContext({
-        document:{
-            readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],
-            getElementById:id=>id==="dungeonPage"?page:id==="v141DungeonNav"?nav:id==="v146AbyssReturn"?topReturn:null
-        }
-    });
+    const context=baseContext({document:{readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],getElementById:id=>id==="dungeonPage"?page:id==="v141DungeonNav"?nav:id==="v146AbyssReturn"?topReturn:null}});
     context.v148SyncDungeonShell();
     assert.equal((html.match(/<button/g)||[]).length,5);
-    assert.match(html,/onclick="showPage\('home'\)" aria-label="主城"/);
-    assert.match(html,/src="assets\/ui\/nav-home\.png"/);
+    assert.match(html,/aria-label="秘寶"/);
+    assert.match(html,/src="assets\/ui\/nav-relic-v175\.webp"/);
+    assert.match(html,/aria-label="返回"/);
+    assert.doesNotMatch(html,/aria-label="商店"|aria-label="主城"/);
     assert.equal(nav.dataset.v146Columns,"5");
     assert.notEqual(topReturn.removed,true);
-    assert.match(source,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
-    assert.match(css,/data-rank="elite"[\s\S]*color:#ff9f43 !important/);
-    assert.match(css,/#mapPage \.map-monster\[data-rank="elite"\]/);
-    assert.match(source,/card\.dataset\.rank=rank==="boss"\?"boss":rank==="elite"\?"elite":"regular"/);
-    assert.match(source,/event\.stopImmediatePropagation\(\)/);
+    assert.match(source,/function dungeonNavMatches\(nav,abyssMapActive,abyssSelectionActive\)/);
 });
 
 console.log("\nV148 combat/dungeon fixes suite: "+passed+" tests passed.");

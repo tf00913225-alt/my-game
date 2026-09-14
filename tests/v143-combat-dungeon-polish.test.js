@@ -35,7 +35,7 @@ test("enemy identity starts at 16px, never drops below 12px and bars use 12px bo
     assert.match(system,/let size=16/);
     assert.match(system,/while\(size>12/);
     assert.match(css,/\.battle-monster-name\.v143-monster-identity[\s\S]*font-size:16px !important/);
-    assert.match(css,/\.monster-bar-text[\s\S]*font-size:12px !important;[\s\S]*font-weight:900/);
+    assert.match(css,/\.monster-bar-text[\s\S]*font-size:var\(--v143-monster-bar-font-size,12px\) !important;[\s\S]*font-weight:900/);
     // Ordinary monster cards keep the V143 76x100 contract through fallback values;
     // only rank=boss may opt into the larger scoped geometry.
     assert.match(css,/width:var\(--v143-monster-card-width,76px\) !important;[\s\S]*height:var\(--v143-monster-card-height,100px\) !important/);
@@ -178,12 +178,12 @@ test("dungeon escape restores its owner and Abyss portrait opens dialogue direct
     assert.doesNotMatch(system,/v141ChallengeAbyssBoss=function/);
 });
 
-test("dungeon nav is in the scaled shell with exactly the five requested destinations",()=>{
-    const navBlock=system.slice(system.indexOf("function fixDungeonNavigation"),system.indexOf("const ABYSS_DIALOGUE"));
-    ["角色","背包","商店","元素匣","返回"].forEach(label=>assert.match(navBlock,new RegExp('aria-label="'+label+'"')));
+test("V143 delegates dungeon destinations to the final owner",()=>{
+    const navBlock=system.slice(system.indexOf("function fixDungeonNavigation"),system.indexOf("/* ----- 6. Synthesis"));
     assert.match(navBlock,/content\.appendChild\(nav\)/);
     assert.match(navBlock,/oldReturn\.remove\(\)/);
-    assert.doesNotMatch(navBlock,/aria-label="任務"/);
+    assert.match(navBlock,/v148SyncDungeonShell/);
+    assert.doesNotMatch(navBlock,/nav\.innerHTML=/);
     assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
 });
 
