@@ -658,6 +658,15 @@
     min-width:0;
 }
 
+/* Boss resource labels are non-wrapping overlays. Keep their rendered text
+   inside the narrower portrait bar so large HP values cannot produce hidden
+   horizontal scroll overflow on mobile. */
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-bar-text{
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:clip;
+}
+
 #game-stage #battlePage .battle-monster.gameplay-boss-card .monster-status-badges{
     width:100%;
     justify-content:center;
