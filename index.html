@@ -1150,7 +1150,6 @@
             <small>特殊戰鬥總覽</small>
             <h2 id="gameplayPageTitle">玩 法</h2>
         </div>
-        <button type="button" class="gameplay-back-button v174-gameplay-home-back" onclick="showPage('home')" aria-label="返回主城">返回</button>
     </header>
 
     <div
@@ -2435,20 +2434,25 @@
 
 <button
     class="nav-button nav-art-button-wrap"
-    onclick="openHomeFeature('quest')"
-    aria-label="任務"
+    onclick="openHomeFeature('relic')"
+    aria-label="秘寶"
 >
-<img class="nav-art-button" src="assets/ui/nav-quest.png" alt="" aria-hidden="true" loading="eager" decoding="async">
-<span class="nav-sr-only">任務</span>
+<img class="nav-art-button" src="assets/ui/nav-relic-v175.webp" alt="" aria-hidden="true" loading="eager" decoding="async">
+<span class="nav-sr-only">秘寶</span>
 </button>
 
 <button
     class="nav-button nav-art-button-wrap"
     onclick="openHomeFeature('autoBattleSettings')"
-    aria-label="元素匣／自動戰鬥設定"
+    aria-label="元素匣"
 >
 <img class="nav-art-button" src="assets/ui/nav-element-box.png" alt="" aria-hidden="true" loading="eager" decoding="async">
 <span class="nav-sr-only">元素匣／自動戰鬥設定</span>
+</button>
+
+<button class="nav-button nav-art-button-wrap" onclick="leaveMap()" aria-label="返回">
+<img class="nav-art-button" src="assets/ui/map-return.png" alt="" aria-hidden="true" loading="eager" decoding="async">
+<span class="nav-sr-only">返回</span>
 </button>
 
 </div>

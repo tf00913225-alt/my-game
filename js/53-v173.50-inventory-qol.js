@@ -154,12 +154,12 @@
         });
 
         output.sort((a,b)=>{
+            const qualityDiff=inventoryQualityRank(b)-inventoryQualityRank(a);
+            if(qualityDiff){ return qualityDiff; }
             const familyA=inventoryFamilyKey(a);
             const familyB=inventoryFamilyKey(b);
             const familyDiff=(familyOrder.get(familyA)??999999)-(familyOrder.get(familyB)??999999);
             if(familyDiff){ return familyDiff; }
-            const qualityDiff=inventoryQualityRank(b)-inventoryQualityRank(a);
-            if(qualityDiff){ return qualityDiff; }
             const idDiff=String(a.id||"").localeCompare(String(b.id||""),"zh-Hant");
             if(idDiff){ return idDiff; }
             return String(a.name||"").localeCompare(String(b.name||""),"zh-Hant");
@@ -346,7 +346,7 @@
             const definition=getPotionDefinition(item.id);
             if(definition){ return {kind:"potion",label:"批量使用",total,definition}; }
         }
-        if(item.type==="chest"&&item.id==="materialChest"&&typeof window.v132OpenMaterialChest==="function"){
+        if(item.type==="chest"&&getChestOpenOnce(item)){
             return {kind:"chest",label:"批量開啟",total};
         }
         if(item.type==="ticket"&&typeof window.useEquipmentTicket==="function"){
@@ -430,15 +430,33 @@
         };
     }
 
+    function getChestOpenOnce(item){
+        if(!item){ return null; }
+        if(item.id==="materialChest"&&typeof window.v132OpenMaterialChest==="function"){
+            return function(){ return window.v132OpenMaterialChest(); };
+        }
+        if(item.id==="equipmentChest"&&typeof window.v17346OpenEquipmentChest==="function"){
+            return function(){
+                const rewards=window.v17346OpenEquipmentChest();
+                return Array.isArray(rewards)
+                    ?rewards.map(reward=>String((reward&&reward.name)||"裝備")+"×1")
+                    :null;
+            };
+        }
+        return null;
+    }
+
     function batchChest(item,requested){
         const rewardMap=new Map();
         const notices=[];
         const originalAlert=window.alert;
+        const openOnce=getChestOpenOnce(item);
         let used=0;
+        if(!openOnce){ return {used:0,message:"這個寶箱目前沒有可用的開啟流程。"}; }
         window.alert=message=>{ notices.push(String(message||"")); };
         try{
             for(let index=0;index<requested;index++){
-                const opened=window.v132OpenMaterialChest();
+                const opened=openOnce();
                 if(!opened){ break; }
                 used++;
                 opened.forEach(line=>parseRewardLine(line,rewardMap));

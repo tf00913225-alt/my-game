@@ -1,0 +1,15 @@
+{
+  "batchId": "2026-09-14-inventory-battle-nav",
+  "releaseVersion": "173.65",
+  "branch": "fix/inventory-battle-nav-20260914",
+  "requirements": [
+    {"id":"REQ-01","title":"背包道具格與詳情圖像完整顯示","status":"IMPLEMENTED"},
+    {"id":"REQ-02","title":"怪物名稱顯示於 HP／SP 條下方","status":"IMPLEMENTED"},
+    {"id":"REQ-03","title":"材料與裝備寶箱皆提供批量開啟","status":"IMPLEMENTED"},
+    {"id":"REQ-04","title":"所有背包分類依稀有度由高到低排序","status":"IMPLEMENTED"},
+    {"id":"REQ-05","title":"BOSS 卡完整顯示、功能卡放大與傷害數字回饋","status":"IMPLEMENTED"},
+    {"id":"REQ-06","title":"技能 VFX 對準／尺寸／火箭方向與 MISS 回饋","status":"IMPLEMENTED"},
+    {"id":"REQ-07","title":"玩法／副本導覽改為角色、背包、秘寶、元素匣、返回，移除玩法右上返回","status":"IMPLEMENTED"},
+    {"id":"REQ-08","title":"角色頁目前操作角色有明顯選取狀態","status":"IMPLEMENTED"}
+  ]
+}

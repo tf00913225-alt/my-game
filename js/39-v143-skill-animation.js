@@ -606,9 +606,13 @@
         node.dataset.placement=placement;
 
         if(placement==="single"){
+            const targetSize=Math.max(target.rect.width,target.rect.height);
+            const configuredMin=Number(sprite.minSize)||96;
+            const configuredMax=Number(sprite.maxSize)||184;
+            const minSize=Math.min(configuredMin,targetSize*1.18);
+            const maxSize=Math.max(minSize,Math.min(configuredMax,targetSize*1.68));
             const size=clamp(
-                Math.max(target.rect.width,target.rect.height)*(Number(sprite.scale)||1.8),
-                Number(sprite.minSize)||96,Number(sprite.maxSize)||184
+                targetSize*(Number(sprite.scale)||1.8),minSize,maxSize
             );
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
@@ -622,9 +626,13 @@
         if(placement==="targetTrajectory"){
             const actor=cardCenter(current.actorCard);
             if(!actor){ return; }
+            const targetSize=Math.max(target.rect.width,target.rect.height);
+            const configuredMin=Number(sprite.minSize)||140;
+            const configuredMax=Number(sprite.maxSize)||240;
+            const minSize=Math.min(configuredMin,targetSize*1.12);
+            const maxSize=Math.max(minSize,Math.min(configuredMax,targetSize*1.56));
             const size=clamp(
-                Math.max(target.rect.width,target.rect.height)*(Number(sprite.scale)||1.7),
-                Number(sprite.minSize)||140,Number(sprite.maxSize)||240
+                targetSize*(Number(sprite.scale)||1.7),minSize,maxSize
             );
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
@@ -636,6 +644,7 @@
             node.style.height=size+"px";
             node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
+            node.style.setProperty("--v143-sprite-angle",Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI+"deg");
             return;
         }
 
