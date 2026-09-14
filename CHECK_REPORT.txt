@@ -3,56 +3,71 @@
 版本：V173.65
 更新日期：2026-09-14
 基線分支：dev
-更新起點：e0e8fe0fe4c65a6262f6e88674f5c058adeeb799
+測試／資源核對來源：dev@0b747b12ab4d2fed1aeeb44900760afca4c924cd
 Game / Cache Version：V173.65 / 173.65
 
-本文件是目前專案測試與資產數字的快速判讀基線。
-V173.4 與更早版本的數字已失效；需要歷史資料時請查 Git history，不得再把舊報告中的數字當成目前專案現況。
+本文件是目前專案「測試結構、靜態資源與 deterministic build」的快速判讀基線。
+本次修正只修改 CHECK_REPORT.txt，不修改程式、測試、資產、build 產物或版本，因此以下 js／tests／assets tree 可作為本次可追溯基線：
+- js tree：9654a94516c6fc2e06d6e05b96098fa4cd3b142a
+- tests tree：97ad5c4d78c283725810d3526036a8de876f7739
+- assets tree：fdd37be4af1b6169bca3401abfafd3bdd9ee2e7a
 
-一、目前 V173.65 測試基線
+V173.4、V121 與其他歷史版本的數字全部只屬歷史紀錄，不得再拿來判斷目前 dev。為避免後續 AI 誤讀，本文件不再重列那些舊數字。
 
-最近一次已建立並完整驗證的 V173.65 基線：
-- JavaScript syntax：228 / 228 通過。
-- Node / browser suites：152 / 152 通過。
-- release / loader / git-diff gates：通過。
-- 相關手機尺寸 Chrome QA、boot／skill／relic QA 與部署後 live QA：通過（完整驗證基線建立於 2026-09-11 的 dev 整合）。
+一、目前 V173.65 測試基線（2026-09-14）
 
-目前 dev HEAD（e0e8fe0fe4c65a6262f6e88674f5c058adeeb799）：
-- GitHub Actions CI：SUCCESS。
-- CI 已有 diff-scope / guard 優化；若某次 HEAD 只修改不影響特定 suite 的檔案，該 suite 可以被 skip。
-- 因此「最新一次 CI 成功」不等於「該次 run 重新執行全部 152 suites」。需要宣稱全量測試時，必須確認該 run 實際執行範圍，或執行完整測試基線。
+目前 repository 結構：
+- js/：76 個 JavaScript 檔案。
+- tests/：165 個 JavaScript／MJS 檔案。
+- 其中 164 個符合 *.test.js／*.test.cjs／*.test.mjs，屬 Node unit／integration suite inventory。
+- 另 1 個 tests/v138-browser-smoke.js 為 browser smoke，不計入上述 164 個 Node suite。
 
-二、目前 V173.65 資產／build 基線
+目前 dev GitHub Actions（run 34836479707）實際輸出：
+- JavaScript syntax：241 / 241 通過（js/ + tests/）。
+- npm run build:check：通過。
+- Release source coherence：V173.65，cache 173.65。
+- Requirements：10 / 10 VERIFIED。
+- Git diff whitespace：通過。
+- unresolved conflict markers：0。
 
-最近一次完整 V173.65 deterministic build 驗證基線：
-- resources：299。
-- static IDs：242。
-- deterministic build assets：22。
-- deterministic build、release 與 loader gate：通過。
+重要：這次 dev 變更屬 documentation-only diff，CI 的 Node unit／integration suites、mobile browser QA 等步驟依 diff-scope 規則為 skipped。
+因此：
+- 「164」是目前 Node suite 的實際檔案 inventory，不代表這次 run 有重新執行 164 / 164。
+- 「CI SUCCESS」也不得被解讀成此次 run 已重新跑完所有 browser／mobile suites。
+- 若需要宣稱完整 suite PASS，必須引用實際執行該 suite 的 run，或重新執行完整測試。
 
-上述數字是目前用來判斷資產／build 是否異常的權威基線；不得再使用 V173.4 的 assets、靜態引用、Loader 或舊檔案數量做比較。
+二、目前 V173.65 靜態資源／asset／build 基線（2026-09-14）
 
-三、已淘汰的 V173.4 數字
+目前 dev GitHub Actions（run 34836479707）實際輸出：
+- Static resources：302 個 unique local targets，全部存在。
+- 靜態資源掃描範圍：4 HTML、60 CSS、76 non-embedded JavaScript。
+- HTML IDs：251 個 static IDs，跨 4 個 HTML 全部唯一。
+- Deterministic production build：22 個 build assets 全部符合 content hash。
+- Critical Boot：exactly 1 hashed script + 1 hashed stylesheet；gameplay features 維持 non-critical。
+- FeatureLoader：仍為唯一 dynamic script owner。
+- release／loader／build gates：通過。
 
-以下 V173.4 舊值只代表 2026-08-31 當時狀態，已全部淘汰，不得用於目前專案判讀：
-- Git 追蹤檔案 351。
-- JavaScript syntax 150 / 150。
-- Node suites 37 / 37。
-- assets/ 142 個檔案。
-- 靜態本地引用 300 個。
-- 以及舊報告中所有 V173.4 HTML／CSS／JS／Loader／圖片格式與檔案數量。
+資產判讀注意：
+- 上述 302 是 CI 實際驗證的「unique local resource targets」，不是 assets/ 資料夾的 raw file count，兩者不可混用。
+- assets/ raw file inventory 若未重新由目前 tree 計數，不得沿用任何歷史總數。
+- 目前 assets/monsters tree 實際只有 5 個 image blobs；過去怪物立繪 Pipeline 的 98 張 queue／工作區產物／規劃數量，不等於目前 dev 已存在 98 張怪物資產。
+- 若要判斷某批美術是否已合入 dev，必須直接查目前 assets tree／registry，不得只引用 HANDOFF、queue 或本機工作區紀錄。
 
-四、後續 AI／維護者判讀規則
+三、後續 AI／維護者判讀規則
 
-1. 判斷目前專案狀態時，先以最新 dev HEAD、最新 CI 與本文件 V173.65 基線為準。
-2. 不得因歷史 test 檔、舊 HANDOFF 段落或 Git history 中的 V173.4 數字，回退目前基線。
-3. CI 若因 diff-scope 顯示 skipped，必須區分「本次未受影響而略過」與「測試失敗／不存在」。
-4. 若新增／刪除正式 script、test suite、resource、static ID 或 deterministic build asset，使基線數字永久改變，必須在同一輪更新本文件。
-5. Game / Cache Version 若仍為 V173.65，但結構基線已改變，也必須更新本文件的日期與新數字，不能只看版本號判斷。
-6. 若本文件與最新 dev 的實際 CI／build 輸出衝突，以最新 dev 的可重現檢查結果為準，並立即修正本文件。
+1. 判斷目前專案時，優先使用最新 dev 的實際 CI／build 輸出與本文件；不得回退使用 V173.4、V121 或其他舊版數字。
+2. 241 / 241 是本次實際執行並通過的 JavaScript syntax 數；164 是目前 Node suite inventory，兩者意義不同。
+3. CI 顯示 skipped 時，必須解讀為「依 diff-scope 未執行」，不能寫成 PASS，也不能寫成 FAIL／不存在。
+4. 302 resources、251 static IDs、22 deterministic build assets 是 2026-09-14 此基線的可重現 CI 數字；未來 dev 結構改變後必須以新 CI 輸出更新，不得永久硬套。
+5. assets/ raw file count、圖片格式分布、某類素材數量若沒有從最新 tree 重新計數，就不要填舊數字。
+6. 若新增／刪除正式 script、test suite、resource、static ID、asset 或 deterministic build asset，使基線永久改變，應在同一輪更新本文件。
+7. Game / Cache Version 即使仍為 V173.65，也不能代表測試／資產結構數字一定沒有改變。
+8. 若本文件與最新 dev 的可重現 CI／build／tree 結果衝突，以最新實際結果為準，並立即修正本文件。
 
 結論：
-- 目前發布版本基線為 V173.65。
-- 已知完整測試基線：228 / 228 JavaScript syntax、152 / 152 Node / browser suites。
-- 已知資產／build 基線：299 resources、242 static IDs、22 deterministic build assets。
-- V173.4 與更早的數字僅屬歷史紀錄，不再代表目前專案。
+- 目前版本基線：V173.65／cache 173.65。
+- 目前實際 syntax 基線：241 / 241 PASS。
+- 目前 Node suite inventory：164；本次 documentation-only CI 未重新執行全套 Node suites。
+- 目前靜態資源基線：302 unique local targets、251 static IDs。
+- 目前 deterministic build 基線：22 build assets，全數 content-hash match。
+- V173.4 與更早版本的數字已退出現行判讀，不得再作為目前專案基線。
