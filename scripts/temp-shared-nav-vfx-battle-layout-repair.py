@@ -97,3 +97,12 @@ assert count == 1, "battle monster identity/art owner block not found"
 battle_path.write_text(battle, encoding="utf-8")
 
 exec(compile(code, "temp-shared-nav-vfx-battle-layout.py", "exec"))
+
+# V148's own historical test must now assert the final shared context-nav owner,
+# not the retired dungeon-only matcher.
+test_path = Path("tests/v148-combat-dungeon-fixes.test.js")
+test_text = test_path.read_text(encoding="utf-8")
+old_assert = r'assert.match(source,/function dungeonNavMatches\(nav,abyssMapActive,abyssSelectionActive\)/);'
+new_assert = r'assert.match(source,/function contextNavMatches\(nav,returnAction\)/);'
+assert old_assert in test_text, "v148 historical nav matcher assertion not found"
+test_path.write_text(test_text.replace(old_assert, new_assert, 1), encoding="utf-8")
