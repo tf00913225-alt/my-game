@@ -1312,14 +1312,17 @@
     }
 
     /* ----- Dungeon navigation and movement. ----- */
-    function dungeonNavMarkup(isAbyss){
+    function dungeonNavMarkup(abyssMapActive,abyssSelectionActive){
         const buttons=[
             ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],
             ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
-            ["商店","assets/ui/home-shop-v147.png","openHomeFeature('shop')"],
-            ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"],
-            ["主城","assets/ui/nav-home.png","showPage('home')"]
+            ["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"],
+            ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"]
         ];
+        const returnAction=abyssMapActive
+            ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")
+            :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')");
+        buttons.push(["返回","assets/ui/map-return.png",returnAction]);
         return buttons.map(button=>
             '<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'">'+
             '<img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>'
@@ -1331,9 +1334,11 @@
         const page=document.getElementById("dungeonPage");
         const nav=document.getElementById("v141DungeonNav");
         if(!page){ return; }
-        const isAbyss=!!page.querySelector(".v141-abyss-shell,.v141-abyss-intro");
+        const abyssMapActive=!!page.querySelector(".v141-abyss-shell");
+        const abyssSelectionActive=!!page.querySelector(".v174-abyss-selection,.v174-abyss-complete,.v141-abyss-intro");
+        const isAbyss=abyssMapActive||abyssSelectionActive;
         let topReturn=document.getElementById("v146AbyssReturn");
-        if(isAbyss&&!topReturn){
+        if(abyssMapActive&&!topReturn){
             topReturn=document.createElement("button");
             topReturn.id="v146AbyssReturn";
             topReturn.type="button";
@@ -1342,13 +1347,13 @@
             topReturn.innerHTML='<img src="assets/ui/map-return.png" alt="">';
             topReturn.onclick=window.v146ExitAbyssMap;
             page.appendChild(topReturn);
-        }else if(!isAbyss&&topReturn){
+        }else if(!abyssMapActive&&topReturn){
             topReturn.remove();
         }
         if(nav){
-            const mode=isAbyss?"abyss":"daily";
+            const mode=abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily");
             if(nav.dataset.v148Mode!==mode||nav.children.length!==5){
-                nav.innerHTML=dungeonNavMarkup(isAbyss);
+                nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);
                 nav.dataset.v148Mode=mode;
             }
             nav.dataset.v146Columns="5";

@@ -332,7 +332,7 @@ test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main
     assert.equal(sprites[0].style["--v143-sprite-dy"],"-258px");
     assert.notEqual(sprites[0].style["--v143-sprite-angle"],"0deg");
     assert.equal(sprites[0].style.width,sprites[0].style.height);
-    assert.equal(sprites[0].style.width,"840px","approved VFX scale is exactly 3x the previous 280px box");
+    assert.equal(sprites[0].style.width,"420px","mobile VFX scale is 1.5x the previous 280px box");
     assert.equal(runtime.legacyRocketCalls(),0);
 });
 
@@ -363,7 +363,7 @@ test("Fire Slash plays one sheet on the selected target and reaches damage at fr
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.placement,"single");
     assert.equal(sprites[0].dataset.targetIndex,"1");
-    assert.ok(parseFloat(sprites[0].style.width)<=660,"single-target VFX keeps the approved 3x scale ceiling");
+    assert.ok(parseFloat(sprites[0].style.width)<=330,"single-target VFX keeps the mobile 1.5x scale ceiling");
     assert.equal(stage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     const before=runtime.scheduled.length;
     runtime.context.showMonsterHit(1,17,"hp",false);
@@ -403,8 +403,8 @@ test("Rage creates one cast sheet inside every affected card",()=>{
     assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
     sprites.forEach(node=>assert.equal(node.dataset.placement,"single"));
     sprites.forEach(node=>{
-        assert.ok(parseFloat(node.style.width)>=360);
-        assert.ok(parseFloat(node.style.width)<=444);
+        assert.ok(parseFloat(node.style.width)>=180);
+        assert.ok(parseFloat(node.style.width)<=222);
     });
 });
 

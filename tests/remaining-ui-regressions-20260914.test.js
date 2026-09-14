@@ -10,6 +10,7 @@ const vfx=read("js/39-v143-skill-animation.js");
 const bossCss=read("css/gameplay-boss-tower.css");
 const bossJs=read("js/gameplay-boss-tower-system.js");
 const fireCss=read("css/56-v174-critical-ui-regressions.css");
+const finalNav=read("js/42-v148-combat-dungeon-fixes.js");
 assert.match(inventoryJs,/const INVENTORY_PAGE_SIZE=18;/);
 assert.match(inventoryJs,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/);
 assert.match(inventoryCss,/inventory-grid-classic[\s\S]*grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
@@ -18,7 +19,7 @@ assert.doesNotMatch(abyssCss,/#game-stage #inventoryPage \.inventory-item-classi
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:0!important;[\s\S]*z-index:24!important/);
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*inset:15px -5px 26px!important/);
 assert.match(battle,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:2px solid #f1c96d!important/);
-assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=3;/);
+assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1\.5;/);
 assert.match(vfx,/function visualRectForCard\(card\)[\s\S]*:scope > \.v174-battle-art/);
 assert.match(vfx,/function applySpriteBox\([\s\S]*SPRITE_SCALE_MULTIPLIER/);
 assert.match(vfx,/naturalWidth[\s\S]*columns[\s\S]*naturalHeight[\s\S]*rows/);
@@ -30,4 +31,8 @@ assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(123px,30%,138px\)/)
 assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(117px,29\.25%,132px\)/);
 assert.match(bossJs,/showDamagePopup\(node,"HP-"\+final,"hp",!!isCrit\)/);
 assert.match(fireCss,/rotate\(calc\(var\(--v143-sprite-angle,0deg\) \+ 90deg\)\)/);
+assert.match(finalNav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","openHomeFeature\(\'relic\'\)"\]/);
+assert.match(finalNav,/buttons\.push\(\["返回","assets\/ui\/map-return\.png",returnAction\]\)/);
+assert.match(finalNav,/const mode=abyssMapActive\?"abyss-map":\(abyssSelectionActive\?"abyss-selection":"daily"\)/);
+assert.doesNotMatch(finalNav,/\["商店","assets\/ui\/home-shop-v147\.png"/);
 console.log("✓ remaining UI regressions guarded");
