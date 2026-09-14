@@ -1,4 +1,6 @@
 import subprocess
+import re
+from pathlib import Path
 
 OLD_WORKFLOW_COMMIT = "d2a9f08b773bccff0af712d0e904599f62f448f0"
 OLD_WORKFLOW_PATH = ".github/workflows/temp-shared-nav-vfx-battle-layout.yml"
@@ -39,8 +41,7 @@ tolerant = (
 assert original in code
 code = code.replace(original, tolerant, 1)
 
-# The embedded workflow lost indentation inside one triple-quoted matcher. Restore
-# the indentation in the generated Python source before executing it.
+# The embedded workflow lost indentation inside one triple-quoted matcher. Restore it.
 bad_old = (
     "old='''            node.style.setProperty(\"font-size\",\"13px\",\"important\");\n"
     "  const available=Math.max(1,node.clientWidth||68);\n"
@@ -69,5 +70,30 @@ assert bad_old in code
 assert bad_new in code
 code = code.replace(bad_old, good_old, 1)
 code = code.replace(bad_new, good_new, 1)
+
+# Current V173.51 name rule has the same semantics but a slightly different property
+# order than the original repair matcher. Normalize only this owner block so the
+# original owner-level patch can apply deterministically.
+battle_path = Path("js/54-v173.51-battle-qa.js")
+battle = battle_path.read_text(encoding="utf-8")
+pattern = re.compile(
+    r'#game-stage > #app > #game-content #battlePage \.battle-monster\.v174-cardless-unit>\.battle-monster-name\{.*?\n\}\n'
+    r'#game-stage > #app > #game-content #battlePage \.battle-monster\.v174-cardless-unit>\.v174-battle-art\{.*?\n\}',
+    re.S,
+)
+normalized = '''#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
+    position:absolute!important;left:0!important;right:0!important;top:0!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    min-height:14px!important;height:14px!important;margin:0!important;padding:0 2px!important;
+    white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
+    z-index:24!important;pointer-events:none!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
+    inset:15px -5px 26px!important;
+    background-size:cover!important;background-position:center center!important;
+}'''
+battle, count = pattern.subn(normalized, battle, count=1)
+assert count == 1, "battle monster identity/art owner block not found"
+battle_path.write_text(battle, encoding="utf-8")
 
 exec(compile(code, "temp-shared-nav-vfx-battle-layout.py", "exec"))
