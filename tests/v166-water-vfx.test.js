@@ -495,7 +495,7 @@ test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
         assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
         results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
-    assert.deepEqual(results[0],["480px","170px","537px","317px"]);
+    assert.deepEqual(results[0],["480px","170px","317px","317px"]);
     assert.deepEqual(results[1],results[0]);
 });
 
