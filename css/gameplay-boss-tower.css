@@ -130,7 +130,7 @@
 }
 
 /* Gameplay activity covers use the same 16:9 production ratio as dungeon
-   covers. Combat BOSS/mechanism cards remain independent 9:16 components. */
+   covers. Combat BOSS/mechanism cards remain independent battlefield components. */
 #game-stage .gameplay-mode-card{
     position:relative;
     display:grid;
@@ -589,7 +589,7 @@
 
 #game-stage #battleMonsterArea.gameplay-boss-active{
     --gameplay-boss-card-width:clamp(118px,29%,132px);
-    --gameplay-mechanism-card-width:clamp(222px,58%,252px);
+    --gameplay-mechanism-card-width:clamp(123px,30%,138px);
     margin-top:-16px;
     max-width:100%;
     overflow:visible;
@@ -624,7 +624,7 @@
 }
 
 /* The portrait owns most of the vertical card. Background portraits and real
-   img children both fill the same crop box without distortion. */
+   img children both fit inside the card without distortion or horizontal crop. */
 #game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon{
     aspect-ratio:9 / 11;
     overflow:hidden;
@@ -688,9 +688,8 @@
     display:flex;
 }
 
-/* Mechanism cards are independent 9:16 battlefield components. Their real
-   flex-basis and width are both 20% of the battle area, with bounds chosen for
-   the supported portrait phones; no transform/zoom is used for sizing. */
+/* Mechanism cards are 50% larger than their original 82–92px owner size.
+   Width/flex-basis stay paired so no transform/zoom distorts targeting. */
 #game-stage #battleMonsterArea .boss-mechanism-card{
     position:relative;
     display:flex;
@@ -1034,6 +1033,6 @@
 @media (max-height:920px){
     #game-stage #battleMonsterArea.gameplay-boss-active{
         --gameplay-boss-card-width:clamp(108px,27%,122px);
-        --gameplay-mechanism-card-width:clamp(198px,53%,224px);
+        --gameplay-mechanism-card-width:clamp(117px,29.25%,132px);
     }
 }
