@@ -4281,9 +4281,11 @@ body.quest-scroll-active,
 #game-stage .v141-dungeon-cover-actions button:disabled{opacity:.4;filter:grayscale(.5);}
 #game-stage .v141-dungeon-remaining{padding:1px 8px 7px;color:#b7a68a;font-size:10px;text-align:center;}
 
-#game-stage #app:not(.v141-dungeon-active) #v141DungeonNav{display:none !important;}
-#game-stage #app.v141-dungeon-active #v141DungeonNav{display:flex !important;}
-#game-stage #app.v141-dungeon-active #bottomNav{display:none !important;}
+#game-stage #app:not(.v141-dungeon-active):not(.v148-context-nav-active) #v141DungeonNav{display:none !important;}
+#game-stage #app.v141-dungeon-active #v141DungeonNav,
+#game-stage #app.v148-context-nav-active #v141DungeonNav{display:flex !important;}
+#game-stage #app.v141-dungeon-active #bottomNav,
+#game-stage #app.v148-context-nav-active #bottomNav{display:none !important;}
 #game-stage #v141DungeonNav{z-index:790 !important;}
 #game-stage #dungeonPage .v141-dungeon-return{display:block !important;position:absolute !important;right:12px !important;top:12px !important;z-index:120 !important;}
 
@@ -4541,6 +4543,15 @@ body.quest-scroll-active,
     height:var(--v143-monster-card-height,100px) !important;
     min-height:var(--v143-monster-card-height,100px) !important;
     padding:3px !important;
+    overflow:visible !important;
+}
+
+
+#game-stage #battleMonsterArea .v131-monster-row{
+    min-height:120px;
+    padding-bottom:18px;
+    box-sizing:border-box;
+    overflow:visible;
 }
 
 #game-stage > #app > #game-content #battlePage .battle-monster[data-rank="boss"]{
@@ -4605,7 +4616,7 @@ body.quest-scroll-active,
     justify-content:center !important;
     height:11px !important;
     color:#fff !important;
-    font-size:var(--v143-monster-bar-font-size,12px) !important;
+    font-size:var(--v143-monster-bar-font-size,9px) !important;
     font-weight:900 !important;
     line-height:11px !important;
     letter-spacing:var(--v143-monster-bar-letter-spacing,-.35px) !important;
@@ -4659,8 +4670,8 @@ body.quest-scroll-active,
     position:fixed;
     inset:0;
     z-index:16000;
-    overflow:hidden;
-    contain:strict;
+    overflow:visible;
+    contain:layout style;
     pointer-events:none;
 }
 
@@ -4668,26 +4679,38 @@ body.quest-scroll-active,
     position:fixed;
     display:block;
     box-sizing:border-box;
-    background-position:0 0;
-    background-repeat:no-repeat;
-    image-rendering:auto;
+    overflow:visible;
+    background-image:none !important;
     opacity:0;
     pointer-events:none;
     transform:translate(-50%,-50%);
     transform-origin:center;
-    will-change:background-position,transform,opacity;
+    will-change:transform,opacity;
+}
+
+.v143-vfx-frame{
+    position:absolute;
+    inset:0;
+    display:block;
+    box-sizing:border-box;
+    overflow:hidden;
+    background-position:0 0;
+    background-repeat:no-repeat;
+    image-rendering:auto;
+    pointer-events:none;
+    will-change:background-position;
 }
 
 .v143-vfx-sprite.v143-vfx-sprite-active{
-    animation:
-        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
-        v143RasterCastEnvelope var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+    animation:v143RasterCastEnvelope var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+
+.v143-vfx-sprite.v143-vfx-sprite-active > .v143-vfx-frame{
+    animation:v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both;
 }
 
 .v143-vfx-sprite.v143-vfx-sprite-active[data-travel="true"]{
-    animation:
-        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
-        v143RasterTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+    animation:v143RasterTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
 .v143-skill-stage[data-element="fire"] .v143-vfx-sprite{

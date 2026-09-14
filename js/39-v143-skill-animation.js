@@ -533,8 +533,18 @@
         node.dataset.renderer="dom-sprite";
         node.dataset.confirmedHit="false";
         node.style.visibility="hidden";
+        const frame=document.createElement("i");
+        frame.className="v143-vfx-frame";
+        frame.dataset.renderer="dom-sprite-frame";
+        if(typeof frame.setAttribute==="function"){ frame.setAttribute("aria-hidden","true"); }
+        node.appendChild(frame);
+        node.__v143Frame=frame;
         state.stage.appendChild(node);
         return node;
+    }
+
+    function spriteFrameNode(node){
+        return node&&node.__v143Frame?node.__v143Frame:node;
     }
 
     function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
@@ -789,9 +799,16 @@
             node.dataset.columns=String(sprite.columns);
             node.dataset.rows=String(sprite.rows);
             node.dataset.frames=String(sprite.frames);
-            node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
-            node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
-            node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
+  const frame=spriteFrameNode(node);
+  const imageValue='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
+  const sizeValue=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
+  /* Keep the outer metadata styles for diagnostics/tests, but CSS prevents
+     them from painting. The inner frame is the only Sprite Sheet viewport. */
+  node.style.backgroundImage=imageValue;
+  node.style.backgroundSize=sizeValue;
+  frame.style.backgroundImage=imageValue;
+  frame.style.backgroundSize=sizeValue;
+  node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
             node.style.setProperty(
                 "--v143-sprite-delay",
                 -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"

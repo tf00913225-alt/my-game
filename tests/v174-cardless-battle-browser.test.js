@@ -171,7 +171,7 @@ function runViewport(chrome,width,height){
     assert.equal(data.enemyArt,true);
     assert.equal(data.enemyNameDisplay,"flex");
     assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");
-    assert.ok(data.enemyNameRect.bottom<=data.enemyArtRect.top+1,"monster name must sit above monster artwork");
+    assert.ok(data.enemySpRect.bottom<=data.enemyNameRect.top+1,"monster name must sit below its own HP/SP bars");
     assert.equal(data.activeOutlineWidth,"2px");
     assert.notEqual(data.activeOutlineColor,"rgba(0, 0, 0, 0)");
     assert.notEqual(data.activeShadow,"none");

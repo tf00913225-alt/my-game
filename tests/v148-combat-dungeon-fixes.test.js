@@ -306,7 +306,7 @@ test("Abyss final nav heals stale five-button markup even when mode and count ma
     const stale=labels.map((label,index)=>element({getAttribute:name=>name==="aria-label"?label:(name==="onclick"?(index===4?"showPage('home')":"legacy()") : ""),querySelector:()=>index===2?{getAttribute:()=>"assets/ui/home-shop-v147.png"}:null}));
     const nav=element({dataset:{v148Mode:"abyss-map"},children:stale});
     Object.defineProperty(nav,"innerHTML",{get:()=>html,set:value=>{ html=value; nav.children=[1,2,3,4,5]; }});
-    const page=element({querySelector:selector=>selector===".v141-abyss-shell"?{}:null});
+    const page=element({classList:classList(["active"]),querySelector:selector=>selector===".v141-abyss-shell"?{}:null});
     const topReturn=element();
     const context=baseContext({document:{readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],getElementById:id=>id==="dungeonPage"?page:id==="v141DungeonNav"?nav:id==="v146AbyssReturn"?topReturn:null}});
     context.v148SyncDungeonShell();
@@ -317,7 +317,7 @@ test("Abyss final nav heals stale five-button markup even when mode and count ma
     assert.doesNotMatch(html,/aria-label="商店"|aria-label="主城"/);
     assert.equal(nav.dataset.v146Columns,"5");
     assert.notEqual(topReturn.removed,true);
-    assert.match(source,/function dungeonNavMatches\(nav,abyssMapActive,abyssSelectionActive\)/);
+    assert.match(source,/function contextNavMatches\(nav,returnAction\)/);
 });
 
 console.log("\nV148 combat/dungeon fixes suite: "+passed+" tests passed.");

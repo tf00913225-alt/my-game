@@ -9,6 +9,7 @@ const css=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
 const loader=fs.readFileSync("scripts/build-production.mjs","utf8");
 const runtime=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const dungeonShell=fs.readFileSync("js/41-v146-system-polish.js","utf8");
+const finalContextNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 
 function cssRule(source,selector){
     const start=source.indexOf(selector);
@@ -57,7 +58,9 @@ assert.match(html,/id="gameplayPage"/);assert.match(html,/id="gameplayHubContent
 assert.match(html,/id="bossPage"/);assert.match(html,/id="towerPage"/);
 assert.match(runtime,/vGameplayOpenBoss/);assert.match(runtime,/vGameplayOpenTower/);assert.match(runtime,/vGameplayOpenAbyss/);
 assert.equal((html.match(/id="dungeonTabBtnAbyss"/g)||[]).length,0,"daily dungeon page must not expose a duplicate Abyss entry");
-assert.match(dungeonShell,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\('home'\)"/);
+assert.doesNotMatch(dungeonShell,/function dungeonNavMarkup\(/,"V146 must not own navigation markup");
+assert.match(dungeonShell,/v148SyncContextNavigation/,"V146 must delegate navigation rendering to V148");
+assert.match(finalContextNav,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\('home'\)"/);
 assert.match(dungeonShell,/page\.classList\.toggle\("v146-abyss-active",abyssActive\)/,"Abyss selection must hide the old dungeon shell as well as the map");
 
 // The Gameplay stylesheet predates this Boss portrait change and still owns a

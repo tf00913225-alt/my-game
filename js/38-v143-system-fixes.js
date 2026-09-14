@@ -251,10 +251,10 @@
     function fitEnemyBars(card){
         card.querySelectorAll(".monster-bar-text").forEach(node=>{
             node.style.removeProperty("transform");
-            node.style.setProperty("font-size","13px","important");
+            node.style.setProperty("font-size","9px","important");
             const available=Math.max(1,node.clientWidth||68);
-            let size=13;
-            while(size>11&&node.scrollWidth>available){
+            let size=9;
+            while(size>8&&node.scrollWidth>available){
                 size--;
                 node.style.setProperty("font-size",size+"px","important");
             }

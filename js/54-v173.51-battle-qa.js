@@ -43,7 +43,8 @@ function ensureBattlePresentationStyles(){
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
-    inset:-2px -2px 30px!important;
+    /* 122×94 legacy art box -> ~183×141 visual box: exact 1.5x presentation. */
+    inset:-49px -33px 30px!important;
     background-size:contain!important;background-position:center bottom!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
@@ -68,15 +69,27 @@ function ensureBattlePresentationStyles(){
     z-index:20!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
-    position:absolute!important;left:0!important;right:0!important;top:0!important;
-    display:flex!important;min-height:14px!important;align-items:center!important;justify-content:center!important;
-    margin:0!important;padding:0 2px!important;line-height:14px!important;text-align:center!important;
+    position:absolute!important;left:-4px!important;right:-4px!important;top:calc(100% + 3px)!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    min-height:16px!important;height:16px!important;margin:0!important;padding:0 2px!important;
     white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
     z-index:24!important;pointer-events:none!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
-    inset:15px -5px 26px!important;
-    background-size:cover!important;background-position:center center!important;
+    inset:2px 2px 26px!important;
+    background-size:contain!important;background-position:center center!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card.v174-cardless-unit>.v174-battle-art{
+    inset:2px 2px 26px!important;
+    background-size:contain!important;background-position:center center!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp,
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp{
+    height:11px!important;min-height:11px!important;border-radius:4px!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp>.monster-bar-text,
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp>.monster-bar-text{
+    height:11px!important;font-size:9px!important;line-height:11px!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
     content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;
