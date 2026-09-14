@@ -1,0 +1,93 @@
+name: Temporary finalize remaining UI repairs v2
+
+on:
+  push:
+    branches:
+      - fix/inventory-battle-nav-runtime-20260914
+    paths:
+      - .github/workflows/temp-finalize-remaining-ui-v2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/inventory-battle-nav-runtime-20260914
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Reuse proven repair script and align current mechanism source
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          workflow=Path('.github/workflows/temp-finalize-remaining-ui.yml').read_text(encoding='utf-8')
+          start_token="          python - <<'PY'\n"
+          end_token='\n          PY\n'
+          start=workflow.index(start_token)+len(start_token)
+          end=workflow.index(end_token,start)
+          script=textwrap.dedent(workflow[start:end])
+
+          block_start=script.index('# Mechanism cards also need to confirm hidden-until-hit VFX.')
+          block_end=script.index('# Browser geometry acceptance for monster name and active player highlight.',block_start)
+          script=script[:block_start]+'# Mechanism VFX confirmation is applied after this extracted script.\n\n'+script[block_end:]
+          exec(compile(script,'<remaining-ui-repair>','exec'),{'__name__':'__main__'})
+
+          path=Path('js/gameplay-boss-tower-system.js')
+          text=path.read_text(encoding='utf-8')
+          old='''        const final=Math.max(1,Math.round(numeric(damage,1)));
+              const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
+              if(node&&typeof showDamagePopup==="function"){
+          '''
+          new='''        const final=Math.max(1,Math.round(numeric(damage,1)));
+              const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
+              if(typeof window.v143RunAtTargetHit==="function"){
+                  window.v143RunAtTargetHit("monster","mechanism:"+card.id,function(){},true);
+              }
+              if(node&&typeof showDamagePopup==="function"){
+          '''
+          if text.count(old)!=1:
+              raise SystemExit(f'current mechanism insertion: expected one match, got {text.count(old)}')
+          path.write_text(text.replace(old,new,1),encoding='utf-8')
+          PY
+
+      - name: Validate source and canonical build
+        run: |
+          git diff --check
+          node --check js/39-v143-skill-animation.js
+          node --check js/54-v173.51-battle-qa.js
+          node --check js/gameplay-boss-tower-system.js
+          node tests/remaining-ui-regressions-20260914.test.js
+          npm run build
+          npm run build:check
+
+      - name: Focused runtime and browser regressions
+        run: |
+          node tests/v153-fire-vfx.test.js
+          node tests/v174-raster-only-combat-vfx-owner.test.js
+          node tests/v152-dev-fixes.test.js
+          node tests/v174-cardless-battle-browser.test.js
+          node tests/remaining-ui-regressions-20260914.test.js
+          git diff --check
+
+      - name: Commit repaired source and build, remove temporary workflows
+        shell: bash
+        run: |
+          rm -f .github/workflows/temp-remaining-ui-repair.yml
+          rm -f .github/workflows/temp-finalize-remaining-ui.yml
+          rm -f .github/workflows/temp-finalize-remaining-ui-v2.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: finish remaining inventory battle and VFX regressions"
+          git push origin HEAD:fix/inventory-battle-nav-runtime-20260914
