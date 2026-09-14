@@ -17,44 +17,7 @@ jobs:
         with:
           node-version: 24
       - name: Patch true owners
-        shell: bash
-        run: |
-          python - <<'PY'
-          import subprocess,re
-          old=subprocess.check_output(["git","show","d2a9f08b773bccff0af712d0e904599f62f448f0:.github/workflows/temp-shared-nav-vfx-battle-layout.yml"],text=True)
-          marker="          python - <<'PY'\n"
-          start=old.index(marker)+len(marker)
-          end=old.index("\n          PY",start)
-          raw=old[start:end]
-          code="\n".join(line[10:] if line.startswith("          ") else line for line in raw.splitlines())
-          original="def replace_once(path, old, new):\n    text=read(path)\n    assert text.count(old)==1, f'{path}: expected exactly one occurrence of {old[:80]!r}, got {text.count(old)}'\n    write(path,text.replace(old,new,1))"
-          tolerant="def replace_once(path, old, new):\n    text=read(path)\n    count=text.count(old)\n    if count==0 and path=='js/39-v143-skill-animation.js' and 'node.dataset.frames=String(sprite.frames);' in old:\n        pattern=r'            node\\.dataset\\.frames=String\\(sprite\\.frames\\);\\n            node\\.style\\.backgroundImage=.*?\\n            node\\.style\\.backgroundSize=.*?\\n            node\\.style\\.setProperty\\(\"--v143-sprite-duration\",current\\.duration\\+\"ms\"\\);'\n        patched,n=re.subn(pattern,new,text,count=1,flags=re.S)\n        assert n==1, f'{path}: flexible VFX assignment match failed'\n        write(path,patched)\n        return\n    assert count==1, f'{path}: expected exactly one occurrence of {old[:80]!r}, got {count}'\n    write(path,text.replace(old,new,1))"
-          assert original in code
-          code=code.replace(original,tolerant,1)
-          bad="""p='js/38-v143-system-fixes.js'; s=read(p)
-old='''            node.style.setProperty(\"font-size\",\"13px\",\"important\");
-  const available=Math.max(1,node.clientWidth||68);
-  let size=13;
-  while(size>11&&node.scrollWidth>available){'''
-new='''            node.style.setProperty(\"font-size\",\"9px\",\"important\");
-  const available=Math.max(1,node.clientWidth||68);
-  let size=9;
-  while(size>8&&node.scrollWidth>available){'''
-assert s.count(old)==1
-write(p,s.replace(old,new,1))"""
-          good="""p='js/38-v143-system-fixes.js'; s=read(p)
-pattern=r'            node\\.style\\.setProperty\\(\"font-size\",\"13px\",\"important\"\\);\\n            const available=Math\\.max\\(1,node\\.clientWidth\\|\\|68\\);\\n            let size=13;\\n            while\\(size>11&&node\\.scrollWidth>available\\)\\{'
-replacement='''            node.style.setProperty(\"font-size\",\"9px\",\"important\");
-            const available=Math.max(1,node.clientWidth||68);
-            let size=9;
-            while(size>8&&node.scrollWidth>available){'''
-s,n=re.subn(pattern,replacement,s,count=1)
-assert n==1, 'js/38 enemy bar font patch not found'
-write(p,s)"""
-          assert bad in code
-          code=code.replace(bad,good,1)
-          exec(compile(code,"temp-shared-nav-vfx-battle-layout.py","exec"))
-          PY
+        run: python scripts/temp-shared-nav-vfx-battle-layout-repair.py
       - name: Focused regression tests
         run: |
           node tests/shared-nav-vfx-battle-layout-20260914.test.js
@@ -70,9 +33,10 @@ write(p,s)"""
         run: |
           npm run build:check
           git diff --check
-      - name: Commit repaired owners and remove temporary workflow
+      - name: Commit repaired owners and remove temporary runner
         run: |
           rm -f .github/workflows/temp-shared-nav-vfx-battle-layout.yml
+          rm -f scripts/temp-shared-nav-vfx-battle-layout-repair.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
