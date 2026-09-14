@@ -98,11 +98,27 @@ battle_path.write_text(battle, encoding="utf-8")
 
 exec(compile(code, "temp-shared-nav-vfx-battle-layout.py", "exec"))
 
-# V148's own historical test must now assert the final shared context-nav owner,
-# not the retired dungeon-only matcher.
+# Historical tests now assert the single shared V148 context-nav owner instead
+# of the retired dungeon-only/V146 markup owners.
 test_path = Path("tests/v148-combat-dungeon-fixes.test.js")
 test_text = test_path.read_text(encoding="utf-8")
 old_assert = r'assert.match(source,/function dungeonNavMatches\(nav,abyssMapActive,abyssSelectionActive\)/);'
 new_assert = r'assert.match(source,/function contextNavMatches\(nav,returnAction\)/);'
 assert old_assert in test_text, "v148 historical nav matcher assertion not found"
 test_path.write_text(test_text.replace(old_assert, new_assert, 1), encoding="utf-8")
+
+hub_test_path = Path("tests/gameplay-hub-ui-and-icon.test.js")
+hub_test = hub_test_path.read_text(encoding="utf-8")
+old_import = 'const dungeonShell=fs.readFileSync("js/41-v146-system-polish.js","utf8");'
+new_import = old_import + '\nconst finalContextNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");'
+assert old_import in hub_test, "gameplay hub dungeon shell import not found"
+hub_test = hub_test.replace(old_import, new_import, 1)
+old_owner_assert = r'assert.match(dungeonShell,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\(\'home\'\)"/);'
+new_owner_assert = (
+    r'assert.doesNotMatch(dungeonShell,/function dungeonNavMarkup\(/,"V146 must not own navigation markup");' + '\n' +
+    r'assert.match(dungeonShell,/v148SyncContextNavigation/,"V146 must delegate navigation rendering to V148");' + '\n' +
+    r'assert.match(finalContextNav,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\(\'home\'\)"/);'
+)
+assert old_owner_assert in hub_test, "gameplay hub stale V146 return assertion not found"
+hub_test = hub_test.replace(old_owner_assert, new_owner_assert, 1)
+hub_test_path.write_text(hub_test, encoding="utf-8")
