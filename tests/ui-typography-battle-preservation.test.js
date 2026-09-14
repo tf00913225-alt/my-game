@@ -122,7 +122,7 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
     );
 
     assert.match(now,/#battlePage:has\(#battleMonsterArea\.gameplay-boss-active\) \.battle-title\{[\s\S]*?visibility:hidden;[\s\S]*?opacity:0;/);
-    assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(148px,36\.5%,160px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(82px,20%,92px\);[\s\S]*?margin-top:-16px;/);
+    assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(118px,29%,132px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(222px,58%,252px\);[\s\S]*?margin-top:-16px;/);
     assert.match(now,/\.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:var\(--gameplay-boss-card-width\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?aspect-ratio:9 \/ 16;/);
     assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?position:relative;[\s\S]*?display:none;[\s\S]*?width:100%;[\s\S]*?margin:3px auto 0;[\s\S]*?pointer-events:none;/);
     assert.match(now,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
