@@ -332,6 +332,18 @@
         return {left:left,top:top,width:right-left,height:bottom-top};
     }
 
+    function mechanismTargetBounds(current,indexes){
+        if(!current||current.targetSide!=="monster"){ return null; }
+        const cards=(indexes||[]).filter(isMechanismTarget)
+            .map(index=>cardFor("monster",index)).filter(Boolean);
+        const bounds=fieldBounds(cards);
+        if(!bounds){ return null; }
+        bounds.centerX=bounds.left+bounds.width/2;
+        bounds.centerY=bounds.top+bounds.height/2;
+        bounds.id="bossMechanismSlot";
+        return bounds;
+    }
+
     function sideAreaBounds(side){
         const id=side==="monster"?"battleMonsterArea":"battlePlayerRow";
         const area=typeof document!=="undefined"?document.getElementById(id):null;
@@ -582,6 +594,8 @@
     }
 
     function fixedTriLayoutBounds(current,indexes){
+        const mechanismBounds=mechanismTargetBounds(current,indexes);
+        if(mechanismBounds){ return mechanismBounds; }
         if(String(current.config.targetType||"")==="allyTri"&&current.targetSide==="player"){
             const playerArea=sideAreaBounds("player");
             if(playerArea){
@@ -641,6 +655,8 @@
     }
 
     function groupLayoutBounds(current,indexes){
+        const mechanismBounds=mechanismTargetBounds(current,indexes);
+        if(mechanismBounds){ return mechanismBounds; }
         if(/tri/i.test(String(current.config.targetType||""))){ return fixedTriLayoutBounds(current,indexes); }
         if(current.targetSide==="player"){ return sideAreaBounds("player"); }
         if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
@@ -706,7 +722,7 @@
         }
 
         if(placement==="battlefield"){
-            const bounds=sideAreaBounds(current.targetSide);
+            const bounds=mechanismTargetBounds(current,emittedSpriteTargets(current))||sideAreaBounds(current.targetSide);
             if(!bounds){ return; }
             const viewportWidth=Number(window.innerWidth)||960;
             const viewportHeight=Number(window.innerHeight)||720;

@@ -605,16 +605,21 @@
     function damageMechanism(card,damage,sourceName,isCrit){
         if(!card||card.destroyed||card.hp<=0){ return 0; }
         const final=Math.max(1,Math.round(numeric(damage,1)));
-        const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
-    if(typeof window.v143RunAtTargetHit==="function"){
-        window.v143RunAtTargetHit("monster","mechanism:"+card.id,function(){},true);
-    }
-        if(node&&typeof showDamagePopup==="function"){
-            showDamagePopup(node,"HP-"+final,"hp",!!isCrit);
+        const applyDamage=function(){
+            if(!card||card.destroyed||card.hp<=0){ return; }
+            const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
+            if(node&&typeof showDamagePopup==="function"){
+                showDamagePopup(node,"HP-"+final,"hp",!!isCrit);
+            }
+            card.hp=Math.max(0,card.hp-final);
+            if(typeof addBattleLog==="function"){ addBattleLog((sourceName||"攻擊")+"命中【"+card.name+"】，造成"+final+"傷害。"); }
+            if(card.hp<=0){ destroyMechanism(card,"destroyed"); }else{ renderMechanisms(); }
+        };
+        if(typeof window.v143RunAtTargetHit==="function"){
+            window.v143RunAtTargetHit("monster","mechanism:"+card.id,applyDamage,true);
+        }else{
+            applyDamage();
         }
-        card.hp=Math.max(0,card.hp-final);
-        if(typeof addBattleLog==="function"){ addBattleLog((sourceName||"攻擊")+"命中【"+card.name+"】，造成"+final+"傷害。"); }
-        if(card.hp<=0){ destroyMechanism(card,"destroyed"); }else{ renderMechanisms(); }
         return final;
     }
     function partyIndexes(){
@@ -720,6 +725,14 @@
                 if(!character||character.sp<cost){ if(typeof addBattleLog==="function"){ addBattleLog("SP不足，無法攻擊機制卡。"); }finishPlayerAction();return; }
                 character.sp-=cost;if(typeof showSkillNameBadge==="function"){ showSkillNameBadge(skill.name,skill.element,characterIndex); }
             }
+        }
+        if(spreads&&skill&&numeric(skill.baseDamage)>0&&typeof window.v142PlaySkillAnimationFromBadge==="function"){
+            /* Keep the selected sidecar target authoritative until the formal
+               V142/V143 owner has created its Sprite. The core resolver may
+               retarget the spread portion to living monsters afterwards. */
+            window.v142PlaySkillAnimationFromBadge(
+                "player",skill.name,skill.element||(character&&character.element)||"normal",characterIndex
+            );
         }
         const result=calculateMechanismActionDamage(characterIndex,queued.action,card);
         if(result.damage>0){ damageMechanism(card,result.damage,(character&&character.id?character.id+"的":"")+result.name,result.crit); }
