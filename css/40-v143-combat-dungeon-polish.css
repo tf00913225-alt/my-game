@@ -74,10 +74,10 @@
     justify-content:center !important;
     height:11px !important;
     color:#fff !important;
-    font-size:12px !important;
+    font-size:var(--v143-monster-bar-font-size,12px) !important;
     font-weight:900 !important;
     line-height:11px !important;
-    letter-spacing:-.35px !important;
+    letter-spacing:var(--v143-monster-bar-letter-spacing,-.35px) !important;
     text-align:center !important;
     text-shadow:0 1px 2px #000,0 0 2px #000 !important;
     transform:scaleX(.94);
