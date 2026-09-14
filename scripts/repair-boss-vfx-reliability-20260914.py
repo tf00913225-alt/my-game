@@ -21,3 +21,11 @@ if text.count(old) != 1:
 text = text.replace(old, new)
 
 path.write_text(text, encoding="utf-8")
+
+test_path = Path("tests/boss-vfx-reliability-20260914.test.js")
+test_text = test_path.read_text(encoding="utf-8")
+old_test = '    assert.deepEqual(current.targetIndexes,[0,1]);'
+new_test = '    assert.deepEqual(Array.from(current.targetIndexes),[0,1]);'
+if test_text.count(old_test) != 1:
+    raise SystemExit(f"cross-realm assertion anchor mismatch: {test_text.count(old_test)}")
+test_path.write_text(test_text.replace(old_test, new_test), encoding="utf-8")
