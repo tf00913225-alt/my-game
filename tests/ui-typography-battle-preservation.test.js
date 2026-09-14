@@ -56,6 +56,17 @@ function restoreGameplayCoverBaseline(text){
         )
         .replace("    min-height:0;\n    flex:0 0 auto;\n    aspect-ratio:16 / 9;\n    box-sizing:border-box;","    min-height:120px;\n    box-sizing:border-box;")
         .replace("#game-stage .gameplay-mode-card.coming-soon{\n    opacity:.67;","#game-stage .gameplay-mode-card.coming-soon{\n    min-height:88px;\n    opacity:.67;")
+        // The reported mobile regression was the decorative bottom pseudo-line.
+        // Reconstruct it only for baseline comparison so the guard continues to
+        // protect every other non-battle panel declaration.
+        .replace(
+            "#game-stage .gameplay-large-panel::before{\n    content:\"\";",
+            "#game-stage .gameplay-large-panel::before,\n#game-stage .gameplay-large-panel::after{\n    content:\"\";"
+        )
+        .replace(
+            "#game-stage .gameplay-large-panel::before{ top:8px; }",
+            "#game-stage .gameplay-large-panel::before{ top:8px; }\n#game-stage .gameplay-large-panel::after{ bottom:8px; }"
+        )
     );
 }
 
@@ -90,9 +101,10 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
 // compact screens shrink both through the same owner, and detail stays in the
 // existing right-side alert. The Gameplay activity cards are additionally allowed
 // to use the approved 16:9 cover geometry and a single-column flex stack so those
-// ratio boxes participate in normal vertical flow without overlapping. Normalize
-// precisely those approved layout changes back to the work base before comparing
-// the rest of the pre-battle panel CSS.
+// ratio boxes participate in normal vertical flow without overlapping. The mobile
+// regression repair also retires the decorative bottom line inside the gameplay panel.
+// Normalize precisely those approved layout changes back to the work base before
+// comparing the rest of the pre-battle panel CSS.
 {
     const file="css/gameplay-boss-tower.css";
     const now=current(file);
@@ -107,11 +119,12 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
     assert.equal(
         restoreGameplayCoverBaseline(now.slice(0,nowMarker)),
         normalize(workBase.slice(0,workBaseMarker)),
-        `${file} non-battle Gameplay panel rules changed outside the approved 16:9 activity-cover geometry and vertical stack`
+        `${file} non-battle Gameplay panel rules changed outside the approved 16:9 activity-cover geometry, vertical stack and removed bottom ornament`
     );
     assert.match(now,/#game-stage \.gameplay-hub-grid\{[\s\S]*?display:flex;[\s\S]*?flex-direction:column;[\s\S]*?align-items:stretch;/);
     assert.match(now,/#game-stage \.gameplay-mode-card\{[\s\S]*?width:100%;[\s\S]*?min-height:0;[\s\S]*?flex:0 0 auto;[\s\S]*?aspect-ratio:16 \/ 9;/);
     assert.doesNotMatch(cssRule(now,"#game-stage .gameplay-mode-card.coming-soon{"),/min-height:/,"coming-soon activity uses the same 16:9 cover geometry");
+    assert.doesNotMatch(now,/#game-stage \.gameplay-large-panel::after/,"gameplay panel must not reintroduce the reported bottom gold line");
 
     const protectedStart="#game-stage #battlePage .battle-monster.gameplay-boss-protected{";
     const motionStart="@media (prefers-reduced-motion:reduce){";
@@ -152,4 +165,4 @@ sameSegment(
     "@media(max-width:390px)"
 );
 
-console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS 9:16/mechanism owner, approved non-overlapping 16:9 activity-cover stack and 4:3 mechanism target and retired procedural VFX selectors.");
+console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS 9:16/mechanism owner, approved non-overlapping 16:9 activity-cover stack, removed gameplay bottom ornament, 4:3 mechanism target and retired procedural VFX selectors.");
