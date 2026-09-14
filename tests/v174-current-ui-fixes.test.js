@@ -26,8 +26,8 @@ assert.match(rewardCss,/width:min\(calc\(100vw - 32px\),392px\) !important;[\s\S
 const start=equipmentJs.indexOf("window.v17346ShowEquipmentDungeonPreview"),end=equipmentJs.indexOf("if(typeof renderDungeonTabContent",start),preview=equipmentJs.slice(start,end);
 assert.match(preview,/equipmentChestOddsText/);assert.match(preview,/v17363-text-reward-preview/);assert.match(preview,/裝備品階機率/);
 assert.doesNotMatch(preview,/previewAssets|v17361-reward-icon|<img/);
-assert.equal((html.match(/class="gameplay-back-button v174-gameplay-home-back"/g)||[]).length,1);
-assert.match(html,/v174-gameplay-home-back" onclick="showPage\('home'\)" aria-label="返回主城"/);
+assert.equal((html.match(/class="gameplay-back-button v174-gameplay-home-back"/g)||[]).length,0);
+assert.doesNotMatch(html,/v174-gameplay-home-back/);
 assert.equal(fs.existsSync("css/57-v174-current-ui-fixes.css"),false);
 assert.equal(fs.existsSync("js/62-v174-current-ui-fixes.js"),false);
 assert.equal(manifest.featureManifest.bundles["app-shell"].scripts.length,1);
