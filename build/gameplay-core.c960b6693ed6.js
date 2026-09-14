@@ -9285,26 +9285,12 @@
     };
 
     function installDungeonNavigation(){
-        if(document.getElementById("v141DungeonNav")){ return; }
-        const nav=document.createElement("div");
-        nav.id="v141DungeonNav";
-        nav.className="bottom-nav map-page-nav v141-dungeon-nav";
-        nav.innerHTML=
-            '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'character\')" aria-label="角色"><img class="nav-art-button" src="assets/ui/nav-character.png" alt=""><span class="nav-sr-only">角色</span></button>'+
-            '<button class="nav-button nav-art-button-wrap" onclick="openMapInventoryOverlay()" aria-label="背包"><img class="nav-art-button" src="assets/ui/nav-backpack.png" alt=""><span class="nav-sr-only">背包</span></button>'+
-            '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'quest\')" aria-label="任務"><img class="nav-art-button" src="assets/ui/nav-quest.png" alt=""><span class="nav-sr-only">任務</span></button>'+
-            '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'autoBattleSettings\')" aria-label="元素匣／自動戰鬥設定"><img class="nav-art-button" src="assets/ui/nav-element-box.png" alt=""><span class="nav-sr-only">元素匣／自動戰鬥設定</span></button>';
-        document.getElementById("app").appendChild(nav);
-
-        const page=document.getElementById("dungeonPage");
-        if(page&&!document.getElementById("v141DungeonReturn")){
-            const back=document.createElement("button");
-            back.id="v141DungeonReturn";
-            back.className="map-page-return-float v141-dungeon-return";
-            back.setAttribute("aria-label","返回主城");
-            back.innerHTML='<img src="assets/ui/map-return.png" alt="">';
-            back.onclick=()=>showPage("home");
-            page.appendChild(back);
+        /* The legacy v141-dungeon-return/nav markup owner is retired.
+ The final V148 context-nav owner creates and renders the shell. */
+        if(typeof window.v148SyncContextNavigation==="function"){
+  window.v148SyncContextNavigation();
+        }else if(typeof window.v148SyncDungeonShell==="function"){
+  window.v148SyncDungeonShell();
         }
     }
 
@@ -11689,10 +11675,10 @@
     function fitEnemyBars(card){
         card.querySelectorAll(".monster-bar-text").forEach(node=>{
             node.style.removeProperty("transform");
-            node.style.setProperty("font-size","13px","important");
+            node.style.setProperty("font-size","9px","important");
             const available=Math.max(1,node.clientWidth||68);
-            let size=13;
-            while(size>11&&node.scrollWidth>available){
+            let size=9;
+            while(size>8&&node.scrollWidth>available){
                 size--;
                 node.style.setProperty("font-size",size+"px","important");
             }
@@ -12787,8 +12773,18 @@
         node.dataset.renderer="dom-sprite";
         node.dataset.confirmedHit="false";
         node.style.visibility="hidden";
+        const frame=document.createElement("i");
+        frame.className="v143-vfx-frame";
+        frame.dataset.renderer="dom-sprite-frame";
+        if(typeof frame.setAttribute==="function"){ frame.setAttribute("aria-hidden","true"); }
+        node.appendChild(frame);
+        node.__v143Frame=frame;
         state.stage.appendChild(node);
         return node;
+    }
+
+    function spriteFrameNode(node){
+        return node&&node.__v143Frame?node.__v143Frame:node;
     }
 
     function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
@@ -13043,9 +13039,16 @@
             node.dataset.columns=String(sprite.columns);
             node.dataset.rows=String(sprite.rows);
             node.dataset.frames=String(sprite.frames);
-            node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
-            node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
-            node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
+  const frame=spriteFrameNode(node);
+  const imageValue='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
+  const sizeValue=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
+  /* Keep the outer metadata styles for diagnostics/tests, but CSS prevents
+     them from painting. The inner frame is the only Sprite Sheet viewport. */
+  node.style.backgroundImage=imageValue;
+  node.style.backgroundSize=sizeValue;
+  frame.style.backgroundImage=imageValue;
+  frame.style.backgroundSize=sizeValue;
+  node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
             node.style.setProperty(
                 "--v143-sprite-delay",
                 -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"
@@ -14677,23 +14680,6 @@
         };
     }
 
-    function dungeonNavMarkup(abyssMapActive,abyssSelectionActive){
-        const buttons=[
-            ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],
-            ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
-            ["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"],
-            ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"]
-        ];
-        const returnAction=abyssMapActive
-            ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")
-            :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')");
-        buttons.push(["返回","assets/ui/map-return.png",returnAction]);
-        return buttons.map(button=>
-            '<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'">'+
-            '<img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>'
-        ).join("");
-    }
-
     window.v146ExitAbyssMap=function(){
         if(typeof window.v174AbyssLeaveToGameplay==="function"){
             window.v174AbyssLeaveToGameplay();
@@ -14712,20 +14698,12 @@
         const abyssActive=abyssMapActive||abyssSelectionActive;
         page.classList.toggle("v146-abyss-active",abyssActive);
         page.classList.toggle("v146-abyss-intro-mode",active&&!!page.querySelector(".v141-abyss-intro"));
-        let nav=document.getElementById("v141DungeonNav");
-        if(active&&!nav){
-            nav=document.createElement("div");
-            nav.id="v141DungeonNav";
-            nav.className="bottom-nav map-page-nav v141-dungeon-nav";
-            app.appendChild(nav);
-        }
-        if(nav){
-            const mode=abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"dungeon");
-            if(nav.dataset.v146Mode!==mode){
-                nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);
-                nav.dataset.v146Mode=mode;
-            }
-            nav.dataset.v146Columns="5";
+        const nav=document.getElementById("v141DungeonNav");
+        if(nav){ nav.dataset.v146Columns="5"; }
+        if(typeof window.v148SyncContextNavigation==="function"){
+  window.v148SyncContextNavigation();
+        }else if(typeof window.v148SyncDungeonShell==="function"){
+  window.v148SyncDungeonShell();
         }
         const oldReturn=document.getElementById("v141DungeonReturn");
         if(oldReturn){ oldReturn.remove(); }
@@ -16557,67 +16535,112 @@
         };
     }
 
-    /* ----- Dungeon navigation and movement. ----- */
-    function dungeonReturnAction(abyssMapActive,abyssSelectionActive){
-    return abyssMapActive
-        ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")
-        :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')");
-}
+    /* ----- Shared Gameplay / Dungeon navigation and movement. ----- */
+    const CONTEXT_NAV_ITEMS=Object.freeze([
+        Object.freeze(["角色","assets/ui/nav-character.png","openHomeFeature('character')"]),
+        Object.freeze(["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"]),
+        Object.freeze(["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"]),
+        Object.freeze(["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"])
+    ]);
 
-function dungeonNavMarkup(abyssMapActive,abyssSelectionActive){
-    const buttons=[
-        ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],
-        ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
-        ["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"],
-        ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"]
-    ];
-    buttons.push(["返回","assets/ui/map-return.png",dungeonReturnAction(abyssMapActive,abyssSelectionActive)]);
-    return buttons.map(button=>'<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'"><img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>').join("");
-}
-
-function dungeonNavMatches(nav,abyssMapActive,abyssSelectionActive){
-    const buttons=Array.from(nav&&nav.children||[]);
-    if(buttons.length!==5){ return false; }
-    const labels=buttons.map(button=>button&&typeof button.getAttribute==="function"?button.getAttribute("aria-label"):"").join("|");
-    if(labels!=="角色|背包|秘寶|元素匣|返回"){ return false; }
-    const relicImage=buttons[2]&&typeof buttons[2].querySelector==="function"?buttons[2].querySelector("img"):null;
-    if(!relicImage||relicImage.getAttribute("src")!=="assets/ui/nav-relic-v175.webp"){ return false; }
-    const action=buttons[4]&&typeof buttons[4].getAttribute==="function"?buttons[4].getAttribute("onclick"):"";
-    return action===dungeonReturnAction(abyssMapActive,abyssSelectionActive);
-}
-
-function syncDungeonShell(){
-        if(typeof document==="undefined"){ return; }
-        const page=document.getElementById("dungeonPage");
-        const nav=document.getElementById("v141DungeonNav");
-        if(!page){ return; }
-        const abyssMapActive=!!page.querySelector(".v141-abyss-shell");
-        const abyssSelectionActive=!!page.querySelector(".v174-abyss-selection,.v174-abyss-complete,.v141-abyss-intro");
-        const isAbyss=abyssMapActive||abyssSelectionActive;
-        let topReturn=document.getElementById("v146AbyssReturn");
-        if(abyssMapActive&&!topReturn){
-            topReturn=document.createElement("button");
-            topReturn.id="v146AbyssReturn";
-            topReturn.type="button";
-            topReturn.className="v146-abyss-return";
-            topReturn.setAttribute("aria-label","返回上一層");
-            topReturn.innerHTML='<img src="assets/ui/map-return.png" alt="">';
-            topReturn.onclick=window.v146ExitAbyssMap;
-            page.appendChild(topReturn);
-        }else if(!abyssMapActive&&topReturn){
-            topReturn.remove();
-        }
-        if(nav){
-            const mode=abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily");
-            if(nav.dataset.v148Mode!==mode||!dungeonNavMatches(nav,abyssMapActive,abyssSelectionActive)){
-                nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);
-                nav.dataset.v148Mode=mode;
-            }
-            nav.dataset.v146Columns="5";
-        }
+    function contextNavMarkup(returnAction){
+        const buttons=CONTEXT_NAV_ITEMS.map(item=>item.slice());
+        buttons.push(["返回","assets/ui/map-return.png",returnAction]);
+        return buttons.map(button=>'<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'"><img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>').join("");
     }
 
-    function scheduleDungeonSync(){ setTimeout(syncDungeonShell,0); }
+    function contextNavMatches(nav,returnAction){
+        const buttons=Array.from(nav&&nav.children||[]);
+        if(buttons.length!==5){ return false; }
+        const labels=buttons.map(button=>button&&typeof button.getAttribute==="function"?button.getAttribute("aria-label"):"").join("|");
+        if(labels!=="角色|背包|秘寶|元素匣|返回"){ return false; }
+        const relicImage=buttons[2]&&typeof buttons[2].querySelector==="function"?buttons[2].querySelector("img"):null;
+        if(!relicImage||relicImage.getAttribute("src")!=="assets/ui/nav-relic-v175.webp"){ return false; }
+        const action=buttons[4]&&typeof buttons[4].getAttribute==="function"?buttons[4].getAttribute("onclick"):"";
+        return action===returnAction;
+    }
+
+    function renderContextNav(nav,returnAction,mode){
+        if(!nav){ return; }
+        if(nav.dataset.v148Mode!==mode||!contextNavMatches(nav,returnAction)){
+  nav.innerHTML=contextNavMarkup(returnAction);
+  nav.dataset.v148Mode=mode;
+        }
+        nav.dataset.v146Columns="5";
+    }
+
+    function dungeonReturnAction(abyssMapActive,abyssSelectionActive){
+        return abyssMapActive
+  ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")
+  :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')");
+    }
+
+    function activeGameplayPageId(){
+        const ids=["gameplayPage","bossPage","towerPage"];
+        for(const id of ids){
+  const page=document.getElementById(id);
+  if(page&&page.classList&&page.classList.contains("active")){ return id; }
+        }
+        return "";
+    }
+
+    window.v148ReturnFromGameplay=function(){
+        const activeId=activeGameplayPageId();
+        if(activeId&&activeId!=="gameplayPage"&&typeof window.vGameplayBackToHub==="function"){
+  window.vGameplayBackToHub();
+        }else if(typeof showPage==="function"){
+  showPage(activeId&&activeId!=="gameplayPage"?"gameplay":"home");
+        }
+    };
+
+    function syncContextNavigation(){
+        if(typeof document==="undefined"){ return; }
+        const page=document.getElementById("dungeonPage");
+        const app=document.getElementById("app");
+        const gameplayPageId=activeGameplayPageId();
+        const dungeonActive=!!(page&&page.classList&&page.classList.contains("active"));
+        const gameplayActive=!!gameplayPageId;
+        const contextActive=dungeonActive||gameplayActive;
+        if(app&&app.classList&&typeof app.classList.toggle==="function"){
+  app.classList.toggle("v148-context-nav-active",contextActive);
+        }
+
+        const abyssMapActive=!!(dungeonActive&&page.querySelector(".v141-abyss-shell"));
+        const abyssSelectionActive=!!(dungeonActive&&page.querySelector(".v174-abyss-selection,.v174-abyss-complete,.v141-abyss-intro"));
+        let topReturn=document.getElementById("v146AbyssReturn");
+        if(abyssMapActive&&!topReturn&&typeof document.createElement==="function"){
+  topReturn=document.createElement("button");
+  topReturn.id="v146AbyssReturn";
+  topReturn.type="button";
+  topReturn.className="v146-abyss-return";
+  topReturn.setAttribute("aria-label","返回上一層");
+  topReturn.innerHTML='<img src="assets/ui/map-return.png" alt="">';
+  topReturn.onclick=window.v146ExitAbyssMap;
+  page.appendChild(topReturn);
+        }else if(!abyssMapActive&&topReturn){
+  topReturn.remove();
+        }
+
+        let nav=document.getElementById("v141DungeonNav");
+        if(contextActive&&!nav&&typeof document.createElement==="function"){
+  nav=document.createElement("div");
+  nav.id="v141DungeonNav";
+  nav.className="bottom-nav map-page-nav v141-dungeon-nav v148-context-nav";
+  const owner=document.getElementById("game-content")||app;
+  if(owner&&typeof owner.appendChild==="function"){ owner.appendChild(nav); }
+        }
+        if(!nav||!contextActive){ return; }
+
+        const returnAction=gameplayActive&&!dungeonActive
+  ?"v148ReturnFromGameplay()"
+  :dungeonReturnAction(abyssMapActive,abyssSelectionActive);
+        const mode=gameplayActive&&!dungeonActive
+  ?"gameplay:"+gameplayPageId
+  :(abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily"));
+        renderContextNav(nav,returnAction,mode);
+    }
+
+    function scheduleDungeonSync(){ setTimeout(syncContextNavigation,0); }
     if(typeof switchDungeonTab==="function"){
         const previousSwitchDungeonTab=switchDungeonTab;
         switchDungeonTab=function(){
@@ -16631,7 +16654,7 @@ function syncDungeonShell(){
         const previousShowPage=showPage;
         showPage=function(page){
             const result=previousShowPage.apply(this,arguments);
-            if(page==="dungeon"){ scheduleDungeonSync(); }
+            scheduleDungeonSync();
             syncQuestNoticeDots();
             return result;
         };
@@ -16728,7 +16751,7 @@ function syncDungeonShell(){
     function boot(){
         installPatrolClickBlocker();
         decoratePatrolRanks();
-        syncDungeonShell();
+        syncContextNavigation();
         syncQuestNoticeDots();
         normalizeAllHardControls();
     }
@@ -16738,7 +16761,7 @@ function syncDungeonShell(){
         const observer=new MutationObserver(()=>{
             if(queued){ return; }
             queued=true;
-            requestAnimationFrame(()=>{ queued=false; syncDungeonShell(); syncQuestNoticeDots(); });
+            requestAnimationFrame(()=>{ queued=false; syncContextNavigation(); syncQuestNoticeDots(); });
         });
         const observe=()=>observer.observe(document.body,{childList:true,subtree:true});
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",observe,{once:true}); }
@@ -16749,7 +16772,8 @@ function syncDungeonShell(){
         document.addEventListener("DOMContentLoaded",boot,{once:true});
     }else{ boot(); }
 
-    window.v148SyncDungeonShell=syncDungeonShell;
+    window.v148SyncContextNavigation=syncContextNavigation;
+    window.v148SyncDungeonShell=syncContextNavigation;
     window.v148SettleDefeatedEnemies=settleDefeatedEnemies;
     window.v148Diagnostics=function(){
         const database=typeof skillDatabase!=="undefined"?skillDatabase:null;
@@ -22894,7 +22918,8 @@ function ensureBattlePresentationStyles(){
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
-    inset:-2px -2px 30px!important;
+    /* 122×94 legacy art box -> ~183×141 visual box: exact 1.5x presentation. */
+    inset:-49px -33px 30px!important;
     background-size:contain!important;background-position:center bottom!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
@@ -22919,15 +22944,27 @@ function ensureBattlePresentationStyles(){
     z-index:20!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
-    position:absolute!important;left:0!important;right:0!important;top:0!important;
-    display:flex!important;min-height:14px!important;align-items:center!important;justify-content:center!important;
-    margin:0!important;padding:0 2px!important;line-height:14px!important;text-align:center!important;
+    position:absolute!important;left:-4px!important;right:-4px!important;top:calc(100% + 3px)!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    min-height:16px!important;height:16px!important;margin:0!important;padding:0 2px!important;
     white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
     z-index:24!important;pointer-events:none!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
-    inset:15px -5px 26px!important;
-    background-size:cover!important;background-position:center center!important;
+    inset:2px 2px 26px!important;
+    background-size:contain!important;background-position:center center!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card.v174-cardless-unit>.v174-battle-art{
+    inset:2px 2px 26px!important;
+    background-size:contain!important;background-position:center center!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp,
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp{
+    height:11px!important;min-height:11px!important;border-radius:4px!important;
+}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp>.monster-bar-text,
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp>.monster-bar-text{
+    height:11px!important;font-size:9px!important;line-height:11px!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
     content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;

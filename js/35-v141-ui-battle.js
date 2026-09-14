@@ -1238,26 +1238,12 @@
     };
 
     function installDungeonNavigation(){
-        if(document.getElementById("v141DungeonNav")){ return; }
-        const nav=document.createElement("div");
-        nav.id="v141DungeonNav";
-        nav.className="bottom-nav map-page-nav v141-dungeon-nav";
-        nav.innerHTML=
-            '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'character\')" aria-label="角色"><img class="nav-art-button" src="assets/ui/nav-character.png" alt=""><span class="nav-sr-only">角色</span></button>'+
-            '<button class="nav-button nav-art-button-wrap" onclick="openMapInventoryOverlay()" aria-label="背包"><img class="nav-art-button" src="assets/ui/nav-backpack.png" alt=""><span class="nav-sr-only">背包</span></button>'+
-            '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'quest\')" aria-label="任務"><img class="nav-art-button" src="assets/ui/nav-quest.png" alt=""><span class="nav-sr-only">任務</span></button>'+
-            '<button class="nav-button nav-art-button-wrap" onclick="openHomeFeature(\'autoBattleSettings\')" aria-label="元素匣／自動戰鬥設定"><img class="nav-art-button" src="assets/ui/nav-element-box.png" alt=""><span class="nav-sr-only">元素匣／自動戰鬥設定</span></button>';
-        document.getElementById("app").appendChild(nav);
-
-        const page=document.getElementById("dungeonPage");
-        if(page&&!document.getElementById("v141DungeonReturn")){
-            const back=document.createElement("button");
-            back.id="v141DungeonReturn";
-            back.className="map-page-return-float v141-dungeon-return";
-            back.setAttribute("aria-label","返回主城");
-            back.innerHTML='<img src="assets/ui/map-return.png" alt="">';
-            back.onclick=()=>showPage("home");
-            page.appendChild(back);
+        /* The legacy v141-dungeon-return/nav markup owner is retired.
+ The final V148 context-nav owner creates and renders the shell. */
+        if(typeof window.v148SyncContextNavigation==="function"){
+  window.v148SyncContextNavigation();
+        }else if(typeof window.v148SyncDungeonShell==="function"){
+  window.v148SyncDungeonShell();
         }
     }
 

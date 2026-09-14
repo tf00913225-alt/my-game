@@ -3835,3 +3835,11 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 巡怪形象切換／角色圖 owner 維持 `js/26-v131-patrol-appearance.js` + `css/32-v131-patrol-appearance.css`；首次遊玩兩幕與創角預備 owner 維持 `js/52-v173.20-startup-loader.js`；卡牌立繪／火箭方向的既有最終 CSS owner 為 `css/56-v174-critical-ui-regressions.css`。本輪未新增 runtime wrapper。
 - 怪物立繪基礎 owner 為 `config/monster-portrait-registry.json`、`js/45-v154-dev-fixes.js` resolver 與 `js/48-v159-abyss-battle-portraits.js` 同步橋接。四張已合入但損毀的天兵 PNG 已以既有透明母圖重新置入 1024×1536 RGBA 檔，非重新生成。
 - 已通過 monster audit（13 existing／94 planned，4 張 generated assets 均可解碼）、專項測試、124/124 非瀏覽器 Node suites、233/233 JS syntax、build deterministic、resources／IDs／loader／release gate／git diff。此環境沒有 Chromium；29 個既有瀏覽器測試留待 GitHub Actions 驗證後才可標示完整完成。
+
+
+## 2026-09-14 — Shared Gameplay/Dungeon nav + unclipped VFX/battle art
+- Base: `dev@bba7cb1f1f896e8eb19f8cbcb7503bddc3dde5e4`; main untouched.
+- `js/42-v148-combat-dungeon-fixes.js` is the sole markup renderer for the shared five-button Gameplay/Dungeon context nav. V141/V146 only delegate to the final owner.
+- Formal cast VFX keep V142 timing + V143 renderer ownership: the fixed positioning node/stage may overflow, while `.v143-vfx-frame` alone clips a Sprite Sheet cell.
+- V174 cardless presentation now renders player battle art at 1.5x its previous visual box; monster/BOSS art uses `contain`, names sit below resource bars, and enemy resource typography matches the player's thin HUD lane.
+- Gameplay BOSS 9:16 cards permit visible overflow; source images remain unchanged. If a source bitmap is already cropped, CSS cannot restore missing pixels.

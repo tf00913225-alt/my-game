@@ -395,23 +395,6 @@
         };
     }
 
-    function dungeonNavMarkup(abyssMapActive,abyssSelectionActive){
-        const buttons=[
-            ["角色","assets/ui/nav-character.png","openHomeFeature('character')"],
-            ["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"],
-            ["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"],
-            ["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"]
-        ];
-        const returnAction=abyssMapActive
-            ?(typeof window.v174AbyssBackToSelection==="function"?"v174AbyssBackToSelection()":"v146ExitAbyssMap()")
-            :(abyssSelectionActive?"v174AbyssLeaveToGameplay()":"showPage('home')");
-        buttons.push(["返回","assets/ui/map-return.png",returnAction]);
-        return buttons.map(button=>
-            '<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'">'+
-            '<img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>'
-        ).join("");
-    }
-
     window.v146ExitAbyssMap=function(){
         if(typeof window.v174AbyssLeaveToGameplay==="function"){
             window.v174AbyssLeaveToGameplay();
@@ -430,20 +413,12 @@
         const abyssActive=abyssMapActive||abyssSelectionActive;
         page.classList.toggle("v146-abyss-active",abyssActive);
         page.classList.toggle("v146-abyss-intro-mode",active&&!!page.querySelector(".v141-abyss-intro"));
-        let nav=document.getElementById("v141DungeonNav");
-        if(active&&!nav){
-            nav=document.createElement("div");
-            nav.id="v141DungeonNav";
-            nav.className="bottom-nav map-page-nav v141-dungeon-nav";
-            app.appendChild(nav);
-        }
-        if(nav){
-            const mode=abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"dungeon");
-            if(nav.dataset.v146Mode!==mode){
-                nav.innerHTML=dungeonNavMarkup(abyssMapActive,abyssSelectionActive);
-                nav.dataset.v146Mode=mode;
-            }
-            nav.dataset.v146Columns="5";
+        const nav=document.getElementById("v141DungeonNav");
+        if(nav){ nav.dataset.v146Columns="5"; }
+        if(typeof window.v148SyncContextNavigation==="function"){
+  window.v148SyncContextNavigation();
+        }else if(typeof window.v148SyncDungeonShell==="function"){
+  window.v148SyncDungeonShell();
         }
         const oldReturn=document.getElementById("v141DungeonReturn");
         if(oldReturn){ oldReturn.remove(); }
