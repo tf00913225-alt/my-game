@@ -30,21 +30,29 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
           def load(path):
               return Path(path).read_text(encoding="utf-8")
 
-          def save(path, text):
-              Path(path).write_text(text, encoding="utf-8")
+          def save(path,text):
+              Path(path).write_text(text,encoding="utf-8")
 
-          def replace_once(path, old, new):
+          def exact1(path,old,new,label):
               text=load(path)
-              count=text.count(old)
-              if count!=1:
-                  raise SystemExit(f"{path}: expected one match, got {count}: {old[:90]!r}")
+              n=text.count(old)
+              if n!=1:
+                  raise SystemExit(f"{label}: expected one exact match, got {n}")
               save(path,text.replace(old,new,1))
 
-          # 1. Inventory: all filters/categories use the same 6x3 square art box.
+          def regex1(path,pattern,replacement,label,flags=re.S):
+              text=load(path)
+              out,n=re.subn(pattern,lambda _m: replacement,text,count=1,flags=flags)
+              if n!=1:
+                  raise SystemExit(f"{label}: expected one regex match, got {n}")
+              save(path,out)
+
+          # 1) Inventory layout/art is owned by the inventory stylesheet, not lazy Abyss CSS.
           path="css/38-v141-system-expansion.css"
           text=load(path)
           marker="""/* Inventory is the owner of equipment-card geometry. It must not depend on
@@ -93,24 +101,17 @@ jobs:
           if block not in text:
               if marker not in text:
                   raise SystemExit("inventory owner marker missing")
-              text=text.replace(marker,block+marker,1)
-              save(path,text)
+              save(path,text.replace(marker,block+marker,1))
 
-          # Abyss must not own backpack geometry.
           path="css/50-v169-abyss-flow.css"
-          text=load(path)
-          cross="""#game-stage #inventoryPage .inventory-item-classic .inventory-icon > .v169-item-art{
-              width:100%;
-              height:100%;
-              max-width:100%;
-              max-height:100%;
-          }
-          """
-          if cross not in text:
-              raise SystemExit("expected Abyss cross-owner inventory block missing")
-          save(path,text.replace(cross,"",1))
+          regex1(
+              path,
+              r'\n?#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{\s*width:100%;\s*height:100%;\s*max-width:100%;\s*max-height:100%;\s*\}\s*',
+              "\n",
+              "remove Abyss inventory cross-owner"
+          )
 
-          # 2 + 5. V174 battle owner: monster name above art; active player gets a gold frame.
+          # 2 + 5) Battle presentation owner: names above monster art and clear gold current-turn frame.
           path="js/54-v173.51-battle-qa.js"
           text=load(path)
           old="""#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{
@@ -152,221 +153,163 @@ jobs:
           }
           """
           if text.count(old)!=1:
-              raise SystemExit("active-turn suppression snippet mismatch")
+              raise SystemExit("active-turn owner snippet mismatch")
           save(path,text.replace(old,new,1))
 
-          # 3 + 4. V143 VFX owner: 3x scale, source-frame aspect, visual-art centering,
-          # and hidden-until-confirmed rendering so MISS never shows a skill sprite.
+          # 3 + 4) V143 owner: center on visible art, 3x current VFX box, preserve source-frame aspect,
+          # and do not reveal a skill sprite when the actual result is MISS.
           path="js/39-v143-skill-animation.js"
           text=load(path)
-          old="""    const failedAssets=new Set();
-          """
-          new="""    const failedAssets=new Set();
-              const SPRITE_SCALE_MULTIPLIER=3;
-              const spriteFrameAspectCache=new Map();
-              const spriteFrameAspectLoading=new Set();
-          """
-          if text.count(old)!=1:
-              raise SystemExit("VFX constant insertion point mismatch")
-          text=text.replace(old,new,1)
+          if "const SPRITE_SCALE_MULTIPLIER=3;" in text:
+              raise SystemExit("VFX repair unexpectedly already present")
+          text=text.replace(
+              "    const failedAssets=new Set();\n",
+              "    const failedAssets=new Set();\n    const SPRITE_SCALE_MULTIPLIER=3;\n    const spriteFrameAspectCache=new Map();\n    const spriteFrameAspectLoading=new Set();\n",
+              1
+          )
+          save(path,text)
 
-          old="""    function cardCenter(card){
-              const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-              return rect?{x:rect.left+rect.width/2,y:rect.top+rect.height/2,rect:rect}:null;
-          }
-          """
-          new="""    function visualRectForCard(card){
-              const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-              if(!rect){ return null; }
-              if(typeof card.querySelector==="function"){
-                  try{
-                      const art=card.querySelector(":scope > .v174-battle-art");
-                      const artRect=art&&art.getBoundingClientRect?art.getBoundingClientRect():null;
-                      if(artRect&&artRect.width>0&&artRect.height>0){ return artRect; }
-                  }catch(_){ }
+          regex1(
+              path,
+              r'    function cardCenter\(card\)\{\s*const rect=card&&card\.getBoundingClientRect\?card\.getBoundingClientRect\(\):null;\s*return rect\?\{x:rect\.left\+rect\.width/2,y:rect\.top\+rect\.height/2,rect:rect\}:null;\s*\}',
+              '''    function visualRectForCard(card){
+                  const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+                  if(!rect){ return null; }
+                  if(typeof card.querySelector==="function"){
+                      try{
+                          const art=card.querySelector(":scope > .v174-battle-art");
+                          const artRect=art&&art.getBoundingClientRect?art.getBoundingClientRect():null;
+                          if(artRect&&artRect.width>0&&artRect.height>0){ return artRect; }
+                      }catch(_){ }
+                  }
+                  return rect;
               }
-              return rect;
-          }
 
               function cardCenter(card){
-              const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-              if(!rect){ return null; }
-              const visualRect=visualRectForCard(card)||rect;
-              return {
-                  x:visualRect.left+visualRect.width/2,
-                  y:visualRect.top+visualRect.height/2,
-                  rect:rect,
-                  visualRect:visualRect
-              };
-          }
-          """
-          if text.count(old)!=1:
-              raise SystemExit("cardCenter snippet mismatch")
-          text=text.replace(old,new,1)
+                  const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+                  if(!rect){ return null; }
+                  const visualRect=visualRectForCard(card)||rect;
+                  return {
+                      x:visualRect.left+visualRect.width/2,
+                      y:visualRect.top+visualRect.height/2,
+                      rect:rect,
+                      visualRect:visualRect
+                  };
+              }''',
+              "VFX visual card center"
+          )
 
-          old="""    function fieldBounds(cards){
-              const rects=cards.map(card=>card&&card.getBoundingClientRect?card.getBoundingClientRect():null)
-                  .filter(rect=>rect&&rect.width&&rect.height);
-          """
-          new="""    function fieldBounds(cards){
-              const rects=cards.map(card=>visualRectForCard(card))
-                  .filter(rect=>rect&&rect.width&&rect.height);
-          """
-          if text.count(old)!=1:
-              raise SystemExit("fieldBounds snippet mismatch")
-          text=text.replace(old,new,1)
+          regex1(
+              path,
+              r'    function fieldBounds\(cards\)\{\s*const rects=cards\.map\(card=>card&&card\.getBoundingClientRect\?card\.getBoundingClientRect\(\):null\)\s*\.filter\(rect=>rect&&rect\.width&&rect\.height\);',
+              '''    function fieldBounds(cards){
+                  const rects=cards.map(card=>visualRectForCard(card))
+                      .filter(rect=>rect&&rect.width&&rect.height);''',
+              "VFX visual field bounds"
+          )
 
-          old="""    function appendSpriteNode(current){
-              const node=document.createElement("i");
-              node.className="v143-vfx-sprite";
-              node.dataset.skill=current.config.id||"unknown";
-              node.dataset.targetSide=current.targetSide;
-              node.dataset.renderer="dom-sprite";
-              state.stage.appendChild(node);
-              return node;
-          }
-
-              function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
-          """
-          new="""    function appendSpriteNode(current){
-              const node=document.createElement("i");
-              node.className="v143-vfx-sprite";
-              node.dataset.skill=current.config.id||"unknown";
-              node.dataset.targetSide=current.targetSide;
-              node.dataset.renderer="dom-sprite";
-              node.dataset.confirmedHit="false";
-              node.style.visibility="hidden";
-              state.stage.appendChild(node);
-              return node;
-          }
+          regex1(
+              path,
+              r'    function appendSpriteNode\(current\)\{\s*const node=document\.createElement\("i"\);\s*node\.className="v143-vfx-sprite";\s*node\.dataset\.skill=current\.config\.id\|\|"unknown";\s*node\.dataset\.targetSide=current\.targetSide;\s*node\.dataset\.renderer="dom-sprite";\s*state\.stage\.appendChild\(node\);\s*return node;\s*\}\s*\n\s*function clamp\(value,min,max\)\{ return Math\.max\(min,Math\.min\(max,value\)\); \}',
+              '''    function appendSpriteNode(current){
+                  const node=document.createElement("i");
+                  node.className="v143-vfx-sprite";
+                  node.dataset.skill=current.config.id||"unknown";
+                  node.dataset.targetSide=current.targetSide;
+                  node.dataset.renderer="dom-sprite";
+                  node.dataset.confirmedHit="false";
+                  node.style.visibility="hidden";
+                  state.stage.appendChild(node);
+                  return node;
+              }
 
               function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
 
               function frameAspectFor(sprite){
-              const key=String(sprite&&sprite.src||"");
-              const cached=key?spriteFrameAspectCache.get(key):null;
-              return Math.max(.1,Number(cached)||Number(sprite&&sprite.cellAspect)||1);
-          }
+                  const key=String(sprite&&sprite.src||"");
+                  const cached=key?spriteFrameAspectCache.get(key):null;
+                  return Math.max(.1,Number(cached)||Number(sprite&&sprite.cellAspect)||1);
+              }
 
               function applySpriteBox(node,width,height,sprite){
-              const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER;
-              const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER;
-              const aspect=frameAspectFor(sprite);
-              let renderWidth=boxWidth,renderHeight=boxHeight;
-              if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
-              else{ renderHeight=renderWidth/aspect; }
-              node.style.width=Math.round(renderWidth)+"px";
-              node.style.height=Math.round(renderHeight)+"px";
-              node.dataset.frameAspect=String(Number(aspect.toFixed(4)));
-          }
+                  const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER;
+                  const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER;
+                  const aspect=frameAspectFor(sprite);
+                  let renderWidth=boxWidth,renderHeight=boxHeight;
+                  if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
+                  else{ renderHeight=renderWidth/aspect; }
+                  node.style.width=Math.round(renderWidth)+"px";
+                  node.style.height=Math.round(renderHeight)+"px";
+                  node.dataset.frameAspect=String(Number(aspect.toFixed(4)));
+              }
 
               function requestSpriteAspect(sprite,current,node,index,target){
-              const key=String(sprite&&sprite.src||"");
-              if(!key||spriteFrameAspectCache.has(key)||spriteFrameAspectLoading.has(key)){ return; }
-              const ImageCtor=typeof window!=="undefined"&&typeof window.Image==="function"
-                  ?window.Image:(typeof Image==="function"?Image:null);
-              if(!ImageCtor){ return; }
-              spriteFrameAspectLoading.add(key);
-              const image=new ImageCtor();
-              image.onload=function(){
-                  spriteFrameAspectLoading.delete(key);
-                  const columns=Math.max(1,Number(sprite.columns)||1);
-                  const rows=Math.max(1,Number(sprite.rows)||1);
-                  const cellWidth=Number(image.naturalWidth||image.width||0)/columns;
-                  const cellHeight=Number(image.naturalHeight||image.height||0)/rows;
-                  if(cellWidth>0&&cellHeight>0){ spriteFrameAspectCache.set(key,cellWidth/cellHeight); }
-                  if(state.current===current&&!current.done){ placeSprite(current,node,index,target); }
-              };
-              image.onerror=function(){ spriteFrameAspectLoading.delete(key);failedAssets.add(key); };
-              image.src=key;
-          }
-          """
-          if text.count(old)!=1:
-              raise SystemExit("sprite node/helper insertion point mismatch")
-          text=text.replace(old,new,1)
+                  const key=String(sprite&&sprite.src||"");
+                  if(!key||spriteFrameAspectCache.has(key)||spriteFrameAspectLoading.has(key)){ return; }
+                  const ImageCtor=typeof window!=="undefined"&&typeof window.Image==="function"
+                      ?window.Image:(typeof Image==="function"?Image:null);
+                  if(!ImageCtor){ return; }
+                  spriteFrameAspectLoading.add(key);
+                  const image=new ImageCtor();
+                  image.onload=function(){
+                      spriteFrameAspectLoading.delete(key);
+                      const columns=Math.max(1,Number(sprite.columns)||1);
+                      const rows=Math.max(1,Number(sprite.rows)||1);
+                      const cellWidth=Number(image.naturalWidth||image.width||0)/columns;
+                      const cellHeight=Number(image.naturalHeight||image.height||0)/rows;
+                      if(cellWidth>0&&cellHeight>0){ spriteFrameAspectCache.set(key,cellWidth/cellHeight); }
+                      if(state.current===current&&!current.done){ placeSprite(current,node,index,target); }
+                  };
+                  image.onerror=function(){ spriteFrameAspectLoading.delete(key); };
+                  image.src=key;
+              }''',
+              "VFX sprite helpers"
+          )
 
-          # Single and target-trajectory square boxes (two identical occurrences).
-          old="""            node.style.left=target.x+"px";
+          # Size replacements use structural regex instead of indentation-sensitive text.
+          regex1(path,
+              r'(node\.style\.left=target\.x\+"px";\s*node\.style\.top=target\.y\+"px";)\s*node\.style\.width=size\+"px";\s*node\.style\.height=size\+"px";',
+              '''node.style.left=target.x+"px";
                   node.style.top=target.y+"px";
-                  node.style.width=size+"px";
-                  node.style.height=size+"px";
-                  return;
-          """
-          new="""            node.style.left=target.x+"px";
-                  node.style.top=target.y+"px";
-                  applySpriteBox(node,size,size,sprite);
-                  return;
-          """
-          if text.count(old)!=1:
-              raise SystemExit(f"single sprite size snippet expected once, got {text.count(old)}")
-          text=text.replace(old,new,1)
-
-          old="""            node.style.left=actor.x+"px";
-                  node.style.top=actor.y+"px";
-                  node.style.width=size+"px";
-                  node.style.height=size+"px";
-                  node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
-          """
-          new="""            node.style.left=actor.x+"px";
+                  applySpriteBox(node,size,size,sprite);''',
+              "single sprite 3x aspect")
+          regex1(path,
+              r'(node\.style\.left=actor\.x\+"px";\s*node\.style\.top=actor\.y\+"px";)\s*node\.style\.width=size\+"px";\s*node\.style\.height=size\+"px";\s*node\.style\.setProperty\("--v143-sprite-dx",target\.x-actor\.x\+"px"\);',
+              '''node.style.left=actor.x+"px";
                   node.style.top=actor.y+"px";
                   applySpriteBox(node,size,size,sprite);
-                  node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
-          """
-          if text.count(old)!=1:
-              raise SystemExit("target trajectory size snippet mismatch")
-          text=text.replace(old,new,1)
-
-          old="""            node.style.left=(bounds.left+bounds.width/2)+"px";
+                  node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");''',
+              "trajectory sprite 3x aspect")
+          regex1(path,
+              r'node\.style\.left=\(bounds\.left\+bounds\.width/2\)\+"px";\s*node\.style\.top=\(bounds\.top\+bounds\.height/2\)\+"px";\s*node\.style\.width=width\+"px";\s*node\.style\.height=height\+"px";',
+              '''node.style.left=(bounds.left+bounds.width/2)+"px";
                   node.style.top=(bounds.top+bounds.height/2)+"px";
-                  node.style.width=width+"px";
-                  node.style.height=height+"px";
-                  return;
-          """
-          new="""            node.style.left=(bounds.left+bounds.width/2)+"px";
-                  node.style.top=(bounds.top+bounds.height/2)+"px";
-                  applySpriteBox(node,width,height,sprite);
-                  return;
-          """
-          if text.count(old)!=1:
-              raise SystemExit("battlefield sprite size snippet mismatch")
-          text=text.replace(old,new,1)
-
-          old="""        node.dataset.targetIndexes=indexes.join(",");
-              node.style.width=size+"px";
-              node.style.height=size+"px";
-              const destination={
-          """
-          new="""        node.dataset.targetIndexes=indexes.join(",");
+                  applySpriteBox(node,width,height,sprite);''',
+              "battlefield sprite 3x aspect")
+          regex1(path,
+              r'node\.dataset\.targetIndexes=indexes\.join\(","\);\s*node\.style\.width=size\+"px";\s*node\.style\.height=size\+"px";\s*const destination=',
+              '''node.dataset.targetIndexes=indexes.join(",");
               applySpriteBox(node,size,size,sprite);
-              const destination={
-          """
-          if text.count(old)!=1:
-              raise SystemExit("group/trajectory sprite size snippet mismatch")
-          text=text.replace(old,new,1)
+              const destination=''',
+              "group sprite 3x aspect")
 
-          old="""        placeSprite(current,node,index,target);
-              if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
-          """
-          new="""        placeSprite(current,node,index,target);
+          regex1(path,
+              r'        placeSprite\(current,node,index,target\);\s*if\(!node\.classList\.contains\("v143-vfx-sprite-active"\)\)\{ node\.classList\.add\("v143-vfx-sprite-active"\); \}',
+              '''        placeSprite(current,node,index,target);
               requestSpriteAspect(sprite,current,node,index,target);
-              if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
-          """
-          if text.count(old)!=1:
-              raise SystemExit("addSprite placement snippet mismatch")
-          text=text.replace(old,new,1)
+              if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }''',
+              "sprite aspect load")
 
-          old="""            spriteNodes:new Map(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
-          """
-          new="""            spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
-          """
-          if text.count(old)!=1:
-              raise SystemExit("current state spriteNodes snippet mismatch")
-          text=text.replace(old,new,1)
+          regex1(path,
+              r'spriteNodes:new Map\(\),deferredStatusTargets:new Map\(\),statusAtStart:snapshotTimedEffects\(\),',
+              'spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),',
+              "VFX confirmed target state")
 
-          # Confirming a real hit/effect reveals the already-positioned sprite.
-          marker="""    function targetHitTime(current,index){
-          """
-          confirm="""    function confirmTargetVisual(current,index){
+          text=load(path)
+          marker="    function targetHitTime(current,index){\n"
+          if marker not in text:
+              raise SystemExit("targetHitTime marker missing")
+          confirm='''    function confirmTargetVisual(current,index){
               if(!current||current.done||!current.model||!current.model.sprite){ return; }
               current.confirmedTargets.add(index);
               const placement=String(current.model.sprite.placement||"single");
@@ -378,148 +321,105 @@ jobs:
               }
           }
 
-          """
-          if marker not in text:
-              raise SystemExit("targetHitTime marker missing")
-          text=text.replace(marker,confirm+marker,1)
+          '''
+          save(path,text.replace(marker,confirm+marker,1))
 
-          old="""    function delayFor(targetSide,index,allowDefeated){
-              const current=registerTarget(targetSide,index,allowDefeated);
-              if(!current){ return 0; }
-              return Math.max(0,targetHitTime(current,index)-Date.now());
-          }
-          """
-          new="""    function delayFor(targetSide,index,allowDefeated){
-              const current=registerTarget(targetSide,index,allowDefeated);
-              if(!current){ return 0; }
-              confirmTargetVisual(current,index);
-              return Math.max(0,targetHitTime(current,index)-Date.now());
-          }
+          regex1(path,
+              r'    function delayFor\(targetSide,index,allowDefeated\)\{\s*const current=registerTarget\(targetSide,index,allowDefeated\);\s*if\(!current\)\{ return 0; \}\s*return Math\.max\(0,targetHitTime\(current,index\)-Date\.now\(\)\);\s*\}',
+              '''    function delayFor(targetSide,index,allowDefeated){
+                  const current=registerTarget(targetSide,index,allowDefeated);
+                  if(!current){ return 0; }
+                  confirmTargetVisual(current,index);
+                  return Math.max(0,targetHitTime(current,index)-Date.now());
+              }
 
               function missDelayFor(targetSide,index){
-              const current=state.current;
-              if(!current||current.done||current.targetSide!==targetSide){ return 0; }
-              if(current.targetIndexes.indexOf(index)<0&&!current.validTargets.has(index)){ return 0; }
-              return Math.max(0,targetHitTime(current,index)-Date.now());
-          }
-          """
-          if text.count(old)!=1:
-              raise SystemExit("delayFor snippet mismatch")
-          text=text.replace(old,new,1)
+                  const current=state.current;
+                  if(!current||current.done||current.targetSide!==targetSide){ return 0; }
+                  if(current.targetIndexes.indexOf(index)<0&&!current.validTargets.has(index)){ return 0; }
+                  return Math.max(0,targetHitTime(current,index)-Date.now());
+              }''',
+              "VFX hit confirmation timing")
 
-          old="""                registerTarget(side,index,false);
-                      let tracked=current.deferredStatusTargets.get(type);
-          """
-          new="""                registerTarget(side,index,false);
-                      confirmTargetVisual(current,index);
-                      let tracked=current.deferredStatusTargets.get(type);
-          """
-          if text.count(old)!=1:
-              raise SystemExit("status visual confirmation snippet mismatch")
-          text=text.replace(old,new,1)
+          regex1(path,
+              r'(if\(types\.indexOf\(type\)>=0\)\{\s*registerTarget\(side,index,false\);)',
+              '''if(types.indexOf(type)>=0){
+                      registerTarget(side,index,false);
+                      confirmTargetVisual(current,index);''',
+              "status confirms VFX")
 
-          old="""    if(typeof showMissEffect==="function"){
-              const previous=showMissEffect;
-              showMissEffect=function(isPlayerTarget,index){
-                  const args=arguments;
-                  const wait=delayFor(isPlayerTarget?"player":"monster",index,true);
-                  if(wait>8){ setTimer(()=>previous.apply(this,args),wait); return; }
-                  return previous.apply(this,args);
-              };
-          }
-          """
-          new="""    if(typeof showMissEffect==="function"){
-              const previous=showMissEffect;
-              showMissEffect=function(isPlayerTarget,index,label){
-                  const args=Array.prototype.slice.call(arguments);
-                  const targetSide=isPlayerTarget?"player":"monster";
-                  const isMiss=String(label||"MISS").trim().toUpperCase()==="MISS";
-                  const wait=isMiss?missDelayFor(targetSide,index):delayFor(targetSide,index,true);
-                  const invoke=()=>{
-                      const result=previous.apply(this,args);
-                      const card=cardFor(targetSide,index);
-                      if(card&&typeof card.querySelectorAll==="function"&&typeof document!=="undefined"&&document.body){
-                          const popups=card.querySelectorAll(":scope > .damage-popup.miss-popup");
-                          const popup=popups.length?popups[popups.length-1]:null;
-                          const rect=popup&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-                          if(popup&&rect){
-                              popup.classList.add("v152-top-damage");
-                              popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
-                              popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
-                              document.body.appendChild(popup);
+          regex1(path,
+              r'    if\(typeof showMissEffect==="function"\)\{\s*const previous=showMissEffect;\s*showMissEffect=function\(isPlayerTarget,index\)\{\s*const args=arguments;\s*const wait=delayFor\(isPlayerTarget\?"player":"monster",index,true\);\s*if\(wait>8\)\{ setTimer\(\(\)=>previous\.apply\(this,args\),wait\); return; \}\s*return previous\.apply\(this,args\);\s*\};\s*\}',
+              '''    if(typeof showMissEffect==="function"){
+                  const previous=showMissEffect;
+                  showMissEffect=function(isPlayerTarget,index,label){
+                      const args=Array.prototype.slice.call(arguments);
+                      const targetSide=isPlayerTarget?"player":"monster";
+                      const isMiss=String(label||"MISS").trim().toUpperCase()==="MISS";
+                      const wait=isMiss?missDelayFor(targetSide,index):delayFor(targetSide,index,true);
+                      const invoke=()=>{
+                          const result=previous.apply(this,args);
+                          const card=cardFor(targetSide,index);
+                          if(card&&typeof card.querySelectorAll==="function"&&typeof document!=="undefined"&&document.body){
+                              const popups=card.querySelectorAll(":scope > .damage-popup.miss-popup");
+                              const popup=popups.length?popups[popups.length-1]:null;
+                              const rect=popup&&card.getBoundingClientRect?card.getBoundingClientRect():null;
+                              if(popup&&rect){
+                                  popup.classList.add("v152-top-damage");
+                                  popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
+                                  popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
+                                  document.body.appendChild(popup);
+                              }
                           }
-                      }
-                      return result;
+                          return result;
+                      };
+                      if(wait>8){ setTimer(invoke,wait); return; }
+                      return invoke();
                   };
-                  if(wait>8){ setTimer(invoke,wait); return; }
-                  return invoke();
-              };
-          }
-          """
-          if text.count(old)!=1:
-              raise SystemExit("showMissEffect wrapper snippet mismatch")
-          text=text.replace(old,new,1)
-          save(path,text)
+              }''',
+              "MISS suppresses skill sprite")
 
-          # Mechanism targets have their own HP sidecar; explicitly confirm the VFX hit
-          # without delaying the already-fixed damage-number behavior.
+          # Mechanism targets must also confirm the hidden-until-hit VFX.
           path="js/gameplay-boss-tower-system.js"
-          text=load(path)
-          old="""        const final=Math.max(1,Math.round(numeric(damage,1)));
-              const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
-              if(node&&typeof showDamagePopup==="function"){
-          """
-          new="""        const final=Math.max(1,Math.round(numeric(damage,1)));
+          regex1(path,
+              r'(const final=Math\.max\(1,Math\.round\(numeric\(damage,1\)\)\);\s*const node=document\.querySelector\(\'#bossMechanismSlot \[data-id="\'\+card\.id\+\'"\]\'\);)',
+              '''const final=Math.max(1,Math.round(numeric(damage,1)));
               const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
               if(typeof window.v143RunAtTargetHit==="function"){
                   window.v143RunAtTargetHit("monster","mechanism:"+card.id,function(){},true);
-              }
-              if(node&&typeof showDamagePopup==="function"){
-          """
-          if text.count(old)!=1:
-              raise SystemExit("mechanism VFX confirmation snippet mismatch")
-          save(path,text.replace(old,new,1))
+              }''',
+              "mechanism VFX hit confirmation")
 
-          # Browser QA: make player 2 active and verify gold frame + monster name geometry.
+          # Mobile browser regression: verify monster-name geometry and active gold frame.
           path="tests/v174-cardless-battle-browser.test.js"
-          text=load(path)
-          old='return `<div id="battlePlayerCard${index}" class="battle-player" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'116\' height=\'144\'%3E%3Crect width=\'116\' height=\'144\' fill=\'%23456\'/%3E%3C/svg%3E&quot;)">'
-          new='return `<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'116\' height=\'144\'%3E%3Crect width=\'116\' height=\'144\' fill=\'%23456\'/%3E%3C/svg%3E&quot;)">'
-          if text.count(old)!=1:
-              raise SystemExit("browser fixture player class snippet mismatch")
-          text=text.replace(old,new,1)
-          old="""      enemyArt:!!enemyArt,
-                  playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,
-          """
-          new="""      enemyArt:!!enemyArt,
+          regex1(path,
+              r'<div id="battlePlayerCard\$\{index\}" class="battle-player"',
+              '<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}"',
+              "browser fixture active turn")
+          regex1(path,
+              r'(\s+enemyArt:!!enemyArt,\n)(\s+playerIdle:)',
+              '''      enemyArt:!!enemyArt,
                   enemyArtRect:qaRect('#battleMonster0 > .v174-battle-art'),
                   enemyNameRect:qaRect('#battleMonster0 > .battle-monster-name'),
                   enemyNameDisplay:getComputedStyle(enemy.querySelector('.battle-monster-name')).display,
                   activeOutlineWidth:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineWidth,
                   activeOutlineColor:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineColor,
                   activeShadow:getComputedStyle(document.getElementById('battlePlayerCard1')).boxShadow,
-                  playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,
-          """
-          if text.count(old)!=1:
-              raise SystemExit("browser result field insertion mismatch")
-          text=text.replace(old,new,1)
-          old="""    assert.equal(data.enemyArt,true);
-              assert.equal(data.playerIdle,"v174BattleIdle");
-          """
-          new="""    assert.equal(data.enemyArt,true);
+                  playerIdle:''',
+              "browser result geometry fields")
+          regex1(path,
+              r'    assert\.equal\(data\.enemyArt,true\);\s*assert\.equal\(data\.playerIdle,"v174BattleIdle"\);',
+              '''    assert.equal(data.enemyArt,true);
               assert.equal(data.enemyNameDisplay,"flex");
               assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");
               assert.ok(data.enemyNameRect.bottom<=data.enemyArtRect.top+1,"monster name must sit above the monster artwork");
               assert.equal(data.activeOutlineWidth,"2px");
               assert.notEqual(data.activeOutlineColor,"rgba(0, 0, 0, 0)");
               assert.notEqual(data.activeShadow,"none");
-              assert.equal(data.playerIdle,"v174BattleIdle");
-          """
-          if text.count(old)!=1:
-              raise SystemExit("browser assertions insertion mismatch")
-          save(path,text.replace(old,new,1))
+              assert.equal(data.playerIdle,"v174BattleIdle");''',
+              "browser geometry assertions")
 
-          # Focused static regression guard for the six-item batch (item 6 is +50%).
+          # Focused static guards for the repaired requirements.
           Path("tests/remaining-ui-regressions-20260914.test.js").write_text(r'''"use strict";
           const assert=require("node:assert/strict");
           const fs=require("node:fs");
@@ -536,7 +436,7 @@ jobs:
           assert.match(inventoryJs,/const INVENTORY_PAGE_SIZE=18;/);
           assert.match(inventoryJs,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/);
           assert.match(inventoryCss,/inventory-grid-classic[\s\S]*grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
-          assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inventory-icon > \.v169-item-art\{[\s\S]*object-fit:contain/);
+          assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inventory-icon > \.v169-item-art[\s\S]*object-fit:contain/);
           assert.doesNotMatch(abyssCss,/#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{/);
 
           assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:0!important;[\s\S]*z-index:24!important/);
@@ -585,12 +485,12 @@ jobs:
       - name: Commit repaired source and canonical build
         shell: bash
         run: |
-          if git diff --quiet; then
-            echo "No repair changes to commit"
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+          if git diff --cached --quiet; then
+            echo "No repair changes to commit"
+            exit 0
+          fi
           git commit -m "fix: finish remaining inventory and battle UI regressions [remaining-ui-applied]"
           git push origin HEAD:fix/inventory-battle-nav-runtime-20260914
