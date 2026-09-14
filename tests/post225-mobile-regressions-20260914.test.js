@@ -1,0 +1,30 @@
+"use strict";
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const read=p=>fs.readFileSync(p,"utf8");
+const nav=read("js/42-v148-combat-dungeon-fixes.js");
+const navCss=read("css/45-v152-dev-fixes.css");
+const panelCss=read("css/gameplay-boss-tower.css");
+const battle=read("js/54-v173.51-battle-qa.js");
+const vfx=read("js/39-v143-skill-animation.js");
+const vfxCss=read("css/40-v143-combat-dungeon-polish.css");
+
+assert.match(nav,/classList\.add\("v148-context-nav"\)/);
+assert.match(navCss,/#v141DungeonNav\.v148-context-nav,[\s\S]*?width:420px !important;[\s\S]*?height:84px !important;/);
+assert.match(navCss,/#v141DungeonNav \.nav-art-button\{[\s\S]*?height:72px !important;/);
+assert.doesNotMatch(panelCss,/\.gameplay-large-panel::after/);
+
+const syncStart=battle.indexOf("function syncUnitArtwork");
+const syncEnd=battle.indexOf("function syncResourceNumbers",syncStart);
+const sync=battle.slice(syncStart,syncEnd);
+assert.ok(sync.indexOf("const source=battleArtworkSource(card,kind)")<sync.indexOf('card.classList.add("v174-cardless-unit")'));
+assert.match(sync,/if\(source\)\{[\s\S]*?art\.style\.backgroundImage=source;[\s\S]*?setProperty\("background-image","none","important"\)/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-hp\{[\s\S]*?bottom:29px!important/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-sp\{[\s\S]*?bottom:16px!important/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*?top:auto!important;bottom:0!important/);
+assert.doesNotMatch(vfxCss,/battleMonsterArea \.v131-monster-row\{[\s\S]*?min-height:120px/);
+assert.equal((vfx.match(/const targetSize=Math\.max\(1,Number\(target\.rect\.width\)\|\|0\);/g)||[]).length,2);
+assert.doesNotMatch(vfx,/const targetSize=Math\.max\(target\.rect\.width,target\.rect\.height\)/);
+assert.match(vfxCss,/\.v143-skill-stage\{[\s\S]*?overflow:visible/);
+assert.match(vfxCss,/\.v143-vfx-frame\{[\s\S]*?overflow:hidden/);
+console.log("post-225 mobile regression guard passed");

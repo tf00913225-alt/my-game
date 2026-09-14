@@ -1406,6 +1406,7 @@
   if(owner&&typeof owner.appendChild==="function"){ owner.appendChild(nav); }
         }
         if(!nav||!contextActive){ return; }
+        if(nav.classList&&typeof nav.classList.add==="function"){ nav.classList.add("v148-context-nav"); }
 
         const returnAction=gameplayActive&&!dungeonActive
   ?"v148ReturnFromGameplay()"

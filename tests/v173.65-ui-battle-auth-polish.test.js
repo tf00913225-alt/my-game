@@ -9,8 +9,9 @@ assert.match(boss,/boss-mechanism-card\{[\s\S]*?aspect-ratio:4 \/ 3;/);
 
 const battle=read("js/54-v173.51-battle-qa.js");
 assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:contain!important/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-hp\{[\s\S]*?bottom:13px!important;[\s\S]*?display:block!important/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-sp\{[\s\S]*?bottom:0!important;[\s\S]*?display:block!important/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-hp\{[\s\S]*?bottom:29px!important;[\s\S]*?display:block!important/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-sp\{[\s\S]*?bottom:16px!important;[\s\S]*?display:block!important/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*?top:auto!important;bottom:0!important/);
 
 const city=read("js/16-stage-v54-main-city-runtime.js");
 const cityCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");
