@@ -22,5 +22,35 @@ new_block = '''    assert.match(finalNavSource,/openMapInventoryOverlay\\(\\)/);
     assert.match(cssSource,/\\.v141-dungeon-active #bottomNav,[\\s\\S]*\\.v148-context-nav-active #bottomNav\\{display:none !important;\\}/);'''
 assert old_block in text, "V141 stale dungeon nav assertions not found"
 text = text.replace(old_block, new_block, 1)
-
 Path(path).write_text(text, encoding="utf-8")
+
+v146_path = Path("tests/v146-system-polish.test.js")
+v146 = v146_path.read_text(encoding="utf-8")
+source_import = 'const source=fs.readFileSync("js/41-v146-system-polish.js","utf8");'
+assert source_import in v146, "V146 source import not found"
+v146 = v146.replace(
+    source_import,
+    source_import + '\nconst finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");',
+    1,
+)
+old_nav_asserts = '''    assert.ok(source.includes('buttons.push(["返回","assets/ui/map-return.png",returnAction]);'));
+    assert.match(source,/abyssSelectionActive\\?"v174AbyssLeaveToGameplay\\(\\)":"showPage\\('home'\\)"/);'''
+new_nav_asserts = '''    assert.match(source,/v148SyncContextNavigation/);
+    assert.doesNotMatch(source,/function dungeonNavMarkup\\(/);
+    assert.ok(finalNavSource.includes('buttons.push(["返回","assets/ui/map-return.png",returnAction]);'));
+    assert.match(finalNavSource,/abyssSelectionActive\\?"v174AbyssLeaveToGameplay\\(\\)":"showPage\\('home'\\)"/);'''
+assert old_nav_asserts in v146, "V146 stale return-nav assertions not found"
+v146 = v146.replace(old_nav_asserts, new_nav_asserts, 1)
+v146 = v146.replace(
+    '    assert.match(source,/\\["秘寶","assets\\/ui\\/nav-relic-v175\\.webp","openHomeFeature\\(\'relic\'\\)"\\]/);',
+    '    assert.match(finalNavSource,/\\["秘寶","assets\\/ui\\/nav-relic-v175\\.webp","openHomeFeature\\(\'relic\'\\)"\\]/);',
+    1,
+)
+v146 = v146.replace(
+    '    assert.match(source,/\\["元素匣","assets\\/ui\\/nav-element-box\\.png","openHomeFeature\\(\'autoBattleSettings\'\\)"\\]/);',
+    '    assert.match(finalNavSource,/\\["元素匣","assets\\/ui\\/nav-element-box\\.png","openHomeFeature\\(\'autoBattleSettings\'\\)"\\]/);',
+    1,
+)
+assert 'assert.match(finalNavSource,/\\["秘寶"' in v146
+assert 'assert.match(finalNavSource,/\\["元素匣"' in v146
+v146_path.write_text(v146, encoding="utf-8")
