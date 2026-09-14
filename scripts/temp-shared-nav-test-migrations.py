@@ -54,3 +54,13 @@ v146 = v146.replace(
 assert 'assert.match(finalNavSource,/\\["秘寶"' in v146
 assert 'assert.match(finalNavSource,/\\["元素匣"' in v146
 v146_path.write_text(v146, encoding="utf-8")
+
+# V174's old browser snapshot expected the enemy name above the portrait.
+# The approved layout now keeps the full portrait visible and places identity
+# below the monster's own HP/SP bars, matching the player's requested hierarchy.
+v174_browser_path = Path("tests/v174-cardless-battle-browser.test.js")
+v174_browser = v174_browser_path.read_text(encoding="utf-8")
+old_enemy_name_guard = '    assert.ok(data.enemyNameRect.bottom<=data.enemyArtRect.top+1,"monster name must sit above monster artwork");'
+new_enemy_name_guard = '    assert.ok(data.enemySpRect.bottom<=data.enemyNameRect.top+1,"monster name must sit below its own HP/SP bars");'
+assert old_enemy_name_guard in v174_browser, "V174 stale monster-name geometry assertion not found"
+v174_browser_path.write_text(v174_browser.replace(old_enemy_name_guard, new_enemy_name_guard, 1), encoding="utf-8")
