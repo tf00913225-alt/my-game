@@ -21,7 +21,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y imagemagick
       - name: Patch true owners
-        run: python scripts/temp-shared-nav-vfx-battle-layout-repair.py
+        run: |
+          python scripts/temp-shared-nav-vfx-battle-layout-repair.py
+          python scripts/temp-shared-nav-test-migrations.py
       - name: Focused regression tests
         run: |
           node tests/shared-nav-vfx-battle-layout-20260914.test.js
@@ -41,6 +43,7 @@ jobs:
         run: |
           rm -f .github/workflows/temp-shared-nav-vfx-battle-layout.yml
           rm -f scripts/temp-shared-nav-vfx-battle-layout-repair.py
+          rm -f scripts/temp-shared-nav-test-migrations.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
