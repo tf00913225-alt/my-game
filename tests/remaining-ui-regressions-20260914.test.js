@@ -27,7 +27,7 @@ assert.match(vfx,/function applySpriteBox\([\s\S]*SPRITE_SCALE_MULTIPLIER/);
 assert.match(vfx,/naturalWidth[\s\S]*columns[\s\S]*naturalHeight[\s\S]*rows/);
 assert.match(vfx,/node\.style\.visibility="hidden"/);
 assert.match(vfx,/function confirmTargetVisual/);
-assert.match(vfx,/isMiss\?missDelayFor\(targetSide,index\):delayFor\(targetSide,index,true\)/);
+assert.match(vfx,/window\.v143RunAtTargetHit=function\(targetSide,index,callback,allowDefeated\)\{[\s\S]*const wait=delayFor\(targetSide,index,allowDefeated===true\);[\s\S]*setTimer\(callback,wait\)/);
 assert.match(vfx,/popup\.classList\.add\("v152-top-damage"\)/);
 assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(123px,30%,138px\)/);
 assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(117px,29\.25%,132px\)/);
