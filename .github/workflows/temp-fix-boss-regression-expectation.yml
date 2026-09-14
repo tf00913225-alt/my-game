@@ -1,0 +1,56 @@
+name: Temporary refresh boss mechanism regression expectation
+
+on:
+  push:
+    branches:
+      - fix/boss-mechanism-regression-expectation-20260914
+    paths:
+      - .github/workflows/temp-fix-boss-regression-expectation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/boss-mechanism-regression-expectation-20260914
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Update only obsolete mechanism-card expectations
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/boss-mechanism-vfx-card-ui-20260909.test.js')
+          text=p.read_text(encoding='utf-8')
+          replacements={
+              '--gameplay-mechanism-card-width:clamp\\(222px,58%,252px\\);':'--gameplay-mechanism-card-width:clamp\\(123px,30%,138px\\);',
+              '--gameplay-mechanism-card-width:clamp\\(198px,53%,224px\\);':'--gameplay-mechanism-card-width:clamp\\(117px,29\\.25%,132px\\);'
+          }
+          for old,new in replacements.items():
+              count=text.count(old)
+              if count!=1:
+                  raise SystemExit(f'expected exactly one obsolete assertion {old!r}, got {count}')
+              text=text.replace(old,new,1)
+          p.write_text(text,encoding='utf-8')
+          PY
+          git diff --check
+          node tests/boss-mechanism-vfx-card-ui-20260909.test.js
+
+      - name: Commit test-only correction and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/temp-fix-boss-regression-expectation.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/boss-mechanism-vfx-card-ui-20260909.test.js .github/workflows/temp-fix-boss-regression-expectation.yml
+          git diff --cached --check
+          git commit -m "test: align boss mechanism sizing regression with approved UI"
+          git push origin HEAD:fix/boss-mechanism-regression-expectation-20260914
