@@ -1,0 +1,58 @@
+name: Mechanism card VFX repair
+
+on:
+  push:
+    branches:
+      - fix/mechanism-card-vfx-reliability-20260914
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Apply owner repair
+        run: python scripts/repair-mechanism-card-vfx-reliability-20260914.py
+
+      - name: Run focused mechanism and VFX regressions
+        run: |
+          node --check js/39-v143-skill-animation.js
+          node --check js/gameplay-boss-tower-system.js
+          node --check tests/mechanism-card-vfx-reliability-20260914.test.js
+          node tests/mechanism-card-vfx-reliability-20260914.test.js
+          node tests/boss-vfx-reliability-20260914.test.js
+          node tests/boss-mechanism-vfx-card-ui-20260909.test.js
+          node tests/gameplay-boss-tower-system.test.js
+          node tests/v174-raster-only-combat-vfx-owner.test.js
+          node tests/v153-fire-vfx.test.js
+          node tests/v166-water-vfx.test.js
+          node tests/v173.23-wind-vfx.test.js
+          node tests/v173.39-earth-light-vfx.test.js
+
+      - name: Regenerate and verify deterministic production build
+        run: |
+          npm run build
+          npm run build:check
+          git diff --check
+
+      - name: Commit verified repair and remove temporary runner
+        run: |
+          rm .github/workflows/mechanism-card-vfx-repair.yml
+          rm scripts/repair-mechanism-card-vfx-reliability-20260914.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'fix: make function-card skill VFX reliable'
+          git push origin HEAD:fix/mechanism-card-vfx-reliability-20260914
