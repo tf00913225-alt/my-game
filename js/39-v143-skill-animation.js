@@ -17,7 +17,7 @@
     let blockedDirectorOverrides=0;
     let blockedCardEffectOverrides=0;
     const failedAssets=new Set();
-    const SPRITE_SCALE_MULTIPLIER=1.5;
+    const SPRITE_SCALE_MULTIPLIER=1;
     const spriteFrameAspectCache=new Map();
     const spriteFrameAspectLoading=new Set();
 
