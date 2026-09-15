@@ -225,8 +225,9 @@
     overflow:hidden !important;
     padding:15px !important;
     box-sizing:border-box;
-    border:2px solid var(--v141-bronze) !important;
-    background:linear-gradient(165deg,#241b11,#0c0a07 72%) !important;
+    border:1px solid rgba(200,154,72,.72) !important;
+    background:linear-gradient(165deg,rgba(35,26,16,.98),rgba(8,7,5,.99) 72%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.04),0 12px 28px rgba(0,0,0,.48) !important;
 }
 
 .item-modal .item-modal-icon{
