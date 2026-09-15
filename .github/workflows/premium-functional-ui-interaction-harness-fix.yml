@@ -1,4 +1,4 @@
-name: Premium Functional UI Interaction Harness Fix
+name: Premium Functional UI Responsive QA Evidence
 
 on:
   push:
@@ -8,47 +8,30 @@ on:
       - .github/workflows/premium-functional-ui-interaction-harness-fix.yml
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  fix-and-clean:
+  responsive-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           ref: feature/premium-functional-ui
-          fetch-depth: 20
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Scroll controls into their formal scroll owner before hit testing
+      - name: Run formal responsive browser QA
         run: |
           set -euo pipefail
-          python3 <<'PY'
-          from pathlib import Path
-          p=Path('tests/premium-functional-ui-responsive-browser.test.js')
-          t=p.read_text()
-          old='''async function hitClick(client,selector){
-  const hit=await evaluate(client,`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return null;const r=el.getBoundingClientRect();const x=r.left+r.width/2;const y=r.top+r.height/2;const top=document.elementFromPoint(x,y);return {x,y,hit:!!top&&(top===el||el.contains(top)),w:r.width,h:r.height};})()`);'''
-          new='''async function hitClick(client,selector){
-  const scrolled=await evaluate(client,`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return false;el.scrollIntoView({block:"center",inline:"nearest"});return true;})()`);
-  assert.equal(scrolled,true,`missing interactive target ${selector}`);
-  await evaluate(client,"new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
-  const hit=await evaluate(client,`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return null;const r=el.getBoundingClientRect();const x=r.left+r.width/2;const y=r.top+r.height/2;const top=document.elementFromPoint(x,y);return {x,y,hit:!!top&&(top===el||el.contains(top)),w:r.width,h:r.height};})()`);'''
-          if old not in t:
-              raise SystemExit('hitClick anchor missing')
-          p.write_text(t.replace(old,new,1))
-          PY
           git diff --check
           node tests/premium-functional-ui-responsive-browser.test.js
-      - name: Save test fix and remove this temporary workflow
-        run: |
-          set -euo pipefail
-          git rm .github/workflows/premium-functional-ui-interaction-harness-fix.yml
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/premium-functional-ui-responsive-browser.test.js
-          git diff --cached --check
-          git commit -m "test: scroll responsive controls before hit testing"
-          git push origin HEAD:feature/premium-functional-ui
+      - name: Upload responsive browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: premium-functional-ui-responsive-evidence
+          path: artifacts/browser-qa/premium-functional-ui
+          if-no-files-found: warn
+          retention-days: 14
