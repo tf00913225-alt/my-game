@@ -1887,7 +1887,11 @@
     function modalNodes(){ return {modal:document.getElementById("homeFeatureModal"),body:document.getElementById("homeFeatureModalBody"),title:document.getElementById("homeFeatureModalTitle")}; }
     function prepareRelicModal(){
         const nodes=modalNodes(); if(!nodes.modal||!nodes.body){ return null; }
-        if(typeof closeHomeFeature==="function"&&!nodes.modal.classList.contains("team-relic-modal")){ try{closeHomeFeature();}catch(_){ } }
+        /* Opening the relic surface must not close and immediately reopen the shared modal.
+           That hide/show cycle caused visible multi-flash when invoked from Gameplay context navigation. */
+        if(!nodes.modal.classList.contains("team-relic-modal")){
+            nodes.modal.classList.remove("v131-shop-open");
+        }
         nodes.modal.classList.add("show","team-relic-modal");
         const box=nodes.modal.querySelector(".home-feature-modal-box"); if(box){ box.classList.add("wide"); }
         if(nodes.title){ nodes.title.textContent="秘 寶"; }
