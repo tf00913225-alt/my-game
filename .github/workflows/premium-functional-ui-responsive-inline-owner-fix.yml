@@ -1,0 +1,54 @@
+name: Premium Functional UI Responsive Inline Owner Fix
+
+on:
+  push:
+    branches:
+      - feature/premium-functional-ui
+    paths:
+      - .github/workflows/premium-functional-ui-responsive-inline-owner-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/premium-functional-ui
+          fetch-depth: 20
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Align fixture with inline character layout owner
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('tests/premium-functional-ui-responsive-browser.test.js')
+          t=p.read_text()
+          css='#game-stage #homeFeatureModal .home-feature-modal-box.wide{width:calc(100% - 8px)!important;max-width:none!important;height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;min-height:0!important;box-sizing:border-box!important}'
+          if css not in t:
+              raise SystemExit('expected static wide override missing')
+          t=t.replace(css,'',1)
+          old="const box=document.querySelector('.home-feature-modal-box');const br=box.getBoundingClientRect();"
+          new="const box=document.querySelector('.home-feature-modal-box');if(box&&box.classList.contains('wide')){[['display','flex'],['flex-direction','column'],['width','calc(100% - 8px)'],['max-width','none'],['height','calc(100% - 8px)'],['max-height','calc(100% - 8px)'],['min-height','0'],['overflow','hidden']].forEach(([k,v])=>box.style.setProperty(k,v,'important'));}const br=box.getBoundingClientRect();"
+          if old not in t:
+              raise SystemExit('measurement anchor missing')
+          t=t.replace(old,new,1)
+          p.write_text(t)
+          PY
+          git diff --check
+          test "$(git diff --name-only)" = "tests/premium-functional-ui-responsive-browser.test.js"
+          node tests/premium-functional-ui-responsive-browser.test.js
+      - name: Save verified fixture repair
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/premium-functional-ui-responsive-browser.test.js
+          git diff --cached --check
+          git commit -m "test: mirror inline character layout owner in responsive QA"
+          git push origin HEAD:feature/premium-functional-ui
