@@ -125,16 +125,18 @@
     gap:4px;
     margin:7px 0 8px;
     padding:8px 9px;
-    border:1px solid rgba(183,133,55,.72);
-    border-radius:8px;
-    background:linear-gradient(180deg,rgba(43,29,15,.88),rgba(14,10,7,.95));
+    border:0;
+    border-left:2px solid rgba(200,154,72,.72);
+    border-radius:0;
+    background:rgba(18,13,8,.58);
     color:#ead9b4;
     overflow:visible;
+    box-shadow:none;
 }
 #game-stage #homeExpPoolCard .v173-exp-charge-status > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status b{color:#f1c96e;font-size:16px;line-height:21px;}
+#game-stage #homeExpPoolCard .v173-exp-charge-status b{color:#efd18a;font-size:16px;line-height:21px;}
 #game-stage #homeExpPoolCard .v173-exp-charge-status span{color:#d8bd82;font-size:14px;line-height:19px;font-weight:800;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status small{color:#b8a88c;font-size:14px;line-height:1.45;}
+#game-stage #homeExpPoolCard .v173-exp-charge-status small{color:#b7a88f;font-size:14px;line-height:1.45;}
 #game-stage #homeExpPoolCard .v173-exp-charge-floats{position:absolute;right:12px;top:24px;pointer-events:none;overflow:visible;}
 #game-stage #homeExpPoolCard .v173-exp-charge-float{
     position:absolute;right:0;top:0;white-space:nowrap;color:#ffe27e;font-size:14px;font-weight:900;text-shadow:0 1px 3px #000;
@@ -147,17 +149,17 @@
     align-items:center;
     justify-content:space-between;
     gap:6px;
-    color:#ad9d81;
+    color:#b7a88f;
     font-size:14px;
     line-height:1.4;
 }
 #game-stage #expDistributeList .v173-exp-row-meta b{
     margin-left:auto;
-    padding:2px 6px;
-    border:1px solid rgba(200,153,69,.58);
-    border-radius:999px;
-    color:#ffd77d;
-    background:rgba(86,54,18,.42);
+    padding:2px 0;
+    border:0;
+    border-radius:0;
+    color:#efd18a;
+    background:transparent;
     font-size:13px;
     line-height:17px;
     white-space:nowrap;
@@ -198,72 +200,304 @@
     font-size:13px !important;
     line-height:17px !important;
 }
+
+/* Premium Functional UI / Demo Visual Parity — Batch A character shell.
+   This remains presentation-only: the existing characterTabContent remains the
+   sole scroll owner, and all status/EXP event handlers keep their formal owners. */
+#game-stage #homeFeatureModal:has(.home-feature-modal-box.wide){
+    background:
+        linear-gradient(180deg,rgba(4,4,3,.52),rgba(4,4,3,.76)),
+        url("../assets/ui/startup-main-city.d43e67af1c1c.jpg") center/cover no-repeat !important;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide{
+    border:1px solid rgba(200,154,72,.34) !important;
+    border-radius:12px !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.90),rgba(10,8,6,.94)) !important;
+    box-shadow:0 7px 20px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,232,180,.03) !important;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide::before{
+    content:"" !important;
+    position:absolute !important;
+    left:14px !important;
+    right:14px !important;
+    top:0 !important;
+    height:1px !important;
+    background:linear-gradient(90deg,transparent,rgba(238,205,139,.28),transparent) !important;
+    pointer-events:none !important;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide::after{display:none !important;}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .home-feature-modal-title{
+    flex:0 0 auto !important;
+    min-height:50px !important;
+    margin:0 8px 7px !important;
+    padding:6px 58px 7px !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(200,154,72,.16) !important;
+    border-radius:0 !important;
+    color:#f6dfaa !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-weight:900 !important;
+    text-shadow:0 1px 2px #000 !important;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+}
+
+/* The existing three character choices become a scene-backed hero hierarchy.
+   The selected choice is the first visual focus; other slots stay available as
+   compact switch targets below it, so no character-switch runtime is replaced. */
+#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody > div:has(> .character-showcase-choice){
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:6px !important;
+    margin:0 8px 7px !important;
+    padding:8px !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    border-radius:12px !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.80),rgba(10,8,6,.86)) !important;
+    box-shadow:0 6px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,232,180,.025) !important;
+}
+#game-stage #homeFeatureModal .character-showcase-choice{
+    position:relative;
+    width:auto !important;
+    min-width:0 !important;
+    min-height:50px;
+    margin:0 !important;
+    padding:5px 6px !important;
+    border:1px solid rgba(200,154,72,.16) !important;
+    border-radius:8px;
+    background:rgba(13,10,7,.46) !important;
+    box-shadow:none !important;
+    transition:border-color .15s ease,background .15s ease;
+}
+#game-stage #homeFeatureModal .character-showcase-choice.is-current-character{
+    grid-column:1 / -1 !important;
+    display:grid !important;
+    grid-template-columns:38% minmax(0,1fr) !important;
+    grid-template-rows:auto auto minmax(0,1fr) !important;
+    gap:5px 9px !important;
+    min-height:178px !important;
+    padding:10px !important;
+    border:1px solid rgba(200,154,72,.32) !important;
+    border-radius:12px !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.88),rgba(10,8,6,.92)) !important;
+    box-shadow:0 7px 20px rgba(0,0,0,.24),inset 0 0 0 1px rgba(255,232,180,.03) !important;
+    text-align:left !important;
+}
+#game-stage #homeFeatureModal .character-showcase-choice.is-current-character > [id^="characterAvatar"]{
+    grid-column:1 !important;
+    grid-row:1 / 4 !important;
+    width:100% !important;
+    height:158px !important;
+    min-height:158px !important;
+    align-self:stretch !important;
+    border:0 !important;
+    border-radius:10px !important;
+    background-size:cover !important;
+    background-position:center 18% !important;
+    box-shadow:none !important;
+    opacity:1 !important;
+    overflow:hidden !important;
+}
+#game-stage #homeFeatureModal .character-showcase-choice.is-current-character > div[style*="font-size:11px"]{
+    grid-column:2 !important;
+    align-self:end !important;
+    margin:18px 0 0 !important;
+    color:#ffe1a0 !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:20px !important;
+    line-height:1.15 !important;
+    font-weight:900 !important;
+    text-align:left !important;
+}
+#game-stage #homeFeatureModal .character-showcase-choice.is-current-character > div[style*="font-size:10px"],
+#game-stage #homeFeatureModal .character-showcase-choice.is-current-character > [id^="characterAvatarLevel"]{
+    grid-column:2 !important;
+    align-self:start !important;
+    color:#b7a88f !important;
+    font-size:14px !important;
+    line-height:1.35 !important;
+    text-align:left !important;
+}
+#game-stage #homeFeatureModal .character-showcase-avatar.is-current-character{
+    border-color:transparent !important;
+    box-shadow:none !important;
+}
+#game-stage #homeFeatureModal [onclick*="selectCharacterForTabs"]>div[style*="font-size:11px"],
+#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:11px"]{font-size:15px!important;line-height:19px!important;}
+#game-stage #homeFeatureModal [id^="characterAvatarLevel"],
+#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:10px"]{font-size:14px!important;line-height:18px!important;}
+
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-tab{
+    min-height:40px !important;
+    border:1px solid rgba(200,154,72,.20) !important;
+    border-radius:8px !important;
+    color:#ab9b81 !important;
+    background:#120e09 !important;
+    box-shadow:none !important;
+    font-size:14px !important;
+    font-weight:900 !important;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-tab.active{
+    border-color:#c59645 !important;
+    color:#f8dfaa !important;
+    background:linear-gradient(#392815,#1a1109) !important;
+    box-shadow:inset 0 1px 0 rgba(255,239,196,.05) !important;
+}
+
+/* Attribute page: hierarchy is carried by rows, dividers and number weight;
+   the +/- controls remain tools while confirm allocation is the primary action. */
+#game-stage #statusPage #statusPageTitle{
+    margin:2px 0 8px !important;
+    color:#efd69d !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:17px !important;
+    line-height:1.25 !important;
+    font-weight:900 !important;
+}
+#game-stage #statusPage .status-card{
+    padding:9px 10px !important;
+    border:1px solid rgba(200,154,72,.24) !important;
+    border-radius:12px !important;
+    background:linear-gradient(160deg,rgba(28,21,13,.70),rgba(9,8,6,.80)) !important;
+    box-shadow:none !important;
+}
+#game-stage #statusPage .status-preview-bars{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:7px !important;
+    margin:0 0 8px !important;
+}
+#game-stage #statusPage .status-preview-bar{
+    min-width:0 !important;
+    margin:0 !important;
+}
+#game-stage #statusPage .status-row{
+    display:grid !important;
+    grid-template-columns:minmax(82px,1fr) 40px minmax(46px,auto) 40px !important;
+    gap:6px !important;
+    align-items:center !important;
+    min-height:48px !important;
+    margin:0 !important;
+    padding:4px 0 !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(200,154,72,.11) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    font-size:15px !important;
+}
+#game-stage #statusPage .status-row:last-of-type{border-bottom:0 !important;}
+#game-stage #statusPage .status-row button{
+    width:40px !important;
+    min-width:40px !important;
+    height:40px !important;
+    min-height:40px !important;
+    padding:0 !important;
+    border:1px solid rgba(200,154,72,.24) !important;
+    border-radius:8px !important;
+    color:#cdbd9e !important;
+    background:#100d09 !important;
+    box-shadow:none !important;
+    font-size:18px !important;
+    line-height:38px !important;
+}
+#game-stage #statusPage .status-number{
+    color:#f3ead7 !important;
+    font-size:18px !important;
+    font-weight:900 !important;
+    text-align:center !important;
+}
+#game-stage #statusPage .status-points-line{
+    margin:8px 0 7px !important;
+    padding:7px 9px !important;
+    border:0 !important;
+    border-left:2px solid #c89a48 !important;
+    border-radius:0 !important;
+    color:#b7a88f !important;
+    background:rgba(13,10,7,.56) !important;
+    font-size:14px!important;
+    line-height:1.45!important;
+}
+#game-stage #statusPage #attributePoints{color:#efd18a !important;font-size:18px !important;}
+#game-stage #statusPage .status-formula-hint,
+#game-stage #statusPage .status-preview-bar-label{color:#b7a88f!important;font-size:14px!important;line-height:1.4!important;}
+#game-stage #statusPage #confirmStatusButton{
+    width:100% !important;
+    min-height:44px !important;
+    margin-top:7px !important;
+    border:1px solid #c99c4b !important;
+    border-radius:9px !important;
+    color:#fff0c2 !important;
+    background:linear-gradient(#5a401f,#28180c) !important;
+    box-shadow:inset 0 0 12px rgba(224,183,90,.10) !important;
+    font-weight:900 !important;
+}
+#game-stage #statusPage #confirmStatusButton:disabled{
+    opacity:.42 !important;
+    border-color:rgba(200,154,72,.18) !important;
+    color:#8f8370 !important;
+    background:#100d09 !important;
+    box-shadow:none !important;
+}
+
+/* EXP page uses the same scene-backed panel language as Character instead of
+   a stack of equal-weight cards. Shared pool is the first numeric focus. */
+#game-stage #homeExpPoolCard{
+    padding:10px !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    border-radius:12px !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.78),rgba(10,8,6,.88)) !important;
+    box-shadow:0 6px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,232,180,.025) !important;
+}
+#game-stage #homeExpPoolCard .exp-pool-hero{
+    padding:2px 2px 9px !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(200,154,72,.16) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+}
 #game-stage #homeExpPoolCard .exp-pool-kicker{
+    color:#9e8963 !important;
     font-size:13px !important;
     line-height:17px !important;
+    letter-spacing:.12em !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-unit{
-    font-size:14px !important;
-    line-height:18px !important;
+#game-stage #homeExpPoolCard .exp-pool-title{
+    color:#f6dfaa !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:17px !important;
+    line-height:1.2 !important;
+    font-weight:900 !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-section-head small{
-    font-size:14px !important;
-    line-height:18px !important;
-}
-#game-stage #homeExpPoolCard .exp-character-copy strong{
-    font-size:15px !important;
-    line-height:19px !important;
-}
-#game-stage #homeExpPoolCard .exp-character-copy small{
-    font-size:14px !important;
-    line-height:18px !important;
-}
-#game-stage #homeExpPoolCard .exp-character-cost b{
-    font-size:15px !important;
-    line-height:19px !important;
-}
-#game-stage #homeExpPoolCard .exp-character-cost small{
-    font-size:13px !important;
-    line-height:17px !important;
-}
-#game-stage .v141-dungeon-cover-art small{
-    font-size:13px;
-    line-height:17px;
-}
-#game-stage .v141-dungeon-cover-info b{
-    font-size:16px;
-    line-height:20px;
-}
-#game-stage .v141-dungeon-cover-info span{
-    font-size:14px;
-    line-height:18px;
-}
-#game-stage #dungeonPage .v141-dungeon-cover-actions button{
-    min-height:38px;
-    font-size:15px;
-    line-height:1.2;
-}
-#game-stage .v141-dungeon-remaining{
-    padding-top:3px;
-    font-size:14px;
-    line-height:18px;
+#game-stage #homeExpPoolCard .exp-pool-total{justify-content:flex-start !important;gap:5px !important;margin-top:2px !important;}
+#game-stage #homeExpPoolCard .exp-pool-value{color:#efd18a !important;font-size:28px !important;line-height:1 !important;font-weight:900 !important;}
+#game-stage #homeExpPoolCard .exp-pool-unit{color:#b7a88f !important;font-size:14px !important;line-height:18px !important;}
+#game-stage #homeExpPoolCard .exp-pool-section-head small{color:#9e8e75 !important;font-size:14px !important;line-height:18px !important;}
+#game-stage #homeExpPoolCard .exp-character-copy strong{color:#f3ead7 !important;font-size:15px !important;line-height:19px !important;}
+#game-stage #homeExpPoolCard .exp-character-copy small{color:#b7a88f !important;font-size:14px !important;line-height:18px !important;}
+#game-stage #homeExpPoolCard .exp-character-cost b{color:#efd18a !important;font-size:15px !important;line-height:19px !important;}
+#game-stage #homeExpPoolCard .exp-character-cost small{color:#9f9179 !important;font-size:13px !important;line-height:17px !important;}
+#game-stage #homeExpPoolCard .v131-exp-preview-btn{
+    border-color:rgba(200,154,72,.34) !important;
+    color:#dfcfad !important;
+    background:linear-gradient(#282117,#12100b) !important;
+    box-shadow:none !important;
 }
 
 /* Other formal non-battle mobile owners discovered by the full typography scan. */
 #game-stage #skillPage .skill-loadout-slot{min-height:60px!important;font-size:15px!important;line-height:1.25!important;}
 #game-stage #skillPage .skill-loadout-slot-name{font-size:15px!important;line-height:18px!important;}
-#game-stage #statusPage .status-points-line{font-size:14px!important;line-height:1.45!important;}
-#game-stage #statusPage .status-formula-hint,#game-stage #statusPage .status-preview-bar-label{font-size:14px!important;line-height:1.4!important;}
 #game-stage #mapPage .map-player-name{max-width:62px!important;font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-player-level{font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-follower{width:64px!important;padding:3px!important;}
 #game-stage #mapPage .map-follower-id{max-width:60px!important;font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-follower-level{font-size:13px!important;line-height:17px!important;}
-#game-stage #homeFeatureModal [onclick*="selectCharacterForTabs"]>div[style*="font-size:11px"],#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:11px"]{font-size:15px!important;line-height:19px!important;}
-#game-stage #homeFeatureModal [id^="characterAvatarLevel"],#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:10px"]{font-size:14px!important;line-height:18px!important;}
-#game-stage #homeFeatureModal .character-showcase-choice{position:relative;padding:5px 3px 4px;border:2px solid transparent;border-radius:12px;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
-#game-stage #homeFeatureModal .character-showcase-choice.is-current-character{border-color:#ffe08a;background:linear-gradient(180deg,rgba(158,104,24,.35),rgba(18,12,7,.16));box-shadow:0 0 0 2px rgba(255,186,58,.22),0 0 15px rgba(255,166,32,.48);}
-#game-stage #homeFeatureModal .character-showcase-avatar.is-current-character{border-color:#fff0ab!important;box-shadow:0 0 0 3px rgba(255,176,42,.55),0 0 16px rgba(255,130,28,.9)!important;}
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody>div:first-child{font-size:15px!important;line-height:1.7!important;}
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody div[style*="font-size:11px"]{font-size:14px!important;line-height:1.55!important;}
 #game-stage .v132-dungeon-list>div[style*="font-size:11px"]{font-size:14px!important;line-height:1.5!important;}
@@ -289,10 +523,14 @@
     #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
     #game-stage #v141DungeonNav{height:78px !important;}
     #game-stage #v141DungeonNav .nav-art-button{height:58px !important;}
+    #game-stage #homeFeatureModal .character-showcase-choice.is-current-character{min-height:158px !important;}
+    #game-stage #homeFeatureModal .character-showcase-choice.is-current-character > [id^="characterAvatar"]{height:138px !important;min-height:138px !important;}
 }
 @media (max-width:380px){
     #game-stage .shop-potion-purchase-row{grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;gap:3px !important;}
     #game-stage .v146-shop-total{font-size:13px;}
+    #game-stage #statusPage .status-row{grid-template-columns:minmax(74px,1fr) 38px minmax(42px,auto) 38px !important;gap:4px !important;}
+    #game-stage #statusPage .status-row button{width:38px !important;min-width:38px !important;height:38px !important;min-height:38px !important;}
 }
 @media (prefers-reduced-motion:reduce){
     .v146-area-impact,.v146-status-popup,#game-stage .v141-abyss-map.v146-too-far,.v173-exp-charge-float{animation-duration:.01ms !important;animation-iteration-count:1 !important;}
