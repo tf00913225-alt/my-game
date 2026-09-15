@@ -1314,8 +1314,8 @@
     /* ----- Shared Gameplay / Dungeon navigation and movement. ----- */
     const CONTEXT_NAV_ITEMS=Object.freeze([
         Object.freeze(["角色","assets/ui/nav-character.png","openHomeFeature('character')"]),
-        Object.freeze(["背包","assets/ui/nav-backpack.png","openMapInventoryOverlay()"]),
-        Object.freeze(["秘寶","assets/ui/nav-relic-v175.webp","openHomeFeature('relic')"]),
+        Object.freeze(["背包","assets/ui/nav-backpack.png","v148OpenContextInventory()"]),
+        Object.freeze(["秘寶","assets/ui/nav-relic-v175.webp","v148OpenContextRelic()"]),
         Object.freeze(["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"])
     ]);
 
@@ -1367,6 +1367,30 @@
         }else if(typeof showPage==="function"){
   showPage(activeId&&activeId!=="gameplayPage"?"gameplay":"home");
         }
+    };
+
+    window.v148OpenContextInventory=function(){
+        if(typeof document==="undefined"||typeof openMapInventoryOverlay!=="function"){ return false; }
+        const dungeonPage=document.getElementById("dungeonPage");
+        const dungeonActive=!!(dungeonPage&&dungeonPage.classList&&dungeonPage.classList.contains("active"));
+        const gameplayPageId=activeGameplayPageId();
+        if(dungeonActive||!gameplayPageId){ return openMapInventoryOverlay(); }
+        if(typeof battleActive!=="undefined"&&battleActive){ return false; }
+
+        const mapPage=document.getElementById("mapPage");
+        const mapWasActive=!!(mapPage&&mapPage.classList&&mapPage.classList.contains("active"));
+        if(mapPage&&!mapWasActive){ mapPage.classList.add("active"); }
+        try{
+            return openMapInventoryOverlay();
+        }finally{
+            if(mapPage&&!mapWasActive){ mapPage.classList.remove("active"); }
+        }
+    };
+
+    window.v148OpenContextRelic=function(){
+        if(typeof window.v174OpenRelicPage==="function"){ return window.v174OpenRelicPage(); }
+        if(typeof openHomeFeature==="function"){ return openHomeFeature("relic"); }
+        return false;
     };
 
     function syncContextNavigation(){
