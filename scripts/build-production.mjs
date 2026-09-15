@@ -204,9 +204,11 @@ const scriptOutputs={
     skill:target("feature-skill","js",combineScripts(skillScripts)),
     bossRelic:target("feature-boss-relic","js",combineScripts(bossRelicScripts)),
     relicProgression:target("feature-relic-progression","js",read(relicProgressionScripts[0])),
-    adventureEntry:target("feature-adventure-entry","js",combineScripts(adventureEntryScripts)),
-    adventureItems:target("feature-adventure-items","js",combineScripts(adventureItemsScripts)),
-    adventure:target("feature-adventure","js",combineScripts(adventureScripts))
+    adventureEntry:target("feature-adventure-entry","js",read(adventureEntryScripts[0])),
+    adventureItems:target("feature-adventure-items","js",read(adventureItemsScripts[0])),
+    adventureContent:target("feature-adventure-content","js",read(adventureScripts[0])),
+    adventureRuntime:target("feature-adventure-runtime","js",read(adventureScripts[1])),
+    adventureUi:target("feature-adventure-ui","js",read(adventureScripts[2]))
 };
 const styleOutputs={
     critical:target("boot-core","css",combineStyles(criticalStyles)),
@@ -216,8 +218,8 @@ const styleOutputs={
     abyss:target("feature-abyss","css",combineStyles(abyssStyles)),
     bossRelic:target("feature-boss-relic","css",combineStyles(bossRelicStyles)),
     relicProgression:target("feature-relic-progression","css",read(relicProgressionStyles[0])),
-    adventureEntry:target("feature-adventure-entry","css",combineStyles(adventureEntryStyles)),
-    adventure:target("feature-adventure","css",combineStyles(adventureStyles))
+    adventureEntry:target("feature-adventure-entry","css",read(adventureEntryStyles[0])),
+    adventure:target("feature-adventure","css",read(adventureStyles[0]))
 };
 Object.values(scriptOutputs).forEach(writeTarget); Object.values(styleOutputs).forEach(writeTarget);
 
@@ -233,7 +235,10 @@ const replacements={
     __BUILD_RELIC_PROGRESSION__:scriptOutputs.relicProgression.path,__BUILD_RELIC_PROGRESSION_STYLE__:styleOutputs.relicProgression.path,
     __BUILD_ADVENTURE_ENTRY__:scriptOutputs.adventureEntry.path,__BUILD_ADVENTURE_ENTRY_STYLE__:styleOutputs.adventureEntry.path,
     __BUILD_ADVENTURE_ITEMS__:scriptOutputs.adventureItems.path,
-    __BUILD_ADVENTURE__:scriptOutputs.adventure.path,__BUILD_ADVENTURE_STYLE__:styleOutputs.adventure.path
+    __BUILD_ADVENTURE_CONTENT__:scriptOutputs.adventureContent.path,
+    __BUILD_ADVENTURE_RUNTIME__:scriptOutputs.adventureRuntime.path,
+    __BUILD_ADVENTURE_UI__:scriptOutputs.adventureUi.path,
+    __BUILD_ADVENTURE_STYLE__:styleOutputs.adventure.path
 };
 const featureManifest=JSON.parse(JSON.stringify(featureTemplate).replace(/__PATROL_ASSETS__/g,patrolAssets.join('\",\"')).replace(/__[A-Z0-9_]+__/g,key=>{
     if(!replacements[key]){ throw new Error(`Unresolved feature manifest token ${key}`); }
