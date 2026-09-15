@@ -57,7 +57,7 @@
         const labels={
             locked:"未解鎖",available:"可探索",current:"目前節點",completed:"已完成",
             "branch-selected":"路線已完成","objective-active":"委託進行中","objective-ready":"委託完成",
-            boss:"Boss",hidden:"？","hidden-available":"？",merchant:"神秘商人","reward-unclaimed":"獎勵待領"
+            boss:"Boss","hidden-available":"？",merchant:"神秘商人","reward-unclaimed":"獎勵待領"
         };
         return labels[status]||status;
     }
