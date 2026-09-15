@@ -62,7 +62,7 @@ body.quest-scroll-active,
 
 #game-stage #homeFeatureModal.quest-mode .quest-tab{
     position:relative !important;
-    min-height:37px !important;
+    min-height:44px !important;
     padding:7px 4px 9px !important;
     border:0 !important;
     border-radius:0 !important;
@@ -113,11 +113,11 @@ body.quest-scroll-active,
 }
 
 #game-stage #homeFeatureModal.quest-mode .quest-card{
-    padding:9px 10px !important;
-    border:1px solid rgba(138,106,58,.78) !important;
-    border-radius:10px !important;
-    background:linear-gradient(160deg,rgba(36,28,18,.96),rgba(15,11,7,.98)) !important;
-    box-shadow:inset 0 0 0 1px rgba(255,226,122,.035) !important;
+    padding:10px 10px !important;
+    border:1px solid rgba(200,154,72,.20) !important;
+    border-radius:9px !important;
+    background:linear-gradient(155deg,rgba(29,22,14,.66),rgba(9,7,5,.80)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.02) !important;
 }
 
 #game-stage #homeFeatureModal.quest-mode .quest-card-head,
@@ -213,11 +213,11 @@ body.quest-scroll-active,
 #game-stage #homeFeatureModal.quest-mode .quest-claim-btn{
     flex:0 0 auto !important;
     min-width:68px !important;
-    min-height:31px !important;
+    min-height:44px !important;
     padding:5px 9px !important;
-    border:1px solid #8a6a3a !important;
+    border:1px solid #a67836 !important;
     border-radius:6px !important;
-    background:linear-gradient(180deg,#5a1a12,#2e0d09) !important;
+    background:linear-gradient(180deg,#5d2417,#2c100a) !important;
     color:#ffe27a !important;
     font-size:11px !important;
     font-weight:800 !important;
@@ -232,9 +232,10 @@ body.quest-scroll-active,
     flex:0 0 auto !important;
     margin-top:7px !important;
     padding:8px 9px 9px !important;
-    border:1px solid rgba(138,106,58,.78) !important;
+    border:1px solid rgba(200,154,72,.22) !important;
     border-radius:10px !important;
-    background:linear-gradient(180deg,rgba(28,20,12,.98),rgba(12,9,6,.98)) !important;
+    background:linear-gradient(180deg,rgba(26,19,12,.82),rgba(10,8,6,.88)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.02) !important;
 }
 
 #game-stage #homeFeatureModal.quest-mode .quest-completion-head{
