@@ -51,6 +51,16 @@ jobs:
           if old_runtime not in t:
               raise SystemExit('runtime owner anchor missing')
           t=t.replace(old_runtime,new_runtime,1)
+          old_loop='for(let i=0;i<100&&!target;i++){'
+          if old_loop not in t:
+              raise SystemExit('Chrome target loop anchor missing')
+          t=t.replace(old_loop,'for(let i=0;i<300&&!target;i++){',1)
+          t=t.replace('if(!target) await sleep(80);','if(child.exitCode!==null) break; if(!target) await sleep(100);',1)
+          t=t.replace(
+              'if(!target){ child.kill("SIGKILL"); throw new Error(`Chrome DevTools target unavailable: ${stderr}`); }',
+              'if(!target){ if(child.exitCode===null) child.kill("SIGKILL"); throw new Error(`Chrome DevTools page target unavailable (exit=${child.exitCode}): ${stderr}`); }',
+              1
+          )
           p.write_text(t)
           PY
           git diff --check
