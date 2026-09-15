@@ -11,9 +11,9 @@ def set_props(path, selector, props):
         raise SystemExit(f'missing rule {selector} in {path}')
     body=match.group(2)
     for name,value in props.items():
-        prop=re.compile(r'(?m)^(\s*)'+re.escape(name)+r'\s*:\s*[^;]+;')
+        prop=re.compile(r'(^|[;\n])(\s*)'+re.escape(name)+r'\s*:\s*[^;]+;',re.M)
         if prop.search(body):
-            body=prop.sub(lambda m: m.group(1)+name+':'+value+';',body,count=1)
+            body=prop.sub(lambda m: m.group(1)+m.group(2)+name+':'+value+';',body,count=1)
         else:
             body=body.rstrip()+'\n    '+name+':'+value+';\n'
     new=text[:match.start()]+match.group(1)+body+match.group(3)+text[match.end():]
@@ -103,11 +103,13 @@ const shopRuntime=read("js/40-v144-rules-and-abyss.js");
 const synthesis=read("js/36-v141-content-systems.js");
 const fixes=read("js/58-v173.63-functional-fixes.js");
 const ui=read("js/51-v169-rpg-ui.js");
+const materialRule=(synth.match(/#game-stage \.v141-material-lines span\{[\s\S]*?\}/)||[""])[0];
 assert.match(shop,/#homeFeatureModal\.v131-shop-open \.v17345-shop-tabs button\{[\s\S]*?min-height:44px !important;[\s\S]*?height:44px !important/);
 assert.match(shop,/\.shop-potion-purchase-row \.shop-potion-buy\{[\s\S]*?min-height:42px !important;[\s\S]*?#f1ce7a/);
 assert.match(shop,/\.v17346-shop-card \.v17346-shop-buy\{[\s\S]*?min-height:42px !important;[\s\S]*?#f1ce7a/);
 assert.match(shop,/v141-synthesis-modal \.v141-synthesis-tabs button\{[\s\S]*?min-height:44px !important/);
-assert.match(synth,/\.v141-material-lines span\{[\s\S]*?border-bottom:1px solid rgba\(200,154,72,.14\)[\s\S]*?background:transparent/);
+assert.match(materialRule,/border-bottom:1px solid rgba\(200,154,72,.14\)/);
+assert.match(materialRule,/background:transparent/);
 assert.match(synth,/\.v141-material-lines \.lack\{color:#ee8e79;/);
 assert.match(synth,/\.v141-synthesis-primary\{[\s\S]*?min-height:44px !important/);
 assert.match(synth,/\.v141-reforge-compare button\{[\s\S]*?min-height:44px/);
