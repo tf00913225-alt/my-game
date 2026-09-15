@@ -36,8 +36,9 @@ jobs:
           printf '%s\n' "$changed"
           test "$changed" = "css/00-main.css
           css/31-v131-fix-batch.css
-          css/38-v141-system-expansion.css
-          tests/premium-functional-ui-batch2.test.js"
+          css/38-v141-system-expansion.css"
+          test -f tests/premium-functional-ui-batch2.test.js
+          test "$(git status --porcelain tests/premium-functional-ui-batch2.test.js | cut -c1-2)" = "??"
 
       - name: Run Batch 2 targeted regression
         run: |
