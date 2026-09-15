@@ -3212,6 +3212,10 @@
         return monster;
     }
     window.v132BuildDungeonMonster=buildDungeonMonster;
+    window.v132DungeonRankMultipliers=Object.freeze({
+        elite:Object.freeze(Object.assign({},DUNGEON_ELITE_MULTIPLIERS)),
+        boss:Object.freeze(Object.assign({},DUNGEON_BOSS_MULTIPLIERS))
+    });
 
     function applyEquipmentDungeonRankStrength(monster){
         if(!monster){ return monster; }
