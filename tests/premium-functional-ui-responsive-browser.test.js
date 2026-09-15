@@ -155,6 +155,9 @@ async function capture(client,file){
   fs.writeFileSync(file,Buffer.from(result.data,"base64"));
 }
 async function hitClick(client,selector){
+  const scrolled=await evaluate(client,`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return false;el.scrollIntoView({block:"center",inline:"nearest"});return true;})()`);
+  assert.equal(scrolled,true,`missing interactive target ${selector}`);
+  await evaluate(client,"new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
   const hit=await evaluate(client,`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return null;const r=el.getBoundingClientRect();const x=r.left+r.width/2;const y=r.top+r.height/2;const top=document.elementFromPoint(x,y);return {x,y,hit:!!top&&(top===el||el.contains(top)),w:r.width,h:r.height};})()`);
   assert.ok(hit,`missing interactive target ${selector}`);
   assert.equal(hit.hit,true,`${selector} is covered at its hit point`);
