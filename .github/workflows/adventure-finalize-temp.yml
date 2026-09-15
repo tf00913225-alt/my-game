@@ -1,0 +1,63 @@
+name: Adventure finalize temporary
+on:
+  push:
+    branches: [feature/adventure-node-system-v1-20260915]
+permissions:
+  contents: write
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/adventure-node-system-v1-20260915
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply final owner and whitespace fixes
+        shell: python
+        run: |
+          from pathlib import Path
+          def one(path,old,new,label):
+              p=Path(path); text=p.read_text(encoding='utf-8')
+              if old in text:
+                  p.write_text(text.replace(old,new,1),encoding='utf-8'); return
+              if new in text: return
+              raise SystemExit('missing patch anchor: '+label)
+          for path in ['js/adventure/adventure-items-v1-20260915.js','js/adventure/adventure-ui-v1-20260915.js']:
+              p=Path(path); p.write_text('\n'.join(x.rstrip() for x in p.read_text(encoding='utf-8').splitlines())+'\n',encoding='utf-8')
+          one('js/27-v132-content-expansion.js','    function launchDungeonBattle(monsterList,onComplete){\n','    function launchDungeonBattle(monsterList,onComplete,options){\n        const opts=options&&typeof options==="object"?options:{};\n','launcher options')
+          one('js/27-v132-content-expansion.js','            onComplete:onComplete,\n            startedAt:Date.now()\n','            onComplete:onComplete,\n            normalizeFailureResources:opts.normalizeFailureResources!==false,\n            startedAt:Date.now()\n','policy state')
+          one('js/27-v132-content-expansion.js','            window.v132ActiveDungeonRun=null;\n\n            getExistingPartyIndexes().forEach(characterIndex=>{\n                const character=getPartyCharacterByIndex(characterIndex);\n                const stats=getPartyBattleStats(characterIndex);\n                if(!character || !stats){ return; }\n                character.hp=stats.maxHP;\n                character.sp=stats.maxSP;\n            });\n            updateUI();\n','            window.v132ActiveDungeonRun=null;\n\n            if(run.normalizeFailureResources!==false){\n                getExistingPartyIndexes().forEach(characterIndex=>{\n                    const character=getPartyCharacterByIndex(characterIndex);\n                    const stats=getPartyBattleStats(characterIndex);\n                    if(!character || !stats){ return; }\n                    character.hp=stats.maxHP;\n                    character.sp=stats.maxSP;\n                });\n            }\n            updateUI();\n','conditional normalization')
+          one('js/adventure/adventure-runtime-v1-20260915.js','            render();\n        });\n        if(!started){\n','            render();\n        },{normalizeFailureResources:false});\n        if(!started){\n','Adventure opt-out')
+          p=Path('tests/adventure-node-system-v1.test.js'); text=p.read_text(encoding='utf-8')
+          anchor='    assert.match(runtime,/v132LaunchDungeonBattle/);\n'
+          add='    assert.match(runtime,/normalizeFailureResources:false/,"Adventure must explicitly opt out of V132 failure refill");\n    const dungeonOwner=read("js/27-v132-content-expansion.js");\n    assert.match(dungeonOwner,/function launchDungeonBattle\\(monsterList,onComplete,options\\)/);\n    assert.match(dungeonOwner,/normalizeFailureResources:opts\\.normalizeFailureResources!==false/);\n    assert.match(dungeonOwner,/if\\(run\\.normalizeFailureResources!==false\\)/);\n'
+          if add not in text:
+              if anchor not in text: raise SystemExit('missing test anchor')
+              p.write_text(text.replace(anchor,anchor+add,1),encoding='utf-8')
+      - name: Rebuild and verify
+        run: |
+          node scripts/build-production.mjs
+          python - <<'PY'
+          from pathlib import Path
+          manifest=Path('asset-manifest.json').read_text(encoding='utf-8')
+          for path in Path('build').glob('feature-adventure*'):
+              if path.as_posix() not in manifest: path.unlink()
+          PY
+          node --check js/27-v132-content-expansion.js
+          node tests/adventure-node-system-v1.test.js
+          npm run build:check
+          git diff --check
+      - name: Commit and push final state
+        run: |
+          rm -f .github/workflows/adventure-finalize-temp.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: finalize Adventure battle owner and build artifacts"
+          git push origin HEAD:feature/adventure-node-system-v1-20260915
