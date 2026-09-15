@@ -1297,6 +1297,10 @@
         0 0 0 1px rgba(198,154,69,.22);
 }
 
+#game-stage .home-feature-modal-box .home-feature-close-btn{
+    min-height:38px;
+}
+
 #game-stage .home-feature-modal-box .home-feature-close-btn,
 #game-stage .item-modal-box .close-item-button,
 #game-stage .creation-skill-detail-box .creation-skill-detail-close,

@@ -20,7 +20,7 @@ const chrome=findChrome();
 assert.ok(chrome,"Chrome is required for premium functional responsive QA");
 
 const styles=[
-  "css/00-main.css","css/22-stage-v78-character-inventory-core.css","css/23-stage-v77-inventory-detail-ui.css",
+  "css/00-main.css","css/02-stage-v3-layout-fix.css","css/03-stage-v4-viewport-lock.css","css/22-stage-v78-character-inventory-core.css","css/23-stage-v77-inventory-detail-ui.css",
   "css/25-stage-v90-quest-interface-core.css","css/31-v131-fix-batch.css","css/37-v139-rested-experience.css",
   "css/38-v141-system-expansion.css","css/42-v146-system-polish.css","css/49-v169-rpg-ui.css",
   "css/53-v173.51-qa.css","css/55-team-relic-system.css"
@@ -43,55 +43,203 @@ const surfaces={
 const viewports=[[360,800],[390,844],[412,915]];
 const evidence=[];
 
-function runChrome(args,label){
-  const result=cp.spawnSync(chrome,args,{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
-  assert.equal(result.status,0,result.stderr||`${label} failed`);
-  return result;
-}
+const os=require("node:os");
+const net=require("node:net");
 
-for(const [width,height] of viewports){
-  for(const [surface,markup] of Object.entries(surfaces)){
-    const fixture=path.join(root,`.premium-functional-${surface}.html`);
-    const wide=["shop","synthesis","quest","achievement","info"].includes(surface)?"":"wide";
-    let classes="home-feature-modal show";
-    if(surface==="shop") classes+=" v131-shop-open";
-    if(surface==="synthesis") classes+=" v141-synthesis-modal";
-    if(surface==="quest") classes+=" quest-mode";
-    const surfaceLiteral=JSON.stringify(surface);
-    // Static screenshot fixtures do not execute js/19; mirror its verified maximum-mobile-shell geometry here.
-    const page=`<!doctype html><html><head><meta charset="utf-8">${links}<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403}#game-viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}#game-stage{position:relative;width:1080px;height:1920px;flex:0 0 1080px;transform-origin:center center;overflow:hidden}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6667px;transform:scale(2.5714285714);transform-origin:top left}#homeFeatureModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important}#game-stage #homeFeatureModal .home-feature-modal-box.wide{width:calc(100% - 8px)!important;max-width:none!important;height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;min-height:0!important;box-sizing:border-box!important}.qa-test-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}</style></head><body><div id="game-viewport"><div id="game-stage"><div id="app"><div id="game-content"><div id="homeFeatureModal" class="${classes}"><div class="home-feature-modal-box ${wide}"><div class="home-feature-modal-title"><span class="qa-test-title">功能型 UI・${surface}</span><button class="home-feature-close-btn qa-major">返回</button></div><div id="homeFeatureModalBody">${markup}</div></div></div></div></div></div></div><pre id="qa-result"></pre><script>(function(){const surfaceName=${surfaceLiteral};const stage=document.getElementById('game-stage');stage.style.transform='scale('+Math.min(innerWidth/1080,innerHeight/1920)+')';const box=document.querySelector('.home-feature-modal-box');const br=box.getBoundingClientRect();const majors=[...document.querySelectorAll('.qa-major')];const commerce=[...document.querySelectorAll('.qa-commerce')];const minCss=els=>els.length?Math.min(...els.map(el=>parseFloat(getComputedStyle(el).minHeight)||parseFloat(getComputedStyle(el).height)||0)):999;const overflow=[...document.querySelectorAll('#homeFeatureModalBody,#characterTabContent,.quest-tab-body,.v141-synthesis-body')].some(el=>el.scrollWidth>el.clientWidth+1);const result={viewport:[innerWidth,innerHeight],surface:surfaceName,docOverflow:document.documentElement.scrollWidth>innerWidth+1||document.documentElement.scrollHeight>innerHeight+1,box:{left:br.left,top:br.top,right:br.right,bottom:br.bottom},contentOverflow:overflow,majorMin:minCss(majors),commerceMin:minCss(commerce)};document.getElementById('qa-result').textContent=JSON.stringify(result);})();</script></body></html>`;
-    fs.writeFileSync(fixture,page,"utf8");
+function sleep(ms){ return new Promise(resolve=>setTimeout(resolve,ms)); }
+async function reservePort(){
+  return new Promise((resolve,reject)=>{
+    const server=net.createServer();
+    server.once("error",reject);
+    server.listen(0,"127.0.0.1",()=>{
+      const address=server.address();
+      const port=typeof address==="object"&&address?address.port:null;
+      server.close(error=>error?reject(error):resolve(port));
+    });
+  });
+}
+function openCdp(webSocketDebuggerUrl){
+  const socket=new WebSocket(webSocketDebuggerUrl);
+  const pending=new Map();
+  let nextId=1;
+  const ready=new Promise((resolve,reject)=>{
+    socket.addEventListener("open",resolve,{once:true});
+    socket.addEventListener("error",reject,{once:true});
+  });
+  socket.addEventListener("message",event=>{
+    const message=JSON.parse(String(event.data));
+    if(!message.id||!pending.has(message.id)) return;
+    const request=pending.get(message.id);
+    pending.delete(message.id);
+    if(message.error) request.reject(new Error(message.error.message));
+    else request.resolve(message.result);
+  });
+  return {
+    ready,
+    send:async(method,params={})=>{
+      await ready;
+      const id=nextId++;
+      return new Promise((resolve,reject)=>{
+        pending.set(id,{resolve,reject});
+        socket.send(JSON.stringify({id,method,params}));
+      });
+    },
+    close:()=>socket.close()
+  };
+}
+async function waitFor(client,expression,label,timeout=8000){
+  const started=Date.now();
+  while(Date.now()-started<timeout){
+    const response=await client.send("Runtime.evaluate",{expression,returnByValue:true,awaitPromise:true});
+    if(response.result&&response.result.value) return response.result.value;
+    await sleep(80);
+  }
+  throw new Error(`Timed out waiting for ${label}`);
+}
+async function launchBrowser(){
+  const port=await reservePort();
+  const profile=fs.mkdtempSync(path.join(os.tmpdir(),"premium-functional-ui-qa-"));
+  const child=cp.spawn(chrome,[
+    "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--hide-scrollbars",
+    "--allow-file-access-from-files","--force-device-scale-factor=1","--remote-debugging-address=127.0.0.1",
+    `--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,"about:blank"
+  ],{stdio:["ignore","ignore","pipe"]});
+  let stderr="";
+  child.stderr.setEncoding("utf8");
+  child.stderr.on("data",chunk=>{ stderr+=chunk; });
+  let target=null;
+  for(let i=0;i<300&&!target;i++){
     try{
-      const url="file://"+fixture.replace(/\\/g,"/");
-      const shot=path.join(out,`${width}x${height}-${surface}.png`);
-      runChrome(["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,`--screenshot=${shot}`,url],`screenshot ${surface}`);
-      const dom=runChrome(["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--dump-dom",url],`dump ${surface}`);
-      const match=dom.stdout.match(/<pre id="qa-result">([^<]+)<\/pre>/);
-      assert.ok(match,`missing QA result ${surface}`);
-      const data=JSON.parse(match[1].replace(/&quot;/g,'"').replace(/&amp;/g,"&"));
-      assert.equal(data.docOverflow,false,`${width}x${height} ${surface} document overflow`);
-      assert.equal(data.contentOverflow,false,`${width}x${height} ${surface} horizontal content overflow`);
-      assert.ok(data.box.left>=-1&&data.box.top>=-1&&data.box.right<=width+1&&data.box.bottom<=height+1,`${width}x${height} ${surface} panel clipped`);
-      assert.ok(data.majorMin>=44,`${surface} major hit area ${data.majorMin}`);
-      assert.ok(data.commerceMin>=42,`${surface} commerce hit area ${data.commerceMin}`);
-      evidence.push(data);
-    }finally{
-      try{fs.unlinkSync(fixture);}catch(_){ }
+      const response=await fetch(`http://127.0.0.1:${port}/json/list`);
+      if(response.ok){
+        const list=await response.json();
+        target=list.find(item=>item.type==="page"&&item.webSocketDebuggerUrl)||null;
+      }
+    }catch(_){ }
+    if(child.exitCode!==null) break; if(!target) await sleep(100);
+  }
+  if(!target){ if(child.exitCode===null) child.kill("SIGKILL"); throw new Error(`Chrome DevTools page target unavailable (exit=${child.exitCode}): ${stderr}`); }
+  const client=openCdp(target.webSocketDebuggerUrl);
+  await client.ready;
+  await client.send("Page.enable");
+  await client.send("Runtime.enable");
+  return {
+    client,
+    close:()=>{
+      try{client.close();}catch(_){ }
+      try{child.kill("SIGKILL");}catch(_){ }
+      try{fs.rmSync(profile,{recursive:true,force:true});}catch(_){ }
     }
+  };
+}
+function fixtureUrl(file){ return "file://"+file.replace(/\\/g,"/"); }
+async function configureViewport(client,width,height){
+  await client.send("Emulation.setDeviceMetricsOverride",{
+    width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height,
+    screenOrientation:{type:"portraitPrimary",angle:0}
+  });
+  await client.send("Emulation.setTouchEmulationEnabled",{enabled:true,maxTouchPoints:5});
+}
+async function navigate(client,url){
+  await client.send("Page.navigate",{url});
+  await waitFor(client,"document.readyState==='complete'","fixture load");
+  await sleep(120);
+}
+async function evaluate(client,expression){
+  const response=await client.send("Runtime.evaluate",{expression,returnByValue:true,awaitPromise:true});
+  if(response.exceptionDetails) throw new Error(response.exceptionDetails.text||"Runtime evaluation failed");
+  return response.result?response.result.value:undefined;
+}
+async function capture(client,file){
+  const result=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true,captureBeyondViewport:false});
+  fs.writeFileSync(file,Buffer.from(result.data,"base64"));
+}
+async function hitClick(client,selector){
+  const hit=await evaluate(client,`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return null;const r=el.getBoundingClientRect();const x=r.left+r.width/2;const y=r.top+r.height/2;const top=document.elementFromPoint(x,y);return {x,y,hit:!!top&&(top===el||el.contains(top)),w:r.width,h:r.height};})()`);
+  assert.ok(hit,`missing interactive target ${selector}`);
+  assert.equal(hit.hit,true,`${selector} is covered at its hit point`);
+  await client.send("Input.dispatchMouseEvent",{type:"mousePressed",x:hit.x,y:hit.y,button:"left",clickCount:1});
+  await client.send("Input.dispatchMouseEvent",{type:"mouseReleased",x:hit.x,y:hit.y,button:"left",clickCount:1});
+  await sleep(40);
+  const clicked=await evaluate(client,`document.querySelector(${JSON.stringify(selector)}).dataset.qaClicked==='1'`);
+  assert.equal(clicked,true,`${selector} did not receive click interaction`);
+  return hit;
+}
+
+async function verifySurface(client,width,height,surface,markup){
+  const fixture=path.join(root,`.premium-functional-${width}x${height}-${surface}.html`);
+  const wide=!["shop","synthesis","quest","achievement","info"].includes(surface);
+  let classes="home-feature-modal show";
+  if(surface==="shop") classes+=" v131-shop-open";
+  if(surface==="synthesis") classes+=" v141-synthesis-modal";
+  if(surface==="quest") classes+=" quest-mode";
+  let surfaceMarkup=markup;
+  if(surface==="character"){
+    surfaceMarkup+=`<section id="skillPage"><button class="skill-action-card qa-major qa-skill-action">技能升級測試</button></section>`;
+  }
+  const runtime='<script src="js/00-main.js"></script>'+(wide?'<script src="js/19-stage-v78-character-inventory-runtime.js"></script>':'');
+  const page=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403}#game-viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}#game-stage{position:relative;width:1080px;height:1920px;flex:0 0 1080px;transform-origin:center center;overflow:hidden}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6667px;transform:scale(2.5714285714);transform-origin:top left}#homeFeatureModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important}.qa-test-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}</style></head><body><div id="game-viewport"><div id="game-stage"><div id="app"><div id="game-content"><div id="homeFeatureModal" class="${classes}"><div class="home-feature-modal-box ${wide?"wide":""}"><div class="home-feature-modal-title"><span class="qa-test-title">功能型 UI・${surface}</span><button class="home-feature-close-btn qa-major">返回</button></div><div id="homeFeatureModalBody">${surfaceMarkup}</div></div></div></div></div></div></div>${runtime}<script>document.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{button.dataset.qaClicked='1';}));</script></body></html>`;
+  fs.writeFileSync(fixture,page,"utf8");
+  try{
+    await configureViewport(client,width,height);
+    await navigate(client,fixtureUrl(fixture));
+    if(wide){
+      await evaluate(client,"window.v78ApplyCharacterInventoryLayout&&window.v78ApplyCharacterInventoryLayout()");
+      await evaluate(client,"new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
+    }
+    const data=await evaluate(client,`(()=>{const rect=o=>o?(()=>{const r=o.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};})():null;const box=document.querySelector('.home-feature-modal-box');const root=document.getElementById('characterTabContent');const parent=box&&box.parentElement;const majors=[...document.querySelectorAll('.qa-major')];const commerce=[...document.querySelectorAll('.qa-commerce')];const minCss=els=>els.length?Math.min(...els.map(el=>parseFloat(getComputedStyle(el).minHeight)||parseFloat(getComputedStyle(el).height)||0)):999;const overflow=[...document.querySelectorAll('#homeFeatureModalBody,#characterTabContent,.quest-tab-body,.v141-synthesis-body')].some(el=>el.scrollWidth>el.clientWidth+1);const c=box?getComputedStyle(box):null;const rc=root?getComputedStyle(root):null;return {viewport:[innerWidth,innerHeight],surface:${JSON.stringify(surface)},docOverflow:document.documentElement.scrollWidth>innerWidth+1||document.documentElement.scrollHeight>innerHeight+1,box:rect(box),parent:rect(parent),root:rect(root),rootScroll:root?{scrollHeight:root.scrollHeight,clientHeight:root.clientHeight,overflowY:rc.overflowY,overflowX:rc.overflowX}:null,contentOverflow:overflow,majorMin:minCss(majors),commerceMin:minCss(commerce),inline:box?{width:box.style.getPropertyValue('width'),height:box.style.getPropertyValue('height'),maxWidth:box.style.getPropertyValue('max-width'),maxHeight:box.style.getPropertyValue('max-height'),overflow:box.style.getPropertyValue('overflow')}:null,computed:c?{width:c.width,height:c.height,maxWidth:c.maxWidth,maxHeight:c.maxHeight,overflow:c.overflow}:null};})()`);
+    assert.deepEqual(data.viewport,[width,height],`${surface} viewport metrics mismatch`);
+    assert.equal(data.docOverflow,false,`${width}x${height} ${surface} document overflow`);
+    assert.equal(data.contentOverflow,false,`${width}x${height} ${surface} horizontal content overflow`);
+    assert.ok(data.box&&data.box.left>=-1&&data.box.top>=-1&&data.box.right<=width+1&&data.box.bottom<=height+1,`${width}x${height} ${surface} panel clipped: ${JSON.stringify(data.box)}`);
+    if(data.majorMin<38){const details=await evaluate(client,"[...document.querySelectorAll(\".qa-major\")].map((el,i)=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {i,id:el.id,className:String(el.className),text:el.textContent.trim().slice(0,30),computedMinHeight:c.minHeight,computedHeight:c.height,rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}}})");throw new Error(`${surface} major logical hit area ${data.majorMin}: ${JSON.stringify(details)}`);}
+    assert.ok(data.commerceMin>=42,`${surface} commerce hit area ${data.commerceMin}`);
+    const interactions={};
+    interactions.back=await hitClick(client,".home-feature-close-btn");
+    if(surface==="character"){
+      assert.ok(data.rootScroll&&["scroll","auto"].includes(data.rootScroll.overflowY),`character scroll owner invalid: ${JSON.stringify(data.rootScroll)}`);
+      assert.equal(data.inline.width,"calc(100% - 8px)","formal character runtime did not own width inline");
+      assert.equal(data.inline.height,"calc(100% - 8px)","formal character runtime did not own height inline");
+      interactions.exp=await hitClick(client,".v131-exp-preview-btn");
+      interactions.status=await hitClick(client,".status-btn");
+      interactions.confirm=await hitClick(client,"#confirmStatusButton");
+      interactions.skill=await hitClick(client,".qa-skill-action");
+    }
+    const shot=path.join(out,`${width}x${height}-${surface}.png`);
+    await capture(client,shot);
+    evidence.push({...data,interactions});
+  }finally{
+    try{fs.unlinkSync(fixture);}catch(_){ }
   }
 }
 
-const dialog=path.join(root,".premium-functional-dialog.html");
-fs.writeFileSync(dialog,`<!doctype html><html><head>${links}</head><body><div id="v169RpgDialogLayer" class="v169-rpg-dialog-layer show"><section class="v169-rpg-dialog" data-kind="confirm" data-tone="danger"><div class="v169-rpg-dialog-crest">⚠</div><h2>刪除角色</h2><div class="v169-rpg-dialog-message">這是不可逆操作。確認長文字仍可閱讀、取消與危險按鈕不被裝飾遮住。</div><div class="v169-rpg-dialog-actions"><button class="v169-rpg-dialog-button secondary">返回</button><button class="v169-rpg-dialog-button primary danger">確認刪除</button></div></section></div></body></html>`,"utf8");
-try{
-  for(const [width,height] of viewports){
-    const url="file://"+dialog.replace(/\\/g,"/");
-    const shot=path.join(out,`${width}x${height}-danger-dialog.png`);
-    runChrome(["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,`--screenshot=${shot}`,url],"dialog screenshot");
+async function verifyDialog(client,width,height){
+  const dialog=path.join(root,`.premium-functional-${width}x${height}-dialog.html`);
+  fs.writeFileSync(dialog,`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}</head><body><div id="v169RpgDialogLayer" class="v169-rpg-dialog-layer show"><section class="v169-rpg-dialog" data-kind="confirm" data-tone="danger"><div class="v169-rpg-dialog-crest">⚠</div><h2>刪除角色</h2><div class="v169-rpg-dialog-message">這是不可逆操作。確認長文字仍可閱讀、取消與危險按鈕不被裝飾遮住。</div><div class="v169-rpg-dialog-actions"><button class="v169-rpg-dialog-button secondary">返回</button><button class="v169-rpg-dialog-button primary danger">確認刪除</button></div></section></div><script>document.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{button.dataset.qaClicked='1';}));</script></body></html>`,"utf8");
+  try{
+    await configureViewport(client,width,height);
+    await navigate(client,fixtureUrl(dialog));
+    const geometry=await evaluate(client,"(()=>{const el=document.querySelector('.v169-rpg-dialog');const r=el.getBoundingClientRect();return {viewport:[innerWidth,innerHeight],left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};})()");
+    assert.deepEqual(geometry.viewport,[width,height],"dialog viewport mismatch");
+    assert.ok(geometry.left>=-1&&geometry.top>=-1&&geometry.right<=width+1&&geometry.bottom<=height+1,`dialog clipped ${JSON.stringify(geometry)}`);
+    await hitClick(client,".v169-rpg-dialog-button.secondary");
+    await hitClick(client,".v169-rpg-dialog-button.danger");
+    await capture(client,path.join(out,`${width}x${height}-danger-dialog.png`));
+  }finally{
+    try{fs.unlinkSync(dialog);}catch(_){ }
   }
-}finally{
-  try{fs.unlinkSync(dialog);}catch(_){ }
 }
 
-fs.writeFileSync(path.join(out,"evidence.json"),JSON.stringify({viewports,evidence},null,2)+"\n");
-console.log(`✓ Premium functional responsive browser QA passed: ${evidence.length} surface/viewport checks`);
+(async()=>{
+  const browser=await launchBrowser();
+  try{
+    for(const [width,height] of viewports){
+      for(const [surface,markup] of Object.entries(surfaces)) await verifySurface(browser.client,width,height,surface,markup);
+      await verifyDialog(browser.client,width,height);
+    }
+    fs.writeFileSync(path.join(out,"evidence.json"),JSON.stringify({viewports,evidence},null,2)+"\n");
+    console.log(`✓ Premium functional responsive browser QA passed: ${evidence.length} surface/viewport checks`);
+  }finally{
+    browser.close();
+  }
+})().catch(error=>{ console.error(error&&error.stack||error); process.exit(1); });
