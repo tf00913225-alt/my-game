@@ -7,6 +7,10 @@ const vm=require("node:vm");
 const source=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const accountSource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const TEST_UID="boss-tower-test";
+const DUNGEON_RANK_MULTIPLIERS={
+    elite:{maxHP:3.2,maxSP:2,defense:1.25},
+    boss:{maxHP:4.5,maxSP:2,defense:1.4}
+};
 
 function storage(seed){
     const values=new Map(Object.entries(seed||{}).map(([key,value])=>[key,String(value)]));
@@ -39,7 +43,11 @@ function load(options={}){
         activeBattleCharacterIndex:0,queuedPlayerActions:{},autoBattle:true,
         skillDatabase:{
             blast:{id:"blast",name:"全域破陣",element:"fire",category:"magic",targetType:"all",baseDamage:100,spCost:10},
-            strike:{id:"strike",name:"破陣斬",element:"fire",category:"physical",targetType:"single",baseDamage:100,spCost:5}
+            strike:{id:"strike",name:"破陣斬",element:"fire",category:"physical",targetType:"single",baseDamage:100,spCost:5},
+            fireRocket:{element:"fire"},explosiveFlurry:{element:"fire"},dragonSlash:{element:"fire"},rage:{element:"fire"},
+            waterKnife:{element:"water"},frostPunch:{element:"water"},floodBeast:{element:"water"},healSpell:{element:"water"},
+            stoneSlash:{element:"earth"},flyingSandStrike:{element:"earth"},dustStorm:{element:"earth"},rockWall:{element:"earth"},
+            stormFlurry:{element:"wind"},windCrossSlash:{element:"wind"},windHowlLightning:{element:"wind"},dodgeSkill:{element:"wind"}
         },
         getExistingPartyIndexes:()=>[0],
         getPartyCharacterByIndex:index=>index===0?context.player:null,
@@ -72,10 +80,15 @@ function load(options={}){
         rebuildInventorySlots:noop,updateGoldDisplay:noop,addBattleLog:message=>{ (context.logs||(context.logs=[])).push(message); },
         showPlayerHit:noop,checkBattleEnd:()=>false,
         v133GetHighestCreatedCharacterLevel:()=>options.level||100,
-        v132BuildDungeonMonster:(name,level,element,rank)=>({
-            name,level,element,rank,maxHP:1000,hp:1000,maxSP:100,sp:100,defense:100,
-            attack:100,magicAttack:100,alive:true,statusEffects:[],activeBuffs:[]
-        }),
+        v132DungeonRankMultipliers:DUNGEON_RANK_MULTIPLIERS,
+        v132BuildDungeonMonster:(name,level,element,rank)=>{
+            const multiplier=DUNGEON_RANK_MULTIPLIERS[rank]||{maxHP:1,maxSP:1,defense:1};
+            return {
+                name,level,element,rank,maxHP:Math.round(1000*multiplier.maxHP),hp:Math.round(1000*multiplier.maxHP),
+                maxSP:Math.round(100*multiplier.maxSP),sp:Math.round(100*multiplier.maxSP),defense:Math.round(100*multiplier.defense),
+                attack:100,magicAttack:100,alive:true,statusEffects:[],activeBuffs:[]
+            };
+        },
         v132AddItemToInventory:()=>true,v132GetOreDefinition:id=>({id,name:id}),
         v141ShowBlackGoldReward:noop,
         v174RelicDevUnlock:id=>{ (context.relicUnlocks||(context.relicUnlocks=[])).push(id);return true; }
@@ -106,6 +119,12 @@ test("central definitions own nine fixed personal bosses, four permanent world b
     assert.equal(context.GameplaySystem.worldBosses.length,4);
     assert.deepEqual(Object.keys(value(context,"GameplaySystem.mechanisms")).sort(),["amplify","charge","heal","seal","shield"]);
     assert.deepEqual(value(context,"GameplaySystem.towerConfig.elementOrder"),["fire","earth","water","wind"]);
+    assert.deepEqual(value(context,"GameplaySystem.personalBosses.map(item=>({id:item.id,summon:item.summon||null}))"),[
+        {id:"personal-20",summon:null},{id:"personal-30",summon:{hpBelow:.5}},{id:"personal-40",summon:null},
+        {id:"personal-50",summon:{round:4}},{id:"personal-60",summon:null},{id:"personal-70",summon:{hpBelow:.55}},
+        {id:"personal-80",summon:null},{id:"personal-90",summon:{round:4}},{id:"personal-100",summon:{hpBelow:.6}}
+    ]);
+    assert.deepEqual(value(context,"GameplaySystem.worldStageProfiles.map(item=>item.summon||null)"),[null,null,{hpBelow:.55},{round:4}]);
 });
 
 test("Tower owner produces 100 floors with elite, boss and milestone cadence",()=>{
@@ -119,6 +138,86 @@ test("Tower owner produces 100 floors with elite, boss and milestone cadence",()
         if(floor%10===0){ assert.match(kind(floor),/BOSS/); }
         else if(floor%5===0){ assert.match(kind(floor),/精英/); }
         else{ assert.equal(kind(floor),"普通層"); }
+    }
+});
+
+test("Gameplay Bosses are built through the Boss rank defense owner without changing the calibrated HP baseline",()=>{
+    const {context}=load();
+    const profile=value(context,"GameplaySystem.getBossBalanceProfile(20,'personal',1)");
+    const elite=context.v132BuildDungeonMonster("同級精英",20,"fire","elite");
+    assert.equal(context.vGameplayStartBoss("personal","personal-20"),true);
+    const boss=context.monsters[0];
+    assert.equal(boss.rank,"boss");
+    assert.ok(boss.defense>elite.defense,"Boss defense must exceed the corresponding elite baseline");
+    assert.equal(Number((boss.defense/elite.defense).toFixed(4)),profile.defenseMultiplier);
+    assert.ok(Math.abs(boss.maxHP-3200*8.37)<=20,"switching to the Boss rank must preserve the current Lv20 HP calibration");
+});
+
+test("selected Bosses summon two same-element elites only after their configured threshold and only once",()=>{
+    {
+        const {context}=load();
+        assert.equal(context.vGameplayStartBoss("personal","personal-30"),true);
+        const boss=context.monsters[0];
+        assert.equal(context.monsters.length,1,"reinforcements must not exist in the opening roster");
+        boss.hp=Math.round(boss.maxHP*.51);context.turn=2;context.startTurn(context.battleToken);
+        assert.equal(context.monsters.length,1,"HP-triggered reinforcements must wait until the configured threshold");
+        boss.hp=Math.floor(boss.maxHP*.5);context.turn=3;context.startTurn(context.battleToken);
+        assert.equal(context.monsters.length,3);
+        const guards=context.monsters.slice(1);
+        assert.ok(guards.every(unit=>unit.vGameplayBossSummon===true&&unit.rank==="elite"&&unit.element===boss.element));
+        assert.equal(new Set(guards.map(unit=>unit.name)).size,2);
+        guards.forEach(unit=>[...unit.skillIds,...(unit.v141SupportSkillIds||[])].forEach(skillId=>{
+            assert.equal(context.skillDatabase[skillId].element,boss.element);
+        }));
+        context.turn=4;context.startTurn(context.battleToken);
+        assert.equal(context.monsters.length,3,"the same encounter may summon reinforcements only once");
+    }
+    {
+        const {context}=load();
+        assert.equal(context.vGameplayStartBoss("personal","personal-50"),true);
+        assert.equal(context.monsters.length,1);
+        context.turn=3;context.startTurn(context.battleToken);assert.equal(context.monsters.length,1);
+        context.turn=4;context.startTurn(context.battleToken);assert.equal(context.monsters.length,3);
+    }
+    {
+        const {context}=load();
+        assert.equal(context.vGameplayStartBoss("personal","personal-60"),true);
+        context.monsters[0].hp=Math.round(context.monsters[0].maxHP*.1);
+        context.turn=10;context.startTurn(context.battleToken);
+        assert.equal(context.monsters.length,1,"Bosses without a summon plan must never gain reinforcements");
+    }
+});
+
+test("world and Tower Boss summon plans retain their stage, HP and round thresholds",()=>{
+    {
+        const {context}=load();
+        const state=value(context,"GameplaySystem.getSerializableState()");
+        state.world["world-40"].completedStages=2;
+        context.GameplaySystem.debugReloadState(state,Date.now());
+        assert.equal(context.vGameplayStartBoss("world","world-40"),true);
+        const boss=context.monsters[0];
+        assert.equal(context.monsters.length,1);
+        boss.hp=Math.round(boss.maxHP*.56);context.turn=2;context.startTurn(context.battleToken);
+        assert.equal(context.monsters.length,1);
+        boss.hp=Math.floor(boss.maxHP*.55);context.turn=3;context.startTurn(context.battleToken);
+        assert.equal(context.monsters.length,3,"world stage 3 must summon at 55% HP");
+    }
+    {
+        const {context}=load();const week=context.GameplaySystem.getWeekInfo(Date.now());
+        context.GameplaySystem.debugReloadState({version:1,personal:{},world:{},tower:{weekKey:week.key,element:week.element,completedFloor:49,highestThisWeek:49,claimedFloors:{},historicalHighest:49,pendingRelicChoice:false}},Date.now());
+        assert.equal(context.vGameplaySelectTowerBand(50),true);
+        const boss=context.monsters[0];
+        assert.equal(context.monsters.length,1);
+        boss.hp=Math.floor(boss.maxHP*.5);context.turn=2;context.startTurn(context.battleToken);
+        assert.equal(context.monsters.length,3,"Tower floor 50 must summon at 50% HP");
+    }
+    {
+        const {context}=load();const week=context.GameplaySystem.getWeekInfo(Date.now());
+        context.GameplaySystem.debugReloadState({version:1,personal:{},world:{},tower:{weekKey:week.key,element:week.element,completedFloor:69,highestThisWeek:69,claimedFloors:{},historicalHighest:69,pendingRelicChoice:false}},Date.now());
+        assert.equal(context.vGameplaySelectTowerBand(70),true);
+        assert.equal(context.monsters.length,1);
+        context.turn=3;context.startTurn(context.battleToken);assert.equal(context.monsters.length,1);
+        context.turn=4;context.startTurn(context.battleToken);assert.equal(context.monsters.length,3,"Tower floor 70 must summon on round 4");
     }
 });
 

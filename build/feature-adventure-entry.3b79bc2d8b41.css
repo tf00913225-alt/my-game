@@ -1,0 +1,96 @@
+/* 出城冒險 V1 — lightweight main-city entrance owner. */
+#adventureHomeAxis.adventure-home-axis{
+    position:absolute;
+    z-index:7;
+    top:42%;
+    left:50%;
+    width:clamp(144px,38vw,212px);
+    min-height:clamp(76px,10vh,104px);
+    transform:translateX(-50%);
+    pointer-events:none;
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+}
+.adventure-home-gate{
+    position:absolute;
+    inset:0 7% 16%;
+    pointer-events:none;
+    border:1px solid rgba(213,174,92,.42);
+    border-bottom:0;
+    border-radius:44% 44% 8px 8px/34% 34% 8px 8px;
+    background:
+        linear-gradient(90deg,rgba(0,0,0,.3),transparent 22%,transparent 78%,rgba(0,0,0,.3)),
+        linear-gradient(180deg,rgba(93,61,27,.28),rgba(22,15,9,.62));
+    box-shadow:inset 0 1px rgba(255,225,155,.12),0 8px 18px rgba(0,0,0,.22);
+}
+.adventure-home-gate::before,.adventure-home-gate::after{
+    content:"";
+    position:absolute;
+    bottom:-7px;
+    width:16%;
+    height:72%;
+    border-radius:5px 5px 2px 2px;
+    background:linear-gradient(90deg,#1a120c,#5a3b22 45%,#23170f);
+    border:1px solid rgba(210,167,88,.35);
+    pointer-events:none;
+}
+.adventure-home-gate::before{left:8%;}.adventure-home-gate::after{right:8%;}
+#adventureHomeEntry.adventure-home-entry{
+    position:relative;
+    z-index:2;
+    pointer-events:auto;
+    width:min(92%,190px);
+    min-height:56px;
+    margin:0;
+    padding:8px 12px 9px;
+    border:1px solid rgba(231,194,119,.78);
+    border-radius:9px 9px 13px 13px;
+    color:#f5dfad;
+    background:linear-gradient(180deg,rgba(54,37,20,.94),rgba(20,14,10,.97));
+    box-shadow:inset 0 1px rgba(255,235,184,.16),0 4px 0 #5f401f,0 7px 13px rgba(0,0,0,.38);
+    font-family:inherit;
+    text-align:center;
+    cursor:pointer;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+    animation:adventureHomeBreath 3.8s ease-in-out infinite;
+}
+#adventureHomeEntry strong{
+    display:block;
+    margin-top:2px;
+    font-size:clamp(18px,5vw,24px);
+    line-height:1.05;
+    letter-spacing:.12em;
+    text-shadow:0 1px 1px #000,0 0 10px rgba(213,168,80,.18);
+}
+.adventure-home-kicker{
+    display:block;
+    color:#cdbb91;
+    font-size:clamp(10px,2.7vw,12px);
+    line-height:1.2;
+    letter-spacing:.05em;
+    white-space:nowrap;
+}
+.adventure-home-notice{
+    position:absolute;
+    top:-5px;
+    right:-5px;
+    width:12px;
+    height:12px;
+    border:2px solid #f3d48b;
+    border-radius:50%;
+    background:#b62d22;
+    box-shadow:0 0 0 2px rgba(0,0,0,.48),0 0 9px rgba(196,53,39,.7);
+}
+.adventure-home-notice[hidden]{display:none!important;}
+#adventureHomeEntry:focus-visible{outline:2px solid #f7df9e;outline-offset:3px;}
+#adventureHomeEntry:active{margin-top:2px;box-shadow:inset 0 1px rgba(255,235,184,.12),0 2px 0 #5f401f,0 4px 8px rgba(0,0,0,.38);}
+@keyframes adventureHomeBreath{0%,100%{filter:brightness(.96)}50%{filter:brightness(1.08)}}
+@media (max-width:379px){
+    #adventureHomeAxis.adventure-home-axis{top:41%;width:148px;min-height:72px;}
+    #adventureHomeEntry.adventure-home-entry{min-height:52px;padding:7px 9px;}
+}
+@media (prefers-reduced-motion:reduce){
+    #adventureHomeEntry.adventure-home-entry{animation:none!important;transition:none!important;}
+}

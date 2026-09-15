@@ -9,6 +9,10 @@ const relicSource=fs.readFileSync("js/relic-progression-drop-system.js","utf8");
 const relicCatalogSource=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const gameplayCss=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
 const skillPreviewCss=fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8");
+const DUNGEON_RANK_MULTIPLIERS={
+    elite:{maxHP:3.2,maxSP:2,defense:1.25},
+    boss:{maxHP:4.5,maxSP:2,defense:1.4}
+};
 
 function bossContext(level=100){
     const noop=()=>{};
@@ -41,10 +45,15 @@ function bossContext(level=100){
         v133GetHighestCreatedCharacterLevel:()=>level,
         saveGame:()=>true,showPage:noop,startTurn:noop,checkBattleEnd:()=>false,
         addBattleLog:noop,
-        v132BuildDungeonMonster:(name,monsterLevel,element,rank)=>({
-            name,level:monsterLevel,element,rank,maxHP:1000,hp:1000,maxSP:200,sp:200,
-            attack:100,magicAttack:100,defense:100,alive:true,statusEffects:[],activeBuffs:[]
-        })
+        v132DungeonRankMultipliers:DUNGEON_RANK_MULTIPLIERS,
+        v132BuildDungeonMonster:(name,monsterLevel,element,rank)=>{
+            const multiplier=DUNGEON_RANK_MULTIPLIERS[rank]||{maxHP:1,maxSP:1,defense:1};
+            return {
+                name,level:monsterLevel,element,rank,maxHP:Math.round(1000*multiplier.maxHP),hp:Math.round(1000*multiplier.maxHP),
+                maxSP:Math.round(200*multiplier.maxSP),sp:Math.round(200*multiplier.maxSP),
+                attack:100,magicAttack:100,defense:Math.round(100*multiplier.defense),alive:true,statusEffects:[],activeBuffs:[]
+            };
+        }
     };
     context.v132LaunchDungeonBattle=(roster,onComplete)=>{
         context.monsters=roster;
@@ -104,8 +113,7 @@ function relicContext(level){
     assert.equal(lv20.expectedPartySize,2,"Lv20 Boss balance must assume two same-level characters");
     assert.equal(lv60.expectedPartySize,3,"Lv60+ Boss balance must assume the third character slot is available");
     assert.ok(lv20.hpMultiplier>4.2,"Lv20 Boss HP must be materially stronger than the old fixed multiplier");
-    assert.equal(lv20.supportCount,0,"early Bosses remain focused one-Boss fights");
-    assert.equal(lv60.supportCount,2,"higher personal Bosses must bring two elite helpers");
+    assert.equal(lv20.defenseMultiplier,1.12,"Boss rank defense must be 12% above the corresponding elite rank baseline");
 
     const personalNames=context.GameplaySystem.personalBosses.map(item=>item.name);
     const worldNames=context.GameplaySystem.worldBosses.map(item=>item.name);
@@ -120,6 +128,8 @@ function relicContext(level){
     assert.equal(context.lastRoster.length,1,"Lv20 remains a one-Boss onboarding challenge");
     const boss=context.lastRoster[0];
     assert.equal(boss.element,"fire");
+    assert.equal(boss.rank,"boss");
+    assert.ok(boss.defense>context.v132BuildDungeonMonster("精英基準",20,"fire","elite").defense);
     assert.ok(boss.skillIds.every(id=>context.skillDatabase[id].element===boss.element),"Boss skills must match the Boss element");
     context.turn=2;context.startTurn(context.battleToken);
     const mechanism=context.GameplaySystem.getActiveBattleState().mechanisms[0];
@@ -128,16 +138,20 @@ function relicContext(level){
 }
 {
     const context=bossContext(100);
-    assert.equal(context.vGameplayStartBoss("personal","personal-60"),true);
-    assert.equal(context.lastRoster.length,3,"Lv60+ personal Boss must have Boss + two elite helpers");
-    const [boss,...helpers]=context.lastRoster;
-    assert.equal(boss.element,"water");
+    assert.equal(context.vGameplayStartBoss("personal","personal-30"),true);
+    assert.equal(context.lastRoster.length,1,"reinforcements must not be present in the opening roster");
+    const boss=context.lastRoster[0];
+    assert.equal(boss.element,"fire");
+    boss.hp=Math.floor(boss.maxHP*.5);context.turn=2;context.startTurn(context.battleToken);
+    const helpers=context.monsters.slice(1);
     assert.equal(helpers.length,2);
     helpers.forEach(helper=>{
         assert.equal(helper.rank,"elite");
         assert.equal(helper.element,boss.element,"elite helper element must match its Boss");
         assert.ok(helper.skillIds.every(id=>context.skillDatabase[id].element===helper.element),"elite helper skills must match helper element");
     });
+    context.turn=3;context.startTurn(context.battleToken);
+    assert.equal(context.monsters.length,3,"reinforcements must not be summoned more than once");
 }
 
 /* Requirement 2: activity cover art uses 16:9 while battlefield Boss and
