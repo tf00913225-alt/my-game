@@ -6,7 +6,7 @@
   "workBranch": "feature/adventure-node-system-v1-20260915",
   "officialVersion": "173.65",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "VERIFIED",
+  "overallStatus": "READY_FOR_CI",
   "requirements": [
     {"id":"ADV-01","status":"VERIFIED","requirement":"主城以正式 lazy feature 入口進入出城冒險，完整頁掛在 #game-content，不建立第二套 stage scaler","evidence":["js/adventure/adventure-entry-v1-20260915.js","js/adventure/adventure-ui-v1-20260915.js","css/adventure-entry-v1-20260915.css","css/adventure-v1-20260915.css"]},
     {"id":"ADV-02","status":"VERIFIED","requirement":"Adventure 章節、節點、事件、委託、商人與獎勵均為資料驅動且只有單一 Adventure Runtime owner","evidence":["js/adventure/adventure-content-v1-20260915.js","js/adventure/adventure-runtime-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
@@ -19,11 +19,12 @@
     {"id":"ADV-09","status":"VERIFIED","requirement":"神秘商人使用固定隱藏位置、25% 章節一次判定、同章購買狀態永久保存","evidence":["js/adventure/adventure-content-v1-20260915.js","js/adventure/adventure-runtime-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
     {"id":"ADV-10","status":"VERIFIED","requirement":"九轉回元丹 HP 100%、太清聚氣丹 SP 100%，沿用補品消耗角色行動，可永久囤積，manualOnly 不進自動補品候選","evidence":["js/adventure/adventure-items-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
     {"id":"ADV-11","status":"VERIFIED","requirement":"四象世界觀元素只使用火、水、風、土，裝備套裝名稱不作為地區或勢力","evidence":["js/adventure/adventure-content-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
-    {"id":"ADV-12","status":"VERIFIED","requirement":"360×800、390×844、412×915 正式 Chrome QA 無水平 overflow、文字裁切、HUD/按鈕重疊，safe-area、裝飾 pointer-events 與 reduced-motion 正常","evidence":[".github/scripts/run-adventure-browser-qa.mjs",".github/workflows/ci.yml","PR #238 CI run 34954173507 SUCCESS","Adventure browser QA artifact sha256:09779d9252cfd2231b29a9acab3d96fb7f15da9d18582d98129287e1b238aadd"]},
-    {"id":"ADV-13","status":"VERIFIED","requirement":"content-hashed Adventure feature artifacts、manifest、loader、release gates 與 git diff checks 全數同步","evidence":["config/feature-manifest.json","scripts/build-production.mjs","asset-manifest.json",".github/workflows/ci.yml","PR #238 CI run 34954173507 SUCCESS","dev CI/deployment run 34954306414 SUCCESS"]}
+    {"id":"ADV-12","status":"READY_FOR_CI","requirement":"360×800、390×844、412×915 正式 Chrome QA 無 overflow／裁切／pointer block，且三尺寸維持同一 9:16 地圖構圖、Boss 後段位置、左右岔路與支線 Hidden Node 關係，並產生三張截圖","evidence":[".github/scripts/run-adventure-browser-qa.mjs","artifacts/browser-qa/adventure-map-360x800.png","artifacts/browser-qa/adventure-map-390x844.png","artifacts/browser-qa/adventure-map-412x915.png","local Chrome QA PASS before push"]},
+    {"id":"ADV-13","status":"READY_FOR_CI","requirement":"content-hashed Adventure feature artifacts、manifest、loader、release gates 與 git diff checks 全數同步","evidence":["config/feature-manifest.json","scripts/build-production.mjs","asset-manifest.json","build/asset-manifest.json","build/feature-adventure-ui.1ea3fa4cb350.js","build/feature-adventure.9966918575a0.css"]},
+    {"id":"ADV-14","status":"READY_FOR_CI","requirement":"章節地圖 Presentation 對齊附件 Demo 的武俠世界地圖方向：移除巨大地圖 Panel 感、道路不再使用流程圖主線虛線、節點改 RPG 徽記、Label 降低卡片感、Boss 成為章節焦點、Hidden Node 位於主路支線，並建立遠／中／近景深；正式 Adventure 不新增第二套全域 scale","evidence":["/mnt/data/冒險節點demo.html","css/adventure-v1-20260915.css","js/adventure/adventure-ui-v1-20260915.js","tests/adventure-node-system-v1.test.js",".github/scripts/run-adventure-browser-qa.mjs"]}
   ],
-  "automatedVerification": "TARGETED_REGRESSION_PASS; BUILD_CHECK_PASS; PR_238_RUN_34954173507_SUCCESS; DEV_RUN_34954306414_SUCCESS; RESOURCES_LOADER_DUPLICATE_ID_RELEASE_GIT_DIFF_GATES_PASS",
-  "visualVerification": "FORMAL_CHROME_CI_PASS_360X800_390X844_412X915; REDUCED_MOTION_PASS_390X844; ARTIFACT_SHA256_09779d9252cfd2231b29a9acab3d96fb7f15da9d18582d98129287e1b238aadd",
+  "automatedVerification": "TARGETED_REGRESSION_PENDING_CI; BUILD_CHECK_PENDING_CI; FORMAL_CHROME_CI_PENDING",
+  "visualVerification": "LOCAL_CHROME_PASS_360X800_390X844_412X915; FORMAL_CI_ARTIFACT_PENDING",
   "verifiedDevCommit": "c3d2b1dff238b44e05080275a93580b1932e7d43",
-  "promotionApproval": "DEV_VERIFIED_MAIN_FORBIDDEN"
+  "promotionApproval": "MAIN_FORBIDDEN; DEV_MERGE_REQUIRES_GREEN_CI"
 }
