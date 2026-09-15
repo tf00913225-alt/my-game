@@ -79,6 +79,28 @@
         });
     }
 
+    let autoPotionGuardInstalled=false;
+    function installAutoPotionGuard(){
+        if(autoPotionGuardInstalled||typeof getAutoPotionId!=="function"){ return false; }
+        const previousGetAutoPotionId=getAutoPotionId;
+        getAutoPotionId=function(resource){
+            if(typeof potionDefinitions!=="undefined"&&Array.isArray(potionDefinitions)&&typeof getPotionCount==="function"){
+                const candidate=potionDefinitions
+                    .filter(definition=>definition&&definition.resource===resource&&definition.manualOnly!==true)
+                    .slice()
+                    .sort((a,b)=>(Number(a.recoveryPercent)||0)-(Number(b.recoveryPercent)||0))
+                    .find(definition=>Math.max(0,Number(getPotionCount(definition.id))||0)>0);
+                if(candidate){ return candidate.id; }
+                return null;
+            }
+            const fallback=previousGetAutoPotionId.apply(this,arguments);
+            const definition=fallback&&typeof getPotionDefinition==="function"?getPotionDefinition(fallback):null;
+            return definition&&definition.manualOnly===true?null:fallback;
+        };
+        autoPotionGuardInstalled=true;
+        return true;
+    }
+
     function count(itemId){
         if(typeof getPotionCount==="function"){ return Math.max(0,Number(getPotionCount(itemId))||0); }
         if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
@@ -104,16 +126,21 @@
     window.FourSymbolsAdventureItems=Object.freeze({
         definitions:definitions,
         install:installDefinitions,
+        installAutoPotionGuard:installAutoPotionGuard,
         hydrate:hydrateOwnedPresentation,
         count:count,
         add:add
     });
 
+    installAutoPotionGuard();
+
     if(!installDefinitions()&&typeof setTimeout==="function"){
         let attempts=0;
         const retry=function(){
             attempts++;
-            if(installDefinitions()||attempts>=80){ return; }
+            const definitionsReady=installDefinitions();
+            installAutoPotionGuard();
+            if(definitionsReady||attempts>=80){ return; }
             setTimeout(retry,50);
         };
         setTimeout(retry,0);
