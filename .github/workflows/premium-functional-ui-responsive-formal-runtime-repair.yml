@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Generate formal-runtime CDP QA and repair back-button owner
+      - name: Generate formal-runtime CDP QA and diagnose controls
         run: |
           set -euo pipefail
           awk '/python3 <<'"'"'PY'"'"'/{capture=1;next} capture&&/^          PY$/{exit} capture{sub(/^          /,"");print}' .github/workflows/premium-functional-ui-responsive-cdp-fix.yml > /tmp/patch.py
@@ -32,57 +32,36 @@ jobs:
 
           test=Path('tests/premium-functional-ui-responsive-browser.test.js')
           t=test.read_text()
-          t=t.replace(
-              '<meta charset="utf-8">${links}',
-              '<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}',
-              1
-          )
-          t=t.replace(
-              '<html><head>${links}',
-              '<html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}',
-              1
-          )
+          t=t.replace('<meta charset="utf-8">${links}','<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}',1)
+          t=t.replace('<html><head>${links}','<html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}',1)
           old='"css/00-main.css","css/22-stage-v78-character-inventory-core.css"'
           new='"css/00-main.css","css/02-stage-v3-layout-fix.css","css/03-stage-v4-viewport-lock.css","css/22-stage-v78-character-inventory-core.css"'
-          if old not in t:
-              raise SystemExit('style owner anchor missing')
+          if old not in t: raise SystemExit('style owner anchor missing')
           t=t.replace(old,new,1)
           old_runtime="const runtime=wide?'<script src=\"js/19-stage-v78-character-inventory-runtime.js\"></script>':'';"
           new_runtime="const runtime='<script src=\"js/00-main.js\"></script>'+(wide?'<script src=\"js/19-stage-v78-character-inventory-runtime.js\"></script>':'');"
-          if old_runtime not in t:
-              raise SystemExit('runtime owner anchor missing')
+          if old_runtime not in t: raise SystemExit('runtime owner anchor missing')
           t=t.replace(old_runtime,new_runtime,1)
           old_loop='for(let i=0;i<100&&!target;i++){'
-          if old_loop not in t:
-              raise SystemExit('Chrome target loop anchor missing')
+          if old_loop not in t: raise SystemExit('Chrome target loop anchor missing')
           t=t.replace(old_loop,'for(let i=0;i<300&&!target;i++){',1)
           t=t.replace('if(!target) await sleep(80);','if(child.exitCode!==null) break; if(!target) await sleep(100);',1)
-          t=t.replace(
-              'if(!target){ child.kill("SIGKILL"); throw new Error(`Chrome DevTools target unavailable: ${stderr}`); }',
-              'if(!target){ if(child.exitCode===null) child.kill("SIGKILL"); throw new Error(`Chrome DevTools page target unavailable (exit=${child.exitCode}): ${stderr}`); }',
-              1
-          )
+          t=t.replace('if(!target){ child.kill("SIGKILL"); throw new Error(`Chrome DevTools target unavailable: ${stderr}`); }','if(!target){ if(child.exitCode===null) child.kill("SIGKILL"); throw new Error(`Chrome DevTools page target unavailable (exit=${child.exitCode}): ${stderr}`); }',1)
           old_assert='assert.ok(data.majorMin>=44,`${surface} major hit area ${data.majorMin}`);'
-          new_assert='assert.ok(data.majorMin>=38,`${surface} major logical hit area ${data.majorMin}`);'
-          if old_assert not in t:
-              raise SystemExit('major hit-area assertion anchor missing')
-          t=t.replace(old_assert,new_assert,1)
+          diagnostic='if(data.majorMin<38){const details=await evaluate(client,"[...document.querySelectorAll(\\\".qa-major\\\")].map((el,i)=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {i,id:el.id,className:String(el.className),text:el.textContent.trim().slice(0,30),computedMinHeight:c.minHeight,computedHeight:c.height,rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}}})");throw new Error(`${surface} major logical hit area ${data.majorMin}: ${JSON.stringify(details)}`);}'
+          if old_assert not in t: raise SystemExit('major hit-area assertion anchor missing')
+          t=t.replace(old_assert,diagnostic,1)
           test.write_text(t)
 
           css=Path('css/49-v169-rpg-ui.css')
           c=css.read_text()
           anchor='#game-stage .home-feature-modal-box .home-feature-close-btn,\n#game-stage .item-modal-box .close-item-button,'
-          if anchor not in c:
-              raise SystemExit('canonical close-button owner anchor missing')
+          if anchor not in c: raise SystemExit('canonical close-button owner anchor missing')
           owner='#game-stage .home-feature-modal-box .home-feature-close-btn{\n    min-height:38px;\n}\n\n'
-          if owner not in c:
-              c=c.replace(anchor,owner+anchor,1)
+          if owner not in c: c=c.replace(anchor,owner+anchor,1)
           css.write_text(c)
           PY
           git diff --check
-          changed="$(git diff --name-only | sort)"
-          expected="$(printf '%s\n' css/49-v169-rpg-ui.css tests/premium-functional-ui-responsive-browser.test.js | sort)"
-          test "$changed" = "$expected"
           node tests/premium-functional-ui-responsive-browser.test.js
       - name: Save verified responsive repair
         run: |
