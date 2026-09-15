@@ -1,0 +1,56 @@
+name: Premium Functional UI Batch 4 Owner Correction
+
+on:
+  push:
+    branches:
+      - feature/premium-functional-ui
+    paths:
+      - .github/workflows/premium-functional-ui-batch4-owner-correction.yml
+      - .github/scripts/premium-functional-ui-batch4-owner-correction.py
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/premium-functional-ui
+          fetch-depth: 4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Apply Batch 4 correction in final QA owner
+        run: |
+          set -euo pipefail
+          before_runtime="$(sha256sum js/28-v133-economy-rebalance.js js/36-v141-content-systems.js js/40-v144-rules-and-abyss.js js/51-v169-rpg-ui.js js/58-v173.63-functional-fixes.js | sha256sum | awk '{print $1}')"
+          python3 .github/scripts/premium-functional-ui-batch4-owner-correction.py
+          after_runtime="$(sha256sum js/28-v133-economy-rebalance.js js/36-v141-content-systems.js js/40-v144-rules-and-abyss.js js/51-v169-rpg-ui.js js/58-v173.63-functional-fixes.js | sha256sum | awk '{print $1}')"
+          test "$before_runtime" = "$after_runtime"
+          changed="$(git diff --name-only | sort)"
+          printf '%s\n' "$changed"
+          test "$changed" = "css/53-v173.51-qa.css
+          tests/premium-functional-ui-batch4.test.js"
+      - name: Run corrected Batch 4 regression
+        run: |
+          set -euo pipefail
+          node tests/premium-functional-ui-batch4.test.js
+          node tests/v173.48-premium-shop-layout.test.js
+          node tests/v173.56-shop-layout-preview-regression.test.js
+          node tests/v169-rpg-ui.test.js
+          node tests/v146-system-polish.test.js
+          node tests/v141-system-expansion.test.js
+          git diff --check
+      - name: Save correction and remove temporary helpers
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/premium-functional-ui-batch4-owner-correction.yml .github/scripts/premium-functional-ui-batch4-owner-correction.py
+          git add css/53-v173.51-qa.css tests/premium-functional-ui-batch4.test.js
+          git diff --cached --check
+          git commit -m "fix: apply premium shop sizing at final owner"
+          git push origin HEAD:feature/premium-functional-ui
