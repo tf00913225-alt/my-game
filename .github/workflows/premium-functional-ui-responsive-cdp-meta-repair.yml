@@ -1,0 +1,57 @@
+name: Premium Functional UI Responsive CDP Meta Repair
+
+on:
+  push:
+    branches:
+      - feature/premium-functional-ui
+    paths:
+      - .github/workflows/premium-functional-ui-responsive-cdp-meta-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/premium-functional-ui
+          fetch-depth: 20
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Generate CDP harness and add real mobile viewport metadata
+        run: |
+          set -euo pipefail
+          awk '/python3 <<'"'"'PY'"'"'/{capture=1;next} capture&&/^          PY$/{exit} capture{sub(/^          /,"");print}' .github/workflows/premium-functional-ui-responsive-cdp-fix.yml > /tmp/patch.py
+          python3 /tmp/patch.py
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('tests/premium-functional-ui-responsive-browser.test.js')
+          t=p.read_text()
+          old='<meta charset="utf-8">${links}'
+          new='<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}'
+          if old not in t:
+              raise SystemExit('surface viewport meta anchor missing')
+          t=t.replace(old,new,1)
+          old_dialog='<html><head>${links}'
+          new_dialog='<html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}'
+          if old_dialog not in t:
+              raise SystemExit('dialog viewport meta anchor missing')
+          t=t.replace(old_dialog,new_dialog,1)
+          p.write_text(t)
+          PY
+          git diff --check
+          test "$(git diff --name-only)" = "tests/premium-functional-ui-responsive-browser.test.js"
+          node tests/premium-functional-ui-responsive-browser.test.js
+      - name: Save verified responsive harness
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/premium-functional-ui-responsive-browser.test.js
+          git diff --cached --check
+          git commit -m "test: use real mobile metrics for responsive browser QA"
+          git push origin HEAD:feature/premium-functional-ui
