@@ -131,31 +131,34 @@
     white-space:nowrap !important;
 }
 
-/* ---------- 角色主區：按參考圖比例，不用固定長條 ---------- */
+/* ---------- Demo Visual Parity / Batch B：左立繪＋右 3×2 六裝備 ---------- */
 #game-stage #inventoryPage .inventory-character-stage{
     position:relative !important;
     width:100% !important;
-    height:var(--inventory-stage-height,240px) !important;
-    min-height:var(--inventory-stage-height,240px) !important;
-    max-height:var(--inventory-stage-height,240px) !important;
+    height:var(--inventory-stage-height,172px) !important;
+    min-height:var(--inventory-stage-height,172px) !important;
+    max-height:var(--inventory-stage-height,172px) !important;
     aspect-ratio:auto !important;
     margin:0 !important;
-    padding:0 !important;
+    padding:8px !important;
     display:grid !important;
-    grid-template-columns:14% 64% 14% !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-    column-gap:4% !important;
+    grid-template-columns:34% minmax(0,1fr) !important;
+    grid-template-rows:minmax(0,1fr) !important;
+    column-gap:7px !important;
     row-gap:0 !important;
-    align-items:center !important;
+    align-items:stretch !important;
     align-content:stretch !important;
-    justify-content:center !important;
+    justify-content:stretch !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    border-radius:12px !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.80),rgba(10,8,6,.86)) !important;
+    box-shadow:0 6px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,232,180,.025) !important;
     box-sizing:border-box !important;
 }
 
-/* 中央立繪：先空框，日後只換圖片，不再重改版面 */
 #game-stage #inventoryPage .inventory-portrait-frame{
-    grid-column:2 !important;
-    grid-row:1 / 4 !important;
+    grid-column:1 !important;
+    grid-row:1 !important;
     width:100% !important;
     height:100% !important;
     min-height:0 !important;
@@ -163,8 +166,8 @@
     align-self:stretch !important;
     justify-self:stretch !important;
     margin:0 !important;
-    border-width:2px !important;
-    border-radius:14px !important;
+    border-width:1px !important;
+    border-radius:9px !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
@@ -176,48 +179,52 @@
     letter-spacing:2px !important;
 }
 
-/* 六裝備：左右各三格，真正做正方形 */
 #game-stage #inventoryPage .inventory-equipment-grid{
-    grid-column:1 / 4 !important;
-    grid-row:1 / 4 !important;
+    grid-column:2 !important;
+    grid-row:1 !important;
     width:100% !important;
     height:100% !important;
     display:grid !important;
-    grid-template-columns:14% 64% 14% !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-    column-gap:4% !important;
-    row-gap:0 !important;
-    align-items:center !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    grid-template-rows:repeat(2,minmax(0,1fr)) !important;
+    gap:5px !important;
+    align-items:stretch !important;
     align-content:stretch !important;
     pointer-events:auto !important;
     z-index:3 !important;
     box-sizing:border-box !important;
 }
 #game-stage #inventoryPage .inventory-equipment-cell{
+    position:relative !important;
     width:100% !important;
     min-width:0 !important;
     min-height:0 !important;
-    align-self:center !important;
-    justify-self:center !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:stretch !important;
-    justify-content:center !important;
-    gap:3px !important;
+    align-self:stretch !important;
+    justify-self:stretch !important;
+    display:block !important;
     box-sizing:border-box !important;
 }
 #game-stage #inventoryPage .inventory-equipment-cell:nth-child(1){grid-column:1 !important;grid-row:1 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(2){grid-column:3 !important;grid-row:1 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(3){grid-column:1 !important;grid-row:2 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(4){grid-column:3 !important;grid-row:2 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(5){grid-column:1 !important;grid-row:3 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(6){grid-column:3 !important;grid-row:3 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(2){grid-column:2 !important;grid-row:1 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(3){grid-column:3 !important;grid-row:1 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(4){grid-column:1 !important;grid-row:2 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(5){grid-column:2 !important;grid-row:2 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(6){grid-column:3 !important;grid-row:2 !important;}
 #game-stage #inventoryPage .inventory-equipment-slot-label{
-    width:100% !important;
+    position:absolute !important;
+    left:4px !important;
+    right:4px !important;
+    bottom:3px !important;
+    z-index:4 !important;
+    width:auto !important;
+    min-width:0 !important;
+    padding:2px 3px !important;
+    border-radius:5px !important;
     text-align:center !important;
-    font-size:12px !important;
-    line-height:1 !important;
-    color:#d6c29a !important;
+    font-size:10px !important;
+    line-height:1.15 !important;
+    color:#b7a88f !important;
+    background:linear-gradient(180deg,transparent,rgba(4,3,2,.82)) !important;
     white-space:nowrap !important;
     overflow:hidden !important;
     text-overflow:ellipsis !important;
@@ -225,15 +232,15 @@
 }
 #game-stage #inventoryPage .inventory-equipment-slot{
     width:100% !important;
-    aspect-ratio:1 / 1 !important;
-    height:auto !important;
+    height:100% !important;
     min-width:0 !important;
     min-height:0 !important;
-    align-self:center !important;
-    justify-self:center !important;
-    border-width:2px !important;
-    border-radius:10px !important;
-    padding:4px !important;
+    aspect-ratio:auto !important;
+    align-self:stretch !important;
+    justify-self:stretch !important;
+    border-width:1px !important;
+    border-radius:8px !important;
+    padding:4px 4px 17px !important;
     box-sizing:border-box !important;
 }
 #game-stage #inventoryPage .inventory-equipment-icon{
@@ -389,17 +396,18 @@
 
 /* V75 explicit visual frames — not dependent on legacy border defaults */
 #game-stage #inventoryPage .inventory-portrait-frame{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.82),rgba(10,8,5,.92)) !important;
-    box-shadow:inset 0 0 0 1px rgba(240,180,41,.12) !important;
+    border:1px solid rgba(200,154,72,.34) !important;
+    background:#0a0806 !important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.035) !important;
 }
 #game-stage #inventoryPage .inventory-equipment-slot{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.88),rgba(10,8,5,.96)) !important;
-    box-shadow:inset 0 0 0 1px rgba(240,180,41,.10) !important;
+    border:1px solid rgba(216,216,216,.42) !important;
+    background:linear-gradient(180deg,#17130e,#0b0907) !important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.035) !important;
 }
 #game-stage #inventoryPage .inventory-stats-panel,
 #game-stage #inventoryPage .inventory-right-panel{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.90),rgba(12,9,6,.96)) !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.80),rgba(10,8,6,.86)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,232,180,.025) !important;
 }
