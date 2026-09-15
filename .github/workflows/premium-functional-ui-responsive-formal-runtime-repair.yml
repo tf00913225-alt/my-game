@@ -61,6 +61,11 @@ jobs:
               'if(!target){ if(child.exitCode===null) child.kill("SIGKILL"); throw new Error(`Chrome DevTools page target unavailable (exit=${child.exitCode}): ${stderr}`); }',
               1
           )
+          old_assert='assert.ok(data.majorMin>=44,`${surface} major hit area ${data.majorMin}`);'
+          new_assert='if(data.majorMin<44){const details=await evaluate(client,"[...document.querySelectorAll(\\\".qa-major\\\")].map((el,i)=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {i,id:el.id,className:String(el.className),text:el.textContent.trim().slice(0,30),computedMinHeight:c.minHeight,computedHeight:c.height,rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}}})");throw new Error(`${surface} major hit area ${data.majorMin}: ${JSON.stringify(details)}`);}'
+          if old_assert not in t:
+              raise SystemExit('major hit-area assertion anchor missing')
+          t=t.replace(old_assert,new_assert,1)
           p.write_text(t)
           PY
           git diff --check
