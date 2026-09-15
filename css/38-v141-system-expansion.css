@@ -687,14 +687,22 @@
 
 /* ----- Compact experience pool: clear hierarchy without oversized buttons ----- */
 #game-stage #homeExpPoolCard .exp-pool-hero{
+    position:relative;
     padding:12px 13px 11px;
+    border:1px solid rgba(200,154,72,.30);
     border-radius:11px;
+    background:linear-gradient(155deg,rgba(35,26,16,.90),rgba(10,8,6,.93));
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.035);
 }
 #game-stage #homeExpPoolCard .exp-pool-kicker{font-size:9px;}
 #game-stage #homeExpPoolCard .exp-pool-title{font-size:18px;}
 #game-stage #homeExpPoolCard .exp-pool-value{font-size:30px;}
 #game-stage #homeExpPoolCard .exp-pool-caption{margin-top:7px;font-size:13px !important;line-height:1.45;}
-#game-stage #homeExpPoolCard .exp-pool-section-head{margin:9px 3px 5px;}
+#game-stage #homeExpPoolCard .exp-pool-section-head{
+    margin:10px 3px 6px;
+    padding-bottom:6px;
+    border-bottom:1px solid rgba(200,154,72,.16);
+}
 #game-stage #homeExpPoolCard .exp-pool-section-head span{font-size:14px;}
 #game-stage #homeExpPoolCard .exp-pool-section-head small{font-size:11px;}
 #game-stage #homeExpPoolCard .exp-pool-character-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}

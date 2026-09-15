@@ -4212,9 +4212,12 @@ button:active{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    margin-bottom:8px;
+    min-height:52px;
+    margin:0;
+    padding:4px 0;
+    border-bottom:1px solid rgba(200,154,72,.14);
     font-size:13px;
-    gap:6px;
+    gap:8px;
 }
 
 /*
@@ -4434,39 +4437,29 @@ button:active{
 }
 
 .status-btn{
-    width:28px;
-    height:28px;
-
-    flex:0 0 28px;
-
-    border:0;
-    border-radius:6px;
-
-    background:#2e2822;
-    color:#f2ead9;
-
-    font-size:16px;
-
-    /*
-       ★ 新增（依照使用者要求，「加點要
-       新增長按快速加點」）：
-       選長按這個方案（不是雙箭頭+10），
-       因為不用多刻一顆按鈕、不用改版面，
-       單純在原本的+/-按鈕上加「按住不放
-       持續加點」的行為，對玩家來說操作
-       方式沒有變，只是多了一個「按久一點
-       會變快」的隱藏加速功能，學習成本
-       最低。
-    */
-
+    width:44px;
+    height:44px;
+    flex:0 0 44px;
+    border:1px solid rgba(200,154,72,.38);
+    border-radius:9px;
+    background:linear-gradient(180deg,#2b2419,#14110d);
+    color:#ead9b4;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.04);
+    font-size:20px;
+    font-weight:900;
     -webkit-tap-highlight-color:transparent;
     -webkit-touch-callout:none;
     user-select:none;
 }
 
 .status-points-line{
+    margin:10px 0 6px;
+    padding:8px 10px;
+    border-left:2px solid #c89a48;
+    background:rgba(18,13,8,.58);
+    color:#d8c7a6;
     font-size:12px;
-    margin:4px 0;
+    line-height:1.45;
 }
 
 /*
@@ -4540,19 +4533,16 @@ button:active{
 
 .status-confirm{
     width:100%;
-
-    margin-top:6px;
-    padding:7px;
-
-    border:0;
-    border-radius:8px;
-
-    background:var(--theme-accent-bg);
-    color:var(--theme-text-gold);
-
-    font-weight:bold;
-
-    font-size:13px;
+    min-height:44px;
+    margin-top:8px;
+    padding:8px 12px;
+    border:1px solid #c89a48;
+    border-radius:9px;
+    background:linear-gradient(180deg,#5a401f,#28180c);
+    color:#fff0c2;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.06);
+    font-weight:900;
+    font-size:14px;
 }
 
 .status-confirm:disabled{
@@ -4604,21 +4594,18 @@ button:active{
 }
 
 .skill-loadout-slot{
-    padding:4px 2px;
-
-    background:#241a0c;
-
-    border:1px solid var(--theme-border);
-    border-radius:8px;
-
+    min-height:60px;
+    padding:6px 4px;
+    background:radial-gradient(circle at 50% 28%,rgba(200,154,72,.10),transparent 44%),#100d09;
+    border:1px solid rgba(200,154,72,.30);
+    border-radius:9px;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.03);
     font-size:10px;
-
     text-align:center;
-
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:3px;
+    gap:4px;
 }
 
 .skill-loadout-slot-icon{
@@ -4680,23 +4667,14 @@ button:active{
 .skill-row{
     display:flex;
     align-items:stretch;
-    gap:6px;
-
-    padding:8px;
-
-    background:#241a0c;
-
-    border:1px solid var(--theme-border);
-    border-radius:8px;
-
-    /*
-       ★ 修正（依照使用者要求，「字體都
-       縮小」）：13px→11px，配合視窗放寬，
-       文字不會再被擠到整條換行。
-    */
-
+    gap:8px;
+    min-height:60px;
+    padding:8px 7px;
+    background:linear-gradient(145deg,rgba(29,22,14,.72),rgba(10,8,6,.82));
+    border:1px solid rgba(200,154,72,.18);
+    border-radius:9px;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.025);
     font-size:11px;
-
     line-height:1.5;
 }
 
@@ -4732,20 +4710,16 @@ button:active{
 */
 
 .skill-action-card{
-    flex:0 0 46px;
-
-    width:46px;
-
+    flex:0 0 48px;
+    width:48px;
+    min-height:44px;
     display:flex;
     flex-direction:column;
-
-    border-radius:5px;
+    border-radius:7px;
     overflow:hidden;
-
-    border:1px solid var(--theme-border);
-
+    border:1px solid rgba(200,154,72,.38);
+    background:#100d09;
     cursor:pointer;
-
     -webkit-tap-highlight-color:transparent;
 }
 
