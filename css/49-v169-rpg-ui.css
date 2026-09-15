@@ -95,6 +95,7 @@
     height:1px;
     background:linear-gradient(90deg,transparent,#c69a50,transparent);
     opacity:.72;
+    pointer-events:none;
 }
 
 .v169-rpg-dialog::before{ top:14px; }
@@ -112,6 +113,7 @@
     font-size:16px;
     line-height:20px;
     text-shadow:0 0 8px rgba(240,180,41,.45);
+    pointer-events:none;
 }
 
 .v169-rpg-dialog[data-tone="danger"]{
@@ -202,6 +204,22 @@
 .v169-rpg-dialog-button:focus-visible{
     outline:2px solid #fff0b3;
     outline-offset:2px;
+}
+
+/* Premium functional UI: announcement is a reading surface, not a dashboard card. */
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) #homeFeatureModalBody > div[style*="line-height:1.8"]{
+    max-width:34em;
+    margin:0 auto;
+    padding:4px 3px 16px;
+    color:#ded1b8;
+    font-size:15px !important;
+    line-height:1.8 !important;
+    letter-spacing:.015em;
+    overflow-wrap:anywhere;
+}
+#game-stage .home-feature-modal-box::before,
+#game-stage .home-feature-modal-box::after{
+    pointer-events:none;
 }
 
 /* Stop the two perpetual modal glows that caused video-visible flashing. */

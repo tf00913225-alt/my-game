@@ -27,9 +27,14 @@
 #game-stage #homeFeatureModalBody .home-feature-row{
     min-height:48px;
     gap:10px;
-    padding:9px 10px;
+    padding:10px 4px;
     font-size:15px;
     line-height:1.5;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.14);
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
 }
 
 #game-stage #homeFeatureModalBody .home-feature-row span[style*="font-size:11px"]{
