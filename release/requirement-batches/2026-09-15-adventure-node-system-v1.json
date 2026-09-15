@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-15-adventure-node-system-v1",
+  "baseBranch": "dev",
+  "baseCommit": "a68d2f9b9db5f5a83c951b6c8e7027d338094eac",
+  "workBranch": "feature/adventure-node-system-v1-20260915",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "PENDING_CI",
+  "requirements": [
+    {"id":"ADV-01","status":"VERIFIED_LOCAL","requirement":"主城以正式 lazy feature 入口進入出城冒險，完整頁掛在 #game-content，不建立第二套 stage scaler","evidence":["js/adventure/adventure-entry-v1-20260915.js","js/adventure/adventure-ui-v1-20260915.js","css/adventure-entry-v1-20260915.css","css/adventure-v1-20260915.css"]},
+    {"id":"ADV-02","status":"VERIFIED_LOCAL","requirement":"Adventure 章節、節點、事件、委託、商人與獎勵均為資料驅動且只有單一 Adventure Runtime owner","evidence":["js/adventure/adventure-content-v1-20260915.js","js/adventure/adventure-runtime-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-03","status":"VERIFIED_LOCAL","requirement":"普通、精英與 Boss 節點沿用既有正式 v132LaunchDungeonBattle，不建立第二套 battle runtime","evidence":["js/adventure/adventure-runtime-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-04","status":"VERIFIED_LOCAL","requirement":"戰後 HP/SP 保留；戰敗留原節點且不得因副本 failure normalize 免費回滿","evidence":["js/adventure/adventure-runtime-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-05","status":"VERIFIED_LOCAL","requirement":"休息節點只使用一次，存活隊員 HP/SP 各恢復最大值 30%","evidence":["js/adventure/adventure-runtime-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-06","status":"VERIFIED_LOCAL","requirement":"野怪委託只從玩家已開放區域選目標，基礎掉落 40%，連續 3 次未掉第 4 次保底，current/target 不進背包","evidence":["js/adventure/adventure-runtime-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-07","status":"VERIFIED_LOCAL","requirement":"自動巡怪與自動戰鬥皆可透過既有擊殺紀錄推進委託；完成後野怪區 HUD 可返回原節點，戰鬥中禁止硬切","evidence":["js/adventure/adventure-runtime-v1-20260915.js","js/adventure/adventure-ui-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-08","status":"VERIFIED_LOCAL","requirement":"每章最多一個主要岔路；首次只能選一側；通關後可直接回溯另一側；首通獎勵不可重複","evidence":["js/adventure/adventure-content-v1-20260915.js","js/adventure/adventure-runtime-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-09","status":"VERIFIED_LOCAL","requirement":"神秘商人使用固定隱藏位置、25% 章節一次判定、同章購買狀態永久保存","evidence":["js/adventure/adventure-content-v1-20260915.js","js/adventure/adventure-runtime-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-10","status":"VERIFIED_LOCAL","requirement":"九轉回元丹 HP 100%、太清聚氣丹 SP 100%，沿用補品消耗角色行動，可永久囤積，manualOnly 不進自動補品候選","evidence":["js/adventure/adventure-items-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-11","status":"VERIFIED_LOCAL","requirement":"四象世界觀元素只使用火、水、風、土，裝備套裝名稱不作為地區或勢力","evidence":["js/adventure/adventure-content-v1-20260915.js","tests/adventure-node-system-v1.test.js"]},
+    {"id":"ADV-12","status":"PENDING_CI","requirement":"360×800、390×844、412×915 正式 Chrome QA 無水平 overflow、文字裁切、HUD/按鈕重疊，safe-area、裝飾 pointer-events 與 reduced-motion 正常","evidence":[".github/scripts/run-adventure-browser-qa.mjs",".github/workflows/ci.yml"]},
+    {"id":"ADV-13","status":"PENDING_CI","requirement":"content-hashed Adventure feature artifacts、manifest、loader、release gates 與 git diff checks 全數同步","evidence":["config/feature-manifest.json","scripts/build-production.mjs","asset-manifest.json",".github/workflows/ci.yml"]}
+  ],
+  "automatedVerification": "LOCAL_TARGETED_REGRESSION_PASS; FORMAL_REPOSITORY_CHECKS_AND_BROWSER_QA_PENDING_PR_CI",
+  "visualVerification": "PENDING_FORMAL_CHROME_CI_360X800_390X844_412X915",
+  "verifiedDevCommit": null,
+  "promotionApproval": "DEV_ONLY_MAIN_FORBIDDEN"
+}
