@@ -380,6 +380,96 @@
         };
     }
 
+    /* ----- Premium Functional UI / Batch A: selected character hero metadata. ----- */
+    function clampHeroResource(value,max){
+        const safeMax=Math.max(0,Math.floor(Number(max)||0));
+        const safeValue=Math.max(0,Math.min(safeMax,Math.floor(Number(value)||0)));
+        return {value:safeValue,max:safeMax,ratio:safeMax>0?safeValue/safeMax:0};
+    }
+
+    function ensureHeroMeta(choice){
+        let meta=choice.querySelector(":scope > .v169-character-hero-meta");
+        if(meta){ return meta; }
+
+        meta=document.createElement("div");
+        meta.className="v169-character-hero-meta";
+        meta.setAttribute("aria-label","角色即時資源");
+        meta.innerHTML=
+            '<span class="v169-character-element"></span>'+
+            '<div class="v169-character-resource hp"><div class="v169-character-resource-head"><span>HP</span><b class="v169-character-hp-value"></b></div><div class="v169-character-resource-track"><i class="v169-character-resource-fill"></i></div></div>'+
+            '<div class="v169-character-resource sp"><div class="v169-character-resource-head"><span>SP</span><b class="v169-character-sp-value"></b></div><div class="v169-character-resource-track"><i class="v169-character-resource-fill"></i></div></div>';
+        choice.appendChild(meta);
+        return meta;
+    }
+
+    function syncCharacterHeroPresentation(){
+        const modal=document.getElementById("homeFeatureModal");
+        if(!modal||!modal.querySelector(".home-feature-modal-box.wide")){ return; }
+
+        const choices=Array.from(modal.querySelectorAll(".character-showcase-choice"));
+        const selected=choices.find(choice=>choice.classList.contains("is-current-character"));
+        choices.forEach(choice=>{
+            if(choice!==selected){
+                const stale=choice.querySelector(":scope > .v169-character-hero-meta");
+                if(stale){ stale.remove(); }
+            }
+        });
+        if(!selected){ return; }
+
+        const avatar=selected.querySelector(":scope > .character-showcase-avatar[id^='characterAvatar']");
+        const match=avatar&&avatar.id.match(/^characterAvatar(\d+)$/);
+        if(!match){ return; }
+
+        const index=Number(match[1]);
+        const character=typeof getPartyCharacterByIndex==="function"
+            ?getPartyCharacterByIndex(index)
+            :null;
+        const stats=typeof getPartyBattleStats==="function"
+            ?getPartyBattleStats(index)
+            :null;
+        if(!character||!stats){ return; }
+
+        const meta=ensureHeroMeta(selected);
+        const elementLabel=typeof elementDatabase!=="undefined"&&elementDatabase[character.element]
+            ?elementDatabase[character.element].name
+            :String(character.element||"");
+        const hp=clampHeroResource(character.hp,stats.maxHP);
+        const sp=clampHeroResource(character.sp,stats.maxSP);
+
+        const element=meta.querySelector(".v169-character-element");
+        const hpValue=meta.querySelector(".v169-character-hp-value");
+        const spValue=meta.querySelector(".v169-character-sp-value");
+        const hpFill=meta.querySelector(".v169-character-resource.hp .v169-character-resource-fill");
+        const spFill=meta.querySelector(".v169-character-resource.sp .v169-character-resource-fill");
+
+        if(element){ element.textContent=elementLabel?elementLabel+"元素":""; }
+        if(hpValue){ hpValue.textContent=hp.value.toLocaleString("zh-TW")+" / "+hp.max.toLocaleString("zh-TW"); }
+        if(spValue){ spValue.textContent=sp.value.toLocaleString("zh-TW")+" / "+sp.max.toLocaleString("zh-TW"); }
+        if(hpFill){ hpFill.style.width=(hp.ratio*100).toFixed(2)+"%"; }
+        if(spFill){ spFill.style.width=(sp.ratio*100).toFixed(2)+"%"; }
+    }
+    window.v169SyncCharacterHeroPresentation=syncCharacterHeroPresentation;
+
+    function wrapHeroPresentationSync(functionName){
+        const previous=window[functionName];
+        if(typeof previous!=="function"){ return; }
+        window[functionName]=function(){
+            const result=previous.apply(this,arguments);
+            syncCharacterHeroPresentation();
+            if(typeof requestAnimationFrame==="function"){
+                requestAnimationFrame(syncCharacterHeroPresentation);
+            }
+            return result;
+        };
+    }
+    ["openHomeFeature","selectCharacterForTabs","refreshCharacterAvatarLevels","confirmStatus"].forEach(wrapHeroPresentationSync);
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",syncCharacterHeroPresentation,{once:true});
+    }else{
+        syncCharacterHeroPresentation();
+    }
+
     /* equipment-progression follows this source inside gameplay-core's fixed execution order. */
 
     /* ----- Dungeon backpack: reuse the one inventory DOM above the map. ----- */
