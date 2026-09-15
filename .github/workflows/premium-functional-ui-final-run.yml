@@ -1,4 +1,4 @@
-name: Premium Functional UI Finalization
+name: Premium Functional UI Workflow Cleanup
 
 on:
   push:
@@ -11,85 +11,21 @@ permissions:
   contents: write
 
 jobs:
-  finalize:
+  cleanup:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           ref: feature/premium-functional-ui
-          fetch-depth: 0
+          fetch-depth: 20
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      - name: Build synchronized content-hashed production assets
+      - name: Remove temporary premium UI workflows
         run: |
           set -euo pipefail
-          npm run build
-          npm run build:check
-
-      - name: Write verified requirement batch
-        run: |
-          set -euo pipefail
-          node <<'NODE'
-          const fs=require('node:fs');
-          const cp=require('node:child_process');
-          const file='release/requirement-batches/2026-09-15-premium-functional-ui.json';
-          const head=cp.execSync('git rev-parse HEAD',{encoding:'utf8'}).trim();
-          const batch={
-            schemaVersion:1,
-            batchId:'2026-09-15-premium-functional-ui',
-            baseBranch:'dev',
-            baseCommit:'7edc8e25e60b66ce88ce96e0e0076feb61e7a6d3',
-            sourceCommit:head,
-            officialVersion:'173.65',
-            officialVersionBumpAllowed:false,
-            overallStatus:'VERIFIED',
-            requirements:[
-              {id:'PFUI-01',status:'VERIFIED',requirement:'登入、系統、帳號、存檔沿用正式功能 owner，只統一黑金層級與危險操作 presentation',evidence:['css/37-v139-rested-experience.css','tests/premium-functional-ui-batch1.test.js','GitHub Actions run 34989050901']},
-              {id:'PFUI-02',status:'VERIFIED',requirement:'角色經驗池、升級、六能力 pending 配點、裝備與技能 runtime 不變並完成 presentation 統一',evidence:['css/00-main.css','css/31-v131-fix-batch.css','css/38-v141-system-expansion.css','tests/premium-functional-ui-batch2.test.js','GitHub Actions run 34989050901']},
-              {id:'PFUI-03',status:'VERIFIED',requirement:'背包維持最新正式 18 格 × 7 頁，秘寶與物品詳情只改 presentation',evidence:['css/22-stage-v78-character-inventory-core.css','css/23-stage-v77-inventory-detail-ui.css','css/55-team-relic-system.css','tests/premium-functional-ui-batch3.test.js','GitHub Actions run 34989050901']},
-              {id:'PFUI-04',status:'VERIFIED',requirement:'商店、合成、冶煉交易與材料規則不變，最終 cascade owner 已同步黑金層級與操作 hit area',evidence:['css/38-v141-system-expansion.css','css/49-v169-rpg-ui.css','css/53-v173.51-qa.css','tests/premium-functional-ui-batch4.test.js','GitHub Actions run 34989050901']},
-              {id:'PFUI-05',status:'VERIFIED',requirement:'成就、公告、圖鑑、任務與 shared Modal 保留正式 state/storage/scroll/modal manager 並統一 presentation',evidence:['css/25-stage-v90-quest-interface-core.css','css/38-v141-system-expansion.css','css/49-v169-rpg-ui.css','css/53-v173.51-qa.css','tests/premium-functional-ui-batch5.test.js','GitHub Actions run 34989050901']},
-              {id:'PFUI-06',status:'VERIFIED',requirement:'360×800、390×844、412×915 在 GitHub Chrome 完成 responsive composition、horizontal overflow、panel clipping、hit area 與 screenshot 驗證',evidence:['tests/premium-functional-ui-responsive-browser.test.js','GitHub Actions run 34989050901','GitHub Artifact 10405515496']}
-            ],
-            automatedVerification:'FEATURE_BRANCH_FULL_REGRESSION_AND_CHROME_QA',
-            verificationRun:34989050901,
-            targetedVerificationRun:34989050901,
-            browserEvidenceArtifactId:10405515496,
-            finalDevVerificationRun:null,
-            visualVerification:'GITHUB_CHROME_SCREENSHOT_QA',
-            promotionApproval:'PENDING_PR_TO_DEV',
-            verifiedOnDevVersion:'173.65',
-            releasedAs:null
-          };
-          fs.mkdirSync('release/requirement-batches',{recursive:true});
-          fs.writeFileSync(file,JSON.stringify(batch,null,2)+'\n');
-          NODE
-
-      - name: Clean temporary QA artifacts and verify final diff
-        run: |
-          set -euo pipefail
-          rm -rf artifacts
-          npm run build:check
-          git diff --check
-          echo '--- final git status --porcelain ---'
-          git status --porcelain
-          test ! -e artifacts
-          unexpected="$(git status --porcelain | sed -E 's/^.. //' | grep -Ev '^(build/|asset-manifest\.json$|index\.html$|release/requirement-batches/2026-09-15-premium-functional-ui\.json$)' || true)"
-          if [ -n "$unexpected" ]; then
-            printf 'Unexpected final output:\n%s\n' "$unexpected" >&2
-            exit 1
-          fi
-
-      - name: Commit content-hashed build and requirement evidence
-        run: |
-          set -euo pipefail
+          git rm .github/workflows/premium-functional-ui-final-run.yml .github/workflows/premium-functional-ui-finalize.yml
+          git diff --cached --check
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A build asset-manifest.json index.html release/requirement-batches/2026-09-15-premium-functional-ui.json
-          git diff --cached --check
-          git commit -m "chore: sync premium UI build and verification evidence"
+          git commit -m "chore: remove premium UI temporary verification workflows"
           git push origin HEAD:feature/premium-functional-ui
