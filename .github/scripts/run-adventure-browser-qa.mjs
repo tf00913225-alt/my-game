@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
-import {spawnSync} from "node:child_process";
+import {spawn,spawnSync} from "node:child_process";
 
 const ROOT=process.cwd();
 const ARTIFACT_DIR=path.join(ROOT,"artifacts/browser-qa");
-const FIXTURE=path.join(ROOT,".adventure-browser-qa.html");
 const VIEWPORTS=[[360,800],[390,844],[412,915]];
 
 function findChrome(){
@@ -16,9 +16,43 @@ function findChrome(){
     throw new Error("Headless Chrome/Chromium is required for Adventure browser QA.");
 }
 function read(file){ return fs.readFileSync(path.join(ROOT,file),"utf8"); }
-function fileHref(file){ return new URL("file://"+path.resolve(ROOT,file).replace(/\\/g,"/")).href; }
-function decodeHtml(text){
-    return text.replace(/&quot;/g,'"').replace(/&#39;|&#x27;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&");
+function sleep(ms){ return new Promise(resolve=>setTimeout(resolve,ms)); }
+async function waitForFile(file,timeoutMs=10000){
+    const deadline=Date.now()+timeoutMs;
+    while(Date.now()<deadline){
+        if(fs.existsSync(file)){ return; }
+        await sleep(50);
+    }
+    throw new Error(`Timed out waiting for Chrome DevTools endpoint: ${file}`);
+}
+function openCdp(webSocketDebuggerUrl){
+    const socket=new WebSocket(webSocketDebuggerUrl);
+    const pending=new Map();
+    let nextId=1;
+    const ready=new Promise((resolve,reject)=>{
+        socket.addEventListener("open",resolve,{once:true});
+        socket.addEventListener("error",reject,{once:true});
+    });
+    socket.addEventListener("message",event=>{
+        const message=JSON.parse(String(event.data));
+        if(!message.id||!pending.has(message.id)){ return; }
+        const request=pending.get(message.id);
+        pending.delete(message.id);
+        if(message.error){ request.reject(new Error(message.error.message)); }
+        else{ request.resolve(message.result); }
+    });
+    return {
+        ready,
+        send:async(method,params={})=>{
+            await ready;
+            const id=nextId++;
+            return new Promise((resolve,reject)=>{
+                pending.set(id,{resolve,reject});
+                socket.send(JSON.stringify({id,method,params}));
+            });
+        },
+        close:()=>socket.close()
+    };
 }
 
 const manifest=JSON.parse(read("asset-manifest.json"));
@@ -35,9 +69,9 @@ assert.match(sourceCss,/env\(safe-area-inset-top\)/);
 assert.match(sourceCss,/env\(safe-area-inset-bottom\)/);
 assert.match(sourceCss,/prefers-reduced-motion\s*:\s*reduce/i);
 assert.doesNotMatch(sourceCss,/transform\s*:\s*scale\s*\(/i,"Adventure feature CSS must not own whole-surface scaling");
+const builtCss=[...entryBundle.styles,...adventureBundle.styles]
+    .map(read).join("\n").replace(/<\/style/gi,"<\\/style");
 
-const cssLinks=[...entryBundle.styles,...adventureBundle.styles]
-    .map(file=>`<link rel="stylesheet" href="${fileHref(file)}">`).join("\n");
 const scenarios={
     home:`<div id="homePage" style="position:relative;width:100%;height:100%;background:#17140f"><div id="adventureHomeAxis" class="adventure-home-axis"><span class="adventure-home-gate" aria-hidden="true"></span><button id="adventureHomeEntry" class="adventure-home-entry"><span class="adventure-home-kicker">江湖主線 · 章節推進</span><strong>出城冒險</strong><span class="adventure-home-notice"></span></button></div></div>`,
     map:`<section id="adventurePage" class="adventure-page"><div class="adventure-scene-decor"><span class="adventure-mist mist-a"></span></div><header class="adventure-header"><button class="adventure-back-button">返回主城</button><div class="adventure-heading"><span>出城冒險</span><strong>山關初行</strong></div><div class="adventure-header-meta"><span>建議 Lv.10</span><span>主線章節</span></div></header><div class="adventure-view"><section class="adventure-map-screen"><div class="adventure-map-caption"><span>第一章 · 山關初行</span><b>建議 Lv.10</b></div><div class="adventure-map-canvas"><svg class="adventure-road-layer" viewBox="0 0 1000 1500"><path class="adventure-road-main" d="M200 1250L500 800L650 350"></path></svg><button class="adventure-node type-battle status-completed" style="--node-x:22%;--node-y:78%"><span class="adventure-node-icon">戰</span><span class="adventure-node-copy"><strong>山道伏影</strong><small>已完成</small></span></button><button class="adventure-node type-objective status-current" style="--node-x:50%;--node-y:53%"><span class="adventure-node-icon">令</span><span class="adventure-node-copy"><strong>村民委託</strong><small>前往野怪區</small></span></button><button class="adventure-node type-rest status-available" style="--node-x:30%;--node-y:31%"><span class="adventure-node-icon">休</span><span class="adventure-node-copy"><strong>落雁驛</strong><small>休息</small></span></button><button class="adventure-node type-boss status-boss" style="--node-x:70%;--node-y:12%"><span class="adventure-node-icon">首</span><span class="adventure-node-copy"><strong>黑松寨主</strong><small>Boss</small></span></button></div><footer class="adventure-map-footer"><span>首次岔路：林間小徑</span><span>主線推不動時，可先回野怪區養成，再回來看看下一節。</span></footer></section></div></section>`,
@@ -48,7 +82,7 @@ const scenarios={
 };
 
 function fixtureHtml(){
-    return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${cssLinks}<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050505}*{box-sizing:border-box}#game-viewport{position:fixed;inset:0;overflow:hidden;background:#050505}#game-stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:center center}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6666667px;transform:scale(${1080/420});transform-origin:top left;overflow:hidden}#qa-result{display:none}</style></head><body><div id="game-viewport"><div id="game-stage"><div id="game-content"></div></div></div><pre id="qa-result"></pre><script>
+    return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>${builtCss}</style><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050505}*{box-sizing:border-box}#game-viewport{position:fixed;inset:0;overflow:hidden;background:#050505}#game-stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:center center}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6666667px;transform:scale(${1080/420});transform-origin:top left;overflow:hidden}#qa-result{display:none}</style></head><body><div id="game-viewport"><div id="game-stage"><div id="game-content"></div></div></div><pre id="qa-result"></pre><script>
 const scenarios=${JSON.stringify(scenarios)};const errors=[];
 window.onerror=(message,source,line,column)=>errors.push(String(message)+"@"+line+":"+column);
 window.onunhandledrejection=event=>errors.push(String(event.reason||"unhandled rejection"));
@@ -78,39 +112,104 @@ run();
 </script></body></html>`;
 }
 
-const chrome=findChrome();fs.mkdirSync(ARTIFACT_DIR,{recursive:true});const evidence=[];
-try{
-    for(const [width,height] of VIEWPORTS){
-        for(const reduced of [false,...(width===390&&height===844?[true]:[])]){
-            fs.writeFileSync(FIXTURE,fixtureHtml(),"utf8");
-            const args=["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1","--virtual-time-budget=1500",`--window-size=${width},${height}`];
-            if(reduced){args.push("--force-prefers-reduced-motion=reduce");}
-            args.push("--dump-dom",fileHref(FIXTURE));
-            const run=spawnSync(chrome,args,{cwd:ROOT,encoding:"utf8",timeout:30000,maxBuffer:16*1024*1024});
-            if(run.error)throw run.error;
-            if(run.status!==0)throw new Error(`Chrome Adventure QA failed to launch at ${width}x${height}: ${run.stderr||run.stdout}`);
-            const match=run.stdout.match(/<pre id="qa-result">QA_JSON:([\s\S]*?)<\/pre>/);
-            assert.ok(match,`missing QA metrics at ${width}x${height}`);
-            const data=JSON.parse(decodeHtml(match[1]));
-            assert.deepEqual(data.errors,[],`console/runtime errors at ${width}x${height}`);
-            for(const result of data.results){
-                assert.equal(result.rootOutside,false,`${result.name}: root outside viewport at ${width}x${height}`);
-                assert.deepEqual(result.badButtons,[],`${result.name}: buttons outside viewport at ${width}x${height}`);
-                assert.deepEqual(result.overlaps,[],`${result.name}: buttons overlap at ${width}x${height}`);
-                assert.deepEqual(result.clipped,[],`${result.name}: readable text clips at ${width}x${height}`);
-                assert.deepEqual(result.badPointer,[],`${result.name}: decorative layer captures pointer events at ${width}x${height}`);
-                assert.equal(result.docOverflow,false,`${result.name}: document overflow at ${width}x${height}`);
-                if(result.name==="tracker"){
-                    assert.equal(result.trackerOverlapPlayer,0,`objective HUD overlaps player at ${width}x${height}`);
-                    assert.equal(result.trackerOverlapControl,0,`objective HUD overlaps control at ${width}x${height}`);
-                }
-            }
-            if(reduced){assert.equal(data.reduced,true,"Chrome reduced-motion emulation must be active");assert.equal(data.reducedAnimation,"none","Adventure home breathing animation must stop under reduced motion");}
-            evidence.push(data);
+async function runChromeViewport(chrome,width,height,reduced){
+    const profile=fs.mkdtempSync(path.join(os.tmpdir(),"adventure-browser-qa-"));
+    let stderr="";
+    const proc=spawn(chrome,[
+        "--headless=new",
+        "--no-sandbox",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--force-device-scale-factor=1",
+        "--remote-debugging-port=0",
+        `--user-data-dir=${profile}`,
+        "about:blank"
+    ],{cwd:ROOT,stdio:["ignore","ignore","pipe"]});
+    proc.stderr.setEncoding("utf8");
+    proc.stderr.on("data",chunk=>{ stderr+=chunk; });
+    let cdp=null;
+    try{
+        const activePortFile=path.join(profile,"DevToolsActivePort");
+        await waitForFile(activePortFile,10000);
+        const [port]=fs.readFileSync(activePortFile,"utf8").trim().split(/\r?\n/);
+        let pages=[];
+        for(let attempt=0;attempt<100;attempt++){
+            try{
+                pages=await fetch(`http://127.0.0.1:${port}/json/list`).then(response=>response.json());
+                if(pages.some(page=>page.type==="page")){ break; }
+            }catch(_){ }
+            await sleep(50);
+        }
+        const page=pages.find(candidate=>candidate.type==="page");
+        assert.ok(page?.webSocketDebuggerUrl,`Chrome DevTools page target unavailable at ${width}x${height}: ${stderr}`);
+        cdp=openCdp(page.webSocketDebuggerUrl);
+        await cdp.ready;
+        await cdp.send("Page.enable");
+        await cdp.send("Runtime.enable");
+        await cdp.send("Emulation.setDeviceMetricsOverride",{
+            width,
+            height,
+            deviceScaleFactor:1,
+            mobile:true,
+            screenWidth:width,
+            screenHeight:height,
+            positionX:0,
+            positionY:0,
+            screenOrientation:{type:"portraitPrimary",angle:0}
+        });
+        await cdp.send("Emulation.setTouchEmulationEnabled",{enabled:true,maxTouchPoints:5});
+        await cdp.send("Emulation.setEmulatedMedia",{
+            features:[{name:"prefers-reduced-motion",value:reduced?"reduce":"no-preference"}]
+        });
+        const frameTree=await cdp.send("Page.getFrameTree");
+        await cdp.send("Page.setDocumentContent",{frameId:frameTree.frameTree.frame.id,html:fixtureHtml()});
+        let qaText="";
+        for(let attempt=0;attempt<100;attempt++){
+            const evaluation=await cdp.send("Runtime.evaluate",{
+                expression:'document.getElementById("qa-result")?.textContent||""',
+                returnByValue:true
+            });
+            qaText=evaluation.result?.value||"";
+            if(qaText.startsWith("QA_JSON:")){ break; }
+            await sleep(50);
+        }
+        assert.match(qaText,/^QA_JSON:/,`missing QA metrics at ${width}x${height}`);
+        return JSON.parse(qaText.slice("QA_JSON:".length));
+    }finally{
+        try{ cdp?.close(); }catch(_){ }
+        if(proc.exitCode===null){ proc.kill("SIGKILL"); }
+        if(proc.exitCode===null){ await new Promise(resolve=>proc.once("exit",resolve)); }
+        for(let attempt=0;attempt<5;attempt++){
+            try{ fs.rmSync(profile,{recursive:true,force:true}); break; }
+            catch(_){ await sleep(50); }
         }
     }
-    fs.writeFileSync(path.join(ARTIFACT_DIR,"adventure-node-system-v1.json"),JSON.stringify({generatedAt:new Date().toISOString(),evidence},null,2)+"\n");
-    console.log("✓ Adventure browser QA passed at 360x800, 390x844 and 412x915 (including reduced motion)");
-}finally{
-    try{fs.rmSync(FIXTURE,{force:true});}catch(_){ }
 }
+
+const chrome=findChrome();fs.mkdirSync(ARTIFACT_DIR,{recursive:true});const evidence=[];
+for(const [width,height] of VIEWPORTS){
+    for(const reduced of [false,...(width===390&&height===844?[true]:[])]){
+        const data=await runChromeViewport(chrome,width,height,reduced);
+        assert.deepEqual(data.viewport,[width,height],`Chrome CSS viewport must exactly match ${width}x${height}`);
+        assert.deepEqual(data.errors,[],`console/runtime errors at ${width}x${height}`);
+        for(const result of data.results){
+            assert.equal(result.rootOutside,false,`${result.name}: root outside viewport at ${width}x${height}`);
+            assert.deepEqual(result.badButtons,[],`${result.name}: buttons outside viewport at ${width}x${height}`);
+            assert.deepEqual(result.overlaps,[],`${result.name}: buttons overlap at ${width}x${height}`);
+            assert.deepEqual(result.clipped,[],`${result.name}: readable text clips at ${width}x${height}`);
+            assert.deepEqual(result.badPointer,[],`${result.name}: decorative layer captures pointer events at ${width}x${height}`);
+            assert.equal(result.docOverflow,false,`${result.name}: document overflow at ${width}x${height}`);
+            if(result.name==="tracker"){
+                assert.equal(result.trackerOverlapPlayer,0,`objective HUD overlaps player at ${width}x${height}`);
+                assert.equal(result.trackerOverlapControl,0,`objective HUD overlaps control at ${width}x${height}`);
+            }
+        }
+        if(reduced){
+            assert.equal(data.reduced,true,"Chrome reduced-motion emulation must be active");
+            assert.equal(data.reducedAnimation,"none","Adventure home breathing animation must stop under reduced motion");
+        }
+        evidence.push(data);
+    }
+}
+fs.writeFileSync(path.join(ARTIFACT_DIR,"adventure-node-system-v1.json"),JSON.stringify({generatedAt:new Date().toISOString(),evidence},null,2)+"\n");
+console.log("✓ Adventure browser QA passed at exact 360x800, 390x844 and 412x915 CSS viewports (including reduced motion)");
