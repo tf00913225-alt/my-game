@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-15-adventure-node-system-v1",
+  "baseBranch": "dev",
+  "baseCommit": "a68d2f9b9db5f5a83c951b6c8e7027d338094eac",
+  "workBranch": "feature/adventure-node-system-v1-20260915",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED_PENDING_PR_CI",
+  "requirements": [],
+  "automatedVerification": "LOCAL_TARGETED_REGRESSION_PASS; FORMAL_PR_CI_AND_CHROME_QA_PENDING",
+  "visualVerification": "PENDING_FORMAL_CHROME_CI_360X800_390X844_412X915",
+  "verifiedDevCommit": null,
+  "promotionApproval": "DEV_ONLY_MAIN_FORBIDDEN"
+}
