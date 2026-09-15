@@ -112,11 +112,7 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     min-height:44px!important;
 }
 
-#game-stage #homeFeatureModal.quest-mode .quest-tab{font-size:16px!important;min-height:42px!important
-    min-height:44px!important;
-}#game-stage #homeFeatureModal.quest-mode .quest-list{gap:10px!important}#game-stage #homeFeatureModal.quest-mode .quest-card{padding:11px 12px!important}#game-stage #homeFeatureModal.quest-mode .quest-card-name{font-size:17px!important;line-height:1.2!important}#game-stage #homeFeatureModal.quest-mode .quest-card-desc{font-size:15px!important;line-height:1.45!important;margin-top:4px!important}#game-stage #homeFeatureModal.quest-mode .quest-progress-line{font-size:14px!important}#game-stage #homeFeatureModal.quest-mode .quest-progress-line strong{font-size:15px!important}#game-stage #homeFeatureModal.quest-mode .quest-reward{font-size:14px!important;line-height:1.4!important}#game-stage #homeFeatureModal.quest-mode .quest-claim-btn{font-size:15px!important;min-width:78px!important;min-height:38px!important
-    min-height:44px!important;
-}
+#game-stage #homeFeatureModal.quest-mode .quest-tab{font-size:16px!important;min-height:44px!important;}#game-stage #homeFeatureModal.quest-mode .quest-list{gap:10px!important}#game-stage #homeFeatureModal.quest-mode .quest-card{padding:11px 12px!important}#game-stage #homeFeatureModal.quest-mode .quest-card-name{font-size:17px!important;line-height:1.2!important}#game-stage #homeFeatureModal.quest-mode .quest-card-desc{font-size:15px!important;line-height:1.45!important;margin-top:4px!important}#game-stage #homeFeatureModal.quest-mode .quest-progress-line{font-size:14px!important}#game-stage #homeFeatureModal.quest-mode .quest-progress-line strong{font-size:15px!important}#game-stage #homeFeatureModal.quest-mode .quest-reward{font-size:14px!important;line-height:1.4!important}#game-stage #homeFeatureModal.quest-mode .quest-claim-btn{font-size:15px!important;min-width:78px!important;min-height:44px!important;}
 #game-stage #homeFeatureModal.quest-mode .quest-milestone-percent{font-size:13px!important;line-height:17px!important}
 #game-stage #homeFeatureModal.quest-mode .quest-milestone-slot{min-height:46px!important;padding:5px 2px!important;font-size:15px!important;line-height:1.25!important}
 #game-stage #homeFeatureModal.quest-mode .quest-milestone-slot small{font-size:13px!important;line-height:17px!important}
