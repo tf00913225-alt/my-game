@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-15-adventure-map-footer-visibility",
+  "baseBranch": "dev",
+  "baseCommit": "cca990ec6cf34cffc82501d888d909ae2af69181",
+  "workBranch": "fix/adventure-map-footer-visibility-20260915",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "ADV-FOOTER-01",
+      "status": "IMPLEMENTED",
+      "requirement": "Adventure 地圖頁使用既有 .adventure-view 作為唯一垂直捲動容器；實際 header 高度、底部安全區與固定導覽列不得裁切 adventure-map-footer。",
+      "evidence": [
+        "css/adventure-v1-20260915.css",
+        "js/01-stage-v8-touch-lock.js",
+        "tests/adventure-node-system-v1.test.js",
+        ".github/scripts/run-adventure-browser-qa.mjs"
+      ]
+    },
+    {
+      "id": "ADV-FOOTER-02",
+      "status": "IMPLEMENTED",
+      "requirement": "360×800、390×844 與 412×915 的 Adventure 地圖頁均可捲至底部，且 footer 完整可見、沒有第二個垂直捲動容器或文字裁切。",
+      "evidence": [
+        ".github/scripts/run-adventure-browser-qa.mjs"
+      ]
+    }
+  ],
+  "automatedVerification": "TARGETED_REGRESSION_PASS; BUILD_CHECK_PASS; BROWSER_QA_PENDING_CI",
+  "visualVerification": "PENDING_CI_BROWSER_QA_360X800_390X844_412X915",
+  "promotionApproval": "DEV_ONLY_MAIN_FORBIDDEN"
+}

@@ -3835,3 +3835,10 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 巡怪形象切換／角色圖 owner 維持 `js/26-v131-patrol-appearance.js` + `css/32-v131-patrol-appearance.css`；首次遊玩兩幕與創角預備 owner 維持 `js/52-v173.20-startup-loader.js`；卡牌立繪／火箭方向的既有最終 CSS owner 為 `css/56-v174-critical-ui-regressions.css`。本輪未新增 runtime wrapper。
 - 怪物立繪基礎 owner 為 `config/monster-portrait-registry.json`、`js/45-v154-dev-fixes.js` resolver 與 `js/48-v159-abyss-battle-portraits.js` 同步橋接。四張已合入但損毀的天兵 PNG 已以既有透明母圖重新置入 1024×1536 RGBA 檔，非重新生成。
 - 已通過 monster audit（13 existing／94 planned，4 張 generated assets 均可解碼）、專項測試、124/124 非瀏覽器 Node suites、233/233 JS syntax、build deterministic、resources／IDs／loader／release gate／git diff。此環境沒有 Chromium；29 個既有瀏覽器測試留待 GitHub Actions 驗證後才可標示完整完成。
+## 2026-09-15 出城冒險地圖 footer 可見性修復（DEV PR 待 CI）
+
+- 工作分支 `fix/adventure-map-footer-visibility-20260915` 從當時最新 `dev@cca990ec6cf34cffc82501d888d909ae2af69181` 建立；本輪禁止修改或推送 `main`。
+- Adventure 唯一地圖版面 owner 仍為 `css/adventure-v1-20260915.css`。原 `.adventure-view` 以預估的 `clamp(66px,9vh,92px)` 扣除高度；實際 header 含瀏海安全區時可比預估值高，造成視窗末端與 footer 的可見區不可靠。現把既有 `#adventurePage` 收斂為 flex column，由實際 header 佔位，`.adventure-view` 維持唯一 `overflow-y:auto` scroll owner，並保留 footer 所需的 bottom safe-area padding；沒有新增第二個 scroll container 或縮小文字。
+- `js/01-stage-v8-touch-lock.js` 的既有全域 scroll whitelist 已加入 `.adventure-view`，使同一個既有 scroll owner 在手機手勢下不會被 touch lock 擋住。未改 Adventure 玩法、章節資料、事件、戰鬥、背包、主城或其他 UI。
+- 新增最小回歸：`tests/adventure-node-system-v1.test.js` 鎖定 flex owner、禁止猜測 header 高度與 touch whitelist；`.github/scripts/run-adventure-browser-qa.mjs` 會在 360×800、390×844、412×915 逐一捲到最底，驗證 footer 完整可見且地圖只有一個垂直 scroll owner。
+- 本機已通過 targeted Adventure regression、build、build check、release gate、syntax 與 `git diff --check`；完整 Node suite 與 Adventure browser QA 需由具 Chromium 的 GitHub CI 完成。本次 Requirement Batch 為 `release/requirement-batches/2026-09-15-adventure-map-footer-visibility.json`，在 CI／部署 SHA 驗證前維持 `IMPLEMENTED`。
