@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Generate formal-runtime CDP QA and diagnose controls
+      - name: Generate formal-runtime CDP QA and repair canonical hit areas
         run: |
           set -euo pipefail
           awk '/python3 <<'"'"'PY'"'"'/{capture=1;next} capture&&/^          PY$/{exit} capture{sub(/^          /,"");print}' .github/workflows/premium-functional-ui-responsive-cdp-fix.yml > /tmp/patch.py
@@ -53,13 +53,21 @@ jobs:
           t=t.replace(old_assert,diagnostic,1)
           test.write_text(t)
 
-          css=Path('css/49-v169-rpg-ui.css')
-          c=css.read_text()
+          css49=Path('css/49-v169-rpg-ui.css')
+          c=css49.read_text()
           anchor='#game-stage .home-feature-modal-box .home-feature-close-btn,\n#game-stage .item-modal-box .close-item-button,'
           if anchor not in c: raise SystemExit('canonical close-button owner anchor missing')
           owner='#game-stage .home-feature-modal-box .home-feature-close-btn{\n    min-height:38px;\n}\n\n'
           if owner not in c: c=c.replace(anchor,owner+anchor,1)
-          css.write_text(c)
+          css49.write_text(c)
+
+          css38=Path('css/38-v141-system-expansion.css')
+          c=css38.read_text()
+          owner='#game-stage #inventoryPage .v141-inventory-pager button{\n    width:42px;\n    height:31px;\n    min-height:31px;'
+          replacement='#game-stage #inventoryPage .v141-inventory-pager button{\n    width:42px;\n    height:38px;\n    min-height:38px;'
+          if owner not in c: raise SystemExit('inventory pager size owner anchor missing')
+          c=c.replace(owner,replacement,1)
+          css38.write_text(c)
           PY
           git diff --check
           node tests/premium-functional-ui-responsive-browser.test.js
@@ -68,7 +76,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add css/49-v169-rpg-ui.css tests/premium-functional-ui-responsive-browser.test.js
+          git add css/38-v141-system-expansion.css css/49-v169-rpg-ui.css tests/premium-functional-ui-responsive-browser.test.js
           git diff --cached --check
-          git commit -m "fix: align functional UI back action hit area"
+          git commit -m "fix: align functional UI mobile hit areas"
           git push origin HEAD:feature/premium-functional-ui
