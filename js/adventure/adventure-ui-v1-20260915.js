@@ -26,7 +26,7 @@
     function ensureRoot(){
         if(ui.root&&ui.root.isConnected){ return ui.root; }
         if(typeof document==="undefined"){ return null; }
-        const stage=document.getElementById("game-stage")||document.body;
+        const stage=document.getElementById("game-content")||document.getElementById("game-stage")||document.body;
         let root=document.getElementById("adventurePage");
         if(!root){
             root=document.createElement("section");
