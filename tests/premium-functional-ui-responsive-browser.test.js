@@ -192,7 +192,7 @@ async function verifySurface(client,width,height,surface,markup){
     assert.equal(data.docOverflow,false,`${width}x${height} ${surface} document overflow`);
     assert.equal(data.contentOverflow,false,`${width}x${height} ${surface} horizontal content overflow`);
     assert.ok(data.box&&data.box.left>=-1&&data.box.top>=-1&&data.box.right<=width+1&&data.box.bottom<=height+1,`${width}x${height} ${surface} panel clipped: ${JSON.stringify(data.box)}`);
-    if(data.majorMin<38){const details=await evaluate(client,"[...document.querySelectorAll(\".qa-major\")].map((el,i)=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {i,id:el.id,className:String(el.className),text:el.textContent.trim().slice(0,30),computedMinHeight:c.minHeight,computedHeight:c.height,rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}}})");throw new Error(`${surface} major logical hit area ${data.majorMin}: ${JSON.stringify(details)}`);}
+    assert.ok(data.majorMin>=38,`${surface} major logical hit area ${data.majorMin}`);
     assert.ok(data.commerceMin>=42,`${surface} commerce hit area ${data.commerceMin}`);
     const interactions={};
     interactions.back=await hitClick(client,".home-feature-close-btn");
