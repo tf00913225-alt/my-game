@@ -12,7 +12,7 @@ const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const compactModalCss=fs.readFileSync("css/37-v139-rested-experience.css","utf8");
-const dungeonNav=fs.readFileSync("js/41-v146-system-polish.js","utf8");
+const dungeonNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 
 /* BOSS mechanism cards remain sidecar attack targets. Detailed text, including
    the lethal charge countdown, now lives in the separate mechanism info panel

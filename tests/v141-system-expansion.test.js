@@ -11,6 +11,7 @@ const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const v133Source=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const coreSource=fs.readFileSync("js/34-v141-core-systems.js","utf8");
 const uiSource=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
+const finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const contentSource=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const cssSource=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
@@ -240,9 +241,10 @@ test("compact UI and daily cover scaffolding meet the mobile layout requirements
     assert.match(cssSource,/\.v141-dungeon-cover-art\{[\s\S]*?aspect-ratio:16 \/ 9/);
     assert.match(uiSource,/獎勵預覽/);
     assert.match(uiSource,/剩餘次數/);
-    assert.match(uiSource,/openMapInventoryOverlay\(\)/);
+    assert.match(finalNavSource,/openMapInventoryOverlay\(\)/);
+    assert.match(uiSource,/v148SyncContextNavigation/);
     assert.match(uiSource,/v141-dungeon-return/);
-    assert.match(cssSource,/\.v141-dungeon-active #bottomNav\{display:none !important;\}/);
+    assert.match(cssSource,/\.v141-dungeon-active #bottomNav,[\s\S]*\.v148-context-nav-active #bottomNav\{display:none !important;\}/);
 });
 
 test("new blueprints encode part, tier and series while legacy saves remain selectable",()=>{
