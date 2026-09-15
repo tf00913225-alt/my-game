@@ -1338,3 +1338,326 @@
         inset 0 0 0 3px rgba(86,91,52,.62),
         inset 0 0 28px rgba(32,55,28,.16);
 }
+
+/* =====================================================
+   Premium Functional UI — Demo Visual Parity / Batch A
+   Formal specialization in the final presentation owner.
+   Runtime/data/scroll/touch owners remain unchanged.
+===================================================== */
+#game-stage #homeFeatureModal:has(.home-feature-modal-box.wide){
+    --rpg-window-iron:#070604;
+    --rpg-window-iron-soft:#0d0b08;
+    --rpg-window-panel:#14100b;
+    --rpg-window-inset:#0d0b08;
+    --rpg-window-gold:#c89a48;
+    --rpg-window-gold-hi:#efd18a;
+    --rpg-window-gold-dark:#7e6337;
+    --rpg-window-text:#f3ead7;
+    --rpg-window-muted:#b7a88f;
+    background:
+        linear-gradient(180deg,rgba(4,4,3,.52),rgba(4,4,3,.76)),
+        url("../assets/ui/startup-main-city.d43e67af1c1c.jpg") center/cover no-repeat;
+}
+
+#game-stage #homeFeatureModal .home-feature-modal-box.wide{
+    border:1px solid rgba(200,154,72,.34);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(31,23,14,.90),rgba(10,8,6,.94));
+    box-shadow:0 7px 20px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,232,180,.03);
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide::before{
+    content:"";
+    position:absolute;
+    left:14px;
+    right:14px;
+    top:0;
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(238,205,139,.28),transparent);
+    pointer-events:none;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide::after{display:none;}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .home-feature-modal-title{
+    flex:0 0 auto;
+    min-height:50px;
+    margin:0 8px 7px;
+    padding:6px 58px 7px;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.16);
+    border-radius:0;
+    color:#f6dfaa;
+    background:transparent;
+    box-shadow:none;
+    font-family:"Noto Serif TC",serif;
+    font-weight:900;
+    text-shadow:0 1px 2px #000;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
+    border:0;
+    background:transparent;
+    box-shadow:none;
+}
+
+#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody div:has(> .character-showcase-choice){
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+    margin:0 8px 7px;
+    padding:8px;
+    border:1px solid rgba(200,154,72,.28);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(31,23,14,.80),rgba(10,8,6,.86));
+    box-shadow:0 6px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,232,180,.025);
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice{
+    position:relative;
+    width:auto !important;
+    min-width:0;
+    min-height:50px;
+    margin:0;
+    padding:5px 6px;
+    border:1px solid rgba(200,154,72,.16);
+    border-radius:8px;
+    background:rgba(13,10,7,.46);
+    box-shadow:none;
+    transition:border-color .15s ease,background .15s ease;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character{
+    grid-column:1 / -1;
+    display:grid;
+    grid-template-columns:38% minmax(0,1fr);
+    grid-template-rows:auto auto minmax(0,1fr);
+    gap:5px 9px;
+    min-height:178px;
+    padding:10px;
+    border:1px solid rgba(200,154,72,.32);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(31,23,14,.88),rgba(10,8,6,.92));
+    box-shadow:0 7px 20px rgba(0,0,0,.24),inset 0 0 0 1px rgba(255,232,180,.03);
+    text-align:left;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > [id^="characterAvatar"]{
+    grid-column:1;
+    grid-row:1 / 4;
+    width:100% !important;
+    height:158px !important;
+    min-height:158px;
+    align-self:stretch;
+    border:0 !important;
+    border-radius:10px;
+    background-size:cover !important;
+    background-position:center 18% !important;
+    box-shadow:none !important;
+    opacity:1 !important;
+    overflow:hidden;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > div[style*="font-size:11px"]{
+    grid-column:2;
+    align-self:end;
+    margin:18px 0 0;
+    color:#ffe1a0;
+    font-family:"Noto Serif TC",serif;
+    font-size:20px !important;
+    line-height:1.15 !important;
+    font-weight:900;
+    text-align:left;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > div[style*="font-size:10px"],
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > [id^="characterAvatarLevel"]{
+    grid-column:2;
+    align-self:start;
+    color:#b7a88f;
+    font-size:14px !important;
+    line-height:1.35 !important;
+    text-align:left;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-avatar.is-current-character{
+    border-color:transparent !important;
+    box-shadow:none !important;
+}
+
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-tab{
+    min-height:40px;
+    border:1px solid rgba(200,154,72,.20);
+    border-radius:8px;
+    color:#ab9b81;
+    background:#120e09;
+    box-shadow:none;
+    font-size:14px;
+    font-weight:900;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-tab.active{
+    border-color:#c59645;
+    color:#f8dfaa;
+    background:linear-gradient(#392815,#1a1109);
+    box-shadow:inset 0 1px 0 rgba(255,239,196,.05);
+}
+
+#game-stage #statusPage #statusPageTitle{
+    margin:2px 0 8px;
+    color:#efd69d;
+    font-family:"Noto Serif TC",serif;
+    font-size:17px;
+    line-height:1.25;
+    font-weight:900;
+}
+#game-stage #statusPage .status-card{
+    padding:9px 10px;
+    border:1px solid rgba(200,154,72,.24);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(28,21,13,.70),rgba(9,8,6,.80));
+    box-shadow:none;
+}
+#game-stage #statusPage .status-preview-bars{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin:0 0 8px;
+}
+#game-stage #statusPage .status-preview-bar{
+    min-width:0;
+    margin:0;
+}
+#game-stage #statusPage .status-row{
+    display:grid;
+    grid-template-columns:minmax(82px,1fr) 40px minmax(46px,auto) 40px;
+    gap:6px;
+    align-items:center;
+    min-height:48px;
+    margin:0;
+    padding:4px 0;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.11);
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+}
+#game-stage #statusPage .status-row:last-of-type{border-bottom:0;}
+#game-stage #statusPage .status-row button{
+    width:40px;
+    min-width:40px;
+    height:40px;
+    min-height:40px;
+    padding:0;
+    border:1px solid rgba(200,154,72,.24);
+    border-radius:8px;
+    color:#cdbd9e;
+    background:#100d09;
+    box-shadow:none;
+    font-size:18px;
+    line-height:38px;
+}
+#game-stage #statusPage .status-number{
+    color:#f3ead7;
+    font-size:18px;
+    font-weight:900;
+    text-align:center;
+}
+#game-stage #statusPage .status-points-line{
+    margin:8px 0 7px;
+    padding:7px 9px;
+    border:0;
+    border-left:2px solid #c89a48;
+    border-radius:0;
+    color:#b7a88f;
+    background:rgba(13,10,7,.56);
+}
+#game-stage #statusPage #attributePoints{
+    color:#efd18a;
+    font-size:18px;
+}
+#game-stage #statusPage .status-formula-hint,
+#game-stage #statusPage .status-preview-bar-label{
+    color:#b7a88f;
+}
+#game-stage #statusPage #confirmStatusButton{
+    width:100%;
+    min-height:44px;
+    margin-top:7px;
+    border:1px solid #c99c4b;
+    border-radius:9px;
+    color:#fff0c2;
+    background:linear-gradient(#5a401f,#28180c);
+    box-shadow:inset 0 0 12px rgba(224,183,90,.10);
+    font-weight:900;
+}
+#game-stage #statusPage #confirmStatusButton:disabled{
+    opacity:.42;
+    border-color:rgba(200,154,72,.18);
+    color:#8f8370;
+    background:#100d09;
+    box-shadow:none;
+}
+
+#game-stage #homeExpPoolCard{
+    padding:10px;
+    border:1px solid rgba(200,154,72,.28);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(31,23,14,.78),rgba(10,8,6,.88));
+    box-shadow:0 6px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,232,180,.025);
+}
+#game-stage #homeExpPoolCard .exp-pool-hero{
+    padding:2px 2px 9px;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.16);
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+}
+#game-stage #homeExpPoolCard .exp-pool-kicker{
+    color:#9e8963;
+    letter-spacing:.12em;
+}
+#game-stage #homeExpPoolCard .exp-pool-title{
+    color:#f6dfaa;
+    font-family:"Noto Serif TC",serif;
+    font-size:17px;
+    line-height:1.2;
+    font-weight:900;
+}
+#game-stage #homeExpPoolCard .exp-pool-total{
+    justify-content:flex-start;
+    gap:5px;
+    margin-top:2px;
+}
+#game-stage #homeExpPoolCard .exp-pool-value{
+    color:#efd18a;
+    font-size:28px;
+    line-height:1;
+    font-weight:900;
+}
+#game-stage #homeExpPoolCard .v173-exp-charge-status{
+    border:0;
+    border-left:2px solid rgba(200,154,72,.72);
+    border-radius:0;
+    background:rgba(18,13,8,.58);
+    box-shadow:none;
+}
+#game-stage #homeExpPoolCard #expDistributeList .v173-exp-row-meta b{
+    padding:2px 0;
+    border:0;
+    border-radius:0;
+    color:#efd18a;
+    background:transparent;
+}
+
+@media (max-height:720px){
+    #game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character{
+        min-height:158px;
+    }
+    #game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > [id^="characterAvatar"]{
+        height:138px !important;
+        min-height:138px;
+    }
+}
+@media (max-width:380px){
+    #game-stage #statusPage .status-row{
+        grid-template-columns:minmax(74px,1fr) 38px minmax(42px,auto) 38px;
+        gap:4px;
+    }
+    #game-stage #statusPage .status-row button{
+        width:38px;
+        min-width:38px;
+        height:38px;
+        min-height:38px;
+    }
+}
