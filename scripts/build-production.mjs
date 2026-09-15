@@ -50,8 +50,7 @@ const appScripts=[
     "js/23-v125-character-creation-bootstrap.js",
     "js/24-v125-character-creation-native-runtime.js",
     "js/20-anonymous-20.js",
-    "js/61-v174-ui-regression-guards.js",
-    "js/adventure/adventure-entry-v1-20260915.js"
+    "js/61-v174-ui-regression-guards.js"
 ];
 const gameplayScripts=[
     "js/25-v131-fix-batch.js",
@@ -86,14 +85,15 @@ const gameplayScripts=[
     "js/55-v173.51-inventory-qa.js",
     "js/56-v173.51-shop-qa.js",
     "js/57-v173.51-quest-qa.js",
-    "js/58-v173.63-functional-fixes.js",
-    "js/adventure/adventure-items-v1-20260915.js"
+    "js/58-v173.63-functional-fixes.js"
 ];
 const patrolScripts=["js/26-v131-patrol-appearance.js"];
 const abyssScripts=["js/59-abyss-two-tier-runtime.js"];
 const skillScripts=["js/60-v173.64-skill-progression-rebalance.js"];
 const bossRelicScripts=["js/gameplay-boss-tower-system.js","js/60-team-relic-system.js"];
 const relicProgressionScripts=["js/relic-progression-drop-system.js"];
+const adventureEntryScripts=["js/adventure/adventure-entry-v1-20260915.js"];
+const adventureItemsScripts=["js/adventure/adventure-items-v1-20260915.js"];
 const adventureScripts=[
     "js/adventure/adventure-content-v1-20260915.js",
     "js/adventure/adventure-runtime-v1-20260915.js",
@@ -107,8 +107,7 @@ const appStyles=[
     "css/08-stage-v14-character-scroll-fix.css","css/09-stage-v15-native-character-shell.css",
     "css/19-stage-v54-main-city-moderate-native-scale.css","css/20-stage-v60-training-only-safety.css",
     "css/21-stage-v64-character-touch-action-bridge.css",
-    "css/30-v130-requested-updates.css","css/56-v174-critical-ui-regressions.css","css/ad-free-service-info-modal.css",
-    "css/adventure-entry-v1-20260915.css"
+    "css/30-v130-requested-updates.css","css/56-v174-critical-ui-regressions.css","css/ad-free-service-info-modal.css"
 ];
 const gameplayStyles=[
     "css/05-stage-v10-battle-log-scroll-fix.css",
@@ -150,6 +149,7 @@ const patrolStyles=["css/32-v131-patrol-appearance.css"];
 const abyssStyles=["css/50-v169-abyss-flow.css","css/54-v174-abyss-two-tier.css"];
 const bossRelicStyles=["css/gameplay-boss-tower.css","css/55-team-relic-system.css"];
 const relicProgressionStyles=["css/relic-progression-drop-system.css"];
+const adventureEntryStyles=["css/adventure-entry-v1-20260915.css"];
 const adventureStyles=["css/adventure-v1-20260915.css"];
 
 function combineScripts(files,prefix=""){
@@ -204,6 +204,8 @@ const scriptOutputs={
     skill:target("feature-skill","js",combineScripts(skillScripts)),
     bossRelic:target("feature-boss-relic","js",combineScripts(bossRelicScripts)),
     relicProgression:target("feature-relic-progression","js",read(relicProgressionScripts[0])),
+    adventureEntry:target("feature-adventure-entry","js",combineScripts(adventureEntryScripts)),
+    adventureItems:target("feature-adventure-items","js",combineScripts(adventureItemsScripts)),
     adventure:target("feature-adventure","js",combineScripts(adventureScripts))
 };
 const styleOutputs={
@@ -214,6 +216,7 @@ const styleOutputs={
     abyss:target("feature-abyss","css",combineStyles(abyssStyles)),
     bossRelic:target("feature-boss-relic","css",combineStyles(bossRelicStyles)),
     relicProgression:target("feature-relic-progression","css",read(relicProgressionStyles[0])),
+    adventureEntry:target("feature-adventure-entry","css",combineStyles(adventureEntryStyles)),
     adventure:target("feature-adventure","css",combineStyles(adventureStyles))
 };
 Object.values(scriptOutputs).forEach(writeTarget); Object.values(styleOutputs).forEach(writeTarget);
@@ -228,6 +231,8 @@ const replacements={
     __BUILD_SKILL__:scriptOutputs.skill.path,
     __BUILD_BOSS_RELIC__:scriptOutputs.bossRelic.path,__BUILD_BOSS_RELIC_STYLE__:styleOutputs.bossRelic.path,
     __BUILD_RELIC_PROGRESSION__:scriptOutputs.relicProgression.path,__BUILD_RELIC_PROGRESSION_STYLE__:styleOutputs.relicProgression.path,
+    __BUILD_ADVENTURE_ENTRY__:scriptOutputs.adventureEntry.path,__BUILD_ADVENTURE_ENTRY_STYLE__:styleOutputs.adventureEntry.path,
+    __BUILD_ADVENTURE_ITEMS__:scriptOutputs.adventureItems.path,
     __BUILD_ADVENTURE__:scriptOutputs.adventure.path,__BUILD_ADVENTURE_STYLE__:styleOutputs.adventure.path
 };
 const featureManifest=JSON.parse(JSON.stringify(featureTemplate).replace(/__PATROL_ASSETS__/g,patrolAssets.join('\",\"')).replace(/__[A-Z0-9_]+__/g,key=>{
