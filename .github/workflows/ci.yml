@@ -40,9 +40,6 @@ jobs:
             git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
           fi
 
-          # Typography regression suites audit the pre-change baseline and the
-          # approved gameplay battle baseline byte-for-byte. fetch-depth: 2 does
-          # not retain those fixed historical objects after the integration merge.
           for typography_baseline_sha in \
             39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
             4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
@@ -76,21 +73,39 @@ jobs:
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
 
-      # Full repository tests are formal-release gates. Dev stays fast and relies
-      # on change-focused tests before merge plus the static/build/release gates below.
       - name: Run all Node unit and integration suites
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
         run: node .github/scripts/ci.mjs tests
 
       - name: Verify production build is synchronized
+        id: build_sync
         run: npm run build:check
 
+      - name: Capture build synchronization evidence
+        if: failure() && steps.build_sync.outcome == 'failure'
+        run: |
+          npm run build
+          mkdir -p artifacts/build-sync
+          cp asset-manifest.json artifacts/build-sync/asset-manifest.json
+          git diff -- asset-manifest.json config/feature-manifest.json scripts/build-production.mjs build/feature-adventure-* > artifacts/build-sync/build-sync.diff || true
+          find build -maxdepth 1 -type f -name 'feature-adventure-*' -print | sort > artifacts/build-sync/adventure-build-files.txt
+
+      - name: Upload build synchronization evidence
+        if: failure() && steps.build_sync.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: adventure-build-sync-${{ github.sha }}
+          path: artifacts/build-sync
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Run Adventure V1 mobile browser QA
-        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
+        id: adventure_browser
+        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
         run: node .github/scripts/run-adventure-browser-qa.mjs
 
       - name: Upload Adventure V1 browser evidence
-        if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && always()
+        if: always() && steps.adventure_browser.outcome != 'skipped'
         uses: actions/upload-artifact@v4
         with:
           name: adventure-browser-qa-${{ github.sha }}
@@ -98,7 +113,6 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      # Heavy browser QA unrelated to this feature remains release-only.
       - name: Run account-first cold/warm mobile browser QA
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
         run: node .github/scripts/run-boot-architecture-browser-qa.mjs
