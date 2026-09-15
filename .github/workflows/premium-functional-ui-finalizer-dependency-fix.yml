@@ -1,0 +1,43 @@
+name: Premium Functional UI Finalizer Dependency Fix
+
+on:
+  push:
+    branches:
+      - feature/premium-functional-ui
+    paths:
+      - .github/workflows/premium-functional-ui-finalizer-dependency-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-finalizer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/premium-functional-ui
+          fetch-depth: 50
+
+      - name: Patch finalizer runner dependency and self-clean
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          path=Path('.github/workflows/premium-functional-ui-finalize.yml')
+          text=path.read_text()
+          marker='''      - uses: actions/setup-node@v4\n        with:\n          node-version: "24"\n\n'''
+          insert='''      - uses: actions/setup-node@v4\n        with:\n          node-version: "24"\n\n      - name: Install ImageMagick required by asset regression suites\n        run: |\n          set -euo pipefail\n          sudo apt-get update\n          sudo apt-get install -y imagemagick\n          identify -version\n\n'''
+          if 'Install ImageMagick required by asset regression suites' in text:
+              raise SystemExit('finalizer already patched')
+          if marker not in text:
+              raise SystemExit('setup-node marker not found')
+          path.write_text(text.replace(marker,insert,1))
+          PY
+          git rm .github/workflows/premium-functional-ui-finalizer-dependency-fix.yml
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/premium-functional-ui-finalize.yml
+          git commit -m "fix: install imagemagick for final UI verification"
+          git push origin HEAD:feature/premium-functional-ui
