@@ -6,11 +6,11 @@
   "workBranch": "fix/adventure-map-footer-visibility-20260915",
   "officialVersion": "173.65",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "ADV-FOOTER-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Adventure 地圖頁使用既有 .adventure-view 作為唯一垂直捲動容器；實際 header 高度、底部安全區與固定導覽列不得裁切 adventure-map-footer。",
       "evidence": [
         "css/adventure-v1-20260915.css",
@@ -21,14 +21,16 @@
     },
     {
       "id": "ADV-FOOTER-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "360×800、390×844 與 412×915 的 Adventure 地圖頁均可捲至底部，且 footer 完整可見、沒有第二個垂直捲動容器或文字裁切。",
       "evidence": [
         ".github/scripts/run-adventure-browser-qa.mjs"
       ]
     }
   ],
-  "automatedVerification": "TARGETED_REGRESSION_PASS; BUILD_CHECK_PASS; BROWSER_QA_PENDING_CI",
-  "visualVerification": "PENDING_CI_BROWSER_QA_360X800_390X844_412X915",
+  "automatedVerification": "TARGETED_REGRESSION_PASS; BUILD_CHECK_PASS; RELEASE_GATE_PASS; PR_241_RUN_34958900612_SUCCESS",
+  "visualVerification": "FORMAL_CHROME_CI_PASS_360X800_390X844_412X915; map footer reaches final scroll position, is fully visible and keeps one scroll owner; artifact sha256:f227086350a6d915041b56ac1275c2630a6e96878a6900468ab1a3f5fdb702c6",
+  "verifiedPullRequest": 241,
+  "verifiedHeadCommit": "8f0a65960a82c7fb7df6059b0577411531072215",
   "promotionApproval": "DEV_ONLY_MAIN_FORBIDDEN"
 }
