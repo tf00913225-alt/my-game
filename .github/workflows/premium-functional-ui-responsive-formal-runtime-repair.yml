@@ -1,0 +1,67 @@
+name: Premium Functional UI Responsive Formal Runtime Repair
+
+on:
+  push:
+    branches:
+      - feature/premium-functional-ui
+    paths:
+      - .github/workflows/premium-functional-ui-responsive-formal-runtime-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/premium-functional-ui
+          fetch-depth: 20
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Generate CDP harness with formal stage and character runtimes
+        run: |
+          set -euo pipefail
+          awk '/python3 <<'"'"'PY'"'"'/{capture=1;next} capture&&/^          PY$/{exit} capture{sub(/^          /,"");print}' .github/workflows/premium-functional-ui-responsive-cdp-fix.yml > /tmp/patch.py
+          python3 /tmp/patch.py
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('tests/premium-functional-ui-responsive-browser.test.js')
+          t=p.read_text()
+          t=t.replace(
+              '<meta charset="utf-8">${links}',
+              '<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}',
+              1
+          )
+          t=t.replace(
+              '<html><head>${links}',
+              '<html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}',
+              1
+          )
+          old='"css/00-main.css","css/22-stage-v78-character-inventory-core.css"'
+          new='"css/00-main.css","css/02-stage-v3-layout-fix.css","css/03-stage-v4-viewport-lock.css","css/22-stage-v78-character-inventory-core.css"'
+          if old not in t:
+              raise SystemExit('style owner anchor missing')
+          t=t.replace(old,new,1)
+          old_runtime="const runtime=wide?'<script src=\"js/19-stage-v78-character-inventory-runtime.js\"></script>':'';"
+          new_runtime="const runtime='<script src=\"js/00-main.js\"></script>'+(wide?'<script src=\"js/19-stage-v78-character-inventory-runtime.js\"></script>':'');"
+          if old_runtime not in t:
+              raise SystemExit('runtime owner anchor missing')
+          t=t.replace(old_runtime,new_runtime,1)
+          p.write_text(t)
+          PY
+          git diff --check
+          test "$(git diff --name-only)" = "tests/premium-functional-ui-responsive-browser.test.js"
+          node tests/premium-functional-ui-responsive-browser.test.js
+      - name: Save verified responsive harness
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/premium-functional-ui-responsive-browser.test.js
+          git diff --cached --check
+          git commit -m "test: run responsive QA through formal stage runtime"
+          git push origin HEAD:feature/premium-functional-ui
