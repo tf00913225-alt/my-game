@@ -38,7 +38,7 @@ assert.doesNotMatch(fireCss,/data-skill="fireRocket"/);
 assert.doesNotMatch(legacyNav,/function fixDungeonNavigation\(\)\{[\s\S]*?nav\.innerHTML=/);
 assert.match(legacyNav,/v148SyncDungeonShell/);
 assert.match(finalNav,/function contextNavMatches\(nav,returnAction\)/);
-assert.match(finalNav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","openHomeFeature\(\'relic\'\)"\]/);
+assert.match(finalNav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
 assert.match(finalNav,/buttons\.push\(\["返回","assets\/ui\/map-return\.png",returnAction\]\)/);
 assert.match(finalNav,/const mode=gameplayActive&&!dungeonActive[\s\S]*?"gameplay:"\+gameplayPageId[\s\S]*?"abyss-map"[\s\S]*?"abyss-selection"[\s\S]*?"daily"/);
 assert.match(finalNav,/window\.v148SyncContextNavigation=syncContextNavigation/);
