@@ -1094,6 +1094,10 @@
     margin:0 !important;
 }
 
+#game-stage .home-feature-modal-box .home-feature-close-btn{
+    min-height:38px;
+}
+
 /* =====================================================
    Shared Black-Gold Window Skin — visual-only owner
    Geometry, stacking, overflow and interaction remain owned by existing rules.
@@ -1295,10 +1299,6 @@
         inset 0 1px 0 rgba(255,239,196,.25),
         inset 0 -2px 0 rgba(0,0,0,.4),
         0 0 0 1px rgba(198,154,69,.22);
-}
-
-#game-stage .home-feature-modal-box .home-feature-close-btn{
-    min-height:38px;
 }
 
 #game-stage .home-feature-modal-box .home-feature-close-btn,
