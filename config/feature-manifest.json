@@ -91,7 +91,9 @@
     },
     "feature-adventure": {
       "scripts": [
-        "__BUILD_ADVENTURE__"
+        "__BUILD_ADVENTURE_CONTENT__",
+        "__BUILD_ADVENTURE_RUNTIME__",
+        "__BUILD_ADVENTURE_UI__"
       ],
       "styles": [
         "__BUILD_ADVENTURE_STYLE__"
