@@ -12,7 +12,7 @@ const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const compactModalCss=fs.readFileSync("css/37-v139-rested-experience.css","utf8");
-const dungeonNav=fs.readFileSync("js/41-v146-system-polish.js","utf8");
+const dungeonNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 
 /* BOSS mechanism cards remain sidecar attack targets. Detailed text, including
    the lethal charge countdown, now lives in the separate mechanism info panel
@@ -60,8 +60,9 @@ assert.match(compactModalCss,/#homeFeatureModal:has\(#homeFeatureModalBody > \.s
 assert.match(compactModalCss,/#homeFeatureModal:has\(#restButton\) #homeFeatureModalBody\{[\s\S]*?max-height:calc\(100% - 62px\) !important;[\s\S]*?overflow-y:auto !important;/);
 assert.match(compactModalCss,/#homeFeatureModal:has\(#homeFeatureModalBody > \.system-panel\) #homeFeatureModalBody\{[\s\S]*?max-height:calc\(100% - 62px\) !important;[\s\S]*?overflow-y:auto !important;/);
 
-/* Dungeon navigation uses the formal relic entry instead of the old shop slot. */
-assert.match(dungeonNav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","openHomeFeature\('relic'\)"\]/);
+/* Shared context navigation keeps the formal relic icon while routing through
+   V148's context-safe relic owner instead of bypassing it. */
+assert.match(dungeonNav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
 assert.ok(fs.existsSync("assets/ui/home-relic-v174.webp"));
 assert.ok(fs.existsSync("assets/ui/home-element-box-v174.webp"));
 assert.ok(fs.existsSync("assets/ui/nav-relic-v175.webp"));

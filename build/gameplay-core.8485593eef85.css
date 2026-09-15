@@ -4281,9 +4281,11 @@ body.quest-scroll-active,
 #game-stage .v141-dungeon-cover-actions button:disabled{opacity:.4;filter:grayscale(.5);}
 #game-stage .v141-dungeon-remaining{padding:1px 8px 7px;color:#b7a68a;font-size:10px;text-align:center;}
 
-#game-stage #app:not(.v141-dungeon-active) #v141DungeonNav{display:none !important;}
-#game-stage #app.v141-dungeon-active #v141DungeonNav{display:flex !important;}
-#game-stage #app.v141-dungeon-active #bottomNav{display:none !important;}
+#game-stage #app:not(.v141-dungeon-active):not(.v148-context-nav-active) #v141DungeonNav{display:none !important;}
+#game-stage #app.v141-dungeon-active #v141DungeonNav,
+#game-stage #app.v148-context-nav-active #v141DungeonNav{display:grid !important;}
+#game-stage #app.v141-dungeon-active #bottomNav,
+#game-stage #app.v148-context-nav-active #bottomNav{display:none !important;}
 #game-stage #v141DungeonNav{z-index:790 !important;}
 #game-stage #dungeonPage .v141-dungeon-return{display:block !important;position:absolute !important;right:12px !important;top:12px !important;z-index:120 !important;}
 
@@ -5700,9 +5702,9 @@ body.quest-scroll-active,
 }
 
 /* Daily and Abyss share one undistorted five-slot bottom navigation. */
-#game-stage #app.v141-dungeon-active #v141DungeonNav,
-#game-stage #app.v141-dungeon-active #v141DungeonNav[data-v146-columns="4"],
-#game-stage #app.v141-dungeon-active #v141DungeonNav[data-v146-columns="5"]{
+#game-stage #v141DungeonNav.v148-context-nav,
+#game-stage #v141DungeonNav.v148-context-nav[data-v146-columns="4"],
+#game-stage #v141DungeonNav.v148-context-nav[data-v146-columns="5"]{
     position:absolute !important;
     left:0 !important;
     right:0 !important;
@@ -5872,7 +5874,7 @@ body > .damage-popup.v152-top-damage{
     #game-stage #app.v141-dungeon-active #dungeonPage.active{
         padding-bottom:80px !important;
     }
-    #game-stage #app.v141-dungeon-active #v141DungeonNav{
+    #game-stage #v141DungeonNav.v148-context-nav{
         height:80px !important;
     }
     #game-stage #v141DungeonNav .nav-art-button{
