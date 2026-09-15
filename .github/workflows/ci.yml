@@ -60,9 +60,13 @@ jobs:
           node --check .github/scripts/run-boot-architecture-browser-qa.mjs
           node --check .github/scripts/run-skill-progression-browser-qa.mjs
           node --check .github/scripts/run-relic-progression-browser-qa.mjs
+          node --check .github/scripts/run-adventure-browser-qa.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
+
+      - name: Run Adventure V1 targeted regression
+        run: node tests/adventure-node-system-v1.test.js
 
       - name: Ensure existing asset-test dependency
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
@@ -81,9 +85,20 @@ jobs:
       - name: Verify production build is synchronized
         run: npm run build:check
 
-      # Heavy browser QA is release-only. Development PRs/pushes keep the fast
-      # repository checks above and can reach the dev preview without waiting
-      # for unrelated full-game browser scenarios.
+      - name: Run Adventure V1 mobile browser QA
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
+        run: node .github/scripts/run-adventure-browser-qa.mjs
+
+      - name: Upload Adventure V1 browser evidence
+        if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: adventure-browser-qa-${{ github.sha }}
+          path: artifacts/browser-qa/adventure-node-system-v1.json
+          if-no-files-found: error
+          retention-days: 90
+
+      # Heavy browser QA unrelated to this feature remains release-only.
       - name: Run account-first cold/warm mobile browser QA
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
         run: node .github/scripts/run-boot-architecture-browser-qa.mjs
