@@ -1,0 +1,54 @@
+name: Premium Functional UI Scroll Hit Test Fix
+
+on:
+  push:
+    branches:
+      - feature/premium-functional-ui
+    paths:
+      - .github/workflows/premium-functional-ui-scroll-hit-test-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/premium-functional-ui
+          fetch-depth: 20
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Make interaction hit testing respect formal scroll owner
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('tests/premium-functional-ui-responsive-browser.test.js')
+          t=p.read_text()
+          old='''async function hitClick(client,selector){
+  const hit=await evaluate(client,`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return null;const r=el.getBoundingClientRect();const x=r.left+r.width/2;const y=r.top+r.height/2;const top=document.elementFromPoint(x,y);return {x,y,hit:!!top&&(top===el||el.contains(top)),w:r.width,h:r.height};})()`);'''
+          new='''async function hitClick(client,selector){
+  const scrolled=await evaluate(client,`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return false;el.scrollIntoView({block:"center",inline:"nearest"});return true;})()`);
+  assert.equal(scrolled,true,`missing interactive target ${selector}`);
+  await evaluate(client,"new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
+  const hit=await evaluate(client,`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return null;const r=el.getBoundingClientRect();const x=r.left+r.width/2;const y=r.top+r.height/2;const top=document.elementFromPoint(x,y);return {x,y,hit:!!top&&(top===el||el.contains(top)),w:r.width,h:r.height};})()`);'''
+          if old not in t:
+              raise SystemExit('hitClick anchor missing')
+          p.write_text(t.replace(old,new,1))
+          PY
+          git diff --check
+          test "$(git diff --name-only)" = "tests/premium-functional-ui-responsive-browser.test.js"
+          node tests/premium-functional-ui-responsive-browser.test.js
+      - name: Save verified test harness fix
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/premium-functional-ui-responsive-browser.test.js
+          git diff --cached --check
+          git commit -m "test: scroll responsive controls before hit testing"
+          git push origin HEAD:feature/premium-functional-ui
