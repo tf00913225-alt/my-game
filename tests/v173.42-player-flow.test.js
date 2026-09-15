@@ -151,7 +151,7 @@ assert.match(waterRules,/FROSTBITE_REMAINING_RATE=\.75/);
 assert.match(waterRules,/previousTryMonsterSpecialAction/);
 assert.match(waterRules,/frostbitePenaltyPercent:25/);
 
-assert.match(dungeonPolish,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","openHomeFeature\('relic'\)"\]/);
+assert.match(dungeonPolish,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
 assert.match(dungeonPolish,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);
 assert.match(dungeonPolish,/\["返回","assets\/ui\/map-return\.png"/);
 assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
