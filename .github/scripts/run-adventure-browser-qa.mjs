@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import net from "node:net";
 import {spawn,spawnSync} from "node:child_process";
 
 const ROOT=process.cwd();
@@ -17,13 +18,16 @@ function findChrome(){
 }
 function read(file){ return fs.readFileSync(path.join(ROOT,file),"utf8"); }
 function sleep(ms){ return new Promise(resolve=>setTimeout(resolve,ms)); }
-async function waitForFile(file,timeoutMs=10000){
-    const deadline=Date.now()+timeoutMs;
-    while(Date.now()<deadline){
-        if(fs.existsSync(file)){ return; }
-        await sleep(50);
-    }
-    throw new Error(`Timed out waiting for Chrome DevTools endpoint: ${file}`);
+async function reservePort(){
+    return new Promise((resolve,reject)=>{
+        const server=net.createServer();
+        server.once("error",reject);
+        server.listen(0,"127.0.0.1",()=>{
+            const address=server.address();
+            const port=typeof address==="object"&&address?address.port:null;
+            server.close(error=>error?reject(error):resolve(port));
+        });
+    });
 }
 function openCdp(webSocketDebuggerUrl){
     const socket=new WebSocket(webSocketDebuggerUrl);
@@ -115,13 +119,15 @@ run();
 async function runChromeViewport(chrome,width,height,reduced){
     const profile=fs.mkdtempSync(path.join(os.tmpdir(),"adventure-browser-qa-"));
     let stderr="";
+    const devtoolsPort=await reservePort();
     const proc=spawn(chrome,[
         "--headless=new",
         "--no-sandbox",
         "--disable-gpu",
         "--disable-dev-shm-usage",
         "--force-device-scale-factor=1",
-        "--remote-debugging-port=0",
+        "--remote-debugging-address=127.0.0.1",
+        `--remote-debugging-port=${devtoolsPort}`,
         `--user-data-dir=${profile}`,
         "about:blank"
     ],{cwd:ROOT,stdio:["ignore","ignore","pipe"]});
@@ -129,13 +135,11 @@ async function runChromeViewport(chrome,width,height,reduced){
     proc.stderr.on("data",chunk=>{ stderr+=chunk; });
     let cdp=null;
     try{
-        const activePortFile=path.join(profile,"DevToolsActivePort");
-        await waitForFile(activePortFile,10000);
-        const [port]=fs.readFileSync(activePortFile,"utf8").trim().split(/\r?\n/);
         let pages=[];
-        for(let attempt=0;attempt<100;attempt++){
+        for(let attempt=0;attempt<200;attempt++){
+            if(proc.exitCode!==null){ break; }
             try{
-                pages=await fetch(`http://127.0.0.1:${port}/json/list`).then(response=>response.json());
+                pages=await fetch(`http://127.0.0.1:${devtoolsPort}/json/list`).then(response=>response.json());
                 if(pages.some(page=>page.type==="page")){ break; }
             }catch(_){ }
             await sleep(50);
