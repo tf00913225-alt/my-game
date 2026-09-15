@@ -1,4 +1,5 @@
 name: Premium Functional UI Final Verification
+# trigger: responsive QA evidence verified on 360x800 / 390x844 / 412x915
 
 on:
   push:
