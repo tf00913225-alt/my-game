@@ -1,0 +1,64 @@
+name: Premium Functional UI Black Gold Geometry Fix
+
+on:
+  push:
+    branches:
+      - feature/premium-functional-ui
+    paths:
+      - .github/workflows/premium-functional-ui-black-gold-geometry-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/premium-functional-ui
+          fetch-depth: 20
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Move close-button geometry before visual-only skin owner
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('css/49-v169-rpg-ui.css')
+          t=p.read_text()
+          rule='''#game-stage .home-feature-modal-box .home-feature-close-btn{
+              min-height:38px;
+          }
+
+          '''.replace('          ','')
+          marker='''/* =====================================================
+             Shared Black-Gold Window Skin — visual-only owner
+             Geometry, stacking, overflow and interaction remain owned by existing rules.
+          ===================================================== */'''.replace('          ','')
+          if t.count(rule)!=1:
+              raise SystemExit(f'expected one close-button geometry rule, got {t.count(rule)}')
+          if marker not in t:
+              raise SystemExit('visual-only skin marker missing')
+          t=t.replace(rule,'',1)
+          t=t.replace(marker,rule+marker,1)
+          p.write_text(t)
+          PY
+          git diff --check
+          test "$(git diff --name-only)" = "css/49-v169-rpg-ui.css"
+          node tests/ui-black-gold-window-skin.test.js
+          node tests/ui-black-gold-window-browser.test.js
+          node tests/premium-functional-ui-batch4.test.js
+          node tests/premium-functional-ui-batch5.test.js
+          node tests/premium-functional-ui-responsive-browser.test.js
+      - name: Save verified owner correction
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add css/49-v169-rpg-ui.css
+          git diff --cached --check
+          git commit -m "fix: keep close hit area outside visual-only skin"
+          git push origin HEAD:feature/premium-functional-ui
