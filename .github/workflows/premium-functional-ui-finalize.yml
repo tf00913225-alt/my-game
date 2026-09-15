@@ -24,6 +24,13 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Install ImageMagick required by asset regression suites
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          identify -version
+
       - name: Build synchronized content-hashed production assets
         run: |
           set -euo pipefail
@@ -81,7 +88,6 @@ jobs:
           const binary=chrome();
           const styles=['css/00-main.css','css/22-stage-v78-character-inventory-core.css','css/23-stage-v77-inventory-detail-ui.css','css/25-stage-v90-quest-interface-core.css','css/31-v131-fix-batch.css','css/37-v139-rested-experience.css','css/38-v141-system-expansion.css','css/42-v146-system-polish.css','css/49-v169-rpg-ui.css','css/53-v173.51-qa.css','css/55-team-relic-system.css'];
           const links=styles.map(file=>`<link rel="stylesheet" href="${file}">`).join('');
-          const common=`<div id="game-viewport"><div id="game-stage"><div id="app"><div id="game-content"><div id="homeFeatureModal" class="home-feature-modal show"><div class="home-feature-modal-box wide"><div class="home-feature-modal-title"><span>功能驗收</span><button class="home-feature-close-btn qa-major">返回</button></div><div id="homeFeatureModalBody"></div></div></div></div></div></div></div>`;
           const cells=Array.from({length:18},(_,i)=>`<div class="inventory-item inventory-item-classic ${i<8?'has-item':'empty'}"><div class="inventory-icon">${i<8?'◇':'·'}</div></div>`).join('');
           const questCards=Array.from({length:8},(_,i)=>`<article class="quest-card"><div class="quest-card-head"><b class="quest-card-name">漫長任務名稱 ${i+1}</b><span class="quest-status ${i<2?'ready':''}">${i<2?'可領取':'進行中'}</span></div><p class="quest-card-desc">完成指定目標並確認獎勵資訊不會因長中文而裁切。</p><div class="quest-progress-line"><span>進度</span><strong>${i+2} / 10</strong></div><div class="quest-progress-track"><div class="quest-progress-fill" style="width:${(i+2)*10}%"></div></div><div class="quest-card-foot"><span class="quest-reward"><b class="quest-reward-label">獎勵</b> 金幣 10,000</span><button class="quest-claim-btn qa-major" ${i<2?'':'disabled'}>領取</button></div></article>`).join('');
           const achievementCards=Array.from({length:7},(_,i)=>`<article class="v17351-achievement-card ${i<2?'ready':i===6?'claimed':'locked'}"><div class="v17351-achievement-copy"><b>長成就名稱 ${i+1}</b><span>完成指定進度，保留正式領取狀態與說明。</span><small>${i+1}/10・獎勵 5,000 金幣</small></div><button class="qa-major">${i<2?'領取':i===6?'已領取':'未達成'}</button></article>`).join('');
@@ -158,12 +164,11 @@ jobs:
           unexpected="$(git status --porcelain | sed -E 's/^.. //' | grep -Ev '^(build/|asset-manifest\.json$|index\.html$|release/requirement-batches/2026-09-15-premium-functional-ui\.json$)' || true)"
           if [ -n "$unexpected" ]; then printf 'Unexpected final output:\n%s\n' "$unexpected" >&2; exit 1; fi
 
-      - name: Save build, requirement evidence and remove finalizer
+      - name: Save build and requirement evidence
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm .github/workflows/premium-functional-ui-finalize.yml
           git add -A build asset-manifest.json index.html release/requirement-batches/2026-09-15-premium-functional-ui.json
           git diff --cached --check
           git commit -m "chore: sync premium UI build and verification evidence"
