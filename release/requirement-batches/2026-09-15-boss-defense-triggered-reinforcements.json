@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-15-boss-defense-triggered-reinforcements",
+  "baseBranch": "dev",
+  "baseCommit": "18b4a32ce41f8e83527e236eebb457391fc9f801",
+  "workBranch": "fix/boss-defense-triggered-reinforcements-20260915",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "BOSS-DEFENSE-01",
+      "status": "VERIFIED",
+      "requirement": "Gameplay Boss 必須在共用副本建怪 owner 中以 boss rank 建立，實際取得高於同級 elite 的 Boss 防禦倍率，同時保留既有 Boss HP 校準。",
+      "evidence": [
+        "js/27-v132-content-expansion.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/gameplay-boss-tower-system.test.js",
+        "tests/v174-boss-balance-gameplay-cover-relic-lv20.test.js",
+        "GitHub Actions CI run 34929101154: SUCCESS"
+      ]
+    },
+    {
+      "id": "BOSS-SUMMON-01",
+      "status": "VERIFIED",
+      "requirement": "指定個人 Boss、世界 Boss 階段與四象塔 Boss 開場只有 Boss；到 PR #167 已定義的回合或 HP 門檻後，才召喚兩名同元素精英。",
+      "evidence": [
+        "js/gameplay-boss-tower-system.js",
+        "tests/gameplay-boss-tower-system.test.js",
+        "GitHub Actions CI run 34929101154: SUCCESS"
+      ]
+    },
+    {
+      "id": "BOSS-SUMMON-02",
+      "status": "VERIFIED",
+      "requirement": "同一場戰鬥援軍只召喚一次；非指定 Boss 不得產生援軍；援軍繼續使用正式元素技能過濾 owner。",
+      "evidence": [
+        "js/gameplay-boss-tower-system.js",
+        "tests/gameplay-boss-tower-system.test.js",
+        "tests/v174-boss-balance-gameplay-cover-relic-lv20.test.js",
+        "GitHub Actions CI run 34929101154: SUCCESS"
+      ]
+    },
+    {
+      "id": "SCOPE-01",
+      "status": "VERIFIED",
+      "requirement": "不得修改 main、assets-library、玩法封面 16:9、元素克制文案、Lv20 秘寶、舊 Boss 名單或 UI/CSS owner；PR #167 保持 Open 且不得合併、cherry-pick 或 rebase。",
+      "evidence": [
+        "git diff --name-only origin/dev...HEAD",
+        "GitHub PR #167 state=open, merged=false",
+        "GitHub Actions CI run 34929101154: SUCCESS"
+      ]
+    }
+  ],
+  "automatedVerification": "GITHUB_CI_RUN_34929101154_SUCCESS",
+  "deploymentVerification": "PENDING_DEV_MERGE_AND_EXACT_SHA_DEPLOYMENT",
+  "notes": "Source, focused Node regressions and Repository checks are verified on PR #236. Game/Cache Version intentionally remains V173.65/cache 173.65. Exact dev deployment verification remains pending until the verified PR head is merged."
+}

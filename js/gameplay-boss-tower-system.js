@@ -44,9 +44,7 @@
         twoMemberLevelCap:59,
         mechanismBaseHpPerMember:180,
         mechanismLevelHpPerMember:28,
-        personalSupportLevel:60,
-        worldSupportStage:3,
-        towerSupportLevel:72
+        reinforcementCount:2
     });
 
     const MECHANISM_DEFINITIONS=Object.freeze({
@@ -59,21 +57,21 @@
 
     const PERSONAL_BOSSES=Object.freeze([
         Object.freeze({id:"personal-20",name:"赤焰君",level:20,element:"fire",phases:1,traits:Object.freeze(["護盾","燃燒"]),mechanisms:Object.freeze([{round:2,type:"shield"}]),firstReward:"首通金幣 1,200・藍階礦石 ×2",repeatReward:"金幣 260・白階礦石",firstGold:1200,repeatGold:260,ore:"oreLow",firstOre:2}),
-        Object.freeze({id:"personal-30",name:"獄火侯",level:30,element:"fire",phases:1,traits:Object.freeze(["蓄力","燃燒"]),mechanisms:Object.freeze([{round:2,type:"charge"},{round:6,type:"charge"}]),firstReward:"首通金幣 1,800・藍階礦石 ×2",repeatReward:"金幣 380・藍階礦石",firstGold:1800,repeatGold:380,ore:"oreMid",firstOre:2}),
+        Object.freeze({id:"personal-30",name:"獄火侯",level:30,element:"fire",phases:1,traits:Object.freeze(["蓄力","燃燒","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"charge"},{round:6,type:"charge"}]),summon:Object.freeze({hpBelow:.5}),firstReward:"首通金幣 1,800・藍階礦石 ×2",repeatReward:"金幣 380・藍階礦石",firstGold:1800,repeatGold:380,ore:"oreMid",firstOre:2}),
         Object.freeze({id:"personal-40",name:"凍海君",level:40,element:"water",phases:2,traits:Object.freeze(["回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"heal"},{hpBelow:.5,type:"charge"}]),firstReward:"首通金幣 2,600・紫階礦石 ×2",repeatReward:"金幣 520・紫階礦石",firstGold:2600,repeatGold:520,ore:"oreHigh",firstOre:2}),
-        Object.freeze({id:"personal-50",name:"霜淵侯",level:50,element:"water",phases:2,traits:Object.freeze(["護盾","回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"shield"},{hpBelow:.45,type:"heal"}]),firstReward:"首通金幣 3,400・紫階礦石 ×3",repeatReward:"金幣 660・紫階礦石",firstGold:3400,repeatGold:660,ore:"oreHigh",firstOre:3}),
-        Object.freeze({id:"personal-60",name:"雪獄尊",level:60,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","凍傷","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 4,300・橙階礦石 ×2",repeatReward:"金幣 820・紫階礦石",firstGold:4300,repeatGold:820,ore:"orePerfect",firstOre:2}),
-        Object.freeze({id:"personal-70",name:"寒劫尊",level:70,element:"water",phases:3,traits:Object.freeze(["回復","增幅","控制","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 5,200・橙階礦石 ×2",repeatReward:"金幣 980・橙階礦石",firstGold:5200,repeatGold:980,ore:"orePerfect",firstOre:2}),
-        Object.freeze({id:"personal-80",name:"凍界皇",level:80,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","回復","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.4,type:"heal"}]),firstReward:"首通回天寶輪・金幣 6,200",repeatReward:"金幣 1,160・橙階礦石",firstGold:6200,repeatGold:1160,ore:"orePerfect",firstOre:1,relic:"relic_returning_wheel"}),
-        Object.freeze({id:"personal-90",name:"霜天皇",level:90,element:"water",phases:4,traits:Object.freeze(["封鎖","護盾","蓄力","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"seal"},{round:4,type:"shield"},{round:7,type:"charge"},{hpBelow:.3,type:"amplify"}]),firstReward:"首通金幣 7,500・橙階礦石 ×3",repeatReward:"金幣 1,360・橙階礦石",firstGold:7500,repeatGold:1360,ore:"orePerfect",firstOre:3}),
-        Object.freeze({id:"personal-100",name:"寒獄帝",level:100,element:"water",phases:4,traits:Object.freeze(["護盾","蓄力","回復","封鎖","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"seal"}]),firstReward:"首通金幣 10,000・橙階礦石 ×4",repeatReward:"金幣 1,600・橙階礦石",firstGold:10000,repeatGold:1600,ore:"orePerfect",firstOre:4})
+        Object.freeze({id:"personal-50",name:"霜淵侯",level:50,element:"water",phases:2,traits:Object.freeze(["護盾","回復","凍傷","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{hpBelow:.45,type:"heal"}]),summon:Object.freeze({round:4}),firstReward:"首通金幣 3,400・紫階礦石 ×3",repeatReward:"金幣 660・紫階礦石",firstGold:3400,repeatGold:660,ore:"oreHigh",firstOre:3}),
+        Object.freeze({id:"personal-60",name:"雪獄尊",level:60,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","凍傷"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 4,300・橙階礦石 ×2",repeatReward:"金幣 820・紫階礦石",firstGold:4300,repeatGold:820,ore:"orePerfect",firstOre:2}),
+        Object.freeze({id:"personal-70",name:"寒劫尊",level:70,element:"water",phases:3,traits:Object.freeze(["回復","增幅","控制","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"},{hpBelow:.35,type:"charge"}]),summon:Object.freeze({hpBelow:.55}),firstReward:"首通金幣 5,200・橙階礦石 ×2",repeatReward:"金幣 980・橙階礦石",firstGold:5200,repeatGold:980,ore:"orePerfect",firstOre:2}),
+        Object.freeze({id:"personal-80",name:"凍界皇",level:80,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","回復"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.4,type:"heal"}]),firstReward:"首通回天寶輪・金幣 6,200",repeatReward:"金幣 1,160・橙階礦石",firstGold:6200,repeatGold:1160,ore:"orePerfect",firstOre:1,relic:"relic_returning_wheel"}),
+        Object.freeze({id:"personal-90",name:"霜天皇",level:90,element:"water",phases:4,traits:Object.freeze(["封鎖","護盾","蓄力","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"seal"},{round:4,type:"shield"},{round:7,type:"charge"},{hpBelow:.3,type:"amplify"}]),summon:Object.freeze({round:4}),firstReward:"首通金幣 7,500・橙階礦石 ×3",repeatReward:"金幣 1,360・橙階礦石",firstGold:7500,repeatGold:1360,ore:"orePerfect",firstOre:3}),
+        Object.freeze({id:"personal-100",name:"寒獄帝",level:100,element:"water",phases:4,traits:Object.freeze(["護盾","蓄力","回復","封鎖","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"seal"}]),summon:Object.freeze({hpBelow:.6}),firstReward:"首通金幣 10,000・橙階礦石 ×4",repeatReward:"金幣 1,600・橙階礦石",firstGold:10000,repeatGold:1600,ore:"orePerfect",firstOre:4})
     ]);
 
     const WORLD_STAGE_PROFILES=Object.freeze([
-        Object.freeze({number:1,label:"第一階段",hpFactor:.78,attackFactor:.92,mechanisms:Object.freeze([{round:3,type:"charge"}]),summary:"試探攻勢與一次蓄力。"}),
-        Object.freeze({number:2,label:"第二階段",hpFactor:.88,attackFactor:1,mechanisms:Object.freeze([{round:2,type:"shield"}]),summary:"以護盾改變攻擊優先順序。"}),
-        Object.freeze({number:3,label:"第三階段",hpFactor:.96,attackFactor:1.06,mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"}]),summary:"回復與法陣形成持久壓力，並有兩名同元素精英援軍。"}),
-        Object.freeze({number:4,label:"最終階段",hpFactor:1,attackFactor:1.12,mechanisms:Object.freeze([{round:2,type:"charge"},{round:4,type:"amplify"},{round:7,type:"shield"}]),summary:"狂暴、蓄力與護體交替，兩名同元素精英援軍同場作戰。"})
+        Object.freeze({number:1,label:"第一階段",hpFactor:.78,attackFactor:.92,mechanisms:Object.freeze([{round:3,type:"charge"}]),summon:null,summary:"試探攻勢與一次蓄力。"}),
+        Object.freeze({number:2,label:"第二階段",hpFactor:.88,attackFactor:1,mechanisms:Object.freeze([{round:2,type:"shield"}]),summon:null,summary:"以護盾改變攻擊優先順序。"}),
+        Object.freeze({number:3,label:"第三階段",hpFactor:.96,attackFactor:1.06,mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"}]),summon:Object.freeze({hpBelow:.55}),summary:"回復與法陣形成持久壓力，生命低於 55% 時召喚兩名同元素精英援軍。"}),
+        Object.freeze({number:4,label:"最終階段",hpFactor:1,attackFactor:1.12,mechanisms:Object.freeze([{round:2,type:"charge"},{round:4,type:"amplify"},{round:7,type:"shield"}]),summon:Object.freeze({round:4}),summary:"狂暴、蓄力與護體交替，第 4 回合召喚兩名同元素精英援軍。"})
     ]);
 
     const WORLD_BOSSES=Object.freeze([
@@ -104,6 +102,13 @@
             .replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
     }
     function copy(value){ return JSON.parse(JSON.stringify(value)); }
+    function dungeonRankRatio(key,numeratorRank,denominatorRank){
+        const table=window.v132DungeonRankMultipliers;
+        const numerator=numeric(table&&table[numeratorRank]&&table[numeratorRank][key],0);
+        const denominator=numeric(table&&table[denominatorRank]&&table[denominatorRank][key],0);
+        if(numerator<=0||denominator<=0){ throw new Error("Gameplay BOSS requires v132 dungeon rank multipliers."); }
+        return numerator/denominator;
+    }
     function expectedPartySizeForLevel(level){
         return Math.max(1,Math.floor(numeric(level,1)))<=BOSS_BALANCE.twoMemberLevelCap?2:3;
     }
@@ -116,18 +121,15 @@
         const resolvedMode=mode==="world"?"world":(mode==="tower"?"tower":"personal");
         const hpModeFactor=resolvedMode==="world"?1.15:(resolvedMode==="tower"?.72:1);
         const attackModeFactor=resolvedMode==="world"?1.05:(resolvedMode==="tower"?.96:1);
-        const resolvedStage=Math.max(1,Math.floor(numeric(stage,1)));
-        let supportCount=0;
-        if(resolvedMode==="personal"&&resolvedLevel>=BOSS_BALANCE.personalSupportLevel){ supportCount=2; }
-        if(resolvedMode==="world"&&resolvedStage>=BOSS_BALANCE.worldSupportStage){ supportCount=2; }
-        if(resolvedMode==="tower"&&resolvedLevel>=BOSS_BALANCE.towerSupportLevel){ supportCount=2; }
+        const bossHpNormalization=dungeonRankRatio("maxHP","elite","boss");
+        const bossDefenseMultiplier=dungeonRankRatio("defense","boss","elite");
         return {
             level:resolvedLevel,
             mode:resolvedMode,
             expectedPartySize:expectedPartySize,
-            hpMultiplier:Number((baseHp*hpModeFactor).toFixed(2)),
+            hpMultiplier:Number((baseHp*hpModeFactor*bossHpNormalization).toFixed(2)),
             attackMultiplier:Number((baseAttack*attackModeFactor).toFixed(2)),
-            supportCount:supportCount
+            defenseMultiplier:Number(bossDefenseMultiplier.toFixed(4))
         };
     }
 
@@ -275,7 +277,8 @@
         const stage=type==="world"?(progress.firstClear?4:Math.min(4,progress.completedStages+1)):1;
         const mechanismText=type==="world"?WORLD_STAGE_PROFILES[stage-1].summary:definition.traits.join("・");
         const balance=bossBalanceProfile(definition.level,type==="world"?"world":"personal",stage);
-        const supportText=balance.supportCount>0?"同元素精英援軍 ×"+balance.supportCount:"本階段無精英援軍";
+        const summonPlan=type==="world"?WORLD_STAGE_PROFILES[stage-1].summon:(definition.summon||null);
+        const supportText=summonPlan?"戰中同元素精英援軍 ×"+BOSS_BALANCE.reinforcementCount:"本階段無精英援軍";
         return '<div class="boss-detail"><button type="button" class="boss-detail-back" onclick="vGameplayCloseBossDetail()">‹ 返回 BOSS 列表</button>'+
             '<section class="boss-hero"><small>'+(type==="world"?'世界觀災厄級・永久單人攻略':'個人挑戰・固定等級')+'</small><h3>'+escapeHtml(definition.name)+'</h3><p>Lv.'+definition.level+'・'+escapeHtml(elementLabel(definition.element))+'元素</p><div class="boss-trait-tags">'+definition.traits.map(item=>'<span>'+escapeHtml(item)+'</span>').join("")+'</div></section>'+
             (type==="world"?worldStageTrack(progress):'')+
@@ -371,14 +374,13 @@
         const profile=options||{};
         const mode=profile.mode||(String(definition.id||"").indexOf("world-")===0?"world":(String(definition.id||"").indexOf("tower-")===0?"tower":"personal"));
         const balance=bossBalanceProfile(definition.level,mode,profile.stage);
-        const monster=buildBaseMonster(definition.name,definition.level,definition.element,"elite");
+        const monster=buildBaseMonster(definition.name,definition.level,definition.element,"boss");
         const hpMultiplier=balance.hpMultiplier*numeric(profile.hpFactor,1);
         const attackMultiplier=balance.attackMultiplier*numeric(profile.attackFactor,1);
         monster.maxHP=Math.max(1,Math.round(numeric(monster.maxHP,1)*hpMultiplier));
         monster.hp=monster.maxHP;
         monster.attack=Math.max(1,Math.round(numeric(monster.attack,1)*attackMultiplier));
         monster.magicAttack=Math.max(1,Math.round(numeric(monster.magicAttack,monster.attack)*attackMultiplier));
-        monster.rank="boss";
         monster.unitKind="boss";
         monster.vGameplayBoss=true;
         monster.vGameplayBossId=definition.id;
@@ -389,13 +391,12 @@
     }
     function buildBossSupportRoster(definition,options){
         const profile=options||{};
-        const mode=profile.mode||(String(definition.id||"").indexOf("world-")===0?"world":(String(definition.id||"").indexOf("tower-")===0?"tower":"personal"));
         const stage=Math.max(1,Math.floor(numeric(profile.stage,1)));
-        const balance=bossBalanceProfile(definition.level,mode,stage);
         const names=BOSS_SUPPORT_NAMES[definition.element]||BOSS_SUPPORT_NAMES.fire;
-        return Array.from({length:balance.supportCount},(_,index)=>{
+        return Array.from({length:BOSS_BALANCE.reinforcementCount},(_,index)=>{
             const monster=buildBaseMonster(names[index%names.length],definition.level,definition.element,"elite");
             monster.vGameplayBossSupport=true;
+            monster.vGameplayBossSummon=true;
             monster.vGameplayBossId=definition.id;
             monster.vGameplayStage=stage;
             configureBossSkills(monster,definition.element,Math.max(1,stage-1));
@@ -422,13 +423,19 @@
         if(floor%10===0){ return [{round:3,type:"charge"}]; }
         return [];
     }
+    function towerSummonPlan(floor){
+        if(floor===100){ return {hpBelow:.6}; }
+        if(floor>=70&&floor%10===0){ return {round:4}; }
+        if(floor>=50&&floor%10===0){ return {hpBelow:.5}; }
+        return null;
+    }
     function buildTowerRoster(floor){
         const element=state.tower.element,level=towerMonsterLevel(floor);
         if(floor%10===0){
             const definition={id:"tower-"+floor,name:towerBossName(element,floor),level:level,element:element};
             const stage=floor===100?4:(floor>=70?3:(floor>=40?2:1));
             const boss=buildBossMonster(definition,{stage:stage,mode:"tower"});
-            return [boss].concat(buildBossSupportRoster(definition,{stage:stage,mode:"tower"}));
+            return [boss];
         }
         const elite=floor%5===0,count=elite?2:Math.min(4,2+Math.floor(floor/35));
         return Array.from({length:count},()=>{
@@ -620,6 +627,31 @@
         }
         return final;
     }
+    function summonBossElites(){
+        const context=activeBattleContext,boss=activeBoss();
+        if(!context||!boss||context.summonsCreated||typeof monsters==="undefined"||!Array.isArray(monsters)||typeof currentBattleMonsters==="undefined"||!Array.isArray(currentBattleMonsters)){ return false; }
+        const definition={id:boss.vGameplayBossId||context.definitionId||("tower-"+numeric(context.floor,0)),level:boss.level,element:boss.element};
+        const stage=Math.max(numeric(context.combatPhase,1),numeric(context.stage,1));
+        const guards=buildBossSupportRoster(definition,{stage:stage,mode:context.mode});
+        guards.forEach(guard=>{
+            const index=monsters.length;
+            monsters.push(guard);
+            currentBattleMonsters.push(index);
+        });
+        context.summonsCreated=true;
+        context.supportCount=guards.length;
+        if(typeof addBattleLog==="function"){ addBattleLog(boss.name+"召來兩名同元素精英援軍助戰！"); }
+        if(typeof renderBattle==="function"){ renderBattle(); }
+        else if(typeof updateUI==="function"){ updateUI(); }
+        return guards.length===BOSS_BALANCE.reinforcementCount;
+    }
+    function processBossSummonPlan(round,boss){
+        const context=activeBattleContext,plan=context&&context.summonPlan;
+        if(!context||!plan||context.summonsCreated||!boss){ return false; }
+        const roundReady=plan.round!==undefined&&round>=numeric(plan.round,1);
+        const hpReady=plan.hpBelow!==undefined&&boss.hp/Math.max(1,boss.maxHP)<=numeric(plan.hpBelow,0);
+        return roundReady||hpReady?summonBossElites():false;
+    }
     function partyIndexes(){
         if(typeof getExistingPartyIndexes==="function"){ return getExistingPartyIndexes(); }
         return [0,1,2].filter(index=>typeof getPartyCharacterByIndex==="function"&&getPartyCharacterByIndex(index));
@@ -641,6 +673,7 @@
         if(!activeBattleContext){ return false; }
         const round=typeof turn!=="undefined"?turn:1,boss=activeBoss();if(!boss){ return false; }
         updateBossCombatPhase();
+        processBossSummonPlan(round,boss);
         aliveMechanisms().slice().forEach(card=>{
             if(card.spawnedRound>=round){ return; }
             if(card.type==="charge"){
@@ -783,15 +816,13 @@
         const world=type==="world",definition=world?findWorld(id):findPersonal(id);if(!definition||highestCharacterLevel()<definition.level){ return false; }
         const progress=world?state.world[definition.id]:state.personal[definition.id];
         const stage=world?(progress.firstClear?4:Math.min(4,progress.completedStages+1)):1;
-        const stageProfile=world?WORLD_STAGE_PROFILES[stage-1]:{stage:1,hpFactor:1,attackFactor:1,mechanisms:definition.mechanisms};
+        const stageProfile=world?WORLD_STAGE_PROFILES[stage-1]:{stage:1,hpFactor:1,attackFactor:1,mechanisms:definition.mechanisms,summon:definition.summon||null};
         const mode=world?"world":"personal";
         const balance=bossBalanceProfile(definition.level,mode,stage);
         const boss=buildBossMonster(definition,{stage:stage,mode:mode,hpFactor:stageProfile.hpFactor,attackFactor:stageProfile.attackFactor});
-        const supports=buildBossSupportRoster(definition,{stage:stage,mode:mode});
-        const roster=[boss].concat(supports);
-        activeBattleContext={mode:mode,definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:0,expectedPartySize:balance.expectedPartySize,supportCount:supports.length,mechanisms:[],mechanismPlan:(world?stageProfile.mechanisms:definition.mechanisms).map(item=>Object.assign({},item)),spawnedPlans:{},maxMechanisms:definition.level>=70?2:1};
+        activeBattleContext={mode:mode,definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:0,expectedPartySize:balance.expectedPartySize,supportCount:0,summonPlan:stageProfile.summon,summonsCreated:false,mechanisms:[],mechanismPlan:(world?stageProfile.mechanisms:definition.mechanisms).map(item=>Object.assign({},item)),spawnedPlans:{},maxMechanisms:definition.level>=70?2:1};
         battleStarting=true;
-        const started=window.v132LaunchDungeonBattle(roster,outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome));
+        const started=window.v132LaunchDungeonBattle([boss],outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome));
         battleStarting=false;if(!started){ cleanupMechanismPresentation();activeBattleContext=null; }return !!started;
     }
 
@@ -821,7 +852,7 @@
         const roster=buildTowerRoster(target),boss=target%10===0?roster[0]:null;
         const towerPhases=boss?(target===100?4:(target>=70?3:(target>=40?2:1))):1;
         const balance=boss?bossBalanceProfile(boss.level,"tower",towerPhases):null;
-        activeBattleContext={mode:"tower",floor:target,boss:boss,bossIndex:boss?0:null,combatPhase:1,totalPhases:towerPhases,expectedPartySize:balance?balance.expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target)),supportCount:boss?Math.max(0,roster.length-1):0,mechanisms:[],mechanismPlan:towerMechanismPlan(target),spawnedPlans:{},maxMechanisms:target>=70?2:1};
+        activeBattleContext={mode:"tower",floor:target,boss:boss,bossIndex:boss?0:null,combatPhase:1,totalPhases:towerPhases,expectedPartySize:balance?balance.expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target)),supportCount:0,summonPlan:boss?towerSummonPlan(target):null,summonsCreated:false,mechanisms:[],mechanismPlan:towerMechanismPlan(target),spawnedPlans:{},maxMechanisms:target>=70?2:1};
         battleStarting=true;const started=window.v132LaunchDungeonBattle(roster,outcome=>completeTowerFloor(target,outcome));
         battleStarting=false;if(!started){ cleanupMechanismPresentation();activeBattleContext=null; }return !!started;
     }
