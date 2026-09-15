@@ -173,8 +173,8 @@
             const isSelected=selected===choice.id;
             const locked=selected&&!view.state.chapterCompleted&&!isSelected;
             return '<button type="button" class="adventure-route-choice '+(isSelected?'selected ':'')+(locked?'locked':'')+'" '+
-                (locked?'disabled':'onclick="FourSymbolsAdventure.selectBranch(\''+attr(node.id)+'\',\''+attr(choice.id)+'\')"')+'>'+ 
-                '<span class="adventure-route-risk">'+esc(choice.risk)+'</span><strong>'+esc(choice.title)+'</strong><p>'+esc(choice.description)+'</p>'+ 
+                (locked?'disabled':'onclick="FourSymbolsAdventure.selectBranch(\''+attr(node.id)+'\',\''+attr(choice.id)+'\')"')+'>'+
+                '<span class="adventure-route-risk">'+esc(choice.risk)+'</span><strong>'+esc(choice.title)+'</strong><p>'+esc(choice.description)+'</p>'+
                 (isSelected?'<small>首次已選</small>':locked?'<small>章節通關後可回溯</small>':'<small>選擇此路線</small>')+'</button>';
         }).join("");
         const actions='<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.setPanel(\'map\')">先看看地圖</button>';
@@ -202,8 +202,8 @@
         const rewardReady=view.state.rewardClaims[node.id]==="ready";
         const body='<div class="adventure-objective-paper">'+
             '<span class="adventure-objective-zone">已開放區域 · '+esc(objective.zoneLabel||objective.zoneKey)+'</span>'+
-            '<h3>'+esc(objective.itemLabel)+'</h3><p>擊敗 <b>'+esc(objective.monsterName)+'</b> 時有 40% 基礎機率取得；連續 3 隻未掉，第 4 隻必掉。</p>'+ 
-            progressDots(objective.current,objective.target)+'<strong class="adventure-objective-count">'+esc(objective.current)+' / '+esc(objective.target)+(ready?' ✓':'')+'</strong>'+ 
+            '<h3>'+esc(objective.itemLabel)+'</h3><p>擊敗 <b>'+esc(objective.monsterName)+'</b> 時有 40% 基礎機率取得；連續 3 隻未掉，第 4 隻必掉。</p>'+
+            progressDots(objective.current,objective.target)+'<strong class="adventure-objective-count">'+esc(objective.current)+' / '+esc(objective.target)+(ready?' ✓':'')+'</strong>'+
             '<small>任務物品只記錄委託進度，不佔一般背包。</small></div>';
         let actions="";
         if(!turned&&ready){
@@ -256,8 +256,8 @@
 
     function renderChapterComplete(view){
         const claimed=view.state.chapterRewardClaimed;
-        const body='<div class="adventure-chapter-seal">章</div><h3>'+esc(view.chapter.title)+' · 完成</h3>'+ 
-            '<p>山路重新通行。你現在可以直接回到岔路，補走第一次沒有選的路線，不必從第一節重打。</p>'+ 
+        const body='<div class="adventure-chapter-seal">章</div><h3>'+esc(view.chapter.title)+' · 完成</h3>'+
+            '<p>山路重新通行。你現在可以直接回到岔路，補走第一次沒有選的路線，不必從第一節重打。</p>'+
             '<div class="adventure-result-box"><b>回溯探索</b><span>另一條岔路的節點仍可取得它自己的首次獎勵。</span></div>';
         const actions=(claimed?'<span class="adventure-used-mark">章節獎勵已領取</span>':'<button type="button" class="adventure-button primary attention" onclick="FourSymbolsAdventure.claimChapterReward()">領取章節獎勵</button>')+
             '<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.setPanel(\'map\')">回到地圖探索</button>';
@@ -270,12 +270,12 @@
         const items=API().merchantStock().map(item=>{
             const bought=!!purchases[item.id],owned=potionCount(item.id);
             return '<article class="adventure-merchant-item tier-'+esc(item.tierKey||"white")+(item.rare?' rare':'')+'">'+
-                '<div class="adventure-merchant-icon" aria-hidden="true">'+(item.rare?'丹':'藥')+'</div>'+ 
-                '<div class="adventure-merchant-copy"><small>'+esc(item.tierKey==="orange"?"橙階珍稀":"旅途補給")+'</small><strong>'+esc(item.name)+'</strong><span>數量 ×'+esc(item.quantity)+' · 持有 '+esc(owned)+'</span></div>'+ 
-                '<button type="button" '+(bought?'disabled':'onclick="FourSymbolsAdventure.buyMerchantItem(\''+attr(item.id)+'\')"')+'>'+ (bought?'已購買':esc(item.price.toLocaleString("zh-TW"))+" 金")+'</button>'+ 
+                '<div class="adventure-merchant-icon" aria-hidden="true">'+(item.rare?'丹':'藥')+'</div>'+
+                '<div class="adventure-merchant-copy"><small>'+esc(item.tierKey==="orange"?"橙階珍稀":"旅途補給")+'</small><strong>'+esc(item.name)+'</strong><span>數量 ×'+esc(item.quantity)+' · 持有 '+esc(owned)+'</span></div>'+
+                '<button type="button" '+(bought?'disabled':'onclick="FourSymbolsAdventure.buyMerchantItem(\''+attr(item.id)+'\')"')+'>'+ (bought?'已購買':esc(item.price.toLocaleString("zh-TW"))+" 金")+'</button>'+
             '</article>';
         }).join("");
-        const body='<div class="adventure-merchant-hero"><div class="adventure-merchant-portrait" aria-hidden="true"><span>商</span></div><div><b>無名旅商</b><p>路過才會遇見的少量補給。不是最有效率的養成來源，也沒有商人限定核心戰力。</p><strong>持有 '+esc(globalGold().toLocaleString("zh-TW"))+' 金幣</strong></div></div>'+ 
+        const body='<div class="adventure-merchant-hero"><div class="adventure-merchant-portrait" aria-hidden="true"><span>商</span></div><div><b>無名旅商</b><p>路過才會遇見的少量補給。不是最有效率的養成來源，也沒有商人限定核心戰力。</p><strong>持有 '+esc(globalGold().toLocaleString("zh-TW"))+' 金幣</strong></div></div>'+
             '<div class="adventure-merchant-grid">'+items+'</div>';
         return panelShell("神秘商人","燈影下的旅商",body,'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.setPanel(\'map\')">離開攤位</button>',"merchant-panel");
     }
@@ -348,10 +348,10 @@
         const inBattle=typeof battleActive!=="undefined"&&!!battleActive;
         tracker.hidden=false;
         tracker.classList.toggle("is-ready",!!objective.ready);
-        tracker.innerHTML='<button type="button" class="adventure-tracker-main" onclick="FourSymbolsAdventure.returnFromPatrol()" '+(inBattle?'aria-disabled="true"':'')+'>'+ 
+        tracker.innerHTML='<button type="button" class="adventure-tracker-main" onclick="FourSymbolsAdventure.returnFromPatrol()" '+(inBattle?'aria-disabled="true"':'')+'>'+
             '<small>出城冒險</small><strong>'+esc(objective.itemLabel)+'</strong>'+progressDots(objective.current,objective.target)+
-            '<b>'+esc(objective.current)+' / '+esc(objective.target)+(objective.ready?' ✓':'')+'</b>'+ 
-            '<span>'+esc(objective.monsterName)+' · '+esc(objective.zoneLabel||objective.zoneKey)+'</span>'+ 
+            '<b>'+esc(objective.current)+' / '+esc(objective.target)+(objective.ready?' ✓':'')+'</b>'+
+            '<span>'+esc(objective.monsterName)+' · '+esc(objective.zoneLabel||objective.zoneKey)+'</span>'+
             '<em>'+(inBattle?'戰鬥結束後可返回':objective.ready?'返回章節':'返回冒險')+'</em></button>';
     }
 

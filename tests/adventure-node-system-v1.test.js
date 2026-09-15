@@ -191,6 +191,11 @@ function baseRuntime(){
     assert.doesNotMatch(runtime,/loseBattle\s*=/,"Adventure must not wrap loseBattle");
     assert.doesNotMatch(runtime,/winBattle\s*=/,"Adventure must not wrap winBattle");
     assert.match(runtime,/v132LaunchDungeonBattle/);
+    assert.match(runtime,/normalizeFailureResources:false/,"Adventure must explicitly opt out of V132 failure refill");
+    const dungeonOwner=read("js/27-v132-content-expansion.js");
+    assert.match(dungeonOwner,/function launchDungeonBattle\(monsterList,onComplete,options\)/);
+    assert.match(dungeonOwner,/normalizeFailureResources:opts\.normalizeFailureResources!==false/);
+    assert.match(dungeonOwner,/if\(run\.normalizeFailureResources!==false\)/);
     const ui=read("js/adventure/adventure-ui-v1-20260915.js");
     assert.match(ui,/getElementById\("game-content"\)\|\|document\.getElementById\("game-stage"\)/,"Adventure page must mount inside the existing game-content owner before falling back to game-stage");
     const entryCss=read("css/adventure-entry-v1-20260915.css");

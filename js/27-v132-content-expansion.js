@@ -1970,7 +1970,8 @@
 
     window.v132ActiveDungeonRun=null;
 
-    function launchDungeonBattle(monsterList,onComplete){
+    function launchDungeonBattle(monsterList,onComplete,options){
+        const opts=options&&typeof options==="object"?options:{};
         if(battleActive){
             alert("目前正在戰鬥中，無法開始副本。");
             return false;
@@ -1980,6 +1981,7 @@
             previousMonsters:monsters,
             previousZone:currentZone,
             onComplete:onComplete,
+            normalizeFailureResources:opts.normalizeFailureResources!==false,
             startedAt:Date.now()
         };
 
@@ -2134,13 +2136,15 @@
             restoreDungeonMonsters();
             window.v132ActiveDungeonRun=null;
 
-            getExistingPartyIndexes().forEach(characterIndex=>{
-                const character=getPartyCharacterByIndex(characterIndex);
-                const stats=getPartyBattleStats(characterIndex);
-                if(!character || !stats){ return; }
-                character.hp=stats.maxHP;
-                character.sp=stats.maxSP;
-            });
+            if(run.normalizeFailureResources!==false){
+                getExistingPartyIndexes().forEach(characterIndex=>{
+                    const character=getPartyCharacterByIndex(characterIndex);
+                    const stats=getPartyBattleStats(characterIndex);
+                    if(!character || !stats){ return; }
+                    character.hp=stats.maxHP;
+                    character.sp=stats.maxSP;
+                });
+            }
             updateUI();
             saveGame();
 

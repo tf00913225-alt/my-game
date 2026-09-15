@@ -17,7 +17,7 @@
             '<stop offset="1" stop-color="'+ORANGE+'"/></radialGradient></defs>'+
             '<circle cx="32" cy="32" r="20" fill="url(#advPill'+mark+')" stroke="#f5d88f" stroke-width="2.6"/>'+
             '<path d="M23 23c5-4 13-5 18 0M22 42c6 4 14 4 20-1" fill="none" stroke="#8c4617" stroke-width="2" stroke-linecap="round"/>'+
-            '<text x="32" y="38" text-anchor="middle" font-size="17" font-weight="700" fill="#4d260f">'+mark+'</text>'+ 
+            '<text x="32" y="38" text-anchor="middle" font-size="17" font-weight="700" fill="#4d260f">'+mark+'</text>'+
             '</svg></span>';
     }
 
