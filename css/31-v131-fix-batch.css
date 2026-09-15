@@ -380,97 +380,111 @@
     to{ transform:scale(1.18); opacity:1; }
 }
 
-#game-stage #expDistributeList{
+/* Premium Functional UI / Demo Visual Parity — EXP presentation owner.
+   Keep renderExpDistributeList() and its preview/confirm runtime unchanged;
+   only rebalance hierarchy so character/current EXP/next level/cost read first. */
+#game-stage #homeExpPoolCard #expDistributeList{
     display:flex;
     flex-direction:column;
-    gap:7px;
+    gap:0;
+    margin-top:7px;
+    border-top:1px solid rgba(200,154,72,.18);
 }
 
-.v131-exp-row{
+#game-stage #homeExpPoolCard .v131-exp-row{
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
-    gap:5px 8px;
+    gap:4px 10px;
     align-items:center;
-    padding:10px 10px 9px;
-    border:1px solid rgba(200,154,72,.24);
-    border-radius:9px;
-    background:linear-gradient(145deg,rgba(29,22,14,.76),rgba(10,8,6,.86));
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025);
+    padding:10px 2px;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.14);
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
 }
 
-.v131-exp-name{
+#game-stage #homeExpPoolCard .v131-exp-name{
     min-width:0;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
-    font-size:15px;
-    font-weight:800;
-    color:#f3dfb2;
-}
-
-.v131-exp-level{
-    font-size:14px;
-    color:#b7a98e;
-    text-align:right;
-}
-
-.v131-exp-level.preview,
-.v131-preview-level{
-    color:#ffdf69 !important;
+    color:#f3ead7;
+    font-family:"Noto Serif TC",serif;
+    font-size:16px;
     font-weight:900;
+    letter-spacing:.01em;
 }
 
-.v131-exp-preview-btn{
-    grid-column:1 / -1;
-    width:100%;
-    min-height:44px;
-    padding:8px 10px;
-    border:1px solid rgba(200,154,72,.42);
-    border-radius:8px;
-    background:linear-gradient(180deg,#2b2419,#14110d);
-    color:#e7d7b5;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.035);
-    font-size:15px;
-    font-weight:900;
-}
-
-.v131-exp-preview-summary{
-    text-align:right;
-    color:#cfbd98;
-    font-size:14px;
+#game-stage #homeExpPoolCard .v131-exp-level{
+    color:#b7a88f;
+    font-size:13px;
     line-height:1.4;
-    padding:3px 2px;
+    text-align:right;
 }
 
-.v131-exp-actions{
+#game-stage #homeExpPoolCard .v131-exp-level.preview,
+#game-stage #homeExpPoolCard .v131-preview-level{
+    color:#efd18a !important;
+    font-weight:900;
+}
+
+#game-stage #homeExpPoolCard .v131-exp-preview-btn{
+    grid-column:1 / -1;
+    justify-self:end;
+    width:min(144px,100%);
+    min-height:40px;
+    padding:7px 10px;
+    border:1px solid rgba(200,154,72,.34);
+    border-radius:8px;
+    background:linear-gradient(180deg,#282117,#12100b);
+    color:#dfcfad;
+    box-shadow:none;
+    font-size:13px;
+    font-weight:900;
+}
+
+#game-stage #homeExpPoolCard .v131-exp-preview-summary{
+    text-align:left;
+    color:#b7a88f;
+    font-size:13px;
+    line-height:1.45;
+    padding:4px 1px;
+}
+
+#game-stage #homeExpPoolCard .v131-exp-actions{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:8px;
+    gap:7px;
+    padding-top:4px;
 }
 
-.v131-exp-actions button{
+#game-stage #homeExpPoolCard .v131-exp-actions button{
     min-height:44px;
-    padding:9px 8px;
-    border:1px solid #a77a35;
-    border-radius:8px;
-    font-size:15px;
+    padding:8px 10px;
+    border-radius:9px;
+    font-size:14px;
     font-weight:900;
 }
 
-.v131-exp-confirm{
-    background:linear-gradient(180deg,#6a3517,#3f190d);
-    color:#ffe7a1;
+#game-stage #homeExpPoolCard .v131-exp-confirm{
+    border:1px solid #c99c4b !important;
+    background:linear-gradient(#5a401f,#28180c) !important;
+    color:#fff0c2 !important;
+    box-shadow:inset 0 0 12px rgba(224,183,90,.10) !important;
 }
 
-.v131-exp-back{
-    background:#21180f;
-    color:#d8c8aa;
+#game-stage #homeExpPoolCard .v131-exp-back{
+    border:1px solid rgba(200,154,72,.34) !important;
+    background:linear-gradient(#282117,#12100b) !important;
+    color:#dfcfad !important;
+    box-shadow:none !important;
 }
 
-.v131-exp-actions button:disabled,
-.v131-exp-preview-btn:disabled{
-    opacity:.35 !important;
-    filter:grayscale(.65);
+#game-stage #homeExpPoolCard .v131-exp-actions button:disabled,
+#game-stage #homeExpPoolCard .v131-exp-preview-btn:disabled{
+    opacity:.42 !important;
+    filter:none;
     pointer-events:none;
 }
 
