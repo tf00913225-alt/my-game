@@ -194,7 +194,7 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.match(index,/assets\/ui\/home-shop\.png/);
     /* The dungeon utility slot is now the requested 元素匣 entry; 秘寶 remains
        the third slot and uses the transparent V175 WebP asset. */
-    assert.match(finalNavSource,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","openHomeFeature\('relic'\)"\]/);
+    assert.match(finalNavSource,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
     assert.match(finalNavSource,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);
     const shopIcon=fs.readFileSync("assets/ui/home-shop-v147.png");
     assert.equal(shopIcon.subarray(1,4).toString(),"PNG");
