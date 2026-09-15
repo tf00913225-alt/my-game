@@ -102,6 +102,12 @@ function measure(name,html){
  const decorations=[...content.querySelectorAll(".adventure-scene-decor,.adventure-panel-scene,.adventure-road-layer,.adventure-landmark,.adventure-home-gate")];
  const badPointer=decorations.filter(node=>getComputedStyle(node).pointerEvents!=="none").map(node=>String(node.className&&node.className.baseVal||node.className||node.tagName));
  const rr=root&&root.getBoundingClientRect();const result={name,rootOutside:rr?outside(rr):true,badButtons:rects.filter(x=>outside(x.r)).map(x=>x.node.textContent.trim().slice(0,24)),overlaps,clipped,badPointer,docOverflow:document.documentElement.scrollWidth>innerWidth+1||document.documentElement.scrollHeight>innerHeight+1};
+ if(name==="map"){
+  const view=content.querySelector(".adventure-view"),footer=content.querySelector(".adventure-map-footer");
+  const scrollOwners=[...content.querySelectorAll("*")].filter(node=>{const style=getComputedStyle(node);return (style.overflowY==="auto"||style.overflowY==="scroll")&&node.scrollHeight>node.clientHeight+1;});
+  if(view&&footer){view.scrollTop=view.scrollHeight;const viewRect=view.getBoundingClientRect(),footerRect=footer.getBoundingClientRect();result.mapFooter={scrollOwnerCount:scrollOwners.length,viewIsScrollOwner:scrollOwners.includes(view),reachedEnd:Math.abs(view.scrollTop-(view.scrollHeight-view.clientHeight))<=1,fullyVisible:footerRect.top>=viewRect.top-1&&footerRect.bottom<=viewRect.bottom+1};}
+  else{result.mapFooter={missing:true};}
+ }
  if(name==="tracker"){const t=content.querySelector("#adventureObjectiveTracker")?.getBoundingClientRect(),p=content.querySelector("#mockPlayer")?.getBoundingClientRect(),c=content.querySelector("#mockControl")?.getBoundingClientRect();result.trackerOverlapPlayer=t&&p?overlap(t,p):999;result.trackerOverlapControl=t&&c?overlap(t,c):999;}
  return result;
 }
@@ -203,6 +209,12 @@ for(const [width,height] of VIEWPORTS){
             assert.deepEqual(result.clipped,[],`${result.name}: readable text clips at ${width}x${height}`);
             assert.deepEqual(result.badPointer,[],`${result.name}: decorative layer captures pointer events at ${width}x${height}`);
             assert.equal(result.docOverflow,false,`${result.name}: document overflow at ${width}x${height}`);
+            if(result.name==="map"){
+                assert.equal(result.mapFooter?.scrollOwnerCount,1,`map: must keep exactly one vertical scroll owner at ${width}x${height}`);
+                assert.equal(result.mapFooter?.viewIsScrollOwner,true,`map: adventure-view must own vertical scrolling at ${width}x${height}`);
+                assert.equal(result.mapFooter?.reachedEnd,true,`map: adventure-view must reach its final scroll position at ${width}x${height}`);
+                assert.equal(result.mapFooter?.fullyVisible,true,`map: footer must be fully visible after scrolling at ${width}x${height}`);
+            }
             if(result.name==="tracker"){
                 assert.equal(result.trackerOverlapPlayer,0,`objective HUD overlaps player at ${width}x${height}`);
                 assert.equal(result.trackerOverlapControl,0,`objective HUD overlaps control at ${width}x${height}`);

@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.425eb79bba75.js"
+          "build/app-shell.f7d9454a85ea.js"
         ],
         "styles": [
           "build/app-shell.6675b1a3a67e.css"
@@ -128,7 +128,7 @@
           "build/feature-adventure-ui.45b18a7b6326.js"
         ],
         "styles": [
-          "build/feature-adventure.e5264f105e2a.css"
+          "build/feature-adventure.ad5001bff4ff.css"
         ],
         "dependencies": [
           "gameplay-core"
@@ -476,19 +476,19 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.425eb79bba75.js",
-        "sha256": "425eb79bba75",
-        "bytes": 919562,
-        "priority": "P1",
-        "type": "script",
-        "decode": false
-      },
-      {
         "path": "build/app-shell.6675b1a3a67e.css",
         "sha256": "6675b1a3a67e",
         "bytes": 101562,
         "priority": "P1",
         "type": "style",
+        "decode": false
+      },
+      {
+        "path": "build/app-shell.f7d9454a85ea.js",
+        "sha256": "f7d9454a85ea",
+        "bytes": 919596,
+        "priority": "P1",
+        "type": "script",
         "decode": false
       },
       {
@@ -724,8 +724,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "5a62c54a901e",
-    "totalBytes": 20773007,
+    "manifestHash": "2e7becdfddbe",
+    "totalBytes": 20773041,
     "totalResources": 70
   },
   "assets": {
@@ -733,9 +733,9 @@
       "sha256": "c60fd6f40514",
       "bytes": 63904
     },
-    "build/app-shell.425eb79bba75.js": {
-      "sha256": "425eb79bba75",
-      "bytes": 919562
+    "build/app-shell.f7d9454a85ea.js": {
+      "sha256": "f7d9454a85ea",
+      "bytes": 919596
     },
     "build/gameplay-core.cc328a1bcdc4.js": {
       "sha256": "cc328a1bcdc4",
@@ -813,9 +813,9 @@
       "sha256": "3b79bc2d8b41",
       "bytes": 3236
     },
-    "build/feature-adventure.e5264f105e2a.css": {
-      "sha256": "e5264f105e2a",
-      "bytes": 20226
+    "build/feature-adventure.ad5001bff4ff.css": {
+      "sha256": "ad5001bff4ff",
+      "bytes": 20323
     },
     "build/firebase/firebase-config.4314d6321ba1.js": {
       "sha256": "4314d6321ba1",
