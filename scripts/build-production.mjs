@@ -86,7 +86,8 @@ const gameplayScripts=[
     "js/55-v173.51-inventory-qa.js",
     "js/56-v173.51-shop-qa.js",
     "js/57-v173.51-quest-qa.js",
-    "js/58-v173.63-functional-fixes.js"
+    "js/58-v173.63-functional-fixes.js",
+    "js/adventure/adventure-items-v1-20260915.js"
 ];
 const patrolScripts=["js/26-v131-patrol-appearance.js"];
 const abyssScripts=["js/59-abyss-two-tier-runtime.js"];
@@ -95,7 +96,6 @@ const bossRelicScripts=["js/gameplay-boss-tower-system.js","js/60-team-relic-sys
 const relicProgressionScripts=["js/relic-progression-drop-system.js"];
 const adventureScripts=[
     "js/adventure/adventure-content-v1-20260915.js",
-    "js/adventure/adventure-items-v1-20260915.js",
     "js/adventure/adventure-runtime-v1-20260915.js",
     "js/adventure/adventure-ui-v1-20260915.js"
 ];
