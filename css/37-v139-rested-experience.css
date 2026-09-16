@@ -99,9 +99,10 @@
 }
 
 /*
-   Demo Visual Parity / Batch F — System is a functional list, not a stack of
-   decorative dashboard cards. Runtime actions, settings persistence and the
-   existing modal scroll owner remain unchanged.
+   System/settings currently contains only a small number of rows, so it is a
+   content-height Medium Modal rather than a 540px empty shell. If future rows
+   exceed the safe viewport, #homeFeatureModalBody becomes the sole vertical
+   scroll owner and the frame remains capped to the available game surface.
 */
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .home-feature-modal-box{
     width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
@@ -118,7 +119,7 @@
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .home-feature-modal-title{
     flex:0 0 auto !important;
-    color:#f3ead7 !important;
+    color:var(--ui-text,#f4ead4) !important;
     letter-spacing:.06em;
 }
 
@@ -137,74 +138,77 @@
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel{
     min-height:0 !important;
     display:grid !important;
-    gap:0 !important;
+    gap:7px !important;
     box-sizing:border-box !important;
-    padding:0 2px 2px !important;
-    border-top:1px solid rgba(200,154,72,.14) !important;
+    padding:2px 1px 4px !important;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row{
     position:relative;
-    min-height:62px !important;
-    padding:9px 3px !important;
-    border:0 !important;
-    border-bottom:1px solid rgba(200,154,72,.14) !important;
-    border-radius:0 !important;
-    background:transparent !important;
-    box-shadow:none !important;
+    min-height:72px !important;
+    padding:10px 10px !important;
+    border:1px solid rgba(200,154,72,.20) !important;
+    border-radius:10px !important;
+    background:linear-gradient(150deg,rgba(31,23,14,.78),rgba(10,8,6,.88)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,232,180,.025) !important;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row::before{
-    display:none !important;
+    content:"";
+    position:absolute;
+    left:12px;
+    right:12px;
+    top:0;
+    height:1px;
+    pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(239,209,138,.22),transparent);
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row strong{
-    color:#f0e3c6 !important;
+    color:#efd69d !important;
     font-family:"Noto Serif TC","Noto Sans TC",serif;
     font-size:15px !important;
     line-height:1.25 !important;
-    letter-spacing:.02em;
+    letter-spacing:.03em;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row small{
     margin-top:3px;
-    color:#a99b84 !important;
-    font-size:12px !important;
-    line-height:1.4 !important;
+    color:var(--ui-text-muted,#a99b83) !important;
+    font-size:13px !important;
+    line-height:1.45 !important;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel button,
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel select,
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel input{
-    min-height:38px !important;
+    min-height:44px !important;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row:not(.danger) .home-feature-buy-btn{
-    min-width:76px !important;
-    border-color:rgba(200,154,72,.28) !important;
-    color:#d9c9aa !important;
-    background:linear-gradient(180deg,#282117,#12100b) !important;
-    box-shadow:none !important;
+    border-color:rgba(200,154,72,.38) !important;
+    color:#e7d7b5 !important;
+    background:linear-gradient(180deg,#2b2419,#14110d) !important;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.035),0 2px 6px rgba(0,0,0,.28) !important;
 }
 
-/* Destructive actions stay explicit, but the warning is local instead of
-   turning the entire row into a red card. */
+/* Warning containers and their destructive actions share one red visual
+   language. A red outer warning with a yellow/black inner button is forbidden. */
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row.danger{
-    padding-left:9px !important;
-    border-left:2px solid #a84d3f !important;
-    background:rgba(72,24,20,.10) !important;
-    box-shadow:none !important;
+    border-color:#a84d3f !important;
+    background:linear-gradient(180deg,rgba(78,27,22,.88),rgba(31,13,11,.94)) !important;
+    box-shadow:inset 0 0 0 1px rgba(220,91,70,.08) !important;
 }
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row.danger::before{
-    display:none !important;
+    background:linear-gradient(90deg,transparent,rgba(240,162,152,.20),transparent);
 }
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row.danger strong{
-    color:#e9aaa1 !important;
+    color:#f0b0a7 !important;
 }
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row.danger .home-feature-buy-btn{
-    border-color:#a84d3f !important;
-    color:#f5d8d3 !important;
-    background:linear-gradient(180deg,#5c2b24,#281310) !important;
-    text-shadow:none !important;
-    box-shadow:none !important;
+    border-color:#cf614e !important;
+    color:#fff0e9 !important;
+    background:linear-gradient(180deg,#8e3b30,#4d1b16) !important;
+    text-shadow:0 1px 2px #000 !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 6px rgba(0,0,0,.4) !important;
 }

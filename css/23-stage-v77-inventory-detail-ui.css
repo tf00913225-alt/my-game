@@ -303,6 +303,7 @@
     min-height:124px !important;
 }
 
+
 /* Skill detail icon is an icon, not a full-width repeating banner. */
 #game-stage #skillDetailModal #skillDetailIcon{
     width:88px!important;height:88px!important;min-height:88px!important;
@@ -312,87 +313,3 @@
     background-color:rgba(9,8,6,.88)!important;
 }
 #game-stage #skillDetailModal #skillDetailIcon img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;}
-
-/* =====================================================
-   Premium Functional UI — Demo Visual Parity / Batch C
-   Item detail presentation only; equipment/potion runtime remains unchanged.
-===================================================== */
-#game-stage #itemModal{
-    background:rgba(2,2,2,.72) !important;
-}
-#game-stage #itemModal .item-modal-box{
-    padding:12px !important;
-    border:1px solid #b88a3b !important;
-    border-radius:14px !important;
-    color:#f3ead7 !important;
-    background:linear-gradient(180deg,#231a10,#0c0906) !important;
-    box-shadow:0 15px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,235,188,.035) !important;
-}
-#game-stage #itemModal #itemModalIcon{
-    align-self:center !important;
-    margin:0 auto 2px !important;
-    border-radius:10px !important;
-    box-shadow:none !important;
-}
-#game-stage #itemModal #itemModalName{
-    margin:0 !important;
-    padding:0 0 8px !important;
-    border:0 !important;
-    border-bottom:1px solid rgba(200,154,72,.18) !important;
-    color:#f0d18a !important;
-    background:transparent !important;
-    box-shadow:none !important;
-    font-family:"Noto Serif TC",serif !important;
-    font-size:18px !important;
-    line-height:1.3 !important;
-    font-weight:900 !important;
-    text-align:center !important;
-}
-#game-stage #itemModal #itemModalStats{
-    padding:4px 2px !important;
-    border:0 !important;
-    border-radius:0 !important;
-    color:#d8cbb4 !important;
-    background:transparent !important;
-    box-shadow:none !important;
-    font-size:14px !important;
-    line-height:1.55 !important;
-}
-#game-stage #itemModal #itemModalStats > div{
-    border-color:rgba(200,154,72,.12) !important;
-}
-#game-stage #itemModal .item-modal-buttons{
-    display:grid !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:8px !important;
-    margin-top:auto !important;
-    padding-top:8px !important;
-    border-top:1px solid rgba(200,154,72,.14) !important;
-}
-#game-stage #itemModal .item-modal-buttons button{
-    min-height:44px !important;
-    border:1px solid rgba(200,154,72,.34) !important;
-    border-radius:8px !important;
-    color:#dfcfad !important;
-    background:linear-gradient(180deg,#282117,#12100b) !important;
-    box-shadow:none !important;
-    font-size:14px !important;
-    font-weight:900 !important;
-}
-#game-stage #itemModal #itemEquipButton:not(:disabled),
-#game-stage #itemModal #v17342InventoryPotionUse:not(:disabled){
-    border-color:#c99c4b !important;
-    color:#fff0c2 !important;
-    background:linear-gradient(#5a401f,#28180c) !important;
-    box-shadow:inset 0 0 10px rgba(224,183,90,.08) !important;
-}
-#game-stage #itemModal .item-modal-buttons button:disabled{
-    opacity:.42 !important;
-    border-color:rgba(200,154,72,.16) !important;
-    color:#817563 !important;
-    background:#100d09 !important;
-}
-#game-stage #itemModal .close-item-button{
-    color:#c9b897 !important;
-    background:#100d09 !important;
-}
