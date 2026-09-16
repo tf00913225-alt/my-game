@@ -123,13 +123,14 @@
     transform:translate(-50%,-118%) !important;
 }
 
-/* Formal cast Sprite Sheet stage. */
+/* Formal cast Sprite Sheet stage. The viewport edge is the only VFX clip owner.
+   Do not use strict/paint containment here: it creates an additional paint clip. */
 .v143-skill-stage{
     position:fixed;
     inset:0;
     z-index:16000;
     overflow:hidden;
-    contain:strict;
+    contain:layout style;
     pointer-events:none;
 }
 

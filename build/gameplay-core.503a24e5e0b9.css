@@ -60,8 +60,9 @@
     position:relative !important;
     background:transparent !important;
     isolation:isolate !important;
-    /* V96：後段 V40 不得再把整個戰鬥頁改回 scroll owner。 */
-    overflow:hidden !important;
+    /* The outer game viewport owns page clipping. Battle artwork/VFX may paint
+       outside their unit boxes without turning battlePage into a scroll owner. */
+    overflow:visible !important;
 }
 
 #game-stage > #app > #game-content #battlePage > .battle-bg-shared{
@@ -327,9 +328,9 @@
     pointer-events:none !important;
 }
 
-/* The battle viewport itself cannot expose horizontal overflow. */
+/* battlePage is not a clipping owner. The outer game viewport prevents page
+   scrolling while combat art remains free to paint outside unit rectangles. */
 #game-stage > #app > #game-content #battlePage{
-    overflow:hidden !important;
     border-right:0 !important;
     outline-right:0 !important;
     box-shadow:none !important;
@@ -2044,14 +2045,32 @@ body.quest-scroll-active,
     overflow:visible !important;
 }
 
+/* Fixed Slot battlefield: every enemy row always owns five physical columns.
+   Empty slots retain their width after death/summon/revive, so neither units nor
+   VFX geometry can re-center around the currently surviving cards. */
 #game-stage #battleMonsterArea .v131-monster-row{
-    display:flex;
+    display:grid;
+    grid-template-columns:repeat(5,76px);
     flex:0 0 auto;
     align-items:flex-start;
     justify-content:center;
     gap:3px;
     width:100%;
     min-width:0;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot{
+    position:relative;
+    width:76px;
+    min-width:76px;
+    min-height:90px;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot > .battle-monster{
+    margin-left:auto !important;
+    margin-right:auto !important;
 }
 
 #game-stage #battleMonsterArea .v131-monster-row .battle-monster{
@@ -2679,6 +2698,55 @@ body.quest-scroll-active,
 #creationSkillDetailModal .creation-skill-detail-level-row,
 #creationSkillDetailModal .creation-skill-detail-level-row b{font-size:39px !important;line-height:1.55 !important;}
 #creationSkillDetailModal .creation-skill-detail-close{font-size:39px !important;}
+
+/* Fixed battlefield ally slots: structural owner, not a positional workaround. */
+#game-stage #battlePlayerRow.v-fixed-ally-formation{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    overflow:visible;
+}
+#game-stage #battlePlayerRow .v-fixed-ally-row{
+    display:grid;
+    grid-template-columns:repeat(3,76px);
+    justify-content:center;
+    gap:5px;
+    min-height:102px;
+    overflow:visible;
+}
+#game-stage #battlePlayerRow .v-fixed-ally-slot{
+    position:relative;
+    width:76px;
+    min-height:102px;
+    overflow:visible;
+}
+#game-stage #battlePlayerRow .v-fixed-ally-slot>.battle-player{
+    width:76px;
+    height:102px;
+}
+.v146-home-roster>header .v-fixed-formation-entry{
+    margin-left:auto;
+    min-width:54px;
+    min-height:30px;
+    border:1px solid rgba(223,187,95,.7);
+    border-radius:8px;
+    background:rgba(31,24,14,.92);
+    color:#f2d783;
+    font-weight:800;
+}
+.v-fixed-formation-panel{display:flex;flex-direction:column;gap:14px;}
+.v-fixed-formation-panel>p{margin:0;text-align:center;line-height:1.5;}
+.v-fixed-formation-row>header{margin-bottom:6px;font-weight:900;color:#e5c76f;}
+.v-fixed-formation-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.v-fixed-formation-slot{
+    min-height:72px;padding:8px 4px;border:1px solid rgba(198,165,78,.55);border-radius:10px;
+    background:rgba(20,18,15,.82);color:#f5ead0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+}
+.v-fixed-formation-slot small{font-size:12px;color:#bda96f;}
+.v-fixed-formation-slot strong{font-size:15px;}
+.v-fixed-formation-slot.selected{outline:2px solid #f2cf63;box-shadow:0 0 12px rgba(242,207,99,.35);}
 
 
 /* bundled source: css/33-v132-content-expansion.css */
@@ -4747,13 +4815,14 @@ body.quest-scroll-active,
     transform:translate(-50%,-118%) !important;
 }
 
-/* Formal cast Sprite Sheet stage. */
+/* Formal cast Sprite Sheet stage. The viewport edge is the only VFX clip owner.
+   Do not use strict/paint containment here: it creates an additional paint clip. */
 .v143-skill-stage{
     position:fixed;
     inset:0;
     z-index:16000;
     overflow:hidden;
-    contain:strict;
+    contain:layout style;
     pointer-events:none;
 }
 

@@ -6388,6 +6388,18 @@ function saveGame(options={}){
             autoConfig3:
                 autoConfig3,
 
+            allyFormation:
+                (
+                    typeof window!=="undefined" &&
+                    window.FourSymbolsBattlefieldSlots &&
+                    typeof window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation==="function"
+                )
+                ? window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation()
+                : (
+                    existingRelicSaveData &&
+                    existingRelicSaveData.allyFormation
+                ),
+
             /*
                Team Relic persistence uses this same SAVE_KEY document.
                On the first save during reload its late runtime does not
@@ -6990,6 +7002,24 @@ function loadGame(){
                 characterSkillLoadouts.player3={name:player3.id,skillLevels:{},equippedSkills:[]};
             }
         }
+
+        const savedAllyFormation=
+            data.allyFormation && typeof data.allyFormation==="object"
+            ? data.allyFormation
+            : null;
+        if(
+            typeof window!=="undefined" &&
+            window.FourSymbolsBattlefieldSlots &&
+            typeof window.FourSymbolsBattlefieldSlots.hydrateAllyFormation==="function"
+        ){
+            window.FourSymbolsBattlefieldSlots.hydrateAllyFormation(
+                savedAllyFormation,
+                getExistingPartyIndexes()
+            );
+        }else if(typeof window!=="undefined"){
+            window.__fourSymbolsPendingAllyFormation=savedAllyFormation;
+        }
+
 
         /*
            ★ 技能配裝資料（新增）
@@ -11197,7 +11227,7 @@ function selectBattleAllyTarget(index){
 
     if(
         !skill ||
-        !(skill.targetType==="ally" || skill.targetType==="deadAlly") ||
+        !(skill.targetType==="ally" || skill.targetType==="allyTri" || skill.targetType==="deadAlly") ||
         !isValidAllyTargetForSkill(skill,character,index)
     ){
         return;
@@ -11498,7 +11528,7 @@ function prepareAction(type){
             }
 
             /* 單體我方技能先選角色；全體技能維持直接宣告。 */
-            if(skill.targetType==="ally" || skill.targetType==="deadAlly"){
+            if(skill.targetType==="ally" || skill.targetType==="allyTri" || skill.targetType==="deadAlly"){
 
                 const hasValidTarget=[0,1,2].some(index=>
                     isValidAllyTargetForSkill(
@@ -25274,6 +25304,13 @@ function openHomeFeature(type){
             window.syncCharacterTouchMode();
         }
 
+    }
+    else if(type==="formation"){
+        titleEl.textContent="佈陣";
+        bodyEl.innerHTML=
+            typeof window.vFixedRenderAllyFormationContent==="function"
+            ? window.vFixedRenderAllyFormationContent()
+            : "";
     }
     else if(type==="offlineExp"){
 
