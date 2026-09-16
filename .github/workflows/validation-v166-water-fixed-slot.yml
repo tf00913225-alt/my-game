@@ -1,0 +1,37 @@
+name: V166 Water VFX Fixed Slot Validation
+
+on:
+  push:
+    branches:
+      - validation/v166-water-vfx-fixed-slot-harness-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v166:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/v166-water-vfx-fixed-slot-harness-20260917
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify validation scope
+        shell: bash
+        run: |
+          base=19ecdef2878aabf5e8ca57673b71b163e1c8baec
+          git fetch --no-tags --depth=1 origin "$base"
+          git diff --check "$base" HEAD
+          changed="$(git diff --name-only "$base" HEAD | sort)"
+          printf '%s\n' "$changed"
+          test -z "$(git diff --name-only "$base" HEAD -- js css)"
+
+      - name: Run formal V166 Fixed Slot diagnosis
+        run: node tests/diagnosis-v166-water-fixed-slot-harness.test.js
