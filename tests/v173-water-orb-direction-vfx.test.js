@@ -20,16 +20,21 @@ test("Water Ball owns a 12-frame, 4x3 group raster sprite with the frame-eight h
     assert.match(animation,/const DEFAULT_HIT=\.5833333333;/);
 });
 
-test("the single group VFX is centered on actual live targets rather than the caster",()=>{
+test("the single group VFX is centered on formal fixed-slot geometry rather than card bounds",()=>{
     const placement=animation.slice(animation.indexOf("function placeSprite(current,node,index,target){"));
     assert.match(
         placement,
-        /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\)/
+        /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const bounds=geometryBounds\(current,indexes,placement\)/
+    );
+    assert.match(
+        animation,
+        /function geometryBounds\(current,indexes,placement\)[\s\S]*?owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/
     );
     assert.match(
         placement,
-        /const destination=\{[\s\S]*?x:targetBounds\.left\+targetBounds\.width\/2,[\s\S]*?y:targetBounds\.top\+targetBounds\.height\/2/
+        /const destination=\{x:bounds\.centerX,y:bounds\.centerY\}/
     );
+    assert.doesNotMatch(placement,/targetCards=indexes\.map|fieldBounds\(|targetBounds\.left|targetBounds\.top/);
     assert.doesNotMatch(placement,/waterBall.*targetTrajectory/);
 });
 
