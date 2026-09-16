@@ -16,6 +16,9 @@ const plain=value=>JSON.parse(JSON.stringify(value));
 const strictDeepEqual=assert.deepEqual.bind(assert);
 assert.deepEqual=(actual,expected,message)=>strictDeepEqual(plain(actual),plain(expected),message);
 
+assert.deepEqual(slots.mechanismSlots,["MECH_L","MECH_C","MECH_R"],"mechanism realm exposes exactly three independent slots");
+assert.ok(slots.mechanismSlots.every(slot=>!slots.enemySlots.includes(slot)&&!slots.allySlots.includes(slot)),"mechanism slots never overlap unit geometry");
+
 const expectedLayouts={
     3:[["ENEMY_F2","ENEMY_F3","ENEMY_F4"]],
     5:[["ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"]],

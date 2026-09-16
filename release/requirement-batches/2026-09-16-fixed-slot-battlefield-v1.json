@@ -81,21 +81,25 @@
     },
     {
       "id": "SLOT-BOSS-01",
-      "status": "TODO",
+      "status": "IMPLEMENTED",
       "requirement": "有兩援軍計畫的 Boss 從開戰即採 3 人 Snapshot：ENEMY_F2 預留左援軍、ENEMY_F3 Boss、ENEMY_F4 預留右援軍；召喚／死亡均不得重排。",
       "evidence": [
         "js/battlefield-slot-owner.js",
-        "js/gameplay-boss-tower-system.js"
+        "js/gameplay-boss-tower-system.js",
+        "tests/gameplay-boss-tower-system.test.js"
       ]
     },
     {
       "id": "SLOT-MECH-01",
-      "status": "TODO",
+      "status": "IMPLEMENTED",
       "requirement": "Mechanism 使用獨立 MECH_L／MECH_C／MECH_R 三格，保留 mechanism:{id} 目標語意且不參與一般 enemy unit geometry。",
       "evidence": [
         "js/battlefield-slot-owner.js",
         "js/gameplay-boss-tower-system.js",
-        "js/39-v143-skill-animation.js"
+        "js/39-v143-skill-animation.js",
+        "css/gameplay-boss-tower.css",
+        "tests/gameplay-boss-tower-system.test.js",
+        "tests/boss-mechanism-vfx-card-ui-20260909.test.js"
       ]
     },
     {

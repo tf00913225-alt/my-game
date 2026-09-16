@@ -1,4 +1,433 @@
 
+/* bundled source: js/battlefield-slot-owner.js */
+/* =====================================================
+   Fixed Battlefield Slot Owner — canonical battlefield geometry model
+   Unit identity and battlefield position are deliberately separate.
+===================================================== */
+(function installFixedBattlefieldSlotOwner(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__fixedBattlefieldSlotOwnerInstalled){ return; }
+    window.__fixedBattlefieldSlotOwnerInstalled=true;
+
+    const ENEMY_BACK=Object.freeze(["ENEMY_B1","ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_B5"]);
+    const ENEMY_FRONT=Object.freeze(["ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"]);
+    const ALLY_FRONT=Object.freeze(["ALLY_F1","ALLY_F2","ALLY_F3"]);
+    const ALLY_BACK=Object.freeze(["ALLY_B1","ALLY_B2","ALLY_B3"]);
+    const MECHANISM=Object.freeze(["MECH_L","MECH_C","MECH_R"]);
+    const ENEMY_SLOTS=Object.freeze(ENEMY_BACK.concat(ENEMY_FRONT));
+    const ALLY_SLOTS=Object.freeze(ALLY_FRONT.concat(ALLY_BACK));
+
+    const ENEMY_LAYOUTS=Object.freeze({
+        1:Object.freeze([Object.freeze(["ENEMY_F3"])]),
+        2:Object.freeze([Object.freeze(["ENEMY_F2","ENEMY_F4"])]),
+        3:Object.freeze([Object.freeze(["ENEMY_F2","ENEMY_F3","ENEMY_F4"])]),
+        4:Object.freeze([Object.freeze(["ENEMY_F1","ENEMY_F2","ENEMY_F4","ENEMY_F5"])]),
+        5:Object.freeze([Object.freeze(ENEMY_FRONT.slice())]),
+        6:Object.freeze([
+            Object.freeze(["ENEMY_B2","ENEMY_B3","ENEMY_B4"]),
+            Object.freeze(["ENEMY_F2","ENEMY_F3","ENEMY_F4"])
+        ]),
+        7:Object.freeze([
+            Object.freeze(ENEMY_BACK.slice()),
+            Object.freeze(["ENEMY_F2","ENEMY_F4"])
+        ]),
+        8:Object.freeze([
+            Object.freeze(["ENEMY_B2","ENEMY_B3","ENEMY_B4"]),
+            Object.freeze(ENEMY_FRONT.slice())
+        ]),
+        9:Object.freeze([
+            Object.freeze(ENEMY_BACK.slice()),
+            Object.freeze(["ENEMY_F1","ENEMY_F2","ENEMY_F4","ENEMY_F5"])
+        ]),
+        10:Object.freeze([
+            Object.freeze(ENEMY_BACK.slice()),
+            Object.freeze(ENEMY_FRONT.slice())
+        ])
+    });
+
+    const FORMAL_PRIORITY=Object.freeze({
+        3:Object.freeze(["ENEMY_F3","ENEMY_F4","ENEMY_F2"]),
+        5:Object.freeze(["ENEMY_F4","ENEMY_F2","ENEMY_F5","ENEMY_F3","ENEMY_F1"]),
+        6:Object.freeze(["ENEMY_B3","ENEMY_F3","ENEMY_B4","ENEMY_B2","ENEMY_F4","ENEMY_F2"]),
+        8:Object.freeze(["ENEMY_B3","ENEMY_F4","ENEMY_F2","ENEMY_B4","ENEMY_B2","ENEMY_F5","ENEMY_F3","ENEMY_F1"]),
+        10:Object.freeze(["ENEMY_B4","ENEMY_B2","ENEMY_F4","ENEMY_F2","ENEMY_B5","ENEMY_B3","ENEMY_B1","ENEMY_F5","ENEMY_F3","ENEMY_F1"])
+    });
+
+    const SLOT_META={};
+    ENEMY_BACK.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"enemy",row:"back",column:index+1}); });
+    ENEMY_FRONT.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"enemy",row:"front",column:index+1}); });
+    ALLY_FRONT.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"ally",row:"front",column:index+1}); });
+    ALLY_BACK.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"ally",row:"back",column:index+1}); });
+    MECHANISM.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"mechanism",row:"mechanism",column:index+1}); });
+    Object.freeze(SLOT_META);
+
+    function validEnemyFormationType(value){
+        const number=Math.max(1,Math.min(10,Math.floor(Number(value)||1)));
+        return ENEMY_LAYOUTS[number]?number:1;
+    }
+
+    function cloneRows(rows){
+        return (rows||[]).map(row=>row.slice());
+    }
+
+    function enemyRowsForType(type){
+        return cloneRows(ENEMY_LAYOUTS[validEnemyFormationType(type)]);
+    }
+
+    function slotColumn(slot){
+        const meta=SLOT_META[slot];
+        return meta?meta.column:0;
+    }
+
+    function centerFirstSlots(slots){
+        const values=(slots||[]).slice();
+        if(values.length<=1){ return values; }
+        const center=3;
+        return values.sort((a,b)=>{
+            const aDistance=Math.abs(slotColumn(a)-center);
+            const bDistance=Math.abs(slotColumn(b)-center);
+            return aDistance-bDistance||slotColumn(a)-slotColumn(b);
+        });
+    }
+
+    function legacyPrioritySlots(type){
+        return enemyRowsForType(type).flatMap(centerFirstSlots);
+    }
+
+    function prioritySlotsForType(type){
+        const normalized=validEnemyFormationType(type);
+        return (FORMAL_PRIORITY[normalized]||legacyPrioritySlots(normalized)).slice();
+    }
+
+    function emptySlotMap(slots){
+        return Object.fromEntries(slots.map(slot=>[slot,null]));
+    }
+
+    function rankOrdered(indexes,rankWeight){
+        const stable=new Map(indexes.map((index,position)=>[index,position]));
+        return indexes.slice().sort((a,b)=>{
+            const difference=Number(rankWeight(b)||0)-Number(rankWeight(a)||0);
+            return difference||(stable.get(a)-stable.get(b));
+        });
+    }
+
+    function createEnemyFormationSnapshot(monsterIndexes,options){
+        const config=options&&typeof options==="object"?options:{};
+        const indexes=(Array.isArray(monsterIndexes)?monsterIndexes:[])
+            .filter(index=>Number.isInteger(index)).slice(0,10);
+        const originalFormationType=validEnemyFormationType(
+            config.originalFormationType===undefined?Math.max(1,indexes.length):config.originalFormationType
+        );
+        const rows=enemyRowsForType(originalFormationType);
+        const slotToMonsterIndex=emptySlotMap(ENEMY_SLOTS);
+        const monsterIndexToSlot={};
+        const rankValues=typeof config.rankWeight==="function"
+            ?indexes.map(index=>Number(config.rankWeight(index)||0)):[];
+        const useRankPlacement=rankValues.length>1&&new Set(rankValues).size>1;
+        const ordered=useRankPlacement?rankOrdered(indexes,config.rankWeight):indexes.slice();
+        let cursor=0;
+
+        rows.forEach(rowSlots=>{
+            const remaining=ordered.length-cursor;
+            if(remaining<=0){ return; }
+            const count=Math.min(rowSlots.length,remaining);
+            const rowUnits=ordered.slice(cursor,cursor+count);
+            cursor+=count;
+            let targetSlots=rowSlots.slice();
+            if(useRankPlacement){ targetSlots=centerFirstSlots(targetSlots).slice(0,count); }
+            else if(indexes.length===1&&originalFormationType>1){ targetSlots=centerFirstSlots(targetSlots).slice(0,1); }
+            else{ targetSlots=targetSlots.slice(0,count); }
+            rowUnits.forEach((monsterIndex,position)=>{
+                const slot=targetSlots[position];
+                if(!slot){ return; }
+                slotToMonsterIndex[slot]=monsterIndex;
+                monsterIndexToSlot[monsterIndex]=slot;
+            });
+        });
+
+        return {
+            kind:"enemy-formation-snapshot",
+            originalFormationType:originalFormationType,
+            monsterIndexToSlot:monsterIndexToSlot,
+            slotToMonsterIndex:slotToMonsterIndex,
+            rowSlots:rows,
+            createdFromMonsterIndexes:indexes.slice()
+        };
+    }
+
+    function slotForMonster(snapshot,monsterIndex){
+        if(!snapshot||!snapshot.monsterIndexToSlot){ return null; }
+        return snapshot.monsterIndexToSlot[monsterIndex]||null;
+    }
+
+    function assignedMonsterAt(snapshot,slot){
+        if(!snapshot||!snapshot.slotToMonsterIndex||!Object.prototype.hasOwnProperty.call(snapshot.slotToMonsterIndex,slot)){ return null; }
+        const value=snapshot.slotToMonsterIndex[slot];
+        return Number.isInteger(value)?value:null;
+    }
+
+    function activeMonsterAt(snapshot,slot,isAlive){
+        const index=assignedMonsterAt(snapshot,slot);
+        if(index===null){ return null; }
+        return typeof isAlive==="function"&&!isAlive(index)?null:index;
+    }
+
+    function assignMonsterToSlot(snapshot,monsterIndex,slot){
+        if(!snapshot||!Number.isInteger(monsterIndex)||!ENEMY_SLOTS.includes(slot)){ return false; }
+        if(assignedMonsterAt(snapshot,slot)!==null){ return false; }
+        const current=slotForMonster(snapshot,monsterIndex);
+        if(current){ snapshot.slotToMonsterIndex[current]=null; }
+        snapshot.slotToMonsterIndex[slot]=monsterIndex;
+        snapshot.monsterIndexToSlot[monsterIndex]=slot;
+        return true;
+    }
+
+    function assignMonsterToPreferredSlot(snapshot,monsterIndex,preferredSlots){
+        const slots=(Array.isArray(preferredSlots)?preferredSlots:[]).filter(slot=>ENEMY_SLOTS.includes(slot));
+        const target=slots.find(slot=>assignedMonsterAt(snapshot,slot)===null);
+        return target&&assignMonsterToSlot(snapshot,monsterIndex,target)?target:null;
+    }
+
+    function priorityMonsterIndexes(snapshot,isAlive){
+        if(!snapshot){ return []; }
+        return prioritySlotsForType(snapshot.originalFormationType)
+            .map(slot=>activeMonsterAt(snapshot,slot,isAlive))
+            .filter(index=>Number.isInteger(index));
+    }
+
+    function snapshotRows(snapshot,options){
+        if(!snapshot){ return []; }
+        const config=options&&typeof options==="object"?options:{};
+        const activeOnly=!!config.activeOnly;
+        const isAlive=typeof config.isAlive==="function"?config.isAlive:null;
+        return cloneRows(snapshot.rowSlots).map(row=>row.map(slot=>{
+            const index=activeOnly?activeMonsterAt(snapshot,slot,isAlive):assignedMonsterAt(snapshot,slot);
+            return {slot:slot,monsterIndex:index};
+        }));
+    }
+
+    function slotsForSide(side){
+        return side==="enemy"?ENEMY_SLOTS:(side==="ally"?ALLY_SLOTS:[]);
+    }
+
+    function normalizeShape(shape){
+        const value=String(shape||"single");
+        if(value==="tri"||value==="horizontal-3"||value==="allyTri"){ return "tri"; }
+        if(value==="allyAll"){ return "all"; }
+        if(value==="ally"){ return "single"; }
+        return value;
+    }
+
+    function resolveSlotsFromShape(side,primarySlot,shape){
+        const allowed=slotsForSide(side);
+        if(!allowed.includes(primarySlot)){ return []; }
+        const meta=SLOT_META[primarySlot];
+        const normalized=normalizeShape(shape);
+        if(normalized==="single"){ return [primarySlot]; }
+        if(normalized==="all"){ return allowed.slice(); }
+        if(normalized==="row"){
+            return allowed.filter(slot=>SLOT_META[slot].row===meta.row)
+                .sort((a,b)=>SLOT_META[a].column-SLOT_META[b].column);
+        }
+        if(normalized==="column"){
+            return allowed.filter(slot=>SLOT_META[slot].column===meta.column)
+                .sort((a,b)=>{
+                    const order=side==="enemy"?{back:0,front:1}:{front:0,back:1};
+                    return (order[SLOT_META[a].row]??9)-(order[SLOT_META[b].row]??9);
+                });
+        }
+        if(normalized==="tri"){
+            return allowed.filter(slot=>
+                SLOT_META[slot].row===meta.row&&
+                Math.abs(SLOT_META[slot].column-meta.column)<=1
+            ).sort((a,b)=>SLOT_META[a].column-SLOT_META[b].column);
+        }
+        return [primarySlot];
+    }
+
+    function resolveEnemyTargets(snapshot,primaryMonsterIndex,shape,isAlive){
+        if(!snapshot){ return []; }
+        const primarySlot=slotForMonster(snapshot,primaryMonsterIndex);
+        if(!primarySlot){ return []; }
+        return resolveSlotsFromShape("enemy",primarySlot,shape)
+            .map(slot=>activeMonsterAt(snapshot,slot,isAlive))
+            .filter(index=>Number.isInteger(index));
+    }
+
+    function nextEnemyPrimaryTarget(snapshot,isAlive){
+        const priority=priorityMonsterIndexes(snapshot,isAlive);
+        return priority.length?priority[0]:null;
+    }
+
+    function assignedEnemyRows(snapshot){
+        if(!snapshot){ return []; }
+        return cloneRows(snapshot.rowSlots).map(row=>row
+            .map(slot=>assignedMonsterAt(snapshot,slot))
+            .filter(index=>Number.isInteger(index))
+        );
+    }
+
+    function defaultAllySlots(characterIndexes){
+        const indexes=(characterIndexes||[]).filter(Number.isInteger).slice(0,6);
+        if(indexes.length===1){ return ["ALLY_F2"]; }
+        if(indexes.length===2){ return ["ALLY_F1","ALLY_F3"]; }
+        return ["ALLY_F1","ALLY_F2","ALLY_F3","ALLY_B1","ALLY_B2","ALLY_B3"].slice(0,indexes.length);
+    }
+
+    function normalizeAllyFormation(saved,characterIndexes){
+        const indexes=(characterIndexes||[]).filter(Number.isInteger).slice(0,6);
+        const allowedIndexes=new Set(indexes);
+        const characterIndexToSlot={};
+        const slotToCharacterIndex={};
+        const savedMap=saved&&typeof saved==="object"&&saved.characterIndexToSlot&&typeof saved.characterIndexToSlot==="object"
+            ?saved.characterIndexToSlot:{};
+
+        indexes.forEach(index=>{
+            const slot=savedMap[index]||savedMap[String(index)];
+            if(ALLY_SLOTS.includes(slot)&&slotToCharacterIndex[slot]===undefined){
+                characterIndexToSlot[index]=slot;
+                slotToCharacterIndex[slot]=index;
+            }
+        });
+
+        const defaults=defaultAllySlots(indexes);
+        indexes.forEach((index,position)=>{
+            if(characterIndexToSlot[index]){ return; }
+            const preferred=defaults[position];
+            const openPreferred=preferred&&slotToCharacterIndex[preferred]===undefined?preferred:null;
+            const slot=openPreferred||ALLY_SLOTS.find(candidate=>slotToCharacterIndex[candidate]===undefined);
+            if(!slot){ return; }
+            characterIndexToSlot[index]=slot;
+            slotToCharacterIndex[slot]=index;
+        });
+
+        Object.keys(characterIndexToSlot).forEach(key=>{
+            if(!allowedIndexes.has(Number(key))){ delete characterIndexToSlot[key]; }
+        });
+        return {version:1,kind:"ally-formation",characterIndexToSlot,slotToCharacterIndex};
+    }
+
+    let allyFormationState=null;
+
+    function hydrateAllyFormation(saved,characterIndexes){
+        allyFormationState=normalizeAllyFormation(saved,characterIndexes);
+        return allyFormationState;
+    }
+
+    function ensureAllyFormation(characterIndexes){
+        allyFormationState=normalizeAllyFormation(allyFormationState,characterIndexes);
+        return allyFormationState;
+    }
+
+    function getSerializableAllyFormation(){
+        if(!allyFormationState){ return null; }
+        return {
+            version:1,
+            characterIndexToSlot:Object.assign({},allyFormationState.characterIndexToSlot)
+        };
+    }
+
+    function allySlotForCharacter(index){
+        return allyFormationState&&allyFormationState.characterIndexToSlot
+            ?allyFormationState.characterIndexToSlot[index]||null:null;
+    }
+
+    function characterAtAllySlot(slot){
+        const value=allyFormationState&&allyFormationState.slotToCharacterIndex
+            ?allyFormationState.slotToCharacterIndex[slot]:undefined;
+        return Number.isInteger(value)?value:null;
+    }
+
+    function moveAllyCharacter(characterIndex,targetSlot){
+        if(!allyFormationState||!Number.isInteger(characterIndex)||!ALLY_SLOTS.includes(targetSlot)){ return false; }
+        const from=allySlotForCharacter(characterIndex);
+        if(!from){ return false; }
+        const occupant=characterAtAllySlot(targetSlot);
+        if(from===targetSlot){ return true; }
+        allyFormationState.characterIndexToSlot[characterIndex]=targetSlot;
+        allyFormationState.slotToCharacterIndex[targetSlot]=characterIndex;
+        if(Number.isInteger(occupant)){
+            allyFormationState.characterIndexToSlot[occupant]=from;
+            allyFormationState.slotToCharacterIndex[from]=occupant;
+        }else{
+            delete allyFormationState.slotToCharacterIndex[from];
+        }
+        return true;
+    }
+
+    function resolveAllyTargets(formation,primaryCharacterIndex,shape,isAlive){
+        const state=formation&&formation.kind==="ally-formation"?formation:allyFormationState;
+        if(!state){ return []; }
+        const normalized=normalizeShape(shape);
+        let slots;
+        if(normalized==="all"){
+            slots=ALLY_SLOTS.slice();
+        }else{
+            const primarySlot=state.characterIndexToSlot&&state.characterIndexToSlot[primaryCharacterIndex];
+            if(!primarySlot){ return []; }
+            slots=resolveSlotsFromShape("ally",primarySlot,normalized);
+        }
+        return slots.map(slot=>{
+            const index=state.slotToCharacterIndex&&state.slotToCharacterIndex[slot];
+            return Number.isInteger(index)&&(!isAlive||isAlive(index))?index:null;
+        }).filter(Number.isInteger);
+    }
+
+    let activeEnemySnapshot=null;
+    function setActiveEnemySnapshot(snapshot){
+        activeEnemySnapshot=snapshot&&snapshot.kind==="enemy-formation-snapshot"?snapshot:null;
+        return activeEnemySnapshot;
+    }
+    function getActiveEnemySnapshot(){ return activeEnemySnapshot; }
+    function clearActiveEnemySnapshot(){ activeEnemySnapshot=null; }
+
+    const api={
+        version:"fixed-slot-v1",
+        enemySlots:ENEMY_SLOTS,
+        enemyBackSlots:ENEMY_BACK,
+        enemyFrontSlots:ENEMY_FRONT,
+        allySlots:ALLY_SLOTS,
+        allyFrontSlots:ALLY_FRONT,
+        allyBackSlots:ALLY_BACK,
+        mechanismSlots:MECHANISM,
+        slotMeta:SLOT_META,
+        getEnemyFormationSlotRows:enemyRowsForType,
+        getPrioritySlotsForFormation:prioritySlotsForType,
+        createEnemyFormationSnapshot:createEnemyFormationSnapshot,
+        getEnemySlotForMonster:slotForMonster,
+        getAssignedMonsterAtEnemySlot:assignedMonsterAt,
+        getActiveMonsterAtEnemySlot:activeMonsterAt,
+        assignMonsterToEnemySlot:assignMonsterToSlot,
+        assignMonsterToPreferredEnemySlot:assignMonsterToPreferredSlot,
+        getPriorityMonsterIndexes:priorityMonsterIndexes,
+        getEnemySnapshotRows:snapshotRows,
+        getAssignedEnemyRows:assignedEnemyRows,
+        resolveSlotsFromShape:resolveSlotsFromShape,
+        resolveEnemyTargets:resolveEnemyTargets,
+        getNextEnemyPrimaryTarget:nextEnemyPrimaryTarget,
+        normalizeAllyFormation:normalizeAllyFormation,
+        hydrateAllyFormation:hydrateAllyFormation,
+        ensureAllyFormation:ensureAllyFormation,
+        getSerializableAllyFormation:getSerializableAllyFormation,
+        getAllySlotForCharacter:allySlotForCharacter,
+        getCharacterAtAllySlot:characterAtAllySlot,
+        moveAllyCharacter:moveAllyCharacter,
+        resolveAllyTargets:resolveAllyTargets,
+        setActiveEnemySnapshot:setActiveEnemySnapshot,
+        getActiveEnemySnapshot:getActiveEnemySnapshot,
+        clearActiveEnemySnapshot:clearActiveEnemySnapshot
+    };
+
+    window.FourSymbolsBattlefieldSlots=Object.freeze(api);
+    if(Object.prototype.hasOwnProperty.call(window,"__fourSymbolsPendingAllyFormation")){
+        const indexes=typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes():[];
+        hydrateAllyFormation(window.__fourSymbolsPendingAllyFormation,indexes);
+        delete window.__fourSymbolsPendingAllyFormation;
+    }
+})();
+
+
 /* bundled source: js/25-v131-fix-batch.js */
 /* V131 — targeted gameplay/UI fixes for request batch 17. */
 (function installV131FixBatch(){
@@ -126,51 +555,55 @@
         return 1;
     }
 
-    function arrangeRowCenterFirst(monsterIndexes){
-        const ranked=(monsterIndexes||[]).slice();
-        const arranged=new Array(ranked.length);
-        const centerOrder=[];
-        const leftCenter=Math.floor((ranked.length-1)/2);
-        const rightCenter=Math.ceil((ranked.length-1)/2);
+    function fixedBattlefieldSlots(){
+        return window.FourSymbolsBattlefieldSlots||null;
+    }
 
-        centerOrder.push(leftCenter);
-        if(rightCenter!==leftCenter){ centerOrder.push(rightCenter); }
-        for(let distance=1;centerOrder.length<ranked.length;distance++){
-            const left=leftCenter-distance;
-            const right=rightCenter+distance;
-            if(left>=0){ centerOrder.push(left); }
-            if(right<ranked.length){ centerOrder.push(right); }
-        }
-
-        ranked.forEach((monsterIndex,priorityIndex)=>{
-            arranged[centerOrder[priorityIndex]]=monsterIndex;
+    function ensureEnemyFormationSnapshot(indexes){
+        const owner=fixedBattlefieldSlots();
+        if(!owner){ return null; }
+        const existing=owner.getActiveEnemySnapshot();
+        if(existing){ return existing; }
+        const requested=(Array.isArray(indexes)?indexes:currentBattleMonsters||[])
+            .filter(index=>Number.isInteger(index)).slice(0,10);
+        if(!requested.length){ return null; }
+        const snapshot=owner.createEnemyFormationSnapshot(requested,{
+            originalFormationType:requested.length,
+            rankWeight:getFormationRankWeight
         });
-        return arranged;
+        owner.setActiveEnemySnapshot(snapshot);
+        return snapshot;
     }
 
     function getFormationRows(indexes){
-        const originalOrder=(indexes||[]).slice(0,10);
-        const stablePosition=new Map(originalOrder.map((index,position)=>[index,position]));
-        const ranked=originalOrder.slice().sort((a,b)=>{
-            const rankDifference=getFormationRankWeight(b)-getFormationRankWeight(a);
-            return rankDifference || stablePosition.get(a)-stablePosition.get(b);
-        });
-        const n=ranked.length;
-        const rowSizes=n<=5 ? [n] : (n===6 ? [3,3] : [5,n-5]);
-        const rows=[];
-        let cursor=0;
-
-        rowSizes.forEach(size=>{
-            rows.push(arrangeRowCenterFirst(ranked.slice(cursor,cursor+size)));
-            cursor+=size;
-        });
+        const owner=fixedBattlefieldSlots();
+        const requested=(indexes||[]).filter(index=>Number.isInteger(index)).slice(0,10);
+        if(!owner){ return requested.length?[requested,[]]:[[],[]]; }
+        let snapshot=owner.getActiveEnemySnapshot();
+        const activeMatches=snapshot&&requested.every(index=>!!owner.getEnemySlotForMonster(snapshot,index));
+        if(!activeMatches){
+            snapshot=owner.createEnemyFormationSnapshot(requested,{
+                originalFormationType:Math.max(1,requested.length),
+                rankWeight:getFormationRankWeight
+            });
+        }
+        const rows=owner.getAssignedEnemyRows(snapshot);
         while(rows.length<2){ rows.push([]); }
         return rows;
     }
 
     function currentFormationRows(){
+        const snapshot=ensureEnemyFormationSnapshot(currentBattleMonsters);
+        const owner=fixedBattlefieldSlots();
+        if(snapshot&&owner){
+            const rows=owner.getAssignedEnemyRows(snapshot);
+            while(rows.length<2){ rows.push([]); }
+            return rows;
+        }
         return getFormationRows(currentBattleMonsters);
     }
+
+    window.v138EnsureEnemyFormationSnapshot=ensureEnemyFormationSnapshot;
 
     function formatDuration(ms){
         const safe=Math.max(0,Math.floor(Number(ms)||0));
@@ -358,62 +791,128 @@
     }
 
     getSkillTargets=function(centerIndex,targetType){
-        const alive=currentBattleMonsters.filter(
-            i=>monsters[i] && monsters[i].alive
-        );
-        if(targetType==="all"){ return alive; }
-        if(targetType==="single"){
-            return monsters[centerIndex] && monsters[centerIndex].alive
-                ? [centerIndex]
-                : [];
+        const owner=fixedBattlefieldSlots();
+        const snapshot=ensureEnemyFormationSnapshot(currentBattleMonsters);
+        if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
+            return owner.resolveEnemyTargets(
+                snapshot,
+                centerIndex,
+                targetType,
+                index=>!!(monsters[index]&&monsters[index].alive!==false&&Number(monsters[index].hp)>0)
+            );
         }
-        if(targetType==="tri" || targetType==="row"){
-            const rows=currentFormationRows();
-            const row=rows.find(r=>r.includes(centerIndex));
-            if(!row){ return []; }
-            if(targetType==="row"){
-                return row.filter(i=>monsters[i] && monsters[i].alive);
-            }
-            const pos=row.indexOf(centerIndex);
-            return row
-                .slice(Math.max(0,pos-1),Math.min(row.length,pos+2))
-                .filter(i=>monsters[i] && monsters[i].alive);
-        }
-        return monsters[centerIndex] && monsters[centerIndex].alive
-            ? [centerIndex]
-            : [];
+        return monsters[centerIndex]&&monsters[centerIndex].alive?[centerIndex]:[];
     };
 
     function applyBattleFormation(){
         const area=document.getElementById("battleMonsterArea");
-        if(!area){ return; }
+        const owner=fixedBattlefieldSlots();
+        if(!area||!owner){ return; }
         const indexes=currentBattleMonsters.slice(0,10);
-        const rows=getFormationRows(indexes);
+        const snapshot=ensureEnemyFormationSnapshot(indexes);
+        if(!snapshot){ return; }
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battleMonster"+index);
             if(card){
                 const monster=monsters[index];
                 const rank=getMonsterRank(monster);
-                card.dataset.element=(monster && monster.element)||"unknown";
-                card.dataset.rank=rank==="boss" ? "boss" : (rank==="elite" ? "elite" : "regular");
+                card.dataset.element=(monster&&monster.element)||"unknown";
+                card.dataset.rank=rank==="boss"?"boss":(rank==="elite"?"elite":"regular");
                 cards.set(index,card);
             }
         });
         area.innerHTML="";
-        area.classList.add("v131-formation");
+        area.classList.add("v131-formation","v-fixed-enemy-zone");
         area.dataset.monsterCount=String(indexes.length);
-        rows.forEach((row,rowIndex)=>{
-            if(row.length===0){ return; }
+        area.dataset.formationType=String(snapshot.originalFormationType);
+        [owner.enemyBackSlots,owner.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
             const rowEl=document.createElement("div");
-            rowEl.className="v131-monster-row v131-monster-row-"+(rowIndex+1);
-            row.forEach(index=>{
-                const card=cards.get(index);
-                if(card){ rowEl.appendChild(card); }
+            rowEl.className="v131-monster-row v131-monster-row-"+(rowIndex+1)+" v-fixed-enemy-row";
+            rowSlots.forEach(slot=>{
+                const slotEl=document.createElement("div");
+                slotEl.className="v-fixed-battle-slot v-fixed-enemy-slot";
+                slotEl.dataset.slot=slot;
+                const index=owner.getAssignedMonsterAtEnemySlot(snapshot,slot);
+                const card=Number.isInteger(index)?cards.get(index):null;
+                if(card){
+                    card.dataset.slot=slot;
+                    slotEl.appendChild(card);
+                }
+                rowEl.appendChild(slotEl);
             });
             area.appendChild(rowEl);
         });
     }
+
+    function ensureAllyFormationState(){
+        const owner=fixedBattlefieldSlots();
+        if(!owner||typeof owner.ensureAllyFormation!=="function"){ return null; }
+        return owner.ensureAllyFormation(getExistingPartyIndexes());
+    }
+
+    function applyAllyBattleFormation(){
+        const area=document.getElementById("battlePlayerRow");
+        const formation=ensureAllyFormationState();
+        if(!area||!formation){ return; }
+        const cards=new Map();
+        getExistingPartyIndexes().forEach(index=>{
+            const card=document.getElementById("battlePlayerCard"+index);
+            if(card){ cards.set(index,card); }
+        });
+        area.innerHTML="";
+        area.classList.add("v-fixed-ally-formation");
+        const owner=fixedBattlefieldSlots();
+        [owner.allyFrontSlots,owner.allyBackSlots].forEach((slots,rowIndex)=>{
+            const row=document.createElement("div");
+            row.className="v-fixed-ally-row v-fixed-ally-row-"+(rowIndex===0?"front":"back");
+            slots.forEach(slot=>{
+                const wrapper=document.createElement("div");
+                wrapper.className="v-fixed-unit-slot v-fixed-ally-slot";
+                wrapper.dataset.slot=slot;
+                const characterIndex=owner.getCharacterAtAllySlot(slot);
+                const card=Number.isInteger(characterIndex)?cards.get(characterIndex):null;
+                if(card){ wrapper.appendChild(card); }
+                row.appendChild(wrapper);
+            });
+            area.appendChild(row);
+        });
+    }
+
+    let vFixedFormationSelectedCharacter=null;
+    function formationSlotLabel(slot){
+        const labels={ALLY_F1:"前左",ALLY_F2:"前中",ALLY_F3:"前右",ALLY_B1:"後左",ALLY_B2:"後中",ALLY_B3:"後右"};
+        return labels[slot]||slot;
+    }
+    function renderAllyFormationContent(){
+        const formation=ensureAllyFormationState();
+        if(!formation){ return '<div class="v-fixed-formation-empty">目前無法讀取佈陣資料。</div>'; }
+        const renderRow=(label,slots)=>'<section class="v-fixed-formation-row"><header>'+label+'</header><div class="v-fixed-formation-slots">'+slots.map(slot=>{
+            const index=fixedBattlefieldSlots().getCharacterAtAllySlot(slot);
+            const character=Number.isInteger(index)?getPartyCharacterByIndex(index):null;
+            const selected=Number.isInteger(index)&&index===vFixedFormationSelectedCharacter;
+            return '<button type="button" class="v-fixed-formation-slot'+(selected?' selected':'')+'" data-slot="'+slot+'" onclick="vFixedSelectFormationSlot(\''+slot+'\')">'+
+                '<small>'+formationSlotLabel(slot)+'</small><strong>'+(character?(character.id||('角色'+(index+1))):'空位')+'</strong></button>';
+        }).join('')+'</div></section>';
+        return '<div class="v-fixed-formation-panel"><p>先點角色，再點目標格位；若目標已有角色會直接交換。</p>'+renderRow('前排',fixedBattlefieldSlots().allyFrontSlots)+renderRow('後排',fixedBattlefieldSlots().allyBackSlots)+'</div>';
+    }
+    window.vFixedRenderAllyFormationContent=renderAllyFormationContent;
+    window.vFixedSelectFormationSlot=function(slot){
+        const formation=ensureAllyFormationState();
+        if(!formation||!fixedBattlefieldSlots().allySlots.includes(slot)){ return; }
+        const occupant=fixedBattlefieldSlots().getCharacterAtAllySlot(slot);
+        if(!Number.isInteger(vFixedFormationSelectedCharacter)){
+            if(!Number.isInteger(occupant)){ return; }
+            vFixedFormationSelectedCharacter=occupant;
+        }else{
+            fixedBattlefieldSlots().moveAllyCharacter(vFixedFormationSelectedCharacter,slot);
+            vFixedFormationSelectedCharacter=null;
+            if(typeof saveGame==="function"){ saveGame({source:"ally-formation"}); }
+            if(typeof window.v54RenderHomeRoster==="function"){ window.v54RenderHomeRoster(); }
+        }
+        const body=document.getElementById("homeFeatureModalBody");
+        if(body){ body.innerHTML=renderAllyFormationContent(); }
+    };
 
     function applyPlayerElementFrames(){
         getExistingPartyIndexes().forEach(characterIndex=>{
@@ -432,6 +931,7 @@
         renderBattle=function(){
             originalRenderBattle.apply(this,arguments);
             applyBattleFormation();
+            applyAllyBattleFormation();
             applyPlayerElementFrames();
             elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
         };
@@ -1166,11 +1666,16 @@
     if(typeof startBattle==="function"){
         const originalStartBattle=startBattle;
         startBattle=function(){
+            const slotOwner=fixedBattlefieldSlots();
+            if(slotOwner){ slotOwner.clearActiveEnemySnapshot(); }
             if(hasAnyAutoBattleEnabled() && elementBoxState.remainingMs<=0){
                 stopElementBoxWhenTimeEnds("元素匣沒有可用時數，自動戰鬥已停止。");
             }
             const result=originalStartBattle.apply(this,arguments);
-            if(battleActive){ syncElementBoxForBattle({silent:true}); }
+            if(battleActive){
+                ensureEnemyFormationSnapshot(currentBattleMonsters);
+                syncElementBoxForBattle({silent:true});
+            }
             return result;
         };
     }
@@ -5871,8 +6376,9 @@
 
     function enforceAutoTargetPriority(queued){
         if(!queuedActionTargetsEnemy(queued)){ return; }
-        const target=getPriorityAutoTarget();
-        if(Number.isInteger(target)){ queued.target=target; }
+        queued.vFixedAutoEnemyPrimary=true;
+        const previewTarget=getPriorityAutoTarget();
+        if(Number.isInteger(previewTarget)){ queued.target=previewTarget; }
     }
 
     /*
@@ -8375,7 +8881,7 @@
                 return;
             }
 
-            if(skill.targetType==="ally"||skill.targetType==="deadAlly"){
+            if(skill.targetType==="ally"||skill.targetType==="allyTri"||skill.targetType==="deadAlly"){
                 const hasTarget=[0,1,2].some(index=>isValidAllyTargetForSkill(
                     skill,getBattleCharacterByIndex(index),index
                 ));
@@ -10203,27 +10709,24 @@
         const living=(entries||currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})))
             .filter(entry=>entry&&entry.monster&&entry.monster.alive!==false&&Number(entry.monster.hp)>0);
         const livingByIndex=new Map(living.map(entry=>[entry.index,entry]));
-        const rows=typeof window.v148GetFormationRows==="function"
-            ?window.v148GetFormationRows(currentBattleMonsters)
-            :typeof window.v138GetFormationRows==="function"
-            ?window.v138GetFormationRows(currentBattleMonsters)
-            :[currentBattleMonsters.slice()];
+        const owner=window.FourSymbolsBattlefieldSlots||null;
+        const snapshot=owner&&typeof owner.getActiveEnemySnapshot==="function"?owner.getActiveEnemySnapshot():null;
         let best=[];
         let bestScore=-1;
-        rows.forEach(row=>{
-            row.forEach((center,position)=>{
-                if(!livingByIndex.has(center)){ return; }
-                const trio=row.slice(Math.max(0,position-1),Math.min(row.length,position+2))
-                    .map(index=>livingByIndex.get(index)).filter(Boolean);
-                const score=trio.reduce((sum,entry)=>{
-                    const ally=entry.monster;
-                    const hpNeed=(monsterBaseMaxHp(ally)-monsterBaseHp(ally))/monsterBaseMaxHp(ally);
-                    const maxSP=Math.max(1,Number(ally.maxSP)||1);
-                    const spNeed=(maxSP-Math.max(0,Number(ally.sp)||0))/maxSP;
-                    return sum+Math.max(0,hpNeed)+Math.max(0,spNeed);
-                },0)+(trio.some(entry=>entry.index===casterIndex)?0.0001:0);
-                if(score>bestScore){ best=trio; bestScore=score; }
-            });
+        living.forEach(centerEntry=>{
+            const center=centerEntry.index;
+            const indexes=owner&&snapshot&&typeof owner.resolveEnemyTargets==="function"
+                ?owner.resolveEnemyTargets(snapshot,center,"tri",index=>livingByIndex.has(index))
+                :[center];
+            const trio=indexes.map(index=>livingByIndex.get(index)).filter(Boolean);
+            const score=trio.reduce((sum,entry)=>{
+                const ally=entry.monster;
+                const hpNeed=(monsterBaseMaxHp(ally)-monsterBaseHp(ally))/monsterBaseMaxHp(ally);
+                const maxSP=Math.max(1,Number(ally.maxSP)||1);
+                const spNeed=(maxSP-Math.max(0,Number(ally.sp)||0))/maxSP;
+                return sum+Math.max(0,hpNeed)+Math.max(0,spNeed);
+            },0)+(trio.some(entry=>entry.index===casterIndex)?0.0001:0);
+            if(score>bestScore){ best=trio; bestScore=score; }
         });
         return best.slice(0,3);
     }
@@ -15272,161 +15775,81 @@
         };
     }
 
-    /*
-       Rendered DOM rows may lose dead cards, so they are only presentation
-       truth. Skill adjacency and auto-target order must use the full formation
-       that existed when the battle began; otherwise two surviving far-edge
-       monsters become false neighbours after the middle cards disappear.
-    */
-    function cardIndex(card){
-        const match=card&&String(card.id||"").match(/^battleMonster(\d+)$/);
-        return match?Number(match[1]):null;
+    function battlefieldSlots(){
+        return window.FourSymbolsBattlefieldSlots||null;
     }
 
-    function visualFormationRows(indexes){
-        const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
-        const allowed=new Set(ordered);
+    function monsterAlive(index){
+        const monster=typeof monsters!=="undefined"?monsters[index]:null;
+        return !!(monster&&monster.alive!==false&&numeric(monster.hp)>0);
+    }
 
-        if(typeof document!=="undefined"){
-            const area=document.getElementById("battleMonsterArea");
-            const rowNodes=area&&area.querySelectorAll
-                ?Array.from(area.querySelectorAll(":scope > .v131-monster-row")):[];
-            const domRows=rowNodes.map(row=>Array.from(row.children||[])
-                .map(cardIndex).filter(index=>index!==null&&allowed.has(index))
-            ).filter(row=>row.length);
-            if(domRows.length&&domRows.flat().some(index=>allowed.has(index))){ return domRows; }
+    function activeFormationSnapshot(indexes){
+        const owner=battlefieldSlots();
+        if(!owner){ return null; }
+        let snapshot=owner.getActiveEnemySnapshot();
+        if(!snapshot&&typeof window.v138EnsureEnemyFormationSnapshot==="function"){
+            snapshot=window.v138EnsureEnemyFormationSnapshot(indexes||[]);
         }
-
-        if(typeof monsters!=="undefined"){
-            const fixed=ordered.map(index=>({index:index,monster:monsters[index]}))
-                .filter(entry=>entry.monster&&Number.isInteger(entry.monster.v141FormationRow));
-            if(fixed.length){
-                const rowNumbers=Array.from(new Set(fixed.map(entry=>entry.monster.v141FormationRow)))
-                    .sort((a,b)=>a-b);
-                return rowNumbers.map(rowNumber=>fixed
-                    .filter(entry=>entry.monster.v141FormationRow===rowNumber)
-                    .sort((a,b)=>numeric(a.monster.v141FormationPosition)-numeric(b.monster.v141FormationPosition))
-                    .map(entry=>entry.index)
-                );
-            }
-        }
-
-        if(typeof window.v138GetFormationRows==="function"){
-            const rows=window.v138GetFormationRows(ordered);
-            if(Array.isArray(rows)&&rows.some(row=>Array.isArray(row)&&row.length)){
-                return rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice());
-            }
-        }
-        return ordered.length?[ordered]:[];
+        return snapshot;
     }
 
     function stableFormationRows(indexes){
-        const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
-        if(typeof monsters!=="undefined"){
-            const fixed=ordered.map(index=>({index:index,monster:monsters[index]}))
-                .filter(entry=>entry.monster&&Number.isInteger(entry.monster.v141FormationRow));
-            if(fixed.length){
-                const rowNumbers=Array.from(new Set(fixed.map(entry=>entry.monster.v141FormationRow)))
-                    .sort((a,b)=>a-b);
-                return rowNumbers.map(rowNumber=>fixed
-                    .filter(entry=>entry.monster.v141FormationRow===rowNumber)
-                    .sort((a,b)=>numeric(a.monster.v141FormationPosition)-numeric(b.monster.v141FormationPosition))
-                    .map(entry=>entry.index)
-                );
-            }
-        }
+        const owner=battlefieldSlots();
+        const snapshot=activeFormationSnapshot(indexes);
+        if(owner&&snapshot){ return owner.getAssignedEnemyRows(snapshot); }
         if(typeof window.v138GetFormationRows==="function"){
-            const rows=window.v138GetFormationRows(ordered);
-            if(Array.isArray(rows)&&rows.some(row=>Array.isArray(row)&&row.length)){
-                return rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice());
-            }
+            const rows=window.v138GetFormationRows((indexes||[]).filter(Number.isInteger));
+            if(Array.isArray(rows)){ return rows.filter(Array.isArray).map(row=>row.slice()); }
         }
-        return visualFormationRows(ordered);
+        const ordered=(indexes||[]).filter(Number.isInteger);
+        return ordered.length?[ordered]:[];
     }
 
     function centerFirstOrder(row){
-        const values=(row||[]).slice();
+        const values=(row||[]).filter(Number.isInteger);
         if(values.length<=1){ return values; }
         const order=[];
-        const leftCenter=Math.floor((values.length-1)/2);
-        const rightCenter=Math.ceil((values.length-1)/2);
-        order.push(leftCenter);
-        if(rightCenter!==leftCenter){ order.push(rightCenter); }
+        const center=Math.floor((values.length-1)/2);
+        order.push(center);
         for(let distance=1;order.length<values.length;distance++){
-            const left=leftCenter-distance;
-            const right=rightCenter+distance;
-            if(left>=0){ order.push(left); }
-            if(right<values.length){ order.push(right); }
+            if(center+distance<values.length){ order.push(center+distance); }
+            if(center-distance>=0){ order.push(center-distance); }
         }
-        return order.map(position=>values[position]).filter(index=>Number.isInteger(index));
+        return order.map(position=>values[position]);
     }
 
     const REFERENCE_TARGET_ORDER_6=[4,1,3,6,2,5];
     const REFERENCE_TARGET_ORDER_10=[7,2,6,1,5,10,4,9,3,8];
 
-    function referenceTargetPriority(rows){
-        const flat=(rows||[]).flat().filter(index=>Number.isInteger(index));
-        const order=flat.length===6?REFERENCE_TARGET_ORDER_6:flat.length===10?REFERENCE_TARGET_ORDER_10:null;
-        if(!order){ return null; }
-        return flat.map((index,position)=>({index:index,order:order[position]}))
-            .sort((a,b)=>a.order-b.order).map(entry=>entry.index);
-    }
-
     function autoTargetPriority(indexes){
-        const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
+        const ordered=(indexes||[]).filter(Number.isInteger);
+        const owner=battlefieldSlots();
+        const snapshot=activeFormationSnapshot(ordered);
+        if(owner&&snapshot){
+            return owner.getPriorityMonsterIndexes(snapshot,monsterAlive);
+        }
         if(typeof monsters!=="undefined"&&ordered.length){
-            const explicit=ordered.map(index=>({
-                index:index,
-                order:monsters[index]&&Number(monsters[index].v148TargetOrder)
-            }));
+            const explicit=ordered.map(index=>({index:index,order:monsters[index]&&Number(monsters[index].v148TargetOrder)}));
             if(explicit.every(entry=>Number.isFinite(entry.order))){
-                return explicit.sort((a,b)=>a.order-b.order).map(entry=>entry.index);
+                return explicit.sort((a,b)=>a.order-b.order).map(entry=>entry.index).filter(monsterAlive);
             }
         }
-        const reference=referenceTargetPriority(stableFormationRows(ordered));
-        if(reference){ return reference; }
-        return stableFormationRows(ordered).flatMap(centerFirstOrder);
+        return stableFormationRows(ordered).flatMap(centerFirstOrder).filter(monsterAlive);
     }
 
     if(typeof getSkillTargets==="function"){
         const previousGetSkillTargets=getSkillTargets;
         getSkillTargets=function(centerIndex,targetType){
-            const indexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[];
-            const alive=indexes.filter(index=>{
-                const monster=typeof monsters!=="undefined"?monsters[index]:null;
-                return !!(monster&&monster.alive!==false&&numeric(monster.hp)>0);
-            });
-            if(targetType==="all"){ return alive; }
-            if(targetType==="single"){ return alive.includes(centerIndex)?[centerIndex]:[]; }
-            if(targetType==="tri"||targetType==="row"){
-                const row=stableFormationRows(indexes).find(candidate=>candidate.includes(centerIndex));
-                if(!row){ return []; }
-                const position=row.indexOf(centerIndex);
-                const selected=targetType==="row"
-                    ?row
-                    :row.slice(Math.max(0,position-1),Math.min(row.length,position+2));
-                return selected.filter(index=>alive.includes(index));
-            }
-            if(targetType==="column"){
-                const rows=stableFormationRows(indexes);
-                const selectedRow=rows.find(candidate=>candidate.includes(centerIndex));
-                if(!selectedRow){ return []; }
-                const selectedMonster=typeof monsters!=="undefined"?monsters[centerIndex]:null;
-                const explicitPosition=selectedMonster&&Number.isInteger(selectedMonster.v141FormationPosition)
-                    ?selectedMonster.v141FormationPosition:null;
-                const fallbackPosition=Math.max(0,selectedRow.indexOf(centerIndex));
-                return rows.map(row=>{
-                    if(explicitPosition!==null&&typeof monsters!=="undefined"){
-                        const exact=row.find(index=>
-                            monsters[index]&&monsters[index].v141FormationPosition===explicitPosition
-                        );
-                        if(Number.isInteger(exact)){ return exact; }
-                    }
-                    return row[fallbackPosition];
-                }).filter(index=>Number.isInteger(index)&&alive.includes(index)).slice(0,2);
+            const owner=battlefieldSlots();
+            const snapshot=activeFormationSnapshot(
+                typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]
+            );
+            if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
+                return owner.resolveEnemyTargets(snapshot,centerIndex,targetType,monsterAlive);
             }
             const legacy=previousGetSkillTargets.apply(this,arguments);
-            return Array.isArray(legacy)?legacy.filter(index=>alive.includes(index)):[];
+            return Array.isArray(legacy)?legacy.filter(monsterAlive):[];
         };
     }
 
@@ -15566,16 +15989,25 @@
     }
 
     function requestedBuffTargets(characterIndex,queued,skill){
-        if(skill.targetType==="allyAll"){ return livingPartyIndexes(); }
-        if(skill.targetType==="allyTri"){
-            const living=livingPartyIndexes();
-            if(living.length<=3){ return living; }
-            const all=partyIndexes();
-            const preferred=Number.isInteger(queued.targetAlly)?queued.targetAlly:all[Math.floor(all.length/2)];
-            const position=Math.max(0,all.indexOf(preferred));
-            return all.slice(Math.max(0,position-1),Math.min(all.length,position+2))
-                .filter(index=>living.includes(index));
+        const owner=battlefieldSlots();
+        const all=partyIndexes();
+        const living=index=>{
+            const target=getPartyCharacterByIndex(index);
+            return !!(target&&numeric(target.hp)>0);
+        };
+        if(owner&&typeof owner.ensureAllyFormation==="function"&&typeof owner.resolveAllyTargets==="function"){
+            const formation=owner.ensureAllyFormation(all);
+            if(skill.targetType==="allyAll"){
+                return owner.resolveAllyTargets(formation,null,"all",living);
+            }
+            if(skill.targetType==="allyTri"){
+                const preferred=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+                return owner.resolveAllyTargets(formation,preferred,"allyTri",living);
+            }
+            const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+            return owner.resolveAllyTargets(formation,selected,"ally",living);
         }
+        if(skill.targetType==="allyAll"){ return livingPartyIndexes(); }
         const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
         const target=getPartyCharacterByIndex(selected);
         return target&&numeric(target.hp)>0?[selected]:[];
@@ -15883,21 +16315,18 @@
 
     function bestMonsterRageTargets(casterIndex){
         const indexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[];
-        const alive=indexes.filter(index=>{
-            const monster=monsters[index];
-            return monster&&monster.alive!==false&&numeric(monster.hp)>0;
-        });
+        const alive=indexes.filter(monsterAlive);
+        const owner=battlefieldSlots();
+        const snapshot=activeFormationSnapshot(indexes);
         let best=[];
         let bestScore=-1;
-        stableFormationRows(indexes).forEach(row=>{
-            row.forEach((center,index)=>{
-                if(!alive.includes(center)){ return; }
-                const trio=row.slice(Math.max(0,index-1),Math.min(row.length,index+2))
-                    .filter(target=>alive.includes(target));
-                const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
-                const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
-                if(score>bestScore){ best=trio; bestScore=score; }
-            });
+        alive.forEach(center=>{
+            const trio=owner&&snapshot
+                ?owner.resolveEnemyTargets(snapshot,center,"tri",monsterAlive)
+                :[center];
+            const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
+            const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
+            if(score>bestScore){ best=trio; bestScore=score; }
         });
         return best.slice(0,3);
     }
@@ -16056,6 +16485,12 @@
         resolveQueuedPlayerAction=function(characterIndex){
             if(settleDefeatedEnemies()){ return; }
             const queued=typeof queuedPlayerActions!=="undefined"?queuedPlayerActions[characterIndex]:null;
+            if(queued&&queued.vFixedAutoEnemyPrimary===true){
+                const nextTarget=autoTargetPriority(
+                    typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]
+                )[0];
+                if(Number.isInteger(nextTarget)){ queued.target=nextTarget; }
+            }
             const skill=queued&&typeof skillDatabase!=="undefined"?skillDatabase[queued.action]:null;
             if(queued&&skill&&["buff","heal","revive"].includes(skill.category)){
                 return resolveSupportAction(characterIndex,Object.assign({},queued),skill);
@@ -16231,6 +16666,8 @@
         resetBattleAdvanceTimers();
         if(typeof closeMenus==="function"){ closeMenus(); }
         if(typeof clearBattleTargetSelectionMode==="function"){ clearBattleTargetSelectionMode(); }
+        const slotOwner=battlefieldSlots();
+        if(slotOwner){ slotOwner.clearActiveEnemySnapshot(); }
         renderBattle();
         const priority=autoTargetPriority(currentBattleMonsters);
         selectedMonster=priority.length?priority[0]:0;
@@ -22903,8 +23340,16 @@ function guard(name){const old=window[name];if(typeof old!=="function"||old.__v1
 ["addPoint","removePoint","confirmStatus","learnSkill","upgradeSkill"].forEach(guard);
 document.addEventListener("click",e=>{if(!inBattle())return;const b=e.target?.closest?.("button,[role=button]");if(!b)return;const s=String(b.getAttribute?.("onclick")||"");if(!/(addPoint|removePoint|confirmStatus|learnSkill|upgradeSkill)\s*\(/.test(s))return;e.preventDefault();e.stopImmediatePropagation();blocked();},true);
 
-function fivePriority(indexes){const list=(indexes||[]).filter(Number.isInteger);if(list.length!==5)return null;let rows=null;try{if(typeof window.v148GetFormationRows==="function")rows=window.v148GetFormationRows(list);else if(typeof window.v138GetFormationRows==="function")rows=window.v138GetFormationRows(list)}catch(_){}const row=Array.isArray(rows)&&Array.isArray(rows[0])&&rows[0].length===5?rows[0].slice():list.slice();return [row[2],row[1],row[3],row[0],row[4]].filter(Number.isInteger);}
-if(typeof window.v148GetAutoTargetPriority==="function"){const old=window.v148GetAutoTargetPriority;window.v148GetAutoTargetPriority=function(indexes){return fivePriority(indexes)||old.apply(this,arguments)}}
+function fivePriority(indexes){
+    const list=(indexes||[]).filter(Number.isInteger);
+    if(list.length!==5)return null;
+    try{
+        if(typeof window.v148GetAutoTargetPriority==="function"){
+            return window.v148GetAutoTargetPriority(list).slice();
+        }
+    }catch(_){}
+    return [list[3],list[1],list[4],list[2],list[0]].filter(Number.isInteger);
+}
 window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 
 /* V174 battle presentation owner.
