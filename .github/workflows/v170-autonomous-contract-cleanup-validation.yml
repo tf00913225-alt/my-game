@@ -6,17 +6,18 @@ on:
       - validation/v170-autonomous-contract-cleanup-20260917
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  validate-east-earth-shield:
+  final-validation:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Check out autonomous fix branch
         uses: actions/checkout@v4
         with:
           ref: fix/v170-autonomous-contract-cleanup-20260917
-          fetch-depth: 0
+          fetch-depth: 2
 
       - name: Use Node.js 24
         uses: actions/setup-node@v4
@@ -25,75 +26,59 @@ jobs:
 
       - name: Verify exact autonomous HEAD
         shell: bash
-        run: test "$(git rev-parse HEAD)" = "e9f041e1c08b9830fe5ca33c6dd190bf8b0ab0e6"
+        run: test "$(git rev-parse HEAD)" = "8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6"
 
-      - name: Apply authorized Earth Shield tests-only contract fix
+      - name: Prepare Git comparison base and typography baselines
+        shell: bash
+        env:
+          CI_BASE_SHA: e3de8f7fee4e65986420528247bdbb99cb588a07
+        run: |
+          if [[ "$CI_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] && \
+             [[ ! "$CI_BASE_SHA" =~ ^0{40}$ ]] && \
+             ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
+          fi
+
+          for typography_baseline_sha in \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            if ! git cat-file -e "$typography_baseline_sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$typography_baseline_sha"
+            fi
+          done
+
+      - name: Ensure existing asset-test dependency
         shell: bash
         run: |
-          python - <<'PY'
-          from pathlib import Path
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
 
-          path=Path("tests/v170-final-spec-integration.test.js")
-          text=path.read_text(encoding="utf-8")
-          start_marker='test("East Earth Shield and Heaven Calm use their assigned formal support values",()=>{'
-          end_marker='\nfunction prepareExtremeEmperor(context){'
-          start=text.index(start_marker)
-          end=text.index(end_marker,start)
-          case=text[start:end]
-
-          def replace_once(source,old,new,label):
-              count=source.count(old)
-              if count!=1:
-                  raise SystemExit(f"{label}: expected exactly one match, found {count}")
-              return source.replace(old,new,1)
-
-          case=replace_once(
-              case,
-              '''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};\n        const earth=v155ResolveEastEarthShield(0,true);\n''',
-              '''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);\n        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        if(!snapshot){ throw new Error("V170 Earth Shield fixture must create the formal enemy snapshot"); }\n        const eastTargets=v141GetMonsterAllyTriTargets(0).map(entry=>entry.index);\n        const eastSlots=eastTargets.map(index=>window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,index));\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};\n        const earth=v155ResolveEastEarthShield(0,true);\n''',
-              "snapshot insertion"
-          )
-          case=replace_once(
-              case,
-              '''            earth:earth,calm:calm,\n            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,\n''',
-              '''            earth:earth,calm:calm,eastTargets:eastTargets,eastSlots:eastSlots,\n            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,\n''',
-              "result payload"
-          )
-          case=replace_once(
-              case,
-              '''    assert.equal(result.earth,true);\n    assert.equal(result.calm,true);\n    assert.equal(result.earthTargets,2);\n''',
-              '''    assert.equal(result.earth,true);\n    assert.equal(result.calm,true);\n    assert.deepEqual(result.eastTargets,[0,1,2]);\n    assert.deepEqual(result.eastSlots,["ENEMY_F1","ENEMY_F2","ENEMY_F3"]);\n    assert.equal(result.earthTargets,3);\n''',
-              "formal Fixed Slot expectation"
-          )
-
-          path.write_text(text[:start]+case+text[end:],encoding="utf-8")
-          PY
-
-          git diff --check
-          test "$(git diff --name-only)" = "tests/v170-final-spec-integration.test.js"
-          git diff -- tests/v170-final-spec-integration.test.js
-
-      - name: Run related Fixed Slot targeted regression
+      - name: Re-run V170 with 90-second timeout
         shell: bash
-        run: node tests/fixed-slot-tri-target-window.test.js
+        run: timeout 90s node tests/v170-final-spec-integration.test.js
 
-      - name: Run V170, commit confirmed fix, and preserve next failure
+      - name: Run all Fixed Slot targeted regressions
         shell: bash
         run: |
-          set +e
-          timeout 90s node tests/v170-final-spec-integration.test.js > /tmp/v170.log 2>&1
-          status=$?
-          set -e
-          cat /tmp/v170.log
+          node tests/fixed-slot-tri-target-window.test.js
+          node tests/ally-tri-rage-fixed-slot-regression.test.js
+          node tests/fixed-slot-battlefield-rendering-v2.test.js
 
-          grep -Fq '✓ East Earth Shield and Heaven Calm use their assigned formal support values' /tmp/v170.log
-          git diff --check
-          test "$(git diff --name-only)" = "tests/v170-final-spec-integration.test.js"
+      - name: Run all Node unit and integration suites
+        shell: bash
+        env:
+          CI_BASE_SHA: e3de8f7fee4e65986420528247bdbb99cb588a07
+          CI_HEAD_SHA: 8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6
+        run: node .github/scripts/ci.mjs tests
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/v170-final-spec-integration.test.js
-          git commit -m "test: align V170 earth shield with fixed-slot tri"
-          git push origin HEAD:fix/v170-autonomous-contract-cleanup-20260917
-
-          exit "$status"
+      - name: Verify tests-only diff and clean worktree
+        shell: bash
+        run: |
+          git diff --check e3de8f7fee4e65986420528247bdbb99cb588a07..HEAD
+          test -z "$(git status --porcelain)"
+          files="$(git diff --name-only e3de8f7fee4e65986420528247bdbb99cb588a07..HEAD)"
+          test "$files" = "tests/v170-final-spec-integration.test.js"
+          git diff --stat e3de8f7fee4e65986420528247bdbb99cb588a07..HEAD
