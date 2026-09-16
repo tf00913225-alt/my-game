@@ -1,0 +1,157 @@
+name: V170 Enemy Heal Tri Diagnosis
+
+on:
+  push:
+    branches:
+      - validation/v170-enemy-heal-tri-diagnosis-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    name: Node 24 isolated enemy Heal Spell diagnosis
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      FIX_HEAD: e3de8f7fee4e65986420528247bdbb99cb588a07
+    steps:
+      - name: Check out diagnosis branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Confirm diagnosis ancestry and scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "NODE_VERSION=$(node --version)"
+          echo "DIAGNOSIS_HEAD=$(git rev-parse HEAD)"
+          git cat-file -e "$FIX_HEAD^{commit}"
+          test "$(git merge-base "$FIX_HEAD" HEAD)" = "$FIX_HEAD"
+          echo 'DIAGNOSIS_ONLY_DIFF:'
+          git diff --name-only "$FIX_HEAD" HEAD
+          test "$(git diff --name-only "$FIX_HEAD" HEAD)" = '.github/workflows/validation-v170-enemy-heal-tri-diagnosis-20260917.yml'
+
+      - name: Build isolated runner from existing V170 harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          source=Path('tests/v170-final-spec-integration.test.js').read_text(encoding='utf-8')
+          marker='test("the baseline and the real index/js20 runtime order are pinned",()=>{'
+          if source.count(marker)!=1:
+              raise SystemExit('V170 first-test marker not unique')
+          prefix=source.split(marker,1)[0]
+
+          diagnosis=r'''
+function makeHealFixture(context){
+    vm.runInContext(`
+        monsters.splice(0,monsters.length);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length);
+        for(let index=0;index<10;index++){
+            monsters.push({name:index===3?"北帝天尊":"天兵天將",element:"water",level:100,
+                rank:index<5?"boss":"elite",v141Abyss:true,v155FinalAbyss:true,alive:true,
+                hp:(index>=1&&index<=3)?100:900,maxHP:1000,sp:1000,maxSP:1000,
+                activeBuffs:[],statusEffects:[],v141FormationRow:index<5?0:1,v141FormationPosition:index%5,
+                v141SupportSkillIds:index===3?["revive","healSpell"]:[],v141ForceSkillLevel:5,skillChance:1});
+            currentBattleMonsters.push(index);
+        }
+        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
+        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};Math.random=function(){ return 0; };
+    `,context);
+}
+
+function healEntriesExpression(){
+    return 'currentBattleMonsters.map(index=>({index:index,monster:monsters[index]}))';
+}
+
+(function runCaseA(){
+    const runtime=loadFinalRuntime();
+    makeHealFixture(runtime.context);
+    const entries=healEntriesExpression();
+    const result=evaluateJson(runtime.context,`(function(){
+        const owner=window.FourSymbolsBattlefieldSlots;
+        const snapshotBefore=owner.getActiveEnemySnapshot();
+        const northTargets=window.v141GetMonsterAllyTriTargets(3,${entries}).map(entry=>entry.index);
+        const beforeNorth=monsters.map(monster=>monster.hp);
+        const north=v155ResolveNorthHeal(3,true);
+        const northChanged=monsters.map((monster,index)=>monster.hp!==beforeNorth[index]?index:null).filter(index=>index!==null);
+        const snapshotAfterNorth=owner.getActiveEnemySnapshot();
+
+        monsters.forEach((monster,index)=>{ monster.hp=(index>=6&&index<=8)?100:1000;monster.sp=1000;monster.v141SupportSkillIds=[]; });
+        monsters[5].v141SupportSkillIds=["healSpell"];
+        monsters[5].v141ForceSkillLevel=5;
+        const snapshotBeforeElite=owner.getActiveEnemySnapshot();
+        const eliteTargets=window.v141GetMonsterAllyTriTargets(5,${entries}).map(entry=>entry.index);
+        const beforeElite=monsters.map(monster=>monster.hp);
+        const elite=v141TryMonsterSpecialAction(5);
+        const eliteChanged=monsters.map((monster,index)=>monster.hp!==beforeElite[index]?index:null).filter(index=>index!==null);
+        return {
+            snapshotBefore:snapshotBefore===null?null:"NON_NULL",
+            snapshotAfterNorth:snapshotAfterNorth===null?null:"NON_NULL",
+            snapshotBeforeElite:snapshotBeforeElite===null?null:"NON_NULL",
+            north:north,northTargets:northTargets,northChanged:northChanged,
+            elite:elite,eliteTargets:eliteTargets,eliteChanged:eliteChanged
+        };
+    })()`);
+    console.log('CASE_A='+JSON.stringify(result));
+})();
+
+(function runCaseB(){
+    const runtime=loadFinalRuntime();
+    makeHealFixture(runtime.context);
+    const entries=healEntriesExpression();
+    const result=evaluateJson(runtime.context,`(function(){
+        const owner=window.FourSymbolsBattlefieldSlots;
+        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);
+        const mapping=Array.from({length:10},(_,index)=>({
+            index:index,
+            formationRow:monsters[index].v141FormationRow,
+            formationPosition:monsters[index].v141FormationPosition,
+            slot:owner.getEnemySlotForMonster(snapshot,index)
+        }));
+        const back=mapping.filter(entry=>String(entry.slot||"").includes("ENEMY_B")).map(entry=>entry.index);
+        const front=mapping.filter(entry=>String(entry.slot||"").includes("ENEMY_F")).map(entry=>entry.index);
+
+        const northTargets=window.v141GetMonsterAllyTriTargets(3,${entries}).map(entry=>entry.index);
+        const beforeNorth=monsters.map(monster=>monster.hp);
+        const north=v155ResolveNorthHeal(3,true);
+        const northChanged=monsters.map((monster,index)=>monster.hp!==beforeNorth[index]?index:null).filter(index=>index!==null);
+
+        monsters.forEach((monster,index)=>{ monster.hp=(index>=6&&index<=8)?100:1000;monster.sp=1000;monster.v141SupportSkillIds=[]; });
+        monsters[5].v141SupportSkillIds=["healSpell"];
+        monsters[5].v141ForceSkillLevel=5;
+        const eliteTargets=window.v141GetMonsterAllyTriTargets(5,${entries}).map(entry=>entry.index);
+        const beforeElite=monsters.map(monster=>monster.hp);
+        const elite=v141TryMonsterSpecialAction(5);
+        const eliteChanged=monsters.map((monster,index)=>monster.hp!==beforeElite[index]?index:null).filter(index=>index!==null);
+        return {
+            snapshotExists:!!snapshot,
+            sameActiveSnapshot:owner.getActiveEnemySnapshot()===snapshot,
+            mapping:mapping,back:back,front:front,
+            north:north,northTargets:northTargets,northChanged:northChanged,
+            elite:elite,eliteTargets:eliteTargets,eliteChanged:eliteChanged
+        };
+    })()`);
+    console.log('CASE_B='+JSON.stringify(result));
+})();
+'''
+
+          Path('/tmp/v170-enemy-heal-tri-diagnosis.js').write_text(prefix+diagnosis,encoding='utf-8')
+          PY
+
+      - name: Run isolated diagnosis within 30 seconds
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 30s node /tmp/v170-enemy-heal-tri-diagnosis.js | tee /tmp/heal-tri-diagnosis.log
+          grep '^CASE_A=' /tmp/heal-tri-diagnosis.log
+          grep '^CASE_B=' /tmp/heal-tri-diagnosis.log
