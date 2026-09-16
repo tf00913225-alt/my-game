@@ -244,6 +244,155 @@
         return [primarySlot];
     }
 
+    /* Geometry is a separate contract from damage-target resolution. Damage may
+       omit defeated units; geometry never collapses because a unit is defeated. */
+    function normalizeGeometrySide(side){
+        const value=String(side||"").toLowerCase();
+        if(value==="monster"||value==="enemy"){ return "enemy"; }
+        if(value==="player"||value==="ally"){ return "ally"; }
+        if(value==="mechanism"||value==="mech"){ return "mechanism"; }
+        return value;
+    }
+
+    function geometrySlotsForSide(side){
+        const normalized=normalizeGeometrySide(side);
+        if(normalized==="enemy"){ return ENEMY_SLOTS; }
+        if(normalized==="ally"){ return ALLY_SLOTS; }
+        if(normalized==="mechanism"){ return MECHANISM; }
+        return [];
+    }
+
+    function slotSelector(slot){
+        const meta=SLOT_META[slot];
+        if(!meta){ return null; }
+        if(meta.side==="enemy"){ return '.v-fixed-enemy-slot[data-slot="'+slot+'"]'; }
+        if(meta.side==="ally"){ return '.v-fixed-ally-slot[data-slot="'+slot+'"]'; }
+        return '.boss-mechanism-position[data-slot="'+slot+'"]';
+    }
+
+    function slotElement(slot){
+        if(typeof document==="undefined"||typeof document.querySelector!=="function"){ return null; }
+        const selector=slotSelector(slot);
+        if(!selector){ return null; }
+        const battlePage=typeof document.getElementById==="function"?document.getElementById("battlePage"):null;
+        return battlePage&&typeof battlePage.querySelector==="function"
+            ?battlePage.querySelector(selector)
+            :document.querySelector(selector);
+    }
+
+    function plainRect(rect,slot){
+        if(!rect){ return null; }
+        const left=Number(rect.left)||0;
+        const top=Number(rect.top)||0;
+        const width=Math.max(0,Number(rect.width)||0);
+        const height=Math.max(0,Number(rect.height)||0);
+        if(width<=0||height<=0){ return null; }
+        const right=Number.isFinite(Number(rect.right))?Number(rect.right):left+width;
+        const bottom=Number.isFinite(Number(rect.bottom))?Number(rect.bottom):top+height;
+        return {
+            slot:slot||null,left:left,top:top,right:right,bottom:bottom,
+            width:width,height:height,centerX:left+width/2,centerY:top+height/2
+        };
+    }
+
+    function geometryRectForSlot(slot){
+        const element=slotElement(slot);
+        const rect=element&&typeof element.getBoundingClientRect==="function"?element.getBoundingClientRect():null;
+        return plainRect(rect,slot);
+    }
+
+    function geometryCenterForSlot(slot){
+        const rect=geometryRectForSlot(slot);
+        return rect?{slot:slot,x:rect.centerX,y:rect.centerY,rect:rect}:null;
+    }
+
+    function geometryRectForSlots(slots){
+        const requested=Array.from(new Set((Array.isArray(slots)?slots:[]).filter(slot=>!!SLOT_META[slot])));
+        if(!requested.length){ return null; }
+        const rects=requested.map(geometryRectForSlot);
+        /* Never silently shrink to the subset that happens to be rendered. */
+        if(rects.some(rect=>!rect)){ return null; }
+        const left=Math.min.apply(null,rects.map(rect=>rect.left));
+        const top=Math.min.apply(null,rects.map(rect=>rect.top));
+        const right=Math.max.apply(null,rects.map(rect=>rect.right));
+        const bottom=Math.max.apply(null,rects.map(rect=>rect.bottom));
+        return {
+            slots:requested.slice(),left:left,top:top,right:right,bottom:bottom,
+            width:right-left,height:bottom-top,centerX:(left+right)/2,centerY:(top+bottom)/2
+        };
+    }
+
+    function geometryRowSlots(side,row){
+        const normalized=normalizeGeometrySide(side);
+        const requestedRow=String(row||"").toLowerCase();
+        return geometrySlotsForSide(normalized).filter(slot=>SLOT_META[slot].row===requestedRow)
+            .sort((a,b)=>SLOT_META[a].column-SLOT_META[b].column);
+    }
+
+    function geometryTriSlots(side,primarySlot){
+        const normalized=normalizeGeometrySide(side);
+        const allowed=geometrySlotsForSide(normalized);
+        const meta=SLOT_META[primarySlot];
+        if(!meta||meta.side!==normalized||!allowed.includes(primarySlot)){ return []; }
+        const row=geometryRowSlots(normalized,meta.row);
+        if(row.length<=3){ return row; }
+        const start=Math.max(1,Math.min(row.length-2,meta.column-1));
+        return row.filter(slot=>SLOT_META[slot].column>=start&&SLOT_META[slot].column<start+3);
+    }
+
+    function geometrySlotsFromShape(side,primarySlot,shape){
+        const normalizedSide=normalizeGeometrySide(side);
+        const allowed=geometrySlotsForSide(normalizedSide);
+        if(!allowed.length){ return []; }
+        const normalizedShape=normalizeShape(shape);
+        if(normalizedShape==="all"){ return allowed.slice(); }
+        if(!primarySlot||!allowed.includes(primarySlot)){
+            return normalizedShape==="all"?allowed.slice():[];
+        }
+        const meta=SLOT_META[primarySlot];
+        if(normalizedShape==="single"){ return [primarySlot]; }
+        if(normalizedShape==="row"){ return geometryRowSlots(normalizedSide,meta.row); }
+        if(normalizedShape==="column"){
+            return allowed.filter(slot=>SLOT_META[slot].column===meta.column)
+                .sort((a,b)=>SLOT_META[a].row.localeCompare(SLOT_META[b].row));
+        }
+        if(normalizedShape==="tri"){ return geometryTriSlots(normalizedSide,primarySlot); }
+        return [primarySlot];
+    }
+
+    function geometryRectForShape(side,primarySlot,shape){
+        return geometryRectForSlots(geometrySlotsFromShape(side,primarySlot,shape));
+    }
+
+    function geometryRowRect(side,row){
+        return geometryRectForSlots(geometryRowSlots(side,row));
+    }
+
+    function geometrySideRect(side){
+        return geometryRectForSlots(geometrySlotsForSide(side));
+    }
+
+    function slotFromElement(element){
+        let current=element||null;
+        while(current){
+            const slot=current.dataset&&current.dataset.slot;
+            if(slot&&SLOT_META[slot]){ return slot; }
+            current=current.parentElement||current.parentNode||null;
+        }
+        return null;
+    }
+
+    function slotForCombatant(side,index){
+        const normalized=normalizeGeometrySide(side);
+        if(normalized==="enemy"){
+            return activeEnemySnapshot?slotForMonster(activeEnemySnapshot,index):null;
+        }
+        if(normalized==="ally"){
+            return allySlotForCharacter(index);
+        }
+        return null;
+    }
+
     function resolveEnemyTargets(snapshot,primaryMonsterIndex,shape,isAlive){
         if(!snapshot){ return []; }
         const primarySlot=slotForMonster(snapshot,primaryMonsterIndex);
@@ -382,6 +531,7 @@
 
     const api={
         version:"fixed-slot-v1",
+        geometryVersion:"slot-geometry-v1",
         enemySlots:ENEMY_SLOTS,
         enemyBackSlots:ENEMY_BACK,
         enemyFrontSlots:ENEMY_FRONT,
@@ -414,7 +564,19 @@
         resolveAllyTargets:resolveAllyTargets,
         setActiveEnemySnapshot:setActiveEnemySnapshot,
         getActiveEnemySnapshot:getActiveEnemySnapshot,
-        clearActiveEnemySnapshot:clearActiveEnemySnapshot
+        clearActiveEnemySnapshot:clearActiveEnemySnapshot,
+        getSlotElement:slotElement,
+        getSlotRect:geometryRectForSlot,
+        getSlotCenter:geometryCenterForSlot,
+        getRectForSlots:geometryRectForSlots,
+        getRowSlots:geometryRowSlots,
+        getRowRect:geometryRowRect,
+        getSideSlots:geometrySlotsForSide,
+        getSideRect:geometrySideRect,
+        getGeometrySlotsFromShape:geometrySlotsFromShape,
+        getGeometryRectFromShape:geometryRectForShape,
+        getSlotFromElement:slotFromElement,
+        getSlotForCombatant:slotForCombatant
     };
 
     window.FourSymbolsBattlefieldSlots=Object.freeze(api);
