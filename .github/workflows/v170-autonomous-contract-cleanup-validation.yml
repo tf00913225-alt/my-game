@@ -6,10 +6,10 @@ on:
       - validation/v170-autonomous-contract-cleanup-20260917
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  validate-heal-spell-contract:
+  diagnose-east-earth-shield:
     runs-on: ubuntu-latest
     steps:
       - name: Check out autonomous fix branch
@@ -23,91 +23,54 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Verify exact starting HEAD
+      - name: Verify exact autonomous HEAD
         shell: bash
-        run: |
-          test "$(git rev-parse HEAD)" = "e3de8f7fee4e65986420528247bdbb99cb588a07"
+        run: test "$(git rev-parse HEAD)" = "e9f041e1c08b9830fe5ca33c6dd190bf8b0ab0e6"
 
-      - name: Apply exact Heal Spell tests-only contract fix
+      - name: Inject validation-only formal snapshot diagnostics
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
 
-          path = Path("tests/v170-final-spec-integration.test.js")
-          text = path.read_text(encoding="utf-8")
-          start_marker = 'test("enemy Heal Spell affects only one same-row trio for both North Emperor and water elites",()=>{'
-          end_marker = '\ntest("North Emperor prioritizes maximum-level Revive for a defeated boss",()=>{'
-          start = text.index(start_marker)
-          end = text.index(end_marker, start)
-          case = text[start:end]
+          path=Path("tests/v170-final-spec-integration.test.js")
+          text=path.read_text(encoding="utf-8")
+          start_marker='test("East Earth Shield and Heaven Calm use their assigned formal support values",()=>{'
+          end_marker='\nfunction prepareExtremeEmperor(context){'
+          start=text.index(start_marker)
+          end=text.index(end_marker,start)
+          case=text[start:end]
 
-          def replace_once(source, old, new, label):
-              count = source.count(old)
-              if count != 1:
-                  raise SystemExit(f"{label}: expected exactly one match, found {count}")
-              return source.replace(old, new, 1)
+          old='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};\n        const earth=v155ResolveEastEarthShield(0,true);\n'''
+          new='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);\n        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        if(!snapshot){ throw new Error("East Earth Shield diagnosis requires the formal enemy snapshot"); }\n        const eastTargets=v141GetMonsterAllyTriTargets(0).map(entry=>entry.index);\n        const eastSlots=eastTargets.map(index=>window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,index));\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};\n        const earth=v155ResolveEastEarthShield(0,true);\n'''
+          if case.count(old)!=1:
+              raise SystemExit(f"fixture anchor count={case.count(old)}")
+          case=case.replace(old,new,1)
 
-          case = replace_once(
-              case,
-              '''            currentBattleMonsters.push(index);\n        }\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n''',
-              '''            currentBattleMonsters.push(index);\n        }\n        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        if(!snapshot){ throw new Error("V170 Heal Spell fixture must create the formal enemy snapshot"); }\n        const slotOwner=window.FourSymbolsBattlefieldSlots;\n        const slotFor=index=>slotOwner.getEnemySlotForMonster(snapshot,index);\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n''',
-              "snapshot insertion"
-          )
-          case = replace_once(
-              case,
-              '''        const beforeNorth=monsters.map(monster=>monster.hp);\n        const north=v155ResolveNorthHeal(3,true);\n''',
-              '''        const northTargets=v141GetMonsterAllyTriTargets(3).map(entry=>entry.index);\n        const northSlots=northTargets.map(slotFor);\n        const beforeNorth=monsters.map(monster=>monster.hp);\n        const north=v155ResolveNorthHeal(3,true);\n''',
-              "North target capture"
-          )
-          case = replace_once(
-              case,
-              '''        const beforeElite=monsters.map(monster=>monster.hp);\n        const elite=v141TryMonsterSpecialAction(5);\n''',
-              '''        const eliteTargets=v141GetMonsterAllyTriTargets(5).map(entry=>entry.index);\n        const eliteSlots=eliteTargets.map(slotFor);\n        const beforeElite=monsters.map(monster=>monster.hp);\n        const elite=v141TryMonsterSpecialAction(5);\n''',
-              "elite target capture"
-          )
-          case = replace_once(
-              case,
-              '''        return {north:north,northChanged:northChanged,elite:elite,eliteChanged:eliteChanged};\n''',
-              '''        return {snapshot:!!snapshot,north:north,northTargets:northTargets,northSlots:northSlots,\n            northChanged:northChanged,elite:elite,eliteTargets:eliteTargets,eliteSlots:eliteSlots,eliteChanged:eliteChanged};\n''',
-              "result payload"
-          )
-          case = replace_once(
-              case,
-              '''    assert.deepEqual(result,{north:true,northChanged:[1,2,3],elite:true,eliteChanged:[6,7,8]});\n''',
-              '''    assert.deepEqual(result,{\n        snapshot:true,\n        north:true,northTargets:[3,1,0],northSlots:["ENEMY_B1","ENEMY_B2","ENEMY_B3"],northChanged:[0,1,3],\n        elite:true,eliteTargets:[6,5,7],eliteSlots:["ENEMY_F2","ENEMY_F3","ENEMY_F4"],eliteChanged:[6,7]\n    });\n''',
-              "formal Fixed Slot expectation"
-          )
+          old='''            earth:earth,calm:calm,\n            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,\n'''
+          new='''            earth:earth,calm:calm,eastTargets:eastTargets,eastSlots:eastSlots,\n            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,\n'''
+          if case.count(old)!=1:
+              raise SystemExit(f"result anchor count={case.count(old)}")
+          case=case.replace(old,new,1)
 
-          updated = text[:start] + case + text[end:]
-          path.write_text(updated, encoding="utf-8")
+          old='''    assert.equal(result.earth,true);\n'''
+          new='''    console.log("EAST_EARTH_SHIELD_DIAG="+JSON.stringify(result));\n    assert.equal(result.earth,true);\n'''
+          if case.count(old)!=1:
+              raise SystemExit(f"log anchor count={case.count(old)}")
+          case=case.replace(old,new,1)
+
+          path.write_text(text[:start]+case+text[end:],encoding="utf-8")
           PY
-
           git diff --check
           test "$(git diff --name-only)" = "tests/v170-final-spec-integration.test.js"
-          git diff -- tests/v170-final-spec-integration.test.js
 
-      - name: Run related Fixed Slot targeted regression
-        shell: bash
-        run: node tests/fixed-slot-tri-target-window.test.js
-
-      - name: Run V170, commit confirmed fix, and preserve next failure
+      - name: Run validation-only V170 diagnosis
         shell: bash
         run: |
           set +e
-          timeout 90s node tests/v170-final-spec-integration.test.js > /tmp/v170.log 2>&1
+          timeout 90s node tests/v170-final-spec-integration.test.js > /tmp/v170-east.log 2>&1
           status=$?
           set -e
-          cat /tmp/v170.log
-
-          grep -Fq '✓ enemy Heal Spell affects only one same-row trio for both North Emperor and water elites' /tmp/v170.log
-          git diff --check
-          test "$(git diff --name-only)" = "tests/v170-final-spec-integration.test.js"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/v170-final-spec-integration.test.js
-          git commit -m "test: align V170 enemy heal with fixed-slot geometry"
-          git push origin HEAD:fix/v170-autonomous-contract-cleanup-20260917
-
-          exit "$status"
+          cat /tmp/v170-east.log
+          test "$status" -ne 124
+          grep -F 'EAST_EARTH_SHIELD_DIAG=' /tmp/v170-east.log
