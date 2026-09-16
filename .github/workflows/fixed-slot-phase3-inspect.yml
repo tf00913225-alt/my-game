@@ -21,7 +21,18 @@ jobs:
         with:
           node-version: '24'
       - name: Apply persistent ally formation
-        run: python3 scripts/_fixed_slot_phase3.py
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('scripts/_fixed_slot_phase3.py')
+          text=path.read_text(encoding='utf-8')
+          start=text.find('s=replace_once(s,\n"""    function normalizeShape')
+          end=text.find('ally_block=',start)
+          if start<0 or end<0:
+              raise SystemExit('phase3 driver normalizeShape compatibility block not found')
+          path.write_text(text[:start]+text[end:],encoding='utf-8')
+          PY
+          python3 scripts/_fixed_slot_phase3.py
       - name: Verify checkpoint 3
         run: |
           node --check js/battlefield-slot-owner.js
