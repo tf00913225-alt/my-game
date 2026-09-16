@@ -29,10 +29,12 @@ assert.match(
     /iceArrowRain:\{[\s\S]*?castSheet\("assets\/vfx\/water\/frost-arrow-rain-vfx\.png\?v=173\.19","battlefield",\{fixedFormation:true,coverageScale:1\.22,minWidth:140,minHeight:140\}\)/
 );
 assert.match(animation,/function castSheet\(src,placement,options\)[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?renderer:"dom-sprite"/);
+assert.match(animation,/function geometryOwner\(\)\{[\s\S]*?window\.FourSymbolsBattlefieldSlots/);
 assert.match(
     animation,
-    /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\);[\s\S]*?groupLayoutBounds\(current,indexes\):fieldBounds\(targetCards\)/
+    /function geometryBounds\(current,indexes,placement\)[\s\S]*?owner\.getSideRect\(current\.targetSide\)[\s\S]*?owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/
 );
+assert.doesNotMatch(animation,/function fieldBounds\(|function groupLayoutBounds\(|function sideAreaBounds\(|function fixedTriLayoutBounds\(/);
 assert.doesNotMatch(animation,/canvas-crop|getContext\(|drawImage\(|createElement\(["']canvas["']\)/);
 
 console.log("V173.39 Abyss, raster VFX, and daily-dungeon regression checks passed.");
