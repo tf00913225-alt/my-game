@@ -35,3 +35,6 @@ jobs:
 
       - name: Run formal V153 Fixed Slot diagnosis
         run: node tests/diagnosis-v153-fixed-slot-harness.test.js
+
+      - name: Run migrated V153 Fire VFX suite
+        run: node tests/v153-fire-vfx.test.js
