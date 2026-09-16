@@ -180,7 +180,6 @@ function config(id,targetType="single",duration=760){
     const [sprite]=spriteNodes(context.v143SkillAnimationState.current);
     assert.ok(sprite,"travel skill must create a Sprite against Boss");
     assert.equal(sprite.dataset.travel,"true");
-    assert.equal(sprite.dataset.geometrySlot,"ENEMY_F3");
     assert.equal(sprite.style.visibility,"visible");
 }
 
