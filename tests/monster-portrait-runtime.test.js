@@ -132,7 +132,10 @@ assert.match(source,/MONSTER_PORTRAIT_REGISTRY_URL="config\/monster-portrait-reg
 assert.match(source,/TEMPORARY_MONSTER_PORTRAIT="assets\/dungeons\/abyss\/soldier\.webp"/);
 assert.match(source,/TEMPORARY_BOSS_PORTRAIT="assets\/monsters\/boss\/boss-placeholder-fire-demon\.webp"/);
 assert.match(source,/target\.status!=="existing"/);
-assert.match(source,/background-size:contain!important/);
+const presentationStyleOwner=source.match(/function installMonsterPortraitPresentationStyle\(\)\{([\s\S]*?)\n    \}/);
+assert.ok(presentationStyleOwner);
+assert.match(presentationStyleOwner[1],/V174 owns/);
+assert.doesNotMatch(presentationStyleOwner[1],/background-size|background-position|style\.textContent/);
 assert.equal((source.match(/renderBattle=function/g)||[]).length,1);
 assert.equal((source.match(/updateMonsterUI=function/g)||[]).length,1);
 assert.match(timingSource,/v154SyncMonsterPortraits/);
