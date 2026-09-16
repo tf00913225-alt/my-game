@@ -107,7 +107,7 @@ jobs:
           retention-days: 14
 
       - name: Commit deterministic production build to PR head
-        if: github.event_name == 'pull_request' && steps.build_sync.outcome == 'failure' && github.event.pull_request.head.repo.full_name == github.repository
+        if: always() && github.event_name == 'pull_request' && steps.build_sync.outcome == 'failure' && github.event.pull_request.head.repo.full_name == github.repository
         env:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
