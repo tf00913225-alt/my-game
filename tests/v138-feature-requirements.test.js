@@ -6,6 +6,7 @@ const vm=require("node:vm");
 
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
+const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 const battleCss=fs.readFileSync("css/31-v131-fix-batch.css","utf8");
@@ -50,7 +51,7 @@ function extractFunction(source,name){
 }
 
 function context(values={}){
-    return vm.createContext({console,Math,Number,String,Object,Array,Map,...values});
+    return vm.createContext({console,Math,Number,String,Object,Array,Map,Set,...values});
 }
 
 let passed=0;
@@ -74,24 +75,34 @@ test("battle pacing is 1.6 seconds per action and 2 seconds per round",()=>{
     );
 });
 
-test("formation puts BOSS in the center, then elites, then regular monsters",()=>{
-    const ctx=context({
-        monsters:[
-            {rank:"regular"},
-            {rank:"elite"},
-            {rank:"boss"},
-            {rank:"regular"},
-            {rank:"elite"}
-        ],
-        getMonsterRank:monster=>monster.rank
+test("formal fixed-slot formation puts BOSS in the center, then elites, then regular monsters",()=>{
+    const ctx=context({});
+    ctx.window=ctx;
+    vm.runInContext(slotOwnerSource,ctx,{filename:"js/battlefield-slot-owner.js"});
+    const owner=ctx.FourSymbolsBattlefieldSlots;
+    assert.ok(owner,"固定格位 owner 必須可用");
+    const monsters=[
+        {rank:"regular"},
+        {rank:"elite"},
+        {rank:"boss"},
+        {rank:"regular"},
+        {rank:"elite"}
+    ];
+    const snapshot=owner.createEnemyFormationSnapshot([0,1,2,3,4],{
+        originalFormationType:5,
+        rankWeight:index=>monsters[index].rank==="boss"?3:(monsters[index].rank==="elite"?2:1)
     });
-    ["getFormationRankWeight","arrangeRowCenterFirst","getFormationRows"]
-        .forEach(name=>vm.runInContext(extractFunction(v131Source,name),ctx));
-    const rows=vm.runInContext("getFormationRows([0,1,2,3,4])",ctx);
-    assert.deepEqual(Array.from(rows[0]),[0,1,2,4,3]);
-    assert.equal(ctx.monsters[rows[0][2]].rank,"boss");
-    assert.equal(ctx.monsters[rows[0][1]].rank,"elite");
-    assert.equal(ctx.monsters[rows[0][3]].rank,"elite");
+    assert.equal(snapshot.monsterIndexToSlot[2],"ENEMY_F3");
+    assert.equal(snapshot.monsterIndexToSlot[1],"ENEMY_F2");
+    assert.equal(snapshot.monsterIndexToSlot[4],"ENEMY_F4");
+    assert.equal(snapshot.monsterIndexToSlot[0],"ENEMY_F1");
+    assert.equal(snapshot.monsterIndexToSlot[3],"ENEMY_F5");
+    const ordered=owner.getEnemySnapshotRows(snapshot)[0].map(entry=>entry.monsterIndex);
+    assert.deepEqual(Array.from(ordered),[0,1,2,4,3]);
+    assert.equal(monsters[ordered[2]].rank,"boss");
+    assert.equal(monsters[ordered[1]].rank,"elite");
+    assert.equal(monsters[ordered[3]].rank,"elite");
+    assert.doesNotMatch(v131Source,/function arrangeRowCenterFirst\(/,"舊排位置中 helper 不應重新成為第二套 Formation owner");
 });
 
 test("monster and player frames use element colors while names use rank colors",()=>{
