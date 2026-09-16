@@ -8,6 +8,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 const zlib=require("node:zlib");
 
+const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const support=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
@@ -18,7 +19,7 @@ const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("sc
 const index=fs.readFileSync("index.html","utf8");
 
 let passed=0;
-function test(name,handler){ handler(); passed++; console.log("\u2713 "+name); }
+function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 const CAST_ASSETS={
     waterKnife:"water-blade-slash-vfx.png",
@@ -159,9 +160,7 @@ function makeNode(rect){
         remove(){ if(this.parentNode){ this.parentNode.removeChild(this); } },
         setAttribute(name,value){ this[name]=String(value); },
         get childElementCount(){ return this.children.length; },
-        getBoundingClientRect(){
-            return rect||{left:0,top:0,right:0,bottom:0,width:0,height:0};
-        },
+        getBoundingClientRect(){ return rect||{left:0,top:0,right:0,bottom:0,width:0,height:0}; },
         querySelector(selector){ return this.querySelectorAll(selector)[0]||null; },
         querySelectorAll(selector){
             const results=[];
@@ -236,6 +235,30 @@ function loadRuntime(options={}){
         playerArea.appendChild(card);
     });
 
+    const fixedSlots={};
+    ["B","F"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=5;column++){
+            const slot="ENEMY_"+row+column;
+            const left=260+(column-1)*91;
+            const top=rowIndex===0?40:210;
+            const node=makeNode({left,top,right:left+76,bottom:top+100,width:76,height:100});
+            node.dataset.slot=slot;
+            node.className="v-fixed-enemy-slot";
+            fixedSlots['.v-fixed-enemy-slot[data-slot="'+slot+'"]']=node;
+        }
+    });
+    ["F","B"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=3;column++){
+            const slot="ALLY_"+row+column;
+            const left=20+(column-1)*140;
+            const top=rowIndex===0?340:485;
+            const node=makeNode({left,top,right:left+118,bottom:top+116,width:118,height:116});
+            node.dataset.slot=slot;
+            node.className="v-fixed-ally-slot";
+            fixedSlots['.v-fixed-ally-slot[data-slot="'+slot+'"]']=node;
+        }
+    });
+
     const monsters=options.monsters||monsterRects.map(()=>({
         alive:true,hp:100,statusEffects:[],activeBuffs:[]
     }));
@@ -272,11 +295,12 @@ function loadRuntime(options={}){
             body,
             createElement(){ return makeNode(); },
             getElementById(id){ return cards[id]||null; },
+            querySelector(selector){ return fixedSlots[selector]||body.querySelector(selector); },
             querySelectorAll(selector){ return body.querySelectorAll(selector); }
         },
         monsters,
         currentBattleMonsters:[0,1,2],
-        queuedPlayerActions:{0:{target:targetIndexes[0]||0,targetAlly:1}},
+        queuedPlayerActions:{0:{target:targetIndexes[0]??0,targetAlly:1}},
         getSkillTargets(){ return targetIndexes.slice(); },
         getPartyCharacterByIndex(index){ return party[index]||null; }
     };
@@ -298,9 +322,13 @@ function loadRuntime(options={}){
         dispose(){}
     };
     vm.createContext(context);
-    vm.runInContext(animation,context);
+    vm.runInContext(slotOwnerSource,context,{filename:"js/battlefield-slot-owner.js"});
+    const owner=context.FourSymbolsBattlefieldSlots;
+    owner.setActiveEnemySnapshot(owner.createEnemyFormationSnapshot([0,1,2],{originalFormationType:3}));
+    owner.hydrateAllyFormation(null,[0,1,2]);
+    vm.runInContext(animation,context,{filename:"js/39-v143-skill-animation.js"});
     return {
-        context,body,cards,monsterArea,playerArea,monsters,party,scheduled,monsterHits,playerHits,
+        context,body,cards,monsterArea,playerArea,monsters,party,scheduled,monsterHits,playerHits,owner,
         playCalls:()=>playCalls,
         legacyIceSpinCalls:()=>legacyIceSpinCalls
     };
@@ -322,15 +350,37 @@ function stageSprites(runtime){
     };
 }
 
+function slotCenter(runtime,side,index){
+    const slot=runtime.owner.getSlotForCombatant(side,index);
+    const center=runtime.owner.getSlotCenter(slot);
+    assert.ok(slot&&center,side+":"+index+" formal Slot center");
+    return {slot,center};
+}
+
+function triBounds(runtime,side){
+    const centerSlot=runtime.owner.getSlotForCombatant(side,1);
+    const bounds=runtime.owner.getGeometryRectFromShape(side,centerSlot,"tri");
+    assert.ok(centerSlot&&bounds,side+" formal tri bounds");
+    return bounds;
+}
+
+function sideBounds(runtime,side){
+    const bounds=runtime.owner.getSideRect(side);
+    assert.ok(bounds,side+" formal side bounds");
+    return bounds;
+}
+
+function expectedSquareFromCoverage(bounds,scale,minSize){
+    const width=Math.max(minSize,Math.round(bounds.width*scale));
+    const height=Math.max(minSize,Math.round(bounds.height*scale));
+    return Math.min(width,height)+"px";
+}
+
 test("all ten cast sheets and both status sheets fully decode as transparent RGBA grids",()=>{
     Object.values(CAST_ASSETS).forEach(filename=>{
         const path="assets/vfx/water/"+filename;
         const image=decodeRgbaPng(path,4,3);
-        assert.deepEqual(
-            [image.width,image.height],
-            [1536,1152],
-            filename
-        );
+        assert.deepEqual([image.width,image.height],[1536,1152],filename);
         if(!["water-orb-vfx.png","frost-arrow-rain-vfx.png"].includes(filename)){
             assert.equal(image.sha256,FINAL_HASHES[filename],filename+" normalized asset hash");
         }
@@ -357,10 +407,7 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
         const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.19":"?v=166";
         assert.ok(model.sprite.src.endsWith(cacheVersion),id+" cache version");
         assert.equal(model.sprite.renderer,"dom-sprite",id+" DOM Sprite renderer");
-        assert.deepEqual(
-            [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
-            [4,3,12,7],id
-        );
+        assert.deepEqual([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],[4,3,12,7],id);
         assert.equal(model.hit,.5833333333,id+" hit timing");
     });
     Object.entries(DURATIONS).forEach(([id,duration])=>{
@@ -368,50 +415,41 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
     });
 });
 
-test("single-target sheets stay centered on the actual selected card",()=>{
-    [
-        ["waterKnife",800],
-        ["frostPunch",900],
-        ["frostCrush",1150]
-    ].forEach(([id,duration])=>{
+test("single-target sheets stay centered on the formal selected Slot, never the legacy card bounds",()=>{
+    [["waterKnife",800],["frostPunch",900],["frostCrush",1150]].forEach(([id,duration])=>{
         const runtime=loadRuntime();
-        runtime.context.v142SkillAnimationDirector.play(
-            castConfig(id,"single"),
-            {side:"player",actorIndex:0,targetId:2}
-        );
+        runtime.context.v142SkillAnimationDirector.play(castConfig(id,"single"),{side:"player",actorIndex:0,targetId:2});
         const {stage,sprites}=stageSprites(runtime);
         assert.equal(sprites.length,1,id);
-        assert.equal(sprites[0].dataset.targetIndex,"2",id);
-        assert.equal(sprites[0].style.left,"578px",id);
-        assert.equal(sprites[0].style.top,"140px",id);
-        assert.equal(sprites[0].style.width,sprites[0].style.height,id+" cells stay square");
+        const sprite=sprites[0];
+        assert.equal(sprite.dataset.targetIndex,"2",id);
+        const {slot,center}=slotCenter(runtime,"monster",2);
+        assert.equal(sprite.dataset.geometrySlot,slot,id);
+        assert.equal(sprite.style.left,center.x+"px",id);
+        assert.equal(sprite.style.top,center.y+"px",id);
+        const cardRect=runtime.cards.battleMonster2.getBoundingClientRect();
+        assert.notEqual(center.x,cardRect.left+cardRect.width/2,id+" fixture keeps card X away from formal Slot X");
+        assert.notEqual(center.y,cardRect.top+cardRect.height/2,id+" fixture keeps card Y away from formal Slot Y");
+        assert.equal(sprite.style.width,sprite.style.height,id+" cells stay square");
         assert.equal(stage.children.some(node=>String(node.className).includes("v143-skill-flight")),false,id);
-        assert.equal(sprites[0].style["--v143-sprite-duration"],duration+"ms",id);
+        assert.equal(sprite.style["--v143-sprite-duration"],duration+"ms",id);
     });
 });
 
-test("Ice Spin creates one synchronized sheet for every real target and never for an empty slot",()=>{
+test("Ice Spin creates one synchronized sheet for every real target on its formal Slot and never for an empty target",()=>{
     [[1],[0,2],[0,1,2]].forEach(indexes=>{
-        const monsters=[0,1,2].map(index=>({
-            alive:indexes.includes(index),hp:indexes.includes(index)?100:0,
-            statusEffects:[],activeBuffs:[]
-        }));
+        const monsters=[0,1,2].map(index=>({alive:indexes.includes(index),hp:indexes.includes(index)?100:0,statusEffects:[],activeBuffs:[]}));
         const runtime=loadRuntime({monsters,targetIndexes:indexes});
-        runtime.context.v142SkillAnimationDirector.play(
-            castConfig("iceSpin","tri"),
-            {side:"player",actorIndex:0,targetIds:indexes}
-        );
+        runtime.context.v142SkillAnimationDirector.play(castConfig("iceSpin","tri"),{side:"player",actorIndex:0,targetIds:indexes});
         const {sprites}=stageSprites(runtime);
         assert.equal(sprites.length,indexes.length,indexes.join(","));
-        assert.deepEqual(
-            sprites.map(node=>Number(node.dataset.targetIndex)),
-            indexes,indexes.join(",")
-        );
-        assert.deepEqual(
-            sprites.map(node=>node.style.left),
-            indexes.map(index=>["338px","458px","578px"][index]),
-            indexes.join(",")
-        );
+        assert.deepEqual(sprites.map(node=>Number(node.dataset.targetIndex)),indexes,indexes.join(","));
+        indexes.forEach((index,position)=>{
+            const {slot,center}=slotCenter(runtime,"monster",index);
+            assert.equal(sprites[position].dataset.geometrySlot,slot,indexes.join(","));
+            assert.equal(sprites[position].style.left,center.x+"px",indexes.join(","));
+            assert.equal(sprites[position].style.top,center.y+"px",indexes.join(","));
+        });
         indexes.forEach(index=>runtime.context.showMonsterHit(index,10,"hp"));
         const delayedNumbers=runtime.scheduled.slice(-indexes.length);
         assert.equal(delayedNumbers.length,indexes.length);
@@ -421,31 +459,29 @@ test("Ice Spin creates one synchronized sheet for every real target and never fo
     });
 });
 
-test("Water Ball renders one sheet centered on the actual living target group",()=>{
+test("Water Ball keeps one formal tri Slot footprint even when living targets change",()=>{
+    const placements=[];
     [[1],[0,2],[0,1,2]].forEach(indexes=>{
-        const monsters=[0,1,2].map(index=>({
-            alive:indexes.includes(index),hp:indexes.includes(index)?100:0,
-            statusEffects:[],activeBuffs:[]
-        }));
+        const monsters=[0,1,2].map(index=>({alive:indexes.includes(index),hp:indexes.includes(index)?100:0,statusEffects:[],activeBuffs:[]}));
         const runtime=loadRuntime({monsters,targetIndexes:indexes});
-        runtime.context.v142SkillAnimationDirector.play(
-            castConfig("waterBall","tri"),
-            {side:"player",actorIndex:0,targetIds:indexes}
-        );
+        runtime.context.v142SkillAnimationDirector.play(castConfig("waterBall","tri"),{side:"player",actorIndex:0,targetIds:indexes});
         const sprites=stageSprites(runtime).sprites;
         assert.equal(sprites.length,1,indexes.join(","));
-        assert.equal(sprites[0].dataset.placement,"group");
-        assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprites[0].style.left,"458px");
-        assert.equal(sprites[0].style.top,"140px");
-        assert.equal(sprites[0].style["--v143-sprite-duration"],"1400ms");
+        const sprite=sprites[0];
+        assert.equal(sprite.dataset.placement,"group");
+        assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
+        const bounds=triBounds(runtime,"monster");
+        assert.equal(sprite.dataset.geometrySlots,bounds.slots.join(","));
+        assert.equal(sprite.style.left,bounds.centerX+"px");
+        assert.equal(sprite.style.top,bounds.centerY+"px");
+        assert.equal(sprite.style["--v143-sprite-duration"],"1400ms");
+        placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
+    assert.deepEqual(placements[1],placements[0],"two separated survivors keep the same formal tri footprint");
+    assert.deepEqual(placements[2],placements[0],"three survivors keep the same formal tri footprint");
 
     const beast=loadRuntime();
-    beast.context.v142SkillAnimationDirector.play(
-        castConfig("floodBeast","single"),
-        {side:"player",actorIndex:0,targetId:1}
-    );
+    beast.context.v142SkillAnimationDirector.play(castConfig("floodBeast","single"),{side:"player",actorIndex:0,targetId:1});
     const beastSprites=stageSprites(beast).sprites;
     assert.equal(beastSprites.length,1);
     assert.equal(beastSprites[0].dataset.targetIndex,"1");
@@ -454,126 +490,128 @@ test("Water Ball renders one sheet centered on the actual living target group",(
     assert.doesNotMatch(css,/v166WaterTargetTravel/);
 });
 
-test("enemy Water Ball keeps one live-target group while endpoints resolve",()=>{
+test("enemy Water Ball keeps one formal ally tri footprint while endpoints resolve",()=>{
     const runtime=loadRuntime();
-    runtime.context.v142SkillAnimationDirector.play(
-        castConfig("waterBall","tri"),
-        {side:"monster",actorIndex:0}
-    );
+    runtime.context.v142SkillAnimationDirector.play(castConfig("waterBall","tri"),{side:"monster",actorIndex:0});
     assert.equal(stageSprites(runtime).sprites.length,0,"enemy targets are not guessed");
     runtime.context.v141PlayCardEffect("player",0,"damage");
     runtime.context.v141PlayCardEffect("player",2,"damage");
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.placement,"group");
-    assert.equal(sprites[0].dataset.targetIndexes,"0,2");
+    const sprite=sprites[0];
+    assert.equal(sprite.dataset.placement,"group");
+    assert.equal(sprite.dataset.targetIndexes,"0,2");
+    const bounds=triBounds(runtime,"player");
+    assert.equal(sprite.dataset.geometrySlots,bounds.slots.join(","));
+    assert.equal(sprite.style.left,bounds.centerX+"px");
+    assert.equal(sprite.style.top,bounds.centerY+"px");
 });
 
-test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
+test("Ice Arrow Rain keeps one fixed full-enemy Slot footprint",()=>{
     const results=[];
     [[1],[0,1,2]].forEach(indexes=>{
-        const monsters=[0,1,2].map(index=>({
-            alive:indexes.includes(index),hp:indexes.includes(index)?100:0,
-            statusEffects:[],activeBuffs:[]
-        }));
+        const monsters=[0,1,2].map(index=>({alive:indexes.includes(index),hp:indexes.includes(index)?100:0,statusEffects:[],activeBuffs:[]}));
         const runtime=loadRuntime({monsters,targetIndexes:indexes});
-        runtime.context.v142SkillAnimationDirector.play(
-            castConfig("iceArrowRain","all"),
-            {side:"player",actorIndex:0}
-        );
+        runtime.context.v142SkillAnimationDirector.play(castConfig("iceArrowRain","all"),{side:"player",actorIndex:0});
         const {sprites}=stageSprites(runtime);
         assert.equal(sprites.length,1,indexes.join(","));
         const sprite=sprites[0];
+        const bounds=sideBounds(runtime,"monster");
         assert.equal(sprite.dataset.targetSide,"monster");
         assert.equal(sprite.dataset.placement,"battlefield");
-        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+        assert.equal(sprite.dataset.areaId,"fixed-enemy-zone");
+        assert.equal(sprite.dataset.geometrySlots,bounds.slots.join(","));
         assert.equal(sprite.dataset.fixedFormation,"true");
         assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprite.style.left,"480px");
-        assert.equal(sprite.style.top,"170px");
+        assert.equal(sprite.style.left,bounds.centerX+"px");
+        assert.equal(sprite.style.top,bounds.centerY+"px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
         assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
+        const expectedSize=expectedSquareFromCoverage(bounds,1.22,140);
+        assert.equal(sprite.style.width,expectedSize);
+        assert.equal(sprite.style.height,expectedSize);
         results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
-    assert.deepEqual(results[0],["480px","170px","317px","317px"]);
-    assert.deepEqual(results[1],results[0]);
+    assert.deepEqual(results[1],results[0],"casualties never collapse the formal enemy side footprint");
 });
 
-test("enemy Ice Arrow Rain stays centered on the complete player formation",()=>{
+test("enemy Ice Arrow Rain stays centered on the complete formal ally side",()=>{
     const runtime=loadRuntime();
-    runtime.context.v142SkillAnimationDirector.play(
-        castConfig("iceArrowRain","all"),{side:"monster",actorIndex:0}
-    );
+    runtime.context.v142SkillAnimationDirector.play(castConfig("iceArrowRain","all"),{side:"monster",actorIndex:0});
     const {sprites}=stageSprites(runtime);
     assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.targetSide,"player");
-    assert.equal(sprites[0].dataset.areaId,"battlePlayerRow");
-    assert.equal(sprites[0].dataset.fixedFormation,"true");
-    assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(sprites[0].style.left,"240px");
-    assert.equal(sprites[0].style.top,"420px");
-    assert.equal(sprites[0].style.width,"195px");
-    assert.equal(sprites[0].style.height,"195px");
-    assert.equal(sprites[0].style.clipPath||sprites[0].style["clip-path"],"none");
-    assert.equal(sprites[0].querySelectorAll(".v166-water-battlefield-tile").length,0);
+    const sprite=sprites[0];
+    const bounds=sideBounds(runtime,"player");
+    assert.equal(sprite.dataset.targetSide,"player");
+    assert.equal(sprite.dataset.areaId,"fixed-ally-zone");
+    assert.equal(sprite.dataset.geometrySlots,bounds.slots.join(","));
+    assert.equal(sprite.dataset.fixedFormation,"true");
+    assert.equal(sprite.dataset.targetIndexes,"0,1,2");
+    assert.equal(sprite.style.left,bounds.centerX+"px");
+    assert.equal(sprite.style.top,bounds.centerY+"px");
+    const expectedSize=expectedSquareFromCoverage(bounds,1.22,140);
+    assert.equal(sprite.style.width,expectedSize);
+    assert.equal(sprite.style.height,expectedSize);
+    assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
+    assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
 });
 
-test("enemy Tidal Beast discovers one real player endpoint even when damage is absorbed",()=>{
+test("enemy Tidal Beast travels between formal caster and target Slots even when damage is absorbed",()=>{
     const runtime=loadRuntime();
-    runtime.context.v142SkillAnimationDirector.play(
-        castConfig("floodBeast","single"),{side:"monster",actorIndex:0}
-    );
+    runtime.context.v142SkillAnimationDirector.play(castConfig("floodBeast","single"),{side:"monster",actorIndex:0});
     assert.equal(stageSprites(runtime).sprites.length,0);
-    runtime.context.applySkillDebuffEffectsToPlayer(
-        castConfig("floodBeast","single"),1,runtime.party[2],2,1,1
-    );
+    runtime.context.applySkillDebuffEffectsToPlayer(castConfig("floodBeast","single"),1,runtime.party[2],2,1,1);
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.targetIndex,"2");
-    assert.equal(sprites[0].dataset.travel,"true");
-    assert.equal(sprites[0].style.left,"338px");
-    assert.equal(sprites[0].style.top,"140px");
-    assert.equal(sprites[0].style["--v143-sprite-dx"],"41px");
-    assert.equal(sprites[0].style["--v143-sprite-dy"],"278px");
+    const sprite=sprites[0];
+    assert.equal(sprite.dataset.targetIndex,"2");
+    assert.equal(sprite.dataset.travel,"true");
+    const actor=slotCenter(runtime,"monster",0).center;
+    const target=slotCenter(runtime,"player",2);
+    assert.equal(sprite.dataset.geometrySlot,target.slot);
+    assert.equal(sprite.style.left,actor.x+"px");
+    assert.equal(sprite.style.top,actor.y+"px");
+    assert.equal(sprite.style["--v143-sprite-dx"],target.center.x-actor.x+"px");
+    assert.equal(sprite.style["--v143-sprite-dy"],target.center.y-actor.y+"px");
 });
 
 test("late callbacks cannot expand a single-target Tidal Beast cast",()=>{
     const runtime=loadRuntime();
-    runtime.context.v142SkillAnimationDirector.play(
-        castConfig("floodBeast","single"),{side:"player",actorIndex:0,targetId:1}
-    );
+    runtime.context.v142SkillAnimationDirector.play(castConfig("floodBeast","single"),{side:"player",actorIndex:0,targetId:1});
     assert.deepEqual(stageSprites(runtime).sprites.map(node=>node.dataset.targetIndex),["1"]);
     runtime.context.showMonsterHit(2,10,"hp");
     assert.deepEqual(stageSprites(runtime).sprites.map(node=>node.dataset.targetIndex),["1"]);
 });
 
-test("the retained tri-target Freeze and ally-all Heal still follow each actual card",()=>{
+test("the retained tri-target Freeze and ally-all Heal follow formal Slots instead of card bounds",()=>{
     const freeze=loadRuntime({targetIndexes:[0,2]});
-    freeze.context.v142SkillAnimationDirector.play(
-        castConfig("freeze","tri"),
-        {side:"player",actorIndex:0,targetIds:[0,2]}
-    );
+    freeze.context.v142SkillAnimationDirector.play(castConfig("freeze","tri"),{side:"player",actorIndex:0,targetIds:[0,2]});
     const freezeSprites=stageSprites(freeze).sprites;
     assert.deepEqual(freezeSprites.map(node=>node.dataset.targetIndex),["0","2"]);
-    assert.deepEqual(freezeSprites.map(node=>node.style.left),["338px","578px"]);
+    [0,2].forEach((index,position)=>{
+        const target=slotCenter(freeze,"monster",index);
+        assert.equal(freezeSprites[position].dataset.geometrySlot,target.slot);
+        assert.equal(freezeSprites[position].style.left,target.center.x+"px");
+        assert.equal(freezeSprites[position].style.top,target.center.y+"px");
+    });
 
     const heal=loadRuntime();
-    heal.context.v142SkillAnimationDirector.play(
-        castConfig("healSpell","allyAll"),
-        {side:"player",actorIndex:0}
-    );
+    heal.context.v142SkillAnimationDirector.play(castConfig("healSpell","allyAll"),{side:"player",actorIndex:0});
     const healSprites=stageSprites(heal).sprites;
     assert.deepEqual(healSprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
-    assert.deepEqual(healSprites.map(node=>node.style.left),["99px","239px","379px"]);
+    [0,1,2].forEach((index,position)=>{
+        const target=slotCenter(heal,"player",index);
+        assert.equal(healSprites[position].dataset.geometrySlot,target.slot);
+        assert.equal(healSprites[position].style.left,target.center.x+"px");
+        assert.equal(healSprites[position].style.top,target.center.y+"px");
+    });
 });
 
-test("Freeze and Frostbite loops mirror statusEffects only and never open an action gate",()=>{
+test("Freeze and Frostbite loops mirror statusEffects on their formal Slots only and never open an action gate",()=>{
     const monsters=[
         {alive:true,hp:100,statusEffects:[{type:"frostbite",turnsLeft:2}],activeBuffs:[]},
         {alive:true,hp:100,statusEffects:[{type:"freeze",turnsLeft:2}],activeBuffs:[]},
-        {alive:true,hp:100,statusEffects:[],activeBuffs:[
-            {type:"frostbite",turnsLeft:2},{type:"freeze",turnsLeft:2}
-        ]}
+        {alive:true,hp:100,statusEffects:[],activeBuffs:[{type:"frostbite",turnsLeft:2},{type:"freeze",turnsLeft:2}]}
     ];
     const party=[
         {hp:100,statusEffects:[{type:"freeze",turnsLeft:2}],activeBuffs:[]},
@@ -591,10 +629,16 @@ test("Freeze and Frostbite loops mirror statusEffects only and never open an act
     const frozen=runtime.cards.battleMonster1.querySelector(".v153-status-vfx-freeze");
     assert.ok(frostbite,"Frostbite loop");
     assert.ok(frozen,"Frozen loop");
+    assert.equal(frostbite.dataset.slot,runtime.owner.getSlotForCombatant("monster",0));
+    assert.equal(frozen.dataset.slot,runtime.owner.getSlotForCombatant("monster",1));
     assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-frostbite"),null);
     assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-freeze"),null);
-    assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-freeze"));
-    assert.ok(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-frostbite"));
+    const playerFrozen=runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-freeze");
+    const playerFrostbite=runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-frostbite");
+    assert.ok(playerFrozen);
+    assert.ok(playerFrostbite);
+    assert.equal(playerFrozen.dataset.slot,runtime.owner.getSlotForCombatant("player",0));
+    assert.equal(playerFrostbite.dataset.slot,runtime.owner.getSlotForCombatant("player",1));
     assert.ok(frostbite.style.backgroundImage.includes("frostbite-status-loop-vfx.png?v=166"));
     assert.ok(frozen.style.backgroundImage.includes("frozen-status-loop-vfx.png?v=166"));
     assert.equal(frostbite.style["--v153-status-duration"],"1000ms");
@@ -623,51 +667,36 @@ test("existing Frozen and Frostbite loops do not restart during a duplicate cast
         runtime.context.v143SyncStatusSpriteEffects();
         const existing=runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type);
         assert.ok(existing);
-        runtime.context.v142SkillAnimationDirector.play(
-            castConfig(id,id==="freeze"?"tri":"single"),
-            {side:"player",actorIndex:0,targetId:0}
-        );
-        assert.strictEqual(
-            runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type),
-            existing,
-            id+" duplicate cast must preserve the existing loop"
-        );
+        assert.equal(existing.dataset.slot,runtime.owner.getSlotForCombatant("monster",0));
+        runtime.context.v142SkillAnimationDirector.play(castConfig(id,id==="freeze"?"tri":"single"),{side:"player",actorIndex:0,targetId:0});
+        assert.strictEqual(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type),existing,id+" duplicate cast must preserve the existing loop");
         const completion=runtime.scheduled.find(timer=>timer.delay>=duration-2&&timer.delay<=duration+2);
         assert.ok(completion,id+" full cast timer");
         completion.callback();
-        assert.strictEqual(
-            runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type),
-            existing,
-            id+" duplicate cast must not restart the loop after completion"
-        );
+        assert.strictEqual(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type),existing,id+" duplicate cast must not restart the loop after completion");
     });
 });
 
-test("enemy Freeze discovers its successful player target from the applied status",()=>{
+test("enemy Freeze discovers its successful player target on the formal Slot",()=>{
     const runtime=loadRuntime();
-    runtime.context.v142SkillAnimationDirector.play(
-        castConfig("freeze","tri"),
-        {side:"monster",actorIndex:0}
-    );
+    runtime.context.v142SkillAnimationDirector.play(castConfig("freeze","tri"),{side:"monster",actorIndex:0});
     assert.equal(stageSprites(runtime).sprites.length,0);
     runtime.context.applyFreezeEffect(runtime.party[1],4);
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.targetIndex,"1");
-    assert.equal(sprites[0].style.left,"239px");
-    assert.equal(sprites[0].style.top,"418px");
+    const sprite=sprites[0];
+    const target=slotCenter(runtime,"player",1);
+    assert.equal(sprite.dataset.targetIndex,"1");
+    assert.equal(sprite.dataset.geometrySlot,target.slot);
+    assert.equal(sprite.style.left,target.center.x+"px");
+    assert.equal(sprite.style.top,target.center.y+"px");
     assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-freeze"),null);
 });
 
 test("legacy Ice Spin projectile is suppressed while its official sheet is active",()=>{
     const runtime=loadRuntime({targetIndexes:[0,1,2]});
-    runtime.context.v142SkillAnimationDirector.play(
-        castConfig("iceSpin","tri"),
-        {side:"player",actorIndex:0,targetIds:[0,1,2]}
-    );
-    runtime.context.playIceSpinProjectile("battlePlayerCard0",[
-        "battleMonster0","battleMonster1","battleMonster2"
-    ]);
+    runtime.context.v142SkillAnimationDirector.play(castConfig("iceSpin","tri"),{side:"player",actorIndex:0,targetIds:[0,1,2]});
+    runtime.context.playIceSpinProjectile("battlePlayerCard0",["battleMonster0","battleMonster1","battleMonster2"]);
     assert.equal(runtime.legacyIceSpinCalls(),0);
 });
 
@@ -676,10 +705,7 @@ test("revive activation and its HP popup wait for the frame-eight hit",()=>{
     assert.match(support,/resolvePartyRevive[\s\S]*?v143RunAtTargetHit/);
     assert.match(support,/const reviveAtImpact=\(\)=>\{[\s\S]*?target\.hp=restoredHP[\s\S]*?showPlayerHit\(restoredHP/);
     assert.match(support,/v143RunAtTargetHit\("player",targetIndex,reviveAtImpact,true\)/);
-    assert.doesNotMatch(
-        support,
-        /target\.hp=Math\.max\([\s\S]{0,500}?setTimeout\(\(\)=>showPlayerHit/
-    );
+    assert.doesNotMatch(support,/target\.hp=Math\.max\([\s\S]{0,500}?setTimeout\(\(\)=>showPlayerHit/);
 });
 
 test("final combat targeting and Frostbite rules use the Water owner",()=>{
