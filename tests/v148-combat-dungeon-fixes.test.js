@@ -82,7 +82,18 @@ test("tri targets follow the rendered fixed row without ACE skipping",()=>{
     const monsters=Array.from({length:5},(_,index)=>({
         alive:true,hp:100,v141FormationRow:0,v141FormationPosition:index
     }));
+    const snapshot={rows:[[0,1,2,3,4]]};
+    const slotOwner={
+        getActiveEnemySnapshot(){ return snapshot; },
+        resolveEnemyTargets(_snapshot,centerIndex,targetType,isAlive){
+            assert.equal(_snapshot,snapshot);
+            assert.equal(targetType,"tri");
+            return [centerIndex-1,centerIndex,centerIndex+1]
+                .filter(index=>index>=0&&index<5&&isAlive(index));
+        }
+    };
     const context=baseContext({
+        FourSymbolsBattlefieldSlots:slotOwner,
         currentBattleMonsters:[0,1,2,3,4],monsters,
         getSkillTargets:()=>[0,2,4]
     });
