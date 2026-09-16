@@ -1,0 +1,104 @@
+name: Diagnose allyTri V170 hang
+
+on:
+  push:
+    branches:
+      - validation/ally-tri-v170-hang-diagnosis-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out diagnosis branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/ally-tri-v170-hang-diagnosis-20260916
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Show immutable inputs
+        run: |
+          node --version
+          git rev-parse HEAD
+          git status --short
+          git diff --exit-code b01f996b53c9321c29dbc389d820af33714f4581 -- js/battlefield-slot-owner.js tests/fixed-slot-tri-target-window.test.js tests/ally-tri-rage-fixed-slot-regression.test.js
+
+      - name: Build validation-only diagnostic copies
+        run: |
+          python scripts/diagnose-v170-hang.py
+          grep -A2 'const EXPECTED_RUNTIME_PATHS=' .diagnostic/v170-owner-startpass.test.js
+          grep -A2 'const EXPECTED_RUNTIME_PATHS=' .diagnostic/v170-owner-marked.test.js
+          grep -A2 'const EXPECTED_RUNTIME_PATHS=' .diagnostic/v170-no-owner-marked.test.js
+
+      - name: Locate first hanging V170 test with 120 second watchdog
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=5s 120s node .diagnostic/v170-owner-startpass.test.js 2>&1 | tee /tmp/v170-startpass.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "STARTPASS_EXIT=$status"
+          echo "LAST_PASS=$(grep '^PASS ' /tmp/v170-startpass.log | tail -n 1 || true)"
+          echo "LAST_START=$(grep '^START ' /tmp/v170-startpass.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "Unexpected diagnostic process status: $status"
+            exit "$status"
+          fi
+
+      - name: Diagnose target case with Slot owner
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=5s 120s node .diagnostic/v170-owner-marked.test.js 2>&1 | tee /tmp/v170-owner-marked.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "OWNER_EXIT=$status"
+          echo "OWNER_LAST_MARK=$(grep '^MARK ' /tmp/v170-owner-marked.log | tail -n 1 || true)"
+          echo "OWNER_LAST_START=$(grep '^START ' /tmp/v170-owner-marked.log | tail -n 1 || true)"
+          echo "OWNER_LAST_PASS=$(grep '^PASS ' /tmp/v170-owner-marked.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "Unexpected owner diagnostic status: $status"
+            exit "$status"
+          fi
+
+      - name: Diagnose target case without Slot owner
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=5s 120s node .diagnostic/v170-no-owner-marked.test.js 2>&1 | tee /tmp/v170-no-owner-marked.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "NO_OWNER_EXIT=$status"
+          echo "NO_OWNER_LAST_MARK=$(grep '^MARK ' /tmp/v170-no-owner-marked.log | tail -n 1 || true)"
+          echo "NO_OWNER_LAST_START=$(grep '^START ' /tmp/v170-no-owner-marked.log | tail -n 1 || true)"
+          echo "NO_OWNER_LAST_PASS=$(grep '^PASS ' /tmp/v170-no-owner-marked.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "Unexpected no-owner diagnostic status: $status"
+            exit "$status"
+          fi
+
+      - name: Read-only wrapper chain evidence
+        shell: bash
+        run: |
+          for file in \
+            js/36-v141-content-systems.js \
+            js/37-v142-skill-animation.js \
+            js/38-v143-system-fixes.js \
+            js/40-v144-rules-and-abyss.js \
+            js/42-v148-combat-dungeon-fixes.js \
+            js/44-v152-dev-fixes.js \
+            js/46-v155-dev-fixes.js \
+            js/50-v169-water-skill-rules.js
+          do
+            echo "===== $file ====="
+            grep -n -C 8 'v141TryMonsterSpecialAction' "$file" || true
+            grep -n -C 5 'FourSymbolsBattlefieldSlots' "$file" || true
+          done
