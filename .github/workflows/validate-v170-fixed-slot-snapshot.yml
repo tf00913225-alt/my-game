@@ -1,0 +1,99 @@
+name: Validate V170 Fixed Slot Snapshot Fixture
+
+on:
+  push:
+    branches:
+      - validation/v170-fixed-slot-snapshot-fixture-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/v170-fixed-slot-snapshot-fixture-20260916
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Record environment and frozen refs
+        shell: bash
+        run: |
+          node --version
+          git rev-parse HEAD
+          git rev-parse HEAD^
+          git diff --name-status c72495a6ee320cee78ffff5681f213c9f6bf866e...HEAD
+
+      - name: Run V170 final integration suite
+        shell: bash
+        run: |
+          set -o pipefail
+          set +e
+          timeout 120s node tests/v170-final-spec-integration.test.js 2>&1 | tee /tmp/v170.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "V170_EXIT=$status"
+          if [ "$status" -ne 0 ]; then
+            echo "V170_LAST_OUTPUT_BEGIN"
+            tail -n 80 /tmp/v170.log || true
+            echo "V170_LAST_OUTPUT_END"
+            exit "$status"
+          fi
+          grep -F '✓ same-name states miss without refresh while differently named hard controls coexist' /tmp/v170.log
+          echo "V170_CASE8_COMPLETED=yes"
+
+      - name: Run fixed-slot tri target window regression
+        shell: bash
+        run: |
+          set -o pipefail
+          timeout 120s node tests/fixed-slot-tri-target-window.test.js 2>&1 | tee /tmp/fixed-slot-tri.log
+          echo "FIXED_SLOT_TRI_EXIT=${PIPESTATUS[0]}"
+
+      - name: Run fixed-slot battlefield rendering v2 regression
+        shell: bash
+        run: |
+          set -o pipefail
+          timeout 120s node tests/fixed-slot-battlefield-rendering-v2.test.js 2>&1 | tee /tmp/fixed-slot-rendering.log
+          echo "FIXED_SLOT_RENDERING_EXIT=${PIPESTATUS[0]}"
+
+      - name: Run ally tri Rage fixed-slot regression
+        shell: bash
+        run: |
+          set -o pipefail
+          timeout 120s node tests/ally-tri-rage-fixed-slot-regression.test.js 2>&1 | tee /tmp/ally-tri-rage.log
+          echo "ALLY_TRI_RAGE_EXIT=${PIPESTATUS[0]}"
+
+      - name: Read-only runtime-order contract audit
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs');
+          const test=fs.readFileSync('tests/v170-final-spec-integration.test.js','utf8');
+          const build=fs.readFileSync('scripts/build-production.mjs','utf8');
+          const expectedBlock=(test.match(/const EXPECTED_RUNTIME_PATHS=\[[\s\S]*?\n\];/)||[''])[0];
+          const loadBlock=(test.match(/function loadFinalRuntime\(\)\{[\s\S]*?\n\}/)||[''])[0];
+          const owner='js/battlefield-slot-owner.js';
+          const v131='js/25-v131-fix-batch.js';
+          console.log('TEST_HEADER_CURRENT_FINAL='+/CURRENT FINAL INTEGRATION SPEC/.test(test));
+          console.log('PINNED_TEST_PRESENT='+/the baseline and the real index\/js20 runtime order are pinned/.test(test));
+          console.log('FORMAL_RUNTIME_ORDER_TEST_PRESENT='+/all formal runtimes execute once in production order/.test(test));
+          console.log('OWNER_IN_EXPECTED_RUNTIME='+expectedBlock.includes(owner));
+          console.log('OWNER_IN_LOAD_FINAL_RUNTIME='+loadBlock.includes(owner));
+          console.log('BUILD_OWNER_INDEX='+build.indexOf('"'+owner+'"'));
+          console.log('BUILD_V131_INDEX='+build.indexOf('"'+v131+'"'));
+          console.log('BUILD_OWNER_BEFORE_V131='+(build.indexOf('"'+owner+'"')>=0&&build.indexOf('"'+owner+'"')<build.indexOf('"'+v131+'"')));
+          console.log('EXPECTED_RUNTIME_PATHS_BLOCK_BEGIN');
+          console.log(expectedBlock);
+          console.log('EXPECTED_RUNTIME_PATHS_BLOCK_END');
+          console.log('LOAD_FINAL_RUNTIME_BLOCK_BEGIN');
+          console.log(loadBlock);
+          console.log('LOAD_FINAL_RUNTIME_BLOCK_END');
+          NODE
