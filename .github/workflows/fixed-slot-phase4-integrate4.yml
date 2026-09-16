@@ -65,11 +65,13 @@ jobs:
         run: node tests/gameplay-hub-ui-and-icon.test.js
       - name: Typography battle preservation tests
         run: node tests/ui-typography-battle-preservation.test.js
+      - name: Regenerate deterministic production outputs
+        run: node scripts/build-production.mjs
       - name: Production build check
         run: node scripts/build-production.mjs --check
       - name: Whitespace check
         run: git diff --check
-      - name: Commit production owner files and strict regression contracts
+      - name: Commit production owner files, generated outputs and strict regression contracts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -79,7 +81,9 @@ jobs:
                   tests/fixed-battlefield-slots.test.js \
                   tests/boss-mechanism-vfx-card-ui-20260909.test.js \
                   tests/ui-typography-battle-preservation.test.js \
-                  release/requirement-batches/2026-09-16-fixed-slot-battlefield-v1.json
+                  release/requirement-batches/2026-09-16-fixed-slot-battlefield-v1.json \
+                  asset-manifest.json
+          git add -A build
           git diff --cached --check
           git commit -m "feat: bind boss and mechanism slots to battlefield owner"
           git push origin HEAD:feature/fixed-slot-battlefield-v1-20260916
