@@ -3,6 +3,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 const zlib=require("node:zlib");
 
+const slotOwner=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const rules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
@@ -74,64 +75,112 @@ function alphaStats(info){
     return {transparent,partial,opaque,total:info.width*info.height};
 }
 
-function makeNode(rect){
+function rect(left,top,width,height){
+    return {left,top,width,height,right:left+width,bottom:top+height};
+}
+
+function center(box){
+    return {x:box.left+box.width/2,y:box.top+box.height/2};
+}
+
+function matches(node,selector){
+    const slotMatch=String(selector||"").match(/^\.([\w-]+)\[data-slot="([^"]+)"\]$/);
+    if(slotMatch){
+        return String(node.className||"").split(/\s+/).includes(slotMatch[1])&&node.dataset.slot===slotMatch[2];
+    }
+    if(String(selector||"").startsWith("#")){ return node.id===selector.slice(1); }
+    if(String(selector||"").startsWith(".")){
+        const classes=selector.slice(1).split(".");
+        const nodeClasses=String(node.className||"").split(/\s+/);
+        return classes.every(name=>nodeClasses.includes(name));
+    }
+    return false;
+}
+
+function queryAll(root,selector){
+    const selectors=String(selector||"").split(",").map(value=>value.trim()).filter(Boolean);
+    const results=[];
+    const visit=current=>{
+        (current.children||[]).forEach(child=>{
+            if(selectors.some(part=>matches(child,part))){ results.push(child); }
+            visit(child);
+        });
+    };
+    visit(root);
+    return results;
+}
+
+function makeNode(box=null){
     const classes=new Set();
     const node={
-        id:"",className:"",dataset:{},children:[],parentNode:null,offsetParent:{},
+        id:"",className:"",dataset:{},children:[],parentNode:null,parentElement:null,offsetParent:{},
         style:{
-            setProperty(name,value){ this[name]=value; },
+            setProperty(name,value){ this[name]=String(value); },
             getPropertyValue(name){ return this[name]||""; }
         },
         classList:{
             add(...names){ names.forEach(name=>classes.add(name)); },
             remove(...names){ names.forEach(name=>classes.delete(name)); },
-            contains(name){ return classes.has(name); }
+            contains(name){ return classes.has(name)||String(node.className||"").split(/\s+/).includes(name); }
         },
-        appendChild(child){ child.parentNode=this; this.children.push(child); return child; },
-        removeChild(child){ this.children=this.children.filter(item=>item!==child); child.parentNode=null; },
+        appendChild(child){ child.parentNode=this; child.parentElement=this; this.children.push(child); return child; },
+        removeChild(child){ this.children=this.children.filter(item=>item!==child); child.parentNode=null; child.parentElement=null; },
         remove(){ if(this.parentNode){ this.parentNode.removeChild(this); } },
         setAttribute(name,value){ this[name]=String(value); },
         get childElementCount(){ return this.children.length; },
-        getBoundingClientRect(){ return rect||{left:0,top:0,right:0,bottom:0,width:0,height:0}; },
-        querySelector(selector){
-            if(!selector.startsWith(".")){ return null; }
-            const name=selector.slice(1);
-            return this.children.find(child=>String(child.className||"").split(/\s+/).includes(name))||null;
-        },
-        querySelectorAll(selector){
-            const results=[];
-            const visit=current=>{
-                current.children.forEach(child=>{
-                    const classMatch=selector.startsWith(".")&&String(child.className||"").split(/\s+/).includes(selector.slice(1));
-                    const idMatch=selector.startsWith("#")&&child.id===selector.slice(1);
-                    if(classMatch||idMatch){ results.push(child); }
-                    visit(child);
-                });
-            };
-            visit(this);
-            return results;
-        }
+        getBoundingClientRect(){ return box||rect(0,0,0,0); },
+        querySelector(selector){ return queryAll(this,selector)[0]||null; },
+        querySelectorAll(selector){ return queryAll(this,selector); }
     };
     return node;
 }
 
 function loadRuntime(options={}){
     const body=makeNode();
+    const battlePage=makeNode(rect(0,0,900,700));
+    battlePage.id="battlePage";
+    body.appendChild(battlePage);
+
+    const slotNodes={};
+    const enemyXs=[100,220,340,460,580];
+    const allyXs=[180,340,500];
+    ["B","F"].forEach((row,rowIndex)=>{
+        enemyXs.forEach((left,index)=>{
+            const id=`ENEMY_${row}${index+1}`;
+            const node=makeNode(rect(left,rowIndex===0?60:180,80,100));
+            node.className="v-fixed-enemy-slot";
+            node.dataset.slot=id;
+            slotNodes[id]=node;
+            battlePage.appendChild(node);
+        });
+    });
+    ["F","B"].forEach((row,rowIndex)=>{
+        allyXs.forEach((left,index)=>{
+            const id=`ALLY_${row}${index+1}`;
+            const node=makeNode(rect(left,rowIndex===0?420:540,100,100));
+            node.className="v-fixed-ally-slot";
+            node.dataset.slot=id;
+            slotNodes[id]=node;
+            battlePage.appendChild(node);
+        });
+    });
+
     const cards={
-        battleMonsterArea:makeNode({left:250,top:40,right:850,bottom:310,width:600,height:270}),
-        battlePlayerRow:makeNode({left:20,top:330,right:620,bottom:470,width:600,height:140}),
-        battlePlayerCard0:makeNode({left:20,top:340,right:138,bottom:456,width:118,height:116}),
-        battlePlayerCard1:makeNode({left:160,top:340,right:278,bottom:456,width:118,height:116}),
-        battlePlayerCard2:makeNode({left:300,top:340,right:418,bottom:456,width:118,height:116}),
-        battleMonster0:makeNode({left:300,top:90,right:376,bottom:190,width:76,height:100}),
-        battleMonster1:makeNode({left:400,top:90,right:476,bottom:190,width:76,height:100}),
-        battleMonster2:makeNode({left:500,top:90,right:576,bottom:190,width:76,height:100})
+        battleMonsterArea:makeNode(rect(250,40,600,270)),
+        battlePlayerRow:makeNode(rect(20,330,600,140)),
+        battlePlayerCard0:makeNode(rect(20,340,118,116)),
+        battlePlayerCard1:makeNode(rect(160,340,118,116)),
+        battlePlayerCard2:makeNode(rect(300,340,118,116)),
+        battleMonster0:makeNode(rect(300,90,76,100)),
+        battleMonster1:makeNode(rect(400,90,76,100)),
+        battleMonster2:makeNode(rect(500,90,76,100))
     };
     for(let index=3;index<10;index++){
         const left=300+(index%5)*100;
         const top=index<5?90:205;
-        cards["battleMonster"+index]=makeNode({left,top,right:left+76,bottom:top+100,width:76,height:100});
+        cards["battleMonster"+index]=makeNode(rect(left,top,76,100));
     }
+
     const monsters=options.monsters||[
         {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
         {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
@@ -142,13 +191,22 @@ function loadRuntime(options={}){
         {hp:100,statusEffects:[],activeBuffs:[]},
         {hp:100,statusEffects:[],activeBuffs:[]}
     ];
+    const currentBattleMonsters=options.currentBattleMonsters||monsters.map((_,index)=>index);
     let timerId=0;
     const scheduled=[];
     const monsterHits=[];
     const misses=[];
     let legacyRocketCalls=0;
+    const allById={battlePage,...cards};
+    const document={
+        body,
+        createElement(){ return makeNode(); },
+        getElementById(id){ return allById[id]||null; },
+        querySelector(selector){ return battlePage.querySelector(selector)||body.querySelector(selector); },
+        querySelectorAll(selector){ return body.querySelectorAll(selector); }
+    };
     const context={
-        window:null,console,Promise,Date,Math,Number,Object,Array,Set,Map,
+        window:null,document,console,Promise,Date,Math,Number,Object,Array,Set,Map,
         innerWidth:900,innerHeight:700,
         navigator:{deviceMemory:4,hardwareConcurrency:4},
         setTimeout(callback,delay){
@@ -167,16 +225,9 @@ function loadRuntime(options={}){
         },
         v141PlayCardEffect(){},
         playFireRocketAnimation(){ legacyRocketCalls++; },
-        document:{
-            body,
-            createElement(){ return makeNode(); },
-            getElementById(id){ return cards[id]||null; },
-            querySelectorAll(selector){ return body.querySelectorAll(selector); }
-        },
-        monsters,
-        currentBattleMonsters:[0,1,2],
+        monsters,currentBattleMonsters,
         queuedPlayerActions:{0:{target:1,targetAlly:1}},
-        getSkillTargets(){ return [0,1,2]; },
+        getSkillTargets(){ return [0,1,2].filter(index=>currentBattleMonsters.includes(index)); },
         getPartyCharacterByIndex(index){ return party[index]||null; }
     };
     context.window=context;
@@ -193,15 +244,38 @@ function loadRuntime(options={}){
         dispose(){}
     };
     vm.createContext(context);
+    vm.runInContext(slotOwner,context);
+    const owner=context.FourSymbolsBattlefieldSlots;
+    assert.ok(owner,"formal Fixed Slot owner must install");
+    const snapshot=owner.createEnemyFormationSnapshot(
+        currentBattleMonsters,
+        {originalFormationType:Math.max(1,currentBattleMonsters.length)}
+    );
+    owner.setActiveEnemySnapshot(snapshot);
+    owner.ensureAllyFormation([0,1,2]);
     vm.runInContext(animation,context);
     return {
-        context,body,cards,monsters,party,scheduled,monsterHits,misses,
+        context,owner,snapshot,slotNodes,body,cards,monsters,party,scheduled,monsterHits,misses,
         legacyRocketCalls:()=>legacyRocketCalls
     };
 }
 
 function castConfig(id,duration,targetType,category="physical"){
     return {id,name:id,element:"fire",category,targetType,duration,resolveDuration:duration};
+}
+
+function stageSprites(runtime){
+    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    assert.ok(stage,"V143 stage must exist");
+    return {stage,sprites:stage.children.filter(node=>String(node.className||"").includes("v143-vfx-sprite"))};
+}
+
+function enemySlot(runtime,index){
+    return runtime.owner.getEnemySlotForMonster(runtime.snapshot,index);
+}
+
+function allySlot(runtime,index){
+    return runtime.owner.getAllySlotForCharacter(index);
 }
 
 test("all supplied cast and loop sheets are exact RGBA Sprite Sheet grids",()=>{
@@ -266,18 +340,30 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
 
 test("tri skills follow valid targets while Phoenix Cry keeps one full-field sheet",()=>{
     const tri=loadRuntime();
+    assert.equal(enemySlot(tri,0),"ENEMY_F2");
+    assert.equal(enemySlot(tri,1),"ENEMY_F3");
+    assert.equal(enemySlot(tri,2),"ENEMY_F4");
+    const triPrimary=enemySlot(tri,1);
+    const triSlots=tri.owner.getGeometrySlotsFromShape("enemy",triPrimary,"tri");
+    const triRect=tri.owner.getGeometryRectFromShape("enemy",triPrimary,"tri");
+    assert.deepEqual(Array.from(triSlots),["ENEMY_F2","ENEMY_F3","ENEMY_F4"]);
     tri.context.v142SkillAnimationDirector.play(
         castConfig("explosiveFlurry",1450,"tri"),{side:"player",actorIndex:0}
     );
-    const triStage=tri.body.children.find(node=>node.id==="v143-skill-stage");
-    const triSprites=triStage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
-    assert.equal(triSprites.length,1);
-    assert.equal(triSprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(triSprites[0].style.left,"438px");
-    assert.equal(triSprites[0].style.top,"140px");
-    assert.equal(triSprites[0].style.width,triSprites[0].style.height,"sheet cells must stay square");
-    assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-flight")),false);
-    assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-field")),false);
+    const triResult=stageSprites(tri);
+    assert.equal(triResult.sprites.length,1);
+    assert.equal(triResult.sprites[0].dataset.targetIndexes,"0,1,2");
+    assert.equal(Number.parseFloat(triResult.sprites[0].style.left),triRect.centerX);
+    assert.equal(Number.parseFloat(triResult.sprites[0].style.top),triRect.centerY);
+    const oldCards=[0,1,2].map(index=>tri.cards["battleMonster"+index].getBoundingClientRect());
+    const oldCenter={
+        x:(Math.min(...oldCards.map(box=>box.left))+Math.max(...oldCards.map(box=>box.right)))/2,
+        y:(Math.min(...oldCards.map(box=>box.top))+Math.max(...oldCards.map(box=>box.bottom)))/2
+    };
+    assert.notDeepEqual(oldCenter,{x:triRect.centerX,y:triRect.centerY});
+    assert.equal(triResult.sprites[0].style.width,triResult.sprites[0].style.height,"sheet cells must stay square");
+    assert.equal(triResult.stage.children.some(node=>node.className.includes("v143-skill-flight")),false);
+    assert.equal(triResult.stage.children.some(node=>node.className.includes("v143-skill-field")),false);
 
     const all=loadRuntime({
         monsters:[
@@ -286,13 +372,17 @@ test("tri skills follow valid targets while Phoenix Cry keeps one full-field she
             {alive:true,hp:100,statusEffects:[],activeBuffs:[]}
         ]
     });
+    const sideRect=all.owner.getSideRect("monster");
     all.context.v142SkillAnimationDirector.play(
         castConfig("phoenixCry",3200,"all","magic"),{side:"player",actorIndex:0}
     );
-    const allStage=all.body.children.find(node=>node.id==="v143-skill-stage");
-    const phoenixes=allStage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
+    const phoenixes=stageSprites(all).sprites;
     assert.equal(phoenixes.length,1,"Phoenix Cry must never clone the phoenix per target");
     assert.equal(phoenixes[0].dataset.targetIndexes,"0,2");
+    assert.equal(Number.parseFloat(phoenixes[0].style.left),sideRect.centerX);
+    assert.equal(Number.parseFloat(phoenixes[0].style.top),sideRect.centerY);
+    assert.notDeepEqual(center(all.cards.battleMonsterArea.getBoundingClientRect()),{x:sideRect.centerX,y:sideRect.centerY});
+
     const onlyOne=loadRuntime({
         monsters:[
             {alive:false,hp:0,statusEffects:[],activeBuffs:[]},
@@ -303,54 +393,62 @@ test("tri skills follow valid targets while Phoenix Cry keeps one full-field she
     onlyOne.context.v142SkillAnimationDirector.play(
         castConfig("phoenixCry",3200,"all","magic"),{side:"player",actorIndex:0}
     );
-    const lonePhoenix=onlyOne.body.children.find(node=>node.id==="v143-skill-stage")
-        .children.find(node=>node.className.includes("v143-vfx-sprite"));
+    const lonePhoenix=stageSprites(onlyOne).sprites[0];
     assert.equal(lonePhoenix.dataset.targetIndexes,"1");
     ["width","height","left","top"].forEach(property=>{
         assert.equal(lonePhoenix.style[property],phoenixes[0].style[property],
-            "Phoenix Cry keeps its full-field placement when only one target remains");
+            "Phoenix Cry keeps its formal full-field placement when only one target remains");
     });
 });
 
 test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main projectile",()=>{
     const runtime=loadRuntime();
+    const actorSlot=allySlot(runtime,0);
+    const actorCenter=runtime.owner.getSlotCenter(actorSlot);
+    const targetRect=runtime.owner.getGeometryRectFromShape("enemy",enemySlot(runtime,1),"tri");
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("fireRocket",900,"tri","magic"),{side:"player",actorIndex:0}
     );
     runtime.context.playFireRocketAnimation("battlePlayerCard0",[
         "battleMonster0","battleMonster1","battleMonster2"
     ]);
-    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
-    const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
+    const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.placement,"trajectory");
     assert.equal(sprites[0].dataset.travelToTargets,"true");
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(sprites[0].style.left,"79px");
-    assert.equal(sprites[0].style.top,"398px");
-    assert.equal(sprites[0].style["--v143-sprite-dx"],"359px");
-    assert.equal(sprites[0].style["--v143-sprite-dy"],"-258px");
+    assert.equal(Number.parseFloat(sprites[0].style.left),actorCenter.x);
+    assert.equal(Number.parseFloat(sprites[0].style.top),actorCenter.y);
+    assert.equal(Number.parseFloat(sprites[0].style["--v143-sprite-dx"]),targetRect.centerX-actorCenter.x);
+    assert.equal(Number.parseFloat(sprites[0].style["--v143-sprite-dy"]),targetRect.centerY-actorCenter.y);
+    assert.notDeepEqual(center(runtime.cards.battlePlayerCard0.getBoundingClientRect()),{x:actorCenter.x,y:actorCenter.y});
     assert.notEqual(sprites[0].style["--v143-sprite-angle"],"0deg");
     assert.equal(sprites[0].style.width,sprites[0].style.height);
-    assert.equal(sprites[0].style.width,"280px","VFX box is restored to the original pre-enlargement size");
+    const rocket=runtime.context.v143SkillAnimationManifest.fireRocket.sprite;
+    const naturalSize=(Math.max(targetRect.width,targetRect.height)+40)*rocket.scale;
+    const expectedSize=Math.round(Math.max(rocket.minSize,Math.min(rocket.maxSize,naturalSize)));
+    assert.equal(Number.parseFloat(sprites[0].style.width),expectedSize,"Fire Rocket keeps its authored scale on formal Fixed Slot tri geometry");
     assert.equal(runtime.legacyRocketCalls(),0);
 });
 
 test("enemy Fire Rocket follows late target registration back to the player row",()=>{
     const runtime=loadRuntime();
+    const actorCenter=runtime.owner.getSlotCenter(enemySlot(runtime,0));
+    const playerPrimary=allySlot(runtime,1);
+    const targetRect=runtime.owner.getGeometryRectFromShape("ally",playerPrimary,"tri");
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("fireRocket",900,"tri","magic"),{side:"monster",actorIndex:0}
     );
-    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    const stage=stageSprites(runtime).stage;
     assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,0);
     [0,1,2].forEach(index=>runtime.context.v141PlayCardEffect("player",index,"damage"));
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(sprites[0].style.left,"338px");
-    assert.equal(sprites[0].style.top,"140px");
-    assert.equal(sprites[0].style["--v143-sprite-dx"],"-119px");
-    assert.equal(sprites[0].style["--v143-sprite-dy"],"258px");
+    assert.equal(Number.parseFloat(sprites[0].style.left),actorCenter.x);
+    assert.equal(Number.parseFloat(sprites[0].style.top),actorCenter.y);
+    assert.equal(Number.parseFloat(sprites[0].style["--v143-sprite-dx"]),targetRect.centerX-actorCenter.x);
+    assert.equal(Number.parseFloat(sprites[0].style["--v143-sprite-dy"]),targetRect.centerY-actorCenter.y);
 });
 
 test("Fire Slash plays one sheet on the selected target and reaches damage at frame eight",()=>{
@@ -358,11 +456,13 @@ test("Fire Slash plays one sheet on the selected target and reaches damage at fr
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("flameSlash",760,"single"),{side:"player",actorIndex:0}
     );
-    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
-    const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
+    const {stage,sprites}=stageSprites(runtime);
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.placement,"single");
     assert.equal(sprites[0].dataset.targetIndex,"1");
+    const targetCenter=runtime.owner.getSlotCenter(enemySlot(runtime,1));
+    assert.equal(Number.parseFloat(sprites[0].style.left),targetCenter.x);
+    assert.equal(Number.parseFloat(sprites[0].style.top),targetCenter.y);
     assert.ok(parseFloat(sprites[0].style.width)<=220,"single-target VFX keeps the original scale ceiling");
     assert.equal(stage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     const before=runtime.scheduled.length;
@@ -378,7 +478,7 @@ test("MISS still plays the formal skill Sprite and keeps MISS feedback on hit ti
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("flameSlash",760,"single"),{side:"player",actorIndex:0}
     );
-    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    const {stage}=stageSprites(runtime);
     const sprite=stage.children.find(node=>node.className.includes("v143-vfx-sprite"));
     assert.ok(sprite);
     assert.equal(sprite.style.visibility,"visible","a positioned cast Sprite is visible before outcome resolution");
@@ -398,14 +498,16 @@ test("Rage creates one cast sheet inside every affected card",()=>{
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("rage",1500,"allyAll","buff"),{side:"player",actorIndex:2}
     );
-    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
-    const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
+    const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,3);
     assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
     sprites.forEach(node=>assert.equal(node.dataset.placement,"single"));
-    sprites.forEach(node=>{
-        assert.ok(parseFloat(node.style.width)>=120);
-        assert.ok(parseFloat(node.style.width)<=148);
+    sprites.forEach((node,index)=>{
+        const formalCenter=runtime.owner.getSlotCenter(allySlot(runtime,index));
+        assert.equal(Number.parseFloat(node.style.left),formalCenter.x);
+        assert.equal(Number.parseFloat(node.style.top),formalCenter.y);
+        assert.ok(parseFloat(node.style.width)>0);
+        assert.ok(parseFloat(node.style.width)<=runtime.context.v143SkillAnimationManifest.rage.sprite.maxSize);
     });
 });
 
@@ -415,12 +517,18 @@ test("enemy Rage allyTri waits for and animates only the three resolved targets"
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("rage",1500,"allyTri","buff"),{side:"monster",actorIndex:0}
     );
-    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    const stage=stageSprites(runtime).stage;
     assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,0);
     [4,5,6].forEach(index=>runtime.context.v141PlayCardEffect("monster",index,"buff"));
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
     assert.equal(sprites.length,3);
     assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["4","5","6"]);
+    sprites.forEach((node,arrayIndex)=>{
+        const monsterIndex=[4,5,6][arrayIndex];
+        const formalCenter=runtime.owner.getSlotCenter(enemySlot(runtime,monsterIndex));
+        assert.equal(Number.parseFloat(node.style.left),formalCenter.x);
+        assert.equal(Number.parseFloat(node.style.top),formalCenter.y);
+    });
 });
 
 test("enemy Rage loop begins on the hit frame and follows its canonical ledger",()=>{
