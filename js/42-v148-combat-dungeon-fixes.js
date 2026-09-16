@@ -271,16 +271,25 @@
     }
 
     function requestedBuffTargets(characterIndex,queued,skill){
-        if(skill.targetType==="allyAll"){ return livingPartyIndexes(); }
-        if(skill.targetType==="allyTri"){
-            const living=livingPartyIndexes();
-            if(living.length<=3){ return living; }
-            const all=partyIndexes();
-            const preferred=Number.isInteger(queued.targetAlly)?queued.targetAlly:all[Math.floor(all.length/2)];
-            const position=Math.max(0,all.indexOf(preferred));
-            return all.slice(Math.max(0,position-1),Math.min(all.length,position+2))
-                .filter(index=>living.includes(index));
+        const owner=battlefieldSlots();
+        const all=partyIndexes();
+        const living=index=>{
+            const target=getPartyCharacterByIndex(index);
+            return !!(target&&numeric(target.hp)>0);
+        };
+        if(owner&&typeof owner.ensureAllyFormation==="function"&&typeof owner.resolveAllyTargets==="function"){
+            const formation=owner.ensureAllyFormation(all);
+            if(skill.targetType==="allyAll"){
+                return owner.resolveAllyTargets(formation,null,"all",living);
+            }
+            if(skill.targetType==="allyTri"){
+                const preferred=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+                return owner.resolveAllyTargets(formation,preferred,"allyTri",living);
+            }
+            const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+            return owner.resolveAllyTargets(formation,selected,"ally",living);
         }
+        if(skill.targetType==="allyAll"){ return livingPartyIndexes(); }
         const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
         const target=getPartyCharacterByIndex(selected);
         return target&&numeric(target.hp)>0?[selected]:[];
@@ -588,21 +597,18 @@
 
     function bestMonsterRageTargets(casterIndex){
         const indexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[];
-        const alive=indexes.filter(index=>{
-            const monster=monsters[index];
-            return monster&&monster.alive!==false&&numeric(monster.hp)>0;
-        });
+        const alive=indexes.filter(monsterAlive);
+        const owner=battlefieldSlots();
+        const snapshot=activeFormationSnapshot(indexes);
         let best=[];
         let bestScore=-1;
-        stableFormationRows(indexes).forEach(row=>{
-            row.forEach((center,index)=>{
-                if(!alive.includes(center)){ return; }
-                const trio=row.slice(Math.max(0,index-1),Math.min(row.length,index+2))
-                    .filter(target=>alive.includes(target));
-                const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
-                const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
-                if(score>bestScore){ best=trio; bestScore=score; }
-            });
+        alive.forEach(center=>{
+            const trio=owner&&snapshot
+                ?owner.resolveEnemyTargets(snapshot,center,"tri",monsterAlive)
+                :[center];
+            const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
+            const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
+            if(score>bestScore){ best=trio; bestScore=score; }
         });
         return best.slice(0,3);
     }

@@ -780,27 +780,24 @@
         const living=(entries||currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})))
             .filter(entry=>entry&&entry.monster&&entry.monster.alive!==false&&Number(entry.monster.hp)>0);
         const livingByIndex=new Map(living.map(entry=>[entry.index,entry]));
-        const rows=typeof window.v148GetFormationRows==="function"
-            ?window.v148GetFormationRows(currentBattleMonsters)
-            :typeof window.v138GetFormationRows==="function"
-            ?window.v138GetFormationRows(currentBattleMonsters)
-            :[currentBattleMonsters.slice()];
+        const owner=window.FourSymbolsBattlefieldSlots||null;
+        const snapshot=owner&&typeof owner.getActiveEnemySnapshot==="function"?owner.getActiveEnemySnapshot():null;
         let best=[];
         let bestScore=-1;
-        rows.forEach(row=>{
-            row.forEach((center,position)=>{
-                if(!livingByIndex.has(center)){ return; }
-                const trio=row.slice(Math.max(0,position-1),Math.min(row.length,position+2))
-                    .map(index=>livingByIndex.get(index)).filter(Boolean);
-                const score=trio.reduce((sum,entry)=>{
-                    const ally=entry.monster;
-                    const hpNeed=(monsterBaseMaxHp(ally)-monsterBaseHp(ally))/monsterBaseMaxHp(ally);
-                    const maxSP=Math.max(1,Number(ally.maxSP)||1);
-                    const spNeed=(maxSP-Math.max(0,Number(ally.sp)||0))/maxSP;
-                    return sum+Math.max(0,hpNeed)+Math.max(0,spNeed);
-                },0)+(trio.some(entry=>entry.index===casterIndex)?0.0001:0);
-                if(score>bestScore){ best=trio; bestScore=score; }
-            });
+        living.forEach(centerEntry=>{
+            const center=centerEntry.index;
+            const indexes=owner&&snapshot&&typeof owner.resolveEnemyTargets==="function"
+                ?owner.resolveEnemyTargets(snapshot,center,"tri",index=>livingByIndex.has(index))
+                :[center];
+            const trio=indexes.map(index=>livingByIndex.get(index)).filter(Boolean);
+            const score=trio.reduce((sum,entry)=>{
+                const ally=entry.monster;
+                const hpNeed=(monsterBaseMaxHp(ally)-monsterBaseHp(ally))/monsterBaseMaxHp(ally);
+                const maxSP=Math.max(1,Number(ally.maxSP)||1);
+                const spNeed=(maxSP-Math.max(0,Number(ally.sp)||0))/maxSP;
+                return sum+Math.max(0,hpNeed)+Math.max(0,spNeed);
+            },0)+(trio.some(entry=>entry.index===casterIndex)?0.0001:0);
+            if(score>bestScore){ best=trio; bestScore=score; }
         });
         return best.slice(0,3);
     }

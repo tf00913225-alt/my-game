@@ -414,6 +414,73 @@
         });
     }
 
+    function ensureAllyFormationState(){
+        if(!fixedBattlefieldSlots||typeof fixedBattlefieldSlots.ensureAllyFormation!=="function"){ return null; }
+        return fixedBattlefieldSlots.ensureAllyFormation(getExistingPartyIndexes());
+    }
+
+    function applyAllyBattleFormation(){
+        const area=document.getElementById("battlePlayerRow");
+        const formation=ensureAllyFormationState();
+        if(!area||!formation){ return; }
+        const cards=new Map();
+        getExistingPartyIndexes().forEach(index=>{
+            const card=document.getElementById("battlePlayerCard"+index);
+            if(card){ cards.set(index,card); }
+        });
+        area.innerHTML="";
+        area.classList.add("v-fixed-ally-formation");
+        [fixedBattlefieldSlots.allyFrontSlots,fixedBattlefieldSlots.allyBackSlots].forEach((slots,rowIndex)=>{
+            const row=document.createElement("div");
+            row.className="v-fixed-ally-row v-fixed-ally-row-"+(rowIndex===0?"front":"back");
+            slots.forEach(slot=>{
+                const wrapper=document.createElement("div");
+                wrapper.className="v-fixed-unit-slot v-fixed-ally-slot";
+                wrapper.dataset.slot=slot;
+                const characterIndex=fixedBattlefieldSlots.getCharacterAtAllySlot(slot);
+                const card=Number.isInteger(characterIndex)?cards.get(characterIndex):null;
+                if(card){ wrapper.appendChild(card); }
+                row.appendChild(wrapper);
+            });
+            area.appendChild(row);
+        });
+    }
+
+    let vFixedFormationSelectedCharacter=null;
+    function formationSlotLabel(slot){
+        const labels={ALLY_F1:"前左",ALLY_F2:"前中",ALLY_F3:"前右",ALLY_B1:"後左",ALLY_B2:"後中",ALLY_B3:"後右"};
+        return labels[slot]||slot;
+    }
+    function renderAllyFormationContent(){
+        const formation=ensureAllyFormationState();
+        if(!formation){ return '<div class="v-fixed-formation-empty">目前無法讀取佈陣資料。</div>'; }
+        const renderRow=(label,slots)=>'<section class="v-fixed-formation-row"><header>'+label+'</header><div class="v-fixed-formation-slots">'+slots.map(slot=>{
+            const index=fixedBattlefieldSlots.getCharacterAtAllySlot(slot);
+            const character=Number.isInteger(index)?getPartyCharacterByIndex(index):null;
+            const selected=Number.isInteger(index)&&index===vFixedFormationSelectedCharacter;
+            return '<button type="button" class="v-fixed-formation-slot'+(selected?' selected':'')+'" data-slot="'+slot+'" onclick="vFixedSelectFormationSlot(\''+slot+'\')">'+
+                '<small>'+formationSlotLabel(slot)+'</small><strong>'+(character?(character.id||('角色'+(index+1))):'空位')+'</strong></button>';
+        }).join('')+'</div></section>';
+        return '<div class="v-fixed-formation-panel"><p>先點角色，再點目標格位；若目標已有角色會直接交換。</p>'+renderRow('前排',fixedBattlefieldSlots.allyFrontSlots)+renderRow('後排',fixedBattlefieldSlots.allyBackSlots)+'</div>';
+    }
+    window.vFixedRenderAllyFormationContent=renderAllyFormationContent;
+    window.vFixedSelectFormationSlot=function(slot){
+        const formation=ensureAllyFormationState();
+        if(!formation||!fixedBattlefieldSlots.allySlots.includes(slot)){ return; }
+        const occupant=fixedBattlefieldSlots.getCharacterAtAllySlot(slot);
+        if(!Number.isInteger(vFixedFormationSelectedCharacter)){
+            if(!Number.isInteger(occupant)){ return; }
+            vFixedFormationSelectedCharacter=occupant;
+        }else{
+            fixedBattlefieldSlots.moveAllyCharacter(vFixedFormationSelectedCharacter,slot);
+            vFixedFormationSelectedCharacter=null;
+            if(typeof saveGame==="function"){ saveGame({source:"ally-formation"}); }
+            if(typeof window.v54RenderHomeRoster==="function"){ window.v54RenderHomeRoster(); }
+        }
+        const body=document.getElementById("homeFeatureModalBody");
+        if(body){ body.innerHTML=renderAllyFormationContent(); }
+    };
+
     function applyPlayerElementFrames(){
         getExistingPartyIndexes().forEach(characterIndex=>{
             const character=getPartyCharacterByIndex(characterIndex);
@@ -431,6 +498,7 @@
         renderBattle=function(){
             originalRenderBattle.apply(this,arguments);
             applyBattleFormation();
+            applyAllyBattleFormation();
             applyPlayerElementFrames();
             elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
         };

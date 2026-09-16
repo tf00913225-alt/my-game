@@ -266,6 +266,112 @@
         );
     }
 
+    function defaultAllySlots(characterIndexes){
+        const indexes=(characterIndexes||[]).filter(Number.isInteger).slice(0,6);
+        if(indexes.length===1){ return ["ALLY_F2"]; }
+        if(indexes.length===2){ return ["ALLY_F1","ALLY_F3"]; }
+        return ["ALLY_F1","ALLY_F2","ALLY_F3","ALLY_B1","ALLY_B2","ALLY_B3"].slice(0,indexes.length);
+    }
+
+    function normalizeAllyFormation(saved,characterIndexes){
+        const indexes=(characterIndexes||[]).filter(Number.isInteger).slice(0,6);
+        const allowedIndexes=new Set(indexes);
+        const characterIndexToSlot={};
+        const slotToCharacterIndex={};
+        const savedMap=saved&&typeof saved==="object"&&saved.characterIndexToSlot&&typeof saved.characterIndexToSlot==="object"
+            ?saved.characterIndexToSlot:{};
+
+        indexes.forEach(index=>{
+            const slot=savedMap[index]||savedMap[String(index)];
+            if(ALLY_SLOTS.includes(slot)&&slotToCharacterIndex[slot]===undefined){
+                characterIndexToSlot[index]=slot;
+                slotToCharacterIndex[slot]=index;
+            }
+        });
+
+        const defaults=defaultAllySlots(indexes);
+        indexes.forEach((index,position)=>{
+            if(characterIndexToSlot[index]){ return; }
+            const preferred=defaults[position];
+            const openPreferred=preferred&&slotToCharacterIndex[preferred]===undefined?preferred:null;
+            const slot=openPreferred||ALLY_SLOTS.find(candidate=>slotToCharacterIndex[candidate]===undefined);
+            if(!slot){ return; }
+            characterIndexToSlot[index]=slot;
+            slotToCharacterIndex[slot]=index;
+        });
+
+        Object.keys(characterIndexToSlot).forEach(key=>{
+            if(!allowedIndexes.has(Number(key))){ delete characterIndexToSlot[key]; }
+        });
+        return {version:1,kind:"ally-formation",characterIndexToSlot,slotToCharacterIndex};
+    }
+
+    let allyFormationState=null;
+
+    function hydrateAllyFormation(saved,characterIndexes){
+        allyFormationState=normalizeAllyFormation(saved,characterIndexes);
+        return allyFormationState;
+    }
+
+    function ensureAllyFormation(characterIndexes){
+        allyFormationState=normalizeAllyFormation(allyFormationState,characterIndexes);
+        return allyFormationState;
+    }
+
+    function getSerializableAllyFormation(){
+        if(!allyFormationState){ return null; }
+        return {
+            version:1,
+            characterIndexToSlot:Object.assign({},allyFormationState.characterIndexToSlot)
+        };
+    }
+
+    function allySlotForCharacter(index){
+        return allyFormationState&&allyFormationState.characterIndexToSlot
+            ?allyFormationState.characterIndexToSlot[index]||null:null;
+    }
+
+    function characterAtAllySlot(slot){
+        const value=allyFormationState&&allyFormationState.slotToCharacterIndex
+            ?allyFormationState.slotToCharacterIndex[slot]:undefined;
+        return Number.isInteger(value)?value:null;
+    }
+
+    function moveAllyCharacter(characterIndex,targetSlot){
+        if(!allyFormationState||!Number.isInteger(characterIndex)||!ALLY_SLOTS.includes(targetSlot)){ return false; }
+        const from=allySlotForCharacter(characterIndex);
+        if(!from){ return false; }
+        const occupant=characterAtAllySlot(targetSlot);
+        if(from===targetSlot){ return true; }
+        allyFormationState.characterIndexToSlot[characterIndex]=targetSlot;
+        allyFormationState.slotToCharacterIndex[targetSlot]=characterIndex;
+        if(Number.isInteger(occupant)){
+            allyFormationState.characterIndexToSlot[occupant]=from;
+            allyFormationState.slotToCharacterIndex[from]=occupant;
+        }else{
+            delete allyFormationState.slotToCharacterIndex[from];
+        }
+        return true;
+    }
+
+    function resolveAllyTargets(formation,primaryCharacterIndex,shape,isAlive){
+        const state=formation&&formation.kind==="ally-formation"?formation:allyFormationState;
+        if(!state){ return []; }
+        const normalized=normalizeShape(shape);
+        let slots;
+        if(normalized==="all"){
+            slots=ALLY_SLOTS.slice();
+        }else{
+            const primarySlot=state.characterIndexToSlot&&state.characterIndexToSlot[primaryCharacterIndex];
+            if(!primarySlot){ return []; }
+            slots=resolveSlotsFromShape("ally",primarySlot,normalized);
+        }
+        return slots.map(slot=>{
+            const index=state.slotToCharacterIndex&&state.slotToCharacterIndex[slot];
+            return Number.isInteger(index)&&(!isAlive||isAlive(index))?index:null;
+        }).filter(Number.isInteger);
+    }
+
     let activeEnemySnapshot=null;
     function setActiveEnemySnapshot(snapshot){
         activeEnemySnapshot=snapshot&&snapshot.kind==="enemy-formation-snapshot"?snapshot:null;
@@ -298,10 +404,23 @@
         resolveSlotsFromShape:resolveSlotsFromShape,
         resolveEnemyTargets:resolveEnemyTargets,
         getNextEnemyPrimaryTarget:nextEnemyPrimaryTarget,
+        normalizeAllyFormation:normalizeAllyFormation,
+        hydrateAllyFormation:hydrateAllyFormation,
+        ensureAllyFormation:ensureAllyFormation,
+        getSerializableAllyFormation:getSerializableAllyFormation,
+        getAllySlotForCharacter:allySlotForCharacter,
+        getCharacterAtAllySlot:characterAtAllySlot,
+        moveAllyCharacter:moveAllyCharacter,
+        resolveAllyTargets:resolveAllyTargets,
         setActiveEnemySnapshot:setActiveEnemySnapshot,
         getActiveEnemySnapshot:getActiveEnemySnapshot,
         clearActiveEnemySnapshot:clearActiveEnemySnapshot
     };
 
     window.FourSymbolsBattlefieldSlots=Object.freeze(api);
+    if(Object.prototype.hasOwnProperty.call(window,"__fourSymbolsPendingAllyFormation")){
+        const indexes=typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes():[];
+        hydrateAllyFormation(window.__fourSymbolsPendingAllyFormation,indexes);
+        delete window.__fourSymbolsPendingAllyFormation;
+    }
 })();
