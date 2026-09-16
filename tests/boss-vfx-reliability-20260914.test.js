@@ -30,6 +30,9 @@ function makeNode(id,rect){
         getBoundingClientRect(){ return rect||{left:0,top:0,right:80,bottom:100,width:80,height:100}; }
     };
 }
+function rect(left,top,width,height,slots){
+    return {left,top,right:left+width,bottom:top+height,width,height,centerX:left+width/2,centerY:top+height/2,slots:slots||[]};
+}
 function createRuntime(){
     const body=makeNode("body",{left:0,top:0,right:420,bottom:720,width:420,height:720});
     const boss=makeNode("battleMonster0",{left:250,top:100,right:330,bottom:210,width:80,height:110});
@@ -43,6 +46,56 @@ function createRuntime(){
     const monsterArea=makeNode("battleMonsterArea",{left:120,top:60,right:385,bottom:255,width:265,height:195});
     const playerArea=makeNode("battlePlayerRow",{left:35,top:455,right:385,bottom:635,width:350,height:180});
     const byId={battleMonster0:boss,battleMonster1:monster1,battlePlayerCard0:player0,battlePlayerCard1:player1,battleMonsterArea:monsterArea,battlePlayerRow:playerArea};
+    const slotRects={
+        ENEMY_F3:rect(250,100,80,110,["ENEMY_F3"]),
+        ENEMY_F2:rect(150,120,75,95,["ENEMY_F2"]),
+        ALLY_F1:rect(92,500,80,100,["ALLY_F1"]),
+        ALLY_F2:rect(180,500,80,100,["ALLY_F2"])
+    };
+    const sideRects={
+        monster:rect(120,60,265,195,["ENEMY_F2","ENEMY_F3"]),
+        player:rect(35,455,350,180,["ALLY_F1","ALLY_F2"])
+    };
+    const slotOwner={
+        getSlotForCombatant(side,index){
+            if(side==="monster")return index===0?"ENEMY_F3":(index===1?"ENEMY_F2":null);
+            if(side==="player")return index===0?"ALLY_F1":(index===1?"ALLY_F2":null);
+            return null;
+        },
+        getSlotFromElement(node){
+            if(!node)return null;
+            if(node.id==="battleMonster0")return "ENEMY_F3";
+            if(node.id==="battleMonster1")return "ENEMY_F2";
+            if(node.id==="battlePlayerCard0")return "ALLY_F1";
+            if(node.id==="battlePlayerCard1")return "ALLY_F2";
+            return null;
+        },
+        getSlotRect(slot){
+            const value=slotRects[slot];
+            return value?Object.assign({},value,{slots:value.slots.slice()}):null;
+        },
+        getSlotCenter(slot){
+            const value=this.getSlotRect(slot);
+            return value?{slot,x:value.centerX,y:value.centerY,rect:value}:null;
+        },
+        getSideRect(side){
+            const value=sideRects[side];
+            return value?Object.assign({},value,{slots:value.slots.slice()}):null;
+        },
+        getGeometryRectFromShape(side,slot,shape){
+            if(String(shape).toLowerCase()==="all"||String(shape).toLowerCase()==="allyall")return this.getSideRect(side);
+            return this.getSlotRect(slot);
+        },
+        getRectForSlots(slots){
+            const values=(slots||[]).map(slot=>slotRects[slot]).filter(Boolean);
+            if(!values.length)return null;
+            const left=Math.min(...values.map(value=>value.left));
+            const top=Math.min(...values.map(value=>value.top));
+            const right=Math.max(...values.map(value=>value.right));
+            const bottom=Math.max(...values.map(value=>value.bottom));
+            return rect(left,top,right-left,bottom-top,slots.slice());
+        }
+    };
     let gateId=0;
     const director={
         play(config){
@@ -57,6 +110,7 @@ function createRuntime(){
         console,Promise,Set,Map,Array,Object,Number,String,Boolean,RegExp,Date,Math,Proxy,
         setTimeout,clearTimeout,innerWidth:420,innerHeight:720,
         v142SkillAnimationDirector:director,
+        FourSymbolsBattlefieldSlots:slotOwner,
         monsters:[
             {name:"Boss",rank:"boss",hp:5000,alive:true,statusEffects:[],activeBuffs:[]},
             {name:"Support",hp:500,alive:true,statusEffects:[],activeBuffs:[]}
@@ -84,7 +138,7 @@ function createRuntime(){
     context.window=context;
     vm.createContext(context);
     vm.runInContext(source,context,{filename:"js/39-v143-skill-animation.js"});
-    return {context,bossArt};
+    return {context,slotRects};
 }
 function spriteNodes(current){ return Array.from(current.spriteNodes.values()); }
 function config(id,targetType="single",duration=760){
@@ -92,15 +146,16 @@ function config(id,targetType="single",duration=760){
 }
 
 {
-    const {context,bossArt}=createRuntime();
+    const {context,slotRects}=createRuntime();
     const gate=context.v142SkillAnimationDirector.play(config("flameSlash"),{side:"player",actorIndex:0});
     const current=context.v143SkillAnimationState.current;
     const [sprite]=spriteNodes(current);
     assert.ok(sprite,"Boss single-target cast must create a Sprite");
     assert.equal(sprite.style.visibility,"visible","positioned Boss Sprite must not wait for damage confirmation");
-    const rect=bossArt.getBoundingClientRect();
-    assert.equal(sprite.style.left,(rect.left+rect.width/2)+"px","Boss artwork bounds own VFX X position");
-    assert.equal(sprite.style.top,(rect.top+rect.height/2)+"px","Boss artwork bounds own VFX Y position");
+    const target=slotRects.ENEMY_F3;
+    assert.equal(sprite.dataset.geometrySlot,"ENEMY_F3","Boss VFX must use the formal enemy Slot");
+    assert.equal(sprite.style.left,target.centerX+"px","fixed Slot center owns Boss VFX X position");
+    assert.equal(sprite.style.top,target.centerY+"px","fixed Slot center owns Boss VFX Y position");
     gate.complete("test-end");
 }
 
@@ -115,6 +170,7 @@ function config(id,targetType="single",duration=760){
     assert.ok(sprite,"MISS must still register the attempted target and emit the formal Sprite");
     assert.equal(sprite.style.visibility,"visible","MISS Sprite must be visible");
     assert.equal(sprite.dataset.confirmedHit,"true","MISS target registration uses the same authoritative endpoint");
+    assert.equal(sprite.dataset.geometrySlot,"ALLY_F1","MISS VFX must resolve through the formal player Slot");
 }
 
 {
@@ -124,6 +180,7 @@ function config(id,targetType="single",duration=760){
     const [sprite]=spriteNodes(context.v143SkillAnimationState.current);
     assert.ok(sprite,"travel skill must create a Sprite against Boss");
     assert.equal(sprite.dataset.travel,"true");
+    assert.equal(sprite.dataset.geometrySlot,"ENEMY_F3");
     assert.equal(sprite.style.visibility,"visible");
 }
 
