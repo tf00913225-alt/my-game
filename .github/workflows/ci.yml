@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
@@ -105,6 +105,24 @@ jobs:
           path: artifacts/build-sync
           if-no-files-found: error
           retention-days: 14
+
+      - name: Commit deterministic production build to PR head
+        if: always() && github.event_name == 'pull_request' && steps.build_sync.outcome == 'failure' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch --no-tags origin "$HEAD_REF"
+          git checkout -B "$HEAD_REF" FETCH_HEAD
+          npm run build
+          git add -A asset-manifest.json build/asset-manifest.json build
+          if git diff --cached --quiet; then
+            echo "Production build already synchronized."
+            exit 0
+          fi
+          git commit -m "build: synchronize fixed-slot observer fix bundle"
+          git push origin "HEAD:$HEAD_REF"
 
       - name: Run Fixed Slot battlefield 9x16 mobile browser QA
         id: fixed_slot_browser
