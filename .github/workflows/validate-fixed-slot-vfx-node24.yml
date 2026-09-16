@@ -1,0 +1,79 @@
+name: Validate Fixed Slot VFX Node 24 R2
+
+on:
+  push:
+    branches:
+      - validation/fixed-slot-vfx-node24-r2-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Node 24 portrait, targeted and full test validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Confirm Node.js version
+        run: node --version
+
+      - name: 00 Monster portrait runtime source contract
+        run: node tests/monster-portrait-runtime.test.js
+
+      - name: 01 Boss VFX reliability
+        run: node tests/boss-vfx-reliability-20260914.test.js
+
+      - name: 02 Mechanism card VFX reliability
+        run: node tests/mechanism-card-vfx-reliability-20260914.test.js
+
+      - name: 03 V153 Fire VFX
+        run: node tests/v153-fire-vfx.test.js
+
+      - name: 04 V166 Water VFX
+        run: node tests/v166-water-vfx.test.js
+
+      - name: 05 V173.23 Wind VFX
+        run: node tests/v173.23-wind-vfx.test.js
+
+      - name: 06 V173.13 Canvas VFX Abyss input
+        run: node tests/v173.13-canvas-vfx-abyss-input.test.js
+
+      - name: 07 V173.39 Earth Light VFX
+        run: node tests/v173.39-earth-light-vfx.test.js
+
+      - name: 08 V171 Combat VFX fixes
+        run: node tests/v171-combat-vfx-fixes.test.js
+
+      - name: 09 V173 Water Orb direction VFX
+        run: node tests/v173-water-orb-direction-vfx.test.js
+
+      - name: 10 V173.11 Abyss VFX dungeon
+        run: node tests/v173.11-abyss-vfx-dungeon.test.js
+
+      - name: 11 V173.40 Beginner balance
+        run: node tests/v173.40-beginner-balance.test.js
+
+      - name: 12 V174 Raster-only combat VFX owner
+        run: node tests/v174-raster-only-combat-vfx-owner.test.js
+
+      - name: 13 Fixed Slot battlefield rendering regression
+        run: node tests/fixed-slot-battlefield-rendering-v2.test.js
+
+      - name: Ensure full-suite asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run all Node unit and integration suites
+        run: node .github/scripts/ci.mjs tests
