@@ -1092,12 +1092,16 @@ test("East Earth Shield and Heaven Calm use their assigned formal support values
             v141FormationRow:0,v141FormationPosition:index
         })));
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);
+        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);
+        if(!snapshot){ throw new Error("V170 Earth Shield fixture must create the formal enemy snapshot"); }
+        const eastTargets=v141GetMonsterAllyTriTargets(0).map(entry=>entry.index);
+        const eastSlots=eastTargets.map(index=>window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,index));
         updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
         showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};
         const earth=v155ResolveEastEarthShield(0,true);
         const calm=v155ResolveHeavenCalm(1,true);
         return {
-            earth:earth,calm:calm,
+            earth:earth,calm:calm,eastTargets:eastTargets,eastSlots:eastSlots,
             earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,
             calmTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="氣定神閒")).length,
             earthBuff:monsters[0].activeBuffs.find(buff=>buff.statusName==="萬象土盾"),
@@ -1106,7 +1110,9 @@ test("East Earth Shield and Heaven Calm use their assigned formal support values
     })()`);
     assert.equal(result.earth,true);
     assert.equal(result.calm,true);
-    assert.equal(result.earthTargets,2);
+    assert.deepEqual(result.eastTargets,[0,1,2]);
+    assert.deepEqual(result.eastSlots,["ENEMY_F1","ENEMY_F2","ENEMY_F3"]);
+    assert.equal(result.earthTargets,3);
     assert.equal(result.calmTargets,5);
     assert.deepEqual(result.earthBuff,{type:"earthShield",v141BuffType:"earthShield",turnsLeft:3,percent:50,statusName:"萬象土盾"});
     assert.deepEqual(result.calmBuff,{type:"resistance",turnsLeft:3,amount:65,accuracyBonusPercent:50,statusName:"氣定神閒",
