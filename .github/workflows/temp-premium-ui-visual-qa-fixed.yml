@@ -1,0 +1,50 @@
+name: TEMP Premium UI Visual QA Fixed
+
+on:
+  push:
+    branches:
+      - feature/premium-functional-ui-demo-parity-20260916
+    paths:
+      - .github/workflows/temp-premium-ui-visual-qa-fixed.yml
+
+permissions:
+  contents: read
+
+jobs:
+  visual-qa-fixed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/premium-functional-ui-demo-parity-20260916
+          fetch-depth: 1
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Verify production source is synchronized
+        run: |
+          npm run build:check
+          git diff --check
+
+      - name: Run exact-viewport visual QA
+        shell: bash
+        run: |
+          awk '/cat > \/tmp\/premium-ui-visual-qa.mjs <<'"'"'NODE'"'"'/{capture=1;next} capture && /^          NODE$/{exit} capture{sub(/^          /,"");print}' .github/workflows/temp-premium-ui-visual-qa.yml > /tmp/premium-ui-visual-qa.mjs
+          test -s /tmp/premium-ui-visual-qa.mjs
+          sed -i 's/mobile:true/mobile:false/' /tmp/premium-ui-visual-qa.mjs
+          sed -i '/await cdp("Runtime.enable");/a\\          await cdp("Emulation.setTouchEmulationEnabled",{enabled:true,maxTouchPoints:5});' /tmp/premium-ui-visual-qa.mjs
+          node --check /tmp/premium-ui-visual-qa.mjs
+          node /tmp/premium-ui-visual-qa.mjs
+
+      - name: Upload exact-viewport visual QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: premium-ui-visual-qa-exact-${{ github.sha }}
+          path: visual-qa-evidence
+          if-no-files-found: error
+          retention-days: 30
