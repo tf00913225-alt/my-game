@@ -45,6 +45,7 @@ const EXPECTED_DIRECT_SCRIPT_PATHS=[
 ];
 
 const EXPECTED_RUNTIME_PATHS=[
+    "js/battlefield-slot-owner.js",
     "js/25-v131-fix-batch.js",
     "js/27-v132-content-expansion.js",
     "js/28-v133-economy-rebalance.js",
@@ -165,6 +166,9 @@ function makeUniversalNode(){
         get(_target,property){
             if(property===Symbol.iterator){ return function* empty(){}; }
             if(property===Symbol.toPrimitive){ return ()=>0; }
+            if(property==="parentElement"){ return null; }
+            if(property==="parentNode"){ return null; }
+            if(property==="ownerDocument"){ return null; }
             if(property==="length"){ return 0; }
             if(property==="style"){ return style; }
             if(property==="dataset"){ return {}; }
@@ -504,6 +508,13 @@ test("same-name states miss without refresh while differently named hard control
             v141Abyss:true,v155FinalAbyss:true
         });
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);
+        if(
+            !snapshot ||
+            window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,0)!=="ENEMY_F3"
+        ){
+            throw new Error("V170 fixture must create the formal ENEMY_F3 snapshot before monster action");
+        }
         Math.random=function(){ return 0; };
         const action=v141TryMonsterSpecialAction(0);
         return {burn:burn,afterPetrify:afterPetrify,afterFreeze:afterFreeze,action:action,sp:monsters[0].sp};
