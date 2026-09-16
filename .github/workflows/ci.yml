@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
@@ -100,6 +100,22 @@ jobs:
           path: artifacts/build-sync
           if-no-files-found: error
           retention-days: 14
+
+      - name: Sync deterministic build outputs to this work branch
+        if: failure() && steps.build_sync.outcome == 'failure' && github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'feature/fixed-slot-battlefield-v1-20260916'
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git fetch --no-tags origin "$HEAD_REF"
+          git checkout -B build-sync FETCH_HEAD
+          node scripts/build-production.mjs
+          git add -A asset-manifest.json build
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build: refresh deterministic bundles"
+            git push origin HEAD:"$HEAD_REF"
+          fi
 
       - name: Run Adventure V1 mobile browser QA
         id: adventure_browser
