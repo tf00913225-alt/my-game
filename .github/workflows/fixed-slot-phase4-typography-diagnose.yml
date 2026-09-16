@@ -1,4 +1,4 @@
-name: Fixed Slot Phase 4 Build Diagnose
+name: Fixed Slot Phase 4 Build Output Diagnose
 
 on:
   push:
@@ -32,18 +32,25 @@ jobs:
           end=workflow.index("\n          PYCODE\n",start)
           body=workflow[start:end]
           body='\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines())
-          exec(compile(body,'phase4-final-build-diagnostic-patch','exec'))
+          exec(compile(body,'phase4-final-generated-build-patch','exec'))
           PYCODE
-      - name: Capture production build gate output
+      - name: Regenerate production output and capture changed files
         run: |
           mkdir -p diagnostics
           set +e
-          node scripts/build-production.mjs --check > diagnostics/build-output.txt 2>&1
-          status=$?
+          node scripts/build-production.mjs > diagnostics/build-regenerate-output.txt 2>&1
+          build_status=$?
+          node scripts/build-production.mjs --check >> diagnostics/build-regenerate-output.txt 2>&1
+          check_status=$?
           set -e
-          printf '\nEXIT_STATUS=%s\n' "$status" >> diagnostics/build-output.txt
+          {
+            printf '\nBUILD_STATUS=%s\nCHECK_STATUS=%s\n\nGIT_STATUS\n' "$build_status" "$check_status"
+            git status --short
+            printf '\nDIFF_CHECK\n'
+            git diff --check || true
+          } >> diagnostics/build-regenerate-output.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: phase4-build-output
-          path: diagnostics/build-output.txt
+          name: phase4-build-regenerate-output
+          path: diagnostics/build-regenerate-output.txt
           if-no-files-found: error
