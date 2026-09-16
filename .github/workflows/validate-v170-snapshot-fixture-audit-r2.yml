@@ -1,0 +1,269 @@
+name: V170 Snapshot Fixture Audit R2
+
+on:
+  push:
+    branches:
+      - validation/v170-snapshot-fixture-audit-r2-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    name: Node 24 snapshot fixture diagnosis
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      BASE_SHA: b6bdb0d6f6a1f21587ed68b0a153dea7782b665d
+      TARGET_TEST: accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules
+    steps:
+      - name: Check out diagnosis branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Confirm diagnosis base
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "NODE_VERSION=$(node --version)"
+          echo "DIAGNOSIS_HEAD=$(git rev-parse HEAD)"
+          echo "DIAGNOSIS_PARENT=$(git rev-parse HEAD^)"
+          test "$(git rev-parse HEAD^)" = "$BASE_SHA"
+          git diff --name-only "$BASE_SHA" HEAD
+          cp tests/v170-final-spec-integration.test.js /tmp/v170.original.js
+          cp js/46-v155-dev-fixes.js /tmp/v155.original.js
+
+      - name: Phase 1 - START PASS isolate first non-returning test
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/v170.original.js tests/v170-final-spec-integration.test.js
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('tests/v170-final-spec-integration.test.js')
+          source=path.read_text(encoding='utf-8')
+          old='''function test(name,handler){\n    handler();\n    passed++;\n    console.log("✓ "+name);\n}'''
+          new='''function test(name,handler){\n    console.log("START "+name);\n    handler();\n    passed++;\n    console.log("PASS "+name);\n}'''
+          if source.count(old)!=1:
+              raise SystemExit('test runner anchor not unique')
+          path.write_text(source.replace(old,new,1),encoding='utf-8')
+          PY
+          set +e
+          timeout 60s node tests/v170-final-spec-integration.test.js > /tmp/phase1.log 2>&1
+          status=$?
+          set -e
+          cat /tmp/phase1.log
+          echo "PHASE1_EXIT=$status"
+          last_start="$(grep '^START ' /tmp/phase1.log | tail -n 1 | sed 's/^START //' || true)"
+          last_pass="$(grep '^PASS ' /tmp/phase1.log | tail -n 1 | sed 's/^PASS //' || true)"
+          echo "PHASE1_LAST_START=$last_start"
+          echo "PHASE1_LAST_PASS=$last_pass"
+          if [ "$status" -ne 124 ]; then
+            echo "PHASE1_CLASSIFICATION=D: target did not reproduce as a timeout"
+            exit 21
+          fi
+          if [ "$last_start" != "$TARGET_TEST" ]; then
+            echo "PHASE1_CLASSIFICATION=D: different START lacked PASS"
+            exit 22
+          fi
+          if [ "$last_pass" = "$TARGET_TEST" ]; then
+            echo "PHASE1_CLASSIFICATION=D: target unexpectedly returned"
+            exit 23
+          fi
+          echo "PHASE1_CONFIRMED_HANG=$TARGET_TEST"
+
+      - name: Phase 2A - Current fixture without Snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/v170.original.js tests/v170-final-spec-integration.test.js
+          cp /tmp/v155.original.js js/46-v155-dev-fixes.js
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('tests/v170-final-spec-integration.test.js')
+          source=path.read_text(encoding='utf-8')
+          target='accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules'
+          old='''function test(name,handler){\n    handler();\n    passed++;\n    console.log("✓ "+name);\n}'''
+          new=f'''function test(name,handler){{\n    if(name!=={target!r}){{ return; }}\n    console.log("START "+name);\n    handler();\n    passed++;\n    console.log("PASS "+name);\n}}'''
+          if source.count(old)!=1:
+              raise SystemExit('isolated test runner anchor not unique')
+          source=source.replace(old,new,1)
+          old_call='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
+          new_call='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        battleToken=91;turn=4;\n        const activeSnapshot=window.FourSymbolsBattlefieldSlots.getActiveEnemySnapshot();\n        console.log("DODGE A snapshot = "+(activeSnapshot===null?"null":JSON.stringify(activeSnapshot)));\n        console.log("DODGE 1 before resolve");\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);\n        console.log("DODGE 2 after resolve");'''
+          if source.count(old_call)!=1:
+              raise SystemExit('Dodge A call anchor not unique')
+          path.write_text(source.replace(old_call,new_call,1),encoding='utf-8')
+          PY
+          set +e
+          timeout 25s node tests/v170-final-spec-integration.test.js > /tmp/case-a.log 2>&1
+          status=$?
+          set -e
+          cat /tmp/case-a.log
+          echo "CASE_A_EXIT=$status"
+          if [ "$status" -ne 124 ]; then
+            echo "CASE_A_CLASSIFICATION=D: isolated current fixture did not timeout"
+            exit 24
+          fi
+          grep -F 'DODGE A snapshot = null' /tmp/case-a.log
+          grep -F 'DODGE 1 before resolve' /tmp/case-a.log
+          if grep -Fq 'DODGE 2 after resolve' /tmp/case-a.log; then
+            echo "CASE_A_CLASSIFICATION=D: resolve returned despite timeout"
+            exit 25
+          fi
+          echo "CASE_A_CONFIRMED_TIMEOUT_WITH_NULL_SNAPSHOT=yes"
+
+      - name: Phase 2A markers - locate Wind Dodge non-return
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/v170.original.js tests/v170-final-spec-integration.test.js
+          cp /tmp/v155.original.js js/46-v155-dev-fixes.js
+          python - <<'PY'
+          from pathlib import Path
+          t=Path('tests/v170-final-spec-integration.test.js')
+          source=t.read_text(encoding='utf-8')
+          target='accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules'
+          old='''function test(name,handler){\n    handler();\n    passed++;\n    console.log("✓ "+name);\n}'''
+          new=f'''function test(name,handler){{\n    if(name!=={target!r}){{ return; }}\n    console.log("START "+name);\n    handler();\n    passed++;\n    console.log("PASS "+name);\n}}'''
+          source=source.replace(old,new,1)
+          old_call='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
+          new_call='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        battleToken=91;turn=4;\n        const activeSnapshot=window.FourSymbolsBattlefieldSlots.getActiveEnemySnapshot();\n        console.log("DODGE A snapshot = "+(activeSnapshot===null?"null":JSON.stringify(activeSnapshot)));\n        console.log("DODGE 1 before resolve");\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);\n        console.log("DODGE 2 after resolve");'''
+          if source.count(old_call)!=1:
+              raise SystemExit('marker test call anchor not unique')
+          t.write_text(source.replace(old_call,new_call,1),encoding='utf-8')
+
+          p=Path('js/46-v155-dev-fixes.js')
+          s=p.read_text(encoding='utf-8')
+          anchors=[
+            ('''    function resolveWindEliteDodge(monsterIndex,forceCast){\n        const monster=''', '''    function resolveWindEliteDodge(monsterIndex,forceCast){\n        console.log("WIND 1 enter");\n        const monster='''),
+            ('''        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"風行"));''', '''        console.log("WIND 2 before allyTriTargets");\n        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"風行"));\n        console.log("WIND 3 after allyTriTargets "+JSON.stringify(targets.map(entry=>entry.index)));'''),
+            ('''        targets.forEach(entry=>{\n            const ally=entry.monster;''', '''        targets.forEach(entry=>{\n            console.log("WIND TARGET "+entry.index+" begin");\n            const ally=entry.monster;'''),
+            ('''            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"buff"); }''', '''            if(typeof window.v141PlayCardEffect==="function"){\n                console.log("WIND TARGET "+entry.index+" before v141PlayCardEffect");\n                window.v141PlayCardEffect("monster",entry.index,"buff");\n                console.log("WIND TARGET "+entry.index+" after v141PlayCardEffect");\n            }''')
+          ]
+          for old_text,new_text in anchors:
+              if s.count(old_text)!=1:
+                  raise SystemExit('V155 marker anchor not unique: '+old_text[:60])
+              s=s.replace(old_text,new_text,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          set +e
+          timeout 20s node tests/v170-final-spec-integration.test.js > /tmp/case-a-markers.log 2>&1
+          status=$?
+          set -e
+          cat /tmp/case-a-markers.log
+          echo "CASE_A_MARKERS_EXIT=$status"
+          grep -F 'WIND 1 enter' /tmp/case-a-markers.log
+          grep -F 'WIND 2 before allyTriTargets' /tmp/case-a-markers.log
+          grep -F 'WIND 3 after allyTriTargets' /tmp/case-a-markers.log
+          if grep -Fq 'before v141PlayCardEffect' /tmp/case-a-markers.log && ! grep -Fq 'after v141PlayCardEffect' /tmp/case-a-markers.log; then
+            echo 'CASE_A_STUCK_IN_V141_PLAY_CARD_EFFECT=yes'
+          else
+            echo 'CASE_A_STUCK_IN_V141_PLAY_CARD_EFFECT=no'
+          fi
+
+      - name: Phase 2B - Formal Snapshot lifecycle equivalent
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/v170.original.js tests/v170-final-spec-integration.test.js
+          cp /tmp/v155.original.js js/46-v155-dev-fixes.js
+          python - <<'PY'
+          from pathlib import Path
+          t=Path('tests/v170-final-spec-integration.test.js')
+          source=t.read_text(encoding='utf-8')
+          target='accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules'
+          old='''function test(name,handler){\n    handler();\n    passed++;\n    console.log("✓ "+name);\n}'''
+          new=f'''function test(name,handler){{\n    if(name!=={target!r}){{ return; }}\n    console.log("START "+name);\n    handler();\n    passed++;\n    console.log("PASS "+name);\n}}'''
+          source=source.replace(old,new,1)
+          old_call='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
+          new_call='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        const snapshotSlot=window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,0);\n        console.log("DODGE B snapshot slot = "+snapshotSlot);\n        if(!snapshot||snapshotSlot!=="ENEMY_F3"){ throw new Error("CASE B requires formal ENEMY_F3 snapshot"); }\n        battleToken=91;turn=4;\n        console.log("DODGE 1 before resolve");\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);\n        console.log("DODGE 2 after resolve");'''
+          if source.count(old_call)!=1:
+              raise SystemExit('Dodge B call anchor not unique')
+          t.write_text(source.replace(old_call,new_call,1),encoding='utf-8')
+
+          p=Path('js/46-v155-dev-fixes.js')
+          s=p.read_text(encoding='utf-8')
+          anchors=[
+            ('''    function resolveWindEliteDodge(monsterIndex,forceCast){\n        const monster=''', '''    function resolveWindEliteDodge(monsterIndex,forceCast){\n        console.log("WIND 1 enter");\n        const monster='''),
+            ('''        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"風行"));''', '''        console.log("WIND 2 before allyTriTargets");\n        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"風行"));\n        console.log("WIND 3 after allyTriTargets "+JSON.stringify(targets.map(entry=>entry.index)));'''),
+            ('''        targets.forEach(entry=>{\n            const ally=entry.monster;''', '''        targets.forEach(entry=>{\n            console.log("WIND TARGET "+entry.index+" begin");\n            const ally=entry.monster;'''),
+            ('''            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"buff"); }''', '''            if(typeof window.v141PlayCardEffect==="function"){\n                console.log("WIND TARGET "+entry.index+" before v141PlayCardEffect");\n                window.v141PlayCardEffect("monster",entry.index,"buff");\n                console.log("WIND TARGET "+entry.index+" after v141PlayCardEffect");\n            }''')
+          ]
+          for old_text,new_text in anchors:
+              if s.count(old_text)!=1:
+                  raise SystemExit('V155 marker anchor not unique: '+old_text[:60])
+              s=s.replace(old_text,new_text,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          set +e
+          timeout 25s node tests/v170-final-spec-integration.test.js > /tmp/case-b.log 2>&1
+          status=$?
+          set -e
+          cat /tmp/case-b.log
+          echo "CASE_B_EXIT=$status"
+          if [ "$status" -ne 0 ]; then
+            echo "CASE_B_CLASSIFICATION=D: formal Snapshot did not return cleanly"
+            exit 26
+          fi
+          grep -F 'DODGE B snapshot slot = ENEMY_F3' /tmp/case-b.log
+          grep -F 'DODGE 2 after resolve' /tmp/case-b.log
+          grep -F 'WIND 3 after allyTriTargets' /tmp/case-b.log
+          grep -F 'after v141PlayCardEffect' /tmp/case-b.log
+          echo 'CASE_AB_CLASSIFICATION=B: stale V170 fixture state'
+
+      - name: Phase 3 - Read-only V170 roster mutation audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/v170.original.js tests/v170-final-spec-integration.test.js
+          cp /tmp/v155.original.js js/46-v155-dev-fixes.js
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          path=Path('tests/v170-final-spec-integration.test.js')
+          lines=path.read_text(encoding='utf-8').splitlines()
+          tests=[]
+          for i,line in enumerate(lines,1):
+              m=re.search(r'^test\("([^"]+)"',line)
+              if m: tests.append((i,m.group(1)))
+          functions=[]
+          for i,line in enumerate(lines,1):
+              m=re.search(r'^function\s+([A-Za-z0-9_$]+)\s*\(',line)
+              if m: functions.append((i,m.group(1)))
+          mutation_re=re.compile(r'(?:\bmonsters\.(?:splice|push)\b|\bcurrentBattleMonsters\.(?:splice|push)\b|\bcurrentBattleMonsters\s*=)')
+          consumer_terms=[
+              'getSkillTargets','v141GetMonsterAllyTriTargets','v141TryMonsterSpecialAction',
+              'v155ResolveWindEliteDodge','v155ResolveNorthHeal','v155ResolveNorthSupport',
+              'v155ResolveExtremeEmperorAction','v155ResolveEastEarthShield','v155ResolveHeavenCalm',
+              'v141PlayCardEffect','castDamageSkill','processSingleMonsterAttack','FourSymbolsBattlefieldSlots',
+              'v138EnsureEnemyFormationSnapshot','tickStatusEffects'
+          ]
+          print('AUDIT_TEST_NAMES_BEGIN')
+          for line,name in tests: print(f'TEST {line}: {name}')
+          print('AUDIT_TEST_NAMES_END')
+          print('AUDIT_MUTATIONS_BEGIN')
+          for i,line in enumerate(lines,1):
+              if not mutation_re.search(line): continue
+              prior_tests=[entry for entry in tests if entry[0]<=i]
+              prior_funcs=[entry for entry in functions if entry[0]<=i]
+              test_name=prior_tests[-1][1] if prior_tests else '<before-first-test>'
+              func_name=prior_funcs[-1][1] if prior_funcs else '<top-level>'
+              lo=max(1,i-35); hi=min(len(lines),i+70)
+              nearby=[]
+              for j in range(lo,hi+1):
+                  for term in consumer_terms:
+                      if term in lines[j-1]: nearby.append(f'{j}:{term}')
+              print(f'MUTATION line={i} nearest_test={test_name!r} nearest_function={func_name!r}')
+              print('  '+line.strip())
+              print('  CONSUMERS '+(', '.join(dict.fromkeys(nearby)) if nearby else '<none-nearby>'))
+          print('AUDIT_MUTATIONS_END')
+          PY
+          echo 'FINAL_GIT_DIFF_BEGIN'
+          git diff -- tests/v170-final-spec-integration.test.js js/46-v155-dev-fixes.js
+          echo 'FINAL_GIT_DIFF_END'
