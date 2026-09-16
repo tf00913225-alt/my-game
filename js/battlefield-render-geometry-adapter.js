@@ -374,6 +374,11 @@
     wrapDamagePopup();
     wrapMissPopup();
 
+    function isOwnedFixedStructure(node){
+        if(!(node instanceof Element)||node.dataset.geometryOwner!=="fixed-slot"){ return false; }
+        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot");
+    }
+
     const observer=new MutationObserver(records=>{
         let needsReconcile=false;
         records.forEach(record=>{
@@ -387,9 +392,13 @@
                     if(slot){ applyPopupAnchor(popup,slot,popupKind(popup,[])); }
                     else{ consumePending(popup); }
                 });
+                /* Reconcile only legacy/new combat content. The fixed rows and
+                   holders below are created by reconcile() itself; observing them
+                   must not recursively schedule another reconcile forever. */
+                if(isOwnedFixedStructure(node)){ return; }
                 if(
                     node.id==="battleMonsterArea"||node.id==="battlePlayerRow"||
-                    node.matches?.(".battle-monster,.battle-player,.v131-monster-row,.v-fixed-ally-row,.v-fixed-ally-slot-row")||
+                    node.matches?.(".battle-monster,.battle-player,.v131-monster-row")||
                     node.querySelector?.(".battle-monster,.battle-player")
                 ){
                     needsReconcile=true;
