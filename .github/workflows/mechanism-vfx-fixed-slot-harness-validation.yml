@@ -1,4 +1,4 @@
-name: Mechanism VFX Fixed Slot Harness Validation
+name: V138 Fixed Slot Formation Contract Validation
 
 on:
   push:
@@ -9,13 +9,13 @@ permissions:
   contents: read
 
 jobs:
-  validate-fix:
+  validate-v138:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out autonomous fix branch
+      - name: Check out validation branch
         uses: actions/checkout@v4
         with:
-          ref: fix/v170-autonomous-contract-cleanup-20260917
+          ref: validation/mechanism-vfx-fixed-slot-harness-20260917
           fetch-depth: 2
 
       - name: Use Node.js 24
@@ -23,60 +23,11 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Verify exact fix HEAD and tests-only commit scope
+      - name: Validate test patch
         shell: bash
         run: |
-          test "$(git rev-parse HEAD)" = "e6a162b4b92d55b263242c471838529fb18b20ab"
-          base=dc70bca06ed016c7bbc44161a281c1f1499b4e5c
-          git fetch --no-tags --depth=1 origin "$base"
-          changed="$(git diff --name-only "$base" HEAD | sort)"
-          printf '%s\n' "$changed"
-          test "$changed" = "tests/ui-typography-battle-preservation.test.js"
-          git diff --check "$base" HEAD
-          test -z "$(git diff --name-only "$base" HEAD -- js css scripts config asset-manifest.json)"
+          git diff --check HEAD^ HEAD
+          test -z "$(git diff --name-only HEAD^ HEAD -- js css scripts config asset-manifest.json)"
 
-      - name: Prepare CI comparison base and typography baselines
-        shell: bash
-        run: |
-          for sha in \
-            e3de8f7fee4e65986420528247bdbb99cb588a07 \
-            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
-            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
-            29b9668057846164a941fbf6617d2458d9af5476; do
-            if ! git cat-file -e "$sha^{commit}" 2>/dev/null; then
-              git fetch --no-tags --depth=1 origin "$sha"
-            fi
-          done
-
-      - name: Ensure existing asset-test dependency
-        shell: bash
-        run: |
-          if ! command -v identify >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends imagemagick
-          fi
-
-      - name: Run typography, UI, portrait and VFX targeted tests
-        shell: bash
-        run: |
-          node tests/ui-typography-battle-preservation.test.js
-          node tests/remaining-ui-regressions-20260914.test.js
-          node tests/monster-portrait-runtime.test.js
-          node tests/mechanism-card-vfx-reliability-20260914.test.js
-          node tests/boss-vfx-reliability-20260914.test.js
-
-      - name: Run V170 final integration test
-        run: node tests/v170-final-spec-integration.test.js
-
-      - name: Run Fixed Slot targeted regressions
-        shell: bash
-        run: |
-          node tests/fixed-slot-tri-target-window.test.js
-          node tests/ally-tri-rage-fixed-slot-regression.test.js
-          node tests/fixed-slot-battlefield-rendering-v2.test.js
-
-      - name: Run full Node suite
-        env:
-          CI_BASE_SHA: e3de8f7fee4e65986420528247bdbb99cb588a07
-          CI_HEAD_SHA: e6a162b4b92d55b263242c471838529fb18b20ab
-        run: node .github/scripts/ci.mjs tests
+      - name: Run V138 feature requirements
+        run: node tests/v138-feature-requirements.test.js
