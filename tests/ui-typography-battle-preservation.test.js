@@ -47,6 +47,47 @@ function retireV146LegacySkillVfx(text){
     return normalize(text.slice(0,start)+text.slice(end));
 }
 
+function restoreV131FixedSlotBaseline(text){
+    const fixedSlotGeometry=`/* Fixed Slot battlefield: every enemy row always owns five physical columns.
+   Empty slots retain their width after death/summon/revive, so neither units nor
+   VFX geometry can re-center around the currently surviving cards. */
+#game-stage #battleMonsterArea .v131-monster-row{
+    display:grid;
+    grid-template-columns:repeat(5,76px);
+    flex:0 0 auto;
+    align-items:flex-start;
+    justify-content:center;
+    gap:3px;
+    width:100%;
+    min-width:0;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot{
+    position:relative;
+    width:76px;
+    min-width:76px;
+    min-height:90px;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot > .battle-monster{
+    margin-left:auto !important;
+    margin-right:auto !important;
+}`;
+    const baselineGeometry=`#game-stage #battleMonsterArea .v131-monster-row{
+    display:flex;
+    flex:0 0 auto;
+    align-items:flex-start;
+    justify-content:center;
+    gap:3px;
+    width:100%;
+    min-width:0;
+}`;
+    assert.equal(text.split(fixedSlotGeometry).length-1,1,"approved V131 Fixed Slot geometry block changed");
+    return normalize(text.replace(fixedSlotGeometry,baselineGeometry));
+}
+
 function restoreGameplayCoverBaseline(text){
     return normalize(text
         .replace(/\/\* Gameplay activity covers use the same 16:9 production ratio as dungeon\n   covers\. Combat BOSS\/mechanism cards remain independent (?:9:16|battlefield) components\. \*\/\n/,"")
@@ -60,12 +101,18 @@ function restoreGameplayCoverBaseline(text){
 }
 
 // V131 starts with battle formation/element-card rules. Typography work begins only
-// after the character/home-feature shell, so the entire battle prefix must be byte-equivalent.
-sameSegment(
-    "css/31-v131-fix-batch.css",
-    "#game-stage #battleMonsterArea.v131-formation",
-    "#game-stage #homeFeatureModal .home-feature-modal-box.wide"
-);
+// after the character/home-feature shell, so preserve the entire battle prefix
+// byte-for-byte after restoring the approved Fixed Slot geometry to its baseline form.
+{
+    const file="css/31-v131-fix-batch.css";
+    const start="#game-stage #battleMonsterArea.v131-formation";
+    const end="#game-stage #homeFeatureModal .home-feature-modal-box.wide";
+    assert.equal(
+        restoreV131FixedSlotBaseline(segment(current(file),start,end)),
+        segment(at(BASE,file),start,end),
+        `${file} battle-owned segment changed outside approved Fixed Slot geometry`
+    );
+}
 
 // V146's opening combat/VFX section is followed by inventory polish. Preserve that
 // full combat region byte-for-byte except the explicitly retired V143 Earth Shield
