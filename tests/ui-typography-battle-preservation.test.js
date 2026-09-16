@@ -40,6 +40,7 @@ function normalizeV131FixedSlotGeometry(text){
             "#game-stage #battleMonsterArea .v131-monster-row{\n    display:flex;\n    flex:0 0 auto;\n    align-items:flex-start;\n    justify-content:center;\n    gap:3px;\n    width:100%;\n    min-width:0;\n}"
         )
         .replace(/\n#game-stage #battleMonsterArea \.v-fixed-enemy-slot\{[\s\S]*?\n\}\n\n#game-stage #battleMonsterArea \.v-fixed-enemy-slot > \.battle-monster\{[\s\S]*?\n\}\n/,"\n")
+        .replace(/\n{3,}/g,"\n\n")
     );
 }
 
