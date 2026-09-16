@@ -1,0 +1,35 @@
+name: V153 Fire VFX Fixed Slot Validation
+
+on:
+  push:
+    branches:
+      - validation/v153-fire-vfx-fixed-slot-harness-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v153:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/v153-fire-vfx-fixed-slot-harness-20260917
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify validation scope
+        shell: bash
+        run: |
+          git diff --check c4eaacc62946f9cd15ac9972115b0306567f8d6d HEAD
+          changed="$(git diff --name-only c4eaacc62946f9cd15ac9972115b0306567f8d6d HEAD | sort)"
+          printf '%s\n' "$changed"
+          test -z "$(git diff --name-only c4eaacc62946f9cd15ac9972115b0306567f8d6d HEAD -- js css)"
+
+      - name: Run formal V153 Fixed Slot diagnosis
+        run: node tests/diagnosis-v153-fixed-slot-harness.test.js
