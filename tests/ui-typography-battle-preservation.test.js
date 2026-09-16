@@ -33,7 +33,8 @@ function cssRule(text,selector){
 }
 
 function normalizeV131FixedSlotGeometry(text){
-    return normalize(text
+    const normalized=text.replace(/\r\n/g,"\n");
+    return normalize(normalized
         .replace(/\/\* Fixed Slot battlefield: every enemy row always owns five physical columns\.[\s\S]*?VFX geometry can re-center around the currently surviving cards\. \*\/\n/,"")
         .replace(
             "#game-stage #battleMonsterArea .v131-monster-row{\n    display:grid;\n    grid-template-columns:repeat(5,76px);\n    flex:0 0 auto;\n    align-items:flex-start;\n    justify-content:center;\n    gap:3px;\n    width:100%;\n    min-width:0;\n    overflow:visible;\n}",
