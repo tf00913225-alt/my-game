@@ -10,7 +10,7 @@ const manifest=animation.match(/waterBall:\{hit:DEFAULT_HIT,sprite:castSheet\("a
 assert.ok(manifest,"Water Ball remains one formal group raster Sprite");
 assert.match(waterRules,/waterBall:\{[\s\S]*?targetType:"tri"/,"Water Ball remains a formal tri-target skill");
 
-const geometryBounds=animation.match(/function geometryBounds\(current,indexes,placement\)\{[\s\S]*?\n\s*return rect;\n\s*\}/);
+const geometryBounds=animation.match(/function geometryBounds\(current,indexes,placement\)\{[\s\S]*?\n\s*function hasTimedEffect/);
 assert.ok(geometryBounds,"formal Fixed Slot geometry resolver exists");
 assert.match(geometryBounds[0],/const owner=geometryOwner\(\)/);
 assert.match(geometryBounds[0],/const seed=geometrySeedIndexes\(current,indexes\)/);
