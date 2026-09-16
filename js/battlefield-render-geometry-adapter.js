@@ -10,6 +10,7 @@
     window.__fixedSlotBattlefieldRenderGeometryV2Installed=true;
 
     const VERSION="fixed-slot-render-v2";
+    const LEGACY_PRESENTATION_STYLE_ID="v174-cardless-battle-style";
     const POPUP_ANCHORS=Object.freeze({
         damage:Object.freeze({x:.5,y:.28}),
         critical:Object.freeze({x:.5,y:.24}),
@@ -29,6 +30,26 @@
     let reconciling=false;
     let reconcileQueued=false;
     const pendingPopupAnchors=[];
+
+    /* V173.51 remains the presentation/runtime owner for artwork creation,
+       lunge and hit-shake behavior, but its historical injected stylesheet also
+       contained geometry. Keep the style id as a sentinel so that stylesheet is
+       not re-injected; presentation-only rules now live in the canonical source
+       stylesheet fixed-slot-battlefield-rendering-v2.css. */
+    function neutralizeLegacyPresentationGeometry(){
+        if(typeof document==="undefined"||!document.head){ return; }
+        let style=document.getElementById(LEGACY_PRESENTATION_STYLE_ID);
+        if(!style){
+            style=document.createElement("style");
+            style.id=LEGACY_PRESENTATION_STYLE_ID;
+            document.head.appendChild(style);
+        }
+        if(style.dataset.geometryOwner!=="fixed-slot"||style.textContent){
+            style.textContent="";
+            style.dataset.geometryOwner="fixed-slot";
+            style.dataset.presentationSource="fixed-slot-battlefield-rendering-v2.css";
+        }
+    }
 
     function integerIndexes(value){
         return Array.isArray(value)?value.filter(Number.isInteger).slice(0,10):[];
@@ -66,6 +87,7 @@
         const node=document.createElement("div");
         node.className=className;
         node.dataset.slot=slot;
+        node.dataset.geometryOwner="fixed-slot";
         return node;
     }
 
@@ -85,14 +107,16 @@
         const fragment=document.createDocumentFragment();
         [slots.enemyBackSlots,slots.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
             const row=document.createElement("div");
-            row.className="v131-monster-row v131-monster-row-"+(rowIndex+1)+" v-fixed-enemy-row";
+            row.className="v-fixed-slot-row v-fixed-enemy-row";
             row.dataset.slotRow=rowIndex===0?"back":"front";
+            row.dataset.geometryOwner="fixed-slot";
             rowSlots.forEach(slot=>{
                 const holder=makeSlot("v-fixed-battle-slot v-fixed-enemy-slot",slot);
                 const index=slots.getAssignedMonsterAtEnemySlot(snapshot,slot);
                 const card=Number.isInteger(index)?cards.get(index):null;
                 if(card){
                     card.dataset.slot=slot;
+                    card.dataset.geometryOwner="fixed-slot";
                     holder.appendChild(card);
                 }
                 row.appendChild(holder);
@@ -100,8 +124,8 @@
             fragment.appendChild(row);
         });
         area.replaceChildren(fragment);
-        area.classList.add("v131-formation","v-fixed-enemy-zone","v-fixed-zone-v2");
-        area.classList.remove("v141-fixed-formation");
+        area.classList.add("v-fixed-enemy-zone","v-fixed-zone-v2");
+        area.classList.remove("battle-monsters","v131-formation","v141-fixed-formation");
         area.dataset.geometryOwner="fixed-slot";
         area.dataset.monsterCount=String(indexes.length);
         area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
@@ -131,14 +155,16 @@
         const fragment=document.createDocumentFragment();
         [slots.allyFrontSlots,slots.allyBackSlots].forEach((rowSlots,rowIndex)=>{
             const row=document.createElement("div");
-            row.className="v-fixed-ally-row v-fixed-ally-row-"+(rowIndex===0?"front":"back");
+            row.className="v-fixed-slot-row v-fixed-ally-slot-row v-fixed-ally-slot-row-"+(rowIndex===0?"front":"back");
             row.dataset.slotRow=rowIndex===0?"front":"back";
+            row.dataset.geometryOwner="fixed-slot";
             rowSlots.forEach(slot=>{
                 const holder=makeSlot("v-fixed-unit-slot v-fixed-ally-slot",slot);
                 const index=slots.getCharacterAtAllySlot(slot);
                 const card=Number.isInteger(index)?cards.get(index):null;
                 if(card){
                     card.dataset.slot=slot;
+                    card.dataset.geometryOwner="fixed-slot";
                     holder.appendChild(card);
                 }
                 row.appendChild(holder);
@@ -147,6 +173,7 @@
         });
         area.replaceChildren(fragment);
         area.classList.add("v-fixed-ally-formation","v-fixed-ally-zone","v-fixed-zone-v2");
+        area.classList.remove("battle-player-row");
         area.dataset.geometryOwner="fixed-slot";
     }
 
@@ -156,15 +183,16 @@
         const mechanism=document.getElementById("bossMechanismSlot");
         if(mechanism){ mechanism.classList.add("v-fixed-mechanism-zone"); mechanism.dataset.geometryOwner="fixed-slot"; }
         const middle=document.querySelector("#battlePage .battle-middle");
-        if(middle){ middle.classList.add("v-fixed-battle-info-zone"); }
+        if(middle){ middle.classList.add("v-fixed-battle-info-zone"); middle.dataset.geometryOwner="fixed-slot"; }
         const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
-        if(action){ action.classList.add("v-fixed-action-zone"); }
+        if(action){ action.classList.add("v-fixed-action-zone"); action.dataset.geometryOwner="fixed-slot"; }
     }
 
     function reconcile(){
         if(reconciling||typeof document==="undefined"){ return; }
         reconciling=true;
         try{
+            neutralizeLegacyPresentationGeometry();
             markBattlefieldZones();
             canonicalizeEnemyZone();
             canonicalizeAllyZone();
@@ -215,6 +243,7 @@
         const type=String((args&&args[2])||"").toLowerCase();
         if(type.includes("heal")||text.startsWith("+")){ return "heal"; }
         if(type.includes("shield")){ return "shield"; }
+        if(type.includes("buff")||type.includes("debuff")||type.includes("status")){ return "status"; }
         if(args&&args[3]===true){ return "critical"; }
         return "damage";
     }
@@ -225,6 +254,7 @@
         if(!anchor){ return false; }
         popup.dataset.slot=slot;
         popup.dataset.geometryOwner="fixed-slot";
+        popup.dataset.popupKind=kind||"damage";
         popup.classList.add("v-fixed-slot-popup");
         popup.style.setProperty("position","fixed","important");
         popup.style.setProperty("left",anchor.x+"px","important");
@@ -323,7 +353,8 @@
         queueReconcile:queueReconcile,
         getSlotForElement:slotForElement,
         getAnchorForSlot:anchorForSlot,
-        getVfxGeometry:geometryForVfx
+        getVfxGeometry:geometryForVfx,
+        neutralizeLegacyPresentationGeometry:neutralizeLegacyPresentationGeometry
     });
     window.FourSymbolsBattlefieldRenderGeometry=api;
 
@@ -339,6 +370,7 @@
         try{ renderBattle=wrapped; }catch(_){ }
     }
 
+    neutralizeLegacyPresentationGeometry();
     wrapDamagePopup();
     wrapMissPopup();
 
@@ -357,7 +389,7 @@
                 });
                 if(
                     node.id==="battleMonsterArea"||node.id==="battlePlayerRow"||
-                    node.matches?.(".battle-monster,.battle-player,.v131-monster-row,.v-fixed-ally-row")||
+                    node.matches?.(".battle-monster,.battle-player,.v131-monster-row,.v-fixed-ally-row,.v-fixed-ally-slot-row")||
                     node.querySelector?.(".battle-monster,.battle-player")
                 ){
                     needsReconcile=true;
