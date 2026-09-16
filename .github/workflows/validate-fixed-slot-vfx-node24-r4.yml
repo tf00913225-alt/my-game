@@ -1,0 +1,68 @@
+name: Validate Fixed Slot VFX Node 24 R4
+
+on:
+  push:
+    branches:
+      - validation/fixed-slot-vfx-node24-r4-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Node 24 typography baseline and full test validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Confirm Node.js version
+        run: node --version
+
+      - name: Prepare Git comparison base
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ "$CI_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] && \
+             [[ ! "$CI_BASE_SHA" =~ ^0{40}$ ]] && \
+             ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
+          fi
+
+          for typography_baseline_sha in \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            if ! git cat-file -e "$typography_baseline_sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$typography_baseline_sha"
+            fi
+          done
+
+      - name: Verify typography baseline commit objects
+        run: |
+          git cat-file -e "39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5^{commit}"
+          git cat-file -e "4a592dd4c41d7efb1a4849fbfe0cbf68598121bf^{commit}"
+          git cat-file -e "29b9668057846164a941fbf6617d2458d9af5476^{commit}"
+          git ls-tree -r --name-only 39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 >/dev/null
+
+      - name: Run typography baseline classification test
+        run: node tests/ui-typography-baseline-classification.test.js
+
+      - name: Ensure full-suite asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run all Node unit and integration suites
+        run: node .github/scripts/ci.mjs tests
