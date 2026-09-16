@@ -1,0 +1,66 @@
+name: Validate allyTri Fixed Slot edge fix
+
+on:
+  push:
+    branches:
+      - validation/ally-tri-edge-node24-20260916
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out production fix branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/ally-tri-edge-fixed-slot-20260916
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Align V170 fixture with production load order
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('tests/v170-final-spec-integration.test.js')
+          text=path.read_text()
+          needle='const EXPECTED_RUNTIME_PATHS=[\n    "js/25-v131-fix-batch.js",'
+          replacement='const EXPECTED_RUNTIME_PATHS=[\n    "js/battlefield-slot-owner.js",\n    "js/25-v131-fix-batch.js",'
+          if text.count(needle) != 1:
+              raise SystemExit('V170 EXPECTED_RUNTIME_PATHS anchor count is not exactly one')
+          path.write_text(text.replace(needle,replacement,1))
+          PY
+          git diff --check
+          test "$(git diff --numstat -- tests/v170-final-spec-integration.test.js)" = $'1\t0\ttests/v170-final-spec-integration.test.js'
+          grep -A2 'const EXPECTED_RUNTIME_PATHS=' tests/v170-final-spec-integration.test.js
+
+      - name: Show Node version
+        run: node --version
+
+      - name: Run Fixed Slot tri target-window unit regression
+        run: node tests/fixed-slot-tri-target-window.test.js
+
+      - name: Run Fixed Slot battlefield rendering regression
+        run: node tests/fixed-slot-battlefield-rendering-v2.test.js
+
+      - name: Run Rage allyTri edge regression
+        run: node tests/ally-tri-rage-fixed-slot-regression.test.js
+
+      - name: Run V170 final integration regression
+        run: node tests/v170-final-spec-integration.test.js
+
+      - name: Commit verified V170 fixture alignment
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add tests/v170-final-spec-integration.test.js
+          git diff --cached --check
+          test "$(git diff --cached --numstat)" = $'1\t0\ttests/v170-final-spec-integration.test.js'
+          git commit -m "test: load fixed-slot owner in V170 integration"
+          git push origin HEAD:fix/ally-tri-edge-fixed-slot-20260916
