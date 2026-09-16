@@ -9,30 +9,68 @@ permissions:
   contents: read
 
 jobs:
-  validate:
+  validate-fix:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out validation branch
+      - name: Check out autonomous fix branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          ref: fix/v170-autonomous-contract-cleanup-20260917
+          fetch-depth: 2
 
       - name: Use Node.js 24
         uses: actions/setup-node@v4
         with:
           node-version: '24'
 
-      - name: Verify validation scope
+      - name: Verify exact fix HEAD and tests-only commit scope
         shell: bash
         run: |
+          test "$(git rev-parse HEAD)" = "9faac616ab8f321d5a4382fa201bc6f7bcaf3477"
           base=8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6
           git fetch --no-tags --depth=1 origin "$base"
           changed="$(git diff --name-only "$base" HEAD | sort)"
           printf '%s\n' "$changed"
-          test "$changed" = $'.github/workflows/boss-vfx-fixed-slot-harness-validation.yml\ntests/boss-vfx-reliability-20260914.test.js'
+          test "$changed" = "tests/boss-vfx-reliability-20260914.test.js"
           git diff --check "$base" HEAD
           test -z "$(git diff --name-only "$base" HEAD -- js css scripts config asset-manifest.json)"
 
-      - name: Run Boss VFX formal Fixed Slot validation
+      - name: Prepare CI comparison base and typography baselines
         shell: bash
+        run: |
+          for sha in \
+            e3de8f7fee4e65986420528247bdbb99cb588a07 \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            if ! git cat-file -e "$sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$sha"
+            fi
+          done
+
+      - name: Ensure existing asset-test dependency
+        shell: bash
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run Boss VFX reliability test
         run: node tests/boss-vfx-reliability-20260914.test.js
+
+      - name: Run V170 final integration test
+        run: node tests/v170-final-spec-integration.test.js
+
+      - name: Run Fixed Slot targeted regressions
+        shell: bash
+        run: |
+          node tests/fixed-slot-tri-target-window.test.js
+          node tests/ally-tri-rage-fixed-slot-regression.test.js
+          node tests/fixed-slot-battlefield-rendering-v2.test.js
+
+      - name: Run full Node suite
+        env:
+          CI_BASE_SHA: e3de8f7fee4e65986420528247bdbb99cb588a07
+          CI_HEAD_SHA: 9faac616ab8f321d5a4382fa201bc6f7bcaf3477
+        run: node .github/scripts/ci.mjs tests
