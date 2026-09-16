@@ -6,6 +6,7 @@ const vm=require("node:vm");
 
 const source=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const timingSource=fs.readFileSync("js/48-v159-abyss-battle-portraits.js","utf8");
+const fixedSlotCss=fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8");
 
 function classList(){
     const values=new Set();
@@ -132,7 +133,10 @@ assert.match(source,/MONSTER_PORTRAIT_REGISTRY_URL="config\/monster-portrait-reg
 assert.match(source,/TEMPORARY_MONSTER_PORTRAIT="assets\/dungeons\/abyss\/soldier\.webp"/);
 assert.match(source,/TEMPORARY_BOSS_PORTRAIT="assets\/monsters\/boss\/boss-placeholder-fire-demon\.webp"/);
 assert.match(source,/target\.status!=="existing"/);
-assert.match(source,/background-size:contain!important/);
+assert.match(source,/function installMonsterPortraitPresentationStyle\(\)\{[\s\S]*?return;/,"V154 must leave portrait geometry to the canonical battlefield stylesheet");
+assert.doesNotMatch(source,/background-size:contain!important/,"V154 must not re-own battle portrait geometry");
+assert.match(fixedSlotCss,/\.v174-battle-art\{[\s\S]*?background-size:contain !important;/,"fixed Slot CSS must own no-crop battle artwork geometry");
+assert.match(fixedSlotCss,/\.v174-battle-art\{[\s\S]*?overflow:visible !important;/,"fixed Slot CSS must keep battle artwork unclipped");
 assert.equal((source.match(/renderBattle=function/g)||[]).length,1);
 assert.equal((source.match(/updateMonsterUI=function/g)||[]).length,1);
 assert.match(timingSource,/v154SyncMonsterPortraits/);
