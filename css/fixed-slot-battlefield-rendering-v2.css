@@ -1,6 +1,8 @@
 /* Fixed Slot Battlefield Rendering V2 — canonical render geometry.
-   FourSymbolsBattlefieldSlots owns Slot coordinates. This stylesheet owns only
-   how those formal Slots are projected into the battle page. */
+   FourSymbolsBattlefieldSlots owns Slot coordinates. This stylesheet is the
+   single source stylesheet that projects those Slots into the battle page.
+   Historical runtime geometry from V173.51 is intentionally neutralized by
+   battlefield-render-geometry-adapter.js. */
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
     --battle-enemy-zone-height:188px;
@@ -13,12 +15,13 @@
     --battle-art-hud-reserve:25px;
 }
 
-/* The fixed viewport boundary is #game-stage. Internal battlefield ancestors
-   must not clip artwork, popups or VFX that paint beyond a small Slot. */
+/* #game-stage is the viewport boundary. Battlefield ancestors must not clip
+   Artwork, Popup or VFX paint that legitimately overhangs an individual Slot. */
 #game-stage #battlePage.v-fixed-slot-render-v2,
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap,
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-wrap{
     overflow:visible !important;
+    contain:none !important;
 }
 
 /* Enemy Zone: two coordinate rows inside one fixed-height Zone. */
@@ -33,6 +36,7 @@
     margin:0 !important;
     padding:0 4px !important;
     overflow:visible !important;
+    contain:none !important;
     box-sizing:border-box !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row{
@@ -48,6 +52,7 @@
     margin:0 !important;
     padding:0 !important;
     overflow:visible !important;
+    contain:none !important;
     align-items:stretch !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="back"]{top:0 !important;}
@@ -59,10 +64,10 @@
     height:100% !important;
     min-height:0 !important;
     overflow:visible !important;
-    contain:layout style !important;
+    contain:none !important;
 }
 
-/* Ally Zone: front/back are coordinate layers, never two natural-flow rows. */
+/* Ally Zone: front/back are coordinate layers, never natural-flow rows. */
 #game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow.v-fixed-ally-zone{
     position:relative !important;
     display:block !important;
@@ -74,9 +79,10 @@
     margin:0 !important;
     padding:0 22px !important;
     overflow:visible !important;
+    contain:none !important;
     box-sizing:border-box !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-row{
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row{
     position:absolute !important;
     left:22px !important;
     right:22px !important;
@@ -89,10 +95,11 @@
     margin:0 !important;
     padding:0 !important;
     overflow:visible !important;
+    contain:none !important;
     align-items:stretch !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-row[data-slot-row="back"]{top:0 !important;}
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-row[data-slot-row="front"]{bottom:0 !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="back"]{top:0 !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="front"]{bottom:0 !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot{
     position:relative !important;
     width:auto !important;
@@ -100,10 +107,10 @@
     height:100% !important;
     min-height:0 !important;
     overflow:visible !important;
-    contain:layout style !important;
+    contain:none !important;
 }
 
-/* Unit identity fills the Slot; it does not size or move it. */
+/* Unit identity fills the Slot; it cannot size or move the Slot. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot > .battle-monster,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player{
     position:absolute !important;
@@ -117,12 +124,17 @@
     margin:0 !important;
     padding:0 !important;
     overflow:visible !important;
+    contain:none !important;
     box-sizing:border-box !important;
-    background:transparent !important;
+    background-color:transparent !important;
+    background-image:none !important;
     border:0 !important;
     border-radius:0 !important;
     box-shadow:none !important;
-    contain:layout style !important;
+    outline:0 !important;
+    isolation:isolate !important;
+    transition-property:opacity !important;
+    transition-duration:.15s !important;
 }
 
 /* Artwork is a paint layer. Full source aspect is preserved with contain. */
@@ -135,11 +147,36 @@
     bottom:var(--battle-art-hud-reserve) !important;
     width:auto !important;
     height:auto !important;
+    display:block !important;
+    z-index:1 !important;
     background-size:contain !important;
     background-position:center bottom !important;
     background-repeat:no-repeat !important;
+    background-color:transparent !important;
     overflow:visible !important;
+    contain:none !important;
     transform-origin:center bottom !important;
+    will-change:transform,filter !important;
+    animation:v174BattleIdle 3.4s ease-in-out infinite !important;
+    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
+    pointer-events:none !important;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:-2px;
+    width:66%;
+    height:10px;
+    border-radius:50%;
+    background:rgba(0,0,0,.42);
+    filter:blur(2px);
+    transform:translateX(-50%);
+    pointer-events:none;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art ~ *{z-index:6;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit > img.v162-abyss-battle-portrait-art{
+    opacity:0 !important;
     pointer-events:none !important;
 }
 
@@ -155,6 +192,8 @@
     text-align:center !important;
     white-space:nowrap !important;
     text-overflow:clip !important;
+    visibility:visible !important;
+    opacity:1 !important;
     pointer-events:none !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name{
@@ -165,16 +204,17 @@
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
+    padding:0 2px !important;
     font-size:11px !important;
     line-height:16px !important;
-    z-index:8 !important;
+    z-index:24 !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
     bottom:-17px !important;
     height:16px !important;
     line-height:16px !important;
     font-size:11px !important;
-    z-index:8 !important;
+    z-index:20 !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp,
@@ -188,7 +228,10 @@
     min-height:9px !important;
     margin:0 !important;
     overflow:hidden !important;
-    z-index:7 !important;
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    z-index:20 !important;
     box-sizing:border-box !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
@@ -208,7 +251,34 @@
     z-index:9 !important;
 }
 
-/* Status artwork is anchored to the Slot-sized Unit, not the source image. */
+/* Presentation-only state effects formerly co-located with V173.51 geometry. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
+    border:0 !important;
+    background:none !important;
+    box-shadow:none !important;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn{
+    outline:2px solid #f1c96d !important;
+    outline-offset:1px !important;
+    border-radius:8px !important;
+    box-shadow:0 0 0 1px rgba(255,232,163,.34),0 0 14px rgba(241,201,109,.82) !important;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target{
+    border:0 !important;
+    box-shadow:none !important;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{
+    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7)));
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up,
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down{animation:none !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up > .v174-battle-art{animation:v174BattleLungeUp .45s ease !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down > .v174-battle-art{animation:v174BattleLungeDown .45s ease !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art.v174-hit-shake{animation:v174BattleHitShake .28s ease !important;}
+
+/* Status artwork is anchored to the Slot-sized Unit, not to source image bounds. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v153-status-vfx{
     left:50% !important;
     top:42% !important;
@@ -217,20 +287,25 @@
     pointer-events:none !important;
 }
 
+/* Zones are independent. Mechanism does not size Enemy/Ally, and battle info / action
+   do not move when the number of occupied Slots changes. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-mechanism-zone{
     position:relative !important;
     flex:0 0 auto !important;
     overflow:visible !important;
+    contain:none !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-battle-info-zone,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-action-zone{
     flex:0 0 auto !important;
     min-height:0 !important;
+    overflow:visible !important;
+    contain:none !important;
 }
 
 .v143-skill-stage[data-geometry-owner="fixed-slot"]{
     overflow:visible !important;
-    contain:layout style !important;
+    contain:none !important;
 }
 .v-fixed-slot-popup{
     position:fixed !important;
@@ -239,26 +314,33 @@
     height:auto !important;
     margin:0 !important;
     overflow:visible !important;
+    contain:none !important;
     white-space:nowrap !important;
     pointer-events:none !important;
     z-index:17020 !important;
 }
 
-@media (max-width:380px){
-    #game-stage #battlePage.v-fixed-slot-render-v2{
-        --battle-enemy-zone-height:180px;
-        --battle-enemy-row-height:88px;
-        --battle-ally-zone-height:142px;
-        --battle-ally-row-height:82px;
-        --battle-slot-column-gap:3px;
-    }
-    #game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow.v-fixed-ally-zone{
-        padding-left:16px !important;
-        padding-right:16px !important;
-    }
-    #game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-row{
-        left:16px !important;
-        right:16px !important;
-        gap:6px !important;
-    }
+@keyframes v174BattleIdle{
+    0%,100%{transform:translateY(0) scale(1)}
+    50%{transform:translateY(-3px) scale(1.015)}
+}
+@keyframes v174BattleLungeUp{
+    0%,100%{transform:translateY(0) scale(1)}
+    38%{transform:translateY(-13px) scale(1.035)}
+    68%{transform:translateY(-5px) scale(1.015)}
+}
+@keyframes v174BattleLungeDown{
+    0%,100%{transform:translateY(0) scale(1)}
+    38%{transform:translateY(13px) scale(1.035)}
+    68%{transform:translateY(5px) scale(1.015)}
+}
+@keyframes v174BattleHitShake{
+    0%,100%{transform:translate(0,0)}
+    18%{transform:translate(-4px,1px)}
+    36%{transform:translate(4px,-1px)}
+    54%{transform:translate(-3px,0)}
+    72%{transform:translate(2px,1px)}
+}
+@media (prefers-reduced-motion:reduce){
+    #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art{animation:none !important;}
 }
