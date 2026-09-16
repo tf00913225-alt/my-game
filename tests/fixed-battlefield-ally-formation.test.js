@@ -54,3 +54,7 @@ for(const element of ["fire","water","wind","earth"]){
 }
 
 console.log("persistent ally formation and four-element slot geometry: PASS");
+
+const formationRuntime=fs.readFileSync(new URL("../js/25-v131-fix-batch.js",import.meta.url),"utf8");
+assert.match(formationRuntime,/const owner=fixedBattlefieldSlots\(\);[\s\S]*owner\.ensureAllyFormation/,"battle ally renderer resolves the canonical owner object");
+assert.doesNotMatch(formationRuntime,/fixedBattlefieldSlots\.ally(?:Front|Back|Slots)/,"battle ally renderer must not read properties from the owner getter function");

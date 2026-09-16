@@ -415,8 +415,9 @@
     }
 
     function ensureAllyFormationState(){
-        if(!fixedBattlefieldSlots||typeof fixedBattlefieldSlots.ensureAllyFormation!=="function"){ return null; }
-        return fixedBattlefieldSlots.ensureAllyFormation(getExistingPartyIndexes());
+        const owner=fixedBattlefieldSlots();
+        if(!owner||typeof owner.ensureAllyFormation!=="function"){ return null; }
+        return owner.ensureAllyFormation(getExistingPartyIndexes());
     }
 
     function applyAllyBattleFormation(){
@@ -430,14 +431,15 @@
         });
         area.innerHTML="";
         area.classList.add("v-fixed-ally-formation");
-        [fixedBattlefieldSlots.allyFrontSlots,fixedBattlefieldSlots.allyBackSlots].forEach((slots,rowIndex)=>{
+        const owner=fixedBattlefieldSlots();
+        [owner.allyFrontSlots,owner.allyBackSlots].forEach((slots,rowIndex)=>{
             const row=document.createElement("div");
             row.className="v-fixed-ally-row v-fixed-ally-row-"+(rowIndex===0?"front":"back");
             slots.forEach(slot=>{
                 const wrapper=document.createElement("div");
                 wrapper.className="v-fixed-unit-slot v-fixed-ally-slot";
                 wrapper.dataset.slot=slot;
-                const characterIndex=fixedBattlefieldSlots.getCharacterAtAllySlot(slot);
+                const characterIndex=owner.getCharacterAtAllySlot(slot);
                 const card=Number.isInteger(characterIndex)?cards.get(characterIndex):null;
                 if(card){ wrapper.appendChild(card); }
                 row.appendChild(wrapper);
@@ -455,24 +457,24 @@
         const formation=ensureAllyFormationState();
         if(!formation){ return '<div class="v-fixed-formation-empty">目前無法讀取佈陣資料。</div>'; }
         const renderRow=(label,slots)=>'<section class="v-fixed-formation-row"><header>'+label+'</header><div class="v-fixed-formation-slots">'+slots.map(slot=>{
-            const index=fixedBattlefieldSlots.getCharacterAtAllySlot(slot);
+            const index=fixedBattlefieldSlots().getCharacterAtAllySlot(slot);
             const character=Number.isInteger(index)?getPartyCharacterByIndex(index):null;
             const selected=Number.isInteger(index)&&index===vFixedFormationSelectedCharacter;
             return '<button type="button" class="v-fixed-formation-slot'+(selected?' selected':'')+'" data-slot="'+slot+'" onclick="vFixedSelectFormationSlot(\''+slot+'\')">'+
                 '<small>'+formationSlotLabel(slot)+'</small><strong>'+(character?(character.id||('角色'+(index+1))):'空位')+'</strong></button>';
         }).join('')+'</div></section>';
-        return '<div class="v-fixed-formation-panel"><p>先點角色，再點目標格位；若目標已有角色會直接交換。</p>'+renderRow('前排',fixedBattlefieldSlots.allyFrontSlots)+renderRow('後排',fixedBattlefieldSlots.allyBackSlots)+'</div>';
+        return '<div class="v-fixed-formation-panel"><p>先點角色，再點目標格位；若目標已有角色會直接交換。</p>'+renderRow('前排',fixedBattlefieldSlots().allyFrontSlots)+renderRow('後排',fixedBattlefieldSlots().allyBackSlots)+'</div>';
     }
     window.vFixedRenderAllyFormationContent=renderAllyFormationContent;
     window.vFixedSelectFormationSlot=function(slot){
         const formation=ensureAllyFormationState();
-        if(!formation||!fixedBattlefieldSlots.allySlots.includes(slot)){ return; }
-        const occupant=fixedBattlefieldSlots.getCharacterAtAllySlot(slot);
+        if(!formation||!fixedBattlefieldSlots().allySlots.includes(slot)){ return; }
+        const occupant=fixedBattlefieldSlots().getCharacterAtAllySlot(slot);
         if(!Number.isInteger(vFixedFormationSelectedCharacter)){
             if(!Number.isInteger(occupant)){ return; }
             vFixedFormationSelectedCharacter=occupant;
         }else{
-            fixedBattlefieldSlots.moveAllyCharacter(vFixedFormationSelectedCharacter,slot);
+            fixedBattlefieldSlots().moveAllyCharacter(vFixedFormationSelectedCharacter,slot);
             vFixedFormationSelectedCharacter=null;
             if(typeof saveGame==="function"){ saveGame({source:"ally-formation"}); }
             if(typeof window.v54RenderHomeRoster==="function"){ window.v54RenderHomeRoster(); }
