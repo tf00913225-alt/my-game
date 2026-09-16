@@ -13,7 +13,7 @@ permissions:
 jobs:
   visual-qa-fixed:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - name: Checkout exact feature branch
         uses: actions/checkout@v4
@@ -38,8 +38,9 @@ jobs:
           test -s /tmp/premium-ui-visual-qa.mjs
           sed -i 's/mobile:true/mobile:false/' /tmp/premium-ui-visual-qa.mjs
           sed -i '/await cdp("Runtime.enable");/a\\          await cdp("Emulation.setTouchEmulationEnabled",{enabled:true,maxTouchPoints:5});' /tmp/premium-ui-visual-qa.mjs
+          printf '\nprocess.exit(0);\n' >> /tmp/premium-ui-visual-qa.mjs
           node --check /tmp/premium-ui-visual-qa.mjs
-          node /tmp/premium-ui-visual-qa.mjs
+          timeout 120s node /tmp/premium-ui-visual-qa.mjs
 
       - name: Upload exact-viewport visual QA evidence
         uses: actions/upload-artifact@v4
