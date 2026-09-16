@@ -15,7 +15,7 @@ jobs:
       - name: Check out validation branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 3
 
       - name: Use Node.js 24
         uses: actions/setup-node@v4
@@ -25,11 +25,13 @@ jobs:
       - name: Verify validation scope
         shell: bash
         run: |
-          test "$(git rev-parse HEAD^)" = "8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6"
-          changed="$(git diff --name-only 8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6...HEAD)"
+          base=8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6
+          test "$(git merge-base HEAD "$base")" = "$base"
+          changed="$(git diff --name-only "$base"...HEAD)"
           printf '%s\n' "$changed"
-          test "$changed" = "tests/boss-vfx-reliability-20260914.test.js"
-          git diff --check 8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6...HEAD
+          test "$changed" = $'.github/workflows/boss-vfx-fixed-slot-harness-validation.yml\ntests/boss-vfx-reliability-20260914.test.js'
+          git diff --check "$base"...HEAD
+          test -z "$(git diff --name-only "$base"...HEAD -- js css scripts config asset-manifest.json)"
 
       - name: Run Boss VFX formal Fixed Slot validation
         shell: bash
