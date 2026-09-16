@@ -20,17 +20,27 @@ test("Water Ball owns a 12-frame, 4x3 group raster sprite with the frame-eight h
     assert.match(animation,/const DEFAULT_HIT=\.5833333333;/);
 });
 
-test("the single group VFX is centered on actual live targets rather than the caster",()=>{
-    const placement=animation.slice(animation.indexOf("function placeSprite(current,node,index,target){"));
-    assert.match(
-        placement,
-        /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\)/
+test("the single group VFX is centered on formal target geometry rather than the caster",()=>{
+    const geometry=animation.slice(
+        animation.indexOf("function geometryBounds(current,indexes,placement){"),
+        animation.indexOf("function hasTimedEffect(entity,type){")
     );
-    assert.match(
-        placement,
-        /const destination=\{[\s\S]*?x:targetBounds\.left\+targetBounds\.width\/2,[\s\S]*?y:targetBounds\.top\+targetBounds\.height\/2/
+    const placement=animation.slice(
+        animation.indexOf("function placeSprite(current,node,index,target){"),
+        animation.indexOf("function addSprite(current,index,target){")
     );
-    assert.doesNotMatch(placement,/waterBall.*targetTrajectory/);
+    assert.match(geometry,/const owner=geometryOwner\(\)/);
+    assert.match(geometry,/const seed=geometrySeedIndexes\(current,indexes\)/);
+    assert.match(geometry,/let primarySlot=geometryPrimarySlot\(current,indexes\)/);
+    assert.match(geometry,/const normalizedTri=\/tri\/i\.test\(targetType\)/);
+    assert.match(geometry,/owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
+    assert.match(placement,/const indexes=emittedSpriteTargets\(current\)/);
+    assert.match(placement,/const bounds=geometryBounds\(current,indexes,placement\)/);
+    assert.match(placement,/const destination=\{x:bounds\.centerX,y:bounds\.centerY\}/);
+    assert.match(placement,/const actor=placement==="trajectory"\?slotAnchor\(current\.side,current\.actorIndex,current\.actorCard\):null/);
+    assert.match(placement,/else\{[\s\S]*?node\.style\.left=bounds\.centerX\+"px";[\s\S]*?node\.style\.top=bounds\.centerY\+"px"/);
+    assert.doesNotMatch(placement,/targetCards=indexes\.map\([^\n]*cardFor/);
+    assert.doesNotMatch(animation,/waterBall:[^\n]*targetTrajectory/);
 });
 
 test("CSS advances the formal 4x3 sheet once without Canvas or per-target travel",()=>{
