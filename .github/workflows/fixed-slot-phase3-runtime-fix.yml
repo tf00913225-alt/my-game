@@ -38,7 +38,6 @@ jobs:
           new3='''                const characterIndex=owner.getCharacterAtAllySlot(slot);'''
           if s.count(old3)!=1: raise SystemExit('ally slot lookup block mismatch')
           s=s.replace(old3,new3,1)
-          # Formation modal helpers also need the owner object, not the getter function.
           s=s.replace('fixedBattlefieldSlots.getCharacterAtAllySlot(slot)','fixedBattlefieldSlots().getCharacterAtAllySlot(slot)')
           s=s.replace('fixedBattlefieldSlots.allyFrontSlots','fixedBattlefieldSlots().allyFrontSlots')
           s=s.replace('fixedBattlefieldSlots.allyBackSlots','fixedBattlefieldSlots().allyBackSlots')
@@ -51,7 +50,7 @@ jobs:
           p=Path('tests/fixed-battlefield-ally-formation.test.js')
           s=p.read_text(encoding='utf-8').rstrip()
           extra='''\n\nconst formationRuntime=fs.readFileSync(new URL("../js/25-v131-fix-batch.js",import.meta.url),"utf8");\nassert.match(formationRuntime,/const owner=fixedBattlefieldSlots\\(\\);[\\s\\S]*owner\\.ensureAllyFormation/,"battle ally renderer resolves the canonical owner object");\nassert.doesNotMatch(formationRuntime,/fixedBattlefieldSlots\\.ally(?:Front|Back|Slots)/,"battle ally renderer must not read properties from the owner getter function");\n'''
-          p.write_text(s+extra+'\n',encoding='utf-8')
+          p.write_text((s+extra).rstrip()+'\n',encoding='utf-8')
           PY
       - name: Verify runtime fix
         run: |
