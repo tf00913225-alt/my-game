@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-15-premium-functional-ui",
+  "baseBranch": "dev",
+  "baseCommit": "7edc8e25e60b66ce88ce96e0e0076feb61e7a6d3",
+  "sourceCommit": "ef05d0e370dea127d190b599c4e54e93b4669d16",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "PFUI-01",
+      "status": "VERIFIED",
+      "requirement": "登入、系統、帳號、存檔沿用正式功能 owner，只統一黑金層級與危險操作 presentation",
+      "evidence": [
+        "css/37-v139-rested-experience.css",
+        "tests/premium-functional-ui-batch1.test.js",
+        "GitHub Actions run 34989050901"
+      ]
+    },
+    {
+      "id": "PFUI-02",
+      "status": "VERIFIED",
+      "requirement": "角色經驗池、升級、六能力 pending 配點、裝備與技能 runtime 不變並完成 presentation 統一",
+      "evidence": [
+        "css/00-main.css",
+        "css/31-v131-fix-batch.css",
+        "css/38-v141-system-expansion.css",
+        "tests/premium-functional-ui-batch2.test.js",
+        "GitHub Actions run 34989050901"
+      ]
+    },
+    {
+      "id": "PFUI-03",
+      "status": "VERIFIED",
+      "requirement": "背包維持最新正式 18 格 × 7 頁，秘寶與物品詳情只改 presentation",
+      "evidence": [
+        "css/22-stage-v78-character-inventory-core.css",
+        "css/23-stage-v77-inventory-detail-ui.css",
+        "css/55-team-relic-system.css",
+        "tests/premium-functional-ui-batch3.test.js",
+        "GitHub Actions run 34989050901"
+      ]
+    },
+    {
+      "id": "PFUI-04",
+      "status": "VERIFIED",
+      "requirement": "商店、合成、冶煉交易與材料規則不變，最終 cascade owner 已同步黑金層級與操作 hit area",
+      "evidence": [
+        "css/38-v141-system-expansion.css",
+        "css/49-v169-rpg-ui.css",
+        "css/53-v173.51-qa.css",
+        "tests/premium-functional-ui-batch4.test.js",
+        "GitHub Actions run 34989050901"
+      ]
+    },
+    {
+      "id": "PFUI-05",
+      "status": "VERIFIED",
+      "requirement": "成就、公告、圖鑑、任務與 shared Modal 保留正式 state/storage/scroll/modal manager 並統一 presentation",
+      "evidence": [
+        "css/25-stage-v90-quest-interface-core.css",
+        "css/38-v141-system-expansion.css",
+        "css/49-v169-rpg-ui.css",
+        "css/53-v173.51-qa.css",
+        "tests/premium-functional-ui-batch5.test.js",
+        "GitHub Actions run 34989050901"
+      ]
+    },
+    {
+      "id": "PFUI-06",
+      "status": "VERIFIED",
+      "requirement": "360×800、390×844、412×915 在 GitHub Chrome 完成 responsive composition、horizontal overflow、panel clipping、hit area 與 screenshot 驗證",
+      "evidence": [
+        "tests/premium-functional-ui-responsive-browser.test.js",
+        "GitHub Actions run 34989050901",
+        "GitHub Artifact 10405515496"
+      ]
+    }
+  ],
+  "automatedVerification": "FEATURE_BRANCH_FULL_REGRESSION_AND_CHROME_QA",
+  "verificationRun": 34989050901,
+  "targetedVerificationRun": 34989050901,
+  "browserEvidenceArtifactId": 10405515496,
+  "finalDevVerificationRun": null,
+  "visualVerification": "GITHUB_CHROME_SCREENSHOT_QA",
+  "promotionApproval": "PENDING_PR_TO_DEV",
+  "verifiedOnDevVersion": "173.65",
+  "releasedAs": null
+}

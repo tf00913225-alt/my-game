@@ -95,6 +95,7 @@
     height:1px;
     background:linear-gradient(90deg,transparent,#c69a50,transparent);
     opacity:.72;
+    pointer-events:none;
 }
 
 .v169-rpg-dialog::before{ top:14px; }
@@ -112,6 +113,7 @@
     font-size:16px;
     line-height:20px;
     text-shadow:0 0 8px rgba(240,180,41,.45);
+    pointer-events:none;
 }
 
 .v169-rpg-dialog[data-tone="danger"]{
@@ -202,6 +204,22 @@
 .v169-rpg-dialog-button:focus-visible{
     outline:2px solid #fff0b3;
     outline-offset:2px;
+}
+
+/* Premium functional UI: announcement is a reading surface, not a dashboard card. */
+#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) #homeFeatureModalBody > div[style*="line-height:1.8"]{
+    max-width:34em;
+    margin:0 auto;
+    padding:4px 3px 16px;
+    color:#ded1b8;
+    font-size:15px !important;
+    line-height:1.8 !important;
+    letter-spacing:.015em;
+    overflow-wrap:anywhere;
+}
+#game-stage .home-feature-modal-box::before,
+#game-stage .home-feature-modal-box::after{
+    pointer-events:none;
 }
 
 /* Stop the two perpetual modal glows that caused video-visible flashing. */
@@ -370,7 +388,7 @@
     gap:8px !important;
 }
 #game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs button{
-    min-height:var(--ui-large-panel-tab-height) !important;
+    min-height:44px !important;
 }
 #game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-body{
     flex:1 1 auto !important;
@@ -751,8 +769,8 @@
     background:transparent !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-shop-tabs button{
-    min-height:40px !important;
-    height:40px !important;
+    min-height:44px !important;
+    height:44px !important;
     font-size:15px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface,
@@ -801,6 +819,9 @@
     overflow:hidden !important;
     border-radius:9px !important;
     box-sizing:border-box !important;
+    border:1px solid rgba(200,154,72,.20) !important;
+    background:linear-gradient(155deg,rgba(28,21,13,.72),rgba(8,7,5,.90)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.025),0 3px 8px rgba(0,0,0,.24) !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art{
     grid-column:1 !important;
@@ -861,13 +882,17 @@
     grid-column:1 / -1 !important;
     grid-row:5 !important;
     width:100% !important;
-    height:30px !important;
-    min-height:30px !important;
+    height:42px !important;
+    min-height:42px !important;
     margin:0 !important;
     padding:2px 6px !important;
     border-radius:6px !important;
     font-size:12px !important;
     line-height:1 !important;
+    border:1px solid #c2964d !important;
+    color:#2b1908 !important;
+    background:linear-gradient(180deg,#f1ce7a,#bd7d2d) !important;
+    font-weight:900 !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh{
     display:grid !important;
@@ -946,6 +971,9 @@
     padding:6px 7px !important;
     overflow:hidden !important;
     border-radius:8px !important;
+    border:1px solid rgba(200,154,72,.20) !important;
+    background:linear-gradient(155deg,rgba(28,21,13,.72),rgba(8,7,5,.90)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.025),0 3px 8px rgba(0,0,0,.24) !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-card-head{
     margin-bottom:1px !important;
@@ -983,8 +1011,8 @@
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{
     width:40px !important;
     min-width:40px !important;
-    height:26px !important;
-    min-height:26px !important;
+    height:38px !important;
+    min-height:38px !important;
     padding:0 3px !important;
     font-size:11px !important;
 }
@@ -995,11 +1023,15 @@
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{
     grid-column:1 / -1 !important;
     width:100% !important;
-    height:28px !important;
-    min-height:28px !important;
+    height:42px !important;
+    min-height:42px !important;
     margin-top:2px !important;
     padding:2px 6px !important;
     font-size:11px !important;
+    border:1px solid #c2964d !important;
+    color:#2b1908 !important;
+    background:linear-gradient(180deg,#f1ce7a,#bd7d2d) !important;
+    font-weight:900 !important;
 }
 
 /* V173.49 — EXP POOL TAP / SCROLL STABILITY
@@ -1060,6 +1092,10 @@
     max-width:none !important;
     min-height:100% !important;
     margin:0 !important;
+}
+
+#game-stage .home-feature-modal-box .home-feature-close-btn{
+    min-height:38px;
 }
 
 /* =====================================================

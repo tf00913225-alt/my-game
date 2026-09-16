@@ -8,8 +8,14 @@
 /* HP / SP 常駐資訊：只留一條小資訊帶 */
 #game-stage #inventoryPage .inventory-stats-panel{
     margin:6px 0 8px !important;
-    padding:7px 10px !important;
+    padding:8px 10px !important;
     min-height:0 !important;
+    border-width:1px 0 !important;
+    border-style:solid !important;
+    border-color:rgba(200,154,72,.16) !important;
+    border-radius:0 !important;
+    background:linear-gradient(90deg,transparent,rgba(200,154,72,.035),transparent) !important;
+    box-shadow:none !important;
 }
 #game-stage #inventoryPage .inventory-stats-title{
     display:none !important;
@@ -23,12 +29,13 @@
     display:flex !important;
     justify-content:space-between !important;
     align-items:center !important;
-    min-height:34px !important;
-    padding:5px 10px !important;
+    min-height:38px !important;
+    padding:6px 4px !important;
     font-size:15px !important;
-    border:1px solid rgba(138,106,58,.65) !important;
-    border-radius:8px !important;
-    background:rgba(0,0,0,.22) !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(200,154,72,.12) !important;
+    border-radius:0 !important;
+    background:transparent !important;
 }
 
 /* 立繪框右上角角色詳細按鈕 */
@@ -93,10 +100,12 @@
     align-items:center !important;
     justify-content:space-between !important;
     gap:8px !important;
-    padding:9px 10px !important;
-    border:1px solid rgba(138,106,58,.55) !important;
-    border-radius:8px !important;
-    background:rgba(0,0,0,.24) !important;
+    min-height:44px !important;
+    padding:8px 4px !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(200,154,72,.14) !important;
+    border-radius:0 !important;
+    background:transparent !important;
     font-size:14px !important;
 }
 
