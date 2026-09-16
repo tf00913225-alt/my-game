@@ -1,4 +1,4 @@
-name: V170 Mock DOM Ancestry Diagnosis
+name: V170 CASE B Mock DOM Ancestry Diagnosis
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   diagnose:
-    name: Node 24 isolated mock DOM diagnosis
+    name: Node 24 CASE B isolated mock DOM diagnosis
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -20,7 +20,7 @@ jobs:
       - name: Check out diagnosis branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 5
+          fetch-depth: 6
 
       - name: Use Node.js 24
         uses: actions/setup-node@v4
@@ -36,7 +36,6 @@ jobs:
           base="$(git merge-base "$BASE_SHA" HEAD)"
           echo "MERGE_BASE=$base"
           test "$base" = "$BASE_SHA"
-          echo 'COMMITTED_DIFF_FROM_BASE:'
           git diff --name-only "$BASE_SHA" HEAD
           if git diff --name-only "$BASE_SHA" HEAD | grep -v '^.github/workflows/validate-v170-snapshot-fixture-audit-r2.yml$' | grep -q .; then
             echo 'Unexpected committed diagnosis diff' >&2
@@ -46,7 +45,7 @@ jobs:
           cp js/39-v143-skill-animation.js /tmp/v143.original.js
           cp js/battlefield-slot-owner.js /tmp/slot-owner.original.js
 
-      - name: Phase 1 - prove mock self-parent and first stuck STATUS tuple
+      - name: Phase 1 - CASE B first stuck STATUS tuple
         shell: bash
         run: |
           set -euo pipefail
@@ -56,45 +55,46 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           TARGET='accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules'
-
-          test_path=Path('tests/v170-final-spec-integration.test.js')
-          source=test_path.read_text(encoding='utf-8')
+          p=Path('tests/v170-final-spec-integration.test.js')
+          s=p.read_text(encoding='utf-8')
           runner='''function test(name,handler){\n    handler();\n    passed++;\n    console.log("✓ "+name);\n}'''
           isolated=f'''function test(name,handler){{\n    if(name!=={TARGET!r}){{ return; }}\n    handler();\n    passed++;\n    console.log("PASS "+name);\n}}'''
-          if source.count(runner)!=1: raise SystemExit('test runner anchor not unique')
-          source=source.replace(runner,isolated,1)
-          dummy_anchor='''    const dummy=makeUniversalNode();\n    const storage=()=>{'''
+          if s.count(runner)!=1: raise SystemExit('runner anchor not unique')
+          s=s.replace(runner,isolated,1)
+          dummy='''    const dummy=makeUniversalNode();\n    const storage=()=>{'''
           dummy_diag='''    const dummy=makeUniversalNode();\n    console.log("MOCK parentElement self = "+(dummy.parentElement===dummy));\n    console.log("MOCK parentNode self = "+(dummy.parentNode===dummy));\n    const storage=()=>{'''
-          if source.count(dummy_anchor)!=1: raise SystemExit('dummy anchor not unique')
-          test_path.write_text(source.replace(dummy_anchor,dummy_diag,1),encoding='utf-8')
+          if s.count(dummy)!=1: raise SystemExit('dummy anchor not unique')
+          s=s.replace(dummy,dummy_diag,1)
+          caseb='''        monsters.splice(0,monsters.length,elite);\n        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
+          caseb_diag='''        monsters.splice(0,monsters.length,elite);\n        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        const caseBSnapshot=v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        console.log("CASE B snapshot slot = "+FourSymbolsBattlefieldSlots.getEnemySlotForMonster(caseBSnapshot,0));\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
+          if s.count(caseb)!=1: raise SystemExit('CASE B anchor not unique')
+          p.write_text(s.replace(caseb,caseb_diag,1),encoding='utf-8')
 
-          v143_path=Path('js/39-v143-skill-animation.js')
-          v143=v143_path.read_text(encoding='utf-8')
+          p=Path('js/39-v143-skill-animation.js')
+          s=p.read_text(encoding='utf-8')
           old='''    function syncStatusSpriteEffects(){\n        purgeLegacyCardVfx();\n        const types=Object.keys(RAW_STATUS_SPRITES);\n        for(let index=0;index<10;index++){ types.forEach(type=>syncStatusSprite("monster",index,type)); }\n        for(let index=0;index<3;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }\n    }'''
           new='''    function syncStatusSpriteEffects(){\n        purgeLegacyCardVfx();\n        const types=Object.keys(RAW_STATUS_SPRITES);\n        for(let index=0;index<10;index++){\n            types.forEach(type=>{\n                console.log("STATUS CALL monster "+index+" "+type);\n                syncStatusSprite("monster",index,type);\n                console.log("STATUS RETURN monster "+index+" "+type);\n            });\n        }\n        for(let index=0;index<3;index++){\n            types.forEach(type=>{\n                console.log("STATUS CALL player "+index+" "+type);\n                syncStatusSprite("player",index,type);\n                console.log("STATUS RETURN player "+index+" "+type);\n            });\n        }\n    }'''
-          if v143.count(old)!=1: raise SystemExit('syncStatusSpriteEffects anchor not unique')
-          v143_path.write_text(v143.replace(old,new,1),encoding='utf-8')
+          if s.count(old)!=1: raise SystemExit('status effects anchor not unique')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
           PY
           set +e
-          timeout 8s node tests/v170-final-spec-integration.test.js > /tmp/status-tuple.log 2>&1
+          timeout 8s node tests/v170-final-spec-integration.test.js > /tmp/caseb-status.log 2>&1
           status=$?
           set -e
-          cat /tmp/status-tuple.log
+          cat /tmp/caseb-status.log
           echo "PHASE1_EXIT=$status"
-          grep -F 'MOCK parentElement self = true' /tmp/status-tuple.log
-          grep -F 'MOCK parentNode self = true' /tmp/status-tuple.log
-          last_call="$(grep '^STATUS CALL ' /tmp/status-tuple.log | tail -n1 || true)"
-          last_return="$(grep '^STATUS RETURN ' /tmp/status-tuple.log | tail -n1 || true)"
+          grep -F 'MOCK parentElement self = true' /tmp/caseb-status.log
+          grep -F 'MOCK parentNode self = true' /tmp/caseb-status.log
+          grep -F 'CASE B snapshot slot = ENEMY_F3' /tmp/caseb-status.log
+          last_call="$(grep '^STATUS CALL ' /tmp/caseb-status.log | tail -n1 || true)"
+          last_return="$(grep '^STATUS RETURN ' /tmp/caseb-status.log | tail -n1 || true)"
           echo "FIRST_STUCK_STATUS_CALL=$last_call"
           echo "LAST_STATUS_RETURN=$last_return"
           test "$status" -eq 124
           test "$last_call" = 'STATUS CALL player 0 dinghaishenzhen'
-          if grep -Fq 'STATUS RETURN player 0 dinghaishenzhen' /tmp/status-tuple.log; then
-            echo 'Unexpected STATUS RETURN for stuck tuple' >&2
-            exit 31
-          fi
+          if grep -Fq 'STATUS RETURN player 0 dinghaishenzhen' /tmp/caseb-status.log; then exit 31; fi
 
-      - name: Phase 2 - trace player dinghaishenzhen to guarded self-parent stop
+      - name: Phase 2 - trace CASE B player status to guarded self-parent stop
         shell: bash
         run: |
           set -euo pipefail
@@ -104,68 +104,70 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           TARGET='accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules'
-
-          test_path=Path('tests/v170-final-spec-integration.test.js')
-          source=test_path.read_text(encoding='utf-8')
+          p=Path('tests/v170-final-spec-integration.test.js')
+          s=p.read_text(encoding='utf-8')
           runner='''function test(name,handler){\n    handler();\n    passed++;\n    console.log("✓ "+name);\n}'''
           isolated=f'''function test(name,handler){{\n    if(name!=={TARGET!r}){{ return; }}\n    handler();\n    passed++;\n    console.log("PASS "+name);\n}}'''
-          if source.count(runner)!=1: raise SystemExit('runner anchor not unique')
-          source=source.replace(runner,isolated,1)
-          dummy_anchor='''    const dummy=makeUniversalNode();\n    const storage=()=>{'''
+          s=s.replace(runner,isolated,1)
+          dummy='''    const dummy=makeUniversalNode();\n    const storage=()=>{'''
           dummy_diag='''    const dummy=makeUniversalNode();\n    console.log("MOCK parentElement self = "+(dummy.parentElement===dummy));\n    console.log("MOCK parentNode self = "+(dummy.parentNode===dummy));\n    const storage=()=>{'''
-          if source.count(dummy_anchor)!=1: raise SystemExit('dummy anchor not unique')
-          test_path.write_text(source.replace(dummy_anchor,dummy_diag,1),encoding='utf-8')
+          s=s.replace(dummy,dummy_diag,1)
+          caseb='''        monsters.splice(0,monsters.length,elite);\n        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
+          caseb_diag='''        monsters.splice(0,monsters.length,elite);\n        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        const caseBSnapshot=v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        console.log("CASE B snapshot slot = "+FourSymbolsBattlefieldSlots.getEnemySlotForMonster(caseBSnapshot,0));\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
+          if s.count(caseb)!=1: raise SystemExit('CASE B anchor not unique')
+          p.write_text(s.replace(caseb,caseb_diag,1),encoding='utf-8')
 
-          v143_path=Path('js/39-v143-skill-animation.js')
-          v143=v143_path.read_text(encoding='utf-8')
-          marker='''    function syncStatusSprite(side,index,type){\n        const spec=STATUS_SPRITES[type];\n        const card=cardFor(side,index);\n        const entity=entityFor(side,index);\n        const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));\n        const active=alive&&hasTimedEffect(entity,type);\n        let node=statusNode(card,type);'''
-          replacement='''    function syncStatusSprite(side,index,type){\n        const diag=side==="player"&&index===0&&type==="dinghaishenzhen";\n        if(diag){ console.log("SPRITE 1 enter"); }\n        const spec=STATUS_SPRITES[type];\n        const card=cardFor(side,index);\n        if(diag){ console.log("SPRITE 2 after cardFor"); }\n        const entity=entityFor(side,index);\n        if(diag){ console.log("SPRITE 3 after entityFor"); }\n        const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));\n        const active=alive&&hasTimedEffect(entity,type);\n        if(diag){ console.log("SPRITE 4 after hasTimedEffect active="+active); }\n        let node=statusNode(card,type);\n        if(diag){ console.log("SPRITE 5 after statusNode"); }'''
-          if v143.count(marker)!=1: raise SystemExit('syncStatusSprite marker anchor not unique')
-          v143=v143.replace(marker,replacement,1)
-          anchor_line='''        const anchor=slotAnchor(side,index,card);'''
-          anchor_diag='''        if(diag){ console.log("SPRITE 6 before slotAnchor"); }\n        const anchor=slotAnchor(side,index,card);\n        if(diag){ console.log("SPRITE 7 after slotAnchor"); }'''
-          if v143.count(anchor_line)!=1: raise SystemExit('slotAnchor call anchor not unique')
-          v143=v143.replace(anchor_line,anchor_diag,1)
+          p=Path('js/39-v143-skill-animation.js')
+          s=p.read_text(encoding='utf-8')
+          head='''    function syncStatusSprite(side,index,type){\n        const spec=STATUS_SPRITES[type];\n        const card=cardFor(side,index);\n        const entity=entityFor(side,index);\n        const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));\n        const active=alive&&hasTimedEffect(entity,type);\n        let node=statusNode(card,type);'''
+          head_diag='''    function syncStatusSprite(side,index,type){\n        const diag=side==="player"&&index===0&&type==="dinghaishenzhen";\n        if(diag){ console.log("SPRITE 1 enter"); }\n        const spec=STATUS_SPRITES[type];\n        const card=cardFor(side,index);\n        if(diag){ console.log("SPRITE 2 after cardFor"); }\n        const entity=entityFor(side,index);\n        if(diag){ console.log("SPRITE 3 after entityFor"); }\n        const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));\n        const active=alive&&hasTimedEffect(entity,type);\n        if(diag){ console.log("SPRITE 4 after hasTimedEffect active="+active); }\n        let node=statusNode(card,type);\n        if(diag){ console.log("SPRITE 5 after statusNode"); }'''
+          if s.count(head)!=1: raise SystemExit('sprite head anchor not unique')
+          s=s.replace(head,head_diag,1)
+          call='''        const anchor=slotAnchor(side,index,card);'''
+          call_diag='''        if(diag){ console.log("SPRITE 6 before slotAnchor"); }\n        const anchor=slotAnchor(side,index,card);\n        if(diag){ console.log("SPRITE 7 after slotAnchor"); }'''
+          if s.count(call)!=1: raise SystemExit('sprite slotAnchor call not unique')
+          s=s.replace(call,call_diag,1)
 
-          slot_anchor='''    function slotAnchor(side,index,card){\n        const owner=geometryOwner();\n        const slot=slotForTarget(side,index,card);'''
-          slot_anchor_diag='''    function slotAnchor(side,index,card){\n        const diag=side==="player"&&index===0;\n        if(diag){ console.log("ANCHOR 1 enter"); }\n        const owner=geometryOwner();\n        if(diag){ console.log("ANCHOR 2 before slotForTarget"); }\n        const slot=slotForTarget(side,index,card);\n        if(diag){ console.log("ANCHOR 3 after slotForTarget"); }'''
-          if v143.count(slot_anchor)!=1: raise SystemExit('slotAnchor function anchor not unique')
-          v143=v143.replace(slot_anchor,slot_anchor_diag,1)
+          anchor='''    function slotAnchor(side,index,card){\n        const owner=geometryOwner();\n        const slot=slotForTarget(side,index,card);'''
+          anchor_diag='''    function slotAnchor(side,index,card){\n        const diagAnchor=side==="player"&&index===0;\n        if(diagAnchor){ console.log("ANCHOR 1 enter"); }\n        const owner=geometryOwner();\n        if(diagAnchor){ console.log("ANCHOR 2 before slotForTarget"); }\n        const slot=slotForTarget(side,index,card);\n        if(diagAnchor){ console.log("ANCHOR 3 after slotForTarget"); }'''
+          if s.count(anchor)!=1: raise SystemExit('anchor function not unique')
+          s=s.replace(anchor,anchor_diag,1)
 
-          slot_target='''    function slotForTarget(side,index,card){\n        const owner=geometryOwner();\n        if(!owner){ return null; }\n        if(side==="monster"&&isMechanismTarget(index)){\n            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;\n        }\n        let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;\n        if(!slot&&typeof owner.getSlotFromElement==="function"){\n            slot=owner.getSlotFromElement(card||cardFor(side,index));\n        }\n        return slot||null;\n    }'''
-          slot_target_diag='''    function slotForTarget(side,index,card){\n        const diag=side==="player"&&index===0;\n        const owner=geometryOwner();\n        if(!owner){ return null; }\n        if(side==="monster"&&isMechanismTarget(index)){\n            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;\n        }\n        let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;\n        if(diag){ console.log('getSlotForCombatant("player",0) = '+String(slot)); }\n        if(!slot&&typeof owner.getSlotFromElement==="function"){\n            if(diag){ console.log("before owner.getSlotFromElement(card)"); }\n            slot=owner.getSlotFromElement(card||cardFor(side,index));\n            if(diag){ console.log("after owner.getSlotFromElement(card)"); }\n        }\n        return slot||null;\n    }'''
-          if v143.count(slot_target)!=1: raise SystemExit('slotForTarget function anchor not unique')
-          v143_path.write_text(v143.replace(slot_target,slot_target_diag,1),encoding='utf-8')
+          target='''    function slotForTarget(side,index,card){\n        const owner=geometryOwner();\n        if(!owner){ return null; }\n        if(side==="monster"&&isMechanismTarget(index)){\n            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;\n        }\n        let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;\n        if(!slot&&typeof owner.getSlotFromElement==="function"){\n            slot=owner.getSlotFromElement(card||cardFor(side,index));\n        }\n        return slot||null;\n    }'''
+          target_diag='''    function slotForTarget(side,index,card){\n        const diagTarget=side==="player"&&index===0;\n        const owner=geometryOwner();\n        if(!owner){ return null; }\n        if(side==="monster"&&isMechanismTarget(index)){\n            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;\n        }\n        let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;\n        if(diagTarget){ console.log('getSlotForCombatant("player",0) = '+String(slot)); }\n        if(!slot&&typeof owner.getSlotFromElement==="function"){\n            if(diagTarget){ console.log("before owner.getSlotFromElement(card)"); }\n            slot=owner.getSlotFromElement(card||cardFor(side,index));\n            if(diagTarget){ console.log("after owner.getSlotFromElement(card)"); }\n        }\n        return slot||null;\n    }'''
+          if s.count(target)!=1: raise SystemExit('slotForTarget function not unique')
+          p.write_text(s.replace(target,target_diag,1),encoding='utf-8')
 
-          owner_path=Path('js/battlefield-slot-owner.js')
-          owner=owner_path.read_text(encoding='utf-8')
-          old_owner='''    function slotFromElement(element){\n        let current=element||null;\n        while(current){\n            const slot=current.dataset&&current.dataset.slot;\n            if(slot&&SLOT_META[slot]){ return slot; }\n            current=current.parentElement||current.parentNode||null;\n        }\n        return null;\n    }'''
-          diag_owner='''    function slotFromElement(element){\n        let current=element||null;\n        console.log("SLOT LOOP element===parentElement = "+!!(element&&element.parentElement===element));\n        console.log("SLOT LOOP element===parentNode = "+!!(element&&element.parentNode===element));\n        console.log("STEP 0 current===element "+(current===element));\n        const step1=current?(current.parentElement||current.parentNode||null):null;\n        console.log("STEP 1 parent===element "+(step1===element));\n        const step2=step1?(step1.parentElement||step1.parentNode||null):null;\n        console.log("STEP 2 parent===element "+(step2===element));\n        if(current&&current.parentElement===current){\n            console.log("SELF_PARENT_LOOP_CONFIRMED=true");\n            throw new Error("DIAG_SELF_PARENT_STOP");\n        }\n        while(current){\n            const slot=current.dataset&&current.dataset.slot;\n            if(slot&&SLOT_META[slot]){ return slot; }\n            current=current.parentElement||current.parentNode||null;\n        }\n        return null;\n    }'''
-          if owner.count(old_owner)!=1: raise SystemExit('slotFromElement owner anchor not unique')
-          owner_path.write_text(owner.replace(old_owner,diag_owner,1),encoding='utf-8')
+          p=Path('js/battlefield-slot-owner.js')
+          s=p.read_text(encoding='utf-8')
+          owner='''    function slotFromElement(element){\n        let current=element||null;\n        while(current){\n            const slot=current.dataset&&current.dataset.slot;\n            if(slot&&SLOT_META[slot]){ return slot; }\n            current=current.parentElement||current.parentNode||null;\n        }\n        return null;\n    }'''
+          owner_diag='''    function slotFromElement(element){\n        let current=element||null;\n        console.log("SLOT LOOP element===parentElement = "+!!(element&&element.parentElement===element));\n        console.log("SLOT LOOP element===parentNode = "+!!(element&&element.parentNode===element));\n        console.log("STEP 0 current===element "+(current===element));\n        const step1=current?(current.parentElement||current.parentNode||null):null;\n        console.log("STEP 1 parent===element "+(step1===element));\n        const step2=step1?(step1.parentElement||step1.parentNode||null):null;\n        console.log("STEP 2 parent===element "+(step2===element));\n        if(current&&current.parentElement===current){\n            console.log("SELF_PARENT_LOOP_CONFIRMED=true");\n            throw new Error("DIAG_SELF_PARENT_STOP");\n        }\n        while(current){\n            const slot=current.dataset&&current.dataset.slot;\n            if(slot&&SLOT_META[slot]){ return slot; }\n            current=current.parentElement||current.parentNode||null;\n        }\n        return null;\n    }'''
+          if s.count(owner)!=1: raise SystemExit('slotFromElement function not unique')
+          p.write_text(s.replace(owner,owner_diag,1),encoding='utf-8')
           PY
           set +e
-          timeout 8s node tests/v170-final-spec-integration.test.js > /tmp/deep-trace.log 2>&1
+          timeout 8s node tests/v170-final-spec-integration.test.js > /tmp/caseb-deep.log 2>&1
           status=$?
           set -e
-          cat /tmp/deep-trace.log
+          cat /tmp/caseb-deep.log
           echo "PHASE2_EXIT=$status"
-          grep -F 'MOCK parentElement self = true' /tmp/deep-trace.log
-          grep -F 'MOCK parentNode self = true' /tmp/deep-trace.log
-          grep -F 'SPRITE 6 before slotAnchor' /tmp/deep-trace.log
-          if grep -Fq 'SPRITE 7 after slotAnchor' /tmp/deep-trace.log; then exit 41; fi
-          grep -F 'ANCHOR 2 before slotForTarget' /tmp/deep-trace.log
-          if grep -Fq 'ANCHOR 3 after slotForTarget' /tmp/deep-trace.log; then exit 42; fi
-          grep -F 'getSlotForCombatant("player",0) = null' /tmp/deep-trace.log
-          grep -F 'before owner.getSlotFromElement(card)' /tmp/deep-trace.log
-          if grep -Fq 'after owner.getSlotFromElement(card)' /tmp/deep-trace.log; then exit 43; fi
-          grep -F 'SLOT LOOP element===parentElement = true' /tmp/deep-trace.log
-          grep -F 'SLOT LOOP element===parentNode = true' /tmp/deep-trace.log
-          grep -F 'STEP 0 current===element true' /tmp/deep-trace.log
-          grep -F 'STEP 1 parent===element true' /tmp/deep-trace.log
-          grep -F 'STEP 2 parent===element true' /tmp/deep-trace.log
-          grep -F 'SELF_PARENT_LOOP_CONFIRMED=true' /tmp/deep-trace.log
-          grep -F 'DIAG_SELF_PARENT_STOP' /tmp/deep-trace.log
+          grep -F 'CASE B snapshot slot = ENEMY_F3' /tmp/caseb-deep.log
+          grep -F 'SPRITE 1 enter' /tmp/caseb-deep.log
+          grep -F 'SPRITE 6 before slotAnchor' /tmp/caseb-deep.log
+          if grep -Fq 'SPRITE 7 after slotAnchor' /tmp/caseb-deep.log; then exit 41; fi
+          grep -F 'ANCHOR 1 enter' /tmp/caseb-deep.log
+          grep -F 'ANCHOR 2 before slotForTarget' /tmp/caseb-deep.log
+          if grep -Fq 'ANCHOR 3 after slotForTarget' /tmp/caseb-deep.log; then exit 42; fi
+          grep -F 'getSlotForCombatant("player",0) = null' /tmp/caseb-deep.log
+          grep -F 'before owner.getSlotFromElement(card)' /tmp/caseb-deep.log
+          if grep -Fq 'after owner.getSlotFromElement(card)' /tmp/caseb-deep.log; then exit 43; fi
+          grep -F 'SLOT LOOP element===parentElement = true' /tmp/caseb-deep.log
+          grep -F 'SLOT LOOP element===parentNode = true' /tmp/caseb-deep.log
+          grep -F 'STEP 0 current===element true' /tmp/caseb-deep.log
+          grep -F 'STEP 1 parent===element true' /tmp/caseb-deep.log
+          grep -F 'STEP 2 parent===element true' /tmp/caseb-deep.log
+          grep -F 'SELF_PARENT_LOOP_CONFIRMED=true' /tmp/caseb-deep.log
+          grep -F 'DIAG_SELF_PARENT_STOP' /tmp/caseb-deep.log
           test "$status" -ne 124
 
       - name: Read-only production DOM ancestry audit
@@ -176,11 +178,9 @@ jobs:
           cp /tmp/v170.original.js tests/v170-final-spec-integration.test.js
           cp /tmp/v143.original.js js/39-v143-skill-animation.js
           cp /tmp/slot-owner.original.js js/battlefield-slot-owner.js
-          echo 'PRODUCTION parentElement references:'
-          git grep -n 'parentElement' -- js || true
-          echo 'PRODUCTION parentNode references:'
-          git grep -n 'parentNode' -- js || true
           echo 'PRODUCTION direct parentElement/parentNode assignments:'
           git grep -nP '\.(parentElement|parentNode)\s*=(?!=)' -- js || true
+          echo 'PRODUCTION slotFromElement traversal:'
+          git grep -n -A8 -B2 'function slotFromElement' -- js/battlefield-slot-owner.js || true
           echo 'WORKTREE_DIFF_AFTER_RESTORE:'
           git diff --name-only
