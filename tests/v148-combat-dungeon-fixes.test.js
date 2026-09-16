@@ -109,10 +109,21 @@ test("enemy Rage buffs only one adjacent trio",()=>{
         activeBuffs:[],v141TeamBuffs:[],v141FormationRow:0,v141FormationPosition:index,
         v141SupportSkillIds:index===2?["rage"]:[]
     }));
+    const snapshot={rows:[[0,1,2,3,4]]};
+    const slotOwner={
+        getActiveEnemySnapshot(){ return snapshot; },
+        resolveEnemyTargets(_snapshot,centerIndex,targetType,isAlive){
+            assert.equal(_snapshot,snapshot);
+            assert.equal(targetType,"tri");
+            return [centerIndex-1,centerIndex,centerIndex+1]
+                .filter(index=>index>=0&&index<5&&isAlive(index));
+        }
+    };
     const math=Object.create(Math);
     math.random=()=>0;
     const context=baseContext({
-        Math:math,currentBattleMonsters:[0,1,2,3,4],monsters,
+        Math:math,FourSymbolsBattlefieldSlots:slotOwner,
+        currentBattleMonsters:[0,1,2,3,4],monsters,
         v141TryMonsterSpecialAction:()=>false,showMonsterSkillNameBadge(){},
         addBattleLog(){},updateUI(){},finishPlayerAction(){ finishes++; },v141PlayCardEffect(){}
     });
