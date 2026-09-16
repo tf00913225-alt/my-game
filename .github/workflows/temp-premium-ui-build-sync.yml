@@ -61,7 +61,7 @@ jobs:
           unexpected=0
           while IFS= read -r path; do
             case "$path" in
-              asset-manifest.json|index.html|build/gameplay-core.*|build/feature-boss-relic.*|artifacts/build-sync/gameplay-core.ad03197fc360.js|artifacts/build-sync/gameplay-core.0ffc92e3e32e.css|artifacts/build-sync/feature-boss-relic.bdab8a40dfe3.css|.github/workflows/temp-premium-ui-build-sync.yml)
+              asset-manifest.json|build/asset-manifest.json|index.html|build/gameplay-core.*|build/feature-boss-relic.*|artifacts/build-sync/gameplay-core.ad03197fc360.js|artifacts/build-sync/gameplay-core.0ffc92e3e32e.css|artifacts/build-sync/feature-boss-relic.bdab8a40dfe3.css|.github/workflows/temp-premium-ui-build-sync.yml)
                 ;;
               *)
                 echo "Unexpected build-sync change: $path"
@@ -73,6 +73,7 @@ jobs:
           test -f build/gameplay-core.ad03197fc360.js
           test -f build/gameplay-core.0ffc92e3e32e.css
           test -f build/feature-boss-relic.bdab8a40dfe3.css
+          test -f build/asset-manifest.json
           test ! -e .github/workflows/temp-premium-ui-build-sync.yml
           test ! -e artifacts/build-sync/gameplay-core.ad03197fc360.js
           test ! -e artifacts/build-sync/gameplay-core.0ffc92e3e32e.css
@@ -84,6 +85,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git push origin --delete feature/premium-functional-ui-demo-parity-20260916-temp-build-sync || true
           git add -A -- asset-manifest.json index.html build artifacts .github/workflows/temp-premium-ui-build-sync.yml
           git diff --cached --check
           git diff --cached --stat
