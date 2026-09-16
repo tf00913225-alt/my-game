@@ -17,40 +17,41 @@ jobs:
         with:
           ref: feature/fixed-slot-battlefield-v1-20260916
           fetch-depth: 1
-      - name: Print phase 3 owner contexts
+      - name: Print exact phase 3 owner functions
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          checks={
-            'js/00-main.js':[
-              'function saveGame(options={}){','function loadGame(){','function renderBattle(){','function renderPlayers','battlePlayerRow','function openHomeFeature'
-            ],
-            'js/35-v141-ui-battle.js':[
-              'setBattleAllyTargetSelectionMode','targetAlly','allyTri','prepareAction','selectAlly'
-            ],
-            'js/42-v148-combat-dungeon-fixes.js':[
-              'function requestedBuffTargets','resolveSupportAction','allyTri'
-            ],
-            'js/50-v169-water-skill-rules.js':[
-              'column','tri','freeze'
-            ],
-            'js/36-v141-content-systems.js':[
-              'getMonsterAllyTriTargets','allyTri'
-            ],
-            'js/25-v131-fix-batch.js':[
-              'function applyPlayerElementFrames','renderBattle=function'
-            ]
-          }
-          for path,markers in checks.items():
-            text=Path(path).read_text(encoding='utf-8')
-            lines=text.splitlines()
-            print('\n===== '+path+' =====')
-            for marker in markers:
-              positions=[i for i,line in enumerate(lines) if marker in line]
-              print('\n--- '+marker+' -> '+str([p+1 for p in positions[:8]])+' ---')
-              for p in positions[:3]:
-                a=max(0,p-12); b=min(len(lines),p+28)
-                for i in range(a,b): print(f'{i+1:05d}: {lines[i]}')
-                print('...')
+          def extract(path, needle, limit=12000):
+              text=Path(path).read_text(encoding='utf-8')
+              start=text.find(needle)
+              print(f'\n===== {path} :: {needle} @ {start} =====')
+              if start<0: return
+              brace=text.find('{',start)
+              if brace<0:
+                  print(text[start:start+limit]); return
+              depth=0; quote=None; esc=False; i=brace
+              while i<len(text):
+                  c=text[i]
+                  if quote:
+                      if esc: esc=False
+                      elif c=='\\': esc=True
+                      elif c==quote: quote=None
+                  else:
+                      if c in "'\"`": quote=c
+                      elif c=='{': depth+=1
+                      elif c=='}':
+                          depth-=1
+                          if depth==0:
+                              print(text[start:i+1]); return
+                  i+=1
+              print(text[start:start+limit])
+
+          for path,needle in [
+            ('js/00-main.js','function prepareAction('),
+            ('js/00-main.js','function setBattleAllyTargetSelectionMode('),
+            ('js/00-main.js','function selectBattleAllyTarget('),
+            ('js/00-main.js','function renderPlayers('),
+            ('js/00-main.js','function openHomeFeature('),
+          ]: extract(path,needle)
           PY
