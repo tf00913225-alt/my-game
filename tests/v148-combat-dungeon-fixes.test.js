@@ -7,6 +7,7 @@ const vm=require("node:vm");
 const index=fs.readFileSync("index.html","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
+const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const source=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const css=fs.readFileSync("css/43-v148-combat-dungeon-fixes.css","utf8");
 const buildSource=fs.readFileSync("scripts/build-production.mjs","utf8");
@@ -59,8 +60,16 @@ function baseContext(overrides={}){
     },overrides);
     context.window=context;
     vm.createContext(context);
+    vm.runInContext(slotOwnerSource,context);
     vm.runInContext(source,context);
     return context;
+}
+
+function setEnemyFormation(context,indexes){
+    const owner=context.FourSymbolsBattlefieldSlots;
+    const snapshot=owner.createEnemyFormationSnapshot(indexes,{originalFormationType:indexes.length});
+    owner.setActiveEnemySnapshot(snapshot);
+    return snapshot;
 }
 
 test("V148 remains ordered inside the deterministic gameplay bundle",()=>{
@@ -86,6 +95,7 @@ test("tri targets follow the rendered fixed row without ACE skipping",()=>{
         currentBattleMonsters:[0,1,2,3,4],monsters,
         getSkillTargets:()=>[0,2,4]
     });
+    setEnemyFormation(context,[0,1,2,3,4]);
     assert.deepEqual(Array.from(context.getSkillTargets(2,"tri")),[1,2,3]);
     monsters[1].hp=0;
     assert.deepEqual(Array.from(context.getSkillTargets(2,"tri")),[2,3],"a dead slot is filtered, not replaced by a farther card");
@@ -105,6 +115,7 @@ test("enemy Rage buffs only one adjacent trio",()=>{
         v141TryMonsterSpecialAction:()=>false,showMonsterSkillNameBadge(){},
         addBattleLog(){},updateUI(){},finishPlayerAction(){ finishes++; },v141PlayCardEffect(){}
     });
+    setEnemyFormation(context,[0,1,2,3,4]);
     assert.equal(context.v141TryMonsterSpecialAction(2),true);
     assert.deepEqual(monsters.map(monster=>monster.v141TeamBuffs.length),[0,1,1,1,0]);
     assert.equal(finishes,1);

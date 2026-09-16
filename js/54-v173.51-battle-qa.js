@@ -12,16 +12,23 @@ function guard(name){const old=window[name];if(typeof old!=="function"||old.__v1
 ["addPoint","removePoint","confirmStatus","learnSkill","upgradeSkill"].forEach(guard);
 document.addEventListener("click",e=>{if(!inBattle())return;const b=e.target?.closest?.("button,[role=button]");if(!b)return;const s=String(b.getAttribute?.("onclick")||"");if(!/(addPoint|removePoint|confirmStatus|learnSkill|upgradeSkill)\s*\(/.test(s))return;e.preventDefault();e.stopImmediatePropagation();blocked();},true);
 
-function fivePriority(indexes){const list=(indexes||[]).filter(Number.isInteger);if(list.length!==5)return null;let rows=null;try{if(typeof window.v148GetFormationRows==="function")rows=window.v148GetFormationRows(list);else if(typeof window.v138GetFormationRows==="function")rows=window.v138GetFormationRows(list)}catch(_){}const row=Array.isArray(rows)&&Array.isArray(rows[0])&&rows[0].length===5?rows[0].slice():list.slice();return [row[2],row[1],row[3],row[0],row[4]].filter(Number.isInteger);}
-if(typeof window.v148GetAutoTargetPriority==="function"){const old=window.v148GetAutoTargetPriority;window.v148GetAutoTargetPriority=function(indexes){return fivePriority(indexes)||old.apply(this,arguments)}}
+function fivePriority(indexes){
+    const list=(indexes||[]).filter(Number.isInteger);
+    if(list.length!==5)return null;
+    try{
+        if(typeof window.v148GetAutoTargetPriority==="function"){
+            return window.v148GetAutoTargetPriority(list).slice();
+        }
+    }catch(_){}
+    return [list[3],list[1],list[4],list[2],list[0]].filter(Number.isInteger);
+}
 window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 
 /* V174 battle presentation owner.
-   Keep the proven 10-seat geometry and action/turn UI untouched. Only the
-   visual shell inside each existing combat slot changes: the card frame is
-   transparent, artwork gets its own presentation layer, HP/SP text shows the
-   current value only, and the already-existing lunge classes animate artwork
-   instead of dragging the HUD bars with the portrait. */
+   Slot geometry is owned exclusively by FourSymbolsBattlefieldSlots plus the
+   formal render-geometry adapter. This layer owns only artwork decoration,
+   layering and transient animation. It deliberately contains no Slot/Unit/HUD
+   top/left/right/bottom/inset/width/height positioning rules. */
 function ensureBattlePresentationStyles(){
     if(document.getElementById("v174-cardless-battle-style"))return;
     const style=document.createElement("style");
@@ -31,52 +38,26 @@ function ensureBattlePresentationStyles(){
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{
     border:0!important;outline:0!important;box-shadow:none!important;
     background-color:transparent!important;background-image:none!important;
-    isolation:isolate!important;
+    isolation:isolate!important;overflow:visible!important;
     transition-property:opacity!important;transition-duration:.15s!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
-    position:absolute!important;inset:0!important;z-index:1!important;
-    display:block!important;pointer-events:none!important;
+    z-index:1!important;display:block!important;pointer-events:none!important;overflow:visible!important;
     background-repeat:no-repeat!important;background-color:transparent!important;
+    background-size:contain!important;background-position:center bottom!important;
     transform-origin:50% 82%!important;will-change:transform,filter!important;
     animation:v174BattleIdle 3.4s ease-in-out infinite!important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
 }
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
-    inset:-2px -2px 30px!important;
-    background-size:contain!important;background-position:center bottom!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
-    position:absolute!important;left:50%!important;bottom:13px!important;
-    margin:0!important;transform:translateX(-50%)!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.sp-bar{
-    position:absolute!important;left:50%!important;bottom:0!important;
-    margin:0!important;transform:translateX(-50%)!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp{
-    position:absolute!important;left:50%!important;bottom:13px!important;
-    display:block!important;visibility:visible!important;opacity:1!important;
-    margin:0!important;transform:translateX(-50%)!important;
-}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp,
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp{
-    position:absolute!important;left:50%!important;bottom:0!important;
     display:block!important;visibility:visible!important;opacity:1!important;
-    margin:0!important;transform:translateX(-50%)!important;
 }
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{
-    z-index:20!important;
-}
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{z-index:20!important;}
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
-    position:absolute!important;left:0!important;right:0!important;top:0!important;
-    display:flex!important;min-height:14px!important;align-items:center!important;justify-content:center!important;
-    margin:0!important;padding:0 2px!important;line-height:14px!important;text-align:center!important;
-    white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
-    z-index:24!important;pointer-events:none!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
-    inset:15px -5px 26px!important;
-    background-size:cover!important;background-position:center center!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    text-align:center!important;white-space:nowrap!important;overflow:visible!important;
+    visibility:visible!important;opacity:1!important;z-index:24!important;pointer-events:none!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
     content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;
@@ -88,25 +69,19 @@ function ensureBattlePresentationStyles(){
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit .sp-bar,
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-hp,
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-sp{z-index:20!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{
-    opacity:0!important;pointer-events:none!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{
-    border:0!important;background:none!important;box-shadow:none!important;
-}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{opacity:0!important;pointer-events:none!important;}
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{border:0!important;background:none!important;box-shadow:none!important;}
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn{
     outline:2px solid #f1c96d!important;outline-offset:1px!important;border-radius:8px!important;
     box-shadow:0 0 0 1px rgba(255,232,163,.34),0 0 14px rgba(241,201,109,.82)!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.ally-targetable{box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target{
-    border:0!important;box-shadow:none!important;
-}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target{border:0!important;box-shadow:none!important;}
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn>.v174-battle-art,
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target>.v174-battle-art{
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7)));
 }
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up{animation:none!important;}
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up,
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down{animation:none!important;}
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up>.v174-battle-art{animation:v174BattleLungeUp .45s ease!important;}
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down>.v174-battle-art{animation:v174BattleLungeDown .45s ease!important;}
@@ -115,9 +90,7 @@ function ensureBattlePresentationStyles(){
 @keyframes v174BattleLungeUp{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(-13px) scale(1.035)}68%{transform:translateY(-5px) scale(1.015)}}
 @keyframes v174BattleLungeDown{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(13px) scale(1.035)}68%{transform:translateY(5px) scale(1.015)}}
 @keyframes v174BattleHitShake{0%,100%{transform:translate(0,0)}18%{transform:translate(-4px,1px)}36%{transform:translate(4px,-1px)}54%{transform:translate(-3px,0)}72%{transform:translate(2px,1px)}}
-@media (prefers-reduced-motion:reduce){
-    #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{animation:none!important;}
-}
+@media (prefers-reduced-motion:reduce){#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{animation:none!important;}}
 `;
     document.head.appendChild(style);
 }
@@ -172,7 +145,10 @@ function shakeArtForPopup(node){
     if(!(node instanceof Element))return;
     const popups=node.matches?.(".damage-popup.hp-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup.hp-popup")||[]);
     popups.forEach(popup=>{
-        const card=popup.closest(".battle-player,.battle-monster");
+        const owner=window.FourSymbolsBattlefieldSlots;
+        const slot=popup.dataset?.slot||owner?.getSlotFromElement?.(popup)||null;
+        const slotElement=slot&&owner?.getSlotElement?.(slot);
+        const card=slotElement?.querySelector?.(".battle-player,.battle-monster")||popup.closest(".battle-player,.battle-monster");
         const art=card?.querySelector(":scope > .v174-battle-art");
         if(!art)return;
         art.classList.remove("v174-hit-shake");void art.offsetWidth;art.classList.add("v174-hit-shake");
@@ -180,49 +156,26 @@ function shakeArtForPopup(node){
     });
 }
 
-/* V173.51: the EXP-row metadata is injected by V133 after the V131 list render.
-   A later list rerender could replace those rows and momentarily/permanently remove
-   the "目前 EXP / 升下一級需求" line. Decorate synchronously after every render
-   so the requirement never disappears while the EXP pool is open. */
+/* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
-    if(typeof window.v173DecorateExpPoolDistributionUi==="function"){
-        window.v173DecorateExpPoolDistributionUi();
-    }
+    if(typeof window.v173DecorateExpPoolDistributionUi==="function")window.v173DecorateExpPoolDistributionUi();
 }
 if(typeof renderExpDistributeList==="function"&&!renderExpDistributeList.__v17351ExpStable){
     const previousRenderExpDistributeList=renderExpDistributeList;
-    const stableRender=function(){
-        const result=previousRenderExpDistributeList.apply(this,arguments);
-        decorateExpRows();
-        return result;
-    };
-    stableRender.__v17351ExpStable=true;
-    renderExpDistributeList=stableRender;
-    window.renderExpDistributeList=stableRender;
+    const stableRender=function(){const result=previousRenderExpDistributeList.apply(this,arguments);decorateExpRows();return result;};
+    stableRender.__v17351ExpStable=true;renderExpDistributeList=stableRender;window.renderExpDistributeList=stableRender;
 }
 function ensureExpRowsVisible(){
-    const list=document.getElementById("expDistributeList");
-    if(!list)return;
-    const rows=Array.from(list.querySelectorAll(".v131-exp-row"));
-    if(rows.length&&rows.some(row=>!row.querySelector(".v173-exp-row-meta")))decorateExpRows();
+    const list=document.getElementById("expDistributeList");if(!list)return;
+    const rows=Array.from(list.querySelectorAll(".v131-exp-row"));if(rows.length&&rows.some(row=>!row.querySelector(".v173-exp-row-meta")))decorateExpRows();
 }
 decorateExpRows();
 
 function syncManagement(){
-    /*
-       VFX lifecycle belongs exclusively to V142/V143. This management QA
-       observer used to hide #v143-skill-stage every 300ms when its broad
-       non-battle heuristic became true. During a terminal hit battleActive
-       can change before the last visual finishes, which made the final skill
-       name/damage appear while the actual Sprite/VFX vanished.
-       Never write VFX visibility from this subsystem.
-    */
+    /* VFX lifecycle belongs exclusively to the battle VFX owner. */
     document.body.classList.remove("v17351-management-open");
-    document.querySelectorAll(".v17342-element-box-use-notice").forEach(n=>{
-        if(!n.classList.contains("v17351-large-use-notice"))n.classList.add("v17351-large-use-notice");
-    });
-    ensureExpRowsVisible();
-    syncBattlePresentation();
+    document.querySelectorAll(".v17342-element-box-use-notice").forEach(n=>{if(!n.classList.contains("v17351-large-use-notice"))n.classList.add("v17351-large-use-notice");});
+    ensureExpRowsVisible();syncBattlePresentation();
 }
 window.v17351SyncManagement=syncManagement;
 

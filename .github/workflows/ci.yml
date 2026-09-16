@@ -58,12 +58,16 @@ jobs:
           node --check .github/scripts/run-skill-progression-browser-qa.mjs
           node --check .github/scripts/run-relic-progression-browser-qa.mjs
           node --check .github/scripts/run-adventure-browser-qa.mjs
+          node --check .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
 
       - name: Run Adventure V1 targeted regression
         run: node tests/adventure-node-system-v1.test.js
+
+      - name: Run Fixed Slot battlefield rendering regression
+        run: node tests/fixed-slot-battlefield-rendering-v2.test.js
 
       - name: Ensure existing asset-test dependency
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
@@ -87,17 +91,34 @@ jobs:
           npm run build
           mkdir -p artifacts/build-sync
           cp asset-manifest.json artifacts/build-sync/asset-manifest.json
-          git diff -- asset-manifest.json config/feature-manifest.json scripts/build-production.mjs build/feature-adventure-* > artifacts/build-sync/build-sync.diff || true
-          find build -maxdepth 1 -type f -name 'feature-adventure-*' -print | sort > artifacts/build-sync/adventure-build-files.txt
+          cp build/asset-manifest.json artifacts/build-sync/build-asset-manifest.json
+          cp build/gameplay-core.*.js artifacts/build-sync/
+          cp build/gameplay-core.*.css artifacts/build-sync/
+          git diff -- asset-manifest.json config/feature-manifest.json scripts/build-production.mjs 'build/feature-adventure-*' 'build/gameplay-core.*' > artifacts/build-sync/build-sync.diff || true
+          find build -maxdepth 1 -type f \( -name 'feature-adventure-*' -o -name 'gameplay-core.*' \) -print | sort > artifacts/build-sync/build-files.txt
 
       - name: Upload build synchronization evidence
         if: failure() && steps.build_sync.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
-          name: adventure-build-sync-${{ github.sha }}
+          name: production-build-sync-${{ github.sha }}
           path: artifacts/build-sync
           if-no-files-found: error
           retention-days: 14
+
+      - name: Run Fixed Slot battlefield 9x16 mobile browser QA
+        id: fixed_slot_browser
+        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+        run: node .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
+
+      - name: Upload Fixed Slot battlefield browser evidence
+        if: always() && steps.fixed_slot_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fixed-slot-battlefield-browser-qa-${{ github.sha }}
+          path: artifacts/browser-qa/fixed-slot-battlefield-rendering-v2.json
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Run Adventure V1 mobile browser QA
         id: adventure_browser
