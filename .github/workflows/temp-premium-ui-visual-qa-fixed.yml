@@ -31,16 +31,69 @@ jobs:
           npm run build:check
           git diff --check
 
+      - name: Install ephemeral browser controller
+        run: npm install --no-save --package-lock=false puppeteer-core
+
       - name: Run exact-viewport visual QA
         shell: bash
         run: |
-          awk '/cat > \/tmp\/premium-ui-visual-qa.mjs <<'"'"'NODE'"'"'/{capture=1;next} capture && /^          NODE$/{exit} capture{sub(/^          /,"");print}' .github/workflows/temp-premium-ui-visual-qa.yml > /tmp/premium-ui-visual-qa.mjs
-          test -s /tmp/premium-ui-visual-qa.mjs
-          sed -i 's/mobile:true/mobile:false/' /tmp/premium-ui-visual-qa.mjs
-          sed -i '/await cdp("Runtime.enable");/a\\          await cdp("Emulation.setTouchEmulationEnabled",{enabled:true,maxTouchPoints:5});' /tmp/premium-ui-visual-qa.mjs
-          printf '\nprocess.exit(0);\n' >> /tmp/premium-ui-visual-qa.mjs
-          node --check /tmp/premium-ui-visual-qa.mjs
-          timeout 120s node /tmp/premium-ui-visual-qa.mjs
+          awk '/cat > \/tmp\/premium-ui-visual-qa.mjs <<'"'"'NODE'"'"'/{capture=1;next} capture && /^          NODE$/{exit} capture{sub(/^          /,"");print}' .github/workflows/temp-premium-ui-visual-qa.yml > /tmp/premium-ui-visual-qa-source.mjs
+          test -s /tmp/premium-ui-visual-qa-source.mjs
+          awk '/^const sizes=/{exit} {print}' /tmp/premium-ui-visual-qa-source.mjs > .tmp-premium-ui-visual-qa.mjs
+          cat >> .tmp-premium-ui-visual-qa.mjs <<'NODE'
+          const {default:puppeteer}=await import("puppeteer-core");
+          const sizes=[[360,800],[390,844],[412,915]];
+          const report=[];
+          const browser=await puppeteer.launch({
+            executablePath:chrome,
+            headless:true,
+            args:["--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files"]
+          });
+          try{
+            for(const [name] of Object.entries(pages)){
+              for(const [w,h] of sizes){
+                const page=await browser.newPage();
+                await page.setViewport({width:w,height:h,deviceScaleFactor:1,isMobile:false,hasTouch:true});
+                const file=path.join(fixtures,`${name}.html`);
+                const url="file://"+file.replace(/\\/g,"/");
+                await page.goto(url,{waitUntil:"load",timeout:15000});
+                await new Promise(resolve=>setTimeout(resolve,100));
+                const metrics=await page.evaluate(()=>{
+                  const root=document.querySelector("#game-stage");
+                  const bad=[...document.querySelectorAll("*")].filter(el=>{
+                    const style=getComputedStyle(el);
+                    return el.scrollWidth>el.clientWidth+2 && style.overflowX!=="auto" && style.overflowX!=="scroll";
+                  });
+                  return {
+                    width:innerWidth,
+                    height:innerHeight,
+                    htmlScrollWidth:document.documentElement.scrollWidth,
+                    bodyOverflow:document.documentElement.scrollWidth>innerWidth+2,
+                    rootOverflow:root?root.scrollWidth>root.clientWidth+2:false,
+                    offenders:bad.slice(0,8).map(el=>({tag:el.tagName,id:el.id,cls:String(el.className||"").slice(0,100),sw:el.scrollWidth,cw:el.clientWidth}))
+                  };
+                });
+                if(metrics.width!==w||metrics.height!==h){
+                  throw new Error(`${name} expected ${w}x${h} viewport, got ${metrics.width}x${metrics.height}`);
+                }
+                if(metrics.bodyOverflow||metrics.rootOverflow){
+                  throw new Error(`${name} ${w}x${h} has root horizontal overflow: ${JSON.stringify(metrics.offenders)}`);
+                }
+                const png=path.join(out,`${name}-${w}x${h}.png`);
+                await page.screenshot({path:png,type:"png",fullPage:false});
+                report.push({page:name,size:`${w}x${h}`,metrics});
+                await page.close();
+              }
+            }
+          }finally{
+            await browser.close();
+          }
+          fs.writeFileSync(path.join(out,"visual-qa-report.json"),JSON.stringify({head:process.env.GITHUB_SHA,pages:Object.keys(pages),sizes,report},null,2));
+          console.log(`Visual QA generated ${report.length} exact-viewport snapshots`);
+          NODE
+          node --check .tmp-premium-ui-visual-qa.mjs
+          timeout 120s node .tmp-premium-ui-visual-qa.mjs
+          rm -f .tmp-premium-ui-visual-qa.mjs
 
       - name: Upload exact-viewport visual QA evidence
         uses: actions/upload-artifact@v4
