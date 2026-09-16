@@ -1,0 +1,149 @@
+name: AllyTri V170 Runtime Order Validation
+
+on:
+  push:
+    branches:
+      - validation/ally-tri-v170-runtime-order-integration-20260916
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    name: Node 24 integration validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Confirm validation base and Node version
+        run: |
+          set -euo pipefail
+          echo "NODE_VERSION=$(node --version)"
+          echo "INITIAL_HEAD=$(git rev-parse HEAD)"
+          git cat-file -e b01f996b53c9321c29dbc389d820af33714f4581^{commit}
+          git diff --exit-code b01f996b53c9321c29dbc389d820af33714f4581 HEAD -- js css tests || true
+
+      - name: 1 - Fixed Slot tri target window
+        run: |
+          set -euo pipefail
+          node tests/fixed-slot-tri-target-window.test.js
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const vm=require('node:vm');
+          const context=vm.createContext({window:{},console});
+          context.window.window=context.window;
+          vm.runInContext(fs.readFileSync('js/battlefield-slot-owner.js','utf8'),context,{filename:'js/battlefield-slot-owner.js'});
+          const owner=context.window.FourSymbolsBattlefieldSlots;
+          const formation=owner.normalizeAllyFormation(null,[0,1,2]);
+          const results=[0,1,2].map(primary=>owner.resolveAllyTargets(formation,primary,'allyTri',()=>true));
+          console.log('ALLY_TRI_RESULTS='+JSON.stringify(results));
+          NODE
+
+      - name: 2 - Rage allyTri Fixed Slot regression
+        run: |
+          set -euo pipefail
+          node tests/ally-tri-rage-fixed-slot-regression.test.js
+
+      - name: 3 - Fixed Slot battlefield rendering regression
+        run: |
+          set -euo pipefail
+          node tests/fixed-slot-battlefield-rendering-v2.test.js
+
+      - name: Apply formal V170 runtime-order and Snapshot fixture correction
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path=Path('tests/v170-final-spec-integration.test.js')
+          source=path.read_text(encoding='utf-8')
+
+          runtime_needle='''const EXPECTED_RUNTIME_PATHS=[\n    "js/25-v131-fix-batch.js",'''
+          runtime_replacement='''const EXPECTED_RUNTIME_PATHS=[\n    "js/battlefield-slot-owner.js",\n    "js/25-v131-fix-batch.js",'''
+          if source.count(runtime_needle)!=1:
+              raise SystemExit('V170 runtime path anchor was not unique')
+          source=source.replace(runtime_needle,runtime_replacement,1)
+
+          snapshot_needle='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        Math.random=function(){ return 0; };'''
+          snapshot_replacement='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        if(\n            !snapshot ||\n            window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,0)!=="ENEMY_F3"\n        ){\n            throw new Error("V170 fixture must create the formal ENEMY_F3 snapshot before monster action");\n        }\n        Math.random=function(){ return 0; };'''
+          if source.count(snapshot_needle)!=1:
+              raise SystemExit('V170 Snapshot fixture anchor was not unique')
+          source=source.replace(snapshot_needle,snapshot_replacement,1)
+
+          if 'fs.readFileSync("js/battlefield-slot-owner.js","utf8")' in source.replace('"js/battlefield-slot-owner.js",',''):
+              raise SystemExit('Case-local battlefield-slot-owner load remains in V170')
+
+          path.write_text(source,encoding='utf-8')
+          PY
+
+          git diff --check
+          test "$(git diff --name-only)" = "tests/v170-final-spec-integration.test.js"
+          grep -A3 'const EXPECTED_RUNTIME_PATHS=' tests/v170-final-spec-integration.test.js
+          git diff -- tests/v170-final-spec-integration.test.js
+
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add tests/v170-final-spec-integration.test.js
+          git commit -m "test: align V170 runtime order with production"
+          echo "VALIDATION_HEAD=$(git rev-parse HEAD)"
+          git push origin HEAD:refs/heads/validation/ally-tri-v170-runtime-order-integration-20260916
+
+      - name: Confirm validation diff scope
+        run: |
+          set -euo pipefail
+          echo 'CHANGED_FILES_FROM_PRODUCTION_FIX:'
+          git diff --name-only b01f996b53c9321c29dbc389d820af33714f4581 HEAD
+          if git diff --name-only b01f996b53c9321c29dbc389d820af33714f4581 HEAD -- js css | grep -q .; then
+            echo 'Unexpected production runtime/style diff' >&2
+            exit 1
+          fi
+          test "$(git diff --name-only b01f996b53c9321c29dbc389d820af33714f4581 HEAD -- tests)" = "tests/v170-final-spec-integration.test.js"
+
+      - name: 4 - Full V170 final integration
+        run: |
+          set -euo pipefail
+          timeout 180s node tests/v170-final-spec-integration.test.js
+
+      - name: Prepare Git comparison base and typography baselines
+        env:
+          CI_BASE_SHA: b01f996b53c9321c29dbc389d820af33714f4581
+        run: |
+          set -euo pipefail
+          if [[ "$CI_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] && \
+             [[ ! "$CI_BASE_SHA" =~ ^0{40}$ ]] && \
+             ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
+          fi
+
+          for typography_baseline_sha in \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            if ! git cat-file -e "$typography_baseline_sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$typography_baseline_sha"
+            fi
+          done
+
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+          identify -version | head -n 1
+
+      - name: Run all 177 Node test suites
+        env:
+          CI_BASE_SHA: b01f996b53c9321c29dbc389d820af33714f4581
+          CI_HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          node .github/scripts/ci.mjs tests
