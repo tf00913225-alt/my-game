@@ -217,6 +217,19 @@
         return value;
     }
 
+    function triRowWindowSlots(allowed,primarySlot){
+        const slots=(Array.isArray(allowed)?allowed:[]).filter(slot=>!!SLOT_META[slot]);
+        if(!slots.includes(primarySlot)){ return []; }
+        const meta=SLOT_META[primarySlot];
+        const row=slots.filter(slot=>
+            SLOT_META[slot].side===meta.side&&SLOT_META[slot].row===meta.row
+        ).sort((a,b)=>SLOT_META[a].column-SLOT_META[b].column);
+        if(row.length<=3){ return row; }
+        const primaryIndex=row.indexOf(primarySlot);
+        const start=Math.max(0,Math.min(row.length-3,primaryIndex-1));
+        return row.slice(start,start+3);
+    }
+
     function resolveSlotsFromShape(side,primarySlot,shape){
         const allowed=slotsForSide(side);
         if(!allowed.includes(primarySlot)){ return []; }
@@ -235,12 +248,7 @@
                     return (order[SLOT_META[a].row]??9)-(order[SLOT_META[b].row]??9);
                 });
         }
-        if(normalized==="tri"){
-            return allowed.filter(slot=>
-                SLOT_META[slot].row===meta.row&&
-                Math.abs(SLOT_META[slot].column-meta.column)<=1
-            ).sort((a,b)=>SLOT_META[a].column-SLOT_META[b].column);
-        }
+        if(normalized==="tri"){ return triRowWindowSlots(allowed,primarySlot); }
         return [primarySlot];
     }
 
@@ -334,10 +342,7 @@
         const allowed=geometrySlotsForSide(normalized);
         const meta=SLOT_META[primarySlot];
         if(!meta||meta.side!==normalized||!allowed.includes(primarySlot)){ return []; }
-        const row=geometryRowSlots(normalized,meta.row);
-        if(row.length<=3){ return row; }
-        const start=Math.max(1,Math.min(row.length-2,meta.column-1));
-        return row.filter(slot=>SLOT_META[slot].column>=start&&SLOT_META[slot].column<start+3);
+        return triRowWindowSlots(allowed,primarySlot);
     }
 
     function geometrySlotsFromShape(side,primarySlot,shape){
