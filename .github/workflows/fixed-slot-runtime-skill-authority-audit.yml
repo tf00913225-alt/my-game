@@ -1,0 +1,81 @@
+name: Fixed Slot Runtime Skill Authority Audit
+
+on:
+  push:
+    branches:
+      - feature/fixed-slot-battlefield-v1-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/fixed-slot-battlefield-v1-20260916
+          fetch-depth: 1
+      - name: Trace formal runtime skill authority
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          build=Path('scripts/build-production.mjs').read_text(encoding='utf-8')
+          def array(name):
+              m=re.search(rf'const {re.escape(name)}=\[(.*?)\];',build,re.S)
+              if not m:
+                  raise SystemExit(f'missing {name}')
+              return re.findall(r'"([^"]+\.js)"',m.group(1))
+
+          files=array('appScripts')+array('gameplayScripts')+array('skillScripts')
+          tracked={
+              'flameTornado':'烈焰龍捲',
+              'stormCircle':'風焰術',
+              'sandWind':'滾石術',
+              'waterKnife':'水刀斬',
+              'frostPunch':'冰霜拳',
+              'iceSpin':'冰旋一閃',
+              'frostCrush':'冰封重擊',
+              'waterBall':'水球術',
+              'floodBeast':'洪水猛獸',
+              'iceArrowRain':'冰霜箭雨',
+              'freeze':'冰封',
+              'healSpell':'治療術',
+              'revive':'復活術',
+              'purifyMind':'淨心訣'
+          }
+          print('=== FORMAL SCRIPT LOAD ORDER ===')
+          for i,path in enumerate(files): print(f'{i:02d} {path}')
+
+          print('\n=== TRACKED SKILL OCCURRENCES IN LOAD ORDER ===')
+          for skill,label in tracked.items():
+              print(f'\n## {label} / {skill}')
+              found=False
+              for order,path in enumerate(files):
+                  text=Path(path).read_text(encoding='utf-8')
+                  lines=text.splitlines()
+                  hits=[i for i,line in enumerate(lines) if skill in line]
+                  if not hits: continue
+                  found=True
+                  print(f'-- {order:02d} {path}')
+                  for hit in hits[:12]:
+                      a=max(0,hit-2); b=min(len(lines),hit+5)
+                      print(f'  [line {hit+1}]')
+                      for j in range(a,b): print(f'    {j+1:05d}: {lines[j]}')
+              if not found: print('  no occurrence')
+
+          print('\n=== getSkillTargets OVERRIDES IN LOAD ORDER ===')
+          for order,path in enumerate(files):
+              text=Path(path).read_text(encoding='utf-8')
+              if 'getSkillTargets' not in text: continue
+              lines=text.splitlines()
+              hits=[i for i,line in enumerate(lines) if 'getSkillTargets' in line]
+              print(f'-- {order:02d} {path}')
+              for hit in hits[:20]:
+                  a=max(0,hit-2); b=min(len(lines),hit+6)
+                  print(f'  [line {hit+1}]')
+                  for j in range(a,b): print(f'    {j+1:05d}: {lines[j]}')
+          PY
