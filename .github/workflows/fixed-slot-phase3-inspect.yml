@@ -1,4 +1,4 @@
-name: Fixed Slot Phase 3 Inspect
+name: Fixed Slot Checkpoint 3
 
 on:
   push:
@@ -6,52 +6,41 @@ on:
       - feature/fixed-slot-battlefield-v1-20260916
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  inspect:
+  patch:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
           ref: feature/fixed-slot-battlefield-v1-20260916
-          fetch-depth: 1
-      - name: Print exact phase 3 owner functions
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply persistent ally formation
+        run: python3 scripts/_fixed_slot_phase3.py
+      - name: Verify checkpoint 3
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          def extract(path, needle, limit=12000):
-              text=Path(path).read_text(encoding='utf-8')
-              start=text.find(needle)
-              print(f'\n===== {path} :: {needle} @ {start} =====')
-              if start<0: return
-              brace=text.find('{',start)
-              if brace<0:
-                  print(text[start:start+limit]); return
-              depth=0; quote=None; esc=False; i=brace
-              while i<len(text):
-                  c=text[i]
-                  if quote:
-                      if esc: esc=False
-                      elif c=='\\': esc=True
-                      elif c==quote: quote=None
-                  else:
-                      if c in "'\"`": quote=c
-                      elif c=='{': depth+=1
-                      elif c=='}':
-                          depth-=1
-                          if depth==0:
-                              print(text[start:i+1]); return
-                  i+=1
-              print(text[start:start+limit])
-
-          for path,needle in [
-            ('js/00-main.js','function prepareAction('),
-            ('js/00-main.js','function setBattleAllyTargetSelectionMode('),
-            ('js/00-main.js','function selectBattleAllyTarget('),
-            ('js/00-main.js','function renderPlayers('),
-            ('js/00-main.js','function openHomeFeature('),
-          ]: extract(path,needle)
-          PY
+          node --check js/battlefield-slot-owner.js
+          node --check js/00-main.js
+          node --check js/16-stage-v54-main-city-runtime.js
+          node --check js/25-v131-fix-batch.js
+          node --check js/35-v141-ui-battle.js
+          node --check js/36-v141-content-systems.js
+          node --check js/42-v148-combat-dungeon-fixes.js
+          node --check js/50-v169-water-skill-rules.js
+          node tests/fixed-battlefield-slots.test.js
+          node tests/fixed-battlefield-ally-formation.test.js
+          git diff --check
+      - name: Commit safe checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/fixed-slot-phase3-inspect.yml scripts/_fixed_slot_phase3.py
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: add persistent ally formation"
+          git push origin HEAD:feature/fixed-slot-battlefield-v1-20260916
