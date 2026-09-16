@@ -1,0 +1,93 @@
+name: Diagnose Fixed Slot snapshot lifecycle
+
+on:
+  push:
+    branches:
+      - validation/fixed-slot-snapshot-lifecycle-proof-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check out lifecycle diagnosis branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/fixed-slot-snapshot-lifecycle-proof-20260916
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Verify frozen production inputs
+        shell: bash
+        run: |
+          node --version
+          git rev-parse HEAD
+          git diff --exit-code b01f996b53c9321c29dbc389d820af33714f4581 -- \
+            js/battlefield-slot-owner.js \
+            js/00-main.js \
+            js/25-v131-fix-batch.js \
+            js/39-v143-skill-animation.js \
+            js/42-v148-combat-dungeon-fixes.js \
+            js/46-v155-dev-fixes.js \
+            tests/v170-final-spec-integration.test.js \
+            tests/fixed-slot-tri-target-window.test.js \
+            tests/ally-tri-rage-fixed-slot-regression.test.js
+
+      - name: Build workspace-only lifecycle cases and markers
+        shell: bash
+        run: |
+          python scripts/diagnose-fixed-slot-snapshot-lifecycle.py
+          grep -A2 'const EXPECTED_RUNTIME_PATHS=' .diagnostic/v170-lifecycle-case-1.test.js
+          grep -n 'CARD 1 official enter\|DELAY 1 enter\|LIFE wrapper before clear\|LIFE originalStartBattle before render' js/39-v143-skill-animation.js js/25-v131-fix-batch.js js/00-main.js
+          git status --short
+
+      - name: Run CASE 1 formal battle lifecycle
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=3s 30s node .diagnostic/v170-lifecycle-case-1.test.js 2>&1 | tee /tmp/lifecycle-case-1.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "CASE_1_EXIT=$status"
+          echo "CASE_1_LAST_LIFE=$(grep '^LIFE ' /tmp/lifecycle-case-1.log | tail -n 1 || true)"
+          echo "CASE_1_LAST_CARD=$(grep '^CARD ' /tmp/lifecycle-case-1.log | tail -n 1 || true)"
+          echo "CASE_1_LAST_DELAY=$(grep '^DELAY ' /tmp/lifecycle-case-1.log | tail -n 1 || true)"
+          echo "CASE_1_LAST_STATE=$(grep '^CASE 1 ' /tmp/lifecycle-case-1.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "CASE_1_UNEXPECTED_EXIT=$status"
+          fi
+
+      - name: Run CASE 2 V170 direct mutation
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=3s 30s node .diagnostic/v170-direct-case-2.test.js 2>&1 | tee /tmp/lifecycle-case-2.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "CASE_2_EXIT=$status"
+          echo "CASE_2_LAST_CARD=$(grep '^CARD ' /tmp/lifecycle-case-2.log | tail -n 1 || true)"
+          echo "CASE_2_LAST_DELAY=$(grep '^DELAY ' /tmp/lifecycle-case-2.log | tail -n 1 || true)"
+          echo "CASE_2_LAST_STATE=$(grep '^CASE 2 ' /tmp/lifecycle-case-2.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "CASE_2_UNEXPECTED_EXIT=$status"
+          fi
+
+      - name: Summarize lifecycle proof
+        if: always()
+        shell: bash
+        run: |
+          echo '===== CASE 1 FORMAL LIFECYCLE ====='
+          if [ -f /tmp/lifecycle-case-1.log ]; then
+            grep -E '^CASE 1 |^LIFE |^CARD |^DELAY ' /tmp/lifecycle-case-1.log | tail -n 160 || true
+          fi
+          echo '===== CASE 2 DIRECT MUTATION ====='
+          if [ -f /tmp/lifecycle-case-2.log ]; then
+            grep -E '^CASE 2 |^LIFE |^CARD |^DELAY ' /tmp/lifecycle-case-2.log | tail -n 120 || true
+          fi
