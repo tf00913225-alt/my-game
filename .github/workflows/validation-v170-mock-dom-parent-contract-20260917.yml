@@ -1,0 +1,122 @@
+name: V170 Mock DOM Parent Contract Validation
+
+on:
+  push:
+    branches:
+      - validation/v170-mock-dom-parent-contract-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Node 24 V170 final tests-only validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FIX_HEAD: e3de8f7fee4e65986420528247bdbb99cb588a07
+      BASE_SHA: b01f996b53c9321c29dbc389d820af33714f4581
+
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Confirm validation ancestry and scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "NODE_VERSION=$(node --version)"
+          echo "VALIDATION_HEAD=$(git rev-parse HEAD)"
+          git cat-file -e "$FIX_HEAD^{commit}"
+          test "$(git merge-base "$FIX_HEAD" HEAD)" = "$FIX_HEAD"
+          echo 'VALIDATION_ONLY_DIFF:'
+          git diff --name-only "$FIX_HEAD" HEAD
+          test "$(git diff --name-only "$FIX_HEAD" HEAD)" = '.github/workflows/validation-v170-mock-dom-parent-contract-20260917.yml'
+          echo 'FIX_DIFF_FROM_PRODUCTION_FIX:'
+          git diff --name-only "$BASE_SHA" "$FIX_HEAD"
+          test "$(git diff --name-only "$BASE_SHA" "$FIX_HEAD")" = 'tests/v170-final-spec-integration.test.js'
+          if git diff --name-only "$BASE_SHA" "$FIX_HEAD" -- js css | grep -q .; then
+            echo 'Unexpected production runtime/style diff' >&2
+            exit 2
+          fi
+
+      - name: 1 - Fixed Slot tri target window
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 120s node tests/fixed-slot-tri-target-window.test.js
+
+      - name: 2 - Rage allyTri Fixed Slot regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 120s node tests/ally-tri-rage-fixed-slot-regression.test.js
+
+      - name: 3 - Fixed Slot battlefield rendering regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 120s node tests/fixed-slot-battlefield-rendering-v2.test.js
+
+      - name: 4 - V170 final integration within 90 seconds
+        shell: bash
+        run: |
+          set -uo pipefail
+          set +e
+          timeout 90s node tests/v170-final-spec-integration.test.js 2>&1 | tee /tmp/v170.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "V170_EXIT=$status"
+          echo "V170_LAST_COMPLETED=$(grep '^✓ ' /tmp/v170.log | tail -n1 || true)"
+          if [ "$status" -eq 124 ]; then
+            echo 'V170_TIMEOUT=true'
+            exit 124
+          fi
+          if [ "$status" -ne 0 ]; then
+            echo 'V170_ASSERTION_OR_RUNTIME_FAILURE=true'
+            exit "$status"
+          fi
+          grep -E '^V170 final integration suite: [0-9]+ tests passed\.$' /tmp/v170.log
+
+      - name: Prepare Git comparison base and typography baselines
+        env:
+          CI_BASE_SHA: b01f996b53c9321c29dbc389d820af33714f4581
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$CI_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] && \
+             [[ ! "$CI_BASE_SHA" =~ ^0{40}$ ]] && \
+             ! git cat-file -e "$CI_BASE_SHA^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
+          fi
+
+          for typography_baseline_sha in \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            if ! git cat-file -e "$typography_baseline_sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$typography_baseline_sha"
+            fi
+          done
+
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+          identify -version | head -n 1
+
+      - name: Run all 177 Node test suites
+        env:
+          CI_BASE_SHA: b01f996b53c9321c29dbc389d820af33714f4581
+          CI_HEAD_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node .github/scripts/ci.mjs tests
