@@ -4,6 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
+const ownerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const vfxSource=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const bossSource=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 
@@ -24,7 +25,8 @@ function style(){
 function makeNode(id,rect){
     return {
         id:id||"",dataset:{},children:[],style:style(),classList:classList(),offsetParent:{},removed:false,
-        appendChild(child){ child.parentNode=this; this.children.push(child); return child; },
+        appendChild(child){ child.parentNode=this; child.parentElement=this; this.children.push(child); return child; },
+        removeChild(child){ this.children=this.children.filter(node=>node!==child); child.parentNode=null; child.parentElement=null; return child; },
         remove(){
             this.removed=true;
             if(this.parentNode&&Array.isArray(this.parentNode.children)){
@@ -34,29 +36,72 @@ function makeNode(id,rect){
         setAttribute(){},
         querySelector(){ return null; },
         querySelectorAll(){ return []; },
+        closest(){ return null; },
         getBoundingClientRect(){ return rect||{left:0,top:0,right:80,bottom:100,width:80,height:100}; }
     };
 }
+function rect(left,top,width,height){
+    return {left,top,width,height,right:left+width,bottom:top+height};
+}
+function centerOf(rectangle){
+    return {x:rectangle.left+rectangle.width/2,y:rectangle.top+rectangle.height/2};
+}
+function pointFromSprite(sprite){
+    return {x:Number.parseFloat(sprite.style.left),y:Number.parseFloat(sprite.style.top)};
+}
+function assertPoint(actual,expected,message){
+    assert.equal(actual.x,expected.x,message+" X");
+    assert.equal(actual.y,expected.y,message+" Y");
+}
+function buildSlotDom(){
+    const slotNodes={};
+    const add=(slot,left,top,width,height,className)=>{
+        const node=makeNode(slot,rect(left,top,width,height));
+        node.dataset.slot=slot;
+        node.classList.add(className);
+        slotNodes[slot]=node;
+        return node;
+    };
+    ["ENEMY_B1","ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_B5"].forEach((slot,index)=>add(slot,40+index*70,60,60,80,"v-fixed-enemy-slot"));
+    ["ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"].forEach((slot,index)=>add(slot,40+index*70,180,60,80,"v-fixed-enemy-slot"));
+    ["ALLY_F1","ALLY_F2","ALLY_F3"].forEach((slot,index)=>add(slot,95+index*95,500,70,90,"v-fixed-ally-slot"));
+    ["ALLY_B1","ALLY_B2","ALLY_B3"].forEach((slot,index)=>add(slot,95+index*95,610,70,90,"v-fixed-ally-slot"));
+    add("MECH_L",30,300,90,70,"boss-mechanism-position");
+    add("MECH_C",165,300,90,70,"boss-mechanism-position");
+    add("MECH_R",300,300,90,70,"boss-mechanism-position");
+    return slotNodes;
+}
 
 function createRuntime(action,targetType){
-    const body=makeNode("body",{left:0,top:0,right:420,bottom:720,width:420,height:720});
-    const monster0=makeNode("battleMonster0",{left:220,top:80,right:300,bottom:190,width:80,height:110});
-    const monster1=makeNode("battleMonster1",{left:310,top:90,right:385,bottom:190,width:75,height:100});
-    const player0=makeNode("battlePlayerCard0",{left:170,top:520,right:250,bottom:620,width:80,height:100});
-    const player1=makeNode("battlePlayerCard1",{left:255,top:520,right:335,bottom:620,width:80,height:100});
-    const monsterArea=makeNode("battleMonsterArea",{left:190,top:50,right:400,bottom:220,width:210,height:170});
-    const playerArea=makeNode("battlePlayerRow",{left:40,top:475,right:380,bottom:650,width:340,height:175});
-    const mechanism=makeNode("mechanismCard",{left:18,top:248,right:138,bottom:338,width:120,height:90});
+    const body=makeNode("body",rect(0,0,420,720));
+    const battlePage=makeNode("battlePage",rect(0,0,420,720));
+    const slotNodes=buildSlotDom();
+    battlePage.querySelector=selector=>{
+        const match=String(selector||"").match(/\[data-slot="([A-Z0-9_]+)"\]/);
+        return match?slotNodes[match[1]]||null:null;
+    };
+
+    const monster0=makeNode("battleMonster0",rect(220,80,80,110));
+    const monster1=makeNode("battleMonster1",rect(310,90,75,100));
+    const player0=makeNode("battlePlayerCard0",rect(10,520,80,100));
+    const player1=makeNode("battlePlayerCard1",rect(255,520,80,100));
+    const monsterArea=makeNode("battleMonsterArea",rect(190,50,210,170));
+    const playerArea=makeNode("battlePlayerRow",rect(40,475,340,175));
+    const mechanism=makeNode("mechanismCard",rect(18,248,120,90));
     mechanism.dataset.id="mechanism-1";
     mechanism.classList.add("boss-mechanism-card");
-    const slot=makeNode("bossMechanismSlot",{left:10,top:235,right:150,bottom:350,width:140,height:115});
-    slot.appendChild(mechanism);
-    slot.querySelectorAll=selector=>selector===".boss-mechanism-card"?[mechanism]:[];
+    const mechanismHost=makeNode("bossMechanismSlot",rect(10,235,400,150));
+    mechanismHost.appendChild(slotNodes.MECH_L);
+    mechanismHost.appendChild(slotNodes.MECH_C);
+    mechanismHost.appendChild(slotNodes.MECH_R);
+    slotNodes.MECH_C.appendChild(mechanism);
+    mechanismHost.querySelectorAll=selector=>selector===".boss-mechanism-card"?[mechanism]:[];
 
     const byId={
+        battlePage,
         battleMonster0:monster0,battleMonster1:monster1,
         battlePlayerCard0:player0,battlePlayerCard1:player1,
-        battleMonsterArea:monsterArea,battlePlayerRow:playerArea,bossMechanismSlot:slot
+        battleMonsterArea:monsterArea,battlePlayerRow:playerArea,bossMechanismSlot:mechanismHost
     };
     let gateId=0;
     const director={
@@ -75,6 +120,7 @@ function createRuntime(action,targetType){
     const context={
         console,Promise,Set,Map,Array,Object,Number,String,Boolean,RegExp,Date,Math,Proxy,
         setTimeout,clearTimeout,innerWidth:420,innerHeight:720,
+        localStorage:{getItem(){return null;},setItem(){},removeItem(){}},
         v142SkillAnimationDirector:director,
         monsters:[
             {name:"Boss",rank:"boss",hp:5000,alive:true,statusEffects:[],activeBuffs:[]},
@@ -93,6 +139,7 @@ function createRuntime(action,targetType){
             body,readyState:"complete",
             createElement(tag){ return makeNode(tag); },
             getElementById(id){ return byId[id]||null; },
+            querySelector(selector){ return battlePage.querySelector(selector); },
             querySelectorAll(){ return []; },
             addEventListener(){}
         },
@@ -100,10 +147,18 @@ function createRuntime(action,targetType){
     };
     context.window=context;
     vm.createContext(context);
+    vm.runInContext(ownerSource,context,{filename:"js/battlefield-slot-owner.js"});
+    const owner=context.FourSymbolsBattlefieldSlots;
+    assert.ok(owner,"formal Fixed Slot owner must install");
+    const snapshot=owner.createEnemyFormationSnapshot([0,1],{originalFormationType:2});
+    owner.setActiveEnemySnapshot(snapshot);
+    owner.ensureAllyFormation([0,1]);
+    assert.equal(owner.getSlotFromElement(mechanism),"MECH_C","function card must inherit its formal mechanism Slot");
+    assert.ok(owner.getAllySlotForCharacter(0),"player 0 must have a formal Ally Slot");
     vm.runInContext(vfxSource,context,{filename:"js/39-v143-skill-animation.js"});
     const config={id:action,name:action,element:"normal",category:"physical",targetType,duration:1450,resolveDuration:1450};
     context.v142SkillAnimationDirector.play(config,{side:"player",actorIndex:0});
-    return {context,mechanism,player0};
+    return {context,owner,snapshot,mechanism,player0,slotNodes};
 }
 
 const AFFECTED_SPREAD_DAMAGE_SKILLS=[
@@ -114,7 +169,7 @@ const AFFECTED_SPREAD_DAMAGE_SKILLS=[
 ];
 
 for(const [id,targetType] of AFFECTED_SPREAD_DAMAGE_SKILLS){
-    const {context,mechanism,player0}=createRuntime(id,targetType);
+    const {context,owner,mechanism}=createRuntime(id,targetType);
     const current=context.v143SkillAnimationState.current;
     assert.ok(current,id+" must open the formal V143 cast");
     assert.deepEqual(Array.from(current.targetIndexes),["mechanism:mechanism-1"],id+" must preserve the selected function-card target");
@@ -125,18 +180,22 @@ for(const [id,targetType] of AFFECTED_SPREAD_DAMAGE_SKILLS){
     assert.equal(sprite.dataset.renderer,"dom-sprite",id+" must remain on the formal DOM Sprite owner");
 
     const placement=String(sprite.dataset.placement||"");
-    const targetRect=mechanism.getBoundingClientRect();
-    const targetX=targetRect.left+targetRect.width/2;
-    const targetY=targetRect.top+targetRect.height/2;
+    const targetCenter=owner.getSlotCenter("MECH_C");
+    assert.ok(targetCenter,id+" function-card target must expose formal mechanism Slot geometry");
+    const cardCenter=centerOf(mechanism.getBoundingClientRect());
+    assert.notDeepEqual({x:targetCenter.x,y:targetCenter.y},cardCenter,id+" regression fixture must keep card rect distinct from formal Slot center");
     if(placement==="trajectory"||placement==="targetTrajectory"){
-        const actorRect=player0.getBoundingClientRect();
-        const actorX=actorRect.left+actorRect.width/2;
-        const actorY=actorRect.top+actorRect.height/2;
-        assert.equal(sprite.style["--v143-sprite-dx"],targetX-actorX+"px",id+" must travel toward the function card X");
-        assert.equal(sprite.style["--v143-sprite-dy"],targetY-actorY+"px",id+" must travel toward the function card Y");
+        const allySlot=owner.getAllySlotForCharacter(0);
+        const actorCenter=owner.getSlotCenter(allySlot);
+        assert.ok(actorCenter,id+" trajectory actor must expose formal Ally Slot geometry");
+        const start=pointFromSprite(sprite);
+        assertPoint(start,{x:actorCenter.x,y:actorCenter.y},id+" must start from the formal Ally Slot");
+        const dx=Number.parseFloat(sprite.style["--v143-sprite-dx"]);
+        const dy=Number.parseFloat(sprite.style["--v143-sprite-dy"]);
+        assertPoint({x:start.x+dx,y:start.y+dy},{x:targetCenter.x,y:targetCenter.y},id+" must travel toward the formal mechanism Slot");
     }else{
-        assert.equal(sprite.style.left,targetX+"px",id+" must center on the function card X");
-        assert.equal(sprite.style.top,targetY+"px",id+" must center on the function card Y");
+        assertPoint(pointFromSprite(sprite),{x:targetCenter.x,y:targetCenter.y},id+" must center on the formal mechanism Slot");
+        assert.notDeepEqual(pointFromSprite(sprite),cardCenter,id+" must not use the retired function-card rect as VFX geometry");
     }
 }
 
