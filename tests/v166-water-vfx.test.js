@@ -8,6 +8,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 const zlib=require("node:zlib");
 
+const slotOwner=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const support=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
@@ -140,7 +141,7 @@ function decodeRgbaPng(path,columns,rows){
 function makeNode(rect){
     const classes=new Set();
     const node={
-        id:"",dataset:{},children:[],parentNode:null,offsetParent:{},
+        id:"",dataset:{},children:[],parentNode:null,parentElement:null,offsetParent:{},
         style:{
             setProperty(name,value){ this[name]=String(value); },
             getPropertyValue(name){ return this[name]||""; }
@@ -150,10 +151,11 @@ function makeNode(rect){
             remove(...names){ names.forEach(name=>classes.delete(name)); },
             contains(name){ return classes.has(name); }
         },
-        appendChild(child){ child.parentNode=this; this.children.push(child); return child; },
+        appendChild(child){ child.parentNode=this; child.parentElement=this; this.children.push(child); return child; },
         removeChild(child){
             this.children=this.children.filter(candidate=>candidate!==child);
             child.parentNode=null;
+            child.parentElement=null;
             return child;
         },
         remove(){ if(this.parentNode){ this.parentNode.removeChild(this); } },
@@ -164,17 +166,24 @@ function makeNode(rect){
         },
         querySelector(selector){ return this.querySelectorAll(selector)[0]||null; },
         querySelectorAll(selector){
+            const selectors=String(selector||"").split(",").map(value=>value.trim()).filter(Boolean);
             const results=[];
-            const matcher=candidate=>{
-                if(selector==="*"){ return true; }
-                if(selector.startsWith("#")){ return candidate.id===selector.slice(1); }
-                if(selector.startsWith(".")){
-                    return String(candidate.className||"").split(/\s+/).includes(selector.slice(1));
+            const matcher=(candidate,part)=>{
+                if(part==="*"){ return true; }
+                if(part.startsWith("#")){ return candidate.id===part.slice(1); }
+                const slotMatch=part.match(/^\.([\w-]+)\[data-slot="([^"]+)"\]$/);
+                if(slotMatch){
+                    return String(candidate.className||"").split(/\s+/).includes(slotMatch[1])&&candidate.dataset.slot===slotMatch[2];
+                }
+                if(part.startsWith(".")){
+                    const required=part.slice(1).split(".");
+                    const classes=String(candidate.className||"").split(/\s+/);
+                    return required.every(name=>classes.includes(name));
                 }
                 return false;
             };
             const visit=current=>current.children.forEach(child=>{
-                if(matcher(child)){ results.push(child); }
+                if(selectors.some(part=>matcher(child,part))){ results.push(child); }
                 visit(child);
             });
             visit(this);
@@ -206,12 +215,40 @@ function makeNode(rect){
 
 function loadRuntime(options={}){
     const body=makeNode();
+    const battlePage=makeNode({left:0,top:0,right:960,bottom:720,width:960,height:720});
+    battlePage.id="battlePage";
+    body.appendChild(battlePage);
+    const slotNodes={};
+    const enemyXs=[100,220,340,460,580];
+    const allyXs=[180,340,500];
+    ["B","F"].forEach((row,rowIndex)=>{
+        enemyXs.forEach((left,index)=>{
+            const id=`ENEMY_${row}${index+1}`;
+            const top=rowIndex===0?60:180;
+            const slot=makeNode({left,top,right:left+80,bottom:top+100,width:80,height:100});
+            slot.className="v-fixed-enemy-slot";
+            slot.dataset.slot=id;
+            slotNodes[id]=slot;
+            battlePage.appendChild(slot);
+        });
+    });
+    ["F","B"].forEach((row,rowIndex)=>{
+        allyXs.forEach((left,index)=>{
+            const id=`ALLY_${row}${index+1}`;
+            const top=rowIndex===0?420:540;
+            const slot=makeNode({left,top,right:left+100,bottom:top+100,width:100,height:100});
+            slot.className="v-fixed-ally-slot";
+            slot.dataset.slot=id;
+            slotNodes[id]=slot;
+            battlePage.appendChild(slot);
+        });
+    });
     const monsterArea=makeNode({left:260,top:40,right:700,bottom:300,width:440,height:260});
     monsterArea.id="battleMonsterArea";
     const playerArea=makeNode({left:20,top:340,right:460,bottom:500,width:440,height:160});
     playerArea.id="battlePlayerRow";
-    body.appendChild(monsterArea);
-    body.appendChild(playerArea);
+    battlePage.appendChild(monsterArea);
+    battlePage.appendChild(playerArea);
     const cards={battleMonsterArea:monsterArea,battlePlayerRow:playerArea};
     const monsterRects=[
         {left:300,top:90,right:376,bottom:190,width:76,height:100},
@@ -271,7 +308,8 @@ function loadRuntime(options={}){
         document:{
             body,
             createElement(){ return makeNode(); },
-            getElementById(id){ return cards[id]||null; },
+            getElementById(id){ return id==="battlePage"?battlePage:(cards[id]||null); },
+            querySelector(selector){ return battlePage.querySelector(selector)||body.querySelector(selector); },
             querySelectorAll(selector){ return body.querySelectorAll(selector); }
         },
         monsters,
@@ -298,9 +336,15 @@ function loadRuntime(options={}){
         dispose(){}
     };
     vm.createContext(context);
+    vm.runInContext(slotOwner,context);
+    const owner=context.FourSymbolsBattlefieldSlots;
+    assert.ok(owner,"formal Fixed Slot owner must install");
+    const snapshot=owner.createEnemyFormationSnapshot([0,1,2],{originalFormationType:3});
+    owner.setActiveEnemySnapshot(snapshot);
+    owner.ensureAllyFormation([0,1,2]);
     vm.runInContext(animation,context);
     return {
-        context,body,cards,monsterArea,playerArea,monsters,party,scheduled,monsterHits,playerHits,
+        context,owner,snapshot,slotNodes,battlePage,body,cards,monsterArea,playerArea,monsters,party,scheduled,monsterHits,playerHits,
         playCalls:()=>playCalls,
         legacyIceSpinCalls:()=>legacyIceSpinCalls
     };
@@ -320,6 +364,38 @@ function stageSprites(runtime){
         stage,
         sprites:stage.children.filter(node=>String(node.className).includes("v143-vfx-sprite"))
     };
+}
+
+function enemySlot(runtime,index){
+    return runtime.owner.getEnemySlotForMonster(runtime.snapshot,index);
+}
+function allySlot(runtime,index){
+    return runtime.owner.getAllySlotForCharacter(index);
+}
+function positionOf(node){
+    return [Number.parseFloat(node.style.left),Number.parseFloat(node.style.top)];
+}
+function formalPosition(runtime,side,index){
+    const slot=side==="monster"?enemySlot(runtime,index):allySlot(runtime,index);
+    const point=runtime.owner.getSlotCenter(slot);
+    return [point.x,point.y];
+}
+function battlefieldExpectedSize(runtime,id,side){
+    const sprite=runtime.context.v143SkillAnimationManifest[id].sprite;
+    const bounds=runtime.owner.getSideRect(side);
+    const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+    const coverageScale=clamp(Number(sprite.coverageScale)||Number(sprite.scale)||1,1,1.4);
+    const viewportWidth=Number(runtime.context.innerWidth)||960;
+    const viewportHeight=Number(runtime.context.innerHeight)||720;
+    const width=clamp(
+        Math.round(bounds.width*coverageScale),Number(sprite.minWidth)||Number(sprite.minSize)||160,
+        Number(sprite.maxWidth)||Math.max(240,viewportWidth*.94)
+    );
+    const height=clamp(
+        Math.round(bounds.height*coverageScale),Number(sprite.minHeight)||Number(sprite.minSize)||160,
+        Number(sprite.maxHeight)||Math.max(240,viewportHeight*.92)
+    );
+    return Math.round(Math.min(width,height));
 }
 
 test("all ten cast sheets and both status sheets fully decode as transparent RGBA grids",()=>{
@@ -382,8 +458,12 @@ test("single-target sheets stay centered on the actual selected card",()=>{
         const {stage,sprites}=stageSprites(runtime);
         assert.equal(sprites.length,1,id);
         assert.equal(sprites[0].dataset.targetIndex,"2",id);
-        assert.equal(sprites[0].style.left,"578px",id);
-        assert.equal(sprites[0].style.top,"140px",id);
+        assert.deepEqual(positionOf(sprites[0]),formalPosition(runtime,"monster",2),id+" formal target Slot");
+        assert.notDeepEqual(
+            formalPosition(runtime,"monster",2),
+            [578,140],
+            id+" must not use the retired battle card center"
+        );
         assert.equal(sprites[0].style.width,sprites[0].style.height,id+" cells stay square");
         assert.equal(stage.children.some(node=>String(node.className).includes("v143-skill-flight")),false,id);
         assert.equal(sprites[0].style["--v143-sprite-duration"],duration+"ms",id);
@@ -408,9 +488,9 @@ test("Ice Spin creates one synchronized sheet for every real target and never fo
             indexes,indexes.join(",")
         );
         assert.deepEqual(
-            sprites.map(node=>node.style.left),
-            indexes.map(index=>["338px","458px","578px"][index]),
-            indexes.join(",")
+            sprites.map(positionOf),
+            indexes.map(index=>formalPosition(runtime,"monster",index)),
+            indexes.join(",")+" formal target Slots"
         );
         indexes.forEach(index=>runtime.context.showMonsterHit(index,10,"hp"));
         const delayedNumbers=runtime.scheduled.slice(-indexes.length);
@@ -436,8 +516,8 @@ test("Water Ball renders one sheet centered on the actual living target group",(
         assert.equal(sprites.length,1,indexes.join(","));
         assert.equal(sprites[0].dataset.placement,"group");
         assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprites[0].style.left,"458px");
-        assert.equal(sprites[0].style.top,"140px");
+        const triRect=runtime.owner.getGeometryRectFromShape("monster",enemySlot(runtime,1),"tri");
+        assert.deepEqual(positionOf(sprites[0]),[triRect.centerX,triRect.centerY]);
         assert.equal(sprites[0].style["--v143-sprite-duration"],"1400ms");
     });
 
@@ -449,7 +529,11 @@ test("Water Ball renders one sheet centered on the actual living target group",(
     const beastSprites=stageSprites(beast).sprites;
     assert.equal(beastSprites.length,1);
     assert.equal(beastSprites[0].dataset.targetIndex,"1");
-    assert.ok(beastSprites[0].style["--v143-sprite-dx"]);
+    const beastActor=formalPosition(beast,"player",0);
+    const beastTarget=formalPosition(beast,"monster",1);
+    assert.deepEqual(positionOf(beastSprites[0]),beastActor);
+    assert.equal(Number.parseFloat(beastSprites[0].style["--v143-sprite-dx"]),beastTarget[0]-beastActor[0]);
+    assert.equal(Number.parseFloat(beastSprites[0].style["--v143-sprite-dy"]),beastTarget[1]-beastActor[1]);
     assert.match(css,/@keyframes v143RasterTravel\{/);
     assert.doesNotMatch(css,/v166WaterTargetTravel/);
 });
@@ -467,6 +551,8 @@ test("enemy Water Ball keeps one live-target group while endpoints resolve",()=>
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.placement,"group");
     assert.equal(sprites[0].dataset.targetIndexes,"0,2");
+    const triRect=runtime.owner.getGeometryRectFromShape("player",allySlot(runtime,1),"tri");
+    assert.deepEqual(positionOf(sprites[0]),[triRect.centerX,triRect.centerY]);
 });
 
 test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
@@ -486,16 +572,18 @@ test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
         const sprite=sprites[0];
         assert.equal(sprite.dataset.targetSide,"monster");
         assert.equal(sprite.dataset.placement,"battlefield");
-        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+        const sideRect=runtime.owner.getSideRect("monster");
+        assert.equal(sprite.dataset.areaId,"fixed-enemy-zone");
         assert.equal(sprite.dataset.fixedFormation,"true");
         assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprite.style.left,"480px");
-        assert.equal(sprite.style.top,"170px");
+        assert.deepEqual(positionOf(sprite),[sideRect.centerX,sideRect.centerY]);
+        const expectedSize=battlefieldExpectedSize(runtime,"iceArrowRain","monster");
+        assert.equal(Number.parseFloat(sprite.style.width),expectedSize);
+        assert.equal(Number.parseFloat(sprite.style.height),expectedSize);
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
         assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
         results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
-    assert.deepEqual(results[0],["480px","170px","317px","317px"]);
     assert.deepEqual(results[1],results[0]);
 });
 
@@ -507,13 +595,14 @@ test("enemy Ice Arrow Rain stays centered on the complete player formation",()=>
     const {sprites}=stageSprites(runtime);
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetSide,"player");
-    assert.equal(sprites[0].dataset.areaId,"battlePlayerRow");
+    assert.equal(sprites[0].dataset.areaId,"fixed-ally-zone");
     assert.equal(sprites[0].dataset.fixedFormation,"true");
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(sprites[0].style.left,"240px");
-    assert.equal(sprites[0].style.top,"420px");
-    assert.equal(sprites[0].style.width,"195px");
-    assert.equal(sprites[0].style.height,"195px");
+    const sideRect=runtime.owner.getSideRect("player");
+    assert.deepEqual(positionOf(sprites[0]),[sideRect.centerX,sideRect.centerY]);
+    const expectedSize=battlefieldExpectedSize(runtime,"iceArrowRain","player");
+    assert.equal(Number.parseFloat(sprites[0].style.width),expectedSize);
+    assert.equal(Number.parseFloat(sprites[0].style.height),expectedSize);
     assert.equal(sprites[0].style.clipPath||sprites[0].style["clip-path"],"none");
     assert.equal(sprites[0].querySelectorAll(".v166-water-battlefield-tile").length,0);
 });
@@ -531,10 +620,11 @@ test("enemy Tidal Beast discovers one real player endpoint even when damage is a
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetIndex,"2");
     assert.equal(sprites[0].dataset.travel,"true");
-    assert.equal(sprites[0].style.left,"338px");
-    assert.equal(sprites[0].style.top,"140px");
-    assert.equal(sprites[0].style["--v143-sprite-dx"],"41px");
-    assert.equal(sprites[0].style["--v143-sprite-dy"],"278px");
+    const actor=formalPosition(runtime,"monster",0);
+    const target=formalPosition(runtime,"player",2);
+    assert.deepEqual(positionOf(sprites[0]),actor);
+    assert.equal(Number.parseFloat(sprites[0].style["--v143-sprite-dx"]),target[0]-actor[0]);
+    assert.equal(Number.parseFloat(sprites[0].style["--v143-sprite-dy"]),target[1]-actor[1]);
 });
 
 test("late callbacks cannot expand a single-target Tidal Beast cast",()=>{
@@ -555,7 +645,10 @@ test("the retained tri-target Freeze and ally-all Heal still follow each actual 
     );
     const freezeSprites=stageSprites(freeze).sprites;
     assert.deepEqual(freezeSprites.map(node=>node.dataset.targetIndex),["0","2"]);
-    assert.deepEqual(freezeSprites.map(node=>node.style.left),["338px","578px"]);
+    assert.deepEqual(
+        freezeSprites.map(positionOf),
+        [0,2].map(index=>formalPosition(freeze,"monster",index))
+    );
 
     const heal=loadRuntime();
     heal.context.v142SkillAnimationDirector.play(
@@ -564,7 +657,10 @@ test("the retained tri-target Freeze and ally-all Heal still follow each actual 
     );
     const healSprites=stageSprites(heal).sprites;
     assert.deepEqual(healSprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
-    assert.deepEqual(healSprites.map(node=>node.style.left),["99px","239px","379px"]);
+    assert.deepEqual(
+        healSprites.map(positionOf),
+        [0,1,2].map(index=>formalPosition(heal,"player",index))
+    );
 });
 
 test("Freeze and Frostbite loops mirror statusEffects only and never open an action gate",()=>{
@@ -654,8 +750,7 @@ test("enemy Freeze discovers its successful player target from the applied statu
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetIndex,"1");
-    assert.equal(sprites[0].style.left,"239px");
-    assert.equal(sprites[0].style.top,"418px");
+    assert.deepEqual(positionOf(sprites[0]),formalPosition(runtime,"player",1));
     assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-freeze"),null);
 });
 
