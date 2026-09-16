@@ -1,4 +1,4 @@
-name: Fixed Slot Phase 4 Typography Diagnose
+name: Fixed Slot Phase 4 Build Diagnose
 
 on:
   push:
@@ -22,37 +22,28 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Apply corrected Boss and mechanism owner patch only
+      - name: Apply the exact final Phase 4 patch in the disposable runner
         run: |
           python3 - <<'PYCODE'
           from pathlib import Path
-          workflow=Path('.github/workflows/fixed-slot-phase4-boss-mechanism.yml').read_text(encoding='utf-8')
-          marker="          python3 - <<'PY'\n"
+          workflow=Path('.github/workflows/fixed-slot-phase4-integrate4.yml').read_text(encoding='utf-8')
+          marker="          python3 - <<'PYCODE'\n"
           start=workflow.index(marker)+len(marker)
-          end=workflow.index("\n          PY\n",start)
+          end=workflow.index("\n          PYCODE\n",start)
           body=workflow[start:end]
           body='\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines())
-          replacements={
-            'guards.map(unit=>unit.vGameplayBattlefieldSlot)':'Array.from(guards,unit=>unit.vGameplayBattlefieldSlot)',
-            'return owner.assignMonsterToEnemySlot(snapshot,monsterIndex,slot);':'return owner.assignMonsterToEnemySlot(snapshot,monsterIndex,slot)?slot:null;'
-          }
-          for old,new in replacements.items():
-              count=body.count(old)
-              if count!=1:
-                  raise SystemExit(f'expected one staged expression {old!r}, found {count}')
-              body=body.replace(old,new,1)
-          exec(compile(body,'phase4-owner-only-diagnostic-patch','exec'))
+          exec(compile(body,'phase4-final-build-diagnostic-patch','exec'))
           PYCODE
-      - name: Capture original typography guard output
+      - name: Capture production build gate output
         run: |
           mkdir -p diagnostics
           set +e
-          node tests/ui-typography-battle-preservation.test.js > diagnostics/typography-output.txt 2>&1
+          node scripts/build-production.mjs --check > diagnostics/build-output.txt 2>&1
           status=$?
           set -e
-          printf '\nEXIT_STATUS=%s\n' "$status" >> diagnostics/typography-output.txt
+          printf '\nEXIT_STATUS=%s\n' "$status" >> diagnostics/build-output.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: phase4-typography-output-full-history
-          path: diagnostics/typography-output.txt
+          name: phase4-build-output
+          path: diagnostics/build-output.txt
           if-no-files-found: error
