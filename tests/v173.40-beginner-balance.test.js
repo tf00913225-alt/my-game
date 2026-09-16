@@ -45,7 +45,7 @@ test("both patrol fight frames display rotated clockwise ninety degrees and walk
     assert.ok((main.match(/img\.style\.transform=\s*"none";/g)||[]).length>=2);
 });
 
-test("range VFX fixes remain fixed-size and centered after casualties",()=>{
+test("range VFX fixes remain fixed-size and centered through the formal Slot owner",()=>{
     assert.match(animation,/function castSheet\(src,placement,options\)\{[\s\S]*?renderer:"dom-sprite"/);
     assert.match(animation,/iceArrowRain:\{hit:DEFAULT_HIT,[\s\S]*?castSheet\("assets\/vfx\/water\/frost-arrow-rain-vfx\.png\?v=173\.19","battlefield",\{fixedFormation:true/);
     ["stormFlurry","windSpell","stormCircle","petrifyFist","earthquakeCrush","stoneThrow","sandWind"].forEach(id=>{
@@ -54,8 +54,9 @@ test("range VFX fixes remain fixed-size and centered after casualties",()=>{
     ["stormRain","flyingSandStrike"].forEach(id=>{
         assert.match(animation,new RegExp(id+':[\\s\\S]*?castSheet\\([\\s\\S]*?,"battlefield"'));
     });
-    assert.match(animation,/function fixedTriLayoutBounds\(current,indexes\)[\s\S]*?const layoutCenterX=[\s\S]*?centerX:layoutCenterX[\s\S]*?id:"fixed-tri-slots"/);
-    assert.match(animation,/if\(placement==="battlefield"\)[\s\S]*?sideAreaBounds\(current\.targetSide\)/);
+    assert.match(animation,/function geometryOwner\(\)\{[\s\S]*?window\.FourSymbolsBattlefieldSlots/);
+    assert.match(animation,/function geometryBounds\(current,indexes,placement\)[\s\S]*?owner\.getSideRect\(current\.targetSide\)[\s\S]*?owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
+    assert.doesNotMatch(animation,/function fixedTriLayoutBounds\(|function sideAreaBounds\(|function groupLayoutBounds\(|function fieldBounds\(/);
     assert.doesNotMatch(animation,/canvas-crop|createElement\(["']canvas["']\)|drawImage\(/);
 });
 
