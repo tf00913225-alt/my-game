@@ -18,23 +18,32 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/fixed-slot-battlefield-v1-20260916
-          fetch-depth: 2
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Apply the same final Phase 4 patch in the disposable runner
+      - name: Apply corrected Boss and mechanism owner patch only
         run: |
           python3 - <<'PYCODE'
           from pathlib import Path
-          workflow=Path('.github/workflows/fixed-slot-phase4-integrate4.yml').read_text(encoding='utf-8')
-          marker="          python3 - <<'PYCODE'\n"
+          workflow=Path('.github/workflows/fixed-slot-phase4-boss-mechanism.yml').read_text(encoding='utf-8')
+          marker="          python3 - <<'PY'\n"
           start=workflow.index(marker)+len(marker)
-          end=workflow.index("\n          PYCODE\n",start)
+          end=workflow.index("\n          PY\n",start)
           body=workflow[start:end]
           body='\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines())
-          exec(compile(body,'phase4-final-diagnostic-patch','exec'))
+          replacements={
+            'guards.map(unit=>unit.vGameplayBattlefieldSlot)':'Array.from(guards,unit=>unit.vGameplayBattlefieldSlot)',
+            'return owner.assignMonsterToEnemySlot(snapshot,monsterIndex,slot);':'return owner.assignMonsterToEnemySlot(snapshot,monsterIndex,slot)?slot:null;'
+          }
+          for old,new in replacements.items():
+              count=body.count(old)
+              if count!=1:
+                  raise SystemExit(f'expected one staged expression {old!r}, found {count}')
+              body=body.replace(old,new,1)
+          exec(compile(body,'phase4-owner-only-diagnostic-patch','exec'))
           PYCODE
-      - name: Capture typography guard output
+      - name: Capture original typography guard output
         run: |
           mkdir -p diagnostics
           set +e
@@ -44,6 +53,6 @@ jobs:
           printf '\nEXIT_STATUS=%s\n' "$status" >> diagnostics/typography-output.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: phase4-typography-output
+          name: phase4-typography-output-full-history
           path: diagnostics/typography-output.txt
           if-no-files-found: error
