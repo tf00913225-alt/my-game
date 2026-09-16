@@ -1,6 +1,6 @@
-/* Fixed Slot Battlefield Rendering V2
-   Canonical battlefield render geometry. Slot coordinates come from the DOM
-   created from FourSymbolsBattlefieldSlots; unit/art/HUD never size the Slot. */
+/* Fixed Slot Battlefield Rendering V2 — canonical render geometry.
+   FourSymbolsBattlefieldSlots owns Slot coordinates. This stylesheet owns only
+   how those formal Slots are projected into the battle page. */
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
     --battle-enemy-zone-height:188px;
@@ -13,7 +13,15 @@
     --battle-art-hud-reserve:25px;
 }
 
-/* Enemy Zone: two fixed coordinate rows inside one fixed-height zone. */
+/* The fixed viewport boundary is #game-stage. Internal battlefield ancestors
+   must not clip artwork, popups or VFX that paint beyond a small Slot. */
+#game-stage #battlePage.v-fixed-slot-render-v2,
+#game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-wrap{
+    overflow:visible !important;
+}
+
+/* Enemy Zone: two coordinate rows inside one fixed-height Zone. */
 #game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.v-fixed-enemy-zone{
     position:relative !important;
     display:block !important;
@@ -27,7 +35,6 @@
     overflow:visible !important;
     box-sizing:border-box !important;
 }
-
 #game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row{
     position:absolute !important;
     left:4px !important;
@@ -43,14 +50,8 @@
     overflow:visible !important;
     align-items:stretch !important;
 }
-
-#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="back"]{
-    top:0 !important;
-}
-#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="front"]{
-    bottom:0 !important;
-}
-
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="back"]{top:0 !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="front"]{bottom:0 !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot{
     position:relative !important;
     width:auto !important;
@@ -61,8 +62,7 @@
     contain:layout style !important;
 }
 
-/* Ally Zone: the front/back rows are coordinate layers, not natural-flow rows.
-   Empty back-row slots therefore never add another 102px row to the page. */
+/* Ally Zone: front/back are coordinate layers, never two natural-flow rows. */
 #game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow.v-fixed-ally-zone{
     position:relative !important;
     display:block !important;
@@ -76,7 +76,6 @@
     overflow:visible !important;
     box-sizing:border-box !important;
 }
-
 #game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-row{
     position:absolute !important;
     left:22px !important;
@@ -92,14 +91,8 @@
     overflow:visible !important;
     align-items:stretch !important;
 }
-
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-row[data-slot-row="back"]{
-    top:0 !important;
-}
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-row[data-slot-row="front"]{
-    bottom:0 !important;
-}
-
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-row[data-slot-row="back"]{top:0 !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-row[data-slot-row="front"]{bottom:0 !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot{
     position:relative !important;
     width:auto !important;
@@ -110,7 +103,7 @@
     contain:layout style !important;
 }
 
-/* Unit boxes fill their formal Slot. Artwork/HUD are visual children only. */
+/* Unit identity fills the Slot; it does not size or move it. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot > .battle-monster,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player{
     position:absolute !important;
@@ -132,8 +125,7 @@
     contain:layout style !important;
 }
 
-/* Artwork layer is anchored to Slot geometry and may paint beyond the tiny HUD
-   box without affecting layout. contain keeps the complete original aspect ratio. */
+/* Artwork is a paint layer. Full source aspect is preserved with contain. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-battle-slot > .battle-monster > .v174-battle-art,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player > .v174-battle-art{
     position:absolute !important;
@@ -143,16 +135,15 @@
     bottom:var(--battle-art-hud-reserve) !important;
     width:auto !important;
     height:auto !important;
-    overflow:visible !important;
     background-size:contain !important;
     background-position:center bottom !important;
     background-repeat:no-repeat !important;
+    overflow:visible !important;
     transform-origin:center bottom !important;
     pointer-events:none !important;
 }
 
-/* HUD anchors are absolute Slot-relative layers. Name length and bars never
-   participate in unit/slot layout. */
+/* HUD uses formal Slot anchors and never participates in Unit layout. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
     position:absolute !important;
@@ -185,7 +176,6 @@
     font-size:11px !important;
     z-index:8 !important;
 }
-
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar,
@@ -202,14 +192,9 @@
     box-sizing:border-box !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar{
-    bottom:11px !important;
-}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar{bottom:11px !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar{
-    bottom:1px !important;
-}
-
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar{bottom:1px !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-status-badges,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .monster-status-badges{
     position:absolute !important;
@@ -223,7 +208,7 @@
     z-index:9 !important;
 }
 
-/* Persistent status sprites are authored relative to the fixed Slot-sized Unit. */
+/* Status artwork is anchored to the Slot-sized Unit, not the source image. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v153-status-vfx{
     left:50% !important;
     top:42% !important;
@@ -232,7 +217,6 @@
     pointer-events:none !important;
 }
 
-/* Zones do not grow when reinforcements/mechanisms appear. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-mechanism-zone{
     position:relative !important;
     flex:0 0 auto !important;
@@ -244,7 +228,6 @@
     min-height:0 !important;
 }
 
-/* VFX/popups live in viewport coordinates after conversion from Slot geometry. */
 .v143-skill-stage[data-geometry-owner="fixed-slot"]{
     overflow:visible !important;
     contain:layout style !important;
