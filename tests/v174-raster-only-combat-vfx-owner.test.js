@@ -10,6 +10,7 @@ const v155=fs.readFileSync("js/46-v155-dev-fixes.js","utf8");
 const css141=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
 const css146=fs.readFileSync("css/42-v146-system-polish.css","utf8");
 const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
+const slotOwner=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const v143=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const css142=fs.readFileSync("css/39-v142-skill-animation.css","utf8");
 const css143=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
@@ -36,7 +37,7 @@ function classList(){
 
 function node(id,rect){
     return {
-        id:id||"",dataset:{},children:[],style:{
+        id:id||"",className:"",dataset:{},children:[],style:{
             setProperty(){},removeProperty(){}
         },classList:classList(),offsetParent:{},
         appendChild(child){ child.parentNode=this; this.children.push(child); return child; },
@@ -55,6 +56,29 @@ function runtime(){
     const monsterArea=node("battleMonsterArea",{left:210,top:80,right:390,bottom:250,width:180,height:170});
     const playerArea=node("battlePlayerRow",{left:40,top:460,right:380,bottom:630,width:340,height:170});
     const byId={battleMonster0:monster,battlePlayerCard0:player,battleMonsterArea:monsterArea,battlePlayerRow:playerArea};
+    const fixedSlots={};
+    ["B","F"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=5;column++){
+            const slot="ENEMY_"+row+column;
+            const left=15+(column-1)*78;
+            const top=rowIndex===0?45:170;
+            const slotNode=node(slot,{left,top,right:left+72,bottom:top+112,width:72,height:112});
+            slotNode.dataset.slot=slot;
+            slotNode.className="v-fixed-enemy-slot";
+            fixedSlots['.v-fixed-enemy-slot[data-slot="'+slot+'"]']=slotNode;
+        }
+    });
+    ["F","B"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=3;column++){
+            const slot="ALLY_"+row+column;
+            const left=55+(column-1)*110;
+            const top=rowIndex===0?470:595;
+            const slotNode=node(slot,{left,top,right:left+90,bottom:top+112,width:90,height:112});
+            slotNode.dataset.slot=slot;
+            slotNode.className="v-fixed-ally-slot";
+            fixedSlots['.v-fixed-ally-slot[data-slot="'+slot+'"]']=slotNode;
+        }
+    });
     let gateId=0;
     const director={
         play(config){
@@ -80,6 +104,7 @@ function runtime(){
             body,readyState:"complete",
             createElement(tag){ return node(tag); },
             getElementById(id){ return byId[id]||null; },
+            querySelector(selector){ return fixedSlots[selector]||null; },
             querySelectorAll(){ return []; },
             addEventListener(){}
         },
@@ -88,6 +113,10 @@ function runtime(){
     };
     context.window=context;
     vm.createContext(context);
+    vm.runInContext(slotOwner,context,{filename:"js/battlefield-slot-owner.js"});
+    const owner=context.FourSymbolsBattlefieldSlots;
+    owner.setActiveEnemySnapshot(owner.createEnemyFormationSnapshot([0],{originalFormationType:1}));
+    owner.hydrateAllyFormation(null,[0]);
     vm.runInContext(v143,context,{filename:"js/39-v143-skill-animation.js"});
     return context;
 }
@@ -180,23 +209,26 @@ test("V143 blocks later manifest and director fallback overrides",()=>{
     assert.ok(diagnostics.blockedDirectorOverrides>=1);
 });
 
-test("the same raster owner dispatches player-to-enemy and enemy-to-player",()=>{
+test("the same raster owner dispatches player-to-enemy and enemy-to-player with the formal Slot owner loaded",()=>{
     const context=runtime();
+    assert.ok(context.FourSymbolsBattlefieldSlots);
     const config={
         id:"flameSlash",name:"火焰斬",element:"fire",category:"physical",
         targetType:"single",duration:760,resolveDuration:760
     };
-    context.v142SkillAnimationDirector.play(config,{side:"player",actorIndex:0});
+    context.v142SkillAnimationDirector.play(config,{side:"player",actorIndex:0,targetId:0});
     assert.equal(context.v143SkillAnimationState.current.side,"player");
     assert.equal(context.v143SkillAnimationState.current.targetSide,"monster");
-    context.v142SkillAnimationDirector.play(config,{side:"monster",actorIndex:0});
+    context.v142SkillAnimationDirector.play(config,{side:"monster",actorIndex:0,targetId:0});
     assert.equal(context.v143SkillAnimationState.current.side,"monster");
     assert.equal(context.v143SkillAnimationState.current.targetSide,"player");
     context.v142SkillAnimationDirector.dispose();
 });
 
-test("resolved group targets and successful deferred statuses remain authoritative VFX endpoints",()=>{
-    assert.match(v143,/const explicitBounds=Array\.isArray\(current\.targetIds\)&&current\.targetIds\.length[\s\S]*?fieldBounds\(indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\)\)[\s\S]*?const layoutCenterX=explicitBounds/);
+test("resolved group targets and successful deferred statuses use formal fixed-slot geometry endpoints",()=>{
+    assert.match(v143,/function geometryOwner\(\)\{[\s\S]*?window\.FourSymbolsBattlefieldSlots/);
+    assert.match(v143,/function geometryBounds\(current,indexes,placement\)[\s\S]*?owner\.getSideRect\(current\.targetSide\)[\s\S]*?owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
+    assert.doesNotMatch(v143,/function fieldBounds\(|function groupLayoutBounds\(|function fixedTriLayoutBounds\(|function sideAreaBounds\(/);
     assert.match(v143,/if\(types\.indexOf\(type\)>=0\)\{[\s\S]*?registerTarget\(side,index,false\);[\s\S]*?current\.deferredStatusTargets\.get\(type\)/);
 });
 
