@@ -1,4 +1,4 @@
-name: V170 CASE B Mock DOM Ancestry Diagnosis
+name: Materialize clean V170 tests-only fix
 
 on:
   push:
@@ -6,181 +6,82 @@ on:
       - validation/v170-snapshot-fixture-audit-r2-20260916
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose:
-    name: Node 24 CASE B isolated mock DOM diagnosis
+  materialize:
+    name: Build one-file V170 fix commit
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      BASE_SHA: b6bdb0d6f6a1f21587ed68b0a153dea7782b665d
-      TARGET_TEST: accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules
+      FIX_BRANCH: fix/v170-final-runtime-fixture-contract-20260917
+      BASE_SHA: b01f996b53c9321c29dbc389d820af33714f4581
     steps:
-      - name: Check out diagnosis branch
+      - name: Check out clean fix branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 6
+          ref: ${{ env.FIX_BRANCH }}
+          fetch-depth: 4
 
-      - name: Use Node.js 24
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      - name: Confirm diagnosis scope
+      - name: Confirm exact base
         shell: bash
         run: |
           set -euo pipefail
-          echo "NODE_VERSION=$(node --version)"
-          echo "DIAGNOSIS_HEAD=$(git rev-parse HEAD)"
-          base="$(git merge-base "$BASE_SHA" HEAD)"
-          echo "MERGE_BASE=$base"
-          test "$base" = "$BASE_SHA"
-          git diff --name-only "$BASE_SHA" HEAD
-          if git diff --name-only "$BASE_SHA" HEAD | grep -v '^.github/workflows/validate-v170-snapshot-fixture-audit-r2.yml$' | grep -q .; then
-            echo 'Unexpected committed diagnosis diff' >&2
-            exit 2
-          fi
-          cp tests/v170-final-spec-integration.test.js /tmp/v170.original.js
-          cp js/39-v143-skill-animation.js /tmp/v143.original.js
-          cp js/battlefield-slot-owner.js /tmp/slot-owner.original.js
+          echo "BEFORE_HEAD=$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD)" = "$BASE_SHA"
+          test -z "$(git status --porcelain)"
 
-      - name: Phase 1 - CASE B first stuck STATUS tuple
+      - name: Apply only V170 test contract fixes
         shell: bash
         run: |
           set -euo pipefail
-          cp /tmp/v170.original.js tests/v170-final-spec-integration.test.js
-          cp /tmp/v143.original.js js/39-v143-skill-animation.js
-          cp /tmp/slot-owner.original.js js/battlefield-slot-owner.js
           python - <<'PY'
           from pathlib import Path
-          TARGET='accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules'
-          p=Path('tests/v170-final-spec-integration.test.js')
-          s=p.read_text(encoding='utf-8')
-          runner='''function test(name,handler){\n    handler();\n    passed++;\n    console.log("✓ "+name);\n}'''
-          isolated=f'''function test(name,handler){{\n    if(name!=={TARGET!r}){{ return; }}\n    handler();\n    passed++;\n    console.log("PASS "+name);\n}}'''
-          if s.count(runner)!=1: raise SystemExit('runner anchor not unique')
-          s=s.replace(runner,isolated,1)
-          dummy='''    const dummy=makeUniversalNode();\n    const storage=()=>{'''
-          dummy_diag='''    const dummy=makeUniversalNode();\n    console.log("MOCK parentElement self = "+(dummy.parentElement===dummy));\n    console.log("MOCK parentNode self = "+(dummy.parentNode===dummy));\n    const storage=()=>{'''
-          if s.count(dummy)!=1: raise SystemExit('dummy anchor not unique')
-          s=s.replace(dummy,dummy_diag,1)
-          caseb='''        monsters.splice(0,monsters.length,elite);\n        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
-          caseb_diag='''        monsters.splice(0,monsters.length,elite);\n        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        const caseBSnapshot=v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        console.log("CASE B snapshot slot = "+FourSymbolsBattlefieldSlots.getEnemySlotForMonster(caseBSnapshot,0));\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
-          if s.count(caseb)!=1: raise SystemExit('CASE B anchor not unique')
-          p.write_text(s.replace(caseb,caseb_diag,1),encoding='utf-8')
 
-          p=Path('js/39-v143-skill-animation.js')
-          s=p.read_text(encoding='utf-8')
-          old='''    function syncStatusSpriteEffects(){\n        purgeLegacyCardVfx();\n        const types=Object.keys(RAW_STATUS_SPRITES);\n        for(let index=0;index<10;index++){ types.forEach(type=>syncStatusSprite("monster",index,type)); }\n        for(let index=0;index<3;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }\n    }'''
-          new='''    function syncStatusSpriteEffects(){\n        purgeLegacyCardVfx();\n        const types=Object.keys(RAW_STATUS_SPRITES);\n        for(let index=0;index<10;index++){\n            types.forEach(type=>{\n                console.log("STATUS CALL monster "+index+" "+type);\n                syncStatusSprite("monster",index,type);\n                console.log("STATUS RETURN monster "+index+" "+type);\n            });\n        }\n        for(let index=0;index<3;index++){\n            types.forEach(type=>{\n                console.log("STATUS CALL player "+index+" "+type);\n                syncStatusSprite("player",index,type);\n                console.log("STATUS RETURN player "+index+" "+type);\n            });\n        }\n    }'''
-          if s.count(old)!=1: raise SystemExit('status effects anchor not unique')
-          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          path=Path('tests/v170-final-spec-integration.test.js')
+          source=path.read_text(encoding='utf-8')
+
+          runtime_old='''const EXPECTED_RUNTIME_PATHS=[\n    "js/25-v131-fix-batch.js",'''
+          runtime_new='''const EXPECTED_RUNTIME_PATHS=[\n    "js/battlefield-slot-owner.js",\n    "js/25-v131-fix-batch.js",'''
+          if source.count(runtime_old)!=1:
+              raise SystemExit('runtime-order anchor not unique')
+          source=source.replace(runtime_old,runtime_new,1)
+
+          mock_old='''            if(property===Symbol.toPrimitive){ return ()=>0; }\n            if(property==="length"){ return 0; }'''
+          mock_new='''            if(property===Symbol.toPrimitive){ return ()=>0; }\n            if(property==="parentElement"){ return null; }\n            if(property==="parentNode"){ return null; }\n            if(property==="ownerDocument"){ return null; }\n            if(property==="length"){ return 0; }'''
+          if source.count(mock_old)!=1:
+              raise SystemExit('mock-DOM anchor not unique')
+          source=source.replace(mock_old,mock_new,1)
+
+          snapshot_old='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        Math.random=function(){ return 0; };\n        const action=v141TryMonsterSpecialAction(0);'''
+          snapshot_new='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        if(\n            !snapshot ||\n            window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,0)!=="ENEMY_F3"\n        ){\n            throw new Error("V170 fixture must create the formal ENEMY_F3 snapshot before monster action");\n        }\n        Math.random=function(){ return 0; };\n        const action=v141TryMonsterSpecialAction(0);'''
+          if source.count(snapshot_old)!=1:
+              raise SystemExit('case-8 Snapshot anchor not unique')
+          source=source.replace(snapshot_old,snapshot_new,1)
+
+          if 'vm.runInContext(fs.readFileSync("js/battlefield-slot-owner.js"' in source:
+              raise SystemExit('case-local Slot owner load detected')
+
+          path.write_text(source,encoding='utf-8')
           PY
-          set +e
-          timeout 8s node tests/v170-final-spec-integration.test.js > /tmp/caseb-status.log 2>&1
-          status=$?
-          set -e
-          cat /tmp/caseb-status.log
-          echo "PHASE1_EXIT=$status"
-          grep -F 'MOCK parentElement self = true' /tmp/caseb-status.log
-          grep -F 'MOCK parentNode self = true' /tmp/caseb-status.log
-          grep -F 'CASE B snapshot slot = ENEMY_F3' /tmp/caseb-status.log
-          last_call="$(grep '^STATUS CALL ' /tmp/caseb-status.log | tail -n1 || true)"
-          last_return="$(grep '^STATUS RETURN ' /tmp/caseb-status.log | tail -n1 || true)"
-          echo "FIRST_STUCK_STATUS_CALL=$last_call"
-          echo "LAST_STATUS_RETURN=$last_return"
-          test "$status" -eq 124
-          test "$last_call" = 'STATUS CALL player 0 dinghaishenzhen'
-          if grep -Fq 'STATUS RETURN player 0 dinghaishenzhen' /tmp/caseb-status.log; then exit 31; fi
 
-      - name: Phase 2 - trace CASE B player status to guarded self-parent stop
+          changed="$(git diff --name-only)"
+          printf 'CHANGED_FILES=%s\n' "$changed"
+          test "$changed" = 'tests/v170-final-spec-integration.test.js'
+
+          git diff --check
+          grep -n -A4 'const EXPECTED_RUNTIME_PATHS=\[' tests/v170-final-spec-integration.test.js
+          grep -n 'property==="parentElement"\|property==="parentNode"\|property==="ownerDocument"' tests/v170-final-spec-integration.test.js
+          grep -n -A8 'const snapshot=window.v138EnsureEnemyFormationSnapshot' tests/v170-final-spec-integration.test.js
+
+      - name: Commit clean one-file fix
         shell: bash
         run: |
           set -euo pipefail
-          cp /tmp/v170.original.js tests/v170-final-spec-integration.test.js
-          cp /tmp/v143.original.js js/39-v143-skill-animation.js
-          cp /tmp/slot-owner.original.js js/battlefield-slot-owner.js
-          python - <<'PY'
-          from pathlib import Path
-          TARGET='accuracy, enemy Rage, monster shields and wind-elite Dodge use their formal state rules'
-          p=Path('tests/v170-final-spec-integration.test.js')
-          s=p.read_text(encoding='utf-8')
-          runner='''function test(name,handler){\n    handler();\n    passed++;\n    console.log("✓ "+name);\n}'''
-          isolated=f'''function test(name,handler){{\n    if(name!=={TARGET!r}){{ return; }}\n    handler();\n    passed++;\n    console.log("PASS "+name);\n}}'''
-          s=s.replace(runner,isolated,1)
-          dummy='''    const dummy=makeUniversalNode();\n    const storage=()=>{'''
-          dummy_diag='''    const dummy=makeUniversalNode();\n    console.log("MOCK parentElement self = "+(dummy.parentElement===dummy));\n    console.log("MOCK parentNode self = "+(dummy.parentNode===dummy));\n    const storage=()=>{'''
-          s=s.replace(dummy,dummy_diag,1)
-          caseb='''        monsters.splice(0,monsters.length,elite);\n        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
-          caseb_diag='''        monsters.splice(0,monsters.length,elite);\n        currentBattleMonsters.splice(0,currentBattleMonsters.length,0);\n        const caseBSnapshot=v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        console.log("CASE B snapshot slot = "+FourSymbolsBattlefieldSlots.getEnemySlotForMonster(caseBSnapshot,0));\n        battleToken=91;turn=4;\n        const dodgeCast=v155ResolveWindEliteDodge(0,true);'''
-          if s.count(caseb)!=1: raise SystemExit('CASE B anchor not unique')
-          p.write_text(s.replace(caseb,caseb_diag,1),encoding='utf-8')
-
-          p=Path('js/39-v143-skill-animation.js')
-          s=p.read_text(encoding='utf-8')
-          head='''    function syncStatusSprite(side,index,type){\n        const spec=STATUS_SPRITES[type];\n        const card=cardFor(side,index);\n        const entity=entityFor(side,index);\n        const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));\n        const active=alive&&hasTimedEffect(entity,type);\n        let node=statusNode(card,type);'''
-          head_diag='''    function syncStatusSprite(side,index,type){\n        const diag=side==="player"&&index===0&&type==="dinghaishenzhen";\n        if(diag){ console.log("SPRITE 1 enter"); }\n        const spec=STATUS_SPRITES[type];\n        const card=cardFor(side,index);\n        if(diag){ console.log("SPRITE 2 after cardFor"); }\n        const entity=entityFor(side,index);\n        if(diag){ console.log("SPRITE 3 after entityFor"); }\n        const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));\n        const active=alive&&hasTimedEffect(entity,type);\n        if(diag){ console.log("SPRITE 4 after hasTimedEffect active="+active); }\n        let node=statusNode(card,type);\n        if(diag){ console.log("SPRITE 5 after statusNode"); }'''
-          if s.count(head)!=1: raise SystemExit('sprite head anchor not unique')
-          s=s.replace(head,head_diag,1)
-          call='''        const anchor=slotAnchor(side,index,card);'''
-          call_diag='''        if(diag){ console.log("SPRITE 6 before slotAnchor"); }\n        const anchor=slotAnchor(side,index,card);\n        if(diag){ console.log("SPRITE 7 after slotAnchor"); }'''
-          if s.count(call)!=1: raise SystemExit('sprite slotAnchor call not unique')
-          s=s.replace(call,call_diag,1)
-
-          anchor='''    function slotAnchor(side,index,card){\n        const owner=geometryOwner();\n        const slot=slotForTarget(side,index,card);'''
-          anchor_diag='''    function slotAnchor(side,index,card){\n        const diagAnchor=side==="player"&&index===0;\n        if(diagAnchor){ console.log("ANCHOR 1 enter"); }\n        const owner=geometryOwner();\n        if(diagAnchor){ console.log("ANCHOR 2 before slotForTarget"); }\n        const slot=slotForTarget(side,index,card);\n        if(diagAnchor){ console.log("ANCHOR 3 after slotForTarget"); }'''
-          if s.count(anchor)!=1: raise SystemExit('anchor function not unique')
-          s=s.replace(anchor,anchor_diag,1)
-
-          target='''    function slotForTarget(side,index,card){\n        const owner=geometryOwner();\n        if(!owner){ return null; }\n        if(side==="monster"&&isMechanismTarget(index)){\n            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;\n        }\n        let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;\n        if(!slot&&typeof owner.getSlotFromElement==="function"){\n            slot=owner.getSlotFromElement(card||cardFor(side,index));\n        }\n        return slot||null;\n    }'''
-          target_diag='''    function slotForTarget(side,index,card){\n        const diagTarget=side==="player"&&index===0;\n        const owner=geometryOwner();\n        if(!owner){ return null; }\n        if(side==="monster"&&isMechanismTarget(index)){\n            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;\n        }\n        let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;\n        if(diagTarget){ console.log('getSlotForCombatant("player",0) = '+String(slot)); }\n        if(!slot&&typeof owner.getSlotFromElement==="function"){\n            if(diagTarget){ console.log("before owner.getSlotFromElement(card)"); }\n            slot=owner.getSlotFromElement(card||cardFor(side,index));\n            if(diagTarget){ console.log("after owner.getSlotFromElement(card)"); }\n        }\n        return slot||null;\n    }'''
-          if s.count(target)!=1: raise SystemExit('slotForTarget function not unique')
-          p.write_text(s.replace(target,target_diag,1),encoding='utf-8')
-
-          p=Path('js/battlefield-slot-owner.js')
-          s=p.read_text(encoding='utf-8')
-          owner='''    function slotFromElement(element){\n        let current=element||null;\n        while(current){\n            const slot=current.dataset&&current.dataset.slot;\n            if(slot&&SLOT_META[slot]){ return slot; }\n            current=current.parentElement||current.parentNode||null;\n        }\n        return null;\n    }'''
-          owner_diag='''    function slotFromElement(element){\n        let current=element||null;\n        console.log("SLOT LOOP element===parentElement = "+!!(element&&element.parentElement===element));\n        console.log("SLOT LOOP element===parentNode = "+!!(element&&element.parentNode===element));\n        console.log("STEP 0 current===element "+(current===element));\n        const step1=current?(current.parentElement||current.parentNode||null):null;\n        console.log("STEP 1 parent===element "+(step1===element));\n        const step2=step1?(step1.parentElement||step1.parentNode||null):null;\n        console.log("STEP 2 parent===element "+(step2===element));\n        if(current&&current.parentElement===current){\n            console.log("SELF_PARENT_LOOP_CONFIRMED=true");\n            throw new Error("DIAG_SELF_PARENT_STOP");\n        }\n        while(current){\n            const slot=current.dataset&&current.dataset.slot;\n            if(slot&&SLOT_META[slot]){ return slot; }\n            current=current.parentElement||current.parentNode||null;\n        }\n        return null;\n    }'''
-          if s.count(owner)!=1: raise SystemExit('slotFromElement function not unique')
-          p.write_text(s.replace(owner,owner_diag,1),encoding='utf-8')
-          PY
-          set +e
-          timeout 8s node tests/v170-final-spec-integration.test.js > /tmp/caseb-deep.log 2>&1
-          status=$?
-          set -e
-          cat /tmp/caseb-deep.log
-          echo "PHASE2_EXIT=$status"
-          grep -F 'CASE B snapshot slot = ENEMY_F3' /tmp/caseb-deep.log
-          grep -F 'SPRITE 1 enter' /tmp/caseb-deep.log
-          grep -F 'SPRITE 6 before slotAnchor' /tmp/caseb-deep.log
-          if grep -Fq 'SPRITE 7 after slotAnchor' /tmp/caseb-deep.log; then exit 41; fi
-          grep -F 'ANCHOR 1 enter' /tmp/caseb-deep.log
-          grep -F 'ANCHOR 2 before slotForTarget' /tmp/caseb-deep.log
-          if grep -Fq 'ANCHOR 3 after slotForTarget' /tmp/caseb-deep.log; then exit 42; fi
-          grep -F 'getSlotForCombatant("player",0) = null' /tmp/caseb-deep.log
-          grep -F 'before owner.getSlotFromElement(card)' /tmp/caseb-deep.log
-          if grep -Fq 'after owner.getSlotFromElement(card)' /tmp/caseb-deep.log; then exit 43; fi
-          grep -F 'SLOT LOOP element===parentElement = true' /tmp/caseb-deep.log
-          grep -F 'SLOT LOOP element===parentNode = true' /tmp/caseb-deep.log
-          grep -F 'STEP 0 current===element true' /tmp/caseb-deep.log
-          grep -F 'STEP 1 parent===element true' /tmp/caseb-deep.log
-          grep -F 'STEP 2 parent===element true' /tmp/caseb-deep.log
-          grep -F 'SELF_PARENT_LOOP_CONFIRMED=true' /tmp/caseb-deep.log
-          grep -F 'DIAG_SELF_PARENT_STOP' /tmp/caseb-deep.log
-          test "$status" -ne 124
-
-      - name: Read-only production DOM ancestry audit
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          cp /tmp/v170.original.js tests/v170-final-spec-integration.test.js
-          cp /tmp/v143.original.js js/39-v143-skill-animation.js
-          cp /tmp/slot-owner.original.js js/battlefield-slot-owner.js
-          echo 'PRODUCTION direct parentElement/parentNode assignments:'
-          git grep -nP '\.(parentElement|parentNode)\s*=(?!=)' -- js || true
-          echo 'PRODUCTION slotFromElement traversal:'
-          git grep -n -A8 -B2 'function slotFromElement' -- js/battlefield-slot-owner.js || true
-          echo 'WORKTREE_DIFF_AFTER_RESTORE:'
-          git diff --name-only
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tests/v170-final-spec-integration.test.js
+          test "$(git diff --cached --name-only)" = 'tests/v170-final-spec-integration.test.js'
+          git commit -m 'test: align V170 final runtime fixture contract'
+          echo "FIX_HEAD=$(git rev-parse HEAD)"
+          git push origin "HEAD:refs/heads/$FIX_BRANCH"
