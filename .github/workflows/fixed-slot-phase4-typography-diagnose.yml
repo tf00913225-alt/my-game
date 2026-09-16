@@ -1,0 +1,49 @@
+name: Fixed Slot Phase 4 Typography Diagnose
+
+on:
+  push:
+    branches:
+      - feature/fixed-slot-battlefield-v1-20260916
+    paths:
+      - .github/workflows/fixed-slot-phase4-typography-diagnose.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/fixed-slot-battlefield-v1-20260916
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply the same final Phase 4 patch in the disposable runner
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          workflow=Path('.github/workflows/fixed-slot-phase4-integrate4.yml').read_text(encoding='utf-8')
+          marker="          python3 - <<'PYCODE'\n"
+          start=workflow.index(marker)+len(marker)
+          end=workflow.index("\n          PYCODE\n",start)
+          body=workflow[start:end]
+          body='\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines())
+          exec(compile(body,'phase4-final-diagnostic-patch','exec'))
+          PYCODE
+      - name: Capture typography guard output
+        run: |
+          mkdir -p diagnostics
+          set +e
+          node tests/ui-typography-battle-preservation.test.js > diagnostics/typography-output.txt 2>&1
+          status=$?
+          set -e
+          printf '\nEXIT_STATUS=%s\n' "$status" >> diagnostics/typography-output.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase4-typography-output
+          path: diagnostics/typography-output.txt
+          if-no-files-found: error
