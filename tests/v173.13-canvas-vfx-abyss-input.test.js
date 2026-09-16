@@ -4,6 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
+const slotOwner=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const legacyAbyssPatch=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
@@ -61,6 +62,7 @@ function loadRasterRuntime(skillId,targetType,targetIds,duration){
     const timers=[];
     const body=makeNode();
     const nodes={};
+    const fixedSlots={};
     const monsterArea=makeNode({left:240,top:30,right:680,bottom:300,width:440,height:270});
     monsterArea.id="battleMonsterArea";
     nodes[monsterArea.id]=monsterArea;
@@ -84,6 +86,22 @@ function loadRasterRuntime(skillId,targetType,targetIds,duration){
         nodes[card.id]=card;
         body.appendChild(card);
     });
+    ["B","F"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=5;column++){
+            const slot="ENEMY_"+row+column,left=240+(column-1)*91,top=rowIndex===0?30:200;
+            const slotNode=makeNode({left,top,right:left+76,bottom:top+100,width:76,height:100});
+            slotNode.dataset.slot=slot; slotNode.className="v-fixed-enemy-slot";
+            fixedSlots['.v-fixed-enemy-slot[data-slot="'+slot+'"]']=slotNode;
+        }
+    });
+    ["F","B"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=3;column++){
+            const slot="ALLY_"+row+column,left=40+(column-1)*130,top=rowIndex===0?370:510;
+            const slotNode=makeNode({left,top,right:left+118,bottom:top+116,width:118,height:116});
+            slotNode.dataset.slot=slot; slotNode.className="v-fixed-ally-slot";
+            fixedSlots['.v-fixed-ally-slot[data-slot="'+slot+'"]']=slotNode;
+        }
+    });
     class FakeImage{
         set src(value){ this._src=value; this.complete=true; this.naturalWidth=1536; this.naturalHeight=1152; }
     }
@@ -91,16 +109,18 @@ function loadRasterRuntime(skillId,targetType,targetIds,duration){
         body,readyState:"complete",
         createElement(){ return makeNode(); },
         getElementById(id){ return nodes[id]||null; },
+        querySelector(selector){ return fixedSlots[selector]||null; },
         querySelectorAll(selector){ return body.querySelectorAll(selector); },
         addEventListener(){}
     };
+    const party=[{hp:100,statusEffects:[],activeBuffs:[]}];
     const context={
         window:null,document,console,Math,Number,Object,Array,Set,Map,Promise,Proxy,Image:FakeImage,
         Date,navigator:{deviceMemory:4,hardwareConcurrency:4},innerWidth:900,innerHeight:700,
         setTimeout(callback,delay){ timers.push({callback,delay}); return timers.length; },clearTimeout(){},
         monsters:[0,1,2].map(()=>({alive:true,hp:100,statusEffects:[],activeBuffs:[]})),
         currentBattleMonsters:[0,1,2],
-        getPartyCharacterByIndex(){ return {hp:100,statusEffects:[],activeBuffs:[]}; },
+        getPartyCharacterByIndex(index){ return party[index]||null; },
         showMonsterHit(){},showPlayerHit(){},v141PlayCardEffect(){},addEventListener(){}
     };
     context.window=context;
@@ -117,7 +137,11 @@ function loadRasterRuntime(skillId,targetType,targetIds,duration){
         dispose(){}
     };
     vm.createContext(context);
-    vm.runInContext(animation,context);
+    vm.runInContext(slotOwner,context,{filename:"js/battlefield-slot-owner.js"});
+    const owner=context.FourSymbolsBattlefieldSlots;
+    owner.setActiveEnemySnapshot(owner.createEnemyFormationSnapshot([0,1,2],{originalFormationType:3}));
+    owner.hydrateAllyFormation(null,[0]);
+    vm.runInContext(animation,context,{filename:"js/39-v143-skill-animation.js"});
     context.v142SkillAnimationDirector.play({
         id:skillId,name:skillId,element:"water",category:"magic",
         targetType,duration,resolveDuration:duration
@@ -125,7 +149,7 @@ function loadRasterRuntime(skillId,targetType,targetIds,duration){
     return {
         context,
         stage:body.children.find(node=>node.id==="v143-skill-stage"),
-        timers
+        timers,owner
     };
 }
 
@@ -147,7 +171,7 @@ test("Water Ball and Ice Arrow Rain own DOM-raster manifests",()=>{
     });
 });
 
-test("the raster renderer creates one shared Water Ball Sprite Sheet node without Canvas",()=>{
+test("the raster renderer creates one shared Water Ball Sprite Sheet node on formal tri Slot geometry without Canvas",()=>{
     const water=loadRasterRuntime("waterBall","tri",[0,1,2],1400);
     const sprites=water.stage.children.filter(node=>node.dataset.renderer==="dom-sprite");
     assert.equal(sprites.length,1);
@@ -156,20 +180,24 @@ test("the raster renderer creates one shared Water Ball Sprite Sheet node withou
     assert.equal(sprite.dataset.rows,"3");
     assert.equal(sprite.dataset.frames,"12");
     assert.match(sprite.style.backgroundImage,/water-orb-vfx\.png\?v=173\.19/);
-    assert.equal(sprite.style.left,"438px");
-    assert.equal(sprite.style.top,"130px");
+    const centerSlot=water.owner.getSlotForCombatant("monster",1);
+    const bounds=water.owner.getGeometryRectFromShape("monster",centerSlot,"tri");
+    assert.equal(sprite.style.left,bounds.centerX+"px");
+    assert.equal(sprite.style.top,bounds.centerY+"px");
     assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|requestAnimationFrame\(/);
 });
 
-test("Ice Arrow Rain stays centered on the full monster battlefield",()=>{
+test("Ice Arrow Rain stays centered on the formal full monster battlefield",()=>{
     const rain=loadRasterRuntime("iceArrowRain","all",[0,1,2],1600);
     const sprites=rain.stage.children.filter(node=>node.dataset.renderer==="dom-sprite");
     assert.equal(sprites.length,1);
     const sprite=sprites[0];
     assert.equal(sprite.dataset.placement,"battlefield");
-    assert.equal(sprite.dataset.areaId,"battleMonsterArea");
-    assert.equal(sprite.style.left,"460px");
-    assert.equal(sprite.style.top,"165px");
+    assert.equal(sprite.dataset.areaId,"fixed-enemy-zone");
+    assert.equal(sprite.dataset.geometrySlots,rain.owner.getSideSlots("monster").join(","));
+    const bounds=rain.owner.getSideRect("monster");
+    assert.equal(sprite.style.left,bounds.centerX+"px");
+    assert.equal(sprite.style.top,bounds.centerY+"px");
     assert.match(sprite.style.backgroundImage,/frost-arrow-rain-vfx\.png\?v=173\.19/);
 });
 
@@ -186,6 +214,7 @@ test("CSS advances the formal 4×3 sheet row-major without procedural fallback n
 test("shared target geometry keeps one group VFX node and excludes invalid targets",()=>{
     assert.match(animation,/const key=placement==="single"\|\|placement==="targetTrajectory"\?String\(index\):"main";/);
     assert.match(animation,/function emittedSpriteTargets\(current\)\{[\s\S]*?canReceive\(current\.config,current\.targetSide,index\)/);
+    assert.match(animation,/function geometryBounds\(current,indexes,placement\)[\s\S]*?owner\.getGeometryRectFromShape/);
     assert.match(animation,/const coverageScale=clamp\(Number\(sprite\.coverageScale\)\|\|Number\(sprite\.scale\)\|\|1,1,1\.4\);/);
 });
 
