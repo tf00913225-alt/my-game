@@ -28,14 +28,32 @@
     overflow:visible !important;
 }
 
+/* Fixed Slot battlefield: every enemy row always owns five physical columns.
+   Empty slots retain their width after death/summon/revive, so neither units nor
+   VFX geometry can re-center around the currently surviving cards. */
 #game-stage #battleMonsterArea .v131-monster-row{
-    display:flex;
+    display:grid;
+    grid-template-columns:repeat(5,76px);
     flex:0 0 auto;
     align-items:flex-start;
     justify-content:center;
     gap:3px;
     width:100%;
     min-width:0;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot{
+    position:relative;
+    width:76px;
+    min-width:76px;
+    min-height:90px;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot > .battle-monster{
+    margin-left:auto !important;
+    margin-right:auto !important;
 }
 
 #game-stage #battleMonsterArea .v131-monster-row .battle-monster{
@@ -671,6 +689,7 @@
     align-items:center;
     justify-content:center;
     gap:4px;
+    overflow:visible;
 }
 #game-stage #battlePlayerRow .v-fixed-ally-row{
     display:grid;
@@ -678,11 +697,13 @@
     justify-content:center;
     gap:5px;
     min-height:102px;
+    overflow:visible;
 }
 #game-stage #battlePlayerRow .v-fixed-ally-slot{
     position:relative;
     width:76px;
     min-height:102px;
+    overflow:visible;
 }
 #game-stage #battlePlayerRow .v-fixed-ally-slot>.battle-player{
     width:76px;
