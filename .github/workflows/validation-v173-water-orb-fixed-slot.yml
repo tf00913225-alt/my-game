@@ -36,5 +36,8 @@ jobs:
       - name: Run formal V173 contract diagnosis
         run: node tests/diagnosis-v173-water-orb-fixed-slot-contract.test.js
 
+      - name: Run migrated V173 Water Ball contract
+        run: node tests/v173-water-orb-direction-vfx.test.js
+
       - name: Re-run formal Water runtime coverage
         run: node tests/v166-water-vfx.test.js
