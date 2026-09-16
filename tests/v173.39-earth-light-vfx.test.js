@@ -4,6 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
+const slotOwner=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const legacyEarth=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
@@ -78,18 +79,36 @@ function makeNode(rect){
 function statusRuntime(){
     const body=makeNode();
     const cards={};
+    const fixedSlots={};
     const monsters=Array.from({length:3},()=>({alive:true,hp:100,statusEffects:[],activeBuffs:[]}));
     const party=Array.from({length:3},()=>({hp:100,statusEffects:[],activeBuffs:[]}));
     for(let index=0;index<3;index++){
-        const monster=makeNode({left:100+index*100,top:50,width:80,height:100});
+        const monster=makeNode({left:100+index*100,top:50,right:180+index*100,bottom:150,width:80,height:100});
         monster.id="battleMonster"+index; cards[monster.id]=monster; body.appendChild(monster);
-        const player=makeNode({left:100+index*100,top:300,width:110,height:110});
+        const player=makeNode({left:100+index*100,top:300,right:210+index*100,bottom:410,width:110,height:110});
         player.id="battlePlayerCard"+index; cards[player.id]=player; body.appendChild(player);
     }
+    ["B","F"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=5;column++){
+            const slot="ENEMY_"+row+column,left=15+(column-1)*78,top=rowIndex===0?45:170;
+            const slotNode=makeNode({left,top,right:left+72,bottom:top+112,width:72,height:112});
+            slotNode.dataset.slot=slot; slotNode.className="v-fixed-enemy-slot";
+            fixedSlots['.v-fixed-enemy-slot[data-slot="'+slot+'"]']=slotNode;
+        }
+    });
+    ["F","B"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=3;column++){
+            const slot="ALLY_"+row+column,left=55+(column-1)*110,top=rowIndex===0?470:595;
+            const slotNode=makeNode({left,top,right:left+90,bottom:top+112,width:90,height:112});
+            slotNode.dataset.slot=slot; slotNode.className="v-fixed-ally-slot";
+            fixedSlots['.v-fixed-ally-slot[data-slot="'+slot+'"]']=slotNode;
+        }
+    });
     const document={
         body,
         createElement(){ return makeNode(); },
         getElementById(id){ return cards[id]||null; },
+        querySelector(selector){ return fixedSlots[selector]||null; },
         querySelectorAll(selector){ return body.querySelectorAll(selector); }
     };
     class FakeImage{ set src(value){ this._src=value; this.complete=true; this.naturalWidth=1024; this.naturalHeight=512; if(this.onload){ this.onload(); } } }
@@ -111,8 +130,12 @@ function statusRuntime(){
     };
     context.window=context;
     vm.createContext(context);
+    vm.runInContext(slotOwner,context);
+    const owner=context.FourSymbolsBattlefieldSlots;
+    owner.setActiveEnemySnapshot(owner.createEnemyFormationSnapshot([0,1,2],{originalFormationType:3}));
+    owner.hydrateAllyFormation(null,[0,1,2]);
     vm.runInContext(animation,context);
-    return {context,cards,monsters,party};
+    return {context,cards,monsters,party,owner};
 }
 
 test("earth and Yuan Zu cast sheets keep the supplied production dimensions and natural 4x3 grid",()=>{
@@ -149,7 +172,7 @@ test("all casts use DOM Sprite Sheets, frame seven impact and the requested plac
     });
 });
 
-test("earth trio sheets opt into fixed slot alignment and full-field earth stays formation-locked",()=>{
+test("earth trio sheets use the formal Slot owner and full-field earth stays formation-locked",()=>{
     const runtime=statusRuntime();
     const manifest=runtime.context.v143SkillAnimationManifest;
     ["petrifyFist","earthquakeCrush","stoneThrow","sandWind","earthShield","rockWall"].forEach(id=>{
@@ -158,9 +181,9 @@ test("earth trio sheets opt into fixed slot alignment and full-field earth stays
     });
     assert.equal(manifest.flyingSandStrike.sprite.placement,"battlefield");
     assert.equal(manifest.flyingSandStrike.sprite.targetBounds,undefined);
-    assert.match(animation,/function fixedTriLayoutBounds\(current,indexes\)/);
-    assert.match(animation,/const coverage=sprite\.alignToSlots\?targetBounds:/);
-    assert.match(animation,/node\.style\.left=\(Number\.isFinite\(targetBounds\.centerX\)\?targetBounds\.centerX:coverage\.left\+coverage\.width\/2\)\+"px"/);
+    assert.ok(runtime.context.FourSymbolsBattlefieldSlots);
+    assert.match(animation,/function geometryBounds\(current,indexes,placement\)[\s\S]*?owner\.getSideRect\(current\.targetSide\)[\s\S]*?owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
+    assert.doesNotMatch(animation,/function fixedTriLayoutBounds\(|function groupLayoutBounds\(|function fieldBounds\(|function sideAreaBounds\(/);
 });
 
 test("all seven persistent effects use 4x2 runtime cropping with the requested loop cadence",()=>{
@@ -181,7 +204,7 @@ test("all seven persistent effects use 4x2 runtime cropping with the requested l
     assert.doesNotMatch(animation,/drawImage\(|getContext\(|canvas-crop/);
 });
 
-test("persistent earth states and Yuan Zu blessing bind to their real combat state owners",()=>{
+test("persistent earth states and Yuan Zu blessing bind to formal combat slots",()=>{
     const runtime=statusRuntime();
     runtime.monsters[0].statusEffects.push({type:"defenseDown",turnsLeft:2});
     runtime.monsters[0].statusEffects.push({type:"petrify",turnsLeft:2});
@@ -191,13 +214,19 @@ test("persistent earth states and Yuan Zu blessing bind to their real combat sta
     runtime.monsters[1].activeBuffs.push({type:"barrier",turnsLeft:5,remainingBlocks:5});
     runtime.monsters[2].activeBuffs.push({type:"v141TeamBuff",statusName:"元祖賜福",turnsLeft:2});
     runtime.context.v143SyncStatusSpriteEffects();
-    assert.ok(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-defenseDown"));
-    assert.ok(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-petrify"));
-    assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-shield"));
-    assert.ok(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-earthShield"));
-    assert.ok(runtime.cards.battlePlayerCard2.querySelector(".v153-status-vfx-rockWall"));
-    assert.ok(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-barrier"));
-    assert.ok(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-yuanZuBlessing"));
+    const assertions=[
+        [runtime.cards.battleMonster0.querySelector(".v153-status-vfx-defenseDown"),"monster",0],
+        [runtime.cards.battleMonster0.querySelector(".v153-status-vfx-petrify"),"monster",0],
+        [runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-shield"),"player",0],
+        [runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-earthShield"),"player",1],
+        [runtime.cards.battlePlayerCard2.querySelector(".v153-status-vfx-rockWall"),"player",2],
+        [runtime.cards.battleMonster1.querySelector(".v153-status-vfx-barrier"),"monster",1],
+        [runtime.cards.battleMonster2.querySelector(".v153-status-vfx-yuanZuBlessing"),"monster",2]
+    ];
+    assertions.forEach(([node,side,index])=>{
+        assert.ok(node);
+        assert.equal(node.dataset.slot,runtime.owner.getSlotForCombatant(side,index));
+    });
 });
 
 test("rock shield on the attacking caster is deferred until its cast sheet finishes",()=>{
