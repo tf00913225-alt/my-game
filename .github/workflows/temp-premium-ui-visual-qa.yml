@@ -1,0 +1,268 @@
+name: TEMP Premium UI Visual QA
+
+on:
+  push:
+    branches:
+      - feature/premium-functional-ui-demo-parity-20260916
+    paths:
+      - .github/workflows/temp-premium-ui-visual-qa.yml
+
+permissions:
+  contents: read
+
+jobs:
+  visual-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/premium-functional-ui-demo-parity-20260916
+          fetch-depth: 1
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Verify exact visual QA source
+        shell: bash
+        run: |
+          test "$GITHUB_REPOSITORY" = "tf00913225-alt/my-game"
+          test "$GITHUB_REF_NAME" = "feature/premium-functional-ui-demo-parity-20260916"
+          git rev-parse HEAD
+          npm run build:check
+          git diff --check
+
+      - name: Generate three-size visual fixtures and screenshots
+        shell: bash
+        run: |
+          cat > /tmp/premium-ui-visual-qa.mjs <<'NODE'
+          import fs from "node:fs";
+          import path from "node:path";
+          import {spawnSync} from "node:child_process";
+
+          function findChrome(){
+            for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
+              const p=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
+              if(p.status===0&&p.stdout.trim()) return p.stdout.trim();
+            }
+            throw new Error("Headless Chrome/Chromium is required.");
+          }
+          const chrome=findChrome();
+          const root=process.cwd();
+          const out=path.join(root,"visual-qa-evidence");
+          const fixtures=path.join(root,".visual-qa-fixtures");
+          fs.rmSync(out,{recursive:true,force:true});
+          fs.rmSync(fixtures,{recursive:true,force:true});
+          fs.mkdirSync(out,{recursive:true});
+          fs.mkdirSync(fixtures,{recursive:true});
+
+          const css=[
+            "../css/00-main.css",
+            "../css/22-stage-v78-character-inventory-core.css",
+            "../css/31-v131-fix-batch.css",
+            "../css/37-v139-rested-experience.css",
+            "../css/38-v141-system-expansion.css",
+            "../css/49-v169-rpg-ui.css",
+            "../css/55-team-relic-system.css"
+          ];
+
+          const baseStyle=`
+          html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070604;color:#f3ead7;font-family:"Noto Sans TC",Arial,sans-serif}
+          *{box-sizing:border-box}
+          #game-stage{position:relative;width:100vw;height:100vh;min-width:0;min-height:0;overflow:hidden;transform:none!important;background:#070604}
+          #homeFeatureModal{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:absolute!important;inset:0!important;align-items:center!important;justify-content:center!important}
+          #homeFeatureModal .home-feature-modal-box{position:relative}
+          #homeFeatureModal .home-feature-modal-box.wide{display:flex!important;flex-direction:column!important}
+          #homeFeatureModalBody{display:flex!important;flex-direction:column!important;min-height:0!important}
+          #characterTabContent{display:block!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important}
+          button{font-family:inherit}
+          .qa-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 8px 7px}
+          .qa-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+          .qa-subtle{color:#b7a88f;font-size:12px}
+          .qa-placeholder{display:grid;place-items:center;color:#b7a88f;background:radial-gradient(circle at 50% 28%,rgba(200,154,72,.15),transparent 45%),#0e0b08}
+          .qa-item-art{display:grid;place-items:center;width:100%;height:100%;font-size:24px}
+          .qa-result{display:none}
+          `;
+
+          function doc(body,extra=""){
+            return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${css.map(h=>`<link rel="stylesheet" href="${h}">`).join("")}<style>${baseStyle}${extra}</style></head><body>${body}<pre class="qa-result" id="qaResult"></pre><script>
+            requestAnimationFrame(()=>requestAnimationFrame(()=>{
+              const root=document.querySelector("#game-stage");
+              const all=[...document.querySelectorAll("*")];
+              const bad=all.filter(el=>el.scrollWidth>el.clientWidth+2 && getComputedStyle(el).overflowX!=="auto" && getComputedStyle(el).overflowX!=="scroll");
+              document.getElementById("qaResult").textContent=JSON.stringify({
+                width:innerWidth,height:innerHeight,
+                bodyOverflow:document.documentElement.scrollWidth>innerWidth+2,
+                rootOverflow:root?root.scrollWidth>root.clientWidth+2:false,
+                offenders:bad.slice(0,8).map(el=>({tag:el.tagName,id:el.id,cls:String(el.className||"").slice(0,100),sw:el.scrollWidth,cw:el.clientWidth}))
+              });
+            }));
+            </script></body></html>`;
+          }
+
+          const pages={
+            character:doc(`
+              <div id="game-stage">
+                <div id="homeFeatureModal" class="home-feature-modal show no-padding">
+                  <div class="home-feature-modal-box wide">
+                    <div class="home-feature-modal-title">角色</div>
+                    <div id="homeFeatureModalBody">
+                      <div>
+                        <div class="character-showcase-choice is-current-character">
+                          <div class="character-showcase-avatar is-current-character qa-placeholder">角色立繪</div>
+                          <div style="font-size:11px;font-weight:bold">冒險者</div>
+                          <div id="characterAvatarLevel0" style="font-size:10px">Lv.32 · 第一隊伍角色</div>
+                          <div class="v169-character-hero-meta">
+                            <div class="v169-character-element">水元素</div>
+                            <div class="v169-character-resource">
+                              <div class="v169-character-resource-head"><span>HP</span><b>2,840 / 3,120</b></div>
+                              <div class="v169-character-resource-track"><span class="v169-character-resource-fill" style="width:91%"></span></div>
+                            </div>
+                            <div class="v169-character-resource sp">
+                              <div class="v169-character-resource-head"><span>SP</span><b>86 / 120</b></div>
+                              <div class="v169-character-resource-track"><span class="v169-character-resource-fill" style="width:72%"></span></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="qa-tabs">
+                        <button class="character-tab active">屬性</button><button class="character-tab">裝備</button><button class="character-tab">技能</button><button class="character-tab">詳細</button>
+                      </div>
+                      <div id="characterTabContent">
+                        <section id="statusPage">
+                          <h2 id="statusPageTitle">能力配點</h2>
+                          ${["體魄","力量","靈巧","精神"].map((n,i)=>`<div class="status-row"><span>${n}</span><button>−</button><div class="status-number">${20+i*3}</div><button>＋</button></div>`).join("")}
+                          <div class="status-points-line">剩餘能力點 <b id="attributePoints">8</b></div>
+                          <button id="confirmStatusButton">確認配點</button>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>`),
+
+            skills:doc(`
+              <div id="game-stage"><div id="homeFeatureModal" class="home-feature-modal show no-padding"><div class="home-feature-modal-box wide">
+                <div class="home-feature-modal-title">技能</div><div id="homeFeatureModalBody"><div id="characterTabContent"><section id="skillPage">
+                  <div class="skill-page-heading"><h2>技能配置</h2></div>
+                  <div id="skillCharacterSwitchCard"><b>目前角色</b><div style="display:grid;grid-template-columns:40px 1fr 40px;gap:6px;align-items:center"><button class="character-arrow">‹</button><div id="skillCharacterNameBox">冒險者</div><button class="character-arrow">›</button></div></div>
+                  <div class="card"><b>戰鬥技能欄 <span class="qa-subtle">4 格</span></b><div id="skillLoadout">
+                    ${["水刀斬","冰霜拳","治療術","冰封"].map((n,i)=>`<div class="skill-loadout-slot"><div class="skill-loadout-slot-icon qa-placeholder">${i+1}</div><div class="skill-loadout-slot-name">${n}</div></div>`).join("")}
+                  </div></div>
+                  <div class="v138-skill-point-summary"><span>剩餘技能點</span><b id="skillPoints">2</b></div>
+                  <div id="allSkillsList">
+                    ${["水刀斬","冰霜拳","冰旋一閃","冰封重擊","水球術","洪水猛獸"].map((n,i)=>`<div class="skill-row"><div class="qa-placeholder" style="width:42px;height:42px;border-radius:8px">${i+1}</div><div class="skill-row-text"><strong>${n}</strong><div class="qa-subtle">水元素 · Lv.${i%3+1} · 魔法</div></div><button class="skill-action-card"><span class="skill-action-card-label">${i<2?"升級":"學習"}</span></button></div>`).join("")}
+                  </div>
+                </section></div></div>
+              </div></div></div>`),
+
+            inventory:doc(`
+              <div id="game-stage"><div id="homeFeatureModal" class="home-feature-modal show no-padding"><div class="home-feature-modal-box wide">
+                <div class="home-feature-modal-title">裝備與背包</div><div id="homeFeatureModalBody"><div id="characterTabContent"><section id="inventoryPage" class="inventory-page-classic"><div class="inventory-classic-shell">
+                  <div class="inventory-character-switch"><button class="inventory-character-arrow">‹</button><div class="inventory-character-name"><span>冒險者</span><small>Lv.32</small></div><button class="inventory-character-arrow">›</button></div>
+                  <div class="inventory-character-stage">
+                    <div class="inventory-portrait-frame qa-placeholder">角色立繪</div>
+                    <div class="inventory-equipment-grid">
+                      ${["武器","頭部","身體","護腕","鞋子","法環"].map((n,i)=>`<div class="inventory-equipment-cell"><div class="inventory-equipment-slot"><div class="inventory-equipment-icon qa-item-art">${["⚔","冠","甲","腕","履","環"][i]}</div></div><div class="inventory-equipment-slot-label">${n}</div></div>`).join("")}
+                    </div>
+                  </div>
+                  <div class="inventory-stats-panel"><div class="inventory-stats-title">詳細能力</div><div class="inventory-detailed-stats">${["攻擊 128","防禦 94","生命 3120","速度 76","暴擊 12%","抗性 18%"].map(t=>`<div class="inventory-stat-row">${t}</div>`).join("")}</div></div>
+                  <div class="inventory-grid-scroll"><div class="inventory-grid-classic">${Array.from({length:18},(_,i)=>`<div class="inventory-item-classic"><div class="inventory-icon"><div class="qa-item-art">${i<12?["劍","甲","石","符","丹","圖"][i%6]:"·"}</div></div></div>`).join("")}</div></div>
+                  <div class="v141-inventory-pager"><button>‹</button><span>1 / 7</span><button>›</button></div>
+                </div></section></div></div>
+              </div></div></div>`,
+              `.inventory-grid-classic{min-height:180px}.inventory-item-classic{min-height:52px;border:1px solid rgba(200,154,72,.18);border-radius:7px;background:#100d09}`),
+
+            shop:doc(`
+              <div id="game-stage"><div id="homeFeatureModal" class="home-feature-modal show no-padding v131-shop-open"><div class="home-feature-modal-box wide">
+                <div class="home-feature-modal-title">商店</div><div id="homeFeatureModalBody" style="padding:8px">
+                  <div class="v17345-shop-tabs" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px"><button class="active">補給</button><button>裝備</button></div>
+                  <div class="shop-potion-interface"><div class="shop-potion-note">每日補給 · 價格依正式資料計算</div><div class="v133-shop-tier-note">目前區域：寒泉</div><div class="shop-potion-list">
+                  ${["小型恢復丹","中型恢復丹","大型恢復丹","回氣散","解毒散","凝神丹"].map((n,i)=>`<div class="shop-potion-card"><div class="shop-potion-card-head"><div class="shop-potion-type">${i<3?"生命補給":"狀態補給"}</div><div class="shop-potion-stock">庫存 ${8+i}</div></div><div class="shop-potion-name">${n}</div><div class="shop-potion-effect">恢復角色資源，效果依正式道具資料。</div><div class="shop-potion-purchase-row"><label>數量</label><input class="shop-potion-quantity" value="1"><div class="v146-shop-total">${120+i*40} 金</div><button class="shop-potion-buy">購買</button></div></div>`).join("")}
+                  </div></div>
+                </div>
+              </div></div></div>`,
+              `#homeFeatureModalBody{height:calc(100% - 58px)!important}.shop-potion-interface{min-height:0;height:100%}`),
+
+            synthesis:doc(`
+              <div id="game-stage"><div id="homeFeatureModal" class="home-feature-modal show no-padding"><div class="home-feature-modal-box wide">
+                <div class="home-feature-modal-title">合成／冶煉</div><div id="homeFeatureModalBody" style="padding:8px"><div class="v141-synthesis-tabs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:7px"><button class="active">合成</button><button>冶煉</button><button>符咒</button></div>
+                  <div class="v141-synthesis-card" style="display:grid;gap:8px">
+                    <section class="v141-craft-preview"><div class="v141-craft-icon qa-placeholder">裝</div><div><b>寒泉系列普通裝備</b><span>結果預覽 · 屬性依正式配方與階級生成</span></div></section>
+                    <div class="v141-blueprint-series"><span>選擇圖紙系列</span><b>寒泉系列</b></div>
+                    <label>裝備部位<select><option>武器</option></select></label>
+                    <div class="v141-material-lines"><span>圖紙 <b class="ok">50 / 50</b></span><span>寒泉礦 <b class="ok">50 / 50</b></span><span>金幣 <b class="ok">12,000</b></span></div>
+                    <button style="min-height:44px">開始合成</button>
+                  </div>
+                  <div class="v141-synthesis-card" style="display:grid;gap:8px;margin-top:8px">
+                    <section class="v141-reforge-current"><b>目前裝備：寒泉刀</b><span class="qa-subtle">保留原裝備，重新生成正式詞條。</span></section>
+                    <div class="v141-material-lines"><span>冶煉圖紙 <b class="ok">100 / 100</b></span><span>寒泉礦 <b class="ok">100 / 100</b></span><span>原裝備 <b class="ok">1 / 1</b></span></div>
+                    <button style="min-height:44px">開始冶煉</button>
+                  </div>
+                </div>
+              </div></div></div>`,
+              `.v141-blueprint-series,.v141-material-lines,.v141-reforge-current{padding:8px;border:1px solid rgba(200,154,72,.18);border-radius:8px;background:rgba(10,8,6,.5)}.v141-material-lines{display:flex;flex-wrap:wrap;gap:8px 14px}.ok{color:#efd18a}`),
+
+            system:doc(`
+              <div id="game-stage"><div id="homeFeatureModal" class="home-feature-modal show"><div class="home-feature-modal-box">
+                <div class="home-feature-modal-title">系統</div><div id="homeFeatureModalBody"><div class="system-panel">
+                  ${[
+                    ["音效與音樂","調整遊戲音效與背景音量","設定",""],
+                    ["遊戲說明","查看玩法與帳號規則","查看",""],
+                    ["客服信箱","聯絡遊戲客服","複製",""],
+                    ["帳號資訊","查看目前登入狀態與綁定資訊","查看",""],
+                    ["清除本機資料","只處理本機快取，不代表刪除雲端帳號","清除","danger"]
+                  ].map(r=>`<div class="system-panel-row ${r[3]}"><div><strong>${r[0]}</strong><small style="display:block">${r[1]}</small></div><button class="home-feature-buy-btn">${r[2]}</button></div>`).join("")}
+                </div></div>
+              </div></div>
+              <div class="v169-rpg-dialog" style="position:absolute;left:50%;bottom:20px;transform:translateX(-50%);width:min(88%,330px);padding:12px;z-index:5"><h2 style="margin:0 0 6px">確認操作</h2><div class="qa-subtle">Shared Modal 視覺驗收</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px"><button class="v169-rpg-dialog-button">取消</button><button class="v169-rpg-dialog-button selected">確認</button></div></div>
+              </div>`,
+              `.system-panel-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}.v169-rpg-dialog h2{font-size:17px;color:#f3ead7}`)
+          };
+
+          for(const [name,html] of Object.entries(pages)) fs.writeFileSync(path.join(fixtures,`${name}.html`),html,"utf8");
+
+          const sizes=[[360,800],[390,844],[412,915]];
+          const report=[];
+          for(const [name] of Object.entries(pages)){
+            for(const [w,h] of sizes){
+              const file=path.join(fixtures,`${name}.html`);
+              const url="file://"+file.replace(/\\/g,"/");
+              const png=path.join(out,`${name}-${w}x${h}.png`);
+              const shot=spawnSync(chrome,[
+                "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files",
+                "--hide-scrollbars","--force-device-scale-factor=1",`--window-size=${w},${h}`,`--screenshot=${png}`,url
+              ],{encoding:"utf8",timeout:30000,maxBuffer:12*1024*1024});
+              if(shot.status!==0) throw new Error(`${name} ${w}x${h} screenshot failed: ${shot.stderr}`);
+              const dom=spawnSync(chrome,[
+                "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files",
+                "--force-device-scale-factor=1",`--window-size=${w},${h}`,"--dump-dom",url
+              ],{encoding:"utf8",timeout:30000,maxBuffer:12*1024*1024});
+              if(dom.status!==0) throw new Error(`${name} ${w}x${h} DOM check failed: ${dom.stderr}`);
+              const m=dom.stdout.match(/<pre class="qa-result" id="qaResult">([\s\S]*?)<\/pre>/);
+              let metrics={parseError:true};
+              if(m){
+                const decoded=m[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+                try{metrics=JSON.parse(decoded)}catch{}
+              }
+              report.push({page:name,size:`${w}x${h}`,metrics});
+              if(metrics.bodyOverflow||metrics.rootOverflow){
+                throw new Error(`${name} ${w}x${h} has root horizontal overflow`);
+              }
+            }
+          }
+          fs.writeFileSync(path.join(out,"visual-qa-report.json"),JSON.stringify({head:process.env.GITHUB_SHA,pages:Object.keys(pages),sizes,report},null,2));
+          console.log(`Visual QA generated ${report.length} snapshots`);
+          NODE
+          node /tmp/premium-ui-visual-qa.mjs
+
+      - name: Upload visual QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: premium-ui-visual-qa-${{ github.sha }}
+          path: visual-qa-evidence
+          if-no-files-found: error
+          retention-days: 30
