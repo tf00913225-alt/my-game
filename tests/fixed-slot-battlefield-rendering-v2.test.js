@@ -23,6 +23,10 @@ assert.match(adapterSource,/replaceChildren\(fragment\)/,"legacy formation DOM m
 assert.match(adapterSource,/slots\.enemyBackSlots,slots\.enemyFrontSlots/);
 assert.match(adapterSource,/slots\.allyFrontSlots,slots\.allyBackSlots/);
 assert.match(adapterSource,/dataset\.geometryOwner="fixed-slot"/);
+assert.match(adapterSource,/neutralizeLegacyPresentationGeometry/);
+assert.match(adapterSource,/style\.dataset\.geometryOwner="fixed-slot"/);
+assert.match(adapterSource,/area\.classList\.remove\("battle-monsters","v131-formation","v141-fixed-formation"\)/);
+assert.match(adapterSource,/area\.classList\.remove\("battle-player-row"\)/);
 assert.match(adapterSource,/VFX_SCALE_CONTRACT/);
 assert.match(adapterSource,/baseWidth:rect\.width/);
 assert.match(adapterSource,/baseHeight:rect\.height/);
@@ -44,11 +48,13 @@ assert.doesNotMatch(vfxSource,/activeCards\([^)]*\)\.length\s*\*/,"VFX scale mus
 assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone\{[\s\S]*position:relative !important;[\s\S]*height:var\(--battle-enemy-zone-height\) !important;/);
 assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*position:absolute !important;/);
 assert.match(css,/#battlePlayerRow\.v-fixed-ally-zone\{[\s\S]*height:var\(--battle-ally-zone-height\) !important;/);
-assert.match(css,/#battlePlayerRow > \.v-fixed-ally-row\{[\s\S]*position:absolute !important;/);
+assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*position:absolute !important;/);
 assert.match(css,/\.v-fixed-enemy-slot > \.battle-monster,[\s\S]*\.v-fixed-ally-slot > \.battle-player\{[\s\S]*position:absolute !important;[\s\S]*inset:0 !important;/);
 assert.match(css,/\.v174-battle-art\{[\s\S]*background-size:contain !important;[\s\S]*overflow:visible !important;/);
-assert.match(css,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important;/);
+assert.match(css,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important;[\s\S]*contain:none !important;/);
 assert.match(css,/\.v-fixed-slot-popup\{[\s\S]*position:fixed !important;/);
+assert.match(css,/@keyframes v174BattleLungeUp/);
+assert.doesNotMatch(css,/@media \(max-width:380px\)/,"fixed Slot geometry must not have a one-phone geometry override");
 
 assert.match(build,/"js\/battlefield-slot-owner\.js"/);
 assert.match(build,/"js\/battlefield-render-geometry-adapter\.js"/);
