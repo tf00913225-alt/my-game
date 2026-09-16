@@ -23466,10 +23466,10 @@ function fivePriority(indexes){
 window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 
 /* V174 battle presentation owner.
-   Slot geometry is owned by FourSymbolsBattlefieldSlots. This layer owns only
-   artwork presentation and HUD layering. Player and monster artwork share the
-   same no-crop contract: preserve source aspect, contain the full figure, and
-   let art paint outside the small unit card without moving the slot itself. */
+   Slot geometry is owned exclusively by FourSymbolsBattlefieldSlots plus the
+   formal render-geometry adapter. This layer owns only artwork decoration,
+   layering and transient animation. It deliberately contains no Slot/Unit/HUD
+   top/left/right/bottom/inset/width/height positioning rules. */
 function ensureBattlePresentationStyles(){
     if(document.getElementById("v174-cardless-battle-style"))return;
     const style=document.createElement("style");
@@ -23483,41 +23483,22 @@ function ensureBattlePresentationStyles(){
     transition-property:opacity!important;transition-duration:.15s!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
-    position:absolute!important;inset:-8px -8px 26px!important;z-index:1!important;
-    display:block!important;pointer-events:none!important;overflow:visible!important;
+    z-index:1!important;display:block!important;pointer-events:none!important;overflow:visible!important;
     background-repeat:no-repeat!important;background-color:transparent!important;
     background-size:contain!important;background-position:center bottom!important;
     transform-origin:50% 82%!important;will-change:transform,filter!important;
     animation:v174BattleIdle 3.4s ease-in-out infinite!important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
 }
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
-    position:absolute!important;left:50%!important;bottom:13px!important;
-    margin:0!important;transform:translateX(-50%)!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.sp-bar{
-    position:absolute!important;left:50%!important;bottom:0!important;
-    margin:0!important;transform:translateX(-50%)!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp{
-    position:absolute!important;left:50%!important;bottom:13px!important;
-    display:block!important;visibility:visible!important;opacity:1!important;
-    margin:0!important;transform:translateX(-50%)!important;
-}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp,
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp{
-    position:absolute!important;left:50%!important;bottom:0!important;
     display:block!important;visibility:visible!important;opacity:1!important;
-    margin:0!important;transform:translateX(-50%)!important;
 }
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{
-    z-index:20!important;
-}
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{z-index:20!important;}
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
-    position:absolute!important;left:0!important;right:0!important;top:0!important;
-    display:flex!important;min-height:14px!important;align-items:center!important;justify-content:center!important;
-    margin:0!important;padding:0 2px!important;line-height:14px!important;text-align:center!important;
-    white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
-    z-index:24!important;pointer-events:none!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    text-align:center!important;white-space:nowrap!important;overflow:visible!important;
+    visibility:visible!important;opacity:1!important;z-index:24!important;pointer-events:none!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
     content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;
@@ -23529,25 +23510,19 @@ function ensureBattlePresentationStyles(){
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit .sp-bar,
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-hp,
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-sp{z-index:20!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{
-    opacity:0!important;pointer-events:none!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{
-    border:0!important;background:none!important;box-shadow:none!important;
-}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{opacity:0!important;pointer-events:none!important;}
+#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{border:0!important;background:none!important;box-shadow:none!important;}
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn{
     outline:2px solid #f1c96d!important;outline-offset:1px!important;border-radius:8px!important;
     box-shadow:0 0 0 1px rgba(255,232,163,.34),0 0 14px rgba(241,201,109,.82)!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.ally-targetable{box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target{
-    border:0!important;box-shadow:none!important;
-}
+#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target{border:0!important;box-shadow:none!important;}
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn>.v174-battle-art,
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target>.v174-battle-art{
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7)));
 }
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up{animation:none!important;}
+#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up,
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down{animation:none!important;}
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up>.v174-battle-art{animation:v174BattleLungeUp .45s ease!important;}
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down>.v174-battle-art{animation:v174BattleLungeDown .45s ease!important;}
@@ -23556,9 +23531,7 @@ function ensureBattlePresentationStyles(){
 @keyframes v174BattleLungeUp{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(-13px) scale(1.035)}68%{transform:translateY(-5px) scale(1.015)}}
 @keyframes v174BattleLungeDown{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(13px) scale(1.035)}68%{transform:translateY(5px) scale(1.015)}}
 @keyframes v174BattleHitShake{0%,100%{transform:translate(0,0)}18%{transform:translate(-4px,1px)}36%{transform:translate(4px,-1px)}54%{transform:translate(-3px,0)}72%{transform:translate(2px,1px)}}
-@media (prefers-reduced-motion:reduce){
-    #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{animation:none!important;}
-}
+@media (prefers-reduced-motion:reduce){#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{animation:none!important;}}
 `;
     document.head.appendChild(style);
 }
@@ -23613,7 +23586,10 @@ function shakeArtForPopup(node){
     if(!(node instanceof Element))return;
     const popups=node.matches?.(".damage-popup.hp-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup.hp-popup")||[]);
     popups.forEach(popup=>{
-        const card=popup.closest(".battle-player,.battle-monster");
+        const owner=window.FourSymbolsBattlefieldSlots;
+        const slot=popup.dataset?.slot||owner?.getSlotFromElement?.(popup)||null;
+        const slotElement=slot&&owner?.getSlotElement?.(slot);
+        const card=slotElement?.querySelector?.(".battle-player,.battle-monster")||popup.closest(".battle-player,.battle-monster");
         const art=card?.querySelector(":scope > .v174-battle-art");
         if(!art)return;
         art.classList.remove("v174-hit-shake");void art.offsetWidth;art.classList.add("v174-hit-shake");
@@ -23621,49 +23597,26 @@ function shakeArtForPopup(node){
     });
 }
 
-/* V173.51: the EXP-row metadata is injected by V133 after the V131 list render.
-   A later list rerender could replace those rows and momentarily/permanently remove
-   the "目前 EXP / 升下一級需求" line. Decorate synchronously after every render
-   so the requirement never disappears while the EXP pool is open. */
+/* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
-    if(typeof window.v173DecorateExpPoolDistributionUi==="function"){
-        window.v173DecorateExpPoolDistributionUi();
-    }
+    if(typeof window.v173DecorateExpPoolDistributionUi==="function")window.v173DecorateExpPoolDistributionUi();
 }
 if(typeof renderExpDistributeList==="function"&&!renderExpDistributeList.__v17351ExpStable){
     const previousRenderExpDistributeList=renderExpDistributeList;
-    const stableRender=function(){
-        const result=previousRenderExpDistributeList.apply(this,arguments);
-        decorateExpRows();
-        return result;
-    };
-    stableRender.__v17351ExpStable=true;
-    renderExpDistributeList=stableRender;
-    window.renderExpDistributeList=stableRender;
+    const stableRender=function(){const result=previousRenderExpDistributeList.apply(this,arguments);decorateExpRows();return result;};
+    stableRender.__v17351ExpStable=true;renderExpDistributeList=stableRender;window.renderExpDistributeList=stableRender;
 }
 function ensureExpRowsVisible(){
-    const list=document.getElementById("expDistributeList");
-    if(!list)return;
-    const rows=Array.from(list.querySelectorAll(".v131-exp-row"));
-    if(rows.length&&rows.some(row=>!row.querySelector(".v173-exp-row-meta")))decorateExpRows();
+    const list=document.getElementById("expDistributeList");if(!list)return;
+    const rows=Array.from(list.querySelectorAll(".v131-exp-row"));if(rows.length&&rows.some(row=>!row.querySelector(".v173-exp-row-meta")))decorateExpRows();
 }
 decorateExpRows();
 
 function syncManagement(){
-    /*
-       VFX lifecycle belongs exclusively to V142/V143. This management QA
-       observer used to hide #v143-skill-stage every 300ms when its broad
-       non-battle heuristic became true. During a terminal hit battleActive
-       can change before the last visual finishes, which made the final skill
-       name/damage appear while the actual Sprite/VFX vanished.
-       Never write VFX visibility from this subsystem.
-    */
+    /* VFX lifecycle belongs exclusively to the battle VFX owner. */
     document.body.classList.remove("v17351-management-open");
-    document.querySelectorAll(".v17342-element-box-use-notice").forEach(n=>{
-        if(!n.classList.contains("v17351-large-use-notice"))n.classList.add("v17351-large-use-notice");
-    });
-    ensureExpRowsVisible();
-    syncBattlePresentation();
+    document.querySelectorAll(".v17342-element-box-use-notice").forEach(n=>{if(!n.classList.contains("v17351-large-use-notice"))n.classList.add("v17351-large-use-notice");});
+    ensureExpRowsVisible();syncBattlePresentation();
 }
 window.v17351SyncManagement=syncManagement;
 
@@ -24211,4 +24164,420 @@ function scheduleRepairs(){
 ensureFunctionalStyles();runRepairs();
 if(typeof MutationObserver!=="undefined"&&document.body){new MutationObserver(scheduleRepairs).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class"]});}
 document.addEventListener("click",scheduleRepairs,true);document.addEventListener("change",scheduleRepairs,true);window.addEventListener("resize",scheduleRepairs,{passive:true});
+})();
+
+
+/* bundled source: js/battlefield-render-geometry-adapter.js */
+/* Fixed Slot Battlefield Rendering V2 — render geometry adapter.
+   FourSymbolsBattlefieldSlots remains the only Slot/formation geometry owner.
+   This adapter only reconciles legacy renderers/popups back onto that owner. */
+(function installFixedSlotBattlefieldRenderGeometryV2(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__fixedSlotBattlefieldRenderGeometryV2Installed){ return; }
+    const slots=window.FourSymbolsBattlefieldSlots;
+    if(!slots){ return; }
+    window.__fixedSlotBattlefieldRenderGeometryV2Installed=true;
+
+    const VERSION="fixed-slot-render-v2";
+    const LEGACY_PRESENTATION_STYLE_ID="v174-cardless-battle-style";
+    const POPUP_ANCHORS=Object.freeze({
+        damage:Object.freeze({x:.5,y:.28}),
+        critical:Object.freeze({x:.5,y:.24}),
+        heal:Object.freeze({x:.5,y:.28}),
+        shield:Object.freeze({x:.5,y:.30}),
+        miss:Object.freeze({x:.5,y:.26}),
+        status:Object.freeze({x:.5,y:.42})
+    });
+    const VFX_SCALE_CONTRACT=Object.freeze({
+        single:Object.freeze({shape:"single",scale:1}),
+        tri:Object.freeze({shape:"tri",scale:1}),
+        row:Object.freeze({shape:"row",scale:1}),
+        column:Object.freeze({shape:"column",scale:1}),
+        all:Object.freeze({shape:"all",scale:1})
+    });
+
+    let reconciling=false;
+    let reconcileQueued=false;
+    const pendingPopupAnchors=[];
+
+    /* V173.51 remains the presentation/runtime owner for artwork creation,
+       lunge and hit-shake behavior, but its historical injected stylesheet also
+       contained geometry. Keep the style id as a sentinel so that stylesheet is
+       not re-injected; presentation-only rules now live in the canonical source
+       stylesheet fixed-slot-battlefield-rendering-v2.css. */
+    function neutralizeLegacyPresentationGeometry(){
+        if(typeof document==="undefined"||!document.head){ return; }
+        let style=document.getElementById(LEGACY_PRESENTATION_STYLE_ID);
+        if(!style){
+            style=document.createElement("style");
+            style.id=LEGACY_PRESENTATION_STYLE_ID;
+            document.head.appendChild(style);
+        }
+        if(style.dataset.geometryOwner!=="fixed-slot"||style.textContent){
+            style.textContent="";
+            style.dataset.geometryOwner="fixed-slot";
+            style.dataset.presentationSource="fixed-slot-battlefield-rendering-v2.css";
+        }
+    }
+
+    function integerIndexes(value){
+        return Array.isArray(value)?value.filter(Number.isInteger).slice(0,10):[];
+    }
+
+    function activeEnemyIndexes(){
+        try{
+            return integerIndexes(typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]);
+        }catch(_){ return []; }
+    }
+
+    function enemyRankWeight(index){
+        try{
+            const monster=typeof monsters!=="undefined"?monsters[index]:null;
+            const rank=typeof getMonsterRank==="function"?getMonsterRank(monster):(monster&&monster.rank);
+            return rank==="boss"?3:(rank==="elite"?2:1);
+        }catch(_){ return 1; }
+    }
+
+    function activeEnemySnapshot(indexes){
+        let snapshot=slots.getActiveEnemySnapshot();
+        const requested=integerIndexes(indexes);
+        const complete=snapshot&&requested.every(index=>!!slots.getEnemySlotForMonster(snapshot,index));
+        if(!complete&&requested.length){
+            snapshot=slots.createEnemyFormationSnapshot(requested,{
+                originalFormationType:requested.length,
+                rankWeight:enemyRankWeight
+            });
+            slots.setActiveEnemySnapshot(snapshot);
+        }
+        return snapshot;
+    }
+
+    function makeSlot(className,slot){
+        const node=document.createElement("div");
+        node.className=className;
+        node.dataset.slot=slot;
+        node.dataset.geometryOwner="fixed-slot";
+        return node;
+    }
+
+    function canonicalizeEnemyZone(){
+        const area=document.getElementById("battleMonsterArea");
+        if(!area){ return; }
+        const indexes=activeEnemyIndexes();
+        const snapshot=activeEnemySnapshot(indexes);
+        if(!snapshot){ return; }
+
+        const cards=new Map();
+        indexes.forEach(index=>{
+            const card=document.getElementById("battleMonster"+index);
+            if(card){ cards.set(index,card); }
+        });
+
+        const fragment=document.createDocumentFragment();
+        [slots.enemyBackSlots,slots.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
+            const row=document.createElement("div");
+            row.className="v-fixed-slot-row v-fixed-enemy-row";
+            row.dataset.slotRow=rowIndex===0?"back":"front";
+            row.dataset.geometryOwner="fixed-slot";
+            rowSlots.forEach(slot=>{
+                const holder=makeSlot("v-fixed-battle-slot v-fixed-enemy-slot",slot);
+                const index=slots.getAssignedMonsterAtEnemySlot(snapshot,slot);
+                const card=Number.isInteger(index)?cards.get(index):null;
+                if(card){
+                    card.dataset.slot=slot;
+                    card.dataset.geometryOwner="fixed-slot";
+                    holder.appendChild(card);
+                }
+                row.appendChild(holder);
+            });
+            fragment.appendChild(row);
+        });
+        area.replaceChildren(fragment);
+        area.classList.add("v-fixed-enemy-zone","v-fixed-zone-v2");
+        area.classList.remove("battle-monsters","v131-formation","v141-fixed-formation");
+        area.dataset.geometryOwner="fixed-slot";
+        area.dataset.monsterCount=String(indexes.length);
+        area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
+    }
+
+    function partyIndexes(){
+        try{
+            if(typeof getExistingPartyIndexes==="function"){
+                return getExistingPartyIndexes().filter(Number.isInteger).slice(0,3);
+            }
+        }catch(_){ }
+        return [0,1,2].filter(index=>!!document.getElementById("battlePlayerCard"+index));
+    }
+
+    function canonicalizeAllyZone(){
+        const area=document.getElementById("battlePlayerRow");
+        if(!area||typeof slots.ensureAllyFormation!=="function"){ return; }
+        const indexes=partyIndexes();
+        const formation=slots.ensureAllyFormation(indexes);
+        if(!formation){ return; }
+        const cards=new Map();
+        indexes.forEach(index=>{
+            const card=document.getElementById("battlePlayerCard"+index);
+            if(card){ cards.set(index,card); }
+        });
+
+        const fragment=document.createDocumentFragment();
+        [slots.allyFrontSlots,slots.allyBackSlots].forEach((rowSlots,rowIndex)=>{
+            const row=document.createElement("div");
+            row.className="v-fixed-slot-row v-fixed-ally-slot-row v-fixed-ally-slot-row-"+(rowIndex===0?"front":"back");
+            row.dataset.slotRow=rowIndex===0?"front":"back";
+            row.dataset.geometryOwner="fixed-slot";
+            rowSlots.forEach(slot=>{
+                const holder=makeSlot("v-fixed-unit-slot v-fixed-ally-slot",slot);
+                const index=slots.getCharacterAtAllySlot(slot);
+                const card=Number.isInteger(index)?cards.get(index):null;
+                if(card){
+                    card.dataset.slot=slot;
+                    card.dataset.geometryOwner="fixed-slot";
+                    holder.appendChild(card);
+                }
+                row.appendChild(holder);
+            });
+            fragment.appendChild(row);
+        });
+        area.replaceChildren(fragment);
+        area.classList.add("v-fixed-ally-formation","v-fixed-ally-zone","v-fixed-zone-v2");
+        area.classList.remove("battle-player-row");
+        area.dataset.geometryOwner="fixed-slot";
+    }
+
+    function markBattlefieldZones(){
+        const page=document.getElementById("battlePage");
+        if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot"; }
+        const mechanism=document.getElementById("bossMechanismSlot");
+        if(mechanism){ mechanism.classList.add("v-fixed-mechanism-zone"); mechanism.dataset.geometryOwner="fixed-slot"; }
+        const middle=document.querySelector("#battlePage .battle-middle");
+        if(middle){ middle.classList.add("v-fixed-battle-info-zone"); middle.dataset.geometryOwner="fixed-slot"; }
+        const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
+        if(action){ action.classList.add("v-fixed-action-zone"); action.dataset.geometryOwner="fixed-slot"; }
+    }
+
+    function reconcile(){
+        if(reconciling||typeof document==="undefined"){ return; }
+        reconciling=true;
+        try{
+            neutralizeLegacyPresentationGeometry();
+            markBattlefieldZones();
+            canonicalizeEnemyZone();
+            canonicalizeAllyZone();
+        }finally{
+            reconciling=false;
+        }
+    }
+
+    function queueReconcile(){
+        if(reconcileQueued){ return; }
+        reconcileQueued=true;
+        queueMicrotask(()=>{
+            reconcileQueued=false;
+            reconcile();
+        });
+    }
+
+    function slotForElement(element){
+        if(!element){ return null; }
+        const direct=slots.getSlotFromElement(element);
+        if(direct){ return direct; }
+        const id=String(element.id||"");
+        let match=id.match(/^battleMonster(\d+)$/);
+        if(match){
+            const snapshot=activeEnemySnapshot(activeEnemyIndexes());
+            return snapshot?slots.getEnemySlotForMonster(snapshot,Number(match[1])):null;
+        }
+        match=id.match(/^battlePlayerCard(\d+)$/);
+        if(match){ return slots.getAllySlotForCharacter(Number(match[1])); }
+        return null;
+    }
+
+    function anchorForSlot(slot,kind){
+        const rect=slot?slots.getSlotRect(slot):null;
+        if(!rect){ return null; }
+        const contract=POPUP_ANCHORS[kind]||POPUP_ANCHORS.damage;
+        return {
+            slot:slot,
+            x:rect.left+rect.width*contract.x,
+            y:rect.top+rect.height*contract.y,
+            rect:rect
+        };
+    }
+
+    function popupKind(popup,args){
+        if(popup&&popup.classList&&popup.classList.contains("miss-popup")){ return "miss"; }
+        const text=String((popup&&popup.textContent)||"");
+        const type=String((args&&args[2])||"").toLowerCase();
+        if(type.includes("heal")||text.startsWith("+")){ return "heal"; }
+        if(type.includes("shield")){ return "shield"; }
+        if(type.includes("buff")||type.includes("debuff")||type.includes("status")){ return "status"; }
+        if(args&&args[3]===true){ return "critical"; }
+        return "damage";
+    }
+
+    function applyPopupAnchor(popup,slot,kind){
+        if(!popup||!slot){ return false; }
+        const anchor=anchorForSlot(slot,kind);
+        if(!anchor){ return false; }
+        popup.dataset.slot=slot;
+        popup.dataset.geometryOwner="fixed-slot";
+        popup.dataset.popupKind=kind||"damage";
+        popup.classList.add("v-fixed-slot-popup");
+        popup.style.setProperty("position","fixed","important");
+        popup.style.setProperty("left",anchor.x+"px","important");
+        popup.style.setProperty("top",anchor.y+"px","important");
+        popup.style.setProperty("font-size",kind==="critical"?"20px":"18px","important");
+        popup.style.setProperty("transform","translate(-50%,-50%)","important");
+        if(document.body&&popup.parentNode!==document.body){ document.body.appendChild(popup); }
+        return true;
+    }
+
+    function newestPopup(before,selector,scope){
+        const candidates=[];
+        if(scope&&scope.querySelectorAll){ candidates.push(...scope.querySelectorAll(selector)); }
+        if(document.body&&document.body.querySelectorAll){ candidates.push(...document.body.querySelectorAll(selector)); }
+        for(let index=candidates.length-1;index>=0;index--){
+            if(!before.has(candidates[index])){ return candidates[index]; }
+        }
+        return null;
+    }
+
+    function rememberPending(slot,kind){
+        if(!slot){ return; }
+        pendingPopupAnchors.push({slot:slot,kind:kind,expiresAt:Date.now()+2400});
+        while(pendingPopupAnchors.length>24){ pendingPopupAnchors.shift(); }
+    }
+
+    function consumePending(popup){
+        const now=Date.now();
+        while(pendingPopupAnchors.length&&pendingPopupAnchors[0].expiresAt<now){ pendingPopupAnchors.shift(); }
+        const pending=pendingPopupAnchors.shift();
+        return pending?applyPopupAnchor(popup,pending.slot,pending.kind):false;
+    }
+
+    function wrapDamagePopup(){
+        if(typeof window.showDamagePopup!=="function"||window.showDamagePopup.__fixedSlotPopupOwner){ return; }
+        const previous=window.showDamagePopup;
+        const wrapped=function(element){
+            const args=Array.prototype.slice.call(arguments);
+            const slot=slotForElement(element);
+            const before=new Set(document.querySelectorAll(".damage-popup"));
+            rememberPending(slot,"damage");
+            const result=previous.apply(this,args);
+            const popup=newestPopup(before,".damage-popup",element);
+            if(popup){
+                const kind=popupKind(popup,args);
+                if(applyPopupAnchor(popup,slot,kind)){ pendingPopupAnchors.pop(); }
+            }
+            return result;
+        };
+        wrapped.__fixedSlotPopupOwner=true;
+        wrapped.__previous=previous;
+        window.showDamagePopup=wrapped;
+        try{ showDamagePopup=wrapped; }catch(_){ }
+    }
+
+    function wrapMissPopup(){
+        if(typeof window.showMissEffect!=="function"||window.showMissEffect.__fixedSlotPopupOwner){ return; }
+        const previous=window.showMissEffect;
+        const wrapped=function(isPlayerTarget,index){
+            const side=isPlayerTarget?"player":"monster";
+            const slot=slots.getSlotForCombatant(side,Number(index)||0,{enemySnapshot:slots.getActiveEnemySnapshot()});
+            rememberPending(slot,"miss");
+            return previous.apply(this,arguments);
+        };
+        wrapped.__fixedSlotPopupOwner=true;
+        wrapped.__previous=previous;
+        window.showMissEffect=wrapped;
+        try{ showMissEffect=wrapped; }catch(_){ }
+    }
+
+    function geometryForVfx(targetSide,primarySlot,shape){
+        const contract=VFX_SCALE_CONTRACT[shape]||VFX_SCALE_CONTRACT.single;
+        let rect=null;
+        if(contract.shape==="all"){
+            rect=slots.getSideRect(targetSide);
+        }else if(primarySlot){
+            rect=slots.getGeometryRectFromShape(targetSide,primarySlot,contract.shape);
+        }
+        if(!rect){ return null; }
+        return {
+            owner:"fixed-slot",
+            shape:contract.shape,
+            scale:contract.scale,
+            baseWidth:rect.width,
+            baseHeight:rect.height,
+            rect:rect,
+            center:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}
+        };
+    }
+
+    const api=Object.freeze({
+        version:VERSION,
+        popupAnchors:POPUP_ANCHORS,
+        vfxScaleContract:VFX_SCALE_CONTRACT,
+        reconcile:reconcile,
+        queueReconcile:queueReconcile,
+        getSlotForElement:slotForElement,
+        getAnchorForSlot:anchorForSlot,
+        getVfxGeometry:geometryForVfx,
+        neutralizeLegacyPresentationGeometry:neutralizeLegacyPresentationGeometry
+    });
+    window.FourSymbolsBattlefieldRenderGeometry=api;
+
+    if(typeof window.renderBattle==="function"&&!window.renderBattle.__fixedSlotRenderV2){
+        const previous=window.renderBattle;
+        const wrapped=function(){
+            const result=previous.apply(this,arguments);
+            reconcile();
+            return result;
+        };
+        wrapped.__fixedSlotRenderV2=true;
+        window.renderBattle=wrapped;
+        try{ renderBattle=wrapped; }catch(_){ }
+    }
+
+    neutralizeLegacyPresentationGeometry();
+    wrapDamagePopup();
+    wrapMissPopup();
+
+    function isOwnedFixedStructure(node){
+        if(!(node instanceof Element)||node.dataset.geometryOwner!=="fixed-slot"){ return false; }
+        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot");
+    }
+
+    const observer=new MutationObserver(records=>{
+        let needsReconcile=false;
+        records.forEach(record=>{
+            record.addedNodes.forEach(node=>{
+                if(!(node instanceof Element)){ return; }
+                const popups=node.matches&&node.matches(".damage-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup")||[]);
+                popups.forEach(popup=>{
+                    if(popup.dataset.geometryOwner==="fixed-slot"){ return; }
+                    const card=popup.closest?.(".battle-player,.battle-monster,[data-slot]");
+                    const slot=card?slotForElement(card):null;
+                    if(slot){ applyPopupAnchor(popup,slot,popupKind(popup,[])); }
+                    else{ consumePending(popup); }
+                });
+                /* Reconcile only legacy/new combat content. The fixed rows and
+                   holders below are created by reconcile() itself; observing them
+                   must not recursively schedule another reconcile forever. */
+                if(isOwnedFixedStructure(node)){ return; }
+                if(
+                    node.id==="battleMonsterArea"||node.id==="battlePlayerRow"||
+                    node.matches?.(".battle-monster,.battle-player,.v131-monster-row")||
+                    node.querySelector?.(".battle-monster,.battle-player")
+                ){
+                    needsReconcile=true;
+                }
+            });
+        });
+        if(needsReconcile){ queueReconcile(); }
+    });
+    if(document.body){ observer.observe(document.body,{subtree:true,childList:true}); }
+
+    reconcile();
 })();
