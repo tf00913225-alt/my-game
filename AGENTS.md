@@ -137,3 +137,52 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 - UI、手機 viewport、捲動、裁切、icon、modal、loading、點擊等不能由靜態 CI 完整證明的需求，仍必須做最小必要實際視覺／操作驗收。
 - Cache invalidation、Game Version、Service Worker 更新不得清除玩家 localStorage、IndexedDB、雲端存檔、帳號、背包、等級、裝備或進度；靜態 Cache 與 Save Data 必須完全分離。
 - 完成回報固定包含：`Requirements: N/N VERIFIED`、Branch、Commit SHA、Game Version、Cache Version、Repository checks、Deploy、Deployment SHA verified。任一未完成即顯示 `NOT COMPLETE`。
+
+## 最高優先：System Contract / Data Security / Payment Contract Gate
+
+本節為所有 AI（人工智慧）施工的永久前置規則，與既有規範共同生效；不得以既有文件未提及某個新功能為理由跳過。
+
+### 一、邏輯與遊戲資料修改前必讀
+任何程式邏輯、遊戲資料、戰鬥、Fixed Slot（固定格位）、技能、狀態、VFX（視覺特效）、背包、裝備、物品、合成、冶煉、商店、貨幣、獎勵、掉落、寶箱、秘寶、冒險、NPC（非玩家角色）、英雄、Boss（頭目）、深淵、副本、援軍、換波、存檔、雲端、帳號、付費或後台修改前，都必須完整閱讀 `SYSTEM_CONTRACTS.md`。
+
+### 二、帳號／雲端／安全修改前額外必讀
+若涉及 Firebase（雲端服務）、Firebase Auth（身分驗證）、UID（使用者唯一識別）、帳號切換、匿名登入、第三方登入、本機／雲端同步、雲端資料、資料遷移、Firestore Rules（資料庫安全規則）、管理員權限、Secret（機密）、個人資料、Log（紀錄）、後台、備份或還原，必須額外完整閱讀 `DATA_SECURITY_CONTRACTS.md`。
+
+### 三、付款／權益修改前額外必讀
+若涉及付款、訂單、刷卡、金流、付費虛寶、Entitlement（玩家付費權益）、退款、補發、人工補償、郵件補償、對帳、Webhook（伺服器通知）、Server Verification（伺服器驗證）、Sandbox（測試環境）或 Production（正式付款環境），必須額外完整閱讀 `PAYMENT_ENTITLEMENT_CONTRACTS.md`。
+
+### 四、涉及 Real Money（เงินจริง）時三份全部必讀
+任何涉及 Real Money（เงินจริง）的施工，`SYSTEM_CONTRACTS.md`、`DATA_SECURITY_CONTRACTS.md`、`PAYMENT_ENTITLEMENT_CONTRACTS.md` 三份全部必須完整閱讀，缺一不可。
+
+### 五、任何邏輯修改前必做 System Contract Check（系統契約檢查）
+施工前必須依 `SYSTEM_CONTRACTS.md` 回報至少以下 17 項：
+
+1. 本次子系統。
+2. Canonical Owner（唯一正式擁有者）。
+3. Source of Truth（唯一真實資料）。
+4. Lifecycle（生命週期）。
+5. 正式 Mutation API（狀態變更介面）。
+6. Derived State（衍生狀態）。
+7. Persistence（持久化）。
+8. Wrapper Chain（包裝呼叫鏈）。
+9. Cross-system Dependencies（跨系統相依）。
+10. Runtime Invariants（執行期不變條件）。
+11. Test Fixture（測試夾具）是否正式等價。
+12. 是否涉及帳號／雲端。
+13. 是否涉及玩家資產。
+14. 是否涉及 Real Money（เงินจริง）。
+15. 是否涉及 Secret（機密）。
+16. 是否涉及後台權限。
+17. 本次修改可能破壞哪些契約。
+
+未完成此檢查，不得施工。
+
+永久施工順序固定為：
+
+**Owner（擁有者） → Source of Truth（唯一真實資料） → Lifecycle（生命週期） → Mutation（狀態變更） → Invariant（不變條件） → Failure Mode（失敗模式） → Security Boundary（安全邊界） → Test Fixture（測試夾具） → 最小修改 → Regression（回歸驗證）。**
+
+涉及 Real Money（เงินจริง）時再追加：
+
+**Order（訂單） → Server Verification（伺服器驗證） → Idempotency（冪等性） → Entitlement（玩家付費權益） → Audit（稽核） → Reconciliation（對帳）。**
+
+禁止「看到症狀 → 加 `if` → 測試通過 → 宣稱修好」。若狀態如何合法形成尚未被證明，先調查，不得修改消費該狀態的程式。

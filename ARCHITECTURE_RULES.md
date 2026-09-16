@@ -36,3 +36,38 @@
 13. 不可因 Auth、Firestore、localStorage 或 migration error 誤判成「新玩家」，也不可因此顯示創角或清除資料。
 14. 新增 feature 預設為 lazy/non-critical；只有能證明它是帳號畫面、創角最小依賴或第一個可操作畫面必要依賴時，才能加入 Critical Boot。
 15. 修改 startup architecture 必須同步更新 boot manifest、production build、`docs/BOOT_ARCHITECTURE.md`、架構測試與 browser QA。
+
+## Cross-System Contract Authority
+
+跨系統狀態、帳號安全與付款權益的永久權威邊界如下：
+
+1. **`SYSTEM_CONTRACTS.md` 是跨系統狀態正確性與生命週期契約的最高權威文件。**
+   - 負責 Canonical Owner（唯一正式擁有者）、Source of Truth（唯一真實資料）、Lifecycle（生命週期）、Mutation（狀態變更）、Invariant（不變條件）、Transaction（交易）、Derived State（衍生狀態）、Async（非同步）、Test Fixture（測試夾具）、Impact Audit（影響稽核）與 Regression（回歸驗證）。
+   - 任何新系統或既有邏輯修改都必須先完成其 System Contract Check（系統契約檢查）。
+
+2. **`DATA_SECURITY_CONTRACTS.md` 是帳號、資料、雲端、安全與後台權限的最高權威文件。**
+   - 負責 Firebase（雲端服務）、Firebase Auth（身分驗證）、UID（使用者唯一識別）、本機／雲端存檔、多裝置同步、Migration（資料遷移）、Firestore Rules（資料庫安全規則）、Secret（機密）、個人資料、Log（紀錄）、Environment Isolation（環境隔離）、管理員後台、Backup（備份）、Restore（還原）與 Disaster Recovery（災難復原）。
+
+3. **`PAYMENT_ENTITLEMENT_CONTRACTS.md` 是付款、訂單、虛寶權益、退款、補發與對帳的最高權威文件。**
+   - 負責 Real Money（เงินจริง）、Order（訂單）、Payment Provider（金流服務商）、Webhook（伺服器通知）、Server Verification（伺服器驗證）、Transaction ID（交易編號）、Idempotency（冪等性）、Entitlement（玩家付費權益）、Grant（發放）、Refund（退款）、Revocation（回收）、補發、郵件補償、Reconciliation（對帳）與 Audit Log（稽核紀錄）。
+
+4. 現有專項權威文件維持原責任，不被上述三份文件取代：
+   - `AGENTS.md`：AI（人工智慧）施工前置要求、專案開發與 QA（品質保證）固定流程。
+   - `CLAUDE.md`：既有開發代理規則。
+   - `HANDOFF.md`：目前專案狀態、歷史施工、交接與暫時補丁紀錄。
+   - `ARCHITECTURE_RULES.md`：檔案 Owner（擁有者）、Wrapper（包裝）、Patch（補丁）收斂、Boot（啟動）與整體架構施工規則。
+   - `UI_GUIDELINES.md`：一般 UI（使用者介面）規範。
+   - `docs/ITEM_RARITY_UI_SPEC.md`：物品階級與固定色號專項權威。
+   - `docs/IMAGE_ASSET_SPEC.md`：圖片格式、WebP（網頁圖片格式）、透明度、尺寸、Sprite Sheet（精靈圖集）／VFX（視覺特效）資產流程專項權威。
+
+5. 禁止把三份 Contract（契約）文件整份複製到其他規範。其他文件只建立清楚的責任邊界與交叉引用，避免形成第二套規範或版本分歧。
+
+6. 若規範發生交叉，依問題類型判定最高權威：
+   - 狀態如何合法形成、誰能修改、生命週期何時成立：`SYSTEM_CONTRACTS.md`。
+   - 帳號屬於誰、資料如何保存／同步／授權、Secret（機密）如何保護：`DATA_SECURITY_CONTRACTS.md`。
+   - 錢是否收到、何時能發貨、如何防重、退款與對帳：`PAYMENT_ENTITLEMENT_CONTRACTS.md`。
+   - UI（使用者介面）呈現：`UI_GUIDELINES.md` 與其專項規格。
+   - 圖片資產格式與導入：`docs/IMAGE_ASSET_SPEC.md`。
+   - 物品稀有度階級與色號：`docs/ITEM_RARITY_UI_SPEC.md`。
+
+永久原則：**先證明一個狀態如何合法形成，再修改使用這個狀態的程式。**
