@@ -32,7 +32,7 @@ assert.match(adapterSource,/applyPopupAnchor/);
 assert.match(adapterSource,/slots\.getSlotRect\(slot\)/);
 assert.match(adapterSource,/wrapDamagePopup/);
 assert.match(adapterSource,/wrapMissPopup/);
-assert.match(adapterSource,/font-size","20px"/);
+assert.match(adapterSource,/kind==="critical"\?"20px":"18px"/);
 assert.doesNotMatch(adapterSource,/rect\.width\s*\/\s*element\.offsetWidth|visualScale/,"popup scale must not be based on card bounds");
 
 assert.match(vfxSource,/getGeometryRectFromShape/);
@@ -55,8 +55,6 @@ assert.match(build,/"js\/battlefield-render-geometry-adapter\.js"/);
 assert.ok(build.indexOf('"js/battlefield-render-geometry-adapter.js"')>build.indexOf('"js/54-v173.51-battle-qa.js"'),"adapter must install after legacy presentation wrappers");
 assert.match(build,/"css\/fixed-slot-battlefield-rendering-v2\.css"/);
 
-// Contract-level geometry stays formation-size independent. This executes the
-// canonical owner with a tiny fake DOM whose Slot rects never move.
 const rects={};
 const enemySlots=["ENEMY_B1","ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_B5","ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"];
 enemySlots.forEach((slot,index)=>{
@@ -85,10 +83,19 @@ for(const count of [1,3,5,6,8,10]){
     const indexes=Array.from({length:count},(_,index)=>index);
     const snapshot=owner.createEnemyFormationSnapshot(indexes,{originalFormationType:count,rankWeight:()=>1});
     const before=JSON.stringify(snapshot.monsterIndexToSlot);
-    // Death never mutates the immutable formation snapshot.
     owner.resolveEnemyTargets(snapshot,Math.min(1,count-1),"all",index=>index!==Math.floor(count/2));
     assert.equal(JSON.stringify(snapshot.monsterIndexToSlot),before,`formation ${count} moved after death filter`);
 }
+
+for(const allyCount of [1,2,3]){
+    const indexes=Array.from({length:allyCount},(_,index)=>index);
+    const formation=owner.normalizeAllyFormation(null,indexes);
+    assert.equal(Object.keys(formation.characterIndexToSlot).length,allyCount);
+    indexes.forEach(index=>assert.ok(owner.allySlots.includes(formation.characterIndexToSlot[index])));
+}
+const split=owner.normalizeAllyFormation({characterIndexToSlot:{0:"ALLY_F1",1:"ALLY_B2",2:"ALLY_F3"}},[0,1,2]);
+assert.equal(split.characterIndexToSlot[1],"ALLY_B2");
+
 const single=owner.getGeometryRectFromShape("monster","ENEMY_F3","single");
 const tri=owner.getGeometryRectFromShape("monster","ENEMY_F3","tri");
 const row=owner.getGeometryRectFromShape("monster","ENEMY_F3","row");
@@ -100,7 +107,5 @@ assert.ok(row.width>=tri.width);
 assert.ok(column.height>single.height);
 assert.ok(all.width>=row.width&&all.height>=column.height);
 
-// v173.51 may animate presentation, but the final geometry adapter is the only
-// owner allowed to reconcile Slot/HUD/popup coordinates.
-assert.match(qaSource,/V174_CARDLESS_PRESENTATION/);
+assert.match(qaSource,/V174 battle presentation owner/);
 console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");
