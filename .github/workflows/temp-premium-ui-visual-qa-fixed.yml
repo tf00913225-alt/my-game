@@ -39,6 +39,7 @@ jobs:
         run: |
           awk '/cat > \/tmp\/premium-ui-visual-qa.mjs <<'"'"'NODE'"'"'/{capture=1;next} capture && /^          NODE$/{exit} capture{sub(/^          /,"");print}' .github/workflows/temp-premium-ui-visual-qa.yml > /tmp/premium-ui-visual-qa-source.mjs
           test -s /tmp/premium-ui-visual-qa-source.mjs
+          sed -i 's/#game-stage{position:relative;width:100vw;height:100vh;min-width:0;min-height:0;overflow:hidden;transform:none!important;background:#070604}/#game-stage{position:relative!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;margin:0!important;width:100vw!important;height:100vh!important;min-width:0;min-height:0;overflow:hidden!important;transform:none!important;background:#070604}/' /tmp/premium-ui-visual-qa-source.mjs
           awk '/^const sizes=/{exit} {print}' /tmp/premium-ui-visual-qa-source.mjs > .tmp-premium-ui-visual-qa.mjs
           cat >> .tmp-premium-ui-visual-qa.mjs <<'NODE'
           const {default:puppeteer}=await import("puppeteer-core");
@@ -60,24 +61,35 @@ jobs:
                 await new Promise(resolve=>setTimeout(resolve,100));
                 const metrics=await page.evaluate(()=>{
                   const root=document.querySelector("#game-stage");
+                  const box=document.querySelector("#homeFeatureModal .home-feature-modal-box");
                   const bad=[...document.querySelectorAll("*")].filter(el=>{
                     const style=getComputedStyle(el);
                     return el.scrollWidth>el.clientWidth+2 && style.overflowX!=="auto" && style.overflowX!=="scroll";
                   });
+                  const rr=root?root.getBoundingClientRect():null;
+                  const br=box?box.getBoundingClientRect():null;
                   return {
                     width:innerWidth,
                     height:innerHeight,
                     htmlScrollWidth:document.documentElement.scrollWidth,
                     bodyOverflow:document.documentElement.scrollWidth>innerWidth+2,
                     rootOverflow:root?root.scrollWidth>root.clientWidth+2:false,
+                    rootRect:rr?{left:rr.left,top:rr.top,right:rr.right,bottom:rr.bottom,width:rr.width,height:rr.height}:null,
+                    boxRect:br?{left:br.left,top:br.top,right:br.right,bottom:br.bottom,width:br.width,height:br.height}:null,
                     offenders:bad.slice(0,8).map(el=>({tag:el.tagName,id:el.id,cls:String(el.className||"").slice(0,100),sw:el.scrollWidth,cw:el.clientWidth}))
                   };
                 });
                 if(metrics.width!==w||metrics.height!==h){
                   throw new Error(`${name} expected ${w}x${h} viewport, got ${metrics.width}x${metrics.height}`);
                 }
+                if(!metrics.rootRect||Math.abs(metrics.rootRect.left)>1||Math.abs(metrics.rootRect.top)>1||Math.abs(metrics.rootRect.width-w)>1||Math.abs(metrics.rootRect.height-h)>1){
+                  throw new Error(`${name} ${w}x${h} stage is not aligned to viewport: ${JSON.stringify(metrics.rootRect)}`);
+                }
                 if(metrics.bodyOverflow||metrics.rootOverflow){
                   throw new Error(`${name} ${w}x${h} has root horizontal overflow: ${JSON.stringify(metrics.offenders)}`);
+                }
+                if(metrics.boxRect&&(metrics.boxRect.left<-2||metrics.boxRect.right>w+2)){
+                  throw new Error(`${name} ${w}x${h} modal box is outside viewport: ${JSON.stringify(metrics.boxRect)}`);
                 }
                 const png=path.join(out,`${name}-${w}x${h}.png`);
                 await page.screenshot({path:png,type:"png",fullPage:false});
