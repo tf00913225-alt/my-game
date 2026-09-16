@@ -33,6 +33,11 @@ jobs:
           path.write_text(text[:start]+text[end:],encoding='utf-8')
           PY
           python3 scripts/_fixed_slot_phase3.py
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('css/31-v131-fix-batch.css')
+          path.write_text(path.read_text(encoding='utf-8').rstrip()+"\n",encoding='utf-8')
+          PY
       - name: Verify checkpoint 3
         run: |
           node --check js/battlefield-slot-owner.js
