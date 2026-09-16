@@ -26,12 +26,12 @@ jobs:
       - name: Verify exact fix HEAD and tests-only commit scope
         shell: bash
         run: |
-          test "$(git rev-parse HEAD)" = "dc70bca06ed016c7bbc44161a281c1f1499b4e5c"
-          base=384c475c2373ae9f034ce88bfe300d8f73f0c13d
+          test "$(git rev-parse HEAD)" = "e6a162b4b92d55b263242c471838529fb18b20ab"
+          base=dc70bca06ed016c7bbc44161a281c1f1499b4e5c
           git fetch --no-tags --depth=1 origin "$base"
           changed="$(git diff --name-only "$base" HEAD | sort)"
           printf '%s\n' "$changed"
-          test "$changed" = "tests/remaining-ui-regressions-20260914.test.js"
+          test "$changed" = "tests/ui-typography-battle-preservation.test.js"
           git diff --check "$base" HEAD
           test -z "$(git diff --name-only "$base" HEAD -- js css scripts config asset-manifest.json)"
 
@@ -56,9 +56,10 @@ jobs:
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
 
-      - name: Run UI, portrait and VFX targeted tests
+      - name: Run typography, UI, portrait and VFX targeted tests
         shell: bash
         run: |
+          node tests/ui-typography-battle-preservation.test.js
           node tests/remaining-ui-regressions-20260914.test.js
           node tests/monster-portrait-runtime.test.js
           node tests/mechanism-card-vfx-reliability-20260914.test.js
@@ -77,5 +78,5 @@ jobs:
       - name: Run full Node suite
         env:
           CI_BASE_SHA: e3de8f7fee4e65986420528247bdbb99cb588a07
-          CI_HEAD_SHA: dc70bca06ed016c7bbc44161a281c1f1499b4e5c
+          CI_HEAD_SHA: e6a162b4b92d55b263242c471838529fb18b20ab
         run: node .github/scripts/ci.mjs tests
