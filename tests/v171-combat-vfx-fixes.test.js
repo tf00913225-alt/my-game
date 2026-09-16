@@ -48,17 +48,31 @@ test("Water trajectories use resolved actor-target geometry before raster activa
 });
 
 test("Ice Arrow Rain uses one centered full-field raster sheet without tiles",()=>{
-    const battlefield=animation.match(/if\(placement==="battlefield"\)\{[\s\S]*?\n\s*return;\n\s*\}/);
+    const geometryBounds=animation.match(/function geometryBounds\(current,indexes,placement\)\{[\s\S]*?\n\s*return rect;\n\s*\}/);
+    assert.ok(geometryBounds);
+    assert.match(geometryBounds[0],/const owner=geometryOwner\(\)/);
+    assert.match(geometryBounds[0],/owner\.getRectForSlots\(mechanismSlots\)/);
+    assert.match(geometryBounds[0],/placement==="battlefield"\|\|targetType==="all"\|\|targetType==="allyAll"/);
+    assert.match(geometryBounds[0],/owner\.getSideRect\(current\.targetSide\)/);
+    assert.match(geometryBounds[0],/fixed-enemy-zone/);
+    assert.match(geometryBounds[0],/fixed-ally-zone/);
+
+    const placeSprite=animation.match(/function placeSprite\(current,node,index,target\)\{[\s\S]*?\n\s*\}\n\n\s*function addSprite/);
+    assert.ok(placeSprite);
+    assert.match(placeSprite[0],/const indexes=emittedSpriteTargets\(current\)/);
+    assert.match(placeSprite[0],/const bounds=geometryBounds\(current,indexes,placement\)/);
+
+    const battlefield=placeSprite[0].match(/if\(placement==="battlefield"\)\{[\s\S]*?\n\s*return;\n\s*\}/);
     assert.ok(battlefield);
-    assert.match(battlefield[0],/const bounds=mechanismTargetBounds\(current,emittedSpriteTargets\(current\)\)\|\|sideAreaBounds\(current\.targetSide\)/);
     assert.match(battlefield[0],/const coverageScale=clamp\(Number\(sprite\.coverageScale\)\|\|Number\(sprite\.scale\)\|\|1,1,1\.4\)/);
     assert.match(battlefield[0],/Math\.round\(bounds\.width\*coverageScale\)/);
     assert.match(battlefield[0],/Math\.round\(bounds\.height\*coverageScale\)/);
     assert.match(battlefield[0],/applySpriteBox\(node,width,height,sprite\)/);
-    assert.match(battlefield[0],/node\.style\.left=\(bounds\.left\+bounds\.width\/2\)\+"px"/);
-    assert.match(battlefield[0],/node\.style\.top=\(bounds\.top\+bounds\.height\/2\)\+"px"/);
+    assert.match(battlefield[0],/node\.style\.left=bounds\.centerX\+"px"/);
+    assert.match(battlefield[0],/node\.style\.top=bounds\.centerY\+"px"/);
     assert.match(battlefield[0],/node\.style\.clipPath="none"/);
     assert.doesNotMatch(battlefield[0],/buildBattlefieldSpriteTiles\(node,sprite,bounds\)/);
+    assert.doesNotMatch(animation,/function mechanismTargetBounds|function sideAreaBounds/);
     assert.doesNotMatch(css,/\.v166-water-battlefield-tile\{/);
 });
 
