@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   patch:
-    if: startsWith(github.event.head_commit.message, 'chore: run fixed-slot checkpoint 2')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
