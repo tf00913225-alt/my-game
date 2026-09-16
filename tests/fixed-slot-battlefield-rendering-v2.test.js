@@ -27,6 +27,8 @@ assert.match(adapterSource,/neutralizeLegacyPresentationGeometry/);
 assert.match(adapterSource,/style\.dataset\.geometryOwner="fixed-slot"/);
 assert.match(adapterSource,/area\.classList\.remove\("battle-monsters","v131-formation","v141-fixed-formation"\)/);
 assert.match(adapterSource,/area\.classList\.remove\("battle-player-row"\)/);
+assert.match(adapterSource,/function isOwnedFixedStructure\(node\)/);
+assert.match(adapterSource,/if\(isOwnedFixedStructure\(node\)\)\{ return; \}/,"observer must ignore its own fixed Slot rows/holders");
 assert.match(adapterSource,/VFX_SCALE_CONTRACT/);
 assert.match(adapterSource,/baseWidth:rect\.width/);
 assert.match(adapterSource,/baseHeight:rect\.height/);
