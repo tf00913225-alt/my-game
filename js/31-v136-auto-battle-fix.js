@@ -295,8 +295,9 @@
 
     function enforceAutoTargetPriority(queued){
         if(!queuedActionTargetsEnemy(queued)){ return; }
-        const target=getPriorityAutoTarget();
-        if(Number.isInteger(target)){ queued.target=target; }
+        queued.vFixedAutoEnemyPrimary=true;
+        const previewTarget=getPriorityAutoTarget();
+        if(Number.isInteger(previewTarget)){ queued.target=previewTarget; }
     }
 
     /*

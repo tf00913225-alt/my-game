@@ -12,8 +12,16 @@ function guard(name){const old=window[name];if(typeof old!=="function"||old.__v1
 ["addPoint","removePoint","confirmStatus","learnSkill","upgradeSkill"].forEach(guard);
 document.addEventListener("click",e=>{if(!inBattle())return;const b=e.target?.closest?.("button,[role=button]");if(!b)return;const s=String(b.getAttribute?.("onclick")||"");if(!/(addPoint|removePoint|confirmStatus|learnSkill|upgradeSkill)\s*\(/.test(s))return;e.preventDefault();e.stopImmediatePropagation();blocked();},true);
 
-function fivePriority(indexes){const list=(indexes||[]).filter(Number.isInteger);if(list.length!==5)return null;let rows=null;try{if(typeof window.v148GetFormationRows==="function")rows=window.v148GetFormationRows(list);else if(typeof window.v138GetFormationRows==="function")rows=window.v138GetFormationRows(list)}catch(_){}const row=Array.isArray(rows)&&Array.isArray(rows[0])&&rows[0].length===5?rows[0].slice():list.slice();return [row[2],row[1],row[3],row[0],row[4]].filter(Number.isInteger);}
-if(typeof window.v148GetAutoTargetPriority==="function"){const old=window.v148GetAutoTargetPriority;window.v148GetAutoTargetPriority=function(indexes){return fivePriority(indexes)||old.apply(this,arguments)}}
+function fivePriority(indexes){
+    const list=(indexes||[]).filter(Number.isInteger);
+    if(list.length!==5)return null;
+    try{
+        if(typeof window.v148GetAutoTargetPriority==="function"){
+            return window.v148GetAutoTargetPriority(list).slice();
+        }
+    }catch(_){}
+    return [list[3],list[1],list[4],list[2],list[0]].filter(Number.isInteger);
+}
 window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 
 /* V174 battle presentation owner.

@@ -120,7 +120,9 @@
         const rows=enemyRowsForType(originalFormationType);
         const slotToMonsterIndex=emptySlotMap(ENEMY_SLOTS);
         const monsterIndexToSlot={};
-        const useRankPlacement=typeof config.rankWeight==="function";
+        const rankValues=typeof config.rankWeight==="function"
+            ?indexes.map(index=>Number(config.rankWeight(index)||0)):[];
+        const useRankPlacement=rankValues.length>1&&new Set(rankValues).size>1;
         const ordered=useRankPlacement?rankOrdered(indexes,config.rankWeight):indexes.slice();
         let cursor=0;
 
@@ -203,6 +205,67 @@
         }));
     }
 
+    function slotsForSide(side){
+        return side==="enemy"?ENEMY_SLOTS:(side==="ally"?ALLY_SLOTS:[]);
+    }
+
+    function normalizeShape(shape){
+        const value=String(shape||"single");
+        if(value==="tri"||value==="horizontal-3"||value==="allyTri"){ return "tri"; }
+        if(value==="allyAll"){ return "all"; }
+        if(value==="ally"){ return "single"; }
+        return value;
+    }
+
+    function resolveSlotsFromShape(side,primarySlot,shape){
+        const allowed=slotsForSide(side);
+        if(!allowed.includes(primarySlot)){ return []; }
+        const meta=SLOT_META[primarySlot];
+        const normalized=normalizeShape(shape);
+        if(normalized==="single"){ return [primarySlot]; }
+        if(normalized==="all"){ return allowed.slice(); }
+        if(normalized==="row"){
+            return allowed.filter(slot=>SLOT_META[slot].row===meta.row)
+                .sort((a,b)=>SLOT_META[a].column-SLOT_META[b].column);
+        }
+        if(normalized==="column"){
+            return allowed.filter(slot=>SLOT_META[slot].column===meta.column)
+                .sort((a,b)=>{
+                    const order=side==="enemy"?{back:0,front:1}:{front:0,back:1};
+                    return (order[SLOT_META[a].row]??9)-(order[SLOT_META[b].row]??9);
+                });
+        }
+        if(normalized==="tri"){
+            return allowed.filter(slot=>
+                SLOT_META[slot].row===meta.row&&
+                Math.abs(SLOT_META[slot].column-meta.column)<=1
+            ).sort((a,b)=>SLOT_META[a].column-SLOT_META[b].column);
+        }
+        return [primarySlot];
+    }
+
+    function resolveEnemyTargets(snapshot,primaryMonsterIndex,shape,isAlive){
+        if(!snapshot){ return []; }
+        const primarySlot=slotForMonster(snapshot,primaryMonsterIndex);
+        if(!primarySlot){ return []; }
+        return resolveSlotsFromShape("enemy",primarySlot,shape)
+            .map(slot=>activeMonsterAt(snapshot,slot,isAlive))
+            .filter(index=>Number.isInteger(index));
+    }
+
+    function nextEnemyPrimaryTarget(snapshot,isAlive){
+        const priority=priorityMonsterIndexes(snapshot,isAlive);
+        return priority.length?priority[0]:null;
+    }
+
+    function assignedEnemyRows(snapshot){
+        if(!snapshot){ return []; }
+        return cloneRows(snapshot.rowSlots).map(row=>row
+            .map(slot=>assignedMonsterAt(snapshot,slot))
+            .filter(index=>Number.isInteger(index))
+        );
+    }
+
     let activeEnemySnapshot=null;
     function setActiveEnemySnapshot(snapshot){
         activeEnemySnapshot=snapshot&&snapshot.kind==="enemy-formation-snapshot"?snapshot:null;
@@ -231,6 +294,10 @@
         assignMonsterToPreferredEnemySlot:assignMonsterToPreferredSlot,
         getPriorityMonsterIndexes:priorityMonsterIndexes,
         getEnemySnapshotRows:snapshotRows,
+        getAssignedEnemyRows:assignedEnemyRows,
+        resolveSlotsFromShape:resolveSlotsFromShape,
+        resolveEnemyTargets:resolveEnemyTargets,
+        getNextEnemyPrimaryTarget:nextEnemyPrimaryTarget,
         setActiveEnemySnapshot:setActiveEnemySnapshot,
         getActiveEnemySnapshot:getActiveEnemySnapshot,
         clearActiveEnemySnapshot:clearActiveEnemySnapshot

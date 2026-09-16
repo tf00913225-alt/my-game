@@ -53,6 +53,7 @@ const appScripts=[
     "js/61-v174-ui-regression-guards.js"
 ];
 const gameplayScripts=[
+    "js/battlefield-slot-owner.js",
     "js/25-v131-fix-batch.js",
     "js/27-v132-content-expansion.js",
     "js/28-v133-economy-rebalance.js",
