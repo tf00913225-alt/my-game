@@ -1032,8 +1032,14 @@ test("enemy Heal Spell affects only one same-row trio for both North Emperor and
                 v141SupportSkillIds:index===3?["revive","healSpell"]:[],v141ForceSkillLevel:5,skillChance:1});
             currentBattleMonsters.push(index);
         }
+        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);
+        if(!snapshot){ throw new Error("V170 Heal Spell fixture must create the formal enemy snapshot"); }
+        const slotOwner=window.FourSymbolsBattlefieldSlots;
+        const slotFor=index=>slotOwner.getEnemySlotForMonster(snapshot,index);
         updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
         showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};Math.random=function(){ return 0; };
+        const northTargets=v141GetMonsterAllyTriTargets(3).map(entry=>entry.index);
+        const northSlots=northTargets.map(slotFor);
         const beforeNorth=monsters.map(monster=>monster.hp);
         const north=v155ResolveNorthHeal(3,true);
         const northChanged=monsters.map((monster,index)=>monster.hp!==beforeNorth[index]?index:null).filter(index=>index!==null);
@@ -1041,12 +1047,19 @@ test("enemy Heal Spell affects only one same-row trio for both North Emperor and
         monsters.forEach((monster,index)=>{ monster.hp=(index>=6&&index<=8)?100:1000;monster.sp=1000;monster.v141SupportSkillIds=[]; });
         monsters[5].v141SupportSkillIds=["healSpell"];
         monsters[5].v141ForceSkillLevel=5;
+        const eliteTargets=v141GetMonsterAllyTriTargets(5).map(entry=>entry.index);
+        const eliteSlots=eliteTargets.map(slotFor);
         const beforeElite=monsters.map(monster=>monster.hp);
         const elite=v141TryMonsterSpecialAction(5);
         const eliteChanged=monsters.map((monster,index)=>monster.hp!==beforeElite[index]?index:null).filter(index=>index!==null);
-        return {north:north,northChanged:northChanged,elite:elite,eliteChanged:eliteChanged};
+        return {snapshot:!!snapshot,north:north,northTargets:northTargets,northSlots:northSlots,
+            northChanged:northChanged,elite:elite,eliteTargets:eliteTargets,eliteSlots:eliteSlots,eliteChanged:eliteChanged};
     })()`);
-    assert.deepEqual(result,{north:true,northChanged:[1,2,3],elite:true,eliteChanged:[6,7,8]});
+    assert.deepEqual(result,{
+        snapshot:true,
+        north:true,northTargets:[3,1,0],northSlots:["ENEMY_B1","ENEMY_B2","ENEMY_B3"],northChanged:[0,1,3],
+        elite:true,eliteTargets:[6,5,7],eliteSlots:["ENEMY_F2","ENEMY_F3","ENEMY_F4"],eliteChanged:[6,7]
+    });
 });
 
 test("North Emperor prioritizes maximum-level Revive for a defeated boss",()=>{
