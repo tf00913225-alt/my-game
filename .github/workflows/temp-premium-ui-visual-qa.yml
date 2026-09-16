@@ -41,7 +41,8 @@ jobs:
           cat > /tmp/premium-ui-visual-qa.mjs <<'NODE'
           import fs from "node:fs";
           import path from "node:path";
-          import {spawnSync} from "node:child_process";
+          import {spawnSync,spawn} from "node:child_process";
+          import os from "node:os";
 
           function findChrome(){
             for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
@@ -227,35 +228,110 @@ jobs:
 
           const sizes=[[360,800],[390,844],[412,915]];
           const report=[];
-          for(const [name] of Object.entries(pages)){
-            for(const [w,h] of sizes){
-              const file=path.join(fixtures,`${name}.html`);
-              const url="file://"+file.replace(/\\/g,"/");
-              const png=path.join(out,`${name}-${w}x${h}.png`);
-              const shot=spawnSync(chrome,[
-                "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files",
-                "--hide-scrollbars","--force-device-scale-factor=1",`--window-size=${w},${h}`,`--screenshot=${png}`,url
-              ],{encoding:"utf8",timeout:30000,maxBuffer:12*1024*1024});
-              if(shot.status!==0) throw new Error(`${name} ${w}x${h} screenshot failed: ${shot.stderr}`);
-              const dom=spawnSync(chrome,[
-                "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files",
-                "--force-device-scale-factor=1",`--window-size=${w},${h}`,"--dump-dom",url
-              ],{encoding:"utf8",timeout:30000,maxBuffer:12*1024*1024});
-              if(dom.status!==0) throw new Error(`${name} ${w}x${h} DOM check failed: ${dom.stderr}`);
-              const m=dom.stdout.match(/<pre class="qa-result" id="qaResult">([\s\S]*?)<\/pre>/);
-              let metrics={parseError:true};
-              if(m){
-                const decoded=m[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'");
-                try{metrics=JSON.parse(decoded)}catch{}
-              }
-              report.push({page:name,size:`${w}x${h}`,metrics});
-              if(metrics.bodyOverflow||metrics.rootOverflow){
-                throw new Error(`${name} ${w}x${h} has root horizontal overflow`);
+
+          const profile=fs.mkdtempSync(path.join(os.tmpdir(),"premium-ui-cdp-"));
+          const chromeProc=spawn(chrome,[
+            "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
+            "--allow-file-access-from-files","--remote-debugging-port=9222",
+            `--user-data-dir=${profile}`,"about:blank"
+          ],{stdio:["ignore","ignore","ignore"]});
+
+          async function waitJson(url){
+            for(let i=0;i<80;i++){
+              try{
+                const response=await fetch(url);
+                if(response.ok) return await response.json();
+              }catch{}
+              await new Promise(resolve=>setTimeout(resolve,100));
+            }
+            throw new Error("Chrome DevTools endpoint did not become ready");
+          }
+
+          const targets=await waitJson("http://127.0.0.1:9222/json/list");
+          if(!targets.length||!targets[0].webSocketDebuggerUrl) throw new Error("No Chrome page target");
+          const ws=new WebSocket(targets[0].webSocketDebuggerUrl);
+          await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
+          let seq=0;
+          const pending=new Map();
+          ws.onmessage=event=>{
+            const message=JSON.parse(event.data);
+            if(!message.id||!pending.has(message.id)) return;
+            const item=pending.get(message.id);
+            pending.delete(message.id);
+            if(message.error) item.reject(new Error(JSON.stringify(message.error)));
+            else item.resolve(message.result);
+          };
+          function cdp(method,params={}){
+            return new Promise((resolve,reject)=>{
+              const id=++seq;
+              pending.set(id,{resolve,reject});
+              ws.send(JSON.stringify({id,method,params}));
+            });
+          }
+
+          await cdp("Page.enable");
+          await cdp("Runtime.enable");
+          try{
+            for(const [name] of Object.entries(pages)){
+              for(const [w,h] of sizes){
+                await cdp("Emulation.setDeviceMetricsOverride",{
+                  width:w,height:h,deviceScaleFactor:1,mobile:true,
+                  screenWidth:w,screenHeight:h,
+                  screenOrientation:{type:"portraitPrimary",angle:0}
+                });
+                const file=path.join(fixtures,`${name}.html`);
+                const url="file://"+file.replace(/\\/g,"/");
+                await cdp("Page.navigate",{url});
+                for(let wait=0;wait<30;wait++){
+                  const state=await cdp("Runtime.evaluate",{expression:"document.readyState",returnByValue:true});
+                  if(state.result?.value==="complete") break;
+                  await new Promise(resolve=>setTimeout(resolve,50));
+                }
+                await new Promise(resolve=>setTimeout(resolve,120));
+
+                const metricEval=await cdp("Runtime.evaluate",{
+                  returnByValue:true,
+                  expression:`(()=>{
+                    const root=document.querySelector("#game-stage");
+                    const bad=[...document.querySelectorAll("*")].filter(el=>{
+                      const style=getComputedStyle(el);
+                      return el.scrollWidth>el.clientWidth+2 && style.overflowX!=="auto" && style.overflowX!=="scroll";
+                    });
+                    return {
+                      width:innerWidth,height:innerHeight,
+                      htmlScrollWidth:document.documentElement.scrollWidth,
+                      bodyOverflow:document.documentElement.scrollWidth>innerWidth+2,
+                      rootOverflow:root?root.scrollWidth>root.clientWidth+2:false,
+                      offenders:bad.slice(0,8).map(el=>({
+                        tag:el.tagName,id:el.id,cls:String(el.className||"").slice(0,100),
+                        sw:el.scrollWidth,cw:el.clientWidth
+                      }))
+                    };
+                  })()`
+                });
+                const metrics=metricEval.result?.value||{missingMetrics:true};
+                if(metrics.width!==w||metrics.height!==h){
+                  throw new Error(`${name} expected ${w}x${h} viewport, got ${metrics.width}x${metrics.height}`);
+                }
+                if(metrics.bodyOverflow||metrics.rootOverflow){
+                  throw new Error(`${name} ${w}x${h} has root horizontal overflow`);
+                }
+
+                const shot=await cdp("Page.captureScreenshot",{
+                  format:"png",fromSurface:true,captureBeyondViewport:false
+                });
+                const png=path.join(out,`${name}-${w}x${h}.png`);
+                fs.writeFileSync(png,Buffer.from(shot.data,"base64"));
+                report.push({page:name,size:`${w}x${h}`,metrics});
               }
             }
+          }finally{
+            try{ws.close();}catch{}
+            try{chromeProc.kill("SIGTERM");}catch{}
+            try{fs.rmSync(profile,{recursive:true,force:true});}catch{}
           }
           fs.writeFileSync(path.join(out,"visual-qa-report.json"),JSON.stringify({head:process.env.GITHUB_SHA,pages:Object.keys(pages),sizes,report},null,2));
-          console.log(`Visual QA generated ${report.length} snapshots`);
+          console.log(`Visual QA generated ${report.length} true-viewport snapshots`);
           NODE
           node /tmp/premium-ui-visual-qa.mjs
 
