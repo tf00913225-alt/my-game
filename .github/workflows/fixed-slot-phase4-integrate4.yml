@@ -1,9 +1,11 @@
-name: Fixed Slot Phase 4 Preservation Integration
+name: Fixed Slot Phase 4 Final Integration
 
 on:
   push:
     branches:
       - feature/fixed-slot-battlefield-v1-20260916
+    paths:
+      - .github/workflows/fixed-slot-phase4-integrate4.yml
 
 permissions:
   contents: write
@@ -20,10 +22,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Apply corrected owner patch and scoped preservation contract
+      - name: Apply corrected fixed-slot owner patch and preservation contract
         run: |
           python3 - <<'PYCODE'
           from pathlib import Path
+
           workflow=Path('.github/workflows/fixed-slot-phase4-boss-mechanism.yml').read_text(encoding='utf-8')
           marker="          python3 - <<'PY'\n"
           start=workflow.index(marker)+len(marker)
@@ -39,27 +42,21 @@ jobs:
               if count!=1:
                   raise SystemExit(f'expected one staged expression {old!r}, found {count}')
               body=body.replace(old,new,1)
-          exec(compile(body,'phase4-corrected-owner-patch','exec'))
+          exec(compile(body,'phase4-final-owner-patch','exec'))
 
           p=Path('tests/ui-typography-battle-preservation.test.js')
           s=p.read_text(encoding='utf-8')
-          css_helper='''function cssRule(text,selector){\n    const start=text.indexOf(selector);\n    assert.ok(start>=0,`missing CSS rule: ${selector}`);\n    const open=text.indexOf("{",start),end=text.indexOf("}",open);\n    assert.ok(open>=0&&end>open,`invalid CSS rule: ${selector}`);\n    return text.slice(start,end+1);\n}\n'''
-          helper_new=css_helper+'''\nfunction stripOptionalCssRule(text,selector){\n    const start=text.indexOf(selector);\n    if(start<0){ return text; }\n    const open=text.indexOf("{",start),end=text.indexOf("}",open);\n    assert.ok(open>=0&&end>open,`invalid optional CSS rule: ${selector}`);\n    return text.slice(0,start)+text.slice(end+1);\n}\n\nfunction stripMechanismSlotLayout(text){\n    return normalize([\n        "#game-stage #battleMonsterArea .boss-mechanism-slot{",\n        "#game-stage #battleMonsterArea .boss-mechanism-slot.active{",\n        "#game-stage #battleMonsterArea .boss-mechanism-position{"\n    ].reduce((value,selector)=>stripOptionalCssRule(value,selector),text));\n}\n'''
-          if s.count(css_helper)!=1:
-              raise SystemExit('typography css helper anchor mismatch')
-          s=s.replace(css_helper,helper_new,1)
+          old='''    const protectedStart="#game-stage #battlePage .battle-monster.gameplay-boss-protected{";\n    const motionStart="@media (prefers-reduced-motion:reduce){";\n    assert.equal(\n        segment(now,protectedStart,motionStart),\n        segment(approved,protectedStart,motionStart),\n        `${file} protected-BOSS/toast/legacy mechanism animations changed outside this UI requirement`\n    );\n'''
+          new='''    const protectedStart="#game-stage #battlePage .battle-monster.gameplay-boss-protected{";\n    const mechanismSlotStart="#game-stage #battleMonsterArea .boss-mechanism-slot{";\n    const mechanismCardStart="#game-stage #battleMonsterArea .boss-mechanism-card{";\n    const motionStart="@media (prefers-reduced-motion:reduce){";\n    assert.equal(\n        segment(now,protectedStart,mechanismSlotStart),\n        segment(approved,protectedStart,mechanismSlotStart),\n        `${file} protected-BOSS/toast rules changed before the fixed mechanism-slot owner`\n    );\n    assert.equal(\n        segment(now,mechanismCardStart,motionStart),\n        segment(approved,mechanismCardStart,motionStart),\n        `${file} protected mechanism-card/animation rules changed after the fixed mechanism-slot owner`\n    );\n'''
+          if s.count(old)!=1:
+              raise SystemExit(f'preservation segment contract: expected 1 match, found {s.count(old)}')
+          s=s.replace(old,new,1)
 
-          old_compare='''    assert.equal(\n        segment(now,protectedStart,motionStart),\n        segment(approved,protectedStart,motionStart),\n        `${file} protected-BOSS/toast/legacy mechanism animations changed outside this UI requirement`\n    );\n'''
-          new_compare='''    assert.equal(\n        stripMechanismSlotLayout(segment(now,protectedStart,motionStart)),\n        stripMechanismSlotLayout(segment(approved,protectedStart,motionStart)),\n        `${file} protected-BOSS/toast/legacy mechanism animations changed outside the fixed mechanism-slot layout requirement`\n    );\n'''
-          if s.count(old_compare)!=1:
-              raise SystemExit('typography protected segment anchor mismatch')
-          s=s.replace(old_compare,new_compare,1)
-
-          old_active='''    assert.match(now,/\\.boss-mechanism-slot\\.active\\{\\s*display:flex;/);\n'''
-          new_active='''    assert.match(now,/\\.boss-mechanism-slot\\{[\\s\\S]*?grid-template-columns:repeat\\(3,minmax\\(0,1fr\\)\\);[\\s\\S]*?gap:4px;/);\n    assert.match(now,/\\.boss-mechanism-slot\\.active\\{\\s*display:grid;/);\n    assert.match(now,/\\.boss-mechanism-position\\{[\\s\\S]*?display:flex;[\\s\\S]*?align-items:flex-start;[\\s\\S]*?justify-content:center;[\\s\\S]*?pointer-events:none;/);\n'''
-          if s.count(old_active)!=1:
-              raise SystemExit('typography active mechanism assertion anchor mismatch')
-          s=s.replace(old_active,new_active,1)
+          old='''    assert.match(now,/\\.boss-mechanism-slot\\{[\\s\\S]*?position:relative;[\\s\\S]*?display:none;[\\s\\S]*?width:100%;[\\s\\S]*?margin:3px auto 0;[\\s\\S]*?pointer-events:none;/);\n    assert.match(now,/\\.boss-mechanism-slot\\.active\\{\\s*display:flex;/);\n'''
+          new='''    assert.match(now,/\\.boss-mechanism-slot\\{[\\s\\S]*?position:relative;[\\s\\S]*?display:none;[\\s\\S]*?width:100%;[\\s\\S]*?grid-template-columns:repeat\\(3,minmax\\(0,1fr\\)\\);[\\s\\S]*?gap:4px;[\\s\\S]*?margin:3px auto 0;[\\s\\S]*?pointer-events:none;/);\n    assert.match(now,/\\.boss-mechanism-slot\\.active\\{\\s*display:grid;/);\n    assert.match(now,/\\.boss-mechanism-position\\{[\\s\\S]*?display:flex;[\\s\\S]*?min-width:0;[\\s\\S]*?align-items:flex-start;[\\s\\S]*?justify-content:center;[\\s\\S]*?pointer-events:none;/);\n'''
+          if s.count(old)!=1:
+              raise SystemExit(f'mechanism slot assertions: expected 1 match, found {s.count(old)}')
+          s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8')
           PYCODE
       - name: Syntax check
@@ -78,7 +75,7 @@ jobs:
         run: node scripts/build-production.mjs --check
       - name: Whitespace check
         run: git diff --check
-      - name: Commit only production owner files and tests
+      - name: Commit production owner files and strict regression contracts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
