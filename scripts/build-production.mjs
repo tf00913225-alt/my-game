@@ -86,7 +86,8 @@ const gameplayScripts=[
     "js/55-v173.51-inventory-qa.js",
     "js/56-v173.51-shop-qa.js",
     "js/57-v173.51-quest-qa.js",
-    "js/58-v173.63-functional-fixes.js"
+    "js/58-v173.63-functional-fixes.js",
+    "js/battlefield-render-geometry-adapter.js"
 ];
 const patrolScripts=["js/26-v131-patrol-appearance.js"];
 const abyssScripts=["js/59-abyss-two-tier-runtime.js"];
@@ -144,7 +145,8 @@ const gameplayStyles=[
     "css/48-v169-element-box-settings.css",
     "css/49-v169-rpg-ui.css",
     "css/52-v173.50-inventory-qol.css",
-    "css/53-v173.51-qa.css"
+    "css/53-v173.51-qa.css",
+    "css/fixed-slot-battlefield-rendering-v2.css"
 ];
 const patrolStyles=["css/32-v131-patrol-appearance.css"];
 const abyssStyles=["css/50-v169-abyss-flow.css","css/54-v174-abyss-two-tier.css"];
