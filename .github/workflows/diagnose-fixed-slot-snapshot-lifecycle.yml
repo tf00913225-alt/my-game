@@ -51,8 +51,14 @@ jobs:
           old='''        battleActive=false;\n        mapCooldown=false;\n        owner.clearActiveEnemySnapshot();\n'''
           new='''        battleActive=false;\n        mapCooldown=false;\n        document.querySelector=function(){ return document.body; };\n        owner.clearActiveEnemySnapshot();\n'''
           if text.count(old)!=1:
-              raise SystemExit('CASE 1 DOM harness anchor mismatch')
-          path.write_text(text.replace(old,new,1))
+              raise SystemExit('CASE 1 document harness anchor mismatch')
+          text=text.replace(old,new,1)
+          old2='''            if(property==="querySelector"){ return ()=>null; }\n'''
+          new2='''            if(property==="querySelector"){ return ()=>node; }\n'''
+          if text.count(old2)!=1:
+              raise SystemExit('CASE 1 universal node harness anchor mismatch')
+          text=text.replace(old2,new2,1)
+          path.write_text(text)
           PY
           grep -A2 'const EXPECTED_RUNTIME_PATHS=' .diagnostic/v170-lifecycle-case-1.test.js
           grep -n 'CARD 1 official enter\|DELAY 1 enter\|LIFE wrapper before clear\|LIFE originalStartBattle before render' js/39-v143-skill-animation.js js/25-v131-fix-batch.js js/00-main.js
