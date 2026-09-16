@@ -58,6 +58,51 @@ function createRuntime(action,targetType){
         battlePlayerCard0:player0,battlePlayerCard1:player1,
         battleMonsterArea:monsterArea,battlePlayerRow:playerArea,bossMechanismSlot:slot
     };
+    const slotRects={
+        MECH_C:{left:18,top:248,right:138,bottom:338,width:120,height:90,centerX:78,centerY:293,slots:["MECH_C"]},
+        ALLY_F1:{left:170,top:520,right:250,bottom:620,width:80,height:100,centerX:210,centerY:570,slots:["ALLY_F1"]},
+        ALLY_F2:{left:255,top:520,right:335,bottom:620,width:80,height:100,centerX:295,centerY:570,slots:["ALLY_F2"]},
+        ENEMY_F3:{left:220,top:80,right:300,bottom:190,width:80,height:110,centerX:260,centerY:135,slots:["ENEMY_F3"]},
+        ENEMY_F4:{left:310,top:90,right:385,bottom:190,width:75,height:100,centerX:347.5,centerY:140,slots:["ENEMY_F4"]}
+    };
+    const slotOwner={
+        getSlotForCombatant(side,index){
+            if(side==="monster")return index===0?"ENEMY_F3":(index===1?"ENEMY_F4":null);
+            if(side==="player")return index===0?"ALLY_F1":(index===1?"ALLY_F2":null);
+            return null;
+        },
+        getSlotFromElement(node){
+            if(node===mechanism)return "MECH_C";
+            if(node===monster0)return "ENEMY_F3";
+            if(node===monster1)return "ENEMY_F4";
+            if(node===player0)return "ALLY_F1";
+            if(node===player1)return "ALLY_F2";
+            return null;
+        },
+        getSlotRect(name){
+            const value=slotRects[name];
+            return value?Object.assign({},value,{slots:value.slots.slice()}):null;
+        },
+        getSlotCenter(name){
+            const value=this.getSlotRect(name);
+            return value?{slot:name,x:value.centerX,y:value.centerY,rect:value}:null;
+        },
+        getRectForSlots(names){
+            const values=(names||[]).map(name=>slotRects[name]).filter(Boolean);
+            if(!values.length)return null;
+            const left=Math.min(...values.map(value=>value.left));
+            const top=Math.min(...values.map(value=>value.top));
+            const right=Math.max(...values.map(value=>value.right));
+            const bottom=Math.max(...values.map(value=>value.bottom));
+            return {left,top,right,bottom,width:right-left,height:bottom-top,centerX:(left+right)/2,centerY:(top+bottom)/2,slots:names.slice()};
+        },
+        getSideRect(side){
+            return side==="monster"
+                ?{left:190,top:50,right:400,bottom:220,width:210,height:170,centerX:295,centerY:135,slots:["ENEMY_F3","ENEMY_F4"]}
+                :{left:40,top:475,right:380,bottom:650,width:340,height:175,centerX:210,centerY:562.5,slots:["ALLY_F1","ALLY_F2"]};
+        },
+        getGeometryRectFromShape(side,name){ return this.getSlotRect(name); }
+    };
     let gateId=0;
     const director={
         play(config){
@@ -76,6 +121,7 @@ function createRuntime(action,targetType){
         console,Promise,Set,Map,Array,Object,Number,String,Boolean,RegExp,Date,Math,Proxy,
         setTimeout,clearTimeout,innerWidth:420,innerHeight:720,
         v142SkillAnimationDirector:director,
+        FourSymbolsBattlefieldSlots:slotOwner,
         monsters:[
             {name:"Boss",rank:"boss",hp:5000,alive:true,statusEffects:[],activeBuffs:[]},
             {name:"Support",hp:500,alive:true,statusEffects:[],activeBuffs:[]}
