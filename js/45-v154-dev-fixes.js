@@ -144,16 +144,9 @@
     };
 
     function installMonsterPortraitPresentationStyle(){
-        if(typeof document==="undefined"||typeof document.createElement!=="function"){ return; }
-        if(document.getElementById&&document.getElementById("v154MonsterPortraitStyle")){ return; }
-        const style=document.createElement("style");
-        style.id="v154MonsterPortraitStyle";
-        style.textContent=
-            '#game-stage #battlePage .battle-monster.v174-cardless-unit.v154-monster-portrait>.v174-battle-art{'+
-            'inset:-8px -5px 2px!important;background-size:contain!important;background-position:center bottom!important;'+
-            'background-repeat:no-repeat!important;}';
-        const host=document.head||document.body;
-        if(host&&typeof host.appendChild==="function"){ host.appendChild(style); }
+        /* Portrait selection belongs here; portrait geometry does not. V174 owns
+           the shared no-crop presentation contract for players, monsters and bosses. */
+        return;
     }
 
     function syncMonsterPortraitArt(card,portrait){
