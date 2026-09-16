@@ -1,0 +1,56 @@
+name: Fixed Slot Phase 3 Inspect
+
+on:
+  push:
+    branches:
+      - feature/fixed-slot-battlefield-v1-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/fixed-slot-battlefield-v1-20260916
+          fetch-depth: 1
+      - name: Print phase 3 owner contexts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          checks={
+            'js/00-main.js':[
+              'function saveGame(options={}){','function loadGame(){','function renderBattle(){','function renderPlayers','battlePlayerRow','function openHomeFeature'
+            ],
+            'js/35-v141-ui-battle.js':[
+              'setBattleAllyTargetSelectionMode','targetAlly','allyTri','prepareAction','selectAlly'
+            ],
+            'js/42-v148-combat-dungeon-fixes.js':[
+              'function requestedBuffTargets','resolveSupportAction','allyTri'
+            ],
+            'js/50-v169-water-skill-rules.js':[
+              'column','tri','freeze'
+            ],
+            'js/36-v141-content-systems.js':[
+              'getMonsterAllyTriTargets','allyTri'
+            ],
+            'js/25-v131-fix-batch.js':[
+              'function applyPlayerElementFrames','renderBattle=function'
+            ]
+          }
+          for path,markers in checks.items():
+            text=Path(path).read_text(encoding='utf-8')
+            lines=text.splitlines()
+            print('\n===== '+path+' =====')
+            for marker in markers:
+              positions=[i for i,line in enumerate(lines) if marker in line]
+              print('\n--- '+marker+' -> '+str([p+1 for p in positions[:8]])+' ---')
+              for p in positions[:3]:
+                a=max(0,p-12); b=min(len(lines),p+28)
+                for i in range(a,b): print(f'{i+1:05d}: {lines[i]}')
+                print('...')
+          PY
