@@ -1,0 +1,105 @@
+name: Diagnose allyTri V170 hang R2
+
+on:
+  push:
+    branches:
+      - validation/ally-tri-v170-hang-diagnosis-r2-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out R2 diagnosis branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/ally-tri-v170-hang-diagnosis-r2-20260916
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Verify frozen production inputs
+        shell: bash
+        run: |
+          node --version
+          git rev-parse HEAD
+          git diff --exit-code b01f996b53c9321c29dbc389d820af33714f4581 -- \
+            js/battlefield-slot-owner.js \
+            js/46-v155-dev-fixes.js \
+            tests/v170-final-spec-integration.test.js \
+            tests/fixed-slot-tri-target-window.test.js \
+            tests/ally-tri-rage-fixed-slot-regression.test.js
+
+      - name: Build diagnosis-only V155 and V170 case copies
+        shell: bash
+        run: |
+          python scripts/diagnose-v170-extreme-r2.py
+          grep -A2 'const EXPECTED_RUNTIME_PATHS=' .diagnostic/v170-case-a.test.js
+          grep -n 'EXTREME 1 enter\|ALLY .* B before applyEvasionBlessing\|BLESS 1 enter' js/46-v155-dev-fixes.js
+          git status --short
+
+      - name: Run CASE A legacy mutation
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=3s 30s node .diagnostic/v170-case-a.test.js 2>&1 | tee /tmp/v170-r2-case-a.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "CASE_A_EXIT=$status"
+          echo "CASE_A_LAST_EXTREME=$(grep '^EXTREME ' /tmp/v170-r2-case-a.log | tail -n 1 || true)"
+          echo "CASE_A_LAST_ALLY=$(grep '^ALLY ' /tmp/v170-r2-case-a.log | tail -n 1 || true)"
+          echo "CASE_A_LAST_BLESS=$(grep '^BLESS ' /tmp/v170-r2-case-a.log | tail -n 1 || true)"
+          echo "CASE_A_SNAPSHOT=$(grep '^CASE A SNAPSHOT=' /tmp/v170-r2-case-a.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "CASE_A_UNEXPECTED_EXIT=$status"
+          fi
+
+      - name: Run CASE B formal snapshot synchronized
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=3s 30s node .diagnostic/v170-case-b.test.js 2>&1 | tee /tmp/v170-r2-case-b.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "CASE_B_EXIT=$status"
+          echo "CASE_B_LAST_EXTREME=$(grep '^EXTREME ' /tmp/v170-r2-case-b.log | tail -n 1 || true)"
+          echo "CASE_B_LAST_ALLY=$(grep '^ALLY ' /tmp/v170-r2-case-b.log | tail -n 1 || true)"
+          echo "CASE_B_LAST_BLESS=$(grep '^BLESS ' /tmp/v170-r2-case-b.log | tail -n 1 || true)"
+          echo "CASE_B_SNAPSHOT=$(grep '^CASE B SNAPSHOT=' /tmp/v170-r2-case-b.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "CASE_B_UNEXPECTED_EXIT=$status"
+          fi
+
+      - name: Run CASE C cleared active snapshot
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=3s 30s node .diagnostic/v170-case-c.test.js 2>&1 | tee /tmp/v170-r2-case-c.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "CASE_C_EXIT=$status"
+          echo "CASE_C_LAST_EXTREME=$(grep '^EXTREME ' /tmp/v170-r2-case-c.log | tail -n 1 || true)"
+          echo "CASE_C_LAST_ALLY=$(grep '^ALLY ' /tmp/v170-r2-case-c.log | tail -n 1 || true)"
+          echo "CASE_C_LAST_BLESS=$(grep '^BLESS ' /tmp/v170-r2-case-c.log | tail -n 1 || true)"
+          echo "CASE_C_SNAPSHOT=$(grep '^CASE C SNAPSHOT=' /tmp/v170-r2-case-c.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "CASE_C_UNEXPECTED_EXIT=$status"
+          fi
+
+      - name: Summarize three cases
+        if: always()
+        shell: bash
+        run: |
+          for name in a b c; do
+            file="/tmp/v170-r2-case-${name}.log"
+            if [ -f "$file" ]; then
+              echo "===== CASE ${name^^} ====="
+              grep -E '^CASE [ABC] STATE |^CASE [ABC] SNAPSHOT=|^CASE [ABC] (BEFORE|AFTER)|^EXTREME |^ALLY |^BLESS ' "$file" | tail -n 120 || true
+            fi
+          done
