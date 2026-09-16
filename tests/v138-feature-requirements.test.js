@@ -4,6 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
+const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
@@ -76,6 +77,10 @@ test("battle pacing is 1.6 seconds per action and 2 seconds per round",()=>{
 
 test("formation puts BOSS in the center, then elites, then regular monsters",()=>{
     const ctx=context({
+        document:{
+            getElementById:()=>null,
+            querySelector:()=>null
+        },
         monsters:[
             {rank:"regular"},
             {rank:"elite"},
@@ -85,13 +90,31 @@ test("formation puts BOSS in the center, then elites, then regular monsters",()=
         ],
         getMonsterRank:monster=>monster.rank
     });
-    ["getFormationRankWeight","arrangeRowCenterFirst","getFormationRows"]
+    ctx.window=ctx;
+    ctx.self=ctx;
+    ctx.globalThis=ctx;
+    vm.runInContext(slotOwnerSource,ctx,{filename:"js/battlefield-slot-owner.js"});
+    ["getFormationRankWeight","fixedBattlefieldSlots","getFormationRows"]
         .forEach(name=>vm.runInContext(extractFunction(v131Source,name),ctx));
+
     const rows=vm.runInContext("getFormationRows([0,1,2,3,4])",ctx);
     assert.deepEqual(Array.from(rows[0]),[0,1,2,4,3]);
     assert.equal(ctx.monsters[rows[0][2]].rank,"boss");
     assert.equal(ctx.monsters[rows[0][1]].rank,"elite");
     assert.equal(ctx.monsters[rows[0][3]].rank,"elite");
+
+    const snapshot=vm.runInContext(
+        "FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot([0,1,2,3,4],{"+
+            "originalFormationType:5,rankWeight:getFormationRankWeight"+
+        "})",
+        ctx
+    );
+    const owner=ctx.FourSymbolsBattlefieldSlots;
+    assert.equal(owner.getEnemySlotForMonster(snapshot,2),"ENEMY_F3");
+    assert.equal(owner.getEnemySlotForMonster(snapshot,1),"ENEMY_F2");
+    assert.equal(owner.getEnemySlotForMonster(snapshot,4),"ENEMY_F4");
+    assert.equal(owner.getEnemySlotForMonster(snapshot,0),"ENEMY_F1");
+    assert.equal(owner.getEnemySlotForMonster(snapshot,3),"ENEMY_F5");
 });
 
 test("monster and player frames use element colors while names use rank colors",()=>{
