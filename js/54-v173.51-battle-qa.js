@@ -25,11 +25,10 @@ function fivePriority(indexes){
 window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 
 /* V174 battle presentation owner.
-   Keep the proven 10-seat geometry and action/turn UI untouched. Only the
-   visual shell inside each existing combat slot changes: the card frame is
-   transparent, artwork gets its own presentation layer, HP/SP text shows the
-   current value only, and the already-existing lunge classes animate artwork
-   instead of dragging the HUD bars with the portrait. */
+   Slot geometry is owned by FourSymbolsBattlefieldSlots. This layer owns only
+   artwork presentation and HUD layering. Player and monster artwork share the
+   same no-crop contract: preserve source aspect, contain the full figure, and
+   let art paint outside the small unit card without moving the slot itself. */
 function ensureBattlePresentationStyles(){
     if(document.getElementById("v174-cardless-battle-style"))return;
     const style=document.createElement("style");
@@ -39,20 +38,17 @@ function ensureBattlePresentationStyles(){
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{
     border:0!important;outline:0!important;box-shadow:none!important;
     background-color:transparent!important;background-image:none!important;
-    isolation:isolate!important;
+    isolation:isolate!important;overflow:visible!important;
     transition-property:opacity!important;transition-duration:.15s!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
-    position:absolute!important;inset:0!important;z-index:1!important;
-    display:block!important;pointer-events:none!important;
+    position:absolute!important;inset:-8px -8px 26px!important;z-index:1!important;
+    display:block!important;pointer-events:none!important;overflow:visible!important;
     background-repeat:no-repeat!important;background-color:transparent!important;
+    background-size:contain!important;background-position:center bottom!important;
     transform-origin:50% 82%!important;will-change:transform,filter!important;
     animation:v174BattleIdle 3.4s ease-in-out infinite!important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
-    inset:-2px -2px 30px!important;
-    background-size:contain!important;background-position:center bottom!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
     position:absolute!important;left:50%!important;bottom:13px!important;
@@ -81,10 +77,6 @@ function ensureBattlePresentationStyles(){
     margin:0!important;padding:0 2px!important;line-height:14px!important;text-align:center!important;
     white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
     z-index:24!important;pointer-events:none!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
-    inset:15px -5px 26px!important;
-    background-size:cover!important;background-position:center center!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
     content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;
