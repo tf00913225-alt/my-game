@@ -1,4 +1,4 @@
-name: V166 Water VFX Fixed Slot Validation
+name: V166 Water VFX Fixed Slot Migration Validation
 
 on:
   push:
@@ -6,16 +6,16 @@ on:
       - validation/v166-water-vfx-fixed-slot-harness-20260917
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  validate-v166:
+  migrate-and-validate-v166:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out validation branch
+      - name: Check out clean V166 candidate
         uses: actions/checkout@v4
         with:
-          ref: validation/v166-water-vfx-fixed-slot-harness-20260917
+          ref: validation/v166-water-vfx-migration-candidate-20260917
           fetch-depth: 2
 
       - name: Use Node.js 24
@@ -23,15 +23,396 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Verify validation scope
+      - name: Verify clean candidate base
         shell: bash
         run: |
-          base=19ecdef2878aabf5e8ca57673b71b163e1c8baec
-          git fetch --no-tags --depth=1 origin "$base"
-          git diff --check "$base" HEAD
-          changed="$(git diff --name-only "$base" HEAD | sort)"
-          printf '%s\n' "$changed"
-          test -z "$(git diff --name-only "$base" HEAD -- js css)"
+          test "$(git rev-parse HEAD)" = "19ecdef2878aabf5e8ca57673b71b163e1c8baec"
+          test -z "$(git status --porcelain)"
 
-      - name: Run formal V166 Fixed Slot diagnosis
-        run: node tests/diagnosis-v166-water-fixed-slot-harness.test.js
+      - name: Apply owner-derived V166 geometry migration
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path=Path("tests/v166-water-vfx.test.js")
+          text=path.read_text()
+
+          def replace_once(old,new,label):
+              global text
+              count=text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, got {count}")
+              text=text.replace(old,new,1)
+
+          replace_once(
+          'const zlib=require("node:zlib");\n\nconst animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");',
+          'const zlib=require("node:zlib");\n\nconst slotOwner=fs.readFileSync("js/battlefield-slot-owner.js","utf8");\nconst animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");',
+          "load formal owner source")
+
+          replace_once(
+          'id:"",dataset:{},children:[],parentNode:null,offsetParent:{},',
+          'id:"",dataset:{},children:[],parentNode:null,parentElement:null,offsetParent:{},',
+          "node parent element")
+          replace_once(
+          'appendChild(child){ child.parentNode=this; this.children.push(child); return child; },',
+          'appendChild(child){ child.parentNode=this; child.parentElement=this; this.children.push(child); return child; },',
+          "append parent element")
+          replace_once(
+          '            child.parentNode=null;\n            return child;',
+          '            child.parentNode=null;\n            child.parentElement=null;\n            return child;',
+          "remove parent element")
+
+          old_query='''        querySelector(selector){ return this.querySelectorAll(selector)[0]||null; },
+        querySelectorAll(selector){
+            const results=[];
+            const matcher=candidate=>{
+                if(selector==="*"){ return true; }
+                if(selector.startsWith("#")){ return candidate.id===selector.slice(1); }
+                if(selector.startsWith(".")){
+                    return String(candidate.className||"").split(/\\s+/).includes(selector.slice(1));
+                }
+                return false;
+            };
+            const visit=current=>current.children.forEach(child=>{
+                if(matcher(child)){ results.push(child); }
+                visit(child);
+            });
+            visit(this);
+            return results;
+        }'''
+          new_query='''        querySelector(selector){ return this.querySelectorAll(selector)[0]||null; },
+        querySelectorAll(selector){
+            const selectors=String(selector||"").split(",").map(value=>value.trim()).filter(Boolean);
+            const results=[];
+            const matcher=(candidate,part)=>{
+                if(part==="*"){ return true; }
+                if(part.startsWith("#")){ return candidate.id===part.slice(1); }
+                const slotMatch=part.match(/^\\.([\\w-]+)\\[data-slot="([^"]+)"\\]$/);
+                if(slotMatch){
+                    return String(candidate.className||"").split(/\\s+/).includes(slotMatch[1])&&candidate.dataset.slot===slotMatch[2];
+                }
+                if(part.startsWith(".")){
+                    const required=part.slice(1).split(".");
+                    const classes=String(candidate.className||"").split(/\\s+/);
+                    return required.every(name=>classes.includes(name));
+                }
+                return false;
+            };
+            const visit=current=>current.children.forEach(child=>{
+                if(selectors.some(part=>matcher(child,part))){ results.push(child); }
+                visit(child);
+            });
+            visit(this);
+            return results;
+        }'''
+          replace_once(old_query,new_query,"formal slot selector support")
+
+          old_prefix='''function loadRuntime(options={}){
+    const body=makeNode();
+    const monsterArea=makeNode({left:260,top:40,right:700,bottom:300,width:440,height:260});
+    monsterArea.id="battleMonsterArea";
+    const playerArea=makeNode({left:20,top:340,right:460,bottom:500,width:440,height:160});
+    playerArea.id="battlePlayerRow";
+    body.appendChild(monsterArea);
+    body.appendChild(playerArea);
+    const cards={battleMonsterArea:monsterArea,battlePlayerRow:playerArea};'''
+          new_prefix='''function loadRuntime(options={}){
+    const body=makeNode();
+    const battlePage=makeNode({left:0,top:0,right:960,bottom:720,width:960,height:720});
+    battlePage.id="battlePage";
+    body.appendChild(battlePage);
+    const slotNodes={};
+    const enemyXs=[100,220,340,460,580];
+    const allyXs=[180,340,500];
+    ["B","F"].forEach((row,rowIndex)=>{
+        enemyXs.forEach((left,index)=>{
+            const id=`ENEMY_${row}${index+1}`;
+            const top=rowIndex===0?60:180;
+            const slot=makeNode({left,top,right:left+80,bottom:top+100,width:80,height:100});
+            slot.className="v-fixed-enemy-slot";
+            slot.dataset.slot=id;
+            slotNodes[id]=slot;
+            battlePage.appendChild(slot);
+        });
+    });
+    ["F","B"].forEach((row,rowIndex)=>{
+        allyXs.forEach((left,index)=>{
+            const id=`ALLY_${row}${index+1}`;
+            const top=rowIndex===0?420:540;
+            const slot=makeNode({left,top,right:left+100,bottom:top+100,width:100,height:100});
+            slot.className="v-fixed-ally-slot";
+            slot.dataset.slot=id;
+            slotNodes[id]=slot;
+            battlePage.appendChild(slot);
+        });
+    });
+    const monsterArea=makeNode({left:260,top:40,right:700,bottom:300,width:440,height:260});
+    monsterArea.id="battleMonsterArea";
+    const playerArea=makeNode({left:20,top:340,right:460,bottom:500,width:440,height:160});
+    playerArea.id="battlePlayerRow";
+    battlePage.appendChild(monsterArea);
+    battlePage.appendChild(playerArea);
+    const cards={battleMonsterArea:monsterArea,battlePlayerRow:playerArea};'''
+          replace_once(old_prefix,new_prefix,"build formal fixed slot DOM")
+
+          old_document='''        document:{
+            body,
+            createElement(){ return makeNode(); },
+            getElementById(id){ return cards[id]||null; },
+            querySelectorAll(selector){ return body.querySelectorAll(selector); }
+        },'''
+          new_document='''        document:{
+            body,
+            createElement(){ return makeNode(); },
+            getElementById(id){ return id==="battlePage"?battlePage:(cards[id]||null); },
+            querySelector(selector){ return battlePage.querySelector(selector)||body.querySelector(selector); },
+            querySelectorAll(selector){ return body.querySelectorAll(selector); }
+        },'''
+          replace_once(old_document,new_document,"formal document selectors")
+
+          old_install='''    vm.createContext(context);
+    vm.runInContext(animation,context);
+    return {
+        context,body,cards,monsterArea,playerArea,monsters,party,scheduled,monsterHits,playerHits,
+        playCalls:()=>playCalls,
+        legacyIceSpinCalls:()=>legacyIceSpinCalls
+    };'''
+          new_install='''    vm.createContext(context);
+    vm.runInContext(slotOwner,context);
+    const owner=context.FourSymbolsBattlefieldSlots;
+    assert.ok(owner,"formal Fixed Slot owner must install");
+    const snapshot=owner.createEnemyFormationSnapshot([0,1,2],{originalFormationType:3});
+    owner.setActiveEnemySnapshot(snapshot);
+    owner.ensureAllyFormation([0,1,2]);
+    vm.runInContext(animation,context);
+    return {
+        context,owner,snapshot,slotNodes,battlePage,body,cards,monsterArea,playerArea,monsters,party,scheduled,monsterHits,playerHits,
+        playCalls:()=>playCalls,
+        legacyIceSpinCalls:()=>legacyIceSpinCalls
+    };'''
+          replace_once(old_install,new_install,"install formal owner before V143")
+
+          old_helpers='''function stageSprites(runtime){
+    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    assert.ok(stage,"skill stage");
+    return {
+        stage,
+        sprites:stage.children.filter(node=>String(node.className).includes("v143-vfx-sprite"))
+    };
+}
+'''
+          new_helpers='''function stageSprites(runtime){
+    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    assert.ok(stage,"skill stage");
+    return {
+        stage,
+        sprites:stage.children.filter(node=>String(node.className).includes("v143-vfx-sprite"))
+    };
+}
+
+function enemySlot(runtime,index){
+    return runtime.owner.getEnemySlotForMonster(runtime.snapshot,index);
+}
+function allySlot(runtime,index){
+    return runtime.owner.getAllySlotForCharacter(index);
+}
+function positionOf(node){
+    return [Number.parseFloat(node.style.left),Number.parseFloat(node.style.top)];
+}
+function formalPosition(runtime,side,index){
+    const slot=side==="monster"?enemySlot(runtime,index):allySlot(runtime,index);
+    const point=runtime.owner.getSlotCenter(slot);
+    return [point.x,point.y];
+}
+function battlefieldExpectedSize(runtime,id,side){
+    const sprite=runtime.context.v143SkillAnimationManifest[id].sprite;
+    const bounds=runtime.owner.getSideRect(side);
+    const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+    const coverageScale=clamp(Number(sprite.coverageScale)||Number(sprite.scale)||1,1,1.4);
+    const viewportWidth=Number(runtime.context.innerWidth)||960;
+    const viewportHeight=Number(runtime.context.innerHeight)||720;
+    const width=clamp(
+        Math.round(bounds.width*coverageScale),Number(sprite.minWidth)||Number(sprite.minSize)||160,
+        Number(sprite.maxWidth)||Math.max(240,viewportWidth*.94)
+    );
+    const height=clamp(
+        Math.round(bounds.height*coverageScale),Number(sprite.minHeight)||Number(sprite.minSize)||160,
+        Number(sprite.maxHeight)||Math.max(240,viewportHeight*.92)
+    );
+    return Math.round(Math.min(width,height));
+}
+'''
+          replace_once(old_helpers,new_helpers,"formal geometry helpers")
+
+          replace_once(
+          '''        assert.equal(sprites[0].style.left,"578px",id);
+        assert.equal(sprites[0].style.top,"140px",id);''',
+          '''        assert.deepEqual(positionOf(sprites[0]),formalPosition(runtime,"monster",2),id+" formal target Slot");
+        assert.notDeepEqual(
+            formalPosition(runtime,"monster",2),
+            [578,140],
+            id+" must not use the retired battle card center"
+        );''',
+          "single target formal slot")
+
+          replace_once(
+          '''        assert.deepEqual(
+            sprites.map(node=>node.style.left),
+            indexes.map(index=>["338px","458px","578px"][index]),
+            indexes.join(",")
+        );''',
+          '''        assert.deepEqual(
+            sprites.map(positionOf),
+            indexes.map(index=>formalPosition(runtime,"monster",index)),
+            indexes.join(",")+" formal target Slots"
+        );''',
+          "Ice Spin formal slots")
+
+          replace_once(
+          '''        assert.equal(sprites[0].style.left,"458px");
+        assert.equal(sprites[0].style.top,"140px");''',
+          '''        const triRect=runtime.owner.getGeometryRectFromShape("monster",enemySlot(runtime,1),"tri");
+        assert.deepEqual(positionOf(sprites[0]),[triRect.centerX,triRect.centerY]);''',
+          "Water Ball formal tri geometry")
+
+          replace_once(
+          '''    assert.equal(sprites[0].dataset.placement,"group");
+    assert.equal(sprites[0].dataset.targetIndexes,"0,2");
+});''',
+          '''    assert.equal(sprites[0].dataset.placement,"group");
+    assert.equal(sprites[0].dataset.targetIndexes,"0,2");
+    const triRect=runtime.owner.getGeometryRectFromShape("player",allySlot(runtime,1),"tri");
+    assert.deepEqual(positionOf(sprites[0]),[triRect.centerX,triRect.centerY]);
+});''',
+          "enemy Water Ball formal tri geometry")
+
+          old_rain='''        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+        assert.equal(sprite.dataset.fixedFormation,"true");
+        assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
+        assert.equal(sprite.style.left,"480px");
+        assert.equal(sprite.style.top,"170px");
+        assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
+        assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
+        results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
+    });
+    assert.deepEqual(results[0],["480px","170px","317px","317px"]);
+    assert.deepEqual(results[1],results[0]);'''
+          new_rain='''        const sideRect=runtime.owner.getSideRect("monster");
+        assert.equal(sprite.dataset.areaId,"fixed-enemy-zone");
+        assert.equal(sprite.dataset.fixedFormation,"true");
+        assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
+        assert.deepEqual(positionOf(sprite),[sideRect.centerX,sideRect.centerY]);
+        const expectedSize=battlefieldExpectedSize(runtime,"iceArrowRain","monster");
+        assert.equal(Number.parseFloat(sprite.style.width),expectedSize);
+        assert.equal(Number.parseFloat(sprite.style.height),expectedSize);
+        assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
+        assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
+        results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
+    });
+    assert.deepEqual(results[1],results[0]);'''
+          replace_once(old_rain,new_rain,"Ice Arrow Rain formal enemy side geometry")
+
+          old_enemy_rain='''    assert.equal(sprites[0].dataset.targetSide,"player");
+    assert.equal(sprites[0].dataset.areaId,"battlePlayerRow");
+    assert.equal(sprites[0].dataset.fixedFormation,"true");
+    assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
+    assert.equal(sprites[0].style.left,"240px");
+    assert.equal(sprites[0].style.top,"420px");
+    assert.equal(sprites[0].style.width,"195px");
+    assert.equal(sprites[0].style.height,"195px");'''
+          new_enemy_rain='''    assert.equal(sprites[0].dataset.targetSide,"player");
+    assert.equal(sprites[0].dataset.areaId,"fixed-ally-zone");
+    assert.equal(sprites[0].dataset.fixedFormation,"true");
+    assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
+    const sideRect=runtime.owner.getSideRect("player");
+    assert.deepEqual(positionOf(sprites[0]),[sideRect.centerX,sideRect.centerY]);
+    const expectedSize=battlefieldExpectedSize(runtime,"iceArrowRain","player");
+    assert.equal(Number.parseFloat(sprites[0].style.width),expectedSize);
+    assert.equal(Number.parseFloat(sprites[0].style.height),expectedSize);'''
+          replace_once(old_enemy_rain,new_enemy_rain,"Ice Arrow Rain formal ally side geometry")
+
+          replace_once(
+          '''    assert.equal(sprites[0].dataset.targetIndex,"2");
+    assert.equal(sprites[0].dataset.travel,"true");
+    assert.equal(sprites[0].style.left,"338px");
+    assert.equal(sprites[0].style.top,"140px");
+    assert.equal(sprites[0].style["--v143-sprite-dx"],"41px");
+    assert.equal(sprites[0].style["--v143-sprite-dy"],"278px");''',
+          '''    assert.equal(sprites[0].dataset.targetIndex,"2");
+    assert.equal(sprites[0].dataset.travel,"true");
+    const actor=formalPosition(runtime,"monster",0);
+    const target=formalPosition(runtime,"player",2);
+    assert.deepEqual(positionOf(sprites[0]),actor);
+    assert.equal(Number.parseFloat(sprites[0].style["--v143-sprite-dx"]),target[0]-actor[0]);
+    assert.equal(Number.parseFloat(sprites[0].style["--v143-sprite-dy"]),target[1]-actor[1]);''',
+          "enemy Tidal Beast formal trajectory")
+
+          replace_once(
+          '''    assert.deepEqual(freezeSprites.map(node=>node.dataset.targetIndex),["0","2"]);
+    assert.deepEqual(freezeSprites.map(node=>node.style.left),["338px","578px"]);''',
+          '''    assert.deepEqual(freezeSprites.map(node=>node.dataset.targetIndex),["0","2"]);
+    assert.deepEqual(
+        freezeSprites.map(positionOf),
+        [0,2].map(index=>formalPosition(freeze,"monster",index))
+    );''',
+          "Freeze formal target slots")
+
+          replace_once(
+          '''    const healSprites=stageSprites(heal).sprites;
+    assert.deepEqual(healSprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
+    assert.deepEqual(healSprites.map(node=>node.style.left),["99px","239px","379px"]);''',
+          '''    const healSprites=stageSprites(heal).sprites;
+    assert.deepEqual(healSprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
+    assert.deepEqual(
+        healSprites.map(positionOf),
+        [0,1,2].map(index=>formalPosition(heal,"player",index))
+    );''',
+          "Heal formal ally slots")
+
+          replace_once(
+          '''    assert.equal(sprites.length,1);
+    assert.equal(sprites[0].dataset.targetIndex,"1");
+    assert.equal(sprites[0].style.left,"239px");
+    assert.equal(sprites[0].style.top,"418px");
+    assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-freeze"),null);''',
+          '''    assert.equal(sprites.length,1);
+    assert.equal(sprites[0].dataset.targetIndex,"1");
+    assert.deepEqual(positionOf(sprites[0]),formalPosition(runtime,"player",1));
+    assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-freeze"),null);''',
+          "enemy Freeze formal ally slot")
+
+          # Strengthen the existing player Tidal Beast trajectory check without changing authored scale/timing.
+          replace_once(
+          '''    assert.equal(beastSprites.length,1);
+    assert.equal(beastSprites[0].dataset.targetIndex,"1");
+    assert.ok(beastSprites[0].style["--v143-sprite-dx"]);''',
+          '''    assert.equal(beastSprites.length,1);
+    assert.equal(beastSprites[0].dataset.targetIndex,"1");
+    const beastActor=formalPosition(beast,"player",0);
+    const beastTarget=formalPosition(beast,"monster",1);
+    assert.deepEqual(positionOf(beastSprites[0]),beastActor);
+    assert.equal(Number.parseFloat(beastSprites[0].style["--v143-sprite-dx"]),beastTarget[0]-beastActor[0]);
+    assert.equal(Number.parseFloat(beastSprites[0].style["--v143-sprite-dy"]),beastTarget[1]-beastActor[1]);''',
+          "player Tidal Beast formal trajectory")
+
+          path.write_text(text)
+          PY
+          git diff --check
+          changed="$(git diff --name-only | sort)"
+          printf '%s\n' "$changed"
+          test "$changed" = "tests/v166-water-vfx.test.js"
+          test -z "$(git diff --name-only -- js css .github)"
+
+      - name: Run migrated V166 Water VFX suite
+        run: node tests/v166-water-vfx.test.js
+
+      - name: Commit validated candidate
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/v166-water-vfx.test.js
+          test "$(git diff --cached --name-only)" = "tests/v166-water-vfx.test.js"
+          git commit -m "test: validate V166 water VFX fixed-slot migration"
+          git push origin HEAD:validation/v166-water-vfx-migration-candidate-20260917
