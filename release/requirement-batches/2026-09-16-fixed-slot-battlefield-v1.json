@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-16-fixed-slot-battlefield-v1",
+  "baseBranch": "dev",
+  "baseCommit": "b23d608e28bd6f42cec70a2a6111f6e50a9e82c0",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "TODO",
+  "renderingFinalizationStatus": "VERIFIED",
+  "renderingFinalizationBaseCommit": "1a8f359aa49beafec0e05245e3cbf81d4a60ff43",
+  "renderingVerificationRun": 35075580264,
+  "renderingBrowserQaArtifact": 10438346345,
+  "requirements": [
+    {
+      "id": "SLOT-ENEMY-01",
+      "status": "IMPLEMENTED",
+      "requirement": "敵方永久使用 2×5 固定 Slot；Unit 與 Slot 分離，死亡不得壓縮或重新置中，originalFormationType 不因死亡改變。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "tests/fixed-battlefield-slots.test.js"
+      ]
+    },
+    {
+      "id": "SLOT-PRIORITY-01",
+      "status": "IMPLEMENTED",
+      "requirement": "3／5／6／8／10 人使用指定固定 Slot 映射與固定自動主目標順位；1／2／4／7／9 不新增特殊玩法順位。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "tests/fixed-battlefield-slots.test.js"
+      ]
+    },
+    {
+      "id": "SLOT-AUTO-01",
+      "status": "IMPLEMENTED",
+      "requirement": "Auto Battle 僅在真正出手前依原始 Formation priority 重選仍存活的 Primary Target，不改玩家手動指定目標。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/31-v136-auto-battle-fix.js"
+      ]
+    },
+    {
+      "id": "SLOT-GEOMETRY-01",
+      "status": "IMPLEMENTED",
+      "requirement": "single／tri／row／column／all 共用同一 Slot Geometry resolver；tri 不補人、row 不跨排、column 不跨列、all 不含 Mechanism。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/42-v148-combat-dungeon-fixes.js"
+      ]
+    },
+    {
+      "id": "SLOT-ALLY-01",
+      "status": "VERIFIED",
+      "requirement": "我方永久 2×3 共 6 Slot；目前 player/player2/player3 可自由佈陣，但不得新增 player4～player6。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/battlefield-render-geometry-adapter.js",
+        "tests/fixed-slot-battlefield-rendering-v2.test.js",
+        ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
+        "CI run 35075580264 / artifact 10438346345"
+      ]
+    },
+    {
+      "id": "SLOT-SAVE-01",
+      "status": "TODO",
+      "requirement": "主城新增最小佈陣入口，使用正式 account save owner 持久化；舊存檔安全 migration 且不改角色／裝備／解鎖資料。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/startup/account-save-repository.js"
+      ]
+    },
+    {
+      "id": "SLOT-SUPPORT-01",
+      "status": "TODO",
+      "requirement": "Buff／Heal／Shield／Debuff 與傷害技能共用 Slot Geometry；allyTri 手動施放必須實際選中心角色，不再存活≤3就全員吃到。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/35-v141-ui-battle.js",
+        "js/42-v148-combat-dungeon-fixes.js"
+      ]
+    },
+    {
+      "id": "SLOT-WATER-01",
+      "status": "TODO",
+      "requirement": "Water freeze 正式維持 column 前後最多2人，歷史 tri compatibility 最終轉入同一 Slot Geometry。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/50-v169-water-skill-rules.js"
+      ]
+    },
+    {
+      "id": "SLOT-BOSS-01",
+      "status": "IMPLEMENTED",
+      "requirement": "有兩援軍計畫的 Boss 從開戰即採 3 人 Snapshot：ENEMY_F2 預留左援軍、ENEMY_F3 Boss、ENEMY_F4 預留右援軍；召喚／死亡均不得重排。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/gameplay-boss-tower-system.test.js"
+      ]
+    },
+    {
+      "id": "SLOT-MECH-01",
+      "status": "IMPLEMENTED",
+      "requirement": "Mechanism 使用獨立 MECH_L／MECH_C／MECH_R 三格，保留 mechanism:{id} 目標語意且不參與一般 enemy unit geometry。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/gameplay-boss-tower-system.js",
+        "js/39-v143-skill-animation.js",
+        "css/gameplay-boss-tower.css",
+        "tests/gameplay-boss-tower-system.test.js",
+        "tests/boss-mechanism-vfx-card-ui-20260909.test.js"
+      ]
+    },
+    {
+      "id": "SLOT-LAYOUT-01",
+      "status": "VERIFIED",
+      "requirement": "戰鬥頁固定 Enemy Unit／Mechanism／Ally Unit／Action 四 Zone，內容數量變化不得推動我方、回合資訊或操作按鈕。",
+      "evidence": [
+        "js/battlefield-render-geometry-adapter.js",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "tests/fixed-slot-battlefield-rendering-v2.test.js",
+        ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
+        "CI run 35075580264 / artifact 10438346345"
+      ]
+    },
+    {
+      "id": "SLOT-ABYSS-01",
+      "status": "TODO",
+      "requirement": "Abyss 既有 v141FormationRow/v141FormationPosition 映射到正式 Slot owner，不形成第二套 Formation，10 人深淵不得回歸。",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/59-abyss-two-tier-runtime.js",
+        "js/battlefield-render-geometry-adapter.js"
+      ]
+    },
+    {
+      "id": "SLOT-VFX-01",
+      "status": "VERIFIED",
+      "requirement": "VFX、傷害／治療／MISS／狀態動畫優先以實際 Unit card／Slot center 定位，固定戰場型特效使用固定 Zone bounds。",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "js/battlefield-render-geometry-adapter.js",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "tests/fixed-slot-battlefield-rendering-v2.test.js",
+        ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
+        "CI run 35075580264 / artifact 10438346345"
+      ]
+    },
+    {
+      "id": "SLOT-QA-01",
+      "status": "TODO",
+      "requirement": "指定自動順位、死亡不壓縮、出手前重選、傷害與 Buff 不補人、Boss 援軍、Mechanism、Ally 6 Slot、Abyss、Water、存讀檔與 9:16 視覺案例全部驗證。",
+      "evidence": [
+        "tests/fixed-battlefield-slots.test.js",
+        "tests/fixed-slot-battlefield-rendering-v2.test.js",
+        ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
+        "Rendering subset verified by CI run 35075580264 / artifact 10438346345; broader save/Water/support QA remains TODO"
+      ]
+    },
+    {
+      "id": "SLOT-SCOPE-01",
+      "status": "VERIFIED",
+      "requirement": "不修改傷害／防禦／元素克制／Boss 數值／EXP／金幣／掉落／裝備／背包／Adventure Runtime／Firebase Auth／Firestore Rules／UID ownership；main 全程不修改。",
+      "evidence": [
+        "PR #251 changed-file audit",
+        "main remained at 314c0f640582e0ae7e8c3e5b7ad09b48c7ceefe2 during rendering finalization",
+        "dev remained at 1a8f359aa49beafec0e05245e3cbf81d4a60ff43; no direct dev push"
+      ]
+    }
+  ],
+  "automatedVerification": "PARTIAL_PASS_PR_251_CI_35075580264_RENDERING_V2",
+  "visualVerification": "PASS_412X915_393X873_360X800_FIXED_SLOT_RENDERING_V2_ARTIFACT_10438346345",
+  "promotionApproval": "dev only; main forbidden by user"
+}

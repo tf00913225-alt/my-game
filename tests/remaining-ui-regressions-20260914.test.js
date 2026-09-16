@@ -22,7 +22,10 @@ assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[
 assert.match(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*inset:15px -5px 26px!important/);
 assert.match(battle,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:2px solid #f1c96d!important/);
 assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1;/);
-assert.match(vfx,/function visualRectForCard\(card\)[\s\S]*:scope > \.v174-battle-art/);
+assert.doesNotMatch(vfx,/function visualRectForCard\(/,"VFX geometry must not regress to character/art DOM bounds");
+assert.match(vfx,/function geometryOwner\(\)\{[\s\S]*window\.FourSymbolsBattlefieldSlots/);
+assert.match(vfx,/function geometryBounds\([\s\S]*owner\.getSideRect[\s\S]*owner\.getGeometryRectFromShape/);
+assert.match(vfx,/node\.dataset\.geometryOwner="fixed-slot"/);
 assert.match(vfx,/function applySpriteBox\([\s\S]*SPRITE_SCALE_MULTIPLIER/);
 assert.match(vfx,/naturalWidth[\s\S]*columns[\s\S]*naturalHeight[\s\S]*rows/);
 assert.match(vfx,/node\.style\.visibility="hidden"/);

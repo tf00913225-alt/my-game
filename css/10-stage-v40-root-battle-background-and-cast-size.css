@@ -1,4 +1,3 @@
-
 /* ============================================================
    V40 — SOURCE-LEVEL FIX
    Baseline: V39.
@@ -24,8 +23,9 @@
     position:relative !important;
     background:transparent !important;
     isolation:isolate !important;
-    /* V96：後段 V40 不得再把整個戰鬥頁改回 scroll owner。 */
-    overflow:hidden !important;
+    /* The outer game viewport owns page clipping. Battle artwork/VFX may paint
+       outside their unit boxes without turning battlePage into a scroll owner. */
+    overflow:visible !important;
 }
 
 #game-stage > #app > #game-content #battlePage > .battle-bg-shared{
