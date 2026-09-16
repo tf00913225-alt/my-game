@@ -26,10 +26,12 @@ jobs:
       - name: Verify validation scope
         shell: bash
         run: |
-          git diff --check c4eaacc62946f9cd15ac9972115b0306567f8d6d HEAD
-          changed="$(git diff --name-only c4eaacc62946f9cd15ac9972115b0306567f8d6d HEAD | sort)"
+          base=c4eaacc62946f9cd15ac9972115b0306567f8d6d
+          git fetch --no-tags --depth=1 origin "$base"
+          git diff --check "$base" HEAD
+          changed="$(git diff --name-only "$base" HEAD | sort)"
           printf '%s\n' "$changed"
-          test -z "$(git diff --name-only c4eaacc62946f9cd15ac9972115b0306567f8d6d HEAD -- js css)"
+          test -z "$(git diff --name-only "$base" HEAD -- js css)"
 
       - name: Run formal V153 Fixed Slot diagnosis
         run: node tests/diagnosis-v153-fixed-slot-harness.test.js
