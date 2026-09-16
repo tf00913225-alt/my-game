@@ -18,8 +18,10 @@ assert.match(inventoryJs,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)
 assert.match(inventoryCss,/inventory-grid-classic[\s\S]*grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
 assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inventory-icon > \.v169-item-art[\s\S]*object-fit:contain/);
 assert.doesNotMatch(abyssCss,/#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:0!important;[\s\S]*z-index:24!important/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*inset:15px -5px 26px!important/);
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[^}]*display:flex!important;[^}]*visibility:visible!important;[^}]*opacity:1!important;[^}]*z-index:24!important/);
+assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[^}]*(?<![-\w])(?:position|top|left|right|bottom|inset|width|height)\s*:/,"V174 monster-name presentation must not own fixed-slot geometry");
+assert.match(battle,/\.v174-cardless-unit>\.v174-battle-art\{[^}]*z-index:1!important;[^}]*display:block!important;[^}]*background-size:contain!important;[^}]*background-position:center bottom!important/);
+assert.doesNotMatch(battle,/\.v174-cardless-unit>\.v174-battle-art\{[^}]*(?<![-\w])(?:position|top|left|right|bottom|inset|width|height)\s*:/,"V174 battle artwork presentation must not own fixed-slot geometry");
 assert.match(battle,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:2px solid #f1c96d!important/);
 assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1;/);
 assert.doesNotMatch(vfx,/function visualRectForCard\(/,"VFX geometry must not regress to character/art DOM bounds");
