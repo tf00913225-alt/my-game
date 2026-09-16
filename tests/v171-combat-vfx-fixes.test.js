@@ -33,12 +33,14 @@ test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path"
     );
 });
 
-test("Water trajectories use resolved actor-target geometry before raster activation",()=>{
+test("Water trajectories use resolved actor-target fixed-slot geometry before raster activation",()=>{
     const addSprite=animation.indexOf("function addSprite(current,index,target)");
     const append=animation.indexOf("node=appendSpriteNode(current);",addSprite);
     const place=animation.indexOf("placeSprite(current,node,index,target);",addSprite);
     const activate=animation.indexOf('node.classList.add("v143-vfx-sprite-active")',place);
     assert.ok(addSprite>=0&&append>addSprite&&place>append&&activate>place);
+    assert.match(animation,/function geometryOwner\(\)\{[\s\S]*?window\.FourSymbolsBattlefieldSlots/);
+    assert.match(animation,/function slotAnchor\(side,index,card\)[\s\S]*?owner\.getSlotCenter\(slot\)[\s\S]*?owner\.getSlotRect\(slot\)/);
     assert.match(animation,/if\(placement==="targetTrajectory"\)\{[\s\S]*?node\.style\.left=actor\.x\+"px";[\s\S]*?node\.style\.top=actor\.y\+"px";[\s\S]*?--v143-sprite-dx",target\.x-actor\.x\+"px"[\s\S]*?--v143-sprite-dy",target\.y-actor\.y\+"px"/);
     assert.match(animation,/if\(placement==="trajectory"&&sprite\.travelToTargets&&actor\)\{[\s\S]*?--v143-sprite-dx",destination\.x-actor\.x\+"px"[\s\S]*?--v143-sprite-dy",destination\.y-actor\.y\+"px"/);
     assert.doesNotMatch(animation,/--v143-sprite-start-left|--v143-sprite-start-top|--v143-sprite-target-left|--v143-sprite-target-top/);
@@ -47,22 +49,23 @@ test("Water trajectories use resolved actor-target geometry before raster activa
     assert.doesNotMatch(css,/v166WaterTargetTravel/);
 });
 
-test("Ice Arrow Rain uses one centered full-field raster sheet without tiles",()=>{
+test("Ice Arrow Rain uses one formal fixed-slot full-field raster sheet without tiles",()=>{
+    assert.match(animation,/function geometryBounds\(current,indexes,placement\)[\s\S]*?owner\.getSideRect\(current\.targetSide\)/);
+    assert.match(animation,/rect\.id=current\.targetSide==="monster"\?"fixed-enemy-zone":"fixed-ally-zone"/);
     const battlefield=animation.match(/if\(placement==="battlefield"\)\{[\s\S]*?\n\s*return;\n\s*\}/);
     assert.ok(battlefield);
-    assert.match(battlefield[0],/const bounds=mechanismTargetBounds\(current,emittedSpriteTargets\(current\)\)\|\|sideAreaBounds\(current\.targetSide\)/);
     assert.match(battlefield[0],/const coverageScale=clamp\(Number\(sprite\.coverageScale\)\|\|Number\(sprite\.scale\)\|\|1,1,1\.4\)/);
     assert.match(battlefield[0],/Math\.round\(bounds\.width\*coverageScale\)/);
     assert.match(battlefield[0],/Math\.round\(bounds\.height\*coverageScale\)/);
     assert.match(battlefield[0],/applySpriteBox\(node,width,height,sprite\)/);
-    assert.match(battlefield[0],/node\.style\.left=\(bounds\.left\+bounds\.width\/2\)\+"px"/);
-    assert.match(battlefield[0],/node\.style\.top=\(bounds\.top\+bounds\.height\/2\)\+"px"/);
+    assert.match(battlefield[0],/node\.style\.left=bounds\.centerX\+"px"/);
+    assert.match(battlefield[0],/node\.style\.top=bounds\.centerY\+"px"/);
     assert.match(battlefield[0],/node\.style\.clipPath="none"/);
-    assert.doesNotMatch(battlefield[0],/buildBattlefieldSpriteTiles\(node,sprite,bounds\)/);
+    assert.doesNotMatch(battlefield[0],/battleMonsterArea|battlePlayerRow|fieldBounds|sideAreaBounds/);
     assert.doesNotMatch(css,/\.v166-water-battlefield-tile\{/);
 });
 
-test("Rage cast and loop remain visible and card-anchored on both sides",()=>{
+test("Rage cast and loop remain visible and slot-anchored on both sides",()=>{
     assert.match(
         animation,
         /rage:\{[\s\S]*?rage-cast\.png\?v=165[\s\S]*?scale:1\.08,minSize:96,maxSize:148/
@@ -71,6 +74,7 @@ test("Rage cast and loop remain visible and card-anchored on both sides",()=>{
         animation,
         /type==="rage"&&current\.config\.id==="rage"[\s\S]*?v143-effects-pending/
     );
+    assert.match(animation,/function syncStatusSprite\(side,index,type\)[\s\S]*?const anchor=slotAnchor\(side,index,card\)/);
     assert.match(
         css,
         /\.v153-status-vfx-rage\{[\s\S]*?z-index:5;[\s\S]*?opacity:1;/
