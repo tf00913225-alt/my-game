@@ -39,6 +39,7 @@ jobs:
         run: |
           awk '/cat > \/tmp\/premium-ui-visual-qa.mjs <<'"'"'NODE'"'"'/{capture=1;next} capture && /^          NODE$/{exit} capture{sub(/^          /,"");print}' .github/workflows/temp-premium-ui-visual-qa.yml > /tmp/premium-ui-visual-qa-source.mjs
           test -s /tmp/premium-ui-visual-qa-source.mjs
+          sed -i '/"\.\.\/css\/31-v131-fix-batch\.css",/i\\            "../css/30-v130-requested-updates.css",' /tmp/premium-ui-visual-qa-source.mjs
           sed -i 's/#game-stage{position:relative;width:100vw;height:100vh;min-width:0;min-height:0;overflow:hidden;transform:none!important;background:#070604}/#game-stage{position:relative!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;margin:0!important;width:100vw!important;height:100vh!important;min-width:0;min-height:0;overflow:hidden!important;transform:none!important;background:#070604}/' /tmp/premium-ui-visual-qa-source.mjs
           awk '/^const sizes=/{exit} {print}' /tmp/premium-ui-visual-qa-source.mjs > .tmp-premium-ui-visual-qa.mjs
           cat >> .tmp-premium-ui-visual-qa.mjs <<'NODE'
