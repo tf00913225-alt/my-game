@@ -6,10 +6,10 @@ on:
       - validation/v170-autonomous-contract-cleanup-20260917
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose-east-earth-shield:
+  validate-east-earth-shield:
     runs-on: ubuntu-latest
     steps:
       - name: Check out autonomous fix branch
@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: test "$(git rev-parse HEAD)" = "e9f041e1c08b9830fe5ca33c6dd190bf8b0ab0e6"
 
-      - name: Inject validation-only formal snapshot diagnostics
+      - name: Apply authorized Earth Shield tests-only contract fix
         shell: bash
         run: |
           python - <<'PY'
@@ -41,36 +41,59 @@ jobs:
           end=text.index(end_marker,start)
           case=text[start:end]
 
-          old='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};\n        const earth=v155ResolveEastEarthShield(0,true);\n'''
-          new='''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);\n        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        if(!snapshot){ throw new Error("East Earth Shield diagnosis requires the formal enemy snapshot"); }\n        const eastTargets=v141GetMonsterAllyTriTargets(0).map(entry=>entry.index);\n        const eastSlots=eastTargets.map(index=>window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,index));\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};\n        const earth=v155ResolveEastEarthShield(0,true);\n'''
-          if case.count(old)!=1:
-              raise SystemExit(f"fixture anchor count={case.count(old)}")
-          case=case.replace(old,new,1)
+          def replace_once(source,old,new,label):
+              count=source.count(old)
+              if count!=1:
+                  raise SystemExit(f"{label}: expected exactly one match, found {count}")
+              return source.replace(old,new,1)
 
-          old='''            earth:earth,calm:calm,\n            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,\n'''
-          new='''            earth:earth,calm:calm,eastTargets:eastTargets,eastSlots:eastSlots,\n            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,\n'''
-          if case.count(old)!=1:
-              raise SystemExit(f"result anchor count={case.count(old)}")
-          case=case.replace(old,new,1)
-
-          old='''    assert.equal(result.earth,true);\n'''
-          new='''    console.log("EAST_EARTH_SHIELD_DIAG="+JSON.stringify(result));\n    assert.equal(result.earth,true);\n'''
-          if case.count(old)!=1:
-              raise SystemExit(f"log anchor count={case.count(old)}")
-          case=case.replace(old,new,1)
+          case=replace_once(
+              case,
+              '''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};\n        const earth=v155ResolveEastEarthShield(0,true);\n''',
+              '''        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);\n        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);\n        if(!snapshot){ throw new Error("V170 Earth Shield fixture must create the formal enemy snapshot"); }\n        const eastTargets=v141GetMonsterAllyTriTargets(0).map(entry=>entry.index);\n        const eastSlots=eastTargets.map(index=>window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,index));\n        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};\n        showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};\n        const earth=v155ResolveEastEarthShield(0,true);\n''',
+              "snapshot insertion"
+          )
+          case=replace_once(
+              case,
+              '''            earth:earth,calm:calm,\n            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,\n''',
+              '''            earth:earth,calm:calm,eastTargets:eastTargets,eastSlots:eastSlots,\n            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,\n''',
+              "result payload"
+          )
+          case=replace_once(
+              case,
+              '''    assert.equal(result.earth,true);\n    assert.equal(result.calm,true);\n    assert.equal(result.earthTargets,2);\n''',
+              '''    assert.equal(result.earth,true);\n    assert.equal(result.calm,true);\n    assert.deepEqual(result.eastTargets,[0,1,2]);\n    assert.deepEqual(result.eastSlots,["ENEMY_F1","ENEMY_F2","ENEMY_F3"]);\n    assert.equal(result.earthTargets,3);\n''',
+              "formal Fixed Slot expectation"
+          )
 
           path.write_text(text[:start]+case+text[end:],encoding="utf-8")
           PY
+
           git diff --check
           test "$(git diff --name-only)" = "tests/v170-final-spec-integration.test.js"
+          git diff -- tests/v170-final-spec-integration.test.js
 
-      - name: Run validation-only V170 diagnosis
+      - name: Run related Fixed Slot targeted regression
+        shell: bash
+        run: node tests/fixed-slot-tri-target-window.test.js
+
+      - name: Run V170, commit confirmed fix, and preserve next failure
         shell: bash
         run: |
           set +e
-          timeout 90s node tests/v170-final-spec-integration.test.js > /tmp/v170-east.log 2>&1
+          timeout 90s node tests/v170-final-spec-integration.test.js > /tmp/v170.log 2>&1
           status=$?
           set -e
-          cat /tmp/v170-east.log
-          test "$status" -ne 124
-          grep -F 'EAST_EARTH_SHIELD_DIAG=' /tmp/v170-east.log
+          cat /tmp/v170.log
+
+          grep -Fq '✓ East Earth Shield and Heaven Calm use their assigned formal support values' /tmp/v170.log
+          git diff --check
+          test "$(git diff --name-only)" = "tests/v170-final-spec-integration.test.js"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/v170-final-spec-integration.test.js
+          git commit -m "test: align V170 earth shield with fixed-slot tri"
+          git push origin HEAD:fix/v170-autonomous-contract-cleanup-20260917
+
+          exit "$status"
