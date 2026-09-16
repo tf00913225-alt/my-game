@@ -450,17 +450,7 @@
     box-sizing:border-box !important;
 }
 
-/* ---------- 角色切換：參考圖是窄的一條人物名稱列 ----------
-   ★ 修正（依照使用者回報，「背包介面的角色切換按鈕與返回
-   按鈕重疊了，把兩邊的箭頭切換按鈕都往角色ID靠攏」）：
-   原本用grid-template-columns:13% 74% 13%把整條列撐滿
-   整個外殼寬度，右側箭頭因此被推到最右邊緣，正好卡在
-   絕對定位、貼右上角的「關閉」按鈕（.map-inventory-
-   overlay-close）下面，兩者疊在一起。改成flex置中排列，
-   兩顆箭頭改成貼著角色名稱兩側（用gap控制間距，不用
-   固定寬度撐滿整列），右箭頭自然遠離右上角，不會再跟
-   關閉按鈕重疊。
-*/
+/* ---------- 角色切換：參考圖是窄的一條人物名稱列 ---------- */
 #game-stage #inventoryPage .inventory-character-switch{
     width:100% !important;
     min-height:48px !important;
@@ -506,31 +496,33 @@
     white-space:nowrap !important;
 }
 
-/* ---------- 角色主區：按參考圖比例，不用固定長條 ---------- */
+/* ---------- Demo Visual Parity / Batch B：左立繪＋右 3×2 六裝備 ---------- */
 #game-stage #inventoryPage .inventory-character-stage{
     position:relative !important;
     width:100% !important;
-    height:var(--inventory-stage-height,240px) !important;
-    min-height:var(--inventory-stage-height,240px) !important;
-    max-height:var(--inventory-stage-height,240px) !important;
+    height:var(--inventory-stage-height,172px) !important;
+    min-height:var(--inventory-stage-height,172px) !important;
+    max-height:var(--inventory-stage-height,172px) !important;
     aspect-ratio:auto !important;
     margin:0 !important;
-    padding:0 !important;
+    padding:8px !important;
     display:grid !important;
-    grid-template-columns:14% 64% 14% !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-    column-gap:4% !important;
+    grid-template-columns:34% minmax(0,1fr) !important;
+    grid-template-rows:minmax(0,1fr) !important;
+    column-gap:7px !important;
     row-gap:0 !important;
-    align-items:center !important;
+    align-items:stretch !important;
     align-content:stretch !important;
-    justify-content:center !important;
+    justify-content:stretch !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    border-radius:12px !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.80),rgba(10,8,6,.86)) !important;
+    box-shadow:0 6px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,232,180,.025) !important;
     box-sizing:border-box !important;
 }
-
-/* 中央立繪：先空框，日後只換圖片，不再重改版面 */
 #game-stage #inventoryPage .inventory-portrait-frame{
-    grid-column:2 !important;
-    grid-row:1 / 4 !important;
+    grid-column:1 !important;
+    grid-row:1 !important;
     width:100% !important;
     height:100% !important;
     min-height:0 !important;
@@ -538,8 +530,8 @@
     align-self:stretch !important;
     justify-self:stretch !important;
     margin:0 !important;
-    border-width:2px !important;
-    border-radius:14px !important;
+    border-width:1px !important;
+    border-radius:9px !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
@@ -550,49 +542,52 @@
     font-size:22px !important;
     letter-spacing:2px !important;
 }
-
-/* 六裝備：左右各三格，真正做正方形 */
 #game-stage #inventoryPage .inventory-equipment-grid{
-    grid-column:1 / 4 !important;
-    grid-row:1 / 4 !important;
+    grid-column:2 !important;
+    grid-row:1 !important;
     width:100% !important;
     height:100% !important;
     display:grid !important;
-    grid-template-columns:14% 64% 14% !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-    column-gap:4% !important;
-    row-gap:0 !important;
-    align-items:center !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    grid-template-rows:repeat(2,minmax(0,1fr)) !important;
+    gap:5px !important;
+    align-items:stretch !important;
     align-content:stretch !important;
     pointer-events:auto !important;
     z-index:3 !important;
     box-sizing:border-box !important;
 }
 #game-stage #inventoryPage .inventory-equipment-cell{
+    position:relative !important;
     width:100% !important;
     min-width:0 !important;
     min-height:0 !important;
-    align-self:center !important;
-    justify-self:center !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:stretch !important;
-    justify-content:center !important;
-    gap:3px !important;
+    align-self:stretch !important;
+    justify-self:stretch !important;
+    display:block !important;
     box-sizing:border-box !important;
 }
 #game-stage #inventoryPage .inventory-equipment-cell:nth-child(1){grid-column:1 !important;grid-row:1 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(2){grid-column:3 !important;grid-row:1 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(3){grid-column:1 !important;grid-row:2 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(4){grid-column:3 !important;grid-row:2 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(5){grid-column:1 !important;grid-row:3 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(6){grid-column:3 !important;grid-row:3 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(2){grid-column:2 !important;grid-row:1 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(3){grid-column:3 !important;grid-row:1 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(4){grid-column:1 !important;grid-row:2 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(5){grid-column:2 !important;grid-row:2 !important;}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(6){grid-column:3 !important;grid-row:2 !important;}
 #game-stage #inventoryPage .inventory-equipment-slot-label{
-    width:100% !important;
+    position:absolute !important;
+    left:4px !important;
+    right:4px !important;
+    bottom:3px !important;
+    z-index:4 !important;
+    width:auto !important;
+    min-width:0 !important;
+    padding:2px 3px !important;
+    border-radius:5px !important;
     text-align:center !important;
-    font-size:12px !important;
-    line-height:1 !important;
-    color:#d6c29a !important;
+    font-size:10px !important;
+    line-height:1.15 !important;
+    color:#b7a88f !important;
+    background:linear-gradient(180deg,transparent,rgba(4,3,2,.82)) !important;
     white-space:nowrap !important;
     overflow:hidden !important;
     text-overflow:ellipsis !important;
@@ -600,15 +595,15 @@
 }
 #game-stage #inventoryPage .inventory-equipment-slot{
     width:100% !important;
-    aspect-ratio:1 / 1 !important;
-    height:auto !important;
+    height:100% !important;
     min-width:0 !important;
     min-height:0 !important;
-    align-self:center !important;
-    justify-self:center !important;
-    border-width:2px !important;
-    border-radius:10px !important;
-    padding:4px !important;
+    aspect-ratio:auto !important;
+    align-self:stretch !important;
+    justify-self:stretch !important;
+    border-width:1px !important;
+    border-radius:8px !important;
+    padding:4px 4px 17px !important;
     box-sizing:border-box !important;
 }
 #game-stage #inventoryPage .inventory-equipment-icon{
@@ -642,16 +637,16 @@
     padding:4px 6px !important;
 }
 
-/* ---------- 背包：參考圖 6 欄，格子為畫面主體 ---------- */
+/* ---------- Demo Visual Parity / Batch C：正式 18 格 × 7 頁保持不變 ---------- */
 #game-stage #inventoryPage .inventory-right-panel{
     position:relative !important;
     width:100% !important;
     max-width:none !important;
-    margin:0 !important;
-    padding:10px !important;
-    border:1px solid rgba(200,154,72,.18) !important;
-    border-radius:12px !important;
-    background:linear-gradient(155deg,rgba(28,21,13,.58),rgba(8,7,5,.74)) !important;
+    margin:0 0 26px !important;
+    padding:8px !important;
+    border:1px solid rgba(200,154,72,.20) !important;
+    border-radius:10px !important;
+    background:linear-gradient(160deg,rgba(28,21,13,.58),rgba(8,7,5,.74)) !important;
     box-shadow:inset 0 1px 0 rgba(255,238,196,.025) !important;
     box-sizing:border-box !important;
 }
@@ -659,22 +654,22 @@
     display:grid !important;
     grid-template-columns:repeat(4,minmax(0,1fr)) !important;
     gap:0 !important;
-    margin:0 0 8px !important;
-    padding:0 6px !important;
-    border-bottom:2px solid #6f542f !important;
+    margin:0 0 7px !important;
+    padding:0 4px !important;
+    border-bottom:1px solid rgba(126,99,55,.72) !important;
     align-items:end !important;
 }
 #game-stage #inventoryPage .inventory-category-tab{
     position:relative !important;
     min-width:0 !important;
     min-height:36px !important;
-    padding:8px 4px 7px !important;
+    padding:8px 3px 7px !important;
     border:0 !important;
     border-radius:0 !important;
     background:transparent !important;
     box-shadow:none !important;
-    color:#b9aa91 !important;
-    font-size:14px !important;
+    color:#a9987c !important;
+    font-size:13px !important;
     font-weight:700 !important;
     line-height:1 !important;
     text-align:center !important;
@@ -684,29 +679,29 @@
 #game-stage #inventoryPage .inventory-category-tab::after{
     content:"" !important;
     position:absolute !important;
-    left:12% !important;
-    right:12% !important;
-    bottom:-2px !important;
-    height:3px !important;
+    left:16% !important;
+    right:16% !important;
+    bottom:-1px !important;
+    height:2px !important;
     background:transparent !important;
-    border-radius:3px 3px 0 0 !important;
+    border-radius:2px 2px 0 0 !important;
 }
 #game-stage #inventoryPage .inventory-category-tab.active{
-    color:#ffe27a !important;
-    background:linear-gradient(180deg,rgba(138,106,58,.14),rgba(138,106,58,0)) !important;
+    color:#efd18a !important;
+    background:rgba(200,154,72,.035) !important;
 }
 #game-stage #inventoryPage .inventory-category-tab.active::after{
-    background:#f0b429 !important;
-    box-shadow:0 0 8px rgba(240,180,41,.35) !important;
+    background:#c89a48 !important;
+    box-shadow:none !important;
 }
 #game-stage #inventoryPage .inventory-category-tab:focus-visible{
-    outline:1px solid #f0b429 !important;
+    outline:1px solid #c89a48 !important;
     outline-offset:-2px !important;
 }
 #game-stage #inventoryPage .inventory-grid-classic{
     display:grid !important;
     grid-template-columns:repeat(6,minmax(0,1fr)) !important;
-    gap:6px !important;
+    gap:5px !important;
     width:100% !important;
     margin:0 !important;
 }
@@ -718,9 +713,9 @@
     min-height:0 !important;
     padding:3px !important;
     border-width:1px !important;
-    border-radius:8px !important;
-    background:radial-gradient(circle at 50% 30%,rgba(200,154,72,.08),transparent 48%),linear-gradient(160deg,#17120d,#090806) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025),0 2px 6px rgba(0,0,0,.28) !important;
+    border-radius:7px !important;
+    background:radial-gradient(circle at 50% 30%,rgba(200,154,72,.06),transparent 48%),linear-gradient(160deg,#15110c,#090806) !important;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.02) !important;
     box-sizing:border-box !important;
 }
 #game-stage #inventoryPage .inventory-item-classic .inventory-icon{
@@ -740,43 +735,46 @@
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
-    gap:14px !important;
-    margin:8px 0 2px !important;
+    gap:10px !important;
+    margin:7px 0 1px !important;
 }
 #game-stage #inventoryPage .inventory-pagination button{
-    width:42px !important;
+    width:38px !important;
     height:34px !important;
-    min-width:42px !important;
+    min-width:38px !important;
     min-height:34px !important;
-    font-size:22px !important;
-    border-radius:6px !important;
+    padding:0 !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    border-radius:7px !important;
+    color:#cdbb99 !important;
+    background:#100d09 !important;
+    box-shadow:none !important;
+    font-size:18px !important;
 }
 #game-stage #inventoryPage #inventoryPageLabel{
     min-width:64px !important;
-    font-size:14px !important;
+    color:#9d8d73 !important;
+    font-size:13px !important;
+    font-weight:700 !important;
+    text-align:center !important;
 }
-
-/* 避免底部導覽列遮掉最後一排 */
-#game-stage #inventoryPage .inventory-right-panel{
-    margin-bottom:26px !important;
-}
-
 
 /* V75 explicit visual frames — not dependent on legacy border defaults */
 #game-stage #inventoryPage .inventory-portrait-frame{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.82),rgba(10,8,5,.92)) !important;
-    box-shadow:inset 0 0 0 1px rgba(240,180,41,.12) !important;
+    border:1px solid rgba(200,154,72,.34) !important;
+    background:#0a0806 !important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.035) !important;
 }
 #game-stage #inventoryPage .inventory-equipment-slot{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.88),rgba(10,8,5,.96)) !important;
-    box-shadow:inset 0 0 0 1px rgba(240,180,41,.10) !important;
+    border:1px solid rgba(216,216,216,.42) !important;
+    background:linear-gradient(180deg,#17130e,#0b0907) !important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.035) !important;
 }
 #game-stage #inventoryPage .inventory-stats-panel,
 #game-stage #inventoryPage .inventory-right-panel{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.90),rgba(12,9,6,.96)) !important;
+    border:1px solid rgba(200,154,72,.24) !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.72),rgba(10,8,6,.82)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,232,180,.025) !important;
 }
 
 
@@ -1085,7 +1083,6 @@
     min-height:124px !important;
 }
 
-
 /* Skill detail icon is an icon, not a full-width repeating banner. */
 #game-stage #skillDetailModal #skillDetailIcon{
     width:88px!important;height:88px!important;min-height:88px!important;
@@ -1095,6 +1092,90 @@
     background-color:rgba(9,8,6,.88)!important;
 }
 #game-stage #skillDetailModal #skillDetailIcon img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;}
+
+/* =====================================================
+   Premium Functional UI — Demo Visual Parity / Batch C
+   Item detail presentation only; equipment/potion runtime remains unchanged.
+===================================================== */
+#game-stage #itemModal{
+    background:rgba(2,2,2,.72) !important;
+}
+#game-stage #itemModal .item-modal-box{
+    padding:12px !important;
+    border:1px solid #b88a3b !important;
+    border-radius:14px !important;
+    color:#f3ead7 !important;
+    background:linear-gradient(180deg,#231a10,#0c0906) !important;
+    box-shadow:0 15px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,235,188,.035) !important;
+}
+#game-stage #itemModal #itemModalIcon{
+    align-self:center !important;
+    margin:0 auto 2px !important;
+    border-radius:10px !important;
+    box-shadow:none !important;
+}
+#game-stage #itemModal #itemModalName{
+    margin:0 !important;
+    padding:0 0 8px !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(200,154,72,.18) !important;
+    color:#f0d18a !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:18px !important;
+    line-height:1.3 !important;
+    font-weight:900 !important;
+    text-align:center !important;
+}
+#game-stage #itemModal #itemModalStats{
+    padding:4px 2px !important;
+    border:0 !important;
+    border-radius:0 !important;
+    color:#d8cbb4 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    font-size:14px !important;
+    line-height:1.55 !important;
+}
+#game-stage #itemModal #itemModalStats > div{
+    border-color:rgba(200,154,72,.12) !important;
+}
+#game-stage #itemModal .item-modal-buttons{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+    margin-top:auto !important;
+    padding-top:8px !important;
+    border-top:1px solid rgba(200,154,72,.14) !important;
+}
+#game-stage #itemModal .item-modal-buttons button{
+    min-height:44px !important;
+    border:1px solid rgba(200,154,72,.34) !important;
+    border-radius:8px !important;
+    color:#dfcfad !important;
+    background:linear-gradient(180deg,#282117,#12100b) !important;
+    box-shadow:none !important;
+    font-size:14px !important;
+    font-weight:900 !important;
+}
+#game-stage #itemModal #itemEquipButton:not(:disabled),
+#game-stage #itemModal #v17342InventoryPotionUse:not(:disabled){
+    border-color:#c99c4b !important;
+    color:#fff0c2 !important;
+    background:linear-gradient(#5a401f,#28180c) !important;
+    box-shadow:inset 0 0 10px rgba(224,183,90,.08) !important;
+}
+#game-stage #itemModal .item-modal-buttons button:disabled{
+    opacity:.42 !important;
+    border-color:rgba(200,154,72,.16) !important;
+    color:#817563 !important;
+    background:#100d09 !important;
+}
+#game-stage #itemModal .close-item-button{
+    color:#c9b897 !important;
+    background:#100d09 !important;
+}
 
 
 /* bundled source: css/24-stage-v85-inventory-inner-grid-scroll-root.css */
@@ -2188,7 +2269,7 @@ body.quest-scroll-active,
     min-height:0 !important;
     max-height:none !important;
     overflow:visible !important;
-    padding-bottom:240px !important;
+    padding-bottom:12px !important;
     touch-action:pan-y !important;
 }
 
@@ -2200,101 +2281,264 @@ body.quest-scroll-active,
     overflow:visible !important;
 }
 
-/*
-   ★ 修正：
-   原本這條規則寫的.learned-skill/.learnable-skill
-   button在目前版本的技能頁裡根本不存在（真正的按鈕
-   是.skill-row底下的.skill-action-card，本來就不是
-   <button>），規則完全沒生效，學習/升級的方框
-   還是原本那個固定46px寬、內部icon區塊撐滿高度的
-   大小。這裡改成真正對到的selector：讓沒有icon內容
-   的.skill-action-card-top直接不佔空間，整塊卡片
-   改用align-self:center縮到跟文字內容一樣大，
-   不再撐滿整列高度。
-*/
+/* =====================================================
+   Premium Functional UI — Demo Visual Parity / Batch B
+   Skill presentation owner only. Runtime/progression stays unchanged.
+===================================================== */
+#game-stage #skillPage .skill-page-heading h2{
+    margin:2px 0 8px !important;
+    color:#efd69d !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:18px !important;
+    line-height:1.25 !important;
+    font-weight:900 !important;
+    text-align:left !important;
+}
+
+#game-stage #skillPage #skillCharacterSwitchCard{
+    margin:0 0 7px !important;
+    padding:7px !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    border-radius:10px !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.76),rgba(10,8,6,.84)) !important;
+    box-shadow:none !important;
+}
+#game-stage #skillPage #skillCharacterSwitchCard > b{
+    display:block !important;
+    margin:0 0 5px !important;
+    color:#a99a80 !important;
+    font-size:13px !important;
+    font-weight:700 !important;
+    letter-spacing:.02em !important;
+}
+#game-stage #skillPage #skillCharacterSwitchCard .character-arrow{
+    width:40px !important;
+    min-width:40px !important;
+    height:40px !important;
+    min-height:40px !important;
+    padding:0 !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    border-radius:8px !important;
+    color:#dec58e !important;
+    background:#100d09 !important;
+    box-shadow:none !important;
+    font-size:20px !important;
+    line-height:38px !important;
+}
+#game-stage #skillPage #skillCharacterNameBox{
+    min-width:0 !important;
+    color:#f1ddaf !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:15px !important;
+    font-weight:900 !important;
+    text-align:center !important;
+}
+
+#game-stage #skillPage .card:has(> #skillLoadout){
+    margin:0 0 7px !important;
+    padding:7px 8px 8px !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    border-radius:10px !important;
+    background:linear-gradient(160deg,rgba(31,23,14,.76),rgba(10,8,6,.84)) !important;
+    box-shadow:none !important;
+}
+#game-stage #skillPage .card:has(> #skillLoadout) > b{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    margin:0 0 6px !important;
+    color:#e9d09a !important;
+    font-family:"Noto Serif TC",serif !important;
+    font-size:14px !important;
+    font-weight:900 !important;
+}
+#game-stage #skillPage #skillLoadout{
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:6px !important;
+    margin:0 !important;
+}
+#game-stage #skillPage #skillLoadout .skill-loadout-slot{
+    min-width:0 !important;
+    min-height:68px !important;
+    aspect-ratio:1 / 1 !important;
+    padding:5px 3px !important;
+    border:1px solid rgba(200,154,72,.32) !important;
+    border-radius:10px !important;
+    background:radial-gradient(circle at 50% 32%,rgba(200,154,72,.10),transparent 42%),#0f0c08 !important;
+    box-shadow:none !important;
+}
+#game-stage #skillPage #skillLoadout .skill-loadout-slot-icon{
+    width:34px !important;
+    height:34px !important;
+    border-radius:8px !important;
+}
+#game-stage #skillPage #skillLoadout .skill-loadout-slot-name{
+    max-width:100% !important;
+    color:#dbc18b !important;
+    font-size:12px !important;
+    line-height:1.2 !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+}
+
+#game-stage #skillPage .v138-skill-point-summary{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    margin:0 0 7px !important;
+    padding:7px 9px !important;
+    border:0 !important;
+    border-left:2px solid #c89a48 !important;
+    border-radius:0 !important;
+    background:rgba(13,10,7,.56) !important;
+    color:#a99a81 !important;
+    font-size:13px !important;
+    font-weight:700 !important;
+    box-shadow:none !important;
+}
+#game-stage #skillPage #skillPoints{
+    display:inline !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    color:#ffd77e !important;
+    font-size:18px !important;
+    line-height:1 !important;
+    box-shadow:none !important;
+}
+
+#game-stage #allSkillsList{
+    display:grid !important;
+    gap:6px !important;
+    margin-top:0 !important;
+    padding:7px !important;
+    border:1px solid rgba(200,154,72,.20) !important;
+    border-radius:10px !important;
+    background:rgba(10,8,6,.62) !important;
+}
+#game-stage #allSkillsList .skill-row{
+    display:grid !important;
+    grid-template-columns:42px minmax(0,1fr) minmax(70px,auto) !important;
+    gap:7px !important;
+    align-items:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    min-height:62px !important;
+    margin:0 !important;
+    padding:7px !important;
+    border:1px solid rgba(200,154,72,.18) !important;
+    border-radius:9px !important;
+    background:rgba(21,16,10,.74) !important;
+    box-shadow:none !important;
+    box-sizing:border-box !important;
+}
+#game-stage #allSkillsList .skill-row-icon{
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+    flex:0 0 42px !important;
+    border:1px solid rgba(200,154,72,.28) !important;
+    border-radius:9px !important;
+    background:rgba(42,24,13,.56) !important;
+    box-shadow:none !important;
+}
+#game-stage #allSkillsList .skill-row-text{
+    min-width:0 !important;
+    overflow:hidden !important;
+}
+#game-stage #allSkillsList .skill-row-text b{
+    display:block !important;
+    color:#f1e4c7 !important;
+    font-size:16px !important;
+    line-height:1.25 !important;
+}
+#game-stage #allSkillsList .skill-row-desc{
+    display:block !important;
+    margin-top:2px !important;
+    color:#9f917a !important;
+    font-size:13px !important;
+    line-height:1.4 !important;
+}
+
 #game-stage #allSkillsList .skill-row .skill-action-card{
     flex:0 0 auto !important;
     align-self:center !important;
     width:auto !important;
-    min-width:54px !important;
+    min-width:70px !important;
+    max-width:108px !important;
     height:auto !important;
-    min-height:36px !important;
+    min-height:38px !important;
+    border:1px solid rgba(200,154,72,.30) !important;
+    border-radius:8px !important;
+    background:linear-gradient(180deg,#282117,#12100b) !important;
+    box-shadow:none !important;
 }
-
+#game-stage #allSkillsList .skill-row .skill-action-card[onclick*="learnSkill"]{
+    border-color:#c99c4b !important;
+    color:#fff0c2 !important;
+    background:linear-gradient(#5a401f,#28180c) !important;
+    box-shadow:inset 0 0 10px rgba(224,183,90,.08) !important;
+}
+#game-stage #allSkillsList .skill-row .skill-action-card[onclick*="upgradeSkill"]{
+    border-color:rgba(200,154,72,.34) !important;
+    color:#dfcfad !important;
+    background:linear-gradient(180deg,#282117,#12100b) !important;
+}
+#game-stage #allSkillsList .skill-row .skill-action-card.disabled,
+#game-stage #allSkillsList .skill-row .skill-action-card[aria-disabled="true"]{
+    opacity:.42 !important;
+    border-color:rgba(200,154,72,.16) !important;
+    color:#817563 !important;
+    background:#100d09 !important;
+    box-shadow:none !important;
+}
 #game-stage #allSkillsList .skill-row .skill-action-card-top:empty{
     display:none !important;
 }
-
 #game-stage #allSkillsList .skill-row .skill-action-card-label{
-    padding:7px 9px !important;
-    font-size:15px !important;
-    line-height:1.3 !important;
-}
-
-/* V138：剩餘技能點改成高對比資訊條，未點詳細也能看到學習成本。 */
-#game-stage #skillPage .v138-skill-point-summary{
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:8px !important;
-    border:2px solid #e8a93c !important;
-    background:linear-gradient(135deg,#2d1d0d,#120e09) !important;
-    color:#f5ecd9 !important;
-    font-size:15px !important;
-    font-weight:800 !important;
-    box-shadow:0 0 12px rgba(232,169,60,.28) !important;
-}
-
-#game-stage #skillPage #skillPoints{
-    display:inline-flex !important;
-    min-width:52px !important;
-    min-height:34px !important;
-    align-items:center !important;
-    justify-content:center !important;
-    padding:2px 10px !important;
-    border-radius:999px !important;
-    background:#e8a93c !important;
-    color:#17100a !important;
-    font-size:22px !important;
-    line-height:1 !important;
-    box-shadow:0 0 10px rgba(255,224,138,.45) !important;
+    padding:8px 9px !important;
+    color:inherit !important;
+    font-size:13px !important;
+    line-height:1.2 !important;
+    font-weight:900 !important;
 }
 
 #game-stage #allSkillsList .v138-skill-learn-cost{
-    display:flex !important;
-    width:max-content !important;
+    display:inline !important;
+    width:auto !important;
     max-width:100% !important;
-    margin-top:4px !important;
-    margin-right:6px !important;
-    padding:3px 7px !important;
-    border:1px solid #d88a32 !important;
-    border-radius:999px !important;
-    background:#301b0a !important;
-    color:#ffc46b !important;
-    font-size:13px !important;
+    margin:2px 6px 0 0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    color:#d8b66d !important;
+    font-size:12px !important;
     line-height:1.35 !important;
-    font-weight:800 !important;
-    white-space:nowrap !important;
+    font-weight:700 !important;
+    white-space:normal !important;
 }
-
 .v131-skill-kind{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:max-content;
-    margin:2px 4px 2px 0;
-    padding:3px 6px;
-    border:1px solid #826536;
-    border-radius:999px;
-    font-size:13px;
-    line-height:1.2;
-    font-weight:800;
-    color:#eadfc8;
-    background:#17120d;
+    display:inline !important;
+    width:auto !important;
+    margin:2px 6px 0 0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    color:#a99a80 !important;
+    background:transparent !important;
+    font-size:12px !important;
+    line-height:1.35 !important;
+    font-weight:700 !important;
 }
-
-.v131-skill-kind.physical{ border-color:#b77c43; }
-.v131-skill-kind.magic{ border-color:#647fc8; }
+.v131-skill-kind.physical,
+.v131-skill-kind.magic{ border-color:transparent !important; }
 
 #game-stage #game-overlay-layer #allElementSkillPreviewModal,
 #game-stage #allElementSkillPreviewModal{
@@ -2396,97 +2640,111 @@ body.quest-scroll-active,
     to{ transform:scale(1.18); opacity:1; }
 }
 
-#game-stage #expDistributeList{
+/* Premium Functional UI / Demo Visual Parity — EXP presentation owner.
+   Keep renderExpDistributeList() and its preview/confirm runtime unchanged;
+   only rebalance hierarchy so character/current EXP/next level/cost read first. */
+#game-stage #homeExpPoolCard #expDistributeList{
     display:flex;
     flex-direction:column;
-    gap:7px;
+    gap:0;
+    margin-top:7px;
+    border-top:1px solid rgba(200,154,72,.18);
 }
 
-.v131-exp-row{
+#game-stage #homeExpPoolCard .v131-exp-row{
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
-    gap:5px 8px;
+    gap:4px 10px;
     align-items:center;
-    padding:10px 10px 9px;
-    border:1px solid rgba(200,154,72,.24);
-    border-radius:9px;
-    background:linear-gradient(145deg,rgba(29,22,14,.76),rgba(10,8,6,.86));
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025);
+    padding:10px 2px;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.14);
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
 }
 
-.v131-exp-name{
+#game-stage #homeExpPoolCard .v131-exp-name{
     min-width:0;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
-    font-size:15px;
-    font-weight:800;
-    color:#f3dfb2;
-}
-
-.v131-exp-level{
-    font-size:14px;
-    color:#b7a98e;
-    text-align:right;
-}
-
-.v131-exp-level.preview,
-.v131-preview-level{
-    color:#ffdf69 !important;
+    color:#f3ead7;
+    font-family:"Noto Serif TC",serif;
+    font-size:16px;
     font-weight:900;
+    letter-spacing:.01em;
 }
 
-.v131-exp-preview-btn{
-    grid-column:1 / -1;
-    width:100%;
-    min-height:44px;
-    padding:8px 10px;
-    border:1px solid rgba(200,154,72,.42);
-    border-radius:8px;
-    background:linear-gradient(180deg,#2b2419,#14110d);
-    color:#e7d7b5;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.035);
-    font-size:15px;
-    font-weight:900;
-}
-
-.v131-exp-preview-summary{
-    text-align:right;
-    color:#cfbd98;
-    font-size:14px;
+#game-stage #homeExpPoolCard .v131-exp-level{
+    color:#b7a88f;
+    font-size:13px;
     line-height:1.4;
-    padding:3px 2px;
+    text-align:right;
 }
 
-.v131-exp-actions{
+#game-stage #homeExpPoolCard .v131-exp-level.preview,
+#game-stage #homeExpPoolCard .v131-preview-level{
+    color:#efd18a !important;
+    font-weight:900;
+}
+
+#game-stage #homeExpPoolCard .v131-exp-preview-btn{
+    grid-column:1 / -1;
+    justify-self:end;
+    width:min(144px,100%);
+    min-height:40px;
+    padding:7px 10px;
+    border:1px solid rgba(200,154,72,.34);
+    border-radius:8px;
+    background:linear-gradient(180deg,#282117,#12100b);
+    color:#dfcfad;
+    box-shadow:none;
+    font-size:13px;
+    font-weight:900;
+}
+
+#game-stage #homeExpPoolCard .v131-exp-preview-summary{
+    text-align:left;
+    color:#b7a88f;
+    font-size:13px;
+    line-height:1.45;
+    padding:4px 1px;
+}
+
+#game-stage #homeExpPoolCard .v131-exp-actions{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:8px;
+    gap:7px;
+    padding-top:4px;
 }
 
-.v131-exp-actions button{
+#game-stage #homeExpPoolCard .v131-exp-actions button{
     min-height:44px;
-    padding:9px 8px;
-    border:1px solid #a77a35;
-    border-radius:8px;
-    font-size:15px;
+    padding:8px 10px;
+    border-radius:9px;
+    font-size:14px;
     font-weight:900;
 }
 
-.v131-exp-confirm{
-    background:linear-gradient(180deg,#6a3517,#3f190d);
-    color:#ffe7a1;
+#game-stage #homeExpPoolCard .v131-exp-confirm{
+    border:1px solid #c99c4b !important;
+    background:linear-gradient(#5a401f,#28180c) !important;
+    color:#fff0c2 !important;
+    box-shadow:inset 0 0 12px rgba(224,183,90,.10) !important;
 }
 
-.v131-exp-back{
-    background:#21180f;
-    color:#d8c8aa;
+#game-stage #homeExpPoolCard .v131-exp-back{
+    border:1px solid rgba(200,154,72,.34) !important;
+    background:linear-gradient(#282117,#12100b) !important;
+    color:#dfcfad !important;
+    box-shadow:none !important;
 }
 
-.v131-exp-actions button:disabled,
-.v131-exp-preview-btn:disabled{
-    opacity:.35 !important;
-    filter:grayscale(.65);
+#game-stage #homeExpPoolCard .v131-exp-actions button:disabled,
+#game-stage #homeExpPoolCard .v131-exp-preview-btn:disabled{
+    opacity:.42 !important;
+    filter:none;
     pointer-events:none;
 }
 
@@ -2571,12 +2829,12 @@ body.quest-scroll-active,
 }
 
 #game-stage #allSkillsList .skill-row-desc{
-    font-size:15px !important;
-    line-height:1.5 !important;
+    font-size:13px !important;
+    line-height:1.4 !important;
 }
 
 #game-stage #allSkillsList .skill-row-text b{
-    font-size:17px !important;
+    font-size:16px !important;
 }
 
 /*
@@ -3428,10 +3686,9 @@ body.quest-scroll-active,
 }
 
 /*
-   System/settings currently contains only a small number of rows, so it is a
-   content-height Medium Modal rather than a 540px empty shell. If future rows
-   exceed the safe viewport, #homeFeatureModalBody becomes the sole vertical
-   scroll owner and the frame remains capped to the available game surface.
+   Demo Visual Parity / Batch F — System is a functional list, not a stack of
+   decorative dashboard cards. Runtime actions, settings persistence and the
+   existing modal scroll owner remain unchanged.
 */
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .home-feature-modal-box{
     width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
@@ -3448,7 +3705,7 @@ body.quest-scroll-active,
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .home-feature-modal-title{
     flex:0 0 auto !important;
-    color:var(--ui-text,#f4ead4) !important;
+    color:#f3ead7 !important;
     letter-spacing:.06em;
 }
 
@@ -3467,79 +3724,76 @@ body.quest-scroll-active,
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel{
     min-height:0 !important;
     display:grid !important;
-    gap:7px !important;
+    gap:0 !important;
     box-sizing:border-box !important;
-    padding:2px 1px 4px !important;
+    padding:0 2px 2px !important;
+    border-top:1px solid rgba(200,154,72,.14) !important;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row{
     position:relative;
-    min-height:72px !important;
-    padding:10px 10px !important;
-    border:1px solid rgba(200,154,72,.20) !important;
-    border-radius:10px !important;
-    background:linear-gradient(150deg,rgba(31,23,14,.78),rgba(10,8,6,.88)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,232,180,.025) !important;
+    min-height:62px !important;
+    padding:9px 3px !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(200,154,72,.14) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row::before{
-    content:"";
-    position:absolute;
-    left:12px;
-    right:12px;
-    top:0;
-    height:1px;
-    pointer-events:none;
-    background:linear-gradient(90deg,transparent,rgba(239,209,138,.22),transparent);
+    display:none !important;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row strong{
-    color:#efd69d !important;
+    color:#f0e3c6 !important;
     font-family:"Noto Serif TC","Noto Sans TC",serif;
     font-size:15px !important;
     line-height:1.25 !important;
-    letter-spacing:.03em;
+    letter-spacing:.02em;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row small{
     margin-top:3px;
-    color:var(--ui-text-muted,#a99b83) !important;
-    font-size:13px !important;
-    line-height:1.45 !important;
+    color:#a99b84 !important;
+    font-size:12px !important;
+    line-height:1.4 !important;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel button,
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel select,
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel input{
-    min-height:44px !important;
+    min-height:38px !important;
 }
 
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row:not(.danger) .home-feature-buy-btn{
-    border-color:rgba(200,154,72,.38) !important;
-    color:#e7d7b5 !important;
-    background:linear-gradient(180deg,#2b2419,#14110d) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.035),0 2px 6px rgba(0,0,0,.28) !important;
+    min-width:76px !important;
+    border-color:rgba(200,154,72,.28) !important;
+    color:#d9c9aa !important;
+    background:linear-gradient(180deg,#282117,#12100b) !important;
+    box-shadow:none !important;
 }
 
-/* Warning containers and their destructive actions share one red visual
-   language. A red outer warning with a yellow/black inner button is forbidden. */
+/* Destructive actions stay explicit, but the warning is local instead of
+   turning the entire row into a red card. */
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row.danger{
-    border-color:#a84d3f !important;
-    background:linear-gradient(180deg,rgba(78,27,22,.88),rgba(31,13,11,.94)) !important;
-    box-shadow:inset 0 0 0 1px rgba(220,91,70,.08) !important;
+    padding-left:9px !important;
+    border-left:2px solid #a84d3f !important;
+    background:rgba(72,24,20,.10) !important;
+    box-shadow:none !important;
 }
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row.danger::before{
-    background:linear-gradient(90deg,transparent,rgba(240,162,152,.20),transparent);
+    display:none !important;
 }
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row.danger strong{
-    color:#f0b0a7 !important;
+    color:#e9aaa1 !important;
 }
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row.danger .home-feature-buy-btn{
-    border-color:#cf614e !important;
-    color:#fff0e9 !important;
-    background:linear-gradient(180deg,#8e3b30,#4d1b16) !important;
-    text-shadow:0 1px 2px #000 !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 6px rgba(0,0,0,.4) !important;
+    border-color:#a84d3f !important;
+    color:#f5d8d3 !important;
+    background:linear-gradient(180deg,#5c2b24,#281310) !important;
+    text-shadow:none !important;
+    box-shadow:none !important;
 }
 
 
@@ -4421,7 +4675,7 @@ body.quest-scroll-active,
 .skill-preview-modal.v141-body-preview .skill-preview-card span{font-size:14px !important;}
 .skill-preview-modal.v141-body-preview .skill-preview-card p{font-size:15px !important;line-height:1.6 !important;}
 
-/* ----- Synthesis system ----- */
+/* ----- Synthesis system / Demo Visual Parity Batch E ----- */
 #game-stage #homeFeatureModal.v141-synthesis-modal{
     padding:5px !important;
 }
@@ -4443,65 +4697,54 @@ body.quest-scroll-active,
 }
 
 #game-stage .v141-synthesis{height:100%;display:flex;min-height:0;flex-direction:column;gap:6px;}
-#game-stage .v141-synthesis-wallet{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid rgba(200,154,72,.24);border-radius:8px;background:linear-gradient(90deg,rgba(27,20,12,.78),rgba(12,9,6,.88));
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025);
-}
-#game-stage .v141-synthesis-wallet span{color:#b9a98d;font-size:13px;}
-#game-stage .v141-synthesis-wallet b{color:#ffe19a;font-size:16px;}
-#game-stage .v141-synthesis-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;}
-#game-stage .v141-synthesis-tabs button{min-height:44px;padding:4px 2px;border:1px solid #69502e;border-radius:7px;color:#b5a58c;background:#17120d;font-size:12px;}
-#game-stage .v141-synthesis-tabs button.active{color:#231607;border-color:#d4a14d;background:linear-gradient(180deg,#f0ca79,#b97d2f);font-weight:900;}
+#game-stage .v141-synthesis-wallet{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid rgba(200,154,72,.20);border-radius:8px;background:rgba(18,13,8,.58);box-shadow:none;}
+#game-stage .v141-synthesis-wallet span{color:#a99b84;font-size:13px;}
+#game-stage .v141-synthesis-wallet b{color:#efd18a;font-size:16px;}
+#game-stage .v141-synthesis-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;border-bottom:1px solid rgba(126,99,55,.58);padding-bottom:4px;}
+#game-stage .v141-synthesis-tabs button{min-height:42px;padding:4px 2px;border:1px solid rgba(200,154,72,.20);border-radius:7px;color:#a99b84;background:#110e09;font-size:12px;box-shadow:none;}
+#game-stage .v141-synthesis-tabs button.active{color:#efd7a5;border-color:#bd9147;background:#2f2112;font-weight:900;box-shadow:none;}
 #game-stage .v141-synthesis-body{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-gutter:stable;}
-#game-stage .v141-synthesis-card,#game-stage .v141-synthesis-empty{min-height:100%;padding:10px;border:1px solid rgba(200,154,72,.20);border-radius:10px;background:linear-gradient(155deg,rgba(29,22,14,.68),rgba(9,7,5,.86));box-sizing:border-box;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.02);
-}
-#game-stage .v141-synthesis-card{height:auto;}
-#game-stage .v141-synthesis-empty{height:100%;}
-#game-stage .v141-synthesis-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#d5c5a7;text-align:center;}
+#game-stage .v141-synthesis-card,#game-stage .v141-synthesis-empty{min-height:100%;padding:10px;border:1px solid rgba(200,154,72,.20);border-radius:10px;background:linear-gradient(155deg,rgba(29,22,14,.68),rgba(9,7,5,.86));box-sizing:border-box;box-shadow:inset 0 1px 0 rgba(255,238,196,.02);}
+#game-stage .v141-synthesis-card{height:auto;display:flex;flex-direction:column;gap:8px;}
+#game-stage .v141-synthesis-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#d5c5a7;text-align:center;}
 #game-stage .v141-synthesis-empty small{margin-top:5px;color:#958871;}
-#game-stage .v141-synthesis-card label{display:grid;grid-template-columns:118px minmax(0,1fr);gap:5px;align-items:center;margin-bottom:7px;color:#d8c6a5;font-size:13px;}
+#game-stage .v141-synthesis-card label{order:1;display:grid;grid-template-columns:118px minmax(0,1fr);gap:5px;align-items:center;margin:0;color:#d8c6a5;font-size:13px;}
 #game-stage .v141-synthesis-card label small{grid-column:1/-1;color:#988a74;font-size:10px;line-height:1.35;}
-#game-stage .v141-blueprint-series{display:grid;grid-template-columns:118px minmax(0,1fr);gap:5px;align-items:center;margin-bottom:7px;color:#d8c6a5;font-size:13px;}
+#game-stage .v141-blueprint-series{order:2;display:grid;grid-template-columns:118px minmax(0,1fr);gap:5px;align-items:center;margin:0;color:#d8c6a5;font-size:13px;}
 #game-stage .v141-blueprint-series b{color:#f0d18c;text-align:right;}
-#game-stage .v141-synthesis-card select{min-width:0;height:34px;border:1px solid #72562f;border-radius:6px;padding:4px;color:#f3e5ca;background:#100d09;font-size:13px;}
-#game-stage .v141-craft-preview{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid #5e492c;border-radius:8px;background:rgba(255,255,255,.025);}
-#game-stage .v141-craft-icon{width:55px;height:55px;flex:0 0 55px;}
+#game-stage .v141-synthesis-card select{min-width:0;height:34px;border:1px solid rgba(200,154,72,.28);border-radius:6px;padding:4px;color:#f3e5ca;background:#100d09;font-size:13px;}
+#game-stage .v141-craft-preview{order:0;display:flex;align-items:center;gap:10px;padding:9px;border:1px solid rgba(255,159,56,.33);border-radius:10px;background:rgba(50,27,10,.20);box-shadow:none;}
+#game-stage .v141-craft-icon{width:58px;height:58px;flex:0 0 58px;border:1px solid rgba(255,159,56,.55);border-radius:10px;background:#0e0b08;box-sizing:border-box;}
 #game-stage .v141-craft-icon svg{width:100%;height:100%;}
 #game-stage .v141-craft-preview > div:last-child{display:flex;min-width:0;flex-direction:column;gap:3px;}
-#game-stage .v141-craft-preview b{color:#f0d18c;font-size:16px;}
-#game-stage .v141-craft-preview span{color:#ad9f87;font-size:12px;}
-#game-stage .v141-material-lines{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:8px 0;}
-#game-stage .v141-material-lines span{padding:6px 4px;border:0;border-radius:0;color:#afa189;background:transparent;font-size:11px;text-align:center;
-    border-bottom:1px solid rgba(200,154,72,.14);
-}
+#game-stage .v141-craft-preview b{color:#ffd39a;font-size:16px;}
+#game-stage .v141-craft-preview span{color:#aa9b82;font-size:12px;}
+#game-stage .v141-material-lines{order:4;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:0;}
+#game-stage .v141-material-lines span{padding:7px 4px;border:1px solid rgba(200,154,72,.14);border-radius:7px;color:#afa189;background:rgba(16,13,9,.52);font-size:11px;text-align:center;}
 #game-stage .v141-material-lines b{display:block;margin-top:2px;font-size:12px;}
 #game-stage .v141-material-lines .ok{color:#8ee6a2;}
 #game-stage .v141-material-lines .lack{color:#ee8e79;}
-#game-stage .v141-synthesis-primary{width:100%;min-height:44px !important;border:1px solid #e0ad55;border-radius:8px;color:#241607;background:linear-gradient(180deg,#f3d083,#b9792a);font-size:15px !important;font-weight:900;}
-#game-stage .v141-synthesis-primary:disabled{opacity:.36;filter:grayscale(.55);}
-#game-stage .v141-affix-info{display:block;margin:6px auto 0;border:0;color:#cdb37d;background:transparent;text-decoration:underline;font-size:12px !important;}
-#game-stage .v141-reforge-current{padding:7px;border:0;border-radius:0;background:rgba(18,13,8,.56);
-    border-left:2px solid rgba(200,154,72,.58);
-}
-#game-stage .v141-reforge-current > b{display:block;color:#f0d18c;font-size:15px;}
+#game-stage .v141-synthesis-primary{order:6;width:100%;min-height:44px !important;border:1px solid #c99c4b;border-radius:8px;color:#fff0c2;background:linear-gradient(180deg,#5a401f,#28180c);box-shadow:none;font-size:15px !important;font-weight:900;}
+#game-stage .v141-synthesis-primary:disabled{opacity:.38;filter:none;border-color:rgba(200,154,72,.18);color:#827765;background:#100d09;}
+#game-stage .v141-affix-info{order:7;display:block;margin:0 auto;border:0;color:#c1aa7b;background:transparent;text-decoration:underline;font-size:12px !important;}
+#game-stage .v141-reforge-current{order:0;padding:9px;border:1px solid rgba(255,159,56,.27);border-radius:10px;background:rgba(50,27,10,.18);box-shadow:none;}
+#game-stage .v141-reforge-current > b{display:block;color:#ffd39a;font-size:16px;}
 #game-stage .v141-reforge-current > small{display:block;color:#a49680;font-size:11px;}
 #game-stage .v141-reforge-current > div{display:flex;flex-wrap:wrap;gap:5px 11px;margin-top:5px;font-size:12px;}
 #game-stage .v141-reforge-current em{width:84px;color:#bca77e;font-style:normal;}
 #game-stage .v141-reforge-current span b{color:#8fd7ff;}
-#game-stage .v141-reforge-compare{position:absolute;inset:58px 8px 8px;z-index:10;display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;padding:9px;border:2px solid #b28138;border-radius:10px;background:rgba(12,9,6,.98);box-shadow:0 10px 28px #000;}
+#game-stage .v141-reforge-compare{position:absolute;inset:58px 8px 8px;z-index:10;display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;padding:9px;border:1px solid #9b7438;border-radius:10px;background:rgba(12,9,6,.98);box-shadow:0 10px 28px #000;}
 #game-stage .v141-reforge-compare section{height:110px;padding:7px;border:1px solid #5f492c;border-radius:7px;background:#15100b;box-sizing:border-box;}
 #game-stage .v141-reforge-compare section small,#game-stage .v141-reforge-compare section span{display:block;margin-bottom:5px;font-size:11px;}
 #game-stage .v141-reforge-compare > b{color:#f1c86d;}
 #game-stage .v141-reforge-compare > div{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-#game-stage .v141-reforge-compare button{border:1px solid #9e7435;border-radius:7px;color:#f2ddb4;background:#261b10;
-    min-height:44px;
-}
-#game-stage .v141-upgrade-flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:9px 0;}
-#game-stage .v141-upgrade-flow section{display:flex;min-width:0;flex-direction:column;align-items:center;gap:4px;padding:9px;border:1px solid rgba(200,154,72,.16);border-radius:8px;background:linear-gradient(155deg,rgba(25,19,13,.64),rgba(10,8,6,.80));text-align:center;}
+#game-stage .v141-reforge-compare button{border:1px solid #9e7435;border-radius:7px;color:#f2ddb4;background:#261b10;min-height:44px;}
+#game-stage .v141-upgrade-flow{order:0;display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:0;padding:8px;border:1px solid rgba(255,159,56,.24);border-radius:10px;background:rgba(50,27,10,.16);}
+#game-stage .v141-upgrade-flow section{display:flex;min-width:0;flex-direction:column;align-items:center;gap:4px;padding:8px;border:1px solid rgba(200,154,72,.14);border-radius:8px;background:rgba(12,10,7,.62);text-align:center;}
 #game-stage .v141-upgrade-flow section > svg{width:54px;height:54px;}
 #game-stage .v141-upgrade-flow section b{font-size:12px;}
 #game-stage .v141-upgrade-flow i{color:#efc76e;font-size:23px;font-style:normal;}
-#game-stage .v141-quantity{display:flex;align-items:center;justify-content:center;gap:5px;margin:7px 0;}
+#game-stage .v141-quantity{order:2;display:flex;align-items:center;justify-content:center;gap:5px;margin:0;}
 #game-stage .v141-quantity button,#game-stage .v141-fragment-controls button{min-width:38px;min-height:32px !important;padding:3px;border:1px solid #795b31;border-radius:6px;color:#edd9b3;background:#1d160f;font-size:12px !important;}
 #game-stage .v141-quantity strong{min-width:38px;text-align:center;}
 #game-stage .v141-fragment-list{display:grid;gap:6px;height:100%;}
@@ -4520,7 +4763,7 @@ body.quest-scroll-active,
 #game-stage .v141-result-item > svg{width:74px;height:74px;}
 #game-stage .v141-result-item span{font-size:14px;}
 #game-stage .v141-crafting-flash .home-feature-modal-box{animation:v141CraftFlash .62s ease;}
-@keyframes v141CraftFlash{0%,100%{box-shadow:0 14px 40px rgba(0,0,0,.75)}45%{box-shadow:inset 0 0 38px rgba(255,205,99,.42),0 0 32px rgba(255,175,53,.68)}}
+@keyframes v141CraftFlash{0%,100%{box-shadow:0 14px 40px rgba(0,0,0,.75)}45%{box-shadow:inset 0 0 26px rgba(255,205,99,.24),0 0 18px rgba(255,175,53,.30)}}
 
 /* ----- Five-floor Abyss map ----- */
 #game-stage .v141-abyss-shell{display:flex;height:100%;min-height:0;flex-direction:column;gap:7px;}
@@ -4559,10 +4802,10 @@ body.quest-scroll-active,
     #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{height:98dvh !important;max-height:98dvh !important;padding:8px !important;}
     #game-stage .v141-synthesis{gap:4px;}
     #game-stage .v141-synthesis-card{padding:7px;}
-    #game-stage .v141-synthesis-card label{margin-bottom:4px;}
-    #game-stage .v141-craft-preview{padding:5px;}
-    #game-stage .v141-craft-icon{width:44px;height:44px;flex-basis:44px;}
-    #game-stage .v141-material-lines{margin:5px 0;}
+    #game-stage .v141-synthesis-card label{margin-bottom:0;}
+    #game-stage .v141-craft-preview{padding:7px;}
+    #game-stage .v141-craft-icon{width:50px;height:50px;flex-basis:50px;}
+    #game-stage .v141-material-lines{margin:0;}
     #game-stage .v141-fragment-row{padding:4px;}
     #game-stage .v141-abyss-map{min-height:390px;}
 }
@@ -4591,24 +4834,24 @@ body.quest-scroll-active,
 #game-stage .v17358-section-title{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;color:#f4dfb0;}
 #game-stage .v17358-section-title>b{font-size:14px;line-height:18px;}
 #game-stage .v17358-section-title>span{color:#aa9a7e;font-size:10px;line-height:14px;}
-#game-stage .v17358-reforge-material,
-#game-stage .v17358-reforge-lock-panel{padding:8px;border:1px solid rgba(177,128,57,.62);border-radius:9px;background:linear-gradient(180deg,rgba(36,27,16,.82),rgba(13,10,7,.9));}
+#game-stage .v17358-reforge-material{order:2;padding:8px;border:1px solid rgba(177,128,57,.34);border-radius:9px;background:rgba(18,13,8,.58);}
+#game-stage .v17358-reforge-lock-panel{order:3;padding:8px;border:1px solid rgba(177,128,57,.34);border-radius:9px;background:rgba(18,13,8,.58);}
 #game-stage .v17358-reforge-tiers{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:0 0 4px;overscroll-behavior-x:contain;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:thin;}
-#game-stage .v17358-reforge-tier{display:flex!important;flex:0 0 142px!important;min-width:142px!important;min-height:58px!important;flex-direction:column;align-items:flex-start!important;justify-content:center!important;gap:1px;padding:6px 8px!important;border:1px solid #72552d!important;border-radius:7px!important;background:linear-gradient(180deg,#291f13,#110d08)!important;color:#e8d6ae!important;text-align:left!important;scroll-snap-align:start;}
-#game-stage .v17358-reforge-tier.active{border-color:#efbd55!important;background:linear-gradient(180deg,#5b3d16,#231506)!important;box-shadow:inset 0 0 0 1px rgba(255,224,151,.32),0 0 9px rgba(224,161,56,.22)!important;}
+#game-stage .v17358-reforge-tier{display:flex!important;flex:0 0 142px!important;min-width:142px!important;min-height:58px!important;flex-direction:column;align-items:flex-start!important;justify-content:center!important;gap:1px;padding:6px 8px!important;border:1px solid rgba(114,85,45,.82)!important;border-radius:7px!important;background:#15100a!important;color:#e8d6ae!important;text-align:left!important;scroll-snap-align:start;box-shadow:none!important;}
+#game-stage .v17358-reforge-tier.active{border-color:#c89a48!important;background:#2b1f12!important;box-shadow:none!important;}
 #game-stage .v17358-reforge-tier>b{font-size:12px;line-height:15px;}
 #game-stage .v17358-reforge-tier>span{font-size:10px;line-height:13px;color:#d9c49a;}
 #game-stage .v17358-reforge-tier>small{font-size:9px;line-height:12px;color:#9e8d72;}
 #game-stage .v17358-reforge-lock-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
-#game-stage .v17358-affix-lock{display:grid!important;grid-template-columns:22px minmax(0,1fr);grid-template-rows:auto auto;min-height:48px!important;padding:5px 7px!important;border:1px solid #625039!important;border-radius:7px!important;background:#15100a!important;color:#d9c8a5!important;text-align:left!important;}
+#game-stage .v17358-affix-lock{display:grid!important;grid-template-columns:22px minmax(0,1fr);grid-template-rows:auto auto;min-height:48px!important;padding:5px 7px!important;border:1px solid #625039!important;border-radius:7px!important;background:#15100a!important;color:#d9c8a5!important;text-align:left!important;box-shadow:none!important;}
 #game-stage .v17358-affix-lock>span{grid-row:1/3;align-self:center;font-size:17px;}
 #game-stage .v17358-affix-lock>b{overflow:hidden;font-size:11px;line-height:14px;text-overflow:ellipsis;white-space:nowrap;}
 #game-stage .v17358-affix-lock>small{font-size:9px;line-height:11px;color:#8d8069;}
-#game-stage .v17358-affix-lock.locked{border-color:#e5ac45!important;background:linear-gradient(180deg,#39250d,#171006)!important;color:#ffe1a0!important;box-shadow:inset 0 0 9px rgba(239,189,85,.12)!important;}
+#game-stage .v17358-affix-lock.locked{border-color:#c89a48!important;background:#2b1f12!important;color:#ffe1a0!important;box-shadow:none!important;}
 #game-stage .v17358-no-affix-lock{grid-column:1/-1;padding:8px;border:1px dashed rgba(165,128,72,.42);border-radius:6px;color:#9f927d;font-size:10px;text-align:center;}
 #game-stage .v17358-reforge-lock-panel>small{display:block;margin-top:5px;color:#a9997d;font-size:9px;}
-#game-stage .v17358-reforge-cost{margin-top:0!important;}
-#game-stage .v17358-reforge-cost-note{margin-top:-2px;color:#a9997d;font-size:9px;line-height:13px;text-align:center;}
+#game-stage .v17358-reforge-cost{order:4;margin-top:0!important;}
+#game-stage .v17358-reforge-cost-note{order:5;margin-top:-2px;color:#a9997d;font-size:9px;line-height:13px;text-align:center;}
 
 
 /* bundled source: css/39-v142-skill-animation.css */
@@ -6664,9 +6907,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     visibility:hidden;
     opacity:0;
     pointer-events:none;
-    background:
-        radial-gradient(circle at 50% 38%,rgba(118,75,25,.2),transparent 45%),
-        rgba(3,2,2,.82);
+    background:rgba(3,2,2,.84);
     transition:opacity .16s ease,visibility 0s linear .16s;
 }
 
@@ -6687,39 +6928,20 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     box-sizing:border-box;
     flex-direction:column;
     gap:var(--ui-small-dialog-content-gap);
-    padding:28px 18px 16px;
+    padding:18px;
     overflow:hidden;
-    border:2px solid #b88a42;
+    border:1px solid #b88a3b;
     border-radius:14px;
-    background:
-        linear-gradient(135deg,transparent 13px,#22180e 0) top left,
-        linear-gradient(225deg,transparent 13px,#22180e 0) top right,
-        linear-gradient(45deg,transparent 13px,#110c08 0) bottom left,
-        linear-gradient(315deg,transparent 13px,#110c08 0) bottom right;
-    background-size:51% 51%;
-    background-repeat:no-repeat;
+    background:linear-gradient(180deg,#231a10,#0c0906);
     color:#eadfc9;
-    box-shadow:
-        0 18px 48px rgba(0,0,0,.78),
-        inset 0 0 0 1px rgba(255,226,151,.08),
-        inset 0 0 26px rgba(185,124,40,.08);
+    box-shadow:0 15px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,232,180,.04);
     text-align:center;
 }
 
 .v169-rpg-dialog::before,
 .v169-rpg-dialog::after{
-    content:"";
-    position:absolute;
-    left:18px;
-    right:18px;
-    height:1px;
-    background:linear-gradient(90deg,transparent,#c69a50,transparent);
-    opacity:.72;
-    pointer-events:none;
+    display:none;
 }
-
-.v169-rpg-dialog::before{ top:14px; }
-.v169-rpg-dialog::after{ bottom:10px; }
 
 .v169-rpg-dialog-crest{
     position:absolute;
@@ -6728,32 +6950,26 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-width:28px;
     padding:0 4px;
     transform:translateX(-50%);
-    background:#21170d;
-    color:#efc96f;
-    font-size:16px;
+    background:#17110b;
+    color:#d8b66f;
+    font-size:14px;
     line-height:20px;
-    text-shadow:0 0 8px rgba(240,180,41,.45);
+    text-shadow:none;
     pointer-events:none;
 }
 
 .v169-rpg-dialog[data-tone="danger"]{
-    border-color:#b95746;
-    box-shadow:
-        0 18px 48px rgba(0,0,0,.78),
-        inset 0 0 0 1px rgba(255,186,162,.08),
-        inset 0 0 30px rgba(145,35,22,.12);
+    border-color:#a84d3f;
+    box-shadow:0 15px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,190,176,.04);
 }
 
 .v169-rpg-dialog[data-tone="danger"] .v169-rpg-dialog-crest{
-    color:#ff9b83;
+    color:#e8a79e;
 }
 
 .v169-rpg-dialog[data-tone="success"]{
-    border-color:#6ca995;
-    box-shadow:
-        0 18px 48px rgba(0,0,0,.78),
-        inset 0 0 0 1px rgba(188,255,229,.08),
-        inset 0 0 30px rgba(29,119,91,.12);
+    border-color:#70805e;
+    box-shadow:0 15px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(188,255,229,.04);
 }
 
 .v169-rpg-dialog h2{
@@ -6799,30 +7015,30 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 .v169-rpg-dialog-button{
     min-height:44px;
     padding:8px 12px;
-    border:1px solid #896838;
+    border:1px solid rgba(200,154,72,.34);
     border-radius:8px;
-    color:#e6d8bc;
-    background:linear-gradient(180deg,#332719,#17100a);
+    color:#dfcfad;
+    background:linear-gradient(180deg,#282117,#12100b);
     font-size:15px;
     font-weight:900;
     letter-spacing:.5px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    box-shadow:none;
 }
 
 .v169-rpg-dialog-button.primary{
-    border-color:#c2964d;
-    color:#2b1908;
-    background:linear-gradient(180deg,#f1ce7a,#bd7d2d);
+    border-color:#c99c4b;
+    color:#fff0c2;
+    background:linear-gradient(180deg,#5a401f,#28180c);
 }
 
 .v169-rpg-dialog-button.primary.danger{
-    border-color:#d26a55;
-    color:#fff1e9;
-    background:linear-gradient(180deg,#9f3d2d,#5e1f17);
+    border-color:rgba(199,94,82,.62);
+    color:#ffd1c9;
+    background:linear-gradient(180deg,#4a1d19,#1f0e0c);
 }
 
 .v169-rpg-dialog-button:focus-visible{
-    outline:2px solid #fff0b3;
+    outline:1px solid #efd18a;
     outline-offset:2px;
 }
 
@@ -6866,12 +7082,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage #itemModal .item-modal-buttons{
     flex:0 0 auto !important;
 }
-/*
-   Keep the Medium Modal frame fixed, but let a short potion/material stat card
-   hug its actual content. Long equipment details still shrink into the
-   available space and scroll here; the unused room stays as panel background
-   instead of becoming a giant black stat card.
-*/
 #game-stage #itemModal #itemModalStats{
     flex:0 1 auto !important;
     min-height:0 !important;
@@ -6887,10 +7097,10 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     margin-top:auto !important;
 }
 
-/* A permanently promoted layer made skill cards shimmer while scrolling. */
 .skill-preview-card{
     will-change:auto !important;
 }
+
 /* ----- Character: same Large Panel frame as shop; only tab content changes. ----- */
 #game-stage #homeFeatureModal .home-feature-modal-box.wide{
     width:calc(100% - var(--ui-large-panel-safe-space)) !important;
@@ -6921,16 +7131,10 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage #homeFeatureModal #characterTabContent > #skillPage{
     padding:0 0 12px !important;
 }
-
 #game-stage #homeFeatureModal #allSkillsList{
     padding-bottom:12px !important;
 }
 
-/*
-   Simple A-level pages use existing stable DOM signatures instead of adding
-   runtime wrapper classes. Exclude the character .wide shell so its internal
-   tab scroll owner remains authoritative when the EXP pool is borrowed into it.
-*/
 #game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) .home-feature-modal-box,
 #game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) .home-feature-modal-box,
 #game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) .home-feature-modal-box,
@@ -7215,7 +7419,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     inset:8px 8px 76px 8px !important;
     z-index:900 !important;
 }
-
 #game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay::before{
     z-index:-1 !important;
 }
@@ -7226,7 +7429,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     max-width:var(--ui-large-panel-max-width) !important;
     margin:0 auto !important;
 }
-
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open{
     left:50% !important;
     right:auto !important;
@@ -7237,7 +7439,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     transform:translateX(-50%) !important;
     padding:10px !important;
 }
-
 #game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
     left:50% !important;
     right:auto !important;
@@ -7247,18 +7448,15 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     max-width:var(--ui-large-panel-max-width) !important;
     transform:translateX(-50%) !important;
 }
-
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-classic-shell{
     width:100% !important;
     max-width:none !important;
     margin:0 !important;
     gap:var(--ui-large-panel-content-gap) !important;
 }
-
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-switch{
     padding-right:86px !important;
 }
-
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .map-inventory-overlay-close{
     top:8px !important;
     right:8px !important;
@@ -7267,12 +7465,9 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     padding:0 12px !important;
     font-size:15px !important;
 }
-
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-grid-scroll{
     scrollbar-gutter:stable !important;
 }
-
-/* Backpack character presentation follows the same black-gold language as the panel. */
 #game-stage #inventoryPage .inventory-character-arrow{
     width:44px !important;
     height:44px !important;
@@ -7283,14 +7478,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     border:1px solid #b88a42 !important;
     border-radius:50% !important;
     color:#f3cf76 !important;
-    background:
-        radial-gradient(circle at 50% 30%,rgba(246,204,112,.18),transparent 52%),
-        linear-gradient(180deg,#362719,#130e09) !important;
-    box-shadow:
-        inset 0 0 0 1px rgba(255,225,151,.08),
-        inset 0 -8px 14px rgba(0,0,0,.28),
-        0 3px 9px rgba(0,0,0,.48),
-        0 0 8px rgba(205,151,65,.12) !important;
+    background:radial-gradient(circle at 50% 30%,rgba(246,204,112,.18),transparent 52%),linear-gradient(180deg,#362719,#130e09) !important;
+    box-shadow:inset 0 0 0 1px rgba(255,225,151,.08),inset 0 -8px 14px rgba(0,0,0,.28),0 3px 9px rgba(0,0,0,.48),0 0 8px rgba(205,151,65,.12) !important;
     font-family:"Noto Serif TC",serif !important;
     font-size:28px !important;
     font-weight:900 !important;
@@ -7304,9 +7493,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     transform:translateY(1px) !important;
 }
 #game-stage #inventoryPage #inventoryPortraitFrame{
-    background:
-        radial-gradient(circle at 50% 42%,rgba(194,132,47,.09),transparent 60%),
-        linear-gradient(180deg,#100c08,#060504) !important;
+    background:radial-gradient(circle at 50% 42%,rgba(194,132,47,.09),transparent 60%),linear-gradient(180deg,#100c08,#060504) !important;
 }
 #game-stage #inventoryPage #inventoryPortraitFrame .v131-inventory-portrait{
     inset:0 !important;
@@ -7357,16 +7544,14 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 
 @media (prefers-reduced-motion:reduce){
-    .v169-rpg-dialog-layer{
-        transition:none;
-    }
+    .v169-rpg-dialog-layer{transition:none;}
 }
 
-/* V173.48 — PREMIUM ONE-SCREEN SHOP
-   - The shop is a fixed game panel, never a webpage-like scrolling surface.
-   - Potion and equipment tabs share the same one-screen geometry.
-   - Equipment cards use explicit grid rows so rarity/reforge differences cannot
-     move names, stats or purchase buttons into different cells. */
+/* =====================================================
+   V173.48 / Demo Visual Parity Batch D — SINGLE ROW SHOP
+   Formal shop runtime/data is unchanged. Keep exactly the existing two tabs,
+   prices, quantity controls, refresh limits and purchase handlers.
+===================================================== */
 #game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody{
     overflow:hidden !important;
     overscroll-behavior:none !important;
@@ -7376,22 +7561,38 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage #homeFeatureModal.v131-shop-open .v17345-shop-shell{
     height:100% !important;
     min-height:0 !important;
-    gap:8px !important;
+    gap:7px !important;
     overflow:hidden !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-shop-tabs{
     position:static !important;
     top:auto !important;
-    flex:0 0 42px !important;
-    height:42px !important;
-    min-height:42px !important;
+    flex:0 0 40px !important;
+    height:40px !important;
+    min-height:40px !important;
+    gap:4px !important;
     padding:0 !important;
+    border-bottom:1px solid rgba(126,99,55,.58) !important;
     background:transparent !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-shop-tabs button{
-    min-height:44px !important;
-    height:44px !important;
-    font-size:15px !important;
+    position:relative !important;
+    min-height:38px !important;
+    height:38px !important;
+    padding:6px 8px !important;
+    border:1px solid rgba(200,154,72,.20) !important;
+    border-radius:8px !important;
+    color:#aa9a7e !important;
+    background:#110e09 !important;
+    box-shadow:none !important;
+    font-size:13px !important;
+    font-weight:900 !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17345-shop-tabs button.active{
+    border-color:#bd9147 !important;
+    color:#efd7a5 !important;
+    background:#2f2112 !important;
+    box-shadow:none !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface,
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-shop{
@@ -7401,23 +7602,20 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     max-height:none !important;
     overflow:hidden !important;
 }
-
-/* The top HUD already owns the gold balance, so the duplicated equipment
-   wallet row is removed and that space is returned to the six merchandise cards. */
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-wallet{
     display:none !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-shop{
     display:grid !important;
-    grid-template-rows:minmax(0,1fr) 58px !important;
-    gap:7px !important;
+    grid-template-rows:minmax(0,1fr) 54px !important;
+    gap:6px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-grid{
     display:grid !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-rows:repeat(6,minmax(0,1fr)) !important;
     align-content:stretch !important;
-    gap:7px !important;
+    gap:5px !important;
     width:100% !important;
     height:100% !important;
     min-height:0 !important;
@@ -7425,8 +7623,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card{
     display:grid !important;
-    grid-template-columns:54px minmax(0,1fr) !important;
-    grid-template-rows:18px 15px 18px 12px 30px !important;
+    grid-template-columns:48px minmax(0,1fr) 92px !important;
+    grid-template-rows:18px 15px 16px !important;
     column-gap:7px !important;
     row-gap:1px !important;
     align-content:center !important;
@@ -7435,22 +7633,23 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     height:100% !important;
     min-width:0 !important;
     min-height:0 !important;
-    padding:6px !important;
+    padding:6px 7px !important;
     overflow:hidden !important;
-    border-radius:9px !important;
+    border:1px solid rgba(200,154,72,.18) !important;
+    border-radius:10px !important;
+    background:linear-gradient(145deg,rgba(30,23,14,.82),rgba(10,8,6,.88)) !important;
+    box-shadow:none !important;
     box-sizing:border-box !important;
-    border:1px solid rgba(200,154,72,.20) !important;
-    background:linear-gradient(155deg,rgba(28,21,13,.72),rgba(8,7,5,.90)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025),0 3px 8px rgba(0,0,0,.24) !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art{
     grid-column:1 !important;
-    grid-row:1 / 5 !important;
-    width:50px !important;
-    height:50px !important;
+    grid-row:1 / 4 !important;
+    width:48px !important;
+    height:48px !important;
     margin:0 !important;
     align-self:center !important;
     justify-self:center !important;
+    border-radius:9px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-name{
     grid-column:2 !important;
@@ -7458,7 +7657,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-width:0 !important;
     margin:0 !important;
     overflow:hidden !important;
-    color:#f6e7c2 !important;
+    color:#f0e3c6 !important;
     font-size:14px !important;
     line-height:18px !important;
     text-overflow:ellipsis !important;
@@ -7470,6 +7669,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-width:0 !important;
     margin:0 !important;
     overflow:hidden !important;
+    color:#9d8f78 !important;
     font-size:11px !important;
     line-height:15px !important;
     text-overflow:ellipsis !important;
@@ -7481,51 +7681,49 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-width:0 !important;
     margin:0 !important;
     overflow:hidden !important;
-    font-size:13px !important;
-    line-height:18px !important;
+    color:#cdbd9e !important;
+    font-size:12px !important;
+    line-height:16px !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-reforge-mini{
-    grid-column:2 !important;
-    grid-row:4 !important;
-    min-width:0 !important;
-    min-height:12px !important;
-    margin:0 !important;
-    overflow:hidden !important;
-    font-size:10px !important;
-    line-height:12px !important;
-    text-overflow:ellipsis !important;
-    white-space:nowrap !important;
+    display:none !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-buy{
-    grid-column:1 / -1 !important;
-    grid-row:5 !important;
-    width:100% !important;
-    height:42px !important;
-    min-height:42px !important;
+    grid-column:3 !important;
+    grid-row:1 / 4 !important;
+    width:92px !important;
+    height:36px !important;
+    min-height:36px !important;
     margin:0 !important;
-    padding:2px 6px !important;
-    border-radius:6px !important;
-    font-size:12px !important;
-    line-height:1 !important;
-    border:1px solid #c2964d !important;
-    color:#2b1908 !important;
-    background:linear-gradient(180deg,#f1ce7a,#bd7d2d) !important;
+    padding:4px 7px !important;
+    align-self:center !important;
+    border:1px solid #c99c4b !important;
+    border-radius:7px !important;
+    color:#fff0c2 !important;
+    background:linear-gradient(#5a401f,#28180c) !important;
+    box-shadow:none !important;
+    font-size:11px !important;
+    line-height:1.1 !important;
     font-weight:900 !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh{
     display:grid !important;
-    grid-template-columns:minmax(0,1fr) 128px !important;
+    grid-template-columns:minmax(0,1fr) 116px !important;
     align-items:center !important;
     gap:8px !important;
     width:100% !important;
-    height:58px !important;
-    min-height:58px !important;
+    height:54px !important;
+    min-height:54px !important;
     margin:0 !important;
-    padding:7px 8px !important;
+    padding:6px 8px !important;
     overflow:hidden !important;
-    border-radius:9px !important;
+    border:1px solid rgba(200,154,72,.18) !important;
+    border-left:2px solid #c39a4c !important;
+    border-radius:8px !important;
+    background:rgba(13,10,7,.68) !important;
+    box-shadow:none !important;
     box-sizing:border-box !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh > div{
@@ -7535,26 +7733,32 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     gap:1px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh b{
+    color:#f5d17b !important;
     font-size:12px !important;
     line-height:15px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh span{
     overflow:hidden !important;
+    color:#a99a81 !important;
     font-size:10px !important;
     line-height:13px !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh > button{
-    width:128px !important;
-    min-width:128px !important;
-    height:38px !important;
-    min-height:38px !important;
+    width:116px !important;
+    min-width:116px !important;
+    height:36px !important;
+    min-height:36px !important;
     padding:4px 7px !important;
+    border:1px solid rgba(200,154,72,.34) !important;
+    border-radius:7px !important;
+    color:#dfcfad !important;
+    background:linear-gradient(180deg,#282117,#12100b) !important;
+    box-shadow:none !important;
     font-size:11px !important;
 }
 
-/* Potion tab: the same two-column / three-row rhythm as equipment. */
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface{
     display:grid !important;
     grid-template-rows:auto auto minmax(0,1fr) !important;
@@ -7566,6 +7770,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     margin:0 !important;
     padding:0 2px !important;
     overflow:hidden !important;
+    color:#9d8f78 !important;
     font-size:10px !important;
     line-height:13px !important;
     text-overflow:ellipsis !important;
@@ -7573,91 +7778,109 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-list{
     display:grid !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-    gap:6px !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-rows:repeat(6,minmax(0,1fr)) !important;
+    gap:5px !important;
     width:100% !important;
     height:100% !important;
     min-height:0 !important;
     overflow:hidden !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-card{
-    display:flex !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 132px !important;
+    grid-template-rows:auto auto !important;
+    column-gap:8px !important;
+    row-gap:1px !important;
     width:100% !important;
     height:100% !important;
     min-width:0 !important;
     min-height:0 !important;
-    flex-direction:column !important;
     padding:6px 7px !important;
     overflow:hidden !important;
-    border-radius:8px !important;
-    border:1px solid rgba(200,154,72,.20) !important;
-    background:linear-gradient(155deg,rgba(28,21,13,.72),rgba(8,7,5,.90)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025),0 3px 8px rgba(0,0,0,.24) !important;
+    border:1px solid rgba(200,154,72,.18) !important;
+    border-radius:10px !important;
+    background:linear-gradient(145deg,rgba(30,23,14,.82),rgba(10,8,6,.88)) !important;
+    box-shadow:none !important;
+    box-sizing:border-box !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-card-head{
-    margin-bottom:1px !important;
+    grid-column:1 !important;
+    grid-row:1 !important;
+    margin:0 !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-type{
+    color:#f0e3c6 !important;
     font-size:11px !important;
     line-height:13px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-stock{
+    color:#9d8f78 !important;
     font-size:9px !important;
     line-height:12px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-name{
+    grid-column:1 !important;
     overflow:hidden !important;
+    color:#f0e3c6 !important;
     font-size:13px !important;
     line-height:16px !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-effect{
+    grid-column:1 !important;
     overflow:hidden !important;
+    color:#9d8f78 !important;
     font-size:10px !important;
     line-height:13px !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
-    grid-template-columns:28px 40px minmax(0,1fr) !important;
+    grid-column:2 !important;
+    grid-row:1 / 3 !important;
+    display:grid !important;
+    grid-template-columns:24px 38px minmax(0,1fr) !important;
+    align-content:center !important;
     gap:3px !important;
-    margin-top:auto !important;
+    margin:0 !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row label{
-    font-size:10px !important;
+    font-size:9px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{
-    width:40px !important;
-    min-width:40px !important;
-    height:38px !important;
-    min-height:38px !important;
+    width:38px !important;
+    min-width:38px !important;
+    height:32px !important;
+    min-height:32px !important;
     padding:0 3px !important;
-    font-size:11px !important;
+    font-size:10px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v146-shop-total{
-    font-size:10px !important;
-    line-height:12px !important;
+    overflow:hidden !important;
+    font-size:9px !important;
+    line-height:11px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{
     grid-column:1 / -1 !important;
     width:100% !important;
-    height:42px !important;
-    min-height:42px !important;
-    margin-top:2px !important;
-    padding:2px 6px !important;
-    font-size:11px !important;
-    border:1px solid #c2964d !important;
-    color:#2b1908 !important;
-    background:linear-gradient(180deg,#f1ce7a,#bd7d2d) !important;
+    height:32px !important;
+    min-height:32px !important;
+    margin-top:1px !important;
+    padding:3px 6px !important;
+    border:1px solid #c99c4b !important;
+    border-radius:7px !important;
+    color:#fff0c2 !important;
+    background:linear-gradient(#5a401f,#28180c) !important;
+    box-shadow:none !important;
+    font-size:10px !important;
     font-weight:900 !important;
 }
 
-/* V173.49 — EXP POOL TAP / SCROLL STABILITY
-   Keep Android Chrome from changing the character scroll position when the
-   EXP preview list is replaced, and do not let a tiny finger drift on an
-   action button become a vertical pan. */
+/* V173.49 — EXP POOL TAP / SCROLL STABILITY */
 #game-stage #homeExpPoolCard,
 #game-stage #homeExpPoolCard .exp-pool-hero,
 #game-stage #homeExpPoolCard .v173-exp-charge-status,
@@ -7713,13 +7936,12 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-height:100% !important;
     margin:0 !important;
 }
-
 #game-stage .home-feature-modal-box .home-feature-close-btn{
     min-height:38px;
 }
 
 /* =====================================================
-   Shared Black-Gold Window Skin — visual-only owner
+   Shared Black-Gold Window Skin — visual-only owner / Demo Visual Parity Batch F
    Geometry, stacking, overflow and interaction remain owned by existing rules.
 ===================================================== */
 #game-stage{
@@ -7742,24 +7964,12 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 .v169-rpg-dialog,
 .v132-reward-modal-inner,
 .v17351-ad-panel{
-    border-color:var(--rpg-window-gold-dark,#73582D);
-    border-radius:10px;
+    border:1px solid rgba(184,138,59,.82);
+    border-radius:12px;
     color:var(--rpg-window-text,#EEE7D8);
-    background:
-        radial-gradient(circle at 50% -12%,rgba(198,154,69,.14),transparent 34%),
-        linear-gradient(180deg,rgba(240,211,138,.045),transparent 14%),
-        linear-gradient(145deg,var(--rpg-window-panel,#201D17),var(--rpg-window-inset,#12110E) 58%,var(--rpg-window-iron,#0D0C09));
-    box-shadow:
-        0 16px 38px rgba(0,0,0,.58),
-        0 0 0 2px var(--rpg-window-iron,#0D0C09),
-        0 0 0 3px var(--rpg-window-gold-dark,#73582D),
-        0 0 0 4px rgba(240,211,138,.5),
-        inset 0 0 0 1px rgba(240,211,138,.36),
-        inset 0 0 0 2px var(--rpg-window-iron,#0D0C09),
-        inset 0 0 0 3px rgba(115,88,45,.82),
-        inset 0 0 30px rgba(0,0,0,.42);
+    background:linear-gradient(180deg,#231a10,#0c0906);
+    box-shadow:0 15px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,232,180,.04);
 }
-
 #game-stage .home-feature-modal-title,
 #game-stage .item-modal-name,
 #game-stage .inventory-classic-title,
@@ -7767,18 +7977,12 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage .v132-reward-modal-title,
 .v169-rpg-dialog h2,
 .v17351-ad-panel h2{
-    border-color:var(--rpg-window-gold-dark,#73582D);
+    border-color:rgba(200,154,72,.22);
     color:var(--rpg-window-text,#EEE7D8);
-    background:
-        linear-gradient(90deg,transparent,rgba(198,154,69,.08) 16%,rgba(240,211,138,.12) 50%,rgba(198,154,69,.08) 84%,transparent),
-        linear-gradient(180deg,#2A251C,var(--rpg-window-iron-soft,#171510) 58%,var(--rpg-window-iron,#0D0C09));
-    box-shadow:
-        inset 0 1px 0 rgba(240,211,138,.2),
-        inset 0 -2px 0 rgba(115,88,45,.8),
-        0 1px 0 rgba(0,0,0,.82);
-    text-shadow:0 1px 2px #000,0 0 6px rgba(198,154,69,.16);
+    background:transparent;
+    box-shadow:none;
+    text-shadow:0 1px 2px #000;
 }
-
 #game-stage #homeFeatureModalBody,
 #game-stage .item-stat-list,
 #game-stage #itemModalStats,
@@ -7792,16 +7996,11 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage .v17351-achievement-card,
 #game-stage .v17351-compare-pane,
 .v132-reward-modal-inner .v17363-text-reward-preview{
-    border-color:rgba(115,88,45,.76);
+    border-color:rgba(115,88,45,.46);
     color:var(--rpg-window-text,#EEE7D8);
-    background:
-        linear-gradient(180deg,rgba(240,211,138,.025),transparent 22%),
-        linear-gradient(180deg,rgba(32,29,23,.97),rgba(18,17,14,.985));
-    box-shadow:
-        inset 0 0 0 1px rgba(115,88,45,.58),
-        inset 0 5px 16px rgba(0,0,0,.28);
+    background:linear-gradient(180deg,rgba(25,20,13,.82),rgba(12,10,7,.90));
+    box-shadow:none;
 }
-
 #game-stage .home-feature-modal-box button,
 #game-stage .item-modal-box button,
 #game-stage .inventory-classic-shell button,
@@ -7809,19 +8008,13 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage .modal-box button,
 .v132-reward-modal-inner button,
 .v169-rpg-dialog-button{
-    border-color:#876936;
+    border-color:rgba(200,154,72,.34);
     border-radius:7px;
-    color:var(--rpg-window-text,#EEE7D8);
-    background:
-        linear-gradient(180deg,rgba(240,211,138,.07),transparent 34%),
-        linear-gradient(180deg,#302A20,#1A1712 56%,#0E0D0A);
-    box-shadow:
-        inset 0 1px 0 rgba(240,211,138,.13),
-        inset 0 -2px 0 rgba(0,0,0,.46),
-        0 2px 5px rgba(0,0,0,.32);
-    text-shadow:0 1px 2px rgba(0,0,0,.92);
+    color:#dfcfad;
+    background:linear-gradient(180deg,#282117,#12100b);
+    box-shadow:none;
+    text-shadow:none;
 }
-
 #game-stage .home-feature-modal-box button:hover,
 #game-stage .item-modal-box button:hover,
 #game-stage .inventory-classic-shell button:hover,
@@ -7830,17 +8023,10 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 .v132-reward-modal-inner button:hover,
 .v169-rpg-dialog-button:hover{
     border-color:var(--rpg-window-gold,#C69A45);
-    color:#FFF4CF;
-    background:
-        linear-gradient(180deg,rgba(240,211,138,.12),transparent 38%),
-        linear-gradient(180deg,#3B3225,#201B14 56%,#11100C);
-    box-shadow:
-        inset 0 1px 0 rgba(240,211,138,.2),
-        inset 0 -2px 0 rgba(0,0,0,.48),
-        0 0 0 1px rgba(198,154,69,.18),
-        0 3px 7px rgba(0,0,0,.36);
+    color:#f0dfbd;
+    background:linear-gradient(180deg,#322719,#17110b);
+    box-shadow:none;
 }
-
 #game-stage .home-feature-modal-box button:active,
 #game-stage .item-modal-box button:active,
 #game-stage .inventory-classic-shell button:active,
@@ -7849,13 +8035,10 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 .v132-reward-modal-inner button:active,
 .v169-rpg-dialog-button:active{
     border-color:var(--rpg-window-gold-hi,#F0D38A);
-    color:#FFF4CF;
-    background:linear-gradient(180deg,#15130F,#252018);
-    box-shadow:
-        inset 0 3px 8px rgba(0,0,0,.64),
-        inset 0 0 0 1px rgba(240,211,138,.12);
+    color:#fff0c2;
+    background:linear-gradient(180deg,#1a1510,#2a2117);
+    box-shadow:none;
 }
-
 #game-stage .home-feature-modal-box button.active,
 #game-stage .home-feature-modal-box button.selected,
 #game-stage .home-feature-modal-box button[aria-selected="true"],
@@ -7867,19 +8050,12 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage .inventory-classic-shell button[aria-selected="true"],
 #game-stage .creation-skill-detail-box button.active,
 #game-stage .creation-skill-detail-box button.selected{
-    border-color:var(--rpg-window-gold-hi,#F0D38A);
-    color:#FFF0BE;
-    background:
-        linear-gradient(180deg,rgba(240,211,138,.18),transparent 38%),
-        linear-gradient(180deg,#5A4727,#2B2217 58%,#16120D);
-    box-shadow:
-        inset 0 1px 0 rgba(255,238,189,.28),
-        inset 0 -2px 0 rgba(0,0,0,.42),
-        0 0 0 1px rgba(198,154,69,.28),
-        0 3px 8px rgba(0,0,0,.34);
-    text-shadow:0 1px 2px #000,0 0 5px rgba(240,211,138,.12);
+    border-color:#c99c4b;
+    color:#fff0c2;
+    background:linear-gradient(180deg,#5a401f,#28180c);
+    box-shadow:inset 0 1px 0 rgba(255,232,180,.04);
+    text-shadow:none;
 }
-
 #game-stage .home-feature-modal-box button:disabled,
 #game-stage .item-modal-box button:disabled,
 #game-stage .inventory-classic-shell button:disabled,
@@ -7889,10 +8065,9 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 .v169-rpg-dialog-button:disabled{
     border-color:#4C4232;
     color:#807563;
-    background:linear-gradient(180deg,#1B1915,#100F0C);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    background:#100f0c;
+    box-shadow:none;
 }
-
 #game-stage .home-feature-modal-box .quest-tab,
 #game-stage .home-feature-modal-box .character-tab,
 #game-stage .home-feature-modal-box .v141-synthesis-tabs button,
@@ -7900,63 +8075,399 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage .inventory-classic-shell .inventory-category-tab{
     border-color:var(--rpg-window-gold-dark,#73582D);
     color:var(--rpg-window-muted,#B9AD98);
-    background:linear-gradient(180deg,#242019,#12110E);
-    box-shadow:inset 0 1px 0 rgba(240,211,138,.08),inset 0 -2px 0 rgba(0,0,0,.42);
+    background:#12110e;
+    box-shadow:none;
 }
-
 #game-stage .home-feature-modal-box .quest-tab.active,
 #game-stage .home-feature-modal-box .character-tab.active,
 #game-stage .home-feature-modal-box .v141-synthesis-tabs button.active,
 #game-stage .home-feature-modal-box .v17345-shop-tabs button.active,
 #game-stage .inventory-classic-shell .inventory-category-tab.active,
 #game-stage .inventory-classic-shell .inventory-category-tab.selected{
-    border-color:var(--rpg-window-gold-hi,#F0D38A);
-    color:#FFF0BE;
-    background:
-        linear-gradient(180deg,rgba(240,211,138,.17),transparent 40%),
-        linear-gradient(180deg,#594625,#2B2217);
-    box-shadow:
-        inset 0 1px 0 rgba(255,239,196,.25),
-        inset 0 -2px 0 rgba(0,0,0,.4),
-        0 0 0 1px rgba(198,154,69,.22);
+    border-color:#c99c4b;
+    color:#fff0c2;
+    background:#2f2112;
+    box-shadow:none;
 }
-
 #game-stage .home-feature-modal-box .home-feature-close-btn,
 #game-stage .item-modal-box .close-item-button,
 #game-stage .creation-skill-detail-box .creation-skill-detail-close,
 #game-stage .creation-skill-detail-box .creation-skill-detail-x,
 #game-stage .inventory-classic-shell .map-inventory-overlay-close{
-    border-color:#9B773B;
-    color:var(--rpg-window-text,#EEE7D8);
-    background:linear-gradient(180deg,#342C20,#171510 62%,#0D0C09);
-    box-shadow:
-        inset 0 1px 0 rgba(240,211,138,.14),
-        inset 0 -2px 0 rgba(0,0,0,.52),
-        0 2px 6px rgba(0,0,0,.36);
+    border-color:rgba(200,154,72,.34);
+    color:#dfcfad;
+    background:linear-gradient(180deg,#282117,#12100b);
+    box-shadow:none;
 }
-
 .v169-rpg-dialog[data-tone="danger"]{
-    border-color:#8E4C3E;
-    box-shadow:
-        0 16px 38px rgba(0,0,0,.6),
-        0 0 0 2px #0D0C09,
-        0 0 0 3px #68402D,
-        0 0 0 4px rgba(220,139,107,.3),
-        inset 0 0 0 1px rgba(240,211,138,.22),
-        inset 0 0 0 3px rgba(104,64,45,.7),
-        inset 0 0 28px rgba(75,20,15,.2);
+    border-color:#a84d3f;
+    background:linear-gradient(180deg,#26110f,#0f0807);
+    box-shadow:0 15px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,190,176,.04);
+}
+.v169-rpg-dialog[data-tone="success"]{
+    border-color:#70805e;
+    background:linear-gradient(180deg,#172017,#0b0d09);
+    box-shadow:0 15px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(188,255,229,.04);
 }
 
-.v169-rpg-dialog[data-tone="success"]{
-    border-color:#70805E;
-    box-shadow:
-        0 16px 38px rgba(0,0,0,.6),
-        0 0 0 2px #0D0C09,
-        0 0 0 3px #5A5735,
-        0 0 0 4px rgba(201,188,111,.25),
-        inset 0 0 0 1px rgba(240,211,138,.2),
-        inset 0 0 0 3px rgba(86,91,52,.62),
-        inset 0 0 28px rgba(32,55,28,.16);
+/* =====================================================
+   Premium Functional UI — Demo Visual Parity / Batch A
+===================================================== */
+#game-stage #homeFeatureModal:has(.home-feature-modal-box.wide){
+    --rpg-window-iron:#070604;
+    --rpg-window-iron-soft:#0d0b08;
+    --rpg-window-panel:#14100b;
+    --rpg-window-inset:#0d0b08;
+    --rpg-window-gold:#c89a48;
+    --rpg-window-gold-hi:#efd18a;
+    --rpg-window-gold-dark:#7e6337;
+    --rpg-window-text:#f3ead7;
+    --rpg-window-muted:#b7a88f;
+    background:linear-gradient(180deg,rgba(4,4,3,.52),rgba(4,4,3,.76)),url("../assets/ui/startup-main-city.d43e67af1c1c.jpg") center/cover no-repeat;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide{
+    border:1px solid rgba(200,154,72,.34);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(31,23,14,.90),rgba(10,8,6,.94));
+    box-shadow:0 7px 20px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,232,180,.03);
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide::before{
+    content:"";
+    position:absolute;
+    left:14px;
+    right:14px;
+    top:0;
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(238,205,139,.28),transparent);
+    pointer-events:none;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide::after{display:none;}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .home-feature-modal-title{
+    flex:0 0 auto;
+    min-height:50px;
+    margin:0 8px 7px;
+    padding:6px 58px 7px;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.16);
+    border-radius:0;
+    color:#f6dfaa;
+    background:transparent;
+    box-shadow:none;
+    font-family:"Noto Serif TC",serif;
+    font-weight:900;
+    text-shadow:0 1px 2px #000;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
+    border:0;
+    background:transparent;
+    box-shadow:none;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody div:has(> .character-showcase-choice){
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+    margin:0 8px 7px;
+    padding:8px;
+    border:1px solid rgba(200,154,72,.28);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(31,23,14,.80),rgba(10,8,6,.86));
+    box-shadow:0 6px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,232,180,.025);
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice{
+    position:relative;
+    width:auto !important;
+    min-width:0;
+    min-height:50px;
+    margin:0;
+    padding:5px 6px;
+    border:1px solid rgba(200,154,72,.16);
+    border-radius:8px;
+    background:rgba(13,10,7,.46);
+    box-shadow:none;
+    transition:border-color .15s ease,background .15s ease;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character{
+    grid-column:1 / -1;
+    display:grid;
+    grid-template-columns:38% minmax(0,1fr);
+    grid-template-rows:auto auto minmax(0,1fr);
+    gap:5px 9px;
+    min-height:178px;
+    padding:10px;
+    border:1px solid rgba(200,154,72,.32);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(31,23,14,.88),rgba(10,8,6,.92));
+    box-shadow:0 7px 20px rgba(0,0,0,.24),inset 0 0 0 1px rgba(255,232,180,.03);
+    text-align:left;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > .character-showcase-avatar{
+    grid-column:1;
+    grid-row:1 / 4;
+    width:100% !important;
+    height:158px !important;
+    min-height:158px;
+    align-self:stretch;
+    border:0 !important;
+    border-radius:10px;
+    background-size:cover !important;
+    background-position:center 18% !important;
+    box-shadow:none !important;
+    opacity:1 !important;
+    overflow:hidden;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > div[style*="font-size:11px"]{
+    grid-column:2;
+    align-self:end;
+    margin:18px 0 0;
+    color:#ffe1a0;
+    font-family:"Noto Serif TC",serif;
+    font-size:20px !important;
+    line-height:1.15 !important;
+    font-weight:900;
+    text-align:left;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > div[style*="font-size:10px"],
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > [id^="characterAvatarLevel"]{
+    grid-column:2;
+    align-self:start;
+    color:#b7a88f;
+    font-size:14px !important;
+    line-height:1.35 !important;
+    text-align:left;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-avatar.is-current-character{
+    border-color:transparent !important;
+    box-shadow:none !important;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .v169-character-hero-meta{
+    grid-column:2;
+    align-self:end;
+    display:grid;
+    gap:5px;
+    min-width:0;
+    margin-top:2px;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .v169-character-element{
+    justify-self:start;
+    padding:3px 7px;
+    border:1px solid rgba(200,154,72,.30);
+    border-radius:999px;
+    color:#e8d4a5;
+    background:rgba(20,15,9,.72);
+    font-size:12px;
+    font-weight:800;
+    line-height:1.2;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .v169-character-resource{
+    display:grid;
+    gap:3px;
+    min-width:0;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .v169-character-resource-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    color:#b7a88f;
+    font-size:11px;
+    line-height:1.15;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .v169-character-resource-head b{
+    min-width:0;
+    overflow:hidden;
+    color:#ead8b4;
+    font-size:11px;
+    font-variant-numeric:tabular-nums;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .v169-character-resource-track{
+    height:6px;
+    overflow:hidden;
+    border:1px solid rgba(200,154,72,.18);
+    border-radius:999px;
+    background:#090806;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .v169-character-resource-fill{
+    display:block;
+    width:0;
+    height:100%;
+    border-radius:inherit;
+    background:linear-gradient(90deg,#7e6337,#d9ad5d);
+    transition:width .18s ease;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .v169-character-resource.sp .v169-character-resource-fill{
+    background:linear-gradient(90deg,#456b75,#79a9b4);
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-tab{
+    min-height:40px;
+    border:1px solid rgba(200,154,72,.20);
+    border-radius:8px;
+    color:#ab9b81;
+    background:#120e09;
+    box-shadow:none;
+    font-size:14px;
+    font-weight:900;
+}
+#game-stage #homeFeatureModal .home-feature-modal-box.wide .character-tab.active{
+    border-color:#c59645;
+    color:#f8dfaa;
+    background:linear-gradient(#392815,#1a1109);
+    box-shadow:inset 0 1px 0 rgba(255,239,196,.05);
+}
+#game-stage #statusPage #statusPageTitle{
+    margin:2px 0 8px;
+    color:#efd69d;
+    font-family:"Noto Serif TC",serif;
+    font-size:17px;
+    line-height:1.25;
+    font-weight:900;
+}
+#game-stage #statusPage .status-card{
+    padding:9px 10px;
+    border:1px solid rgba(200,154,72,.24);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(28,21,13,.70),rgba(9,8,6,.80));
+    box-shadow:none;
+}
+#game-stage #statusPage .status-preview-bars{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin:0 0 8px;
+}
+#game-stage #statusPage .status-preview-bar{
+    min-width:0;
+    margin:0;
+}
+#game-stage #statusPage .status-row{
+    display:grid;
+    grid-template-columns:minmax(82px,1fr) 40px minmax(46px,auto) 40px;
+    gap:6px;
+    align-items:center;
+    min-height:48px;
+    margin:0;
+    padding:4px 0;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.11);
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+}
+#game-stage #statusPage .status-row:last-of-type{border-bottom:0;}
+#game-stage #statusPage .status-row button{
+    width:40px;
+    min-width:40px;
+    height:40px;
+    min-height:40px;
+    padding:0;
+    border:1px solid rgba(200,154,72,.24);
+    border-radius:8px;
+    color:#cdbd9e;
+    background:#100d09;
+    box-shadow:none;
+    font-size:18px;
+    line-height:38px;
+}
+#game-stage #statusPage .status-number{
+    color:#f3ead7;
+    font-size:18px;
+    font-weight:900;
+    text-align:center;
+}
+#game-stage #statusPage .status-points-line{
+    margin:8px 0 7px;
+    padding:7px 9px;
+    border:0;
+    border-left:2px solid #c89a48;
+    border-radius:0;
+    color:#b7a88f;
+    background:rgba(13,10,7,.56);
+}
+#game-stage #statusPage #attributePoints{
+    color:#efd18a;
+    font-size:18px;
+}
+#game-stage #statusPage .status-formula-hint,
+#game-stage #statusPage .status-preview-bar-label{
+    color:#b7a88f;
+}
+#game-stage #statusPage #confirmStatusButton{
+    width:100%;
+    min-height:44px;
+    margin-top:7px;
+    border:1px solid #c99c4b;
+    border-radius:9px;
+    color:#fff0c2;
+    background:linear-gradient(#5a401f,#28180c);
+    box-shadow:inset 0 0 12px rgba(224,183,90,.10);
+    font-weight:900;
+}
+#game-stage #statusPage #confirmStatusButton:disabled{
+    opacity:.42;
+    border-color:rgba(200,154,72,.18);
+    color:#8f8370;
+    background:#100d09;
+    box-shadow:none;
+}
+#game-stage #homeExpPoolCard{
+    padding:10px;
+    border:1px solid rgba(200,154,72,.28);
+    border-radius:12px;
+    background:linear-gradient(160deg,rgba(31,23,14,.78),rgba(10,8,6,.88));
+    box-shadow:0 6px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,232,180,.025);
+}
+#game-stage #homeExpPoolCard .exp-pool-hero{
+    padding:2px 2px 9px;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.16);
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+}
+#game-stage #homeExpPoolCard .exp-pool-kicker{
+    color:#9e8963;
+    letter-spacing:.12em;
+}
+#game-stage #homeExpPoolCard .exp-pool-title{
+    color:#f6dfaa;
+    font-family:"Noto Serif TC",serif;
+    font-size:17px;
+    line-height:1.2;
+    font-weight:900;
+}
+#game-stage #homeExpPoolCard .exp-pool-total{
+    justify-content:flex-start;
+    gap:5px;
+    margin-top:2px;
+}
+#game-stage #homeExpPoolCard .exp-pool-value{
+    color:#efd18a;
+    font-size:28px;
+    line-height:1;
+    font-weight:900;
+}
+#game-stage #homeExpPoolCard .v173-exp-charge-status{
+    border:0;
+    border-left:2px solid rgba(200,154,72,.72);
+    border-radius:0;
+    background:rgba(18,13,8,.58);
+    box-shadow:none;
+}
+#game-stage #homeExpPoolCard #expDistributeList .v173-exp-row-meta b{
+    padding:2px 0;
+    border:0;
+    border-radius:0;
+    color:#efd18a;
+    background:transparent;
+}
+@media (max-height:720px){
+    #game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character{min-height:158px;}
+    #game-stage #homeFeatureModal .home-feature-modal-box.wide .character-showcase-choice.is-current-character > .character-showcase-avatar{height:138px !important;min-height:138px;}
+}
+@media (max-width:380px){
+    #game-stage #statusPage .status-row{grid-template-columns:minmax(74px,1fr) 38px minmax(42px,auto) 38px;gap:4px;}
+    #game-stage #statusPage .status-row button{width:38px;min-width:38px;height:38px;min-height:38px;}
 }
 
 
