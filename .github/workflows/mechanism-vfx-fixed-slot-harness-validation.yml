@@ -1,0 +1,37 @@
+name: Mechanism VFX Fixed Slot Harness Validation
+
+on:
+  push:
+    branches:
+      - validation/mechanism-vfx-fixed-slot-harness-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify validation scope
+        shell: bash
+        run: |
+          base=9faac616ab8f321d5a4382fa201bc6f7bcaf3477
+          git fetch --no-tags --depth=1 origin "$base"
+          changed="$(git diff --name-only "$base" HEAD | sort)"
+          printf '%s\n' "$changed"
+          test "$changed" = $'.github/workflows/mechanism-vfx-fixed-slot-harness-validation.yml\ntests/mechanism-card-vfx-reliability-20260914.test.js'
+          git diff --check "$base" HEAD
+          test -z "$(git diff --name-only "$base" HEAD -- js css scripts config asset-manifest.json)"
+
+      - name: Run mechanism-card VFX formal Fixed Slot validation
+        run: node tests/mechanism-card-vfx-reliability-20260914.test.js
