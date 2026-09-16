@@ -487,6 +487,11 @@ test("final normal hit and status-effect bounds override the historical floors",
 
 test("same-name states miss without refresh while differently named hard controls coexist",()=>{
     const runtime=loadFinalRuntime();
+    vm.runInContext(
+        fs.readFileSync("js/battlefield-slot-owner.js","utf8"),
+        runtime.context,
+        {filename:"js/battlefield-slot-owner.js",timeout:2000}
+    );
     const result=evaluateJson(runtime.context,`(function(){
         const target={name:"狀態目標",hp:100,maxHP:100,alive:true,statusEffects:[]};
         applyBurnEffect(target,2,3);
@@ -504,6 +509,13 @@ test("same-name states miss without refresh while differently named hard control
             v141Abyss:true,v155FinalAbyss:true
         });
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);
+        if(
+            !snapshot ||
+            window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,0)!=="ENEMY_F3"
+        ){
+            throw new Error("V170 fixture must create the formal ENEMY_F3 snapshot before monster action");
+        }
         Math.random=function(){ return 0; };
         const action=v141TryMonsterSpecialAction(0);
         return {burn:burn,afterPetrify:afterPetrify,afterFreeze:afterFreeze,action:action,sp:monsters[0].sp};
