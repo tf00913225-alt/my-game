@@ -8,9 +8,14 @@ assert.match(boss,/gameplay-boss-card[\s\S]*?battle-monster-icon[\s\S]*?backgrou
 assert.match(boss,/boss-mechanism-card\{[\s\S]*?aspect-ratio:4 \/ 3;/);
 
 const battle=read("js/54-v173.51-battle-qa.js");
-assert.match(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:contain!important/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-hp\{[\s\S]*?bottom:13px!important;[\s\S]*?display:block!important/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-sp\{[\s\S]*?bottom:0!important;[\s\S]*?display:block!important/);
+const fixedSlotCss=read("css/fixed-slot-battlefield-rendering-v2.css");
+assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?(?:inset:|top:|bottom:|left:|right:)/,"V173.51 must not own player artwork geometry");
+assert.match(fixedSlotCss,/\.v174-battle-art\{[\s\S]*?background-size:contain !important;/,"fixed Slot CSS must own no-crop artwork sizing");
+assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.monster-hp\{[\s\S]*?bottom:/,"V173.51 must not own monster HP position");
+assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.monster-sp\{[\s\S]*?bottom:/,"V173.51 must not own monster SP position");
+assert.match(fixedSlotCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*\.v-fixed-ally-slot \.hp-bar\{bottom:11px !important;\}/,"fixed Slot CSS must own HP anchor");
+assert.match(fixedSlotCss,/\.v-fixed-enemy-slot \.monster-sp,[\s\S]*\.v-fixed-ally-slot \.sp-bar\{bottom:1px !important;\}/,"fixed Slot CSS must own SP anchor");
+assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-hp,[\s\S]*battle-monster\.v174-cardless-unit>\.monster-sp\{[\s\S]*display:block!important;[\s\S]*visibility:visible!important/,"V173.51 may retain HP/SP presentation visibility");
 
 const city=read("js/16-stage-v54-main-city-runtime.js");
 const cityCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");
