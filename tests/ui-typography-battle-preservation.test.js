@@ -32,6 +32,17 @@ function cssRule(text,selector){
     return text.slice(start,end+1);
 }
 
+function normalizeV131FixedSlotGeometry(text){
+    return normalize(text
+        .replace(/\/\* Fixed Slot battlefield: every enemy row always owns five physical columns\.[\s\S]*?VFX geometry can re-center around the currently surviving cards\. \*\/\n/,"")
+        .replace(
+            "#game-stage #battleMonsterArea .v131-monster-row{\n    display:grid;\n    grid-template-columns:repeat(5,76px);\n    flex:0 0 auto;\n    align-items:flex-start;\n    justify-content:center;\n    gap:3px;\n    width:100%;\n    min-width:0;\n    overflow:visible;\n}",
+            "#game-stage #battleMonsterArea .v131-monster-row{\n    display:flex;\n    flex:0 0 auto;\n    align-items:flex-start;\n    justify-content:center;\n    gap:3px;\n    width:100%;\n    min-width:0;\n}"
+        )
+        .replace(/\n#game-stage #battleMonsterArea \.v-fixed-enemy-slot\{[\s\S]*?\n\}\n\n#game-stage #battleMonsterArea \.v-fixed-enemy-slot > \.battle-monster\{[\s\S]*?\n\}\n/,"\n")
+    );
+}
+
 function retireV143EarthShieldSelector(text){
     return normalize(text.replace(
         "#battlePage .v146-defeated .v141-effect,\n#battlePage .v146-defeated .v143-earth-shield-effect{display:none !important;}",
@@ -59,13 +70,19 @@ function restoreGameplayCoverBaseline(text){
     );
 }
 
-// V131 starts with battle formation/element-card rules. Typography work begins only
-// after the character/home-feature shell, so the entire battle prefix must be byte-equivalent.
-sameSegment(
-    "css/31-v131-fix-batch.css",
-    "#game-stage #battleMonsterArea.v131-formation",
-    "#game-stage #homeFeatureModal .home-feature-modal-box.wide"
-);
+// V131's battle prefix also contains the approved Fixed Slot geometry migration.
+// Normalize only that geometry back to the typography baseline, then keep the rest
+// byte-equivalent so typography/element-card presentation still cannot drift.
+{
+    const file="css/31-v131-fix-batch.css";
+    const start="#game-stage #battleMonsterArea.v131-formation";
+    const end="#game-stage #homeFeatureModal .home-feature-modal-box.wide";
+    assert.equal(
+        normalizeV131FixedSlotGeometry(segment(current(file),start,end)),
+        normalizeV131FixedSlotGeometry(segment(at(BASE,file),start,end)),
+        `${file} battle-owned segment changed outside approved Fixed Slot geometry`
+    );
+}
 
 // V146's opening combat/VFX section is followed by inventory polish. Preserve that
 // full combat region byte-for-byte except the explicitly retired V143 Earth Shield
@@ -154,4 +171,4 @@ sameSegment(
     "@media(max-width:390px)"
 );
 
-console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS 9:16/mechanism owner, approved non-overlapping 16:9 activity-cover stack and 4:3 mechanism target and retired procedural VFX selectors.");
+console.log("Battle preservation: mixed CSS keeps typography/presentation at approved baselines while allowing the formal Fixed Slot geometry migration, scoped Gameplay BOSS 9:16/mechanism owner, approved non-overlapping 16:9 activity-cover stack and retired procedural VFX selectors.");
