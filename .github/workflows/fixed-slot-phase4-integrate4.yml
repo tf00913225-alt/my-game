@@ -1,0 +1,94 @@
+name: Fixed Slot Phase 4 Preservation Integration
+
+on:
+  push:
+    branches:
+      - feature/fixed-slot-battlefield-v1-20260916
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/fixed-slot-battlefield-v1-20260916
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply corrected owner patch and scoped preservation contract
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          workflow=Path('.github/workflows/fixed-slot-phase4-boss-mechanism.yml').read_text(encoding='utf-8')
+          marker="          python3 - <<'PY'\n"
+          start=workflow.index(marker)+len(marker)
+          end=workflow.index("\n          PY\n",start)
+          body=workflow[start:end]
+          body='\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines())
+          replacements={
+            'guards.map(unit=>unit.vGameplayBattlefieldSlot)':'Array.from(guards,unit=>unit.vGameplayBattlefieldSlot)',
+            'return owner.assignMonsterToEnemySlot(snapshot,monsterIndex,slot);':'return owner.assignMonsterToEnemySlot(snapshot,monsterIndex,slot)?slot:null;'
+          }
+          for old,new in replacements.items():
+              count=body.count(old)
+              if count!=1:
+                  raise SystemExit(f'expected one staged expression {old!r}, found {count}')
+              body=body.replace(old,new,1)
+          exec(compile(body,'phase4-corrected-owner-patch','exec'))
+
+          p=Path('tests/ui-typography-battle-preservation.test.js')
+          s=p.read_text(encoding='utf-8')
+          css_helper='''function cssRule(text,selector){\n    const start=text.indexOf(selector);\n    assert.ok(start>=0,`missing CSS rule: ${selector}`);\n    const open=text.indexOf("{",start),end=text.indexOf("}",open);\n    assert.ok(open>=0&&end>open,`invalid CSS rule: ${selector}`);\n    return text.slice(start,end+1);\n}\n'''
+          helper_new=css_helper+'''\nfunction stripOptionalCssRule(text,selector){\n    const start=text.indexOf(selector);\n    if(start<0){ return text; }\n    const open=text.indexOf("{",start),end=text.indexOf("}",open);\n    assert.ok(open>=0&&end>open,`invalid optional CSS rule: ${selector}`);\n    return text.slice(0,start)+text.slice(end+1);\n}\n\nfunction stripMechanismSlotLayout(text){\n    return normalize([\n        "#game-stage #battleMonsterArea .boss-mechanism-slot{",\n        "#game-stage #battleMonsterArea .boss-mechanism-slot.active{",\n        "#game-stage #battleMonsterArea .boss-mechanism-position{"\n    ].reduce((value,selector)=>stripOptionalCssRule(value,selector),text));\n}\n'''
+          if s.count(css_helper)!=1:
+              raise SystemExit('typography css helper anchor mismatch')
+          s=s.replace(css_helper,helper_new,1)
+
+          old_compare='''    assert.equal(\n        segment(now,protectedStart,motionStart),\n        segment(approved,protectedStart,motionStart),\n        `${file} protected-BOSS/toast/legacy mechanism animations changed outside this UI requirement`\n    );\n'''
+          new_compare='''    assert.equal(\n        stripMechanismSlotLayout(segment(now,protectedStart,motionStart)),\n        stripMechanismSlotLayout(segment(approved,protectedStart,motionStart)),\n        `${file} protected-BOSS/toast/legacy mechanism animations changed outside the fixed mechanism-slot layout requirement`\n    );\n'''
+          if s.count(old_compare)!=1:
+              raise SystemExit('typography protected segment anchor mismatch')
+          s=s.replace(old_compare,new_compare,1)
+
+          old_active='''    assert.match(now,/\\.boss-mechanism-slot\\.active\\{\\s*display:flex;/);\n'''
+          new_active='''    assert.match(now,/\\.boss-mechanism-slot\\{[\\s\\S]*?grid-template-columns:repeat\\(3,minmax\\(0,1fr\\)\\);[\\s\\S]*?gap:4px;/);\n    assert.match(now,/\\.boss-mechanism-slot\\.active\\{\\s*display:grid;/);\n    assert.match(now,/\\.boss-mechanism-position\\{[\\s\\S]*?display:flex;[\\s\\S]*?align-items:flex-start;[\\s\\S]*?justify-content:center;[\\s\\S]*?pointer-events:none;/);\n'''
+          if s.count(old_active)!=1:
+              raise SystemExit('typography active mechanism assertion anchor mismatch')
+          s=s.replace(old_active,new_active,1)
+          p.write_text(s,encoding='utf-8')
+          PYCODE
+      - name: Syntax check
+        run: node --check js/gameplay-boss-tower-system.js
+      - name: Fixed battlefield slot tests
+        run: node tests/fixed-battlefield-slots.test.js
+      - name: Gameplay Boss runtime tests
+        run: node tests/gameplay-boss-tower-system.test.js
+      - name: Boss mechanism UI regression tests
+        run: node tests/boss-mechanism-vfx-card-ui-20260909.test.js
+      - name: Gameplay hub UI tests
+        run: node tests/gameplay-hub-ui-and-icon.test.js
+      - name: Typography battle preservation tests
+        run: node tests/ui-typography-battle-preservation.test.js
+      - name: Production build check
+        run: node scripts/build-production.mjs --check
+      - name: Whitespace check
+        run: git diff --check
+      - name: Commit only production owner files and tests
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/gameplay-boss-tower-system.js \
+                  css/gameplay-boss-tower.css \
+                  tests/gameplay-boss-tower-system.test.js \
+                  tests/fixed-battlefield-slots.test.js \
+                  tests/boss-mechanism-vfx-card-ui-20260909.test.js \
+                  tests/ui-typography-battle-preservation.test.js \
+                  release/requirement-batches/2026-09-16-fixed-slot-battlefield-v1.json
+          git diff --cached --check
+          git commit -m "feat: bind boss and mechanism slots to battlefield owner"
+          git push origin HEAD:feature/fixed-slot-battlefield-v1-20260916
