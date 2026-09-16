@@ -6,6 +6,7 @@ const vm=require("node:vm");
 
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
+const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 const battleCss=fs.readFileSync("css/31-v131-fix-batch.css","utf8");
@@ -50,7 +51,7 @@ function extractFunction(source,name){
 }
 
 function context(values={}){
-    return vm.createContext({console,Math,Number,String,Object,Array,Map,...values});
+    return vm.createContext({console,Math,Number,String,Object,Array,Set,Map,...values});
 }
 
 let passed=0;
@@ -85,13 +86,30 @@ test("formation puts BOSS in the center, then elites, then regular monsters",()=
         ],
         getMonsterRank:monster=>monster.rank
     });
-    ["getFormationRankWeight","arrangeRowCenterFirst","getFormationRows"]
+    ctx.window=ctx;
+    vm.runInContext(slotOwnerSource,ctx,{filename:"js/battlefield-slot-owner.js"});
+    ["getFormationRankWeight","fixedBattlefieldSlots","getFormationRows"]
         .forEach(name=>vm.runInContext(extractFunction(v131Source,name),ctx));
+
+    const owner=ctx.FourSymbolsBattlefieldSlots;
+    assert.ok(owner,"正式 Fixed Slot owner 應安裝完成");
+    assert.equal(vm.runInContext("fixedBattlefieldSlots()",ctx),owner);
+
     const rows=vm.runInContext("getFormationRows([0,1,2,3,4])",ctx);
     assert.deepEqual(Array.from(rows[0]),[0,1,2,4,3]);
     assert.equal(ctx.monsters[rows[0][2]].rank,"boss");
     assert.equal(ctx.monsters[rows[0][1]].rank,"elite");
     assert.equal(ctx.monsters[rows[0][3]].rank,"elite");
+
+    const snapshot=owner.createEnemyFormationSnapshot([0,1,2,3,4],{
+        originalFormationType:5,
+        rankWeight:ctx.getFormationRankWeight
+    });
+    assert.equal(owner.getEnemySlotForMonster(snapshot,2),"ENEMY_F3","BOSS 必須固定在中央格位");
+    assert.equal(owner.getEnemySlotForMonster(snapshot,1),"ENEMY_F2","第一名菁英必須在中央左側格位");
+    assert.equal(owner.getEnemySlotForMonster(snapshot,4),"ENEMY_F4","第二名菁英必須在中央右側格位");
+    const assignedRows=owner.getAssignedEnemyRows(snapshot);
+    assert.deepEqual(Array.from(assignedRows[0]),[0,1,2,4,3]);
 });
 
 test("monster and player frames use element colors while names use rank colors",()=>{
