@@ -246,6 +246,155 @@
         return [primarySlot];
     }
 
+    /* Geometry is a separate contract from damage-target resolution. Damage may
+       omit defeated units; geometry never collapses because a unit is defeated. */
+    function normalizeGeometrySide(side){
+        const value=String(side||"").toLowerCase();
+        if(value==="monster"||value==="enemy"){ return "enemy"; }
+        if(value==="player"||value==="ally"){ return "ally"; }
+        if(value==="mechanism"||value==="mech"){ return "mechanism"; }
+        return value;
+    }
+
+    function geometrySlotsForSide(side){
+        const normalized=normalizeGeometrySide(side);
+        if(normalized==="enemy"){ return ENEMY_SLOTS; }
+        if(normalized==="ally"){ return ALLY_SLOTS; }
+        if(normalized==="mechanism"){ return MECHANISM; }
+        return [];
+    }
+
+    function slotSelector(slot){
+        const meta=SLOT_META[slot];
+        if(!meta){ return null; }
+        if(meta.side==="enemy"){ return '.v-fixed-enemy-slot[data-slot="'+slot+'"]'; }
+        if(meta.side==="ally"){ return '.v-fixed-ally-slot[data-slot="'+slot+'"]'; }
+        return '.boss-mechanism-position[data-slot="'+slot+'"]';
+    }
+
+    function slotElement(slot){
+        if(typeof document==="undefined"||typeof document.querySelector!=="function"){ return null; }
+        const selector=slotSelector(slot);
+        if(!selector){ return null; }
+        const battlePage=typeof document.getElementById==="function"?document.getElementById("battlePage"):null;
+        return battlePage&&typeof battlePage.querySelector==="function"
+            ?battlePage.querySelector(selector)
+            :document.querySelector(selector);
+    }
+
+    function plainRect(rect,slot){
+        if(!rect){ return null; }
+        const left=Number(rect.left)||0;
+        const top=Number(rect.top)||0;
+        const width=Math.max(0,Number(rect.width)||0);
+        const height=Math.max(0,Number(rect.height)||0);
+        if(width<=0||height<=0){ return null; }
+        const right=Number.isFinite(Number(rect.right))?Number(rect.right):left+width;
+        const bottom=Number.isFinite(Number(rect.bottom))?Number(rect.bottom):top+height;
+        return {
+            slot:slot||null,left:left,top:top,right:right,bottom:bottom,
+            width:width,height:height,centerX:left+width/2,centerY:top+height/2
+        };
+    }
+
+    function geometryRectForSlot(slot){
+        const element=slotElement(slot);
+        const rect=element&&typeof element.getBoundingClientRect==="function"?element.getBoundingClientRect():null;
+        return plainRect(rect,slot);
+    }
+
+    function geometryCenterForSlot(slot){
+        const rect=geometryRectForSlot(slot);
+        return rect?{slot:slot,x:rect.centerX,y:rect.centerY,rect:rect}:null;
+    }
+
+    function geometryRectForSlots(slots){
+        const requested=Array.from(new Set((Array.isArray(slots)?slots:[]).filter(slot=>!!SLOT_META[slot])));
+        if(!requested.length){ return null; }
+        const rects=requested.map(geometryRectForSlot);
+        /* Never silently shrink to the subset that happens to be rendered. */
+        if(rects.some(rect=>!rect)){ return null; }
+        const left=Math.min.apply(null,rects.map(rect=>rect.left));
+        const top=Math.min.apply(null,rects.map(rect=>rect.top));
+        const right=Math.max.apply(null,rects.map(rect=>rect.right));
+        const bottom=Math.max.apply(null,rects.map(rect=>rect.bottom));
+        return {
+            slots:requested.slice(),left:left,top:top,right:right,bottom:bottom,
+            width:right-left,height:bottom-top,centerX:(left+right)/2,centerY:(top+bottom)/2
+        };
+    }
+
+    function geometryRowSlots(side,row){
+        const normalized=normalizeGeometrySide(side);
+        const requestedRow=String(row||"").toLowerCase();
+        return geometrySlotsForSide(normalized).filter(slot=>SLOT_META[slot].row===requestedRow)
+            .sort((a,b)=>SLOT_META[a].column-SLOT_META[b].column);
+    }
+
+    function geometryTriSlots(side,primarySlot){
+        const normalized=normalizeGeometrySide(side);
+        const allowed=geometrySlotsForSide(normalized);
+        const meta=SLOT_META[primarySlot];
+        if(!meta||meta.side!==normalized||!allowed.includes(primarySlot)){ return []; }
+        const row=geometryRowSlots(normalized,meta.row);
+        if(row.length<=3){ return row; }
+        const start=Math.max(1,Math.min(row.length-2,meta.column-1));
+        return row.filter(slot=>SLOT_META[slot].column>=start&&SLOT_META[slot].column<start+3);
+    }
+
+    function geometrySlotsFromShape(side,primarySlot,shape){
+        const normalizedSide=normalizeGeometrySide(side);
+        const allowed=geometrySlotsForSide(normalizedSide);
+        if(!allowed.length){ return []; }
+        const normalizedShape=normalizeShape(shape);
+        if(normalizedShape==="all"){ return allowed.slice(); }
+        if(!primarySlot||!allowed.includes(primarySlot)){
+            return normalizedShape==="all"?allowed.slice():[];
+        }
+        const meta=SLOT_META[primarySlot];
+        if(normalizedShape==="single"){ return [primarySlot]; }
+        if(normalizedShape==="row"){ return geometryRowSlots(normalizedSide,meta.row); }
+        if(normalizedShape==="column"){
+            return allowed.filter(slot=>SLOT_META[slot].column===meta.column)
+                .sort((a,b)=>SLOT_META[a].row.localeCompare(SLOT_META[b].row));
+        }
+        if(normalizedShape==="tri"){ return geometryTriSlots(normalizedSide,primarySlot); }
+        return [primarySlot];
+    }
+
+    function geometryRectForShape(side,primarySlot,shape){
+        return geometryRectForSlots(geometrySlotsFromShape(side,primarySlot,shape));
+    }
+
+    function geometryRowRect(side,row){
+        return geometryRectForSlots(geometryRowSlots(side,row));
+    }
+
+    function geometrySideRect(side){
+        return geometryRectForSlots(geometrySlotsForSide(side));
+    }
+
+    function slotFromElement(element){
+        let current=element||null;
+        while(current){
+            const slot=current.dataset&&current.dataset.slot;
+            if(slot&&SLOT_META[slot]){ return slot; }
+            current=current.parentElement||current.parentNode||null;
+        }
+        return null;
+    }
+
+    function slotForCombatant(side,index){
+        const normalized=normalizeGeometrySide(side);
+        if(normalized==="enemy"){
+            return activeEnemySnapshot?slotForMonster(activeEnemySnapshot,index):null;
+        }
+        if(normalized==="ally"){
+            return allySlotForCharacter(index);
+        }
+        return null;
+    }
+
     function resolveEnemyTargets(snapshot,primaryMonsterIndex,shape,isAlive){
         if(!snapshot){ return []; }
         const primarySlot=slotForMonster(snapshot,primaryMonsterIndex);
@@ -384,6 +533,7 @@
 
     const api={
         version:"fixed-slot-v1",
+        geometryVersion:"slot-geometry-v1",
         enemySlots:ENEMY_SLOTS,
         enemyBackSlots:ENEMY_BACK,
         enemyFrontSlots:ENEMY_FRONT,
@@ -416,7 +566,19 @@
         resolveAllyTargets:resolveAllyTargets,
         setActiveEnemySnapshot:setActiveEnemySnapshot,
         getActiveEnemySnapshot:getActiveEnemySnapshot,
-        clearActiveEnemySnapshot:clearActiveEnemySnapshot
+        clearActiveEnemySnapshot:clearActiveEnemySnapshot,
+        getSlotElement:slotElement,
+        getSlotRect:geometryRectForSlot,
+        getSlotCenter:geometryCenterForSlot,
+        getRectForSlots:geometryRectForSlots,
+        getRowSlots:geometryRowSlots,
+        getRowRect:geometryRowRect,
+        getSideSlots:geometrySlotsForSide,
+        getSideRect:geometrySideRect,
+        getGeometrySlotsFromShape:geometrySlotsFromShape,
+        getGeometryRectFromShape:geometryRectForShape,
+        getSlotFromElement:slotFromElement,
+        getSlotForCombatant:slotForCombatant
     };
 
     window.FourSymbolsBattlefieldSlots=Object.freeze(api);
@@ -12752,6 +12914,7 @@
 /* =====================================================
    V143 — single-owner raster battle VFX runtime
    V174 cleanup: official PNG Sprite Sheets/status loops only.
+   Fixed Slot geometry is the only battle position/coverage source.
    No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback.
 ===================================================== */
 (function installV143SkillAnimationRuntime(){
@@ -12761,7 +12924,7 @@
     if(!window.v142SkillAnimationDirector){ return; }
     window.__v143SkillAnimationInstalled=true;
 
-    const VERSION="174-raster-owner";
+    const VERSION="174-slot-geometry-owner";
     const DEFAULT_HIT=.5833333333;
     const MECHANISM_TARGET_PREFIX="mechanism:";
     let blockedManifestWrites=0;
@@ -12994,24 +13157,32 @@
         return Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false);
     }
 
-    function visualRectForCard(card){
-        const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-        if(!rect){ return null; }
-        if(typeof card.querySelector==="function"){
-            try{
-                const art=card.querySelector(":scope > .v174-battle-art");
-                const artRect=art&&art.getBoundingClientRect?art.getBoundingClientRect():null;
-                if(artRect&&artRect.width>0&&artRect.height>0){ return artRect; }
-            }catch(_){ }
-        }
-        return rect;
+    function geometryOwner(){
+        const owner=window.FourSymbolsBattlefieldSlots;
+        return owner&&typeof owner.getSlotRect==="function"?owner:null;
     }
 
-    function cardCenter(card){
-        const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-        if(!rect){ return null; }
-        const visualRect=visualRectForCard(card)||rect;
-        return {x:visualRect.left+visualRect.width/2,y:visualRect.top+visualRect.height/2,rect:rect,visualRect:visualRect};
+    function slotForTarget(side,index,card){
+        const owner=geometryOwner();
+        if(!owner){ return null; }
+        if(side==="monster"&&isMechanismTarget(index)){
+            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;
+        }
+        let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;
+        if(!slot&&typeof owner.getSlotFromElement==="function"){
+            slot=owner.getSlotFromElement(card||cardFor(side,index));
+        }
+        return slot||null;
+    }
+
+    function slotAnchor(side,index,card){
+        const owner=geometryOwner();
+        const slot=slotForTarget(side,index,card);
+        if(!owner||!slot){ return null; }
+        const center=typeof owner.getSlotCenter==="function"?owner.getSlotCenter(slot):null;
+        const rect=center&&center.rect?center.rect:owner.getSlotRect(slot);
+        if(!center||!rect){ return null; }
+        return {slot:slot,x:center.x,y:center.y,rect:rect};
     }
 
     function activeCards(side,config){
@@ -13072,38 +13243,77 @@
         return [];
     }
 
-    function fieldBounds(cards){
-        const rects=cards.map(card=>visualRectForCard(card))
-            .filter(rect=>rect&&rect.width&&rect.height);
-        if(!rects.length){ return null; }
-        const left=Math.min.apply(null,rects.map(rect=>rect.left));
-        const top=Math.min.apply(null,rects.map(rect=>rect.top));
-        const right=Math.max.apply(null,rects.map(rect=>rect.right));
-        const bottom=Math.max.apply(null,rects.map(rect=>rect.bottom));
-        return {left:left,top:top,width:right-left,height:bottom-top};
+    function geometrySeedIndexes(current,indexes){
+        if(Array.isArray(current&&current.targetIds)&&current.targetIds.length){ return current.targetIds.slice(); }
+        if(current&&current.targetId!==undefined&&current.targetId!==null){ return [current.targetId]; }
+        return Array.isArray(indexes)?indexes.slice():[];
     }
 
-    function mechanismTargetBounds(current,indexes){
-        if(!current||current.targetSide!=="monster"){ return null; }
-        const cards=(indexes||[]).filter(isMechanismTarget)
-            .map(index=>cardFor("monster",index)).filter(Boolean);
-        const bounds=fieldBounds(cards);
-        if(!bounds){ return null; }
-        bounds.centerX=bounds.left+bounds.width/2;
-        bounds.centerY=bounds.top+bounds.height/2;
-        bounds.id="bossMechanismSlot";
-        return bounds;
+    function queuedPrimaryIndex(current){
+        if(!current||current.side!=="player"||typeof queuedPlayerActions==="undefined"){ return null; }
+        const queued=queuedPlayerActions&&queuedPlayerActions[current.actorIndex];
+        if(!queued){ return null; }
+        return current.targetSide==="monster"?queued.target:queued.targetAlly;
     }
 
-    function sideAreaBounds(side){
-        const id=side==="monster"?"battleMonsterArea":"battlePlayerRow";
-        const area=typeof document!=="undefined"?document.getElementById(id):null;
-        const rect=area&&area.getBoundingClientRect?area.getBoundingClientRect():null;
-        if(rect&&rect.width&&rect.height){
-            return {left:rect.left,top:rect.top,width:rect.width,height:rect.height,id:id};
+    function geometryPrimarySlot(current,indexes){
+        const owner=geometryOwner();
+        if(!owner||!current){ return null; }
+        const seed=geometrySeedIndexes(current,indexes);
+        const candidates=[];
+        if(current.targetId!==undefined&&current.targetId!==null){ candidates.push(current.targetId); }
+        const queued=queuedPrimaryIndex(current);
+        if(queued!==undefined&&queued!==null){ candidates.push(queued); }
+        seed.forEach(value=>candidates.push(value));
+        for(const value of candidates){
+            const slot=slotForTarget(current.targetSide,value,cardFor(current.targetSide,value));
+            if(slot){ return slot; }
         }
-        const fallback=fieldBounds(activeCards(side,{category:""}).map(entry=>entry.card));
-        return fallback?Object.assign({id:id},fallback):null;
+        return null;
+    }
+
+    function geometryBounds(current,indexes,placement){
+        const owner=geometryOwner();
+        if(!owner||!current){ return null; }
+        const seed=geometrySeedIndexes(current,indexes);
+        const mechanismSlots=seed.filter(isMechanismTarget)
+            .map(index=>slotForTarget("monster",index,cardFor("monster",index))).filter(Boolean);
+        if(mechanismSlots.length&&typeof owner.getRectForSlots==="function"){
+            const rect=owner.getRectForSlots(mechanismSlots);
+            if(rect){ rect.id="mechanism-slots"; return rect; }
+        }
+
+        const targetType=String(current.config&&current.config.targetType||"single");
+        if(placement==="battlefield"||targetType==="all"||targetType==="allyAll"){
+            const rect=typeof owner.getSideRect==="function"?owner.getSideRect(current.targetSide):null;
+            if(rect){ rect.id=current.targetSide==="monster"?"fixed-enemy-zone":"fixed-ally-zone"; }
+            return rect;
+        }
+
+        let primarySlot=geometryPrimarySlot(current,indexes);
+        const normalizedTri=/tri/i.test(targetType);
+        if(normalizedTri&&seed.length>1&&typeof owner.getSlotForCombatant==="function"){
+            const seedSlots=seed.map(index=>slotForTarget(current.targetSide,index,cardFor(current.targetSide,index))).filter(Boolean);
+            const metas=seedSlots.map(slot=>owner.slotMeta&&owner.slotMeta[slot]).filter(Boolean);
+            if(metas.length>1&&metas.every(meta=>meta.row===metas[0].row)){
+                const columns=metas.map(meta=>meta.column);
+                const centerColumn=Math.round((Math.min.apply(null,columns)+Math.max.apply(null,columns))/2);
+                const rowSlots=typeof owner.getRowSlots==="function"?owner.getRowSlots(current.targetSide,metas[0].row):[];
+                const centered=rowSlots.find(slot=>owner.slotMeta&&owner.slotMeta[slot]&&owner.slotMeta[slot].column===centerColumn);
+                if(centered){ primarySlot=centered; }
+            }
+        }
+        if(!primarySlot){ return null; }
+
+        let shape=targetType;
+        if(!/^(single|all|allyAll|row|column|tri|horizontal-3|allyTri)$/i.test(shape)){
+            shape=placement==="group"||placement==="trajectory"?(current.targetSide==="player"?"all":"row"):"single";
+        }
+        const rect=typeof owner.getGeometryRectFromShape==="function"
+            ?owner.getGeometryRectFromShape(current.targetSide,primarySlot,shape)
+            :owner.getSlotRect(primarySlot);
+        if(rect){ rect.id="fixed-slot-"+String(shape).toLowerCase(); }
+        return rect;
     }
 
     function hasTimedEffect(entity,type){
@@ -13194,10 +13404,12 @@
             node.style.setProperty("--v153-status-duration",spec.duration+"ms");
             card.appendChild(node);
         }
-        const rect=card.getBoundingClientRect?card.getBoundingClientRect():null;
+        const anchor=slotAnchor(side,index,card);
+        if(!anchor){ return; }
         const scale=(Number(spec.scale)||1.18)*1.28;
-        const size=Math.max(96,Math.max(Number(rect&&rect.width)||0,Number(rect&&rect.height)||0)*scale);
+        const size=Math.max(96,Math.max(anchor.rect.width,anchor.rect.height)*scale);
         const cellAspect=Math.max(.1,Number(spec.cellAspect)||1);
+        node.dataset.slot=anchor.slot;
         if(cellAspect>=1){
             node.style.width=size+"px";
             node.style.height=(size/cellAspect)+"px";
@@ -13237,8 +13449,8 @@
         if(current&&!current.done&&current.targetSide===side){
             const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
             if(types.indexOf(type)>=0){
-            registerTarget(side,index,false);
-            confirmTargetVisual(current,index);
+                registerTarget(side,index,false);
+                confirmTargetVisual(current,index);
                 let tracked=current.deferredStatusTargets.get(type);
                 if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
                 tracked.add(index);
@@ -13283,6 +13495,7 @@
         node.dataset.targetSide=current.targetSide;
         node.dataset.renderer="dom-sprite";
         node.dataset.confirmedHit="false";
+        node.dataset.geometryOwner="fixed-slot";
         node.style.visibility="hidden";
         state.stage.appendChild(node);
         return node;
@@ -13335,95 +13548,14 @@
         );
     }
 
-    function formationRowsForVfx(indexes){
-        const resolver=typeof window.v148GetFormationRows==="function"
-            ?window.v148GetFormationRows
-            :(typeof window.v138GetFormationRows==="function"?window.v138GetFormationRows:null);
-        if(!resolver){ return []; }
-        const rows=resolver(indexes||[]);
-        return Array.isArray(rows)?rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice()):[];
-    }
-
-    function fixedTriLayoutBounds(current,indexes){
-        const mechanismBounds=mechanismTargetBounds(current,indexes);
-        if(mechanismBounds){ return mechanismBounds; }
-        if(String(current.config.targetType||"")==="allyTri"&&current.targetSide==="player"){
-            const playerArea=sideAreaBounds("player");
-            if(playerArea){
-                playerArea.centerX=playerArea.left+playerArea.width/2;
-                playerArea.centerY=playerArea.top+playerArea.height/2;
-                return playerArea;
-            }
-        }
-        const queued=current.side==="player"&&typeof queuedPlayerActions!=="undefined"
-            ?queuedPlayerActions&&queuedPlayerActions[current.actorIndex]:null;
-        let center=Number.isInteger(current.targetId)?current.targetId:null;
-        if(center===null&&queued){
-            if(current.targetSide==="monster"&&Number.isInteger(queued.target)){ center=queued.target; }
-            if(current.targetSide==="player"&&Number.isInteger(queued.targetAlly)){ center=queued.targetAlly; }
-        }
-        if(center===null&&indexes.length){ center=indexes[Math.floor((indexes.length-1)/2)]; }
-        const anchor=Number.isInteger(center)?cardCenter(cardFor(current.targetSide,center)):null;
-        if(!anchor){
-            const area=sideAreaBounds(current.targetSide);
-            if(area){
-                area.centerX=area.left+area.width/2;
-                area.centerY=area.top+area.height/2;
-            }
-            return area;
-        }
-        /* Explicit resolved targets are authoritative for VFX centering.  A queued
-           tri target can point at the first surviving slot (for example 0 while
-           the real hit set is [0,2]); keeping that slot as the visual center
-           shifts a group Sprite off the actual targets.  Preserve the fixed tri
-           coverage width below, but center it on the resolved target geometry. */
-        const explicitBounds=Array.isArray(current.targetIds)&&current.targetIds.length
-            ?fieldBounds(indexes.map(i=>cardFor(current.targetSide,i)).filter(Boolean))
-            :null;
-        const layoutCenterX=explicitBounds?explicitBounds.left+explicitBounds.width/2:anchor.x;
-        const layoutCenterY=explicitBounds?explicitBounds.top+explicitBounds.height/2:anchor.y;
-        let step=Math.max(1,anchor.rect.width+3);
-        if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
-            const rows=formationRowsForVfx(currentBattleMonsters);
-            const row=rows.find(candidate=>candidate.includes(center));
-            if(row){
-                const pos=row.indexOf(center);
-                const distances=[row[pos-1],row[pos+1]].filter(Number.isInteger)
-                    .map(i=>cardCenter(cardFor("monster",i))).filter(Boolean)
-                    .map(p=>Math.abs(p.x-anchor.x)).filter(distance=>distance>1);
-                if(distances.length){ step=Math.min.apply(null,distances); }
-            }
-        }else if(current.targetSide==="player"){
-            const distances=[0,1,2].map(i=>cardCenter(cardFor("player",i))).filter(Boolean)
-                .map(p=>Math.abs(p.x-anchor.x)).filter(distance=>distance>1);
-            if(distances.length){ step=Math.min.apply(null,distances); }
-        }
-        const width=anchor.rect.width+step*2;
-        return {
-            left:layoutCenterX-width/2,top:anchor.rect.top,width:width,height:anchor.rect.height,
-            centerX:layoutCenterX,centerY:layoutCenterY,id:"fixed-tri-slots"
-        };
-    }
-
-    function groupLayoutBounds(current,indexes){
-        const mechanismBounds=mechanismTargetBounds(current,indexes);
-        if(mechanismBounds){ return mechanismBounds; }
-        if(/tri/i.test(String(current.config.targetType||""))){ return fixedTriLayoutBounds(current,indexes); }
-        if(current.targetSide==="player"){ return sideAreaBounds("player"); }
-        if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
-            const queued=current.side==="player"&&typeof queuedPlayerActions!=="undefined"
-                ?queuedPlayerActions&&queuedPlayerActions[current.actorIndex]:null;
-            const center=Number.isInteger(current.targetId)
-                ?current.targetId
-                :(queued&&Number.isInteger(queued.target)?queued.target:indexes[0]);
-            const rows=formationRowsForVfx(currentBattleMonsters);
-            const row=rows.find(candidate=>candidate.includes(center));
-            if(row){
-                const layout=fieldBounds(row.map(i=>cardFor("monster",i)).filter(Boolean));
-                if(layout){ return layout; }
-            }
-        }
-        return fieldBounds(indexes.map(i=>cardFor(current.targetSide,i)).filter(Boolean));
+    function authoredSquareSize(sprite,geometry,defaults){
+        const base=Math.max(1,Math.max(Number(geometry&&geometry.width)||0,Number(geometry&&geometry.height)||0));
+        const scale=Number(sprite.scale)||defaults.scale;
+        const configuredMin=Number(sprite.minSize)||defaults.min;
+        const configuredMax=Number(sprite.maxSize)||defaults.max;
+        const minSize=Math.min(configuredMin,base*defaults.minRatio);
+        const maxSize=Math.max(minSize,Math.min(configuredMax,base*defaults.maxRatio));
+        return clamp(base*scale,minSize,maxSize);
     }
 
     function placeSprite(current,node,index,target){
@@ -13432,51 +13564,44 @@
         node.dataset.placement=placement;
 
         if(placement==="single"){
-            const targetSize=Math.max(target.rect.width,target.rect.height);
-            const configuredMin=Number(sprite.minSize)||96;
-            const configuredMax=Number(sprite.maxSize)||184;
-            const minSize=Math.min(configuredMin,targetSize*1.18);
-            const maxSize=Math.max(minSize,Math.min(configuredMax,targetSize*1.68));
-            const size=clamp(
-                targetSize*(Number(sprite.scale)||1.8),minSize,maxSize
-            );
+            const size=authoredSquareSize(sprite,target.rect,{scale:1.8,min:96,max:184,minRatio:1.18,maxRatio:1.68});
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
+            node.dataset.geometrySlot=target.slot;
             node.style.left=target.x+"px";
-        node.style.top=target.y+"px";
-        applySpriteBox(node,size,size,sprite);
+            node.style.top=target.y+"px";
+            applySpriteBox(node,size,size,sprite);
             return;
         }
 
         if(placement==="targetTrajectory"){
-            const actor=cardCenter(current.actorCard);
+            const actor=slotAnchor(current.side,current.actorIndex,current.actorCard);
             if(!actor){ return; }
-            const targetSize=Math.max(target.rect.width,target.rect.height);
-            const configuredMin=Number(sprite.minSize)||140;
-            const configuredMax=Number(sprite.maxSize)||240;
-            const minSize=Math.min(configuredMin,targetSize*1.12);
-            const maxSize=Math.max(minSize,Math.min(configuredMax,targetSize*1.56));
-            const size=clamp(
-                targetSize*(Number(sprite.scale)||1.7),minSize,maxSize
-            );
+            const size=authoredSquareSize(sprite,target.rect,{scale:1.7,min:140,max:240,minRatio:1.12,maxRatio:1.56});
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
+            node.dataset.geometrySlot=target.slot;
             node.dataset.travel="true";
             node.dataset.travelToTargets="true";
             node.style.left=actor.x+"px";
-        node.style.top=actor.y+"px";
-        applySpriteBox(node,size,size,sprite);
-        node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
+            node.style.top=actor.y+"px";
+            applySpriteBox(node,size,size,sprite);
+            node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
             node.style.setProperty("--v143-sprite-angle",Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI+"deg");
             return;
         }
 
+        const indexes=emittedSpriteTargets(current);
+        const bounds=geometryBounds(current,indexes,placement);
+        if(!bounds){ return; }
+        node.dataset.geometrySlots=Array.isArray(bounds.slots)?bounds.slots.join(","):"";
+
         if(placement==="battlefield"){
-            const bounds=mechanismTargetBounds(current,emittedSpriteTargets(current))||sideAreaBounds(current.targetSide);
-            if(!bounds){ return; }
             const viewportWidth=Number(window.innerWidth)||960;
             const viewportHeight=Number(window.innerHeight)||720;
+            /* coverageScale is an authored multiplier over the complete fixed
+               battlefield zone. It never measures currently surviving targets. */
             const coverageScale=clamp(Number(sprite.coverageScale)||Number(sprite.scale)||1,1,1.4);
             const width=clamp(
                 Math.round(bounds.width*coverageScale),Number(sprite.minWidth)||Number(sprite.minSize)||160,
@@ -13486,35 +13611,28 @@
                 Math.round(bounds.height*coverageScale),Number(sprite.minHeight)||Number(sprite.minSize)||160,
                 Number(sprite.maxHeight)||Math.max(240,viewportHeight*.92)
             );
-            node.dataset.areaId=bounds.id;
-            node.dataset.targetIndexes=emittedSpriteTargets(current).join(",");
+            node.dataset.areaId=bounds.id||"fixed-battlefield";
+            node.dataset.targetIndexes=indexes.join(",");
             if(sprite.fixedFormation){ node.dataset.fixedFormation="true"; }
             node.dataset.coverageScale=String(coverageScale);
             node.style.clipPath="none";
-            node.style.left=(bounds.left+bounds.width/2)+"px";
-        node.style.top=(bounds.top+bounds.height/2)+"px";
-        applySpriteBox(node,width,height,sprite);
+            node.style.left=bounds.centerX+"px";
+            node.style.top=bounds.centerY+"px";
+            applySpriteBox(node,width,height,sprite);
             return;
         }
 
-        const indexes=emittedSpriteTargets(current);
-        const targetCards=indexes.map(i=>cardFor(current.targetSide,i)).filter(Boolean);
-        const targetBounds=sprite.alignToSlots?groupLayoutBounds(current,indexes):fieldBounds(targetCards);
-        if(!targetBounds){ return; }
-        const coverageCards=placement==="trajectory"&&current.actorCard?[current.actorCard].concat(targetCards):targetCards;
-        const coverage=sprite.alignToSlots?targetBounds:(fieldBounds(coverageCards)||targetBounds);
-        const naturalSize=(Math.max(coverage.width,coverage.height)+40)*(Number(sprite.scale)||1);
+        /* Group/row/tri/trajectory size is derived from the fixed geometry shape,
+           never from the number or outer bounds of surviving target cards. */
+        const naturalSize=(Math.max(bounds.width,bounds.height)+40)*(Number(sprite.scale)||1);
         const viewportWidth=Number(window.innerWidth)||960;
         const viewportHeight=Number(window.innerHeight)||720;
         const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
         const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);
         node.dataset.targetIndexes=indexes.join(",");
-    applySpriteBox(node,size,size,sprite);
-    const destination={
-            x:targetBounds.left+targetBounds.width/2,
-            y:targetBounds.top+targetBounds.height/2
-        };
-        const actor=placement==="trajectory"?cardCenter(current.actorCard):null;
+        applySpriteBox(node,size,size,sprite);
+        const destination={x:bounds.centerX,y:bounds.centerY};
+        const actor=placement==="trajectory"?slotAnchor(current.side,current.actorIndex,current.actorCard):null;
         if(placement==="trajectory"&&sprite.travelToTargets&&actor){
             node.dataset.travel="true";
             node.dataset.travelToTargets="true";
@@ -13524,8 +13642,8 @@
             node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");
             node.style.setProperty("--v143-sprite-angle",Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI+"deg");
         }else{
-            node.style.left=(Number.isFinite(targetBounds.centerX)?targetBounds.centerX:coverage.left+coverage.width/2)+"px";
-            node.style.top=(Number.isFinite(targetBounds.centerY)?targetBounds.centerY:coverage.top+coverage.height/2)+"px";
+            node.style.left=bounds.centerX+"px";
+            node.style.top=bounds.centerY+"px";
         }
     }
 
@@ -13553,7 +13671,7 @@
         placeSprite(current,node,index,target);
         requestSpriteAspect(sprite,current,node,index,target);
         /* A formal cast Sprite represents the attempted skill, not only a landed hit.
-           Reveal it as soon as the official owner has a real target position.
+           Reveal it as soon as the official owner has a real fixed-slot position.
            Outcome confirmation still marks the node and controls hit feedback, but
            MISS/status/custom Boss paths must not make the cast animation disappear. */
         if(node.style.left&&node.style.top){
@@ -13564,13 +13682,13 @@
     }
 
     function confirmTargetVisual(current,index){
-    if(!current||current.done||!current.model||!current.model.sprite){ return; }
-    current.confirmedTargets.add(index);
-    const placement=String(current.model.sprite.placement||"single");
-    const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
-    const node=current.spriteNodes.get(key);
-    if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
-}
+        if(!current||current.done||!current.model||!current.model.sprite){ return; }
+        current.confirmedTargets.add(index);
+        const placement=String(current.model.sprite.placement||"single");
+        const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
+        const node=current.spriteNodes.get(key);
+        if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
+    }
 
     function targetHitTime(current,index){
         return Math.min(
@@ -13591,11 +13709,11 @@
         if(!state.stage||current.emitted.has(index)||!current.validTargets.has(index)){ return; }
         if(!allowDefeated&&!canReceive(current.config,current.targetSide,index)){ return; }
         const targetCard=cardFor(current.targetSide,index);
-        const target=cardCenter(targetCard);
+        const target=slotAnchor(current.targetSide,index,targetCard);
         if(!target){ return; }
         current.emitted.add(index);
         if(current.targetIndexes.indexOf(index)<0){ current.targetIndexes.push(index); }
-        if(targetCard.classList){ targetCard.classList.add("v143-effects-pending"); }
+        if(targetCard&&targetCard.classList){ targetCard.classList.add("v143-effects-pending"); }
         if(current.model.sprite){ addSprite(current,index,target); }
         setTimer(()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now()));
     }
@@ -13669,6 +13787,7 @@
         stage.dataset.skill=String(config.id||"unknown");
         stage.dataset.element=String(config.element||"normal");
         stage.dataset.renderer="raster-only";
+        stage.dataset.geometryOwner="fixed-slot";
         if(model.missingAsset||model.missingDedicatedAsset){ stage.dataset.missingVisual="true"; }
         document.body.appendChild(stage);
 
@@ -13959,6 +14078,7 @@
             blockedCardEffectOverrides:blockedCardEffectOverrides,
             failedAssets:Array.from(failedAssets),
             renderer:"dom-sprite-only",
+            geometryOwner:"fixed-slot",
             stageNodes:state.stage?state.stage.querySelectorAll("*").length:0
         });
     };
@@ -18885,16 +19005,9 @@
     };
 
     function installMonsterPortraitPresentationStyle(){
-        if(typeof document==="undefined"||typeof document.createElement!=="function"){ return; }
-        if(document.getElementById&&document.getElementById("v154MonsterPortraitStyle")){ return; }
-        const style=document.createElement("style");
-        style.id="v154MonsterPortraitStyle";
-        style.textContent=
-            '#game-stage #battlePage .battle-monster.v174-cardless-unit.v154-monster-portrait>.v174-battle-art{'+
-            'inset:-8px -5px 2px!important;background-size:contain!important;background-position:center bottom!important;'+
-            'background-repeat:no-repeat!important;}';
-        const host=document.head||document.body;
-        if(host&&typeof host.appendChild==="function"){ host.appendChild(style); }
+        /* Portrait selection belongs here; portrait geometry does not. V174 owns
+           the shared no-crop presentation contract for players, monsters and bosses. */
+        return;
     }
 
     function syncMonsterPortraitArt(card,portrait){
@@ -23353,11 +23466,10 @@ function fivePriority(indexes){
 window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 
 /* V174 battle presentation owner.
-   Keep the proven 10-seat geometry and action/turn UI untouched. Only the
-   visual shell inside each existing combat slot changes: the card frame is
-   transparent, artwork gets its own presentation layer, HP/SP text shows the
-   current value only, and the already-existing lunge classes animate artwork
-   instead of dragging the HUD bars with the portrait. */
+   Slot geometry is owned by FourSymbolsBattlefieldSlots. This layer owns only
+   artwork presentation and HUD layering. Player and monster artwork share the
+   same no-crop contract: preserve source aspect, contain the full figure, and
+   let art paint outside the small unit card without moving the slot itself. */
 function ensureBattlePresentationStyles(){
     if(document.getElementById("v174-cardless-battle-style"))return;
     const style=document.createElement("style");
@@ -23367,20 +23479,17 @@ function ensureBattlePresentationStyles(){
 #game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{
     border:0!important;outline:0!important;box-shadow:none!important;
     background-color:transparent!important;background-image:none!important;
-    isolation:isolate!important;
+    isolation:isolate!important;overflow:visible!important;
     transition-property:opacity!important;transition-duration:.15s!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
-    position:absolute!important;inset:0!important;z-index:1!important;
-    display:block!important;pointer-events:none!important;
+    position:absolute!important;inset:-8px -8px 26px!important;z-index:1!important;
+    display:block!important;pointer-events:none!important;overflow:visible!important;
     background-repeat:no-repeat!important;background-color:transparent!important;
+    background-size:contain!important;background-position:center bottom!important;
     transform-origin:50% 82%!important;will-change:transform,filter!important;
     animation:v174BattleIdle 3.4s ease-in-out infinite!important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.v174-battle-art{
-    inset:-2px -2px 30px!important;
-    background-size:contain!important;background-position:center bottom!important;
 }
 #game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.hp-bar{
     position:absolute!important;left:50%!important;bottom:13px!important;
@@ -23409,10 +23518,6 @@ function ensureBattlePresentationStyles(){
     margin:0!important;padding:0 2px!important;line-height:14px!important;text-align:center!important;
     white-space:nowrap!important;overflow:visible!important;visibility:visible!important;opacity:1!important;
     z-index:24!important;pointer-events:none!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.v174-battle-art{
-    inset:15px -5px 26px!important;
-    background-size:cover!important;background-position:center center!important;
 }
 #game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
     content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;

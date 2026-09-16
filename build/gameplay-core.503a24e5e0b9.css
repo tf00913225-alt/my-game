@@ -60,8 +60,9 @@
     position:relative !important;
     background:transparent !important;
     isolation:isolate !important;
-    /* V96：後段 V40 不得再把整個戰鬥頁改回 scroll owner。 */
-    overflow:hidden !important;
+    /* The outer game viewport owns page clipping. Battle artwork/VFX may paint
+       outside their unit boxes without turning battlePage into a scroll owner. */
+    overflow:visible !important;
 }
 
 #game-stage > #app > #game-content #battlePage > .battle-bg-shared{
@@ -327,9 +328,9 @@
     pointer-events:none !important;
 }
 
-/* The battle viewport itself cannot expose horizontal overflow. */
+/* battlePage is not a clipping owner. The outer game viewport prevents page
+   scrolling while combat art remains free to paint outside unit rectangles. */
 #game-stage > #app > #game-content #battlePage{
-    overflow:hidden !important;
     border-right:0 !important;
     outline-right:0 !important;
     box-shadow:none !important;
@@ -2044,14 +2045,32 @@ body.quest-scroll-active,
     overflow:visible !important;
 }
 
+/* Fixed Slot battlefield: every enemy row always owns five physical columns.
+   Empty slots retain their width after death/summon/revive, so neither units nor
+   VFX geometry can re-center around the currently surviving cards. */
 #game-stage #battleMonsterArea .v131-monster-row{
-    display:flex;
+    display:grid;
+    grid-template-columns:repeat(5,76px);
     flex:0 0 auto;
     align-items:flex-start;
     justify-content:center;
     gap:3px;
     width:100%;
     min-width:0;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot{
+    position:relative;
+    width:76px;
+    min-width:76px;
+    min-height:90px;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot > .battle-monster{
+    margin-left:auto !important;
+    margin-right:auto !important;
 }
 
 #game-stage #battleMonsterArea .v131-monster-row .battle-monster{
@@ -2687,6 +2706,7 @@ body.quest-scroll-active,
     align-items:center;
     justify-content:center;
     gap:4px;
+    overflow:visible;
 }
 #game-stage #battlePlayerRow .v-fixed-ally-row{
     display:grid;
@@ -2694,11 +2714,13 @@ body.quest-scroll-active,
     justify-content:center;
     gap:5px;
     min-height:102px;
+    overflow:visible;
 }
 #game-stage #battlePlayerRow .v-fixed-ally-slot{
     position:relative;
     width:76px;
     min-height:102px;
+    overflow:visible;
 }
 #game-stage #battlePlayerRow .v-fixed-ally-slot>.battle-player{
     width:76px;
@@ -4793,13 +4815,14 @@ body.quest-scroll-active,
     transform:translate(-50%,-118%) !important;
 }
 
-/* Formal cast Sprite Sheet stage. */
+/* Formal cast Sprite Sheet stage. The viewport edge is the only VFX clip owner.
+   Do not use strict/paint containment here: it creates an additional paint clip. */
 .v143-skill-stage{
     position:fixed;
     inset:0;
     z-index:16000;
     overflow:hidden;
-    contain:strict;
+    contain:layout style;
     pointer-events:none;
 }
 
