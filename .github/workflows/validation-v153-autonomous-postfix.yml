@@ -34,6 +34,19 @@ jobs:
           test "$changed" = ".github/workflows/validation-v153-autonomous-postfix.yml"
           test -z "$(git diff --name-only "$base" HEAD -- js css tests scripts config asset-manifest.json)"
 
+      - name: Fetch historical test baselines
+        shell: bash
+        run: |
+          for sha in \
+            e3de8f7fee4e65986420528247bdbb99cb588a07 \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            if ! git cat-file -e "$sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$sha"
+            fi
+          done
+
       - name: Ensure image inspection tool
         shell: bash
         run: |
