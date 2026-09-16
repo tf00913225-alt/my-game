@@ -1,0 +1,96 @@
+name: Diagnose V170 snapshot final B
+
+on:
+  push:
+    branches:
+      - validation/v170-snapshot-final-b-diagnosis-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check out final B diagnosis branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/v170-snapshot-final-b-diagnosis-20260916
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Verify frozen production inputs
+        shell: bash
+        run: |
+          node --version
+          git rev-parse HEAD
+          git diff --exit-code b01f996b53c9321c29dbc389d820af33714f4581 -- \
+            js/battlefield-slot-owner.js \
+            js/00-main.js \
+            js/25-v131-fix-batch.js \
+            js/39-v143-skill-animation.js \
+            js/42-v148-combat-dungeon-fixes.js \
+            js/46-v155-dev-fixes.js \
+            tests/v170-final-spec-integration.test.js \
+            tests/fixed-slot-tri-target-window.test.js \
+            tests/ally-tri-rage-fixed-slot-regression.test.js
+
+      - name: Build workspace-only final B cases and markers
+        shell: bash
+        run: |
+          python scripts/diagnose-v170-snapshot-final-b.py
+          grep -A2 'const EXPECTED_RUNTIME_PATHS=' .diagnostic/v170-formal-final-b.test.js
+          grep -n 'CARD 4 before invoke\|SYNC 1 before\|STATUS 1 enter\|SPRITE 17 before slot' js/39-v143-skill-animation.js
+          git status --short
+
+      - name: Run FORMAL lifecycle special action
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=3s 30s node .diagnostic/v170-formal-final-b.test.js 2>&1 | tee /tmp/v170-final-b-formal.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "FORMAL_EXIT=$status"
+          echo "FORMAL_LAST=$(grep '^FORMAL ' /tmp/v170-final-b-formal.log | tail -n 1 || true)"
+          echo "FORMAL_LAST_CARD=$(grep '^CARD ' /tmp/v170-final-b-formal.log | tail -n 1 || true)"
+          echo "FORMAL_LAST_SYNC=$(grep '^SYNC ' /tmp/v170-final-b-formal.log | tail -n 1 || true)"
+          echo "FORMAL_LAST_STATUS=$(grep '^STATUS ' /tmp/v170-final-b-formal.log | tail -n 1 || true)"
+          echo "FORMAL_LAST_SPRITE=$(grep '^SPRITE ' /tmp/v170-final-b-formal.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "FORMAL_UNEXPECTED_EXIT=$status"
+          fi
+
+      - name: Run DIRECT V170 mutation
+        shell: bash
+        run: |
+          set +e
+          timeout --signal=TERM --kill-after=3s 30s node .diagnostic/v170-direct-final-b.test.js 2>&1 | tee /tmp/v170-final-b-direct.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "DIRECT_EXIT=$status"
+          echo "DIRECT_LAST=$(grep '^DIRECT ' /tmp/v170-final-b-direct.log | tail -n 1 || true)"
+          echo "DIRECT_LAST_CARD=$(grep '^CARD ' /tmp/v170-final-b-direct.log | tail -n 1 || true)"
+          echo "DIRECT_LAST_SYNC=$(grep '^SYNC ' /tmp/v170-final-b-direct.log | tail -n 1 || true)"
+          echo "DIRECT_LAST_STATUS=$(grep '^STATUS ' /tmp/v170-final-b-direct.log | tail -n 1 || true)"
+          echo "DIRECT_LAST_SPRITE=$(grep '^SPRITE ' /tmp/v170-final-b-direct.log | tail -n 1 || true)"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "DIRECT_UNEXPECTED_EXIT=$status"
+          fi
+
+      - name: Summarize final B evidence
+        if: always()
+        shell: bash
+        run: |
+          echo '===== FORMAL ====='
+          if [ -f /tmp/v170-final-b-formal.log ]; then
+            grep -E '^FORMAL |^CARD |^DELAY |^SYNC |^TIMER |^STATUS (1|2|3|4|5|CALL|RETURN)|^SPRITE ' /tmp/v170-final-b-formal.log | tail -n 220 || true
+          fi
+          echo '===== DIRECT ====='
+          if [ -f /tmp/v170-final-b-direct.log ]; then
+            grep -E '^DIRECT |^CARD |^DELAY |^SYNC |^TIMER |^STATUS (1|2|3|4|5|CALL|RETURN)|^SPRITE ' /tmp/v170-final-b-direct.log | tail -n 220 || true
+          fi
