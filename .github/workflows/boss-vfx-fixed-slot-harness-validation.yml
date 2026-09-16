@@ -1,0 +1,36 @@
+name: Boss VFX Fixed Slot Harness Validation
+
+on:
+  push:
+    branches:
+      - validation/boss-vfx-fixed-slot-harness-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify validation scope
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD^)" = "8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6"
+          changed="$(git diff --name-only 8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6...HEAD)"
+          printf '%s\n' "$changed"
+          test "$changed" = "tests/boss-vfx-reliability-20260914.test.js"
+          git diff --check 8cbb4307f83893851a9adcd5a4b74cd6d2c11fe6...HEAD
+
+      - name: Run Boss VFX formal Fixed Slot validation
+        shell: bash
+        run: node tests/boss-vfx-reliability-20260914.test.js
