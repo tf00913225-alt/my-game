@@ -27,9 +27,14 @@
 #game-stage #homeFeatureModalBody .home-feature-row{
     min-height:48px;
     gap:10px;
-    padding:9px 10px;
+    padding:10px 4px;
     font-size:15px;
     line-height:1.5;
+    border:0;
+    border-bottom:1px solid rgba(200,154,72,.14);
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
 }
 
 #game-stage #homeFeatureModalBody .home-feature-row span[style*="font-size:11px"]{
@@ -180,8 +185,8 @@
 
 #game-stage #inventoryPage .v141-inventory-pager button{
     width:42px;
-    height:31px;
-    min-height:31px;
+    height:38px;
+    min-height:38px;
     padding:0;
     border:1px solid #85632f;
     border-radius:7px;
@@ -225,8 +230,9 @@
     overflow:hidden !important;
     padding:15px !important;
     box-sizing:border-box;
-    border:2px solid var(--v141-bronze) !important;
-    background:linear-gradient(165deg,#241b11,#0c0a07 72%) !important;
+    border:1px solid rgba(200,154,72,.72) !important;
+    background:linear-gradient(165deg,rgba(35,26,16,.98),rgba(8,7,5,.99) 72%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.04),0 12px 28px rgba(0,0,0,.48) !important;
 }
 
 .item-modal .item-modal-icon{
@@ -687,14 +693,22 @@
 
 /* ----- Compact experience pool: clear hierarchy without oversized buttons ----- */
 #game-stage #homeExpPoolCard .exp-pool-hero{
+    position:relative;
     padding:12px 13px 11px;
+    border:1px solid rgba(200,154,72,.30);
     border-radius:11px;
+    background:linear-gradient(155deg,rgba(35,26,16,.90),rgba(10,8,6,.93));
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.035);
 }
 #game-stage #homeExpPoolCard .exp-pool-kicker{font-size:9px;}
 #game-stage #homeExpPoolCard .exp-pool-title{font-size:18px;}
 #game-stage #homeExpPoolCard .exp-pool-value{font-size:30px;}
 #game-stage #homeExpPoolCard .exp-pool-caption{margin-top:7px;font-size:13px !important;line-height:1.45;}
-#game-stage #homeExpPoolCard .exp-pool-section-head{margin:9px 3px 5px;}
+#game-stage #homeExpPoolCard .exp-pool-section-head{
+    margin:10px 3px 6px;
+    padding-bottom:6px;
+    border-bottom:1px solid rgba(200,154,72,.16);
+}
 #game-stage #homeExpPoolCard .exp-pool-section-head span{font-size:14px;}
 #game-stage #homeExpPoolCard .exp-pool-section-head small{font-size:11px;}
 #game-stage #homeExpPoolCard .exp-pool-character-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
@@ -883,14 +897,18 @@
 }
 
 #game-stage .v141-synthesis{height:100%;display:flex;min-height:0;flex-direction:column;gap:6px;}
-#game-stage .v141-synthesis-wallet{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid #806031;border-radius:8px;background:#120e09;}
+#game-stage .v141-synthesis-wallet{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid rgba(200,154,72,.24);border-radius:8px;background:linear-gradient(90deg,rgba(27,20,12,.78),rgba(12,9,6,.88));
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.025);
+}
 #game-stage .v141-synthesis-wallet span{color:#b9a98d;font-size:13px;}
 #game-stage .v141-synthesis-wallet b{color:#ffe19a;font-size:16px;}
 #game-stage .v141-synthesis-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;}
-#game-stage .v141-synthesis-tabs button{min-height:38px;padding:4px 2px;border:1px solid #69502e;border-radius:7px;color:#b5a58c;background:#17120d;font-size:12px;}
+#game-stage .v141-synthesis-tabs button{min-height:44px;padding:4px 2px;border:1px solid #69502e;border-radius:7px;color:#b5a58c;background:#17120d;font-size:12px;}
 #game-stage .v141-synthesis-tabs button.active{color:#231607;border-color:#d4a14d;background:linear-gradient(180deg,#f0ca79,#b97d2f);font-weight:900;}
 #game-stage .v141-synthesis-body{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-gutter:stable;}
-#game-stage .v141-synthesis-card,#game-stage .v141-synthesis-empty{min-height:100%;padding:10px;border:1px solid #785a31;border-radius:10px;background:linear-gradient(155deg,#21180f,#0e0b08);box-sizing:border-box;}
+#game-stage .v141-synthesis-card,#game-stage .v141-synthesis-empty{min-height:100%;padding:10px;border:1px solid rgba(200,154,72,.20);border-radius:10px;background:linear-gradient(155deg,rgba(29,22,14,.68),rgba(9,7,5,.86));box-sizing:border-box;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.02);
+}
 #game-stage .v141-synthesis-card{height:auto;}
 #game-stage .v141-synthesis-empty{height:100%;}
 #game-stage .v141-synthesis-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#d5c5a7;text-align:center;}
@@ -907,14 +925,18 @@
 #game-stage .v141-craft-preview b{color:#f0d18c;font-size:16px;}
 #game-stage .v141-craft-preview span{color:#ad9f87;font-size:12px;}
 #game-stage .v141-material-lines{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:8px 0;}
-#game-stage .v141-material-lines span{padding:6px 4px;border:1px solid #55442c;border-radius:6px;color:#afa189;background:#130f0b;font-size:11px;text-align:center;}
+#game-stage .v141-material-lines span{padding:6px 4px;border:0;border-radius:0;color:#afa189;background:transparent;font-size:11px;text-align:center;
+    border-bottom:1px solid rgba(200,154,72,.14);
+}
 #game-stage .v141-material-lines b{display:block;margin-top:2px;font-size:12px;}
 #game-stage .v141-material-lines .ok{color:#8ee6a2;}
 #game-stage .v141-material-lines .lack{color:#ee8e79;}
-#game-stage .v141-synthesis-primary{width:100%;min-height:43px !important;border:1px solid #e0ad55;border-radius:8px;color:#241607;background:linear-gradient(180deg,#f3d083,#b9792a);font-size:15px !important;font-weight:900;}
+#game-stage .v141-synthesis-primary{width:100%;min-height:44px !important;border:1px solid #e0ad55;border-radius:8px;color:#241607;background:linear-gradient(180deg,#f3d083,#b9792a);font-size:15px !important;font-weight:900;}
 #game-stage .v141-synthesis-primary:disabled{opacity:.36;filter:grayscale(.55);}
 #game-stage .v141-affix-info{display:block;margin:6px auto 0;border:0;color:#cdb37d;background:transparent;text-decoration:underline;font-size:12px !important;}
-#game-stage .v141-reforge-current{padding:7px;border:1px solid #5d492d;border-radius:8px;background:#110e0a;}
+#game-stage .v141-reforge-current{padding:7px;border:0;border-radius:0;background:rgba(18,13,8,.56);
+    border-left:2px solid rgba(200,154,72,.58);
+}
 #game-stage .v141-reforge-current > b{display:block;color:#f0d18c;font-size:15px;}
 #game-stage .v141-reforge-current > small{display:block;color:#a49680;font-size:11px;}
 #game-stage .v141-reforge-current > div{display:flex;flex-wrap:wrap;gap:5px 11px;margin-top:5px;font-size:12px;}
@@ -925,9 +947,11 @@
 #game-stage .v141-reforge-compare section small,#game-stage .v141-reforge-compare section span{display:block;margin-bottom:5px;font-size:11px;}
 #game-stage .v141-reforge-compare > b{color:#f1c86d;}
 #game-stage .v141-reforge-compare > div{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-#game-stage .v141-reforge-compare button{border:1px solid #9e7435;border-radius:7px;color:#f2ddb4;background:#261b10;}
+#game-stage .v141-reforge-compare button{border:1px solid #9e7435;border-radius:7px;color:#f2ddb4;background:#261b10;
+    min-height:44px;
+}
 #game-stage .v141-upgrade-flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:9px 0;}
-#game-stage .v141-upgrade-flow section{display:flex;min-width:0;flex-direction:column;align-items:center;gap:4px;padding:9px;border:1px solid #5f4b31;border-radius:8px;background:#120f0b;text-align:center;}
+#game-stage .v141-upgrade-flow section{display:flex;min-width:0;flex-direction:column;align-items:center;gap:4px;padding:9px;border:1px solid rgba(200,154,72,.16);border-radius:8px;background:linear-gradient(155deg,rgba(25,19,13,.64),rgba(10,8,6,.80));text-align:center;}
 #game-stage .v141-upgrade-flow section > svg{width:54px;height:54px;}
 #game-stage .v141-upgrade-flow section b{font-size:12px;}
 #game-stage .v141-upgrade-flow i{color:#efc76e;font-size:23px;font-style:normal;}
