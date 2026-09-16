@@ -1,0 +1,50 @@
+name: Fixed Slot Phase 4 Diagnose
+
+on:
+  push:
+    branches:
+      - feature/fixed-slot-battlefield-v1-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/fixed-slot-battlefield-v1-20260916
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply the staged owner patch in the disposable runner
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          workflow=Path('.github/workflows/fixed-slot-phase4-boss-mechanism.yml').read_text(encoding='utf-8')
+          marker="          python3 - <<'PY'\n"
+          start=workflow.index(marker)+len(marker)
+          end=workflow.index("\n          PY\n",start)
+          body=workflow[start:end]
+          body='\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines())
+          exec(compile(body,'phase4-owner-patch','exec'))
+          PYCODE
+      - name: Syntax check
+        run: node --check js/gameplay-boss-tower-system.js
+      - name: Fixed battlefield slot tests
+        run: node tests/fixed-battlefield-slots.test.js
+      - name: Gameplay Boss runtime tests
+        run: node tests/gameplay-boss-tower-system.test.js
+      - name: Boss mechanism UI regression tests
+        run: node tests/boss-mechanism-vfx-card-ui-20260909.test.js
+      - name: Gameplay hub UI tests
+        run: node tests/gameplay-hub-ui-and-icon.test.js
+      - name: Typography battle preservation tests
+        run: node tests/ui-typography-battle-preservation.test.js
+      - name: Production build check
+        run: node scripts/build-production.mjs --check
+      - name: Whitespace check
+        run: git diff --check
