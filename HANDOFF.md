@@ -1,3 +1,12 @@
+## 2026-09-17 — Battle three-region layout, range VFX footprint and action-gate repair (NOT COMPLETE)
+
+- Base is `dev@b38411944c8c01b56faa6308f41d969644d82b25`; branch is `fix/battle-layout-vfx-runtime-20260917`. Severity is P1 because the reported Ice Arrow Rain path can block the core battle loop. `main` is explicitly excluded.
+- User evidence `1000070338.mp4` shows a stopped battle after Ice Arrow Rain, undersized single-card-like area VFX and crowded/tiny battle units. Screenshot `1000070335.jpg` is treated only as a three-region proportion concept.
+- Root causes: V142 omitted its safety deadline for V143's `render:false` timing call; V143 shrank complete-side/group geometry through square contain fitting and 0.72/0.62 factors; final skill target types could drift from authored manifest placement; the battle DOM lacked explicit enemy/operation/ally region ownership; and a failed raster render could leave a stale stage before the next Wind Flame cast.
+- Existing owners were repaired: `index.html` now exposes enemy / operation-status / ally regions; `css/fixed-slot-battlefield-rendering-v2.css` owns 34fr / 31fr / 35fr tracks and centralized equal slot/card/art/name/bar sizing; V142 always releases the action gate by deadline; V143 derives range placement from `config.targetType`, preserves three-target/full-side footprints, permits visual overflow and purges stale stages. Fixed Slot geometry adapters and combat/target/damage data remain unchanged.
+- Focused coverage audits all four elements' representative single/tri/all skills, Ice Arrow Rain after casualties, Ice Spin and Wind Flame survivor-independent group geometry, one Wind Flame raster node, unclipped cards/VFX and render-failure gate release. `npm run build` was used only after `build:check` identified a stale manifest; synchronized bundles retain V173.65/cache 173.65.
+- Detailed evidence: `docs/qa/battle-layout-vfx-runtime-20260917.md`. Requirement batch `2026-09-17-battle-layout-vfx-runtime` remains IMPLEMENTED / NOT COMPLETE until Repository checks pass, the candidate is merged to `dev`, the exact SHA is deployed, and fully loaded portrait-mobile combat confirms progression/layout/range VFX. No dev → main promotion is authorized.
+
 ## 2026-09-17 — Function-card spread isolation and primary-target VFX anchor (NOT COMPLETE)
 
 - Follow-up base is `dev@a21736f3ea1f92b2e7da9e48870dce705c4c5cc4`; working branch is `fix/battle-tri-mechanism-vfx-anchor-20260917`. `main` is not part of this repair.

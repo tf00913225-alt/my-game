@@ -224,20 +224,19 @@
             style:config.style,element:config.element,side:meta.side||"player"
         };
 
-        /* V142 is intentionally visual-free. V143 replaces director.play and
-           passes render:false while it renders the formal image Sprite Sheet.
-           If V143 is unavailable, timing still completes without a substitute VFX. */
-        if(meta.render!==false){
-            state.fallbackTimer=setTimeout(
-                ()=>gate.complete("v142-timing-only"),
-                Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
-            );
-            if(typeof document!=="undefined"&&document.addEventListener){
-                state.visibilityHandler=function(){
-                    if(!document.hidden&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
-                };
-                document.addEventListener("visibilitychange",state.visibilityHandler);
-            }
+        /* V142 owns action completion even when V143 owns the pixels. Keep the
+           deadline independent from render:false so a VFX asset/DOM failure can
+           never leave the combat initiative waiting forever. V143 normally
+           completes the same idempotent gate at this deadline. */
+        state.fallbackTimer=setTimeout(
+            ()=>gate.complete(meta.render===false?"v142-render-safety-deadline":"v142-timing-only"),
+            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
+        );
+        if(typeof document!=="undefined"&&document.addEventListener){
+            state.visibilityHandler=function(){
+                if(!document.hidden&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
+            };
+            document.addEventListener("visibilitychange",state.visibilityHandler);
         }
         return gate;
     }

@@ -69,6 +69,13 @@ jobs:
       - name: Run Fixed Slot battlefield rendering regression
         run: node tests/fixed-slot-battlefield-rendering-v2.test.js
 
+      - name: Run battle layout, timing and range-VFX regressions
+        run: |
+          node tests/battle-layout-vfx-runtime-20260917.test.js
+          node tests/v142-skill-animation.test.js
+          node tests/v150-ice-arrow-rain-vfx.test.js
+          node tests/v173.23-wind-vfx.test.js
+
       - name: Ensure existing asset-test dependency
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
         run: |

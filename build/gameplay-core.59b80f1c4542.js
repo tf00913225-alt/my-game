@@ -11704,20 +11704,19 @@
             style:config.style,element:config.element,side:meta.side||"player"
         };
 
-        /* V142 is intentionally visual-free. V143 replaces director.play and
-           passes render:false while it renders the formal image Sprite Sheet.
-           If V143 is unavailable, timing still completes without a substitute VFX. */
-        if(meta.render!==false){
-            state.fallbackTimer=setTimeout(
-                ()=>gate.complete("v142-timing-only"),
-                Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
-            );
-            if(typeof document!=="undefined"&&document.addEventListener){
-                state.visibilityHandler=function(){
-                    if(!document.hidden&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
-                };
-                document.addEventListener("visibilitychange",state.visibilityHandler);
-            }
+        /* V142 owns action completion even when V143 owns the pixels. Keep the
+           deadline independent from render:false so a VFX asset/DOM failure can
+           never leave the combat initiative waiting forever. V143 normally
+           completes the same idempotent gate at this deadline. */
+        state.fallbackTimer=setTimeout(
+            ()=>gate.complete(meta.render===false?"v142-render-safety-deadline":"v142-timing-only"),
+            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
+        );
+        if(typeof document!=="undefined"&&document.addEventListener){
+            state.visibilityHandler=function(){
+                if(!document.hidden&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
+            };
+            document.addEventListener("visibilitychange",state.visibilityHandler);
         }
         return gate;
     }
@@ -12939,7 +12938,7 @@
     const SPRITE_SCALE_MULTIPLIER=1;
     /* Size the raster box before centering/travel. CSS independent scale also
        scales translate(-50%) and the travel vector, moving the visible hit. */
-    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:.80,group:.62,battlefield:.72});
+    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:.80,group:1,battlefield:1});
     const spriteFrameAspectCache=new Map();
     const spriteFrameAspectLoading=new Set();
 
@@ -13123,6 +13122,13 @@
             if(node&&typeof node.remove==="function"){ node.remove(); removed++; }
         });
         state.metrics.legacyNodesPurged+=removed;
+    }
+
+    function purgeStaleRasterStages(){
+        if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
+        document.querySelectorAll("#v143-skill-stage").forEach(node=>{
+            if(node!==state.stage&&node&&typeof node.remove==="function"){ node.remove(); }
+        });
     }
 
     function isMechanismTarget(index){
@@ -13327,6 +13333,16 @@
         return rect;
     }
 
+    function placementFor(config,sprite){
+        const authored=String(sprite&&sprite.placement||"single");
+        const targetType=String(config&&config.targetType||"single");
+        if(/^(all|enemyAll|allyAll)$/i.test(targetType)){ return "battlefield"; }
+        if(/^(tri|allyTri|row|column|horizontal-3)$/i.test(targetType)){
+            return authored==="trajectory"?"trajectory":"group";
+        }
+        return authored;
+    }
+
     function hasTimedEffect(entity,type){
         if(!entity){ return false; }
         const spec=STATUS_SPRITES[type];
@@ -13520,17 +13536,25 @@
         return Math.max(.1,Number(cached)||Number(sprite&&sprite.cellAspect)||1);
     }
 
-    function applySpriteBox(node,width,height,sprite){
+    function applySpriteBox(node,width,height,sprite,fit){
         const placementScale=PLACEMENT_SIZE_SCALE[node.dataset.placement]||1;
         const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
         const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
         const aspect=frameAspectFor(sprite);
         let renderWidth=boxWidth,renderHeight=boxHeight;
-        if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
+        if(fit==="stretch"){
+            /* Range sheets deliberately fill their semantic Fixed Slot shape.
+               Keeping the node inside that shape protects the center controls,
+               while showing the complete frame without a paint clip. */
+        }else if(fit==="cover"){
+            if(renderWidth/renderHeight>aspect){ renderHeight=renderWidth/aspect; }
+            else{ renderWidth=renderHeight*aspect; }
+        }else if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
         else{ renderHeight=renderWidth/aspect; }
         node.style.width=Math.round(renderWidth)+"px";
         node.style.height=Math.round(renderHeight)+"px";
         node.dataset.frameAspect=String(Number(aspect.toFixed(4)));
+        node.dataset.frameFit=fit==="stretch"?"stretch":fit==="cover"?"cover":"contain";
     }
 
     function requestSpriteAspect(sprite,current,node,index,target){
@@ -13572,7 +13596,7 @@
 
     function placeSprite(current,node,index,target){
         const sprite=current.model.sprite;
-        const placement=String(sprite.placement||"single");
+        const placement=placementFor(current.config,sprite);
         node.dataset.placement=placement;
 
         if(placement==="single"){
@@ -13616,14 +13640,10 @@
             /* coverageScale is an authored multiplier over the complete fixed
                battlefield zone. It never measures currently surviving targets. */
             const coverageScale=clamp(Number(sprite.coverageScale)||Number(sprite.scale)||1,1,1.4);
-            const width=clamp(
-                Math.round(bounds.width*coverageScale),Number(sprite.minWidth)||Number(sprite.minSize)||160,
-                Number(sprite.maxWidth)||Math.max(240,viewportWidth*.94)
-            );
-            const height=clamp(
-                Math.round(bounds.height*coverageScale),Number(sprite.minHeight)||Number(sprite.minSize)||160,
-                Number(sprite.maxHeight)||Math.max(240,viewportHeight*.92)
-            );
+            const viewportMaxWidth=Math.max(240,viewportWidth*.98);
+            const viewportMaxHeight=Math.max(240,viewportHeight*.96);
+            const width=clamp(Math.round(bounds.width),1,viewportMaxWidth);
+            const height=clamp(Math.round(bounds.height),1,viewportMaxHeight);
             node.dataset.areaId=bounds.id||"fixed-battlefield";
             node.dataset.targetIndexes=indexes.join(",");
             if(sprite.fixedFormation){ node.dataset.fixedFormation="true"; }
@@ -13631,19 +13651,21 @@
             node.style.clipPath="none";
             node.style.left=bounds.centerX+"px";
             node.style.top=bounds.centerY+"px";
-            applySpriteBox(node,width,height,sprite);
+            /* Range effects fill the complete fixed-side rectangle but never
+               extend into the independent operation track. The whole source
+               frame remains visible; no card or Zone is a paint clip owner. */
+            applySpriteBox(node,width,height,sprite,"stretch");
             return;
         }
 
         /* Group/row/tri/trajectory size is derived from the fixed geometry shape,
            never from the number or outer bounds of surviving target cards. */
-        const naturalSize=(Math.max(bounds.width,bounds.height)+40)*(Number(sprite.scale)||1);
         const viewportWidth=Number(window.innerWidth)||960;
         const viewportHeight=Number(window.innerHeight)||720;
-        const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
-        const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);
+        const width=clamp(Math.round(bounds.width),1,Math.max(240,viewportWidth*.98));
+        const height=clamp(Math.round(bounds.height),1,Math.max(160,viewportHeight*.96));
         node.dataset.targetIndexes=indexes.join(",");
-        applySpriteBox(node,size,size,sprite);
+        applySpriteBox(node,width,height,sprite,"stretch");
         /* A group/row/tri Sprite keeps the fixed-shape bounds for sizing, but
            its visual center belongs to the explicitly selected primary card.
            Only full-battlefield effects remain centered on the whole side. */
@@ -13669,7 +13691,7 @@
     function addSprite(current,index,target){
         const sprite=current.model.sprite;
         if(!sprite||!target||!state.stage){ return; }
-        const placement=String(sprite.placement||"single");
+        const placement=placementFor(current.config,sprite);
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         let node=current.spriteNodes.get(key);
         if(!node){
@@ -13703,7 +13725,7 @@
     function confirmTargetVisual(current,index){
         if(!current||current.done||!current.model||!current.model.sprite){ return; }
         current.confirmedTargets.add(index);
-        const placement=String(current.model.sprite.placement||"single");
+        const placement=placementFor(current.config,current.model.sprite);
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         const node=current.spriteNodes.get(key);
         if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
@@ -13778,6 +13800,7 @@
         }
         if(state.current&&!state.current.done){ cleanupCurrent(state.current,"superseded"); }
         purgeLegacyCardVfx();
+        purgeStaleRasterStages();
 
         const model=modelFor(config);
         const targetSide=targetSideFor(config,meta.side||"player");
@@ -13836,7 +13859,15 @@
         const safeMeta=Object.assign({},meta||{},{render:false});
         const gate=originalPlay(config,safeMeta);
         if(state.current&&state.current.gate===gate){ return gate; }
-        render(config,Object.assign({side:"player",actorIndex:0},meta||{}),gate);
+        try{
+            render(config,Object.assign({side:"player",actorIndex:0},meta||{}),gate);
+        }catch(error){
+            state.metrics.renderErrors=(state.metrics.renderErrors||0)+1;
+            if(typeof console!=="undefined"&&typeof console.error==="function"){
+                console.error("V143 raster render failed; combat timing recovered.",error);
+            }
+            if(!gate.done){ gate.complete("v143-render-error"); }
+        }
         return gate;
     }
 
