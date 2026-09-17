@@ -5,6 +5,7 @@ const crypto=require("node:crypto");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
+const slotOwner=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
@@ -103,6 +104,31 @@ function loadRuntime(options={}){
     const playerHits=[];
     const cardEffects=[];
     const body=makeNode();
+    const slotNodes={};
+    const enemyXs=[100,220,340,460,580];
+    const allyXs=[180,340,500];
+    ["B","F"].forEach((row,rowIndex)=>{
+        enemyXs.forEach((left,index)=>{
+            const id=`ENEMY_${row}${index+1}`;
+            const top=rowIndex===0?60:180;
+            const slot=makeNode({left,top,right:left+80,bottom:top+100,width:80,height:100});
+            slot.className="v-fixed-enemy-slot";
+            slot.dataset.slot=id;
+            slotNodes[id]=slot;
+            body.appendChild(slot);
+        });
+    });
+    ["F","B"].forEach((row,rowIndex)=>{
+        allyXs.forEach((left,index)=>{
+            const id=`ALLY_${row}${index+1}`;
+            const top=rowIndex===0?420:540;
+            const slot=makeNode({left,top,right:left+100,bottom:top+100,width:100,height:100});
+            slot.className="v-fixed-ally-slot";
+            slot.dataset.slot=id;
+            slotNodes[id]=slot;
+            body.appendChild(slot);
+        });
+    });
     const monsterArea=makeNode({left:260,top:40,right:700,bottom:300,width:440,height:260});
     monsterArea.id="battleMonsterArea";
     const playerArea=makeNode({left:20,top:340,right:460,bottom:500,width:440,height:160});
@@ -167,6 +193,10 @@ function loadRuntime(options={}){
             return node;
         },
         getElementById(id){ return cards[id]||null; },
+        querySelector(selector){
+            const match=String(selector||"").match(/\[data-slot="([^"]+)"\]/);
+            return match?(slotNodes[match[1]]||null):body.querySelector(selector);
+        },
         querySelectorAll(selector){ return body.querySelectorAll(selector); }
     };
     const context={
@@ -214,9 +244,15 @@ function loadRuntime(options={}){
         dispose(){}
     };
     vm.createContext(context);
+    vm.runInContext(slotOwner,context);
+    const owner=context.FourSymbolsBattlefieldSlots;
+    assert.ok(owner,"formal Fixed Slot owner must install");
+    const snapshot=owner.createEnemyFormationSnapshot([0,1,2],{originalFormationType:3});
+    owner.setActiveEnemySnapshot(snapshot);
+    owner.ensureAllyFormation([0,1,2]);
     vm.runInContext(animation,context);
     return {
-        context,body,cards,monsters,party,scheduled,raf,drawCalls,monsterHits,playerHits,cardEffects,
+        context,owner,snapshot,slotNodes,body,cards,monsters,party,scheduled,raf,drawCalls,monsterHits,playerHits,cardEffects,
         setClock(value){ clock=value; },
         imageCount(){ return imageCount; },
         tick(value){
@@ -244,6 +280,21 @@ function stageSprites(runtime){
 
 function runTimers(runtime,delay){
     runtime.scheduled.filter(timer=>Math.abs(timer.delay-delay)<2).forEach(timer=>timer.callback());
+}
+
+function positionOf(node){
+    return [Number.parseFloat(node.style.left),Number.parseFloat(node.style.top)];
+}
+function enemySlot(runtime,index){
+    return runtime.owner.getEnemySlotForMonster(runtime.snapshot,index);
+}
+function allySlot(runtime,index){
+    return runtime.owner.getAllySlotForCharacter(index);
+}
+function formalPosition(runtime,side,index){
+    const slot=side==="monster"?enemySlot(runtime,index):allySlot(runtime,index);
+    const point=runtime.owner.getSlotCenter(slot);
+    return [point.x,point.y];
 }
 
 test("the supplied wind PNG files remain byte-identical and keep their actual source dimensions",()=>{
@@ -301,8 +352,8 @@ test("Wind casts use one DOM Sprite Sheet node and never invoke Canvas drawing",
     const sprite=sprites[0];
     assert.equal(sprite.dataset.renderer,"dom-sprite");
     assert.equal(sprite.dataset.targetIndex,"2");
-    assert.equal(sprite.style.left,"578px");
-    assert.equal(sprite.style.top,"140px");
+    assert.deepEqual(positionOf(sprite),formalPosition(runtime,"monster",2));
+    assert.notDeepEqual(positionOf(sprite),[578,140],"must not use retired monster-card geometry");
     assert.match(sprite.style.backgroundImage,/storm-fist-cast\.png\?v=173\.24/);
     assert.equal(stage.children.length,1,"no procedural charge, flight, field or hit node");
     assert.equal(runtime.drawCalls.length,0,"DOM Sprite renderer must never call Canvas drawImage");
@@ -319,8 +370,8 @@ test("single, three-lane and battlefield casts each own one correctly positioned
     assert.equal(groupSprites.length,1,"one three-lane sheet, not nine effects");
     assert.equal(groupSprites[0].dataset.placement,"group");
     assert.equal(groupSprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(groupSprites[0].style.left,"458px");
-    assert.equal(groupSprites[0].style.top,"140px");
+    const groupRect=group.owner.getGeometryRectFromShape("monster",enemySlot(group,1),"tri");
+    assert.deepEqual(positionOf(groupSprites[0]),[groupRect.centerX,groupRect.centerY]);
 
     const all=loadRuntime();
     all.context.v142SkillAnimationDirector.play(
@@ -330,10 +381,10 @@ test("single, three-lane and battlefield casts each own one correctly positioned
     const allSprites=stageSprites(all).sprites;
     assert.equal(allSprites.length,1,"one battlefield sheet");
     assert.equal(allSprites[0].dataset.placement,"battlefield");
-    assert.equal(allSprites[0].dataset.areaId,"battleMonsterArea");
+    assert.equal(allSprites[0].dataset.areaId,"fixed-enemy-zone");
     assert.equal(allSprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(allSprites[0].style.left,"480px");
-    assert.equal(allSprites[0].style.top,"170px");
+    const allRect=all.owner.getSideRect("monster");
+    assert.deepEqual(positionOf(allSprites[0]),[allRect.centerX,allRect.centerY]);
 });
 
 test("three-target wind sheets keep a fixed three-slot footprint centered on the selected target",()=>{
@@ -358,8 +409,8 @@ test("three-target wind sheets keep a fixed three-slot footprint centered on the
         const sprite=stageSprites(runtime).sprites[0];
         assert.ok(sprite);
         assert.equal(sprite.dataset.placement,"group");
-        assert.equal(sprite.style.left,"458px","selected middle target remains the visual centre");
-        assert.equal(sprite.style.top,"140px");
+        const triRect=runtime.owner.getGeometryRectFromShape("monster",enemySlot(runtime,1),"tri");
+        assert.deepEqual(positionOf(sprite),[triRect.centerX,triRect.centerY],"selected middle Slot remains the visual centre");
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
     assert.deepEqual(placements[1],placements[0],"casualties do not shrink or move the three-target sheet");
@@ -399,8 +450,8 @@ test("enemy casts discover the real player target instead of using a fixed facti
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetSide,"player");
     assert.equal(sprites[0].dataset.targetIndex,"1");
-    assert.equal(sprites[0].style.left,"239px");
-    assert.equal(sprites[0].style.top,"418px");
+    assert.deepEqual(positionOf(sprites[0]),formalPosition(runtime,"player",1));
+    assert.notDeepEqual(positionOf(sprites[0]),[239,418],"must not use retired player-card geometry");
 });
 
 test("frame seven releases resolved attack results once, while buffs never shake or show damage",()=>{
