@@ -33,13 +33,13 @@
     }
   ],
   "blockers": [
-    "Candidate runtime has not been deployed; post-fix real BOSS reinforcement and VFX combat remain unverified."
+    "The candidate was merged and deployed to dev, but post-fix real BOSS reinforcement and VFX combat remain unverified."
   ],
   "publication": {
-    "draftPullRequest": 263,
-    "remoteCommit": "a486e4bc6d2b1580cb50b796b112caa5b2646af8",
-    "ciRun": 35219995186,
+    "pullRequest": 263,
+    "mergeCommit": "f4cd11ff8e9a4ba51edf64ec37c0db711140616a",
+    "ciRun": 35220583287,
     "ciConclusion": "success",
-    "devDeployment": "skipped"
+    "devDeployment": "success"
   }
 }

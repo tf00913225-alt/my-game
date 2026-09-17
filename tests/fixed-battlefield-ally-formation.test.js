@@ -35,6 +35,13 @@ eq(slots.resolveAllyTargets(formation,2,"column",alive),[1,2],"ally column stays
 eq(slots.resolveAllyTargets(formation,null,"allyAll",alive),[0,1,4,2,3],"allyAll returns occupied living ally unit slots only");
 assert.equal(slots.mechanismSlots.some(slot=>slots.allySlots.includes(slot)),false,"mechanism slots are not ally unit geometry");
 
+formation=slots.hydrateAllyFormation({characterIndexToSlot:{
+    0:"ALLY_B2",1:"ALLY_F1",2:"ALLY_F3"
+}},[0,1,2]);
+eq(slots.resolveAllyTargets(formation,1,"tri",index=>[0,1,2].includes(index)),[1],"a tri attack on an ally front-edge slot cannot hit the back-row water character");
+eq(slots.resolveAllyTargets(formation,1,"row",index=>[0,1,2].includes(index)),[1,2],"a row attack on the ally front row hits only front-row characters");
+eq(slots.resolveAllyTargets(formation,0,"row",index=>[0,1,2].includes(index)),[0],"a row attack on the ally back row only hits that back-row character");
+
 const core=fs.readFileSync(new URL("../js/00-main.js",import.meta.url),"utf8");
 const support=fs.readFileSync(new URL("../js/42-v148-combat-dungeon-fixes.js",import.meta.url),"utf8");
 const enemySupport=fs.readFileSync(new URL("../js/36-v141-content-systems.js",import.meta.url),"utf8");
@@ -46,6 +53,8 @@ assert.match(support,/resolveAllyTargets\(/,"party buffs/heals share canonical a
 assert.match(support,/resolveEnemyTargets\(snapshot,center,\"tri\"/,"enemy rage shares canonical enemy slot geometry");
 assert.match(enemySupport,/resolveEnemyTargets\(snapshot,center,\"tri\"/,"enemy heal/support shares canonical enemy slot geometry");
 assert.match(water,/\"column\"/,"water freeze compatibility still resolves to column geometry");
+assert.match(core,/battlefieldSlots\.resolveAllyTargets\([\s\S]*skillTargetType/,"monster range targeting delegates to the canonical ally Slot owner");
+assert.doesNotMatch(core,/const attackTargets=isRangeSkill\s*\?\s*livingTargets/,"monster tri and row skills must not expand to all living allies");
 
 // Geometry is element-agnostic: all four elements consume the same shape truth.
 for(const element of ["fire","water","wind","earth"]){

@@ -103,8 +103,10 @@
     contain:none !important;
     align-items:stretch !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="back"]{top:0 !important;}
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="front"]{bottom:0 !important;}
+/* The enemy is above this zone, so an ally front row belongs at the top.
+   Keep the Slot names semantic; only this visual projection changes. */
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="front"]{top:0 !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="back"]{bottom:0 !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot{
     position:relative !important;
     width:auto !important;
@@ -294,9 +296,18 @@
 
 /* Zones are independent. Mechanism does not size Enemy/Ally, and battle info / action
    do not move when the number of occupied Slots changes. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-mechanism-zone{
-    position:relative !important;
-    flex:0 0 auto !important;
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.v-fixed-enemy-zone > .v-fixed-mechanism-zone{
+    /* Mechanisms are independent attackable targets, but their visual plane is
+       the enemy front row: closest to the player, never normal-flow back row. */
+    position:absolute !important;
+    left:4px !important;
+    right:4px !important;
+    bottom:0 !important;
+    z-index:30 !important;
+    width:auto !important;
+    height:var(--battle-enemy-row-height) !important;
+    min-height:var(--battle-enemy-row-height) !important;
+    margin:0 !important;
     overflow:visible !important;
     contain:none !important;
 }

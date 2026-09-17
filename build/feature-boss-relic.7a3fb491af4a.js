@@ -584,6 +584,11 @@
         if(!area){ return; }
         let slot=document.getElementById("bossMechanismSlot");
         if(!slot){ slot=document.createElement("div");slot.id="bossMechanismSlot";slot.className="boss-mechanism-slot";slot.setAttribute("aria-label","BOSS 機制卡槽");area.appendChild(slot); }
+        /* This is an independent target class, not an enemy unit Slot. It still
+           occupies the enemy-front visual plane so it remains nearest to allies. */
+        slot.classList.add("v-fixed-mechanism-zone");
+        slot.dataset.geometryOwner="fixed-slot";
+        slot.dataset.slotRow="front";
         const owner=battlefieldSlotOwner();
         const mechanismSlots=owner&&Array.isArray(owner.mechanismSlots)?owner.mechanismSlots:["MECH_L","MECH_C","MECH_R"];
         mechanismSlots.forEach(slotName=>{

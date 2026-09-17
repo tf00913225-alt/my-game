@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-17-battle-formation-targeting",
+  "baseBranch": "dev",
+  "baseCommit": "f4cd11ff8e9a4ba51edf64ec37c0db711140616a",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "completion": "NOT COMPLETE",
+  "verificationPolicy": "Source and automated checks are supplementary only. Require a fully loaded real battle runtime on dev for formation geometry, BOSS mechanism placement, and range targets.",
+  "requirements": [
+    {
+      "id": "FORMATION-PROJECTION",
+      "status": "IMPLEMENTED",
+      "requirement": "For allies, the front row is the row nearest enemies and the back row is farthest from enemies.",
+      "evidence": [
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "tests/fixed-slot-battlefield-rendering-v2.test.js"
+      ],
+      "remaining": "In the dev runtime, verify the water character in ALLY_B is visually behind the two front-row allies."
+    },
+    {
+      "id": "BOSS-MECHANISM-FRONT",
+      "status": "IMPLEMENTED",
+      "requirement": "An independent BOSS mechanism card renders on the enemy front visual plane without becoming an enemy unit target.",
+      "evidence": [
+        "js/gameplay-boss-tower-system.js",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "tests/fixed-slot-battlefield-rendering-v2.test.js"
+      ],
+      "remaining": "In the dev runtime, spawn a BOSS mechanism card and verify it is nearest the player while remaining independently selectable."
+    },
+    {
+      "id": "MONSTER-RANGE-TARGETING",
+      "status": "IMPLEMENTED",
+      "requirement": "Monster tri, row and column skills resolve against the canonical ally formation instead of every living party member; all skills remain all-target.",
+      "evidence": [
+        "js/00-main.js",
+        "js/battlefield-slot-owner.js",
+        "tests/fixed-battlefield-ally-formation.test.js"
+      ],
+      "remaining": "In the dev runtime, let an enemy cast tri or row against a split front/back three-person formation and capture only the legal row targets receiving damage."
+    }
+  ],
+  "blockers": [
+    "Awaiting real dev battle runtime verification; synthetic QA and CI do not satisfy this batch."
+  ]
+}
