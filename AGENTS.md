@@ -8,13 +8,14 @@
 6. **修改前必須先在回報中列出：本次功能的 owner 檔案、主要函式、現有 wrapper／後續覆蓋點，以及是否需要暫時補丁。未完成此檢查不得修改。**
 7. **不得自行把 `low / mid / high / perfect` 或「低階／中階／高階／完美」當成新的正式物品階級；正式六階與固定色號一律以 `docs/ITEM_RARITY_UI_SPEC.md` 為準。**
 8. **凡涉及新增、替換、轉檔或正式導入任何點陣圖片資產，必須先完整閱讀 `docs/IMAGE_ASSET_SPEC.md`。該文件是圖片格式、WebP 轉換、無損驗證、透明度、尺寸、Sprite Sheet／VFX 幀資料與正式引用流程的最高權威來源。**
+9. **凡任務屬於修復 Bug、`fix`、failure、test failure、CI failure、fixture、test harness 或 stale contract，且使用者未在當次任務指定其他模式，必須先完整閱讀 `AUTONOMOUS_REPAIR_CONTRACT.md`，並依其中「受控自主修復契約」執行。該文件是自主修復範圍、failure 額度、可執行驗證門檻與硬停止條件的唯一正式來源；不得依舊對話摘要或記憶自行放寬。**
 
 ## 《四象江湖傳》專案開發、QA 與外部研究固定規則
 
 本章為永久固定開發規範。除非專案負責人日後明確要求修改，所有程式開發、Bug 修正、功能新增／調整、程式重構、GitHub 操作、Pull Request、Repository checks、GitHub Actions、瀏覽器測試、QA、自動化測試、技術研究、除錯與程式碼搜尋，都必須遵守以下原則。既有第 1～7 條為本章的具體前置要求，內容重疊時合併理解，不重複建立第二套標準。
 
 ### 一、專案內部資料永遠優先
-- 所有判斷、修改與除錯，先依據目前 Repository 的正式規格、程式碼、資料結構、函式、模組、遊戲規則、共用工具、既有測試、GitHub Actions、Repository checks，以及 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`UI_GUIDELINES.md`、`CHECK_REPORT.txt` 等正式文件。
+- 所有判斷、修改與除錯，先依據目前 Repository 的正式規格、程式碼、資料結構、函式、模組、遊戲規則、共用工具、既有測試、GitHub Actions、Repository checks，以及 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`UI_GUIDELINES.md`、`AUTONOMOUS_REPAIR_CONTRACT.md`、`CHECK_REPORT.txt` 等正式文件。
 - 每次先確認：「本專案是不是已經有現成做法？」若已有，優先沿用，不得因外部案例看起來方便就擅自偏離現有架構。
 
 ### 二、禁止無關外部遊戲研究
@@ -57,7 +58,6 @@
 - 修改前搜尋本專案是否已有共用函式、UI 元件、資料結構、排序、戰鬥計算、技能／狀態處理、工具函式與測試流程；已有者優先復用。
 - 修 Bug 必須找真正原因，做最小且正確的修復；避免魔法數字、多層 `if` 擋錯、重複 workaround、只修畫面不修資料、只修單一案例卻破壞其他流程。
 - 同時不得因追求完美而過度重構；遵守 `ARCHITECTURE_RULES.md` 的 owner 與 patch 收斂規則。
-
 ### 八、QA 的正式定義與檢查範圍
 - QA = Quality Assurance（品質保證／品質驗證），目的在確認《四象江湖傳》修改後仍正常運作，不代表研究、比較或抄用其他遊戲。
 - 依任務需要可檢查：遊戲載入、JavaScript／Console 新錯誤、UI 跑版／重疊、按鈕與觸控、頁面切換、捲動、Canvas、戰鬥、技能、背包、裝備、商店、副本、修改是否生效、手機尺寸／觸控、載入流程與回歸問題。
