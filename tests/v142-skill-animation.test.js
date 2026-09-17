@@ -25,6 +25,7 @@ function makeSkillDatabase(){
         explosiveFlurry:{id:"explosiveFlurry",name:"火爆亂擊",element:"fire",category:"physical",targetType:"tri",tier:2},
         phoenixCry:{id:"phoenixCry",name:"火鳳天鳴",element:"fire",category:"magic",targetType:"all",tier:4},
         frostCrush:{id:"frostCrush",name:"冰封重擊",element:"water",category:"physical",targetType:"single",tier:3},
+        iceArrowRain:{id:"iceArrowRain",name:"冰霜箭雨",element:"water",category:"magic",targetType:"all",tier:3},
         stormRain:{id:"stormRain",name:"風起雲湧",element:"wind",category:"magic",targetType:"all",tier:4},
         dustStorm:{id:"dustStorm",name:"地牛猛襲",element:"earth",category:"magic",targetType:"all",tier:4},
         healSpell:{id:"healSpell",name:"治療術",element:"water",category:"heal",targetType:"ally",tier:3},
@@ -358,7 +359,7 @@ function createContext(options={}){
         assert.equal(calls.begin,1);
     });
 
-    await test("background resume completes an expired action without double resolve",async()=>{
+    await test("the timing owner completes an expired render-owned action without double resolve",async()=>{
         const {context,scheduler}=createContext();
         let completions=0;
         const gate=context.v142SkillAnimationDirector.play(
@@ -369,8 +370,24 @@ function createContext(options={}){
         context.v142SkillAnimationDirector.notifyVisibilityReturn();
         context.v142SkillAnimationDirector.notifyVisibilityReturn();
         await Promise.resolve();
-        assert.equal(gate.reason,"visibility-resume");
+        assert.equal(gate.reason,"v142-render-safety-deadline");
         assert.equal(completions,1);
+    });
+
+    await test("render:false never disables the combat-deadlock safety deadline",async()=>{
+        const {context,scheduler}=createContext();
+        const gate=context.v142SkillAnimationDirector.play(
+            context.v142GetSkillAnimationConfig("iceArrowRain"),
+            {side:"player",actorIndex:0,render:false}
+        );
+        assert.equal(gate.done,false);
+        scheduler.advance(1599);
+        assert.equal(gate.done,false);
+        scheduler.advance(1600);
+        await Promise.resolve();
+        assert.equal(gate.done,true);
+        assert.equal(gate.reason,"v142-render-safety-deadline");
+        assert.equal(gate.completionCount,1);
     });
 
     await test("direct badge trigger shares one gate-only director while V143 owns rendering",()=>{

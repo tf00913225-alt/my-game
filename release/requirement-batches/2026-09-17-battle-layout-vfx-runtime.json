@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-17-battle-layout-vfx-runtime",
+  "baseBranch": "dev",
+  "baseCommit": "b38411944c8c01b56faa6308f41d969644d82b25",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "completion": "NOT COMPLETE",
+  "verificationPolicy": "Source and automated checks are supplementary. A fully loaded deployed dev battle at portrait-mobile dimensions must prove turn progression, three-region layout, unclipped VFX and survivor-independent single/tri/all footprints before this batch is complete.",
+  "requirements": [
+    {
+      "id": "P1-ACTION-GATE-FAILSAFE",
+      "status": "IMPLEMENTED",
+      "requirement": "A raster VFX render or geometry failure cannot leave a player action awaiting forever; combat advances through one bounded timing gate.",
+      "evidence": [
+        "js/37-v142-skill-animation.js",
+        "js/39-v143-skill-animation.js",
+        "tests/v142-skill-animation.test.js",
+        "tests/battle-layout-vfx-runtime-20260917.test.js"
+      ],
+      "remaining": "On deployed dev, repeatedly cast Ice Arrow Rain and confirm damage settlement and the following turn continue without a frozen battle."
+    },
+    {
+      "id": "THREE-REGION-PORTRAIT-LAYOUT",
+      "status": "IMPLEMENTED",
+      "requirement": "Portrait battle uses separate enemy, operation/status and ally regions; equal-type fixed slots and cards have equal dimensions, with enemies and allies visibly larger and no region intrusion.",
+      "evidence": [
+        "index.html",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
+        "tests/fixed-slot-battlefield-rendering-v2.test.js"
+      ],
+      "remaining": "Verify normal, BOSS, reinforcement and three-ally battles on deployed dev at multiple portrait-phone dimensions."
+    },
+    {
+      "id": "SURVIVOR-INDEPENDENT-RANGE-VFX",
+      "status": "IMPLEMENTED",
+      "requirement": "For all four elements, single VFX uses one-card geometry, tri VFX keeps a three-person footprint with one, two or three survivors, and all-target VFX always covers the complete fixed-side battlefield region.",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "tests/v150-ice-arrow-rain-vfx.test.js",
+        "tests/v173.23-wind-vfx.test.js",
+        "tests/battle-layout-vfx-runtime-20260917.test.js"
+      ],
+      "remaining": "Capture representative fire, water, wind and earth single/tri/all casts on deployed dev, including Ice Arrow Rain after enemy deaths."
+    },
+    {
+      "id": "UNCLIPPED-ACTUAL-SLOT-ANCHORS",
+      "status": "IMPLEMENTED",
+      "requirement": "Battle VFX is not clipped by unit, slot or battle-region containers; single attacks remain centered on the actual card and range geometry is derived from live Fixed Slot/card bounding boxes rather than hard-coded coordinates.",
+      "evidence": [
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/39-v143-skill-animation.js",
+        ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
+        "tests/battle-layout-vfx-runtime-20260917.test.js"
+      ],
+      "remaining": "Inspect deployed dev VFX bounds and centers during real portrait-mobile combat."
+    },
+    {
+      "id": "WIND-FLAME-SINGLE-RASTER-STAGE",
+      "status": "IMPLEMENTED",
+      "requirement": "Wind Flame uses one shared range raster node and stale V143 stages are removed before the next cast so overlapping sheets cannot appear as two simultaneous videos.",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "tests/v173.23-wind-vfx.test.js",
+        "tests/battle-layout-vfx-runtime-20260917.test.js"
+      ],
+      "remaining": "Cast Wind Flame repeatedly on deployed dev and confirm only one visible raster stage/node per cast."
+    }
+  ],
+  "blockers": [
+    "The candidate has not yet completed Repository checks and has not been merged/deployed to dev.",
+    "Fully loaded deployed-dev portrait combat verification is still required."
+  ]
+}

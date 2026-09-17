@@ -32,7 +32,8 @@
     },
     "gameplay-core": {
       "scripts": [
-        "__BUILD_GAMEPLAY_CORE__"
+        "__BUILD_GAMEPLAY_CORE_PRIMARY__",
+        "__BUILD_GAMEPLAY_CORE_SECONDARY__"
       ],
       "styles": [
         "__BUILD_GAMEPLAY_CORE_STYLE__"

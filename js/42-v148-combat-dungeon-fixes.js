@@ -57,161 +57,81 @@
         };
     }
 
-    /*
-       Rendered DOM rows may lose dead cards, so they are only presentation
-       truth. Skill adjacency and auto-target order must use the full formation
-       that existed when the battle began; otherwise two surviving far-edge
-       monsters become false neighbours after the middle cards disappear.
-    */
-    function cardIndex(card){
-        const match=card&&String(card.id||"").match(/^battleMonster(\d+)$/);
-        return match?Number(match[1]):null;
+    function battlefieldSlots(){
+        return window.FourSymbolsBattlefieldSlots||null;
     }
 
-    function visualFormationRows(indexes){
-        const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
-        const allowed=new Set(ordered);
+    function monsterAlive(index){
+        const monster=typeof monsters!=="undefined"?monsters[index]:null;
+        return !!(monster&&monster.alive!==false&&numeric(monster.hp)>0);
+    }
 
-        if(typeof document!=="undefined"){
-            const area=document.getElementById("battleMonsterArea");
-            const rowNodes=area&&area.querySelectorAll
-                ?Array.from(area.querySelectorAll(":scope > .v131-monster-row")):[];
-            const domRows=rowNodes.map(row=>Array.from(row.children||[])
-                .map(cardIndex).filter(index=>index!==null&&allowed.has(index))
-            ).filter(row=>row.length);
-            if(domRows.length&&domRows.flat().some(index=>allowed.has(index))){ return domRows; }
+    function activeFormationSnapshot(indexes){
+        const owner=battlefieldSlots();
+        if(!owner){ return null; }
+        let snapshot=owner.getActiveEnemySnapshot();
+        if(!snapshot&&typeof window.v138EnsureEnemyFormationSnapshot==="function"){
+            snapshot=window.v138EnsureEnemyFormationSnapshot(indexes||[]);
         }
-
-        if(typeof monsters!=="undefined"){
-            const fixed=ordered.map(index=>({index:index,monster:monsters[index]}))
-                .filter(entry=>entry.monster&&Number.isInteger(entry.monster.v141FormationRow));
-            if(fixed.length){
-                const rowNumbers=Array.from(new Set(fixed.map(entry=>entry.monster.v141FormationRow)))
-                    .sort((a,b)=>a-b);
-                return rowNumbers.map(rowNumber=>fixed
-                    .filter(entry=>entry.monster.v141FormationRow===rowNumber)
-                    .sort((a,b)=>numeric(a.monster.v141FormationPosition)-numeric(b.monster.v141FormationPosition))
-                    .map(entry=>entry.index)
-                );
-            }
-        }
-
-        if(typeof window.v138GetFormationRows==="function"){
-            const rows=window.v138GetFormationRows(ordered);
-            if(Array.isArray(rows)&&rows.some(row=>Array.isArray(row)&&row.length)){
-                return rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice());
-            }
-        }
-        return ordered.length?[ordered]:[];
+        return snapshot;
     }
 
     function stableFormationRows(indexes){
-        const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
-        if(typeof monsters!=="undefined"){
-            const fixed=ordered.map(index=>({index:index,monster:monsters[index]}))
-                .filter(entry=>entry.monster&&Number.isInteger(entry.monster.v141FormationRow));
-            if(fixed.length){
-                const rowNumbers=Array.from(new Set(fixed.map(entry=>entry.monster.v141FormationRow)))
-                    .sort((a,b)=>a-b);
-                return rowNumbers.map(rowNumber=>fixed
-                    .filter(entry=>entry.monster.v141FormationRow===rowNumber)
-                    .sort((a,b)=>numeric(a.monster.v141FormationPosition)-numeric(b.monster.v141FormationPosition))
-                    .map(entry=>entry.index)
-                );
-            }
-        }
+        const owner=battlefieldSlots();
+        const snapshot=activeFormationSnapshot(indexes);
+        if(owner&&snapshot){ return owner.getAssignedEnemyRows(snapshot); }
         if(typeof window.v138GetFormationRows==="function"){
-            const rows=window.v138GetFormationRows(ordered);
-            if(Array.isArray(rows)&&rows.some(row=>Array.isArray(row)&&row.length)){
-                return rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice());
-            }
+            const rows=window.v138GetFormationRows((indexes||[]).filter(Number.isInteger));
+            if(Array.isArray(rows)){ return rows.filter(Array.isArray).map(row=>row.slice()); }
         }
-        return visualFormationRows(ordered);
+        const ordered=(indexes||[]).filter(Number.isInteger);
+        return ordered.length?[ordered]:[];
     }
 
     function centerFirstOrder(row){
-        const values=(row||[]).slice();
+        const values=(row||[]).filter(Number.isInteger);
         if(values.length<=1){ return values; }
         const order=[];
-        const leftCenter=Math.floor((values.length-1)/2);
-        const rightCenter=Math.ceil((values.length-1)/2);
-        order.push(leftCenter);
-        if(rightCenter!==leftCenter){ order.push(rightCenter); }
+        const center=Math.floor((values.length-1)/2);
+        order.push(center);
         for(let distance=1;order.length<values.length;distance++){
-            const left=leftCenter-distance;
-            const right=rightCenter+distance;
-            if(left>=0){ order.push(left); }
-            if(right<values.length){ order.push(right); }
+            if(center+distance<values.length){ order.push(center+distance); }
+            if(center-distance>=0){ order.push(center-distance); }
         }
-        return order.map(position=>values[position]).filter(index=>Number.isInteger(index));
+        return order.map(position=>values[position]);
     }
 
     const REFERENCE_TARGET_ORDER_6=[4,1,3,6,2,5];
     const REFERENCE_TARGET_ORDER_10=[7,2,6,1,5,10,4,9,3,8];
 
-    function referenceTargetPriority(rows){
-        const flat=(rows||[]).flat().filter(index=>Number.isInteger(index));
-        const order=flat.length===6?REFERENCE_TARGET_ORDER_6:flat.length===10?REFERENCE_TARGET_ORDER_10:null;
-        if(!order){ return null; }
-        return flat.map((index,position)=>({index:index,order:order[position]}))
-            .sort((a,b)=>a.order-b.order).map(entry=>entry.index);
-    }
-
     function autoTargetPriority(indexes){
-        const ordered=(indexes||[]).filter(index=>Number.isInteger(index));
+        const ordered=(indexes||[]).filter(Number.isInteger);
+        const owner=battlefieldSlots();
+        const snapshot=activeFormationSnapshot(ordered);
+        if(owner&&snapshot){
+            return owner.getPriorityMonsterIndexes(snapshot,monsterAlive);
+        }
         if(typeof monsters!=="undefined"&&ordered.length){
-            const explicit=ordered.map(index=>({
-                index:index,
-                order:monsters[index]&&Number(monsters[index].v148TargetOrder)
-            }));
+            const explicit=ordered.map(index=>({index:index,order:monsters[index]&&Number(monsters[index].v148TargetOrder)}));
             if(explicit.every(entry=>Number.isFinite(entry.order))){
-                return explicit.sort((a,b)=>a.order-b.order).map(entry=>entry.index);
+                return explicit.sort((a,b)=>a.order-b.order).map(entry=>entry.index).filter(monsterAlive);
             }
         }
-        const reference=referenceTargetPriority(stableFormationRows(ordered));
-        if(reference){ return reference; }
-        return stableFormationRows(ordered).flatMap(centerFirstOrder);
+        return stableFormationRows(ordered).flatMap(centerFirstOrder).filter(monsterAlive);
     }
 
     if(typeof getSkillTargets==="function"){
         const previousGetSkillTargets=getSkillTargets;
         getSkillTargets=function(centerIndex,targetType){
-            const indexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[];
-            const alive=indexes.filter(index=>{
-                const monster=typeof monsters!=="undefined"?monsters[index]:null;
-                return !!(monster&&monster.alive!==false&&numeric(monster.hp)>0);
-            });
-            if(targetType==="all"){ return alive; }
-            if(targetType==="single"){ return alive.includes(centerIndex)?[centerIndex]:[]; }
-            if(targetType==="tri"||targetType==="row"){
-                const row=stableFormationRows(indexes).find(candidate=>candidate.includes(centerIndex));
-                if(!row){ return []; }
-                const position=row.indexOf(centerIndex);
-                const selected=targetType==="row"
-                    ?row
-                    :row.slice(Math.max(0,position-1),Math.min(row.length,position+2));
-                return selected.filter(index=>alive.includes(index));
-            }
-            if(targetType==="column"){
-                const rows=stableFormationRows(indexes);
-                const selectedRow=rows.find(candidate=>candidate.includes(centerIndex));
-                if(!selectedRow){ return []; }
-                const selectedMonster=typeof monsters!=="undefined"?monsters[centerIndex]:null;
-                const explicitPosition=selectedMonster&&Number.isInteger(selectedMonster.v141FormationPosition)
-                    ?selectedMonster.v141FormationPosition:null;
-                const fallbackPosition=Math.max(0,selectedRow.indexOf(centerIndex));
-                return rows.map(row=>{
-                    if(explicitPosition!==null&&typeof monsters!=="undefined"){
-                        const exact=row.find(index=>
-                            monsters[index]&&monsters[index].v141FormationPosition===explicitPosition
-                        );
-                        if(Number.isInteger(exact)){ return exact; }
-                    }
-                    return row[fallbackPosition];
-                }).filter(index=>Number.isInteger(index)&&alive.includes(index)).slice(0,2);
+            const owner=battlefieldSlots();
+            const snapshot=activeFormationSnapshot(
+                typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]
+            );
+            if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
+                return owner.resolveEnemyTargets(snapshot,centerIndex,targetType,monsterAlive);
             }
             const legacy=previousGetSkillTargets.apply(this,arguments);
-            return Array.isArray(legacy)?legacy.filter(index=>alive.includes(index)):[];
+            return Array.isArray(legacy)?legacy.filter(monsterAlive):[];
         };
     }
 
@@ -341,26 +261,37 @@
         return {character:character,key:key,level:level,cost:cost,stats:stats};
     }
 
-    function animateSupportCast(state,characterIndex,skill){
+    function animateSupportCast(state,characterIndex,skill,targetId,targetIds,targetSide){
         state.character.sp=Math.max(0,numeric(state.character.sp)-state.cost);
         if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
-        if(typeof showSkillNameBadge==="function"){ showSkillNameBadge(skill.name,skill.element,characterIndex); }
+        if(typeof showSkillNameBadge==="function"){
+            showSkillNameBadge(skill.name,skill.element,characterIndex,targetId,targetIds,targetSide);
+        }
         if(typeof showPlayerSpPopup==="function"){
             setTimeout(()=>showPlayerSpPopup(state.cost,characterIndex),500);
         }
     }
 
     function requestedBuffTargets(characterIndex,queued,skill){
-        if(skill.targetType==="allyAll"){ return livingPartyIndexes(); }
-        if(skill.targetType==="allyTri"){
-            const living=livingPartyIndexes();
-            if(living.length<=3){ return living; }
-            const all=partyIndexes();
-            const preferred=Number.isInteger(queued.targetAlly)?queued.targetAlly:all[Math.floor(all.length/2)];
-            const position=Math.max(0,all.indexOf(preferred));
-            return all.slice(Math.max(0,position-1),Math.min(all.length,position+2))
-                .filter(index=>living.includes(index));
+        const owner=battlefieldSlots();
+        const all=partyIndexes();
+        const living=index=>{
+            const target=getPartyCharacterByIndex(index);
+            return !!(target&&numeric(target.hp)>0);
+        };
+        if(owner&&typeof owner.ensureAllyFormation==="function"&&typeof owner.resolveAllyTargets==="function"){
+            const formation=owner.ensureAllyFormation(all);
+            if(skill.targetType==="allyAll"){
+                return owner.resolveAllyTargets(formation,null,"all",living);
+            }
+            if(skill.targetType==="allyTri"){
+                const preferred=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+                return owner.resolveAllyTargets(formation,preferred,"allyTri",living);
+            }
+            const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+            return owner.resolveAllyTargets(formation,selected,"ally",living);
         }
+        if(skill.targetType==="allyAll"){ return livingPartyIndexes(); }
         const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
         const target=getPartyCharacterByIndex(selected);
         return target&&numeric(target.hp)>0?[selected]:[];
@@ -399,7 +330,7 @@
             return !activeBuff(target,skill.id);
         });
 
-        animateSupportCast(state,characterIndex,skill);
+        animateSupportCast(state,characterIndex,skill,requested[0],requested,"player");
         const extra=buffFields(skill,state.level);
         eligible.forEach(index=>{
             const target=getPartyCharacterByIndex(index);
@@ -449,7 +380,7 @@
     function resolvePartyHeal(characterIndex,queued,skill,state){
         const targets=requestedBuffTargets(characterIndex,queued,skill);
         if(!targets.length){ return finishSupport(skill.name+"目前沒有可治療的存活目標。"); }
-        animateSupportCast(state,characterIndex,skill);
+        animateSupportCast(state,characterIndex,skill,targets[0],targets,"player");
         let hpTotal=0;
         let spTotal=0;
         let cleansedTotal=0;
@@ -492,7 +423,7 @@
         const targetStats=getPartyBattleStats(targetIndex);
         if(!targetStats){ return finishSupport("復活目標資料無法讀取。"); }
 
-        animateSupportCast(state,characterIndex,skill);
+        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player");
         const exSkill=typeof skillDatabase!=="undefined"?skillDatabase[skill.element+"EX"]:null;
         const exLevel=Math.max(0,Math.floor(numeric(getSkillLevel(state.key,skill.element+"EX"))));
         const multiplier=exSkill&&exLevel>0&&numeric(exSkill.healBonusPercent)>0
@@ -550,7 +481,7 @@
             if(!enemy||!isCurrent||enemy.alive===false||numeric(enemy.hp)<=0){
                 return finishSupport(skill.name+"目前沒有有效目標。");
             }
-            animateSupportCast(state,characterIndex,skill);
+            animateSupportCast(state,characterIndex,skill,enemyIndex,[enemyIndex],"monster");
             clearEnemyPositiveStates(enemy);
             if(typeof window.v141PlayCardEffect==="function"){
                 window.v141PlayCardEffect("monster",enemyIndex,"buff");
@@ -564,7 +495,7 @@
         const targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
         const target=getPartyCharacterByIndex(targetIndex);
         if(!target||numeric(target.hp)<=0){ return finishSupport(skill.name+"目前沒有有效目標。"); }
-        animateSupportCast(state,characterIndex,skill);
+        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player");
         const negativeCount=Array.isArray(target.statusEffects)?target.statusEffects.length:0;
         const buffCount=Array.isArray(target.activeBuffs)?target.activeBuffs.length:0;
         target.statusEffects=[];
@@ -668,21 +599,18 @@
 
     function bestMonsterRageTargets(casterIndex){
         const indexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[];
-        const alive=indexes.filter(index=>{
-            const monster=monsters[index];
-            return monster&&monster.alive!==false&&numeric(monster.hp)>0;
-        });
+        const alive=indexes.filter(monsterAlive);
+        const owner=battlefieldSlots();
+        const snapshot=activeFormationSnapshot(indexes);
         let best=[];
         let bestScore=-1;
-        stableFormationRows(indexes).forEach(row=>{
-            row.forEach((center,index)=>{
-                if(!alive.includes(center)){ return; }
-                const trio=row.slice(Math.max(0,index-1),Math.min(row.length,index+2))
-                    .filter(target=>alive.includes(target));
-                const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
-                const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
-                if(score>bestScore){ best=trio; bestScore=score; }
-            });
+        alive.forEach(center=>{
+            const trio=owner&&snapshot
+                ?owner.resolveEnemyTargets(snapshot,center,"tri",monsterAlive)
+                :[center];
+            const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
+            const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
+            if(score>bestScore){ best=trio; bestScore=score; }
         });
         return best.slice(0,3);
     }
@@ -841,6 +769,12 @@
         resolveQueuedPlayerAction=function(characterIndex){
             if(settleDefeatedEnemies()){ return; }
             const queued=typeof queuedPlayerActions!=="undefined"?queuedPlayerActions[characterIndex]:null;
+            if(queued&&queued.vFixedAutoEnemyPrimary===true){
+                const nextTarget=autoTargetPriority(
+                    typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]
+                )[0];
+                if(Number.isInteger(nextTarget)){ queued.target=nextTarget; }
+            }
             const skill=queued&&typeof skillDatabase!=="undefined"?skillDatabase[queued.action]:null;
             if(queued&&skill&&["buff","heal","revive"].includes(skill.category)){
                 return resolveSupportAction(characterIndex,Object.assign({},queued),skill);
@@ -1016,6 +950,8 @@
         resetBattleAdvanceTimers();
         if(typeof closeMenus==="function"){ closeMenus(); }
         if(typeof clearBattleTargetSelectionMode==="function"){ clearBattleTargetSelectionMode(); }
+        const slotOwner=battlefieldSlots();
+        if(slotOwner){ slotOwner.clearActiveEnemySnapshot(); }
         renderBattle();
         const priority=autoTargetPriority(currentBattleMonsters);
         selectedMonster=priority.length?priority[0]:0;

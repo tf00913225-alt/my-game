@@ -7,6 +7,7 @@ const zlib=require("node:zlib");
 
 const assetPath="assets/vfx/water/frost-arrow-rain-vfx.png";
 const asset=fs.readFileSync(assetPath);
+const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
@@ -92,6 +93,18 @@ function loadRuntime(livingIndexes){
     body.appendChild(monsterArea);
     body.appendChild(playerArea);
     const cards={battleMonsterArea:monsterArea,battlePlayerRow:playerArea};
+    const fixedSlotNodes={};
+    ["B","F"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=5;column++){
+            const slot="ENEMY_"+row+column;
+            const left=240+(column-1)*91;
+            const top=rowIndex===0?30:200;
+            const node=makeNode({left,top,right:left+76,bottom:top+100,width:76,height:100});
+            node.className="v-fixed-enemy-slot";
+            node.dataset.slot=slot;
+            fixedSlotNodes['.v-fixed-enemy-slot[data-slot="'+slot+'"]']=node;
+        }
+    });
     const monsterRects=[
         {left:280,top:80,right:356,bottom:180,width:76,height:100},
         {left:400,top:80,right:476,bottom:180,width:76,height:100},
@@ -130,6 +143,7 @@ function loadRuntime(livingIndexes){
             body,
             createElement(){ return makeNode(); },
             getElementById(id){ return cards[id]||null; },
+            querySelector(selector){ return fixedSlotNodes[selector]||body.querySelector(selector); },
             querySelectorAll(selector){ return body.querySelectorAll(selector); }
         },
         monsters,
@@ -155,6 +169,9 @@ function loadRuntime(livingIndexes){
         dispose(){}
     };
     vm.createContext(context);
+    vm.runInContext(slotOwnerSource,context);
+    const owner=context.FourSymbolsBattlefieldSlots;
+    owner.setActiveEnemySnapshot(owner.createEnemyFormationSnapshot([0,1,2],{originalFormationType:3}));
     vm.runInContext(animation,context);
     return {context,body,scheduled,hitCalls:()=>hitCalls};
 }
@@ -200,22 +217,34 @@ test("one shared raster sheet stays locked to the complete enemy formation after
     const placements=[];
     [[1],[0,1,2]].forEach(indexes=>{
         const runtime=loadRuntime(indexes);
+        const targetId=indexes[0];
         runtime.context.v142SkillAnimationDirector.play({
             id:"iceArrowRain",name:"冰霜箭雨",element:"water",category:"magic",
             targetType:"all",duration:1600,resolveDuration:1600
-        },{side:"player",actorIndex:0});
+        },{
+            side:"player",actorIndex:0,targetId,targetIds:indexes.slice(),targetSide:"monster",
+            targetContract:{
+                version:"battle-target-contract-v1",targetSide:"monster",
+                targetId,targetIds:indexes.slice()
+            }
+        });
         const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
         const sprites=stage.children.filter(node=>String(node.className).includes("v143-vfx-sprite"));
         assert.equal(sprites.length,1,indexes.join(","));
         const sprite=sprites[0];
         assert.equal(sprite.dataset.placement,"battlefield");
         assert.equal(sprite.dataset.targetSide,"monster");
-        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+        assert.equal(sprite.dataset.areaId,"fixed-enemy-zone");
+        assert.equal(
+            sprite.dataset.geometrySlots,
+            ["ENEMY_B1","ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_B5","ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"].join(",")
+        );
         assert.equal(sprite.dataset.fixedFormation,"true");
         assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
         assert.equal(sprite.style.left,"460px");
         assert.equal(sprite.style.top,"165px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
+        assert.equal(sprite.dataset.frameFit,"stretch");
         assert.equal(sprite.dataset.renderer,"dom-sprite");
         assert.equal(sprite.style.backgroundImage,'url("'+assetPath+'?v=173.19")');
         assert.equal(sprite.style.backgroundSize,"400% 300%");
@@ -223,8 +252,28 @@ test("one shared raster sheet stays locked to the complete enemy formation after
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
         assert.ok(runtime.scheduled.some(timer=>timer.delay>=1590),"full 1.6 second action gate");
     });
-    assert.deepEqual(placements[0],["460px","165px","329px","329px"]);
+    assert.deepEqual(placements[0],["460px","165px","440px","270px"]);
+    assert.equal(Number.parseFloat(placements[0][2]),440,"full-field sheet must fill the fixed enemy-side width");
+    assert.equal(Number.parseFloat(placements[0][3]),270,"full-field sheet must stay inside the fixed enemy-side height");
     assert.deepEqual(placements[1],placements[0],"one survivor and three survivors use the same full-formation footprint");
+});
+
+test("Water three-target casts use one fixed three-slot sheet even when one target survives",()=>{
+    const placements=[];
+    [[1],[0,1,2]].forEach(indexes=>{
+        const runtime=loadRuntime(indexes);
+        runtime.context.v142SkillAnimationDirector.play({
+            id:"iceSpin",name:"冰旋一閃",element:"water",category:"physical",
+            targetType:"tri",duration:1000,resolveDuration:1000
+        },{side:"player",actorIndex:0,targetId:1,targetIds:indexes});
+        const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+        const sprites=stage.children.filter(node=>String(node.className).includes("v143-vfx-sprite"));
+        assert.equal(sprites.length,1,"three-target cast owns one range sheet");
+        assert.equal(sprites[0].dataset.placement,"group");
+        assert.equal(sprites[0].dataset.frameFit,"stretch");
+        placements.push([sprites[0].style.left,sprites[0].style.top,sprites[0].style.width,sprites[0].style.height]);
+    });
+    assert.deepEqual(placements[1],placements[0],"survivor count must not collapse a three-slot footprint");
 });
 
 test("all damage numbers share frame eight while remaining target-specific",()=>{

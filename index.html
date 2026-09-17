@@ -1401,6 +1401,8 @@
 
 <div class="battle-wrap">
 
+<section class="battle-enemy-region" aria-label="敵方戰鬥區">
+
 <div class="battle-title">
      戰鬥
 </div>
@@ -1410,17 +1412,9 @@
     class="battle-monsters"
 ></div>
 
-<!--
-    ★ 新增（依照使用者要求）：
-    這個spacer負責吸收畫面剩餘空間，
-    讓下面「回合倒數框→戰鬥指令框→
-    人物卡牌」緊緊貼在一起、貼齊人物卡牌，
-    同時怪物卡片區本身維持固定/自然高度，
-    不會有兩排怪物卡片被壓縮、跟回合倒數框
-    重疊的風險。
--->
+</section>
 
-<div class="battle-monster-gap-filler"></div>
+<section class="battle-center-region" aria-label="戰鬥操作與回合資訊區">
 
 <!--
     ★ 修正（依照使用者要求，重新設計）：
@@ -1692,47 +1686,29 @@
 
 </div>
 
+</section>
+
+<section class="battle-ally-region" aria-label="我方戰鬥區">
+
 <div
     id="battlePlayerRow"
     class="battle-player-row"
 ></div>
 
-<!--
-    ★ 新增（依照使用者要求重新設計）：
-    戰鬥資訊這次改成單純的固定區塊，
-    放在角色卡片下方，永遠佔固定的一格空間，
-    不再有任何展開/收合、絕對定位、
-    z-index疊放順序的花招——
-    上次那一整套機關就是問題的根源，
-    這次故意做得很陽春：就是一個
-    普通的、永遠在文件流裡的方塊，
-    不會影響上面任何東西的位置，
-    自己這塊也不會被任何東西影響。
--->
+</section>
 
-<!--
-    ★ 新增（依照使用者要求）：
-    「戰鬥資訊」框上方加一個固定顯示目前
-    回合數的小標籤，不會隨著戰鬥紀錄捲動
-    被沖掉——跟turnTargetRow那個計時器/
-    目標不一樣，那個只在手動操作時才顯示，
-    這個不管自動/手動戰鬥都會顯示，單純
-    讓玩家隨時看得到「現在打到第幾輪」。
--->
+<section class="battle-info-region" aria-label="戰鬥資訊區">
 
 <div class="battle-info-header-row">
-
-
-<div id="battleTurnIndicator">
-    第 1 回合
-</div>
-
+    <div id="battleTurnIndicator">第 1 回合</div>
 </div>
 
 <div
     id="battleInfo"
     class="battle-info"
 ></div>
+
+</section>
 
 <!-- V96：底部固定自動戰鬥列已移除。
      戰鬥頁改由上方「元素匣」icon開啟同一套設定。 -->

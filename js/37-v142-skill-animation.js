@@ -224,20 +224,19 @@
             style:config.style,element:config.element,side:meta.side||"player"
         };
 
-        /* V142 is intentionally visual-free. V143 replaces director.play and
-           passes render:false while it renders the formal image Sprite Sheet.
-           If V143 is unavailable, timing still completes without a substitute VFX. */
-        if(meta.render!==false){
-            state.fallbackTimer=setTimeout(
-                ()=>gate.complete("v142-timing-only"),
-                Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
-            );
-            if(typeof document!=="undefined"&&document.addEventListener){
-                state.visibilityHandler=function(){
-                    if(!document.hidden&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
-                };
-                document.addEventListener("visibilitychange",state.visibilityHandler);
-            }
+        /* V142 owns action completion even when V143 owns the pixels. Keep the
+           deadline independent from render:false so a VFX asset/DOM failure can
+           never leave the combat initiative waiting forever. V143 normally
+           completes the same idempotent gate at this deadline. */
+        state.fallbackTimer=setTimeout(
+            ()=>gate.complete(meta.render===false?"v142-render-safety-deadline":"v142-timing-only"),
+            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
+        );
+        if(typeof document!=="undefined"&&document.addEventListener){
+            state.visibilityHandler=function(){
+                if(!document.hidden&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
+            };
+            document.addEventListener("visibilitychange",state.visibilityHandler);
         }
         return gate;
     }
@@ -277,17 +276,31 @@
         },"test-"+state.sequence,onComplete);
     };
 
-    function startFromBadge(side,name,element,actorIndex){
+    function startFromBadge(side,name,element,actorIndex,targetId,targetIds,targetContract){
         if(typeof battleActive!=="undefined"&&!battleActive){ return null; }
         const config=animationConfig(null,name,element);
         if(config.category==="passive"||config.targetType==="none"){ return null; }
-        return director.play(config,{
+        const meta={
             side:side,actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
             key:identity(side,name,actorIndex)
-        });
+        };
+        const contract=targetContract&&targetContract.version==="battle-target-contract-v1"
+            ?targetContract
+            :Object.freeze({
+                version:"battle-target-contract-v1",
+                side:side,
+                actorIndex:meta.actorIndex,
+                targetId:targetId!==undefined?targetId:null,
+                targetIds:Object.freeze(Array.isArray(targetIds)?targetIds.slice():[])
+            });
+        meta.targetContract=contract;
+        meta.targetSide=contract.targetSide;
+        meta.targetId=contract.targetId!==undefined?contract.targetId:null;
+        meta.targetIds=Array.isArray(contract.targetIds)?contract.targetIds.slice():[];
+        return director.play(config,meta);
     }
-    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex){
-        return startFromBadge(side,name,element,actorIndex);
+    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex,targetId,targetIds,targetContract){
+        return startFromBadge(side,name,element,actorIndex,targetId,targetIds,targetContract);
     };
 
     function currentGate(){

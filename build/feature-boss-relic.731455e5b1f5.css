@@ -690,15 +690,26 @@
     min-height:0;
     box-sizing:border-box;
     flex:0 0 auto;
+    grid-template-columns:repeat(3,minmax(0,1fr));
     align-items:flex-start;
     justify-content:center;
-    gap:8px;
+    gap:4px;
     margin:3px auto 0;
     pointer-events:none;
 }
 
 #game-stage #battleMonsterArea .boss-mechanism-slot.active{
+    display:grid;
+}
+
+#game-stage #battleMonsterArea .boss-mechanism-position{
+    position:relative;
     display:flex;
+    min-width:0;
+    min-height:0;
+    align-items:flex-start;
+    justify-content:center;
+    pointer-events:none;
 }
 
 /* Mechanism cards are 50% larger than their original 82–92px owner size.

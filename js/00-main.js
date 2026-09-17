@@ -4045,6 +4045,28 @@ let battleAdvanceTimeoutId=null;
 let battleAdvanceScheduled=false;
 const BATTLE_DECLARE_ADVANCE_MS=90;
 const BATTLE_RESOLVE_ADVANCE_MS=520;
+const BATTLE_ACTION_WATCHDOG_MS=7000;
+let battleActionWatchdogTimeoutId=null;
+
+function clearBattleActionWatchdog(){
+    if(!battleActionWatchdogTimeoutId){ return; }
+    clearTimeout(battleActionWatchdogTimeoutId);
+    battleActionWatchdogTimeoutId=null;
+}
+
+function armBattleActionWatchdog(token,index){
+    clearBattleActionWatchdog();
+    battleActionWatchdogTimeoutId=setTimeout(()=>{
+        battleActionWatchdogTimeoutId=null;
+        if(!battleActive||token!==battleToken||index!==initiativeIndex||battleAdvanceScheduled){ return; }
+        console.error("戰鬥行動超過安全期限，已釋放流程閘門。",{token:token,initiativeIndex:index});
+        addBattleLog("本次行動未正常回收，已由安全閘門強制繼續。");
+        const director=typeof window!=="undefined"?window.v142SkillAnimationDirector:null;
+        const gate=director&&typeof director.getActive==="function"?director.getActive():null;
+        if(gate&&!gate.done&&typeof gate.complete==="function"){ gate.complete("combat-action-watchdog"); }
+        finishPlayerAction();
+    },BATTLE_ACTION_WATCHDOG_MS);
+}
 
 let monsterMoveId=null;
 
@@ -6388,6 +6410,18 @@ function saveGame(options={}){
             autoConfig3:
                 autoConfig3,
 
+            allyFormation:
+                (
+                    typeof window!=="undefined" &&
+                    window.FourSymbolsBattlefieldSlots &&
+                    typeof window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation==="function"
+                )
+                ? window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation()
+                : (
+                    existingRelicSaveData &&
+                    existingRelicSaveData.allyFormation
+                ),
+
             /*
                Team Relic persistence uses this same SAVE_KEY document.
                On the first save during reload its late runtime does not
@@ -6990,6 +7024,24 @@ function loadGame(){
                 characterSkillLoadouts.player3={name:player3.id,skillLevels:{},equippedSkills:[]};
             }
         }
+
+        const savedAllyFormation=
+            data.allyFormation && typeof data.allyFormation==="object"
+            ? data.allyFormation
+            : null;
+        if(
+            typeof window!=="undefined" &&
+            window.FourSymbolsBattlefieldSlots &&
+            typeof window.FourSymbolsBattlefieldSlots.hydrateAllyFormation==="function"
+        ){
+            window.FourSymbolsBattlefieldSlots.hydrateAllyFormation(
+                savedAllyFormation,
+                getExistingPartyIndexes()
+            );
+        }else if(typeof window!=="undefined"){
+            window.__fourSymbolsPendingAllyFormation=savedAllyFormation;
+        }
+
 
         /*
            ★ 技能配裝資料（新增）
@@ -10036,6 +10088,7 @@ function startBattle(triggerIndex){
         clearTimeout(battleAdvanceTimeoutId);
         battleAdvanceTimeoutId=null;
     }
+    clearBattleActionWatchdog();
     battleAdvanceScheduled=false;
 
 
@@ -11197,7 +11250,7 @@ function selectBattleAllyTarget(index){
 
     if(
         !skill ||
-        !(skill.targetType==="ally" || skill.targetType==="deadAlly") ||
+        !(skill.targetType==="ally" || skill.targetType==="allyTri" || skill.targetType==="deadAlly") ||
         !isValidAllyTargetForSkill(skill,character,index)
     ){
         return;
@@ -11498,7 +11551,7 @@ function prepareAction(type){
             }
 
             /* 單體我方技能先選角色；全體技能維持直接宣告。 */
-            if(skill.targetType==="ally" || skill.targetType==="deadAlly"){
+            if(skill.targetType==="ally" || skill.targetType==="allyTri" || skill.targetType==="deadAlly"){
 
                 const hasValidTarget=[0,1,2].some(index=>
                     isValidAllyTargetForSkill(
@@ -12544,6 +12597,8 @@ function processNextCombatant(token){
         initiativeIndex
     );
 
+    armBattleActionWatchdog(token,initiativeIndex);
+
 
     const entry=
 
@@ -12621,18 +12676,30 @@ function processNextCombatant(token){
            真正拿出來執行。
         */
 
-        resolveQueuedPlayerAction(
-            entry.characterIndex,
-            token
-        );
+        try{
+            resolveQueuedPlayerAction(
+                entry.characterIndex,
+                token
+            );
+        }catch(error){
+            console.error("結算玩家行動時發生未攔截例外：",error);
+            addBattleLog("結算玩家行動時發生例外，已由安全閘門繼續。");
+            finishPlayerAction();
+        }
 
     }
     else{
 
-        processSingleMonsterAttack(
-            entry.monsterIndex,
-            token
-        );
+        try{
+            processSingleMonsterAttack(
+                entry.monsterIndex,
+                token
+            );
+        }catch(error){
+            console.error("結算敵方行動時發生未攔截例外：",error);
+            addBattleLog("結算敵方行動時發生例外，已由安全閘門繼續。");
+            finishPlayerAction();
+        }
 
     }
 
@@ -15469,6 +15536,12 @@ function castDamageSkill(skillId){
         return;
     }
 
+    const targets =
+        getSkillTargets(
+            centerIndex,
+            skill.targetType
+        );
+
 
     player.sp -=
         skill.spCost;
@@ -15479,7 +15552,10 @@ function castDamageSkill(skillId){
 
     showSkillNameBadge(
         skill.name,
-        skill.element
+        skill.element,
+        0,
+        skill.targetType==="all"?null:centerIndex,
+        targets
     );
 
 
@@ -15501,13 +15577,6 @@ function castDamageSkill(skillId){
         :
         stats.attack;
 
-
-
-    const targets =
-        getSkillTargets(
-            centerIndex,
-            skill.targetType
-        );
 
 
     /*
@@ -16720,7 +16789,10 @@ function normalAttack(){
 
     showSkillNameBadge(
         "普通攻擊",
-        "normal"
+        "normal",
+        0,
+        index,
+        [index]
     );
 
 
@@ -16903,7 +16975,10 @@ function windArrowAttack(){
 
     showSkillNameBadge(
         skillDatabase.windArrow.name,
-        "wind"
+        "wind",
+        0,
+        index,
+        [index]
     );
 
 
@@ -17357,39 +17432,6 @@ function processSingleMonsterAttack(monsterIndex,token){
            可以套用。
         */
 
-        showMonsterSkillNameBadge(
-            castSkillName,
-            (
-                castSkillData &&
-                castSkillData.element
-            )
-            ||
-            monster.element
-            ||
-            "normal",
-            monsterIndex
-        );
-
-    }
-    else{
-
-        /*
-           ★ 新增（依照使用者要求，「為何野怪
-           普通攻擊時沒有字樣顯示」）：
-           玩家普通攻擊（normalAttack()／
-           player2NormalAttack()）都會跳出
-           「普通攻擊」字樣，怪物只有施放技能
-           那個分支有做（上面if(usesSkill)裡），
-           普通攻擊這邊當初漏掉了，兩邊
-           不對稱，補上讓兩邊一致。
-        */
-
-        showMonsterSkillNameBadge(
-            "普通攻擊",
-            "normal",
-            monsterIndex
-        );
-
     }
 
 
@@ -17415,14 +17457,9 @@ function processSingleMonsterAttack(monsterIndex,token){
           等級，等級越高的怪物、技能等級
           也越高），不同技能會打出真的不同
           的傷害，不是統一乘1.3。
-       2. targetType==="tri"的技能，改成
-          真的打「場上所有還活著的角色」
-          （最多2人：玩家1+玩家2），不是
-          只打一個。玩家這邊只有最多2個
-          角色，沒有「中/左/右3個目標」的
-          概念，「打全部還活著的角色」是
-          對應到「tri」這個設計精神最合理
-          的對應方式。
+       2. targetType==="tri"／"row"／"column" 必須由
+          固定戰場 Slot owner 依實際前後排與欄位選取，
+          不能把範圍技能偷換成場上所有存活角色。
        3. 每個目標各自獨立擲命中/爆擊，
           沒命中的照樣顯示MISS、有命中的
           正常扣血，跟原本單體攻擊的呈現
@@ -17434,7 +17471,7 @@ function processSingleMonsterAttack(monsterIndex,token){
         ? skillDatabase[castSkillId].targetType
         : "single";
 
-    const isRangeSkill=["tri","row","all"].includes(skillTargetType);
+    const isRangeSkill=["tri","row","column","all"].includes(skillTargetType);
 
     const livingTargets=getExistingPartyIndexes()
         .map(index=>({
@@ -17456,13 +17493,68 @@ function processSingleMonsterAttack(monsterIndex,token){
         return;
     }
 
-    const attackTargets=isRangeSkill
-        ? livingTargets
-        : [
-            selectableSingleTargets[
-                Math.floor(Math.random()*selectableSingleTargets.length)
-            ]
+    let attackTargets=[];
+    let primaryTargetIndex=null;
+
+    if(skillTargetType==="all"){
+        attackTargets=livingTargets;
+    }else if(isRangeSkill){
+        /* The formal formation is already the owner for allyTri and player
+           targeting. Monster range skills must resolve through that same Slot
+           geometry, including a party member placed in the back row. */
+        const battlefieldSlots=typeof window!=="undefined"
+            ? window.FourSymbolsBattlefieldSlots
+            : null;
+        const primary=livingTargets[
+            Math.floor(Math.random()*livingTargets.length)
         ];
+        primaryTargetIndex=primary?primary.index:null;
+        const formation=battlefieldSlots&&typeof battlefieldSlots.ensureAllyFormation==="function"
+            ? battlefieldSlots.ensureAllyFormation(getExistingPartyIndexes())
+            : null;
+        const targetIndexes=primary&&formation&&typeof battlefieldSlots.resolveAllyTargets==="function"
+            ? battlefieldSlots.resolveAllyTargets(
+                formation,
+                primary.index,
+                skillTargetType,
+                index=>{
+                    const character=getPartyCharacterByIndex(index);
+                    return !!(character&&character.hp>0);
+                }
+            )
+            : [];
+        attackTargets=targetIndexes.map(index=>
+            livingTargets.find(entry=>entry.index===index)
+        ).filter(Boolean);
+    }else{
+        const primary=selectableSingleTargets[
+            Math.floor(Math.random()*selectableSingleTargets.length)
+        ];
+        primaryTargetIndex=primary?primary.index:null;
+        attackTargets=[primary];
+    }
+
+    if(attackTargets.length===0){
+        addBattleLog(monster.name+"找不到可被此技能選中的目標。");
+        updateUI();
+        finishPlayerAction();
+        return;
+    }
+
+    const attackTargetIndexes=attackTargets.map(target=>target.index);
+    if(usesSkill){
+        showMonsterSkillNameBadge(
+            castSkillName,
+            (castSkillData&&castSkillData.element)||monster.element||"normal",
+            monsterIndex,
+            skillTargetType==="all"?null:primaryTargetIndex,
+            attackTargetIndexes
+        );
+    }else{
+        showMonsterSkillNameBadge(
+            "普通攻擊","normal",monsterIndex,primaryTargetIndex,attackTargetIndexes
+        );
+    }
 
 
     /*
@@ -18105,6 +18197,7 @@ function winBattle(){
         clearTimeout(battleAdvanceTimeoutId);
         battleAdvanceTimeoutId=null;
     }
+    clearBattleActionWatchdog();
     battleAdvanceScheduled=false;
 
 
@@ -18369,6 +18462,7 @@ function loseBattle(){
         clearTimeout(battleAdvanceTimeoutId);
         battleAdvanceTimeoutId=null;
     }
+    clearBattleActionWatchdog();
     battleAdvanceScheduled=false;
 
 
@@ -21117,7 +21211,7 @@ function secondaryCharacterNormalAttack(characterIndex,index){
     const monster=monsters[index];
 
     lungePlayerCard(characterIndex);
-    showSkillNameBadge("普通攻擊","normal",characterIndex);
+    showSkillNameBadge("普通攻擊","normal",characterIndex,index,[index]);
 
     const hit=rollHitChance(
         stats.accuracy,
@@ -21193,9 +21287,21 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         return;
     }
 
+    centerIndex=findAliveTargetIndex(centerIndex);
+
+    if(centerIndex===null){
+        finishPlayerAction();
+        return;
+    }
+
+    const targets=getSkillTargets(centerIndex,skill.targetType);
+
     character.sp-=spCost;
     lungePlayerCard(characterIndex);
-    showSkillNameBadge(skill.name,skill.element,characterIndex);
+    showSkillNameBadge(
+        skill.name,skill.element,characterIndex,
+        skill.targetType==="all"?null:centerIndex,targets
+    );
     setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
 
     const statBonus=skill.category==="magic" ? stats.magicAttack : stats.attack;
@@ -21235,15 +21341,6 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         finishPlayerAction();
         return;
     }
-
-    centerIndex=findAliveTargetIndex(centerIndex);
-
-    if(centerIndex===null){
-        finishPlayerAction();
-        return;
-    }
-
-    const targets=getSkillTargets(centerIndex,skill.targetType);
 
     if(skillId==="fireRocket"){
         playFireRocketAnimation(
@@ -21450,7 +21547,9 @@ function player2NormalAttack(index){
     showSkillNameBadge(
         "普通攻擊",
         "normal",
-        1
+        1,
+        index,
+        [index]
     );
 
 
@@ -21663,8 +21762,16 @@ function castPlayer2Skill(skillId,centerIndex){
     }
 
 
-    player2.sp-=
-        spCost;
+    centerIndex=findAliveTargetIndex(centerIndex);
+
+    if(centerIndex===null){
+        finishPlayerAction();
+        return;
+    }
+
+    const targets=getSkillTargets(centerIndex,skill.targetType);
+
+    player2.sp-=spCost;
 
 
     lungePlayerCard(1);
@@ -21673,7 +21780,9 @@ function castPlayer2Skill(skillId,centerIndex){
     showSkillNameBadge(
         skill.name,
         skill.element,
-        1
+        1,
+        skill.targetType==="all"?null:centerIndex,
+        targets
     );
 
 
@@ -21727,10 +21836,7 @@ function castPlayer2Skill(skillId,centerIndex){
 
     if(!skill.baseDamage){
 
-        const resolvedIndex=
-            findAliveTargetIndex(
-                centerIndex
-            );
+        const resolvedIndex=centerIndex;
 
 
         if(resolvedIndex===null){
@@ -21806,13 +21912,6 @@ function castPlayer2Skill(skillId,centerIndex){
         return;
 
     }
-
-
-    const targets=
-        getSkillTargets(
-            centerIndex,
-            skill.targetType
-        );
 
 
     /*
@@ -23814,6 +23913,105 @@ function spawnFireSparkBurst(
 }
 
 
+function findBattleSkillByPresentation(skillName,elementType){
+    if(typeof skillDatabase==="undefined"){ return null; }
+    const ids=Object.keys(skillDatabase);
+    for(let index=0;index<ids.length;index++){
+        const skill=skillDatabase[ids[index]];
+        if(
+            skill&&skill.name===skillName&&
+            (!elementType||!skill.element||skill.element===elementType)
+        ){
+            return skill;
+        }
+    }
+    return null;
+}
+
+function activeBattleTargetIds(side,includeDefeated){
+    if(side==="monster"){
+        return (Array.isArray(currentBattleMonsters)?currentBattleMonsters:[]).filter(index=>{
+            const monster=monsters[index];
+            return !!(monster&&(includeDefeated||monster.alive!==false&&Number(monster.hp)>0));
+        });
+    }
+    return getExistingPartyIndexes().filter(index=>{
+        const character=getPartyCharacterByIndex(index);
+        return !!(character&&(includeDefeated||Number(character.hp)>0));
+    });
+}
+
+/* Combat owns target selection. This contract is created before V142/V143 see
+   the cast, so the VFX runtime never reads the action queue, hit order or live
+   survivor bounds to guess its primary target or semantic footprint. */
+function createBattleTargetContract(side,skillName,elementType,actorIndex,targetId,targetIds,targetSideOverride){
+    const skill=skillName==="普通攻擊"
+        ?{id:"normal",targetType:"single",category:"physical"}
+        :findBattleSkillByPresentation(skillName,elementType);
+    const targetType=String(skill&&skill.targetType||"single");
+    const sameSide=/ally/i.test(targetType)||/heal|revive|buff/.test(String(skill&&skill.category||""));
+    const targetSide=targetSideOverride==="player"||targetSideOverride==="monster"
+        ?targetSideOverride
+        :(sameSide?side:(side==="player"?"monster":"player"));
+    const explicitIds=Array.isArray(targetIds)?targetIds.slice():[];
+    let primary=targetId!==undefined&&targetId!==null?targetId:null;
+    let ids=explicitIds;
+
+    if(!ids.length){
+        let queued=null;
+        if(side==="player"&&typeof queuedPlayerActions!=="undefined"){
+            queued=queuedPlayerActions&&queuedPlayerActions[actorIndex];
+        }
+        if(primary===null&&queued){
+            primary=targetSide==="monster"?queued.target:queued.targetAlly;
+        }
+        if(primary===null&&side==="player"&&targetSide==="monster"&&typeof selectedMonster!=="undefined"){
+            primary=selectedMonster;
+        }
+
+        if(targetType==="all"||targetType==="allyAll"){
+            ids=activeBattleTargetIds(targetSide,false);
+        }else if(targetSide==="monster"&&Number.isInteger(primary)&&/^(tri|row|column|horizontal-3)$/i.test(targetType)){
+            ids=typeof getSkillTargets==="function"?getSkillTargets(primary,targetType):[primary];
+        }else if(targetSide==="player"&&Number.isInteger(primary)&&/^(tri|allyTri|row|column)$/i.test(targetType)){
+            const owner=typeof window!=="undefined"?window.FourSymbolsBattlefieldSlots:null;
+            const formation=owner&&typeof owner.ensureAllyFormation==="function"
+                ?owner.ensureAllyFormation(getExistingPartyIndexes()):null;
+            ids=formation&&typeof owner.resolveAllyTargets==="function"
+                ?owner.resolveAllyTargets(formation,primary,targetType,index=>{
+                    const character=getPartyCharacterByIndex(index);
+                    return !!(character&&Number(character.hp)>0);
+                }):[primary];
+        }else if(primary!==null&&primary!==undefined){
+            ids=[primary];
+        }else if(sameSide){
+            ids=activeBattleTargetIds(targetSide,false);
+            primary=ids.length?ids[0]:null;
+        }
+    }
+
+    ids=Array.from(new Set(ids.filter(value=>Number.isInteger(value)||(
+        typeof value==="string"&&value.indexOf("mechanism:")===0
+    ))));
+    if(targetType==="all"||targetType==="allyAll"){ primary=null; }
+    else if(primary===null&&ids.length){ primary=ids[0]; }
+
+    return Object.freeze({
+        version:"battle-target-contract-v1",
+        side:side,
+        targetSide:targetSide,
+        targetType:targetType,
+        actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
+        targetId:primary,
+        targetIds:Object.freeze(ids.slice())
+    });
+}
+
+window.FourSymbolsBattleTargetContract=Object.freeze({
+    version:"battle-target-contract-v1",
+    create:createBattleTargetContract
+});
+
 function getSkillNameBadgeDuration(skillName,elementType){
 
     if(
@@ -23837,7 +24035,11 @@ function getSkillNameBadgeDuration(skillName,elementType){
 }
 
 
-function showSkillNameBadge(skillName,elementType,characterIndex){
+function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds,targetSide){
+
+    const targetContract=createBattleTargetContract(
+        "player",skillName,elementType,Number.isInteger(characterIndex)?characterIndex:0,targetId,targetIds,targetSide
+    );
 
     const element =
         $("battlePlayerCard"+
@@ -23957,7 +24159,9 @@ const badgePoint =
     },badgeDuration);
 
     if(typeof window!=="undefined" && typeof window.v142PlaySkillAnimationFromBadge==="function"){
-        window.v142PlaySkillAnimationFromBadge("player",skillName,elementType,characterIndex||0);
+        window.v142PlaySkillAnimationFromBadge("player",skillName,elementType,
+            characterIndex||0,targetContract.targetId,targetContract.targetIds,targetContract
+        );
     }
 
 }
@@ -23981,8 +24185,15 @@ const badgePoint =
 function showMonsterSkillNameBadge(
     skillName,
     elementType,
-    monsterIndex
+    monsterIndex,
+    targetId,
+    targetIds,
+    targetSide
 ){
+
+    const targetContract=createBattleTargetContract(
+        "monster",skillName,elementType,Number.isInteger(monsterIndex)?monsterIndex:0,targetId,targetIds,targetSide
+    );
 
     const element=
         $("battleMonster"+
@@ -24078,7 +24289,9 @@ const badgePoint =
     },badgeDuration);
 
     if(typeof window!=="undefined" && typeof window.v142PlaySkillAnimationFromBadge==="function"){
-        window.v142PlaySkillAnimationFromBadge("monster",skillName,elementType,monsterIndex||0);
+        window.v142PlaySkillAnimationFromBadge("monster",skillName,elementType,
+            monsterIndex||0,targetContract.targetId,targetContract.targetIds,targetContract
+        );
     }
 
 }
@@ -25274,6 +25487,13 @@ function openHomeFeature(type){
             window.syncCharacterTouchMode();
         }
 
+    }
+    else if(type==="formation"){
+        titleEl.textContent="佈陣";
+        bodyEl.innerHTML=
+            typeof window.vFixedRenderAllyFormationContent==="function"
+            ? window.vFixedRenderAllyFormationContent()
+            : "";
     }
     else if(type==="offlineExp"){
 

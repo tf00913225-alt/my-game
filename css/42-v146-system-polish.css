@@ -8,7 +8,7 @@
     -webkit-tap-highlight-color:rgba(0,0,0,0) !important;
 }
 
-#game-stage #battlePage #battleMonsterArea{
+#game-stage #battlePage #battleMonsterArea:not(.v-fixed-enemy-zone){
     position:relative;
     z-index:4;
     transform:translateY(16px);
@@ -285,7 +285,7 @@
 .v132-reward-modal .v132-reward-actions button{min-height:40px!important;font-size:15px!important;line-height:1.25!important;}
 
 @media (max-height:720px){
-    #game-stage #battlePage #battleMonsterArea{transform:translateY(12px);}
+    #game-stage #battlePage #battleMonsterArea:not(.v-fixed-enemy-zone){transform:translateY(12px);}
     #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
     #game-stage #v141DungeonNav{height:78px !important;}
     #game-stage #v141DungeonNav .nav-art-button{height:58px !important;}

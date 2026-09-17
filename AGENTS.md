@@ -8,13 +8,14 @@
 6. **修改前必須先在回報中列出：本次功能的 owner 檔案、主要函式、現有 wrapper／後續覆蓋點，以及是否需要暫時補丁。未完成此檢查不得修改。**
 7. **不得自行把 `low / mid / high / perfect` 或「低階／中階／高階／完美」當成新的正式物品階級；正式六階與固定色號一律以 `docs/ITEM_RARITY_UI_SPEC.md` 為準。**
 8. **凡涉及新增、替換、轉檔或正式導入任何點陣圖片資產，必須先完整閱讀 `docs/IMAGE_ASSET_SPEC.md`。該文件是圖片格式、WebP 轉換、無損驗證、透明度、尺寸、Sprite Sheet／VFX 幀資料與正式引用流程的最高權威來源。**
+9. **凡屬修復、fix、failure、test failure、CI failure、fixture、test harness、stale contract 或既有修復分支續修任務，若使用者未在當次任務另行指定不同模式，必須先完整閱讀根目錄 `AUTONOMOUS_REPAIR_CONTRACT.md`，並以該文件作為受控自主修復的唯一正式契約來源；不得依舊對話摘要自行擴張授權。**
 
 ## 《四象江湖傳》專案開發、QA 與外部研究固定規則
 
-本章為永久固定開發規範。除非專案負責人日後明確要求修改，所有程式開發、Bug 修正、功能新增／調整、程式重構、GitHub 操作、Pull Request、Repository checks、GitHub Actions、瀏覽器測試、QA、自動化測試、技術研究、除錯與程式碼搜尋，都必須遵守以下原則。既有第 1～7 條為本章的具體前置要求，內容重疊時合併理解，不重複建立第二套標準。
+本章為永久固定開發規範。除非專案負責人日後明確要求修改，所有程式開發、Bug 修正、功能新增／調整、程式重構、GitHub 操作、Pull Request、Repository checks、GitHub Actions、瀏覽器測試、QA、自動化測試、技術研究、除錯與程式碼搜尋，都必須遵守以下原則。既有第 1～9 條為本章的具體前置要求，內容重疊時合併理解，不重複建立第二套標準。
 
 ### 一、專案內部資料永遠優先
-- 所有判斷、修改與除錯，先依據目前 Repository 的正式規格、程式碼、資料結構、函式、模組、遊戲規則、共用工具、既有測試、GitHub Actions、Repository checks，以及 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`UI_GUIDELINES.md`、`CHECK_REPORT.txt` 等正式文件。
+- 所有判斷、修改與除錯，先依據目前 Repository 的正式規格、程式碼、資料結構、函式、模組、遊戲規則、共用工具、既有測試、GitHub Actions、Repository checks，以及 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`UI_GUIDELINES.md`、`AUTONOMOUS_REPAIR_CONTRACT.md`、`CHECK_REPORT.txt` 等正式文件。
 - 每次先確認：「本專案是不是已經有現成做法？」若已有，優先沿用，不得因外部案例看起來方便就擅自偏離現有架構。
 
 ### 二、禁止無關外部遊戲研究
@@ -137,3 +138,12 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 - UI、手機 viewport、捲動、裁切、icon、modal、loading、點擊等不能由靜態 CI 完整證明的需求，仍必須做最小必要實際視覺／操作驗收。
 - Cache invalidation、Game Version、Service Worker 更新不得清除玩家 localStorage、IndexedDB、雲端存檔、帳號、背包、等級、裝備或進度；靜態 Cache 與 Save Data 必須完全分離。
 - 完成回報固定包含：`Requirements: N/N VERIFIED`、Branch、Commit SHA、Game Version、Cache Version、Repository checks、Deploy、Deployment SHA verified。任一未完成即顯示 `NOT COMPLETE`。
+
+## GitHub 遠端寫入與憑證固定規則
+- 平台已連線的 GitHub Connector／API 授權，與工作區內 `git`／`gh`／SSH／PAT 的本機憑證是兩套獨立機制；不得把「本機 Git CLI 沒憑證」誤判成「GitHub 未授權」。
+- 當目前代理環境已提供可存取本 Repository 且具備所需寫入權限的 GitHub Connector／API 時，所有遠端寫入必須優先使用該已授權通道完成，包括建立 branch、建立／更新檔案、blob/tree/commit、更新 branch ref、建立或更新 PR、查詢 CI／Repository checks，以及在既有合併規則允許時合併 PR。
+- 工作區內的 Git CLI 預設僅用於本機檢查、diff、修改、測試與必要的本機版本控制；不得把 `git push`、`gh auth login`、PAT 或 SSH 金鑰設定成主要或必要的遠端發布流程。
+- 若本機 `git push` 因缺少憑證失敗，但 GitHub Connector／API 仍可正常寫入，代理必須改走已連線的 GitHub 遠端寫入流程，不得要求使用者重新登入 GitHub，也不得回報成 GitHub 授權失效。
+- 只有 GitHub Connector／API 本身明確回傳 authentication／authorization／permission 錯誤、缺少必要寫入能力，或使用者明確指定必須使用 Git CLI 時，才可把憑證或授權列為阻塞事項。
+- 即使改走 Connector／API，仍必須遵守既有分支政策：禁止直接改寫 `dev`／`main`，必須由最新 `dev` 建立 `fix/`、`feature/`、`docs/` 等工作分支，經 PR、Repository checks／CI 與既有 Release Gate 後再合併。
+- 若修改內容先在本機產生，代理應透過既有 GitHub 檔案／blob／tree／commit／ref 能力發布到工作分支；不得因工作區沒有可持久化 Git 認證而把已完成的修改留在本機或重複要求授權。

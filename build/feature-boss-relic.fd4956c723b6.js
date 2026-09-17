@@ -455,6 +455,52 @@
     function activeBoss(){
         return activeBattleContext&&activeBattleContext.boss&&activeBattleContext.boss.alive!==false?activeBattleContext.boss:null;
     }
+    /* Gameplay mechanisms own the enemy-front plane. Keep the Boss trio in the
+       reserved back row so the independent MECH lane never covers a unit. */
+    const BOSS_REINFORCEMENT_SLOTS=Object.freeze(["ENEMY_B2","ENEMY_B4"]);
+    const MECHANISM_SLOT_PRIORITY=Object.freeze(["MECH_C","MECH_L","MECH_R"]);
+    function battlefieldSlotOwner(){ return window.FourSymbolsBattlefieldSlots||null; }
+    function seedBossBattlefieldSnapshot(){
+        const context=activeBattleContext,boss=activeBoss(),owner=battlefieldSlotOwner();
+        if(!context||!boss||!owner||typeof monsters==="undefined"||!Array.isArray(monsters)){ return null; }
+        const bossIndex=monsters.indexOf(boss);
+        if(bossIndex<0){ return null; }
+        const snapshot=owner.createEnemyFormationSnapshot([bossIndex],{originalFormationType:6});
+        owner.setActiveEnemySnapshot(snapshot);
+        context.bossIndex=bossIndex;
+        context.enemySnapshot=snapshot;
+        const geometry=window.FourSymbolsBattlefieldRenderGeometry;
+        if(geometry&&typeof geometry.reconcile==="function"){ geometry.reconcile(); }
+        else if(typeof renderBattle==="function"){ renderBattle(); }
+        return snapshot;
+    }
+    function bossBattlefieldSnapshot(){
+        const context=activeBattleContext,owner=battlefieldSlotOwner();
+        if(!context||!owner){ return null; }
+        return context.enemySnapshot||owner.getActiveEnemySnapshot()||null;
+    }
+    function assignBossReinforcementSlot(monsterIndex,supportIndex){
+        const owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
+        const slot=BOSS_REINFORCEMENT_SLOTS[supportIndex]||null;
+        if(!owner||!snapshot||!slot){ return null; }
+        return owner.assignMonsterToEnemySlot(snapshot,monsterIndex,slot)?slot:null;
+    }
+    function releaseBossBattlefieldSnapshot(){
+        const context=activeBattleContext,owner=battlefieldSlotOwner();
+        if(!context||!owner){ return; }
+        if(context.enemySnapshot&&owner.getActiveEnemySnapshot()===context.enemySnapshot){ owner.clearActiveEnemySnapshot(); }
+        context.enemySnapshot=null;
+    }
+    function mechanismSlotOrder(){
+        const owner=battlefieldSlotOwner();
+        const available=owner&&Array.isArray(owner.mechanismSlots)?owner.mechanismSlots:["MECH_L","MECH_C","MECH_R"];
+        return MECHANISM_SLOT_PRIORITY.filter(slot=>available.includes(slot));
+    }
+    function nextMechanismBattlefieldSlot(){
+        const context=activeBattleContext;if(!context){ return null; }
+        const used=new Set((context.mechanisms||[]).filter(card=>card&&card.hp>0&&!card.destroyed&&card.battlefieldSlot).map(card=>card.battlefieldSlot));
+        return mechanismSlotOrder().find(slot=>!used.has(slot))||null;
+    }
     function aliveMechanisms(){
         return activeBattleContext?(activeBattleContext.mechanisms||[]).filter(card=>card&&card.hp>0&&!card.destroyed):[];
     }
@@ -527,6 +573,7 @@
         if(ui.host.classList.contains("open")){ ui.body.innerHTML=alive.map(mechanismInfoMarkup).join(""); }
     }
     function cleanupMechanismPresentation(){
+        releaseBossBattlefieldSnapshot();
         const area=document.getElementById("battleMonsterArea");
         if(area){
             area.classList.remove("gameplay-boss-active");
@@ -542,6 +589,22 @@
         if(!area){ return; }
         let slot=document.getElementById("bossMechanismSlot");
         if(!slot){ slot=document.createElement("div");slot.id="bossMechanismSlot";slot.className="boss-mechanism-slot";slot.setAttribute("aria-label","BOSS 機制卡槽");area.appendChild(slot); }
+        /* This is an independent target class, not an enemy unit Slot. It still
+           occupies the enemy-front visual plane so it remains nearest to allies. */
+        slot.classList.add("v-fixed-mechanism-zone");
+        slot.dataset.geometryOwner="fixed-slot";
+        slot.dataset.slotRow="front";
+        const owner=battlefieldSlotOwner();
+        const mechanismSlots=owner&&Array.isArray(owner.mechanismSlots)?owner.mechanismSlots:["MECH_L","MECH_C","MECH_R"];
+        mechanismSlots.forEach(slotName=>{
+            let position=slot.querySelector('.boss-mechanism-position[data-slot="'+slotName+'"]');
+            if(!position){
+                position=document.createElement("div");
+                position.className="boss-mechanism-position";
+                position.dataset.slot=slotName;
+                slot.appendChild(position);
+            }
+        });
         const alive=aliveMechanisms();
         slot.classList.toggle("active",alive.length>0);
         Array.from(slot.querySelectorAll(".boss-mechanism-card")).forEach(node=>{
@@ -551,8 +614,11 @@
             let node=slot.querySelector('[data-id="'+card.id+'"]');
             if(!node){
                 node=document.createElement("button");node.type="button";node.className="boss-mechanism-card";node.dataset.id=card.id;node.dataset.type=card.type;
-                node.onclick=function(){ selectMechanism(card.id); };slot.appendChild(node);
+                node.onclick=function(){ selectMechanism(card.id); };
             }
+            const position=card.battlefieldSlot?slot.querySelector('.boss-mechanism-position[data-slot="'+card.battlefieldSlot+'"]'):null;
+            if(position&&node.parentNode!==position){ position.appendChild(node); }
+            else if(!node.parentNode){ slot.appendChild(node); }
             node.classList.toggle("targetable",!!(typeof actionReady!=="undefined"&&actionReady&&typeof pendingAction!=="undefined"&&pendingAction));
             node.setAttribute("aria-label",card.name+"，"+card.kind+"，HP "+Math.max(0,Math.ceil(card.hp))+" / "+card.maxHP+"，點擊可作為攻擊目標");
             node.innerHTML='<b class="boss-mechanism-name">'+escapeHtml(card.name)+'</b><span class="boss-mechanism-kind">'+escapeHtml(card.kind)+'</span><span class="boss-mechanism-hp">HP '+Math.max(0,Math.ceil(card.hp))+' / '+card.maxHP+'</span>';
@@ -585,14 +651,16 @@
     function spawnMechanism(type,sourceKey){
         const definition=MECHANISM_DEFINITIONS[type],boss=activeBoss(),context=activeBattleContext;
         if(!definition||!boss||!context){ return null; }
-        const maximum=context.maxMechanisms||1;
+        const maximum=Math.min(context.maxMechanisms||1,mechanismSlotOrder().length);
         if(aliveMechanisms().length>=maximum){ return null; }
+        const battlefieldSlot=nextMechanismBattlefieldSlot();
+        if(!battlefieldSlot){ return null; }
         const expected=context.expectedPartySize||expectedPartySizeForLevel(boss.level);
         const scaledHp=Math.round(boss.maxHP*definition.hpRatio);
         const levelFloor=Math.round((BOSS_BALANCE.mechanismBaseHpPerMember+boss.level*BOSS_BALANCE.mechanismLevelHpPerMember)*expected);
         const card={
             id:"mechanism-"+(++mechanismSerial),sourceKey:sourceKey||"manual-"+mechanismSerial,
-            type:definition.type,unitKind:"mechanism",rank:"mechanism",kind:definition.kind,name:definition.name,
+            type:definition.type,unitKind:"mechanism",rank:"mechanism",kind:definition.kind,name:definition.name,battlefieldSlot:battlefieldSlot,
             maxHP:Math.max(1,scaledHp,levelFloor),hp:0,defense:Math.max(0,Math.round(numeric(boss.defense,0)*.4)),
             level:boss.level,element:boss.element,effect:definition.effect,priority:definition.priority,
             countdown:definition.countdown||null,spawnedRound:typeof turn!=="undefined"?turn:1,destroyed:false
@@ -635,10 +703,11 @@
         const definition={id:boss.vGameplayBossId||context.definitionId||("tower-"+numeric(context.floor,0)),level:boss.level,element:boss.element};
         const stage=Math.max(numeric(context.combatPhase,1),numeric(context.stage,1));
         const guards=buildBossSupportRoster(definition,{stage:stage,mode:context.mode});
-        guards.forEach(guard=>{
+        guards.forEach((guard,supportIndex)=>{
             const index=monsters.length;
             monsters.push(guard);
             currentBattleMonsters.push(index);
+            guard.vGameplayBattlefieldSlot=assignBossReinforcementSlot(index,supportIndex);
         });
         context.summonsCreated=true;
         context.supportCount=guards.length;
@@ -751,30 +820,17 @@
         if(!card){ queued.target=typeof monsters!=="undefined"?monsters.findIndex(monster=>monster&&monster.alive):-1;return previous.apply(that,args); }
         const skill=queued.action!=="normal"?skillDatabase[queued.action]:null;
         const character=getPartyCharacterByIndex(characterIndex);
-        const spreads=skill&&["tri","row","column","all"].includes(skill.targetType);
         if(skill){
             const cost=skill.spCost!==undefined?skill.spCost:(skill.cost||0);
-            if(!spreads){
-                if(!character||character.sp<cost){ if(typeof addBattleLog==="function"){ addBattleLog("SP不足，無法攻擊機制卡。"); }finishPlayerAction();return; }
-                character.sp-=cost;if(typeof showSkillNameBadge==="function"){ showSkillNameBadge(skill.name,skill.element,characterIndex); }
+            if(!character||character.sp<cost){ if(typeof addBattleLog==="function"){ addBattleLog("SP不足，無法攻擊機制卡。"); }finishPlayerAction();return; }
+            character.sp-=cost;
+            if(typeof showSkillNameBadge==="function"){
+                showSkillNameBadge(skill.name,skill.element,characterIndex,queued.target,[queued.target]);
             }
-        }
-        if(spreads&&skill&&numeric(skill.baseDamage)>0&&typeof window.v142PlaySkillAnimationFromBadge==="function"){
-            /* Keep the selected sidecar target authoritative until the formal
-               V142/V143 owner has created its Sprite. The core resolver may
-               retarget the spread portion to living monsters afterwards. */
-            window.v142PlaySkillAnimationFromBadge(
-                "player",skill.name,skill.element||(character&&character.element)||"normal",characterIndex
-            );
         }
         const result=calculateMechanismActionDamage(characterIndex,queued.action,card);
         if(result.damage>0){ damageMechanism(card,result.damage,(character&&character.id?character.id+"的":"")+result.name,result.crit); }
         else if(typeof addBattleLog==="function"){ addBattleLog(result.name+"無法直接破壞機制卡。需要使用傷害技能。"); }
-        if(spreads){
-            const fallback=currentBattleMonsters.find(index=>monsters[index]&&monsters[index].alive);
-            queued.target=fallback===undefined?null:fallback;
-            return previous.apply(that,args);
-        }
         if(typeof updateUI==="function"){ updateUI(); }finishPlayerAction();
     }
 
@@ -825,7 +881,10 @@
         activeBattleContext={mode:mode,definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:0,expectedPartySize:balance.expectedPartySize,supportCount:0,summonPlan:stageProfile.summon,summonsCreated:false,mechanisms:[],mechanismPlan:(world?stageProfile.mechanisms:definition.mechanisms).map(item=>Object.assign({},item)),spawnedPlans:{},maxMechanisms:definition.level>=70?2:1};
         battleStarting=true;
         const started=window.v132LaunchDungeonBattle([boss],outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome));
-        battleStarting=false;if(!started){ cleanupMechanismPresentation();activeBattleContext=null; }return !!started;
+        battleStarting=false;
+        if(!started){ cleanupMechanismPresentation();activeBattleContext=null;return false; }
+        seedBossBattlefieldSnapshot();
+        return true;
     }
 
     function towerReward(floor){
@@ -856,7 +915,10 @@
         const balance=boss?bossBalanceProfile(boss.level,"tower",towerPhases):null;
         activeBattleContext={mode:"tower",floor:target,boss:boss,bossIndex:boss?0:null,combatPhase:1,totalPhases:towerPhases,expectedPartySize:balance?balance.expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target)),supportCount:0,summonPlan:boss?towerSummonPlan(target):null,summonsCreated:false,mechanisms:[],mechanismPlan:towerMechanismPlan(target),spawnedPlans:{},maxMechanisms:target>=70?2:1};
         battleStarting=true;const started=window.v132LaunchDungeonBattle(roster,outcome=>completeTowerFloor(target,outcome));
-        battleStarting=false;if(!started){ cleanupMechanismPresentation();activeBattleContext=null; }return !!started;
+        battleStarting=false;
+        if(!started){ cleanupMechanismPresentation();activeBattleContext=null;return false; }
+        seedBossBattlefieldSnapshot();
+        return true;
     }
     function chooseTowerRelic(id){
         const choice=TOWER_CONFIG.relicChoices.find(item=>item.id===id);if(!choice||!state.tower.pendingRelicChoice){ return false; }

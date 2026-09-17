@@ -26,10 +26,14 @@ assert.match(vfx,/const MECHANISM_TARGET_PREFIX="mechanism:";/);
 assert.match(vfx,/function mechanismCardFor\(index\)/);
 assert.match(vfx,/document\.getElementById\("bossMechanismSlot"\)/);
 assert.match(vfx,/card\.dataset\.id===mechanismId/);
-assert.match(vfx,/function queuedMechanismTarget\(config,meta,targetSide\)/);
-assert.match(vfx,/if\(mechanismTarget\)\{ return \[mechanismTarget\]; \}/);
-assert.match(vfx,/if\(mechanismTarget\)\{ validTargets\.add\(mechanismTarget\); \}/);
+assert.doesNotMatch(vfx,/function queuedMechanismTarget|queuedPlayerActions/,
+    "the VFX owner must not inspect the combat queue for a mechanism target");
+assert.match(vfx,/const explicit=Array\.isArray\(meta\.targetIds\)/);
+assert.match(vfx,/Number\.isInteger\(index\)\|\|isMechanismTarget\(index\)/);
+assert.match(vfx,/explicitTargets\.forEach\(index=>\{/);
 assert.match(vfx,/isMechanismTarget\(index\)\)\{ return mechanismCardFor\(index\); \}/);
+assert.match(runtime,/showSkillNameBadge\(skill\.name,skill\.element,characterIndex,queued\.target,\[queued\.target\]\)/,
+    "the mechanism action owner must pass its exact sidecar target into the formal contract");
 
 // Generic battle card sizes remain untouched. Only a runtime-tagged Gameplay
 // BOSS receives the paired 9:16 geometry requested for this screen.
@@ -64,7 +68,8 @@ assert.doesNotMatch(activeBossRowRule,/!important/);
 // The function/mechanism card is the paired 4:3 battlefield component. Its
 // face is compact type -> name -> HP; the separate detail panel owns the full
 // dynamic explanation and the battlefield card never uses transform sizing.
-assert.match(boss,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
+assert.match(boss,/\.boss-mechanism-slot\.active\{\s*display:grid;/);
+assert.match(boss,/\.boss-mechanism-position\{[\s\S]*?display:flex;[\s\S]*?justify-content:center;/);
 assert.match(boss,/\.boss-mechanism-card\{[\s\S]*?width:var\(--gameplay-mechanism-card-width\);[\s\S]*?aspect-ratio:4 \/ 3;[\s\S]*?flex:0 0 var\(--gameplay-mechanism-card-width\);/);
 assert.match(boss,/\.boss-mechanism-kind\{[\s\S]*?order:1;[\s\S]*?font-size:10px;/);
 assert.match(boss,/\.boss-mechanism-name\{[\s\S]*?order:2;[\s\S]*?font-size:11px;[\s\S]*?-webkit-line-clamp:1;/);
@@ -87,6 +92,9 @@ const renderEnd=runtime.indexOf("function showMechanismToast",renderStart);
 assert.ok(renderStart>=0&&renderEnd>renderStart,"renderMechanisms owner must exist");
 const renderBlock=runtime.slice(renderStart,renderEnd);
 assert.match(renderBlock,/node\.onclick=function\(\)\{ selectMechanism\(card\.id\); \};/);
+assert.match(renderBlock,/position\.className="boss-mechanism-position"/);
+assert.match(renderBlock,/position\.dataset\.slot=slotName/);
+assert.match(renderBlock,/card\.battlefieldSlot/);
 assert.match(renderBlock,/boss-mechanism-name/);
 assert.match(renderBlock,/boss-mechanism-kind/);
 assert.match(renderBlock,/boss-mechanism-hp/);
