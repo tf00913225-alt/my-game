@@ -11757,17 +11757,20 @@
         },"test-"+state.sequence,onComplete);
     };
 
-    function startFromBadge(side,name,element,actorIndex){
+    function startFromBadge(side,name,element,actorIndex,targetId,targetIds){
         if(typeof battleActive!=="undefined"&&!battleActive){ return null; }
         const config=animationConfig(null,name,element);
         if(config.category==="passive"||config.targetType==="none"){ return null; }
-        return director.play(config,{
+        const meta={
             side:side,actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
             key:identity(side,name,actorIndex)
-        });
+        };
+        if(targetId!==undefined&&targetId!==null){ meta.targetId=targetId; }
+        if(Array.isArray(targetIds)&&targetIds.length){ meta.targetIds=targetIds.slice(); }
+        return director.play(config,meta);
     }
-    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex){
-        return startFromBadge(side,name,element,actorIndex);
+    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex,targetId,targetIds){
+        return startFromBadge(side,name,element,actorIndex,targetId,targetIds);
     };
 
     function currentGate(){
@@ -13277,6 +13280,21 @@
         return null;
     }
 
+    function geometryPrimaryAnchor(current,indexes){
+        const owner=geometryOwner();
+        const slot=geometryPrimarySlot(current,indexes);
+        if(!owner||!slot){ return null; }
+        const center=typeof owner.getSlotCenter==="function"?owner.getSlotCenter(slot):null;
+        const rect=center&&center.rect?center.rect:owner.getSlotRect(slot);
+        if(!rect){ return null; }
+        return {
+            slot:slot,
+            x:center?center.x:rect.centerX,
+            y:center?center.y:rect.centerY,
+            rect:rect
+        };
+    }
+
     function geometryBounds(current,indexes,placement){
         const owner=geometryOwner();
         if(!owner||!current){ return null; }
@@ -13295,19 +13313,7 @@
             return rect;
         }
 
-        let primarySlot=geometryPrimarySlot(current,indexes);
-        const normalizedTri=/tri/i.test(targetType);
-        if(normalizedTri&&seed.length>1&&typeof owner.getSlotForCombatant==="function"){
-            const seedSlots=seed.map(index=>slotForTarget(current.targetSide,index,cardFor(current.targetSide,index))).filter(Boolean);
-            const metas=seedSlots.map(slot=>owner.slotMeta&&owner.slotMeta[slot]).filter(Boolean);
-            if(metas.length>1&&metas.every(meta=>meta.row===metas[0].row)){
-                const columns=metas.map(meta=>meta.column);
-                const centerColumn=Math.round((Math.min.apply(null,columns)+Math.max.apply(null,columns))/2);
-                const rowSlots=typeof owner.getRowSlots==="function"?owner.getRowSlots(current.targetSide,metas[0].row):[];
-                const centered=rowSlots.find(slot=>owner.slotMeta&&owner.slotMeta[slot]&&owner.slotMeta[slot].column===centerColumn);
-                if(centered){ primarySlot=centered; }
-            }
-        }
+        const primarySlot=geometryPrimarySlot(current,indexes);
         if(!primarySlot){ return null; }
 
         let shape=targetType;
@@ -13601,6 +13607,7 @@
         const indexes=emittedSpriteTargets(current);
         const bounds=geometryBounds(current,indexes,placement);
         if(!bounds){ return; }
+        const primaryAnchor=geometryPrimaryAnchor(current,indexes);
         node.dataset.geometrySlots=Array.isArray(bounds.slots)?bounds.slots.join(","):"";
 
         if(placement==="battlefield"){
@@ -13637,7 +13644,13 @@
         const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);
         node.dataset.targetIndexes=indexes.join(",");
         applySpriteBox(node,size,size,sprite);
-        const destination={x:bounds.centerX,y:bounds.centerY};
+        /* A group/row/tri Sprite keeps the fixed-shape bounds for sizing, but
+           its visual center belongs to the explicitly selected primary card.
+           Only full-battlefield effects remain centered on the whole side. */
+        const destination=primaryAnchor
+            ?{x:primaryAnchor.x,y:primaryAnchor.y}
+            :{x:bounds.centerX,y:bounds.centerY};
+        if(primaryAnchor){ node.dataset.geometrySlot=primaryAnchor.slot; }
         const actor=placement==="trajectory"?slotAnchor(current.side,current.actorIndex,current.actorCard):null;
         if(placement==="trajectory"&&sprite.travelToTargets&&actor){
             node.dataset.travel="true";
@@ -13648,8 +13661,8 @@
             node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");
             node.style.setProperty("--v143-sprite-angle",Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI+"deg");
         }else{
-            node.style.left=bounds.centerX+"px";
-            node.style.top=bounds.centerY+"px";
+            node.style.left=destination.x+"px";
+            node.style.top=destination.y+"px";
         }
     }
 

@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "batchId": "2026-09-17-battle-formation-targeting",
   "baseBranch": "dev",
-  "baseCommit": "f4cd11ff8e9a4ba51edf64ec37c0db711140616a",
+  "baseCommit": "a21736f3ea1f92b2e7da9e48870dce705c4c5cc4",
   "officialVersion": "173.65",
   "officialVersionBumpAllowed": false,
   "overallStatus": "IMPLEMENTED",
   "completion": "NOT COMPLETE",
-  "verificationPolicy": "Source and automated checks are supplementary only. Require a fully loaded real battle runtime on dev for formation geometry, BOSS mechanism placement, and range targets.",
+  "verificationPolicy": "Source and automated checks are supplementary only. Require a fully loaded real battle runtime on dev for formation geometry, BOSS mechanism placement, range targets, mechanism spread isolation, and primary-target VFX anchoring.",
   "requirements": [
     {
       "id": "FORMATION-PROJECTION",
@@ -22,31 +22,55 @@
     },
     {
       "id": "BOSS-MECHANISM-FRONT",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "An independent BOSS mechanism card renders on the enemy front visual plane without becoming an enemy unit target.",
       "evidence": [
         "js/gameplay-boss-tower-system.js",
         "css/fixed-slot-battlefield-rendering-v2.css",
         "tests/fixed-slot-battlefield-rendering-v2.test.js",
         "tests/gameplay-boss-tower-system.test.js",
-        "Real DEV mobile battle video 1000070330.mp4 exposed the previous front-plane collision"
+        "Real DEV mobile battle video 1000070330.mp4 exposed the previous front-plane collision",
+        "Subsequent real DEV mobile verification: BOSS and mechanism card no longer overlap"
       ],
-      "remaining": "After the follow-up branch deploys, spawn a BOSS mechanism card and verify the card occupies the front lane without covering the BOSS or reinforcements and remains independently selectable."
+      "remaining": null
     },
     {
       "id": "MONSTER-RANGE-TARGETING",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Monster tri, row and column skills resolve against the canonical ally formation instead of every living party member; all skills remain all-target.",
       "evidence": [
         "js/00-main.js",
         "js/battlefield-slot-owner.js",
-        "tests/fixed-battlefield-ally-formation.test.js"
+        "tests/fixed-battlefield-ally-formation.test.js",
+        "Subsequent real DEV mobile verification of legal formation targets"
       ],
-      "remaining": "In the dev runtime, let an enemy cast tri or row against a split front/back three-person formation and capture only the legal row targets receiving damage."
+      "remaining": null
+    },
+    {
+      "id": "MECHANISM-SPREAD-ISOLATION",
+      "status": "IMPLEMENTED",
+      "requirement": "A player tri, row, column or all-target skill explicitly aimed at a BOSS mechanism card damages only that mechanism and never retargets the BOSS or reinforcements during the same action.",
+      "evidence": [
+        "js/gameplay-boss-tower-system.js",
+        "tests/gameplay-boss-tower-system.test.js"
+      ],
+      "remaining": "On the deployed dev runtime, use a three-target skill on a mechanism card while the BOSS and two reinforcements are alive; verify that only the mechanism loses HP and the skill cost is paid once."
+    },
+    {
+      "id": "PRIMARY-TARGET-VFX-ANCHOR",
+      "status": "IMPLEMENTED",
+      "requirement": "Enemy single and tri/row skill VFX are centered on the actual primary target card; all-target VFX remain centered on the complete ally formation.",
+      "evidence": [
+        "js/00-main.js",
+        "js/37-v142-skill-animation.js",
+        "js/39-v143-skill-animation.js",
+        "tests/battle-primary-target-vfx-anchor-20260917.test.js"
+      ],
+      "remaining": "On the deployed dev runtime, capture enemy single-target and three-target casts against a non-center ally and verify their VFX center on that card; also capture an all-target cast and verify it remains formation-centered."
     }
   ],
   "blockers": [
-    "Awaiting post-fix real dev battle runtime verification for the BOSS mechanism lane.",
-    "Awaiting a real enemy tri or row cast against the split ally formation; the supplied clip contains only single-target enemy casts."
+    "Awaiting a real dev BOSS encounter proving that a three-target skill aimed at a mechanism card does not damage the BOSS or reinforcements.",
+    "Awaiting real dev enemy single, three-target and all-target casts proving the new primary-card VFX anchor and preserved formation-wide anchor."
   ]
 }
