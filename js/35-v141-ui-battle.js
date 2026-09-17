@@ -320,7 +320,7 @@
                 return;
             }
 
-            if(skill.targetType==="ally"||skill.targetType==="deadAlly"){
+            if(skill.targetType==="ally"||skill.targetType==="allyTri"||skill.targetType==="deadAlly"){
                 const hasTarget=[0,1,2].some(index=>isValidAllyTargetForSkill(
                     skill,getBattleCharacterByIndex(index),index
                 ));

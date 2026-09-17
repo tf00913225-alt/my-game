@@ -7,6 +7,7 @@ const zlib=require("node:zlib");
 
 const assetPath="assets/vfx/water/frost-arrow-rain-vfx.png";
 const asset=fs.readFileSync(assetPath);
+const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
@@ -92,6 +93,18 @@ function loadRuntime(livingIndexes){
     body.appendChild(monsterArea);
     body.appendChild(playerArea);
     const cards={battleMonsterArea:monsterArea,battlePlayerRow:playerArea};
+    const fixedSlotNodes={};
+    ["B","F"].forEach((row,rowIndex)=>{
+        for(let column=1;column<=5;column++){
+            const slot="ENEMY_"+row+column;
+            const left=240+(column-1)*91;
+            const top=rowIndex===0?30:200;
+            const node=makeNode({left,top,right:left+76,bottom:top+100,width:76,height:100});
+            node.className="v-fixed-enemy-slot";
+            node.dataset.slot=slot;
+            fixedSlotNodes['.v-fixed-enemy-slot[data-slot="'+slot+'"]']=node;
+        }
+    });
     const monsterRects=[
         {left:280,top:80,right:356,bottom:180,width:76,height:100},
         {left:400,top:80,right:476,bottom:180,width:76,height:100},
@@ -130,6 +143,7 @@ function loadRuntime(livingIndexes){
             body,
             createElement(){ return makeNode(); },
             getElementById(id){ return cards[id]||null; },
+            querySelector(selector){ return fixedSlotNodes[selector]||body.querySelector(selector); },
             querySelectorAll(selector){ return body.querySelectorAll(selector); }
         },
         monsters,
@@ -155,6 +169,9 @@ function loadRuntime(livingIndexes){
         dispose(){}
     };
     vm.createContext(context);
+    vm.runInContext(slotOwnerSource,context);
+    const owner=context.FourSymbolsBattlefieldSlots;
+    owner.setActiveEnemySnapshot(owner.createEnemyFormationSnapshot([0,1,2],{originalFormationType:3}));
     vm.runInContext(animation,context);
     return {context,body,scheduled,hitCalls:()=>hitCalls};
 }
@@ -210,7 +227,11 @@ test("one shared raster sheet stays locked to the complete enemy formation after
         const sprite=sprites[0];
         assert.equal(sprite.dataset.placement,"battlefield");
         assert.equal(sprite.dataset.targetSide,"monster");
-        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+        assert.equal(sprite.dataset.areaId,"fixed-enemy-zone");
+        assert.equal(
+            sprite.dataset.geometrySlots,
+            ["ENEMY_B1","ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_B5","ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"].join(",")
+        );
         assert.equal(sprite.dataset.fixedFormation,"true");
         assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
         assert.equal(sprite.style.left,"460px");

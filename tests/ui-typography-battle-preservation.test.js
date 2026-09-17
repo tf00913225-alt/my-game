@@ -47,6 +47,49 @@ function retireV146LegacySkillVfx(text){
     return normalize(text.slice(0,start)+text.slice(end));
 }
 
+function restoreApprovedFixedSlotEnemyBaseline(text){
+    const approvedComment=`/* Fixed Slot battlefield: every enemy row always owns five physical columns.
+   Empty slots retain their width after death/summon/revive, so neither units nor
+   VFX geometry can re-center around the currently surviving cards. */
+`;
+    const approvedCurrent=`#game-stage #battleMonsterArea .v131-monster-row{
+    display:grid;
+    grid-template-columns:repeat(5,76px);
+    flex:0 0 auto;
+    align-items:flex-start;
+    justify-content:center;
+    gap:3px;
+    width:100%;
+    min-width:0;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot{
+    position:relative;
+    width:76px;
+    min-width:76px;
+    min-height:90px;
+    overflow:visible;
+}
+
+#game-stage #battleMonsterArea .v-fixed-enemy-slot > .battle-monster{
+    margin-left:auto !important;
+    margin-right:auto !important;
+}`;
+    const historical=`#game-stage #battleMonsterArea .v131-monster-row{
+    display:flex;
+    flex:0 0 auto;
+    align-items:flex-start;
+    justify-content:center;
+    gap:3px;
+    width:100%;
+    min-width:0;
+}`;
+    assert.equal((text.match(/Fixed Slot battlefield: every enemy row always owns five physical columns\./g)||[]).length,1,"approved Fixed Slot enemy geometry marker changed");
+    assert.ok(text.includes(approvedCurrent),"approved Fixed Slot enemy geometry block changed");
+    return normalize(text.replace(approvedComment,"").replace(approvedCurrent,historical));
+}
+
 function restoreGameplayCoverBaseline(text){
     return normalize(text
         .replace(/\/\* Gameplay activity covers use the same 16:9 production ratio as dungeon\n   covers\. Combat BOSS\/mechanism cards remain independent (?:9:16|battlefield) components\. \*\/\n/,"")
@@ -60,12 +103,23 @@ function restoreGameplayCoverBaseline(text){
 }
 
 // V131 starts with battle formation/element-card rules. Typography work begins only
-// after the character/home-feature shell, so the entire battle prefix must be byte-equivalent.
-sameSegment(
-    "css/31-v131-fix-batch.css",
-    "#game-stage #battleMonsterArea.v131-formation",
-    "#game-stage #homeFeatureModal .home-feature-modal-box.wide"
-);
+// after the character/home-feature shell. The formal Fixed Slot migration later
+// changed only the enemy-row structure in this protected prefix so empty slots keep
+// their physical columns after death/summon/revive. Normalize precisely that approved
+// geometry change back to the typography baseline, then keep the rest byte-equivalent.
+{
+    const file="css/31-v131-fix-batch.css";
+    const start="#game-stage #battleMonsterArea.v131-formation";
+    const end="#game-stage #homeFeatureModal .home-feature-modal-box.wide";
+    const now=segment(current(file),start,end);
+    assert.match(now,/#game-stage #battleMonsterArea \.v131-monster-row\{[\s\S]*?display:grid;[\s\S]*?grid-template-columns:repeat\(5,76px\);[\s\S]*?overflow:visible;/);
+    assert.match(now,/#game-stage #battleMonsterArea \.v-fixed-enemy-slot\{[\s\S]*?width:76px;[\s\S]*?min-height:90px;[\s\S]*?overflow:visible;/);
+    assert.equal(
+        restoreApprovedFixedSlotEnemyBaseline(now),
+        segment(at(BASE,file),start,end),
+        `${file} battle-owned segment changed outside approved Fixed Slot empty-slot geometry`
+    );
+}
 
 // V146's opening combat/VFX section is followed by inventory polish. Preserve that
 // full combat region byte-for-byte except the explicitly retired V143 Earth Shield
@@ -125,7 +179,9 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
     assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(118px,29%,132px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(123px,30%,138px\);[\s\S]*?margin-top:-16px;/);
     assert.match(now,/\.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:var\(--gameplay-boss-card-width\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?aspect-ratio:9 \/ 16;/);
     assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?position:relative;[\s\S]*?display:none;[\s\S]*?width:100%;[\s\S]*?margin:3px auto 0;[\s\S]*?pointer-events:none;/);
-    assert.match(now,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
+    assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?gap:4px;/);
+    assert.match(now,/\.boss-mechanism-slot\.active\{\s*display:grid;/);
+    assert.match(now,/\.boss-mechanism-position\{[\s\S]*?display:flex;[\s\S]*?align-items:flex-start;[\s\S]*?justify-content:center;[\s\S]*?pointer-events:none;/);
     assert.match(now,/\.boss-mechanism-card\{[\s\S]*?width:var\(--gameplay-mechanism-card-width\);[\s\S]*?min-width:0;[\s\S]*?aspect-ratio:4 \/ 3;[\s\S]*?flex:0 0 var\(--gameplay-mechanism-card-width\);[\s\S]*?pointer-events:auto;[\s\S]*?animation:gameplayMechanismEnter \.24s ease-out both;/);
     assert.match(now,/\.boss-mechanism-hp\{[\s\S]*?min-height:12px;[\s\S]*?font-size:9\.5px;[\s\S]*?font-weight:900;/);
     assert.match(now,/@media \(max-height:920px\)\{[\s\S]*?--gameplay-boss-card-width:clamp\(108px,27%,122px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(117px,29\.25%,132px\);/);
@@ -152,4 +208,4 @@ sameSegment(
     "@media(max-width:390px)"
 );
 
-console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Gameplay BOSS 9:16/mechanism owner, approved non-overlapping 16:9 activity-cover stack and 4:3 mechanism target and retired procedural VFX selectors.");
+console.log("Battle preservation: mixed CSS keeps battle layout at approved baselines outside the scoped Fixed Slot empty-slot geometry, Gameplay BOSS 9:16/mechanism owner, approved non-overlapping 16:9 activity-cover stack and 4:3 mechanism target and retired procedural VFX selectors.");

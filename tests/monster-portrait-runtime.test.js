@@ -6,6 +6,7 @@ const vm=require("node:vm");
 
 const source=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const timingSource=fs.readFileSync("js/48-v159-abyss-battle-portraits.js","utf8");
+const presentationSource=fs.readFileSync("js/54-v173.51-battle-qa.js","utf8");
 
 function classList(){
     const values=new Set();
@@ -132,7 +133,8 @@ assert.match(source,/MONSTER_PORTRAIT_REGISTRY_URL="config\/monster-portrait-reg
 assert.match(source,/TEMPORARY_MONSTER_PORTRAIT="assets\/dungeons\/abyss\/soldier\.webp"/);
 assert.match(source,/TEMPORARY_BOSS_PORTRAIT="assets\/monsters\/boss\/boss-placeholder-fire-demon\.webp"/);
 assert.match(source,/target\.status!=="existing"/);
-assert.match(source,/background-size:contain!important/);
+assert.match(source,/Portrait selection belongs here; portrait geometry does not/);
+assert.match(presentationSource,/\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:contain!important/);
 assert.equal((source.match(/renderBattle=function/g)||[]).length,1);
 assert.equal((source.match(/updateMonsterUI=function/g)||[]).length,1);
 assert.match(timingSource,/v154SyncMonsterPortraits/);

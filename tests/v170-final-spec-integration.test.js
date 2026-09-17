@@ -45,6 +45,7 @@ const EXPECTED_DIRECT_SCRIPT_PATHS=[
 ];
 
 const EXPECTED_RUNTIME_PATHS=[
+    "js/battlefield-slot-owner.js",
     "js/25-v131-fix-batch.js",
     "js/27-v132-content-expansion.js",
     "js/28-v133-economy-rebalance.js",
@@ -165,6 +166,9 @@ function makeUniversalNode(){
         get(_target,property){
             if(property===Symbol.iterator){ return function* empty(){}; }
             if(property===Symbol.toPrimitive){ return ()=>0; }
+            if(property==="parentElement"){ return null; }
+            if(property==="parentNode"){ return null; }
+            if(property==="ownerDocument"){ return null; }
             if(property==="length"){ return 0; }
             if(property==="style"){ return style; }
             if(property==="dataset"){ return {}; }
@@ -504,6 +508,13 @@ test("same-name states miss without refresh while differently named hard control
             v141Abyss:true,v155FinalAbyss:true
         });
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);
+        if(
+            !snapshot ||
+            window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,0)!=="ENEMY_F3"
+        ){
+            throw new Error("V170 fixture must create the formal ENEMY_F3 snapshot before monster action");
+        }
         Math.random=function(){ return 0; };
         const action=v141TryMonsterSpecialAction(0);
         return {burn:burn,afterPetrify:afterPetrify,afterFreeze:afterFreeze,action:action,sp:monsters[0].sp};
@@ -1021,8 +1032,14 @@ test("enemy Heal Spell affects only one same-row trio for both North Emperor and
                 v141SupportSkillIds:index===3?["revive","healSpell"]:[],v141ForceSkillLevel:5,skillChance:1});
             currentBattleMonsters.push(index);
         }
+        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);
+        if(!snapshot){ throw new Error("V170 Heal Spell fixture must create the formal enemy snapshot"); }
+        const slotOwner=window.FourSymbolsBattlefieldSlots;
+        const slotFor=index=>slotOwner.getEnemySlotForMonster(snapshot,index);
         updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
         showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};Math.random=function(){ return 0; };
+        const northTargets=v141GetMonsterAllyTriTargets(3).map(entry=>entry.index);
+        const northSlots=northTargets.map(slotFor);
         const beforeNorth=monsters.map(monster=>monster.hp);
         const north=v155ResolveNorthHeal(3,true);
         const northChanged=monsters.map((monster,index)=>monster.hp!==beforeNorth[index]?index:null).filter(index=>index!==null);
@@ -1030,12 +1047,19 @@ test("enemy Heal Spell affects only one same-row trio for both North Emperor and
         monsters.forEach((monster,index)=>{ monster.hp=(index>=6&&index<=8)?100:1000;monster.sp=1000;monster.v141SupportSkillIds=[]; });
         monsters[5].v141SupportSkillIds=["healSpell"];
         monsters[5].v141ForceSkillLevel=5;
+        const eliteTargets=v141GetMonsterAllyTriTargets(5).map(entry=>entry.index);
+        const eliteSlots=eliteTargets.map(slotFor);
         const beforeElite=monsters.map(monster=>monster.hp);
         const elite=v141TryMonsterSpecialAction(5);
         const eliteChanged=monsters.map((monster,index)=>monster.hp!==beforeElite[index]?index:null).filter(index=>index!==null);
-        return {north:north,northChanged:northChanged,elite:elite,eliteChanged:eliteChanged};
+        return {snapshot:!!snapshot,north:north,northTargets:northTargets,northSlots:northSlots,
+            northChanged:northChanged,elite:elite,eliteTargets:eliteTargets,eliteSlots:eliteSlots,eliteChanged:eliteChanged};
     })()`);
-    assert.deepEqual(result,{north:true,northChanged:[1,2,3],elite:true,eliteChanged:[6,7,8]});
+    assert.deepEqual(result,{
+        snapshot:true,
+        north:true,northTargets:[3,1,0],northSlots:["ENEMY_B1","ENEMY_B2","ENEMY_B3"],northChanged:[0,1,3],
+        elite:true,eliteTargets:[6,5,7],eliteSlots:["ENEMY_F2","ENEMY_F3","ENEMY_F4"],eliteChanged:[6,7]
+    });
 });
 
 test("North Emperor prioritizes maximum-level Revive for a defeated boss",()=>{
@@ -1068,12 +1092,16 @@ test("East Earth Shield and Heaven Calm use their assigned formal support values
             v141FormationRow:0,v141FormationPosition:index
         })));
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);
+        const snapshot=window.v138EnsureEnemyFormationSnapshot(currentBattleMonsters);
+        if(!snapshot){ throw new Error("V170 Earth Shield fixture must create the formal enemy snapshot"); }
+        const eastTargets=v141GetMonsterAllyTriTargets(0).map(entry=>entry.index);
+        const eastSlots=eastTargets.map(index=>window.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,index));
         updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
         showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};
         const earth=v155ResolveEastEarthShield(0,true);
         const calm=v155ResolveHeavenCalm(1,true);
         return {
-            earth:earth,calm:calm,
+            earth:earth,calm:calm,eastTargets:eastTargets,eastSlots:eastSlots,
             earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,
             calmTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="氣定神閒")).length,
             earthBuff:monsters[0].activeBuffs.find(buff=>buff.statusName==="萬象土盾"),
@@ -1082,7 +1110,9 @@ test("East Earth Shield and Heaven Calm use their assigned formal support values
     })()`);
     assert.equal(result.earth,true);
     assert.equal(result.calm,true);
-    assert.equal(result.earthTargets,2);
+    assert.deepEqual(result.eastTargets,[0,1,2]);
+    assert.deepEqual(result.eastSlots,["ENEMY_F1","ENEMY_F2","ENEMY_F3"]);
+    assert.equal(result.earthTargets,3);
     assert.equal(result.calmTargets,5);
     assert.deepEqual(result.earthBuff,{type:"earthShield",v141BuffType:"earthShield",turnsLeft:3,percent:50,statusName:"萬象土盾"});
     assert.deepEqual(result.calmBuff,{type:"resistance",turnsLeft:3,amount:65,accuracyBonusPercent:50,statusName:"氣定神閒",

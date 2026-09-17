@@ -54,8 +54,9 @@ test("range VFX fixes remain fixed-size and centered after casualties",()=>{
     ["stormRain","flyingSandStrike"].forEach(id=>{
         assert.match(animation,new RegExp(id+':[\\s\\S]*?castSheet\\([\\s\\S]*?,"battlefield"'));
     });
-    assert.match(animation,/function fixedTriLayoutBounds\(current,indexes\)[\s\S]*?const layoutCenterX=[\s\S]*?centerX:layoutCenterX[\s\S]*?id:"fixed-tri-slots"/);
-    assert.match(animation,/if\(placement==="battlefield"\)[\s\S]*?sideAreaBounds\(current\.targetSide\)/);
+    assert.match(animation,/function geometryBounds\(current,indexes,placement\)\{[\s\S]*?const owner=geometryOwner\(\);[\s\S]*?owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
+    assert.match(animation,/if\(placement==="battlefield"\|\|targetType==="all"\|\|targetType==="allyAll"\)\{[\s\S]*?owner\.getSideRect\(current\.targetSide\)/);
+    assert.match(animation,/const destination=\{x:bounds\.centerX,y:bounds\.centerY\};[\s\S]*?node\.style\.left=bounds\.centerX\+"px";[\s\S]*?node\.style\.top=bounds\.centerY\+"px"/);
     assert.doesNotMatch(animation,/canvas-crop|createElement\(["']canvas["']\)|drawImage\(/);
 });
 

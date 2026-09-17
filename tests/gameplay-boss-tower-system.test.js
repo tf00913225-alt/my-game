@@ -6,6 +6,7 @@ const vm=require("node:vm");
 
 const source=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const accountSource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const battlefieldSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const TEST_UID="boss-tower-test";
 const DUNGEON_RANK_MULTIPLIERS={
     elite:{maxHP:3.2,maxSP:2,defense:1.25},
@@ -101,6 +102,7 @@ function load(options={}){
     vm.createContext(context);
     vm.runInContext(accountSource,context,{filename:"js/startup/account-save-repository.js"});
     context.FourSymbolsAccountSave.activate(TEST_UID);
+    vm.runInContext(battlefieldSource,context,{filename:"js/battlefield-slot-owner.js"});
     vm.runInContext(source,context,{filename:"js/gameplay-boss-tower-system.js"});
     return {context,localStorage};
 }
@@ -157,13 +159,25 @@ test("selected Bosses summon two same-element elites only after their configured
     {
         const {context}=load();
         assert.equal(context.vGameplayStartBoss("personal","personal-30"),true);
-        const boss=context.monsters[0];
+        const boss=context.monsters[0],slotOwner=context.FourSymbolsBattlefieldSlots;
+        const openingSnapshot=slotOwner.getActiveEnemySnapshot();
+        assert.equal(openingSnapshot.originalFormationType,3,"summoning Boss must reserve the three-unit formation from battle start");
+        assert.equal(slotOwner.getEnemySlotForMonster(openingSnapshot,0),"ENEMY_F3");
+        assert.equal(slotOwner.getAssignedMonsterAtEnemySlot(openingSnapshot,"ENEMY_F2"),null);
+        assert.equal(slotOwner.getAssignedMonsterAtEnemySlot(openingSnapshot,"ENEMY_F4"),null);
         assert.equal(context.monsters.length,1,"reinforcements must not exist in the opening roster");
         boss.hp=Math.round(boss.maxHP*.51);context.turn=2;context.startTurn(context.battleToken);
         assert.equal(context.monsters.length,1,"HP-triggered reinforcements must wait until the configured threshold");
         boss.hp=Math.floor(boss.maxHP*.5);context.turn=3;context.startTurn(context.battleToken);
         assert.equal(context.monsters.length,3);
-        const guards=context.monsters.slice(1);
+        const guards=context.monsters.slice(1),summonedSnapshot=slotOwner.getActiveEnemySnapshot();
+        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,0),"ENEMY_F3");
+        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,1),"ENEMY_F2");
+        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,2),"ENEMY_F4");
+        assert.deepEqual(Array.from(guards,unit=>unit.vGameplayBattlefieldSlot),["ENEMY_F2","ENEMY_F4"]);
+        guards[0].alive=false;guards[0].hp=0;
+        assert.equal(slotOwner.getAssignedMonsterAtEnemySlot(summonedSnapshot,"ENEMY_F2"),1,"dead reinforcement keeps its assigned slot");
+        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,0),"ENEMY_F3","Boss must not move after reinforcement death");
         assert.ok(guards.every(unit=>unit.vGameplayBossSummon===true&&unit.rank==="elite"&&unit.element===boss.element));
         assert.equal(new Set(guards.map(unit=>unit.name)).size,2);
         guards.forEach(unit=>[...unit.skillIds,...(unit.v141SupportSkillIds||[])].forEach(skillId=>{
@@ -264,6 +278,23 @@ test("multi-phase personal bosses change action loadout at HP thresholds",()=>{
     assert.equal(value(context,"GameplaySystem.getActiveBattleState().combatPhase"),2);
     assert.match(context.logs.join("\n"),/進入第二階段/);
     assert.ok(context.monsters[0].skillIds.length>=2,"later phase must change the Boss action loadout");
+});
+
+
+test("Mechanisms use stable independent sidecar slots and never join enemy unit geometry",()=>{
+    const {context}=load();
+    assert.equal(context.vGameplayStartBoss("personal","personal-70"),true);
+    const first=context.GameplaySystem.debugSpawnMechanism("shield","slot-test-a");
+    const second=context.GameplaySystem.debugSpawnMechanism("charge","slot-test-b");
+    assert.ok(first&&second);
+    assert.deepEqual([first.battlefieldSlot,second.battlefieldSlot],["MECH_C","MECH_L"]);
+    assert.equal(new Set([first.battlefieldSlot,second.battlefieldSlot]).size,2);
+    const owner=context.FourSymbolsBattlefieldSlots;
+    assert.deepEqual(value(context,"FourSymbolsBattlefieldSlots.mechanismSlots"),["MECH_L","MECH_C","MECH_R"]);
+    assert.ok([first.battlefieldSlot,second.battlefieldSlot].every(slot=>!owner.enemySlots.includes(slot)));
+    assert.equal(context.currentBattleMonsters.length,1,"mechanism cards must stay outside currentBattleMonsters");
+    const snapshot=owner.getActiveEnemySnapshot();
+    assert.equal(owner.getEnemySlotForMonster(snapshot,0),"ENEMY_F3");
 });
 
 test("AoE destroys the shield but cannot retarget the Boss until the next formal action",()=>{

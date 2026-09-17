@@ -1,4 +1,3 @@
-
 /* V50 ROOT-CAUSE FIX
    The visible right-side line came from the battle background layer being
    hard-coded to the old Legacy size (420px x 746.67px) inside the
@@ -24,9 +23,9 @@
     pointer-events:none !important;
 }
 
-/* The battle viewport itself cannot expose horizontal overflow. */
+/* battlePage is not a clipping owner. The outer game viewport prevents page
+   scrolling while combat art remains free to paint outside unit rectangles. */
 #game-stage > #app > #game-content #battlePage{
-    overflow:hidden !important;
     border-right:0 !important;
     outline-right:0 !important;
     box-shadow:none !important;
