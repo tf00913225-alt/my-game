@@ -76,18 +76,41 @@ function createRuntime(action,targetType){
         console,Promise,Set,Map,Array,Object,Number,String,Boolean,RegExp,Date,Math,Proxy,
         setTimeout,clearTimeout,innerWidth:420,innerHeight:720,
         v142SkillAnimationDirector:director,
+        FourSymbolsBattlefieldSlots:{
+            getSlotForCombatant(side,index){ return (side==="monster"?"MONSTER_":"PLAYER_")+index; },
+            getSlotFromElement(element){ return element===mechanism?"MECHANISM_1":element&&element.dataset?element.dataset.slot:null; },
+            getSlotRect(slotId){
+                if(slotId==="MECHANISM_1"){
+                    const rect=mechanism.getBoundingClientRect();
+                    return Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2});
+                }
+                const match=String(slotId).match(/^(MONSTER|PLAYER)_(\d+)$/);
+                if(!match){ return null; }
+                const node=byId[(match[1]==="MONSTER"?"battleMonster":"battlePlayerCard")+match[2]];
+                const rect=node&&node.getBoundingClientRect();
+                return rect?Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2}):null;
+            },
+            getSlotCenter(slotId){
+                const rect=this.getSlotRect(slotId);
+                return rect?{x:rect.centerX,y:rect.centerY,rect}:null;
+            },
+            getRectForSlots(slotIds){ return this.getSlotRect(slotIds[0]); },
+            getGeometryRectFromShape(side,slotId){ return this.getSlotRect(slotId)||this.getSideRect(side); },
+            getSideRect(side){
+                const rect=(side==="monster"?monsterArea:playerArea).getBoundingClientRect();
+                return Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2});
+            }
+        },
         monsters:[
             {name:"Boss",rank:"boss",hp:5000,alive:true,statusEffects:[],activeBuffs:[]},
             {name:"Support",hp:500,alive:true,statusEffects:[],activeBuffs:[]}
         ],
         currentBattleMonsters:[0,1],
-        queuedPlayerActions:[{action,target:"mechanism:mechanism-1",targetAlly:0}],
         getPartyCharacterByIndex(index){
             if(index===0)return {id:"P0",hp:100,alive:true,statusEffects:[],activeBuffs:[]};
             if(index===1)return {id:"P1",hp:100,alive:true,statusEffects:[],activeBuffs:[]};
             return null;
         },
-        getSkillTargets(){ return [0,1]; },
         showMissEffect(){},showMonsterHit(){},showPlayerHit(){},v141PlayCardEffect(){},
         document:{
             body,readyState:"complete",
@@ -102,7 +125,10 @@ function createRuntime(action,targetType){
     vm.createContext(context);
     vm.runInContext(vfxSource,context,{filename:"js/39-v143-skill-animation.js"});
     const config={id:action,name:action,element:"normal",category:"physical",targetType,duration:1450,resolveDuration:1450};
-    context.v142SkillAnimationDirector.play(config,{side:"player",actorIndex:0});
+    const targetId="mechanism:mechanism-1";
+    context.v142SkillAnimationDirector.play(config,{
+        side:"player",actorIndex:0,targetSide:"monster",targetId,targetIds:[targetId]
+    });
     return {context,mechanism,player0};
 }
 
@@ -144,13 +170,14 @@ const resolverStart=bossSource.indexOf("    function resolveMechanismAction(char
 const resolverEnd=bossSource.indexOf("    function inventoryDefinition(id){",resolverStart);
 assert.ok(resolverStart>=0&&resolverEnd>resolverStart,"mechanism action owner must exist");
 const resolver=bossSource.slice(resolverStart,resolverEnd);
-const gateIndex=resolver.indexOf('window.v142PlaySkillAnimationFromBadge(');
+const gateIndex=resolver.indexOf('showSkillNameBadge(');
 const damageIndex=resolver.indexOf("const result=calculateMechanismActionDamage");
-const retargetIndex=resolver.indexOf("queued.target=fallback");
-assert.ok(gateIndex>=0,"spread function-card damage must explicitly open the existing formal animation gate");
+assert.ok(gateIndex>=0,"spread function-card damage must enter the formal badge/target-contract owner");
 assert.ok(gateIndex<damageIndex,"formal animation gate must start before function-card damage resolves");
-assert.ok(gateIndex<retargetIndex,"formal animation gate must capture mechanism:* before core retargeting");
-assert.match(resolver,/spreads&&skill&&numeric\(skill\.baseDamage\)>0/,"non-damaging spread skills must not fake a function-card hit VFX");
+assert.match(resolver,/showSkillNameBadge\(skill\.name,skill\.element,characterIndex,queued\.target,\[queued\.target\]\)/,
+    "formal animation gate must carry the selected mechanism:* target explicitly");
+assert.match(resolver,/if\(result\.damage>0\)\{ damageMechanism\(/,
+    "non-damaging skills may present their cast but must not fake a function-card hit");
 
 const damageStart=bossSource.indexOf("    function damageMechanism(card,damage,sourceName,isCrit){");
 const damageEnd=bossSource.indexOf("    function partyIndexes(){",damageStart);

@@ -274,6 +274,38 @@ function loadRuntime(options={}){
             getElementById(id){ return cards[id]||null; },
             querySelectorAll(selector){ return body.querySelectorAll(selector); }
         },
+        FourSymbolsBattlefieldSlots:{
+            getSlotForCombatant(side,index){ return (side==="monster"?"MONSTER_":"PLAYER_")+index; },
+            getSlotFromElement(element){
+                const match=String(element&&element.id||"").match(/^battle(Monster|PlayerCard)(\d+)$/);
+                return match?(match[1]==="Monster"?"MONSTER_":"PLAYER_")+match[2]:null;
+            },
+            getSlotRect(slot){
+                const match=String(slot).match(/^(MONSTER|PLAYER)_(\d+)$/);
+                if(!match){ return null; }
+                const node=cards[(match[1]==="MONSTER"?"battleMonster":"battlePlayerCard")+match[2]];
+                const rect=node&&node.getBoundingClientRect();
+                return rect?Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2}):null;
+            },
+            getSlotCenter(slot){
+                const rect=this.getSlotRect(slot);
+                return rect?{x:rect.centerX,y:rect.centerY,rect}:null;
+            },
+            getGeometryRectFromShape(side,slot,shape){
+                if(String(shape).toLowerCase()==="single"){ return this.getSlotRect(slot); }
+                const prefix=side==="monster"?"MONSTER_":"PLAYER_";
+                const rects=[0,1,2].map(index=>this.getSlotRect(prefix+index)).filter(Boolean);
+                const left=Math.min(...rects.map(rect=>rect.left));
+                const top=Math.min(...rects.map(rect=>rect.top));
+                const right=Math.max(...rects.map(rect=>rect.right));
+                const bottom=Math.max(...rects.map(rect=>rect.bottom));
+                return {left,top,right,bottom,width:right-left,height:bottom-top,centerX:(left+right)/2,centerY:(top+bottom)/2};
+            },
+            getSideRect(side){
+                const rect=cards[side==="monster"?"battleMonsterArea":"battlePlayerRow"].getBoundingClientRect();
+                return Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2});
+            }
+        },
         monsters,
         currentBattleMonsters:[0,1,2],
         queuedPlayerActions:{0:{target:targetIndexes[0]||0,targetAlly:1}},
@@ -377,7 +409,7 @@ test("single-target sheets stay centered on the actual selected card",()=>{
         const runtime=loadRuntime();
         runtime.context.v142SkillAnimationDirector.play(
             castConfig(id,"single"),
-            {side:"player",actorIndex:0,targetId:2}
+            {side:"player",actorIndex:0,targetSide:"monster",targetId:2,targetIds:[2]}
         );
         const {stage,sprites}=stageSprites(runtime);
         assert.equal(sprites.length,1,id);
@@ -390,7 +422,7 @@ test("single-target sheets stay centered on the actual selected card",()=>{
     });
 });
 
-test("Ice Spin creates one synchronized sheet for every real target and never for an empty slot",()=>{
+test("Ice Spin creates one fixed tri-target sheet centered on the explicit primary target",()=>{
     [[1],[0,2],[0,1,2]].forEach(indexes=>{
         const monsters=[0,1,2].map(index=>({
             alive:indexes.includes(index),hp:indexes.includes(index)?100:0,
@@ -399,19 +431,14 @@ test("Ice Spin creates one synchronized sheet for every real target and never fo
         const runtime=loadRuntime({monsters,targetIndexes:indexes});
         runtime.context.v142SkillAnimationDirector.play(
             castConfig("iceSpin","tri"),
-            {side:"player",actorIndex:0,targetIds:indexes}
+            {side:"player",actorIndex:0,targetSide:"monster",targetId:indexes[0],targetIds:indexes}
         );
         const {sprites}=stageSprites(runtime);
-        assert.equal(sprites.length,indexes.length,indexes.join(","));
-        assert.deepEqual(
-            sprites.map(node=>Number(node.dataset.targetIndex)),
-            indexes,indexes.join(",")
-        );
-        assert.deepEqual(
-            sprites.map(node=>node.style.left),
-            indexes.map(index=>["338px","458px","578px"][index]),
-            indexes.join(",")
-        );
+        assert.equal(sprites.length,1,indexes.join(","));
+        assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
+        assert.equal(sprites[0].style.left,["338px","458px","578px"][indexes[0]]);
+        assert.equal(sprites[0].style.width,"316px");
+        assert.equal(sprites[0].style.height,"100px");
         indexes.forEach(index=>runtime.context.showMonsterHit(index,10,"hp"));
         const delayedNumbers=runtime.scheduled.slice(-indexes.length);
         assert.equal(delayedNumbers.length,indexes.length);
@@ -428,15 +455,16 @@ test("Water Ball renders one sheet centered on the actual living target group",(
             statusEffects:[],activeBuffs:[]
         }));
         const runtime=loadRuntime({monsters,targetIndexes:indexes});
+        const primary=indexes.includes(1)?1:indexes[indexes.length-1];
         runtime.context.v142SkillAnimationDirector.play(
             castConfig("waterBall","tri"),
-            {side:"player",actorIndex:0,targetIds:indexes}
+            {side:"player",actorIndex:0,targetSide:"monster",targetId:primary,targetIds:indexes}
         );
         const sprites=stageSprites(runtime).sprites;
         assert.equal(sprites.length,1,indexes.join(","));
         assert.equal(sprites[0].dataset.placement,"group");
         assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprites[0].style.left,"458px");
+        assert.equal(sprites[0].style.left,["338px","458px","578px"][primary]);
         assert.equal(sprites[0].style.top,"140px");
         assert.equal(sprites[0].style["--v143-sprite-duration"],"1400ms");
     });
@@ -444,7 +472,7 @@ test("Water Ball renders one sheet centered on the actual living target group",(
     const beast=loadRuntime();
     beast.context.v142SkillAnimationDirector.play(
         castConfig("floodBeast","single"),
-        {side:"player",actorIndex:0,targetId:1}
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]}
     );
     const beastSprites=stageSprites(beast).sprites;
     assert.equal(beastSprites.length,1);
@@ -454,13 +482,13 @@ test("Water Ball renders one sheet centered on the actual living target group",(
     assert.doesNotMatch(css,/v166WaterTargetTravel/);
 });
 
-test("enemy Water Ball keeps one live-target group while endpoints resolve",()=>{
+test("enemy Water Ball uses its explicit player target group",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("waterBall","tri"),
-        {side:"monster",actorIndex:0}
+        {side:"monster",actorIndex:0,targetSide:"player",targetId:0,targetIds:[0,2]}
     );
-    assert.equal(stageSprites(runtime).sprites.length,0,"enemy targets are not guessed");
+    assert.equal(stageSprites(runtime).sprites.length,1,"explicit targets render before hit callbacks");
     runtime.context.v141PlayCardEffect("player",0,"damage");
     runtime.context.v141PlayCardEffect("player",2,"damage");
     const sprites=stageSprites(runtime).sprites;
@@ -479,14 +507,14 @@ test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
         const runtime=loadRuntime({monsters,targetIndexes:indexes});
         runtime.context.v142SkillAnimationDirector.play(
             castConfig("iceArrowRain","all"),
-            {side:"player",actorIndex:0}
+            {side:"player",actorIndex:0,targetSide:"monster",targetId:indexes[0],targetIds:indexes}
         );
         const {sprites}=stageSprites(runtime);
         assert.equal(sprites.length,1,indexes.join(","));
         const sprite=sprites[0];
         assert.equal(sprite.dataset.targetSide,"monster");
         assert.equal(sprite.dataset.placement,"battlefield");
-        assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+        assert.equal(sprite.dataset.areaId,"fixed-enemy-zone");
         assert.equal(sprite.dataset.fixedFormation,"true");
         assert.equal(sprite.dataset.targetIndexes,indexes.join(","));
         assert.equal(sprite.style.left,"480px");
@@ -495,35 +523,36 @@ test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
         assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
         results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
-    assert.deepEqual(results[0],["480px","170px","317px","317px"]);
+    assert.deepEqual(results[0],["480px","170px","440px","260px"]);
     assert.deepEqual(results[1],results[0]);
 });
 
 test("enemy Ice Arrow Rain stays centered on the complete player formation",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("iceArrowRain","all"),{side:"monster",actorIndex:0}
+        castConfig("iceArrowRain","all"),
+        {side:"monster",actorIndex:0,targetSide:"player",targetId:1,targetIds:[0,1,2]}
     );
     const {sprites}=stageSprites(runtime);
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetSide,"player");
-    assert.equal(sprites[0].dataset.areaId,"battlePlayerRow");
+    assert.equal(sprites[0].dataset.areaId,"fixed-ally-zone");
     assert.equal(sprites[0].dataset.fixedFormation,"true");
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
     assert.equal(sprites[0].style.left,"240px");
     assert.equal(sprites[0].style.top,"420px");
-    assert.equal(sprites[0].style.width,"195px");
-    assert.equal(sprites[0].style.height,"195px");
+    assert.equal(sprites[0].style.width,"440px");
+    assert.equal(sprites[0].style.height,"160px");
     assert.equal(sprites[0].style.clipPath||sprites[0].style["clip-path"],"none");
     assert.equal(sprites[0].querySelectorAll(".v166-water-battlefield-tile").length,0);
 });
 
-test("enemy Tidal Beast discovers one real player endpoint even when damage is absorbed",()=>{
+test("enemy Tidal Beast uses its explicit player endpoint even when damage is absorbed",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("floodBeast","single"),{side:"monster",actorIndex:0}
+        castConfig("floodBeast","single"),{side:"monster",actorIndex:0,targetSide:"player",targetId:2,targetIds:[2]}
     );
-    assert.equal(stageSprites(runtime).sprites.length,0);
+    assert.equal(stageSprites(runtime).sprites.length,1);
     runtime.context.applySkillDebuffEffectsToPlayer(
         castConfig("floodBeast","single"),1,runtime.party[2],2,1,1
     );
@@ -540,31 +569,39 @@ test("enemy Tidal Beast discovers one real player endpoint even when damage is a
 test("late callbacks cannot expand a single-target Tidal Beast cast",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("floodBeast","single"),{side:"player",actorIndex:0,targetId:1}
+        castConfig("floodBeast","single"),
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]}
     );
     assert.deepEqual(stageSprites(runtime).sprites.map(node=>node.dataset.targetIndex),["1"]);
     runtime.context.showMonsterHit(2,10,"hp");
     assert.deepEqual(stageSprites(runtime).sprites.map(node=>node.dataset.targetIndex),["1"]);
 });
 
-test("the retained tri-target Freeze and ally-all Heal still follow each actual card",()=>{
+test("tri-target Freeze and ally-all Heal use their fixed semantic footprints",()=>{
     const freeze=loadRuntime({targetIndexes:[0,2]});
     freeze.context.v142SkillAnimationDirector.play(
         castConfig("freeze","tri"),
-        {side:"player",actorIndex:0,targetIds:[0,2]}
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0,2]}
     );
     const freezeSprites=stageSprites(freeze).sprites;
-    assert.deepEqual(freezeSprites.map(node=>node.dataset.targetIndex),["0","2"]);
-    assert.deepEqual(freezeSprites.map(node=>node.style.left),["338px","578px"]);
+    assert.equal(freezeSprites.length,1);
+    assert.equal(freezeSprites[0].dataset.targetIndexes,"0,2");
+    assert.equal(freezeSprites[0].style.left,"338px");
+    assert.equal(freezeSprites[0].style.width,"316px");
+    assert.equal(freezeSprites[0].style.height,"100px");
 
     const heal=loadRuntime();
     heal.context.v142SkillAnimationDirector.play(
         castConfig("healSpell","allyAll"),
-        {side:"player",actorIndex:0}
+        {side:"player",actorIndex:0,targetSide:"player",targetId:0,targetIds:[0,1,2]}
     );
     const healSprites=stageSprites(heal).sprites;
-    assert.deepEqual(healSprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
-    assert.deepEqual(healSprites.map(node=>node.style.left),["99px","239px","379px"]);
+    assert.equal(healSprites.length,1);
+    assert.equal(healSprites[0].dataset.targetIndexes,"0,1,2");
+    assert.equal(healSprites[0].dataset.placement,"battlefield");
+    assert.equal(healSprites[0].style.left,"240px");
+    assert.equal(healSprites[0].style.width,"440px");
+    assert.equal(healSprites[0].style.height,"160px");
 });
 
 test("Freeze and Frostbite loops mirror statusEffects only and never open an action gate",()=>{
@@ -625,7 +662,7 @@ test("existing Frozen and Frostbite loops do not restart during a duplicate cast
         assert.ok(existing);
         runtime.context.v142SkillAnimationDirector.play(
             castConfig(id,id==="freeze"?"tri":"single"),
-            {side:"player",actorIndex:0,targetId:0}
+            {side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0]}
         );
         assert.strictEqual(
             runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type),
@@ -643,19 +680,21 @@ test("existing Frozen and Frostbite loops do not restart during a duplicate cast
     });
 });
 
-test("enemy Freeze discovers its successful player target from the applied status",()=>{
+test("enemy Freeze uses its explicit successful player target",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("freeze","tri"),
-        {side:"monster",actorIndex:0}
+        {side:"monster",actorIndex:0,targetSide:"player",targetId:1,targetIds:[1]}
     );
-    assert.equal(stageSprites(runtime).sprites.length,0);
+    assert.equal(stageSprites(runtime).sprites.length,1);
     runtime.context.applyFreezeEffect(runtime.party[1],4);
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.targetIndex,"1");
+    assert.equal(sprites[0].dataset.targetIndexes,"1");
     assert.equal(sprites[0].style.left,"239px");
     assert.equal(sprites[0].style.top,"418px");
+    assert.equal(sprites[0].style.width,"398px");
+    assert.equal(sprites[0].style.height,"116px");
     assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-freeze"),null);
 });
 
@@ -663,7 +702,7 @@ test("legacy Ice Spin projectile is suppressed while its official sheet is activ
     const runtime=loadRuntime({targetIndexes:[0,1,2]});
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("iceSpin","tri"),
-        {side:"player",actorIndex:0,targetIds:[0,1,2]}
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[0,1,2]}
     );
     runtime.context.playIceSpinProjectile("battlePlayerCard0",[
         "battleMonster0","battleMonster1","battleMonster2"

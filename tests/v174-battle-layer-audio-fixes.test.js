@@ -39,12 +39,14 @@ test("Live modal overlap QA snapshots one V143 stage without a CDP timing race",
     assert.doesNotMatch(liveQa,/modal-overlap V143 presentation/);
 });
 
-test("Live production cast QA captures its V143 stage in the casting browser task",()=>{
-    const start=liveQa.indexOf("const productionCastSnapshot=await client.eval");
+test("Live production cast QA enters through declaration and captures its V143 stage",()=>{
+    const start=liveQa.indexOf("const productionDeclaration=await client.eval");
     const end=liveQa.indexOf("evidence.checks.skillLayerBeforeElementBox=",start);
     assert.ok(start>=0&&end>start,"live QA must own one atomic production-cast browser task");
     const snapshot=liveQa.slice(start,end);
-    assert.match(snapshot,/castDamageSkill\('explosiveFlurry'\)/);
+    assert.match(snapshot,/queuedPlayerActions\[0\]=\{action:'explosiveFlurry',target:2,targetAlly:null\}/);
+    assert.match(snapshot,/startResolutionPhase\(battleToken\)/);
+    assert.match(snapshot,/waitFor\(client,"document\.getElementById\('v143-skill-stage'\)\?\.dataset\.skill==='explosiveFlurry'"/);
     assert.match(snapshot,/document\.getElementById\('v143-skill-stage'\)/);
     assert.doesNotMatch(liveQa,/visible V143 skill layer/);
 });

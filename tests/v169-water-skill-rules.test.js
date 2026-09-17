@@ -208,7 +208,7 @@ test("Frostbite is a soft debuff and never blocks skills or monster special acti
 test("monster Freeze pure-control damage is owned by the authoritative core",()=>{
     const main=fs.readFileSync("js/00-main.js","utf8");
     assert.doesNotMatch(source,/window\.calculateDamage\s*=/);
-    assert.match(main,/const isPureControlSkill=[\s\S]*?castSkillData2\.id==="freeze"/);
+    assert.match(main,/const isPureControlSkill=[\s\S]*?castSkillData\.id==="freeze"/);
     assert.match(main,/let damage=[\s\S]*?isPureControlSkill[\s\S]*?\?0/);
     assert.match(main,/if\(damage>0 && hasBarrier\)/);
 });

@@ -132,6 +132,7 @@ function loadRuntime(options={}){
         const top=index<5?90:205;
         cards["battleMonster"+index]=makeNode({left,top,right:left+76,bottom:top+100,width:76,height:100});
     }
+    Object.entries(cards).forEach(([id,node])=>{ node.id=id; });
     const monsters=options.monsters||[
         {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
         {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
@@ -173,10 +174,39 @@ function loadRuntime(options={}){
             getElementById(id){ return cards[id]||null; },
             querySelectorAll(selector){ return body.querySelectorAll(selector); }
         },
+        FourSymbolsBattlefieldSlots:{
+            getSlotForCombatant(side,index){ return (side==="monster"?"MONSTER_":"PLAYER_")+index; },
+            getSlotFromElement(element){ return element&&element.id||null; },
+            getSlotRect(slot){
+                const match=String(slot).match(/^(MONSTER|PLAYER)_(\d+)$/);
+                if(!match){ return null; }
+                const node=cards[(match[1]==="MONSTER"?"battleMonster":"battlePlayerCard")+match[2]];
+                const rect=node&&node.getBoundingClientRect();
+                return rect?Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2}):null;
+            },
+            getSlotCenter(slot){
+                const rect=this.getSlotRect(slot);
+                return rect?{x:rect.centerX,y:rect.centerY,rect}:null;
+            },
+            getGeometryRectFromShape(side,slot,shape){
+                if(String(shape).toLowerCase()==="single"){ return this.getSlotRect(slot); }
+                const match=String(slot).match(/^(MONSTER|PLAYER)_(\d+)$/);
+                if(!match){ return null; }
+                const indexes=match[1]==="MONSTER"?[0,1,2]:[0,1,2];
+                const rects=indexes.map(index=>this.getSlotRect(match[1]+"_"+index)).filter(Boolean);
+                const left=Math.min(...rects.map(rect=>rect.left));
+                const top=Math.min(...rects.map(rect=>rect.top));
+                const right=Math.max(...rects.map(rect=>rect.right));
+                const bottom=Math.max(...rects.map(rect=>rect.bottom));
+                return {left,top,right,bottom,width:right-left,height:bottom-top,centerX:(left+right)/2,centerY:(top+bottom)/2};
+            },
+            getSideRect(side){
+                const rect=cards[side==="monster"?"battleMonsterArea":"battlePlayerRow"].getBoundingClientRect();
+                return Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2});
+            }
+        },
         monsters,
         currentBattleMonsters:[0,1,2],
-        queuedPlayerActions:{0:{target:1,targetAlly:1}},
-        getSkillTargets(){ return [0,1,2]; },
         getPartyCharacterByIndex(index){ return party[index]||null; }
     };
     context.window=context;
@@ -267,7 +297,8 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
 test("tri skills follow valid targets while Phoenix Cry keeps one full-field sheet",()=>{
     const tri=loadRuntime();
     tri.context.v142SkillAnimationDirector.play(
-        castConfig("explosiveFlurry",1450,"tri"),{side:"player",actorIndex:0}
+        castConfig("explosiveFlurry",1450,"tri"),
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[0,1,2]}
     );
     const triStage=tri.body.children.find(node=>node.id==="v143-skill-stage");
     const triSprites=triStage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
@@ -275,7 +306,8 @@ test("tri skills follow valid targets while Phoenix Cry keeps one full-field she
     assert.equal(triSprites[0].dataset.targetIndexes,"0,1,2");
     assert.equal(triSprites[0].style.left,"438px");
     assert.equal(triSprites[0].style.top,"140px");
-    assert.equal(triSprites[0].style.width,triSprites[0].style.height,"sheet cells must stay square");
+    assert.equal(triSprites[0].style.width,"276px","three-target cast keeps the fixed three-slot width");
+    assert.equal(triSprites[0].style.height,"100px","three-target cast stays inside the fixed row height");
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-field")),false);
 
@@ -287,7 +319,8 @@ test("tri skills follow valid targets while Phoenix Cry keeps one full-field she
         ]
     });
     all.context.v142SkillAnimationDirector.play(
-        castConfig("phoenixCry",3200,"all","magic"),{side:"player",actorIndex:0}
+        castConfig("phoenixCry",3200,"all","magic"),
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0,2]}
     );
     const allStage=all.body.children.find(node=>node.id==="v143-skill-stage");
     const phoenixes=allStage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
@@ -301,7 +334,8 @@ test("tri skills follow valid targets while Phoenix Cry keeps one full-field she
         ]
     });
     onlyOne.context.v142SkillAnimationDirector.play(
-        castConfig("phoenixCry",3200,"all","magic"),{side:"player",actorIndex:0}
+        castConfig("phoenixCry",3200,"all","magic"),
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]}
     );
     const lonePhoenix=onlyOne.body.children.find(node=>node.id==="v143-skill-stage")
         .children.find(node=>node.className.includes("v143-vfx-sprite"));
@@ -315,7 +349,8 @@ test("tri skills follow valid targets while Phoenix Cry keeps one full-field she
 test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main projectile",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("fireRocket",900,"tri","magic"),{side:"player",actorIndex:0}
+        castConfig("fireRocket",900,"tri","magic"),
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[0,1,2]}
     );
     runtime.context.playFireRocketAnimation("battlePlayerCard0",[
         "battleMonster0","battleMonster1","battleMonster2"
@@ -331,18 +366,19 @@ test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main
     assert.equal(sprites[0].style["--v143-sprite-dx"],"359px");
     assert.equal(sprites[0].style["--v143-sprite-dy"],"-258px");
     assert.notEqual(sprites[0].style["--v143-sprite-angle"],"0deg");
-    assert.equal(sprites[0].style.width,sprites[0].style.height);
-    assert.equal(sprites[0].style.width,"280px","VFX box is restored to the original pre-enlargement size");
+    assert.equal(sprites[0].style.width,"276px","projectile owns the same fixed three-slot width as its impact");
+    assert.equal(sprites[0].style.height,"100px","projectile owns the fixed target-row height");
     assert.equal(runtime.legacyRocketCalls(),0);
 });
 
-test("enemy Fire Rocket follows late target registration back to the player row",()=>{
+test("enemy Fire Rocket uses its explicit player target group",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("fireRocket",900,"tri","magic"),{side:"monster",actorIndex:0}
+        castConfig("fireRocket",900,"tri","magic"),
+        {side:"monster",actorIndex:0,targetSide:"player",targetId:1,targetIds:[0,1,2]}
     );
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
-    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,0);
+    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,1);
     [0,1,2].forEach(index=>runtime.context.v141PlayCardEffect("player",index,"damage"));
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
     assert.equal(sprites.length,1);
@@ -356,7 +392,8 @@ test("enemy Fire Rocket follows late target registration back to the player row"
 test("Fire Slash plays one sheet on the selected target and reaches damage at frame eight",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("flameSlash",760,"single"),{side:"player",actorIndex:0}
+        castConfig("flameSlash",760,"single"),
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]}
     );
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
@@ -376,7 +413,8 @@ test("Fire Slash plays one sheet on the selected target and reaches damage at fr
 test("MISS still plays the formal skill Sprite and keeps MISS feedback on hit timing",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("flameSlash",760,"single"),{side:"player",actorIndex:0}
+        castConfig("flameSlash",760,"single"),
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]}
     );
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
     const sprite=stage.children.find(node=>node.className.includes("v143-vfx-sprite"));
@@ -393,41 +431,43 @@ test("MISS still plays the formal skill Sprite and keeps MISS feedback on hit ti
     assert.equal(runtime.misses[0][2],"MISS");
 });
 
-test("Rage creates one cast sheet inside every affected card",()=>{
+test("Rage creates one shared full-ally cast sheet",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("rage",1500,"allyAll","buff"),{side:"player",actorIndex:2}
+        castConfig("rage",1500,"allyAll","buff"),
+        {side:"player",actorIndex:2,targetSide:"player",targetId:2,targetIds:[0,1,2]}
     );
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
-    assert.equal(sprites.length,3);
-    assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["0","1","2"]);
-    sprites.forEach(node=>assert.equal(node.dataset.placement,"single"));
-    sprites.forEach(node=>{
-        assert.ok(parseFloat(node.style.width)>=120);
-        assert.ok(parseFloat(node.style.width)<=148);
-    });
+    assert.equal(sprites.length,1);
+    assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
+    assert.equal(sprites[0].dataset.placement,"battlefield");
+    assert.equal(sprites[0].style.width,"600px");
+    assert.equal(sprites[0].style.height,"140px");
 });
 
-test("enemy Rage allyTri waits for and animates only the three resolved targets",()=>{
+test("enemy Rage allyTri animates only the three explicit targets",()=>{
     const monsters=Array.from({length:10},()=>({alive:true,hp:100,statusEffects:[],activeBuffs:[]}));
     const runtime=loadRuntime({monsters});
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("rage",1500,"allyTri","buff"),{side:"monster",actorIndex:0}
+        castConfig("rage",1500,"allyTri","buff"),
+        {side:"monster",actorIndex:0,targetSide:"monster",targetId:5,targetIds:[4,5,6]}
     );
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
-    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,0);
+    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,1);
     [4,5,6].forEach(index=>runtime.context.v141PlayCardEffect("monster",index,"buff"));
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
-    assert.equal(sprites.length,3);
-    assert.deepEqual(sprites.map(node=>node.dataset.targetIndex),["4","5","6"]);
+    assert.equal(sprites.length,1);
+    assert.equal(sprites[0].dataset.targetIndexes,"4,5,6");
+    assert.equal(sprites[0].dataset.placement,"group");
 });
 
 test("enemy Rage loop begins on the hit frame and follows its canonical ledger",()=>{
     const monsters=Array.from({length:10},()=>({alive:true,hp:100,statusEffects:[],activeBuffs:[]}));
     const runtime=loadRuntime({monsters});
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("rage",1500,"allyTri","buff"),{side:"monster",actorIndex:0}
+        castConfig("rage",1500,"allyTri","buff"),
+        {side:"monster",actorIndex:0,targetSide:"monster",targetId:5,targetIds:[4,5,6]}
     );
     monsters[4].v141TeamBuffs=[{type:"rage",turnsLeft:2}];
     runtime.context.v141PlayCardEffect("monster",4,"buff");
@@ -443,7 +483,8 @@ test("enemy Rage loop begins on the hit frame and follows its canonical ledger",
 test("frame eight delays hit numbers together and Fire Critical keeps its critical text reaction",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("fireCritical",1050,"single"),{side:"player",actorIndex:0}
+        castConfig("fireCritical",1050,"single"),
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]}
     );
     const before=runtime.scheduled.length;
     runtime.context.showMonsterHit(1,55,"hp",false);
@@ -494,7 +535,8 @@ test("Burn and Rage loops follow live status records without owning an action ga
 test("a newly applied Burn starts its loop on the exact target hit frame",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
-        castConfig("flameTornado",2100,"single","magic"),{side:"player",actorIndex:0}
+        castConfig("flameTornado",2100,"single","magic"),
+        {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]}
     );
     runtime.context.showMonsterHit(1,135,"hp",false);
     const beforeBurn=runtime.scheduled.length;
