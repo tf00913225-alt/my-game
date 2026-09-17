@@ -127,4 +127,4 @@ assert.ok(column.height>single.height);
 assert.ok(all.width>=row.width&&all.height>=column.height);
 
 assert.match(qaSource,/V174 battle presentation owner/);
-console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.\n");
+console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");
