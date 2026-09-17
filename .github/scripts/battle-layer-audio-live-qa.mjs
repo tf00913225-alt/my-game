@@ -499,9 +499,9 @@ try{
             getSkillLevel=function(key,id){return id==='explosiveFlurry'?1:original.apply(this,arguments);};
         }
         const phase=typeof battlePhase!=='undefined'?battlePhase:null;
-        if(phase!=='declare'||typeof finishPlayerAction!=='function'){return {declared:false,phase};}
-        finishPlayerAction();
-        return {declared:true,phase};
+        if(phase!=='declare'||typeof startResolutionPhase!=='function'){return {declared:false,phase};}
+        startResolutionPhase(battleToken);
+        return {declared:true,phase,phaseAfter:typeof battlePhase!=='undefined'?battlePhase:null};
     })()`);
     evidence.checks.productionDeclaration=productionDeclaration;
     assert.equal(productionDeclaration.declared,true,"Real Fire Flurry must enter through the formal declaration phase");
