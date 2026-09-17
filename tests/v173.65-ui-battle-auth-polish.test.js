@@ -26,7 +26,7 @@ assert.match(base,/#skillDetailModal\{\s*z-index:13000;/);
 assert.match(native,/native-v18-skill-detail-layer\{z-index:13000!important;/);
 assert.match(detail,/#skillDetailModal #skillDetailIcon\{[\s\S]*?width:88px!important;[\s\S]*?background-size:contain!important;[\s\S]*?background-repeat:no-repeat!important;/);
 
-const auth=read("js/firebase/firebase-auth-ui.js"),startup=read("js/52-v173.20-startup-loader.js","utf8");
+const auth=read("js/firebase/firebase-auth-ui.js"),startup=read("js/52-v173.20-startup-loader.js");
 assert.match(auth,/Array\.isArray\(user\.providerIds\)/);
 assert.match(auth,/使用 Google 登入中/);
 assert.match(auth,/使用 \"\+user\.email\+\" 信箱登入中/);
