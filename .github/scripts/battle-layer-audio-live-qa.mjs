@@ -206,7 +206,12 @@ try{
         window.v133GetHighestCreatedCharacterLevel=()=>40;
         if(typeof showPage==='function'){showPage('dungeon');}
         const roster=v174AbyssBuildRoster(40,0,0);
-        const started=window.v132LaunchDungeonBattle(roster,()=>{});
+        window.__battleLayerQaDungeonOutcome=null;
+        const started=window.v132LaunchDungeonBattle(roster,outcome=>{
+            window.__battleLayerQaDungeonOutcome=outcome;
+            if(typeof showPage==='function'){showPage('dungeon');}
+        });
+        window.__battleLayerQaInitialBattleToken=Number(battleToken)||0;
         return {
             started:!!started,
             rosterCount:roster.length,
@@ -634,18 +639,23 @@ try{
 
     const endTransitionStart=await client.eval(`(()=>{
         if(typeof closeHomeFeature==='function'){closeHomeFeature();}
-        const beforeToken=Number(battleToken)||0;
-        (typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).forEach(index=>{
-            if(typeof monsters!=='undefined'&&monsters[index]){monsters[index].hp=0;monsters[index].alive=false;}
-        });
-        return {beforeToken,ended:typeof checkBattleEnd==='function'?checkBattleEnd():false};
+        const initialToken=Number(window.__battleLayerQaInitialBattleToken)||0;
+        if(typeof battleActive!=='undefined'&&battleActive){
+            (typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).forEach(index=>{
+                if(typeof monsters!=='undefined'&&monsters[index]){monsters[index].hp=0;monsters[index].alive=false;}
+            });
+        }
+        const ended=typeof battleActive!=='undefined'&&!battleActive
+            ?true:(typeof checkBattleEnd==='function'?checkBattleEnd():false);
+        return {initialToken,ended};
     })()`);
     await waitFor(client,"typeof battleActive!=='undefined'&&battleActive===false","battle victory flow release",5000);
-    await waitFor(client,"document.getElementById('mapPage')?.classList.contains('active')","battle-end map transition",6000);
+    await waitFor(client,"window.__battleLayerQaDungeonOutcome?.result==='win'&&document.getElementById('dungeonPage')?.classList.contains('active')","battle-end dungeon transition",6000);
     const endTransition=await client.eval(`({
         ended:${JSON.stringify(true)},battleActive:!!battleActive,
-        tokenAdvanced:(Number(battleToken)||0)>${endTransitionStart.beforeToken},
-        mapActive:document.getElementById('mapPage')?.classList.contains('active')||false,
+        tokenAdvanced:(Number(battleToken)||0)>${endTransitionStart.initialToken},
+        outcome:window.__battleLayerQaDungeonOutcome?.result||null,
+        dungeonActive:document.getElementById('dungeonPage')?.classList.contains('active')||false,
         stageCount:document.querySelectorAll('#v143-skill-stage').length
     })`);
     endTransition.ended=endTransitionStart.ended;
@@ -653,7 +663,8 @@ try{
     assert.equal(endTransition.ended,true,"Defeating the final targets must enter the formal battle-end path");
     assert.equal(endTransition.battleActive,false,"Battle-end path must clear battleActive");
     assert.equal(endTransition.tokenAdvanced,true,"Battle-end path must invalidate the completed battle token");
-    assert.equal(endTransition.mapActive,true,"Battle-end path must return to the map");
+    assert.equal(endTransition.outcome,"win","Dungeon battle-end path must deliver its win callback");
+    assert.equal(endTransition.dungeonActive,true,"Dungeon battle-end path must return to the dungeon page");
     assert.equal(endTransition.stageCount,0,"Battle-end path must leave no V143 stage behind");
 
     evidence.status="PASS";
