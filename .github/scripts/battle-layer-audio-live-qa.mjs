@@ -167,6 +167,81 @@ try{
 
     await waitFor(client,"document.getElementById('battlePage')?.classList.contains('active')&&document.getElementById('battlePlayerCard0')&&document.querySelector('#battlePlayerCard0 .hp-bar')&&document.querySelector('#battleMonster0 .monster-hp')","real battle resource bars",15000);
 
+    const layout=await client.eval(`(()=>{
+        const rectFor=element=>{
+            if(!element){return null;}
+            const rect=element.getBoundingClientRect();
+            return {left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom,width:rect.width,height:rect.height};
+        };
+        const inside=(inner,outer,tolerance=1)=>!!inner&&!!outer&&
+            inner.left>=outer.left-tolerance&&inner.right<=outer.right+tolerance&&
+            inner.top>=outer.top-tolerance&&inner.bottom<=outer.bottom+tolerance;
+        const intersects=(a,b)=>!!a&&!!b&&Math.min(a.right,b.right)-Math.max(a.left,b.left)>.5&&
+            Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>.5;
+        const sizeRange=rects=>({
+            count:rects.length,
+            minWidth:Math.min(...rects.map(rect=>rect.width)),
+            maxWidth:Math.max(...rects.map(rect=>rect.width)),
+            minHeight:Math.min(...rects.map(rect=>rect.height)),
+            maxHeight:Math.max(...rects.map(rect=>rect.height))
+        });
+        const owner=window.FourSymbolsBattlefieldSlots;
+        const enemy=rectFor(document.querySelector('.battle-enemy-region'));
+        const center=rectFor(document.querySelector('.battle-center-region'));
+        const ally=rectFor(document.querySelector('.battle-ally-region'));
+        const action=rectFor(document.getElementById('battleActionRegion'));
+        const info=rectFor(document.getElementById('battleInfo'));
+        const enemyArea=rectFor(document.getElementById('battleMonsterArea'));
+        const allyArea=rectFor(document.getElementById('battlePlayerRow'));
+        const enemySlotRects=owner.enemySlots.map(slot=>owner.getSlotRect(slot)).filter(Boolean);
+        const allySlotRects=owner.allySlots.map(slot=>owner.getSlotRect(slot)).filter(Boolean);
+        const cards=Array.from(document.querySelectorAll('.v-fixed-enemy-slot > .battle-monster,.v-fixed-ally-slot > .battle-player'))
+            .filter(card=>card.offsetParent!==null);
+        const hud=cards.map(card=>{
+            const name=card.querySelector('.battle-monster-name,.battle-player-id');
+            const hp=card.querySelector('.monster-hp,.hp-bar');
+            const sp=card.querySelector('.monster-sp,.sp-bar');
+            const visible=element=>!!element&&getComputedStyle(element).visibility==='visible'&&
+                getComputedStyle(element).display!=='none'&&element.getBoundingClientRect().width>0&&
+                element.getBoundingClientRect().height>0;
+            return {id:card.id,name:visible(name),hp:visible(hp),sp:visible(sp)};
+        });
+        const enemyCards=cards.filter(card=>card.classList.contains('battle-monster')).map(rectFor);
+        const allyCards=cards.filter(card=>card.classList.contains('battle-player')).map(rectFor);
+        return {
+            viewport:{width:innerWidth,height:innerHeight},
+            pageClass:document.getElementById('battlePage')?.className||'',
+            regions:{enemy,center,ally,action,info,enemyArea,allyArea},
+            separation:{
+                enemyBeforeCenter:enemy.bottom<=center.top+1,
+                centerBeforeAlly:center.bottom<=ally.top+1,
+                actionInsideCenter:inside(action,center),
+                infoInsideCenter:inside(info,center),
+                enemyAreaInsideEnemy:inside(enemyArea,enemy),
+                allyAreaInsideAlly:inside(allyArea,ally),
+                enemyCardsClearCenter:enemyCards.every(card=>!intersects(card,center)),
+                allyCardsClearCenter:allyCards.every(card=>!intersects(card,center))
+            },
+            enemySlots:sizeRange(enemySlotRects),
+            allySlots:sizeRange(allySlotRects),
+            hud
+        };
+    })()`);
+    evidence.checks.battleLayout=layout;
+    assert.equal(layout.viewport.width,412,"Live battle QA must use the portrait mobile viewport");
+    assert.match(layout.pageClass,/v-fixed-slot-render-v2/,"Deployed battle must use the Fixed Slot V2 layout owner");
+    Object.entries(layout.separation).forEach(([name,value])=>assert.equal(value,true,`Battle region separation failed: ${name}`));
+    assert.equal(layout.enemySlots.count,10,"The deployed enemy region must expose all ten fixed geometry slots");
+    assert.equal(layout.allySlots.count,6,"The deployed ally region must expose both three-column fixed geometry layers");
+    assert.ok(layout.enemySlots.maxWidth-layout.enemySlots.minWidth<=1,"Enemy slot widths must be equal");
+    assert.ok(layout.enemySlots.maxHeight-layout.enemySlots.minHeight<=1,"Enemy slot heights must be equal");
+    assert.ok(layout.allySlots.maxWidth-layout.allySlots.minWidth<=1,"Ally slot widths must be equal");
+    assert.ok(layout.allySlots.maxHeight-layout.allySlots.minHeight<=1,"Ally slot heights must be equal");
+    assert.ok(layout.enemySlots.minHeight>92,"Enemy slots must remain visibly larger than the previous compact cards");
+    assert.ok(layout.allySlots.minHeight>100,"Ally slots must retain the enlarged portrait layout");
+    assert.ok(layout.hud.length>=9,"The real Abyss battle must expose one ally and eight enemy card HUDs");
+    assert.ok(layout.hud.every(entry=>entry.name&&entry.hp&&entry.sp),"Every live combatant must keep its name, HP and SP visible");
+
     const resourceLayers=await client.eval(`(()=>{
         const playerCard=document.getElementById('battlePlayerCard0');
         const monsterCard=document.getElementById('battleMonster0');
@@ -201,6 +276,131 @@ try{
     assert.ok(resourceLayers.monsterSpZ>resourceLayers.monsterStatusZ,"Enemy SP bar must render above status VFX");
     assert.equal(resourceLayers.playerHpVisible,"visible","Player HP bar must remain visible");
     assert.equal(resourceLayers.monsterHpVisible,"visible","Enemy HP bar must remain visible");
+
+    const iceArrowRain=await client.eval(`(()=>{
+        const director=window.v142SkillAnimationDirector;
+        const owner=window.FourSymbolsBattlefieldSlots;
+        if(!director||typeof director.play!=='function'||typeof window.v142GetSkillAnimationConfig!=='function'||!owner){return null;}
+        const config=Object.assign({},window.v142GetSkillAnimationConfig('iceArrowRain'),{duration:1100,resolveDuration:1100});
+        const gate=director.play(config,{side:'player',actorIndex:0,key:'battle-layout-ice-arrow-rain-'+Date.now()});
+        window.__battleLayoutIceGate=gate;
+        const stage=document.getElementById('v143-skill-stage');
+        const sprites=stage?Array.from(stage.querySelectorAll('.v143-vfx-sprite')):[];
+        const sprite=sprites[0]||null;
+        const bounds=owner.getSideRect('monster');
+        const css=stage?getComputedStyle(stage):null;
+        return {
+            config:{id:config.id,targetType:config.targetType,duration:config.duration},
+            stageCount:document.querySelectorAll('#v143-skill-stage').length,
+            stageSkill:stage?.dataset.skill||null,
+            spriteCount:sprites.length,
+            placement:sprite?.dataset.placement||null,
+            frameFit:sprite?.dataset.frameFit||null,
+            areaId:sprite?.dataset.areaId||null,
+            targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
+            geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),
+            spriteBox:sprite?{
+                left:Number.parseFloat(sprite.style.left),top:Number.parseFloat(sprite.style.top),
+                width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)
+            }:null,
+            bounds,
+            stageOverflow:css?.overflow||null,
+            emitted:sprite?.dataset.emittedVisual||null,
+            gateId:gate?.id||null
+        };
+    })()`);
+    evidence.checks.iceArrowRainFullRange=iceArrowRain;
+    assert.equal(iceArrowRain?.config?.targetType,"all","Ice Arrow Rain must use its final all-target rule in production");
+    assert.equal(iceArrowRain?.stageCount,1,"Ice Arrow Rain must own exactly one V143 stage");
+    assert.equal(iceArrowRain?.stageSkill,"iceArrowRain","The deployed V143 stage must render Ice Arrow Rain");
+    assert.equal(iceArrowRain?.spriteCount,1,"A full-range cast must render one shared raster node");
+    assert.equal(iceArrowRain?.placement,"battlefield","All-target VFX must use the complete battlefield placement");
+    assert.equal(iceArrowRain?.frameFit,"stretch","All-target VFX must fill its semantic Fixed Slot region");
+    assert.equal(iceArrowRain?.areaId,"fixed-enemy-zone","Ice Arrow Rain must bind to the complete enemy fixed zone");
+    assert.equal(iceArrowRain?.geometrySlots.length,10,"Full-range VFX geometry must retain all ten slots regardless of occupancy");
+    assert.equal(iceArrowRain?.targetIndexes.length,8,"The real eight-enemy battle must expose all living targets to Ice Arrow Rain");
+    assert.ok(Math.abs(iceArrowRain.spriteBox.width-Math.round(iceArrowRain.bounds.width))<=1,"Ice Arrow Rain width must equal the complete enemy region");
+    assert.ok(Math.abs(iceArrowRain.spriteBox.height-Math.round(iceArrowRain.bounds.height))<=1,"Ice Arrow Rain height must equal the complete enemy region");
+    assert.ok(Math.abs(iceArrowRain.spriteBox.left-iceArrowRain.bounds.centerX)<=1,"Ice Arrow Rain must stay centered on the complete enemy region");
+    assert.ok(Math.abs(iceArrowRain.spriteBox.top-iceArrowRain.bounds.centerY)<=1,"Ice Arrow Rain must stay centered on the complete enemy region");
+    assert.equal(iceArrowRain.stageOverflow,"visible","The VFX owner must not clip full-range animation paint");
+    assert.equal(iceArrowRain.emitted,"true","Ice Arrow Rain must emit a visible production sprite");
+
+    await sleep(1350);
+    const iceGate=await client.eval(`(()=>{
+        const gate=window.__battleLayoutIceGate;
+        return {done:!!gate?.done,reason:gate?.reason||null,completionCount:gate?.completionCount||0,stageExists:!!document.getElementById('v143-skill-stage')};
+    })()`);
+    evidence.checks.iceArrowRainCompletion=iceGate;
+    assert.equal(iceGate.done,true,"Ice Arrow Rain must release its animation gate");
+    assert.equal(iceGate.completionCount,1,"Ice Arrow Rain gate must complete exactly once");
+    assert.ok(["v143-raster-complete","v142-render-safety-deadline"].includes(iceGate.reason),"Ice Arrow Rain must finish through a bounded production deadline");
+    assert.equal(iceGate.stageExists,false,"Completed full-range VFX must remove its stage");
+
+    const windFlame=await client.eval(`(()=>{
+        const director=window.v142SkillAnimationDirector;
+        const owner=window.FourSymbolsBattlefieldSlots;
+        const snapshot=owner?.getActiveEnemySnapshot?.();
+        const candidates=(typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).filter(index=>
+            typeof monsters!=='undefined'&&monsters[index]&&monsters[index].alive&&
+            owner.slotMeta[owner.getEnemySlotForMonster(snapshot,index)]?.column===3
+        );
+        const targetId=candidates[0]??(typeof currentBattleMonsters!=='undefined'?currentBattleMonsters[0]:0);
+        const primarySlot=owner.getEnemySlotForMonster(snapshot,targetId);
+        const config=Object.assign({},window.v142GetSkillAnimationConfig('stormCircle'),{duration:1100,resolveDuration:1100});
+        const gate=director.play(config,{side:'player',actorIndex:0,targetId,key:'battle-layout-wind-flame-'+Date.now()});
+        window.__battleLayoutWindGate=gate;
+        const stage=document.getElementById('v143-skill-stage');
+        const sprites=stage?Array.from(stage.querySelectorAll('.v143-vfx-sprite')):[];
+        const sprite=sprites[0]||null;
+        const bounds=owner.getGeometryRectFromShape('monster',primarySlot,'tri');
+        return {
+            config:{id:config.id,targetType:config.targetType,duration:config.duration},
+            targetId,primarySlot,
+            stageCount:document.querySelectorAll('#v143-skill-stage').length,
+            stageSkill:stage?.dataset.skill||null,
+            spriteCount:sprites.length,
+            placement:sprite?.dataset.placement||null,
+            frameFit:sprite?.dataset.frameFit||null,
+            targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
+            geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),
+            spriteBox:sprite?{
+                left:Number.parseFloat(sprite.style.left),top:Number.parseFloat(sprite.style.top),
+                width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)
+            }:null,
+            bounds,
+            emitted:sprite?.dataset.emittedVisual||null,
+            globalSpriteCount:document.querySelectorAll('.v143-vfx-sprite').length,
+            gateId:gate?.id||null
+        };
+    })()`);
+    evidence.checks.windFlameTriRange=windFlame;
+    assert.equal(windFlame?.config?.targetType,"tri","Wind Flame must use its final three-target rule in production");
+    assert.equal(windFlame?.stageCount,1,"Wind Flame must own exactly one V143 stage");
+    assert.equal(windFlame?.stageSkill,"stormCircle","The deployed V143 stage must render Wind Flame");
+    assert.equal(windFlame?.spriteCount,1,"Wind Flame must not render two simultaneous videos");
+    assert.equal(windFlame?.globalSpriteCount,1,"No stale V143 sprite may coexist with Wind Flame");
+    assert.equal(windFlame?.placement,"group","Three-target VFX must use fixed group geometry");
+    assert.equal(windFlame?.frameFit,"stretch","Three-target VFX must fill its semantic three-slot region");
+    assert.equal(windFlame?.targetIndexes.length,1,"This live check deliberately supplies only one surviving target");
+    assert.equal(windFlame?.geometrySlots.length,3,"Wind Flame must retain a three-slot footprint for a single surviving target");
+    assert.ok(Math.abs(windFlame.spriteBox.width-Math.round(windFlame.bounds.width))<=1,"Wind Flame width must equal the fixed three-slot geometry");
+    assert.ok(Math.abs(windFlame.spriteBox.height-Math.round(windFlame.bounds.height))<=1,"Wind Flame height must equal the fixed three-slot geometry");
+    assert.equal(windFlame.emitted,"true","Wind Flame must emit a visible production sprite");
+
+    const rangeScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
+    if(rangeScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"battle-layout-wind-flame-mobile.png"),Buffer.from(rangeScreenshot.data,"base64")); }
+
+    await sleep(1350);
+    const windGate=await client.eval(`(()=>{
+        const gate=window.__battleLayoutWindGate;
+        return {done:!!gate?.done,reason:gate?.reason||null,completionCount:gate?.completionCount||0,stageExists:!!document.getElementById('v143-skill-stage')};
+    })()`);
+    evidence.checks.windFlameCompletion=windGate;
+    assert.equal(windGate.done,true,"Wind Flame must release its animation gate");
+    assert.equal(windGate.completionCount,1,"Wind Flame gate must complete exactly once");
+    assert.ok(["v143-raster-complete","v142-render-safety-deadline"].includes(windGate.reason),"Wind Flame must finish through a bounded production deadline");
+    assert.equal(windGate.stageExists,false,"Completed Wind Flame VFX must remove its stage");
 
     /* Capture the production cast and the stage it creates in the same browser
        task. The battle remains live, so a later CDP poll may observe the next
