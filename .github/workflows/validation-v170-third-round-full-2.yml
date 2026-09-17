@@ -1,0 +1,84 @@
+name: V170 Third Round Full Validation 2
+
+on:
+  push:
+    branches:
+      - validation/v170-third-round-full-2-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  validate-full:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/v170-third-round-full-2-20260917
+          fetch-depth: 2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify validation scope
+        shell: bash
+        run: |
+          base=90aee2c9863eda50b95aba7c08fc1e18616841f0
+          git fetch --no-tags --depth=1 origin "$base"
+          git diff --check "$base" HEAD
+          changed="$(git diff --name-only "$base" HEAD | sort)"
+          printf '%s\n' "$changed"
+          test "$changed" = ".github/workflows/validation-v170-third-round-full-2.yml"
+          test -z "$(git diff --name-only "$base" HEAD -- js css tests scripts config asset-manifest.json)"
+
+      - name: Fetch historical test baselines
+        shell: bash
+        run: |
+          for sha in \
+            e3de8f7fee4e65986420528247bdbb99cb588a07 \
+            39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5 \
+            4a592dd4c41d7efb1a4849fbfe0cbf68598121bf \
+            29b9668057846164a941fbf6617d2458d9af5476; do
+            if ! git cat-file -e "$sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$sha"
+            fi
+          done
+
+      - name: Ensure image inspection tool
+        shell: bash
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run current Fixed Slot VFX contracts
+        shell: bash
+        run: |
+          node tests/v173.13-canvas-vfx-abyss-input.test.js
+          node tests/v173.11-abyss-vfx-dungeon.test.js
+          node tests/v173-water-orb-direction-vfx.test.js
+          node tests/v171-combat-vfx-fixes.test.js
+          node tests/v166-water-vfx.test.js
+          node tests/v153-fire-vfx.test.js
+          node tests/boss-vfx-reliability-20260914.test.js
+          node tests/mechanism-card-vfx-reliability-20260914.test.js
+
+      - name: Run V170 final integration
+        run: node tests/v170-final-spec-integration.test.js
+
+      - name: Run Fixed Slot regressions
+        shell: bash
+        run: |
+          node tests/fixed-slot-tri-target-window.test.js
+          node tests/ally-tri-rage-fixed-slot-regression.test.js
+          node tests/fixed-slot-battlefield-rendering-v2.test.js
+
+      - name: Run full Node suite
+        env:
+          CI_BASE_SHA: e3de8f7fee4e65986420528247bdbb99cb588a07
+          CI_HEAD_SHA: 90aee2c9863eda50b95aba7c08fc1e18616841f0
+        run: node .github/scripts/ci.mjs tests
