@@ -206,7 +206,14 @@ try{
         const infoRegion=rectFor(document.querySelector('.battle-info-region'));
         const action=rectFor(document.getElementById('battleActionRegion'));
         const info=rectFor(document.getElementById('battleInfo'));
-        const elementBox=rectFor(document.querySelector('.battle-element-box-button'));
+        const elementBoxNode=document.querySelector('.battle-element-box-button');
+        const elementBox=rectFor(elementBoxNode);
+        const elementBoxLogical=elementBoxNode?{
+            width:elementBoxNode.offsetWidth,
+            height:elementBoxNode.offsetHeight,
+            computedWidth:getComputedStyle(elementBoxNode).width,
+            computedHeight:getComputedStyle(elementBoxNode).height
+        }:null;
         const enemyArea=rectFor(document.getElementById('battleMonsterArea'));
         const allyArea=rectFor(document.getElementById('battlePlayerRow'));
         const enemySlotRects=owner.enemySlots.map(slot=>owner.getSlotRect(slot)).filter(Boolean);
@@ -227,7 +234,7 @@ try{
         return {
             viewport:{width:innerWidth,height:innerHeight},
             pageClass:document.getElementById('battlePage')?.className||'',
-            regions:{enemy,center,ally,infoRegion,action,info,elementBox,enemyArea,allyArea},
+            regions:{enemy,center,ally,infoRegion,action,info,elementBox,elementBoxLogical,enemyArea,allyArea},
             separation:{
                 enemyBeforeCenter:enemy.bottom<=center.top+1,
                 centerBeforeAlly:center.bottom<=ally.top+1,
@@ -254,8 +261,8 @@ try{
     assert.ok(layout.enemySlots.maxHeight-layout.enemySlots.minHeight<=1,"Enemy slot heights must be equal");
     assert.ok(layout.allySlots.maxWidth-layout.allySlots.minWidth<=1,"Ally slot widths must be equal");
     assert.ok(layout.allySlots.maxHeight-layout.allySlots.minHeight<=1,"Ally slot heights must be equal");
-    assert.ok(Math.abs(layout.regions.elementBox.width-66)<=1,"Element Box button width must be the restored 66px size");
-    assert.ok(Math.abs(layout.regions.elementBox.height-66)<=1,"Element Box button height must be the restored 66px size");
+    assert.equal(layout.regions.elementBoxLogical.width,66,"Element Box button width must be the restored 66px layout size");
+    assert.equal(layout.regions.elementBoxLogical.height,66,"Element Box button height must be the restored 66px layout size");
     assert.ok(layout.enemySlots.minHeight>92,"Enemy slots must remain visibly larger than the previous compact cards");
     assert.ok(layout.allySlots.minHeight>100,"Ally slots must retain the enlarged portrait layout");
     assert.ok(layout.hud.length>=9,"The real Abyss battle must expose one ally and eight enemy card HUDs");
