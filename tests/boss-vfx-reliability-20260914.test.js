@@ -57,6 +57,32 @@ function createRuntime(){
         console,Promise,Set,Map,Array,Object,Number,String,Boolean,RegExp,Date,Math,Proxy,
         setTimeout,clearTimeout,innerWidth:420,innerHeight:720,
         v142SkillAnimationDirector:director,
+        FourSymbolsBattlefieldSlots:{
+            getSlotForCombatant(side,index){ return (side==="monster"?"MONSTER_":"PLAYER_")+index; },
+            getSlotFromElement(element){ return element&&element.dataset?element.dataset.slot:null; },
+            getSlotRect(slot){
+                const match=String(slot).match(/^(MONSTER|PLAYER)_(\d+)$/);
+                if(!match){ return null; }
+                const index=Number(match[2]);
+                const node=match[1]==="MONSTER"
+                    ?(index===0?bossArt:byId["battleMonster"+index])
+                    :byId["battlePlayerCard"+index];
+                const rect=node&&node.getBoundingClientRect();
+                return rect?Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2}):null;
+            },
+            getSlotCenter(slot){
+                const rect=this.getSlotRect(slot);
+                return rect?{x:rect.centerX,y:rect.centerY,rect}:null;
+            },
+            getGeometryRectFromShape(side,slot,shape){
+                if(String(shape).toLowerCase()==="single"){ return this.getSlotRect(slot); }
+                return this.getSideRect(side);
+            },
+            getSideRect(side){
+                const rect=(side==="monster"?monsterArea:playerArea).getBoundingClientRect();
+                return Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2});
+            }
+        },
         monsters:[
             {name:"Boss",rank:"boss",hp:5000,alive:true,statusEffects:[],activeBuffs:[]},
             {name:"Support",hp:500,alive:true,statusEffects:[],activeBuffs:[]}
@@ -93,7 +119,9 @@ function config(id,targetType="single",duration=760){
 
 {
     const {context,bossArt}=createRuntime();
-    const gate=context.v142SkillAnimationDirector.play(config("flameSlash"),{side:"player",actorIndex:0});
+    const gate=context.v142SkillAnimationDirector.play(config("flameSlash"),{
+        side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0]
+    });
     const current=context.v143SkillAnimationState.current;
     const [sprite]=spriteNodes(current);
     assert.ok(sprite,"Boss single-target cast must create a Sprite");
@@ -106,9 +134,11 @@ function config(id,targetType="single",duration=760){
 
 {
     const {context}=createRuntime();
-    context.v142SkillAnimationDirector.play(config("flameSlash"),{side:"monster",actorIndex:0});
+    context.v142SkillAnimationDirector.play(config("flameSlash"),{
+        side:"monster",actorIndex:0,targetSide:"player",targetId:0,targetIds:[0]
+    });
     let current=context.v143SkillAnimationState.current;
-    assert.equal(spriteNodes(current).length,0,"monster single target waits until the actual target is known");
+    assert.equal(spriteNodes(current).length,1,"monster single target uses the explicit combat target immediately");
     context.showMissEffect(true,0,"MISS");
     current=context.v143SkillAnimationState.current;
     const [sprite]=spriteNodes(current);
@@ -120,7 +150,9 @@ function config(id,targetType="single",duration=760){
 {
     const {context}=createRuntime();
     context.queuedPlayerActions[0]={action:"fireRocket",target:0,targetAlly:0};
-    context.v142SkillAnimationDirector.play(config("fireRocket"),{side:"player",actorIndex:0});
+    context.v142SkillAnimationDirector.play(config("fireRocket"),{
+        side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0]
+    });
     const [sprite]=spriteNodes(context.v143SkillAnimationState.current);
     assert.ok(sprite,"travel skill must create a Sprite against Boss");
     assert.equal(sprite.dataset.travel,"true");
@@ -129,7 +161,9 @@ function config(id,targetType="single",duration=760){
 
 {
     const {context}=createRuntime();
-    context.v142SkillAnimationDirector.play(config("explosiveFlurry","all",1450),{side:"player",actorIndex:0});
+    context.v142SkillAnimationDirector.play(config("explosiveFlurry","all",1450),{
+        side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0,1]
+    });
     const current=context.v143SkillAnimationState.current;
     const [sprite]=spriteNodes(current);
     assert.ok(sprite,"multi-target group skill must create its shared Sprite");
@@ -139,10 +173,14 @@ function config(id,targetType="single",duration=760){
 
 {
     const {context}=createRuntime();
-    const first=context.v142SkillAnimationDirector.play(config("flameSlash"),{side:"player",actorIndex:0});
+    const first=context.v142SkillAnimationDirector.play(config("flameSlash"),{
+        side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0]
+    });
     const firstStage=context.v143SkillAnimationState.stage;
     context.queuedPlayerActions[0]={action:"fireRocket",target:0,targetAlly:0};
-    context.v142SkillAnimationDirector.play(config("fireRocket"),{side:"player",actorIndex:0});
+    context.v142SkillAnimationDirector.play(config("fireRocket"),{
+        side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0]
+    });
     const secondStage=context.v143SkillAnimationState.stage;
     assert.notEqual(firstStage,secondStage);
     assert.equal(firstStage.removed,true,"superseded stage is cleaned");
