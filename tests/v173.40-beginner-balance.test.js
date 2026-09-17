@@ -19,7 +19,7 @@ test("newbie forest normal attacks are final 10 to 15 before defend or shields a
     assert.match(main,/const BEGINNER_FOREST_NORMAL_DAMAGE_MIN=10;/);
     assert.match(main,/const BEGINNER_FOREST_NORMAL_DAMAGE_MAX=15;/);
     assert.match(main,/function rollBeginnerForestNormalAttackDamage\(\)[\s\S]*?Math\.random\(\)[\s\S]*?BEGINNER_FOREST_NORMAL_DAMAGE_MAX-BEGINNER_FOREST_NORMAL_DAMAGE_MIN\+1/);
-    assert.match(main,/const isBeginnerForestNormalAttack=[\s\S]*?currentZone==="forest"[\s\S]*?!castSkillData2[\s\S]*?monster\.v173BeginnerForest===true/);
+    assert.match(main,/const isBeginnerForestNormalAttack=[\s\S]*?currentZone==="forest"[\s\S]*?!castSkillData[\s\S]*?monster\.v173BeginnerForest===true/);
     assert.match(main,/const monsterCritChance=isBeginnerForestNormalAttack[\s\S]*?\?0/);
     assert.match(main,/:isBeginnerForestNormalAttack\s*\?rollBeginnerForestNormalAttackDamage\(\)/);
 });
@@ -54,8 +54,8 @@ test("range VFX fixes remain fixed-size and centered after casualties",()=>{
     ["stormRain","flyingSandStrike"].forEach(id=>{
         assert.match(animation,new RegExp(id+':[\\s\\S]*?castSheet\\([\\s\\S]*?,"battlefield"'));
     });
-    assert.match(animation,/function fixedTriLayoutBounds\(current,indexes\)[\s\S]*?const layoutCenterX=[\s\S]*?centerX:layoutCenterX[\s\S]*?id:"fixed-tri-slots"/);
-    assert.match(animation,/if\(placement==="battlefield"\)[\s\S]*?sideAreaBounds\(current\.targetSide\)/);
+    assert.match(animation,/owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
+    assert.match(animation,/if\(placement==="battlefield"\|\|targetType==="all"\|\|targetType==="allyAll"\)[\s\S]*?owner\.getSideRect\(current\.targetSide\)/);
     assert.doesNotMatch(animation,/canvas-crop|createElement\(["']canvas["']\)|drawImage\(/);
 });
 

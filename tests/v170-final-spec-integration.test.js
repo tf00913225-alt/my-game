@@ -45,6 +45,7 @@ const EXPECTED_DIRECT_SCRIPT_PATHS=[
 ];
 
 const EXPECTED_RUNTIME_PATHS=[
+    "js/battlefield-slot-owner.js",
     "js/25-v131-fix-batch.js",
     "js/27-v132-content-expansion.js",
     "js/28-v133-economy-rebalance.js",
@@ -159,6 +160,10 @@ function extractRuntimePaths(){
 function makeUniversalNode(){
     const style={setProperty(){},removeProperty(){},getPropertyValue(){ return ""; }};
     const classList={add(){},remove(){},toggle(){ return false; },contains(){ return false; }};
+    const terminalParent={
+        dataset:{},parentElement:null,parentNode:null,
+        insertBefore(){},removeChild(){},appendChild(child){ return child; }
+    };
     let node;
     const target=function(){ return node; };
     node=new Proxy(target,{
@@ -168,6 +173,8 @@ function makeUniversalNode(){
             if(property==="length"){ return 0; }
             if(property==="style"){ return style; }
             if(property==="dataset"){ return {}; }
+            if(property==="parentElement"){ return null; }
+            if(property==="parentNode"){ return terminalParent; }
             if(property==="classList"){ return classList; }
             if(property==="querySelector"){ return ()=>null; }
             if(property==="querySelectorAll"){ return ()=>[]; }
@@ -743,7 +750,7 @@ test("multi-target buffs resolve same-name MISS independently without replacing 
         getPartyBattleStats=function(){ return {maxHP:500,maxSP:100,intelligence:0}; };
         updateUI=function(){};finishPlayerAction=function(){};lungePlayerCard=function(){};
         showSkillNameBadge=function(){};showPlayerSpPopup=function(){};showMissEffect=function(){};addBattleLog=function(){};
-        v148ResolveSupportAction(0,{action:"rage",targetAlly:0},skillDatabase.rage);
+        v148ResolveSupportAction(0,{action:"rage",targetAlly:1},skillDatabase.rage);
         return {
             sp:player.sp,
             buffs:[player,player2,player3].map(character=>character.activeBuffs.map(buff=>({
@@ -861,6 +868,7 @@ test("Heal Spell restores allies but never refunds the caster's own SP",()=>{
         updateUI=function(){};
         battleActive=true;
         activeBattleCharacterIndex=0;
+        FourSymbolsBattlefieldSlots.hydrateAllyFormation({characterIndexToSlot:{0:"ALLY_F1",1:"ALLY_F2"}},[0,1]);
         const settled=v148ResolveSupportAction(0,{action:"healSpell",targetAlly:0},skillDatabase.healSpell);
         return {
             settled:settled,
@@ -1021,6 +1029,9 @@ test("enemy Heal Spell affects only one same-row trio for both North Emperor and
                 v141SupportSkillIds:index===3?["revive","healSpell"]:[],v141ForceSkillLevel:5,skillChance:1});
             currentBattleMonsters.push(index);
         }
+        FourSymbolsBattlefieldSlots.setActiveEnemySnapshot(
+            FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(currentBattleMonsters,{originalFormationType:10})
+        );
         updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
         showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};Math.random=function(){ return 0; };
         const beforeNorth=monsters.map(monster=>monster.hp);
@@ -1068,6 +1079,9 @@ test("East Earth Shield and Heaven Calm use their assigned formal support values
             v141FormationRow:0,v141FormationPosition:index
         })));
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);
+        FourSymbolsBattlefieldSlots.setActiveEnemySnapshot(
+            FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(currentBattleMonsters,{originalFormationType:5})
+        );
         updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
         showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};
         const earth=v155ResolveEastEarthShield(0,true);

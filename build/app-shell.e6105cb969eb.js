@@ -17374,6 +17374,8 @@ function processSingleMonsterAttack(monsterIndex,token){
 
     let castSkillName=null;
 
+    let castSkillData=null;
+
 
     if(usesSkill){
 
@@ -17387,7 +17389,7 @@ function processSingleMonsterAttack(monsterIndex,token){
             ];
 
 
-        const castSkillData=
+        castSkillData=
             skillDatabase[castSkillId];
 
 
@@ -17586,21 +17588,12 @@ function processSingleMonsterAttack(monsterIndex,token){
        的怪物放同一個技能都一樣強。
     */
 
-    const castSkillData2=
-
-        usesSkill && castSkillId
-        ?
-        skillDatabase[castSkillId]
-        :
-        null;
-
-
     const effectiveSkillLevel=
 
-        castSkillData2
+        castSkillData
         ?
         Math.min(
-            castSkillData2.maxLevel||1,
+            castSkillData.maxLevel||1,
             Math.max(
                 1,
                 Number.isFinite(Number(monster.v141ForceSkillLevel))
@@ -17622,11 +17615,11 @@ function processSingleMonsterAttack(monsterIndex,token){
 
     /* Pure-control skills keep their status effect but never enter direct-damage settlement. */
     const isPureControlSkill=
-        !!(castSkillData2 && castSkillData2.id==="freeze");
+        !!(castSkillData && castSkillData.id==="freeze");
 
     const isMonsterMagicSkill=
-        castSkillData2 &&
-        castSkillData2.category==="magic";
+        castSkillData &&
+        castSkillData.category==="magic";
 
     const baseAttackStatRaw=
         isMonsterMagicSkill
@@ -17707,7 +17700,7 @@ function processSingleMonsterAttack(monsterIndex,token){
 
             const isBeginnerForestNormalAttack=
                 currentZone==="forest" &&
-                !castSkillData2 &&
+                !castSkillData &&
                 monster &&
                 monster.v173BeginnerForest===true;
 
@@ -17729,9 +17722,9 @@ function processSingleMonsterAttack(monsterIndex,token){
                 ?0
                 :isBeginnerForestNormalAttack
                 ?rollBeginnerForestNormalAttackDamage()
-                :castSkillData2
+                :castSkillData
                 ?calculateSkillDamage({
-                    skill:castSkillData2,
+                    skill:castSkillData,
                     skillLevel:effectiveSkillLevel,
                     effectiveAttack:baseAttackStat,
                     target:targetCharacter,
@@ -18013,12 +18006,12 @@ function processSingleMonsterAttack(monsterIndex,token){
 
             if(
                 usesSkill &&
-                castSkillData2 &&
+                castSkillData &&
                 targetCharacter.hp>0
             ){
 
                 applySkillDebuffEffectsToPlayer(
-                    castSkillData2,
+                    castSkillData,
                     effectiveSkillLevel,
                     targetCharacter,
                     targetIndex,
@@ -18030,8 +18023,8 @@ function processSingleMonsterAttack(monsterIndex,token){
 
             if(
                 usesSkill &&
-                castSkillData2 &&
-                castSkillData2.lifestealPercentByLevel &&
+                castSkillData &&
+                castSkillData.lifestealPercentByLevel &&
                 damage>0
             ){
                 monsterLifestealDamage+=damage;
@@ -18043,12 +18036,12 @@ function processSingleMonsterAttack(monsterIndex,token){
 
     if(
         usesSkill &&
-        castSkillData2 &&
-        castSkillData2.lifestealPercentByLevel &&
+        castSkillData &&
+        castSkillData.lifestealPercentByLevel &&
         monsterLifestealDamage>0 &&
         monster.alive
     ){
-        const percent=castSkillData2.lifestealPercentByLevel[effectiveSkillLevel-1];
+        const percent=castSkillData.lifestealPercentByLevel[effectiveSkillLevel-1];
         const amount=Math.floor(monsterLifestealDamage*percent/100);
 
         if(amount>0){

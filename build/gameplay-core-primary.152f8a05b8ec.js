@@ -219,6 +219,18 @@
         return value;
     }
 
+    function fixedTriGeometrySlots(side,primarySlot){
+        const allowed=slotsForSide(side);
+        const meta=SLOT_META[primarySlot];
+        if(!meta||!allowed.includes(primarySlot)){ return []; }
+        const row=allowed.filter(slot=>SLOT_META[slot].row===meta.row)
+            .sort((a,b)=>SLOT_META[a].column-SLOT_META[b].column);
+        if(row.length<=3){ return row; }
+        const primaryPosition=row.indexOf(primarySlot);
+        const start=Math.max(0,Math.min(row.length-3,primaryPosition-1));
+        return row.slice(start,start+3);
+    }
+
     function resolveSlotsFromShape(side,primarySlot,shape){
         const allowed=slotsForSide(side);
         if(!allowed.includes(primarySlot)){ return []; }
@@ -333,13 +345,7 @@
 
     function geometryTriSlots(side,primarySlot){
         const normalized=normalizeGeometrySide(side);
-        const allowed=geometrySlotsForSide(normalized);
-        const meta=SLOT_META[primarySlot];
-        if(!meta||meta.side!==normalized||!allowed.includes(primarySlot)){ return []; }
-        const row=geometryRowSlots(normalized,meta.row);
-        if(row.length<=3){ return row; }
-        const start=Math.max(1,Math.min(row.length-2,meta.column-1));
-        return row.filter(slot=>SLOT_META[slot].column>=start&&SLOT_META[slot].column<start+3);
+        return fixedTriGeometrySlots(normalized,primarySlot);
     }
 
     function geometrySlotsFromShape(side,primarySlot,shape){
