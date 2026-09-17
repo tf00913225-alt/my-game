@@ -107,6 +107,17 @@ async function prepareAccountFirstRuntime(client,features){
         if(state==="ERROR"){ throw new Error("Live anonymous UID/save resolution failed"); }
     }
     await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
+    if(state==="NEED_CHARACTER"){
+        const created=await client.eval(`(()=>{
+            const input=document.getElementById('creationId');
+            if(!input||typeof createCharacter!=='function'){return false;}
+            input.value='QA俠客';
+            return createCharacter()===true;
+        })()`);
+        if(!created){ throw new Error("Live anonymous account could not complete the formal character-creation flow"); }
+        await waitFor(client,"FourSymbolsStartupPolicy.getState()==='READY'&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'","anonymous character creation completion",30000);
+        state="READY";
+    }
     return state;
 }
 
@@ -134,7 +145,8 @@ try{
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
     await client.send("Page.navigate",{url:qaUrl});
     await waitFor(client,"document.readyState==='complete'","page load");
-    await prepareAccountFirstRuntime(client,["abyss"]);
+    const accountState=await prepareAccountFirstRuntime(client,["abyss"]);
+    evidence.checks.accountState=accountState;
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
     await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
 
@@ -165,7 +177,7 @@ try{
     assert.equal(bootstrap.skillVolumeScale,2,"Deployed skill SFX multiplier must be exactly 2.0 (+100%)");
     assert.equal(bootstrap.combatFeedbackVolumeScale,2,"Deployed general battle feedback multiplier must be exactly 2.0 (+100%)");
 
-    await waitFor(client,"document.getElementById('battlePage')?.classList.contains('active')&&document.getElementById('battlePlayerCard0')&&document.querySelector('#battlePlayerCard0 .hp-bar')&&document.querySelector('#battleMonster0 .monster-hp')","real battle resource bars",15000);
+    await waitFor(client,"(()=>{const page=document.getElementById('battlePage');const rect=page?.getBoundingClientRect();return page?.classList.contains('active')&&!page.classList.contains('v141-preparing-entry')&&!page.classList.contains('v141-entry-moving')&&rect?.width>0&&rect?.height>0&&document.getElementById('battlePlayerCard0')&&document.querySelector('#battlePlayerCard0 .hp-bar')&&document.querySelector('#battleMonster0 .monster-hp');})()","visible real battle after entry transition",15000);
 
     const layout=await client.eval(`(()=>{
         const rectFor=element=>{
