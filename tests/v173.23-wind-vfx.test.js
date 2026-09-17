@@ -361,7 +361,7 @@ test("single, three-lane and battlefield casts each own one correctly positioned
     const all=loadRuntime();
     all.context.v142SkillAnimationDirector.play(
         config("stormRain","all","magic"),
-        {side:"player",actorIndex:0}
+        {side:"player",actorIndex:0,targetId:0,targetIds:[0,1,2],targetSide:"monster"}
     );
     const allSprites=stageSprites(all).sprites;
     assert.equal(allSprites.length,1,"one battlefield sheet");
@@ -387,9 +387,10 @@ test("three-target wind sheets keep a fixed three-slot footprint centered on the
         ]
     ].forEach(monsters=>{
         const runtime=loadRuntime({monsters});
+        const targetIds=monsters.map((monster,index)=>monster.alive?index:null).filter(Number.isInteger);
         runtime.context.v142SkillAnimationDirector.play(
             config("stormFlurry","tri","physical"),
-            {side:"player",actorIndex:0}
+            {side:"player",actorIndex:0,targetId:1,targetIds,targetSide:"monster"}
         );
         const sprite=stageSprites(runtime).sprites[0];
         assert.ok(sprite);
@@ -412,9 +413,10 @@ test("full-field wind sheets stay locked to the complete enemy area after casual
         ]
     ].forEach(monsters=>{
         const runtime=loadRuntime(monsters?{monsters}:{});
+        const targetIds=(monsters||runtime.monsters).map((monster,index)=>monster.alive?index:null).filter(Number.isInteger);
         runtime.context.v142SkillAnimationDirector.play(
             config("stormRain","all","magic"),
-            {side:"player",actorIndex:0}
+            {side:"player",actorIndex:0,targetId:targetIds[0],targetIds,targetSide:"monster"}
         );
         const sprite=stageSprites(runtime).sprites[0];
         assert.ok(sprite);
@@ -423,14 +425,12 @@ test("full-field wind sheets stay locked to the complete enemy area after casual
     assert.deepEqual(placements[1],placements[0],"full-field VFX does not follow survivor bounds");
 });
 
-test("enemy casts discover the real player target instead of using a fixed faction position",()=>{
+test("enemy casts use the explicit player target instead of a fixed faction position",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         config("stormFist","single","physical"),
-        {side:"monster",actorIndex:0}
+        {side:"monster",actorIndex:0,targetId:1,targetIds:[1],targetSide:"player"}
     );
-    assert.equal(stageSprites(runtime).sprites.length,0,"no guessed player target");
-    runtime.context.showPlayerHit(20,"hp",1);
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetSide,"player");
@@ -455,7 +455,7 @@ test("frame seven releases resolved attack results once, while buffs never shake
     const buff=loadRuntime();
     buff.context.v142SkillAnimationDirector.play(
         config("dodgeSkill","allyAll","buff"),
-        {side:"player",actorIndex:0}
+        {side:"player",actorIndex:0,targetId:0,targetIds:[0,1,2],targetSide:"player"}
     );
     buff.party.forEach(character=>character.activeBuffs.push({type:"dodgeSkill",turnsLeft:2}));
     [0,1,2].forEach(index=>buff.context.v141PlayCardEffect("player",index,"buff"));
