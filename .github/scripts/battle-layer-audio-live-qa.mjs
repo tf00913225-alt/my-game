@@ -532,10 +532,11 @@ try{
         battleActive:!!battleActive,turn:Number(turn)||0,initiativeIndex:Number(initiativeIndex)||0,
         battleToken:Number(battleToken)||0,stageSkill:document.getElementById('v143-skill-stage')?.dataset.skill||null
     })`);
-    await sleep(4200);
+    await sleep(8500);
     const combatProgressAfter=await client.eval(`({
         battleActive:!!battleActive,turn:Number(turn)||0,initiativeIndex:Number(initiativeIndex)||0,
-        battleToken:Number(battleToken)||0,stageCount:document.querySelectorAll('#v143-skill-stage').length
+        battleToken:Number(battleToken)||0,stageCount:document.querySelectorAll('#v143-skill-stage').length,
+        latestGateReason:window.v142SkillAnimationDirector?.getLatest?.()?.reason||null
     })`);
     const combatAdvanced=!combatProgressAfter.battleActive||
         combatProgressAfter.battleToken!==combatProgressBefore.battleToken||
