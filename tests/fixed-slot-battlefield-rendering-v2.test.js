@@ -49,11 +49,12 @@ assert.match(vfxSource,/node\.style\.left=bounds\.centerX\+"px";[\s\S]*node\.sty
 assert.doesNotMatch(vfxSource,/activeCards\([^)]*\)\.length\s*\*/,"VFX scale must not multiply by surviving target count");
 
 assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone\{[\s\S]*position:relative !important;[\s\S]*height:var\(--battle-enemy-zone-height\) !important;/);
+assert.match(css,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)/,"battle layout must own three proportional structural tracks");
 assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*position:absolute !important;/);
 assert.match(css,/#battlePlayerRow\.v-fixed-ally-zone\{[\s\S]*height:var\(--battle-ally-zone-height\) !important;/);
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*position:absolute !important;/);
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="front"\]\{top:0 !important;\}/,"ally front row must be nearest the enemy zone");
-assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="back"\]\{bottom:0 !important;\}/,"ally back row must be farthest from the enemy zone");
+assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="back"\]\{bottom:var\(--battle-ally-name-reserve\) !important;\}/,"ally back row must be farthest from the enemy zone with a name reserve");
 assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone > \.v-fixed-mechanism-zone\{[\s\S]*position:absolute !important;[\s\S]*bottom:0 !important;/,"BOSS mechanism cards must use the enemy front visual plane");
 assert.match(css,/\.v-fixed-enemy-slot > \.battle-monster,[\s\S]*\.v-fixed-ally-slot > \.battle-player\{[\s\S]*position:absolute !important;[\s\S]*inset:0 !important;/);
 assert.match(css,/\.v174-battle-art\{[\s\S]*background-size:contain !important;[\s\S]*overflow:visible !important;/);
@@ -66,7 +67,7 @@ assert.doesNotMatch(css,/@media \(max-width:380px\)/,"fixed Slot geometry must n
 const safeTop=Number(css.match(/--battle-enemy-safe-top:(\d+)px/)?.[1]||0);
 const artOverhang=Number(css.match(/--battle-art-overhang-top:(\d+)px/)?.[1]||0);
 assert.ok(safeTop>=artOverhang+3,"enemy safe-top must cover artwork overhang plus idle lift");
-assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone\{[\s\S]*top:var\(--battle-enemy-safe-top\) !important;/,"enemy zone must stay inside the portrait viewport safe region");
+assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\[data-slot-row="back"\]\{top:var\(--battle-enemy-safe-top\) !important;\}/,"enemy back row must stay inside the portrait viewport safe region");
 assert.doesNotMatch(css,/\bscale\s*:/,"raster size must not scale its centering or flight translation");
 
 // Execute the production sizing functions. These checks supplement, never
@@ -75,7 +76,7 @@ const sizingContext={spriteFrameAspectCache:new Map(),SPRITE_SCALE_MULTIPLIER:1}
 vm.createContext(sizingContext);
 vm.runInContext(vfxSource.match(/const PLACEMENT_SIZE_SCALE=Object\.freeze\(\{[^;]+;/)[0]+"\n"+
     vfxSource.slice(vfxSource.indexOf("    function frameAspectFor("),vfxSource.indexOf("    function requestSpriteAspect(")),sizingContext);
-for(const [placement,factor] of Object.entries({single:.88,targetTrajectory:.80,trajectory:.80,group:.62,battlefield:.72})){
+for(const [placement,factor] of Object.entries({single:.88,targetTrajectory:.80,trajectory:.80,group:1,battlefield:1})){
     const sprite={dataset:{placement},style:{left:"180px",top:"240px"}};
     sizingContext.applySpriteBox(sprite,200,200,{cellAspect:1});
     assert.equal(sprite.style.width,Math.round(200*factor)+"px",placement+" owns bounded raster width");
