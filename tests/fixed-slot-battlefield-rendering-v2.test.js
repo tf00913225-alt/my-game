@@ -45,6 +45,7 @@ assert.match(vfxSource,/getGeometryRectFromShape/);
 assert.match(vfxSource,/getSideRect/);
 assert.match(vfxSource,/dataset\.geometryOwner="fixed-slot"/);
 assert.match(vfxSource,/authoredSquareSize\(sprite,target\.rect/);
+assert.match(vfxSource,/node\.style\.left=bounds\.centerX\+"px";[\s\S]*node\.style\.top=bounds\.centerY\+"px";/,"group/all VFX must remain centered on Fixed Slot geometry");
 assert.doesNotMatch(vfxSource,/activeCards\([^)]*\)\.length\s*\*/,"VFX scale must not multiply by surviving target count");
 
 assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone\{[\s\S]*position:relative !important;[\s\S]*height:var\(--battle-enemy-zone-height\) !important;/);
@@ -58,6 +59,15 @@ assert.match(css,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]
 assert.match(css,/\.v-fixed-slot-popup\{[\s\S]*position:fixed !important;/);
 assert.match(css,/@keyframes v174BattleLungeUp/);
 assert.doesNotMatch(css,/@media \(max-width:380px\)/,"fixed Slot geometry must not have a one-phone geometry override");
+
+const safeTop=Number(css.match(/--battle-enemy-safe-top:(\d+)px/)?.[1]||0);
+const artOverhang=Number(css.match(/--battle-art-overhang-top:(\d+)px/)?.[1]||0);
+assert.ok(safeTop>=artOverhang+3,"enemy safe-top must cover artwork overhang plus idle lift");
+assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone\{[\s\S]*top:var\(--battle-enemy-safe-top\) !important;/,"enemy zone must stay inside the portrait viewport safe region");
+assert.match(css,/\.v143-vfx-sprite\[data-placement="single"\]\{\s*scale:\.88;/);
+assert.match(css,/\.v143-vfx-sprite\[data-placement="group"\]\{\s*scale:\.62;/);
+assert.match(css,/\.v143-vfx-sprite\[data-placement="battlefield"\]\{\s*scale:\.72;/);
+assert.match(css,/\.v143-vfx-sprite\[data-placement="targetTrajectory"\],[\s\S]*?\.v143-vfx-sprite\[data-placement="trajectory"\]\{\s*scale:\.80;/);
 
 assert.match(build,/"js\/battlefield-slot-owner\.js"/);
 assert.match(build,/"js\/battlefield-render-geometry-adapter\.js"/);

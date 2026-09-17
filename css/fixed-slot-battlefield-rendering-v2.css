@@ -13,6 +13,7 @@
     --battle-art-overhang-x:6px;
     --battle-art-overhang-top:10px;
     --battle-art-hud-reserve:25px;
+    --battle-enemy-safe-top:16px;
 }
 
 /* #game-stage is the viewport boundary. Battlefield ancestors must not clip
@@ -24,9 +25,12 @@
     contain:none !important;
 }
 
-/* Enemy Zone: two coordinate rows inside one fixed-height Zone. */
+/* Enemy Zone: two coordinate rows inside one fixed-height Zone. The safe-top
+   offset keeps the top row and its intentional artwork overhang inside the
+   visible game-stage instead of letting portrait mobile browsers crop it. */
 #game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.v-fixed-enemy-zone{
     position:relative !important;
+    top:var(--battle-enemy-safe-top) !important;
     display:block !important;
     flex:0 0 var(--battle-enemy-zone-height) !important;
     width:100% !important;
@@ -303,9 +307,27 @@
     contain:none !important;
 }
 
+/* Fixed Slot remains the sole VFX center/coverage owner. These presentation
+   scales are uniform per placement type, so target count can no longer make
+   group/all-target sprites balloon over names and resource bars. The separate
+   scale property composes with V143's transform animation and preserves each
+   Sprite Sheet frame aspect and Fixed Slot center. */
 .v143-skill-stage[data-geometry-owner="fixed-slot"]{
     overflow:visible !important;
     contain:none !important;
+}
+.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="single"]{
+    scale:.88;
+}
+.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="targetTrajectory"],
+.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="trajectory"]{
+    scale:.80;
+}
+.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="group"]{
+    scale:.62;
+}
+.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="battlefield"]{
+    scale:.72;
 }
 .v-fixed-slot-popup{
     position:fixed !important;
