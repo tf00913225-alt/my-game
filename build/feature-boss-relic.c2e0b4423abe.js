@@ -455,18 +455,23 @@
     function activeBoss(){
         return activeBattleContext&&activeBattleContext.boss&&activeBattleContext.boss.alive!==false?activeBattleContext.boss:null;
     }
-    const BOSS_REINFORCEMENT_SLOTS=Object.freeze(["ENEMY_F2","ENEMY_F4"]);
+    /* Gameplay mechanisms own the enemy-front plane. Keep the Boss trio in the
+       reserved back row so the independent MECH lane never covers a unit. */
+    const BOSS_REINFORCEMENT_SLOTS=Object.freeze(["ENEMY_B2","ENEMY_B4"]);
     const MECHANISM_SLOT_PRIORITY=Object.freeze(["MECH_C","MECH_L","MECH_R"]);
     function battlefieldSlotOwner(){ return window.FourSymbolsBattlefieldSlots||null; }
     function seedBossBattlefieldSnapshot(){
         const context=activeBattleContext,boss=activeBoss(),owner=battlefieldSlotOwner();
-        if(!context||!context.summonPlan||!boss||!owner||typeof monsters==="undefined"||!Array.isArray(monsters)){ return null; }
+        if(!context||!boss||!owner||typeof monsters==="undefined"||!Array.isArray(monsters)){ return null; }
         const bossIndex=monsters.indexOf(boss);
         if(bossIndex<0){ return null; }
-        const snapshot=owner.createEnemyFormationSnapshot([bossIndex],{originalFormationType:3});
+        const snapshot=owner.createEnemyFormationSnapshot([bossIndex],{originalFormationType:6});
         owner.setActiveEnemySnapshot(snapshot);
         context.bossIndex=bossIndex;
         context.enemySnapshot=snapshot;
+        const geometry=window.FourSymbolsBattlefieldRenderGeometry;
+        if(geometry&&typeof geometry.reconcile==="function"){ geometry.reconcile(); }
+        else if(typeof renderBattle==="function"){ renderBattle(); }
         return snapshot;
     }
     function bossBattlefieldSnapshot(){

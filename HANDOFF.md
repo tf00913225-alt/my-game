@@ -1,3 +1,11 @@
+## 2026-09-17 — Real runtime follow-up: BOSS mechanism front-lane collision (NOT COMPLETE)
+
+- User mobile DEV recording `1000070330.mp4` verifies the ally projection: the water character is behind the two front allies. Requirement batch `2026-09-17-battle-formation-targeting` is now 1/3 VERIFIED.
+- The same real recording disproves the first BOSS mechanism placement as complete: the mechanism card occupies the same visual band and covers the center BOSS／reinforcement unit.
+- Root cause is in the existing BOSS owner, not another CSS cascade: `seedBossBattlefieldSnapshot()` and `BOSS_REINFORCEMENT_SLOTS` still placed the BOSS trio at `ENEMY_F3/F2/F4`, while the independent `MECH_*` zone now correctly owns the enemy front plane.
+- Follow-up branch `fix/boss-mechanism-front-lane-runtime-20260917` starts from `dev@167486c627e57fde9d1f9baabf7185d455c423ed`. It reserves `ENEMY_B3/B2/B4` for every Gameplay BOSS and its two reinforcements, then asks the existing fixed-slot geometry adapter to reconcile the live DOM immediately. No new wrapper, CSS priority patch, skill-number change, VFX change or save change.
+- The recording only shows enemy single-target casts (`冰霜拳`, `洪水猛獸`). It does not validate `tri`／`row`; range targeting remains IMPLEMENTED but not VERIFIED until a real enemy range cast is captured.
+
 ## 2026-09-17 — Battle runtime P1 repair candidate (NOT COMPLETE)
 
 - Base `acc6419b72ee3a31a6314a6833ded3f81a3fd219`; branch `fix/battle-runtime-portraits-vfx-20260917`.

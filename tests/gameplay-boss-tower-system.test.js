@@ -158,26 +158,28 @@ test("Gameplay Bosses are built through the Boss rank defense owner without chan
 test("selected Bosses summon two same-element elites only after their configured threshold and only once",()=>{
     {
         const {context}=load();
+        context.FourSymbolsBattlefieldRenderGeometry={reconcile(){ context.geometryReconciles=(context.geometryReconciles||0)+1; }};
         assert.equal(context.vGameplayStartBoss("personal","personal-30"),true);
+        assert.equal(context.geometryReconciles,1,"Boss snapshot must be projected into the live battlefield immediately");
         const boss=context.monsters[0],slotOwner=context.FourSymbolsBattlefieldSlots;
         const openingSnapshot=slotOwner.getActiveEnemySnapshot();
-        assert.equal(openingSnapshot.originalFormationType,3,"summoning Boss must reserve the three-unit formation from battle start");
-        assert.equal(slotOwner.getEnemySlotForMonster(openingSnapshot,0),"ENEMY_F3");
-        assert.equal(slotOwner.getAssignedMonsterAtEnemySlot(openingSnapshot,"ENEMY_F2"),null);
-        assert.equal(slotOwner.getAssignedMonsterAtEnemySlot(openingSnapshot,"ENEMY_F4"),null);
+        assert.equal(openingSnapshot.originalFormationType,6,"summoning Boss must reserve a back trio plus an empty front mechanism lane from battle start");
+        assert.equal(slotOwner.getEnemySlotForMonster(openingSnapshot,0),"ENEMY_B3");
+        assert.equal(slotOwner.getAssignedMonsterAtEnemySlot(openingSnapshot,"ENEMY_B2"),null);
+        assert.equal(slotOwner.getAssignedMonsterAtEnemySlot(openingSnapshot,"ENEMY_B4"),null);
         assert.equal(context.monsters.length,1,"reinforcements must not exist in the opening roster");
         boss.hp=Math.round(boss.maxHP*.51);context.turn=2;context.startTurn(context.battleToken);
         assert.equal(context.monsters.length,1,"HP-triggered reinforcements must wait until the configured threshold");
         boss.hp=Math.floor(boss.maxHP*.5);context.turn=3;context.startTurn(context.battleToken);
         assert.equal(context.monsters.length,3);
         const guards=context.monsters.slice(1),summonedSnapshot=slotOwner.getActiveEnemySnapshot();
-        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,0),"ENEMY_F3");
-        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,1),"ENEMY_F2");
-        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,2),"ENEMY_F4");
-        assert.deepEqual(Array.from(guards,unit=>unit.vGameplayBattlefieldSlot),["ENEMY_F2","ENEMY_F4"]);
+        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,0),"ENEMY_B3");
+        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,1),"ENEMY_B2");
+        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,2),"ENEMY_B4");
+        assert.deepEqual(Array.from(guards,unit=>unit.vGameplayBattlefieldSlot),["ENEMY_B2","ENEMY_B4"]);
         guards[0].alive=false;guards[0].hp=0;
-        assert.equal(slotOwner.getAssignedMonsterAtEnemySlot(summonedSnapshot,"ENEMY_F2"),1,"dead reinforcement keeps its assigned slot");
-        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,0),"ENEMY_F3","Boss must not move after reinforcement death");
+        assert.equal(slotOwner.getAssignedMonsterAtEnemySlot(summonedSnapshot,"ENEMY_B2"),1,"dead reinforcement keeps its assigned slot");
+        assert.equal(slotOwner.getEnemySlotForMonster(summonedSnapshot,0),"ENEMY_B3","Boss must not move after reinforcement death");
         assert.ok(guards.every(unit=>unit.vGameplayBossSummon===true&&unit.rank==="elite"&&unit.element===boss.element));
         assert.equal(new Set(guards.map(unit=>unit.name)).size,2);
         guards.forEach(unit=>[...unit.skillIds,...(unit.v141SupportSkillIds||[])].forEach(skillId=>{
@@ -250,6 +252,9 @@ test("weekly UTC owner resets only weekly Tower fields and preserves history",()
 test("blocking shield is outside the monster roster and blocks single, tri and all target resolution",()=>{
     const {context}=load();
     assert.equal(context.vGameplayStartBoss("personal","personal-20"),true);
+    assert.equal(context.FourSymbolsBattlefieldSlots.getEnemySlotForMonster(
+        context.FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),0
+    ),"ENEMY_B3","a mechanism Boss without reinforcements must still leave the enemy front lane clear");
     context.monsters[0].statusEffects.push({type:"burn",turnsLeft:2});
     context.turn=2;context.startTurn(context.battleToken);
     const battle=value(context,"GameplaySystem.getActiveBattleState()");
@@ -294,7 +299,7 @@ test("Mechanisms use stable independent sidecar slots and never join enemy unit 
     assert.ok([first.battlefieldSlot,second.battlefieldSlot].every(slot=>!owner.enemySlots.includes(slot)));
     assert.equal(context.currentBattleMonsters.length,1,"mechanism cards must stay outside currentBattleMonsters");
     const snapshot=owner.getActiveEnemySnapshot();
-    assert.equal(owner.getEnemySlotForMonster(snapshot,0),"ENEMY_F3");
+    assert.equal(owner.getEnemySlotForMonster(snapshot,0),"ENEMY_B3");
 });
 
 test("AoE destroys the shield but cannot retarget the Boss until the next formal action",()=>{
