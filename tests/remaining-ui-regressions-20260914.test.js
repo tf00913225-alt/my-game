@@ -6,6 +6,7 @@ const inventoryCss=read("css/38-v141-system-expansion.css");
 const abyssCss=read("css/50-v169-abyss-flow.css");
 const inventoryJs=read("js/35-v141-ui-battle.js");
 const battle=read("js/54-v173.51-battle-qa.js");
+const battlefieldCss=read("css/fixed-slot-battlefield-rendering-v2.css");
 const vfx=read("js/39-v143-skill-animation.js");
 const vfxCss=read("css/40-v143-combat-dungeon-polish.css");
 const bossCss=read("css/gameplay-boss-tower.css");
@@ -18,11 +19,18 @@ assert.match(inventoryJs,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)
 assert.match(inventoryCss,/inventory-grid-classic[\s\S]*grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
 assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inventory-icon > \.v169-item-art[\s\S]*object-fit:contain/);
 assert.doesNotMatch(abyssCss,/#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:0!important;[\s\S]*z-index:24!important/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*inset:15px -5px 26px!important/);
-assert.match(battle,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:2px solid #f1c96d!important/);
+assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:0!important/,
+    "legacy V173.51 runtime must not move enemy names above the card");
+assert.match(battlefieldCss,/\.v-fixed-enemy-slot \.battle-monster-name\{[\s\S]*bottom:21px !important;[\s\S]*z-index:24 !important/,
+    "the Fixed Slot layout owner must keep enemy names below their artwork");
+assert.match(battlefieldCss,/\.v-fixed-battle-slot > \.battle-monster > \.v174-battle-art,[\s\S]*bottom:var\(--battle-art-hud-reserve\) !important/,
+    "the Fixed Slot layout owner must reserve card-bottom HUD space");
+assert.match(battlefieldCss,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:2px solid #f1c96d !important/);
 assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1;/);
-assert.match(vfx,/function visualRectForCard\(card\)[\s\S]*:scope > \.v174-battle-art/);
+assert.doesNotMatch(vfx,/function visualRectForCard\(/,"VFX geometry must not regress to character/art DOM bounds");
+assert.match(vfx,/function geometryOwner\(\)\{[\s\S]*window\.FourSymbolsBattlefieldSlots/);
+assert.match(vfx,/function geometryBounds\([\s\S]*owner\.getSideRect[\s\S]*owner\.getGeometryRectFromShape/);
+assert.match(vfx,/node\.dataset\.geometryOwner="fixed-slot"/);
 assert.match(vfx,/function applySpriteBox\([\s\S]*SPRITE_SCALE_MULTIPLIER/);
 assert.match(vfx,/naturalWidth[\s\S]*columns[\s\S]*naturalHeight[\s\S]*rows/);
 assert.match(vfx,/node\.style\.visibility="hidden"/);

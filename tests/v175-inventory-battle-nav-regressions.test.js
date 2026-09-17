@@ -28,8 +28,9 @@ assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(123px,30%,138px\)/)
 assert.doesNotMatch(bossCss,/gameplay-boss-card \.damage-popup\{\s*display:none/);
 
 const vfx=read("js/39-v143-skill-animation.js");
-assert.match(vfx,/const maxSize=Math\.max\(minSize,Math\.min\(configuredMax,targetSize\*1\.68\)\);/);
-assert.match(vfx,/const maxSize=Math\.max\(minSize,Math\.min\(configuredMax,targetSize\*1\.56\)\);/);
+assert.match(vfx,/function authoredSquareSize\(sprite,geometry,defaults\)[\s\S]*?Math\.min\(configuredMax,base\*defaults\.maxRatio\)/);
+assert.match(vfx,/placement==="single"[\s\S]*?maxRatio:1\.68/);
+assert.match(vfx,/placement==="targetTrajectory"[\s\S]*?maxRatio:1\.56/);
 assert.match(vfx,/placement==="targetTrajectory"[\s\S]*?--v143-sprite-angle/);
 const vfxCss=read("css/40-v143-combat-dungeon-polish.css");
 const fireCss=read("css/56-v174-critical-ui-regressions.css");

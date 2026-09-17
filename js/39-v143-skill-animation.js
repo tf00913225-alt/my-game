@@ -1,6 +1,7 @@
 /* =====================================================
    V143 — single-owner raster battle VFX runtime
    V174 cleanup: official PNG Sprite Sheets/status loops only.
+   Fixed Slot geometry is the only battle position/coverage source.
    No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback.
 ===================================================== */
 (function installV143SkillAnimationRuntime(){
@@ -10,7 +11,7 @@
     if(!window.v142SkillAnimationDirector){ return; }
     window.__v143SkillAnimationInstalled=true;
 
-    const VERSION="174-raster-owner";
+    const VERSION="174-slot-geometry-owner";
     const DEFAULT_HIT=.5833333333;
     const MECHANISM_TARGET_PREFIX="mechanism:";
     let blockedManifestWrites=0;
@@ -18,6 +19,9 @@
     let blockedCardEffectOverrides=0;
     const failedAssets=new Set();
     const SPRITE_SCALE_MULTIPLIER=1;
+    /* Size the raster box before centering/travel. CSS independent scale also
+       scales translate(-50%) and the travel vector, moving the visible hit. */
+    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:1,group:1,battlefield:1});
     const spriteFrameAspectCache=new Map();
     const spriteFrameAspectLoading=new Set();
 
@@ -61,6 +65,7 @@
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
         revive:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-revive-vfx.png?v=166","single",{scale:2.3,maxSize:285})},
+        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250,reusedFrom:"healSpell"})},
         waterEX:{hit:.74,noVisual:true,passive:true},
 
         stormFist:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/storm-fist-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
@@ -203,6 +208,13 @@
         state.metrics.legacyNodesPurged+=removed;
     }
 
+    function purgeStaleRasterStages(){
+        if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
+        document.querySelectorAll("#v143-skill-stage").forEach(node=>{
+            if(node!==state.stage&&node&&typeof node.remove==="function"){ node.remove(); }
+        });
+    }
+
     function isMechanismTarget(index){
         return typeof index==="string"&&index.indexOf(MECHANISM_TARGET_PREFIX)===0&&index.length>MECHANISM_TARGET_PREFIX.length;
     }
@@ -243,29 +255,37 @@
         return Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false);
     }
 
-    function visualRectForCard(card){
-        const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-        if(!rect){ return null; }
-        if(typeof card.querySelector==="function"){
-            try{
-                const art=card.querySelector(":scope > .v174-battle-art");
-                const artRect=art&&art.getBoundingClientRect?art.getBoundingClientRect():null;
-                if(artRect&&artRect.width>0&&artRect.height>0){ return artRect; }
-            }catch(_){ }
-        }
-        return rect;
+    function geometryOwner(){
+        const owner=window.FourSymbolsBattlefieldSlots;
+        return owner&&typeof owner.getSlotRect==="function"?owner:null;
     }
 
-    function cardCenter(card){
-        const rect=card&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-        if(!rect){ return null; }
-        const visualRect=visualRectForCard(card)||rect;
-        return {x:visualRect.left+visualRect.width/2,y:visualRect.top+visualRect.height/2,rect:rect,visualRect:visualRect};
+    function slotForTarget(side,index,card){
+        const owner=geometryOwner();
+        if(!owner){ return null; }
+        if(side==="monster"&&isMechanismTarget(index)){
+            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;
+        }
+        let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;
+        if(!slot&&typeof owner.getSlotFromElement==="function"){
+            slot=owner.getSlotFromElement(card||cardFor(side,index));
+        }
+        return slot||null;
+    }
+
+    function slotAnchor(side,index,card){
+        const owner=geometryOwner();
+        const slot=slotForTarget(side,index,card);
+        if(!owner||!slot){ return null; }
+        const center=typeof owner.getSlotCenter==="function"?owner.getSlotCenter(slot):null;
+        const rect=center&&center.rect?center.rect:owner.getSlotRect(slot);
+        if(!center||!rect){ return null; }
+        return {slot:slot,x:center.x,y:center.y,rect:rect};
     }
 
     function activeCards(side,config){
         const cards=[];
-        const max=side==="monster"?10:3;
+        const max=side==="monster"?10:6;
         for(let index=0;index<max;index++){
             const card=cardFor(side,index);
             if(card&&card.offsetParent!==null&&canReceive(config,side,index)){ cards.push({index:index,card:card}); }
@@ -278,81 +298,90 @@
         return ally?side:(side==="player"?"monster":"player");
     }
 
-    function queuedMechanismTarget(config,meta,targetSide){
-        if(targetSide!=="monster"||!meta||meta.side!=="player"||typeof queuedPlayerActions==="undefined"){ return null; }
-        const queued=queuedPlayerActions&&queuedPlayerActions[meta.actorIndex];
-        const target=queued&&queued.target;
-        return isMechanismTarget(target)&&canReceive(config,targetSide,target)?target:null;
-    }
-
     function initialTargetIndexes(config,meta,targetSide){
-        const targetType=String(config.targetType||"");
-        const all=targetType==="all"||targetType==="allyAll";
-        const formation=/row|tri|column/i.test(targetType);
         const explicit=Array.isArray(meta.targetIds)
             ?meta.targetIds
             :(meta.targetId!==undefined&&meta.targetId!==null?[meta.targetId]:[]);
-        if(explicit.length){
-            return Array.from(new Set(explicit.filter(index=>
-                (Number.isInteger(index)||isMechanismTarget(index))&&canReceive(config,targetSide,index)
-            )));
-        }
-        const mechanismTarget=queuedMechanismTarget(config,meta,targetSide);
-        if(mechanismTarget){ return [mechanismTarget]; }
-        const cards=activeCards(targetSide,config);
-        if(all){ return cards.map(entry=>entry.index); }
-        if(meta.side==="player"&&typeof queuedPlayerActions!=="undefined"){
-            const queued=queuedPlayerActions&&queuedPlayerActions[meta.actorIndex];
-            if(queued){
-                if(
-                    targetSide==="monster"&&formation&&Number.isInteger(queued.target)&&
-                    typeof getSkillTargets==="function"
-                ){
-                    return getSkillTargets(queued.target,targetType).filter(index=>canReceive(config,targetSide,index));
-                }
-                if(targetSide==="monster"&&(Number.isInteger(queued.target)||isMechanismTarget(queued.target))&&canReceive(config,targetSide,queued.target)){
-                    return [queued.target];
-                }
-                if(targetSide==="player"&&Number.isInteger(queued.targetAlly)&&canReceive(config,targetSide,queued.targetAlly)){
-                    return [queued.targetAlly];
-                }
-            }
-        }
-        return [];
+        return Array.from(new Set(explicit.filter(index=>
+            (Number.isInteger(index)||isMechanismTarget(index))&&canReceive(config,targetSide,index)
+        )));
     }
 
-    function fieldBounds(cards){
-        const rects=cards.map(card=>visualRectForCard(card))
-            .filter(rect=>rect&&rect.width&&rect.height);
-        if(!rects.length){ return null; }
-        const left=Math.min.apply(null,rects.map(rect=>rect.left));
-        const top=Math.min.apply(null,rects.map(rect=>rect.top));
-        const right=Math.max.apply(null,rects.map(rect=>rect.right));
-        const bottom=Math.max.apply(null,rects.map(rect=>rect.bottom));
-        return {left:left,top:top,width:right-left,height:bottom-top};
+    function geometrySeedIndexes(current,indexes){
+        if(Array.isArray(current&&current.targetIds)&&current.targetIds.length){ return current.targetIds.slice(); }
+        if(current&&current.targetId!==undefined&&current.targetId!==null){ return [current.targetId]; }
+        return Array.isArray(indexes)?indexes.slice():[];
     }
 
-    function mechanismTargetBounds(current,indexes){
-        if(!current||current.targetSide!=="monster"){ return null; }
-        const cards=(indexes||[]).filter(isMechanismTarget)
-            .map(index=>cardFor("monster",index)).filter(Boolean);
-        const bounds=fieldBounds(cards);
-        if(!bounds){ return null; }
-        bounds.centerX=bounds.left+bounds.width/2;
-        bounds.centerY=bounds.top+bounds.height/2;
-        bounds.id="bossMechanismSlot";
-        return bounds;
-    }
-
-    function sideAreaBounds(side){
-        const id=side==="monster"?"battleMonsterArea":"battlePlayerRow";
-        const area=typeof document!=="undefined"?document.getElementById(id):null;
-        const rect=area&&area.getBoundingClientRect?area.getBoundingClientRect():null;
-        if(rect&&rect.width&&rect.height){
-            return {left:rect.left,top:rect.top,width:rect.width,height:rect.height,id:id};
+    function geometryPrimarySlot(current,indexes){
+        const owner=geometryOwner();
+        if(!owner||!current){ return null; }
+        const seed=geometrySeedIndexes(current,indexes);
+        const candidates=[];
+        if(current.targetId!==undefined&&current.targetId!==null){ candidates.push(current.targetId); }
+        seed.forEach(value=>candidates.push(value));
+        for(const value of candidates){
+            const slot=slotForTarget(current.targetSide,value,cardFor(current.targetSide,value));
+            if(slot){ return slot; }
         }
-        const fallback=fieldBounds(activeCards(side,{category:""}).map(entry=>entry.card));
-        return fallback?Object.assign({id:id},fallback):null;
+        return null;
+    }
+
+    function geometryPrimaryAnchor(current,indexes){
+        const owner=geometryOwner();
+        const slot=geometryPrimarySlot(current,indexes);
+        if(!owner||!slot){ return null; }
+        const center=typeof owner.getSlotCenter==="function"?owner.getSlotCenter(slot):null;
+        const rect=center&&center.rect?center.rect:owner.getSlotRect(slot);
+        if(!rect){ return null; }
+        return {
+            slot:slot,
+            x:center?center.x:rect.centerX,
+            y:center?center.y:rect.centerY,
+            rect:rect
+        };
+    }
+
+    function geometryBounds(current,indexes,placement){
+        const owner=geometryOwner();
+        if(!owner||!current){ return null; }
+        const seed=geometrySeedIndexes(current,indexes);
+        const mechanismSlots=seed.filter(isMechanismTarget)
+            .map(index=>slotForTarget("monster",index,cardFor("monster",index))).filter(Boolean);
+        if(mechanismSlots.length&&typeof owner.getRectForSlots==="function"){
+            const rect=owner.getRectForSlots(mechanismSlots);
+            if(rect){ rect.id="mechanism-slots"; return rect; }
+        }
+
+        const targetType=String(current.config&&current.config.targetType||"single");
+        if(placement==="battlefield"||targetType==="all"||targetType==="allyAll"){
+            const rect=typeof owner.getSideRect==="function"?owner.getSideRect(current.targetSide):null;
+            if(rect){ rect.id=current.targetSide==="monster"?"fixed-enemy-zone":"fixed-ally-zone"; }
+            return rect;
+        }
+
+        const primarySlot=geometryPrimarySlot(current,indexes);
+        if(!primarySlot){ return null; }
+
+        let shape=targetType;
+        if(!/^(single|all|allyAll|row|column|tri|horizontal-3|allyTri)$/i.test(shape)){
+            shape=placement==="group"||placement==="trajectory"?(current.targetSide==="player"?"all":"row"):"single";
+        }
+        const rect=typeof owner.getGeometryRectFromShape==="function"
+            ?owner.getGeometryRectFromShape(current.targetSide,primarySlot,shape)
+            :owner.getSlotRect(primarySlot);
+        if(rect){ rect.id="fixed-slot-"+String(shape).toLowerCase(); }
+        return rect;
+    }
+
+    function placementFor(config,sprite){
+        const authored=String(sprite&&sprite.placement||"single");
+        const targetType=String(config&&config.targetType||"single");
+        if(/^(all|enemyAll|allyAll)$/i.test(targetType)){ return "battlefield"; }
+        if(/^(tri|allyTri|row|column|horizontal-3)$/i.test(targetType)){
+            return authored==="trajectory"?"trajectory":"group";
+        }
+        return authored;
     }
 
     function hasTimedEffect(entity,type){
@@ -371,7 +400,7 @@
 
     function snapshotTimedEffects(){
         const snapshot=new Set();
-        [["monster",10],["player",3]].forEach(entry=>{
+        [["monster",10],["player",6]].forEach(entry=>{
             for(let index=0;index<entry[1];index++){
                 const entity=entityFor(entry[0],index);
                 Object.keys(RAW_STATUS_SPRITES).forEach(type=>{
@@ -443,10 +472,12 @@
             node.style.setProperty("--v153-status-duration",spec.duration+"ms");
             card.appendChild(node);
         }
-        const rect=card.getBoundingClientRect?card.getBoundingClientRect():null;
+        const anchor=slotAnchor(side,index,card);
+        if(!anchor){ return; }
         const scale=(Number(spec.scale)||1.18)*1.28;
-        const size=Math.max(96,Math.max(Number(rect&&rect.width)||0,Number(rect&&rect.height)||0)*scale);
+        const size=Math.max(96,Math.max(anchor.rect.width,anchor.rect.height)*scale);
         const cellAspect=Math.max(.1,Number(spec.cellAspect)||1);
+        node.dataset.slot=anchor.slot;
         if(cellAspect>=1){
             node.style.width=size+"px";
             node.style.height=(size/cellAspect)+"px";
@@ -460,7 +491,7 @@
         purgeLegacyCardVfx();
         const types=Object.keys(RAW_STATUS_SPRITES);
         for(let index=0;index<10;index++){ types.forEach(type=>syncStatusSprite("monster",index,type)); }
-        for(let index=0;index<3;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }
+        for(let index=0;index<6;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }
     }
 
     function removeStatusSpriteEffects(){
@@ -477,7 +508,7 @@
             if(index>=0){ side="monster"; }
         }
         if(!side&&typeof getPartyCharacterByIndex==="function"){
-            for(let partyIndex=0;partyIndex<3;partyIndex++){
+            for(let partyIndex=0;partyIndex<6;partyIndex++){
                 if(getPartyCharacterByIndex(partyIndex)===entity){ side="player"; index=partyIndex; break; }
             }
         }
@@ -486,8 +517,8 @@
         if(current&&!current.done&&current.targetSide===side){
             const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
             if(types.indexOf(type)>=0){
-            registerTarget(side,index,false);
-            confirmTargetVisual(current,index);
+                registerTarget(side,index,false);
+                confirmTargetVisual(current,index);
                 let tracked=current.deferredStatusTargets.get(type);
                 if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
                 tracked.add(index);
@@ -532,6 +563,7 @@
         node.dataset.targetSide=current.targetSide;
         node.dataset.renderer="dom-sprite";
         node.dataset.confirmedHit="false";
+        node.dataset.geometryOwner="fixed-slot";
         node.style.visibility="hidden";
         state.stage.appendChild(node);
         return node;
@@ -545,16 +577,25 @@
         return Math.max(.1,Number(cached)||Number(sprite&&sprite.cellAspect)||1);
     }
 
-    function applySpriteBox(node,width,height,sprite){
-        const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER;
-        const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER;
+    function applySpriteBox(node,width,height,sprite,fit){
+        const placementScale=PLACEMENT_SIZE_SCALE[node.dataset.placement]||1;
+        const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
+        const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
         const aspect=frameAspectFor(sprite);
         let renderWidth=boxWidth,renderHeight=boxHeight;
-        if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
+        if(fit==="stretch"){
+            /* Range sheets deliberately fill their semantic Fixed Slot shape.
+               Keeping the node inside that shape protects the center controls,
+               while showing the complete frame without a paint clip. */
+        }else if(fit==="cover"){
+            if(renderWidth/renderHeight>aspect){ renderHeight=renderWidth/aspect; }
+            else{ renderWidth=renderHeight*aspect; }
+        }else if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
         else{ renderHeight=renderWidth/aspect; }
         node.style.width=Math.round(renderWidth)+"px";
         node.style.height=Math.round(renderHeight)+"px";
         node.dataset.frameAspect=String(Number(aspect.toFixed(4)));
+        node.dataset.frameFit=fit==="stretch"?"stretch":fit==="cover"?"cover":"contain";
     }
 
     function requestSpriteAspect(sprite,current,node,index,target){
@@ -584,186 +625,90 @@
         );
     }
 
-    function formationRowsForVfx(indexes){
-        const resolver=typeof window.v148GetFormationRows==="function"
-            ?window.v148GetFormationRows
-            :(typeof window.v138GetFormationRows==="function"?window.v138GetFormationRows:null);
-        if(!resolver){ return []; }
-        const rows=resolver(indexes||[]);
-        return Array.isArray(rows)?rows.filter(row=>Array.isArray(row)&&row.length).map(row=>row.slice()):[];
-    }
-
-    function fixedTriLayoutBounds(current,indexes){
-        const mechanismBounds=mechanismTargetBounds(current,indexes);
-        if(mechanismBounds){ return mechanismBounds; }
-        if(String(current.config.targetType||"")==="allyTri"&&current.targetSide==="player"){
-            const playerArea=sideAreaBounds("player");
-            if(playerArea){
-                playerArea.centerX=playerArea.left+playerArea.width/2;
-                playerArea.centerY=playerArea.top+playerArea.height/2;
-                return playerArea;
-            }
-        }
-        const queued=current.side==="player"&&typeof queuedPlayerActions!=="undefined"
-            ?queuedPlayerActions&&queuedPlayerActions[current.actorIndex]:null;
-        let center=Number.isInteger(current.targetId)?current.targetId:null;
-        if(center===null&&queued){
-            if(current.targetSide==="monster"&&Number.isInteger(queued.target)){ center=queued.target; }
-            if(current.targetSide==="player"&&Number.isInteger(queued.targetAlly)){ center=queued.targetAlly; }
-        }
-        if(center===null&&indexes.length){ center=indexes[Math.floor((indexes.length-1)/2)]; }
-        const anchor=Number.isInteger(center)?cardCenter(cardFor(current.targetSide,center)):null;
-        if(!anchor){
-            const area=sideAreaBounds(current.targetSide);
-            if(area){
-                area.centerX=area.left+area.width/2;
-                area.centerY=area.top+area.height/2;
-            }
-            return area;
-        }
-        /* Explicit resolved targets are authoritative for VFX centering.  A queued
-           tri target can point at the first surviving slot (for example 0 while
-           the real hit set is [0,2]); keeping that slot as the visual center
-           shifts a group Sprite off the actual targets.  Preserve the fixed tri
-           coverage width below, but center it on the resolved target geometry. */
-        const explicitBounds=Array.isArray(current.targetIds)&&current.targetIds.length
-            ?fieldBounds(indexes.map(i=>cardFor(current.targetSide,i)).filter(Boolean))
-            :null;
-        const layoutCenterX=explicitBounds?explicitBounds.left+explicitBounds.width/2:anchor.x;
-        const layoutCenterY=explicitBounds?explicitBounds.top+explicitBounds.height/2:anchor.y;
-        let step=Math.max(1,anchor.rect.width+3);
-        if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
-            const rows=formationRowsForVfx(currentBattleMonsters);
-            const row=rows.find(candidate=>candidate.includes(center));
-            if(row){
-                const pos=row.indexOf(center);
-                const distances=[row[pos-1],row[pos+1]].filter(Number.isInteger)
-                    .map(i=>cardCenter(cardFor("monster",i))).filter(Boolean)
-                    .map(p=>Math.abs(p.x-anchor.x)).filter(distance=>distance>1);
-                if(distances.length){ step=Math.min.apply(null,distances); }
-            }
-        }else if(current.targetSide==="player"){
-            const distances=[0,1,2].map(i=>cardCenter(cardFor("player",i))).filter(Boolean)
-                .map(p=>Math.abs(p.x-anchor.x)).filter(distance=>distance>1);
-            if(distances.length){ step=Math.min.apply(null,distances); }
-        }
-        const width=anchor.rect.width+step*2;
-        return {
-            left:layoutCenterX-width/2,top:anchor.rect.top,width:width,height:anchor.rect.height,
-            centerX:layoutCenterX,centerY:layoutCenterY,id:"fixed-tri-slots"
-        };
-    }
-
-    function groupLayoutBounds(current,indexes){
-        const mechanismBounds=mechanismTargetBounds(current,indexes);
-        if(mechanismBounds){ return mechanismBounds; }
-        if(/tri/i.test(String(current.config.targetType||""))){ return fixedTriLayoutBounds(current,indexes); }
-        if(current.targetSide==="player"){ return sideAreaBounds("player"); }
-        if(current.targetSide==="monster"&&typeof currentBattleMonsters!=="undefined"){
-            const queued=current.side==="player"&&typeof queuedPlayerActions!=="undefined"
-                ?queuedPlayerActions&&queuedPlayerActions[current.actorIndex]:null;
-            const center=Number.isInteger(current.targetId)
-                ?current.targetId
-                :(queued&&Number.isInteger(queued.target)?queued.target:indexes[0]);
-            const rows=formationRowsForVfx(currentBattleMonsters);
-            const row=rows.find(candidate=>candidate.includes(center));
-            if(row){
-                const layout=fieldBounds(row.map(i=>cardFor("monster",i)).filter(Boolean));
-                if(layout){ return layout; }
-            }
-        }
-        return fieldBounds(indexes.map(i=>cardFor(current.targetSide,i)).filter(Boolean));
+    function authoredSquareSize(sprite,geometry,defaults){
+        const base=Math.max(1,Math.max(Number(geometry&&geometry.width)||0,Number(geometry&&geometry.height)||0));
+        const scale=Number(sprite.scale)||defaults.scale;
+        const configuredMin=Number(sprite.minSize)||defaults.min;
+        const configuredMax=Number(sprite.maxSize)||defaults.max;
+        const minSize=Math.min(configuredMin,base*defaults.minRatio);
+        const maxSize=Math.max(minSize,Math.min(configuredMax,base*defaults.maxRatio));
+        return clamp(base*scale,minSize,maxSize);
     }
 
     function placeSprite(current,node,index,target){
         const sprite=current.model.sprite;
-        const placement=String(sprite.placement||"single");
+        const placement=placementFor(current.config,sprite);
         node.dataset.placement=placement;
 
         if(placement==="single"){
-            const targetSize=Math.max(target.rect.width,target.rect.height);
-            const configuredMin=Number(sprite.minSize)||96;
-            const configuredMax=Number(sprite.maxSize)||184;
-            const minSize=Math.min(configuredMin,targetSize*1.18);
-            const maxSize=Math.max(minSize,Math.min(configuredMax,targetSize*1.68));
-            const size=clamp(
-                targetSize*(Number(sprite.scale)||1.8),minSize,maxSize
-            );
+            const size=authoredSquareSize(sprite,target.rect,{scale:1.8,min:96,max:184,minRatio:1.18,maxRatio:1.68});
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
+            node.dataset.geometrySlot=target.slot;
             node.style.left=target.x+"px";
-        node.style.top=target.y+"px";
-        applySpriteBox(node,size,size,sprite);
+            node.style.top=target.y+"px";
+            applySpriteBox(node,size,size,sprite);
             return;
         }
 
         if(placement==="targetTrajectory"){
-            const actor=cardCenter(current.actorCard);
+            const actor=slotAnchor(current.side,current.actorIndex,current.actorCard);
             if(!actor){ return; }
-            const targetSize=Math.max(target.rect.width,target.rect.height);
-            const configuredMin=Number(sprite.minSize)||140;
-            const configuredMax=Number(sprite.maxSize)||240;
-            const minSize=Math.min(configuredMin,targetSize*1.12);
-            const maxSize=Math.max(minSize,Math.min(configuredMax,targetSize*1.56));
-            const size=clamp(
-                targetSize*(Number(sprite.scale)||1.7),minSize,maxSize
-            );
+            const size=authoredSquareSize(sprite,target.rect,{scale:1.7,min:140,max:240,minRatio:1.12,maxRatio:1.56});
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
+            node.dataset.geometrySlot=target.slot;
             node.dataset.travel="true";
             node.dataset.travelToTargets="true";
             node.style.left=actor.x+"px";
-        node.style.top=actor.y+"px";
-        applySpriteBox(node,size,size,sprite);
-        node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
+            node.style.top=actor.y+"px";
+            applySpriteBox(node,size,size,sprite);
+            node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
             node.style.setProperty("--v143-sprite-angle",Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI+"deg");
             return;
         }
 
+        const indexes=emittedSpriteTargets(current);
+        const bounds=geometryBounds(current,indexes,placement);
+        if(!bounds){ return; }
+        const primaryAnchor=geometryPrimaryAnchor(current,indexes);
+        node.dataset.geometrySlots=Array.isArray(bounds.slots)?bounds.slots.join(","):"";
+
         if(placement==="battlefield"){
-            const bounds=mechanismTargetBounds(current,emittedSpriteTargets(current))||sideAreaBounds(current.targetSide);
-            if(!bounds){ return; }
-            const viewportWidth=Number(window.innerWidth)||960;
-            const viewportHeight=Number(window.innerHeight)||720;
+            /* coverageScale is an authored multiplier over the complete fixed
+               battlefield zone. It never measures currently surviving targets. */
             const coverageScale=clamp(Number(sprite.coverageScale)||Number(sprite.scale)||1,1,1.4);
-            const width=clamp(
-                Math.round(bounds.width*coverageScale),Number(sprite.minWidth)||Number(sprite.minSize)||160,
-                Number(sprite.maxWidth)||Math.max(240,viewportWidth*.94)
-            );
-            const height=clamp(
-                Math.round(bounds.height*coverageScale),Number(sprite.minHeight)||Number(sprite.minSize)||160,
-                Number(sprite.maxHeight)||Math.max(240,viewportHeight*.92)
-            );
-            node.dataset.areaId=bounds.id;
-            node.dataset.targetIndexes=emittedSpriteTargets(current).join(",");
+            const width=Math.max(1,Math.round(bounds.width));
+            const height=Math.max(1,Math.round(bounds.height));
+            node.dataset.areaId=bounds.id||"fixed-battlefield";
+            node.dataset.targetIndexes=indexes.join(",");
             if(sprite.fixedFormation){ node.dataset.fixedFormation="true"; }
             node.dataset.coverageScale=String(coverageScale);
             node.style.clipPath="none";
-            node.style.left=(bounds.left+bounds.width/2)+"px";
-        node.style.top=(bounds.top+bounds.height/2)+"px";
-        applySpriteBox(node,width,height,sprite);
+            node.style.left=bounds.centerX+"px";
+            node.style.top=bounds.centerY+"px";
+            /* Range effects fill the complete fixed-side rectangle but never
+               extend into the independent operation track. The whole source
+               frame remains visible; no card or Zone is a paint clip owner. */
+            applySpriteBox(node,width,height,sprite,"stretch");
             return;
         }
 
-        const indexes=emittedSpriteTargets(current);
-        const targetCards=indexes.map(i=>cardFor(current.targetSide,i)).filter(Boolean);
-        const targetBounds=sprite.alignToSlots?groupLayoutBounds(current,indexes):fieldBounds(targetCards);
-        if(!targetBounds){ return; }
-        const coverageCards=placement==="trajectory"&&current.actorCard?[current.actorCard].concat(targetCards):targetCards;
-        const coverage=sprite.alignToSlots?targetBounds:(fieldBounds(coverageCards)||targetBounds);
-        const naturalSize=(Math.max(coverage.width,coverage.height)+40)*(Number(sprite.scale)||1);
-        const viewportWidth=Number(window.innerWidth)||960;
-        const viewportHeight=Number(window.innerHeight)||720;
-        const dynamicMaximum=Math.max(320,Math.min(1280,Math.max(viewportWidth,viewportHeight)*.96));
-        const size=clamp(naturalSize,Number(sprite.minSize)||160,Number(sprite.maxSize)||dynamicMaximum);
+        /* Group/row/tri/trajectory size is derived from the fixed geometry shape,
+           never from the number or outer bounds of surviving target cards. */
+        const width=Math.max(1,Math.round(bounds.width));
+        const height=Math.max(1,Math.round(bounds.height));
         node.dataset.targetIndexes=indexes.join(",");
-    applySpriteBox(node,size,size,sprite);
-    const destination={
-            x:targetBounds.left+targetBounds.width/2,
-            y:targetBounds.top+targetBounds.height/2
-        };
-        const actor=placement==="trajectory"?cardCenter(current.actorCard):null;
+        applySpriteBox(node,width,height,sprite,"stretch");
+        /* A group/row/tri Sprite keeps the fixed-shape bounds for sizing, but
+           its visual center belongs to the explicitly selected primary card.
+           Only full-battlefield effects remain centered on the whole side. */
+        const destination=primaryAnchor
+            ?{x:primaryAnchor.x,y:primaryAnchor.y}
+            :{x:bounds.centerX,y:bounds.centerY};
+        if(primaryAnchor){ node.dataset.geometrySlot=primaryAnchor.slot; }
+        const actor=placement==="trajectory"?slotAnchor(current.side,current.actorIndex,current.actorCard):null;
         if(placement==="trajectory"&&sprite.travelToTargets&&actor){
             node.dataset.travel="true";
             node.dataset.travelToTargets="true";
@@ -773,15 +718,15 @@
             node.style.setProperty("--v143-sprite-dy",destination.y-actor.y+"px");
             node.style.setProperty("--v143-sprite-angle",Math.atan2(destination.y-actor.y,destination.x-actor.x)*180/Math.PI+"deg");
         }else{
-            node.style.left=(Number.isFinite(targetBounds.centerX)?targetBounds.centerX:coverage.left+coverage.width/2)+"px";
-            node.style.top=(Number.isFinite(targetBounds.centerY)?targetBounds.centerY:coverage.top+coverage.height/2)+"px";
+            node.style.left=destination.x+"px";
+            node.style.top=destination.y+"px";
         }
     }
 
     function addSprite(current,index,target){
         const sprite=current.model.sprite;
         if(!sprite||!target||!state.stage){ return; }
-        const placement=String(sprite.placement||"single");
+        const placement=placementFor(current.config,sprite);
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         let node=current.spriteNodes.get(key);
         if(!node){
@@ -802,7 +747,7 @@
         placeSprite(current,node,index,target);
         requestSpriteAspect(sprite,current,node,index,target);
         /* A formal cast Sprite represents the attempted skill, not only a landed hit.
-           Reveal it as soon as the official owner has a real target position.
+           Reveal it as soon as the official owner has a real fixed-slot position.
            Outcome confirmation still marks the node and controls hit feedback, but
            MISS/status/custom Boss paths must not make the cast animation disappear. */
         if(node.style.left&&node.style.top){
@@ -813,13 +758,13 @@
     }
 
     function confirmTargetVisual(current,index){
-    if(!current||current.done||!current.model||!current.model.sprite){ return; }
-    current.confirmedTargets.add(index);
-    const placement=String(current.model.sprite.placement||"single");
-    const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
-    const node=current.spriteNodes.get(key);
-    if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
-}
+        if(!current||current.done||!current.model||!current.model.sprite){ return; }
+        current.confirmedTargets.add(index);
+        const placement=placementFor(current.config,current.model.sprite);
+        const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
+        const node=current.spriteNodes.get(key);
+        if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
+    }
 
     function targetHitTime(current,index){
         return Math.min(
@@ -840,11 +785,11 @@
         if(!state.stage||current.emitted.has(index)||!current.validTargets.has(index)){ return; }
         if(!allowDefeated&&!canReceive(current.config,current.targetSide,index)){ return; }
         const targetCard=cardFor(current.targetSide,index);
-        const target=cardCenter(targetCard);
+        const target=slotAnchor(current.targetSide,index,targetCard);
         if(!target){ return; }
         current.emitted.add(index);
         if(current.targetIndexes.indexOf(index)<0){ current.targetIndexes.push(index); }
-        if(targetCard.classList){ targetCard.classList.add("v143-effects-pending"); }
+        if(targetCard&&targetCard.classList){ targetCard.classList.add("v143-effects-pending"); }
         if(current.model.sprite){ addSprite(current,index,target); }
         setTimer(()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now()));
     }
@@ -890,13 +835,23 @@
         }
         if(state.current&&!state.current.done){ cleanupCurrent(state.current,"superseded"); }
         purgeLegacyCardVfx();
+        purgeStaleRasterStages();
 
         const model=modelFor(config);
-        const targetSide=targetSideFor(config,meta.side||"player");
+        const contractedSide=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
+            ?meta.targetContract.targetSide:meta&&meta.targetSide;
+        const targetSide=contractedSide==="player"||contractedSide==="monster"
+            ?contractedSide:targetSideFor(config,meta.side||"player");
         const duration=Math.max(520,Number(config.duration)||520);
         const validTargets=new Set(activeCards(targetSide,config).map(entry=>entry.index));
-        const mechanismTarget=queuedMechanismTarget(config,meta,targetSide);
-        if(mechanismTarget){ validTargets.add(mechanismTarget); }
+        const explicitTargets=Array.isArray(meta.targetIds)
+            ?meta.targetIds
+            :(meta.targetId!==undefined&&meta.targetId!==null?[meta.targetId]:[]);
+        explicitTargets.forEach(index=>{
+            if((Number.isInteger(index)||isMechanismTarget(index))&&cardFor(targetSide,index)){
+                validTargets.add(index);
+            }
+        });
 
         const current={
             sequence:++sequence,config:config,model:model,gate:gate,
@@ -918,6 +873,7 @@
         stage.dataset.skill=String(config.id||"unknown");
         stage.dataset.element=String(config.element||"normal");
         stage.dataset.renderer="raster-only";
+        stage.dataset.geometryOwner="fixed-slot";
         if(model.missingAsset||model.missingDedicatedAsset){ stage.dataset.missingVisual="true"; }
         document.body.appendChild(stage);
 
@@ -947,7 +903,15 @@
         const safeMeta=Object.assign({},meta||{},{render:false});
         const gate=originalPlay(config,safeMeta);
         if(state.current&&state.current.gate===gate){ return gate; }
-        render(config,Object.assign({side:"player",actorIndex:0},meta||{}),gate);
+        try{
+            render(config,Object.assign({side:"player",actorIndex:0},meta||{}),gate);
+        }catch(error){
+            state.metrics.renderErrors=(state.metrics.renderErrors||0)+1;
+            if(typeof console!=="undefined"&&typeof console.error==="function"){
+                console.error("V143 raster render failed; combat timing recovered.",error);
+            }
+            if(!gate.done){ gate.complete("v143-render-error"); }
+        }
         return gate;
     }
 
@@ -1208,6 +1172,7 @@
             blockedCardEffectOverrides:blockedCardEffectOverrides,
             failedAssets:Array.from(failedAssets),
             renderer:"dom-sprite-only",
+            geometryOwner:"fixed-slot",
             stageNodes:state.stage?state.stage.querySelectorAll("*").length:0
         });
     };

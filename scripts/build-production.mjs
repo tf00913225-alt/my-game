@@ -53,6 +53,7 @@ const appScripts=[
     "js/61-v174-ui-regression-guards.js"
 ];
 const gameplayScripts=[
+    "js/battlefield-slot-owner.js",
     "js/25-v131-fix-batch.js",
     "js/27-v132-content-expansion.js",
     "js/28-v133-economy-rebalance.js",
@@ -85,7 +86,8 @@ const gameplayScripts=[
     "js/55-v173.51-inventory-qa.js",
     "js/56-v173.51-shop-qa.js",
     "js/57-v173.51-quest-qa.js",
-    "js/58-v173.63-functional-fixes.js"
+    "js/58-v173.63-functional-fixes.js",
+    "js/battlefield-render-geometry-adapter.js"
 ];
 const patrolScripts=["js/26-v131-patrol-appearance.js"];
 const abyssScripts=["js/59-abyss-two-tier-runtime.js"];
@@ -98,6 +100,12 @@ const adventureScripts=[
     "js/adventure/adventure-content-v1-20260915.js",
     "js/adventure/adventure-runtime-v1-20260915.js",
     "js/adventure/adventure-ui-v1-20260915.js"
+];
+const gameplaySplitIndex=gameplayScripts.indexOf("js/40-v144-rules-and-abyss.js");
+if(gameplaySplitIndex<=0){ throw new Error("Gameplay bundle split boundary is missing."); }
+const gameplayScriptParts=[
+    gameplayScripts.slice(0,gameplaySplitIndex),
+    gameplayScripts.slice(gameplaySplitIndex)
 ];
 
 const criticalStyles=["css/00-main.css","css/29-v125-character-creation-native.css","css/51-v173.20-startup-loader.css","css/firebase-auth.css"];
@@ -143,7 +151,8 @@ const gameplayStyles=[
     "css/48-v169-element-box-settings.css",
     "css/49-v169-rpg-ui.css",
     "css/52-v173.50-inventory-qol.css",
-    "css/53-v173.51-qa.css"
+    "css/53-v173.51-qa.css",
+    "css/fixed-slot-battlefield-rendering-v2.css"
 ];
 const patrolStyles=["css/32-v131-patrol-appearance.css"];
 const abyssStyles=["css/50-v169-abyss-flow.css","css/54-v174-abyss-two-tier.css"];
@@ -198,7 +207,8 @@ for(const name of ["firebase-config.js","firebase-auth.js","firebase-cloud-save.
 
 const scriptOutputs={
     app:target("app-shell","js",combineScripts(appScripts)),
-    gameplay:target("gameplay-core","js",combineScripts(gameplayScripts)),
+    gameplayPrimary:target("gameplay-core-primary","js",combineScripts(gameplayScriptParts[0])),
+    gameplaySecondary:target("gameplay-core-secondary","js",combineScripts(gameplayScriptParts[1])),
     patrol:target("feature-patrol","js",combineScripts(patrolScripts)),
     abyss:target("feature-abyss","js",combineScripts(abyssScripts)),
     skill:target("feature-skill","js",combineScripts(skillScripts)),
@@ -227,7 +237,9 @@ const patrolAssets=fs.readdirSync(path.join(ROOT,"assets/characters/patrol"))
     .filter(name=>/\.[0-9a-f]{12}\.webp$/.test(name)).sort().map(name=>`assets/characters/patrol/${name}`);
 const replacements={
     __BUILD_APP_SHELL__:scriptOutputs.app.path,__BUILD_APP_SHELL_STYLE__:styleOutputs.app.path,
-    __BUILD_GAMEPLAY_CORE__:scriptOutputs.gameplay.path,__BUILD_GAMEPLAY_CORE_STYLE__:styleOutputs.gameplay.path,
+    __BUILD_GAMEPLAY_CORE_PRIMARY__:scriptOutputs.gameplayPrimary.path,
+    __BUILD_GAMEPLAY_CORE_SECONDARY__:scriptOutputs.gameplaySecondary.path,
+    __BUILD_GAMEPLAY_CORE_STYLE__:styleOutputs.gameplay.path,
     __BUILD_PATROL__:scriptOutputs.patrol.path,__BUILD_PATROL_STYLE__:styleOutputs.patrol.path,
     __BUILD_ABYSS__:scriptOutputs.abyss.path,__BUILD_ABYSS_STYLE__:styleOutputs.abyss.path,
     __BUILD_SKILL__:scriptOutputs.skill.path,

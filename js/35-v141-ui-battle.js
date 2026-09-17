@@ -320,7 +320,7 @@
                 return;
             }
 
-            if(skill.targetType==="ally"||skill.targetType==="deadAlly"){
+            if(skill.targetType==="ally"||skill.targetType==="allyTri"||skill.targetType==="deadAlly"){
                 const hasTarget=[0,1,2].some(index=>isValidAllyTargetForSkill(
                     skill,getBattleCharacterByIndex(index),index
                 ));
@@ -672,6 +672,7 @@
         applyFixedAbyssFormation();
     }
 
+    const startedEntryTokens=new Set();
     if(typeof renderBattle==="function"){
         const originalRenderBattle=renderBattle;
         renderBattle=function(){
@@ -694,7 +695,9 @@
             const result=originalRenderBattle.apply(this,arguments);
             decorateBattleCards();
             const page=document.getElementById("battlePage");
-            if(page){
+            /* Reinforcements redraw the existing battle. Its entry has already
+               started, so startTurn will not run the entry cleanup again. */
+            if(page&&!startedEntryTokens.has(battleToken)){
                 page.classList.remove("v141-entry-moving","v141-exit-player","v141-exit-monster");
                 page.classList.add("v141-preparing-entry");
             }
@@ -719,7 +722,6 @@
         return overlay;
     }
 
-    const startedEntryTokens=new Set();
     if(typeof startTurn==="function"){
         const originalStartTurn=startTurn;
         startTurn=function(token){

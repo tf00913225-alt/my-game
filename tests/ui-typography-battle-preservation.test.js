@@ -47,6 +47,13 @@ function retireV146LegacySkillVfx(text){
     return normalize(text.slice(0,start)+text.slice(end));
 }
 
+function restoreV146FixedSlotExclusion(text){
+    return normalize(text.replace(
+        "#game-stage #battlePage #battleMonsterArea:not(.v-fixed-enemy-zone){",
+        "#game-stage #battlePage #battleMonsterArea{"
+    ));
+}
+
 function restoreGameplayCoverBaseline(text){
     return normalize(text
         .replace(/\/\* Gameplay activity covers use the same 16:9 production ratio as dungeon\n   covers\. Combat BOSS\/mechanism cards remain independent (?:9:16|battlefield) components\. \*\/\n/,"")
@@ -59,13 +66,17 @@ function restoreGameplayCoverBaseline(text){
     );
 }
 
-// V131 starts with battle formation/element-card rules. Typography work begins only
-// after the character/home-feature shell, so the entire battle prefix must be byte-equivalent.
-sameSegment(
-    "css/31-v131-fix-batch.css",
-    "#game-stage #battleMonsterArea.v131-formation",
-    "#game-stage #homeFeatureModal .home-feature-modal-box.wide"
-);
+// Fixed Slot intentionally replaced the ancient flex/re-centering formation
+// baseline. Guard the accepted scaffold and the canonical final owner instead
+// of comparing this battle section byte-for-byte with the pre-Fixed-Slot SHA.
+{
+    const v131=current("css/31-v131-fix-batch.css");
+    const fixedSlot=current("css/fixed-slot-battlefield-rendering-v2.css");
+    assert.match(v131,/#battleMonsterArea \.v131-monster-row\{[\s\S]*grid-template-columns:repeat\(5,76px\)/);
+    assert.match(v131,/#battleMonsterArea \.v-fixed-enemy-slot\{[\s\S]*position:relative/);
+    assert.match(fixedSlot,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*position:absolute !important/);
+    assert.match(fixedSlot,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*position:absolute !important/);
+}
 
 // V146's opening combat/VFX section is followed by inventory polish. Preserve that
 // full combat region byte-for-byte except the explicitly retired V143 Earth Shield
@@ -75,13 +86,13 @@ sameSegment(
     const start="#game-stage #battlePage #battleMonsterArea";
     const end="#game-stage #inventoryPage .inventory-grid-scroll";
     assert.equal(
-        retireV146LegacySkillVfx(retireV143EarthShieldSelector(segment(current(file),start,end))),
+        restoreV146FixedSlotExclusion(retireV146LegacySkillVfx(retireV143EarthShieldSelector(segment(current(file),start,end)))),
         retireV146LegacySkillVfx(retireV143EarthShieldSelector(segment(at(BASE,file),start,end))),
-        `${file} battle-owned segment changed outside retired V143 Earth Shield selector and V146 legacy skill VFX block`
+        `${file} battle-owned segment changed outside the Fixed Slot exclusion, retired V143 Earth Shield selector and V146 legacy skill VFX block`
     );
 }
 assert.match(base("css/42-v146-system-polish.css"),/#game-stage #battlePage #battleMonsterArea\{[\s\S]*?transform:translateY\(16px\);[\s\S]*?\}/);
-assert.match(current("css/42-v146-system-polish.css"),/#game-stage #battlePage #battleMonsterArea\{[\s\S]*?transform:translateY\(16px\);[\s\S]*?\}/);
+assert.match(current("css/42-v146-system-polish.css"),/#game-stage #battlePage #battleMonsterArea:not\(\.v-fixed-enemy-zone\)\{[\s\S]*?transform:translateY\(16px\);[\s\S]*?\}/);
 assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-earth-shield-effect/);
 assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|v143-skill-field|v143-hit-impact|v146-flight-art/);
 
@@ -125,7 +136,9 @@ assert.doesNotMatch(current("css/42-v146-system-polish.css"),/v143-skill-flight|
     assert.match(now,/#battleMonsterArea\.gameplay-boss-active\{[\s\S]*?--gameplay-boss-card-width:clamp\(118px,29%,132px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(123px,30%,138px\);[\s\S]*?margin-top:-16px;/);
     assert.match(now,/\.battle-monster\.gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*?--v143-monster-card-width:var\(--gameplay-boss-card-width\);[\s\S]*?--v143-monster-card-height:auto;[\s\S]*?aspect-ratio:9 \/ 16;/);
     assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?position:relative;[\s\S]*?display:none;[\s\S]*?width:100%;[\s\S]*?margin:3px auto 0;[\s\S]*?pointer-events:none;/);
-    assert.match(now,/\.boss-mechanism-slot\.active\{\s*display:flex;/);
+    assert.match(now,/\.boss-mechanism-slot\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?gap:4px;/);
+    assert.match(now,/\.boss-mechanism-slot\.active\{\s*display:grid;/);
+    assert.match(now,/\.boss-mechanism-position\{[\s\S]*?display:flex;[\s\S]*?align-items:flex-start;[\s\S]*?justify-content:center;[\s\S]*?pointer-events:none;/);
     assert.match(now,/\.boss-mechanism-card\{[\s\S]*?width:var\(--gameplay-mechanism-card-width\);[\s\S]*?min-width:0;[\s\S]*?aspect-ratio:4 \/ 3;[\s\S]*?flex:0 0 var\(--gameplay-mechanism-card-width\);[\s\S]*?pointer-events:auto;[\s\S]*?animation:gameplayMechanismEnter \.24s ease-out both;/);
     assert.match(now,/\.boss-mechanism-hp\{[\s\S]*?min-height:12px;[\s\S]*?font-size:9\.5px;[\s\S]*?font-weight:900;/);
     assert.match(now,/@media \(max-height:920px\)\{[\s\S]*?--gameplay-boss-card-width:clamp\(108px,27%,122px\);[\s\S]*?--gameplay-mechanism-card-width:clamp\(117px,29\.25%,132px\);/);

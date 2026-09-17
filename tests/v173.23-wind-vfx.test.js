@@ -200,6 +200,42 @@ function loadRuntime(options={}){
         updateMonsterUI(){},
         killMonster(index){ if(monsters[index]){ monsters[index].alive=false; } }
     };
+    const slotRects={
+        ENEMY_F1:monsterRects[0],ENEMY_F2:monsterRects[1],ENEMY_F3:monsterRects[2],
+        ALLY_F1:playerRects[0],ALLY_F2:playerRects[1],ALLY_F3:playerRects[2]
+    };
+    function plainRect(rect,slots){
+        return Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2,slots:slots||[]});
+    }
+    context.FourSymbolsBattlefieldSlots={
+        getSlotForCombatant(side,index){ return (side==="monster"?"ENEMY_F":"ALLY_F")+(Number(index)+1); },
+        getSlotFromElement(element){
+            const match=String(element&&element.id||"").match(/(?:battleMonster|battlePlayerCard)(\d+)/);
+            if(!match){ return null; }
+            return String(element.id).startsWith("battleMonster")?"ENEMY_F"+(Number(match[1])+1):"ALLY_F"+(Number(match[1])+1);
+        },
+        getSlotRect(slot){ return slotRects[slot]?plainRect(slotRects[slot],[slot]):null; },
+        getSlotCenter(slot){
+            const rect=this.getSlotRect(slot);
+            return rect?{x:rect.centerX,y:rect.centerY,rect}:null;
+        },
+        getSideRect(side){
+            const rect=side==="monster"?monsterArea.getBoundingClientRect():playerArea.getBoundingClientRect();
+            return plainRect(rect,Object.keys(slotRects).filter(slot=>slot.startsWith(side==="monster"?"ENEMY":"ALLY")));
+        },
+        getGeometryRectFromShape(side,slot,shape){
+            if(shape==="all"||shape==="allyAll"){ return this.getSideRect(side); }
+            if(/tri|row|horizontal-3|allyTri/i.test(shape)){
+                const rects=side==="monster"?monsterRects:playerRects;
+                const left=Math.min(...rects.map(rect=>rect.left));
+                const top=Math.min(...rects.map(rect=>rect.top));
+                const right=Math.max(...rects.map(rect=>rect.right));
+                const bottom=Math.max(...rects.map(rect=>rect.bottom));
+                return plainRect({left,top,right,bottom,width:right-left,height:bottom-top},rects.map((_,index)=>(side==="monster"?"ENEMY_F":"ALLY_F")+(index+1)));
+            }
+            return this.getSlotRect(slot);
+        }
+    };
     context.window=context;
     context.v142SkillAnimationDirector={
         play(config){
@@ -325,12 +361,12 @@ test("single, three-lane and battlefield casts each own one correctly positioned
     const all=loadRuntime();
     all.context.v142SkillAnimationDirector.play(
         config("stormRain","all","magic"),
-        {side:"player",actorIndex:0}
+        {side:"player",actorIndex:0,targetId:0,targetIds:[0,1,2],targetSide:"monster"}
     );
     const allSprites=stageSprites(all).sprites;
     assert.equal(allSprites.length,1,"one battlefield sheet");
     assert.equal(allSprites[0].dataset.placement,"battlefield");
-    assert.equal(allSprites[0].dataset.areaId,"battleMonsterArea");
+    assert.equal(allSprites[0].dataset.areaId,"fixed-enemy-zone");
     assert.equal(allSprites[0].dataset.targetIndexes,"0,1,2");
     assert.equal(allSprites[0].style.left,"480px");
     assert.equal(allSprites[0].style.top,"170px");
@@ -351,9 +387,10 @@ test("three-target wind sheets keep a fixed three-slot footprint centered on the
         ]
     ].forEach(monsters=>{
         const runtime=loadRuntime({monsters});
+        const targetIds=monsters.map((monster,index)=>monster.alive?index:null).filter(Number.isInteger);
         runtime.context.v142SkillAnimationDirector.play(
             config("stormFlurry","tri","physical"),
-            {side:"player",actorIndex:0}
+            {side:"player",actorIndex:0,targetId:1,targetIds,targetSide:"monster"}
         );
         const sprite=stageSprites(runtime).sprites[0];
         assert.ok(sprite);
@@ -376,9 +413,10 @@ test("full-field wind sheets stay locked to the complete enemy area after casual
         ]
     ].forEach(monsters=>{
         const runtime=loadRuntime(monsters?{monsters}:{});
+        const targetIds=(monsters||runtime.monsters).map((monster,index)=>monster.alive?index:null).filter(Number.isInteger);
         runtime.context.v142SkillAnimationDirector.play(
             config("stormRain","all","magic"),
-            {side:"player",actorIndex:0}
+            {side:"player",actorIndex:0,targetId:targetIds[0],targetIds,targetSide:"monster"}
         );
         const sprite=stageSprites(runtime).sprites[0];
         assert.ok(sprite);
@@ -387,14 +425,12 @@ test("full-field wind sheets stay locked to the complete enemy area after casual
     assert.deepEqual(placements[1],placements[0],"full-field VFX does not follow survivor bounds");
 });
 
-test("enemy casts discover the real player target instead of using a fixed faction position",()=>{
+test("enemy casts use the explicit player target instead of a fixed faction position",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         config("stormFist","single","physical"),
-        {side:"monster",actorIndex:0}
+        {side:"monster",actorIndex:0,targetId:1,targetIds:[1],targetSide:"player"}
     );
-    assert.equal(stageSprites(runtime).sprites.length,0,"no guessed player target");
-    runtime.context.showPlayerHit(20,"hp",1);
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetSide,"player");
@@ -419,7 +455,7 @@ test("frame seven releases resolved attack results once, while buffs never shake
     const buff=loadRuntime();
     buff.context.v142SkillAnimationDirector.play(
         config("dodgeSkill","allyAll","buff"),
-        {side:"player",actorIndex:0}
+        {side:"player",actorIndex:0,targetId:0,targetIds:[0,1,2],targetSide:"player"}
     );
     buff.party.forEach(character=>character.activeBuffs.push({type:"dodgeSkill",turnsLeft:2}));
     [0,1,2].forEach(index=>buff.context.v141PlayCardEffect("player",index,"buff"));

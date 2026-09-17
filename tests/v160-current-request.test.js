@@ -31,8 +31,8 @@ test("hard-control caps end at regular eighty, elite sixty and boss forty",()=>{
     assert.match(balance,/boss:\{min:5,max:40\}/);
 });
 
-test("Rage tri-target detection cannot be mistaken for all targets",()=>{
-    assert.match(animation,/const all=targetType==="all"\|\|targetType==="allyAll"/);
+test("Fixed Slot range detection cannot mistake Rage tri-target for all targets",()=>{
+    assert.match(animation,/if\(placement==="battlefield"\|\|targetType==="all"\|\|targetType==="allyAll"\)/);
     assert.doesNotMatch(animation,/const all=\/all\/i\.test\(targetType\)/);
 });
 
