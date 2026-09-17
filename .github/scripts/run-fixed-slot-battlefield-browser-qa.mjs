@@ -37,11 +37,11 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 </style>
 <style id="v174-cardless-battle-style">#battlePage .v174-battle-art{inset:999px!important}#battlePage .battle-wrap{overflow:hidden!important}</style>
 <style>${geometryCss}</style></head><body>
-<div id="game-stage"><section id="battlePage" class="v-fixed-slot-render-v2"><div class="battle-wrap">
+<div id="game-stage"><div id="app"><div id="game-content"><section id="battlePage" class="v-fixed-slot-render-v2"><div class="battle-wrap">
 <div class="battle-title">戰鬥</div><div id="battleMonsterArea" class="battle-monsters v131-formation"></div><div id="bossMechanismSlot"></div>
 <div class="battle-middle"><div id="battleTurnIndicator">第 1 回合</div></div>
 <div id="battlePlayerRow" class="battle-player-row"></div><div id="battleActionRegion" class="v-fixed-action-zone">操作區</div>
-</div></section></div><pre id="result" hidden></pre>
+</div></section></div></div></div><pre id="result" hidden></pre>
 <script>
 window.__allyIndexes=[0,1,2];
 window.getExistingPartyIndexes=function(){return window.__allyIndexes.slice();};

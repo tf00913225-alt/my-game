@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-17-battle-runtime-p1",
+  "baseBranch": "dev",
+  "baseCommit": "acc6419b72ee3a31a6314a6833ded3f81a3fd219",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "completion": "NOT COMPLETE",
+  "verificationPolicy": "Synthetic QA and CI are supplementary only; require fully loaded real battle runtime evidence.",
+  "requirements": [
+    {
+      "id": "P1-PORTRAITS",
+      "status": "IMPLEMENTED",
+      "requirement": "人物與敵方立繪在正式戰鬥、BOSS 援軍重繪後保持可見並符合固定站位。",
+      "evidence": [
+        "docs/qa/battle-runtime-p1-20260917.md",
+        "js/35-v141-ui-battle.js",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "css/42-v146-system-polish.css"
+      ],
+      "remaining": "修正後正式 BOSS 第4回合援軍與三人隊伍實際畫面驗證。"
+    },
+    {
+      "id": "P1-VFX",
+      "status": "IMPLEMENTED",
+      "requirement": "VFX 尺寸有界，縮放不改變目標中心或飛行終點。",
+      "evidence": [
+        "docs/qa/battle-runtime-p1-20260917.md",
+        "js/39-v143-skill-animation.js"
+      ],
+      "remaining": "修正後正式戰鬥單體、群體與飛行 VFX 實際中心／尺寸量測。"
+    }
+  ],
+  "blockers": [
+    "Automatic approval review rejected pushing the repair branch; explicit user push/Draft PR authorization required.",
+    "Browser native alert prevents continued real battle inspection; candidate runtime remains unverified."
+  ]
+}

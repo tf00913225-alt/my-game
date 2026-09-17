@@ -2,7 +2,8 @@
    FourSymbolsBattlefieldSlots owns Slot coordinates. This stylesheet is the
    single source stylesheet that projects those Slots into the battle page.
    Historical runtime geometry from V173.51 is intentionally neutralized by
-   battlefield-render-geometry-adapter.js. */
+   battlefield-render-geometry-adapter.js. Canonical rules use the real app host
+   namespace so legacy card dimensions cannot override the Slot contract. */
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
     --battle-enemy-zone-height:188px;
@@ -115,8 +116,8 @@
 }
 
 /* Unit identity fills the Slot; it cannot size or move the Slot. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot > .battle-monster,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot > .battle-monster,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player{
     position:absolute !important;
     inset:0 !important;
     width:100% !important;
@@ -142,8 +143,8 @@
 }
 
 /* Artwork is a paint layer. Full source aspect is preserved with contain. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-battle-slot > .battle-monster > .v174-battle-art,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player > .v174-battle-art{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-battle-slot > .battle-monster > .v174-battle-art,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player > .v174-battle-art{
     position:absolute !important;
     left:calc(-1 * var(--battle-art-overhang-x)) !important;
     right:calc(-1 * var(--battle-art-overhang-x)) !important;
@@ -165,7 +166,7 @@
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
     pointer-events:none !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art::after{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art::after{
     content:"";
     position:absolute;
     left:50%;
@@ -178,15 +179,15 @@
     transform:translateX(-50%);
     pointer-events:none;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art ~ *{z-index:6;}
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit > img.v162-abyss-battle-portrait-art{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art ~ *{z-index:6;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit > img.v162-abyss-battle-portrait-art{
     opacity:0 !important;
     pointer-events:none !important;
 }
 
 /* HUD uses formal Slot anchors and never participates in Unit layout. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
     position:absolute !important;
     left:2px !important;
     right:2px !important;
@@ -200,7 +201,7 @@
     opacity:1 !important;
     pointer-events:none !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name{
     top:0 !important;
     height:16px !important;
     min-height:16px !important;
@@ -213,17 +214,17 @@
     line-height:16px !important;
     z-index:24 !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
     bottom:-17px !important;
     height:16px !important;
     line-height:16px !important;
     font-size:11px !important;
     z-index:20 !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar{
     position:absolute !important;
     left:4px !important;
     right:4px !important;
@@ -238,12 +239,12 @@
     z-index:20 !important;
     box-sizing:border-box !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar{bottom:11px !important;}
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar{bottom:1px !important;}
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-status-badges,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .monster-status-badges{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar{bottom:11px !important;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar{bottom:1px !important;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-status-badges,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .monster-status-badges{
     position:absolute !important;
     left:0 !important;
     right:0 !important;
@@ -256,34 +257,34 @@
 }
 
 /* Presentation-only state effects formerly co-located with V173.51 geometry. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
     border:0 !important;
     background:none !important;
     box-shadow:none !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn{
     outline:2px solid #f1c96d !important;
     outline-offset:1px !important;
     border-radius:8px !important;
     box-shadow:0 0 0 1px rgba(255,232,163,.34),0 0 14px rgba(241,201,109,.82) !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable,
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target{
     border:0 !important;
     box-shadow:none !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7)));
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down{animation:none !important;}
-#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up > .v174-battle-art{animation:v174BattleLungeUp .45s ease !important;}
-#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down > .v174-battle-art{animation:v174BattleLungeDown .45s ease !important;}
-#game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art.v174-hit-shake{animation:v174BattleHitShake .28s ease !important;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down{animation:none !important;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up > .v174-battle-art{animation:v174BattleLungeUp .45s ease !important;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down > .v174-battle-art{animation:v174BattleLungeDown .45s ease !important;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art.v174-hit-shake{animation:v174BattleHitShake .28s ease !important;}
 
 /* Status artwork is anchored to the Slot-sized Unit, not to source image bounds. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .v153-status-vfx{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v153-status-vfx{
     left:50% !important;
     top:42% !important;
     transform:translate(-50%,-50%) !important;
@@ -307,27 +308,11 @@
     contain:none !important;
 }
 
-/* Fixed Slot remains the sole VFX center/coverage owner. These presentation
-   scales are uniform per placement type, so target count can no longer make
-   group/all-target sprites balloon over names and resource bars. The separate
-   scale property composes with V143's transform animation and preserves each
-   Sprite Sheet frame aspect and Fixed Slot center. */
+/* V143 sizes raster boxes before applying center/travel transforms. Independent
+   CSS scale would also scale those translations and detach VFX from the Slot. */
 .v143-skill-stage[data-geometry-owner="fixed-slot"]{
     overflow:visible !important;
     contain:none !important;
-}
-.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="single"]{
-    scale:.88;
-}
-.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="targetTrajectory"],
-.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="trajectory"]{
-    scale:.80;
-}
-.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="group"]{
-    scale:.62;
-}
-.v143-skill-stage[data-geometry-owner="fixed-slot"] .v143-vfx-sprite[data-placement="battlefield"]{
-    scale:.72;
 }
 .v-fixed-slot-popup{
     position:fixed !important;

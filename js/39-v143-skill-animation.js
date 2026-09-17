@@ -19,6 +19,9 @@
     let blockedCardEffectOverrides=0;
     const failedAssets=new Set();
     const SPRITE_SCALE_MULTIPLIER=1;
+    /* Size the raster box before centering/travel. CSS independent scale also
+       scales translate(-50%) and the travel vector, moving the visible hit. */
+    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:.80,group:.62,battlefield:.72});
     const spriteFrameAspectCache=new Map();
     const spriteFrameAspectLoading=new Set();
 
@@ -597,8 +600,9 @@
     }
 
     function applySpriteBox(node,width,height,sprite){
-        const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER;
-        const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER;
+        const placementScale=PLACEMENT_SIZE_SCALE[node.dataset.placement]||1;
+        const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
+        const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
         const aspect=frameAspectFor(sprite);
         let renderWidth=boxWidth,renderHeight=boxHeight;
         if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
