@@ -59,6 +59,7 @@ jobs:
           node --check .github/scripts/run-relic-progression-browser-qa.mjs
           node --check .github/scripts/run-adventure-browser-qa.mjs
           node --check .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
+          node --check .github/scripts/battle-layer-audio-live-qa.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
@@ -124,6 +125,29 @@ jobs:
         with:
           name: fixed-slot-battlefield-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/fixed-slot-battlefield-rendering-v2.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Run exact-candidate real battle mobile browser QA
+        id: battle_live_browser
+        if: success() && github.event_name == 'pull_request'
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/four-symbols-battle-qa-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          DEV_BASE_URL=http://127.0.0.1:4173 node .github/scripts/battle-layer-audio-live-qa.mjs
+
+      - name: Upload exact-candidate real battle browser evidence
+        if: always() && steps.battle_live_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: battle-layout-vfx-live-qa-${{ github.sha }}
+          path: |
+            artifacts/browser-qa/battle-layer-audio-live-qa.json
+            artifacts/browser-qa/battle-layout-wind-flame-mobile.png
+            artifacts/browser-qa/battle-layer-element-box-mobile.png
           if-no-files-found: error
           retention-days: 90
 

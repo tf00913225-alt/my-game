@@ -26,10 +26,14 @@ assert.match(vfx,/const MECHANISM_TARGET_PREFIX="mechanism:";/);
 assert.match(vfx,/function mechanismCardFor\(index\)/);
 assert.match(vfx,/document\.getElementById\("bossMechanismSlot"\)/);
 assert.match(vfx,/card\.dataset\.id===mechanismId/);
-assert.match(vfx,/function queuedMechanismTarget\(config,meta,targetSide\)/);
-assert.match(vfx,/if\(mechanismTarget\)\{ return \[mechanismTarget\]; \}/);
-assert.match(vfx,/if\(mechanismTarget\)\{ validTargets\.add\(mechanismTarget\); \}/);
+assert.doesNotMatch(vfx,/function queuedMechanismTarget|queuedPlayerActions/,
+    "the VFX owner must not inspect the combat queue for a mechanism target");
+assert.match(vfx,/const explicit=Array\.isArray\(meta\.targetIds\)/);
+assert.match(vfx,/Number\.isInteger\(index\)\|\|isMechanismTarget\(index\)/);
+assert.match(vfx,/explicitTargets\.forEach\(index=>\{/);
 assert.match(vfx,/isMechanismTarget\(index\)\)\{ return mechanismCardFor\(index\); \}/);
+assert.match(runtime,/showSkillNameBadge\(skill\.name,skill\.element,characterIndex,queued\.target,\[queued\.target\]\)/,
+    "the mechanism action owner must pass its exact sidecar target into the formal contract");
 
 // Generic battle card sizes remain untouched. Only a runtime-tagged Gameplay
 // BOSS receives the paired 9:16 geometry requested for this screen.

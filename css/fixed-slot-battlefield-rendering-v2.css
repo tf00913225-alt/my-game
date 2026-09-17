@@ -6,31 +6,31 @@
    namespace so legacy card dimensions cannot override the Slot contract. */
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
-    --battle-enemy-region-track:34fr;
-    --battle-center-region-track:31fr;
+    --battle-enemy-region-track:32fr;
+    --battle-center-region-track:17fr;
     --battle-ally-region-track:35fr;
+    --battle-info-region-track:16fr;
     --battle-region-gap:4px;
     --battle-title-height:20px;
     --battle-enemy-zone-height:100%;
     --battle-enemy-row-gap:6px;
     --battle-enemy-row-height:calc((100% - var(--battle-enemy-safe-top) - var(--battle-enemy-row-gap)) / 2);
     --battle-ally-zone-height:100%;
-    --battle-ally-name-reserve:20px;
-    --battle-ally-row-overlap:28px;
-    --battle-ally-row-height:calc((100% - var(--battle-ally-name-reserve) + var(--battle-ally-row-overlap)) / 2);
+    --battle-ally-row-gap:8px;
+    --battle-ally-row-height:calc((100% - var(--battle-ally-row-gap)) / 2);
     --battle-slot-column-gap:4px;
     --battle-ally-column-gap:8px;
     --battle-enemy-inline-padding:4px;
     --battle-ally-inline-padding:14px;
     --battle-art-overhang-x:8px;
     --battle-art-overhang-top:8px;
-    --battle-art-hud-reserve:28px;
+    --battle-art-hud-reserve:48px;
     --battle-name-row-height:17px;
     --battle-resource-bar-height:10px;
     --battle-enemy-safe-top:12px;
 }
 
-/* The battle page has three structural tracks. Their proportions are owned
+/* The battle page has four structural tracks. Their proportions are owned
    here, while the legacy 420×746.67 surface continues to scale as one unit on
    every portrait viewport. Occupancy never changes any track size. */
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap{
@@ -38,13 +38,15 @@
     grid-template-rows:
         minmax(0,var(--battle-enemy-region-track))
         minmax(0,var(--battle-center-region-track))
-        minmax(0,var(--battle-ally-region-track)) !important;
+        minmax(0,var(--battle-ally-region-track))
+        minmax(0,var(--battle-info-region-track)) !important;
     gap:var(--battle-region-gap) !important;
     min-height:0 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-enemy-region,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-ally-region{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-ally-region,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region{
     position:relative;
     width:100%;
     min-width:0;
@@ -68,7 +70,7 @@
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region{
     display:grid;
-    grid-template-rows:36px auto 20px minmax(0,1fr);
+    grid-template-rows:36px minmax(0,1fr);
     gap:3px;
     padding:3px 4px;
     border-top:1px solid rgba(213,170,88,.42);
@@ -90,12 +92,18 @@
     min-height:0;
     margin:0;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region .battle-info-header-row{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region{
+    display:grid;
+    grid-template-rows:20px minmax(0,1fr);
+    gap:2px;
+    padding:0 4px 3px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > .battle-info-header-row{
     height:20px;
     min-height:20px;
     margin:0;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > #battleInfo{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > #battleInfo{
     min-height:0 !important;
     height:100% !important;
     margin:0 !important;
@@ -197,7 +205,7 @@
 /* The enemy is above this zone, so an ally front row belongs at the top.
    Keep the Slot names semantic; only this visual projection changes. */
 #game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="front"]{top:0 !important;}
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="back"]{bottom:var(--battle-ally-name-reserve) !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="back"]{bottom:0 !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot{
     position:relative !important;
     width:auto !important;
@@ -295,7 +303,7 @@
     pointer-events:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name{
-    top:0 !important;
+    bottom:21px !important;
     height:var(--battle-name-row-height) !important;
     min-height:var(--battle-name-row-height) !important;
     max-height:var(--battle-name-row-height) !important;
@@ -308,7 +316,7 @@
     z-index:24 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
-    bottom:-17px !important;
+    bottom:21px !important;
     height:var(--battle-name-row-height) !important;
     line-height:var(--battle-name-row-height) !important;
     font-size:12px !important;
@@ -341,7 +349,7 @@
     position:absolute !important;
     left:0 !important;
     right:0 !important;
-    bottom:22px !important;
+    bottom:39px !important;
     width:auto !important;
     min-height:10px !important;
     max-height:10px !important;
@@ -410,15 +418,15 @@
     contain:none !important;
 }
 
-/* Initial placement keeps the draggable Element Box inside the center control
-   track. Pointer dragging still resolves against battlePage as before. */
+/* Initial placement keeps the draggable Element Box beside the center controls.
+   Its original 66px touch target is part of the mobile interaction contract. */
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-element-box-button{
     left:auto !important;
     right:8px !important;
-    top:calc(34% + 6px) !important;
+    top:calc(34% + 4px) !important;
     bottom:auto !important;
-    width:44px !important;
-    height:44px !important;
+    width:66px !important;
+    height:66px !important;
 }
 
 /* V143 sizes raster boxes before applying center/travel transforms. Independent

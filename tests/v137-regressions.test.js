@@ -94,8 +94,9 @@ function test(name,fn){
 
 test("runtime patches keep deterministic execution order without an HTTP waterfall",()=>{
     const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
-    const gameplayUrl=manifest.featureManifest.bundles["gameplay-core"].scripts[0];
-    const bundle=fs.readFileSync(gameplayUrl,"utf8");
+    const gameplayUrls=manifest.featureManifest.bundles["gameplay-core"].scripts;
+    assert.equal(gameplayUrls.length,2,"gameplay-core keeps one ordered runtime split boundary");
+    const bundle=gameplayUrls.map(url=>fs.readFileSync(url,"utf8")).join("\n");
     const expected=[
         "js/25-v131-fix-batch.js","js/27-v132-content-expansion.js","js/28-v133-economy-rebalance.js",
         "js/29-v134-fixes.js","js/30-v135-fixes.js","js/31-v136-auto-battle-fix.js",

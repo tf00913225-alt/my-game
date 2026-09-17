@@ -217,10 +217,17 @@ test("one shared raster sheet stays locked to the complete enemy formation after
     const placements=[];
     [[1],[0,1,2]].forEach(indexes=>{
         const runtime=loadRuntime(indexes);
+        const targetId=indexes[0];
         runtime.context.v142SkillAnimationDirector.play({
             id:"iceArrowRain",name:"冰霜箭雨",element:"water",category:"magic",
             targetType:"all",duration:1600,resolveDuration:1600
-        },{side:"player",actorIndex:0});
+        },{
+            side:"player",actorIndex:0,targetId,targetIds:indexes.slice(),targetSide:"monster",
+            targetContract:{
+                version:"battle-target-contract-v1",targetSide:"monster",
+                targetId,targetIds:indexes.slice()
+            }
+        });
         const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
         const sprites=stage.children.filter(node=>String(node.className).includes("v143-vfx-sprite"));
         assert.equal(sprites.length,1,indexes.join(","));

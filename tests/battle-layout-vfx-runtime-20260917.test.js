@@ -81,15 +81,19 @@ for(const [element,groups] of Object.entries(ELEMENT_DAMAGE_SKILLS)){
     }
 }
 
-assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonsterArea"[\s\S]*<section class="battle-center-region"[\s\S]*id="turnTargetRow"[\s\S]*id="battleActionRegion"[\s\S]*id="battleInfo"[\s\S]*<section class="battle-ally-region"[\s\S]*id="battlePlayerRow"/);
+assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonsterArea"[\s\S]*<section class="battle-center-region"[\s\S]*id="turnTargetRow"[\s\S]*id="battleActionRegion"[\s\S]*<section class="battle-ally-region"[\s\S]*id="battlePlayerRow"[\s\S]*<section class="battle-info-region"[\s\S]*id="battleInfo"/);
+const centerMarkup=index.slice(index.indexOf('<section class="battle-center-region"'),index.indexOf('<section class="battle-ally-region"'));
+assert.doesNotMatch(centerMarkup,/id="battleInfo"/,"the bottom battle log must not be owned by the middle controls");
 assert.doesNotMatch(index,/<div class="battle-monster-gap-filler"><\/div>/,"legacy space-filler must not own battle layout");
-assert.match(layoutCss,/--battle-enemy-region-track:34fr/);
-assert.match(layoutCss,/--battle-center-region-track:31fr/);
+assert.match(layoutCss,/--battle-enemy-region-track:32fr/);
+assert.match(layoutCss,/--battle-center-region-track:17fr/);
 assert.match(layoutCss,/--battle-ally-region-track:35fr/);
+assert.match(layoutCss,/--battle-info-region-track:16fr/);
 assert.match(layoutCss,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/,"enemy slots remain equal width");
 assert.match(layoutCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/,"ally slots remain equal width");
 assert.match(layoutCss,/--battle-ally-row-height:calc\(/,"front/back ally containers share one size token");
-assert.match(layoutCss,/\.battle-center-region > #battleInfo\{[\s\S]*overflow-y:auto/,"battle log scroll stays inside the center track");
+assert.match(layoutCss,/\.battle-info-region > #battleInfo\{[\s\S]*overflow-y:auto/,"battle log scroll stays inside the bottom track");
+assert.match(layoutCss,/\.battle-element-box-button\{[\s\S]*width:66px !important;[\s\S]*height:66px !important/,"the mobile element-box touch target keeps its original large size");
 assert.match(layoutCss,/\.v-fixed-ally-slot\{[\s\S]*overflow:visible !important/,"unit artwork must not be clipped by its slot");
 assert.match(layoutCss,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important/,"VFX stage must not clip at a card or region boundary");
 
@@ -100,4 +104,4 @@ assert.match(vfx,/purgeStaleRasterStages\(\)/,"stale stages cannot make Wind Fla
 assert.match(vfx,/gate\.complete\("v143-render-error"\)/,"synchronous renderer errors must release combat");
 assert.match(timing,/v142-render-safety-deadline/,"render-owned actions retain an independent timing deadline");
 
-console.log("Battle three-region layout and four-element VFX range contract passed.");
+console.log("Battle four-region layout and four-element VFX range contract passed.");

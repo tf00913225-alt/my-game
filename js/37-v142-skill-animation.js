@@ -276,7 +276,7 @@
         },"test-"+state.sequence,onComplete);
     };
 
-    function startFromBadge(side,name,element,actorIndex,targetId,targetIds){
+    function startFromBadge(side,name,element,actorIndex,targetId,targetIds,targetContract){
         if(typeof battleActive!=="undefined"&&!battleActive){ return null; }
         const config=animationConfig(null,name,element);
         if(config.category==="passive"||config.targetType==="none"){ return null; }
@@ -284,12 +284,23 @@
             side:side,actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
             key:identity(side,name,actorIndex)
         };
-        if(targetId!==undefined&&targetId!==null){ meta.targetId=targetId; }
-        if(Array.isArray(targetIds)&&targetIds.length){ meta.targetIds=targetIds.slice(); }
+        const contract=targetContract&&targetContract.version==="battle-target-contract-v1"
+            ?targetContract
+            :Object.freeze({
+                version:"battle-target-contract-v1",
+                side:side,
+                actorIndex:meta.actorIndex,
+                targetId:targetId!==undefined?targetId:null,
+                targetIds:Object.freeze(Array.isArray(targetIds)?targetIds.slice():[])
+            });
+        meta.targetContract=contract;
+        meta.targetSide=contract.targetSide;
+        meta.targetId=contract.targetId!==undefined?contract.targetId:null;
+        meta.targetIds=Array.isArray(contract.targetIds)?contract.targetIds.slice():[];
         return director.play(config,meta);
     }
-    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex,targetId,targetIds){
-        return startFromBadge(side,name,element,actorIndex,targetId,targetIds);
+    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex,targetId,targetIds,targetContract){
+        return startFromBadge(side,name,element,actorIndex,targetId,targetIds,targetContract);
     };
 
     function currentGate(){
