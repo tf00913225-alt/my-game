@@ -187,8 +187,8 @@ function runViewport(chrome,width,height){
     assert.equal(data.enemySp,"630");
     assert.equal(data.enemyHpDisplay,"block");
     assert.ok(data.enemyHpRect.height>0&&data.enemySpRect.height>0,"enemy HP/SP bars must remain visible");
-    assert.ok(data.enemyNameRect.bottom<=data.enemyHpRect.top+1,"monster name must sit below artwork and above HP");
     assert.ok(data.enemyHpRect.bottom<=data.enemySpRect.top+1,"enemy HP must sit above SP");
+    assert.ok(data.enemySpRect.bottom<=data.enemyNameRect.top+1,"monster name must sit below HP and SP");
     console.log(`V174 cardless battle browser QA ${width}x${height}:`,JSON.stringify(data));
 }
 
