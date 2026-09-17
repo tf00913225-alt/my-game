@@ -158,9 +158,12 @@ test("earth trio sheets opt into fixed slot alignment and full-field earth stays
     });
     assert.equal(manifest.flyingSandStrike.sprite.placement,"battlefield");
     assert.equal(manifest.flyingSandStrike.sprite.targetBounds,undefined);
-    assert.match(animation,/function fixedTriLayoutBounds\(current,indexes\)/);
-    assert.match(animation,/const coverage=sprite\.alignToSlots\?targetBounds:/);
-    assert.match(animation,/node\.style\.left=\(Number\.isFinite\(targetBounds\.centerX\)\?targetBounds\.centerX:coverage\.left\+coverage\.width\/2\)\+"px"/);
+    assert.match(animation,/function geometryBounds\(current,indexes,placement\)\{[\s\S]*?const owner=geometryOwner\(\);[\s\S]*?owner\.getSideRect\(current\.targetSide\)[\s\S]*?owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
+    assert.match(animation,/const bounds=geometryBounds\(current,indexes,placement\);[\s\S]*?if\(!bounds\)\{ return; \}/);
+    assert.match(animation,/const naturalSize=\(Math\.max\(bounds\.width,bounds\.height\)\+40\)\*\(Number\(sprite\.scale\)\|\|1\)/);
+    assert.match(animation,/const destination=\{x:bounds\.centerX,y:bounds\.centerY\};[\s\S]*?node\.style\.left=bounds\.centerX\+"px";[\s\S]*?node\.style\.top=bounds\.centerY\+"px"/);
+    assert.match(animation,/node\.dataset\.areaId=bounds\.id\|\|"fixed-battlefield";[\s\S]*?node\.style\.left=bounds\.centerX\+"px";[\s\S]*?node\.style\.top=bounds\.centerY\+"px"/);
+    assert.doesNotMatch(animation,/function fixedTriLayoutBounds\(current,indexes\)|groupLayoutBounds\(|fieldBounds\(targetCards\)/);
 });
 
 test("all seven persistent effects use 4x2 runtime cropping with the requested loop cadence",()=>{
