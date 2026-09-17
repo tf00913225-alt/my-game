@@ -44,6 +44,7 @@ function load(options={}){
         activeBattleCharacterIndex:0,queuedPlayerActions:{},autoBattle:true,
         skillDatabase:{
             blast:{id:"blast",name:"全域破陣",element:"fire",category:"magic",targetType:"all",baseDamage:100,spCost:10},
+            triBlast:{id:"triBlast",name:"三才破陣",element:"fire",category:"magic",targetType:"tri",baseDamage:100,spCost:10},
             strike:{id:"strike",name:"破陣斬",element:"fire",category:"physical",targetType:"single",baseDamage:100,spCost:5},
             fireRocket:{element:"fire"},explosiveFlurry:{element:"fire"},dragonSlash:{element:"fire"},rage:{element:"fire"},
             waterKnife:{element:"water"},frostPunch:{element:"water"},floodBeast:{element:"water"},healSpell:{element:"water"},
@@ -61,6 +62,7 @@ function load(options={}){
         calculateSkillDamage:options=>Math.max(1,Math.round(options.effectiveAttack)),
         calculateDamage:attack=>Math.max(1,Math.round(Number(attack)||1)),
         getSkillTargets:(center,targetType)=>targetType==="all"||targetType==="tri"||targetType==="row"?[0]:[center],
+        showSkillNameBadge(){ context.lastSkillBadge=Array.from(arguments); },
         finishPlayerAction:()=>{ context.finished=(context.finished||0)+1; },
         updateUI:noop,startTurn:noop,setBattleTargetSelectionMode:noop,clearBattleTargetSelectionMode:noop,
         selectBattleTarget:()=>{ context.numericSelections=(context.numericSelections||0)+1; },
@@ -302,16 +304,41 @@ test("Mechanisms use stable independent sidecar slots and never join enemy unit 
     assert.equal(owner.getEnemySlotForMonster(snapshot,0),"ENEMY_B3");
 });
 
-test("AoE destroys the shield but cannot retarget the Boss until the next formal action",()=>{
+test("AoE destroys the shield without entering normal monster settlement until the next formal action",()=>{
     const {context}=load();
     context.vGameplayStartBoss("personal","personal-20");context.turn=2;context.startTurn(context.battleToken);
     const shield=value(context,"GameplaySystem.getActiveBattleState().mechanisms[0]");
     context.queuedPlayerActions[0]={action:"blast",target:"mechanism:"+shield.id};
     context.battlePhase="resolve";context.resolveQueuedPlayerAction(0,context.battleToken);
-    assert.deepEqual(context.coreTargets,[],"same AoE action must retain its shield snapshot after breaking the card");
+    assert.equal(context.coreTargets,undefined,"the function-card action must not enter normal monster settlement");
     assert.equal(value(context,"GameplaySystem.getActiveBattleState().mechanisms.length"),0);
     assert.equal(context.GameplaySystem.canDirectlyAffectMonster(context.monsters[0]),true);
     assert.deepEqual(context.getSkillTargets(0,"all"),[0],"the next action may target the Boss again");
+});
+
+test("three-target skills aimed at a mechanism card never damage Boss reinforcements",()=>{
+    const {context}=load();
+    context.vGameplayStartBoss("personal","personal-30");
+    const boss=context.monsters[0];
+    boss.hp=Math.floor(boss.maxHP*.5);
+    context.turn=3;context.startTurn(context.battleToken);
+    assert.equal(context.monsters.length,3);
+    const mechanism=value(context,"GameplaySystem.getActiveBattleState().mechanisms[0]");
+    assert.ok(mechanism,"the encounter must expose its scheduled mechanism card");
+    const hpBefore=context.monsters.map(monster=>monster.hp);
+    const spBefore=context.player.sp;
+    context.queuedPlayerActions[0]={action:"triBlast",target:"mechanism:"+mechanism.id};
+    context.battlePhase="resolve";
+    context.resolveQueuedPlayerAction(0,context.battleToken);
+    assert.deepEqual(context.monsters.map(monster=>monster.hp),hpBefore,"Boss and both reinforcements must remain untouched");
+    assert.equal(context.coreTargets,undefined,"mechanism settlement must not retarget the same skill to living monsters");
+    assert.equal(context.player.sp,spBefore-10,"the selected skill cost is paid exactly once");
+    assert.deepEqual(
+        value(context,"lastSkillBadge.slice(3)"),
+        ["mechanism:"+mechanism.id,["mechanism:"+mechanism.id]],
+        "the formal VFX gate must keep the mechanism card as its only target"
+    );
+    assert.equal(context.finished,1,"the isolated mechanism action must finish exactly once");
 });
 
 test("auto battle prioritizes a blocking mechanism card instead of selecting the protected Boss",()=>{

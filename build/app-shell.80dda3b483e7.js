@@ -17387,39 +17387,6 @@ function processSingleMonsterAttack(monsterIndex,token){
            可以套用。
         */
 
-        showMonsterSkillNameBadge(
-            castSkillName,
-            (
-                castSkillData &&
-                castSkillData.element
-            )
-            ||
-            monster.element
-            ||
-            "normal",
-            monsterIndex
-        );
-
-    }
-    else{
-
-        /*
-           ★ 新增（依照使用者要求，「為何野怪
-           普通攻擊時沒有字樣顯示」）：
-           玩家普通攻擊（normalAttack()／
-           player2NormalAttack()）都會跳出
-           「普通攻擊」字樣，怪物只有施放技能
-           那個分支有做（上面if(usesSkill)裡），
-           普通攻擊這邊當初漏掉了，兩邊
-           不對稱，補上讓兩邊一致。
-        */
-
-        showMonsterSkillNameBadge(
-            "普通攻擊",
-            "normal",
-            monsterIndex
-        );
-
     }
 
 
@@ -17482,6 +17449,7 @@ function processSingleMonsterAttack(monsterIndex,token){
     }
 
     let attackTargets=[];
+    let primaryTargetIndex=null;
 
     if(skillTargetType==="all"){
         attackTargets=livingTargets;
@@ -17495,6 +17463,7 @@ function processSingleMonsterAttack(monsterIndex,token){
         const primary=livingTargets[
             Math.floor(Math.random()*livingTargets.length)
         ];
+        primaryTargetIndex=primary?primary.index:null;
         const formation=battlefieldSlots&&typeof battlefieldSlots.ensureAllyFormation==="function"
             ? battlefieldSlots.ensureAllyFormation(getExistingPartyIndexes())
             : null;
@@ -17513,11 +17482,11 @@ function processSingleMonsterAttack(monsterIndex,token){
             livingTargets.find(entry=>entry.index===index)
         ).filter(Boolean);
     }else{
-        attackTargets=[
-            selectableSingleTargets[
-                Math.floor(Math.random()*selectableSingleTargets.length)
-            ]
+        const primary=selectableSingleTargets[
+            Math.floor(Math.random()*selectableSingleTargets.length)
         ];
+        primaryTargetIndex=primary?primary.index:null;
+        attackTargets=[primary];
     }
 
     if(attackTargets.length===0){
@@ -17525,6 +17494,21 @@ function processSingleMonsterAttack(monsterIndex,token){
         updateUI();
         finishPlayerAction();
         return;
+    }
+
+    const attackTargetIndexes=attackTargets.map(target=>target.index);
+    if(usesSkill){
+        showMonsterSkillNameBadge(
+            castSkillName,
+            (castSkillData&&castSkillData.element)||monster.element||"normal",
+            monsterIndex,
+            skillTargetType==="all"?null:primaryTargetIndex,
+            attackTargetIndexes
+        );
+    }else{
+        showMonsterSkillNameBadge(
+            "普通攻擊","normal",monsterIndex,primaryTargetIndex,attackTargetIndexes
+        );
     }
 
 
@@ -23900,7 +23884,7 @@ function getSkillNameBadgeDuration(skillName,elementType){
 }
 
 
-function showSkillNameBadge(skillName,elementType,characterIndex){
+function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds){
 
     const element =
         $("battlePlayerCard"+
@@ -24020,7 +24004,9 @@ const badgePoint =
     },badgeDuration);
 
     if(typeof window!=="undefined" && typeof window.v142PlaySkillAnimationFromBadge==="function"){
-        window.v142PlaySkillAnimationFromBadge("player",skillName,elementType,characterIndex||0);
+        window.v142PlaySkillAnimationFromBadge("player",skillName,elementType,
+            characterIndex||0,targetId,targetIds
+        );
     }
 
 }
@@ -24044,7 +24030,9 @@ const badgePoint =
 function showMonsterSkillNameBadge(
     skillName,
     elementType,
-    monsterIndex
+    monsterIndex,
+    targetId,
+    targetIds
 ){
 
     const element=
@@ -24141,7 +24129,9 @@ const badgePoint =
     },badgeDuration);
 
     if(typeof window!=="undefined" && typeof window.v142PlaySkillAnimationFromBadge==="function"){
-        window.v142PlaySkillAnimationFromBadge("monster",skillName,elementType,monsterIndex||0);
+        window.v142PlaySkillAnimationFromBadge("monster",skillName,elementType,
+            monsterIndex||0,targetId,targetIds
+        );
     }
 
 }

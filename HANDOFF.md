@@ -1,3 +1,12 @@
+## 2026-09-17 — Function-card spread isolation and primary-target VFX anchor (NOT COMPLETE)
+
+- Follow-up base is `dev@a21736f3ea1f92b2e7da9e48870dce705c4c5cc4`; working branch is `fix/battle-tri-mechanism-vfx-anchor-20260917`. `main` is not part of this repair.
+- Real DEV confirmation completed the prior three battle-formation requirements. The new report exposed two separate defects: a player three-target skill aimed at a BOSS function card also damaged the two rear reinforcements, and enemy single/three-target VFX stayed at the front-row center instead of the actual attacked card. Full-field VFX must remain formation-centered.
+- Root causes remain in existing owners. `resolveMechanismAction()` damaged the mechanism and then retargeted spread skills into the normal monster resolver; enemy `processSingleMonsterAttack()` started the badge before target selection; V142 carried no target metadata; V143 centered group geometry on the row.
+- Repair keeps one settlement path and one VFX owner: mechanism-targeted skills pay once, damage only the mechanism and finish; monster selection passes primary/target indexes through the badge and V142; V143 keeps fixed-shape sizing but centers non-battlefield group VFX on the explicit primary card. Battlefield/all-target VFX still use the whole-side center.
+- Focused regressions: Gameplay/BOSS/Tower runtime proves BOSS and both reinforcements retain HP, the skill cost is paid once and normal monster settlement is never entered; primary-target VFX regression proves enemy single and tri use the selected non-center ally while all-target keeps the complete formation center.
+- Requirement batch `2026-09-17-battle-formation-targeting` is **3/5 VERIFIED — NOT COMPLETE**. The two new items remain IMPLEMENTED until the deployed dev runtime confirms (1) a three-target mechanism hit leaves the BOSS/reinforcements untouched and (2) enemy single/tri/all VFX use the required centers. Game/Cache Version remains 173.65.
+
 ## 2026-09-17 — Real runtime follow-up: BOSS mechanism front-lane collision (NOT COMPLETE)
 
 - User mobile DEV recording `1000070330.mp4` verifies the ally projection: the water character is behind the two front allies. Requirement batch `2026-09-17-battle-formation-targeting` is now 1/3 VERIFIED.

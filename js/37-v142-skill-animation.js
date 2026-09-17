@@ -277,17 +277,20 @@
         },"test-"+state.sequence,onComplete);
     };
 
-    function startFromBadge(side,name,element,actorIndex){
+    function startFromBadge(side,name,element,actorIndex,targetId,targetIds){
         if(typeof battleActive!=="undefined"&&!battleActive){ return null; }
         const config=animationConfig(null,name,element);
         if(config.category==="passive"||config.targetType==="none"){ return null; }
-        return director.play(config,{
+        const meta={
             side:side,actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
             key:identity(side,name,actorIndex)
-        });
+        };
+        if(targetId!==undefined&&targetId!==null){ meta.targetId=targetId; }
+        if(Array.isArray(targetIds)&&targetIds.length){ meta.targetIds=targetIds.slice(); }
+        return director.play(config,meta);
     }
-    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex){
-        return startFromBadge(side,name,element,actorIndex);
+    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex,targetId,targetIds){
+        return startFromBadge(side,name,element,actorIndex,targetId,targetIds);
     };
 
     function currentGate(){

@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.feac80acb0aa.js"
+          "build/app-shell.80dda3b483e7.js"
         ],
         "styles": [
           "build/app-shell.6675b1a3a67e.css"
@@ -49,7 +49,7 @@
       },
       "gameplay-core": {
         "scripts": [
-          "build/gameplay-core.fd68c58ad325.js"
+          "build/gameplay-core.4a4949b431c8.js"
         ],
         "styles": [
           "build/gameplay-core.ba371c1d5a98.css"
@@ -110,7 +110,7 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.c2e0b4423abe.js",
+          "build/feature-boss-relic.fd4956c723b6.js",
           "build/feature-relic-progression.cb61b7c5a1e8.js"
         ],
         "styles": [
@@ -484,9 +484,9 @@
         "decode": false
       },
       {
-        "path": "build/app-shell.feac80acb0aa.js",
-        "sha256": "feac80acb0aa",
-        "bytes": 922497,
+        "path": "build/app-shell.80dda3b483e7.js",
+        "sha256": "80dda3b483e7",
+        "bytes": 922402,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -708,24 +708,24 @@
         "decode": false
       },
       {
+        "path": "build/gameplay-core.4a4949b431c8.js",
+        "sha256": "4a4949b431c8",
+        "bytes": 1224876,
+        "priority": "P2",
+        "type": "script",
+        "decode": false
+      },
+      {
         "path": "build/gameplay-core.ba371c1d5a98.css",
         "sha256": "ba371c1d5a98",
         "bytes": 338186,
         "priority": "P2",
         "type": "style",
         "decode": false
-      },
-      {
-        "path": "build/gameplay-core.fd68c58ad325.js",
-        "sha256": "fd68c58ad325",
-        "bytes": 1224567,
-        "priority": "P2",
-        "type": "script",
-        "decode": false
       }
     ],
-    "manifestHash": "9c7c5c4c17e8",
-    "totalBytes": 20840561,
+    "manifestHash": "764234818e82",
+    "totalBytes": 20840775,
     "totalResources": 70
   },
   "assets": {
@@ -733,13 +733,13 @@
       "sha256": "c60fd6f40514",
       "bytes": 63904
     },
-    "build/app-shell.feac80acb0aa.js": {
-      "sha256": "feac80acb0aa",
-      "bytes": 922497
+    "build/app-shell.80dda3b483e7.js": {
+      "sha256": "80dda3b483e7",
+      "bytes": 922402
     },
-    "build/gameplay-core.fd68c58ad325.js": {
-      "sha256": "fd68c58ad325",
-      "bytes": 1224567
+    "build/gameplay-core.4a4949b431c8.js": {
+      "sha256": "4a4949b431c8",
+      "bytes": 1224876
     },
     "build/feature-patrol.5312ee69f0b5.js": {
       "sha256": "5312ee69f0b5",
@@ -753,9 +753,9 @@
       "sha256": "524941589f72",
       "bytes": 35010
     },
-    "build/feature-boss-relic.c2e0b4423abe.js": {
-      "sha256": "c2e0b4423abe",
-      "bytes": 151716
+    "build/feature-boss-relic.fd4956c723b6.js": {
+      "sha256": "fd4956c723b6",
+      "bytes": 150878
     },
     "build/feature-relic-progression.cb61b7c5a1e8.js": {
       "sha256": "cb61b7c5a1e8",

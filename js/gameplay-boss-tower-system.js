@@ -818,30 +818,17 @@
         if(!card){ queued.target=typeof monsters!=="undefined"?monsters.findIndex(monster=>monster&&monster.alive):-1;return previous.apply(that,args); }
         const skill=queued.action!=="normal"?skillDatabase[queued.action]:null;
         const character=getPartyCharacterByIndex(characterIndex);
-        const spreads=skill&&["tri","row","column","all"].includes(skill.targetType);
         if(skill){
             const cost=skill.spCost!==undefined?skill.spCost:(skill.cost||0);
-            if(!spreads){
-                if(!character||character.sp<cost){ if(typeof addBattleLog==="function"){ addBattleLog("SP不足，無法攻擊機制卡。"); }finishPlayerAction();return; }
-                character.sp-=cost;if(typeof showSkillNameBadge==="function"){ showSkillNameBadge(skill.name,skill.element,characterIndex); }
+            if(!character||character.sp<cost){ if(typeof addBattleLog==="function"){ addBattleLog("SP不足，無法攻擊機制卡。"); }finishPlayerAction();return; }
+            character.sp-=cost;
+            if(typeof showSkillNameBadge==="function"){
+                showSkillNameBadge(skill.name,skill.element,characterIndex,queued.target,[queued.target]);
             }
-        }
-        if(spreads&&skill&&numeric(skill.baseDamage)>0&&typeof window.v142PlaySkillAnimationFromBadge==="function"){
-            /* Keep the selected sidecar target authoritative until the formal
-               V142/V143 owner has created its Sprite. The core resolver may
-               retarget the spread portion to living monsters afterwards. */
-            window.v142PlaySkillAnimationFromBadge(
-                "player",skill.name,skill.element||(character&&character.element)||"normal",characterIndex
-            );
         }
         const result=calculateMechanismActionDamage(characterIndex,queued.action,card);
         if(result.damage>0){ damageMechanism(card,result.damage,(character&&character.id?character.id+"的":"")+result.name,result.crit); }
         else if(typeof addBattleLog==="function"){ addBattleLog(result.name+"無法直接破壞機制卡。需要使用傷害技能。"); }
-        if(spreads){
-            const fallback=currentBattleMonsters.find(index=>monsters[index]&&monsters[index].alive);
-            queued.target=fallback===undefined?null:fallback;
-            return previous.apply(that,args);
-        }
         if(typeof updateUI==="function"){ updateUI(); }finishPlayerAction();
     }
 
