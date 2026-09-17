@@ -112,8 +112,8 @@ assert.match(v131,/const wait=Math\.max\(0,V138_ACTION_DELAY_MS-elapsed\)/);
 assert.match(autoBattle,/v148GetAutoTargetPriority/);
 assert.match(dungeonPolish,/function stableFormationRows\(indexes\)/);
 assert.match(dungeonPolish,/function autoTargetPriority\(indexes\)/);
-assert.match(dungeonPolish,/row\.slice\(Math\.max\(0,position-1\),Math\.min\(row\.length,position\+2\)\)/);
-assert.match(dungeonPolish,/return selected\.filter\(index=>alive\.includes\(index\)\)/);
+assert.match(dungeonPolish,/function battlefieldSlots\(\)\{[\s\S]*?window\.FourSymbolsBattlefieldSlots\|\|null/);
+assert.match(dungeonPolish,/if\(owner&&snapshot&&\["single","tri","row","column","all"\]\.includes\(targetType\)\)\{[\s\S]*?return owner\.resolveEnemyTargets\(snapshot,centerIndex,targetType,monsterAlive\);/);
 
 /* Daily content is one shared 3-wave × 6 structure: EXP / Material / Gold. */
 assert.match(dungeonPolish,/DAILY_DUNGEON_META=\{/);
