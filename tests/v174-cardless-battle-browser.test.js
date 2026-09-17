@@ -48,7 +48,7 @@ function enemyCard(index){
 }
 
 function playerCard(index,hp,sp){
-    return `<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'%3E%3C/rect%3E%3C/svg%3E&quot;)">
+    return `<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'/%3E%3C/svg%3E&quot;)">
       <div class="battle-player-icon"></div>
       <div id="battlePlayerStatus${index}" class="monster-status-badges"></div>
       <div class="hp-bar"><div id="battlePlayerHPBar${index}" class="hp-bar-inner"></div><div id="battlePlayerShieldBar${index}" class="hp-bar-shield-overlay"></div><div class="hp-bar-text">${hp}/1000</div></div>
