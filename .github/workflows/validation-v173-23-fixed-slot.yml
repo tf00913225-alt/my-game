@@ -1,0 +1,57 @@
+name: V173.23 Fixed Slot Harness Validation
+
+on:
+  push:
+    branches:
+      - validation/v173-23-fixed-slot-harness-20260917
+
+permissions:
+  contents: write
+
+jobs:
+  validate-v173-23:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/v173-23-fixed-slot-harness-20260917
+          fetch-depth: 3
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify production files are untouched
+        shell: bash
+        run: |
+          base=90aee2c9863eda50b95aba7c08fc1e18616841f0
+          git fetch --no-tags --depth=1 origin "$base"
+          git diff --check "$base" HEAD
+          test -z "$(git diff --name-only "$base" HEAD -- js css scripts config asset-manifest.json)"
+
+      - name: Build migrated V173.23 candidate
+        run: node .github/scripts/migrate-v173-23-fixed-slot.mjs
+
+      - name: Validate migrated Wind harness
+        shell: bash
+        run: |
+          node tests/v173.23-wind-vfx.test.js
+          node tests/v166-water-vfx.test.js
+          node tests/v153-fire-vfx.test.js
+          node tests/fixed-slot-battlefield-rendering-v2.test.js
+          node tests/fixed-slot-tri-target-window.test.js
+
+      - name: Commit validated test candidate
+        shell: bash
+        run: |
+          if git diff --quiet -- tests/v173.23-wind-vfx.test.js; then
+            echo "Validated candidate already committed."
+            exit 0
+          fi
+          git config user.name "tf00913225-alt"
+          git config user.email "tf00913225@gmail.com"
+          git add tests/v173.23-wind-vfx.test.js
+          git commit -m "test: validate V173.23 with fixed-slot harness"
+          git push origin HEAD:validation/v173-23-fixed-slot-harness-20260917
