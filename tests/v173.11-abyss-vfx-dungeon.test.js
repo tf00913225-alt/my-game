@@ -31,8 +31,17 @@ assert.match(
 assert.match(animation,/function castSheet\(src,placement,options\)[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?renderer:"dom-sprite"/);
 assert.match(
     animation,
-    /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\);[\s\S]*?groupLayoutBounds\(current,indexes\):fieldBounds\(targetCards\)/
+    /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const bounds=geometryBounds\(current,indexes,placement\);[\s\S]*?if\(!bounds\)\{ return; \}/
+);
+assert.match(
+    animation,
+    /function geometryBounds\(current,indexes,placement\)\{[\s\S]*?const owner=geometryOwner\(\);[\s\S]*?owner\.getSideRect\(current\.targetSide\)[\s\S]*?owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/
+);
+assert.match(animation,/const destination=\{x:bounds\.centerX,y:bounds\.centerY\};/);
+assert.doesNotMatch(
+    animation,
+    /const targetCards=indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\);[\s\S]*?groupLayoutBounds\(current,indexes\):fieldBounds\(targetCards\)/
 );
 assert.doesNotMatch(animation,/canvas-crop|getContext\(|drawImage\(|createElement\(["']canvas["']\)/);
 
-console.log("V173.39 Abyss, raster VFX, and daily-dungeon regression checks passed.");
+console.log("V173.39 Abyss, Fixed Slot raster VFX, and daily-dungeon regression checks passed.");
