@@ -1,0 +1,54 @@
+name: V173.13 Fixed Slot Harness Validation
+
+on:
+  push:
+    branches:
+      - validation/v173-13-fixed-slot-harness-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v173-13:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/v173-13-fixed-slot-harness-20260917
+          fetch-depth: 3
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify validation scope
+        shell: bash
+        run: |
+          base=47a6ef0dfdf762f7070916e4d9c0c425bb60e963
+          git fetch --no-tags --depth=1 origin "$base"
+          git diff --check "$base" HEAD
+          changed="$(git diff --name-only "$base" HEAD | sort)"
+          printf '%s\n' "$changed"
+          test -z "$(git diff --name-only "$base" HEAD -- js css scripts config asset-manifest.json)"
+
+      - name: Ensure image inspection tool
+        shell: bash
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
+      - name: Run migrated V173.13 harness
+        run: node tests/v173.13-canvas-vfx-abyss-input.test.js
+
+      - name: Run related Fixed Slot VFX regressions
+        shell: bash
+        run: |
+          node tests/v166-water-vfx.test.js
+          node tests/v173-water-orb-direction-vfx.test.js
+          node tests/v173.11-abyss-vfx-dungeon.test.js
+          node tests/fixed-slot-battlefield-rendering-v2.test.js
+          node tests/fixed-slot-tri-target-window.test.js
