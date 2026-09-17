@@ -152,6 +152,47 @@ try{
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
     await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
 
+    await client.eval(`(()=>{
+        if(typeof showPage==='function'){showPage('home');}
+        if(typeof window.v54RenderHomeRoster==='function'){window.v54RenderHomeRoster();}
+        return true;
+    })()`);
+    await waitFor(client,"document.querySelector('.v-fixed-formation-entry[data-feature=\"gameplay-core\"]')","home Formation entry");
+    await client.eval("document.querySelector('.v-fixed-formation-entry[data-feature=\"gameplay-core\"]').click();true");
+    await waitFor(client,"document.getElementById('homeFeatureModal')?.classList.contains('show')&&document.querySelectorAll('#homeFeatureModalBody .v-fixed-formation-slot').length===6","real Formation editor");
+    const formationInteraction=await client.eval(`(()=>{
+        const owner=window.FourSymbolsBattlefieldSlots;
+        const slots=owner?.allySlots||[];
+        const entry=document.querySelector('.v-fixed-formation-entry');
+        const before=owner?.getSerializableAllyFormation?.();
+        const source=slots.find(slot=>Number.isInteger(owner.getCharacterAtAllySlot(slot)));
+        const destination=slots.find(slot=>!Number.isInteger(owner.getCharacterAtAllySlot(slot)));
+        const characterIndex=source?owner.getCharacterAtAllySlot(source):null;
+        const clickSlot=slot=>document.querySelector('#homeFeatureModalBody .v-fixed-formation-slot[data-slot="'+slot+'"]')?.click();
+        clickSlot(source);
+        clickSlot(destination);
+        const moved=Number.isInteger(characterIndex)&&owner.getCharacterAtAllySlot(destination)===characterIndex;
+        clickSlot(destination);
+        clickSlot(source);
+        const restored=Number.isInteger(characterIndex)&&owner.getCharacterAtAllySlot(source)===characterIndex;
+        const panel=document.querySelector('#homeFeatureModalBody .v-fixed-formation-panel');
+        const slotCount=document.querySelectorAll('#homeFeatureModalBody .v-fixed-formation-slot').length;
+        const after=owner?.getSerializableAllyFormation?.();
+        if(typeof closeHomeFeature==='function'){closeHomeFeature();}
+        return {
+            entryFeature:entry?.dataset.feature||null,panel:!!panel,slotCount,
+            source,destination,characterIndex,moved,restored,
+            before:before?.characterIndexToSlot||null,after:after?.characterIndexToSlot||null
+        };
+    })()`);
+    evidence.checks.formationInteraction=formationInteraction;
+    assert.equal(formationInteraction.entryFeature,"gameplay-core","Formation entry must load the canonical gameplay owner");
+    assert.equal(formationInteraction.panel,true,"Formation must open the real editor instead of an empty shell");
+    assert.equal(formationInteraction.slotCount,6,"Formation editor must expose all six fixed ally slots");
+    assert.ok(formationInteraction.source&&formationInteraction.destination,"Formation QA needs one occupied and one empty slot");
+    assert.equal(formationInteraction.moved,true,"Formation editor must move the selected character to the chosen slot");
+    assert.equal(formationInteraction.restored,true,"Formation editor must support a second real move and restore the test position");
+
     const bootstrap=await client.eval(`(()=>{
         try{sessionStorage.setItem('sixiang_startup_session_ready_v1','1');}catch(_){}
         if(typeof player!=='undefined'&&player){
