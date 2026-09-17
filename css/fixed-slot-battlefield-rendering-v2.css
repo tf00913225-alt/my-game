@@ -6,8 +6,8 @@
    namespace so legacy card dimensions cannot override the Slot contract. */
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
-    --battle-enemy-region-track:34fr;
-    --battle-center-region-track:15fr;
+    --battle-enemy-region-track:32fr;
+    --battle-center-region-track:17fr;
     --battle-ally-region-track:35fr;
     --battle-info-region-track:16fr;
     --battle-region-gap:4px;

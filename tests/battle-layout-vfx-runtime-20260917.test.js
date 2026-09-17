@@ -85,8 +85,8 @@ assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonster
 const centerMarkup=index.slice(index.indexOf('<section class="battle-center-region"'),index.indexOf('<section class="battle-ally-region"'));
 assert.doesNotMatch(centerMarkup,/id="battleInfo"/,"the bottom battle log must not be owned by the middle controls");
 assert.doesNotMatch(index,/<div class="battle-monster-gap-filler"><\/div>/,"legacy space-filler must not own battle layout");
-assert.match(layoutCss,/--battle-enemy-region-track:34fr/);
-assert.match(layoutCss,/--battle-center-region-track:15fr/);
+assert.match(layoutCss,/--battle-enemy-region-track:32fr/);
+assert.match(layoutCss,/--battle-center-region-track:17fr/);
 assert.match(layoutCss,/--battle-ally-region-track:35fr/);
 assert.match(layoutCss,/--battle-info-region-track:16fr/);
 assert.match(layoutCss,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/,"enemy slots remain equal width");
