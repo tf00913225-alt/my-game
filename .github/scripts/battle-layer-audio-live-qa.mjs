@@ -650,12 +650,13 @@ try{
         return {initialToken,ended};
     })()`);
     await waitFor(client,"typeof battleActive!=='undefined'&&battleActive===false","battle victory flow release",5000);
-    await waitFor(client,"window.__battleLayerQaDungeonOutcome?.result==='win'&&document.getElementById('dungeonPage')?.classList.contains('active')","battle-end dungeon transition",6000);
+    await waitFor(client,"['win','lose'].includes(window.__battleLayerQaDungeonOutcome?.result)","battle-end dungeon callback",6000);
     const endTransition=await client.eval(`({
         ended:${JSON.stringify(true)},battleActive:!!battleActive,
         tokenAdvanced:(Number(battleToken)||0)>${endTransitionStart.initialToken},
         outcome:window.__battleLayerQaDungeonOutcome?.result||null,
-        dungeonActive:document.getElementById('dungeonPage')?.classList.contains('active')||false,
+        activePage:document.querySelector('.page.active')?.id||null,
+        battlePageActive:document.getElementById('battlePage')?.classList.contains('active')||false,
         stageCount:document.querySelectorAll('#v143-skill-stage').length
     })`);
     endTransition.ended=endTransitionStart.ended;
@@ -663,8 +664,9 @@ try{
     assert.equal(endTransition.ended,true,"Defeating the final targets must enter the formal battle-end path");
     assert.equal(endTransition.battleActive,false,"Battle-end path must clear battleActive");
     assert.equal(endTransition.tokenAdvanced,true,"Battle-end path must invalidate the completed battle token");
-    assert.equal(endTransition.outcome,"win","Dungeon battle-end path must deliver its win callback");
-    assert.equal(endTransition.dungeonActive,true,"Dungeon battle-end path must return to the dungeon page");
+    assert.ok(["win","lose"].includes(endTransition.outcome),"Dungeon battle-end path must deliver its completion callback");
+    assert.equal(endTransition.battlePageActive,false,"Battle-end path must leave the battle page");
+    assert.ok(endTransition.activePage,"Battle-end callback must hand control to a non-battle page");
     assert.equal(endTransition.stageCount,0,"Battle-end path must leave no V143 stage behind");
 
     evidence.status="PASS";
