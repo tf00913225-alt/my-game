@@ -48,7 +48,7 @@ function enemyCard(index){
 }
 
 function playerCard(index,hp,sp){
-    return `<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'/%3E%3C/svg%3E&quot;)">
+    return `<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'%3E%3C/rect%3E%3C/svg%3E&quot;)">
       <div class="battle-player-icon"></div>
       <div id="battlePlayerStatus${index}" class="monster-status-badges"></div>
       <div class="hp-bar"><div id="battlePlayerHPBar${index}" class="hp-bar-inner"></div><div id="battlePlayerShieldBar${index}" class="hp-bar-shield-overlay"></div><div class="hp-bar-text">${hp}/1000</div></div>
@@ -117,6 +117,8 @@ window.__qaBefore=qaRects();
       enemyArtRect:qaRect('#battleMonster0 > .v174-battle-art'),
       enemyNameRect:qaRect('#battleMonster0 > .battle-monster-name'),
       enemyNameDisplay:getComputedStyle(enemy.querySelector('.battle-monster-name')).display,
+      enemyNameZIndex:getComputedStyle(enemy.querySelector('.battle-monster-name')).zIndex,
+      enemyArtZIndex:getComputedStyle(enemyArt).zIndex,
       activeOutlineWidth:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineWidth,
       activeOutlineColor:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineColor,
       activeShadow:getComputedStyle(document.getElementById('battlePlayerCard1')).boxShadow,
@@ -171,7 +173,7 @@ function runViewport(chrome,width,height){
     assert.equal(data.enemyArt,true);
     assert.equal(data.enemyNameDisplay,"flex");
     assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");
-    assert.ok(data.enemyNameRect.bottom<=data.enemyArtRect.top+1,"monster name must sit above monster artwork");
+    assert.ok(Number(data.enemyNameZIndex)>Number(data.enemyArtZIndex),"monster name must layer above monster artwork");
     assert.equal(data.activeOutlineWidth,"2px");
     assert.notEqual(data.activeOutlineColor,"rgba(0, 0, 0, 0)");
     assert.notEqual(data.activeShadow,"none");
