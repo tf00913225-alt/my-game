@@ -485,9 +485,9 @@ try{
     /* Capture the production cast and the stage it creates in the same browser
        task. The battle remains live, so a later CDP poll may observe the next
        action after this 1.45s presentation has legitimately been superseded. */
-    const productionCastSnapshot=await client.eval(`(()=>{
+    const productionDeclaration=await client.eval(`(()=>{
         if(typeof castDamageSkill!=='function'||typeof skillDatabase==='undefined'||!skillDatabase.explosiveFlurry){
-            return {triggered:false,skill:null,visibility:null,opacity:null};
+            return {declared:false,phase:typeof battlePhase!=='undefined'?battlePhase:null};
         }
         if(typeof queuedPlayerActions!=='undefined'){queuedPlayerActions[0]={action:'explosiveFlurry',target:2,targetAlly:null};}
         if(typeof selectedMonster!=='undefined'){selectedMonster=2;}
@@ -498,7 +498,15 @@ try{
             const original=getSkillLevel;
             getSkillLevel=function(key,id){return id==='explosiveFlurry'?1:original.apply(this,arguments);};
         }
-        castDamageSkill('explosiveFlurry');
+        const phase=typeof battlePhase!=='undefined'?battlePhase:null;
+        if(phase!=='declare'||typeof finishPlayerAction!=='function'){return {declared:false,phase};}
+        finishPlayerAction();
+        return {declared:true,phase};
+    })()`);
+    evidence.checks.productionDeclaration=productionDeclaration;
+    assert.equal(productionDeclaration.declared,true,"Real Fire Flurry must enter through the formal declaration phase");
+    await waitFor(client,"document.getElementById('v143-skill-stage')?.dataset.skill==='explosiveFlurry'","formal Fire Flurry resolution",8000);
+    const productionCastSnapshot=await client.eval(`(()=>{
         const stage=document.getElementById('v143-skill-stage');
         const style=stage?getComputedStyle(stage):null;
         return {
