@@ -171,7 +171,7 @@ function runViewport(chrome,width,height){
     assert.equal(data.enemyArt,true);
     assert.equal(data.enemyNameDisplay,"flex");
     assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");
-    assert.ok(data.enemyNameRect.bottom<=data.enemyArtRect.top+1,"monster name must sit above monster artwork");
+    assert.ok(data.enemyArtRect.bottom<=data.enemyNameRect.top+1,"monster artwork must end above the lower HUD");
     assert.equal(data.activeOutlineWidth,"2px");
     assert.notEqual(data.activeOutlineColor,"rgba(0, 0, 0, 0)");
     assert.notEqual(data.activeShadow,"none");
@@ -187,6 +187,7 @@ function runViewport(chrome,width,height){
     assert.equal(data.enemySp,"630");
     assert.equal(data.enemyHpDisplay,"block");
     assert.ok(data.enemyHpRect.height>0&&data.enemySpRect.height>0,"enemy HP/SP bars must remain visible");
+    assert.ok(data.enemyNameRect.bottom<=data.enemyHpRect.top+1,"monster name must sit below artwork and above HP");
     assert.ok(data.enemyHpRect.bottom<=data.enemySpRect.top+1,"enemy HP must sit above SP");
     console.log(`V174 cardless battle browser QA ${width}x${height}:`,JSON.stringify(data));
 }
