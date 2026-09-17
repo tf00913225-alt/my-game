@@ -17,7 +17,7 @@ const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 assert.match(battle,/\["addPoint","removePoint","confirmStatus","learnSkill","upgradeSkill"\]\.forEach\(guard\)/);
 assert.match(battle,/戰鬥進行中無法調整能力值，也無法學習或升級技能/);
 assert.match(battle,/list\.length!==5/);
-assert.match(battle,/return \[row\[2\],row\[1\],row\[3\],row\[0\],row\[4\]\]/);
+assert.match(battle,/if\(typeof window\.v148GetAutoTargetPriority==="function"\)\{[\s\S]*?return window\.v148GetAutoTargetPriority\(list\)\.slice\(\);/);
 assert.match(battle,/previousRenderExpDistributeList/);
 assert.match(battle,/window\.v173DecorateExpPoolDistributionUi\(\)/);
 assert.match(battle,/\.v173-exp-row-meta/);
