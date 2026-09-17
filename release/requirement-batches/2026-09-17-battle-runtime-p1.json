@@ -33,7 +33,13 @@
     }
   ],
   "blockers": [
-    "Automatic approval review rejected pushing the repair branch; explicit user push/Draft PR authorization required.",
-    "Browser native alert prevents continued real battle inspection; candidate runtime remains unverified."
-  ]
+    "Candidate runtime has not been deployed; post-fix real BOSS reinforcement and VFX combat remain unverified."
+  ],
+  "publication": {
+    "draftPullRequest": 263,
+    "remoteCommit": "a486e4bc6d2b1580cb50b796b112caa5b2646af8",
+    "ciRun": 35219995186,
+    "ciConclusion": "success",
+    "devDeployment": "skipped"
+  }
 }

@@ -4,7 +4,7 @@
 - Scope only portraits and VFX geometry. Actual deployed normal battle confirmed legacy 122px/100px unit heights overriding 86px/92px slots; user video plus source trace identifies same-token BOSS reinforcement redraw reapplying entry hiding/translation.
 - Existing owners edited: V141 `renderBattle` / `startTurn` entry-token lifecycle; fixed-slot canonical CSS host namespace; V146 legacy zone translation; V143 `applySpriteBox` size factors. No added runtime wrapper or temporary patch.
 - `docs/qa/battle-runtime-p1-20260917.md` distinguishes actual observations, source diagnosis and supplementary tests. Requirement batch `2026-09-17-battle-runtime-p1` remains 0/2 VERIFIED. Version/cache remain 173.65.
-- Runtime source commit `f230a5bb46867f1483481ef3481f5d53888cb039`. Automatic approval review rejected remote push; no Draft PR/CI/deploy was created. Ask explicit approval for pushing this branch and creating its validation Draft PR; do not use another write path to bypass the rejection.
+- Runtime source was connector-published as `a486e4bc6d2b1580cb50b796b112caa5b2646af8`; Draft PR #263 targets `dev`. CI Run #1799 (`35219995186`) passed, including Repository checks and the existing isolated 9:16 browser gate; the Draft PR dev deployment gate was skipped. These are supplementary only and do not change 0/2 VERIFIED.
 - Browser native DEV resource alert blocked further real-game inspection. Candidate BOSS reinforcement and VFX captures remain required. Never treat isolated QA or CI success as completion; no merge/deployment authorized by the autonomous validation contract.
 
 ## 2026-09-12 Facebook Android 原生登入 PoC（工作分支，未合併）

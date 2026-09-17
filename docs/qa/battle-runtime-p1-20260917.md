@@ -48,6 +48,6 @@ Owners remain `FourSymbolsBattlefieldSlots`, its render adapter, the existing V1
 
 The source proposal is reviewable; the requested real-runtime repair is not yet verified or complete. No deployment or integration has been performed by this change.
 
-## Publication blocker
+## Publication and CI status
 
-The automatic approval reviewer rejected `git push --set-upstream origin fix/battle-runtime-portraits-vfx-20260917` to `https://github.com/tf00913225-alt/my-game.git`: it treated the remote as unverified and required explicit authorization to avoid disclosing private source. No alternate write tool was used to bypass the rejection. The local commit is preserved; no Draft PR, remote CI or deployment has been created for this candidate. User approval is required before retrying that push and creating its validation Draft PR.
+Explicit user authorization was received. The connector-published branch commit is `a486e4bc6d2b1580cb50b796b112caa5b2646af8`; Draft PR #263 targets `dev`. CI Run #1799 / `35219995186` completed successfully, including Repository checks, build synchronization and the existing isolated 9:16 browser gate. The dev deployment gate was skipped for this Draft PR. These results remain supplementary: no candidate deployment or post-fix real BOSS/VFX runtime acceptance exists yet.
