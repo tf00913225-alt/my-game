@@ -8,9 +8,10 @@ assert.match(boss,/gameplay-boss-card[\s\S]*?battle-monster-icon[\s\S]*?backgrou
 assert.match(boss,/boss-mechanism-card\{[\s\S]*?aspect-ratio:4 \/ 3;/);
 
 const battle=read("js/54-v173.51-battle-qa.js");
+const fixedSlotCss=read("css/fixed-slot-battlefield-rendering-v2.css");
 assert.match(battle,/\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?background-size:contain!important/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-hp\{[\s\S]*?bottom:13px!important;[\s\S]*?display:block!important/);
-assert.match(battle,/battle-monster\.v174-cardless-unit>\.monster-sp\{[\s\S]*?bottom:0!important;[\s\S]*?display:block!important/);
+assert.match(fixedSlotCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?display:block !important;[\s\S]*?\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?\{bottom:11px !important;\}/);
+assert.match(fixedSlotCss,/\.v-fixed-enemy-slot \.monster-sp,[\s\S]*?display:block !important;[\s\S]*?\.v-fixed-enemy-slot \.monster-sp,[\s\S]*?\{bottom:1px !important;\}/);
 
 const city=read("js/16-stage-v54-main-city-runtime.js");
 const cityCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");
@@ -25,7 +26,7 @@ assert.match(base,/#skillDetailModal\{\s*z-index:13000;/);
 assert.match(native,/native-v18-skill-detail-layer\{z-index:13000!important;/);
 assert.match(detail,/#skillDetailModal #skillDetailIcon\{[\s\S]*?width:88px!important;[\s\S]*?background-size:contain!important;[\s\S]*?background-repeat:no-repeat!important;/);
 
-const auth=read("js/firebase/firebase-auth-ui.js"),startup=read("js/52-v173.20-startup-loader.js");
+const auth=read("js/firebase/firebase-auth-ui.js"),startup=read("js/52-v173.20-startup-loader.js","utf8");
 assert.match(auth,/Array\.isArray\(user\.providerIds\)/);
 assert.match(auth,/使用 Google 登入中/);
 assert.match(auth,/使用 \"\+user\.email\+\" 信箱登入中/);
