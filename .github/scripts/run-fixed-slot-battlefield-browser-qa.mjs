@@ -27,6 +27,7 @@ function fixtureHtml(width,height){
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;color:#fff;font-family:sans-serif}
 #game-stage{width:${width}px;height:${height}px;overflow:hidden}
+#app,#game-content{width:100%;height:100%}
 #battlePage{position:relative;width:100%;height:100%;overflow:visible}
 .battle-wrap{height:100%;display:flex;flex-direction:column;gap:3px;overflow:visible}
 .battle-title{flex:0 0 20px;height:20px;text-align:center}
