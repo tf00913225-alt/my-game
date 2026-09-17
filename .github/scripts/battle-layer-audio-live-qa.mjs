@@ -203,8 +203,10 @@ try{
         const enemy=rectFor(document.querySelector('.battle-enemy-region'));
         const center=rectFor(document.querySelector('.battle-center-region'));
         const ally=rectFor(document.querySelector('.battle-ally-region'));
+        const infoRegion=rectFor(document.querySelector('.battle-info-region'));
         const action=rectFor(document.getElementById('battleActionRegion'));
         const info=rectFor(document.getElementById('battleInfo'));
+        const elementBox=rectFor(document.querySelector('.battle-element-box-button'));
         const enemyArea=rectFor(document.getElementById('battleMonsterArea'));
         const allyArea=rectFor(document.getElementById('battlePlayerRow'));
         const enemySlotRects=owner.enemySlots.map(slot=>owner.getSlotRect(slot)).filter(Boolean);
@@ -225,12 +227,13 @@ try{
         return {
             viewport:{width:innerWidth,height:innerHeight},
             pageClass:document.getElementById('battlePage')?.className||'',
-            regions:{enemy,center,ally,action,info,enemyArea,allyArea},
+            regions:{enemy,center,ally,infoRegion,action,info,elementBox,enemyArea,allyArea},
             separation:{
                 enemyBeforeCenter:enemy.bottom<=center.top+1,
                 centerBeforeAlly:center.bottom<=ally.top+1,
+                allyBeforeInfo:ally.bottom<=infoRegion.top+1,
                 actionInsideCenter:inside(action,center),
-                infoInsideCenter:inside(info,center),
+                infoInsideBottom:inside(info,infoRegion),
                 enemyAreaInsideEnemy:inside(enemyArea,enemy),
                 allyAreaInsideAlly:inside(allyArea,ally),
                 enemyCardsClearCenter:enemyCards.every(card=>!intersects(card,center)),
@@ -251,6 +254,8 @@ try{
     assert.ok(layout.enemySlots.maxHeight-layout.enemySlots.minHeight<=1,"Enemy slot heights must be equal");
     assert.ok(layout.allySlots.maxWidth-layout.allySlots.minWidth<=1,"Ally slot widths must be equal");
     assert.ok(layout.allySlots.maxHeight-layout.allySlots.minHeight<=1,"Ally slot heights must be equal");
+    assert.ok(Math.abs(layout.regions.elementBox.width-66)<=1,"Element Box button width must be the restored 66px size");
+    assert.ok(Math.abs(layout.regions.elementBox.height-66)<=1,"Element Box button height must be the restored 66px size");
     assert.ok(layout.enemySlots.minHeight>92,"Enemy slots must remain visibly larger than the previous compact cards");
     assert.ok(layout.allySlots.minHeight>100,"Ally slots must retain the enlarged portrait layout");
     assert.ok(layout.hud.length>=9,"The real Abyss battle must expose one ally and eight enemy card HUDs");
@@ -296,7 +301,15 @@ try{
         const owner=window.FourSymbolsBattlefieldSlots;
         if(!director||typeof director.play!=='function'||typeof window.v142GetSkillAnimationConfig!=='function'||!owner){return null;}
         const config=Object.assign({},window.v142GetSkillAnimationConfig('iceArrowRain'),{duration:1100,resolveDuration:1100});
-        const gate=director.play(config,{side:'player',actorIndex:0,key:'battle-layout-ice-arrow-rain-'+Date.now()});
+        const targetIds=(typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).filter(index=>
+            typeof monsters!=='undefined'&&monsters[index]&&monsters[index].alive
+        );
+        const targetId=targetIds[0]??null;
+        const gate=director.play(config,{
+            side:'player',actorIndex:0,targetSide:'monster',targetId,targetIds,
+            targetContract:{version:'battle-target-contract-v1',targetSide:'monster',targetId,targetIds},
+            key:'battle-layout-ice-arrow-rain-'+Date.now()
+        });
         window.__battleLayoutIceGate=gate;
         const stage=document.getElementById('v143-skill-stage');
         const sprites=stage?Array.from(stage.querySelectorAll('.v143-vfx-sprite')):[];
@@ -362,7 +375,12 @@ try{
         const targetId=candidates[0]??(typeof currentBattleMonsters!=='undefined'?currentBattleMonsters[0]:0);
         const primarySlot=owner.getEnemySlotForMonster(snapshot,targetId);
         const config=Object.assign({},window.v142GetSkillAnimationConfig('stormCircle'),{duration:1100,resolveDuration:1100});
-        const gate=director.play(config,{side:'player',actorIndex:0,targetId,key:'battle-layout-wind-flame-'+Date.now()});
+        const targetIds=[targetId];
+        const gate=director.play(config,{
+            side:'player',actorIndex:0,targetSide:'monster',targetId,targetIds,
+            targetContract:{version:'battle-target-contract-v1',targetSide:'monster',targetId,targetIds},
+            key:'battle-layout-wind-flame-'+Date.now()
+        });
         window.__battleLayoutWindGate=gate;
         const stage=document.getElementById('v143-skill-stage');
         const sprites=stage?Array.from(stage.querySelectorAll('.v143-vfx-sprite')):[];
@@ -458,8 +476,11 @@ try{
         const getConfig=window.v142GetSkillAnimationConfig;
         if(!director||typeof director.play!=='function'||typeof getConfig!=='function'){return null;}
         const config=Object.assign({},getConfig('explosiveFlurry'),{duration:4000,resolveDuration:4000});
+        const targetId=2;
+        const targetIds=[targetId];
         const gate=director.play(config,{
-            side:'player',actorIndex:0,targetId:2,
+            side:'player',actorIndex:0,targetSide:'monster',targetId,targetIds,
+            targetContract:{version:'battle-target-contract-v1',targetSide:'monster',targetId,targetIds},
             key:'battle-layer-modal-overlap-'+Date.now()
         });
         const stageBefore=document.getElementById('v143-skill-stage');
