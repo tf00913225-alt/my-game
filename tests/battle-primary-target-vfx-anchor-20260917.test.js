@@ -140,7 +140,9 @@ function currentSprite(runtime){
 
 {
     const runtime=loadRuntime();
-    runtime.context.v142PlaySkillAnimationFromBadge("monster","疾風拳","wind",0,2,[2]);
+    runtime.context.v142PlaySkillAnimationFromBadge("monster","疾風拳","wind",0,2,[2],{
+        version:"battle-target-contract-v1",side:"monster",targetSide:"player",targetType:"single",actorIndex:0,targetId:2,targetIds:[2]
+    });
     const current=runtime.context.v143SkillAnimationState.current;
     const sprite=currentSprite(runtime);
     assert.equal(current.targetId,2);
@@ -152,7 +154,9 @@ function currentSprite(runtime){
 
 {
     const runtime=loadRuntime();
-    runtime.context.v142PlaySkillAnimationFromBadge("monster","暴風連擊","wind",0,2,[0,1,2]);
+    runtime.context.v142PlaySkillAnimationFromBadge("monster","暴風連擊","wind",0,2,[0,1,2],{
+        version:"battle-target-contract-v1",side:"monster",targetSide:"player",targetType:"tri",actorIndex:0,targetId:2,targetIds:[0,1,2]
+    });
     const current=runtime.context.v143SkillAnimationState.current;
     const sprite=currentSprite(runtime);
     assert.equal(current.targetId,2);
@@ -164,7 +168,19 @@ function currentSprite(runtime){
 
 {
     const runtime=loadRuntime();
-    runtime.context.v142PlaySkillAnimationFromBadge("monster","風起雲湧","wind",0,null,[0,1,2]);
+    runtime.context.v142PlaySkillAnimationFromBadge("monster","暴風連擊","wind",0,2,[2],{
+        version:"battle-target-contract-v1",side:"monster",targetSide:"player",targetType:"tri",actorIndex:0,targetId:2,targetIds:[2]
+    });
+    const sprite=currentSprite(runtime);
+    assert.equal(sprite.dataset.geometrySlot,"PLAYER_2");
+    assert.equal(sprite.style.width,"320px","one survivor must not collapse a three-slot footprint");
+}
+
+{
+    const runtime=loadRuntime();
+    runtime.context.v142PlaySkillAnimationFromBadge("monster","風起雲湧","wind",0,null,[2],{
+        version:"battle-target-contract-v1",side:"monster",targetSide:"player",targetType:"all",actorIndex:0,targetId:null,targetIds:[2]
+    });
     const sprite=currentSprite(runtime);
     assert.equal(sprite.dataset.placement,"battlefield");
     assert.equal(sprite.dataset.areaId,"fixed-ally-zone");
@@ -178,7 +194,8 @@ const monsterAction=mainSource.slice(
     mainSource.indexOf("function checkBattleEnd")
 );
 assert.match(mainSource,/function showMonsterSkillNameBadge\([\s\S]*?targetId,[\s\S]*?targetIds/);
-assert.match(mainSource,/v142PlaySkillAnimationFromBadge\("monster",skillName,elementType,\s*monsterIndex\|\|0,targetId,targetIds/);
+assert.match(mainSource,/v142PlaySkillAnimationFromBadge\("monster",skillName,elementType,[\s\S]*?targetContract\.targetId,targetContract\.targetIds,targetContract/);
+assert.doesNotMatch(vfxSource,/queuedPlayerActions/,"the VFX runtime must not infer targets from the combat queue");
 assert.ok(
     monsterAction.indexOf("const attackTargetIndexes")<monsterAction.indexOf("showMonsterSkillNameBadge("),
     "monster target selection must complete before the badge starts the VFX gate"

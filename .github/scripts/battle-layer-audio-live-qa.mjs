@@ -11,6 +11,8 @@ fs.mkdirSync(artifactDir,{recursive:true});
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 
 function chromeBinary(){
+    const configured=String(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||"").trim();
+    if(configured&&fs.existsSync(configured)){ return configured; }
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }

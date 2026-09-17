@@ -49,12 +49,13 @@ assert.match(vfxSource,/node\.style\.left=bounds\.centerX\+"px";[\s\S]*node\.sty
 assert.doesNotMatch(vfxSource,/activeCards\([^)]*\)\.length\s*\*/,"VFX scale must not multiply by surviving target count");
 
 assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone\{[\s\S]*position:relative !important;[\s\S]*height:var\(--battle-enemy-zone-height\) !important;/);
-assert.match(css,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)/,"battle layout must own three proportional structural tracks");
+assert.match(css,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)[\s\S]*var\(--battle-info-region-track\)/,"battle layout must own four proportional structural tracks");
 assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*position:absolute !important;/);
 assert.match(css,/#battlePlayerRow\.v-fixed-ally-zone\{[\s\S]*height:var\(--battle-ally-zone-height\) !important;/);
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*position:absolute !important;/);
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="front"\]\{top:0 !important;\}/,"ally front row must be nearest the enemy zone");
-assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="back"\]\{bottom:var\(--battle-ally-name-reserve\) !important;\}/,"ally back row must be farthest from the enemy zone with a name reserve");
+assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="back"\]\{bottom:0 !important;\}/,"ally back row must stay inside its separated row");
+assert.match(css,/--battle-ally-row-gap:8px/);
 assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone > \.v-fixed-mechanism-zone\{[\s\S]*position:absolute !important;[\s\S]*bottom:0 !important;/,"BOSS mechanism cards must use the enemy front visual plane");
 assert.match(css,/\.v-fixed-enemy-slot > \.battle-monster,[\s\S]*\.v-fixed-ally-slot > \.battle-player\{[\s\S]*position:absolute !important;[\s\S]*inset:0 !important;/);
 assert.match(css,/\.v174-battle-art\{[\s\S]*background-size:contain !important;[\s\S]*overflow:visible !important;/);
@@ -76,7 +77,7 @@ const sizingContext={spriteFrameAspectCache:new Map(),SPRITE_SCALE_MULTIPLIER:1}
 vm.createContext(sizingContext);
 vm.runInContext(vfxSource.match(/const PLACEMENT_SIZE_SCALE=Object\.freeze\(\{[^;]+;/)[0]+"\n"+
     vfxSource.slice(vfxSource.indexOf("    function frameAspectFor("),vfxSource.indexOf("    function requestSpriteAspect(")),sizingContext);
-for(const [placement,factor] of Object.entries({single:.88,targetTrajectory:.80,trajectory:.80,group:1,battlefield:1})){
+for(const [placement,factor] of Object.entries({single:.88,targetTrajectory:.80,trajectory:1,group:1,battlefield:1})){
     const sprite={dataset:{placement},style:{left:"180px",top:"240px"}};
     sizingContext.applySpriteBox(sprite,200,200,{cellAspect:1});
     assert.equal(sprite.style.width,Math.round(200*factor)+"px",placement+" owns bounded raster width");
@@ -162,7 +163,7 @@ for(const count of [1,3,5,6,8,10]){
     assert.equal(JSON.stringify(snapshot.monsterIndexToSlot),before,`formation ${count} moved after death filter`);
 }
 
-for(const allyCount of [1,2,3]){
+for(const allyCount of [1,2,3,4,5,6]){
     const indexes=Array.from({length:allyCount},(_,index)=>index);
     const formation=owner.normalizeAllyFormation(null,indexes);
     assert.equal(Object.keys(formation.characterIndexToSlot).length,allyCount);

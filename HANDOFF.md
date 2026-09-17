@@ -1,3 +1,14 @@
+## 2026-09-18 — Battle target contract, four-track layout, Formation entry and flow recovery (NOT COMPLETE)
+
+- Base is the latest GitHub `dev@30c8253713fa0fee76ceea597521d7e9a314a9a0`; branch is `fix/battle-vfx-layout-formation-freeze-20260918`. `main` is excluded. The requested `SYSTEM_CONTRACTS.md` does not exist in the base or reachable history, so no substitute contract was invented.
+- User video `1000070339.mp4` ends after Water's Ice Arrow Rain with an unchanged battle frame. Source tracing found the systemic deadlock boundary: initiative ultimately relied on VFX/DOM completion, while the combat owner had no bounded final recovery.
+- Target ownership is now combat → immutable `battle-target-contract-v1` → V142 timing gate → V143 raster renderer. V143 no longer reads `queuedPlayerActions`, `selectedMonster`, hit order or survivor bounds. Player/enemy damage actions pass explicit targets; V148 support actions pass explicit target side and ids, including enemy-target Purify Mind.
+- Fixed Slot remains the only geometry owner. Single uses card center, tri/row/column use fixed semantic shape size centered on the explicit primary card, all uses the whole side, and trajectory starts at caster Slot center and ends at primary Slot center. Stale stages are purged and render errors release the gate.
+- `index.html` and the canonical fixed-slot stylesheet now own four tracks: enemy cards, middle turn/actions, ally cards, bottom battle info. The element-box button is restored to 66×66; enemy/ally HUD rows sit below art; ally rows use a real 8px gap with no negative overlap. The adapter accepts six ally Slots.
+- The existing V131 Formation editor remains the only editor. The home button now declares `data-feature="gameplay-core"`, allowing the first click to load that real owner before `openHomeFeature('formation')` renders it.
+- `processNextCombatant()` now arms a 7-second final action watchdog and catches player/enemy settlement exceptions. It completes any active V142 gate and advances exactly once; ordinary V142/V143 deadlines remain the primary cleanup path.
+- Requirement batch: `release/requirement-batches/2026-09-18-battle-system-integration.json`. Detailed analysis: `docs/qa/battle-system-integration-20260918.md`. Remains IMPLEMENTED / NOT COMPLETE until exact-candidate portrait-browser battles and Formation interaction are verified.
+
 ## 2026-09-17 — Battle three-region layout, range VFX footprint and action-gate repair (NOT COMPLETE)
 
 - Base is `dev@b38411944c8c01b56faa6308f41d969644d82b25`; branch is `fix/battle-layout-vfx-runtime-20260917`. Severity is P1 because the reported Ice Arrow Rain path can block the core battle loop. `main` is explicitly excluded.

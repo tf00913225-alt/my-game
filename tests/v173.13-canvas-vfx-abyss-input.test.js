@@ -104,6 +104,29 @@ function loadRasterRuntime(skillId,targetType,targetIds,duration){
         showMonsterHit(){},showPlayerHit(){},v141PlayCardEffect(){},addEventListener(){}
     };
     context.window=context;
+    context.FourSymbolsBattlefieldSlots={
+        getSlotForCombatant(side,index){ return side==="monster"?"MONSTER_"+index:"PLAYER_"+index; },
+        getSlotFromElement(element){ return element&&element.dataset?element.dataset.slot:null; },
+        getSlotRect(slot){
+            const match=String(slot).match(/^(MONSTER|PLAYER)_(\d+)$/);
+            if(!match){ return null; }
+            const card=document.getElementById((match[1]==="MONSTER"?"battleMonster":"battlePlayerCard")+match[2]);
+            const rect=card&&card.getBoundingClientRect();
+            return rect?Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2}):null;
+        },
+        getSlotCenter(slot){
+            const rect=this.getSlotRect(slot);
+            return rect?{x:rect.centerX,y:rect.centerY,rect}:null;
+        },
+        getGeometryRectFromShape(side,slot,shape){
+            if(String(shape).toLowerCase()==="single"){ return this.getSlotRect(slot); }
+            return this.getSideRect(side);
+        },
+        getSideRect(side){
+            const rect=side==="monster"?monsterArea.getBoundingClientRect():playerArea.getBoundingClientRect();
+            return Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2});
+        }
+    };
     context.v142SkillAnimationDirector={
         play(){
             let resolve;
@@ -121,7 +144,13 @@ function loadRasterRuntime(skillId,targetType,targetIds,duration){
     context.v142SkillAnimationDirector.play({
         id:skillId,name:skillId,element:"water",category:"magic",
         targetType,duration,resolveDuration:duration
-    },{side:"player",actorIndex:0,targetIds});
+    },{
+        side:"player",actorIndex:0,targetId:targetIds[0]??null,targetIds,
+        targetContract:{
+            version:"battle-target-contract-v1",side:"player",targetSide:"monster",
+            targetType,actorIndex:0,targetId:targetType==="all"?null:(targetIds[0]??null),targetIds
+        }
+    });
     return {
         context,
         stage:body.children.find(node=>node.id==="v143-skill-stage"),
@@ -156,7 +185,7 @@ test("the raster renderer creates one shared Water Ball Sprite Sheet node withou
     assert.equal(sprite.dataset.rows,"3");
     assert.equal(sprite.dataset.frames,"12");
     assert.match(sprite.style.backgroundImage,/water-orb-vfx\.png\?v=173\.19/);
-    assert.equal(sprite.style.left,"438px");
+    assert.equal(sprite.style.left,"318px","three-target VFX is centered on the explicit primary target");
     assert.equal(sprite.style.top,"130px");
     assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|requestAnimationFrame\(/);
 });
@@ -167,7 +196,7 @@ test("Ice Arrow Rain stays centered on the full monster battlefield",()=>{
     assert.equal(sprites.length,1);
     const sprite=sprites[0];
     assert.equal(sprite.dataset.placement,"battlefield");
-    assert.equal(sprite.dataset.areaId,"battleMonsterArea");
+    assert.equal(sprite.dataset.areaId,"fixed-enemy-zone");
     assert.equal(sprite.style.left,"460px");
     assert.equal(sprite.style.top,"165px");
     assert.match(sprite.style.backgroundImage,/frost-arrow-rain-vfx\.png\?v=173\.19/);

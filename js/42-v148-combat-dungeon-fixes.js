@@ -261,10 +261,12 @@
         return {character:character,key:key,level:level,cost:cost,stats:stats};
     }
 
-    function animateSupportCast(state,characterIndex,skill){
+    function animateSupportCast(state,characterIndex,skill,targetId,targetIds,targetSide){
         state.character.sp=Math.max(0,numeric(state.character.sp)-state.cost);
         if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
-        if(typeof showSkillNameBadge==="function"){ showSkillNameBadge(skill.name,skill.element,characterIndex); }
+        if(typeof showSkillNameBadge==="function"){
+            showSkillNameBadge(skill.name,skill.element,characterIndex,targetId,targetIds,targetSide);
+        }
         if(typeof showPlayerSpPopup==="function"){
             setTimeout(()=>showPlayerSpPopup(state.cost,characterIndex),500);
         }
@@ -328,7 +330,7 @@
             return !activeBuff(target,skill.id);
         });
 
-        animateSupportCast(state,characterIndex,skill);
+        animateSupportCast(state,characterIndex,skill,requested[0],requested,"player");
         const extra=buffFields(skill,state.level);
         eligible.forEach(index=>{
             const target=getPartyCharacterByIndex(index);
@@ -378,7 +380,7 @@
     function resolvePartyHeal(characterIndex,queued,skill,state){
         const targets=requestedBuffTargets(characterIndex,queued,skill);
         if(!targets.length){ return finishSupport(skill.name+"目前沒有可治療的存活目標。"); }
-        animateSupportCast(state,characterIndex,skill);
+        animateSupportCast(state,characterIndex,skill,targets[0],targets,"player");
         let hpTotal=0;
         let spTotal=0;
         let cleansedTotal=0;
@@ -421,7 +423,7 @@
         const targetStats=getPartyBattleStats(targetIndex);
         if(!targetStats){ return finishSupport("復活目標資料無法讀取。"); }
 
-        animateSupportCast(state,characterIndex,skill);
+        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player");
         const exSkill=typeof skillDatabase!=="undefined"?skillDatabase[skill.element+"EX"]:null;
         const exLevel=Math.max(0,Math.floor(numeric(getSkillLevel(state.key,skill.element+"EX"))));
         const multiplier=exSkill&&exLevel>0&&numeric(exSkill.healBonusPercent)>0
@@ -479,7 +481,7 @@
             if(!enemy||!isCurrent||enemy.alive===false||numeric(enemy.hp)<=0){
                 return finishSupport(skill.name+"目前沒有有效目標。");
             }
-            animateSupportCast(state,characterIndex,skill);
+            animateSupportCast(state,characterIndex,skill,enemyIndex,[enemyIndex],"monster");
             clearEnemyPositiveStates(enemy);
             if(typeof window.v141PlayCardEffect==="function"){
                 window.v141PlayCardEffect("monster",enemyIndex,"buff");
@@ -493,7 +495,7 @@
         const targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
         const target=getPartyCharacterByIndex(targetIndex);
         if(!target||numeric(target.hp)<=0){ return finishSupport(skill.name+"目前沒有有效目標。"); }
-        animateSupportCast(state,characterIndex,skill);
+        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player");
         const negativeCount=Array.isArray(target.statusEffects)?target.statusEffects.length:0;
         const buffCount=Array.isArray(target.activeBuffs)?target.activeBuffs.length:0;
         target.statusEffects=[];

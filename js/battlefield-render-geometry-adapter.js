@@ -134,10 +134,10 @@
     function partyIndexes(){
         try{
             if(typeof getExistingPartyIndexes==="function"){
-                return getExistingPartyIndexes().filter(Number.isInteger).slice(0,3);
+                return getExistingPartyIndexes().filter(Number.isInteger).slice(0,6);
             }
         }catch(_){ }
-        return [0,1,2].filter(index=>!!document.getElementById("battlePlayerCard"+index));
+        return [0,1,2,3,4,5].filter(index=>!!document.getElementById("battlePlayerCard"+index));
     }
 
     function canonicalizeAllyZone(){
@@ -182,8 +182,8 @@
         if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot"; }
         const mechanism=document.getElementById("bossMechanismSlot");
         if(mechanism){ mechanism.classList.add("v-fixed-mechanism-zone"); mechanism.dataset.geometryOwner="fixed-slot"; }
-        const middle=document.querySelector("#battlePage .battle-middle");
-        if(middle){ middle.classList.add("v-fixed-battle-info-zone"); middle.dataset.geometryOwner="fixed-slot"; }
+        const info=document.querySelector("#battlePage .battle-info-region");
+        if(info){ info.classList.add("v-fixed-battle-info-zone"); info.dataset.geometryOwner="fixed-slot"; }
         const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
         if(action){ action.classList.add("v-fixed-action-zone"); action.dataset.geometryOwner="fixed-slot"; }
     }

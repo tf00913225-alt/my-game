@@ -21,7 +21,7 @@
     const SPRITE_SCALE_MULTIPLIER=1;
     /* Size the raster box before centering/travel. CSS independent scale also
        scales translate(-50%) and the travel vector, moving the visible hit. */
-    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:.80,group:1,battlefield:1});
+    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:1,group:1,battlefield:1});
     const spriteFrameAspectCache=new Map();
     const spriteFrameAspectLoading=new Set();
 
@@ -65,6 +65,7 @@
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
         revive:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-revive-vfx.png?v=166","single",{scale:2.3,maxSize:285})},
+        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250,reusedFrom:"healSpell"})},
         waterEX:{hit:.74,noVisual:true,passive:true},
 
         stormFist:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/storm-fist-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
@@ -284,7 +285,7 @@
 
     function activeCards(side,config){
         const cards=[];
-        const max=side==="monster"?10:3;
+        const max=side==="monster"?10:6;
         for(let index=0;index<max;index++){
             const card=cardFor(side,index);
             if(card&&card.offsetParent!==null&&canReceive(config,side,index)){ cards.push({index:index,card:card}); }
@@ -297,47 +298,13 @@
         return ally?side:(side==="player"?"monster":"player");
     }
 
-    function queuedMechanismTarget(config,meta,targetSide){
-        if(targetSide!=="monster"||!meta||meta.side!=="player"||typeof queuedPlayerActions==="undefined"){ return null; }
-        const queued=queuedPlayerActions&&queuedPlayerActions[meta.actorIndex];
-        const target=queued&&queued.target;
-        return isMechanismTarget(target)&&canReceive(config,targetSide,target)?target:null;
-    }
-
     function initialTargetIndexes(config,meta,targetSide){
-        const targetType=String(config.targetType||"");
-        const all=targetType==="all"||targetType==="allyAll";
-        const formation=/row|tri|column/i.test(targetType);
         const explicit=Array.isArray(meta.targetIds)
             ?meta.targetIds
             :(meta.targetId!==undefined&&meta.targetId!==null?[meta.targetId]:[]);
-        if(explicit.length){
-            return Array.from(new Set(explicit.filter(index=>
-                (Number.isInteger(index)||isMechanismTarget(index))&&canReceive(config,targetSide,index)
-            )));
-        }
-        const mechanismTarget=queuedMechanismTarget(config,meta,targetSide);
-        if(mechanismTarget){ return [mechanismTarget]; }
-        const cards=activeCards(targetSide,config);
-        if(all){ return cards.map(entry=>entry.index); }
-        if(meta.side==="player"&&typeof queuedPlayerActions!=="undefined"){
-            const queued=queuedPlayerActions&&queuedPlayerActions[meta.actorIndex];
-            if(queued){
-                if(
-                    targetSide==="monster"&&formation&&Number.isInteger(queued.target)&&
-                    typeof getSkillTargets==="function"
-                ){
-                    return getSkillTargets(queued.target,targetType).filter(index=>canReceive(config,targetSide,index));
-                }
-                if(targetSide==="monster"&&(Number.isInteger(queued.target)||isMechanismTarget(queued.target))&&canReceive(config,targetSide,queued.target)){
-                    return [queued.target];
-                }
-                if(targetSide==="player"&&Number.isInteger(queued.targetAlly)&&canReceive(config,targetSide,queued.targetAlly)){
-                    return [queued.targetAlly];
-                }
-            }
-        }
-        return [];
+        return Array.from(new Set(explicit.filter(index=>
+            (Number.isInteger(index)||isMechanismTarget(index))&&canReceive(config,targetSide,index)
+        )));
     }
 
     function geometrySeedIndexes(current,indexes){
@@ -346,21 +313,12 @@
         return Array.isArray(indexes)?indexes.slice():[];
     }
 
-    function queuedPrimaryIndex(current){
-        if(!current||current.side!=="player"||typeof queuedPlayerActions==="undefined"){ return null; }
-        const queued=queuedPlayerActions&&queuedPlayerActions[current.actorIndex];
-        if(!queued){ return null; }
-        return current.targetSide==="monster"?queued.target:queued.targetAlly;
-    }
-
     function geometryPrimarySlot(current,indexes){
         const owner=geometryOwner();
         if(!owner||!current){ return null; }
         const seed=geometrySeedIndexes(current,indexes);
         const candidates=[];
         if(current.targetId!==undefined&&current.targetId!==null){ candidates.push(current.targetId); }
-        const queued=queuedPrimaryIndex(current);
-        if(queued!==undefined&&queued!==null){ candidates.push(queued); }
         seed.forEach(value=>candidates.push(value));
         for(const value of candidates){
             const slot=slotForTarget(current.targetSide,value,cardFor(current.targetSide,value));
@@ -442,7 +400,7 @@
 
     function snapshotTimedEffects(){
         const snapshot=new Set();
-        [["monster",10],["player",3]].forEach(entry=>{
+        [["monster",10],["player",6]].forEach(entry=>{
             for(let index=0;index<entry[1];index++){
                 const entity=entityFor(entry[0],index);
                 Object.keys(RAW_STATUS_SPRITES).forEach(type=>{
@@ -533,7 +491,7 @@
         purgeLegacyCardVfx();
         const types=Object.keys(RAW_STATUS_SPRITES);
         for(let index=0;index<10;index++){ types.forEach(type=>syncStatusSprite("monster",index,type)); }
-        for(let index=0;index<3;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }
+        for(let index=0;index<6;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }
     }
 
     function removeStatusSpriteEffects(){
@@ -550,7 +508,7 @@
             if(index>=0){ side="monster"; }
         }
         if(!side&&typeof getPartyCharacterByIndex==="function"){
-            for(let partyIndex=0;partyIndex<3;partyIndex++){
+            for(let partyIndex=0;partyIndex<6;partyIndex++){
                 if(getPartyCharacterByIndex(partyIndex)===entity){ side="player"; index=partyIndex; break; }
             }
         }
@@ -718,15 +676,11 @@
         node.dataset.geometrySlots=Array.isArray(bounds.slots)?bounds.slots.join(","):"";
 
         if(placement==="battlefield"){
-            const viewportWidth=Number(window.innerWidth)||960;
-            const viewportHeight=Number(window.innerHeight)||720;
             /* coverageScale is an authored multiplier over the complete fixed
                battlefield zone. It never measures currently surviving targets. */
             const coverageScale=clamp(Number(sprite.coverageScale)||Number(sprite.scale)||1,1,1.4);
-            const viewportMaxWidth=Math.max(240,viewportWidth*.98);
-            const viewportMaxHeight=Math.max(240,viewportHeight*.96);
-            const width=clamp(Math.round(bounds.width),1,viewportMaxWidth);
-            const height=clamp(Math.round(bounds.height),1,viewportMaxHeight);
+            const width=Math.max(1,Math.round(bounds.width));
+            const height=Math.max(1,Math.round(bounds.height));
             node.dataset.areaId=bounds.id||"fixed-battlefield";
             node.dataset.targetIndexes=indexes.join(",");
             if(sprite.fixedFormation){ node.dataset.fixedFormation="true"; }
@@ -743,10 +697,8 @@
 
         /* Group/row/tri/trajectory size is derived from the fixed geometry shape,
            never from the number or outer bounds of surviving target cards. */
-        const viewportWidth=Number(window.innerWidth)||960;
-        const viewportHeight=Number(window.innerHeight)||720;
-        const width=clamp(Math.round(bounds.width),1,Math.max(240,viewportWidth*.98));
-        const height=clamp(Math.round(bounds.height),1,Math.max(160,viewportHeight*.96));
+        const width=Math.max(1,Math.round(bounds.width));
+        const height=Math.max(1,Math.round(bounds.height));
         node.dataset.targetIndexes=indexes.join(",");
         applySpriteBox(node,width,height,sprite,"stretch");
         /* A group/row/tri Sprite keeps the fixed-shape bounds for sizing, but
@@ -886,11 +838,20 @@
         purgeStaleRasterStages();
 
         const model=modelFor(config);
-        const targetSide=targetSideFor(config,meta.side||"player");
+        const contractedSide=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
+            ?meta.targetContract.targetSide:meta&&meta.targetSide;
+        const targetSide=contractedSide==="player"||contractedSide==="monster"
+            ?contractedSide:targetSideFor(config,meta.side||"player");
         const duration=Math.max(520,Number(config.duration)||520);
         const validTargets=new Set(activeCards(targetSide,config).map(entry=>entry.index));
-        const mechanismTarget=queuedMechanismTarget(config,meta,targetSide);
-        if(mechanismTarget){ validTargets.add(mechanismTarget); }
+        const explicitTargets=Array.isArray(meta.targetIds)
+            ?meta.targetIds
+            :(meta.targetId!==undefined&&meta.targetId!==null?[meta.targetId]:[]);
+        explicitTargets.forEach(index=>{
+            if((Number.isInteger(index)||isMechanismTarget(index))&&cardFor(targetSide,index)){
+                validTargets.add(index);
+            }
+        });
 
         const current={
             sequence:++sequence,config:config,model:model,gate:gate,
