@@ -637,6 +637,12 @@ try{
     const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
     if(screenshot.data){ fs.writeFileSync(path.join(artifactDir,"battle-layer-element-box-mobile.png"),Buffer.from(screenshot.data,"base64")); }
 
+    await client.eval(`(()=>{
+        const director=window.v142SkillAnimationDirector;
+        if(director&&typeof director.dispose==='function'){director.dispose();}
+        return document.querySelectorAll('#v143-skill-stage').length;
+    })()`);
+
     const endTransitionStart=await client.eval(`(()=>{
         if(typeof closeHomeFeature==='function'){closeHomeFeature();}
         const initialToken=Number(window.__battleLayerQaInitialBattleToken)||0;
