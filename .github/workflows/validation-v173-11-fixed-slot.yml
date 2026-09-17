@@ -1,0 +1,46 @@
+name: V173.11 Fixed Slot Contract Validation
+
+on:
+  push:
+    branches:
+      - validation/v173-11-fixed-slot-contract-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v173-11:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out validation branch
+        uses: actions/checkout@v4
+        with:
+          ref: validation/v173-11-fixed-slot-contract-20260917
+          fetch-depth: 3
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify validation scope
+        shell: bash
+        run: |
+          base=50b8f73fb79699ec0e8f9da64c7326247f6bd133
+          git fetch --no-tags --depth=1 origin "$base"
+          git diff --check "$base" HEAD
+          changed="$(git diff --name-only "$base" HEAD | sort)"
+          printf '%s\n' "$changed"
+          test -z "$(git diff --name-only "$base" HEAD -- js css scripts config asset-manifest.json)"
+
+      - name: Run V173.11 migrated contract
+        run: node tests/v173.11-abyss-vfx-dungeon.test.js
+
+      - name: Run related VFX and Fixed Slot regressions
+        shell: bash
+        run: |
+          node tests/v173-water-orb-direction-vfx.test.js
+          node tests/v171-combat-vfx-fixes.test.js
+          node tests/v166-water-vfx.test.js
+          node tests/fixed-slot-battlefield-rendering-v2.test.js
+          node tests/fixed-slot-tri-target-window.test.js
