@@ -501,10 +501,17 @@ try{
         const phase=typeof battlePhase!=='undefined'?battlePhase:null;
         if(phase!=='declare'||typeof startResolutionPhase!=='function'){return {declared:false,phase};}
         startResolutionPhase(battleToken);
-        return {declared:true,phase,phaseAfter:typeof battlePhase!=='undefined'?battlePhase:null};
+        if(Array.isArray(initiativeQueue)){
+            initiativeQueue.sort((left,right)=>left?.type==='player'?-1:right?.type==='player'?1:0);
+        }
+        return {
+            declared:true,phase,phaseAfter:typeof battlePhase!=='undefined'?battlePhase:null,
+            firstCombatant:Array.isArray(initiativeQueue)?initiativeQueue[0]?.type||null:null
+        };
     })()`);
     evidence.checks.productionDeclaration=productionDeclaration;
     assert.equal(productionDeclaration.declared,true,"Real Fire Flurry must enter through the formal declaration phase");
+    assert.equal(productionDeclaration.firstCombatant,"player","Live flow QA must put the declared player action first");
     await waitFor(client,"document.getElementById('v143-skill-stage')?.dataset.skill==='explosiveFlurry'","formal Fire Flurry resolution",8000);
     const productionCastSnapshot=await client.eval(`(()=>{
         const stage=document.getElementById('v143-skill-stage');
