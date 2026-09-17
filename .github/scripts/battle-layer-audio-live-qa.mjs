@@ -513,6 +513,23 @@ try{
     assert.equal(productionCastSnapshot.skill,"explosiveFlurry","Expected real Fire Flurry V143 layer before Element Box opens");
     assert.equal(productionCastSnapshot.visibility,"visible","Skill layer must be visible during normal battle presentation");
 
+    const combatProgressBefore=await client.eval(`({
+        battleActive:!!battleActive,turn:Number(turn)||0,initiativeIndex:Number(initiativeIndex)||0,
+        battleToken:Number(battleToken)||0,stageSkill:document.getElementById('v143-skill-stage')?.dataset.skill||null
+    })`);
+    await sleep(4200);
+    const combatProgressAfter=await client.eval(`({
+        battleActive:!!battleActive,turn:Number(turn)||0,initiativeIndex:Number(initiativeIndex)||0,
+        battleToken:Number(battleToken)||0,stageCount:document.querySelectorAll('#v143-skill-stage').length
+    })`);
+    const combatAdvanced=!combatProgressAfter.battleActive||
+        combatProgressAfter.battleToken!==combatProgressBefore.battleToken||
+        combatProgressAfter.turn!==combatProgressBefore.turn||
+        combatProgressAfter.initiativeIndex!==combatProgressBefore.initiativeIndex;
+    evidence.checks.combatProgress={before:combatProgressBefore,after:combatProgressAfter,advanced:combatAdvanced};
+    assert.equal(combatAdvanced,true,"A real player cast must release initiative so player/enemy combat can continue");
+    assert.ok(combatProgressAfter.stageCount<=1,"Combat progression must never leave duplicate V143 stages");
+
     /* The production cast above proves that a real battle action reaches V143.
        A live battle keeps advancing between CDP round trips, so another formal
        action may legitimately supersede any presentation started by the QA.
@@ -598,6 +615,30 @@ try{
 
     const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
     if(screenshot.data){ fs.writeFileSync(path.join(artifactDir,"battle-layer-element-box-mobile.png"),Buffer.from(screenshot.data,"base64")); }
+
+    const endTransitionStart=await client.eval(`(()=>{
+        if(typeof closeHomeFeature==='function'){closeHomeFeature();}
+        const beforeToken=Number(battleToken)||0;
+        (typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).forEach(index=>{
+            if(typeof monsters!=='undefined'&&monsters[index]){monsters[index].hp=0;monsters[index].alive=false;}
+        });
+        return {beforeToken,ended:typeof checkBattleEnd==='function'?checkBattleEnd():false};
+    })()`);
+    await waitFor(client,"typeof battleActive!=='undefined'&&battleActive===false","battle victory flow release",5000);
+    await waitFor(client,"document.getElementById('mapPage')?.classList.contains('active')","battle-end map transition",6000);
+    const endTransition=await client.eval(`({
+        ended:${JSON.stringify(true)},battleActive:!!battleActive,
+        tokenAdvanced:(Number(battleToken)||0)>${endTransitionStart.beforeToken},
+        mapActive:document.getElementById('mapPage')?.classList.contains('active')||false,
+        stageCount:document.querySelectorAll('#v143-skill-stage').length
+    })`);
+    endTransition.ended=endTransitionStart.ended;
+    evidence.checks.battleEndTransition=endTransition;
+    assert.equal(endTransition.ended,true,"Defeating the final targets must enter the formal battle-end path");
+    assert.equal(endTransition.battleActive,false,"Battle-end path must clear battleActive");
+    assert.equal(endTransition.tokenAdvanced,true,"Battle-end path must invalidate the completed battle token");
+    assert.equal(endTransition.mapActive,true,"Battle-end path must return to the map");
+    assert.equal(endTransition.stageCount,0,"Battle-end path must leave no V143 stage behind");
 
     evidence.status="PASS";
     evidence.finishedAt=new Date().toISOString();
