@@ -11,13 +11,14 @@
   "requirements": [
     {
       "id": "FORMATION-PROJECTION",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "For allies, the front row is the row nearest enemies and the back row is farthest from enemies.",
       "evidence": [
         "css/fixed-slot-battlefield-rendering-v2.css",
-        "tests/fixed-slot-battlefield-rendering-v2.test.js"
+        "tests/fixed-slot-battlefield-rendering-v2.test.js",
+        "Real DEV mobile battle video 1000070330.mp4: water character is visibly behind the two front-row allies"
       ],
-      "remaining": "In the dev runtime, verify the water character in ALLY_B is visually behind the two front-row allies."
+      "remaining": null
     },
     {
       "id": "BOSS-MECHANISM-FRONT",
@@ -26,9 +27,11 @@
       "evidence": [
         "js/gameplay-boss-tower-system.js",
         "css/fixed-slot-battlefield-rendering-v2.css",
-        "tests/fixed-slot-battlefield-rendering-v2.test.js"
+        "tests/fixed-slot-battlefield-rendering-v2.test.js",
+        "tests/gameplay-boss-tower-system.test.js",
+        "Real DEV mobile battle video 1000070330.mp4 exposed the previous front-plane collision"
       ],
-      "remaining": "In the dev runtime, spawn a BOSS mechanism card and verify it is nearest the player while remaining independently selectable."
+      "remaining": "After the follow-up branch deploys, spawn a BOSS mechanism card and verify the card occupies the front lane without covering the BOSS or reinforcements and remains independently selectable."
     },
     {
       "id": "MONSTER-RANGE-TARGETING",
@@ -43,6 +46,7 @@
     }
   ],
   "blockers": [
-    "Awaiting real dev battle runtime verification; synthetic QA and CI do not satisfy this batch."
+    "Awaiting post-fix real dev battle runtime verification for the BOSS mechanism lane.",
+    "Awaiting a real enemy tri or row cast against the split ally formation; the supplied clip contains only single-target enemy casts."
   ]
 }
