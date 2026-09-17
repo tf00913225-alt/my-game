@@ -17445,14 +17445,9 @@ function processSingleMonsterAttack(monsterIndex,token){
           等級，等級越高的怪物、技能等級
           也越高），不同技能會打出真的不同
           的傷害，不是統一乘1.3。
-       2. targetType==="tri"的技能，改成
-          真的打「場上所有還活著的角色」
-          （最多2人：玩家1+玩家2），不是
-          只打一個。玩家這邊只有最多2個
-          角色，沒有「中/左/右3個目標」的
-          概念，「打全部還活著的角色」是
-          對應到「tri」這個設計精神最合理
-          的對應方式。
+       2. targetType==="tri"／"row"／"column" 必須由
+          固定戰場 Slot owner 依實際前後排與欄位選取，
+          不能把範圍技能偷換成場上所有存活角色。
        3. 每個目標各自獨立擲命中/爆擊，
           沒命中的照樣顯示MISS、有命中的
           正常扣血，跟原本單體攻擊的呈現
@@ -17464,7 +17459,7 @@ function processSingleMonsterAttack(monsterIndex,token){
         ? skillDatabase[castSkillId].targetType
         : "single";
 
-    const isRangeSkill=["tri","row","all"].includes(skillTargetType);
+    const isRangeSkill=["tri","row","column","all"].includes(skillTargetType);
 
     const livingTargets=getExistingPartyIndexes()
         .map(index=>({
@@ -17486,13 +17481,51 @@ function processSingleMonsterAttack(monsterIndex,token){
         return;
     }
 
-    const attackTargets=isRangeSkill
-        ? livingTargets
-        : [
+    let attackTargets=[];
+
+    if(skillTargetType==="all"){
+        attackTargets=livingTargets;
+    }else if(isRangeSkill){
+        /* The formal formation is already the owner for allyTri and player
+           targeting. Monster range skills must resolve through that same Slot
+           geometry, including a party member placed in the back row. */
+        const battlefieldSlots=typeof window!=="undefined"
+            ? window.FourSymbolsBattlefieldSlots
+            : null;
+        const primary=livingTargets[
+            Math.floor(Math.random()*livingTargets.length)
+        ];
+        const formation=battlefieldSlots&&typeof battlefieldSlots.ensureAllyFormation==="function"
+            ? battlefieldSlots.ensureAllyFormation(getExistingPartyIndexes())
+            : null;
+        const targetIndexes=primary&&formation&&typeof battlefieldSlots.resolveAllyTargets==="function"
+            ? battlefieldSlots.resolveAllyTargets(
+                formation,
+                primary.index,
+                skillTargetType,
+                index=>{
+                    const character=getPartyCharacterByIndex(index);
+                    return !!(character&&character.hp>0);
+                }
+            )
+            : [];
+        attackTargets=targetIndexes.map(index=>
+            livingTargets.find(entry=>entry.index===index)
+        ).filter(Boolean);
+    }else{
+        attackTargets=[
             selectableSingleTargets[
                 Math.floor(Math.random()*selectableSingleTargets.length)
             ]
         ];
+    }
+
+    if(attackTargets.length===0){
+        addBattleLog(monster.name+"找不到可被此技能選中的目標。");
+        updateUI();
+        finishPlayerAction();
+        return;
+    }
 
 
     /*
