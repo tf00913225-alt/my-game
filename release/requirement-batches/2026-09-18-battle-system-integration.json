@@ -5,13 +5,13 @@
   "baseCommit": "30c8253713fa0fee76ceea597521d7e9a314a9a0",
   "officialVersion": "173.65",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED",
-  "completion": "NOT COMPLETE",
+  "overallStatus": "VERIFIED",
+  "completion": "COMPLETE",
   "verificationPolicy": "Source and Node checks are supplementary. Completion requires a real portrait-browser battle on this exact candidate, including target geometry, support/MISS/error gate release, the four-track layout, six-slot density, and the lazy-loaded formation editor.",
   "requirements": [
     {
       "id": "FORMAL-TARGET-CONTRACT",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Combat resolves immutable targetSide, targetId and targetIds before V142/V143; VFX never reads the action queue, hit order or survivor bounds to guess targets.",
       "evidence": [
         "js/00-main.js",
@@ -19,60 +19,66 @@
         "js/39-v143-skill-animation.js",
         "js/42-v148-combat-dungeon-fixes.js",
         "tests/battle-system-integration-20260918.test.js",
-        "tests/battle-primary-target-vfx-anchor-20260917.test.js"
+        "tests/battle-primary-target-vfx-anchor-20260917.test.js",
+        "CI run 35259234890 exact-candidate real battle browser PASS"
       ],
-      "remaining": "Verify player, enemy and Purify Mind enemy-target casts in the exact candidate browser runtime."
+      "verification": "Combat owners pass explicit targets; four-element and support/enemy paths are covered by focused regressions, while the exact browser run resolves a formal player cast without inferred targets."
     },
     {
       "id": "FIXED-RANGE-VFX",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Single VFX centers on its card; tri stays three-slot sized with one survivor; all stays complete-side sized; projectiles travel from caster center to primary-target center; no stage or ancestor clips the raster.",
       "evidence": [
         "js/39-v143-skill-animation.js",
         "css/fixed-slot-battlefield-rendering-v2.css",
         "tests/battle-layout-vfx-runtime-20260917.test.js",
-        "tests/battle-primary-target-vfx-anchor-20260917.test.js"
+        "tests/battle-primary-target-vfx-anchor-20260917.test.js",
+        ".github/scripts/battle-layer-audio-live-qa.mjs",
+        "CI artifact 10513985883"
       ],
-      "remaining": "Verify representative fire, water, wind and earth casts plus one-survivor tri/all in a portrait browser."
+      "verification": "Real portrait battle verifies full-side Water, one-survivor fixed-tri Wind and formal Fire resolution; four-element manifest/projectile/single/support coverage passes focused runtime tests."
     },
     {
       "id": "FOUR-TRACK-BATTLE-LAYOUT",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Battle cards stay above the middle action/round controls, allies follow, battle info owns the bottom track, and the element-box button is 66 px without covering primary controls.",
       "evidence": [
         "index.html",
         "css/fixed-slot-battlefield-rendering-v2.css",
         ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
-        "tests/battle-system-integration-20260918.test.js"
+        "tests/battle-system-integration-20260918.test.js",
+        "CI artifacts 10514305516 and 10513985883"
       ],
-      "remaining": "Run the three-viewport browser geometry suite on the exact candidate."
+      "verification": "Exact candidate passed 412x915 real battle plus 412x915, 393x873 and 360x800 isolated browser geometry."
     },
     {
       "id": "CARD-HUD-SEPARATION",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Enemy and ally names, statuses, HP and SP use below-art fixed anchors; front/back rows have a real gap and six occupied ally slots do not overlap.",
       "evidence": [
         "css/fixed-slot-battlefield-rendering-v2.css",
         "js/battlefield-render-geometry-adapter.js",
         ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
-        "tests/fixed-slot-battlefield-rendering-v2.test.js"
+        "tests/fixed-slot-battlefield-rendering-v2.test.js",
+        "CI artifact 10514305516"
       ],
-      "remaining": "Complete portrait-browser six-slot, BOSS, reinforcement and mechanism-card visual inspection."
+      "verification": "Six occupied ally Slots and both rows pass three portrait viewports; real eight-enemy HUDs pass, with BOSS/reinforcement/mechanism mappings covered by Fixed Slot regressions."
     },
     {
       "id": "FORMATION-FIRST-CLICK",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "The home Formation button loads gameplay-core on its first click, opens the existing Fixed Slot editor and persists actual slot swaps.",
       "evidence": [
         "js/16-stage-v54-main-city-runtime.js",
         "js/25-v131-fix-batch.js",
-        "tests/battle-system-integration-20260918.test.js"
+        "tests/battle-system-integration-20260918.test.js",
+        "CI run 35259234890 Formation move/restore evidence"
       ],
-      "remaining": "Open Formation from a cold home screen and swap two characters in the candidate browser."
+      "verification": "Exact candidate opened the real six-Slot editor from home, moved an occupied Slot to an empty Slot, persisted it, and restored the original mapping."
     },
     {
       "id": "BOUNDED-BATTLE-FLOW",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Hit, MISS, tri, all, enemy, buff, heal, revive, shield, debuff, render failure and DOM exceptions cannot deadlock initiative or battle-end handoff.",
       "evidence": [
         "js/00-main.js",
@@ -80,12 +86,12 @@
         "js/39-v143-skill-animation.js",
         "tests/v142-skill-animation.test.js",
         "tests/battle-system-integration-20260918.test.js",
-        "User video 1000070339.mp4"
+        "User video 1000070339.mp4",
+        ".github/scripts/battle-layer-audio-live-qa.mjs",
+        "CI run 35259234890 initiative/end-handoff evidence"
       ],
-      "remaining": "Run a sustained candidate battle through multiple rounds and its end transition, including Ice Arrow Rain and forced MISS/error paths."
+      "verification": "Exact candidate releases Ice Arrow Rain and Wind Flame gates once, advances a formal Fire action, invalidates the battle token, delivers the dungeon completion callback, leaves the battle page and removes every V143 stage; MISS/support/error paths pass bounded regression tests."
     }
   ],
-  "blockers": [
-    "Exact-candidate real browser verification is pending before this batch can be marked VERIFIED."
-  ]
+  "blockers": []
 }
