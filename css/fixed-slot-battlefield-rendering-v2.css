@@ -7,8 +7,8 @@
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
     --battle-enemy-region-track:36fr;
-    --battle-center-region-track:15fr;
-    --battle-ally-region-track:49fr;
+    --battle-center-region-track:16fr;
+    --battle-ally-region-track:48fr;
     --battle-info-panel-height:150px;
     --battle-info-handle-height:24px;
     --battle-region-gap:4px;
