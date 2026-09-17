@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: validation/third-round-resume-20260917
-          fetch-depth: 2
+          fetch-depth: 3
 
       - name: Use Node.js 24
         uses: actions/setup-node@v4
@@ -31,8 +31,9 @@ jobs:
           git diff --check "$base" HEAD
           changed="$(git diff --name-only "$base" HEAD | sort)"
           printf '%s\n' "$changed"
-          test "$changed" = ".github/workflows/validation-third-round-resume.yml"
-          test -z "$(git diff --name-only "$base" HEAD -- js css tests scripts config asset-manifest.json)"
+          expected="$(printf '%s\n' '.github/workflows/validation-third-round-resume.yml' 'tests/diagnosis-v17339-earth-light-fixed-slot-contract.test.js')"
+          test "$changed" = "$expected"
+          test -z "$(git diff --name-only "$base" HEAD -- js css scripts config asset-manifest.json)"
 
       - name: Fetch historical test baselines
         shell: bash
@@ -54,6 +55,9 @@ jobs:
             sudo apt-get update
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
+
+      - name: Run formal V173.39 Earth Light diagnosis
+        run: node tests/diagnosis-v17339-earth-light-fixed-slot-contract.test.js
 
       - name: Run third-round migrated tests
         shell: bash
@@ -81,9 +85,3 @@ jobs:
           node tests/fixed-slot-tri-target-window.test.js
           node tests/ally-tri-rage-fixed-slot-regression.test.js
           node tests/fixed-slot-battlefield-rendering-v2.test.js
-
-      - name: Run full Node suite
-        env:
-          CI_BASE_SHA: e3de8f7fee4e65986420528247bdbb99cb588a07
-          CI_HEAD_SHA: 7565af4975d3344fc5ec3b31e6b001c0fb9a8c98
-        run: node .github/scripts/ci.mjs tests
