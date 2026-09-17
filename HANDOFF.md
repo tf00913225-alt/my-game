@@ -1,3 +1,12 @@
+## 2026-09-17 — Battle runtime P1 repair candidate (NOT COMPLETE)
+
+- Base `acc6419b72ee3a31a6314a6833ded3f81a3fd219`; branch `fix/battle-runtime-portraits-vfx-20260917`.
+- Scope only portraits and VFX geometry. Actual deployed normal battle confirmed legacy 122px/100px unit heights overriding 86px/92px slots; user video plus source trace identifies same-token BOSS reinforcement redraw reapplying entry hiding/translation.
+- Existing owners edited: V141 `renderBattle` / `startTurn` entry-token lifecycle; fixed-slot canonical CSS host namespace; V146 legacy zone translation; V143 `applySpriteBox` size factors. No added runtime wrapper or temporary patch.
+- `docs/qa/battle-runtime-p1-20260917.md` distinguishes actual observations, source diagnosis and supplementary tests. Requirement batch `2026-09-17-battle-runtime-p1` remains 0/2 VERIFIED. Version/cache remain 173.65.
+- Runtime source was connector-published as `a486e4bc6d2b1580cb50b796b112caa5b2646af8`; Draft PR #263 targets `dev`. CI Run #1799 (`35219995186`) passed, including Repository checks and the existing isolated 9:16 browser gate; the Draft PR dev deployment gate was skipped. These are supplementary only and do not change 0/2 VERIFIED.
+- Browser native DEV resource alert blocked further real-game inspection. Candidate BOSS reinforcement and VFX captures remain required. Never treat isolated QA or CI success as completion; no merge/deployment authorized by the autonomous validation contract.
+
 ## 2026-09-12 Facebook Android 原生登入 PoC（工作分支，未合併）
 
 - 工作分支 `feature/android-native-facebook-login-poc-20260912`，基準為已重新核對的 GitHub `dev@f4fc2f78d704a6019252b52345cb6f66a74133ce`；`main` 沒有修改、沒有建立 promotion。

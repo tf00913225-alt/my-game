@@ -64,10 +64,62 @@ const safeTop=Number(css.match(/--battle-enemy-safe-top:(\d+)px/)?.[1]||0);
 const artOverhang=Number(css.match(/--battle-art-overhang-top:(\d+)px/)?.[1]||0);
 assert.ok(safeTop>=artOverhang+3,"enemy safe-top must cover artwork overhang plus idle lift");
 assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone\{[\s\S]*top:var\(--battle-enemy-safe-top\) !important;/,"enemy zone must stay inside the portrait viewport safe region");
-assert.match(css,/\.v143-vfx-sprite\[data-placement="single"\]\{\s*scale:\.88;/);
-assert.match(css,/\.v143-vfx-sprite\[data-placement="group"\]\{\s*scale:\.62;/);
-assert.match(css,/\.v143-vfx-sprite\[data-placement="battlefield"\]\{\s*scale:\.72;/);
-assert.match(css,/\.v143-vfx-sprite\[data-placement="targetTrajectory"\],[\s\S]*?\.v143-vfx-sprite\[data-placement="trajectory"\]\{\s*scale:\.80;/);
+assert.doesNotMatch(css,/\bscale\s*:/,"raster size must not scale its centering or flight translation");
+
+// Execute the production sizing functions. These checks supplement, never
+// replace, fully loaded battle runtime visual acceptance.
+const sizingContext={spriteFrameAspectCache:new Map(),SPRITE_SCALE_MULTIPLIER:1};
+vm.createContext(sizingContext);
+vm.runInContext(vfxSource.match(/const PLACEMENT_SIZE_SCALE=Object\.freeze\(\{[^;]+;/)[0]+"\n"+
+    vfxSource.slice(vfxSource.indexOf("    function frameAspectFor("),vfxSource.indexOf("    function requestSpriteAspect(")),sizingContext);
+for(const [placement,factor] of Object.entries({single:.88,targetTrajectory:.80,trajectory:.80,group:.62,battlefield:.72})){
+    const sprite={dataset:{placement},style:{left:"180px",top:"240px"}};
+    sizingContext.applySpriteBox(sprite,200,200,{cellAspect:1});
+    assert.equal(sprite.style.width,Math.round(200*factor)+"px",placement+" owns bounded raster width");
+    assert.equal(sprite.style.height,sprite.style.width,placement+" preserves frame aspect");
+    assert.equal(sprite.style.left,"180px",placement+" does not move the hit anchor");
+    assert.equal(sprite.style.top,"240px",placement+" does not move the hit anchor");
+    assert.equal(sprite.style.scale,undefined,placement+" does not rescale the travel vector");
+}
+const portraitSprite={dataset:{placement:"single"},style:{}};
+sizingContext.applySpriteBox(portraitSprite,200,200,{cellAspect:.75});
+assert.equal(portraitSprite.style.width,"132px");
+assert.equal(portraitSprite.style.height,"176px");
+
+// Re-run the actual entry owner through initial entry, a same-battle redraw
+// (BOSS reinforcements), and the next battle. No replacement render algorithm.
+const transitionSource=read("js/35-v141-ui-battle.js");
+const pageClasses=new Set(),overlayClasses=new Set(),timers=[];
+const classes=set=>({add(...names){names.forEach(name=>set.add(name));},remove(...names){names.forEach(name=>set.delete(name));}});
+const transitionPage={classList:classes(pageClasses)};
+const transitionOverlay={classList:classes(overlayClasses)};
+const transitionContext={
+    window:{v132ActiveDungeonRun:{}},lastWildRankToken:null,battleToken:10,battleActive:true,
+    gold:0,sharedExp:0,currentBattleMonsters:[0],getItemCounts(){return [];},
+    rebalanceDungeonElements(){},decorateBattleCards(){},renderBattle(){},
+    turnStarts:0,startTurn(){transitionContext.turnStarts++;},
+    document:{getElementById(id){return id==="battlePage"?transitionPage:transitionOverlay;}},
+    setTimeout(callback){timers.push(callback);}
+};
+vm.createContext(transitionContext);
+vm.runInContext(transitionSource.slice(transitionSource.indexOf("    const startedEntryTokens="),transitionSource.indexOf("    function collectRewardSummary(")),transitionContext);
+transitionContext.renderBattle();
+assert.ok(pageClasses.has("v141-preparing-entry"));
+transitionContext.startTurn(10);
+while(timers.length)timers.shift()();
+assert.ok(!pageClasses.has("v141-preparing-entry"));
+assert.equal(transitionContext.turnStarts,1);
+transitionContext.renderBattle();
+transitionContext.startTurn(10);
+assert.ok(!pageClasses.has("v141-preparing-entry"),"reinforcement redraw must not hide players or shift enemies");
+assert.equal(timers.length,0,"same-battle redraw must not replay entry");
+transitionContext.battleToken=11;
+transitionContext.renderBattle();
+assert.ok(pageClasses.has("v141-preparing-entry"),"new battle retains its real entry animation");
+transitionContext.startTurn(11);
+while(timers.length)timers.shift()();
+assert.ok(!pageClasses.has("v141-preparing-entry"));
+
 
 assert.match(build,/"js\/battlefield-slot-owner\.js"/);
 assert.match(build,/"js\/battlefield-render-geometry-adapter\.js"/);
