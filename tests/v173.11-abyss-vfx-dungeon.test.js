@@ -31,7 +31,7 @@ assert.match(
 assert.match(animation,/function castSheet\(src,placement,options\)[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?renderer:"dom-sprite"/);
 assert.match(
     animation,
-    /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\);[\s\S]*?groupLayoutBounds\(current,indexes\):fieldBounds\(targetCards\)/
+    /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const bounds=geometryBounds\(current,indexes,placement\);[\s\S]*?const primaryAnchor=geometryPrimaryAnchor\(current,indexes\)/
 );
 assert.doesNotMatch(animation,/canvas-crop|getContext\(|drawImage\(|createElement\(["']canvas["']\)/);
 

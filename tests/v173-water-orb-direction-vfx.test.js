@@ -20,15 +20,15 @@ test("Water Ball owns a 12-frame, 4x3 group raster sprite with the frame-eight h
     assert.match(animation,/const DEFAULT_HIT=\.5833333333;/);
 });
 
-test("the single group VFX is centered on actual live targets rather than the caster",()=>{
+test("the single group VFX uses fixed geometry and the explicit primary target",()=>{
     const placement=animation.slice(animation.indexOf("function placeSprite(current,node,index,target){"));
     assert.match(
         placement,
-        /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const targetCards=indexes\.map\(i=>cardFor\(current\.targetSide,i\)\)\.filter\(Boolean\)/
+        /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const bounds=geometryBounds\(current,indexes,placement\);[\s\S]*?const primaryAnchor=geometryPrimaryAnchor\(current,indexes\)/
     );
     assert.match(
         placement,
-        /const destination=\{[\s\S]*?x:targetBounds\.left\+targetBounds\.width\/2,[\s\S]*?y:targetBounds\.top\+targetBounds\.height\/2/
+        /const destination=primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}[\s\S]*?:\{x:bounds\.centerX,y:bounds\.centerY\}/
     );
     assert.doesNotMatch(placement,/waterBall.*targetTrajectory/);
 });
