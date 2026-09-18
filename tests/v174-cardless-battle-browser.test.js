@@ -47,6 +47,10 @@ function enemyCard(index){
     </div>`;
 }
 
+function enemySlot(index,row,column){
+    return `<div class="v-fixed-battle-slot v-fixed-enemy-slot" data-slot="ENEMY_${row}_${column}">${enemyCard(index)}</div>`;
+}
+
 function playerCard(index,hp,sp){
     return `<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'/%3E%3C/svg%3E&quot;)">
       <div class="battle-player-icon"></div>
@@ -57,23 +61,26 @@ function playerCard(index,hp,sp){
     </div>`;
 }
 
+function playerSlot(index,hp,sp){
+    return `<div class="v-fixed-unit-slot v-fixed-ally-slot" data-slot="ALLY_FRONT_${index+1}">${playerCard(index,hp,sp)}</div>`;
+}
+
 function innerHtml(){
     const links=stylePaths.map(href=>`<link rel="stylesheet" href="${href}">`).join("\n");
     return `<!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${links}
 <style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#17120d}*{animation-duration:.5s}</style></head><body>
 <div id="game-viewport"><div id="game-stage"><div id="app" class="in-battle"><div id="game-content" class="content">
-<div id="battlePage" class="page active v154-abyss-battle"><div class="battle-wrap">
-<div class="battle-title">戰鬥</div>
-<div id="battleMonsterArea" class="battle-monsters v131-formation v141-fixed-formation">
-  <div class="v131-monster-row v131-monster-row-1">${[0,1,2,3,4].map(enemyCard).join("")}</div>
-  <div class="v131-monster-row v131-monster-row-2">${[5,6,7,8,9].map(enemyCard).join("")}</div>
-</div>
-<div class="battle-monster-gap-filler"></div>
-<div class="battle-middle"><div class="turn-target-row" id="turnTargetRow"><span>第 3 回合　目標：天兵1</span><strong>9</strong></div>
-<div id="battleActionRegion"><div id="battleCommandRow"><button>攻擊</button><button>技能</button><button>防禦</button><button>元素匣</button></div></div></div>
-<div id="battlePlayerRow" class="battle-player-row">${playerCard(0,835,412)}${playerCard(1,798,468)}${playerCard(2,752,506)}</div>
-<div id="battleInfo" class="battle-info">戰鬥紀錄</div>
+<div id="battlePage" class="page active v154-abyss-battle v-fixed-slot-render-v2"><div class="battle-wrap">
+<div class="battle-enemy-region"><div class="battle-title">戰鬥</div>
+<div id="battleMonsterArea" class="v-fixed-enemy-zone v-fixed-zone-v2">
+  <div class="v-fixed-slot-row v-fixed-enemy-row" data-slot-row="back">${[0,1,2,3,4].map((index)=>enemySlot(index,"BACK",index+1)).join("")}</div>
+  <div class="v-fixed-slot-row v-fixed-enemy-row" data-slot-row="front">${[5,6,7,8,9].map((index)=>enemySlot(index,"FRONT",index-4)).join("")}</div>
+</div></div>
+<div class="battle-center-region"><div class="turn-target-row" id="turnTargetRow"><span>第 3 回合　目標：天兵1</span><strong>9</strong></div>
+<div class="battle-middle"><div id="battleActionRegion"><div id="battleCommandRow"><button>攻擊</button><button>技能</button><button>防禦</button><button>元素匣</button></div></div></div></div>
+<div id="battlePlayerRow" class="battle-ally-region v-fixed-ally-zone v-fixed-zone-v2"><div class="v-fixed-slot-row v-fixed-ally-slot-row v-fixed-ally-slot-row-front" data-slot-row="front">${playerSlot(0,835,412)}${playerSlot(1,798,468)}${playerSlot(2,752,506)}</div></div>
+<div class="battle-info-region"><div class="battle-info-header-row"></div><div id="battleInfo" class="battle-info">戰鬥紀錄</div></div>
 </div></div></div></div></div></div>
 <script>
 var battleActive=true;
@@ -187,8 +194,8 @@ function runViewport(chrome,width,height){
     assert.equal(data.enemySp,"630");
     assert.equal(data.enemyHpDisplay,"block");
     assert.ok(data.enemyHpRect.height>0&&data.enemySpRect.height>0,"enemy HP/SP bars must remain visible");
-    assert.ok(data.enemyNameRect.bottom<=data.enemyHpRect.top+1,"monster name must sit below artwork and above HP");
     assert.ok(data.enemyHpRect.bottom<=data.enemySpRect.top+1,"enemy HP must sit above SP");
+    assert.ok(data.enemySpRect.bottom<=data.enemyNameRect.top+1,"monster name must sit below HP and SP");
     console.log(`V174 cardless battle browser QA ${width}x${height}:`,JSON.stringify(data));
 }
 
