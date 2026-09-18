@@ -307,7 +307,7 @@ test("tri skills follow valid targets while Phoenix Cry keeps one full-field she
     assert.equal(triSprites[0].style.left,"438px");
     assert.equal(triSprites[0].style.top,"140px");
     assert.equal(triSprites[0].style.width,"276px","three-target cast keeps the fixed three-slot width");
-    assert.equal(triSprites[0].style.height,"100px","three-target cast stays inside the fixed row height");
+    assert.equal(triSprites[0].style.height,"276px","three-target cast preserves its authored square frame while covering the fixed footprint");
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-field")),false);
 
@@ -367,7 +367,7 @@ test("Fire Rocket uses one caster-to-target sheet and suppresses its legacy main
     assert.equal(sprites[0].style["--v143-sprite-dy"],"-258px");
     assert.notEqual(sprites[0].style["--v143-sprite-angle"],"0deg");
     assert.equal(sprites[0].style.width,"276px","projectile owns the same fixed three-slot width as its impact");
-    assert.equal(sprites[0].style.height,"100px","projectile owns the fixed target-row height");
+    assert.equal(sprites[0].style.height,"276px","projectile preserves its authored square frame while covering the fixed target footprint");
     assert.equal(runtime.legacyRocketCalls(),0);
 });
 
@@ -443,7 +443,7 @@ test("Rage creates one shared full-ally cast sheet",()=>{
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
     assert.equal(sprites[0].dataset.placement,"battlefield");
     assert.equal(sprites[0].style.width,"600px");
-    assert.equal(sprites[0].style.height,"140px");
+    assert.equal(sprites[0].style.height,"600px","full-ally Rage preserves its authored square frame while covering the ally side");
 });
 
 test("enemy Rage allyTri animates only the three explicit targets",()=>{
