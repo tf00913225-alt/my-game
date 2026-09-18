@@ -822,7 +822,11 @@ try{
         const healCard=document.getElementById('battleMonster'+healIndex);
         const bossCard=document.getElementById('battleMonster'+bossIndex);
         const footprint=document.querySelector('.v-fixed-boss-footprint');
-        const rect=node=>{const value=node?.getBoundingClientRect();return value?{left:value.left,top:value.top,right:value.right,bottom:value.bottom,width:value.width,height:value.height}:null;};
+        const rect=node=>{const value=node?.getBoundingClientRect();return value?{left:value.left,top:value.top,right:value.right,bottom:value.bottom,width:value.width,height:value.height,centerX:value.left+value.width/2}:null;};
+        const bossHp=bossCard?.querySelector(':scope > .monster-hp');
+        const bossSp=bossCard?.querySelector(':scope > .monster-sp');
+        const bossName=bossCard?.querySelector(':scope > .battle-monster-name');
+        const sideVisual=index=>{const card=document.getElementById('battleMonster'+index),art=card?.querySelector(':scope > .v174-battle-art');return {index,slot:slotOf(index),card:rect(card),art:rect(art)};};
         const healReticle=getComputedStyle(healCard,'::before');
         const director=window.v142SkillAnimationDirector;
         const config=Object.assign({},window.v142GetSkillAnimationConfig('stormCircle'),{duration:1100,resolveDuration:1100});
@@ -840,7 +844,9 @@ try{
             slots:{boss:slotOf(bossIndex),reinforcements:reinforcements.map(slotOf),objects:[slotOf(healIndex),slotOf(flagIndex)]},
             units:currentBattleMonsters.map(index=>({index,kind:monsters[index]?.unitKind||null,canAct:monsters[index]?.canAct!==false,noRewards:!!monsters[index]?.noRewards,cardless:document.getElementById('battleMonster'+index)?.classList.contains('v174-cardless-unit')||false})),
             settlement,
-            footprint:rect(footprint),bossCard:rect(bossCard),bossCount:document.querySelectorAll('.v-fixed-boss-footprint > .gameplay-boss-card').length,
+            footprint:rect(footprint),bossCard:rect(bossCard),bossArt:rect(bossCard?.querySelector(':scope > .v174-battle-art')),bossCount:document.querySelectorAll('.v-fixed-boss-footprint > .gameplay-boss-card').length,
+            bossHud:{hp:rect(bossHp),sp:rect(bossSp),name:rect(bossName),hpPosition:getComputedStyle(bossHp).position,spPosition:getComputedStyle(bossSp).position,hpDisplay:getComputedStyle(bossHp).display,spDisplay:getComputedStyle(bossSp).display},
+            sideVisuals:reinforcements.concat([healIndex,flagIndex]).map(sideVisual),
             healFeedback:{className:healCard?.className||'',reticleBorder:healReticle.borderTopWidth,reticleAnimation:healReticle.animationName},
             bossFeedback:{className:bossCard?.className||''},
             vfx:{targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),placement:sprite?.dataset.placement||null,emitted:sprite?.dataset.emittedVisual||null},
@@ -862,6 +868,13 @@ try{
     assert.equal(bossMode.healFeedback.reticleBorder,"3px","Destructible Boss objects must expose the formal target reticle");
     assert.match(bossMode.healFeedback.reticleAnimation,/v174TargetReticlePulse/);
     assert.ok(Math.abs(bossMode.footprint.left-bossMode.bossCard.left)<=1&&Math.abs(bossMode.footprint.right-bossMode.bossCard.right)<=1&&Math.abs(bossMode.footprint.top-bossMode.bossCard.top)<=1&&Math.abs(bossMode.footprint.bottom-bossMode.bossCard.bottom)<=1,"One Boss hit area must fill the central six-Slot visual footprint");
+    assert.equal(bossMode.bossHud.hpPosition,"absolute","Boss HP must remain on its absolute HUD anchor");
+    assert.equal(bossMode.bossHud.spPosition,"absolute","Boss SP must remain on its absolute HUD anchor");
+    assert.equal(bossMode.bossHud.hpDisplay,"block");assert.equal(bossMode.bossHud.spDisplay,"block");
+    assert.equal(Math.round(bossMode.bossHud.hp.height),11);assert.equal(Math.round(bossMode.bossHud.sp.height),11);
+    assert.ok(bossMode.bossHud.hp.bottom<=bossMode.bossHud.sp.top+1,"Boss HP must sit above SP");
+    assert.ok(bossMode.bossHud.sp.bottom<=bossMode.bossHud.name.top+1,"Boss SP must sit above the name");
+    bossMode.sideVisuals.forEach(side=>{assert.ok(side.art.right<=bossMode.bossArt.left+1||side.art.left>=bossMode.bossArt.right-1,"Boss-side artwork must not overlap Boss artwork");if(/[15]$/.test(side.slot)){const left=/1$/.test(side.slot);assert.ok(left?side.art.centerX<=side.card.centerX-6:side.art.centerX>=side.card.centerX+6,"Boss-side artwork must visibly shift outward");}});
     assert.equal(bossMode.vfx.targetIndexes.length,1,"Boss tri VFX damage identity must remain one selected entity");
     assert.equal(bossMode.vfx.geometrySlots.length,3,"Boss tri VFX must retain its authored three-Slot visual width");
     assert.equal(bossMode.vfx.placement,"group");
