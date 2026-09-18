@@ -78,7 +78,7 @@ jobs:
               exit 1
             fi
 
-            cwebp -quiet -lossless -exact -z 9 "$input" -o "$output"
+            cwebp -quiet -lossless -exact -z 3 "$input" -o "$output"
             dwebp "$output" -quiet -o "relic-vfx-artifact/decoded/${MAP[$input_name]%.webp}.png"
 
             read out_width out_height <<<"$(identify -format '%w %h' "$output")"
