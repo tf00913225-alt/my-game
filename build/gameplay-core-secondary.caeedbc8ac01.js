@@ -1872,21 +1872,6 @@
         return stableFormationRows(ordered).flatMap(centerFirstOrder).filter(monsterAlive);
     }
 
-    if(typeof getSkillTargets==="function"){
-        const previousGetSkillTargets=getSkillTargets;
-        getSkillTargets=function(centerIndex,targetType){
-            const owner=battlefieldSlots();
-            const snapshot=activeFormationSnapshot(
-                typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]
-            );
-            if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
-                return owner.resolveEnemyTargets(snapshot,centerIndex,targetType,monsterAlive);
-            }
-            const legacy=previousGetSkillTargets.apply(this,arguments);
-            return Array.isArray(legacy)?legacy.filter(monsterAlive):[];
-        };
-    }
-
     window.v148GetFormationRows=stableFormationRows;
     window.v148GetAutoTargetPriority=autoTargetPriority;
 
@@ -2535,37 +2520,8 @@
         };
     }
 
-    if(typeof processNextCombatant==="function"){
-        const previousProcessNext=processNextCombatant;
-        processNextCombatant=function(){
-            if(settleDefeatedEnemies()){ return; }
-            return previousProcessNext.apply(this,arguments);
-        };
-    }
-
-    if(typeof finishPlayerAction==="function"){
-        const previousFinishAction=finishPlayerAction;
-        let terminalPending=false;
-        finishPlayerAction=function(){
-            if(enemiesHaveNoHp()){
-                const gate=window.v142SkillAnimationDirector&&window.v142SkillAnimationDirector.getActive
-                    ?window.v142SkillAnimationDirector.getActive():null;
-                if(gate&&gate.promise&&!gate.done){
-                    if(terminalPending){ return; }
-                    terminalPending=true;
-                    const that=this;
-                    const args=arguments;
-                    gate.promise.then(()=>{
-                        terminalPending=false;
-                        if(!settleDefeatedEnemies()){ previousFinishAction.apply(that,args); }
-                    });
-                    return;
-                }
-                if(settleDefeatedEnemies()){ return; }
-            }
-            return previousFinishAction.apply(this,arguments);
-        };
-    }
+    /* Zero-HP settlement and queue advancement are owned by 00-main.js.
+       This feature module must never Promise-gate or replace either owner. */
 
     /* ----- Formal daily dungeons: one shared 3-wave × 6-enemy battle flow. ----- */
     const DAILY_ELEMENTS=["fire","water","earth","wind"];
@@ -3660,54 +3616,6 @@
         };
     }
 
-    function rejectFrostbittenSkill(character,index,skill,consumeTurn){
-        if(!skill||!activeStatus(character,"frostbite")){ return false; }
-        if(typeof showMissEffect==="function"){ showMissEffect(true,index,"MISS"); }
-        if(typeof addBattleLog==="function"){
-            addBattleLog((character.id||"角色")+"處於凍傷狀態，無法使用"+skill.name+"。可改用普通攻擊、補品、符咒、防禦或逃脫。");
-        }
-        if(consumeTurn&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
-        return true;
-    }
-
-    if(typeof prepareAction==="function"){
-        const previousPrepareAction=prepareAction;
-        prepareAction=function(type){
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase[type]:null;
-            const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-            if(skill&&rejectFrostbittenSkill(character,index,skill,false)){ return; }
-            return previousPrepareAction.apply(this,arguments);
-        };
-    }
-
-    if(typeof resolveQueuedPlayerAction==="function"){
-        const previousResolveQueuedAction=resolveQueuedPlayerAction;
-        resolveQueuedPlayerAction=function(characterIndex){
-            const queued=typeof queuedPlayerActions!=="undefined"?queuedPlayerActions[characterIndex]:null;
-            const skill=queued&&typeof skillDatabase!=="undefined"?skillDatabase[queued.action]:null;
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            if(skill&&rejectFrostbittenSkill(character,characterIndex,skill,true)){ return; }
-            return previousResolveQueuedAction.apply(this,arguments);
-        };
-    }
-
-    if(typeof autoActionForCharacter==="function"){
-        const previousAutoAction=autoActionForCharacter;
-        autoActionForCharacter=function(characterIndex){
-            const result=previousAutoAction.apply(this,arguments);
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const queued=typeof queuedPlayerActions!=="undefined"?queuedPlayerActions[characterIndex]:null;
-            if(character&&activeStatus(character,"frostbite")&&queued&&skillDatabase[queued.action]){
-                queued.action="normal";
-                if(typeof addBattleLog==="function"){
-                    addBattleLog((character.id||"角色")+"處於凍傷狀態，自動戰鬥已改用普通攻擊。");
-                }
-            }
-            return result;
-        };
-    }
-
     /* ----- Player Fire EX, guaranteed Burn and conditional follow-ups. ----- */
     let playerSkillContext=null;
 
@@ -3752,6 +3660,15 @@
         else{ setTimeout(callback,0); }
     }
 
+    function captureBattleFinish(onFinish){
+        const flow=window.FourSymbolsBattleFlow;
+        if(!flow||typeof flow.interceptActionFinish!=="function"){ return function(){}; }
+        return flow.interceptActionFinish(()=>{
+            if(typeof onFinish==="function"){ onFinish(); }
+            return true;
+        });
+    }
+
     function livingMonsterSnapshot(){
         return livingMonsterIndexes().map(index=>({
             index:index,monster:monsters[index],wasAlive:true
@@ -3778,7 +3695,8 @@
             options.skill.spCost=0;
             options.skill.v149FreeFollowUp=true;
         }
-        if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+        const releaseFinishCapture=options.realFinish
+            ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
         if(originalRoll){
             rollCritical=function(){
                 const roll=originalRoll.apply(this,arguments);
@@ -3792,7 +3710,7 @@
             );
         }finally{
             if(originalRoll){ rollCritical=originalRoll; }
-            if(options.realFinish){ finishPlayerAction=options.realFinish; }
+            releaseFinishCapture();
             options.skill.spCost=originalCost;
             if(hadFreeFlag){ options.skill.v149FreeFollowUp=originalFreeFlag; }
             else{ delete options.skill.v149FreeFollowUp; }
@@ -4022,7 +3940,8 @@
             monster.v141SupportSkillIds=[];
             monster.skillChance=1;
             currentReflectAttacker=options.monsterIndex;
-            if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+            const releaseFinishCapture=options.realFinish
+                ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
             if(originalHit){
                 showPlayerHit=function(){
                     if(arguments[4]===true){ repeatedCritical=true; }
@@ -4059,7 +3978,7 @@
                 console.error("敵方"+options.skill.name+"追擊施放失敗：",error);
             }
             finally{
-                if(options.realFinish){ finishPlayerAction=options.realFinish; }
+                releaseFinishCapture();
                 if(originalHit){ showPlayerHit=originalHit; }
                 if(originalLog){ addBattleLog=originalLog; }
                 if(originalStatusRoll){ rollStatusEffectHit=originalStatusRoll; }
@@ -4098,15 +4017,6 @@
         processSingleMonsterAttack=function(monsterIndex){
             const attackArgs=Array.prototype.slice.call(arguments);
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const frostbitten=activeStatus(monster,"frostbite");
-            const saved=monster?{
-                skillIds:monster.skillIds,supports:monster.v141SupportSkillIds,skillChance:monster.skillChance
-            }:null;
-            if(frostbitten&&monster){
-                monster.skillIds=[];
-                monster.v141SupportSkillIds=[];
-                monster.skillChance=0;
-            }
             const realFinish=typeof finishPlayerAction==="function"?finishPlayerAction:null;
             const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
             const previousHit=typeof showPlayerHit==="function"?showPlayerHit:null;
@@ -4118,7 +4028,8 @@
             let finishRequested=false;
             let castSkillId=null;
             let critical=false;
-            if(realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+            const releaseFinishCapture=realFinish
+                ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
             if(previousBadge){
                 showMonsterSkillNameBadge=function(name){
                     if(typeof skillDatabase!=="undefined"){
@@ -4157,16 +4068,11 @@
             finally{
                 currentReflectAttacker=previousAttacker;
                 window.v149CurrentDamageActor=previousDamageActor;
-                if(realFinish){ finishPlayerAction=realFinish; }
+                releaseFinishCapture();
                 if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
                 if(previousHit){ showPlayerHit=previousHit; }
                 if(previousLog){ addBattleLog=previousLog; }
                 if(previousStatusRoll){ rollStatusEffectHit=previousStatusRoll; }
-                if(frostbitten&&monster){
-                    monster.skillIds=saved.skillIds;
-                    monster.v141SupportSkillIds=saved.supports;
-                    monster.skillChance=saved.skillChance;
-                }
             }
             const repeatSkill=castSkillId&&skillDatabase[castSkillId];
             const livingTargets=livingPartyIndexes();
@@ -4231,7 +4137,7 @@
     window.v149SyncCombatCards=syncAllCombatCards;
     window.v149Diagnostics=function(){
         return {
-            version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:true,
+            version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:false,
             sameNameStateMiss:true,barrierCornerCount:false,proceduralSkillFallback:false,
             mainShopIcon:"assets/ui/home-shop.png",navShopIcon:"assets/ui/home-shop-v147.png"
         };
@@ -4514,64 +4420,6 @@
         };
     }
 
-    function hasFrostbite(character){
-        return !!(character&&Array.isArray(character.statusEffects)&&character.statusEffects.some(effect=>
-            effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0
-        ));
-    }
-
-    function activeBattleCharacter(){
-        const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-        return typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-    }
-
-    function syncFrostbiteSkillControls(){
-        if(typeof document==="undefined"){ return; }
-        const blocked=hasFrostbite(activeBattleCharacter());
-        const mainButton=document.querySelector&&document.querySelector("#mainBattleMenu > .menu-button.skill");
-        if(mainButton){
-            if(blocked){
-                mainButton.disabled=true;
-                mainButton.dataset.v152FrostbiteBlocked="1";
-                mainButton.classList.add("v152-frostbite-blocked");
-                mainButton.setAttribute("aria-label","凍傷禁止使用技能");
-            }else if(mainButton.dataset.v152FrostbiteBlocked==="1"){
-                mainButton.disabled=false;
-                delete mainButton.dataset.v152FrostbiteBlocked;
-                mainButton.classList.remove("v152-frostbite-blocked");
-                mainButton.setAttribute("aria-label","技能");
-            }
-        }
-        if(document.querySelectorAll){
-            document.querySelectorAll(".v152-frostbite-symbol").forEach(symbol=>symbol.remove());
-        }
-        if(!blocked||!document.querySelectorAll){ return; }
-        document.querySelectorAll("#skillQuickBarGrid .skill-quick-button").forEach(button=>{
-            button.disabled=true;
-            button.onclick=null;
-            button.classList.add("v152-frostbite-blocked");
-        });
-    }
-
-    if(typeof populateSkillQuickBar==="function"){
-        const previousPopulateSkillQuickBar=populateSkillQuickBar;
-        populateSkillQuickBar=function(){
-            const result=previousPopulateSkillQuickBar.apply(this,arguments);
-            syncFrostbiteSkillControls();
-            return result;
-        };
-    }
-    if(typeof toggleSkillQuickBar==="function"){
-        const previousToggleSkillQuickBar=toggleSkillQuickBar;
-        toggleSkillQuickBar=function(){
-            if(hasFrostbite(activeBattleCharacter())){
-                syncFrostbiteSkillControls();
-                return;
-            }
-            return previousToggleSkillQuickBar.apply(this,arguments);
-        };
-    }
-
     if(typeof showDamagePopup==="function"){
         const previousShowDamagePopup=showDamagePopup;
         showDamagePopup=function(element){
@@ -4732,7 +4580,6 @@
         updateUI=function(){
             const result=previousUpdateUI.apply(this,arguments);
             syncSkillPointDisplay();
-            syncFrostbiteSkillControls();
             syncAbyssBattleUi();
             return result;
         };
@@ -4741,7 +4588,6 @@
     function boot(){
         cleanAccidentalFireSkill();
         syncSkillPointDisplay();
-        syncFrostbiteSkillControls();
         syncAbyssBattleUi();
         removeTaskTracker();
     }
@@ -4762,7 +4608,6 @@
     window.v152SyncSkillPointDisplay=syncSkillPointDisplay;
     window.v152NormalizeRageBuff=normalizeRageBuff;
     window.v152ResolveExtremeEmperorAction=resolveExtremeEmperorAction;
-    window.v152SyncFrostbiteSkillControls=syncFrostbiteSkillControls;
     window.v152SyncAbyssBattleUi=syncAbyssBattleUi;
     window.v152Diagnostics=function(){
         return {
@@ -4875,6 +4720,19 @@
 
     function resolveMonsterPortraitRecord(monster,options){
         if(!monster){ return null; }
+        const dedicatedPath=String(monster.vGameplayPortrait||"").trim();
+        if(dedicatedPath){
+            return {
+                portraitKey:"gameplay.object."+String(monster.objectType||monster.name||"unit"),
+                name:monster.name||"",
+                element:monster.element||"dynamic",
+                rank:monster.rank||"regular",
+                sizeClass:monster.unitKind==="boss"?"boss":"regular",
+                path:dedicatedPath,
+                status:"existing",
+                dedicated:true
+            };
+        }
         const temporaryBoss=monster.rank==="boss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.v141BattleRank==="boss"||(monster.v141Abyss===true&&monster.name!=="天兵天將"&&(Object.prototype.hasOwnProperty.call(EARLY_ABYSS_PORTRAITS,monster.name)||Object.prototype.hasOwnProperty.call(FINAL_ABYSS_PORTRAITS,monster.name)));
         return {
             portraitKey:temporaryBoss?"temporary.boss-reference":"temporary.heavenly-soldier",
@@ -5319,7 +5177,6 @@
     window.__v155DevFixesInstalled=true;
 
     const VERSION="155";
-    const HARD_CONTROL_SKIP_MS=300;
     const FINAL_BOSS_ORDER=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
     const FINAL_BOSS_RULES={
         東帝天尊:{element:"earth",skills:["dustStorm","stoneBreakSky"],supports:["earthShield"]},
@@ -5530,30 +5387,6 @@
         }
     }
     window.v155WithForcedFinalAbyssSkillLevel=withForcedFinalAbyssSkillLevel;
-
-    function withHardControlDelay(callback){
-        const hadOverride=Object.prototype.hasOwnProperty.call(window,"__battleAdvanceDelayOverrideMs");
-        const previousOverride=window.__battleAdvanceDelayOverrideMs;
-        window.__battleAdvanceDelayOverrideMs=HARD_CONTROL_SKIP_MS;
-        try{ return callback(); }
-        finally{
-            if(hadOverride){ window.__battleAdvanceDelayOverrideMs=previousOverride; }
-            else{ delete window.__battleAdvanceDelayOverrideMs; }
-        }
-    }
-
-    if(typeof beginCharacterTurn==="function"){
-        const previousBeginCharacterTurn=beginCharacterTurn;
-        beginCharacterTurn=function(){
-            const character=typeof activeBattleCharacterIndex!=="undefined"&&typeof getPartyCharacterByIndex==="function"
-                ?getPartyCharacterByIndex(activeBattleCharacterIndex):null;
-            if(typeof battlePhase!=="undefined"&&battlePhase==="declare"&&hardControlled(character)){
-                const that=this,args=arguments;
-                return withHardControlDelay(()=>previousBeginCharacterTurn.apply(that,args));
-            }
-            return previousBeginCharacterTurn.apply(this,arguments);
-        };
-    }
 
     function currentRound(){ return typeof turn!=="undefined"?Math.max(0,numeric(turn)):0; }
     function currentBattleToken(){ return typeof battleToken!=="undefined"?battleToken:null; }
@@ -6272,7 +6105,9 @@
                 withPhoenixCast("monster",monster,monsterIndex,()=>previousMonsterAttack.apply(that,args))
             );
             const invokeAtForcedLevel=()=>withForcedFinalAbyssSkillLevel(monster,invoke);
-            return hardControlled(monster)?withHardControlDelay(invokeAtForcedLevel):invokeAtForcedLevel();
+            /* The core battle queue owns every resolve delay, including a
+               frozen or petrified enemy's skipped action. */
+            return invokeAtForcedLevel();
         };
     }
 
@@ -6280,7 +6115,7 @@
 
     window.v155RuleDiagnostics=function(){
         return {
-            version:VERSION,hardControlSkipMs:HARD_CONTROL_SKIP_MS,
+            version:VERSION,hardControlUsesQueueTiming:true,
             elementalSkillDataOwnedByFinalLayers:true,
             monsterOnlyFireBurst:!!(typeof skillDatabase!=="undefined"&&skillDatabase.fireBurstStrike)
         };
@@ -7214,114 +7049,7 @@
         ));
     }
 
-    function activeFrostbite(entity){
-        return !!(entity&&(entity.v169FrostbiteCompatibilityActive===true||hasStoredFrostbite(entity)));
-    }
-
-    /* Frostbite is a three-stat soft debuff, never a skill lock. Historical
-       V149/V152 wrappers still contain their old gating checks, so only those
-       checks see a filtered status list. A compatibility marker keeps the
-       real Frostbite penalties active while the underlying skill resolves. */
-    function withoutLegacyFrostbiteLock(entity,callback){
-        if(!entity||!Array.isArray(entity.statusEffects)||!hasStoredFrostbite(entity)){
-            return callback();
-        }
-        const original=entity.statusEffects;
-        const frostbite=original.filter(effect=>effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0);
-        const filtered=original.filter(effect=>!frostbite.includes(effect));
-        entity.statusEffects=filtered;
-        entity.v169FrostbiteCompatibilityActive=true;
-        try{ return callback(); }
-        finally{
-            const after=Array.isArray(entity.statusEffects)?entity.statusEffects:filtered;
-            delete entity.v169FrostbiteCompatibilityActive;
-            if(after===filtered){
-                entity.statusEffects=original;
-            }else if(after.length===0){
-                /* A cleanse replaced the filtered list with an empty list, so
-                   Frostbite must be removed too. */
-                entity.statusEffects=[];
-            }else{
-                entity.statusEffects=after.concat(frostbite.filter(effect=>numeric(effect.turnsLeft)>0));
-            }
-        }
-    }
-
-    function clearLegacyFrostbiteSkillLocks(){
-        if(typeof document==="undefined"){ return; }
-        const mainButton=document.querySelector&&document.querySelector("#mainBattleMenu > .menu-button.skill.v152-frostbite-blocked");
-        if(mainButton){
-            mainButton.disabled=false;
-            mainButton.classList.remove("v152-frostbite-blocked");
-            if(mainButton.dataset){ delete mainButton.dataset.v152FrostbiteBlocked; }
-            mainButton.setAttribute("aria-label","技能");
-        }
-        if(document.querySelectorAll){
-            document.querySelectorAll("#skillQuickBarGrid .skill-quick-button.v152-frostbite-blocked").forEach(button=>{
-                button.disabled=false;
-                button.classList.remove("v152-frostbite-blocked");
-            });
-        }
-    }
-
-    if(typeof window.prepareAction==="function"){
-        const previousPrepareAction=window.prepareAction;
-        window.prepareAction=function(){
-            const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-            const that=this,args=arguments;
-            const result=withoutLegacyFrostbiteLock(character,()=>previousPrepareAction.apply(that,args));
-            clearLegacyFrostbiteSkillLocks();
-            return result;
-        };
-    }
-
-    if(typeof window.resolveQueuedPlayerAction==="function"){
-        const previousResolveQueuedPlayerAction=window.resolveQueuedPlayerAction;
-        window.resolveQueuedPlayerAction=function(characterIndex){
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const that=this,args=arguments;
-            const result=withoutLegacyFrostbiteLock(character,()=>previousResolveQueuedPlayerAction.apply(that,args));
-            clearLegacyFrostbiteSkillLocks();
-            return result;
-        };
-    }
-
-    if(typeof window.autoActionForCharacter==="function"){
-        const previousAutoActionForCharacter=window.autoActionForCharacter;
-        window.autoActionForCharacter=function(characterIndex){
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const that=this,args=arguments;
-            return withoutLegacyFrostbiteLock(character,()=>previousAutoActionForCharacter.apply(that,args));
-        };
-    }
-
-    if(typeof window.processSingleMonsterAttack==="function"){
-        const previousProcessSingleMonsterAttack=window.processSingleMonsterAttack;
-        window.processSingleMonsterAttack=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const that=this,args=arguments;
-            return withoutLegacyFrostbiteLock(monster,()=>previousProcessSingleMonsterAttack.apply(that,args));
-        };
-    }
-
-    if(typeof window.v141TryMonsterSpecialAction==="function"){
-        const previousTryMonsterSpecialAction=window.v141TryMonsterSpecialAction;
-        window.v141TryMonsterSpecialAction=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const that=this,args=arguments;
-            return withoutLegacyFrostbiteLock(monster,()=>previousTryMonsterSpecialAction.apply(that,args));
-        };
-    }
-
-    if(typeof window.updateUI==="function"){
-        const previousUpdateUI=window.updateUI;
-        window.updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            clearLegacyFrostbiteSkillLocks();
-            return result;
-        };
-    }
+    function activeFrostbite(entity){ return hasStoredFrostbite(entity); }
 
     /* Damage -25%. Different named outgoing-damage reductions coexist by
        multiplication, matching the shared status stacking rules. */
@@ -7393,8 +7121,6 @@
             return previousAddBattleLog.call(this,text);
         };
     }
-
-    clearLegacyFrostbiteSkillLocks();
 
     /* V158's compatibility resolver asks for tri. Freeze's final target truth is
        a front/back column of at most two valid targets. */
@@ -9386,70 +9112,9 @@ window.v17351FiveEnemyAutoTargetPriority=fivePriority;
    formal render-geometry adapter. This layer owns only artwork decoration,
    layering and transient animation. It deliberately contains no Slot/Unit/HUD
    top/left/right/bottom/inset/width/height positioning rules. */
-function ensureBattlePresentationStyles(){
-    if(document.getElementById("v174-cardless-battle-style"))return;
-    const style=document.createElement("style");
-    style.id="v174-cardless-battle-style";
-    style.textContent=`
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit,
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{
-    border:0!important;outline:0!important;box-shadow:none!important;
-    background-color:transparent!important;background-image:none!important;
-    isolation:isolate!important;overflow:visible!important;
-    transition-property:opacity!important;transition-duration:.15s!important;
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
-    z-index:1!important;display:block!important;pointer-events:none!important;overflow:visible!important;
-    background-repeat:no-repeat!important;background-color:transparent!important;
-    background-size:contain!important;background-position:center bottom!important;
-    transform-origin:50% 82%!important;will-change:transform,filter!important;
-    animation:v174BattleIdle 3.4s ease-in-out infinite!important;
-    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
-}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp,
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp{
-    display:block!important;visibility:visible!important;opacity:1!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{z-index:20!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
-    display:flex!important;align-items:center!important;justify-content:center!important;
-    text-align:center!important;white-space:nowrap!important;overflow:visible!important;
-    visibility:visible!important;opacity:1!important;z-index:24!important;pointer-events:none!important;
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
-    content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;
-    border-radius:50%;background:rgba(0,0,0,.42);filter:blur(2px);
-    transform:translateX(-50%);pointer-events:none;
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art~*{z-index:6;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .hp-bar,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .sp-bar,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-hp,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-sp{z-index:20!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{opacity:0!important;pointer-events:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{border:0!important;background:none!important;box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn{
-    outline:2px solid #f1c96d!important;outline-offset:1px!important;border-radius:8px!important;
-    box-shadow:0 0 0 1px rgba(255,232,163,.34),0 0 14px rgba(241,201,109,.82)!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.ally-targetable{box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target{border:0!important;box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn>.v174-battle-art,
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target>.v174-battle-art{
-    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7)));
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down{animation:none!important;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up>.v174-battle-art{animation:v174BattleLungeUp .45s ease!important;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down>.v174-battle-art{animation:v174BattleLungeDown .45s ease!important;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art.v174-hit-shake{animation:v174BattleHitShake .28s ease!important;}
-@keyframes v174BattleIdle{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.015)}}
-@keyframes v174BattleLungeUp{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(-13px) scale(1.035)}68%{transform:translateY(-5px) scale(1.015)}}
-@keyframes v174BattleLungeDown{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(13px) scale(1.035)}68%{transform:translateY(5px) scale(1.015)}}
-@keyframes v174BattleHitShake{0%,100%{transform:translate(0,0)}18%{transform:translate(-4px,1px)}36%{transform:translate(4px,-1px)}54%{transform:translate(-3px,0)}72%{transform:translate(2px,1px)}}
-@media (prefers-reduced-motion:reduce){#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{animation:none!important;}}
-`;
-    document.head.appendChild(style);
+function removeRetiredPresentationStyles(){
+    const style=document.getElementById("v174-cardless-battle-style");
+    if(style){ style.remove(); }
 }
 function numericValue(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0;}
 function setTextIfChanged(node,value){if(node&&node.textContent!==value)node.textContent=value;}
@@ -9493,26 +9158,16 @@ function syncResourceNumbers(){
     });
 }
 function syncBattlePresentation(){
-    ensureBattlePresentationStyles();
+    removeRetiredPresentationStyles();
     document.querySelectorAll("#battlePage .battle-player").forEach(card=>syncUnitArtwork(card,"player"));
     document.querySelectorAll("#battlePage .battle-monster").forEach(card=>syncUnitArtwork(card,"monster"));
     syncResourceNumbers();
 }
-function shakeArtForPopup(node){
-    if(!(node instanceof Element))return;
-    const popups=node.matches?.(".damage-popup.hp-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup.hp-popup")||[]);
-    popups.forEach(popup=>{
-        const owner=window.FourSymbolsBattlefieldSlots;
-        const slot=popup.dataset?.slot||owner?.getSlotFromElement?.(popup)||null;
-        const slotElement=slot&&owner?.getSlotElement?.(slot);
-        const card=slotElement?.querySelector?.(".battle-player,.battle-monster")||popup.closest(".battle-player,.battle-monster");
-        const art=card?.querySelector(":scope > .v174-battle-art");
-        if(!art)return;
-        art.classList.remove("v174-hit-shake");void art.offsetWidth;art.classList.add("v174-hit-shake");
-        setTimeout(()=>art.classList.remove("v174-hit-shake"),300);
-    });
-}
-
+window.FourSymbolsBattlePresentation=Object.freeze({
+    version:"cardless-presentation-v2",
+    applyUnit:syncUnitArtwork,
+    sync:syncBattlePresentation
+});
 /* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
     if(typeof window.v173DecorateExpPoolDistributionUi==="function")window.v173DecorateExpPoolDistributionUi();
@@ -9539,9 +9194,18 @@ window.v17351SyncManagement=syncManagement;
 function adLayer(){let l=document.getElementById("v17351AdSimulator");if(l)return l;l=document.createElement("div");l.id="v17351AdSimulator";l.className="v17351-ad-simulator";l.setAttribute("aria-hidden","true");l.innerHTML='<section class="v17351-ad-panel" role="dialog" aria-modal="true"><div class="v17351-ad-badge">AD</div><h2>模擬觀看廣告</h2><p>測試模式：播放完成後才發放獎勵。</p><strong id="v17351AdCountdown">3</strong><span id="v17351AdStatus">秒後完成</span></section>';document.body.appendChild(l);return l;}
 window.showRewardedAd=function(onSuccess,onFail){if(adRunning)return false;adRunning=true;const l=adLayer(),num=l.querySelector("#v17351AdCountdown"),status=l.querySelector("#v17351AdStatus");l.classList.add("show");l.setAttribute("aria-hidden","false");let remain=3;num.textContent="3";status.textContent="秒後完成";const timer=setInterval(()=>{remain--;if(remain>0){num.textContent=String(remain);return}clearInterval(timer);num.textContent="✓";status.textContent="觀看完成";setTimeout(()=>{l.classList.remove("show");l.setAttribute("aria-hidden","true");adRunning=false;try{if(typeof onSuccess==="function")onSuccess()}catch(err){console.error(err);if(typeof onFail==="function")onFail(err)}},280)},1000);return true;};
 
-const observer=new MutationObserver(mutations=>{syncManagement();mutations.forEach(record=>record.addedNodes.forEach(shakeArtForPopup));});
+const observer=new MutationObserver(mutations=>{
+    let needsResourceSync=false;
+    mutations.forEach(record=>record.addedNodes.forEach(node=>{
+        if(!(node instanceof Element)){ return; }
+        const units=node.matches?.(".battle-player,.battle-monster")
+            ?[node]:Array.from(node.querySelectorAll?.(".battle-player,.battle-monster")||[]);
+        units.forEach(card=>syncUnitArtwork(card,card.classList.contains("battle-monster")?"monster":"player"));
+        if(units.length){ needsResourceSync=true; }
+    }));
+    if(needsResourceSync){ syncResourceNumbers(); }
+});
 observer.observe(document.body,{subtree:true,childList:true});
-setInterval(syncManagement,300);
 syncManagement();
 })();
 
@@ -10117,24 +9781,12 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
     let reconcileQueued=false;
     const pendingPopupAnchors=[];
 
-    /* V173.51 remains the presentation/runtime owner for artwork creation,
-       lunge and hit-shake behavior, but its historical injected stylesheet also
-       contained geometry. Keep the style id as a sentinel so that stylesheet is
-       not re-injected; presentation-only rules now live in the canonical source
-       stylesheet fixed-slot-battlefield-rendering-v2.css. */
+    /* Cardless presentation is source CSS only. Remove the retired runtime
+       stylesheet if an old session created it; never inject a replacement. */
     function neutralizeLegacyPresentationGeometry(){
-        if(typeof document==="undefined"||!document.head){ return; }
-        let style=document.getElementById(LEGACY_PRESENTATION_STYLE_ID);
-        if(!style){
-            style=document.createElement("style");
-            style.id=LEGACY_PRESENTATION_STYLE_ID;
-            document.head.appendChild(style);
-        }
-        if(style.dataset.geometryOwner!=="fixed-slot"||style.textContent){
-            style.textContent="";
-            style.dataset.geometryOwner="fixed-slot";
-            style.dataset.presentationSource="fixed-slot-battlefield-rendering-v2.css";
-        }
+        if(typeof document==="undefined"){ return; }
+        const style=document.getElementById(LEGACY_PRESENTATION_STYLE_ID);
+        if(style){ style.remove(); }
     }
 
     function integerIndexes(value){
@@ -10158,6 +9810,29 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
     function activeEnemySnapshot(indexes){
         let snapshot=slots.getActiveEnemySnapshot();
         const requested=integerIndexes(indexes);
+        const boss=bossBattleOwner();
+        const bossActive=!!(boss&&typeof boss.isActive==="function"&&boss.isActive());
+        if(bossActive){
+            const unslotted=requested.filter(index=>{
+                const monster=typeof monsters!=="undefined"?monsters[index]:null;
+                return !!(monster&&monster.alive!==false&&Number(monster.hp)>0)&&
+                    !(snapshot&&slots.getEnemySlotForMonster(snapshot,index));
+            });
+            if(unslotted.length){
+                if(boss&&typeof boss.recordLifecycleViolation==="function"){
+                    boss.recordLifecycleViolation("boss-active-entity-without-slot",{
+                        indexes:unslotted,
+                        snapshotKind:snapshot&&snapshot.kind||null,
+                        snapshotBossOwned:!!(snapshot&&snapshot.bossBattleSnapshot)
+                    });
+                }
+                /* Boss geometry cannot degrade into a normal formation. The
+                   unassigned entity is refused by this render pass so the
+                   formal B1/B5/F1/F5/Boss footprint remains intact. */
+                return snapshot;
+            }
+            return snapshot;
+        }
         const complete=snapshot&&requested.every(index=>!!slots.getEnemySlotForMonster(snapshot,index));
         if(!complete&&requested.length){
             snapshot=slots.createEnemyFormationSnapshot(requested,{
@@ -10177,6 +9852,13 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
         return node;
     }
 
+    function applyPresentation(card,kind){
+        const owner=window.FourSymbolsBattlePresentation;
+        if(owner&&typeof owner.applyUnit==="function"){ owner.applyUnit(card,kind); }
+    }
+
+    function bossBattleOwner(){ return window.FourSymbolsBossBattle||null; }
+
     function canonicalizeEnemyZone(){
         const area=document.getElementById("battleMonsterArea");
         if(!area){ return; }
@@ -10187,8 +9869,11 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battleMonster"+index);
-            if(card){ cards.set(index,card); }
+            if(card){ applyPresentation(card,"monster");cards.set(index,card); }
         });
+        const bossOwner=bossBattleOwner();
+        const bossIndex=bossOwner&&typeof bossOwner.getBossIndex==="function"?bossOwner.getBossIndex():null;
+        const bossCard=Number.isInteger(bossIndex)?cards.get(bossIndex):null;
 
         const fragment=document.createDocumentFragment();
         [slots.enemyBackSlots,slots.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
@@ -10199,7 +9884,7 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
             rowSlots.forEach(slot=>{
                 const holder=makeSlot("v-fixed-battle-slot v-fixed-enemy-slot",slot);
                 const index=slots.getAssignedMonsterAtEnemySlot(snapshot,slot);
-                const card=Number.isInteger(index)?cards.get(index):null;
+                const card=Number.isInteger(index)&&index!==bossIndex?cards.get(index):null;
                 if(card){
                     card.dataset.slot=slot;
                     card.dataset.geometryOwner="fixed-slot";
@@ -10209,12 +9894,24 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
             });
             fragment.appendChild(row);
         });
+        if(bossCard){
+            const footprint=document.createElement("div");
+            footprint.className="v-fixed-boss-footprint";
+            footprint.dataset.geometryOwner="fixed-slot";
+            footprint.dataset.slots=slots.bossFootprintSlots.join(" ");
+            bossCard.classList.add("gameplay-boss-card");
+            bossCard.dataset.slot="ENEMY_B3";
+            bossCard.dataset.geometryOwner="fixed-slot";
+            footprint.appendChild(bossCard);
+            fragment.appendChild(footprint);
+        }
         area.replaceChildren(fragment);
         area.classList.add("v-fixed-enemy-zone","v-fixed-zone-v2");
         area.classList.remove("battle-monsters","v131-formation","v141-fixed-formation");
         area.dataset.geometryOwner="fixed-slot";
         area.dataset.monsterCount=String(indexes.length);
         area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
+        area.classList.toggle("gameplay-boss-active",!!bossCard);
     }
 
     function partyIndexes(){
@@ -10235,7 +9932,7 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battlePlayerCard"+index);
-            if(card){ cards.set(index,card); }
+            if(card){ applyPresentation(card,"player");cards.set(index,card); }
         });
 
         const fragment=document.createDocumentFragment();
@@ -10266,8 +9963,6 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
     function markBattlefieldZones(){
         const page=document.getElementById("battlePage");
         if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot"; }
-        const mechanism=document.getElementById("bossMechanismSlot");
-        if(mechanism){ mechanism.classList.add("v-fixed-mechanism-zone"); mechanism.dataset.geometryOwner="fixed-slot"; }
         const info=document.querySelector("#battlePage .battle-info-region");
         if(info){ info.classList.add("v-fixed-battle-info-zone"); info.dataset.geometryOwner="fixed-slot"; }
         const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
@@ -10462,7 +10157,7 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
 
     function isOwnedFixedStructure(node){
         if(!(node instanceof Element)||node.dataset.geometryOwner!=="fixed-slot"){ return false; }
-        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot");
+        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint");
     }
 
     const observer=new MutationObserver(records=>{

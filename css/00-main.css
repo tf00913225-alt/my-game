@@ -3392,10 +3392,6 @@ button:active{
     animation:lungeUp .45s ease;
 }
 
-.battle-player.active-turn.hit{
-    animation:hitAnimation .3s ease;
-}
-
 .battle-player.active-turn.dodge-back{
     animation:dodgeBack .45s ease;
 }
@@ -3697,26 +3693,6 @@ button:active{
     box-shadow:
         0 2px 0 #4a140c,
         0 3px 6px rgba(0,0,0,.4);
-}
-
-.hit{
-    animation:hitAnimation .3s ease;
-}
-
-.red-hit{
-    border-color:#ef4444!important;
-    box-shadow:0 0 9px rgba(239,68,68,.9)!important;
-}
-
-@keyframes hitAnimation{
-    /*
-       ★ 修正（依照使用者要求，震動幅度加大）：
-       原本±3px太小，幾乎感覺不到，
-       這次明顯加大到±8px。
-    */
-    25%{transform:translateX(-8px);}
-    50%{transform:translateX(8px);}
-    75%{transform:translateX(-5px);}
 }
 
 /*

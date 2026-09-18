@@ -7,6 +7,7 @@ const vm=require("node:vm");
 const source=fs.readFileSync("js/46-v155-dev-fixes.js","utf8");
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v142Source=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
+const coreSource=fs.readFileSync("js/00-main.js","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
@@ -239,7 +240,7 @@ test("Phoenix fewer-than-three Burn cast grants one non-refreshable next-round 3
     );
 });
 
-test("hard-controlled player and monster finish with the 300 ms override only",()=>{
+test("hard-controlled player and monster leave timing to the core queue owner",()=>{
     const observed=[];
     const player={hp:100,frozen:true};
     const monster={name:"敵人",hp:100,alive:true,frozen:true};
@@ -254,10 +255,12 @@ test("hard-controlled player and monster finish with the 300 ms override only",(
     context.beginCharacterTurn(1);
     context.battlePhase="resolve";
     context.processSingleMonsterAttack(0,1);
-    assert.deepEqual(observed,[300,300]);
+    assert.deepEqual(observed,[undefined,undefined]);
     assert.equal(Object.prototype.hasOwnProperty.call(context,"__battleAdvanceDelayOverrideMs"),false);
-    assert.match(v131Source,/consumeBattleAdvanceDelayOverride\(normalDelayMs\)/);
-    assert.match(v142Source,/delayOverride===null\?resolveDelay\(initiativeIndex\):delayOverride/);
+    assert.match(coreSource,/function getBattleAdvanceDelay\(phase\)/);
+    assert.doesNotMatch(source,/withHardControlDelay|__battleAdvanceDelayOverrideMs/);
+    assert.doesNotMatch(v131Source,/finishPlayerAction\s*=(?!=)/);
+    assert.doesNotMatch(v142Source,/finishPlayerAction\s*=(?!=)/);
 });
 
 console.log("\nV155 current-request suite: "+passed+" tests passed.");

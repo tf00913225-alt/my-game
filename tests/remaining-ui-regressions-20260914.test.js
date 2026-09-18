@@ -25,7 +25,7 @@ assert.match(battlefieldCss,/\.v-fixed-enemy-slot \.battle-monster-name\{[\s\S]*
     "the Fixed Slot layout owner must keep enemy names below their artwork");
 assert.match(battlefieldCss,/\.v-fixed-battle-slot > \.battle-monster > \.v174-battle-art,[\s\S]*bottom:var\(--battle-art-hud-reserve\) !important/,
     "the Fixed Slot layout owner must reserve card-bottom HUD space");
-assert.match(battlefieldCss,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:2px solid #f1c96d !important/);
+assert.match(battlefieldCss,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:0 !important;[\s\S]*box-shadow:none !important/);
 assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1;/);
 assert.doesNotMatch(vfx,/function visualRectForCard\(/,"VFX geometry must not regress to character/art DOM bounds");
 assert.match(vfx,/function geometryOwner\(\)\{[\s\S]*window\.FourSymbolsBattlefieldSlots/);
@@ -37,9 +37,9 @@ assert.match(vfx,/node\.style\.visibility="hidden"/);
 assert.match(vfx,/function confirmTargetVisual/);
 assert.match(vfx,/window\.v143RunAtTargetHit=function\(targetSide,index,callback,allowDefeated\)\{[\s\S]*const wait=delayFor\(targetSide,index,allowDefeated===true\);[\s\S]*setTimer\(callback,wait\)/);
 assert.match(vfx,/popup\.classList\.add\("v152-top-damage"\)/);
-assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(123px,30%,138px\)/);
-assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(117px,29\.25%,132px\)/);
-assert.match(bossJs,/showDamagePopup\(node,"HP-"\+final,"hp",!!isCrit\)/);
+assert.match(bossCss,/\.v-fixed-boss-footprint\{/);
+assert.match(bossJs,/function applyBossShield\(amount\)/);
+assert.doesNotMatch(bossJs,/showDamagePopup\(node,"HP-"\+final/);
 assert.match(vfxCss,/@keyframes v143RasterTravel\{[\s\S]*rotate\(var\(--v143-sprite-angle,0deg\)\)/);
 assert.doesNotMatch(fireCss,/v174FireRocketTravel/);
 assert.doesNotMatch(fireCss,/data-skill="fireRocket"/);

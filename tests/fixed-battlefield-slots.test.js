@@ -16,8 +16,9 @@ const plain=value=>JSON.parse(JSON.stringify(value));
 const strictDeepEqual=assert.deepEqual.bind(assert);
 assert.deepEqual=(actual,expected,message)=>strictDeepEqual(plain(actual),plain(expected),message);
 
-assert.deepEqual(slots.mechanismSlots,["MECH_L","MECH_C","MECH_R"],"mechanism realm exposes exactly three independent slots");
-assert.ok(slots.mechanismSlots.every(slot=>!slots.enemySlots.includes(slot)&&!slots.allySlots.includes(slot)),"mechanism slots never overlap unit geometry");
+assert.deepEqual(slots.bossFootprintSlots,["ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_F2","ENEMY_F3","ENEMY_F4"],"Boss visual footprint owns the central six enemy slots");
+assert.ok(slots.bossFootprintSlots.every(slot=>slots.enemySlots.includes(slot)),"Boss footprint is geometry, not a parallel target realm");
+assert.equal(Object.prototype.hasOwnProperty.call(slots,"mechanismSlots"),false,"retired function-card slots are absent");
 
 const expectedLayouts={
     3:[["ENEMY_F2","ENEMY_F3","ENEMY_F4"]],
@@ -54,11 +55,12 @@ assert.equal(slots.getEnemySlotForMonster(snapshot10,8),"ENEMY_F4","surviving I 
 assert.equal(snapshot10.originalFormationType,10,"death does not switch formation type");
 assert.deepEqual(slots.getPriorityMonsterIndexes(snapshot10,isAlive),[8,0,9],"10-unit priority remains active after seven deaths");
 
-const bossSnapshot=slots.createEnemyFormationSnapshot([20],{originalFormationType:3});
-assert.equal(slots.getEnemySlotForMonster(bossSnapshot,20),"ENEMY_F3","summoning boss reserves three-unit formation and starts centered");
-assert.equal(slots.assignMonsterToPreferredEnemySlot(bossSnapshot,21,["ENEMY_F2","ENEMY_F4"]),"ENEMY_F2");
-assert.equal(slots.assignMonsterToPreferredEnemySlot(bossSnapshot,22,["ENEMY_F4","ENEMY_F2"]),"ENEMY_F4");
-assert.equal(slots.getEnemySlotForMonster(bossSnapshot,20),"ENEMY_F3","boss remains centered after reinforcements fill reserved slots");
+const bossSnapshot=slots.createEnemyFormationSnapshot([20],{originalFormationType:6});
+assert.equal(slots.getEnemySlotForMonster(bossSnapshot,20),"ENEMY_B3","Boss identity stays centered while its artwork spans six slots");
+assert.equal(slots.assignMonsterToPreferredEnemySlot(bossSnapshot,21,["ENEMY_B1","ENEMY_B5"]),"ENEMY_B1");
+assert.equal(slots.assignMonsterToPreferredEnemySlot(bossSnapshot,22,["ENEMY_B5","ENEMY_B1"]),"ENEMY_B5");
+assert.equal(slots.assignMonsterToPreferredEnemySlot(bossSnapshot,23,["ENEMY_F1","ENEMY_F5"]),"ENEMY_F1");
+assert.equal(slots.assignMonsterToPreferredEnemySlot(bossSnapshot,24,["ENEMY_F5","ENEMY_F1"]),"ENEMY_F5");
 
 const ranked=slots.createEnemyFormationSnapshot([30,31,32,33,34],{
     rankWeight:index=>index===34?3:1

@@ -24,7 +24,7 @@ assert.match(adapterSource,/slots\.enemyBackSlots,slots\.enemyFrontSlots/);
 assert.match(adapterSource,/slots\.allyFrontSlots,slots\.allyBackSlots/);
 assert.match(adapterSource,/dataset\.geometryOwner="fixed-slot"/);
 assert.match(adapterSource,/neutralizeLegacyPresentationGeometry/);
-assert.match(adapterSource,/style\.dataset\.geometryOwner="fixed-slot"/);
+assert.match(adapterSource,/if\(style\)\{ style\.remove\(\); \}/,"retired runtime stylesheet is removed, not replaced");
 assert.match(adapterSource,/area\.classList\.remove\("battle-monsters","v131-formation","v141-fixed-formation"\)/);
 assert.match(adapterSource,/area\.classList\.remove\("battle-player-row"\)/);
 assert.match(adapterSource,/function isOwnedFixedStructure\(node\)/);
@@ -57,7 +57,7 @@ assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*position:ab
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="front"\]\{top:0 !important;\}/,"ally front row must be nearest the enemy zone");
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="back"\]\{bottom:0 !important;\}/,"ally back row must stay inside its separated row");
 assert.match(css,/--battle-ally-row-gap:8px/);
-assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone > \.v-fixed-mechanism-zone\{[\s\S]*position:absolute !important;[\s\S]*bottom:0 !important;/,"BOSS mechanism cards must use the enemy front visual plane");
+assert.doesNotMatch(css,/v-fixed-mechanism-zone|MECH_L|MECH_C|MECH_R/,"retired function-card plane is absent");
 assert.match(css,/\.v-fixed-enemy-slot > \.battle-monster,[\s\S]*\.v-fixed-ally-slot > \.battle-player\{[\s\S]*position:absolute !important;[\s\S]*inset:0 !important;/);
 assert.match(css,/\.v174-battle-art\{[\s\S]*background-size:contain !important;[\s\S]*overflow:visible !important;/);
 assert.match(css,/\.v153-status-vfx\{[\s\S]*left:50% !important;[\s\S]*top:42% !important;[\s\S]*transform:translate\(-50%,-50%\) !important;/,"status VFX must stay Slot-relative");
@@ -184,12 +184,7 @@ assert.ok(row.width>=tri.width);
 assert.ok(column.height>single.height);
 assert.ok(all.width>=row.width&&all.height>=column.height);
 
-rects.MECH_C={left:140,top:180,width:80,height:70,right:220,bottom:250};
-const mechanismSingle=owner.getGeometryRectFromShape("monster","MECH_C","single");
-const mechanismRange=owner.getGeometryRectFromShape("monster","MECH_C","tri");
-assert.equal(mechanismSingle.width,80,"single-target mechanism art stays on the function card");
-assert.equal(mechanismRange.width,all.width,"range art aimed at a function card uses the full enemy-side width");
-assert.equal(mechanismRange.height,all.height,"range art aimed at a function card uses the full enemy-side height");
+assert.deepEqual(JSON.parse(JSON.stringify(owner.bossFootprintSlots)),["ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_F2","ENEMY_F3","ENEMY_F4"]);
 
 assert.match(qaSource,/V174 battle presentation owner/);
 console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");

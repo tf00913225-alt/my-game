@@ -1,6 +1,6 @@
 /* =====================================================
    Gameplay Center / Boss / Four-Symbol Tower
-   Formal owner for the special-mode large panels and Boss mechanism cards.
+   Formal owner for special-mode panels and Boss target entities.
    The existing 420px game surface and 70px bottom navigation remain unchanged.
 ===================================================== */
 
@@ -130,7 +130,7 @@
 }
 
 /* Gameplay activity covers use the same 16:9 production ratio as dungeon
-   covers. Combat BOSS/mechanism cards remain independent battlefield components. */
+   covers. Combat BOSS target entities remain independent battlefield components. */
 #game-stage .gameplay-mode-card{
     position:relative;
     display:grid;
@@ -576,11 +576,8 @@
 #game-stage .tower-relic-options{ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px; }
 #game-stage .tower-relic-options button{ min-height:44px;padding:7px;border:1px solid #7e5e33;border-radius:7px;color:#e3cfaa;background:#1c140d;font-size:15px;font-weight:900; }
 
-/* ---------- Boss battle portrait / mechanism UI ---------- */
+/* ---------- Boss battle target-entity presentation ---------- */
 
-/* The historical V15 battle title has priority-sized geometry. Rather than
-   add another priority patch here, hide its text only while a Gameplay BOSS
-   is active and reclaim the exact 23px title row from the following formation. */
 #game-stage #battlePage:has(#battleMonsterArea.gameplay-boss-active) .battle-title{
     visibility:hidden;
     opacity:0;
@@ -588,473 +585,160 @@
 }
 
 #game-stage #battleMonsterArea.gameplay-boss-active{
-    --gameplay-boss-card-width:clamp(118px,29%,132px);
-    --gameplay-mechanism-card-width:clamp(123px,30%,138px);
+    position:relative;
     margin-top:-16px;
     max-width:100%;
     overflow:visible;
 }
 
-/* V131 fixes regular monster rows with a hard 76px flex-basis. A Gameplay
-   BOSS must opt out of that flex sizing without another !important override;
-   switching the active one-BOSS row to grid makes the real card width owner
-   the V143 width variable below. Player cards and ordinary monster rows stay
-   on the existing flex layout. */
-#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{
-    display:grid;
-    grid-template-columns:1fr;
-    place-items:start center;
-    width:100%;
+/* B2/B3/B4 + F2/F3/F4 are one visual footprint. Empty Slot holders remain
+   available as geometry/VFX anchors, while the one Boss card owns all input. */
+#game-stage #battleMonsterArea.gameplay-boss-active > .v-fixed-boss-footprint{
+    position:absolute;
+    z-index:8;
+    left:calc(20% + 5px);
+    right:calc(20% + 5px);
+    top:var(--battle-enemy-safe-top);
+    bottom:0;
+    overflow:visible;
+    pointer-events:none;
 }
 
-/* Only Gameplay Center BOSSes receive the portrait treatment. The selector
-   deliberately mirrors the shared V143 battle namespace, then adds the live
-   Gameplay-BOSS marker so these variables outrank the generic 82x106 rank rule
-   without another !important. Height is derived from the card's current 9:16 ratio. */
-#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{
-    --v143-monster-card-width:var(--gameplay-boss-card-width);
-    --v143-monster-card-height:auto;
-    --v143-monster-icon-width:calc(100% - 12px);
-    --v143-monster-icon-height:auto;
-    --v143-monster-bar-width:calc(100% - 10px);
-    --v143-monster-bar-font-size:9.5px;
-    --v143-monster-bar-letter-spacing:-.45px;
-    aspect-ratio:9 / 16;
-    box-sizing:border-box;
-    align-self:start;
-    overflow:hidden;
-}
-
-/* The portrait owns most of the vertical card. Background portraits and real
-   img children both fit inside the card without distortion or horizontal crop. */
-#game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon{
-    aspect-ratio:9 / 11;
-    overflow:hidden;
-    border-radius:8px;
-    background-position:center;
-    background-repeat:no-repeat;
-    background-size:contain;
-}
-
-#game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-icon > img{
-    display:block;
+#game-stage #battleMonsterArea.gameplay-boss-active > .v-fixed-boss-footprint > .battle-monster.gameplay-boss-card{
+    position:absolute;
+    inset:0;
     width:100%;
     height:100%;
-    object-fit:contain;
-    object-position:center;
-}
-
-#game-stage #battlePage .battle-monster.gameplay-boss-card .battle-monster-name,
-#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-status-badges,
-#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-hp,
-#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-sp{
-    max-width:100%;
-    box-sizing:border-box;
-}
-
-#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-hp,
-#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-sp{
-    width:calc(100% - 10px);
-    min-width:0;
-}
-
-/* Boss resource labels are non-wrapping overlays. Keep their rendered text
-   inside the narrower portrait bar so large HP values cannot produce hidden
-   horizontal scroll overflow on mobile. */
-#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-bar-text{
-    max-width:100%;
-    overflow:hidden;
-    text-overflow:clip;
-}
-
-#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-status-badges{
-    width:100%;
-    justify-content:center;
-}
-
-#game-stage #battlePage .battle-monster.gameplay-boss-card .damage-popup{
-    display:block;
-}
-
-#game-stage #battleMonsterArea{
-    position:relative;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-slot{
-    position:relative;
-    z-index:18;
-    display:none;
-    width:100%;
-    min-height:0;
-    box-sizing:border-box;
-    flex:0 0 auto;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    align-items:flex-start;
-    justify-content:center;
-    gap:4px;
-    margin:3px auto 0;
-    pointer-events:none;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-slot.active{
-    display:grid;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-position{
-    position:relative;
-    display:flex;
     min-width:0;
     min-height:0;
-    align-items:flex-start;
-    justify-content:center;
-    pointer-events:none;
-}
-
-/* Mechanism cards are 50% larger than their original 82–92px owner size.
-   Width/flex-basis stay paired so no transform/zoom distorts targeting. */
-#game-stage #battleMonsterArea .boss-mechanism-card{
-    position:relative;
-    display:flex;
-    width:var(--gameplay-mechanism-card-width);
-    min-width:0;
-    min-height:0;
-    aspect-ratio:4 / 3;
-    box-sizing:border-box;
-    flex:0 0 var(--gameplay-mechanism-card-width);
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    gap:1px;
-    padding:2px 3px;
-    overflow:hidden;
-    border:2px solid var(--mechanism-color,#d5aa56);
-    border-radius:9px;
-    color:#eadbbd;
-    background:
-        radial-gradient(circle at 50% 0,var(--mechanism-glow,rgba(216,167,75,.22)),transparent 55%),
-        linear-gradient(180deg,rgba(37,27,17,.98),rgba(8,6,4,.98));
-    box-shadow:0 0 10px var(--mechanism-glow,rgba(216,167,75,.25)),inset 0 0 0 1px rgba(255,255,255,.07);
-    text-align:center;
-    pointer-events:auto;
-    animation:gameplayMechanismEnter .24s ease-out both;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="shield"]{ --mechanism-color:#e1b957;--mechanism-glow:rgba(225,185,87,.32); }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="charge"]{ --mechanism-color:#d45743;--mechanism-glow:rgba(212,87,67,.34); }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="heal"]{ --mechanism-color:#58a986;--mechanism-glow:rgba(88,169,134,.3); }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="amplify"]{ --mechanism-color:#b66bd0;--mechanism-glow:rgba(182,107,208,.3); }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="seal"]{ --mechanism-color:#6d91ce;--mechanism-glow:rgba(109,145,206,.3); }
-
-#game-stage #battleMonsterArea .boss-mechanism-card.targetable{
-    cursor:crosshair;
-    animation:gameplayMechanismTarget 1s ease-in-out infinite;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-card.target{
-    box-shadow:0 0 0 2px #fff0b4,0 0 16px var(--mechanism-color);
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-card.blocked-pulse{
-    animation:gameplayMechanismBlocked .35s ease-out;
-}
-
-/* Keep the destroy animation without leaving an invisible flex placeholder. */
-#game-stage #battleMonsterArea .boss-mechanism-card.destroying{
-    position:absolute;
-    pointer-events:none;
-    animation:gameplayMechanismDestroy .28s ease-in both;
-}
-
-/* DOM order stays stable for targeting; CSS order turns it into a portrait
-   mechanism-card hierarchy: type -> name -> HP -> concise battlefield effect. */
-#game-stage #battleMonsterArea .boss-mechanism-kind{
-    order:1;
-    display:block;
-    max-width:100%;
-    padding:0 4px;
-    border:1px solid color-mix(in srgb,var(--mechanism-color) 62%,transparent);
-    border-radius:999px;
-    color:var(--mechanism-color);
-    background:rgba(6,5,4,.62);
-    font-family:"Noto Serif TC",serif;
-    font-size:10px;
-    font-weight:900;
-    line-height:11px;
-    letter-spacing:.5px;
-    white-space:nowrap;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-name{
-    order:2;
-    display:-webkit-box;
-    max-width:100%;
-    min-height:12px;
-    overflow:hidden;
-    color:#fff0c4;
-    font-family:"Noto Serif TC",serif;
-    font-size:11px;
-    font-weight:900;
-    line-height:12px;
-    text-align:center;
-    text-overflow:clip;
-    white-space:normal;
-    overflow-wrap:anywhere;
-    -webkit-box-orient:vertical;
-    -webkit-line-clamp:1;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-hp{
-    order:3;
-    display:flex;
-    width:100%;
-    min-height:12px;
-    box-sizing:border-box;
-    align-items:center;
-    justify-content:center;
-    padding:0 2px;
-    border:1px solid rgba(248,199,101,.55);
-    border-radius:999px;
-    color:#ffe3a0;
-    background:linear-gradient(180deg,rgba(107,29,20,.92),rgba(47,10,8,.92));
-    box-shadow:inset 0 1px 0 rgba(255,239,183,.18),0 0 7px rgba(177,50,34,.18);
-    font-size:9.5px;
-    font-weight:900;
-    line-height:1.05;
-    letter-spacing:-.45px;
-    text-shadow:0 1px 2px #000;
-    white-space:nowrap;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-card::after{
-    display:none;
-}
-
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="shield"]::after{ content:"護體中・優先擊破"; }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="charge"]::after{ content:"倒數重擊・擊破可取消"; }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="heal"]::after{ content:"每回合回復 BOSS 4%"; }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="amplify"]::after{ content:"BOSS 傷害提高25%"; }
-#game-stage #battleMonsterArea .boss-mechanism-card[data-type="seal"]::after{ content:"治療／SP 回復 -40%"; }
-
-/* Information is deliberately separate from attack targeting: the battlefield
-   mechanism card remains the combat target; this right-side control opens the
-   full explanation and can be collapsed with 返回. */
-#game-stage #battlePage .boss-mechanism-info-host{
-    position:absolute;
-    z-index:74;
-    inset:0;
-    pointer-events:none;
-}
-
-#game-stage #battlePage .boss-mechanism-info-alert{
-    position:absolute;
-    top:146px;
-    right:9px;
-    display:none;
-    width:42px;
-    height:42px;
-    box-sizing:border-box;
-    place-items:center;
-    padding:0;
-    border:2px solid #ff5a50;
-    border-radius:50%;
-    color:#fff5ee;
-    background:radial-gradient(circle,#b51f1a 0,#5e0d0a 68%,#220302 100%);
-    box-shadow:0 0 0 2px rgba(255,74,64,.22),0 0 18px rgba(255,42,31,.85);
-    font-family:"Noto Serif TC",serif;
-    font-size:27px;
-    font-weight:900;
-    line-height:1;
-    text-shadow:0 1px 2px #000;
-    pointer-events:auto;
-    animation:gameplayMechanismInfoAlert .48s ease-in-out infinite;
-}
-
-#game-stage #battlePage .boss-mechanism-info-host.has-mechanism:not(.open) .boss-mechanism-info-alert{
-    display:grid;
-}
-
-#game-stage #battlePage .boss-mechanism-info-panel{
-    position:absolute;
-    top:78px;
-    right:8px;
-    display:none;
-    width:170px;
-    height:302px;
-    aspect-ratio:9 / 16;
-    box-sizing:border-box;
-    flex-direction:column;
-    gap:8px;
-    padding:9px;
-    overflow:hidden;
-    border:2px solid #bd8240;
-    border-radius:11px;
-    color:#eadbbd;
-    background:
-        radial-gradient(circle at 50% 0,rgba(215,150,63,.22),transparent 48%),
-        linear-gradient(180deg,rgba(35,24,14,.98),rgba(8,6,4,.98));
-    box-shadow:0 10px 30px rgba(0,0,0,.72),0 0 16px rgba(213,153,66,.3),inset 0 0 0 1px rgba(255,237,188,.07);
-    pointer-events:auto;
-}
-
-#game-stage #battlePage .boss-mechanism-info-host.open .boss-mechanism-info-panel{
-    display:flex;
-}
-
-#game-stage #battlePage .boss-mechanism-info-back{
-    flex:0 0 auto;
-    align-self:flex-start;
-    min-height:32px;
-    padding:5px 7px;
-    border:1px solid #8f6735;
-    border-radius:7px;
-    color:#f0d49a;
-    background:linear-gradient(180deg,#332416,#17100a);
-    font-size:13px;
-    font-weight:900;
-}
-
-#game-stage #battlePage .boss-mechanism-info-body{
-    display:flex;
-    min-height:0;
-    flex:1 1 auto;
-    flex-direction:column;
-    gap:8px;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    overscroll-behavior-y:contain;
-    touch-action:pan-y;
-}
-
-#game-stage #battlePage .boss-mechanism-info-card{
-    display:flex;
-    flex:0 0 auto;
-    flex-direction:column;
-    gap:3px;
-    padding:6px 7px;
-    border:1px solid #836238;
-    border-radius:8px;
-    background:rgba(11,8,5,.72);
-}
-
-#game-stage #battlePage .boss-mechanism-info-name{
-    color:#fff0c4;
-    font-family:"Noto Serif TC",serif;
-    font-size:17px;
-    font-weight:900;
-    line-height:1.25;
-}
-
-#game-stage #battlePage .boss-mechanism-info-kind{
-    color:#e4b961;
-    font-size:14px;
-    font-weight:900;
-}
-
-#game-stage #battlePage .boss-mechanism-info-hp{
-    color:#ffdda0;
-    font-size:13px;
-    font-weight:900;
-}
-
-#game-stage #battlePage .boss-mechanism-info-effect{
     margin:0;
-    color:#c9bda7;
-    font-size:13px;
-    font-weight:700;
-    line-height:1.35;
+    padding:0;
+    overflow:visible;
+    border:0 !important;
+    outline:0 !important;
+    border-radius:0;
+    background:none !important;
+    box-shadow:none !important;
+    pointer-events:auto;
 }
 
-@keyframes gameplayMechanismInfoAlert{
-    0%,100%{ filter:brightness(1);transform:scale(1);box-shadow:0 0 0 2px rgba(255,74,64,.18),0 0 9px rgba(255,42,31,.55); }
-    50%{ filter:brightness(1.65);transform:scale(1.09);box-shadow:0 0 0 4px rgba(255,74,64,.34),0 0 23px rgba(255,42,31,1); }
+#game-stage #battleMonsterArea .v-fixed-enemy-slot[data-slot="ENEMY_B1"],
+#game-stage #battleMonsterArea .v-fixed-enemy-slot[data-slot="ENEMY_B5"]{
+    z-index:12;
+}
+#game-stage #battleMonsterArea .v-fixed-enemy-slot[data-slot="ENEMY_F1"],
+#game-stage #battleMonsterArea .v-fixed-enemy-slot[data-slot="ENEMY_F5"]{
+    z-index:16;
 }
 
-#game-stage #battlePage .battle-monster.gameplay-boss-protected{
-    opacity:.58;
-    filter:saturate(.65) brightness(.72);
-    cursor:not-allowed;
-}
-
-#game-stage #battlePage .battle-monster.gameplay-boss-protected::after{
-    content:"鎖";
+#game-stage #battlePage .gameplay-boss-card > .v174-battle-art{
     position:absolute;
-    z-index:9;
-    top:3px;
-    right:3px;
-    display:grid;
-    width:20px;
-    height:20px;
-    place-items:center;
-    border:1px solid #e2b85c;
-    border-radius:50%;
-    color:#ffe19a;
-    background:rgba(24,15,6,.9);
-    font-size:9px;
-    font-weight:900;
-}
-
-#game-stage #battlePage .boss-mechanism-toast{
-    position:absolute;
-    z-index:80;
-    top:74px;
-    left:50%;
-    padding:5px 11px;
-    transform:translateX(-50%);
-    border:1px solid #c79545;
-    border-radius:999px;
-    color:#ffe8aa;
-    background:rgba(13,9,5,.94);
-    box-shadow:0 0 12px rgba(219,158,53,.32);
-    font-size:11px;
-    font-weight:900;
+    z-index:1;
+    left:0;
+    right:0;
+    top:-4px;
+    bottom:44px;
+    width:auto;
+    height:auto;
+    background-position:center bottom;
+    background-repeat:no-repeat;
+    background-size:contain;
     pointer-events:none;
-    animation:gameplayMechanismToast .9s ease-out both;
 }
 
-@keyframes gameplayMechanismEnter{
-    from{ opacity:0;transform:translateY(-10px) scale(.76); }
-    to{ opacity:1;transform:translateY(0) scale(1); }
+#game-stage #battlePage .gameplay-boss-card > .battle-monster-icon,
+#game-stage #battlePage .gameplay-boss-card > .battle-monster-level{
+    display:none;
 }
 
-@keyframes gameplayMechanismTarget{
-    0%,100%{ box-shadow:0 0 7px var(--mechanism-glow); }
-    50%{ box-shadow:0 0 0 2px rgba(255,240,190,.64),0 0 15px var(--mechanism-color); }
+#game-stage #battlePage .gameplay-boss-card > .battle-monster-name,
+#game-stage #battlePage .gameplay-boss-card > .monster-hp,
+#game-stage #battlePage .gameplay-boss-card > .monster-sp,
+#game-stage #battlePage .gameplay-boss-card > .monster-status-badges{
+    position:absolute;
+    left:8%;
+    right:8%;
+    width:auto;
+    box-sizing:border-box;
+    z-index:22;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .gameplay-boss-card > .battle-monster-name{
+    position:absolute !important;
+    top:auto !important;
+    bottom:0 !important;
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    flex:none !important;
+    width:auto !important;
+    height:16px !important;
+    min-height:16px !important;
+    max-height:16px !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#f4d88f;
+    font-size:14px;
+    line-height:16px;
+    text-align:center;
+}
+#game-stage #battlePage .gameplay-boss-card > .monster-hp,
+#game-stage #battlePage .gameplay-boss-card > .monster-sp{
+    position:absolute !important;
+    top:auto !important;
+    display:block !important;
+    flex:none !important;
+    margin:0 !important;
+    height:var(--battle-resource-bar-height,11px) !important;
+    min-height:var(--battle-resource-bar-height,11px) !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    overflow:hidden !important;
+}
+#game-stage #battlePage .gameplay-boss-card > .monster-hp{bottom:29px !important;}
+#game-stage #battlePage .gameplay-boss-card > .monster-sp{bottom:17px !important;}
+#game-stage #battlePage .gameplay-boss-card .monster-bar-text{
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    height:var(--battle-resource-bar-height,11px) !important;
+    font-size:10px;
+    line-height:var(--battle-resource-bar-height,11px) !important;
+}
+#game-stage #battlePage .gameplay-boss-card > .monster-status-badges{
+    bottom:53px;
+    min-height:12px;
+}
+#game-stage #battlePage .gameplay-boss-card > .monster-hp > .boss-hp-shield-overlay{
+    position:absolute;
+    top:0;
+    height:100%;
+    width:0;
+    z-index:1;
+    background:rgba(255,255,255,.92);
+    box-shadow:inset 0 0 2px rgba(0,0,0,.35);
+    transition:left .25s ease,width .25s ease;
+    pointer-events:none;
+}
+#game-stage #battlePage .gameplay-boss-card > .monster-hp > .monster-bar-text{
+    position:relative;
+    z-index:2;
 }
 
-@keyframes gameplayMechanismBlocked{
-    0%,100%{ filter:brightness(1);transform:scale(1); }
-    45%{ filter:brightness(1.7);transform:scale(1.06); }
+/* Boss objects and reinforcements use the normal cardless Unit pipeline.
+   Their artwork may overhang vertically, but their F1/F5 or B1/B5 holder clips
+   neither HUD nor portrait and never invades the central Boss footprint. */
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.gameplay-boss-active .v-fixed-enemy-slot[data-slot$="1"] .v174-battle-art{
+    left:-2px !important;
+    right:14px !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.gameplay-boss-active .v-fixed-enemy-slot[data-slot$="5"] .v174-battle-art{
+    left:14px !important;
+    right:-2px !important;
 }
 
-@keyframes gameplayMechanismDestroy{
-    0%{ opacity:1;transform:scale(1);filter:brightness(1); }
-    55%{ opacity:.8;transform:scale(1.08) rotate(2deg);filter:brightness(1.8); }
-    100%{ opacity:0;transform:scale(.55) rotate(-4deg);filter:brightness(.5); }
-}
-
-@keyframes gameplayMechanismToast{
-    0%{ opacity:0;transform:translate(-50%,6px); }
-    18%,70%{ opacity:1;transform:translate(-50%,0); }
-    100%{ opacity:0;transform:translate(-50%,-5px); }
-}
-
-@media (prefers-reduced-motion:reduce){
-    #game-stage #battleMonsterArea .boss-mechanism-card,
-    #game-stage #battleMonsterArea .boss-mechanism-card.targetable,
-    #game-stage #battleMonsterArea .boss-mechanism-card.blocked-pulse,
-    #game-stage #battleMonsterArea .boss-mechanism-card.destroying,
-    #game-stage #battlePage .boss-mechanism-info-alert,
-    #game-stage #battlePage .boss-mechanism-toast{
-        animation-duration:.01ms;
-        animation-iteration-count:1;
-    }
-}
-
-/* If the physical viewport is short, both battlefield cards shrink together.
-   Never solve a collision by changing only one member of the pair. */
-@media (max-height:920px){
-    #game-stage #battleMonsterArea.gameplay-boss-active{
-        --gameplay-boss-card-width:clamp(108px,27%,122px);
-        --gameplay-mechanism-card-width:clamp(117px,29.25%,132px);
+@media (max-height:760px){
+    #game-stage #battleMonsterArea.gameplay-boss-active > .v-fixed-boss-footprint{
+        left:calc(20% + 5px);
+        right:calc(20% + 5px);
     }
 }

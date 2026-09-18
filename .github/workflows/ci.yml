@@ -73,6 +73,8 @@ jobs:
       - name: Run battle layout, timing and range-VFX regressions
         run: |
           node tests/battle-layout-vfx-runtime-20260917.test.js
+          node tests/boss-battle-architecture-convergence-20260918.test.js
+          node tests/gameplay-boss-tower-system.test.js
           node tests/v142-skill-animation.test.js
           node tests/v150-ice-arrow-rain-vfx.test.js
           node tests/v173.23-wind-vfx.test.js
@@ -124,7 +126,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fixed-slot-battlefield-browser-qa-${{ github.sha }}
-          path: artifacts/browser-qa/fixed-slot-battlefield-rendering-v2.json
+          path: |
+            artifacts/browser-qa/fixed-slot-battlefield-rendering-v2.json
+            artifacts/browser-qa/boss-battle-convergence-412x915.png
           if-no-files-found: error
           retention-days: 90
 
@@ -148,6 +152,7 @@ jobs:
             artifacts/browser-qa/battle-layer-audio-live-qa.json
             artifacts/browser-qa/battle-layout-wind-flame-mobile.png
             artifacts/browser-qa/battle-layer-element-box-mobile.png
+            artifacts/browser-qa/boss-target-entity-live-412x915.png
           if-no-files-found: error
           retention-days: 90
 

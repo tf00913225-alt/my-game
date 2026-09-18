@@ -45,10 +45,18 @@ test("Live production cast QA enters through declaration and captures its V143 s
     assert.ok(start>=0&&end>start,"live QA must own one atomic production-cast browser task");
     const snapshot=liveQa.slice(start,end);
     assert.match(snapshot,/queuedPlayerActions\[0\]=\{action:'explosiveFlurry',target:2,targetAlly:null\}/);
+    assert.match(snapshot,/player\.agility=Math\.max\(originalAgility,100000\)/);
     assert.match(snapshot,/startResolutionPhase\(battleToken\)/);
+    assert.doesNotMatch(snapshot,/initiativeQueue\.sort/);
     assert.match(snapshot,/waitFor\(client,"document\.getElementById\('v143-skill-stage'\)\?\.dataset\.skill==='explosiveFlurry'"/);
     assert.match(snapshot,/document\.getElementById\('v143-skill-stage'\)/);
     assert.doesNotMatch(liveQa,/visible V143 skill layer/);
+});
+
+test("Live Boss geometry is measured after the formal entrance choreography",()=>{
+    assert.match(liveQa,/completed Boss entrance choreography/);
+    assert.match(liveQa,/v141-preparing-entry/);
+    assert.match(liveQa,/v141-entry-moving/);
 });
 
 test("Skill SFX and general combat feedback are both exactly doubled",()=>{

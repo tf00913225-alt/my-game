@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-18-boss-hud-world-reinforcement-hit-shield",
+  "baseBranch": "dev",
+  "baseCommit": "9e0ba369925e3c857bc6a8c619fcd071c87d94bc",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "mainPromotionAllowed": false,
+  "requirements": [
+    {
+      "id": "BOSS-HUD-WIDTH-01",
+      "status": "IMPLEMENTED",
+      "requirement": "Personal／World Boss 的 HP 與 SP 由 Boss HUD owner 取得完整寬度，不得受一般怪物 68px 資源條規則限制。",
+      "evidence": ["css/40-v143-combat-dungeon-polish.css", "css/gameplay-boss-tower.css", "tests/battle-presentation-followup-browser.test.js"]
+    },
+    {
+      "id": "WORLD-REINFORCEMENT-SNAPSHOT-02",
+      "status": "IMPLEMENTED",
+      "requirement": "World Boss Stage 3／4 實際召喚後，live snapshot、card slot 與 holder slot 都維持 ENEMY_B1／ENEMY_B5。",
+      "evidence": ["js/gameplay-boss-tower-system.js", "tests/gameplay-boss-tower-system.test.js"]
+    },
+    {
+      "id": "ENEMY-HIT-FEEDBACK-03",
+      "status": "IMPLEMENTED",
+      "requirement": "Enemy-side HP damage 不建立紅色 HP popup，且不觸發 v174 hit shake；玩家側回饋不變。",
+      "evidence": ["js/00-main.js", "js/54-v173.51-battle-qa.js", "tests/boss-battle-architecture-convergence-20260918.test.js"]
+    },
+    {
+      "id": "BOSS-SHIELD-IN-HP-04",
+      "status": "IMPLEMENTED",
+      "requirement": "Personal／World／Tower Boss 的白色 Shield 直接位於同一條 HP bar，依正式玩家 HP+Shield 比例同步，無獨立 Shield HUD。",
+      "evidence": ["js/gameplay-boss-tower-system.js", "css/gameplay-boss-tower.css", "tests/gameplay-boss-tower-system.test.js"]
+    }
+  ],
+  "verification": "Pending: Chrome browser QA at 412x915, remote Repository checks, merged dev deployment SHA verification, and deployed Runtime verification.",
+  "promotionApproval": "MAIN MUST REMAIN UNCHANGED",
+  "releasedAs": null
+}

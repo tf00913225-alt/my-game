@@ -110,6 +110,18 @@ Cache、版本、Service Worker 更新只允許處理靜態資源 Cache。禁止
 
 CI 無法取代所有 UI／手機實機、操作手感、視覺完整性、使用者主觀確認；這些項目需在 Requirement Checklist 中清楚標明驗證方式。遠端 GitHub CI 也無法看見開發者尚未 commit 的本機工作目錄，因此「功能改了但沒進 commit」仍必須由開發代理在 push 前以 `git status`／`git diff --cached`／commit diff 進行工作區驗證。
 
+## 20. dev → main 發布期間的修復回流
+
+發布檢查、Code Review、QA、Browser Test、Security Check 或自動審查若發現程式問題，正式流程固定為：
+
+`最新 dev → 新 fix/ 分支 → 最小必要測試 → PR 回 dev → CI 綠燈 → 合併 dev → 以最新 dev 重跑 main 發布檢查 → dev 合併 main`。
+
+- 禁止直接只修 main。
+- 禁止只在既有 dev → main PR 的 head 上保留一份 dev 沒有的修復。
+- main 不得出現 dev 尚未擁有的獨立程式修復。
+- 發布 PR 已開啟時，仍必須先讓修復正式進入 dev，再重新核對發布 PR diff。
+- 任一時刻若形成 `dev = A`、`main = A + 修復 B`，Release Gate 必須失敗並停止發布。
+
 
 ## 正式版本與 CHANGELOG 對應規則
 

@@ -14,7 +14,10 @@
     const ENEMY_FRONT=Object.freeze(["ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"]);
     const ALLY_FRONT=Object.freeze(["ALLY_F1","ALLY_F2","ALLY_F3"]);
     const ALLY_BACK=Object.freeze(["ALLY_B1","ALLY_B2","ALLY_B3"]);
-    const MECHANISM=Object.freeze(["MECH_L","MECH_C","MECH_R"]);
+    const BOSS_FOOTPRINT=Object.freeze([
+        "ENEMY_B2","ENEMY_B3","ENEMY_B4",
+        "ENEMY_F2","ENEMY_F3","ENEMY_F4"
+    ]);
     const ENEMY_SLOTS=Object.freeze(ENEMY_BACK.concat(ENEMY_FRONT));
     const ALLY_SLOTS=Object.freeze(ALLY_FRONT.concat(ALLY_BACK));
 
@@ -59,7 +62,6 @@
     ENEMY_FRONT.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"enemy",row:"front",column:index+1}); });
     ALLY_FRONT.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"ally",row:"front",column:index+1}); });
     ALLY_BACK.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"ally",row:"back",column:index+1}); });
-    MECHANISM.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"mechanism",row:"mechanism",column:index+1}); });
     Object.freeze(SLOT_META);
 
     function validEnemyFormationType(value){
@@ -183,6 +185,15 @@
         return true;
     }
 
+    function removeMonsterFromSlot(snapshot,monsterIndex){
+        if(!snapshot||!Number.isInteger(monsterIndex)){ return false; }
+        const current=slotForMonster(snapshot,monsterIndex);
+        if(!current){ return false; }
+        snapshot.slotToMonsterIndex[current]=null;
+        delete snapshot.monsterIndexToSlot[monsterIndex];
+        return true;
+    }
+
     function assignMonsterToPreferredSlot(snapshot,monsterIndex,preferredSlots){
         const slots=(Array.isArray(preferredSlots)?preferredSlots:[]).filter(slot=>ENEMY_SLOTS.includes(slot));
         const target=slots.find(slot=>assignedMonsterAt(snapshot,slot)===null);
@@ -264,7 +275,6 @@
         const value=String(side||"").toLowerCase();
         if(value==="monster"||value==="enemy"){ return "enemy"; }
         if(value==="player"||value==="ally"){ return "ally"; }
-        if(value==="mechanism"||value==="mech"){ return "mechanism"; }
         return value;
     }
 
@@ -272,7 +282,6 @@
         const normalized=normalizeGeometrySide(side);
         if(normalized==="enemy"){ return ENEMY_SLOTS; }
         if(normalized==="ally"){ return ALLY_SLOTS; }
-        if(normalized==="mechanism"){ return MECHANISM; }
         return [];
     }
 
@@ -281,7 +290,7 @@
         if(!meta){ return null; }
         if(meta.side==="enemy"){ return '.v-fixed-enemy-slot[data-slot="'+slot+'"]'; }
         if(meta.side==="ally"){ return '.v-fixed-ally-slot[data-slot="'+slot+'"]'; }
-        return '.boss-mechanism-position[data-slot="'+slot+'"]';
+        return null;
     }
 
     function slotElement(slot){
@@ -353,13 +362,6 @@
         const allowed=geometrySlotsForSide(normalizedSide);
         if(!allowed.length){ return []; }
         const normalizedShape=normalizeShape(shape);
-        /* A mechanism card is a damage target, not a VFX-sized battlefield.
-           Single-target art stays on the card; any authored range keeps the
-           complete enemy-side visual footprint even though settlement still
-           contains only that mechanism target. */
-        if(MECHANISM.includes(primarySlot)&&(normalizedSide==="enemy"||normalizedSide==="mechanism")){
-            return normalizedShape==="single"?[primarySlot]:ENEMY_SLOTS.slice();
-        }
         if(normalizedShape==="all"){ return allowed.slice(); }
         if(!primarySlot||!allowed.includes(primarySlot)){
             return normalizedShape==="all"?allowed.slice():[];
@@ -553,7 +555,7 @@
         allySlots:ALLY_SLOTS,
         allyFrontSlots:ALLY_FRONT,
         allyBackSlots:ALLY_BACK,
-        mechanismSlots:MECHANISM,
+        bossFootprintSlots:BOSS_FOOTPRINT,
         slotMeta:SLOT_META,
         getEnemyFormationSlotRows:enemyRowsForType,
         getPrioritySlotsForFormation:prioritySlotsForType,
@@ -562,6 +564,7 @@
         getAssignedMonsterAtEnemySlot:assignedMonsterAt,
         getActiveMonsterAtEnemySlot:activeMonsterAt,
         assignMonsterToEnemySlot:assignMonsterToSlot,
+        removeMonsterFromEnemySlot:removeMonsterFromSlot,
         assignMonsterToPreferredEnemySlot:assignMonsterToPreferredSlot,
         getPriorityMonsterIndexes:priorityMonsterIndexes,
         getEnemySnapshotRows:snapshotRows,
@@ -620,12 +623,11 @@
        0.4 秒的回合交接＋1.6 秒的首位出手等待組成，不會錯疊成
        2+1.6＝3.6 秒，也不會再隨死亡數量越拖越久。
     */
-    const V138_ACTION_DELAY_MS=1600;
-    const V138_ROUND_TRANSITION_MS=2000;
-    const V138_ROUND_HANDOFF_DELAY_MS=Math.max(
-        0,
-        V138_ROUND_TRANSITION_MS-V138_ACTION_DELAY_MS
-    );
+    /* Historical diagnostic metadata only. The live timing owner is 00-main. */
+    const V138_ACTION_DELAY_MS=1250;
+    const V138_ROUND_TRANSITION_MS=1250;
+    const V138_ROUND_HANDOFF_DELAY_MS=800;
+    const V138_ROUND_ANNOUNCEMENT_DELAY_MS=450;
     const V173_32_WILD_ZONE_STRENGTHS=Object.freeze([
         0.75,0.90,0.95,1.00,1.05,1.10,1.15,1.20,1.25,1.30
     ]);
@@ -788,196 +790,10 @@
         return hours+"小時 "+minutes+"分鐘";
     }
 
-    function isInitiativeEntryActive(entry){
-        if(!entry){ return false; }
-        if(entry.type==="player"){
-            const character=getPartyCharacterByIndex(entry.characterIndex);
-            return !!(character && character.hp>0);
-        }
-        if(entry.type==="monster"){
-            const monster=monsters[entry.monsterIndex];
-            return !!(monster && monster.alive);
-        }
-        return false;
-    }
+    /* Queue advancement belongs exclusively to 00-main.js. Earlier pacing
+       wrappers duplicated finishPlayerAction/processNextCombatant and could
+       strand an initiative entry when a visual Promise completed out of order. */
 
-    function skipInactiveInitiativeEntries(){
-        while(
-            initiativeIndex<initiativeQueue.length &&
-            !isInitiativeEntryActive(initiativeQueue[initiativeIndex])
-        ){
-            processedInitiativeIndexes.add(initiativeIndex);
-            initiativeIndex++;
-        }
-    }
-
-    function consumeBattleAdvanceDelayOverride(fallback){
-        const override=typeof window!=="undefined"
-            ?Number(window.__battleAdvanceDelayOverrideMs):NaN;
-        if(typeof window!=="undefined"&&Number.isFinite(override)){
-            delete window.__battleAdvanceDelayOverrideMs;
-            return Math.max(0,override);
-        }
-        return fallback;
-    }
-
-    if(typeof finishPlayerAction==="function"){
-        finishPlayerAction=function(){
-            if(!battleActive){ return; }
-            clearInterval(timerId);
-            actionReady=false;
-            pendingAction=null;
-            clearBattleTargetSelectionMode();
-            if(checkBattleEnd()){ return; }
-            if(battleAdvanceScheduled){ return; }
-            battleAdvanceScheduled=true;
-            const token=battleToken;
-
-            if(battlePhase==="declare"){
-                activeBattleCharacterIndex++;
-                const delayMs=consumeBattleAdvanceDelayOverride(BATTLE_DECLARE_ADVANCE_MS);
-                battleAdvanceTimeoutId=setTimeout(()=>{
-                    battleAdvanceTimeoutId=null;
-                    battleAdvanceScheduled=false;
-                    if(!battleActive || token!==battleToken){ return; }
-                    beginCharacterTurn(token);
-                },delayMs);
-                return;
-            }
-            initiativeIndex++;
-            skipInactiveInitiativeEntries();
-            const normalDelayMs=
-                initiativeIndex>=initiativeQueue.length
-                ? V138_ROUND_HANDOFF_DELAY_MS
-                : V138_ACTION_DELAY_MS;
-            const delayMs=consumeBattleAdvanceDelayOverride(normalDelayMs);
-            battleAdvanceTimeoutId=setTimeout(()=>{
-                battleAdvanceTimeoutId=null;
-                battleAdvanceScheduled=false;
-                if(!battleActive || token!==battleToken){ return; }
-                try{
-                    processNextCombatant(token);
-                }catch(error){
-                    console.error("V131 推進下一位時發生例外：",error);
-                    addBattleLog(
-                        "推進下一位時發生例外（"+
-                        ((error&&error.message)||"未知錯誤")+
-                        "），嘗試強制繼續。"
-                    );
-                    initiativeIndex++;
-                    processNextCombatant(token);
-                }
-            },delayMs);
-        };
-    }
-
-    /*
-       首位出手也套用跟一般有效出手相同的 1.6 秒節奏：
-       進入戰鬥／新回合開始後，第一位實際行動者不會立即跳出。
-       上面finishPlayerAction()的override已經確保「同一大回合內、
-       每一位角色/怪物實際出手之間」都固定等V138_ACTION_DELAY_MS，
-       但漏了兩個時間點——「進入戰鬥」到「這一回合第一位出手」、
-       跟「下一回合開始」到「新回合第一位出手」——這兩個時間點
-       原本都是宣告階段一結束，startResolutionPhase()馬上同步呼叫
-       processNextCombatant()，中間完全沒有停頓，造成「每回合的
-       第一下出手感覺特別快、節奏跟其他出手對不起來」。
-
-       這裡不改寫startResolutionPhase()本體（避免重做一套複雜的
-       結算階段初始化邏輯），改成標記法：startResolutionPhase()
-       被呼叫的當下，設一個旗標記住「等一下processNextCombatant()
-       第一次被呼叫時，要先補這段停頓」；processNextCombatant()
-       這邊只在偵測到這個旗標時，才把「真正執行」包進
-       setTimeout(...,V138_ACTION_DELAY_MS)裡延後，消費掉旗標後
-       就不會再影響同一回合裡後面正常的呼叫（那些已經各自被
-       finishPlayerAction()的排程過了，不會被這裡重複延遲）。
-    */
-    let v131PendingFirstResolveDelay=false;
-
-    /*
-       首位出手的等待要扣除宣告階段已花掉的時間：
-       只把上面那個「第一位出手前補一段延遲」寫死成
-       V138_ACTION_DELAY_MS 是不夠準的——宣告階段本身也會花時間
-       （每個自動角色會經過 beginCharacterTurn 的 150ms 自動出手延遲，
-       加上 finishPlayerAction 宣告分支的 BATTLE_DECLARE_ADVANCE_MS
-       90ms），所以「回合開始 → 第一位出手」實際上會變成
-       如果直接再等完整 1600ms，會讓第一位比後續出手多等宣告時間。
-
-       改成以「這一回合開始的時間點」為錨：等待時間 =
-       1600 - (宣告階段已經花掉的時間)，不足就不再等。這樣不管隊伍
-       有幾個自動角色、宣告階段花多久，玩家看到的
-       「第N回合開始 → 第一位出手」都會以 1.6 秒為目標。
-       如果宣告階段本身就超過 1.6 秒（例如手動角色思考很久），
-       等待會變成 0，玩家一按完就馬上結算，不會再無謂地多等。
-    */
-    let v131TurnStartedAt=0;
-
-    if(typeof startTurn==="function"){
-        const originalStartTurn=startTurn;
-        startTurn=function(token){
-            if(battleActive && token===battleToken){
-                v131TurnStartedAt=Date.now();
-            }
-            return originalStartTurn.apply(this,arguments);
-        };
-    }
-
-    if(typeof startResolutionPhase==="function"){
-        const originalStartResolutionPhase=startResolutionPhase;
-        startResolutionPhase=function(token){
-            /*
-               ★ 修正（實測抓到的bug）：startResolutionPhase()
-               本體自己就有防重複呼叫的機制（resolutionPhaseStarted
-               已經是true就直接return、不做任何事）——但如果我在
-               呼叫原本函式「之前」就無條件把旗標設成true，遇到
-               這種「重複呼叫、原本函式其實什麼都沒做」的情況，
-               旗標還是會被錯誤地重新架上，導致之後某個不相關的
-               processNextCombatant()呼叫被多延遲一次
-               （量測到同一回合內兩位角色間距變成3秒的雙倍延遲）。
-               這裡改成先複製原本函式自己的判斷條件，只有「這次
-               呼叫真的會執行」時才架旗標，跟原本函式的行為完全
-               對齊。
-            */
-            if(battleActive && token===battleToken && !resolutionPhaseStarted){
-                v131PendingFirstResolveDelay=true;
-            }
-            return originalStartResolutionPhase.apply(this,arguments);
-        };
-    }
-
-    if(typeof processNextCombatant==="function"){
-        const originalProcessNextCombatant=processNextCombatant;
-        processNextCombatant=function(token){
-            if(v131PendingFirstResolveDelay){
-                v131PendingFirstResolveDelay=false;
-
-                /* 扣掉宣告階段已經花掉的時間，讓「回合開始→第一位
-                   出手」剛好等於 V138_ACTION_DELAY_MS。 */
-                const elapsed=v131TurnStartedAt>0 ? (Date.now()-v131TurnStartedAt) : 0;
-                const wait=Math.max(0,V138_ACTION_DELAY_MS-elapsed);
-
-                setTimeout(()=>{
-                    if(!battleActive || token!==battleToken){ return; }
-                    originalProcessNextCombatant.call(this,token);
-                },wait);
-                return;
-            }
-            return originalProcessNextCombatant.apply(this,arguments);
-        };
-    }
-
-    getSkillTargets=function(centerIndex,targetType){
-        const owner=fixedBattlefieldSlots();
-        const snapshot=ensureEnemyFormationSnapshot(currentBattleMonsters);
-        if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
-            return owner.resolveEnemyTargets(
-                snapshot,
-                centerIndex,
-                targetType,
-                index=>!!(monsters[index]&&monsters[index].alive!==false&&Number(monsters[index].hp)>0)
-            );
-        }
-        return monsters[centerIndex]&&monsters[centerIndex].alive?[centerIndex]:[];
-    };
 
     function applyBattleFormation(){
         const area=document.getElementById("battleMonsterArea");
@@ -1116,7 +932,8 @@
     window.v138BattlePacing={
         actionDelayMs:V138_ACTION_DELAY_MS,
         roundDelayMs:V138_ROUND_TRANSITION_MS,
-        roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS
+        roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS,
+        roundAnnouncementDelayMs:V138_ROUND_ANNOUNCEMENT_DELAY_MS
     };
 
     function strengthenMonster(monster,multiplier){
@@ -11505,9 +11322,6 @@
 
     const VERSION="142-gate-only";
     const NORMAL_ANIMATION_MS=520;
-    const CURRENT_DECLARE_DELAY_MS=90;
-    const CURRENT_RESOLVE_DELAY_MS=1600;
-    const CURRENT_ROUND_HANDOFF_MS=400;
 
     const SPECS={
         flameSlash:[760,"basic","slash"],fireCritical:[1050,"medium","impact"],
@@ -11644,10 +11458,9 @@
 
     const state={
         sequence:0,active:null,latest:null,fallbackTimer:0,visibilityHandler:null,
-        tickets:{declare:null,resolve:null},roundGate:null,completedBoundaries:[],
         metrics:{
             version:VERSION,started:0,completed:0,superseded:0,
-            boundariesAdvanced:0,duplicateBoundariesBlocked:0,last:null
+            last:null
         }
     };
 
@@ -11661,6 +11474,19 @@
     function cleanup(){
         removeVisibilityHandler();
         if(state.fallbackTimer){ clearTimeout(state.fallbackTimer); state.fallbackTimer=0; }
+    }
+
+    function armGateDeadline(gate,duration,reason){
+        if(!gate||gate.done){ return false; }
+        if(state.fallbackTimer){ clearTimeout(state.fallbackTimer); state.fallbackTimer=0; }
+        const visualDuration=Math.max(0,Number(duration)||0);
+        gate.visualStartedAt=Date.now();
+        gate.deadline=gate.visualStartedAt+visualDuration;
+        state.fallbackTimer=setTimeout(
+            ()=>gate.complete(reason||"v142-timing-only"),
+            visualDuration
+        );
+        return true;
     }
 
     function identity(side,name,actorIndex){
@@ -11679,10 +11505,13 @@
         const gate={
             id:++state.sequence,key:key,
             battleToken:typeof battleToken!=="undefined"?battleToken:null,
-            config:config,startedAt:Date.now(),deadline:0,done:false,reason:null,
+            config:config,startedAt:Date.now(),visualStartedAt:0,deadline:0,done:false,reason:null,
             completionCount:0,promise:null,complete:null
         };
         gate.deadline=gate.startedAt+Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0);
+        gate.restartVisualTimeline=function(duration){
+            return armGateDeadline(gate,duration,"v142-v143-visual-complete");
+        };
         gate.promise=new Promise(resolve=>{ resolvePromise=resolve; });
         gate.complete=function(reason){
             if(gate.done){ return false; }
@@ -11717,13 +11546,13 @@
             style:config.style,element:config.element,side:meta.side||"player"
         };
 
-        /* V142 owns action completion even when V143 owns the pixels. Keep the
-           deadline independent from render:false so a VFX asset/DOM failure can
-           never leave the combat initiative waiting forever. V143 normally
-           completes the same idempotent gate at this deadline. */
-        state.fallbackTimer=setTimeout(
-            ()=>gate.complete(meta.render===false?"v142-render-safety-deadline":"v142-timing-only"),
-            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
+        /* The gate measures visual lifetime only. Queue progression never waits
+           on this Promise; 00-main.js reads the remaining time and schedules its
+           own deterministic handoff even if the raster renderer fails. */
+        armGateDeadline(
+            gate,
+            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0),
+            meta.render===false?"v142-render-safety-deadline":"v142-timing-only"
         );
         if(typeof document!=="undefined"&&document.addEventListener){
             state.visibilityHandler=function(){
@@ -11740,9 +11569,6 @@
         getLatest:function(){ return state.latest; },
         getMetrics:function(){ return Object.assign({},state.metrics,{active:!!state.active}); },
         dispose:function(){
-            state.tickets.declare=null;
-            state.tickets.resolve=null;
-            state.roundGate=null;
             if(state.active&&!state.active.done){ state.active.complete("dispose"); }
             else{ cleanup(); }
         },
@@ -11803,156 +11629,14 @@
         return gate;
     }
 
-    function rememberBoundary(key){
-        state.completedBoundaries.push(key);
-        if(state.completedBoundaries.length>48){
-            state.completedBoundaries.splice(0,state.completedBoundaries.length-48);
-        }
-    }
+    /* The visual gate owns only visual lifetime. Queue progression has one
+       owner in 00-main.js and can never wait on a renderer Promise. */
+    window.v142GetActiveAnimationGate=currentGate;
+    window.v142GetRemainingAnimationMs=function(){
+        const gate=currentGate();
+        return gate&&!gate.done?Math.max(0,gate.deadline-Date.now()):0;
+    };
 
-    function runTicket(kind,ticket,invoke){
-        const key=[kind,ticket.token,ticket.round,ticket.index,ticket.gateId].join("|");
-        if(ticket.consumed||state.completedBoundaries.indexOf(key)>=0){
-            state.metrics.duplicateBoundariesBlocked++;
-            return;
-        }
-        ticket.consumed=true;
-        const delay=Math.max(0,ticket.earliestAt-Date.now());
-        const timeReady=delay?new Promise(resolve=>setTimeout(resolve,delay)):Promise.resolve();
-        const animationReady=ticket.gate&&!ticket.gate.done?ticket.gate.promise:Promise.resolve();
-        Promise.all([timeReady,animationReady]).then(()=>{
-            if(state.completedBoundaries.indexOf(key)>=0){ return; }
-            if(typeof battleActive!=="undefined"&&!battleActive){ return; }
-            if(typeof battleToken!=="undefined"&&ticket.token!==battleToken){ return; }
-            rememberBoundary(key);
-            state.metrics.boundariesAdvanced++;
-            if(state.tickets[kind]===ticket){ state.tickets[kind]=null; }
-            invoke();
-        });
-    }
-
-    function resolveDelay(index){
-        return typeof initiativeQueue!=="undefined"&&index>=initiativeQueue.length
-            ?CURRENT_ROUND_HANDOFF_MS:CURRENT_RESOLVE_DELAY_MS;
-    }
-
-    function partyDefeated(){
-        if(typeof getPartyCharacterByIndex!=="function"){ return false; }
-        let found=false,alive=false;
-        for(let index=0;index<3;index++){
-            const character=getPartyCharacterByIndex(index);
-            if(character){ found=true; if(character.hp>0){ alive=true; } }
-        }
-        return found&&!alive;
-    }
-
-    function monstersDefeated(){
-        if(typeof currentBattleMonsters==="undefined"||!Array.isArray(currentBattleMonsters)||!currentBattleMonsters.length){ return false; }
-        return !currentBattleMonsters.some(index=>typeof monsters!=="undefined"&&monsters[index]&&monsters[index].alive);
-    }
-
-    const terminalLocks=new Set();
-    if(typeof finishPlayerAction==="function"){
-        const previous=finishPlayerAction;
-        finishPlayerAction=function(){
-            const gate=currentGate();
-            if((partyDefeated()||monstersDefeated())&&gate&&!gate.done){
-                const lock="terminal|"+gate.id;
-                if(terminalLocks.has(lock)){ return; }
-                terminalLocks.add(lock);
-                const that=this,args=arguments;
-                gate.promise.then(()=>{
-                    terminalLocks.delete(lock);
-                    if(typeof battleActive!=="undefined"&&!battleActive){ return; }
-                    previous.apply(that,args);
-                });
-                return;
-            }
-
-            const phase=typeof battlePhase!=="undefined"?battlePhase:null;
-            const token=typeof battleToken!=="undefined"?battleToken:null;
-            const beforeDeclare=typeof activeBattleCharacterIndex!=="undefined"?activeBattleCharacterIndex:null;
-            const beforeResolve=typeof initiativeIndex!=="undefined"?initiativeIndex:null;
-            const calledAt=Date.now();
-            const delayOverride=typeof window!=="undefined"&&Number.isFinite(Number(window.__battleAdvanceDelayOverrideMs))
-                ?Math.max(0,Number(window.__battleAdvanceDelayOverrideMs)):null;
-            const result=previous.apply(this,arguments);
-            const actionGate=currentGate();
-            const boundaryGate=delayOverride===null?actionGate:null;
-
-            if(phase==="declare"&&typeof activeBattleCharacterIndex!=="undefined"&&activeBattleCharacterIndex!==beforeDeclare){
-                state.tickets.declare={
-                    token:token,round:typeof turn!=="undefined"?turn:0,index:activeBattleCharacterIndex,
-                    gate:boundaryGate,gateId:boundaryGate?boundaryGate.id:"none",
-                    earliestAt:Math.max(
-                        calledAt+(delayOverride===null?CURRENT_DECLARE_DELAY_MS:delayOverride),
-                        boundaryGate?boundaryGate.deadline:0
-                    ),
-                    consumed:false
-                };
-            }else if(phase==="resolve"&&typeof initiativeIndex!=="undefined"&&initiativeIndex!==beforeResolve){
-                const roundEnded=typeof initiativeQueue!=="undefined"&&initiativeIndex>=initiativeQueue.length;
-                state.roundGate=roundEnded&&boundaryGate?{token:token,gate:boundaryGate,consumed:false}:null;
-                state.tickets.resolve={
-                    token:token,round:typeof turn!=="undefined"?turn:0,index:initiativeIndex,
-                    gate:boundaryGate,gateId:boundaryGate?boundaryGate.id:"none",
-                    earliestAt:Math.max(
-                        calledAt+(delayOverride===null?resolveDelay(initiativeIndex):delayOverride),
-                        boundaryGate?boundaryGate.deadline:0
-                    ),
-                    consumed:false
-                };
-            }
-            return result;
-        };
-    }
-
-    if(typeof beginCharacterTurn==="function"){
-        const previous=beginCharacterTurn;
-        beginCharacterTurn=function(token){
-            const ticket=state.tickets.declare;
-            if(ticket&&ticket.token===token&&typeof activeBattleCharacterIndex!=="undefined"&&ticket.index===activeBattleCharacterIndex){
-                const that=this,args=arguments;
-                runTicket("declare",ticket,()=>previous.apply(that,args));
-                return;
-            }
-            const roundGate=state.roundGate;
-            if(roundGate&&roundGate.token===token){
-                if(!roundGate.gate||roundGate.gate.done){
-                    state.roundGate=null;
-                    return previous.apply(this,arguments);
-                }
-                if(roundGate.consumed){
-                    state.metrics.duplicateBoundariesBlocked++;
-                    return;
-                }
-                roundGate.consumed=true;
-                const that=this,args=arguments;
-                roundGate.gate.promise.then(()=>{
-                    if(state.roundGate!==roundGate){ return; }
-                    state.roundGate=null;
-                    if(typeof battleActive!=="undefined"&&!battleActive){ return; }
-                    if(typeof battleToken!=="undefined"&&token!==battleToken){ return; }
-                    previous.apply(that,args);
-                });
-                return;
-            }
-            return previous.apply(this,arguments);
-        };
-    }
-
-    if(typeof processNextCombatant==="function"){
-        const previous=processNextCombatant;
-        processNextCombatant=function(token){
-            const ticket=state.tickets.resolve;
-            if(ticket&&ticket.token===token&&typeof initiativeIndex!=="undefined"&&ticket.index===initiativeIndex){
-                const that=this,args=arguments;
-                runTicket("resolve",ticket,()=>previous.apply(that,args));
-                return;
-            }
-            return previous.apply(this,arguments);
-        };
-    }
 
     function emperorAllies(){
         if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
@@ -12954,7 +12638,6 @@
 
     const VERSION="174-slot-geometry-owner";
     const DEFAULT_HIT=.5833333333;
-    const MECHANISM_TARGET_PREFIX="mechanism:";
     let blockedManifestWrites=0;
     let blockedDirectorOverrides=0;
     let blockedCardEffectOverrides=0;
@@ -13156,23 +12839,8 @@
         });
     }
 
-    function isMechanismTarget(index){
-        return typeof index==="string"&&index.indexOf(MECHANISM_TARGET_PREFIX)===0&&index.length>MECHANISM_TARGET_PREFIX.length;
-    }
-
-    function mechanismCardFor(index){
-        if(typeof document==="undefined"||!isMechanismTarget(index)){ return null; }
-        const slot=document.getElementById("bossMechanismSlot");
-        if(!slot||typeof slot.querySelectorAll!=="function"){ return null; }
-        const mechanismId=index.slice(MECHANISM_TARGET_PREFIX.length);
-        return Array.from(slot.querySelectorAll(".boss-mechanism-card")).find(card=>
-            card&&card.dataset&&card.dataset.id===mechanismId
-        )||null;
-    }
-
     function cardFor(side,index){
         if(typeof document==="undefined"){ return null; }
-        if(side==="monster"&&isMechanismTarget(index)){ return mechanismCardFor(index); }
         return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
     }
 
@@ -13184,10 +12852,6 @@
     }
 
     function canReceive(config,side,index){
-        if(side==="monster"&&isMechanismTarget(index)){
-            const card=cardFor(side,index);
-            return !!(card&&(!card.classList||!card.classList.contains("destroying")));
-        }
         const entity=entityFor(side,index);
         if(!entity){ return false; }
         if(String(config&&config.category||"")==="revive"){
@@ -13204,9 +12868,6 @@
     function slotForTarget(side,index,card){
         const owner=geometryOwner();
         if(!owner){ return null; }
-        if(side==="monster"&&isMechanismTarget(index)){
-            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;
-        }
         let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;
         if(!slot&&typeof owner.getSlotFromElement==="function"){
             slot=owner.getSlotFromElement(card||cardFor(side,index));
@@ -13215,6 +12876,13 @@
     }
 
     function slotAnchor(side,index,card){
+        const boss=window.FourSymbolsBossBattle;
+        if(side==="monster"&&boss&&typeof boss.getTargetGeometry==="function"){
+            const targetRect=boss.getTargetGeometry(index);
+            if(targetRect){
+                return {slot:isBossIndexForVfx(index)?"BOSS_FOOTPRINT":slotForTarget(side,index,card),x:targetRect.centerX,y:targetRect.centerY,rect:targetRect};
+            }
+        }
         const owner=geometryOwner();
         const slot=slotForTarget(side,index,card);
         if(!owner||!slot){ return null; }
@@ -13224,13 +12892,20 @@
         return {slot:slot,x:center.x,y:center.y,rect:rect};
     }
 
+    function isBossIndexForVfx(index){
+        const boss=window.FourSymbolsBossBattle;
+        return !!(boss&&typeof boss.isBossIndex==="function"&&boss.isBossIndex(index));
+    }
+
     function activeCards(side,config){
         const cards=[];
-        const max=side==="monster"?10:6;
-        for(let index=0;index<max;index++){
+        const indexes=side==="monster"&&typeof currentBattleMonsters!=="undefined"
+            ?currentBattleMonsters.filter(Number.isInteger)
+            :[0,1,2,3,4,5];
+        indexes.forEach(index=>{
             const card=cardFor(side,index);
             if(card&&card.offsetParent!==null&&canReceive(config,side,index)){ cards.push({index:index,card:card}); }
-        }
+        });
         return cards;
     }
 
@@ -13244,7 +12919,7 @@
             ?meta.targetIds
             :(meta.targetId!==undefined&&meta.targetId!==null?[meta.targetId]:[]);
         return Array.from(new Set(explicit.filter(index=>
-            (Number.isInteger(index)||isMechanismTarget(index))&&canReceive(config,targetSide,index)
+            Number.isInteger(index)&&canReceive(config,targetSide,index)
         )));
     }
 
@@ -13269,6 +12944,16 @@
     }
 
     function geometryPrimaryAnchor(current,indexes){
+        const seed=geometrySeedIndexes(current,indexes);
+        const primary=current&&current.targetId!==undefined&&current.targetId!==null
+            ?current.targetId:(seed.length?seed[0]:null);
+        if(current&&current.targetSide==="monster"&&Number.isInteger(primary)){
+            const boss=window.FourSymbolsBossBattle;
+            const targetRect=boss&&typeof boss.getTargetGeometry==="function"?boss.getTargetGeometry(primary):null;
+            if(targetRect){
+                return {slot:isBossIndexForVfx(primary)?"BOSS_FOOTPRINT":slotForTarget("monster",primary,cardFor("monster",primary)),x:targetRect.centerX,y:targetRect.centerY,rect:targetRect};
+            }
+        }
         const owner=geometryOwner();
         const slot=geometryPrimarySlot(current,indexes);
         if(!owner||!slot){ return null; }
@@ -13288,18 +12973,11 @@
         if(!owner||!current){ return null; }
         const seed=geometrySeedIndexes(current,indexes);
         const targetType=String(current.config&&current.config.targetType||"single");
-        const mechanismSlots=seed.filter(isMechanismTarget)
-            .map(index=>slotForTarget("monster",index,cardFor("monster",index))).filter(Boolean);
         if(placement==="battlefield"||targetType==="all"||targetType==="allyAll"){
             const rect=typeof owner.getSideRect==="function"?owner.getSideRect(current.targetSide):null;
             if(rect){ rect.id=current.targetSide==="monster"?"fixed-enemy-zone":"fixed-ally-zone"; }
             return rect;
         }
-        if(mechanismSlots.length&&/^single$/i.test(targetType)&&typeof owner.getRectForSlots==="function"){
-            const rect=owner.getRectForSlots(mechanismSlots);
-            if(rect){ rect.id="mechanism-slots"; return rect; }
-        }
-
         const primarySlot=geometryPrimarySlot(current,indexes);
         if(!primarySlot){ return null; }
 
@@ -13311,8 +12989,16 @@
             ?owner.getGeometryRectFromShape(current.targetSide,primarySlot,shape)
             :owner.getSlotRect(primarySlot);
         if(rect){
-            rect.id=mechanismSlots.length?"mechanism-range-zone":"fixed-slot-"+String(shape).toLowerCase();
-            rect.centerOnBounds=mechanismSlots.length&&!/^single$/i.test(shape);
+            const anchor=geometryPrimaryAnchor(current,indexes);
+            if(anchor&&isBossIndexForVfx(current.targetId)&&!/^all$/i.test(shape)){
+                rect.left=anchor.x-rect.width/2;
+                rect.right=anchor.x+rect.width/2;
+                rect.top=anchor.y-rect.height/2;
+                rect.bottom=anchor.y+rect.height/2;
+                rect.centerX=anchor.x;
+                rect.centerY=anchor.y;
+            }
+            rect.id="fixed-slot-"+String(shape).toLowerCase();
         }
         return rect;
     }
@@ -13343,13 +13029,17 @@
 
     function snapshotTimedEffects(){
         const snapshot=new Set();
-        [["monster",10],["player",6]].forEach(entry=>{
-            for(let index=0;index<entry[1];index++){
+        const groups=[
+            ["monster",typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[]],
+            ["player",[0,1,2,3,4,5]]
+        ];
+        groups.forEach(entry=>{
+            entry[1].forEach(index=>{
                 const entity=entityFor(entry[0],index);
                 Object.keys(RAW_STATUS_SPRITES).forEach(type=>{
                     if(hasTimedEffect(entity,type)){ snapshot.add(entry[0]+":"+index+":"+type); }
                 });
-            }
+            });
         });
         return snapshot;
     }
@@ -13433,7 +13123,8 @@
     function syncStatusSpriteEffects(){
         purgeLegacyCardVfx();
         const types=Object.keys(RAW_STATUS_SPRITES);
-        for(let index=0;index<10;index++){ types.forEach(type=>syncStatusSprite("monster",index,type)); }
+        const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
+        enemyIndexes.forEach(index=>types.forEach(type=>syncStatusSprite("monster",index,type)));
         for(let index=0;index<6;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }
     }
 
@@ -13671,6 +13362,8 @@
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         let node=current.spriteNodes.get(key);
         if(!node){
+            const initialSprite=!current.firstVisibleFrameAt;
+            if(initialSprite){ beginVisualTimeline(current); }
             node=appendSpriteNode(current);
             node.dataset.columns=String(sprite.columns);
             node.dataset.rows=String(sprite.rows);
@@ -13678,9 +13371,13 @@
             node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
             node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
             node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
-            node.style.setProperty(
-                "--v143-sprite-delay",
-                -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"
+            /* The first normal cast always begins at Frame 1. A later sprite
+               for a separately delayed target may catch up to the visual
+               timeline, but it must never rewrite the initial cast. */
+            node.dataset.emission=initialSprite?"initial":"late";
+            node.style.setProperty("--v143-sprite-delay",initialSprite
+                ?"0ms"
+                :-Math.min(current.duration,Math.max(0,Date.now()-(current.visualStartedAt||current.startedAt)))+"ms"
             );
             if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
             current.spriteNodes.set(key,node);
@@ -13708,10 +13405,25 @@
     }
 
     function targetHitTime(current,index){
+        const visualStartedAt=current.visualStartedAt||current.startedAt;
         return Math.min(
-            current.startedAt+current.duration-120,
-            current.startedAt+current.duration*(Number(current.model.hit)||DEFAULT_HIT)
+            visualStartedAt+current.duration-120,
+            visualStartedAt+current.duration*(Number(current.model.hit)||DEFAULT_HIT)
         );
+    }
+
+    function beginVisualTimeline(current){
+        if(!current||current.firstVisibleFrameAt){ return false; }
+        current.firstVisibleFrameAt=Date.now();
+        current.visualStartedAt=current.firstVisibleFrameAt;
+        if(current.gate&&typeof current.gate.restartVisualTimeline==="function"){
+            current.gate.restartVisualTimeline(current.duration);
+        }
+        current.cleanupTimer=setTimer(
+            ()=>cleanupCurrent(current,"v143-raster-complete"),
+            current.duration
+        );
+        return true;
     }
 
     function settleTargetVisual(current,index){
@@ -13789,7 +13501,7 @@
             ?meta.targetIds
             :(meta.targetId!==undefined&&meta.targetId!==null?[meta.targetId]:[]);
         explicitTargets.forEach(index=>{
-            if((Number.isInteger(index)||isMechanismTarget(index))&&cardFor(targetSide,index)){
+            if(Number.isInteger(index)&&cardFor(targetSide,index)){
                 validTargets.add(index);
             }
         });
@@ -13802,7 +13514,8 @@
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
             spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
-            startedAt:Date.now(),duration:duration,hitReached:false,done:false
+            startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,
+            duration:duration,hitReached:false,done:false,cleanupTimer:0
         };
         current.targetIndexes=initialTargetIndexes(config,current,targetSide);
 
@@ -13833,7 +13546,9 @@
             current.targetIndexes.slice().forEach(index=>emitSprite(current,index));
         }
 
-        setTimer(()=>cleanupCurrent(current,"v143-raster-complete"),Math.max(duration,Number(config.resolveDuration)||duration));
+        if(model.noVisual||!model.sprite){
+            current.cleanupTimer=setTimer(()=>cleanupCurrent(current,"v143-raster-complete"),duration);
+        }
         gate.promise.then(()=>{
             if(state.current===current&&!current.done){ cleanupCurrent(current,gate.reason||"gate-complete"); }
         });

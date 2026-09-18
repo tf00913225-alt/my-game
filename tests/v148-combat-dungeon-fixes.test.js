@@ -8,6 +8,7 @@ const index=fs.readFileSync("index.html","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
+const coreSource=fs.readFileSync("js/00-main.js","utf8");
 const source=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const css=fs.readFileSync("css/43-v148-combat-dungeon-fixes.css","utf8");
 const buildSource=fs.readFileSync("scripts/build-production.mjs","utf8");
@@ -87,7 +88,7 @@ test("V148 remains ordered inside the deterministic gameplay bundle",()=>{
         .forEach(path=>assert.equal(fs.existsSync(path),true,path+" must exist"));
 });
 
-test("tri targets follow the rendered fixed row without ACE skipping",()=>{
+test("core target owner resolves tri from the rendered fixed row without ACE skipping",()=>{
     const monsters=Array.from({length:5},(_,index)=>({
         alive:true,hp:100,v141FormationRow:0,v141FormationPosition:index
     }));
@@ -95,10 +96,14 @@ test("tri targets follow the rendered fixed row without ACE skipping",()=>{
         currentBattleMonsters:[0,1,2,3,4],monsters,
         getSkillTargets:()=>[0,2,4]
     });
-    setEnemyFormation(context,[0,1,2,3,4]);
-    assert.deepEqual(Array.from(context.getSkillTargets(2,"tri")),[1,2,3]);
+    const snapshot=setEnemyFormation(context,[0,1,2,3,4]);
+    const owner=context.FourSymbolsBattlefieldSlots;
+    const alive=index=>!!(monsters[index]&&monsters[index].alive!==false&&Number(monsters[index].hp)>0);
+    assert.doesNotMatch(source,/getSkillTargets\s*=/,"V148 must not replace the core target owner");
+    assert.match(coreSource,/function getSkillTargets\(centerIndex,targetType\)[\s\S]*?FourSymbolsBossBattle[\s\S]*?FourSymbolsBattlefieldSlots/);
+    assert.deepEqual(Array.from(owner.resolveEnemyTargets(snapshot,2,"tri",alive)),[1,2,3]);
     monsters[1].hp=0;
-    assert.deepEqual(Array.from(context.getSkillTargets(2,"tri")),[2,3],"a dead slot is filtered, not replaced by a farther card");
+    assert.deepEqual(Array.from(owner.resolveEnemyTargets(snapshot,2,"tri",alive)),[2,3],"a dead slot is filtered, not replaced by a farther card");
 });
 
 test("enemy Rage buffs only one adjacent trio",()=>{

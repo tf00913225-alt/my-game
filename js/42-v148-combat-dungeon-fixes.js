@@ -120,21 +120,6 @@
         return stableFormationRows(ordered).flatMap(centerFirstOrder).filter(monsterAlive);
     }
 
-    if(typeof getSkillTargets==="function"){
-        const previousGetSkillTargets=getSkillTargets;
-        getSkillTargets=function(centerIndex,targetType){
-            const owner=battlefieldSlots();
-            const snapshot=activeFormationSnapshot(
-                typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]
-            );
-            if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
-                return owner.resolveEnemyTargets(snapshot,centerIndex,targetType,monsterAlive);
-            }
-            const legacy=previousGetSkillTargets.apply(this,arguments);
-            return Array.isArray(legacy)?legacy.filter(monsterAlive):[];
-        };
-    }
-
     window.v148GetFormationRows=stableFormationRows;
     window.v148GetAutoTargetPriority=autoTargetPriority;
 
@@ -783,37 +768,8 @@
         };
     }
 
-    if(typeof processNextCombatant==="function"){
-        const previousProcessNext=processNextCombatant;
-        processNextCombatant=function(){
-            if(settleDefeatedEnemies()){ return; }
-            return previousProcessNext.apply(this,arguments);
-        };
-    }
-
-    if(typeof finishPlayerAction==="function"){
-        const previousFinishAction=finishPlayerAction;
-        let terminalPending=false;
-        finishPlayerAction=function(){
-            if(enemiesHaveNoHp()){
-                const gate=window.v142SkillAnimationDirector&&window.v142SkillAnimationDirector.getActive
-                    ?window.v142SkillAnimationDirector.getActive():null;
-                if(gate&&gate.promise&&!gate.done){
-                    if(terminalPending){ return; }
-                    terminalPending=true;
-                    const that=this;
-                    const args=arguments;
-                    gate.promise.then(()=>{
-                        terminalPending=false;
-                        if(!settleDefeatedEnemies()){ previousFinishAction.apply(that,args); }
-                    });
-                    return;
-                }
-                if(settleDefeatedEnemies()){ return; }
-            }
-            return previousFinishAction.apply(this,arguments);
-        };
-    }
+    /* Zero-HP settlement and queue advancement are owned by 00-main.js.
+       This feature module must never Promise-gate or replace either owner. */
 
     /* ----- Formal daily dungeons: one shared 3-wave × 6-enemy battle flow. ----- */
     const DAILY_ELEMENTS=["fire","water","earth","wind"];

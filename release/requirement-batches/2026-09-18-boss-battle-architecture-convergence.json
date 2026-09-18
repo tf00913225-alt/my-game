@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-18-boss-battle-architecture-convergence",
+  "baseBranch": "dev",
+  "baseCommit": "1142ba9c0cc0dac9200772326ba920d5b1a07fed",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "mainPromotionAllowed": false,
+  "requirements": [
+    {
+      "id": "BOSS-ENTITY-01",
+      "status": "VERIFIED",
+      "requirement": "Boss 是單一 target entity，中央六格只提供 visual footprint、點擊與 VFX 幾何。",
+      "evidence": ["js/gameplay-boss-tower-system.js", "js/battlefield-render-geometry-adapter.js", "tests/gameplay-boss-tower-system.test.js"]
+    },
+    {
+      "id": "BOSS-TARGET-02",
+      "status": "VERIFIED",
+      "requirement": "Boss 模式非 all 技能只命中指定單位；all 命中全部存活單位；一般戰鬥範圍規則隔離不變。",
+      "evidence": ["js/gameplay-boss-tower-system.js", "js/00-main.js", "tests/boss-battle-architecture-convergence-20260918.test.js"]
+    },
+    {
+      "id": "BOSS-OBJECT-03",
+      "status": "VERIFIED",
+      "requirement": "援軍使用 B1/B5；Boss 技能物件使用 F1/F5、無卡框、可受擊、canAct=false 且無一般獎勵。",
+      "evidence": ["js/gameplay-boss-tower-system.js", "css/gameplay-boss-tower.css", "tests/gameplay-boss-tower-system.test.js"]
+    },
+    {
+      "id": "BOSS-SHIELD-04",
+      "status": "VERIFIED",
+      "requirement": "金剛護體改為 Boss Shield，先吸收傷害且正確處理溢出。",
+      "evidence": ["js/gameplay-boss-tower-system.js", "js/00-main.js", "tests/gameplay-boss-tower-system.test.js"]
+    },
+    {
+      "id": "BATTLE-CARDLESS-05",
+      "status": "VERIFIED",
+      "requirement": "玩家、普通／精英敵人、Boss、援軍與 Boss 技能物件統一無卡框立繪，動態生成時立即套用。",
+      "evidence": ["js/54-v173.51-battle-qa.js", "js/battlefield-render-geometry-adapter.js", "css/fixed-slot-battlefield-rendering-v2.css"]
+    },
+    {
+      "id": "BATTLE-VFX-06",
+      "status": "VERIFIED",
+      "requirement": "四元素 single／tri／all／projectile 使用正式 Fixed Slot 幾何，Boss 傷害目標數與視覺範圍分離。",
+      "evidence": ["js/37-v142-skill-animation.js", "js/39-v143-skill-animation.js", "tests/v153-fire-vfx.test.js", "tests/battle-layout-vfx-runtime-20260917.test.js"]
+    },
+    {
+      "id": "BATTLE-FLOW-07",
+      "status": "VERIFIED",
+      "requirement": "核心是唯一回合推進 owner；VFX、秘寶、副本與追擊不得 Promise-gate 或覆寫完成／下一行動函式。",
+      "evidence": ["js/00-main.js", "js/37-v142-skill-animation.js", "js/42-v148-combat-dungeon-fixes.js", "js/43-v149-skill-ui-rules.js", "js/60-team-relic-system.js"]
+    },
+    {
+      "id": "BATTLE-HIT-08",
+      "status": "VERIFIED",
+      "requirement": "root red-hit 卡框退役；受擊由數字、立繪震動與 VFX 負責；Heal 不觸發紅色受擊。",
+      "evidence": ["js/00-main.js", "css/00-main.css", "css/fixed-slot-battlefield-rendering-v2.css"]
+    },
+    {
+      "id": "BATTLE-LAYOUT-09",
+      "status": "VERIFIED",
+      "requirement": "資訊抽屜在底部，操作／回合區在中間，元素匣 66px，抽屜按鈕上移且使用金色粗框箭頭。",
+      "evidence": ["css/fixed-slot-battlefield-rendering-v2.css", "tests/battle-layout-vfx-runtime-20260917.test.js"]
+    },
+    {
+      "id": "BATTLE-HUD-10",
+      "status": "VERIFIED",
+      "requirement": "玩家與普通敵方 HP 條共用 10px 高度與正式下方 HUD；立繪不侵入 HUD。",
+      "evidence": ["css/fixed-slot-battlefield-rendering-v2.css", "tests/ui-typography-battle-preservation.test.js"]
+    },
+    {
+      "id": "BATTLE-GOLD-LINE-11",
+      "status": "VERIFIED",
+      "requirement": "中間區殘留兩條金色水平線從 border owner 正式移除，不以背景遮蓋。",
+      "evidence": ["css/fixed-slot-battlefield-rendering-v2.css"]
+    },
+    {
+      "id": "FORMATION-12",
+      "status": "VERIFIED",
+      "requirement": "首頁布陣入口開啟既有 V131 正式面板，可交換前後排並透過正式 save owner 持久化。",
+      "evidence": ["js/16-stage-v54-main-city-runtime.js", "js/25-v131-fix-batch.js", "js/battlefield-slot-owner.js"]
+    },
+    {
+      "id": "BROWSER-QA-13",
+      "status": "VERIFIED",
+      "requirement": "412×915 實際瀏覽器逐項驗證普通戰鬥、Boss 模式、UI、受擊與布陣，並對照使用者截圖。",
+      "evidence": [
+        ".github/scripts/battle-layer-audio-live-qa.mjs",
+        ".github/scripts/fixed-slot-battlefield-rendering-v2.mjs",
+        "GitHub Actions run 35312399951",
+        "battle-layout-vfx-live-qa artifact 10533494779",
+        "battlefield-fixed-slot-v2 artifact 10533901304",
+        "412x915 manual comparison against /mnt/data/1000070393.jpg"
+      ]
+    },
+    {
+      "id": "RELEASE-FLOW-14",
+      "status": "VERIFIED",
+      "requirement": "發布檢查發現問題一律 fix → dev 後重跑發布；main 不得擁有 dev 沒有的獨立修復。",
+      "evidence": ["SYSTEM_CONTRACTS.md", "docs/RELEASE_VERIFICATION_RULES.md"]
+    }
+  ],
+  "automatedVerification": "PR_CI_AND_MOBILE_BROWSER_QA_VERIFIED",
+  "verificationRun": 35312399951,
+  "visualVerification": "MANUAL_REFERENCE_COMPARISON_AND_AUTOMATED_MOBILE_CHROME_PASS",
+  "verifiedCommit": "9236d93363c093b688a49ae99276f071f2b3d463",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "releasedAs": null
+}

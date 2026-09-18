@@ -14,12 +14,11 @@
        0.4 秒的回合交接＋1.6 秒的首位出手等待組成，不會錯疊成
        2+1.6＝3.6 秒，也不會再隨死亡數量越拖越久。
     */
-    const V138_ACTION_DELAY_MS=1600;
-    const V138_ROUND_TRANSITION_MS=2000;
-    const V138_ROUND_HANDOFF_DELAY_MS=Math.max(
-        0,
-        V138_ROUND_TRANSITION_MS-V138_ACTION_DELAY_MS
-    );
+    /* Historical diagnostic metadata only. The live timing owner is 00-main. */
+    const V138_ACTION_DELAY_MS=1250;
+    const V138_ROUND_TRANSITION_MS=1250;
+    const V138_ROUND_HANDOFF_DELAY_MS=800;
+    const V138_ROUND_ANNOUNCEMENT_DELAY_MS=450;
     const V173_32_WILD_ZONE_STRENGTHS=Object.freeze([
         0.75,0.90,0.95,1.00,1.05,1.10,1.15,1.20,1.25,1.30
     ]);
@@ -182,196 +181,10 @@
         return hours+"小時 "+minutes+"分鐘";
     }
 
-    function isInitiativeEntryActive(entry){
-        if(!entry){ return false; }
-        if(entry.type==="player"){
-            const character=getPartyCharacterByIndex(entry.characterIndex);
-            return !!(character && character.hp>0);
-        }
-        if(entry.type==="monster"){
-            const monster=monsters[entry.monsterIndex];
-            return !!(monster && monster.alive);
-        }
-        return false;
-    }
+    /* Queue advancement belongs exclusively to 00-main.js. Earlier pacing
+       wrappers duplicated finishPlayerAction/processNextCombatant and could
+       strand an initiative entry when a visual Promise completed out of order. */
 
-    function skipInactiveInitiativeEntries(){
-        while(
-            initiativeIndex<initiativeQueue.length &&
-            !isInitiativeEntryActive(initiativeQueue[initiativeIndex])
-        ){
-            processedInitiativeIndexes.add(initiativeIndex);
-            initiativeIndex++;
-        }
-    }
-
-    function consumeBattleAdvanceDelayOverride(fallback){
-        const override=typeof window!=="undefined"
-            ?Number(window.__battleAdvanceDelayOverrideMs):NaN;
-        if(typeof window!=="undefined"&&Number.isFinite(override)){
-            delete window.__battleAdvanceDelayOverrideMs;
-            return Math.max(0,override);
-        }
-        return fallback;
-    }
-
-    if(typeof finishPlayerAction==="function"){
-        finishPlayerAction=function(){
-            if(!battleActive){ return; }
-            clearInterval(timerId);
-            actionReady=false;
-            pendingAction=null;
-            clearBattleTargetSelectionMode();
-            if(checkBattleEnd()){ return; }
-            if(battleAdvanceScheduled){ return; }
-            battleAdvanceScheduled=true;
-            const token=battleToken;
-
-            if(battlePhase==="declare"){
-                activeBattleCharacterIndex++;
-                const delayMs=consumeBattleAdvanceDelayOverride(BATTLE_DECLARE_ADVANCE_MS);
-                battleAdvanceTimeoutId=setTimeout(()=>{
-                    battleAdvanceTimeoutId=null;
-                    battleAdvanceScheduled=false;
-                    if(!battleActive || token!==battleToken){ return; }
-                    beginCharacterTurn(token);
-                },delayMs);
-                return;
-            }
-            initiativeIndex++;
-            skipInactiveInitiativeEntries();
-            const normalDelayMs=
-                initiativeIndex>=initiativeQueue.length
-                ? V138_ROUND_HANDOFF_DELAY_MS
-                : V138_ACTION_DELAY_MS;
-            const delayMs=consumeBattleAdvanceDelayOverride(normalDelayMs);
-            battleAdvanceTimeoutId=setTimeout(()=>{
-                battleAdvanceTimeoutId=null;
-                battleAdvanceScheduled=false;
-                if(!battleActive || token!==battleToken){ return; }
-                try{
-                    processNextCombatant(token);
-                }catch(error){
-                    console.error("V131 推進下一位時發生例外：",error);
-                    addBattleLog(
-                        "推進下一位時發生例外（"+
-                        ((error&&error.message)||"未知錯誤")+
-                        "），嘗試強制繼續。"
-                    );
-                    initiativeIndex++;
-                    processNextCombatant(token);
-                }
-            },delayMs);
-        };
-    }
-
-    /*
-       首位出手也套用跟一般有效出手相同的 1.6 秒節奏：
-       進入戰鬥／新回合開始後，第一位實際行動者不會立即跳出。
-       上面finishPlayerAction()的override已經確保「同一大回合內、
-       每一位角色/怪物實際出手之間」都固定等V138_ACTION_DELAY_MS，
-       但漏了兩個時間點——「進入戰鬥」到「這一回合第一位出手」、
-       跟「下一回合開始」到「新回合第一位出手」——這兩個時間點
-       原本都是宣告階段一結束，startResolutionPhase()馬上同步呼叫
-       processNextCombatant()，中間完全沒有停頓，造成「每回合的
-       第一下出手感覺特別快、節奏跟其他出手對不起來」。
-
-       這裡不改寫startResolutionPhase()本體（避免重做一套複雜的
-       結算階段初始化邏輯），改成標記法：startResolutionPhase()
-       被呼叫的當下，設一個旗標記住「等一下processNextCombatant()
-       第一次被呼叫時，要先補這段停頓」；processNextCombatant()
-       這邊只在偵測到這個旗標時，才把「真正執行」包進
-       setTimeout(...,V138_ACTION_DELAY_MS)裡延後，消費掉旗標後
-       就不會再影響同一回合裡後面正常的呼叫（那些已經各自被
-       finishPlayerAction()的排程過了，不會被這裡重複延遲）。
-    */
-    let v131PendingFirstResolveDelay=false;
-
-    /*
-       首位出手的等待要扣除宣告階段已花掉的時間：
-       只把上面那個「第一位出手前補一段延遲」寫死成
-       V138_ACTION_DELAY_MS 是不夠準的——宣告階段本身也會花時間
-       （每個自動角色會經過 beginCharacterTurn 的 150ms 自動出手延遲，
-       加上 finishPlayerAction 宣告分支的 BATTLE_DECLARE_ADVANCE_MS
-       90ms），所以「回合開始 → 第一位出手」實際上會變成
-       如果直接再等完整 1600ms，會讓第一位比後續出手多等宣告時間。
-
-       改成以「這一回合開始的時間點」為錨：等待時間 =
-       1600 - (宣告階段已經花掉的時間)，不足就不再等。這樣不管隊伍
-       有幾個自動角色、宣告階段花多久，玩家看到的
-       「第N回合開始 → 第一位出手」都會以 1.6 秒為目標。
-       如果宣告階段本身就超過 1.6 秒（例如手動角色思考很久），
-       等待會變成 0，玩家一按完就馬上結算，不會再無謂地多等。
-    */
-    let v131TurnStartedAt=0;
-
-    if(typeof startTurn==="function"){
-        const originalStartTurn=startTurn;
-        startTurn=function(token){
-            if(battleActive && token===battleToken){
-                v131TurnStartedAt=Date.now();
-            }
-            return originalStartTurn.apply(this,arguments);
-        };
-    }
-
-    if(typeof startResolutionPhase==="function"){
-        const originalStartResolutionPhase=startResolutionPhase;
-        startResolutionPhase=function(token){
-            /*
-               ★ 修正（實測抓到的bug）：startResolutionPhase()
-               本體自己就有防重複呼叫的機制（resolutionPhaseStarted
-               已經是true就直接return、不做任何事）——但如果我在
-               呼叫原本函式「之前」就無條件把旗標設成true，遇到
-               這種「重複呼叫、原本函式其實什麼都沒做」的情況，
-               旗標還是會被錯誤地重新架上，導致之後某個不相關的
-               processNextCombatant()呼叫被多延遲一次
-               （量測到同一回合內兩位角色間距變成3秒的雙倍延遲）。
-               這裡改成先複製原本函式自己的判斷條件，只有「這次
-               呼叫真的會執行」時才架旗標，跟原本函式的行為完全
-               對齊。
-            */
-            if(battleActive && token===battleToken && !resolutionPhaseStarted){
-                v131PendingFirstResolveDelay=true;
-            }
-            return originalStartResolutionPhase.apply(this,arguments);
-        };
-    }
-
-    if(typeof processNextCombatant==="function"){
-        const originalProcessNextCombatant=processNextCombatant;
-        processNextCombatant=function(token){
-            if(v131PendingFirstResolveDelay){
-                v131PendingFirstResolveDelay=false;
-
-                /* 扣掉宣告階段已經花掉的時間，讓「回合開始→第一位
-                   出手」剛好等於 V138_ACTION_DELAY_MS。 */
-                const elapsed=v131TurnStartedAt>0 ? (Date.now()-v131TurnStartedAt) : 0;
-                const wait=Math.max(0,V138_ACTION_DELAY_MS-elapsed);
-
-                setTimeout(()=>{
-                    if(!battleActive || token!==battleToken){ return; }
-                    originalProcessNextCombatant.call(this,token);
-                },wait);
-                return;
-            }
-            return originalProcessNextCombatant.apply(this,arguments);
-        };
-    }
-
-    getSkillTargets=function(centerIndex,targetType){
-        const owner=fixedBattlefieldSlots();
-        const snapshot=ensureEnemyFormationSnapshot(currentBattleMonsters);
-        if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
-            return owner.resolveEnemyTargets(
-                snapshot,
-                centerIndex,
-                targetType,
-                index=>!!(monsters[index]&&monsters[index].alive!==false&&Number(monsters[index].hp)>0)
-            );
-        }
-        return monsters[centerIndex]&&monsters[centerIndex].alive?[centerIndex]:[];
-    };
 
     function applyBattleFormation(){
         const area=document.getElementById("battleMonsterArea");
@@ -510,7 +323,8 @@
     window.v138BattlePacing={
         actionDelayMs:V138_ACTION_DELAY_MS,
         roundDelayMs:V138_ROUND_TRANSITION_MS,
-        roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS
+        roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS,
+        roundAnnouncementDelayMs:V138_ROUND_ANNOUNCEMENT_DELAY_MS
     };
 
     function strengthenMonster(monster,multiplier){
