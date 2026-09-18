@@ -63,7 +63,7 @@ try{
     assert.ok(data.rightArt.left>=data.bossArt.right,"B5 reinforcement artwork must not overlap Boss artwork");
     assert.ok(data.leftArt.centerX<=data.leftCard.centerX-6,"B1 reinforcement artwork must visibly shift outward");
     assert.ok(data.rightArt.centerX>=data.rightCard.centerX+6,"B5 reinforcement artwork must visibly shift outward");
-    assert.ok(data.toggle.right<=data.stage.right-3&&data.toggle.right>=data.stage.right-5,"drawer handle must sit at the bottom-right inset");
+    assert.ok(Math.abs((data.stage.right-data.toggle.right)-(4*data.gameContentScale))<=1,"drawer handle must keep its 4px logical bottom-right inset after canonical stage scaling");
     assert.match(data.toggleBackground,/rgba?\(0, 0, 0/);
     console.log("Battle presentation follow-up browser QA 412x915 passed:",JSON.stringify(data));
 }finally{
