@@ -7,8 +7,12 @@
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
     --battle-enemy-region-track:42fr;
-    --battle-center-region-track:14fr;
-    --battle-ally-region-track:44fr;
+    /* The center owns a 36px turn row plus the 66px command row. At 14fr the
+       command row overflowed roughly 9px into the ally region on 412x915.
+       Keep both combat sides balanced and reserve the center's real minimum
+       content height in the canonical three-track grid. */
+    --battle-center-region-track:16fr;
+    --battle-ally-region-track:42fr;
     --battle-info-panel-height:150px;
     --battle-info-handle-height:34px;
     --battle-region-gap:4px;

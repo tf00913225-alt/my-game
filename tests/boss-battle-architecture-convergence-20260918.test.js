@@ -53,7 +53,7 @@ assert.match(core,/const prefix=type==="heal"\?"\+":"-"/);
 
 assert.match(fixedCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?\.v-fixed-ally-slot \.hp-bar\{bottom:26px !important/);
 assert.match(fixedCss,/--battle-resource-bar-height:10px/);
-assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-ally-region-track:44fr/);
+assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-center-region-track:16fr[\s\S]*?--battle-ally-region-track:42fr/);
 assert.match(fixedCss,/\.battle-center-region\{[\s\S]*?border:0/);
 assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?position:absolute !important;[\s\S]*?bottom:0 !important/);
 assert.match(fixedCss,/\.battle-info-toggle\{[\s\S]*?width:64px;[\s\S]*?border:3px solid #d9ad50/);
