@@ -22,8 +22,8 @@ assert.match(boss,/\.gameplay-boss-card > \.v174-battle-art\{[\s\S]*?background-
 assert.doesNotMatch(boss,/boss-mechanism|MECH_[LCR]|aspect-ratio:4\s*\/\s*3/);
 assert.match(boss,/\.gameplay-boss-card > \.battle-monster-name\{[\s\S]*?position:absolute !important;[\s\S]*?height:16px !important;[\s\S]*?min-height:16px !important;[\s\S]*?max-height:16px !important/);
 assert.match(boss,/\.gameplay-boss-card > \.monster-hp,[\s\S]*?position:absolute !important;[\s\S]*?display:block !important;[\s\S]*?visibility:visible !important/);
-assert.match(boss,/\.v-fixed-enemy-slot\[data-slot\$="1"\] \.v174-battle-art\{[\s\S]*?left:-2px !important;[\s\S]*?right:14px !important/);
-assert.match(boss,/\.v-fixed-enemy-slot\[data-slot\$="5"\] \.v174-battle-art\{[\s\S]*?left:14px !important;[\s\S]*?right:-2px !important/);
+assert.match(boss,/\.v-fixed-enemy-slot\[data-slot\$="1"\] \.v174-battle-art\{[\s\S]*?left:4px !important;[\s\S]*?right:26px !important/);
+assert.match(boss,/\.v-fixed-enemy-slot\[data-slot\$="5"\] \.v174-battle-art\{[\s\S]*?left:26px !important;[\s\S]*?right:4px !important/);
 
 assert.doesNotMatch(polish,/v143-earth-shield-effect/);
 assert.doesNotMatch(polish,/v143-skill-flight|v143-skill-field|v143-hit-impact|v146-flight-art/);

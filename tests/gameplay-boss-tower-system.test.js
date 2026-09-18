@@ -129,7 +129,7 @@ test("definitions expose Boss objects instead of a parallel function-card system
 test("Boss is one entity with one target identity and isolated target settlement",()=>{
     const {context}=load();
     assert.equal(context.vGameplayStartBoss("personal","personal-20"),true);
-    assert.equal(context.currentBattleMonsters.length,1);
+    assert.ok(context.currentBattleMonsters.every(index=>context.monsters[index]?.unitKind!=="boss-reinforcement"));
     assert.equal(context.FourSymbolsBossBattle.getBossIndex(),0);
     for(const type of ["single","tri","row","column"]){
         assert.deepEqual(value(context,'FourSymbolsBossBattle.resolveEnemyDamageTargets(0,"'+type+'")'),[0]);
@@ -181,6 +181,33 @@ test("World Boss uses the live Fixed Slot snapshot when stage-three reinforcemen
         JSON.parse(JSON.stringify(guards.map(unit=>slots.getEnemySlotForMonster(slots.getActiveEnemySnapshot(),context.monsters.indexOf(unit))))),
         ["ENEMY_B1","ENEMY_B5"]
     );
+    const trace=context.FourSymbolsBossBattle.getLastReinforcementProjection();
+    assert.equal(trace.mode,"world");
+    assert.deepEqual(JSON.parse(JSON.stringify(trace.monsterSlots.map(entry=>entry.slot))),["ENEMY_B1","ENEMY_B5"]);
+    assert.deepEqual(JSON.parse(JSON.stringify(trace.monsterSlots.map(entry=>entry.getEnemySlotForMonster))),["ENEMY_B1","ENEMY_B5"]);
+    assert.deepEqual(JSON.parse(JSON.stringify(trace.currentBattleMonsters)),[0,1,2]);
+    assert.equal(trace.snapshotMonsterIndexToSlot[0],slots.getEnemySlotForMonster(slots.getActiveEnemySnapshot(),0));
+    assert.equal(trace.snapshotMonsterIndexToSlot[1],"ENEMY_B1");
+    assert.equal(trace.snapshotMonsterIndexToSlot[2],"ENEMY_B5");
+    assert.equal(trace.snapshotSlotToMonsterIndex.ENEMY_B1,1);
+    assert.equal(trace.snapshotSlotToMonsterIndex.ENEMY_B5,2);
+});
+
+test("a blocked official reinforcement Slot aborts the World Boss summon atomically",()=>{
+    const {context}=load();
+    context.GameplaySystem.debugReloadState({
+        world:{"world-40":{completedStages:2,firstClear:false,clears:0}}
+    });
+    assert.equal(context.vGameplayStartBoss("world","world-40"),true);
+    const boss=context.monsters[0],slots=context.FourSymbolsBattlefieldSlots;
+    const snapshot=slots.getActiveEnemySnapshot();
+    assert.equal(slots.assignMonsterToEnemySlot(snapshot,99,"ENEMY_B1"),true);
+    boss.hp=Math.floor(boss.maxHP*.5);
+    context.turn=3;
+    assert.equal(context.FourSymbolsBossBattle.processRound(),false);
+    assert.equal(context.monsters.filter(unit=>unit.unitKind==="boss-reinforcement").length,0);
+    assert.ok(context.currentBattleMonsters.every(index=>context.monsters[index]?.unitKind!=="boss-reinforcement"));
+    assert.equal(slots.getEnemySlotForMonster(snapshot,99),"ENEMY_B1");
 });
 
 test("totems and flags are normal numeric target entities at F1/F5 but never act or reward",()=>{

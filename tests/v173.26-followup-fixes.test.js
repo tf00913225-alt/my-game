@@ -81,6 +81,7 @@ test("turn-end status and buff cleanup resynchronize Sprites at one shared bound
     const context={
         window:null,Set,
         battleActive:true,battleToken:7,turn:2,
+        ROUND_ANNOUNCE_LEAD_MS:450,setTimeout:fn=>{ fn();return 1; },
         battlePhase:"",activeBattleCharacterIndex:-1,
         declaredCharacterIndexes:null,resolutionPhaseStarted:true,
         turnAdvancePending:true,queuedPlayerActions:null,

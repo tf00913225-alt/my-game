@@ -496,6 +496,61 @@
         if(!owner||!snapshot||!slot){ return null; }
         return owner.assignMonsterToEnemySlot(snapshot,monsterIndex,slot)?slot:null;
     }
+    function captureReinforcementProjection(indexes){
+        const context=activeBattleContext,owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
+        if(!context||!owner||!snapshot){ return null; }
+        const result={
+            mode:context.mode,
+            currentBattleMonsters:typeof currentBattleMonsters!=="undefined"&&Array.isArray(currentBattleMonsters)
+                ?currentBattleMonsters.slice():[],
+            monsterIndexes:indexes.slice(),
+            monsterSlots:indexes.map(index=>{
+                const monster=monsterAt(index);
+                return {
+                    index:index,
+                    slot:monster&&monster.vGameplayBattlefieldSlot||null,
+                    getEnemySlotForMonster:owner.getEnemySlotForMonster(snapshot,index)||null
+                };
+            }),
+            snapshotMonsterIndexToSlot:Object.assign({},snapshot.monsterIndexToSlot||{}),
+            snapshotSlotToMonsterIndex:Object.assign({},snapshot.slotToMonsterIndex||{}),
+            dom:[]
+        };
+        const rectSnapshot=rect=>rect?{
+            left:Number(rect.left)||0,right:Number(rect.right)||0,
+            top:Number(rect.top)||0,bottom:Number(rect.bottom)||0,
+            width:Number(rect.width)||0,height:Number(rect.height)||0
+        }:null;
+        if(typeof document!=="undefined"){
+            indexes.forEach(index=>{
+                const card=document.getElementById("battleMonster"+index);
+                const holder=card&&card.parentElement;
+                const art=card&&card.querySelector(":scope > .v174-battle-art");
+                result.dom.push({
+                    index:index,
+                    cardSlot:card&&card.dataset&&card.dataset.slot||null,
+                    holderSlot:holder&&holder.dataset&&holder.dataset.slot||null,
+                    cardRect:card&&card.getBoundingClientRect?rectSnapshot(card.getBoundingClientRect()):null,
+                    artRect:art&&art.getBoundingClientRect?rectSnapshot(art.getBoundingClientRect()):null
+                });
+            });
+            const bossCard=Number.isInteger(bossIndex())?document.getElementById("battleMonster"+bossIndex()):null;
+            const bossArt=bossCard&&bossCard.querySelector(":scope > .v174-battle-art");
+            result.bossArtRect=bossArt&&bossArt.getBoundingClientRect?rectSnapshot(bossArt.getBoundingClientRect()):null;
+            if(result.bossArtRect){
+                result.dom.forEach(entry=>{
+                    if(!entry.artRect){ entry.artworkClearOfBoss=null;return; }
+                    const projectedSlot=entry.cardSlot||entry.holderSlot;
+                    entry.artworkClearOfBoss=projectedSlot==="ENEMY_B1"
+                        ?entry.artRect.right<=result.bossArtRect.left
+                        :projectedSlot==="ENEMY_B5"
+                            ?entry.artRect.left>=result.bossArtRect.right:null;
+                });
+            }
+        }
+        context.lastReinforcementProjection=result;
+        return result;
+    }
     function seedBossBattlefieldSnapshot(){
         const context=activeBattleContext,boss=activeBoss(),owner=battlefieldSlotOwner();
         if(!context||!boss||!owner||typeof monsters==="undefined"||!Array.isArray(monsters)){ return null; }
@@ -694,19 +749,34 @@
         const definition={id:boss.vGameplayBossId||context.definitionId||("tower-"+numeric(context.floor,0)),level:boss.level,element:boss.element};
         const stage=Math.max(numeric(context.combatPhase,1),numeric(context.stage,1));
         const guards=buildBossSupportRoster(definition,{stage:stage,mode:context.mode});
+        const owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
+        if(guards.length!==BOSS_BALANCE.reinforcementCount||!owner||!snapshot||
+           BOSS_REINFORCEMENT_SLOTS.some(slot=>owner.getAssignedMonsterAtEnemySlot(snapshot,slot)!==null)){
+            return false;
+        }
+        const indexes=guards.map((_,offset)=>monsters.length+offset);
+        /* Summoning is atomic. A failed Slot assignment must not mark the plan
+           complete or leave a card that the renderer later places by fallback. */
+        for(let supportIndex=0;supportIndex<guards.length;supportIndex++){
+            if(!owner.assignMonsterToEnemySlot(snapshot,indexes[supportIndex],BOSS_REINFORCEMENT_SLOTS[supportIndex])){
+                indexes.forEach(index=>owner.removeMonsterFromEnemySlot(snapshot,index));
+                return false;
+            }
+        }
         guards.forEach((guard,supportIndex)=>{
-            const index=monsters.length;
-            monsters.push(guard);
-            currentBattleMonsters.push(index);
+            const index=indexes[supportIndex];
             guard.unitKind="boss-reinforcement";
             guard.canAct=true;
-            guard.vGameplayBattlefieldSlot=assignEnemySlot(index,BOSS_REINFORCEMENT_SLOTS[supportIndex]);
+            guard.vGameplayBattlefieldSlot=BOSS_REINFORCEMENT_SLOTS[supportIndex];
+            monsters.push(guard);
+            currentBattleMonsters.push(index);
         });
         context.summonsCreated=true;
         context.supportCount=guards.length;
         if(typeof addBattleLog==="function"){ addBattleLog(boss.name+"召來兩名同元素精英援軍助戰！"); }
         if(typeof renderBattle==="function"){ renderBattle(); }
         else if(typeof updateUI==="function"){ updateUI(); }
+        captureReinforcementProjection(indexes);
         return guards.length===BOSS_BALANCE.reinforcementCount;
     }
     function processBossSummonPlan(round,boss){
@@ -994,6 +1064,7 @@
         isBossObjectIndex:isBossObjectIndex,
         getBossFootprintSlots:function(){ return BOSS_FOOTPRINT_SLOTS.slice(); },
         getReinforcementSlots:function(){ return BOSS_REINFORCEMENT_SLOTS.slice(); },
+        getLastReinforcementProjection:function(){ return activeBattleContext&&copy(activeBattleContext.lastReinforcementProjection||null); },
         getObjectSlots:function(){ return BOSS_OBJECT_SLOTS.slice(); },
         resolveEnemyDamageTargets:resolveEnemyDamageTargets,
         getTargetGeometry:targetGeometry,

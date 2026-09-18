@@ -5,6 +5,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const bossSource=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
+const battlefieldSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const relicSource=fs.readFileSync("js/relic-progression-drop-system.js","utf8");
 const relicCatalogSource=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const gameplayCss=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
@@ -65,6 +66,7 @@ function bossContext(level=100){
     };
     context.window=context;context.globalThis=context;
     vm.createContext(context);
+    vm.runInContext(battlefieldSource,context,{filename:"js/battlefield-slot-owner.js"});
     vm.runInContext(bossSource,context,{filename:"js/gameplay-boss-tower-system.js"});
     return context;
 }

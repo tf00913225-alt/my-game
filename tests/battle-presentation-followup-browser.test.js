@@ -56,7 +56,7 @@ try{
     assert.ok(data.bossHp.bottom<=data.bossSp.top+1,"Boss HP must sit above SP");
     assert.ok(data.bossSp.bottom<=data.bossName.top+1,"Boss SP must sit above the name");
     assert.equal(data.leftHpHeight,11);
-    assert.equal(data.popupDisplay,"none");
+    assert.notEqual(data.popupDisplay,"none","Boss HP damage popup must remain visible");
     assert.ok(data.leftArt.right<=data.bossArt.left,"B1 reinforcement artwork must not overlap Boss artwork");
     assert.ok(data.rightArt.left>=data.bossArt.right,"B5 reinforcement artwork must not overlap Boss artwork");
     assert.ok(data.leftArt.centerX<=data.leftCard.centerX-6,"B1 reinforcement artwork must visibly shift outward");

@@ -58,10 +58,11 @@ assert.doesNotMatch(presentation,/setInterval\(syncManagement\s*,\s*300\)/);
 assert.doesNotMatch(core,/red-hit/);
 assert.doesNotMatch(read("css/00-main.css"),/\.red-hit/);
 assert.match(core,/const prefix=type==="heal"\?"\+":"-"/);
-assert.match(core,/const suppressEnemyHpPopup=type==="hp"/);
+assert.doesNotMatch(core,/suppressEnemyHpPopup/);
+assert.match(core,/settlement\.hpDamage>0\)[\s\S]*?showDamagePopup\(element,"-"\+settlement\.hpDamage\+"HP","hp",isCrit\)/);
 assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit\{[\s\S]*?border:0 !important;[\s\S]*?box-shadow:none !important/);
-assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit > \.damage-popup\.hp-popup\{[\s\S]*?display:none !important/);
-assert.match(presentation,/if\(card\?\.classList\?\.contains\("battle-monster"\)\)return/);
+assert.doesNotMatch(fixedCss,/\.damage-popup\.hp-popup\{[\s\S]*?display:none/);
+assert.doesNotMatch(presentation,/v174-hit-shake|shakeArtForPopup/);
 
 assert.match(fixedCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?\.v-fixed-ally-slot \.hp-bar\{bottom:26px !important/);
 assert.match(fixedCss,/--battle-resource-bar-height:11px/);

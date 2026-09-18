@@ -85,22 +85,6 @@ window.FourSymbolsBattlePresentation=Object.freeze({
     applyUnit:syncUnitArtwork,
     sync:syncBattlePresentation
 });
-function shakeArtForPopup(node){
-    if(!(node instanceof Element))return;
-    const popups=node.matches?.(".damage-popup.hp-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup.hp-popup")||[]);
-    popups.forEach(popup=>{
-        const owner=window.FourSymbolsBattlefieldSlots;
-        const slot=popup.dataset?.slot||owner?.getSlotFromElement?.(popup)||null;
-        const slotElement=slot&&owner?.getSlotElement?.(slot);
-        const card=slotElement?.querySelector?.(".battle-player,.battle-monster")||popup.closest(".battle-player,.battle-monster");
-        if(card?.classList?.contains("battle-monster"))return;
-        const art=card?.querySelector(":scope > .v174-battle-art");
-        if(!art)return;
-        art.classList.remove("v174-hit-shake");void art.offsetWidth;art.classList.add("v174-hit-shake");
-        setTimeout(()=>art.classList.remove("v174-hit-shake"),300);
-    });
-}
-
 /* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
     if(typeof window.v173DecorateExpPoolDistributionUi==="function")window.v173DecorateExpPoolDistributionUi();
@@ -130,7 +114,6 @@ window.showRewardedAd=function(onSuccess,onFail){if(adRunning)return false;adRun
 const observer=new MutationObserver(mutations=>{
     let needsResourceSync=false;
     mutations.forEach(record=>record.addedNodes.forEach(node=>{
-        shakeArtForPopup(node);
         if(!(node instanceof Element)){ return; }
         const units=node.matches?.(".battle-player,.battle-monster")
             ?[node]:Array.from(node.querySelectorAll?.(".battle-player,.battle-monster")||[]);

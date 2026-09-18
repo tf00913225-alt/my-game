@@ -183,6 +183,15 @@
         return true;
     }
 
+    function removeMonsterFromSlot(snapshot,monsterIndex){
+        if(!snapshot||!Number.isInteger(monsterIndex)){ return false; }
+        const current=slotForMonster(snapshot,monsterIndex);
+        if(!current){ return false; }
+        snapshot.slotToMonsterIndex[current]=null;
+        delete snapshot.monsterIndexToSlot[monsterIndex];
+        return true;
+    }
+
     function assignMonsterToPreferredSlot(snapshot,monsterIndex,preferredSlots){
         const slots=(Array.isArray(preferredSlots)?preferredSlots:[]).filter(slot=>ENEMY_SLOTS.includes(slot));
         const target=slots.find(slot=>assignedMonsterAt(snapshot,slot)===null);
@@ -553,6 +562,7 @@
         getAssignedMonsterAtEnemySlot:assignedMonsterAt,
         getActiveMonsterAtEnemySlot:activeMonsterAt,
         assignMonsterToEnemySlot:assignMonsterToSlot,
+        removeMonsterFromEnemySlot:removeMonsterFromSlot,
         assignMonsterToPreferredEnemySlot:assignMonsterToPreferredSlot,
         getPriorityMonsterIndexes:priorityMonsterIndexes,
         getEnemySnapshotRows:snapshotRows,

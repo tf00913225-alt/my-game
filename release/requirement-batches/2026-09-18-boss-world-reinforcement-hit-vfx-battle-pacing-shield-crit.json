@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-18-boss-world-reinforcement-hit-vfx-battle-pacing-shield-crit",
+  "baseBranch": "dev",
+  "baseCommit": "4533f1d155800e3f8b765ce50ccfb9eceb2a0bad",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "mainPromotionAllowed": false,
+  "requirements": [
+    {
+      "id": "WORLD-REINFORCEMENT-PROJECTION-01",
+      "status": "IMPLEMENTED",
+      "requirement": "World Boss Stage 3／4 援軍以 live snapshot 原子寫入 ENEMY_B1／ENEMY_B5，並記錄資料、DOM holder/card 與 artwork rect 投影。",
+      "evidence": ["js/gameplay-boss-tower-system.js", "js/battlefield-slot-owner.js", "css/gameplay-boss-tower.css", "tests/gameplay-boss-tower-system.test.js"]
+    },
+    {
+      "id": "ENEMY-HIT-FEEDBACK-SPLIT-02",
+      "status": "IMPLEMENTED",
+      "requirement": "保留 V143 技能主 VFX 與紅色 HP 傷害浮字，移除額外敵方紅色受擊光影與 v174-hit-shake。",
+      "evidence": ["js/00-main.js", "js/54-v173.51-battle-qa.js", "css/fixed-slot-battlefield-rendering-v2.css", "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js"]
+    },
+    {
+      "id": "BOSS-SHIELD-CRIT-03",
+      "status": "IMPLEMENTED",
+      "requirement": "每一筆對正式 vBossShield 的傷害 packet 在爆擊倍率前檢查 Shield；Shield>0 時整筆（含 overflow）不可爆擊，下一個獨立 multihit packet 可重新判定。",
+      "evidence": ["js/00-main.js", "js/gameplay-boss-tower-system.js", "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js"]
+    },
+    {
+      "id": "BATTLE-QUEUE-TIMING-04",
+      "status": "IMPLEMENTED",
+      "requirement": "00-main.js 是唯一 queue timing owner：宣告完成 250ms、普通行動最低 1250ms、技能 VFX 剩餘時間+400ms、回合交接 800ms 與回合標示 450ms；Manual/Auto resolve 共用。",
+      "evidence": ["js/00-main.js", "js/46-v155-dev-fixes.js", "js/25-v131-fix-batch.js", "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js"]
+    }
+  ],
+  "verification": "Pending: production bundle checks, Repository CI, merged dev deploy SHA read-back, and deployed 412x915 real runtime verification.",
+  "promotionApproval": "MAIN MUST REMAIN UNCHANGED",
+  "releasedAs": null
+}
