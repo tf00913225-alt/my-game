@@ -1,0 +1,54 @@
+{
+  "date": "2026-09-19",
+  "title": "舊帳號存檔退役技能引用造成 hydration 失敗根因修復",
+  "base_branch": "dev",
+  "base_sha": "f5a052adea2739eb8009cf558f975712e86cc470",
+  "work_branch": "fix/account-save-legacy-skill-hydration-20260919",
+  "officialVersion": "173.65",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "修復已驗證 UID 的舊帳號存檔在 Startup READY hydration 階段回傳 false，顯示 Resolved account save could not hydrate gameplay state。",
+      "owner": [
+        "js/00-main.js::loadGame()",
+        "js/00-main.js::renderSkillLoadout()",
+        "js/44-v152-dev-fixes.js::cleanAccidentalFireSkill()"
+      ],
+      "implementation": "確認 V152 既有 fireBurstStrike 玩家引用清理由後載入 gameplay bundle 執行，但 account startup 的 app-shell loadGame() 會先 renderSkillLoadout()；舊存檔若仍裝備 fireBurstStrike，skillDatabase 查不到該玩家技能而在第一次 render 前崩潰。核心 hydration 新增 normalizeHydratedRetiredSkillReferences()，在 UI render 前清理退役／不存在的 equipped skill reference，移除 fireBurstStrike skillLevels，並把 stale auto-battle skill 回退 normal。"
+    },
+    {
+      "id": 2,
+      "status": "VERIFIED",
+      "request": "修復不得刪角色、清背包、清 localStorage、改 UID ownership 或弱化雲端／本機存檔安全。",
+      "owner": [
+        "js/startup/account-save-repository.js",
+        "js/52-v173.20-startup-loader.js",
+        "js/00-main.js"
+      ],
+      "implementation": "只處理玩家技能引用相容與技能 UI defensive guard；未修改 AccountSave repository、Firebase cloud resolution、Firestore policy、save schema、角色／背包／裝備／金幣／進度資料。"
+    },
+    {
+      "id": 3,
+      "status": "VERIFIED",
+      "request": "合法技能必須完整保留，並防止未來 stale equipped skill id 再讓 hydration 因 renderSkillLoadout() 崩潰。",
+      "owner": [
+        "js/00-main.js::normalizeHydratedRetiredSkillReferences()",
+        "js/00-main.js::renderSkillLoadout()",
+        "tests/account-save-legacy-skill-hydration.test.js"
+      ],
+      "implementation": "合法 skill id 維持原樣；退役 fireBurstStrike 與不存在的 equipped id 在 hydration 前移除；renderer 對缺失 skill id 顯示空槽而不丟例外。"
+    }
+  ],
+  "verification": [
+    "tests/account-save-legacy-skill-hydration.test.js",
+    "PR #325 Repository checks first pass",
+    "npm run build:check",
+    "Fixed Slot 9:16 mobile browser QA",
+    "exact-candidate real battle mobile browser QA",
+    "Adventure V1 mobile browser QA",
+    "Release/cache/deprecated-code gates"
+  ],
+  "verificationResult": "3/3 VERIFIED；根因為 V152 退役技能 cleanup 的載入時序晚於 account hydration 第一次 skill UI render。修復移至 core save compatibility layer 並保留後層 runtime cleanup；不重置任何玩家資料。"
+}
