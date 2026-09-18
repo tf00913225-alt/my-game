@@ -132,7 +132,7 @@ function runViewport(chrome,width,height){
     assert.ok(baseline.center.bottom<=baseline.allyRegion.top+.5,"center operation region must end before the ally region");
     assert.ok(baseline.action.top>=baseline.center.top-.5&&baseline.action.bottom<=baseline.center.bottom+.5,"action controls stay inside the center region");
     assert.equal(baseline.centerBackground,"none","center controls must not own a black translucent background");
-    assert.ok(data.collapsedDrawer.toggle.top>=baseline.allyRegion.bottom-25&&data.collapsedDrawer.toggle.bottom<=baseline.allyRegion.bottom+.5,"collapsed drawer exposes only its bottom handle");
+    assert.ok(data.collapsedDrawer.toggle.top>=baseline.allyRegion.bottom-35&&data.collapsedDrawer.toggle.bottom<=baseline.allyRegion.bottom+.5,"collapsed drawer exposes its complete 32px touch handle above the bottom edge");
     assert.ok(data.collapsedDrawer.info.top>=baseline.allyRegion.bottom-.5,"collapsed battle log must stay below the battlefield");
     assert.ok(data.expandedDrawer.region.bottom<=baseline.allyRegion.bottom+.5,"expanded drawer stays anchored to the battlefield bottom");
     assert.ok(data.expandedDrawer.info.top<data.expandedDrawer.info.bottom&&data.expandedDrawer.info.bottom<=baseline.allyRegion.bottom+.5,"expanded battle log must slide fully into view");
