@@ -1,6 +1,6 @@
 /* =====================================================
    V143 — single-owner raster battle VFX runtime
-   V174 cleanup: official raster Sprite Sheets/status loops only.
+   V174 cleanup: official PNG Sprite Sheets/status loops only.
    Fixed Slot geometry is the only battle position/coverage source.
    No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback.
 ===================================================== */
@@ -37,21 +37,6 @@
             duration:duration,collection:collection||"statusEffects",
             renderer:"dom-sprite"
         },options||{});
-    }
-
-    function relicSheet(src,options){
-        const spec=Object.assign({duration:1000,hitFrame:7,element:"normal",scale:2.05,maxSize:260},options||{});
-        const hitFrame=Math.max(1,Math.min(12,Math.floor(Number(spec.hitFrame)||7)));
-        return {
-            hit:(hitFrame-1)/12,
-            duration:Math.max(520,Math.min(1100,Number(spec.duration)||1000)),
-            element:spec.element||"normal",
-            sprite:castSheet(src,"single",{
-                hitFrame:hitFrame,
-                scale:Number(spec.scale)||2.05,
-                maxSize:Number(spec.maxSize)||260
-            })
-        };
     }
 
     function relicSheet(src,hitFrame,options){
@@ -147,32 +132,6 @@
         relic_spirit_spring_bottle:relicSheet("assets/vfx/relic/relic_spirit_spring_bottle.webp",6),
         relic_demon_suppressing_seal:relicSheet("assets/vfx/relic/relic_demon_suppressing_seal.webp",6),
         relic_all_returning_array:relicSheet("assets/vfx/relic/relic_all_returning_array.webp",8),
-
-        /* Team Relic VFX — 20 authored 4x3 WebP sheets.
-           Placement is resolved dynamically from the relic trigger contract:
-           single effects anchor to the real target card, while all/allies use
-           the complete Fixed Slot side geometry. Durations stay below the
-           1.15s combat handoff so relic presentation never lengthens turn pacing. */
-        relic_all_returning_array:relicSheet("assets/vfx/relic/relic_all_returning_array.webp",{duration:1100,hitFrame:7,element:"light",scale:2.05,maxSize:270}),
-        relic_broken_army_scroll:relicSheet("assets/vfx/relic/relic_broken_army_scroll.webp",{duration:960,hitFrame:8,element:"normal",scale:2.15,maxSize:280}),
-        relic_burning_star_mark:relicSheet("assets/vfx/relic/relic_burning_star_mark.webp",{duration:1000,hitFrame:7,element:"fire",scale:2.15,maxSize:280}),
-        relic_cold_spring_jade:relicSheet("assets/vfx/relic/relic_cold_spring_jade.webp",{duration:1080,hitFrame:7,element:"water",scale:2.05,maxSize:270}),
-        relic_demon_suppressing_seal:relicSheet("assets/vfx/relic/relic_demon_suppressing_seal.webp",{duration:1050,hitFrame:6,element:"light",scale:2.1,maxSize:275}),
-        relic_ice_mirror_heart:relicSheet("assets/vfx/relic/relic_ice_mirror_heart.webp",{duration:1020,hitFrame:6,element:"water",scale:2.1,maxSize:275}),
-        relic_mountain_river_cauldron:relicSheet("assets/vfx/relic/relic_mountain_river_cauldron.webp",{duration:1100,hitFrame:7,element:"earth",scale:2.1,maxSize:280}),
-        relic_nine_dragon_fire:relicSheet("assets/vfx/relic/relic_nine_dragon_fire.webp",{duration:1050,hitFrame:8,element:"fire",scale:2.15,maxSize:285}),
-        relic_origin_talisman:relicSheet("assets/vfx/relic/relic_origin_talisman.webp",{duration:1080,hitFrame:7,element:"light",scale:2.05,maxSize:270}),
-        relic_qiankun_flask:relicSheet("assets/vfx/relic/relic_qiankun_flask.webp",{duration:1020,hitFrame:7,element:"water",scale:2.05,maxSize:270}),
-        relic_qinglan_feather:relicSheet("assets/vfx/relic/relic_qinglan_feather.webp",{duration:960,hitFrame:6,element:"wind",scale:2.05,maxSize:270}),
-        relic_red_sky_war_mark:relicSheet("assets/vfx/relic/relic_red_sky_war_mark.webp",{duration:980,hitFrame:7,element:"fire",scale:2.1,maxSize:275}),
-        relic_returning_wheel:relicSheet("assets/vfx/relic/relic_returning_wheel.webp",{duration:1100,hitFrame:7,element:"light",scale:2.1,maxSize:280}),
-        relic_rock_mountain_seal:relicSheet("assets/vfx/relic/relic_rock_mountain_seal.webp",{duration:1080,hitFrame:7,element:"earth",scale:2.1,maxSize:280}),
-        relic_soul_bell:relicSheet("assets/vfx/relic/relic_soul_bell.webp",{duration:1080,hitFrame:7,element:"light",scale:2.1,maxSize:280}),
-        relic_spirit_spring_bottle:relicSheet("assets/vfx/relic/relic_spirit_spring_bottle.webp",{duration:1020,hitFrame:6,element:"water",scale:2.05,maxSize:270}),
-        relic_sun_orb:relicSheet("assets/vfx/relic/relic_sun_orb.webp",{duration:960,hitFrame:7,element:"fire",scale:2.15,maxSize:280}),
-        relic_tiangang_banner:relicSheet("assets/vfx/relic/relic_tiangang_banner.webp",{duration:1050,hitFrame:8,element:"fire",scale:2.15,maxSize:285}),
-        relic_wind_chasing_talisman:relicSheet("assets/vfx/relic/relic_wind_chasing_talisman.webp",{duration:900,hitFrame:6,element:"wind",scale:2.05,maxSize:270}),
-        relic_xuanwu_seal:relicSheet("assets/vfx/relic/relic_xuanwu_seal.webp",{duration:1080,hitFrame:8,element:"water",scale:2.1,maxSize:280}),
 
         /* These Light support skills currently have no dedicated finished cast
            sheet. Their battle timing remains valid, but there is deliberately
@@ -1014,81 +973,6 @@
         });
         return current;
     }
-
-    function detachedPresentationGate(duration){
-        let resolvePromise=null;
-        const gate={
-            done:false,reason:null,deadline:Date.now()+duration,promise:null,complete:null,restartVisualTimeline:null
-        };
-        gate.promise=new Promise(resolve=>{ resolvePromise=resolve; });
-        gate.complete=function(reason){
-            if(gate.done){ return false; }
-            gate.done=true;
-            gate.reason=reason||"v143-detached-complete";
-            resolvePromise(gate);
-            return true;
-        };
-        gate.restartVisualTimeline=function(nextDuration){
-            gate.deadline=Date.now()+Math.max(0,Number(nextDuration)||duration);
-            return true;
-        };
-        return gate;
-    }
-
-    window.v143PlayRelicVfx=function(relicId,meta){
-        meta=meta||{};
-        const model=MANIFEST[relicId];
-        if(!model||!model.sprite){ return null; }
-        const duration=Math.max(520,Math.min(1100,Number(model.duration)||1000));
-        const targetSide=meta.targetSide==="monster"?"monster":"player";
-        const targetIds=Array.isArray(meta.targetIds)?meta.targetIds.filter(Number.isInteger):[];
-        const targetId=Number.isInteger(meta.targetId)?meta.targetId:(targetIds.length===1?targetIds[0]:null);
-        const targetType=String(meta.targetType||((targetSide==="monster")?"all":"allyAll"));
-        const config={
-            id:relicId,
-            name:String(meta.name||"秘寶"),
-            element:String(model.element||meta.element||"normal"),
-            duration:duration,
-            resolveDuration:duration,
-            tier:"relic",
-            style:"relic",
-            category:String(meta.category||""),
-            targetType:targetType
-        };
-        const gate=detachedPresentationGate(duration);
-        const contract=Object.freeze({
-            version:"battle-target-contract-v1",
-            side:"player",
-            actorIndex:Number.isInteger(meta.actorIndex)?meta.actorIndex:0,
-            targetSide:targetSide,
-            targetType:targetType,
-            targetId:targetId,
-            targetIds:Object.freeze(targetIds.slice())
-        });
-        try{
-            render(config,{
-                side:"player",
-                actorIndex:contract.actorIndex,
-                targetSide:targetSide,
-                targetId:targetId,
-                targetIds:targetIds,
-                targetContract:contract
-            },gate);
-        }catch(error){
-            state.metrics.renderErrors=(state.metrics.renderErrors||0)+1;
-            if(typeof console!=="undefined"&&typeof console.error==="function"){
-                console.error("V143 relic raster render failed.",error);
-            }
-            gate.complete("v143-relic-render-error");
-        }
-        return Object.freeze({
-            relicId:relicId,
-            duration:duration,
-            hitMs:Math.round(duration*(Number(model.hit)||DEFAULT_HIT)),
-            promise:gate.promise,
-            gate:gate
-        });
-    };
 
     function officialPlay(config,meta){
         const safeMeta=Object.assign({},meta||{},{render:false});
