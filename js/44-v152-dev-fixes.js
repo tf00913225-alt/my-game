@@ -272,64 +272,6 @@
         };
     }
 
-    function hasFrostbite(character){
-        return !!(character&&Array.isArray(character.statusEffects)&&character.statusEffects.some(effect=>
-            effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0
-        ));
-    }
-
-    function activeBattleCharacter(){
-        const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-        return typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-    }
-
-    function syncFrostbiteSkillControls(){
-        if(typeof document==="undefined"){ return; }
-        const blocked=hasFrostbite(activeBattleCharacter());
-        const mainButton=document.querySelector&&document.querySelector("#mainBattleMenu > .menu-button.skill");
-        if(mainButton){
-            if(blocked){
-                mainButton.disabled=true;
-                mainButton.dataset.v152FrostbiteBlocked="1";
-                mainButton.classList.add("v152-frostbite-blocked");
-                mainButton.setAttribute("aria-label","凍傷禁止使用技能");
-            }else if(mainButton.dataset.v152FrostbiteBlocked==="1"){
-                mainButton.disabled=false;
-                delete mainButton.dataset.v152FrostbiteBlocked;
-                mainButton.classList.remove("v152-frostbite-blocked");
-                mainButton.setAttribute("aria-label","技能");
-            }
-        }
-        if(document.querySelectorAll){
-            document.querySelectorAll(".v152-frostbite-symbol").forEach(symbol=>symbol.remove());
-        }
-        if(!blocked||!document.querySelectorAll){ return; }
-        document.querySelectorAll("#skillQuickBarGrid .skill-quick-button").forEach(button=>{
-            button.disabled=true;
-            button.onclick=null;
-            button.classList.add("v152-frostbite-blocked");
-        });
-    }
-
-    if(typeof populateSkillQuickBar==="function"){
-        const previousPopulateSkillQuickBar=populateSkillQuickBar;
-        populateSkillQuickBar=function(){
-            const result=previousPopulateSkillQuickBar.apply(this,arguments);
-            syncFrostbiteSkillControls();
-            return result;
-        };
-    }
-    if(typeof toggleSkillQuickBar==="function"){
-        const previousToggleSkillQuickBar=toggleSkillQuickBar;
-        toggleSkillQuickBar=function(){
-            if(hasFrostbite(activeBattleCharacter())){
-                syncFrostbiteSkillControls();
-                return;
-            }
-            return previousToggleSkillQuickBar.apply(this,arguments);
-        };
-    }
-
     if(typeof showDamagePopup==="function"){
         const previousShowDamagePopup=showDamagePopup;
         showDamagePopup=function(element){
@@ -490,7 +432,6 @@
         updateUI=function(){
             const result=previousUpdateUI.apply(this,arguments);
             syncSkillPointDisplay();
-            syncFrostbiteSkillControls();
             syncAbyssBattleUi();
             return result;
         };
@@ -499,7 +440,6 @@
     function boot(){
         cleanAccidentalFireSkill();
         syncSkillPointDisplay();
-        syncFrostbiteSkillControls();
         syncAbyssBattleUi();
         removeTaskTracker();
     }
@@ -520,7 +460,6 @@
     window.v152SyncSkillPointDisplay=syncSkillPointDisplay;
     window.v152NormalizeRageBuff=normalizeRageBuff;
     window.v152ResolveExtremeEmperorAction=resolveExtremeEmperorAction;
-    window.v152SyncFrostbiteSkillControls=syncFrostbiteSkillControls;
     window.v152SyncAbyssBattleUi=syncAbyssBattleUi;
     window.v152Diagnostics=function(){
         return {

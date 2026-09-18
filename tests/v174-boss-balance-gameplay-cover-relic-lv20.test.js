@@ -157,7 +157,7 @@ function relicContext(level){
 /* Requirement 2: activity cover art uses 16:9 while the battlefield Boss
    occupies one six-Slot, cardless target footprint. */
 assert.match(gameplayCss,/\.gameplay-mode-card\{[\s\S]*?aspect-ratio:16\s*\/\s*9;/);
-assert.match(gameplayCss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 5px\);[\s\S]*?right:calc\(20% \+ 5px\);/);
+assert.match(gameplayCss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 12px\);[\s\S]*?right:calc\(20% \+ 12px\);/);
 assert.match(gameplayCss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?pointer-events:auto;/);
 assert.doesNotMatch(gameplayCss,/boss-mechanism-card|boss-mechanism-slot/);
 

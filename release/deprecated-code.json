@@ -63,6 +63,18 @@
         "resolveMechanismAction",
         ".red-hit"
       ]
+    },
+    {
+      "id": "DEP-005-frostbite-skill-lock-ui",
+      "description": "凍傷是傷害、閃避與異常抗性各降低 25% 的 soft debuff，不得再禁止玩家或怪物使用技能，也不得顯示舊禁止文字。",
+      "enabled": true,
+      "forbidden": [
+        "v152-frostbite-blocked",
+        "凍傷禁止使用技能",
+        "rejectFrostbittenSkill",
+        "withoutLegacyFrostbiteLock",
+        "v169FrostbiteCompatibilityActive"
+      ]
     }
   ]
 }

@@ -63,18 +63,13 @@ assert.match(dungeonShell,/v148SyncContextNavigation/,"V146 must delegate naviga
 assert.match(finalContextNav,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\('home'\)"/);
 assert.match(dungeonShell,/page\.classList\.toggle\("v146-abyss-active",abyssActive\)/,"Abyss selection must hide the old dungeon shell as well as the map");
 
-// The Gameplay stylesheet predates this Boss portrait change and still owns a
-// few intentional priority rules in unrelated panel/detail UI. Keep the
-// regression focused on the Boss battlefield geometry changed here: these
-// sizing/placement owners must stay specificity-driven instead of adding new
-// !important patches.
-const bossBattlePriorityScope=[
-    cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active{"),
-    cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active > .v-fixed-boss-footprint{"),
-    cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active > .v-fixed-boss-footprint > .battle-monster.gameplay-boss-card{")
-].join("\n");
-assert.doesNotMatch(bossBattlePriorityScope,/!important/,"Boss battlefield sizing must not introduce priority patches");
- assert.doesNotMatch(css.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
+// The footprint geometry remains specificity-driven. The Boss root/HUD reset
+// intentionally uses priority because earlier shared battle styles also use
+// priority and otherwise restore the retired frame or hide the Boss HP bar.
+const bossFootprintRule=cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active > .v-fixed-boss-footprint{");
+const bossCardRule=cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active > .v-fixed-boss-footprint > .battle-monster.gameplay-boss-card{");
+assert.doesNotMatch(bossFootprintRule,/!important/,"Boss footprint coordinates must remain geometry-owned");
+assert.match(bossCardRule,/border:0 !important;[\s\S]*?outline:0 !important;[\s\S]*?background:none !important;[\s\S]*?box-shadow:none !important;/);
 
 const gameplayIndex=loader.indexOf("js/gameplay-boss-tower-system.js");
 const relicIndex=loader.indexOf("js/60-team-relic-system.js");

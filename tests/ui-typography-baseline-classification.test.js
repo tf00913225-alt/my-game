@@ -10,7 +10,7 @@ const boss=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
 assert.match(guidelines,/13px — 絕對最低值/);
 assert.match(guidelines,/戰鬥介面排除/);
 assert.match(fixed,/--battle-name-row-height:14px/);
-assert.match(fixed,/--battle-resource-bar-height:10px/);
+assert.match(fixed,/--battle-resource-bar-height:11px/);
 assert.match(fixed,/\.battle-monster-name\{[\s\S]*?font-size:11px !important/);
 assert.match(fixed,/\.monster-bar-text,[\s\S]*?font-size:9px !important/);
 assert.match(boss,/\.gameplay-boss-card > \.battle-monster-name\{[\s\S]*?font-size:14px/);

@@ -3616,54 +3616,6 @@
         };
     }
 
-    function rejectFrostbittenSkill(character,index,skill,consumeTurn){
-        if(!skill||!activeStatus(character,"frostbite")){ return false; }
-        if(typeof showMissEffect==="function"){ showMissEffect(true,index,"MISS"); }
-        if(typeof addBattleLog==="function"){
-            addBattleLog((character.id||"角色")+"處於凍傷狀態，無法使用"+skill.name+"。可改用普通攻擊、補品、符咒、防禦或逃脫。");
-        }
-        if(consumeTurn&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
-        return true;
-    }
-
-    if(typeof prepareAction==="function"){
-        const previousPrepareAction=prepareAction;
-        prepareAction=function(type){
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase[type]:null;
-            const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-            if(skill&&rejectFrostbittenSkill(character,index,skill,false)){ return; }
-            return previousPrepareAction.apply(this,arguments);
-        };
-    }
-
-    if(typeof resolveQueuedPlayerAction==="function"){
-        const previousResolveQueuedAction=resolveQueuedPlayerAction;
-        resolveQueuedPlayerAction=function(characterIndex){
-            const queued=typeof queuedPlayerActions!=="undefined"?queuedPlayerActions[characterIndex]:null;
-            const skill=queued&&typeof skillDatabase!=="undefined"?skillDatabase[queued.action]:null;
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            if(skill&&rejectFrostbittenSkill(character,characterIndex,skill,true)){ return; }
-            return previousResolveQueuedAction.apply(this,arguments);
-        };
-    }
-
-    if(typeof autoActionForCharacter==="function"){
-        const previousAutoAction=autoActionForCharacter;
-        autoActionForCharacter=function(characterIndex){
-            const result=previousAutoAction.apply(this,arguments);
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const queued=typeof queuedPlayerActions!=="undefined"?queuedPlayerActions[characterIndex]:null;
-            if(character&&activeStatus(character,"frostbite")&&queued&&skillDatabase[queued.action]){
-                queued.action="normal";
-                if(typeof addBattleLog==="function"){
-                    addBattleLog((character.id||"角色")+"處於凍傷狀態，自動戰鬥已改用普通攻擊。");
-                }
-            }
-            return result;
-        };
-    }
-
     /* ----- Player Fire EX, guaranteed Burn and conditional follow-ups. ----- */
     let playerSkillContext=null;
 
@@ -4065,15 +4017,6 @@
         processSingleMonsterAttack=function(monsterIndex){
             const attackArgs=Array.prototype.slice.call(arguments);
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const frostbitten=activeStatus(monster,"frostbite");
-            const saved=monster?{
-                skillIds:monster.skillIds,supports:monster.v141SupportSkillIds,skillChance:monster.skillChance
-            }:null;
-            if(frostbitten&&monster){
-                monster.skillIds=[];
-                monster.v141SupportSkillIds=[];
-                monster.skillChance=0;
-            }
             const realFinish=typeof finishPlayerAction==="function"?finishPlayerAction:null;
             const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
             const previousHit=typeof showPlayerHit==="function"?showPlayerHit:null;
@@ -4130,11 +4073,6 @@
                 if(previousHit){ showPlayerHit=previousHit; }
                 if(previousLog){ addBattleLog=previousLog; }
                 if(previousStatusRoll){ rollStatusEffectHit=previousStatusRoll; }
-                if(frostbitten&&monster){
-                    monster.skillIds=saved.skillIds;
-                    monster.v141SupportSkillIds=saved.supports;
-                    monster.skillChance=saved.skillChance;
-                }
             }
             const repeatSkill=castSkillId&&skillDatabase[castSkillId];
             const livingTargets=livingPartyIndexes();
@@ -4199,7 +4137,7 @@
     window.v149SyncCombatCards=syncAllCombatCards;
     window.v149Diagnostics=function(){
         return {
-            version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:true,
+            version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:false,
             sameNameStateMiss:true,barrierCornerCount:false,proceduralSkillFallback:false,
             mainShopIcon:"assets/ui/home-shop.png",navShopIcon:"assets/ui/home-shop-v147.png"
         };
@@ -4482,64 +4420,6 @@
         };
     }
 
-    function hasFrostbite(character){
-        return !!(character&&Array.isArray(character.statusEffects)&&character.statusEffects.some(effect=>
-            effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0
-        ));
-    }
-
-    function activeBattleCharacter(){
-        const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-        return typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-    }
-
-    function syncFrostbiteSkillControls(){
-        if(typeof document==="undefined"){ return; }
-        const blocked=hasFrostbite(activeBattleCharacter());
-        const mainButton=document.querySelector&&document.querySelector("#mainBattleMenu > .menu-button.skill");
-        if(mainButton){
-            if(blocked){
-                mainButton.disabled=true;
-                mainButton.dataset.v152FrostbiteBlocked="1";
-                mainButton.classList.add("v152-frostbite-blocked");
-                mainButton.setAttribute("aria-label","凍傷禁止使用技能");
-            }else if(mainButton.dataset.v152FrostbiteBlocked==="1"){
-                mainButton.disabled=false;
-                delete mainButton.dataset.v152FrostbiteBlocked;
-                mainButton.classList.remove("v152-frostbite-blocked");
-                mainButton.setAttribute("aria-label","技能");
-            }
-        }
-        if(document.querySelectorAll){
-            document.querySelectorAll(".v152-frostbite-symbol").forEach(symbol=>symbol.remove());
-        }
-        if(!blocked||!document.querySelectorAll){ return; }
-        document.querySelectorAll("#skillQuickBarGrid .skill-quick-button").forEach(button=>{
-            button.disabled=true;
-            button.onclick=null;
-            button.classList.add("v152-frostbite-blocked");
-        });
-    }
-
-    if(typeof populateSkillQuickBar==="function"){
-        const previousPopulateSkillQuickBar=populateSkillQuickBar;
-        populateSkillQuickBar=function(){
-            const result=previousPopulateSkillQuickBar.apply(this,arguments);
-            syncFrostbiteSkillControls();
-            return result;
-        };
-    }
-    if(typeof toggleSkillQuickBar==="function"){
-        const previousToggleSkillQuickBar=toggleSkillQuickBar;
-        toggleSkillQuickBar=function(){
-            if(hasFrostbite(activeBattleCharacter())){
-                syncFrostbiteSkillControls();
-                return;
-            }
-            return previousToggleSkillQuickBar.apply(this,arguments);
-        };
-    }
-
     if(typeof showDamagePopup==="function"){
         const previousShowDamagePopup=showDamagePopup;
         showDamagePopup=function(element){
@@ -4700,7 +4580,6 @@
         updateUI=function(){
             const result=previousUpdateUI.apply(this,arguments);
             syncSkillPointDisplay();
-            syncFrostbiteSkillControls();
             syncAbyssBattleUi();
             return result;
         };
@@ -4709,7 +4588,6 @@
     function boot(){
         cleanAccidentalFireSkill();
         syncSkillPointDisplay();
-        syncFrostbiteSkillControls();
         syncAbyssBattleUi();
         removeTaskTracker();
     }
@@ -4730,7 +4608,6 @@
     window.v152SyncSkillPointDisplay=syncSkillPointDisplay;
     window.v152NormalizeRageBuff=normalizeRageBuff;
     window.v152ResolveExtremeEmperorAction=resolveExtremeEmperorAction;
-    window.v152SyncFrostbiteSkillControls=syncFrostbiteSkillControls;
     window.v152SyncAbyssBattleUi=syncAbyssBattleUi;
     window.v152Diagnostics=function(){
         return {
@@ -7195,114 +7072,7 @@
         ));
     }
 
-    function activeFrostbite(entity){
-        return !!(entity&&(entity.v169FrostbiteCompatibilityActive===true||hasStoredFrostbite(entity)));
-    }
-
-    /* Frostbite is a three-stat soft debuff, never a skill lock. Historical
-       V149/V152 wrappers still contain their old gating checks, so only those
-       checks see a filtered status list. A compatibility marker keeps the
-       real Frostbite penalties active while the underlying skill resolves. */
-    function withoutLegacyFrostbiteLock(entity,callback){
-        if(!entity||!Array.isArray(entity.statusEffects)||!hasStoredFrostbite(entity)){
-            return callback();
-        }
-        const original=entity.statusEffects;
-        const frostbite=original.filter(effect=>effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0);
-        const filtered=original.filter(effect=>!frostbite.includes(effect));
-        entity.statusEffects=filtered;
-        entity.v169FrostbiteCompatibilityActive=true;
-        try{ return callback(); }
-        finally{
-            const after=Array.isArray(entity.statusEffects)?entity.statusEffects:filtered;
-            delete entity.v169FrostbiteCompatibilityActive;
-            if(after===filtered){
-                entity.statusEffects=original;
-            }else if(after.length===0){
-                /* A cleanse replaced the filtered list with an empty list, so
-                   Frostbite must be removed too. */
-                entity.statusEffects=[];
-            }else{
-                entity.statusEffects=after.concat(frostbite.filter(effect=>numeric(effect.turnsLeft)>0));
-            }
-        }
-    }
-
-    function clearLegacyFrostbiteSkillLocks(){
-        if(typeof document==="undefined"){ return; }
-        const mainButton=document.querySelector&&document.querySelector("#mainBattleMenu > .menu-button.skill.v152-frostbite-blocked");
-        if(mainButton){
-            mainButton.disabled=false;
-            mainButton.classList.remove("v152-frostbite-blocked");
-            if(mainButton.dataset){ delete mainButton.dataset.v152FrostbiteBlocked; }
-            mainButton.setAttribute("aria-label","技能");
-        }
-        if(document.querySelectorAll){
-            document.querySelectorAll("#skillQuickBarGrid .skill-quick-button.v152-frostbite-blocked").forEach(button=>{
-                button.disabled=false;
-                button.classList.remove("v152-frostbite-blocked");
-            });
-        }
-    }
-
-    if(typeof window.prepareAction==="function"){
-        const previousPrepareAction=window.prepareAction;
-        window.prepareAction=function(){
-            const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-            const that=this,args=arguments;
-            const result=withoutLegacyFrostbiteLock(character,()=>previousPrepareAction.apply(that,args));
-            clearLegacyFrostbiteSkillLocks();
-            return result;
-        };
-    }
-
-    if(typeof window.resolveQueuedPlayerAction==="function"){
-        const previousResolveQueuedPlayerAction=window.resolveQueuedPlayerAction;
-        window.resolveQueuedPlayerAction=function(characterIndex){
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const that=this,args=arguments;
-            const result=withoutLegacyFrostbiteLock(character,()=>previousResolveQueuedPlayerAction.apply(that,args));
-            clearLegacyFrostbiteSkillLocks();
-            return result;
-        };
-    }
-
-    if(typeof window.autoActionForCharacter==="function"){
-        const previousAutoActionForCharacter=window.autoActionForCharacter;
-        window.autoActionForCharacter=function(characterIndex){
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const that=this,args=arguments;
-            return withoutLegacyFrostbiteLock(character,()=>previousAutoActionForCharacter.apply(that,args));
-        };
-    }
-
-    if(typeof window.processSingleMonsterAttack==="function"){
-        const previousProcessSingleMonsterAttack=window.processSingleMonsterAttack;
-        window.processSingleMonsterAttack=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const that=this,args=arguments;
-            return withoutLegacyFrostbiteLock(monster,()=>previousProcessSingleMonsterAttack.apply(that,args));
-        };
-    }
-
-    if(typeof window.v141TryMonsterSpecialAction==="function"){
-        const previousTryMonsterSpecialAction=window.v141TryMonsterSpecialAction;
-        window.v141TryMonsterSpecialAction=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const that=this,args=arguments;
-            return withoutLegacyFrostbiteLock(monster,()=>previousTryMonsterSpecialAction.apply(that,args));
-        };
-    }
-
-    if(typeof window.updateUI==="function"){
-        const previousUpdateUI=window.updateUI;
-        window.updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            clearLegacyFrostbiteSkillLocks();
-            return result;
-        };
-    }
+    function activeFrostbite(entity){ return hasStoredFrostbite(entity); }
 
     /* Damage -25%. Different named outgoing-damage reductions coexist by
        multiplication, matching the shared status stacking rules. */
@@ -7374,8 +7144,6 @@
             return previousAddBattleLog.call(this,text);
         };
     }
-
-    clearLegacyFrostbiteSkillLocks();
 
     /* V158's compatibility resolver asks for tri. Freeze's final target truth is
        a front/back column of at most two valid targets. */
