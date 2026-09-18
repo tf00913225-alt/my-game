@@ -52,6 +52,7 @@ window.__allyIndexes=[0,1,2];
 window.getExistingPartyIndexes=function(){return window.__allyIndexes.slice();};
 window.monsters=Array.from({length:10},function(_,i){return {hp:1000,alive:true,rank:i===2?'boss':(i===1?'elite':'regular')};});
 window.currentBattleMonsters=[];window.getMonsterRank=function(m){return m&&m.rank||'regular';};window.renderBattle=function(){};
+window.addEventListener('error',function(event){var result=document.getElementById('result');if(result&&!result.textContent){result.textContent=JSON.stringify({fixtureError:String(event.error&&event.error.stack||event.message||'unknown fixture error')});}});
 /* The focused geometry fixture supplies the public presentation boundary only;
    the exact production implementation is covered by static/runtime suites and
    by the exact-candidate browser job. This prevents unrelated management UI
@@ -116,7 +117,7 @@ function runViewport(chrome,width,height){
     const fileUrl="file://"+FIXTURE.replace(/\\/g,"/");
     const result=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:24*1024*1024});
     assert.equal(result.status,0,result.stderr||`browser fixture failed ${width}x${height}`);
-    const match=result.stdout.match(/<pre id="result"[^>]*>([\s\S]*?)<\/pre>/);assert.ok(match,`missing QA result ${width}x${height}`);const data=JSON.parse(decode(match[1]));
+    const match=result.stdout.match(/<pre id="result"[^>]*>([\s\S]*?)<\/pre>/);assert.ok(match,`missing QA result ${width}x${height}`);const data=JSON.parse(decode(match[1]));assert.ok(!data.fixtureError,data.fixtureError);
     if(width===412&&height===915){
         const screenshot=path.join(ARTIFACT_DIR,"boss-battle-convergence-412x915.png");
         const shot=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200",`--screenshot=${screenshot}`,fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
