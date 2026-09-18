@@ -5,11 +5,11 @@
   "base_sha": "d91687cb09d04519766d8303c331945508bde3a5",
   "work_branch": "feature/relic-vfx-animation-20260918",
   "officialVersion": "173.65",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": 1,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "從 assets-library/assets/inbox/秘寶icon/秘寶技能VFX 導入 20 張秘寶 4×3 PNG；正式 runtime 一律使用無損 WebP，保留原始 1448×1086 畫布、4×3 格數、每格 362×362、透明度與像素內容。",
       "owner": [
         "assets/vfx/relic/",
@@ -19,7 +19,7 @@
     },
     {
       "id": 2,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "依每張 VFX 的實際形成／高峰／消散內容判斷命中影格與播放秒數，並沿用 V143 既有 4×3 Sprite Sheet renderer，不新增第二套 VFX owner。",
       "owner": [
         "js/39-v143-skill-animation.js::relicSheet()",
@@ -30,7 +30,7 @@
     },
     {
       "id": 3,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "秘寶觸發時依技能效果在正確目標側播放 VFX；全敵、全隊、單體救援與反震均使用正式 Fixed Slot／Boss 幾何，並保持既有秘寶效果、戰鬥回合與 1.15 秒出手節奏。",
       "owner": [
         "js/60-team-relic-system.js::queueRelicPresentation()",
@@ -49,5 +49,5 @@
     "npm run build:check",
     "PR Repository checks / mobile browser QA"
   ],
-  "verificationResult": "IMPLEMENTED — awaiting generated build synchronization and Repository checks."
+  "verificationResult": "3/3 VERIFIED；20 張 4×3 PNG 已由 assets-library 轉為 lossless WebP 並逐張確認 1448×1086、362×362 cell、Alpha 與解碼像素 AE=0（staging run 35366394140 SUCCESS）。V143 單一 raster owner 已綁定 20 件 reviewed hit frame，秘寶 runtime 依 Trigger／Effect 使用正式 Fixed Slot／Boss target contract，VFX 0.78–0.98 秒 + 120ms lead gap 保持在 1150ms post-action beat 內；未開放 10 件仍維持 runtimeReady:false。PR #316 Repository checks run 35368054937 SUCCESS：source syntax、battle layout/timing/range-VFX regression、build:check、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、release/cache/deprecated-code gates 與 git diff check 均通過。"
 }
