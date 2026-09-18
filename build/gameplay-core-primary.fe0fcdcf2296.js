@@ -786,24 +786,6 @@
        strand an initiative entry when a visual Promise completed out of order. */
 
 
-    getSkillTargets=function(centerIndex,targetType){
-        const bossOwner=window.FourSymbolsBossBattle;
-        if(bossOwner&&typeof bossOwner.isActive==="function"&&bossOwner.isActive()){
-            return bossOwner.resolveEnemyDamageTargets(centerIndex,targetType);
-        }
-        const owner=fixedBattlefieldSlots();
-        const snapshot=ensureEnemyFormationSnapshot(currentBattleMonsters);
-        if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
-            return owner.resolveEnemyTargets(
-                snapshot,
-                centerIndex,
-                targetType,
-                index=>!!(monsters[index]&&monsters[index].alive!==false&&Number(monsters[index].hp)>0)
-            );
-        }
-        return monsters[centerIndex]&&monsters[centerIndex].alive?[centerIndex]:[];
-    };
-
     function applyBattleFormation(){
         const area=document.getElementById("battleMonsterArea");
         const owner=fixedBattlefieldSlots();

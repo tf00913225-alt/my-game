@@ -13724,9 +13724,10 @@ function getSkillDamageAtLevel(skill,level){
    （回傳的是monsters陣列的原始index清單）。
 
    single：只打選定的目標。
-   tri / row：命中選定目標所在的固定3人橫排。
-   all：命中目前場上全部存活敵人。
-   戰鬥最多6隻怪時，前排與後排不會因死亡而重新補位。
+   一般戰鬥由 FourSymbolsBattlefieldSlots 的固定十格快照解析
+   single / tri / row / column / all；死亡後不會重新補位。
+   Boss 專屬模式則先交給 FourSymbolsBossBattle：除 all 外一律
+   只結算 primary target。這裡是敵方傷害目標的唯一 owner。
 */
 
 function getSkillTargets(centerIndex,targetType){
@@ -13735,6 +13736,19 @@ function getSkillTargets(centerIndex,targetType){
     if(bossOwner&&typeof bossOwner.isActive==="function"&&bossOwner.isActive()&&
        typeof bossOwner.resolveEnemyDamageTargets==="function"){
         return bossOwner.resolveEnemyDamageTargets(centerIndex,targetType);
+    }
+
+    const slotOwner=typeof window!=="undefined"?window.FourSymbolsBattlefieldSlots:null;
+    const snapshot=slotOwner&&typeof slotOwner.getActiveEnemySnapshot==="function"
+        ?slotOwner.getActiveEnemySnapshot():null;
+    if(slotOwner&&snapshot&&typeof slotOwner.resolveEnemyTargets==="function"&&
+       ["single","tri","row","column","all"].includes(targetType)){
+        return slotOwner.resolveEnemyTargets(
+            snapshot,
+            centerIndex,
+            targetType,
+            index=>!!(monsters[index]&&monsters[index].alive!==false&&Number(monsters[index].hp)>0)
+        );
     }
 
     const alive=currentBattleMonsters.filter(

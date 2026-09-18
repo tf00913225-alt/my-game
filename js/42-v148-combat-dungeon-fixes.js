@@ -120,21 +120,6 @@
         return stableFormationRows(ordered).flatMap(centerFirstOrder).filter(monsterAlive);
     }
 
-    if(typeof getSkillTargets==="function"){
-        const previousGetSkillTargets=getSkillTargets;
-        getSkillTargets=function(centerIndex,targetType){
-            const owner=battlefieldSlots();
-            const snapshot=activeFormationSnapshot(
-                typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]
-            );
-            if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
-                return owner.resolveEnemyTargets(snapshot,centerIndex,targetType,monsterAlive);
-            }
-            const legacy=previousGetSkillTargets.apply(this,arguments);
-            return Array.isArray(legacy)?legacy.filter(monsterAlive):[];
-        };
-    }
-
     window.v148GetFormationRows=stableFormationRows;
     window.v148GetAutoTargetPriority=autoTargetPriority;
 

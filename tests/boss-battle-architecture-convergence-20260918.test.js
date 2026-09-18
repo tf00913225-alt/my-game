@@ -66,6 +66,9 @@ assert.match(formation,/saveGame\(\{source:"ally-formation"\}\)/);
 
 assert.match(core,/window\.FourSymbolsBattleFlow=Object\.freeze/);
 assert.match(core,/interceptActionFinish\(interceptor\)/);
+assert.match(core,/function getSkillTargets\(centerIndex,targetType\)[\s\S]*?FourSymbolsBossBattle[\s\S]*?FourSymbolsBattlefieldSlots/);
+assert.doesNotMatch(read("js/25-v131-fix-batch.js"),/getSkillTargets\s*=/);
+assert.doesNotMatch(read("js/42-v148-combat-dungeon-fixes.js"),/getSkillTargets\s*=/);
 assert.match(core,/subscribeBeforeCombatant\(observer\)/);
 assert.match(core,/v142GetRemainingAnimationMs/);
 assert.doesNotMatch(timing,/finishPlayerAction\s*=(?!=)|processNextCombatant\s*=(?!=)/);
