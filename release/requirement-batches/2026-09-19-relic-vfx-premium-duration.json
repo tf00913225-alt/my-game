@@ -5,11 +5,11 @@
   "base_sha": "4e449c7dd3ac192b33546ef99d73aa5c32541e83",
   "work_branch": "fix/relic-vfx-premium-duration-20260919",
   "officialVersion": "173.65",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": 1,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "所有秘寶技能 VFX 最低播放 3 秒，整體呈現需比一般角色技能更有壓場感與高級感。",
       "owner": [
         "js/60-team-relic-system.js::RELIC_VFX_PRESENTATION",
@@ -19,7 +19,7 @@
     },
     {
       "id": 2,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "延長秘寶 VFX 不得改變 1.15 秒正式戰鬥節奏 owner、技能效果數值、觸發條件或 main。",
       "owner": [
         "js/00-main.js::POST_ACTION_DELAY_MS",
@@ -37,6 +37,6 @@
     "npm run build:check",
     "PR Repository checks / mobile browser QA"
   ],
-  "verificationResult": "IMPLEMENTED — 待 Repository checks / build sync / dev deploy exact-SHA 驗證後改為 VERIFIED。",
+  "verificationResult": "2/2 VERIFIED；20 件秘寶 VFX 已強制至少 3000ms，正式設定為 3.0–3.8 秒；reviewed hit frame、V142/V143 單一 VFX owner、Fixed Slot/Boss 幾何與 1150ms POST_ACTION_DELAY_MS 均未改。Focused build sync run 35369870821 SUCCESS；PR #317 Repository checks run 35369950450 SUCCESS，包含 JavaScript syntax、battle/VFX regressions、build:check、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile QA、Adventure mobile QA、static resources、Release Gate 與 git diff check。",
   "releasedAs": null
 }
