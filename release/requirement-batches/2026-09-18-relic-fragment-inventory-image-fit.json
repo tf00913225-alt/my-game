@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-18",
+  "title": "秘寶碎片背包圖示尺寸與詳情穿圖修復",
+  "base_branch": "dev",
+  "base_sha": "d9c6d2d2beb78a0a944af171ca20eeb92f02abaa",
+  "work_branch": "fix/relic-fragment-inventory-image-fit-20260918",
+  "officialVersion": "173.65",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "IMPLEMENTED",
+      "request": "修復背包格內秘寶碎片圖示看起來全黑，以及點開道具詳情後圖片以原始大圖尺寸穿出彈窗。",
+      "owner": [
+        "js/relic-progression-drop-system.js::fragmentIconMarkup()",
+        "css/38-v141-system-expansion.css"
+      ],
+      "implementation": "根因是新 WebP 碎片以裸 <img> 寫入 item.icon，繞過背包格與 itemModal 既有 `.v169-item-art > img` 幾何 owner。fragmentIconMarkup 改回既有 v169-item-art 包裝，使背包格和詳情共用既有 width/height/object-fit:contain 規則；沒有新增 CSS override、沒有改素材、掉落、合成或背包邏輯。"
+    }
+  ],
+  "verification": [
+    "tests/relic-icon-assets.test.mjs",
+    "tests/v175-inventory-battle-nav-regressions.test.js",
+    "npm run build:check",
+    "PR Repository checks / mobile browser QA"
+  ],
+  "verificationResult": "PENDING",
+  "releasedAs": null
+}
