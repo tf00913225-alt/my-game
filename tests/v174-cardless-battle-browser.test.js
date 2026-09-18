@@ -184,7 +184,7 @@ function runViewport(chrome,width,height){
     assert.notEqual(data.activeShadow,"none");
     assert.equal(data.playerIdle,"v174BattleIdle");
     assert.equal(data.lungeAnimation,"v174BattleLungeUp");
-    assert.equal(data.hitAnimation,"v174BattleHitShake");
+    assert.equal(data.hitAnimation,"none");
     assert.notEqual(data.footShadowContent,"none");
     assert.equal(data.abyssOwnerOpacity,"0");
     assert.equal(data.overlayPosition,"absolute");

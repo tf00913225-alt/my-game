@@ -240,7 +240,7 @@ test("Phoenix fewer-than-three Burn cast grants one non-refreshable next-round 3
     );
 });
 
-test("hard-controlled player and monster finish with the 300 ms override only",()=>{
+test("hard-controlled player and monster leave timing to the core queue owner",()=>{
     const observed=[];
     const player={hp:100,frozen:true};
     const monster={name:"敵人",hp:100,alive:true,frozen:true};
@@ -255,10 +255,10 @@ test("hard-controlled player and monster finish with the 300 ms override only",(
     context.beginCharacterTurn(1);
     context.battlePhase="resolve";
     context.processSingleMonsterAttack(0,1);
-    assert.deepEqual(observed,[300,300]);
+    assert.deepEqual(observed,[undefined,undefined]);
     assert.equal(Object.prototype.hasOwnProperty.call(context,"__battleAdvanceDelayOverrideMs"),false);
-    assert.match(coreSource,/function getBattleAdvanceDelay\(baseDelay\)/);
-    assert.match(coreSource,/delete window\.__battleAdvanceDelayOverrideMs/);
+    assert.match(coreSource,/function getBattleAdvanceDelay\(phase\)/);
+    assert.doesNotMatch(source,/withHardControlDelay|__battleAdvanceDelayOverrideMs/);
     assert.doesNotMatch(v131Source,/finishPlayerAction\s*=(?!=)/);
     assert.doesNotMatch(v142Source,/finishPlayerAction\s*=(?!=)/);
 });

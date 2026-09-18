@@ -274,11 +274,12 @@ async function seedParty(page){
                 pacing:window.v138BattlePacing
             };
         });
-        assert.deepEqual(pacing.delays,[400]);
+        assert.deepEqual(pacing.delays,[800]);
         assert.equal(pacing.initiativeIndex,3);
-        assert.equal(pacing.pacing.actionDelayMs,1600);
-        assert.equal(pacing.pacing.roundDelayMs,2000);
-        assert.equal(pacing.pacing.roundHandoffDelayMs,400);
+        assert.equal(pacing.pacing.actionDelayMs,1250);
+        assert.equal(pacing.pacing.roundDelayMs,1250);
+        assert.equal(pacing.pacing.roundHandoffDelayMs,800);
+        assert.equal(pacing.pacing.roundAnnouncementDelayMs,450);
 
         assert.deepEqual(errors,[]);
         console.log("✓ V138 browser smoke passed");

@@ -728,12 +728,12 @@
    Their artwork may overhang vertically, but their F1/F5 or B1/B5 holder clips
    neither HUD nor portrait and never invades the central Boss footprint. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.gameplay-boss-active .v-fixed-enemy-slot[data-slot$="1"] .v174-battle-art{
-    left:-2px !important;
-    right:14px !important;
+    left:4px !important;
+    right:26px !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.gameplay-boss-active .v-fixed-enemy-slot[data-slot$="5"] .v174-battle-art{
-    left:14px !important;
-    right:-2px !important;
+    left:26px !important;
+    right:4px !important;
 }
 
 @media (max-height:760px){

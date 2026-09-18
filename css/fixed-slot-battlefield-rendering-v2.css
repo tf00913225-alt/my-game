@@ -450,11 +450,6 @@
     background:none !important;
     box-shadow:none !important;
 }
-/* Enemy HP damage keeps VFX and HP-bar feedback but does not add a separate
-   flashing red popup over the cardless portrait. */
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit > .damage-popup.hp-popup{
-    display:none !important;
-}
 /* Formal target feedback is a compact reticle over the artwork, never a card
    outline. The same owner covers normal enemies, Boss, reinforcements and
    destructible Boss objects as soon as they enter the Unit pipeline. */
@@ -485,7 +480,6 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down{animation:none !important;}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up > .v174-battle-art{animation:v174BattleLungeUp .45s ease !important;}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down > .v174-battle-art{animation:v174BattleLungeDown .45s ease !important;}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art.v174-hit-shake{animation:v174BattleHitShake .28s ease !important;}
 
 /* Status artwork is anchored to the Slot-sized Unit, not to source image bounds. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v153-status-vfx{
@@ -548,13 +542,6 @@
     0%,100%{transform:translateY(0) scale(1)}
     38%{transform:translateY(13px) scale(1.035)}
     68%{transform:translateY(5px) scale(1.015)}
-}
-@keyframes v174BattleHitShake{
-    0%,100%{transform:translate(0,0)}
-    18%{transform:translate(-4px,1px)}
-    36%{transform:translate(4px,-1px)}
-    54%{transform:translate(-3px,0)}
-    72%{transform:translate(2px,1px)}
 }
 @keyframes v174TargetReticlePulse{
     from{opacity:.58;filter:brightness(.92)}

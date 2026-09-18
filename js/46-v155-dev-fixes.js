@@ -8,7 +8,6 @@
     window.__v155DevFixesInstalled=true;
 
     const VERSION="155";
-    const HARD_CONTROL_SKIP_MS=300;
     const FINAL_BOSS_ORDER=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
     const FINAL_BOSS_RULES={
         東帝天尊:{element:"earth",skills:["dustStorm","stoneBreakSky"],supports:["earthShield"]},
@@ -219,30 +218,6 @@
         }
     }
     window.v155WithForcedFinalAbyssSkillLevel=withForcedFinalAbyssSkillLevel;
-
-    function withHardControlDelay(callback){
-        const hadOverride=Object.prototype.hasOwnProperty.call(window,"__battleAdvanceDelayOverrideMs");
-        const previousOverride=window.__battleAdvanceDelayOverrideMs;
-        window.__battleAdvanceDelayOverrideMs=HARD_CONTROL_SKIP_MS;
-        try{ return callback(); }
-        finally{
-            if(hadOverride){ window.__battleAdvanceDelayOverrideMs=previousOverride; }
-            else{ delete window.__battleAdvanceDelayOverrideMs; }
-        }
-    }
-
-    if(typeof beginCharacterTurn==="function"){
-        const previousBeginCharacterTurn=beginCharacterTurn;
-        beginCharacterTurn=function(){
-            const character=typeof activeBattleCharacterIndex!=="undefined"&&typeof getPartyCharacterByIndex==="function"
-                ?getPartyCharacterByIndex(activeBattleCharacterIndex):null;
-            if(typeof battlePhase!=="undefined"&&battlePhase==="declare"&&hardControlled(character)){
-                const that=this,args=arguments;
-                return withHardControlDelay(()=>previousBeginCharacterTurn.apply(that,args));
-            }
-            return previousBeginCharacterTurn.apply(this,arguments);
-        };
-    }
 
     function currentRound(){ return typeof turn!=="undefined"?Math.max(0,numeric(turn)):0; }
     function currentBattleToken(){ return typeof battleToken!=="undefined"?battleToken:null; }
@@ -961,7 +936,9 @@
                 withPhoenixCast("monster",monster,monsterIndex,()=>previousMonsterAttack.apply(that,args))
             );
             const invokeAtForcedLevel=()=>withForcedFinalAbyssSkillLevel(monster,invoke);
-            return hardControlled(monster)?withHardControlDelay(invokeAtForcedLevel):invokeAtForcedLevel();
+            /* The core battle queue owns every resolve delay, including a
+               frozen or petrified enemy's skipped action. */
+            return invokeAtForcedLevel();
         };
     }
 
@@ -969,7 +946,7 @@
 
     window.v155RuleDiagnostics=function(){
         return {
-            version:VERSION,hardControlSkipMs:HARD_CONTROL_SKIP_MS,
+            version:VERSION,hardControlUsesQueueTiming:true,
             elementalSkillDataOwnedByFinalLayers:true,
             monsterOnlyFireBurst:!!(typeof skillDatabase!=="undefined"&&skillDatabase.fireBurstStrike)
         };

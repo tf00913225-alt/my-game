@@ -4043,8 +4043,13 @@ let timerId=null;
 /* Every declare/resolve step owns one deterministic advance timer. */
 let battleAdvanceTimeoutId=null;
 let battleAdvanceScheduled=false;
-const BATTLE_DECLARE_ADVANCE_MS=90;
-const BATTLE_RESOLVE_ADVANCE_MS=520;
+/* Queue timing has one owner: this module. V142/V143 report visual time only. */
+const MANUAL_RESOLUTION_START_MS=250;
+const BATTLE_MIN_ACTION_INTERVAL_MS=1250;
+const BATTLE_SKILL_VFX_TAIL_MS=400;
+const ROUND_HANDOFF_MS=800;
+const ROUND_ANNOUNCE_LEAD_MS=450;
+const BATTLE_DECLARE_ADVANCE_MS=MANUAL_RESOLUTION_START_MS;
 const battleActionFinishObservers=new Set();
 const battleBeforeCombatantObservers=new Set();
 const battleActionFinishInterceptors=[];
@@ -4095,15 +4100,21 @@ function notifyBeforeCombatant(token){
         catch(error){ console.error("戰鬥佇列觀察器失敗：",error); }
     });
 }
-function getBattleAdvanceDelay(baseDelay){
-    const override=typeof window!=="undefined"?Number(window.__battleAdvanceDelayOverrideMs):NaN;
-    if(typeof window!=="undefined"&&Number.isFinite(override)){
-        delete window.__battleAdvanceDelayOverrideMs;
-        return Math.max(0,override);
+function getBattleAdvanceDelay(phase){
+    if(phase==="declare"){
+        /* A previous VFX must never delay the last declared action. */
+        return MANUAL_RESOLUTION_START_MS;
     }
     const visualRemaining=typeof window!=="undefined"&&typeof window.v142GetRemainingAnimationMs==="function"
         ?Number(window.v142GetRemainingAnimationMs())||0:0;
-    return Math.max(0,Number(baseDelay)||0,visualRemaining);
+    return Math.max(BATTLE_MIN_ACTION_INTERVAL_MS,visualRemaining+BATTLE_SKILL_VFX_TAIL_MS);
+}
+function getRoundHandoffDelay(){
+    const visualRemaining=typeof window!=="undefined"&&typeof window.v142GetRemainingAnimationMs==="function"
+        ?Number(window.v142GetRemainingAnimationMs())||0:0;
+    /* A round ends only after its last VFX has cleaned up, then gets the
+       formal handoff beat. This is deliberately not an extra action delay. */
+    return Math.max(ROUND_HANDOFF_MS,visualRemaining+ROUND_HANDOFF_MS);
 }
 const BATTLE_ACTION_WATCHDOG_MS=7000;
 let battleActionWatchdogTimeoutId=null;
@@ -10602,9 +10613,18 @@ function startTurn(token){
     updateActionHudVisibility();
 
 
-    beginCharacterTurn(
-        token
-    );
+    /* The round label is intentionally visible before the next declaration /
+       resolve decision. This is scheduled by the same queue timer that owns
+       every other battle boundary. */
+    const roundLead=turn>1?ROUND_ANNOUNCE_LEAD_MS:0;
+    if(roundLead>0){
+        battleAdvanceTimeoutId=setTimeout(()=>{
+            battleAdvanceTimeoutId=null;
+            if(battleActive&&token===battleToken){ beginCharacterTurn(token); }
+        },roundLead);
+        return;
+    }
+    beginCharacterTurn(token);
 
 }
 
@@ -15399,7 +15419,13 @@ function getElementDamagePassiveMultiplier(character){
         : 1;
 }
 
-function rollCritical(character,category="physical",targetAntiCritPercent=0){
+function rollCritical(character,category="physical",targetAntiCritPercent=0,target){
+    /* Boss Shield is evaluated at the beginning of every independent damage
+       packet. The packet's overflow therefore remains non-critical, while a
+       later multi-hit packet may roll normally after the Shield is gone. */
+    if(target&&target.vBossShield&&Number(target.vBossShield.current)>0){
+        return {isCrit:false,multiplier:1};
+    }
 
     const isMagic=
         category==="magic";
@@ -15851,7 +15877,8 @@ function castDamageSkill(skillId){
             rollCritical(
                 player,
                 skill.category,
-                getMonsterEffectiveAntiCrit(monster)
+                getMonsterEffectiveAntiCrit(monster),
+                monster
             );
 
         const damage =
@@ -16960,7 +16987,8 @@ function normalAttack(){
         rollCritical(
             player,
             "physical",
-            getMonsterEffectiveAntiCrit(monster)
+            getMonsterEffectiveAntiCrit(monster),
+            monster
         );
 
     const damage =
@@ -17241,7 +17269,7 @@ function finishPlayerAction(){
                 token
             );
 
-        },getBattleAdvanceDelay(BATTLE_DECLARE_ADVANCE_MS));
+        },getBattleAdvanceDelay("declare"));
 
         return;
 
@@ -17259,6 +17287,11 @@ function finishPlayerAction(){
        這裡調快到700ms，動畫還是看得清楚，
        但整體節奏會俐落不少。
     */
+
+    const isRoundBoundary=initiativeIndex+1>=initiativeQueue.length;
+    const nextDelay=isRoundBoundary
+        ?getRoundHandoffDelay()
+        :getBattleAdvanceDelay("resolve");
 
     battleAdvanceTimeoutId=setTimeout(()=>{
 
@@ -17308,7 +17341,7 @@ function finishPlayerAction(){
 
         }
 
-    },getBattleAdvanceDelay(BATTLE_RESOLVE_ADVANCE_MS));
+    },nextDelay);
 
 }
 
@@ -21348,7 +21381,8 @@ function secondaryCharacterNormalAttack(characterIndex,index){
     const critResult=rollCritical(
         character,
         "physical",
-        getMonsterEffectiveAntiCrit(monster)
+        getMonsterEffectiveAntiCrit(monster),
+        monster
     );
 
     const damage=calculateDamage(
@@ -21492,7 +21526,8 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         const critResult=rollCritical(
             character,
             skill.category,
-            getMonsterEffectiveAntiCrit(monster)
+            getMonsterEffectiveAntiCrit(monster),
+            monster
         );
 
         const damage=calculateSkillDamage({
@@ -21730,7 +21765,8 @@ function player2NormalAttack(index){
         rollCritical(
             player2,
             "physical",
-            getMonsterEffectiveAntiCrit(monster)
+            getMonsterEffectiveAntiCrit(monster),
+            monster
         );
 
     const damage=
@@ -22124,7 +22160,8 @@ function castPlayer2Skill(skillId,centerIndex){
             rollCritical(
                 player2,
                 skill.category,
-                getMonsterEffectiveAntiCrit(monster)
+                getMonsterEffectiveAntiCrit(monster),
+                monster
             );
 
         const damage=
@@ -24729,11 +24766,6 @@ function showMonsterHit(index,amount,type,isCrit){
     const element=$("battleMonster"+index);
     if(!element||amount===undefined||amount===null){ return; }
 
-    /* Enemy HP feedback is owned here. Cardless enemies keep their actual
-       resource update and skill/status VFX, but do not create a red HP popup
-       that later gets reparented to body by the Fixed Slot popup owner. */
-    const suppressEnemyHpPopup=type==="hp";
-
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     const settlement=type==="hp"&&bossOwner&&typeof bossOwner.consumeDamageSettlement==="function"
         ?bossOwner.consumeDamageSettlement(index):null;
@@ -24742,13 +24774,11 @@ function showMonsterHit(index,amount,type,isCrit){
         if(settlement.shieldAbsorbed>0){
             showDamagePopup(element,"-"+settlement.shieldAbsorbed,"shield",false);
         }
-        if(settlement.hpDamage>0&&!suppressEnemyHpPopup){
+        if(settlement.hpDamage>0){
             showDamagePopup(element,"-"+settlement.hpDamage+"HP","hp",isCrit);
         }
         return;
     }
-
-    if(suppressEnemyHpPopup){ return; }
 
     const prefix=type==="heal"?"+":"-";
     showDamagePopup(

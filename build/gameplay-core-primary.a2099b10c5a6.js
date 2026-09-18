@@ -185,6 +185,15 @@
         return true;
     }
 
+    function removeMonsterFromSlot(snapshot,monsterIndex){
+        if(!snapshot||!Number.isInteger(monsterIndex)){ return false; }
+        const current=slotForMonster(snapshot,monsterIndex);
+        if(!current){ return false; }
+        snapshot.slotToMonsterIndex[current]=null;
+        delete snapshot.monsterIndexToSlot[monsterIndex];
+        return true;
+    }
+
     function assignMonsterToPreferredSlot(snapshot,monsterIndex,preferredSlots){
         const slots=(Array.isArray(preferredSlots)?preferredSlots:[]).filter(slot=>ENEMY_SLOTS.includes(slot));
         const target=slots.find(slot=>assignedMonsterAt(snapshot,slot)===null);
@@ -555,6 +564,7 @@
         getAssignedMonsterAtEnemySlot:assignedMonsterAt,
         getActiveMonsterAtEnemySlot:activeMonsterAt,
         assignMonsterToEnemySlot:assignMonsterToSlot,
+        removeMonsterFromEnemySlot:removeMonsterFromSlot,
         assignMonsterToPreferredEnemySlot:assignMonsterToPreferredSlot,
         getPriorityMonsterIndexes:priorityMonsterIndexes,
         getEnemySnapshotRows:snapshotRows,
@@ -613,12 +623,11 @@
        0.4 秒的回合交接＋1.6 秒的首位出手等待組成，不會錯疊成
        2+1.6＝3.6 秒，也不會再隨死亡數量越拖越久。
     */
-    const V138_ACTION_DELAY_MS=1600;
-    const V138_ROUND_TRANSITION_MS=2000;
-    const V138_ROUND_HANDOFF_DELAY_MS=Math.max(
-        0,
-        V138_ROUND_TRANSITION_MS-V138_ACTION_DELAY_MS
-    );
+    /* Historical diagnostic metadata only. The live timing owner is 00-main. */
+    const V138_ACTION_DELAY_MS=1250;
+    const V138_ROUND_TRANSITION_MS=1250;
+    const V138_ROUND_HANDOFF_DELAY_MS=800;
+    const V138_ROUND_ANNOUNCEMENT_DELAY_MS=450;
     const V173_32_WILD_ZONE_STRENGTHS=Object.freeze([
         0.75,0.90,0.95,1.00,1.05,1.10,1.15,1.20,1.25,1.30
     ]);
@@ -923,7 +932,8 @@
     window.v138BattlePacing={
         actionDelayMs:V138_ACTION_DELAY_MS,
         roundDelayMs:V138_ROUND_TRANSITION_MS,
-        roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS
+        roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS,
+        roundAnnouncementDelayMs:V138_ROUND_ANNOUNCEMENT_DELAY_MS
     };
 
     function strengthenMonster(monster,multiplier){

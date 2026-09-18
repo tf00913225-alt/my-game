@@ -28,13 +28,13 @@ test('HP and SP labels are normalized to current values only without observer ch
     assert.equal((source.match(/new MutationObserver/g)||[]).length,1);
 });
 
-test('portrait motion reuses existing lunge and damage-popup lifecycle',()=>{
+test('portrait motion keeps lunge while enemy hit feedback has no shake lifecycle',()=>{
     assert.match(css,/attacker-lunge-up > \.v174-battle-art/);
     assert.match(css,/attacker-lunge-down > \.v174-battle-art/);
     assert.match(css,/@keyframes v174BattleIdle/);
     assert.match(css,/@keyframes v174BattleLungeUp/);
     assert.match(css,/@keyframes v174BattleLungeDown/);
-    assert.match(css,/@keyframes v174BattleHitShake/);
+    assert.doesNotMatch(css,/@keyframes v174BattleHitShake|v174-hit-shake/);
     assert.match(css,/\.v174-battle-art::after/);
 });
 

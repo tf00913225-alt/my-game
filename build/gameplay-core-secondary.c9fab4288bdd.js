@@ -5177,7 +5177,6 @@
     window.__v155DevFixesInstalled=true;
 
     const VERSION="155";
-    const HARD_CONTROL_SKIP_MS=300;
     const FINAL_BOSS_ORDER=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
     const FINAL_BOSS_RULES={
         東帝天尊:{element:"earth",skills:["dustStorm","stoneBreakSky"],supports:["earthShield"]},
@@ -5388,30 +5387,6 @@
         }
     }
     window.v155WithForcedFinalAbyssSkillLevel=withForcedFinalAbyssSkillLevel;
-
-    function withHardControlDelay(callback){
-        const hadOverride=Object.prototype.hasOwnProperty.call(window,"__battleAdvanceDelayOverrideMs");
-        const previousOverride=window.__battleAdvanceDelayOverrideMs;
-        window.__battleAdvanceDelayOverrideMs=HARD_CONTROL_SKIP_MS;
-        try{ return callback(); }
-        finally{
-            if(hadOverride){ window.__battleAdvanceDelayOverrideMs=previousOverride; }
-            else{ delete window.__battleAdvanceDelayOverrideMs; }
-        }
-    }
-
-    if(typeof beginCharacterTurn==="function"){
-        const previousBeginCharacterTurn=beginCharacterTurn;
-        beginCharacterTurn=function(){
-            const character=typeof activeBattleCharacterIndex!=="undefined"&&typeof getPartyCharacterByIndex==="function"
-                ?getPartyCharacterByIndex(activeBattleCharacterIndex):null;
-            if(typeof battlePhase!=="undefined"&&battlePhase==="declare"&&hardControlled(character)){
-                const that=this,args=arguments;
-                return withHardControlDelay(()=>previousBeginCharacterTurn.apply(that,args));
-            }
-            return previousBeginCharacterTurn.apply(this,arguments);
-        };
-    }
 
     function currentRound(){ return typeof turn!=="undefined"?Math.max(0,numeric(turn)):0; }
     function currentBattleToken(){ return typeof battleToken!=="undefined"?battleToken:null; }
@@ -6130,7 +6105,9 @@
                 withPhoenixCast("monster",monster,monsterIndex,()=>previousMonsterAttack.apply(that,args))
             );
             const invokeAtForcedLevel=()=>withForcedFinalAbyssSkillLevel(monster,invoke);
-            return hardControlled(monster)?withHardControlDelay(invokeAtForcedLevel):invokeAtForcedLevel();
+            /* The core battle queue owns every resolve delay, including a
+               frozen or petrified enemy's skipped action. */
+            return invokeAtForcedLevel();
         };
     }
 
@@ -6138,7 +6115,7 @@
 
     window.v155RuleDiagnostics=function(){
         return {
-            version:VERSION,hardControlSkipMs:HARD_CONTROL_SKIP_MS,
+            version:VERSION,hardControlUsesQueueTiming:true,
             elementalSkillDataOwnedByFinalLayers:true,
             monsterOnlyFireBurst:!!(typeof skillDatabase!=="undefined"&&skillDatabase.fireBurstStrike)
         };
@@ -9191,22 +9168,6 @@ window.FourSymbolsBattlePresentation=Object.freeze({
     applyUnit:syncUnitArtwork,
     sync:syncBattlePresentation
 });
-function shakeArtForPopup(node){
-    if(!(node instanceof Element))return;
-    const popups=node.matches?.(".damage-popup.hp-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup.hp-popup")||[]);
-    popups.forEach(popup=>{
-        const owner=window.FourSymbolsBattlefieldSlots;
-        const slot=popup.dataset?.slot||owner?.getSlotFromElement?.(popup)||null;
-        const slotElement=slot&&owner?.getSlotElement?.(slot);
-        const card=slotElement?.querySelector?.(".battle-player,.battle-monster")||popup.closest(".battle-player,.battle-monster");
-        if(card?.classList?.contains("battle-monster"))return;
-        const art=card?.querySelector(":scope > .v174-battle-art");
-        if(!art)return;
-        art.classList.remove("v174-hit-shake");void art.offsetWidth;art.classList.add("v174-hit-shake");
-        setTimeout(()=>art.classList.remove("v174-hit-shake"),300);
-    });
-}
-
 /* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
     if(typeof window.v173DecorateExpPoolDistributionUi==="function")window.v173DecorateExpPoolDistributionUi();
@@ -9236,7 +9197,6 @@ window.showRewardedAd=function(onSuccess,onFail){if(adRunning)return false;adRun
 const observer=new MutationObserver(mutations=>{
     let needsResourceSync=false;
     mutations.forEach(record=>record.addedNodes.forEach(node=>{
-        shakeArtForPopup(node);
         if(!(node instanceof Element)){ return; }
         const units=node.matches?.(".battle-player,.battle-monster")
             ?[node]:Array.from(node.querySelectorAll?.(".battle-player,.battle-monster")||[]);
