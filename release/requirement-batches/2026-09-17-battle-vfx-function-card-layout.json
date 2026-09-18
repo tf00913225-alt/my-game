@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-17-battle-vfx-function-card-layout",
+  "baseBranch": "dev",
+  "baseCommit": "049e18e7440ff01588f27c2fd24c235cbbe79fa0",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "BATTLE-VFX-ASPECT-01",
+      "status": "VERIFIED",
+      "requirement": "風焰術、水球術及所有範圍 Sprite VFX 必須保持素材單格比例，不得被固定格位橫向拉伸而垂直壓扁",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "tests/battle-layout-vfx-runtime-20260917.test.js",
+        ".github/scripts/battle-layer-audio-live-qa.mjs"
+      ]
+    },
+    {
+      "id": "BATTLE-MECHANISM-TARGET-01",
+      "status": "VERIFIED",
+      "requirement": "範圍技能指定功能卡時，VFX 使用完整敵方區域而傷害只結算該功能卡；只有金剛護體強制鎖定，其他功能卡不得劫持一般或自動目標",
+      "evidence": [
+        "js/battlefield-slot-owner.js",
+        "js/39-v143-skill-animation.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/mechanism-card-vfx-reliability-20260914.test.js",
+        "tests/gameplay-boss-tower-system.test.js",
+        ".github/scripts/battle-layer-audio-live-qa.mjs"
+      ]
+    },
+    {
+      "id": "BATTLE-INFO-DRAWER-01",
+      "status": "VERIFIED",
+      "requirement": "移除中間操作區黑色透明底，戰鬥資訊預設收到底部只露灰色上箭頭，點擊後向上展開且箭頭翻轉，再點擊可收合且不重排戰場",
+      "evidence": [
+        "index.html",
+        "js/00-main.js",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
+        ".github/scripts/battle-layer-audio-live-qa.mjs"
+      ]
+    },
+    {
+      "id": "BATTLE-HUD-LAYOUT-01",
+      "status": "VERIFIED",
+      "requirement": "資訊抽屜不再佔格後擴大敵方與我方戰區、我方立繪靠近 HP；敵我 HP/SP 同為薄條且名稱統一置於資源條下方，六人滿編不得重疊",
+      "evidence": [
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "tests/fixed-slot-battlefield-rendering-v2.test.js",
+        ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs",
+        ".github/scripts/battle-layer-audio-live-qa.mjs"
+      ]
+    }
+  ],
+  "automatedVerification": "PR_CI_AND_EXACT_CANDIDATE_LIVE_MOBILE_QA_VERIFIED",
+  "verificationRun": 35278902597,
+  "targetedVerificationRun": 35278902597,
+  "finalDevVerificationRun": 35278902597,
+  "visualVerification": "AUTOMATED_MOBILE_CHROME_PR_QA_PASS_412x915_393x873_360x800",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "verifiedOnDevVersion": "173.65",
+  "releasedAs": null
+}

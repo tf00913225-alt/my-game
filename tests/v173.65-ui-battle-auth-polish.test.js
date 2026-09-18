@@ -11,8 +11,8 @@ const battle=read("js/54-v173.51-battle-qa.js");
 const fixedBattle=read("css/fixed-slot-battlefield-rendering-v2.css");
 assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?position:absolute!important/);
 assert.match(fixedBattle,/v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{[\s\S]*?background-size:contain !important/);
-assert.match(fixedBattle,/v-fixed-enemy-slot \.monster-hp,[\s\S]*?bottom:11px !important/);
-assert.match(fixedBattle,/v-fixed-enemy-slot \.monster-sp,[\s\S]*?bottom:1px !important/);
+assert.match(fixedBattle,/v-fixed-enemy-slot \.monster-hp,[\s\S]*?bottom:24px !important/);
+assert.match(fixedBattle,/v-fixed-enemy-slot \.monster-sp,[\s\S]*?bottom:15px !important/);
 
 const city=read("js/16-stage-v54-main-city-runtime.js");
 const cityCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");

@@ -160,7 +160,7 @@ test("earth trio sheets opt into fixed slot alignment and full-field earth stays
     assert.equal(manifest.flyingSandStrike.sprite.targetBounds,undefined);
     assert.match(animation,/owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
     assert.match(animation,/const bounds=geometryBounds\(current,indexes,placement\)/);
-    assert.match(animation,/const destination=primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}/);
+    assert.match(animation,/const destination=bounds\.centerOnBounds&&placement!=="trajectory"[\s\S]*?\?\{x:bounds\.centerX,y:bounds\.centerY\}[\s\S]*?:primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}/);
 });
 
 test("all seven persistent effects use 4x2 runtime cropping with the requested loop cadence",()=>{

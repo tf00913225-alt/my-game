@@ -353,6 +353,13 @@
         const allowed=geometrySlotsForSide(normalizedSide);
         if(!allowed.length){ return []; }
         const normalizedShape=normalizeShape(shape);
+        /* A mechanism card is a damage target, not a VFX-sized battlefield.
+           Single-target art stays on the card; any authored range keeps the
+           complete enemy-side visual footprint even though settlement still
+           contains only that mechanism target. */
+        if(MECHANISM.includes(primarySlot)&&(normalizedSide==="enemy"||normalizedSide==="mechanism")){
+            return normalizedShape==="single"?[primarySlot]:ENEMY_SLOTS.slice();
+        }
         if(normalizedShape==="all"){ return allowed.slice(); }
         if(!primarySlot||!allowed.includes(primarySlot)){
             return normalizedShape==="all"?allowed.slice():[];
@@ -13280,18 +13287,17 @@
         const owner=geometryOwner();
         if(!owner||!current){ return null; }
         const seed=geometrySeedIndexes(current,indexes);
+        const targetType=String(current.config&&current.config.targetType||"single");
         const mechanismSlots=seed.filter(isMechanismTarget)
             .map(index=>slotForTarget("monster",index,cardFor("monster",index))).filter(Boolean);
-        if(mechanismSlots.length&&typeof owner.getRectForSlots==="function"){
-            const rect=owner.getRectForSlots(mechanismSlots);
-            if(rect){ rect.id="mechanism-slots"; return rect; }
-        }
-
-        const targetType=String(current.config&&current.config.targetType||"single");
         if(placement==="battlefield"||targetType==="all"||targetType==="allyAll"){
             const rect=typeof owner.getSideRect==="function"?owner.getSideRect(current.targetSide):null;
             if(rect){ rect.id=current.targetSide==="monster"?"fixed-enemy-zone":"fixed-ally-zone"; }
             return rect;
+        }
+        if(mechanismSlots.length&&/^single$/i.test(targetType)&&typeof owner.getRectForSlots==="function"){
+            const rect=owner.getRectForSlots(mechanismSlots);
+            if(rect){ rect.id="mechanism-slots"; return rect; }
         }
 
         const primarySlot=geometryPrimarySlot(current,indexes);
@@ -13304,7 +13310,10 @@
         const rect=typeof owner.getGeometryRectFromShape==="function"
             ?owner.getGeometryRectFromShape(current.targetSide,primarySlot,shape)
             :owner.getSlotRect(primarySlot);
-        if(rect){ rect.id="fixed-slot-"+String(shape).toLowerCase(); }
+        if(rect){
+            rect.id=mechanismSlots.length?"mechanism-range-zone":"fixed-slot-"+String(shape).toLowerCase();
+            rect.centerOnBounds=mechanismSlots.length&&!/^single$/i.test(shape);
+        }
         return rect;
     }
 
@@ -13517,11 +13526,7 @@
         const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
         const aspect=frameAspectFor(sprite);
         let renderWidth=boxWidth,renderHeight=boxHeight;
-        if(fit==="stretch"){
-            /* Range sheets deliberately fill their semantic Fixed Slot shape.
-               Keeping the node inside that shape protects the center controls,
-               while showing the complete frame without a paint clip. */
-        }else if(fit==="cover"){
+        if(fit==="cover"){
             if(renderWidth/renderHeight>aspect){ renderHeight=renderWidth/aspect; }
             else{ renderWidth=renderHeight*aspect; }
         }else if(renderWidth/renderHeight>aspect){ renderWidth=renderHeight*aspect; }
@@ -13625,7 +13630,7 @@
             /* Range effects fill the complete fixed-side rectangle but never
                extend into the independent operation track. The whole source
                frame remains visible; no card or Zone is a paint clip owner. */
-            applySpriteBox(node,width,height,sprite,"stretch");
+            applySpriteBox(node,width,height,sprite,"cover");
             return;
         }
 
@@ -13634,11 +13639,13 @@
         const width=Math.max(1,Math.round(bounds.width));
         const height=Math.max(1,Math.round(bounds.height));
         node.dataset.targetIndexes=indexes.join(",");
-        applySpriteBox(node,width,height,sprite,"stretch");
+        applySpriteBox(node,width,height,sprite,"cover");
         /* A group/row/tri Sprite keeps the fixed-shape bounds for sizing, but
            its visual center belongs to the explicitly selected primary card.
            Only full-battlefield effects remain centered on the whole side. */
-        const destination=primaryAnchor
+        const destination=bounds.centerOnBounds&&placement!=="trajectory"
+            ?{x:bounds.centerX,y:bounds.centerY}
+            :primaryAnchor
             ?{x:primaryAnchor.x,y:primaryAnchor.y}
             :{x:bounds.centerX,y:bounds.centerY};
         if(primaryAnchor){ node.dataset.geometrySlot=primaryAnchor.slot; }
