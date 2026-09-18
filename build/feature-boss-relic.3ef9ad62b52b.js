@@ -1205,7 +1205,7 @@
         controlModifier:1,
         burnPercent:3,
         bannerDurationMs:1800,
-        presentationDurationMs:3200,
+        presentationDurationMs:1500,
         presentationLeadGapMs:120,
         upgradeGoldBase:650,
         upgradeGoldPerLevel:180
