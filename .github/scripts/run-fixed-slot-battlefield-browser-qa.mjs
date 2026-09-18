@@ -22,7 +22,9 @@ function decode(value){return value.replace(/&amp;/g,"&").replace(/&lt;/g,"<").r
 
 const ownerSource=read("js/battlefield-slot-owner.js").replace(/<\/script/gi,"<\\/script");
 const adapterSource=read("js/battlefield-render-geometry-adapter.js").replace(/<\/script/gi,"<\\/script");
-const presentationSource=read("js/54-v173.51-battle-qa.js").replace(/<\/script/gi,"<\\/script");
+const presentationSource=read("js/54-v173.51-battle-qa.js")
+    .replace("observer.observe(document.body,{subtree:true,childList:true});","/* Fixture uses the production applyUnit API synchronously; no observer loop. */")
+    .replace(/<\/script/gi,"<\\/script");
 const geometryCss=read("css/fixed-slot-battlefield-rendering-v2.css").replace(/<\/style/gi,"<\\/style");
 const bossCss=read("css/gameplay-boss-tower.css").replace(/<\/style/gi,"<\\/style");
 
