@@ -8429,7 +8429,7 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle{
     position:absolute;
     left:auto;
-    right:4px;
+    right:-4px;
     top:0;
     z-index:2;
     display:flex;
