@@ -125,7 +125,7 @@
             nextText:{5:"全體火傷提高至0.85×",10:"0.90×並有20%機率燃燒",15:"1.00×、燃燒25%",20:"1.10×、燃燒30%，燃燒目標+15%"}
         },
         {
-            id:"relic_cold_spring_jade",name:"寒泉玉珮",category:"recovery",tags:["water","emergency","element"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_cold_spring_jade",name:"寒泉玉珮",category:"recovery",tags:["water","emergency","element"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_cold_spring_jade.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"任一隊友首次跌破35%最大HP時進行急救。",
             scalars:{healHpPercent:[[1,12],[10,15],[20,18]],spPercent:[[1,0],[19,0],[20,4]]},
             triggers:[trigger("hp_below_35","ally_hp_below",{hpThreshold:.35,maxTriggersPerBattle:2,cooldownRounds:3},[
