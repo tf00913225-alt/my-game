@@ -33,7 +33,7 @@
         burnPercent:3,
         bannerDurationMs:1400,
         presentationDurationMs:2200,
-        presentationLeadGapMs:500,
+        presentationLeadGapMs:120,
         upgradeGoldBase:650,
         upgradeGoldPerLevel:180
     });
@@ -46,26 +46,26 @@
         });
     }
     const RELIC_VFX_PRESENTATION=Object.freeze({
-        relic_qiankun_flask:relicVfx(1050,"normal","allyAll"),
-        relic_sun_orb:relicVfx(950,"fire","enemyAll"),
-        relic_xuanwu_seal:relicVfx(1100,"normal","allyAll"),
-        relic_soul_bell:relicVfx(1050,"normal","enemyAll"),
-        relic_tiangang_banner:relicVfx(1100,"normal","enemyAll"),
-        relic_nine_dragon_fire:relicVfx(1100,"fire","enemyAll"),
-        relic_cold_spring_jade:relicVfx(1000,"water","singleAlly"),
-        relic_qinglan_feather:relicVfx(950,"wind","allyAll"),
-        relic_rock_mountain_seal:relicVfx(1100,"earth","allyAll"),
-        relic_returning_wheel:relicVfx(1150,"normal","singleAlly"),
-        relic_origin_talisman:relicVfx(1050,"normal","allyAll"),
-        relic_broken_army_scroll:relicVfx(950,"normal","singleEnemy"),
-        relic_red_sky_war_mark:relicVfx(950,"normal","allyAll"),
-        relic_ice_mirror_heart:relicVfx(1000,"water","enemyAll"),
-        relic_wind_chasing_talisman:relicVfx(900,"wind","allyAll"),
-        relic_mountain_river_cauldron:relicVfx(1100,"earth","allyAll"),
-        relic_burning_star_mark:relicVfx(950,"fire","enemyAll"),
-        relic_spirit_spring_bottle:relicVfx(1000,"water","allyAll"),
-        relic_demon_suppressing_seal:relicVfx(1050,"normal","allyAll"),
-        relic_all_returning_array:relicVfx(1150,"normal","allyAll")
+        relic_qiankun_flask:relicVfx(920,"normal","allyAll"),
+        relic_sun_orb:relicVfx(840,"fire","enemyAll"),
+        relic_xuanwu_seal:relicVfx(980,"normal","allyAll"),
+        relic_soul_bell:relicVfx(960,"normal","enemyAll"),
+        relic_tiangang_banner:relicVfx(980,"normal","enemyAll"),
+        relic_nine_dragon_fire:relicVfx(900,"fire","enemyAll"),
+        relic_cold_spring_jade:relicVfx(900,"water","singleAlly"),
+        relic_qinglan_feather:relicVfx(840,"wind","allyAll"),
+        relic_rock_mountain_seal:relicVfx(960,"earth","allyAll"),
+        relic_returning_wheel:relicVfx(980,"normal","singleAlly"),
+        relic_origin_talisman:relicVfx(940,"normal","allyAll"),
+        relic_broken_army_scroll:relicVfx(820,"normal","singleEnemy"),
+        relic_red_sky_war_mark:relicVfx(840,"normal","allyAll"),
+        relic_ice_mirror_heart:relicVfx(900,"water","enemyAll"),
+        relic_wind_chasing_talisman:relicVfx(780,"wind","allyAll"),
+        relic_mountain_river_cauldron:relicVfx(960,"earth","allyAll"),
+        relic_burning_star_mark:relicVfx(840,"fire","enemyAll"),
+        relic_spirit_spring_bottle:relicVfx(880,"water","allyAll"),
+        relic_demon_suppressing_seal:relicVfx(940,"normal","allyAll"),
+        relic_all_returning_array:relicVfx(980,"normal","allyAll")
     });
 
     function scalar(points,level){
