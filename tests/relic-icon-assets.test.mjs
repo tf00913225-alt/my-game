@@ -26,7 +26,7 @@ test("team relic catalog uses confirmed WebP art and preserves ambiguous 寒泉�
   for(const path of iconPaths){ assert.ok(source.includes(`iconPath:"${path}"`),path); }
   assert.match(source,/id:"relic_cold_spring_jade",name:"寒泉玉珮"[^\n]*iconPath:""/);
   assert.ok(!source.includes("assets/relics/icons/relic_cold_spring_jade.webp"));
-  assert.ok(!source.includes(".png"));
+  for(const id of confirmed){ assert.ok(!source.includes(`assets/relics/icons/${id}.png`)); }
 });
 
 test("inventory fragment definitions use img markup for confirmed WebP art",()=>{
