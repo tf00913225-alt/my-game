@@ -54,7 +54,7 @@ test("Ice Arrow Rain uses one centered full-field raster sheet without tiles",()
     assert.match(battlefield[0],/const coverageScale=clamp\(Number\(sprite\.coverageScale\)\|\|Number\(sprite\.scale\)\|\|1,1,1\.4\)/);
     assert.match(battlefield[0],/Math\.round\(bounds\.width\)/);
     assert.match(battlefield[0],/Math\.round\(bounds\.height\)/);
-    assert.match(battlefield[0],/applySpriteBox\(node,width,height,sprite,"stretch"\)/);
+    assert.match(battlefield[0],/applySpriteBox\(node,width,height,sprite,"cover"\)/,"battlefield sheets preserve their full authored raster frame");
     assert.match(battlefield[0],/node\.style\.left=bounds\.centerX\+"px"/);
     assert.match(battlefield[0],/node\.style\.top=bounds\.centerY\+"px"/);
     assert.match(battlefield[0],/node\.style\.clipPath="none"/);

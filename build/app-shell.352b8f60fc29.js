@@ -32343,7 +32343,31 @@ function syncBattleAutoSettings(){
    戰鬥資訊
 ===================================================== */
 
+function setBattleInfoExpanded(expanded){
+
+    const region=document.querySelector("#battlePage .battle-info-region");
+    const toggle=$("battleInfoToggle");
+
+    if(!region||!toggle){ return false; }
+
+    const next=!!expanded;
+    region.classList.toggle("is-expanded",next);
+    toggle.setAttribute("aria-expanded",next?"true":"false");
+    toggle.setAttribute("aria-label",next?"收合戰鬥資訊":"展開戰鬥資訊");
+    return true;
+
+}
+
+function toggleBattleInfoPanel(){
+
+    const region=document.querySelector("#battlePage .battle-info-region");
+    return setBattleInfoExpanded(!(region&&region.classList.contains("is-expanded")));
+
+}
+
 function clearBattleLog(){
+
+    setBattleInfoExpanded(false);
 
     $("battleInfo")
         .innerHTML="";

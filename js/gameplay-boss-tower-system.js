@@ -504,8 +504,7 @@
     }
     function blockingShield(){ return aliveMechanisms().find(card=>card.type==="shield")||null; }
     function canDirectlyAffectMonster(monster){
-        const boss=activeBoss();
-        return !(boss&&monster===boss&&(actionShieldSnapshot||blockingShield()));
+        return !!monster&&!(actionShieldSnapshot||blockingShield());
     }
     function mechanismEffectText(card){
         if(card.type==="charge"){ return "倒數 "+card.countdown+" 回合・歸零發動大型技能"; }
@@ -617,7 +616,8 @@
             const position=card.battlefieldSlot?slot.querySelector('.boss-mechanism-position[data-slot="'+card.battlefieldSlot+'"]'):null;
             if(position&&node.parentNode!==position){ position.appendChild(node); }
             else if(!node.parentNode){ slot.appendChild(node); }
-            node.classList.toggle("targetable",!!(typeof actionReady!=="undefined"&&actionReady&&typeof pendingAction!=="undefined"&&pendingAction));
+            const shield=blockingShield();
+            node.classList.toggle("targetable",!!(typeof actionReady!=="undefined"&&actionReady&&typeof pendingAction!=="undefined"&&pendingAction&&(!shield||card===shield)));
             node.setAttribute("aria-label",card.name+"，"+card.kind+"，HP "+Math.max(0,Math.ceil(card.hp))+" / "+card.maxHP+"，點擊可作為攻擊目標");
             node.innerHTML='<b class="boss-mechanism-name">'+escapeHtml(card.name)+'</b><span class="boss-mechanism-kind">'+escapeHtml(card.kind)+'</span><span class="boss-mechanism-hp">HP '+Math.max(0,Math.ceil(card.hp))+' / '+card.maxHP+'</span>';
         });
@@ -782,9 +782,7 @@
         }
         return true;
     }
-    function prioritizedMechanism(){
-        return aliveMechanisms().slice().sort((a,b)=>numeric(b.priority)-numeric(a.priority))[0]||null;
-    }
+    function mandatoryMechanismTarget(){ return blockingShield(); }
     function mechanismByTarget(target){
         const id=typeof target==="string"&&target.indexOf("mechanism:")===0?target.slice(10):String(target||"");
         return aliveMechanisms().find(card=>card.id===id)||null;
@@ -792,6 +790,8 @@
     function selectMechanism(id){
         const card=aliveMechanisms().find(item=>item.id===id);
         if(!card||typeof battleActive==="undefined"||!battleActive||typeof battlePhase!=="undefined"&&battlePhase!=="declare"||typeof actionReady==="undefined"||!actionReady||typeof pendingAction==="undefined"||!pendingAction){ return false; }
+        const shield=blockingShield();
+        if(shield&&card!==shield){ reportProtectedBoss();return false; }
         document.querySelectorAll(".boss-mechanism-card.target").forEach(node=>node.classList.remove("target"));
         const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');if(node){ node.classList.add("target"); }
         const targetText=document.getElementById("battleTarget");if(targetText){ targetText.textContent="目標："+card.name; }
@@ -958,7 +958,7 @@
     }
     if(typeof setBattleTargetSelectionMode==="function"){
         const previous=setBattleTargetSelectionMode;
-        setBattleTargetSelectionMode=function(){ const result=previous.apply(this,arguments);if(activeBattleContext){ renderMechanisms();const boss=activeBoss(),index=boss?monsters.indexOf(boss):-1;if(blockingShield()&&index>=0){ const node=document.getElementById("battleMonster"+index);if(node){ node.classList.remove("targetable"); } } }return result; };
+        setBattleTargetSelectionMode=function(){ const result=previous.apply(this,arguments);if(activeBattleContext){ renderMechanisms();if(blockingShield()){ document.querySelectorAll(".battle-monster.targetable").forEach(node=>node.classList.remove("targetable")); } }return result; };
     }
     if(typeof clearBattleTargetSelectionMode==="function"){
         const previous=clearBattleTargetSelectionMode;
@@ -966,19 +966,19 @@
     }
     if(typeof selectBattleTarget==="function"){
         const previous=selectBattleTarget;
-        selectBattleTarget=function(index){ const boss=activeBoss();if(boss&&monsters[index]===boss&&blockingShield()){ reportProtectedBoss();return false; }return previous.apply(this,arguments); };
+        selectBattleTarget=function(index){ if(monsters[index]&&blockingShield()){ reportProtectedBoss();return false; }return previous.apply(this,arguments); };
     }
     if(typeof getSkillTargets==="function"){
         const previous=getSkillTargets;
-        getSkillTargets=function(){ const targets=previous.apply(this,arguments);const boss=activeBoss();return boss&&(actionShieldSnapshot||blockingShield())?targets.filter(index=>monsters[index]!==boss):targets; };
+        getSkillTargets=function(){ const targets=previous.apply(this,arguments);return actionShieldSnapshot||blockingShield()?[]:targets; };
     }
     if(typeof resolveQueuedPlayerAction==="function"){
         const previous=resolveQueuedPlayerAction;
         resolveQueuedPlayerAction=function(characterIndex){
             const queued=queuedPlayerActions[characterIndex];
             if(queued&&activeBattleContext){
-                const boss=activeBoss(),shield=blockingShield();
-                if(shield&&typeof queued.target==="number"&&monsters[queued.target]===boss){ queued.target="mechanism:"+shield.id; }
+                const shield=blockingShield();
+                if(shield&&typeof queued.target==="number"){ queued.target="mechanism:"+shield.id; }
                 actionShieldSnapshot=!!shield;
                 try{ if(mechanismByTarget(queued.target)){ return resolveMechanismAction(characterIndex,queued,previous,this,arguments); }return previous.apply(this,arguments); }
                 finally{ actionShieldSnapshot=false; }
@@ -989,7 +989,7 @@
     if(typeof autoActionForCharacter==="function"){
         const previous=autoActionForCharacter;
         autoActionForCharacter=function(characterIndex,token){
-            const mechanism=prioritizedMechanism();
+            const mechanism=mandatoryMechanismTarget();
             if(!mechanism){ return previous.apply(this,arguments); }
             const character=getPartyCharacterByIndex(characterIndex),config=getPartyAutoConfig(characterIndex);
             const autoOn=characterIndex===0?autoBattle:config.enabled;
