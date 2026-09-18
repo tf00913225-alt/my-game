@@ -22,6 +22,7 @@ function decode(value){return value.replace(/&amp;/g,"&").replace(/&lt;/g,"<").r
 
 const ownerSource=read("js/battlefield-slot-owner.js").replace(/<\/script/gi,"<\\/script");
 const adapterSource=read("js/battlefield-render-geometry-adapter.js").replace(/<\/script/gi,"<\\/script");
+const identityCss=read("css/40-v143-combat-dungeon-polish.css").replace(/<\/style/gi,"<\\/style");
 const v154Css=read("css/46-v154-dev-fixes.css").replace(/<\/style/gi,"<\\/style");
 const geometryCss=read("css/fixed-slot-battlefield-rendering-v2.css").replace(/<\/style/gi,"<\\/style");
 const bossCss=read("css/gameplay-boss-tower.css").replace(/<\/style/gi,"<\\/style");
@@ -41,7 +42,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 .v143-skill-stage{position:fixed;inset:0;pointer-events:none}.damage-popup{position:absolute;font-weight:900}
 </style>
 <style id="v174-cardless-battle-style">#battlePage .v174-battle-art{inset:999px!important}#battlePage .battle-wrap{overflow:hidden!important}</style>
-<style>${v154Css}</style><style>${geometryCss}</style><style>${bossCss}</style></head><body>
+<style>${identityCss}</style><style>${v154Css}</style><style>${geometryCss}</style><style>${bossCss}</style></head><body>
 <div id="game-stage"><div id="app"><div id="game-content"><section id="battlePage" class="v-fixed-slot-render-v2"><div class="battle-wrap">
 <section class="battle-enemy-region"><div class="battle-title">戰鬥</div><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
 <section class="battle-center-region"><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone">操作區</div></div></section>
@@ -65,7 +66,7 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
 <script>
 (function(){
  const owner=window.FourSymbolsBattlefieldSlots,adapter=window.FourSymbolsBattlefieldRenderGeometry;
- function enemyCard(index){var c=document.createElement('div');c.id='battleMonster'+index;c.className='battle-monster '+(index===4?'abyss-unit':'');c.dataset.rank=window.monsters[index].rank;c.innerHTML='<div class="v174-battle-art"></div><div class="battle-monster-name">怪物'+index+'</div><div class="monster-status-badges"></div><div class="monster-hp"></div><div class="monster-sp"></div>';return c;}
+ function enemyCard(index){var c=document.createElement('div');c.id='battleMonster'+index;c.className='battle-monster '+(index===4?'abyss-unit':'');c.dataset.rank=window.monsters[index].rank;c.innerHTML='<div class="v174-battle-art"></div><div class="battle-monster-name v143-monster-identity">怪物'+index+'</div><div class="monster-status-badges"></div><div class="monster-hp"></div><div class="monster-sp"></div>';return c;}
  function allyCard(index){var c=document.createElement('div');c.id='battlePlayerCard'+index;c.className='battle-player';c.innerHTML='<div class="v174-battle-art"></div><div class="battle-player-id">角色'+index+'</div><div class="monster-status-badges"></div><div class="hp-bar"></div><div class="sp-bar"></div>';return c;}
  function addCards(enemyCount,allyCount,split){
    allyCount=allyCount===undefined?3:allyCount;

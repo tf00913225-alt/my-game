@@ -664,8 +664,19 @@
     z-index:22;
 }
 #game-stage #battlePage .gameplay-boss-card > .battle-monster-name{
-    bottom:0;
-    height:16px;
+    position:absolute !important;
+    top:auto !important;
+    bottom:0 !important;
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    flex:none !important;
+    width:auto !important;
+    height:16px !important;
+    min-height:16px !important;
+    max-height:16px !important;
+    margin:0 !important;
+    padding:0 !important;
     color:#f4d88f;
     font-size:14px;
     line-height:16px;
