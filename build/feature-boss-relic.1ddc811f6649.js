@@ -1192,7 +1192,7 @@
     const RARITY_ORDER={white:0,blue:1,purple:2,orange:3,pink:4,"four-symbol":5};
     const RARITY_LABELS={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
 
-    const RELIC_VFX_MIN_DURATION_MS=3000;
+    const RELIC_VFX_FLOOR_MS=3000;
     const RELIC_BALANCE_CONFIG=Object.freeze({
         basePower:40,
         averagePartyLevelPower:5,
@@ -1213,7 +1213,7 @@
 
     function relicVfx(durationMs,element,defaultTarget){
         return Object.freeze({
-            durationMs:Math.max(RELIC_VFX_MIN_DURATION_MS,Math.floor(Number(durationMs)||0)),
+            durationMs:Math.max(RELIC_VFX_FLOOR_MS,Math.floor(Number(durationMs)||0)),
             element:element||"normal",
             defaultTarget:defaultTarget||"allyAll"
         });
