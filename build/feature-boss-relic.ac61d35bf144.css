@@ -665,9 +665,20 @@
     box-sizing:border-box;
     z-index:22;
 }
-#game-stage #battlePage .gameplay-boss-card > .battle-monster-name{
-    bottom:0;
-    height:16px;
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .gameplay-boss-card > .battle-monster-name{
+    position:absolute !important;
+    top:auto !important;
+    bottom:0 !important;
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    flex:none !important;
+    width:auto !important;
+    height:16px !important;
+    min-height:16px !important;
+    max-height:16px !important;
+    margin:0 !important;
+    padding:0 !important;
     color:#f4d88f;
     font-size:14px;
     line-height:16px;
@@ -675,15 +686,19 @@
 }
 #game-stage #battlePage .gameplay-boss-card > .monster-hp,
 #game-stage #battlePage .gameplay-boss-card > .monster-sp{
+    position:absolute !important;
+    top:auto !important;
     display:block !important;
+    flex:none !important;
+    margin:0 !important;
     height:var(--battle-resource-bar-height,11px) !important;
     min-height:var(--battle-resource-bar-height,11px) !important;
     visibility:visible !important;
     opacity:1 !important;
     overflow:hidden !important;
 }
-#game-stage #battlePage .gameplay-boss-card > .monster-hp{bottom:29px;}
-#game-stage #battlePage .gameplay-boss-card > .monster-sp{bottom:17px;}
+#game-stage #battlePage .gameplay-boss-card > .monster-hp{bottom:29px !important;}
+#game-stage #battlePage .gameplay-boss-card > .monster-sp{bottom:17px !important;}
 #game-stage #battlePage .gameplay-boss-card .monster-bar-text{
     display:flex !important;
     align-items:center;
@@ -726,10 +741,13 @@
 /* Boss objects and reinforcements use the normal cardless Unit pipeline.
    Their artwork may overhang vertically, but their F1/F5 or B1/B5 holder clips
    neither HUD nor portrait and never invades the central Boss footprint. */
-#game-stage #battleMonsterArea.gameplay-boss-active .v-fixed-enemy-slot[data-slot$="1"] .v174-battle-art,
-#game-stage #battleMonsterArea.gameplay-boss-active .v-fixed-enemy-slot[data-slot$="5"] .v174-battle-art{
-    left:4px !important;
-    right:4px !important;
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.gameplay-boss-active .v-fixed-enemy-slot[data-slot$="1"] .v174-battle-art{
+    left:-2px !important;
+    right:14px !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.gameplay-boss-active .v-fixed-enemy-slot[data-slot$="5"] .v174-battle-art{
+    left:14px !important;
+    right:-2px !important;
 }
 
 @media (max-height:760px){
