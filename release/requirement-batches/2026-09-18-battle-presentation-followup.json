@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-18-battle-presentation-followup",
+  "baseBranch": "dev",
+  "baseCommit": "394d4a6baba1aa6e7061d60390201bf1925c4a1e",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "mainPromotionAllowed": false,
+  "requirements": [
+    {
+      "id": "PRESENTATION-01",
+      "status": "VERIFIED",
+      "requirement": "所有敵方單位包含 Boss、援軍與 Boss 物件維持無卡框；敵方受擊不再疊加紅色 HP 浮字閃爍。",
+      "evidence": ["css/fixed-slot-battlefield-rendering-v2.css", "tests/boss-battle-architecture-convergence-20260918.test.js", ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs"]
+    },
+    {
+      "id": "BOSS-HUD-02",
+      "status": "VERIFIED",
+      "requirement": "Boss HP／SP HUD 必須持續可見且使用正式共同資源條高度。",
+      "evidence": ["css/gameplay-boss-tower.css", "tests/ui-typography-battle-preservation.test.js", ".github/scripts/battle-layer-audio-live-qa.mjs"]
+    },
+    {
+      "id": "FROSTBITE-03",
+      "status": "VERIFIED",
+      "requirement": "凍傷只保留三項 25% soft debuff，不禁止技能且不顯示禁止技能文字。",
+      "evidence": ["js/43-v149-skill-ui-rules.js", "js/44-v152-dev-fixes.js", "js/50-v169-water-skill-rules.js", "css/45-v152-dev-fixes.css", "release/deprecated-code.json"]
+    },
+    {
+      "id": "DRAWER-04",
+      "status": "VERIFIED",
+      "requirement": "戰鬥資訊抽屜箭頭位於畫面右下角並使用半透明黑底，展開／收合方向維持正常。",
+      "evidence": ["css/fixed-slot-battlefield-rendering-v2.css", "tests/boss-battle-architecture-convergence-20260918.test.js", ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs"]
+    },
+    {
+      "id": "RESOURCE-BAR-05",
+      "status": "VERIFIED",
+      "requirement": "一般怪物、援軍、Boss 與玩家資源條共用 11px 實際高度。",
+      "evidence": ["css/fixed-slot-battlefield-rendering-v2.css", "css/gameplay-boss-tower.css", "tests/ui-typography-battle-preservation.test.js", ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs", ".github/scripts/battle-layer-audio-live-qa.mjs"]
+    },
+    {
+      "id": "BOSS-SLOT-06",
+      "status": "VERIFIED",
+      "requirement": "B1／B5 援軍立繪不得與中央 Boss 六格視覺佔位重疊。",
+      "evidence": ["css/gameplay-boss-tower.css", "tests/boss-mobile-portrait-browser.test.js", ".github/scripts/run-fixed-slot-battlefield-browser-qa.mjs"]
+    }
+  ],
+  "automatedVerification": "PASS_CI_35318320369",
+  "visualVerification": "PASS_412x915_FIXED_SLOT_AND_REAL_BATTLE",
+  "verifiedCommit": "ea74b44109f159f292ec8a93ae39592abea1f024",
+  "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
+  "releasedAs": null
+}

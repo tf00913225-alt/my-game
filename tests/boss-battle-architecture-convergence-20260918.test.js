@@ -40,7 +40,7 @@ assert.match(geometry,/className="v-fixed-boss-footprint"/);
 assert.match(geometry,/\.v-fixed-boss-footprint/);
 assert.match(geometry,/isOwnedFixedStructure[\s\S]*?v-fixed-boss-footprint/);
 assert.match(geometry,/footprint\.dataset\.slots=slots\.bossFootprintSlots\.join\(" "\)/);
-assert.match(bossCss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 5px\);[\s\S]*?right:calc\(20% \+ 5px\)/);
+assert.match(bossCss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 12px\);[\s\S]*?right:calc\(20% \+ 12px\)/);
 assert.match(bossCss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?pointer-events:auto/);
 assert.match(bossCss,/\.gameplay-boss-card > \.v174-battle-art\{[\s\S]*?background-size:contain/);
 assert.doesNotMatch(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster\{[\s\S]*?--v143-monster-card-width/);
@@ -55,13 +55,15 @@ assert.doesNotMatch(presentation,/setInterval\(syncManagement\s*,\s*300\)/);
 assert.doesNotMatch(core,/red-hit/);
 assert.doesNotMatch(read("css/00-main.css"),/\.red-hit/);
 assert.match(core,/const prefix=type==="heal"\?"\+":"-"/);
+assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit\{[\s\S]*?border:0 !important;[\s\S]*?box-shadow:none !important/);
+assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit > \.damage-popup\.hp-popup\{[\s\S]*?display:none !important/);
 
 assert.match(fixedCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?\.v-fixed-ally-slot \.hp-bar\{bottom:26px !important/);
-assert.match(fixedCss,/--battle-resource-bar-height:10px/);
+assert.match(fixedCss,/--battle-resource-bar-height:11px/);
 assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-center-region-track:16fr[\s\S]*?--battle-ally-region-track:42fr/);
 assert.match(fixedCss,/\.battle-center-region\{[\s\S]*?border:0/);
 assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?position:absolute !important;[\s\S]*?bottom:0 !important/);
-assert.match(fixedCss,/\.battle-info-toggle\{[\s\S]*?width:64px;[\s\S]*?border:3px solid #d9ad50/);
+assert.match(fixedCss,/\.battle-info-toggle\{[\s\S]*?left:auto;[\s\S]*?right:4px;[\s\S]*?width:64px;[\s\S]*?background:rgba\(0,0,0,\.62\)/);
 assert.match(fixedCss,/\.battle-element-box-button\{[\s\S]*?width:66px !important;[\s\S]*?height:66px !important/);
 
 assert.match(home,/openHomeFeature\(\\'formation\\'\)/);

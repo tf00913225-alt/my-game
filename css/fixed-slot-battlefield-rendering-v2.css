@@ -31,7 +31,7 @@
     --battle-art-overhang-top:6px;
     --battle-art-hud-reserve:39px;
     --battle-name-row-height:14px;
-    --battle-resource-bar-height:10px;
+    --battle-resource-bar-height:11px;
     --battle-enemy-safe-top:12px;
 }
 
@@ -125,7 +125,8 @@
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle{
     position:absolute;
-    left:50%;
+    left:auto;
+    right:4px;
     top:0;
     z-index:2;
     display:flex;
@@ -139,9 +140,9 @@
     border-bottom:0;
     border-radius:10px 10px 0 0;
     color:#f5cf72;
-    background:rgba(40,31,20,.9);
+    background:rgba(0,0,0,.62);
     box-shadow:0 -2px 10px rgba(217,173,80,.34);
-    transform:translateX(-50%);
+    transform:none;
     pointer-events:auto;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle > span{
@@ -438,6 +439,21 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target{
     border:0 !important;
     box-shadow:none !important;
+}
+/* Boss cards live in the central six-Slot footprint instead of a regular
+   holder. Keep every enemy target entity on the same cardless root contract,
+   including Bosses and dynamically inserted reinforcements/objects. */
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit{
+    border:0 !important;
+    outline:0 !important;
+    border-radius:0 !important;
+    background:none !important;
+    box-shadow:none !important;
+}
+/* Enemy HP damage keeps VFX and HP-bar feedback but does not add a separate
+   flashing red popup over the cardless portrait. */
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit > .damage-popup.hp-popup{
+    display:none !important;
 }
 /* Formal target feedback is a compact reticle over the artwork, never a card
    outline. The same owner covers normal enemies, Boss, reinforcements and

@@ -119,7 +119,7 @@ assert.match(gameplay, /\.boss-shield-value\{[\s\S]*?font-size:10px/);
 assert.doesNotMatch(gameplay,/boss-mechanism/);
 assert.match(relic, /\.team-relic-battle-banner b\{[^}]*17px/);
 assert.match(relic, /#battlePage \.battle-player \.team-relic-sp-float\{[^}]*13px/);
-assert.match(read('css/45-v152-dev-fixes.css'), /v152-frostbite-blocked::after\{[\s\S]*?font-size:12px !important/);
+assert.doesNotMatch(read('css/45-v152-dev-fixes.css'), /v152-frostbite-blocked|凍傷禁止使用技能/);
 
 // Permanent documentation must describe both the floor and the battle carve-out.
 assert.match(docs, /## UI Typography \/ UI 文字尺寸規範（永久規則）/);

@@ -380,54 +380,6 @@
         };
     }
 
-    function rejectFrostbittenSkill(character,index,skill,consumeTurn){
-        if(!skill||!activeStatus(character,"frostbite")){ return false; }
-        if(typeof showMissEffect==="function"){ showMissEffect(true,index,"MISS"); }
-        if(typeof addBattleLog==="function"){
-            addBattleLog((character.id||"角色")+"處於凍傷狀態，無法使用"+skill.name+"。可改用普通攻擊、補品、符咒、防禦或逃脫。");
-        }
-        if(consumeTurn&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
-        return true;
-    }
-
-    if(typeof prepareAction==="function"){
-        const previousPrepareAction=prepareAction;
-        prepareAction=function(type){
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase[type]:null;
-            const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-            if(skill&&rejectFrostbittenSkill(character,index,skill,false)){ return; }
-            return previousPrepareAction.apply(this,arguments);
-        };
-    }
-
-    if(typeof resolveQueuedPlayerAction==="function"){
-        const previousResolveQueuedAction=resolveQueuedPlayerAction;
-        resolveQueuedPlayerAction=function(characterIndex){
-            const queued=typeof queuedPlayerActions!=="undefined"?queuedPlayerActions[characterIndex]:null;
-            const skill=queued&&typeof skillDatabase!=="undefined"?skillDatabase[queued.action]:null;
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            if(skill&&rejectFrostbittenSkill(character,characterIndex,skill,true)){ return; }
-            return previousResolveQueuedAction.apply(this,arguments);
-        };
-    }
-
-    if(typeof autoActionForCharacter==="function"){
-        const previousAutoAction=autoActionForCharacter;
-        autoActionForCharacter=function(characterIndex){
-            const result=previousAutoAction.apply(this,arguments);
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const queued=typeof queuedPlayerActions!=="undefined"?queuedPlayerActions[characterIndex]:null;
-            if(character&&activeStatus(character,"frostbite")&&queued&&skillDatabase[queued.action]){
-                queued.action="normal";
-                if(typeof addBattleLog==="function"){
-                    addBattleLog((character.id||"角色")+"處於凍傷狀態，自動戰鬥已改用普通攻擊。");
-                }
-            }
-            return result;
-        };
-    }
-
     /* ----- Player Fire EX, guaranteed Burn and conditional follow-ups. ----- */
     let playerSkillContext=null;
 
@@ -829,15 +781,6 @@
         processSingleMonsterAttack=function(monsterIndex){
             const attackArgs=Array.prototype.slice.call(arguments);
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const frostbitten=activeStatus(monster,"frostbite");
-            const saved=monster?{
-                skillIds:monster.skillIds,supports:monster.v141SupportSkillIds,skillChance:monster.skillChance
-            }:null;
-            if(frostbitten&&monster){
-                monster.skillIds=[];
-                monster.v141SupportSkillIds=[];
-                monster.skillChance=0;
-            }
             const realFinish=typeof finishPlayerAction==="function"?finishPlayerAction:null;
             const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
             const previousHit=typeof showPlayerHit==="function"?showPlayerHit:null;
@@ -894,11 +837,6 @@
                 if(previousHit){ showPlayerHit=previousHit; }
                 if(previousLog){ addBattleLog=previousLog; }
                 if(previousStatusRoll){ rollStatusEffectHit=previousStatusRoll; }
-                if(frostbitten&&monster){
-                    monster.skillIds=saved.skillIds;
-                    monster.v141SupportSkillIds=saved.supports;
-                    monster.skillChance=saved.skillChance;
-                }
             }
             const repeatSkill=castSkillId&&skillDatabase[castSkillId];
             const livingTargets=livingPartyIndexes();
@@ -963,7 +901,7 @@
     window.v149SyncCombatCards=syncAllCombatCards;
     window.v149Diagnostics=function(){
         return {
-            version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:true,
+            version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:false,
             sameNameStateMiss:true,barrierCornerCount:false,proceduralSkillFallback:false,
             mainShopIcon:"assets/ui/home-shop.png",navShopIcon:"assets/ui/home-shop-v147.png"
         };

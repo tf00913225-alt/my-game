@@ -10,17 +10,17 @@ const relic=fs.readFileSync("css/55-team-relic-system.css","utf8");
 
 assert.match(fixed,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*?grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
 assert.match(fixed,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
-assert.match(fixed,/--battle-resource-bar-height:10px/);
+assert.match(fixed,/--battle-resource-bar-height:11px/);
 assert.match(fixed,/\.monster-bar-text,[\s\S]*?font-size:9px !important/);
 assert.match(fixed,/\.battle-info-region\{[\s\S]*?position:absolute !important;[\s\S]*?bottom:0 !important/);
 assert.match(fixed,/\.battle-info-toggle\{[\s\S]*?width:64px;[\s\S]*?height:32px;[\s\S]*?border:3px solid #d9ad50/);
 
 assert.match(boss,/\/\* ---------- Boss battle target-entity presentation ---------- \*\//);
-assert.match(boss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 5px\);[\s\S]*?right:calc\(20% \+ 5px\);[\s\S]*?pointer-events:none/);
-assert.match(boss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?border:0;[\s\S]*?background:none;[\s\S]*?pointer-events:auto/);
+assert.match(boss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 12px\);[\s\S]*?right:calc\(20% \+ 12px\);[\s\S]*?pointer-events:none/);
+assert.match(boss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?border:0 !important;[\s\S]*?background:none !important;[\s\S]*?pointer-events:auto/);
 assert.match(boss,/\.gameplay-boss-card > \.v174-battle-art\{[\s\S]*?background-size:contain/);
 assert.doesNotMatch(boss,/boss-mechanism|MECH_[LCR]|aspect-ratio:4\s*\/\s*3/);
-assert.doesNotMatch(boss.replace(/\/\*[\s\S]*?\*\//g,""),/!important/);
+assert.match(boss,/\.gameplay-boss-card > \.monster-hp,[\s\S]*?display:block !important;[\s\S]*?visibility:visible !important/);
 
 assert.doesNotMatch(polish,/v143-earth-shield-effect/);
 assert.doesNotMatch(polish,/v143-skill-flight|v143-skill-field|v143-hit-impact|v146-flight-art/);

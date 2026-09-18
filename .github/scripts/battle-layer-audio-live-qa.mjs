@@ -394,7 +394,7 @@ try{
         assert.ok(hud.sp.bottom<=hud.name.top+1,`${side} name must sit below both resource bars`);
     }
     assert.equal(resourceLayers.logicalHeights.monsterHp,resourceLayers.logicalHeights.playerHp,"Enemy and player resource bars must use the same formal owner height");
-    assert.equal(resourceLayers.logicalHeights.monsterHp,10,"Battle resource bars must use the restored 10px logical height");
+    assert.equal(resourceLayers.logicalHeights.monsterHp,11,"Battle resource bars must use the shared 11px logical height");
 
     const iceArrowRain=await client.eval(`(()=>{
         const director=window.v142SkillAnimationDirector;

@@ -1,3 +1,12 @@
+## 2026-09-18 — Battle presentation follow-up: Boss HUD, cardless enemy feedback, drawer and reinforcement spacing (IMPLEMENTED / QA PENDING)
+
+- Base: latest GitHub `dev@394d4a6baba1aa6e7061d60390201bf1925c4a1e`; branch: `fix/battle-presentation-boss-hud-slots-20260918`. `main` remains excluded.
+- User video `1000070405.mp4` and screenshots `1000070400.jpg`／`1000070404.jpg` show the Boss footprint still inheriting a legacy elemental card border, enemy red HP popup feedback, a missing Boss HP bar, a stale Frostbite skill-prohibition label, a centered drawer handle, a perceived enemy/player bar-height mismatch and B1 reinforcement artwork touching the Boss portrait.
+- Existing owners only: `css/fixed-slot-battlefield-rendering-v2.css` now applies the cardless root reset to every enemy entity, suppresses enemy red HP popup paint, shares an 11px player/enemy resource-bar token and anchors the drawer handle at bottom-right with a translucent black background. No new stylesheet or late runtime patch was added.
+- `css/gameplay-boss-tower.css` now gives the Boss HUD explicit visibility/height priority over older shared battle styles, reserves 12px beyond the outer enemy columns for the Boss footprint and insets B1/B5/F1/F5 artwork so reinforcements/objects do not touch the central Boss portrait.
+- Frostbite is formally converged to its V169 soft-debuff rule: `js/43`, `js/44`, `js/50` and `css/45` no longer contain player/monster skill-lock wrappers, disabled-control classes or the obsolete prohibition text. Damage, evasion and status resistance penalties remain owned by V169. Deprecated-code gate prevents those retired tokens from returning.
+- Requirement batch: `release/requirement-batches/2026-09-18-battle-presentation-followup.json`. Status remains IMPLEMENTED / QA PENDING until focused tests, deterministic build check, mobile browser geometry and Repository checks pass.
+
 ## 2026-09-18 — Boss target-entity convergence, cardless battlefield and queue-owner cleanup (IMPLEMENTED / QA PENDING)
 
 - Base: latest GitHub `dev@1142ba9c0cc0dac9200772326ba920d5b1a07fed`; branch: `fix/boss-battle-architecture-convergence-20260918`. `main` is excluded.
