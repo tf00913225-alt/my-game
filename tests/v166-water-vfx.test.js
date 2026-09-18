@@ -438,7 +438,7 @@ test("Ice Spin creates one fixed tri-target sheet centered on the explicit prima
         assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
         assert.equal(sprites[0].style.left,["338px","458px","578px"][indexes[0]]);
         assert.equal(sprites[0].style.width,"316px");
-        assert.equal(sprites[0].style.height,"100px");
+        assert.equal(sprites[0].style.height,"316px","Ice Spin preserves its authored square frame across the fixed tri-target footprint");
         indexes.forEach(index=>runtime.context.showMonsterHit(index,10,"hp"));
         const delayedNumbers=runtime.scheduled.slice(-indexes.length);
         assert.equal(delayedNumbers.length,indexes.length);
@@ -523,7 +523,7 @@ test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
         assert.equal(sprite.querySelectorAll(".v166-water-battlefield-tile").length,0);
         results.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
-    assert.deepEqual(results[0],["480px","170px","440px","260px"]);
+    assert.deepEqual(results[0],["480px","170px","440px","440px"],"Ice Arrow Rain preserves its authored square frame over the complete fixed formation");
     assert.deepEqual(results[1],results[0]);
 });
 
@@ -542,7 +542,7 @@ test("enemy Ice Arrow Rain stays centered on the complete player formation",()=>
     assert.equal(sprites[0].style.left,"240px");
     assert.equal(sprites[0].style.top,"420px");
     assert.equal(sprites[0].style.width,"440px");
-    assert.equal(sprites[0].style.height,"160px");
+    assert.equal(sprites[0].style.height,"440px","Ice Arrow Rain preserves its authored square frame over the complete ally formation");
     assert.equal(sprites[0].style.clipPath||sprites[0].style["clip-path"],"none");
     assert.equal(sprites[0].querySelectorAll(".v166-water-battlefield-tile").length,0);
 });
@@ -588,7 +588,7 @@ test("tri-target Freeze and ally-all Heal use their fixed semantic footprints",(
     assert.equal(freezeSprites[0].dataset.targetIndexes,"0,2");
     assert.equal(freezeSprites[0].style.left,"338px");
     assert.equal(freezeSprites[0].style.width,"316px");
-    assert.equal(freezeSprites[0].style.height,"100px");
+    assert.equal(freezeSprites[0].style.height,"316px","Freeze preserves its authored square frame across the fixed tri-target footprint");
 
     const heal=loadRuntime();
     heal.context.v142SkillAnimationDirector.play(
@@ -601,7 +601,7 @@ test("tri-target Freeze and ally-all Heal use their fixed semantic footprints",(
     assert.equal(healSprites[0].dataset.placement,"battlefield");
     assert.equal(healSprites[0].style.left,"240px");
     assert.equal(healSprites[0].style.width,"440px");
-    assert.equal(healSprites[0].style.height,"160px");
+    assert.equal(healSprites[0].style.height,"440px","Heal preserves its authored square frame over the complete ally formation");
 });
 
 test("Freeze and Frostbite loops mirror statusEffects only and never open an action gate",()=>{
@@ -694,7 +694,7 @@ test("enemy Freeze uses its explicit successful player target",()=>{
     assert.equal(sprites[0].style.left,"239px");
     assert.equal(sprites[0].style.top,"418px");
     assert.equal(sprites[0].style.width,"398px");
-    assert.equal(sprites[0].style.height,"116px");
+    assert.equal(sprites[0].style.height,"398px","enemy Freeze preserves its authored square frame across the fixed tri-target footprint");
     assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-freeze"),null);
 });
 

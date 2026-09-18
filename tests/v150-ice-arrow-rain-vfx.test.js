@@ -244,7 +244,7 @@ test("one shared raster sheet stays locked to the complete enemy formation after
         assert.equal(sprite.style.left,"460px");
         assert.equal(sprite.style.top,"165px");
         assert.equal(sprite.style.clipPath||sprite.style["clip-path"],"none");
-        assert.equal(sprite.dataset.frameFit,"stretch");
+        assert.equal(sprite.dataset.frameFit,"cover");
         assert.equal(sprite.dataset.renderer,"dom-sprite");
         assert.equal(sprite.style.backgroundImage,'url("'+assetPath+'?v=173.19")');
         assert.equal(sprite.style.backgroundSize,"400% 300%");
@@ -252,9 +252,9 @@ test("one shared raster sheet stays locked to the complete enemy formation after
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
         assert.ok(runtime.scheduled.some(timer=>timer.delay>=1590),"full 1.6 second action gate");
     });
-    assert.deepEqual(placements[0],["460px","165px","440px","270px"]);
+    assert.deepEqual(placements[0],["460px","165px","440px","440px"]);
     assert.equal(Number.parseFloat(placements[0][2]),440,"full-field sheet must fill the fixed enemy-side width");
-    assert.equal(Number.parseFloat(placements[0][3]),270,"full-field sheet must stay inside the fixed enemy-side height");
+    assert.equal(Number.parseFloat(placements[0][3]),440,"full-field sheet must preserve its square source frame instead of flattening to the zone height");
     assert.deepEqual(placements[1],placements[0],"one survivor and three survivors use the same full-formation footprint");
 });
 
@@ -270,7 +270,7 @@ test("Water three-target casts use one fixed three-slot sheet even when one targ
         const sprites=stage.children.filter(node=>String(node.className).includes("v143-vfx-sprite"));
         assert.equal(sprites.length,1,"three-target cast owns one range sheet");
         assert.equal(sprites[0].dataset.placement,"group");
-        assert.equal(sprites[0].dataset.frameFit,"stretch");
+        assert.equal(sprites[0].dataset.frameFit,"cover");
         placements.push([sprites[0].style.left,sprites[0].style.top,sprites[0].style.width,sprites[0].style.height]);
     });
     assert.deepEqual(placements[1],placements[0],"survivor count must not collapse a three-slot footprint");
