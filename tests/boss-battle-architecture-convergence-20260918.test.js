@@ -43,8 +43,11 @@ assert.match(geometry,/footprint\.dataset\.slots=slots\.bossFootprintSlots\.join
 assert.match(bossCss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 12px\);[\s\S]*?right:calc\(20% \+ 12px\)/);
 assert.match(bossCss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?pointer-events:auto/);
 assert.match(bossCss,/\.gameplay-boss-card > \.v174-battle-art\{[\s\S]*?background-size:contain/);
+assert.match(bossCss,/\.gameplay-boss-card > \.monster-hp > \.boss-hp-shield-overlay\{[\s\S]*?background:rgba\(255,255,255,\.92\)/);
+assert.doesNotMatch(bossCss,/boss-shield-hud/);
 assert.doesNotMatch(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster\{[\s\S]*?--v143-monster-card-width/);
 assert.match(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster:not\(\.gameplay-boss-card\)\{/);
+assert.match(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster:not\(\.gameplay-boss-card\) \.monster-hp,[\s\S]*?\.battle-monster:not\(\.gameplay-boss-card\) \.monster-sp/);
 assert.doesNotMatch(read("css/38-v141-system-expansion.css"),/#game-content #battlePage \.battle-monster\{/);
 assert.match(read("css/38-v141-system-expansion.css"),/#game-content #battlePage \.battle-monster:not\(\.gameplay-boss-card\)\{/);
 assert.doesNotMatch(read("css/09-stage-v15-native-character-shell.css"),/#game-content #battlePage \.battle-monster\{/);
@@ -55,8 +58,10 @@ assert.doesNotMatch(presentation,/setInterval\(syncManagement\s*,\s*300\)/);
 assert.doesNotMatch(core,/red-hit/);
 assert.doesNotMatch(read("css/00-main.css"),/\.red-hit/);
 assert.match(core,/const prefix=type==="heal"\?"\+":"-"/);
+assert.match(core,/const suppressEnemyHpPopup=type==="hp"/);
 assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit\{[\s\S]*?border:0 !important;[\s\S]*?box-shadow:none !important/);
 assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit > \.damage-popup\.hp-popup\{[\s\S]*?display:none !important/);
+assert.match(presentation,/if\(card\?\.classList\?\.contains\("battle-monster"\)\)return/);
 
 assert.match(fixedCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?\.v-fixed-ally-slot \.hp-bar\{bottom:26px !important/);
 assert.match(fixedCss,/--battle-resource-bar-height:11px/);

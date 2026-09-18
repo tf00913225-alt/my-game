@@ -4750,8 +4750,8 @@ body.quest-scroll-active,
     line-height:10px !important;
 }
 
-#game-stage #battlePage .battle-monster .monster-hp,
-#game-stage #battlePage .battle-monster .monster-sp{
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-hp,
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-sp{
     width:var(--v143-monster-bar-width,68px) !important;
     height:11px !important;
     min-height:11px !important;

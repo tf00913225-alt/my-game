@@ -24729,6 +24729,11 @@ function showMonsterHit(index,amount,type,isCrit){
     const element=$("battleMonster"+index);
     if(!element||amount===undefined||amount===null){ return; }
 
+    /* Enemy HP feedback is owned here. Cardless enemies keep their actual
+       resource update and skill/status VFX, but do not create a red HP popup
+       that later gets reparented to body by the Fixed Slot popup owner. */
+    const suppressEnemyHpPopup=type==="hp";
+
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     const settlement=type==="hp"&&bossOwner&&typeof bossOwner.consumeDamageSettlement==="function"
         ?bossOwner.consumeDamageSettlement(index):null;
@@ -24737,11 +24742,13 @@ function showMonsterHit(index,amount,type,isCrit){
         if(settlement.shieldAbsorbed>0){
             showDamagePopup(element,"-"+settlement.shieldAbsorbed,"shield",false);
         }
-        if(settlement.hpDamage>0){
+        if(settlement.hpDamage>0&&!suppressEnemyHpPopup){
             showDamagePopup(element,"-"+settlement.hpDamage+"HP","hp",isCrit);
         }
         return;
     }
+
+    if(suppressEnemyHpPopup){ return; }
 
     const prefix=type==="heal"?"+":"-";
     showDamagePopup(
