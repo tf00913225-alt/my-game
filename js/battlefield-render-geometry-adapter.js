@@ -60,6 +60,29 @@
     function activeEnemySnapshot(indexes){
         let snapshot=slots.getActiveEnemySnapshot();
         const requested=integerIndexes(indexes);
+        const boss=bossBattleOwner();
+        const bossActive=!!(boss&&typeof boss.isActive==="function"&&boss.isActive());
+        if(bossActive){
+            const unslotted=requested.filter(index=>{
+                const monster=typeof monsters!=="undefined"?monsters[index]:null;
+                return !!(monster&&monster.alive!==false&&Number(monster.hp)>0)&&
+                    !(snapshot&&slots.getEnemySlotForMonster(snapshot,index));
+            });
+            if(unslotted.length){
+                if(boss&&typeof boss.recordLifecycleViolation==="function"){
+                    boss.recordLifecycleViolation("boss-active-entity-without-slot",{
+                        indexes:unslotted,
+                        snapshotKind:snapshot&&snapshot.kind||null,
+                        snapshotBossOwned:!!(snapshot&&snapshot.bossBattleSnapshot)
+                    });
+                }
+                /* Boss geometry cannot degrade into a normal formation. The
+                   unassigned entity is refused by this render pass so the
+                   formal B1/B5/F1/F5/Boss footprint remains intact. */
+                return snapshot;
+            }
+            return snapshot;
+        }
         const complete=snapshot&&requested.every(index=>!!slots.getEnemySlotForMonster(snapshot,index));
         if(!complete&&requested.length){
             snapshot=slots.createEnemyFormationSnapshot(requested,{

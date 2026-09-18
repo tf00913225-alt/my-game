@@ -4045,10 +4045,7 @@ let battleAdvanceTimeoutId=null;
 let battleAdvanceScheduled=false;
 /* Queue timing has one owner: this module. V142/V143 report visual time only. */
 const MANUAL_RESOLUTION_START_MS=250;
-const BATTLE_MIN_ACTION_INTERVAL_MS=1250;
-const BATTLE_SKILL_VFX_TAIL_MS=400;
-const ROUND_HANDOFF_MS=800;
-const ROUND_ANNOUNCE_LEAD_MS=450;
+const POST_ACTION_DELAY_MS=1150;
 const BATTLE_DECLARE_ADVANCE_MS=MANUAL_RESOLUTION_START_MS;
 const battleActionFinishObservers=new Set();
 const battleBeforeCombatantObservers=new Set();
@@ -4107,14 +4104,10 @@ function getBattleAdvanceDelay(phase){
     }
     const visualRemaining=typeof window!=="undefined"&&typeof window.v142GetRemainingAnimationMs==="function"
         ?Number(window.v142GetRemainingAnimationMs())||0:0;
-    return Math.max(BATTLE_MIN_ACTION_INTERVAL_MS,visualRemaining+BATTLE_SKILL_VFX_TAIL_MS);
-}
-function getRoundHandoffDelay(){
-    const visualRemaining=typeof window!=="undefined"&&typeof window.v142GetRemainingAnimationMs==="function"
-        ?Number(window.v142GetRemainingAnimationMs())||0:0;
-    /* A round ends only after its last VFX has cleaned up, then gets the
-       formal handoff beat. This is deliberately not an extra action delay. */
-    return Math.max(ROUND_HANDOFF_MS,visualRemaining+ROUND_HANDOFF_MS);
+    /* V142/V143 only report whether the current visual gate remains active.
+       This queue owner waits for that gate, then schedules exactly one formal
+       post-action beat before the next combatant. */
+    return Math.max(0,visualRemaining)+POST_ACTION_DELAY_MS;
 }
 const BATTLE_ACTION_WATCHDOG_MS=7000;
 let battleActionWatchdogTimeoutId=null;
@@ -10613,17 +10606,8 @@ function startTurn(token){
     updateActionHudVisibility();
 
 
-    /* The round label is intentionally visible before the next declaration /
-       resolve decision. This is scheduled by the same queue timer that owns
-       every other battle boundary. */
-    const roundLead=turn>1?ROUND_ANNOUNCE_LEAD_MS:0;
-    if(roundLead>0){
-        battleAdvanceTimeoutId=setTimeout(()=>{
-            battleAdvanceTimeoutId=null;
-            if(battleActive&&token===battleToken){ beginCharacterTurn(token); }
-        },roundLead);
-        return;
-    }
+    /* The preceding action already owns the complete round handoff window.
+       The round label renders inside that window; it has no second delay. */
     beginCharacterTurn(token);
 
 }
@@ -17288,10 +17272,7 @@ function finishPlayerAction(){
        但整體節奏會俐落不少。
     */
 
-    const isRoundBoundary=initiativeIndex+1>=initiativeQueue.length;
-    const nextDelay=isRoundBoundary
-        ?getRoundHandoffDelay()
-        :getBattleAdvanceDelay("resolve");
+    const nextDelay=getBattleAdvanceDelay("resolve");
 
     battleAdvanceTimeoutId=setTimeout(()=>{
 

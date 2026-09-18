@@ -229,6 +229,45 @@ test("totems and flags are normal numeric target entities at F1/F5 but never act
     );
 });
 
+test("retiring or destroying a Boss object releases its formal F1/F5 slot",()=>{
+    const {context}=load();
+    context.vGameplayStartBoss("personal","personal-70");
+    const object=context.GameplaySystem.debugSpawnBossObject("heal","slot-release");
+    const index=context.monsters.indexOf(object);
+    const slots=context.FourSymbolsBattlefieldSlots;
+    const snapshot=slots.getActiveEnemySnapshot();
+    assert.equal(slots.getEnemySlotForMonster(snapshot,index),"ENEMY_F1");
+
+    object.alive=false;
+    object.hp=0;
+    assert.equal(context.FourSymbolsBossBattle.onEnemyDeath(index,object),true);
+    assert.equal(slots.getEnemySlotForMonster(snapshot,index),null);
+    assert.equal(slots.getAssignedMonsterAtEnemySlot(snapshot,"ENEMY_F1"),null);
+    assert.equal(object.vGameplayBattlefieldSlot,null);
+});
+
+test("Boss object spawn never publishes an entity when its formal slot is occupied",()=>{
+    const {context}=load();
+    context.vGameplayStartBoss("personal","personal-70");
+    const slots=context.FourSymbolsBattlefieldSlots;
+    const snapshot=slots.getActiveEnemySnapshot();
+    assert.equal(slots.assignMonsterToEnemySlot(snapshot,99,"ENEMY_F1"),true);
+    assert.equal(slots.assignMonsterToEnemySlot(snapshot,98,"ENEMY_F5"),true);
+    const monsterCount=context.monsters.length;
+    const roster=context.currentBattleMonsters.slice();
+    const objects=context.GameplaySystem.getActiveBattleState().objectIndexes.slice();
+
+    assert.equal(context.GameplaySystem.debugSpawnBossObject("heal","occupied-slot"),null);
+    assert.equal(context.monsters.length,monsterCount);
+    assert.deepEqual(JSON.parse(JSON.stringify(context.currentBattleMonsters)),JSON.parse(JSON.stringify(roster)));
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(context.GameplaySystem.getActiveBattleState().objectIndexes)),
+        JSON.parse(JSON.stringify(objects))
+    );
+    assert.equal(slots.getAssignedMonsterAtEnemySlot(snapshot,"ENEMY_F1"),99);
+    assert.equal(slots.getAssignedMonsterAtEnemySlot(snapshot,"ENEMY_F5"),98);
+});
+
 test("Boss Shield absorbs first and only overflow reaches HP",()=>{
     const {context}=load();
     context.vGameplayStartBoss("personal","personal-30");

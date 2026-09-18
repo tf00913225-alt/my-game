@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-18-boss-world-lifecycle-vfx-first-frame-cadence",
+  "baseBranch": "dev",
+  "baseCommit": "a1ecec4c864f37f89d93c291c22546a941d06178",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "mainPromotionAllowed": false,
+  "requirements": [
+    {
+      "id": "BOSS-LIFECYCLE-01",
+      "status": "IMPLEMENTED",
+      "requirement": "Boss Object retirement and destruction release F1/F5 in the authoritative Boss snapshot; an object cannot remain alive in roster without a successfully assigned formal slot.",
+      "evidence": ["js/gameplay-boss-tower-system.js", "js/battlefield-slot-owner.js", "tests/gameplay-boss-tower-system.test.js"]
+    },
+    {
+      "id": "BOSS-SNAPSHOT-02",
+      "status": "IMPLEMENTED",
+      "requirement": "An active Boss battle retains its specialised Boss snapshot and records/refuses an active entity without a formal slot instead of rebuilding a general enemy formation.",
+      "evidence": ["js/gameplay-boss-tower-system.js", "js/battlefield-render-geometry-adapter.js", "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js"]
+    },
+    {
+      "id": "BOSS-BASELINE-03",
+      "status": "IMPLEMENTED",
+      "requirement": "Personal Boss baseline geometry is restored: footprint inset 20% + 5px and outer B1/B5/F1/F5 artwork insets -2/14 and 14/-2.",
+      "evidence": ["css/gameplay-boss-tower.css", "tests/boss-battle-architecture-convergence-20260918.test.js"]
+    },
+    {
+      "id": "VFX-FIRST-FRAME-04",
+      "status": "IMPLEMENTED",
+      "requirement": "The normal initial V143 Sprite starts at Frame 1 with 0ms delay. V142/V143 restart the visual gate from the first visible frame; late target emission is explicitly separate.",
+      "evidence": ["js/37-v142-skill-animation.js", "js/39-v143-skill-animation.js", "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js"]
+    },
+    {
+      "id": "QUEUE-CADENCE-05",
+      "status": "IMPLEMENTED",
+      "requirement": "00-main.js is the only queue advance owner: manual declaration to resolve is 250ms; every completed normal or skill visual waits exactly one POST_ACTION_DELAY_MS of 1150ms; no separate 1250ms, VFX tail, 800ms or 450ms owner remains.",
+      "evidence": ["js/00-main.js", "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js"]
+    },
+    {
+      "id": "HIT-FEEDBACK-06",
+      "status": "IMPLEMENTED",
+      "requirement": "Enemy HP damage keeps red damage popups while the retired red hit overlay/shake remains absent; formal skill and status VFX remain separate.",
+      "evidence": ["js/00-main.js", "js/39-v143-skill-animation.js", "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js"]
+    },
+    {
+      "id": "BOSS-SHIELD-CRIT-07",
+      "status": "IMPLEMENTED",
+      "requirement": "Each independent damage packet checks vBossShield before critical calculation. Shield absorption and same-packet overflow are non-critical; a later hit after break may roll again.",
+      "evidence": ["js/00-main.js", "js/gameplay-boss-tower-system.js", "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js"]
+    }
+  ],
+  "verification": "Pending focused executable tests, production build checks, CI, merged dev deployment SHA read-back, and 412x915 live DEV runtime verification.",
+  "promotionApproval": "MAIN MUST REMAIN UNCHANGED",
+  "releasedAs": null
+}

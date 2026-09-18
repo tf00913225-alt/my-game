@@ -11476,6 +11476,19 @@
         if(state.fallbackTimer){ clearTimeout(state.fallbackTimer); state.fallbackTimer=0; }
     }
 
+    function armGateDeadline(gate,duration,reason){
+        if(!gate||gate.done){ return false; }
+        if(state.fallbackTimer){ clearTimeout(state.fallbackTimer); state.fallbackTimer=0; }
+        const visualDuration=Math.max(0,Number(duration)||0);
+        gate.visualStartedAt=Date.now();
+        gate.deadline=gate.visualStartedAt+visualDuration;
+        state.fallbackTimer=setTimeout(
+            ()=>gate.complete(reason||"v142-timing-only"),
+            visualDuration
+        );
+        return true;
+    }
+
     function identity(side,name,actorIndex){
         return [
             typeof battleToken!=="undefined"?battleToken:"none",
@@ -11492,10 +11505,13 @@
         const gate={
             id:++state.sequence,key:key,
             battleToken:typeof battleToken!=="undefined"?battleToken:null,
-            config:config,startedAt:Date.now(),deadline:0,done:false,reason:null,
+            config:config,startedAt:Date.now(),visualStartedAt:0,deadline:0,done:false,reason:null,
             completionCount:0,promise:null,complete:null
         };
         gate.deadline=gate.startedAt+Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0);
+        gate.restartVisualTimeline=function(duration){
+            return armGateDeadline(gate,duration,"v142-v143-visual-complete");
+        };
         gate.promise=new Promise(resolve=>{ resolvePromise=resolve; });
         gate.complete=function(reason){
             if(gate.done){ return false; }
@@ -11533,9 +11549,10 @@
         /* The gate measures visual lifetime only. Queue progression never waits
            on this Promise; 00-main.js reads the remaining time and schedules its
            own deterministic handoff even if the raster renderer fails. */
-        state.fallbackTimer=setTimeout(
-            ()=>gate.complete(meta.render===false?"v142-render-safety-deadline":"v142-timing-only"),
-            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
+        armGateDeadline(
+            gate,
+            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0),
+            meta.render===false?"v142-render-safety-deadline":"v142-timing-only"
         );
         if(typeof document!=="undefined"&&document.addEventListener){
             state.visibilityHandler=function(){
@@ -13345,6 +13362,8 @@
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         let node=current.spriteNodes.get(key);
         if(!node){
+            const initialSprite=!current.firstVisibleFrameAt;
+            if(initialSprite){ beginVisualTimeline(current); }
             node=appendSpriteNode(current);
             node.dataset.columns=String(sprite.columns);
             node.dataset.rows=String(sprite.rows);
@@ -13352,9 +13371,13 @@
             node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
             node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
             node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
-            node.style.setProperty(
-                "--v143-sprite-delay",
-                -Math.min(current.duration,Math.max(0,Date.now()-current.startedAt))+"ms"
+            /* The first normal cast always begins at Frame 1. A later sprite
+               for a separately delayed target may catch up to the visual
+               timeline, but it must never rewrite the initial cast. */
+            node.dataset.emission=initialSprite?"initial":"late";
+            node.style.setProperty("--v143-sprite-delay",initialSprite
+                ?"0ms"
+                :-Math.min(current.duration,Math.max(0,Date.now()-(current.visualStartedAt||current.startedAt)))+"ms"
             );
             if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
             current.spriteNodes.set(key,node);
@@ -13382,10 +13405,25 @@
     }
 
     function targetHitTime(current,index){
+        const visualStartedAt=current.visualStartedAt||current.startedAt;
         return Math.min(
-            current.startedAt+current.duration-120,
-            current.startedAt+current.duration*(Number(current.model.hit)||DEFAULT_HIT)
+            visualStartedAt+current.duration-120,
+            visualStartedAt+current.duration*(Number(current.model.hit)||DEFAULT_HIT)
         );
+    }
+
+    function beginVisualTimeline(current){
+        if(!current||current.firstVisibleFrameAt){ return false; }
+        current.firstVisibleFrameAt=Date.now();
+        current.visualStartedAt=current.firstVisibleFrameAt;
+        if(current.gate&&typeof current.gate.restartVisualTimeline==="function"){
+            current.gate.restartVisualTimeline(current.duration);
+        }
+        current.cleanupTimer=setTimer(
+            ()=>cleanupCurrent(current,"v143-raster-complete"),
+            current.duration
+        );
+        return true;
     }
 
     function settleTargetVisual(current,index){
@@ -13476,7 +13514,8 @@
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
             spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
-            startedAt:Date.now(),duration:duration,hitReached:false,done:false
+            startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,
+            duration:duration,hitReached:false,done:false,cleanupTimer:0
         };
         current.targetIndexes=initialTargetIndexes(config,current,targetSide);
 
@@ -13507,7 +13546,9 @@
             current.targetIndexes.slice().forEach(index=>emitSprite(current,index));
         }
 
-        setTimer(()=>cleanupCurrent(current,"v143-raster-complete"),Math.max(duration,Number(config.resolveDuration)||duration));
+        if(model.noVisual||!model.sprite){
+            current.cleanupTimer=setTimer(()=>cleanupCurrent(current,"v143-raster-complete"),duration);
+        }
         gate.promise.then(()=>{
             if(state.current===current&&!current.done){ cleanupCurrent(current,gate.reason||"gate-complete"); }
         });

@@ -14,16 +14,13 @@ const bossCss=read("css/gameplay-boss-tower.css");
 const vfx=read("js/39-v143-skill-animation.js");
 
 assert.match(core,/const MANUAL_RESOLUTION_START_MS=250;/);
-assert.match(core,/const BATTLE_MIN_ACTION_INTERVAL_MS=1250;/);
-assert.match(core,/const BATTLE_SKILL_VFX_TAIL_MS=400;/);
-assert.match(core,/const ROUND_HANDOFF_MS=800;/);
-assert.match(core,/const ROUND_ANNOUNCE_LEAD_MS=450;/);
+assert.match(core,/const POST_ACTION_DELAY_MS=1150;/);
 assert.match(core,/if\(phase==="declare"\)[\s\S]*?return MANUAL_RESOLUTION_START_MS;/);
-assert.match(core,/return Math\.max\(BATTLE_MIN_ACTION_INTERVAL_MS,visualRemaining\+BATTLE_SKILL_VFX_TAIL_MS\);/);
+assert.match(core,/return Math\.max\(0,visualRemaining\)\+POST_ACTION_DELAY_MS;/);
 assert.doesNotMatch(core,/__battleAdvanceDelayOverrideMs/);
 assert.doesNotMatch(read("js/46-v155-dev-fixes.js"),/__battleAdvanceDelayOverrideMs/);
-assert.match(core,/function getRoundHandoffDelay\(\)[\s\S]*?visualRemaining\+ROUND_HANDOFF_MS/);
-assert.match(core,/const isRoundBoundary=initiativeIndex\+1>=initiativeQueue\.length;[\s\S]*?\?getRoundHandoffDelay\(\)/);
+assert.doesNotMatch(core,/BATTLE_MIN_ACTION_INTERVAL_MS|BATTLE_SKILL_VFX_TAIL_MS|ROUND_HANDOFF_MS|ROUND_ANNOUNCE_LEAD_MS|getRoundHandoffDelay/);
+assert.match(core,/const nextDelay=getBattleAdvanceDelay\("resolve"\);/);
 
 assert.match(core,/function rollCritical\(character,category="physical",targetAntiCritPercent=0,target\)/);
 assert.match(core,/target&&target\.vBossShield&&Number\(target\.vBossShield\.current\)>0[\s\S]*?isCrit:false,multiplier:1/);
@@ -33,8 +30,16 @@ assert.match(boss,/Summoning is atomic/);
 assert.match(boss,/removeMonsterFromEnemySlot/);
 assert.match(boss,/getLastReinforcementProjection/);
 assert.match(slots,/function removeMonsterFromSlot/);
-assert.match(bossCss,/left:4px !important;[\s\S]*?right:26px !important;/);
-assert.match(bossCss,/left:26px !important;[\s\S]*?right:4px !important;/);
+assert.match(bossCss,/left:-2px !important;[\s\S]*?right:14px !important;/);
+assert.match(bossCss,/left:14px !important;[\s\S]*?right:-2px !important;/);
+assert.match(bossCss,/left:calc\(20% \+ 5px\);[\s\S]*?right:calc\(20% \+ 5px\)/);
+assert.match(boss,/function retireBossObject[\s\S]*?releaseBossObjectSlot\(entry\.index,entry\.monster/);
+assert.match(boss,/function spawnBossObject[\s\S]*?assignMonsterToEnemySlot\(snapshot,index,slot\)[\s\S]*?monsters\.push\(object\)/);
+
+assert.match(vfx,/const initialSprite=!current\.firstVisibleFrameAt;/);
+assert.match(vfx,/node\.dataset\.emission=initialSprite\?"initial":"late"/);
+assert.match(vfx,/initialSprite\s*\?"0ms"/);
+assert.match(vfx,/function beginVisualTimeline\(current\)[\s\S]*?restartVisualTimeline\(current\.duration\)/);
 
 assert.doesNotMatch(presentation,/v174-hit-shake/);
 assert.doesNotMatch(fixedCss,/v174-hit-shake/);

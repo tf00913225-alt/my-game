@@ -474,20 +474,52 @@
     }
     function isBossObject(monster){ return !!monster&&monster.unitKind==="boss-object"; }
     function isBossObjectIndex(index){ return isBossObject(monsterAt(index)); }
+    function recordLifecycleViolation(code,details){
+        const context=activeBattleContext;
+        if(!context){ return; }
+        const entry=Object.assign({code:code,at:Date.now()},details||{});
+        const diagnostics=context.lifecycleDiagnostics||(context.lifecycleDiagnostics=[]);
+        diagnostics.push(entry);
+        while(diagnostics.length>32){ diagnostics.shift(); }
+        if(typeof console!=="undefined"&&typeof console.warn==="function"){
+            console.warn("Boss lifecycle contract violation",entry);
+        }
+    }
+    function releaseBossObjectSlot(index,monster,reason){
+        const owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
+        if(!owner||!snapshot||!Number.isInteger(index)){ return false; }
+        const released=owner.removeMonsterFromEnemySlot(snapshot,index);
+        if(!released){
+            recordLifecycleViolation("boss-object-slot-missing-on-retire",{index:index,reason:reason||"retired"});
+        }
+        if(monster){ monster.vGameplayBattlefieldSlot=null; }
+        return released;
+    }
 
     function bossBattlefieldSnapshot(){
         const context=activeBattleContext,owner=battlefieldSlotOwner();
         if(!context||!owner){ return null; }
-        /* Rendering can replace the active snapshot while a World Boss is
-           alive. Dynamic units must be assigned against that live snapshot,
-           not the stale startup snapshot retained by the Boss context. */
-        const active=owner.getActiveEnemySnapshot();
         const index=bossIndex();
+        const snapshot=context.enemySnapshot;
+        /* A Boss battle owns one specialised snapshot for its entire lifetime.
+           A generic renderer snapshot may contain the Boss index, but it does
+           not encode the Boss footprint and must never replace this owner. */
+        if(snapshot&&Number.isInteger(index)&&owner.getEnemySlotForMonster(snapshot,index)){
+            if(owner.getActiveEnemySnapshot()!==snapshot){
+                owner.setActiveEnemySnapshot(snapshot);
+                recordLifecycleViolation("restored-boss-snapshot",{bossIndex:index});
+            }
+            return snapshot;
+        }
+        const active=owner.getActiveEnemySnapshot();
         if(active&&Number.isInteger(index)&&owner.getEnemySlotForMonster(active,index)){
+            active.bossBattleSnapshot=true;
             context.enemySnapshot=active;
+            recordLifecycleViolation("adopted-legacy-boss-snapshot",{bossIndex:index});
             return active;
         }
-        return context.enemySnapshot||active||null;
+        recordLifecycleViolation("missing-boss-snapshot",{bossIndex:index});
+        return null;
     }
     function assignEnemySlot(monsterIndex,slot){
         const owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
@@ -555,6 +587,7 @@
         const index=monsters.indexOf(boss);
         if(index<0){ return null; }
         const snapshot=owner.createEnemyFormationSnapshot([index],{originalFormationType:6});
+        snapshot.bossBattleSnapshot=true;
         owner.setActiveEnemySnapshot(snapshot);
         context.bossIndex=index;
         context.enemySnapshot=snapshot;
@@ -582,6 +615,10 @@
     }
     function bossHasObject(type){ return aliveBossObjects(type).length>0; }
     function nextBossObjectSlot(){
+        const owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
+        if(owner&&snapshot){
+            return BOSS_OBJECT_SLOTS.find(slot=>owner.getAssignedMonsterAtEnemySlot(snapshot,slot)===null)||null;
+        }
         const used=new Set(aliveBossObjects().map(entry=>entry.monster.vGameplayBattlefieldSlot));
         return BOSS_OBJECT_SLOTS.find(slot=>!used.has(slot))||null;
     }
@@ -722,15 +759,34 @@
             return applyBossShield(amount)?{type:"shield",amount:amount}:null;
         }
         if(aliveBossObjects().length>=2){ return null; }
-        const slot=nextBossObjectSlot();
-        if(!slot||typeof monsters==="undefined"||typeof currentBattleMonsters==="undefined"){ return null; }
+        const slot=nextBossObjectSlot(),owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
+        if(!slot||!owner||!snapshot||typeof monsters==="undefined"||typeof currentBattleMonsters==="undefined"){ return null; }
         const object=buildBossObject(type,slot,sourceKey);
         if(!object){ return null; }
         const index=monsters.length;
-        monsters.push(object);
-        currentBattleMonsters.push(index);
-        context.objectIndexes.push(index);
-        assignEnemySlot(index,slot);
+        /* Slot assignment is the commit point. Never publish an object to the
+           combat roster unless the formal Boss snapshot accepted its slot. */
+        if(!owner.assignMonsterToEnemySlot(snapshot,index,slot)){
+            recordLifecycleViolation("boss-object-slot-rejected",{index:index,slot:slot,type:type});
+            return null;
+        }
+        try{
+            monsters.push(object);
+            currentBattleMonsters.push(index);
+            if(!Array.isArray(context.objectIndexes)){ context.objectIndexes=[]; }
+            context.objectIndexes.push(index);
+        }catch(error){
+            owner.removeMonsterFromEnemySlot(snapshot,index);
+            if(monsters[index]===object){ monsters.pop(); }
+            const rosterIndex=currentBattleMonsters.lastIndexOf(index);
+            if(rosterIndex>=0){ currentBattleMonsters.splice(rosterIndex,1); }
+            if(Array.isArray(context.objectIndexes)){
+                const objectIndex=context.objectIndexes.lastIndexOf(index);
+                if(objectIndex>=0){ context.objectIndexes.splice(objectIndex,1); }
+            }
+            recordLifecycleViolation("boss-object-rollback",{index:index,slot:slot,type:type,message:String(error&&error.message||error)});
+            return null;
+        }
         if(typeof addBattleLog==="function"){
             addBattleLog(boss.name+"召出【"+object.name+"】！");
         }
@@ -813,6 +869,7 @@
         if(!entry||!entry.monster||!entry.monster.alive){ return; }
         entry.monster.alive=false;
         entry.monster.hp=0;
+        releaseBossObjectSlot(entry.index,entry.monster,reason||"retired");
         if(typeof addBattleLog==="function"){
             addBattleLog("【"+entry.monster.name+"】消失。"+(entry.monster.objectType==="charge"&&reason!=="resolved"?"大型技能已取消。":""));
         }
@@ -887,10 +944,12 @@
     }
     function onEnemyDeath(index,monster){
         if(!isBossObject(monster)){ return false; }
+        releaseBossObjectSlot(index,monster,"destroyed");
         if(typeof addBattleLog==="function"){
             addBattleLog("【"+monster.name+"】已被破壞，持續效果立即停止。");
         }
         syncBossShieldHud();
+        if(typeof renderBattle==="function"){ renderBattle(); }
         return true;
     }
     function cleanupBossBattlePresentation(){
@@ -1063,6 +1122,8 @@
         getBossFootprintSlots:function(){ return BOSS_FOOTPRINT_SLOTS.slice(); },
         getReinforcementSlots:function(){ return BOSS_REINFORCEMENT_SLOTS.slice(); },
         getLastReinforcementProjection:function(){ return activeBattleContext&&copy(activeBattleContext.lastReinforcementProjection||null); },
+        getLifecycleDiagnostics:function(){ return activeBattleContext&&copy(activeBattleContext.lifecycleDiagnostics||[]); },
+        recordLifecycleViolation:recordLifecycleViolation,
         getObjectSlots:function(){ return BOSS_OBJECT_SLOTS.slice(); },
         resolveEnemyDamageTargets:resolveEnemyDamageTargets,
         getTargetGeometry:targetGeometry,
