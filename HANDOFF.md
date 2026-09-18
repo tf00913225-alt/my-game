@@ -1,3 +1,12 @@
+## 2026-09-18 — 20 件秘寶 4×3 VFX WebP 與戰鬥演出整合
+
+- 工作分支：`feature/relic-vfx-animation-20260918`；基準為 `dev@d91687cb09d04519766d8303c331945508bde3a5`，`main` 不修改。
+- 20 張母圖來源固定為 `assets-library/assets/inbox/秘寶icon/秘寶技能VFX/`；正式 runtime 只使用 `assets/vfx/relic/*.webp`。依 `docs/IMAGE_ASSET_SPEC.md` 保留 1448×1086 完整畫布、4×3／12 幀、362×362 單格與 Alpha，不 trim／crop／resize；PNG 僅留素材庫。
+- VFX 唯一 raster owner 仍是 `js/39-v143-skill-animation.js`：`relicSheet()` 與 `RAW_MANIFEST` 登錄 20 件秘寶素材與 reviewed hit frame；使用既有 `v143RasterCastFrames`，未建立第二 renderer。秘寶素材採 lazy preflight，僅裝備中的秘寶由 `v143PreloadBattleVfxAsset()` 預載。
+- 秘寶觸發／效果唯一 owner 仍是 `js/60-team-relic-system.js`：`relicVfxTarget()` 依既有 Trigger／Effect 決定 enemy all、ally all、single ally 或 single enemy；`queueRelicPresentation()` 呼叫正式 V142/V143 動畫管線。已開放 10 件立即使用；其餘 `runtimeReady:false` 的 10 件只預先登錄 VFX，不因此開放技能或取得。
+- 既有 1.15 秒出手後節奏 owner `js/00-main.js::POST_ACTION_DELAY_MS` 不修改。秘寶 VFX 採 0.78–0.98 秒並保留 120ms lead gap，避免在下一個正式行動開始時被截斷。致命傷保命仍先同步結算，再播放 `回天寶輪` 視覺，不能為了動畫延後死亡攔截。
+- 檔名勘誤映射：`玄冰淨心vfx.png` → 正式 `玄冰鏡心`；`赤宵戰紋vfx.png` → 正式 `赤霄戰紋`。兩者只修正 runtime 命名映射，不修改素材內容。
+
 ## 2026-09-18 — 秘寶碎片背包黑圖／詳情穿圖修復（VERIFIED）
 
 - Base: `dev@d9c6d2d2beb78a0a944af171ca20eeb92f02abaa`; branch: `fix/relic-fragment-inventory-image-fit-20260918`; `main` 不修改。
