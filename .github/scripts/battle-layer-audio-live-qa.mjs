@@ -463,7 +463,7 @@ try{
     evidence.checks.iceArrowRainCompletion=iceGate;
     assert.equal(iceGate.done,true,"Ice Arrow Rain must release its animation gate");
     assert.equal(iceGate.completionCount,1,"Ice Arrow Rain gate must complete exactly once");
-    assert.ok(["v143-raster-complete","v142-render-safety-deadline"].includes(iceGate.reason),"Ice Arrow Rain must finish through a bounded production deadline");
+    assert.ok(["v143-raster-complete","v142-v143-visual-complete","v142-render-safety-deadline"].includes(iceGate.reason),"Ice Arrow Rain must finish through its formal visual-complete deadline");
     assert.equal(iceGate.stageExists,false,"Completed full-range VFX must remove its stage");
 
     const windFlame=await client.eval(`(()=>{
