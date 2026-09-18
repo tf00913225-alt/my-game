@@ -665,7 +665,7 @@
     box-sizing:border-box;
     z-index:22;
 }
-#game-stage #battlePage .gameplay-boss-card > .battle-monster-name{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .gameplay-boss-card > .battle-monster-name{
     position:absolute !important;
     top:auto !important;
     bottom:0 !important;
