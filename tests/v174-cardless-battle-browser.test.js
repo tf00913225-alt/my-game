@@ -127,6 +127,7 @@ window.__qaBefore=qaRects();
       activeOutlineWidth:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineWidth,
       activeOutlineColor:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineColor,
       activeShadow:getComputedStyle(document.getElementById('battlePlayerCard1')).boxShadow,
+      activeArtFilter:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).filter,
       playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,
       lungeAnimation:lungeAnimation,
       hitAnimation:getComputedStyle(art).animationName,
@@ -179,9 +180,10 @@ function runViewport(chrome,width,height){
     assert.equal(data.enemyNameDisplay,"flex");
     assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");
     assert.ok(data.enemyArtRect.bottom<=data.enemyNameRect.top+1,"monster artwork must end above the lower HUD");
-    assert.equal(data.activeOutlineWidth,"2px");
-    assert.notEqual(data.activeOutlineColor,"rgba(0, 0, 0, 0)");
-    assert.notEqual(data.activeShadow,"none");
+    assert.equal(data.activeOutlineWidth,"0px");
+    assert.equal(data.activeOutlineColor,"rgba(0, 0, 0, 0)");
+    assert.equal(data.activeShadow,"none");
+    assert.notEqual(data.activeArtFilter,"none","active cardless feedback must remain on artwork instead of a card frame");
     assert.equal(data.playerIdle,"v174BattleIdle");
     assert.equal(data.lungeAnimation,"v174BattleLungeUp");
     assert.equal(data.hitAnimation,"none");
