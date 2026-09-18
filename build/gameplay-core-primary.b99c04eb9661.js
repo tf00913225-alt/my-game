@@ -12664,6 +12664,19 @@
         },options||{});
     }
 
+    function relicSheet(src,hitFrame,options){
+        const frame=Math.max(1,Math.min(12,Math.floor(Number(hitFrame)||7)));
+        const frameIndex=frame-1;
+        return {
+            hit:frameIndex/12,
+            authoredHitFrame:frame,
+            lazyAsset:true,
+            sprite:castSheet(src,"single",Object.assign({
+                hitFrame:frameIndex,scale:2.05,maxSize:280
+            },options||{}))
+        };
+    }
+
     const RAW_MANIFEST={
         normal:{hit:.57,noVisual:true},
 
@@ -12721,6 +12734,29 @@
         rockWall:{hit:.5,deferredStatusTypes:["rockWall"],sprite:castSheet("assets/vfx/earth/rock-wall-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
         barrier:{hit:.5,deferredStatusTypes:["barrier"],sprite:castSheet("assets/vfx/earth/barrier-cast.png?v=173.39","single",{scale:2.25,maxSize:280})},
         earthEX:{hit:.74,noVisual:true,passive:true},
+
+        /* Team Relic VFX — 4x3 / 12-frame lossless WebP sheets.
+           These are lazy because only the equipped relic should be prefetched. */
+        relic_qiankun_flask:relicSheet("assets/vfx/relic/relic_qiankun_flask.webp",7),
+        relic_sun_orb:relicSheet("assets/vfx/relic/relic_sun_orb.webp",7),
+        relic_xuanwu_seal:relicSheet("assets/vfx/relic/relic_xuanwu_seal.webp",8),
+        relic_soul_bell:relicSheet("assets/vfx/relic/relic_soul_bell.webp",8),
+        relic_tiangang_banner:relicSheet("assets/vfx/relic/relic_tiangang_banner.webp",9),
+        relic_nine_dragon_fire:relicSheet("assets/vfx/relic/relic_nine_dragon_fire.webp",8),
+        relic_cold_spring_jade:relicSheet("assets/vfx/relic/relic_cold_spring_jade.webp",7),
+        relic_qinglan_feather:relicSheet("assets/vfx/relic/relic_qinglan_feather.webp",6),
+        relic_rock_mountain_seal:relicSheet("assets/vfx/relic/relic_rock_mountain_seal.webp",7),
+        relic_returning_wheel:relicSheet("assets/vfx/relic/relic_returning_wheel.webp",7),
+        relic_origin_talisman:relicSheet("assets/vfx/relic/relic_origin_talisman.webp",7),
+        relic_broken_army_scroll:relicSheet("assets/vfx/relic/relic_broken_army_scroll.webp",8),
+        relic_red_sky_war_mark:relicSheet("assets/vfx/relic/relic_red_sky_war_mark.webp",7),
+        relic_ice_mirror_heart:relicSheet("assets/vfx/relic/relic_ice_mirror_heart.webp",6),
+        relic_wind_chasing_talisman:relicSheet("assets/vfx/relic/relic_wind_chasing_talisman.webp",6),
+        relic_mountain_river_cauldron:relicSheet("assets/vfx/relic/relic_mountain_river_cauldron.webp",7),
+        relic_burning_star_mark:relicSheet("assets/vfx/relic/relic_burning_star_mark.webp",7),
+        relic_spirit_spring_bottle:relicSheet("assets/vfx/relic/relic_spirit_spring_bottle.webp",6),
+        relic_demon_suppressing_seal:relicSheet("assets/vfx/relic/relic_demon_suppressing_seal.webp",6),
+        relic_all_returning_array:relicSheet("assets/vfx/relic/relic_all_returning_array.webp",8),
 
         /* These Light support skills currently have no dedicated finished cast
            sheet. Their battle timing remains valid, but there is deliberately
@@ -12797,10 +12833,18 @@
         image.src=source;
     }
     Object.keys(RAW_MANIFEST).forEach(id=>{
-        const sprite=RAW_MANIFEST[id]&&RAW_MANIFEST[id].sprite;
-        if(sprite&&sprite.src){ preflightAsset(sprite.src); }
+        const model=RAW_MANIFEST[id];
+        const sprite=model&&model.sprite;
+        if(sprite&&sprite.src&&!model.lazyAsset){ preflightAsset(sprite.src); }
     });
     Object.keys(RAW_STATUS_SPRITES).forEach(type=>preflightAsset(RAW_STATUS_SPRITES[type].src));
+    window.v143PreloadBattleVfxAsset=function(effectId){
+        const model=MANIFEST[effectId];
+        const sprite=model&&model.sprite;
+        if(!sprite||!sprite.src){ return false; }
+        preflightAsset(sprite.src);
+        return true;
+    };
 
     const director=window.v142SkillAnimationDirector;
     const originalPlay=director.play.bind(director);

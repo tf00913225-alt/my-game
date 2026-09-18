@@ -1,0 +1,53 @@
+{
+  "date": "2026-09-18",
+  "title": "20 件秘寶 4×3 VFX WebP 正式導入與戰鬥動畫整合",
+  "base_branch": "dev",
+  "base_sha": "d91687cb09d04519766d8303c331945508bde3a5",
+  "work_branch": "feature/relic-vfx-animation-20260918",
+  "officialVersion": "173.65",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "從 assets-library/assets/inbox/秘寶icon/秘寶技能VFX 導入 20 張秘寶 4×3 PNG；正式 runtime 一律使用無損 WebP，保留原始 1448×1086 畫布、4×3 格數、每格 362×362、透明度與像素內容。",
+      "owner": [
+        "assets/vfx/relic/",
+        "docs/IMAGE_ASSET_SPEC.md"
+      ],
+      "implementation": "20 張母圖以 lossless WebP + exact alpha 方式轉入 assets/vfx/relic；玄冰淨心檔名映射正式玄冰鏡心，赤宵戰紋檔名映射正式赤霄戰紋。轉檔驗證逐張確認尺寸、4×3 可整除、解碼與像素 AE=0。"
+    },
+    {
+      "id": 2,
+      "status": "VERIFIED",
+      "request": "依每張 VFX 的實際形成／高峰／消散內容判斷命中影格與播放秒數，並沿用 V143 既有 4×3 Sprite Sheet renderer，不新增第二套 VFX owner。",
+      "owner": [
+        "js/39-v143-skill-animation.js::relicSheet()",
+        "js/39-v143-skill-animation.js::RAW_MANIFEST",
+        "css/40-v143-combat-dungeon-polish.css::v143RasterCastFrames"
+      ],
+      "implementation": "20 件秘寶各自綁定 reviewed hit frame；修正 one-based hit frame 的 off-by-one 換算。動畫仍用 V143 既有 12-frame 4×3 background-position renderer，不 trim/crop/resize 母圖。"
+    },
+    {
+      "id": 3,
+      "status": "VERIFIED",
+      "request": "秘寶觸發時依技能效果在正確目標側播放 VFX；全敵、全隊、單體救援與反震均使用正式 Fixed Slot／Boss 幾何，並保持既有秘寶效果、戰鬥回合與 1.15 秒出手節奏。",
+      "owner": [
+        "js/60-team-relic-system.js::queueRelicPresentation()",
+        "js/60-team-relic-system.js::relicVfxTarget()",
+        "js/00-main.js::POST_ACTION_DELAY_MS"
+      ],
+      "implementation": "秘寶 runtime 只呼叫正式 v142SkillAnimationDirector → V143 renderer；效果種類決定 enemy all / ally all / single ally / single enemy。每件 VFX 0.78–0.98 秒，presentation lead gap 120ms，避免與 1150ms post-action beat 互相截斷。before_lethal_damage 仍先同步完成保命結算再排演出。"
+    }
+  ],
+  "verification": [
+    "tests/relic-vfx-animation-20260918.test.js",
+    "tests/v174-team-relic-system.test.js",
+    "tests/v174-team-relic-hardening.test.js",
+    "tests/v142-skill-animation.test.js",
+    "tests/battle-layout-vfx-runtime-20260917.test.js",
+    "npm run build:check",
+    "PR Repository checks / mobile browser QA"
+  ],
+  "verificationResult": "3/3 VERIFIED；20 張 VFX 母圖已以 lossless WebP 導入並逐張驗證 1448×1086、4×3／12 幀、362×362 單格、Alpha 與解碼像素 AE=0。Build sync run 35367798768 SUCCESS；PR #316 Repository checks run 35368054937 SUCCESS，包含 JavaScript syntax、戰鬥／V142／V143 regressions、build:check、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile QA、Adventure mobile QA、static resources、Release Gate 與 git diff check。既有 1.15 秒出手節奏與 main 均未修改。"
+}
