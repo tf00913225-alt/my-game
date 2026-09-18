@@ -1236,7 +1236,7 @@
 
     const RELIC_CATALOG_LIST=[
         {
-            id:"relic_qiankun_flask",name:"乾坤玉壺",category:"recovery",tags:["recovery","sustain"],rarity:"blue",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_qiankun_flask",name:"乾坤玉壺",category:"recovery",tags:["recovery","sustain"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_qiankun_flask.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"奇數回合結束時，穩定恢復全隊生命；高等級追加少量SP回復。",
             scalars:{healHpPercent:[[1,4],[5,4.5],[10,5],[15,6],[20,7]],spPercent:[[1,0],[9,0],[10,1],[15,1.5],[20,2]]},
             triggers:[trigger("odd_end","odd_round_end",{maxTriggersPerRound:1},[
@@ -1246,7 +1246,7 @@
             nextText:{5:"HP回復提高至4.5%",10:"HP回復5%，追加1%最大SP",15:"HP 6%＋SP 1.5%",20:"HP 7%＋SP 2%"}
         },
         {
-            id:"relic_sun_orb",name:"烈陽神珠",category:"attack",tags:["attack","group"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_sun_orb",name:"烈陽神珠",category:"attack",tags:["attack","group"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_sun_orb.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"偶數回合開始時對敵方全體造成穩定秘寶傷害，對燃燒目標更強。",
             scalars:{damageMultiplier:[[1,.75],[10,.9],[20,1.1]],burnBonus:[[1,0],[9,0],[10,.15],[20,.25]]},
             triggers:[trigger("even_start","even_round_start",{},[
@@ -1256,7 +1256,7 @@
             nextText:{10:"傷害0.90×秘寶威力；燃燒目標+15%",20:"傷害1.10×；燃燒目標+25%"}
         },
         {
-            id:"relic_xuanwu_seal",name:"玄武靈印",category:"defense",tags:["defense","shield"],rarity:"blue",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_xuanwu_seal",name:"玄武靈印",category:"defense",tags:["defense","shield"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_xuanwu_seal.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"每第3回合開始為全隊建立不疊加的護盾。",
             scalars:{shieldPercent:[[1,6],[10,8],[20,10]],damageReduction:[[1,0],[19,0],[20,8]]},
             triggers:[trigger("third_start","every_n_rounds",{phase:"round_start",roundInterval:3},[
@@ -1266,7 +1266,7 @@
             nextText:{10:"護盾提高至最大HP 8%",20:"護盾10%，並獲得1回合8%減傷"}
         },
         {
-            id:"relic_soul_bell",name:"鎮魂古鐘",category:"control",tags:["control","soft-control"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_soul_bell",name:"鎮魂古鐘",category:"control",tags:["control","soft-control"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_soul_bell.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"每第4回合開始，以降攻與降命中壓制敵方全體。",
             scalars:{attackDown:[[1,10],[10,12],[20,15]],accuracyDown:[[1,0],[9,0],[10,5],[20,8]]},
             triggers:[trigger("fourth_start","every_n_rounds",{phase:"round_start",roundInterval:4},[
@@ -1276,7 +1276,7 @@
             nextText:{10:"降攻12%並追加命中-5%",20:"降攻15%、命中-8%"}
         },
         {
-            id:"relic_tiangang_banner",name:"天罡戰旗",category:"defense",tags:["attack","defense","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_tiangang_banner",name:"天罡戰旗",category:"defense",tags:["attack","defense","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_tiangang_banner.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"我方累積遭受6次敵方有效攻擊後反擊全體，敵人越多越容易累積。",
             scalars:{damageMultiplier:[[1,.65],[10,.8],[20,1]],attackDown:[[1,0],[9,0],[10,5],[20,8]]},
             triggers:[trigger("ally_hits_6","ally_hit_count",{threshold:6,resetOnTrigger:true,maxTriggersPerRound:1},[
@@ -1286,7 +1286,7 @@
             nextText:{10:"全體傷害0.80×並降攻5%一回合",20:"全體傷害1.00×並降攻8%"}
         },
         {
-            id:"relic_nine_dragon_fire",name:"九龍神火罩",category:"element",tags:["attack","fire","anti_swarm"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_nine_dragon_fire",name:"九龍神火罩",category:"element",tags:["attack","fire","anti_swarm"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_nine_dragon_fire.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"敵方累積完成7次有效行動後爆發全體火屬性秘寶傷害。",
             scalars:{damageMultiplier:[[1,.8],[5,.85],[10,.9],[15,1],[20,1.1]],burnChance:[[1,0],[9,0],[10,.2],[15,.25],[20,.3]],burnBonus:[[1,0],[19,0],[20,.15]]},
             triggers:[trigger("enemy_actions_7","enemy_action_count",{threshold:7,resetOnTrigger:true,maxTriggersPerRound:1},[
@@ -1297,7 +1297,7 @@
             nextText:{5:"全體火傷提高至0.85×",10:"0.90×並有20%機率燃燒",15:"1.00×、燃燒25%",20:"1.10×、燃燒30%，燃燒目標+15%"}
         },
         {
-            id:"relic_cold_spring_jade",name:"寒泉玉珮",category:"recovery",tags:["water","emergency","element"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_cold_spring_jade",name:"寒泉玉珮",category:"recovery",tags:["water","emergency","element"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_cold_spring_jade.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"任一隊友首次跌破35%最大HP時進行急救。",
             scalars:{healHpPercent:[[1,12],[10,15],[20,18]],spPercent:[[1,0],[19,0],[20,4]]},
             triggers:[trigger("hp_below_35","ally_hp_below",{hpThreshold:.35,maxTriggersPerBattle:2,cooldownRounds:3},[
@@ -1307,7 +1307,7 @@
             nextText:{10:"急救15%最大HP並解除1個一般負面",20:"急救18%HP、淨化1個可解除負面並回4%最大SP"}
         },
         {
-            id:"relic_qinglan_feather",name:"青嵐羽符",category:"buff",tags:["wind","evasion","element"],rarity:"blue",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_qinglan_feather",name:"青嵐羽符",category:"buff",tags:["wind","evasion","element"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_qinglan_feather.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"戰鬥開始時提高全隊閃避與異常抗性。",
             scalars:{evasionBonus:[[1,8],[10,10],[20,12]],resistanceBonus:[[1,8],[10,10],[20,12]],duration:[[1,2],[19,2],[20,3]]},
             triggers:[trigger("battle_start","battle_start",{oncePerBattle:true},[
@@ -1317,7 +1317,7 @@
             nextText:{10:"閃避與異常抗性各+10%",20:"各+12%，持續3回合"}
         },
         {
-            id:"relic_rock_mountain_seal",name:"岩岳鎮印",category:"defense",tags:["earth","pressure","element"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_rock_mountain_seal",name:"岩岳鎮印",category:"defense",tags:["earth","pressure","element"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_rock_mountain_seal.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"開場提高全隊防禦，受圍攻時再產生隊伍護盾。",
             scalars:{defenseBonus:[[1,10],[10,12],[20,15]],shieldPercent:[[1,5],[10,6],[20,8]],reflectMultiplier:[[1,0],[19,0],[20,.18]]},
             triggers:[
@@ -1330,7 +1330,7 @@
             nextText:{10:"開場防禦+12%，受擊護盾6%",20:"防禦+15%、護盾8%，追加一次反震"}
         },
         {
-            id:"relic_returning_wheel",name:"回天寶輪",category:"special",tags:["recovery","survival"],rarity:"pink",maxLevel:20,iconPath:"",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            id:"relic_returning_wheel",name:"回天寶輪",category:"special",tags:["recovery","survival"],rarity:"pink",maxLevel:20,iconPath:"assets/relics/icons/relic_returning_wheel.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"每場第一次致命傷害發生時阻止死亡，留下1HP後立即回復並獲得護盾。",
             scalars:{healHpPercent:[[1,15],[10,18],[20,22]],shieldPercent:[[1,8],[10,8],[20,10]]},
             triggers:[trigger("before_lethal","before_lethal_damage",{oncePerBattle:true,maxTriggersPerBattle:1},[
@@ -1340,16 +1340,16 @@
             triggerText:"本場第一次有我方角色將受到致命傷害時",limitText:"整支隊伍每場只觸發一次，不是每個角色各一次。",
             nextText:{10:"保命後回復18%最大HP",20:"回復22%、護盾10%並解除1個一般負面"}
         },
-        {id:"relic_origin_talisman",name:"太初聖符",category:"buff",tags:["recovery","cleanse","special"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合結束淨化負面最多的隊友，並恢復全隊HP。",triggerText:"每第4回合結束",limitText:"第一版資料已建立，尚未開放取得。"},
-        {id:"relic_broken_army_scroll",name:"破軍殘卷",category:"attack",tags:["execute"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"角色擊敗敵人後，追擊目前HP最低的存活敵人。",triggerText:"角色攻擊／技能擊敗敵人後",limitText:"每回合最多一次；秘寶與DOT擊殺不觸發。"},
-        {id:"relic_red_sky_war_mark",name:"赤霄戰紋",category:"buff",tags:["attack","burst"],rarity:"orange",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"戰鬥開始時短暫提高全隊攻擊，後期追加暴擊率。",triggerText:"戰鬥開始時",limitText:"只觸發一次，不長時間常駐。"},
-        {id:"relic_ice_mirror_heart",name:"玄冰鏡心",category:"element",tags:["water","frostbite","freeze","control"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束，對凍傷或冰封中的敵人追加水屬性秘寶傷害。",triggerText:"每第3回合結束",limitText:"不附加冰封，不刷新凍傷。"},
-        {id:"relic_wind_chasing_talisman",name:"追風行符",category:"buff",tags:["wind","tempo"],rarity:"blue",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合開始提高隊伍節奏與閃避。",triggerText:"每第3回合開始",limitText:"第一版資料保留；待確認正式速度 owner 後再開放。"},
-        {id:"relic_mountain_river_cauldron",name:"山河寶鼎",category:"defense",tags:["recovery","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"我方累積受7次有效攻擊後，恢復全隊並短暫提高防禦。",triggerText:"我方累積受7次有效攻擊後",limitText:"每回合最多一次。"},
-        {id:"relic_burning_star_mark",name:"焚星殘印",category:"element",tags:["fire","burn","attack"],rarity:"purple",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"偶數回合結束時對燃燒中的敵人追加火屬性秘寶傷害。",triggerText:"偶數回合結束",limitText:"不消耗或刷新燃燒。"},
-        {id:"relic_spirit_spring_bottle",name:"靈泉法瓶",category:"recovery",tags:["sp","long-battle"],rarity:"blue",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束恢復全隊SP，高等級追加少量HP。",triggerText:"每第3回合結束",limitText:"死亡角色不受影響。"},
-        {id:"relic_demon_suppressing_seal",name:"伏魔金印",category:"defense",tags:["buff","cleanse"],rarity:"orange",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"開場提高異常抗性，並在首次中負面時自動淨化。",triggerText:"戰鬥開始；首次成功受到一般負面狀態",limitText:"自動淨化每場一次。"},
-        {id:"relic_all_returning_array",name:"萬象歸元盤",category:"special",tags:["adaptive"],rarity:"four-symbol",maxLevel:20,iconPath:"",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合開始依全隊平均HP決定回血或攻防增益。",triggerText:"每第4回合開始",limitText:"一次只發動回血或攻防其中一種。"}
+        {id:"relic_origin_talisman",name:"太初聖符",category:"buff",tags:["recovery","cleanse","special"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_origin_talisman.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合結束淨化負面最多的隊友，並恢復全隊HP。",triggerText:"每第4回合結束",limitText:"第一版資料已建立，尚未開放取得。"},
+        {id:"relic_broken_army_scroll",name:"破軍殘卷",category:"attack",tags:["execute"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_broken_army_scroll.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"角色擊敗敵人後，追擊目前HP最低的存活敵人。",triggerText:"角色攻擊／技能擊敗敵人後",limitText:"每回合最多一次；秘寶與DOT擊殺不觸發。"},
+        {id:"relic_red_sky_war_mark",name:"赤霄戰紋",category:"buff",tags:["attack","burst"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_red_sky_war_mark.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"戰鬥開始時短暫提高全隊攻擊，後期追加暴擊率。",triggerText:"戰鬥開始時",limitText:"只觸發一次，不長時間常駐。"},
+        {id:"relic_ice_mirror_heart",name:"玄冰鏡心",category:"element",tags:["water","frostbite","freeze","control"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_ice_mirror_heart.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束，對凍傷或冰封中的敵人追加水屬性秘寶傷害。",triggerText:"每第3回合結束",limitText:"不附加冰封，不刷新凍傷。"},
+        {id:"relic_wind_chasing_talisman",name:"追風行符",category:"buff",tags:["wind","tempo"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_wind_chasing_talisman.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合開始提高隊伍節奏與閃避。",triggerText:"每第3回合開始",limitText:"第一版資料保留；待確認正式速度 owner 後再開放。"},
+        {id:"relic_mountain_river_cauldron",name:"山河寶鼎",category:"defense",tags:["recovery","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_mountain_river_cauldron.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"我方累積受7次有效攻擊後，恢復全隊並短暫提高防禦。",triggerText:"我方累積受7次有效攻擊後",limitText:"每回合最多一次。"},
+        {id:"relic_burning_star_mark",name:"焚星殘印",category:"element",tags:["fire","burn","attack"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_burning_star_mark.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"偶數回合結束時對燃燒中的敵人追加火屬性秘寶傷害。",triggerText:"偶數回合結束",limitText:"不消耗或刷新燃燒。"},
+        {id:"relic_spirit_spring_bottle",name:"靈泉法瓶",category:"recovery",tags:["sp","long-battle"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_spirit_spring_bottle.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束恢復全隊SP，高等級追加少量HP。",triggerText:"每第3回合結束",limitText:"死亡角色不受影響。"},
+        {id:"relic_demon_suppressing_seal",name:"伏魔金印",category:"defense",tags:["buff","cleanse"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_demon_suppressing_seal.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"開場提高異常抗性，並在首次中負面時自動淨化。",triggerText:"戰鬥開始；首次成功受到一般負面狀態",limitText:"自動淨化每場一次。"},
+        {id:"relic_all_returning_array",name:"萬象歸元盤",category:"special",tags:["adaptive"],rarity:"four-symbol",maxLevel:20,iconPath:"assets/relics/icons/relic_all_returning_array.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合開始依全隊平均HP決定回血或攻防增益。",triggerText:"每第4回合開始",limitText:"一次只發動回血或攻防其中一種。"}
     ];
 
     RELIC_CATALOG_LIST.forEach(def=>{

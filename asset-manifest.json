@@ -111,8 +111,8 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.1a76c281c172.js",
-          "build/feature-relic-progression.cb61b7c5a1e8.js"
+          "build/feature-boss-relic.4b993620e83a.js",
+          "build/feature-relic-progression.f8549cd85b4b.js"
         ],
         "styles": [
           "build/feature-boss-relic.d3a82736d930.css",
@@ -766,13 +766,13 @@
       "sha256": "6d991851d4e4",
       "bytes": 34973
     },
-    "build/feature-boss-relic.1a76c281c172.js": {
-      "sha256": "1a76c281c172",
-      "bytes": 146721
+    "build/feature-boss-relic.4b993620e83a.js": {
+      "sha256": "4b993620e83a",
+      "bytes": 147663
     },
-    "build/feature-relic-progression.cb61b7c5a1e8.js": {
-      "sha256": "cb61b7c5a1e8",
-      "bytes": 67640
+    "build/feature-relic-progression.f8549cd85b4b.js": {
+      "sha256": "f8549cd85b4b",
+      "bytes": 69664
     },
     "build/feature-adventure-entry.43c6c9446f8e.js": {
       "sha256": "43c6c9446f8e",
