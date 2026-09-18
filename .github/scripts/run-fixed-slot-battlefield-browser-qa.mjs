@@ -22,9 +22,6 @@ function decode(value){return value.replace(/&amp;/g,"&").replace(/&lt;/g,"<").r
 
 const ownerSource=read("js/battlefield-slot-owner.js").replace(/<\/script/gi,"<\\/script");
 const adapterSource=read("js/battlefield-render-geometry-adapter.js").replace(/<\/script/gi,"<\\/script");
-const presentationSource=read("js/54-v173.51-battle-qa.js")
-    .replace("observer.observe(document.body,{subtree:true,childList:true});","/* Fixture uses the production applyUnit API synchronously; no observer loop. */")
-    .replace(/<\/script/gi,"<\\/script");
 const geometryCss=read("css/fixed-slot-battlefield-rendering-v2.css").replace(/<\/style/gi,"<\\/style");
 const bossCss=read("css/gameplay-boss-tower.css").replace(/<\/style/gi,"<\\/style");
 
@@ -55,9 +52,14 @@ window.__allyIndexes=[0,1,2];
 window.getExistingPartyIndexes=function(){return window.__allyIndexes.slice();};
 window.monsters=Array.from({length:10},function(_,i){return {hp:1000,alive:true,rank:i===2?'boss':(i===1?'elite':'regular')};});
 window.currentBattleMonsters=[];window.getMonsterRank=function(m){return m&&m.rank||'regular';};window.renderBattle=function(){};
+/* The focused geometry fixture supplies the public presentation boundary only;
+   the exact production implementation is covered by static/runtime suites and
+   by the exact-candidate browser job. This prevents unrelated management UI
+   observers from participating in a synthetic DOM. */
+window.FourSymbolsBattlePresentation={applyUnit:function(card){if(!card)return;card.classList.add('v174-cardless-unit');var art=card.querySelector(':scope > .v174-battle-art');if(!art){art=document.createElement('div');art.className='v174-battle-art';card.insertBefore(art,card.firstChild);}card.style.setProperty('background-image','none','important');}};
 window.showDamagePopup=function(element,text,type,isCrit){var p=document.createElement('div');p.className='damage-popup hp-popup'+(isCrit?' crit':'');p.textContent=text||'-100';element.appendChild(p);return p;};
 window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getElementById((isPlayerTarget?'battlePlayerCard':'battleMonster')+index);if(!el)return;var p=document.createElement('div');p.className='damage-popup miss-popup';p.textContent=label||'MISS';el.appendChild(p);};
-</script><script>${ownerSource}</script><script>${adapterSource}</script><script>${presentationSource}</script>
+</script><script>${ownerSource}</script><script>${adapterSource}</script>
 <script>
 (function(){
  const owner=window.FourSymbolsBattlefieldSlots,adapter=window.FourSymbolsBattlefieldRenderGeometry;
