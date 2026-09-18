@@ -28,7 +28,7 @@ test("the single group VFX uses fixed geometry and the explicit primary target",
     );
     assert.match(
         placement,
-        /const destination=primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}[\s\S]*?:\{x:bounds\.centerX,y:bounds\.centerY\}/
+        /const destination=bounds\.centerOnBounds&&placement!=="trajectory"[\s\S]*?\?\{x:bounds\.centerX,y:bounds\.centerY\}[\s\S]*?:primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}[\s\S]*?:\{x:bounds\.centerX,y:bounds\.centerY\}/
     );
     assert.doesNotMatch(placement,/waterBall.*targetTrajectory/);
 });
