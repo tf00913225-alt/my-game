@@ -1,0 +1,46 @@
+name: Relic VFX premium build sync
+
+on:
+  push:
+    branches:
+      - fix/relic-vfx-premium-duration-20260919
+    paths:
+      - .github/workflows/relic-vfx-premium-build-sync.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/relic-vfx-premium-duration-20260919
+          fetch-depth: 0
+
+      - name: Build production bundles
+        run: npm run build
+
+      - name: Run focused tests
+        run: |
+          node tests/relic-vfx-animation-20260918.test.js
+          node tests/v174-team-relic-system.test.js
+          node tests/v174-team-relic-hardening.test.js
+          node tests/v142-skill-animation.test.js
+          node tests/battle-layout-vfx-runtime-20260917.test.js
+          npm run build:check
+
+      - name: Commit synchronized build outputs
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add build asset-manifest.json index.html config
+          if git diff --cached --quiet; then
+            echo "No generated build changes"
+            exit 0
+          fi
+          git commit -m "build: sync relic VFX premium durations"
+          git push origin HEAD:fix/relic-vfx-premium-duration-20260919
