@@ -53,6 +53,12 @@ test("Live production cast QA enters through declaration and captures its V143 s
     assert.doesNotMatch(liveQa,/visible V143 skill layer/);
 });
 
+test("Live Boss geometry is measured after the formal entrance choreography",()=>{
+    assert.match(liveQa,/completed Boss entrance choreography/);
+    assert.match(liveQa,/v141-preparing-entry/);
+    assert.match(liveQa,/v141-entry-moving/);
+});
+
 test("Skill SFX and general combat feedback are both exactly doubled",()=>{
     assert.match(audio,/const SKILL_VOLUME_SCALE=2;/);
     assert.match(audio,/const COMBAT_FEEDBACK_VOLUME_SCALE=2;/);

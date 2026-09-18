@@ -792,6 +792,7 @@ try{
     assert.equal(bossBootstrap.started,true,"The exact candidate must start a real Boss-mode battle");
     assert.equal(bossBootstrap.owner,"boss-target-entity-v1","Boss mode must expose the single target-entity owner");
     await waitFor(client,"battleActive===true&&FourSymbolsBossBattle.isActive()&&document.querySelector('.v-fixed-boss-footprint > .gameplay-boss-card')","real Boss target-entity battlefield",15000);
+    await waitFor(client,"!document.getElementById('battlePage')?.classList.contains('v141-preparing-entry')&&!document.getElementById('battlePage')?.classList.contains('v141-entry-moving')","completed Boss entrance choreography",5000);
 
     const bossMode=await client.eval(`(()=>{
         const bossOwner=window.FourSymbolsBossBattle;
