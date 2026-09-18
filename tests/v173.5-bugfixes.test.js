@@ -51,7 +51,7 @@ test("Phoenix Cry and Ice Arrow Rain use one centered battlefield raster sheet",
     assert.match(animation,/phoenixCry:\{[\s\S]*?phoenix-cry-cast\.png\?v=165[\s\S]*?"battlefield"[\s\S]*?minSize:280/);
     assert.match(animation,/iceArrowRain:\{[\s\S]*?frost-arrow-rain-vfx\.png\?v=173\.19[\s\S]*?"battlefield"[\s\S]*?fixedFormation:true,coverageScale:1\.22,[\s\S]*?minWidth:140,minHeight:140/);
     const placement=sourceFunction(animation,"function placeSprite(current,node,index,target){");
-    assert.match(placement,/if\(placement==="battlefield"\)[\s\S]*?applySpriteBox\(node,width,height,sprite,"stretch"\)/);
+    assert.match(placement,/if\(placement==="battlefield"\)[\s\S]*?applySpriteBox\(node,width,height,sprite,"cover"\)/,"battlefield sheets preserve their authored raster frame");
     assert.doesNotMatch(placement,/buildBattlefieldSpriteTiles\(|getContext\(|drawImage\(/);
 });
 
