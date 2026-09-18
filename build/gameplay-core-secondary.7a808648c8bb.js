@@ -9199,6 +9199,7 @@ function shakeArtForPopup(node){
         const slot=popup.dataset?.slot||owner?.getSlotFromElement?.(popup)||null;
         const slotElement=slot&&owner?.getSlotElement?.(slot);
         const card=slotElement?.querySelector?.(".battle-player,.battle-monster")||popup.closest(".battle-player,.battle-monster");
+        if(card?.classList?.contains("battle-monster"))return;
         const art=card?.querySelector(":scope > .v174-battle-art");
         if(!art)return;
         art.classList.remove("v174-hit-shake");void art.offsetWidth;art.classList.add("v174-hit-shake");

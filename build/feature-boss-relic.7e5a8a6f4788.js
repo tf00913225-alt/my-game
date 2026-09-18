@@ -480,7 +480,16 @@
     function bossBattlefieldSnapshot(){
         const context=activeBattleContext,owner=battlefieldSlotOwner();
         if(!context||!owner){ return null; }
-        return context.enemySnapshot||owner.getActiveEnemySnapshot()||null;
+        /* Rendering can replace the active snapshot while a World Boss is
+           alive. Dynamic units must be assigned against that live snapshot,
+           not the stale startup snapshot retained by the Boss context. */
+        const active=owner.getActiveEnemySnapshot();
+        const index=bossIndex();
+        if(active&&Number.isInteger(index)&&owner.getEnemySlotForMonster(active,index)){
+            context.enemySnapshot=active;
+            return active;
+        }
+        return context.enemySnapshot||active||null;
     }
     function assignEnemySlot(monsterIndex,slot){
         const owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
@@ -554,6 +563,7 @@
                 if(requested>=health){
                     health=requested;
                     boss.vLastDamageSettlement=null;
+                    syncBossShieldHud();
                     return;
                 }
                 const requestedDamage=health-requested;
@@ -588,19 +598,30 @@
         const index=bossIndex();
         const card=Number.isInteger(index)?document.getElementById("battleMonster"+index):null;
         if(!card){ return; }
-        let bar=card.querySelector(":scope > .boss-shield-hud");
-        const shield=activeBattleContext&&activeBattleContext.boss&&activeBattleContext.boss.vBossShield;
-        const current=Math.max(0,numeric(shield&&shield.current,0));
-        const maximum=Math.max(1,numeric(shield&&shield.max,1));
-        if(!bar){
-            bar=document.createElement("div");
-            bar.className="boss-shield-hud";
-            bar.innerHTML='<span class="boss-shield-fill"></span><b class="boss-shield-value"></b>';
-            card.appendChild(bar);
+        const hpBar=card.querySelector(":scope > .monster-hp");
+        if(!hpBar){ return; }
+        let shieldOverlay=hpBar.querySelector(":scope > .boss-hp-shield-overlay");
+        if(!shieldOverlay){
+            shieldOverlay=document.createElement("div");
+            shieldOverlay.className="boss-hp-shield-overlay";
+            const label=hpBar.querySelector(":scope > .monster-bar-text");
+            hpBar.insertBefore(shieldOverlay,label||null);
         }
-        bar.hidden=current<=0;
-        bar.querySelector(".boss-shield-fill").style.width=(current/maximum*100)+"%";
-        bar.querySelector(".boss-shield-value").textContent="護盾 "+current+" / "+maximum;
+        card.querySelectorAll(":scope > .boss-shield-hud").forEach(node=>node.remove());
+        const boss=activeBattleContext&&activeBattleContext.boss;
+        const shield=boss&&boss.vBossShield;
+        const current=Math.max(0,numeric(shield&&shield.current,0));
+        const maximum=Math.max(1,numeric(boss&&boss.maxHP,1));
+        const health=Math.max(0,Math.min(maximum,numeric(boss&&boss.hp,0)));
+        const total=current>0?maximum+current:maximum;
+        const hpPercent=health/total*100;
+        const shieldPercent=current/total*100;
+        const hpInner=hpBar.querySelector(":scope > .monster-hp-inner");
+        const label=hpBar.querySelector(":scope > .monster-bar-text");
+        if(hpInner){ hpInner.style.width=hpPercent+"%"; }
+        shieldOverlay.style.left=hpPercent+"%";
+        shieldOverlay.style.width=shieldPercent+"%";
+        if(label){ label.textContent=Math.floor(health)+" / "+Math.floor(maximum); }
     }
 
     function objectDefinition(type){

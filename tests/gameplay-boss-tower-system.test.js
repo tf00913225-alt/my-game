@@ -155,6 +155,34 @@ test("reinforcements occupy B1/B5 and retain normal action capability",()=>{
     assert.ok(guards.every(unit=>unit.canAct===true&&unit.rank==="elite"));
 });
 
+test("World Boss uses the live Fixed Slot snapshot when stage-three reinforcements arrive",()=>{
+    const {context}=load();
+    context.GameplaySystem.debugReloadState({
+        world:{"world-40":{completedStages:2,firstClear:false,clears:0}}
+    });
+    assert.equal(context.vGameplayStartBoss("world","world-40"),true);
+    const boss=context.monsters[0];
+    const slots=context.FourSymbolsBattlefieldSlots;
+
+    /* A legacy render may replace the active snapshot after the Boss context
+       was seeded. Summons must write to that live geometry owner. */
+    slots.setActiveEnemySnapshot(slots.createEnemyFormationSnapshot([0],{originalFormationType:3}));
+    boss.hp=Math.floor(boss.maxHP*.5);
+    context.turn=3;
+    context.FourSymbolsBossBattle.processRound();
+
+    const guards=context.monsters.filter(unit=>unit.unitKind==="boss-reinforcement");
+    assert.equal(context.GameplaySystem.getActiveBattleState().mode,"world");
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(guards.map(unit=>unit.vGameplayBattlefieldSlot))),
+        ["ENEMY_B1","ENEMY_B5"]
+    );
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(guards.map(unit=>slots.getEnemySlotForMonster(slots.getActiveEnemySnapshot(),context.monsters.indexOf(unit))))),
+        ["ENEMY_B1","ENEMY_B5"]
+    );
+});
+
 test("totems and flags are normal numeric target entities at F1/F5 but never act or reward",()=>{
     const {context}=load();
     context.vGameplayStartBoss("personal","personal-70");
@@ -187,6 +215,63 @@ test("Boss Shield absorbs first and only overflow reaches HP",()=>{
     assert.deepEqual(JSON.parse(JSON.stringify(settlement)),{
         requested:5000,reduced:0,shieldAbsorbed:3000,hpDamage:2000
     });
+});
+
+test("Boss Shield keeps HP state correct through shield-only, overflow and heal",()=>{
+    const {context}=load();
+    context.vGameplayStartBoss("personal","personal-30");
+    const boss=context.monsters[0];
+    const full=boss.hp;
+    assert.equal(context.FourSymbolsBossBattle.applyShield(10000),10000);
+    boss.hp=full-5000;
+    assert.equal(boss.hp,full,"shield-only damage must not reduce Boss HP");
+    assert.equal(context.FourSymbolsBossBattle.getShieldState().current,5000);
+    boss.hp=full-11000;
+    assert.equal(boss.hp,full-6000,"overflow must reduce Boss HP after the shield is exhausted");
+    assert.equal(context.FourSymbolsBossBattle.getShieldState(),null);
+    boss.hp=Math.min(boss.maxHP,boss.hp+3000);
+    assert.equal(boss.hp,full-3000,"Boss heal must retain the formal HP value after shield settlement");
+});
+
+test("Boss HUD renders the white shield inside its formal HP bar",()=>{
+    const {context}=load();
+    context.vGameplayStartBoss("personal","personal-30");
+    const boss=context.monsters[0];
+    const hpInner={className:"monster-hp-inner",style:{}};
+    const hpLabel={className:"monster-bar-text",style:{},textContent:""};
+    const hpBar={
+        children:[hpInner,hpLabel],
+        querySelector(selector){
+            const className=selector.match(/\.([\w-]+)$/)?.[1];
+            return this.children.find(node=>node.className===className)||null;
+        },
+        insertBefore(node,before){
+            const index=before?this.children.indexOf(before):-1;
+            if(index>=0){ this.children.splice(index,0,node); }
+            else{ this.children.push(node); }
+        }
+    };
+    const card={
+        querySelector(selector){ return selector.includes(".monster-hp")?hpBar:null; },
+        querySelectorAll(){ return []; }
+    };
+    context.document.getElementById=id=>id==="battleMonster0"?card:null;
+    context.document.createElement=()=>({className:"",style:{}});
+
+    context.FourSymbolsBossBattle.applyShield(10000);
+    const overlay=hpBar.children.find(node=>node.className==="boss-hp-shield-overlay");
+    assert.ok(overlay,"shield overlay must be a monster-hp child");
+    const fullHpPercent=boss.maxHP/(boss.maxHP+10000)*100;
+    const fullShieldPercent=10000/(boss.maxHP+10000)*100;
+    assert.equal(hpInner.style.width,fullHpPercent+"%","full HP and shield use the formal shared proportion");
+    assert.equal(overlay.style.left,fullHpPercent+"%");
+    assert.equal(overlay.style.width,fullShieldPercent+"%");
+    assert.equal(hpLabel.textContent,boss.hp+" / "+boss.maxHP);
+
+    boss.hp=boss.hp-5000;
+    assert.equal(overlay.style.width,5000/(boss.maxHP+5000)*100+"%","half shield remaining shrinks the white segment immediately");
+    boss.hp=boss.hp-5000;
+    assert.equal(overlay.style.width,"0%","shield zero removes the white segment without a second HUD");
 });
 
 test("a destroyed healing object stops its persistent effect immediately",()=>{

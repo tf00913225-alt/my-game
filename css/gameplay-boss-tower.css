@@ -654,8 +654,7 @@
 #game-stage #battlePage .gameplay-boss-card > .battle-monster-name,
 #game-stage #battlePage .gameplay-boss-card > .monster-hp,
 #game-stage #battlePage .gameplay-boss-card > .monster-sp,
-#game-stage #battlePage .gameplay-boss-card > .monster-status-badges,
-#game-stage #battlePage .gameplay-boss-card > .boss-shield-hud{
+#game-stage #battlePage .gameplay-boss-card > .monster-status-badges{
     position:absolute;
     left:8%;
     right:8%;
@@ -709,31 +708,20 @@
     bottom:53px;
     min-height:12px;
 }
-
-#game-stage #battlePage .gameplay-boss-card > .boss-shield-hud{
-    bottom:41px;
-    height:10px;
-    overflow:hidden;
-    border:1px solid rgba(244,214,130,.72);
-    border-radius:999px;
-    color:#fff4c9;
-    background:rgba(26,20,12,.86);
-}
-#game-stage #battlePage .boss-shield-hud[hidden]{display:none;}
-#game-stage #battlePage .boss-shield-fill{
+#game-stage #battlePage .gameplay-boss-card > .monster-hp > .boss-hp-shield-overlay{
     position:absolute;
-    inset:0 auto 0 0;
-    background:linear-gradient(90deg,#9b7933,#f2d279);
+    top:0;
+    height:100%;
+    width:0;
+    z-index:1;
+    background:rgba(255,255,255,.92);
+    box-shadow:inset 0 0 2px rgba(0,0,0,.35);
+    transition:left .25s ease,width .25s ease;
+    pointer-events:none;
 }
-#game-stage #battlePage .boss-shield-value{
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:10px;
-    line-height:10px;
-    text-shadow:0 1px 2px #000;
+#game-stage #battlePage .gameplay-boss-card > .monster-hp > .monster-bar-text{
+    position:relative;
+    z-index:2;
 }
 
 /* Boss objects and reinforcements use the normal cardless Unit pipeline.

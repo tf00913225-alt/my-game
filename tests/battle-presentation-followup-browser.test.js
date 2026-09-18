@@ -50,6 +50,9 @@ try{
     assert.equal(data.bossHpPosition,"absolute");
     assert.equal(data.bossSpPosition,"absolute");
     assert.equal(data.bossHp.height,11);
+    assert.ok(data.bossHp.width>100,"Boss HP must escape the legacy 68px monster-bar width");
+    assert.ok(Math.abs(data.bossHp.width-data.bossName.width)<=1,"Boss HP must use the same HUD width as the Boss name");
+    assert.ok(Math.abs(data.bossSp.width-data.bossHp.width)<=1,"Boss SP must align to the formal Boss HP width");
     assert.ok(data.bossHp.bottom<=data.bossSp.top+1,"Boss HP must sit above SP");
     assert.ok(data.bossSp.bottom<=data.bossName.top+1,"Boss SP must sit above the name");
     assert.equal(data.leftHpHeight,11);
