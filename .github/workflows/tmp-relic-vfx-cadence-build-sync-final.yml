@@ -1,0 +1,40 @@
+name: Temporary relic VFX cadence final build sync
+
+on:
+  push:
+    branches:
+      - fix/relic-vfx-cadence-retune-20260919
+    paths:
+      - .github/workflows/tmp-relic-vfx-cadence-build-sync-final.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout work branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/relic-vfx-cadence-retune-20260919
+          fetch-depth: 0
+
+      - name: Build production bundles
+        run: |
+          npm run build
+          git diff --check
+
+      - name: Commit synchronized build
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add asset-manifest.json build
+          if git diff --cached --quiet; then
+            echo "Build already synchronized"
+          else
+            git commit -m "build: resync final relic VFX cadence bundles"
+            git push origin HEAD:fix/relic-vfx-cadence-retune-20260919
+          fi
