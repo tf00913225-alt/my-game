@@ -7,11 +7,13 @@ const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 
-assert.match(relic,/presentationDurationMs:2200/,
-    "relic presentation retains its authored visual duration");
-assert.match(relic,/presentationLeadGapMs:500/,
-    "relic presentation must begin after the previous action has visually settled");
-assert.match(relic,/function queueRelicPresentation\(def,onStart\)/);
+assert.match(relic,/RELIC_VFX_FLOOR_MS=3000/,
+    "relic VFX keeps the formal premium three-second minimum");
+assert.match(relic,/presentationDurationMs:3200/,
+    "relic presentation fallback matches the premium visual duration baseline");
+assert.match(relic,/presentationLeadGapMs:120/,
+    "relic presentation keeps the short handoff gap after the previous visual gate settles");
+assert.match(relic,/function queueRelicPresentation\(def,onStart,visualContext\)/);
 assert.match(relic,/waitForAnimationRelease\(gate\)/,
     "relic presentation must wait for the active V142 skill gate");
 assert.doesNotMatch(relic,/waitForRelicPresentation|deferredCombatants|deferredStartTurns/,
