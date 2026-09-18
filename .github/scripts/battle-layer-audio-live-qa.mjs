@@ -246,10 +246,12 @@ try{
             maxHeight:Math.max(...rects.map(rect=>rect.height))
         });
         const owner=window.FourSymbolsBattlefieldSlots;
+        const wrap=rectFor(document.querySelector('.battle-wrap'));
         const enemy=rectFor(document.querySelector('.battle-enemy-region'));
         const center=rectFor(document.querySelector('.battle-center-region'));
         const ally=rectFor(document.querySelector('.battle-ally-region'));
         const infoRegion=rectFor(document.querySelector('.battle-info-region'));
+        const infoToggle=rectFor(document.getElementById('battleInfoToggle'));
         const action=rectFor(document.getElementById('battleActionRegion'));
         const info=rectFor(document.getElementById('battleInfo'));
         const elementBoxNode=document.querySelector('.battle-element-box-button');
@@ -280,13 +282,17 @@ try{
         return {
             viewport:{width:innerWidth,height:innerHeight},
             pageClass:document.getElementById('battlePage')?.className||'',
-            regions:{enemy,center,ally,infoRegion,action,info,elementBox,elementBoxLogical,enemyArea,allyArea},
+            regions:{wrap,enemy,center,ally,infoRegion,infoToggle,action,info,elementBox,elementBoxLogical,enemyArea,allyArea},
+            centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage,
+            infoExpanded:document.querySelector('.battle-info-region')?.classList.contains('is-expanded')||false,
+            infoAria:document.getElementById('battleInfoToggle')?.getAttribute('aria-expanded')||null,
             separation:{
                 enemyBeforeCenter:enemy.bottom<=center.top+1,
                 centerBeforeAlly:center.bottom<=ally.top+1,
-                allyBeforeInfo:ally.bottom<=infoRegion.top+1,
                 actionInsideCenter:inside(action,center),
-                infoInsideBottom:inside(info,infoRegion),
+                allyFillsBattleBottom:Math.abs(ally.bottom-wrap.bottom)<=1,
+                collapsedHandleInside:inside(infoToggle,wrap),
+                collapsedInfoBelowBattle:info.top>=wrap.bottom-1,
                 enemyAreaInsideEnemy:inside(enemyArea,enemy),
                 allyAreaInsideAlly:inside(allyArea,ally),
                 enemyCardsClearCenter:enemyCards.every(card=>!intersects(card,center)),
@@ -300,6 +306,9 @@ try{
     evidence.checks.battleLayout=layout;
     assert.equal(layout.viewport.width,412,"Live battle QA must use the portrait mobile viewport");
     assert.match(layout.pageClass,/v-fixed-slot-render-v2/,"Deployed battle must use the Fixed Slot V2 layout owner");
+    assert.equal(layout.centerBackground,"none","The middle operation region must not keep a black translucent background");
+    assert.equal(layout.infoExpanded,false,"Battle info must start collapsed");
+    assert.equal(layout.infoAria,"false","The collapsed drawer handle must expose its state accessibly");
     Object.entries(layout.separation).forEach(([name,value])=>assert.equal(value,true,`Battle region separation failed: ${name}`));
     assert.equal(layout.enemySlots.count,10,"The deployed enemy region must expose all ten fixed geometry slots");
     assert.equal(layout.allySlots.count,6,"The deployed ally region must expose both three-column fixed geometry layers");
@@ -314,6 +323,29 @@ try{
     assert.ok(layout.hud.length>=9,"The real Abyss battle must expose one ally and eight enemy card HUDs");
     assert.ok(layout.hud.every(entry=>entry.name&&entry.hp&&entry.sp),"Every live combatant must keep its name, HP and SP visible");
 
+    const infoDrawer=await client.eval(`(()=>{
+        const region=document.querySelector('#battlePage .battle-info-region');
+        const button=document.getElementById('battleInfoToggle');
+        const info=document.getElementById('battleInfo');
+        if(!region||!button||!info||typeof toggleBattleInfoPanel!=='function'){return null;}
+        region.style.transition='none';
+        const rect=node=>{const value=node.getBoundingClientRect();return {top:value.top,bottom:value.bottom,height:value.height};};
+        toggleBattleInfoPanel();
+        const expanded={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className};
+        toggleBattleInfoPanel();
+        const collapsed={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className};
+        region.style.removeProperty('transition');
+        return {expanded,collapsed};
+    })()`);
+    evidence.checks.battleInfoDrawer=infoDrawer;
+    assert.ok(infoDrawer,"Live battle must expose the formal battle-info drawer owner");
+    assert.equal(infoDrawer.expanded.aria,"true","Tapping the handle must expand battle info");
+    assert.match(infoDrawer.expanded.className,/is-expanded/);
+    assert.ok(infoDrawer.expanded.info.top<layout.regions.wrap.bottom,"Expanded battle info must slide into the battlefield viewport");
+    assert.equal(infoDrawer.collapsed.aria,"false","Tapping again must collapse battle info");
+    assert.doesNotMatch(infoDrawer.collapsed.className,/is-expanded/);
+    assert.ok(infoDrawer.collapsed.info.top>=layout.regions.wrap.bottom-1,"Collapsed battle info must return below the battlefield viewport");
+
     const resourceLayers=await client.eval(`(()=>{
         const playerCard=document.getElementById('battlePlayerCard0');
         const monsterCard=document.getElementById('battleMonster0');
@@ -321,6 +353,11 @@ try{
         const playerSp=playerCard?.querySelector('.sp-bar');
         const monsterHp=monsterCard?.querySelector('.monster-hp');
         const monsterSp=monsterCard?.querySelector('.monster-sp');
+        const playerName=playerCard?.querySelector('.battle-player-id');
+        const monsterName=monsterCard?.querySelector('.battle-monster-name');
+        const playerArt=playerCard?.querySelector('.v174-battle-art');
+        const monsterArt=monsterCard?.querySelector('.v174-battle-art');
+        const rect=node=>{const value=node?.getBoundingClientRect();return value?{top:value.top,bottom:value.bottom,height:value.height}:null;};
         const playerStatus=document.createElement('div');
         playerStatus.className='v153-status-vfx v153-status-vfx-rage';
         const monsterStatus=document.createElement('div');
@@ -335,7 +372,10 @@ try{
             monsterSpZ:Number(getComputedStyle(monsterSp).zIndex||0),
             monsterStatusZ:Number(getComputedStyle(monsterStatus).zIndex||0),
             playerHpVisible:getComputedStyle(playerHp).visibility,
-            monsterHpVisible:getComputedStyle(monsterHp).visibility
+            monsterHpVisible:getComputedStyle(monsterHp).visibility,
+            player:{art:rect(playerArt),hp:rect(playerHp),sp:rect(playerSp),name:rect(playerName)},
+            monster:{art:rect(monsterArt),hp:rect(monsterHp),sp:rect(monsterSp),name:rect(monsterName)},
+            logicalHeights:{playerHp:playerHp?.offsetHeight||0,monsterHp:monsterHp?.offsetHeight||0}
         };
         playerStatus.remove();
         monsterStatus.remove();
@@ -348,6 +388,13 @@ try{
     assert.ok(resourceLayers.monsterSpZ>resourceLayers.monsterStatusZ,"Enemy SP bar must render above status VFX");
     assert.equal(resourceLayers.playerHpVisible,"visible","Player HP bar must remain visible");
     assert.equal(resourceLayers.monsterHpVisible,"visible","Enemy HP bar must remain visible");
+    for(const [side,hud] of Object.entries({player:resourceLayers.player,monster:resourceLayers.monster})){
+        assert.ok(hud.art.bottom<=hud.hp.top+1,`${side} artwork must end close to and above HP`);
+        assert.ok(hud.hp.bottom<=hud.sp.top+1,`${side} HP must sit above SP`);
+        assert.ok(hud.sp.bottom<=hud.name.top+1,`${side} name must sit below both resource bars`);
+    }
+    assert.equal(resourceLayers.logicalHeights.monsterHp,resourceLayers.logicalHeights.playerHp,"Enemy and player resource bars must use the same thin owner height");
+    assert.equal(resourceLayers.logicalHeights.monsterHp,8,"Battle resource bars must use the compact 8px logical height");
 
     const iceArrowRain=await client.eval(`(()=>{
         const director=window.v142SkillAnimationDirector;
@@ -376,6 +423,7 @@ try{
             spriteCount:sprites.length,
             placement:sprite?.dataset.placement||null,
             frameFit:sprite?.dataset.frameFit||null,
+            frameAspect:Number(sprite?.dataset.frameAspect||0),
             areaId:sprite?.dataset.areaId||null,
             targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
             geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),
@@ -395,12 +443,13 @@ try{
     assert.equal(iceArrowRain?.stageSkill,"iceArrowRain","The deployed V143 stage must render Ice Arrow Rain");
     assert.equal(iceArrowRain?.spriteCount,1,"A full-range cast must render one shared raster node");
     assert.equal(iceArrowRain?.placement,"battlefield","All-target VFX must use the complete battlefield placement");
-    assert.equal(iceArrowRain?.frameFit,"stretch","All-target VFX must fill its semantic Fixed Slot region");
+    assert.equal(iceArrowRain?.frameFit,"cover","All-target VFX must preserve its source-frame aspect");
     assert.equal(iceArrowRain?.areaId,"fixed-enemy-zone","Ice Arrow Rain must bind to the complete enemy fixed zone");
     assert.equal(iceArrowRain?.geometrySlots.length,10,"Full-range VFX geometry must retain all ten slots regardless of occupancy");
     assert.equal(iceArrowRain?.targetIndexes.length,8,"The real eight-enemy battle must expose all living targets to Ice Arrow Rain");
-    assert.ok(Math.abs(iceArrowRain.spriteBox.width-Math.round(iceArrowRain.bounds.width))<=1,"Ice Arrow Rain width must equal the complete enemy region");
-    assert.ok(Math.abs(iceArrowRain.spriteBox.height-Math.round(iceArrowRain.bounds.height))<=1,"Ice Arrow Rain height must equal the complete enemy region");
+    assert.ok(iceArrowRain.spriteBox.width>=iceArrowRain.bounds.width-1,"Ice Arrow Rain must cover the complete enemy width");
+    assert.ok(iceArrowRain.spriteBox.height>=iceArrowRain.bounds.height-1,"Ice Arrow Rain must cover the complete enemy height");
+    assert.ok(Math.abs(iceArrowRain.spriteBox.width/iceArrowRain.spriteBox.height-iceArrowRain.frameAspect)<=.02,"Ice Arrow Rain must not flatten its source frame");
     assert.ok(Math.abs(iceArrowRain.spriteBox.left-iceArrowRain.bounds.centerX)<=1,"Ice Arrow Rain must stay centered on the complete enemy region");
     assert.ok(Math.abs(iceArrowRain.spriteBox.top-iceArrowRain.bounds.centerY)<=1,"Ice Arrow Rain must stay centered on the complete enemy region");
     assert.equal(iceArrowRain.stageOverflow,"visible","The VFX owner must not clip full-range animation paint");
@@ -447,6 +496,7 @@ try{
             spriteCount:sprites.length,
             placement:sprite?.dataset.placement||null,
             frameFit:sprite?.dataset.frameFit||null,
+            frameAspect:Number(sprite?.dataset.frameAspect||0),
             targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
             geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),
             spriteBox:sprite?{
@@ -466,11 +516,12 @@ try{
     assert.equal(windFlame?.spriteCount,1,"Wind Flame must not render two simultaneous videos");
     assert.equal(windFlame?.globalSpriteCount,1,"No stale V143 sprite may coexist with Wind Flame");
     assert.equal(windFlame?.placement,"group","Three-target VFX must use fixed group geometry");
-    assert.equal(windFlame?.frameFit,"stretch","Three-target VFX must fill its semantic three-slot region");
+    assert.equal(windFlame?.frameFit,"cover","Three-target VFX must preserve its source-frame aspect");
     assert.equal(windFlame?.targetIndexes.length,1,"This live check deliberately supplies only one surviving target");
     assert.equal(windFlame?.geometrySlots.length,3,"Wind Flame must retain a three-slot footprint for a single surviving target");
-    assert.ok(Math.abs(windFlame.spriteBox.width-Math.round(windFlame.bounds.width))<=1,"Wind Flame width must equal the fixed three-slot geometry");
-    assert.ok(Math.abs(windFlame.spriteBox.height-Math.round(windFlame.bounds.height))<=1,"Wind Flame height must equal the fixed three-slot geometry");
+    assert.ok(windFlame.spriteBox.width>=windFlame.bounds.width-1,"Wind Flame must cover the fixed three-slot width");
+    assert.ok(windFlame.spriteBox.height>=windFlame.bounds.height-1,"Wind Flame must cover the fixed three-slot height");
+    assert.ok(Math.abs(windFlame.spriteBox.width/windFlame.spriteBox.height-windFlame.frameAspect)<=.02,"Wind Flame must not flatten its source frame");
     assert.equal(windFlame.emitted,"true","Wind Flame must emit a visible production sprite");
 
     const rangeScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
@@ -486,6 +537,85 @@ try{
     assert.equal(windGate.completionCount,1,"Wind Flame gate must complete exactly once");
     assert.ok(["v143-raster-complete","v142-render-safety-deadline"].includes(windGate.reason),"Wind Flame must finish through a bounded production deadline");
     assert.equal(windGate.stageExists,false,"Completed Wind Flame VFX must remove its stage");
+
+    const waterOrb=await client.eval(`(()=>{
+        const director=window.v142SkillAnimationDirector;
+        const owner=window.FourSymbolsBattlefieldSlots;
+        const snapshot=owner?.getActiveEnemySnapshot?.();
+        const targetId=(typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).find(index=>
+            typeof monsters!=='undefined'&&monsters[index]&&monsters[index].alive
+        );
+        const primarySlot=owner.getEnemySlotForMonster(snapshot,targetId);
+        const config=Object.assign({},window.v142GetSkillAnimationConfig('waterBall'),{duration:1100,resolveDuration:1100});
+        const gate=director.play(config,{
+            side:'player',actorIndex:0,targetSide:'monster',targetId,targetIds:[targetId],
+            targetContract:{version:'battle-target-contract-v1',targetSide:'monster',targetId,targetIds:[targetId]},
+            key:'battle-layout-water-orb-'+Date.now()
+        });
+        window.__battleLayoutWaterGate=gate;
+        const stage=document.getElementById('v143-skill-stage');
+        const sprite=stage?.querySelector('.v143-vfx-sprite')||null;
+        const bounds=owner.getGeometryRectFromShape('monster',primarySlot,'tri');
+        return {
+            targetId,primarySlot,bounds,
+            frameFit:sprite?.dataset.frameFit||null,
+            frameAspect:Number(sprite?.dataset.frameAspect||0),
+            geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),
+            targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
+            spriteBox:sprite?{width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)}:null,
+            emitted:sprite?.dataset.emittedVisual||null
+        };
+    })()`);
+    evidence.checks.waterOrbTriRange=waterOrb;
+    assert.equal(waterOrb?.frameFit,"cover","Water Orb must preserve its source-frame aspect");
+    assert.equal(waterOrb?.geometrySlots.length,3,"Water Orb must keep a fixed three-slot footprint");
+    assert.equal(waterOrb?.targetIndexes.length,1,"Water Orb geometry must not depend on surviving target count");
+    assert.ok(waterOrb.spriteBox.width>=waterOrb.bounds.width-1&&waterOrb.spriteBox.height>=waterOrb.bounds.height-1,"Water Orb must cover its fixed three-slot geometry");
+    assert.ok(Math.abs(waterOrb.spriteBox.width/waterOrb.spriteBox.height-waterOrb.frameAspect)<=.02,"Water Orb must not flatten its square source frame");
+    assert.equal(waterOrb.emitted,"true","Water Orb must emit a visible production sprite");
+    const waterScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
+    if(waterScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"battle-layout-water-orb-mobile.png"),Buffer.from(waterScreenshot.data,"base64")); }
+    await sleep(1350);
+    const waterGate=await client.eval(`(()=>{const gate=window.__battleLayoutWaterGate;return {done:!!gate?.done,reason:gate?.reason||null,completionCount:gate?.completionCount||0,stageExists:!!document.getElementById('v143-skill-stage')};})()`);
+    evidence.checks.waterOrbCompletion=waterGate;
+    assert.equal(waterGate.done,true,"Water Orb must release its animation gate");
+    assert.equal(waterGate.completionCount,1,"Water Orb gate must complete exactly once");
+    assert.equal(waterGate.stageExists,false,"Completed Water Orb VFX must remove its stage");
+
+    const mechanismRange=await client.eval(`(()=>{
+        const area=document.getElementById('battleMonsterArea');
+        let host=document.getElementById('bossMechanismSlot');
+        if(!host){host=document.createElement('div');host.id='bossMechanismSlot';host.className='v-fixed-mechanism-zone';host.dataset.geometryOwner='fixed-slot';area.appendChild(host);}
+        const position=document.createElement('div');position.className='boss-mechanism-position';position.dataset.slot='MECH_C';
+        const card=document.createElement('button');card.className='boss-mechanism-card';card.dataset.id='qa-function-card';card.textContent='功能卡';position.appendChild(card);host.appendChild(position);
+        const director=window.v142SkillAnimationDirector;
+        const owner=window.FourSymbolsBattlefieldSlots;
+        const targetId='mechanism:qa-function-card';
+        const config=Object.assign({},window.v142GetSkillAnimationConfig('stormCircle'),{duration:1100,resolveDuration:1100});
+        const gate=director.play(config,{side:'player',actorIndex:0,targetSide:'monster',targetId,targetIds:[targetId],targetContract:{version:'battle-target-contract-v1',targetSide:'monster',targetId,targetIds:[targetId]},key:'battle-layout-function-card-'+Date.now()});
+        window.__battleLayoutMechanismGate=gate;
+        const stage=document.getElementById('v143-skill-stage');
+        const sprite=stage?.querySelector('.v143-vfx-sprite')||null;
+        const bounds=owner.getSideRect('monster');
+        return {
+            bounds,targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
+            geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),
+            areaId:sprite?.dataset.areaId||null,frameFit:sprite?.dataset.frameFit||null,
+            spriteBox:sprite?{left:Number.parseFloat(sprite.style.left),top:Number.parseFloat(sprite.style.top),width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)}:null
+        };
+    })()`);
+    evidence.checks.functionCardRange=mechanismRange;
+    assert.deepEqual(mechanismRange?.targetIndexes,["mechanism:qa-function-card"],"Function-card damage targeting must remain isolated");
+    assert.equal(mechanismRange?.geometrySlots.length,10,"A range cast on a function card must keep the complete enemy-side visual geometry");
+    assert.equal(mechanismRange?.frameFit,"cover","Function-card range VFX must preserve source aspect");
+    assert.ok(Math.abs(mechanismRange.spriteBox.left-mechanismRange.bounds.centerX)<=1&&Math.abs(mechanismRange.spriteBox.top-mechanismRange.bounds.centerY)<=1,"Function-card range VFX must center on the complete enemy side");
+    assert.ok(mechanismRange.spriteBox.width>=mechanismRange.bounds.width-1&&mechanismRange.spriteBox.height>=mechanismRange.bounds.height-1,"Function-card range VFX must cover the complete enemy side");
+    await sleep(1350);
+    const mechanismGate=await client.eval(`(()=>{const gate=window.__battleLayoutMechanismGate;document.getElementById('bossMechanismSlot')?.remove();return {done:!!gate?.done,reason:gate?.reason||null,completionCount:gate?.completionCount||0,stageExists:!!document.getElementById('v143-skill-stage')};})()`);
+    evidence.checks.functionCardRangeCompletion=mechanismGate;
+    assert.equal(mechanismGate.done,true,"Function-card range cast must release its animation gate");
+    assert.equal(mechanismGate.completionCount,1,"Function-card range gate must complete exactly once");
+    assert.equal(mechanismGate.stageExists,false,"Function-card range stage must clean up");
 
     /* Capture the production cast and the stage it creates in the same browser
        task. The battle remains live, so a later CDP poll may observe the next

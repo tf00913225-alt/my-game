@@ -1700,6 +1700,15 @@
 <section class="battle-info-region" aria-label="戰鬥資訊區">
 
 <div class="battle-info-header-row">
+    <button
+        id="battleInfoToggle"
+        class="battle-info-toggle"
+        type="button"
+        aria-controls="battleInfo"
+        aria-expanded="false"
+        aria-label="展開戰鬥資訊"
+        onclick="toggleBattleInfoPanel()"
+    ><span aria-hidden="true">⌃</span></button>
     <div id="battleTurnIndicator">第 1 回合</div>
 </div>
 

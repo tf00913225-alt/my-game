@@ -49,7 +49,8 @@ assert.match(vfxSource,/node\.style\.left=bounds\.centerX\+"px";[\s\S]*node\.sty
 assert.doesNotMatch(vfxSource,/activeCards\([^)]*\)\.length\s*\*/,"VFX scale must not multiply by surviving target count");
 
 assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone\{[\s\S]*position:relative !important;[\s\S]*height:var\(--battle-enemy-zone-height\) !important;/);
-assert.match(css,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)[\s\S]*var\(--battle-info-region-track\)/,"battle layout must own four proportional structural tracks");
+assert.match(css,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)/,"battle layout must own three proportional structural tracks");
+assert.doesNotMatch(css,/--battle-info-region-track/,"bottom info drawer must not resize battlefield tracks");
 assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*position:absolute !important;/);
 assert.match(css,/#battlePlayerRow\.v-fixed-ally-zone\{[\s\S]*height:var\(--battle-ally-zone-height\) !important;/);
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*position:absolute !important;/);
@@ -182,6 +183,13 @@ assert.ok(tri.width>single.width);
 assert.ok(row.width>=tri.width);
 assert.ok(column.height>single.height);
 assert.ok(all.width>=row.width&&all.height>=column.height);
+
+rects.MECH_C={left:140,top:180,width:80,height:70,right:220,bottom:250};
+const mechanismSingle=owner.getGeometryRectFromShape("monster","MECH_C","single");
+const mechanismRange=owner.getGeometryRectFromShape("monster","MECH_C","tri");
+assert.equal(mechanismSingle.width,80,"single-target mechanism art stays on the function card");
+assert.equal(mechanismRange.width,all.width,"range art aimed at a function card uses the full enemy-side width");
+assert.equal(mechanismRange.height,all.height,"range art aimed at a function card uses the full enemy-side height");
 
 assert.match(qaSource,/V174 battle presentation owner/);
 console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");

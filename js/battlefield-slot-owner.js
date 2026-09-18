@@ -351,6 +351,13 @@
         const allowed=geometrySlotsForSide(normalizedSide);
         if(!allowed.length){ return []; }
         const normalizedShape=normalizeShape(shape);
+        /* A mechanism card is a damage target, not a VFX-sized battlefield.
+           Single-target art stays on the card; any authored range keeps the
+           complete enemy-side visual footprint even though settlement still
+           contains only that mechanism target. */
+        if(MECHANISM.includes(primarySlot)&&(normalizedSide==="enemy"||normalizedSide==="mechanism")){
+            return normalizedShape==="single"?[primarySlot]:ENEMY_SLOTS.slice();
+        }
         if(normalizedShape==="all"){ return allowed.slice(); }
         if(!primarySlot||!allowed.includes(primarySlot)){
             return normalizedShape==="all"?allowed.slice():[];
