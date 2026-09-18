@@ -38,6 +38,36 @@
         upgradeGoldPerLevel:180
     });
 
+    function relicVfx(durationMs,element,defaultTarget){
+        return Object.freeze({
+            durationMs:Math.max(520,Math.floor(Number(durationMs)||0)),
+            element:element||"normal",
+            defaultTarget:defaultTarget||"allyAll"
+        });
+    }
+    const RELIC_VFX_PRESENTATION=Object.freeze({
+        relic_qiankun_flask:relicVfx(1050,"normal","allyAll"),
+        relic_sun_orb:relicVfx(950,"fire","enemyAll"),
+        relic_xuanwu_seal:relicVfx(1100,"normal","allyAll"),
+        relic_soul_bell:relicVfx(1050,"normal","enemyAll"),
+        relic_tiangang_banner:relicVfx(1100,"normal","enemyAll"),
+        relic_nine_dragon_fire:relicVfx(1100,"fire","enemyAll"),
+        relic_cold_spring_jade:relicVfx(1000,"water","singleAlly"),
+        relic_qinglan_feather:relicVfx(950,"wind","allyAll"),
+        relic_rock_mountain_seal:relicVfx(1100,"earth","allyAll"),
+        relic_returning_wheel:relicVfx(1150,"normal","singleAlly"),
+        relic_origin_talisman:relicVfx(1050,"normal","allyAll"),
+        relic_broken_army_scroll:relicVfx(950,"normal","singleEnemy"),
+        relic_red_sky_war_mark:relicVfx(950,"normal","allyAll"),
+        relic_ice_mirror_heart:relicVfx(1000,"water","enemyAll"),
+        relic_wind_chasing_talisman:relicVfx(900,"wind","allyAll"),
+        relic_mountain_river_cauldron:relicVfx(1100,"earth","allyAll"),
+        relic_burning_star_mark:relicVfx(950,"fire","enemyAll"),
+        relic_spirit_spring_bottle:relicVfx(1000,"water","allyAll"),
+        relic_demon_suppressing_seal:relicVfx(1050,"normal","allyAll"),
+        relic_all_returning_array:relicVfx(1150,"normal","allyAll")
+    });
+
     function scalar(points,level){
         const list=(points||[]).slice().sort((a,b)=>a[0]-b[0]);
         const lv=Math.max(1,Math.min(MAX_LEVEL,Math.floor(Number(level)||1)));
@@ -181,6 +211,7 @@
     ];
 
     RELIC_CATALOG_LIST.forEach(def=>{
+        def.vfx=RELIC_VFX_PRESENTATION[def.id]||null;
         def.upgradeCost={
             items:[],
             goldCost:{base:RELIC_BALANCE_CONFIG.upgradeGoldBase,perLevel:RELIC_BALANCE_CONFIG.upgradeGoldPerLevel},
@@ -199,6 +230,7 @@
     let relicPresentationTail=Promise.resolve();
     let relicPresentationPending=0;
     let relicPresentationGeneration=0;
+    let relicVfxSequence=0;
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
     function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
@@ -223,11 +255,113 @@
         relicPresentationGeneration++;
         relicPresentationTail=Promise.resolve();
         relicPresentationPending=0;
+        relicVfxSequence=0;
         relicVisualCollector=null;
     }
     function currentAnimationGate(){
         const director=window.v142SkillAnimationDirector;
         return director&&typeof director.getActive==="function"?director.getActive():null;
+    }
+    function preloadRelicVfx(defOrId){
+        const id=typeof defOrId==="string"?defOrId:defOrId&&defOrId.id;
+        if(!id||typeof window.v143PreloadBattleVfxAsset!=="function"){ return false; }
+        try{ return !!window.v143PreloadBattleVfxAsset(id); }
+        catch(error){ console.error("秘寶 VFX 預載失敗：",error); return false; }
+    }
+    function eligibleEnemyIndexesForRelicVfx(){
+        const indexes=typeof currentBattleMonsters!=="undefined"&&Array.isArray(currentBattleMonsters)?currentBattleMonsters:[];
+        return indexes.filter(index=>{
+            const monster=typeof monsters!=="undefined"&&monsters?monsters[index]:null;
+            if(!Number.isInteger(index)||!monster||monster.alive===false||numeric(monster.hp)<=0){ return false; }
+            if(
+                window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&
+                !window.GameplaySystem.canDirectlyAffectMonster(monster,index)
+            ){ return false; }
+            return true;
+        });
+    }
+    function fallbackRelicVfxTarget(def,payload){
+        const mode=def&&def.vfx&&def.vfx.defaultTarget||"allyAll";
+        if(mode==="enemyAll"){
+            return {targetSide:"monster",targetType:"all",targetId:null,targetIds:eligibleEnemyIndexesForRelicVfx(),category:"attack"};
+        }
+        if(mode==="singleEnemy"){
+            const requested=payload&&Number.isInteger(payload.monsterIndex)?payload.monsterIndex:
+                payload&&Number.isInteger(payload.targetIndex)?payload.targetIndex:null;
+            const enemies=eligibleEnemyIndexesForRelicVfx();
+            const targetId=requested!==null&&enemies.indexOf(requested)>=0?requested:(enemies.length?enemies[0]:null);
+            return {targetSide:"monster",targetType:"single",targetId:targetId,targetIds:targetId===null?[]:[targetId],category:"attack"};
+        }
+        if(mode==="singleAlly"){
+            const allies=partyIndexes().filter(index=>{ const character=characterAt(index); return character&&numeric(character.hp)>0; });
+            const requested=payload&&Number.isInteger(payload.targetIndex)?payload.targetIndex:null;
+            const targetId=requested!==null&&allies.indexOf(requested)>=0?requested:(allies.length?allies[0]:null);
+            return {targetSide:"player",targetType:"single",targetId:targetId,targetIds:targetId===null?[]:[targetId],category:"buff"};
+        }
+        return {targetSide:"player",targetType:"allyAll",targetId:null,targetIds:partyIndexes().filter(index=>{ const character=characterAt(index); return character&&numeric(character.hp)>0; }),category:"buff"};
+    }
+    function normalizeRelicVfxOverride(override){
+        if(!override||typeof override!=="object"){ return null; }
+        const targetSide=override.targetSide==="monster"?"monster":"player";
+        const targetType=String(override.targetType||"single");
+        let ids=Array.isArray(override.targetIds)?override.targetIds.filter(Number.isInteger):[];
+        if(!ids.length&&Number.isInteger(override.targetId)){ ids=[override.targetId]; }
+        const targetId=targetType==="single"&&ids.length?ids[0]:null;
+        return {targetSide:targetSide,targetType:targetType,targetId:targetId,targetIds:Array.from(new Set(ids)),category:override.category||"buff"};
+    }
+    function relicVfxTarget(def,triggerDef,payload,override){
+        const forced=normalizeRelicVfxOverride(override);
+        if(forced){ return forced; }
+        const effects=triggerDef&&Array.isArray(triggerDef.effects)?triggerDef.effects:[];
+        const types=effects.map(effectDef=>String(effectDef&&effectDef.type||""));
+        if(types.some(type=>["damage_all_enemies","debuff_all_enemies","apply_status_all_enemies"].includes(type))){
+            return {targetSide:"monster",targetType:"all",targetId:null,targetIds:eligibleEnemyIndexesForRelicVfx(),category:"attack"};
+        }
+        if(
+            payload&&Number.isInteger(payload.targetIndex)&&
+            types.some(type=>["heal_single_ally","restore_sp_single","shield_single","cleanse_single","prevent_death"].includes(type))
+        ){
+            return {targetSide:"player",targetType:"single",targetId:payload.targetIndex,targetIds:[payload.targetIndex],category:"buff"};
+        }
+        if(types.some(type=>["heal_all_allies","restore_sp_all","shield_all","buff_all","prepare_reflect"].includes(type))){
+            return {targetSide:"player",targetType:"allyAll",targetId:null,targetIds:partyIndexes().filter(index=>{ const character=characterAt(index); return character&&numeric(character.hp)>0; }),category:"buff"};
+        }
+        return fallbackRelicVfxTarget(def,payload);
+    }
+    function relicPresentationDuration(def){
+        return Math.max(520,numeric(def&&def.vfx&&def.vfx.durationMs)||RELIC_BALANCE_CONFIG.presentationDurationMs);
+    }
+    function playRelicVfx(def,triggerDef,payload,override){
+        if(!def||!def.vfx||!hasLiveBattlePresentationHost()){ return null; }
+        const director=window.v142SkillAnimationDirector;
+        if(!director||typeof director.play!=="function"){ return null; }
+        const target=relicVfxTarget(def,triggerDef,payload||{},override);
+        if(!target||!target.targetIds.length){ return null; }
+        const duration=relicPresentationDuration(def);
+        const contract=Object.freeze({
+            version:"battle-target-contract-v1",
+            side:"player",
+            targetSide:target.targetSide,
+            targetType:target.targetType,
+            actorIndex:0,
+            targetId:target.targetId,
+            targetIds:Object.freeze(target.targetIds.slice())
+        });
+        try{
+            return director.play({
+                id:def.id,name:def.name,element:def.vfx.element||"normal",
+                category:target.category||"buff",targetType:target.targetType,
+                duration:duration,resolveDuration:duration,tier:"relic",style:"relic"
+            },{
+                side:"player",actorIndex:0,targetSide:target.targetSide,
+                targetId:target.targetId,targetIds:target.targetIds.slice(),
+                targetContract:contract,
+                key:"relic:"+String(currentBattleToken())+":"+def.id+":"+String(++relicVfxSequence)
+            });
+        }catch(error){
+            console.error("秘寶 VFX 啟動失敗：",error);
+            return null;
+        }
     }
     function waitForAnimationRelease(gate){
         if(!gate){ return Promise.resolve(); }
@@ -240,7 +374,7 @@
         callback();
     }
     function flushRelicVisuals(list){ (list||[]).forEach(callback=>{ try{callback();}catch(error){console.error("秘寶視覺效果失敗：",error);} }); }
-    function queueRelicPresentation(def,onStart){
+    function queueRelicPresentation(def,onStart,visualContext){
         if(!hasLiveBattlePresentationHost()){
             showBanner(def);
             if(typeof onStart==="function"){ onStart(); }
@@ -254,8 +388,14 @@
         const job=Promise.resolve(previousTail).catch(()=>{}).then(()=>waitForAnimationRelease(gate)).then(()=>{
             if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){ return; }
             showBanner(def);
+            playRelicVfx(
+                def,
+                visualContext&&visualContext.triggerDef,
+                visualContext&&visualContext.payload,
+                visualContext&&visualContext.override
+            );
             if(typeof onStart==="function"){ onStart(); }
-            return waitMs(RELIC_BALANCE_CONFIG.presentationDurationMs);
+            return waitMs(relicPresentationDuration(def));
         }).catch(error=>{ console.error("秘寶演出序列失敗：",error); }).then(()=>{
             if(generation===relicPresentationGeneration){ relicPresentationPending=Math.max(0,relicPresentationPending-1); }
         });
@@ -294,6 +434,7 @@
         teamLoadout=normalizeLoadout(data.teamLoadout);
         window.playerRelics=playerRelics;
         window.teamLoadout=teamLoadout;
+        if(teamLoadout.relicId){ preloadRelicVfx(teamLoadout.relicId); }
     }
     function persistIntoSaveDocument(){
         try{
@@ -588,6 +729,9 @@
             else{ resolveEffects(triggerDef,def,payload||{}); }
             battleLog(def.name+"｜"+currentEffectText(def,relicLevel(def.id)));
             if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
+        },{
+            triggerDef:triggerDef,
+            payload:payload||{}
         });
     }
 
@@ -625,7 +769,10 @@
     function initializeBattleRelic(){
         relicBattleState=createBattleState(teamLoadout.relicId);
         pendingBattleInit=false;
-        if(relicBattleState.relicId){ dispatchRelicEvent("battle_start",{sourceType:"system"}); }
+        if(relicBattleState.relicId){
+            preloadRelicVfx(relicBattleState.relicId);
+            dispatchRelicEvent("battle_start",{sourceType:"system"});
+        }
     }
 
     if(typeof startBattle==="function"){
@@ -699,6 +846,9 @@
                             damageEnemy(monsterIndex,damage,"earth");
                             battleLog(def.name+"反震"+damage+"點秘寶傷害。");
                             if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
+                        },{
+                            payload:{monsterIndex:monsterIndex},
+                            override:{targetSide:"monster",targetType:"single",targetId:monsterIndex,targetIds:[monsterIndex],category:"attack"}
                         });
                     }
                 }
@@ -815,7 +965,7 @@
     function equipRelic(id){
         const def=relicCatalog[id],owned=statusOf(id);
         if(!def||!def.runtimeReady||!owned.unlocked||!equipmentAllowed()){ return false; }
-        teamLoadout.relicId=id; owned.seen=true; saveRelics(); syncHomeRelicUi(); renderRelicPage(); return true;
+        teamLoadout.relicId=id; owned.seen=true; preloadRelicVfx(id); saveRelics(); syncHomeRelicUi(); renderRelicPage(); return true;
     }
     function unequipRelic(){ if(!equipmentAllowed()){ return false; } teamLoadout.relicId=null; saveRelics(); syncHomeRelicUi(); renderRelicPage(); return true; }
     function upgradeRelic(id){
