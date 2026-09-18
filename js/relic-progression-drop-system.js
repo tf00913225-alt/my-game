@@ -158,6 +158,7 @@
     }
     const RELIC_FRAGMENT_ICON_PATHS=Object.freeze({
         relic_qiankun_flask:"assets/relics/fragments/relic_qiankun_flask.webp",
+        relic_cold_spring_jade:"assets/relics/fragments/relic_cold_spring_jade.webp",
         relic_sun_orb:"assets/relics/fragments/relic_sun_orb.webp",
         relic_xuanwu_seal:"assets/relics/fragments/relic_xuanwu_seal.webp",
         relic_soul_bell:"assets/relics/fragments/relic_soul_bell.webp",
