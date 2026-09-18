@@ -206,7 +206,7 @@ function loadRuntime(options={}){
             }
         },
         monsters,
-        currentBattleMonsters:[0,1,2],
+        currentBattleMonsters:options.currentBattleMonsters||[0,1,2],
         getPartyCharacterByIndex(index){ return party[index]||null; }
     };
     context.window=context;
@@ -448,7 +448,7 @@ test("Rage creates one shared full-ally cast sheet",()=>{
 
 test("enemy Rage allyTri animates only the three explicit targets",()=>{
     const monsters=Array.from({length:10},()=>({alive:true,hp:100,statusEffects:[],activeBuffs:[]}));
-    const runtime=loadRuntime({monsters});
+    const runtime=loadRuntime({monsters,currentBattleMonsters:[4,5,6]});
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("rage",1500,"allyTri","buff"),
         {side:"monster",actorIndex:0,targetSide:"monster",targetId:5,targetIds:[4,5,6]}
@@ -464,7 +464,7 @@ test("enemy Rage allyTri animates only the three explicit targets",()=>{
 
 test("enemy Rage loop begins on the hit frame and follows its canonical ledger",()=>{
     const monsters=Array.from({length:10},()=>({alive:true,hp:100,statusEffects:[],activeBuffs:[]}));
-    const runtime=loadRuntime({monsters});
+    const runtime=loadRuntime({monsters,currentBattleMonsters:[4,5,6]});
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("rage",1500,"allyTri","buff"),
         {side:"monster",actorIndex:0,targetSide:"monster",targetId:5,targetIds:[4,5,6]}

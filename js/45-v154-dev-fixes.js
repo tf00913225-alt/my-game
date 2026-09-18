@@ -98,6 +98,19 @@
 
     function resolveMonsterPortraitRecord(monster,options){
         if(!monster){ return null; }
+        const dedicatedPath=String(monster.vGameplayPortrait||"").trim();
+        if(dedicatedPath){
+            return {
+                portraitKey:"gameplay.object."+String(monster.objectType||monster.name||"unit"),
+                name:monster.name||"",
+                element:monster.element||"dynamic",
+                rank:monster.rank||"regular",
+                sizeClass:monster.unitKind==="boss"?"boss":"regular",
+                path:dedicatedPath,
+                status:"existing",
+                dedicated:true
+            };
+        }
         const temporaryBoss=monster.rank==="boss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.v141BattleRank==="boss"||(monster.v141Abyss===true&&monster.name!=="天兵天將"&&(Object.prototype.hasOwnProperty.call(EARLY_ABYSS_PORTRAITS,monster.name)||Object.prototype.hasOwnProperty.call(FINAL_ABYSS_PORTRAITS,monster.name)));
         return {
             portraitKey:temporaryBoss?"temporary.boss-reference":"temporary.heavenly-soldier",

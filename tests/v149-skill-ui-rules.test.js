@@ -53,6 +53,28 @@ function bareDocument(overrides={}){
     },overrides);
 }
 
+function installBattleFlow(context){
+    const interceptors=[];
+    context.FourSymbolsBattleFlow={
+        interceptActionFinish(interceptor){
+            interceptors.push(interceptor);
+            return ()=>{
+                const index=interceptors.lastIndexOf(interceptor);
+                if(index>=0){ interceptors.splice(index,1); }
+            };
+        }
+    };
+    const finish=context.finishPlayerAction;
+    if(typeof finish==="function"){
+        context.finishPlayerAction=function(){
+            for(let index=interceptors.length-1;index>=0;index--){
+                if(interceptors[index]()===true){ return; }
+            }
+            return finish.apply(this,arguments);
+        };
+    }
+}
+
 function load(overrides={}){
     const context=Object.assign({
         window:null,console,Math,Date,Number,Object,Array,Set,Map,Promise,
@@ -60,6 +82,7 @@ function load(overrides={}){
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback()
     },overrides);
     context.window=context;
+    installBattleFlow(context);
     vm.createContext(context);
     vm.runInContext(source,context);
     return context;
@@ -201,6 +224,7 @@ test("Fire EX abnormal-target bonus is owned by the unified core damage bucket, 
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback()
     };
     context.window=context;
+    installBattleFlow(context);
     vm.createContext(context);
     vm.runInContext("calculateSkillDamage=function(){return 100}; castDamageSkill=function(){return calculateSkillDamage(1,1,damageTarget,1,'fire')}",context);
     vm.runInContext(source,context);
@@ -225,6 +249,7 @@ test("Flood Beast never performs the obsolete all-enemy Freeze sweep",()=>{
         addBattleLog(){},setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback()
     };
     context.window=context;
+    installBattleFlow(context);
     vm.createContext(context);
     vm.runInContext("applySkillDebuffEffects=function(){}; castDamageSkill=function(){applySkillDebuffEffects(skillDatabase.floodBeast,1,monsters[0],0,1,1)}",context);
     vm.runInContext(source,context);
@@ -251,6 +276,7 @@ test("Dragon Slash follows up after an initial critical without charging SP twic
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback()
     };
     context.window=context;
+    installBattleFlow(context);
     vm.createContext(context);
     vm.runInContext("castDamageSkill=function(id){player.sp-=skillDatabase[id].spCost;targets.push(selectedMonster);castCount++;rollCritical();finishPlayerAction()}",context);
     vm.runInContext(source,context);
@@ -275,6 +301,7 @@ test("Dragon Slash adds a second repeat when the first repeat is critical",()=>{
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback()
     };
     context.window=context;
+    installBattleFlow(context);
     vm.createContext(context);
     vm.runInContext("castDamageSkill=function(id){player.sp-=skillDatabase[id].spCost;castCount++;rollCritical();finishPlayerAction()}",context);
     vm.runInContext(source,context);

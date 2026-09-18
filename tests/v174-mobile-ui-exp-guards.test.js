@@ -13,9 +13,9 @@ assert.match(css,/#creationPage \.creation-role-card\{[\s\S]*overflow:visible !i
 assert.match(touch,/\.creation-page-scroll, \.creation-role-card, \.inventory-grid-scroll/);
 assert.match(css,/#v146HomeRoster \.v146-home-resource\{[\s\S]*height:14px !important;/);
 assert.match(css,/#v146HomeRoster \.v146-home-resource strong\{[\s\S]*font-size:11px !important;/);
-assert.match(boss,/gameplay-boss-card\[data-rank="boss"\]\{[\s\S]*aspect-ratio:9 \/ 16;/);
-assert.match(boss,/\.boss-mechanism-card\{[\s\S]*aspect-ratio:4 \/ 3;/);
-assert.match(boss,/max-height:920px[\s\S]*--gameplay-boss-card-width[\s\S]*--gameplay-mechanism-card-width/);
+assert.match(boss,/\.v-fixed-boss-footprint\{[\s\S]*left:calc\(20% \+ 5px\);[\s\S]*right:calc\(20% \+ 5px\);/);
+assert.match(boss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*pointer-events:auto;/);
+assert.doesNotMatch(boss,/boss-mechanism-card|boss-mechanism-slot/);
 assert.doesNotMatch(skill,/function addProgressionHint|addProgressionHint\(/);
 assert.match(skill,/renderSkillDetailProgression[\s\S]*最低學習等級[\s\S]*前置技能/);
 assert.match(exp,/v131ConfirmExpPreview=async function/);

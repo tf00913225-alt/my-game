@@ -4,14 +4,15 @@ const fs=require("node:fs");
 const read=p=>fs.readFileSync(p,"utf8");
 
 const boss=read("css/gameplay-boss-tower.css");
-assert.match(boss,/gameplay-boss-card[\s\S]*?battle-monster-icon[\s\S]*?background-size:contain;/);
-assert.match(boss,/boss-mechanism-card\{[\s\S]*?aspect-ratio:4 \/ 3;/);
+assert.match(boss,/gameplay-boss-card > \.v174-battle-art\{[\s\S]*?background-size:contain;/);
+assert.match(boss,/\.v-fixed-boss-footprint\{[\s\S]*?pointer-events:none;/);
+assert.doesNotMatch(boss,/boss-mechanism-card|boss-mechanism-slot/);
 
 const battle=read("js/54-v173.51-battle-qa.js");
 const fixedBattle=read("css/fixed-slot-battlefield-rendering-v2.css");
 assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?position:absolute!important/);
 assert.match(fixedBattle,/v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{[\s\S]*?background-size:contain !important/);
-assert.match(fixedBattle,/v-fixed-enemy-slot \.monster-hp,[\s\S]*?bottom:24px !important/);
+assert.match(fixedBattle,/v-fixed-enemy-slot \.monster-hp,[\s\S]*?bottom:26px !important/);
 assert.match(fixedBattle,/v-fixed-enemy-slot \.monster-sp,[\s\S]*?bottom:15px !important/);
 
 const city=read("js/16-stage-v54-main-city-runtime.js");

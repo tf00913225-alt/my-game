@@ -1,3 +1,16 @@
+## 2026-09-18 — Boss target-entity convergence, cardless battlefield and queue-owner cleanup (IMPLEMENTED / QA PENDING)
+
+- Base: latest GitHub `dev@1142ba9c0cc0dac9200772326ba920d5b1a07fed`; branch: `fix/boss-battle-architecture-convergence-20260918`. `main` is excluded.
+- This entry supersedes every older function-card／Mechanism design below. Boss is one target entity with one HP/SP/status identity; `B2/B3/B4/F2/F3/F4` are one visual footprint only. Reinforcements use `B1/B5`; destructible Boss objects use `F1/F5`, normal numeric enemy identities, `canAct=false` and no ordinary rewards.
+- 金剛護體 is now Boss Shield. The old `MECH_*`, `mechanism:*`, mandatory mechanism target, mechanism-specific settlement and mechanism VFX paths are removed from production owners.
+- Boss mode isolates non-all damage to the selected target; `all/enemyAll` hits every living Boss-side entity. General battles retain their existing single／tri／row／column／all Fixed Slot rules. Boss tri VFX keeps authored group size even though damage settles one target.
+- `00-main.js` is the sole `finishPlayerAction`／`processNextCombatant` owner. V142 exposes remaining visual time only; dungeon, relic and Fire follow-up modules no longer Promise-gate or replace queue functions. Fire follow-up uses the core `FourSymbolsBattleFlow` removable interceptor.
+- Cardless presentation is source CSS plus immediate `FourSymbolsBattlePresentation.applyUnit()` at DOM creation. The 300ms presentation poll and `.red-hit` root-card feedback are retired; Heal has independent positive feedback.
+- Fixed Slot CSS owns 42／14／44 enemy-center-ally tracks, equal 10px player/enemy bars, bottom information drawer, 66px Element Box and the raised 64×32 gold drawer handle. The center-region borders were the two residual gold lines and are now removed at their source.
+- Existing V131 Formation remains the only editor and persists through `saveGame({source:"ally-formation"})`; no fake modal was added.
+- System contract: `SYSTEM_CONTRACTS.md`. Focused regression: `tests/boss-battle-architecture-convergence-20260918.test.js`. Requirement batch: `release/requirement-batches/2026-09-18-boss-battle-architecture-convergence.json`.
+- Status remains IMPLEMENTED / QA PENDING until 412×915 Browser QA, full repository checks, commit/push and PR to dev complete.
+
 ## 2026-09-18 — Battle target contract, four-track layout, Formation entry and flow recovery (VERIFIED)
 
 - Base is the latest GitHub `dev@30c8253713fa0fee76ceea597521d7e9a314a9a0`; branch is `fix/battle-vfx-layout-formation-freeze-20260918`. `main` is excluded. The requested `SYSTEM_CONTRACTS.md` does not exist in the base or reachable history, so no substitute contract was invented.

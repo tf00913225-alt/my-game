@@ -199,8 +199,6 @@
     let relicPresentationTail=Promise.resolve();
     let relicPresentationPending=0;
     let relicPresentationGeneration=0;
-    const deferredStartTurns=new Set();
-    const deferredCombatants=new Set();
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
     function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
@@ -226,8 +224,6 @@
         relicPresentationTail=Promise.resolve();
         relicPresentationPending=0;
         relicVisualCollector=null;
-        deferredStartTurns.clear();
-        deferredCombatants.clear();
     }
     function currentAnimationGate(){
         const director=window.v142SkillAnimationDirector;
@@ -266,13 +262,6 @@
         relicPresentationTail=job;
         return job;
     }
-    function waitForRelicPresentation(callback){
-        if(typeof callback!=="function"){ return; }
-        const tail=relicPresentationTail;
-        if(relicPresentationPending<=0){ callback(); return; }
-        Promise.resolve(tail).then(callback);
-    }
-
     function normalizeOwned(raw){
         const next={};
         RELIC_CATALOG_LIST.forEach(def=>{
@@ -652,32 +641,17 @@
     if(typeof startTurn==="function"){
         const previous=startTurn;
         startTurn=function(){
-            const token=arguments[0];
-            const key=String(token)+":"+String(typeof turn!=="undefined"?turn:0);
-            if(deferredStartTurns.has(key)){ return; }
             if(typeof battleActive!=="undefined"&&battleActive){
                 if(pendingBattleInit||!relicBattleState||relicBattleState.battleToken!==currentBattleToken()){ initializeBattleRelic(); }
                 cleanupPlayerMods();
                 resetRoundCounters();
                 dispatchRelicEvent("round_start",{sourceType:"system"});
             }
-            if(relicPresentationPending>0&&hasLiveBattlePresentationHost()){
-                deferredStartTurns.add(key);
-                const that=this,args=arguments,generation=relicPresentationGeneration;
-                waitForRelicPresentation(()=>{
-                    deferredStartTurns.delete(key);
-                    if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){ return; }
-                    previous.apply(that,args);
-                });
-                return;
-            }
             return previous.apply(this,arguments);
         };
     }
-    if(typeof processNextCombatant==="function"){
-        const previous=processNextCombatant;
-        processNextCombatant=function(){
-            const token=arguments[0];
+    if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeBeforeCombatant==="function"){
+        window.FourSymbolsBattleFlow.subscribeBeforeCombatant(()=>{
             if(
                 relicBattleState&&typeof battleActive!=="undefined"&&battleActive&&
                 typeof battlePhase!=="undefined"&&battlePhase==="resolve"&&
@@ -685,20 +659,7 @@
             ){
                 dispatchRelicEvent("round_end",{sourceType:"system"});
             }
-            if(relicPresentationPending>0&&hasLiveBattlePresentationHost()){
-                const key=String(token)+":"+String(typeof turn!=="undefined"?turn:0)+":"+String(typeof initiativeIndex!=="undefined"?initiativeIndex:0);
-                if(deferredCombatants.has(key)){ return; }
-                deferredCombatants.add(key);
-                const that=this,args=arguments,generation=relicPresentationGeneration;
-                waitForRelicPresentation(()=>{
-                    deferredCombatants.delete(key);
-                    if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){ return; }
-                    previous.apply(that,args);
-                });
-                return;
-            }
-            return previous.apply(this,arguments);
-        };
+        });
     }
 
     if(typeof processSingleMonsterAttack==="function"){

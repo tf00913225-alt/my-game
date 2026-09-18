@@ -71,8 +71,9 @@ test("latest skill table contains every exact requested value",()=>{
     ].forEach(pattern=>assert.match(rules,pattern));
 });
 
-test("battle timing, dead-target filtering and raster-only choreography are enforced",()=>{
-    assert.match(timing,/earliestAt:Math\.max\([\s\S]*boundaryGate\?boundaryGate\.deadline:0/);
+test("visual timing, dead-target filtering and raster-only choreography are enforced",()=>{
+    assert.match(timing,/window\.v142GetRemainingAnimationMs=function/);
+    assert.doesNotMatch(timing,/finishPlayerAction\s*=(?!=)|processNextCombatant\s*=(?!=)/);
     assert.match(animation,/function canReceive\(config,side,index\)/);
     assert.match(animation,/entity\.hp\)>0/);
     assert.match(animation,/dragonSlash:\{[\s\S]*dragon-slash-cast\.png/);

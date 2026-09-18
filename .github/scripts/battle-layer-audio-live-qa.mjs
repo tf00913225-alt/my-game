@@ -147,7 +147,7 @@ try{
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
     await client.send("Page.navigate",{url:qaUrl});
     await waitFor(client,"document.readyState==='complete'","page load");
-    const accountState=await prepareAccountFirstRuntime(client,["abyss"]);
+    const accountState=await prepareAccountFirstRuntime(client,["abyss","boss-tower"]);
     evidence.checks.accountState=accountState;
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
     await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
@@ -393,8 +393,8 @@ try{
         assert.ok(hud.hp.bottom<=hud.sp.top+1,`${side} HP must sit above SP`);
         assert.ok(hud.sp.bottom<=hud.name.top+1,`${side} name must sit below both resource bars`);
     }
-    assert.equal(resourceLayers.logicalHeights.monsterHp,resourceLayers.logicalHeights.playerHp,"Enemy and player resource bars must use the same thin owner height");
-    assert.equal(resourceLayers.logicalHeights.monsterHp,8,"Battle resource bars must use the compact 8px logical height");
+    assert.equal(resourceLayers.logicalHeights.monsterHp,resourceLayers.logicalHeights.playerHp,"Enemy and player resource bars must use the same formal owner height");
+    assert.equal(resourceLayers.logicalHeights.monsterHp,10,"Battle resource bars must use the restored 10px logical height");
 
     const iceArrowRain=await client.eval(`(()=>{
         const director=window.v142SkillAnimationDirector;
@@ -581,41 +581,6 @@ try{
     assert.equal(waterGate.done,true,"Water Orb must release its animation gate");
     assert.equal(waterGate.completionCount,1,"Water Orb gate must complete exactly once");
     assert.equal(waterGate.stageExists,false,"Completed Water Orb VFX must remove its stage");
-
-    const mechanismRange=await client.eval(`(()=>{
-        const area=document.getElementById('battleMonsterArea');
-        let host=document.getElementById('bossMechanismSlot');
-        if(!host){host=document.createElement('div');host.id='bossMechanismSlot';host.className='v-fixed-mechanism-zone';host.dataset.geometryOwner='fixed-slot';area.appendChild(host);}
-        const position=document.createElement('div');position.className='boss-mechanism-position';position.dataset.slot='MECH_C';
-        const card=document.createElement('button');card.className='boss-mechanism-card';card.dataset.id='qa-function-card';card.textContent='功能卡';position.appendChild(card);host.appendChild(position);
-        const director=window.v142SkillAnimationDirector;
-        const owner=window.FourSymbolsBattlefieldSlots;
-        const targetId='mechanism:qa-function-card';
-        const config=Object.assign({},window.v142GetSkillAnimationConfig('stormCircle'),{duration:1100,resolveDuration:1100});
-        const gate=director.play(config,{side:'player',actorIndex:0,targetSide:'monster',targetId,targetIds:[targetId],targetContract:{version:'battle-target-contract-v1',targetSide:'monster',targetId,targetIds:[targetId]},key:'battle-layout-function-card-'+Date.now()});
-        window.__battleLayoutMechanismGate=gate;
-        const stage=document.getElementById('v143-skill-stage');
-        const sprite=stage?.querySelector('.v143-vfx-sprite')||null;
-        const bounds=owner.getSideRect('monster');
-        return {
-            bounds,targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
-            geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),
-            areaId:sprite?.dataset.areaId||null,frameFit:sprite?.dataset.frameFit||null,
-            spriteBox:sprite?{left:Number.parseFloat(sprite.style.left),top:Number.parseFloat(sprite.style.top),width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)}:null
-        };
-    })()`);
-    evidence.checks.functionCardRange=mechanismRange;
-    assert.deepEqual(mechanismRange?.targetIndexes,["mechanism:qa-function-card"],"Function-card damage targeting must remain isolated");
-    assert.equal(mechanismRange?.geometrySlots.length,10,"A range cast on a function card must keep the complete enemy-side visual geometry");
-    assert.equal(mechanismRange?.frameFit,"cover","Function-card range VFX must preserve source aspect");
-    assert.ok(Math.abs(mechanismRange.spriteBox.left-mechanismRange.bounds.centerX)<=1&&Math.abs(mechanismRange.spriteBox.top-mechanismRange.bounds.centerY)<=1,"Function-card range VFX must center on the complete enemy side");
-    assert.ok(mechanismRange.spriteBox.width>=mechanismRange.bounds.width-1&&mechanismRange.spriteBox.height>=mechanismRange.bounds.height-1,"Function-card range VFX must cover the complete enemy side");
-    await sleep(1350);
-    const mechanismGate=await client.eval(`(()=>{const gate=window.__battleLayoutMechanismGate;document.getElementById('bossMechanismSlot')?.remove();return {done:!!gate?.done,reason:gate?.reason||null,completionCount:gate?.completionCount||0,stageExists:!!document.getElementById('v143-skill-stage')};})()`);
-    evidence.checks.functionCardRangeCompletion=mechanismGate;
-    assert.equal(mechanismGate.done,true,"Function-card range cast must release its animation gate");
-    assert.equal(mechanismGate.completionCount,1,"Function-card range gate must complete exactly once");
-    assert.equal(mechanismGate.stageExists,false,"Function-card range stage must clean up");
 
     /* Capture the production cast and the stage it creates in the same browser
        task. The battle remains live, so a later CDP poll may observe the next
@@ -804,6 +769,106 @@ try{
     assert.equal(endTransition.battlePageActive,false,"Battle-end path must leave the battle page");
     assert.ok(endTransition.activePage,"Battle-end callback must hand control to a non-battle page");
     assert.equal(endTransition.stageCount,0,"Battle-end path must leave no V143 stage behind");
+
+    const bossBootstrap=await client.eval(`(()=>{
+        if(typeof player!=='undefined'&&player){
+            player.level=100;
+            player.hp=Math.max(99999,Number(player.hp)||0);
+            player.sp=Math.max(99999,Number(player.sp)||0);
+        }
+        window.v133GetHighestCreatedCharacterLevel=()=>100;
+        if(typeof showPage==='function'){showPage('boss');}
+        return {
+            started:typeof vGameplayStartBoss==='function'&&vGameplayStartBoss('personal','personal-70')===true,
+            owner:window.FourSymbolsBossBattle?.version||null
+        };
+    })()`);
+    evidence.checks.bossBootstrap=bossBootstrap;
+    assert.equal(bossBootstrap.started,true,"The exact candidate must start a real Boss-mode battle");
+    assert.equal(bossBootstrap.owner,"boss-target-entity-v1","Boss mode must expose the single target-entity owner");
+    await waitFor(client,"battleActive===true&&FourSymbolsBossBattle.isActive()&&document.querySelector('.v-fixed-boss-footprint > .gameplay-boss-card')","real Boss target-entity battlefield",15000);
+
+    const bossMode=await client.eval(`(()=>{
+        const bossOwner=window.FourSymbolsBossBattle;
+        const gameplay=window.GameplaySystem;
+        const slotOwner=window.FourSymbolsBattlefieldSlots;
+        const bossIndex=bossOwner.getBossIndex();
+        const boss=monsters[bossIndex];
+        const heal=gameplay.debugSpawnBossObject('heal','live-qa-heal');
+        const flag=gameplay.debugSpawnBossObject('amplify','live-qa-flag');
+        const healIndex=monsters.indexOf(heal);
+        const flagIndex=monsters.indexOf(flag);
+        boss.hp=Math.floor(boss.maxHP*.5);
+        bossOwner.processRound();
+        const reinforcements=currentBattleMonsters.filter(index=>monsters[index]?.unitKind==='boss-reinforcement');
+        const snapshot=slotOwner.getActiveEnemySnapshot();
+        const slotOf=index=>slotOwner.getEnemySlotForMonster(snapshot,index);
+        const allTargets=getSkillTargets(bossIndex,'all').slice().sort((a,b)=>a-b);
+        const singleBoss=getSkillTargets(bossIndex,'tri');
+        const singleObject=getSkillTargets(healIndex,'row');
+        bossOwner.applyShield(3000);
+        const hpBefore=boss.hp;
+        boss.hp=hpBefore-5000;
+        const settlement=bossOwner.consumeDamageSettlement(bossIndex);
+        selectBattleTarget(healIndex);
+        showMonsterHit(healIndex,100,'hp');
+        showMonsterHit(bossIndex,100,'heal');
+        const healCard=document.getElementById('battleMonster'+healIndex);
+        const bossCard=document.getElementById('battleMonster'+bossIndex);
+        const footprint=document.querySelector('.v-fixed-boss-footprint');
+        const rect=node=>{const value=node?.getBoundingClientRect();return value?{left:value.left,top:value.top,right:value.right,bottom:value.bottom,width:value.width,height:value.height}:null;};
+        const healReticle=getComputedStyle(healCard,'::before');
+        const director=window.v142SkillAnimationDirector;
+        const config=Object.assign({},window.v142GetSkillAnimationConfig('stormCircle'),{duration:1100,resolveDuration:1100});
+        const gate=director.play(config,{
+            side:'player',actorIndex:0,targetSide:'monster',targetId:bossIndex,targetIds:[bossIndex],
+            targetContract:{version:'battle-target-contract-v1',targetSide:'monster',targetId:bossIndex,targetIds:[bossIndex]},
+            key:'boss-target-entity-live-'+Date.now()
+        });
+        window.__bossTargetEntityQaGate=gate;
+        const stage=document.getElementById('v143-skill-stage');
+        const sprite=stage?.querySelector('.v143-vfx-sprite');
+        return {
+            bossIndex,healIndex,flagIndex,
+            targetRules:{singleBoss,singleObject,allTargets},
+            slots:{boss:slotOf(bossIndex),reinforcements:reinforcements.map(slotOf),objects:[slotOf(healIndex),slotOf(flagIndex)]},
+            units:currentBattleMonsters.map(index=>({index,kind:monsters[index]?.unitKind||null,canAct:monsters[index]?.canAct!==false,noRewards:!!monsters[index]?.noRewards,cardless:document.getElementById('battleMonster'+index)?.classList.contains('v174-cardless-unit')||false})),
+            settlement,
+            footprint:rect(footprint),bossCard:rect(bossCard),bossCount:document.querySelectorAll('.v-fixed-boss-footprint > .gameplay-boss-card').length,
+            healFeedback:{className:healCard?.className||'',reticleBorder:healReticle.borderTopWidth,reticleAnimation:healReticle.animationName},
+            bossFeedback:{className:bossCard?.className||''},
+            vfx:{targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),placement:sprite?.dataset.placement||null,emitted:sprite?.dataset.emittedVisual||null},
+            livingCount:currentBattleMonsters.filter(index=>monsters[index]?.alive).length
+        };
+    })()`);
+    evidence.checks.bossMode=bossMode;
+    assert.equal(bossMode.bossCount,1,"The central six-Slot footprint must contain one Boss DOM target");
+    assert.deepEqual(bossMode.targetRules.singleBoss,[bossMode.bossIndex],"Boss-mode tri must settle only the selected Boss");
+    assert.deepEqual(bossMode.targetRules.singleObject,[bossMode.healIndex],"Boss-mode row must settle only the selected object");
+    assert.equal(bossMode.targetRules.allTargets.length,bossMode.livingCount,"Boss-mode all must settle every living enemy entity once");
+    assert.deepEqual(bossMode.slots.reinforcements,["ENEMY_B1","ENEMY_B5"],"Boss reinforcements must use B1/B5");
+    assert.deepEqual(bossMode.slots.objects,["ENEMY_F1","ENEMY_F5"],"Boss objects must use F1/F5");
+    assert.ok(bossMode.units.filter(unit=>unit.kind==='boss-object').every(unit=>unit.canAct===false&&unit.noRewards&&unit.cardless),"Boss objects must be non-acting, rewardless and immediately cardless");
+    assert.ok(bossMode.units.every(unit=>unit.cardless),"Every dynamic Boss-side entity must be cardless immediately");
+    assert.deepEqual(bossMode.settlement,{requested:5000,reduced:0,shieldAbsorbed:3000,hpDamage:2000},"Boss Shield must absorb before HP and preserve overflow");
+    assert.equal(/(?:^|\\s)(?:red-hit|hit)(?:\\s|$)/.test(bossMode.healFeedback.className),false,"Damage must not add a root red-hit card state");
+    assert.equal(/(?:^|\\s)(?:red-hit|hit)(?:\\s|$)/.test(bossMode.bossFeedback.className),false,"Heal must not add a red damage state");
+    assert.equal(bossMode.healFeedback.reticleBorder,"3px","Destructible Boss objects must expose the formal target reticle");
+    assert.match(bossMode.healFeedback.reticleAnimation,/v174TargetReticlePulse/);
+    assert.ok(Math.abs(bossMode.footprint.left-bossMode.bossCard.left)<=1&&Math.abs(bossMode.footprint.right-bossMode.bossCard.right)<=1&&Math.abs(bossMode.footprint.top-bossMode.bossCard.top)<=1&&Math.abs(bossMode.footprint.bottom-bossMode.bossCard.bottom)<=1,"One Boss hit area must fill the central six-Slot visual footprint");
+    assert.equal(bossMode.vfx.targetIndexes.length,1,"Boss tri VFX damage identity must remain one selected entity");
+    assert.equal(bossMode.vfx.geometrySlots.length,3,"Boss tri VFX must retain its authored three-Slot visual width");
+    assert.equal(bossMode.vfx.placement,"group");
+    assert.equal(bossMode.vfx.emitted,"true");
+    await sleep(1350);
+    const bossGate=await client.eval(`(()=>{const gate=window.__bossTargetEntityQaGate;return {done:!!gate?.done,completionCount:gate?.completionCount||0,stageExists:!!document.getElementById('v143-skill-stage')};})()`);
+    evidence.checks.bossModeVfxCompletion=bossGate;
+    assert.equal(bossGate.done,true,"Boss-mode VFX gate must complete");
+    assert.equal(bossGate.completionCount,1,"Boss-mode VFX gate must complete exactly once");
+    assert.equal(bossGate.stageExists,false,"Boss-mode VFX stage must clean up");
+
+    const bossScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
+    if(bossScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"boss-target-entity-live-412x915.png"),Buffer.from(bossScreenshot.data,"base64")); }
 
     evidence.status="PASS";
     evidence.finishedAt=new Date().toISOString();

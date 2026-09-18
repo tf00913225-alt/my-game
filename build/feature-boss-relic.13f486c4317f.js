@@ -4,7 +4,7 @@
    Gameplay Center / BOSS / Four-Symbol Tower Runtime
    - One single-player owner for special-mode navigation and progression.
    - BOSS and Tower battles reuse the existing v132 dungeon battle launcher.
-   - Mechanism cards are real attackable sidecar targets, never monsters.
+   - Boss objects are ordinary target entities; Shield belongs to the Boss.
 ===================================================== */
 (function installGameplayBossTowerSystem(){
     "use strict";
@@ -44,36 +44,37 @@
     });
     const BOSS_BALANCE=Object.freeze({
         twoMemberLevelCap:59,
-        mechanismBaseHpPerMember:180,
-        mechanismLevelHpPerMember:28,
+        objectBaseHpPerMember:180,
+        objectLevelHpPerMember:28,
         reinforcementCount:2
     });
 
-    const MECHANISM_DEFINITIONS=Object.freeze({
-        shield:Object.freeze({type:"shield",kind:"護盾",name:"金剛護體",hpRatio:.24,priority:100,effect:"存在期間 BOSS 無法被指定或受到新的直接傷害／異常。"}),
-        charge:Object.freeze({type:"charge",kind:"蓄力",name:"滅魂陣",hpRatio:.20,priority:90,countdown:2,effect:"倒數歸零時發動有預告的大型攻擊；破壞可取消。"}),
-        heal:Object.freeze({type:"heal",kind:"圖騰",name:"血祭圖騰",hpRatio:.18,priority:80,healRatio:.04,effect:"存在期間，每回合恢復 BOSS 4% 最大生命。"}),
-        amplify:Object.freeze({type:"amplify",kind:"法陣",name:"煞氣法陣",hpRatio:.18,priority:70,damageMultiplier:1.25,effect:"存在期間，BOSS 造成傷害提高 25%。"}),
-        seal:Object.freeze({type:"seal",kind:"封鎖",name:"鎖脈禁制",hpRatio:.16,priority:60,healingMultiplier:.6,effect:"存在期間，我方治療與 SP 回復效果降低 40%。"})
+    const BOSS_OBJECT_DEFINITIONS=Object.freeze({
+        shield:Object.freeze({type:"shield",kind:"護盾",name:"金剛護體",shieldRatio:.24,effect:"傷害先由 BOSS 護盾吸收，溢出才扣生命。"}),
+        charge:Object.freeze({type:"charge",kind:"法器",name:"滅魂陣",hpRatio:.20,countdown:2,effect:"倒數歸零時發動大型攻擊；破壞即可取消。"}),
+        heal:Object.freeze({type:"heal",kind:"圖騰",name:"血祭圖騰",hpRatio:.18,healRatio:.04,effect:"存活期間，每回合恢復 BOSS 4% 最大生命。"}),
+        amplify:Object.freeze({type:"amplify",kind:"戰旗",name:"煞氣戰旗",hpRatio:.18,damageMultiplier:1.25,effect:"存活期間，BOSS 造成傷害提高 25%。"}),
+        defense:Object.freeze({type:"defense",kind:"圖騰",name:"玄甲圖騰",hpRatio:.18,effect:"存活期間，BOSS 受到的傷害降低 25%。"}),
+        seal:Object.freeze({type:"seal",kind:"法器",name:"鎖脈法器",hpRatio:.16,healingMultiplier:.6,effect:"存活期間，我方治療與 SP 回復降低 40%。"})
     });
 
     const PERSONAL_BOSSES=Object.freeze([
-        Object.freeze({id:"personal-20",name:"赤焰君",level:20,element:"fire",phases:1,traits:Object.freeze(["護盾","燃燒"]),mechanisms:Object.freeze([{round:2,type:"shield"}]),firstReward:"首通金幣 1,200・藍階礦石 ×2",repeatReward:"金幣 260・白階礦石",firstGold:1200,repeatGold:260,ore:"oreLow",firstOre:2}),
-        Object.freeze({id:"personal-30",name:"獄火侯",level:30,element:"fire",phases:1,traits:Object.freeze(["蓄力","燃燒","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"charge"},{round:6,type:"charge"}]),summon:Object.freeze({hpBelow:.5}),firstReward:"首通金幣 1,800・藍階礦石 ×2",repeatReward:"金幣 380・藍階礦石",firstGold:1800,repeatGold:380,ore:"oreMid",firstOre:2}),
-        Object.freeze({id:"personal-40",name:"凍海君",level:40,element:"water",phases:2,traits:Object.freeze(["回復","凍傷"]),mechanisms:Object.freeze([{round:2,type:"heal"},{hpBelow:.5,type:"charge"}]),firstReward:"首通金幣 2,600・紫階礦石 ×2",repeatReward:"金幣 520・紫階礦石",firstGold:2600,repeatGold:520,ore:"oreHigh",firstOre:2}),
-        Object.freeze({id:"personal-50",name:"霜淵侯",level:50,element:"water",phases:2,traits:Object.freeze(["護盾","回復","凍傷","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{hpBelow:.45,type:"heal"}]),summon:Object.freeze({round:4}),firstReward:"首通金幣 3,400・紫階礦石 ×3",repeatReward:"金幣 660・紫階礦石",firstGold:3400,repeatGold:660,ore:"oreHigh",firstOre:3}),
-        Object.freeze({id:"personal-60",name:"雪獄尊",level:60,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","凍傷"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 4,300・橙階礦石 ×2",repeatReward:"金幣 820・紫階礦石",firstGold:4300,repeatGold:820,ore:"orePerfect",firstOre:2}),
-        Object.freeze({id:"personal-70",name:"寒劫尊",level:70,element:"water",phases:3,traits:Object.freeze(["回復","增幅","控制","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"},{hpBelow:.35,type:"charge"}]),summon:Object.freeze({hpBelow:.55}),firstReward:"首通金幣 5,200・橙階礦石 ×2",repeatReward:"金幣 980・橙階礦石",firstGold:5200,repeatGold:980,ore:"orePerfect",firstOre:2}),
-        Object.freeze({id:"personal-80",name:"凍界皇",level:80,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","回復"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.4,type:"heal"}]),firstReward:"首通回天寶輪・金幣 6,200",repeatReward:"金幣 1,160・橙階礦石",firstGold:6200,repeatGold:1160,ore:"orePerfect",firstOre:1,relic:"relic_returning_wheel"}),
-        Object.freeze({id:"personal-90",name:"霜天皇",level:90,element:"water",phases:4,traits:Object.freeze(["封鎖","護盾","蓄力","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"seal"},{round:4,type:"shield"},{round:7,type:"charge"},{hpBelow:.3,type:"amplify"}]),summon:Object.freeze({round:4}),firstReward:"首通金幣 7,500・橙階礦石 ×3",repeatReward:"金幣 1,360・橙階礦石",firstGold:7500,repeatGold:1360,ore:"orePerfect",firstOre:3}),
-        Object.freeze({id:"personal-100",name:"寒獄帝",level:100,element:"water",phases:4,traits:Object.freeze(["護盾","蓄力","回復","封鎖","精英援軍"]),mechanisms:Object.freeze([{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"seal"}]),summon:Object.freeze({hpBelow:.6}),firstReward:"首通金幣 10,000・橙階礦石 ×4",repeatReward:"金幣 1,600・橙階礦石",firstGold:10000,repeatGold:1600,ore:"orePerfect",firstOre:4})
+        Object.freeze({id:"personal-20",name:"赤焰君",level:20,element:"fire",phases:1,traits:Object.freeze(["護盾","燃燒"]),objects:Object.freeze([{round:2,type:"shield"}]),firstReward:"首通金幣 1,200・藍階礦石 ×2",repeatReward:"金幣 260・白階礦石",firstGold:1200,repeatGold:260,ore:"oreLow",firstOre:2}),
+        Object.freeze({id:"personal-30",name:"獄火侯",level:30,element:"fire",phases:1,traits:Object.freeze(["蓄力","燃燒","精英援軍"]),objects:Object.freeze([{round:2,type:"charge"},{round:6,type:"charge"}]),summon:Object.freeze({hpBelow:.5}),firstReward:"首通金幣 1,800・藍階礦石 ×2",repeatReward:"金幣 380・藍階礦石",firstGold:1800,repeatGold:380,ore:"oreMid",firstOre:2}),
+        Object.freeze({id:"personal-40",name:"凍海君",level:40,element:"water",phases:2,traits:Object.freeze(["回復","凍傷"]),objects:Object.freeze([{round:2,type:"heal"},{hpBelow:.5,type:"charge"}]),firstReward:"首通金幣 2,600・紫階礦石 ×2",repeatReward:"金幣 520・紫階礦石",firstGold:2600,repeatGold:520,ore:"oreHigh",firstOre:2}),
+        Object.freeze({id:"personal-50",name:"霜淵侯",level:50,element:"water",phases:2,traits:Object.freeze(["護盾","回復","凍傷","精英援軍"]),objects:Object.freeze([{round:2,type:"shield"},{hpBelow:.45,type:"heal"}]),summon:Object.freeze({round:4}),firstReward:"首通金幣 3,400・紫階礦石 ×3",repeatReward:"金幣 660・紫階礦石",firstGold:3400,repeatGold:660,ore:"oreHigh",firstOre:3}),
+        Object.freeze({id:"personal-60",name:"雪獄尊",level:60,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","凍傷"]),objects:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.35,type:"charge"}]),firstReward:"首通金幣 4,300・橙階礦石 ×2",repeatReward:"金幣 820・紫階礦石",firstGold:4300,repeatGold:820,ore:"orePerfect",firstOre:2}),
+        Object.freeze({id:"personal-70",name:"寒劫尊",level:70,element:"water",phases:3,traits:Object.freeze(["回復","增幅","控制","精英援軍"]),objects:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"},{hpBelow:.35,type:"charge"}]),summon:Object.freeze({hpBelow:.55}),firstReward:"首通金幣 5,200・橙階礦石 ×2",repeatReward:"金幣 980・橙階礦石",firstGold:5200,repeatGold:980,ore:"orePerfect",firstOre:2}),
+        Object.freeze({id:"personal-80",name:"凍界皇",level:80,element:"water",phases:3,traits:Object.freeze(["護盾","蓄力","回復"]),objects:Object.freeze([{round:2,type:"shield"},{round:5,type:"charge"},{hpBelow:.4,type:"heal"}]),firstReward:"首通回天寶輪・金幣 6,200",repeatReward:"金幣 1,160・橙階礦石",firstGold:6200,repeatGold:1160,ore:"orePerfect",firstOre:1,relic:"relic_returning_wheel"}),
+        Object.freeze({id:"personal-90",name:"霜天皇",level:90,element:"water",phases:4,traits:Object.freeze(["封鎖","護盾","蓄力","精英援軍"]),objects:Object.freeze([{round:2,type:"seal"},{round:4,type:"shield"},{round:7,type:"charge"},{hpBelow:.3,type:"amplify"}]),summon:Object.freeze({round:4}),firstReward:"首通金幣 7,500・橙階礦石 ×3",repeatReward:"金幣 1,360・橙階礦石",firstGold:7500,repeatGold:1360,ore:"orePerfect",firstOre:3}),
+        Object.freeze({id:"personal-100",name:"寒獄帝",level:100,element:"water",phases:4,traits:Object.freeze(["護盾","蓄力","回復","封鎖","精英援軍"]),objects:Object.freeze([{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"seal"}]),summon:Object.freeze({hpBelow:.6}),firstReward:"首通金幣 10,000・橙階礦石 ×4",repeatReward:"金幣 1,600・橙階礦石",firstGold:10000,repeatGold:1600,ore:"orePerfect",firstOre:4})
     ]);
 
     const WORLD_STAGE_PROFILES=Object.freeze([
-        Object.freeze({number:1,label:"第一階段",hpFactor:.78,attackFactor:.92,mechanisms:Object.freeze([{round:3,type:"charge"}]),summon:null,summary:"試探攻勢與一次蓄力。"}),
-        Object.freeze({number:2,label:"第二階段",hpFactor:.88,attackFactor:1,mechanisms:Object.freeze([{round:2,type:"shield"}]),summon:null,summary:"以護盾改變攻擊優先順序。"}),
-        Object.freeze({number:3,label:"第三階段",hpFactor:.96,attackFactor:1.06,mechanisms:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"}]),summon:Object.freeze({hpBelow:.55}),summary:"回復與法陣形成持久壓力，生命低於 55% 時召喚兩名同元素精英援軍。"}),
-        Object.freeze({number:4,label:"最終階段",hpFactor:1,attackFactor:1.12,mechanisms:Object.freeze([{round:2,type:"charge"},{round:4,type:"amplify"},{round:7,type:"shield"}]),summon:Object.freeze({round:4}),summary:"狂暴、蓄力與護體交替，第 4 回合召喚兩名同元素精英援軍。"})
+        Object.freeze({number:1,label:"第一階段",hpFactor:.78,attackFactor:.92,objects:Object.freeze([{round:3,type:"charge"}]),summon:null,summary:"試探攻勢與一次蓄力。"}),
+        Object.freeze({number:2,label:"第二階段",hpFactor:.88,attackFactor:1,objects:Object.freeze([{round:2,type:"shield"}]),summon:null,summary:"以護盾改變攻擊優先順序。"}),
+        Object.freeze({number:3,label:"第三階段",hpFactor:.96,attackFactor:1.06,objects:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"}]),summon:Object.freeze({hpBelow:.55}),summary:"回復與法陣形成持久壓力，生命低於 55% 時召喚兩名同元素精英援軍。"}),
+        Object.freeze({number:4,label:"最終階段",hpFactor:1,attackFactor:1.12,objects:Object.freeze([{round:2,type:"charge"},{round:4,type:"amplify"},{round:7,type:"shield"}]),summon:Object.freeze({round:4}),summary:"狂暴、蓄力與護體交替，第 4 回合召喚兩名同元素精英援軍。"})
     ]);
 
     const WORLD_BOSSES=Object.freeze([
@@ -194,8 +195,6 @@
     let towerOverviewOpen=false;
     let activeBattleContext=null;
     let battleStarting=false;
-    let mechanismSerial=0;
-    let actionShieldSnapshot=false;
     let abyssSession=false;
 
     function ensureCurrentTowerWeek(now){
@@ -277,7 +276,7 @@
     function bossDetailMarkup(type,definition){
         const progress=type==="world"?state.world[definition.id]:state.personal[definition.id];
         const stage=type==="world"?(progress.firstClear?4:Math.min(4,progress.completedStages+1)):1;
-        const mechanismText=type==="world"?WORLD_STAGE_PROFILES[stage-1].summary:definition.traits.join("・");
+        const objectText=type==="world"?WORLD_STAGE_PROFILES[stage-1].summary:definition.traits.join("・");
         const balance=bossBalanceProfile(definition.level,type==="world"?"world":"personal",stage);
         const summonPlan=type==="world"?WORLD_STAGE_PROFILES[stage-1].summon:(definition.summon||null);
         const supportText=summonPlan?"戰中同元素精英援軍 ×"+BOSS_BALANCE.reinforcementCount:"本階段無精英援軍";
@@ -285,7 +284,7 @@
             '<section class="boss-hero"><small>'+(type==="world"?'世界觀災厄級・永久單人攻略':'個人挑戰・固定等級')+'</small><h3>'+escapeHtml(definition.name)+'</h3><p>Lv.'+definition.level+'・'+escapeHtml(elementLabel(definition.element))+'元素</p><div class="boss-trait-tags">'+definition.traits.map(item=>'<span>'+escapeHtml(item)+'</span>').join("")+'</div></section>'+
             (type==="world"?worldStageTrack(progress):'')+
             '<button type="button" class="gameplay-primary-action" onclick="vGameplayStartBoss(\''+type+'\',\''+definition.id+'\')">'+(type==="world"?'挑戰'+WORLD_STAGE_PROFILES[stage-1].label:'開始挑戰')+'</button>'+
-            '<div class="boss-detail-grid"><section><h4>建議陣容</h4><p>同級角色 ×'+balance.expectedPartySize+'・'+escapeHtml(supportText)+'</p></section><section><h4>戰鬥特性</h4><p>'+escapeHtml(type==="world"?'四個永久攻略階段；失敗只重打目前階段。':definition.phases+' 個戰鬥階段；可不限次數挑戰，固定等級保留角色成長感。')+'</p></section><section><h4>機制簡介</h4><p>'+escapeHtml(mechanismText)+'</p></section><section><h4>首次擊敗獎勵</h4><p>'+escapeHtml(definition.firstReward)+'・'+(progress.firstClear?'已領取':'尚未領取')+'</p></section><section><h4>重複掉落</h4><p>'+escapeHtml(definition.repeatReward)+'</p></section></div>'+
+            '<div class="boss-detail-grid"><section><h4>建議陣容</h4><p>同級角色 ×'+balance.expectedPartySize+'・'+escapeHtml(supportText)+'</p></section><section><h4>戰鬥特性</h4><p>'+escapeHtml(type==="world"?'四個永久攻略階段；失敗只重打目前階段。':definition.phases+' 個戰鬥階段；可不限次數挑戰，固定等級保留角色成長感。')+'</p></section><section><h4>機制簡介</h4><p>'+escapeHtml(objectText)+'</p></section><section><h4>首次擊敗獎勵</h4><p>'+escapeHtml(definition.firstReward)+'・'+(progress.firstClear?'已領取':'尚未領取')+'</p></section><section><h4>重複掉落</h4><p>'+escapeHtml(definition.repeatReward)+'</p></section></div>'+
             '</div>';
     }
     function renderBossPage(){
@@ -416,7 +415,7 @@
         return map[element]||"四象尊";
     }
     function towerMonsterLevel(floor){ return clamp(Math.round(29+floor*.71),30,100); }
-    function towerMechanismPlan(floor){
+    function towerObjectPlan(floor){
         if(floor===100){ return [{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"amplify"}]; }
         if(floor>=70&&floor%10===0){ return [{round:2,type:"heal"},{round:5,type:"amplify"}]; }
         if(floor>=50&&floor%10===0){ return [{round:2,type:"shield"},{round:5,type:"amplify"}]; }
@@ -453,253 +452,224 @@
     }
 
     function activeBoss(){
-        return activeBattleContext&&activeBattleContext.boss&&activeBattleContext.boss.alive!==false?activeBattleContext.boss:null;
+        return activeBattleContext&&activeBattleContext.boss&&activeBattleContext.boss.alive!==false
+            ?activeBattleContext.boss:null;
     }
-    /* Gameplay mechanisms own the enemy-front plane. Keep the Boss trio in the
-       reserved back row so the independent MECH lane never covers a unit. */
-    const BOSS_REINFORCEMENT_SLOTS=Object.freeze(["ENEMY_B2","ENEMY_B4"]);
-    const MECHANISM_SLOT_PRIORITY=Object.freeze(["MECH_C","MECH_L","MECH_R"]);
+
+    const BOSS_REINFORCEMENT_SLOTS=Object.freeze(["ENEMY_B1","ENEMY_B5"]);
+    const BOSS_OBJECT_SLOTS=Object.freeze(["ENEMY_F1","ENEMY_F5"]);
+    const BOSS_FOOTPRINT_SLOTS=Object.freeze([
+        "ENEMY_B2","ENEMY_B3","ENEMY_B4",
+        "ENEMY_F2","ENEMY_F3","ENEMY_F4"
+    ]);
+
     function battlefieldSlotOwner(){ return window.FourSymbolsBattlefieldSlots||null; }
-    function seedBossBattlefieldSnapshot(){
-        const context=activeBattleContext,boss=activeBoss(),owner=battlefieldSlotOwner();
-        if(!context||!boss||!owner||typeof monsters==="undefined"||!Array.isArray(monsters)){ return null; }
-        const bossIndex=monsters.indexOf(boss);
-        if(bossIndex<0){ return null; }
-        const snapshot=owner.createEnemyFormationSnapshot([bossIndex],{originalFormationType:6});
-        owner.setActiveEnemySnapshot(snapshot);
-        context.bossIndex=bossIndex;
-        context.enemySnapshot=snapshot;
-        const geometry=window.FourSymbolsBattlefieldRenderGeometry;
-        if(geometry&&typeof geometry.reconcile==="function"){ geometry.reconcile(); }
-        else if(typeof renderBattle==="function"){ renderBattle(); }
-        return snapshot;
+    function bossIndex(){
+        const context=activeBattleContext;
+        if(!context||typeof monsters==="undefined"){ return null; }
+        const index=Number.isInteger(context.bossIndex)?context.bossIndex:monsters.indexOf(context.boss);
+        return index>=0?index:null;
     }
+    function isBossIndex(index){ return Number.isInteger(index)&&index===bossIndex(); }
+    function monsterAt(index){
+        return typeof monsters!=="undefined"&&Number.isInteger(index)?monsters[index]||null:null;
+    }
+    function isBossObject(monster){ return !!monster&&monster.unitKind==="boss-object"; }
+    function isBossObjectIndex(index){ return isBossObject(monsterAt(index)); }
+
     function bossBattlefieldSnapshot(){
         const context=activeBattleContext,owner=battlefieldSlotOwner();
         if(!context||!owner){ return null; }
         return context.enemySnapshot||owner.getActiveEnemySnapshot()||null;
     }
-    function assignBossReinforcementSlot(monsterIndex,supportIndex){
+    function assignEnemySlot(monsterIndex,slot){
         const owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
-        const slot=BOSS_REINFORCEMENT_SLOTS[supportIndex]||null;
         if(!owner||!snapshot||!slot){ return null; }
         return owner.assignMonsterToEnemySlot(snapshot,monsterIndex,slot)?slot:null;
+    }
+    function seedBossBattlefieldSnapshot(){
+        const context=activeBattleContext,boss=activeBoss(),owner=battlefieldSlotOwner();
+        if(!context||!boss||!owner||typeof monsters==="undefined"||!Array.isArray(monsters)){ return null; }
+        const index=monsters.indexOf(boss);
+        if(index<0){ return null; }
+        const snapshot=owner.createEnemyFormationSnapshot([index],{originalFormationType:6});
+        owner.setActiveEnemySnapshot(snapshot);
+        context.bossIndex=index;
+        context.enemySnapshot=snapshot;
+        boss.vGameplayBattlefieldSlot=owner.getEnemySlotForMonster(snapshot,index);
+        installBossHealthOwner(boss);
+        const geometry=window.FourSymbolsBattlefieldRenderGeometry;
+        if(geometry&&typeof geometry.reconcile==="function"){ geometry.reconcile(); }
+        else if(typeof renderBattle==="function"){ renderBattle(); }
+        return snapshot;
     }
     function releaseBossBattlefieldSnapshot(){
         const context=activeBattleContext,owner=battlefieldSlotOwner();
         if(!context||!owner){ return; }
-        if(context.enemySnapshot&&owner.getActiveEnemySnapshot()===context.enemySnapshot){ owner.clearActiveEnemySnapshot(); }
+        if(context.enemySnapshot&&owner.getActiveEnemySnapshot()===context.enemySnapshot){
+            owner.clearActiveEnemySnapshot();
+        }
         context.enemySnapshot=null;
     }
-    function mechanismSlotOrder(){
-        const owner=battlefieldSlotOwner();
-        const available=owner&&Array.isArray(owner.mechanismSlots)?owner.mechanismSlots:["MECH_L","MECH_C","MECH_R"];
-        return MECHANISM_SLOT_PRIORITY.filter(slot=>available.includes(slot));
+
+    function aliveBossObjects(type){
+        if(!activeBattleContext||typeof monsters==="undefined"){ return []; }
+        return (activeBattleContext.objectIndexes||[])
+            .map(index=>({index:index,monster:monsters[index]}))
+            .filter(entry=>entry.monster&&entry.monster.alive&&entry.monster.hp>0&&(!type||entry.monster.objectType===type));
     }
-    function nextMechanismBattlefieldSlot(){
-        const context=activeBattleContext;if(!context){ return null; }
-        const used=new Set((context.mechanisms||[]).filter(card=>card&&card.hp>0&&!card.destroyed&&card.battlefieldSlot).map(card=>card.battlefieldSlot));
-        return mechanismSlotOrder().find(slot=>!used.has(slot))||null;
+    function bossHasObject(type){ return aliveBossObjects(type).length>0; }
+    function nextBossObjectSlot(){
+        const used=new Set(aliveBossObjects().map(entry=>entry.monster.vGameplayBattlefieldSlot));
+        return BOSS_OBJECT_SLOTS.find(slot=>!used.has(slot))||null;
     }
-    function aliveMechanisms(){
-        return activeBattleContext?(activeBattleContext.mechanisms||[]).filter(card=>card&&card.hp>0&&!card.destroyed):[];
+    function bossShield(){
+        const boss=activeBoss();
+        const shield=boss&&boss.vBossShield;
+        return shield&&shield.current>0?shield:null;
     }
-    function blockingShield(){ return aliveMechanisms().find(card=>card.type==="shield")||null; }
-    function canDirectlyAffectMonster(monster){
-        return !!monster&&!(actionShieldSnapshot||blockingShield());
-    }
-    function mechanismEffectText(card){
-        if(card.type==="charge"){ return "倒數 "+card.countdown+" 回合・歸零發動大型技能"; }
-        return card.effect;
-    }
-    function mechanismInfoMarkup(card){
-        return '<article class="boss-mechanism-info-card" data-type="'+escapeHtml(card.type)+'">'+
-            '<b class="boss-mechanism-info-name">'+escapeHtml(card.name)+'</b>'+
-            '<span class="boss-mechanism-info-kind">'+escapeHtml(card.kind)+'</span>'+
-            '<span class="boss-mechanism-info-hp">HP '+Math.max(0,Math.ceil(card.hp))+' / '+card.maxHP+'</span>'+
-            '<p class="boss-mechanism-info-effect">'+escapeHtml(mechanismEffectText(card))+'</p></article>';
-    }
-    function ensureMechanismInfoUI(){
-        const page=document.getElementById("battlePage");
-        if(!page){ return null; }
-        let host=document.getElementById("bossMechanismInfoHost");
-        if(!host){
-            host=document.createElement("div");
-            host.id="bossMechanismInfoHost";
-            host.className="boss-mechanism-info-host";
-            host.innerHTML='<button type="button" class="boss-mechanism-info-alert" aria-label="查看 BOSS 機制說明" aria-expanded="false">!</button>'+
-                '<section class="boss-mechanism-info-panel" aria-label="BOSS 機制說明">'+
-                '<button type="button" class="boss-mechanism-info-back">‹ 返回</button>'+
-                '<div class="boss-mechanism-info-body"></div></section>';
-            page.appendChild(host);
-            host.querySelector(".boss-mechanism-info-alert").onclick=openMechanismInfoPanel;
-            host.querySelector(".boss-mechanism-info-back").onclick=closeMechanismInfoPanel;
-        }
-        return {
-            host:host,
-            alert:host.querySelector(".boss-mechanism-info-alert"),
-            panel:host.querySelector(".boss-mechanism-info-panel"),
-            body:host.querySelector(".boss-mechanism-info-body")
-        };
-    }
-    function openMechanismInfoPanel(){
-        const ui=ensureMechanismInfoUI(),alive=aliveMechanisms();
-        if(!ui||!alive.length){ return false; }
-        ui.host.classList.add("open");
-        ui.alert.setAttribute("aria-expanded","true");
-        ui.body.innerHTML=alive.map(mechanismInfoMarkup).join("");
-        return true;
-    }
-    function closeMechanismInfoPanel(){
-        const host=document.getElementById("bossMechanismInfoHost");
-        if(!host){ return false; }
-        host.classList.remove("open");
-        const alert=host.querySelector(".boss-mechanism-info-alert");
-        if(alert){ alert.setAttribute("aria-expanded","false"); }
-        return true;
-    }
-    function syncMechanismInfoUI(alive){
-        const ui=ensureMechanismInfoUI();
-        if(!ui){ return; }
-        const hasMechanism=alive.length>0;
-        ui.host.classList.toggle("has-mechanism",hasMechanism);
-        if(!hasMechanism){
-            ui.host.classList.remove("open");
-            ui.alert.setAttribute("aria-expanded","false");
-            ui.body.innerHTML="";
-            return;
-        }
-        if(ui.host.classList.contains("open")){ ui.body.innerHTML=alive.map(mechanismInfoMarkup).join(""); }
-    }
-    function cleanupMechanismPresentation(){
-        releaseBossBattlefieldSnapshot();
-        const area=document.getElementById("battleMonsterArea");
-        if(area){
-            area.classList.remove("gameplay-boss-active");
-            area.querySelectorAll(".battle-monster.gameplay-boss-card").forEach(node=>node.classList.remove("gameplay-boss-card","gameplay-boss-protected"));
-            const slot=area.querySelector("#bossMechanismSlot");
-            if(slot){ slot.remove(); }
-        }
-        const host=document.getElementById("bossMechanismInfoHost");
-        if(host){ host.remove(); }
-    }
-    function renderMechanisms(){
-        const area=document.getElementById("battleMonsterArea");
-        if(!area){ return; }
-        let slot=document.getElementById("bossMechanismSlot");
-        if(!slot){ slot=document.createElement("div");slot.id="bossMechanismSlot";slot.className="boss-mechanism-slot";slot.setAttribute("aria-label","BOSS 機制卡槽");area.appendChild(slot); }
-        /* This is an independent target class, not an enemy unit Slot. It still
-           occupies the enemy-front visual plane so it remains nearest to allies. */
-        slot.classList.add("v-fixed-mechanism-zone");
-        slot.dataset.geometryOwner="fixed-slot";
-        slot.dataset.slotRow="front";
-        const owner=battlefieldSlotOwner();
-        const mechanismSlots=owner&&Array.isArray(owner.mechanismSlots)?owner.mechanismSlots:["MECH_L","MECH_C","MECH_R"];
-        mechanismSlots.forEach(slotName=>{
-            let position=slot.querySelector('.boss-mechanism-position[data-slot="'+slotName+'"]');
-            if(!position){
-                position=document.createElement("div");
-                position.className="boss-mechanism-position";
-                position.dataset.slot=slotName;
-                slot.appendChild(position);
-            }
-        });
-        const alive=aliveMechanisms();
-        slot.classList.toggle("active",alive.length>0);
-        Array.from(slot.querySelectorAll(".boss-mechanism-card")).forEach(node=>{
-            if(!alive.some(card=>card.id===node.dataset.id)&&!node.classList.contains("destroying")){ node.remove(); }
-        });
-        alive.forEach(card=>{
-            let node=slot.querySelector('[data-id="'+card.id+'"]');
-            if(!node){
-                node=document.createElement("button");node.type="button";node.className="boss-mechanism-card";node.dataset.id=card.id;node.dataset.type=card.type;
-                node.onclick=function(){ selectMechanism(card.id); };
-            }
-            const position=card.battlefieldSlot?slot.querySelector('.boss-mechanism-position[data-slot="'+card.battlefieldSlot+'"]'):null;
-            if(position&&node.parentNode!==position){ position.appendChild(node); }
-            else if(!node.parentNode){ slot.appendChild(node); }
-            const shield=blockingShield();
-            node.classList.toggle("targetable",!!(typeof actionReady!=="undefined"&&actionReady&&typeof pendingAction!=="undefined"&&pendingAction&&(!shield||card===shield)));
-            node.setAttribute("aria-label",card.name+"，"+card.kind+"，HP "+Math.max(0,Math.ceil(card.hp))+" / "+card.maxHP+"，點擊可作為攻擊目標");
-            node.innerHTML='<b class="boss-mechanism-name">'+escapeHtml(card.name)+'</b><span class="boss-mechanism-kind">'+escapeHtml(card.kind)+'</span><span class="boss-mechanism-hp">HP '+Math.max(0,Math.ceil(card.hp))+' / '+card.maxHP+'</span>';
-        });
-        const boss=activeBoss(),bossIndex=boss&&typeof monsters!=="undefined"?monsters.indexOf(boss):-1;
-        const bossCard=bossIndex>=0?document.getElementById("battleMonster"+bossIndex):null;
-        area.querySelectorAll(".battle-monster.gameplay-boss-card").forEach(node=>{ if(node!==bossCard){ node.classList.remove("gameplay-boss-card","gameplay-boss-protected"); } });
-        area.classList.toggle("gameplay-boss-active",!!bossCard);
-        if(bossCard){
-            bossCard.classList.add("gameplay-boss-card");
-            bossCard.classList.toggle("gameplay-boss-protected",!!blockingShield());
-            bossCard.setAttribute("aria-disabled",blockingShield()?"true":"false");
-        }
-        syncMechanismInfoUI(alive);
-    }
-    function showMechanismToast(message){
-        const page=document.getElementById("battlePage");if(!page){ return; }
-        const previous=page.querySelector(".boss-mechanism-toast");if(previous){ previous.remove(); }
-        const toast=document.createElement("div");toast.className="boss-mechanism-toast";toast.textContent=message;page.appendChild(toast);
-        setTimeout(()=>{ if(toast.parentNode){ toast.remove(); } },950);
-    }
-    function pulseMechanism(card){
-        const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
-        if(!node){ return; }node.classList.remove("blocked-pulse");void node.offsetWidth;node.classList.add("blocked-pulse");
-    }
-    function reportProtectedBoss(){
-        const shield=blockingShield();if(!shield){ return; }showMechanismToast("護盾尚未破除");pulseMechanism(shield);
-        if(typeof addBattleLog==="function"){ addBattleLog("護盾尚未破除，必須先擊破【"+shield.name+"】。"); }
-    }
-    function spawnMechanism(type,sourceKey){
-        const definition=MECHANISM_DEFINITIONS[type],boss=activeBoss(),context=activeBattleContext;
-        if(!definition||!boss||!context){ return null; }
-        const maximum=Math.min(context.maxMechanisms||1,mechanismSlotOrder().length);
-        if(aliveMechanisms().length>=maximum){ return null; }
-        const battlefieldSlot=nextMechanismBattlefieldSlot();
-        if(!battlefieldSlot){ return null; }
-        const expected=context.expectedPartySize||expectedPartySizeForLevel(boss.level);
-        const scaledHp=Math.round(boss.maxHP*definition.hpRatio);
-        const levelFloor=Math.round((BOSS_BALANCE.mechanismBaseHpPerMember+boss.level*BOSS_BALANCE.mechanismLevelHpPerMember)*expected);
-        const card={
-            id:"mechanism-"+(++mechanismSerial),sourceKey:sourceKey||"manual-"+mechanismSerial,
-            type:definition.type,unitKind:"mechanism",rank:"mechanism",kind:definition.kind,name:definition.name,battlefieldSlot:battlefieldSlot,
-            maxHP:Math.max(1,scaledHp,levelFloor),hp:0,defense:Math.max(0,Math.round(numeric(boss.defense,0)*.4)),
-            level:boss.level,element:boss.element,effect:definition.effect,priority:definition.priority,
-            countdown:definition.countdown||null,spawnedRound:typeof turn!=="undefined"?turn:1,destroyed:false
-        };
-        card.hp=card.maxHP;context.mechanisms.push(card);
-        if(typeof addBattleLog==="function"){ addBattleLog(boss.name+"展開機制卡【"+card.name+"】！"); }
-        renderMechanisms();return card;
-    }
-    function destroyMechanism(card,reason){
-        if(!card||card.destroyed){ return; }card.hp=0;card.destroyed=true;
-        const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');if(node){ node.classList.remove("targetable","target");node.classList.add("destroying"); }
+    function applyBossShield(amount){
+        const boss=activeBoss();
+        const value=Math.max(0,Math.round(numeric(amount,0)));
+        if(!boss||!value){ return 0; }
+        const shield=boss.vBossShield||{current:0,max:0};
+        shield.current+=value;
+        shield.max=Math.max(shield.max,shield.current);
+        boss.vBossShield=shield;
         if(typeof addBattleLog==="function"){
-            addBattleLog("【"+card.name+"】已被破壞。"+(card.type==="charge"&&reason!=="resolved"?"大型技能已取消。":""));
+            addBattleLog(boss.name+"獲得【金剛護體】護盾 "+value+"。");
         }
-        setTimeout(()=>{ if(activeBattleContext){ activeBattleContext.mechanisms=activeBattleContext.mechanisms.filter(item=>item!==card);renderMechanisms(); } },290);
+        syncBossShieldHud();
+        return value;
     }
-    function damageMechanism(card,damage,sourceName,isCrit){
-        if(!card||card.destroyed||card.hp<=0){ return 0; }
-        const final=Math.max(1,Math.round(numeric(damage,1)));
-        const applyDamage=function(){
-            if(!card||card.destroyed||card.hp<=0){ return; }
-            const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');
-            if(node&&typeof showDamagePopup==="function"){
-                showDamagePopup(node,"HP-"+final,"hp",!!isCrit);
+    function installBossHealthOwner(boss){
+        if(!boss||boss.__bossHealthOwnerInstalled){ return; }
+        let health=Math.max(0,numeric(boss.hp,boss.maxHP));
+        Object.defineProperty(boss,"hp",{
+            configurable:true,
+            enumerable:true,
+            get:function(){ return health; },
+            set:function(nextValue){
+                const requested=clamp(numeric(nextValue,health),0,numeric(boss.maxHP,health));
+                if(requested>=health){
+                    health=requested;
+                    boss.vLastDamageSettlement=null;
+                    return;
+                }
+                const requestedDamage=health-requested;
+                const reduction=bossHasObject("defense")?.25:0;
+                const afterReduction=Math.max(0,Math.round(requestedDamage*(1-reduction)));
+                const shield=boss.vBossShield||{current:0,max:0};
+                const absorbed=Math.min(afterReduction,Math.max(0,numeric(shield.current,0)));
+                shield.current=Math.max(0,numeric(shield.current,0)-absorbed);
+                boss.vBossShield=shield;
+                const hpDamage=Math.max(0,afterReduction-absorbed);
+                health=Math.max(0,health-hpDamage);
+                boss.vLastDamageSettlement={
+                    requested:requestedDamage,
+                    reduced:requestedDamage-afterReduction,
+                    shieldAbsorbed:absorbed,
+                    hpDamage:hpDamage
+                };
+                syncBossShieldHud();
             }
-            card.hp=Math.max(0,card.hp-final);
-            if(typeof addBattleLog==="function"){ addBattleLog((sourceName||"攻擊")+"命中【"+card.name+"】，造成"+final+"傷害。"); }
-            if(card.hp<=0){ destroyMechanism(card,"destroyed"); }else{ renderMechanisms(); }
-        };
-        if(typeof window.v143RunAtTargetHit==="function"){
-            window.v143RunAtTargetHit("monster","mechanism:"+card.id,applyDamage,true);
-        }else{
-            applyDamage();
-        }
-        return final;
+        });
+        Object.defineProperty(boss,"__bossHealthOwnerInstalled",{value:true,configurable:true});
     }
+    function consumeBossDamageSettlement(index){
+        if(!isBossIndex(index)){ return null; }
+        const boss=activeBattleContext&&activeBattleContext.boss;
+        const settlement=boss&&boss.vLastDamageSettlement;
+        if(boss){ boss.vLastDamageSettlement=null; }
+        return settlement||null;
+    }
+    function syncBossShieldHud(){
+        if(typeof document==="undefined"){ return; }
+        const index=bossIndex();
+        const card=Number.isInteger(index)?document.getElementById("battleMonster"+index):null;
+        if(!card){ return; }
+        let bar=card.querySelector(":scope > .boss-shield-hud");
+        const shield=activeBattleContext&&activeBattleContext.boss&&activeBattleContext.boss.vBossShield;
+        const current=Math.max(0,numeric(shield&&shield.current,0));
+        const maximum=Math.max(1,numeric(shield&&shield.max,1));
+        if(!bar){
+            bar=document.createElement("div");
+            bar.className="boss-shield-hud";
+            bar.innerHTML='<span class="boss-shield-fill"></span><b class="boss-shield-value"></b>';
+            card.appendChild(bar);
+        }
+        bar.hidden=current<=0;
+        bar.querySelector(".boss-shield-fill").style.width=(current/maximum*100)+"%";
+        bar.querySelector(".boss-shield-value").textContent="護盾 "+current+" / "+maximum;
+    }
+
+    function objectDefinition(type){
+        return BOSS_OBJECT_DEFINITIONS[type]||null;
+    }
+    function buildBossObject(type,slot,sourceKey){
+        const definition=objectDefinition(type),boss=activeBoss();
+        if(!definition||!boss||type==="shield"){ return null; }
+        const expected=activeBattleContext.expectedPartySize||expectedPartySizeForLevel(boss.level);
+        const scaledHp=Math.round(boss.maxHP*definition.hpRatio);
+        const levelFloor=Math.round((BOSS_BALANCE.objectBaseHpPerMember+boss.level*BOSS_BALANCE.objectLevelHpPerMember)*expected);
+        const object=buildBaseMonster(definition.name,boss.level,boss.element,"regular");
+        Object.assign(object,{
+            alive:true,
+            hp:Math.max(1,scaledHp,levelFloor),
+            maxHP:Math.max(1,scaledHp,levelFloor),
+            sp:0,
+            maxSP:0,
+            defense:Math.max(0,Math.round(numeric(boss.defense,0)*.4)),
+            rank:"construct",
+            unitKind:"boss-object",
+            objectType:type,
+            objectKind:definition.kind,
+            objectEffect:definition.effect,
+            objectSourceKey:sourceKey,
+            canAct:false,
+            noRewards:true,
+            noKillCredit:true,
+            rewardEligible:false,
+            skillChance:0,
+            skillIds:[],
+            v141SupportSkillIds:[],
+            vGameplayBattlefieldSlot:slot,
+            vGameplayPortrait:definition.portrait||null,
+            countdown:definition.countdown||null,
+            spawnedRound:typeof turn!=="undefined"?turn:1
+        });
+        return object;
+    }
+    function spawnBossObject(type,sourceKey){
+        const definition=objectDefinition(type),boss=activeBoss(),context=activeBattleContext;
+        if(!definition||!boss||!context){ return null; }
+        if(type==="shield"){
+            const amount=Math.max(1,Math.round(boss.maxHP*definition.shieldRatio));
+            return applyBossShield(amount)?{type:"shield",amount:amount}:null;
+        }
+        if(aliveBossObjects().length>=2){ return null; }
+        const slot=nextBossObjectSlot();
+        if(!slot||typeof monsters==="undefined"||typeof currentBattleMonsters==="undefined"){ return null; }
+        const object=buildBossObject(type,slot,sourceKey);
+        if(!object){ return null; }
+        const index=monsters.length;
+        monsters.push(object);
+        currentBattleMonsters.push(index);
+        context.objectIndexes.push(index);
+        assignEnemySlot(index,slot);
+        if(typeof addBattleLog==="function"){
+            addBattleLog(boss.name+"召出【"+object.name+"】！");
+        }
+        if(typeof renderBattle==="function"){ renderBattle(); }
+        else if(typeof updateUI==="function"){ updateUI(); }
+        return object;
+    }
+
     function summonBossElites(){
         const context=activeBattleContext,boss=activeBoss();
-        if(!context||!boss||context.summonsCreated||typeof monsters==="undefined"||!Array.isArray(monsters)||typeof currentBattleMonsters==="undefined"||!Array.isArray(currentBattleMonsters)){ return false; }
+        if(!context||!boss||context.summonsCreated||typeof monsters==="undefined"||
+           !Array.isArray(monsters)||typeof currentBattleMonsters==="undefined"||
+           !Array.isArray(currentBattleMonsters)){ return false; }
         const definition={id:boss.vGameplayBossId||context.definitionId||("tower-"+numeric(context.floor,0)),level:boss.level,element:boss.element};
         const stage=Math.max(numeric(context.combatPhase,1),numeric(context.stage,1));
         const guards=buildBossSupportRoster(definition,{stage:stage,mode:context.mode});
@@ -707,7 +677,9 @@
             const index=monsters.length;
             monsters.push(guard);
             currentBattleMonsters.push(index);
-            guard.vGameplayBattlefieldSlot=assignBossReinforcementSlot(index,supportIndex);
+            guard.unitKind="boss-reinforcement";
+            guard.canAct=true;
+            guard.vGameplayBattlefieldSlot=assignEnemySlot(index,BOSS_REINFORCEMENT_SLOTS[supportIndex]);
         });
         context.summonsCreated=true;
         context.supportCount=guards.length;
@@ -725,49 +697,74 @@
     }
     function partyIndexes(){
         if(typeof getExistingPartyIndexes==="function"){ return getExistingPartyIndexes(); }
-        return [0,1,2].filter(index=>typeof getPartyCharacterByIndex==="function"&&getPartyCharacterByIndex(index));
+        return [0,1,2,3,4,5].filter(index=>typeof getPartyCharacterByIndex==="function"&&getPartyCharacterByIndex(index));
     }
     function applyTelegraphedMajor(){
         const boss=activeBoss();if(!boss){ return; }
         if(typeof addBattleLog==="function"){ addBattleLog(boss.name+"完成【滅魂陣】，大型攻勢爆發！"); }
         partyIndexes().forEach(index=>{
-            const character=getPartyCharacterByIndex(index),stats=getPartyBattleStats(index);if(!character||!stats||character.hp<=0){ return; }
+            const character=getPartyCharacterByIndex(index),stats=getPartyBattleStats(index);
+            if(!character||!stats||character.hp<=0){ return; }
             let damage=Math.max(1,Math.round(stats.maxHP*.42));
             if(character.isDefending){ damage=Math.max(1,Math.floor(damage*.5)); }
             const shield=(character.activeBuffs||[]).find(buff=>buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0);
-            if(shield){ const absorbed=Math.min(damage,numeric(shield.remaining));shield.remaining-=absorbed;damage-=absorbed; }
-            if(damage>0){ character.hp=Math.max(0,character.hp-damage);if(typeof showPlayerHit==="function"){ showPlayerHit(damage,"hp",index,false); } }
+            if(shield){
+                const absorbed=Math.min(damage,numeric(shield.remaining));
+                shield.remaining-=absorbed;
+                damage-=absorbed;
+            }
+            if(damage>0){
+                character.hp=Math.max(0,character.hp-damage);
+                if(typeof showPlayerHit==="function"){ showPlayerHit(damage,"hp",index,false); }
+            }
         });
         if(typeof updateUI==="function"){ updateUI(); }
     }
-    function processMechanismRound(){
+    function retireBossObject(entry,reason){
+        if(!entry||!entry.monster||!entry.monster.alive){ return; }
+        entry.monster.alive=false;
+        entry.monster.hp=0;
+        if(typeof addBattleLog==="function"){
+            addBattleLog("【"+entry.monster.name+"】消失。"+(entry.monster.objectType==="charge"&&reason!=="resolved"?"大型技能已取消。":""));
+        }
+        if(typeof renderBattle==="function"){ renderBattle(); }
+    }
+    function processBossRound(){
         if(!activeBattleContext){ return false; }
-        const round=typeof turn!=="undefined"?turn:1,boss=activeBoss();if(!boss){ return false; }
+        const round=typeof turn!=="undefined"?turn:1,boss=activeBoss();
+        if(!boss){ return false; }
         updateBossCombatPhase();
         processBossSummonPlan(round,boss);
-        aliveMechanisms().slice().forEach(card=>{
-            if(card.spawnedRound>=round){ return; }
-            if(card.type==="charge"){
-                card.countdown=Math.max(0,numeric(card.countdown,0)-1);
-                if(card.countdown<=0){ applyTelegraphedMajor();destroyMechanism(card,"resolved"); }
-            }else if(card.type==="heal"){
-                const amount=Math.max(1,Math.round(boss.maxHP*MECHANISM_DEFINITIONS.heal.healRatio));
-                const actual=Math.max(0,Math.min(amount,boss.maxHP-boss.hp));boss.hp+=actual;
-                if(actual>0&&typeof addBattleLog==="function"){ addBattleLog("【"+card.name+"】使"+boss.name+"恢復"+actual+"點生命。"); }
+        aliveBossObjects().slice().forEach(entry=>{
+            const object=entry.monster;
+            if(object.spawnedRound>=round){ return; }
+            if(object.objectType==="charge"){
+                object.countdown=Math.max(0,numeric(object.countdown,0)-1);
+                if(object.countdown<=0){ applyTelegraphedMajor();retireBossObject(entry,"resolved"); }
+            }else if(object.objectType==="heal"){
+                const amount=Math.max(1,Math.round(boss.maxHP*BOSS_OBJECT_DEFINITIONS.heal.healRatio));
+                const before=boss.hp;
+                boss.hp=Math.min(boss.maxHP,boss.hp+amount);
+                const actual=boss.hp-before;
+                if(actual>0&&typeof showMonsterHit==="function"){ showMonsterHit(bossIndex(),actual,"heal"); }
+                if(actual>0&&typeof addBattleLog==="function"){
+                    addBattleLog("【"+object.name+"】使"+boss.name+"恢復"+actual+"點生命。");
+                }
             }
         });
         if(typeof checkBattleEnd==="function"&&checkBattleEnd()){ return true; }
-        const plans=activeBattleContext.mechanismPlan||[];
-        plans.forEach((plan,index)=>{
-            const key="plan-"+index;if(activeBattleContext.spawnedPlans[key]){ return; }
+        (activeBattleContext.objectPlan||[]).forEach((plan,index)=>{
+            const key="object-plan-"+index;
+            if(activeBattleContext.spawnedPlans[key]){ return; }
             const roundReady=plan.round!==undefined&&round>=plan.round;
             const hpReady=plan.hpBelow!==undefined&&boss.hp/Math.max(1,boss.maxHP)<=plan.hpBelow;
             if(roundReady||hpReady){
-                const created=spawnMechanism(plan.type,key);
+                const created=spawnBossObject(plan.type,key);
                 if(created){ activeBattleContext.spawnedPlans[key]=true; }
             }
         });
-        renderMechanisms();return false;
+        syncBossShieldHud();
+        return false;
     }
     function combatPhaseLabel(phase){ return ["第一階段","第二階段","第三階段","最終階段"][Math.max(1,Math.floor(numeric(phase,1)))-1]||("第 "+phase+" 階段"); }
     function updateBossCombatPhase(){
@@ -784,54 +781,46 @@
         }
         return true;
     }
-    function mandatoryMechanismTarget(){ return blockingShield(); }
-    function mechanismByTarget(target){
-        const id=typeof target==="string"&&target.indexOf("mechanism:")===0?target.slice(10):String(target||"");
-        return aliveMechanisms().find(card=>card.id===id)||null;
+
+    function resolveEnemyDamageTargets(primaryIndex,targetType){
+        if(!activeBattleContext){ return null; }
+        const alive=(typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[])
+            .filter(index=>monsterAt(index)&&monsterAt(index).alive);
+        if(targetType==="all"||targetType==="enemyAll"){ return alive; }
+        return alive.includes(primaryIndex)?[primaryIndex]:[];
     }
-    function selectMechanism(id){
-        const card=aliveMechanisms().find(item=>item.id===id);
-        if(!card||typeof battleActive==="undefined"||!battleActive||typeof battlePhase!=="undefined"&&battlePhase!=="declare"||typeof actionReady==="undefined"||!actionReady||typeof pendingAction==="undefined"||!pendingAction){ return false; }
-        const shield=blockingShield();
-        if(shield&&card!==shield){ reportProtectedBoss();return false; }
-        document.querySelectorAll(".boss-mechanism-card.target").forEach(node=>node.classList.remove("target"));
-        const node=document.querySelector('#bossMechanismSlot [data-id="'+card.id+'"]');if(node){ node.classList.add("target"); }
-        const targetText=document.getElementById("battleTarget");if(targetText){ targetText.textContent="目標："+card.name; }
-        const action=pendingAction;actionReady=false;pendingAction=null;
-        if(typeof clearBattleTargetSelectionMode==="function"){ clearBattleTargetSelectionMode(); }
-        queuedPlayerActions[activeBattleCharacterIndex]={action:action,target:"mechanism:"+card.id};
-        if(typeof updateUI==="function"){ updateUI(); }if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }return true;
+    function outgoingDamageMultiplier(attacker){
+        return attacker===activeBoss()&&bossHasObject("amplify")
+            ?BOSS_OBJECT_DEFINITIONS.amplify.damageMultiplier:1;
     }
-    function calculateMechanismActionDamage(characterIndex,action,card){
-        const character=getPartyCharacterByIndex(characterIndex),stats=getPartyBattleStats(characterIndex);if(!character||!stats){ return {damage:1,name:"攻擊",crit:false}; }
-        if(action==="normal"){
-            const crit=typeof rollCritical==="function"?rollCritical(character,"physical",0):{multiplier:1,isCrit:false};
-            return {damage:calculateDamage(stats.attack,card.defense,character.level,card.level,character.element,card.element,{attacker:character,target:card,critMultiplier:crit.multiplier}),name:"普通攻擊",crit:crit.isCrit};
+    function healingMultiplier(){
+        return bossHasObject("seal")?BOSS_OBJECT_DEFINITIONS.seal.healingMultiplier:1;
+    }
+    function onEnemyDeath(index,monster){
+        if(!isBossObject(monster)){ return false; }
+        if(typeof addBattleLog==="function"){
+            addBattleLog("【"+monster.name+"】已被破壞，持續效果立即停止。");
         }
-        const skill=skillDatabase[action];if(!skill||!skill.baseDamage){ return {damage:0,name:skill&&skill.name||action,crit:false}; }
-        const key=typeof getPartyCharacterKey==="function"?getPartyCharacterKey(characterIndex):(character.element||"fire");
-        const level=Math.max(1,numeric(getSkillLevel(key,action),1));
-        const stat=skill.category==="magic"?stats.magicAttack:stats.attack;
-        const crit=typeof rollCritical==="function"?rollCritical(character,skill.category,0):{multiplier:1,isCrit:false};
-        return {damage:calculateSkillDamage({skill:skill,skillLevel:level,effectiveAttack:stat,target:card,casterLevel:character.level,casterElement:character.element,attacker:character,critMultiplier:crit.multiplier}),name:skill.name,crit:crit.isCrit};
+        syncBossShieldHud();
+        return true;
     }
-    function resolveMechanismAction(characterIndex,queued,previous,that,args){
-        const card=mechanismByTarget(queued.target);
-        if(!card){ queued.target=typeof monsters!=="undefined"?monsters.findIndex(monster=>monster&&monster.alive):-1;return previous.apply(that,args); }
-        const skill=queued.action!=="normal"?skillDatabase[queued.action]:null;
-        const character=getPartyCharacterByIndex(characterIndex);
-        if(skill){
-            const cost=skill.spCost!==undefined?skill.spCost:(skill.cost||0);
-            if(!character||character.sp<cost){ if(typeof addBattleLog==="function"){ addBattleLog("SP不足，無法攻擊機制卡。"); }finishPlayerAction();return; }
-            character.sp-=cost;
-            if(typeof showSkillNameBadge==="function"){
-                showSkillNameBadge(skill.name,skill.element,characterIndex,queued.target,[queued.target]);
-            }
+    function cleanupBossBattlePresentation(){
+        releaseBossBattlefieldSnapshot();
+        if(typeof document!=="undefined"){
+            const area=document.getElementById("battleMonsterArea");
+            if(area){ area.classList.remove("gameplay-boss-active"); }
         }
-        const result=calculateMechanismActionDamage(characterIndex,queued.action,card);
-        if(result.damage>0){ damageMechanism(card,result.damage,(character&&character.id?character.id+"的":"")+result.name,result.crit); }
-        else if(typeof addBattleLog==="function"){ addBattleLog(result.name+"無法直接破壞機制卡。需要使用傷害技能。"); }
-        if(typeof updateUI==="function"){ updateUI(); }finishPlayerAction();
+    }
+    function targetGeometry(index){
+        if(typeof document==="undefined"){ return null; }
+        const card=document.getElementById("battleMonster"+index);
+        if(!card||typeof card.getBoundingClientRect!=="function"){ return null; }
+        const rect=card.getBoundingClientRect();
+        return rect.width>0&&rect.height>0?{
+            left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom,
+            width:rect.width,height:rect.height,
+            centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2
+        }:null;
     }
 
     function inventoryDefinition(id){
@@ -857,7 +846,7 @@
         if(outcome&&outcome.result==="win"){
             const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.clears++;persist();
         }
-        cleanupMechanismPresentation();activeBattleContext=null;bossDetail={type:"personal",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
+        cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"personal",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
     }
     function completeWorldStage(definition,stage,outcome){
         const progress=state.world[definition.id];
@@ -867,22 +856,22 @@
                 const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.completedStages=4;progress.clears++;persist();
             }
         }
-        cleanupMechanismPresentation();activeBattleContext=null;bossDetail={type:"world",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
+        cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"world",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
     }
     function startBoss(type,id){
         if(battleStarting||typeof battleActive!=="undefined"&&battleActive){ return false; }
         const world=type==="world",definition=world?findWorld(id):findPersonal(id);if(!definition||highestCharacterLevel()<definition.level){ return false; }
         const progress=world?state.world[definition.id]:state.personal[definition.id];
         const stage=world?(progress.firstClear?4:Math.min(4,progress.completedStages+1)):1;
-        const stageProfile=world?WORLD_STAGE_PROFILES[stage-1]:{stage:1,hpFactor:1,attackFactor:1,mechanisms:definition.mechanisms,summon:definition.summon||null};
+        const stageProfile=world?WORLD_STAGE_PROFILES[stage-1]:{stage:1,hpFactor:1,attackFactor:1,objects:definition.objects,summon:definition.summon||null};
         const mode=world?"world":"personal";
         const balance=bossBalanceProfile(definition.level,mode,stage);
         const boss=buildBossMonster(definition,{stage:stage,mode:mode,hpFactor:stageProfile.hpFactor,attackFactor:stageProfile.attackFactor});
-        activeBattleContext={mode:mode,definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:0,expectedPartySize:balance.expectedPartySize,supportCount:0,summonPlan:stageProfile.summon,summonsCreated:false,mechanisms:[],mechanismPlan:(world?stageProfile.mechanisms:definition.mechanisms).map(item=>Object.assign({},item)),spawnedPlans:{},maxMechanisms:definition.level>=70?2:1};
+        activeBattleContext={mode:mode,definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:null,expectedPartySize:balance.expectedPartySize,supportCount:0,summonPlan:stageProfile.summon,summonsCreated:false,objectIndexes:[],objectPlan:(world?stageProfile.objects:definition.objects).map(item=>Object.assign({},item)),spawnedPlans:{}};
         battleStarting=true;
         const started=window.v132LaunchDungeonBattle([boss],outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome));
         battleStarting=false;
-        if(!started){ cleanupMechanismPresentation();activeBattleContext=null;return false; }
+        if(!started){ cleanupBossBattlePresentation();activeBattleContext=null;return false; }
         seedBossBattlefieldSnapshot();
         return true;
     }
@@ -904,7 +893,7 @@
             state.tower.historicalHighest=Math.max(state.tower.historicalHighest,floor);
             towerReward(floor);persist();
         }
-        cleanupMechanismPresentation();activeBattleContext=null;if(typeof showPage==="function"){ showPage("tower"); }renderTowerPage();
+        cleanupBossBattlePresentation();activeBattleContext=null;if(typeof showPage==="function"){ showPage("tower"); }renderTowerPage();
     }
     function startTowerFloor(floor){
         ensureCurrentTowerWeek();
@@ -913,11 +902,11 @@
         const roster=buildTowerRoster(target),boss=target%10===0?roster[0]:null;
         const towerPhases=boss?(target===100?4:(target>=70?3:(target>=40?2:1))):1;
         const balance=boss?bossBalanceProfile(boss.level,"tower",towerPhases):null;
-        activeBattleContext={mode:"tower",floor:target,boss:boss,bossIndex:boss?0:null,combatPhase:1,totalPhases:towerPhases,expectedPartySize:balance?balance.expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target)),supportCount:0,summonPlan:boss?towerSummonPlan(target):null,summonsCreated:false,mechanisms:[],mechanismPlan:towerMechanismPlan(target),spawnedPlans:{},maxMechanisms:target>=70?2:1};
+        activeBattleContext={mode:"tower",floor:target,boss:boss,bossIndex:null,combatPhase:1,totalPhases:towerPhases,expectedPartySize:balance?balance.expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target)),supportCount:0,summonPlan:boss?towerSummonPlan(target):null,summonsCreated:false,objectIndexes:[],objectPlan:boss?towerObjectPlan(target):[],spawnedPlans:{}};
         battleStarting=true;const started=window.v132LaunchDungeonBattle(roster,outcome=>completeTowerFloor(target,outcome));
         battleStarting=false;
-        if(!started){ cleanupMechanismPresentation();activeBattleContext=null;return false; }
-        seedBossBattlefieldSnapshot();
+        if(!started){ cleanupBossBattlePresentation();activeBattleContext=null;return false; }
+        if(boss){ seedBossBattlefieldSnapshot(); }
         return true;
     }
     function chooseTowerRelic(id){
@@ -946,74 +935,6 @@
     }
     function openDailyDungeons(){ abyssSession=false;if(typeof showPage==="function"){ showPage("dungeon"); }if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); } }
 
-    if(typeof renderBattle==="function"){
-        const previous=renderBattle;
-        renderBattle=function(){ const result=previous.apply(this,arguments);if(activeBattleContext&&activeBoss()){ renderMechanisms(); }return result; };
-    }
-    if(typeof updateUI==="function"){
-        const previous=updateUI;
-        updateUI=function(){ const result=previous.apply(this,arguments);if(activeBattleContext&&typeof battleActive!=="undefined"&&battleActive){ renderMechanisms(); }return result; };
-    }
-    if(typeof startTurn==="function"){
-        const previous=startTurn;
-        startTurn=function(){ if(activeBattleContext&&processMechanismRound()){ return; }return previous.apply(this,arguments); };
-    }
-    if(typeof setBattleTargetSelectionMode==="function"){
-        const previous=setBattleTargetSelectionMode;
-        setBattleTargetSelectionMode=function(){ const result=previous.apply(this,arguments);if(activeBattleContext){ renderMechanisms();if(blockingShield()){ document.querySelectorAll(".battle-monster.targetable").forEach(node=>node.classList.remove("targetable")); } }return result; };
-    }
-    if(typeof clearBattleTargetSelectionMode==="function"){
-        const previous=clearBattleTargetSelectionMode;
-        clearBattleTargetSelectionMode=function(){ const result=previous.apply(this,arguments);document.querySelectorAll(".boss-mechanism-card").forEach(node=>node.classList.remove("targetable","target"));return result; };
-    }
-    if(typeof selectBattleTarget==="function"){
-        const previous=selectBattleTarget;
-        selectBattleTarget=function(index){ if(monsters[index]&&blockingShield()){ reportProtectedBoss();return false; }return previous.apply(this,arguments); };
-    }
-    if(typeof getSkillTargets==="function"){
-        const previous=getSkillTargets;
-        getSkillTargets=function(){ const targets=previous.apply(this,arguments);return actionShieldSnapshot||blockingShield()?[]:targets; };
-    }
-    if(typeof resolveQueuedPlayerAction==="function"){
-        const previous=resolveQueuedPlayerAction;
-        resolveQueuedPlayerAction=function(characterIndex){
-            const queued=queuedPlayerActions[characterIndex];
-            if(queued&&activeBattleContext){
-                const shield=blockingShield();
-                if(shield&&typeof queued.target==="number"){ queued.target="mechanism:"+shield.id; }
-                actionShieldSnapshot=!!shield;
-                try{ if(mechanismByTarget(queued.target)){ return resolveMechanismAction(characterIndex,queued,previous,this,arguments); }return previous.apply(this,arguments); }
-                finally{ actionShieldSnapshot=false; }
-            }
-            return previous.apply(this,arguments);
-        };
-    }
-    if(typeof autoActionForCharacter==="function"){
-        const previous=autoActionForCharacter;
-        autoActionForCharacter=function(characterIndex,token){
-            const mechanism=mandatoryMechanismTarget();
-            if(!mechanism){ return previous.apply(this,arguments); }
-            const character=getPartyCharacterByIndex(characterIndex),config=getPartyAutoConfig(characterIndex);
-            const autoOn=characterIndex===0?autoBattle:config.enabled;
-            if(!battleActive||!character||character.hp<=0||!autoOn||token!==battleToken){ return; }
-            let action=config.skill||"normal";const skill=skillDatabase[action];const key=getPartyCharacterKey(characterIndex);
-            if(action!=="normal"&&(!skill||getSkillLevel(key,action)<=0||character.sp<(skill.spCost!==undefined?skill.spCost:(skill.cost||0))||["buff","passive","heal","revive"].includes(skill.category))){ action="normal"; }
-            queuedPlayerActions[characterIndex]={action:action,target:"mechanism:"+mechanism.id};updateUI();finishPlayerAction();
-        };
-    }
-    if(typeof calculateDamage==="function"){
-        const previous=calculateDamage;
-        calculateDamage=function(){ const result=previous.apply(this,arguments),options=arguments[6]&&typeof arguments[6]==="object"?arguments[6]:{};const amp=aliveMechanisms().find(card=>card.type==="amplify");return amp&&options.attacker===activeBoss()?Math.max(1,Math.round(result*MECHANISM_DEFINITIONS.amplify.damageMultiplier)):result; };
-    }
-    if(typeof castHealSkill==="function"){
-        const previous=castHealSkill;
-        castHealSkill=function(){
-            const seal=aliveMechanisms().find(card=>card.type==="seal");if(!seal){ return previous.apply(this,arguments); }
-            const before=partyIndexes().map(index=>{ const character=getPartyCharacterByIndex(index);return {index:index,hp:numeric(character&&character.hp),sp:numeric(character&&character.sp)}; });
-            const result=previous.apply(this,arguments);before.forEach(entry=>{ const character=getPartyCharacterByIndex(entry.index);if(!character){ return; }const hpGain=Math.max(0,character.hp-entry.hp),spGain=Math.max(0,character.sp-entry.sp);character.hp=entry.hp+Math.floor(hpGain*MECHANISM_DEFINITIONS.seal.healingMultiplier);character.sp=entry.sp+Math.floor(spGain*MECHANISM_DEFINITIONS.seal.healingMultiplier); });
-            if(typeof addBattleLog==="function"){ addBattleLog("【"+seal.name+"】使本次治療與 SP 回復降低 40%。"); }if(typeof updateUI==="function"){ updateUI(); }return result;
-        };
-    }
     if(typeof showPage==="function"){
         const previous=showPage;
         showPage=function(page){
@@ -1042,15 +963,37 @@
     window.vGameplayRenderHub=renderGameplayHub;
     window.vGameplayRenderBoss=renderBossPage;
     window.vGameplayRenderTower=renderTowerPage;
-    window.vGameplaySelectMechanism=selectMechanism;
     window.switchBossTab=switchBossTab;
+
+    window.FourSymbolsBossBattle=Object.freeze({
+        version:"boss-target-entity-v1",
+        isActive:function(){ return !!activeBoss(); },
+        getBossIndex:bossIndex,
+        isBossIndex:isBossIndex,
+        isBossObjectIndex:isBossObjectIndex,
+        getBossFootprintSlots:function(){ return BOSS_FOOTPRINT_SLOTS.slice(); },
+        getReinforcementSlots:function(){ return BOSS_REINFORCEMENT_SLOTS.slice(); },
+        getObjectSlots:function(){ return BOSS_OBJECT_SLOTS.slice(); },
+        resolveEnemyDamageTargets:resolveEnemyDamageTargets,
+        getTargetGeometry:targetGeometry,
+        getShieldState:function(){ const shield=bossShield();return shield?copy(shield):null; },
+        applyShield:applyBossShield,
+        consumeDamageSettlement:consumeBossDamageSettlement,
+        onEnemyDeath:onEnemyDeath,
+        processRound:processBossRound,
+        getOutgoingDamageMultiplier:outgoingDamageMultiplier,
+        getHealingMultiplier:healingMultiplier,
+        syncHud:syncBossShieldHud,
+        canEnemyAct:function(index){ const monster=monsterAt(index);return !!monster&&monster.alive&&monster.canAct!==false; },
+        isRewardEligible:function(index){ const monster=monsterAt(index);return !!monster&&!monster.noRewards; }
+    });
 
     window.GameplaySystem=Object.freeze({
         stateVersion:STATE_VERSION,
         personalBosses:PERSONAL_BOSSES,
         worldBosses:WORLD_BOSSES,
         worldStageProfiles:WORLD_STAGE_PROFILES,
-        mechanisms:MECHANISM_DEFINITIONS,
+        objects:BOSS_OBJECT_DEFINITIONS,
         towerConfig:TOWER_CONFIG,
         bossBalance:BOSS_BALANCE,
         getBossBalanceProfile:function(level,mode,stage){ return copy(bossBalanceProfile(level,mode,stage)); },
@@ -1059,12 +1002,9 @@
         getWeekInfo:utcWeekInfo,
         getTowerFloorKind:towerFloorKind,
         buildTowerRoster:buildTowerRoster,
-        canDirectlyAffectMonster:canDirectlyAffectMonster,
-        getActiveBattleState:function(){ return activeBattleContext?copy({mode:activeBattleContext.mode,definitionId:activeBattleContext.definitionId||null,stage:activeBattleContext.stage||null,floor:activeBattleContext.floor||null,combatPhase:activeBattleContext.combatPhase||1,totalPhases:activeBattleContext.totalPhases||1,mechanisms:aliveMechanisms()}):null; },
-        debugSpawnMechanism:spawnMechanism,
-        debugDamageMechanism:damageMechanism,
-        debugDamageMechanismById:function(id,amount){ return damageMechanism(mechanismByTarget("mechanism:"+id),amount,"測試攻擊"); },
-        debugProcessMechanismRound:processMechanismRound,
+        getActiveBattleState:function(){ return activeBattleContext?copy({mode:activeBattleContext.mode,definitionId:activeBattleContext.definitionId||null,stage:activeBattleContext.stage||null,floor:activeBattleContext.floor||null,combatPhase:activeBattleContext.combatPhase||1,totalPhases:activeBattleContext.totalPhases||1,bossIndex:bossIndex(),objectIndexes:(activeBattleContext.objectIndexes||[]).slice(),shield:bossShield()}):null; },
+        debugSpawnBossObject:spawnBossObject,
+        debugProcessBossRound:processBossRound,
         debugReloadState:function(raw,now){ state=normalizeState(raw,now);return serializableState(); }
     });
 
@@ -1278,8 +1218,6 @@
     let relicPresentationTail=Promise.resolve();
     let relicPresentationPending=0;
     let relicPresentationGeneration=0;
-    const deferredStartTurns=new Set();
-    const deferredCombatants=new Set();
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
     function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
@@ -1305,8 +1243,6 @@
         relicPresentationTail=Promise.resolve();
         relicPresentationPending=0;
         relicVisualCollector=null;
-        deferredStartTurns.clear();
-        deferredCombatants.clear();
     }
     function currentAnimationGate(){
         const director=window.v142SkillAnimationDirector;
@@ -1345,13 +1281,6 @@
         relicPresentationTail=job;
         return job;
     }
-    function waitForRelicPresentation(callback){
-        if(typeof callback!=="function"){ return; }
-        const tail=relicPresentationTail;
-        if(relicPresentationPending<=0){ callback(); return; }
-        Promise.resolve(tail).then(callback);
-    }
-
     function normalizeOwned(raw){
         const next={};
         RELIC_CATALOG_LIST.forEach(def=>{
@@ -1731,32 +1660,17 @@
     if(typeof startTurn==="function"){
         const previous=startTurn;
         startTurn=function(){
-            const token=arguments[0];
-            const key=String(token)+":"+String(typeof turn!=="undefined"?turn:0);
-            if(deferredStartTurns.has(key)){ return; }
             if(typeof battleActive!=="undefined"&&battleActive){
                 if(pendingBattleInit||!relicBattleState||relicBattleState.battleToken!==currentBattleToken()){ initializeBattleRelic(); }
                 cleanupPlayerMods();
                 resetRoundCounters();
                 dispatchRelicEvent("round_start",{sourceType:"system"});
             }
-            if(relicPresentationPending>0&&hasLiveBattlePresentationHost()){
-                deferredStartTurns.add(key);
-                const that=this,args=arguments,generation=relicPresentationGeneration;
-                waitForRelicPresentation(()=>{
-                    deferredStartTurns.delete(key);
-                    if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){ return; }
-                    previous.apply(that,args);
-                });
-                return;
-            }
             return previous.apply(this,arguments);
         };
     }
-    if(typeof processNextCombatant==="function"){
-        const previous=processNextCombatant;
-        processNextCombatant=function(){
-            const token=arguments[0];
+    if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeBeforeCombatant==="function"){
+        window.FourSymbolsBattleFlow.subscribeBeforeCombatant(()=>{
             if(
                 relicBattleState&&typeof battleActive!=="undefined"&&battleActive&&
                 typeof battlePhase!=="undefined"&&battlePhase==="resolve"&&
@@ -1764,20 +1678,7 @@
             ){
                 dispatchRelicEvent("round_end",{sourceType:"system"});
             }
-            if(relicPresentationPending>0&&hasLiveBattlePresentationHost()){
-                const key=String(token)+":"+String(typeof turn!=="undefined"?turn:0)+":"+String(typeof initiativeIndex!=="undefined"?initiativeIndex:0);
-                if(deferredCombatants.has(key)){ return; }
-                deferredCombatants.add(key);
-                const that=this,args=arguments,generation=relicPresentationGeneration;
-                waitForRelicPresentation(()=>{
-                    deferredCombatants.delete(key);
-                    if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){ return; }
-                    previous.apply(that,args);
-                });
-                return;
-            }
-            return previous.apply(this,arguments);
-        };
+        });
     }
 
     if(typeof processSingleMonsterAttack==="function"){

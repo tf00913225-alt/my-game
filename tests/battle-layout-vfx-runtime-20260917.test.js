@@ -86,9 +86,9 @@ assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonster
 const centerMarkup=index.slice(index.indexOf('<section class="battle-center-region"'),index.indexOf('<section class="battle-ally-region"'));
 assert.doesNotMatch(centerMarkup,/id="battleInfo"/,"the bottom battle log must not be owned by the middle controls");
 assert.doesNotMatch(index,/<div class="battle-monster-gap-filler"><\/div>/,"legacy space-filler must not own battle layout");
-assert.match(layoutCss,/--battle-enemy-region-track:36fr/);
-assert.match(layoutCss,/--battle-center-region-track:16fr/);
-assert.match(layoutCss,/--battle-ally-region-track:48fr/);
+assert.match(layoutCss,/--battle-enemy-region-track:42fr/);
+assert.match(layoutCss,/--battle-center-region-track:14fr/);
+assert.match(layoutCss,/--battle-ally-region-track:44fr/);
 assert.match(layoutCss,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)/);
 assert.doesNotMatch(layoutCss,/--battle-info-region-track/,"battle info must not consume a structural grid track");
 assert.match(layoutCss,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/,"enemy slots remain equal width");
@@ -105,13 +105,15 @@ assert.match(layoutCss,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{
 assert.match(vfx,/function placementFor\(config,sprite\)/);
 assert.match(vfx,/applySpriteBox\(node,width,height,sprite,"cover"\)/,"range VFX must preserve source-frame aspect while covering its semantic geometry");
 assert.doesNotMatch(vfx,/applySpriteBox\(node,width,height,sprite,"stretch"\)/,"range VFX must never flatten source frames");
-assert.match(vfx,/rect\.centerOnBounds=mechanismSlots\.length/,"function-card range geometry must be visually independent from its damage target rectangle");
+assert.doesNotMatch(vfx,/mechanism:|MECH_L|MECH_C|MECH_R/,"VFX must use normal numeric target entities only");
+assert.match(vfx,/isBossIndexForVfx\(current\.targetId\)/,"Boss visual anchoring is independent from target settlement count");
 assert.match(vfx,/const key=placement==="single"\|\|placement==="targetTrajectory"\?String\(index\):"main"/,"range casts must own exactly one shared raster node");
 assert.match(vfx,/purgeStaleRasterStages\(\)/,"stale stages cannot make Wind Flame look like two simultaneous videos");
 assert.match(vfx,/gate\.complete\("v143-render-error"\)/,"synchronous renderer errors must release combat");
 assert.match(timing,/v142-render-safety-deadline/,"render-owned actions retain an independent timing deadline");
-assert.match(bossSystem,/function mandatoryMechanismTarget\(\)\{ return blockingShield\(\); \}/,"only the shield may force a function-card target");
-assert.doesNotMatch(bossSystem,/function prioritizedMechanism\(/,"non-shield function cards must not own auto targeting");
-assert.match(bossSystem,/if\(shield&&typeof queued\.target==="number"\)\{ queued\.target="mechanism:"\+shield\.id; \}/,"the shield redirects every normal unit target to itself");
+assert.match(bossSystem,/resolveEnemyDamageTargets\(primaryIndex,targetType\)/,"Boss mode owns an isolated damage-target resolver");
+assert.match(bossSystem,/if\(targetType==="all"\|\|targetType==="enemyAll"\)\{ return alive; \}/,"only all-target skills fan out in Boss mode");
+assert.match(bossSystem,/return alive\.includes\(primaryIndex\)\?\[primaryIndex\]:\[\]/,"non-all Boss skills hit only the selected entity");
+assert.doesNotMatch(bossSystem,/blockingShield|mandatoryMechanismTarget|resolveMechanismAction/);
 
 console.log("Battle drawer layout and four-element VFX range contract passed.");

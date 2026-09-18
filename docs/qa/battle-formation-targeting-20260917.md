@@ -1,4 +1,11 @@
-# Battle formation, mechanism isolation and VFX anchor repair — NOT COMPLETE
+# Battle formation, mechanism isolation and VFX anchor repair — SUPERSEDED
+
+> Historical investigation only. The separate Boss function-card/mechanism
+> target lane described below was retired by the 2026-09-18 convergence. It is
+> not an implementation contract. The authoritative rules are now
+> [`SYSTEM_CONTRACTS.md`](../../SYSTEM_CONTRACTS.md): one Boss entity, B1/B5
+> reinforcements, F1/F5 destructible non-acting objects, Boss Shield, and no
+> parallel mechanism target or VFX pipeline.
 
 Base: `a21736f3ea1f92b2e7da9e48870dce705c4c5cc4`.
 Scope: ally/enemy front-back projection, BOSS mechanism visual plane, monster range targeting, mechanism-only spread settlement, and enemy primary-target VFX anchoring.
