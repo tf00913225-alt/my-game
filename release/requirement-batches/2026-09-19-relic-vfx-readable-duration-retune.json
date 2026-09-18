@@ -1,0 +1,79 @@
+{
+  "date": "2026-09-19",
+  "title": "20 件秘寶 VFX 可讀性時長重調",
+  "base_branch": "dev",
+  "base_sha": "a9f38ad9e5a299bd72146cb0f15e59ba70aa7de9",
+  "work_branch": "fix/relic-vfx-readable-duration-20260919",
+  "officialVersion": "173.65",
+  "status": "VERIFIED",
+  "supersedes": "2026-09-19-relic-vfx-cadence-retune.json 中 1.25–1.60 秒的秘寶 VFX duration、1200ms floor 與 1500ms fallback；舊文件保留為歷史紀錄。",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "延長 20 件秘寶 VFX 可視時間，避免玩家尚未辨識秘寶本體就消失，同時避免回到 3.0–3.8 秒的慢格動畫。",
+      "owner": [
+        "js/60-team-relic-system.js::RELIC_VFX_PRESENTATION",
+        "js/60-team-relic-system.js::relicVfx()",
+        "js/60-team-relic-system.js::relicPresentationDuration()"
+      ],
+      "implementation": "RELIC_VFX_FLOOR_MS 由 1200ms 調整為 2000ms；presentationDurationMs fallback 由 1500ms 調整為 2400ms；20 件秘寶依可讀性需求設定 2200–2800ms。"
+    },
+    {
+      "id": 2,
+      "status": "VERIFIED",
+      "request": "保留既有逐張審核的 V143 authored hit frame、120ms presentation lead gap、V142/V143 單一 VFX owner 與正式 1.15 秒戰鬥出手 owner。",
+      "owner": [
+        "js/39-v143-skill-animation.js::relicSheet()",
+        "js/60-team-relic-system.js::queueRelicPresentation()",
+        "js/00-main.js::POST_ACTION_DELAY_MS"
+      ],
+      "implementation": "不修改 V143 第 6–9 幀 authored hit frame、不修改 presentationLeadGapMs:120、不修改 POST_ACTION_DELAY_MS=1150、不新增第二套 renderer 或 runtime patch。"
+    },
+    {
+      "id": 3,
+      "status": "VERIFIED",
+      "request": "時長調整不得改變秘寶傷害、治療、護盾、Buff、Debuff、觸發條件、目標幾何、站位或一般技能動畫時長。",
+      "owner": [
+        "js/60-team-relic-system.js",
+        "tests/relic-vfx-animation-20260918.test.js",
+        "tests/v174-battle-presentation-sequencing.test.js"
+      ],
+      "implementation": "只修改秘寶 visual duration/fallback 與對應測試契約；正式 content-hashed build 已同步，未修改技能資料、秘寶效果數值、Fixed Slot 幾何或一般技能 SPECS。"
+    }
+  ],
+  "durationMs": {
+    "relic_wind_chasing_talisman": 2200,
+    "relic_sun_orb": 2250,
+    "relic_broken_army_scroll": 2250,
+    "relic_burning_star_mark": 2250,
+    "relic_red_sky_war_mark": 2300,
+    "relic_qinglan_feather": 2350,
+    "relic_origin_talisman": 2350,
+    "relic_demon_suppressing_seal": 2400,
+    "relic_ice_mirror_heart": 2400,
+    "relic_spirit_spring_bottle": 2450,
+    "relic_qiankun_flask": 2500,
+    "relic_cold_spring_jade": 2500,
+    "relic_soul_bell": 2500,
+    "relic_nine_dragon_fire": 2550,
+    "relic_xuanwu_seal": 2600,
+    "relic_rock_mountain_seal": 2600,
+    "relic_mountain_river_cauldron": 2650,
+    "relic_returning_wheel": 2750,
+    "relic_tiangang_banner": 2800,
+    "relic_all_returning_array": 2800
+  },
+  "verification": [
+    "tests/relic-vfx-animation-20260918.test.js",
+    "tests/v174-battle-presentation-sequencing.test.js",
+    "battle layout, timing and range-VFX regressions",
+    "npm run build:check",
+    "Fixed Slot 9:16 mobile browser QA",
+    "exact-candidate real battle mobile browser QA",
+    "Adventure V1 mobile browser QA",
+    "Release/cache/deprecated-code gates",
+    "PR #324 Repository checks run 35387116891 SUCCESS"
+  ],
+  "verificationResult": "3/3 VERIFIED；20 件秘寶已依指定值調整為 2.20–2.80 秒，floor=2000ms、fallback=2400ms；V143 authored hit frame、120ms lead gap、POST_ACTION_DELAY_MS=1150 與秘寶效果數值均未修改。PR #324 第一輪 Repository checks run 35387116891 SUCCESS，包含 VFX regressions、production build synchronization、Fixed Slot 9:16、exact-candidate real battle mobile browser QA、Adventure mobile QA、Release Gate 與 git diff check。"
+}
