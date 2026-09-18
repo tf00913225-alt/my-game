@@ -95,7 +95,12 @@ function createRuntime(action,targetType){
                 return rect?{x:rect.centerX,y:rect.centerY,rect}:null;
             },
             getRectForSlots(slotIds){ return this.getSlotRect(slotIds[0]); },
-            getGeometryRectFromShape(side,slotId){ return this.getSlotRect(slotId)||this.getSideRect(side); },
+            getGeometryRectFromShape(side,slotId,shape){
+                if(slotId==="MECHANISM_1"&&shape!=="single"){
+                    return Object.assign({slots:["ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"]},this.getSideRect(side));
+                }
+                return this.getSlotRect(slotId)||this.getSideRect(side);
+            },
             getSideRect(side){
                 const rect=(side==="monster"?monsterArea:playerArea).getBoundingClientRect();
                 return Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2});
@@ -154,15 +159,19 @@ for(const [id,targetType] of AFFECTED_SPREAD_DAMAGE_SKILLS){
     const targetRect=mechanism.getBoundingClientRect();
     const targetX=targetRect.left+targetRect.width/2;
     const targetY=targetRect.top+targetRect.height/2;
+    const rangeRect=context.FourSymbolsBattlefieldSlots.getSideRect("monster");
+    assert.equal(sprite.dataset.frameFit,"cover",id+" must preserve its authored per-frame aspect");
+    assert.ok(Number.parseFloat(sprite.style.width)>=rangeRect.width,id+" range width must cover the enemy side");
+    assert.ok(Number.parseFloat(sprite.style.height)>=rangeRect.height,id+" range height must cover the enemy side");
     if(placement==="trajectory"||placement==="targetTrajectory"){
         const actorRect=player0.getBoundingClientRect();
         const actorX=actorRect.left+actorRect.width/2;
         const actorY=actorRect.top+actorRect.height/2;
-        assert.equal(sprite.style["--v143-sprite-dx"],targetX-actorX+"px",id+" must travel toward the function card X");
-        assert.equal(sprite.style["--v143-sprite-dy"],targetY-actorY+"px",id+" must travel toward the function card Y");
+        assert.equal(sprite.style["--v143-sprite-dx"],targetX-actorX+"px",id+" must preserve the function-card projectile endpoint X");
+        assert.equal(sprite.style["--v143-sprite-dy"],targetY-actorY+"px",id+" must preserve the function-card projectile endpoint Y");
     }else{
-        assert.equal(sprite.style.left,targetX+"px",id+" must center on the function card X");
-        assert.equal(sprite.style.top,targetY+"px",id+" must center on the function card Y");
+        assert.equal(sprite.style.left,rangeRect.centerX+"px",id+" function-card range VFX must center on the enemy side X");
+        assert.equal(sprite.style.top,rangeRect.centerY+"px",id+" function-card range VFX must center on the enemy side Y");
     }
 }
 

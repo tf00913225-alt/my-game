@@ -263,9 +263,9 @@ test("blocking shield is outside the monster roster and blocks single, tri and a
     assert.equal(battle.mechanisms.length,1);assert.equal(battle.mechanisms[0].type,"shield");
     assert.equal(context.currentBattleMonsters.length,1,"mechanism card must not consume a normal formation slot");
     assert.equal(context.GameplaySystem.canDirectlyAffectMonster(context.monsters[0]),false);
-    assert.deepEqual(context.getSkillTargets(0,"single"),[]);
-    assert.deepEqual(context.getSkillTargets(0,"tri"),[]);
-    assert.deepEqual(context.getSkillTargets(0,"all"),[]);
+    assert.deepEqual(value(context,"getSkillTargets(0,'single')"),[]);
+    assert.deepEqual(value(context,"getSkillTargets(0,'tri')"),[]);
+    assert.deepEqual(value(context,"getSkillTargets(0,'all')"),[]);
     context.selectBattleTarget(0);
     assert.equal(context.numericSelections||0,0);
     assert.match(context.logs.join("\n"),/護盾尚未破除/);
@@ -349,14 +349,16 @@ test("auto battle prioritizes a blocking mechanism card instead of selecting the
     assert.equal(context.baseAutoCalled||0,0);
 });
 
-test("auto battle uses the formal mechanism priority after the shield tier",()=>{
+test("non-shield function cards stay optional and never hijack auto battle",()=>{
     const {context}=load();
     context.vGameplayStartBoss("personal","personal-70");context.turn=2;context.startTurn(context.battleToken);
     const charge=context.GameplaySystem.debugSpawnMechanism("charge","priority-test");
     const active=value(context,"GameplaySystem.getActiveBattleState().mechanisms");
     assert.deepEqual(active.map(card=>card.type).sort(),["charge","heal"]);
     context.autoActionForCharacter(0,context.battleToken);
-    assert.equal(context.queuedPlayerActions[0].target,"mechanism:"+charge.id,"charge must outrank healing when no shield exists");
+    assert.equal(context.baseAutoCalled,1,"normal auto targeting must remain the owner without a shield");
+    assert.equal(context.queuedPlayerActions[0],undefined,"optional function cards must not force a target");
+    assert.ok(charge,"the optional charge card remains present and manually attackable");
 });
 
 test("charge cancels when destroyed, heal restores Boss, amplify raises damage and seal reduces healing",()=>{

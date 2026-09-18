@@ -67,19 +67,21 @@ assert.match(vfx,/--v143-sprite-dx",destination\.x-actor\.x\+"px"/);
 assert.match(vfx,/gate\.complete\("v143-render-error"\)/);
 assert.match(vfx,/purgeStaleRasterStages\(\)/);
 
-// One canonical four-track layout keeps controls in the middle and the log at the bottom.
+// One canonical three-track layout keeps controls centered and the log in an overlay drawer.
 const enemy=index.indexOf('<section class="battle-enemy-region"');
 const center=index.indexOf('<section class="battle-center-region"');
 const ally=index.indexOf('<section class="battle-ally-region"');
 const info=index.indexOf('<section class="battle-info-region"');
 assert.ok(enemy<center&&center<ally&&ally<info,"battle DOM must be enemy → controls → allies → bottom info");
 assert.doesNotMatch(index.slice(center,ally),/id="battleInfo"/);
-assert.match(css,/--battle-info-region-track:16fr/);
-assert.match(css,/grid-template-rows:\s*minmax\(0,var\(--battle-enemy-region-track\)\)[\s\S]*var\(--battle-info-region-track\)/);
+assert.doesNotMatch(css,/--battle-info-region-track/);
+assert.match(css,/grid-template-rows:\s*minmax\(0,var\(--battle-enemy-region-track\)\)[\s\S]*var\(--battle-ally-region-track\)/);
+assert.match(css,/\.battle-info-region\{[\s\S]*position:absolute !important;[\s\S]*bottom:0 !important/);
+assert.match(main,/function toggleBattleInfoPanel\(\)/);
 assert.match(css,/--battle-ally-row-gap:8px/);
 assert.match(css,/data-slot-row="back"\]\{bottom:0 !important;\}/);
-assert.match(css,/\.battle-monster-name\{[\s\S]*bottom:21px !important/);
-assert.match(css,/\.battle-player-id\{[\s\S]*bottom:21px !important/);
+assert.match(css,/\.battle-monster-name\{[\s\S]*bottom:0 !important/);
+assert.match(css,/\.battle-player-id\{[\s\S]*bottom:0 !important/);
 assert.match(css,/\.battle-element-box-button\{[\s\S]*width:66px !important;[\s\S]*height:66px !important/);
 assert.match(adapter,/slice\(0,6\)/);
 
