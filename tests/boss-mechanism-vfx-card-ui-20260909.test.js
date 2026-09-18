@@ -27,8 +27,12 @@ assert.doesNotMatch(runtime,/blockingShield|mandatoryMechanismTarget|resolveMech
 
 assert.match(adapter,/className="v-fixed-boss-footprint"/);
 assert.match(adapter,/footprint\.appendChild\(bossCard\)/);
-assert.match(css,/\.v-fixed-boss-footprint\{[\s\S]*left:calc\(20% \+ 12px\);[\s\S]*right:calc\(20% \+ 12px\);/);
+assert.match(css,/\.v-fixed-boss-footprint\{[\s\S]*left:calc\(20% \+ 5px\);[\s\S]*right:calc\(20% \+ 5px\);/);
 assert.match(css,/\.gameplay-boss-card > \.v174-battle-art\{[\s\S]*background-size:contain;/);
+assert.match(css,/data-slot\$="1"\] \.v174-battle-art\{[\s\S]*left:-2px !important;[\s\S]*right:14px !important;/);
+assert.match(css,/data-slot\$="5"\] \.v174-battle-art\{[\s\S]*left:14px !important;[\s\S]*right:-2px !important;/);
+assert.doesNotMatch(css,/data-slot\$="1"\] \.v174-battle-art\{[\s\S]*left:4px !important;[\s\S]*right:26px !important;/);
+assert.doesNotMatch(css,/data-slot\$="5"\] \.v174-battle-art\{[\s\S]*left:26px !important;[\s\S]*right:4px !important;/);
 assert.doesNotMatch(css,/boss-mechanism-card|boss-mechanism-slot/);
 
 assert.match(vfx,/Number\.isInteger\(index\)&&canReceive/);
