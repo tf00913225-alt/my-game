@@ -56,7 +56,7 @@ for(const [id,file,duration,hitFrame,target] of expected){
 assert.match(vfx,/function relicSheet\(src,hitFrame,options\)[\s\S]*const frameIndex=frame-1;[\s\S]*hit:frameIndex\/12/,"relic hit timing must use the one-based authored frame without an off-by-one delay");
 assert.match(vfx,/lazyAsset:true/,"relic VFX must remain lazy instead of preloading all 20 sheets");
 assert.match(vfx,/window\.v143PreloadBattleVfxAsset=function/,"equipped relic VFX must preload through the V143 owner");
-assert.match(relic,/RELIC_VFX_MIN_DURATION_MS=3000/,"every relic VFX must enforce the premium 3-second minimum");
+assert.match(relic,/RELIC_VFX_FLOOR_MS=3000/,"every relic VFX must enforce the premium 3-second minimum");
 assert.match(relic,/presentationLeadGapMs:120/,"relic VFX must keep the existing handoff gap without shortening the authored animation");
 assert.ok(expected.every(row=>row[2]>=3000),"every configured relic VFX must be at least 3 seconds");
 assert.match(relic,/function playRelicVfx\([\s\S]*director\.play\(/,"relic presentation must reuse the V142/V143 formal animation pipeline");
