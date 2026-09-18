@@ -37,6 +37,8 @@ assert.doesNotMatch(boss,/calculateDamage\s*=\s*function/);
 assert.doesNotMatch(boss,/castHealSkill\s*=\s*function/);
 
 assert.match(geometry,/className="v-fixed-boss-footprint"/);
+assert.match(geometry,/\.v-fixed-boss-footprint/);
+assert.match(geometry,/isOwnedFixedStructure[\s\S]*?v-fixed-boss-footprint/);
 assert.match(geometry,/footprint\.dataset\.slots=slots\.bossFootprintSlots\.join\(" "\)/);
 assert.match(bossCss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 5px\);[\s\S]*?right:calc\(20% \+ 5px\)/);
 assert.match(bossCss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?pointer-events:auto/);

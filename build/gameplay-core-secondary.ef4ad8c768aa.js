@@ -10420,7 +10420,7 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
 
     function isOwnedFixedStructure(node){
         if(!(node instanceof Element)||node.dataset.geometryOwner!=="fixed-slot"){ return false; }
-        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot");
+        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint");
     }
 
     const observer=new MutationObserver(records=>{
