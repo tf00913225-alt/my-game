@@ -7206,10 +7206,10 @@ function loadGame(){
         }
 
 
-                normalizeHydratedRetiredSkillReferences();
+        normalizeHydratedRetiredSkillReferences();
 
 
-/*
+        /*
            裝備資料
         */
 
