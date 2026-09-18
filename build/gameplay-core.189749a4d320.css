@@ -4696,7 +4696,7 @@ body.quest-scroll-active,
 ===================================================== */
 
 /* 1. Enemy identity and resource numbers use the existing card width. */
-#game-stage > #app > #game-content #battlePage .battle-monster{
+#game-stage > #app > #game-content #battlePage .battle-monster:not(.gameplay-boss-card){
     width:var(--v143-monster-card-width,76px) !important;
     max-width:var(--v143-monster-card-width,76px) !important;
     height:var(--v143-monster-card-height,100px) !important;
@@ -4704,7 +4704,7 @@ body.quest-scroll-active,
     padding:3px !important;
 }
 
-#game-stage > #app > #game-content #battlePage .battle-monster[data-rank="boss"]{
+#game-stage > #app > #game-content #battlePage .battle-monster[data-rank="boss"]:not(.gameplay-boss-card){
     --v143-monster-card-width:82px;
     --v143-monster-card-height:106px;
     --v143-monster-icon-width:30px;

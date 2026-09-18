@@ -43,6 +43,8 @@ assert.match(geometry,/footprint\.dataset\.slots=slots\.bossFootprintSlots\.join
 assert.match(bossCss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 5px\);[\s\S]*?right:calc\(20% \+ 5px\)/);
 assert.match(bossCss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?pointer-events:auto/);
 assert.match(bossCss,/\.gameplay-boss-card > \.v174-battle-art\{[\s\S]*?background-size:contain/);
+assert.doesNotMatch(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster\{[\s\S]*?--v143-monster-card-width/);
+assert.match(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster:not\(\.gameplay-boss-card\)\{/);
 
 assert.match(presentation,/window\.FourSymbolsBattlePresentation=Object\.freeze\([\s\S]*?applyUnit:syncUnitArtwork/);
 assert.match(geometry,/applyPresentation\(card,"monster"\)/);
