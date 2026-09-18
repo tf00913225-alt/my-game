@@ -179,40 +179,6 @@ body > .damage-popup.v152-top-damage{
     box-shadow:0 0 5px rgba(255,220,145,.45) !important;
 }
 
-/* Frostbite blocks only the skill command and equipped skill choices. */
-#game-stage #mainBattleMenu > .menu-button.skill.v152-frostbite-blocked{
-    z-index:6 !important;
-    cursor:not-allowed !important;
-    pointer-events:none !important;
-}
-#game-stage #mainBattleMenu > .menu-button.skill.v152-frostbite-blocked::after{
-    content:"凍傷禁止使用技能" !important;
-    left:16% !important;
-    right:2% !important;
-    top:12% !important;
-    bottom:10% !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    box-sizing:border-box !important;
-    padding:4px 3px !important;
-    border-radius:9px !important;
-    opacity:1 !important;
-    color:#fff !important;
-    background:rgba(8,12,18,.56) !important;
-    filter:none !important;
-    font-size:12px !important;
-    font-weight:900 !important;
-    line-height:1.3 !important;
-    text-align:center !important;
-    white-space:normal !important;
-    text-shadow:0 1px 3px #000,0 0 4px #000 !important;
-}
-#game-stage .skill-quick-button.v152-frostbite-blocked{
-    cursor:not-allowed !important;
-    filter:grayscale(.85) brightness(.58) !important;
-}
-
 /* Give the Skill hotspot a narrow priority overlap at its right boundary. */
 #game-stage #mainBattleMenu > .menu-button.skill{
     width:21.5% !important;

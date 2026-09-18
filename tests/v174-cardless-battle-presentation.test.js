@@ -43,3 +43,9 @@ test('Abyss keeps its existing portrait owner but avoids double-rendering artwor
     assert.match(css,/img\.v162-abyss-battle-portrait-art\{[\s\S]*?opacity:0 !important;[\s\S]*?pointer-events:none !important;/);
     assert.doesNotMatch(source,/removeChild\([^)]*v162-abyss-battle-portrait-art/);
 });
+
+test('retired full-card status overlays and root frames cannot reappear',()=>{
+    assert.match(source,/card-status-overlay[\s\S]*?overlay\.remove\(\)/);
+    assert.match(css,/\.v174-cardless-unit\{[\s\S]*?border:0 !important;[\s\S]*?box-shadow:none !important;/);
+    assert.doesNotMatch(source,/classList\.(?:add|toggle)\([^)]+(?:red-hit|\"hit\")/);
+});

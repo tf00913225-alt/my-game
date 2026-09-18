@@ -173,7 +173,7 @@ test("Extreme Emperor's three Light skills use the exact final values",()=>{
     assert.equal(state.ally.agility,120);
 });
 
-test("Frostbite visibly disables the Skill command without disabling normal attack",()=>{
+test("Frostbite leaves the Skill command and quick skills enabled",()=>{
     const skillButton={disabled:false,dataset:{},classList:classList(),setAttribute(){}};
     const normalButton={disabled:false};
     const quick={disabled:false,onclick(){},classList:classList()};
@@ -185,12 +185,11 @@ test("Frostbite visibly disables the Skill command without disabling normal atta
     });
     const context=load({document,getPartyCharacterByIndex:()=>character,activeBattleCharacterIndex:0,populateSkillQuickBar(){}});
     context.populateSkillQuickBar();
-    assert.equal(skillButton.disabled,true);
-    assert.equal(quick.disabled,true);
+    assert.equal(skillButton.disabled,false);
+    assert.equal(quick.disabled,false);
     assert.equal(normalButton.disabled,false);
-    assert.match(css,/content:"凍傷禁止使用技能" !important/);
-    assert.doesNotMatch(css,/content:"🚫"|v152-frostbite-symbol/);
-    assert.doesNotMatch(source,/symbol\.textContent="🚫"/);
+    assert.doesNotMatch(css,/凍傷禁止使用技能|v152-frostbite-blocked|v152-frostbite-symbol/);
+    assert.doesNotMatch(source,/syncFrostbiteSkillControls|v152FrostbiteBlocked|rejectFrostbittenSkill/);
 });
 
 test("entering a map immediately runs configured auto recovery exactly once",()=>{

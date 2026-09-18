@@ -15,7 +15,7 @@ test("HP and SP resource HUD stays above persistent status VFX",()=>{
     assert.match(vfxCss,/\.v153-status-vfx-rage\{[\s\S]*?z-index:5;/);
     assert.match(
         layerCss,
-        /#game-stage #battlePage \.battle-player \.hp-bar,[\s\S]*?#game-stage #battlePage \.battle-monster \.monster-sp\{[\s\S]*?position:relative !important;[\s\S]*?z-index:20 !important;/
+        /#game-stage #battlePage \.battle-player \.hp-bar,[\s\S]*?#game-stage #battlePage \.battle-monster:not\(\.gameplay-boss-card\) \.monster-sp\{[\s\S]*?position:relative !important;[\s\S]*?z-index:20 !important;/
     );
 });
 

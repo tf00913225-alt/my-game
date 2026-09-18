@@ -62,7 +62,12 @@ assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-center-r
 assert.match(fixedCss,/\.battle-center-region\{[\s\S]*?border:0/);
 assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?position:absolute !important;[\s\S]*?bottom:0 !important/);
 assert.match(fixedCss,/\.battle-info-toggle\{[\s\S]*?width:64px;[\s\S]*?border:3px solid #d9ad50/);
+assert.match(fixedCss,/\.battle-info-toggle\{[\s\S]*?right:4px;[\s\S]*?background:rgba\(0,0,0,\.62\)/);
 assert.match(fixedCss,/\.battle-element-box-button\{[\s\S]*?width:66px !important;[\s\S]*?height:66px !important/);
+assert.match(bossCss,/\.gameplay-boss-card > \.monster-hp,[\s\S]*?position:absolute;[\s\S]*?display:block;/);
+assert.match(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster:not\(\.gameplay-boss-card\) \.monster-hp/);
+assert.match(read("css/46-v154-dev-fixes.css"),/\.battle-monster:not\(\.gameplay-boss-card\) \.monster-hp/);
+assert.match(fixedCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?\.v-fixed-ally-slot \.hp-bar[\s\S]*?border:1px solid rgba\(255,255,255,\.28\) !important/);
 
 assert.match(home,/openHomeFeature\(\\'formation\\'\)/);
 assert.match(formation,/window\.vFixedRenderAllyFormationContent=renderAllyFormationContent/);

@@ -676,9 +676,15 @@
 #game-stage #battlePage .gameplay-boss-card > .monster-hp,
 #game-stage #battlePage .gameplay-boss-card > .monster-sp{
     display:block;
+    visibility:visible;
+    opacity:1;
     height:10px;
     min-height:10px;
+    max-height:10px;
+    margin:0;
     overflow:hidden;
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:4px;
 }
 #game-stage #battlePage .gameplay-boss-card > .monster-hp{bottom:29px;}
 #game-stage #battlePage .gameplay-boss-card > .monster-sp{bottom:17px;}

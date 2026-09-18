@@ -48,6 +48,9 @@ function battleArtworkSource(card,kind){
 function syncUnitArtwork(card,kind){
     if(!card)return;
     card.classList.add("v174-cardless-unit");
+    /* Full-card Freeze/Burn overlays belong to the retired card presentation.
+       Formal status Sprite Sheets remain anchored to the artwork layer. */
+    Array.from(card.querySelectorAll?.(":scope > .card-status-overlay")||[]).forEach(overlay=>overlay.remove());
     let art=card.querySelector(":scope > .v174-battle-art");
     if(!art){art=document.createElement("div");art.className="v174-battle-art";card.insertBefore(art,card.firstChild);}
     const source=battleArtworkSource(card,kind);

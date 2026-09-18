@@ -125,7 +125,8 @@
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle{
     position:absolute;
-    left:50%;
+    left:auto;
+    right:4px;
     top:0;
     z-index:2;
     display:flex;
@@ -139,9 +140,9 @@
     border-bottom:0;
     border-radius:10px 10px 0 0;
     color:#f5cf72;
-    background:rgba(40,31,20,.9);
+    background:rgba(0,0,0,.62);
     box-shadow:0 -2px 10px rgba(217,173,80,.34);
-    transform:translateX(-50%);
+    transform:none;
     pointer-events:auto;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle > span{
@@ -278,6 +279,7 @@
 
 /* Unit identity fills the Slot; it cannot size or move the Slot. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot > .battle-monster,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-boss-footprint > .battle-monster,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player{
     position:absolute !important;
     inset:0 !important;
@@ -292,15 +294,20 @@
     overflow:visible !important;
     contain:none !important;
     box-sizing:border-box !important;
+    isolation:isolate !important;
+    transition-property:opacity !important;
+    transition-duration:.15s !important;
+}
+
+/* Cardless presentation is authoritative as soon as a Unit is created, before
+   the geometry adapter moves it into its formal Slot or Boss footprint. */
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit{
     background-color:transparent !important;
     background-image:none !important;
     border:0 !important;
     border-radius:0 !important;
     box-shadow:none !important;
     outline:0 !important;
-    isolation:isolate !important;
-    transition-property:opacity !important;
-    transition-duration:.15s !important;
 }
 
 /* Artwork is a paint layer. Full source aspect is preserved with contain. */
@@ -399,6 +406,8 @@
     opacity:1 !important;
     z-index:20 !important;
     box-sizing:border-box !important;
+    border:1px solid rgba(255,255,255,.28) !important;
+    border-radius:4px !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar{bottom:26px !important;}
@@ -410,6 +419,14 @@
     height:var(--battle-resource-bar-height) !important;
     font-size:9px !important;
     line-height:var(--battle-resource-bar-height) !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp-inner,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp-inner,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar-inner,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar-inner{
+    top:0 !important;
+    bottom:0 !important;
+    height:auto !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-status-badges,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .monster-status-badges{
@@ -435,7 +452,8 @@
     box-shadow:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable{
     border:0 !important;
     box-shadow:none !important;
 }
@@ -443,7 +461,8 @@
    outline. The same owner covers normal enemies, Boss, reinforcements and
    destructible Boss objects as soon as they enter the Unit pipeline. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before{
     content:"" !important;
     position:absolute !important;
     z-index:30 !important;
@@ -460,6 +479,10 @@
     transform:translate(-50%,-50%) !important;
     pointer-events:none !important;
     animation:v174TargetReticlePulse .72s ease-in-out infinite alternate !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after{
+    content:none !important;
+    display:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{

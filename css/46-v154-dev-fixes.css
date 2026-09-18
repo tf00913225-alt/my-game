@@ -34,8 +34,8 @@ body.v162-element-box-settings-open > .skill-name-badge.v143-caster-skill-label{
    on the card but must stay behind both ally and enemy resource bars. */
 #game-stage #battlePage .battle-player .hp-bar,
 #game-stage #battlePage .battle-player .sp-bar,
-#game-stage #battlePage .battle-monster .monster-hp,
-#game-stage #battlePage .battle-monster .monster-sp{
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-hp,
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-sp{
     position:relative !important;
     z-index:20 !important;
     isolation:isolate;

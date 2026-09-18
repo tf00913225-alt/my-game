@@ -168,7 +168,7 @@ test("every special percentage, duration and prerequisite is exact",()=>{
     assertArray(s.earthShield.requires,["stoneBreakSky","flyingSandStrike"]);
 });
 
-test("Frostbite rejects skills but allows normal actions and auto falls back",()=>{
+test("Frostbite is a soft debuff and does not replace manual or automatic skills",()=>{
     const party=[{id:"甲",hp:100,activeBuffs:[],statusEffects:[{type:"frostbite",turnsLeft:2}]}];
     let prepared=0,finished=0,misses=0,legacyResolved=0;
     const queued={0:{action:"iceSpin",target:0}};
@@ -181,13 +181,13 @@ test("Frostbite rejects skills but allows normal actions and auto falls back",()
     });
     context.prepareAction("iceSpin");
     context.prepareAction("normal");
-    assert.equal(prepared,1,"normal action remains available");
+    assert.equal(prepared,2,"Frostbite leaves both skill and normal actions available");
     context.resolveQueuedPlayerAction(0,1);
-    assert.equal(legacyResolved,0);
-    assert.equal(finished,1,"a queued skill consumed by Frostbite ends once");
+    assert.equal(legacyResolved,1);
+    assert.equal(finished,0,"Frostbite does not consume the queued action");
     context.autoActionForCharacter(0,1);
-    assert.equal(queued[0].action,"normal");
-    assert.equal(misses,2);
+    assert.equal(queued[0].action,"iceSpin");
+    assert.equal(misses,0);
 });
 
 test("differently named buffs no longer reject or overwrite one another",()=>{
