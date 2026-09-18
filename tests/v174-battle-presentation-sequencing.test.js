@@ -7,10 +7,10 @@ const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 
-assert.match(relic,/RELIC_VFX_FLOOR_MS=3000/,
-    "relic VFX keeps the formal premium three-second minimum");
-assert.match(relic,/presentationDurationMs:3200/,
-    "relic presentation fallback matches the premium visual duration baseline");
+assert.match(relic,/RELIC_VFX_FLOOR_MS=1200/,
+    "relic VFX keeps a deliberate cadence floor without stretching 12-frame sheets into slow motion");
+assert.match(relic,/presentationDurationMs:1500/,
+    "relic presentation fallback stays inside the reviewed 12-frame cadence window");
 assert.match(relic,/presentationLeadGapMs:120/,
     "relic presentation keeps the short handoff gap after the previous visual gate settles");
 assert.match(relic,/function queueRelicPresentation\(def,onStart,visualContext\)/);
