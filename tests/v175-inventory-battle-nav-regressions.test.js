@@ -23,8 +23,8 @@ assert.match(main,/character-showcase-choice/);
 assert.match(main,/choice\.classList\.toggle\("is-current-character",selected\)/);
 
 const bossCss=read("css/gameplay-boss-tower.css");
-assert.match(bossCss,/--gameplay-boss-card-width:clamp\(118px,29%,132px\)/);
-assert.match(bossCss,/--gameplay-mechanism-card-width:clamp\(123px,30%,138px\)/);
+assert.match(bossCss,/\.v-fixed-boss-footprint\{[\s\S]*left:calc\(20% \+ 5px\);[\s\S]*right:calc\(20% \+ 5px\);/);
+assert.doesNotMatch(bossCss,/boss-mechanism-card|boss-mechanism-slot/);
 assert.doesNotMatch(bossCss,/gameplay-boss-card \.damage-popup\{\s*display:none/);
 
 const vfx=read("js/39-v143-skill-animation.js");

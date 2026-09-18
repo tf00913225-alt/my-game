@@ -1663,22 +1663,22 @@
 }
 
 /* Monster cards */
-#game-stage > #app > #game-content #battlePage .battle-monster{
+#game-stage > #app > #game-content #battlePage .battle-monster:not(.gameplay-boss-card){
     width:88px !important;
     height:104px !important;
     padding:5px 4px !important;
     font-size:8px !important;
 }
 
-#game-stage > #app > #game-content #battlePage .battle-monster-icon{
+#game-stage > #app > #game-content #battlePage .battle-monster:not(.gameplay-boss-card) .battle-monster-icon{
     width:36px !important;
     height:36px !important;
     flex-basis:36px !important;
     font-size:28px !important;
 }
 
-#game-stage > #app > #game-content #battlePage .battle-monster-name,
-#game-stage > #app > #game-content #battlePage .battle-monster-level{
+#game-stage > #app > #game-content #battlePage .battle-monster:not(.gameplay-boss-card) .battle-monster-name,
+#game-stage > #app > #game-content #battlePage .battle-monster:not(.gameplay-boss-card) .battle-monster-level{
     font-size:10px !important;
     line-height:12px !important;
 }

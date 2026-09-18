@@ -12,9 +12,6 @@
 
     const VERSION="142-gate-only";
     const NORMAL_ANIMATION_MS=520;
-    const CURRENT_DECLARE_DELAY_MS=90;
-    const CURRENT_RESOLVE_DELAY_MS=1600;
-    const CURRENT_ROUND_HANDOFF_MS=400;
 
     const SPECS={
         flameSlash:[760,"basic","slash"],fireCritical:[1050,"medium","impact"],
@@ -151,10 +148,9 @@
 
     const state={
         sequence:0,active:null,latest:null,fallbackTimer:0,visibilityHandler:null,
-        tickets:{declare:null,resolve:null},roundGate:null,completedBoundaries:[],
         metrics:{
             version:VERSION,started:0,completed:0,superseded:0,
-            boundariesAdvanced:0,duplicateBoundariesBlocked:0,last:null
+            last:null
         }
     };
 
@@ -224,10 +220,9 @@
             style:config.style,element:config.element,side:meta.side||"player"
         };
 
-        /* V142 owns action completion even when V143 owns the pixels. Keep the
-           deadline independent from render:false so a VFX asset/DOM failure can
-           never leave the combat initiative waiting forever. V143 normally
-           completes the same idempotent gate at this deadline. */
+        /* The gate measures visual lifetime only. Queue progression never waits
+           on this Promise; 00-main.js reads the remaining time and schedules its
+           own deterministic handoff even if the raster renderer fails. */
         state.fallbackTimer=setTimeout(
             ()=>gate.complete(meta.render===false?"v142-render-safety-deadline":"v142-timing-only"),
             Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
@@ -247,9 +242,6 @@
         getLatest:function(){ return state.latest; },
         getMetrics:function(){ return Object.assign({},state.metrics,{active:!!state.active}); },
         dispose:function(){
-            state.tickets.declare=null;
-            state.tickets.resolve=null;
-            state.roundGate=null;
             if(state.active&&!state.active.done){ state.active.complete("dispose"); }
             else{ cleanup(); }
         },
@@ -310,156 +302,14 @@
         return gate;
     }
 
-    function rememberBoundary(key){
-        state.completedBoundaries.push(key);
-        if(state.completedBoundaries.length>48){
-            state.completedBoundaries.splice(0,state.completedBoundaries.length-48);
-        }
-    }
+    /* The visual gate owns only visual lifetime. Queue progression has one
+       owner in 00-main.js and can never wait on a renderer Promise. */
+    window.v142GetActiveAnimationGate=currentGate;
+    window.v142GetRemainingAnimationMs=function(){
+        const gate=currentGate();
+        return gate&&!gate.done?Math.max(0,gate.deadline-Date.now()):0;
+    };
 
-    function runTicket(kind,ticket,invoke){
-        const key=[kind,ticket.token,ticket.round,ticket.index,ticket.gateId].join("|");
-        if(ticket.consumed||state.completedBoundaries.indexOf(key)>=0){
-            state.metrics.duplicateBoundariesBlocked++;
-            return;
-        }
-        ticket.consumed=true;
-        const delay=Math.max(0,ticket.earliestAt-Date.now());
-        const timeReady=delay?new Promise(resolve=>setTimeout(resolve,delay)):Promise.resolve();
-        const animationReady=ticket.gate&&!ticket.gate.done?ticket.gate.promise:Promise.resolve();
-        Promise.all([timeReady,animationReady]).then(()=>{
-            if(state.completedBoundaries.indexOf(key)>=0){ return; }
-            if(typeof battleActive!=="undefined"&&!battleActive){ return; }
-            if(typeof battleToken!=="undefined"&&ticket.token!==battleToken){ return; }
-            rememberBoundary(key);
-            state.metrics.boundariesAdvanced++;
-            if(state.tickets[kind]===ticket){ state.tickets[kind]=null; }
-            invoke();
-        });
-    }
-
-    function resolveDelay(index){
-        return typeof initiativeQueue!=="undefined"&&index>=initiativeQueue.length
-            ?CURRENT_ROUND_HANDOFF_MS:CURRENT_RESOLVE_DELAY_MS;
-    }
-
-    function partyDefeated(){
-        if(typeof getPartyCharacterByIndex!=="function"){ return false; }
-        let found=false,alive=false;
-        for(let index=0;index<3;index++){
-            const character=getPartyCharacterByIndex(index);
-            if(character){ found=true; if(character.hp>0){ alive=true; } }
-        }
-        return found&&!alive;
-    }
-
-    function monstersDefeated(){
-        if(typeof currentBattleMonsters==="undefined"||!Array.isArray(currentBattleMonsters)||!currentBattleMonsters.length){ return false; }
-        return !currentBattleMonsters.some(index=>typeof monsters!=="undefined"&&monsters[index]&&monsters[index].alive);
-    }
-
-    const terminalLocks=new Set();
-    if(typeof finishPlayerAction==="function"){
-        const previous=finishPlayerAction;
-        finishPlayerAction=function(){
-            const gate=currentGate();
-            if((partyDefeated()||monstersDefeated())&&gate&&!gate.done){
-                const lock="terminal|"+gate.id;
-                if(terminalLocks.has(lock)){ return; }
-                terminalLocks.add(lock);
-                const that=this,args=arguments;
-                gate.promise.then(()=>{
-                    terminalLocks.delete(lock);
-                    if(typeof battleActive!=="undefined"&&!battleActive){ return; }
-                    previous.apply(that,args);
-                });
-                return;
-            }
-
-            const phase=typeof battlePhase!=="undefined"?battlePhase:null;
-            const token=typeof battleToken!=="undefined"?battleToken:null;
-            const beforeDeclare=typeof activeBattleCharacterIndex!=="undefined"?activeBattleCharacterIndex:null;
-            const beforeResolve=typeof initiativeIndex!=="undefined"?initiativeIndex:null;
-            const calledAt=Date.now();
-            const delayOverride=typeof window!=="undefined"&&Number.isFinite(Number(window.__battleAdvanceDelayOverrideMs))
-                ?Math.max(0,Number(window.__battleAdvanceDelayOverrideMs)):null;
-            const result=previous.apply(this,arguments);
-            const actionGate=currentGate();
-            const boundaryGate=delayOverride===null?actionGate:null;
-
-            if(phase==="declare"&&typeof activeBattleCharacterIndex!=="undefined"&&activeBattleCharacterIndex!==beforeDeclare){
-                state.tickets.declare={
-                    token:token,round:typeof turn!=="undefined"?turn:0,index:activeBattleCharacterIndex,
-                    gate:boundaryGate,gateId:boundaryGate?boundaryGate.id:"none",
-                    earliestAt:Math.max(
-                        calledAt+(delayOverride===null?CURRENT_DECLARE_DELAY_MS:delayOverride),
-                        boundaryGate?boundaryGate.deadline:0
-                    ),
-                    consumed:false
-                };
-            }else if(phase==="resolve"&&typeof initiativeIndex!=="undefined"&&initiativeIndex!==beforeResolve){
-                const roundEnded=typeof initiativeQueue!=="undefined"&&initiativeIndex>=initiativeQueue.length;
-                state.roundGate=roundEnded&&boundaryGate?{token:token,gate:boundaryGate,consumed:false}:null;
-                state.tickets.resolve={
-                    token:token,round:typeof turn!=="undefined"?turn:0,index:initiativeIndex,
-                    gate:boundaryGate,gateId:boundaryGate?boundaryGate.id:"none",
-                    earliestAt:Math.max(
-                        calledAt+(delayOverride===null?resolveDelay(initiativeIndex):delayOverride),
-                        boundaryGate?boundaryGate.deadline:0
-                    ),
-                    consumed:false
-                };
-            }
-            return result;
-        };
-    }
-
-    if(typeof beginCharacterTurn==="function"){
-        const previous=beginCharacterTurn;
-        beginCharacterTurn=function(token){
-            const ticket=state.tickets.declare;
-            if(ticket&&ticket.token===token&&typeof activeBattleCharacterIndex!=="undefined"&&ticket.index===activeBattleCharacterIndex){
-                const that=this,args=arguments;
-                runTicket("declare",ticket,()=>previous.apply(that,args));
-                return;
-            }
-            const roundGate=state.roundGate;
-            if(roundGate&&roundGate.token===token){
-                if(!roundGate.gate||roundGate.gate.done){
-                    state.roundGate=null;
-                    return previous.apply(this,arguments);
-                }
-                if(roundGate.consumed){
-                    state.metrics.duplicateBoundariesBlocked++;
-                    return;
-                }
-                roundGate.consumed=true;
-                const that=this,args=arguments;
-                roundGate.gate.promise.then(()=>{
-                    if(state.roundGate!==roundGate){ return; }
-                    state.roundGate=null;
-                    if(typeof battleActive!=="undefined"&&!battleActive){ return; }
-                    if(typeof battleToken!=="undefined"&&token!==battleToken){ return; }
-                    previous.apply(that,args);
-                });
-                return;
-            }
-            return previous.apply(this,arguments);
-        };
-    }
-
-    if(typeof processNextCombatant==="function"){
-        const previous=processNextCombatant;
-        processNextCombatant=function(token){
-            const ticket=state.tickets.resolve;
-            if(ticket&&ticket.token===token&&typeof initiativeIndex!=="undefined"&&ticket.index===initiativeIndex){
-                const that=this,args=arguments;
-                runTicket("resolve",ticket,()=>previous.apply(that,args));
-                return;
-            }
-            return previous.apply(this,arguments);
-        };
-    }
 
     function emperorAllies(){
         if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }

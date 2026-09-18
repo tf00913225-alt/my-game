@@ -1872,21 +1872,6 @@
         return stableFormationRows(ordered).flatMap(centerFirstOrder).filter(monsterAlive);
     }
 
-    if(typeof getSkillTargets==="function"){
-        const previousGetSkillTargets=getSkillTargets;
-        getSkillTargets=function(centerIndex,targetType){
-            const owner=battlefieldSlots();
-            const snapshot=activeFormationSnapshot(
-                typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]
-            );
-            if(owner&&snapshot&&["single","tri","row","column","all"].includes(targetType)){
-                return owner.resolveEnemyTargets(snapshot,centerIndex,targetType,monsterAlive);
-            }
-            const legacy=previousGetSkillTargets.apply(this,arguments);
-            return Array.isArray(legacy)?legacy.filter(monsterAlive):[];
-        };
-    }
-
     window.v148GetFormationRows=stableFormationRows;
     window.v148GetAutoTargetPriority=autoTargetPriority;
 
@@ -2535,37 +2520,8 @@
         };
     }
 
-    if(typeof processNextCombatant==="function"){
-        const previousProcessNext=processNextCombatant;
-        processNextCombatant=function(){
-            if(settleDefeatedEnemies()){ return; }
-            return previousProcessNext.apply(this,arguments);
-        };
-    }
-
-    if(typeof finishPlayerAction==="function"){
-        const previousFinishAction=finishPlayerAction;
-        let terminalPending=false;
-        finishPlayerAction=function(){
-            if(enemiesHaveNoHp()){
-                const gate=window.v142SkillAnimationDirector&&window.v142SkillAnimationDirector.getActive
-                    ?window.v142SkillAnimationDirector.getActive():null;
-                if(gate&&gate.promise&&!gate.done){
-                    if(terminalPending){ return; }
-                    terminalPending=true;
-                    const that=this;
-                    const args=arguments;
-                    gate.promise.then(()=>{
-                        terminalPending=false;
-                        if(!settleDefeatedEnemies()){ previousFinishAction.apply(that,args); }
-                    });
-                    return;
-                }
-                if(settleDefeatedEnemies()){ return; }
-            }
-            return previousFinishAction.apply(this,arguments);
-        };
-    }
+    /* Zero-HP settlement and queue advancement are owned by 00-main.js.
+       This feature module must never Promise-gate or replace either owner. */
 
     /* ----- Formal daily dungeons: one shared 3-wave × 6-enemy battle flow. ----- */
     const DAILY_ELEMENTS=["fire","water","earth","wind"];
@@ -3752,6 +3708,15 @@
         else{ setTimeout(callback,0); }
     }
 
+    function captureBattleFinish(onFinish){
+        const flow=window.FourSymbolsBattleFlow;
+        if(!flow||typeof flow.interceptActionFinish!=="function"){ return function(){}; }
+        return flow.interceptActionFinish(()=>{
+            if(typeof onFinish==="function"){ onFinish(); }
+            return true;
+        });
+    }
+
     function livingMonsterSnapshot(){
         return livingMonsterIndexes().map(index=>({
             index:index,monster:monsters[index],wasAlive:true
@@ -3778,7 +3743,8 @@
             options.skill.spCost=0;
             options.skill.v149FreeFollowUp=true;
         }
-        if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+        const releaseFinishCapture=options.realFinish
+            ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
         if(originalRoll){
             rollCritical=function(){
                 const roll=originalRoll.apply(this,arguments);
@@ -3792,7 +3758,7 @@
             );
         }finally{
             if(originalRoll){ rollCritical=originalRoll; }
-            if(options.realFinish){ finishPlayerAction=options.realFinish; }
+            releaseFinishCapture();
             options.skill.spCost=originalCost;
             if(hadFreeFlag){ options.skill.v149FreeFollowUp=originalFreeFlag; }
             else{ delete options.skill.v149FreeFollowUp; }
@@ -4022,7 +3988,8 @@
             monster.v141SupportSkillIds=[];
             monster.skillChance=1;
             currentReflectAttacker=options.monsterIndex;
-            if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+            const releaseFinishCapture=options.realFinish
+                ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
             if(originalHit){
                 showPlayerHit=function(){
                     if(arguments[4]===true){ repeatedCritical=true; }
@@ -4059,7 +4026,7 @@
                 console.error("敵方"+options.skill.name+"追擊施放失敗：",error);
             }
             finally{
-                if(options.realFinish){ finishPlayerAction=options.realFinish; }
+                releaseFinishCapture();
                 if(originalHit){ showPlayerHit=originalHit; }
                 if(originalLog){ addBattleLog=originalLog; }
                 if(originalStatusRoll){ rollStatusEffectHit=originalStatusRoll; }
@@ -4118,7 +4085,8 @@
             let finishRequested=false;
             let castSkillId=null;
             let critical=false;
-            if(realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+            const releaseFinishCapture=realFinish
+                ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
             if(previousBadge){
                 showMonsterSkillNameBadge=function(name){
                     if(typeof skillDatabase!=="undefined"){
@@ -4157,7 +4125,7 @@
             finally{
                 currentReflectAttacker=previousAttacker;
                 window.v149CurrentDamageActor=previousDamageActor;
-                if(realFinish){ finishPlayerAction=realFinish; }
+                releaseFinishCapture();
                 if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
                 if(previousHit){ showPlayerHit=previousHit; }
                 if(previousLog){ addBattleLog=previousLog; }
@@ -4875,6 +4843,19 @@
 
     function resolveMonsterPortraitRecord(monster,options){
         if(!monster){ return null; }
+        const dedicatedPath=String(monster.vGameplayPortrait||"").trim();
+        if(dedicatedPath){
+            return {
+                portraitKey:"gameplay.object."+String(monster.objectType||monster.name||"unit"),
+                name:monster.name||"",
+                element:monster.element||"dynamic",
+                rank:monster.rank||"regular",
+                sizeClass:monster.unitKind==="boss"?"boss":"regular",
+                path:dedicatedPath,
+                status:"existing",
+                dedicated:true
+            };
+        }
         const temporaryBoss=monster.rank==="boss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.v141BattleRank==="boss"||(monster.v141Abyss===true&&monster.name!=="天兵天將"&&(Object.prototype.hasOwnProperty.call(EARLY_ABYSS_PORTRAITS,monster.name)||Object.prototype.hasOwnProperty.call(FINAL_ABYSS_PORTRAITS,monster.name)));
         return {
             portraitKey:temporaryBoss?"temporary.boss-reference":"temporary.heavenly-soldier",
@@ -9386,70 +9367,9 @@ window.v17351FiveEnemyAutoTargetPriority=fivePriority;
    formal render-geometry adapter. This layer owns only artwork decoration,
    layering and transient animation. It deliberately contains no Slot/Unit/HUD
    top/left/right/bottom/inset/width/height positioning rules. */
-function ensureBattlePresentationStyles(){
-    if(document.getElementById("v174-cardless-battle-style"))return;
-    const style=document.createElement("style");
-    style.id="v174-cardless-battle-style";
-    style.textContent=`
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit,
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{
-    border:0!important;outline:0!important;box-shadow:none!important;
-    background-color:transparent!important;background-image:none!important;
-    isolation:isolate!important;overflow:visible!important;
-    transition-property:opacity!important;transition-duration:.15s!important;
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
-    z-index:1!important;display:block!important;pointer-events:none!important;overflow:visible!important;
-    background-repeat:no-repeat!important;background-color:transparent!important;
-    background-size:contain!important;background-position:center bottom!important;
-    transform-origin:50% 82%!important;will-change:transform,filter!important;
-    animation:v174BattleIdle 3.4s ease-in-out infinite!important;
-    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
-}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp,
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp{
-    display:block!important;visibility:visible!important;opacity:1!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{z-index:20!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
-    display:flex!important;align-items:center!important;justify-content:center!important;
-    text-align:center!important;white-space:nowrap!important;overflow:visible!important;
-    visibility:visible!important;opacity:1!important;z-index:24!important;pointer-events:none!important;
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
-    content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;
-    border-radius:50%;background:rgba(0,0,0,.42);filter:blur(2px);
-    transform:translateX(-50%);pointer-events:none;
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art~*{z-index:6;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .hp-bar,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .sp-bar,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-hp,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-sp{z-index:20!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{opacity:0!important;pointer-events:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{border:0!important;background:none!important;box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn{
-    outline:2px solid #f1c96d!important;outline-offset:1px!important;border-radius:8px!important;
-    box-shadow:0 0 0 1px rgba(255,232,163,.34),0 0 14px rgba(241,201,109,.82)!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.ally-targetable{box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target{border:0!important;box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn>.v174-battle-art,
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target>.v174-battle-art{
-    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7)));
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down{animation:none!important;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up>.v174-battle-art{animation:v174BattleLungeUp .45s ease!important;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down>.v174-battle-art{animation:v174BattleLungeDown .45s ease!important;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art.v174-hit-shake{animation:v174BattleHitShake .28s ease!important;}
-@keyframes v174BattleIdle{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.015)}}
-@keyframes v174BattleLungeUp{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(-13px) scale(1.035)}68%{transform:translateY(-5px) scale(1.015)}}
-@keyframes v174BattleLungeDown{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(13px) scale(1.035)}68%{transform:translateY(5px) scale(1.015)}}
-@keyframes v174BattleHitShake{0%,100%{transform:translate(0,0)}18%{transform:translate(-4px,1px)}36%{transform:translate(4px,-1px)}54%{transform:translate(-3px,0)}72%{transform:translate(2px,1px)}}
-@media (prefers-reduced-motion:reduce){#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{animation:none!important;}}
-`;
-    document.head.appendChild(style);
+function removeRetiredPresentationStyles(){
+    const style=document.getElementById("v174-cardless-battle-style");
+    if(style){ style.remove(); }
 }
 function numericValue(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0;}
 function setTextIfChanged(node,value){if(node&&node.textContent!==value)node.textContent=value;}
@@ -9493,11 +9413,16 @@ function syncResourceNumbers(){
     });
 }
 function syncBattlePresentation(){
-    ensureBattlePresentationStyles();
+    removeRetiredPresentationStyles();
     document.querySelectorAll("#battlePage .battle-player").forEach(card=>syncUnitArtwork(card,"player"));
     document.querySelectorAll("#battlePage .battle-monster").forEach(card=>syncUnitArtwork(card,"monster"));
     syncResourceNumbers();
 }
+window.FourSymbolsBattlePresentation=Object.freeze({
+    version:"cardless-presentation-v2",
+    applyUnit:syncUnitArtwork,
+    sync:syncBattlePresentation
+});
 function shakeArtForPopup(node){
     if(!(node instanceof Element))return;
     const popups=node.matches?.(".damage-popup.hp-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup.hp-popup")||[]);
@@ -9539,9 +9464,19 @@ window.v17351SyncManagement=syncManagement;
 function adLayer(){let l=document.getElementById("v17351AdSimulator");if(l)return l;l=document.createElement("div");l.id="v17351AdSimulator";l.className="v17351-ad-simulator";l.setAttribute("aria-hidden","true");l.innerHTML='<section class="v17351-ad-panel" role="dialog" aria-modal="true"><div class="v17351-ad-badge">AD</div><h2>模擬觀看廣告</h2><p>測試模式：播放完成後才發放獎勵。</p><strong id="v17351AdCountdown">3</strong><span id="v17351AdStatus">秒後完成</span></section>';document.body.appendChild(l);return l;}
 window.showRewardedAd=function(onSuccess,onFail){if(adRunning)return false;adRunning=true;const l=adLayer(),num=l.querySelector("#v17351AdCountdown"),status=l.querySelector("#v17351AdStatus");l.classList.add("show");l.setAttribute("aria-hidden","false");let remain=3;num.textContent="3";status.textContent="秒後完成";const timer=setInterval(()=>{remain--;if(remain>0){num.textContent=String(remain);return}clearInterval(timer);num.textContent="✓";status.textContent="觀看完成";setTimeout(()=>{l.classList.remove("show");l.setAttribute("aria-hidden","true");adRunning=false;try{if(typeof onSuccess==="function")onSuccess()}catch(err){console.error(err);if(typeof onFail==="function")onFail(err)}},280)},1000);return true;};
 
-const observer=new MutationObserver(mutations=>{syncManagement();mutations.forEach(record=>record.addedNodes.forEach(shakeArtForPopup));});
+const observer=new MutationObserver(mutations=>{
+    let needsResourceSync=false;
+    mutations.forEach(record=>record.addedNodes.forEach(node=>{
+        shakeArtForPopup(node);
+        if(!(node instanceof Element)){ return; }
+        const units=node.matches?.(".battle-player,.battle-monster")
+            ?[node]:Array.from(node.querySelectorAll?.(".battle-player,.battle-monster")||[]);
+        units.forEach(card=>syncUnitArtwork(card,card.classList.contains("battle-monster")?"monster":"player"));
+        if(units.length){ needsResourceSync=true; }
+    }));
+    if(needsResourceSync){ syncResourceNumbers(); }
+});
 observer.observe(document.body,{subtree:true,childList:true});
-setInterval(syncManagement,300);
 syncManagement();
 })();
 
@@ -10117,24 +10052,12 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
     let reconcileQueued=false;
     const pendingPopupAnchors=[];
 
-    /* V173.51 remains the presentation/runtime owner for artwork creation,
-       lunge and hit-shake behavior, but its historical injected stylesheet also
-       contained geometry. Keep the style id as a sentinel so that stylesheet is
-       not re-injected; presentation-only rules now live in the canonical source
-       stylesheet fixed-slot-battlefield-rendering-v2.css. */
+    /* Cardless presentation is source CSS only. Remove the retired runtime
+       stylesheet if an old session created it; never inject a replacement. */
     function neutralizeLegacyPresentationGeometry(){
-        if(typeof document==="undefined"||!document.head){ return; }
-        let style=document.getElementById(LEGACY_PRESENTATION_STYLE_ID);
-        if(!style){
-            style=document.createElement("style");
-            style.id=LEGACY_PRESENTATION_STYLE_ID;
-            document.head.appendChild(style);
-        }
-        if(style.dataset.geometryOwner!=="fixed-slot"||style.textContent){
-            style.textContent="";
-            style.dataset.geometryOwner="fixed-slot";
-            style.dataset.presentationSource="fixed-slot-battlefield-rendering-v2.css";
-        }
+        if(typeof document==="undefined"){ return; }
+        const style=document.getElementById(LEGACY_PRESENTATION_STYLE_ID);
+        if(style){ style.remove(); }
     }
 
     function integerIndexes(value){
@@ -10177,6 +10100,13 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
         return node;
     }
 
+    function applyPresentation(card,kind){
+        const owner=window.FourSymbolsBattlePresentation;
+        if(owner&&typeof owner.applyUnit==="function"){ owner.applyUnit(card,kind); }
+    }
+
+    function bossBattleOwner(){ return window.FourSymbolsBossBattle||null; }
+
     function canonicalizeEnemyZone(){
         const area=document.getElementById("battleMonsterArea");
         if(!area){ return; }
@@ -10187,8 +10117,11 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battleMonster"+index);
-            if(card){ cards.set(index,card); }
+            if(card){ applyPresentation(card,"monster");cards.set(index,card); }
         });
+        const bossOwner=bossBattleOwner();
+        const bossIndex=bossOwner&&typeof bossOwner.getBossIndex==="function"?bossOwner.getBossIndex():null;
+        const bossCard=Number.isInteger(bossIndex)?cards.get(bossIndex):null;
 
         const fragment=document.createDocumentFragment();
         [slots.enemyBackSlots,slots.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
@@ -10199,7 +10132,7 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
             rowSlots.forEach(slot=>{
                 const holder=makeSlot("v-fixed-battle-slot v-fixed-enemy-slot",slot);
                 const index=slots.getAssignedMonsterAtEnemySlot(snapshot,slot);
-                const card=Number.isInteger(index)?cards.get(index):null;
+                const card=Number.isInteger(index)&&index!==bossIndex?cards.get(index):null;
                 if(card){
                     card.dataset.slot=slot;
                     card.dataset.geometryOwner="fixed-slot";
@@ -10209,12 +10142,24 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
             });
             fragment.appendChild(row);
         });
+        if(bossCard){
+            const footprint=document.createElement("div");
+            footprint.className="v-fixed-boss-footprint";
+            footprint.dataset.geometryOwner="fixed-slot";
+            footprint.dataset.slots=slots.bossFootprintSlots.join(" ");
+            bossCard.classList.add("gameplay-boss-card");
+            bossCard.dataset.slot="ENEMY_B3";
+            bossCard.dataset.geometryOwner="fixed-slot";
+            footprint.appendChild(bossCard);
+            fragment.appendChild(footprint);
+        }
         area.replaceChildren(fragment);
         area.classList.add("v-fixed-enemy-zone","v-fixed-zone-v2");
         area.classList.remove("battle-monsters","v131-formation","v141-fixed-formation");
         area.dataset.geometryOwner="fixed-slot";
         area.dataset.monsterCount=String(indexes.length);
         area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
+        area.classList.toggle("gameplay-boss-active",!!bossCard);
     }
 
     function partyIndexes(){
@@ -10235,7 +10180,7 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battlePlayerCard"+index);
-            if(card){ cards.set(index,card); }
+            if(card){ applyPresentation(card,"player");cards.set(index,card); }
         });
 
         const fragment=document.createDocumentFragment();
@@ -10266,8 +10211,6 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
     function markBattlefieldZones(){
         const page=document.getElementById("battlePage");
         if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot"; }
-        const mechanism=document.getElementById("bossMechanismSlot");
-        if(mechanism){ mechanism.classList.add("v-fixed-mechanism-zone"); mechanism.dataset.geometryOwner="fixed-slot"; }
         const info=document.querySelector("#battlePage .battle-info-region");
         if(info){ info.classList.add("v-fixed-battle-info-zone"); info.dataset.geometryOwner="fixed-slot"; }
         const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
@@ -10462,7 +10405,7 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
 
     function isOwnedFixedStructure(node){
         if(!(node instanceof Element)||node.dataset.geometryOwner!=="fixed-slot"){ return false; }
-        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot");
+        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint");
     }
 
     const observer=new MutationObserver(records=>{

@@ -104,9 +104,10 @@ assert.match(homeCss,/-webkit-tap-highlight-color:rgba\(0,0,0,0\) !important/);
 assert.match(homeCss,/\.v141-notice-dot,[\s\S]*width:7px !important;[\s\S]*height:7px !important/);
 assert.match(homeCss,/animation:v131RedDotPulse 1\.1s ease-in-out infinite alternate !important/);
 
-/* Manual actions do not add a second empty wait after the turn declaration. */
-assert.match(v131,/const elapsed=v131TurnStartedAt>0 \? \(Date\.now\(\)-v131TurnStartedAt\) : 0/);
-assert.match(v131,/const wait=Math\.max\(0,V138_ACTION_DELAY_MS-elapsed\)/);
+/* Manual actions use one core delay owner extended only by visual remaining time. */
+assert.match(core,/function getBattleAdvanceDelay\(baseDelay\)/);
+assert.match(core,/v142GetRemainingAnimationMs/);
+assert.doesNotMatch(v131,/finishPlayerAction\s*=|processNextCombatant\s*=/);
 
 /* Auto targeting and tri-target geometry use the original full formation. */
 assert.match(autoBattle,/v148GetAutoTargetPriority/);

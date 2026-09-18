@@ -10,6 +10,7 @@ const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSy
 const indexSource=fs.readFileSync("index.html","utf8");
 const battleCss=fs.readFileSync("css/31-v131-fix-batch.css","utf8");
 const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
+const coreSource=fs.readFileSync("js/00-main.js","utf8");
 
 function extractFunction(source,name){
     const start=source.indexOf("function "+name+"(");
@@ -61,18 +62,12 @@ function test(name,fn){
     console.log("✓ "+name);
 }
 
-test("battle pacing is 1.6 seconds per action and 2 seconds per round",()=>{
-    assert.match(v131Source,/const V138_ACTION_DELAY_MS=1600/);
-    assert.match(v131Source,/const V138_ROUND_TRANSITION_MS=2000/);
-    assert.match(
-        v131Source,
-        /V138_ROUND_TRANSITION_MS-V138_ACTION_DELAY_MS/
-    );
-    assert.match(v131Source,/skipInactiveInitiativeEntries\(\)/);
-    assert.match(
-        v131Source,
-        /initiativeIndex>=initiativeQueue\.length\s*\? V138_ROUND_HANDOFF_DELAY_MS\s*:\s*V138_ACTION_DELAY_MS/
-    );
+test("core battle flow owns pacing and skips non-acting entities",()=>{
+    assert.match(coreSource,/function getBattleAdvanceDelay\(baseDelay\)/);
+    assert.match(coreSource,/v142GetRemainingAnimationMs/);
+    assert.match(coreSource,/monsters\[i\]\.canAct!==false/);
+    assert.match(coreSource,/actingMonster\.canAct===false/);
+    assert.doesNotMatch(v131Source,/finishPlayerAction\s*=|processNextCombatant\s*=/);
 });
 
 test("formation puts BOSS in the center, then elites, then regular monsters",()=>{

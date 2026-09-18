@@ -12,7 +12,10 @@
     const ENEMY_FRONT=Object.freeze(["ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"]);
     const ALLY_FRONT=Object.freeze(["ALLY_F1","ALLY_F2","ALLY_F3"]);
     const ALLY_BACK=Object.freeze(["ALLY_B1","ALLY_B2","ALLY_B3"]);
-    const MECHANISM=Object.freeze(["MECH_L","MECH_C","MECH_R"]);
+    const BOSS_FOOTPRINT=Object.freeze([
+        "ENEMY_B2","ENEMY_B3","ENEMY_B4",
+        "ENEMY_F2","ENEMY_F3","ENEMY_F4"
+    ]);
     const ENEMY_SLOTS=Object.freeze(ENEMY_BACK.concat(ENEMY_FRONT));
     const ALLY_SLOTS=Object.freeze(ALLY_FRONT.concat(ALLY_BACK));
 
@@ -57,7 +60,6 @@
     ENEMY_FRONT.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"enemy",row:"front",column:index+1}); });
     ALLY_FRONT.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"ally",row:"front",column:index+1}); });
     ALLY_BACK.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"ally",row:"back",column:index+1}); });
-    MECHANISM.forEach((slot,index)=>{ SLOT_META[slot]=Object.freeze({side:"mechanism",row:"mechanism",column:index+1}); });
     Object.freeze(SLOT_META);
 
     function validEnemyFormationType(value){
@@ -262,7 +264,6 @@
         const value=String(side||"").toLowerCase();
         if(value==="monster"||value==="enemy"){ return "enemy"; }
         if(value==="player"||value==="ally"){ return "ally"; }
-        if(value==="mechanism"||value==="mech"){ return "mechanism"; }
         return value;
     }
 
@@ -270,7 +271,6 @@
         const normalized=normalizeGeometrySide(side);
         if(normalized==="enemy"){ return ENEMY_SLOTS; }
         if(normalized==="ally"){ return ALLY_SLOTS; }
-        if(normalized==="mechanism"){ return MECHANISM; }
         return [];
     }
 
@@ -279,7 +279,7 @@
         if(!meta){ return null; }
         if(meta.side==="enemy"){ return '.v-fixed-enemy-slot[data-slot="'+slot+'"]'; }
         if(meta.side==="ally"){ return '.v-fixed-ally-slot[data-slot="'+slot+'"]'; }
-        return '.boss-mechanism-position[data-slot="'+slot+'"]';
+        return null;
     }
 
     function slotElement(slot){
@@ -351,13 +351,6 @@
         const allowed=geometrySlotsForSide(normalizedSide);
         if(!allowed.length){ return []; }
         const normalizedShape=normalizeShape(shape);
-        /* A mechanism card is a damage target, not a VFX-sized battlefield.
-           Single-target art stays on the card; any authored range keeps the
-           complete enemy-side visual footprint even though settlement still
-           contains only that mechanism target. */
-        if(MECHANISM.includes(primarySlot)&&(normalizedSide==="enemy"||normalizedSide==="mechanism")){
-            return normalizedShape==="single"?[primarySlot]:ENEMY_SLOTS.slice();
-        }
         if(normalizedShape==="all"){ return allowed.slice(); }
         if(!primarySlot||!allowed.includes(primarySlot)){
             return normalizedShape==="all"?allowed.slice():[];
@@ -551,7 +544,7 @@
         allySlots:ALLY_SLOTS,
         allyFrontSlots:ALLY_FRONT,
         allyBackSlots:ALLY_BACK,
-        mechanismSlots:MECHANISM,
+        bossFootprintSlots:BOSS_FOOTPRINT,
         slotMeta:SLOT_META,
         getEnemyFormationSlotRows:enemyRowsForType,
         getPrioritySlotsForFormation:prioritySlotsForType,

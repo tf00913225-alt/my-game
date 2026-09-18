@@ -33,7 +33,7 @@ eq(slots.resolveAllyTargets(formation,2,"allyTri",alive),[2,3],"back-centre ally
 eq(slots.resolveAllyTargets(formation,1,"allyTri",alive),[0,1,4],"front-centre allyTri hits only its three physical row slots");
 eq(slots.resolveAllyTargets(formation,2,"column",alive),[1,2],"ally column stays in the same physical column");
 eq(slots.resolveAllyTargets(formation,null,"allyAll",alive),[0,1,4,2,3],"allyAll returns occupied living ally unit slots only");
-assert.equal(slots.mechanismSlots.some(slot=>slots.allySlots.includes(slot)),false,"mechanism slots are not ally unit geometry");
+assert.equal(Object.prototype.hasOwnProperty.call(slots,"mechanismSlots"),false,"retired sidecar target geometry is absent");
 
 formation=slots.hydrateAllyFormation({characterIndexToSlot:{
     0:"ALLY_B2",1:"ALLY_F1",2:"ALLY_F3"

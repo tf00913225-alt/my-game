@@ -14,19 +14,13 @@ const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const compactModalCss=fs.readFileSync("css/37-v139-rested-experience.css","utf8");
 const dungeonNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 
-/* BOSS mechanism cards remain sidecar attack targets. Detailed text, including
-   the lethal charge countdown, now lives in the separate mechanism info panel
-   instead of crowding the small portrait target card. */
-assert.match(bossRuntime,/Mechanism cards are real attackable sidecar targets, never monsters/);
-assert.match(bossRuntime,/if\(card\.type==="charge"\)\{ return "倒數 "\+card\.countdown\+" 回合・歸零發動大型技能"; \}/);
-assert.match(bossRuntime,/boss-mechanism-info-effect/);
-assert.match(bossRuntime,/ui\.body\.innerHTML=alive\.map\(mechanismInfoMarkup\)\.join\(""\)/);
-assert.match(bossCss,/\.boss-mechanism-card\.destroying\{[\s\S]*?position:absolute;[\s\S]*?pointer-events:none;/);
-assert.match(bossCss,/\.boss-mechanism-info-panel\{[\s\S]*?aspect-ratio:9 \/ 16;/);
-
-/* The stale destroyed card must not remain as an invisible flex item that
-   pushes the next mechanism to the right of the BOSS. */
-assert.doesNotMatch(bossCss,/\.boss-mechanism-card\.destroying\{\s*pointer-events:none;/);
+/* Boss objects share numeric enemy target identity and cardless presentation. */
+assert.match(bossRuntime,/unitKind:"boss-object"/);
+assert.match(bossRuntime,/canAct:false/);
+assert.match(bossRuntime,/noRewards:true/);
+assert.match(bossCss,/\.v-fixed-boss-footprint\{/);
+assert.doesNotMatch(bossRuntime,/mechanism:|boss-mechanism-card/);
+assert.doesNotMatch(bossCss,/boss-mechanism-card|boss-mechanism-slot/);
 
 /* Four-Symbol Tower weekly element is gameplay state, not just border color.
    Keep these assertions whitespace-safe so formatting changes do not create a

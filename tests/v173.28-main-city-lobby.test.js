@@ -90,14 +90,14 @@ test("the historical V54 bridge no longer flattens hierarchy with inline importa
     assert.doesNotMatch(v54Css,/#game-stage #homePage button,[\s\S]*font-size:18px !important/);
 });
 
-test("the roster renderer keeps all character details only in the adventure party and lays three enlarged slots in one row",()=>{
+test("the roster renderer keeps all character details in the six-position adventure formation",()=>{
     assert.match(rosterRuntime,/const partyIndexes=getExistingPartyIndexes\(\)\.slice\(0,3\)/);
     assert.doesNotMatch(rosterRuntime,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
     assert.doesNotMatch(rosterRuntime,/home-hud-character-(?:list|row|avatar)/);
     assert.doesNotMatch(rosterRuntime,/primaryCharacter=partyIndexes/);
     assert.match(rosterRuntime,/homeHudGoldValue/);
     assert.match(rosterRuntime,/homeHudExpValue/);
-    assert.match(rosterRuntime,/隊伍 '\+partyIndexes\.length\+' \/ 3/);
+    assert.match(rosterRuntime,/隊伍 '\+partyIndexes\.length\+' \/ 6/);
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:4px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
     assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1;[\s\S]*min-height:23px;[\s\S]*font-size:15px/);

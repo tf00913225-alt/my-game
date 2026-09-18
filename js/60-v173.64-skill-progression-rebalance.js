@@ -574,12 +574,10 @@
             return result;
         };
     }
-    if(typeof finishPlayerAction==="function"){
-        const previousFinishPlayerAction=finishPlayerAction;
-        finishPlayerAction=function(){
+    if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeActionFinished==="function"){
+        window.FourSymbolsBattleFlow.subscribeActionFinished(()=>{
             if(fireCastContext){ fireCastContext.finished=true; }
-            return previousFinishPlayerAction.apply(this,arguments);
-        };
+        });
     }
 
     if(typeof castDamageSkill==="function"){

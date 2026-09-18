@@ -7,6 +7,7 @@ const vm=require("node:vm");
 const source=fs.readFileSync("js/46-v155-dev-fixes.js","utf8");
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const v142Source=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
+const coreSource=fs.readFileSync("js/00-main.js","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
@@ -256,8 +257,10 @@ test("hard-controlled player and monster finish with the 300 ms override only",(
     context.processSingleMonsterAttack(0,1);
     assert.deepEqual(observed,[300,300]);
     assert.equal(Object.prototype.hasOwnProperty.call(context,"__battleAdvanceDelayOverrideMs"),false);
-    assert.match(v131Source,/consumeBattleAdvanceDelayOverride\(normalDelayMs\)/);
-    assert.match(v142Source,/delayOverride===null\?resolveDelay\(initiativeIndex\):delayOverride/);
+    assert.match(coreSource,/function getBattleAdvanceDelay\(baseDelay\)/);
+    assert.match(coreSource,/delete window\.__battleAdvanceDelayOverrideMs/);
+    assert.doesNotMatch(v131Source,/finishPlayerAction\s*=(?!=)/);
+    assert.doesNotMatch(v142Source,/finishPlayerAction\s*=(?!=)/);
 });
 
 console.log("\nV155 current-request suite: "+passed+" tests passed.");

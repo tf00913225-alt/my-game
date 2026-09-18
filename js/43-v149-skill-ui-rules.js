@@ -472,6 +472,15 @@
         else{ setTimeout(callback,0); }
     }
 
+    function captureBattleFinish(onFinish){
+        const flow=window.FourSymbolsBattleFlow;
+        if(!flow||typeof flow.interceptActionFinish!=="function"){ return function(){}; }
+        return flow.interceptActionFinish(()=>{
+            if(typeof onFinish==="function"){ onFinish(); }
+            return true;
+        });
+    }
+
     function livingMonsterSnapshot(){
         return livingMonsterIndexes().map(index=>({
             index:index,monster:monsters[index],wasAlive:true
@@ -498,7 +507,8 @@
             options.skill.spCost=0;
             options.skill.v149FreeFollowUp=true;
         }
-        if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+        const releaseFinishCapture=options.realFinish
+            ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
         if(originalRoll){
             rollCritical=function(){
                 const roll=originalRoll.apply(this,arguments);
@@ -512,7 +522,7 @@
             );
         }finally{
             if(originalRoll){ rollCritical=originalRoll; }
-            if(options.realFinish){ finishPlayerAction=options.realFinish; }
+            releaseFinishCapture();
             options.skill.spCost=originalCost;
             if(hadFreeFlag){ options.skill.v149FreeFollowUp=originalFreeFlag; }
             else{ delete options.skill.v149FreeFollowUp; }
@@ -742,7 +752,8 @@
             monster.v141SupportSkillIds=[];
             monster.skillChance=1;
             currentReflectAttacker=options.monsterIndex;
-            if(options.realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+            const releaseFinishCapture=options.realFinish
+                ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
             if(originalHit){
                 showPlayerHit=function(){
                     if(arguments[4]===true){ repeatedCritical=true; }
@@ -779,7 +790,7 @@
                 console.error("敵方"+options.skill.name+"追擊施放失敗：",error);
             }
             finally{
-                if(options.realFinish){ finishPlayerAction=options.realFinish; }
+                releaseFinishCapture();
                 if(originalHit){ showPlayerHit=originalHit; }
                 if(originalLog){ addBattleLog=originalLog; }
                 if(originalStatusRoll){ rollStatusEffectHit=originalStatusRoll; }
@@ -838,7 +849,8 @@
             let finishRequested=false;
             let castSkillId=null;
             let critical=false;
-            if(realFinish){ finishPlayerAction=function(){ finishRequested=true; }; }
+            const releaseFinishCapture=realFinish
+                ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
             if(previousBadge){
                 showMonsterSkillNameBadge=function(name){
                     if(typeof skillDatabase!=="undefined"){
@@ -877,7 +889,7 @@
             finally{
                 currentReflectAttacker=previousAttacker;
                 window.v149CurrentDamageActor=previousDamageActor;
-                if(realFinish){ finishPlayerAction=realFinish; }
+                releaseFinishCapture();
                 if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
                 if(previousHit){ showPlayerHit=previousHit; }
                 if(previousLog){ addBattleLog=previousLog; }

@@ -70,17 +70,15 @@ assert.match(dungeonShell,/page\.classList\.toggle\("v146-abyss-active",abyssAct
 // !important patches.
 const bossBattlePriorityScope=[
     cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active{"),
-    cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active .v131-monster-row{"),
-    cssRule(css,'#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card[data-rank="boss"]{'),
-    cssRule(css,"#game-stage #battleMonsterArea .boss-mechanism-slot{"),
-    cssRule(css,"#game-stage #battleMonsterArea .boss-mechanism-card{")
+    cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active > .v-fixed-boss-footprint{"),
+    cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-active > .v-fixed-boss-footprint > .battle-monster.gameplay-boss-card{")
 ].join("\n");
 assert.doesNotMatch(bossBattlePriorityScope,/!important/,"Boss battlefield sizing must not introduce priority patches");
  assert.doesNotMatch(css.replace(/\/\*[\s\S]*?\*\//g,""),/!important/,"Entire Gameplay Boss stylesheet declarations must remain free of priority patches");
 
 const gameplayIndex=loader.indexOf("js/gameplay-boss-tower-system.js");
 const relicIndex=loader.indexOf("js/60-team-relic-system.js");
-assert.ok(gameplayIndex>=0&&relicIndex>=0&&gameplayIndex<relicIndex,"Gameplay mechanism integration must load before the final Team Relic wrapper");
+assert.ok(gameplayIndex>=0&&relicIndex>=0&&gameplayIndex<relicIndex,"Gameplay Boss integration must load before the final Team Relic wrapper");
 
 const image=pngRgba("assets/ui/nav-gameplay.png");
 assert.deepEqual([image.width,image.height],[320,320]);

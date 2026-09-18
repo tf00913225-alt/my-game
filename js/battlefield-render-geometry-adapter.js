@@ -31,24 +31,12 @@
     let reconcileQueued=false;
     const pendingPopupAnchors=[];
 
-    /* V173.51 remains the presentation/runtime owner for artwork creation,
-       lunge and hit-shake behavior, but its historical injected stylesheet also
-       contained geometry. Keep the style id as a sentinel so that stylesheet is
-       not re-injected; presentation-only rules now live in the canonical source
-       stylesheet fixed-slot-battlefield-rendering-v2.css. */
+    /* Cardless presentation is source CSS only. Remove the retired runtime
+       stylesheet if an old session created it; never inject a replacement. */
     function neutralizeLegacyPresentationGeometry(){
-        if(typeof document==="undefined"||!document.head){ return; }
-        let style=document.getElementById(LEGACY_PRESENTATION_STYLE_ID);
-        if(!style){
-            style=document.createElement("style");
-            style.id=LEGACY_PRESENTATION_STYLE_ID;
-            document.head.appendChild(style);
-        }
-        if(style.dataset.geometryOwner!=="fixed-slot"||style.textContent){
-            style.textContent="";
-            style.dataset.geometryOwner="fixed-slot";
-            style.dataset.presentationSource="fixed-slot-battlefield-rendering-v2.css";
-        }
+        if(typeof document==="undefined"){ return; }
+        const style=document.getElementById(LEGACY_PRESENTATION_STYLE_ID);
+        if(style){ style.remove(); }
     }
 
     function integerIndexes(value){
@@ -91,6 +79,13 @@
         return node;
     }
 
+    function applyPresentation(card,kind){
+        const owner=window.FourSymbolsBattlePresentation;
+        if(owner&&typeof owner.applyUnit==="function"){ owner.applyUnit(card,kind); }
+    }
+
+    function bossBattleOwner(){ return window.FourSymbolsBossBattle||null; }
+
     function canonicalizeEnemyZone(){
         const area=document.getElementById("battleMonsterArea");
         if(!area){ return; }
@@ -101,8 +96,11 @@
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battleMonster"+index);
-            if(card){ cards.set(index,card); }
+            if(card){ applyPresentation(card,"monster");cards.set(index,card); }
         });
+        const bossOwner=bossBattleOwner();
+        const bossIndex=bossOwner&&typeof bossOwner.getBossIndex==="function"?bossOwner.getBossIndex():null;
+        const bossCard=Number.isInteger(bossIndex)?cards.get(bossIndex):null;
 
         const fragment=document.createDocumentFragment();
         [slots.enemyBackSlots,slots.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
@@ -113,7 +111,7 @@
             rowSlots.forEach(slot=>{
                 const holder=makeSlot("v-fixed-battle-slot v-fixed-enemy-slot",slot);
                 const index=slots.getAssignedMonsterAtEnemySlot(snapshot,slot);
-                const card=Number.isInteger(index)?cards.get(index):null;
+                const card=Number.isInteger(index)&&index!==bossIndex?cards.get(index):null;
                 if(card){
                     card.dataset.slot=slot;
                     card.dataset.geometryOwner="fixed-slot";
@@ -123,12 +121,24 @@
             });
             fragment.appendChild(row);
         });
+        if(bossCard){
+            const footprint=document.createElement("div");
+            footprint.className="v-fixed-boss-footprint";
+            footprint.dataset.geometryOwner="fixed-slot";
+            footprint.dataset.slots=slots.bossFootprintSlots.join(" ");
+            bossCard.classList.add("gameplay-boss-card");
+            bossCard.dataset.slot="ENEMY_B3";
+            bossCard.dataset.geometryOwner="fixed-slot";
+            footprint.appendChild(bossCard);
+            fragment.appendChild(footprint);
+        }
         area.replaceChildren(fragment);
         area.classList.add("v-fixed-enemy-zone","v-fixed-zone-v2");
         area.classList.remove("battle-monsters","v131-formation","v141-fixed-formation");
         area.dataset.geometryOwner="fixed-slot";
         area.dataset.monsterCount=String(indexes.length);
         area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
+        area.classList.toggle("gameplay-boss-active",!!bossCard);
     }
 
     function partyIndexes(){
@@ -149,7 +159,7 @@
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battlePlayerCard"+index);
-            if(card){ cards.set(index,card); }
+            if(card){ applyPresentation(card,"player");cards.set(index,card); }
         });
 
         const fragment=document.createDocumentFragment();
@@ -180,8 +190,6 @@
     function markBattlefieldZones(){
         const page=document.getElementById("battlePage");
         if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot"; }
-        const mechanism=document.getElementById("bossMechanismSlot");
-        if(mechanism){ mechanism.classList.add("v-fixed-mechanism-zone"); mechanism.dataset.geometryOwner="fixed-slot"; }
         const info=document.querySelector("#battlePage .battle-info-region");
         if(info){ info.classList.add("v-fixed-battle-info-zone"); info.dataset.geometryOwner="fixed-slot"; }
         const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
@@ -376,7 +384,7 @@
 
     function isOwnedFixedStructure(node){
         if(!(node instanceof Element)||node.dataset.geometryOwner!=="fixed-slot"){ return false; }
-        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot");
+        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint");
     }
 
     const observer=new MutationObserver(records=>{

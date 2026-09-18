@@ -4045,6 +4045,66 @@ let battleAdvanceTimeoutId=null;
 let battleAdvanceScheduled=false;
 const BATTLE_DECLARE_ADVANCE_MS=90;
 const BATTLE_RESOLVE_ADVANCE_MS=520;
+const battleActionFinishObservers=new Set();
+const battleBeforeCombatantObservers=new Set();
+const battleActionFinishInterceptors=[];
+if(typeof window!=="undefined"){
+    window.FourSymbolsBattleFlow=Object.freeze({
+        subscribeActionFinished(observer){
+            if(typeof observer!=="function"){ return function(){}; }
+            battleActionFinishObservers.add(observer);
+            return function(){ battleActionFinishObservers.delete(observer); };
+        },
+        subscribeBeforeCombatant(observer){
+            if(typeof observer!=="function"){ return function(){}; }
+            battleBeforeCombatantObservers.add(observer);
+            return function(){ battleBeforeCombatantObservers.delete(observer); };
+        },
+        interceptActionFinish(interceptor){
+            if(typeof interceptor!=="function"){ return function(){}; }
+            battleActionFinishInterceptors.push(interceptor);
+            let active=true;
+            return function(){
+                if(!active){ return; }
+                active=false;
+                const index=battleActionFinishInterceptors.lastIndexOf(interceptor);
+                if(index>=0){ battleActionFinishInterceptors.splice(index,1); }
+            };
+        }
+    });
+}
+function notifyBattleActionFinished(){
+    battleActionFinishObservers.forEach(observer=>{
+        try{ observer(); }
+        catch(error){ console.error("戰鬥行動完成觀察器失敗：",error); }
+    });
+}
+function interceptBattleActionFinish(){
+    for(let index=battleActionFinishInterceptors.length-1;index>=0;index--){
+        try{
+            if(battleActionFinishInterceptors[index]()===true){ return true; }
+        }catch(error){
+            console.error("戰鬥行動完成攔截器失敗：",error);
+        }
+    }
+    return false;
+}
+function notifyBeforeCombatant(token){
+    battleBeforeCombatantObservers.forEach(observer=>{
+        try{ observer({token:token,turn:turn,index:initiativeIndex,queue:initiativeQueue}); }
+        catch(error){ console.error("戰鬥佇列觀察器失敗：",error); }
+    });
+}
+function getBattleAdvanceDelay(baseDelay){
+    const override=typeof window!=="undefined"?Number(window.__battleAdvanceDelayOverrideMs):NaN;
+    if(typeof window!=="undefined"&&Number.isFinite(override)){
+        delete window.__battleAdvanceDelayOverrideMs;
+        return Math.max(0,override);
+    }
+    const visualRemaining=typeof window!=="undefined"&&typeof window.v142GetRemainingAnimationMs==="function"
+        ?Number(window.v142GetRemainingAnimationMs())||0:0;
+    return Math.max(0,Number(baseDelay)||0,visualRemaining);
+}
 const BATTLE_ACTION_WATCHDOG_MS=7000;
 let battleActionWatchdogTimeoutId=null;
 
@@ -4413,7 +4473,7 @@ function getPartyCharacterIndex(character){
 
 
 function getExistingPartyIndexes(){
-    return [0,1,2].filter(index=>!!getPartyCharacterByIndex(index));
+    return [0,1,2,3,4,5].filter(index=>!!getPartyCharacterByIndex(index));
 }
 
 
@@ -10420,6 +10480,12 @@ function startTurn(token){
         return;
     }
 
+    const bossRoundOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
+    if(bossRoundOwner&&typeof bossRoundOwner.processRound==="function"&&
+       bossRoundOwner.processRound()===true){
+        return;
+    }
+
 
     /*
        ★ 新增（依照使用者要求）：
@@ -12010,12 +12076,15 @@ function calculateDamage(
         :1;
     const attacker=getDamageContextAttacker(options);
     const pressureFactor=getEnemyPressureMultiplier(attacker,options.target||null);
+    const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
+    const bossDamageFactor=bossOwner&&typeof bossOwner.getOutgoingDamageMultiplier==="function"
+        ?Math.max(0,Number(bossOwner.getOutgoingDamageMultiplier(attacker))||0):1;
     const budgetFactor=getDamageBudgetMultiplier(options);
     const randomFactor=0.95+Math.random()*0.10;
 
     const result=
         safeAttack*levelFactor*elementFactor*defenseFactor*
-        ordinaryFactor*criticalFactor*pressureFactor*budgetFactor*randomFactor;
+        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*budgetFactor*randomFactor;
 
     if(!Number.isFinite(result)){ return 1; }
     return Math.max(1,Math.round(result));
@@ -12236,7 +12305,8 @@ function buildInitiativeQueue(){
 
             if(
                 monsters[i] &&
-                monsters[i].alive
+                monsters[i].alive &&
+                monsters[i].canAct!==false
             ){
 
                 list.push({
@@ -12397,7 +12467,7 @@ function startResolutionPhase(token){
        這樣防禦一定會在任何怪物出手之前就已經生效。
     */
 
-    [0,1,2].forEach(
+    getExistingPartyIndexes().forEach(
         characterIndex=>{
 
             const queued=
@@ -12516,6 +12586,12 @@ function processNextCombatant(token){
         !battleActive ||
         token!==battleToken
     ){
+        return;
+    }
+
+    notifyBeforeCombatant(token);
+
+    if(checkBattleEnd()){
         return;
     }
 
@@ -12689,6 +12765,13 @@ function processNextCombatant(token){
 
     }
     else{
+
+        const actingMonster=monsters[entry.monsterIndex];
+        if(!actingMonster||!actingMonster.alive||actingMonster.canAct===false){
+            initiativeIndex++;
+            processNextCombatant(token);
+            return;
+        }
 
         try{
             processSingleMonsterAttack(
@@ -13641,12 +13724,32 @@ function getSkillDamageAtLevel(skill,level){
    （回傳的是monsters陣列的原始index清單）。
 
    single：只打選定的目標。
-   tri / row：命中選定目標所在的固定3人橫排。
-   all：命中目前場上全部存活敵人。
-   戰鬥最多6隻怪時，前排與後排不會因死亡而重新補位。
+   一般戰鬥由 FourSymbolsBattlefieldSlots 的固定十格快照解析
+   single / tri / row / column / all；死亡後不會重新補位。
+   Boss 專屬模式則先交給 FourSymbolsBossBattle：除 all 外一律
+   只結算 primary target。這裡是敵方傷害目標的唯一 owner。
 */
 
 function getSkillTargets(centerIndex,targetType){
+
+    const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
+    if(bossOwner&&typeof bossOwner.isActive==="function"&&bossOwner.isActive()&&
+       typeof bossOwner.resolveEnemyDamageTargets==="function"){
+        return bossOwner.resolveEnemyDamageTargets(centerIndex,targetType);
+    }
+
+    const slotOwner=typeof window!=="undefined"?window.FourSymbolsBattlefieldSlots:null;
+    const snapshot=slotOwner&&typeof slotOwner.getActiveEnemySnapshot==="function"
+        ?slotOwner.getActiveEnemySnapshot():null;
+    if(slotOwner&&snapshot&&typeof slotOwner.resolveEnemyTargets==="function"&&
+       ["single","tri","row","column","all"].includes(targetType)){
+        return slotOwner.resolveEnemyTargets(
+            snapshot,
+            centerIndex,
+            targetType,
+            index=>!!(monsters[index]&&monsters[index].alive!==false&&Number(monsters[index].hp)>0)
+        );
+    }
 
     const alive=currentBattleMonsters.filter(
         i=>monsters[i] && monsters[i].alive
@@ -16344,17 +16447,20 @@ function castHealSkill(skillId,targetIndex){
     const healBonusMultiplier=(exSkill && exLevel>0 && exSkill.healBonusPercent)
         ? 1+exSkill.healBonusPercent/100
         : 1;
+    const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
+    const bossHealingMultiplier=bossOwner&&typeof bossOwner.getHealingMultiplier==="function"
+        ?Math.max(0,Number(bossOwner.getHealingMultiplier())||0):1;
 
     const baseHealHP=skill.baseHeal+skill.healPerLevel*(level-1);
     const healHP=Math.floor(
-        calculateHealingAmount(baseHealHP,casterStats.intelligence)*healBonusMultiplier
+        calculateHealingAmount(baseHealHP,casterStats.intelligence)*healBonusMultiplier*bossHealingMultiplier
     );
 
     const potentialHealSP=Math.floor(
         calculateSPHealingAmount(
             skill.baseHealSP+(skill.healSPPerLevel||0)*(level-1),
             casterStats.intelligence
-        )*healBonusMultiplier
+        )*healBonusMultiplier*bossHealingMultiplier
     );
 
     const actualHealHP=Math.max(
@@ -16384,6 +16490,10 @@ function castHealSkill(skillId,targetIndex){
             ? "；施放者本人不回復SP。"
             : "、"+actualHealSP+"點SP。")
     );
+
+    if(bossHealingMultiplier<1){
+        addBattleLog("【鎖脈法器】使本次治療與 SP 回復降低 40%。");
+    }
 
     updateUI();
     finishPlayerAction();
@@ -17044,6 +17154,11 @@ function windArrowAttack(){
 
 function finishPlayerAction(){
 
+    notifyBattleActionFinished();
+    if(interceptBattleActionFinish()){
+        return;
+    }
+
     if(!battleActive){
         return;
     }
@@ -17126,7 +17241,7 @@ function finishPlayerAction(){
                 token
             );
 
-        },BATTLE_DECLARE_ADVANCE_MS);
+        },getBattleAdvanceDelay(BATTLE_DECLARE_ADVANCE_MS));
 
         return;
 
@@ -17193,7 +17308,7 @@ function finishPlayerAction(){
 
         }
 
-    },BATTLE_RESOLVE_ADVANCE_MS);
+    },getBattleAdvanceDelay(BATTLE_RESOLVE_ADVANCE_MS));
 
 }
 
@@ -18076,6 +18191,16 @@ function checkBattleEnd(){
     if(!battleActive){
         return true;
     }
+
+    /* HP settlement belongs to the core battle flow. Any damage source may
+       reduce HP to zero; adapters must not wrap queue functions merely to
+       translate that state into the single canonical death path. */
+    currentBattleMonsters.forEach(index=>{
+        const monster=monsters[index];
+        if(monster&&monster.alive!==false&&Number(monster.hp)<=0){
+            killMonster(index);
+        }
+    });
 
 
     const partyDefeated=getExistingPartyIndexes().every(index=>{
@@ -22472,18 +22597,17 @@ function killMonster(index){
        每個分支各自重複判斷一次。
     */
 
-    recordMonsterKillForBestiary(
-        monster
-    );
+    const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
+    if(bossOwner&&typeof bossOwner.onEnemyDeath==="function"){
+        bossOwner.onEnemyDeath(index,monster);
+    }
 
-
-    awardMonsterGoldDrop(
-        monster
-    );
-
-
-    /* 怪物掉落與擊殺進度一起即時存檔，避免中途戰敗/切背景遺失。 */
-    saveGame();
+    if(!monster.noRewards){
+        recordMonsterKillForBestiary(monster);
+        awardMonsterGoldDrop(monster);
+        /* 怪物掉落與擊殺進度一起即時存檔，避免中途戰敗/切背景遺失。 */
+        saveGame();
+    }
 
 
     updateMonsterUI(index);
@@ -22613,6 +22737,11 @@ function renderBattle(){
                 card
             );
 
+            const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
+            if(presentation&&typeof presentation.applyUnit==="function"){
+                presentation.applyUnit(card,"monster");
+            }
+
         }
     );
 
@@ -22626,6 +22755,11 @@ function renderBattle(){
 
 
     renderPlayers();
+
+    const bossPresentationOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
+    if(bossPresentationOwner&&typeof bossPresentationOwner.syncHud==="function"){
+        bossPresentationOwner.syncHud();
+    }
 
 
     /*
@@ -23983,9 +24117,7 @@ function createBattleTargetContract(side,skillName,elementType,actorIndex,target
         }
     }
 
-    ids=Array.from(new Set(ids.filter(value=>Number.isInteger(value)||(
-        typeof value==="string"&&value.indexOf("mechanism:")===0
-    ))));
+    ids=Array.from(new Set(ids.filter(Number.isInteger)));
     if(targetType==="all"||targetType==="allyAll"){ primary=null; }
     else if(primary===null&&ids.length){ primary=ids[0]; }
 
@@ -24506,44 +24638,9 @@ function showPlayerHit(amount,type,characterIndex,isPositive,isCrit){
        某個情況考慮進去」而漏掉的狀況。
     */
 
-    if(!isPositive){
-
-        element.classList.remove(
-            "hit",
-            "red-hit"
-        );
-
-
-        void element.offsetWidth;
-
-
-        element.classList.add(
-            "hit",
-            "red-hit"
-        );
-
-
-        /*
-           ★ 修正（跟showMonsterHit()同一個
-           bug，一起修）："hit"沒有跟著清掉，
-           會一直殘留在classList上。
-        */
-
-        setTimeout(()=>{
-            element.classList.remove(
-                "hit"
-            );
-        },300);
-
-
-        setTimeout(()=>{
-            element.classList.remove(
-                "red-hit"
-            );
-        },350);
-
-    }
-
+    /* Damage popup creation is the hit-feedback owner. The card root never
+       receives a border/shadow hit state; positive Heal/SP feedback therefore
+       cannot accidentally inherit damage semantics. */
 
     if(
         amount!==undefined &&
@@ -24629,110 +24726,30 @@ function showShieldAbsorb(characterIndex,absorbed){
 
 
 function showMonsterHit(index,amount,type,isCrit){
+    const element=$("battleMonster"+index);
+    if(!element||amount===undefined||amount===null){ return; }
 
-    const element =
-        $("battleMonster"+index);
+    const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
+    const settlement=type==="hp"&&bossOwner&&typeof bossOwner.consumeDamageSettlement==="function"
+        ?bossOwner.consumeDamageSettlement(index):null;
 
-
-    if(!element){
+    if(settlement){
+        if(settlement.shieldAbsorbed>0){
+            showDamagePopup(element,"-"+settlement.shieldAbsorbed,"shield",false);
+        }
+        if(settlement.hpDamage>0){
+            showDamagePopup(element,"-"+settlement.hpDamage+"HP","hp",isCrit);
+        }
         return;
     }
 
-
-    element.classList.remove(
-        "hit",
-        "red-hit"
+    const prefix=type==="heal"?"+":"-";
+    showDamagePopup(
+        element,
+        prefix+amount+(type==="sp"?"SP":"HP"),
+        type,
+        isCrit
     );
-
-
-    void element.offsetWidth;
-
-
-    element.classList.add(
-        "hit",
-        "red-hit"
-    );
-
-
-    /*
-       ★ 修正（依照使用者要求，查修野怪攻擊/
-       施放技能時偶爾左右抖動的問題）：
-       "red-hit"原本就有清掉，但"hit"這個
-       class（真正負責左右震動的hitAnimation）
-       從來沒有被清掉過——一旦這隻怪物被打中
-       一次，"hit"就會一直留在它的
-       classList上，直到牠下次又被打中
-       （remove再add）才會重新處理。
-
-       雖然hitAnimation本身不是infinite、
-       播完就停了，理論上留著不會一直重播，
-       但這個殘留的class是個不乾淨的狀態，
-       如果之後有其他地方也用同一招
-       「remove某個class、強制reflow、
-       再add」的手法去觸發別的動畫
-       （例如攻擊方前傾的attacker-lunge-down），
-       兩個class同時疊在同一個元素上，
-       都在動同一個transform屬性，
-       就可能互相干擾、疊出不是原本設計的
-       動畫效果——這很可能就是「攻擊/施放
-       技能時卡片有機率抖動」的來源。
-
-       這裡讓"hit"也在動畫播完後（跟CSS
-       設定的.3s一致）自動清掉，
-       不會再有殘留的class疊在攻擊動畫上面。
-    */
-
-    setTimeout(()=>{
-        element.classList.remove(
-            "hit"
-        );
-    },300);
-
-
-    setTimeout(()=>{
-        element.classList.remove(
-            "red-hit"
-        );
-    },350);
-
-
-    if(
-        amount!==undefined &&
-        amount!==null
-    ){
-
-        const prefix =
-            type==="heal"
-            ?
-            "+"
-            :
-            "-";
-
-
-        showDamagePopup(
-            element,
-            (
-                isCrit
-                ?
-                ""
-                :
-                ""
-            )+
-            prefix+
-            amount+
-            (
-                type==="sp"
-                ?
-                "SP"
-                :
-                "HP"
-            ),
-            type,
-            isCrit
-        );
-
-    }
-
 }
 
 
@@ -33425,6 +33442,11 @@ function updateUI(){
 
         updateBattlePlayerBars();
 
+        const bossPresentationOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
+        if(bossPresentationOwner&&typeof bossPresentationOwner.syncHud==="function"){
+            bossPresentationOwner.syncHud();
+        }
+
     }
 
 }
@@ -35375,7 +35397,7 @@ catch(error){
                 '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(rosterNumber(stats.maxHP))+'</strong></div>'+
                 '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'</strong></div></div></article>';
         }).join("");
-        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 3</span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button></header>'+cards;
+        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 6</span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button></header>'+cards;
         roster.dataset.ready="true";
         return true;
     }

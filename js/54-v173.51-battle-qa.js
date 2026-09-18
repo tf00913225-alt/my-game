@@ -29,70 +29,9 @@ window.v17351FiveEnemyAutoTargetPriority=fivePriority;
    formal render-geometry adapter. This layer owns only artwork decoration,
    layering and transient animation. It deliberately contains no Slot/Unit/HUD
    top/left/right/bottom/inset/width/height positioning rules. */
-function ensureBattlePresentationStyles(){
-    if(document.getElementById("v174-cardless-battle-style"))return;
-    const style=document.createElement("style");
-    style.id="v174-cardless-battle-style";
-    style.textContent=`
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit,
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit{
-    border:0!important;outline:0!important;box-shadow:none!important;
-    background-color:transparent!important;background-image:none!important;
-    isolation:isolate!important;overflow:visible!important;
-    transition-property:opacity!important;transition-duration:.15s!important;
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{
-    z-index:1!important;display:block!important;pointer-events:none!important;overflow:visible!important;
-    background-repeat:no-repeat!important;background-color:transparent!important;
-    background-size:contain!important;background-position:center bottom!important;
-    transform-origin:50% 82%!important;will-change:transform,filter!important;
-    animation:v174BattleIdle 3.4s ease-in-out infinite!important;
-    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
-}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-hp,
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.monster-sp{
-    display:block!important;visibility:visible!important;opacity:1!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit>.battle-player-id{z-index:20!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>.battle-monster-name{
-    display:flex!important;align-items:center!important;justify-content:center!important;
-    text-align:center!important;white-space:nowrap!important;overflow:visible!important;
-    visibility:visible!important;opacity:1!important;z-index:24!important;pointer-events:none!important;
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art::after{
-    content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;
-    border-radius:50%;background:rgba(0,0,0,.42);filter:blur(2px);
-    transform:translateX(-50%);pointer-events:none;
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art~*{z-index:6;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .hp-bar,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .sp-bar,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-hp,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit .monster-sp{z-index:20!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit>img.v162-abyss-battle-portrait-art{opacity:0!important;pointer-events:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn::after{border:0!important;background:none!important;box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn{
-    outline:2px solid #f1c96d!important;outline-offset:1px!important;border-radius:8px!important;
-    box-shadow:0 0 0 1px rgba(255,232,163,.34),0 0 14px rgba(241,201,109,.82)!important;
-}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.ally-targetable{box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target{border:0!important;box-shadow:none!important;}
-#game-stage > #app > #game-content #battlePage .battle-player.v174-cardless-unit.active-turn>.v174-battle-art,
-#game-stage > #app > #game-content #battlePage .battle-monster.v174-cardless-unit.target>.v174-battle-art{
-    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7)));
-}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up,
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down{animation:none!important;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-up>.v174-battle-art{animation:v174BattleLungeUp .45s ease!important;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit.attacker-lunge-down>.v174-battle-art{animation:v174BattleLungeDown .45s ease!important;}
-#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art.v174-hit-shake{animation:v174BattleHitShake .28s ease!important;}
-@keyframes v174BattleIdle{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.015)}}
-@keyframes v174BattleLungeUp{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(-13px) scale(1.035)}68%{transform:translateY(-5px) scale(1.015)}}
-@keyframes v174BattleLungeDown{0%,100%{transform:translateY(0) scale(1)}38%{transform:translateY(13px) scale(1.035)}68%{transform:translateY(5px) scale(1.015)}}
-@keyframes v174BattleHitShake{0%,100%{transform:translate(0,0)}18%{transform:translate(-4px,1px)}36%{transform:translate(4px,-1px)}54%{transform:translate(-3px,0)}72%{transform:translate(2px,1px)}}
-@media (prefers-reduced-motion:reduce){#game-stage > #app > #game-content #battlePage .v174-cardless-unit>.v174-battle-art{animation:none!important;}}
-`;
-    document.head.appendChild(style);
+function removeRetiredPresentationStyles(){
+    const style=document.getElementById("v174-cardless-battle-style");
+    if(style){ style.remove(); }
 }
 function numericValue(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0;}
 function setTextIfChanged(node,value){if(node&&node.textContent!==value)node.textContent=value;}
@@ -136,11 +75,16 @@ function syncResourceNumbers(){
     });
 }
 function syncBattlePresentation(){
-    ensureBattlePresentationStyles();
+    removeRetiredPresentationStyles();
     document.querySelectorAll("#battlePage .battle-player").forEach(card=>syncUnitArtwork(card,"player"));
     document.querySelectorAll("#battlePage .battle-monster").forEach(card=>syncUnitArtwork(card,"monster"));
     syncResourceNumbers();
 }
+window.FourSymbolsBattlePresentation=Object.freeze({
+    version:"cardless-presentation-v2",
+    applyUnit:syncUnitArtwork,
+    sync:syncBattlePresentation
+});
 function shakeArtForPopup(node){
     if(!(node instanceof Element))return;
     const popups=node.matches?.(".damage-popup.hp-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup.hp-popup")||[]);
@@ -182,8 +126,18 @@ window.v17351SyncManagement=syncManagement;
 function adLayer(){let l=document.getElementById("v17351AdSimulator");if(l)return l;l=document.createElement("div");l.id="v17351AdSimulator";l.className="v17351-ad-simulator";l.setAttribute("aria-hidden","true");l.innerHTML='<section class="v17351-ad-panel" role="dialog" aria-modal="true"><div class="v17351-ad-badge">AD</div><h2>模擬觀看廣告</h2><p>測試模式：播放完成後才發放獎勵。</p><strong id="v17351AdCountdown">3</strong><span id="v17351AdStatus">秒後完成</span></section>';document.body.appendChild(l);return l;}
 window.showRewardedAd=function(onSuccess,onFail){if(adRunning)return false;adRunning=true;const l=adLayer(),num=l.querySelector("#v17351AdCountdown"),status=l.querySelector("#v17351AdStatus");l.classList.add("show");l.setAttribute("aria-hidden","false");let remain=3;num.textContent="3";status.textContent="秒後完成";const timer=setInterval(()=>{remain--;if(remain>0){num.textContent=String(remain);return}clearInterval(timer);num.textContent="✓";status.textContent="觀看完成";setTimeout(()=>{l.classList.remove("show");l.setAttribute("aria-hidden","true");adRunning=false;try{if(typeof onSuccess==="function")onSuccess()}catch(err){console.error(err);if(typeof onFail==="function")onFail(err)}},280)},1000);return true;};
 
-const observer=new MutationObserver(mutations=>{syncManagement();mutations.forEach(record=>record.addedNodes.forEach(shakeArtForPopup));});
+const observer=new MutationObserver(mutations=>{
+    let needsResourceSync=false;
+    mutations.forEach(record=>record.addedNodes.forEach(node=>{
+        shakeArtForPopup(node);
+        if(!(node instanceof Element)){ return; }
+        const units=node.matches?.(".battle-player,.battle-monster")
+            ?[node]:Array.from(node.querySelectorAll?.(".battle-player,.battle-monster")||[]);
+        units.forEach(card=>syncUnitArtwork(card,card.classList.contains("battle-monster")?"monster":"player"));
+        if(units.length){ needsResourceSync=true; }
+    }));
+    if(needsResourceSync){ syncResourceNumbers(); }
+});
 observer.observe(document.body,{subtree:true,childList:true});
-setInterval(syncManagement,300);
 syncManagement();
 })();

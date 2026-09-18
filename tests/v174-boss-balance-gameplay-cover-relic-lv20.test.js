@@ -105,7 +105,7 @@ function relicContext(level){
 }
 
 /* Requirement 1: level-derived Boss balance, same-element skill loadouts,
-   meaningful mechanism durability and two same-element elite helpers. */
+   Boss-owned Shield durability and two same-element elite helpers. */
 {
     const context=bossContext(100);
     const lv20=context.GameplaySystem.getBossBalanceProfile(20,"personal",1);
@@ -131,10 +131,10 @@ function relicContext(level){
     assert.equal(boss.rank,"boss");
     assert.ok(boss.defense>context.v132BuildDungeonMonster("精英基準",20,"fire","elite").defense);
     assert.ok(boss.skillIds.every(id=>context.skillDatabase[id].element===boss.element),"Boss skills must match the Boss element");
-    context.turn=2;context.startTurn(context.battleToken);
-    const mechanism=context.GameplaySystem.getActiveBattleState().mechanisms[0];
-    assert.equal(mechanism.type,"shield");
-    assert.ok(mechanism.maxHP>=1500,"Lv20 mechanism cards must survive more than a trivial single hit");
+    context.turn=2;context.FourSymbolsBossBattle.processRound();
+    const shield=context.GameplaySystem.getActiveBattleState().shield;
+    assert.ok(shield&&shield.current>0,"Lv20 金剛護體 must create a Boss-owned Shield");
+    assert.equal(context.monsters.length,1,"Shield must not create a second target entity");
 }
 {
     const context=bossContext(100);
@@ -142,23 +142,24 @@ function relicContext(level){
     assert.equal(context.lastRoster.length,1,"reinforcements must not be present in the opening roster");
     const boss=context.lastRoster[0];
     assert.equal(boss.element,"fire");
-    boss.hp=Math.floor(boss.maxHP*.5);context.turn=2;context.startTurn(context.battleToken);
-    const helpers=context.monsters.slice(1);
+    boss.hp=Math.floor(boss.maxHP*.5);context.turn=2;context.FourSymbolsBossBattle.processRound();
+    const helpers=context.monsters.filter(monster=>monster.unitKind==="boss-reinforcement");
     assert.equal(helpers.length,2);
     helpers.forEach(helper=>{
         assert.equal(helper.rank,"elite");
         assert.equal(helper.element,boss.element,"elite helper element must match its Boss");
         assert.ok(helper.skillIds.every(id=>context.skillDatabase[id].element===helper.element),"elite helper skills must match helper element");
     });
-    context.turn=3;context.startTurn(context.battleToken);
-    assert.equal(context.monsters.length,3,"reinforcements must not be summoned more than once");
+    context.turn=3;context.FourSymbolsBossBattle.processRound();
+    assert.equal(context.monsters.filter(monster=>monster.unitKind==="boss-reinforcement").length,2,"reinforcements must not be summoned more than once");
 }
 
-/* Requirement 2: activity cover art uses 16:9 while battlefield Boss and
-   BOSS card retains 9:16 while the mechanism card uses the requested 4:3 combat geometry. */
+/* Requirement 2: activity cover art uses 16:9 while the battlefield Boss
+   occupies one six-Slot, cardless target footprint. */
 assert.match(gameplayCss,/\.gameplay-mode-card\{[\s\S]*?aspect-ratio:16\s*\/\s*9;/);
-assert.match(gameplayCss,/gameplay-boss-card\[data-rank="boss"\]\{[^}]*aspect-ratio:9\s*\/\s*16;/);
-assert.match(gameplayCss,/\.boss-mechanism-card\{[^}]*aspect-ratio:4\s*\/\s*3;/);
+assert.match(gameplayCss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 5px\);[\s\S]*?right:calc\(20% \+ 5px\);/);
+assert.match(gameplayCss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?pointer-events:auto;/);
+assert.doesNotMatch(gameplayCss,/boss-mechanism-card|boss-mechanism-slot/);
 
 /* Requirement 3: all-element preview explicitly distinguishes advantage from
    disadvantage and stays on the real body-mounted modal owner. */

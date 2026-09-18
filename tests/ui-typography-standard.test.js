@@ -65,7 +65,7 @@ enforceNoTinyText(owners.qa, (text) => text.split('/* DEV-only ad simulator')[0]
 enforceNoTinyText(owners.relic, (text) => text
   .split('#game-stage .team-relic-battle-banner')[0]
   .replace('font-size:0!important', ''));
-enforceNoTinyText(owners.gameplay, (text) => text.split('/* ---------- Boss battle portrait / mechanism UI ---------- */')[0]);
+enforceNoTinyText(owners.gameplay, (text) => text.split('/* ---------- Boss battle target-entity presentation ---------- */')[0]);
 
 // Mixed V146 owner: only its non-battle region is governed by this task.
 const nonBattlePolish = homePolish
@@ -111,14 +111,12 @@ for (const designPx of [34,36,39,41,46]) {
   assert.ok(designPx * nativeScale >= 13, `${designPx}px native design text would render below 13px`);
 }
 
-// Explicitly protect battle exclusions: these integrated battle values are intentional.
-// The new mechanism face is more legible (14/13) but its compact HP remains an
-// intentional battle-only 11px exception; detailed copy lives in the 13px+ panel.
-assert.match(gameplay, /\.boss-mechanism-kind\{[\s\S]*?font-size:13px/);
-assert.match(gameplay, /\.boss-mechanism-name\{[\s\S]*?font-size:14px/);
-assert.match(gameplay, /\.boss-mechanism-hp\{[\s\S]*?font-size:11px[\s\S]*?font-weight:900/);
-assert.match(gameplay, /\.boss-mechanism-info-effect\{[\s\S]*?font-size:13px/);
-assert.match(gameplay, /\.boss-mechanism-toast\{[\s\S]*?font-size:11px/);
+// Explicitly protect the compact, battle-only Boss HUD exclusion. Boss objects
+// use the normal Unit HUD and no longer own a separate function-card type scale.
+assert.match(gameplay, /\.gameplay-boss-card > \.battle-monster-name\{[\s\S]*?font-size:14px/);
+assert.match(gameplay, /\.gameplay-boss-card \.monster-bar-text\{[\s\S]*?font-size:10px/);
+assert.match(gameplay, /\.boss-shield-value\{[\s\S]*?font-size:10px/);
+assert.doesNotMatch(gameplay,/boss-mechanism/);
 assert.match(relic, /\.team-relic-battle-banner b\{[^}]*17px/);
 assert.match(relic, /#battlePage \.battle-player \.team-relic-sp-float\{[^}]*13px/);
 assert.match(read('css/45-v152-dev-fixes.css'), /v152-frostbite-blocked::after\{[\s\S]*?font-size:12px !important/);

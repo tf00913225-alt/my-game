@@ -225,138 +225,35 @@ function createContext(options={}){
         assert.equal(metrics.active,false);
     });
 
-    await test("large skills block initiative until animation completion",async()=>{
-        const {context,scheduler,calls}=createContext();
-        const config=context.v142GetSkillAnimationConfig("phoenixCry");
-        const gate=context.v142SkillAnimationDirector.play(config,{side:"player",actorIndex:0,render:false});
-        context.finishPlayerAction();
-        scheduler.advance(1600);
-        context.processNextCombatant(7);
-        await Promise.resolve();
-        assert.equal(calls.process,0,"initiative must not advance at the old fixed delay");
-        scheduler.advance(3199);
-        await Promise.resolve();
-        assert.equal(calls.process,0);
-        scheduler.advance(3200);
+    await test("the director reports visual time without owning the initiative queue",()=>{
+        const {context,scheduler}=createContext();
+        const gate=context.v142SkillAnimationDirector.play(
+            context.v142GetSkillAnimationConfig("phoenixCry"),
+            {side:"player",actorIndex:0,render:false}
+        );
+        assert.equal(context.v142GetRemainingAnimationMs(),3200);
+        scheduler.advance(1200);
+        assert.equal(context.v142GetRemainingAnimationMs(),2000);
         gate.complete("animationend");
-        await Promise.resolve();
-        await Promise.resolve();
-        assert.equal(calls.process,1);
-        assert.equal(context.v142GetAnimationDiagnostics().duplicateBoundariesBlocked>=1,true);
+        assert.equal(context.v142GetRemainingAnimationMs(),0);
+        assert.doesNotMatch(source,/finishPlayerAction\s*=(?!=)|processNextCombatant\s*=(?!=)|beginCharacterTurn\s*=(?!=)/);
     });
 
-    await test("the next action can issue its own independent gate",async()=>{
-        const {context,scheduler,calls}=createContext();
-        context.initiativeQueue=[{type:"player"},{type:"monster"},{type:"player"}];
+    await test("a superseded visual gate settles once and cannot strand combat",async()=>{
+        const {context}=createContext();
         const first=context.v142SkillAnimationDirector.play(
             context.v142GetSkillAnimationConfig("flameSlash"),
-            {side:"player",actorIndex:0,render:false}
+            {side:"player",actorIndex:0,render:false,key:"first"}
         );
-        let second=null;
-        context.onProcess=function(){
-            context.onProcess=null;
-            second=context.v142SkillAnimationDirector.play(
-                context.v142GetSkillAnimationConfig("phoenixCry"),
-                {side:"monster",actorIndex:1,render:false}
-            );
-            context.finishPlayerAction();
-        };
-        context.finishPlayerAction();
-        scheduler.advance(760);
-        first.complete("animationend");
-        scheduler.advance(1600);
-        await Promise.resolve();
-        await Promise.resolve();
-        assert.equal(calls.process,1);
-        assert.ok(second);
-        scheduler.advance(3200);
-        await Promise.resolve();
-        assert.equal(calls.process,1,"second action is still animating");
-        scheduler.advance(4800);
-        second.complete("animationend");
-        await Promise.resolve();
-        await Promise.resolve();
-        assert.equal(calls.process,2);
-    });
-
-    await test("simple skills do not add delay beyond the existing 1.6 second cadence",async()=>{
-        const {context,scheduler,calls}=createContext();
-        const gate=context.v142SkillAnimationDirector.play(
-            context.v142GetSkillAnimationConfig("flameSlash"),
-            {side:"player",actorIndex:0,render:false}
+        const second=context.v142SkillAnimationDirector.play(
+            context.v142GetSkillAnimationConfig("iceArrowRain"),
+            {side:"player",actorIndex:0,render:false,key:"second"}
         );
-        context.finishPlayerAction();
-        scheduler.advance(760);
-        gate.complete("animationend");
-        scheduler.advance(1599);
         await Promise.resolve();
-        assert.equal(calls.process,0);
-        scheduler.advance(1600);
-        await Promise.resolve();
-        await Promise.resolve();
-        assert.equal(calls.process,1);
-    });
-
-    await test("completed boundaries stay unique when a later round reuses the last gate",async()=>{
-        const {context,scheduler,calls}=createContext();
-        const gate=context.v142SkillAnimationDirector.play(
-            context.v142GetSkillAnimationConfig("flameSlash"),
-            {side:"player",actorIndex:0,render:false}
-        );
-        gate.complete("animationend");
-
-        context.finishPlayerAction();
-        scheduler.advance(1600);
-        await Promise.resolve();
-        await Promise.resolve();
-        assert.equal(calls.process,1);
-
-        context.turn=2;
-        context.initiativeIndex=0;
-        context.finishPlayerAction();
-        scheduler.advance(3200);
-        await Promise.resolve();
-        await Promise.resolve();
-        assert.equal(calls.process,2,"a repeated gate id in round two must still advance combat");
-    });
-
-    await test("round handoff cannot expose the next manual turn before the final animation ends",async()=>{
-        const {context,scheduler,calls}=createContext({roundFlow:true});
-        context.initiativeQueue=[{type:"player"}];
-        const gate=context.v142SkillAnimationDirector.play(
-            context.v142GetSkillAnimationConfig("flameSlash"),
-            {side:"player",actorIndex:0,render:false}
-        );
-        context.finishPlayerAction();
-        scheduler.advance(400);
-        await Promise.resolve();
-        await Promise.resolve();
-        assert.equal(calls.startTurn,0,"startTurn must remain gated while the final animation is active");
-        assert.equal(calls.begin,0,"the next actor may not begin while the prior animation is active");
-        scheduler.advance(760);
-        gate.complete("animationend");
-        await Promise.resolve();
-        await Promise.resolve();
-        assert.equal(calls.startTurn,1);
-        assert.equal(calls.begin,1);
-    });
-
-    await test("auto/declare actions also wait for their own animation",async()=>{
-        const {context,scheduler,calls}=createContext();
-        context.battlePhase="declare";
-        const gate=context.v142SkillAnimationDirector.play(
-            context.v142GetSkillAnimationConfig("flameSlash"),
-            {side:"player",actorIndex:0,render:false}
-        );
-        context.finishPlayerAction();
-        scheduler.advance(90);
-        await Promise.resolve();
-        assert.equal(calls.begin,0);
-        scheduler.advance(760);
-        gate.complete("animationend");
-        await Promise.resolve();
-        await Promise.resolve();
-        assert.equal(calls.begin,1);
+        assert.equal(first.done,true);
+        assert.equal(first.reason,"superseded");
+        assert.equal(first.completionCount,1);
+        assert.equal(second.done,false);
     });
 
     await test("the timing owner completes an expired render-owned action without double resolve",async()=>{

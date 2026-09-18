@@ -13,7 +13,6 @@
 
     const VERSION="174-slot-geometry-owner";
     const DEFAULT_HIT=.5833333333;
-    const MECHANISM_TARGET_PREFIX="mechanism:";
     let blockedManifestWrites=0;
     let blockedDirectorOverrides=0;
     let blockedCardEffectOverrides=0;
@@ -215,23 +214,8 @@
         });
     }
 
-    function isMechanismTarget(index){
-        return typeof index==="string"&&index.indexOf(MECHANISM_TARGET_PREFIX)===0&&index.length>MECHANISM_TARGET_PREFIX.length;
-    }
-
-    function mechanismCardFor(index){
-        if(typeof document==="undefined"||!isMechanismTarget(index)){ return null; }
-        const slot=document.getElementById("bossMechanismSlot");
-        if(!slot||typeof slot.querySelectorAll!=="function"){ return null; }
-        const mechanismId=index.slice(MECHANISM_TARGET_PREFIX.length);
-        return Array.from(slot.querySelectorAll(".boss-mechanism-card")).find(card=>
-            card&&card.dataset&&card.dataset.id===mechanismId
-        )||null;
-    }
-
     function cardFor(side,index){
         if(typeof document==="undefined"){ return null; }
-        if(side==="monster"&&isMechanismTarget(index)){ return mechanismCardFor(index); }
         return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
     }
 
@@ -243,10 +227,6 @@
     }
 
     function canReceive(config,side,index){
-        if(side==="monster"&&isMechanismTarget(index)){
-            const card=cardFor(side,index);
-            return !!(card&&(!card.classList||!card.classList.contains("destroying")));
-        }
         const entity=entityFor(side,index);
         if(!entity){ return false; }
         if(String(config&&config.category||"")==="revive"){
@@ -263,9 +243,6 @@
     function slotForTarget(side,index,card){
         const owner=geometryOwner();
         if(!owner){ return null; }
-        if(side==="monster"&&isMechanismTarget(index)){
-            return typeof owner.getSlotFromElement==="function"?owner.getSlotFromElement(card||cardFor(side,index)):null;
-        }
         let slot=typeof owner.getSlotForCombatant==="function"?owner.getSlotForCombatant(side,index):null;
         if(!slot&&typeof owner.getSlotFromElement==="function"){
             slot=owner.getSlotFromElement(card||cardFor(side,index));
@@ -274,6 +251,13 @@
     }
 
     function slotAnchor(side,index,card){
+        const boss=window.FourSymbolsBossBattle;
+        if(side==="monster"&&boss&&typeof boss.getTargetGeometry==="function"){
+            const targetRect=boss.getTargetGeometry(index);
+            if(targetRect){
+                return {slot:isBossIndexForVfx(index)?"BOSS_FOOTPRINT":slotForTarget(side,index,card),x:targetRect.centerX,y:targetRect.centerY,rect:targetRect};
+            }
+        }
         const owner=geometryOwner();
         const slot=slotForTarget(side,index,card);
         if(!owner||!slot){ return null; }
@@ -283,13 +267,20 @@
         return {slot:slot,x:center.x,y:center.y,rect:rect};
     }
 
+    function isBossIndexForVfx(index){
+        const boss=window.FourSymbolsBossBattle;
+        return !!(boss&&typeof boss.isBossIndex==="function"&&boss.isBossIndex(index));
+    }
+
     function activeCards(side,config){
         const cards=[];
-        const max=side==="monster"?10:6;
-        for(let index=0;index<max;index++){
+        const indexes=side==="monster"&&typeof currentBattleMonsters!=="undefined"
+            ?currentBattleMonsters.filter(Number.isInteger)
+            :[0,1,2,3,4,5];
+        indexes.forEach(index=>{
             const card=cardFor(side,index);
             if(card&&card.offsetParent!==null&&canReceive(config,side,index)){ cards.push({index:index,card:card}); }
-        }
+        });
         return cards;
     }
 
@@ -303,7 +294,7 @@
             ?meta.targetIds
             :(meta.targetId!==undefined&&meta.targetId!==null?[meta.targetId]:[]);
         return Array.from(new Set(explicit.filter(index=>
-            (Number.isInteger(index)||isMechanismTarget(index))&&canReceive(config,targetSide,index)
+            Number.isInteger(index)&&canReceive(config,targetSide,index)
         )));
     }
 
@@ -328,6 +319,16 @@
     }
 
     function geometryPrimaryAnchor(current,indexes){
+        const seed=geometrySeedIndexes(current,indexes);
+        const primary=current&&current.targetId!==undefined&&current.targetId!==null
+            ?current.targetId:(seed.length?seed[0]:null);
+        if(current&&current.targetSide==="monster"&&Number.isInteger(primary)){
+            const boss=window.FourSymbolsBossBattle;
+            const targetRect=boss&&typeof boss.getTargetGeometry==="function"?boss.getTargetGeometry(primary):null;
+            if(targetRect){
+                return {slot:isBossIndexForVfx(primary)?"BOSS_FOOTPRINT":slotForTarget("monster",primary,cardFor("monster",primary)),x:targetRect.centerX,y:targetRect.centerY,rect:targetRect};
+            }
+        }
         const owner=geometryOwner();
         const slot=geometryPrimarySlot(current,indexes);
         if(!owner||!slot){ return null; }
@@ -347,18 +348,11 @@
         if(!owner||!current){ return null; }
         const seed=geometrySeedIndexes(current,indexes);
         const targetType=String(current.config&&current.config.targetType||"single");
-        const mechanismSlots=seed.filter(isMechanismTarget)
-            .map(index=>slotForTarget("monster",index,cardFor("monster",index))).filter(Boolean);
         if(placement==="battlefield"||targetType==="all"||targetType==="allyAll"){
             const rect=typeof owner.getSideRect==="function"?owner.getSideRect(current.targetSide):null;
             if(rect){ rect.id=current.targetSide==="monster"?"fixed-enemy-zone":"fixed-ally-zone"; }
             return rect;
         }
-        if(mechanismSlots.length&&/^single$/i.test(targetType)&&typeof owner.getRectForSlots==="function"){
-            const rect=owner.getRectForSlots(mechanismSlots);
-            if(rect){ rect.id="mechanism-slots"; return rect; }
-        }
-
         const primarySlot=geometryPrimarySlot(current,indexes);
         if(!primarySlot){ return null; }
 
@@ -370,8 +364,16 @@
             ?owner.getGeometryRectFromShape(current.targetSide,primarySlot,shape)
             :owner.getSlotRect(primarySlot);
         if(rect){
-            rect.id=mechanismSlots.length?"mechanism-range-zone":"fixed-slot-"+String(shape).toLowerCase();
-            rect.centerOnBounds=mechanismSlots.length&&!/^single$/i.test(shape);
+            const anchor=geometryPrimaryAnchor(current,indexes);
+            if(anchor&&isBossIndexForVfx(current.targetId)&&!/^all$/i.test(shape)){
+                rect.left=anchor.x-rect.width/2;
+                rect.right=anchor.x+rect.width/2;
+                rect.top=anchor.y-rect.height/2;
+                rect.bottom=anchor.y+rect.height/2;
+                rect.centerX=anchor.x;
+                rect.centerY=anchor.y;
+            }
+            rect.id="fixed-slot-"+String(shape).toLowerCase();
         }
         return rect;
     }
@@ -402,13 +404,17 @@
 
     function snapshotTimedEffects(){
         const snapshot=new Set();
-        [["monster",10],["player",6]].forEach(entry=>{
-            for(let index=0;index<entry[1];index++){
+        const groups=[
+            ["monster",typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[]],
+            ["player",[0,1,2,3,4,5]]
+        ];
+        groups.forEach(entry=>{
+            entry[1].forEach(index=>{
                 const entity=entityFor(entry[0],index);
                 Object.keys(RAW_STATUS_SPRITES).forEach(type=>{
                     if(hasTimedEffect(entity,type)){ snapshot.add(entry[0]+":"+index+":"+type); }
                 });
-            }
+            });
         });
         return snapshot;
     }
@@ -492,7 +498,8 @@
     function syncStatusSpriteEffects(){
         purgeLegacyCardVfx();
         const types=Object.keys(RAW_STATUS_SPRITES);
-        for(let index=0;index<10;index++){ types.forEach(type=>syncStatusSprite("monster",index,type)); }
+        const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
+        enemyIndexes.forEach(index=>types.forEach(type=>syncStatusSprite("monster",index,type)));
         for(let index=0;index<6;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }
     }
 
@@ -848,7 +855,7 @@
             ?meta.targetIds
             :(meta.targetId!==undefined&&meta.targetId!==null?[meta.targetId]:[]);
         explicitTargets.forEach(index=>{
-            if((Number.isInteger(index)||isMechanismTarget(index))&&cardFor(targetSide,index)){
+            if(Number.isInteger(index)&&cardFor(targetSide,index)){
                 validTargets.add(index);
             }
         });

@@ -46,6 +46,23 @@
         "先使用本機存檔",
         "DEV_AUTH_BYPASS"
       ]
+    },
+    {
+      "id": "DEP-004-boss-function-card-and-root-hit-frame",
+      "description": "Boss 功能卡平行目標系統與 root red-hit 卡框已正式退役；正式程式只允許數字 enemy target entity 與立繪受擊回饋。",
+      "enabled": true,
+      "forbidden": [
+        "MECH_L",
+        "MECH_C",
+        "MECH_R",
+        "boss-mechanism-card",
+        "boss-mechanism-slot",
+        "mechanism:",
+        "blockingShield",
+        "mandatoryMechanismTarget",
+        "resolveMechanismAction",
+        ".red-hit"
+      ]
     }
   ]
 }
