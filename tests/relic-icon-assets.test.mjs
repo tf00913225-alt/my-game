@@ -32,5 +32,7 @@ test("inventory fragment definitions use img markup for confirmed WebP art",()=>
   for(const path of confirmed.map(id=>`assets/relics/fragments/${id}.webp`)){ assert.ok(source.includes(path),path); }
   assert.ok(source.includes("assets/relics/fragments/relic_universal_fragment.webp"));
   assert.match(source,/function fragmentIconMarkup\(path\)/);
+  assert.match(source,/fragmentIconMarkup\(path\)\{[\s\S]*?class="v169-item-art v174-relic-fragment-art"[\s\S]*?<img src=/);
+  assert.match(source,/decoding="async" onerror="this\.hidden=true"/);
   assert.ok(!source.includes(".png"));
 });
