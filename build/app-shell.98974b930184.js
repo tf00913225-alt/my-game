@@ -6588,6 +6588,42 @@ function saveGame(options={}){
    ★ 舊存檔修復 / 讀檔
 ===================================================== */
 
+/* =====================================================
+   舊存檔技能引用相容
+   - V152 曾把誤加入玩家技能池的 fireBurstStrike 退役。
+   - 後層 gameplay runtime 仍會清理怪物與執行階段資料，
+     但帳號 hydration 必須在第一次技能 UI render 前先清理玩家存檔引用。
+===================================================== */
+function normalizeHydratedRetiredSkillReferences(){
+
+    const retiredPlayerSkillIds=new Set([
+        "fireBurstStrike"
+    ]);
+
+    Object.values(characterSkillLoadouts||{}).forEach(loadout=>{
+        if(!loadout||typeof loadout!=="object"){ return; }
+
+        if(loadout.skillLevels&&typeof loadout.skillLevels==="object"&&!Array.isArray(loadout.skillLevels)){
+            retiredPlayerSkillIds.forEach(skillId=>delete loadout.skillLevels[skillId]);
+        }
+
+        if(Array.isArray(loadout.equippedSkills)){
+            loadout.equippedSkills=loadout.equippedSkills.filter(skillId=>{
+                if(retiredPlayerSkillIds.has(skillId)){ return false; }
+                const skill=skillDatabase&&skillDatabase[skillId];
+                return !!(skill&&skill.monsterOnly!==true);
+            });
+        }
+    });
+
+    [autoConfig,autoConfig2,autoConfig3].forEach(config=>{
+        if(config&&retiredPlayerSkillIds.has(config.skill)){
+            config.skill="normal";
+        }
+    });
+}
+
+
 function loadGame(){
 
     const resolvedSave=arguments[0]||null;
@@ -7168,6 +7204,9 @@ function loadGame(){
             });
 
         }
+
+
+        normalizeHydratedRetiredSkillReferences();
 
 
         /*
@@ -29450,7 +29489,7 @@ function renderSkillLoadout(){
             "skill-loadout-slot";
 
 
-        if(skillId){
+        if(skillId&&skillDatabase[skillId]){
 
             const skill =
                 skillDatabase[skillId];
