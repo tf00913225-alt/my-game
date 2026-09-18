@@ -184,7 +184,7 @@ function runViewport(chrome,width,height){
     assert.notEqual(data.activeArtFilter,"none","active cardless feedback must remain on artwork instead of a card frame");
     assert.equal(data.playerIdle,"v174BattleIdle");
     assert.equal(data.lungeAnimation,"v174BattleLungeUp");
-    assert.equal(data.hitAnimation,"none");
+    assert.equal(data.hitAnimation,"v174BattleIdle","damage popups must not replace the formal cardless idle animation with hit feedback");
     assert.notEqual(data.footShadowContent,"none");
     assert.equal(data.abyssOwnerOpacity,"0");
     assert.equal(data.overlayPosition,"absolute");
