@@ -600,10 +600,15 @@ try{
         }
         const phase=typeof battlePhase!=='undefined'?battlePhase:null;
         if(phase!=='declare'||typeof startResolutionPhase!=='function'){return {declared:false,phase};}
-        startResolutionPhase(battleToken);
-        if(Array.isArray(initiativeQueue)){
-            initiativeQueue.sort((left,right)=>left?.type==='player'?-1:right?.type==='player'?1:0);
-        }
+        /* startResolutionPhase starts index zero synchronously. Re-sorting the
+           queue after that call can move the already-running monster away from
+           index zero and move the player into an index that will never run.
+           Make the fixture's player legitimately win initiative before the
+           production queue is built, then restore the persisted stat. */
+        const originalAgility=Number(player.agility)||0;
+        player.agility=Math.max(originalAgility,100000);
+        try{ startResolutionPhase(battleToken); }
+        finally{ player.agility=originalAgility; }
         return {
             declared:true,phase,phaseAfter:typeof battlePhase!=='undefined'?battlePhase:null,
             firstCombatant:Array.isArray(initiativeQueue)?initiativeQueue[0]?.type||null:null
