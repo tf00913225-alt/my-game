@@ -166,6 +166,19 @@
         if(state.fallbackTimer){ clearTimeout(state.fallbackTimer); state.fallbackTimer=0; }
     }
 
+    function armGateDeadline(gate,duration,reason){
+        if(!gate||gate.done){ return false; }
+        if(state.fallbackTimer){ clearTimeout(state.fallbackTimer); state.fallbackTimer=0; }
+        const visualDuration=Math.max(0,Number(duration)||0);
+        gate.visualStartedAt=Date.now();
+        gate.deadline=gate.visualStartedAt+visualDuration;
+        state.fallbackTimer=setTimeout(
+            ()=>gate.complete(reason||"v142-timing-only"),
+            visualDuration
+        );
+        return true;
+    }
+
     function identity(side,name,actorIndex){
         return [
             typeof battleToken!=="undefined"?battleToken:"none",
@@ -182,10 +195,13 @@
         const gate={
             id:++state.sequence,key:key,
             battleToken:typeof battleToken!=="undefined"?battleToken:null,
-            config:config,startedAt:Date.now(),deadline:0,done:false,reason:null,
+            config:config,startedAt:Date.now(),visualStartedAt:0,deadline:0,done:false,reason:null,
             completionCount:0,promise:null,complete:null
         };
         gate.deadline=gate.startedAt+Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0);
+        gate.restartVisualTimeline=function(duration){
+            return armGateDeadline(gate,duration,"v142-v143-visual-complete");
+        };
         gate.promise=new Promise(resolve=>{ resolvePromise=resolve; });
         gate.complete=function(reason){
             if(gate.done){ return false; }
@@ -223,9 +239,10 @@
         /* The gate measures visual lifetime only. Queue progression never waits
            on this Promise; 00-main.js reads the remaining time and schedules its
            own deterministic handoff even if the raster renderer fails. */
-        state.fallbackTimer=setTimeout(
-            ()=>gate.complete(meta.render===false?"v142-render-safety-deadline":"v142-timing-only"),
-            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0)
+        armGateDeadline(
+            gate,
+            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0),
+            meta.render===false?"v142-render-safety-deadline":"v142-timing-only"
         );
         if(typeof document!=="undefined"&&document.addEventListener){
             state.visibilityHandler=function(){
