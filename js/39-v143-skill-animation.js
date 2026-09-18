@@ -41,11 +41,13 @@
 
     function relicSheet(src,hitFrame,options){
         const frame=Math.max(1,Math.min(12,Math.floor(Number(hitFrame)||7)));
+        const frameIndex=frame-1;
         return {
-            hit:frame/12,
+            hit:frameIndex/12,
+            authoredHitFrame:frame,
             lazyAsset:true,
             sprite:castSheet(src,"single",Object.assign({
-                hitFrame:frame,scale:2.05,maxSize:280
+                hitFrame:frameIndex,scale:2.05,maxSize:280
             },options||{}))
         };
     }
@@ -129,7 +131,7 @@
         relic_burning_star_mark:relicSheet("assets/vfx/relic/relic_burning_star_mark.webp",7),
         relic_spirit_spring_bottle:relicSheet("assets/vfx/relic/relic_spirit_spring_bottle.webp",6),
         relic_demon_suppressing_seal:relicSheet("assets/vfx/relic/relic_demon_suppressing_seal.webp",6),
-        relic_all_returning_array:relicSheet("assets/vfx/relic/relic_all_returning_array.webp",7),
+        relic_all_returning_array:relicSheet("assets/vfx/relic/relic_all_returning_array.webp",8),
 
         /* These Light support skills currently have no dedicated finished cast
            sheet. Their battle timing remains valid, but there is deliberately
