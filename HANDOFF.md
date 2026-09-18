@@ -1,3 +1,11 @@
+## 2026-09-18 — 秘寶碎片背包黑圖／詳情穿圖修復（VERIFIED）
+
+- Base: `dev@d9c6d2d2beb78a0a944af171ca20eeb92f02abaa`; branch: `fix/relic-fragment-inventory-image-fit-20260918`; `main` 不修改。
+- 實機截圖顯示秘寶碎片在背包格內只看到黑色／局部畫面，點開道具詳情後則以原始大圖尺寸穿出 modal。
+- 根因在 `js/relic-progression-drop-system.js::fragmentIconMarkup()`：上一輪 WebP 導入使用裸 `<img>`，繞過既有背包與 itemModal 的 `.v169-item-art > img` 幾何 owner。
+- 修正只把碎片 icon markup 收斂回既有 `v169-item-art` 包裝；沿用 `css/38-v141-system-expansion.css` 已有的尺寸與 `object-fit:contain`。沒有新增 CSS override、runtime wrapper、素材轉檔或玩法／掉落／合成變更。
+- Requirement batch: `release/requirement-batches/2026-09-18-relic-fragment-inventory-image-fit.json`。PR #315 Repository checks run `35364121111` 已通過，包含 build sync、9:16 mobile QA、exact-candidate real battle QA、Adventure mobile QA 與 release gates。
+
 ## 2026-09-18 — Battle presentation follow-up: Boss HUD, cardless enemy feedback, drawer and reinforcement spacing (IMPLEMENTED / QA PENDING)
 
 - Base: latest GitHub `dev@394d4a6baba1aa6e7061d60390201bf1925c4a1e`; branch: `fix/battle-presentation-boss-hud-slots-20260918`. `main` remains excluded.

@@ -154,7 +154,7 @@
     function fragmentIdFor(relicId){ return "relicFragment_"+String(relicId||"").replace(/^relic_/,""); }
 
     function fragmentIconMarkup(path){
-        return '<img src="'+path+'" alt="" draggable="false">';
+        return '<span class="v169-item-art v174-relic-fragment-art"><img src="'+path+'" alt="" aria-hidden="true" draggable="false" decoding="async" onerror="this.hidden=true"></span>';
     }
     const RELIC_FRAGMENT_ICON_PATHS=Object.freeze({
         relic_qiankun_flask:"assets/relics/fragments/relic_qiankun_flask.webp",
