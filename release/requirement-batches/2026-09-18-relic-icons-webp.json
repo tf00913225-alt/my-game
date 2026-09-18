@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-18",
+  "title": "秘寶與秘寶碎片 WebP 圖示正式導入",
+  "base_branch": "dev",
+  "base_sha": "7f50b879d512b598c9060c53d6629693394be75c",
+  "work_branch": "feature/relic-icons-webp-20260918",
+  "officialVersion": "173.65",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "將 assets-library/assets/inbox/秘寶icon 中可由檔名唯一確認的秘寶 PNG 轉為無損 WebP，並配置到秘寶頁既有 iconPath owner；不確定檔案不得配置。",
+      "owner": [
+        "js/60-team-relic-system.js",
+        "assets/relics/icons/"
+      ],
+      "implementation": "沿用 RELIC_CATALOG_LIST[].iconPath 與 relicIconMarkup()；20 個秘寶圖示全部配置 WebP。使用者已確認 assets-library 的「寒泉玉佩.png」只是檔名字形誤植，實際即對應正式「寒泉玉珮」。"
+    },
+    {
+      "id": 2,
+      "status": "VERIFIED",
+      "request": "將秘寶碎片資料夾中可確認的 PNG 轉為無損 WebP，並配置到背包對應碎片 item.icon；不確定檔案不得配置。",
+      "owner": [
+        "js/relic-progression-drop-system.js",
+        "assets/relics/fragments/"
+      ],
+      "implementation": "沿用 fragmentIdFor()/itemDefinitions/hydrateOwnedItemPresentation；20 個專屬碎片與秘寶通用碎片全部使用 WebP <img> markup。使用者已確認「寒泉玉佩 碎片.png」只是檔名字形誤植，實際即對應「寒泉玉珮碎片」。"
+    }
+  ],
+  "verification": [
+    "tests/relic-icon-assets.test.mjs",
+    "tests/v174-relic-square-art-ui.test.js",
+    "tests/v174-relic-progression-drop-system.test.js",
+    "npm run build:check",
+    "GitHub Actions run 35360651499",
+    "GitHub Actions run 35362222074"
+  ],
+  "verificationResult": "2/2 VERIFIED；首次 39 張與後續寒泉玉珮本體/碎片 2 張均以 lossless WebP 轉換。兩輪轉檔皆逐張驗證來源與成品尺寸一致、透明狀態一致、ImageMagick AE 像素差異為 0；source syntax、正式 build、素材引用 test、既有秘寶養成 test、360/390/412/430px 秘寶頁 browser QA 與 build:check 全數通過。使用者已確認「寒泉玉佩」僅為檔名字形誤植，正式對應「寒泉玉珮」。",
+  "releasedAs": null
+}

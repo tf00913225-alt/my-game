@@ -153,17 +153,43 @@
 
     function fragmentIdFor(relicId){ return "relicFragment_"+String(relicId||"").replace(/^relic_/,""); }
 
+    function fragmentIconMarkup(path){
+        return '<span class="v169-item-art v174-relic-fragment-art"><img src="'+path+'" alt="" aria-hidden="true" draggable="false" decoding="async" onerror="this.hidden=true"></span>';
+    }
+    const RELIC_FRAGMENT_ICON_PATHS=Object.freeze({
+        relic_qiankun_flask:"assets/relics/fragments/relic_qiankun_flask.webp",
+        relic_cold_spring_jade:"assets/relics/fragments/relic_cold_spring_jade.webp",
+        relic_sun_orb:"assets/relics/fragments/relic_sun_orb.webp",
+        relic_xuanwu_seal:"assets/relics/fragments/relic_xuanwu_seal.webp",
+        relic_soul_bell:"assets/relics/fragments/relic_soul_bell.webp",
+        relic_tiangang_banner:"assets/relics/fragments/relic_tiangang_banner.webp",
+        relic_nine_dragon_fire:"assets/relics/fragments/relic_nine_dragon_fire.webp",
+        relic_qinglan_feather:"assets/relics/fragments/relic_qinglan_feather.webp",
+        relic_rock_mountain_seal:"assets/relics/fragments/relic_rock_mountain_seal.webp",
+        relic_returning_wheel:"assets/relics/fragments/relic_returning_wheel.webp",
+        relic_origin_talisman:"assets/relics/fragments/relic_origin_talisman.webp",
+        relic_broken_army_scroll:"assets/relics/fragments/relic_broken_army_scroll.webp",
+        relic_red_sky_war_mark:"assets/relics/fragments/relic_red_sky_war_mark.webp",
+        relic_ice_mirror_heart:"assets/relics/fragments/relic_ice_mirror_heart.webp",
+        relic_wind_chasing_talisman:"assets/relics/fragments/relic_wind_chasing_talisman.webp",
+        relic_mountain_river_cauldron:"assets/relics/fragments/relic_mountain_river_cauldron.webp",
+        relic_burning_star_mark:"assets/relics/fragments/relic_burning_star_mark.webp",
+        relic_spirit_spring_bottle:"assets/relics/fragments/relic_spirit_spring_bottle.webp",
+        relic_demon_suppressing_seal:"assets/relics/fragments/relic_demon_suppressing_seal.webp",
+        relic_all_returning_array:"assets/relics/fragments/relic_all_returning_array.webp"
+    });
+
     const itemDefinitions={};
     Object.values(catalog).forEach(def=>{
         if(!def||!def.id){ return; }
         const id=fragmentIdFor(def.id);
         itemDefinitions[id]=Object.freeze({
-            id:id,name:def.name+"碎片",icon:materialSvg("fragment",def.rarity),type:"material",price:0,
+            id:id,name:def.name+"碎片",icon:RELIC_FRAGMENT_ICON_PATHS[def.id]?fragmentIconMarkup(RELIC_FRAGMENT_ICON_PATHS[def.id]):materialSvg("fragment",def.rarity),type:"material",price:0,
             tierKey:def.rarity||"white",stats:{},relicId:def.id,relicFragment:true
         });
     });
     itemDefinitions[MATERIAL_CONFIG.universalItemId]=Object.freeze({
-        id:MATERIAL_CONFIG.universalItemId,name:"秘寶通用碎片",icon:materialSvg("fragment","purple"),type:"material",price:0,tierKey:"purple",stats:{},relicUniversalFragment:true
+        id:MATERIAL_CONFIG.universalItemId,name:"秘寶通用碎片",icon:fragmentIconMarkup("assets/relics/fragments/relic_universal_fragment.webp"),type:"material",price:0,tierKey:"purple",stats:{},relicUniversalFragment:true
     });
     itemDefinitions[MATERIAL_CONFIG.essenceItemId]=Object.freeze({
         id:MATERIAL_CONFIG.essenceItemId,name:"秘寶精華",icon:materialSvg("essence","blue"),type:"material",price:0,tierKey:"blue",stats:{},relicEssence:true
