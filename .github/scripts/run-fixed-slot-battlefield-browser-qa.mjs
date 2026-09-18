@@ -125,7 +125,7 @@ function runViewport(chrome,width,height){
         assert.ok(fs.existsSync(screenshot),"Boss mobile screenshot evidence missing");
     }
     assert.equal(data.enemySlots,10);assert.equal(data.allySlots,6);
-    assert.equal(data.legacyStyle.owner,"fixed-slot");assert.equal(data.legacyStyle.textLength,0,"legacy runtime geometry style must be neutralized");
+    assert.equal(data.legacyStyle.owner,null);assert.equal(data.legacyStyle.textLength,-1,"legacy runtime geometry style must be removed rather than kept as an override");
     assert.doesNotMatch(data.legacyClasses.enemy,/battle-monsters|v131-formation|v141-fixed-formation/);assert.doesNotMatch(data.legacyClasses.ally,/battle-player-row/);
     const baseline=data.scenarios[1].lower;
     assert.ok(baseline.enemy.bottom<=baseline.center.top+.5,"enemy region must end before the center operation region");
