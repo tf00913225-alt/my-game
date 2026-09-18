@@ -106,7 +106,7 @@ window.__qaBefore=qaRects();
     var enemyArt=enemy.querySelector(':scope > .v174-battle-art');
     var overlay=document.getElementById('battleMonsterFreezeOverlay0');
     var result={
-      rows:document.querySelectorAll('#battleMonsterArea > .v131-monster-row').length,
+      rows:document.querySelectorAll('#battleMonsterArea > .v-fixed-enemy-row').length,
       enemies:document.querySelectorAll('#battleMonsterArea .battle-monster').length,
       players:document.querySelectorAll('#battlePlayerRow .battle-player').length,
       before:window.__qaBefore,after:after,
