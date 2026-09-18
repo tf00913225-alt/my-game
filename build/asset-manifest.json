@@ -770,6 +770,10 @@
       "sha256": "4b993620e83a",
       "bytes": 147663
     },
+    "build/feature-relic-progression.0013b6d4dea5.js": {
+      "sha256": "0013b6d4dea5",
+      "bytes": 69786
+    },
     "build/feature-adventure-entry.43c6c9446f8e.js": {
       "sha256": "43c6c9446f8e",
       "bytes": 4631
@@ -853,10 +857,6 @@
     "assets/ui/startup-main-city.d43e67af1c1c.jpg": {
       "sha256": "d43e67af1c1c",
       "bytes": 363193
-    },
-    "build/feature-relic-progression.0013b6d4dea5.js": {
-      "sha256": "0013b6d4dea5",
-      "bytes": 69786
     }
   }
 }
