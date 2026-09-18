@@ -45,6 +45,9 @@ assert.match(bossCss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?pointer-even
 assert.match(bossCss,/\.gameplay-boss-card > \.v174-battle-art\{[\s\S]*?background-size:contain/);
 assert.doesNotMatch(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster\{[\s\S]*?--v143-monster-card-width/);
 assert.match(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster:not\(\.gameplay-boss-card\)\{/);
+assert.doesNotMatch(read("css/38-v141-system-expansion.css"),/#game-content #battlePage \.battle-monster\{/);
+assert.match(read("css/38-v141-system-expansion.css"),/#game-content #battlePage \.battle-monster:not\(\.gameplay-boss-card\)\{/);
+assert.doesNotMatch(read("css/09-stage-v15-native-character-shell.css"),/#game-content #battlePage \.battle-monster\{/);
 
 assert.match(presentation,/window\.FourSymbolsBattlePresentation=Object\.freeze\([\s\S]*?applyUnit:syncUnitArtwork/);
 assert.match(geometry,/applyPresentation\(card,"monster"\)/);

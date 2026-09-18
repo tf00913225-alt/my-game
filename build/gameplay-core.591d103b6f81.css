@@ -3991,8 +3991,8 @@ body.quest-scroll-active,
     align-items:flex-start;
 }
 
-#game-stage #battleMonsterArea .v131-monster-row .battle-monster,
-#game-stage > #app > #game-content #battlePage .battle-monster{
+#game-stage #battleMonsterArea .v131-monster-row .battle-monster:not(.gameplay-boss-card),
+#game-stage > #app > #game-content #battlePage .battle-monster:not(.gameplay-boss-card){
     flex:0 0 var(--v143-monster-card-width,76px) !important;
     width:var(--v143-monster-card-width,76px) !important;
     max-width:var(--v143-monster-card-width,76px) !important;
@@ -4003,14 +4003,14 @@ body.quest-scroll-active,
     box-sizing:border-box !important;
 }
 
-#game-stage > #app > #game-content #battlePage .battle-monster-icon{
+#game-stage > #app > #game-content #battlePage .battle-monster:not(.gameplay-boss-card) .battle-monster-icon{
     width:27px !important;
     height:24px !important;
     flex:0 0 24px !important;
     font-size:21px !important;
 }
 
-#game-stage > #app > #game-content #battlePage .battle-monster-name{
+#game-stage > #app > #game-content #battlePage .battle-monster:not(.gameplay-boss-card) .battle-monster-name{
     display:-webkit-box !important;
     width:100% !important;
     min-height:24px !important;
@@ -4025,13 +4025,13 @@ body.quest-scroll-active,
     overflow-wrap:anywhere;
 }
 
-#game-stage > #app > #game-content #battlePage .battle-monster-level{
+#game-stage > #app > #game-content #battlePage .battle-monster:not(.gameplay-boss-card) .battle-monster-level{
     flex:0 0 10px;
     font-size:8px !important;
     line-height:10px !important;
 }
 
-#game-stage #battlePage .battle-monster .monster-status-badges{
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-status-badges{
     min-height:10px;
     max-height:10px;
     line-height:10px;
@@ -4039,8 +4039,8 @@ body.quest-scroll-active,
     overflow:hidden;
 }
 
-#game-stage #battlePage .battle-monster .monster-hp,
-#game-stage #battlePage .battle-monster .monster-sp{
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-hp,
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-sp{
     flex:0 0 9px;
     width:68px !important;
     height:9px !important;
@@ -4048,7 +4048,7 @@ body.quest-scroll-active,
     overflow:hidden;
 }
 
-#game-stage #battlePage .battle-monster .monster-bar-text{
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-bar-text{
     font-size:7px !important;
     line-height:9px !important;
     white-space:nowrap;

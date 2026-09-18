@@ -23,7 +23,7 @@
           "build/app-shell.1a7d96adb1e2.js"
         ],
         "styles": [
-          "build/app-shell.6675b1a3a67e.css"
+          "build/app-shell.f7dc681e0eda.css"
         ],
         "dependencies": [
           "feature-adventure-entry"
@@ -53,7 +53,7 @@
           "build/gameplay-core-secondary.4dfe8737b0cf.js"
         ],
         "styles": [
-          "build/gameplay-core.189749a4d320.css"
+          "build/gameplay-core.591d103b6f81.css"
         ],
         "dependencies": [
           "app-shell",
@@ -485,9 +485,9 @@
         "decode": false
       },
       {
-        "path": "build/app-shell.6675b1a3a67e.css",
-        "sha256": "6675b1a3a67e",
-        "bytes": 101562,
+        "path": "build/app-shell.f7dc681e0eda.css",
+        "sha256": "f7dc681e0eda",
+        "bytes": 101710,
         "priority": "P1",
         "type": "style",
         "decode": false
@@ -725,16 +725,16 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core.189749a4d320.css",
-        "sha256": "189749a4d320",
-        "bytes": 346371,
+        "path": "build/gameplay-core.591d103b6f81.css",
+        "sha256": "591d103b6f81",
+        "bytes": 346644,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "e4d3fb58f720",
-    "totalBytes": 20839963,
+    "manifestHash": "948d7d5361ca",
+    "totalBytes": 20840384,
     "totalResources": 71
   },
   "assets": {
@@ -798,13 +798,13 @@
       "sha256": "5a8cd2ae7908",
       "bytes": 222485
     },
-    "build/app-shell.6675b1a3a67e.css": {
-      "sha256": "6675b1a3a67e",
-      "bytes": 101562
+    "build/app-shell.f7dc681e0eda.css": {
+      "sha256": "f7dc681e0eda",
+      "bytes": 101710
     },
-    "build/gameplay-core.189749a4d320.css": {
-      "sha256": "189749a4d320",
-      "bytes": 346371
+    "build/gameplay-core.591d103b6f81.css": {
+      "sha256": "591d103b6f81",
+      "bytes": 346644
     },
     "build/feature-patrol.e8e0adf7d268.css": {
       "sha256": "e8e0adf7d268",
