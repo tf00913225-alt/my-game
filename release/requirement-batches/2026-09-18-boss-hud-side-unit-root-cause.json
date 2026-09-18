@@ -5,12 +5,12 @@
   "baseCommit": "59314dacba783564c9b87f5423808d743d994118",
   "officialVersion": "173.65",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "mainPromotionAllowed": false,
   "requirements": [
     {
       "id": "BOSS-HUD-CASCADE-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Boss HP／SP 必須以絕對定位固定在名稱上方，並在 V154 共用 HUD 規則載入時仍保持可見、11px 高與正確順序。",
       "evidence": [
         "css/gameplay-boss-tower.css",
@@ -21,7 +21,7 @@
     },
     {
       "id": "BOSS-SIDE-ARTWORK-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "B1／F1 左側與 B5／F5 右側 Boss-side 單位立繪必須明顯向外位移，且不得與中央 Boss 立繪重疊。",
       "evidence": [
         "css/gameplay-boss-tower.css",
@@ -31,9 +31,10 @@
       ]
     }
   ],
-  "automatedVerification": "PENDING",
-  "visualVerification": "PENDING_EXACT_CANDIDATE_AND_DEPLOYED_DEV",
-  "verifiedCommit": null,
+  "automatedVerification": "PASS_CI_35321623096",
+  "verificationRun": 35321623096,
+  "visualVerification": "PASS_FIXED_SLOT_412x915_393x873_360x800_AND_REAL_BOSS_412x915",
+  "verifiedCommit": "6d48cfe9604a3400e5a0038cad54c44ebe602506",
   "promotionApproval": "NOT_REQUESTED_MAIN_MUST_REMAIN_UNCHANGED",
   "releasedAs": null
 }
