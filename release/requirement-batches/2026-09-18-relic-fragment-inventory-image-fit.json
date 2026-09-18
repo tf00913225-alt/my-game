@@ -5,11 +5,11 @@
   "base_sha": "d9c6d2d2beb78a0a944af171ca20eeb92f02abaa",
   "work_branch": "fix/relic-fragment-inventory-image-fit-20260918",
   "officialVersion": "173.65",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": 1,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "修復背包格內秘寶碎片圖示看起來全黑，以及點開道具詳情後圖片以原始大圖尺寸穿出彈窗。",
       "owner": [
         "js/relic-progression-drop-system.js::fragmentIconMarkup()",
@@ -24,6 +24,6 @@
     "npm run build:check",
     "PR Repository checks / mobile browser QA"
   ],
-  "verificationResult": "PENDING",
+  "verificationResult": "1/1 VERIFIED；PR #315 Repository checks run 35364121111 SUCCESS。Build synchronization、JavaScript syntax、Fixed Slot 9:16 mobile QA、exact-candidate real battle mobile QA、Adventure mobile QA、static resources、release/loader gate、deprecated-code gate 與 git diff check 全數通過。根因修復只將秘寶碎片裸 <img> 收斂回既有 v169-item-art 幾何包裝，未新增 CSS override。",
   "releasedAs": null
 }
