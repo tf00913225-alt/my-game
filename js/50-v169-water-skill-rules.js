@@ -199,112 +199,7 @@
     }
 
     function activeFrostbite(entity){
-        return !!(entity&&(entity.v169FrostbiteCompatibilityActive===true||hasStoredFrostbite(entity)));
-    }
-
-    /* Frostbite is a three-stat soft debuff, never a skill lock. Historical
-       V149/V152 wrappers still contain their old gating checks, so only those
-       checks see a filtered status list. A compatibility marker keeps the
-       real Frostbite penalties active while the underlying skill resolves. */
-    function withoutLegacyFrostbiteLock(entity,callback){
-        if(!entity||!Array.isArray(entity.statusEffects)||!hasStoredFrostbite(entity)){
-            return callback();
-        }
-        const original=entity.statusEffects;
-        const frostbite=original.filter(effect=>effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0);
-        const filtered=original.filter(effect=>!frostbite.includes(effect));
-        entity.statusEffects=filtered;
-        entity.v169FrostbiteCompatibilityActive=true;
-        try{ return callback(); }
-        finally{
-            const after=Array.isArray(entity.statusEffects)?entity.statusEffects:filtered;
-            delete entity.v169FrostbiteCompatibilityActive;
-            if(after===filtered){
-                entity.statusEffects=original;
-            }else if(after.length===0){
-                /* A cleanse replaced the filtered list with an empty list, so
-                   Frostbite must be removed too. */
-                entity.statusEffects=[];
-            }else{
-                entity.statusEffects=after.concat(frostbite.filter(effect=>numeric(effect.turnsLeft)>0));
-            }
-        }
-    }
-
-    function clearLegacyFrostbiteSkillLocks(){
-        if(typeof document==="undefined"){ return; }
-        const mainButton=document.querySelector&&document.querySelector("#mainBattleMenu > .menu-button.skill.v152-frostbite-blocked");
-        if(mainButton){
-            mainButton.disabled=false;
-            mainButton.classList.remove("v152-frostbite-blocked");
-            if(mainButton.dataset){ delete mainButton.dataset.v152FrostbiteBlocked; }
-            mainButton.setAttribute("aria-label","技能");
-        }
-        if(document.querySelectorAll){
-            document.querySelectorAll("#skillQuickBarGrid .skill-quick-button.v152-frostbite-blocked").forEach(button=>{
-                button.disabled=false;
-                button.classList.remove("v152-frostbite-blocked");
-            });
-        }
-    }
-
-    if(typeof window.prepareAction==="function"){
-        const previousPrepareAction=window.prepareAction;
-        window.prepareAction=function(){
-            const index=typeof activeBattleCharacterIndex==="number"?activeBattleCharacterIndex:0;
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-            const that=this,args=arguments;
-            const result=withoutLegacyFrostbiteLock(character,()=>previousPrepareAction.apply(that,args));
-            clearLegacyFrostbiteSkillLocks();
-            return result;
-        };
-    }
-
-    if(typeof window.resolveQueuedPlayerAction==="function"){
-        const previousResolveQueuedPlayerAction=window.resolveQueuedPlayerAction;
-        window.resolveQueuedPlayerAction=function(characterIndex){
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const that=this,args=arguments;
-            const result=withoutLegacyFrostbiteLock(character,()=>previousResolveQueuedPlayerAction.apply(that,args));
-            clearLegacyFrostbiteSkillLocks();
-            return result;
-        };
-    }
-
-    if(typeof window.autoActionForCharacter==="function"){
-        const previousAutoActionForCharacter=window.autoActionForCharacter;
-        window.autoActionForCharacter=function(characterIndex){
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null;
-            const that=this,args=arguments;
-            return withoutLegacyFrostbiteLock(character,()=>previousAutoActionForCharacter.apply(that,args));
-        };
-    }
-
-    if(typeof window.processSingleMonsterAttack==="function"){
-        const previousProcessSingleMonsterAttack=window.processSingleMonsterAttack;
-        window.processSingleMonsterAttack=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const that=this,args=arguments;
-            return withoutLegacyFrostbiteLock(monster,()=>previousProcessSingleMonsterAttack.apply(that,args));
-        };
-    }
-
-    if(typeof window.v141TryMonsterSpecialAction==="function"){
-        const previousTryMonsterSpecialAction=window.v141TryMonsterSpecialAction;
-        window.v141TryMonsterSpecialAction=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const that=this,args=arguments;
-            return withoutLegacyFrostbiteLock(monster,()=>previousTryMonsterSpecialAction.apply(that,args));
-        };
-    }
-
-    if(typeof window.updateUI==="function"){
-        const previousUpdateUI=window.updateUI;
-        window.updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            clearLegacyFrostbiteSkillLocks();
-            return result;
-        };
+        return hasStoredFrostbite(entity);
     }
 
     /* Damage -25%. Different named outgoing-damage reductions coexist by
@@ -364,21 +259,6 @@
             return activeFrostbite(target)?value*FROSTBITE_REMAINING_RATE:value;
         };
     }
-
-    /* V149's old application log mentioned a skill prohibition. Keep the
-       application itself and rewrite only that obsolete explanatory sentence. */
-    if(typeof window.addBattleLog==="function"){
-        const previousAddBattleLog=window.addBattleLog;
-        window.addBattleLog=function(message){
-            let text=String(message==null?"":message);
-            if(text.includes("陷入凍傷")&&text.includes("無法使用技能")){
-                text=text.replace(/，\d+回合內無法使用技能。/,"，期間傷害、閃避、異常狀態抗性降低25%。");
-            }
-            return previousAddBattleLog.call(this,text);
-        };
-    }
-
-    clearLegacyFrostbiteSkillLocks();
 
     /* V158's compatibility resolver asks for tri. Freeze's final target truth is
        a front/back column of at most two valid targets. */

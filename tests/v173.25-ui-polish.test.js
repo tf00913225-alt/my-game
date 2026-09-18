@@ -76,10 +76,9 @@ test("skill labels keep the two-thirds lifetime but remain text-only UI",()=>{
     assert.doesNotMatch(animationUi,/badge\.remove\(\); \} \},650/);
 });
 
-test("frostbite uses text instead of a prohibition icon",()=>{
-    assert.match(frostbiteCss,/content:"凍傷禁止使用技能" !important/);
-    assert.doesNotMatch(frostbiteCss,/content:"🚫"|v152-frostbite-symbol/);
-    assert.doesNotMatch(frostbiteUi,/symbol\.textContent="🚫"/);
+test("frostbite no longer renders or applies a skill prohibition",()=>{
+    assert.doesNotMatch(frostbiteCss,/凍傷禁止使用技能|v152-frostbite-blocked|v152-frostbite-symbol/);
+    assert.doesNotMatch(frostbiteUi,/syncFrostbiteSkillControls|v152FrostbiteBlocked|凍傷禁止使用技能/);
 });
 
 test("status text sits below damage and stays fully visible for one second",()=>{

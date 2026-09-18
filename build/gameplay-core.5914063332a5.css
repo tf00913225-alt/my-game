@@ -4750,8 +4750,8 @@ body.quest-scroll-active,
     line-height:10px !important;
 }
 
-#game-stage #battlePage .battle-monster .monster-hp,
-#game-stage #battlePage .battle-monster .monster-sp{
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-hp,
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-sp{
     width:var(--v143-monster-bar-width,68px) !important;
     height:11px !important;
     min-height:11px !important;
@@ -4760,7 +4760,7 @@ body.quest-scroll-active,
     border-radius:4px !important;
 }
 
-#game-stage #battlePage .battle-monster .monster-bar-text{
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-bar-text{
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
@@ -5966,40 +5966,6 @@ body > .damage-popup.v152-top-damage{
     box-shadow:0 0 5px rgba(255,220,145,.45) !important;
 }
 
-/* Frostbite blocks only the skill command and equipped skill choices. */
-#game-stage #mainBattleMenu > .menu-button.skill.v152-frostbite-blocked{
-    z-index:6 !important;
-    cursor:not-allowed !important;
-    pointer-events:none !important;
-}
-#game-stage #mainBattleMenu > .menu-button.skill.v152-frostbite-blocked::after{
-    content:"凍傷禁止使用技能" !important;
-    left:16% !important;
-    right:2% !important;
-    top:12% !important;
-    bottom:10% !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    box-sizing:border-box !important;
-    padding:4px 3px !important;
-    border-radius:9px !important;
-    opacity:1 !important;
-    color:#fff !important;
-    background:rgba(8,12,18,.56) !important;
-    filter:none !important;
-    font-size:12px !important;
-    font-weight:900 !important;
-    line-height:1.3 !important;
-    text-align:center !important;
-    white-space:normal !important;
-    text-shadow:0 1px 3px #000,0 0 4px #000 !important;
-}
-#game-stage .skill-quick-button.v152-frostbite-blocked{
-    cursor:not-allowed !important;
-    filter:grayscale(.85) brightness(.58) !important;
-}
-
 /* Give the Skill hotspot a narrow priority overlap at its right boundary. */
 #game-stage #mainBattleMenu > .menu-button.skill{
     width:21.5% !important;
@@ -6086,8 +6052,8 @@ body.v162-element-box-settings-open > .skill-name-badge.v143-caster-skill-label{
    on the card but must stay behind both ally and enemy resource bars. */
 #game-stage #battlePage .battle-player .hp-bar,
 #game-stage #battlePage .battle-player .sp-bar,
-#game-stage #battlePage .battle-monster .monster-hp,
-#game-stage #battlePage .battle-monster .monster-sp{
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-hp,
+#game-stage #battlePage .battle-monster:not(.gameplay-boss-card) .monster-sp{
     position:relative !important;
     z-index:20 !important;
     isolation:isolate;
@@ -8462,7 +8428,8 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle{
     position:absolute;
-    left:50%;
+    left:auto;
+    right:-4px;
     top:0;
     z-index:2;
     display:flex;
@@ -8476,9 +8443,9 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     border-bottom:0;
     border-radius:10px 10px 0 0;
     color:#f5cf72;
-    background:rgba(40,31,20,.9);
+    background:rgba(0,0,0,.62);
     box-shadow:0 -2px 10px rgba(217,173,80,.34);
-    transform:translateX(-50%);
+    transform:none;
     pointer-events:auto;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle > span{
@@ -8615,6 +8582,7 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
 
 /* Unit identity fills the Slot; it cannot size or move the Slot. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot > .battle-monster,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-boss-footprint > .battle-monster,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player{
     position:absolute !important;
     inset:0 !important;
@@ -8629,15 +8597,20 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     overflow:visible !important;
     contain:none !important;
     box-sizing:border-box !important;
+    isolation:isolate !important;
+    transition-property:opacity !important;
+    transition-duration:.15s !important;
+}
+
+/* Cardless presentation is authoritative as soon as a Unit is created, before
+   the geometry adapter moves it into its formal Slot or Boss footprint. */
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit{
     background-color:transparent !important;
     background-image:none !important;
     border:0 !important;
     border-radius:0 !important;
     box-shadow:none !important;
     outline:0 !important;
-    isolation:isolate !important;
-    transition-property:opacity !important;
-    transition-duration:.15s !important;
 }
 
 /* Artwork is a paint layer. Full source aspect is preserved with contain. */
@@ -8736,6 +8709,8 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     opacity:1 !important;
     z-index:20 !important;
     box-sizing:border-box !important;
+    border:1px solid rgba(255,255,255,.28) !important;
+    border-radius:4px !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar{bottom:26px !important;}
@@ -8747,6 +8722,14 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     height:var(--battle-resource-bar-height) !important;
     font-size:9px !important;
     line-height:var(--battle-resource-bar-height) !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp-inner,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp-inner,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar-inner,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar-inner{
+    top:0 !important;
+    bottom:0 !important;
+    height:auto !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-status-badges,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .monster-status-badges{
@@ -8772,7 +8755,8 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     box-shadow:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable{
     border:0 !important;
     box-shadow:none !important;
 }
@@ -8780,7 +8764,8 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
    outline. The same owner covers normal enemies, Boss, reinforcements and
    destructible Boss objects as soon as they enter the Unit pipeline. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before{
     content:"" !important;
     position:absolute !important;
     z-index:30 !important;
@@ -8797,6 +8782,10 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     transform:translate(-50%,-50%) !important;
     pointer-events:none !important;
     animation:v174TargetReticlePulse .72s ease-in-out infinite alternate !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after{
+    content:none !important;
+    display:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{

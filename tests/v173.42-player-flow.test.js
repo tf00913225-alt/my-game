@@ -113,8 +113,8 @@ assert.doesNotMatch(v131,/finishPlayerAction\s*=|processNextCombatant\s*=/);
 assert.match(autoBattle,/v148GetAutoTargetPriority/);
 assert.match(dungeonPolish,/function stableFormationRows\(indexes\)/);
 assert.match(dungeonPolish,/function autoTargetPriority\(indexes\)/);
-assert.match(dungeonPolish,/owner\.resolveEnemyTargets\(snapshot,centerIndex,targetType,monsterAlive\)/);
-assert.match(dungeonPolish,/return Array\.isArray\(legacy\)\?legacy\.filter\(monsterAlive\):\[\]/);
+assert.doesNotMatch(dungeonPolish,/getSkillTargets\s*=/);
+assert.match(core,/slotOwner\.resolveEnemyTargets\([\s\S]*?snapshot,[\s\S]*?centerIndex,[\s\S]*?targetType/);
 
 /* Daily content is one shared 3-wave × 6 structure: EXP / Material / Gold. */
 assert.match(dungeonPolish,/DAILY_DUNGEON_META=\{/);
@@ -149,7 +149,7 @@ assert.match(waterRules,/healSpell:\{[\s\S]*learnCost:16[\s\S]*requires:\["frost
 assert.match(waterRules,/revive:\{[\s\S]*learnCost:18/);
 assert.match(waterRules,/purifyMind:\{[\s\S]*learnCost:1[\s\S]*spCost:22[\s\S]*removeAllStates:true/);
 assert.match(waterRules,/FROSTBITE_REMAINING_RATE=\.75/);
-assert.match(waterRules,/previousTryMonsterSpecialAction/);
+assert.doesNotMatch(waterRules,/withoutLegacyFrostbiteLock|previousTryMonsterSpecialAction|v152-frostbite-blocked/);
 assert.match(waterRules,/frostbitePenaltyPercent:25/);
 
 assert.match(dungeonPolish,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
