@@ -5,11 +5,11 @@
   "base_sha": "9d5852cc960bfc31f1426ae1efb7d254c4ec7dd0",
   "work_branch": "fix/battle-vfx-performance-status-sync-20260919",
   "officialVersion": "173.65",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": 1,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "降低技能 VFX 多時手動操作卡頓；不得改技能數值、動畫秒數、命中規則或畫質。",
       "owner": [
         "js/39-v143-skill-animation.js::snapshotTimedEffects()",
@@ -26,6 +26,6 @@
     "npm run build:check",
     "PR Repository checks / mobile browser QA"
   ],
-  "verificationResult": "等待可執行驗證與 Repository checks。",
+  "verificationResult": "1/1 VERIFIED；PR #331 Repository checks run 35419283199 SUCCESS。戰鬥 layout/timing/range-VFX regressions、V173.39 wind status lifecycle、production build sync、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、Release Gate 與 git diff check 全數通過。技能數值、動畫秒數、命中規則與 VFX 美術未修改。",
   "releasedAs": null
 }
