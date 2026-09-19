@@ -20,13 +20,15 @@ const ids=[
 
 assert.match(relic,/RELIC_DIM_IN_MS=360/);
 assert.match(relic,/RELIC_IDENTITY_REVEAL_MS=360/);
+assert.match(relic,/RELIC_IDENTITY_HOLD_MS=1150/);
+assert.match(relic,/RELIC_IDENTITY_EXIT_MS=420/);
 assert.match(relic,/RELIC_TARGET_REVEAL_MS=420/);
 assert.match(relic,/RELIC_DIM_OUT_MS=420/);
 assert.match(relic,/RELIC_MIN_VISUAL_PROTECTION_MS=1200/,
   "relic-only visual protection must preserve the existing 1.2s minimum handoff window");
 
-assert.match(relic,/function beginRelicCinematic\(def,target\)[\s\S]*classList\.add\("dim-visible"\)[\s\S]*waitMs\(RELIC_DIM_IN_MS\)[\s\S]*classList\.add\("identity-visible"\)[\s\S]*waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*revealRelicTargets\(target\)/,
-  "cinematic prelude must dim first, reveal identity second, then reveal the real resolved targets");
+assert.match(relic,/function beginRelicCinematic\(def,target\)[\s\S]*classList\.add\("dim-visible"\)[\s\S]*waitMs\(RELIC_DIM_IN_MS\)[\s\S]*classList\.add\("identity-visible"\)[\s\S]*waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*Promise\.all\(\[[\s\S]*waitMs\(RELIC_IDENTITY_EXIT_MS\)[\s\S]*revealRelicTargets\(target\)/,
+  "cinematic prelude must serialize dim -> identity reveal -> 1.15s hold -> identity exit plus target reveal");
 assert.match(relic,/function relicTargetCard\(side,index\)[\s\S]*battleMonster[\s\S]*battlePlayerCard/,
   "target lookup must resolve the actual battle unit roots");
 assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*relicTargetCard\(target\.targetSide,index\)[\s\S]*team-relic-battle-target-focus-visible/,
@@ -49,6 +51,16 @@ assert.match(relic,/function cleanupRelicCutin\(\)[\s\S]*clearRelicTargetFocus\(
 
 assert.match(css,/\.team-relic-battle-presentation\.dim-visible \.team-relic-battle-dim\{opacity:\.75;\}/,
   "battlefield must dim to roughly 75 percent");
+assert.match(css,/\.team-relic-battle-presentation\{[^}]*position:fixed[^}]*inset:0/,
+  "relic dim presentation must cover the complete transformed 420x746 battle surface, including battlePage padding");
+assert.match(css,/\.team-relic-battle-cutin\{[^}]*width:min\(72vw,280px\)/,
+  "relic identity group must be visibly larger");
+assert.match(css,/\.team-relic-battle-cutin-icon\{[^}]*width:clamp\(140px,44vw,210px\)[^}]*height:clamp\(140px,44vw,210px\)/,
+  "relic battle icon must be larger than the previous 112-170px contract");
+assert.match(css,/\.team-relic-battle-cutin-copy strong\{[^}]*clamp\(28px,8vw,36px\)/,
+  "relic name must scale up with the larger icon");
+assert.match(css,/\.team-relic-battle-presentation\.identity-exiting \.team-relic-battle-cutin,[\s\S]*transition-duration:\.42s/,
+  "identity fade-out must be gradual and share the target reveal window");
 assert.match(css,/\.team-relic-battle-dim\{[^}]*transition:opacity \.36s ease/,
   "battlefield dimming must be gradual");
 assert.match(css,/\.team-relic-battle-cutin\{[^}]*flex-direction:column[^}]*border:0[^}]*background:none[^}]*box-shadow:none/,
