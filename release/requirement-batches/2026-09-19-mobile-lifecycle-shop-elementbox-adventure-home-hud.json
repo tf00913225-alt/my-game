@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-19-mobile-lifecycle-shop-elementbox-adventure-home-hud",
+  "baseBranch": "dev",
+  "baseCommit": "ccf587d0feec8d4790d17834a11b67a6d05bc55f",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "MOBILE-01",
+      "status": "IMPLEMENTED",
+      "requirement": "Screen Wake Lock visible acquire／hidden release／system release reacquire／bounded retry／diagnostics，不建立第二 owner",
+      "evidence": [
+        "js/startup/screen-wake-lock-runtime.js",
+        "tests/screen-wake-lock.test.js",
+        "docs/BOOT_ARCHITECTURE.md"
+      ]
+    },
+    {
+      "id": "MOBILE-02",
+      "status": "IMPLEMENTED",
+      "requirement": "Android background immediate save + pageshow/freeze/resume/wasDiscarded/navigation diagnostics；普通 resume 不重跑 Startup；不改 Cloud Save 權威",
+      "evidence": [
+        "js/00-main.js",
+        "tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js",
+        "docs/BOOT_ARCHITECTURE.md"
+      ]
+    },
+    {
+      "id": "SHOP-03",
+      "status": "IMPLEMENTED",
+      "requirement": "商店目前金幣可見；補品購買數量唯一上限 999，輸入框／計價／確認／buy／背包一致",
+      "evidence": [
+        "js/28-v133-economy-rebalance.js",
+        "js/35-v141-ui-battle.js",
+        "js/40-v144-rules-and-abyss.js",
+        "js/41-v146-system-polish.js",
+        "tests/v146-system-polish.test.js",
+        "tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js"
+      ]
+    },
+    {
+      "id": "ELEMENT-04",
+      "status": "IMPLEMENTED",
+      "requirement": "元素匣 HP=0 角色可經實際 HP 補品恢復；缺藥不免費復活；仍死亡時不先消耗 SP 藥",
+      "evidence": [
+        "js/45-v154-dev-fixes.js",
+        "tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js"
+      ]
+    },
+    {
+      "id": "ADVENTURE-05",
+      "status": "IMPLEMENTED",
+      "requirement": "Adventure 返回巡怪正式走單一 Patrol exit；清理 timer／walking／pending callback；舊 Fight Animation callback 離場後不可 startBattle；委託進度保留",
+      "evidence": [
+        "js/00-main.js",
+        "js/adventure/adventure-runtime-v1-20260915.js",
+        "tests/adventure-node-system-v1.test.js",
+        "tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js"
+      ]
+    },
+    {
+      "id": "ADFREE-06",
+      "status": "IMPLEMENTED",
+      "requirement": "NT$99 30天免廣告資訊取消 startup／pageshow／MutationObserver auto-show，只保留 manual open",
+      "evidence": [
+        "js/16-stage-v54-main-city-runtime.js",
+        "tests/ad-free-service-info-modal.test.js",
+        "tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js"
+      ]
+    },
+    {
+      "id": "HOME-07",
+      "status": "IMPLEMENTED",
+      "requirement": "主城隊伍 HUD 與秘寶摘要固定 First Screen shell；摘要資料橋小型且唯一；不 execute 完整 feature-boss-relic；點秘寶仍 lazy load",
+      "evidence": [
+        "js/relic-summary-catalog.js",
+        "js/16-stage-v54-main-city-runtime.js",
+        "css/19-stage-v54-main-city-moderate-native-scale.css",
+        "js/60-team-relic-system.js",
+        "css/55-team-relic-system.css",
+        "scripts/build-production.mjs",
+        "tests/v173.65-dev-deploy-home-utilities.test.js",
+        "tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js",
+        "docs/TEAM_RELIC_SYSTEM_RULES.md"
+      ]
+    }
+  ],
+  "automatedVerification": "PENDING_TARGETED_TESTS_AND_REPOSITORY_CHECKS",
+  "visualVerification": "PENDING_EXISTING_MOBILE_BROWSER_QA_WHERE_APPLICABLE",
+  "verifiedSourceCommit": null,
+  "mergedDevCommit": null
+}
