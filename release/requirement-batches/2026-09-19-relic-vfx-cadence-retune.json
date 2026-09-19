@@ -1,0 +1,56 @@
+{
+  "date": "2026-09-19",
+  "title": "秘寶 VFX 逐幀重審與高級節奏重調",
+  "base_branch": "dev",
+  "base_sha": "6683ee3a78be5a42d83e5766408af3012f848908",
+  "work_branch": "fix/relic-vfx-cadence-retune-20260919",
+  "officialVersion": "173.65",
+  "status": "VERIFIED",
+  "supersedes": "2026-09-19-relic-vfx-premium-duration.json 的 3 秒最低播放時間規格；舊文件保留為歷史紀錄。",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "從原始 20 張 4×3／12 幀秘寶 VFX 母圖重新判讀形成、首次衝擊／峰值與尾韻，確認既有 authored hit frame 是否仍正確。",
+      "owner": [
+        "assets/vfx/relic/",
+        "js/39-v143-skill-animation.js::relicSheet()"
+      ],
+      "implementation": "由 GitHub Actions run 35366394140 的未過期 artifact relic-vfx-source-and-evidence 取回 20 張 1448×1086 PNG 母圖逐張檢視；既有第 6～9 幀 authored hit frame 與素材實際首次衝擊／效果峰值一致，因此保留，不改 V143 renderer。"
+    },
+    {
+      "id": 2,
+      "status": "VERIFIED",
+      "request": "修正 12 幀素材被平均拉長至 3.0–3.8 秒造成的慢格感，為 20 件秘寶重新設定符合各自爆發與尾韻的總播放秒數。",
+      "owner": [
+        "js/60-team-relic-system.js::RELIC_VFX_PRESENTATION",
+        "js/60-team-relic-system.js::relicVfx()",
+        "js/60-team-relic-system.js::relicPresentationDuration()"
+      ],
+      "implementation": "20 件秘寶依攻擊／增益、一般支援、重型防禦／復活／大範圍演出分別設定 1.25–1.60 秒；RELIC_VFX_FLOOR_MS 改為 1200ms，presentationDurationMs fallback 改為 1500ms。12 幀平均約 104–133ms／幀，保留 120ms presentation lead gap。"
+    },
+    {
+      "id": 3,
+      "status": "VERIFIED",
+      "request": "節奏重調不得改變秘寶效果數值、觸發條件、目標幾何、V142/V143 單一 VFX owner、一般技能或正式 1.15 秒戰鬥出手 owner。",
+      "owner": [
+        "js/39-v143-skill-animation.js",
+        "js/60-team-relic-system.js",
+        "js/00-main.js::POST_ACTION_DELAY_MS"
+      ],
+      "implementation": "只修改秘寶 visual duration 與對應測試契約；authored hit frame、V143 raster geometry、傷害／治療／護盾／Buff／Debuff 數值與 POST_ACTION_DELAY_MS 均未修改。"
+    }
+  ],
+  "verification": [
+    "tests/relic-vfx-animation-20260918.test.js",
+    "tests/v174-battle-presentation-sequencing.test.js",
+    "battle layout, timing and range-VFX regressions",
+    "npm run build:check",
+    "Fixed Slot 9:16 mobile browser QA",
+    "exact-candidate real battle mobile browser QA",
+    "Adventure V1 mobile browser QA",
+    "Release/cache/deprecated-code gates",
+    "PR #323 Repository checks run 35375157903 SUCCESS"
+  ],
+  "verificationResult": "3/3 VERIFIED；20 件秘寶 VFX 已由 3.0–3.8 秒重調為 1.25–1.60 秒，既有逐張 reviewed authored hit frames 保持不變；第一輪 PR #323 Repository checks run 35375157903 SUCCESS，包含 VFX regressions、production build synchronization、Fixed Slot 9:16、exact-candidate real battle mobile browser QA、Adventure mobile QA、Release Gate 與 git diff check。"
+}

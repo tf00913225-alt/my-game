@@ -1,0 +1,63 @@
+{
+  "date": "2026-09-19",
+  "title": "秘寶戰鬥演出遮罩全幅覆蓋、身份放大與單線時序調整",
+  "base_branch": "dev",
+  "base_sha": "c5da466c3bbb64f08b85d9632928c0b37f4b8a23",
+  "work_branch": "fix/relic-cinematic-sequence-coverage-20260919",
+  "officialVersion": "173.65",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "秘寶演出遮罩必須完整覆蓋戰鬥畫面，不得在左右留下未遮罩亮邊。",
+      "implementation": "team-relic-battle-presentation 由 battle-wrap 內 absolute inset 改為 fixed inset:0；由已 transform 的 420x746.6667 #game-content 成為 fixed containing block，仍保留 battle-wrap stacking context，完整涵蓋 battlePage 的 6px 左右、4px 上、2px 下 padding。"
+    },
+    {
+      "id": 2,
+      "status": "VERIFIED",
+      "request": "秘寶 battle icon 與名稱放大，完整顯示後至少停留 1.15 秒再慢慢消失。",
+      "implementation": "icon 由 112–170px 提升為 140–210px，名稱由 23–31px 提升為 28–36px；新增 RELIC_IDENTITY_HOLD_MS=1150，完整 fade-in 後才開始計時。"
+    },
+    {
+      "id": 3,
+      "status": "VERIFIED",
+      "request": "演出時序固定為遮罩漸暗 → 身份漸入並停1.15秒 → 身份漸出與目標同時漸亮 → VFX → VFX結束 → 遮罩漸退。",
+      "implementation": "beginRelicCinematic 新增 identity hold 與 identity-exiting 階段；RELIC_IDENTITY_EXIT_MS=420 與 RELIC_TARGET_REVEAL_MS=420 透過 Promise.all 同步完成，queueRelicPresentation 僅在此階段完成後啟動正式 V142/V143 VFX，endRelicCinematic 仍等待 relicGate.promise 後才釋放 dim。"
+    },
+    {
+      "id": 4,
+      "status": "VERIFIED",
+      "request": "不得改秘寶數值、技能目標、Fixed Slot 幾何、V143 VFX 內容／秒數或一般普攻／技能 1.15 秒節奏。",
+      "implementation": "只修改 team relic presentation JS/CSS、既有回歸測試、requirement batch 與同步 hashed build；POST_ACTION_DELAY_MS、RELIC_VFX_PRESENTATION、V143 renderer/manifest 與戰鬥結算不變。"
+    }
+  ],
+  "cinematicMs": {
+    "dimIn": 360,
+    "identityReveal": 360,
+    "identityHold": 1150,
+    "identityExit": 420,
+    "targetReveal": 420,
+    "dimOut": 420
+  },
+  "verification": [
+    "PASS: PR #329 CI run 35417244163 Repository checks",
+    "PASS: battle layout, timing and range-VFX regressions",
+    "PASS: production build synchronization",
+    "PASS: Fixed Slot battlefield 9x16 mobile browser QA",
+    "PASS: exact-candidate real battle mobile browser QA",
+    "PASS: Adventure V1 mobile browser QA",
+    "PASS: static resources, duplicate IDs, release/loader integrity, Release Gate and Git checks",
+    "PENDING RELEASE STEP: merge to dev, then verify Cloudflare DEV deployed SHA"
+  ],
+  "preMergeEvidence": {
+    "pullRequest": 329,
+    "officialPrCiRun": 35417244163,
+    "repositoryChecks": "PASS",
+    "fixedSlot9x16MobileQa": "PASS",
+    "exactCandidateRealBattleMobileQa": "PASS",
+    "buildSynchronization": "PASS",
+    "releaseGate": "PASS",
+    "sequencing": "dim -> identity fade-in -> 1150ms hold -> 420ms identity fade-out + target reveal -> V143 VFX -> VFX gate complete -> 420ms dim-out"
+  }
+}

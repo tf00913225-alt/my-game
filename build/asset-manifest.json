@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.95e6e80f30c6.js"
+          "build/app-shell.98974b930184.js"
         ],
         "styles": [
           "build/app-shell.f7dc681e0eda.css"
@@ -111,11 +111,11 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.1ddc811f6649.js",
+          "build/feature-boss-relic.45b8e7114c3c.js",
           "build/feature-relic-progression.0013b6d4dea5.js"
         ],
         "styles": [
-          "build/feature-boss-relic.d3a82736d930.css",
+          "build/feature-boss-relic.6c4c9503b489.css",
           "build/feature-relic-progression.8844d5eb6e81.css"
         ],
         "dependencies": [
@@ -477,9 +477,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.95e6e80f30c6.js",
-        "sha256": "95e6e80f30c6",
-        "bytes": 935358,
+        "path": "build/app-shell.98974b930184.js",
+        "sha256": "98974b930184",
+        "bytes": 936818,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -733,8 +733,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "f0dc6bb39d4f",
-    "totalBytes": 20833126,
+    "manifestHash": "f25ed05563d7",
+    "totalBytes": 20834586,
     "totalResources": 71
   },
   "assets": {
@@ -742,9 +742,9 @@
       "sha256": "c60fd6f40514",
       "bytes": 63904
     },
-    "build/app-shell.95e6e80f30c6.js": {
-      "sha256": "95e6e80f30c6",
-      "bytes": 935358
+    "build/app-shell.98974b930184.js": {
+      "sha256": "98974b930184",
+      "bytes": 936818
     },
     "build/gameplay-core-primary.b99c04eb9661.js": {
       "sha256": "b99c04eb9661",
@@ -766,9 +766,9 @@
       "sha256": "6d991851d4e4",
       "bytes": 34973
     },
-    "build/feature-boss-relic.1ddc811f6649.js": {
-      "sha256": "1ddc811f6649",
-      "bytes": 156576
+    "build/feature-boss-relic.45b8e7114c3c.js": {
+      "sha256": "45b8e7114c3c",
+      "bytes": 172915
     },
     "build/feature-relic-progression.0013b6d4dea5.js": {
       "sha256": "0013b6d4dea5",
@@ -814,9 +814,9 @@
       "sha256": "647839d5b5a7",
       "bytes": 25468
     },
-    "build/feature-boss-relic.d3a82736d930.css": {
-      "sha256": "d3a82736d930",
-      "bytes": 39015
+    "build/feature-boss-relic.6c4c9503b489.css": {
+      "sha256": "6c4c9503b489",
+      "bytes": 43058
     },
     "build/feature-relic-progression.8844d5eb6e81.css": {
       "sha256": "8844d5eb6e81",

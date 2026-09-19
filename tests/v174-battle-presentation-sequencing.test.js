@@ -7,10 +7,10 @@ const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 
-assert.match(relic,/RELIC_VFX_FLOOR_MS=3000/,
-    "relic VFX keeps the formal premium three-second minimum");
-assert.match(relic,/presentationDurationMs:3200/,
-    "relic presentation fallback matches the premium visual duration baseline");
+assert.match(relic,/RELIC_VFX_FLOOR_MS=2000/,
+    "relic VFX keeps a readable minimum while preserving the single V142/V143 presentation owner");
+assert.match(relic,/presentationDurationMs:2400/,
+    "relic presentation fallback stays in the readable duration band instead of flashing or returning to 3-second slow motion");
 assert.match(relic,/presentationLeadGapMs:120/,
     "relic presentation keeps the short handoff gap after the previous visual gate settles");
 assert.match(relic,/function queueRelicPresentation\(def,onStart,visualContext\)/);
