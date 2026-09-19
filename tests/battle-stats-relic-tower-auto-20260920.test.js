@@ -90,7 +90,7 @@ assert.match(boss,/towerAutoAdvanceCountdown=3/);
 assert.match(boss,/towerAutoAdvanceCountdown--/);
 assert.match(boss,/towerAutoAdvanceTimeoutId=setTimeout\(tick,1000\)/);
 assert.doesNotMatch(boss,/towerAutoAdvance[^\n]*setInterval|setInterval[^\n]*towerAutoAdvance/);
-assert.match(boss,/if\(!won\)\{[\s\S]*?cancelTowerAutoAdvance\(true\)/);
+assert.match(boss,/else\{[\s\S]*?cancelTowerAutoAdvance\(true\);[\s\S]*?\}[\s\S]*?if\(!won\)\{ return; \}/,"Tower loss must cancel auto-advance before returning");
 assert.match(boss,/state\.tower\.completedFloor>=TOWER_FLOORS/);
 assert.match(bossCss,/\.tower-auto-advance/);
 assert.match(bossCss,/\.tower-auto-countdown/);
