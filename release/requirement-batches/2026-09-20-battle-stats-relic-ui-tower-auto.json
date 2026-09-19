@@ -4,11 +4,11 @@
   "base": "dev@f0f2a65bce98aa2105ffe17ea66a5a07d2ced626",
   "branch": "feature/battle-stats-relic-ui-tower-auto-20260920",
   "mainModified": false,
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": "BSTAT-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "主城秘寶摘要使用正式 SAVE_KEY 內 teamLoadout.relicId，主城／秘寶頁／戰鬥不建立第二份裝備真相；主城底部可完整捲動到隊伍秘寶。",
       "evidence": [
         "js/16-stage-v54-main-city-runtime.js",
@@ -19,7 +19,7 @@
     },
     {
       "id": "BSTAT-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "秘寶玩家 UI 移除 DEV 配裝分類；DEV 驗收也走正式 teamLoadout.relicId，既有 runtimeReady 僅保留內部能力 gate，不偽造未實裝 Trigger／Effect。",
       "evidence": [
         "js/60-team-relic-system.js",
@@ -29,7 +29,7 @@
     },
     {
       "id": "BSTAT-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "符咒合成左右兩張圖分別是材料與目標，不重複 render；2:3 預覽尺寸由 synthesis owner 控制並 object-fit contain。",
       "evidence": [
         "js/36-v141-content-systems.js",
@@ -39,7 +39,7 @@
     },
     {
       "id": "BSTAT-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Battle Statistics 以 combatant ID 建立單一每場統計 owner，累積實際傷害、有效治療、實際承傷、真正暴擊次數，不統計技能施放次數並預留 Hero NPC／援軍。",
       "evidence": [
         "js/battle-statistics-system.js",
@@ -50,7 +50,7 @@
     },
     {
       "id": "BSTAT-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Auto Battle 每個正式新回合開始前顯示第 X 回合 0.5 秒，使用 BattleFlow tracked presentation lock，不改 1.15 秒既定出手節奏。",
       "evidence": [
         "js/00-main.js",
@@ -60,7 +60,7 @@
     },
     {
       "id": "BSTAT-06",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "左側詳細戰況 Drawer 即時讀同一 Battle Statistics；左右 Drawer 共用 BattleFlow pause lock，Auto Battle 開啟 Drawer 時停止後續正式動作。",
       "evidence": [
         "js/battle-statistics-system.js",
@@ -71,7 +71,7 @@
     },
     {
       "id": "BSTAT-07",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Boss 有存活功能物件時顯示右側紅色快速閃爍驚嘆號；Drawer 列出所有目前 Boss object 的名稱、效果、觸發、狀態與剩餘回合。",
       "evidence": [
         "js/gameplay-boss-tower-system.js",
@@ -82,7 +82,7 @@
     },
     {
       "id": "BSTAT-08",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "個人 Boss／世界 Boss／深淵在戰後保留同一統計 snapshot 並顯示可手動關閉詳細結算；一般巡怪與每日副本維持原快速流程。",
       "evidence": [
         "js/gameplay-boss-tower-system.js",
@@ -93,7 +93,7 @@
     },
     {
       "id": "BSTAT-09",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "元素塔可勾選自動挑戰下一層；勝利後正式 3→2→1 倒數，戰敗／最高層／進入條件／獎勵 gate／取消／離頁均停止，無自動重試。",
       "evidence": [
         "js/gameplay-boss-tower-system.js",
@@ -104,7 +104,7 @@
     },
     {
       "id": "BSTAT-10",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "只修改本批直接 owner 與 production bundles，不修改角色技能、秘寶技能數值、Boss 數值、怪物 AI、EXP、金幣、掉落、獎勵或既定戰鬥速度。",
       "evidence": [
         "scripts/build-production.mjs",
@@ -120,6 +120,7 @@
       "tests/v173.45-synthesis-touch-icon.test.js",
       "tests/gameplay-boss-tower-system.test.js"
     ],
-    "repositoryChecks": "PENDING"
+    "repositoryChecks": "GitHub Actions CI run 35466343921 Repository checks SUCCESS",
+    "result": "Focused battle/relic/Boss/Tower regressions, relic lifecycle tests, deterministic production build check, exact-candidate battle mobile browser QA, Adventure mobile QA, static resources, loader integrity, Release Gate and git-diff all passed."
   }
 }

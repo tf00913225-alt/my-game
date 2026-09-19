@@ -1,3 +1,18 @@
+## 2026-09-20 — Battle Statistics／正式秘寶配裝／Boss 戰況抽屜／元素塔自動續戰（VERIFIED／main 未修改）
+
+- 工作分支：`feature/battle-stats-relic-ui-tower-auto-20260920`；PR #355；最新基準已合併 `dev@48bca3e4672591b67a1fbc75d8a67c6b7a66eae9`，未 rebase／force push，`main` 全程未修改。
+- 主城隊伍秘寶根因：First Screen（首屏）摘要與 lazy Relic（秘寶）runtime 的刷新時序不同。正式修法維持 `teamLoadout.relicId` 為唯一裝備真相，主城從同一 UID 正式存檔讀取摘要；主城本身成為唯一垂直 scroll owner，底部預留固定導覽列＋Safe Area（安全區域）。
+- 符咒合成巨大圖根因：92×138 的符咒預覽規則原本誤放在 Abyss（深淵）lazy CSS，單獨開合成頁不一定載入。材料與目標兩張圖本來就是兩個正式格位，沒有重複 Render（渲染）；尺寸規則已移回 synthesis owner 並固定 `object-fit:contain`。
+- 秘寶卡片不再顯示 DEV／Runtime Ready／Presentation Only 等工程分類；DEV 驗收也使用正式「裝備／已裝備／卸下／詳情」與 `teamLoadout.relicId`，不再保留 `devPreviewRelicId` 第二套配裝狀態。尚未具正式 Trigger／Effect 的秘寶仍不虛構技能效果或數值。
+- 新增 `FourSymbolsBattleStatistics`：每場建立一份 combatant-ID Map，欄位固定為實際總傷害、有效治療、實際承傷、真正暴擊次數；戰鬥結束凍結同一份 snapshot，Boss／深淵結算不重新計算。資料型別已預留 `playerCharacter / heroNpc / reinforcement`，未來 Hero NPC 只需註冊進同一 owner。
+- Auto Battle（自動戰鬥）每個正式新回合在第一個宣告／行動前顯示 0.5 秒「第 X 回合」。左側「詳細戰況」與右側 Boss 功能物件 Drawer 共用 `FourSymbolsBattleFlow` pause/presentation lock；開啟時停止後續自動行動，關閉後由同一 lifecycle 恢復。
+- Boss 紅色「！」只投影目前存活的正式 Boss object entity（F1／F5 功能物件），不復活已退役的 `MECH_*` 系統；Drawer 會列出全部存活物件的名稱、效果、觸發、狀態與剩餘回合。
+- 個人 Boss、世界 Boss、深淵正式戰鬥使用同一 Battle Statistics frozen snapshot 顯示手動關閉的詳細結算；一般巡怪與每日副本仍走原快速結束流程。
+- 元素塔新增「自動挑戰下一層」checkbox；勝利後由單一受管理 timeout owner 顯示 3→2→1，再啟動正式下一層。戰敗、最高層、獎勵 gate、不符進入條件、launcher 失敗、玩家取消或真正離開 Tower 都會取消，不會失敗重試或背景殘留。
+- 既定 `POST_ACTION_DELAY_MS=1150`、角色／秘寶技能數值、Boss 數值、AI、EXP、金幣、掉落與獎勵均未修改。
+- Requirement Batch：`release/requirement-batches/2026-09-20-battle-stats-relic-ui-tower-auto.json`，10/10 VERIFIED。PR #355 candidate CI run `35466343921` 的 Repository checks 已 SUCCESS，包含 focused regression、relic lifecycle、deterministic build:check、exact-candidate real battle mobile browser QA、Adventure mobile QA、resources、loader／Release Gate／git-diff。
+
+
 ## 2026-09-19 — DEV 正式版本公告視覺預覽（VERIFIED／main 未修改）
 
 ## 2026-09-19 — V173.66 DEV 發布驗證（REL-01～04 VERIFIED／main PENDING）
