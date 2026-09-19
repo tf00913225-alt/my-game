@@ -86,6 +86,7 @@ test("turn-end status and buff cleanup resynchronize Sprites at one shared bound
         declaredCharacterIndexes:null,resolutionPhaseStarted:true,
         turnAdvancePending:true,queuedPlayerActions:null,
         addBattleLog(){},$(){ return null; },
+        notifyBattleRoundBoundary(){},
         tickStatusEffects(){ entity.statusEffects=[]; },
         tickPlayerBuffs(){ entity.activeBuffs=[]; },
         checkBattleEnd(){ return false; },
