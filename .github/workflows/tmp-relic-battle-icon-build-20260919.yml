@@ -75,7 +75,7 @@ jobs:
                   source_size=im.size
                   source_has_alpha="A" in im.getbands()
                   rgba=im.convert("RGBA")
-                  rgba.save(target,"WEBP",lossless=True,quality=100,method=4,exact=True)
+                  rgba.save(target,"WEBP",lossless=True,quality=100,method=2,exact=True)
               with Image.open(target) as out:
                   out.load()
                   if out.size != source_size:
