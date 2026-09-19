@@ -944,51 +944,74 @@
         });
     }
 
+    function shouldHoldMonsterActionFinishForRelic(hardControlled){
+        const def=activeBattleRelic();
+        if(!def||!def.runtimeReady||!relicBattleState){ return false; }
+        if(Object.keys(relicBattleState.reflectReady||{}).length){ return true; }
+        return def.triggers.some((triggerDef,index)=>{
+            const key=def.id+":"+(triggerDef.id||index);
+            if(!canTrigger(triggerDef,key)){ return false; }
+            if(triggerDef.type==="enemy_action_count"){
+                return !hardControlled&&numeric(relicBattleState.enemyActionCount)+1>=numeric(triggerDef.threshold);
+            }
+            if(triggerDef.type==="ally_hit_count"){
+                return numeric(relicBattleState.allyHitCount)+1>=numeric(triggerDef.threshold);
+            }
+            return false;
+        });
+    }
+
     if(typeof processSingleMonsterAttack==="function"){
         const previous=processSingleMonsterAttack;
         processSingleMonsterAttack=function(monsterIndex){
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
             const hardControlled=!!(monster&&((typeof isMonsterFrozen==="function"&&isMonsterFrozen(monster))||(typeof isMonsterPetrified==="function"&&isMonsterPetrified(monster))));
-            const before=partyIndexes().map(index=>{
-                const character=characterAt(index);
-                const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
-                    buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
-                );
-                return {index:index,hp:numeric(character&&character.hp),shield:numeric(shield&&shield.remaining)};
-            });
-            if(relicBattleState){ relicBattleState.currentEnemyIndex=monsterIndex; }
-            const result=withSource("enemy",()=>previous.apply(this,arguments));
-            const hitTargets=[];
-            before.forEach(entry=>{
-                const character=characterAt(entry.index);
-                const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
-                    buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
-                );
-                const shieldAfter=numeric(shield&&shield.remaining);
-                if(character&&(numeric(character.hp)<entry.hp||shieldAfter<entry.shield)){ hitTargets.push(entry.index); }
-            });
-            if(relicBattleState){
-                relicBattleState.currentEnemyIndex=null;
-                if(!hardControlled){ relicBattleState.enemyActionCount++; dispatchRelicEvent("after_enemy_action",{sourceType:"enemy",monsterIndex:monsterIndex}); }
-                if(hitTargets.length){ relicBattleState.allyHitCount++; dispatchRelicEvent("after_ally_hit",{sourceType:"enemy",monsterIndex:monsterIndex,targetIndexes:hitTargets}); }
-                const reflectedIndex=hitTargets.find(index=>relicBattleState.reflectReady[String(index)]);
-                if(reflectedIndex!==undefined&&monster&&monster.alive){
-                    const reflect=relicBattleState.reflectReady[String(reflectedIndex)]; delete relicBattleState.reflectReady[String(reflectedIndex)];
-                    const def=activeBattleRelic();
-                    if(def){
-                        queueRelicPresentation(def,()=>{
-                            const damage=Math.max(1,Math.floor(getRelicPower(def.id)*numeric(reflect.multiplier)));
-                            damageEnemy(monsterIndex,damage,"earth");
-                            battleLog(def.name+"反震"+damage+"點秘寶傷害。");
-                            if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
-                        },{
-                            payload:{monsterIndex:monsterIndex},
-                            override:{targetSide:"monster",targetType:"single",targetId:monsterIndex,targetIds:[monsterIndex],category:"attack"}
-                        });
+            const finishProbe=shouldHoldMonsterActionFinishForRelic(hardControlled);
+            if(finishProbe){ relicPresentationHandoffsPending++; }
+            try{
+                const before=partyIndexes().map(index=>{
+                    const character=characterAt(index);
+                    const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
+                        buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
+                    );
+                    return {index:index,hp:numeric(character&&character.hp),shield:numeric(shield&&shield.remaining)};
+                });
+                if(relicBattleState){ relicBattleState.currentEnemyIndex=monsterIndex; }
+                const result=withSource("enemy",()=>previous.apply(this,arguments));
+                const hitTargets=[];
+                before.forEach(entry=>{
+                    const character=characterAt(entry.index);
+                    const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
+                        buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
+                    );
+                    const shieldAfter=numeric(shield&&shield.remaining);
+                    if(character&&(numeric(character.hp)<entry.hp||shieldAfter<entry.shield)){ hitTargets.push(entry.index); }
+                });
+                if(relicBattleState){
+                    relicBattleState.currentEnemyIndex=null;
+                    if(!hardControlled){ relicBattleState.enemyActionCount++; dispatchRelicEvent("after_enemy_action",{sourceType:"enemy",monsterIndex:monsterIndex}); }
+                    if(hitTargets.length){ relicBattleState.allyHitCount++; dispatchRelicEvent("after_ally_hit",{sourceType:"enemy",monsterIndex:monsterIndex,targetIndexes:hitTargets}); }
+                    const reflectedIndex=hitTargets.find(index=>relicBattleState.reflectReady[String(index)]);
+                    if(reflectedIndex!==undefined&&monster&&monster.alive){
+                        const reflect=relicBattleState.reflectReady[String(reflectedIndex)]; delete relicBattleState.reflectReady[String(reflectedIndex)];
+                        const def=activeBattleRelic();
+                        if(def){
+                            queueRelicPresentation(def,()=>{
+                                const damage=Math.max(1,Math.floor(getRelicPower(def.id)*numeric(reflect.multiplier)));
+                                damageEnemy(monsterIndex,damage,"earth");
+                                battleLog(def.name+"反震"+damage+"點秘寶傷害。");
+                                if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
+                            },{
+                                payload:{monsterIndex:monsterIndex},
+                                override:{targetSide:"monster",targetType:"single",targetId:monsterIndex,targetIds:[monsterIndex],category:"attack"}
+                            });
+                        }
                     }
                 }
+                return result;
+            }finally{
+                if(finishProbe){ releaseRelicPresentationHandoff(false); }
             }
-            return result;
         };
     }
 
