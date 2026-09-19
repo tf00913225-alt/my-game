@@ -102,6 +102,11 @@ jobs:
       - name: Run relic cut-in contract
         run: node tests/relic-battle-cutin-icon-readability-20260919.test.js
 
+      - name: Install repository test image dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
       - name: Run repository unit checks
         run: npm test
 
