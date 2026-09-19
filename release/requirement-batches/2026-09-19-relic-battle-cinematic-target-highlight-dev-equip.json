@@ -5,7 +5,7 @@
   "base_sha": "f11fbb4070097c0a5f27049375c458d0f0952525",
   "work_branch": "fix/relic-battle-cinematic-target-highlight-dev-equip-20260919",
   "officialVersion": "173.65",
-  "status": "IMPLEMENTED_PENDING_GATE",
+  "status": "VERIFIED",
   "supersedes": "2026-09-19-relic-battle-cutin-icon-readability.json 中 0.38 壓暗、黑金框式 Cut-in、VFX 前移除 overlay 與僅以 DEV 狀態亮起秘寶的呈現方式；20 張 battle icon、2.2–2.8 秒 VFX、1200ms relic-only protection、V143 authored hit frame 與一般 1.15 秒 pacing 保留。",
   "requirements": [
     {
@@ -40,7 +40,7 @@
     },
     {
       "id": 6,
-      "status": "IMPLEMENTED_PENDING_GATE",
+      "status": "VERIFIED",
       "request": "不得改普通攻擊／一般技能節奏、秘寶數值、目標幾何、V143 authored hit frame 或 2.2–2.8 秒 VFX。",
       "implementation": "只修改 js/60 team relic presentation owner、css/55 team relic owner、對應測試與 requirement batch；正式 gate 待 PR checks。"
     }
@@ -53,14 +53,31 @@
   },
   "dimOpacity": 0.75,
   "verification": [
-    "pending: JavaScript syntax",
-    "pending: relic cinematic contract",
-    "pending: full npm test",
-    "pending: npm run build:check",
-    "pending: Repository checks",
-    "pending: Fixed Slot 9:16 mobile browser QA",
-    "pending: exact-candidate real battle mobile browser QA",
-    "pending: Adventure mobile QA",
-    "pending: Release Gate"
-  ]
+    "PASS: JavaScript syntax for js/60-team-relic-system.js",
+    "PASS: relic cinematic target reveal / DEV testing equip contract",
+    "PASS: battle presentation sequencing contract",
+    "PASS: full npm test in temporary pre-PR verification run 35414244247",
+    "PASS: production build generation and npm run build:check",
+    "PASS: PR #327 Repository checks run 35414414580",
+    "PASS: Adventure V1 targeted regression",
+    "PASS: Fixed Slot battlefield rendering regression",
+    "PASS: battle layout, timing and range-VFX regressions",
+    "PASS: Fixed Slot battlefield 9x16 mobile browser QA",
+    "PASS: exact-candidate real battle mobile browser QA",
+    "PASS: Adventure V1 mobile browser QA",
+    "PASS: static local resources / duplicate HTML IDs / loader integrity",
+    "PASS: Release/cache/checklist/deprecated-code gates",
+    "PASS: Git whitespace and conflict marker check"
+  ],
+  "preMergeEvidence": {
+    "prePrFullVerificationRun": 35414244247,
+    "officialPrCiRun": 35414414580,
+    "pullRequest": 327,
+    "repositoryChecks": "PASS",
+    "fixedSlot9x16MobileQa": "PASS",
+    "exactCandidateRealBattleMobileQa": "PASS",
+    "adventureMobileQa": "PASS",
+    "releaseGate": "PASS",
+    "finalScope": "8 formal files before verification record update; no temporary workflow or browser-QA artifacts"
+  }
 }
