@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-19-v17366-main-release",
+  "baseBranch": "dev",
+  "baseCommit": "eb5431683e3cee1f6dab6305a2b3206c774db6f3",
+  "officialVersion": "173.66",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REL-01",
+      "status": "VERIFIED",
+      "requirement": "稽核實際 main...dev 全量差異；main 獨有 Git 歷史不得包含 dev 缺少的實際檔案內容。",
+      "evidence": [
+        "main@b8c2ba7f3a822fd213dfd234b68cd393b78b8ac2",
+        "dev@eb5431683e3cee1f6dab6305a2b3206c774db6f3",
+        "compare dev..main files=[]；main 獨有 18 commits 僅歷史分岔，無實際檔案差異"
+      ]
+    },
+    {
+      "id": "REL-02",
+      "status": "IMPLEMENTED",
+      "requirement": "依 main...dev 玩家可感知差異產生 V173.66 正式公告、CHANGELOG、Game/Cache Version 與 deterministic build。",
+      "evidence": [
+        "release/release.json",
+        "release/release-update.json",
+        "CHANGELOG.md",
+        "js/20-anonymous-20.js",
+        "package.json",
+        "asset-manifest.json",
+        "build/asset-manifest.json"
+      ]
+    },
+    {
+      "id": "REL-03",
+      "status": "VERIFIED",
+      "requirement": "V173.66 發布候選 PR 回 dev 的 Repository checks、build:check、Release Update browser QA 與 Release Gate 全綠。",
+      "evidence": [
+        "PR #349",
+        "CI run 35453776605 Repository checks SUCCESS",
+        "Release Update targeted regression SUCCESS",
+        "deterministic build:check SUCCESS",
+        "Release Update mobile browser QA SUCCESS",
+        "Fixed Slot / exact-candidate battle / Adventure mobile QA SUCCESS",
+        "Release Gate / loader / resources / git-diff SUCCESS"
+      ]
+    },
+    {
+      "id": "REL-04",
+      "status": "TODO",
+      "requirement": "發布候選合併 dev 後，dev HEAD CI 與 Cloudflare DEV exact-SHA deployment 成功。",
+      "evidence": []
+    },
+    {
+      "id": "REL-05",
+      "status": "TODO",
+      "requirement": "dev → main PR 全綠後合併 protected main，並驗證 production main SHA／V173.66。",
+      "evidence": []
+    }
+  ],
+  "automatedVerification": "REL-03 VERIFIED on PR #349 CI run 35453776605; awaiting merge to dev and exact-SHA DEV deployment before REL-04.",
+  "visualVerification": "Release Update mobile browser QA, Fixed Slot mobile QA, exact-candidate battle QA and Adventure mobile QA SUCCESS on PR #349 CI run 35453776605.",
+  "verifiedSourceCommit": "8da0de53a00199fbefb91ed358beeb3e6c99d728",
+  "mergedDevCommit": null,
+  "mergedMainCommit": null,
+  "candidateCiRun": 35453776605
+}
