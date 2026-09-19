@@ -47,7 +47,8 @@
     "PASS: Fixed Slot battlefield 9x16 mobile browser QA",
     "PASS: exact-candidate real battle mobile browser QA",
     "PASS: Adventure V1 mobile browser QA",
-    "PASS: static resources, duplicate IDs, release/loader integrity, Release Gate and Git checks"
+    "PASS: static resources, duplicate IDs, release/loader integrity, Release Gate and Git checks",
+    "PENDING RELEASE STEP: merge to dev, then verify Cloudflare DEV deployed SHA"
   ],
   "preMergeEvidence": {
     "pullRequest": 329,
@@ -57,7 +58,6 @@
     "exactCandidateRealBattleMobileQa": "PASS",
     "buildSynchronization": "PASS",
     "releaseGate": "PASS",
-    "sequence": "dim 360ms -> identity reveal 360ms -> identity hold 1150ms -> identity exit 420ms + target reveal 420ms -> V142/V143 VFX -> VFX gate complete -> dim out 420ms",
-    "coverage": "position:fixed inset:0 inside transformed 420x746.6667 battle surface"
+    "sequencing": "dim -> identity fade-in -> 1150ms hold -> 420ms identity fade-out + target reveal -> V143 VFX -> VFX gate complete -> 420ms dim-out"
   }
 }
