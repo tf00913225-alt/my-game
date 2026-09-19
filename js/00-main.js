@@ -6611,10 +6611,26 @@ function saveGame(options={}){
 
 
         const persistenceOptions=options&&typeof options==="object"?options:{};
-        repository.writeForUid(activeUid,saveData,{
-            source:String(persistenceOptions.source||"gameplay"),
-            ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
-        });
+        let endReleaseSaveOperation=null;
+        try{
+            if(
+                window.FourSymbolsReleaseUpdate&&
+                typeof window.FourSymbolsReleaseUpdate.beginCriticalOperation==="function"
+            ){
+                endReleaseSaveOperation=
+                    window.FourSymbolsReleaseUpdate.beginCriticalOperation("account-save-write");
+            }
+        }catch(_){ }
+        try{
+            repository.writeForUid(activeUid,saveData,{
+                source:String(persistenceOptions.source||"gameplay"),
+                ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
+            });
+        }finally{
+            if(typeof endReleaseSaveOperation==="function"){
+                endReleaseSaveOperation();
+            }
+        }
         return true;
 
     }
@@ -26073,6 +26089,27 @@ function closeHomeFeature(){
     const modal=
         $("homeFeatureModal");
 
+    const releaseUpdate=
+        window.FourSymbolsReleaseUpdate;
+
+    if(
+        releaseUpdate&&
+        typeof releaseUpdate.shouldPreventSharedModalClose==="function"&&
+        releaseUpdate.shouldPreventSharedModalClose()
+    ){
+        if(typeof releaseUpdate.announceForcedLock==="function"){
+            releaseUpdate.announceForcedLock();
+        }
+        return false;
+    }
+
+    if(
+        releaseUpdate&&
+        typeof releaseUpdate.onSharedModalClosed==="function"
+    ){
+        releaseUpdate.onSharedModalClosed();
+    }
+
 
     if(modal){
 
@@ -28078,6 +28115,21 @@ function claimAchievement(achievementId){
 ===================================================== */
 
 function renderAnnouncementContent(){
+
+    const releaseUpdate=
+        window.FourSymbolsReleaseUpdate;
+
+    if(
+        releaseUpdate&&
+        typeof releaseUpdate.renderAnnouncementContent==="function"
+    ){
+        const releaseContent=
+            releaseUpdate.renderAnnouncementContent();
+
+        if(releaseContent){
+            return releaseContent;
+        }
+    }
 
     return (
 
@@ -33896,6 +33948,15 @@ catch(error){
             history.pushState({rpgExitGuard:true},"",location.href);
             guardRestored=true;
         }catch(_){ }
+
+        if(
+            window.FourSymbolsReleaseUpdate&&
+            typeof window.FourSymbolsReleaseUpdate.isForcedUpdateBlocking==="function"&&
+            window.FourSymbolsReleaseUpdate.isForcedUpdateBlocking()
+        ){
+            window.FourSymbolsReleaseUpdate.announceForcedLock();
+            return;
+        }
 
         if(exitPromptOpen){ return; }
         exitPromptOpen=true;

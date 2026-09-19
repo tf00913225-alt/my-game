@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "publicNotice": true,
+  "releaseVersion": "V173.65",
+  "noticeId": "release-v17365",
+  "title": "V173.65 更新",
+  "summary": "帳號啟動與遊戲體驗優化，點擊查看更新內容。",
+  "content": [
+    "優化登入、角色載入與進入遊戲的流程，讓帳號資料更穩定地接續冒險。",
+    "改善帳號下的遊戲資料隔離與舊存檔保護，降低切換帳號時誤讀資料的風險。",
+    "修正已知介面與遊戲流程問題，提升整體遊玩穩定度。"
+  ],
+  "publishedAt": "2026-09-19T00:00:00.000Z",
+  "updateMode": "normal",
+  "minimumVersion": null
+}

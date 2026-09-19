@@ -134,6 +134,7 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 - **未完成逐項 VERIFIED 前，禁止更新正式版本號並宣稱完成。** 版本號只能表示「已驗證批次準備發布」，不能作為功能完成證據。
 - 程式修改、commit、push、Repository checks SUCCESS、Deploy SUCCESS、版本號更新，任何單一項都不等於完成；缺少 source/commit/push/CI/deploy SHA/Game+Cache/Requirement Verification 任一環節，一律回報 `NOT COMPLETE`。
 - `release/release.json` 是 Game Version／Cache Version 的 release source of truth；`.github/scripts/release-gate.mjs` 與 CI／deploy workflow 為強制執行 owner。
+- **每次 dev → main 正式發布，除非專案負責人明確說「本次不公告」，發布 owner 必須先比對 current `main` 與候選 `dev` 的完整實際 diff，主動整理全部玩家可感知變更到唯一 `release/release-update.json`。不得要求專案負責人另寫跑馬燈、首頁公告或 Release Notes；不得把檔名、函式、Commit SHA、CI 或除錯術語交給玩家。完整規則以 `docs/RELEASE_VERIFICATION_RULES.md` 的「玩家正式版本通知與 dev → main Release Contract」為準。**
 - 正式移除功能必須在 `release/deprecated-code.json` 登記 forbidden tokens；舊 DOM id、class、handler、函式、設定 key 或顯示文字仍存在於正式 HTML/JS/CSS 時，CI 必須失敗。
 - UI、手機 viewport、捲動、裁切、icon、modal、loading、點擊等不能由靜態 CI 完整證明的需求，仍必須做最小必要實際視覺／操作驗收。
 - Cache invalidation、Game Version、Service Worker 更新不得清除玩家 localStorage、IndexedDB、雲端存檔、帳號、背包、等級、裝備或進度；靜態 Cache 與 Save Data 必須完全分離。

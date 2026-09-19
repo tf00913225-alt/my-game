@@ -19,6 +19,14 @@
 
 8. 不順手全面重構；只在本次修改的同一子系統內做小範圍收斂。
 
+## Release Update Notification System
+
+1. 玩家正式版本公告的唯一資料 owner 是 `release/release-update.json`；Game／Cache Version 仍由 `release/release.json` 擁有。部署用 `release-manifest.json` 的 Commit SHA 不得作為玩家公告版本判斷。
+2. Runtime owner 是 `js/release-update-notification.js`。它必須重用既有 `#game-overlay-layer` 跑馬燈與 `#homeFeatureModal`，不得建立第二套公告列、Modal 框架、全頁透明點擊層或一般公告資料來源。
+3. 安全重新載入只允許透過 `FourSymbolsReleaseUpdate.canSafelyReloadForUpdate()` 與其 critical-operation registry 判斷；戰鬥、結算、獎勵、背包交易、合成／冶煉、商店交易與存檔寫入不得各自複製 reload 判斷。
+4. Runtime 只可維持一個 3～5 分鐘版本 polling interval；visibility／online 使用節流。延後更新期間的單一短期 recheck timer 必須在 pending work 結束後清除，不得演變成第二套全域 timer。
+5. `release/release-update.json` 由 `release-gate` 驗證，並以 `no-store`／cache-busting 請求；未來加入 Service Worker 或 PWA 前，必須明確把此檔排除於長期 cache 或補上等價的 network-first 規則與跨版本測試。
+
 ## Boot Architecture
 
 1. Critical Boot 只包含首次操作真正需要的模組；權威清單為 `asset-manifest.json` 的 `critical`。

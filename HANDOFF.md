@@ -1,3 +1,11 @@
+## 2026-09-19 — Release Update Notification System（VERIFIED／main 未修改）
+
+- 工作分支：`feature/release-update-notification-system-20260919`，基準為最新 `origin/dev@af7d0f6b132ebbaeb5f594133db1338d2545861c`；本輪只會 PR 回 `dev`，不得直接修改或發布 `main`。
+- 正式玩家版本公告唯一資料為 `release/release-update.json`，與 `release/release.json` 的 Game／Cache Version 對齊；`release-manifest.json` 仍只供部署 SHA 驗證。`js/release-update-notification.js` 為 runtime owner，重用 `#game-overlay-layer` 跑馬燈和 `#homeFeatureModal`，不可另建 Modal／公告系統。
+- Runtime 在 startup ready、每 4 分鐘、visibility 回前景與 online 恢復時，節流讀取 cache-busted `release/release-update.json`；正常更新只通知，強制更新待安全狀態再鎖定。安全 reload 唯一入口為 `canSafelyReloadForUpdate()`，且已接上 battle／presentation／reward、背包交易與 account save write critical operation。
+- 永久 dev → main Release Contract 已補入 `AGENTS.md`、`SYSTEM_CONTRACTS.md`、`ARCHITECTURE_RULES.md` 與 `docs/RELEASE_VERIFICATION_RULES.md`：除非專案負責人明確說「本次不公告」，每次發布 owner 必須從完整 main...dev 實際 diff 自行整理所有玩家可感知變更到同一份 manifest；不可要求另給公告文案，也不可對玩家顯示檔名、函式、SHA、CI 或 debug 用語。`npm run release:update-diff -- --base origin/main --head HEAD` 是內部差異規劃 helper。
+- 實際驗證：PR [#344](https://github.com/tf00913225-alt/my-game/pull/344) 只目標 `dev`；GitHub Actions CI [run 35445108483](https://github.com/tf00913225-alt/my-game/actions/runs/35445108483) 已全綠。它完成 targeted Case A–J、deterministic build／build check、Release Gate、360×800／390×844／412×915 更新通知 browser QA、既有戰鬥與資源／loader 檢查；更新通知截圖與 JSON 證據已上傳為該 run artifact。`main` 仍未修改；最終 `dev` SHA 以 PR 合併結果為準。
+
 ## 2026-09-19 — Phase 1 main 發布檢查：Firebase 模組數過期測試修正
 
 - 發布 PR #342 的 CI run `35441331170` 實際發現 `tests/critical-feature-budget.test.js` 仍要求 5 個 Firebase 模組；Phase 1 正式建置 owner 已明確包含 `session-client.js` 與 `firebase-session.js`，共 7 個。分類為 stale test contract，非正式程式錯誤；自主失敗額度 1/4、修正 1 次。

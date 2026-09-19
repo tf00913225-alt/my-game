@@ -2503,10 +2503,24 @@
 
     function runInventoryTransaction(operation){
         const snapshot=cloneInventorySnapshot();
+        let endReleaseInventoryOperation=null;
+        try{
+            if(
+                window.FourSymbolsReleaseUpdate&&
+                typeof window.FourSymbolsReleaseUpdate.beginCriticalOperation==="function"
+            ){
+                endReleaseInventoryOperation=
+                    window.FourSymbolsReleaseUpdate.beginCriticalOperation("inventory-transaction");
+            }
+        }catch(_){ }
         try{
             if(operation()){ return true; }
         }catch(error){
             console.error("背包交易失敗，已還原：",error);
+        }finally{
+            if(typeof endReleaseInventoryOperation==="function"){
+                endReleaseInventoryOperation();
+            }
         }
         restoreInventorySnapshot(snapshot);
         return false;
@@ -9828,7 +9842,15 @@
             const maxLevel=Math.max(1,Number(window.v133MaxLevel)||100);
             return !!(character&&Number(character.level)<maxLevel&&Number(sharedExp)>=Math.max(1,Number(character.expNext)||1));
         });
-        const announcementUnread=localStorage.getItem(ANNOUNCEMENT_READ_KEY)!=="1";
+        const releaseAnnouncementUnread=
+            !!(
+                window.FourSymbolsReleaseUpdate&&
+                typeof window.FourSymbolsReleaseUpdate.hasUnreadReleaseNotice==="function"&&
+                window.FourSymbolsReleaseUpdate.hasUnreadReleaseNotice()
+            );
+        const announcementUnread=
+            localStorage.getItem(ANNOUNCEMENT_READ_KEY)!=="1"||
+            releaseAnnouncementUnread;
         setNotificationDot(document.getElementById("homeIconQuest")?.parentElement,hasQuestNotice,"任務有新進度");
         setNotificationDot(document.getElementById("homeIconAchievement")?.parentElement,hasAchievement,"成就可領取");
         setNotificationDot(document.getElementById("homeIconCharacter")?.parentElement,hasExpLevelUp,"經驗池可讓角色升級");
