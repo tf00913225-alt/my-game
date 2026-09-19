@@ -5,11 +5,11 @@
   "baseCommit": "ccf587d0feec8d4790d17834a11b67a6d05bc55f",
   "officialVersion": "173.65",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "COMPLETE",
   "requirements": [
     {
       "id": "MOBILE-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Screen Wake Lock visible acquire／hidden release／system release reacquire／bounded retry／diagnostics，不建立第二 owner",
       "evidence": [
         "js/startup/screen-wake-lock-runtime.js",
@@ -19,7 +19,7 @@
     },
     {
       "id": "MOBILE-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Android background immediate save + pageshow/freeze/resume/wasDiscarded/navigation diagnostics；普通 resume 不重跑 Startup；不改 Cloud Save 權威",
       "evidence": [
         "js/00-main.js",
@@ -29,7 +29,7 @@
     },
     {
       "id": "SHOP-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "商店目前金幣可見；補品購買數量唯一上限 999，輸入框／計價／確認／buy／背包一致",
       "evidence": [
         "js/28-v133-economy-rebalance.js",
@@ -42,7 +42,7 @@
     },
     {
       "id": "ELEMENT-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "元素匣 HP=0 角色可經實際 HP 補品恢復；缺藥不免費復活；仍死亡時不先消耗 SP 藥",
       "evidence": [
         "js/45-v154-dev-fixes.js",
@@ -51,7 +51,7 @@
     },
     {
       "id": "ADVENTURE-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Adventure 返回巡怪正式走單一 Patrol exit；清理 timer／walking／pending callback；舊 Fight Animation callback 離場後不可 startBattle；委託進度保留",
       "evidence": [
         "js/00-main.js",
@@ -62,7 +62,7 @@
     },
     {
       "id": "ADFREE-06",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "NT$99 30天免廣告資訊取消 startup／pageshow／MutationObserver auto-show，只保留 manual open",
       "evidence": [
         "js/16-stage-v54-main-city-runtime.js",
@@ -72,7 +72,7 @@
     },
     {
       "id": "HOME-07",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "主城隊伍 HUD 與秘寶摘要固定 First Screen shell；摘要資料橋小型且唯一；不 execute 完整 feature-boss-relic；點秘寶仍 lazy load",
       "evidence": [
         "js/relic-summary-catalog.js",
@@ -87,8 +87,10 @@
       ]
     }
   ],
-  "automatedVerification": "PENDING_TARGETED_TESTS_AND_REPOSITORY_CHECKS",
-  "visualVerification": "PENDING_EXISTING_MOBILE_BROWSER_QA_WHERE_APPLICABLE",
-  "verifiedSourceCommit": null,
-  "mergedDevCommit": null
+  "automatedVerification": "PR #347 CI run 35450909260 SUCCESS: syntax, targeted regressions, deterministic build:check, Release Update mobile browser QA, Fixed Slot mobile QA, exact-candidate real battle mobile QA, Adventure V1 mobile browser QA, static resources, HTML IDs, loader integrity, Release Gate and git-diff all passed.",
+  "visualVerification": "CI mobile browser QA PASS for Release Update, Fixed Slot / real battle and Adventure; no unrelated full-site manual regression added.",
+  "verifiedSourceCommit": "e2dfd39e62e7d56b2e2d97a6c157c39fb103995f",
+  "mergedDevCommit": null,
+  "verificationRunId": 35450909260,
+  "verifiedAt": "2026-09-19"
 }
