@@ -276,7 +276,6 @@
     let relicFocusedTargetCards=[];
     let relicFocusedTargetLayers=[];
     const relicPresentationLockReleases=new Set();
-    let devPreviewRelicId=null;
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
     function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
@@ -300,7 +299,7 @@
         return host===RELIC_DEV_HOST||host==="localhost"||host==="127.0.0.1"||host==="::1";
     }
     function effectiveLoadoutRelicId(){
-        return isRelicDevTestingEnvironment()&&devPreviewRelicId?devPreviewRelicId:teamLoadout.relicId;
+        return teamLoadout.relicId;
     }
     function hasLiveBattlePresentationHost(){
         return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
@@ -654,7 +653,7 @@
     }
     function normalizeLoadout(raw){
         const id=raw&&typeof raw.relicId==="string"?raw.relicId:null;
-        return {relicId:id&&relicCatalog[id]&&relicCatalog[id].runtimeReady?id:null,subRelicId:null};
+        return {relicId:id&&relicCatalog[id]?id:null,subRelicId:null};
     }
     function readSaveDocument(){
         try{
@@ -1238,22 +1237,22 @@
     function equipmentAllowed(){ return !(typeof battleActive!=="undefined"&&battleActive); }
     function equipRelic(id){
         const def=relicCatalog[id],owned=statusOf(id);
-        const devTesting=isRelicDevTestingEnvironment();
-        if(!def||(!def.runtimeReady&&!devTesting)||!owned.unlocked||!equipmentAllowed()){ return false; }
+        if(!def||!owned.unlocked||!equipmentAllowed()){ return false; }
         preloadRelicVfx(id);
-        if(devTesting){
-            devPreviewRelicId=id;
-            syncHomeRelicUi(); renderRelicPage(); return true;
-        }
-        devPreviewRelicId=null;
         teamLoadout.relicId=id;
         if(playerRelics[id]){ playerRelics[id].seen=true; }
-        saveRelics(); syncHomeRelicUi(); renderRelicPage(); return true;
+        saveRelics();
+        syncHomeRelicUi();
+        renderRelicPage();
+        return true;
     }
     function unequipRelic(){
         if(!equipmentAllowed()){ return false; }
-        if(isRelicDevTestingEnvironment()&&devPreviewRelicId){ devPreviewRelicId=null; syncHomeRelicUi(); renderRelicPage(); return true; }
-        teamLoadout.relicId=null; saveRelics(); syncHomeRelicUi(); renderRelicPage(); return true;
+        teamLoadout.relicId=null;
+        saveRelics();
+        syncHomeRelicUi();
+        renderRelicPage();
+        return true;
     }
     function upgradeRelic(id){
         const def=relicCatalog[id],owned=statusOf(id); if(!def||!def.runtimeReady||!owned.unlocked||owned.level>=MAX_LEVEL){ return false; }
@@ -1269,20 +1268,17 @@
     }
     function cardMarkup(def){
         const owned=statusOf(def.id),equipped=effectiveLoadoutRelicId()===def.id;
-        const devTesting=isRelicDevTestingEnvironment();
-        if(devTesting){
-            const runtimeStatus=def.runtimeReady?"Runtime Ready（正式功能已完成）":"Presentation Only（僅演出預覽）";
-            return '<div class="team-relic-card team-relic-card-dev '+rarityClass(def)+(equipped?' equipped':'')+'">'+
-                '<button type="button" class="team-relic-card-open-overlay" aria-label="查看'+esc(def.name)+'詳情" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')"></button>'+
-                '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span><span class="team-relic-card-name">'+esc(def.name)+'</span>'+
-                '<span class="team-relic-card-meta">'+esc(runtimeStatus)+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
-                '<button type="button" class="team-relic-dev-equip" onclick="event.stopPropagation();v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'DEV 已配裝':(def.runtimeReady?'DEV 正式功能配裝':'DEV 僅演出配裝'))+'</button>'+
-                (equipped?'<em>DEV已配裝</em>':'')+'</div>';
-        }
-        return '<button type="button" class="team-relic-card '+rarityClass(def)+(owned.unlocked?' unlocked':' locked')+(equipped?' equipped':'')+'" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')">'+
-            '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span><span class="team-relic-card-name">'+esc(def.name)+'</span>'+
+        const canEquip=owned.unlocked&&equipmentAllowed();
+        return '<div class="team-relic-card '+rarityClass(def)+(owned.unlocked?' unlocked':' locked')+(equipped?' equipped':'')+'">'+
+            '<button type="button" class="team-relic-card-open-overlay" aria-label="查看'+esc(def.name)+'詳情" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')"></button>'+
+            '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span>'+
+            '<span class="team-relic-card-name">'+esc(def.name)+'</span>'+
             '<span class="team-relic-card-meta">'+(owned.unlocked?'Lv.'+owned.level:'尚未獲得')+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
-            (equipped?'<em>已裝備</em>':'')+'</button>';
+            (owned.unlocked
+                ?'<button type="button" class="team-relic-equip" '+(canEquip?'':'disabled')+' onclick="event.stopPropagation();v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>'
+                :'<button type="button" class="team-relic-equip" disabled>尚未獲得</button>')+
+            (equipped?'<em>已裝備</em>':'')+
+        '</div>';
     }
     function renderRelicList(){
         const equippedId=effectiveLoadoutRelicId();
@@ -1291,26 +1287,20 @@
             '<div class="team-relic-current-card empty"><div class="team-relic-empty-slot">寶</div><div class="team-relic-current-copy"><small>目前隊伍秘寶</small><b>尚未裝備秘寶</b><p>每支隊伍只能啟用一件秘寶。</p></div><button class="team-relic-select-first" onclick="v174SetRelicFilter(\'all\')">選擇秘寶</button></div>';
         const filters=["all","attack","recovery","defense","buff","control","element","special"].map(key=>'<button class="'+(currentFilter===key?'active':'')+'" onclick="v174SetRelicFilter(\''+key+'\')">'+esc(CATEGORY_LABELS[key])+'</button>').join("");
         const cards=sortedRelics().filter(filterMatch).map(cardMarkup).join("");
-        return '<div class="team-relic-page"><div class="team-relic-resource-line"><span>隊伍共用戰場神器</span><b>'+(isRelicDevTestingEnvironment()?'DEV：10 件 Runtime Ready（正式功能已完成）／10 件 Presentation Only（僅演出預覽）':'強化：目前僅消耗金幣')+'</b></div>'+current+
+        return '<div class="team-relic-page"><div class="team-relic-resource-line"><span>隊伍共用戰場神器</span><b>每支隊伍可裝備 1 件秘寶</b></div>'+current+
             '<div class="team-relic-tabs">'+filters+'</div><div class="team-relic-grid">'+cards+'</div></div>';
     }
     function detailMarkup(def){
         const owned=statusOf(def.id),level=owned.level,next=nextMilestone(def,level),cost=RELIC_BALANCE_CONFIG.upgradeGoldBase+RELIC_BALANCE_CONFIG.upgradeGoldPerLevel*level;
-        const devTesting=isRelicDevTestingEnvironment();
-        const devPresentation=devTesting&&!def.runtimeReady;
         const equipped=effectiveLoadoutRelicId()===def.id;
-        const devStatus=def.runtimeReady?"Runtime Ready（正式功能已完成）":"Presentation Only（僅演出預覽；不具正式 Trigger／Effect）";
-        const canPreview=devTesting&&typeof battleActive!=="undefined"&&battleActive;
         return '<div class="team-relic-detail"><button class="team-relic-detail-back" onclick="v174OpenRelicPage()">‹ 返回秘寶列表</button><div class="team-relic-detail-hero '+rarityClass(def)+'">'+
             '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+'・Lv.'+level+' / 20</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+(def.tags&&def.tags.length?' / '+esc(def.tags.join('・')):'')+'</strong></div>'+
             '<section><h3>觸發條件</h3><p>'+esc(def.triggerText||"尚未定義")+'</p></section><section><h3>秘寶效果</h3><p>'+esc(currentEffectText(def,level))+'</p></section><section><h3>觸發限制</h3><p>'+esc(def.limitText||"依秘寶設定。")+'</p></section>'+
-            (devTesting?'<section><h3>DEV 狀態</h3><p>'+esc(devStatus)+'</p></section>':'')+
             '<section><h3>下一強化</h3><p>'+(level>=20?'已達最高等級。':next?'Lv.'+next+'：'+esc(def.nextText[next]):'下一級提升效果數值。')+'</p></section>'+
-            '<section class="team-relic-upgrade"><h3>強化</h3><p>目前 Lv.'+level+' → '+(level>=20?'MAX':'Lv.'+(level+1))+'</p><p>素材：第一版尚未啟用正式素材來源；目前只消耗金幣。</p><b>金幣 '+cost.toLocaleString("zh-TW")+'</b></section>'+
+            '<section class="team-relic-upgrade"><h3>強化</h3><p>目前 Lv.'+level+' → '+(level>=20?'MAX':'Lv.'+(level+1))+'</p><p>依目前正式秘寶養成規則消耗對應素材。</p><b>金幣 '+cost.toLocaleString("zh-TW")+'</b></section>'+
             '<div class="team-relic-detail-actions">'+
             (owned.unlocked&&def.runtimeReady&&level<20?'<button onclick="v174UpgradeRelic(\''+esc(def.id)+'\')">強化</button>':'')+
-            (owned.unlocked&&(def.runtimeReady||devPresentation)?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(devTesting?(equipped?'DEV 已配裝':(def.runtimeReady?'DEV 正式功能配裝':'DEV 僅演出配裝')):(equipped?'已裝備':'裝備'))+'</button>':'<button disabled>'+(def.runtimeReady?'尚未獲得':'第一版未開放')+'</button>')+
-            (devPresentation&&canPreview?'<button onclick="v174RelicDevPreviewPresentation(\''+esc(def.id)+'\')">DEV 演出預覽</button>':'')+
+            (owned.unlocked?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>':'<button disabled>尚未獲得</button>')+
             '</div></div>';
     }
 
