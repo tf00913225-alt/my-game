@@ -1,4 +1,4 @@
-# Phase 1 acceptance and exact-dev release evidence: docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md
+# Phase 1 acceptance: docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md; final release evidence: https://github.com/tf00913225-alt/my-game/pull/341
 name: Session Authority
 
 on:

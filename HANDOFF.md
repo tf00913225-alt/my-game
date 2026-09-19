@@ -1,3 +1,9 @@
+## 2026-09-19 — Phase 1 main 發布檢查：Firebase 模組數過期測試修正
+
+- 發布 PR #342 的 CI run `35441331170` 實際發現 `tests/critical-feature-budget.test.js` 仍要求 5 個 Firebase 模組；Phase 1 正式建置 owner 已明確包含 `session-client.js` 與 `firebase-session.js`，共 7 個。分類為 stale test contract，非正式程式錯誤；自主失敗額度 1/4、修正 1 次。
+- 從最新 `dev@10a2decd213cc061e8820fbfd5b01e4ad4d386f4` 建 `fix/cloud-session-phase1-release-gate-20260919`；只將既有模組數斷言對齊 7，不放寬 bytes、hash 或 feature boundary 檢查。本機同一測試先重現 7 !== 5，再修正為 PASS。
+- 結案文件與既有 Session Authority workflow 的文件連結註解同步；workflow 所有執行定義、後端／客戶端程式、遊戲與 Cache Version 均不變。修復必須 PR 回 dev、CI 通過後合併，再驗證最新 dev／Firebase／DEV 與 main PR；最新發布狀態和 SHA 以 [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久記錄為準。Phase 1 仍為 5/5 VERIFIED，Phase 2 未開始。
+
 ## 2026-09-19 — Cloud Account Phase 1 正式驗收結案（COMPLETE / 5/5 VERIFIED）
 
 - 本節取代下方歷史「Phase 1 BLOCKED / Firebase 403」作為目前狀態；歷史紀錄保留。長期進度唯一來源仍是 `docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md`，Phase 2–10 全部尚未開始。
