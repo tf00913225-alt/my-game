@@ -5,11 +5,11 @@
   "baseCommit": "af7d0f6b132ebbaeb5f594133db1338d2545861c",
   "officialVersion": "173.65",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED_PENDING_PR_CI_AND_MOBILE_QA",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "RUP-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "建立唯一玩家正式版本資料來源，且與 Game／Cache Version 對齊",
       "evidence": [
         "release/release-update.json",
@@ -19,7 +19,7 @@
     },
     {
       "id": "RUP-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "startup、4 分鐘 polling、前景／online 節流檢查與 cache-busting 容錯",
       "evidence": [
         "js/release-update-notification.js",
@@ -29,7 +29,7 @@
     },
     {
       "id": "RUP-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "正常更新使用既有原生 overlay 跑馬燈與共用 Home Feature Modal，三個入口共用同一資料",
       "evidence": [
         "js/release-update-notification.js",
@@ -39,7 +39,7 @@
     },
     {
       "id": "RUP-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "強制更新與單一 safe reload 判斷，戰鬥／獎勵／交易／存檔中不 reload",
       "evidence": [
         "js/release-update-notification.js",
@@ -50,7 +50,7 @@
     },
     {
       "id": "RUP-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "per-UID localStorage 已讀與提醒冷卻，非 Cloud Save，且新版 notice 仍可辨識",
       "evidence": [
         "js/release-update-notification.js",
@@ -60,7 +60,7 @@
     },
     {
       "id": "RUP-06",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "永久 dev → main Release Contract：自動比對完整實際 diff 並產生玩家可感知內容",
       "evidence": [
         "scripts/prepare-release-update-diff.mjs",
@@ -70,7 +70,7 @@
     },
     {
       "id": "RUP-07",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "直接 A–J 行為測試、production build、Release Gate 與三種手機 viewport browser QA",
       "evidence": [
         "tests/release-update-notification-system.test.js",
@@ -84,7 +84,7 @@
     "build": "PASS：npm run build && npm run build:check",
     "releaseGate": "PASS：node .github/scripts/release-gate.mjs ci",
     "javascriptSyntax": "PASS：node .github/scripts/ci.mjs syntax（280/280）",
-    "browserQa": "PENDING：本地環境沒有 Headless Chrome/Chromium；PR CI 會執行 360×800、390×844、412×915 focused browser QA。"
+    "browserQa": "PASS：PR #344 GitHub Actions CI run 35445108483 實際執行 focused browser QA，360×800、390×844、412×915 全部通過，並上傳截圖與 JSON 證據。"
   },
-  "publicationEvidence": "本批只準備 PR → dev；main 未修改，CI／PR／合併 SHA 不得在未執行前預填。"
+  "publicationEvidence": "PR #344 只目標 dev；GitHub Actions CI run 35445108483 已通過。main 未修改；最終 dev 整合 SHA 由 PR merge 結果記錄。"
 }

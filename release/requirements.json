@@ -150,7 +150,19 @@
     {
       "id": "REQ-11",
       "title": "正式版本更新通知與玩家公告 Release Contract",
-      "status": "IMPLEMENTED"
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "release/release-update.json",
+          "js/release-update-notification.js",
+          "css/release-update-notification.css",
+          "tests/release-update-notification-system.test.js",
+          ".github/scripts/run-release-update-notification-browser-qa.mjs",
+          "docs/RELEASE_VERIFICATION_RULES.md"
+        ],
+        "verification": "targeted A–J、production build/build check、Release Gate，以及 PR #344 CI 的 360×800／390×844／412×915 mobile browser QA",
+        "result": "GitHub Actions CI run 35445108483 已通過；同一 run 完成更新通知 browser QA、既有戰鬥 QA、靜態資源、loader 與 Release Gate 檢查。"
+      }
     }
   ]
 }
