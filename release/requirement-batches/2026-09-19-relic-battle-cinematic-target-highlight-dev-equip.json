@@ -10,31 +10,31 @@
   "requirements": [
     {
       "id": 1,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "秘寶輪到演出時，戰場先慢慢壓暗約 75%。",
       "implementation": "battlePage 內正式秘寶 dim layer 以 360ms opacity transition 從 0 到 0.75。"
     },
     {
       "id": 2,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "戰鬥秘寶 icon 與秘寶名稱在畫面中央慢慢顯示，icon 在上、名稱在下，兩者完全無框。",
       "implementation": "360ms identity reveal；移除上一版 Cut-in border/background/box-shadow/掃光與小標，只保留透明 battle icon + centered name。"
     },
     {
       "id": 3,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "實際被選擇的目標連同立繪、名稱、HP/SP 一起漸層變亮；增益亮我方，傷害亮敵方。",
       "implementation": "沿用 relicVfxTarget 的正式 targetSide/targetIds，直接對 battlePlayerCardX / battleMonsterX root 套 target-focus；420ms 從暗到亮，未建立假目標 DOM。"
     },
     {
       "id": 4,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "目標亮起後才播放原本秘寶 VFX，傷害/治療浮字沿用正式 V143/showPlayerHit/showMonsterHit 管線；VFX 結束後戰場慢慢變亮。",
       "implementation": "queueRelicPresentation 先完成 cinematic prelude，再呼叫 V142/V143 director；等待 relic gate.promise 真正完成後才以 420ms fade-out 恢復戰場並清理 focus/DOM。"
     },
     {
       "id": 5,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "DEV 20 件秘寶要能直接配裝測試，不只把原本暗的卡片變亮。",
       "implementation": "DEV 每張秘寶卡新增明確「測試配裝」按鈕，詳情頁新增「DEV 測試配裝」；仍只寫 transient devPreviewRelicId，不寫正式 playerRelics/teamLoadout 存檔。"
     },
@@ -53,31 +53,30 @@
   },
   "dimOpacity": 0.75,
   "verification": [
-    "PASS: JavaScript syntax for js/60-team-relic-system.js",
-    "PASS: relic cinematic target reveal / DEV testing equip contract",
-    "PASS: battle presentation sequencing contract",
-    "PASS: full npm test in temporary pre-PR verification run 35414244247",
+    "PASS: JavaScript syntax",
+    "PASS: relic cinematic identity/target/DEV equip contract",
+    "PASS: battle presentation sequencing",
+    "PASS: full Repository Node tests in temporary verification run 35414244247",
     "PASS: production build generation and npm run build:check",
     "PASS: PR #327 Repository checks run 35414414580",
-    "PASS: Adventure V1 targeted regression",
-    "PASS: Fixed Slot battlefield rendering regression",
-    "PASS: battle layout, timing and range-VFX regressions",
     "PASS: Fixed Slot battlefield 9x16 mobile browser QA",
     "PASS: exact-candidate real battle mobile browser QA",
     "PASS: Adventure V1 mobile browser QA",
-    "PASS: static local resources / duplicate HTML IDs / loader integrity",
-    "PASS: Release/cache/checklist/deprecated-code gates",
-    "PASS: Git whitespace and conflict marker check"
+    "PASS: static local resources and duplicate HTML IDs",
+    "PASS: release entries / loader integrity",
+    "PASS: Release, cache, checklist and deprecated-code gates",
+    "PASS: Git whitespace and conflict markers"
   ],
   "preMergeEvidence": {
-    "prePrFullVerificationRun": 35414244247,
+    "temporaryVerificationRun": 35414244247,
     "officialPrCiRun": 35414414580,
-    "pullRequest": 327,
     "repositoryChecks": "PASS",
     "fixedSlot9x16MobileQa": "PASS",
     "exactCandidateRealBattleMobileQa": "PASS",
     "adventureMobileQa": "PASS",
+    "buildSynchronization": "PASS",
     "releaseGate": "PASS",
-    "finalScope": "8 formal files before verification record update; no temporary workflow or browser-QA artifacts"
-  }
+    "cleanFinalDiff": "runtime/CSS, synchronized hashed build, manifests, tests and requirement batch only; no temporary workflow or generated browser-QA artifacts"
+  },
+  "pullRequest": 327
 }
