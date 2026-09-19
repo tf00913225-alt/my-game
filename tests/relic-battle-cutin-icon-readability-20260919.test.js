@@ -38,7 +38,7 @@ assert.match(relic,/const finishProbe=shouldHoldMonsterActionFinishForRelic\(har
   "monster-action finish must be held before the legacy owner schedules the next combatant and released after trigger dispatch");
 
 assert.ok(
-  relic.includes('team-relic-battle-icon"><img src="'+esc(def.battleIconPath||def.iconPath||"")'),
+  relic.includes(`team-relic-battle-icon"><img src="'+esc(def.battleIconPath||def.iconPath||"")`),
   "the auxiliary banner must use the battle icon instead of the legacy glyph"
 );
 assert.match(relic,/def\.battleIconPath\|\|def\.iconPath\|\|""/,
