@@ -201,6 +201,16 @@ test("resolved group targets and successful deferred statuses remain authoritati
     assert.match(v143,/if\(types\.indexOf\(type\)>=0\)\{[\s\S]*?registerTarget\(side,index,false\);[\s\S]*?current\.deferredStatusTargets\.get\(type\)/);
 });
 
+
+test("V143 status VFX synchronization avoids duplicate full-battle scans",()=>{
+    assert.match(v143,/function syncStatusSpritesForUnit\(side,index\)/);
+    assert.match(v143,/statusAtStart:snapshotTimedEffects\(model\)/);
+    assert.match(v143,/function snapshotTimedEffects\(model\)[\s\S]*relevantTypes/);
+    assert.doesNotMatch(v143,/updateUI=function\(\)\{[\s\S]*?setTimer\(syncStatusSpriteEffects,0\)/);
+    assert.match(v143,/updateMonsterUI=function\(index\)[\s\S]*?syncStatusSpritesForUnit\("monster",Number\(index\)\)/);
+    assert.match(v143,/updateSingleCharacterStatusBadge=function\(index\)[\s\S]*?syncStatusSpritesForUnit\("player",Number\(index\)\)/);
+});
+
 test("secondary status owners cannot recreate procedural combat VFX",()=>{
     assert.doesNotMatch(v143fixes,/v143-earth-shield-effect/);
     assert.doesNotMatch(v155,/v143SkillAnimationManifest/);
