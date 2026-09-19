@@ -1134,37 +1134,7 @@
         };
     }
 
-    if(typeof renderShopContent==="function"){
-        const originalRenderShopContent=renderShopContent;
-        renderShopContent=function(){
-            return '<div class="v141-shop-wallet">目前金幣 <b>'+Math.floor(gold).toLocaleString("zh-TW")+'</b></div>'+
-                originalRenderShopContent.apply(this,arguments);
-        };
-    }
-
-    if(typeof buyShopItem==="function"){
-        const originalBuyShopItem=buyShopItem;
-        buyShopItem=async function(itemId,requestedQuantity){
-            const item=getPotionDefinition(itemId);
-            const quantity=Math.max(1,Math.min(9999,Math.floor(Number(requestedQuantity)||1)));
-            if(!item){ return; }
-            const total=(Number(item.price)||0)*quantity;
-            if(
-                typeof window.rpgConfirm!=="function" ||
-                !await window.rpgConfirm(
-                    "確認購買「"+item.name+"」×"+quantity+"？\n將消耗 "+total.toLocaleString("zh-TW")+" 金幣。",
-                    {
-                        title:"商店購買",
-                        confirmText:"確定購買",
-                        cancelText:"返回"
-                    }
-                )
-            ){
-                return;
-            }
-            return originalBuyShopItem.apply(this,arguments);
-        };
-    }
+    /* Shop render/purchase ownership is finalized by V144; legacy V141 wrappers removed. */
 
     function compactElementBoxPanel(){
         const panel=document.getElementById("autoBattleSettingsPanel");
