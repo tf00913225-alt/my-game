@@ -6,6 +6,7 @@ const {getAuth:getAdminAuth}=require("firebase-admin/auth");
 const {FieldValue,Timestamp,getFirestore}=require("firebase-admin/firestore");
 const {setGlobalOptions}=require("firebase-functions/v2");
 const {HttpsError,onCall}=require("firebase-functions/v2/https");
+const {createSessionAuthority}=require("./src/session-authority");
 
 const {
     CLOUD_SAVE_SCHEMA_VERSION,
@@ -15,6 +16,7 @@ const {
 }=require("./src/cloud-save-policy");
 
 initializeApp();
+const sessions=createSessionAuthority({db:getFirestore(),FieldValue,HttpsError});
 
 const REGION="us-central1";
 const PUBLIC_SAVE_PATH_SEGMENTS=["saves","current"];
@@ -72,6 +74,44 @@ function serverUserRef(db,uid){
     return db.collection("serverUsers").doc(uid);
 }
 
+/* Callable verifies the signature; additionally reject disabled users and
+ * revoked Firebase refresh sessions at every game-authority entry point. */
+async function verifyGameIdentity(request){
+    const uid=requireUid(request);
+    const bearer=request.rawRequest?.headers?.authorization;
+    if(typeof bearer!=="string"||!bearer.startsWith("Bearer ")){
+        throw new HttpsError("unauthenticated","AUTH_REQUIRED",{code:"AUTH_REQUIRED"});
+    }
+    try{
+        const decoded=await getAdminAuth().verifyIdToken(bearer.slice(7),true);
+        if(decoded.uid!==uid){ throw new Error("UID mismatch"); }
+        if(decoded.authBridge==="android-facebook"){
+            const user=await getAdminAuth().getUser(uid);
+            const source=decoded.sessionSourceAuthTime;
+            if(!Number.isSafeInteger(source)||source<=0||source>decoded.auth_time||
+               source*1000<Date.parse(user.tokensValidAfterTime)){
+                throw new Error("Native source login is invalid or revoked");
+            }
+        }
+        return {...request,auth:{uid,token:decoded}};
+    }catch(_){
+        throw new HttpsError("unauthenticated","AUTH_REQUIRED",{code:"AUTH_REQUIRED"});
+    }
+}
+
+exports.createGameSession=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await sessions.create(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+exports.revokeGameSession=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await sessions.revoke(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+exports.protectedTest=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await sessions.protectedTest(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+
 function nativeAuthCodeHash(code){
     return createHash("sha256").update(code,"utf8").digest("hex");
 }
@@ -81,6 +121,7 @@ function nativeAuthHandoffRef(db,code){
 }
 
 exports.createNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
+    request=await verifyGameIdentity(request);
     const uid=requireUid(request);
     const provider=authProvider(request);
     if(provider!=="facebook.com"){
@@ -95,12 +136,14 @@ exports.createNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
         const db=getFirestore();
         const now=Date.now();
         const reference=nativeAuthHandoffRef(db,code);
-        await reference.set({
-            uid,
-            provider,
-            createdAt:Timestamp.fromMillis(now),
-            expiresAt:Timestamp.fromMillis(now+NATIVE_AUTH_HANDOFF_TTL_MS),
-            used:false
+        await db.runTransaction(async transaction=>{
+            await sessions.requireCurrentLoginEpoch(transaction,uid,request.auth.token.auth_time);
+            transaction.create(reference,{
+                uid,provider,authTime:request.auth.token.auth_time,
+                createdAt:Timestamp.fromMillis(now),
+                expiresAt:Timestamp.fromMillis(now+NATIVE_AUTH_HANDOFF_TTL_MS),
+                used:false
+            });
         });
         return {
             ok:true,
@@ -124,7 +167,7 @@ exports.redeemNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
     try{
         const db=getFirestore();
         const reference=nativeAuthHandoffRef(db,code);
-        const uid=await db.runTransaction(async(transaction)=>{
+        const handoff=await db.runTransaction(async(transaction)=>{
             const snapshot=await transaction.get(reference);
             if(!snapshot.exists){
                 throw new HttpsError("not-found","Native auth handoff is missing or already used.");
@@ -146,20 +189,23 @@ exports.redeemNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
                 transaction.delete(reference);
                 throw new HttpsError("data-loss","Native auth handoff has no Firebase UID.");
             }
+            const authTime=snapshot.get("authTime");
+            await sessions.requireCurrentLoginEpoch(transaction,ownerUid,authTime);
             transaction.delete(reference);
-            return ownerUid;
+            return {uid:ownerUid,authTime};
         });
 
-        const customToken=await getAdminAuth().createCustomToken(uid,{
-            authBridge:"android-facebook"
+        const customToken=await getAdminAuth().createCustomToken(handoff.uid,{
+            authBridge:"android-facebook",sessionSourceAuthTime:handoff.authTime
         });
-        return {ok:true,uid,customToken};
+        return {ok:true,uid:handoff.uid,customToken};
     }catch(error){
         throw asHttpsError(error);
     }
 });
 
 exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
+    request=await verifyGameIdentity(request);
     const uid=requireUid(request);
     const db=getFirestore();
     const userRef=db.collection("users").doc(uid);
@@ -168,7 +214,7 @@ exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
     const provider=authProvider(request);
 
     try{
-        const result=await db.runTransaction(async(transaction)=>{
+        const result=await sessions.runProtected(request,async(transaction)=>{
             const [userSnapshot,saveSnapshot,privateSnapshot]=await Promise.all([
                 transaction.get(userRef),
                 transaction.get(saveRef),
@@ -253,6 +299,7 @@ exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
 });
 
 exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
+    request=await verifyGameIdentity(request);
     const uid=requireUid(request);
 
     try{
@@ -266,7 +313,7 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
         const privateRef=serverUserRef(db,uid);
         const candidateRef=privateRef.collection("migrationCandidates").doc("latest");
 
-        const result=await db.runTransaction(async(transaction)=>{
+        const result=await sessions.runProtected(request,async(transaction)=>{
             const [saveSnapshot,privateSnapshot,candidateSnapshot]=await Promise.all([
                 transaction.get(saveRef),
                 transaction.get(privateRef),

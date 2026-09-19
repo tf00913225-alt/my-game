@@ -12,25 +12,21 @@ import {
     getDoc,
     getFirestore
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
-import {
-    getFunctions,
-    httpsCallable
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-functions.js";
+import {CLOUD_FUNCTIONS_REGION,callProtectedFunction} from "./firebase-session.cb0907b5ca79.js";
 
 import {
     getFirebaseApp,
     getFirebaseAuth,
     initializeFirebaseAuth
-} from "./firebase-auth.86313ff8c064.js";
+} from "./firebase-auth.6a269762828f.js";
 
 export const CLOUD_SAVE_WRITE_POLICY = "trusted-backend-only";
-export const CLOUD_FUNCTIONS_REGION = "us-central1";
+export {CLOUD_FUNCTIONS_REGION};
 export const CURRENT_SAVE_SUBCOLLECTION = "saves";
 export const CURRENT_SAVE_DOCUMENT = "current";
 export const LEGACY_LOCAL_SAVE_KEY = "battle_full_version_save_v5";
 
 let firestore = null;
-let functions = null;
 
 async function ensureFirebaseApp(){
     await initializeFirebaseAuth();
@@ -47,12 +43,6 @@ async function ensureFirestore(){
     const app = await ensureFirebaseApp();
     if(!firestore){ firestore = getFirestore(app); }
     return firestore;
-}
-
-async function ensureFunctions(){
-    const app = await ensureFirebaseApp();
-    if(!functions){ functions = getFunctions(app, CLOUD_FUNCTIONS_REGION); }
-    return functions;
 }
 
 function requireSignedInUid(){
@@ -96,11 +86,8 @@ function readLegacyLocalSave(){
 }
 
 async function callTrustedFunction(name, payload){
-    requireSignedInUid();
-    const callableFunctions = await ensureFunctions();
-    const callable = httpsCallable(callableFunctions, name, { timeout: 30000 });
-    const result = await callable(payload || {});
-    return result && result.data ? result.data : null;
+    const expectedUid=requireSignedInUid();
+    return callProtectedFunction(name,payload||{},expectedUid);
 }
 
 export async function readCurrentCloudSave(){

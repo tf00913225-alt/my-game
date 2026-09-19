@@ -201,7 +201,7 @@ if(!checkOnly){
 
 const firebaseMap={};
 const firebaseOutputs=[];
-for(const name of ["firebase-config.js","firebase-auth.js","firebase-cloud-save.js","firebase-auth-ui.js","firebase-bootstrap.js"]){
+for(const name of ["firebase-config.js","firebase-auth.js","session-client.js","firebase-session.js","firebase-cloud-save.js","firebase-auth-ui.js","firebase-bootstrap.js"]){
     const module=firebaseModule(name,firebaseMap); firebaseMap[name]=module.path; firebaseOutputs.push(module);
 }
 

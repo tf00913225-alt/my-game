@@ -116,7 +116,8 @@ function renderResumeCountdown(){
 function render(){
     if(!installed){ return; }
     const status=byId("firebaseAuthStatus");
-    status.textContent=state.message||""; status.classList.toggle("is-error",state.error===true);
+    status.textContent=state.sessionError||state.message||"";
+    status.classList.toggle("is-error",!!state.sessionError||state.error===true);
     const signedOut=byId("firebaseSignedOutPanel"); const signedIn=byId("firebaseSignedInPanel");
     const resume=byId("firebaseAuthResumePanel");
     if(resume){ resume.hidden=!resumeActive; }

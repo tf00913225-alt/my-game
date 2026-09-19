@@ -9,3 +9,10 @@
 /android/facebook-login-poc/build/
 /android/facebook-login-poc/app/build/
 /android/facebook-login-poc/*.apk
+
+# Local Firebase tooling and emulator output; credentials never enter git.
+node_modules/
+*-debug.log
+firebase-debug.*.log
+.firebase/
+gha-creds-*.json

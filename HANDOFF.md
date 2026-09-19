@@ -1,3 +1,12 @@
+## 2026-09-19 — Cloud Account Phase 1：Single Active Session（實作中）
+
+- 基準 `dev@7dd60dcddc9334902e058123a6084a93353e5943`；分支 `feature/cloud-session-authority-phase1-20260919`，只整合 `dev`，`main` 禁止修改。
+- 長期進度唯一來源：[docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md](docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md)。後續每個 Cloud Save Phase 必須更新；內含 14 項稽核、十階段狀態、永久決策、風險與下一步。基準缺少 `DATA_SECURITY_CONTRACTS.md`，已如實記錄。
+- 新 owner：`functions/src/session-authority.js`；新增 `createGameSession`／`revokeGameSession`／`protectedTest`。兩支既有存檔 callable 在同一 Firestore transaction 內驗證 active session 與寫入；native auth handoff 加 source authTime 防繞過，仍只做身分交換。
+- Client owner：`js/firebase/session-client.js`＋`firebase-session.js`；auth/bootstrap／readonly cloud-save 接入，不包裝 gameplay save、不搬玩家資料、不改 UI 版面；所有 error 明確且不自動重試寫入／搶回 session。
+- 已有精準登入／啟動／UID／session client 測試通過；emulator、CI、部署與雲端雙裝置結果請看長期進度文件，不以已提交或 CI 綠燈宣稱正式驗收完成。
+- 下一步：先完成 Phase 1 exact-SHA 部署／A→B takeover 驗收，再開始 Phase 2 save envelope；不得略過 session transaction gate 或直接提升 local snapshot 為權威。
+
 ## 2026-09-18 — 20 件秘寶 4×3 VFX WebP 與戰鬥演出整合
 
 - 工作分支：`feature/relic-vfx-animation-20260918`；基準為 `dev@d91687cb09d04519766d8303c331945508bde3a5`，`main` 不修改。

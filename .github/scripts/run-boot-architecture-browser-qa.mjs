@@ -12,6 +12,7 @@ const evidenceFile=path.join(artifactDir,"boot-architecture-browser-qa.json");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 const authPath="/"+Object.keys(manifest.assets).find(file=>/build\/firebase\/firebase-auth\.[0-9a-f]{12}\.js$/.test(file));
 const cloudPath="/"+Object.keys(manifest.assets).find(file=>/build\/firebase\/firebase-cloud-save\.[0-9a-f]{12}\.js$/.test(file));
+const sessionPath="/"+Object.keys(manifest.assets).find(file=>/build\/firebase\/firebase-session\.[0-9a-f]{12}\.js$/.test(file));
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const qaReadyFirstPlayRecord={
     gameVersion:String(manifest.release||""),
@@ -47,6 +48,7 @@ window.__qaAuthUser=current;
 export function getFirebaseAuthConfigStatus(){return Object.freeze({ready:true,missingFields:[],projectId:"boot-qa",sdkVersion:"qa"});}
 export async function initializeFirebaseAuth(){return Object.freeze({app:{name:"boot-qa"},auth:{currentUser:current}});}
 export function getFirebaseApp(){return {name:"boot-qa"};}
+export function installFirebaseSessionHooks(){}
 export function getFirebaseAuth(){return {currentUser:current};}
 export function getSignedInUser(){return current;}
 export async function observeFirebaseAuthState(listener){listeners.add(listener);queueMicrotask(()=>{if(scenario==="auth-error"){const error=new Error("simulated auth network failure");error.code="auth/network-request-failed";listener(null,error);}else{listener(current,null);}});return ()=>listeners.delete(listener);}
@@ -83,6 +85,19 @@ export async function readCurrentCloudSave(){
 }
 export async function bootstrapTrustedCloudSave(){return {status:"qa-no-write"};}
 export async function submitLegacyMigrationCandidate(){throw new Error("QA never performs a cloud write");}
+`;
+
+/* Boot QA is offline: a missing session backend must never bypass auth or
+   block the existing read-only/local boot. Session enforcement has its own
+   real Auth/Functions/Firestore emulator test. */
+const fakeSession=String.raw`
+export const CLOUD_FUNCTIONS_REGION="qa-local";
+export async function synchronizeGameSession(user){
+  window.dispatchEvent(new CustomEvent("four-symbols:game-session-state",{detail:{uid:user?.uid||null,status:user?"unavailable":"signed-out",code:user?"SESSION_UNAVAILABLE":null}}));
+}
+export async function revokeGameSession(){}
+export async function protectedTest(){throw Object.assign(new Error("SESSION_UNAVAILABLE"),{code:"SESSION_UNAVAILABLE"});}
+export function getGameSessionState(){return {status:"unavailable",code:"SESSION_UNAVAILABLE"};}
 `;
 
 function qaPrelude(){
@@ -157,6 +172,7 @@ async function createQaServer(){
             const fetchDest=String(request.headers["sec-fetch-dest"]||"");
             if(url.pathname===authPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}
             if(url.pathname===cloudPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
+            if(url.pathname===sessionPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeSession);return;}
             const relative=decodeURIComponent(url.pathname==="/"?"index.html":url.pathname.slice(1));
             if(relative==="index.html"){ activeScenario=url.searchParams.get("scenario")||""; injected404=false; }
             // resource-404 is injected in-page so retry behavior is deterministic per navigation.
