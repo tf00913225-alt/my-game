@@ -179,13 +179,13 @@ async function waitFor(client,expression,label,timeoutMs=12000){
 async function runViewport(chrome,fixtureUrl,width,height){
     const profile=fs.mkdtempSync(path.join(os.tmpdir(),"release-update-browser-qa-"));
     const port=9300+Math.floor(Math.random()*400);
-    const process=spawn(chrome,[
+    const chromeProcess=spawn(chrome,[
         "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
         "--remote-debugging-address=127.0.0.1","--remote-debugging-port="+port,
         "--user-data-dir="+profile,"about:blank"
     ],{stdio:["ignore","ignore","pipe"]});
     let stderr="";
-    process.stderr.on("data",chunk=>{stderr+=String(chunk);});
+    chromeProcess.stderr.on("data",chunk=>{stderr+=String(chunk);});
     let client=null;
     try{
         const targets=await waitForJson("http://127.0.0.1:"+port+"/json/list");
@@ -258,8 +258,24 @@ async function runViewport(chrome,fixtureUrl,width,height){
         return {viewport:[width,height],marquee,modal};
     }finally{
         client&&client.close();
-        process.kill("SIGTERM");
-        fs.rmSync(profile,{recursive:true,force:true});
+        if(chromeProcess.exitCode===null){
+            await new Promise(resolve=>{
+                let settled=false;
+                const finish=()=>{
+                    if(settled){ return; }
+                    settled=true;
+                    clearTimeout(timeout);
+                    resolve();
+                };
+                const timeout=setTimeout(()=>{
+                    if(chromeProcess.exitCode===null){ chromeProcess.kill("SIGKILL"); }
+                    finish();
+                },1200);
+                chromeProcess.once("exit",finish);
+                chromeProcess.kill("SIGTERM");
+            });
+        }
+        fs.rmSync(profile,{recursive:true,force:true,maxRetries:4,retryDelay:80});
     }
 }
 
