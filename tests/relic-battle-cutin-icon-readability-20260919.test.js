@@ -27,8 +27,10 @@ assert.match(relic,/RELIC_MIN_VISUAL_PROTECTION_MS=1200/,
 
 assert.match(relic,/function beginRelicCinematic\(def,target\)[\s\S]*classList\.add\("dim-visible"\)[\s\S]*waitMs\(RELIC_DIM_IN_MS\)[\s\S]*classList\.add\("identity-visible"\)[\s\S]*waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*revealRelicTargets\(target\)/,
   "cinematic prelude must dim first, reveal identity second, then reveal the real resolved targets");
-assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*battleMonster[\s\S]*battlePlayerCard[\s\S]*team-relic-battle-target-focus-visible/,
-  "target reveal must use the actual battle unit roots so artwork, name and resource HUD brighten together");
+assert.match(relic,/function relicTargetCard\(side,index\)[\s\S]*battleMonster[\s\S]*battlePlayerCard/,
+  "target lookup must resolve the actual battle unit roots");
+assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*relicTargetCard\(target\.targetSide,index\)[\s\S]*team-relic-battle-target-focus-visible/,
+  "target reveal must focus those real unit roots so artwork, name and resource HUD brighten together");
 assert.match(relic,/function queueRelicPresentation\(def,onStart,visualContext\)[\s\S]*beginRelicCinematic\(def,resolvedTarget\)[\s\S]*enterRelicVfxPhase\(node\)[\s\S]*playRelicVfx\([\s\S]*resolvedTarget[\s\S]*relicGate&&relicGate\.promise[\s\S]*endRelicCinematic\(node\)/,
   "formal relic VFX must start only after target reveal, and battlefield restore must wait for the V143 gate to finish");
 assert.match(relic,/function endRelicCinematic\(node\)[\s\S]*classList\.add\("releasing"\)[\s\S]*waitMs\(RELIC_DIM_OUT_MS\)/,
