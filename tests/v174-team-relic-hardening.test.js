@@ -2,6 +2,7 @@
 const fs=require("fs"),vm=require("vm"),assert=require("node:assert/strict");
 const summarySource=fs.readFileSync("js/relic-summary-catalog.js","utf8");
 const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
+assert.match(summarySource,/FourSymbolsRelicSummaryCatalog/,"hardening harness must load the formal first-screen relic summary bridge before the full relic runtime");
 
 function make(){
  const store=new Map([["save",JSON.stringify({player:{id:"甲"},gold:99999})]]);
