@@ -1,5 +1,15 @@
 ## 2026-09-19 — DEV 正式版本公告視覺預覽（VERIFIED／main 未修改）
 
+## 2026-09-19 — V173.66 DEV 發布驗證（REL-01～04 VERIFIED／main PENDING）
+
+- V173.66 release candidate PR #349 的候選 CI runs `35453776605`、`35454779325` 已 SUCCESS。
+- 候選合併後 `dev@7d8a7180afc2c054b5966048e172f171a2fe5a8b`，push CI run `35454884505` SUCCESS；Repository checks job `105928300907`、Dev deployment gate job `105928430038` 均 SUCCESS。
+- DEV 部署 job 已逐步通過：仍為 dev HEAD、Release Gate、immutable static site、Cloudflare deploy、部署後 Commit SHA／Game Version／Cache Version 驗證、deployed battle/VFX live QA。
+- 正式版本：Game Version `V173.66`，Cache Version `173.66`；正式公告 `release-v17366` 已依實際 main...dev 玩家可感知差異整理。
+- Requirement Batch：`release/requirement-batches/2026-09-19-v17366-main-release.json`。REL-01～04 VERIFIED；REL-05 等待 protected `dev → main` PR、main CI 與 production SHA 驗證。
+- 本文件收尾 PR 只記錄 DEV 發布證據，不修改玩法／數值／runtime。
+
+
 ## 2026-09-19 — Release Update 每次登入公告 + 今日不再提醒（3/3 VERIFIED）
 
 - Base：`dev@d2dfc01045ddead0e6ca71888334dc9c8eddccf7`；工作分支：`feature/release-update-daily-login-reminder-20260919`；`main` 不修改。

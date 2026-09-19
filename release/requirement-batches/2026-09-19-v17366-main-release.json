@@ -19,7 +19,7 @@
     },
     {
       "id": "REL-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "依 main...dev 玩家可感知差異產生 V173.66 正式公告、CHANGELOG、Game/Cache Version 與 deterministic build。",
       "evidence": [
         "release/release.json",
@@ -28,7 +28,9 @@
         "js/20-anonymous-20.js",
         "package.json",
         "asset-manifest.json",
-        "build/asset-manifest.json"
+        "build/asset-manifest.json",
+        "PR #349 candidate source verified by CI runs 35453776605 and 35454779325",
+        "V173.66 release/release.json + release-update.json + CHANGELOG + deterministic hashed build synchronized"
       ]
     },
     {
@@ -47,9 +49,17 @@
     },
     {
       "id": "REL-04",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "發布候選合併 dev 後，dev HEAD CI 與 Cloudflare DEV exact-SHA deployment 成功。",
-      "evidence": []
+      "evidence": [
+        "dev merge commit 7d8a7180afc2c054b5966048e172f171a2fe5a8b",
+        "push CI run 35454884505 SUCCESS",
+        "Repository checks job 105928300907 SUCCESS",
+        "Dev deployment gate / Deploy dev preview job 105928430038 SUCCESS",
+        "Confirm this commit is still dev HEAD SUCCESS",
+        "Verify deployed commit, game version and cache version SUCCESS",
+        "deployed battle layout and VFX live QA SUCCESS"
+      ]
     },
     {
       "id": "REL-05",
@@ -58,10 +68,12 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "REL-03 VERIFIED on PR #349 CI run 35453776605; awaiting merge to dev and exact-SHA DEV deployment before REL-04.",
-  "visualVerification": "Release Update mobile browser QA, Fixed Slot mobile QA, exact-candidate battle QA and Adventure mobile QA SUCCESS on PR #349 CI run 35453776605.",
-  "verifiedSourceCommit": "8da0de53a00199fbefb91ed358beeb3e6c99d728",
-  "mergedDevCommit": null,
+  "automatedVerification": "REL-01..04 VERIFIED. PR #349 candidate CI runs 35453776605 / 35454779325 SUCCESS; dev push CI/deploy run 35454884505 SUCCESS with exact-SHA, V173.66 and cache 173.66 verification. REL-05 remains pending protected main promotion.",
+  "visualVerification": "Release Update mobile browser QA, Fixed Slot mobile QA, exact-candidate battle QA and Adventure mobile QA passed on the V173.66 candidate; deployed DEV battle layout/VFX live QA passed on run 35454884505.",
+  "verifiedSourceCommit": "9e2ba867f1008a16366acf6505ab3a8efed8dad5",
+  "mergedDevCommit": "7d8a7180afc2c054b5966048e172f171a2fe5a8b",
   "mergedMainCommit": null,
-  "candidateCiRun": 35453776605
+  "candidateCiRun": 35453776605,
+  "devPushCiRun": 35454884505,
+  "devDeployJob": 105928430038
 }
