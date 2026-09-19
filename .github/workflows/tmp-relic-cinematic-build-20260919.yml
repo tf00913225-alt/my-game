@@ -34,6 +34,9 @@ jobs:
       - name: Battle presentation sequencing
         run: node tests/v174-battle-presentation-sequencing.test.js
 
+      - name: Install ImageMagick for repository asset suites
+        run: sudo apt-get update -qq && sudo apt-get install -y imagemagick
+
       - name: Full repository tests
         run: npm test
 
