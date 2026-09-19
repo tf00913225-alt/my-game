@@ -268,6 +268,7 @@
     let relicFinishRetryTimer=0;
     let relicCutinNode=null;
     let relicFocusedTargetCards=[];
+    let relicFocusedTargetLayers=[];
     let devPreviewRelicId=null;
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
@@ -299,15 +300,23 @@
     }
     function clearRelicTargetFocus(){
         const cards=relicFocusedTargetCards.slice();
+        const layers=relicFocusedTargetLayers.slice();
         relicFocusedTargetCards=[];
+        relicFocusedTargetLayers=[];
         cards.forEach(card=>{
             if(card&&card.classList){
                 card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
             }
         });
+        layers.forEach(layer=>{
+            if(layer&&layer.classList){ layer.classList.remove("team-relic-battle-target-layer"); }
+        });
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
             document.querySelectorAll(".team-relic-battle-target-focus,.team-relic-battle-target-focus-visible").forEach(card=>{
                 card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
+            });
+            document.querySelectorAll(".team-relic-battle-target-layer").forEach(layer=>{
+                layer.classList.remove("team-relic-battle-target-layer");
             });
         }
     }
@@ -321,12 +330,21 @@
         if(typeof document==="undefined"||!Number.isInteger(index)){ return null; }
         return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
     }
+    function relicTargetLayer(card){
+        if(!card){ return null; }
+        if(typeof card.closest==="function"){
+            return card.closest(".v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint")||card;
+        }
+        return card;
+    }
     function revealRelicTargets(target){
         clearRelicTargetFocus();
         const cards=target&&Array.isArray(target.targetIds)
             ?target.targetIds.map(index=>relicTargetCard(target.targetSide,index)).filter(Boolean)
             :[];
         relicFocusedTargetCards=Array.from(new Set(cards));
+        relicFocusedTargetLayers=Array.from(new Set(relicFocusedTargetCards.map(relicTargetLayer).filter(Boolean)));
+        relicFocusedTargetLayers.forEach(layer=>layer.classList.add("team-relic-battle-target-layer"));
         relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus"));
         const show=()=>relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus-visible"));
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(show); }else{ show(); }
@@ -335,7 +353,8 @@
     function beginRelicCinematic(def,target){
         if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
         cleanupRelicCutin();
-        const host=document.getElementById("battlePage");
+        const battlePage=document.getElementById("battlePage");
+        const host=battlePage&&typeof battlePage.querySelector==="function"?battlePage.querySelector(".battle-wrap"):null;
         if(!host){ return Promise.resolve(null); }
         const node=document.createElement("div");
         node.id="teamRelicBattlePresentation";
