@@ -446,8 +446,14 @@
         );
     }
 
-    function snapshotTimedEffects(){
+    function snapshotTimedEffects(model){
         const snapshot=new Set();
+        const relevantTypes=Array.from(new Set(
+            []
+                .concat(Array.isArray(model&&model.deferredStatusTypes)?model.deferredStatusTypes:[])
+                .concat(Array.isArray(model&&model.deferredActorStatusTypes)?model.deferredActorStatusTypes:[])
+        )).filter(type=>!!STATUS_SPRITES[type]);
+        if(!relevantTypes.length){ return snapshot; }
         const groups=[
             ["monster",typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[]],
             ["player",[0,1,2,3,4,5]]
@@ -455,7 +461,7 @@
         groups.forEach(entry=>{
             entry[1].forEach(index=>{
                 const entity=entityFor(entry[0],index);
-                Object.keys(RAW_STATUS_SPRITES).forEach(type=>{
+                relevantTypes.forEach(type=>{
                     if(hasTimedEffect(entity,type)){ snapshot.add(entry[0]+":"+index+":"+type); }
                 });
             });
@@ -539,12 +545,43 @@
         }
     }
 
+    function syncStatusSpritesForUnit(side,index){
+        Object.keys(RAW_STATUS_SPRITES).forEach(type=>syncStatusSprite(side,index,type));
+    }
+
     function syncStatusSpriteEffects(){
         purgeLegacyCardVfx();
-        const types=Object.keys(RAW_STATUS_SPRITES);
         const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
-        enemyIndexes.forEach(index=>types.forEach(type=>syncStatusSprite("monster",index,type)));
-        for(let index=0;index<6;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }
+        enemyIndexes.forEach(index=>syncStatusSpritesForUnit("monster",index));
+        for(let index=0;index<6;index++){ syncStatusSpritesForUnit("player",index); }
+    }
+
+    let statusSyncTimer=0;
+    let statusFullSyncQueued=false;
+    const statusUnitSyncQueue=new Map();
+
+    function flushStatusSpriteSyncQueue(){
+        statusSyncTimer=0;
+        if(statusFullSyncQueued){
+            statusFullSyncQueued=false;
+            statusUnitSyncQueue.clear();
+            syncStatusSpriteEffects();
+            return;
+        }
+        const pending=Array.from(statusUnitSyncQueue.values());
+        statusUnitSyncQueue.clear();
+        pending.forEach(entry=>syncStatusSpritesForUnit(entry.side,entry.index));
+    }
+
+    function queueStatusSpriteEffects(side,index){
+        if((side==="player"||side==="monster")&&Number.isInteger(index)){
+            if(!statusFullSyncQueued){ statusUnitSyncQueue.set(side+":"+index,{side:side,index:index}); }
+        }else{
+            statusFullSyncQueued=true;
+            statusUnitSyncQueue.clear();
+        }
+        if(statusSyncTimer){ return; }
+        statusSyncTimer=setTimeout(flushStatusSpriteSyncQueue,0);
     }
 
     function removeStatusSpriteEffects(){
@@ -850,7 +887,7 @@
         const card=cardFor(current.targetSide,index);
         if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
         current.hitReached=true;
-        syncStatusSpriteEffects();
+        queueStatusSpriteEffects(current.targetSide,index);
     }
 
     function emitSprite(current,index,allowDefeated){
@@ -887,7 +924,7 @@
             state.stage.remove();
         }
         if(state.current===current){ state.current=null; state.stage=null; }
-        syncStatusSpriteEffects();
+        queueStatusSpriteEffects();
         state.metrics.completed++;
         if(current.gate&&!current.gate.done){ current.gate.complete(reason||"v143-raster-complete"); }
     }
@@ -931,7 +968,7 @@
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
-            spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
+            spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(model),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,
             duration:duration,hitReached:false,done:false,cleanupTimer:0
@@ -1009,6 +1046,9 @@
 
     director.dispose=function(){
         clearTimers();
+        if(statusSyncTimer){ clearTimeout(statusSyncTimer); statusSyncTimer=0; }
+        statusFullSyncQueued=false;
+        statusUnitSyncQueue.clear();
         if(state.current&&!state.current.done){ cleanupCurrent(state.current,"dispose"); }
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
             document.querySelectorAll("#v143-skill-stage").forEach(node=>node.remove());
@@ -1118,8 +1158,7 @@
         }
         const wait=delayFor(side,index,false);
         const invoke=function(){
-            syncStatusSpriteEffects();
-            setTimer(syncStatusSpriteEffects,0);
+            queueStatusSpriteEffects(side,Number(index));
         };
         if(wait>8){ setTimer(invoke,wait); }else{ invoke(); }
     }
@@ -1166,15 +1205,13 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previous.apply(this,args);
-                        syncStatusSpriteEffects();
-                        setTimer(syncStatusSpriteEffects,0);
+                        queueStatusSpriteEffects("monster",Number(index));
                     },wait);
                 }
                 return;
             }
             const result=previous.apply(this,arguments);
-            syncStatusSpriteEffects();
-            setTimer(syncStatusSpriteEffects,0);
+            queueStatusSpriteEffects("monster",Number(index));
             return result;
         };
     }
@@ -1183,10 +1220,10 @@
         const previous=updateUI;
         updateUI=function(){
             const result=previous.apply(this,arguments);
-            syncStatusSpriteEffects();
-            /* Later wrappers can synchronously recreate V141 legacy layers.
-               Purge once more after the complete wrapper stack unwinds. */
-            setTimer(syncStatusSpriteEffects,0);
+            /* Coalesce the complete wrapper stack into one status pass.
+               This preserves legacy-layer cleanup without scanning the whole
+               battlefield twice for every UI refresh. */
+            queueStatusSpriteEffects();
             return result;
         };
     }
@@ -1203,15 +1240,13 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previous.apply(this,args);
-                        syncStatusSpriteEffects();
-                        setTimer(syncStatusSpriteEffects,0);
+                        queueStatusSpriteEffects("player",Number(index));
                     },wait);
                 }
                 return;
             }
             const result=previous.apply(this,arguments);
-            syncStatusSpriteEffects();
-            setTimer(syncStatusSpriteEffects,0);
+            queueStatusSpriteEffects("player",Number(index));
             return result;
         };
     }
