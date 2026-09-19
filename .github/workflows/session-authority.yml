@@ -1,0 +1,108 @@
+name: Session Authority
+
+on:
+  pull_request:
+    branches: [dev]
+    paths:
+      - 'functions/**'
+      - 'js/firebase/**'
+      - 'firestore.rules'
+      - 'firebase*.json'
+      - 'scripts/test-session-authority-emulator.mjs'
+      - 'tests/session-*.test.mjs'
+      - '.github/workflows/session-authority.yml'
+  push:
+    branches: [dev]
+    paths:
+      - 'functions/**'
+      - 'js/firebase/**'
+      - 'firestore.rules'
+      - 'firebase*.json'
+      - 'scripts/test-session-authority-emulator.mjs'
+      - 'tests/session-*.test.mjs'
+      - '.github/workflows/session-authority.yml'
+
+permissions:
+  contents: read
+  checks: read
+
+concurrency:
+  group: session-authority-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  emulator:
+    name: Session authority emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm --prefix functions ci --no-audit --no-fund
+      - run: node --test tests/session-client.test.mjs
+      - name: Verify account boot with session backend unavailable
+        run: node .github/scripts/run-boot-architecture-browser-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: session-authority-boot-${{ github.sha }}
+          path: artifacts/browser-qa/boot-architecture-browser-qa.json
+          if-no-files-found: error
+      - name: Verify actual callable and Firestore authorization
+        run: npx --yes firebase-tools@15.30.0 emulators:exec --project demo-four-symbols-session --config firebase.session-emulators.json --only auth,firestore,functions 'node scripts/test-session-authority-emulator.mjs'
+
+  deploy:
+    name: Deploy session authority from dev
+    needs: emulator
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: firebase-session-authority-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require current dev and its Repository checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
+          for attempt in $(seq 1 80); do
+            conclusion="$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs" --jq '[.check_runs[] | select(.name == "Repository checks")][0].conclusion // "pending"')"
+            if [[ "$conclusion" == "success" ]]; then exit 0; fi
+            if [[ "$conclusion" != "pending" ]]; then
+              echo "::error::Repository checks did not succeed ($conclusion)."
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "::error::Timed out waiting for Repository checks."
+          exit 1
+      - name: Require existing Firebase deployment secret
+        env:
+          DEPLOY_CREDENTIAL: ${{ secrets.FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$DEPLOY_CREDENTIAL" ]; then
+            echo "::error::Missing FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON; Phase 1 live activation is BLOCKED."
+            exit 1
+          fi
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON }}
+          project_id: four-symbols-jianghu
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm --prefix functions ci --no-audit --no-fund
+      - name: Deploy only Phase 1 endpoints and deny-write rules
+        shell: bash
+        run: |
+          test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
+          npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,firestore:rules'

@@ -83,7 +83,8 @@ test("browser Firestore remains read-only and server-private paths stay closed",
     assert.match(rules,/allow create, update, delete: if false/);
     assert.match(rules,/allow read, write: if false/);
     assert.doesNotMatch(client,/\bsetDoc\b|\baddDoc\b|\bupdateDoc\b|\bdeleteDoc\b|\bwriteBatch\b|\brunTransaction\b/);
-    assert.match(client,/httpsCallable/);
+    assert.match(client,/callProtectedFunction/);
+    assert.match(read("js/firebase/firebase-session.js"),/httpsCallable/);
     assert.match(client,/CLOUD_SAVE_WRITE_POLICY\s*=\s*"trusted-backend-only"/);
 });
 

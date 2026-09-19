@@ -2,7 +2,7 @@
 import {
     createAccountWithEmail,getSignedInUser,signInAsAnonymous,signInWithEmail,
     signInWithFacebook,signInWithGoogle,signOutFirebase
-} from "./firebase-auth.86313ff8c064.js";
+} from "./firebase-auth.6a269762828f.js";
 
 const OVERLAY_ID="firebaseAuthOverlay";
 const RESUME_GRACE_MS=5000;
@@ -116,7 +116,8 @@ function renderResumeCountdown(){
 function render(){
     if(!installed){ return; }
     const status=byId("firebaseAuthStatus");
-    status.textContent=state.message||""; status.classList.toggle("is-error",state.error===true);
+    status.textContent=state.sessionError||state.message||"";
+    status.classList.toggle("is-error",!!state.sessionError||state.error===true);
     const signedOut=byId("firebaseSignedOutPanel"); const signedIn=byId("firebaseSignedInPanel");
     const resume=byId("firebaseAuthResumePanel");
     if(resume){ resume.hidden=!resumeActive; }
