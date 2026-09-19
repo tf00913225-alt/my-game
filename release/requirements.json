@@ -146,6 +146,11 @@
         "verification": "GitHub Pages platform-managed build/deploy head_sha 與 protected main HEAD 核對",
         "result": "Production Pages Run #100 build/deploy 與 main CI Run #770 均綁定 main SHA ac735f17b5e9ed3526b689bffbf68a2a2c94860c"
       }
+    },
+    {
+      "id": "REQ-11",
+      "title": "正式版本更新通知與玩家公告 Release Contract",
+      "status": "IMPLEMENTED"
     }
   ]
 }

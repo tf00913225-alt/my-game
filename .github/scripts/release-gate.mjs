@@ -33,7 +33,49 @@ function getConfig(){
   if(requirements.releaseVersion && normalizeVersion(requirements.releaseVersion)!==version){
     fail(`requirements releaseVersion ${requirements.releaseVersion} != V${version}.`);
   }
+  if(typeof release.updateNoticeFile!=="string"||!release.updateNoticeFile.trim()){
+    fail('release/updateNoticeFile must point to the player release notice source.');
+  }
   return {release,requirements,deprecated,version,cacheVersion};
+}
+function checkReleaseUpdateNotice(root,config){
+  const relative=config.release.updateNoticeFile;
+  const notice=readJson(path.join(root,relative));
+  const releaseVersion=normalizeVersion(notice.releaseVersion);
+  const minimumVersion=notice.minimumVersion===null||notice.minimumVersion===undefined||notice.minimumVersion===""
+    ? null
+    : normalizeVersion(notice.minimumVersion);
+  const validVersion=value=>/^\d+(?:\.\d+)+$/.test(normalizeVersion(value));
+  const content=Array.isArray(notice.content)?notice.content:[];
+  if(notice.schemaVersion!==1) fail(`${relative} schemaVersion must be 1.`);
+  if(typeof notice.publicNotice!=="boolean") fail(`${relative} publicNotice must be boolean.`);
+  if(!validVersion(notice.releaseVersion)||releaseVersion!==config.version){
+    fail(`${relative} releaseVersion ${notice.releaseVersion} != V${config.version}.`);
+  }
+  if(typeof notice.noticeId!=="string"||!notice.noticeId.trim()) fail(`${relative} needs noticeId.`);
+  if(typeof notice.title!=="string"||!notice.title.trim()) fail(`${relative} needs title.`);
+  if(typeof notice.summary!=="string"||!notice.summary.trim()) fail(`${relative} needs summary.`);
+  if(content.length===0||content.some(item=>typeof item!=="string"||!item.trim())){
+    fail(`${relative} needs non-empty player-facing content entries.`);
+  }
+  if(typeof notice.publishedAt!=="string"||!notice.publishedAt.trim()||Number.isNaN(Date.parse(notice.publishedAt))){
+    fail(`${relative} needs an ISO publishedAt timestamp.`);
+  }
+  if(notice.updateMode!=="normal"&&notice.updateMode!=="forced"){
+    fail(`${relative} updateMode must be normal or forced.`);
+  }
+  if(minimumVersion!==null&&!validVersion(minimumVersion)){
+    fail(`${relative} minimumVersion is invalid.`);
+  }
+  if(!notice.publicNotice){
+    if(typeof notice.skipReason!=="string"||!notice.skipReason.trim()){
+      fail(`${relative} publicNotice:false requires a player-safe skipReason.`);
+    }
+    if(notice.updateMode!=="normal"||minimumVersion!==null){
+      fail(`${relative} publicNotice:false cannot carry a forced/minimum-version update.`);
+    }
+  }
+  return notice;
 }
 function validateRequirements(requirements){
   const items=Array.isArray(requirements.requirements)?requirements.requirements:[];
@@ -148,6 +190,14 @@ function checkVersionAdvanceGuard(config,summary){
     if(!summary.allVerified) fail(`Version changed before Requirement Checklist reached 100% VERIFIED (${summary.verified}/${summary.total}).`);
   }
 }
+function checkReleaseUpdateNoticeAdvance(config,notice){
+  const previous=gitShowJson(process.env.CI_BASE_SHA||'',config.release.updateNoticeFile);
+  if(!previous) return;
+  const previousVersion=normalizeVersion(previous.releaseVersion);
+  if(previousVersion!==config.version&&previous.noticeId===notice.noticeId){
+    fail(`Player release noticeId ${notice.noticeId} was reused from V${previousVersion}.`);
+  }
+}
 function ensureReleaseReady(config,summary){
   if(config.release.status!=='READY') fail(`Release status is ${config.release.status}; final release requires READY.`);
   if(!summary.allVerified) fail(`Requirements ${summary.verified}/${summary.total} VERIFIED; final release requires ${summary.total}/${summary.total}.`);
@@ -189,27 +239,33 @@ async function main(){
   const summary=validateRequirements(config.requirements);
   if(mode==='ci'){
     checkVersionMarkers(ROOT,config);
+    const notice=checkReleaseUpdateNotice(ROOT,config);
     checkReleaseNotes(config);
     checkDeprecated(ROOT,config.deprecated);
     checkVersionAdvanceGuard(config,summary);
+    checkReleaseUpdateNoticeAdvance(config,notice);
     console.log(`✓ Release source coherence: V${config.version}, cache ${config.cacheVersion}.`);
     console.log(`✓ Requirements: ${summary.verified}/${summary.total} VERIFIED.`);
     return;
   }
   if(mode==='release-ready'){
     checkVersionMarkers(ROOT,config);
+    const notice=checkReleaseUpdateNotice(ROOT,config);
     checkReleaseNotes(config);
     checkDeprecated(ROOT,config.deprecated);
+    checkReleaseUpdateNoticeAdvance(config,notice);
     ensureReleaseReady(config,summary);
     console.log(`✓ Final release gate: ${summary.total}/${summary.total} VERIFIED.`);
     return;
   }
   if(mode==='prepare-artifact'){
     checkVersionMarkers(ROOT,config);
+    checkReleaseUpdateNotice(ROOT,config);
     checkReleaseNotes(config);
     checkDeprecated(ROOT,config.deprecated);
     const deployRoot=path.resolve(process.env.DEPLOY_DIR||path.join(ROOT,'_deploy'));
     checkVersionMarkers(deployRoot,config);
+    checkReleaseUpdateNotice(deployRoot,config);
     checkDeprecated(deployRoot,config.deprecated);
     writeDeployManifest(deployRoot,config,summary);
     validateArtifactManifest(deployRoot,config,summary);

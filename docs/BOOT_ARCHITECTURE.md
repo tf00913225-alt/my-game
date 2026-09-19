@@ -19,6 +19,7 @@
 | 雲端 read／trusted callable | `js/firebase/firebase-cloud-save.js` |
 | Firebase lifecycle | `js/firebase/firebase-bootstrap.js` |
 | 功能意圖、局部 loading、idle preload | `js/20-anonymous-20.js` |
+| 正式版本檢查、跑馬燈與共用更新視窗協調 | `js/release-update-notification.js` + `release/release-update.json` |
 | 巡怪圖片 | `js/26-v131-patrol-appearance.js` 與 `assets/characters/patrol/*.webp` |
 
 不得新增另一個 startup owner、全域 runtime gate、帳號 bypass loader 或 `*-fix-loading.js` 類後置 patch。
@@ -112,6 +113,8 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 
 取得 UID 後，`app-shell` 與 UID save I/O 並行。`app-shell` 是創角或已有角色進第一個可操作畫面的必要 legacy core；`gameplay-core` 與其餘 feature 不得阻塞 Auth UI、創角或主城互動。
 
+正式版本通知屬於 `app-shell` 的非阻塞 runtime：只在 `four-symbols:startup-ready` 後開始背景檢查，不能延後 Auth、存檔解析、創角或 READY。它重用既有 `#homeFeatureModal`，在 native `#game-overlay-layer` 放置可點擊但不覆蓋全畫面的通知列；詳見 `SYSTEM_CONTRACTS.md`。首次檢查失敗、離線、timeout 或 manifest 損壞都只能安靜失敗並等待下一次節流檢查。
+
 Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK、Auth state、save resolution、initial destination。100% 表示當前 destination 已可操作；唯一離場延遲是 360ms fade，不存在 cinematic minimum 或 90→100 計時補值。
 
 ## Feature manifest
@@ -138,6 +141,7 @@ Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK�
 執行 `node scripts/build-production.mjs` 產生 deterministic bundles、`asset-manifest.json` 與 hashed filenames；`--check` 只驗證，不改檔。source array 的順序就是 legacy execution contract，調整前必須先驗證 wrapper/override dependency。
 
 - `/`、`index.html` 與 `asset-manifest.json`：要求每次重新驗證（設定為 `no-cache, no-store, must-revalidate`；Cloudflare 若正規化為語意等價的 `max-age=0, must-revalidate` 亦可接受，但絕不可為 `immutable`）。
+- `release/release-update.json`：玩家正式版本資料，必須 `no-cache, no-store, must-revalidate`；runtime 同時加 timestamp query 與 `cache: no-store`。GitHub Pages 即使無法套用 `_headers`，也不得讓此檔走長期快取。
 - `build/*`、hashed patrol WebP、hashed startup logo：`max-age=31536000, immutable`。
 - Cache invalidation 只靠內容 hash；`V_ASSET_VERSION` 不再讓未變更 bundle 全部失效。
 - 不使用 Service Worker。若未來導入，必須另有 versioned cache、activation、cleanup、rollback 與跨版本測試。

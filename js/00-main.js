@@ -6611,10 +6611,26 @@ function saveGame(options={}){
 
 
         const persistenceOptions=options&&typeof options==="object"?options:{};
-        repository.writeForUid(activeUid,saveData,{
-            source:String(persistenceOptions.source||"gameplay"),
-            ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
-        });
+        let endReleaseSaveOperation=null;
+        try{
+            if(
+                window.FourSymbolsReleaseUpdate&&
+                typeof window.FourSymbolsReleaseUpdate.beginCriticalOperation==="function"
+            ){
+                endReleaseSaveOperation=
+                    window.FourSymbolsReleaseUpdate.beginCriticalOperation("account-save-write");
+            }
+        }catch(_){ }
+        try{
+            repository.writeForUid(activeUid,saveData,{
+                source:String(persistenceOptions.source||"gameplay"),
+                ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
+            });
+        }finally{
+            if(typeof endReleaseSaveOperation==="function"){
+                endReleaseSaveOperation();
+            }
+        }
         return true;
 
     }
@@ -15671,18469 +15687,457 @@ function castDamageSkill(skillId){
             "ã€‚"
         );
 
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    if(player.sp<skill.spCost){
-
-        if(autoBattle){
-
-            addBattleLog(
-                "SPä¸è¶³ï¼Œæ”¹ç”¨æ™®é€šæ”»æ“Šã€‚"
-            );
-
-            normalAttack();
-
-        }
-        else{
-
-            /*
-               â˜… ä¿®æ­£ï¼ˆçœŸçš„æŠ“åˆ°äº†ï¼Œæ„Ÿè¬å¦ä¸€å€‹å°è©±
-               å…ˆåŠ çš„é™¤éŒ¯è¨Šæ¯å¹«å¿™é–å®šç¯„åœï¼‰ï¼š
-               é€™è£¡æ˜¯ã€Œæ‰‹å‹•æ¨¡å¼ã€SPä¸å¤ æ–½æ”¾é€™å€‹
-               æŠ€èƒ½ã€çš„åˆ†æ”¯ï¼ŒåŸæœ¬åªå°ä¸€å¥
-               âŒè¨Šæ¯å°±ç›´æ¥returnï¼Œå®Œå…¨æ²’æœ‰å‘¼å«
-               finishPlayerAction()ã€‚
-
-               ä¸€æ—¦é€™å€‹åˆ†æ”¯è¢«è§¸ç™¼ï¼ˆä¾‹å¦‚ï¼šæŠ€èƒ½é¸å–®
-               é¡¯ç¤ºçš„SPæ˜¯å®£å‘Šç•¶ä¸‹çš„æ•¸å€¼ï¼Œä½†é€™å€‹
-               è§’è‰²å¯¦éš›è¼ªåˆ°çµç®—éšæ®µåŸ·è¡Œæ™‚ï¼Œ
-               autoBattleå‰›å¥½è¢«ä½¿ç”¨è€…åˆ‡æ›éç‹€æ…‹ï¼Œ
-               æˆ–SPåˆ¤å®šçš„ç•¶ä¸‹ä¸åœ¨è‡ªå‹•æ¨¡å¼ï¼‰ï¼Œ
-               çµç®—éšæ®µçš„æ¨é€²éˆå°±æœƒåœ¨é€™ä¸€æ­¥
-               æ•´å€‹åœä½â€”â€”ä¸åªé€™å€‹è§’è‰²ä¸æœƒå†è¡Œå‹•ï¼Œ
-               å¾Œé¢æ‰€æœ‰é‚„æ²’è¼ªåˆ°çš„è§’è‰²ã€æ€ªç‰©
-               éƒ½æœƒè·Ÿè‘—å¡ä½ä¸å‹•ï¼Œå› ç‚º
-               processNextCombatant()å†ä¹Ÿæ²’æœ‰
-               è¢«å‘¼å«éã€‚
-
-               é€™æ­£æ˜¯ã€Œå…©éš»äººç‰©å¡è‘—ä¸æ”»æ“Šã€çš„
-               çœŸæ­£åŸå› ï¼šä¸€æ—¦å¡ä½ï¼Œæœƒå¡ä½çš„ä¸åª
-               è§¸ç™¼çš„é‚£å€‹è§’è‰²ï¼Œæ˜¯æ•´æ¢çµç®—éˆå¾é‚£
-               ä¸€åˆ»é–‹å§‹å®Œå…¨åœæ­¢æ¨é€²ã€‚
-
-               æŒ‰ã€Œåœæ­¢ã€å†æŒ‰ã€Œå•Ÿå‹•ã€èƒ½æš«æ™‚æ¢å¾©ï¼Œ
-               ä¸æ˜¯å› ç‚ºå•é¡Œè‡ªå·±å¥½äº†ï¼Œæ˜¯å› ç‚º
-               toggleAutoBattle()è£¡æœ‰ä¸€æ®µ
-               ã€Œé‡æ–°é–‹å•Ÿæ™‚å¼·åˆ¶å‘¼å«ä¸€æ¬¡
-               autoAction()ã€çš„é‚è¼¯ï¼Œç­‰æ–¼å¾å¤–éƒ¨
-               ç¡¬æŠŠæ–°çš„å®£å‘Š/çµç®—éˆè¸¢å‹•èµ·ä¾†ï¼Œ
-               è“‹æ‰äº†åŸæœ¬å¡æ­»çš„é‚£æ¢éˆâ€”â€”
-               æ²»æ¨™ï¼Œæ²’æœ‰æ²»æœ¬ã€‚
-
-               è£œä¸ŠfinishPlayerAction()ï¼Œè®“é€™å€‹
-               åˆ†æ”¯è·Ÿå…¶ä»–æ‰€æœ‰ã€Œè¡Œå‹•æå‰çµæŸã€çš„
-               åˆ†æ”¯ä¸€è‡´ï¼Œè¡Œå‹•ä¸€å®šæœƒæ­£å¸¸æ”¶å°¾ã€
-               çµç®—éˆä¸æœƒå†ä¸­æ–·ã€‚
-            */
-
-            addBattleLog(
-                "SPä¸è¶³ï¼Œç„¡æ³•ä½¿ç”¨"+
-                skill.name+
-                "ã€‚"
-            );
-
-            finishPlayerAction();
-
-        }
-
-        return;
-
-    }
-
-
-    const centerIndex =
-        resolveAttackTargetIndex();
-
-
-    if(centerIndex===null){
-        return;
-    }
-
-    const targets =
-        getSkillTargets(
-            centerIndex,
-            skill.targetType
-        );
-
-
-    player.sp -=
-        skill.spCost;
-
-
-    lungePlayerCard();
-
-
-    showSkillNameBadge(
-        skill.name,
-        skill.element,
-        0,
-        skill.targetType==="all"?null:centerIndex,
-        targets
-    );
-
-
-    setTimeout(()=>{
-        showPlayerSpPopup(
-            skill.spCost
-        );
-    },500);
-
-
-    const stats =
-        getMainCharacterStats();
-
-
-    const statBonus =
-        skill.category==="magic"
-        ?
-        stats.magicAttack
-        :
-        stats.attack;
-
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œç«ç®­æŠ€èƒ½
-       å°ˆå±¬çš„ä¸‰é€£ç™¼é£›è¡Œç‰¹æ•ˆï¼‰ï¼š
-       åªåœ¨æ”¾çš„æ˜¯ç«ç®­ï¼ˆfireRocketï¼‰æ™‚è§¸ç™¼ï¼Œ
-       å…¶ä»–æŠ€èƒ½ä¸å—å½±éŸ¿ã€‚ç”¨targetsé€™ä»½
-       ã€Œé€™æ¬¡æŠ€èƒ½å¯¦éš›æœƒæ‰“ä¸­èª°ã€çš„æ¸…å–®ï¼Œ
-       ç¢ºä¿å°„å‡ºçš„ç«ç®­æ•¸é‡ã€æ–¹å‘éƒ½è·ŸçœŸæ­£
-       çµç®—çš„ç›®æ¨™ä¸€è‡´ï¼Œä¸æœƒå‡ºç¾ã€Œç•«é¢å°„äº†
-       ä¸‰ç™¼ã€ä½†å…¶å¯¦åªæ‰“ä¸­ä¸€éš»ã€é€™ç¨®å°ä¸ä¸Š
-       çš„æƒ…æ³ã€‚
-    */
-
-    if(skillId==="fireRocket"){
-
-        playFireRocketAnimation(
-            "battlePlayerCard0",
-            targets.map(
-                index=>"battleMonster"+index
-            )
-        );
-
-    }
-
-
-    let totalLifestealDamage=0;
-
-
-    targets.forEach(index=>{
-
-        const monster =
-            monsters[index];
-
-
-        if(
-            !monster ||
-            !monster.alive
-        ){
-            return;
-        }
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-           å†°æ—‹ä¸€é–ƒå°ˆå±¬çš„é£›è¡Œå‹•ç•«ï¼Œæ”¾åœ¨å­˜æ´»
-           åˆ¤æ–·ä¹‹å¾Œã€å‘½ä¸­åˆ¤å®šä¹‹å‰â€”â€”ä¸ç®¡é€™æ¬¡
-           æ”»æ“Šæœ€å¾Œæœ‰æ²’æœ‰æ‰“ä¸­ï¼Œåœ–ç¤ºéƒ½æœƒå…ˆé£›
-           éå»ï¼ˆä»£è¡¨ã€Œé€™ä¸€æ“ŠçœŸçš„å‡ºæ‹›äº†ã€ï¼‰ï¼Œ
-           MISSæˆ–é€ æˆå‚·å®³çš„æ•ˆæœç…§èˆŠæ¥åœ¨å¾Œé¢ï¼Œ
-           å…©ä»¶äº‹äº’ä¸å½±éŸ¿ã€‚
-        */
-
-        if(skill.id==="iceSpin"){
-
-            playIceSpinProjectile(
-                0,
-                index
-            );
-
-        }
-
-
-        /*
-           â˜… ç´”æ§å ´æŠ€èƒ½ï¼ˆå†°å°ï¼Œæ²’æœ‰baseDamageï¼‰ï¼š
-           ä¸ç®—å‚·å®³ã€ä¸åšå‘½ä¸­/é–ƒé¿åˆ¤å®šï¼Œ
-           ç›´æ¥ç”¨ç•°å¸¸ç‹€æ…‹å‘½ä¸­å…¬å¼
-           ï¼ˆæ™ºåŠ›/ç²¾ç¥/ç­‰ç´šå£“åˆ¶ï¼‰åˆ¤æ–·
-           å†°å°æœ‰æ²’æœ‰ç”Ÿæ•ˆï¼Œæ²’ç”Ÿæ•ˆå°±é¡¯ç¤ºæŠµæŠ—+é–ƒé¿å‹•ç•«ã€‚
-        */
-
-        if(!skill.baseDamage){
-
-            if(skill.freezeChance){
-
-                const freezeRoll=rollNamedPersistentStatusEffect(
-                    monster,"freeze",[
-                        skill.freezeChance,player.level,monster.level,
-                        stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
-                        true,getMonsterRank(monster)
-                    ],"monster",index,skill.name
-                );
-
-
-                if(freezeRoll.hit){
-
-                    applyFreezeEffect(
-                        monster,
-                        skill.freezeDuration
-                    );
-
-
-                    addBattleLog(
-                        ""+
-                        monster.name+
-                        "è¢«å†°å°äº†ï¼"
-                    );
-
-                }
-                else if(!freezeRoll.duplicate){
-
-                    showMissEffect(
-                        false,
-                        index,
-                        "æŠµæŠ—"
-                    );
-
-
-                    addBattleLog(
-                        skill.name+
-                        "å°"+
-                        monster.name+
-                        "æ²’æœ‰ç”Ÿæ•ˆï¼ˆæŠµæŠ—ï¼‰ã€‚"
-                    );
-
-                }
-
-            }
-
-
-            return;
-
-        }
-
-
-        /*
-           â˜… å‘½ä¸­åˆ¤å®šï¼š
-           æ‰“ç©ºçš„è©±è·³MISSã€æ’­æ”¾é–ƒé¿å‹•ç•«ï¼Œ
-           ä¸è¨ˆç®—å‚·å®³ï¼Œä¹Ÿä¸æœƒé™„åŠ ç‡ƒç‡’/å†°å°/å¸è¡€
-           ï¼ˆæ”»æ“Šéƒ½æ²’æ‰“ä¸­äº†ï¼Œé™„åŠ æ•ˆæœè‡ªç„¶ä¹Ÿä¸æœƒç™¼ç”Ÿï¼‰ã€‚
-        */
-
-        const hit =
-            rollHitChance(
-                stats.accuracy,
-                getMonsterEvasion(
-                    monster
-                ),
-                getMonsterDebuffValue(
-                    player,
-                    "stun"
-                )
-            );
-
-
-        if(!hit){
-
-            showMissEffect(
-                false,
-                index,
-                "MISS"
-            );
-
-
-            addBattleLog(
-                skill.name+
-                "å°"+
-                monster.name+
-                "ï¼Œæ²’æœ‰å‘½ä¸­ï¼"
-            );
-
-
-            return;
-
-        }
-
-
-        const critResult =
-            rollCritical(
-                player,
-                skill.category,
-                getMonsterEffectiveAntiCrit(monster),
-                monster
-            );
-
-        const damage =
-            calculateSkillDamage({
-                skill:skill,
-                skillLevel:level,
-                effectiveAttack:statBonus,
-                target:monster,
-                casterLevel:player.level,
-                casterElement:player.element,
-                attacker:player,
-                critMultiplier:critResult.multiplier
-            });
-
-        const hpBeforeDirectDamage=monster.hp;
-
-        monster.hp =
-            Math.max(
-                0,
-                monster.hp-damage
-            );
-
-
-        showMonsterHit(
-            index,
-            damage,
-            "hp",
-            critResult.isCrit
-        );
-
-        const actualDamageDealt=Math.max(0,hpBeforeDirectDamage-monster.hp);
-
-
-        addBattleLog(
-
-            skill.name+
-            "å‘½ä¸­"+
-            monster.name+
-            (
-                critResult.isCrit
-                ?
-                "ï¼ˆçˆ†æ“Šï¼ï¼‰"
-                :
-                ""
-            )+
-            "ï¼Œé€ æˆ"+
-            damage+
-            "å‚·å®³ã€‚"
-
-        );
-
-
-        if(
-            skill.burnChance
-        ){
-
-            const burnRoll=rollNamedPersistentStatusEffect(
-                monster,"burn",[
-                    skill.burnChance,player.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
-                ],"monster",index,skill.name,skill.guaranteedBurn===true
-            );
-
-
-            if(burnRoll.hit){
-
-                const burnPercent =
-                    skill.burnPercentByLevel[
-                        level-1
-                    ];
-
-
-                applyBurnEffect(
-                    monster,
-                    skill.burnDuration,
-                    burnPercent
-                );
-
-
-                addBattleLog(
-                    ""+
-                    monster.name+
-                    "é™·å…¥ç‡ƒç‡’ç‹€æ…‹ï¼"
-                );
-
-            }
-            else if(!burnRoll.duplicate){
-
-                addBattleLog(
-                    "ï¼ˆç‡ƒç‡’æ•ˆæœè¢«"+
-                    monster.name+
-                    "æŠµæŠ—äº†ï¼‰"
-                );
-
-            }
-
-        }
-
-
-        /*
-           â˜… å†°å°åˆ¤å®šï¼ˆæ°´ç³»ï¼šå†°å°é‡æ“Šï¼‰ã€‚
-           è·Ÿç‡ƒç‡’å…±ç”¨åŒä¸€å¥—æ©Ÿç‡å…¬å¼
-           ï¼ˆæ™ºåŠ›/ç²¾ç¥/ç­‰ç´šå£“åˆ¶ï¼‰ã€‚
-           é€™è£¡çš„ç›®æ¨™å·²ç¶“è¢«ä¸Šé¢çš„æ”»æ“Šå‘½ä¸­éï¼Œ
-           å†°å°æ˜¯ã€Œé™„åŠ æ•ˆæœã€ï¼Œæ²’ç”Ÿæ•ˆåªæç¤ºæŠµæŠ—ï¼Œ
-           ä¸ç”¨å†è·³ä¸€æ¬¡é–ƒé¿å‹•ç•«
-           ï¼ˆé–ƒé¿å‹•ç•«ç•™çµ¦ã€Œæ”»æ“Šæœ¬èº«æ²’å‘½ä¸­ã€çš„æƒ…æ³ï¼‰ã€‚
-        */
-
-        if(
-            skill.freezeChance
-        ){
-
-            const freezeRoll=rollNamedPersistentStatusEffect(
-                monster,"freeze",[
-                    skill.freezeChance,player.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
-                    true,getMonsterRank(monster)
-                ],"monster",index,skill.name
-            );
-
-
-            if(freezeRoll.hit){
-
-                applyFreezeEffect(
-                    monster,
-                    skill.freezeDuration
-                );
-
-
-                addBattleLog(
-                    ""+
-                    monster.name+
-                    "è¢«å†°å°äº†ï¼"
-                );
-
-            }
-            else if(!freezeRoll.duplicate){
-
-                addBattleLog(
-                    "ï¼ˆå†°å°æ•ˆæœè¢«"+
-                    monster.name+
-                    "æŠµæŠ—äº†ï¼‰"
-                );
-
-            }
-
-        }
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ¥ä¸Šé¢¨ç³»/
-           åœŸç³»æŠ€èƒ½çš„é™„åŠ æ•ˆæœï¼‰ï¼šè·Ÿç‡ƒç‡’/å†°å°
-           åŒä¸€å€‹æ™‚æ©Ÿé»å‘¼å«ï¼Œè™•ç†é™æ•æ·/é™å…¨
-           å±¬æ€§/é™é˜²ç¦¦/æšˆçœ©/çŸ³åŒ–é€™äº”ç¨®æ–°æ•ˆæœã€‚
-        */
-
-        applySkillDebuffEffects(
-            skill,
-            level,
-            monster,
-            index,
-            player.level,
-            stats.intelligence
-        );
-
-
-        /*
-           â˜… å¸è¡€ï¼ˆæ°´ç³»ï¼šå†°æ—‹ä¸€é–ƒï¼‰ã€‚
-           ç´¯åŠ é€™æ¬¡æ”»æ“Šé€ æˆçš„ç¸½å‚·å®³ï¼Œ
-           æ‰€æœ‰ç›®æ¨™è™•ç†å®Œä¹‹å¾Œçµ±ä¸€çµç®—å›è¡€ï¼Œ
-           é¿å…å‘½ä¸­æ¯å€‹ç›®æ¨™éƒ½å„è‡ªè·³ä¸€æ¬¡å›è¡€è¨Šæ¯ã€‚
-        */
-
-        if(
-            skill.lifestealPercentByLevel
-        ){
-
-            totalLifestealDamage+=
-                actualDamageDealt;
-
-        }
-
-
-        if(monster.hp<=0){
-
-            killMonster(
-                index
-            );
-
-        }
-
-    });
-
-
-    if(
-        skill.lifestealPercentByLevel &&
-        totalLifestealDamage>0
-    ){
-
-        const lifestealPercent =
-            skill.lifestealPercentByLevel[
-                level-1
-            ];
-
-
-        const lifestealAmount =
-            Math.floor(
-                totalLifestealDamage*
-                lifestealPercent/
-                100
-            );
-
-
-        const currentStats =
-            getMainCharacterStats();
-
-
-        const healedHP =
-            Math.min(
-                lifestealAmount,
-                currentStats.maxHP-
-                player.hp
-            );
-
-
-        const healedSP =
-            Math.min(
-                lifestealAmount,
-                currentStats.maxSP-
-                player.sp
-            );
-
-
-        player.hp =
-            Math.min(
-                currentStats.maxHP,
-                player.hp+
-                lifestealAmount
-            );
-
-
-        player.sp =
-            Math.min(
-                currentStats.maxSP,
-                player.sp+
-                lifestealAmount
-            );
-
-
-        if(healedHP>0){
-
-            showPlayerHit(
-                healedHP,
-                "heal",
-                0,
-                true
-            );
-
-        }
-
-
-        addBattleLog(
-            "å¸æ”¶å‚·å®³çš„"+
-            lifestealPercent+
-            "%ï¼Œå›å¾©äº†"+
-            lifestealAmount+
-            "é»HPèˆ‡SPã€‚"
-        );
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ¥ä¸ŠåœŸç³»çš„
-       è‡ªèº«è­·ç›¾ï¼å…¨é«”è­·ç›¾æŠ€èƒ½ï¼‰ï¼š
-       åœ°è£‚é‡æ“Šï¼ˆselfShieldByLevelï¼‰åªçµ¦
-       è‡ªå·±ï¼›çŸ³ç›¾æ‹³ï¼çŸ³ç ´å¤©é©šï¼ˆallyShieldByLevelï¼‰
-       çµ¦å ´ä¸Šæ‰€æœ‰é‚„æ´»è‘—çš„è§’è‰²ï¼ˆç©å®¶è‡ªå·±+
-       player2ï¼Œplayer2ä¸å­˜åœ¨æˆ–å·²ç¶“å€’ä¸‹
-       å°±è·³éï¼‰ã€‚è­·ç›¾ç”¨åŒä¸€å¥—activeBuffs
-       é™£åˆ—å­˜æ”¾ï¼Œtypeå›ºå®šå«"shield"ï¼Œ
-       remainingæ˜¯ç›®å‰é‚„å‰©å¤šå°‘å¯ä»¥å¸æ”¶çš„é‡ã€‚
-    */
-
-    if(skill.selfShieldByLevel){
-
-        const shieldAmount=
-            skill.selfShieldByLevel[
-                level-1
-            ];
-
-
-        if(canApplyNamedPersistentState(player,"shield","player",0,skill.name)){
-            player.activeBuffs=(player.activeBuffs||[]).filter(
-                b=>!b||b.type!=="shield"||Number(b.turnsLeft)>0&&Number(b.remaining)>0
-            );
-            player.activeBuffs.push(markPersistentStateName({
-                type:"shield",turnsLeft:skill.shieldDuration||2,remaining:shieldAmount
-            },"shield"));
-            addBattleLog("ç²å¾—ã€å²©ç›¾ã€‘"+shieldAmount+"é»ï¼ŒæŒçºŒ"+(skill.shieldDuration||2)+"å›åˆã€‚");
-        }
-
-    }
-
-
-    if(skill.allyShieldByLevel){
-
-        const shieldAmount=
-            skill.allyShieldByLevel[
-                level-1
-            ];
-
-
-        getCharacters().forEach(
-            character=>{
-
-                if(
-                    character.hp<=0
-                ){
-                    return;
-                }
-
-
-                const targetIndex=getPartyCharacterIndex(character);
-                if(!canApplyNamedPersistentState(character,"shield","player",targetIndex,skill.name)){
-                    return;
-                }
-                character.activeBuffs=(character.activeBuffs||[]).filter(
-                    b=>!b||b.type!=="shield"||Number(b.turnsLeft)>0&&Number(b.remaining)>0
-                );
-                character.activeBuffs.push(markPersistentStateName({
-                    type:"shield",turnsLeft:skill.shieldDuration||2,remaining:shieldAmount
-                },"shield"));
-
-            }
-        );
-
-
-        addBattleLog(
-            "æˆ‘æ–¹æœ‰æ•ˆç›®æ¨™ç²å¾—ã€å²©ç›¾ã€‘"+
-            shieldAmount+
-            "é»è­·ç›¾ï¼ŒæŒçºŒ"+
-            (skill.shieldDuration||2)+
-            "å›åˆã€‚"
-        );
-
-    }
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-/*
-   æ–½æ”¾æ€’ç«ï¼ˆå¢ç›ŠæŠ€èƒ½ï¼‰ã€‚
-   ç›®å‰éŠæˆ²è£¡åªæœ‰ç©å®¶è‡ªå·±ä¸€ä½è§’è‰²æœƒæˆ°é¬¥ï¼Œ
-   æ‰€ä»¥ã€Œæˆ‘æ–¹ç›®æ¨™1äººã€å›ºå®šå°±æ˜¯ç©å®¶è‡ªå·±ï¼Œ
-   ä¹‹å¾Œæœ‰ç¬¬äºŒåè§’è‰²èƒ½ä¸€èµ·æˆ°é¬¥æ™‚ï¼Œ
-   é€™è£¡å¯ä»¥æ”¹æˆè®“ç©å®¶é¸è¦buffèª°ã€‚
-*/
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œæ¥ä¸Šã€æ–°å¢çš„
-   é¢¨ç³»/åœŸç³»å¢ç›ŠæŠ€èƒ½ï¼‰ï¼š
-   åŸæœ¬é€™å€‹å‡½å¼å«castRageBuff()ï¼Œå¯«æ­»åªè™•ç†
-   ã€Œæ€’ç«ã€é€™ä¸€å€‹æŠ€èƒ½ã€‚ç¾åœ¨æ”¹åæˆ
-   castBuffSkill(skillId)ï¼Œé€šç”¨è™•ç†å…¨éƒ¨
-   buffé¡æŠ€èƒ½â€”â€”å…±ç”¨çš„éƒ¨åˆ†ï¼ˆç­‰ç´šæª¢æŸ¥/SPæª¢æŸ¥/
-   æ‰£SP/æŠ€èƒ½åç¨±å‹•ç•«ï¼‰å®Œå…¨ä¸è®Šï¼Œåªæœ‰ã€Œé€™å€‹
-   æŠ€èƒ½å¯¦éš›æœƒç”¢ç”Ÿä»€éº¼æ•ˆæœã€é€™æ®µæ”¹æˆä¾skillId
-   åˆ†æµï¼š
-
-   rageï¼ˆæ€’ç«ï¼‰â†’ æå‡çˆ†æ“Šç‡/çˆ†æ“Šå‚·å®³
-   dodgeSkillï¼ˆé–ƒèº²è¡“ï¼‰â†’ æå‡é–ƒèº²ç‡
-   rockWallï¼ˆå²©çŸ³å£å£˜ï¼‰â†’ æå‡é˜²ç¦¦åŠ›
-   earthShieldï¼ˆè¬è±¡åœŸç›¾ï¼‰â†’ åå‚·
-   barrierï¼ˆçµç•Œï¼‰â†’ å®Œå…¨æ ¼æ“‹
-   stealthSkillï¼ˆéš±èº«è¡“ï¼‰â†’ éš±èº«ï¼ˆç„¡æ³•è¢«å–®é«”æŠ€èƒ½é¸ä¸­ï¼‰
-   dinghaishenzhenï¼ˆæ°£å®šç¥é–’ï¼‰â†’ æå‡ç•°å¸¸ç‹€æ…‹æŠ—æ€§
-
-   å…¨éƒ¨çµ±ä¸€å­˜é€²player.activeBuffsï¼ˆè·Ÿæ€’ç«
-   åŒä¸€å€‹é™£åˆ—ï¼‰ï¼Œæ¯ç¨®typeåªä¿ç•™ä¸€ä»½ã€
-   é‡è¤‡æ–½æ”¾æœƒåˆ·æ–°æŒçºŒæ™‚é–“ï¼Œä¸æœƒç–ŠåŠ ã€‚
-*/
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œæ‡‰è©²è¨­å®šåªè¦
-   æˆ‘æ–¹éƒ½èƒ½åƒåˆ°æ•ˆæœï¼Œä¸ç„¶ä»¥å¾Œé–‹æ”¾3ã€4ã€5ã€6
-   éš»è§’è‰²ï¼Œå¦³ä¸å°±éƒ½è¦å¯«ä¸€æ¬¡ï¼Ÿæ²’æœ‰é‚£ç¨®å¯«ä¸€æ¬¡
-   å°±ä¸€å‹æ°¸é€¸çš„æ–¹æ³•å—ï¼Ÿã€ï¼‰ï¼š
-
-   é€™å€‹å‡½å¼å›å‚³ã€Œç›®å‰å ´ä¸Šé‚„æ´»è‘—çš„æˆ‘æ–¹è§’è‰²ã€
-   æ¸…å–®ã€‚ç¾åœ¨æœƒå›å‚³[player, player2]ï¼ˆplayer2
-   ä¸å­˜åœ¨æˆ–å·²æ­»äº¡å°±ä¸åˆ—å…¥ï¼‰ï¼Œä»¥å¾Œé–‹æ”¾è§’è‰²
-   ä¸‰è™Ÿã€å››è™Ÿï¼Œåªè¦æŠŠæ–°è§’è‰²åŠ é€²é€™å€‹å‡½å¼å›å‚³
-   çš„æ¸…å–®ï¼Œã€Œå…¨é«”æˆ‘æ–¹ã€é¡çš„å¢ç›ŠæŠ€èƒ½
-   ï¼ˆé–ƒèº²è¡“/å²©çŸ³å£å£˜/è¬è±¡åœŸç›¾/çµç•Œ/éš±èº«è¡“/
-   å®šæµ·ç¥é‡â€¦â€¦ï¼‰å°±æœƒè‡ªå‹•å¥—ç”¨åˆ°æ–°è§’è‰²èº«ä¸Šï¼Œ
-   ä¸ç”¨å†å›é ­ä¸€å€‹ä¸€å€‹æŠ€èƒ½æ”¹ã€‚
-
-   â˜… è€å¯¦èªªæ˜ç¯„åœï¼ˆä¸è¦èª¤æœƒé€™è§£æ±ºäº†å…¨éƒ¨ï¼‰ï¼š
-   é€™å€‹åšæ³•åªè§£æ±ºã€Œå…¨é«”æˆ‘æ–¹ã€é¡buffæŠ€èƒ½çš„
-   æ“´å……å•é¡Œã€‚å–®é«”æŠ€èƒ½ã€å‚·å®³æŠ€èƒ½ã€æ¯å€‹è§’è‰²
-   å„è‡ªçš„æ”»æ“Šæµç¨‹ï¼Œå› ç‚ºæ•´å€‹æˆ°é¬¥ç³»çµ±ç›®å‰æ˜¯
-   ç”¨playerã€player2å…©å€‹å„è‡ªç¨ç«‹å‘½åçš„
-   å…¨åŸŸè®Šæ•¸å¯«çš„ï¼ˆä¸æ˜¯ä¸€ä»½è§’è‰²é™£åˆ—ï¼‰ï¼Œä»¥å¾Œ
-   é–‹æ”¾æ–°è§’è‰²ï¼Œé‚£äº›åœ°æ–¹é‚„æ˜¯è¦ç…§ç¾åœ¨çš„æ¨¡å¼
-   ï¼ˆè§’è‰²ä¸€è™Ÿä¸€å¥—ã€è§’è‰²äºŒè™Ÿä¸€å¥—ï¼‰å¦å¤–æ¥ï¼Œ
-   é€™å€‹å‡½å¼æ²’è¾¦æ³•è§£æ±ºé‚£éƒ¨åˆ†ã€‚
-*/
-
-function getActivePlayerCharacters(){
-    return getCharacters().filter(
-        character=>character && character.hp>0
-    );
-}
-
-
-function castBuffSkill(skillId,targetIndex){
-
-    const skill=skillDatabase[skillId];
-
-    if(!battleActive || !skill){ return; }
-
-    const level=getSkillLevel("fire",skillId);
-
-    if(level<=0){
-        addBattleLog("å°šæœªå­¸ç¿’"+skill.name+"ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    let chosenTarget=null;
-    if(skill.targetType==="ally"){
-        chosenTarget=getBattleCharacterByIndex(
-            targetIndex===null || targetIndex===undefined ? 0 : targetIndex
-        );
-
-        if(!chosenTarget || chosenTarget.hp<=0){
-            addBattleLog(skill.name+"çš„ç›®æ¨™ç›®å‰ç„¡æ³•æ¥å—æ­¤æ•ˆæœã€‚");
-            finishPlayerAction();
-            return;
-        }
-    }
-
-    if(player.sp<skill.spCost){
-        addBattleLog("SPä¸è¶³ï¼Œç„¡æ³•ä½¿ç”¨"+skill.name+"ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    player.sp-=skill.spCost;
-    lungePlayerCard();
-    showSkillNameBadge(skill.name,skill.element);
-    setTimeout(()=>{ showPlayerSpPopup(skill.spCost); },500);
-
-    function pushBuff(extraFields){
-        const targets=skill.targetType==="allyAll"
-            ? getActivePlayerCharacters().slice(0,3)
-            : [chosenTarget||player];
-
-        targets.forEach(character=>{
-            if(!character || character.hp<=0){ return; }
-            const characterIndex=getPartyCharacterIndex(character);
-            if(!canApplyNamedPersistentState(
-                character,skillId,"player",characterIndex,skill.name
-            )){ return; }
-            character.activeBuffs=(character.activeBuffs||[])
-                .filter(b=>!b||b.type!==skillId||Number(b.turnsLeft)>0);
-            character.activeBuffs.push(markPersistentStateName(Object.assign(
-                {type:skillId,turnsLeft:skill.duration},
-                extraFields||{}
-            ),skillId));
-        });
-    }
-
-    if(skillId==="rage"){
-        const bonusPercent=skill.critBonusByLevel[level-1];
-        pushBuff({bonusPercent:bonusPercent});
-        addBattleLog(
-            "æ€’ç«ç”Ÿæ•ˆï¼æˆ‘æ–¹æœ€å¤š3äººçˆ†æ“Šç‡èˆ‡çˆ†æ“Šå‚·å®³æå‡"+
-            bonusPercent+"%ï¼ŒæŒçºŒ"+skill.duration+"å›åˆã€‚"
-        );
-    }
-    else if(skillId==="dodgeSkill"){
-        pushBuff({percent:skill.evasionBonusPercent});
-        addBattleLog(
-            "é–ƒèº²è¡“ç”Ÿæ•ˆï¼æˆ‘æ–¹å…¨é«”é–ƒèº²ç‡æå‡"+
-            skill.evasionBonusPercent+"%ï¼ŒæŒçºŒ"+skill.duration+"å›åˆã€‚"
-        );
-    }
-    else if(skillId==="rockWall"){
-        pushBuff({percent:skill.defenseBonusPercent});
-        addBattleLog(
-            "å²©çŸ³å£å£˜ç”Ÿæ•ˆï¼æˆ‘æ–¹å…¨é«”é˜²ç¦¦åŠ›æå‡"+
-            skill.defenseBonusPercent+"%ï¼ŒæŒçºŒ"+skill.duration+"å›åˆã€‚"
-        );
-    }
-    else if(skillId==="earthShield"){
-        pushBuff({percent:skill.reflectPercent});
-        addBattleLog(
-            (chosenTarget&&chosenTarget.id ? chosenTarget.id : "ç›®æ¨™")+
-            "ç²å¾—"+skill.reflectPercent+"%åå‚·åœŸç›¾ï¼ŒæŒçºŒ"+skill.duration+"å›åˆã€‚"
-        );
-    }
-    else if(skillId==="barrier"){
-        pushBuff({});
-        addBattleLog(
-            (chosenTarget&&chosenTarget.id ? chosenTarget.id : "ç›®æ¨™")+
-            "ç²å¾—çµç•Œï¼Œå¯æŠµæ“‹æ‰€æœ‰å‚·å®³ï¼ŒæŒçºŒ"+skill.duration+"å›åˆã€‚"
-        );
-    }
-    else if(skillId==="stealthSkill"){
-        pushBuff({});
-        addBattleLog(
-            (chosenTarget&&chosenTarget.id ? chosenTarget.id : "ç›®æ¨™")+
-            "é€²å…¥éš±èº«ï¼Œç„¡æ³•è¢«å–®é«”æ”»æ“Šé¸ä¸­ï¼ŒæŒçºŒ"+skill.duration+"å›åˆã€‚"
-        );
-    }
-    else if(skillId==="dinghaishenzhen"){
-        pushBuff({resistBonus:skill.statusResistBonus});
-        addBattleLog(
-            skill.name+"ç”Ÿæ•ˆï¼æˆ‘æ–¹å…¨é«”ç•°å¸¸ç‹€æ…‹æŠ—æ€§æå‡"+
-            skill.statusResistBonus+"%ï¼ŒæŒçºŒ"+skill.duration+"å›åˆã€‚"
-        );
-    }
-    else{
-        addBattleLog(skill.name+"çš„æ•ˆæœå°šæœªå¯¦ä½œã€‚");
-    }
-
-    updateUI();
-    finishPlayerAction();
-}
-
-
-/*
-   â˜… æ–½æ”¾æ²»ç™‚é¡æŠ€èƒ½ï¼ˆç›®å‰æ˜¯æ°´ç³»çš„æ²»ç™‚è¡“ï¼‰ã€‚
-
-   è·ŸcastDamageSkill()ä¸€æ¨£ä¸å¯«æ­»è§’è‰²ï¼Œ
-   ç”¨skill.elementå‹•æ…‹æŸ¥è©¢ï¼Œ
-   ä¹‹å¾Œæ°´è§’è‰²èƒ½ä¸Šå ´æˆ°é¬¥æ™‚å¯ä»¥ç›´æ¥æ²¿ç”¨ã€‚
-
-   ç›®å‰éŠæˆ²è£¡åªæœ‰ç©å®¶è‡ªå·±ä¸€å€‹è§’è‰²åœ¨æˆ°é¬¥ï¼Œ
-   ã€Œæ“‡ä¸€å‹æ–¹ç›®æ¨™ã€æš«æ™‚å›ºå®šå°±æ˜¯ç©å®¶è‡ªå·±ï¼Œ
-   ä¹‹å¾Œæœ‰ç¬¬äºŒåè§’è‰²èƒ½ä¸€èµ·æˆ°é¬¥æ™‚ï¼Œ
-   é€™è£¡å¯ä»¥æ”¹æˆè®“ç©å®¶é¸è¦æ²»ç™‚èª°ã€‚
-*/
-
-function castHealSkill(skillId,targetIndex){
-
-    const skill=skillDatabase[skillId];
-    if(!battleActive || !skill){ return; }
-
-    const level=getSkillLevel("fire",skillId);
-
-    if(level<=0){
-        addBattleLog("å°šæœªå­¸ç¿’"+skill.name+"ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    const resolvedTargetIndex=getBattleCharacterByIndex(targetIndex)
-        ? Number(targetIndex)
-        : 0;
-    const targetCharacter=getBattleCharacterByIndex(resolvedTargetIndex);
-
-    if(!targetCharacter || targetCharacter.hp<=0){
-        addBattleLog(skill.name+"çš„ç›®æ¨™å·²ç„¡æ³•æ¥å—æ²»ç™‚ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    if(player.sp<skill.spCost){
-        addBattleLog("SPä¸è¶³ï¼Œç„¡æ³•ä½¿ç”¨"+skill.name+"ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    player.sp-=skill.spCost;
-    lungePlayerCard();
-    showSkillNameBadge(skill.name,skill.element);
-    setTimeout(()=>{ showPlayerSpPopup(skill.spCost); },500);
-
-    const casterStats=getMainCharacterStats();
-    const targetStats=getPartyBattleStats(resolvedTargetIndex);
-
-    const exSkill=skillDatabase.waterEX;
-    const exLevel=getSkillLevel("fire","waterEX");
-    const healBonusMultiplier=(exSkill && exLevel>0 && exSkill.healBonusPercent)
-        ? 1+exSkill.healBonusPercent/100
-        : 1;
-    const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
-    const bossHealingMultiplier=bossOwner&&typeof bossOwner.getHealingMultiplier==="function"
-        ?Math.max(0,Number(bossOwner.getHealingMultiplier())||0):1;
-
-    const baseHealHP=skill.baseHeal+skill.healPerLevel*(level-1);
-    const healHP=Math.floor(
-        calculateHealingAmount(baseHealHP,casterStats.intelligence)*healBonusMultiplier*bossHealingMultiplier
-    );
-
-    const potentialHealSP=Math.floor(
-        calculateSPHealingAmount(
-            skill.baseHealSP+(skill.healSPPerLevel||0)*(level-1),
-            casterStats.intelligence
-        )*healBonusMultiplier*bossHealingMultiplier
-    );
-
-    const actualHealHP=Math.max(
-        0,
-        Math.min(healHP,targetStats.maxHP-targetCharacter.hp)
-    );
-
-    /* ä½¿ç”¨è€…æ­£å¼è¦å‰‡ï¼šæ–½æ”¾è€…æœ¬äººä¸å›å¾©SPï¼›æ²»ç™‚å…¶ä»–éšŠå‹æ‰æ¢å¾©SPã€‚ */
-    const actualHealSP=targetCharacter===player
-        ? 0
-        : Math.max(0,Math.min(potentialHealSP,targetStats.maxSP-targetCharacter.sp));
-
-    targetCharacter.hp=Math.min(targetStats.maxHP,targetCharacter.hp+healHP);
-
-    if(targetCharacter!==player){
-        targetCharacter.sp=Math.min(targetStats.maxSP,targetCharacter.sp+potentialHealSP);
-    }
-
-    if(actualHealHP>0){
-        showPlayerHit(actualHealHP,"heal",resolvedTargetIndex,true);
-    }
-
-    addBattleLog(
-        skill.name+"ä½¿"+(targetCharacter.id||"ç›®æ¨™")+
-        "æ¢å¾©"+actualHealHP+"é»HP"+
-        (targetCharacter===player
-            ? "ï¼›æ–½æ”¾è€…æœ¬äººä¸å›å¾©SPã€‚"
-            : "ã€"+actualHealSP+"é»SPã€‚")
-    );
-
-    if(bossHealingMultiplier<1){
-        addBattleLog("ã€é–è„ˆæ³•å™¨ã€‘ä½¿æœ¬æ¬¡æ²»ç™‚èˆ‡ SP å›å¾©é™ä½ 40%ã€‚");
-    }
-
-    updateUI();
-    finishPlayerAction();
-}
-
-
-/*
-   â˜… æ–½æ”¾å¾©æ´»é¡æŠ€èƒ½ï¼ˆç›®å‰æ˜¯æ°´ç³»çš„å¾©æ´»è¡“ï¼‰ã€‚
-
-   è·ŸcastReviveSkill()åŸæœ¬çš„èªªæ˜ä¸åŒâ€”â€”
-   player2ç¾åœ¨å·²ç¶“æ˜¯çœŸæ­£èƒ½ä¸€èµ·ä¸Šå ´æˆ°é¬¥ã€
-   æœƒçœŸçš„é™£äº¡çš„è§’è‰²äº†ï¼ˆå‰ä¸€è¼ªä¿®å¾©å…ƒç´ 
-   è¢«å‹•bugæ™‚ç¢ºèªéï¼Œplayer2æœ‰å®Œæ•´çš„
-   ç­‰ç´š/HPç³»çµ±ï¼‰ï¼Œé€™è£¡æ¥ä¸ŠçœŸæ­£çš„å¾©æ´»
-   é‚è¼¯ï¼š
-
-   - å¾©æ´»å°è±¡å›ºå®šæ˜¯player2ï¼ˆç©å®¶è‡ªå·±æ­»äº¡
-     æœƒç›´æ¥è§¸ç™¼loseBattle()ã€æˆ°é¬¥ç«‹åˆ»
-     çµæŸï¼Œä¸æœƒæœ‰ã€Œç©å®¶æ­»äº¡ä½†éšŠå‹é‚„åœ¨ã€
-     çš„æƒ…å¢ƒï¼Œæ‰€ä»¥èƒ½è¢«å¾©æ´»çš„åªå¯èƒ½æ˜¯
-     player2ï¼Œä¸éœ€è¦é¡å¤–çš„é¸æ“‡ç›®æ¨™UIï¼‰ã€‚
-   - æ²’æœ‰player2ã€æˆ–player2é‚„æ´»è‘—ï¼Œ
-     éƒ½è¦–ç‚ºç„¡æ•ˆæ–½æ”¾ï¼Œæ“‹ä¸‹ä¾†ä¸¦æç¤ºã€‚
-   - å¾©æ´»å¾Œæ¢å¾©çš„è¡€é‡ï¼…æ•¸ä¾æŠ€èƒ½ç­‰ç´šæŸ¥
-     reviveHealPercentByLevelï¼Œè·Ÿæ²»ç™‚è¡“
-     ä¸€æ¨£åƒæ°´å…ƒç´ EXçš„healBonusPercent
-     åŠ æˆã€‚
-*/
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œå¾©æ´»è¡“ä¸åª
-   ç©å®¶2å¯ä»¥ç”¨ï¼Œæ”¹å¤©ç©å®¶å¦‚æœ3éš»éƒ½ç©æ°´ï¼Œ
-   è¦ä¸‰éš»éƒ½å¯ä»¥ç”¨ã€ï¼‰ï¼š
-   åŸæœ¬å¯«æ­»æŠ“player2ï¼Œæ”¹æˆç”¨
-   getRevivableAllySlots()é€™å€‹æ¸…å–®å»æ‰¾
-   ã€Œèª°æ­»äº†å¯ä»¥è¢«å¾©æ´»ã€ï¼Œä¸å†ç¡¬ç¶æ­»
-   player2é€™ä¸€å€‹è§’è‰²ã€‚
-
-   ç›®å‰éŠæˆ²æ¶æ§‹å°±åªæœ‰playerï¼ˆä¸€è™Ÿï¼Œæ­»äº¡
-   ç›´æ¥åˆ¤è² ï¼Œä¸æœƒæ˜¯å¾©æ´»å°è±¡ï¼‰è·Ÿplayer2
-   ï¼ˆäºŒè™Ÿï¼‰é€™å…©å€‹è§’è‰²æ¬„ä½ï¼Œplayer3/
-   player4é‚„æ²’æœ‰çœŸæ­£çš„è§’è‰²è³‡æ–™ã€å‰µè§’æµç¨‹ã€
-   æˆ°é¬¥å¡ç‰‡â€”â€”é€™äº›æ˜¯æ›´å¤§çš„æ¶æ§‹å·¥ç¨‹ï¼Œ
-   ä¸æ˜¯é€™æ¬¡é †æ‰‹å°±èƒ½ç”Ÿå‡ºä¾†çš„ï¼Œæ‰€ä»¥é€™è£¡
-   å…ˆæŠŠã€Œå¯èƒ½è¢«å¾©æ´»çš„éšŠå‹æ¸…å–®ã€æŠ½æˆä¸€å€‹
-   å‡½å¼ï¼Œä¹‹å¾ŒçœŸçš„åŠ äº†player3/player4ï¼Œ
-   åªè¦æŠŠä»–å€‘ä¹Ÿå¡é€²é€™å€‹æ¸…å–®ã€çµ¦ä¸€å¼µæˆ°é¬¥
-   å¡ç‰‡ï¼Œå¾©æ´»è¡“é€™è£¡å®Œå…¨ä¸ç”¨å†æ”¹ä¸€è¡Œã€‚
-
-   å¦‚æœæ¸…å–®è£¡åŒæ™‚æœ‰å…©å€‹ä»¥ä¸Šçš„äººé™£äº¡
-   ï¼ˆç¾åœ¨æ¶æ§‹ä¸‹ä¸æœƒç™¼ç”Ÿï¼Œåªæœ‰player2ä¸€å€‹
-   å¯èƒ½æ­»äº¡å°è±¡ï¼Œä½†å…ˆå¯«å¥½æº–å‚™ï¼‰ï¼Œç›®å‰å…ˆ
-   å¾©æ´»ã€Œå…ˆåŠ å…¥æ¸…å–®çš„é‚£ä¸€å€‹ã€ï¼Œç­‰çœŸçš„æœ‰
-   3äººä»¥ä¸ŠåŒæ™‚æˆ°é¬¥æ™‚ï¼Œé€™è£¡è¦å¦å¤–åšä¸€å€‹
-   ã€Œé¸æ“‡è¦å¾©æ´»èª°ã€çš„å°è¦–çª—ï¼Œå…ˆåœ¨è¨»è§£
-   ç•™ä¸€å€‹æé†’ã€‚
-*/
-
-function getRevivableAllySlots(){
-    return getExistingPartyIndexes().map(characterIndex=>({
-        character:getPartyCharacterByIndex(characterIndex),
-        characterIndex:characterIndex
-    }));
-
-}
-
-
-function castReviveSkill(skillId,targetIndex){
-
-    const skill=skillDatabase[skillId];
-    if(!battleActive || !skill){ return; }
-
-    const level=getSkillLevel("fire",skillId);
-
-    if(level<=0){
-        addBattleLog("å°šæœªå­¸ç¿’"+skill.name+"ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    const revivableSlots=getRevivableAllySlots();
-
-    if(revivableSlots.length===0){
-        addBattleLog("ç›®å‰æ²’æœ‰å…¶ä»–éšŠå‹ï¼Œç„¡æ³•ä½¿ç”¨"+skill.name+"ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    let targetSlot=null;
-
-    if(targetIndex!==null && targetIndex!==undefined){
-        targetSlot=revivableSlots.find(
-            slot=>slot.characterIndex===targetIndex && slot.character.hp<=0
-        )||null;
-    }
-
-    if(!targetSlot){
-        targetSlot=revivableSlots.find(slot=>slot.character.hp<=0)||null;
-    }
-
-    if(!targetSlot){
-        addBattleLog("ç›®å‰æ²’æœ‰é™£äº¡çš„éšŠå‹ï¼Œä¸éœ€è¦"+skill.name+"ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    if(player.sp<skill.spCost){
-        addBattleLog("SPä¸è¶³ï¼Œç„¡æ³•ä½¿ç”¨"+skill.name+"ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    const targetCharacter=targetSlot.character;
-    const targetIndexResolved=targetSlot.characterIndex;
-
-    player.sp-=skill.spCost;
-    lungePlayerCard();
-    showSkillNameBadge(skill.name,skill.element);
-    setTimeout(()=>{ showPlayerSpPopup(skill.spCost); },500);
-
-    const exSkill=skillDatabase.waterEX;
-    const exLevel=getSkillLevel("fire","waterEX");
-    const healBonusMultiplier=(exSkill && exLevel>0 && exSkill.healBonusPercent)
-        ? 1+exSkill.healBonusPercent/100
-        : 1;
-
-    const revivePercent=skill.reviveHealPercentByLevel[level-1];
-    const targetStats=getPartyBattleStats(targetIndexResolved);
-
-    const reviveHP=Math.max(
-        1,
-        Math.floor(targetStats.maxHP*revivePercent/100*healBonusMultiplier)
-    );
-
-    targetCharacter.hp=Math.min(targetStats.maxHP,reviveHP);
-
-    /* æœ€æ–°æ­£å¼è¦æ ¼åªæŒ‡å®šæ¢å¾©è¡€é‡ï¼›å¾©æ´»ä¸å†é¡å¤–æ¢å¾©SPã€‚ */
-
-    setTimeout(()=>{
-        showPlayerHit(targetCharacter.hp,"heal",targetIndexResolved,true);
-    },300);
-
-    addBattleLog(
-        (targetCharacter.id||"éšŠå‹")+"è¢«"+skill.name+
-        "å¾©æ´»äº†ï¼æ¢å¾©"+targetCharacter.hp+"é»HPã€‚"
-    );
-
-    updateUI();
-    finishPlayerAction();
-}
-
-
-/*
-   æ¯å›åˆé–‹å§‹æ™‚ï¼Œbuffçš„æŒçºŒå›åˆæ•¸è¦éæ¸›ï¼Œ
-   æ­¸é›¶å°±ç§»é™¤ï¼Œä¸¦åœ¨æˆ°é¬¥è³‡è¨Šç•™ä¸€ç­†ç´€éŒ„ã€‚
-*/
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ¥ä¸Šæ–°å¢çš„
-   å¢ç›ŠæŠ€èƒ½ï¼‰ï¼š
-   åŸæœ¬é€™å€‹å‡½å¼å¯«æ­»ã€Œâ³ æ€’ç«æ•ˆæœå·²çµæŸã€ï¼Œ
-   ä¸ç®¡éæœŸçš„æ˜¯å“ªå€‹bufféƒ½å°åŒä¸€å¥è©±ï¼Œ
-   è€Œä¸”åªè™•ç†player.activeBuffsï¼Œplayer2
-   çš„buffï¼ˆä¾‹å¦‚player2å­¸æœƒçš„å²©çŸ³å£å£˜/
-   é–ƒèº²è¡“ä¹‹é¡ï¼‰å®Œå…¨æ²’è¢«å€’æ•¸éï¼Œæœƒè®Šæˆ
-   æ°¸ä¹…ç”Ÿæ•ˆã€æ™‚é–“åˆ°äº†ä¹Ÿä¸æœƒæ¶ˆå¤±ã€‚
-
-   æ”¹æˆé€šç”¨ç‰ˆæœ¬ï¼Œç”¨DEBUFF_LABELSé€™ç¨®
-   å°ç…§è¡¨çµ±ä¸€æ±ºå®šæ¯ç¨®buffé¡å‹éæœŸæ™‚è¦
-   é¡¯ç¤ºä»€éº¼è¨Šæ¯ï¼Œplayer/player2éƒ½æœƒè™•ç†ï¼Œ
-   è·ŸtickStatusEffects()è™•ç†æ€ªç‰©æ¸›ç›Šæ˜¯
-   åŒä¸€å¥—è¨­è¨ˆé‚è¼¯ã€‚
-*/
-
-const BUFF_EXPIRE_LABELS={
-
-    rage:"æ€’ç«",
-    phoenixMight:"é³³å¨",
-    dodgeSkill:"é¢¨è¡Œ",
-    rockWall:"å²©çŸ³å£å£˜",
-    earthShield:"è¬è±¡åœŸç›¾ï¼ˆåå‚·ï¼‰",
-    barrier:"çµç•Œ",
-    stealthSkill:"éš±èº«",
-    dinghaishenzhen:"æ°£å®šç¥é–’",
-    shield:"å²©ç›¾"
-
-};
-
-
-function tickBuffsForCharacter(character){
-
-    if(
-        !character ||
-        !character.activeBuffs ||
-        character.activeBuffs.length===0
-    ){
-        return;
-    }
-
-
-    character.activeBuffs=
-        character.activeBuffs.filter(
-            buff=>{
-
-                if(buff.type==="phoenixMight"){
-                    const active=
-                        buff.battleToken===battleToken&&
-                        turn<Number(buff.expiresTurn);
-                    if(active){
-                        buff.turnsLeft=Math.max(1,Number(buff.expiresTurn)-turn);
-                        return true;
-                    }
-                    addBattleLog("â³é³³å¨æ•ˆæœå·²çµæŸã€‚");
-                    return false;
-                }
-
-                buff.turnsLeft--;
-
-
-                if(buff.turnsLeft<=0){
-
-                    addBattleLog(
-
-                        "â³"+
-                        (
-                            BUFF_EXPIRE_LABELS[
-                                buff.type
-                            ]||
-                            buff.type
-                        )+
-                        "æ•ˆæœå·²çµæŸã€‚"
-
-                    );
-
-                    return false;
-
-                }
-
-
-                return true;
-
-            }
-        );
-
-}
-
-
-function tickPlayerBuffs(){
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆè§’è‰²é™£åˆ—é‡æ§‹ç¬¬ä¸€éšæ®µï¼‰ï¼š
-       æ”¹ç”¨getCharacters()ï¼Œä¹‹å¾ŒåŠ ç¬¬ä¸‰è§’è‰²ï¼Œ
-       é€™è£¡å®Œå…¨ä¸ç”¨å†æ”¹ä¸€è¡Œï¼Œè‡ªå‹•å°±æœƒä¸€èµ·
-       è™•ç†åˆ°ã€‚
-    */
-
-    getCharacters().forEach(
-        character=>{
-
-            tickBuffsForCharacter(
-                character
-            );
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   å…±ç”¨ï¼šè§£æç›®å‰çš„æ”»æ“Šç›®æ¨™
-===================================================== */
-
-/*
-   â˜… æ–°å¢ï¼ˆä¿®å¾©ã€Œç›®æ¨™æ­»äº¡ä½†selectedMonster
-   ç´¢å¼•é‚„æ²’æ›´æ–°ï¼Œè§’è‰²è¡Œå‹•æ•´å€‹å¡æ­»ã€çš„bugï¼‰ï¼š
-
-   æ™®é€šæ”»æ“Šã€å‚·å®³æŠ€èƒ½ã€é¢¨ä¹‹ç®­é€™ä¸‰å€‹å‡½å¼ï¼Œ
-   åŸæœ¬å„è‡ªé‡è¤‡å¯«ä¸€æ¬¡ã€ŒselectedMonsteræŒ‡åˆ°çš„
-   æ€ªç‰©é‚„æ´»è‘—å—ã€çš„åˆ¤æ–·ï¼Œä¸€æ—¦éšŠå‹å…ˆæŠŠé€™éš»æ€ªç‰©
-   æ‰“æ­»ã€ä½†é€™å€‹è§’è‰²é–å®šçš„ç´¢å¼•é‚„æ²’æ›éï¼Œåˆ¤æ–·
-   å¤±æ•—å°±ç›´æ¥returnâ€”â€”å•é¡Œæ˜¯é€™å€‹returnæ²’æœ‰
-   å‘¼å«finishPlayerAction()ï¼Œå°è‡´é€™å€‹è§’è‰²çš„
-   è¡Œå‹•å¡åœ¨åŸåœ°ä¸æœƒå¾€ä¸‹èµ°ã€‚å› ç‚ºæ€ªç‰©çš„è¡Œå‹•é‚è¼¯
-   æ˜¯ç¨ç«‹è·‘çš„ï¼Œç•«é¢ä¸Šæ‰æœƒçœ‹èµ·ä¾†åƒã€Œæ€ªç‰©ä¸€ç›´æ‰“ã€
-   æˆ‘æ–¹å®Œå…¨æ²’åæ‡‰ã€ï¼Œå…¶å¯¦æ˜¯æˆ‘æ–¹çš„è¡Œå‹•ä½‡åˆ—è¢«
-   å¡ä½äº†ã€‚
-
-   æ‹†æˆå…©å±¤ï¼š
-
-   1. findAliveTargetIndex(preferredIndex)ï¼š
-      ç´”ç²¹çš„ã€Œæ‰¾ç›®æ¨™ã€é‚è¼¯ï¼Œä¸å‘¼å«
-      finishPlayerAction()ã€ä¸æ”¹selectedMonsterï¼Œ
-      å–®ç´”å›å‚³ã€Œæ‡‰è©²æ‰“èª°ã€æˆ–nullï¼ˆæ²’äººå¯æ‰“ï¼‰ã€‚
-      é€™æ¨£ä¸ç®¡å‘¼å«ç«¯è‡ªå·±æœ‰æ²’æœ‰è™•ç†
-      finishPlayerAction()ï¼Œéƒ½èƒ½å®‰å…¨å…±ç”¨åŒä¸€å¥—
-      æ‰¾ç›®æ¨™è¦å‰‡ï¼Œä¸æœƒæœ‰å‰¯ä½œç”¨æ‰“æ¶çš„å•é¡Œã€‚
-
-   2. resolveAttackTargetIndex()ï¼š
-      çµ¦player1çš„æ™®é€šæ”»æ“Š/å‚·å®³æŠ€èƒ½/é¢¨ä¹‹ç®­ç”¨
-      ï¼ˆé€™ä¸‰å€‹å‡½å¼æœ¬èº«è¦è‡ªå·±è² è²¬å‘¼å«
-      finishPlayerAction()ï¼Œå‘¼å«ç«¯ä¸æœƒè£œï¼‰ï¼Œ
-      åœ¨findAliveTargetIndexçš„çµæœä¸Šï¼Œ
-      å¤šåšã€ŒåŒæ­¥selectedMonsterã€è·Ÿ
-      ã€Œæ‰¾ä¸åˆ°ç›®æ¨™æ™‚å‘¼å«finishPlayerAction()ã€
-      é€™å…©ä»¶äº‹ã€‚
-
-   å…©å±¤è¦å‰‡ä¸€è‡´ï¼š
-   - selectedMonsteræŒ‡åˆ°çš„æ€ªç‰©é‚„æ´»è‘—ï¼Œç›´æ¥æ²¿ç”¨ï¼Œ
-     ä¸æ”¹è®Šç©å®¶åŸæœ¬é–å®šçš„ç›®æ¨™ï¼›
-   - æ­»äº†çš„è©±ï¼Œè‡ªå‹•æ”¹é–å®šcurrentBattleMonstersè£¡
-     ç¬¬ä¸€éš»é‚„æ´»è‘—çš„æ€ªç‰©ï¼Œè®“æ”»æ“Šè‡ªå‹•æ¥çºŒä¸‹å»ï¼›
-   - é€£ä¸€éš»æ´»è‘—çš„æ€ªç‰©éƒ½æ‰¾ä¸åˆ°ï¼ˆæ•µæ–¹å·²åœ˜æ»…ï¼‰ï¼Œ
-     å›å‚³nullã€‚
-
-   é€™å…©å€‹å‡½å¼åªè™•ç†ã€Œç›®æ¨™æ˜¯å¦æœ‰æ•ˆã€ï¼Œ
-   ä¸æœƒå‹•åˆ°å‚·å®³å…¬å¼ã€å‘½ä¸­ç‡ã€æš´æ“Šç‡ç­‰
-   ä»»ä½•æ—¢æœ‰æˆ°é¬¥æ•¸å€¼æ©Ÿåˆ¶ã€‚
-*/
-
-function findAliveTargetIndex(preferredIndex){
-
-    if(
-        preferredIndex!==null &&
-        preferredIndex!==undefined &&
-        monsters[preferredIndex] &&
-        monsters[preferredIndex].alive
-    ){
-        return preferredIndex;
-    }
-
-
-    const fallbackIndex =
-        currentBattleMonsters.find(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    return (
-        fallbackIndex===undefined
-        ?
-        null
-        :
-        fallbackIndex
-    );
-
-}
-
-
-function resolveAttackTargetIndex(){
-
-    const index =
-        findAliveTargetIndex(
-            selectedMonster
-        );
-
-
-    if(index===null){
-
-        finishPlayerAction();
-
-        return null;
-
-    }
-
-
-    selectedMonster=
-        index;
-
-    return index;
-
-}
-
-
-/* =====================================================
-   æ™®é€šæ”»æ“Š
-===================================================== */
-
-function normalAttack(){
-
-    if(!battleActive){
-        return;
-    }
-
-
-    const index =
-        resolveAttackTargetIndex();
-
-
-    if(index===null){
-        return;
-    }
-
-
-    const monster =
-        monsters[index];
-
-
-    lungePlayerCard();
-
-
-    showSkillNameBadge(
-        "æ™®é€šæ”»æ“Š",
-        "normal",
-        0,
-        index,
-        [index]
-    );
-
-
-    const stats =
-        getMainCharacterStats();
-
-
-    /*
-       â˜… å‘½ä¸­åˆ¤å®šï¼š
-       æ‰“ç©ºçš„è©±ç›´æ¥è·³MISSã€æ’­æ”¾é–ƒé¿å‹•ç•«ï¼Œ
-       ä¸è¨ˆç®—å‚·å®³ã€ä¸æ‰£è¡€ï¼Œ
-       ä½†é‚„æ˜¯è¦æ­£å¸¸çµæŸé€™æ¬¡è¡Œå‹•
-       ï¼ˆé€²å…¥æ€ªç‰©å›åˆï¼‰ï¼Œä¸èƒ½å¡ä½ã€‚
-    */
-
-    const hit =
-        rollHitChance(
-            stats.accuracy,
-            getMonsterEvasion(
-                monster
-            ),
-            getMonsterDebuffValue(
-                player,
-                "stun"
-            )
-        );
-
-
-    if(!hit){
-
-        showMissEffect(
-            false,
-            index,
-            "MISS"
-        );
-
-
-        addBattleLog(
-            "æ™®é€šæ”»æ“Š"+
-            monster.name+
-            "ï¼Œæ²’æœ‰å‘½ä¸­ï¼"
-        );
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const critResult =
-        rollCritical(
-            player,
-            "physical",
-            getMonsterEffectiveAntiCrit(monster),
-            monster
-        );
-
-    const damage =
-        calculateDamage(
-            stats.attack,
-            getMonsterEffectiveDefense(monster),
-            player.level,
-            monster.level,
-            player.element,
-            monster.element,
-            {
-                attacker:player,
-                target:monster,
-                critMultiplier:critResult.multiplier
-            }
-        );
-
-
-    monster.hp =
-        Math.max(
-            0,
-            monster.hp-damage
-        );
-
-
-    showMonsterHit(
-        index,
-        damage,
-        "hp",
-        critResult.isCrit
-    );
-
-
-    addBattleLog(
-
-        "æ™®é€šæ”»æ“Š"+
-        monster.name+
-        (
-            critResult.isCrit
-            ?
-            "ï¼ˆçˆ†æ“Šï¼ï¼‰"
-            :
-            ""
-        )+
-        "ï¼Œé€ æˆ"+
-        damage+
-        "å‚·å®³ã€‚"
-
-    );
-
-
-    if(monster.hp<=0){
-        killMonster(index);
-    }
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-
-/* =====================================================
-   é¢¨ä¹‹ç®­
-===================================================== */
-
-function windArrowAttack(){
-
-    if(!battleActive){
-        return;
-    }
-
-
-    if(player.sp<10){
-
-        if(autoBattle){
-
-            normalAttack();
-
-        }
-        else{
-
-            /*
-               â˜… ä¿®æ­£ï¼ˆè·ŸcastDamageSkill()åŒä¸€ç¨®
-               bugï¼ŒåŒä¸€æ¬¡ä¸€èµ·ä¿®æ‰ï¼‰ï¼š
-               åŸæœ¬é€™è£¡ä¹Ÿæ˜¯å°å®ŒâŒè¨Šæ¯å°±ç›´æ¥returnï¼Œ
-               æ²’å‘¼å«finishPlayerAction()ï¼Œæœƒè®“
-               çµç®—éˆå¾é€™è£¡é–‹å§‹æ•´å€‹å¡ä½ï¼Œä¸åªé¢¨ä¹‹ç®­
-               é€™æ¬¡è¡Œå‹•ï¼Œå¾Œé¢æ‰€æœ‰è§’è‰²/æ€ªç‰©çš„å›åˆ
-               éƒ½ä¸æœƒå†è¢«æ¨é€²ã€‚
-            */
-
-            addBattleLog(
-                "SPä¸è¶³ï¼Œç„¡æ³•ä½¿ç”¨é¢¨ä¹‹ç®­ã€‚"
-            );
-
-            finishPlayerAction();
-
-        }
-
-        return;
-
-    }
-
-
-    const index =
-        resolveAttackTargetIndex();
-
-
-    if(index===null){
-        return;
-    }
-
-
-    player.sp -= 10;
-
-
-    lungePlayerCard();
-
-
-    showSkillNameBadge(
-        skillDatabase.windArrow.name,
-        "wind",
-        0,
-        index,
-        [index]
-    );
-
-
-    setTimeout(()=>{
-        showPlayerSpPopup(10);
-    },500);
-
-
-    const monster =
-        monsters[index];
-
-
-    const stats =
-        getMainCharacterStats();
-
-
-    const damage =
-        calculateDamage(
-            stats.attack+15,
-            getMonsterEffectiveDefense(monster),
-            player.level,
-            monster.level,
-            player.element,
-            monster.element,
-            {attacker:player,target:monster}
-        );
-
-
-    monster.hp =
-        Math.max(
-            0,
-            monster.hp-damage
-        );
-
-
-    showMonsterHit(index,damage,"hp");
-
-
-    addBattleLog(
-        "é¢¨ä¹‹ç®­å‘½ä¸­"+
-        monster.name+
-        "ï¼Œé€ æˆ"+
-        damage+
-        "å‚·å®³ã€‚"
-    );
-
-
-    if(monster.hp<=0){
-        killMonster(index);
-    }
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-/* =====================================================
-   ç©å®¶è¡Œå‹•çµæŸ
-===================================================== */
-
-function finishPlayerAction(){
-
-    notifyBattleActionFinished();
-    if(interceptBattleActionFinish()){
-        return;
-    }
-
-    if(!battleActive){
-        return;
-    }
-
-
-    clearInterval(timerId);
-
-
-    actionReady=false;
-
-    pendingAction=null;
-    clearBattleTargetSelectionMode();
-
-
-    if(checkBattleEnd()){
-        return;
-    }
-
-    /* A single action may reach this helper through animation and fallback
-       paths. Only the first call is allowed to advance the queue. */
-    if(battleAdvanceScheduled){
-        return;
-    }
-
-    battleAdvanceScheduled=true;
-
-
-    const token=
-        battleToken;
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆé‡æ–°è¨­è¨ˆå›åˆåˆ¶ï¼‰ï¼š
-       é€™å€‹å‡½å¼ç¾åœ¨åŒæ™‚æœå‹™å…©ç¨®æƒ…å¢ƒï¼Œ
-       è¦çœ‹battlePhaseæ±ºå®šã€ŒçµæŸå¾Œæ¥ä¸‹ä¾†åšä»€éº¼ã€ï¼š
-
-       1. battlePhase==="declare"ï¼š
-          ä»£è¡¨é€™æ˜¯å®£å‘Šéšæ®µï¼ˆè‡ªå‹•è§’è‰²å®£å‘Šæ™‚
-          ç›´æ¥åŸ·è¡Œã€æˆ–é˜²ç¦¦/ç‰©å“/å¢ç›Šé€™é¡
-          ä¸éœ€è¦çµç®—æ’åºçš„è¡Œå‹•å‰›åŸ·è¡Œå®Œï¼‰ï¼Œ
-          çµæŸå¾Œè¦å¾€ä¸‹ä¸€å€‹ã€Œé‚„æ²’å®£å‘Šçš„è§’è‰²ã€æ¨é€²ï¼Œ
-          activeBattleCharacterIndex++ï¼Œ
-          å‘¼å«beginCharacterTurn()ã€‚
-
-       2. battlePhase==="resolve"ï¼š
-          ä»£è¡¨é€™æ˜¯çµç®—éšæ®µï¼ˆæ™®é€šæ”»æ“Š/å‚·å®³æŠ€èƒ½
-          çœŸæ­£åœ¨ä¾æ•æ·é †åºåŸ·è¡Œï¼‰ï¼Œ
-          çµæŸå¾Œå¾€initiativeIndexæ¨é€²ï¼Œ
-          å‘¼å«processNextCombatant()ã€‚
-    */
-
-    if(battlePhase==="declare"){
-
-        activeBattleCharacterIndex++;
-
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œé€™æ¬¡é€²ä¸€æ­¥ï¼‰ï¼š
-           å®£å‘Šéšæ®µåŸæœ¬é‚„æœƒé¡¯ç¤ºã€Œå·²é¸æ“‡XXã€æ–‡å­—ï¼Œ
-           æ‰€ä»¥ç•™äº†ä¸€é»å»¶é²è®“ç©å®¶çœ‹å¾—åˆ°é‚£è¡Œå­—ã€‚
-           ç¾åœ¨å·²ç¶“æ‹¿æ‰é‚£è¡Œæ–‡å­—äº†ï¼Œ
-           ç´”ç²¹æ›äººé¸æ“‡ä¸éœ€è¦å†ç­‰ï¼Œ
-           ç›´æ¥é€²ä¸‹ä¸€ä½ã€å¹¾ä¹æ„Ÿè¦ºä¸åˆ°åœé “ã€‚
-        */
-
-        battleAdvanceTimeoutId=setTimeout(()=>{
-
-            battleAdvanceTimeoutId=null;
-            battleAdvanceScheduled=false;
-
-            if(
-                !battleActive ||
-                token!==battleToken
-            ){
-                return;
-            }
-
-
-            beginCharacterTurn(
-                token
-            );
-
-        },getBattleAdvanceDelay("declare"));
-
-        return;
-
-    }
-
-
-    initiativeIndex++;
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼ŒåŠ å¿«ç¯€å¥ï¼‰ï¼š
-       åŸæœ¬1050msï¼Œä½¿ç”¨è€…åæ‡‰ã€Œæ¯å€‹äººè¡Œå‹•å®Œã€
-       æ›ä¸‹ä¸€ä½ã€çš„é–“éš”æ„Ÿè¦ºåä¹…ï¼Œå°¤å…¶ä¸€æ•´è¼ª
-       æ‰“å®Œè¦æ¥ä¸‹ä¸€è¼ªçš„æ™‚å€™ç‰¹åˆ¥æ˜é¡¯â€”â€”
-       é€™è£¡èª¿å¿«åˆ°700msï¼Œå‹•ç•«é‚„æ˜¯çœ‹å¾—æ¸…æ¥šï¼Œ
-       ä½†æ•´é«”ç¯€å¥æœƒä¿è½ä¸å°‘ã€‚
-    */
-
-    const nextDelay=getBattleAdvanceDelay("resolve");
-
-    battleAdvanceTimeoutId=setTimeout(()=>{
-
-        battleAdvanceTimeoutId=null;
-        battleAdvanceScheduled=false;
-
-        if(
-            !battleActive ||
-            token!==battleToken
-        ){
-            return;
-        }
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆé€™è£¡æ˜¯æœ€é—œéµçš„ä¸€å€‹ç¼ºå£â€”â€”
-           æ¯å€‹äººè¡Œå‹•å®Œã€æ›ä¸‹ä¸€ä½ï¼Œå…¨éƒ¨éƒ½è¦
-           ç¶“éé€™è£¡ï¼Œä¹‹å‰å®Œå…¨æ²’æœ‰ä¿è­·ï¼Œ
-           å¦‚æœä»»ä½•ä¸€æ¬¡çš„processNextCombatant()
-           åœ¨åŸ·è¡Œä¸­å‡ºéŒ¯ï¼Œæˆ°é¬¥å°±æœƒå¾é‚£ä¸€åˆ»
-           é–‹å§‹å®Œå…¨éœæ­¢ï¼Œç©å®¶åªæœƒçœ‹åˆ°
-           ç•«é¢åœåœ¨åŸåœ°ï¼Œä»€éº¼æç¤ºéƒ½æ²’æœ‰ï¼‰ï¼š
-        */
-
-        try{
-
-            processNextCombatant(
-                token
-            );
-
-        }
-        catch(error){
-
-            console.error(
-                "æ¨é€²ä¸‹ä¸€ä½æ™‚ç™¼ç”Ÿä¾‹å¤–ï¼š",
-                error
-            );
-
-            addBattleLog(
-                "æ¨é€²ä¸‹ä¸€ä½æ™‚ç™¼ç”Ÿä¾‹å¤–ï¼ˆ"+
-                (error&&error.message)+
-                "ï¼‰ï¼Œå˜—è©¦å¼·åˆ¶ç¹¼çºŒã€‚"
-            );
-
-            initiativeIndex++;
-            processNextCombatant(token);
-
-        }
-
-    },nextDelay);
-
-}
-
-
-/* =====================================================
-   æ€ªç‰©æ”»æ“Š
-===================================================== */
-
-/*
-   â˜… ä¿®æ­£ï¼ˆæ•æ·æ’åºç³»çµ±ï¼‰ï¼š
-   åŸæœ¬çš„monsterTurn()æ˜¯ã€Œä¸€æ¬¡æŠŠæ‰€æœ‰æ€ªç‰©
-   éƒ½æ‰“éä¸€è¼ªã€çš„æ‰¹æ¬¡è™•ç†å‡½å¼ï¼Œ
-   è·Ÿç¾åœ¨ã€Œç©å®¶ã€æ€ªç‰©æ··åœ¨åŒä¸€ä»½è¡Œå‹•é †åºæ¸…å–®è£¡
-   è¼ªæµè¡Œå‹•ã€çš„æ¶æ§‹ä¸ç›¸å®¹äº†ã€‚
-   æ”¹å¯«æˆprocessSingleMonsterAttack()ï¼Œ
-   ä¸€æ¬¡åªè™•ç†ã€Œé€™ä¸€éš»ã€æ€ªç‰©çš„æ”»æ“Šï¼Œ
-   æ‰“å®Œå‘¼å«finishPlayerAction()
-   ï¼ˆç¾åœ¨é€™å€‹å‡½å¼å…¶å¯¦æ˜¯ã€ŒçµæŸç›®å‰é€™ä½çš„è¡Œå‹•ã€ï¼Œ
-   ä¸ç®¡æ˜¯è§’è‰²é‚„æ˜¯æ€ªç‰©éƒ½å…±ç”¨å®ƒï¼‰å¾€ä¸‹ä¸€ä½æ¨é€²ã€‚
-*/
-
-function processSingleMonsterAttack(monsterIndex,token){
-
-    if(
-        !battleActive ||
-        token!==battleToken
-    ){
-        return;
-    }
-
-
-    const monster=
-        monsters[monsterIndex];
-
-
-    /*
-       é€™éš»æ€ªç‰©æœ‰å¯èƒ½åœ¨é€™å€‹å¤§å›åˆæ›´æ—©ä¹‹å‰
-       å°±å·²ç¶“è¢«æ‰“æ­»äº†ï¼ˆæ›æ•æ·æ’åºå¾Œï¼Œ
-       ç©å®¶å¯èƒ½å…ˆæ‰‹æŠŠç‰ æ®ºæ‰ï¼‰ï¼Œ
-       ç›´æ¥è·³éï¼Œä¸ä½”ç”¨è¡Œå‹•ã€ä¸æ‰è¡€ã€‚
-    */
-
-    if(
-        !monster ||
-        !monster.alive
-    ){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    if(
-        isMonsterFrozen(monster)
-    ){
-
-        addBattleLog(
-            ""+
-            monster.name+
-            "è¢«å†°å°ï¼Œç„¡æ³•è¡Œå‹•ã€‚"
-        );
-
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œé£›æ²™ç¬æ“Šçš„
-       çŸ³åŒ–æ•ˆæœï¼‰ï¼šè·Ÿå†°å°åŒæ¨£çš„ã€Œç„¡æ³•è¡Œå‹•ã€
-       åˆ¤æ–·ï¼Œåªæ˜¯é¡å‹ä¸åŒã€è¨Šæ¯ä¸åŒã€‚
-    */
-
-    if(
-        isMonsterPetrified(monster)
-    ){
-
-        addBattleLog(
-            ""+
-            monster.name+
-            "è¢«çŸ³åŒ–ï¼Œç„¡æ³•è¡Œå‹•ã€‚"
-        );
-
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    lungeMonsterCard(
-        monsterIndex
-    );
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œç¬¬2ã€3é …ï¼‰ï¼š
-       1. æŠ€èƒ½åç¨±ä¸å†è‡ªå·±å–ï¼Œæ”¹æˆå¾æŠ€èƒ½æ± 
-          ï¼ˆskillIdsï¼Œå¼•ç”¨çœŸæ­£å­˜åœ¨çš„æŠ€èƒ½ï¼‰
-          éš¨æ©ŸæŒ‘ä¸€å€‹è¦æ–½æ”¾çš„æŠ€èƒ½IDï¼Œ
-          é¡¯ç¤ºçš„åç¨±ç›´æ¥å»skillDatabaseæŸ¥
-          çœŸæ­£çš„æŠ€èƒ½åç¨±ï¼Œè·Ÿç©å®¶ç”¨çš„æ˜¯
-          åŒä¸€å¥—æŠ€èƒ½ã€åŒä¸€å€‹åå­—ã€‚
-       2. æŠ€èƒ½é‡‹æ”¾æ©Ÿç‡ä¸å†å¯«æ­»50%ï¼Œ
-          æ”¹æˆè®€æ€ªç‰©è³‡æ–™è£¡å„è‡ªçš„skillChance
-          ï¼ˆä¸åŒå€åŸŸæ©Ÿç‡ä¸ä¸€æ¨£ï¼‰ï¼Œ
-          æ˜¯ä¸€å€‹ç¨ç«‹ã€é‡å°ã€Œé€™éš»æ€ªç‰©é€™ä¸€æ¬¡
-          æ”»æ“Šã€å–®ç¨éª°çš„æ©Ÿç‡ï¼Œä¸æ˜¯è·Ÿæ™®é€šæ”»æ“Š
-          ç¶åœ¨ä¸€èµ·ã€äº’æ–¥çš„å…©å€‹é¸é …å…±ç”¨åŒä¸€å€‹
-          åˆ¤æ–·å¼è€Œå·²ï¼Œå„å€åŸŸå¯ä»¥è‡ªç”±èª¿æ•´
-          é€™å€‹æ•¸å­—ã€ä¸å½±éŸ¿å…¶ä»–åœ°æ–¹ã€‚
-    */
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€ŒSPè¦å¯¦éš›
-       æ¶ˆè€—ï¼Œæ²’äº†å°±ä¸èƒ½é‡‹æ”¾æŠ€èƒ½ã€ï¼‰ï¼š
-       åŸæœ¬é€™è£¡åªçœ‹skillChanceæ©Ÿç‡ã€å®Œå…¨æ²’
-       æª¢æŸ¥æ€ªç‰©SPå¤ ä¸å¤ ï¼ŒæŠ€èƒ½ç­‰æ–¼æ˜¯å…è²»çš„ã€
-       SPç´”ç²¹æ˜¯é¡¯ç¤ºç”¨çš„è£é£¾æ•¸å­—ã€‚
-
-       ç¾åœ¨å…ˆæŠŠã€Œé€™éš»æ€ªç‰©SPä»˜å¾—èµ·ã€çš„æŠ€èƒ½
-       æŒ‘å‡ºä¾†ï¼ˆaffordableSkillIdsï¼‰ï¼Œåªæœ‰
-       æŒ‘å¾—å‡ºè‡³å°‘ä¸€å€‹ä»˜å¾—èµ·çš„æŠ€èƒ½ï¼Œæ‰æœƒçœŸçš„
-       éª°æ©Ÿç‡æ±ºå®šè¦ä¸è¦æ”¾æŠ€èƒ½ï¼›SPä¸å¤ çš„æŠ€èƒ½
-       ä¸æœƒè¢«é¸åˆ°ï¼ŒSPæ•´å€‹è¦‹åº•çš„è©±å°±ç›´æ¥
-       æ”¹æ™®é€šæ”»æ“Šï¼Œè·Ÿç©å®¶ã€ŒSPä¸è¶³è‡ªå‹•æ”¹ç”¨
-       æ™®é€šæ”»æ“Šã€æ˜¯åŒä¸€ç¨®è¡Œç‚ºã€‚
-    */
-
-    const hasVisibleSingleTarget=getExistingPartyIndexes().some(index=>{
-        const character=getPartyCharacterByIndex(index);
-        return character&&character.hp>0&&!hasActiveBuff(character,"stealthSkill");
-    });
-
-    const affordableSkillIds=
-
-        Array.isArray(monster.skillIds)
-        ?
-        monster.skillIds.filter(
-            skillId=>{
-
-                const data=
-                    skillDatabase[skillId];
-
-
-                return (
-                    data &&
-                    monster.sp>=data.spCost&&
-                    (data.targetType!=="single"||hasVisibleSingleTarget)
-                );
-
-            }
-        )
-        :
-        [];
-
-
-    const usesSkill=
-
-        affordableSkillIds.length>0 &&
-        Math.random()<
-        (
-            monster.skillChance!==undefined
-            ?
-            monster.skillChance
-            :
-            0
-        );
-
-
-    let castSkillId=null;
-
-    let castSkillName=null;
-
-    let castSkillData=null;
-
-
-    if(usesSkill){
-
-        castSkillId=
-
-            affordableSkillIds[
-                Math.floor(
-                    Math.random()*
-                    affordableSkillIds.length
-                )
-            ];
-
-
-        castSkillData=
-            skillDatabase[castSkillId];
-
-
-        castSkillName=
-
-            castSkillData
-            ?
-            castSkillData.name
-            :
-            castSkillId;
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼ŒSPçœŸçš„è¦
-           è¢«æ‰£æ‰ï¼‰ï¼šè·Ÿç©å®¶æ–½æ”¾æŠ€èƒ½ä¸€æ¨£ï¼Œ
-           æ”¾ä¸‹å»å°±çœŸçš„æ‰£è¡€æ¢ä¸‹é¢é‚£æ¢SPï¼Œ
-           ä¸æ˜¯åªæœ‰ç•«é¢æ•¸å­—å‹•ã€å¯¦éš›é‚è¼¯æ²’å‹•ã€‚
-        */
-
-        if(castSkillData){
-
-            monster.sp=
-
-                Math.max(
-                    0,
-                    monster.sp-
-                    castSkillData.spCost
-                );
-
-        }
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œè·Ÿç©å®¶
-           æ–½æ”¾æŠ€èƒ½ä¸€æ¨£ï¼Œæ€ªç‰©æ–½æ”¾æŠ€èƒ½æ™‚ä¹Ÿè¦
-           è·³å‡ºæŠ€èƒ½åç¨±ï¼‰ï¼š
-           å…ƒç´ é¡åˆ¥å„ªå…ˆç”¨æŠ€èƒ½æœ¬èº«çš„element
-           ï¼ˆè·Ÿç©å®¶æŠ€èƒ½å¾½ç« ç”¨çš„æ˜¯åŒä¸€å¥—
-           badge-fire/badge-wateræ¨£å¼ï¼‰ï¼Œ
-           æŠ€èƒ½è³‡æ–™æŸ¥ä¸åˆ°çš„è©±é€€å›ç”¨æ€ªç‰©
-           è‡ªå·±çš„elementï¼Œç¢ºä¿ä¸€å®šæœ‰æ¨£å¼
-           å¯ä»¥å¥—ç”¨ã€‚
-        */
-
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œæ€ªç‰©æ ¹æœ¬
-       æ²’æœ‰çœŸçš„é‡‹æ”¾æŠ€èƒ½ã€â€”â€”é€™å€‹å•é¡Œæ˜¯çœŸçš„ï¼Œ
-       ä¸æ˜¯èª¤æœƒï¼‰ï¼š
-
-       åŸæœ¬é€™è£¡ä¸ç®¡æ”¾çš„æ˜¯å“ªå€‹æŠ€èƒ½ï¼Œä¸€å¾‹å¥—ç”¨
-       å›ºå®š1.3å€å‚·å®³ä¿‚æ•¸ï¼ŒæŠ€èƒ½æœ¬èº«åœ¨
-       skillDatabaseè£¡å®šç¾©çš„baseDamageï¼
-       damagePerLevelå®Œå…¨æ²’è¢«ç”¨åˆ°ï¼Œåªæœ‰
-       åç¨±é¡¯ç¤ºæ˜¯çœŸçš„ï¼›è€ŒtargetType:"tri"
-       ï¼ˆç«ç®­/æ°´çƒè¡“é€™é¡ä¸‰é‡ç›®æ¨™æŠ€èƒ½ï¼‰
-       å¯¦éš›ä¸Šä¹Ÿåªæœƒæ‰“ä¸­ä¸€å€‹éš¨æ©Ÿç›®æ¨™ï¼Œ
-       è·Ÿç©å®¶ä½¿ç”¨åŒä¸€å€‹æŠ€èƒ½æ™‚ã€Œæ‰“ä¸­/å·¦/å³
-       ä¸‰å€‹ç›®æ¨™ã€çš„æ•ˆæœå®Œå…¨ä¸ä¸€æ¨£ã€‚
-
-       é€™è£¡é‡æ–°è¨­è¨ˆï¼š
-       1. æŠ€èƒ½å‚·å®³æ”¹æˆmonster.attackåŠ ä¸Š
-          æŠ€èƒ½è‡ªå·±çš„baseDamage/damagePerLevel
-          ï¼ˆä¾æ€ªç‰©ç­‰ç´šæ›ç®—å‡ºä¸€å€‹åˆç†çš„æŠ€èƒ½
-          ç­‰ç´šï¼Œç­‰ç´šè¶Šé«˜çš„æ€ªç‰©ã€æŠ€èƒ½ç­‰ç´š
-          ä¹Ÿè¶Šé«˜ï¼‰ï¼Œä¸åŒæŠ€èƒ½æœƒæ‰“å‡ºçœŸçš„ä¸åŒ
-          çš„å‚·å®³ï¼Œä¸æ˜¯çµ±ä¸€ä¹˜1.3ã€‚
-       2. targetType==="tri"ï¼"row"ï¼"column" å¿…é ˆç”±
-          å›ºå®šæˆ°å ´ Slot owner ä¾å¯¦éš›å‰å¾Œæ’èˆ‡æ¬„ä½é¸å–ï¼Œ
-          ä¸èƒ½æŠŠç¯„åœæŠ€èƒ½å·æ›æˆå ´ä¸Šæ‰€æœ‰å­˜æ´»è§’è‰²ã€‚
-       3. æ¯å€‹ç›®æ¨™å„è‡ªç¨ç«‹æ“²å‘½ä¸­/çˆ†æ“Šï¼Œ
-          æ²’å‘½ä¸­çš„ç…§æ¨£é¡¯ç¤ºMISSã€æœ‰å‘½ä¸­çš„
-          æ­£å¸¸æ‰£è¡€ï¼Œè·ŸåŸæœ¬å–®é«”æ”»æ“Šçš„å‘ˆç¾
-          æ–¹å¼ä¸€è‡´ï¼Œåªæ˜¯å¯èƒ½åŒæ™‚ç™¼ç”Ÿåœ¨
-          å…©å€‹è§’è‰²èº«ä¸Šã€‚
-    */
-
-    const skillTargetType=(usesSkill && castSkillId && skillDatabase[castSkillId])
-        ? skillDatabase[castSkillId].targetType
-        : "single";
-
-    const isRangeSkill=["tri","row","column","all"].includes(skillTargetType);
-
-    const livingTargets=getExistingPartyIndexes()
-        .map(index=>({
-            character:getPartyCharacterByIndex(index),
-            stats:getPartyBattleStats(index),
-            index:index
-        }))
-        .filter(entry=>entry.character && entry.character.hp>0);
-
-    /* éš±èº«åªé˜»æ­¢å–®é«”ï¼æ™®é€šæ”»æ“Šé¸ä¸­ï¼›ç¯„åœæŠ€èƒ½ä»æœƒæ³¢åŠã€‚ */
-    const selectableSingleTargets=livingTargets.filter(
-        entry=>!hasActiveBuff(entry.character,"stealthSkill")
-    );
-
-    if(!isRangeSkill && selectableSingleTargets.length===0){
-        addBattleLog(monster.name+"æ‰¾ä¸åˆ°å¯è¢«å–®é«”æ”»æ“Šé¸ä¸­çš„ç›®æ¨™ã€‚");
-        updateUI();
-        finishPlayerAction();
-        return;
-    }
-
-    let attackTargets=[];
-    let primaryTargetIndex=null;
-
-    if(skillTargetType==="all"){
-        attackTargets=livingTargets;
-    }else if(isRangeSkill){
-        /* The formal formation is already the owner for allyTri and player
-           targeting. Monster range skills must resolve through that same Slot
-           geometry, including a party member placed in the back row. */
-        const battlefieldSlots=typeof window!=="undefined"
-            ? window.FourSymbolsBattlefieldSlots
-            : null;
-        const primary=livingTargets[
-            Math.floor(Math.random()*livingTargets.length)
-        ];
-        primaryTargetIndex=primary?primary.index:null;
-        const formation=battlefieldSlots&&typeof battlefieldSlots.ensureAllyFormation==="function"
-            ? battlefieldSlots.ensureAllyFormation(getExistingPartyIndexes())
-            : null;
-        const targetIndexes=primary&&formation&&typeof battlefieldSlots.resolveAllyTargets==="function"
-            ? battlefieldSlots.resolveAllyTargets(
-                formation,
-                primary.index,
-                skillTargetType,
-                index=>{
-                    const character=getPartyCharacterByIndex(index);
-                    return !!(character&&character.hp>0);
-                }
-            )
-            : [];
-        attackTargets=targetIndexes.map(index=>
-            livingTargets.find(entry=>entry.index===index)
-        ).filter(Boolean);
-    }else{
-        const primary=selectableSingleTargets[
-            Math.floor(Math.random()*selectableSingleTargets.length)
-        ];
-        primaryTargetIndex=primary?primary.index:null;
-        attackTargets=[primary];
-    }
-
-    if(attackTargets.length===0){
-        addBattleLog(monster.name+"æ‰¾ä¸åˆ°å¯è¢«æ­¤æŠ€èƒ½é¸ä¸­çš„ç›®æ¨™ã€‚");
-        updateUI();
-        finishPlayerAction();
-        return;
-    }
-
-    const attackTargetIndexes=attackTargets.map(target=>target.index);
-    if(usesSkill){
-        showMonsterSkillNameBadge(
-            castSkillName,
-            (castSkillData&&castSkillData.element)||monster.element||"normal",
-            monsterIndex,
-            skillTargetType==="all"?null:primaryTargetIndex,
-            attackTargetIndexes
-        );
-    }else{
-        showMonsterSkillNameBadge(
-            "æ™®é€šæ”»æ“Š","normal",monsterIndex,primaryTargetIndex,attackTargetIndexes
-        );
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ€ªç‰©ç”¨ç«ç®­
-       æ”»æ“Šç©å®¶æ™‚ï¼Œä¹Ÿè¦æœ‰ä¸‰ç™¼é£›è¡Œç‰¹æ•ˆï¼Œ
-       æ–¹å‘ç›¸åï¼šå¾æ€ªç‰©å¡ç‰‡é£›å‘ç©å®¶å¡ç‰‡ï¼‰ã€‚
-    */
-
-    if(castSkillId==="fireRocket"){
-
-        playFireRocketAnimation(
-            "battleMonster"+monsterIndex,
-            attackTargets.map(
-                target=>
-                    "battlePlayerCard"+
-                    target.index
-            )
-        );
-
-    }
-
-
-    /*
-       â˜… æŠ€èƒ½ç­‰ç´šæ²’æœ‰å­˜åœ¨æ€ªç‰©è³‡æ–™è£¡ï¼ˆæ€ªç‰©
-       ä¸åƒç©å®¶æœ‰ã€Œå­¸æœƒã€å‡ç´šæŠ€èƒ½ã€çš„æ¦‚å¿µï¼‰ï¼Œ
-       é€™è£¡ç”¨æ€ªç‰©ç­‰ç´šæ›ç®—å‡ºä¸€å€‹1~æŠ€èƒ½ä¸Šé™
-       ä¹‹é–“çš„åˆç†æŠ€èƒ½ç­‰ç´šï¼Œç­‰ç´šè¶Šé«˜çš„æ€ªç‰©
-       ç”¨èµ·æŠ€èƒ½ä¾†å¨åŠ›ä¹Ÿè¶Šå¼·ï¼Œä¸æœƒæ‰€æœ‰ç­‰ç´š
-       çš„æ€ªç‰©æ”¾åŒä¸€å€‹æŠ€èƒ½éƒ½ä¸€æ¨£å¼·ã€‚
-    */
-
-    const effectiveSkillLevel=
-
-        castSkillData
-        ?
-        Math.min(
-            castSkillData.maxLevel||1,
-            Math.max(
-                1,
-                Number.isFinite(Number(monster.v141ForceSkillLevel))
-                    ?Math.floor(Number(monster.v141ForceSkillLevel))
-                    :Math.round(monster.level/8)
-            )
-        )
-        :
-        0;
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œç‰©ç†/æ³•è¡“
-       åˆ†é–‹ç®—ï¼Œå®Œå…¨æ¯”ç…§ç©å®¶castDamageSkill()
-       çš„è¦å‰‡ï¼šskill.category==="magic"ç”¨
-       æ³•è¡“æ”»æ“Šï¼Œå…¶é¤˜ï¼ˆå«æ²’æ”¾æŠ€èƒ½çš„æ™®é€š
-       æ”»æ“Šï¼‰ç”¨ä¸€èˆ¬æ”»æ“ŠåŠ›ï¼‰ï¼š
-    */
-
-    /* Pure-control skills keep their status effect but never enter direct-damage settlement. */
-    const isPureControlSkill=
-        !!(castSkillData && castSkillData.id==="freeze");
-
-    const isMonsterMagicSkill=
-        castSkillData &&
-        castSkillData.category==="magic";
-
-    const baseAttackStatRaw=
-        isMonsterMagicSkill
-        ? monster.magicAttack
-        : monster.attack;
-
-    const offensiveStatDown=
-        getStatDownPercentFor(
-            monster,
-            isMonsterMagicSkill ? "intelligence" : "attack"
-        );
-
-    const baseAttackStat=
-        baseAttackStatRaw*(1-offensiveStatDown/100);
-
-
-    let monsterLifestealDamage=0;
-
-
-    attackTargets.forEach(
-        targetEntry=>{
-
-            const targetCharacter=
-                targetEntry.character;
-
-            const targetStats=
-                targetEntry.stats;
-
-            const targetIndex=
-                targetEntry.index;
-
-
-            const monsterHit=
-                rollHitChance(
-                    getMonsterAccuracy(
-                        monster
-                    ),
-                    targetStats.evasion,
-                    getMonsterDebuffValue(
-                        monster,
-                        "stun"
-                    )
-                );
-
-
-            if(!monsterHit){
-
-                showMissEffect(
-                    true,
-                    targetIndex,
-                    "MISS"
-                );
-
-
-                addBattleLog(
-
-                    ""+
-                    monster.name+
-                    ""+
-                    (
-                        usesSkill
-                        ?
-                        "æ–½æ”¾"+castSkillName
-                        :
-                        "æ”»æ“Š"
-                    )+
-                    ""+
-                    (targetCharacter.id||"ä½ ")+
-                    "ï¼Œæ²’æœ‰å‘½ä¸­ï¼"
-
-                );
-
-
-                return;
-
-            }
-
-
-            const isBeginnerForestNormalAttack=
-                currentZone==="forest" &&
-                !castSkillData &&
-                monster &&
-                monster.v173BeginnerForest===true;
-
-            /* æ–°æ‰‹æ£®æ—æ™®é€šæ”»æ“Šæ˜¯æ•™å­¸ä¿è­·å€¼ï¼šä¸åƒçˆ†æ“Šï¼Œæœªé˜²ç¦¦æ™‚å›ºå®š10ï½15ã€‚ */
-            const rageCriticalBonuses=getActiveRageCriticalBonuses(monster);
-            const monsterCritChance=isBeginnerForestNormalAttack
-                ?0
-                :Math.max(
-                    CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,
-                    10+rageCriticalBonuses.chance-(targetStats.antiCrit||0)
-                );
-            const monsterCrit=!isBeginnerForestNormalAttack&&Math.random()*100<monsterCritChance;
-            const monsterCritMultiplier=monsterCrit
-                ?Math.min(CRIT_MULTIPLIER_MAX,1.5+rageCriticalBonuses.damage/100)
-                :1;
-
-            let damage=
-                isPureControlSkill
-                ?0
-                :isBeginnerForestNormalAttack
-                ?rollBeginnerForestNormalAttackDamage()
-                :castSkillData
-                ?calculateSkillDamage({
-                    skill:castSkillData,
-                    skillLevel:effectiveSkillLevel,
-                    effectiveAttack:baseAttackStat,
-                    target:targetCharacter,
-                    targetDefense:targetStats.defense,
-                    casterLevel:monster.level,
-                    casterElement:monster.element,
-                    attacker:monster,
-                    critMultiplier:monsterCritMultiplier
-                })
-                :calculateDamage(
-                    baseAttackStat,
-                    targetStats.defense,
-                    monster.level,
-                    targetCharacter.level,
-                    monster.element,
-                    targetCharacter.element,
-                    {
-                        attacker:monster,
-                        target:targetCharacter,
-                        critMultiplier:monsterCritMultiplier
-                    }
-                );
-
-
-            if(targetCharacter.isDefending && damage>0){
-
-                damage=
-                    Math.max(
-                        1,
-                        Math.floor(
-                            damage*0.5
-                        )
-                    );
-
-            }
-
-
-            /*
-               â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ¥ä¸Š
-               çµç•Œ/è­·ç›¾/åå‚·é€™å¹¾å€‹é˜²ç¦¦é¡
-               å¢ç›Šæ•ˆæœï¼‰ï¼š
-               çµç•Œï¼ˆbarrierï¼‰å®Œå…¨æ ¼æ“‹ï¼Œ
-               é€™æ¬¡æ”»æ“Šç›´æ¥æ­¸é›¶ï¼Œé€£è­·ç›¾éƒ½
-               ä¸ç”¨æ¶ˆè€—ï¼›æ²’æœ‰çµç•Œçš„è©±æ‰æª¢æŸ¥
-               è­·ç›¾ï¼ˆshieldï¼‰ï¼Œè­·ç›¾æŒ‰å‰©é¤˜
-               é»æ•¸å¸æ”¶å‚·å®³ï¼Œå¸æ”¶ä¸å®Œçš„éƒ¨åˆ†
-               æ‰æœƒçœŸçš„æ‰£è¡€ï¼›æ‰£è¡€ä¹‹å¾Œå¦‚æœ
-               ç›®æ¨™èº«ä¸Šæœ‰åå‚·ï¼ˆearthShieldï¼‰ï¼Œ
-               ä¾æ¯”ä¾‹æŠŠå‚·å®³æ‰“å›æ€ªç‰©èº«ä¸Šã€‚
-            */
-
-            const hasBarrier=
-                hasActiveBuff(
-                    targetCharacter,
-                    "barrier"
-                );
-
-
-            if(damage>0 && hasBarrier){
-
-                damage=0;
-
-
-                addBattleLog(
-                    ""+
-                    (targetCharacter.id||"ä½ ")+
-                    "çš„çµç•Œå®Œå…¨æ ¼æ“‹äº†é€™æ¬¡æ”»æ“Šï¼"
-                );
-
-            }
-            else{
-
-                const shieldBuff=
-
-                    (targetCharacter.activeBuffs||[])
-                    .find(
-                        b=>
-
-                            b.type==="shield"&&
-                            b.turnsLeft>0 &&
-                            b.remaining>0
-
-                    );
-
-
-                if(damage>0 && shieldBuff){
-
-                    const absorbed=
-
-                        Math.min(
-                            damage,
-                            shieldBuff.remaining
-                        );
-
-
-                    shieldBuff.remaining-=
-                        absorbed;
-
-                    damage-=
-                        absorbed;
-
-
-                    if(absorbed>0){
-
-                        addBattleLog(
-                            "è­·ç›¾å¸æ”¶äº†"+
-                            absorbed+
-                            "é»å‚·å®³ï¼ˆå‰©é¤˜"+
-                            shieldBuff.remaining+
-                            "é»ï¼‰ã€‚"
-                        );
-
-                        showShieldAbsorb(
-                            targetIndex,
-                            absorbed
-                        );
-
-                    }
-
-                }
-
-            }
-
-
-            const hpBeforeDirectDamage=Math.max(0,Number(targetCharacter.hp)||0);
-
-            targetCharacter.hp=
-                Math.max(
-                    0,
-                    targetCharacter.hp-
-                    damage
-                );
-
-            const actualHpDamage=Math.max(0,hpBeforeDirectDamage-targetCharacter.hp);
-
-
-            /*
-               â˜… åå‚·ï¼ˆè¬è±¡åœŸç›¾ï¼earthShieldï¼‰ï¼š
-               æ‰£å®Œè¡€ä¹‹å¾Œæ‰ç®—ï¼Œé¿å…çµç•Œ/è­·ç›¾
-               æ“‹ä¸‹çš„éƒ¨åˆ†ä¹Ÿè¢«èª¤ç®—é€²åå‚·è£¡ã€‚
-            */
-
-            const reflectPercent=
-
-                getActiveBuffPercent(
-                    targetCharacter,
-                    "earthShield"
-                );
-
-
-            if(
-                reflectPercent>0 &&
-                actualHpDamage>0
-            ){
-
-                const reflectDamage=
-
-                    Math.max(
-                        1,
-                        Math.floor(
-                            actualHpDamage*
-                            reflectPercent/
-                            100
-                        )
-                    );
-
-
-                monster.hp=
-                    Math.max(
-                        0,
-                        monster.hp-
-                        reflectDamage
-                    );
-
-
-                addBattleLog(
-                    "åå‚·é€ æˆ"+
-                    monster.name+
-                    ""+
-                    reflectDamage+
-                    "é»å‚·å®³ã€‚"
-                );
-
-
-                if(monster.hp<=0){
-
-                    killMonster(
-                        monsterIndex
-                    );
-
-                }
-
-            }
-
-
-            /*
-               â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œæˆ°é¬¥ä¸­æ“æœ‰è­·ç›¾ï¼Œ
-               å—åˆ°å‚·å®³æ™‚ï¼Œæ‰£HPçš„...å°±ä¸ç”¨è·³å‹•ï¼Œç›´æ¥é¡¯ç¤º
-               ç™½è‰²è­·ç›¾æ‰£é™¤çš„æ•¸å­—ï¼Œé™¤éè­·ç›¾å‰©é¤˜æ‰¿å—é‡å°æ–¼
-               å‚·å®³ï¼Œé‚£å‰‡ä¸€èµ·é¡¯ç¤ºã€ï¼‰ï¼š
-               ä¸Šé¢è­·ç›¾å¸æ”¶çš„é‚è¼¯åŸ·è¡Œå®Œä¹‹å¾Œï¼Œdamageå·²ç¶“æ˜¯
-               ã€Œè­·ç›¾æ“‹ä¸ä½ã€çœŸæ­£æœƒæ‰£è¡€ã€çš„å‰©é¤˜é‡â€”â€”è­·ç›¾
-               å®Œå…¨æ“‹ä¸‹é€™æ¬¡æ”»æ“Šæ™‚damageæœƒè®Šæˆ0ï¼Œé€™è£¡åŸæœ¬
-               ä¸ç®¡damageæ˜¯ä¸æ˜¯0éƒ½æœƒå‘¼å«showPlayerHit()ï¼Œ
-               é€£å¸¶è§¸ç™¼å¡ç‰‡éœ‡å‹•æ•ˆæœè·Ÿã€Œ-0HPã€é€™ç¨®æ²’æœ‰æ„ç¾©
-               çš„ç´…å­—å½ˆå‡ºå‹•ç•«ï¼Œæ˜æ˜è¡€é‡æ ¹æœ¬æ²’æ‰£ã€å»çœ‹èµ·ä¾†
-               åˆè·³å­—åˆéœ‡å‹•ï¼Œè·Ÿè­·ç›¾æ‡‰è©²è¦æœ‰çš„ã€Œå®Œå…¨æ“‹ä¸‹ã€
-               è§€æ„Ÿä¸ç¬¦ã€‚æ”¹æˆåªæœ‰damage>0ï¼ˆè­·ç›¾æ²’æœ‰å®Œå…¨
-               æ“‹ä½ã€çœŸçš„æœ‰æ‰£åˆ°è¡€ï¼‰æ‰å‘¼å«ï¼Œå¤©ç„¶å°±åŒæ™‚æ»¿è¶³
-               ã€Œè­·ç›¾å¤ ç”¨æ™‚åªé¡¯ç¤ºç™½å­—ã€è·Ÿã€Œè­·ç›¾ä¸å¤ ç”¨æ™‚
-               ç™½å­—ç´…å­—ä¸€èµ·é¡¯ç¤ºã€ï¼ˆå› ç‚ºshowShieldAbsorb()
-               å·²ç¶“åœ¨ä¸Šé¢è­·ç›¾å¸æ”¶é‚è¼¯è£¡å‘¼å«éäº†ï¼Œé€™è£¡åªæ˜¯
-               å¦å¤–æ±ºå®šè¦ä¸è¦ã€Œå†åŠ ä¸Šã€ç´…å­—HPæ‰£è¡€æç¤ºï¼‰ã€‚
-            */
-            if(damage>0){
-
-                showPlayerHit(
-                    damage,
-                    "hp",
-                    targetIndex,
-                    false,
-                    monsterCrit
-                );
-
-            }
-
-
-            if(!isPureControlSkill){
-                addBattleLog(
-
-                    ""+
-                    monster.name+
-                    ""+
-                    (
-                        usesSkill
-                        ?
-                        "æ–½æ”¾"+castSkillName
-                        :
-                        "æ”»æ“Š"
-                    )+
-                    ""+
-                    (targetCharacter.id||"ä½ ")+
-                    (
-                        monsterCrit
-                        ?
-                        "ï¼ˆçˆ†æ“Šï¼ï¼‰"
-                        :
-                        ""
-                    )+
-                    "ï¼Œé€ æˆ"+
-                    damage+
-                    "å‚·å®³"+
-                    (
-                        targetCharacter.isDefending
-                        ?
-                        "ï¼ˆé˜²ç¦¦ç‹€æ…‹å‚·å®³æ¸›åŠï¼‰"
-                        :
-                        ""
-                    )+
-                    "ã€‚"
-
-                );
-            }
-
-
-            /*
-               â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œé‡æ€ª
-               ç•°å¸¸ç‹€æ…‹ç›´æ¥åšã€ï¼‰ï¼š
-               æ€ªç‰©é€™æ¬¡çœŸçš„æœ‰æ”¾æŠ€èƒ½ã€è€Œä¸”æŠ€èƒ½
-               æœ¬èº«å¸¶æœ‰ç•°å¸¸æ•ˆæœæ¬„ä½çš„è©±ï¼Œåœ¨
-               å‚·å®³çµç®—å®Œã€ç¢ºèªç›®æ¨™é‚„æ´»è‘—çš„
-               æƒ…æ³ä¸‹ï¼Œå¥—ç”¨åˆ°ç›®æ¨™ç©å®¶èº«ä¸Šã€‚
-               è·Ÿç©å®¶å°æ€ªç‰©é‚£å¥—æ˜¯åŒä¸€é¡†å‡½å¼
-               å®¶æ—ï¼ˆapplySkillDebuffEffectsToPlayer()
-               é¡åƒapplySkillDebuffEffects()ï¼‰ï¼Œ
-               å‘¼å«æ™‚æ©Ÿä¹Ÿä¸€è‡´ï¼šå‘½ä¸­ã€å‚·å®³çµç®—
-               å®Œä¹‹å¾Œæ‰åˆ¤å®šé™„åŠ æ•ˆæœã€‚
-            */
-
-            if(
-                usesSkill &&
-                castSkillData &&
-                targetCharacter.hp>0
-            ){
-
-                applySkillDebuffEffectsToPlayer(
-                    castSkillData,
-                    effectiveSkillLevel,
-                    targetCharacter,
-                    targetIndex,
-                    monster.level,
-                    getMonsterEffectiveAbilityPoints(monster,"intelligence")
-                );
-
-            }
-
-            if(
-                usesSkill &&
-                castSkillData &&
-                castSkillData.lifestealPercentByLevel &&
-                damage>0
-            ){
-                monsterLifestealDamage+=damage;
-            }
-
-        }
-    );
-
-
-    if(
-        usesSkill &&
-        castSkillData &&
-        castSkillData.lifestealPercentByLevel &&
-        monsterLifestealDamage>0 &&
-        monster.alive
-    ){
-        const percent=castSkillData.lifestealPercentByLevel[effectiveSkillLevel-1];
-        const amount=Math.floor(monsterLifestealDamage*percent/100);
-
-        if(amount>0){
-            const hpRecovered=Math.max(0,Math.min(amount,monster.maxHP-monster.hp));
-            const spRecovered=Math.max(0,Math.min(amount,monster.maxSP-monster.sp));
-
-            monster.hp=Math.min(monster.maxHP,monster.hp+amount);
-            monster.sp=Math.min(monster.maxSP,monster.sp+amount);
-
-            addBattleLog(
-                monster.name+"å¸å–å‚·å®³çš„"+percent+
-                "%ä¸¦æ¢å¾©"+hpRecovered+"é»HPã€"+spRecovered+"é»SPã€‚"
-            );
-        }
-    }
-
-
-    updateUI();
-
-
-    finishPlayerAction();
-
-}
-
-
-/* =====================================================
-   æˆ°é¬¥çµæŸ
-===================================================== */
-
-function checkBattleEnd(){
-
-    if(!battleActive){
-        return true;
-    }
-
-    /* HP settlement belongs to the core battle flow. Any damage source may
-       reduce HP to zero; adapters must not wrap queue functions merely to
-       translate that state into the single canonical death path. */
-    currentBattleMonsters.forEach(index=>{
-        const monster=monsters[index];
-        if(monster&&monster.alive!==false&&Number(monster.hp)<=0){
-            killMonster(index);
-        }
-    });
-
-
-    const partyDefeated=getExistingPartyIndexes().every(index=>{
-        const character=getPartyCharacterByIndex(index);
-        return !character || character.hp<=0;
-    });
-
-    if(partyDefeated){
-
-        loseBattle();
-
-        return true;
-
-    }
-
-
-    const alive =
-        currentBattleMonsters
-        .some(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    if(!alive){
-
-        winBattle();
-
-        return true;
-
-    }
-
-
-    return false;
-
-}
-
-
-function applyPostBattleAutoRecovery(){
-
-    getExistingPartyIndexes().forEach(characterIndex=>{
-
-        const character=getPartyCharacterByIndex(characterIndex);
-        const config=getPartyAutoConfig(characterIndex);
-        const stats=getPartyBattleStats(characterIndex);
-
-        if(!character || character.hp<=0 || !config.enabled || !stats){
-            return;
-        }
-
-        ["hp","sp"].forEach(resource=>{
-
-            const maxValue=resource==="hp" ? stats.maxHP : stats.maxSP;
-            const currentValue=resource==="hp" ? character.hp : character.sp;
-            const threshold=normalizeAutoBattleThreshold(config[resource],resource==="hp" ? 50 : 25);
-
-            if(maxValue<=0 || currentValue>=maxValue || currentValue/maxValue*100>threshold){
-                return;
-            }
-
-            const potionId=getAutoPotionId(resource);
-            const definition=getPotionDefinition(potionId);
-
-            if(!definition || !consumePotionFromInventory(potionId,1)){
-                return;
-            }
-
-            const planned=definition.recoveryPercent>=100
-                ? maxValue-currentValue
-                : Math.max(1,Math.round(maxValue*definition.recoveryPercent/100));
-            const recovered=Math.max(0,Math.min(maxValue-currentValue,planned));
-
-            if(resource==="hp"){
-                character.hp=Math.min(maxValue,character.hp+recovered);
-            }else{
-                character.sp=Math.min(maxValue,character.sp+recovered);
-            }
-
-            addBattleLog(
-                "æˆ°é¬¥çµæŸå¾Œï¼Œ"+(character.id||"è§’è‰²")+
-                "è‡ªå‹•ä½¿ç”¨"+definition.name+"ï¼Œæ¢å¾©"+recovered+" "+resource.toUpperCase()+"ã€‚"
-            );
-        });
-    });
-
-    rebuildInventorySlots();
-}
-
-
-function winBattle(){
-
-    if(!battleActive){
-        return;
-    }
-
-
-    battleActive=false;
-
-    autoBattle=false;
-
-    actionReady=false;
-
-    pendingAction=null;
-
-
-    clearInterval(timerId);
-
-    timerId=null;
-
-    if(battleAdvanceTimeoutId){
-        clearTimeout(battleAdvanceTimeoutId);
-        battleAdvanceTimeoutId=null;
-    }
-    clearBattleActionWatchdog();
-    battleAdvanceScheduled=false;
-
-
-    battleToken++;
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ¯æ—¥ä»»å‹™
-       ã€Œæ‰“è´1å ´æˆ°é¬¥ã€ï¼‰ï¼šå‹åˆ©çµç®—é€™è£¡æ˜¯
-       å”¯ä¸€æœƒç¶“éçš„åœ°æ–¹ï¼Œç›´æ¥è¨˜éŒ„é€²åº¦ã€‚
-    */
-
-    ensureDailyQuestsCurrent();
-
-    dailyQuestState.progress.winBattle=
-        Math.min(
-            1,
-            (
-                dailyQuestState.progress.winBattle||
-                0
-            )+1
-        );
-
-
-    /*
-       â˜… æ–°å¢ï¼šå§”è¨—ä»»å‹™ã€Œæ‰“è´3å ´æˆ°é¬¥ã€ï¼Œ
-       åŒä¸€å€‹äº‹ä»¶ä¾†æºä¸€èµ·ç´¯åŠ ã€‚
-    */
-
-    commissionQuestState.progress.winBattle=
-        Math.min(
-
-            commissionQuestDefinitions.find(
-                q=>q.id==="winBattle"
-            ).goal,
-
-            (
-                commissionQuestState.progress.winBattle||
-                0
-            )+1
-
-        );
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆåŒä¸€å€‹å•é¡Œçš„å¦ä¸€åŠï¼‰ï¼š
-       è·ŸloseBattle()ä¸€æ¨£ï¼Œå‹åˆ©çµç®—ä¹Ÿå®Œå…¨æ²’æœ‰
-       æ”¶åˆå¯èƒ½é‚„é–‹è‘—çš„å­é¸å–®ï¼Œä¸€æ¨£è£œä¸Šã€‚
-    */
-
-    closeMenus();
-
-
-    addBattleLog(
-        "æ‰€æœ‰æ€ªç‰©å·²è¢«æ“Šæ•—ï¼"
-    );
-
-
-    const expGain =
-        currentBattleMonsters
-        .reduce(
-            (total,i)=>
-                total+
-                monsters[i].level*10,
-            0
-        );
-
-
-    /*
-       â˜… æˆ°é¬¥ä¸­çµ•å°ä¸èƒ½å‡ç´šã€‚
-       EXPå…ˆé€²å…¥ã€Œå…±ç”¨ç¶“é©—æ± ã€ï¼Œ
-       ç­‰ç©å®¶å›åˆ°ä¸»åŸè‡ªè¡ŒæŒ‰ã€Œåˆ†é…ç¶“é©—å€¼ã€
-       æ‰æœƒçœŸæ­£åˆ¤æ–·å‡ç´šã€‚
-    */
-
-    sharedExp +=
-        expGain;
-
-
-    addBattleLog(
-        "ç²å¾—"+
-        expGain+
-        "EXPï¼Œå·²å­˜å…¥ç¶“é©—æ± ã€‚"
-    );
-
-    applyPostBattleAutoRecovery();
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬ EXP æç¤ºï¼ˆé»ƒè‰²æµ®å‹•è¨Šæ¯ï¼‰
-       åœ¨æˆ°é¬¥ç•«é¢çµæŸç•¶ä¸‹å°±ç«‹åˆ»è·³å‡ºä¾†ï¼Œ
-       è·Ÿæˆ°é¬¥ç•«é¢é‡ç–Šåœ¨ä¸€èµ·å¾ˆäº‚ã€‚
-       æ”¹æˆç­‰ç•«é¢çœŸçš„åˆ‡å›åœ°åœ–ä¹‹å¾Œæ‰é¡¯ç¤ºï¼Œ
-       æ”¾é€²ä¸‹é¢ showPage("map") é‚£å€‹
-       setTimeout callback è£¡é¢ã€‚
-    */
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™è£¡æ‰“è´å°±æœƒè‡ªå‹•æŠŠHP/SPè£œæ»¿ï¼Œ
-       é€™æ˜¯æœ€æ—©è¦æ ¼å¯«çš„ï¼ˆå›è¡€/å›SPï¼‰ï¼Œ
-       ä½†å¯¦éš›ç©èµ·ä¾†æœƒè®“HP/SPè—¥æ°´å®Œå…¨æ²’æœ‰æ„ç¾©â€”â€”
-       åæ­£æ‰“å®Œå°±å…¨æ»¿ï¼Œè—¥æ°´æ ¹æœ¬ä¸ç”¨ç”¨ã€‚
-
-       æ”¹æˆï¼šæ‰“è´ä¹‹å¾ŒHP/SPç¶­æŒæˆ°é¬¥çµæŸç•¶ä¸‹çš„æ•¸å€¼ï¼Œ
-       ä¸æœƒè‡ªå‹•è£œæ»¿ï¼Œè¦å˜›å¸¶è—¥æ°´ï¼Œ
-       è¦å˜›ä¹‹å¾Œè£œä¸€å€‹ã€Œå›ä¸»åŸä¼‘æ¯å›è¡€ã€çš„åŠŸèƒ½ã€‚
-
-       æˆ°é¬¥ã€Œå¤±æ•—ã€è¢«æ“Šæ•—çš„è£œè¡€é‚è¼¯ç¶­æŒä¸è®Š
-       ï¼ˆé‚£å€‹æ¯”è¼ƒåƒæ˜¯ã€Œé‡ç”Ÿã€çš„æ¦‚å¿µï¼Œ
-       è·Ÿé€™è£¡æ‰“è´è£œè¡€ä¸æ˜¯åŒä¸€ä»¶äº‹ï¼Œ
-       æ•…æ„ç•™è‘—æ²’æœ‰ä¸€èµ·æ‹¿æ‰ï¼‰ã€‚
-    */
-
-
-    clearTimeout(respawnId);
-
-
-    /*
-       â˜… ç¸®çŸ­æ€ªç‰©é‡ç”Ÿæ™‚é–“ï¼š
-       åŸæœ¬5ç§’ï¼Œé…åˆç¾åœ¨ç§»å‹•å·²ç¶“è§£é–ï¼Œ
-       ç©å®¶é¦¬ä¸Šå°±èƒ½åœ¨åœ°åœ–ä¸Šèµ°å‹•ï¼Œ
-       ä½†æ€ªç‰©é‚„è¦ç­‰5ç§’æ‰å‡ºç¾ï¼Œ
-       ç•«é¢æœƒæœ‰ä¸€æ®µæ™‚é–“æ„Ÿè¦ºç©ºç©ºçš„ã€‚
-       æ”¹æˆ2ç§’ï¼Œé«”æ„Ÿä¸Šè½å·®å°å¾ˆå¤šã€‚
-    */
-
-    respawnId =
-        setTimeout(
-            respawnMonsters,
-            2000
-        );
-
-
-    saveGame();
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       ä¹‹å‰ç‚ºäº†è§£æ±ºã€Œå›åœ°åœ–å¾Œæ€ªç‰©ç©ºäº†å¥½ä¸€é™£å­ã€
-       æŠŠé€™è£¡å£“åˆ°250msï¼Œ
-       ä½†é€™æ¨£æˆ°é¬¥çµæŸå¹¾ä¹æ˜¯ç¬é–“è·³èµ°ï¼Œ
-       æ–‡å­—RPGçœ‹ä¸åˆ°ã€Œæ‰“è´äº†ã€çš„è¨Šæ¯è·Ÿç²å¾—çš„EXPï¼Œ
-       å®Œå…¨æ²’æœ‰åœç•™æ„Ÿã€‚
-
-       ç¾åœ¨ã€Œæ€ªç‰©æ¶ˆå¤±å¤ªä¹…ã€è·Ÿã€Œç§»å‹•è¢«å¡ä½ã€
-       å·²ç¶“ç”¨åˆ¥çš„æ–¹å¼è§£æ±ºäº†ï¼ˆrespawnç¸®åˆ°2ç§’ã€
-       ç§»å‹•ä¸å†è¢«mapCooldownå¡ä½ï¼‰ï¼Œ
-       æ‰€ä»¥é€™è£¡å¯ä»¥æ”¾å¿ƒæ‹‰é•·ï¼Œ
-       è®“ç©å®¶æœ‰æ™‚é–“çœ‹æ¸…æ¥šæˆ°é¬¥è³‡è¨Šè£¡çš„çµæœã€‚
-    */
-
-    setTimeout(()=>{
-
-        showPage("map");
-
-        setMapCooldown(3000);
-
-
-        startMonsterMovement();
-
-        scheduleAutoPatrolCheck(5000);
-
-        updateUI();
-
-
-        showExpToast(
-            expGain
-        );
-
-
-        /*
-           â˜… æ–°å¢ï¼šæ²’è—¥æ°´è‡ªå‹•å›ä¸»åŸã€‚
-           åªè¦ç¬¬ä¸€è§’è‰²æˆ–ç¬¬äºŒè§’è‰²æœ‰å‹¾é¸é€™å€‹è¨­å®šï¼Œ
-           æˆ°é¬¥çµæŸå›åˆ°åœ°åœ–ä¹‹å¾Œï¼Œ
-           æª¢æŸ¥èº«ä¸ŠHP/SPè—¥æ°´æ˜¯ä¸æ˜¯éƒ½ç”¨å®Œäº†ï¼Œ
-           éƒ½ç”¨å®Œçš„è©±ç›´æ¥é£›å›ä¸»åŸï¼Œ
-           ä¸ç”¨ç©å®¶è‡ªå·±è¨˜å¾—è¦å›å»è£œè²¨ã€‚
-        */
-
-        checkAutoReturnToCity();
-
-    },2200);
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼šæ²’è—¥æ°´è‡ªå‹•å›ä¸»åŸçš„åµæ¸¬ã€‚
-   è—¥æ°´æ˜¯ç©å®¶å¸³è™Ÿå…±ç”¨çš„å–®ä¸€åº«å­˜
-   ï¼ˆä¸æ˜¯æ¯å€‹è§’è‰²å„è‡ªå¸¶ä¸€ä»½ï¼‰ï¼Œ
-   åªè¦ä»»ä¸€è§’è‰²æœ‰é–‹å•Ÿé€™å€‹è¨­å®šï¼Œ
-   èº«ä¸ŠHPã€SPè—¥æ°´éƒ½ç”¨å®Œäº†ï¼Œ
-   å°±è‡ªå‹•é›¢é–‹åœ°åœ–ã€é£›å›ä¸»åŸã€‚
-*/
-
-function checkAutoReturnToCity(){
-
-    const shouldCheck=
-
-        autoConfig.returnToCityWhenEmpty ||
-        (
-            player2 &&
-            autoConfig2.returnToCityWhenEmpty
-        ) ||
-        (
-            player3 &&
-            autoConfig3.returnToCityWhenEmpty
-        );
-
-
-    if(!shouldCheck){
-        return;
-    }
-
-
-    if(
-        getTotalPotionCount()>0
-    ){
-        return;
-    }
-
-
-    stopMonsterMovement();
-
-
-    showPage(
-        "home"
-    );
-
-
-    alert(
-        "HPï¼SPè—¥æ°´éƒ½ç”¨å®Œäº†ï¼Œå·²è‡ªå‹•è¿”å›ä¸»åŸã€‚"
-    );
-
-}
-
-
-function loseBattle(){
-
-    if(!battleActive){
-        return;
-    }
-
-
-    battleActive=false;
-
-    autoBattle=false;
-
-    actionReady=false;
-
-    pendingAction=null;
-
-
-    clearInterval(timerId);
-
-    timerId=null;
-
-    if(battleAdvanceTimeoutId){
-        clearTimeout(battleAdvanceTimeoutId);
-        battleAdvanceTimeoutId=null;
-    }
-    clearBattleActionWatchdog();
-    battleAdvanceScheduled=false;
-
-
-    battleToken++;
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸçš„æŠ“åˆ°ã€Œç•«é¢ä¸‹æ–¹ç•™ä¸‹ä¸€å¤§æˆªç©ºç™½ã€
-       çš„å…¶ä¸­ä¸€å€‹åŸå› ï¼‰ï¼š
-       æˆ°æ•—çµç®—å®Œå…¨æ²’æœ‰æŠŠå¯èƒ½é‚„é–‹è‘—çš„å­é¸å–®
-       ï¼ˆä¾‹å¦‚ç‰©å“æ¬„çš„HP/SPè—¥æ°´é¸å–®ï¼‰æ”¶åˆï¼Œ
-       å¦‚æœæˆ°æ•—çš„ç•¶ä¸‹å‰›å¥½é¸å–®æ˜¯é–‹è‘—çš„ï¼Œ
-       å®ƒå°±æœƒå¡åœ¨æ‰“é–‹çš„ç‹€æ…‹ï¼Œè®Šæˆç•«é¢ä¸Š
-       ä¸€å¤§å¡Šçœ‹èµ·ä¾†åƒã€Œç©ºç™½ã€çš„å€åŸŸï¼Œ
-       å…¶å¯¦æ˜¯ä¸€å€‹å…§å®¹çœ‹èµ·ä¾†ç©ºç©ºçš„é¸å–®å¡åœ¨é‚£è£¡ã€‚
-       é€™è£¡è£œä¸ŠcloseMenus()ï¼Œç¢ºä¿æˆ°æ•—ç•«é¢
-       ä¹¾æ·¨ã€ä¸æœƒæ®˜ç•™ä»»ä½•é¸å–®ã€‚
-    */
-
-    closeMenus();
-
-
-    addBattleLog(
-        "ä½ è¢«æ“Šæ•—äº†â€¦â€¦"
-    );
-
-
-    const stats =
-        getMainCharacterStats();
-
-
-    player.hp =
-        stats.maxHP;
-
-
-    player.sp =
-        stats.maxSP;
-
-
-    /*
-       â˜… æ–°å¢ï¼š
-       ç¬¬ä¸€è§’è‰²æˆ°æ•—æœƒè¢«ã€Œæ•‘å›ã€é‡ç”Ÿè£œæ»¿HP/SPï¼Œ
-       ç¬¬äºŒè§’è‰²åŸæœ¬æ²’æœ‰è·Ÿè‘—ä¸€èµ·è™•ç†ï¼Œ
-       æœƒå¸¶è‘—æˆ°é¬¥ä¸­æ®˜ç•™çš„ä½è¡€é‡é€²åˆ°ä¸‹ä¸€å ´æˆ°é¬¥ï¼Œ
-       è·Ÿç¬¬ä¸€è§’è‰²çš„é«”é©—ä¸ä¸€è‡´ã€‚
-       é€™è£¡è®“ä»–è·Ÿè‘—ä¸€èµ·è£œæ»¿ã€‚
-    */
-
-    if(player2){
-
-        const stats2=
-            getPlayer2BattleStats();
-
-
-        player2.hp=
-            stats2.maxHP;
-
-
-        player2.sp=
-            stats2.maxSP;
-
-    }
-
-    if(player3){
-
-        const stats3=getPartyBattleStats(2);
-        player3.hp=stats3.maxHP;
-        player3.sp=stats3.maxSP;
-
-    }
-
-
-    setTimeout(()=>{
-
-        showPage("map");
-
-        setMapCooldown(3000);
-
-
-        startMonsterMovement();
-
-        scheduleAutoPatrolCheck(5000);
-
-        updateUI();
-
-    },2200);
-
-}
-
-
-function attemptEscape(){
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬åªæª¢æŸ¥å…¨åŸŸçš„autoBattleï¼Œ
-       æ”¹æˆçœ‹ç›®å‰æ˜¯èª°çš„å›åˆã€
-       ç”¨å°æ‡‰è§’è‰²çš„è‡ªå‹•é–‹é—œä¾†åˆ¤æ–·
-       ï¼ˆé€ƒè„«æ˜¯æ•´å€‹éšŠä¼ä¸€èµ·é€ƒï¼Œ
-       ä½†æ“ä½œæ™‚æ©Ÿé‚„æ˜¯è¦è·Ÿç›®å‰å›åˆçš„
-       æ‰‹å‹•/è‡ªå‹•ç‹€æ…‹ä¸€è‡´ï¼Œ
-       ä¸ç„¶è‡ªå‹•è§’è‰²è¡Œå‹•ä¸­é€”é‚„èƒ½è¢«é€ƒè„«æŒ‰éˆ•æ‰“æ–·ï¼‰ã€‚
-    */
-
-    const autoOn=
-        activeBattleCharacterIndex===0
-        ? autoBattle
-        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-
-
-    if(
-        !battleActive ||
-        autoOn ||
-        actionReady
-    ){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸçš„æŠ“åˆ°å…©å€‹bugï¼Œéƒ½æ˜¯ä½¿ç”¨è€…æŒ‡å‡ºçš„ï¼‰ï¼š
-
-       1. é€™è£¡åŸæœ¬æ²’æœ‰è¨­å®šactionReady=trueï¼Œ
-          é˜²å‘†å½¢åŒè™›è¨­ï¼Œå¿«é€Ÿé€£é»æœƒä¸€ç›´é‡æ–°
-          åˆ¤å®šé€ƒè„«æˆåŠŸç‡ï¼Œç›´åˆ°æˆåŠŸç‚ºæ­¢â€”â€”
-          æ­£ç¢ºè¡Œç‚ºæ‡‰è©²æ˜¯ã€Œé€™å›åˆåªèƒ½å˜—è©¦ä¸€æ¬¡ã€ï¼Œ
-          é»ä¸‹å»ä¹‹å¾Œä¸ç®¡çµæœå¦‚ä½•éƒ½è¦é–ä½ã€‚
-
-       2. é€ƒè„«åŸæœ¬æ˜¯ã€ŒæŒ‰ä¸‹å»ç«‹åˆ»åˆ¤å®šã€ï¼Œ
-          å®Œå…¨è·³éå®£å‘Š/çµç®—æ©Ÿåˆ¶ã€‚
-          ä½¿ç”¨è€…æ˜ç¢ºæŒ‡å‡ºï¼šé€ƒè„«ä¹Ÿè¦çœ‹æ•æ·â€”â€”
-          æ•æ·å¤ å¿«çš„è§’è‰²å…ˆæ”»æ“Šï¼Œ
-          æ•æ·æ…¢çš„è§’è‰²æ‰è¼ªåˆ°å˜—è©¦é€ƒè„«ï¼Œ
-          å¦‚æœæ•æ·å¤ªä½ã€é€ƒè„«é‚„æ²’è¼ªåˆ°è‡ªå·±
-          å°±å…ˆè¢«æ‰“æ­»ï¼Œé‚£ä¹Ÿæ˜¯åˆç†çš„çµæœï¼Œ
-          ä¸æ‡‰è©²è®“é€ƒè„«è®Šæˆã€Œä¸å—æ•æ·é™åˆ¶çš„ç‰¹æ¬Šã€ã€‚
-
-       æ”¹æˆè·Ÿå…¶ä»–è¡Œå‹•ä¸€æ¨£å…ˆå®£å‘Šã€
-       çµç®—éšæ®µæ‰ä¾æ•æ·é †åºçœŸæ­£åˆ¤å®šé€ƒè„«æˆä¸æˆåŠŸã€‚
-    */
-
-    actionReady=true;
-
-
-    queuedPlayerActions[
-        activeBattleCharacterIndex
-    ]={
-
-        action:"escape",
-
-        target:null
-
-    };
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼šé€ƒè„«çš„çœŸæ­£åˆ¤å®šï¼Œ
-   åªåœ¨çµç®—éšæ®µè¢«resolveQueuedPlayerAction()å‘¼å«ï¼Œ
-   é‚è¼¯å®Œå…¨æ¯”ç…§åŸæœ¬attemptEscape()è£¡çš„åˆ¤å®šå¼ï¼Œ
-   åªæ˜¯æŠ½å‡ºä¾†çµ¦çµç®—éšæ®µç”¨ã€‚
-*/
-
-function resolveEscapeAttempt(characterIndex){
-
-    clearInterval(timerId);
-
-
-    const alive =
-        currentBattleMonsters
-        .map(
-            i=>monsters[i]
-        )
-        .filter(
-            m=>m.alive
-        );
-
-
-    if(alive.length===0){
-
-        checkBattleEnd();
-
-        return;
-
-    }
-
-
-    const highestLevel =
-        Math.max(
-            ...alive.map(
-                m=>m.level
-            )
-        );
-
-
-    const escapingCharacter=getPartyCharacterByIndex(characterIndex)||player;
-
-    const chance =
-        Math.max(
-            10,
-            Math.min(
-                95,
-                50+
-                (
-                    escapingCharacter.level-
-                    highestLevel
-                )*5
-            )
-        );
-
-
-    if(
-        Math.random()*100<
-        chance
-    ){
-
-        battleActive=false;
-
-        autoBattle=false;
-
-        battleToken++;
-
-
-        addBattleLog(
-            "æˆåŠŸé€ƒè„«ï¼"
-        );
-
-
-        setTimeout(()=>{
-
-            showPage("map");
-
-            setMapCooldown(3000);
-
-
-            startMonsterMovement();
-
-            ensureAutoPatrolInterval();
-
-        },1400);
-
-    }
-    else{
-
-        addBattleLog(
-            "é€ƒè„«å¤±æ•—ï¼"
-        );
-
-
-        finishPlayerAction();
-
-    }
-
-}
-
-
-/* =====================================================
-   æŠ€èƒ½é¸å–®
-===================================================== */
-
-function openSkillMenu(){
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™è£¡æ°¸é è®€characterSkillLoadouts.fireã€
-       æ°¸é æª¢æŸ¥å…¨åŸŸçš„autoBattleè·Ÿplayer.spï¼Œ
-       ç¾åœ¨æ”¹æˆä¾ç…§activeBattleCharacterIndex
-       æ±ºå®šè¦é¡¯ç¤ºèª°çš„æŠ€èƒ½æ¬„ã€èª°çš„SPã€‚
-    */
-
-    const autoOn=
-        activeBattleCharacterIndex===0
-        ? autoBattle
-        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-
-
-    if(
-        !battleActive ||
-        autoOn
-    ){
-        return;
-    }
-
-
-    const activeCharacterId=
-        getPartyCharacterKey(activeBattleCharacterIndex);
-
-    const activeCharacterObj=
-        getPartyCharacterByIndex(activeBattleCharacterIndex);
-
-
-    const character =
-        characterSkillLoadouts[
-            activeCharacterId
-        ];
-
-
-    if(
-        !character ||
-        !activeCharacterObj
-    ){
-        return;
-    }
-
-
-    const menu =
-        $("skillMenu");
-
-
-    menu.innerHTML="";
-
-
-    /*
-       â˜… æ–°å¢ï¼šå±•é–‹æ¨¡å¼çš„ç½®é ‚è¿”å›æŒ‰éˆ•ã€‚
-       æ”¾åœ¨æ¸…å–®æœ€ä¸Šé¢ï¼Œå±•é–‹ä¹‹å¾Œä¸ç”¨æ»‘åˆ°æœ€ä¸‹é¢
-       æ‰æ‰¾å¾—åˆ°è¿”å›ï¼Œä¸€æ‰“é–‹å°±çœ‹å¾—åˆ°ã€‚
-    */
-
-    const pinnedBack=
-        document.createElement(
-            "button"
-        );
-
-
-    pinnedBack.className=
-        "sub-menu-pinned-back";
-
-
-    pinnedBack.textContent=
-        "è¿”å›";
-
-
-    pinnedBack.onclick=
-        closeMenus;
-
-
-    menu.appendChild(
-        pinnedBack
-    );
-
-
-    character.equippedSkills
-    .forEach(skillId=>{
-
-        const skill =
-            skillDatabase[skillId];
-
-
-        if(!skill){
-            return;
-        }
-
-
-        const skillLevel =
-            getSkillLevel(
-                activeCharacterId,
-                skillId
-            );
-
-
-        const spCost =
-            skill.spCost!==undefined
-            ?
-            skill.spCost
-            :
-            skill.cost;
-
-
-        const enoughSP =
-            activeCharacterObj.sp>=
-            spCost;
-
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-
-        button.className =
-            "sub-button";
-
-
-        if(!enoughSP){
-
-            button.classList.add(
-                "skill-sp-insufficient"
-            );
-
-
-            button.disabled=true;
-
-
-            button.innerHTML =
-
-            `
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
-                <span style="font-size:15px;font-weight:bold;">
-                    ${skill.name}
-                    ${
-                        skillLevel>0
-                        ?
-                        "Lv."+skillLevel
-                        :
-                        ""
-                    }
-                </span>
-                <span style="font-size:11px;color:#93c5fd;white-space:nowrap;">
-                    ${activeCharacterObj.sp}/${spCost} SP
-                </span>
-            </div>
-            <div style="font-size:11px;color:#fca5a5;margin-top:2px;">
-                SPä¸è¶³
-            </div>
-            `;
-
-        }
-        else{
-
-            const damagePreview =
-                skill.baseDamage
-                ?
-                "å‚·å®³ç´„"+
-                getSkillDamageAtLevel(
-                    skill,
-                    skillLevel||1
-                )+
-                "ï½œ"
-                :
-                "";
-
-
-            button.innerHTML =
-
-            `
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
-                <span style="font-size:15px;font-weight:bold;">
-                    ${skill.name}
-                    ${
-                        skillLevel>0
-                        ?
-                        "Lv."+skillLevel
-                        :
-                        ""
-                    }
-                </span>
-                <span style="font-size:11px;color:#93c5fd;white-space:nowrap;">
-                    ${spCost} SP
-                </span>
-            </div>
-            <div style="font-size:11px;color:#d1d5db;margin-top:2px;">
-                ${damagePreview}${skill.description}
-            </div>
-            `;
-
-
-            button.onclick=()=>{
-                prepareAction(
-                    skill.id
-                );
-            };
-
-        }
-
-
-        menu.appendChild(
-            button
-        );
-
-    });
-
-
-    const back =
-        document.createElement(
-            "button"
-        );
-
-
-    back.className =
-        "sub-button";
-
-
-    back.textContent =
-        "è¿”å›";
-
-
-    back.onclick =
-        closeMenus;
-
-
-    menu.appendChild(
-        back
-    );
-
-
-    $("mainBattleMenu")
-        .style.display =
-        "none";
-
-
-    $("itemMenu")
-        .classList
-        .remove("show");
-
-
-    $("skillMenu")
-        .classList
-        .add("show");
-
-
-    /*
-       â˜… å±•é–‹æŠ€èƒ½é¸å–®ï¼Œè“‹ä½æ€ªç‰©å€/å›åˆè³‡è¨Š/
-       æˆ°é¬¥ç´€éŒ„é‚£ä¸€å¡Šï¼Œè®“ç©å®¶åœ¨æ¯”è¼ƒå¤§çš„ç‰ˆé¢ä¸Š
-       æŒ‘æŠ€èƒ½ï¼Œé¸å®Œæˆ–æŒ‰è¿”å›æœƒè‡ªå‹•æ”¶åˆ
-       ï¼ˆæ”¶åˆé‚è¼¯åœ¨closeMenus()ï¼‰ã€‚
-    */
-
-    $("skillMenu")
-        .classList
-        .add("expanded");
-
-}
-
-
-function openItemMenu(){
-
-    if(
-        !battleActive ||
-        autoBattle
-    ){
-        return;
-    }
-
-    /* æˆ°é¬¥èƒŒåŒ…æ˜¯ç¨ç«‹è¦†è“‹å±¤ï¼Œä¸å†ç”¨èˆŠ expanded å¹¾ä½•ã€‚ */
-    const quickBar=$("skillQuickBar");
-    if(quickBar){
-        quickBar.classList.remove("show");
-    }
-
-    $("skillMenu")
-        .classList
-        .remove("show");
-
-    $("skillMenu")
-        .classList
-        .remove("expanded");
-
-    battleItemCategory="potion";
-    renderBattleItemMenu();
-
-    $("itemMenu")
-        .classList
-        .add("show");
-
-    syncTurnTimerWithBattlePickers();
-
-}
-
-
-function closeMenus(){
-
-    const quickBar=
-        $("skillQuickBar");
-
-    if(quickBar){
-        quickBar.classList.remove(
-            "show"
-        );
-    }
-
-    $("skillMenu")
-        .classList
-        .remove("show");
-
-    $("skillMenu")
-        .classList
-        .remove("expanded");
-
-    const itemMenu=$("itemMenu");
-    if(itemMenu){
-        itemMenu.classList.remove("show");
-    }
-
-    syncTurnTimerWithBattlePickers();
-
-}
-
-
-/* =====================================================
-   è—¥æ°´
-===================================================== */
-
-/*
-   â˜… æ–°å¢ï¼šé˜²ç¦¦ã€‚
-
-   é¸æ“‡é˜²ç¦¦çš„è©±ï¼Œæœ¬å›åˆä¸æ”»æ“Šï¼Œ
-   ä½†æ¥ä¸‹ä¾†æ€ªç‰©æ”»æ“Šéšæ®µå°é€™å€‹è§’è‰²é€ æˆçš„å‚·å®³
-   æœƒå†æ‰“5æŠ˜ï¼ˆè·Ÿé˜²ç¦¦åŠ›æ¸›å‚·ç–ŠåŠ ï¼Œä¸æ˜¯å–ä»£ï¼‰ã€‚
-   æ•ˆæœæŒçºŒåˆ°é€™å€‹è§’è‰²è‡ªå·±çš„ä¸‹ä¸€å›åˆé–‹å§‹ç‚ºæ­¢
-   ï¼ˆbeginCharacterTurn()è£¡æœƒæ¸…æ‰é€™å€‹æ¨™è¨˜ï¼‰ã€‚
-
-   è·ŸusePotion()ä¸€æ¨£ä¸ç”¨é¸ç›®æ¨™ï¼Œ
-   é»ä¸‹å»ç›´æ¥ç”Ÿæ•ˆã€çµæŸé€™å€‹è§’è‰²çš„è¡Œå‹•ã€‚
-*/
-
-/*
-   â˜… ä¿®æ­£ï¼š
-   æŠŠã€ŒçœŸæ­£åŸ·è¡Œé˜²ç¦¦ã€çš„é‚è¼¯æŠ½æˆç¨ç«‹å‡½å¼ï¼Œ
-   æ‰‹å‹•æŒ‰é˜²ç¦¦éˆ•ï¼ˆuseDefend()ï¼Œæœ‰é˜²å‘†æª”ä½è‡ªå‹•æ¨¡å¼ä¸‹èª¤è§¸ï¼‰
-   è·Ÿè‡ªå‹•æˆ°é¬¥è¨­å®šæˆé˜²ç¦¦ï¼ˆautoAction()è£¡ç›´æ¥å‘¼å«ï¼‰
-   å…©æ¢è·¯å¾‘å…±ç”¨é€™å€‹æ ¸å¿ƒé‚è¼¯ï¼Œ
-   ä¸æœƒå‡ºç¾ã€Œè‡ªå‹•æ¨¡å¼è®¾æˆé˜²ç¦¦å»è¢«é˜²å‘†æ“‹ä½ä¸ç”Ÿæ•ˆã€çš„å•é¡Œã€‚
-*/
-
-/*
-   â˜… ä¿®æ­£ï¼ˆçœŸçš„æŠ“åˆ°ä¸€å€‹bugï¼‰ï¼š
-   player2çš„è‡ªå‹•æ”»æ“Š/æŠ€èƒ½ï¼ˆplayer2NormalAttackã€
-   castPlayer2Skillï¼‰éƒ½ä¸æœƒè‡ªå·±å‘¼å«
-   finishPlayerAction()â€”â€”ç”±beginCharacterTurn()
-   çš„è‡ªå‹•åˆ†æ´¾é‚è¼¯çµ±ä¸€åœ¨å¤–é¢å‘¼å«ä¸€æ¬¡ã€‚
-
-   å¦‚æœé€™è£¡çš„é˜²ç¦¦ä¹Ÿåœ¨å…§éƒ¨å‘¼å«finishPlayerAction()ï¼Œ
-   å¤–é¢é‚£å€‹ã€Œå‘¼å«å®Œplayer2AutoAction()
-   ä¹‹å¾Œå†å‘¼å«ä¸€æ¬¡finishPlayerAction()ã€çš„é‚è¼¯
-   æœƒè®Šæˆå‘¼å«å…©æ¬¡ï¼Œå°è‡´è¡Œå‹•é †åºè¢«è·³è™Ÿã€
-   è§’è‰²ç´¢å¼•éŒ¯äº‚ã€‚
-
-   æ‰€ä»¥æ‹†æˆå…©å±¤ï¼š
-   setDefendingState()åªè² è²¬ã€Œè¨­å®šé˜²ç¦¦ç‹€æ…‹+è¨˜éŒ„ã€ï¼Œ
-   ä¸ç®¡é€²ä¸é€²åº¦ï¼›
-   applyDefendEffect()æ˜¯çµ¦ã€Œæœƒè‡ªå·±è² è²¬çµæŸè¡Œå‹•ã€
-   çš„å‘¼å«è€…ç”¨ï¼ˆæ‰‹å‹•é˜²ç¦¦ã€player1è‡ªå‹•é˜²ç¦¦ï¼‰ï¼Œ
-   å…§éƒ¨æ‰å‘¼å«finishPlayerAction()ã€‚
-   player2AutoAction()çš„é˜²ç¦¦åˆ†æ”¯å‰‡ç›´æ¥å‘¼å«
-   setDefendingState()ï¼Œè®“å¤–å±¤çµ±ä¸€å‘¼å«
-   finishPlayerAction()ï¼Œç¶­æŒè·Ÿå…¶ä»–player2
-   è‡ªå‹•è¡Œå‹•è·¯å¾‘ä¸€è‡´çš„å‘¼å«æ–¹å¼ã€‚
-*/
-
-function setDefendingState(characterIndex){
-    const activeCharacter=
-        getPartyCharacterByIndex(characterIndex);
-
-
-    if(!activeCharacter){
-        return;
-    }
-
-
-    activeCharacter.isDefending=
-        true;
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-       é€™è£¡åŸæœ¬æœƒé¡å¤–å°ä¸€è¡Œã€Œæ“ºå‡ºé˜²ç¦¦å§¿æ…‹ï¼Œ
-       æœ¬å›åˆå—åˆ°çš„å‚·å®³æ¸›åŠã€ï¼Œ
-       ä½¿ç”¨è€…è¦ºå¾—æ²’å¿…è¦â€”â€”é˜²ç¦¦æœ‰æ²’æœ‰ç”Ÿæ•ˆï¼Œ
-       æ‡‰è©²ç›´æ¥åæ˜ åœ¨ã€Œè¢«æ”»æ“Šæ™‚çš„é‚£ä¸€è¡Œã€ï¼Œ
-       æ¨™è¨»ã€Œï¼ˆé˜²ç¦¦ç‹€æ…‹å‚·å®³æ¸›åŠï¼‰ã€å°±å¤ äº†ï¼Œ
-       ä¸éœ€è¦å¦å¤–å¤šä¸€è¡Œäº‹å…ˆå®£å‘Šçš„è¨Šæ¯ã€‚
-       é€™è£¡æ‹¿æ‰é€™è¡Œlogï¼Œæ•ˆæœæœ¬èº«
-       ï¼ˆisDefending=trueï¼‰é‚„æ˜¯ç…§å¸¸å¥—ç”¨ã€‚
-    */
-
-    updateUI();
-
-}
-
-
-function applyDefendEffect(characterIndex){
-
-    setDefendingState(
-        characterIndex
-    );
-
-
-    finishPlayerAction();
-
-}
-
-
-function useDefend(){
-    const autoOn=
-        activeBattleCharacterIndex===0
-        ? autoBattle
-        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-
-    const activeCharacter=
-        getPartyCharacterByIndex(activeBattleCharacterIndex);
-
-
-    if(
-        !battleActive ||
-        autoOn ||
-        actionReady ||
-        !activeCharacter ||
-        activeCharacter.hp<=0
-    ){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸçš„æŠ“åˆ°å…©å€‹bugï¼‰ï¼š
-
-       1. é€™è£¡åŸæœ¬åªã€Œæª¢æŸ¥ã€actionReadyï¼Œ
-          å¾ä¾†æ²’æœ‰ã€Œè¨­å®šã€actionReady=trueï¼Œ
-          ç­‰æ–¼é€™é“é˜²å‘†å½¢åŒè™›è¨­â€”â€”
-          æ‰‹æŒ‡æŒ‰å¿«ä¸€é»ï¼Œç¬¬äºŒæ¬¡é»æ“Šæœƒåœ¨
-          finishPlayerAction()çœŸæ­£æŠŠç‹€æ…‹é–ä½ä¹‹å‰
-          å°±å…ˆé—–é—œæˆåŠŸï¼Œå°è‡´åŒä¸€å€‹è§’è‰²çš„è¡Œå‹•
-          è¢«å®£å‘Šå…©æ¬¡ã€é€²åº¦è¢«æ¨é€²å…©æ¬¡ï¼Œ
-          å¾Œé¢çš„è§’è‰²/æ€ªç‰©çš„åŸ·è¡Œé †åºå°±æ•´å€‹éŒ¯äº‚ï¼Œ
-          é€™æ­£æ˜¯ã€Œæ€ªç‰©æ”»æ“Šå…©æ¬¡ã€èƒŒå¾Œçš„çœŸæ­£åŸå› ã€‚
-
-       2. è§’è‰²å·²ç¶“æ­»äº¡ï¼ˆHP<=0ï¼‰é‚„æ˜¯èƒ½æŒ‰é˜²ç¦¦ï¼Œ
-          é€™è£¡ä¹Ÿä¸€ä½µè£œä¸Šé˜²å‘†ã€‚
-
-       é€™è£¡åœ¨çœŸæ­£ç”Ÿæ•ˆä¹‹å‰ç«‹åˆ»é–ä½actionReadyï¼Œ
-       ç¬¬äºŒæ¬¡é»æ“Šæœƒç›´æ¥è¢«ä¸Šé¢é‚£é“guardæ“‹ä¸‹ä¾†ã€‚
-    */
-
-    actionReady=true;
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆé‡è¦ï¼Œä¾ç…§ä½¿ç”¨è€…æ˜ç¢ºæŒ‡æ­£ï¼‰ï¼š
-       é˜²ç¦¦ä¹‹å‰æ˜¯ã€ŒæŒ‰äº†å°±ç«‹åˆ»ç”Ÿæ•ˆã€ï¼Œ
-       è·³éå®£å‘Š/çµç®—æµç¨‹ã€‚
-       ç¾åœ¨æ”¹æˆè·Ÿå…¶ä»–è¡Œå‹•ä¸€æ¨£å…ˆå®£å‘Šã€
-       ç­‰çµç®—éšæ®µç…§æ•æ·é †åºæ‰çœŸæ­£ç”Ÿæ•ˆâ€”â€”
-       é›–ç„¶é˜²ç¦¦æœ¬èº«ã€Œä¿è­·çš„æ˜¯æ¥ä¸‹ä¾†å—åˆ°çš„å‚·å®³ã€ï¼Œ
-       ä¸å¤ªå—é †åºå½±éŸ¿ï¼Œä½†ç©å®¶æ˜ç¢ºè¦æ±‚
-       ã€Œæ‰€æœ‰è¡Œå‹•éƒ½è¦éµå¾ªåŒä¸€å¥—å®£å‘Š/çµç®—æ©Ÿåˆ¶ã€ï¼Œ
-       ä¸è¦æœ‰é˜²ç¦¦é€™ç¨®ç‰¹ä¾‹ï¼Œé€™è£¡å°±ç…§åšã€‚
-    */
-
-    queuedPlayerActions[
-        activeBattleCharacterIndex
-    ]={
-
-        action:"defend",
-
-        target:null
-
-    };
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-function usePotion(potionId){
-
-    /*
-       V91ï¼šæˆ°é¬¥å®£å‘Šç›´æ¥è¨˜ä½ã€Œå“ªä¸€ç“¶ã€è—¥æ°´ï¼Œ
-       ä¸å†åªè¨˜ hp/sp é¡å‹ã€‚çœŸæ­£æ‰£èƒŒåŒ…æ•¸é‡èˆ‡
-       ç™¾åˆ†æ¯”æ¢å¾©ä»ç•™åœ¨æ•æ·æ’åºå¾Œçš„çµç®—éšæ®µã€‚
-    */
-
-    const definition=getPotionDefinition(potionId);
-
-    if(!definition){
-        return;
-    }
-
-    const autoOn=
-        activeBattleCharacterIndex===0
-        ? autoBattle
-        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-
-    if(
-        !battleActive ||
-        autoOn ||
-        actionReady
-    ){
-        return;
-    }
-
-    const activeCharacter=
-        getPartyCharacterByIndex(activeBattleCharacterIndex);
-
-    if(
-        !activeCharacter ||
-        activeCharacter.hp<=0
-    ){
-        return;
-    }
-
-    if(getPotionCount(potionId)<=0){
-        addBattleLog(
-            definition.name+
-            "ç›®å‰æ²’æœ‰åº«å­˜ã€‚"
-        );
-        renderBattlePotionMenu();
-        return;
-    }
-
-    const stats=
-        getPartyBattleStats(activeBattleCharacterIndex);
-
-    if(
-        definition.resource==="hp" &&
-        activeCharacter.hp>=stats.maxHP
-    ){
-        addBattleLog("HPå·²ç¶“æ˜¯æ»¿çš„ã€‚");
-        return;
-    }
-
-    if(
-        definition.resource==="sp" &&
-        activeCharacter.sp>=stats.maxSP
-    ){
-        addBattleLog("SPå·²ç¶“æ˜¯æ»¿çš„ã€‚");
-        return;
-    }
-
-    actionReady=true;
-
-    queuedPlayerActions[
-        activeBattleCharacterIndex
-    ]={
-        action:"potion",
-        potionId:potionId,
-        target:null
-    };
-
-    closeMenus();
-    updateUI();
-    finishPlayerAction();
-}
-
-
-function applyPotionEffect(potionId,characterIndex){
-
-    const definition=getPotionDefinition(potionId);
-
-    if(!definition){
-        addBattleLog("æ‰¾ä¸åˆ°é€™å€‹è—¥æ°´è³‡æ–™ã€‚");
-        finishPlayerAction();
-        return;
-    }
-
-    const activeCharacter=
-        getPartyCharacterByIndex(characterIndex);
-
-    if(!activeCharacter){
-        finishPlayerAction();
-        return;
-    }
-
-    const stats=
-        getPartyBattleStats(characterIndex);
-
-    const maxValue=
-        definition.resource==="hp"
-        ? stats.maxHP
-        : stats.maxSP;
-
-    const currentValue=
-        definition.resource==="hp"
-        ? activeCharacter.hp
-        : activeCharacter.sp;
-
-    if(currentValue>=maxValue){
-        addBattleLog(
-            (definition.resource==="hp" ? "HP" : "SP")+
-            "å·²ç¶“æ˜¯æ»¿çš„ã€‚"
-        );
-        finishPlayerAction();
-        return;
-    }
-
-    if(getPotionCount(potionId)<=0){
-        addBattleLog(
-            definition.name+
-            "ç›®å‰æ²’æœ‰åº«å­˜ã€‚"
-        );
-        finishPlayerAction();
-        return;
-    }
-
-    let plannedRecovery;
-
-    if(definition.recoveryPercent>=100){
-        plannedRecovery=maxValue-currentValue;
-    }else{
-        plannedRecovery=Math.max(
-            1,
-            Math.round(
-                maxValue*
-                definition.recoveryPercent/
-                100
-            )
-        );
-    }
-
-    const recovered=Math.max(
-        0,
-        Math.min(
-            maxValue-currentValue,
-            plannedRecovery
-        )
-    );
-
-    if(recovered<=0){
-        finishPlayerAction();
-        return;
-    }
-
-    if(!consumePotionFromInventory(potionId,1)){
-        addBattleLog(
-            definition.name+
-            "æ‰£é™¤å¤±æ•—ã€‚"
-        );
-        finishPlayerAction();
-        return;
-    }
-
-    if(definition.resource==="hp"){
-        activeCharacter.hp=Math.min(
-            stats.maxHP,
-            activeCharacter.hp+recovered
-        );
-
-        showPlayerHit(
-            recovered,
-            "heal",
-            characterIndex,
-            true
-        );
-    }else{
-        activeCharacter.sp=Math.min(
-            stats.maxSP,
-            activeCharacter.sp+recovered
-        );
-
-        showPlayerHit(
-            recovered,
-            "sp",
-            characterIndex,
-            true
-        );
-    }
-
-    addBattleLog(
-        (activeCharacter.id||"ä½ ")+
-        "ä½¿ç”¨"+
-        definition.name+
-        "ï¼Œæ¢å¾©"+
-        recovered+
-        " "+
-        definition.resource.toUpperCase()+
-        "ã€‚"
-    );
-
-    updateUI();
-    saveGame();
-    finishPlayerAction();
-}
-
-
-/* =====================================================
-   è‡ªå‹•æˆ°é¬¥
-===================================================== */
-
-function toggleAutoBattle(){
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œè®“å·¡é‚é é¢çš„
-       è‡ªå‹•æˆ°é¬¥æŒ‰éˆ•ä¹Ÿèƒ½ç”¨ï¼‰ï¼š
-       åŸæœ¬é€™è£¡é–‹é ­å°±æ˜¯ã€Œä¸åœ¨æˆ°é¬¥ä¸­å°±ç›´æ¥
-       returnã€ï¼Œå°è‡´åœ¨åœ°åœ–ï¼å·¡é‚é é¢æŒ‰é€™é¡†
-       æŒ‰éˆ•å®Œå…¨æ²’æœ‰ä»»ä½•åæ‡‰â€”â€”ä½†ç©å®¶æœƒæƒ³åœ¨
-       æˆ°é¬¥ä¹‹å¤–ï¼Œå…ˆæŠŠã€Œä¸‹ä¸€å ´æˆ°é¬¥è¦ä¸è¦è‡ªå‹•ã€
-       é€™å€‹åå¥½è¨­å®šå¥½ï¼Œä¸éœ€è¦çœŸçš„äººåœ¨æˆ°é¬¥è£¡
-       æ‰èƒ½èª¿æ•´ã€‚
-
-       æ‹¿æ‰é€™å€‹é–‹é ­çš„æ“‹æ¿ä¹‹å¾Œï¼Œä¸‹é¢çš„é‚è¼¯
-       ï¼ˆæ”¹autoBattleã€åŒæ­¥autoConfig.enabledï¼
-       autoConfig2.enabledã€æ›´æ–°æŒ‰éˆ•æ–‡å­—ã€
-       å¯«ä¸€è¡Œæˆ°é¬¥ç´€éŒ„ï¼‰åœ¨ä¸åœ¨æˆ°é¬¥ä¸­åŸ·è¡Œéƒ½æ˜¯
-       å®‰å…¨çš„â€”â€”autoConfig.enabledæœ¬ä¾†å°±æ˜¯
-       ã€Œä¸‹ä¸€å ´æˆ°é¬¥è¦æ²¿ç”¨çš„è¨­å®šã€ï¼ŒstartBattle()
-       é–‹æ–°æˆ°é¬¥æ™‚æœƒè‡ªå·±è®€é€™å€‹å€¼ï¼Œæ‰€ä»¥åœ¨æˆ°é¬¥å¤–
-       èª¿æ•´ï¼Œæ•ˆæœå°±æ˜¯ã€Œå…ˆè¨­å®šå¥½ï¼Œä¸‹ä¸€å ´è‡ªå‹•ç”Ÿæ•ˆã€ï¼Œ
-       è·ŸåŸæœ¬è¨­è¨ˆçš„ç”¨é€”å®Œå…¨ä¸€è‡´ã€‚
-       æœ€ä¸‹é¢é‚£æ®µã€Œå®£å‘Šéšæ®µå®‰å…¨æ¥æ‰‹ã€çš„é‚è¼¯
-       æœ¬èº«æœ‰battlePhaseï¼battleActiveé›™é‡æª¢æŸ¥ï¼Œ
-       ä¸åœ¨æˆ°é¬¥ä¸­åŸ·è¡Œä¹Ÿä¸æœƒæœ‰ä»»ä½•å‰¯ä½œç”¨ã€‚
-    */
-
-    autoBattle =
-        !autoBattle;
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-       åˆ‡æ›è‡ªå‹•æˆ°é¬¥çš„ç•¶ä¸‹ï¼Œç«‹åˆ»é‡æ–°åˆ¤æ–·
-       å›åˆè³‡è¨Šåˆ—ï¼æˆ°é¬¥æŒ‡ä»¤æŒ‰éˆ•è¦ä¸è¦é¡¯ç¤ºâ€”â€”
-       æ‰“é–‹è‡ªå‹•æˆ°é¬¥æ™‚æ‡‰è©²é¦¬ä¸Šè—èµ·ä¾†ï¼ˆä¸ç”¨
-       ç­‰åˆ°ä¸‹ä¸€æ¬¡declare/resolveåˆ‡æ›æ‰ç”Ÿæ•ˆï¼‰ï¼Œ
-       é—œæ‰æ¢å¾©æ‰‹å‹•æ™‚ï¼Œå¦‚æœç¾åœ¨å‰›å¥½æ˜¯å®£å‘Š
-       éšæ®µã€è¼ªåˆ°ç©å®¶è‡ªå·±é¸ï¼Œä¹Ÿè¦ç«‹åˆ»é¡¯ç¤º
-       å‡ºä¾†ï¼Œä¸èƒ½è®“ç©å®¶å°è‘—è—èµ·ä¾†çš„æŒ‰éˆ•
-       ä¸çŸ¥é“è¦é»å“ªè£¡ã€‚
-    */
-
-    updateActionHudVisibility();
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™è£¡åªæ”¹äº†æœ¬å ´æˆ°é¬¥ç”¨çš„ autoBattleï¼Œ
-       æ²’æœ‰åŒæ­¥å› autoConfig.enabledï¼Œ
-       å°è‡´ä¸‹ä¸€å ´æˆ°é¬¥é–‹å§‹æ™‚
-       startBattle() æœƒç”¨ä¸»åŸè¨­å®šçš„
-       autoConfig.enabled é‡æ–°è¦†è“‹ï¼Œ
-       å¦‚æœç©å®¶æ²’æœ‰å¦å¤–å»ä¸»åŸå‹¾é¸ï¼Œ
-       ç¬¬äºŒå ´å°±æœƒè®Šå›æ‰‹å‹•ï¼Œçœ‹èµ·ä¾†åƒã€Œè‡ªå‹•æˆ°é¬¥å¤±æ•ˆã€ã€‚
-       é€™è£¡åŒæ­¥æ›´æ–°è¨­å®šï¼Œä¸¦ä¸”é †ä¾¿åŒæ­¥
-       ä¸»åŸé‚£å€‹checkboxçš„ç•«é¢ï¼Œ
-       é€™æ¨£åˆ‡æ›ä¸€æ¬¡ä¹‹å¾Œä¹‹å¾Œæ¯ä¸€å ´éƒ½æœƒæ²¿ç”¨ã€‚
-    */
-
-    autoConfig.enabled =
-        autoBattle;
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸçš„æŠ“åˆ°ä¸€å€‹bugï¼‰ï¼š
-       é€™è£¡åŸæœ¬å®Œå…¨æ²’æœ‰å‹•åˆ°autoConfig2.enabledï¼Œ
-       ç­‰æ–¼é€™é¡†å…±ç”¨çš„ã€Œå•Ÿå‹•/åœæ­¢ã€æŒ‰éˆ•
-       æ°¸é åªæ§åˆ¶ç¬¬ä¸€è§’è‰²ï¼Œ
-       ç¬¬äºŒè§’è‰²çš„è‡ªå‹•æˆ°é¬¥é–‹é—œå¾é ­åˆ°å°¾æ²’è¢«ç¢°éï¼Œ
-       ä¸€ç›´ç¶­æŒåœ¨é è¨­çš„é—œé–‰ç‹€æ…‹â€”â€”
-       é€™æ­£æ˜¯ã€Œåªæœ‰é’å¢¨æ±çš‡æœƒè‡ªå‹•ï¼Œé’æ°´ä¸æœƒã€
-       çš„çœŸæ­£åŸå› ã€‚
-
-       ç¾åœ¨åªæœ‰ä¸€é¡†å…±ç”¨æŒ‰éˆ•ï¼Œæ²’æœ‰å¦å¤–çš„
-       per-characteré–‹é—œå¯ä»¥åˆ†åˆ¥æŒ‰ï¼Œ
-       åˆç†çš„è¡Œç‚ºæ‡‰è©²æ˜¯ã€Œä¸€éµè®“æ•´éšŠéƒ½è‡ªå‹•/éƒ½æ‰‹å‹•ã€ï¼Œ
-       æ‰€ä»¥é€™è£¡è®“ç¬¬äºŒè§’è‰²ï¼ˆå¦‚æœå­˜åœ¨ï¼‰
-       è·Ÿè‘—ç¬¬ä¸€è§’è‰²çš„ç‹€æ…‹ä¸€èµ·åˆ‡æ›ã€‚
-    */
-
-    if(player2){
-
-        autoConfig2.enabled=
-            autoBattle;
-
-    }
-
-    if(player3){
-
-        autoConfig3.enabled=
-            autoBattle;
-
-    }
-
-
-    const homeCheckbox =
-        $("autoEnabled");
-
-
-    if(homeCheckbox){
-
-        homeCheckbox.checked =
-            autoBattle;
-
-    }
-
-
-    const player2Checkbox=
-        $("autoEnabledPlayer2");
-
-
-    if(player2Checkbox){
-
-        player2Checkbox.checked=
-            autoBattle;
-
-    }
-
-
-    actionReady=false;
-
-    pendingAction=null;
-
-    if(autoBattle){
-        clearBattleTargetSelectionMode();
-        clearActiveCharacterHighlight();
-    }
-    else if(
-        battleActive &&
-        battlePhase==="declare"
-    ){
-        /* V95ï¼šå¾è‡ªå‹•åˆ‡å›æ‰‹å‹•æ™‚ï¼Œä¸é‡æ–°å•Ÿå‹•å›åˆã€
-           ä¸æ”¹ activeBattleCharacterIndexï¼›ç›´æ¥ç”¨ç•¶ä¸‹çœŸæ­£
-           æ­£åœ¨ç­‰å¾…æ“ä½œçš„è§’è‰²é¡¯ç¤ºç²—é»ƒæ¡†èˆ‡æŠ€èƒ½åˆ—ã€‚ */
-        clearBattleTargetSelectionMode();
-        updateActiveCharacterHighlight();
-        populateSkillQuickBar();
-    }
-
-
-    updateAutoButton();
-
-
-    addBattleLog(
-
-        autoBattle
-        ?
-        "è‡ªå‹•æˆ°é¬¥é–‹å§‹ï¼ˆä¸‹ä¸€å ´ä¹Ÿæœƒæ²¿ç”¨æ­¤è¨­å®šï¼‰ã€‚"
-        :
-        "â¹ å·²åœæ­¢è‡ªå‹•æˆ°é¬¥ã€‚"
-
-    );
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸçš„æŠ“åˆ°äº†ï¼Œé€™æ¬¡çš„é™¤éŒ¯è¨Šæ¯
-       ç›´æ¥æŠŠå…‡æ‰‹æŠ“å‡ºä¾†äº†ï¼‰ï¼š
-
-       é€™è£¡åŸæœ¬ã€Œé‡æ–°å•Ÿå‹•è‡ªå‹•æˆ°é¬¥æ™‚ï¼Œ
-       400mså¾Œå¼·åˆ¶å‘¼å«ä¸€æ¬¡autoAction()ã€ï¼Œ
-       æ˜¯å¾ˆæ—©ä¹‹å‰ç‚ºäº†è§£æ±ºã€Œè‡ªå‹•æˆ°é¬¥å¡ä½ã€
-       ç•™ä¸‹çš„æ¬Šå®œä¹‹è¨ˆâ€”â€”ä½†autoAction()
-       æ˜¯ã€Œç¬¬ä¸€è§’è‰²å®£å‘Šéšæ®µã€å°ˆç”¨çš„å‡½å¼ï¼Œ
-       é€™è£¡å®Œå…¨æ²’æœ‰æª¢æŸ¥ç•¶ä¸‹ï¼š
-       - ç¾åœ¨æ˜¯å®£å‘Šéšæ®µé‚„æ˜¯çµç®—éšæ®µ
-         ï¼ˆbattlePhaseï¼‰
-       - ç¾åœ¨çœŸçš„è¼ªåˆ°ç¬¬ä¸€è§’è‰²å®£å‘Šå—
-         ï¼ˆactiveBattleCharacterIndexï¼‰
-       - è‡ªç„¶çš„æµç¨‹æœ¬èº«æ˜¯ä¸æ˜¯æ ¹æœ¬æ²’å¡ä½ï¼Œ
-         åªæ˜¯ç©å®¶è‡ªå·±æ‰‹ç™¢æŒ‰äº†åœæ­¢/å•Ÿå‹•
-
-       åªè¦ç©å®¶åœ¨å®£å‘Šéšæ®µä½†è¼ªåˆ°ã€Œæ¸…æ°´æˆ°ã€
-       å®£å‘Šæ™‚æŒ‰äº†åœæ­¢åˆå•Ÿå‹•ï¼Œ400mså¾Œé€™æ®µ
-       æœƒä¸ç®¡ä¸‰ä¸ƒäºŒåä¸€ç›´æ¥å‘¼å«autoAction()
-       ï¼ˆå¹«ç¬¬ä¸€è§’è‰²å®£å‘Šä¸€æ¬¡ã€ä¸¦å‘¼å«ä¸€æ¬¡
-       finishPlayerAction()ï¼‰ï¼Œç­‰æ–¼åœ¨
-       activeBattleCharacterIndexé‚„æ²’çœŸæ­£
-       è¼ªåˆ°ç¬¬ä¸€è§’è‰²çš„æƒ…æ³ä¸‹ï¼Œç¡¬æ˜¯æŠŠå®ƒå¾€å‰
-       å¤šæ¨äº†ä¸€æ­¥â€”â€”é€™æ­£æ˜¯ã€Œå®£å‘Šéšæ®µè«åå…¶å¦™
-       å¤šå‡ºä¸€æ¬¡finishPlayerAction()ã€
-       æ¸…æ°´æˆ°çš„å®£å‘Šè¢«è·³éã€queuedè®Šç©ºã€
-       çš„çœŸæ­£åŸå› ã€‚å¦‚æœå‰›å¥½ç™¼ç”Ÿåœ¨çµç®—éšæ®µï¼Œ
-       ä¸€æ¨£æœƒè®“initiativeIndexè¢«å¤šæ¨ä¸€æ­¥ï¼Œ
-       è·³éè©²è¼ªåˆ°çš„ä¸‹ä¸€ä½ã€‚
-
-       ç¾åœ¨å·²ç¶“æŠŠã€Œæ‰‹å‹•/è‡ªå‹•æ¨¡å¼ä¸‹ï¼ŒSPä¸è¶³ã€
-       å°šæœªå­¸ç¿’ç­‰åˆ†æ”¯æ¼å‘¼å«finishPlayerAction()ã€
-       é€™äº›çœŸæ­£æœƒè®“æµç¨‹å¡æ­»çš„æ¼æ´éƒ½è£œä¸Šäº†ï¼Œ
-       æ­£å¸¸æƒ…æ³ä¸‹è‡ªç„¶çš„å®£å‘Š/çµç®—éˆä¸æœƒå†
-       ç„¡è²å¡ä½ï¼Œé€™å€‹ã€Œå¤–éƒ¨ç¡¬è¸¢ä¸€æ¬¡ã€çš„
-       æ¬Šå®œä¹‹è¨ˆå·²ç¶“ä¸éœ€è¦ã€è€Œä¸”æ˜¯ä¸»å‹•çš„
-       å±å®³ä¾†æºï¼Œç›´æ¥æ‹¿æ‰ã€‚
-
-       åˆ‡æ›è‡ªå‹•æˆ°é¬¥ç¾åœ¨åªå–®ç´”æ”¹
-       autoBattle/autoConfigé€™äº›ç‹€æ…‹æ——æ¨™ï¼Œ
-       ä¸‹ä¸€æ¬¡beginCharacterTurn()è‡ªç„¶åŸ·è¡Œåˆ°
-       çš„æ™‚å€™ï¼Œæœƒè‡ªå·±è®€åˆ°æ–°çš„autoOnå€¼ã€
-       æ­£ç¢ºåˆ¤æ–·è¦ä¸è¦è‡ªå‹•å‡ºæ‰‹ã€‚
-
-       â˜… ä½†ï¼ˆä¾ç…§ä½¿ç”¨è€…å¯¦æ¸¬å›å ±ï¼Œè£œå›ä¸€å€‹
-       åˆç†ä½†è¦åšå°çš„è¡Œç‚ºï¼‰ï¼š
-       å¦‚æœåˆ‡æ›çš„ç•¶ä¸‹ï¼Œå‰›å¥½å¡åœ¨ã€Œå®£å‘Šéšæ®µï¼Œ
-       æ­£åœ¨ç­‰æŸå€‹è§’è‰²æ‰‹å‹•è¼¸å…¥ã€ï¼ˆé‚£å€‹è§’è‰²çš„
-       20ç§’è¨ˆæ™‚å™¨æ­£åœ¨è·‘ï¼‰ï¼Œç©å®¶æŠŠè‡ªå‹•æ‰“é–‹ï¼Œ
-       ç›´è¦ºæœƒæœŸå¾…ã€Œé€™å€‹æ­£åœ¨ç­‰æˆ‘çš„è§’è‰²ï¼Œ
-       ç¾åœ¨é¦¬ä¸Šè‡ªå‹•å¹«æˆ‘é¸ã€â€”â€”ä¸èƒ½ä»€éº¼éƒ½ä¸åšï¼Œ
-       ä¸ç„¶è¦å˜›åªèƒ½ç­‰20ç§’é€¾æ™‚ã€è¦å˜›å¾—å…ˆåšå®Œ
-       é€™è¼ªæ‰‹å‹•é¸æ“‡ï¼Œè‡ªå‹•é–‹é—œçœ‹èµ·ä¾†åƒæ²’åæ‡‰ã€‚
-
-       é€™è£¡è·Ÿæ‹¿æ‰çš„èˆŠç‰ˆæœ€å¤§å·®åˆ¥ï¼š
-       1. åªæ¥æ‰‹ã€Œç•¶ä¸‹æ­£åœ¨ç­‰å¾…ã€ä¸”å‰›è¢«åˆ‡æˆ
-          è‡ªå‹•ã€çš„é‚£ä¸€ä½ï¼Œä¸æœƒä¸åˆ†é’ç´…çš‚ç™½
-          æ°¸é å‘¼å«player1çš„autoAction()ã€‚
-       2. åŸ·è¡Œå‰ç”¨closureè¨˜ä½ç•¶ä¸‹çš„
-          battleTokenã€battlePhaseã€
-          activeBattleCharacterIndexï¼Œ
-          setTimeoutçœŸæ­£åŸ·è¡Œçš„é‚£ä¸€åˆ»ï¼Œ
-          ä¸‰å€‹æ¢ä»¶éƒ½è¦é‡æ–°æ ¸å°ä¸€æ¬¡æ²’æœ‰è®Šé
-          ï¼ˆtokenæ²’æ›æ–°æˆ°é¬¥ã€é‚„æ˜¯å®£å‘Šéšæ®µã€
-          é‚„æ˜¯åŒä¸€å€‹è§’è‰²åœ¨ç­‰ï¼‰â€”â€”å¦‚æœç©å®¶
-          åœ¨é€™400mså…§è‡ªå·±æ‰‹å‹•é¸å®Œäº†ï¼Œ
-          æˆ–æµç¨‹æœ¬ä¾†å°±è‡ªç„¶ç¹¼çºŒå¾€ä¸‹èµ°äº†ï¼Œ
-          é€™è£¡çš„æ ¸å°æœƒå¤±æ•—ï¼Œç›´æ¥ä»€éº¼éƒ½ä¸åšï¼Œ
-          ä¸æœƒç™¼ç”Ÿã€Œå·²ç¶“æœ‰äººé¸éäº†ï¼Œé€™è£¡
-          åˆç¡¬æ’ä¸€æ¬¡ã€çš„é‡è¤‡æ¨é€²ã€‚
-    */
-
-    if(
-        autoBattle &&
-        battlePhase==="declare"
-    ){
-
-        const expectedToken=
-            battleToken;
-
-        const expectedCharacterIndex=
-            activeBattleCharacterIndex;
-
-        setTimeout(()=>{
-
-            if(
-                !battleActive ||
-                battleToken!==
-                expectedToken ||
-                battlePhase!==
-                "declare"||
-                activeBattleCharacterIndex!==
-                expectedCharacterIndex
-            ){
-                return;
-            }
-
-
-            try{
-
-                autoActionForCharacter(
-                    expectedCharacterIndex,
-                    expectedToken
-                );
-
-            }
-            catch(error){
-
-                console.error(
-                    "åˆ‡æ›è‡ªå‹•æˆ°é¬¥æ™‚æ¥æ‰‹å®£å‘Šç™¼ç”Ÿä¾‹å¤–ï¼š",
-                    error
-                );
-
-            }
-
-        },400);
-
-    }
-
-}
-
-
-function updateAutoButton(){
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…æŒ‡å®šç‰ˆé¢ï¼‰ï¼š
-       å•Ÿå‹•ä¹‹å¾ŒæŒ‰éˆ•æ–‡å­—æ”¹æˆã€Œåœæ­¢ã€ã€
-       åŠ ä¸Šactiveçš„ç´…è‰²æ¨£å¼ï¼›
-       å·¦é‚Šçš„æ¨™ç±¤æ–‡å­—ä¹Ÿè¦è·Ÿè‘—æ›æˆã€Œè‡ªå‹•æˆ°é¬¥ä¸­ã€ã€‚
-    */
-
-    const button=
-        $("autoBattleButton");
-
-
-    if(button){
-
-        button.textContent=
-
-            autoBattle
-            ?
-            "â¹ åœæ­¢"
-            :
-            "â–¶ å•Ÿå‹•";
-
-
-        button.classList.toggle(
-            "active",
-            autoBattle
-        );
-
-    }
-
-
-    const label=
-        $("autoBattleLabel");
-
-
-    if(label){
-
-        label.textContent=
-
-            autoBattle
-            ?
-            "è‡ªå‹•æˆ°é¬¥ä¸­"
-            :
-            "è‡ªå‹•æˆ°é¬¥";
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œå·¡é‚é é¢çš„
-       è‡ªå‹•æˆ°é¬¥é¢æ¿ï¼‰ï¼š
-       è·Ÿä¸Šé¢åŒä¸€å¥—é‚è¼¯ï¼ŒåŒæ­¥æ›´æ–°å·¡é‚é é¢
-       é‚£ä»½è‡ªå‹•æˆ°é¬¥æŒ‰éˆ•/æ¨™ç±¤ï¼Œç¢ºä¿å…©é‚Š
-       é¡¯ç¤ºçš„ç‹€æ…‹æ°¸é ä¸€è‡´ï¼Œä¸æœƒå‡ºç¾æˆ°é¬¥
-       é é¢é¡¯ç¤ºã€Œåœæ­¢ã€ã€å·¡é‚é é¢å»é‚„é¡¯ç¤º
-       ã€Œå•Ÿå‹•ã€é€™ç¨®ä¸åŒæ­¥çš„æƒ…æ³ã€‚
-    */
-
-    const mapButton=
-        $("mapAutoBattleButton");
-
-
-    if(mapButton){
-
-        mapButton.textContent=
-
-            autoBattle
-            ?
-            "â¹ åœæ­¢"
-            :
-            "â–¶ å•Ÿå‹•";
-
-
-        mapButton.classList.toggle(
-            "active",
-            autoBattle
-        );
-
-    }
-
-
-    const mapLabel=
-        $("mapAutoBattleLabel");
-
-
-    if(mapLabel){
-
-        mapLabel.textContent=
-
-            autoBattle
-            ?
-            "è‡ªå‹•æˆ°é¬¥ä¸­"
-            :
-            "è‡ªå‹•æˆ°é¬¥";
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œå·¡æ€ªé é¢
-       å·¦ä¸Šè§’æ–°å¢å°æŒ‰éˆ•ï¼Œè‡ªå‹•æˆ°é¬¥å¿«æ·é–‹å•Ÿ/
-       åœæ­¢ã€ï¼‰ï¼š
-       è·Ÿä¸Šé¢å…©é¡†æŒ‰éˆ•åŒä¸€å¥—é‚è¼¯ï¼ŒåŒæ­¥æ›´æ–°
-       å·¦ä¸Šè§’é€™é¡†å°å¿«æ·éˆ•ï¼Œç¢ºä¿ä¸‰å€‹åœ°æ–¹
-       ï¼ˆæˆ°é¬¥é é¢/åœ°åœ–è¦†è“‹å±¤/å·¦ä¸Šè§’å¿«æ·éˆ•ï¼‰
-       æ°¸é é¡¯ç¤ºä¸€è‡´çš„ç‹€æ…‹ã€‚é€™é¡†ç¾åœ¨æ”¹æˆ
-       ç´”åœ–ç¤ºéˆ•ï¼ˆé–‹/é—œå„ä¸€å¼µä¸Šå‚³çš„iconåœ–ï¼‰ï¼Œ
-       ä¸å†æ”¾æ–‡å­—ï¼Œæ”¹ç”¨activeé€™å€‹class
-       åˆ‡æ›è¦é¡¯ç¤ºå“ªä¸€å¼µåœ–ï¼ˆè¦‹CSS
-       .map-quick-toggle-btn .icon-onï¼
-       .icon-offï¼‰ï¼Œä¸¦é™„å¸¶aria-labelæ–¹ä¾¿
-       ç„¡éšœç¤™é–±è®€ï¼Œä¸èƒ½ç›´æ¥å¯«textContent
-       ï¼ˆé‚£æ¨£æœƒæŠŠè£¡é¢çš„<img>å­å…ƒç´ æ•´å€‹
-       æ´—æ‰ï¼Œåœ–ç¤ºæœƒæ¶ˆå¤±ï¼‰ã€‚
-    */
-
-    const quickBattleBtn=
-        $("quickAutoBattleToggle");
-
-
-    if(quickBattleBtn){
-
-        quickBattleBtn.setAttribute(
-            "aria-label",
-
-            autoBattle
-            ?
-            "è‡ªå‹•æˆ°é¬¥ï¼ˆé–‹å•Ÿä¸­ï¼‰"
-            :
-            "è‡ªå‹•æˆ°é¬¥ï¼ˆé—œé–‰ï¼‰"
-        );
-
-
-        quickBattleBtn.classList.toggle(
-            "active",
-            autoBattle
-        );
-
-    }
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼šè‡ªå‹•æˆ°é¬¥è©³ç´°è¨­å®šé¢æ¿ï¼ˆå±•é–‹ç‰ˆï¼‰ã€‚
-
-   openAutoBattleSettings()ï¼šå±•é–‹é¢æ¿ï¼Œ
-   é è¨­å…ˆé¡¯ç¤ºç©å®¶1çš„è¨­å®šã€‚
-
-   switchAutoSettingsCharacter()ï¼šåˆ‡æ›è§’è‰²æ™‚ï¼Œ
-   é‡æ–°å¡«å…¥ã€Œè‡ªå‹•è¡Œå‹•ã€ä¸‹æ‹‰é¸å–®
-   ï¼ˆæ™®é€šæ”»æ“Š/é˜²ç¦¦/è©²è§’è‰²è£å‚™çš„æŠ€èƒ½ï¼‰ï¼Œ
-   ä¸¦è¼‰å…¥è©²è§’è‰²ç›®å‰çš„HP%/SP%/è‡ªå‹•å›åŸè¨­å®šã€‚
-
-   confirmAutoBattleSettings()ï¼šæŠŠè¡¨å–®ä¸Šçš„å€¼
-   å¯«å›å°æ‡‰è§’è‰²çš„autoConfig/autoConfig2ï¼Œå­˜æª”ï¼Œæ”¶èµ·é¢æ¿ã€‚
-
-   closeAutoBattleSettings()ï¼šä¸å„²å­˜ï¼Œç›´æ¥æ”¶èµ·é¢æ¿ã€‚
-*/
-
-/*
-   â˜… æ–°å¢ï¼šè¨˜ä½è‡ªå‹•æˆ°é¬¥è¨­å®šé¢æ¿åŸæœ¬
-   ï¼ˆåœ¨battlePageè£¡ï¼‰çš„ä½ç½®ï¼ŒopenAutoBattleSettings()
-   æŠŠå®ƒæš«æ™‚æ¬åˆ°document.bodyåº•ä¸‹æ™‚è¨˜éŒ„ï¼Œ
-   closeAutoBattleSettings()é—œé–‰æ™‚ä¾ç…§é€™å…©å€‹å€¼
-   æ¬å›åŸä½ã€‚
-*/
-
-let autoSettingsOriginalParent=
-    null;
-
-let autoSettingsOriginalNextSibling=
-    null;
-
-
-function openAutoBattleSettings(){
-
-    const panel=
-        $("autoBattleSettingsPanel");
-
-
-    if(!panel){
-        return;
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œè®“åœ°åœ–ï¼å·¡é‚
-       é é¢çš„ã€Œè¨­å®šã€æŒ‰éˆ•ä¹Ÿèƒ½ç”¨ï¼‰ï¼š
-       é€™å€‹é¢æ¿åŸæœ¬æ˜¯battlePageåº•ä¸‹çš„
-       å­å…ƒç´ ï¼Œä¸åœ¨æˆ°é¬¥ä¸­çš„æ™‚å€™battlePage
-       æ•´å€‹display:noneï¼Œå°±ç®—æŠŠé¢æ¿è‡ªå·±çš„
-       displayæ”¹æ‰ï¼Œä¹Ÿæœƒè¢«æ²’æœ‰displayçš„
-       ç¥–å…ˆè“‹ä½çœ‹ä¸è¦‹â€”â€”é€™æ­£æ˜¯ã€Œè¨­å®šæŒ‰éˆ•
-       æ²’åæ‡‰ã€çš„çœŸæ­£åŸå› ã€‚
-
-       é€™è£¡åœ¨ã€Œä¸åœ¨æˆ°é¬¥ä¸­ã€çš„æƒ…æ³ä¸‹ï¼ŒæŠŠé¢æ¿
-       é€™å€‹DOMç¯€é»æš«æ™‚æ¬åˆ°document.bodyåº•ä¸‹
-       ï¼ˆé€ƒå‡ºbattlePageé‚£å±¤display:noneï¼‰ï¼Œ
-       ä¸¦å¥—ç”¨ä¸Šé¢æ–°å¢çš„floating-modalæ¨£å¼
-       ï¼ˆæ”¹æˆposition:fixedã€è‡ªå·±å®šä½ï¼‰ã€‚
-       æ¬èµ°ä¹‹å‰å…ˆè¨˜ä½åŸæœ¬çš„ä½ç½®
-       ï¼ˆautoSettingsOriginalParentï¼
-       autoSettingsOriginalNextSiblingï¼‰ï¼Œ
-       closeAutoBattleSettings()è£¡æœƒä¾ç…§
-       é€™å…©å€‹å€¼æŠŠå®ƒæ¬å›battlePageåŸæœ¬çš„
-       ä½ç½®ï¼Œä¸æœƒè®“å®ƒå¾æ­¤æ¶ˆå¤±åœ¨battlePageè£¡ã€‚
-    */
-
-    if(
-        !battleActive &&
-        panel.parentNode!==
-        document.body
-    ){
-
-        autoSettingsOriginalParent=
-            panel.parentNode;
-
-        autoSettingsOriginalNextSibling=
-            panel.nextSibling;
-
-
-        document.body.appendChild(
-            panel
-        );
-
-
-        panel.classList.add(
-            "floating-modal"
-        );
-
-    }
-
-
-    const characterSelect=
-        $("autoSettingsCharacterSelect");
-
-
-    if(characterSelect){
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…æŒ‡æ­£ï¼‰ï¼š
-           ä¸‹æ‹‰é¸é …åŸæœ¬å¯«æ­»é¡¯ç¤ºã€Œç©å®¶1ã€ã€Œç©å®¶2ã€ï¼Œ
-           é‚£åªæ˜¯æˆ‘èªªæ˜æ™‚èˆ‰ä¾‹ç”¨çš„ä»£ç¨±ï¼Œ
-           ä½¿ç”¨è€…è¦çš„å…¶å¯¦æ˜¯ã€Œè§’è‰²è‡ªå·±çš„IDã€ï¼Œ
-           é€™è£¡æ”¹æˆå‹•æ…‹å¸¶å…¥player.id/player2.idã€‚
-        */
-
-        const option0=
-            $("autoSettingsCharOption0");
-
-
-        if(option0){
-
-            option0.textContent=
-
-                player.id||
-                "è§’è‰²1";
-
-        }
-
-
-        const option1=
-            $("autoSettingsCharOption1");
-
-
-        if(option1){
-
-            option1.textContent=
-
-                player2
-                ?
-                player2.id
-                :
-                "è§’è‰²2ï¼ˆå°šæœªå‰µå»ºï¼‰";
-
-        }
-
-
-        /*
-           ç©å®¶2é‚„æ²’å‰µå»ºçš„è©±ï¼Œ
-           ä¸‹æ‹‰é¸å–®è£¡å…ˆä¸çµ¦é¸ï¼Œ
-           é¿å…é¸åˆ°ä¸€å€‹ä¸å­˜åœ¨çš„è§’è‰²ã€‚
-        */
-
-        if(option1){
-
-            option1.disabled=
-
-                !player2;
-
-        }
-
-
-        characterSelect.value="0";
-
-    }
-
-
-    /*
-       â˜… å‰›æ‰“é–‹é¢æ¿ï¼Œç•«é¢æ¬„ä½æ˜¯ä¸Šæ¬¡æ®˜ç•™çš„å…§å®¹ï¼Œ
-       ä¸æ˜¯ç©å®¶æ­£åœ¨ç·¨è¼¯çš„æ±è¥¿ï¼Œé€™è£¡å‚³true
-       è·³éã€Œå­˜å›ä¸Šä¸€å€‹è§’è‰²ã€é‚£ä¸€æ­¥ã€‚
-    */
-
-    switchAutoSettingsCharacter(true);
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œé‡æ–°è¨­è¨ˆï¼‰ï¼š
-       è¨­å®šé¢æ¿æ”¹æˆçœŸæ­£çš„ã€Œæœ€ä¸Šå±¤è¦†è“‹ã€ï¼Œ
-       ç¯„åœæ˜¯ã€Œæ€ªç‰©å¡ç‰Œä¸‹ç·£ã€åˆ°ã€Œäººç‰©å¡ç‰Œä¸‹ç·£ã€ï¼Œ
-       ä¸å†ä¾è³´CSSå»çŒœé€™å€‹ç¯„åœè©²å¤šé«˜â€”â€”
-       ç›´æ¥ç”¨JSé‡å‡ºé€™å…©å€‹é‚Šç•Œçš„å¯¦éš›è¢å¹•åº§æ¨™ï¼Œ
-       ç”¨position:fixedç²¾æº–å°é½Šï¼Œ
-       ç–Šæ”¾é †åºæ‹‰åˆ°æœ€é«˜ï¼Œç¢ºä¿ä¸€å®šæœƒè“‹åœ¨
-       æ‰€æœ‰æ±è¥¿çš„æœ€ä¸Šé¢ã€‚
-    */
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸæ­£æŠ“åˆ°ã€Œè¨­å®šè·‘åˆ°æœ€ä¸Šé¢ã€çš„
-       åŸå› ï¼‰ï¼š
-       é€™æ®µé‡æ¸¬ã€Œæ€ªç‰©å¡ç‰Œä¸‹ç·£ï½äººç‰©å¡ç‰Œä¸‹ç·£ã€
-       å†ç”¨è¡Œå…§æ¨£å¼å®šä½çš„é‚è¼¯ï¼Œæ˜¯ç‚ºäº†æˆ°é¬¥
-       é é¢å…§è¨­è¨ˆçš„ï¼Œå»æ²’æœ‰åˆ¤æ–·ã€Œç¾åœ¨åˆ°åº•æ˜¯
-       ä¸æ˜¯åœ¨æˆ°é¬¥é é¢ã€â€”â€”åœ¨åœ°åœ–ï¼å·¡é‚é é¢
-       æ‰“é–‹è¨­å®šæ™‚ï¼Œ.battle-monstersï¼
-       .battle-player-rowé€™å…©å€‹å…ƒç´ é›–ç„¶é‚„åœ¨
-       DOMè£¡ï¼Œä½†battlePageæ•´å±¤display:noneï¼Œ
-       display:noneçš„å…ƒç´ getBoundingClientRect()
-       é‡å‡ºä¾†ä¸€å¾‹æ˜¯{top:0,bottom:0,...}ï¼Œ
-       ç­‰æ–¼é€™è£¡æœƒæŠŠpanel.style.topç¡¬è¨­æˆ
-       "0px"ã€heightè¨­æˆ"0px"â€”â€”è€Œä¸”é€™æ˜¯
-       è¡Œå…§æ¨£å¼ï¼Œå„ªå…ˆæ¬Šæ¯”floating-modalé‚£å€‹
-       CSS classé‚„é«˜ï¼Œå°±ç®—classæœ‰æ­£ç¢ºå¥—ç”¨ï¼Œ
-       ä¹Ÿæœƒè¢«é€™è£¡çš„è¡Œå…§æ¨£å¼è“‹éå»ï¼Œé€™æ‰æ˜¯
-       è¨­å®šé¢æ¿è·‘åˆ°ç•«é¢æœ€ä¸Šé¢ã€çœ‹èµ·ä¾†ç©ºç©ºçš„
-       çœŸæ­£åŸå› ã€‚
-
-       æ”¹æˆåªæœ‰ã€ŒçœŸçš„åœ¨æˆ°é¬¥ä¸­ã€æ‰åŸ·è¡Œé€™æ®µ
-       é‡æ¸¬å®šä½ï¼›ä¸åœ¨æˆ°é¬¥ä¸­ï¼ˆåœ°åœ–é é¢æ‰“é–‹ï¼‰
-       çš„è©±å®Œå…¨è·³éï¼Œäº¤çµ¦floating-modal
-       é‚£å€‹classè‡ªå·±çš„position:fixedï¼
-       bottom:80pxå»å®šä½ï¼Œä¸æœƒå†è¢«é€™è£¡çš„
-       è¡Œå…§æ¨£å¼è“‹æ‰ã€‚
-    */
-
-    if(battleActive){
-
-        const monsterArea=
-            document.querySelector(
-                ".battle-monsters"
-            );
-
-
-        const playerRow=
-            document.querySelector(
-                ".battle-player-row"
-            );
-
-
-        if(
-            monsterArea &&
-            playerRow
-        ){
-
-            const topEdge=
-                monsterArea
-                .getBoundingClientRect()
-                .bottom;
-
-
-            const bottomEdge=
-                playerRow
-                .getBoundingClientRect()
-                .bottom;
-
-
-            panel.style.position=
-                "fixed";
-
-            panel.style.top=
-                topEdge+"px";
-
-            panel.style.left=
-                "6px";
-
-            panel.style.right=
-                "6px";
-
-            panel.style.height=
-
-                (bottomEdge-topEdge)+
-                "px";
-
-            panel.style.zIndex=
-                "99999";
-
-        }
-
-    }
-    else{
-
-        /*
-           â˜… ä¸åœ¨æˆ°é¬¥ä¸­ï¼šæ¸…æ‰å¯èƒ½æ®˜ç•™çš„è¡Œå…§
-           å®šä½æ¨£å¼ï¼ˆä¾‹å¦‚ä¸Šä¸€æ¬¡åœ¨æˆ°é¬¥é é¢è£¡
-           æ‰“é–‹æ™‚è¨­éçš„top/heightï¼‰ï¼Œ
-           è®“floating-modalé€™å€‹classèƒ½å¤ 
-           æ­£å¸¸ç”Ÿæ•ˆï¼Œä¸è¢«æ®˜ç•™çš„è¡Œå…§æ¨£å¼å¡ä½ã€‚
-        */
-
-        panel.style.position=
-            "";
-
-        panel.style.top=
-            "";
-
-        panel.style.left=
-            "";
-
-        panel.style.right=
-            "";
-
-        panel.style.height=
-            "";
-
-        panel.style.zIndex=
-            "";
-
-    }
-
-
-    panel.style.display=
-        "flex";
-
-}
-
-
-function closeAutoBattleSettings(){
-
-    const panel=
-        $("autoBattleSettingsPanel");
-
-
-    if(panel){
-
-        panel.style.display=
-            "none";
-
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ”¹ç”¨
-           openHomeFeature()å½ˆçª—é¡¯ç¤ºè¨­å®š
-           é¢æ¿ä¹‹å¾Œï¼‰ï¼š
-           å¦‚æœé¢æ¿ç›®å‰æ˜¯è¢«å€Ÿé€²å½ˆçª—
-           ï¼ˆ#homeFeatureModalBodyï¼‰è£¡é¡¯ç¤ºçš„
-           â€”â€”ä¸æ˜¯èˆŠçš„document.bodyæ¬ç§»æ³•
-           â€”â€”æŒ‰ä¸‹ã€Œç¢ºå®šã€æ™‚è¦é€£åŒæ•´å€‹å½ˆçª—
-           ä¸€èµ·é—œæ‰ï¼Œä¸ç„¶å½ˆçª—æœƒç•™åœ¨ç•«é¢ä¸Šã€
-           è£¡é¢å»æ˜¯ç©ºçš„ï¼ˆé¢æ¿è¢«è¨­æˆdisplay:
-           noneï¼‰ï¼Œçœ‹èµ·ä¾†åƒå¡ä½ã€‚
-        */
-
-        if(
-            panel.parentNode &&
-            panel.parentNode.id===
-            "homeFeatureModalBody"
-        ){
-
-            closeHomeFeature();
-
-            return;
-
-        }
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆè·ŸopenAutoBattleSettings()
-           çš„æ¬ç§»å‹•ä½œé…å°ï¼‰ï¼š
-           å¦‚æœé¢æ¿ç›®å‰è¢«æ¬åˆ°document.body
-           åº•ä¸‹ï¼ˆä»£è¡¨æ˜¯å¾åœ°åœ–ï¼å·¡é‚é é¢æ‰“é–‹çš„ï¼‰ï¼Œ
-           é—œé–‰çš„æ™‚å€™æ¬å›battlePageè£¡åŸæœ¬çš„
-           ä½ç½®ï¼Œä¸¦æŠŠfloating-modalé€™å€‹class
-           æ‹¿æ‰ï¼Œæ¢å¾©æˆåŸæœ¬åœ¨æˆ°é¬¥é é¢è£¡
-           çš„å®šä½æ–¹å¼ã€‚ä¸é€™æ¨£åšçš„è©±ï¼Œé¢æ¿æœƒ
-           æ°¸é ç•™åœ¨bodyåº•ä¸‹ï¼Œä¸‹æ¬¡åœ¨æˆ°é¬¥é é¢
-           è£¡æ‰“é–‹æ™‚ï¼Œç‰ˆé¢æœƒè·‘æ‰ã€‚
-        */
-
-        if(
-            panel.parentNode===
-            document.body &&
-            autoSettingsOriginalParent
-        ){
-
-            if(
-                autoSettingsOriginalNextSibling &&
-                autoSettingsOriginalNextSibling.parentNode===
-                autoSettingsOriginalParent
-            ){
-
-                autoSettingsOriginalParent.insertBefore(
-                    panel,
-                    autoSettingsOriginalNextSibling
-                );
-
-            }
-            else{
-
-                autoSettingsOriginalParent.appendChild(
-                    panel
-                );
-
-            }
-
-
-            panel.classList.remove(
-                "floating-modal"
-            );
-
-        }
-
-    }
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼šæŠŠç›®å‰è¨­å®šé¢æ¿ç•«é¢ä¸Šé¡¯ç¤ºçš„å€¼ï¼Œ
-   å­˜å›ã€ŒcharacterIndexã€é€™å€‹è§’è‰²çš„
-   autoConfig/autoConfig2èº«ä¸Šã€‚
-   åœ¨åˆ‡æ›è§’è‰²ä¹‹å‰ã€ä»¥åŠçœŸæ­£æŒ‰ä¸‹ç¢ºå®šæ™‚
-   éƒ½æœƒå‘¼å«é€™è£¡ï¼Œç¢ºä¿æ²’æœ‰ä»»ä½•ä¸€é‚Šçš„èª¿æ•´
-   æœƒå› ç‚ºåˆ‡æ›è§’è‰²è€Œä¸å°å¿ƒéºå¤±ã€‚
-*/
-
-function saveAutoSettingsFormToCharacter(characterIndex){
-
-    const actionSelect=
-        $("autoSettingsActionSelect");
-
-
-    const hpSelect=
-        $("autoSettingsHP");
-
-
-    const spSelect=
-        $("autoSettingsSP");
-
-
-    const returnCityCheckbox=
-        $("autoSettingsReturnCity");
-
-
-    const targetConfig=
-        getPartyAutoConfig(Number(characterIndex));
-
-
-    if(actionSelect){
-
-        targetConfig.skill=
-            actionSelect.value;
-
-    }
-
-
-    if(hpSelect){
-
-        targetConfig.hp=
-            Number(hpSelect.value);
-
-    }
-
-
-    if(spSelect){
-
-        targetConfig.sp=
-            Number(spSelect.value);
-
-    }
-
-
-    if(returnCityCheckbox){
-
-        targetConfig.returnToCityWhenEmpty=
-
-            returnCityCheckbox.checked;
-
-    }
-
-}
-
-
-function switchAutoSettingsCharacter(skipSave){
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸæ­£è§£æ±ºã€Œåˆ‡æ›è§’è‰²æœƒéºå¤±
-       æœªå„²å­˜è®Šæ›´ã€çš„bugï¼‰ï¼š
-       åœ¨è®€å–æ–°è§’è‰²çš„è³‡æ–™ã€é‡æ–°ç•«é¢ä¹‹å‰ï¼Œ
-       å…ˆæŠŠã€Œç›®å‰ç•«é¢ä¸Šé¡¯ç¤ºçš„å€¼ã€
-       å­˜å›ã€Œåˆ‡æ›å‰ã€é‚£å€‹è§’è‰²èº«ä¸Šâ€”â€”
-       é€™æ¨£ä½¿ç”¨è€…ä¸ç®¡åœ¨Aã€Bå…©å€‹è§’è‰²ä¹‹é–“
-       åˆ‡æ›å¹¾æ¬¡ã€èª¿æ•´å¹¾æ¬¡ï¼Œ
-       æ¯ä¸€æ¬¡åˆ‡æ›éƒ½æœƒå…ˆå¹«å¿™å­˜èµ·ä¾†ï¼Œ
-       ä¸ç”¨åˆ‡ä¸€å€‹è§’è‰²å°±è¦æŒ‰ä¸€æ¬¡ç¢ºå®šï¼Œ
-       æœ€å¾Œçµ±ä¸€æŒ‰ä¸€æ¬¡ç¢ºå®šå³å¯ã€‚
-
-       â˜… ä½†æœ‰å€‹ä¾‹å¤–ï¼šå‰›æ‰“é–‹è¨­å®šé¢æ¿çš„é‚£ä¸€åˆ»
-       ï¼ˆopenAutoBattleSettings()å‘¼å«é€™è£¡æ™‚ï¼‰ï¼Œ
-       ç•«é¢ä¸Šçš„æ¬„ä½å…¶å¯¦æ˜¯ã€Œä¸Šä¸€æ¬¡é—œé–‰æ™‚
-       æ®˜ç•™çš„èˆŠå…§å®¹ã€ï¼Œä¸æ˜¯ç©å®¶æ­£åœ¨ç·¨è¼¯çš„æ±è¥¿ï¼Œ
-       é€™æ™‚å€™å¦‚æœé‚„åŸ·è¡Œã€Œå­˜å›ä¸Šä¸€å€‹è§’è‰²ã€ï¼Œ
-       åè€Œæœƒç”¨é€™äº›éæ™‚çš„æ®˜ç•™å€¼ï¼Œ
-       æŠŠè§’è‰²çœŸæ­£çš„è¨­å®šè¦†è“‹æ‰ã€‚
-       æ‰€ä»¥å‰›æ‰“é–‹é¢æ¿æ™‚ç”¨skipSave=trueè·³éé€™ä¸€æ­¥ï¼Œ
-       åªæœ‰ç©å®¶åœ¨é¢æ¿ã€Œå·²ç¶“æ‰“é–‹çš„ç‹€æ…‹ä¸‹ã€
-       ä¸»å‹•åˆ‡æ›è§’è‰²æ™‚ï¼Œæ‰éœ€è¦å„²å­˜ã€‚
-    */
-
-    if(!skipSave){
-
-        saveAutoSettingsFormToCharacter(
-            autoSettingsCurrentCharacter
-        );
-
-    }
-
-
-    const characterSelect=
-        $("autoSettingsCharacterSelect");
-
-
-    const actionSelect=
-        $("autoSettingsActionSelect");
-
-
-    const hpSelect=
-        $("autoSettingsHP");
-
-
-    const spSelect=
-        $("autoSettingsSP");
-
-
-    const returnCityCheckbox=
-        $("autoSettingsReturnCity");
-
-
-    if(!characterSelect){
-        return;
-    }
-
-
-    let requestedIndex=
-        Number(characterSelect.value);
-
-    if(!getPartyCharacterByIndex(requestedIndex)){
-
-        characterSelect.value="0";
-        requestedIndex=0;
-
-    }
-
-
-    const targetConfig=
-        getPartyAutoConfig(requestedIndex);
-
-
-    targetConfig.hp=normalizeAutoBattleThreshold(targetConfig.hp,50);
-    targetConfig.sp=normalizeAutoBattleThreshold(targetConfig.sp,25);
-
-
-    const characterId=
-        getPartyCharacterKey(requestedIndex);
-
-
-    const loadout=
-        characterSkillLoadouts[
-            characterId
-        ];
-
-
-    /*
-       â˜… è‡ªå‹•è¡Œå‹•ä¸‹æ‹‰é¸å–®ï¼š
-       æ™®é€šæ”»æ“Šã€é˜²ç¦¦ï¼ŒåŠ ä¸Šè©²è§’è‰²è£å‚™çš„
-       æ¯ä¸€æ ¼æŠ€èƒ½ï¼ˆæœ€å¤š4å€‹ï¼‰ã€‚
-    */
-
-    if(actionSelect){
-
-        let optionsHTML=
-
-            '<option value="normal">æ™®é€šæ”»æ“Š</option>'+
-            '<option value="defend">é˜²ç¦¦</option>';
-
-
-        if(loadout){
-
-            loadout.equippedSkills.forEach(
-                skillId=>{
-
-                    const skill=
-                        skillDatabase[skillId];
-
-
-                    if(
-                        !skill ||
-                        skill.category==="buff"||
-                        skill.category==="passive"||
-                        skill.category==="heal"||
-                        skill.category==="revive"
-                    ){
-                        return;
-                    }
-
-
-                    optionsHTML+=
-
-                        '<option value="'+
-                        skillId+
-                        '">'+
-                        skill.name+
-                        '</option>';
-
-                }
-            );
-
-        }
-
-
-        actionSelect.innerHTML=
-            optionsHTML;
-
-
-        const stillValid=
-
-            Array.from(
-                actionSelect.options
-            )
-            .some(
-                opt=>
-                    opt.value===
-                    targetConfig.skill
-            );
-
-
-        actionSelect.value=
-
-            stillValid
-            ?
-            targetConfig.skill
-            :
-            "normal";
-
-    }
-
-
-    if(hpSelect){
-
-        hpSelect.value=
-            targetConfig.hp;
-
-    }
-
-
-    if(spSelect){
-
-        spSelect.value=
-            targetConfig.sp;
-
-    }
-
-
-    if(returnCityCheckbox){
-
-        returnCityCheckbox.checked=
-
-            !!targetConfig.returnToCityWhenEmpty;
-
-    }
-
-
-    /*
-       â˜… æ›´æ–°è¿½è¹¤è®Šæ•¸ï¼Œè¨˜ä½è¡¨å–®ç¾åœ¨é¡¯ç¤ºçš„
-       æ˜¯å“ªå€‹è§’è‰²ï¼Œä¸‹æ¬¡åˆ‡æ›æ™‚æ‰çŸ¥é“
-       è¦æŠŠè³‡æ–™å­˜å›èª°èº«ä¸Šã€‚
-    */
-
-    autoSettingsCurrentCharacter=
-        requestedIndex;
-
-}
-
-
-function confirmAutoBattleSettings(){
-
-    const characterSelect=
-        $("autoSettingsCharacterSelect");
-
-
-    if(!characterSelect){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼šç›´æ¥å‘¼å«å…±ç”¨çš„å„²å­˜å‡½å¼ï¼Œ
-       ç¢ºä¿é€™è£¡è·Ÿåˆ‡æ›è§’è‰²æ™‚ç”¨çš„æ˜¯åŒä¸€å¥—é‚è¼¯ï¼Œ
-       ä¸æœƒå‡ºç¾å…©é‚Šå„å¯«ä¸€ä»½ã€ä»¥å¾Œæ”¹ä¸€é‚Šå¿˜è¨˜æ”¹
-       å¦ä¸€é‚Šçš„æƒ…æ³ã€‚
-    */
-
-    saveAutoSettingsFormToCharacter(
-        Number(characterSelect.value)
-    );
-
-
-    /*
-       â˜… è¨­å®šå®ŒåŒæ­¥ä¸€ä¸‹ä¸»åŸé‚£é‚Šçš„èˆŠç‰ˆUI
-       ï¼ˆå¦‚æœç©å®¶ä¹‹å¾Œé‚„æ˜¯æœƒå»ä¸»åŸèª¿æ•´ï¼‰ï¼Œ
-       é¿å…å…©é‚Šé¡¯ç¤ºçš„æ•¸å­—å°ä¸ä¸Šã€‚
-    */
-
-    if(characterSelect.value==="1"){
-
-        populateAutoSkillOptions2();
-
-    }
-    else if(characterSelect.value==="0"){
-
-        populateAutoSkillOptions();
-
-    }
-
-
-    saveGame();
-
-
-    closeAutoBattleSettings();
-
-
-    addBattleLog(
-        "è‡ªå‹•æˆ°é¬¥è¨­å®šå·²æ›´æ–°ã€‚"
-    );
-
-}
-
-
-/* Automatic combat only declares combat actions. HP/SP recovery is handled
-   once after victory by applyPostBattleAutoRecovery(). */
-function autoActionForCharacter(characterIndex,token){
-
-    const character=getPartyCharacterByIndex(characterIndex);
-    const config=getPartyAutoConfig(characterIndex);
-    const autoOn=characterIndex===0 ? autoBattle : config.enabled;
-
-    if(
-        !battleActive ||
-        !character ||
-        character.hp<=0 ||
-        !autoOn ||
-        token!==battleToken
-    ){
-        return;
-    }
-
-    if(config.skill==="defend"){
-        queuedPlayerActions[characterIndex]={action:"defend",target:null};
-        updateUI();
-        finishPlayerAction();
-        return;
-    }
-
-    const aliveInBattle=currentBattleMonsters.filter(
-        index=>monsters[index] && monsters[index].alive
-    );
-
-    if(aliveInBattle.length===0){
-        checkBattleEnd();
-        return;
-    }
-
-    const skill=skillDatabase[config.skill];
-    const spreads=skill && ["tri","row","column","all"].includes(skill.targetType);
-    let target=aliveInBattle[0];
-
-    /*
-       V137ï¼šæ€ªç‰©æ“´å……åˆ°æœ€å¤š10éš»ã€ä¸¦åˆ†æˆå…©æ’ä¹‹å¾Œï¼Œã€Œæ•´ä»½å­˜æ´»æ¸…å–®çš„
-       ä¸­é–“ã€ä¸å†ç­‰æ–¼ã€ŒæŠ€èƒ½èƒ½æ‰“æœ€å¤šäººçš„ä¸­å¿ƒã€ã€‚ä¾‹å¦‚6éš»æ€ªæ™‚èˆŠç®—æ³•
-       æœƒé¸ç¬¬ä¸€æ’æœ€å³é‚Šï¼ŒtriæŠ€èƒ½åªæ‰“åˆ°2éš»ã€‚é€ä¸€ç”¨çœŸæ­£çš„
-       getSkillTargets()è©•ä¼°å€™é¸ä¸­å¿ƒï¼Œé¸å‘½ä¸­æ•¸æœ€å¤šçš„é‚£ä¸€å€‹ï¼Œrowï¼
-       triæŠ€èƒ½æ‰æœƒä¾ç›®å‰é™£å½¢èˆ‡æ­»äº¡ç¼ºå£æ­£ç¢ºé¸ä½ã€‚
-    */
-    if(spreads && typeof getSkillTargets==="function"){
-        let bestCount=-1;
-        aliveInBattle.forEach(candidate=>{
-            const hitCount=getSkillTargets(candidate,skill.targetType).length;
-            if(hitCount>bestCount){
-                bestCount=hitCount;
-                target=candidate;
-            }
-        });
-    }
-
-    let action=config.skill||"normal";
-    const skillKey=getPartyCharacterKey(characterIndex);
-
-    if(
-        action!=="normal" &&
-        (
-            !skill ||
-            getSkillLevel(skillKey,action)<=0 ||
-            character.sp<(skill.spCost!==undefined ? skill.spCost : (skill.cost||0)) ||
-            ["buff","passive","heal","revive"].includes(skill.category)
-        )
-    ){
-        action="normal";
-    }
-
-    queuedPlayerActions[characterIndex]={
-        action:action,
-        target:target
-    };
-
-    updateUI();
-    finishPlayerAction();
-}
-
-
-function autoAction(token){
-
-    return autoActionForCharacter(0,token);
-
-    if(
-        !battleActive ||
-        !autoBattle ||
-        token!==battleToken
-    ){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆé‡è¦ï¼Œä¾ç…§ä½¿ç”¨è€…æ˜ç¢ºæŒ‡æ­£ï¼‰ï¼š
-       è‡ªå‹•æˆ°é¬¥ä¹‹å‰æ˜¯ã€Œè¼ªåˆ°è‡ªå·±å°±ç«‹åˆ»åŸ·è¡Œã€ï¼Œ
-       å®Œå…¨è·³éå®£å‘Š/çµç®—æ©Ÿåˆ¶ï¼Œ
-       ç­‰æ–¼è‡ªå‹•è§’è‰²æ°¸é ç„¡è¦–æ•æ·æ’åºã€
-       æ°¸é æ˜¯å®£å‘Šéšæ®µé‚£ä¸€åˆ»å°±å‡ºæ‰‹ã€‚
-
-       ç¾åœ¨æ”¹æˆï¼šè‡ªå‹•æˆ°é¬¥åªè² è²¬ã€Œæ±ºå®šè¦åšä»€éº¼ã€
-       ï¼ˆé˜²ç¦¦/è—¥æ°´/æŠ€èƒ½+ç›®æ¨™ï¼‰ï¼Œ
-       æ±ºå®šå¥½ä¹‹å¾Œä¸€æ¨£å­˜é€²queuedPlayerActionsï¼Œ
-       çœŸæ­£çš„åŸ·è¡Œç•™åˆ°çµç®—éšæ®µï¼Œ
-       è·Ÿæ‰‹å‹•æ“ä½œçš„è§’è‰²ç”¨åŒä¸€å¥—è¦å‰‡ã€
-       åŒæ¨£è¦çœ‹æ•æ·é †åºï¼Œä¸å†æœ‰ç‰¹ä¾‹ã€‚
-    */
-
-    if(autoConfig.skill==="defend"){
-
-        queuedPlayerActions[0]={
-
-            action:"defend",
-
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const stats =
-        getMainCharacterStats();
-
-
-    const hpPercent =
-        player.hp/
-        stats.maxHP*
-        100;
-
-
-    const autoHpPotionId=
-        getAutoPotionId("hp");
-
-
-    if(
-        hpPercent<=autoConfig.hp &&
-        autoHpPotionId
-    ){
-
-        queuedPlayerActions[0]={
-
-            action:"potion",
-            potionId:autoHpPotionId,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const spPercent =
-        player.sp/
-        stats.maxSP*
-        100;
-
-
-    const autoSpPotionId=
-        getAutoPotionId("sp");
-
-
-    if(
-        spPercent<=autoConfig.sp &&
-        autoSpPotionId
-    ){
-
-        queuedPlayerActions[0]={
-
-            action:"potion",
-            potionId:autoSpPotionId,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    /*
-       â˜… é‡æ–°è¨­è¨ˆè‡ªå‹•æˆ°é¬¥é¸æ€ªé‚è¼¯ï¼š
-
-       ä¹‹å‰ä¸ç®¡ç”¨ä»€éº¼æŠ€èƒ½ï¼Œéƒ½ç”¨åŒä¸€å¥—å›ºå®šå„ªå…ˆé †åºé¸ç›®æ¨™ï¼Œ
-       å°è‡´ç¯„åœæŠ€èƒ½ï¼ˆç«ç®­ï¼šä¸­å·¦å³ä¸‰äººï¼‰
-       å¸¸å¸¸é¸åˆ°åªèƒ½æ‰“åˆ°1~2éš»çš„ä½ç½®ï¼Œ
-       å®Œå…¨æ²’æœ‰ã€Œç›¡é‡ç‚¸åˆ°æœ€å¤šéš»ã€çš„é‚è¼¯ï¼Œé€™æ˜¯ä¸»è¦çš„æ€ªç•°ä¹‹è™•ã€‚
-
-       ç¾åœ¨æ”¹æˆï¼š
-       - ç¯„åœæŠ€èƒ½ï¼ˆç›®å‰æ˜¯ç«ç®­ï¼‰ï¼š
-         é¸ã€Œç›®å‰æˆ°é¬¥ä¸­é‚„æ´»è‘—çš„æ€ªç‰©ã€æ­£ä¸­é–“é‚£ä¸€éš»ï¼Œ
-         å› ç‚ºç«ç®­æ˜¯ã€Œä»¥é¸å®šç›®æ¨™ç‚ºä¸­å¿ƒï¼Œå‘å·¦å³æ“´æ•£ã€ï¼Œ
-         æ‰“ä¸­é–“æ‰èƒ½ç›¡é‡æ¶µè“‹æœ€å¤šéš»ã€‚
-         ç”±æ–¼ä¸€å ´æˆ°é¬¥æœ€å¤šåªæœ‰1~3éš»æ€ªï¼Œ
-         é€™æ¨£åšå‡ºä¾†çš„æ•ˆæœè‡ªç„¶å°±æ˜¯ï¼š
-         3éš»éƒ½æ´»è‘— â†’ å…¨éƒ¨æ‰“åˆ°ï¼›
-         å‰©2éš» â†’ å…©éš»éƒ½æ‰“åˆ°ï¼›
-         å‰©1éš» â†’ å–®é«”å‘½ä¸­ã€‚
-         æ­£å¥½ç¬¦åˆã€Œå„ªå…ˆä¸‰é€£ã€å…¶æ¬¡å…©é€£ã€æœ€å¾Œå–®éš»ã€çš„é‚è¼¯ï¼Œ
-         ä¸éœ€è¦é¡å¤–åˆ¤æ–·ã€Œæ€ªç‰©æ˜¯å¦é€£åœ¨ä¸€èµ·ã€ï¼Œ
-         å› ç‚ºç¾åœ¨æ•´å ´æˆ°é¬¥çš„æ€ªç‰©æœ¬ä¾†å°±éƒ½ç®—ã€Œé€£åœ¨ä¸€èµ·ã€ã€‚
-       - å–®é«”æŠ€èƒ½ï¼ˆæ™®é€šæ”»æ“Šã€æœƒå¿ƒä¸€æ“Šï¼‰ï¼š
-         ç›´æ¥æ‰“ç›®å‰é‚„æ´»è‘—çš„ç¬¬ä¸€éš»å°±å¥½ï¼Œ
-         å–®é«”æŠ€èƒ½æœ¬ä¾†å°±ä¸éœ€è¦è€ƒæ…®èª°åœ¨ä¸­é–“ã€‚
-    */
-
-    const aliveInBattle =
-        currentBattleMonsters
-        .filter(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    /*
-       â˜… åˆ¤æ–·ç›®å‰é¸å®šçš„è‡ªå‹•æŠ€èƒ½æ˜¯ä¸æ˜¯ã€Œç¯„åœç³»ã€ï¼Œ
-       ç¯„åœç³»ï¼ˆtri/row/allï¼‰å°±æŒ‘ä¸­é–“çš„æ€ªï¼Œ
-       ç›¡é‡ç‚¸åˆ°æœ€å¤šéš»ï¼›
-       å–®é«”æŠ€èƒ½æˆ–æ™®é€šæ”»æ“Šï¼Œç›´æ¥æ‰“ç¬¬ä¸€éš»æ´»è‘—çš„å°±å¥½ã€‚
-       é€™è£¡æ”¹æˆå¾skillDatabaseå‹•æ…‹æŸ¥è©¢ï¼Œ
-       ä¹‹å¾Œæ–°å¢æŠ€èƒ½ä¸ç”¨å†å›ä¾†æ”¹é€™æ®µã€‚
-    */
-
-    const autoSkillData =
-        skillDatabase[
-            autoConfig.skill
-        ];
-
-
-    const isSpreadSkill =
-        autoSkillData &&
-        (
-            autoSkillData.targetType==="tri"||
-            autoSkillData.targetType==="row"||
-            autoSkillData.targetType==="column"||
-            autoSkillData.targetType==="all"
-        );
-
-
-    let target;
-
-
-    if(
-        isSpreadSkill &&
-        aliveInBattle.length>0
-    ){
-
-        const midPosition =
-            Math.floor(
-                (
-                    aliveInBattle.length-1
-                )/2
-            );
-
-
-        target =
-            aliveInBattle[
-                midPosition
-            ];
-
-    }
-    else{
-
-        target =
-            aliveInBattle[0];
-
-    }
-
-
-    if(target===undefined){
-
-        checkBattleEnd();
-
-        return;
-
-    }
-
-
-    /*
-       â˜… buffé¡ï¼ˆæ€’ç«ï¼‰ä¸éœ€è¦é¸ç›®æ¨™ï¼Œ
-       ç›´æ¥å®£å‘Šã€Œè¦ç”¨æ€’ç«ã€å°±å¥½ã€‚
-    */
-
-    if(
-        autoSkillData &&
-        autoSkillData.category==="buff"
-    ){
-
-        queuedPlayerActions[0]={
-
-            action:
-                autoConfig.skill,
-
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    let chosenAction=
-        autoConfig.skill;
-
-
-    if(autoSkillData){
-
-        const spCost =
-            autoSkillData.spCost!==undefined
-            ?
-            autoSkillData.spCost
-            :
-            autoSkillData.cost;
-
-
-        if(player.sp<spCost){
-
-            addBattleLog(
-                "SPä¸è¶³ï¼Œæ”¹ç”¨æ™®é€šæ”»æ“Šã€‚"
-            );
-
-
-            chosenAction=
-                "normal";
-
-        }
-
-    }
-
-
-    queuedPlayerActions[0]={
-
-        action:chosenAction,
-
-        target:target
-
-    };
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-/* =====================================================
-   â˜… ç¬¬äºŒè§’è‰²è‡ªå‹•æˆ°é¬¥ï¼ˆæ–°å¢ï¼‰
-
-   player2æ²’æœ‰æ‰‹å‹•æ“ä½œä»‹é¢ï¼Œ
-   æ¯å›åˆç©å®¶çš„è¡Œå‹•çµæŸä¹‹å¾Œï¼Œ
-   æœƒè‡ªå‹•ç”¨ä»–è‡ªå·±è£å‚™çš„æŠ€èƒ½/è‡ªå‹•è¨­å®š
-   ï¼ˆautoConfig2ï¼‰æ‰“ä¸€æ¬¡ï¼Œ
-   é‚è¼¯ç›¡é‡è·ŸautoAction()å°ç¨±ï¼Œ
-   ä½†å®Œå…¨ç¨ç«‹é‹ä½œï¼Œä¸æœƒå‹•åˆ°ç¬¬ä¸€è§’è‰²çš„ä»»ä½•ç‹€æ…‹ã€‚
-===================================================== */
-
-function player2AutoAction(token){
-
-    return autoActionForCharacter(1,token);
-
-    if(
-        !battleActive ||
-        !player2 ||
-        player2.hp<=0 ||
-        token!==battleToken
-    ){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆé‡è¦ï¼Œä¾ç…§ä½¿ç”¨è€…æ˜ç¢ºæŒ‡æ­£ï¼‰ï¼š
-       ç¬¬äºŒè§’è‰²çš„è‡ªå‹•æˆ°é¬¥ä¹‹å‰ä¹Ÿæ˜¯ã€Œè¼ªåˆ°è‡ªå·±
-       å°±ç«‹åˆ»åŸ·è¡Œã€ï¼Œä¸€æ¨£é•åäº†ã€Œæ‰€æœ‰è¡Œå‹•éƒ½è¦
-       ç…§æ•æ·é †åºçµç®—ã€çš„è¦æ±‚ã€‚
-       æ”¹æˆè·Ÿplayer1çš„autoAction()ä¸€æ¨£ï¼Œ
-       åªè² è²¬ã€Œæ±ºå®šè¦åšä»€éº¼ã€ä¸¦å­˜é€²
-       queuedPlayerActionsï¼ŒçœŸæ­£åŸ·è¡Œç•™åˆ°
-       çµç®—éšæ®µï¼Œä¸¦ä¸”é€™è£¡è‡ªå·±è² è²¬å‘¼å«
-       finishPlayerAction()ï¼ˆä¸å†ä¾è³´
-       beginCharacterTurn()é‚£é‚Šé¡å¤–å‘¼å«ä¸€æ¬¡ï¼Œ
-       é¿å…é‡è¤‡æ¨é€²ï¼‰ã€‚
-    */
-
-    if(autoConfig2.skill==="defend"){
-
-        queuedPlayerActions[1]={
-
-            action:"defend",
-
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const stats2=
-        getPlayer2BattleStats();
-
-
-    const hpPercent2=
-        player2.hp/
-        stats2.maxHP*
-        100;
-
-
-    const autoHpPotionId2=
-        getAutoPotionId("hp");
-
-
-    if(
-        hpPercent2<=autoConfig2.hp &&
-        autoHpPotionId2
-    ){
-
-        queuedPlayerActions[1]={
-
-            action:"potion",
-            potionId:autoHpPotionId2,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const spPercent2=
-        player2.sp/
-        stats2.maxSP*
-        100;
-
-
-    const autoSpPotionId2=
-        getAutoPotionId("sp");
-
-
-    if(
-        spPercent2<=autoConfig2.sp &&
-        autoSpPotionId2
-    ){
-
-        queuedPlayerActions[1]={
-
-            action:"potion",
-            potionId:autoSpPotionId2,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const aliveInBattle=
-        currentBattleMonsters.filter(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    if(aliveInBattle.length===0){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const autoSkillData=
-        skillDatabase[
-            autoConfig2.skill
-        ];
-
-
-    const isSpreadSkill=
-        autoSkillData &&
-        (
-            autoSkillData.targetType==="tri"||
-            autoSkillData.targetType==="row"||
-            autoSkillData.targetType==="column"||
-            autoSkillData.targetType==="all"
-        );
-
-
-    let target;
-
-
-    if(
-        isSpreadSkill &&
-        aliveInBattle.length>0
-    ){
-
-        const midPosition=
-            Math.floor(
-                (
-                    aliveInBattle.length-1
-                )/2
-            );
-
-
-        target=
-            aliveInBattle[
-                midPosition
-            ];
-
-    }
-    else{
-
-        target=
-            aliveInBattle[0];
-
-    }
-
-
-    if(target===undefined){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    let chosenAction=
-        autoConfig2.skill;
-
-
-    if(
-        autoSkillData &&
-        autoSkillData.category!=="buff"&&
-        autoSkillData.category!=="passive"&&
-        autoSkillData.category!=="heal"&&
-        autoSkillData.category!=="revive"
-    ){
-
-        const spCost=
-            autoSkillData.spCost!==undefined
-            ?
-            autoSkillData.spCost
-            :
-            autoSkillData.cost;
-
-
-        if(player2.sp<spCost){
-
-            addBattleLog(
-                ""+
-                player2.id+
-                "SPä¸è¶³ï¼Œæ”¹ç”¨æ™®é€šæ”»æ“Šã€‚"
-            );
-
-
-            chosenAction=
-                "normal";
-
-        }
-
-    }
-
-
-    queuedPlayerActions[1]={
-
-        action:chosenAction,
-
-        target:target
-
-    };
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-function player3AutoAction(token){
-    return autoActionForCharacter(2,token);
-}
-
-
-function secondaryCharacterNormalAttack(characterIndex,index){
-
-    const character=getPartyCharacterByIndex(characterIndex);
-    const stats=getPartyBattleStats(characterIndex);
-
-    index=findAliveTargetIndex(index);
-
-    if(!character || !stats || index===null){
-        finishPlayerAction();
-        return;
-    }
-
-    selectedMonster=index;
-    const monster=monsters[index];
-
-    lungePlayerCard(characterIndex);
-    showSkillNameBadge("æ™®é€šæ”»æ“Š","normal",characterIndex,index,[index]);
-
-    const hit=rollHitChance(
-        stats.accuracy,
-        getMonsterEvasion(monster),
-        getMonsterDebuffValue(character,"stun")
-    );
-
-    if(!hit){
-        showMissEffect(false,index,"MISS");
-        addBattleLog((character.id||"éšŠå‹")+"æ™®é€šæ”»æ“Š"+monster.name+"ï¼Œæ²’æœ‰å‘½ä¸­ï¼");
-        updateUI();
-        finishPlayerAction();
-        return;
-    }
-
-    const critResult=rollCritical(
-        character,
-        "physical",
-        getMonsterEffectiveAntiCrit(monster),
-        monster
-    );
-
-    const damage=calculateDamage(
-        stats.attack,
-        getMonsterEffectiveDefense(monster),
-        character.level,
-        monster.level,
-        character.element,
-        monster.element,
-        {
-            attacker:character,
-            target:monster,
-            critMultiplier:critResult.multiplier
-        }
-    );
-    monster.hp=Math.max(0,monster.hp-damage);
-
-    showMonsterHit(index,damage,"hp",critResult.isCrit);
-    addBattleLog(
-        (character.id||"éšŠå‹")+"æ™®é€šæ”»æ“Š"+monster.name+
-        (critResult.isCrit ? "ï¼ˆçˆ†æ“Šï¼ï¼‰" : "")+
-        "ï¼Œé€ æˆ"+damage+"å‚·å®³ã€‚"
-    );
-
-    if(monster.hp<=0){ killMonster(index); }
-
-    updateUI();
-    finishPlayerAction();
-}
-
-
-function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
-
-    const character=getPartyCharacterByIndex(characterIndex);
-    const characterKey=getPartyCharacterKey(characterIndex);
-    const stats=getPartyBattleStats(characterIndex);
-    const skill=skillDatabase[skillId];
-
-    if(!character || !stats || !skill){
-        finishPlayerAction();
-        return;
-    }
-
-    const level=getSkillLevel(characterKey,skillId);
-    const spCost=skill.spCost!==undefined ? skill.spCost : (skill.cost||0);
-
-    if(level<=0 || character.sp<spCost){
-        addBattleLog(
-            level<=0
-            ? (character.id+"å°šæœªå­¸ç¿’"+skill.name+"ã€‚")
-            : (character.id+"SPä¸è¶³ï¼Œç„¡æ³•ä½¿ç”¨"+skill.name+"ã€‚")
-        );
-        finishPlayerAction();
-        return;
-    }
-
-    centerIndex=findAliveTargetIndex(centerIndex);
-
-    if(centerIndex===null){
-        finishPlayerAction();
-        return;
-    }
-
-    const targets=getSkillTargets(centerIndex,skill.targetType);
-
-    character.sp-=spCost;
-    lungePlayerCard(characterIndex);
-    showSkillNameBadge(
-        skill.name,skill.element,characterIndex,
-        skill.targetType==="all"?null:centerIndex,targets
-    );
-    setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
-
-    const statBonus=skill.category==="magic" ? stats.magicAttack : stats.attack;
-
-    if(!skill.baseDamage){
-        const resolvedIndex=findAliveTargetIndex(centerIndex);
-
-        if(resolvedIndex!==null && skill.freezeChance){
-            const monster=monsters[resolvedIndex];
-            const freezeResult=rollNamedPersistentStatusEffect(
-                monster,
-                "freeze",
-                [
-                    skill.freezeChance,
-                    character.level,
-                    monster.level,
-                    stats.intelligence,
-                    getMonsterEffectiveSpiritPoints(monster),
-                    true,
-                    getMonsterRank(monster)
-                ],
-                "monster",
-                resolvedIndex,
-                skill.name
-            );
-
-            if(freezeResult.hit){
-                applyFreezeEffect(monster,skill.freezeDuration);
-                addBattleLog(monster.name+"è¢«å†°å°äº†ï¼");
-            }else if(!freezeResult.duplicate){
-                showMissEffect(false,resolvedIndex,"æŠµæŠ—");
-                addBattleLog(skill.name+"å°"+monster.name+"æ²’æœ‰ç”Ÿæ•ˆï¼ˆæŠµæŠ—ï¼‰ã€‚");
-            }
-        }
-
-        updateUI();
-        finishPlayerAction();
-        return;
-    }
-
-    if(skillId==="fireRocket"){
-        playFireRocketAnimation(
-            "battlePlayerCard"+characterIndex,
-            targets.map(index=>"battleMonster"+index)
-        );
-    }
-
-    let totalLifesteal=0;
-
-    targets.forEach(index=>{
-        const monster=monsters[index];
-        if(!monster || !monster.alive){ return; }
-
-        if(skill.id==="iceSpin"){
-            playIceSpinProjectile(characterIndex,index);
-        }
-
-        const hit=rollHitChance(
-            stats.accuracy,
-            getMonsterEvasion(monster),
-            getMonsterDebuffValue(character,"stun")
-        );
-
-        if(!hit){
-            showMissEffect(false,index,"MISS");
-            addBattleLog(skill.name+"å°"+monster.name+"ï¼Œæ²’æœ‰å‘½ä¸­ï¼");
-            return;
-        }
-
-        const critResult=rollCritical(
-            character,
-            skill.category,
-            getMonsterEffectiveAntiCrit(monster),
-            monster
-        );
-
-        const damage=calculateSkillDamage({
-            skill:skill,
-            skillLevel:level,
-            effectiveAttack:statBonus,
-            target:monster,
-            casterLevel:character.level,
-            casterElement:character.element,
-            attacker:character,
-            critMultiplier:critResult.multiplier
-        });
-        const hpBeforeDirectDamage=monster.hp;
-        monster.hp=Math.max(0,monster.hp-damage);
-
-        showMonsterHit(index,damage,"hp",critResult.isCrit);
-        const actualDamageDealt=Math.max(0,hpBeforeDirectDamage-monster.hp);
-        addBattleLog(
-            (character.id||"éšŠå‹")+"æ–½æ”¾"+skill.name+"å‘½ä¸­"+monster.name+
-            (critResult.isCrit ? "ï¼ˆçˆ†æ“Šï¼ï¼‰" : "")+
-            "ï¼Œé€ æˆ"+damage+"å‚·å®³ã€‚"
-        );
-
-        const burnResult=skill.burnChance
-            ?rollNamedPersistentStatusEffect(
-                monster,
-                "burn",
-                [
-                    skill.burnChance,character.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
-                ],
-                "monster",
-                index,
-                skill.name,
-                skill.guaranteedBurn===true
-            )
-            :null;
-        if(burnResult&&burnResult.hit){
-            applyBurnEffect(monster,skill.burnDuration,skill.burnPercentByLevel[level-1]);
-            addBattleLog(monster.name+"é™·å…¥ç‡ƒç‡’ç‹€æ…‹ï¼");
-        }
-
-        const freezeResult=skill.freezeChance
-            ?rollNamedPersistentStatusEffect(
-                monster,
-                "freeze",
-                [
-                    skill.freezeChance,character.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
-                    true,getMonsterRank(monster)
-                ],
-                "monster",
-                index,
-                skill.name
-            )
-            :null;
-        if(freezeResult&&freezeResult.hit){
-            applyFreezeEffect(monster,skill.freezeDuration);
-            addBattleLog(monster.name+"è¢«å†°å°äº†ï¼");
-        }
-
-        applySkillDebuffEffects(
-            skill,level,monster,index,character.level,stats.intelligence
-        );
-
-        if(skill.lifestealPercentByLevel){ totalLifesteal+=actualDamageDealt; }
-        if(monster.hp<=0){ killMonster(index); }
-    });
-
-    if(skill.lifestealPercentByLevel && totalLifesteal>0){
-        const amount=Math.floor(
-            totalLifesteal*skill.lifestealPercentByLevel[level-1]/100
-        );
-        character.hp=Math.min(stats.maxHP,character.hp+amount);
-        character.sp=Math.min(stats.maxSP,character.sp+amount);
-        showPlayerHit(amount,"heal",characterIndex,true);
-        addBattleLog((character.id||"éšŠå‹")+"å¸æ”¶å‚·å®³ä¸¦å›å¾©HPèˆ‡SPã€‚");
-    }
-
-    if(skill.selfShieldByLevel&&canApplyNamedPersistentState(
-        character,"shield","player",characterIndex,skill.name
-    )){
-        character.activeBuffs=(character.activeBuffs||[]).filter(buff=>
-            !buff||buff.type!=="shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
-        );
-        character.activeBuffs.push(markPersistentStateName({
-            type:"shield",
-            turnsLeft:skill.shieldDuration||2,
-            remaining:skill.selfShieldByLevel[level-1]
-        },"shield"));
-    }
-
-    if(skill.allyShieldByLevel){
-        const amount=skill.allyShieldByLevel[level-1];
-        getActivePlayerCharacters().forEach((target,targetIndex)=>{
-            if(!canApplyNamedPersistentState(
-                target,"shield","player",targetIndex,skill.name
-            )){ return; }
-            target.activeBuffs=(target.activeBuffs||[]).filter(buff=>
-                !buff||buff.type!=="shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
-            );
-            target.activeBuffs.push(markPersistentStateName({
-                type:"shield",
-                turnsLeft:skill.shieldDuration||2,
-                remaining:amount
-            },"shield"));
-        });
-    }
-
-    updateUI();
-    finishPlayerAction();
-}
-
-
-/*
-   â˜… ç¬¬äºŒè§’è‰²çš„æ™®é€šæ”»æ“Šã€‚
-   é‚è¼¯è·ŸnormalAttack()ä¸€è‡´ï¼Œ
-   ä½†å®Œå…¨æ“ä½œplayer2/stats2ï¼Œ
-   ä¸æœƒå‹•åˆ°playerã€‚
-*/
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œè£œä¸Šè·Ÿplayer1
-   åŒä¸€å¥—ã€Œç›®æ¨™æ­»äº¡è‡ªå‹•è½‰ç«ã€çš„ä¿è­·ï¼‰ï¼š
-   é€™å€‹å‡½å¼å‘¼å«ç«¯ï¼ˆexecuteAction/
-   resolveQueuedPlayerActionï¼‰æœ¬ä¾†å°±æœƒåœ¨
-   å‘¼å«å®Œä¹‹å¾Œç„¡æ¢ä»¶è£œå‘¼å«ä¸€æ¬¡
-   finishPlayerAction()ï¼Œæ‰€ä»¥åŸæœ¬ã€Œç›®æ¨™æ­»äº†
-   å°±ç›´æ¥returnã€ä¸¦ä¸æœƒè®“æˆ°é¬¥å¡ä½ï¼Œåªæ˜¯æœƒ
-   è®“é€™æ¬¡æ”»æ“Šè®Šæˆæ‰“ç©ºæ°£ã€ä¸æœƒè‡ªå‹•è½‰ç«ã€‚
-
-   é€™è£¡æ”¹ç”¨findAliveTargetIndex()ï¼ˆç´”æ‰¾ç›®æ¨™ï¼Œ
-   ä¸å‘¼å«finishPlayerAction()ï¼‰ï¼Œæ‰¾åˆ°ç›®æ¨™
-   é‚„æ´»è‘—å°±æ²¿ç”¨ï¼Œæ­»äº†å°±è‡ªå‹•æ”¹æ‰“
-   currentBattleMonstersè£¡ç¬¬ä¸€éš»é‚„æ´»è‘—çš„æ€ªç‰©ï¼Œ
-   è·Ÿplayer1çš„è¡Œç‚ºä¸€è‡´ã€‚çœŸçš„ä¸€éš»æ€ªç‰©éƒ½ä¸å‰©
-   ï¼ˆå…¨æ»…ï¼‰æ‰returnï¼Œäº¤çµ¦å‘¼å«ç«¯æœ¬ä¾†å°±æœƒè£œä¸Šçš„
-   finishPlayerAction()æ”¶å°¾ï¼Œä¸æœƒåœ¨é€™è£¡
-   é‡è¤‡å‘¼å«ç¬¬äºŒæ¬¡ã€‚
-*/
-
-function player2NormalAttack(index){
-
-    index=
-        findAliveTargetIndex(
-            index
-        );
-
-
-    if(index===null){
-        return;
-    }
-
-
-    selectedMonster=
-        index;
-
-
-    const monster=
-        monsters[index];
-
-
-    const stats2=
-        getPlayer2BattleStats();
-
-
-    lungePlayerCard(1);
-
-
-    showSkillNameBadge(
-        "æ™®é€šæ”»æ“Š",
-        "normal",
-        1,
-        index,
-        [index]
-    );
-
-
-    const hit=
-        rollHitChance(
-            stats2.accuracy,
-            getMonsterEvasion(
-                monster
-            ),
-            getMonsterDebuffValue(
-                player2,
-                "stun"
-            )
-        );
-
-
-    if(!hit){
-
-        showMissEffect(
-            false,
-            index,
-            "MISS"
-        );
-
-
-        addBattleLog(
-            ""+
-            player2.id+
-            "æ™®é€šæ”»æ“Š"+
-            monster.name+
-            "ï¼Œæ²’æœ‰å‘½ä¸­ï¼"
-        );
-
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆçœŸçš„æ‰¾åˆ°æœ€ä¸»è¦çš„å¡ä½åŸå› äº†ï¼‰ï¼š
-           é€™å€‹å‡½å¼æ˜¯æ°´å¢¨çš„æ™®é€šæ”»æ“Šï¼Œã€Œæ²’å‘½ä¸­ã€
-           è·Ÿã€Œæ”»æ“Šå®Œã€é€™å…©æ¢è·¯å¾‘ï¼ŒåŸæœ¬å®Œå…¨æ²’æœ‰
-           å‘¼å«updateUI()ã€finishPlayerAction()â€”â€”
-           æ™®é€šæ”»æ“Šæ˜¯ä½¿ç”¨é »ç‡æœ€é«˜çš„å‹•ä½œï¼Œ
-           é€™ä»£è¡¨æ°´å¢¨å¹¾ä¹æ¯æ¬¡æ™®é€šæ”»æ“Šéƒ½æœƒè®“
-           æˆ°é¬¥å¡ä½ä¸å‹•ï¼Œé€™æ‡‰è©²å°±æ˜¯ã€Œæˆ°é¬¥åˆ°ä¸€åŠ
-           å¡ä½ã€æœ€ä¸»è¦ã€æœ€å¸¸ç™¼ç”Ÿçš„åŸå› ï¼Œ
-           ä¸æ˜¯èƒŒæ™¯åŸ·è¡Œçš„å•é¡Œã€‚
-
-           è£œä¸Šé€™å…©è¡Œï¼Œæ²’å‘½ä¸­çš„æ™‚å€™ä¹Ÿè¦æ­£ç¢ºçµæŸ
-           é€™å€‹è§’è‰²çš„è¡Œå‹•ã€å¾€ä¸‹ä¸€ä½æ¨é€²ã€‚
-        */
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const critResult=
-        rollCritical(
-            player2,
-            "physical",
-            getMonsterEffectiveAntiCrit(monster),
-            monster
-        );
-
-    const damage=
-        calculateDamage(
-            stats2.attack,
-            getMonsterEffectiveDefense(monster),
-            player2.level,
-            monster.level,
-            player2.element,
-            monster.element,
-            {
-                attacker:player2,
-                target:monster,
-                critMultiplier:critResult.multiplier
-            }
-        );
-
-
-    monster.hp=
-        Math.max(
-            0,
-            monster.hp-damage
-        );
-
-
-    showMonsterHit(
-        index,
-        damage,
-        "hp",
-        critResult.isCrit
-    );
-
-
-    addBattleLog(
-
-        ""+
-        player2.id+
-        "æ™®é€šæ”»æ“Š"+
-        monster.name+
-        (
-            critResult.isCrit
-            ?
-            "ï¼ˆçˆ†æ“Šï¼ï¼‰"
-            :
-            ""
-        )+
-        "ï¼Œé€ æˆ"+
-        damage+
-        "å‚·å®³ã€‚"
-
-    );
-
-
-    if(monster.hp<=0){
-        killMonster(index);
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆåŒä¸€å€‹å‡½å¼çš„å¦ä¸€åŠï¼Œé€™è£¡ä¹Ÿæ¼æ‰äº†ï¼‰ï¼š
-       æ”»æ“Šå‘½ä¸­ã€é€ æˆå‚·å®³ä¹‹å¾Œï¼Œä¸€æ¨£å®Œå…¨æ²’æœ‰
-       å‘¼å«updateUI()ã€finishPlayerAction()ï¼Œ
-       è£œä¸Šï¼Œç¢ºä¿æ‰“ä¸­çš„æƒ…æ³ä¸‹æˆ°é¬¥ä¹Ÿèƒ½æ­£ç¢º
-       ç¹¼çºŒé€²è¡Œã€‚
-    */
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-/*
-   â˜… ç¬¬äºŒè§’è‰²çš„æŠ€èƒ½æ–½æ”¾ã€‚
-   å…±ç”¨castDamageSkill()è£¡å·²ç¶“æŠ½å‡ºä¾†çš„
-   é€šç”¨å·¥å…·å‡½å¼ï¼ˆgetSkillTargetsã€
-   calculateSkillDamageã€rollCriticalã€
-   applyBurnEffectã€applyFreezeEffectç­‰ï¼‰ï¼Œ
-   è‡ªå·±çµ„ä¸€ä»½ã€Œæ“ä½œplayer2ã€çš„æ–½æ”¾æµç¨‹ï¼Œ
-   ä¸ç›´æ¥å‘¼å«castDamageSkill()
-   ï¼ˆé‚£å€‹å‡½å¼å¾é ­åˆ°å°¾éƒ½æ˜¯æ“ä½œplayerï¼Œ
-   ç¡¬è¦å…±ç”¨é¢¨éšªæ¯”è‡ªå·±å¯«ä¸€ä»½æ›´é«˜ï¼‰ã€‚
-*/
-
-function castPlayer2Skill(skillId,centerIndex){
-
-    const skill=
-        skillDatabase[skillId];
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆé˜²å‘†ï¼Œé¿å…åŒä¸€é¡bugçš„å…¶ä»–åˆ†æ”¯ï¼‰ï¼š
-       é€™å¹¾å€‹ææ—©returnçš„åˆ†æ”¯ï¼ŒåŸæœ¬éƒ½æ˜¯ç›´æ¥
-       returnï¼Œå®Œå…¨æ²’æœ‰å‘¼å«finishPlayerAction()â€”â€”
-       æ­£å¸¸æƒ…æ³ä¸‹é€™å¹¾å€‹æ¢ä»¶ä¸æ‡‰è©²è¢«è§¸ç™¼
-       ï¼ˆUIæ‡‰è©²æœƒå…ˆæ“‹æ‰æ²’å­¸æœƒ/SPä¸è¶³çš„æŠ€èƒ½ï¼‰ï¼Œ
-       ä½†è¬ä¸€çœŸçš„å› ç‚ºæŸç¨®ä¾‹å¤–æƒ…æ³ï¼ˆä¾‹å¦‚è³‡æ–™
-       æ²’å°é½Šã€auto-battleçš„åˆ¤æ–·æ™‚æ©Ÿå·®äº†ä¸€é»ï¼‰
-       èª¤è§¸ç™¼ï¼Œä¸€æ¨£æœƒè®“æˆ°é¬¥å¡ä½ä¸å‹•ï¼Œè·Ÿé€™æ¬¡
-       æŠ“åˆ°çš„ä¸»è¦bugæ˜¯åŒä¸€ç¨®é¢¨éšªã€‚
-
-       é€™è£¡å¹«é€™å¹¾å€‹åˆ†æ”¯éƒ½è£œä¸Šã€Œè‡³å°‘è®“è¡Œå‹•
-       çµæŸã€æˆ°é¬¥ç¹¼çºŒé€²è¡Œã€çš„ä¿è­·ï¼Œä¸æœƒå†æœ‰
-       ä»»ä½•ä¸€æ¢è·¯å¾‘è®“éŠæˆ²å¡æ­»ã€‚
-    */
-
-    if(!skill){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const level=
-        getSkillLevel(
-            "player2",
-            skillId
-        );
-
-
-    if(level<=0){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const spCost=
-        skill.spCost!==undefined
-        ?
-        skill.spCost
-        :
-        skill.cost;
-
-
-    if(player2.sp<spCost){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    centerIndex=findAliveTargetIndex(centerIndex);
-
-    if(centerIndex===null){
-        finishPlayerAction();
-        return;
-    }
-
-    const targets=getSkillTargets(centerIndex,skill.targetType);
-
-    player2.sp-=spCost;
-
-
-    lungePlayerCard(1);
-
-
-    showSkillNameBadge(
-        skill.name,
-        skill.element,
-        1,
-        skill.targetType==="all"?null:centerIndex,
-        targets
-    );
-
-
-    setTimeout(()=>{
-
-        showPlayerSpPopup(
-            spCost,
-            1
-        );
-
-    },500);
-
-
-    const stats2=
-        getPlayer2BattleStats();
-
-
-    const statBonus=
-        skill.category==="magic"
-        ?
-        stats2.magicAttack
-        :
-        stats2.attack;
-
-
-
-    /*
-       ç´”æ§å ´æŠ€èƒ½ï¼ˆä¾‹å¦‚å†°å°ï¼Œæ²’æœ‰baseDamageï¼‰ï¼š
-       ä¸è¨ˆç®—å‚·å®³/å‘½ä¸­ï¼Œç›´æ¥è·‘ç•°å¸¸ç‹€æ…‹å‘½ä¸­å…¬å¼ã€‚
-    */
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œæ’²ç©ºå°±ä¸è¡Œã€ï¼‰ï¼š
-       åŸæœ¬é€™è£¡æ˜¯ã€ŒcenterIndexæŒ‡åˆ°çš„æ€ªç‰©é‚„æ´»è‘—
-       æ‰è™•ç†ï¼Œæ­»äº†å°±æ•´æ®µè·³éã€ç›´æ¥returnã€ï¼Œ
-       ç­‰æ–¼é–å®šçš„ç›®æ¨™è¢«éšŠå‹å…ˆæ‰“æ­»æ™‚ï¼Œé€™å€‹æ§å ´
-       æŠ€èƒ½æœƒç›´æ¥æ‰“ç©ºæ°£ï¼Œç©å®¶æ˜æ˜é¸äº†æ–½æ”¾ï¼Œ
-       ç•«é¢å»ä»€éº¼äº‹éƒ½æ²’ç™¼ç”Ÿã€é€£æˆ°é¬¥ç´€éŒ„éƒ½ä¸æœƒ
-       å¤šä¸€è¡Œå­—ã€‚
-
-       æ”¹æˆè·Ÿæ™®é€šæ”»æ“Š/å‚·å®³æŠ€èƒ½ä¸€è‡´ï¼Œå…ˆç”¨
-       findAliveTargetIndex()ç¢ºèªç›®æ¨™ï¼Œæ­»äº†
-       å°±è‡ªå‹•è½‰æ‰“currentBattleMonstersè£¡ç¬¬ä¸€éš»
-       é‚„æ´»è‘—çš„æ€ªç‰©ï¼›çœŸçš„å…¨æ»…äº†æ‰return
-       ï¼ˆé€™è£¡ä¸éœ€è¦å¦å¤–å‘¼å«finishPlayerAction()ï¼Œ
-       å‘¼å«ç«¯castPlayer2Skillçš„ä¸Šå±¤
-       executeAction/resolveQueuedPlayerAction
-       æœ¬ä¾†å°±æœƒç„¡æ¢ä»¶è£œå‘¼å«ä¸€æ¬¡ï¼ŒåŸå› 
-       è·Ÿplayer2NormalAttack()é‚£æ¬¡ä¿®æ­£ä¸€æ¨£ï¼‰ã€‚
-    */
-
-    if(!skill.baseDamage){
-
-        const resolvedIndex=centerIndex;
-
-
-        if(resolvedIndex===null){
-            return;
-        }
-
-
-        selectedMonster=
-            resolvedIndex;
-
-
-        const monster=
-            monsters[resolvedIndex];
-
-
-        if(skill.freezeChance){
-
-            const freezeResult=
-                rollNamedPersistentStatusEffect(
-                    monster,
-                    "freeze",
-                    [
-                        skill.freezeChance,
-                        player2.level,
-                        monster.level,
-                        stats2.intelligence,
-                        getMonsterEffectiveSpiritPoints(monster),
-                        true,
-                        getMonsterRank(monster)
-                    ],
-                    "monster",
-                    resolvedIndex,
-                    skill.name
-                );
-
-
-            if(freezeResult.hit){
-
-                applyFreezeEffect(
-                    monster,
-                    skill.freezeDuration
-                );
-
-
-                addBattleLog(
-                    ""+
-                    monster.name+
-                    "è¢«å†°å°äº†ï¼"
-                );
-
-            }
-            else if(!freezeResult.duplicate){
-
-                showMissEffect(
-                    false,
-                    resolvedIndex,
-                    "æŠµæŠ—"
-                );
-
-
-                addBattleLog(
-                    skill.name+
-                    "å°"+
-                    monster.name+
-                    "æ²’æœ‰ç”Ÿæ•ˆï¼ˆæŠµæŠ—ï¼‰ã€‚"
-                );
-
-            }
-
-        }
-
-
-        return;
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œç«ç®­æŠ€èƒ½
-       é£›è¡Œç‰¹æ•ˆï¼Œplayer2ç‰ˆæœ¬ï¼Œè·Ÿplayer1çš„
-       castDamageSkill()åŒä¸€ä»½é‚è¼¯ï¼Œä¾†æº
-       æ”¹æˆbattlePlayerCard1ï¼‰ï¼š
-    */
-
-    if(skillId==="fireRocket"){
-
-        playFireRocketAnimation(
-            "battlePlayerCard1",
-            targets.map(
-                index=>"battleMonster"+index
-            )
-        );
-
-    }
-
-
-    let totalLifesteal=0;
-
-
-    targets.forEach(index=>{
-
-        const monster=
-            monsters[index];
-
-
-        if(
-            !monster ||
-            !monster.alive
-        ){
-            return;
-        }
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-           å†°æ—‹ä¸€é–ƒå°ˆå±¬çš„é£›è¡Œå‹•ç•«ï¼Œç¬¬äºŒè§’è‰²
-           æ–½æ”¾æ™‚èµ·é»æ˜¯battlePlayerCard1ï¼Œ
-           é‚è¼¯è·ŸcastDamageSkill()è£¡çš„player1
-           ç‰ˆæœ¬å®Œå…¨ä¸€è‡´ã€‚
-        */
-
-        if(skill.id==="iceSpin"){
-
-            playIceSpinProjectile(
-                1,
-                index
-            );
-
-        }
-
-
-        const hit=
-            rollHitChance(
-                stats2.accuracy,
-                getMonsterEvasion(
-                    monster
-                ),
-                getMonsterDebuffValue(
-                    player2,
-                    "stun"
-                )
-            );
-
-
-        if(!hit){
-
-            showMissEffect(
-                false,
-                index,
-                "MISS"
-            );
-
-
-            addBattleLog(
-                skill.name+
-                "å°"+
-                monster.name+
-                "ï¼Œæ²’æœ‰å‘½ä¸­ï¼"
-            );
-
-            return;
-
-        }
-
-
-        const critResult=
-            rollCritical(
-                player2,
-                skill.category,
-                getMonsterEffectiveAntiCrit(monster),
-                monster
-            );
-
-        const damage=
-            calculateSkillDamage({
-                skill:skill,
-                skillLevel:level,
-                effectiveAttack:statBonus,
-                target:monster,
-                casterLevel:player2.level,
-                casterElement:player2.element,
-                attacker:player2,
-                critMultiplier:critResult.multiplier
-            });
-
-        const hpBeforeDirectDamage=monster.hp;
-
-        monster.hp=
-            Math.max(
-                0,
-                monster.hp-damage
-            );
-
-
-        showMonsterHit(
-            index,
-            damage,
-            "hp",
-            critResult.isCrit
-        );
-
-        const actualDamageDealt=Math.max(0,hpBeforeDirectDamage-monster.hp);
-
-
-        addBattleLog(
-
-            skill.name+
-            "å‘½ä¸­"+
-            monster.name+
-            (
-                critResult.isCrit
-                ?
-                "ï¼ˆçˆ†æ“Šï¼ï¼‰"
-                :
-                ""
-            )+
-            "ï¼Œé€ æˆ"+
-            damage+
-            "å‚·å®³ã€‚"
-
-        );
-
-
-        if(skill.burnChance){
-
-            const burnResult=
-                rollNamedPersistentStatusEffect(
-                    monster,
-                    "burn",
-                    [
-                        skill.burnChance,
-                        player2.level,
-                        monster.level,
-                        stats2.intelligence,
-                        getMonsterEffectiveSpiritPoints(monster)
-                    ],
-                    "monster",
-                    index,
-                    skill.name,
-                    skill.guaranteedBurn===true
-                );
-
-
-            if(burnResult.hit){
-
-                applyBurnEffect(
-                    monster,
-                    skill.burnDuration,
-                    skill.burnPercentByLevel[
-                        level-1
-                    ]
-                );
-
-
-                addBattleLog(
-                    ""+
-                    monster.name+
-                    "é™·å…¥ç‡ƒç‡’ç‹€æ…‹ï¼"
-                );
-
-            }
-
-        }
-
-
-        if(skill.freezeChance){
-
-            const freezeResult=
-                rollNamedPersistentStatusEffect(
-                    monster,
-                    "freeze",
-                    [
-                        skill.freezeChance,
-                        player2.level,
-                        monster.level,
-                        stats2.intelligence,
-                        getMonsterEffectiveSpiritPoints(monster),
-                        true,
-                        getMonsterRank(monster)
-                    ],
-                    "monster",
-                    index,
-                    skill.name
-                );
-
-
-            if(freezeResult.hit){
-
-                applyFreezeEffect(
-                    monster,
-                    skill.freezeDuration
-                );
-
-
-                addBattleLog(
-                    ""+
-                    monster.name+
-                    "è¢«å†°å°äº†ï¼"
-                );
-
-            }
-
-        }
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ¥ä¸Šé¢¨ç³»/
-           åœŸç³»æŠ€èƒ½çš„é™„åŠ æ•ˆæœï¼Œè·Ÿplayer1çš„
-           castDamageSkill()æ˜¯åŒä¸€ä»½é‚è¼¯ï¼‰ï¼š
-        */
-
-        applySkillDebuffEffects(
-            skill,
-            level,
-            monster,
-            index,
-            player2.level,
-            stats2.intelligence
-        );
-
-
-        if(skill.lifestealPercentByLevel){
-
-            totalLifesteal+=
-                actualDamageDealt;
-
-        }
-
-
-        if(monster.hp<=0){
-            killMonster(index);
-        }
-
-    });
-
-
-    if(
-        skill.lifestealPercentByLevel &&
-        totalLifesteal>0
-    ){
-
-        const lifestealPercent=
-            skill.lifestealPercentByLevel[
-                level-1
-            ];
-
-
-        const lifestealAmount=
-            Math.floor(
-                totalLifesteal*
-                lifestealPercent/
-                100
-            );
-
-
-        player2.hp=
-            Math.min(
-                stats2.maxHP,
-                player2.hp+
-                lifestealAmount
-            );
-
-
-        player2.sp=
-            Math.min(
-                stats2.maxSP,
-                player2.sp+
-                lifestealAmount
-            );
-
-
-        showPlayerHit(
-            lifestealAmount,
-            "heal",
-            1,
-            true
-        );
-
-
-        addBattleLog(
-            ""+
-            player2.id+
-            "å¸æ”¶å‚·å®³å›å¾©äº†"+
-            lifestealAmount+
-            "é»HPèˆ‡SPã€‚"
-        );
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ¥ä¸ŠåœŸç³»çš„
-       è‡ªèº«è­·ç›¾ï¼å…¨é«”è­·ç›¾æŠ€èƒ½ï¼Œplayer2ç‰ˆæœ¬ï¼Œ
-       è·Ÿplayer1çš„castDamageSkill()æ˜¯åŒä¸€ä»½
-       é‚è¼¯ï¼‰ï¼š
-    */
-
-    if(skill.selfShieldByLevel&&canApplyNamedPersistentState(
-        player2,"shield","player",1,skill.name
-    )){
-
-        const shieldAmount=
-            skill.selfShieldByLevel[
-                level-1
-            ];
-
-
-        player2.activeBuffs=(player2.activeBuffs||[]).filter(buff=>
-            !buff||buff.type!=="shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
-        );
-
-
-        player2.activeBuffs.push(markPersistentStateName({
-            type:"shield",
-            turnsLeft:
-                skill.shieldDuration||2,
-            remaining:
-                shieldAmount
-
-        },"shield"));
-
-
-        addBattleLog(
-            ""+
-            player2.id+
-            "ç²å¾—"+
-            shieldAmount+
-            "é»è­·ç›¾ï¼ŒæŒçºŒ"+
-            (skill.shieldDuration||2)+
-            "å›åˆã€‚"
-        );
-
-    }
-
-
-    if(skill.allyShieldByLevel){
-
-        const shieldAmount=
-            skill.allyShieldByLevel[
-                level-1
-            ];
-
-
-        getCharacters().forEach(
-            (character,targetIndex)=>{
-
-                if(
-                    character.hp<=0
-                ){
-                    return;
-                }
-
-                if(!canApplyNamedPersistentState(
-                    character,"shield","player",targetIndex,skill.name
-                )){ return; }
-
-                character.activeBuffs=(character.activeBuffs||[]).filter(buff=>
-                    !buff||buff.type!=="shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
-                );
-
-
-                character.activeBuffs.push(markPersistentStateName({
-                    type:"shield",
-                    turnsLeft:
-                        skill.shieldDuration||2,
-                    remaining:
-                        shieldAmount
-
-                },"shield"));
-
-            }
-        );
-
-
-        addBattleLog(
-            "æˆ‘æ–¹å…¨é«”ç²å¾—"+
-            shieldAmount+
-            "é»è­·ç›¾ï¼ŒæŒçºŒ"+
-            (skill.shieldDuration||2)+
-            "å›åˆã€‚"
-        );
-
-    }
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-/* =====================================================
-   V92 â€” æ€ªç‰©é‡‘å¹£æ‰è½
-   åŸºç¤å€¼è·Ÿæ€ªç‰©ç­‰ç´šæˆé•·ï¼›ç²¾è‹±/BOSSæé«˜å€ç‡ï¼Œä¸¦ä¿ç•™å°‘é‡éš¨æ©Ÿæµ®å‹•ã€‚
-===================================================== */
-
-function getMonsterGoldDrop(monster){
-    if(!monster){
-        return 0;
-    }
-
-    const level=Math.max(1,Math.floor(Number(monster.level)||1));
-    const rank=getMonsterRank(monster);
-    const rankMultiplier=
-        rank==="boss"
-        ? 8
-        : rank==="elite"
-        ? 3
-        : 1;
-
-    const base=level*2+3;
-    const variance=0.85+Math.random()*0.30;
-
-    return Math.max(
-        1,
-        Math.floor(base*rankMultiplier*variance)
-    );
-}
-
-function awardMonsterGoldDrop(monster){
-    const amount=getMonsterGoldDrop(monster);
-
-    if(amount<=0){
-        return 0;
-    }
-
-    gold+=amount;
-    updateGoldDisplay();
-
-    addBattleLog(
-        monster.name+
-        "æ‰è½ "+
-        amount+
-        " é‡‘å¹£ã€‚"
-    );
-
-    return amount;
-}
-
-
-/* =====================================================
-   æ€ªç‰©æ­»äº¡
-===================================================== */
-
-function killMonster(index){
-
-    const monster =
-        monsters[index];
-
-
-    if(
-        !monster ||
-        !monster.alive
-    ){
-        return;
-    }
-
-
-    monster.alive=false;
-
-    monster.hp=0;
-
-    monster.sp=0;
-
-
-    const card =
-        $("battleMonster"+index);
-
-
-    if(card){
-
-        /*
-           â˜… ä¿®æ­£ï¼š
-           åŸæœ¬ä¸€æ“Šæ®ºæ­»æ€ªç‰©çš„ç•¶ä¸‹ï¼Œ
-           ç«‹åˆ»æŠŠ.deadé€™å€‹classï¼ˆopacity:.16ï¼‰
-           åŠ ä¸Šå»ï¼Œä½†å‚·å®³æµ®å‹•æ•¸å­—æ˜¯é€™å¼µå¡ç‰‡
-           çš„ã€Œå­å…ƒç´ ã€ï¼Œopacityæœƒç›´æ¥é€£å¸¶
-           æŠŠé‚„åœ¨é£„çš„å‚·å®³æ•¸å­—ä¸€èµ·è®Šæš—ï¼Œ
-           å‰›å¥½æ‰“æ­»çš„é‚£ä¸€ä¸‹åè€Œæœ€ä¸å®¹æ˜“çœ‹æ¸…æ¥šå‚·å®³ã€‚
-
-           æ”¹æˆå…ˆåŠ .dyingï¼ˆåªæ“‹é»æ“Šï¼Œä¸è®Šæš—ï¼‰ï¼Œ
-           ç­‰å‚·å®³æ•¸å­—å‹•ç•«ï¼ˆ1.8ç§’ï¼‰è·‘å®Œä¹‹å¾Œ
-           æ‰çœŸæ­£åŠ ä¸Š.deadè®“å¡ç‰‡è®Šæš—ï¼Œ
-           å…©è€…é †åºå°èª¿å°±ä¸æœƒäº’ç›¸å½±éŸ¿äº†ã€‚
-        */
-
-        card.classList.add(
-            "dying"
-        );
-
-
-        setTimeout(()=>{
-
-            card.classList.remove(
-                "dying"
-            );
-
-            card.classList.add(
-                "dead"
-            );
-
-        },1850);
-
-    }
-
-
-    /*
-       â˜… æ€ªç‰©æ­»äº¡å¾Œä¹Ÿè¦åœ¨åœ°åœ–ä¸Šéš±è—ï¼Œ
-       é¿å…å›åˆ°åœ°åœ–æ™‚çœ‹åˆ°å·²æ­»æ€ªç‰©çš„åœ–ç¤ºã€‚
-    */
-
-    const mapIcon =
-        $("mapMonster"+index);
-
-
-    if(mapIcon){
-
-        mapIcon.style.display =
-            "none";
-
-    }
-
-
-    addBattleLog(
-
-        ""+
-        monster.name+
-        "è¢«æ“Šæ•—ã€‚"
-
-    );
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œä¸»åŸåœ–é‘‘/
-       æ¯æ—¥ä»»å‹™/æˆå°±ç³»çµ±ï¼‰ï¼š
-       é€™è£¡æ˜¯ã€Œæ€ªç‰©çœŸçš„è¢«æ‰“æ­»ã€å”¯ä¸€æœƒç¶“é
-       çš„åœ°æ–¹ï¼Œåœ–é‘‘çš„æ“Šæ®ºæ•¸ã€æ¯æ—¥ä»»å‹™çš„
-       æ“Šæ•—æ€ªç‰©é€²åº¦ã€æˆå°±çš„ç´¯è¨ˆæ“Šæ®ºæ•¸ï¼Œ
-       å…¨éƒ¨åœ¨é€™è£¡ä¸€æ¬¡è¨˜éŒ„ï¼Œä¸ç”¨åœ¨æˆ°é¬¥çš„
-       æ¯å€‹åˆ†æ”¯å„è‡ªé‡è¤‡åˆ¤æ–·ä¸€æ¬¡ã€‚
-    */
-
-    const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
-    if(bossOwner&&typeof bossOwner.onEnemyDeath==="function"){
-        bossOwner.onEnemyDeath(index,monster);
-    }
-
-    if(!monster.noRewards){
-        recordMonsterKillForBestiary(monster);
-        awardMonsterGoldDrop(monster);
-        /* æ€ªç‰©æ‰è½èˆ‡æ“Šæ®ºé€²åº¦ä¸€èµ·å³æ™‚å­˜æª”ï¼Œé¿å…ä¸­é€”æˆ°æ•—/åˆ‡èƒŒæ™¯éºå¤±ã€‚ */
-        saveGame();
-    }
-
-
-    updateMonsterUI(index);
-
-}
-
-
-/* =====================================================
-   æˆ°é¬¥ç•«é¢
-===================================================== */
-
-function renderBattle(){
-
-    const area =
-        $("battleMonsterArea");
-
-
-    area.innerHTML="";
-
-
-    currentBattleMonsters
-    .forEach(
-        index=>{
-
-            const monster =
-                monsters[index];
-
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.id =
-                "battleMonster"+index;
-
-
-            card.className =
-                "battle-monster";
-
-
-            card.onclick=()=>{
-                selectBattleTarget(
-                    index
-                );
-            };
-
-
-            const icon =
-                monster.name==="å²èŠå§†"
-                ?
-                ""
-                :
-                monster.name==="æ²™æ¼ è±ºç‹¼"
-                ?
-                ""
-                :
-                monster.name==="æ²™è "
-                ?
-                ""
-                :
-                "";
-
-
-            card.innerHTML =
-
-            `
-            <div
-                id="battleMonsterFreezeOverlay${index}"
-                class="card-status-overlay freeze-overlay"
-            ></div>
-
-            <div
-                id="battleMonsterBurnOverlay${index}"
-                class="card-status-overlay burn-overlay"
-            ></div>
-
-            <div class="battle-monster-icon">
-                ${icon}
-            </div>
-
-            <div
-                id="battleMonsterStatus${index}"
-                class="monster-status-badges"
-            ></div>
-
-            <div class="monster-hp">
-
-                <div
-                    id="battleMonsterBar${index}"
-                    class="monster-hp-inner"
-                ></div>
-
-                <div
-                    id="battleMonsterHPText${index}"
-                    class="monster-bar-text"
-                ></div>
-
-            </div>
-
-            <div class="monster-sp">
-
-                <div
-                    id="battleMonsterSPBar${index}"
-                    class="monster-sp-inner"
-                ></div>
-
-                <div
-                    id="battleMonsterSPText${index}"
-                    class="monster-bar-text"
-                ></div>
-
-            </div>
-
-            <div class="battle-monster-name">
-                ${monster.name}
-            </div>
-
-            <div class="battle-monster-level">
-                Lv.${monster.level}
-            </div>
-            `;
-
-
-            area.appendChild(
-                card
-            );
-
-            const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
-            if(presentation&&typeof presentation.applyUnit==="function"){
-                presentation.applyUnit(card,"monster");
-            }
-
-        }
-    );
-
-
-    currentBattleMonsters
-    .forEach(
-        index=>{
-            updateMonsterUI(index);
-        }
-    );
-
-
-    renderPlayers();
-
-    const bossPresentationOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
-    if(bossPresentationOwner&&typeof bossPresentationOwner.syncHud==="function"){
-        bossPresentationOwner.syncHud();
-    }
-
-
-    /*
-       â˜… é‡æ–°åŠ å›ä¾†ï¼ˆä¾ç…§ä½¿ç”¨è€…æŒ‡æ­£ï¼Œé€™æ˜¯å°çš„ï¼‰ï¼š
-       ä¹‹å‰é€™å¥—ã€ŒJSç›´æ¥é‡æ¸¬ã€å¼·åˆ¶æ’æ»¿ã€çš„åšæ³•
-       å…¶å¯¦æ˜¯å·²ç¶“é©—è­‰éæº–ç¢ºçš„ï¼ˆæ›¾ç¶“é‡åˆ°é
-       æ­£ç¢ºçš„å·®è·æ•¸å­—ï¼‰ï¼Œæ‹¿æ‰æ˜¯åˆ¤æ–·éŒ¯èª¤â€”â€”
-       CSSçš„flex-growåœ¨ä½¿ç”¨è€…çš„å¯¦éš›æ¸¬è©¦ç’°å¢ƒä¸‹
-       ä¸€ç›´ä¸å¤ å¯é ï¼Œèˆ‡å…¶ç¹¼çºŒä¿¡ä»»CSSå»çŒœï¼Œ
-       ä¸å¦‚ä¿¡ä»»é€™å€‹å·²ç¶“è­‰å¯¦æº–ç¢ºçš„é‡æ¸¬æ–¹å¼ï¼Œ
-       ç”¨å¯¦éš›é‡åˆ°çš„æ•¸å­—ç›´æ¥å¼·åˆ¶è¨­å®šé«˜åº¦ï¼Œ
-       ç¢ºä¿æˆ°é¬¥ç´€éŒ„ä¸€å®šæœƒè²¼æ»¿åˆ°è©²åˆ°çš„åœ°æ–¹ã€‚
-    */
-
-    /* V96ï¼šæˆ°é¬¥è³‡è¨Šé«˜åº¦ç”± Flex æ±ºå®šï¼Œä¸å†æ’ç¨‹äºŒæ¬¡ JS é‡æ¸¬ã€‚ */
-
-}
-
-
-/*
-   â˜… é‡æ–°åŠ å›ä¾†ï¼šé‡æ¸¬.battle-infoç›®å‰çš„ä¸‹ç·£ï¼Œ
-   è·Ÿç•«é¢å¯¦éš›å¯è¦–ç¯„åœä¸‹ç·£ä¹‹é–“é‚„å·®å¤šå°‘ï¼Œ
-   ç›´æ¥æŠŠå·®è·åŠ å›.battle-infoçš„é«˜åº¦ä¸Šï¼Œ
-   å¼·åˆ¶è²¼æ»¿ï¼Œä¸å†å–®ç´”ä¾è³´CSS flex-grow
-   æ˜¯å¦æœ‰ç¢ºå¯¦ç”Ÿæ•ˆã€‚
-*/
-
-function fillBattleInfoGap(){
-    /* V96 compatibility stubï¼šèˆŠå‡½å¼åç¨±ä¿ç•™ï¼Œé¿å…å…¶ä»–èˆŠç¨‹å¼åƒç…§æ™‚å ±éŒ¯ã€‚
-       å¯¦éš›é«˜åº¦å®Œå…¨äº¤çµ¦ CSS Flexï¼Œä¸å†è®€ visualViewportã€ä¸å†å¯« inline heightã€‚ */
-}
-
-
-/*
-   â˜… ä¿®æ­£ï¼ˆæ‹¿æ‰æ•´å¥—JSå¼·åˆ¶è£œé«˜çš„æ©Ÿåˆ¶ï¼‰ï¼š
-   é€™ä¸€æ•´å¥—ã€Œé‡æ¸¬ã€è£œé«˜ã€ç›£è½è¦–çª—è®ŠåŒ–ã€
-   å®šæ™‚é‡æ–°æª¢æŸ¥ã€çš„åšæ³•ï¼Œæ˜¯ä¹‹å‰ç‚ºäº†è§£æ±º
-   æˆ°é¬¥ç´€éŒ„ä¸‹æ–¹ç©ºç™½åè¦†å˜—è©¦çš„å…¶ä¸­ä¸€ç¨®æ‰‹æ³•ï¼Œ
-   ä½†é€™å¹¾è¼ªåœ¨ä½¿ç”¨è€…å¯¦éš›æ¸¬è©¦ç’°å¢ƒä¸‹ä¸€ç›´æ²’æœ‰
-   ç©©å®šç”Ÿæ•ˆï¼Œåè€Œå¢åŠ äº†ç¨‹å¼ç¢¼è¤‡é›œåº¦ã€
-   ä¹Ÿè®“æ¯æ¬¡updateUI()éƒ½è¦å¤šåšä¸€æ¬¡é‡æ¸¬é‹ç®—ã€‚
-
-   ç¾åœ¨æ”¹ç”¨æ›´æ ¹æœ¬çš„åšæ³•ï¼šè®“.turn-target-row
-   ï¼ˆå›åˆè³‡è¨Šå€å¡Šï¼‰æœ¬èº«å°±æ˜¯ã€Œæœ‰å¤šå°‘å‰©é¤˜ç©ºé–“
-   å°±è‡ªå‹•é•·å¤šå¤§ã€çš„å€å¡Šï¼Œä¸å†éœ€è¦å¦å¤–ç”¨JS
-   å»é‡æ¸¬ã€å»è£œï¼Œé€™æ•´æ®µç¨‹å¼ç¢¼å·²ç¶“ä¸éœ€è¦äº†ã€‚
-*/
-
-function updateMonsterUI(index){
-
-    const monster =
-        monsters[index];
-
-
-    if(!monster){
-        return;
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼šç‡ƒç‡’ç‹€æ…‹åœ–ç¤ºã€‚
-       ä¹‹å‰ç‡ƒç‡’åªæœ‰åœ¨æ‰£è¡€é‚£ä¸€åˆ»çš„æˆ°é¬¥ç´€éŒ„è£¡çœ‹å¾—åˆ°ï¼Œ
-       æŒçºŒæœŸé–“å¡ç‰‡ä¸Šå®Œå…¨æ²’æœ‰ä»»ä½•æç¤ºï¼Œ
-       ç©å®¶çœ‹ä¸å‡ºã€Œé€™éš»ç¾åœ¨æ­£åœ¨ç‡’ã€ã€‚
-       æ”¹æˆåªè¦monster.statusEffectsè£¡æœ‰ç‡ƒç‡’ï¼Œ
-       å¡ç‰‡ä¸Šå°±æœƒä¸€ç›´é¡¯ç¤ºä¸€å€‹é–ƒçˆçš„ğŸ”¥åœ–ç¤ºï¼Œ
-       ç›´åˆ°ç‡ƒç‡’çµæŸæ‰æ¶ˆå¤±ã€‚
-    */
-
-    const statusArea =
-        $("battleMonsterStatus"+index);
-
-
-    if(statusArea){
-
-        const hasBurn =
-            monster.statusEffects &&
-            monster.statusEffects.some(
-                effect=>
-                    effect.type==="burn"
-            );
-
-
-        const hasFreeze =
-            isMonsterFrozen(
-                monster
-            );
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-           çŸ³åŒ–è·Ÿå››ç¨®ç°¡å–®æ¸›ç›Šæ•ˆæœï¼Œä¹Ÿä¸€ä½µ
-           é¡¯ç¤ºå°åœ–ç¤ºï¼Œç©å®¶æ‰çœ‹å¾—å‡ºé€™éš»æ€ªç‰©
-           èº«ä¸Šç¾åœ¨æ›è‘—å“ªäº›æ•ˆæœï¼Œä¸ç”¨åªèƒ½
-           å¾æˆ°é¬¥ç´€éŒ„è£¡å›é ­æ‰¾ã€‚
-        */
-
-        const hasPetrify=
-
-            monster.statusEffects &&
-            monster.statusEffects.some(
-                effect=>
-
-                    effect.type==="petrify"&&
-                    effect.turnsLeft>0
-
-            );
-
-
-        const hasAgilityDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "agilityDown"
-            )>0;
-
-
-        const hasStatDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "statDown"
-            )>0;
-
-
-        const hasDefenseDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "defenseDown"
-            )>0;
-
-
-        const hasDamageDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "damageDown"
-            )>0;
-
-
-        const hasStun=
-
-            getMonsterDebuffValue(
-                monster,
-                "stun"
-            )>0;
-
-
-        statusArea.innerHTML =
-
-            (
-                hasBurn
-                ?
-                '<span class="monster-status-badge burn"title="ç‡ƒç‡’ä¸­"></span>'
-                :
-                ""
-            )+
-            (
-                hasFreeze
-                ?
-                '<span class="monster-status-badge freeze"title="å†°å°ä¸­"></span>'
-                :
-                ""
-            )+
-            (
-                hasPetrify
-                ?
-                '<span class="monster-status-badge"title="çŸ³åŒ–ä¸­"></span>'
-                :
-                ""
-            )+
-            (
-                hasAgilityDown
-                ?
-                '<span class="monster-status-badge"title="é‡åŠ›ä¸­"></span>'
-                :
-                ""
-            )+
-            (
-                hasStatDown
-                ?
-                '<span class="monster-status-badge"title="å…¨å±¬æ€§é™ä½ä¸­"></span>'
-                :
-                ""
-            )+
-            (
-                hasDefenseDown
-                ?
-                '<span class="monster-status-badge"title="ç ´é˜²ä¸­"></span>'
-                :
-                ""
-            )+
-            (
-                hasDamageDown
-                ?
-                '<span class="monster-status-badge"title="æ®¤é¢¨ä¸­"></span>'
-                :
-                ""
-            )+
-            (
-                hasStun
-                ?
-                '<span class="monster-status-badge"title="æšˆçœ©ä¸­"></span>'
-                :
-                ""
-            );
-
-
-        /*
-           â˜… æ–°å¢ï¼šæ•´å¼µå¡ç‰‡çš„å†°å°/ç‡ƒç‡’åŒ…è¦†æ•ˆæœï¼Œ
-           è·Ÿä¸Šé¢å°åœ–ç¤ºåŒæ­¥é–‹é—œã€‚
-        */
-
-        const freezeOverlay=
-            $("battleMonsterFreezeOverlay"+index);
-
-
-        const burnOverlay=
-            $("battleMonsterBurnOverlay"+index);
-
-
-        if(freezeOverlay){
-
-            freezeOverlay.classList.toggle(
-                "show",
-                hasFreeze
-            );
-
-        }
-
-
-        if(burnOverlay){
-
-            burnOverlay.classList.toggle(
-                "show",
-                hasBurn
-            );
-
-        }
-
-    }
-
-
-    const hpBar =
-        $("battleMonsterBar"+index);
-
-
-    const spBar =
-        $("battleMonsterSPBar"+index);
-
-
-    const hpText =
-        $("battleMonsterHPText"+index);
-
-
-    const spText =
-        $("battleMonsterSPText"+index);
-
-
-    if(hpBar){
-
-        hpBar.style.width =
-            (
-                monster.hp/
-                monster.maxHP*
-                100
-            )+
-            "%";
-
-    }
-
-
-    if(spBar){
-
-        spBar.style.width =
-            (
-                monster.sp/
-                monster.maxSP*
-                100
-            )+
-            "%";
-
-    }
-
-
-    if(hpText){
-
-        hpText.textContent =
-            monster.hp+
-            "/"+
-            monster.maxHP;
-
-    }
-
-
-    if(spText){
-
-        spText.textContent =
-            monster.sp+
-            "/"+
-            monster.maxSP;
-
-    }
-
-}
-
-
-function renderPlayers(){
-
-    const row =
-        $("battlePlayerRow");
-
-
-    row.innerHTML="";
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™è£¡å›ºå®šåªç•«ç¬¬ä¸€è§’è‰²ä¸€å¼µå¡ï¼Œ
-       ç¾åœ¨player2å­˜åœ¨çš„è©±æœƒä¸€èµ·ç•«å‡ºä¾†ï¼Œ
-       æ¯å¼µå¡çš„å…§éƒ¨å…ƒä»¶idéƒ½åŠ ä¸Šç´¢å¼•
-       ï¼ˆ0=ç¬¬ä¸€è§’è‰²ã€1=ç¬¬äºŒè§’è‰²ï¼‰ï¼Œ
-       é¿å…å…©å¼µå¡çš„è¡€æ¢/ç‹€æ…‹åœ–ç¤ºidäº’ç›¸æ‰“æ¶ã€‚
-    */
-
-    const party=getExistingPartyIndexes().map(characterIndex=>{
-        const character=getPartyCharacterByIndex(characterIndex);
-        return {
-            character:character,
-            characterIndex:characterIndex,
-            id:character.id||("è§’è‰²"+(characterIndex+1)),
-            icon:elementDatabase[character.element]
-                ? elementDatabase[character.element].icon
-                : "",
-            level:character.level
-        };
-    });
-
-
-    party.forEach(entry=>{
-
-        const index=entry.characterIndex;
-
-        const box =
-            document.createElement(
-                "div"
-            );
-
-
-        box.className =
-            "battle-player";
-
-
-        box.id=
-            "battlePlayerCard"+
-            index;
-
-        box.style.backgroundImage=
-            "url('"+getCharacterBattleArtworkPath(entry.character)+"')";
-
-
-        box.innerHTML =
-
-        `
-        <div class="battle-player-icon">
-            ${entry.icon}
-        </div>
-
-        <div
-            id="battlePlayerStatus${index}"
-            class="monster-status-badges"
-        ></div>
-
-        <div class="hp-bar">
-
-            <div
-                id="battlePlayerHPBar${index}"
-                class="hp-bar-inner"
-            ></div>
-
-            <div
-                id="battlePlayerShieldBar${index}"
-                class="hp-bar-shield-overlay"
-            ></div>
-
-            <div class="hp-bar-text"></div>
-
-        </div>
-
-        <div class="sp-bar">
-
-            <div
-                id="battlePlayerSPBar${index}"
-                class="sp-bar-inner"
-            ></div>
-
-            <div class="sp-bar-text"></div>
-
-        </div>
-
-        <div class="battle-player-id"></div>
-        `;
-
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-           ç­‰ç´šåŸæœ¬ç¨ç«‹ä¸€è¡Œé¡¯ç¤ºåœ¨ä¸Šæ–¹ï¼Œ
-           ç¾åœ¨æ”¹æˆè·Ÿåº•éƒ¨çš„idåˆä½µæˆä¸€è¡Œ
-           ã€Œè§’è‰²å Lv.Xã€ï¼Œ
-           çœä¸‹ä¸€è¡Œçš„é«˜åº¦ï¼Œ
-           è®“å¡ç‰‡ä¸‹åŠéƒ¨çš„è³‡è¨Šåˆ—å¯ä»¥æ›´ç²¾ç°¡ã€‚
-        */
-
-        box.querySelector(
-            ".battle-player-id"
-        ).textContent =
-
-            entry.id+
-            " Lv."+
-            entry.level;
-
-
-        box.addEventListener(
-            "click",
-            ()=>{
-                if(box.classList.contains("ally-targetable")){
-                    selectBattleAllyTarget(index);
-                }
-            }
-        );
-
-
-        row.appendChild(
-            box
-        );
-
-    });
-
-
-    updatePlayerStatusBadges();
-
-}
-
-
-/*
-   â˜… ç©å®¶è‡ªå·±èº«ä¸Šçš„buffç‹€æ…‹åœ–ç¤º
-   ï¼ˆç›®å‰åªæœ‰æ€’ç«ï¼‰ï¼Œ
-   è·Ÿæ€ªç‰©çš„ç‡ƒç‡’åœ–ç¤ºæ˜¯åŒä¸€å¥—é‚è¼¯ï¼Œ
-   æœ‰ç”Ÿæ•ˆä¸­çš„buffå°±ä¸€ç›´é¡¯ç¤ºï¼ŒçµæŸæ‰æ¶ˆå¤±ã€‚
-*/
-
-function updatePlayerStatusBadges(){
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™è£¡åªæ›´æ–°ä¸€å¼µå¡ï¼ˆå›ºå®šidï¼‰ï¼Œ
-       ç¾åœ¨æ”¹æˆåŒæ™‚æ›´æ–°ç¬¬ä¸€è§’è‰²è·Ÿç¬¬äºŒè§’è‰²
-       ï¼ˆå­˜åœ¨çš„è©±ï¼‰å„è‡ªçš„buffåœ–ç¤ºã€‚
-    */
-
-    getExistingPartyIndexes().forEach(index=>{
-        updateSingleCharacterStatusBadge(
-            index,
-            getPartyCharacterByIndex(index)
-        );
-    });
-
-}
-
-
-function updateSingleCharacterStatusBadge(
-    index,
-    character
-){
-
-    const statusArea =
-        $("battlePlayerStatus"+index);
-
-
-    if(!statusArea){
-        return;
-    }
-
-
-    const rageBuff =
-        (character.activeBuffs||[])
-        .find(
-            b=>b.type==="rage"
-        );
-
-
-    statusArea.innerHTML =
-
-        rageBuff
-        ?
-        '<span class="monster-status-badge rage"title="æ€’ç«ç”Ÿæ•ˆä¸­"></span>'
-        :
-        "";
-
-}
-
-
-function updateBattlePlayerBars(){
-
-    updatePlayerStatusBadges();
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™è£¡åªæ›´æ–°ç¬¬ä¸€è§’è‰²çš„è¡€æ¢ï¼Œ
-       è€Œä¸”hpText/spTextæ˜¯ç”¨
-       document.querySelector(".hp-bar-text")
-       å»å…¨åŸŸæ‰¾ç¬¬ä¸€å€‹ç¬¦åˆçš„å…ƒç´ ï¼Œ
-       å°±ç®—åŠ äº†ç¬¬äºŒå¼µå¡ä¹Ÿæ°¸é æŠ“åˆ°åŒä¸€å€‹ã€‚
-       æ”¹æˆåˆ†åˆ¥æ›´æ–°å…©å¼µå¡å„è‡ªçš„è¡€æ¢ï¼Œ
-       æ–‡å­—å…ƒç´ ä¹Ÿæ”¹æˆåœ¨è©²å¼µå¡çš„ç¯„åœå…§æ‰¾ï¼Œ
-       ä¸æœƒæŠ“éŒ¯ã€‚
-    */
-
-    getExistingPartyIndexes().forEach(index=>{
-        updateSingleCharacterBars(
-            index,
-            getPartyCharacterByIndex(index),
-            getPartyBattleStats(index)
-        );
-    });
-
-}
-
-
-function updateSingleCharacterBars(
-    index,
-    character,
-    stats
-){
-
-    const card=
-        $("battlePlayerCard"+index);
-
-
-    if(!card){
-        return;
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œæ´»è‘—è¦äº®ï¼Œ
-       æ­»äº¡æ‰æš—ã€ï¼‰ï¼š
-       æ¯æ¬¡è¡€æ¢æ›´æ–°çš„æ™‚å€™ï¼Œé †ä¾¿æª¢æŸ¥è§’è‰²æ˜¯å¦
-       å·²ç¶“å€’ä¸‹ï¼ˆhp<=0ï¼‰ï¼Œæ˜¯çš„è©±åŠ ä¸Š.down
-       è®“å¡ç‰‡è®Šæš—ï¼Œæ´»è‘—å°±æŠŠ.downæ‹¿æ‰ç¶­æŒ
-       åŸæœ¬äº®åº¦ã€‚é€™å€‹å‡½å¼æœ¬ä¾†å°±æ˜¯å”¯ä¸€è² è²¬
-       åŒæ­¥ã€Œç•«é¢è¡€æ¢ã€è·Ÿã€Œè§’è‰²å¯¦éš›hpã€çš„
-       åœ°æ–¹ï¼Œå¡ç‰‡çš„æ˜æš—å…¶å¯¦ä¹Ÿæ˜¯åŒä¸€ä»¶äº‹çš„
-       å»¶ä¼¸ï¼ˆéƒ½æ˜¯æŠŠhpç‹€æ…‹åæ˜ åˆ°ç•«é¢ä¸Šï¼‰ï¼Œ
-       æ”¾åœ¨é€™è£¡ä¸€èµ·è™•ç†ï¼Œä¸ç”¨å¦å¤–æ‰¾åœ°æ–¹
-       é‡è¤‡åˆ¤æ–·character.hp<=0ã€‚
-    */
-
-    card.classList.toggle(
-        "down",
-        character.hp<=0
-    );
-
-
-    const hpBar =
-        $("battlePlayerHPBar"+index);
-
-
-    const spBar =
-        $("battlePlayerSPBar"+index);
-
-
-    const shieldBar =
-        $("battlePlayerShieldBar"+index);
-
-
-    const hpPercent =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                character.hp/
-                stats.maxHP*
-                100
-            )
-        );
-
-
-    if(hpBar){
-
-        hpBar.style.width =
-            hpPercent+
-            "%";
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œè­·ç›¾æ•ˆæœç”Ÿæˆçš„è©±ï¼Œ
-       æˆ‘æ–¹è¡€é‡æ¢è¦å¢åŠ ç­‰å€¼é•·åº¦çš„ç™½è‰²è¡€é‡æ¢ã€ï¼‰ï¼š
-       ç™½è‰²è‰²å¡Šç·Šæ¥åœ¨ç´…è‰²è¡€é‡å³å´é–‹å§‹ï¼ˆleft=hpPercentï¼‰ï¼Œ
-       å¯¬åº¦ï¼è­·ç›¾å‰©é¤˜é‡ä½”maxHPçš„æ¯”ä¾‹ï¼Œè·Ÿè¡€æ¢æœ¬èº«ç”¨
-       åŒä¸€å€‹maxHPåŸºæº–æ›ç®—ï¼Œè¶…å‡ºå®¹å™¨çš„éƒ¨åˆ†å› ç‚º
-       .hp-baræœ¬èº«overflow:hiddenæœƒè‡ªå‹•è¢«è£æ‰ï¼Œ
-       ä¸æœƒç•«å‡ºæ ¼ç·šå¤–ã€‚
-    */
-
-    if(shieldBar){
-
-        const shieldBuff=
-
-            (character.activeBuffs||[])
-            .find(
-                b=>
-
-                    b.type==="shield"&&
-                    b.turnsLeft>0&&
-                    b.remaining>0
-
-            );
-
-
-        const shieldPercent=
-
-            shieldBuff
-            ?
-            Math.max(
-                0,
-                shieldBuff.remaining/
-                stats.maxHP*
-                100
-            )
-            :
-            0;
-
-
-        shieldBar.style.left=
-            hpPercent+
-            "%";
-
-        shieldBar.style.width=
-            shieldPercent+
-            "%";
-
-    }
-
-
-    if(spBar){
-
-        spBar.style.width =
-            Math.max(
-                0,
-                Math.min(
-                    100,
-                    character.sp/
-                    stats.maxSP*
-                    100
-                )
-            )+
-            "%";
-
-    }
-
-
-    const hpText =
-        card.querySelector(
-            ".hp-bar-text"
-        );
-
-
-    const spText =
-        card.querySelector(
-            ".sp-bar-text"
-        );
-
-
-    if(hpText){
-
-        hpText.textContent =
-            character.hp+
-            "/"+
-            stats.maxHP;
-
-    }
-
-
-    if(spText){
-
-        spText.textContent =
-            character.sp+
-            "/"+
-            stats.maxSP;
-
-    }
-
-}
-
-
-function triggerCriticalImpact(element){
-
-    if(!element){
-        return;
-    }
-
-    element.classList.remove("critical-impact");
-    void element.offsetWidth;
-    element.classList.add("critical-impact");
-
-    setTimeout(()=>{
-        element.classList.remove("critical-impact");
-    },520);
-}
-
-
-function showDamagePopup(element,text,type,isCrit){
-
-    if(!element){
-        return;
-    }
-
-
-    const popup =
-        document.createElement(
-            "div"
-        );
-
-
-    popup.className =
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œã€Œæå¤±
-           è¡€é‡é¡¯ç¤ºè®Šæˆåœ¨è¡€æ¢ä¸‹é¢ã€ï¼‰ï¼š
-           çœŸæ­£åŸå› æ‰¾åˆ°äº†â€”â€”é€™è£¡å°‘æ‰“äº†
-           ç©ºæ ¼ï¼Œ"damage-popup"ç›´æ¥æ¥
-           "hp-popup"è®Šæˆ
-           "damage-popuphp-popup"é€™ç¨®
-           classå±¬æ€§æ ¹æœ¬ä¸å­˜åœ¨çš„å­—ä¸²ï¼Œ
-           .damage-popupé‚£çµ„CSSï¼ˆposition:
-           absolute;top:26%â€¦â€¦åŸæœ¬è¨­è¨ˆ
-           æˆé£„åœ¨å¡ç‰‡ä¸­æ®µã€æŠ€èƒ½åç¨±è·Ÿè¡€æ¢
-           ä¸­é–“ï¼‰å®Œå…¨æ²’å¥—ç”¨åˆ°ï¼Œpopupè®Šæˆ
-           ä¸€å€‹æ²’æœ‰ä»»ä½•å®šä½æ¨£å¼çš„æ™®é€š
-           <div>ï¼Œåªèƒ½ä¹–ä¹–æ’åœ¨appendChild()
-           æ”¾é€²å»çš„åœ°æ–¹ï¼Œä¹Ÿå°±æ˜¯å¡ç‰‡æœ€ä¸‹é¢ã€
-           è¡€æ¢/SPæ¢/åç¨±éƒ½æ’å®Œä¹‹å¾Œã€‚
-           æ¯å€‹classä¹‹é–“éƒ½è£œä¸Šç©ºæ ¼ï¼Œ
-           è·Ÿå‰é¢ã€ŒæŠ€èƒ½æŒ‰éˆ•æ•´å€‹ä¸èƒ½é»ã€
-           æ˜¯åŒä¸€ç¨®typoï¼Œé€™å·²ç¶“æ˜¯é€™å€‹
-           æª”æ¡ˆè£¡ç¬¬ä¸‰æ¬¡æŠ“åˆ°åŒæ¨£çš„æ¼å­—
-           bugäº†ã€‚
-        */
-
-        "damage-popup "+
-        (
-            type==="sp"
-            ?
-            "sp-popup"
-            :
-            type==="heal"
-            ?
-            "heal-popup"
-            :
-            type==="miss"
-            ?
-            "miss-popup"
-            :
-            type==="shield"
-            ?
-            "shield-popup"
-            :
-            "hp-popup"
-        )+
-        (
-            isCrit
-            ?
-            " critical-popup"
-            :
-            ""
-        );
-
-
-    if(isCrit){
-        /* V100ï¼šçˆ†æ“Šæµ®å­—åªä¿ç•™ã€Œçˆ†æ“Š + å‚·å®³æ•¸å­—ã€ã€‚
-           showPlayerHit/showMonsterHit å‚³é€²ä¾†çš„ text å¯èƒ½å« -ã€HP/SPï¼Œ
-           é€™è£¡åªæŠ½å‡ºæ•¸å­—åšé¡¯ç¤ºï¼›ä¸å½±éŸ¿å¯¦éš›å‚·å®³å€¼ã€‚ */
-        const criticalNumberMatch =
-            String(text).match(/\d+(?:\.\d+)?/);
-
-        popup.textContent =
-            "çˆ†æ“Š "+
-            (criticalNumberMatch ? criticalNumberMatch[0] : String(text));
-    }else{
-        popup.textContent = text;
-    }
-
-
-    if(isCrit){
-        triggerCriticalImpact(element);
-    }
-
-
-    element.appendChild(
-        popup
-    );
-
-
-    setTimeout(()=>{
-
-        if(
-            popup &&
-            popup.parentNode
-        ){
-
-            popup.parentNode.removeChild(
-                popup
-            );
-
-        }
-
-    },1800);
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-   å†°æ—‹ä¸€é–ƒå°ˆå±¬çš„é£›è¡Œåœ–ç¤ºï¼Œä½¿ç”¨è€…ä¸Šå‚³çš„
-   åœ–ç‰‡ç›´æ¥è½‰æˆbase64å…§åµŒåœ¨é€™è£¡ï¼Œ
-   è·Ÿè§’è‰²åœ–ç‰‡ï¼ˆbattlePlayerCard0/1çš„
-   background-imageï¼‰ç”¨åŒä¸€ç¨®åšæ³•â€”â€”
-   å–®ä¸€HTMLæª”æ¡ˆä¸ä¾è³´å¤–éƒ¨åœ–ç‰‡æª”æ¡ˆï¼Œ
-   è¤‡è£½é€™å€‹æª”æ¡ˆåˆ°åˆ¥çš„åœ°æ–¹ä¹Ÿä¸æœƒæœ‰
-   åœ–ç‰‡è·¯å¾‘å¤±æ•ˆã€åœ–ç‰‡æ¶ˆå¤±çš„å•é¡Œã€‚
-*/
-
-const ICE_SPIN_PROJECTILE_IMAGE=
-    "assets/battle/ice-spin-projectile.webp";
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œå†°æ—‹ä¸€é–ƒå°ˆå±¬
-   æ”»æ“Šå‹•ç•«ï¼‰ï¼š
-   è®“ä¸Šé¢é‚£å¼µåœ–å¾æ–½æ³•è€…å¡ç‰‡é£›åˆ°è¢«æ‰“ä¸­çš„
-   æ€ªç‰©å¡ç‰‡ï¼Œä¸­é€”æ—‹è½‰ã€æ”¾å¤§ï¼ŒæŠµé”æ™‚æ·¡å‡ºï¼Œ
-   ç•¶æˆé€™å€‹æŠ€èƒ½çš„æ”»æ“Šç‰¹æ•ˆã€‚
-
-   è·ŸshowSkillNameBadge()ä¸€æ¨£æ›åœ¨
-   document.bodyåº•ä¸‹ã€ç”¨getBoundingClientRect()
-   é‡åº§æ¨™ï¼Œä¸ç•¶å¡ç‰‡çš„å­å…ƒç´ ï¼Œé¿å…è¢«å¡ç‰‡
-   è‡ªå·±çš„transformå‹•ç•«å›°ä½ï¼ˆåŸå› è¦‹
-   showSkillNameBadge()æ—é‚Šçš„èªªæ˜ï¼‰ã€‚
-
-   casterCharacterIndexï¼š0=ç¬¬ä¸€è§’è‰²ã€
-   1=ç¬¬äºŒè§’è‰²ï¼Œæ±ºå®šé£›è¡Œèµ·é»æ˜¯å“ªå¼µç©å®¶å¡ã€‚
-   targetMonsterIndexï¼šé£›è¡Œçµ‚é»æ˜¯å“ªéš»æ€ªç‰©å¡ã€‚
-
-   åªè² è²¬ã€Œç•«é¢ä¸Šé£›ä¸€ä¸‹ã€ï¼Œä¸åšä»»ä½•å‚·å®³/
-   å‘½ä¸­åˆ¤å®šï¼Œå‘¼å«ç«¯è©²æ‰“MISSé‚„æ˜¯è©²æ‰£è¡€ï¼Œ
-   è·Ÿé€™å€‹å‡½å¼å®Œå…¨ç„¡é—œï¼Œå…©ä»¶äº‹åˆ†é–‹è™•ç†ã€‚
-*/
-
-function playIceSpinProjectile(
-    casterCharacterIndex,
-    targetMonsterIndex
-){
-
-    const casterCard=
-        $("battlePlayerCard"+
-            casterCharacterIndex
-        );
-
-
-    const targetCard=
-        $("battleMonster"+
-            targetMonsterIndex
-        );
-
-
-    if(
-        !casterCard ||
-        !targetCard
-    ){
-        return;
-    }
-
-
-    const casterRect=
-        casterCard.getBoundingClientRect();
-
-
-    const targetRect=
-        targetCard.getBoundingClientRect();
-
-
-    const projectile=
-        document.createElement(
-            "img"
-        );
-
-
-    projectile.src=
-        ICE_SPIN_PROJECTILE_IMAGE;
-
-    projectile.className=
-        "ice-spin-projectile";
-
-    const startPoint =
-        gamePointFromClient(
-            casterRect.left+
-            casterRect.width/2,
-            casterRect.top+
-            casterRect.height/2
-        );
-
-    const endPoint =
-        gamePointFromClient(
-            targetRect.left+
-            targetRect.width/2,
-            targetRect.top+
-            targetRect.height/2
-        );
-
-    projectile.style.left=
-        startPoint.x+"px";
-
-    projectile.style.top=
-        startPoint.y+"px";
-
-    const overlayLayer =
-        $("game-overlay-layer") ||
-        document.getElementById("game-stage");
-
-    overlayLayer.appendChild(
-        projectile
-    );
-
-
-    /*
-       â˜… å¼·åˆ¶è§¸ç™¼reflowï¼š
-       èµ·é»çš„left/topå‰›è¨­å®šå®Œï¼Œç€è¦½å™¨é‚„æ²’
-       çœŸæ­£ç•«å‡ºé€™ä¸€å¹€ï¼Œå¦‚æœé¦¬ä¸Šåœ¨åŒä¸€è¼ª
-       äº‹ä»¶å¾ªç’°è£¡æŠŠleft/topæ”¹æˆçµ‚é»åº§æ¨™ï¼Œ
-       transitionæœƒç›´æ¥è·³éå»ã€çœ‹ä¸åˆ°é£›è¡Œ
-       éç¨‹ã€‚ç”¨void projectile.offsetWidth
-       å¼·è¿«ç€è¦½å™¨å…ˆç®—ä¸€æ¬¡ç›®å‰çš„ç‰ˆé¢ï¼Œ
-       ç¢ºèªã€Œèµ·é»ã€å·²ç¶“ç”Ÿæ•ˆï¼Œæ¥ä¸‹ä¾†
-       requestAnimationFrameè£¡æ”¹æˆçµ‚é»åº§æ¨™
-       æ‰æœƒçœŸçš„è§¸ç™¼transitionå‹•ç•«ã€‚
-    */
-
-    void projectile.offsetWidth;
-
-
-    requestAnimationFrame(()=>{
-
-        projectile.style.left=
-            endPoint.x+"px";
-
-        projectile.style.top=
-            endPoint.y+"px";
-
-        projectile.classList.add(
-            "arrived"
-        );
-
-    });
-
-
-    setTimeout(()=>{
-
-        if(
-            projectile &&
-            projectile.parentNode
-        ){
-
-            projectile.parentNode.removeChild(
-                projectile
-            );
-
-        }
-
-    },500);
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œç«ç®­æŠ€èƒ½çš„
-   ä¸‰ç™¼é£›è¡Œç‰¹æ•ˆï¼Œç´”CSS/JSå‹•ç•«ï¼‰ï¼š
-   sourceCardIdæ˜¯æ–½æ³•è€…çš„å¡ç‰‡DOM id
-   ï¼ˆä¾‹å¦‚"battlePlayerCard0"ï¼‰ï¼Œ
-   targetIndexesæ˜¯é€™æ¬¡ç«ç®­å¯¦éš›æ‰“ä¸­çš„
-   æ€ªç‰©ç´¢å¼•é™£åˆ—ï¼ˆæœ€å¤š3å€‹ï¼Œå°æ‡‰ä¸­/å·¦/å³ï¼‰ã€‚
-
-   æ¯ä¸€ç™¼ç«ç®­ï¼š
-   1. å¾æ–½æ³•è€…å¡ç‰‡ä¸­å¿ƒå‡ºç™¼ï¼Œç”¨
-      element.animate()ï¼ˆWeb Animations
-      APIï¼‰é£›å‘ç›®æ¨™å¡ç‰‡ä¸­å¿ƒï¼Œé£›è¡Œéç¨‹ä¸­
-      æœ¬é«”æœƒä¾é£›è¡Œæ–¹å‘è‡ªå‹•æ—‹è½‰ï¼Œçœ‹èµ·ä¾†
-      åƒçœŸçš„æœç›®æ¨™é£›éå»ï¼Œä¸æ˜¯æ­»æ¿åœ°
-      å¹³ç§»ã€‚
-   2. åˆ°é”çš„ç¬é–“ï¼Œç«ç®­æœ¬é«”æ¶ˆå¤±ï¼ŒåŸåœ°
-      ç‚¸é–‹ä¸€å°ç¾¤ç«èŠ±ç²’å­ï¼ˆ8é¡†ï¼Œå„è‡ªå¾€
-      ä¸åŒè§’åº¦å™´å°„å†æ·¡å‡ºï¼‰ã€‚
-   3. ä¸‰ç™¼ä¹‹é–“æ•…æ„åŠ ä¸€é»é»æ™‚é–“å·®
-      ï¼ˆæ¯ç™¼é–“éš”80msæ‰ç™¼å°„ï¼‰ï¼Œä¸æœƒä¸‰ç™¼
-      çœ‹èµ·ä¾†åƒåŒä¸€ç™¼è¤‡è£½è²¼ä¸Šï¼Œæ¯”è¼ƒæœ‰
-      ã€Œé€£çºŒç™¼å°„ã€çš„ç¯€å¥æ„Ÿã€‚
-
-   æ‰€æœ‰å‹•æ…‹ç”Ÿæˆçš„DOMå…ƒç´ å‹•ç•«æ’­å®Œéƒ½æœƒ
-   è‡ªå·±ç§»é™¤ï¼Œä¸æœƒç•™åœ¨ç•«é¢ä¸Šç´¯ç©ã€‚
-*/
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ€ªç‰©ç”¨ç«ç®­
-   æ”»æ“Šç©å®¶æ™‚ä¹Ÿè¦æœ‰åŒæ¨£çš„é£›è¡Œç‰¹æ•ˆï¼‰ï¼š
-   åŸæœ¬é€™è£¡åªæ¥å—ã€Œæ€ªç‰©ç´¢å¼•é™£åˆ—ã€ï¼Œ
-   å¯«æ­»çµ„å‡º"battleMonster"+indexå»æ‰¾
-   ç›®æ¨™å…ƒç´ ï¼Œåªèƒ½ç”¨åœ¨ã€Œç©å®¶å°„æ€ªç‰©ã€é€™å€‹
-   æ–¹å‘ã€‚æ”¹æˆç›´æ¥æ¥å—ã€Œç›®æ¨™DOM idçš„é™£åˆ—ã€ï¼Œ
-   æ‰“ç©å®¶ï¼ˆ"battlePlayerCard"+indexï¼‰
-   è·Ÿæ‰“æ€ªç‰©ï¼ˆ"battleMonster"+indexï¼‰
-   å…©ç¨®æ–¹å‘éƒ½èƒ½å…±ç”¨åŒä¸€å¥—å‹•ç•«é‚è¼¯ï¼Œä¸ç”¨
-   å¯«å…©ä»½å¹¾ä¹ä¸€æ¨£çš„ç¨‹å¼ç¢¼ã€‚
-*/
-
-function playFireRocketAnimation(
-    sourceCardId,
-    targetElementIds
-){
-
-    const sourceEl=
-        $(sourceCardId);
-
-
-    if(!sourceEl){
-        return;
-    }
-
-
-    const sourceRect=
-        sourceEl.getBoundingClientRect();
-
-    const sourcePoint =
-        gamePointFromClient(
-            sourceRect.left+
-            sourceRect.width/2,
-            sourceRect.top+
-            sourceRect.height/2
-        );
-
-    const startX =
-        sourcePoint.x;
-
-    const startY =
-        sourcePoint.y;
-
-
-    targetElementIds.forEach(
-        (targetElementId,i)=>{
-
-            setTimeout(()=>{
-
-                fireOneRocket(
-                    startX,
-                    startY,
-                    targetElementId
-                );
-
-            },i*80);
-
-        }
-    );
-
-}
-
-
-function fireOneRocket(
-    startX,
-    startY,
-    targetElementId
-){
-
-    const targetEl=
-        $(targetElementId);
-
-
-    if(!targetEl){
-        return;
-    }
-
-
-    const targetRect=
-        targetEl.getBoundingClientRect();
-
-    const targetPoint =
-        gamePointFromClient(
-            targetRect.left+
-            targetRect.width/2,
-            targetRect.top+
-            targetRect.height/2
-        );
-
-    const endX =
-        targetPoint.x;
-
-    const endY =
-        targetPoint.y;
-
-
-    const angleDeg=
-
-        Math.atan2(
-            endY-startY,
-            endX-startX
-        )*
-        180/Math.PI;
-
-
-    const rocket=
-        document.createElement("div");
-
-    rocket.className=
-        "fire-rocket-projectile";
-
-    rocket.style.left=
-        startX+"px";
-
-    rocket.style.top=
-        startY+"px";
-
-    rocket.style.transform=
-
-        "translate(-50%,-50%) rotate("+
-        angleDeg+
-        "deg)";
-
-
-    const overlayLayer =
-        $("game-overlay-layer") ||
-        document.getElementById("game-stage");
-
-    overlayLayer.appendChild(
-        rocket
-    );
-
-
-    const flightMs=
-        420;
-
-
-    const anim=
-
-        rocket.animate(
-            [
-                {
-                    left:startX+"px",
-                    top:startY+"px",
-                    offset:0
-                },
-                {
-                    left:endX+"px",
-                    top:endY+"px",
-                    offset:1
-                }
-            ],
-            {
-                duration:flightMs,
-                easing:"ease-in"
-            }
-        );
-
-
-    anim.onfinish=()=>{
-
-        rocket.remove();
-
-
-        spawnFireSparkBurst(
-            endX,
-            endY
-        );
-
-    };
-
-}
-
-
-function spawnFireSparkBurst(
-    x,
-    y
-){
-
-    const sparkCount=
-        8;
-
-
-    for(
-        let i=0;
-        i<sparkCount;
-        i++
-    ){
-
-        const spark=
-            document.createElement("div");
-
-        spark.className=
-            "fire-rocket-spark";
-
-        spark.style.left=
-            x+"px";
-
-        spark.style.top=
-            y+"px";
-
-
-        document.body.appendChild(
-            spark
-        );
-
-
-        const angle=
-
-            (
-                Math.PI*2*i/
-                sparkCount
-            )+
-            (Math.random()*0.5);
-
-
-        const distance=
-
-            18+
-            Math.random()*16;
-
-
-        const spread=
-
-            spark.animate(
-                [
-                    {
-                        left:x+"px",
-                        top:y+"px",
-                        opacity:1,
-                        offset:0
-                    },
-                    {
-                        left:
-                            (
-                                x+
-                                Math.cos(angle)*distance
-                            )+"px",
-                        top:
-                            (
-                                y+
-                                Math.sin(angle)*distance
-                            )+"px",
-                        opacity:0,
-                        offset:1
-                    }
-                ],
-                {
-                    duration:380,
-                    easing:"ease-out"
-                }
-            );
-
-
-        spread.onfinish=()=>{
-
-            spark.remove();
-
-        };
-
-    }
-
-}
-
-
-function findBattleSkillByPresentation(skillName,elementType){
-    if(typeof skillDatabase==="undefined"){ return null; }
-    const ids=Object.keys(skillDatabase);
-    for(let index=0;index<ids.length;index++){
-        const skill=skillDatabase[ids[index]];
-        if(
-            skill&&skill.name===skillName&&
-            (!elementType||!skill.element||skill.element===elementType)
-        ){
-            return skill;
-        }
-    }
-    return null;
-}
-
-function activeBattleTargetIds(side,includeDefeated){
-    if(side==="monster"){
-        return (Array.isArray(currentBattleMonsters)?currentBattleMonsters:[]).filter(index=>{
-            const monster=monsters[index];
-            return !!(monster&&(includeDefeated||monster.alive!==false&&Number(monster.hp)>0));
-        });
-    }
-    return getExistingPartyIndexes().filter(index=>{
-        const character=getPartyCharacterByIndex(index);
-        return !!(character&&(includeDefeated||Number(character.hp)>0));
-    });
-}
-
-/* Combat owns target selection. This contract is created before V142/V143 see
-   the cast, so the VFX runtime never reads the action queue, hit order or live
-   survivor bounds to guess its primary target or semantic footprint. */
-function createBattleTargetContract(side,skillName,elementType,actorIndex,targetId,targetIds,targetSideOverride){
-    const skill=skillName==="æ™®é€šæ”»æ“Š"
-        ?{id:"normal",targetType:"single",category:"physical"}
-        :findBattleSkillByPresentation(skillName,elementType);
-    const targetType=String(skill&&skill.targetType||"single");
-    const sameSide=/ally/i.test(targetType)||/heal|revive|buff/.test(String(skill&&skill.category||""));
-    const targetSide=targetSideOverride==="player"||targetSideOverride==="monster"
-        ?targetSideOverride
-        :(sameSide?side:(side==="player"?"monster":"player"));
-    const explicitIds=Array.isArray(targetIds)?targetIds.slice():[];
-    let primary=targetId!==undefined&&targetId!==null?targetId:null;
-    let ids=explicitIds;
-
-    if(!ids.length){
-        let queued=null;
-        if(side==="player"&&typeof queuedPlayerActions!=="undefined"){
-            queued=queuedPlayerActions&&queuedPlayerActions[actorIndex];
-        }
-        if(primary===null&&queued){
-            primary=targetSide==="monster"?queued.target:queued.targetAlly;
-        }
-        if(primary===null&&side==="player"&&targetSide==="monster"&&typeof selectedMonster!=="undefined"){
-            primary=selectedMonster;
-        }
-
-        if(targetType==="all"||targetType==="allyAll"){
-            ids=activeBattleTargetIds(targetSide,false);
-        }else if(targetSide==="monster"&&Number.isInteger(primary)&&/^(tri|row|column|horizontal-3)$/i.test(targetType)){
-            ids=typeof getSkillTargets==="function"?getSkillTargets(primary,targetType):[primary];
-        }else if(targetSide==="player"&&Number.isInteger(primary)&&/^(tri|allyTri|row|column)$/i.test(targetType)){
-            const owner=typeof window!=="undefined"?window.FourSymbolsBattlefieldSlots:null;
-            const formation=owner&&typeof owner.ensureAllyFormation==="function"
-                ?owner.ensureAllyFormation(getExistingPartyIndexes()):null;
-            ids=formation&&typeof owner.resolveAllyTargets==="function"
-                ?owner.resolveAllyTargets(formation,primary,targetType,index=>{
-                    const character=getPartyCharacterByIndex(index);
-                    return !!(character&&Number(character.hp)>0);
-                }):[primary];
-        }else if(primary!==null&&primary!==undefined){
-            ids=[primary];
-        }else if(sameSide){
-            ids=activeBattleTargetIds(targetSide,false);
-            primary=ids.length?ids[0]:null;
-        }
-    }
-
-    ids=Array.from(new Set(ids.filter(Number.isInteger)));
-    if(targetType==="all"||targetType==="allyAll"){ primary=null; }
-    else if(primary===null&&ids.length){ primary=ids[0]; }
-
-    return Object.freeze({
-        version:"battle-target-contract-v1",
-        side:side,
-        targetSide:targetSide,
-        targetType:targetType,
-        actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
-        targetId:primary,
-        targetIds:Object.freeze(ids.slice())
-    });
-}
-
-window.FourSymbolsBattleTargetContract=Object.freeze({
-    version:"battle-target-contract-v1",
-    create:createBattleTargetContract
-});
-
-function getSkillNameBadgeDuration(skillName,elementType){
-
-    if(
-        typeof window!=="undefined" &&
-        typeof window.v142GetSkillNameDisplayDuration==="function"
-    ){
-        const duration=
-            Number(
-                window.v142GetSkillNameDisplayDuration(
-                    skillName,
-                    elementType
-                )
-            );
-
-        if(Number.isFinite(duration) && duration>0){
-            return Math.round(duration);
-        }
-    }
-
-    return Math.round(520*2/3);
-}
-
-
-function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds,targetSide){
-
-    const targetContract=createBattleTargetContract(
-        "player",skillName,elementType,Number.isInteger(characterIndex)?characterIndex:0,targetId,targetIds,targetSide
-    );
-
-    const element =
-        $("battlePlayerCard"+
-            (characterIndex||0)
-        );
-
-
-    if(!element){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸæ­£è§£æ±ºã€Œæ–‡å­—æœƒå…ˆè¢«è“‹ä½ã€
-       åˆè·³åˆ°æœ€å‰é¢ã€çš„æ ¹æœ¬åŸå› ï¼‰ï¼š
-       ä¹‹å‰æŠŠæ–‡å­—å…ƒç´ ç›´æ¥å¡é€²è§’è‰²å¡ç‰‡è£¡é¢
-       ç•¶å­å…ƒç´ ã€‚ä½†è§’è‰²å¡ç‰‡æ”»æ“Šçš„ç¬é–“æœƒæ’­æ”¾
-       ã€Œå‰å‚¾ã€å‹•ç•«ï¼ˆtransformä½ç§»ï¼‰ï¼Œ
-       CSSè¦å‰‡ï¼šä»»ä½•æœ‰ä½œç”¨ä¸­transformçš„å…ƒç´ ï¼Œ
-       æœƒå»ºç«‹ä¸€å€‹æ–°çš„ç–Šæ”¾å±¤ï¼ŒæŠŠå®ƒæ‰€æœ‰å­å…ƒç´ çš„
-       ç–Šæ”¾é †åºé—œé€²é€™å€‹å±€éƒ¨ç¯„åœè£¡â€”â€”ä¸ç®¡å­å…ƒç´ 
-       çš„z-indexè¨­å¤šé«˜ï¼Œéƒ½è·³ä¸å‡ºé€™å€‹ç¯„åœå»è·Ÿ
-       å¤–é¢çš„æ±è¥¿æ¯”è¼ƒã€‚æŠ€èƒ½åç¨±æ–‡å­—å‰›å¥½æ˜¯å¡ç‰‡çš„
-       å­å…ƒç´ ï¼Œå¡ç‰‡å‰›å¥½åœ¨æ”»æ“Šç¬é–“æœ‰transformåœ¨è·‘ï¼Œ
-       é€™å°±æ˜¯ä¸ç®¡z-indexè¨­å¤šé«˜éƒ½æ²’ç”¨çš„çœŸæ­£åŸå› ã€‚
-
-       æ”¹æˆä¸å†ç•¶å¡ç‰‡çš„å­å…ƒç´ ï¼Œç›´æ¥æ›åˆ°
-       document.bodyåº•ä¸‹ï¼ˆä¸æœƒè¢«ä»»ä½•å‹•ç•«
-       æ³¢åŠçš„åœ°æ–¹ï¼‰ï¼Œç”¨getBoundingClientRect()
-       é‡å‡ºå¡ç‰‡ç›®å‰åœ¨ç•«é¢ä¸Šçš„å¯¦éš›åº§æ¨™ï¼Œ
-       å†ç”¨position:fixedæŠŠæ–‡å­—ç²¾æº–ç–Šåœ¨
-       å¡ç‰‡æ­£ä¸Šæ–¹â€”â€”é€™æ¨£æ–‡å­—çš„ç–Šæ”¾é †åº
-       å°±æ˜¯ç›¸å°æ–¼æ•´å€‹é é¢åœ¨æ¯”è¼ƒï¼Œ
-       ä¸æœƒå†è¢«å¡ç‰‡è‡ªå·±çš„å‹•ç•«å›°ä½ã€‚
-    */
-
-    const rect=
-        element.getBoundingClientRect();
-
-
-    const badge =
-        document.createElement(
-            "div"
-        );
-
-
-    badge.className =
-        "skill-name-badge badge-"+
-        elementType;
-
-
-    badge.textContent =
-        skillName;
-
-    const badgeDuration=
-        getSkillNameBadgeDuration(
-            skillName,
-            elementType
-        );
-
-    badge.style.setProperty(
-        "--skill-name-display-duration",
-        badgeDuration+"ms"
-    );
-
-
-
-    /* V38 SOURCE-LEVEL UI SIZE FIX:
-       The badge gets its final visual size at creation time.
-       This is deliberately inline + !important so later CSS cannot
-       silently override it. */
-    badge.style.setProperty("font-size","72px","important");
-    badge.style.setProperty("line-height","1.05","important");
-    badge.style.setProperty("font-weight","900","important");
-    badge.style.setProperty("white-space","nowrap","important");
-    badge.style.setProperty("width","max-content","important");
-    badge.style.setProperty("min-width","max-content","important");
-    badge.style.setProperty("-webkit-text-stroke","1.8px #f2ead9","important");
-const badgePoint =
-        gamePointFromClient(
-            rect.left+rect.width/2,
-            rect.top
-        );
-
-    badge.style.position=
-        "absolute";
-
-    badge.style.left=
-        badgePoint.x+"px";
-
-    badge.style.top=
-        badgePoint.y+"px";
-
-
-    const overlayLayer =
-        $("game-overlay-layer") ||
-        document.getElementById("game-stage");
-
-    overlayLayer.appendChild(
-        badge
-    );
-
-
-    setTimeout(()=>{
-
-        if(
-            badge &&
-            badge.parentNode
-        ){
-
-            badge.parentNode.removeChild(
-                badge
-            );
-
-        }
-
-    },badgeDuration);
-
-    if(typeof window!=="undefined" && typeof window.v142PlaySkillAnimationFromBadge==="function"){
-        window.v142PlaySkillAnimationFromBadge("player",skillName,elementType,
-            characterIndex||0,targetContract.targetId,targetContract.targetIds,targetContract
-        );
-    }
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ€ªç‰©æ–½æ”¾æŠ€èƒ½æ™‚
-   ä¹Ÿè¦è·³æŠ€èƒ½åç¨±ï¼‰ï¼š
-   è·ŸshowSkillNameBadge()å¹¾ä¹ä¸€æ¨¡ä¸€æ¨£ï¼Œ
-   å”¯ä¸€å·®åˆ¥æ˜¯ç›®æ¨™å…ƒç´ å¾
-   battlePlayerCard+characterIndex
-   æ›æˆbattleMonster+monsterIndexâ€”â€”
-   æ€ªç‰©æ”»æ“Šæ™‚åŒæ¨£å¯èƒ½è§¸ç™¼å¡ç‰‡å‰å‚¾å‹•ç•«
-   ï¼ˆlungeMonsterCard()ï¼‰ï¼Œæ‰€ä»¥é€™è£¡
-   ä¸€æ¨£ä¸ç•¶å¡ç‰‡çš„å­å…ƒç´ ã€æ›åœ¨
-   document.bodyåº•ä¸‹ã€ç”¨position:fixed
-   ç–Šåœ¨æ€ªç‰©å¡ç‰‡æ­£ä¸Šæ–¹ï¼ŒåŸå› è·Ÿ
-   showSkillNameBadge()å®Œå…¨ç›¸åŒã€‚
-*/
-
-function showMonsterSkillNameBadge(
-    skillName,
-    elementType,
-    monsterIndex,
-    targetId,
-    targetIds,
-    targetSide
-){
-
-    const targetContract=createBattleTargetContract(
-        "monster",skillName,elementType,Number.isInteger(monsterIndex)?monsterIndex:0,targetId,targetIds,targetSide
-    );
-
-    const element=
-        $("battleMonster"+
-            monsterIndex
-        );
-
-
-    if(!element){
-        return;
-    }
-
-
-    const rect=
-        element.getBoundingClientRect();
-
-
-    const badge=
-        document.createElement(
-            "div"
-        );
-
-
-    badge.className=
-        "skill-name-badge badge-"+
-        elementType;
-
-
-    badge.textContent=
-        skillName;
-
-    const badgeDuration=
-        getSkillNameBadgeDuration(
-            skillName,
-            elementType
-        );
-
-    badge.style.setProperty(
-        "--skill-name-display-duration",
-        badgeDuration+"ms"
-    );
-
-
-
-    /* V38 SOURCE-LEVEL UI SIZE FIX:
-       The badge gets its final visual size at creation time.
-       This is deliberately inline + !important so later CSS cannot
-       silently override it. */
-    badge.style.setProperty("font-size","72px","important");
-    badge.style.setProperty("line-height","1.05","important");
-    badge.style.setProperty("font-weight","900","important");
-    badge.style.setProperty("white-space","nowrap","important");
-    badge.style.setProperty("width","max-content","important");
-    badge.style.setProperty("min-width","max-content","important");
-    badge.style.setProperty("-webkit-text-stroke","1.8px #f2ead9","important");
-const badgePoint =
-        gamePointFromClient(
-            rect.left+rect.width/2,
-            rect.top
-        );
-
-    badge.style.position=
-        "absolute";
-
-    badge.style.left=
-        badgePoint.x+"px";
-
-    badge.style.top=
-        badgePoint.y+"px";
-
-
-    const overlayLayer =
-        $("game-overlay-layer") ||
-        document.getElementById("game-stage");
-
-    overlayLayer.appendChild(
-        badge
-    );
-
-
-    setTimeout(()=>{
-
-        if(
-            badge &&
-            badge.parentNode
-        ){
-
-            badge.parentNode.removeChild(
-                badge
-            );
-
-        }
-
-    },badgeDuration);
-
-    if(typeof window!=="undefined" && typeof window.v142PlaySkillAnimationFromBadge==="function"){
-        window.v142PlaySkillAnimationFromBadge("monster",skillName,elementType,
-            monsterIndex||0,targetContract.targetId,targetContract.targetIds,targetContract
-        );
-    }
-
-}
-
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ‹¿æ‰æ–½æ”¾æŠ€èƒ½æ™‚
-   è·³å‡ºSPæ¶ˆè€—æ•¸å­—çš„å‹•ç•«ï¼‰ï¼š
-   ä¹‹å‰æ¯æ¬¡æ–½æ”¾æŠ€èƒ½ï¼Œéƒ½æœƒå¦å¤–è·³å‡ºä¸€å€‹
-   ã€Œ-XXSPã€çš„æµ®å‹•æ–‡å­—ï¼Œæé†’æ‰£äº†å¤šå°‘SPã€‚
-   ä½¿ç”¨è€…è¦ºå¾—é€™å€‹æç¤ºä¸éœ€è¦ï¼Œç›´æ¥æ‹¿æ‰ã€‚
-   ä¿ç•™é€™å€‹å‡½å¼æœ¬èº«ï¼ˆè®“æ‰€æœ‰å‘¼å«çš„åœ°æ–¹
-   é‚„æ˜¯èƒ½æ­£å¸¸é‹ä½œã€ä¸æœƒå™´éŒ¯ï¼‰ï¼Œ
-   ä½†å‡½å¼å…§å®¹æ¸…ç©ºï¼Œä¸å†åšä»»ä½•é¡¯ç¤ºã€‚
-*/
-
-function showPlayerSpPopup(amount,characterIndex){
-
-    return;
-
-}
-
-
-function lungePlayerCard(characterIndex){
-
-    const element =
-        $("battlePlayerCard"+
-            (characterIndex||0)
-        );
-
-
-    if(!element){
-        return;
-    }
-
-
-    element.classList.remove(
-        "attacker-lunge-up"
-    );
-
-
-    void element.offsetWidth;
-
-
-    element.classList.add(
-        "attacker-lunge-up"
-    );
-
-
-    setTimeout(()=>{
-
-        element.classList.remove(
-            "attacker-lunge-up"
-        );
-
-    },450);
-
-}
-
-
-function lungeMonsterCard(index){
-
-    const element =
-        $("battleMonster"+index);
-
-
-    if(!element){
-        return;
-    }
-
-
-    element.classList.remove(
-        "attacker-lunge-down"
-    );
-
-
-    void element.offsetWidth;
-
-
-    element.classList.add(
-        "attacker-lunge-down"
-    );
-
-
-    setTimeout(()=>{
-
-        element.classList.remove(
-            "attacker-lunge-down"
-        );
-
-    },450);
-
-}
-
-
-/*
-   â˜… é–ƒé¿å‹•ç•«ï¼ˆæ–°å¢ï¼‰ï¼š
-   è·Ÿlungeæ˜¯åŒä¸€ç¨®å¯«æ³•ï¼Œåªæ˜¯æ›ä¸€å€‹classï¼Œ
-   å¥—ç”¨åœ¨ã€Œèº²éæ”»æ“Š/æŠµæŠ—ç•°å¸¸ç‹€æ…‹ã€çš„é‚£å€‹ç›®æ¨™èº«ä¸Šã€‚
-*/
-
-function showDodgeAnimation(element){
-
-    if(!element){
-        return;
-    }
-
-
-    element.classList.remove(
-        "dodge-back"
-    );
-
-
-    void element.offsetWidth;
-
-
-    element.classList.add(
-        "dodge-back"
-    );
-
-
-    setTimeout(()=>{
-
-        element.classList.remove(
-            "dodge-back"
-        );
-
-    },450);
-
-}
-
-
-/*
-   åŒæ™‚è™•ç†ã€Œæ”»æ“Šæ²’å‘½ä¸­ã€è·Ÿã€Œç•°å¸¸ç‹€æ…‹æ²’ç”Ÿæ•ˆã€
-   é€™å…©ç¨®missç‹€æ³ï¼š
-   ç›®æ¨™å¡ç‰‡æ’­æ”¾é–ƒé¿å‹•ç•«ï¼Œ
-   ä¸¦è·³å‡ºä¸€å€‹ç°ç™½è‰²çš„æ–‡å­—æç¤ºã€‚
-
-   isPlayerTarget=trueæ™‚å°è±¡æ˜¯ç©å®¶è‡ªå·±çš„å¡ç‰‡ï¼Œ
-   å¦å‰‡ç”¨indexå»æŠ“æ€ªç‰©å¡ç‰‡ã€‚
-*/
-
-function showMissEffect(isPlayerTarget,index,text){
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       isPlayerTarget=trueæ™‚ï¼Œ
-       indexç¾åœ¨ä»£è¡¨ã€Œç¬¬å¹¾å¼µç©å®¶å¡ã€
-       ï¼ˆ0=ç¬¬ä¸€è§’è‰²ã€1=ç¬¬äºŒè§’è‰²ï¼‰ï¼Œ
-       ä¸å†æ°¸é æŠ“battlePlayerRowè£¡ç¬¬ä¸€å¼µå¡ï¼Œ
-       é€™æ¨£ç¬¬äºŒè§’è‰²è¢«æ”»æ“Šæ²’å‘½ä¸­æ™‚ï¼Œ
-       é–ƒé¿å‹•ç•«æ‰æœƒå‡ºç¾åœ¨æ­£ç¢ºçš„å¡ç‰‡ä¸Šã€‚
-    */
-
-    const element =
-        isPlayerTarget
-        ?
-        $("battlePlayerCard"+
-            (index||0)
-        )
-        :
-        $("battleMonster"+index);
-
-
-    if(!element){
-        return;
-    }
-
-
-    showDodgeAnimation(
-        element
-    );
-
-
-    showDamagePopup(
-        element,
-        text||"MISS",
-        "miss"
-    );
-
-}
-
-
-function showPlayerHit(amount,type,characterIndex,isPositive,isCrit){
-
-    const element =
-        $("battlePlayerCard"+
-            (characterIndex||0)
-        );
-
-
-    if(!element){
-        return;
-    }
-
-
-    /*
-       â˜… å†æ¬¡ä¿®æ­£ï¼ˆçœŸçš„æŠ“åˆ°éºæ¼çš„åœ°æ–¹ï¼‰ï¼š
-       ä¸Šæ¬¡åªæ’é™¤äº†type==="heal"ï¼Œä½†SPè—¥æ°´
-       æ¢å¾©ç”¨çš„æ˜¯type==="sp"ï¼Œä¸æ˜¯"heal"ï¼Œ
-       æ¼ç¶²ä¹‹é­šï¼Œå–SPè—¥æ°´æ¢å¾©çš„æ™‚å€™é‚„æ˜¯æœƒ
-       èª¤è§¸ç™¼éœ‡å‹•â€”â€”åŒä¸€å€‹æ ¹æœ¬å•é¡Œï¼ˆç”¨è³‡æº
-       ç¨®é¡çš„å­—ä¸²å»çŒœæ¸¬ã€Œé€™æ˜¯æ­£é¢é‚„è² é¢æ•ˆæœã€
-       æœ¬ä¾†å°±ä¸å¯é ï¼Œ"sp"é€™å€‹å­—ä¸²åŒæ™‚ä»£è¡¨
-       ã€Œé€™æ˜¯SPã€ï¼Œæ²’è¾¦æ³•åŒæ™‚åˆ†è¾¨ã€Œæ˜¯æ¢å¾©
-       é‚„æ˜¯æµå¤±ã€ï¼‰ã€‚
-
-       é€™è£¡é€£å¸¶ç™¼ç¾äº†å¦ä¸€å€‹å› ç‚ºåŒæ¨£åŸå› é€ æˆçš„
-       bugï¼šä¸‹é¢é¡¯ç¤ºçš„+/-ç¬¦è™Ÿï¼Œä¹Ÿåªèªå¾—
-       type==="heal"ï¼ŒSPè—¥æ°´æ¢å¾©çš„æ™‚å€™
-       æœƒé¡¯ç¤ºæˆã€Œ-50SPã€é€™ç¨®èª¤å°äººçš„è² æ•¸ï¼Œ
-       æ˜æ˜æ˜¯åœ¨è£œè¡€/è£œé­”å»é¡¯ç¤ºè² è™Ÿã€‚
-
-       æ”¹æˆæ˜ç¢ºå‚³ä¸€å€‹isPositiveåƒæ•¸ï¼Œ
-       ä¸å†é å­—ä¸²å»çŒœï¼Œé€™è£¡å‘¼å«çš„æ¯å€‹åœ°æ–¹
-       éƒ½è¦è‡ªå·±æ˜ç¢ºè¬›æ¸…æ¥šã€Œé€™æ¬¡æ˜¯æ­£é¢æ•ˆæœ
-       é‚„æ˜¯è² é¢æ•ˆæœã€ï¼Œå…©å€‹bugä¸€æ¬¡ä¿®å¥½ï¼Œ
-       ä»¥å¾Œä¹Ÿä¸æœƒå†æœ‰é¡ä¼¼ã€Œtypeå­—ä¸²æ²’æŠŠ
-       æŸå€‹æƒ…æ³è€ƒæ…®é€²å»ã€è€Œæ¼æ‰çš„ç‹€æ³ã€‚
-    */
-
-    /* Damage popup creation is the hit-feedback owner. The card root never
-       receives a border/shadow hit state; positive Heal/SP feedback therefore
-       cannot accidentally inherit damage semantics. */
-
-    if(
-        amount!==undefined &&
-        amount!==null
-    ){
-
-        const prefix =
-            isPositive
-            ?
-            "+"
-            :
-            "-";
-
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ€ªç‰©æ‰“ç©å®¶
-           çˆ†æ“Šæ™‚ä¹Ÿè¦æœ‰æ•ˆæœï¼Œè·ŸshowMonsterHit()
-           é‚£é‚Šç©å®¶æ‰“æ€ªç‰©çˆ†æ“Šçš„å‘ˆç¾æ–¹å¼ä¸€è‡´ï¼‰ï¼š
-           isCritç‚ºtrueæ™‚ï¼Œæ•¸å­—å‰é¢åŠ ğŸ’¥ï¼Œ
-           ä¸¦æŠŠisCritå‚³çµ¦showDamagePopup()ï¼Œ
-           è®“å®ƒå¥—ä¸Š.critical-popupæ¨£å¼
-           ï¼ˆå­—æ›´å¤§ã€é¡è‰²æ›´é†’ç›®ï¼‰ï¼Œè·Ÿç©å®¶å°
-           æ€ªç‰©çˆ†æ“Šæ™‚çœ‹åˆ°çš„æ•ˆæœåŒä¸€å¥—ã€‚
-        */
-
-        showDamagePopup(
-            element,
-            (
-                isCrit
-                ?
-                ""
-                :
-                ""
-            )+
-            prefix+
-            amount+
-            (
-                type==="sp"
-                ?
-                "SP"
-                :
-                "HP"
-            ),
-            type,
-            isCrit
-        );
-
-    }
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œè­·ç›¾å‚·å®³æ©Ÿåˆ¶...é¡¯ç¤ºç™½è‰²
-   æ•¸å­—æ‰£é™¤å‹•ç•«ï¼Œå¦‚ï¼š[-567]ã€ï¼‰ï¼š
-   è·ŸshowPlayerHit()åŒæ¨£æ‰¾battlePlayerCardå…ƒç´ ï¼Œ
-   ä½†ç”¨å°ˆå±¬çš„shieldé¡å‹ï¼ˆç™½è‰²æ–‡å­—ï¼Œè¦‹.damage-popup.
-   shield-popupï¼‰ï¼Œè·Ÿä¸€èˆ¬HPæ‰è¡€çš„ç´…å­—æ˜ç¢ºå€åˆ†é–‹ä¾†ï¼Œ
-   ä»£è¡¨ã€Œé€™æ˜¯è­·ç›¾æ‰›ä¸‹ä¾†çš„é‡ï¼Œä¸æ˜¯çœŸçš„æ‰£è¡€ã€ã€‚
-*/
-function showShieldAbsorb(characterIndex,absorbed){
-
-    if(!absorbed || absorbed<=0){
-        return;
-    }
-
-    const element =
-        $("battlePlayerCard"+
-            (characterIndex||0)
-        );
-
-    if(!element){
-        return;
-    }
-
-    showDamagePopup(
-        element,
-        "-"+absorbed,
-        "shield"
-    );
-
-}
-
-
-function showMonsterHit(index,amount,type,isCrit){
-    const element=$("battleMonster"+index);
-    if(!element||amount===undefined||amount===null){ return; }
-
-    const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
-    const settlement=type==="hp"&&bossOwner&&typeof bossOwner.consumeDamageSettlement==="function"
-        ?bossOwner.consumeDamageSettlement(index):null;
-
-    if(settlement){
-        if(settlement.shieldAbsorbed>0){
-            showDamagePopup(element,"-"+settlement.shieldAbsorbed,"shield",false);
-        }
-        if(settlement.hpDamage>0){
-            showDamagePopup(element,"-"+settlement.hpDamage+"HP","hp",isCrit);
-        }
-        return;
-    }
-
-    const prefix=type==="heal"?"+":"-";
-    showDamagePopup(
-        element,
-        prefix+amount+(type==="sp"?"SP":"HP"),
-        type,
-        isCrit
-    );
-}
-
-
-/* =====================================================
-   æ€ªç‰©é‡ç”Ÿ
-===================================================== */
-
-function respawnMonsters(){
-
-    if(battleActive){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™è£¡ä¸åˆ†é’ç´…çš‚ç™½ï¼Œ
-       æ¯æ¬¡éƒ½æŠŠå…¨éƒ¨6éš»æ€ªç‰©é‡ç½®ä½ç½®ï¼‹å›æ»¿è¡€ï¼Œ
-       ç¾åœ¨æˆ°é¬¥åªæœƒæ²å…¥1~3éš»ï¼Œ
-       å…¶é¤˜æ²’æ­»çš„æ€ªç‰©ä¸æ‡‰è©²è¢«å‹•åˆ°
-       ï¼ˆä¸ç„¶æ²’æ­»çš„æ€ªç‰©ä¹Ÿæœƒæ¯æ¬¡æˆ°é¬¥å¾Œçªç„¶è·³ä½ç½®ï¼‰ã€‚
-       æ”¹æˆåªè™•ç†ã€ŒçœŸçš„å·²ç¶“æ­»äº¡ã€çš„æ€ªç‰©ã€‚
-    */
-
-    monsters
-    .slice(
-        0,
-        MAX_TRAINING_MONSTERS
-    )
-    .forEach(
-        (monster,index)=>{
-
-            if(
-                !monster ||
-                monster.alive
-            ){
-                return;
-            }
-
-
-            monster.alive=true;
-
-            monster.hp =
-                monster.maxHP;
-
-            monster.sp =
-                monster.maxSP;
-
-
-            /*
-               â˜… ä¿®æ­£ï¼ˆæ¸…ç†æ®˜ç•™ç¨‹å¼ç¢¼ï¼‰ï¼š
-               é€™è£¡åŸæœ¬é‚„åœ¨é‡æ–°è¨ˆç®—æ€ªç‰©çš„x/yåº§æ¨™ã€
-               æ›´æ–°åœ°åœ–åœ–ç¤ºçš„ä½ç½®ï¼Œä½†æ€ªç‰©å·²ç¶“
-               ä¸å†å·¡é‚ã€åœ–ç¤ºä¹Ÿæ•´å€‹éš±è—äº†ï¼Œ
-               é€™æ®µå®Œå…¨ç”¨ä¸åˆ°äº†ï¼Œæ‹¿æ‰ã€‚
-               æ–°å€åŸŸï¼ˆå†°éœœå±±è„ˆä¹‹å¾Œï¼‰çš„æ€ªç‰©è³‡æ–™
-               æœ¬ä¾†å°±æ²’æœ‰x/yé€™å…©å€‹æ¬„ä½ï¼Œ
-               ç•™è‘—é€™æ®µå°å®ƒå€‘ä¾†èªªåªæœƒç®—å‡º
-               æ²’æœ‰æ„ç¾©çš„NaNï¼Œæ¸…æ‰æ¯”è¼ƒä¹¾æ·¨ã€‚
-            */
-
-        }
-    );
-
-}
-
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œé€™æ¬¡çœŸçš„çµ±ä¸€æ‰äº†ï¼‰ï¼š
-   é€™è£¡ä¹‹å‰å·²ç¶“è¢«æ”¹æˆã€Œé€²å…¥åœ°åœ–å°±è‡ªå‹•æ¯4ç§’
-   è§¸ç™¼ä¸€æ¬¡æˆ°é¬¥ã€ï¼Œä½†ä½¿ç”¨è€…é€™æ¬¡æ˜ç¢ºè¦æ±‚ï¼š
-   é€²å…¥åœ°åœ–å¾Œå¿…é ˆå…ˆæŒ‰ã€Œè‡ªå‹•å·¡æ€ªã€æŒ‰éˆ•ï¼Œ
-   æ‰æœƒé–‹å§‹æ¯4ç§’è‡ªå‹•æˆ°é¬¥â€”â€”é€™æ­£æ˜¯å¾Œä¾†
-   åœ¨toggleAutoPatrol()/runAutoPatrolCheck()
-   ï¼ˆåœ°åœ–é é¢è‡ªå‹•æˆ°é¬¥é¢æ¿æ—é‚Šé‚£é¡†æ–°æŒ‰éˆ•ï¼‰
-   åšçš„äº‹ï¼Œå…©å¥—é‚è¼¯åšçš„æ˜¯åŒä¸€ä»¶äº‹ï¼Œå»å„è‡ª
-   ç¨ç«‹é‹ä½œã€äº’ä¸çŸ¥é“å°æ–¹å­˜åœ¨ï¼Œæ‰æœƒå‡ºç¾
-   ã€Œè‡ªå‹•å·¡æ€ªéƒ½é‚„æ²’æŒ‰ï¼Œå°±è‡ªå·±æ‰“èµ·ä¾†ã€
-   é€™ç¨®è¡Œç‚ºâ€”â€”å› ç‚ºçœŸæ­£åœ¨èƒŒæ™¯é‹ä½œçš„å…¶å¯¦æ˜¯
-   é€™è£¡é€™å¥—ã€Œé€²åœ°åœ–å°±è‡ªå‹•é–‹å§‹ã€çš„èˆŠé‚è¼¯ï¼Œ
-   è·Ÿä½¿ç”¨è€…æŒ‰çš„é‚£é¡†æŒ‰éˆ•å®Œå…¨ç„¡é—œã€‚
-
-   å‡½å¼åç¨±ã€å‘¼å«çš„åœ°æ–¹ï¼ˆenterZone()ã€
-   winBattle()ä¹‹å¾Œã€é€ƒè„«æˆåŠŸä¹‹å¾Œâ€¦ï¼‰éƒ½ç¶­æŒ
-   ä¸å‹•ï¼Œä½†å‡½å¼æœ¬é«”æ”¹æˆç©ºçš„â€”â€”ç¾åœ¨
-   ã€Œè¦ä¸è¦æ¯4ç§’è‡ªå‹•æˆ°é¬¥ã€å”¯ä¸€çš„é–‹é—œæ˜¯
-   toggleAutoPatrol()é‚£é¡†æŒ‰éˆ•ï¼Œä¸æœƒå†æœ‰
-   é€²åœ°åœ–å°±è‡ªå‹•è§¸ç™¼çš„è¡Œç‚ºã€‚
-*/
-
-function startMonsterMovement(){
-
-    /*
-       æ•…æ„ç•™ç©ºï¼šè‡ªå‹•å·¡æ€ªçš„é–‹é—œåªäº¤çµ¦
-       toggleAutoPatrol()è™•ç†ï¼Œé€™è£¡ä¸å†
-       è‡ªå‹•å•Ÿå‹•ä»»ä½•è¨ˆæ™‚å™¨ã€‚
-    */
-
-}
-
-
-function stopMonsterMovement(){
-
-    /*
-       æ•…æ„ç•™ç©ºï¼ŒåŸå› åŒä¸Šâ€”â€”çœŸæ­£çš„åœæ­¢é‚è¼¯
-       åœ¨stopAutoPatrol()ï¼Œå‘¼å«é€™è£¡ä¸æœƒ
-       æœ‰ä»»ä½•ä½œç”¨ï¼Œç´”ç²¹æ˜¯ç‚ºäº†è®“èˆŠçš„å‘¼å«é»
-       ï¼ˆleaveMap()ã€startBattle()â€¦ï¼‰
-       ä¸ç”¨ä¸€å€‹ä¸€å€‹æ”¹æ‰ã€ä¸æœƒå™´éŒ¯ã€‚
-    */
-
-}
-
-
-/* =====================================================
-   å‡ç´š
-===================================================== */
-
-function checkLevelUp(targetCharacter){
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™æ•´å€‹å‡½å¼å¯«æ­»åªèªplayerï¼Œ
-       ç¬¬äºŒè§’è‰²æ²’è¾¦æ³•é€éé€™è£¡å‡ç´šã€‚
-       æ”¹æˆå¯ä»¥å‚³å…¥è¦å‡ç´šçš„è§’è‰²ç‰©ä»¶ï¼Œ
-       ä¸å‚³çš„è©±é è¨­é‚„æ˜¯player
-       ï¼ˆä¿ç•™èˆŠçš„å‘¼å«æ–¹å¼ç›¸å®¹ï¼‰ã€‚
-    */
-
-    const character=
-        targetCharacter||
-        player;
-
-
-    let levels=0;
-
-
-    /*
-       â˜… æ–°å¢é˜²å‘†ï¼š
-       æ­£å¸¸æƒ…æ³ä¸‹é€™å€‹whileæœ€å¤šè·‘1æ¬¡
-       ï¼ˆdistributeExpToCharacteræ¯æ¬¡éƒ½åªçµ¦
-       å‰›å¥½1ç´šçš„é‡ï¼‰ï¼Œ
-       ä½†é‚„æ˜¯åŠ ä¸€å€‹ä¿éšªä¸Šé™ï¼Œ
-       é¿å…ä»»ä½•æˆ‘æ²’é æ–™åˆ°çš„è³‡æ–™ç•°å¸¸
-       ï¼ˆä¾‹å¦‚èˆŠå­˜æª”çš„expNextå£æ‰ï¼‰
-       å°è‡´é€™è£¡è·‘å‡ºé›¢è­œçš„è¿´åœˆæ¬¡æ•¸ï¼Œ
-       ä¸€æ¬¡çˆ†å¢å¹¾ç™¾ç´šã€çŒå‡ºå¤©æ–‡æ•¸å­—çš„æŠ€èƒ½é»ã€‚
-       200ç´šå°ç›®å‰éŠæˆ²é€²åº¦ä¾†èªªå·²ç¶“éå¸¸å¤šï¼Œ
-       æ­£å¸¸ç©æ³•ä¸å¯èƒ½ä¸€æ¬¡è§¸ç™¼åˆ°é€™å€‹ä¸Šé™ã€‚
-    */
-
-    while(
-        character.exp>=
-        character.expNext &&
-        levels<200
-    ){
-
-        character.exp -=
-            character.expNext;
-
-
-        character.level++;
-
-
-        character.expNext =
-            Math.max(
-                character.expNext+1,
-                Math.floor(
-                    character.expNext*1.2
-                )
-            );
-
-
-        character.attributePoints += 5;
-
-        character.skillPoints += 2;
-
-
-        /*
-           â˜… è¦æ ¼è¦æ±‚ï¼š
-           å‡ç´šå›ºå®š +30 æœ€å¤§HPã€+10 æœ€å¤§SPï¼Œ
-           è·Ÿé«”è³ª/èƒ½é‡é…é»åŠ æˆåˆ†é–‹ç´¯åŠ ã€‚
-        */
-
-        character.bonusHP += 30;
-
-        character.bonusSP += 10;
-
-
-        levels++;
-
-    }
-
-
-    if(levels>0){
-
-        /*
-           â˜… ä¿®æ­£ï¼š
-           é€™è£¡è·Ÿä¹‹å‰æˆ°é¬¥å‹åˆ©è£œè¡€æ˜¯åŒä¸€ç¨®å•é¡Œâ€”â€”
-           å‡ç´šç•¶ä¸‹ç›´æ¥æŠŠHP/SPå¼·åˆ¶è£œæ»¿ï¼Œ
-           è·Ÿä½ è¨­å®šçš„ã€ŒHPä½æ–¼X%/SPä½æ–¼X%ã€
-           è‡ªå‹•è£œè—¥æ°´é–€æª»å®Œå…¨ç„¡é—œï¼Œ
-           é›£æ€ªä½ æœƒè¦ºå¾—ã€Œæ˜æ˜é‚„æ²’åˆ°é–€æª»ï¼Œ
-           å®ƒè‡ªå·±å°±è£œäº†ã€ã€‚
-
-           æ‹¿æ‰å¼·åˆ¶è£œæ»¿ï¼Œåªé‡æ–°è¨ˆç®—ä¸€æ¬¡
-           current hp/spçš„ä¸Šé™å¤¾ä½ï¼ˆé¿å…è¶…éæ–°çš„maxHP/maxSPï¼‰ï¼Œ
-           ä¸æœƒå¹³ç™½ç„¡æ•…è®Šæˆå…¨æ»¿ã€‚
-
-           player2æ²’æœ‰getMainCharacterStats()å¯ä»¥ç”¨
-           ï¼ˆé‚£å€‹å‡½å¼å¯«æ­»ç®—playerçš„ï¼‰ï¼Œ
-           æ”¹ç”¨è·ŸgetInventoryCharacterStats()
-           player2åˆ†æ”¯åŒä¸€å¥—å…¬å¼ç¾ç®—ä¸€æ¬¡ã€‚
-        */
-
-        let maxHP;
-
-        let maxSP;
-
-
-        if(character===player){
-
-            const stats =
-                getMainCharacterStats();
-
-
-            maxHP=
-                stats.maxHP;
-
-            maxSP=
-                stats.maxSP;
-
-        }
-        else{
-
-            const characterIndex=
-                getPartyCharacterIndex(
-                    character
-                );
-
-
-            const bonus2 =
-                getEquipmentBonus(
-                    getPartyCharacterKey(
-                        characterIndex
-                    )
-                );
-
-
-            maxHP=
-                100+
-                character.vitality*50+
-                character.bonusHP+
-                bonus2.maxHP+
-                bonus2.vitality*50;
-
-
-            maxSP=
-                50+
-                character.energy*15+
-                character.bonusSP+
-                bonus2.maxSP+
-                bonus2.energy*15;
-
-        }
-
-
-        character.hp =
-            Math.min(
-                character.hp,
-                maxHP
-            );
-
-
-        character.sp =
-            Math.min(
-                character.sp,
-                maxSP
-            );
-
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œç¶“é©—å€¼
-           åˆ†é…å‡ç´šçš„æ™‚å€™ï¼Œç›´æ¥é»é¸å°±å¥½ï¼Œ
-           ä¸è¦å†è·³å‡ºè¦–çª—é¡¯ç¤ºå‘ŠçŸ¥ã€ï¼Œå¾ŒçºŒ
-           åˆè£œå……ã€Œå¸Œæœ›å‡ç´šçš„æ™‚å€™å¯ä»¥è·³å‡º
-           ä¸€å€‹è¨Šæ¯æ¡†ï¼Œé¡¯ç¤ºXXXå‡åˆ°XXç´šã€ï¼‰ï¼š
-           checkLevelUp()ç›®å‰åªæœ‰ä¸€å€‹å‘¼å«
-           ä¾†æºâ€”â€”distributeExpToCharacter()
-           ï¼ˆç¶“é©—æ± åˆ†é…é é¢æŒ‰ã€Œåˆ†é…ç¶“é©—å€¼çµ¦
-           Xã€é‚£å€‹æŒ‰éˆ•ï¼‰ï¼Œæ‰€ä»¥é€™è£¡çš„ä¿®æ”¹
-           åªå½±éŸ¿é€™å€‹æµç¨‹ï¼Œä¸æœƒèª¤å‚·å…¶ä»–
-           æƒ…å¢ƒã€‚
-
-           åŸæœ¬å‡ç´šç•¶ä¸‹æœƒå¼·åˆ¶è·³å‡ºä¸€å€‹è¦
-           æ‰‹å‹•æŒ‰ã€Œç¢ºå®šã€æ‰èƒ½é—œæ‰çš„
-           levelModalå½ˆçª—ï¼Œç©å®¶è‡ªå·±ä¸»å‹•
-           é»åˆ†é…ã€æœŸå¾…çš„å°±æ˜¯ã€Œé»ä¸‹å»é¦¬ä¸Š
-           ç”Ÿæ•ˆã€ï¼Œä¸éœ€è¦é¡å¤–å†è·³ä¸€å±¤
-           ç¢ºèª/å‘ŠçŸ¥è¦–çª—æ‰èƒ½ç¹¼çºŒæ“ä½œâ€”â€”
-           é€™éƒ¨åˆ†ç¶­æŒæ‹¿æ‰ã€‚
-
-           ä½†ç©å®¶å¾Œä¾†æ˜ç¢ºè¡¨ç¤ºé‚„æ˜¯æƒ³è¦ã€Œæœ‰
-           å‘ŠçŸ¥ã€ï¼Œåªæ˜¯ä¸è¦é‚£ç¨®è¦æŒ‰ç¢ºå®šçš„
-           å½¢å¼ï¼Œæ”¹æˆè·Ÿç²å¾—EXPåŒä¸€ç¨®è¼•é‡
-           toasté€šçŸ¥ï¼ˆè¦‹showLevelUpToast()ï¼‰ï¼Œ
-           ä¸æ“‹æ“ä½œã€çœ‹éå°±è‡ªå‹•æ¶ˆå¤±ã€‚
-
-           levelModalé€™å€‹å½ˆå‡ºè¦–çª—æœ¬èº«ã€
-           closeLevelModal()éƒ½å…ˆä¿ç•™åœ¨
-           ç¨‹å¼ç¢¼è£¡æ²’åˆªï¼Œåªæ˜¯ä¸å†å¾é€™è£¡
-           è§¸ç™¼é¡¯ç¤ºã€‚
-        */
-
-        showLevelUpToast(
-            character===player
-            ?
-            (player.id||"ä½ ")
-            :
-            character.id,
-            character.level
-        );
-
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œã€ŒæŒ‰å‡ç´šçš„
-       æ™‚å€™ï¼Œä¸Šé¢é ­åƒæ¡†çš„ç­‰ç´šæ²’æœ‰è·Ÿè‘—
-       å¢åŠ ã€ï¼‰ï¼š
-       ä¸ç®¡æœ‰æ²’æœ‰çœŸçš„å‡ç´šï¼ˆlevels>0ï¼‰ï¼Œ
-       éƒ½å‘¼å«ä¸€æ¬¡ï¼Œé †ä¾¿åŒæ­¥å¥½ç›®å‰çš„ç­‰ç´š
-       æ•¸å­—ï¼Œæˆæœ¬å¾ˆä½ï¼ˆæ‰¾ä¸åˆ°å…ƒç´ å°±ç›´æ¥
-       returnï¼‰ï¼Œæ²’æœ‰å‰¯ä½œç”¨ã€‚
-    */
-
-    refreshCharacterAvatarLevels();
-
-
-    saveGame();
-
-    updateUI();
-
-}
-
-
-function closeLevelModal(){
-
-    $("levelModal")
-        .classList
-        .remove("show");
-
-}
-
-
-/* =====================================================
-   â˜… ç¶“é©—æ± åˆ†é…
-=====================================================
-
-   è¦æ ¼äº”ã€å…­ï¼š
-   EXPå…ˆé€²å…¥å…±ç”¨ç¶“é©—æ± ï¼Œ
-   ä¸æœƒæˆ°é¬¥ä¸€çµæŸå°±è‡ªå‹•å‡ç´šã€‚
-   ç©å®¶å›åˆ°ä¸»åŸå¾Œï¼Œè‡ªè¡ŒæŒ‰ã€Œåˆ†é…ç¶“é©—å€¼ã€
-   æŠŠç¶“é©—æ± çš„EXPåˆ†çµ¦è§’è‰²ï¼Œ
-   æ‰æœƒçœŸæ­£è§¸ç™¼å‡ç´šåˆ¤å®šã€‚
-
-   ç›®å‰éŠæˆ²è£¡å”¯ä¸€æ“æœ‰å®Œæ•´ç­‰ç´š/å±¬æ€§ç³»çµ±çš„
-   è§’è‰²æ˜¯ä¸»è§’ï¼ˆplayerï¼Œä¹Ÿå°±æ˜¯å‰µè§’æ™‚é¸çš„å…ƒç´ ï¼‰ã€‚
-   æ°´æˆ°å£«ï¼é¢¨å¼“æ‰‹ç›®å‰åªæœ‰è£å‚™æ¬„ï¼Œ
-   å°šæœªæœ‰ç¨ç«‹ç­‰ç´šç³»çµ±
-   ï¼ˆè¦æ ¼äºŒæœ‰è¨»æ˜ã€Œå¤šè§’è‰²åŒæ™‚æˆ°é¬¥ã€æ˜¯æœªä¾†åŠŸèƒ½ï¼‰ï¼Œ
-   æ‰€ä»¥åˆ†é…æŒ‰éˆ•å…ˆåªé–‹æ”¾çµ¦ä¸»è§’ï¼Œ
-   å…¶é¤˜è§’è‰²é¡¯ç¤ºã€Œå°šæœªé–‹æ”¾ã€ã€‚
-
-===================================================== */
-
-let expToastTimer=null;
-
-
-function showExpToast(amount){
-
-    const toast =
-        $("expToast");
-
-
-    if(!toast){
-        return;
-    }
-
-
-    toast.textContent =
-        "ç²å¾—"+
-        amount+
-        "EXPï¼ˆå·²å­˜å…¥ç¶“é©—æ± ï¼‰";
-
-
-    toast.classList.add(
-        "show"
-    );
-
-
-    clearTimeout(
-        expToastTimer
-    );
-
-
-    expToastTimer =
-        setTimeout(()=>{
-
-            toast.classList.remove(
-                "show"
-            );
-
-        },2600);
-
-}
-
-
-let levelUpToastTimer=null;
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œå‡ç´šçš„æ™‚å€™
-   å¯ä»¥è·³å‡ºä¸€å€‹è¨Šæ¯æ¡†ï¼Œé¡¯ç¤ºXXXå‡åˆ°XXç´šã€ï¼‰ï¼š
-   è·ŸshowExpToast()åŒä¸€å¥—å¯«æ³•ï¼Œéé˜»æ–·ã€
-   è‡ªå‹•æ¶ˆå¤±ï¼Œä¸éœ€è¦ç©å®¶æŒ‰ç¢ºå®šã€‚
-*/
-
-function showLevelUpToast(characterName,level){
-
-    const toast=
-        $("levelUpToast");
-
-
-    if(!toast){
-        return;
-    }
-
-
-    toast.textContent=
-        characterName+
-        "å‡åˆ°"+
-        level+
-        "ç´šï¼";
-
-
-    toast.classList.add(
-        "show"
-    );
-
-
-    clearTimeout(
-        levelUpToastTimer
-    );
-
-
-    levelUpToastTimer=
-        setTimeout(()=>{
-
-            toast.classList.remove(
-                "show"
-            );
-
-        },2600);
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œã€ŒæŒ‰å‡ç´šçš„
-   æ™‚å€™ï¼Œä¸Šé¢é ­åƒæ¡†çš„ç­‰ç´šæ²’æœ‰è·Ÿè‘—å¢åŠ ã€ï¼‰ï¼š
-   åªæ›´æ–°è§’è‰²å½ˆçª—é ­åƒé‚£å…©å€‹ç­‰ç´šæ–‡å­—ï¼Œ
-   ä¸é‡ç•«æ•´å€‹å½ˆçª—å…§å®¹ï¼ˆé‡ç•«æ•´å€‹å½ˆçª—
-   innerHTMLæœƒæŠŠç©å®¶æ­£åœ¨çœ‹çš„åˆ†é â€”â€”
-   ä¾‹å¦‚ç¶“é©—æ± åˆ†é…æœ¬èº«â€”â€”ä¸€èµ·æ´—æ‰ï¼Œ
-   ä¹‹å‰è™•ç†ã€Œè‡ªå‹•æˆ°é¬¥è¨­å®šè·³å‡ºç©ºç™½
-   æŠ€èƒ½é ã€å°±æ˜¯åŒä¸€ç¨®bugï¼Œé€™è£¡æ”¹ç”¨
-   é‡å°æ€§æ›´æ–°ï¼Œå®‰å…¨å¾ˆå¤šï¼‰ã€‚
-
-   è§’è‰²å½ˆçª—æ²’é–‹è‘—çš„æ™‚å€™ï¼Œ$()æœƒæ‰¾ä¸åˆ°
-   å°æ‡‰idã€ç›´æ¥returnï¼Œå‘¼å«é€™å€‹å‡½å¼
-   ä¸æœƒå‡ºéŒ¯ï¼Œå¯ä»¥æ”¾å¿ƒåœ¨checkLevelUp()
-   è£¡ç„¡æ¢ä»¶å‘¼å«ã€‚
-*/
-
-function refreshCharacterAvatarLevels(){
-    getExistingPartyIndexes().forEach(index=>{
-        const levelEl=$("characterAvatarLevel"+index);
-        const character=getPartyCharacterByIndex(index);
-        if(levelEl && character){
-            levelEl.textContent="Lv."+character.level;
-        }
-    });
-
-}
-
-
-/* =====================================================
-   â˜… ä¸»åŸä¼‘æ¯ï¼ˆå…è²»å›æ»¿HP/SPï¼‰
-
-   ä¹‹å‰æŠŠã€Œæˆ°é¬¥å‹åˆ©/å‡ç´šè‡ªå‹•è£œæ»¿HPã€SPã€æ‹¿æ‰ä¹‹å¾Œï¼Œ
-   è—¥æ°´ç”¨å®Œå°±æ²’æœ‰å…¶ä»–å›è¡€æ‰‹æ®µäº†ï¼Œ
-   éŠæˆ²è£¡ç›®å‰ä¹Ÿé‚„æ²’æœ‰çœŸæ­£çš„å•†åº—/é‡‘å¹£ç³»çµ±
-   å¯ä»¥è²·æ–°è—¥æ°´ï¼ˆã€Œé‡‘å¹£ã€ç›®å‰åªæ˜¯èƒŒåŒ…å”®å‡ºæ™‚çš„é¡¯ç¤ºæ–‡å­—ï¼Œ
-   æ²’æœ‰çœŸçš„è¢«è¨˜éŒ„ã€ä¹Ÿæ²’åœ°æ–¹èŠ±ï¼‰ã€‚
-
-   å…ˆç”¨æœ€å–®ç´”çš„æ–¹å¼è£œä¸Šé€™å€‹ç¼ºå£ï¼š
-   å›ä¸»åŸå¯ä»¥å…è²»ä¼‘æ¯ï¼Œç›´æ¥å›æ»¿HP/SPï¼Œ
-   ä¸éœ€è¦è—¥æ°´ã€ä¸éœ€è¦é‡‘å¹£ã€‚
-   ä¹‹å¾Œå¦‚æœè¦åšçœŸæ­£çš„å•†åº—ç³»çµ±ï¼Œ
-   é€™å€‹å‡½å¼å¯ä»¥å†æ“´å……æˆ–æ›¿æ›æ‰ã€‚
-===================================================== */
-
-/* =====================================================
-   â˜… ä¸»åŸç´”æ–‡å­—é¸å–®â€”â€”å…±ç”¨å½ˆå‡ºè¦–çª—
-===================================================== */
-
-let homeFeatureBorrowedElement=
-    null;
-
-let homeFeatureBorrowedParent=
-    null;
-
-let homeFeatureBorrowedNextSibling=
-    null;
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œè§’è‰²è¦–çª—éš±è—
-   å€Ÿé€²ä¾†é é¢è£¡å¤šé¤˜çš„ç®­é ­åˆ‡æ›å€å¡Šï¼‰ï¼š
-   è¨˜ä½é€™æ¬¡å€Ÿé é¢é€²ä¾†æ™‚ï¼Œé †æ‰‹éš±è—äº†å“ªä¸€å€‹
-   ã€Œâ—€è§’è‰²åâ–¶ã€çš„å€å¡Šï¼ŒrestoreBorrowedElement()
-   æ­¸ä½æ™‚è¦è² è²¬æŠŠå®ƒçš„é¡¯ç¤ºç‹€æ…‹æ¢å¾©å›ä¾†ï¼Œ
-   ä¸ç„¶åˆ‡èµ°ä¹‹å¾Œï¼Œé‚£å€‹é é¢å–®ç¨è¢«ä½¿ç”¨æ™‚
-   ï¼ˆä¾‹å¦‚ä¹‹å¾Œå¯èƒ½é‚„æœ‰å…¶ä»–å€Ÿç”¨å ´æ™¯ï¼‰æœƒ
-   ä¸€ç›´ç¶­æŒéš±è—ã€æ‰¾ä¸å›ä¾†ã€‚
-*/
-
-let homeFeatureHiddenSwitchCard=
-    null;
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œä¸»åŸç«‹ç¹ªéš¨æ©Ÿ
-   åˆ‡æ›ï¼‰ï¼šå…©å¼µåœ–base64å…§åµŒï¼Œæ¯æ¬¡é€²å…¥ä¸»åŸ
-   é é¢æ™‚ï¼ˆshowPage()è£¡å‘¼å«ï¼Œè¦‹ä¸‹é¢
-   showHomePortrait()çš„å‘¼å«é»ï¼‰éš¨æ©ŸæŒ‘ä¸€å¼µ
-   é¡¯ç¤ºï¼Œä¸æ˜¯æˆ°é¬¥ç”¨çš„è§’è‰²å¡ç‰‡åœ–ï¼Œæ˜¯é¡å¤–
-   æº–å‚™çš„ç«‹ç¹ªã€‚
-*/
-
-/* =====================================================
-   V89 â€” ä»»å‹™ä»‹é¢å°ˆç”¨æ‰‹å‹¢æ¨¡å¼
-   ä»»å‹™ä½¿ç”¨ #questTabBody ä½œç‚ºå”¯ä¸€å…§å±¤ scroll ownerã€‚
-   éŠæˆ²æœ€å¤–å±¤åŸæœ¬ touch-action:noneï¼Œå› æ­¤åªåœ¨ä»»å‹™è¦–çª—
-   é–‹å•ŸæœŸé–“æ”¾è¡Œ pan-yï¼›ä¸æ–°å¢ touch/pointer listenerã€‚
-===================================================== */
-function setQuestTouchMode(active){
-
-    [
-        document.documentElement,
-        document.body,
-        document.getElementById("game-viewport"),
-        document.getElementById("game-stage")
-    ].forEach(function(element){
-
-        if(!element){
-            return;
-        }
-
-        element.classList.toggle(
-            "quest-scroll-active",
-            !!active
-        );
-
-    });
-
-}
-
-
-function openHomeFeature(type){
-
-    const modal=
-        $("homeFeatureModal");
-
-    const titleEl=
-        $("homeFeatureModalTitle");
-
-    const bodyEl=
-        $("homeFeatureModalBody");
-
-
-    if(
-        !modal ||
-        !titleEl ||
-        !bodyEl
-    ){
-        return;
-    }
-
-
-    closeHomeFeature();
-
-
-    if(type==="rest"){
-
-        titleEl.textContent=
-            "ä¸»åŸä¼‘æ¯";
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œã€Œå·¡æ€ª
-           é é¢æŒ‰è‡ªå‹•æˆ°é¬¥è·³å‡ºç©ºç™½æŠ€èƒ½é é¢ã€ï¼Œ
-           è¿½æŸ¥å¾Œç™¼ç¾åŒä¸€å€‹bugå…¶å¯¦å½±éŸ¿ä¸‰å€‹
-           åœ°æ–¹ï¼Œé€™è£¡é †ä¾¿ä¸€èµ·ä¿®æ‰ï¼‰ï¼š
-           é€™å€‹åˆ†æ”¯åªå‘¼å«borrowElementIntoModal()
-           æŠŠhomeRestCardå€Ÿé€²ä¾†ï¼Œå¾ä¾†æ²’æœ‰
-           æ¸…ç©ºébodyElæœ¬èº«çš„innerHTMLã€‚
-           å¦‚æœã€Œä¸Šä¸€æ¬¡ã€é–‹çš„æ˜¯ç”¨innerHTML=
-           æ•´æ®µè“‹æ‰çš„é¡å‹ï¼ˆä¾‹å¦‚ã€Œè§’è‰²ã€â€”â€”
-           è£¡é¢æœ‰é ­åƒåˆ‡æ›åˆ—ã€åˆ†é æŒ‰éˆ•ã€
-           characterTabContentï¼‰ï¼Œé‚£äº›æ®˜ç•™
-           HTMLæœƒä¸€ç›´ç•™åœ¨bodyElè£¡ï¼Œé€™æ¬¡å€Ÿä¾†
-           çš„å…§å®¹åªæ˜¯ã€ŒåŠ ã€åœ¨å¾Œé¢ï¼Œä¸æ˜¯
-           ã€Œå–ä»£ã€ï¼Œç©å®¶æœƒçœ‹åˆ°ä¸Šä¸€æ¬¡çš„èˆŠ
-           ç•«é¢å¡åœ¨æœ€ä¸Šé¢ã€æ–°å…§å®¹è¢«æ¨åˆ°
-           ä¸‹é¢çœ‹ä¸åˆ°ï¼ˆè¦æ»¾å‹•å¾ˆå¤šæ‰çœ‹å¾—åˆ°ï¼Œ
-           ç”šè‡³çœ‹èµ·ä¾†åƒæ•´å€‹ç©ºç™½ï¼Œå› ç‚ºè§’è‰²
-           é é‚£å€‹characterTabContentæœ¬èº«
-           å› ç‚ºã€Œåˆ†é é«˜åº¦è¦ä¸€è‡´ã€çš„éœ€æ±‚ï¼Œ
-           ä¿ç•™äº†ä¸€å€‹å›ºå®šçš„min-heightï¼Œ
-           ç©ºè‘—çš„æ™‚å€™çœ‹èµ·ä¾†å°±æ˜¯ä¸€å¤§å¡Š
-           ç©ºç™½æ¡†æ¡†ï¼‰ã€‚
-
-           ä¿®æ³•ï¼šè·Ÿå…¶ä»–ç”¨innerHTML=æ•´æ®µè“‹æ‰
-           çš„åˆ†æ”¯ä¸€æ¨£ï¼Œå…ˆæ¸…ç©ºbodyElï¼Œä¿è­‰
-           æ¯æ¬¡é–‹è¦–çª—éƒ½æ˜¯ä¹¾æ·¨çš„èµ·é»ï¼Œä¸ç®¡
-           ä¸Šä¸€æ¬¡é–‹çš„æ˜¯ä»€éº¼é¡å‹ã€‚
-        */
-
-        bodyEl.innerHTML=
-            "";
-
-        borrowElementIntoModal(
-            $("homeRestCard"),
-            bodyEl
-        );
-
-    }
-    else if(type==="expPool"){
-
-        titleEl.textContent=
-            "ç¶“é©—æ± åˆ†é…";
-
-        /*
-           â˜… ä¿®æ­£ï¼šè·Ÿä¸Šé¢ã€Œä¸»åŸä¼‘æ¯ã€åŒä¸€å€‹
-           bugã€åŒä¸€å€‹ä¿®æ³•ï¼Œå…ˆæ¸…ç©ºbodyElã€‚
-        */
-
-        bodyEl.innerHTML=
-            "";
-
-        borrowElementIntoModal(
-            $("homeExpPoolCard"),
-            bodyEl
-        );
-
-    }
-    else if(type==="shop"){
-
-        titleEl.textContent=
-            "å•†åº—";
-
-        bodyEl.innerHTML=
-            renderShopContent();
-
-    }
-    else if(type==="character"){
-
-        titleEl.textContent=
-            "è§’è‰²";
-
-
-        /*
-           â˜… æ–°å¢ï¼šè§’è‰²é é¢å…§å®¹æ¯”è¼ƒå¤š
-           ï¼ˆå€Ÿé€²ä¾†çš„æ•´é å…§å®¹ï¼‰ï¼Œå¥—ç”¨åŠ å¯¬
-           æ¨£å¼ï¼ŒcloseHomeFeature()é—œé–‰æ™‚
-           æœƒè‡ªå‹•æ‹¿æ‰ï¼Œä¸å½±éŸ¿å…¶ä»–ä¸€èˆ¬å¤§å°
-           çš„è¦–çª—ã€‚
-        */
-
-        const box=
-
-            modal.querySelector(
-                ".home-feature-modal-box"
-            );
-
-
-        if(box){
-
-            box.classList.add(
-                "wide"
-            );
-
-        }
-
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œè¦–çª—è¦
-           æ”¾å¤§åˆ°æ¥è¿‘æ»¿ç‰ˆï¼‰ï¼šå…§å±¤è¦–çª—è®Šæˆ
-           100vwä¹‹å¾Œï¼Œå¤–å±¤é®ç½©ï¼ˆ.home-feature-
-           modalï¼‰æœ¬èº«é‚„æœ‰20pxçš„paddingï¼Œ
-           æœƒè®“å…§å±¤è¦–çª—è¶…å‡ºè¢å¹•ã€ç”¢ç”Ÿæ°´å¹³
-           æ²å‹•ã€‚é€™è£¡é †ä¾¿æŠŠå¤–å±¤é®ç½©çš„padding
-           ä¹Ÿæ”¶æ‰ï¼Œå…©å±¤ä¸€èµ·è™•ç†æ‰æœƒçœŸçš„è²¼é½Š
-           è¢å¹•é‚Šç·£ã€‚
-        */
-
-        modal.classList.add(
-            "no-padding"
-        );
-
-
-        bodyEl.innerHTML=
-            renderCharacterShowcaseContent();
-
-
-        /*
-           â˜… ä¿®æ­£ï¼šé è¨­ä¸€æ‰“é–‹å°±é¸ç¬¬ä¸€è§’è‰²ã€
-           é¡¯ç¤ºèƒ½åŠ›å€¼åˆ†é â€”â€”æ”¹å‘¼å«
-           selectCharacterForTabs(0)è€Œä¸æ˜¯
-           ç›´æ¥switchCharacterTab("status")ï¼Œ
-           é€™æ¨£ä¸‰å€‹é é¢çš„è§’è‰²ç‹€æ…‹å¾ä¸€é–‹å§‹
-           å°±æ˜¯åŒæ­¥çš„ï¼Œä¸ç”¨ç­‰ç©å®¶è‡ªå·±é»ä¸€æ¬¡
-           é ­åƒæ‰å°é½Šã€‚
-        */
-
-        selectCharacterForTabs(
-            0
-        );
-
-        switchCharacterTab(
-            "status"
-        );
-
-        if(window.syncCharacterTouchMode){
-            window.syncCharacterTouchMode();
-        }
-
-    }
-    else if(type==="formation"){
-        titleEl.textContent="ä½ˆé™£";
-        bodyEl.innerHTML=
-            typeof window.vFixedRenderAllyFormationContent==="function"
-            ? window.vFixedRenderAllyFormationContent()
-            : "";
-    }
-    else if(type==="offlineExp"){
-
-        titleEl.textContent=
-            "é›¢ç·šç¶“é©—";
-
-        bodyEl.innerHTML=
-            renderOfflineExpContent();
-
-    }
-    else if(type==="quest"){
-
-        titleEl.textContent=
-            "ä»»å‹™";
-
-        /*
-           V89ï¼šä»»å‹™ä¸å†æ²¿ç”¨å•†åº—çš„ä¸€èˆ¬ row/button ç‰ˆå‹ã€‚
-           åªåœ¨ä»»å‹™é–‹å•ŸæœŸé–“å¥—ç”¨å°ˆç”¨ modal çµæ§‹èˆ‡æ‰‹å‹¢æ¨¡å¼ã€‚
-        */
-        modal.classList.add(
-            "quest-mode"
-        );
-
-        setQuestTouchMode(
-            true
-        );
-
-        ensureDailyQuestsCurrent();
-
-        dailyQuestState.progress.checkin=
-            1;
-
-        bodyEl.innerHTML=
-            renderQuestTabContent(
-                "daily"
-            );
-
-    }
-    else if(type==="bestiary"){
-
-        titleEl.textContent=
-            "åœ–é‘‘";
-
-        bodyEl.innerHTML=
-            renderBestiaryContent();
-
-    }
-    else if(type==="achievement"){
-
-        titleEl.textContent=
-            "æˆå°±";
-
-        bodyEl.innerHTML=
-            renderAchievementContent();
-
-    }
-    else if(type==="announcement"){
-
-        titleEl.textContent=
-            "å…¬å‘Š";
-
-        bodyEl.innerHTML=
-            renderAnnouncementContent();
-
-    }
-    else if(type==="system"){
-
-        titleEl.textContent=
-            "ç³»çµ±";
-
-        bodyEl.innerHTML=
-            renderSystemContent();
-
-    }
-    else if(type==="autoBattleSettings"){
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œè‡ªå‹•
-           æˆ°é¬¥æ”¾é€²ä¸‹é¢å°è¦½åˆ—ï¼ŒæŒ‰ä¸‹å»è·³å‡º
-           è¨­å®šè¦–çª—ã€ï¼‰ï¼š
-           åŸæœ¬#autoBattleSettingsPanel
-           é‚£å¥—æ˜¯è‡ªå·±åœŸæ³•ç…‰é‹¼ç®—position:
-           fixedåº§æ¨™ã€å¦å¤–æ¬åˆ°document.body
-           åº•ä¸‹é¡¯ç¤ºï¼Œç‰½æ¶‰battlePageçš„
-           display:noneã€è¡Œå…§æ¨£å¼è¦†è“‹ç­‰
-           å¥½å¹¾å±¤å•é¡Œï¼ŒæŸ¥è­‰å¾Œå°±æ˜¯é€™ä¸€æ•´å¥—
-           è‡ªè¨‚å®šä½é‚è¼¯æœ¬èº«å®¹æ˜“åœ¨ã€Œä¸åœ¨
-           æˆ°é¬¥ä¸­ã€çš„æƒ…å¢ƒå‡ºéŒ¯ï¼Œæ‰æœƒæœ‰
-           ã€ŒæŒ‰ä¸‹å»æ²’åæ‡‰ã€çš„ç‹€æ³ã€‚
-
-           é€™è£¡ä¸ä¿®é‚£å¥—èˆŠé‚è¼¯ï¼Œè€Œæ˜¯ç›´æ¥
-           æ”¹ç”¨æ•´å€‹éŠæˆ²å…±ç”¨ã€å·²ç¶“é©—è­‰é
-           å¾ˆå¤šæ¬¡éƒ½æ­£å¸¸é‹ä½œçš„
-           openHomeFeature()å½ˆçª—ç³»çµ±â€”â€”
-           å€Ÿç”¨åŒä¸€å€‹#autoBattleSettingsPanel
-           ï¼ˆæ¬„ä½/ä¸‹æ‹‰é¸å–®å®Œå…¨ä¸ç”¨é‡åšï¼‰ï¼Œ
-           ä½†ç”¨borrowElementIntoModal()
-           å¡é€²é€™å€‹å½ˆçª—çš„bodyï¼Œè·Ÿã€Œä¼‘æ¯ã€
-           ã€Œç¶“é©—æ± åˆ†é…ã€ç”¨çš„æ˜¯åŒä¸€æ‹›ï¼Œ
-           ä¸å†éœ€è¦è‡ªå·±ç®—åº§æ¨™ã€è‡ªå·±ç®¡
-           z-indexã€‚
-        */
-
-        titleEl.textContent=
-            "è‡ªå‹•æˆ°é¬¥è¨­å®š";
-
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œã€Œå·¡æ€ª
-           é é¢æŒ‰è‡ªå‹•æˆ°é¬¥è·³å‡ºç©ºç™½æŠ€èƒ½é é¢ã€ï¼‰ï¼š
-           çœŸæ­£åŸå› æ‰¾åˆ°äº†â€”â€”é€™å€‹åˆ†æ”¯å¾é ­åˆ°å°¾
-           åªç”¨borrowElementIntoModal()æŠŠ
-           autoBattleSettingsPanelå€Ÿé€²ä¾†ï¼Œ
-           å¾ä¾†æ²’æ¸…ç©ºébodyElæœ¬èº«çš„innerHTMLã€‚
-           å¦‚æœä¸Šä¸€æ¬¡é–‹çš„æ˜¯ã€Œè§’è‰²ã€ï¼ˆç”¨
-           innerHTML=æ•´æ®µè“‹æ‰ï¼Œè£¡é¢æœ‰é ­åƒ
-           åˆ‡æ›åˆ—ã€åˆ†é æŒ‰éˆ•ã€
-           characterTabContentï¼‰ï¼ŒcloseHomeFeature()
-           åªæœƒæŠŠã€Œå€Ÿèµ°çš„å­é é¢ã€ï¼ˆä¾‹å¦‚
-           skillPageï¼‰æ­¸ä½ï¼Œä¸¦ä¸æœƒæ¸…æ‰
-           bodyEl.innerHTMLæœ¬èº«é‚£å±¤â€”â€”é‚£å±¤
-           è§’è‰²é çš„å¤–æ®¼ï¼ˆé ­åƒ+åˆ†é æŒ‰éˆ•+
-           ä¸€å€‹å› ç‚ºã€Œåˆ†é è¦ç­‰é«˜ã€è€Œä¿ç•™
-           å›ºå®šé«˜åº¦çš„ç©ºcharacterTabContentï¼‰
-           æœƒä¸€ç›´å¡åœ¨bodyElè£¡ï¼Œé€™æ¬¡å€Ÿä¾†çš„
-           è¨­å®šé¢æ¿åªæ˜¯ã€ŒåŠ ã€åœ¨å®ƒå¾Œé¢ï¼Œ
-           ä¸æ˜¯ã€Œå–ä»£ã€å®ƒã€‚ç©å®¶çœ‹åˆ°çš„å°±æ˜¯
-           ä½¿ç”¨è€…æˆªåœ–é‚£æ¨£ï¼šä¸Šé¢é‚„æ˜¯è§’è‰²é çš„
-           åˆ†é æŒ‰éˆ•ï¼Œä¸‹é¢ä¸€å¤§å¡Šç©ºç™½ï¼ˆé‚£å€‹
-           ç©ºçš„characterTabContentï¼‰ï¼Œ
-           è¨­å®šé¢æ¿æœ¬èº«å…¶å¯¦é‚„åœ¨ï¼Œåªæ˜¯è¢«
-           æ¨åˆ°æ›´ä¸‹é¢ï¼Œç•«é¢ä¸Šå®Œå…¨çœ‹ä¸åˆ°ã€‚
-
-           è·Ÿã€Œä¸»åŸä¼‘æ¯ã€ã€Œç¶“é©—æ± åˆ†é…ã€
-           åŒä¸€å€‹bugã€åŒä¸€å€‹ä¿®æ³•ï¼šå…ˆæ¸…ç©º
-           bodyElï¼Œä¿è­‰æ¯æ¬¡é–‹è¦–çª—éƒ½æ˜¯ä¹¾æ·¨
-           èµ·é»ã€‚
-        */
-
-        bodyEl.innerHTML=
-            "";
-
-
-        const panel=
-            $("autoBattleSettingsPanel");
-
-
-        if(panel){
-
-            /*
-               â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œã€Œé€™äº›
-               æŒ‰éˆ•éƒ½æ²’åæ‡‰ã€ï¼‹ã€Œè¨­å®šé é¢é ä¸Šé¢
-               å¾ˆé†œã€ï¼‰ï¼š
-               çœŸæ­£çš„åŸå› æ‰¾åˆ°äº†â€”â€”ä¸Šé¢é€™æ®µåª
-               æ¸…æ‰ã€Œè¡Œå…§ã€å®šä½æ¨£å¼ï¼Œä½†
-               #autoBattleSettingsPanelé€™å€‹
-               å…ƒç´ æœ¬èº«çš„CSS class
-               ï¼ˆ.auto-settings-expandedï¼‰
-               å¯«æ­»äº†position:absoluteï¼›
-               top:0ï¼›left:0ï¼›right:0ï¼›
-               height:360pxï¼›z-index:98
-               ï¼ˆåŸæœ¬æ˜¯è¨­è¨ˆçµ¦battlePageè£¡
-               ã€Œè“‹åœ¨è§’è‰²å¡ç‰Œä¸Šé¢ã€é‚£ç¨®ç”¨æ³•ï¼‰ã€‚
-               è¡Œå…§æ¨£å¼æ¸…æˆ""ä¹‹å¾Œï¼Œç€è¦½å™¨æœƒ
-               fallbackå›é€™å€‹classæœ¬èº«çš„è¨­å®šï¼Œ
-               ç­‰æ–¼é¢æ¿é‚„æ˜¯position:absoluteï¼Œ
-               è€Œä¸”å› ç‚º.home-feature-modal-box
-               æ²’æœ‰è¨­positionï¼Œæœ€è¿‘çš„ã€Œå·²å®šä½
-               ç¥–å…ˆã€è®Šæˆ.home-feature-modal
-               æœ¬èº«ï¼ˆposition:fixed;inset:0ï¼‰ï¼Œ
-               é¢æ¿å°±æœƒæ•´å€‹è²¼é½Šé‚£å€‹å…¨è¢å¹•é®ç½©
-               çš„å·¦ä¸Šè§’â€”â€”é€™å°±æ˜¯ã€Œé ä¸Šé¢å¾ˆé†œã€
-               çš„åŸå› ï¼›åœ¨Samsung Browseré€™é¡
-               æ‰‹æ©Ÿç€è¦½å™¨ä¸Šï¼Œé€™ç¨®ã€Œposition:
-               absoluteé€ƒå‡ºé æœŸçš„æ’ç‰ˆä½ç½®ã€
-               é‚„å¸¸å¸¸ä¼´éš¨é»æ“Šåº§æ¨™å°ä¸æº–ï¼ˆå°¤å…¶
-               ç¶²å€åˆ—æ»‘å‡º/æ»‘å…¥ã€è¦–çª—é«˜åº¦æµ®å‹•
-               çš„æ™‚å€™ï¼‰ï¼Œé€™å°±æ˜¯ã€ŒæŒ‰éˆ•éƒ½æ²’åæ‡‰ã€
-               çš„åŸå› ã€‚
-
-               é€™è£¡ä¸èƒ½åªæ¸…è¡Œå…§æ¨£å¼ï¼Œè¦ã€Œæ˜ç¢º
-               è“‹æ‰ã€classæœ¬èº«çš„è¨­å®šï¼šæ”¹æˆ
-               position:staticã€height:autoï¼Œ
-               è®“é¢æ¿çœŸçš„å›åˆ°#homeFeatureModalBody
-               çš„æ­£å¸¸æ–‡ä»¶æµè£¡é¢ï¼Œè·Ÿã€Œä¼‘æ¯ã€
-               ã€Œç¶“é©—æ± åˆ†é…ã€é‚£äº›ä¸€æ¨£æ­£å¸¸é¡¯ç¤ºã€
-               æ­£å¸¸åƒå¾—åˆ°é»æ“Šäº‹ä»¶ã€‚
-            */
-
-            panel.style.position=
-                "static";
-
-            panel.style.top=
-                "";
-
-            panel.style.left=
-                "";
-
-            panel.style.right=
-                "";
-
-            panel.style.bottom=
-                "";
-
-            panel.style.height=
-                "auto";
-
-            panel.style.zIndex=
-                "";
-
-            panel.style.maxHeight=
-                "";
-
-            panel.classList.remove(
-                "floating-modal"
-            );
-
-
-            borrowElementIntoModal(
-                panel,
-                bodyEl
-            );
-
-
-            panel.style.display=
-                "flex";
-
-        }
-
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…æœ€æ–°è¦æ±‚ï¼Œã€Œç‚ºä»€éº¼æœ‰æ™‚å€™
-           è‡ªå‹•æˆ°é¬¥è¨­å®šé é¢å¾ˆç½®ä¸­ï¼Œæœ‰æ™‚å€™å¾ˆé ä¸‹é¢ï¼Œéƒ½æŠŠ
-           å®ƒå›ºå®šç½®ä¸­ï¼›æŠŠæ•´å€‹é é¢æ”¾å¤§è®“æ–‡å­—éƒ½èƒ½å¡é€²å»ï¼Œ
-           ä¸è¦è®“ä»–æ²å‹•ã€ï¼‰ï¼š
-           é€™è£¡åŸæœ¬ä¾ç…§æ›´æ—©ä¸€è¼ªçš„è¦æ±‚åŠ äº†dock-bottomæ¨£å¼
-           ï¼ˆæˆ°é¬¥ä¸­è®“è¦–çª—è²¼é½Šç•«é¢ä¸‹ç·£çš„æˆ°é¬¥è³‡è¨Šæ¡†ï¼‰ï¼Œé€™æ­£æ˜¯
-           ã€Œæœ‰æ™‚å€™ç½®ä¸­ã€æœ‰æ™‚å€™é ä¸‹é¢ã€çš„åŸå› â€”â€”æˆ°é¬¥ä¸­è²¼åº•ã€
-           ä¸åœ¨æˆ°é¬¥ä¸­ç½®ä¸­ï¼Œå…©ç¨®ç‹€æ…‹äº¤æ›¿å‡ºç¾ã€‚ä½¿ç”¨è€…ç¾åœ¨
-           æ˜ç¢ºè¦æ±‚ã€Œéƒ½å›ºå®šç½®ä¸­ã€ï¼Œæ”¹æˆå®Œå…¨ä¸å†åŠ dock-bottom
-           é€™å€‹classï¼Œä¸ç®¡åœ¨ä¸åœ¨æˆ°é¬¥ä¸­éƒ½ç¶­æŒ
-           .home-feature-modalé è¨­çš„ç½®ä¸­é¡¯ç¤ºã€‚
-
-           åŒæ™‚æŠŠè¦–çª—æœ¬èº«ï¼ˆ.home-feature-modal-boxï¼‰çš„
-           max-heightæ”¾å¯¬åˆ°96dvhï¼ˆåŸæœ¬æˆ°é¬¥ä¸­åªæœ‰80dvhï¼Œ
-           éæˆ°é¬¥ä¸­å·²ç¶“æ˜¯96dvhï¼Œé€™è£¡çµ±ä¸€æˆä¸åˆ†æƒ…å¢ƒéƒ½ç”¨
-           96dvhï¼‰ï¼Œç›¡é‡è®“å…§å®¹ä¸€æ¬¡å°±èƒ½å®Œæ•´é¡¯ç¤ºã€ä¸ç”¨æ²å‹•ã€‚
-        */
-
-        const settingsBox=
-            modal.querySelector(
-                ".home-feature-modal-box"
-            );
-
-
-        if(settingsBox){
-
-            settingsBox.style.setProperty(
-                "max-height",
-                "96dvh",
-                "important"
-            );
-
-        }
-
-
-        const characterSelect=
-            $("autoSettingsCharacterSelect");
-
-
-        if(characterSelect){
-
-            const option0=
-                $("autoSettingsCharOption0");
-
-
-            if(option0){
-
-                option0.textContent=
-
-                    player.id||
-                    "è§’è‰²1";
-
-            }
-
-
-            const option1=
-                $("autoSettingsCharOption1");
-
-
-            if(option1){
-
-                option1.textContent=
-
-                    player2
-                    ?
-                    player2.id
-                    :
-                    "è§’è‰²2ï¼ˆå°šæœªå‰µå»ºï¼‰";
-
-
-                option1.disabled=
-                    !player2;
-
-            }
-
-            const option2=
-                $("autoSettingsCharOption2");
-
-            if(option2){
-                option2.textContent=
-                    player3
-                    ? player3.id
-                    : "è§’è‰²3ï¼ˆå°šæœªå‰µå»ºï¼‰";
-                option2.disabled=!player3;
-            }
-
-
-            characterSelect.value="0";
-
-        }
-
-
-        switchAutoSettingsCharacter(
-            true
-        );
-
-    }
-
-
-    modal.classList.add(
-        "show"
-    );
-
-}
-
-
-function borrowElementIntoModal(
-    element,
-    bodyEl
-){
-
-    if(!element){
-        return;
-    }
-
-
-    homeFeatureBorrowedElement=
-        element;
-
-    homeFeatureBorrowedParent=
-        element.parentNode;
-
-    homeFeatureBorrowedNextSibling=
-        element.nextSibling;
-
-
-    bodyEl.appendChild(
-        element
-    );
-
-
-    element.style.display=
-        "block";
-
-}
-
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œè§’è‰²é é¢è¦èƒ½
-   åœ¨åŒä¸€å€‹è¦–çª—è£¡åˆ‡æ›åˆ†é ï¼‰ï¼š
-   æŠŠã€Œå€Ÿä¾†çš„å…ƒç´ æ­¸ä½ã€é€™æ®µé‚è¼¯æŠ½æˆç¨ç«‹
-   å‡½å¼ï¼ŒcloseHomeFeature()ï¼ˆæ•´å€‹é—œè¦–çª—ï¼‰
-   è·ŸswitchCharacterTab()ï¼ˆåªæ˜¯æ›ä¸€å€‹
-   åˆ†é ã€è¦–çª—é‚„é–‹è‘—ï¼‰éƒ½è¦ç”¨åˆ°åŒä¸€å¥—æ­¸ä½
-   é‚è¼¯ï¼Œä¸è¦é‡è¤‡å¯«å…©æ¬¡ã€‚
-*/
-
-function restoreBorrowedElement(){
-
-    /*
-       â˜… æ–°å¢ï¼šå…ˆæŠŠå¯èƒ½è¢«éš±è—çš„ç®­é ­åˆ‡æ›
-       å€å¡Šæ¢å¾©é¡¯ç¤ºï¼Œä¸ç®¡é€™æ¬¡å€Ÿçš„æ˜¯å“ªå€‹
-       é é¢ï¼Œéƒ½è¦å…ˆè™•ç†ï¼Œè·ŸhomeFeatureBorrowedElement
-       æ˜¯ä¸æ˜¯nullç„¡é—œï¼ˆç¨ç«‹çš„ä¸€ä»½ç‹€æ…‹ï¼‰ã€‚
-    */
-
-    if(homeFeatureHiddenSwitchCard){
-
-        homeFeatureHiddenSwitchCard.style.display=
-            "";
-
-
-        homeFeatureHiddenSwitchCard=
-            null;
-
-    }
-
-
-    if(!homeFeatureBorrowedElement){
-        return;
-    }
-
-
-    homeFeatureBorrowedElement.style.display=
-        "none";
-
-
-    if(
-        homeFeatureBorrowedNextSibling &&
-        homeFeatureBorrowedNextSibling.parentNode===
-        homeFeatureBorrowedParent
-    ){
-
-        homeFeatureBorrowedParent.insertBefore(
-            homeFeatureBorrowedElement,
-            homeFeatureBorrowedNextSibling
-        );
-
-    }
-    else if(homeFeatureBorrowedParent){
-
-        homeFeatureBorrowedParent.appendChild(
-            homeFeatureBorrowedElement
-        );
-
-    }
-
-
-    homeFeatureBorrowedElement=
-        null;
-
-    homeFeatureBorrowedParent=
-        null;
-
-    homeFeatureBorrowedNextSibling=
-        null;
-
-}
-
-
-function closeHomeFeature(){
-
-    const modal=
-        $("homeFeatureModal");
-
-
-    if(modal){
-
-        modal.classList.remove(
-            "show"
-        );
-
-
-        /*
-           â˜… æ–°å¢ï¼šé—œé–‰è¦–çª—æ™‚ï¼Œå¦‚æœå¥—ç”¨é
-           ã€Œè§’è‰²é é¢ç”¨çš„åŠ å¯¬æ¨£å¼ã€ï¼Œä¸€ä½µ
-           æ‹¿æ‰ï¼Œä¸æœƒå½±éŸ¿ä¸‹æ¬¡é–‹å•†åº—/ä»»å‹™
-           é€™ç¨®ä¸€èˆ¬å¤§å°çš„è¦–çª—ã€‚
-        */
-
-        const box=
-
-            modal.querySelector(
-                ".home-feature-modal-box"
-            );
-
-
-        if(box){
-
-            box.classList.remove(
-                "wide"
-            );
-
-        }
-
-
-        /*
-           â˜… æ–°å¢ï¼šè·Ÿä¸Šé¢åŠ wideæ˜¯åŒä¸€çµ„ï¼Œ
-           é—œé–‰è¦–çª—æ™‚å¤–å±¤é®ç½©çš„no-padding
-           ä¹Ÿè¦ä¸€ä½µæ‹¿æ‰ã€‚
-        */
-
-        modal.classList.remove(
-            "no-padding"
-        );
-
-
-        /*
-           â˜… æ–°å¢ï¼šè·Ÿno-paddingåŒä¸€çµ„æ”¶å°¾â€”â€”
-           è‡ªå‹•æˆ°é¬¥è¨­å®šè¦–çª—ç”¨çš„dock-bottom
-           ï¼ˆè²¼åº•é¡¯ç¤ºï¼‰ä¹Ÿè¦ä¸€ä½µæ‹¿æ‰ï¼Œä¸æœƒ
-           è®“ä¸‹æ¬¡é–‹å•†åº—/ä»»å‹™é€™ç¨®ä¸€èˆ¬ç½®ä¸­
-           è¦–çª—è¢«èª¤å¥—ç”¨è²¼åº•æ¨£å¼ã€‚
-        */
-
-        modal.classList.remove(
-            "dock-bottom"
-        );
-
-        /* V89ï¼šä»»å‹™å°ˆç”¨ç‰ˆå‹èˆ‡ç¥–å±¤ pan-y åªåœ¨ä»»å‹™é–‹å•Ÿæ™‚å­˜åœ¨ã€‚ */
-        modal.classList.remove(
-            "quest-mode"
-        );
-
-    }
-
-    setQuestTouchMode(
-        false
-    );
-
-
-    /*
-       â˜… æ–°å¢ï¼šè·Ÿwide/no-paddingæ˜¯åŒä¸€çµ„
-       æ”¶å°¾å‹•ä½œï¼Œé—œé–‰è¦–çª—æ™‚æŠŠï¼ŸæŒ‰éˆ•é‡ç½®å›
-       éš±è—ï¼Œé¿å…ä¸‹æ¬¡é–‹å•†åº—/ä»»å‹™é€™ç¨®ä¸€èˆ¬
-       è¦–çª—æ™‚æ®˜ç•™é¡¯ç¤ºã€‚
-    */
-
-    const helpBtn=
-        $("statusHelpButton");
-
-
-    if(helpBtn){
-
-        helpBtn.style.display=
-            "none";
-
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œã€Œè‡ªå‹•æˆ°é¬¥çš„æ¡†...å¥—ç”¨ä¸¦
-       æœŸå¾…æŒ‰éˆ•å†æˆ°é¬¥ä¸­æ ¹æœ¬æ²’æœ‰åæ‡‰ã€æ—é‚Šé‚£å¼µæˆªåœ–ï¼Œ
-       ã€Œå…¨å±¬æ€§æŠ€èƒ½é è¦½ã€æŒ‰éˆ•å‡ºç¾åœ¨è‡ªå‹•æˆ°é¬¥è¨­å®šè¦–çª—ä¸Šï¼‰ï¼š
-       è·Ÿä¸Šé¢statusHelpButtonåŒä¸€å€‹bugã€æ¼äº†åŒä¸€å€‹åœ°æ–¹
-       æ²’é‡ç½®â€”â€”skillPreviewHeaderButtonåªæœ‰åœ¨
-       switchCharacterTab()è£¡è¢«è¨­æˆé¡¯ç¤º/éš±è—ï¼Œåªè¦ç©å®¶
-       é€²éä¸€æ¬¡è§’è‰²è¦–çª—çš„ã€ŒæŠ€èƒ½ã€åˆ†é ï¼Œé€™é¡†æŒ‰éˆ•çš„
-       inline style.displayæœƒåœåœ¨"inline-block"ï¼Œ
-       ä¹‹å¾Œä¸ç®¡é–‹ä»€éº¼è¦–çª—ï¼ˆè‡ªå‹•æˆ°é¬¥è¨­å®šã€å•†åº—ã€ä»»å‹™â€¦â€¦ï¼‰
-       éƒ½æœƒæ®˜ç•™é¡¯ç¤ºï¼Œå› ç‚ºåˆ‡åˆ†é è·Ÿé—œè¦–çª—æ˜¯å…©æ¢ä¸åŒè·¯å¾‘ï¼Œ
-       é—œè¦–çª—é‚£é‚ŠåŸæœ¬æ²’æœ‰é‡ç½®åˆ°å®ƒã€‚é€™è£¡è£œä¸Šè·Ÿ
-       statusHelpButtonä¸€æ¨£çš„æ”¶å°¾é‡ç½®ã€‚
-    */
-
-    const skillPreviewBtn=
-        $("skillPreviewHeaderButton");
-
-
-    if(skillPreviewBtn){
-
-        skillPreviewBtn.style.display=
-            "none";
-
-    }
-
-
-    restoreBorrowedElement();
-
-    if(window.syncCharacterTouchMode){
-        window.syncCharacterTouchMode();
-    }
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œè§’è‰²é é¢æ•´åˆ
-   è£å‚™/èƒ½åŠ›å€¼/æŠ€èƒ½ä¸‰å€‹åˆ†é ï¼‰ï¼š
-   è·ŸborrowElementIntoModal()æ˜¯åŒä¸€æ‹›ï¼Œ
-   åªæ˜¯é€™æ¬¡å€Ÿçš„æ˜¯æ•´å€‹èƒŒåŒ…/ç‹€æ…‹/æŠ€èƒ½é é¢
-   ï¼ˆæœ¬ä¾†å°±å­˜åœ¨ã€å·²ç¶“æ¸¬è©¦ç©©å®šçš„å®Œæ•´é é¢ï¼Œ
-   ä¸æ˜¯é‡å¯«ä¸€å¥—æ–°çš„ï¼‰ï¼Œå¡é€²è§’è‰²è¦–çª—è£¡çš„
-   #characterTabContentå®¹å™¨åŸåœ°é¡¯ç¤ºã€‚
-
-   åˆ‡æ›åˆ†é æ™‚ï¼Œå…ˆæŠŠã€Œä¸Šä¸€å€‹åˆ†é å€Ÿèµ°çš„
-   é é¢ã€æ­¸ä½ï¼Œå†å€Ÿæ–°çš„é é¢é€²ä¾†â€”â€”
-   åŒä¸€æ™‚é–“åªæœƒæœ‰ä¸€å€‹é é¢è¢«å€Ÿèµ°ï¼Œä¸æœƒ
-   å…©å€‹åˆ†é çš„å…§å®¹ç–Šåœ¨ä¸€èµ·ã€‚
-*/
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œä¸Šé¢é ­åƒ
-   æ ¹æœ¬æ²’åæ‡‰ã€â€”â€”é€™å€‹å•é¡Œæ˜¯çœŸçš„ï¼Œä¹‹å‰
-   é ­åƒçš„onclickåªæ˜¯åˆ‡æ›åˆ†é ï¼Œå®Œå…¨æ²’æœ‰
-   çœŸçš„åˆ‡æ›è§’è‰²ï¼‰ï¼š
-   é»é ­åƒæ™‚ï¼ŒæŠŠç‹€æ…‹/èƒŒåŒ…/æŠ€èƒ½ä¸‰å€‹é é¢
-   å„è‡ªçš„ã€Œç›®å‰æ­£åœ¨çœ‹å“ªå€‹è§’è‰²ã€ç‹€æ…‹
-   ä¸€æ¬¡å…¨éƒ¨è¨­æˆåŒä¸€å€‹è§’è‰²ï¼Œä¸¦å‘¼å«ä¸‰å€‹
-   é é¢å„è‡ªçš„ç•«é¢æ›´æ–°å‡½å¼â€”â€”ä¸ç®¡ç©å®¶
-   ç¾åœ¨æ­£åœ¨çœ‹å“ªå€‹åˆ†é ï¼Œåˆ‡å¥½ä¹‹å¾Œç•«é¢
-   éƒ½æ˜¯å°çš„ï¼Œä¸ç”¨ç­‰ç©å®¶è‡ªå·±å†é»ä¸€æ¬¡
-   åˆ†é æ‰æ›´æ–°ã€‚
-
-   ä¸‰å€‹é é¢ç”¨çš„ç‹€æ…‹è®Šæ•¸æ ¼å¼ä¸ä¸€æ¨£
-   ï¼ˆstatusCharacterIndex/
-   inventoryCharacterIndexæ˜¯0æˆ–1çš„æ•¸å­—ï¼Œ
-   currentSkillCharacteræ˜¯"fire"ï¼
-   "player2"é€™ç¨®å­—ä¸²ï¼‰ï¼Œé€™è£¡å„è‡ªè½‰æ›
-   æˆå°çš„æ ¼å¼å†è³¦å€¼ï¼Œä¸æ˜¯ä¸‰å€‹éƒ½èƒ½å…±ç”¨
-   åŒä¸€å€‹æ•¸å­—ã€‚
-*/
-
-function selectCharacterForTabs(targetIndex){
-
-    const targetCharacter=
-        getPartyCharacterByIndex(targetIndex);
-
-    if(!targetCharacter){
-        return;
-    }
-
-
-    statusCharacterIndex=
-        targetIndex;
-
-    Object.keys(
-        pendingStats
-    ).forEach(
-        stat=>{
-
-            pendingStats[stat]=
-                0;
-
-        }
-    );
-
-    updateStatusPreview();
-
-
-    inventoryCharacterIndex=
-        targetIndex;
-
-    renderInventory();
-
-
-    currentSkillCharacter=
-        getPartyCharacterKey(targetIndex);
-
-    renderSkillLoadout();
-
-
-    /*
-       â˜… è®“è¢«é¸ä¸­çš„é ­åƒæœ‰è¦–è¦ºä¸Šçš„å€åˆ¥
-       ï¼ˆä¾‹å¦‚å¤–åœˆè®Šäº®ï¼‰ï¼Œç©å®¶æ‰çœ‹å¾—å‡ºä¾†
-       ç›®å‰é¸çš„æ˜¯å“ªä¸€å€‹è§’è‰²ã€‚
-    */
-
-    [0,1,2].forEach(
-        i=>{
-
-            const avatarEl=
-                $("characterAvatar"+i);
-
-
-            if(avatarEl){
-                const selected=i===targetIndex;
-                avatarEl.style.opacity=selected ? "1" : ".5";
-                avatarEl.classList.toggle("is-current-character",selected);
-                const choice=avatarEl.closest(".character-showcase-choice");
-                if(choice){ choice.classList.toggle("is-current-character",selected); }
-            }
-
-        }
-    );
-
-}
-
-
-function switchCharacterTab(tabName){
-
-    restoreBorrowedElement();
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œè¿”å›æ¡†æ¡†
-       æ—é‚Šå¤šä¸€å€‹ï¼ŸæŒ‰éˆ•ã€ï¼Œåªåœ¨èƒ½åŠ›å€¼åˆ†é 
-       é¡¯ç¤ºï¼‰ï¼š
-       æ¯æ¬¡åˆ‡åˆ†é éƒ½é‡æ–°åˆ¤æ–·ä¸€æ¬¡ï¼Œåˆ‡åˆ°
-       "status"æ‰é¡¯ç¤ºï¼Œåˆ‡åˆ°å…¶ä»–åˆ†é 
-       ï¼ˆç¶“é©—æ± åˆ†é…/æŠ€èƒ½/èƒŒåŒ…ï¼‰è‡ªå‹•éš±è—ï¼Œ
-       ä¸ç”¨åœ¨æ¯å€‹åˆ†é å„è‡ªè™•ç†ã€‚
-    */
-
-    const helpBtn=
-        $("statusHelpButton");
-
-
-    if(helpBtn){
-
-        helpBtn.style.display=
-
-            tabName==="status"
-            ?
-            "inline-block"
-            :
-            "none";
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œå…¨æŠ€èƒ½é è¦½
-       æ–‡å­—æŒ‰éˆ•ï¼Œæ‡‰è©²æ”¾åœ¨æŠ€èƒ½é é¢çš„è¿”å›
-       ä¸‹é¢ã€ï¼‰ï¼š
-       è·ŸstatusHelpButtonåŒä¸€å¥—é‚è¼¯ï¼Œåªæœ‰
-       åˆ‡åˆ°ã€ŒæŠ€èƒ½ã€åˆ†é æ‰é¡¯ç¤ºï¼Œå…¶ä»–åˆ†é 
-       è‡ªå‹•éš±è—ã€‚
-    */
-
-    const skillPreviewBtn=
-        $("skillPreviewHeaderButton");
-
-
-    if(skillPreviewBtn){
-
-        skillPreviewBtn.style.display=
-
-            tabName==="skill"
-            ?
-            "inline-block"
-            :
-            "none";
-
-    }
-
-
-    const container=
-        $("characterTabContent");
-
-
-    if(!container){
-        return;
-    }
-
-
-    const pageIdMap={
-        status:"statusPage",
-        inventory:"inventoryPage",
-        skill:"skillPage",
-        expPool:"homeExpPoolCard"
-    };
-
-
-    const pageEl=
-        $(
-            pageIdMap[tabName]
-        );
-
-
-    if(!pageEl){
-        return;
-    }
-
-
-    borrowElementIntoModal(
-        pageEl,
-        container
-    );
-
-    if(window.v78ApplyCharacterInventoryLayout){
-        window.v78ApplyCharacterInventoryLayout();
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œä¸Šé¢å·²ç¶“
-       å¯ä»¥åˆ‡æ›è§’è‰²äº†ï¼Œä¸‹é¢ç®­é ­é‚£æ’æ‹¿æ‰ã€ï¼‰ï¼š
-       é€™ä¸‰å€‹é é¢å„è‡ªåŸæœ¬å°±æœ‰çš„ã€Œâ—€è§’è‰²åâ–¶ã€
-       ç®­é ­åˆ‡æ›å€å¡Šï¼Œå€Ÿé€²è§’è‰²è¦–çª—ä¹‹å¾Œè·Ÿ
-       ä¸Šæ–¹æ–°åŠ çš„é ­åƒé¸æ“‡é‡è¤‡äº†ï¼Œé€™è£¡æŠŠå®ƒ
-       éš±è—æ‰â€”â€”åªåœ¨ã€Œå€Ÿé€²è§’è‰²è¦–çª—é¡¯ç¤ºã€
-       é€™å€‹æƒ…å¢ƒéš±è—ï¼Œé é¢æœ¬èº«å¦‚æœä¹‹å¾Œè¢«
-       å–®ç¨å€Ÿç”¨åœ¨åˆ¥çš„åœ°æ–¹ï¼Œä¸å—å½±éŸ¿
-       ï¼ˆå› ç‚ºæ˜¯åœ¨å€Ÿé€²ä¾†ã€ç¢ºå®šè¦é¡¯ç¤ºçš„é€™å€‹
-       æ™‚é–“é»æ‰éš±è—ï¼Œä¸æ˜¯å¯«æ­»åœ¨é é¢æœ¬èº«
-       çš„CSSä¸Šï¼‰ã€‚
-    */
-
-    const switchCardIdMap={
-        status:"statusCharacterSwitchCard",
-        inventory:"inventoryCharacterSwitchCard",
-        skill:"skillCharacterSwitchCard"
-    };
-
-
-    const switchCard=
-        $(
-            switchCardIdMap[tabName]
-        );
-
-
-    if(switchCard){
-
-        switchCard.style.display=
-            "none";
-
-
-        homeFeatureHiddenSwitchCard=
-            switchCard;
-
-    }
-
-
-    /*
-       â˜… é †ä¾¿è®“ç›®å‰é¸ä¸­çš„åˆ†é æŒ‰éˆ•æœ‰
-       è¦–è¦ºä¸Šçš„å€åˆ¥ï¼ˆä¾‹å¦‚åº•è‰²åç™½ï¼‰ï¼Œ
-       ç©å®¶æ‰çœ‹å¾—å‡ºä¾†ç›®å‰æ­£åœ¨çœ‹å“ªå€‹åˆ†é ã€‚
-    */
-
-    ["ExpPool","Status","Skill"].forEach(
-        name=>{
-
-            const btn=
-                $("characterTabBtn"+name);
-
-
-            if(btn){
-
-                btn.style.opacity=
-
-                    name.toLowerCase()===
-                    tabName.toLowerCase()
-                    ?
-                    "1"
-                    :
-                    ".55";
-
-            }
-
-        }
-    );
-
-}
-
-
-function updateGoldDisplay(){
-
-    const value=Math.max(0,Math.floor(Number(gold)||0));
-
-    [
-        $("homeGoldValue"),
-        $("inventoryGoldValue")
-    ].forEach(el=>{
-        if(el){
-            el.textContent=value.toLocaleString("zh-TW");
-        }
-    });
-
-}
-
-
-/* =====================================================
-   â˜… å•†åº—
-===================================================== */
-
-function renderShopContent(){
-
-    const cards=shopItems.map(shopItem=>{
-        const count=getPotionCount(shopItem.id);
-        const resourceLabel=shopItem.resource==="hp" ? "HP" : "SP";
-        const effectText=shopItem.recoveryPercent>=100
-            ? `å›å¾©æ‰€æœ‰${resourceLabel}`
-            : `å›å¾©æœ€å¤§${resourceLabel}çš„ ${shopItem.recoveryPercent}%`;
-
-        const hasPrice=Number.isFinite(shopItem.price);
-        const disabled=!hasPrice || gold<shopItem.price;
-        const buttonText=!hasPrice
-            ? "åƒ¹æ ¼å¾…å®š"
-            : `${shopItem.price} é‡‘å¹£`;
-
-        return `
-            <div class="shop-potion-card ${shopItem.resource}">
-                <div class="shop-potion-card-head">
-                    <span class="shop-potion-type">${resourceLabel}</span>
-                    <span class="shop-potion-stock">æŒæœ‰ ${count}</span>
-                </div>
-                <div class="shop-potion-name">${shopItem.name}</div>
-                <div class="shop-potion-effect">${effectText}</div>
-                <div class="shop-potion-purchase-row">
-                    <label for="shopQuantity-${shopItem.id}">æ•¸é‡</label>
-                    <input
-                        id="shopQuantity-${shopItem.id}"
-                        class="shop-potion-quantity"
-                        type="number"
-                        inputmode="numeric"
-                        min="1"
-                        max="9999"
-                        step="1"
-                        value="1"
-                    >
-                    <button
-                        class="home-feature-buy-btn shop-potion-buy"
-                        ${disabled ? "disabled" : ""}
-                        onclick="buyShopItem('${shopItem.id}',document.getElementById('shopQuantity-${shopItem.id}').value)"
-                    >${buttonText}</button>
-                </div>
-            </div>
-        `;
-    }).join("");
-
-    return `
-        <div class="shop-potion-interface">
-            <div class="shop-potion-note">åªè²©å”® HPï¼SP å›å¾©è—¥æ°´</div>
-            <div class="shop-potion-list">${cards}</div>
-        </div>
-    `;
-}
-
-
-function buyShopItem(itemId,requestedQuantity){
-
-    const shopItem=getPotionDefinition(itemId);
-
-    if(!shopItem){
-        return;
-    }
-
-    if(!Number.isFinite(shopItem.price)){
-        alert("é€™å€‹è—¥æ°´çš„åƒ¹æ ¼å°šæœªè¨­å®šã€‚");
-        return;
-    }
-
-    const quantity=Math.max(
-        1,
-        Math.min(9999,Math.floor(Number(requestedQuantity)||1))
-    );
-
-    const totalPrice=shopItem.price*quantity;
-
-    if(gold<totalPrice){
-        alert("é‡‘å¹£ä¸å¤ ï¼Œæœ¬æ¬¡éœ€è¦ "+totalPrice.toLocaleString("zh-TW")+" é‡‘å¹£ã€‚");
-        return;
-    }
-
-    if(!addPotionToInventory(itemId,quantity)){
-        alert("èƒŒåŒ…å·²æ»¿ï¼Œæˆ–è©²è—¥æ°´å·²æ²’æœ‰å¯ç”¨çš„å †ç–Šç©ºé–“ã€‚");
-        return;
-    }
-
-    gold=gold-totalPrice;
-
-    rebuildInventorySlots();
-    updateGoldDisplay();
-    saveGame();
-
-    const bodyEl=$("homeFeatureModalBody");
-
-    if(bodyEl){
-        bodyEl.innerHTML=renderShopContent();
-    }
-}
-
-
-/* =====================================================
-   â˜… è§’è‰²å±•ç¤º
-===================================================== */
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œåƒè€ƒåœ–é‚£ç¨®
-   ã€Œä¸Šé¢é¡¯ç¤ºå·²é–‹æ”¾/æœªé–‹æ”¾è§’è‰²ï¼Œä¸‹é¢åˆ‡æ›
-   è£å‚™/èƒ½åŠ›å€¼/æŠ€èƒ½ã€çš„è§’è‰²é é¢ï¼‰ï¼š
-
-   ä¸Šæ’ï¼šè§’è‰²é ­åƒæ ¼ï¼Œå·²å‰µå»ºçš„è§’è‰²é¡¯ç¤º
-   å±¬æ€§åœ–ç¤º+åç¨±+ç­‰ç´šï¼Œé‚„æ²’å‰µå»ºçš„ï¼ˆç›®å‰
-   åªæœ‰ç¬¬äºŒè§’è‰²é€™å€‹ä½ç½®ï¼‰é¡¯ç¤ºé–é ­+è§£é–
-   æ¢ä»¶ï¼Œé»ä¸‹å»å¦‚æœæ¢ä»¶å·²ç¶“é”æˆå°±ç›´æ¥
-   è·³å‡ºå‰µå»ºè¦–çª—ã€‚
-
-   ä¸‹æ’ï¼šä¸‰å€‹æŒ‰éˆ•ï¼ˆè£å‚™/èƒ½åŠ›å€¼/æŠ€èƒ½ï¼‰ï¼Œ
-   ç›´æ¥å°å»ç¾æˆçš„èƒŒåŒ…/ç‹€æ…‹/æŠ€èƒ½é é¢â€”â€”
-   é€™ä¸‰å€‹é é¢æœ¬èº«å·²ç¶“æœ‰è§’è‰²åˆ‡æ›ç®­é ­
-   ï¼ˆchangeInventoryCharacter/
-   changeStatusCharacter/
-   changeSkillCharacterArrowï¼‰ï¼Œä¸ç”¨åœ¨
-   é€™è£¡é‡æ–°åšä¸€å¥—è§’è‰²åˆ‡æ›é‚è¼¯ï¼Œç›´æ¥æ²¿ç”¨
-   ç¾æˆã€å·²ç¶“æ¸¬è©¦éçš„é é¢å°±å¥½ã€‚
-*/
-
-function renderCharacterShowcaseContent(){
-
-    const slots=[
-        player,
-        player2,
-        player3
-    ];
-
-
-    let html=
-
-        '<div style="display:flex;gap:10px;'+
-        'justify-content:center;margin-bottom:8px;">';
-
-
-    slots.forEach(
-        (character,slotIndex)=>{
-
-            if(character){
-                html+=
-
-                    '<div class="character-showcase-choice" style="width:86px;text-align:center;'+
-                    'cursor:pointer;" onclick="selectCharacterForTabs('+
-                    slotIndex+
-                    ');">'+
-
-                    '<div id="characterAvatar'+
-                    slotIndex+
-                    '" class="character-showcase-avatar" style="width:56px;height:56px;margin:0 auto;'+
-                    'border-radius:50%;background-color:#15100a;background-image:url(\''+
-                    getCharacterArtworkPath(character)+
-                    '\');background-size:cover;background-position:center 18%;'+
-                    'border:2px solid #f0b429;display:flex;align-items:center;'+
-                    'justify-content:center;font-size:18px;transition:opacity .15s;">'+
-                    "</div>"+
-
-                    '<div style="font-size:11px;font-weight:bold;margin-top:2px;'+
-                    'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+
-                    character.id+
-                    "</div>"+
-
-                    /*
-                       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œã€ŒæŒ‰å‡ç´š
-                       çš„æ™‚å€™ï¼Œä¸Šé¢é ­åƒæ¡†çš„ç­‰ç´šæ²’æœ‰è·Ÿè‘—
-                       å¢åŠ ã€ï¼‰ï¼š
-                       é€™å€‹ç­‰ç´šæ–‡å­—åŸæœ¬æ²’æœ‰idï¼Œç´”ç²¹æ˜¯
-                       renderCharacterShowcaseContent()
-                       çµ„å­—ä¸²æ™‚ç•¶ä¸‹ç®—å¥½ç›´æ¥å¯«æ­»é€²HTMLï¼Œ
-                       é€™å€‹å‡½å¼åªæœ‰ã€Œæ‰“é–‹è§’è‰²å½ˆçª—é‚£ä¸€åˆ»ã€
-                       æœƒè¢«å‘¼å«ä¸€æ¬¡ï¼Œä¹‹å¾Œä¸ç®¡ç­‰ç´šæ€éº¼è®Š
-                       ï¼ˆä¾‹å¦‚å»ç¶“é©—æ± åˆ†é…é é¢æŒ‰åˆ†é…ã€
-                       è§’è‰²å‡ç´šäº†ï¼‰ï¼Œé€™æ®µå­—ä¸²æ—©å°±å·²ç¶“
-                       é‡˜æ­»åœ¨ç•«é¢ä¸Šï¼Œæ²’æœ‰äººæœƒå†å›ä¾†æ›´æ–°
-                       å®ƒâ€”â€”ä¸æ˜¯è³‡æ–™æ²’ç®—å°ï¼Œæ˜¯ç•«é¢æ ¹æœ¬
-                       æ²’è¢«é€šçŸ¥è¦é‡ç•«ã€‚
-
-                       åŠ ä¸€å€‹idï¼Œè®“checkLevelUp()å‡ç´š
-                       ç™¼ç”Ÿçš„ç•¶ä¸‹å¯ä»¥ç›´æ¥æ‰¾åˆ°é€™å€‹å…ƒç´ ã€
-                       åªæ›´æ–°é€™ä¸€å°å¡Šæ–‡å­—ï¼Œä¸ç”¨é‡ç•«æ•´å€‹
-                       å½ˆçª—ï¼ˆé‡ç•«æ•´å€‹å½ˆçª—æœƒæŠŠç©å®¶æ­£åœ¨çœ‹
-                       çš„åˆ†é å…§å®¹ä¹Ÿä¸€èµ·æ´—æ‰ï¼Œä¹‹å‰æ‰ä¿®é
-                       åŒä¸€é¡å‹çš„bugï¼‰ã€‚
-                    */
-
-                    '<div id="characterAvatarLevel'+
-                    slotIndex+
-                    '" style="font-size:10px;color:#b3a58c;">'+
-                    "Lv."+character.level+
-                    "</div>"+
-
-                    "</div>";
-
-            }
-            else{
-
-                const eligible=
-                    slotIndex===1
-                    ? player.level>=10
-                    : isThirdCharacterUnlocked();
-
-                const unlockText=
-                    slotIndex===1
-                    ? "Lv.10è§£é–"
-                    : "å‰å…©åçš† Lv.50";
-
-
-                html+=
-
-                    '<div style="width:66px;text-align:center;'+
-                    'cursor:pointer;opacity:'+
-                    (eligible?"1":".55")+
-                    ';" onclick="'+
-                    (
-                        eligible
-                        ?
-                        "closeHomeFeature();openCharacterCreation("+(slotIndex+1)+");"
-                        :
-                        ""
-                    )+
-                    '">'+
-
-                    '<div style="width:40px;height:40px;margin:0 auto;'+
-                    'border-radius:50%;background:linear-gradient(160deg,#241c12,#15100a);'+
-                    'border:2px dashed #8a6a3a;display:flex;align-items:center;'+
-                    'justify-content:center;font-size:16px;">'+
-                    ""+
-                    "</div>"+
-
-                    '<div style="font-size:11px;font-weight:bold;margin-top:2px;'+
-                    'color:#8a8a8a;">'+
-                    "æœªè§£é–"+
-                    "</div>"+
-
-                    '<div style="font-size:10px;color:#7a6f5c;">'+
-                    (
-                        eligible
-                        ?
-                        "é»æ“Šå‰µå»º"
-                        :
-                        unlockText
-                    )+
-                    "</div>"+
-
-                    "</div>";
-
-            }
-
-        }
-    );
-
-
-    html+=
-        "</div>";
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œä¸æ˜¯è¦æŒ‰ä¸‹å»
-       åˆ‡æ›åˆ°åŸæœ¬é é¢ï¼Œæ˜¯è¦æ•´åˆåˆ°åŒä¸€å€‹
-       ç•«é¢è£¡ã€ï¼‰ï¼š
-       åŸæœ¬é€™è£¡æ˜¯ä¸‰å€‹ã€Œå°é ã€æŒ‰éˆ•ï¼Œé»ä¸‹å»æœƒ
-       é—œæ‰é€™å€‹è¦–çª—ã€è·³å»èƒŒåŒ…/ç‹€æ…‹/æŠ€èƒ½
-       é é¢ã€‚æ”¹æˆä¸‰å€‹ã€Œåˆ†é ã€æŒ‰éˆ•ï¼Œé»ä¸‹å»
-       å‘¼å«switchCharacterTab()â€”â€”ä¸æœƒé—œæ‰
-       è¦–çª—ï¼Œæ˜¯æŠŠå°æ‡‰é é¢çš„å…§å®¹ã€Œå€Ÿã€é€²
-       #characterTabContenté€™å€‹å®¹å™¨è£¡
-       åŸåœ°é¡¯ç¤ºï¼Œè·Ÿä¹‹å‰å€Ÿç”¨ä¸»åŸä¼‘æ¯/ç¶“é©—æ± 
-       å¡ç‰‡æ˜¯åŒä¸€æ‹›ï¼Œåªæ˜¯é€™æ¬¡å€Ÿçš„æ˜¯æ•´é ã€‚
-    */
-
-    html+=
-
-        '<div style="display:flex;gap:6px;margin-bottom:6px;">'+
-
-        '<button id="characterTabBtnExpPool" class="home-feature-buy-btn"'+
-        'style="flex:1;padding:10px 6px;font-size:18px;min-height:52px;"'+
-        'onclick="switchCharacterTab(\'expPool\')">'+
-        "ç¶“é©—æ± åˆ†é…"+
-        "</button>"+
-
-        '<button id="characterTabBtnStatus" class="home-feature-buy-btn"'+
-        'style="flex:1;padding:10px 6px;font-size:18px;min-height:52px;"'+
-        'onclick="switchCharacterTab(\'status\')">'+
-        "èƒ½åŠ›å€¼"+
-        "</button>"+
-
-        '<button id="characterTabBtnSkill" class="home-feature-buy-btn"'+
-        'style="flex:1;padding:10px 6px;font-size:18px;min-height:52px;"'+
-        'onclick="switchCharacterTab(\'skill\')">'+
-        "æŠ€èƒ½"+
-        "</button>"+
-
-        "</div>"+
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œã€ŒæŠ€èƒ½
-           é é¢ä¸èƒ½æ²å‹•ï¼Œå°è‡´ä¸‹é¢æŠ€èƒ½çœ‹
-           ä¸åˆ°ã€ï¼‰ï¼š
-           åŸæœ¬min-heightå¯«æ­»480pxï¼Œåœ¨
-           æ‰‹æ©Ÿç€è¦½å™¨ï¼ˆå°¤å…¶ç¶²å€åˆ—é‚„é¡¯ç¤ºè‘—
-           çš„Samsung Browserï¼‰å¯¦éš›å¯è¦–
-           é«˜åº¦æ¯”è¼ƒçŸ®çš„æ™‚å€™ï¼Œ480pxé€™å€‹
-           ä¸‹é™ç¡¬æ˜¯æ¯”max-height:60dvhé‚„
-           é«˜ï¼ŒCSSè¦å‰‡è£¡min-heightå„ªå…ˆæ¬Š
-           æ¯”max-heighté«˜ï¼Œç­‰æ–¼é€™å€‹å®¹å™¨
-           æ°¸é è‡³å°‘480pxé«˜ï¼Œè·Ÿå¤–å±¤
-           .home-feature-modal-boxè‡ªå·±
-           çš„é«˜åº¦ä¸Šé™ï¼ˆ80dvhï¼.wideæ™‚
-           96dvhï¼‰æ“ åœ¨ä¸€èµ·ï¼Œå®¹æ˜“å…©å±¤éƒ½
-           è¶…å‡ºã€è®Šæˆã€Œå¤–å±¤å®¹å™¨+å…§å±¤
-           å®¹å™¨ã€å…©å€‹éƒ½è¦æ²å‹•çš„å·¢ç‹€æ²å‹•ï¼Œ
-           æ‰‹æ©Ÿä¸Šå¾ˆå®¹æ˜“å¡ä½ã€æ„Ÿè¦ºå®Œå…¨
-           æ²ä¸å‹•ã€‚
-
-           æ”¹æˆmin(480px,50dvh)â€”â€”å…§å®¹
-           è¼ƒå¤šçš„åˆ†é ï¼ˆèƒ½åŠ›å€¼ï¼‰é‚„æ˜¯ç›¡é‡
-           æŠ“æ»¿480pxé€™å€‹ç†æƒ³å€¼ï¼Œä½†è¢å¹•
-           çœŸçš„çŸ®çš„æ™‚å€™æœƒè‡ªå‹•è®“æ­¥ï¼Œ
-           ä¸æœƒç¡¬æ’å‡ºå…©å±¤éƒ½è¦æ²å‹•çš„
-           è¡çªï¼ŒåŒæ™‚å› ç‚ºæ¯æ¬¡ç®—å‡ºä¾†çš„
-           é‚„æ˜¯åŒä¸€å€‹å›ºå®šå€¼ï¼ˆä¸æœƒå› ç‚º
-           åˆ‡åˆ†é è€Œæ”¹è®Šï¼‰ï¼ŒåŸæœ¬ã€Œåˆ‡åˆ†é 
-           å¤§å°ä¸è·³å‹•ã€çš„éœ€æ±‚é‚„æ˜¯æœ‰ä¿ç•™ã€‚
-        */
-
-        '<div id="characterTabContent"'+
-        'style="flex:1 1 auto;height:auto;min-height:0;max-height:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y;box-sizing:border-box;"></div>';
-
-
-    return html;
-
-}
-
-
-/* =====================================================
-   â˜… æ¯æ—¥ä»»å‹™
-===================================================== */
-
-/* =====================================================
-   â˜… é›¢ç·šç¶“é©—
-===================================================== */
-
-function renderOfflineExpContent(){
-
-    const hours=
-
-        Math.floor(
-            offlineElapsedMinutesForDisplay/60
-        );
-
-    const minutes=
-
-        offlineElapsedMinutesForDisplay%
-        60;
-
-
-    const cappedNotice=
-
-        offlineElapsedMinutesForDisplay>
-        OFFLINE_EXP_MAX_MINUTES
-        ?
-        '<div style="font-size:11px;color:#e8836b;margin-top:4px;">'+
-        "ï¼ˆé›¢ç·šç¶“é©—æœ€å¤šåªè¨ˆç®—8å°æ™‚ï¼Œè¶…éçš„éƒ¨åˆ†ä¸æœƒé¡å¤–ç´¯ç©ï¼‰"+
-        "</div>"
-        :
-        "";
-
-
-    return (
-
-        '<div style="font-size:13px;line-height:1.8;">'+
-
-        "é›¢ç·šæ™‚é–“ï¼š"+hours+"å°æ™‚"+minutes+"åˆ†é˜<br>"+
-
-        "å¯é ˜å–é›¢ç·šç¶“é©—ï¼š"+
-        '<span style="color:#f0b429;font-weight:bold;">'+
-        pendingOfflineExp+
-        "</span>"+
-        "EXP"+
-
-        cappedNotice+
-
-        '<div style="font-size:11px;color:#b3a58c;margin-top:8px;">'+
-        "é›¢ç·šç¶“é©—æœƒç›´æ¥åŠ é€²å…±ç”¨ç¶“é©—æ± ï¼Œ"+
-        "æ¯åˆ†é˜"+OFFLINE_EXP_PER_MINUTE+"é»ï¼Œ"+
-        "æœ€å¤šè¨ˆç®—8å°æ™‚ã€‚"+
-        "</div>"+
-
-        "</div>"+
-
-        '<button class="home-feature-buy-btn"style="width:100%;margin-top:12px;padding:10px;"'+
-
-        (
-            pendingOfflineExp<=0
-            ?
-            "disabled"
-            :
-            ""
-        )+
-
-        'onclick="claimOfflineExp()">'+
-
-        (
-            pendingOfflineExp<=0
-            ?
-            "ç›®å‰æ²’æœ‰å¯é ˜å–çš„é›¢ç·šç¶“é©—"
-            :
-            "é ˜å–"+pendingOfflineExp+"é›¢ç·šç¶“é©—"
-        )+
-
-        "</button>"+
-
-        /*
-           â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œçœ‹å»£å‘Š
-           é›™å€é ˜å–ã€çš„ç¬¬ä¸€å€‹ç¤ºç¯„ç”¨æ³•ï¼‰ï¼š
-           åªæœ‰åœ¨æœ‰æ±è¥¿å¯ä»¥é ˜å–çš„æ™‚å€™æ‰é¡¯ç¤º
-           é€™é¡†æŒ‰éˆ•ï¼Œå‘¼å«showRewardedAd()ï¼Œ
-           æˆåŠŸçš„callbackè£¡å‘¼å«
-           claimOfflineExp(true)ï¼ˆå¤šä¸€å€‹
-           åƒæ•¸å‘Šè¨´é ˜å–å‡½å¼ã€Œé€™æ¬¡æ˜¯é›™å€ã€ï¼‰ã€‚
-        */
-
-        (
-
-            pendingOfflineExp>0
-            ?
-            '<button class="home-feature-buy-btn"'+
-            'style="width:100%;margin-top:8px;padding:10px;'+
-            'background:linear-gradient(180deg,#f0b429,#c9791e);'+
-            'color:#2a1706;"'+
-            'onclick="claimOfflineExpWithAd()">'+
-            "çœ‹å»£å‘Šé›™å€é ˜å–ï¼ˆ"+
-            (pendingOfflineExp*2)+
-            "EXPï¼‰"+
-            "</button>"
-            :
-            ""
-
-        )
-
-    );
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼šçœ‹å»£å‘Šé›™å€é ˜å–çš„å…¥å£ï¼Œå‘¼å«
-   é€šç”¨çš„showRewardedAd()ï¼ŒæˆåŠŸæ‰çœŸçš„
-   é›™å€ç™¼æ”¾ï¼Œå¤±æ•—/å–æ¶ˆçš„è©±ä»€éº¼éƒ½ä¸æœƒ
-   ç™¼ç”Ÿï¼ˆä¸æœƒæ‰£ä»»ä½•æ±è¥¿ï¼Œåªæ˜¯æ²’æ‹¿åˆ°
-   é›™å€åŠ æˆï¼ŒåŸæœ¬æ²’çœ‹å»£å‘Šçš„æ­£å¸¸é ˜å–
-   claimOfflineExp()é‚„æ˜¯å¯ä»¥ç…§å¸¸ä½¿ç”¨ï¼‰ã€‚
-*/
-
-function claimOfflineExpWithAd(){
-
-    if(pendingOfflineExp<=0){
-        return;
-    }
-
-
-    showRewardedAd(
-        ()=>{
-
-            claimOfflineExp(
-                true
-            );
-
-        },
-        ()=>{
-
-            addBattleLog(
-                "å»£å‘Šæœªçœ‹å®Œï¼Œç„¡æ³•é ˜å–é›™å€çå‹µã€‚"
-            );
-
-        }
-    );
-
-}
-
-
-function claimOfflineExp(
-    isDoubled
-){
-
-    if(pendingOfflineExp<=0){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼šåŠ äº†isDoubledé€™å€‹åƒæ•¸ï¼Œ
-       çœ‹å»£å‘ŠæˆåŠŸæ™‚å‚³trueï¼Œå¯¦éš›å­˜å…¥ç¶“é©—æ± 
-       çš„æ•¸å­—ä¹˜ä»¥2ï¼›ä¸€èˆ¬æ²’çœ‹å»£å‘Šçš„é ˜å–
-       ç¶­æŒåŸæœ¬æ•¸å­—ä¸è®Šã€‚
-    */
-
-    const rewardAmount=
-
-        isDoubled
-        ?
-        pendingOfflineExp*2
-        :
-        pendingOfflineExp;
-
-
-    sharedExp=
-        sharedExp+
-        rewardAmount;
-
-
-    addBattleLog(
-
-        (
-            isDoubled
-            ?
-            "å»£å‘Šé›™å€é ˜å–é›¢ç·šç¶“é©—"
-            :
-            "é ˜å–é›¢ç·šç¶“é©—"
-        )+
-        rewardAmount+
-        "é»ï¼Œå·²å­˜å…¥ç¶“é©—æ± ã€‚"
-
-    );
-
-
-    pendingOfflineExp=
-        0;
-
-
-    updateUI();
-
-    saveGame();
-
-
-    const bodyEl=
-        $("homeFeatureModalBody");
-
-
-    if(bodyEl){
-
-        bodyEl.innerHTML=
-            renderOfflineExpContent();
-
-    }
-
-}
-
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œä»»å‹™æ”¹æˆå…©å€‹
-   åˆ†é ï¼šæ¯æ—¥ä»»å‹™ï¼å§”è¨—ä»»å‹™ï¼‰ï¼š
-   åŸæœ¬renderQuestContent()æ•´æ®µé‚è¼¯æŠ½æˆ
-   é€šç”¨ç‰ˆæœ¬renderQuestListGeneric()ï¼Œ
-   åƒã€ŒæŠ€èƒ½å®šç¾©æ¸…å–®/ç‹€æ…‹ç‰©ä»¶/é ˜å–å‡½å¼
-   åç¨±ã€ä¸‰å€‹åƒæ•¸ï¼Œæ¯æ—¥ä»»å‹™ã€å§”è¨—ä»»å‹™
-   å…±ç”¨åŒä¸€ä»½æ¸²æŸ“é‚è¼¯ï¼Œä¸ç”¨å¯«å…©æ¬¡å¹¾ä¹
-   ä¸€æ¨£çš„ç¨‹å¼ç¢¼ã€‚
-*/
-
-function formatQuestReward(reward){
-
-    const parts=[];
-
-    if(reward.gold){
-        parts.push(
-            "é‡‘å¹£ "+reward.gold
-        );
-    }
-
-    if(reward.exp){
-        parts.push(
-            "EXP "+reward.exp
-        );
-    }
-
-    return parts.join("ã€€");
-
-}
-
-
-/* =====================================================
-   V89 â€” ä»»å‹™å®Œæˆåº¦çå‹µéª¨æ¶
-   - 20 / 40 / 60 / 80 / 100 äº”éšæ®µã€‚
-   - ç›®å‰åªå»ºç«‹ UI èˆ‡å®Œæˆåº¦è¨ˆç®—ï¼Œä¸ç™¼æ”¾ä»»ä½•çå‹µã€ä¸å¯«å…¥å­˜æª”ã€‚
-   - å®Œæˆåº¦ä¾ã€Œæ‰€æœ‰ä»»å‹™ç›®æ¨™çš„ç´¯ç©é€²åº¦ / æ‰€æœ‰ç›®æ¨™ç¸½é‡ã€è¨ˆç®—ï¼Œ
-     è®“æ¯æ—¥ 3 ä»»å‹™ã€å§”è¨— 2 ä»»å‹™ä¹Ÿèƒ½è‡ªç„¶è·¨é 20% éšæ®µã€‚
-===================================================== */
-const QUEST_COMPLETION_MILESTONES=[
-    20,40,60,80,100
-];
-
-
-function getQuestCompletionPercent(
-    definitions,
-    state
-){
-
-    let totalGoal=0;
-    let totalProgress=0;
-
-    definitions.forEach(function(quest){
-
-        const goal=
-            Math.max(
-                0,
-                Number(quest.goal)||0
-            );
-
-        const progress=
-            Math.max(
-                0,
-                Number(
-                    state.progress[quest.id]
-                )||0
-            );
-
-        totalGoal+=goal;
-        totalProgress+=
-            Math.min(
-                goal,
-                progress
-            );
-
-    });
-
-    if(totalGoal<=0){
-        return 100;
-    }
-
-    return Math.min(
-        100,
-        Math.max(
-            0,
-            totalProgress/totalGoal*100
-        )
-    );
-
-}
-
-
-function renderQuestCompletionPanelContent(
-    definitions,
-    state
-){
-
-    const percent=
-        getQuestCompletionPercent(
-            definitions,
-            state
-        );
-
-    const displayPercent=
-        Math.floor(percent);
-
-    const milestones=
-        QUEST_COMPLETION_MILESTONES
-        .map(function(threshold){
-
-            const reached=
-                percent>=threshold;
-
-            return (
-                '<div class="quest-milestone'+
-                    (reached ? " reached" : "")+'">'+
-                    '<div class="quest-milestone-percent">'+
-                        threshold+'%'+
-                    '</div>'+
-                    '<div class="quest-milestone-slot" aria-label="çå‹µå¾…è¨­å®š">'+
-                        '<span>å¾…å®š</span>'+
-                    '</div>'+
-                '</div>'
-            );
-
-        })
-        .join("");
-
-    return (
-        '<div class="quest-completion-head">'+
-            '<span>å®Œæˆåº¦çå‹µ</span>'+
-            '<strong>'+displayPercent+'%</strong>'+
-        '</div>'+
-
-        '<div class="quest-completion-track" aria-hidden="true">'+
-            '<div class="quest-completion-fill" style="width:'+percent+'%;"></div>'+
-        '</div>'+
-
-        '<div class="quest-completion-milestones">'+
-            milestones+
-        '</div>'
-    );
-
-}
-
-
-function renderQuestListGeneric(
-    definitions,
-    state,
-    claimFnName
-){
-
-    let html=
-        '<div class="quest-list">';
-
-
-    definitions.forEach(
-        quest=>{
-
-            const progress=
-                state.progress[
-                    quest.id
-                ]||0;
-
-            const claimed=
-                !!state.claimed[
-                    quest.id
-                ];
-
-            const done=
-                progress>=quest.goal;
-
-            const safeProgress=
-                Math.min(
-                    progress,
-                    quest.goal
-                );
-
-            const percent=
-                quest.goal>0
-                ?
-                Math.min(
-                    100,
-                    Math.max(
-                        0,
-                        (progress/quest.goal)*100
-                    )
-                )
-                :
-                100;
-
-            const statusText=
-                claimed
-                ?
-                "å·²é ˜å–"
-                :
-                done
-                ?
-                "å¯é ˜å–"
-                :
-                "é€²è¡Œä¸­";
-
-            const statusClass=
-                claimed
-                ?
-                "claimed"
-                :
-                done
-                ?
-                "ready"
-                :
-                "progress";
-
-            const buttonText=
-                claimed
-                ?
-                "å·²é ˜å–"
-                :
-                done
-                ?
-                "é ˜å–"
-                :
-                "æœªé”æˆ";
-
-            html+=
-                '<section class="quest-card '+statusClass+'">'+
-
-                    '<div class="quest-card-head">'+
-                        '<div class="quest-card-name">'+
-                            quest.name+
-                        '</div>'+
-                        '<div class="quest-status '+statusClass+'">'+
-                            statusText+
-                        '</div>'+
-                    '</div>'+
-
-                    '<div class="quest-card-desc">'+
-                        quest.desc+
-                    '</div>'+
-
-                    '<div class="quest-progress-line">'+
-                        '<span>é€²åº¦</span>'+
-                        '<strong>'+safeProgress+' / '+quest.goal+'</strong>'+
-                    '</div>'+
-
-                    '<div class="quest-progress-track" aria-hidden="true">'+
-                        '<div class="quest-progress-fill" style="width:'+percent+'%;"></div>'+
-                    '</div>'+
-
-                    '<div class="quest-card-foot">'+
-                        '<div class="quest-reward">'+
-                            '<span class="quest-reward-label">çå‹µ</span>'+
-                            '<span>'+formatQuestReward(quest.reward)+'</span>'+
-                        '</div>'+
-
-                        '<button class="quest-claim-btn"'+
-                            (
-                                !done || claimed
-                                ?
-                                " disabled"
-                                :
-                                ""
-                            )+
-                            ' onclick="'+claimFnName+'(\''+quest.id+'\')">'+
-                            buttonText+
-                        '</button>'+
-                    '</div>'+
-
-                '</section>';
-
-        }
-    );
-
-
-    html+=
-        "</div>";
-
-    return html;
-
-}
-
-
-function renderDailyQuestListContent(){
-
-    return renderQuestListGeneric(
-        dailyQuestDefinitions,
-        dailyQuestState,
-        "claimDailyQuest"
-    );
-
-}
-
-
-function renderCommissionQuestListContent(){
-
-    return renderQuestListGeneric(
-        commissionQuestDefinitions,
-        commissionQuestState,
-        "claimCommissionQuest"
-    );
-
-}
-
-function getClaimableQuestIds(definitions,state){
-    return (definitions||[]).filter(function(quest){
-        return quest && !state.claimed[quest.id] &&
-            (Number(state.progress[quest.id])||0)>=Math.max(1,Number(quest.goal)||1);
-    }).map(function(quest){ return quest.id; });
-}
-
-function v17361SyncQuestClaimAllButton(isCommission){
-    const button=$("questClaimAllButton");
-    if(!button){ return; }
-    const definitions=isCommission?commissionQuestDefinitions:dailyQuestDefinitions;
-    const state=isCommission?commissionQuestState:dailyQuestState;
-    const count=getClaimableQuestIds(definitions,state).length;
-    button.disabled=count<=0;
-    button.textContent=count>0?"ä¸€éµé ˜å–ï¼ˆ"+count+"ï¼‰":"ä¸€éµé ˜å–";
-    button.onclick=isCommission?v17361ClaimAllCommissionQuests:v17361ClaimAllDailyQuests;
-}
-
-function v17361RefreshOpenQuestPage(){
-    const body=$("questTabBody");
-    if(!body){ return false; }
-    const commissionBtn=$("questTabBtnCommission");
-    const isCommission=!!(commissionBtn&&commissionBtn.classList.contains("active"));
-    const scrollTop=body.scrollTop;
-    body.innerHTML=isCommission?renderCommissionQuestListContent():renderDailyQuestListContent();
-    const completionPanel=$("questCompletionPanel");
-    if(completionPanel){
-        completionPanel.innerHTML=renderQuestCompletionPanelContent(
-            isCommission?commissionQuestDefinitions:dailyQuestDefinitions,
-            isCommission?commissionQuestState:dailyQuestState
-        );
-    }
-    body.scrollTop=scrollTop;
-    v17361SyncQuestClaimAllButton(isCommission);
-    return true;
-}
-window.v17361RefreshOpenQuestPage=v17361RefreshOpenQuestPage;
-
-
-
-/*
-   V89ï¼šä»»å‹™è¦–çª—ç‚ºã€Œå›ºå®šæ¨™ç±¤åˆ— + å…§å±¤ä»»å‹™æ¸…å–® + å›ºå®šå®Œæˆåº¦çå‹µã€æ¶æ§‹ã€‚
-   #questTabBody æ˜¯ä»»å‹™å”¯ä¸€ scroll ownerï¼›æ¨™é¡Œèˆ‡å…©å€‹æ¨™ç±¤ä¸è·Ÿè‘—æ²ã€‚
-*/
-function renderQuestTabContent(activeTab){
-
-    const isCommission=
-        activeTab==="commission";
-
-    return (
-        '<div class="quest-interface">'+
-
-            '<div class="quest-tabs" role="tablist" aria-label="ä»»å‹™åˆ†é¡">'+
-
-                '<button id="questTabBtnDaily" class="quest-tab'+
-                    (!isCommission ? " active" : "")+'"'+
-                    ' role="tab" aria-selected="'+(!isCommission ? "true" : "false")+'"'+
-                    ' onclick="switchQuestTab(\'daily\')">'+
-                    "æ¯æ—¥ä»»å‹™"+
-                '</button>'+
-
-                '<button id="questTabBtnCommission" class="quest-tab'+
-                    (isCommission ? " active" : "")+'"'+
-                    ' role="tab" aria-selected="'+(isCommission ? "true" : "false")+'"'+
-                    ' onclick="switchQuestTab(\'commission\')">'+
-                    "å§”è¨—ä»»å‹™"+
-                '</button>'+
-
-            '</div>'+
-
-            '<div class="quest-batch-actions">'+
-                '<button id="questClaimAllButton" class="quest-claim-all-btn" type="button" '+
-                    (getClaimableQuestIds(
-                        isCommission?commissionQuestDefinitions:dailyQuestDefinitions,
-                        isCommission?commissionQuestState:dailyQuestState
-                    ).length?'':'disabled ')+
-                    'onclick="'+(isCommission?'v17361ClaimAllCommissionQuests()':'v17361ClaimAllDailyQuests()')+'">ä¸€éµé ˜å–</button>'+
-            '</div>'+
-
-            '<div id="questTabBody" class="quest-tab-body" role="tabpanel">'+
-                (
-                    isCommission
-                    ?
-                    renderCommissionQuestListContent()
-                    :
-                    renderDailyQuestListContent()
-                )+
-            '</div>'+
-
-            '<div id="questCompletionPanel" class="quest-completion-panel">'+
-                renderQuestCompletionPanelContent(
-                    isCommission
-                    ? commissionQuestDefinitions
-                    : dailyQuestDefinitions,
-                    isCommission
-                    ? commissionQuestState
-                    : dailyQuestState
-                )+
-            '</div>'+
-
-        '</div>'
-    );
-
-}
-
-
-function switchQuestTab(tabName){
-
-    const container=
-        $("questTabBody");
-
-    if(!container){
-        return;
-    }
-
-    const isCommission=
-        tabName==="commission";
-
-    container.innerHTML=
-        isCommission
-        ?
-        renderCommissionQuestListContent()
-        :
-        renderDailyQuestListContent();
-
-    container.scrollTop=
-        0;
-
-    const completionPanel=
-        $("questCompletionPanel");
-
-    if(completionPanel){
-
-        completionPanel.innerHTML=
-            renderQuestCompletionPanelContent(
-                isCommission
-                ? commissionQuestDefinitions
-                : dailyQuestDefinitions,
-                isCommission
-                ? commissionQuestState
-                : dailyQuestState
-            );
-
-    }
-
-    const dailyBtn=
-        $("questTabBtnDaily");
-
-    const commissionBtn=
-        $("questTabBtnCommission");
-
-    if(dailyBtn){
-        dailyBtn.classList.toggle(
-            "active",
-            !isCommission
-        );
-        dailyBtn.setAttribute(
-            "aria-selected",
-            !isCommission ? "true" : "false"
-        );
-    }
-
-    if(commissionBtn){
-        commissionBtn.classList.toggle(
-            "active",
-            isCommission
-        );
-        commissionBtn.setAttribute(
-            "aria-selected",
-            isCommission ? "true" : "false"
-        );
-    }
-
-    v17361SyncQuestClaimAllButton(isCommission);
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œæ–°å¢å‰¯æœ¬/BOSS
-   å…©å€‹å°è¦½åˆ—é …ç›®ï¼Œå„è‡ª2å€‹åˆ†é ï¼‰ï¼š
-   ç›®å‰åªå…ˆåšå‡ºã€Œåˆ†é åˆ‡æ›ã€é€™å¥—éª¨æ¶è·Ÿ
-   èªªæ˜æ–‡å­—ï¼Œå¯¦éš›çš„å‰¯æœ¬/BOSSæˆ°é¬¥è¦å‰‡
-   ï¼ˆæ€ªç‰©å¼·åº¦ã€çå‹µã€æ¯å¤©èƒ½æŒ‘æˆ°å¹¾æ¬¡ã€
-   è·Ÿç¾æœ‰ç·´åŠŸå€çš„å·®ç•°æ˜¯ä»€éº¼ï¼‰éƒ½é‚„æ²’å®šæ¡ˆï¼Œ
-   ç­‰ä½¿ç”¨è€…æä¾›è¦å‰‡å¾Œå†å¯¦éš›æ¥ä¸Šæˆ°é¬¥
-   é‚è¼¯â€”â€”é€™è£¡å…ˆç¢ºä¿åˆ‡åˆ†é çš„ä»‹é¢æ˜¯
-   é€šçš„ï¼Œä¹‹å¾Œè¦æ›å…§å®¹åªéœ€è¦æ”¹
-   renderå‡½å¼ï¼Œä¸ç”¨å‹•HTMLçµæ§‹ã€‚
-*/
-
-function renderDungeonTabContent(tabName){
-
-    if(tabName==="abyss"){
-
-        return (
-
-            '<div style="font-size:13px;line-height:1.8;color:#b3a58c;">'+
-            "æ·±æ·µå‰¯æœ¬å°šæœªè¨­è¨ˆå®Œæˆã€‚"+
-            "</div>"
-
-        );
-
-    }
-
-
-    return (
-
-        '<div style="font-size:13px;line-height:1.8;color:#b3a58c;">'+
-        "æ—¥å¸¸å‰¯æœ¬å°šæœªè¨­è¨ˆå®Œæˆã€‚"+
-        "</div>"
-
-    );
-
-}
-
-
-function switchDungeonTab(tabName){
-
-    const container=
-        $("dungeonTabContent");
-
-
-    if(!container){
-        return;
-    }
-
-
-    container.innerHTML=
-
-        renderDungeonTabContent(
-            tabName
-        );
-
-
-    ["Daily","Abyss"].forEach(
-        name=>{
-
-            const btn=
-                $("dungeonTabBtn"+name);
-
-
-            if(btn){
-
-                btn.style.opacity=
-
-                    name.toLowerCase()===
-                    tabName
-                    ?
-                    "1"
-                    :
-                    ".55";
-
-            }
-
-        }
-    );
-
-}
-
-
-function renderBossTabContent(tabName){
-
-    if(tabName==="hell"){
-
-        return (
-
-            '<div style="font-size:13px;line-height:1.8;color:#b3a58c;">'+
-            "åœ°ç„BOSSå°šæœªè¨­è¨ˆå®Œæˆã€‚"+
-            "</div>"
-
-        );
-
-    }
-
-
-    return (
-
-        '<div style="font-size:13px;line-height:1.8;color:#b3a58c;">'+
-        "å€‹äººBOSSå°šæœªè¨­è¨ˆå®Œæˆã€‚"+
-        "</div>"
-
-    );
-
-}
-
-
-function switchBossTab(tabName){
-
-    const container=
-        $("bossTabContent");
-
-
-    if(!container){
-        return;
-    }
-
-
-    container.innerHTML=
-
-        renderBossTabContent(
-            tabName
-        );
-
-
-    ["Personal","Hell"].forEach(
-        name=>{
-
-            const btn=
-                $("bossTabBtn"+name);
-
-
-            if(btn){
-
-                btn.style.opacity=
-
-                    name.toLowerCase()===
-                    tabName
-                    ?
-                    "1"
-                    :
-                    ".55";
-
-            }
-
-        }
-    );
-
-}
-
-
-
-
-function claimDailyQuest(questId){
-
-    const quest=
-
-        dailyQuestDefinitions.find(
-            q=>q.id===questId
-        );
-
-
-    if(!quest){
-        return;
-    }
-
-
-    const progress=
-
-        dailyQuestState.progress[
-            questId
-        ]||0;
-
-
-    if(
-        progress<quest.goal ||
-        dailyQuestState.claimed[questId]
-    ){
-        return;
-    }
-
-
-    dailyQuestState.claimed[questId]=
-        true;
-
-
-    if(quest.reward.gold){
-
-        gold=
-            gold+
-            quest.reward.gold;
-
-    }
-
-
-    if(quest.reward.exp){
-
-        sharedExp=
-            sharedExp+
-            quest.reward.exp;
-
-    }
-
-
-    updateGoldDisplay();
-
-    updateUI();
-
-    saveGame();
-
-
-    /*
-       â˜… ä¿®æ­£ï¼šæ”¹æˆåªé‡ç¹ª#questTabBody
-       é€™å€‹å®¹å™¨ï¼ˆç¶­æŒåœ¨ã€Œæ¯æ—¥ä»»å‹™ã€åˆ†é ï¼‰ï¼Œ
-       ä¸å†æ•´å€‹è¦–çª—é‡ä¾†â€”â€”renderQuestContent()
-       é€™å€‹èˆŠå‡½å¼å·²ç¶“æ‹†æˆå…©å€‹åˆ†é å„è‡ªçš„
-       æ¸²æŸ“å‡½å¼ï¼Œä¸å­˜åœ¨äº†ã€‚
-    */
-    if(!window.__v17361BulkQuestClaim){ switchQuestTab("daily"); }
-
-}
-
-
-function claimCommissionQuest(questId){
-
-    const quest=
-
-        commissionQuestDefinitions.find(
-            q=>q.id===questId
-        );
-
-
-    if(!quest){
-        return;
-    }
-
-
-    const progress=
-
-        commissionQuestState.progress[
-            questId
-        ]||0;
-
-
-    if(
-        progress<quest.goal ||
-        commissionQuestState.claimed[questId]
-    ){
-        return;
-    }
-
-
-    commissionQuestState.claimed[questId]=
-        true;
-
-
-    if(quest.reward.gold){
-
-        gold=
-            gold+
-            quest.reward.gold;
-
-    }
-
-
-    if(quest.reward.exp){
-
-        sharedExp=
-            sharedExp+
-            quest.reward.exp;
-
-    }
-
-
-    updateGoldDisplay();
-
-    updateUI();
-
-    saveGame();
-    if(!window.__v17361BulkQuestClaim){ switchQuestTab("commission"); }
-
-}
-
-
-function v17361ClaimAllQuestGroup(definitions,state,claimFn,title){
-    const ids=getClaimableQuestIds(definitions,state);
-    if(!ids.length){ v17361RefreshOpenQuestPage(); return 0; }
-    window.__v17361BulkQuestClaim=true;
-    try{ ids.forEach(function(id){ claimFn(id); }); }
-    finally{ window.__v17361BulkQuestClaim=false; }
-    v17361RefreshOpenQuestPage();
-    if(typeof window.rpgAlert==="function"){
-        void window.rpgAlert("å·²ä¸€éµé ˜å– "+ids.length+" å€‹"+title+"çå‹µã€‚",{title:title+"çå‹µ",confirmText:"çŸ¥é“äº†",tone:"success"});
-    }
-    return ids.length;
-}
-function v17361ClaimAllDailyQuests(){
-    return v17361ClaimAllQuestGroup(dailyQuestDefinitions,dailyQuestState,claimDailyQuest,"æ¯æ—¥ä»»å‹™");
-}
-function v17361ClaimAllCommissionQuests(){
-    return v17361ClaimAllQuestGroup(commissionQuestDefinitions,commissionQuestState,claimCommissionQuest,"å§”è¨—ä»»å‹™");
-}
-window.v17361ClaimAllDailyQuests=v17361ClaimAllDailyQuests;
-window.v17361ClaimAllCommissionQuests=v17361ClaimAllCommissionQuests;
-
-/* =====================================================
-   â˜… åœ–é‘‘
-===================================================== */
-
-function renderBestiaryContent(){
-
-    const allZoneArrays=[
-        forestMonsters,
-        desertMonsters,
-        iceMountainMonsters,
-        zone4Monsters,
-        zone5Monsters,
-        zone6Monsters,
-        zone7Monsters,
-        zone8Monsters
-    ];
-
-
-    const seenNames=
-        new Set();
-
-
-    let html=
-        "";
-
-
-    allZoneArrays.forEach(
-        zoneArray=>{
-
-            zoneArray.forEach(
-                monster=>{
-
-                    if(
-                        seenNames.has(
-                            monster.name
-                        )
-                    ){
-                        return;
-                    }
-
-
-                    seenNames.add(
-                        monster.name
-                    );
-
-
-                    const entry=
-
-                        bestiaryData[
-                            monster.name
-                        ];
-
-
-                    const element=
-
-                        elementDatabase[
-                            monster.element
-                        ]
-                        ||
-                        elementDatabase.fire;
-
-
-                    html+=
-
-                        '<div class="home-feature-row">'+
-
-                        "<span>"+
-
-                        (
-                            entry && entry.seen
-                            ?
-                            getElementIconHTML(
-                                monster.element
-                            )+
-                            ""+monster.name
-                            :
-                            "ï¼Ÿï¼Ÿï¼Ÿ"
-                        )+
-
-                        "</span>"+
-
-                        "<span>"+
-
-                        (
-                            entry && entry.seen
-                            ?
-                            "æ“Šæ®º"+(entry.kills||0)
-                            :
-                            "æœªé‡è¦‹"
-                        )+
-
-                        "</span>"+
-
-                        "</div>";
-
-                }
-            );
-
-        }
-    );
-
-
-    return html;
-
-}
-
-
-/* =====================================================
-   â˜… æˆå°±
-===================================================== */
-
-function renderAchievementContent(){
-
-    let html=
-        "";
-
-
-    achievementDefinitions.forEach(
-        achievement=>{
-
-            const done=
-
-                achievement.check();
-
-
-            const claimed=
-
-                achievementState[
-                    achievement.id
-                ];
-
-
-            const rewardText=
-
-                Object.keys(
-                    achievement.reward
-                )
-                .map(
-                    key=>
-                        achievement.reward[key]+""
-                )
-                .join("ã€");
-
-
-            html+=
-
-                '<div class="home-feature-row">'+
-
-                "<span>"+
-                achievement.name+
-                "<br>"+
-                '<span style="font-size:11px;color:#b3a58c;">'+
-                achievement.desc+
-                "çå‹µï¼š"+rewardText+
-                "</span>"+
-                "</span>"+
-
-                '<button class="home-feature-buy-btn"'+
-
-                (
-                    !done || claimed
-                    ?
-                    "disabled"
-                    :
-                    ""
-                )+
-
-                'onclick="claimAchievement(\''+
-                achievement.id+
-                '\')">'+
-
-                (
-                    claimed
-                    ?
-                    "å·²é ˜å–"
-                    :
-                    done
-                    ?
-                    "é ˜å–"
-                    :
-                    "æœªé”æˆ"
-                )+
-
-                "</button>"+
-
-                "</div>";
-
-        }
-    );
-
-
-    return html;
-
-}
-
-
-function claimAchievement(achievementId){
-
-    const achievement=
-
-        achievementDefinitions.find(
-            a=>a.id===achievementId
-        );
-
-
-    if(!achievement){
-        return;
-    }
-
-
-    if(
-        !achievement.check() ||
-        achievementState[achievementId]
-    ){
-        return;
-    }
-
-
-    achievementState[achievementId]=
-        true;
-
-
-    if(achievement.reward.gold){
-
-        gold=
-            gold+
-            achievement.reward.gold;
-
-    }
-
-
-    updateGoldDisplay();
-
-    saveGame();
-
-
-    const bodyEl=
-        $("homeFeatureModalBody");
-
-
-    if(bodyEl){
-
-        bodyEl.innerHTML=
-            renderAchievementContent();
-
-    }
-
-}
-
-
-/* =====================================================
-   â˜… å…¬å‘Š
-===================================================== */
-
-function renderAnnouncementContent(){
-
-    return (
-
-        '<div style="font-size:13px;line-height:1.8;">'+
-
-        "ä¸»åŸå…¨æ–°æ”¹ç‰ˆï¼<br>"+
-        "æ–°å¢å•†åº—ã€åœ–é‘‘ã€æ¯æ—¥ä»»å‹™ã€æˆå°±ç³»çµ±ï¼Œ"+
-        "æ­¡è¿æ…¢æ…¢é€›é€›ã€‚<br><br>"+
-
-        "é–‹ç™¼ä¸­åŠŸèƒ½ï¼š<br>"+
-        "æ›´å¤šè£å‚™ã€æ›´å¤šåœ°å€ã€æ›´å¤šæŠ€èƒ½ï¼Œ"+
-        "é™¸çºŒæ›´æ–°ä¸­ã€‚"+
-
-        "</div>"
-
-    );
-
-}
-
-
-function renderSystemContent(){
-
-    return (
-        '<div class="system-panel">'+
-            '<div class="system-panel-row">'+
-                '<div><strong>éŠæˆ²å­˜æª”</strong><small>ç›®å‰éŠæˆ²æœƒè‡ªå‹•å­˜æª”ï¼Œä¹Ÿå¯ä»¥ç«‹å³æ‰‹å‹•ä¿å­˜ã€‚</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="saveGame();alert(\'å·²å®Œæˆæ‰‹å‹•å­˜æª”ã€‚\')">ç«‹å³å­˜æª”</button>'+
-            '</div>'+
-            '<div class="system-panel-row">'+
-                '<div><strong>å¸³è™Ÿç®¡ç†</strong><small>æŸ¥çœ‹ç›®å‰ Firebase UIDã€ç™»å‡ºæˆ–åˆ‡æ›å¸³è™Ÿã€‚</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">åˆ‡æ›å¸³è™Ÿï¼ç¶å®šå¸³è™Ÿ</button>'+
-            '</div>'+
-            '<div class="system-panel-row">'+
-                '<div><strong>å®¢æœä¿¡ç®±</strong><small>æŸ¥çœ‹ã€Šå››è±¡æ±Ÿæ¹–å‚³ã€‹å®¢æœè¯çµ¡æ–¹å¼ã€‚</small></div>'+
-                '<button id="systemSupportEmailButton" class="home-feature-buy-btn" onclick="window.FourSymbolsSupport.show()">æŸ¥çœ‹ä¿¡ç®±</button>'+
-            '</div>'+
-            '<div class="system-panel-row danger">'+
-                '<div><strong>åˆªé™¤è§’è‰²</strong><small>åˆªé™¤å…¨éƒ¨è§’è‰²èˆ‡éŠæˆ²é€²åº¦ï¼Œè¿”å›åˆå§‹å‰µè§’é é¢ã€‚</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="resetGame()">åˆªé™¤è§’è‰²</button>'+
-            '</div>'+
-        '</div>'
-    );
-
-}
-
-
-function restAtHome(){
-
-    if(battleActive){
-
-        alert(
-            "æˆ°é¬¥ä¸­ç„¡æ³•ä¼‘æ¯ã€‚"
-        );
-
-        return;
-
-    }
-
-
-    const needsRest=getExistingPartyIndexes().some(index=>{
-        const character=getPartyCharacterByIndex(index);
-        const stats=getPartyBattleStats(index);
-        return character.hp<stats.maxHP || character.sp<stats.maxSP;
-    });
-
-    if(!needsRest){
-
-        alert(
-            "HPã€SP å·²ç¶“æ˜¯æ»¿çš„äº†ã€‚"
-        );
-
-        return;
-
-    }
-
-
-    getExistingPartyIndexes().forEach(index=>{
-        const character=getPartyCharacterByIndex(index);
-        const stats=getPartyBattleStats(index);
-        character.hp=stats.maxHP;
-        character.sp=stats.maxSP;
-    });
-
-
-    updateUI();
-
-    saveGame();
-
-
-    alert(
-        "ä¼‘æ¯å®Œç•¢ï¼ŒHPï¼SP å·²ç¶“å…¨éƒ¨è£œæ»¿ã€‚"
-    );
-
-}
-
-
-/* =====================================================
-   V92 â€” ä¸»åŸé–‹ç™¼æ¸¬è©¦å¿«æ·éµ
-===================================================== */
-
-function grantTestGoldMillion(){
-    gold=
-        Math.max(0,Math.floor(Number(gold)||0))+
-        TEST_GOLD_GRANT;
-
-    updateGoldDisplay();
-    updateUI();
-    saveGame();
-
-    alert(
-        "é‡‘å¹£ +1,000,000ï¼Œç›®å‰å…±æœ‰ "+
-        gold.toLocaleString("zh-TW")+
-        " é‡‘å¹£ã€‚"
-    );
-}
-
-function grantTestExpTenMillion(){
-    sharedExp=
-        Math.max(0,Math.floor(Number(sharedExp)||0))+
-        TEST_EXP_POOL_GRANT;
-
-    updateUI();
-    saveGame();
-
-    alert(
-        "ç¶“é©—æ±  +1,000,000,000ï¼Œç›®å‰å…±æœ‰ "+
-        sharedExp.toLocaleString("zh-TW")+
-        " EXPã€‚"
-    );
-}
-
-function updateHomeTestTools(){
-    const goldButton=$("testGoldMillionButton");
-    const expButton=$("testExpTenMillionButton");
-
-    if(goldButton){
-        goldButton.innerHTML="é‡‘å¹£ <b>+100è¬</b>";
-    }
-
-    if(expButton){
-        expButton.innerHTML="ç¶“é©—æ±  <b>+10å„„</b>";
-    }
-}
-
-
-/*
-   â˜… æ¸¬è©¦ç”¨ï¼šæŠ€èƒ½é» +999ã€‚
-
-   ç´”ç²¹æ–¹ä¾¿ä½ æ¸¬è©¦æŠ€èƒ½æ•ˆæœï¼ˆå°¤å…¶æ˜¯ç‡ƒç‡’é€™ç¨®
-   éœ€è¦ä¸€è·¯å‡ç´šæ‰çœ‹å¾—å‡ºå·®ç•°çš„æŠ€èƒ½ï¼‰ï¼Œ
-   ä¹‹å¾Œæ­£å¼ç‰ˆä¸Šç·šå‰è¨˜å¾—æŠŠé€™å¼µå¡ç‰‡
-   è·Ÿé€™å€‹å‡½å¼ä¸€èµ·æ‹¿æ‰ã€‚
-*/
-
-function grantTestSkillPoints(){
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™è£¡å¯«æ­»åªåŠ çµ¦playerï¼ˆç¬¬ä¸€è§’è‰²ï¼‰ï¼Œ
-       ç¬¬äºŒè§’è‰²æ°¸é æ¸¬è©¦ä¸åˆ°ã€Œçµ¦é»æ•¸ã€é€™å€‹æŒ‰éˆ•ï¼Œ
-       å®¹æ˜“è®“äººèª¤ä»¥ç‚ºç¬¬äºŒè§’è‰²çš„æŠ€èƒ½é»æ˜¯å¾åˆ¥çš„åœ°æ–¹
-       ï¼ˆç”šè‡³bugï¼‰å†’å‡ºä¾†çš„ã€‚
-       æ”¹æˆplayer2å­˜åœ¨çš„è©±å…©é‚Šéƒ½å„åŠ 999ï¼Œ
-       æ¸¬è©¦å“ªå€‹è§’è‰²éƒ½æ–¹ä¾¿ã€‚
-    */
-
-    player.skillPoints+=999;
-
-
-    let message=
-
-        "æŠ€èƒ½é» +999ï¼Œã€Œ"+
-        (player.id||"ç¬¬ä¸€è§’è‰²")+
-        "ã€ç›®å‰å…±æœ‰"+
-        player.skillPoints+
-        "é»ã€‚";
-
-
-    if(player2){
-
-        player2.skillPoints+=999;
-
-
-        message+=
-
-            "\nã€Œ"+
-            player2.id+
-            "ã€ç›®å‰å…±æœ‰"+
-            player2.skillPoints+
-            "é»ã€‚";
-
-    }
-
-    if(player3){
-
-        player3.skillPoints+=999;
-
-        message+=
-            "\nã€Œ"+
-            player3.id+
-            "ã€ç›®å‰å…±æœ‰"+
-            player3.skillPoints+
-            "é»ã€‚";
-
-    }
-
-
-    updateUI();
-
-    renderSkillLoadout();
-
-    saveGame();
-
-
-    alert(
-        message
-    );
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆæ¸¬è©¦ç”¨ï¼‰ï¼šç¶“é©—æ±  +100000ã€‚
-
-   ç´”ç²¹æ–¹ä¾¿æ¸¬è©¦å‡ç´šã€æŠ€èƒ½é–‹æ”¾é–€æª»é€™é¡
-   éœ€è¦ç·´åŠŸç·´å¾ˆä¹…æ‰çœ‹å¾—åˆ°æ•ˆæœçš„æ±è¥¿ï¼Œ
-   ç›´æ¥æŠŠç¶“é©—å­˜é€²å…±ç”¨ç¶“é©—æ± ï¼Œ
-   ä¹‹å¾Œè¦ä¸è¦åˆ†çµ¦è§’è‰²é‚„æ˜¯ç…§åŸæœ¬çš„æ–¹å¼
-   è‡ªå·±å»åˆ†é…ã€‚ä¹‹å¾Œæ­£å¼ç‰ˆä¸Šç·šå‰è¨˜å¾—
-   æŠŠé€™å€‹æŒ‰éˆ•è·Ÿé€™å€‹å‡½å¼ä¸€èµ·æ‹¿æ‰ã€‚
-*/
-
-function grantTestExp(){
-
-    sharedExp+=100000;
-
-    updateUI();
-
-    saveGame();
-
-
-    alert(
-        "ç¶“é©—æ±  +100000ï¼Œç›®å‰å…±æœ‰"+
-        sharedExp+
-        "é»ç¶“é©—å€¼ã€‚"
-    );
-
-}
-
-
-function distributeExpToPlayer(){
-
-    distributeExpToCharacter(
-        player
-    );
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼šåˆ†é…ç¶“é©—å€¼çµ¦ç¬¬äºŒè§’è‰²ã€‚
-   è·ŸdistributeExpToPlayer()æ˜¯åŒä¸€å¥—é‚è¼¯ï¼Œ
-   ç›´æ¥å‘¼å«å…±ç”¨å‡½å¼ï¼Œåªæ˜¯æ›ä¸€å€‹è§’è‰²ç‰©ä»¶ã€‚
-*/
-
-function distributeExpToPlayer2(){
-
-    if(!player2){
-        return;
-    }
-
-
-    distributeExpToCharacter(
-        player2
-    );
-
-}
-
-
-function distributeExpToPlayer3(){
-
-    if(!player3){
-        return;
-    }
-
-    distributeExpToCharacter(
-        player3
-    );
-
-}
-
-
-/*
-   æŠŠdistributeExpToPlayer()åŸæœ¬çš„é‚è¼¯
-   æŠ½æˆé€šç”¨å‡½å¼ï¼Œplayer/player2å…±ç”¨åŒä¸€å¥—ï¼Œ
-   ä¸ç”¨ç¶­è­·å…©ä»½å¹¾ä¹ä¸€æ¨£çš„ç¨‹å¼ç¢¼ã€‚
-*/
-
-function distributeExpToCharacter(character){
-
-    if(battleActive){
-
-        alert(
-            "æˆ°é¬¥ä¸­ç„¡æ³•åˆ†é…ç¶“é©—å€¼ã€‚"
-        );
-
-        return;
-
-    }
-
-
-    if(sharedExp<=0){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬æ˜¯æŠŠç¶“é©—æ± ã€Œå…¨éƒ¨ã€ä¸€æ¬¡å¡çµ¦è§’è‰²ï¼Œ
-       å¯èƒ½ä¸€æ¬¡é€£çºŒå‡å¥½å¹¾ç´šï¼Œ
-       è€Œä¸”æœƒæŠŠç¶“é©—æ± æ¸…ç©ºï¼Œ
-       å°è‡´ç©å®¶æ²’è¾¦æ³•æŠŠå‰©ä¸‹çš„ç¶“é©—
-       ç•™çµ¦å…¶ä»–è§’è‰²ã€‚
-
-       æ”¹æˆï¼šæ¯æŒ‰ä¸€æ¬¡ï¼Œåªè½‰ç§»ã€Œå‰›å¥½å‡ä¸Šä¸‹ä¸€ç´šã€
-       æ‰€éœ€è¦çš„ç¶“é©—å€¼ï¼Œä¸€æ¬¡åªå‡ä¸€ç´šã€‚
-       å¦‚æœç¶“é©—æ± ä¸å¤ å‡ä¸€ç´šï¼Œ
-       å°±ä¸è½‰ç§»ã€æç¤ºé‚„å·®å¤šå°‘ï¼Œ
-       é¿å…ç¶“é©—å€¼å¡åœ¨ä¸€å€‹ä¸ä¸Šä¸ä¸‹çš„ç‹€æ…‹ã€‚
-
-       â˜… æ–°å¢é˜²å‘†ï¼š
-       å¦‚æœè§’è‰²çš„expä¸çŸ¥é“ç‚ºä»€éº¼å·²ç¶“è¶…éexpNext
-       ï¼ˆç†è«–ä¸Šä¸è©²ç™¼ç”Ÿï¼Œä½†å­˜æª”å¯èƒ½å› ç‚ºæŸäº›æ“ä½œ
-       ç•™ä¸‹ä¸ä¸€è‡´çš„è³‡æ–™ï¼‰ï¼Œneededæœƒè®Šæˆè² æ•¸æˆ–0ï¼Œ
-       é€™æ¨£ã€ŒsharedExp<neededã€é€™å€‹åˆ¤æ–·æ°¸é æ˜¯falseï¼Œ
-       ç­‰æ–¼ç™½ç™½å¾ç¶“é©—æ± é‚£è£¡ã€Œå·ã€åˆ°expï¼Œ
-       é‚„å¯èƒ½è®“checkLevelUp()ä¸€æ¬¡è·‘å¾ˆå¤šè¼ªï¼Œ
-       çŒå‡ºé›¢è­œçš„æŠ€èƒ½é»/å±¬æ€§é»æ•¸å­—ã€‚
-       é€™è£¡å…ˆæŠŠneededå¤¾åœ¨æœ€å°1ï¼Œ
-       å¾¹åº•é¿å…é€™å€‹æ¼æ´ã€‚
-    */
-
-    const needed =
-        Math.max(
-            1,
-            character.expNext-
-            character.exp
-        );
-
-
-    if(sharedExp<needed){
-
-        alert(
-            "ç¶“é©—æ± ä¸è¶³ä»¥å‡ç´šï¼Œé‚„å·®"+
-            (needed-sharedExp)+
-            "EXPã€‚"
-        );
-
-        return;
-
-    }
-
-
-    character.exp +=
-        needed;
-
-    sharedExp -=
-        needed;
-
-
-    checkLevelUp(
-        character
-    );
-
-    updateUI();
-
-    saveGame();
-
-}
-
-
-function renderExpDistributeList(){
-
-    const container =
-        $("expDistributeList");
-
-
-    if(!container){
-        return;
-    }
-
-
-    container.innerHTML="";
-
-
-    const element =
-        elementDatabase[
-            player.element
-        ]||
-        elementDatabase.fire;
-
-
-    const needed =
-        Math.max(
-            0,
-            player.expNext-
-            player.exp
-        );
-
-
-    const mainRow =
-        document.createElement(
-            "div"
-        );
-
-
-    mainRow.innerHTML =
-
-        `
-        <button
-            id="distributeMainButton"
-            class="exp-distribute-button"
-        >
-            <span class="exp-character-icon">${element.icon}</span>
-            <span class="exp-character-copy">
-                <strong>${player.id||element.character}</strong>
-                <small>Lv.${player.level} â†’ Lv.${player.level+1}</small>
-            </span>
-            <span class="exp-character-cost">
-                <b>${needed.toLocaleString("zh-TW")}</b>
-                <small>EXP</small>
-            </span>
-        </button>
-        `;
-
-
-    container.appendChild(
-        mainRow
-    );
-
-
-    /*
-       â˜… ä¸€æ¬¡åªå‡ä¸€ç´šï¼š
-       ç¶“é©—æ± ä¸å¤ å‡ä¸‹ä¸€ç´šæ™‚ç›´æ¥é–ä½æŒ‰éˆ•ï¼Œ
-       ä¸æœƒè®“ç©å®¶èª¤æŒ‰å¾ŒæŠŠç¶“é©—æ± æ¸…ç©º
-       å»å‡ä¸äº†ç´šã€‚
-    */
-
-    $("distributeMainButton")
-        .disabled =
-        sharedExp<needed ||
-        battleActive;
-
-
-    $("distributeMainButton")
-        .onclick =
-        distributeExpToPlayer;
-
-
-    /*
-       â˜… ç¬¬äºŒè§’è‰²çš„åˆ†é…æŒ‰éˆ•ï¼ˆæ–°å¢ï¼‰ã€‚
-       player2å­˜åœ¨çš„è©±é¡¯ç¤ºçœŸæ­£å¯ä»¥æŒ‰çš„æŒ‰éˆ•ï¼Œ
-       é‚è¼¯è·Ÿç¬¬ä¸€è§’è‰²çš„æŒ‰éˆ•å®Œå…¨å°ç¨±ã€‚
-    */
-
-    if(player2){
-
-        const player2Row=
-            document.createElement(
-                "div"
-            );
-
-
-        const needed2=
-            Math.max(
-                0,
-                player2.expNext-
-                player2.exp
-            );
-
-
-        player2Row.innerHTML=
-
-            `
-            <button
-                id="distributePlayer2Button"
-                class="exp-distribute-button"
-            >
-                <span class="exp-character-icon">â—†</span>
-                <span class="exp-character-copy">
-                    <strong>${player2.id}</strong>
-                    <small>Lv.${player2.level} â†’ Lv.${player2.level+1}</small>
-                </span>
-                <span class="exp-character-cost">
-                    <b>${needed2.toLocaleString("zh-TW")}</b>
-                    <small>EXP</small>
-                </span>
-            </button>
-            `;
-
-
-        container.appendChild(
-            player2Row
-        );
-
-
-        $("distributePlayer2Button")
-            .disabled=
-
-            sharedExp<needed2 ||
-            battleActive;
-
-
-        $("distributePlayer2Button")
-            .onclick=
-            distributeExpToPlayer2;
-
-    }
-
-
-    if(player3){
-
-        const player3Row=
-            document.createElement(
-                "div"
-            );
-
-        const needed3=
-            Math.max(
-                0,
-                player3.expNext-
-                player3.exp
-            );
-
-        player3Row.innerHTML=
-            `
-            <button
-                id="distributePlayer3Button"
-                class="exp-distribute-button"
-            >
-                <span class="exp-character-icon">â—†</span>
-                <span class="exp-character-copy">
-                    <strong>${player3.id}</strong>
-                    <small>Lv.${player3.level} â†’ Lv.${player3.level+1}</small>
-                </span>
-                <span class="exp-character-cost">
-                    <b>${needed3.toLocaleString("zh-TW")}</b>
-                    <small>EXP</small>
-                </span>
-            </button>
-            `;
-
-        container.appendChild(
-            player3Row
-        );
-
-        $("distributePlayer3Button").disabled=
-            sharedExp<needed3 ||
-            battleActive;
-
-        $("distributePlayer3Button").onclick=
-            distributeExpToPlayer3;
-
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       æ°´æˆ°å£«ï¼é¢¨å¼“æ‰‹é€™å…©å€‹é–å®šä½”ä½æŒ‰éˆ•
-       ä¾ç…§ç©å®¶è¦æ±‚æ•´å€‹æ‹¿æ‰ï¼Œä¸å†é¡¯ç¤ºï¼Œ
-       é€™å…©å€‹ç›®å‰æœ¬ä¾†å°±æ²’æœ‰çœŸæ­£çš„è§’è‰²è³‡æ–™
-       ï¼ˆé™¤éç©å®¶å‰µå»ºç¬¬äºŒè§’è‰²æ™‚å‰›å¥½é¸äº†åŒæ¨£å…ƒç´ ï¼Œ
-       ä½†é‚£å€‹æƒ…æ³ä¸‹å¯¦éš›æ›çš„æ˜¯player2ï¼Œ
-       ä¸æ˜¯é€™è£¡çš„æ°´/é¢¨ä½”ä½ç¬¦ï¼‰ï¼Œ
-       ç•™è‘—åªæ˜¯å¤šé¤˜çš„è¦–è¦ºé›œè¨Šã€‚
-    */
-
-}
-
-
-/* =====================================================
-   ç‹€æ…‹åŠ é»
-===================================================== */
-
-/*
-   â˜… ç‹€æ…‹é åˆ‡æ›è§’è‰²ï¼ˆæ–°å¢ï¼‰ã€‚
-   åˆ‡æ›çš„æ™‚å€™è¦æŠŠpendingStatsæ¸…ç©ºï¼Œ
-   ä¸ç„¶ã€Œé‚„æ²’ç¢ºèªçš„åŠ é»ã€æœƒèª¤å¸¶åˆ°å¦ä¸€å€‹è§’è‰²èº«ä¸Šã€‚
-*/
-
-function changeStatusCharacter(direction){
-
-    const indexes=getExistingPartyIndexes();
-
-    if(indexes.length<2){
-        return;
-    }
-
-    const currentPosition=Math.max(
-        0,
-        indexes.indexOf(statusCharacterIndex)
-    );
-
-    statusCharacterIndex=indexes[
-        (currentPosition+direction+indexes.length)%indexes.length
-    ];
-
-
-    Object.keys(
-        pendingStats
-    )
-    .forEach(stat=>{
-
-        pendingStats[stat]=0;
-
-    });
-
-
-    updateStatusPreview();
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€ŒåŠ é»è¦æ–°å¢
-   é•·æŒ‰å¿«é€ŸåŠ é»æ¯”è¼ƒç°¡å–®ï¼Œé‚„æ˜¯é›™ç®­é ­æŒ‰ä¸€ä¸‹
-   +10æ¯”è¼ƒç°¡å–®ï¼Œå¦³ç›´æ¥é¸ä¸€å€‹ã€â€”â€”é¸äº†
-   é•·æŒ‰æ–¹æ¡ˆï¼‰ï¼š
-
-   å…±ç”¨çš„ã€Œé•·æŒ‰æŒçºŒè§¸ç™¼ã€å°å·¥å…·ã€‚æŒ‰ä¸‹
-   ï¼ˆtouchstart/mousedownï¼‰å…ˆç­‰500æ¯«ç§’
-   ï¼ˆé¿å…æ‰‹æ»‘è¼•é»ä¹Ÿè¢«ç•¶æˆé•·æŒ‰ï¼‰ï¼Œæ¥è‘—
-   æ¯120æ¯«ç§’è‡ªå‹•å‘¼å«ä¸€æ¬¡å‚³é€²ä¾†çš„å‡½å¼ï¼Œ
-   ç›´åˆ°æ”¾é–‹/æ‰‹æŒ‡ç§»å‡º/æ»‘èµ°ç‚ºæ­¢
-   ï¼ˆtouchend/touchcancel/mouseup/
-   mouseleaveå…¨éƒ¨éƒ½è¦æ¸…æ‰è¨ˆæ™‚å™¨ï¼Œ
-   ä»»ä½•ä¸€ç¨®æ”¾é–‹æ‰‹æŒ‡çš„æ–¹å¼éƒ½ä¸èƒ½æ¼æ¥ï¼Œ
-   ä¸ç„¶è¨ˆæ™‚å™¨æœƒå¡ä½ä¸€ç›´åŠ ä¸‹å»ï¼‰ã€‚
-
-   6çµ„+/-æŒ‰éˆ•ï¼ˆæ”»æ“Š/é«”è³ª/èƒ½é‡/æ™ºåŠ›/
-   ç²¾ç¥/æ•æ·ï¼‰å…¨éƒ¨å‘¼å«é€™å€‹å‡½å¼ï¼Œä¸ç”¨
-   æ¯é¡†æŒ‰éˆ•å„å¯«ä¸€ä»½é•·æŒ‰é‚è¼¯ã€‚
-*/
-
-function attachLongPress(el,fn){
-
-    if(!el){
-        return;
-    }
-
-
-    let holdTimeout=null;
-
-    let repeatInterval=null;
-
-
-    function stop(){
-
-        if(holdTimeout){
-            clearTimeout(holdTimeout);
-            holdTimeout=null;
-        }
-
-
-        if(repeatInterval){
-            clearInterval(repeatInterval);
-            repeatInterval=null;
-        }
-
-    }
-
-
-    function start(e){
-
-        e.preventDefault();
-
-        fn();
-
-
-        stop();
-
-
-        holdTimeout=
-            setTimeout(
-                ()=>{
-
-                    repeatInterval=
-                        setInterval(
-                            fn,
-                            55
-                        );
-
-                },
-                250
-            );
-
-    }
-
-
-    el.addEventListener(
-        "touchstart",
-        start,
-        {passive:false}
-    );
-
-    el.addEventListener(
-        "mousedown",
-        start
-    );
-
-
-    [
-        "touchend",
-        "touchcancel",
-        "mouseup",
-        "mouseleave"
-    ].forEach(evtName=>{
-
-        el.addEventListener(
-            evtName,
-            stop
-        );
-
-    });
-
-}
-
-
-function addPoint(stat){
-
-    if(
-        !Object.prototype.hasOwnProperty.call(
-            pendingStats,
-            stat
-        )
-    ){
-        return;
-    }
-
-
-    const targetCharacter=
-        getStatusCharacterObject();
-
-
-    const used =
-        Object.values(
-            pendingStats
-        )
-        .reduce(
-            (sum,value)=>
-                sum+value,
-            0
-        );
-
-
-    if(
-        used>=
-        targetCharacter.attributePoints
-    ){
-        return;
-    }
-
-
-    pendingStats[stat]++;
-
-
-    updateStatusPreview();
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…æŒ‡æ­£ï¼‰ï¼š
-   ä¹‹å‰é€™è£¡åªæœ‰addPoint()ï¼Œå®Œå…¨æ²’æœ‰å°æ‡‰çš„
-   æ¸›è™Ÿå‡½å¼ï¼Œå°è‡´ç‹€æ…‹é é¢åˆ†é…å‡ç´šé»æ•¸çš„åœ°æ–¹
-   åªèƒ½åŠ ã€ä¸èƒ½æ‰£ï¼Œè·Ÿå‰µè§’é é¢ï¼ˆæœ¬ä¾†å°±æœ‰
-   åŠ æ¸›å…©é¡†æŒ‰éˆ•ï¼‰ä¸ä¸€è‡´ã€‚
-   è£œä¸ŠremovePoint()ï¼Œåªèƒ½æ‰£æ‰ã€Œé€™æ¬¡é‚„æ²’
-   ç¢ºèªã€æš«å­˜ä¸­ã€çš„é»æ•¸ï¼Œä¸æœƒå‹•åˆ°è§’è‰²
-   å·²ç¶“ç”Ÿæ•ˆçš„å±¬æ€§å€¼ï¼Œé‚è¼¯ä¸Šè·Ÿå‰µè§’é é¢çš„
-   creationAdd(stat,-1)æ˜¯åŒä¸€ç¨®åšæ³•ã€‚
-*/
-
-function removePoint(stat){
-
-    if(
-        !Object.prototype.hasOwnProperty.call(
-            pendingStats,
-            stat
-        )
-    ){
-        return;
-    }
-
-
-    if(
-        pendingStats[stat]<=0
-    ){
-        return;
-    }
-
-
-    pendingStats[stat]--;
-
-
-    updateStatusPreview();
-
-}
-
-
-function updateStatusPreview(){
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™æ•´å€‹å‡½å¼éƒ½å¯«æ­»èªplayerï¼Œ
-       ç¬¬äºŒè§’è‰²æ²’è¾¦æ³•ç”¨ç‹€æ…‹é åŠ é»ã€‚
-       æ”¹æˆå…ˆæŠ“ã€Œç›®å‰é¸ä¸­çš„è§’è‰²ã€
-       ï¼ˆplayeræˆ–player2ï¼‰ï¼Œ
-       ä¸‹é¢æ‰€æœ‰è¨ˆç®—éƒ½å°é€™å€‹è§’è‰²åšï¼Œ
-       ä¸ç”¨æ•´å€‹å‡½å¼é‡å¯«å…©ä»½ã€‚
-    */
-
-    const targetCharacter=
-        getStatusCharacterObject();
-
-
-    const current = {
-
-        attack:
-            targetCharacter.attack+
-            pendingStats.attack,
-
-        vitality:
-            targetCharacter.vitality+
-            pendingStats.vitality,
-
-        energy:
-            targetCharacter.energy+
-            pendingStats.energy,
-
-        intelligence:
-            targetCharacter.intelligence+
-            pendingStats.intelligence,
-
-        spirit:
-            targetCharacter.spirit+
-            pendingStats.spirit,
-
-        agility:
-            targetCharacter.agility+
-            pendingStats.agility
-
-    };
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œé»æ•¸åˆ†é…
-       é¡¯ç¤ºç•¶å‰è§’è‰²çš„HPã€SPæ¢ï¼ŒåŠ é»é«”è³ª/
-       èƒ½é‡æ™‚å¯ä»¥é è¦½å¢åŠ çš„å‹•ç•«ï¼Œè¡€æ¢æœƒ
-       åˆç†ç¸®çŸ­ã€ï¼‰ï¼š
-       maxHP/maxSPå…¬å¼è·ŸgetBaseStats()
-       è£¡çš„ç®—æ³•å®Œå…¨ä¸€è‡´ï¼ˆ1é«”è³ª=+50HPï¼Œ
-       1èƒ½é‡=+15SPï¼‰ï¼Œåªæ˜¯é€™è£¡æ”¹æˆåƒ
-       targetCharacterï¼ˆå¯èƒ½æ˜¯playeræˆ–
-       player2ï¼‰ï¼Œä¸èƒ½ç›´æ¥å‘¼å«
-       getBaseStats()ï¼ˆé‚£å€‹å‡½å¼å¯«æ­»æŠ“
-       playerï¼‰ï¼Œè‡ªå·±é‡ç®—ä¸€æ¬¡ã€‚
-
-       ç›®å‰HP/SPï¼ˆtargetCharacter.hpï¼.spï¼‰
-       ä¸æœƒå› ç‚ºé è¦½åŠ é»è€Œæ”¹è®Šï¼Œåªæœ‰ã€Œä¸Šé™ã€
-       æœƒè·Ÿè‘—pendingStats.vitalityï¼.energy
-       å³æ™‚é è¦½è®ŠåŒ–â€”â€”é€™æ¨£è¡€æ¢å¯¬åº¦
-       ï¼ˆç¾åœ¨HPÃ·é è¦½å¾Œä¸Šé™ï¼‰å°±æœƒè‡ªç„¶
-       éš¨è‘—ä¸Šé™è®Šå¤§è€Œç¸®çŸ­ï¼Œä¸ç”¨å¦å¤–å¯«
-       ã€Œç¸®çŸ­å‹•ç•«ã€çš„ç‰¹æ®Šé‚è¼¯ã€‚
-    */
-
-    const previewMaxHP=
-
-        100+
-        current.vitality*50+
-        (targetCharacter.bonusHP||0);
-
-
-    const previewMaxSP=
-
-        50+
-        current.energy*15+
-        (targetCharacter.bonusSP||0);
-
-
-    const currentHP=
-
-        Math.min(
-            targetCharacter.hp||0,
-            previewMaxHP
-        );
-
-
-    const currentSP=
-
-        Math.min(
-            targetCharacter.sp||0,
-            previewMaxSP
-        );
-
-
-    $("statusPreviewHpText")
-        .textContent=
-
-        currentHP+
-        "ï¼"+
-        previewMaxHP;
-
-
-    $("statusPreviewSpText")
-        .textContent=
-
-        currentSP+
-        "ï¼"+
-        previewMaxSP;
-
-
-    $("statusPreviewHpFill")
-        .style.width=
-
-        (
-            previewMaxHP>0
-            ?
-            (currentHP/previewMaxHP*100)
-            :
-            0
-        )+
-        "%";
-
-
-    $("statusPreviewSpFill")
-        .style.width=
-
-        (
-            previewMaxSP>0
-            ?
-            (currentSP/previewMaxSP*100)
-            :
-            0
-        )+
-        "%";
-
-
-    /*
-       â˜… æ–°å¢ï¼š
-       ç‹€æ…‹é é¢ç¾åœ¨æœƒé¡¯ç¤º
-       ã€Œç©å®¶é»æ•¸ + è£å‚™åŠ æˆ = ç¸½åˆã€ï¼Œ
-       è€Œä¸æ˜¯åªé¡¯ç¤ºç©å®¶è‡ªå·±åŠ é»çš„æ•¸å­—ã€‚
-       è£å‚™åŠ æˆæŠ“å°æ‡‰è§’è‰²çš„è£å‚™æ¬„
-       ï¼ˆplayerâ†’player.elementã€
-       player2â†’å›ºå®š"player2"é€™å€‹keyï¼‰ï¼Œ
-       è·Ÿä¸»åŸã€èƒŒåŒ…é çœ‹åˆ°çš„é‚è¼¯ä¸€è‡´ã€‚
-    */
-
-    const equipmentBonus =
-        getEquipmentBonus(
-            getPartyCharacterKey(
-                getPartyCharacterIndex(targetCharacter)
-            )
-        );
-
-
-    function formatStatLine(
-        baseValue,
-        bonusValue
-    ){
-
-        /*
-           â˜… ä¿®æ­£ï¼š
-           ä¹‹å‰è£å‚™åŠ æˆæ˜¯0çš„æ™‚å€™åªé¡¯ç¤ºå–®ä¸€æ•¸å­—ï¼Œ
-           ç©å®¶æ²’è£å‚™æ±è¥¿æ™‚å®Œå…¨çœ‹ä¸å‡º
-           ã€Œæœ‰åœ¨ç®—è£å‚™åŠ æˆã€é€™ä»¶äº‹ï¼Œ
-           ä»¥ç‚ºæ²’ç”Ÿæ•ˆã€‚
-           æ”¹æˆä¸€å¾‹é¡¯ç¤ºã€ŒåŸºç¤+è£å‚™=ç¸½åˆã€ï¼Œ
-           å°±ç®—è£å‚™åŠ æˆæ˜¯0ä¹Ÿä¸€æ¨£é¡¯ç¤ºï¼Œ
-           ä¾‹å¦‚ 9+0=9ã€‚
-        */
-
-        return (
-            baseValue+
-            "+"+
-            bonusValue+
-            "="+
-            (
-                baseValue+
-                bonusValue
-            )
-        );
-
-    }
-
-
-    $("statusAttack")
-        .textContent =
-        formatStatLine(
-            current.attack,
-            equipmentBonus.attack
-        );
-
-
-    $("statusVitality")
-        .textContent =
-        formatStatLine(
-            current.vitality,
-            equipmentBonus.vitality
-        );
-
-
-    $("statusEnergy")
-        .textContent =
-        formatStatLine(
-            current.energy,
-            equipmentBonus.energy
-        );
-
-
-    $("statusIntelligence")
-        .textContent =
-        formatStatLine(
-            current.intelligence,
-            equipmentBonus.intelligence
-        );
-
-
-    $("statusSpirit")
-        .textContent =
-        formatStatLine(
-            current.spirit,
-            equipmentBonus.spirit
-        );
-
-
-    $("statusAgility")
-        .textContent =
-        formatStatLine(
-            current.agility,
-            equipmentBonus.agility
-        );
-
-
-    const used =
-        Object.values(
-            pendingStats
-        )
-        .reduce(
-            (sum,value)=>
-                sum+value,
-            0
-        );
-
-
-    $("attributePoints")
-        .textContent =
-        Math.max(
-            0,
-            targetCharacter.attributePoints-used
-        );
-
-
-    $("confirmStatusButton")
-        .disabled =
-        used===0;
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸæ­£æŠ“åˆ°ã€Œç®­é ­å€å¡Šæ€éº¼é—œéƒ½é—œ
-       ä¸æ‰ã€çš„åŸå› ï¼‰ï¼š
-       é€™è£¡åŸæœ¬ç„¡æ¢ä»¶ä¾ç…§player2å­˜ä¸å­˜åœ¨
-       é‡æ–°è¨­å®šé¡¯ç¤ºç‹€æ…‹ï¼Œå®Œå…¨ä¸çŸ¥é“é€™å€‹
-       å€å¡Šç¾åœ¨æ˜¯ä¸æ˜¯æ­£è¢«è§’è‰²è¦–çª—
-       ï¼ˆswitchCharacterTab()ï¼‰æ•…æ„å€Ÿèµ°
-       éš±è—â€”â€”åªè¦ç©å®¶é»ä¸€æ¬¡+/-æŒ‰éˆ•ï¼Œ
-       é€™è£¡å°±æœƒæŠŠéš±è—çš„æ•ˆæœè“‹æ‰ã€é‡æ–°
-       é¡¯ç¤ºå‡ºä¾†ï¼Œé€™æ‰æ˜¯ã€Œæ€éº¼éš±è—éƒ½æ²’ç”¨ã€
-       çš„çœŸæ­£åŸå› ã€‚
-
-       åŠ ä¸€å€‹åˆ¤æ–·ï¼šå¦‚æœé€™å€‹å…ƒç´ æ­£æ˜¯
-       homeFeatureHiddenSwitchCardè¨˜éŒ„çš„
-       é‚£ä¸€å€‹ï¼ˆä»£è¡¨ç›®å‰æ­£è¢«è§’è‰²è¦–çª—å€Ÿèµ°ï¼‰ï¼Œ
-       å°±è·³éé€™è£¡çš„é¡¯ç¤ºé‚è¼¯ï¼Œç¶­æŒéš±è—ï¼Œ
-       ä¸è¦è“‹æ‰ã€‚
-    */
-
-    const switchCard=
-        $("statusCharacterSwitchCard");
-
-
-    const nameBox=
-        $("statusCharacterName");
-
-
-    if(
-        switchCard &&
-        switchCard!==
-        homeFeatureHiddenSwitchCard
-    ){
-
-        switchCard.style.display=
-
-            getExistingPartyIndexes().length>1
-            ?
-            "block"
-            :
-            "none";
-
-    }
-
-
-    if(nameBox){
-
-        nameBox.textContent=
-            (targetCharacter.id||"å†’éšªè€…")+
-            " Lv."+
-            targetCharacter.level;
-
-    }
-
-}
-
-
-function confirmStatus(){
-
-    const targetCharacter=
-        getStatusCharacterObject();
-
-
-    const used =
-        Object.values(
-            pendingStats
-        )
-        .reduce(
-            (sum,value)=>
-                sum+value,
-            0
-        );
-
-
-    if(
-        used<=0 ||
-        used>
-        targetCharacter.attributePoints
-    ){
-        return;
-    }
-
-
-    /*
-       â˜… ä¸€æ¬¡ç¢ºèªå¾Œå…¨éƒ¨æ­¸é›¶ï¼Œ
-       ä¸æœƒå‡ºç¾ä¹‹å‰ã€Œç¢ºèªå¾Œé‚„èƒ½äº‚æŒ‰ã€é€ æˆç•¶æ©Ÿã€‚
-    */
-
-    Object.keys(
-        pendingStats
-    )
-    .forEach(stat=>{
-
-        targetCharacter[stat] +=
-            pendingStats[stat];
-
-        pendingStats[stat]=0;
-
-    });
-
-
-    targetCharacter.attributePoints -=
-        used;
-
-
-    updateStatusPreview();
-
-    updateUI();
-
-    saveGame();
-
-}
-
-
-/* =====================================================
-   æŠ€èƒ½
-===================================================== */
-
-const SKILL_PREVIEW_ELEMENTS=["fire","water","wind","earth"];
-
-function getSkillPreviewSummary(skill){
-
-    const scopes={
-        single:"æ”»æ“Šå–®ä¸€æ•µäºº",
-        tri:"æ”»æ“Šç›¸é„°çš„ä¸€æ’æ•µäºº",
-        row:"æ”»æ“Šä¸€æ•´æ’æ•µäºº",
-        column:"æ”»æ“ŠåŒä¸€ç›´åˆ—æ•µäºº",
-        all:"æ”»æ“Šæ•µæ–¹å…¨é«”",
-        ally:"æ”¯æ´ä¸€åå‹æ–¹",
-        allyAll:"æ”¯æ´æˆ‘æ–¹å…¨é«”",
-        deadAlly:"å¾©æ´»ä¸€åå€’ä¸‹çš„å‹æ–¹",
-        none:"è¢«å‹•ç”Ÿæ•ˆ"
-    };
-
-    const effects=[];
-
-    if(skill.category==="physical"){
-        effects.push("é€ æˆç‰©ç†å‚·å®³");
-    }
-    if(skill.category==="magic"){
-        effects.push("é€ æˆæ³•è¡“å‚·å®³");
-    }
-    if(skill.burnChance){ effects.push("å¯èƒ½é™„åŠ ç‡ƒç‡’"); }
-    if(skill.freezeChance){ effects.push("å¯èƒ½ä½¿ç›®æ¨™å†°å°"); }
-    if(skill.stunChance){ effects.push("å¯èƒ½ä½¿ç›®æ¨™æšˆçœ©ä¸¦é™ä½å‘½ä¸­"); }
-    if(skill.agilityDownChance){ effects.push("å¯èƒ½é™ä½ç›®æ¨™æ•æ·"); }
-    if(skill.damageDownChance){ effects.push("å¯èƒ½é™ä½ç›®æ¨™é€ æˆçš„å‚·å®³"); }
-    if(skill.defenseDownChance){ effects.push("å¯èƒ½é™ä½ç›®æ¨™é˜²ç¦¦"); }
-    if(skill.statDownChance){ effects.push("å¯èƒ½é™ä½ç›®æ¨™å¤šé …èƒ½åŠ›"); }
-    if(skill.lifestealPercentByLevel){ effects.push("å¯å¸æ”¶å‚·å®³å›å¾©è‡ªèº«"); }
-    if(skill.selfShieldByLevel){ effects.push("ç‚ºè‡ªå·±å»ºç«‹è­·ç›¾"); }
-    if(skill.allyShieldByLevel){ effects.push("ç‚ºæˆ‘æ–¹å»ºç«‹è­·ç›¾"); }
-
-    if(skill.category==="heal"){
-        effects.push("å›å¾©å‹æ–¹ç”Ÿå‘½èˆ‡èƒ½é‡");
-    }
-    if(skill.category==="revive"){
-        effects.push("è®“å€’ä¸‹çš„å‹æ–¹é‡æ–°åƒæˆ°");
-    }
-    if(skill.category==="passive"){
-        effects.push("æ°¸ä¹…å¼·åŒ–è©²å…ƒç´ çš„æˆ°é¬¥ç‰¹è‰²");
-    }
-
-    const namedEffects={
-        rage:"æå‡æˆ‘æ–¹çˆ†æ“Šèƒ½åŠ›",
-        dodgeSkill:"æå‡æˆ‘æ–¹é–ƒèº²èƒ½åŠ›",
-        stealthSkill:"è®“å‹æ–¹é€²å…¥éš±èº«",
-        dinghaishenzhen:"æå‡æˆ‘æ–¹ç•°å¸¸ç‹€æ…‹æŠ—æ€§",
-        rockWall:"æå‡æˆ‘æ–¹é˜²ç¦¦èƒ½åŠ›",
-        earthShield:"è³¦äºˆå‹æ–¹åå‚·æ•ˆæœ",
-        barrier:"ç‚ºå‹æ–¹å»ºç«‹å‚·å®³çµç•Œ"
-    };
-
-    if(namedEffects[skill.id]){
-        effects.push(namedEffects[skill.id]);
-    }
-
-    return [
-        scopes[skill.targetType]||"ç‰¹æ®Šæ•ˆæœ",
-        ...effects
-    ].filter(Boolean).join("ï¼›")+"ã€‚";
-
-}
-
-function renderAllElementSkillPreview(element){
-
-    const body=$("skillPreviewBody");
-    const tabs=$("skillPreviewTabs");
-
-    if(!body || !tabs){ return; }
-
-    const selected=SKILL_PREVIEW_ELEMENTS.includes(element)
-        ? element
-        : "fire";
-
-    tabs.innerHTML=SKILL_PREVIEW_ELEMENTS.map(key=>{
-        const data=elementDatabase[key];
-        return '<button type="button" class="'+
-            (key===selected ? "active" : "")+
-            '" onclick="renderAllElementSkillPreview(\''+key+'\')">'+
-            data.name+'å±¬æ€§</button>';
-    }).join("");
-
-    const categoryNames={
-        physical:"ç‰©ç†",
-        magic:"æ³•è¡“",
-        buff:"å¢ç›Š",
-        heal:"å›å¾©",
-        revive:"å¾©æ´»",
-        passive:"è¢«å‹•"
-    };
-
-    const skills=Object.values(skillDatabase).filter(
-        skill=>skill.element===selected
-    );
-
-    body.innerHTML=skills.map(skill=>
-        '<article class="skill-preview-card">'+
-            '<div><strong>'+skill.name+'</strong><span>'+
-            (categoryNames[skill.category]||"ç‰¹æ®Š")+'</span></div>'+
-            '<p>'+getSkillPreviewSummary(skill)+'</p>'+
-        '</article>'
-    ).join("");
-
-    body.scrollTop=0;
-}
-
-function openAllElementSkillPreview(){
-
-    const modal=$("allElementSkillPreviewModal");
-    if(!modal){ return; }
-
-    renderAllElementSkillPreview("fire");
-    modal.classList.add("show");
-    modal.setAttribute("aria-hidden","false");
-}
-
-function closeAllElementSkillPreview(){
-
-    const modal=$("allElementSkillPreviewModal");
-    if(!modal){ return; }
-
-    modal.classList.remove("show");
-    modal.setAttribute("aria-hidden","true");
-}
-
-function changeSkillCharacterArrow(direction){
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬æ˜¯<select>ä¸‹æ‹‰é¸å–®ï¼Œ
-       æ”¹æˆè·Ÿç‹€æ…‹é ä¸€è‡´çš„å·¦å³ç®­é ­åˆ‡æ›ï¼Œ
-       æ°´æˆ°å£«/é¢¨å¼“æ‰‹é€™å…©å€‹ç›®å‰æ²’æœ‰çœŸæ­£è§’è‰²è³‡æ–™çš„
-       é¸é …ä¹Ÿä¸€ä½µæ‹¿æ‰ï¼Œ
-       åªåœ¨fireï¼ˆç¬¬ä¸€è§’è‰²ï¼‰è·Ÿplayer2ï¼ˆç¬¬äºŒè§’è‰²ï¼Œ
-       å­˜åœ¨çš„è©±ï¼‰ä¹‹é–“åˆ‡æ›ï¼Œæ¯”è¼ƒä¸æœƒèª¤å°ç©å®¶
-       ä»¥ç‚ºæ°´/é¢¨ä¹Ÿèƒ½æ­£å¸¸ç”¨ã€‚
-    */
-
-    const keys=getExistingPartyIndexes().map(
-        index=>getPartyCharacterKey(index)
-    );
-
-    if(keys.length<2){
-        return;
-    }
-
-    const currentPosition=Math.max(
-        0,
-        keys.indexOf(currentSkillCharacter)
-    );
-
-    currentSkillCharacter=keys[
-        (currentPosition+direction+keys.length)%keys.length
-    ];
-
-
-    renderSkillLoadout();
-
-}
-
-
-function getSkillCharacterObject(characterId){
-
-    /*
-       â˜… æ–°å¢ï¼š
-       æŠ€èƒ½å­¸ç¿’/å‡ç´šè¦èŠ±çš„æŠ€èƒ½é»ï¼Œ
-       ç›®å‰åªæœ‰playerï¼ˆfireï¼‰è·Ÿplayer2
-       é€™å…©å€‹è§’è‰²æœ‰çœŸæ­£ç¨ç«‹çš„skillPointsï¼Œ
-       water/windé‚„åªæ˜¯è£å‚™ç”¨çš„ç©ºæ®¼ï¼Œ
-       æ²’æœ‰èƒŒå¾Œçš„è§’è‰²è³‡æ–™ï¼Œå›å‚³nullï¼Œ
-       å‘¼å«çš„åœ°æ–¹è¦è‡ªå·±åˆ¤æ–·nullçš„æƒ…æ³ã€‚
-    */
-
-    if(characterId==="fire"){
-        return player;
-    }
-
-
-    if(
-        characterId==="player2"&&
-        player2
-    ){
-        return player2;
-    }
-
-    if(
-        characterId==="player3"&&
-        player3
-    ){
-        return player3;
-    }
-
-
-    return null;
-
-}
-
-
-function renderSkillLoadout(){
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬æ˜¯æ›´æ–°<select>è£¡å…©å€‹<option>çš„æ–‡å­—ï¼Œ
-       ç¾åœ¨UIæ”¹æˆå·¦å³ç®­é ­+ä¸€å€‹åå­—æ–¹å¡Šï¼Œ
-       æ”¹æˆç›´æ¥æ›´æ–°é‚£å€‹æ–¹å¡Šçš„æ–‡å­—ï¼Œ
-       é¡¯ç¤ºç›®å‰é¸ä¸­è§’è‰²çš„åå­—+ç­‰ç´šï¼Œ
-       è·Ÿç‹€æ…‹é çš„åˆ‡æ›å¡ç‰‡é‚è¼¯ä¸€è‡´ã€‚
-    */
-
-    const nameBox=
-        $("skillCharacterNameBox");
-
-
-    if(nameBox){
-
-        const selectedIndex=
-            currentSkillCharacter==="player3"
-            ? 2
-            : currentSkillCharacter==="player2"
-            ? 1
-            : 0;
-
-        const selectedCharacter=
-            getPartyCharacterByIndex(selectedIndex)||player;
-
-        nameBox.textContent=
-            (selectedCharacter.id||"è§’è‰²"+(selectedIndex+1))+
-            " Lv."+
-            selectedCharacter.level;
-
-    }
-
-
-    const character =
-        characterSkillLoadouts[
-            currentSkillCharacter
-        ];
-
-
-    if(!character){
-        return;
-    }
-
-
-    const loadout =
-        $("skillLoadout");
-
-
-    const allList =
-        $("allSkillsList");
-
-
-    loadout.innerHTML="";
-
-    allList.innerHTML="";
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€ŒæŠ€èƒ½é…è£
-       åªé¡¯ç¤ºiconè·Ÿåç¨±ï¼Œå…¶é¤˜éƒ½çœç•¥ï¼Œä¸€æ’
-       å››å€‹æ’ä¸€èµ·ã€ï¼‰ï¼š
-       åŸæœ¬æ¯æ ¼å…§å®¹ä¸€å¤§ä¸²ï¼ˆåˆ†é¡/èªªæ˜/SP/
-       ç§»é™¤æŒ‰éˆ•ï¼‰ï¼Œæ”¹æˆåªæœ‰åœ–ç¤º+åç¨±å…©è¡Œï¼Œ
-       é»æ ¼å­æœ¬èº«ç›´æ¥è§¸ç™¼ç§»é™¤ï¼ˆæœ‰è£å‚™æ™‚ï¼‰
-       ï¼Œä¸å†éœ€è¦é¡å¤–çš„ç§»é™¤æŒ‰éˆ•æ–‡å­—ä½”ä½ç½®ã€‚
-    */
-
-    for(
-        let i=0;
-        i<4;
-        i++
-    ){
-
-        const skillId =
-            character.equippedSkills[i];
-
-
-        const box =
-            document.createElement(
-                "div"
-            );
-
-
-        box.className =
-            "skill-loadout-slot";
-
-
-        if(skillId&&skillDatabase[skillId]){
-
-            const skill =
-                skillDatabase[skillId];
-
-
-            box.innerHTML =
-
-            `
-            <div
-                id="loadoutIcon_${skillId}"
-                class="skill-loadout-slot-icon"
-                style="background-image:${getSkillIconBackgroundImage(skillId)};"
-            ></div>
-            <div class="skill-loadout-slot-name">
-                ${skill.name}
-            </div>
-            `;
-
-
-            box.onclick=
-                ()=>removeEquippedSkill(i);
-
-        }
-        else{
-
-            box.innerHTML =
-
-            `
-            <div class="skill-loadout-slot-icon"></div>
-            <div
-                class="skill-loadout-slot-name"
-                style="color:#64748b;"
-            >
-                ç©º
-            </div>
-            `;
-
-        }
-
-
-        loadout.appendChild(
-            box
-        );
-
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œä¸ç”¨ç‰¹åˆ¥
-       å†åšä¸€å€‹å·²å­¸æœƒæŠ€èƒ½çš„æ¡†äº†ï¼Œæ‹¿æ‰ï¼Œ
-       ç¾åœ¨æŠ€èƒ½å°±æ˜¯ç”¨ä¸€æ’ä¸€æ’å‘ˆç¾ï¼Œæ²’å­¸ç¿’
-       çš„å°±é¡¯ç¤ºæœªå­¸ç¿’å°±å¥½ã€ï¼‰ï¼š
-       åŸæœ¬ã€Œå·²å­¸æœƒæŠ€èƒ½ã€ã€Œå¯å­¸ç¿’æŠ€èƒ½ã€æ˜¯
-       å…©å€‹å„è‡ªç¨ç«‹çš„forEachè¿´åœˆï¼Œå„è‡ª
-       appendChildåˆ°ä¸åŒå®¹å™¨ã€‚åˆä½µæˆä¸€å€‹
-       è¿´åœˆï¼Œä¸€æ¬¡è·‘éé€™å€‹è§’è‰²å…ƒç´ åº•ä¸‹çš„
-       å…¨éƒ¨æŠ€èƒ½ï¼Œæ¯ä¸€åˆ—è‡ªå·±åˆ¤æ–·ã€Œé‚„æ²’å­¸ï¼
-       å·²å­¸æœªæ»¿ç´šï¼å·²æ»¿ç´šã€è©²é¡¯ç¤ºå“ªç¨®ç‹€æ…‹ï¼Œ
-       å…¨éƒ¨appendåˆ°åŒä¸€å€‹allListå®¹å™¨ã€‚
-    */
-
-    const skillLevels =
-        character.skillLevels||
-        {};
-
-
-    /*
-       â˜… é€™å€‹è§’è‰²èƒŒå¾ŒçœŸæ­£çš„è³‡æ–™ç‰©ä»¶
-       ï¼ˆplayeræˆ–player2ï¼‰ï¼Œ
-       ç”¨ä¾†æŸ¥è©¢/é¡¯ç¤ºæŠ€èƒ½é»æ•¸é‡ã€‚
-       water/windç›®å‰é‚„æ²’æœ‰çœŸæ­£çš„è§’è‰²è³‡æ–™ï¼Œ
-       skillOwneræœƒæ˜¯nullï¼Œ
-       ä¸‹é¢ç”¨åˆ°çš„åœ°æ–¹éƒ½è¦é˜²å‘†è™•ç†
-       ï¼ˆè¦–ç‚º0é»æŠ€èƒ½é»ï¼Œå…¨éƒ¨æŠ€èƒ½éƒ½ä¸èƒ½å­¸/å‡ï¼‰ã€‚
-    */
-
-    const skillOwner=
-        getSkillCharacterObject(
-            currentSkillCharacter
-        );
-
-
-    const availableSkillPoints=Math.max(
-        0,
-        Number(skillOwner ? skillOwner.skillPoints : 0)||0
-    );
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€ŒæŠ€èƒ½æ’ç‰ˆ
-       å¢åŠ å·²å­¸ç¿’/æœªå­¸ç¿’çš„æ–‡å­—åˆ†éš”å€å¡Šï¼Œ
-       ä¸ç”¨æ¡†ç·šï¼Œåªè¦æ–‡å­—å€éš”ï¼›æœªå­¸ç¿’çš„
-       æŠ€èƒ½ä¸€æ—¦å­¸æœƒï¼Œè‡ªå‹•è·‘åˆ°å·²å­¸ç¿’é‚£é‚Šã€ï¼‰ï¼š
-       åŸæœ¬æ˜¯å–®ä¸€å€‹forEachã€ä¾è³‡æ–™åº«åŸå§‹
-       é †åºç›´æ¥æŠŠæ¯ä¸€åˆ—appendä¸Šå»ã€‚æ”¹æˆå…ˆ
-       ç¯©å‡ºé€™å€‹è§’è‰²å…ƒç´ åº•ä¸‹çš„å…¨éƒ¨æŠ€èƒ½idï¼Œ
-       åˆ†æˆã€Œå·²å­¸ç¿’ã€ã€Œæœªå­¸ç¿’ã€å…©çµ„é™£åˆ—ï¼Œ
-       å€‹åˆ¥æ¸²æŸ“ã€‚å› ç‚ºæ¯æ¬¡renderSkillLoadout()
-       éƒ½æ˜¯é‡æ–°åˆ†çµ„ï¼ˆä¸æ˜¯å­˜ä¸€ä»½ã€Œå·²å­¸ç¿’
-       æ¸…å–®ã€å¿«å–ï¼‰ï¼Œåªè¦å­¸äº†æ–°æŠ€èƒ½ã€
-       skillLevelsè®Šäº†ï¼Œä¸‹æ¬¡é‡ç¹ªå°±æœƒè‡ªå‹•
-       è¢«åˆ†åˆ°ã€Œå·²å­¸ç¿’ã€é‚£çµ„ï¼Œä¸ç”¨é¡å¤–å¯«
-       ã€Œæ¬ç§»ã€çš„é‚è¼¯ã€‚
-    */
-
-    const matchingSkillIds=
-
-        Object.keys(skillDatabase)
-        .filter(skillId=>{
-
-            const skill=
-                skillDatabase[skillId];
-
-
-            return (
-                skill &&
-                skill.element===
-                (
-                    skillOwner
-                    ?
-                    skillOwner.element
-                    :
-                    currentSkillCharacter
-                )
-            );
-
-        });
-
-
-    const learnedIds=
-
-        matchingSkillIds.filter(
-            skillId=>
-                (skillLevels[skillId]||0)>0
-        );
-
-
-    const unlearnedIds=
-
-        matchingSkillIds.filter(
-            skillId=>
-                !(skillLevels[skillId]>0)
-        );
-
-
-    /*
-       â˜… æŠŠã€Œçµ„å‡ºä¸€åˆ—æŠ€èƒ½rowã€é€™æ®µé‚è¼¯æŠ½æˆ
-       ç¨ç«‹å‡½å¼ï¼Œå·²å­¸ç¿’/æœªå­¸ç¿’å…©çµ„éƒ½å‘¼å«
-       åŒä¸€ä»½ï¼Œä¸ç”¨å¯«å…©æ¬¡ä¸€æ¨£çš„HTMLçµ„å­—ä¸²ã€‚
-    */
-
-    function buildSkillRowElement(skillId){
-
-        const skill =
-            skillDatabase[skillId];
-
-
-        const level =
-            skillLevels[skillId]||
-            0;
-
-
-        const isLearned =
-            level>0;
-
-
-        const equipped =
-            character.equippedSkills
-            .includes(skillId);
-
-
-        const isMaxLevel =
-            isLearned &&
-            level>=
-            (skill.maxLevel||1);
-
-
-        const canAfford =
-            availableSkillPoints>=
-            (skill.learnCost||0);
-
-
-        const box =
-            document.createElement(
-                "div"
-            );
-
-
-        box.className =
-            "skill-row";
-
-
-        let actionIcon;
-        let actionLabel;
-        let actionOnclick;
-        let actionDisabled;
-
-
-        const prereqMet =
-            isSkillPrereqMet(
-                skillLevels,
-                skill
-            );
-
-
-        if(!isLearned){
-
-            actionIcon="";
-
-
-            /*
-               â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œå‰ç½®
-               æŠ€èƒ½è¦å­¸çš„æ©Ÿåˆ¶ã€ï¼Œä¸”è¦ã€Œå®Œå…¨ä¸èƒ½
-               é»ã€ï¼‰ï¼š
-               å‰ç½®æ²’é”æˆæ™‚å„ªå…ˆé¡¯ç¤ºé–ä½ç‹€æ…‹ï¼Œ
-               è“‹éåŸæœ¬çš„ã€Œå­¸ç¿’ï¼é»æ•¸ä¸è¶³ã€
-               åˆ¤æ–·ï¼ŒæŒ‰éˆ•å¼·åˆ¶disabled=trueï¼Œ
-               ç©å®¶é€£é»éƒ½é»ä¸äº†ï¼ˆseeä¸Šé¢
-               .skill-action-card.disabledçš„
-               pointer-events:noneï¼Œä¹‹å‰é€™è£¡
-               æœ‰å€‹classå­—ä¸²å°‘æ‰“ä¸€å€‹ç©ºæ ¼çš„
-               bugï¼Œé †ä¾¿ä¿®æ‰ï¼Œä¸ç„¶disabled
-               æ¨£å¼å…¶å¯¦å¾ä¾†æ²’çœŸçš„ç”Ÿæ•ˆéï¼‰ã€‚
-            */
-
-            actionLabel=
-                !prereqMet
-                ?
-                "ğŸ”’ "+getSkillPrereqLabel(skill)
-                :
-                (
-                    canAfford
-                    ?
-                    "å­¸ç¿’"
-                    :
-                    "é»æ•¸ä¸è¶³"
-                );
-
-            actionOnclick=
-                "learnSkill('"+skillId+"')";
-
-            actionDisabled=
-                !prereqMet ||
-                !canAfford;
-
-        }
-        else if(isMaxLevel){
-
-            actionIcon="";
-            actionLabel="å·²æ»¿ç´š";
-
-            actionOnclick=
-                "upgradeSkill('"+skillId+"')";
-
-            actionDisabled=
-                true;
-
-        }
-        else{
-
-            actionIcon="";
-
-            actionLabel=
-                availableSkillPoints<1
-                ?
-                "é»æ•¸ä¸è¶³"
-                :
-                "å‡ç´š";
-
-            actionOnclick=
-                "upgradeSkill('"+skillId+"')";
-
-            actionDisabled=
-                availableSkillPoints<1;
-
-        }
-
-
-        const showEquipButton=
-
-            isLearned &&
-            (
-                skill.category==="physical"||
-                skill.category==="magic"||
-                skill.category==="buff"||
-                skill.category==="heal"||
-                skill.category==="revive"
-            );
-
-
-        box.innerHTML =
-
-        `
-        <div
-            id="skillIcon_${skillId}"
-            class="skill-row-icon"
-            style="background-image:${getSkillIconBackgroundImage(skillId)};"
-        ></div>
-
-        <div class="skill-row-text">
-            <b>${skill.name}</b>
-            ${
-                isLearned
-                ?
-                "Lv."+level+
-                (
-                    skill.maxLevel
-                    ?
-                    "/"+skill.maxLevel
-                    :
-                    ""
-                )
-                :
-                '<span style="color:#64748b;">æœªå­¸ç¿’</span>'
-            }
-            <br>
-            <span class="skill-row-desc">
-                ${skill.description}
-            </span>
-            ${
-                !isLearned &&
-                !prereqMet
-                ?
-                `
-                <br>
-                <span style="color:#f59e0b;">
-                    ğŸ”’ ${getSkillPrereqLabel(skill)}
-                </span>
-                `
-                :
-                ""
-            }
-            <span
-                class="skill-row-detail-link"
-                onclick="showSkillDetail('${skillId}')"
-            >
-                â€¦â€¦è©³ç´°Â»
-            </span>
-        </div>
-
-        <div
-            class="skill-action-card${
-                actionDisabled
-                ?
-                " disabled"
-                :
-                ""
-            }"
-            onclick="${actionOnclick}"
-        >
-            <div class="skill-action-card-top">${actionIcon}</div>
-            <div class="skill-action-card-label">
-                ${actionLabel}
-            </div>
-        </div>
-
-        ${
-            showEquipButton
-            ?
-            `
-            <div
-                class="skill-action-card${
-                    equipped
-                    ?
-                    " disabled"
-                    :
-                    ""
-                }"
-                onclick="equipSkill('${skillId}')"
-            >
-                <div class="skill-action-card-top"></div>
-                <div class="skill-action-card-label">
-                    ${
-                        equipped
-                        ?
-                        "å·²è£å‚™"
-                        :
-                        "è£å‚™"
-                    }
-                </div>
-            </div>
-            `
-            :
-            ""
-        }
-        `;
-
-
-        return box;
-
-    }
-
-
-    /*
-       â˜… åˆ†éš”ç·šç”¨çš„ç´”æ–‡å­—æ¨™ç±¤ï¼Œæ•…æ„ä¸ç”¨
-       ä»»ä½•æ¡†ç·š/åº•è‰²ï¼Œåªæ˜¯ä¸€è¡Œç½®ä¸­çš„
-       è™›ç·š+æ–‡å­—ï¼Œå–®ç´”è¦–è¦ºä¸Šå€éš”å…©çµ„ã€‚
-    */
-
-    function buildSkillSectionDivider(label){
-
-        const divider=
-            document.createElement(
-                "div"
-            );
-
-
-        divider.style.cssText=
-
-            "text-align:center;"+
-            "font-size:11px;"+
-            "color:#8a7a5c;"+
-            "margin:10px 0 4px;";
-
-
-        divider.textContent=
-
-            "â”€â”€â”€â”€â”€"+
-            label+
-            "â”€â”€â”€â”€â”€";
-
-
-        return divider;
-
-    }
-
-
-    if(learnedIds.length>0){
-
-        allList.appendChild(
-            buildSkillSectionDivider(
-                "å·²å­¸ç¿’"
-            )
-        );
-
-
-        learnedIds.forEach(skillId=>{
-
-            allList.appendChild(
-                buildSkillRowElement(
-                    skillId
-                )
-            );
-
-        });
-
-    }
-
-
-    if(unlearnedIds.length>0){
-
-        allList.appendChild(
-            buildSkillSectionDivider(
-                "æœªå­¸ç¿’"
-            )
-        );
-
-
-        unlearnedIds.forEach(skillId=>{
-
-            allList.appendChild(
-                buildSkillRowElement(
-                    skillId
-                )
-            );
-
-        });
-
-    }
-
-
-    /*
-       â˜… æ¯æ¬¡é‡æ–°æ¸²æŸ“æŠ€èƒ½é é¢æ™‚ï¼Œ
-       é †ä¾¿åŒæ­¥ä¸€æ¬¡è‡ªå‹•æˆ°é¬¥çš„æŠ€èƒ½ä¸‹æ‹‰é¸å–®ï¼Œ
-       é€™æ¨£è£å‚™è®Šäº†ã€å­¸æ–°æŠ€èƒ½äº†ï¼Œ
-       é¸å–®éƒ½æœƒè‡ªå‹•è·Ÿä¸Šï¼Œä¸ç”¨æ¯å€‹å‘¼å«renderSkillLoadout()
-       çš„åœ°æ–¹éƒ½å„è‡ªè¨˜å¾—å†å‘¼å«ä¸€æ¬¡ã€‚
-    */
-
-    populateAutoSkillOptions();
-
-    populateAutoSkillOptions2();
-
-}
-
-
-/*
-   çµ„å‡ºæŠ€èƒ½ç›®å‰ç­‰ç´šçš„æ•ˆæœæ–‡å­—èªªæ˜ï¼Œ
-   ç”¨åœ¨æŠ€èƒ½é…è£é é¢çµ¦ç©å®¶åƒè€ƒã€‚
-*/
-
-/*
-   â˜… æŠ€èƒ½åˆ†é¡æ¨™ç±¤ï¼ˆæ–°å¢ï¼‰ï¼š
-   ç‰©ç†ä¸»å‹•ï¼æ³•è¡“ä¸»å‹•ï¼å¢ç›Šä¸»å‹•ï¼è¢«å‹•ï¼Œ
-   çµ±ä¸€å¾é€™è£¡ç”¢ç”Ÿæ–‡å­—ï¼Œ
-   æŠ€èƒ½é…è£æ¬„ã€å·²å­¸æŠ€èƒ½ã€å¯å­¸æŠ€èƒ½ä¸‰å€‹åœ°æ–¹éƒ½å…±ç”¨ï¼Œ
-   ç¢ºä¿é¡¯ç¤ºæ–¹å¼ä¸€è‡´ã€‚
-*/
-
-function getSkillCategoryLabel(category){
-
-    if(category==="physical"){
-        return"ç‰©ç†ä¸»å‹•";
-    }
-
-    if(category==="magic"){
-        return"æ³•è¡“ä¸»å‹•";
-    }
-
-    if(category==="buff"){
-        return"å¢ç›Šä¸»å‹•";
-    }
-
-    if(category==="heal"){
-        return"æ²»ç™‚ä¸»å‹•";
-    }
-
-    if(category==="revive"){
-        return"å¾©æ´»ä¸»å‹•";
-    }
-
-    if(category==="passive"){
-        return"è¢«å‹•";
-    }
-
-    return"";
-
-}
-
-
-function getSkillEffectPreviewText(skill,level){
-
-    /*
-       â˜… ç´”æ§å ´æŠ€èƒ½ï¼ˆç›®å‰æ˜¯å†°å°ï¼Œæ²’æœ‰baseDamageï¼‰
-       è¦åœ¨ã€Œæœ‰å‚·å®³çš„ç‰©ç†/æ³•è¡“æŠ€èƒ½ã€åˆ¤æ–·ä¹‹å‰
-       å…ˆæ””æˆªè™•ç†ï¼Œä¸ç„¶æœƒè¢«ä¸‹é¢é‚£å€‹åˆ¤æ–·
-       èª¤åˆ¤æˆã€Œå‚·å®³0ã€çš„æ”»æ“ŠæŠ€èƒ½ï¼Œ
-       é¡¯ç¤ºå‡ºã€Œç›®å‰å‚·å®³ç´„0ã€é€™ç¨®èª¤å°æ–‡å­—ã€‚
-    */
-
-    if(
-        (
-            skill.category==="physical"||
-            skill.category==="magic"
-        ) &&
-        !skill.baseDamage &&
-        skill.freezeChance
-    ){
-
-        return (
-            skill.freezeChance+
-            "%æ©Ÿç‡å†°å°ç›®æ¨™ï¼Œ"+
-            skill.freezeDuration+
-            "å›åˆç„¡æ³•è¡Œå‹•"
-        );
-
-    }
-
-
-    if(
-        skill.category==="physical"||
-        skill.category==="magic"
-    ){
-
-        /*
-           â˜… ä¿®æ­£ï¼š
-           é€™è£¡ä¹‹å‰åªé¡¯ç¤ºæŠ€èƒ½åŸºç¤å‚·å®³ï¼Œ
-           å®Œå…¨æ²’æœ‰ç®—é€²ç«å…ƒç´ EXè¢«å‹•çš„+10%åŠ æˆï¼Œ
-           å°è‡´ç©å®¶å­¸äº†è¢«å‹•ä¹‹å¾Œï¼Œ
-           åœ¨é€™å€‹é è¦½æ•¸å­—ä¸Šå®Œå…¨çœ‹ä¸å‡ºå·®ç•°ï¼Œ
-           ä»¥ç‚ºè¢«å‹•æ²’æœ‰ç”Ÿæ•ˆ
-           ï¼ˆå¯¦éš›ä¸Šæˆ°é¬¥æ™‚castDamageSkill()è£¡
-           æœ‰æ­£ç¢ºå¥—ç”¨ï¼Œåªæ˜¯é€™å€‹é è¦½æ•¸å­—æ²’è·Ÿä¸Šï¼‰ã€‚
-           ç¾åœ¨è£œä¸Šï¼Œè®“ç©å®¶èƒ½ç›´æ¥åœ¨é€™è£¡
-           çœ‹åˆ°å­¸è¢«å‹•å‰å¾Œæ•¸å­—çš„è®ŠåŒ–ã€‚
-        */
-
-        /*
-           â˜… ä¿®æ­£ï¼š
-           é€™è£¡ä¹‹å‰åªé¡¯ç¤ºæŠ€èƒ½åŸºç¤å‚·å®³ï¼Œ
-           å®Œå…¨æ²’æœ‰ç®—é€²å…ƒç´ EXè¢«å‹•çš„åŠ æˆï¼Œ
-           å°è‡´ç©å®¶å­¸äº†è¢«å‹•ä¹‹å¾Œï¼Œ
-           åœ¨é€™å€‹é è¦½æ•¸å­—ä¸Šå®Œå…¨çœ‹ä¸å‡ºå·®ç•°ï¼Œ
-           ä»¥ç‚ºè¢«å‹•æ²’æœ‰ç”Ÿæ•ˆ
-           ï¼ˆå¯¦éš›ä¸Šæˆ°é¬¥æ™‚castDamageSkill()è£¡
-           æœ‰æ­£ç¢ºå¥—ç”¨ï¼Œåªæ˜¯é€™å€‹é è¦½æ•¸å­—æ²’è·Ÿä¸Šï¼‰ã€‚
-           ç¾åœ¨è£œä¸Šï¼Œè®“ç©å®¶èƒ½ç›´æ¥åœ¨é€™è£¡
-           çœ‹åˆ°å­¸è¢«å‹•å‰å¾Œæ•¸å­—çš„è®ŠåŒ–ã€‚
-           è·ŸcastDamageSkill()ä¸€æ¨£ï¼Œ
-           æ”¹æˆå‹•æ…‹ç”¨ã€Œå…ƒç´ +EXã€æŸ¥è¡¨ï¼Œ
-           æ°´å…ƒç´ EXä¹Ÿèƒ½æ­£ç¢ºåæ˜ åœ¨é€™è£¡ã€‚
-        */
-
-        const exSkillId =
-            skill.element+
-            "EX";
-
-
-        const exSkill =
-            skillDatabase[exSkillId];
-
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œå…ƒç´ 
-           è¢«å‹•å®Œå…¨æ²’ç”Ÿæ•ˆã€ï¼Œé€™å€‹é è¦½æ•¸å­—
-           è·ŸcastDamageSkill()çŠ¯äº†åŒä¸€å€‹
-           bugï¼‰ï¼š
-           ä¸èƒ½ç”¨skill.elementç•¶è§’è‰²æ¬„ä½
-           keyï¼Œé€™è£¡æ”¹ç”¨currentSkillCharacter
-           ï¼ˆç›®å‰ç•«é¢ä¸Šé¡¯ç¤ºçš„æ˜¯å“ªå€‹è§’è‰²çš„
-           æŠ€èƒ½åˆ—è¡¨ï¼Œ"fire"æˆ–"player2"ï¼‰ï¼Œ
-           è·Ÿç©å®¶å¯¦éš›åœ¨çœ‹èª°çš„æŠ€èƒ½ä¿æŒä¸€è‡´ã€‚
-        */
-
-        const exLevel =
-            getSkillLevel(
-                currentSkillCharacter,
-                exSkillId
-            );
-
-
-
-        const passiveMultiplier =
-            (
-                exSkill &&
-                exLevel>0 &&
-                exSkill.damageBonusPercent
-            )
-            ?
-            1+
-            exSkill.damageBonusPercent/
-            100
-            :
-            1;
-
-
-        const previewDamage =
-            Math.floor(
-                getSkillDamageAtLevel(
-                    skill,
-                    level
-                )*
-                passiveMultiplier
-            );
-
-
-        let text =
-            "ç›®å‰å‚·å®³ç´„"+
-            previewDamage+
-            (
-                passiveMultiplier>1
-                ?
-                "ï¼ˆå·²å«"+
-                (
-                    exSkill
-                    ?
-                    exSkill.name
-                    :
-                    ""
-                )+
-                "åŠ æˆï¼‰"
-                :
-                ""
-            );
-
-
-        if(skill.burnChance){
-
-            text+=
-
-                "ï½œ"+
-                skill.burnChance+
-                "%ç‡ƒç‡’ï¼ˆ"+
-                skill.burnPercentByLevel[
-                    level-1
-                ]+
-                "%æœ€å¤§HPï¼å›åˆï¼‰";
-
-        }
-
-
-        if(skill.freezeChance){
-
-            text+=
-
-                "ï½œ"+
-                skill.freezeChance+
-                "%å†°å°ï¼ˆ"+
-                skill.freezeDuration+
-                "å›åˆç„¡æ³•è¡Œå‹•ï¼‰";
-
-        }
-
-
-        if(skill.lifestealPercentByLevel){
-            text+="ï½œå¸å–"+skill.lifestealPercentByLevel[level-1]+"%å‚·å®³ï¼ˆå›å¾©HP/SPï¼‰";
-        }
-        if(skill.agilityDownByLevel){
-            text+="ï½œ"+skill.agilityDownChance+"%é™æ•"+skill.agilityDownByLevel[level-1]+"%ï¼ˆ"+(skill.agilityDownDuration||2)+"å›åˆï¼‰";
-        }
-        if(skill.statDownByLevel){
-            text+="ï½œ"+skill.statDownChance+"%é™èƒ½åŠ›"+skill.statDownByLevel[level-1]+"%ï¼ˆ"+(skill.statDownDuration||2)+"å›åˆï¼‰";
-        }
-        if(skill.defenseDownByLevel){
-            text+="ï½œ"+skill.defenseDownChance+"%é™é˜²"+skill.defenseDownByLevel[level-1]+"%ï¼ˆ"+(skill.defenseDownDuration||2)+"å›åˆï¼‰";
-        }
-        if(skill.missBonusByLevel){
-            text+="ï½œ"+skill.stunChance+"%æšˆçœ©ï¼ŒMISS +"+skill.missBonusByLevel[level-1]+"%ï¼ˆ"+(skill.stunDuration||2)+"å›åˆï¼‰";
-        }
-        if(skill.petrifyChanceByLevel){
-            text+="ï½œ"+skill.petrifyChanceByLevel[level-1]+"%çŸ³åŒ–ï¼ˆ"+(skill.petrifyDuration||2)+"å›åˆï¼‰";
-        }
-        if(skill.selfShieldByLevel){
-            text+="ï½œè‡ªèº«è­·ç›¾ "+skill.selfShieldByLevel[level-1]+"ï¼ˆ"+(skill.shieldDuration||2)+"å›åˆï¼‰";
-        }
-        if(skill.allyShieldByLevel){
-            text+="ï½œå…¨é«”è­·ç›¾ "+skill.allyShieldByLevel[level-1]+"ï¼ˆ"+(skill.shieldDuration||2)+"å›åˆï¼‰";
-        }
-
-        return text;
-
-    }
-
-
-    if(skill.category==="buff"){
-        if(skill.critBonusByLevel){
-            return "çˆ†æ“Šç‡ï¼çˆ†æ“Šå‚·å®³ +"+skill.critBonusByLevel[level-1]+"%ï¼ŒæŒçºŒ"+skill.duration+"å›åˆ";
-        }
-        if(skill.evasionBonusPercent){
-            return "é–ƒèº²ç‡ +"+skill.evasionBonusPercent+"%ï¼ŒæŒçºŒ"+skill.duration+"å›åˆ";
-        }
-        if(skill.defenseBonusPercent){
-            return "é˜²ç¦¦åŠ› +"+skill.defenseBonusPercent+"%ï¼ŒæŒçºŒ"+skill.duration+"å›åˆ";
-        }
-        if(skill.reflectPercent){
-            return "åå‚· "+skill.reflectPercent+"%ï¼ŒæŒçºŒ"+skill.duration+"å›åˆ";
-        }
-        if(skill.statusResistBonus){
-            return "ç•°å¸¸ç‹€æ…‹æŠ—æ€§ +"+skill.statusResistBonus+"%ï¼ŒæŒçºŒ"+skill.duration+"å›åˆ";
-        }
-        return skill.description;
-    }
-
-
-    if(skill.category==="heal"){
-
-        const healAmount =
-            skill.baseHeal+
-            skill.healPerLevel*
-            (level-1);
-
-
-        return (
-            "å›å¾©HPï¼šåŸºç¤"+
-            healAmount+
-            "+æ™ºåŠ›Ã—"+
-            HEALING_INT_COEFFICIENT+
-            "ï¼›SPï¼šåŸºç¤"+
-            (skill.baseHealSP+(skill.healSPPerLevel||0)*(level-1))+
-            "+æ™ºåŠ›Ã—"+
-            SP_HEALING_INT_COEFFICIENT+
-            "ï¼ˆæ–½æ”¾è€…æœ¬äººä¸å›å¾©SPï¼‰"
-        );
-
-    }
-
-
-    if(skill.category==="revive"){
-
-        return (
-            "å¾©æ´»å¾Œæ¢å¾©"+
-            skill.reviveHealPercentByLevel[
-                level-1
-            ]+
-            "%è¡€é‡"
-        );
-
-    }
-
-
-    if(skill.category==="passive"){
-
-        return skill.description;
-
-    }
-
-
-    return"";
-
-}
-
-
-function learnSkill(skillId){
-
-    const character =
-        characterSkillLoadouts[
-            currentSkillCharacter
-        ];
-
-
-    const skill =
-        skillDatabase[skillId];
-
-
-    /*
-       â˜… ä¿®æ­£ï¼š
-       åŸæœ¬é€™è£¡ç›´æ¥æ‰£player.skillPointsï¼Œ
-       ä¸ç®¡ç›®å‰é¸çš„æ˜¯èª°ï¼Œä¸€å¾‹æ‰£ç¬¬ä¸€è§’è‰²çš„é»æ•¸ã€‚
-       æ”¹æˆå…ˆæŸ¥å‡ºã€Œé€™å€‹è§’è‰²çœŸæ­£çš„è³‡æ–™ç‰©ä»¶ã€ï¼Œ
-       water/windç›®å‰æ²’æœ‰çœŸæ­£è§’è‰²è³‡æ–™ï¼Œ
-       ç›´æ¥æ“‹æ‰ä¸èƒ½å­¸ï¼ˆé¡¯ç¤ºæç¤ºï¼‰ã€‚
-    */
-
-    const owner=
-        getSkillCharacterObject(
-            currentSkillCharacter
-        );
-
-
-    if(
-        !character ||
-        !skill
-    ){
-        return;
-    }
-
-
-    if(!owner){
-
-        alert(
-            "é€™å€‹è§’è‰²é‚„æ²’æœ‰é–‹æ”¾æŠ€èƒ½å­¸ç¿’åŠŸèƒ½ã€‚"
-        );
-
-        return;
-
-    }
-
-
-    if(!character.skillLevels){
-
-        character.skillLevels={};
-
-    }
-
-
-    if(
-        (character.skillLevels[skillId]||0)>0
-    ){
-        return;
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œå‰ç½®æŠ€èƒ½
-       è¦å­¸çš„æ©Ÿåˆ¶ã€ï¼‰ï¼š
-       UIä¸Šå·²ç¶“æŠŠæŒ‰éˆ•disabledæ“‹ä½é»æ“Šäº†ï¼Œ
-       é€™è£¡æ˜¯ç¬¬äºŒå±¤é˜²è­·â€”â€”è¬ä¸€æœ‰åˆ¥çš„åœ°æ–¹
-       ç¹éç•«é¢ç›´æ¥å‘¼å«learnSkill()ï¼Œ
-       å¾Œç«¯ä¸€æ¨£è¦æ“‹ä½ï¼Œä¸èƒ½åªé å‰ç«¯ã€‚
-    */
-
-    if(
-        !isSkillPrereqMet(
-            character.skillLevels,
-            skill
-        )
-    ){
-
-        alert(
-            getSkillPrereqLabel(skill)+
-            "ï¼Œæ‰èƒ½å­¸ç¿’ã€Œ"+
-            skill.name+
-            "ã€ã€‚"
-        );
-
-        return;
-
-    }
-
-
-    const learnCost=Math.max(0,Number(skill.learnCost)||0);
-    const availablePoints=Math.max(0,Number(owner.skillPoints)||0);
-
-    if(availablePoints<learnCost){
-        alert(
-            "æŠ€èƒ½é»ä¸è¶³ï¼Œéœ€è¦"+
-            learnCost+
-            "é»ã€‚"
-        );
-        return;
-    }
-
-    owner.skillPoints=availablePoints-learnCost;
-
-
-    character.skillLevels[skillId]=1;
-
-
-    renderSkillLoadout();
-
-    updateUI();
-
-    saveGame();
-
-}
-
-
-function upgradeSkill(skillId){
-
-    const character =
-        characterSkillLoadouts[
-            currentSkillCharacter
-        ];
-
-
-    const skill =
-        skillDatabase[skillId];
-
-
-    const owner=
-        getSkillCharacterObject(
-            currentSkillCharacter
-        );
-
-
-    if(
-        !character ||
-        !skill ||
-        !character.skillLevels ||
-        !owner
-    ){
-        return;
-    }
-
-
-    const currentLevel =
-        character.skillLevels[
-            skillId
-        ]||
-        0;
-
-
-    if(currentLevel<=0){
-        return;
-    }
-
-
-    const maxLevel =
-        skill.maxLevel||
-        1;
-
-
-    if(currentLevel>=maxLevel){
-        return;
-    }
-
-
-    if(owner.skillPoints<1){
-
-        alert(
-            "æŠ€èƒ½é»ä¸è¶³ã€‚"
-        );
-
-        return;
-
-    }
-
-
-    owner.skillPoints-=1;
-
-
-    character.skillLevels[skillId]=
-        currentLevel+1;
-
-
-    renderSkillLoadout();
-
-    updateUI();
-
-    saveGame();
-
-}
-
-
-function equipSkill(skillId){
-
-    const character =
-        characterSkillLoadouts[
-            currentSkillCharacter
-        ];
-
-
-    if(!character){
-        return;
-    }
-
-
-    if(
-        character.equippedSkills
-        .includes(skillId)
-    ){
-        return;
-    }
-
-
-    if(
-        character.equippedSkills.length>=4
-    ){
-
-        alert(
-            "æ¯å€‹è§’è‰²æœ€å¤šåªèƒ½æ”œå¸¶4å€‹æŠ€èƒ½ã€‚"
-        );
-
-        return;
-
-    }
-
-
-    character.equippedSkills
-        .push(skillId);
-
-
-    renderSkillLoadout();
-
-    populateAutoSkillOptions();
-
-    populateAutoSkillOptions2();
-
-    saveGame();
-
-}
-
-
-function removeEquippedSkill(index){
-
-    const character =
-        characterSkillLoadouts[
-            currentSkillCharacter
-        ];
-
-
-    if(!character){
-        return;
-    }
-
-
-    character.equippedSkills
-        .splice(
-            index,
-            1
-        );
-
-
-    renderSkillLoadout();
-
-    populateAutoSkillOptions();
-
-    populateAutoSkillOptions2();
-
-    saveGame();
-
-}
-
-
-/* =====================================================
-   èƒŒåŒ…è§’è‰² / ç¶“å…¸ RPG èƒŒåŒ…
-===================================================== */
-
-let inventoryFilter = "equipment";
-const INVENTORY_CATEGORY_SLOT_COUNT = 120;
-
-function getBackpackPartyCharacters(){
-    return [player, player2, player3];
-}
-
-function getBackpackCharacter(index){
-    return getBackpackPartyCharacters()[index] || null;
-}
-
-function getBackpackEquipmentKey(index){
-    return getBackpackCharacter(index)
-        ? getPartyCharacterKey(index)
-        : null;
-}
-
-function getInventoryEquipmentSlot(itemType){
-    const map={
-        weapon:"hand",
-        helmet:"head",
-        head:"head",
-        shoulder:"shoulder",
-        armor:"armor",
-        shoes:"shoes",
-        accessory:"ring",
-        ring:"ring"
-    };
-    return map[itemType] || null;
-}
-
-function getBackpackCharacterStats(index){
-    const character=getBackpackCharacter(index);
-    if(!character) return null;
-
-    if(index===0) return getMainCharacterStats();
-
-    const key=getBackpackEquipmentKey(index);
-    const bonus=getEquipmentBonus(key);
-
-    return {
-        maxHP:100+(character.bonusHP||0)+character.vitality*HP_PER_VITALITY_POINT+bonus.maxHP+bonus.vitality*HP_PER_VITALITY_POINT,
-        maxSP:50+(character.bonusSP||0)+character.energy*15+bonus.maxSP+bonus.energy*15,
-        attack:BASE_PHYSICAL_ATTACK+Math.max(1,Number(character.level)||1)*ATTACK_PER_LEVEL+(character.attack+bonus.attack)*ATTACK_PER_POINT,
-        magicAttack:BASE_MAGIC_ATTACK+Math.max(1,Number(character.level)||1)*MAGIC_ATTACK_PER_LEVEL+(character.intelligence+bonus.intelligence)*MAGIC_ATTACK_PER_POINT,
-        defense:BASE_DEFENSE+Math.max(1,Number(character.level)||1)*DEFENSE_PER_LEVEL+(character.vitality+bonus.vitality)*DEFENSE_PER_VITALITY_POINT+bonus.defense,
-        vitality:character.vitality+bonus.vitality,
-        energy:character.energy+bonus.energy,
-        intelligence:character.intelligence+bonus.intelligence,
-        spirit:character.spirit+bonus.spirit,
-        agility:character.agility+bonus.agility,
-        accuracy:character.spirit*2+bonus.spirit*2,
-        resistance:calculateStatusResistancePercent(character.spirit+bonus.spirit),
-        antiCrit:calculateAntiCritPercent(character.spirit+bonus.spirit),
-        evasion:(character.agility+bonus.agility)*0.6
-    };
-}
-
-function changeInventoryCharacter(direction){
-    const party=getBackpackPartyCharacters();
-    let next=inventoryCharacterIndex+direction;
-    if(next<0) next=party.length-1;
-    if(next>=party.length) next=0;
-
-    // æœªå»ºç«‹çš„è§’è‰²ä»å¯é¡¯ç¤ºç¬¬ä¸‰æ ¼ï¼Œä½†ä¸èƒ½æŠŠç©ºè§’è‰²ç•¶æˆå¯è£å‚™è§’è‰²ã€‚
-    inventoryCharacterIndex=next;
-    renderInventory();
-
-    if(typeof syncCharacterTabsFromInventory === "function"){
-        syncCharacterTabsFromInventory(next);
-    }
-}
-
-function selectInventoryCharacter(index){
-    const party=getBackpackPartyCharacters();
-    if(index<0 || index>=party.length) return;
-    inventoryCharacterIndex=index;
-    renderInventory();
-
-    if(party[index] && typeof syncCharacterTabsFromInventory === "function"){
-        syncCharacterTabsFromInventory(index);
-    }
-}
-
-function syncCharacterTabsFromInventory(index){
-    if(index===0 || index===1 || index===2){
-        if(typeof selectCharacterForTabs === "function" &&
-           getPartyCharacterByIndex(index)){
-            // é¿å… selectCharacterForTabs å†æ¬¡è§¸ç™¼ renderInventory å½¢æˆéè¿´ã€‚
-            statusCharacterIndex=index;
-            inventoryCharacterIndex=index;
-            currentSkillCharacter=getPartyCharacterKey(index);
-        }
-    }
-}
-
-function renderInventoryCharacterTabs(){
-    const wrap=$("inventoryCharacterTabs");
-    if(!wrap) return;
-
-    const charactersList=[player,player2,player3];
-    const character=charactersList[inventoryCharacterIndex];
-
-    const leftDisabled=inventoryCharacterIndex<=0;
-    const rightDisabled=inventoryCharacterIndex>=charactersList.length-1 || !charactersList[inventoryCharacterIndex+1];
-
-    wrap.innerHTML=`
-        <button type="button"
-            class="inventory-character-arrow"
-            aria-label="ä¸Šä¸€å€‹è§’è‰²"
-            ${leftDisabled ? "disabled" : ""}
-            onclick="selectInventoryCharacter(${Math.max(0,inventoryCharacterIndex-1)})">â€¹</button>
-
-        <div class="inventory-character-name">
-            <span>${character ? (character.id || "è§’è‰²"+(inventoryCharacterIndex+1)) : "è§’è‰²"+(inventoryCharacterIndex+1)}</span>
-            ${character ? `<small class="inventory-character-level">Lv.${character.level || 1}</small>` : `<small class="inventory-character-level">å°šæœªå»ºç«‹</small>`}
-        </div>
-
-        <button type="button"
-            class="inventory-character-arrow"
-            aria-label="ä¸‹ä¸€å€‹è§’è‰²"
-            ${rightDisabled ? "disabled" : ""}
-            onclick="selectInventoryCharacter(${Math.min(charactersList.length-1,inventoryCharacterIndex+1)})">â€º</button>
-    `;
-}
-
-function renderInventoryStats(){
-    const stats=getBackpackCharacterStats(inventoryCharacterIndex);
-    const el=$("inventoryStats");
-    if(!el) return;
-
-    if(!stats){
-        el.innerHTML='<div class="inventory-empty-character">ç¬¬ä¸‰è§’è‰²å°šæœªå»ºç«‹</div>';
-        return;
-    }
-
-    /*
-       V77ï¼š
-       èƒŒåŒ…å¸¸é§è³‡è¨Šåªç•™ HP / SPã€‚
-       å…¶ä»–èƒ½åŠ›æ”¹ç”±ç«‹ç¹ªå³ä¸Šè§’æ”¾å¤§é¡é–‹å•Ÿè©³ç´°è³‡è¨Šã€‚
-    */
-    el.innerHTML=`
-        <div class="inventory-stat-row inventory-stat-primary">
-            <span>HP</span><b>${stats.maxHP}</b>
-        </div>
-        <div class="inventory-stat-row inventory-stat-primary">
-            <span>SP</span><b>${stats.maxSP}</b>
-        </div>
-    `;
-}
-
-function getInventoryCharacterCriticalStats(index){
-    const character=getBackpackCharacter(index);
-
-    if(!character){
-        return null;
-    }
-
-    /*
-       V118ï¼šèƒŒåŒ…è©³ç´°è³‡æ–™åŒæ­¥é¡¯ç¤ºç‰©ç†ï¼æ³•è¡“å…©å¥—çˆ†æ“Šã€‚
-       åªåšé¡¯ç¤ºï¼Œå…¬å¼èˆ‡ rollCritical() ä¿æŒä¸€è‡´ï¼š
-       ç‰©ç†çœ‹ attackã€æ³•è¡“çœ‹ intelligenceã€‚
-    */
-    const rageBuff=
-        (
-            (character&&character.activeBuffs)||
-            []
-        )
-        .find(
-            buff=>buff.type==="rage"
-        );
-
-    function buildCriticalProfile(statPoints,chancePerPoint,multiplierPerPoint){
-        let critChance=
-            Math.min(
-                CRIT_CHANCE_MAX,
-                CRIT_CHANCE_BASE+
-                statPoints*
-                chancePerPoint
-            );
-
-        let critMultiplier=
-            Math.min(
-                CRIT_MULTIPLIER_ATTRIBUTE_MAX,
-                CRIT_MULTIPLIER_BASE+
-                statPoints*
-                multiplierPerPoint
-            );
-
-        if(rageBuff){
-            critChance+=
-                rageBuff.bonusPercent;
-
-            critMultiplier=
-                1+
-                rageBuff.bonusPercent/
-                100;
-        }
-
-        return {
-            chance:critChance,
-            multiplier:critMultiplier
-        };
-    }
-
-    return {
-        physical:buildCriticalProfile(
-            (character.attack||0),
-            CRIT_CHANCE_PER_ATTACK_POINT,
-            CRIT_MULTIPLIER_PER_ATTACK_POINT
-        ),
-        magic:buildCriticalProfile(
-            (getBackpackCharacterStats(index).intelligence||0),
-            CRIT_CHANCE_PER_INTELLIGENCE_POINT,
-            CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT
-        )
-    };
-}
-
-function openInventoryCharacterDetail(){
-    const modal=$("inventoryCharacterDetailModal");
-    const title=$("inventoryCharacterDetailName");
-    const body=$("inventoryCharacterDetailStats");
-
-    if(!modal || !title || !body){
-        return;
-    }
-
-    const character=
-        getBackpackCharacter(
-            inventoryCharacterIndex
-        );
-
-    const stats=
-        getBackpackCharacterStats(
-            inventoryCharacterIndex
-        );
-
-    const critical=
-        getInventoryCharacterCriticalStats(
-            inventoryCharacterIndex
-        );
-
-    if(!character || !stats || !critical){
-        title.textContent="è§’è‰²è©³ç´°è³‡è¨Š";
-        body.innerHTML='<div class="inventory-empty-character">è§’è‰²å°šæœªå»ºç«‹</div>';
-        modal.classList.add("show");
-        return;
-    }
-
-    title.textContent=
-        `${character.id || "è§’è‰²"+(inventoryCharacterIndex+1)}ã€€Lv.${character.level||1}`;
-
-    const rows=[
-        ["HP",stats.maxHP],
-        ["SP",stats.maxSP],
-        ["æ”»æ“Š",stats.attack],
-        ["é˜²ç¦¦",stats.defense],
-        ["æ™ºåŠ›",stats.intelligence],
-        ["é«”è³ª",stats.vitality],
-        ["èƒ½é‡",stats.energy],
-        ["ç²¾ç¥",stats.spirit],
-        ["æ•æ·",stats.agility],
-        ["å‘½ä¸­",stats.accuracy],
-        ["é–ƒé¿",stats.evasion],
-        ["ç•°å¸¸æŠ—æ€§",stats.resistance.toFixed(1)+"%"],
-        ["æŠ—æš´",stats.antiCrit.toFixed(1)+"%"],
-        ["ç‰©ç†çˆ†æ“Šç‡",critical.physical.chance.toFixed(1)+"%"],
-        ["ç‰©ç†çˆ†æ“Šå‚·å®³",(critical.physical.multiplier*100).toFixed(1)+"%"],
-        ["æ³•è¡“çˆ†æ“Šç‡",critical.magic.chance.toFixed(1)+"%"],
-        ["æ³•è¡“çˆ†æ“Šå‚·å®³",(critical.magic.multiplier*100).toFixed(1)+"%"]
-    ];
-
-    body.innerHTML=
-        rows.map(
-            ([name,value])=>`
-                <div class="inventory-character-detail-row">
-                    <span>${name}</span>
-                    <b>${value}</b>
-                </div>
-            `
-        ).join("")+
-        `<div class="inventory-character-detail-note">
-            åŸºç¤å‘½ä¸­ç‡ï¼clamp(95%ï¼‹å‘½ä¸­Ã—0.3ï¼ç›´æ¥å‘½ä¸­ç‡é™ä½, 50%, 99%)ï¼Œå†ä¹˜ä¸Š(1ï¼ç›®æ¨™æœ€çµ‚é–ƒèº²ç‡)ã€‚<br>
-            ä¸€èˆ¬ç•°å¸¸æ¯1ç²¾ç¥é™ä½0.05å€‹ç™¾åˆ†é»å‘½ä¸­ç‡ï¼›æ¯1æ•æ·ï¼+1é€Ÿåº¦ã€+0.6å€‹ç™¾åˆ†é»åŸºç¤é–ƒèº²ã€‚
-        </div>`;
-
-    modal.classList.add("show");
-}
-
-function closeInventoryCharacterDetail(){
-    const modal=$("inventoryCharacterDetailModal");
-
-    if(modal){
-        modal.classList.remove("show");
-    }
-}
-
-function renderEquipment(){
-    const grid=$("equipmentGrid");
-    if(!grid) return;
-    grid.innerHTML="";
-
-    const key=getBackpackEquipmentKey(inventoryCharacterIndex);
-    const equipment=key ? characterEquipment[key] : null;
-
-    const slots=[
-        {key:"head",name:"é ­"},
-        {key:"hand",name:"æ‰‹"},
-        {key:"shoulder",name:"è­·è…•"},
-        {key:"armor",name:"è¡£æœ"},
-        {key:"shoes",name:"é‹å­"},
-        {key:"ring",name:"æˆ’æŒ‡"}
-    ];
-
-    slots.forEach(slot=>{
-        const cell=document.createElement("div");
-        cell.className="inventory-equipment-cell";
-
-        const label=document.createElement("div");
-        label.className="inventory-equipment-slot-label";
-        label.textContent=slot.name;
-
-        const box=document.createElement("div");
-        box.className="inventory-equipment-slot";
-        const item=equipment ? equipment[slot.key] : null;
-
-        if(item){
-            box.classList.add("has-item");
-            box.innerHTML=`<div class="inventory-equipment-icon">${item.icon || "â—†"}</div>`;
-            box.title=item.name || slot.name;
-            box.onclick=()=>openEquippedItem(item,slot.key);
-        }else{
-            box.innerHTML=`<div class="inventory-equipment-icon empty">ï¼‹</div>`;
-        }
-
-        cell.appendChild(label);
-        cell.appendChild(box);
-        grid.appendChild(cell);
-    });
-}
-
-function getFilteredInventoryItems(){
-    const equipmentTypes=[
-        "weapon",
-        "helmet",
-        "head",
-        "shoulder",
-        "armor",
-        "shoes",
-        "accessory",
-        "ring"
-    ];
-
-    const functionTypes=[
-        "function",
-        "utility",
-        "key",
-        "quest",
-        "special"
-    ];
-
-    return inventoryItems.filter(item=>{
-        if(!item) return false;
-
-        if(inventoryFilter==="equipment"){
-            return equipmentTypes.includes(item.type);
-        }
-
-        if(inventoryFilter==="material"){
-            return item.type==="material";
-        }
-
-        if(inventoryFilter==="function"){
-            return functionTypes.includes(item.type);
-        }
-
-        /*
-           ã€Œç‰©å“ã€æ‰¿æ¥è—¥æ°´èˆ‡ä¸€èˆ¬ç‰©å“ã€‚
-           æœªä¾†å¦‚æœæ–°å¢å°šæœªæ­¸é¡çš„æ–° typeï¼Œä¹Ÿå…ˆç•™åœ¨ç‰©å“é ï¼Œ
-           é¿å…å› ç‚º UI åˆ†é¡æ›´æ–°é€ æˆæ—¢æœ‰ç‰©å“æ†‘ç©ºçœ‹ä¸åˆ°ã€‚
-        */
-        return (
-            !equipmentTypes.includes(item.type) &&
-            item.type!=="material" &&
-            !functionTypes.includes(item.type)
-        );
-    });
-}
-
-function setInventoryFilter(filter){
-    inventoryFilter=filter;
-    renderInventoryItems();
-
-    const scroller=$("inventoryGridScroll");
-    if(scroller) scroller.scrollTop=0;
-}
-
-function renderInventoryItems(){
-    rebuildInventorySlots();
-    const grid=$("inventoryGrid");
-    if(!grid) return;
-    grid.innerHTML="";
-
-    const items=getFilteredInventoryItems().slice(0,INVENTORY_CATEGORY_SLOT_COUNT);
-
-    for(let index=0;index<INVENTORY_CATEGORY_SLOT_COUNT;index++){
-        const item=items[index] || null;
-        const box=document.createElement("div");
-        box.className="inventory-item inventory-item-classic "+(item ? "has-item":"empty");
-        box.innerHTML=`<div class="inventory-slot-number">${index+1}</div>`;
-
-        if(item){
-            box.innerHTML+=`<div class="inventory-icon">${item.icon || "â—†"}</div><div class="inventory-count">${item.count>1 ? "Ã—"+item.count : ""}</div>`;
-            const realIndex=inventoryItems.indexOf(item);
-            box.onclick=()=>openItemModal(realIndex);
-        }else{
-            box.innerHTML+='<div class="inventory-empty-dot">Â·</div>';
-        }
-        grid.appendChild(box);
-    }
-
-    document.querySelectorAll("#inventoryCategoryTabs [data-filter]").forEach(tab=>{
-        const active=tab.dataset.filter===inventoryFilter;
-        tab.classList.toggle("active",active);
-        tab.setAttribute("aria-selected",active ? "true" : "false");
-    });
-}
-
-function renderInventory(){
-    const character=getBackpackCharacter(inventoryCharacterIndex);
-    const nameEl=$("inventoryCharacterName");
-    if(nameEl){
-        nameEl.textContent=character ? `${character.id || "è§’è‰²"+(inventoryCharacterIndex+1)}ã€€Lv.${character.level||1}` : `è§’è‰²${inventoryCharacterIndex+1}ã€€å°šæœªå»ºç«‹`;
-    }
-
-    renderInventoryCharacterTabs();
-    renderEquipment();
-    renderInventoryItems();
-}
-
-/* =====================================================
-   ç‰©å“è©³ç´°
-===================================================== */
-
-function getStatText(stats){
-
-    if(
-        !stats ||
-        Object.keys(stats).length===0
-    ){
-
-        return"æ²’æœ‰é¡å¤–èƒ½åŠ›åŠ æˆã€‚";
-
-    }
-
-
-    const names = {
-
-        attack:"æ”»æ“Š",
-
-        vitality:"é«”è³ª",
-
-        energy:"èƒ½é‡",
-
-        intelligence:"æ™ºåŠ›",
-
-        spirit:"ç²¾ç¥",
-
-        agility:"æ•æ·",
-
-        maxHP:"æœ€å¤§HP",
-
-        maxSP:"æœ€å¤§SP",
-
-        defense:"é˜²ç¦¦"
-
-    };
-
-
-    let html="";
-
-
-    Object.keys(stats)
-    .forEach(key=>{
-
-        const value =
-            stats[key];
-
-
-        if(!value){
-            return;
-        }
-
-
-        html +=
-
-        `
-        <div>
-            ${names[key]||key}ï¼š
-            <b>+${value}</b>
-        </div>
-        `;
-
-    });
-
-
-    return html ||
-        "æ²’æœ‰é¡å¤–èƒ½åŠ›åŠ æˆã€‚";
-
-}
-
-
-function openItemModal(
-    slotIndex
-){
-
-    const item =
-        inventorySlots[
-            slotIndex
-        ];
-
-
-    if(!item){
-        return;
-    }
-
-
-    selectedInventorySlot =
-        slotIndex;
-
-
-    $("itemModalIcon")
-        .textContent =
-        item.icon;
-
-
-    $("itemModalName")
-        .textContent =
-        item.name;
-
-
-    $("itemModalStats")
-        .innerHTML =
-
-        `
-        ${
-            item.type==="potion"
-            ?
-            `<div>æ•ˆæœï¼š<b>${getPotionEffectDescription(item.id)}</b></div>`
-            :
-            getStatText(item.stats)
-        }
-
-        <div
-            style="
-                margin-top:7px;
-                color:#b3a58c;
-            "
-        >
-            å”®åƒ¹ï¼š${item.price||0} é‡‘å¹£
-        </div>
-        `;
-
-
-    const equipButton =
-        $("itemEquipButton");
-
-
-    equipButton.removeAttribute(
-        "data-slot"
-    );
-
-
-    if(item.type==="potion"){
-
-        equipButton.disabled=true;
-
-        equipButton.textContent =
-            "ä¸å¯è£å‚™";
-
-        equipButton.style.opacity =
-            ".4";
-
-    }
-    else{
-
-        equipButton.disabled=false;
-
-        equipButton.textContent =
-            "ç©¿æˆ´";
-
-        equipButton.style.opacity =
-            "1";
-
-    }
-
-
-    $("itemModal")
-        .classList
-        .add("show");
-
-}
-
-
-function openEquippedItem(
-    item,
-    slot
-){
-
-    selectedInventorySlot =
-        null;
-
-
-    $("itemModalIcon")
-        .textContent =
-        item.icon;
-
-
-    $("itemModalName")
-        .textContent =
-        item.name+
-        "ï¼ˆå·²è£å‚™ï¼‰";
-
-
-    $("itemModalStats")
-        .innerHTML =
-        getStatText(
-            item.stats
-        );
-
-
-    const equipButton =
-        $("itemEquipButton");
-
-
-    equipButton.disabled=false;
-
-    equipButton.textContent =
-        "è„«ä¸‹";
-
-    equipButton.style.opacity =
-        "1";
-
-
-    equipButton.dataset.slot =
-        slot;
-
-
-    $("itemModal")
-        .classList
-        .add("show");
-
-}
-
-
-function closeItemModal(){
-
-    selectedInventorySlot =
-        null;
-
-
-    $("itemEquipButton")
-        .removeAttribute(
-            "data-slot"
-        );
-
-
-    $("itemModal")
-        .classList
-        .remove("show");
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œæ–‡å­—å¤ªå¤š
-   å¡ä¸ä¸‹ï¼Œå°±ç²¾ç°¡é¡¯ç¤ºï¼Œå¾Œé¢ç”¨â€¦â€¦è©³ç´°
-   è®“ç©å®¶é»æ“Šè·³å‡ºå®Œæ•´ä»‹ç´¹ã€ï¼‰ï¼š
-   æŠ€èƒ½è©³ç´°è³‡è¨Šå½ˆçª—ï¼Œè·Ÿç‰©å“è©³ç´°å½ˆçª—å…±ç”¨
-   åŒä¸€å¥—.item-modalæ¨£å¼ã€‚showSkillDetail()
-   åƒæŠ€èƒ½IDï¼Œè‡ªå·±é‡æ–°æŸ¥ä¸€æ¬¡ç›®å‰è§’è‰²/ç­‰ç´š
-   ç‹€æ…‹ï¼Œçµ„å‡ºå®Œæ•´èªªæ˜æ–‡å­—ï¼ˆä¸æˆªæ–·ï¼‰ã€‚
-*/
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œä¸ç®¡æŠ€èƒ½æœ‰æ²’æœ‰
-   å­¸ç¿’ï¼Œè©³ç´°è³‡è¨Šéƒ½è¦æŠŠæ¯æ¬¡å‡ç´šå¢åŠ å¤šå°‘
-   é»å‚·å®³ã€æ©Ÿç‡%æ•¸æ€éº¼æå‡ï¼Œå®Œæ•´é¡¯ç¤ºã€ï¼‰ï¼š
-   æŠŠæŠ€èƒ½å¾Lv.1åˆ°æ»¿ç´šæ¯ä¸€ç´šçš„æ•¸å€¼éƒ½æ”¤é–‹ä¾†
-   åˆ—å‡ºä¾†ï¼Œä¸ç®¡ç©å®¶ç›®å‰å­¸äº†æ²’å­¸ã€å­¸åˆ°ç¬¬
-   å¹¾ç´šï¼Œé€™è£¡éƒ½æ˜¯å®Œæ•´çš„ä¸€ä»½ç¸½è¡¨â€”â€”å‚·å®³
-   æŠ€èƒ½é¡å¤–æ¨™å‡ºã€Œæ¯ç´š+Xã€çš„å›ºå®šå¢é‡ï¼Œ
-   æ–¹ä¾¿ç©å®¶ä¸€çœ¼çœ‹å‡ºæˆé•·å¹…åº¦ï¼Œä¸ç”¨è‡ªå·±
-   ä¸€ç´šä¸€ç´šå»å¿ƒç®—å·®å¤šå°‘ã€‚
-*/
-
-function buildSkillLevelBreakdownHTML(skill){
-
-    const maxLevel=
-        skill.maxLevel||
-        1;
-
-
-    let lines=
-        [];
-
-
-    for(
-        let lv=1;
-        lv<=maxLevel;
-        lv++
-    ){
-
-        let parts=
-            [];
-
-
-        if(
-            (
-                skill.category==="physical"||
-                skill.category==="magic"
-            ) &&
-            skill.baseDamage
-        ){
-
-            const dmg=
-                getSkillDamageAtLevel(
-                    skill,
-                    lv
-                );
-
-
-            parts.push(
-                "å‚·å®³"+
-                Math.floor(dmg)+
-
-                (
-                    skill.damagePerLevel
-                    ?
-                    "ï¼ˆæ¯ç´š+"+
-                    skill.damagePerLevel+
-                    "ï¼‰"
-                    :
-                    ""
-                )
-
-            );
-
-        }
-
-
-        if(
-            skill.burnChance &&
-            skill.burnPercentByLevel
-        ){
-
-            parts.push(
-
-                skill.burnChance+
-                "%æ©Ÿç‡ç‡ƒç‡’"+
-                skill.burnPercentByLevel[lv-1]+
-                "%æœ€å¤§HPï¼å›åˆ"
-
-            );
-
-        }
-
-
-        if(skill.freezeChance){
-
-            parts.push(
-
-                skill.freezeChance+
-                "%æ©Ÿç‡å†°å°"+
-                skill.freezeDuration+
-                "å›åˆ"
-
-            );
-
-        }
-
-
-        if(skill.lifestealPercentByLevel){
-            parts.push("å¸å–å‚·å®³"+skill.lifestealPercentByLevel[lv-1]+"%ï¼ˆå›å¾©HP/SPï¼‰");
-        }
-        if(skill.agilityDownByLevel){
-            parts.push(skill.agilityDownChance+"%é™æ•"+skill.agilityDownByLevel[lv-1]+"%ï¼Œ"+(skill.agilityDownDuration||2)+"å›åˆ");
-        }
-        if(skill.statDownByLevel){
-            parts.push(skill.statDownChance+"%é™èƒ½åŠ›"+skill.statDownByLevel[lv-1]+"%ï¼Œ"+(skill.statDownDuration||2)+"å›åˆ");
-        }
-        if(skill.defenseDownByLevel){
-            parts.push(skill.defenseDownChance+"%é™é˜²"+skill.defenseDownByLevel[lv-1]+"%ï¼Œ"+(skill.defenseDownDuration||2)+"å›åˆ");
-        }
-        if(skill.missBonusByLevel){
-            parts.push(skill.stunChance+"%æšˆçœ©ï¼ŒMISS +"+skill.missBonusByLevel[lv-1]+"%ï¼Œ"+(skill.stunDuration||2)+"å›åˆ");
-        }
-        if(skill.petrifyChanceByLevel){
-            parts.push(skill.petrifyChanceByLevel[lv-1]+"%çŸ³åŒ–ï¼Œ"+(skill.petrifyDuration||2)+"å›åˆ");
-        }
-        if(skill.selfShieldByLevel){
-            parts.push("è‡ªèº«è­·ç›¾"+skill.selfShieldByLevel[lv-1]+"é»ï¼Œ"+(skill.shieldDuration||2)+"å›åˆ");
-        }
-        if(skill.allyShieldByLevel){
-            parts.push("æˆ‘æ–¹å…¨é«”è­·ç›¾"+skill.allyShieldByLevel[lv-1]+"é»ï¼Œ"+(skill.shieldDuration||2)+"å›åˆ");
-        }
-
-
-        if(skill.category==="buff"&&skill.critBonusByLevel){
-            parts.push("çˆ†æ“Šç‡ï¼çˆ†æ“Šå‚·å®³ +"+skill.critBonusByLevel[lv-1]+"%ï¼Œ"+skill.duration+"å›åˆ");
-        }
-        else if(skill.category==="buff"&&skill.evasionBonusPercent){
-            parts.push("é–ƒèº²ç‡ +"+skill.evasionBonusPercent+"%ï¼Œ"+skill.duration+"å›åˆ");
-        }
-        else if(skill.category==="buff"&&skill.defenseBonusPercent){
-            parts.push("é˜²ç¦¦åŠ› +"+skill.defenseBonusPercent+"%ï¼Œ"+skill.duration+"å›åˆ");
-        }
-        else if(skill.category==="buff"&&skill.reflectPercent){
-            parts.push("åå‚· "+skill.reflectPercent+"%ï¼Œ"+skill.duration+"å›åˆ");
-        }
-        else if(skill.category==="buff"&&skill.statusResistBonus){
-            parts.push("ç•°å¸¸ç‹€æ…‹æŠ—æ€§ +"+skill.statusResistBonus+"%ï¼Œ"+skill.duration+"å›åˆ");
-        }
-        else if(skill.category==="buff"){
-            parts.push(skill.description);
-        }
-
-
-        if(skill.category==="heal"){
-
-            const healAmount=
-
-                skill.baseHeal+
-                skill.healPerLevel*
-                (lv-1);
-
-
-            parts.push(
-
-                "å›å¾©HPåŸºç¤"+
-                healAmount+
-                "+æ™ºåŠ›Ã—"+
-                HEALING_INT_COEFFICIENT+
-
-                (
-                    skill.healPerLevel
-                    ?
-                    "ï¼ˆåŸºç¤æ¯ç´š+"+
-                    skill.healPerLevel+
-                    "ï¼‰"
-                    :
-                    ""
-                )+
-                "ï¼›SPåŸºç¤"+
-                (skill.baseHealSP+(skill.healSPPerLevel||0)*(lv-1))+
-                (skill.healSPPerLevel ? "ï¼ˆåŸºç¤æ¯ç´š+"+skill.healSPPerLevel+"ï¼‰" : "")+
-                "+æ™ºåŠ›Ã—"+
-                SP_HEALING_INT_COEFFICIENT+
-                "ï¼ˆæ–½æ”¾è€…æœ¬äººä¸å›å¾©SPï¼‰"
-
-            );
-
-        }
-
-
-        if(
-            skill.category==="revive"&&
-            skill.reviveHealPercentByLevel
-        ){
-
-            parts.push(
-
-                "å¾©æ´»æ¢å¾©"+
-                skill.reviveHealPercentByLevel[lv-1]+
-                "%è¡€é‡"
-
-            );
-
-        }
-
-
-        if(
-            skill.category==="passive"
-        ){
-
-            parts.push(
-                skill.description
-            );
-
-        }
-
-
-        if(parts.length<1){
-            continue;
-        }
-
-
-        lines.push(
-
-            '<div style="'+
-            'display:flex;gap:6px;padding:3px 0;'+
-            'border-bottom:1px solid rgba(240,180,41,.12);">'+
-
-            '<span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">'+
-            "Lv."+lv+
-            "</span>"+
-
-            '<span style="flex:1;">'+
-            parts.join("ï½œ")+
-            "</span>"+
-
-            "</div>"
-
-        );
-
-    }
-
-
-    return lines.join("");
-
-}
-
-
-function showSkillDetail(skillId){
-
-    const skill=
-        skillDatabase[skillId];
-
-
-    if(!skill){
-        return;
-    }
-
-
-    const character=
-        characterSkillLoadouts[
-            currentSkillCharacter
-        ];
-
-
-    const level=
-
-        (
-            character&&
-            character.skillLevels&&
-            character.skillLevels[skillId]
-        )||
-        0;
-
-
-    const spCost=
-
-        skill.spCost!==undefined
-        ?
-        skill.spCost
-        :
-        skill.cost;
-
-
-    const iconEl=
-        $("skillDetailIcon");
-
-
-    if(iconEl){
-
-        iconEl.style.backgroundImage=
-
-            skillIconImages&&
-            skillIconImages[skillId]
-            ?
-            "url("+
-            skillIconImages[skillId]+
-            ")"
-            :
-            "none";
-
-        iconEl.textContent=
-
-            skillIconImages&&
-            skillIconImages[skillId]
-            ?
-            ""
-            :
-            "";
-
-    }
-
-
-    $("skillDetailName")
-        .textContent=
-
-        skill.name+
-
-        (
-            level>0
-            ?
-            "ï¼ˆLv."+level+
-            (
-                skill.maxLevel
-                ?
-                "/"+skill.maxLevel
-                :
-                ""
-            )+
-            "ï¼‰"
-            :
-            "ï¼ˆæœªå­¸ç¿’ï¼‰"
-        );
-
-
-    $("skillDetailStats")
-        .innerHTML=
-
-        `
-        <div style="margin-bottom:6px;">
-            <span style="
-                display:inline-block;
-                background:#2e2822;
-                color:#f0b429;
-                font-size:11px;
-                font-weight:bold;
-                padding:2px 7px;
-                border-radius:10px;
-            ">
-                ${getSkillCategoryLabel(skill.category)}
-            </span>
-        </div>
-
-        <div style="line-height:1.7;">
-            ${skill.description}
-        </div>
-
-        <div style="margin-top:8px;color:#b3a58c;">
-            ${
-                skill.category==="passive"
-                ?
-                "è¢«å‹•æŠ€èƒ½ï¼Œä¸ç”¨è£å‚™ï¼Œå­¸äº†å°±æ°¸ä¹…ç”Ÿæ•ˆ"
-                :
-                spCost+"SP"
-            }
-            ${
-                skill.learnCost
-                ?
-                "ï½œå­¸ç¿’éœ€è¦"+skill.learnCost+"æŠ€èƒ½é»"
-                :
-                ""
-            }
-        </div>
-
-        <div style="margin-top:10px;font-size:11px;color:#f0b429;font-weight:bold;">
-             å„ç­‰ç´šæ•¸å€¼
-        </div>
-
-        <div style="margin-top:4px;font-size:12px;">
-            ${
-                buildSkillLevelBreakdownHTML(
-                    skill
-                )
-            }
-        </div>
-
-        `;
-
-
-    const detailStats=$("skillDetailStats");
-
-    if(detailStats){
-        detailStats.scrollTop=0;
-    }
-
-    [
-        document.documentElement,
-        document.body,
-        $("game-viewport"),
-        $("game-stage")
-    ].forEach(el=>{
-        if(el){
-            el.classList.add("skill-detail-scroll-active");
-        }
-    });
-
-    $("skillDetailModal")
-        .classList
-        .add("show");
-
-}
-
-
-function closeSkillDetail(){
-
-    $("skillDetailModal")
-        .classList
-        .remove("show");
-
-    [
-        document.documentElement,
-        document.body,
-        $("game-viewport"),
-        $("game-stage")
-    ].forEach(el=>{
-        if(el){
-            el.classList.remove("skill-detail-scroll-active");
-        }
-    });
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œè¿”å›æ¡†æ¡†
-   æ—é‚Šå¤šä¸€å€‹ï¼ŸæŒ‰éˆ•ï¼Œè·³å‡ºå±¬æ€§èªªæ˜ã€ï¼‰ï¼š
-   å½ˆçª—å…§å®¹å›ºå®šå¯«æ­»åœ¨HTMLè£¡ï¼Œé€™å…©å€‹å‡½å¼
-   åªè² è²¬é–‹é—œï¼Œè·ŸcloseSkillDetail()æ˜¯
-   åŒä¸€ç¨®ç°¡å–®æ¨¡å¼ã€‚
-*/
-
-function showStatusHelp(){
-
-    $("statusHelpModal")
-        .classList
-        .add("show");
-
-}
-
-
-function closeStatusHelp(){
-
-    $("statusHelpModal")
-        .classList
-        .remove("show");
-
-}
-
-
-/* =====================================================
-   ç©¿æˆ´
-===================================================== */
-
-function equipSelectedItem(){
-
-    const button =
-        $("itemEquipButton");
-
-
-    if(button.dataset.slot){
-
-        unequipItem(
-            button.dataset.slot
-        );
-
-        return;
-
-    }
-
-
-    if(
-        selectedInventorySlot===null
-    ){
-        return;
-    }
-
-
-    const item =
-        inventorySlots[
-            selectedInventorySlot
-        ];
-
-
-    if(
-        !item ||
-        item.type==="potion"
-    ){
-        return;
-    }
-
-
-    const character =
-        getBackpackCharacter(
-            inventoryCharacterIndex
-        );
-
-
-    if(!character){
-        return;
-    }
-
-
-    const equipmentKey =
-        getBackpackEquipmentKey(
-            inventoryCharacterIndex
-        );
-
-
-    const equipment =
-        characterEquipment[equipmentKey];
-
-
-    const equipmentSlot =
-        getInventoryEquipmentSlot(item.type);
-
-
-    if(!equipmentSlot){
-        return;
-    }
-
-
-    const oldItem =
-        equipment[equipmentSlot];
-
-
-    if(oldItem){
-
-        inventoryItems.push(
-            oldItem
-        );
-
-    }
-
-
-    const actualIndex =
-        inventoryItems.indexOf(
-            item
-        );
-
-
-    if(actualIndex>=0){
-
-        inventoryItems.splice(
-            actualIndex,
-            1
-        );
-
-    }
-
-
-    equipment[equipmentSlot] =
-        item;
-
-
-    closeItemModal();
-
-    rebuildInventorySlots();
-
-    renderInventory();
-
-    updateUI();
-
-    saveGame();
-
-}
-
-
-/* =====================================================
-   è„«ä¸‹
-===================================================== */
-
-function unequipItem(slot){
-
-    const character =
-        getBackpackCharacter(
-            inventoryCharacterIndex
-        );
-
-
-    if(!character){
-        return;
-    }
-
-
-    const equipmentKey =
-        getBackpackEquipmentKey(
-            inventoryCharacterIndex
-        );
-
-
-    const equipment =
-        characterEquipment[equipmentKey];
-
-
-    const item =
-        equipment[slot];
-
-
-    if(!item){
-        return;
-    }
-
-
-    if(
-        inventoryItems.length>=120
-    ){
-
-        alert(
-            "èƒŒåŒ…å·²æ»¿ï¼Œç„¡æ³•è„«ä¸‹è£å‚™ã€‚"
-        );
-
-        return;
-
-    }
-
-
-    inventoryItems.push(
-        item
-    );
-
-
-    equipment[slot]=null;
-
-
-    closeItemModal();
-
-    rebuildInventorySlots();
-
-    renderInventory();
-
-    updateUI();
-
-    saveGame();
-
-}
-
-
-/* =====================================================
-   å”®å‡º
-===================================================== */
-
-async function sellSelectedItem(){
-
-    if(
-        selectedInventorySlot===null
-    ){
-        return;
-    }
-
-
-    const item =
-        inventorySlots[
-            selectedInventorySlot
-        ];
-
-
-    if(!item){
-        return;
-    }
-
-
-    const price =
-        item.price||
-        0;
-
-
-    if(
-        typeof window.rpgConfirm!=="function" ||
-        !await window.rpgConfirm(
-            "ç¢ºå®šè¦å‡ºå”®"+
-            item.name+
-            "ï¼Ÿ\n"+
-            "ç²å¾—"+
-            price+
-            "é‡‘å¹£ã€‚",
-            {
-                title:"å‡ºå”®è£å‚™",
-                confirmText:"ç¢ºå®šå‡ºå”®",
-                cancelText:"è¿”å›"
-            }
-        )
-    ){
-        return;
-    }
-
-    if(
-        selectedInventorySlot===null ||
-        inventorySlots[selectedInventorySlot]!==item
-    ){
-        return;
-    }
-
-
-    const actualIndex =
-        inventoryItems.indexOf(
-            item
-        );
-
-
-    if(actualIndex>=0){
-
-        const storedItem=inventoryItems[actualIndex];
-        const currentCount=Math.max(1,Number(storedItem.count)||1);
-
-        if(currentCount>1){
-            storedItem.count=currentCount-1;
-        }else{
-            inventoryItems.splice(
-                actualIndex,
-                1
-            );
-        }
-
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸæ­£æŠ“åˆ°å•é¡Œæ ¹æºï¼‰ï¼š
-       ä¹‹å‰é€™è£¡çš„ç¢ºèªè¨Šæ¯ä¸€ç›´èªªã€Œç²å¾—
-       XXé‡‘å¹£ã€ï¼Œä½†å¾é ­åˆ°å°¾æ²’æœ‰ä»»ä½•ä¸€è¡Œ
-       ç¨‹å¼ç¢¼çœŸçš„æŠŠé€™å€‹æ•¸å­—åŠ é€²ä»»ä½•åœ°æ–¹â€”â€”
-       é‡‘å¹£ç³»çµ±ç•¶æ™‚æ ¹æœ¬ä¸å­˜åœ¨ï¼Œé€™å¥è©±ç­‰æ–¼
-       æ˜¯ç©ºé ­æ”¯ç¥¨ã€‚ç¾åœ¨çœŸçš„æœ‰goldé€™å€‹å…±ç”¨
-       è³‡æºäº†ï¼Œé€™è£¡è£œä¸ŠçœŸæ­£çš„åŠ å€¼ã€‚
-    */
-
-    gold=
-        gold+
-        price;
-
-
-    closeItemModal();
-
-    rebuildInventorySlots();
-
-    renderInventory();
-
-    updateGoldDisplay();
-
-    saveGame();
-
-}
-
-
-/* =====================================================
-   è‡ªå‹•æˆ°é¬¥è¨­å®š
-===================================================== */
-
-/*
-   â˜… V137ï¼ˆæ¸…é™¤æ®˜ç•™éŒ¯èª¤è¨Šæ¯ï¼‰ï¼š
-   autoEnabledã€autoSkillHomeã€hpUsePctHomeã€spUsePctHome
-   æ˜¯èˆŠç‰ˆä¸»åŸå…§åµŒè‡ªå‹•è¨­å®šçš„å…ƒç´ ï¼Œç¾è¡Œè¨­å®šå·²æ”¹ç”±
-   autoBattleSettingsPanelå‹•æ…‹è¡¨å–®è™•ç†ã€‚èˆŠç‰ˆsafeBindä»åœ¨æ¯æ¬¡è¼‰å…¥
-   ä¸»å‹•æŠŠé€™å››å€‹ã€Œå·²çŸ¥ä¸å­˜åœ¨ã€çš„å…ƒç´ è¨˜æˆconsole.errorï¼Œæœƒæ©è“‹çœŸæ­£
-   çš„éŒ¯èª¤ï¼›å››æ®µç„¡æ•ˆç¶å®šå·²ç§»é™¤ã€‚
-
-   autoSkillBattleã€hpUsePctBattleã€spUsePctBattle
-   é€™ä¸‰å€‹æ˜¯å¾ˆæ—©æœŸç‰ˆæœ¬ã€æˆ°é¬¥ç•«é¢å…§åµŒä¸‹æ‹‰é¸å–®çš„
-   èˆŠå…ƒç´ IDï¼Œå¾Œä¾†é‡æ–°è¨­è¨ˆæˆç¾åœ¨é€™ç¨®
-   ã€Œæ¨™ç±¤+å•Ÿå‹•/åœæ­¢+è¨­å®šã€çš„è‡ªå‹•æˆ°é¬¥é¢æ¿æ™‚
-   å·²ç¶“æ‹¿æ‰äº†ï¼Œä½†é€™è£¡ç¶å®šäº‹ä»¶çš„ç¨‹å¼ç¢¼
-   æ²’æœ‰è·Ÿè‘—æ¸…ä¹¾æ·¨ï¼Œå°è‡´æ¯æ¬¡è¼‰å…¥éƒ½æœƒå˜—è©¦æ‰¾
-   é€™å¹¾å€‹ä¸å­˜åœ¨çš„å…ƒç´ ã€å°å‡ºéŒ¯èª¤è¨Šæ¯
-   ï¼ˆé›–ç„¶æœ‰é˜²å‘†ä¸æœƒè®“éŠæˆ²ç•¶æ©Ÿï¼Œä½†çµ‚ç©¶æ˜¯é›œè¨Šï¼‰ã€‚
-   é€™è£¡ç›´æ¥åˆªæ‰é€™ä¸‰æ®µå·²ç¶“æ²’æœ‰ç›®æ¨™å¯ä»¥ç¶çš„ç¨‹å¼ç¢¼ã€‚
-*/
-
-
-/*
-   â˜… è‡ªå‹•æˆ°é¬¥æŠ€èƒ½ä¸‹æ‹‰é¸å–®æ”¹æˆå‹•æ…‹ç”¢ç”Ÿã€‚
-   ä¹‹å‰æ˜¯å¯«æ­»åœ¨HTMLè£¡çš„å›ºå®šé¸é …ï¼ˆåªæœ‰ç«ç®­ã€æœƒå¿ƒä¸€æ“Šï¼‰ï¼Œ
-   ç¾åœ¨æŠ€èƒ½æ˜¯ç©å®¶è‡ªå·±å­¸ã€è‡ªå·±è£å‚™çš„ï¼Œ
-   é¸å–®è¦è·Ÿè‘—ã€Œç›®å‰è£å‚™çš„æŠ€èƒ½ã€å‹•æ…‹æ›´æ–°ï¼Œ
-   ä¸ç„¶ç©å®¶è£å‚™äº†æ–°æŠ€èƒ½ï¼Œé€™è£¡å»é¸ä¸åˆ°ã€‚
-
-   è¢«å‹•æŠ€èƒ½è·Ÿå¢ç›ŠæŠ€èƒ½ï¼ˆæ€’ç«ï¼‰ä¸æ”¾é€²è‡ªå‹•é¸å–®ï¼Œ
-   è¢«å‹•æŠ€èƒ½æ²’æœ‰ã€Œä¸»å‹•ä½¿ç”¨ã€é€™å›äº‹ï¼›
-   æ€’ç«å¦‚æœæ”¾é€²è‡ªå‹•é¸å–®ï¼Œ
-   è‡ªå‹•æˆ°é¬¥æ¯å›åˆéƒ½æœƒé‡æ–°æ–½æ”¾ï¼Œ
-   é‚è¼¯æœƒè®Šå¾—å¾ˆå¥‡æ€ªï¼Œ
-   æ‰€ä»¥æ€’ç«ç›®å‰å…ˆåªèƒ½åœ¨æˆ°é¬¥ä¸­æ‰‹å‹•é»æŠ€èƒ½é¸å–®æ–½æ”¾ã€‚
-*/
-
-function populateAutoSkillOptions(){
-
-    const character =
-        characterSkillLoadouts.fire;
-
-
-    if(!character){
-        return;
-    }
-
-
-    let optionsHTML =
-
-        '<option value="normal">æ™®é€šæ”»æ“Š</option>';
-
-
-    character.equippedSkills
-    .forEach(skillId=>{
-
-        const skill =
-            skillDatabase[skillId];
-
-
-        if(
-            !skill ||
-            skill.category==="buff"||
-            skill.category==="passive"
-        ){
-            return;
-        }
-
-
-        optionsHTML+=
-
-            '<option value="'+
-            skillId+
-            '">'+
-            skill.name+
-            '</option>';
-
-    });
-
-
-    const homeSelect =
-        $("autoSkillHome");
-
-
-    const battleSelect =
-        $("autoSkillBattle");
-
-
-    const previousValue =
-        autoConfig.skill;
-
-
-    if(homeSelect){
-
-        homeSelect.innerHTML =
-            optionsHTML;
-
-    }
-
-
-    if(battleSelect){
-
-        battleSelect.innerHTML =
-            optionsHTML;
-
-    }
-
-
-    /*
-       â˜… çœŸçš„æŠ“åˆ°å•é¡Œæ ¹æºäº†ï¼š
-       é€™è£¡åŸæœ¬åªæ‰¿èª"normal"æˆ–ã€Œç›®å‰è£å‚™çš„æŠ€èƒ½ã€
-       æ˜¯åˆæ³•å€¼ï¼Œ"defend"ï¼ˆé˜²ç¦¦ï¼‰ä¸åœ¨é€™å…©ç¨®æƒ…æ³å…§ï¼Œ
-       æœƒè¢«é€™æ®µé˜²å‘†é‚è¼¯èª¤åˆ¤æˆã€Œä¸åˆæ³•çš„æ®˜ç•™å€¼ã€ï¼Œ
-       å¼·åˆ¶é€€å›ã€Œæ™®é€šæ”»æ“Šã€â€”â€”
-       é€™æ­£æ˜¯ã€Œæ˜æ˜è¨­å®šé˜²ç¦¦ï¼Œå»è®Šæˆæ™®é€šæ”»æ“Šã€
-       çš„çœŸæ­£åŸå› ï¼šconfirmAutoBattleSettings()
-       æ‰å‰›æŠŠautoConfig.skillæ­£ç¢ºè¨­æˆ"defend"ï¼Œ
-       ç·Šæ¥è‘—å‘¼å«é€™å€‹å‡½å¼åšåŒæ­¥ï¼Œ
-       é€™è£¡åˆæŠŠå®ƒæ´—å›"normal"ï¼Œ
-       ç­‰æ–¼ä½¿ç”¨è€…çš„é¸æ“‡åœ¨å„²å­˜çš„ä¸‹ä¸€åˆ»å°±è¢«è¦†è“‹æ‰ã€‚
-
-       ä¿®æ­£ï¼šæŠŠ"defend"ä¹Ÿè¦–ç‚ºåˆæ³•å€¼ã€‚
-    */
-
-    const stillValid =
-        previousValue==="normal"||
-        previousValue==="defend"||
-        character.equippedSkills.includes(
-            previousValue
-        );
-
-
-    if(!stillValid){
-
-        autoConfig.skill=
-            "normal";
-
-    }
-
-
-    if(homeSelect){
-
-        homeSelect.value =
-            autoConfig.skill;
-
-    }
-
-
-    if(battleSelect){
-
-        battleSelect.value =
-            autoConfig.skill;
-
-    }
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼šç¬¬äºŒè§’è‰²ç‰ˆæœ¬çš„è‡ªå‹•æŠ€èƒ½é¸å–®åŒæ­¥ã€‚
-   è·ŸpopulateAutoSkillOptions()é‚è¼¯å®Œå…¨å°ç¨±ï¼Œ
-   è®€characterSkillLoadouts.player2ï¼Œ
-   å¯«autoConfig2ï¼Œæ“ä½œçš„DOMå…ƒä»¶ä¹Ÿæ˜¯
-   å°ˆå±¬æ–¼ç¬¬äºŒè§’è‰²é‚£çµ„idã€‚
-   åŒæ™‚è² è²¬é¡¯ç¤º/éš±è—æ•´å¼µè¨­å®šå¡ç‰‡
-   ï¼ˆplayer2ä¸å­˜åœ¨å°±ä¸ç”¨è®“ç©å®¶çœ‹åˆ°é€™å€å¡Šï¼‰ã€‚
-*/
-
-function populateAutoSkillOptions2(){
-
-    const card=
-        $("player2AutoSettingsCard");
-
-
-    if(!card){
-        return;
-    }
-
-
-    if(!player2){
-
-        card.style.display=
-            "none";
-
-        return;
-
-    }
-
-
-    card.style.display=
-        "block";
-
-
-    const titleEl=
-        $("player2AutoSettingsTitle");
-
-
-    if(titleEl){
-
-        titleEl.textContent=
-
-            ""+
-            player2.id+
-            "è‡ªå‹•æˆ°é¬¥è¨­å®š";
-
-    }
-
-
-    const character=
-        characterSkillLoadouts.player2;
-
-
-    if(!character){
-        return;
-    }
-
-
-    let optionsHTML=
-
-        '<option value="normal">æ™®é€šæ”»æ“Š</option>';
-
-
-    character.equippedSkills
-    .forEach(skillId=>{
-
-        const skill=
-            skillDatabase[skillId];
-
-
-        if(
-            !skill ||
-            skill.category==="buff"||
-            skill.category==="passive"||
-            skill.category==="heal"||
-            skill.category==="revive"
-        ){
-            return;
-        }
-
-
-        optionsHTML+=
-
-            '<option value="'+
-            skillId+
-            '">'+
-            skill.name+
-            '</option>';
-
-    });
-
-
-    const select=
-        $("autoSkillPlayer2");
-
-
-    if(!select){
-        return;
-    }
-
-
-    const previousValue=
-        autoConfig2.skill;
-
-
-    select.innerHTML=
-        optionsHTML;
-
-
-    const stillValid=
-        previousValue==="normal"||
-        previousValue==="defend"||
-        character.equippedSkills.includes(
-            previousValue
-        );
-
-
-    if(!stillValid){
-
-        autoConfig2.skill=
-            "normal";
-
-    }
-
-
-    select.value=
-        autoConfig2.skill;
-
-
-    const hpSelect=
-        $("hpUsePctPlayer2");
-
-
-    const spSelect=
-        $("spUsePctPlayer2");
-
-
-    if(hpSelect){
-
-        hpSelect.value=
-            autoConfig2.hp;
-
-    }
-
-
-    if(spSelect){
-
-        spSelect.value=
-            autoConfig2.sp;
-
-    }
-
-
-    const enabledCheckbox=
-        $("autoEnabledPlayer2");
-
-
-    if(enabledCheckbox){
-
-        enabledCheckbox.checked=
-            autoConfig2.enabled;
-
-    }
-
-}
-
-
-/*
-   â˜… ç¬¬äºŒè§’è‰²è‡ªå‹•æˆ°é¬¥è¨­å®šçš„ä¸‹æ‹‰é¸å–®
-   ç•°å‹•æ™‚ï¼ŒæŠŠå€¼å¯«å›autoConfig2ã€‚
-*/
-
-function updateAutoConfig2FromUI(){
-
-    const enabledCheckbox=
-        $("autoEnabledPlayer2");
-
-
-    const select=
-        $("autoSkillPlayer2");
-
-
-    const hpSelect=
-        $("hpUsePctPlayer2");
-
-
-    const spSelect=
-        $("spUsePctPlayer2");
-
-
-    if(enabledCheckbox){
-
-        autoConfig2.enabled=
-            enabledCheckbox.checked;
-
-    }
-
-
-    if(select){
-
-        autoConfig2.skill=
-            select.value;
-
-    }
-
-
-    if(hpSelect){
-
-        autoConfig2.hp=
-            Number(
-                hpSelect.value
-            );
-
-    }
-
-
-    if(spSelect){
-
-        autoConfig2.sp=
-            Number(
-                spSelect.value
-            );
-
-    }
-
-
-    saveGame();
-
-}
-
-
-function syncBattleAutoSettings(){
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆçœŸçš„æŠ“åˆ°ä¸€å€‹æœƒç•¶æ©Ÿçš„bugï¼‰ï¼š
-       é€™è£¡åŸæœ¬æœƒç›´æ¥å°
-       autoSkillBattle/hpUsePctBattle/spUsePctBattle
-       é€™ä¸‰å€‹èˆŠç‰ˆæˆ°é¬¥ç•«é¢å…§åµŒä¸‹æ‹‰é¸å–®è¨­å€¼ï¼Œ
-       ä½†é€™æ¬¡æ”¹ç‰ˆå¾Œï¼Œé€™ä¸‰å€‹ä¸‹æ‹‰é¸å–®å·²ç¶“æ•´å€‹æ‹¿æ‰
-       ï¼ˆç›¸é—œè¨­å®šç§»åˆ°ã€Œè¨­å®šã€æŒ‰éˆ•å±•é–‹çš„
-       autoBattleSettingsPanelè£¡äº†ï¼‰ï¼Œ
-       DOMè£¡å·²ç¶“æ‰¾ä¸åˆ°é€™ä¸‰å€‹å…ƒç´ ï¼Œ
-       ç›´æ¥å°null.valueè³¦å€¼æœƒç›´æ¥ä¸Ÿå‡ºéŒ¯èª¤ï¼Œ
-       å°è‡´å‘¼å«é€™å€‹å‡½å¼çš„åœ°æ–¹å…¨éƒ¨ä¸­æ–·åŸ·è¡Œâ€”â€”
-       åŒ…æ‹¬beginCharacterTurn()ï¼Œ
-       ç­‰æ–¼æ¯æ¬¡è¼ªåˆ°ç©å®¶è¡Œå‹•ï¼Œ
-       ç•«é¢éƒ½æœ‰å¯èƒ½å› ç‚ºé€™è£¡å™´éŒ¯è€Œå¡ä½ã€‚
-
-       æ–°ç‰ˆè¨­å®šé¢æ¿æ˜¯ã€Œé»è¨­å®šæ‰å±•é–‹ï¼Œ
-       å±•é–‹æ™‚æ‰ç”±switchAutoSettingsCharacter()
-       è² è²¬å¸¶å…¥ç›®å‰çš„å€¼ã€ï¼Œä¸éœ€è¦åœ¨é€™è£¡
-       æ¯æ¬¡éƒ½ä¸»å‹•åŒæ­¥ï¼Œæ‰€ä»¥ç›´æ¥æŠŠé€™ä¸‰è¡Œæ‹¿æ‰ï¼Œ
-       åªä¿ç•™åŒæ­¥ã€Œå·²å­¸æŠ€èƒ½é¸é …ã€é€™éƒ¨åˆ†
-       ï¼ˆpopulateAutoSkillOptionsç³»åˆ—å‡½å¼
-       å†…éƒ¨éƒ½å·²ç¶“æœ‰nullæª¢æŸ¥ï¼Œä¸æœƒæœ‰åŒæ¨£çš„å•é¡Œï¼‰ã€‚
-    */
-
-    populateAutoSkillOptions();
-
-    populateAutoSkillOptions2();
-
-}
-
-
-/* =====================================================
-   æˆ°é¬¥è³‡è¨Š
-===================================================== */
-
-function setBattleInfoExpanded(expanded){
-
-    const region=document.querySelector("#battlePage .battle-info-region");
-    const toggle=$("battleInfoToggle");
-
-    if(!region||!toggle){ return false; }
-
-    const next=!!expanded;
-    region.classList.toggle("is-expanded",next);
-    toggle.setAttribute("aria-expanded",next?"true":"false");
-    toggle.setAttribute("aria-label",next?"æ”¶åˆæˆ°é¬¥è³‡è¨Š":"å±•é–‹æˆ°é¬¥è³‡è¨Š");
-    return true;
-
-}
-
-function toggleBattleInfoPanel(){
-
-    const region=document.querySelector("#battlePage .battle-info-region");
-    return setBattleInfoExpanded(!(region&&region.classList.contains("is-expanded")));
-
-}
-
-function clearBattleLog(){
-
-    setBattleInfoExpanded(false);
-
-    $("battleInfo")
-        .innerHTML="";
-
-    /* V173.42: Element Box can use potions while no battle is running.
-       Carry those notices into the next battle-info panel exactly once. */
-    const pendingElementBoxNotices=
-        typeof window!=="undefined"&&Array.isArray(window.v17342PendingBattleNotices)
-            ? window.v17342PendingBattleNotices.splice(0)
-            : [];
-    pendingElementBoxNotices.forEach(message=>addBattleLog(message));
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œå·¡é‚é é¢çš„
-       æˆ°é¬¥è³‡è¨Šè¦†è“‹å±¤ï¼‰ï¼š
-       æ–°æˆ°é¬¥é–‹å§‹æ¸…ç©ºç´€éŒ„çš„åŒæ™‚ï¼Œ
-       å·¡é‚é é¢é‚£ä»½ä¹Ÿè¦ä¸€èµ·æ¸…ç©ºï¼Œ
-       ä¸ç„¶æ–°æˆ°é¬¥æ‰“åˆ°ä¸€åŠï¼Œå·¡é‚é é¢å»é‚„
-       æ®˜ç•™è‘—ä¸Šä¸Šä¸€å ´çš„èˆŠç´€éŒ„ï¼Œå…©é‚Šæœƒå°ä¸èµ·ä¾†ã€‚
-    */
-
-    const mapInfo=
-        $("mapBattleInfo");
-
-
-    if(mapInfo){
-
-        mapInfo.innerHTML=
-            "";
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-       æ–°æˆ°é¬¥é–‹å§‹ï¼Œå›ºå®šé¡¯ç¤ºçš„å›åˆæ•¸æ¨™ç±¤
-       ä¹Ÿè¦é‡ç½®å›ç¬¬1å›åˆï¼Œä¸ç„¶æœƒæ®˜ç•™
-       ä¸Šä¸€å ´æˆ°é¬¥çµæŸæ™‚çš„å›åˆæ•¸ã€‚
-    */
-
-    const turnIndicator=
-        $("battleTurnIndicator");
-
-
-    if(turnIndicator){
-
-        turnIndicator.textContent=
-            "ç¬¬ 1 å›åˆ";
-
-    }
-
-
-    const mapTurnIndicator=
-        $("mapBattleTurnIndicator");
-
-
-    if(mapTurnIndicator){
-
-        mapTurnIndicator.textContent=
-            "ç¬¬ 1 å›åˆ";
-
-    }
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-   æ±ºå®šå›åˆè³‡è¨Šåˆ—ï¼ˆç¬¬Xå›åˆï¼å€’æ•¸ï¼ç›®æ¨™ï¼‰
-   è·Ÿæˆ°é¬¥æŒ‡ä»¤æŒ‰éˆ•å€ï¼ˆæŠ€èƒ½/æ™®é€šæ”»æ“Š/é˜²ç¦¦/
-   ç‰©å“/é€ƒè„«ï¼‰ç¾åœ¨è©²é¡¯ç¤ºé‚„æ˜¯è©²è—èµ·ä¾†ã€‚
-
-   è¦å‰‡ï¼š
-   - autoBattleç‚ºtrueï¼ˆè‡ªå‹•æˆ°é¬¥æŒçºŒé–‹è‘—ï¼‰ï¼š
-     ä¸ç®¡ç¾åœ¨æ˜¯å®£å‘Šé‚„æ˜¯çµç®—éšæ®µï¼Œä¸€å¾‹è—èµ·ä¾†ï¼Œ
-     ä¸æœƒæ¯å€‹è§’è‰²è¡Œå‹•å®Œå°±åˆ‡æ›ä¸€æ¬¡ã€é »ç¹é–ƒçˆã€‚
-   - autoBattleç‚ºfalseï¼ˆæ‰‹å‹•ï¼‰ï¼š
-     çµç®—éšæ®µï¼ˆbattlePhase==="resolve"ï¼Œ
-     é›™æ–¹æ­£åœ¨ä¾åºçœŸæ­£å‡ºæ‰‹ï¼‰è—èµ·ä¾†ï¼Œæ¸›å°‘ç•«é¢
-     é›œè¨Šï¼›å®£å‘Šéšæ®µï¼ˆbattlePhase==="declare"ï¼Œ
-     ç­‰ç©å®¶è‡ªå·±é¸æ“‡è¦åšä»€éº¼ï¼‰é¡¯ç¤ºå‡ºä¾†ï¼Œ
-     ä¸ç„¶ç©å®¶æœƒçœ‹ä¸åˆ°æŒ‰éˆ•ã€ä¸çŸ¥é“è¦é»å“ªè£¡ã€‚
-
-   è—èµ·ä¾†çš„æ™‚å€™é †ä¾¿é—œé–‰å¯èƒ½é‚„é–‹è‘—çš„æŠ€èƒ½/
-   ç‰©å“å­é¸å–®ï¼ˆcloseMenus()ï¼‰ï¼Œé¿å…æŒ‰éˆ•å€
-   è¢«è—èµ·ä¾†ã€å­é¸å–®å»é‚„é£„åœ¨ç•«é¢ä¸Šçš„æ€ªç‹€æ³ã€‚
-*/
-
-function updateActionHudVisibility(){
-
-    const activeAuto=
-        activeBattleCharacterIndex===0
-        ? autoBattle
-        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-
-    const battlePresentationActive=!!(
-        typeof window!=="undefined"&&
-        window.FourSymbolsBattleFlow&&
-        typeof window.FourSymbolsBattleFlow.isPresentationActive==="function"&&
-        window.FourSymbolsBattleFlow.isPresentationActive()
-    );
-
-    const shouldHide=
-        activeAuto || battlePhase==="resolve" || battlePresentationActive;
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…æ¾„æ¸…ï¼Œå…ˆå‰ç†è§£éŒ¯äº†ï¼‰ï¼š
-       å›åˆè³‡è¨Šåˆ—ï¼ˆå«å›åˆæ•¸/è¨ˆæ™‚å™¨/ç›®æ¨™ï¼‰
-       è‡ªå‹•æˆ°é¬¥æ™‚ç…§èˆŠæ•´å€‹éš±è—ï¼Œä¸ç‰¹åˆ¥ç•™
-       å›åˆæ•¸åœ¨é€™è£¡â€”â€”ä½¿ç”¨è€…è¦çš„æ˜¯ã€Œæˆ°é¬¥
-       è³‡è¨Š(æˆ°é¬¥ç´€éŒ„æ¡†)æœ¬èº«ã€é¡¯ç¤ºç›®å‰å›åˆæ•¸ï¼Œ
-       ä¸æ˜¯é€™å€‹æŒ‰éˆ•åˆ—çš„ä¸€éƒ¨åˆ†ï¼Œæ”¹å›åŸæœ¬
-       çš„æ•´é«”éš±è—é‚è¼¯ã€‚
-    */
-
-    const turnRow=
-        $("turnTargetRow");
-
-
-    if(turnRow){
-
-        turnRow.classList.toggle(
-            "battle-hud-hidden",
-            shouldHide
-        );
-
-    }
-
-
-    const commandRow=
-        $("battleCommandRow");
-
-
-    if(commandRow){
-
-        commandRow.classList.toggle(
-            "battle-hud-hidden",
-            shouldHide
-        );
-
-
-        if(shouldHide){
-
-            closeMenus();
-            clearBattleTargetSelectionMode();
-
-        }
-
-    }
-
-}
-
-
-function addBattleLog(text){
-
-    const info =
-        $("battleInfo");
-
-
-    if(!info){
-        return;
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-       ä¹‹å‰æ¯åŠ ä¸€è¡Œæ–°è¨Šæ¯ï¼Œå°±å¼·åˆ¶æŠŠæ²è»¸æ‹‰åˆ°
-       æœ€åº•éƒ¨ï¼Œå°è‡´ä½¿ç”¨è€…å¾€ä¸Šæ»‘æƒ³çœ‹ä¹‹å‰çš„
-       ç´€éŒ„æ™‚ï¼Œä¸€æœ‰æ–°è¨Šæ¯é€²ä¾†å°±è¢«å¼·åˆ¶æ‹‰å›å»ï¼Œ
-       å®Œå…¨çœ‹ä¸åˆ°æƒ³çœ‹çš„å…§å®¹ã€‚
-
-       æ”¹æˆå…ˆåˆ¤æ–·ã€Œä½¿ç”¨è€…ç¾åœ¨æ˜¯ä¸æ˜¯å·²ç¶“åœ¨
-       æ¥è¿‘åº•éƒ¨ã€ï¼ˆå®¹è¨±20pxçš„èª¤å·®ï¼‰ï¼Œ
-       åªæœ‰åœ¨ã€ŒåŸæœ¬å°±åœ¨åº•éƒ¨é™„è¿‘ã€çš„æƒ…æ³ä¸‹ï¼Œ
-       æ‰è‡ªå‹•æ²åˆ°æ–°è¨Šæ¯ï¼›å¦‚æœä½¿ç”¨è€…å·²ç¶“
-       ä¸»å‹•å¾€ä¸Šæ»‘é–‹ä¸€æ®µè·é›¢ï¼Œä»£è¡¨ä»–æ­£åœ¨
-       å›é ­çœ‹ä¹‹å‰çš„ç´€éŒ„ï¼Œé€™æ™‚å€™æ–°è¨Šæ¯é€²ä¾†
-       ä¸æœƒæ‰“æ–·ä»–ï¼Œæ²å‹•ä½ç½®ç¶­æŒä¸è®Šã€‚
-    */
-
-    const wasNearBottom=
-
-        info.scrollHeight-
-        info.scrollTop-
-        info.clientHeight
-        <20;
-
-
-    const line =
-        document.createElement(
-            "div"
-        );
-
-
-    line.className =
-        "battle-line";
-
-
-    line.textContent =
-        text;
-
-
-    info.appendChild(
-        line
-    );
-
-
-    while(
-        info.children.length>80
-    ){
-
-        info.removeChild(
-            info.firstChild
-        );
-
-    }
-
-
-    if(wasNearBottom){
-
-        info.scrollTop =
-            info.scrollHeight;
-
-    }
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œå·¡é‚é é¢çš„
-       æˆ°é¬¥è³‡è¨Šè¦†è“‹å±¤ï¼‰ï¼š
-       æ¯åŠ ä¸€è¡Œæˆ°é¬¥ç´€éŒ„ï¼ŒåŒæ­¥è¤‡è£½ä¸€ä»½åˆ°
-       å·¡é‚é é¢é‚£ä»½æˆ°é¬¥è³‡è¨Šæ¡†â€”â€”é€™æ˜¯å”¯ä¸€
-       è² è²¬å¯«å…¥æˆ°é¬¥ç´€éŒ„æ–‡å­—çš„åœ°æ–¹ï¼Œ
-       åœ¨é€™è£¡åŒæ­¥æœ€å–®ç´”ï¼Œä¸ç”¨å¦å¤–æ‰¾
-       æ¯ä¸€å€‹å‘¼å«addBattleLog()çš„åœ°æ–¹
-       å„è‡ªè™•ç†ã€‚é€™ä»½ä¸ç”¨è™•ç†ã€Œæ²åˆ°åº•éƒ¨ã€
-       çš„é‚è¼¯ï¼Œç©å®¶é›¢é–‹æˆ°é¬¥ã€å›åˆ°åœ°åœ–ä¹‹å¾Œ
-       æ‰æœƒçœ‹åˆ°é€™ä»½ï¼Œä¸æœƒæœ‰ã€Œæ–°è¨Šæ¯ä¸€ç›´
-       æ‰“æ–·æ­£åœ¨çœ‹çš„å…§å®¹ã€çš„å•é¡Œã€‚
-    */
-
-    const mapInfo=
-        $("mapBattleInfo");
-
-
-    if(mapInfo){
-
-        const mapLine=
-            document.createElement(
-                "div"
-            );
-
-
-        mapLine.className=
-            "battle-line";
-
-
-        mapLine.textContent=
-            text;
-
-
-        mapInfo.appendChild(
-            mapLine
-        );
-
-
-        while(
-            mapInfo.children.length>80
-        ){
-
-            mapInfo.removeChild(
-                mapInfo.firstChild
-            );
-
-        }
-
-
-        mapInfo.scrollTop=
-            mapInfo.scrollHeight;
-
-    }
-
-}
-
-
-/* =====================================================
-   ç©å®¶è³‡è¨Š
-===================================================== */
-
-function updatePlayerHeader(){
-
-    const element =
-        elementDatabase[
-            player.element
-        ]
-        ||
-        elementDatabase.fire;
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œemojiæ›æˆ
-       CSSå‹•ç•«åœ–ç¤ºï¼‰ï¼štextContentæ”¹æˆ
-       innerHTMLï¼Œæ‰èƒ½çœŸçš„æŠŠ
-       <span class="element-icon...">
-       é€™ç¨®HTMLæ¨™ç±¤æ¸²æŸ“å‡ºä¾†ï¼Œä¸ç„¶æœƒè¢«
-       ç•¶æˆç´”æ–‡å­—å­—é¢é¡¯ç¤ºã€‚
-    */
-
-    $("playerName")
-        .innerHTML =
-
-        getElementIconHTML(
-            player.element
-        )+
-        ""+
-        (
-            player.id||
-            element.character
-        );
-
-
-    $("elementText")
-        .innerHTML =
-
-        getElementIconHTML(
-            player.element
-        )+
-        ""+
-        element.name;
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-   åœ¨å·¡é‚ï¼åœ°åœ–é é¢æ™‚ï¼Œæœ€ä¸Šé¢é‚£æ¢æ¨™é¡Œåˆ—
-   ä¸é¡¯ç¤ºè§’è‰²çš„ç­‰ç´š/HP/SPï¼Œæ”¹é¡¯ç¤ºã€Œåœ°åœ–
-   åç¨±ã€ï¼‹ã€Œæ€ªç‰©è³‡è¨Šï¼ˆåç¨±/å±¬æ€§/è¡€é‡/
-   æ•æ·ï¼‰ã€ã€‚
-
-   æ€ªç‰©è³‡è¨ŠæŠ“çš„æ˜¯ç›®å‰åœ°åœ–ä¸Šï¼ˆmonsters[0]~
-   monsters[MAX_TRAINING_MONSTERS-1]ï¼‰
-   ç¬¬ä¸€éš»é‚„æ´»è‘—çš„æ€ªç‰©â€”â€”è·ŸrunAutoPatrolCheck()
-   è‡ªå‹•å·¡æ€ªæ™‚ã€Œæ‰“ç¬¬ä¸€éš»é‚„æ´»è‘—çš„æ€ªç‰©ã€ç”¨çš„
-   æ˜¯åŒä¸€å€‹é‚è¼¯ï¼Œé€™è£¡é¡¯ç¤ºçš„å°±æ˜¯ã€Œå·¡æ€ªæŒ‰ä¸‹å»
-   æœƒæ‰“åˆ°çš„é‚£éš»æ€ªç‰©ã€ï¼Œä¸æ˜¯éš¨ä¾¿æŠ“ä¸€éš»ã€‚
-
-   å…©çµ„æ¨™é¡Œåˆ—ï¼ˆåŸæœ¬çš„è§’è‰²è³‡è¨Šï¼é€™è£¡æ–°å¢çš„
-   åœ°åœ–+æ€ªç‰©è³‡è¨Šï¼‰å¹³å¸¸åªæœƒé¡¯ç¤ºä¸€çµ„ï¼Œ
-   åœ¨showPage()è£¡åˆ‡æ›é é¢æ™‚æœƒå‘¼å«é€™è£¡
-   é‡æ–°åˆ¤æ–·è¦é¡¯ç¤ºå“ªä¸€çµ„ã€‚
-*/
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œç·´åŠŸå€æ”¹ç‰ˆ
-   å…±ç”¨é‚è¼¯ï¼‰ï¼š
-   æŠŠã€Œåˆ—å‡ºæŸå€‹åœ°å€å…¨éƒ¨æ€ªç‰©ç¨®é¡çš„åç¨±/
-   ç­‰ç´š/æ•æ·ã€é€™æ®µé‚è¼¯æŠ½æˆç¨ç«‹å‡½å¼ï¼Œ
-   åœ°åœ–é é¢çš„æ€ªç‰©æ¸…å–®æ¡†ã€ç·´åŠŸå€æ–°çš„
-   åœ°åœ–è³‡è¨Šå½ˆçª—ï¼Œå…©é‚Šéƒ½è¦ç”¨åˆ°åŒä¸€å¥—ï¼Œ
-   ä¸è¦å„è‡ªå¯«ä¸€ä»½å¹¾ä¹ä¸€æ¨£çš„ç¨‹å¼ç¢¼ã€‚
-
-   åŒåæ€ªç‰©ï¼ˆæ‹¿æ‰ç‹/çš‡ä¸ç®—ï¼‰åªåˆ—ä¸€æ¬¡ï¼Œ
-   ä¸åˆ—è¡€é‡ï¼Œç”¨config.monsters()æ‹¿åˆ°
-   æ•´ä»½åŸå§‹åå–®ï¼ˆä¸æ˜¯currentBattleMonsters
-   é€™ç¨®ã€Œé€™å ´æˆ°é¬¥æŠ½åˆ°èª°ã€çš„æ¸…å–®ï¼‰ï¼Œ
-   ç¢ºä¿å°±ç®—æ€ªç‰©åœ¨æˆ°é¬¥è£¡è¢«æ‰“æ­»ï¼Œæ¸…å–®
-   é‚„æ˜¯å®Œæ•´é¡¯ç¤ºé€™å€‹åœ°å€ã€Œæœ‰å“ªäº›ç¨®é¡ã€ã€‚
-*/
-
-function getZoneMonsterListHTML(zoneKey){
-
-    const config=
-        zoneConfig[zoneKey];
-
-
-    if(!config){
-        return"";
-    }
-
-
-    const zoneMonsters=
-
-        typeof config.monsters===
-        "function"
-        ?
-        config.monsters()
-        :
-        [];
-
-
-    const seenNames=
-        new Set();
-
-
-    const lines=
-        [];
-
-
-    zoneMonsters.forEach(
-        monster=>{
-
-            if(
-                !monster ||
-                seenNames.has(
-                    monster.name
-                )
-            ){
-                return;
-            }
-
-
-            seenNames.add(
-                monster.name
-            );
-
-
-            lines.push(
-
-                monster.name+
-                "Lv."+
-                monster.level+
-                "æ•æ·"+
-                Math.round(
-                    getMonsterAgility(
-                        monster
-                    )
-                )
-
-            );
-
-        }
-    );
-
-
-    return lines
-        .map(
-            line=>
-                "<div>"+
-                line+
-                "</div>"
-        )
-        .join("");
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œç·´åŠŸå€æ”¹ç‰ˆï¼‰ï¼š
-   æ¯å€‹åœ°å€çš„èƒŒæ™¯ç¾è¡“åœ–ï¼Œå…ˆç•™ç©ºå­—ä¸²
-   ï¼ˆä½¿ç”¨è€…ä¹‹å¾Œæœƒè£œä¸Šbase64æˆ–åœ–ç‰‡ç¶²å€ï¼Œ
-   åªè¦æŠŠå°æ‡‰æ¬„ä½å¡«é€²å»å°±æœƒç”Ÿæ•ˆï¼Œ
-   applyTrainingZoneBackground()è·Ÿé€™è£¡
-   å®Œå…¨ä¸ç”¨å†æ”¹ï¼‰ã€‚
-*/
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œå·¡æ€ªé é¢
-   ï¼ˆ#mapPageï¼‰èƒŒæ™¯æ”¹æˆä¾åœ°å€å‹•æ…‹åˆ‡æ›ï¼‰ï¼š
-   åŸæœ¬#mapPageçš„èƒŒæ™¯æ˜¯å¯«æ­»åœ¨CSSè£¡çš„
-   å–®ä¸€å¼µæ£®æ—åœ–ï¼Œä¸ç®¡é€²å“ªå€‹åœ°å€éƒ½é•·å¾—
-   ä¸€æ¨£ã€‚é€™è£¡æ”¹æˆè·Ÿç·´åŠŸå€åœ°åœ–é è¦½åŒä¸€ç¨®
-   è¨­è¨ˆâ€”â€”ä¸€å€‹ç‰©ä»¶è£è‘—æ¯å€‹åœ°å€å„è‡ªçš„
-   èƒŒæ™¯åœ–ï¼Œforest/desertå…ˆæ”¾ä¸Šä½¿ç”¨è€…
-   é€™æ¬¡æä¾›çš„åœ–ï¼Œå…¶é¤˜åœ°å€ç•™ç©ºã€ä¹‹å¾Œ
-   ä½¿ç”¨è€…è¦è£œåœ–ç‰‡ç›´æ¥å¡«é€²å°æ‡‰æ¬„ä½å°±å¥½ï¼Œ
-   ä¸ç”¨æ”¹ä»»ä½•å…¶ä»–ç¨‹å¼ç¢¼ã€‚
-
-   é‚„æ²’æœ‰å°ˆå±¬åœ–ç‰‡çš„åœ°å€ï¼Œå¥—ç”¨applyMapZoneBackground()
-   æ™‚æœƒé€€å›é¡¯ç¤ºforesté€™å¼µç•¶é è¨­å€¼ï¼Œ
-   ä¸æœƒå‡ºç¾ä¸€ç‰‡é»‘çš„ç•«é¢ã€‚
-*/
-
-const mapZoneBackgroundImages={
-
-    forest:"assets/maps/forest.jpg",
-    desert:"assets/maps/desert.jpg",
-    ice:"",
-    zone4:"",
-    zone5:"",
-    zone6:"",
-    zone7:"",
-    zone8:"",
-    zone9:"",
-    zone10:""
-
-};
-
-
-function applyMapZoneBackground(zoneKey){
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œæ”¹æˆæ“ä½œ
-       ç¨ç«‹çš„position:fixedèƒŒæ™¯åœ–å±¤ï¼Œ
-       ä¸å†ç›´æ¥å°#mapPageæœ¬èº«è¨­å®š
-       background-imageï¼‰ã€‚
-    */
-
-    const bgLayer=
-        $("mapPageBgLayer");
-
-
-    if(!bgLayer){
-        return;
-    }
-
-
-    const imageUrl=
-
-        mapZoneBackgroundImages[zoneKey]||
-        mapZoneBackgroundImages.forest;
-
-
-    bgLayer.style.backgroundImage=
-
-        "url("+
-        imageUrl+
-        ")";
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€ŒæŠ€èƒ½é…è£
-   åªé¡¯ç¤ºiconï¼Œç›®å‰æ²’æœ‰iconåœ–ç¤ºå°±å…ˆç©ºè‘—ã€ï¼‰ï¼š
-   æŠ€èƒ½åœ–ç¤ºçš„é ç•™æŸ¥æ‰¾è¡¨ï¼Œkeyæ˜¯æŠ€èƒ½IDï¼Œ
-   valueå…ˆå…¨éƒ¨ç•™ç©ºå­—ä¸²ã€‚ä¹‹å¾Œè¦å¹«æŠ€èƒ½è£œ
-   åœ–ç¤ºï¼Œç›´æ¥å°é€™å€‹ç‰©ä»¶å¡«å…¥å°æ‡‰çš„
-   base64æˆ–åœ–ç‰‡ç¶²å€å°±æœƒç”Ÿæ•ˆï¼ˆæŠ€èƒ½åˆ—è¡¨ã€
-   è£å‚™æ¬„æ ¼å­ã€æŠ€èƒ½è©³ç´°å½ˆçª—ä¸‰å€‹åœ°æ–¹éƒ½
-   æœƒè‡ªå‹•å¥—ç”¨åŒä¸€å¼µåœ–ï¼Œä¸ç”¨åˆ†åˆ¥å»æ”¹ï¼‰ï¼Œ
-   ä¸ç”¨æ”¹ä»»ä½•å…¶ä»–ç¨‹å¼ç¢¼ã€‚
-*/
-
-const skillIconImages=elementSkillIconMap;
-
-
-const zoneBackgroundImages={
-
-    forest:"",
-    desert:"",
-    ice:"",
-    zone4:"",
-    zone5:"",
-    zone6:"",
-    zone7:"",
-    zone8:"",
-    zone9:"",
-    zone10:""
-
-};
-
-
-function applyTrainingZoneBackground(zoneKey){
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œæ”¹æˆæ“ä½œ
-       ç¨ç«‹çš„position:fixedèƒŒæ™¯åœ–å±¤ï¼‰ï¼š
-       é€™å€‹åœ–å±¤çš„CSS classæœ¬èº«å·²ç¶“å…§å»ºäº†
-       ã€Œèª¿æš—æ¼¸å±¤+é è¨­ç¸½è¦½åœ–ã€é€™å€‹çµ„åˆ
-       ï¼ˆè¦‹.training-bg-fixed-layerï¼‰ï¼Œ
-       é€™è£¡å¦‚æœåªç”¨è¡Œå…§æ¨£å¼è“‹ä¸€å€‹å–®ç´”çš„
-       url(...)ä¸Šå»ï¼ŒæœƒæŠŠèª¿æš—æ¼¸å±¤ä¸€èµ·è“‹æ‰ã€
-       å€‹åˆ¥åœ°å€çš„åœ–ç‰‡æœƒè®Šæˆæ²’æœ‰èª¿æš—æ•ˆæœï¼Œ
-       è·Ÿç¸½è¦½åœ–ä¸ä¸€è‡´ã€‚æ‰€ä»¥é€™è£¡è¨­å®šè¡Œå…§
-       æ¨£å¼æ™‚ï¼Œä¸€æ¨£è¦ç”¨ã€Œæ¼¸å±¤+åœ–ç‰‡ã€çš„
-       çµ„åˆå¯«æ³•ï¼Œä¸èƒ½åªå¯«url()ã€‚
-    */
-
-    const bgLayer=
-        $("trainingPageBgLayer");
-
-
-    if(!bgLayer){
-        return;
-    }
-
-
-    const imageUrl=
-        zoneBackgroundImages[zoneKey];
-
-
-    if(imageUrl){
-
-        const nextBackground=
-            "linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.4)),"+
-            "url("+
-            imageUrl+
-            ")";
-
-        if(bgLayer.style.backgroundImage!==nextBackground){
-            bgLayer.style.backgroundImage=nextBackground;
-        }
-
-    }
-    else{
-
-        /*
-           V97ï¼šæ²’æœ‰å°ˆå±¬åœ–ç‰‡æ™‚åªåœ¨çœŸçš„å­˜åœ¨è¡Œå…§èƒŒæ™¯æ™‚æ‰æ¸…é™¤ã€‚
-           éå»æ¯æ¬¡æ‰“é–‹åœ°å€è³‡è¨Šéƒ½é‡å¯«backgroundImageï¼Œé…åˆ
-           Samsung Browserçš„transformç¸®æ”¾èˆ‡fixedèƒŒæ™¯æœƒè§¸ç™¼æ˜‚è²´é‡ç¹ªã€‚
-           ç¾åœ¨é¿å…ç„¡æ„ç¾©çš„style mutationï¼Œç›´æ¥æ²¿ç”¨CSSç¸½è¦½èƒŒæ™¯ã€‚
-        */
-
-        if(bgLayer.style.backgroundImage){
-            bgLayer.style.removeProperty("background-image");
-        }
-
-    }
-
-}
-
-
-/*
-   â˜… æ–°å¢ï¼šç·´åŠŸå€åœ°å€è³‡è¨Šå½ˆçª—â€”â€”é»æ–‡å­—
-   æ™‚è§¸ç™¼ï¼Œé¡¯ç¤ºé€™å€‹åœ°å€çš„æ€ªç‰©æ¸…å–®ï¼Œ
-   ä¸¦ä¾ç…§ç›®å‰ç­‰ç´šæ±ºå®šã€Œé€²å…¥ã€æŒ‰éˆ•èƒ½ä¸èƒ½
-   æŒ‰ã€‚è·Ÿä¸»åŸé‚£æ‰¹å½ˆçª—å…±ç”¨åŒä¸€å¥—
-   .home-feature-modalæ¨£å¼ã€‚
-*/
-
-function openTrainingZoneInfo(zoneKey){
-
-    const config=
-        zoneConfig[zoneKey];
-
-
-    const modal=
-        $("trainingZoneModal");
-
-    const titleEl=
-        $("trainingZoneModalTitle");
-
-    const bodyEl=
-        $("trainingZoneModalBody");
-
-
-    if(
-        !config ||
-        !modal ||
-        !titleEl ||
-        !bodyEl
-    ){
-        return;
-    }
-
-
-    applyTrainingZoneBackground(
-        zoneKey
-    );
-
-
-    titleEl.textContent=
-        config.title||"åœ°å€è³‡è¨Š";
-
-
-    const monsterListHTML=
-        getZoneMonsterListHTML(
-            zoneKey
-        );
-
-
-    const unlocked=
-
-        player.level>=
-        config.requiredLevel;
-
-
-    bodyEl.innerHTML=
-
-        '<div style="font-size:16px;color:#f0b429;margin-bottom:8px;">'+
-        (config.levelRange||"")+
-        "</div>"+
-
-        '<div style="font-size:16px;line-height:1.9;margin-bottom:16px;">'+
-        (
-            monsterListHTML||
-            '<span style="color:#b3a58c;">ï¼ˆå°šç„¡æ€ªç‰©è³‡æ–™ï¼‰</span>'
-        )+
-        "</div>"+
-
-        '<div style="display:flex;gap:8px;">'+
-
-        (
-            unlocked
-            ?
-            '<button class="home-feature-buy-btn"style="flex:1;padding:10px 12px;font-size:16px;min-height:46px;"'+
-            'onclick="closeTrainingZoneInfo();enterZone(\''+
-            zoneKey+
-            '\');">'+
-            "é€²å…¥"+
-            "</button>"
-            :
-            '<button class="home-feature-buy-btn"style="flex:1;padding:10px 12px;font-size:16px;min-height:46px;"disabled>'+
-            "éœ€è¦ Lv."+
-            config.requiredLevel+
-            "</button>"
-        )+
-
-        '<button class="home-feature-buy-btn"style="flex:1;padding:10px;"'+
-        'onclick="closeTrainingZoneInfo();">'+
-        "è¿”å›"+
-        "</button>"+
-
-        "</div>";
-
-
-    modal.classList.add(
-        "show"
-    );
-
-}
-
-
-function closeTrainingZoneInfo(){
-
-    const modal=
-        $("trainingZoneModal");
-
-
-    if(modal){
-
-        modal.classList.remove(
-            "show"
-        );
-
-    }
-
-}
-
-
-function updateMapPageHeader(){
-
-    const mapPageElement=
-        $("mapPage");
-
-
-    const isMapPage=
-
-        mapPageElement &&
-        mapPageElement.classList.contains(
-            "active"
-        );
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œä¸æ˜¯éš±è—ï¼Œ
-       æ˜¯æ•´å€‹æ‹¿æ‰ï¼Œä¸è¦ç•™ä¸€å¡Šé»‘è‰²ç©ºç™½ã€ï¼‰ï¼š
-       é€™è£¡åŸæœ¬è‡ªå·±åœŸæ³•ç…‰é‹¼å¯«äº†ä¸€ä»½ã€Œä¸»åŸæ™‚
-       éš±è—æ¨™é¡Œåˆ—ã€çš„é‚è¼¯ï¼Œåªç”¨display:none
-       è“‹æ‰å…§å®¹ï¼Œä½†.contenté‚£å¡Šå€åŸŸåŸæœ¬æ˜¯
-       ç”¨position:absolute;top:62pxç®—å¥½
-       ã€Œæ‰£æ‰æ¨™é¡Œåˆ—é«˜åº¦å¾Œã€çš„ä½ç½®ï¼Œæ¨™é¡Œåˆ—
-       æ¶ˆå¤±äº†ã€.contentæ²’æœ‰è·Ÿè‘—è£œä¸Šå»ï¼Œ
-       æ‰æœƒç©ºå‡ºä¸€å¡Š62pxé«˜çš„é»‘è‰²å€åŸŸã€‚
-
-       å¾Œä¾†ç™¼ç¾showPage()è£¡å…¶å¯¦å·²ç¶“æœ‰ä¸€å¥—
-       å®Œæ•´ã€æ­£ç¢ºè™•ç†é€™ä»¶äº‹çš„æ©Ÿåˆ¶
-       ï¼ˆ#appçš„no-headeré€™å€‹classï¼Œæ­é…
-       CSSçš„.content{top:0}ï¼‰ï¼Œæ‹¿æ‰é€™è£¡
-       æ•´æ®µè‡ªå·±å¯«çš„é‚è¼¯ï¼Œæ”¹æˆæŠŠ"home"ï¼
-       "training"åŠ é€²showPage()è£¡çš„
-       hideHeaderPagesæ¸…å–®ï¼Œç›´æ¥ç”¨ç¾æˆã€
-       æ­£ç¢ºçš„æ©Ÿåˆ¶è™•ç†ï¼Œä¸æœƒå†ç•™ä¸‹ç©ºç™½å€å¡Šã€‚
-    */
-
-
-    const nameEl=
-        $("playerName");
-
-    const infoEl=
-        $("playerHeaderInfo");
-
-    const zoneEl=
-        $("mapHeaderZoneName");
-
-    const monsterInfoEl=
-        $("mapHeaderMonsterInfo");
-
-
-    if(nameEl){
-
-        nameEl.style.display=
-
-            isMapPage
-            ?
-            "none"
-            :
-            "";
-
-    }
-
-
-    if(infoEl){
-
-        infoEl.style.display=
-
-            isMapPage
-            ?
-            "none"
-            :
-            "";
-
-    }
-
-
-    if(zoneEl){
-
-        zoneEl.style.display=
-
-            isMapPage
-            ?
-            ""
-            :
-            "none";
-
-    }
-
-
-    if(monsterInfoEl){
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œè—è‰²æ¡†
-           å…¶ä»–éƒ½ä¸è¦ã€ï¼‰ï¼šé€™å€‹å®¹å™¨(ç­‰ç´šç¯„åœ
-           é‚£è¡Œ)ä¸ç®¡åœ¨ä¸åœ¨åœ°åœ–é é¢ï¼Œä¸€å¾‹
-           éš±è—ï¼Œåªç•™åœ°åœ–åç¨±é‚£ä¸€è¡Œã€‚
-        */
-
-        monsterInfoEl.style.display=
-            "none";
-
-    }
-
-
-    if(!isMapPage){
-        return;
-    }
-
-
-    const config=
-
-        zoneConfig[currentZone]
-        ||
-        zoneConfig.forest;
-
-
-    if(zoneEl){
-
-        /*
-           â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œä¸Šé¢
-           è—è‰²æ¡†åªç•™åœ°åœ–åå­—å››å€‹å­—ï¼Œå…¶ä»–
-           éƒ½ä¸è¦ã€ï¼‰ï¼š
-           config.titleæœ¬èº«å¸¶è‘—emojiå‰ç¶´
-           ï¼ˆä¾‹å¦‚"â›°ï¸ å·¨ç¸è’åŸ"ï¼‰ï¼Œé€™è£¡ç”¨
-           æ­£è¦è¡¨é”å¼å»æ‰é–‹é ­çš„emojiè·Ÿ
-           ç©ºç™½ï¼Œåªç•™ä¸‹ç´”ä¸­æ–‡åœ°åœ–åç¨±ã€‚
-           ä¹Ÿä¸å†è‡ªå·±åŠ "ğŸ—ºï¸ "é€™å€‹å‰ç¶´ã€‚
-        */
-
-        zoneEl.textContent=
-
-            (config.title||"")
-            .replace(
-                /^\S+\s*/,
-                ""
-            );
-
-    }
-
-
-    /*
-       â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€Œè—è‰²æ¡†
-       å…¶ä»–éƒ½ä¸è¦ã€ã€Œæ©˜è‰²éƒ¨åˆ†å¯ä»¥æ‹¿æ‰ã€ï¼‰ï¼š
-       ç­‰ç´šç¯„åœæ–‡å­—ã€æ€ªç‰©æ¸…å–®æ¡†ï¼Œå…©å€‹éƒ½
-       æ•´å€‹ä¸å†é¡¯ç¤ºâ€”â€”mapHeaderMonsterInfo
-       é€™å€‹å¤–å±¤å®¹å™¨æœ¬ä¾†å°±åœ¨ä¸Šé¢çš„isMapPage
-       åˆ¤æ–·å¼è£¡è¢«è¨­æˆä¸€å®šéš±è—
-       ï¼ˆdisplay:noneï¼‰ï¼Œé€™è£¡ä¸ç”¨å†è™•ç†ï¼›
-       æ€ªç‰©æ¸…å–®æ¡†ï¼ˆmapMonsterListBoxï¼‰
-       çš„å…§å®¹ä¹Ÿä¸ç”¨å†ç”¢ç”Ÿï¼Œç›´æ¥ä¸å¯«å…¥ã€‚
-    */
-
-}
-
-
-/* =====================================================
-   â˜… æ›´æ–°UI
-===================================================== */
-
-function updateUI(){
-
-    updateHomeTestTools();
-
-    /*
-       â˜… æ¯æ¬¡æ›´æ–°ç•«é¢æ™‚ï¼Œé †ä¾¿æª¢æŸ¥ä¸€æ¬¡
-       è’æ¼ åœ°å¸¶çš„è§£é–ç‹€æ…‹è¦ä¸è¦æ›´æ–°
-       ï¼ˆç©å®¶å‡ç´šè·¨éLv.11é‚£ä¸€åˆ»ï¼Œ
-       ç·´åŠŸå€åˆ—è¡¨è¦ç«‹åˆ»åæ˜ å‡ºä¾†ï¼Œ
-       ä¸ç”¨ç‰¹åœ°è·³é æ‰æ›´æ–°ï¼‰ã€‚
-    */
-
-    updateTrainingZoneLocks();
-
-    updateSecondCharacterBanner();
-
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œä¸»åŸé‡‘å¹£
-       é¡¯ç¤ºï¼‰ï¼šé‡‘å¹£æ˜¯å…±ç”¨è³‡æºï¼Œä»»ä½•æ™‚å€™
-       éƒ½å¯èƒ½è®Šå‹•ï¼ˆè³£è£å‚™ã€é ˜ä»»å‹™/æˆå°±
-       çå‹µã€å•†åº—æ¶ˆè²»ï¼‰ï¼ŒupdateUI()æœ¬ä¾†
-       å°±æœƒåœ¨å¾ˆå¤šæ™‚æ©Ÿé»è¢«å‘¼å«ï¼Œä¸€èµ·æ›´æ–°
-       æœ€å–®ç´”ï¼Œä¸ç”¨å¦å¤–æ‰¾åœ°æ–¹é‡è¤‡åˆ¤æ–·ã€‚
-    */
-
-    updateGoldDisplay();
-
-
-    /*
-       â˜… æ–°å¢ï¼šåœ°åœ–ä¸Šç©å®¶å¡ç‰‡çš„åå­—/ç­‰ç´š
-       ï¼ˆåŒ…å«è·Ÿéš¨æ–¹å¡Šï¼‰è¦è·Ÿè‘—åŒæ­¥æ›´æ–°ï¼Œ
-       ä¸ç„¶å‡ç´šä¹‹å¾Œåœ°åœ–ä¸Šé¡¯ç¤ºçš„é‚„æ˜¯èˆŠç­‰ç´šã€‚
-    */
-
-    updateMapPlayerCard();
-
-
-    /*
-       â˜… æ–°å¢ï¼šå·¡é‚é é¢æ¨™é¡Œåˆ—çš„æ€ªç‰©è³‡è¨Š
-       ï¼ˆåç¨±/å±¬æ€§/è¡€é‡/æ•æ·ï¼‰æœƒéš¨è‘—æˆ°é¬¥
-       é€²è¡Œè®ŠåŒ–ï¼ˆæ‰“æ­»ä¸€éš»æ›ä¸‹ä¸€éš»ã€
-       è¡€é‡æ¸›å°‘ï¼‰ï¼ŒupdateUI()æœ¬ä¾†å°±æœƒåœ¨
-       å¾ˆå¤šæ™‚æ©Ÿè¢«å‘¼å«ï¼Œä¸€èµ·æ›´æ–°ï¼Œ
-       ä¸ç”¨å¦å¤–æ‰¾åœ°æ–¹é‡è¤‡åˆ¤æ–·ã€‚
-    */
-
-    updateMapPageHeader();
-
-
-    /*
-       â˜… æ–°å¢ï¼šæˆ°é¬¥ä¸­SPè®ŠåŒ–ï¼ˆç”¨äº†æŠ€èƒ½ã€å–äº†è—¥æ°´ï¼‰
-       è¦å³æ™‚åæ˜ åœ¨æŠ€èƒ½å¿«æ·åˆ—çš„å¯ç”¨ç‹€æ…‹ä¸Šï¼Œ
-       ä¸ç„¶SPæ‰£åˆ°ä¸å¤ äº†ï¼ŒæŒ‰éˆ•å»é‚„äº®è‘—èƒ½é»ã€‚
-    */
-
-    if(battleActive){
-
-        populateSkillQuickBar();
-
-    }
-
-
-    const stats =
-        getMainCharacterStats();
-
-
-    /*
-       å¦‚æœè£å‚™æˆ–èƒ½åŠ›æ”¹è®Šï¼Œ
-       HP/SPä¸Šé™è®ŠåŒ–æ™‚ä¸è¦è¶…å‡ºä¸Šé™ã€‚
-    */
-
-    player.hp =
-        Math.max(
-            0,
-            Math.min(
-                player.hp,
-                stats.maxHP
-            )
-        );
-
-
-    player.sp =
-        Math.max(
-            0,
-            Math.min(
-                player.sp,
-                stats.maxSP
-            )
-        );
-
-
-    $("playerLevel")
-        .textContent =
-        player.level;
-
-
-    $("headerHP")
-        .textContent =
-        player.hp;
-
-
-    $("headerSP")
-        .textContent =
-        player.sp;
-
-
-    /*
-       â˜… ä¾ç…§ç©å®¶è¦æ±‚ï¼Œä¸»åŸé¦–é çš„å®Œæ•´å±¬æ€§åˆ—è¡¨
-       ï¼ˆæœ€å¤§HP/SPã€å…­åœã€é˜²ç¦¦ã€å‡ç´šé€²åº¦ï¼‰
-       æ•´å€‹æ‹¿æ‰äº†ï¼Œé€™äº›è³‡è¨Šåœ¨ã€Œç‹€æ…‹ã€é æœ¬ä¾†å°±æœ‰ï¼Œ
-       é¦–é é‡è¤‡é¡¯ç¤ºæ˜¯å¤šé¤˜çš„é›œè¨Šã€‚
-       é€™è£¡åŸæœ¬å¯«çµ¦ #homeHP ç­‰å…ƒç´ çš„é‚£äº›è¡Œä¹Ÿä¸€ä½µç§»é™¤ï¼Œ
-       ä¸ç„¶å…ƒç´ ä¸å­˜åœ¨äº†ï¼Œç¹¼çºŒå¯«å…¥æœƒç›´æ¥å™´éŒ¯ï¼Œ
-       å°è‡´updateUI()å¾Œé¢çš„æ±è¥¿å…¨éƒ¨ä¸æœƒåŸ·è¡Œã€‚
-    */
-
-
-    if(
-        $("itemMenu") &&
-        $("itemMenu").classList.contains("show")
-    ){
-        renderBattlePotionMenu();
-    }
-
-
-    $("skillPoints")
-        .textContent =
-
-        (
-            getSkillCharacterObject(
-                currentSkillCharacter
-            )||
-            player
-        ).skillPoints;
-
-
-    /*
-       ç¶“é©—æ± é¡¯ç¤º
-    */
-
-    $("sharedExpValue")
-        .textContent =
-        Math.max(0,Math.floor(Number(sharedExp)||0))
-            .toLocaleString("zh-TW");
-
-
-    renderExpDistributeList();
-
-
-    /*
-       ç‹€æ…‹é 
-    */
-
-    updateStatusPreview();
-
-
-    /*
-       æˆ°é¬¥ä¸­çš„è¡€æ¢
-    */
-
-    if(battleActive){
-
-        currentBattleMonsters
-        .forEach(
-            index=>{
-                updateMonsterUI(
-                    index
-                );
-            }
-        );
-
-
-        updateBattlePlayerBars();
-
-        const bossPresentationOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
-        if(bossPresentationOwner&&typeof bossPresentationOwner.syncHud==="function"){
-            bossPresentationOwner.syncHud();
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-   â˜… è‡ªå‹•å­˜æª”
-
-   é™¤äº†åŸæœ¬åœ¨ç‰¹å®šå‹•ä½œé»ï¼ˆå‡ç´šã€è£å‚™ã€æˆ°é¬¥å‹åˆ©â€¦ï¼‰
-   æœƒå­˜æª”ä¹‹å¤–ï¼Œé€™è£¡å†åŠ å…©å±¤ä¿éšªï¼š
-
-   1. æ¯ 20 ç§’å®šæ™‚è‡ªå‹•å­˜ä¸€æ¬¡ï¼Œ
-      ä¸¦åœ¨ç•«é¢å³ä¸‹è§’çŸ­æš«é¡¯ç¤ºã€ŒğŸ’¾ å·²è‡ªå‹•å­˜æª”ã€ï¼Œ
-      è®“ç©å®¶çŸ¥é“çœŸçš„æœ‰åœ¨å­˜ï¼Œä¸æ˜¯æ†‘ç©ºæ”¾å¿ƒã€‚
-
-   2. åˆ‡åˆ°èƒŒæ™¯ï¼ˆåˆ‡Appã€åˆ‡åˆ†é ã€è¢å¹•é–å®šï¼‰
-      çš„ç•¶ä¸‹ç«‹åˆ»å­˜ä¸€æ¬¡ï¼Œ
-      é€™æ˜¯æœ€å®¹æ˜“æ¼æ‰é€²åº¦çš„æƒ…æ³â€”â€”
-      ç©å®¶å¾ˆå¯èƒ½çªç„¶è¢«é›»è©±æ‰“æ–·ã€
-      æˆ–ç›´æ¥åˆ‡å‡ºå»å›LINEï¼Œ
-      é€™æ™‚å€™ä¸èƒ½åªé 20ç§’çš„å®šæ™‚å™¨ã€‚
-
-   å…©ç¨®æƒ…æ³éƒ½å‘¼å«åŒä¸€å€‹ autoSaveNow()ï¼Œ
-   å…§éƒ¨æœ¬èº«æœ‰try/catchï¼Œ
-   å­˜æª”å¤±æ•—ä¸æœƒè®“éŠæˆ²ç•¶æ‰ï¼Œ
-   åªæœƒåœ¨consoleç•™ä¸‹éŒ¯èª¤è¨Šæ¯æ–¹ä¾¿ä¹‹å¾Œé™¤éŒ¯ã€‚
-===================================================== */
-
-let autosaveIndicatorTimer=null;
-
-let autosaveIntervalId=null;
-
-
-function isGameStarted(){
-
-    return !!(
-        player &&
-        player.id
-    );
-
-}
-
-
-function showAutosaveIndicator(){
-
-    const el =
-        $("autosaveIndicator");
-
-
-    if(!el){
-        return;
-    }
-
-
-    el.classList.add(
-        "show"
-    );
-
-
-    clearTimeout(
-        autosaveIndicatorTimer
-    );
-
-
-    autosaveIndicatorTimer =
-        setTimeout(()=>{
-
-            el.classList.remove(
-                "show"
-            );
-
-        },1600);
-
-}
-
-
-function autoSaveNow(showIndicator){
-
-    if(!isGameStarted()){
-        return;
-    }
-
-
-    try{
-
-        saveGame();
-
-
-        if(showIndicator){
-
-            showAutosaveIndicator();
-
-        }
-
-    }
-    catch(error){
-
-        console.error(
-            "è‡ªå‹•å­˜æª”å¤±æ•—ï¼š",
-            error
-        );
-
-    }
-
-}
-
-
-function startAutoSave(){
-
-    if(autosaveIntervalId){
-
-        clearInterval(
-            autosaveIntervalId
-        );
-
-    }
-
-
-    /*
-       æ¯20ç§’å®šæ™‚å­˜æª”ï¼Œ
-       åªæœ‰çœŸæ­£é–‹å§‹éŠæˆ²ï¼ˆå·²å‰µè§’ï¼‰æ‰æœƒå¯¦éš›å¯«å…¥ï¼Œ
-       é‚„åœ¨å‰µè§’ç•«é¢æ™‚é€™è£¡æœƒç›´æ¥è·³éã€‚
-    */
-
-    autosaveIntervalId =
-        setInterval(()=>{
-
-            autoSaveNow(true);
-
-        },20000);
-
-
-    /*
-       åˆ‡åˆ°èƒŒæ™¯ï¼åˆ‡åˆ†é æ™‚ç«‹åˆ»å­˜ä¸€æ¬¡ã€‚
-       ä¸é¡¯ç¤ºæç¤ºï¼Œå› ç‚ºç•«é¢é€™æ™‚å€™
-       ç©å®¶é€šå¸¸å·²ç¶“çœ‹ä¸åˆ°äº†ã€‚
-    */
-
-    document.addEventListener(
-        "visibilitychange",
-        ()=>{
-
-            if(document.hidden){
-
-                autoSaveNow(false);
-
-
-                /*
-                   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…å›å ±ï¼Œ
-                   ã€Œåˆ‡åˆ°èƒŒæ™¯å†åˆ‡å›ä¾†åˆ°åº•æœ‰æ²’æœ‰
-                   ç®—é›¢ç·šç¶“é©—ã€ï¼‰ï¼šåˆ‡åˆ°èƒŒæ™¯çš„
-                   ç•¶ä¸‹ï¼Œè¨˜éŒ„é€™å€‹æ™‚é–“é»ï¼Œç­‰
-                   åˆ‡å›å‰æ™¯æ™‚æ‰çŸ¥é“è¦å¾é€™è£¡
-                   é–‹å§‹ç®—ã€Œé›¢é–‹äº†å¤šä¹…ã€ã€‚
-                */
-
-                lastOfflineCheckTimestamp=
-                    Date.now();
-
-            }
-            else{
-
-                /*
-                   â˜… æ–°å¢ï¼šåˆ‡å›å‰æ™¯æ™‚ï¼Œç”¨å‰›å‰›
-                   åˆ‡åˆ°èƒŒæ™¯è¨˜éŒ„çš„æ™‚é–“é»ï¼Œç®—å‡º
-                   é€™æ®µé›¢ç·šæ™‚é–“å°æ‡‰çš„é›¢ç·šç¶“é©—â€”â€”
-                   é€™æ¨£ä¸ç”¨æ•´å€‹é‡æ–°æ•´ç†é é¢ã€
-                   å–®ç´”åˆ‡èƒŒæ™¯å†åˆ‡å›ä¾†å°±æœƒçœŸçš„
-                   ç®—åˆ°ï¼Œå›ç­”äº†ä½¿ç”¨è€…çš„ç–‘å•ã€‚
-                */
-
-                calculateOfflineExpSince(
-                    lastOfflineCheckTimestamp
-                );
-
-                lastOfflineCheckTimestamp=
-                    Date.now();
-
-
-                /*
-                   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œå˜—è©¦è™•ç†
-                   ã€Œç¸®å°è¦–çª—/åˆ‡åˆ°èƒŒæ™¯å†æ‰“é–‹æœƒå¡ä½ã€
-                   çš„å•é¡Œï¼‰ï¼š
-                   ä¹‹å‰é€™è£¡åªè™•ç†äº†ã€Œåˆ‡å‡ºå»ã€çš„
-                   é‚£ä¸€åŠï¼ˆå­˜æª”ï¼‰ï¼Œå®Œå…¨æ²’æœ‰è™•ç†
-                   ã€Œåˆ‡å›ä¾†ã€è©²æ€éº¼æ¢å¾©â€”â€”æ‰‹æ©Ÿç€è¦½å™¨
-                   åœ¨èƒŒæ™¯æ™‚æœƒå¤§å¹…é™ä½ç”šè‡³æš«åœè¨ˆæ™‚å™¨
-                   çš„åŸ·è¡Œé€Ÿåº¦ï¼Œå›åˆ°å‰æ™¯çš„æ™‚å€™ï¼Œ
-                   éŠæˆ²å…§éƒ¨çš„å›åˆè¨ˆæ™‚å™¨ã€
-                   setTimeoutæ’ç¨‹å¾ˆå¯èƒ½å·²ç¶“è·Ÿ
-                   å¯¦éš›ç¶“éçš„æ™‚é–“å°ä¸ä¸Šï¼Œè®Šæˆå¡ä½
-                   ä¸å‹•çš„æ¨£å­ã€‚
-
-                   é€™è£¡æ²’è¾¦æ³•ä¿è­‰100%ä¿®å¥½æ¯ä¸€ç¨®
-                   å¡ä½çš„æƒ…æ³ï¼ˆèƒŒæ™¯é™åˆ¶æ˜¯ç€è¦½å™¨
-                   å±¤ç´šçš„ï¼Œæœ¬ä¾†å°±æœ‰äº›ç‹€æ³æ²’è¾¦æ³•
-                   å®Œå…¨é¿å…ï¼‰ï¼Œä½†è‡³å°‘åšäº†ä¸€å€‹
-                   åˆç†çš„è£œæ•‘ï¼šå›åˆ°å‰æ™¯æ™‚ï¼Œå¦‚æœ
-                   æˆ°é¬¥é‚„åœ¨é€²è¡Œã€è¼ªåˆ°éœ€è¦ç©å®¶è‡ªå·±
-                   é¸æ“‡çš„è§’è‰²ï¼Œé‡æ–°æ•´ç†ä¸€æ¬¡å€’æ•¸è¨ˆæ™‚
-                   ï¼ˆçµ¦ä¸€å€‹å…¨æ–°çš„20ç§’ï¼Œè€Œä¸æ˜¯å»¶çºŒ
-                   ä¸€å€‹å¯èƒ½å·²ç¶“åœ¨èƒŒæ™¯è·‘å®Œçš„èˆŠå€’æ•¸ï¼‰ï¼Œ
-                   ä¸¦ä¸”é‡æ–°æ•´ç†ä¸€æ¬¡ç•«é¢é¡¯ç¤ºï¼Œ
-                   é™ä½å¡ä½çš„æ©Ÿç‡ã€‚
-                */
-
-                if(
-                    battleActive &&
-                    battlePhase===
-                    "declare"
-                ){
-
-                    const autoOn=
-                        activeBattleCharacterIndex===0
-                        ? autoBattle
-                        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-
-
-                    if(!autoOn){
-
-                        timer=20;
-
-                        updateTimer();
-
-                    }
-
-                }
-
-
-                if(battleActive){
-
-                    updateUI();
-
-                }
-
-            }
-
-        }
-    );
-
-
-    /*
-       é—œé–‰åˆ†é ï¼é‡æ–°æ•´ç†å‰ç›¡é‡å­˜ä¸€æ¬¡ã€‚
-       æ‰‹æ©Ÿç€è¦½å™¨ä¸ä¸€å®šæœƒç¢ºå¯¦è§¸ç™¼é€™å€‹äº‹ä»¶ï¼Œ
-       ä½†åŠ äº†å®Œå…¨ç„¡å®³ï¼Œå¤šä¸€å±¤ä¿éšªã€‚
-    */
-
-    window.addEventListener(
-        "beforeunload",
-        ()=>{
-
-            autoSaveNow(false);
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   åˆå§‹åŒ–
-===================================================== */
-
-try{
-
-    rebuildInventorySlots();
-
-    updateCreationUI();
-
-    renderSkillLoadout();
-
-    renderInventory();
-
-    updatePlayerHeader();
-
-    updateUI();
-
-}
-catch(error){
-
-    console.error(
-        "éŠæˆ²åˆå§‹åŒ–ç™¼ç”ŸéŒ¯èª¤ï¼š",
-        error
-    );
-
-}
-
-
-/* Mobile hardware/browser Back guard. The first Back press asks for
-   confirmation; confirming performs the real navigation, cancelling keeps
-   the player in the game. */
-(function installMobileBackConfirmation(){
-
-    let allowingExit=false;
-    let exitPromptOpen=false;
-
-    window.allowGameNavigation=()=>{
-        allowingExit=true;
-    };
-
-    try{
-        history.pushState({rpgExitGuard:true},"",location.href);
-    }
-    catch(error){
-        console.warn("ç„¡æ³•å»ºç«‹è¿”å›é˜²å‘†ç´€éŒ„ï¼š",error);
-    }
-
-    window.addEventListener("popstate",async()=>{
-        if(allowingExit){ return; }
-
-        /* Native confirm used to block browser history while it was open.
-           The RPG dialog is asynchronous, so immediately restore a guard
-           entry before awaiting the player's choice. */
-        let guardRestored=false;
-        try{
-            history.pushState({rpgExitGuard:true},"",location.href);
-            guardRestored=true;
-        }catch(_){ }
-
-        if(exitPromptOpen){ return; }
-        exitPromptOpen=true;
-
-        const confirmed=
-            typeof window.rpgConfirm==="function" &&
-            await window.rpgConfirm(
-                "ç¢ºå®šè¦é›¢é–‹éŠæˆ²å—ï¼Ÿç›®å‰é€²åº¦æœƒå…ˆè‡ªå‹•å­˜æª”ã€‚",
-                {
-                    title:"é›¢é–‹å†’éšª",
-                    confirmText:"å„²å­˜ä¸¦é›¢é–‹",
-                    cancelText:"ç¹¼çºŒå†’éšª"
-                }
-            );
-
-        exitPromptOpen=false;
-
-        if(confirmed){
-            allowingExit=true;
-            saveGame();
-            history.go(guardRestored?-2:-1);
-        }
-    });
-
-})();
-
-
-/*
-   â˜… æ–°å¢ï¼šå…¨è¢å¹•åŠŸèƒ½ã€‚
-
-   é‡è¦çš„æŠ€è¡“é™åˆ¶å…ˆèªªæ¸…æ¥šï¼š
-   ç€è¦½å™¨åŸºæ–¼å®‰å…¨è€ƒé‡ï¼Œã€Œçµ•å°ä¸å…è¨±ã€ç¶²é åœ¨
-   å®Œå…¨æ²’æœ‰ä½¿ç”¨è€…äº’å‹•çš„æƒ…æ³ä¸‹è‡ªå‹•é€²å…¥å…¨è¢å¹•ï¼Œ
-   ä¸€å®šè¦ç©å®¶è‡ªå·±é»ä¸€ä¸‹ç•«é¢æ‰èƒ½è§¸ç™¼â€”â€”
-   é€™æ˜¯Chromeã€Safariã€æ‰€æœ‰ç€è¦½å™¨å…±é€šçš„é™åˆ¶ï¼Œ
-   ä¸æ˜¯é€™å€‹éŠæˆ²åšå¾—åˆ°æˆ–åšä¸åˆ°çš„å•é¡Œï¼Œ
-   ä»»ä½•ç¶²é éŠæˆ²éƒ½ç¹ä¸éé€™ä¸€é—œã€‚
-
-   é€™è£¡åšçš„æ˜¯ã€Œé€€è€Œæ±‚å…¶æ¬¡ã€ä½†æœ€é †æ‰‹çš„åšæ³•ï¼š
-   ç›£è½ç©å®¶åœ¨ç•«é¢ä¸Šã€Œç¬¬ä¸€æ¬¡ã€çš„é»æ“Šæˆ–è§¸æ§ï¼Œ
-   é‚£ä¸€ä¸‹é †ä¾¿ä¸€èµ·è§¸ç™¼å…¨è¢å¹•è«‹æ±‚ï¼Œ
-   ç©å®¶å¹¾ä¹æ„Ÿè¦ºä¸åˆ°å¤šä¸€å€‹æ­¥é©Ÿ
-   ï¼ˆä¸ç®¡ä»–é»çš„æ˜¯å‰µè§’ç•«é¢çš„æŒ‰éˆ•ï¼Œ
-   é‚„æ˜¯å·²æœ‰å­˜æª”æ™‚ä¸»åŸç•«é¢çš„ä»»ä½•åœ°æ–¹ï¼Œ
-   éƒ½æœƒè§¸ç™¼ï¼Œä¹‹å¾Œå°±ä¸æœƒå†æ‰“æ“¾ï¼‰ã€‚
-
-   å¦‚æœç©å®¶çš„ç€è¦½å™¨ä¸æ”¯æ´å…¨è¢å¹•APIã€
-   æˆ–ç€è¦½å™¨åŸºæ–¼æŸäº›åŸå› æ‹’çµ•è«‹æ±‚ï¼Œ
-   é€™è£¡ç”¨try/catchæ•´å€‹åŒ…èµ·ä¾†ï¼Œ
-   å¤±æ•—äº†å°±é»˜é»˜æ”¾æ£„ï¼Œä¸æœƒå½±éŸ¿éŠæˆ²æœ¬èº«æ­£å¸¸é‹ä½œã€‚
-*/
-
-function requestGameFullscreen(){
-
-    const el=
-        document.documentElement;
-
-
-    const request=
-
-        el.requestFullscreen||
-        el.webkitRequestFullscreen||
-        el.mozRequestFullScreen||
-        el.msRequestFullscreen;
-
-
-    if(!request){
-        return;
-    }
-
-
-    try{
-
-        const result=
-            request.call(el);
-
-
-        if(
-            result &&
-            result.catch
-        ){
-
-            result.catch(()=>{});
-
-        }
-
-    }
-    catch(error){}
-
-}
-
-
-function enableFullscreenOnFirstTap(){
-
-    const handler=()=>{
-
-        requestGameFullscreen();
-
-    };
-
-
-    document.addEventListener(
-        "click",
-        handler,
-        {once:true}
-    );
-
-
-    document.addEventListener(
-        "touchstart",
-        handler,
-        {once:true}
-    );
-
-}
-
-
-/*
-   â˜… ä¿®æ­£ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-   ä¸è¦å†å¼·åˆ¶å…¨è¢å¹•ï¼Œé€™è£¡ä¸å‘¼å«
-   enableFullscreenOnFirstTap()ï¼Œ
-   å‡½å¼æœ¬èº«ä¿ç•™è‘—ï¼Œä¹‹å¾Œå¦‚æœæƒ³è¦é‡æ–°æ‰“é–‹
-   é€™å€‹åŠŸèƒ½ï¼Œç›´æ¥æŠŠä¸‹é¢é€™è¡Œå–æ¶ˆè¨»è§£å³å¯ã€‚
-*/
-
-/* V12: Do not auto-enter browser fullscreen on first tap. */
-/*
-   â˜… æœ€å¾Œæ‰è®€å–å­˜æª”ã€‚
-   é€™æ¨£ç¬¬ä¸€æ¬¡å•Ÿå‹•ä¸€å®šæœƒé€²å‰µè§’ï¼Œ
-   æœ‰å­˜æª”å‰‡ä¸€å®šé€²éŠæˆ²ã€‚
-   loadGameå…§éƒ¨æœ¬èº«ä¹Ÿæœ‰try/catchï¼Œ
-   é€™è£¡å†åŒ…ä¸€å±¤æ˜¯é›™é‡ä¿éšªï¼Œ
-   ç¢ºä¿ç„¡è«–å¦‚ä½•éƒ½ä¸æœƒå¡æ­»æ•´å€‹ç¶²é ã€‚
-*/
-
-/*
-   â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼‰ï¼š
-   æŠŠ4å€‹è‡ªå‹•æˆ°é¬¥è¨­å®šé¢æ¿è£¡çš„åŸç”Ÿ<select>
-   æ›æˆè‡ªè¨‚å‡é¸å–®ã€‚é€™4å€‹å…ƒç´ åœ¨HTMLè£¡
-   æœ¬ä¾†å°±å­˜åœ¨ï¼ˆä¸æ˜¯ä¹‹å¾Œæ‰å‹•æ…‹ç”¢ç”Ÿçš„ï¼‰ï¼Œ
-   é€™è£¡å¯ä»¥æ”¾å¿ƒåœ¨éŠæˆ²å•Ÿå‹•æ™‚å°±åˆå§‹åŒ–ä¸€æ¬¡ï¼Œ
-   ä¸ç”¨ç­‰åˆ°è¨­å®šé¢æ¿çœŸçš„è¢«æ‰“é–‹ã€‚
-*/
-
-try{
-
-    [
-        "autoSettingsCharacterSelect",
-        "autoSettingsActionSelect",
-        "autoSettingsHP",
-        "autoSettingsSP"
-    ].forEach(
-        selectId=>{
-
-            initCustomDropdown(
-                selectId
-            );
-
-        }
-    );
-
-}
-catch(error){
-
-    console.error(
-        "è‡ªè¨‚ä¸‹æ‹‰é¸å–®åˆå§‹åŒ–å¤±æ•—ï¼š",
-        error
-    );
-
-}
-
-
-try{
-
-    /*
-       â˜… æ–°å¢ï¼ˆä¾ç…§ä½¿ç”¨è€…è¦æ±‚ï¼Œã€ŒåŠ é»è¦
-       æ–°å¢é•·æŒ‰å¿«é€ŸåŠ é»ã€ï¼‰ï¼š
-       é é¢è¼‰å…¥æ™‚ï¼ŒæŠŠ6çµ„å±¬æ€§çš„+/-æŒ‰éˆ•
-       å…¨éƒ¨ç¶ä¸Šé•·æŒ‰æŒçºŒè§¸ç™¼ï¼Œä¸€æ¬¡æ€§
-       è¨­å®šï¼Œä¸ç”¨åœ¨æ¯å€‹æŒ‰éˆ•çš„HTMLä¸Š
-       å„è‡ªå¯«äº‹ä»¶ã€‚
-    */
-
-    [
-        ["attack","Attack"],
-        ["vitality","Vitality"],
-        ["energy","Energy"],
-        ["intelligence","Intelligence"],
-        ["spirit","Spirit"],
-        ["agility","Agility"]
-    ].forEach(([statKey,idPart])=>{
-
-        attachLongPress(
-            $("statusBtn"+idPart+"Minus"),
-            ()=>removePoint(statKey)
-        );
-
-
-        attachLongPress(
-            $("statusBtn"+idPart+"Plus"),
-            ()=>addPoint(statKey)
-        );
-
-    });
-
-}
-catch(error){
-
-    console.error(
-        "å±¬æ€§åŠ é»é•·æŒ‰ç¶å®šå¤±æ•—ï¼š",
-        error
-    );
-
-}
-
-
-/* StartupStateMachine is the only owner allowed to select and load an account save. */
-
-
-/*
-   â˜… ä¸ç®¡å‰µè§’æˆ–è®€æª”å“ªæ¢è·¯å¾‘ï¼Œ
-   æœ€å¾Œéƒ½å•Ÿå‹•è‡ªå‹•å­˜æª”ã€‚
-   startAutoSave() å…§éƒ¨çš„å®šæ™‚å™¨
-   æ¯æ¬¡è§¸ç™¼éƒ½æœƒè‡ªå·±æª¢æŸ¥éŠæˆ²æ˜¯å¦å·²ç¶“é–‹å§‹ï¼Œ
-   æ‰€ä»¥å°±ç®—é€™æ™‚å€™ç©å®¶é‚„åœ¨å‰µè§’ç•«é¢ï¼Œ
-   ä¹Ÿä¸æœƒå‡ºéŒ¯æˆ–å­˜é€²ç©ºè³‡æ–™ã€‚
-*/
-
-try{
-
-    startAutoSave();
-
-}
-catch(error){
-
-    console.error(
-        "è‡ªå‹•å­˜æª”å•Ÿå‹•å¤±æ•—ï¼š",
-        error
-    );
-
-}
+        finishPlayerActionã½½Ù¼­zÊ&ŠÛ^t€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥t€˜˜(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥t¹…±¥Ù”(€€€€€€€€¤ì(((€€€É•ÑÕÉ¸€ (€€€€€€€™…±±‰…­%¹‘•àôôõÕ¹‘•™¥¹•(€€€€€€€€ü(€€€€€€€¹Õ±°(€€€€€€€€è(€€€€€€€™…±±‰…­%¹‘•à(€€€€¤ì()ô(()™Õ¹Ñ¥½¸É•Í½±Ù•ÑÑ…­Q…É•Ñ%¹‘•à ¥ì((€€€½¹ÍĞ¥¹‘•à€ô(€€€€€€€™¥¹‘±¥Ù•Q…É•Ñ%¹‘•à (€€€€€€€€€€€Í•±•Ñ•‘5½¹ÍÑ•È(€€€€€€€€¤ì(((€€€¥˜¡¥¹‘•àôôõ¹Õ±°¥ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸¹Õ±°ì((€€€ô(((€€€Í•±•Ñ•‘5½¹ÍÑ•Èô(€€€€€€€¥¹‘•àì((€€€É•ÑÕÉ¸¥¹‘•àì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒšf»¦kšRïšN((ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸¹½Éµ…±ÑÑ…¬ ¥ì((€€€¥˜ …‰…ÑÑ±•Ñ¥Ù”¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ¥¹‘•à€ô(€€€€€€€É•Í½±Ù•ÑÑ…­Q…É•Ñ%¹‘•à ¤ì(((€€€¥˜¡¥¹‘•àôôõ¹Õ±°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞµ½¹ÍÑ•È€ô(€€€€€€€µ½¹ÍÑ•ÉÍm¥¹‘•átì(((€€€±Õ¹•A±…å•É…É ¤ì(((€€€Í¡½İM­¥±±9…µ•	…‘” (€€€€€€€€‹šf»¦kšRïšN(ˆ°(€€€€€€€€‰¹½Éµ…°ˆ°(€€€€€€€€À°(€€€€€€€¥¹‘•à°(€€€€€€€m¥¹‘•át(€€€€¤ì(((€€€½¹ÍĞÍÑ…ÑÌ€ô(€€€€€€€•Ñ5…¥¹¡…É…Ñ•ÉMÑ…ÑÌ ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ–F÷’â·–"“–ºk¾òh(€€€€€€ƒš&O¦ëj¢¦ÇnÓš:—¢ŞÍ5%MOšJ·šRû¦Z¦ÿ–.WV¯¾ò0(€€€€€€ƒ’â7¢¢#º_–
+ß–ºÏ’â7š&¢†¾ò0(€€€€€€ƒ’ö¦
+šb¿¢šš¶–âãÖCšv¦gš²‡¢†3–.T(€€€€€€ƒ¾ò#¦Ë–—š«&§–n{–B#¾ò'¾ò3’â7¢÷–6‡’ö?(€€€€¨¼((€€€½¹ÍĞ¡¥Ğ€ô(€€€€€€€É½±±!¥Ñ¡…¹” (€€€€€€€€€€€ÍÑ…ÑÌ¹…ÕÉ…ä°(€€€€€€€€€€€•Ñ5½¹ÍÑ•ÉÙ…Í¥½¸ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€€€€€¤°(€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ” (€€€€€€€€€€€€€€€Á±…å•È°(€€€€€€€€€€€€€€€€‰ÍÑÕ¸ˆ(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€¥˜ …¡¥Ğ¥ì((€€€€€€€Í¡½İ5¥ÍÍ™™•Ğ (€€€€€€€€€€€™…±Í”°(€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€€‰5%MLˆ(€€€€€€€€¤ì(((€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€‹šf»¦kšRïšN(ˆ¬(€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€‹¾ò3šÊKšr'–F÷’â·¾òˆ(€€€€€€€€¤ì(((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞÉ¥ÑI•ÍÕ±Ğ€ô(€€€€€€€É½±±É¥Ñ¥…° (€€€€€€€€€€€Á±…å•È°(€€€€€€€€€€€€‰Á¡åÍ¥…°ˆ°(€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•¹Ñ¥É¥Ğ¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€¤ì((€€€½¹ÍĞ‘…µ…”€ô(€€€€€€€…±Õ±…Ñ•…µ…” (€€€€€€€€€€€ÍÑ…ÑÌ¹…ÑÑ…¬°(€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù••™•¹Í”¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€Á±…å•È¹±•Ù•°°(€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€Á±…å•È¹•±•µ•¹Ğ°(€€€€€€€€€€€µ½¹ÍÑ•È¹•±•µ•¹Ğ°(€€€€€€€€€€€ì(€€€€€€€€€€€€€€€…ÑÑ…­•ÈéÁ±…å•È°(€€€€€€€€€€€€€€€Ñ…É•Ğéµ½¹ÍÑ•È°(€€€€€€€€€€€€€€€É¥Ñ5Õ±Ñ¥Á±¥•ÈéÉ¥ÑI•ÍÕ±Ğ¹µÕ±Ñ¥Á±¥•È(€€€€€€€€€€€ô(€€€€€€€€¤ì(((€€€µ½¹ÍÑ•È¹¡À€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€À°(€€€€€€€€€€€µ½¹ÍÑ•È¹¡Àµ‘…µ…”(€€€€€€€€¤ì(((€€€Í¡½İ5½¹ÍÑ•É!¥Ğ (€€€€€€€¥¹‘•à°(€€€€€€€‘…µ…”°(€€€€€€€€‰¡Àˆ°(€€€€€€€É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ(€€€€¤ì(((€€€…‘‘	…ÑÑ±•1½œ ((€€€€€€€€‹šf»¦kšRïšN(ˆ¬(€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€ (€€€€€€€€€€€É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹¾ò#"šN+¾ò¾ò$ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆˆ(€€€€€€€€¤¬(€€€€€€€€‹¾ò3¦ƒš"@ˆ¬(€€€€€€€‘…µ…”¬(€€€€€€€€‹–
+ß–ºÏˆ((€€€€¤ì(((€€€¥˜¡µ½¹ÍÑ•È¹¡ÀğôÀ¥ì(€€€€€€€­¥±±5½¹ÍÑ•È¡¥¹‘•à¤ì(€€€ô(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô((((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ¦Š£’æ/º´(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸İ¥¹‘ÉÉ½İÑÑ…¬ ¥ì((€€€¥˜ …‰…ÑÑ±•Ñ¥Ù”¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜¡Á±…å•È¹ÍÀğÄÀ¥ì((€€€€€€€¥˜¡…ÕÑ½	…ÑÑ±”¥ì((€€€€€€€€€€€¹½Éµ…±ÑÑ…¬ ¤ì((€€€€€€€ô(€€€€€€€•±Í•ì((€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#¢Ş}…ÍÑ…µ…•M­¥±° §–B3’â¢¸(€€€€€€€€€€€€€€‰ÕŸ¾ò3–B3’âš²‡’â¢Öß’ş»š:'¾ò'¾òh(€€€€€€€€€€€€€€ƒ–:šr³¦g¢‡’æšb¿–6Ã–º3Šv3¢¢+š¿–ÂÇnÓš:•É•ÑÕÉ»¾ò0(€€€€€€€€€€€€€€ƒšÊK–Fó–>­™¥¹¥Í¡A±…å•ÉÑ¥½¸ §¾ò3šr¢ºL(€€€€€€€€€€€€€€ƒÖCº_¦>#–ú{¦g¢‡¦Z/–/šVÓ–/–6‡’ö?¾ò3’â7–>«¦Š£’æ/º´(€€€€€€€€€€€€€€ƒ¦gš²‡¢†3–.W¾ò3–ú3¦v‹š&šr'¢K¢&È¿š«&§j–n{–B (€€€€€€€€€€€€€€ƒ¦÷’â7šr–7¢Š¯š:£¦Ë(€€€€€€€€€€€€¨¼((€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€‰MC’â7¢ÚÏ¾ò3‡šÎW’öÿR£¦Š£’æ/º·ˆ(€€€€€€€€€€€€¤ì((€€€€€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€ô((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞ¥¹‘•à€ô(€€€€€€€É•Í½±Ù•ÑÑ…­Q…É•Ñ%¹‘•à ¤ì(((€€€¥˜¡¥¹‘•àôôõ¹Õ±°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€Á±…å•È¹ÍÀ€´ô€ÄÀì(((€€€±Õ¹•A±…å•É…É ¤ì(((€€€Í¡½İM­¥±±9…µ•	…‘” (€€€€€€€Í­¥±±…Ñ…‰…Í”¹İ¥¹‘ÉÉ½Ü¹¹…µ”°(€€€€€€€€‰İ¥¹ˆ°(€€€€€€€€À°(€€€€€€€¥¹‘•à°(€€€€€€€m¥¹‘•át(€€€€¤ì(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì(€€€€€€€Í¡½İA±…å•ÉMÁA½ÁÕÀ ÄÀ¤ì(€€€ô°ÔÀÀ¤ì(((€€€½¹ÍĞµ½¹ÍÑ•È€ô(€€€€€€€µ½¹ÍÑ•ÉÍm¥¹‘•átì(((€€€½¹ÍĞÍÑ…ÑÌ€ô(€€€€€€€•Ñ5…¥¹¡…É…Ñ•ÉMÑ…ÑÌ ¤ì(((€€€½¹ÍĞ‘…µ…”€ô(€€€€€€€…±Õ±…Ñ•…µ…” (€€€€€€€€€€€ÍÑ…ÑÌ¹…ÑÑ…¬¬ÄÔ°(€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù••™•¹Í”¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€Á±…å•È¹±•Ù•°°(€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€Á±…å•È¹•±•µ•¹Ğ°(€€€€€€€€€€€µ½¹ÍÑ•È¹•±•µ•¹Ğ°(€€€€€€€€€€€í…ÑÑ…­•ÈéÁ±…å•È±Ñ…É•Ğéµ½¹ÍÑ•Éô(€€€€€€€€¤ì(((€€€µ½¹ÍÑ•È¹¡À€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€À°(€€€€€€€€€€€µ½¹ÍÑ•È¹¡Àµ‘…µ…”(€€€€€€€€¤ì(((€€€Í¡½İ5½¹ÍÑ•É!¥Ğ¡¥¹‘•à±‘…µ…”°‰¡Àˆ¤ì(((€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€‹¦Š£’æ/º·–F÷’â´ˆ¬(€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€‹¾ò3¦ƒš"@ˆ¬(€€€€€€€‘…µ…”¬(€€€€€€€€‹–
+ß–ºÏˆ(€€€€¤ì(((€€€¥˜¡µ½¹ÍÑ•È¹¡ÀğôÀ¥ì(€€€€€€€­¥±±5½¹ÍÑ•È¡¥¹‘•à¤ì(€€€ô(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ:§–ºÛ¢†3–.WÖCšv|(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¥ì((€€€¹½Ñ¥™å	…ÑÑ±•Ñ¥½¹¥¹¥Í¡• ¤ì(€€€¥˜¡¥¹Ñ•É•ÁÑ	…ÑÑ±•Ñ¥½¹¥¹¥Í  ¤¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜ …‰…ÑÑ±•Ñ¥Ù”¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€±•…É%¹Ñ•ÉÙ…°¡Ñ¥µ•É%¤ì(((€€€…Ñ¥½¹I•…‘äõ™…±Í”ì((€€€Á•¹‘¥¹Ñ¥½¸õ¹Õ±°ì(€€€±•…É	…ÑÑ±•Q…É•ÑM•±•Ñ¥½¹5½‘” ¤ì(((€€€¥˜¡¡•­	…ÑÑ±•¹ ¤¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€€¼¨Í¥¹±”…Ñ¥½¸µ…äÉ•… Ñ¡¥Ì¡•±Á•ÈÑ¡É½Õ …¹¥µ…Ñ¥½¸…¹™…±±‰…¬(€€€€€€Á…Ñ¡Ì¸=¹±äÑ¡”™¥ÉÍĞ…±°¥Ì…±±½İ•Ñ¼…‘Ù…¹”Ñ¡”ÅÕ•Õ”¸€¨¼(€€€¥˜¡‰…ÑÑ±•‘Ù…¹•M¡•‘Õ±•¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€‰…ÑÑ±•‘Ù…¹•M¡•‘Õ±•õÑÉÕ”ì(((€€€½¹ÍĞÑ½­•¸ô(€€€€€€€‰…ÑÑ±•Q½­•¸ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#¦7šZÃ¢¢·¢¢#–n{–B#–"Û¾ò'¾òh(€€€€€€ƒ¦g–/–÷–ò?>û–r£–B3šfšr7–.g–§¢»š–Š¾ò0(€€€€€€ƒ¢šr-‰…ÑÑ±•A¡…Í—šÆë–ºk3ÖCšv–ú3š:—’â/’ú–k’î¦êó7¾òh((€€€€€€€Ä¸‰…ÑÑ±•A¡…Í”ôôô‰‘•±…É”‹¾òh(€€€€€€€€€ƒ’î¢†£¦gšb¿–º–F+¦j;šº×¾ò#¢«–.W¢K¢&Ë–º–F+šf(€€€€€€€€€ƒnÓš:—–~ß¢†3š"[¦bËš˜¿&§–N¿–Š{n+¦g¦†x(€€€€€€€€€ƒ’â7¦r¢šÖCº_š:K–ê?j¢†3–.W–&o–~ß¢†3–º3¾ò'¾ò0(€€€€€€€€€ƒÖCšv–ú3¢š–ú’â/’â–/3¦
+šÊK–º–F+j¢K¢&Ë7š:£¦Ë¾ò0(€€€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¬¯¾ò0(€€€€€€€€€ƒ–Fó–>­‰•¥¹¡…É…Ñ•ÉQÕÉ¸ §((€€€€€€€È¸‰…ÑÑ±•A¡…Í”ôôô‰É•Í½±Ù”‹¾òh(€€€€€€€€€ƒ’î¢†£¦gšb¿ÖCº_¦j;šº×¾ò#šf»¦kšRïšN(¿–
+ß–ºÏš*¢ô(€€€€€€€€€ƒrš¶–r£’úwšV?š6ß¦‚–ê?–~ß¢†3¾ò'¾ò0(€€€€€€€€€ƒÖCšv–ú3–ú¥¹¥Ñ¥…Ñ¥Ù•%¹‘•ãš:£¦Ë¾ò0(€€€€€€€€€ƒ–Fó–>­ÁÉ½•ÍÍ9•áÑ½µ‰…Ñ…¹Ğ §(€€€€¨¼((€€€¥˜¡‰…ÑÑ±•A¡…Í”ôôô‰‘•±…É”ˆ¥ì((€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¬¬ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¦gš²‡¦Ë’âš¶—¾ò'¾òh(€€€€€€€€€€ƒ–º–F+¦j;šº×–:šr³¦
+šr¦†¿’ë3–ŞË¦ãšNac7šZ–¶_¾ò0(€€€€€€€€€€ƒš&’î—Vg’ê’â¦î{–îÛ¦Ë¢ºO:§–ºÛr/–ú_–"Ã¦
+¢†3–¶_(€€€€€€€€€€ƒ>û–r£–ŞËÚOš.ÿš:'¦
+¢†3šZ–¶_’ê¾ò0(€€€€€€€€€€ƒÒSÊçš>o’êë¦ãšN’â7¦r¢š–7¶'¾ò0(€€€€€€€€€€ƒnÓš:—¦Ë’â/’â’ö7–æû’æ;š¢šë’â7–"Ã–s¦‚O(€€€€€€€€¨¼((€€€€€€€‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%õÍ•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€€€€€‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%õ¹Õ±°ì(€€€€€€€€€€€‰…ÑÑ±•‘Ù…¹•M¡•‘Õ±•õ™…±Í”ì((€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€€€€€€€€€Ñ½­•¸„ôõ‰…ÑÑ±•Q½­•¸(€€€€€€€€€€€€¥ì(€€€€€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€ô(((€€€€€€€€€€€‰•¥¹¡…É…Ñ•ÉQÕÉ¸ (€€€€€€€€€€€€€€€Ñ½­•¸(€€€€€€€€€€€€¤ì((€€€€€€€ô±•Ñ	…ÑÑ±•‘Ù…¹••±…ä ‰‘•±…É”ˆ¤¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€¥¹¥Ñ¥…Ñ¥Ù•%¹‘•à¬¬ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3–*ƒ–ş¯¾––?¾ò'¾òh(€€€€€€ƒ–:šr°ÄÀÔÁµÏ¾ò3’öÿR£¢–>7š'3š¾?–/’êë¢†3–.W–º3(€€€€€€ƒš>o’â/’â’ö77j¦ZO¦jSš¢šë–?’æ¾ò3–Â“–Û’âšVÓ¢ò¨(€€€€€€ƒš&O–º3¢šš:—’â/’â¢ò«jšf–g&ç–"—šb;¦†¿ŠSŠP(€€€€€€ƒ¦g¢‡¢ªÿ–ş¯–"ÀÜÀÁµÏ¾ò3–.WV¯¦
+šb¿r/–ú_šâš–k¾ò0(€€€€€€ƒ’öšVÓ¦®S¾––?šr’şC¢B÷’â7–ÂG(€€€€¨¼((€€€½¹ÍĞ¹•áÑ•±…äõ•Ñ	…ÑÑ±•‘Ù…¹••±…ä ‰É•Í½±Ù”ˆ¤ì((€€€‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%õÍ•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%õ¹Õ±°ì(€€€€€€€‰…ÑÑ±•‘Ù…¹•M¡•‘Õ±•õ™…±Í”ì((€€€€€€€¥˜ (€€€€€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€€€€€Ñ½­•¸„ôõ‰…ÑÑ±•Q½­•¸(€€€€€€€€¥ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#¦g¢‡šb¿šr¦^s¦6×j’â–/òë–>ŠSŠP(€€€€€€€€€€ƒš¾?–/’êë¢†3–.W–º3š>o’â/’â’ö7¾ò3–£¦£¦÷¢š(€€€€€€€€€€ƒÚO¦;¦g¢‡¾ò3’æ/–&7–º3–£šÊKšr'’şw¢¶ß¾ò0(€€€€€€€€€€ƒ–ššzs’îï’öW’âš²‡jÁÉ½•ÍÍ9•áÑ½µ‰…Ñ…¹Ğ ¤(€€€€€€€€€€ƒ–r£–~ß¢†3’â·–ë¦2¿¾ò3š"Ã¦²—–ÂÇšr–ú{¦
+’â–"ì(€€€€€€€€€€ƒ¦Z/–/–º3–£¦vsš¶‹¾ò3:§–ºÛ–>«šrr/–"À(€€€€€€€€€€ƒV¯¦v‹–s–r£–:–rÃ¾ò3’î¦êóš>C’ë¦÷šÊKšr'¾ò'¾òh(€€€€€€€€¨¼((€€€€€€€ÑÉåì((€€€€€€€€€€€ÁÉ½•ÍÍ9•áÑ½µ‰…Ñ…¹Ğ (€€€€€€€€€€€€€€€Ñ½­•¸(€€€€€€€€€€€€¤ì((€€€€€€€ô(€€€€€€€…Ñ ¡•ÉÉ½È¥ì((€€€€€€€€€€€½¹Í½±”¹•ÉÉ½È (€€€€€€€€€€€€€€€€‹š:£¦Ë’â/’â’ö7šffóR’ú/–’[¾òhˆ°(€€€€€€€€€€€€€€€•ÉÉ½È(€€€€€€€€€€€€¤ì((€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€‹š:£¦Ë’â/’â’ö7šffóR’ú/–’[¾ò ˆ¬(€€€€€€€€€€€€€€€€¡•ÉÉ½È˜™•ÉÉ½È¹µ•ÍÍ…”¤¬(€€€€€€€€€€€€€€€€‹¾ò'¾ò3–b_¢¦›–òß–"Ûæóê3ˆ(€€€€€€€€€€€€¤ì((€€€€€€€€€€€¥¹¥Ñ¥…Ñ¥Ù•%¹‘•à¬¬ì(€€€€€€€€€€€ÁÉ½•ÍÍ9•áÑ½µ‰…Ñ…¹Ğ¡Ñ½­•¸¤ì((€€€€€€€ô((€€€ô±¹•áÑ•±…ä¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒš«&§šRïšN((ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼((¼¨(€€ƒŠbƒ’ş»š¶¾ò#šV?š6ßš:K–ê?ÎïÖÇ¾ò'¾òh(€€ƒ–:šr³jµ½¹ÍÑ•ÉQÕÉ¸ §šb¿3’âš²‡š*+š&šr'š«&¤(€€ƒ¦÷š&O¦;’â¢ò«7jš&çš²‡¢fWB–÷–ò?¾ò0(€€ƒ¢Ş>û–r£3:§–ºÛš«&§šŞß–r£–B3’â’î÷¢†3–.W¦‚–ê?šâ–Z»¢„(€€ƒ¢ò«šÖ¢†3–.W7jšzÛš/’â7nã–ºç’ê(€€ƒšRç–¾¯š"AÁÉ½•ÍÍM¥¹±•5½¹ÍÑ•ÉÑÑ…¬ §¾ò0(€€ƒ’âš²‡–>«¢fWB3¦g’â¦jï7š«&§jšRïšN+¾ò0(€€ƒš&O–º3–Fó–>­™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤(€€ƒ¾ò#>û–r£¦g–/–÷–ò?–Û–¾›šb¿3ÖCšvn»–&7¦g’ö7j¢†3–.W7¾ò0(€€ƒ’â7º‡šb¿¢K¢&Ë¦
+šb¿š«&§¦÷–ÇR£–º¾ò'–ú’â/’â’ö7š:£¦Ë(¨¼()™Õ¹Ñ¥½¸ÁÉ½•ÍÍM¥¹±•5½¹ÍÑ•ÉÑÑ…¬¡µ½¹ÍÑ•É%¹‘•à±Ñ½­•¸¥ì((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€Ñ½­•¸„ôõ‰…ÑÑ±•Q½­•¸(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞµ½¹ÍÑ•Èô(€€€€€€€µ½¹ÍÑ•ÉÍmµ½¹ÍÑ•É%¹‘•átì(((€€€€¼¨(€€€€€€ƒ¦g¦jïš«&§šr'–>¿¢÷–r£¦g–/–’Ÿ–n{–B#šnÓš^§’æ/–&4(€€€€€€ƒ–ÂÇ–ŞËÚO¢Š¯š&Oš¶ï’ê¾ò#š>ošV?š6ßš:K–ê?–ú3¾ò0(€€€€€€ƒ:§–ºÛ–>¿¢÷–#š&/š*+&ƒšºëš:'¾ò'¾ò0(€€€€€€ƒnÓš:—¢ŞÏ¦;¾ò3’â7’öSR£¢†3–.W’â7š:'¢†(€€€€¨¼((€€€¥˜ (€€€€€€€€…µ½¹ÍÑ•Èñğ(€€€€€€€€…µ½¹ÍÑ•È¹…±¥Ù”(€€€€¥ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€¥˜ (€€€€€€€¥Í5½¹ÍÑ•ÉÉ½é•¸¡µ½¹ÍÑ•È¤(€€€€¥ì((€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€‹¢Š¯–Ã–Â¾ò3‡šÎW¢†3–.Wˆ(€€€€€€€€¤ì(((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¦ošÊgz³šN+j(€€€€€€ƒ~Ï–2[šV#šzs¾ò'¾òk¢Ş–Ã–Â–B3š¢j3‡šÎW¢†3–.W4(€€€€€€ƒ–"“šZß¾ò3–>«šb¿¦†{–z/’â7–B3¢¢+š¿’â7–B3(€€€€¨¼((€€€¥˜ (€€€€€€€¥Í5½¹ÍÑ•ÉA•ÑÉ¥™¥•¡µ½¹ÍÑ•È¤(€€€€¥ì((€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€‹¢Š¯~Ï–2[¾ò3‡šÎW¢†3–.Wˆ(€€€€€€€€¤ì(((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€±Õ¹•5½¹ÍÑ•É…É (€€€€€€€µ½¹ÍÑ•É%¹‘•à(€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3²°ËÏ¦‚¾ò'¾òh(€€€€€€€Ä¸ƒš*¢÷–B7¢Ç’â7–7¢«–ŞÇ–>[¾ò3šRçš"C–ú{š*¢÷šÆ€(€€€€€€€€€ƒ¾ò!Í­¥±±%‘Ï¾ò3–òWR£rš¶–¶c–r£jš*¢÷¾ò$(€€€€€€€€€ƒ¦j£š¦š2G’â–/¢ššZ÷šRûjš*¢õ%¾ò0(€€€€€€€€€ƒ¦†¿’ëj–B7¢ÇnÓš:—–:íÍ­¥±±…Ñ…‰…Í—š~”(€€€€€€€€€ƒrš¶jš*¢÷–B7¢Ç¾ò3¢Ş:§–ºÛR£jšb¼(€€€€€€€€€ƒ–B3’â––_š*¢÷–B3’â–/–B7–¶_(€€€€€€€È¸ƒš*¢÷¦/šRûš¦:’â7–7–¾¯š¶ìÔÀ—¾ò0(€€€€€€€€€ƒšRçš"C¢ºš«&§¢ÎšZg¢‡–B¢«jÍ­¥±±¡…¹”(€€€€€€€€€ƒ¾ò#’â7–B3–6–~š¦:’â7’âš¢¾ò'¾ò0(€€€€€€€€€ƒšb¿’â–/6£®/¦w–Â73¦g¦jïš«&§¦g’âš²„(€€€€€€€€€ƒšRïšN+7–Z»6£¦ªÃjš¦:¾ò3’â7šb¿¢Şšf»¦kšRïšN((€€€€€€€€€ƒÚ–r£’â¢Öß’êKšZ—j–§–/¦ã¦‚–ÇR£–B3’â–,(€€€€€€€€€ƒ–"“šZß–ò?¢3–ŞË¾ò3–B–6–~–>¿’î—¢«RÇ¢ªÿšVĞ(€€€€€€€€€ƒ¦g–/šVã–¶_’â7–öÇ¦~ÿ–Û’î[–rÃšZç(€€€€¨¼((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò31MC¢š–¾›¦jl(€€€€€€ƒšÚ#¢_¾ò3šÊK’ê–ÂÇ’â7¢÷¦/šRûš*¢÷7¾ò'¾òh(€€€€€€ƒ–:šr³¦g¢‡–>«r-Í­¥±±¡…¹—š¦:–º3–£šÊH(€€€€€€ƒšª‹š~—š«&¥MC–’ƒ’â7–’ƒ¾ò3š*¢÷¶'šZóšb¿–7¢Êïj(€€€€€€MCÒSÊçšb¿¦†¿’ëR£j¢w¦ûšVã–¶_((€€€€€€ƒ>û–r£–#š*+3¦g¦jïš«&¥MC’îc–ú_¢Öß7jš*¢ô(€€€€€€ƒš2G–ë’ú¾ò!…™™½É‘…‰±•M­¥±±%‘Ï¾ò'¾ò3–>«šr$(€€€€€€ƒš2G–ú_–ë¢Ï–ÂG’â–/’îc–ú_¢Ößjš*¢÷¾ò3š&7šrrj(€€€€€€ƒ¦ªÃš¦:šÆë–ºk¢š’â7¢ššRûš*¢÷¾òmMC’â7–’ƒjš*¢ô(€€€€€€ƒ’â7šr¢Š¯¦ã–"Ã¾ò1MCšVÓ–/¢š/–êWj¢¦Ç–ÂÇnÓš:”(€€€€€€ƒšRçšf»¦kšRïšN+¾ò3¢Ş:§–ºÛ1MC’â7¢ÚÏ¢«–.WšRçR (€€€€€€ƒšf»¦kšRïšN+7šb¿–B3’â¢»¢†3
+ë(€€€€¨¼((€€€½¹ÍĞ¡…ÍY¥Í¥‰±•M¥¹±•Q…É•Ğõ•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹Í½µ”¡¥¹‘•àôùì(€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤ì(€€€€€€€É•ÑÕÉ¸¡…É…Ñ•È˜™¡…É…Ñ•È¹¡ÀøÀ˜˜…¡…ÍÑ¥Ù•	Õ™˜¡¡…É…Ñ•È°‰ÍÑ•…±Ñ¡M­¥±°ˆ¤ì(€€€ô¤ì((€€€½¹ÍĞ…™™½É‘…‰±•M­¥±±%‘Ìô((€€€€€€€ÉÉ…ä¹¥ÍÉÉ…ä¡µ½¹ÍÑ•È¹Í­¥±±%‘Ì¤(€€€€€€€€ü(€€€€€€€µ½¹ÍÑ•È¹Í­¥±±%‘Ì¹™¥±Ñ•È (€€€€€€€€€€€Í­¥±±%ôùì((€€€€€€€€€€€€€€€½¹ÍĞ‘…Ñ„ô(€€€€€€€€€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€€€€€€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€€€€€€€€€‘…Ñ„€˜˜(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÀøõ‘…Ñ„¹ÍÁ½ÍĞ˜˜(€€€€€€€€€€€€€€€€€€€€¡‘…Ñ„¹Ñ…É•ÑQåÁ”„ôô‰Í¥¹±”‰ññ¡…ÍY¥Í¥‰±•M¥¹±•Q…É•Ğ¤(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô(€€€€€€€€¤(€€€€€€€€è(€€€€€€€mtì(((€€€½¹ÍĞÕÍ•ÍM­¥±°ô((€€€€€€€…™™½É‘…‰±•M­¥±±%‘Ì¹±•¹Ñ øÀ€˜˜(€€€€€€€5…Ñ ¹É…¹‘½´ ¤ğ(€€€€€€€€ (€€€€€€€€€€€µ½¹ÍÑ•È¹Í­¥±±¡…¹”„ôõÕ¹‘•™¥¹•(€€€€€€€€€€€€ü(€€€€€€€€€€€µ½¹ÍÑ•È¹Í­¥±±¡…¹”(€€€€€€€€€€€€è(€€€€€€€€€€€€À(€€€€€€€€¤ì(((€€€±•Ğ…ÍÑM­¥±±%õ¹Õ±°ì((€€€±•Ğ…ÍÑM­¥±±9…µ”õ¹Õ±°ì((€€€±•Ğ…ÍÑM­¥±±…Ñ„õ¹Õ±°ì(((€€€¥˜¡ÕÍ•ÍM­¥±°¥ì((€€€€€€€…ÍÑM­¥±±%ô((€€€€€€€€€€€…™™½É‘…‰±•M­¥±±%‘Íl(€€€€€€€€€€€€€€€5…Ñ ¹™±½½È (€€€€€€€€€€€€€€€€€€€5…Ñ ¹É…¹‘½´ ¤¨(€€€€€€€€€€€€€€€€€€€…™™½É‘…‰±•M­¥±±%‘Ì¹±•¹Ñ (€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€tì(((€€€€€€€…ÍÑM­¥±±…Ñ„ô(€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•m…ÍÑM­¥±±%‘tì(((€€€€€€€…ÍÑM­¥±±9…µ”ô((€€€€€€€€€€€…ÍÑM­¥±±…Ñ„(€€€€€€€€€€€€ü(€€€€€€€€€€€…ÍÑM­¥±±…Ñ„¹¹…µ”(€€€€€€€€€€€€è(€€€€€€€€€€€…ÍÑM­¥±±%ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò1MCrj¢š(€€€€€€€€€€ƒ¢Š¯š&š:'¾ò'¾òk¢Ş:§–ºÛšZ÷šRûš*¢÷’âš¢¾ò0(€€€€€€€€€€ƒšRû’â/–:ï–ÂÇrjš&¢†šŠw’â/¦v‹¦
+šŠuMC¾ò0(€€€€€€€€€€ƒ’â7šb¿–>«šr'V¯¦v‹šVã–¶_–.W–¾›¦jo¦
+?¢ò¿šÊK–.W(€€€€€€€€¨¼((€€€€€€€¥˜¡…ÍÑM­¥±±…Ñ„¥ì((€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÀô((€€€€€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÀ´(€€€€€€€€€€€€€€€€€€€…ÍÑM­¥±±…Ñ„¹ÍÁ½ÍĞ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¢Ş:§–ºØ(€€€€€€€€€€ƒšZ÷šRûš*¢÷’âš¢¾ò3š«&§šZ÷šRûš*¢÷šf’æ¢š(€€€€€€€€€€ƒ¢ŞÏ–ëš*¢÷–B7¢Ç¾ò'¾òh(€€€€€€€€€€ƒ–Òƒ¦†{–"—–«–#R£š*¢÷šr³¢ê¯j•±•µ•¹Ğ(€€€€€€€€€€ƒ¾ò#¢Ş:§–ºÛš*¢÷–ú÷®ƒR£jšb¿–B3’â––\(€€€€€€€€€€‰…‘”µ™¥É”½‰…‘”µİ…Ñ•Ëš¢–ò?¾ò'¾ò0(€€€€€€€€€€ƒš*¢÷¢ÎšZgš~—’â7–"Ãj¢¦Ç¦–n{R£š«&¤(€€€€€€€€€€ƒ¢«–ŞÇj•±•µ•¹Ó¾ò3Šë’şw’â–ºkšr'š¢–ò<(€€€€€€€€€€ƒ–>¿’î—––_R£(€€€€€€€€¨¼((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33š«&§š‚çšr°(€€€€€€ƒšÊKšr'rj¦/šRûš*¢÷7ŠSŠS¦g–/–V?¦†3šb¿rj¾ò0(€€€€€€ƒ’â7šb¿¢ª“šr¾ò'¾òh((€€€€€€ƒ–:šr³¦g¢‡’â7º‡šRûjšb¿–N«–/š*¢÷¾ò3’â–ú/––_R (€€€€€€ƒ–në–ºhÄ¸Ï–7–
+ß–ºÏ’şšVã¾ò3š*¢÷šr³¢ê¯–r (€€€€€€Í­¥±±…Ñ…‰…Í—¢‡–ºkú§j‰…Í•…µ…—¾ò<(€€€€€€‘…µ…•A•É1•Ù•³–º3–£šÊK¢Š¯R£–"Ã¾ò3–>«šr$(€€€€€€ƒ–B7¢Ç¦†¿’ëšb¿rj¾òo¢1Ñ…É•ÑQåÁ”è‰ÑÉ¤ˆ(€€€€€€ƒ¾ò#¯º´¿šÂÓB¢†O¦g¦†{’â'¦7n»š¢gš*¢÷¾ò$(€€€€€€ƒ–¾›¦jo’â+’æ–>«šrš&O’â·’â–/¦j£š¦n»š¢g¾ò0(€€€€€€ƒ¢Ş:§–ºÛ’öÿR£–B3’â–/š*¢÷šf3š&O’â´¿–Ş˜¿–>Ì(€€€€€€ƒ’â'–/n»š¢g7jšV#šzs–º3–£’â7’âš¢((€€€€€€ƒ¦g¢‡¦7šZÃ¢¢·¢¢#¾òh(€€€€€€€Ä¸ƒš*¢÷–
+ß–ºÏšRçš"Aµ½¹ÍÑ•È¹…ÑÑ…¯–*ƒ’â((€€€€€€€€€ƒš*¢÷¢«–ŞÇj‰…Í•…µ…”½‘…µ…•A•É1•Ù•°(€€€€€€€€€ƒ¾ò#’úwš«&§¶'Òkš>oº_–ë’â–/–B#Bjš*¢ô(€€€€€€€€€ƒ¶'Òk¾ò3¶'Òk¢Ú+¦®cjš«&§š*¢÷¶'Òh(€€€€€€€€€ƒ’æ¢Ú+¦®c¾ò'¾ò3’â7–B3š*¢÷šrš&O–ërj’â7–B0(€€€€€€€€€ƒj–
+ß–ºÏ¾ò3’â7šb¿ÖÇ’â’æ`Ä¸Ï(€€€€€€€È¸Ñ…É•ÑQåÁ”ôôô‰ÑÉ¤‹¾ò<‰É½Ü‹¾ò<‰½±Õµ¸ˆƒ–ş¦‚#RÄ(€€€€€€€€€ƒ–në–ºkš"Ã–‚ĞM±½Ğ½İ¹•Èƒ’úw–¾›¦jo–&7–ú3š:K¢"š²’ö7¦ã–>[¾ò0(€€€€€€€€€ƒ’â7¢÷š*+¾–r7š*¢÷–ßš>oš"C–‚Ó’â+š&šr'–¶cšÒï¢K¢&Ë(€€€€€€€Ì¸ƒš¾?–/n»š¢g–B¢«6£®/šNË–F÷’â´¿"šN+¾ò0(€€€€€€€€€ƒšÊK–F÷’â·jŸš¢¦†¿’é5%MOšr'–F÷’â·j(€€€€€€€€€ƒš¶–âãš&¢†¾ò3¢Ş–:šr³–Z»¦®SšRïšN+j–F#>ø(€€€€€€€€€ƒšZç–ò?’â¢Ó¾ò3–>«šb¿–>¿¢÷–B3šffóR–r (€€€€€€€€€ƒ–§–/¢K¢&Ë¢ê¯’â+(€€€€¨¼((€€€½¹ÍĞÍ­¥±±Q…É•ÑQåÁ”ô¡ÕÍ•ÍM­¥±°€˜˜…ÍÑM­¥±±%€˜˜Í­¥±±…Ñ…‰…Í•m…ÍÑM­¥±±%‘t¤(€€€€€€€€üÍ­¥±±…Ñ…‰…Í•m…ÍÑM­¥±±%‘t¹Ñ…É•ÑQåÁ”(€€€€€€€€è€‰Í¥¹±”ˆì((€€€½¹ÍĞ¥ÍI…¹•M­¥±°õl‰ÑÉ¤ˆ°‰É½Üˆ°‰½±Õµ¸ˆ°‰…±°‰t¹¥¹±Õ‘•Ì¡Í­¥±±Q…É•ÑQåÁ”¤ì((€€€½¹ÍĞ±¥Ù¥¹Q…É•ÑÌõ•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤(€€€€€€€€¹µ…À¡¥¹‘•àôø¡ì(€€€€€€€€€€€¡…É…Ñ•Èé•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤°(€€€€€€€€€€€ÍÑ…ÑÌé•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ¡¥¹‘•à¤°(€€€€€€€€€€€¥¹‘•àé¥¹‘•à(€€€€€€€ô¤¤(€€€€€€€€¹™¥±Ñ•È¡•¹ÑÉäôù•¹ÑÉä¹¡…É…Ñ•È€˜˜•¹ÑÉä¹¡…É…Ñ•È¹¡ÀøÀ¤ì((€€€€¼¨ƒ¦jÇ¢ê¯–>«¦bïš¶‹–Z»¦®S¾ò?šf»¦kšRïšN+¦ã’â·¾òo¾–r7š*¢÷’î7šršÎ‹–>+€¨¼(€€€½¹ÍĞÍ•±•Ñ…‰±•M¥¹±•Q…É•ÑÌõ±¥Ù¥¹Q…É•ÑÌ¹™¥±Ñ•È (€€€€€€€•¹ÑÉäôø…¡…ÍÑ¥Ù•	Õ™˜¡•¹ÑÉä¹¡…É…Ñ•È°‰ÍÑ•…±Ñ¡M­¥±°ˆ¤(€€€€¤ì((€€€¥˜ …¥ÍI…¹•M­¥±°€˜˜Í•±•Ñ…‰±•M¥¹±•Q…É•ÑÌ¹±•¹Ñ ôôôÀ¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ¡µ½¹ÍÑ•È¹¹…µ”¬‹š&û’â7–"Ã–>¿¢Š¯–Z»¦®SšRïšN+¦ã’â·jn»š¢gˆ¤ì(€€€€€€€ÕÁ‘…Ñ•U$ ¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€±•Ğ…ÑÑ…­Q…É•ÑÌõmtì(€€€±•ĞÁÉ¥µ…ÉåQ…É•Ñ%¹‘•àõ¹Õ±°ì((€€€¥˜¡Í­¥±±Q…É•ÑQåÁ”ôôô‰…±°ˆ¥ì(€€€€€€€…ÑÑ…­Q…É•ÑÌõ±¥Ù¥¹Q…É•ÑÌì(€€€õ•±Í”¥˜¡¥ÍI…¹•M­¥±°¥ì(€€€€€€€€¼¨Q¡”™½Éµ…°™½Éµ…Ñ¥½¸¥Ì…±É•…‘äÑ¡”½İ¹•È™½È…±±åQÉ¤…¹Á±…å•È(€€€€€€€€€€Ñ…É•Ñ¥¹œ¸5½¹ÍÑ•ÈÉ…¹”Í­¥±±ÌµÕÍĞÉ•Í½±Ù”Ñ¡É½Õ Ñ¡…ĞÍ…µ”M±½Ğ(€€€€€€€€€€•½µ•ÑÉä°¥¹±Õ‘¥¹œ„Á…ÉÑäµ•µ‰•ÈÁ±…•¥¸Ñ¡”‰…¬É½Ü¸€¨¼(€€€€€€€½¹ÍĞ‰…ÑÑ±•™¥•±‘M±½ÑÌõÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆ(€€€€€€€€€€€€üİ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	…ÑÑ±•™¥•±‘M±½ÑÌ(€€€€€€€€€€€€è¹Õ±°ì(€€€€€€€½¹ÍĞÁÉ¥µ…Éäõ±¥Ù¥¹Q…É•ÑÍl(€€€€€€€€€€€5…Ñ ¹™±½½È¡5…Ñ ¹É…¹‘½´ ¤©±¥Ù¥¹Q…É•ÑÌ¹±•¹Ñ ¤(€€€€€€€tì(€€€€€€€ÁÉ¥µ…ÉåQ…É•Ñ%¹‘•àõÁÉ¥µ…ÉäıÁÉ¥µ…Éä¹¥¹‘•àé¹Õ±°ì(€€€€€€€½¹ÍĞ™½Éµ…Ñ¥½¸õ‰…ÑÑ±•™¥•±‘M±½ÑÌ˜™ÑåÁ•½˜‰…ÑÑ±•™¥•±‘M±½ÑÌ¹•¹ÍÕÉ•±±å½Éµ…Ñ¥½¸ôôô‰™Õ¹Ñ¥½¸ˆ(€€€€€€€€€€€€ü‰…ÑÑ±•™¥•±‘M±½ÑÌ¹•¹ÍÕÉ•±±å½Éµ…Ñ¥½¸¡•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¤(€€€€€€€€€€€€è¹Õ±°ì(€€€€€€€½¹ÍĞÑ…É•Ñ%¹‘•á•ÌõÁÉ¥µ…Éä˜™™½Éµ…Ñ¥½¸˜™ÑåÁ•½˜‰…ÑÑ±•™¥•±‘M±½ÑÌ¹É•Í½±Ù•±±åQ…É•ÑÌôôô‰™Õ¹Ñ¥½¸ˆ(€€€€€€€€€€€€ü‰…ÑÑ±•™¥•±‘M±½ÑÌ¹É•Í½±Ù•±±åQ…É•ÑÌ (€€€€€€€€€€€€€€€™½Éµ…Ñ¥½¸°(€€€€€€€€€€€€€€€ÁÉ¥µ…Éä¹¥¹‘•à°(€€€€€€€€€€€€€€€Í­¥±±Q…É•ÑQåÁ”°(€€€€€€€€€€€€€€€¥¹‘•àôùì(€€€€€€€€€€€€€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤ì(€€€€€€€€€€€€€€€€€€€É•ÑÕÉ¸€„„¡¡…É…Ñ•È˜™¡…É…Ñ•È¹¡ÀøÀ¤ì(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€¤(€€€€€€€€€€€€èmtì(€€€€€€€…ÑÑ…­Q…É•ÑÌõÑ…É•Ñ%¹‘•á•Ì¹µ…À¡¥¹‘•àôø(€€€€€€€€€€€±¥Ù¥¹Q…É•ÑÌ¹™¥¹¡•¹ÑÉäôù•¹ÑÉä¹¥¹‘•àôôõ¥¹‘•à¤(€€€€€€€€¤¹™¥±Ñ•È¡	½½±•…¸¤ì(€€€õ•±Í•ì(€€€€€€€½¹ÍĞÁÉ¥µ…ÉäõÍ•±•Ñ…‰±•M¥¹±•Q…É•ÑÍl(€€€€€€€€€€€5…Ñ ¹™±½½È¡5…Ñ ¹É…¹‘½´ ¤©Í•±•Ñ…‰±•M¥¹±•Q…É•ÑÌ¹±•¹Ñ ¤(€€€€€€€tì(€€€€€€€ÁÉ¥µ…ÉåQ…É•Ñ%¹‘•àõÁÉ¥µ…ÉäıÁÉ¥µ…Éä¹¥¹‘•àé¹Õ±°ì(€€€€€€€…ÑÑ…­Q…É•ÑÌõmÁÉ¥µ…Éåtì(€€€ô((€€€¥˜¡…ÑÑ…­Q…É•ÑÌ¹±•¹Ñ ôôôÀ¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ¡µ½¹ÍÑ•È¹¹…µ”¬‹š&û’â7–"Ã–>¿¢Š¯š¶“š*¢÷¦ã’â·jn»š¢gˆ¤ì(€€€€€€€ÕÁ‘…Ñ•U$ ¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞ…ÑÑ…­Q…É•Ñ%¹‘•á•Ìõ…ÑÑ…­Q…É•ÑÌ¹µ…À¡Ñ…É•ĞôùÑ…É•Ğ¹¥¹‘•à¤ì(€€€¥˜¡ÕÍ•ÍM­¥±°¥ì(€€€€€€€Í¡½İ5½¹ÍÑ•ÉM­¥±±9…µ•	…‘” (€€€€€€€€€€€…ÍÑM­¥±±9…µ”°(€€€€€€€€€€€€¡…ÍÑM­¥±±…Ñ„˜™…ÍÑM­¥±±…Ñ„¹•±•µ•¹Ğ¥ññµ½¹ÍÑ•È¹•±•µ•¹Ññğ‰¹½Éµ…°ˆ°(€€€€€€€€€€€µ½¹ÍÑ•É%¹‘•à°(€€€€€€€€€€€Í­¥±±Q…É•ÑQåÁ”ôôô‰…±°ˆı¹Õ±°éÁÉ¥µ…ÉåQ…É•Ñ%¹‘•à°(€€€€€€€€€€€…ÑÑ…­Q…É•Ñ%¹‘•á•Ì(€€€€€€€€¤ì(€€€õ•±Í•ì(€€€€€€€Í¡½İ5½¹ÍÑ•ÉM­¥±±9…µ•	…‘” (€€€€€€€€€€€€‹šf»¦kšRïšN(ˆ°‰¹½Éµ…°ˆ±µ½¹ÍÑ•É%¹‘•à±ÁÉ¥µ…ÉåQ…É•Ñ%¹‘•à±…ÑÑ…­Q…É•Ñ%¹‘•á•Ì(€€€€€€€€¤ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3š«&§R£¯º´(€€€€€€ƒšRïšN+:§–ºÛšf¾ò3’æ¢ššr'’â'fó¦o¢†3&çšV#¾ò0(€€€€€€ƒšZç–BGnã–>7¾òk–ú{š«&§–6‡&¦o–BG:§–ºÛ–6‡&¾ò'(€€€€¨¼((€€€¥˜¡…ÍÑM­¥±±%ôôô‰™¥É•I½­•Ğˆ¥ì((€€€€€€€Á±…å¥É•I½­•Ñ¹¥µ…Ñ¥½¸ (€€€€€€€€€€€€‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­µ½¹ÍÑ•É%¹‘•à°(€€€€€€€€€€€…ÑÑ…­Q…É•ÑÌ¹µ…À (€€€€€€€€€€€€€€€Ñ…É•Ğôø(€€€€€€€€€€€€€€€€€€€€‰‰…ÑÑ±•A±…å•É…Éˆ¬(€€€€€€€€€€€€€€€€€€€Ñ…É•Ğ¹¥¹‘•à(€€€€€€€€€€€€¤(€€€€€€€€¤ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒš*¢÷¶'ÒkšÊKšr'–¶c–r£š«&§¢ÎšZg¢‡¾ò#š«&¤(€€€€€€ƒ’â7–?:§–ºÛšr'3–¶ãšr–6Òkš*¢÷7jšš–ş×¾ò'¾ò0(€€€€€€ƒ¦g¢‡R£š«&§¶'Òkš>oº_–ë’â–,Åûš*¢÷’â+¦f@(€€€€€€ƒ’æ/¦ZOj–B#Bš*¢÷¶'Òk¾ò3¶'Òk¢Ú+¦®cjš«&¤(€€€€€€ƒR£¢Ößš*¢÷’ú–¢–*o’æ¢Ú+–òß¾ò3’â7šrš&šr'¶'Òh(€€€€€€ƒjš«&§šRû–B3’â–/š*¢÷¦÷’âš¢–òß(€€€€¨¼((€€€½¹ÍĞ•™™•Ñ¥Ù•M­¥±±1•Ù•°ô((€€€€€€€…ÍÑM­¥±±…Ñ„(€€€€€€€€ü(€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€…ÍÑM­¥±±…Ñ„¹µ…á1•Ù•±ñğÄ°(€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€Ä°(€€€€€€€€€€€€€€€9Õµ‰•È¹¥Í¥¹¥Ñ”¡9Õµ‰•È¡µ½¹ÍÑ•È¹ØÄĞÅ½É•M­¥±±1•Ù•°¤¤(€€€€€€€€€€€€€€€€€€€€ı5…Ñ ¹™±½½È¡9Õµ‰•È¡µ½¹ÍÑ•È¹ØÄĞÅ½É•M­¥±±1•Ù•°¤¤(€€€€€€€€€€€€€€€€€€€€é5…Ñ ¹É½Õ¹¡µ½¹ÍÑ•È¹±•Ù•°¼à¤(€€€€€€€€€€€€¤(€€€€€€€€¤(€€€€€€€€è(€€€€€€€€Àì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3&§B¿šÎW¢†L(€€€€€€ƒ–"¦Z/º_¾ò3–º3–£š¾SŸ:§–ºÙ…ÍÑ…µ…•M­¥±° ¤(€€€€€€ƒj¢š?–&¾òiÍ­¥±°¹…Ñ•½Éäôôô‰µ…¥Œ‹R (€€€€€€ƒšÎW¢†OšRïšN+¾ò3–Û¦’c¾ò#–B¯šÊKšRûš*¢÷jšf»¦h(€€€€€€ƒšRïšN+¾ò'R£’â¢"³šRïšN+–*o¾ò'¾òh(€€€€¨¼((€€€€¼¨AÕÉ”µ½¹ÑÉ½°Í­¥±±Ì­••ÀÑ¡•¥ÈÍÑ…ÑÕÌ•™™•Ğ‰ÕĞ¹•Ù•È•¹Ñ•È‘¥É•Ğµ‘…µ…”Í•ÑÑ±•µ•¹Ğ¸€¨¼(€€€½¹ÍĞ¥ÍAÕÉ•½¹ÑÉ½±M­¥±°ô(€€€€€€€€„„¡…ÍÑM­¥±±…Ñ„€˜˜…ÍÑM­¥±±…Ñ„¹¥ôôô‰™É••é”ˆ¤ì((€€€½¹ÍĞ¥Í5½¹ÍÑ•É5…¥M­¥±°ô(€€€€€€€…ÍÑM­¥±±…Ñ„€˜˜(€€€€€€€…ÍÑM­¥±±…Ñ„¹…Ñ•½Éäôôô‰µ…¥Œˆì((€€€½¹ÍĞ‰…Í•ÑÑ…­MÑ…ÑI…Üô(€€€€€€€¥Í5½¹ÍÑ•É5…¥M­¥±°(€€€€€€€€üµ½¹ÍÑ•È¹µ…¥ÑÑ…¬(€€€€€€€€èµ½¹ÍÑ•È¹…ÑÑ…¬ì((€€€½¹ÍĞ½™™•¹Í¥Ù•MÑ…Ñ½İ¸ô(€€€€€€€•ÑMÑ…Ñ½İ¹A•É•¹Ñ½È (€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€¥Í5½¹ÍÑ•É5…¥M­¥±°€ü€‰¥¹Ñ•±±¥•¹”ˆ€è€‰…ÑÑ…¬ˆ(€€€€€€€€¤ì((€€€½¹ÍĞ‰…Í•ÑÑ…­MÑ…Ğô(€€€€€€€‰…Í•ÑÑ…­MÑ…ÑI…Ü¨ Äµ½™™•¹Í¥Ù•MÑ…Ñ½İ¸¼ÄÀÀ¤ì(((€€€±•Ğµ½¹ÍÑ•É1¥™•ÍÑ•…±…µ…”ôÀì(((€€€…ÑÑ…­Q…É•ÑÌ¹™½É…  (€€€€€€€Ñ…É•Ñ¹ÑÉäôùì((€€€€€€€€€€€½¹ÍĞÑ…É•Ñ¡…É…Ñ•Èô(€€€€€€€€€€€€€€€Ñ…É•Ñ¹ÑÉä¹¡…É…Ñ•Èì((€€€€€€€€€€€½¹ÍĞÑ…É•ÑMÑ…ÑÌô(€€€€€€€€€€€€€€€Ñ…É•Ñ¹ÑÉä¹ÍÑ…ÑÌì((€€€€€€€€€€€½¹ÍĞÑ…É•Ñ%¹‘•àô(€€€€€€€€€€€€€€€Ñ…É•Ñ¹ÑÉä¹¥¹‘•àì(((€€€€€€€€€€€½¹ÍĞµ½¹ÍÑ•É!¥Ğô(€€€€€€€€€€€€€€€É½±±!¥Ñ¡…¹” (€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•ÉÕÉ…ä (€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€€€€€€€€€€€€€¤°(€€€€€€€€€€€€€€€€€€€Ñ…É•ÑMÑ…ÑÌ¹•Ù…Í¥½¸°(€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ” (€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€€€€€€€€€‰ÍÑÕ¸ˆ(€€€€€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€¥˜ …µ½¹ÍÑ•É!¥Ğ¥ì((€€€€€€€€€€€€€€€Í¡½İ5¥ÍÍ™™•Ğ (€€€€€€€€€€€€€€€€€€€ÑÉÕ”°(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ%¹‘•à°(€€€€€€€€€€€€€€€€€€€€‰5%MLˆ(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ ((€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€ÕÍ•ÍM­¥±°(€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€‹šZ÷šRøˆ­…ÍÑM­¥±±9…µ”(€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€‹šRïšN(ˆ(€€€€€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€€¡Ñ…É•Ñ¡…É…Ñ•È¹¥‘ñğ‹’ö€ˆ¤¬(€€€€€€€€€€€€€€€€€€€€‹¾ò3šÊKšr'–F÷’â·¾òˆ((€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€É•ÑÕÉ¸ì((€€€€€€€€€€€ô(((€€€€€€€€€€€½¹ÍĞ¥Í	•¥¹¹•É½É•ÍÑ9½Éµ…±ÑÑ…¬ô(€€€€€€€€€€€€€€€ÕÉÉ•¹Ñi½¹”ôôô‰™½É•ÍĞˆ€˜˜(€€€€€€€€€€€€€€€€……ÍÑM­¥±±…Ñ„€˜˜(€€€€€€€€€€€€€€€µ½¹ÍÑ•È€˜˜(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹ØÄÜÍ	•¥¹¹•É½É•ÍĞôôõÑÉÕ”ì((€€€€€€€€€€€€¼¨ƒšZÃš&/š»šz_šf»¦kšRïšN+šb¿šVg–¶ã’şw¢¶ß–ó¾òk’â7–B"šN+¾ò3šr«¦bËš›šf–në–ºhÄÃ¾öxÄ×€¨¼(€€€€€€€€€€€½¹ÍĞÉ…•É¥Ñ¥…±	½¹ÕÍ•Ìõ•ÑÑ¥Ù•I…•É¥Ñ¥…±	½¹ÕÍ•Ì¡µ½¹ÍÑ•È¤ì(€€€€€€€€€€€½¹ÍĞµ½¹ÍÑ•ÉÉ¥Ñ¡…¹”õ¥Í	•¥¹¹•É½É•ÍÑ9½Éµ…±ÑÑ…¬(€€€€€€€€€€€€€€€€üÀ(€€€€€€€€€€€€€€€€é5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€€€€I%Q}!9}5%9}QI}9Q%}I%P°(€€€€€€€€€€€€€€€€€€€€ÄÀ­É…•É¥Ñ¥…±	½¹ÕÍ•Ì¹¡…¹”´¡Ñ…É•ÑMÑ…ÑÌ¹…¹Ñ¥É¥ÑñğÀ¤(€€€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€½¹ÍĞµ½¹ÍÑ•ÉÉ¥Ğô…¥Í	•¥¹¹•É½É•ÍÑ9½Éµ…±ÑÑ…¬˜™5…Ñ ¹É…¹‘½´ ¤¨ÄÀÀñµ½¹ÍÑ•ÉÉ¥Ñ¡…¹”ì(€€€€€€€€€€€½¹ÍĞµ½¹ÍÑ•ÉÉ¥Ñ5Õ±Ñ¥Á±¥•Èõµ½¹ÍÑ•ÉÉ¥Ğ(€€€€€€€€€€€€€€€€ı5…Ñ ¹µ¥¸¡I%Q}5U1Q%A1%I}5`°Ä¸Ô­É…•É¥Ñ¥…±	½¹ÕÍ•Ì¹‘…µ…”¼ÄÀÀ¤(€€€€€€€€€€€€€€€€èÄì((€€€€€€€€€€€±•Ğ‘…µ…”ô(€€€€€€€€€€€€€€€¥ÍAÕÉ•½¹ÑÉ½±M­¥±°(€€€€€€€€€€€€€€€€üÀ(€€€€€€€€€€€€€€€€é¥Í	•¥¹¹•É½É•ÍÑ9½Éµ…±ÑÑ…¬(€€€€€€€€€€€€€€€€ıÉ½±±	•¥¹¹•É½É•ÍÑ9½Éµ…±ÑÑ…­…µ…” ¤(€€€€€€€€€€€€€€€€é…ÍÑM­¥±±…Ñ„(€€€€€€€€€€€€€€€€ı…±Õ±…Ñ•M­¥±±…µ…”¡ì(€€€€€€€€€€€€€€€€€€€Í­¥±°é…ÍÑM­¥±±…Ñ„°(€€€€€€€€€€€€€€€€€€€Í­¥±±1•Ù•°é•™™•Ñ¥Ù•M­¥±±1•Ù•°°(€€€€€€€€€€€€€€€€€€€•™™•Ñ¥Ù•ÑÑ…¬é‰…Í•ÑÑ…­MÑ…Ğ°(€€€€€€€€€€€€€€€€€€€Ñ…É•ĞéÑ…É•Ñ¡…É…Ñ•È°(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ•™•¹Í”éÑ…É•ÑMÑ…ÑÌ¹‘•™•¹Í”°(€€€€€€€€€€€€€€€€€€€…ÍÑ•É1•Ù•°éµ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€…ÍÑ•É±•µ•¹Ğéµ½¹ÍÑ•È¹•±•µ•¹Ğ°(€€€€€€€€€€€€€€€€€€€…ÑÑ…­•Èéµ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€€€€É¥Ñ5Õ±Ñ¥Á±¥•Èéµ½¹ÍÑ•ÉÉ¥Ñ5Õ±Ñ¥Á±¥•È(€€€€€€€€€€€€€€€ô¤(€€€€€€€€€€€€€€€€é…±Õ±…Ñ•…µ…” (€€€€€€€€€€€€€€€€€€€‰…Í•ÑÑ…­MÑ…Ğ°(€€€€€€€€€€€€€€€€€€€Ñ…É•ÑMÑ…ÑÌ¹‘•™•¹Í”°(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹•±•µ•¹Ğ°(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹•±•µ•¹Ğ°(€€€€€€€€€€€€€€€€€€€ì(€€€€€€€€€€€€€€€€€€€€€€€…ÑÑ…­•Èéµ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€€€€€€€€Ñ…É•ĞéÑ…É•Ñ¡…É…Ñ•È°(€€€€€€€€€€€€€€€€€€€€€€€É¥Ñ5Õ±Ñ¥Á±¥•Èéµ½¹ÍÑ•ÉÉ¥Ñ5Õ±Ñ¥Á±¥•È(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€¥˜¡Ñ…É•Ñ¡…É…Ñ•È¹¥Í•™•¹‘¥¹œ€˜˜‘…µ…”øÀ¥ì((€€€€€€€€€€€€€€€‘…µ…”ô(€€€€€€€€€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€€€€€€€€€Ä°(€€€€€€€€€€€€€€€€€€€€€€€5…Ñ ¹™±½½È (€€€€€€€€€€€€€€€€€€€€€€€€€€€‘…µ…”¨À¸Ô(€€€€€€€€€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô(((€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3š:—’â((€€€€€€€€€€€€€€ƒÖCV0¿¢¶ßnø¿–>7–
+ß¦g–æû–/¦bËš›¦†x(€€€€€€€€€€€€€€ƒ–Š{n+šV#šzs¾ò'¾òh(€€€€€€€€€€€€€€ƒÖCV3¾ò!‰…ÉÉ¥•Ë¾ò'–º3–£š‚óšN/¾ò0(€€€€€€€€€€€€€€ƒ¦gš²‡šRïšN+nÓš:—š¶ã¦nÛ¾ò3¦¢¶ßnû¦ô(€€€€€€€€€€€€€€ƒ’â7R£šÚ#¢_¾òošÊKšr'ÖCV3j¢¦Çš&7šª‹š~”(€€€€€€€€€€€€€€ƒ¢¶ßnû¾ò!Í¡¥•±“¾ò'¾ò3¢¶ßnûš2'–&§¦’`(€€€€€€€€€€€€€€ƒ¦î{šVã–BãšRÛ–
+ß–ºÏ¾ò3–BãšRÛ’â7–º3j¦£–"(€€€€€€€€€€€€€€ƒš&7šrrjš&¢†¾òoš&¢†’æ/–ú3–ššzp(€€€€€€€€€€€€€€ƒn»š¢g¢ê¯’â+šr'–>7–
+ß¾ò!•…ÉÑ¡M¡¥•±“¾ò'¾ò0(€€€€€€€€€€€€€€ƒ’úwš¾S’ú/š*+–
+ß–ºÏš&O–n{š«&§¢ê¯’â+(€€€€€€€€€€€€¨¼((€€€€€€€€€€€½¹ÍĞ¡…Í	…ÉÉ¥•Èô(€€€€€€€€€€€€€€€¡…ÍÑ¥Ù•	Õ™˜ (€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È°(€€€€€€€€€€€€€€€€€€€€‰‰…ÉÉ¥•Èˆ(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€¥˜¡‘…µ…”øÀ€˜˜¡…Í	…ÉÉ¥•È¥ì((€€€€€€€€€€€€€€€‘…µ…”ôÀì(((€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€€¡Ñ…É•Ñ¡…É…Ñ•È¹¥‘ñğ‹’ö€ˆ¤¬(€€€€€€€€€€€€€€€€€€€€‹jÖCV3–º3–£š‚óšN/’ê¦gš²‡šRïšN+¾òˆ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô(€€€€€€€€€€€•±Í•ì((€€€€€€€€€€€€€€€½¹ÍĞÍ¡¥•±‘	Õ™˜ô((€€€€€€€€€€€€€€€€€€€€¡Ñ…É•Ñ¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Íññmt¤(€€€€€€€€€€€€€€€€€€€€¹™¥¹ (€€€€€€€€€€€€€€€€€€€€€€€ˆôø((€€€€€€€€€€€€€€€€€€€€€€€€€€€ˆ¹ÑåÁ”ôôô‰Í¡¥•±ˆ˜˜(€€€€€€€€€€€€€€€€€€€€€€€€€€€ˆ¹ÑÕÉ¹Í1•™ĞøÀ€˜˜(€€€€€€€€€€€€€€€€€€€€€€€€€€€ˆ¹É•µ…¥¹¥¹œøÀ((€€€€€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€¥˜¡‘…µ…”øÀ€˜˜Í¡¥•±‘	Õ™˜¥ì((€€€€€€€€€€€€€€€€€€€½¹ÍĞ…‰Í½É‰•ô((€€€€€€€€€€€€€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€€€€€€€€€€€€€‘…µ…”°(€€€€€€€€€€€€€€€€€€€€€€€€€€€Í¡¥•±‘	Õ™˜¹É•µ…¥¹¥¹œ(€€€€€€€€€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€€€€€Í¡¥•±‘	Õ™˜¹É•µ…¥¹¥¹œ´ô(€€€€€€€€€€€€€€€€€€€€€€€…‰Í½É‰•ì((€€€€€€€€€€€€€€€€€€€‘…µ…”´ô(€€€€€€€€€€€€€€€€€€€€€€€…‰Í½É‰•ì(((€€€€€€€€€€€€€€€€€€€¥˜¡…‰Í½É‰•øÀ¥ì((€€€€€€€€€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€€€€€€€€€€€€€‹¢¶ßnû–BãšRÛ’êˆ¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€…‰Í½É‰•¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€€‹¦î{–
+ß–ºÏ¾ò#–&§¦’`ˆ¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€Í¡¥•±‘	Õ™˜¹É•µ…¥¹¥¹œ¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€€‹¦î{¾ò'ˆ(€€€€€€€€€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€€€€€€€€€€€€€Í¡½İM¡¥•±‘‰Í½Éˆ (€€€€€€€€€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ%¹‘•à°(€€€€€€€€€€€€€€€€€€€€€€€€€€€…‰Í½É‰•(€€€€€€€€€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€€€€€€€€€ô((€€€€€€€€€€€€€€€ô((€€€€€€€€€€€ô(((€€€€€€€€€€€½¹ÍĞ¡Á	•™½É•¥É•Ñ…µ…”õ5…Ñ ¹µ…à À±9Õµ‰•È¡Ñ…É•Ñ¡…É…Ñ•È¹¡À¥ñğÀ¤ì((€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹¡Àô(€€€€€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹¡À´(€€€€€€€€€€€€€€€€€€€‘…µ…”(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€½¹ÍĞ…ÑÕ…±!Á…µ…”õ5…Ñ ¹µ…à À±¡Á	•™½É•¥É•Ñ…µ…”µÑ…É•Ñ¡…É…Ñ•È¹¡À¤ì(((€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€ƒŠbƒ–>7–
+ß¾ò#¢B³¢Æ‡–rnû¾ò=•…ÉÑ¡M¡¥•±“¾ò'¾òh(€€€€€€€€€€€€€€ƒš&–º3¢†’æ/–ú3š&7º_¾ò3¦ÿ–7ÖCV0¿¢¶ßnø(€€€€€€€€€€€€€€ƒšN/’â/j¦£–"’æ¢Š¯¢ª“º_¦Ë–>7–
+ß¢‡(€€€€€€€€€€€€¨¼((€€€€€€€€€€€½¹ÍĞÉ•™±•ÑA•É•¹Ğô((€€€€€€€€€€€€€€€•ÑÑ¥Ù•	Õ™™A•É•¹Ğ (€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È°(€€€€€€€€€€€€€€€€€€€€‰•…ÉÑ¡M¡¥•±ˆ(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€É•™±•ÑA•É•¹ĞøÀ€˜˜(€€€€€€€€€€€€€€€…ÑÕ…±!Á…µ…”øÀ(€€€€€€€€€€€€¥ì((€€€€€€€€€€€€€€€½¹ÍĞÉ•™±•Ñ…µ…”ô((€€€€€€€€€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€€€€€€€€€Ä°(€€€€€€€€€€€€€€€€€€€€€€€5…Ñ ¹™±½½È (€€€€€€€€€€€€€€€€€€€€€€€€€€€…ÑÕ…±!Á…µ…”¨(€€€€€€€€€€€€€€€€€€€€€€€€€€€É•™±•ÑA•É•¹Ğ¼(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ÄÀÀ(€€€€€€€€€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¡Àô(€€€€€€€€€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¡À´(€€€€€€€€€€€€€€€€€€€€€€€É•™±•Ñ…µ…”(€€€€€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€€€€€‹–>7–
+ß¦ƒš"@ˆ¬(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€É•™±•Ñ…µ…”¬(€€€€€€€€€€€€€€€€€€€€‹¦î{–
+ß–ºÏˆ(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€¥˜¡µ½¹ÍÑ•È¹¡ÀğôÀ¥ì((€€€€€€€€€€€€€€€€€€€­¥±±5½¹ÍÑ•È (€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•É%¹‘•à(€€€€€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€€€€€ô((€€€€€€€€€€€ô(((€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33š"Ã¦²—’â·šNšr'¢¶ßnû¾ò0(€€€€€€€€€€€€€€ƒ–>_–"Ã–
+ß–ºÏšf¾ò3š&!Cj¸¸»–ÂÇ’â7R£¢ŞÏ–.W¾ò3nÓš:—¦†¿’è(€€€€€€€€€€€€€€ƒf÷¢&Ë¢¶ßnûš&¦f“jšVã–¶_¾ò3¦f“¦v{¢¶ßnû–&§¦’cš&ÿ–>_¦?–Â?šZğ(€€€€€€€€€€€€€€ƒ–
+ß–ºÏ¾ò3¦
+–&’â¢Öß¦†¿’ë7¾ò'¾òh(€€€€€€€€€€€€€€ƒ’â+¦v‹¢¶ßnû–BãšRÛj¦
+?¢ò¿–~ß¢†3–º3’æ/–ú3¾ò1‘…µ…—–ŞËÚOšb¼(€€€€€€€€€€€€€€ƒ3¢¶ßnûšN/’â7’ö?rš¶šrš&¢†7j–&§¦’c¦?ŠSŠS¢¶ßnø(€€€€€€€€€€€€€€ƒ–º3–£šN/’â/¦gš²‡šRïšN+šf	‘…µ…—šr¢º+š"@Ã¾ò3¦g¢‡–:šr°(€€€€€€€€€€€€€€ƒ’â7º…‘…µ…—šb¿’â7šb¼Ã¦÷šr–Fó–>­Í¡½İA±…å•É!¥Ğ §¾ò0(€€€€€€€€€€€€€€ƒ¦–âÛ¢ãfó–6‡&¦r–.WšV#šzs¢Ş0´Á!C7¦g¢»šÊKšr'š?ú¤(€€€€€€€€€€€€€€ƒjÒ–¶_–ö#–ë–.WV¯¾ò3šb;šb;¢†¦?š‚çšr³šÊKš&–6ïr/¢Öß’ú(€€€€€€€€€€€€€€ƒ–>#¢ŞÏ–¶_–>#¦r–.W¾ò3¢Ş¢¶ßnûš'¢¦Ë¢ššr'j3–º3–£šN/’â/4(€€€€€€€€€€€€€€ƒ¢š’â7²›šRçš"C–>«šr%‘…µ…”øÃ¾ò#¢¶ßnûšÊKšr'–º3– (€€€€€€€€€€€€€€ƒšN/’ö?rjšr'š&–"Ã¢†¾ò'š&7–Fó–>¯¾ò3–’§Û–ÂÇ–B3šfšîÿ¢ÚÌ(€€€€€€€€€€€€€€ƒ3¢¶ßnû–’ƒR£šf–>«¦†¿’ëf÷–¶_7¢Ş3¢¶ßnû’â7–’ƒR£šf(€€€€€€€€€€€€€€ƒf÷–¶_Ò–¶_’â¢Öß¦†¿’ë7¾ò#–nƒ
+éÍ¡½İM¡¥•±‘‰Í½Éˆ ¤(€€€€€€€€€€€€€€ƒ–ŞËÚO–r£’â+¦v‹¢¶ßnû–BãšRÛ¦
+?¢ò¿¢‡–Fó–>¯¦;’ê¾ò3¦g¢‡–>«šb¼(€€€€€€€€€€€€€€ƒ–>›–’[šÆë–ºk¢š’â7¢š3–7–*ƒ’â+7Ò–¶]!Cš&¢†š>C’ë¾ò'(€€€€€€€€€€€€¨¼(€€€€€€€€€€€¥˜¡‘…µ…”øÀ¥ì((€€€€€€€€€€€€€€€Í¡½İA±…å•É!¥Ğ (€€€€€€€€€€€€€€€€€€€‘…µ…”°(€€€€€€€€€€€€€€€€€€€€‰¡Àˆ°(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ%¹‘•à°(€€€€€€€€€€€€€€€€€€€™…±Í”°(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÉ¥Ğ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô(((€€€€€€€€€€€¥˜ …¥ÍAÕÉ•½¹ÑÉ½±M­¥±°¥ì(€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ ((€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€ÕÍ•ÍM­¥±°(€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€‹šZ÷šRøˆ­…ÍÑM­¥±±9…µ”(€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€‹šRïšN(ˆ(€€€€€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€€¡Ñ…É•Ñ¡…É…Ñ•È¹¥‘ñğ‹’ö€ˆ¤¬(€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÉ¥Ğ(€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€‹¾ò#"šN+¾ò¾ò$ˆ(€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€€€€€‹¾ò3¦ƒš"@ˆ¬(€€€€€€€€€€€€€€€€€€€‘…µ…”¬(€€€€€€€€€€€€€€€€€€€€‹–
+ß–ºÌˆ¬(€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹¥Í•™•¹‘¥¹œ(€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€‹¾ò#¦bËš›.š/–
+ß–ºÏšâo–6+¾ò$ˆ(€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€€€€€‹ˆ((€€€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€ô(((€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33¦;š¨(€€€€€€€€€€€€€€ƒVÃ–âã.š/nÓš:—–k7¾ò'¾òh(€€€€€€€€€€€€€€ƒš«&§¦gš²‡rjšr'šRûš*¢÷¢3’âSš*¢ô(€€€€€€€€€€€€€€ƒšr³¢ê¯–âÛšr'VÃ–âãšV#šzsš²’ö7j¢¦Ç¾ò3–r (€€€€€€€€€€€€€€ƒ–
+ß–ºÏÖCº_–º3Šë¢ª7n»š¢g¦
+šÒï¢F_j(€€€€€€€€€€€€€€ƒššÎ’â/¾ò3––_R£–"Ãn»š¢g:§–ºÛ¢ê¯’â+(€€€€€€€€€€€€€€ƒ¢Ş:§–ºÛ–Â7š«&§¦
+––_šb¿–B3’â¦†–÷–ò<(€€€€€€€€€€€€€€ƒ–ºÛš^?¾ò!…ÁÁ±åM­¥±±•‰Õ™™™™•ÑÍQ½A±…å•È ¤(€€€€€€€€€€€€€€ƒ¦>‡–=…ÁÁ±åM­¥±±•‰Õ™™™™•ÑÌ §¾ò'¾ò0(€€€€€€€€€€€€€€ƒ–Fó–>¯šfš¦’æ’â¢Ó¾òk–F÷’â·–
+ß–ºÏÖCº\(€€€€€€€€€€€€€€ƒ–º3’æ/–ú3š&7–"“–ºk¦f–*ƒšV#šzs(€€€€€€€€€€€€¨¼((€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€ÕÍ•ÍM­¥±°€˜˜(€€€€€€€€€€€€€€€…ÍÑM­¥±±…Ñ„€˜˜(€€€€€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹¡ÀøÀ(€€€€€€€€€€€€¥ì((€€€€€€€€€€€€€€€…ÁÁ±åM­¥±±•‰Õ™™™™•ÑÍQ½A±…å•È (€€€€€€€€€€€€€€€€€€€…ÍÑM­¥±±…Ñ„°(€€€€€€€€€€€€€€€€€€€•™™•Ñ¥Ù•M­¥±±1•Ù•°°(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È°(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ%¹‘•à°(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•‰¥±¥ÑåA½¥¹ÑÌ¡µ½¹ÍÑ•È°‰¥¹Ñ•±±¥•¹”ˆ¤(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô((€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€ÕÍ•ÍM­¥±°€˜˜(€€€€€€€€€€€€€€€…ÍÑM­¥±±…Ñ„€˜˜(€€€€€€€€€€€€€€€…ÍÑM­¥±±…Ñ„¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•°€˜˜(€€€€€€€€€€€€€€€‘…µ…”øÀ(€€€€€€€€€€€€¥ì(€€€€€€€€€€€€€€€µ½¹ÍÑ•É1¥™•ÍÑ•…±…µ…”¬õ‘…µ…”ì(€€€€€€€€€€€ô((€€€€€€€ô(€€€€¤ì(((€€€¥˜ (€€€€€€€ÕÍ•ÍM­¥±°€˜˜(€€€€€€€…ÍÑM­¥±±…Ñ„€˜˜(€€€€€€€…ÍÑM­¥±±…Ñ„¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•°€˜˜(€€€€€€€µ½¹ÍÑ•É1¥™•ÍÑ•…±…µ…”øÀ€˜˜(€€€€€€€µ½¹ÍÑ•È¹…±¥Ù”(€€€€¥ì(€€€€€€€½¹ÍĞÁ•É•¹Ğõ…ÍÑM­¥±±…Ñ„¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•±m•™™•Ñ¥Ù•M­¥±±1•Ù•°´Åtì(€€€€€€€½¹ÍĞ…µ½Õ¹Ğõ5…Ñ ¹™±½½È¡µ½¹ÍÑ•É1¥™•ÍÑ•…±…µ…”©Á•É•¹Ğ¼ÄÀÀ¤ì((€€€€€€€¥˜¡…µ½Õ¹ĞøÀ¥ì(€€€€€€€€€€€½¹ÍĞ¡ÁI•½Ù•É•õ5…Ñ ¹µ…à À±5…Ñ ¹µ¥¸¡…µ½Õ¹Ğ±µ½¹ÍÑ•È¹µ…á!@µµ½¹ÍÑ•È¹¡À¤¤ì(€€€€€€€€€€€½¹ÍĞÍÁI•½Ù•É•õ5…Ñ ¹µ…à À±5…Ñ ¹µ¥¸¡…µ½Õ¹Ğ±µ½¹ÍÑ•È¹µ…áM@µµ½¹ÍÑ•È¹ÍÀ¤¤ì((€€€€€€€€€€€µ½¹ÍÑ•È¹¡Àõ5…Ñ ¹µ¥¸¡µ½¹ÍÑ•È¹µ…á!@±µ½¹ÍÑ•È¹¡À­…µ½Õ¹Ğ¤ì(€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÀõ5…Ñ ¹µ¥¸¡µ½¹ÍÑ•È¹µ…áM@±µ½¹ÍÑ•È¹ÍÀ­…µ½Õ¹Ğ¤ì((€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬‹–Bã–>[–
+ß–ºÏjˆ­Á•É•¹Ğ¬(€€€€€€€€€€€€€€€€ˆ—’â›š‹–ú¤ˆ­¡ÁI•½Ù•É•¬‹¦îy!Cˆ­ÍÁI•½Ù•É•¬‹¦îyMCˆ(€€€€€€€€€€€€¤ì(€€€€€€€ô(€€€ô(((€€€ÕÁ‘…Ñ•U$ ¤ì(((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒš"Ã¦²—ÖCšv|(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸¡•­	…ÑÑ±•¹ ¥ì((€€€¥˜ …‰…ÑÑ±•Ñ¥Ù”¥ì(€€€€€€€É•ÑÕÉ¸ÑÉÕ”ì(€€€ô((€€€€¼¨!@Í•ÑÑ±•µ•¹Ğ‰•±½¹ÌÑ¼Ñ¡”½É”‰…ÑÑ±”™±½Ü¸¹ä‘…µ…”Í½ÕÉ”µ…ä(€€€€€€É•‘Õ”!@Ñ¼é•É¼ì…‘…ÁÑ•ÉÌµÕÍĞ¹½ĞİÉ…ÀÅÕ•Õ”™Õ¹Ñ¥½¹Ìµ•É•±äÑ¼(€€€€€€ÑÉ…¹Í±…Ñ”Ñ¡…ĞÍÑ…Ñ”¥¹Ñ¼Ñ¡”Í¥¹±”…¹½¹¥…°‘•…Ñ Á…Ñ ¸€¨¼(€€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ¹™½É… ¡¥¹‘•àôùì(€€€€€€€½¹ÍĞµ½¹ÍÑ•Èõµ½¹ÍÑ•ÉÍm¥¹‘•átì(€€€€€€€¥˜¡µ½¹ÍÑ•È˜™µ½¹ÍÑ•È¹…±¥Ù”„ôõ™…±Í”˜™9Õµ‰•È¡µ½¹ÍÑ•È¹¡À¤ğôÀ¥ì(€€€€€€€€€€€­¥±±5½¹ÍÑ•È¡¥¹‘•à¤ì(€€€€€€€ô(€€€ô¤ì(((€€€½¹ÍĞÁ…ÉÑå•™•…Ñ•õ•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹•Ù•Éä¡¥¹‘•àôùì(€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤ì(€€€€€€€É•ÑÕÉ¸€…¡…É…Ñ•Èñğ¡…É…Ñ•È¹¡ÀğôÀì(€€€ô¤ì((€€€¥˜¡Á…ÉÑå•™•…Ñ•¥ì((€€€€€€€±½Í•	…ÑÑ±” ¤ì((€€€€€€€É•ÑÕÉ¸ÑÉÕ”ì((€€€ô(((€€€½¹ÍĞ…±¥Ù”€ô(€€€€€€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ(€€€€€€€€¹Í½µ” (€€€€€€€€€€€¤ôø(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥t€˜˜(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥t¹…±¥Ù”(€€€€€€€€¤ì(((€€€¥˜ ……±¥Ù”¥ì((€€€€€€€İ¥¹	…ÑÑ±” ¤ì((€€€€€€€É•ÑÕÉ¸ÑÉÕ”ì((€€€ô(((€€€É•ÑÕÉ¸™…±Í”ì()ô(()™Õ¹Ñ¥½¸…ÁÁ±åA½ÍÑ	…ÑÑ±•ÕÑ½I•½Ù•Éä ¥ì((€€€•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹™½É… ¡¡…É…Ñ•É%¹‘•àôùì((€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¡…É…Ñ•É%¹‘•à¤ì(€€€€€€€½¹ÍĞ½¹™¥œõ•ÑA…ÉÑåÕÑ½½¹™¥œ¡¡…É…Ñ•É%¹‘•à¤ì(€€€€€€€½¹ÍĞÍÑ…ÑÌõ•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ¡¡…É…Ñ•É%¹‘•à¤ì((€€€€€€€¥˜ …¡…É…Ñ•Èñğ¡…É…Ñ•È¹¡ÀğôÀñğ€…½¹™¥œ¹•¹…‰±•ñğ€…ÍÑ…ÑÌ¥ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô((€€€€€€€l‰¡Àˆ°‰ÍÀ‰t¹™½É… ¡É•Í½ÕÉ”ôùì((€€€€€€€€€€€½¹ÍĞµ…áY…±Õ”õÉ•Í½ÕÉ”ôôô‰¡Àˆ€üÍÑ…ÑÌ¹µ…á!@€èÍÑ…ÑÌ¹µ…áM@ì(€€€€€€€€€€€½¹ÍĞÕÉÉ•¹ÑY…±Õ”õÉ•Í½ÕÉ”ôôô‰¡Àˆ€ü¡…É…Ñ•È¹¡À€è¡…É…Ñ•È¹ÍÀì(€€€€€€€€€€€½¹ÍĞÑ¡É•Í¡½±õ¹½Éµ…±¥é•ÕÑ½	…ÑÑ±•Q¡É•Í¡½±¡½¹™¥mÉ•Í½ÕÉ•t±É•Í½ÕÉ”ôôô‰¡Àˆ€ü€ÔÀ€è€ÈÔ¤ì((€€€€€€€€€€€¥˜¡µ…áY…±Õ”ğôÀñğÕÉÉ•¹ÑY…±Õ”øõµ…áY…±Õ”ñğÕÉÉ•¹ÑY…±Õ”½µ…áY…±Õ”¨ÄÀÀùÑ¡É•Í¡½±¥ì(€€€€€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€ô((€€€€€€€€€€€½¹ÍĞÁ½Ñ¥½¹%õ•ÑÕÑ½A½Ñ¥½¹%¡É•Í½ÕÉ”¤ì(€€€€€€€€€€€½¹ÍĞ‘•™¥¹¥Ñ¥½¸õ•ÑA½Ñ¥½¹•™¥¹¥Ñ¥½¸¡Á½Ñ¥½¹%¤ì((€€€€€€€€€€€¥˜ …‘•™¥¹¥Ñ¥½¸ñğ€…½¹ÍÕµ•A½Ñ¥½¹É½µ%¹Ù•¹Ñ½Éä¡Á½Ñ¥½¹%°Ä¤¥ì(€€€€€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€ô((€€€€€€€€€€€½¹ÍĞÁ±…¹¹•õ‘•™¥¹¥Ñ¥½¸¹É•½Ù•ÉåA•É•¹ĞøôÄÀÀ(€€€€€€€€€€€€€€€€üµ…áY…±Õ”µÕÉÉ•¹ÑY…±Õ”(€€€€€€€€€€€€€€€€è5…Ñ ¹µ…à Ä±5…Ñ ¹É½Õ¹¡µ…áY…±Õ”©‘•™¥¹¥Ñ¥½¸¹É•½Ù•ÉåA•É•¹Ğ¼ÄÀÀ¤¤ì(€€€€€€€€€€€½¹ÍĞÉ•½Ù•É•õ5…Ñ ¹µ…à À±5…Ñ ¹µ¥¸¡µ…áY…±Õ”µÕÉÉ•¹ÑY…±Õ”±Á±…¹¹•¤¤ì((€€€€€€€€€€€¥˜¡É•Í½ÕÉ”ôôô‰¡Àˆ¥ì(€€€€€€€€€€€€€€€¡…É…Ñ•È¹¡Àõ5…Ñ ¹µ¥¸¡µ…áY…±Õ”±¡…É…Ñ•È¹¡À­É•½Ù•É•¤ì(€€€€€€€€€€€õ•±Í•ì(€€€€€€€€€€€€€€€¡…É…Ñ•È¹ÍÀõ5…Ñ ¹µ¥¸¡µ…áY…±Õ”±¡…É…Ñ•È¹ÍÀ­É•½Ù•É•¤ì(€€€€€€€€€€€ô((€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€‹š"Ã¦²—ÖCšv–ú3¾ò0ˆ¬¡¡…É…Ñ•È¹¥‘ñğ‹¢K¢&Èˆ¤¬(€€€€€€€€€€€€€€€€‹¢«–.W’öÿR ˆ­‘•™¥¹¥Ñ¥½¸¹¹…µ”¬‹¾ò3š‹–ú¤ˆ­É•½Ù•É•¬ˆ€ˆ­É•Í½ÕÉ”¹Ñ½UÁÁ•É…Í” ¤¬‹ˆ(€€€€€€€€€€€€¤ì(€€€€€€€ô¤ì(€€€ô¤ì((€€€É•‰Õ¥±‘%¹Ù•¹Ñ½ÉåM±½ÑÌ ¤ì)ô(()™Õ¹Ñ¥½¸İ¥¹	…ÑÑ±” ¥ì((€€€¥˜ …‰…ÑÑ±•Ñ¥Ù”¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€‰…ÑÑ±•Ñ¥Ù”õ™…±Í”ì((€€€…ÕÑ½	…ÑÑ±”õ™…±Í”ì((€€€…Ñ¥½¹I•…‘äõ™…±Í”ì((€€€Á•¹‘¥¹Ñ¥½¸õ¹Õ±°ì(((€€€±•…É%¹Ñ•ÉÙ…°¡Ñ¥µ•É%¤ì((€€€Ñ¥µ•É%õ¹Õ±°ì((€€€¥˜¡‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%¥ì(€€€€€€€±•…ÉQ¥µ•½ÕĞ¡‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%¤ì(€€€€€€€‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%õ¹Õ±°ì(€€€ô(€€€±•…É	…ÑÑ±•Ñ¥½¹]…Ñ¡‘½œ ¤ì(€€€‰…ÑÑ±•‘Ù…¹•M¡•‘Õ±•õ™…±Í”ì(((€€€‰…ÑÑ±•Q½­•¸¬¬ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3š¾?š^—’îï–.d(€€€€€€ƒ3š&O¢Ò<Ç–‚Óš"Ã¦²—7¾ò'¾òk–.w–"§ÖCº_¦g¢‡šb¼(€€€€€€ƒ–R¿’âšrÚO¦;j–rÃšZç¾ò3nÓš:—¢¢c¦2¦Ë–ê›(€€€€¨¼((€€€•¹ÍÕÉ•…¥±åEÕ•ÍÑÍÕÉÉ•¹Ğ ¤ì((€€€‘…¥±åEÕ•ÍÑMÑ…Ñ”¹ÁÉ½É•ÍÌ¹İ¥¹	…ÑÑ±”ô(€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€Ä°(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€‘…¥±åEÕ•ÍÑMÑ…Ñ”¹ÁÉ½É•ÍÌ¹İ¥¹	…ÑÑ±•ñğ(€€€€€€€€€€€€€€€€À(€€€€€€€€€€€€¤¬Ä(€€€€€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òk–S¢¢_’îï–.g3š&O¢Ò<Ï–‚Óš"Ã¦²—7¾ò0(€€€€€€ƒ–B3’â–/’ê/’îÛ’úšêC’â¢ÖßÒ¿–*ƒ(€€€€¨¼((€€€½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”¹ÁÉ½É•ÍÌ¹İ¥¹	…ÑÑ±”ô(€€€€€€€5…Ñ ¹µ¥¸ ((€€€€€€€€€€€½µµ¥ÍÍ¥½¹EÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì¹™¥¹ (€€€€€€€€€€€€€€€ÄôùÄ¹¥ôôô‰İ¥¹	…ÑÑ±”ˆ(€€€€€€€€€€€€¤¹½…°°((€€€€€€€€€€€€ (€€€€€€€€€€€€€€€½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”¹ÁÉ½É•ÍÌ¹İ¥¹	…ÑÑ±•ñğ(€€€€€€€€€€€€€€€€À(€€€€€€€€€€€€¤¬Ä((€€€€€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#–B3’â–/–V?¦†3j–>›’â–6+¾ò'¾òh(€€€€€€ƒ¢Ş}±½Í•	…ÑÑ±” §’âš¢¾ò3–.w–"§ÖCº_’æ–º3–£šÊKšr$(€€€€€€ƒšRÛ–B#–>¿¢÷¦
+¦Z/¢F_j–¶C¦ã–Z»¾ò3’âš¢¢s’â+(€€€€¨¼((€€€±½Í•5•¹ÕÌ ¤ì(((€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€‹š&šr'š«&§–ŞË¢Š¯šN+šV_¾òˆ(€€€€¤ì(((€€€½¹ÍĞ•áÁ…¥¸€ô(€€€€€€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ(€€€€€€€€¹É•‘Õ” (€€€€€€€€€€€€¡Ñ½Ñ…°±¤¤ôø(€€€€€€€€€€€€€€€Ñ½Ñ…°¬(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥t¹±•Ù•°¨ÄÀ°(€€€€€€€€€€€€À(€€€€€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒš"Ã¦²—’â·ÖW–Â7’â7¢÷–6Òk(€€€€€€aC–#¦Ë–—3–ÇR£ÚO¦¦_šÆƒ7¾ò0(€€€€€€ƒ¶':§–ºÛ–n{–"Ã’âï–~;¢«¢†3š2'3–"¦7ÚO¦¦_–ó4(€€€€€€ƒš&7šrrš¶–"“šZß–6Òk(€€€€¨¼((€€€Í¡…É•‘áÀ€¬ô(€€€€€€€•áÁ…¥¸ì(((€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€‹6Ë–ú\ˆ¬(€€€€€€€•áÁ…¥¸¬(€€€€€€€€‰aC¾ò3–ŞË–¶c–—ÚO¦¦_šÆƒˆ(€€€€¤ì((€€€…ÁÁ±åA½ÍÑ	…ÑÑ±•ÕÑ½I•½Ù•Éä ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr°a@ƒš>C’ë¾ò#¦î¢&ËšÖ»–.W¢¢+š¿¾ò$(€€€€€€ƒ–r£š"Ã¦²—V¯¦v‹ÖCšvVÛ’â/–ÂÇ®/–"ï¢ŞÏ–ë’ú¾ò0(€€€€€€ƒ¢Şš"Ã¦²—V¯¦v‹¦7Z+–r£’â¢Öß–ú#’ê(€€€€€€ƒšRçš"C¶'V¯¦v‹rj–"–n{–rÃ–r[’æ/–ú3š&7¦†¿’ë¾ò0(€€€€€€ƒšRû¦Ë’â/¦vˆÍ¡½İA…” ‰µ…Àˆ¤ƒ¦
+–,(€€€€€€Í•ÑQ¥µ•½ÕĞ…±±‰…¬ƒ¢‡¦v‹(€€€€¨¼(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦g¢‡š&O¢Ò?–ÂÇšr¢«–.Wš*)!@½MC¢sšîÿ¾ò0(€€€€€€ƒ¦gšb¿šrš^§¢š?š‚ó–¾¯j¾ò#–n{¢† ¿–nyMC¾ò'¾ò0(€€€€€€ƒ’ö–¾›¦jo:§¢Öß’úšr¢ºM!@½MC¢^—šÂÓ–º3–£šÊKšr'š?ú§ŠSŠP(€€€€€€ƒ–>7š¶š&O–º3–ÂÇ–£šîÿ¾ò3¢^—šÂÓš‚çšr³’â7R£R£((€€€€€€ƒšRçš"C¾òkš&O¢Ò?’æ/–ú1!@½MCÚ·š2š"Ã¦²—ÖCšvVÛ’â/jšVã–ó¾ò0(€€€€€€ƒ’â7šr¢«–.W¢sšîÿ¾ò3¢š–bo–âÛ¢^—šÂÓ¾ò0(€€€€€€ƒ¢š–bo’æ/–ú3¢s’â–/3–n{’âï–~;’òGš¿–n{¢†7j–*¢÷((€€€€€€ƒš"Ã¦²—3–’ÇšV_7¢Š¯šN+šV_j¢s¢†¦
+?¢ò¿Ú·š2’â7¢º((€€€€€€ƒ¾ò#¦
+–/š¾S¢ò–?šb¿3¦7R7jšš–ş×¾ò0(€€€€€€ƒ¢Ş¦g¢‡š&O¢Ò?¢s¢†’â7šb¿–B3’â’îÛ’ê/¾ò0(€€€€€€ƒšVš?Vg¢F_šÊKšr'’â¢Ößš.ÿš:'¾ò'(€€€€¨¼(((€€€±•…ÉQ¥µ•½ÕĞ¡É•ÍÁ…İ¹%¤ì(((€€€€¼¨(€€€€€€ƒŠbƒâ»~·š«&§¦7Ršf¦ZO¾òh(€€€€€€ƒ–:šr°×K¾ò3¦7–B#>û–r£ï–.W–ŞËÚO¢¦:[¾ò0(€€€€€€ƒ:§–ºÛ¦š³’â+–ÂÇ¢÷–r£–rÃ–r[’â+¢ÖÃ–.W¾ò0(€€€€€€ƒ’öš«&§¦
+¢š¶$×Kš&7–ë>û¾ò0(€€€€€€ƒV¯¦v‹šršr'’âšº×šf¦ZOš¢šë¦ë¦ëj(€€€€€€ƒšRçš"@ËK¾ò3¦®Sš’â+¢B÷–Ş»–Â?–ú#–’k(€€€€¨¼((€€€É•ÍÁ…İ¹%€ô(€€€€€€€Í•ÑQ¥µ•½ÕĞ (€€€€€€€€€€€É•ÍÁ…İ¹5½¹ÍÑ•ÉÌ°(€€€€€€€€€€€€ÈÀÀÀ(€€€€€€€€¤ì(((€€€Í…Ù•…µ” ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ’æ/–&7
+ë’ê¢šÆë3–n{–rÃ–r[–ú3š«&§¦ë’ê––÷’â¦f–¶C4(€€€€€€ƒš*+¦g¢‡–O–"ÀÈÔÁµÏ¾ò0(€€€€€€ƒ’ö¦gš¢š"Ã¦²—ÖCšv–æû’æ;šb¿z³¦ZO¢ŞÏ¢ÖÃ¾ò0(€€€€€€ƒšZ–¶]IAr/’â7–"Ã3š&O¢Ò?’ê7j¢¢+š¿¢Ş6Ë–ú_jaC¾ò0(€€€€€€ƒ–º3–£šÊKšr'–sVgš((€€€€€€ƒ>û–r£3š«&§šÚ#–’Ç–’«’æ7¢Ş3ï–.W¢Š¯–6‡’ö?4(€€€€€€ƒ–ŞËÚOR£–"—jšZç–ò?¢šÆë’ê¾ò!É•ÍÁ…İ»â»–"ÀËK(€€€€€€ƒï–.W’â7–7¢Š­µ…Á½½±‘½İ»–6‡’ö?¾ò'¾ò0(€€€€€€ƒš&’î—¦g¢‡–>¿’î—šRû–şš.'¦Vß¾ò0(€€€€€€ƒ¢ºO:§–ºÛšr'šf¦ZOr/šâš–kš"Ã¦²—¢Î¢¢+¢‡jÖCšzs(€€€€¨¼((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€Í¡½İA…” ‰µ…Àˆ¤ì((€€€€€€€Í•Ñ5…Á½½±‘½İ¸ ÌÀÀÀ¤ì(((€€€€€€€ÍÑ…ÉÑ5½¹ÍÑ•É5½Ù•µ•¹Ğ ¤ì((€€€€€€€Í¡•‘Õ±•ÕÑ½A…ÑÉ½±¡•¬ ÔÀÀÀ¤ì((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì(((€€€€€€€Í¡½İáÁQ½…ÍĞ (€€€€€€€€€€€•áÁ…¥¸(€€€€€€€€¤ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾òkšÊK¢^—šÂÓ¢«–.W–n{’âï–~;(€€€€€€€€€€ƒ–>«¢š²³’â¢K¢&Ëš"[²³’ê3¢K¢&Ëšr'–.û¦ã¦g–/¢¢·–ºk¾ò0(€€€€€€€€€€ƒš"Ã¦²—ÖCšv–n{–"Ã–rÃ–r[’æ/–ú3¾ò0(€€€€€€€€€€ƒšª‹š~—¢ê¯’â)!@½MC¢^—šÂÓšb¿’â7šb¿¦÷R£–º3’ê¾ò0(€€€€€€€€€€ƒ¦÷R£–º3j¢¦ÇnÓš:—¦o–n{’âï–~;¾ò0(€€€€€€€€€€ƒ’â7R£:§–ºÛ¢«–ŞÇ¢¢c–ú_¢š–n{–:ï¢s¢Ê£(€€€€€€€€¨¼((€€€€€€€¡•­ÕÑ½I•ÑÕÉ¹Q½¥Ñä ¤ì((€€€ô°ÈÈÀÀ¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾òkšÊK¢^—šÂÓ¢«–.W–n{’âï–~;j–×šâ³(€€ƒ¢^—šÂÓšb¿:§–ºÛ–âÏ¢f–ÇR£j–Z»’â–ê¯–¶`(€€ƒ¾ò#’â7šb¿š¾?–/¢K¢&Ë–B¢«–âÛ’â’î÷¾ò'¾ò0(€€ƒ–>«¢š’îï’â¢K¢&Ëšr'¦Z/–V¦g–/¢¢·–ºk¾ò0(€€ƒ¢ê¯’â)!CMC¢^—šÂÓ¦÷R£–º3’ê¾ò0(€€ƒ–ÂÇ¢«–.W¦n‹¦Z/–rÃ–r[¦o–n{’âï–~;(¨¼()™Õ¹Ñ¥½¸¡•­ÕÑ½I•ÑÕÉ¹Q½¥Ñä ¥ì((€€€½¹ÍĞÍ¡½Õ±‘¡•¬ô((€€€€€€€…ÕÑ½½¹™¥œ¹É•ÑÕÉ¹Q½¥Ñå]¡•¹µÁÑäñğ(€€€€€€€€ (€€€€€€€€€€€Á±…å•ÈÈ€˜˜(€€€€€€€€€€€…ÕÑ½½¹™¥œÈ¹É•ÑÕÉ¹Q½¥Ñå]¡•¹µÁÑä(€€€€€€€€¤ñğ(€€€€€€€€ (€€€€€€€€€€€Á±…å•ÈÌ€˜˜(€€€€€€€€€€€…ÕÑ½½¹™¥œÌ¹É•ÑÕÉ¹Q½¥Ñå]¡•¹µÁÑä(€€€€€€€€¤ì(((€€€¥˜ …Í¡½Õ±‘¡•¬¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜ (€€€€€€€•ÑQ½Ñ…±A½Ñ¥½¹½Õ¹Ğ ¤øÀ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€ÍÑ½Á5½¹ÍÑ•É5½Ù•µ•¹Ğ ¤ì(((€€€Í¡½İA…” (€€€€€€€€‰¡½µ”ˆ(€€€€¤ì(((€€€…±•ÉĞ (€€€€€€€€‰!C¾ò=MC¢^—šÂÓ¦÷R£–º3’ê¾ò3–ŞË¢«–.W¢şS–n{’âï–~;ˆ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸±½Í•	…ÑÑ±” ¥ì((€€€¥˜ …‰…ÑÑ±•Ñ¥Ù”¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€‰…ÑÑ±•Ñ¥Ù”õ™…±Í”ì((€€€…ÕÑ½	…ÑÑ±”õ™…±Í”ì((€€€…Ñ¥½¹I•…‘äõ™…±Í”ì((€€€Á•¹‘¥¹Ñ¥½¸õ¹Õ±°ì(((€€€±•…É%¹Ñ•ÉÙ…°¡Ñ¥µ•É%¤ì((€€€Ñ¥µ•É%õ¹Õ±°ì((€€€¥˜¡‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%¥ì(€€€€€€€±•…ÉQ¥µ•½ÕĞ¡‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%¤ì(€€€€€€€‰…ÑÑ±•‘Ù…¹•Q¥µ•½ÕÑ%õ¹Õ±°ì(€€€ô(€€€±•…É	…ÑÑ±•Ñ¥½¹]…Ñ¡‘½œ ¤ì(€€€‰…ÑÑ±•‘Ù…¹•M¡•‘Õ±•õ™…±Í”ì(((€€€‰…ÑÑ±•Q½­•¸¬¬ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rjš*O–"Ã3V¯¦v‹’â/šZçVg’â/’â–’Ÿš"«¦ëf÷4(€€€€€€ƒj–Û’â·’â–/–:–nƒ¾ò'¾òh(€€€€€€ƒš"ÃšV_ÖCº_–º3–£šÊKšr'š*+–>¿¢÷¦
+¦Z/¢F_j–¶C¦ã–Z¸(€€€€€€ƒ¾ò#’ú/–š&§–Nš²j!@½MC¢^—šÂÓ¦ã–Z»¾ò'šRÛ–B#¾ò0(€€€€€€ƒ–ššzsš"ÃšV_jVÛ’â/–&o––÷¦ã–Z»šb¿¦Z/¢F_j¾ò0(€€€€€€ƒ–º–ÂÇšr–6‡–r£š&O¦Z/j.š/¾ò3¢º+š"CV¯¦v‹’â((€€€€€€ƒ’â–’Ÿ–†+r/¢Öß’ú–?3¦ëf÷7j–6–~¾ò0(€€€€€€ƒ–Û–¾›šb¿’â–/–Ÿ–ºçr/¢Öß’ú¦ë¦ëj¦ã–Z»–6‡–r£¦
+¢‡(€€€€€€ƒ¦g¢‡¢s’â)±½Í•5•¹ÕÌ §¾ò3Šë’şwš"ÃšV_V¯¦vˆ(€€€€€€ƒ’æûšŞ£’â7šršºcVg’îï’öW¦ã–Z»(€€€€¨¼((€€€±½Í•5•¹ÕÌ ¤ì(((€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€‹’öƒ¢Š¯šN+šV_’êŠ›Š˜ˆ(€€€€¤ì(((€€€½¹ÍĞÍÑ…ÑÌ€ô(€€€€€€€•Ñ5…¥¹¡…É…Ñ•ÉMÑ…ÑÌ ¤ì(((€€€Á±…å•È¹¡À€ô(€€€€€€€ÍÑ…ÑÌ¹µ…á!@ì(((€€€Á±…å•È¹ÍÀ€ô(€€€€€€€ÍÑ…ÑÌ¹µ…áM@ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òh(€€€€€€ƒ²³’â¢K¢&Ëš"ÃšV_šr¢Š¯3šVG–n{7¦7R¢sšîı!@½MC¾ò0(€€€€€€ƒ²³’ê3¢K¢&Ë–:šr³šÊKšr'¢Ş¢F_’â¢Öß¢fWB¾ò0(€€€€€€ƒšr–âÛ¢F_š"Ã¦²—’â·šºcVgj’ö;¢†¦?¦Ë–"Ã’â/’â–‚Óš"Ã¦²—¾ò0(€€€€€€ƒ¢Ş²³’â¢K¢&Ëj¦®S¦¦_’â7’â¢Ó(€€€€€€ƒ¦g¢‡¢ºO’î[¢Ş¢F_’â¢Öß¢sšîÿ(€€€€¨¼((€€€¥˜¡Á±…å•ÈÈ¥ì((€€€€€€€½¹ÍĞÍÑ…ÑÌÈô(€€€€€€€€€€€•ÑA±…å•ÈÉ	…ÑÑ±•MÑ…ÑÌ ¤ì(((€€€€€€€Á±…å•ÈÈ¹¡Àô(€€€€€€€€€€€ÍÑ…ÑÌÈ¹µ…á!@ì(((€€€€€€€Á±…å•ÈÈ¹ÍÀô(€€€€€€€€€€€ÍÑ…ÑÌÈ¹µ…áM@ì((€€€ô((€€€¥˜¡Á±…å•ÈÌ¥ì((€€€€€€€½¹ÍĞÍÑ…ÑÌÌõ•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ È¤ì(€€€€€€€Á±…å•ÈÌ¹¡ÀõÍÑ…ÑÌÌ¹µ…á!@ì(€€€€€€€Á±…å•ÈÌ¹ÍÀõÍÑ…ÑÌÌ¹µ…áM@ì((€€€ô(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€Í¡½İA…” ‰µ…Àˆ¤ì((€€€€€€€Í•Ñ5…Á½½±‘½İ¸ ÌÀÀÀ¤ì(((€€€€€€€ÍÑ…ÉÑ5½¹ÍÑ•É5½Ù•µ•¹Ğ ¤ì((€€€€€€€Í¡•‘Õ±•ÕÑ½A…ÑÉ½±¡•¬ ÔÀÀÀ¤ì((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€ô°ÈÈÀÀ¤ì()ô(()™Õ¹Ñ¥½¸…ÑÑ•µÁÑÍ…Á” ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³–>«šª‹š~—–£–~j…ÕÑ½	…ÑÑ±—¾ò0(€€€€€€ƒšRçš"Cr/n»–&7šb¿¢ªÃj–n{–B#(€€€€€€ƒR£–Â7š'¢K¢&Ëj¢«–.W¦Z/¦^s’ú–"“šZÜ(€€€€€€ƒ¾ò#¦¢¯šb¿šVÓ–/¦j+’ò7’â¢Öß¦¾ò0(€€€€€€ƒ’öšN7’ösšfš¦¦
+šb¿¢š¢Şn»–&7–n{–B#j(€€€€€€ƒš&/–.T¿¢«–.W.š/’â¢Ó¾ò0(€€€€€€ƒ’â7Û¢«–.W¢K¢&Ë¢†3–.W’â·¦S¦
+¢÷¢Š¯¦¢¯š2'¦"Wš&OšZß¾ò'(€€€€¨¼((€€€½¹ÍĞ…ÕÑ½=¸ô(€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•àôôôÀ(€€€€€€€€ü…ÕÑ½	…ÑÑ±”(€€€€€€€€è•ÑA…ÉÑåÕÑ½½¹™¥œ¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤¹•¹…‰±•ì(((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€…ÕÑ½=¸ñğ(€€€€€€€…Ñ¥½¹I•…‘ä(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rjš*O–"Ã–§–-‰ÕŸ¾ò3¦÷šb¿’öÿR£¢š2–ëj¾ò'¾òh((€€€€€€€Ä¸ƒ¦g¢‡–:šr³šÊKšr'¢¢·–ºi…Ñ¥½¹I•…‘äõÑÉÕ—¾ò0(€€€€€€€€€ƒ¦bË–F–ö‹–B3¢fo¢¢·¾ò3–ş¯¦¦¦î{šr’ânÓ¦7šZÀ(€€€€€€€€€ƒ–"“–ºk¦¢¯š"C–*:¾ò3nÓ–"Ãš"C–*
+ëš¶‹ŠSŠP(€€€€€€€€€ƒš¶Šë¢†3
+ëš'¢¦Ëšb¿3¦g–n{–B#–>«¢÷–b_¢¦›’âš²‡7¾ò0(€€€€€€€€€ƒ¦î{’â/–:ï’æ/–ú3’â7º‡ÖCšzs–š’öW¦÷¢š¦:[’ö?((€€€€€€€È¸ƒ¦¢¯–:šr³šb¿3š2'’â/–:ï®/–"ï–"“–ºk7¾ò0(€€€€€€€€€ƒ–º3–£¢ŞÏ¦;–º–F(¿ÖCº_š¦–"Û(€€€€€€€€€ƒ’öÿR£¢šb;Šëš2–ë¾òk¦¢¯’æ¢šr/šV?š6ßŠSŠP(€€€€€€€€€ƒšV?š6ß–’ƒ–ş¯j¢K¢&Ë–#šRïšN+¾ò0(€€€€€€€€€ƒšV?š6ßš‹j¢K¢&Ëš&7¢ò«–"Ã–b_¢¦›¦¢¯¾ò0(€€€€€€€€€ƒ–ššzsšV?š6ß–’«’ö;¦¢¯¦
+šÊK¢ò«–"Ã¢«–ŞÄ(€€€€€€€€€ƒ–ÂÇ–#¢Š¯š&Oš¶ï¾ò3¦
+’æšb¿–B#BjÖCšzs¾ò0(€€€€€€€€€ƒ’â7š'¢¦Ë¢ºO¦¢¯¢º+š"C3’â7–>_šV?š6ß¦fC–"Ûj&çš²+7((€€€€€€ƒšRçš"C¢Ş–Û’î[¢†3–.W’âš¢–#–º–F+(€€€€€€ƒÖCº_¦j;šº×š&7’úwšV?š6ß¦‚–ê?rš¶–"“–ºk¦¢¯š"C’â7š"C–*(€€€€¨¼((€€€…Ñ¥½¹I•…‘äõÑÉÕ”ì(((€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹Íl(€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à(€€€tõì((€€€€€€€…Ñ¥½¸è‰•Í…Á”ˆ°((€€€€€€€Ñ…É•Ğé¹Õ±°((€€€ôì(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾òk¦¢¯jrš¶–"“–ºk¾ò0(€€ƒ–>«–r£ÖCº_¦j;šº×¢Š­É•Í½±Ù•EÕ•Õ•‘A±…å•ÉÑ¥½¸ §–Fó–>¯¾ò0(€€ƒ¦
+?¢ò¿–º3–£š¾SŸ–:šr±…ÑÑ•µÁÑÍ…Á” §¢‡j–"“–ºk–ò?¾ò0(€€ƒ–>«šb¿š*÷–ë’úÖ›ÖCº_¦j;šº×R£(¨¼()™Õ¹Ñ¥½¸É•Í½±Ù•Í…Á•ÑÑ•µÁĞ¡¡…É…Ñ•É%¹‘•à¥ì((€€€±•…É%¹Ñ•ÉÙ…°¡Ñ¥µ•É%¤ì(((€€€½¹ÍĞ…±¥Ù”€ô(€€€€€€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ(€€€€€€€€¹µ…À (€€€€€€€€€€€¤ôùµ½¹ÍÑ•ÉÍm¥t(€€€€€€€€¤(€€€€€€€€¹™¥±Ñ•È (€€€€€€€€€€€´ôù´¹…±¥Ù”(€€€€€€€€¤ì(((€€€¥˜¡…±¥Ù”¹±•¹Ñ ôôôÀ¥ì((€€€€€€€¡•­	…ÑÑ±•¹ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞ¡¥¡•ÍÑ1•Ù•°€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€¸¸¹…±¥Ù”¹µ…À (€€€€€€€€€€€€€€€´ôù´¹±•Ù•°(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€½¹ÍĞ•Í…Á¥¹¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¡…É…Ñ•É%¹‘•à¥ññÁ±…å•Èì((€€€½¹ÍĞ¡…¹”€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€ÄÀ°(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€€äÔ°(€€€€€€€€€€€€€€€€ÔÀ¬(€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€•Í…Á¥¹¡…É…Ñ•È¹±•Ù•°´(€€€€€€€€€€€€€€€€€€€¡¥¡•ÍÑ1•Ù•°(€€€€€€€€€€€€€€€€¤¨Ô(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€¥˜ (€€€€€€€5…Ñ ¹É…¹‘½´ ¤¨ÄÀÀğ(€€€€€€€¡…¹”(€€€€¥ì((€€€€€€€‰…ÑÑ±•Ñ¥Ù”õ™…±Í”ì((€€€€€€€…ÕÑ½	…ÑÑ±”õ™…±Í”ì((€€€€€€€‰…ÑÑ±•Q½­•¸¬¬ì(((€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€‹š"C–*¦¢¯¾òˆ(€€€€€€€€¤ì(((€€€€€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€€€€€Í¡½İA…” ‰µ…Àˆ¤ì((€€€€€€€€€€€Í•Ñ5…Á½½±‘½İ¸ ÌÀÀÀ¤ì(((€€€€€€€€€€€ÍÑ…ÉÑ5½¹ÍÑ•É5½Ù•µ•¹Ğ ¤ì((€€€€€€€€€€€•¹ÍÕÉ•ÕÑ½A…ÑÉ½±%¹Ñ•ÉÙ…° ¤ì((€€€€€€€ô°ÄĞÀÀ¤ì((€€€ô(€€€•±Í•ì((€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€‹¦¢¯–’ÇšV_¾òˆ(€€€€€€€€¤ì(((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€ô()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒš*¢÷¦ã–Z¸(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸½Á•¹M­¥±±5•¹Ô ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦g¢‡šÂã¦ƒ¢º¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÌ¹™¥É—(€€€€€€ƒšÂã¦ƒšª‹š~—–£–~j…ÕÑ½	…ÑÑ±—¢Ş}Á±…å•È¹ÍÃ¾ò0(€€€€€€ƒ>û–r£šRçš"C’úw…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à(€€€€€€ƒšÆë–ºk¢š¦†¿’ë¢ªÃjš*¢÷š²¢ªÃjMC(€€€€¨¼((€€€½¹ÍĞ…ÕÑ½=¸ô(€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•àôôôÀ(€€€€€€€€ü…ÕÑ½	…ÑÑ±”(€€€€€€€€è•ÑA…ÉÑåÕÑ½½¹™¥œ¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤¹•¹…‰±•ì(((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€…ÕÑ½=¸(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ…Ñ¥Ù•¡…É…Ñ•É%ô(€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É-•ä¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤ì((€€€½¹ÍĞ…Ñ¥Ù•¡…É…Ñ•É=‰¨ô(€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤ì(((€€€½¹ÍĞ¡…É…Ñ•È€ô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÍl(€€€€€€€€€€€…Ñ¥Ù•¡…É…Ñ•É%(€€€€€€€tì(((€€€¥˜ (€€€€€€€€…¡…É…Ñ•Èñğ(€€€€€€€€……Ñ¥Ù•¡…É…Ñ•É=‰¨(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞµ•¹Ô€ô(€€€€€€€€ ‰Í­¥±±5•¹Ôˆ¤ì(((€€€µ•¹Ô¹¥¹¹•É!Q50ôˆˆì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òk–ÆW¦Z/š¢‡–ò?jö»¦‚¢şS–n{š2'¦"W(€€€€€€ƒšRû–r£šâ–Z»šr’â+¦v‹¾ò3–ÆW¦Z/’æ/–ú3’â7R£šîG–"Ãšr’â/¦vˆ(€€€€€€ƒš&7š&û–ú_–"Ã¢şS–n{¾ò3’âš&O¦Z/–ÂÇr/–ú_–"Ã(€€€€¨¼((€€€½¹ÍĞÁ¥¹¹•‘	…¬ô(€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€‰‰ÕÑÑ½¸ˆ(€€€€€€€€¤ì(((€€€Á¥¹¹•‘	…¬¹±…ÍÍ9…µ”ô(€€€€€€€€‰ÍÕˆµµ•¹ÔµÁ¥¹¹•µ‰…¬ˆì(((€€€Á¥¹¹•‘	…¬¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€‹¢şS–nxˆì(((€€€Á¥¹¹•‘	…¬¹½¹±¥¬ô(€€€€€€€±½Í•5•¹ÕÌì(((€€€µ•¹Ô¹…ÁÁ•¹‘¡¥± (€€€€€€€Á¥¹¹•‘	…¬(€€€€¤ì(((€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì(€€€€¹™½É… ¡Í­¥±±%ôùì((€€€€€€€½¹ÍĞÍ­¥±°€ô(€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€€€€¥˜ …Í­¥±°¥ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô(((€€€€€€€½¹ÍĞÍ­¥±±1•Ù•°€ô(€€€€€€€€€€€•ÑM­¥±±1•Ù•° (€€€€€€€€€€€€€€€…Ñ¥Ù•¡…É…Ñ•É%°(€€€€€€€€€€€€€€€Í­¥±±%(€€€€€€€€€€€€¤ì(((€€€€€€€½¹ÍĞÍÁ½ÍĞ€ô(€€€€€€€€€€€Í­¥±°¹ÍÁ½ÍĞ„ôõÕ¹‘•™¥¹•(€€€€€€€€€€€€ü(€€€€€€€€€€€Í­¥±°¹ÍÁ½ÍĞ(€€€€€€€€€€€€è(€€€€€€€€€€€Í­¥±°¹½ÍĞì(((€€€€€€€½¹ÍĞ•¹½Õ¡M@€ô(€€€€€€€€€€€…Ñ¥Ù•¡…É…Ñ•É=‰¨¹ÍÀøô(€€€€€€€€€€€ÍÁ½ÍĞì(((€€€€€€€½¹ÍĞ‰ÕÑÑ½¸€ô(€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€€€€€‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€¤ì(((€€€€€€€‰ÕÑÑ½¸¹±…ÍÍ9…µ”€ô(€€€€€€€€€€€€‰ÍÕˆµ‰ÕÑÑ½¸ˆì(((€€€€€€€¥˜ …•¹½Õ¡M@¥ì((€€€€€€€€€€€‰ÕÑÑ½¸¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€€€€€€€€€‰Í­¥±°µÍÀµ¥¹ÍÕ™™¥¥•¹Ğˆ(€€€€€€€€€€€€¤ì(((€€€€€€€€€€€‰ÕÑÑ½¸¹‘¥Í…‰±•õÑÉÕ”ì(((€€€€€€€€€€€‰ÕÑÑ½¸¹¥¹¹•É!Q50€ô((€€€€€€€€€€€€(€€€€€€€€€€€€ñ‘¥ØÍÑå±”ô‰‘¥ÍÁ±…äé™±•àí…±¥¸µ¥Ñ•µÌé•¹Ñ•Èí©ÕÍÑ¥™äµ½¹Ñ•¹ĞéÍÁ…”µ‰•Ñİ••¸í…ÀèÙÁàìˆø(€€€€€€€€€€€€€€€€ñÍÁ…¸ÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÕÁàí™½¹Ğµİ•¥¡Ğé‰½±ìˆø(€€€€€€€€€€€€€€€€€€€€‘íÍ­¥±°¹¹…µ•ô(€€€€€€€€€€€€€€€€€€€€‘ì(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±±1•Ù•°øÀ(€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€‰1Ø¸ˆ­Í­¥±±1•Ù•°(€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ñÍÁ…¸ÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÅÁàí½±½ÈèŒäÍŒÕ™íİ¡¥Ñ”µÍÁ…”é¹½İÉ…Àìˆø(€€€€€€€€€€€€€€€€€€€€‘í…Ñ¥Ù•¡…É…Ñ•É=‰¨¹ÍÁô¼‘íÍÁ½ÍÑôM@(€€€€€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÅÁàí½±½Èè™„Õ„Ôíµ…É¥¸µÑ½ÀèÉÁàìˆø(€€€€€€€€€€€€€€€MC’â7¢ÚÌ(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ì((€€€€€€€ô(€€€€€€€•±Í•ì((€€€€€€€€€€€½¹ÍĞ‘…µ…•AÉ•Ù¥•Ü€ô(€€€€€€€€€€€€€€€Í­¥±°¹‰…Í•…µ…”(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹–
+ß–ºÏÒˆ¬(€€€€€€€€€€€€€€€•ÑM­¥±±…µ…•Ñ1•Ù•° (€€€€€€€€€€€€€€€€€€€Í­¥±°°(€€€€€€€€€€€€€€€€€€€Í­¥±±1•Ù•±ñğÄ(€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€‹¾öpˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆì(((€€€€€€€€€€€‰ÕÑÑ½¸¹¥¹¹•É!Q50€ô((€€€€€€€€€€€€(€€€€€€€€€€€€ñ‘¥ØÍÑå±”ô‰‘¥ÍÁ±…äé™±•àí…±¥¸µ¥Ñ•µÌé•¹Ñ•Èí©ÕÍÑ¥™äµ½¹Ñ•¹ĞéÍÁ…”µ‰•Ñİ••¸í…ÀèÙÁàìˆø(€€€€€€€€€€€€€€€€ñÍÁ…¸ÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÕÁàí™½¹Ğµİ•¥¡Ğé‰½±ìˆø(€€€€€€€€€€€€€€€€€€€€‘íÍ­¥±°¹¹…µ•ô(€€€€€€€€€€€€€€€€€€€€‘ì(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±±1•Ù•°øÀ(€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€‰1Ø¸ˆ­Í­¥±±1•Ù•°(€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ñÍÁ…¸ÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÅÁàí½±½ÈèŒäÍŒÕ™íİ¡¥Ñ”µÍÁ…”é¹½İÉ…Àìˆø(€€€€€€€€€€€€€€€€€€€€‘íÍÁ½ÍÑôM@(€€€€€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÅÁàí½±½ÈèÅÕ‘ˆíµ…É¥¸µÑ½ÀèÉÁàìˆø(€€€€€€€€€€€€€€€€‘í‘…µ…•AÉ•Ù¥•İô‘íÍ­¥±°¹‘•ÍÉ¥ÁÑ¥½¹ô(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ì(((€€€€€€€€€€€‰ÕÑÑ½¸¹½¹±¥¬ô ¤ôùì(€€€€€€€€€€€€€€€ÁÉ•Á…É•Ñ¥½¸ (€€€€€€€€€€€€€€€€€€€Í­¥±°¹¥(€€€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€ôì((€€€€€€€ô(((€€€€€€€µ•¹Ô¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€‰ÕÑÑ½¸(€€€€€€€€¤ì((€€€ô¤ì(((€€€½¹ÍĞ‰…¬€ô(€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€‰‰ÕÑÑ½¸ˆ(€€€€€€€€¤ì(((€€€‰…¬¹±…ÍÍ9…µ”€ô(€€€€€€€€‰ÍÕˆµ‰ÕÑÑ½¸ˆì(((€€€‰…¬¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€‹¢şS–nxˆì(((€€€‰…¬¹½¹±¥¬€ô(€€€€€€€±½Í•5•¹ÕÌì(((€€€µ•¹Ô¹…ÁÁ•¹‘¡¥± (€€€€€€€‰…¬(€€€€¤ì(((€€€€ ‰µ…¥¹	…ÑÑ±•5•¹Ôˆ¤(€€€€€€€€¹ÍÑå±”¹‘¥ÍÁ±…ä€ô(€€€€€€€€‰¹½¹”ˆì(((€€€€ ‰¥Ñ•µ5•¹Ôˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹É•µ½Ù” ‰Í¡½Üˆ¤ì(((€€€€ ‰Í­¥±±5•¹Ôˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹…‘ ‰Í¡½Üˆ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ–ÆW¦Z/š*¢÷¦ã–Z»¾ò3¢N/’ö?š«&§–6 ¿–n{–B#¢Î¢¢(¼(€€€€€€ƒš"Ã¦²—Ò¦2¦
+’â–†+¾ò3¢ºO:§–ºÛ–r£š¾S¢ò–’Ÿj&#¦v‹’â((€€€€€€ƒš2Gš*¢÷¾ò3¦ã–º3š"[š2'¢şS–n{šr¢«–.WšRÛ–B (€€€€€€ƒ¾ò#šRÛ–B#¦
+?¢ò¿–r¡±½Í•5•¹ÕÌ §¾ò'(€€€€¨¼((€€€€ ‰Í­¥±±5•¹Ôˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹…‘ ‰•áÁ…¹‘•ˆ¤ì()ô(()™Õ¹Ñ¥½¸½Á•¹%Ñ•µ5•¹Ô ¥ì((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€€¼¨ƒš"Ã¦²—¢3–2šb¿6£®/¢š¢N/–Æ“¾ò3’â7–7R£¢"(•áÁ…¹‘•ƒ–æû’öW€¨¼(€€€½¹ÍĞÅÕ¥­	…Èô ‰Í­¥±±EÕ¥­	…Èˆ¤ì(€€€¥˜¡ÅÕ¥­	…È¥ì(€€€€€€€ÅÕ¥­	…È¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” ‰Í¡½Üˆ¤ì(€€€ô((€€€€ ‰Í­¥±±5•¹Ôˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹É•µ½Ù” ‰Í¡½Üˆ¤ì((€€€€ ‰Í­¥±±5•¹Ôˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹É•µ½Ù” ‰•áÁ…¹‘•ˆ¤ì((€€€‰…ÑÑ±•%Ñ•µ…Ñ•½Éäô‰Á½Ñ¥½¸ˆì(€€€É•¹‘•É	…ÑÑ±•%Ñ•µ5•¹Ô ¤ì((€€€€ ‰¥Ñ•µ5•¹Ôˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹…‘ ‰Í¡½Üˆ¤ì((€€€Íå¹QÕÉ¹Q¥µ•É]¥Ñ¡	…ÑÑ±•A¥­•ÉÌ ¤ì()ô(()™Õ¹Ñ¥½¸±½Í•5•¹ÕÌ ¥ì((€€€½¹ÍĞÅÕ¥­	…Èô(€€€€€€€€ ‰Í­¥±±EÕ¥­	…Èˆ¤ì((€€€¥˜¡ÅÕ¥­	…È¥ì(€€€€€€€ÅÕ¥­	…È¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€‰Í¡½Üˆ(€€€€€€€€¤ì(€€€ô((€€€€ ‰Í­¥±±5•¹Ôˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹É•µ½Ù” ‰Í¡½Üˆ¤ì((€€€€ ‰Í­¥±±5•¹Ôˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹É•µ½Ù” ‰•áÁ…¹‘•ˆ¤ì((€€€½¹ÍĞ¥Ñ•µ5•¹Ôô ‰¥Ñ•µ5•¹Ôˆ¤ì(€€€¥˜¡¥Ñ•µ5•¹Ô¥ì(€€€€€€€¥Ñ•µ5•¹Ô¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” ‰Í¡½Üˆ¤ì(€€€ô((€€€Íå¹QÕÉ¹Q¥µ•É]¥Ñ¡	…ÑÑ±•A¥­•ÉÌ ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ¢^—šÂĞ(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼((¼¨(€€ƒŠbƒšZÃ–Š{¾òk¦bËš›((€€ƒ¦ãšN¦bËš›j¢¦Ç¾ò3šr³–n{–B#’â7šRïšN+¾ò0(€€ƒ’öš:—’â/’úš«&§šRïšN+¦j;šº×–Â7¦g–/¢K¢&Ë¦ƒš"Cj–
+ß–ºÌ(€€ƒšr–7š&L×š*c¾ò#¢Ş¦bËš›–*ošâo–
+ßZ+–*ƒ¾ò3’â7šb¿–>[’î¾ò'(€€ƒšV#šzsš2ê3–"Ã¦g–/¢K¢&Ë¢«–ŞÇj’â/’â–n{–B#¦Z/–/
+ëš¶ˆ(€€ƒ¾ò!‰•¥¹¡…É…Ñ•ÉQÕÉ¸ §¢‡šršâš:'¦g–/š¢g¢¢c¾ò'((€€ƒ¢Ş}ÕÍ•A½Ñ¥½¸ §’âš¢’â7R£¦ãn»š¢g¾ò0(€€ƒ¦î{’â/–:ïnÓš:—RšV#ÖCšv¦g–/¢K¢&Ëj¢†3–.W(¨¼((¼¨(€€ƒŠbƒ’ş»š¶¾òh(€€ƒš*+3rš¶–~ß¢†3¦bËš›7j¦
+?¢ò¿š*÷š"C6£®/–÷–ò?¾ò0(€€ƒš&/–.Wš2'¦bËš›¦"W¾ò!ÕÍ••™•¹ §¾ò3šr'¦bË–FšªS’ö?¢«–.Wš¢‡–ò?’â/¢ª“¢ã¾ò$(€€ƒ¢Ş¢«–.Wš"Ã¦²—¢¢·–ºkš"C¦bËš›¾ò!…ÕÑ½Ñ¥½¸ §¢‡nÓš:—–Fó–>¯¾ò$(€€ƒ–§šŠw¢Ş¿–úG–ÇR£¦g–/š‚ã–ş¦
+?¢ò¿¾ò0(€€ƒ’â7šr–ë>û3¢«–.Wš¢‡–ò?¢ºûš"C¦bËš›–6ï¢Š¯¦bË–FšN/’ö?’â7RšV#7j–V?¦†3(¨¼((¼¨(€€ƒŠbƒ’ş»š¶¾ò#rjš*O–"Ã’â–-‰ÕŸ¾ò'¾òh(€€Á±…å•ÈËj¢«–.WšRïšN(¿š*¢÷¾ò!Á±…å•ÈÉ9½Éµ…±ÑÑ…¯(€€…ÍÑA±…å•ÈÉM­¥±³¾ò'¦÷’â7šr¢«–ŞÇ–Fó–>¬(€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ §ŠSŠSRÅ‰•¥¹¡…É…Ñ•ÉQÕÉ¸ ¤(€€ƒj¢«–.W–"šÒû¦
+?¢ò¿ÖÇ’â–r£–’[¦v‹–Fó–>¯’âš²‡((€€ƒ–ššzs¦g¢‡j¦bËš›’æ–r£–Ÿ¦£–Fó–>­™¥¹¥Í¡A±…å•ÉÑ¥½¸ §¾ò0(€€ƒ–’[¦v‹¦
+–/3–Fó–>¯–º1Á±…å•ÈÉÕÑ½Ñ¥½¸ ¤(€€ƒ’æ/–ú3–7–Fó–>¯’âš²…™¥¹¥Í¡A±…å•ÉÑ¥½¸ §7j¦
+?¢ò¼(€€ƒšr¢º+š"C–Fó–>¯–§š²‡¾ò3–Â;¢Ó¢†3–.W¦‚–ê?¢Š¯¢ŞÏ¢f(€€ƒ¢K¢&ËÒ‹–òW¦2¿’ê((€€ƒš&’î—š.š"C–§–Æ“¾òh(€€Í•Ñ•™•¹‘¥¹MÑ…Ñ” §–>«¢Êƒ¢Ê³3¢¢·–ºk¦bËš›.š,¯¢¢c¦27¾ò0(€€ƒ’â7º‡¦Ë’â7¦Ë–ê›¾òl(€€…ÁÁ±å•™•¹‘™™•Ğ §šb¿Ö›3šr¢«–ŞÇ¢Êƒ¢Ê³ÖCšv¢†3–.W4(€€ƒj–Fó–>¯¢R£¾ò#š&/–.W¦bËš›Á±…å•ÈÇ¢«–.W¦bËš›¾ò'¾ò0(€€ƒ–Ÿ¦£š&7–Fó–>­™¥¹¥Í¡A±…å•ÉÑ¥½¸ §(€€Á±…å•ÈÉÕÑ½Ñ¥½¸ §j¦bËš›–"šR¿–&nÓš:—–Fó–>¬(€€Í•Ñ•™•¹‘¥¹MÑ…Ñ” §¾ò3¢ºO–’[–Æ“ÖÇ’â–Fó–>¬(€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ §¾ò3Ú·š2¢Ş–Û’îYÁ±…å•ÈÈ(€€ƒ¢«–.W¢†3–.W¢Ş¿–úG’â¢Ój–Fó–>¯šZç–ò?(¨¼()™Õ¹Ñ¥½¸Í•Ñ•™•¹‘¥¹MÑ…Ñ”¡¡…É…Ñ•É%¹‘•à¥ì(€€€½¹ÍĞ…Ñ¥Ù•¡…É…Ñ•Èô(€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¡…É…Ñ•É%¹‘•à¤ì(((€€€¥˜ ……Ñ¥Ù•¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€…Ñ¥Ù•¡…É…Ñ•È¹¥Í•™•¹‘¥¹œô(€€€€€€€ÑÉÕ”ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€€€€€ƒ¦g¢‡–:šr³šr¦†7–’[–6Ã’â¢†33šNë–ë¦bËš›–ÿš/¾ò0(€€€€€€ƒšr³–n{–B#–>_–"Ãj–
+ß–ºÏšâo–6+7¾ò0(€€€€€€ƒ’öÿR£¢¢šë–ú_šÊK–ş¢šŠSŠS¦bËš›šr'šÊKšr'RšV#¾ò0(€€€€€€ƒš'¢¦ËnÓš:—–>7šbƒ–r£3¢Š¯šRïšN+šfj¦
+’â¢†37¾ò0(€€€€€€ƒš¢g¢¢ï3¾ò#¦bËš›.š/–
+ß–ºÏšâo–6+¾ò'7–ÂÇ–’ƒ’ê¾ò0(€€€€€€ƒ’â7¦r¢š–>›–’[–’k’â¢†3’ê/–#–º–F+j¢¢+š¿(€€€€€€ƒ¦g¢‡š.ÿš:'¦g¢†1±½Ÿ¾ò3šV#šzsšr³¢ê¬(€€€€€€ƒ¾ò!¥Í•™•¹‘¥¹œõÑÉÕ—¾ò'¦
+šb¿Ÿ–âã––_R£(€€€€¨¼((€€€ÕÁ‘…Ñ•U$ ¤ì()ô(()™Õ¹Ñ¥½¸…ÁÁ±å•™•¹‘™™•Ğ¡¡…É…Ñ•É%¹‘•à¥ì((€€€Í•Ñ•™•¹‘¥¹MÑ…Ñ” (€€€€€€€¡…É…Ñ•É%¹‘•à(€€€€¤ì(((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô(()™Õ¹Ñ¥½¸ÕÍ••™•¹ ¥ì(€€€½¹ÍĞ…ÕÑ½=¸ô(€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•àôôôÀ(€€€€€€€€ü…ÕÑ½	…ÑÑ±”(€€€€€€€€è•ÑA…ÉÑåÕÑ½½¹™¥œ¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤¹•¹…‰±•ì((€€€½¹ÍĞ…Ñ¥Ù•¡…É…Ñ•Èô(€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤ì(((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€…ÕÑ½=¸ñğ(€€€€€€€…Ñ¥½¹I•…‘äñğ(€€€€€€€€……Ñ¥Ù•¡…É…Ñ•Èñğ(€€€€€€€…Ñ¥Ù•¡…É…Ñ•È¹¡ÀğôÀ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rjš*O–"Ã–§–-‰ÕŸ¾ò'¾òh((€€€€€€€Ä¸ƒ¦g¢‡–:šr³–>«3šª‹š~—5…Ñ¥½¹I•…‘ç¾ò0(€€€€€€€€€ƒ–ú{’úšÊKšr'3¢¢·–ºk5…Ñ¥½¹I•…‘äõÑÉÕ—¾ò0(€€€€€€€€€ƒ¶'šZó¦g¦O¦bË–F–ö‹–B3¢fo¢¢·ŠSŠP(€€€€€€€€€ƒš&/š2š2'–ş¯’â¦î{¾ò3²³’ê3š²‡¦î{šN+šr–r (€€€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ §rš¶š*+.š/¦:[’ö?’æ/–&4(€€€€€€€€€ƒ–ÂÇ–#¦^[¦^sš"C–*¾ò3–Â;¢Ó–B3’â–/¢K¢&Ëj¢†3–.T(€€€€€€€€€ƒ¢Š¯–º–F+–§š²‡¦Ë–ê›¢Š¯š:£¦Ë–§š²‡¾ò0(€€€€€€€€€ƒ–ú3¦v‹j¢K¢&È¿š«&§j–~ß¢†3¦‚–ê?–ÂÇšVÓ–/¦2¿’ê¾ò0(€€€€€€€€€ƒ¦gš¶šb¿3š«&§šRïšN+–§š²‡7¢3–ú3jrš¶–:–nƒ((€€€€€€€È¸ƒ¢K¢&Ë–ŞËÚOš¶ï’ê‡¾ò!!@ğôÃ¾ò'¦
+šb¿¢÷š2'¦bËš›¾ò0(€€€€€€€€€ƒ¦g¢‡’æ’â’ö×¢s’â+¦bË–F((€€€€€€ƒ¦g¢‡–r£rš¶RšV#’æ/–&7®/–"ï¦:[’ö=…Ñ¥½¹I•…‘ç¾ò0(€€€€€€ƒ²³’ê3š²‡¦î{šN+šrnÓš:—¢Š¯’â+¦v‹¦
+¦MÕ…É“šN/’â/’ú(€€€€¨¼((€€€…Ñ¥½¹I•…‘äõÑÉÕ”ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#¦7¢š¾ò3’úwŸ’öÿR£¢šb;Šëš2š¶¾ò'¾òh(€€€€€€ƒ¦bËš›’æ/–&7šb¿3š2'’ê–ÂÇ®/–"ïRšV#7¾ò0(€€€€€€ƒ¢ŞÏ¦;–º–F(¿ÖCº_šÖ¢/(€€€€€€ƒ>û–r£šRçš"C¢Ş–Û’î[¢†3–.W’âš¢–#–º–F+(€€€€€€ƒ¶'ÖCº_¦j;šº×ŸšV?š6ß¦‚–ê?š&7rš¶RšV#ŠSŠP(€€€€€€ƒ¦n[Û¦bËš›šr³¢ê¯3’şw¢¶ßjšb¿š:—’â/’ú–>_–"Ãj–
+ß–ºÏ7¾ò0(€€€€€€ƒ’â7–’«–>_¦‚–ê?–öÇ¦~ÿ¾ò3’ö:§–ºÛšb;Šë¢ššÆ(€€€€€€ƒ3š&šr'¢†3–.W¦÷¢š¦×–ú«–B3’â––_–º–F(¿ÖCº_š¦–"Û7¾ò0(€€€€€€ƒ’â7¢ššr'¦bËš›¦g¢»&ç’ú/¾ò3¦g¢‡–ÂÇŸ–k(€€€€¨¼((€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹Íl(€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à(€€€tõì((€€€€€€€…Ñ¥½¸è‰‘•™•¹ˆ°((€€€€€€€Ñ…É•Ğé¹Õ±°((€€€ôì(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô(()™Õ¹Ñ¥½¸ÕÍ•A½Ñ¥½¸¡Á½Ñ¥½¹%¥ì((€€€€¼¨(€€€€€€XäÇ¾òkš"Ã¦²—–º–F+nÓš:—¢¢c’ö?3–N«’âNÛ7¢^—šÂÓ¾ò0(€€€€€€ƒ’â7–7–>«¢¢`¡À½ÍÀƒ¦†{–z/rš¶š&¢3–2šVã¦?¢"(€€€€€€ƒfû–"š¾Sš‹–ú§’î7Vg–r£šV?š6ßš:K–ê?–ú3jÖCº_¦j;šº×(€€€€¨¼((€€€½¹ÍĞ‘•™¥¹¥Ñ¥½¸õ•ÑA½Ñ¥½¹•™¥¹¥Ñ¥½¸¡Á½Ñ¥½¹%¤ì((€€€¥˜ …‘•™¥¹¥Ñ¥½¸¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞ…ÕÑ½=¸ô(€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•àôôôÀ(€€€€€€€€ü…ÕÑ½	…ÑÑ±”(€€€€€€€€è•ÑA…ÉÑåÕÑ½½¹™¥œ¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤¹•¹…‰±•ì((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€…ÕÑ½=¸ñğ(€€€€€€€…Ñ¥½¹I•…‘ä(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞ…Ñ¥Ù•¡…É…Ñ•Èô(€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤ì((€€€¥˜ (€€€€€€€€……Ñ¥Ù•¡…É…Ñ•Èñğ(€€€€€€€…Ñ¥Ù•¡…É…Ñ•È¹¡ÀğôÀ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜¡•ÑA½Ñ¥½¹½Õ¹Ğ¡Á½Ñ¥½¹%¤ğôÀ¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€‘•™¥¹¥Ñ¥½¸¹¹…µ”¬(€€€€€€€€€€€€‹n»–&7šÊKšr'–ê¯–¶cˆ(€€€€€€€€¤ì(€€€€€€€É•¹‘•É	…ÑÑ±•A½Ñ¥½¹5•¹Ô ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÍÑ…ÑÌô(€€€€€€€•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤ì((€€€¥˜ (€€€€€€€‘•™¥¹¥Ñ¥½¸¹É•Í½ÕÉ”ôôô‰¡Àˆ€˜˜(€€€€€€€…Ñ¥Ù•¡…É…Ñ•È¹¡ÀøõÍÑ…ÑÌ¹µ…á!@(€€€€¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ ‰!C–ŞËÚOšb¿šîÿjˆ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜ (€€€€€€€‘•™¥¹¥Ñ¥½¸¹É•Í½ÕÉ”ôôô‰ÍÀˆ€˜˜(€€€€€€€…Ñ¥Ù•¡…É…Ñ•È¹ÍÀøõÍÑ…ÑÌ¹µ…áM@(€€€€¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ ‰MC–ŞËÚOšb¿šîÿjˆ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€…Ñ¥½¹I•…‘äõÑÉÕ”ì((€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹Íl(€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à(€€€tõì(€€€€€€€…Ñ¥½¸è‰Á½Ñ¥½¸ˆ°(€€€€€€€Á½Ñ¥½¹%éÁ½Ñ¥½¹%°(€€€€€€€Ñ…É•Ğé¹Õ±°(€€€ôì((€€€±½Í•5•¹ÕÌ ¤ì(€€€ÕÁ‘…Ñ•U$ ¤ì(€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì)ô(()™Õ¹Ñ¥½¸…ÁÁ±åA½Ñ¥½¹™™•Ğ¡Á½Ñ¥½¹%±¡…É…Ñ•É%¹‘•à¥ì((€€€½¹ÍĞ‘•™¥¹¥Ñ¥½¸õ•ÑA½Ñ¥½¹•™¥¹¥Ñ¥½¸¡Á½Ñ¥½¹%¤ì((€€€¥˜ …‘•™¥¹¥Ñ¥½¸¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ ‹š&û’â7–"Ã¦g–/¢^—šÂÓ¢ÎšZgˆ¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞ…Ñ¥Ù•¡…É…Ñ•Èô(€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¡…É…Ñ•É%¹‘•à¤ì((€€€¥˜ ……Ñ¥Ù•¡…É…Ñ•È¥ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÍÑ…ÑÌô(€€€€€€€•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ¡¡…É…Ñ•É%¹‘•à¤ì((€€€½¹ÍĞµ…áY…±Õ”ô(€€€€€€€‘•™¥¹¥Ñ¥½¸¹É•Í½ÕÉ”ôôô‰¡Àˆ(€€€€€€€€üÍÑ…ÑÌ¹µ…á!@(€€€€€€€€èÍÑ…ÑÌ¹µ…áM@ì((€€€½¹ÍĞÕÉÉ•¹ÑY…±Õ”ô(€€€€€€€‘•™¥¹¥Ñ¥½¸¹É•Í½ÕÉ”ôôô‰¡Àˆ(€€€€€€€€ü…Ñ¥Ù•¡…É…Ñ•È¹¡À(€€€€€€€€è…Ñ¥Ù•¡…É…Ñ•È¹ÍÀì((€€€¥˜¡ÕÉÉ•¹ÑY…±Õ”øõµ…áY…±Õ”¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€¡‘•™¥¹¥Ñ¥½¸¹É•Í½ÕÉ”ôôô‰¡Àˆ€ü€‰!@ˆ€è€‰M@ˆ¤¬(€€€€€€€€€€€€‹–ŞËÚOšb¿šîÿjˆ(€€€€€€€€¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜¡•ÑA½Ñ¥½¹½Õ¹Ğ¡Á½Ñ¥½¹%¤ğôÀ¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€‘•™¥¹¥Ñ¥½¸¹¹…µ”¬(€€€€€€€€€€€€‹n»–&7šÊKšr'–ê¯–¶cˆ(€€€€€€€€¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€±•ĞÁ±…¹¹•‘I•½Ù•Éäì((€€€¥˜¡‘•™¥¹¥Ñ¥½¸¹É•½Ù•ÉåA•É•¹ĞøôÄÀÀ¥ì(€€€€€€€Á±…¹¹•‘I•½Ù•Éäõµ…áY…±Õ”µÕÉÉ•¹ÑY…±Õ”ì(€€€õ•±Í•ì(€€€€€€€Á±…¹¹•‘I•½Ù•Éäõ5…Ñ ¹µ…à (€€€€€€€€€€€€Ä°(€€€€€€€€€€€5…Ñ ¹É½Õ¹ (€€€€€€€€€€€€€€€µ…áY…±Õ”¨(€€€€€€€€€€€€€€€‘•™¥¹¥Ñ¥½¸¹É•½Ù•ÉåA•É•¹Ğ¼(€€€€€€€€€€€€€€€€ÄÀÀ(€€€€€€€€€€€€¤(€€€€€€€€¤ì(€€€ô((€€€½¹ÍĞÉ•½Ù•É•õ5…Ñ ¹µ…à (€€€€€€€€À°(€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€µ…áY…±Õ”µÕÉÉ•¹ÑY…±Õ”°(€€€€€€€€€€€Á±…¹¹•‘I•½Ù•Éä(€€€€€€€€¤(€€€€¤ì((€€€¥˜¡É•½Ù•É•ğôÀ¥ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜ …½¹ÍÕµ•A½Ñ¥½¹É½µ%¹Ù•¹Ñ½Éä¡Á½Ñ¥½¹%°Ä¤¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€‘•™¥¹¥Ñ¥½¸¹¹…µ”¬(€€€€€€€€€€€€‹š&¦f“–’ÇšV_ˆ(€€€€€€€€¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜¡‘•™¥¹¥Ñ¥½¸¹É•Í½ÕÉ”ôôô‰¡Àˆ¥ì(€€€€€€€…Ñ¥Ù•¡…É…Ñ•È¹¡Àõ5…Ñ ¹µ¥¸ (€€€€€€€€€€€ÍÑ…ÑÌ¹µ…á!@°(€€€€€€€€€€€…Ñ¥Ù•¡…É…Ñ•È¹¡À­É•½Ù•É•(€€€€€€€€¤ì((€€€€€€€Í¡½İA±…å•É!¥Ğ (€€€€€€€€€€€É•½Ù•É•°(€€€€€€€€€€€€‰¡•…°ˆ°(€€€€€€€€€€€¡…É…Ñ•É%¹‘•à°(€€€€€€€€€€€ÑÉÕ”(€€€€€€€€¤ì(€€€õ•±Í•ì(€€€€€€€…Ñ¥Ù•¡…É…Ñ•È¹ÍÀõ5…Ñ ¹µ¥¸ (€€€€€€€€€€€ÍÑ…ÑÌ¹µ…áM@°(€€€€€€€€€€€…Ñ¥Ù•¡…É…Ñ•È¹ÍÀ­É•½Ù•É•(€€€€€€€€¤ì((€€€€€€€Í¡½İA±…å•É!¥Ğ (€€€€€€€€€€€É•½Ù•É•°(€€€€€€€€€€€€‰ÍÀˆ°(€€€€€€€€€€€¡…É…Ñ•É%¹‘•à°(€€€€€€€€€€€ÑÉÕ”(€€€€€€€€¤ì(€€€ô((€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€¡…Ñ¥Ù•¡…É…Ñ•È¹¥‘ñğ‹’ö€ˆ¤¬(€€€€€€€€‹’öÿR ˆ¬(€€€€€€€‘•™¥¹¥Ñ¥½¸¹¹…µ”¬(€€€€€€€€‹¾ò3š‹–ú¤ˆ¬(€€€€€€€É•½Ù•É•¬(€€€€€€€€ˆ€ˆ¬(€€€€€€€‘•™¥¹¥Ñ¥½¸¹É•Í½ÕÉ”¹Ñ½UÁÁ•É…Í” ¤¬(€€€€€€€€‹ˆ(€€€€¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì(€€€Í…Ù•…µ” ¤ì(€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì)ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ¢«–.Wš"Ã¦²”(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸Ñ½±•ÕÑ½	…ÑÑ±” ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¢ºO–Ş‡¦
+?¦‚¦v‹j(€€€€€€ƒ¢«–.Wš"Ã¦²—š2'¦"W’æ¢÷R£¾ò'¾òh(€€€€€€ƒ–:šr³¦g¢‡¦Z/¦‚·–ÂÇšb¿3’â7–r£š"Ã¦²—’â·–ÂÇnÓš:”(€€€€€€É•ÑÕÉ»7¾ò3–Â;¢Ó–r£–rÃ–r[¾ò?–Ş‡¦
+?¦‚¦v‹š2'¦g¦†(€€€€€€ƒš2'¦"W–º3–£šÊKšr'’îï’öW–>7š'ŠSŠS’ö:§–ºÛšršÏ–r (€€€€€€ƒš"Ã¦²—’æ/–’[¾ò3–#š*+3’â/’â–‚Óš"Ã¦²—¢š’â7¢š¢«–.W4(€€€€€€ƒ¦g–/–?––÷¢¢·–ºk––÷¾ò3’â7¦r¢šrj’êë–r£š"Ã¦²—¢„(€€€€€€ƒš&7¢÷¢ªÿšVÓ((€€€€€€ƒš.ÿš:'¦g–/¦Z/¦‚·jšN/švÿ’æ/–ú3¾ò3’â/¦v‹j¦
+?¢ò¼(€€€€€€ƒ¾ò#šRå…ÕÑ½	…ÑÑ±—–B3š¶•…ÕÑ½½¹™¥œ¹•¹…‰±•“¾ò<(€€€€€€…ÕÑ½½¹™¥œÈ¹•¹…‰±•“šnÓšZÃš2'¦"WšZ–¶_(€€€€€€ƒ–¾¯’â¢†3š"Ã¦²—Ò¦2¾ò'–r£’â7–r£š"Ã¦²—’â·–~ß¢†3¦÷šb¼(€€€€€€ƒ–º'–£jŠSŠQ…ÕÑ½½¹™¥œ¹•¹…‰±•“šr³’ú–ÂÇšb¼(€€€€€€ƒ3’â/’â–‚Óš"Ã¦²—¢ššÊÿR£j¢¢·–ºk7¾ò1ÍÑ…ÉÑ	…ÑÑ±” ¤(€€€€€€ƒ¦Z/šZÃš"Ã¦²—šfšr¢«–ŞÇ¢º¦g–/–ó¾ò3š&’î—–r£š"Ã¦²—–’X(€€€€€€ƒ¢ªÿšVÓ¾ò3šV#šzs–ÂÇšb¿3–#¢¢·–ºk––÷¾ò3’â/’â–‚Ó¢«–.WRšV#7¾ò0(€€€€€€ƒ¢Ş–:šr³¢¢·¢¢#jR£¦S–º3–£’â¢Ó(€€€€€€ƒšr’â/¦v‹¦
+šº×3–º–F+¦j;šº×–º'–£š:—š&/7j¦
+?¢ò¼(€€€€€€ƒšr³¢ê¯šr%‰…ÑÑ±•A¡…Í—¾ò=‰…ÑÑ±•Ñ¥Ù—¦ng¦7šª‹š~—¾ò0(€€€€€€ƒ’â7–r£š"Ã¦²—’â·–~ß¢†3’æ’â7šršr'’îï’öW–&¿’ösR£(€€€€¨¼((€€€…ÕÑ½	…ÑÑ±”€ô(€€€€€€€€……ÕÑ½	…ÑÑ±”ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€€€€€ƒ–"š>o¢«–.Wš"Ã¦²—jVÛ’â/¾ò3®/–"ï¦7šZÃ–"“šZÜ(€€€€€€ƒ–n{–B#¢Î¢¢+–"_¾ò?š"Ã¦²—š2’î“š2'¦"W¢š’â7¢š¦†¿’ëŠSŠP(€€€€€€ƒš&O¦Z/¢«–.Wš"Ã¦²—šfš'¢¦Ë¦š³’â+¢^?¢Öß’ú¾ò#’â7R (€€€€€€ƒ¶'–"Ã’â/’âš²…‘•±…É”½É•Í½±Ù—–"š>oš&7RšV#¾ò'¾ò0(€€€€€€ƒ¦^sš:'š‹–ú§š&/–.Wšf¾ò3–ššzs>û–r£–&o––÷šb¿–º–F((€€€€€€ƒ¦j;šº×¢ò«–"Ã:§–ºÛ¢«–ŞÇ¦ã¾ò3’æ¢š®/–"ï¦†¿’è(€€€€€€ƒ–ë’ú¾ò3’â7¢÷¢ºO:§–ºÛ–Â7¢F_¢^?¢Öß’újš2'¦"T(€€€€€€ƒ’â7~—¦O¢š¦î{–N«¢‡(€€€€¨¼((€€€ÕÁ‘…Ñ•Ñ¥½¹!Õ‘Y¥Í¥‰¥±¥Ñä ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦g¢‡–>«šRç’êšr³–‚Óš"Ã¦²—R£j…ÕÑ½	…ÑÑ±—¾ò0(€€€€€€ƒšÊKšr'–B3š¶—–nx…ÕÑ½½¹™¥œ¹•¹…‰±•“¾ò0(€€€€€€ƒ–Â;¢Ó’â/’â–‚Óš"Ã¦²—¦Z/–/šf(€€€€€€ÍÑ…ÉÑ	…ÑÑ±” ¤ƒšrR£’âï–~;¢¢·–ºkj(€€€€€€…ÕÑ½½¹™¥œ¹•¹…‰±•ƒ¦7šZÃ¢š¢N/¾ò0(€€€€€€ƒ–ššzs:§–ºÛšÊKšr'–>›–’[–:ï’âï–~;–.û¦ã¾ò0(€€€€€€ƒ²³’ê3–‚Ó–ÂÇšr¢º+–n{š&/–.W¾ò3r/¢Öß’ú–?3¢«–.Wš"Ã¦²—–’ÇšV#7(€€€€€€ƒ¦g¢‡–B3š¶—šnÓšZÃ¢¢·–ºk¾ò3’â›’âS¦‚’úÿ–B3š¶”(€€€€€€ƒ’âï–~;¦
+–-¡•­‰½ãjV¯¦v‹¾ò0(€€€€€€ƒ¦gš¢–"š>o’âš²‡’æ/–ú3’æ/–ú3š¾?’â–‚Ó¦÷šršÊÿR£(€€€€¨¼((€€€…ÕÑ½½¹™¥œ¹•¹…‰±•€ô(€€€€€€€…ÕÑ½	…ÑÑ±”ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rjš*O–"Ã’â–-‰ÕŸ¾ò'¾òh(€€€€€€ƒ¦g¢‡–:šr³–º3–£šÊKšr'–.W–"Á…ÕÑ½½¹™¥œÈ¹•¹…‰±•“¾ò0(€€€€€€ƒ¶'šZó¦g¦†–ÇR£j3–V–.T¿–sš¶‹7š2'¦"T(€€€€€€ƒšÂã¦ƒ–>«š:Ÿ–"Û²³’â¢K¢&Ë¾ò0(€€€€€€ƒ²³’ê3¢K¢&Ëj¢«–.Wš"Ã¦²—¦Z/¦^s–ú{¦‚·–"Ã–ÂûšÊK¢Š¯ŠÃ¦;¾ò0(€€€€€€ƒ’ânÓÚ·š2–r£¦‚C¢¢·j¦^s¦Z'.š/ŠSŠP(€€€€€€ƒ¦gš¶šb¿3–>«šr'¦vK–Š£švÇjšr¢«–.W¾ò3¦vKšÂÓ’â7šr4(€€€€€€ƒjrš¶–:–nƒ((€€€€€€ƒ>û–r£–>«šr'’â¦†–ÇR£š2'¦"W¾ò3šÊKšr'–>›–’[j(€€€€€€Á•Èµ¡…É…Ñ•Ë¦Z/¦^s–>¿’î—–"–"—š2'¾ò0(€€€€€€ƒ–B#Bj¢†3
+ëš'¢¦Ëšb¿3’â¦6×¢ºOšVÓ¦j+¦÷¢«–.T¿¦÷š&/–.W7¾ò0(€€€€€€ƒš&’î—¦g¢‡¢ºO²³’ê3¢K¢&Ë¾ò#–ššzs–¶c–r£¾ò$(€€€€€€ƒ¢Ş¢F_²³’â¢K¢&Ëj.š/’â¢Öß–"š>o(€€€€¨¼((€€€¥˜¡Á±…å•ÈÈ¥ì((€€€€€€€…ÕÑ½½¹™¥œÈ¹•¹…‰±•ô(€€€€€€€€€€€…ÕÑ½	…ÑÑ±”ì((€€€ô((€€€¥˜¡Á±…å•ÈÌ¥ì((€€€€€€€…ÕÑ½½¹™¥œÌ¹•¹…‰±•ô(€€€€€€€€€€€…ÕÑ½	…ÑÑ±”ì((€€€ô(((€€€½¹ÍĞ¡½µ•¡•­‰½à€ô(€€€€€€€€ ‰…ÕÑ½¹…‰±•ˆ¤ì(((€€€¥˜¡¡½µ•¡•­‰½à¥ì((€€€€€€€¡½µ•¡•­‰½à¹¡•­•€ô(€€€€€€€€€€€…ÕÑ½	…ÑÑ±”ì((€€€ô(((€€€½¹ÍĞÁ±…å•ÈÉ¡•­‰½àô(€€€€€€€€ ‰…ÕÑ½¹…‰±•‘A±…å•ÈÈˆ¤ì(((€€€¥˜¡Á±…å•ÈÉ¡•­‰½à¥ì((€€€€€€€Á±…å•ÈÉ¡•­‰½à¹¡•­•ô(€€€€€€€€€€€…ÕÑ½	…ÑÑ±”ì((€€€ô(((€€€…Ñ¥½¹I•…‘äõ™…±Í”ì((€€€Á•¹‘¥¹Ñ¥½¸õ¹Õ±°ì((€€€¥˜¡…ÕÑ½	…ÑÑ±”¥ì(€€€€€€€±•…É	…ÑÑ±•Q…É•ÑM•±•Ñ¥½¹5½‘” ¤ì(€€€€€€€±•…ÉÑ¥Ù•¡…É…Ñ•É!¥¡±¥¡Ğ ¤ì(€€€ô(€€€•±Í”¥˜ (€€€€€€€‰…ÑÑ±•Ñ¥Ù”€˜˜(€€€€€€€‰…ÑÑ±•A¡…Í”ôôô‰‘•±…É”ˆ(€€€€¥ì(€€€€€€€€¼¨Xä×¾òk–ú{¢«–.W–"–n{š&/–.Wšf¾ò3’â7¦7šZÃ–V–.W–n{–B#(€€€€€€€€€€ƒ’â7šRä…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•ã¾òonÓš:—R£VÛ’â/rš¶Œ(€€€€€€€€€€ƒš¶–r£¶'–úšN7’ösj¢K¢&Ë¦†¿’ëÊ_¦îš†¢"š*¢÷–"_€¨¼(€€€€€€€±•…É	…ÑÑ±•Q…É•ÑM•±•Ñ¥½¹5½‘” ¤ì(€€€€€€€ÕÁ‘…Ñ•Ñ¥Ù•¡…É…Ñ•É!¥¡±¥¡Ğ ¤ì(€€€€€€€Á½ÁÕ±…Ñ•M­¥±±EÕ¥­	…È ¤ì(€€€ô(((€€€ÕÁ‘…Ñ•ÕÑ½	ÕÑÑ½¸ ¤ì(((€€€…‘‘	…ÑÑ±•1½œ ((€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€€€€€ü(€€€€€€€€‹¢«–.Wš"Ã¦²—¦Z/–/¾ò#’â/’â–‚Ó’æšršÊÿR£š¶“¢¢·–ºk¾ò'ˆ(€€€€€€€€è(€€€€€€€€‹Š>äƒ–ŞË–sš¶‹¢«–.Wš"Ã¦²—ˆ((€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rjš*O–"Ã’ê¾ò3¦gš²‡j¦f“¦2¿¢¢+š¼(€€€€€€ƒnÓš:—š*+–š&/š*O–ë’ú’ê¾ò'¾òh((€€€€€€ƒ¦g¢‡–:šr³3¦7šZÃ–V–.W¢«–.Wš"Ã¦²—šf¾ò0(€€€€€€€ĞÀÁµÏ–ú3–òß–"Û–Fó–>¯’âš²……ÕÑ½Ñ¥½¸ §7¾ò0(€€€€€€ƒšb¿–ú#š^§’æ/–&7
+ë’ê¢šÆë3¢«–.Wš"Ã¦²—–6‡’ö?4(€€€€€€ƒVg’â/jš²+–ºs’æ/¢¢#ŠSŠS’ö…ÕÑ½Ñ¥½¸ ¤(€€€€€€ƒšb¿3²³’â¢K¢&Ë–º–F+¦j;šº×7–Â#R£j–÷–ò?¾ò0(€€€€€€ƒ¦g¢‡–º3–£šÊKšr'šª‹š~—VÛ’â/¾òh(€€€€€€€´ƒ>û–r£šb¿–º–F+¦j;šº×¦
+šb¿ÖCº_¦j;šºÔ(€€€€€€€€ƒ¾ò!‰…ÑÑ±•A¡…Í—¾ò$(€€€€€€€´ƒ>û–r£rj¢ò«–"Ã²³’â¢K¢&Ë–º–F+–^8(€€€€€€€€ƒ¾ò!…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•ã¾ò$(€€€€€€€´ƒ¢«ÛjšÖ¢/šr³¢ê¯šb¿’â7šb¿š‚çšr³šÊK–6‡’ö?¾ò0(€€€€€€€€ƒ–>«šb¿:§–ºÛ¢«–ŞÇš&/f‹š2'’ê–sš¶ˆ¿–V–.T((€€€€€€ƒ–>«¢š:§–ºÛ–r£–º–F+¦j;šº×’ö¢ò«–"Ã3šâšÂÓš"Ã4(€€€€€€ƒ–º–F+šfš2'’ê–sš¶‹–>#–V–.W¾ò0ĞÀÁµÏ–ú3¦gšºÔ(€€€€€€ƒšr’â7º‡’â'’â’ê3–6’ânÓš:—–Fó–>­…ÕÑ½Ñ¥½¸ ¤(€€€€€€ƒ¾ò#–æ¯²³’â¢K¢&Ë–º–F+’âš²‡’â›–Fó–>¯’âš²„(€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ §¾ò'¾ò3¶'šZó–r (€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•ã¦
+šÊKrš¶Œ(€€€€€€ƒ¢ò«–"Ã²³’â¢K¢&ËjššÎ’â/¾ò3†³šb¿š*+–º–ú–&4(€€€€€€ƒ–’kš:£’ê’âš¶—ŠSŠS¦gš¶šb¿3–º–F+¦j;šº×¢:¯–B7–Û–šd(€€€€€€ƒ–’k–ë’âš²…™¥¹¥Í¡A±…å•ÉÑ¥½¸ §(€€€€€€ƒšâšÂÓš"Ãj–º–F+¢Š¯¢ŞÏ¦;ÅÕ•Õ•“¢º+¦ë4(€€€€€€ƒjrš¶–:–nƒ–ššzs–&o––÷fóR–r£ÖCº_¦j;šº×¾ò0(€€€€€€ƒ’âš¢šr¢ºM¥¹¥Ñ¥…Ñ¥Ù•%¹‘•ã¢Š¯–’kš:£’âš¶—¾ò0(€€€€€€ƒ¢ŞÏ¦;¢¦Ë¢ò«–"Ãj’â/’â’ö7((€€€€€€ƒ>û–r£–ŞËÚOš*+3š&/–.T¿¢«–.Wš¢‡–ò?’â/¾ò1MC’â7¢ÚÏ(€€€€€€ƒ–Âkšr«–¶ãşK¶'–"šR¿šò?–Fó–>­™¥¹¥Í¡A±…å•ÉÑ¥½¸ §4(€€€€€€ƒ¦g’êorš¶šr¢ºOšÖ¢/–6‡š¶ïjšò?šÒ{¦÷¢s’â+’ê¾ò0(€€€€€€ƒš¶–âãššÎ’â/¢«Ûj–º–F(¿ÖCº_¦>#’â7šr–4(€€€€€€ƒ‡¢Ë–6‡’ö?¾ò3¦g–/3–’[¦£†³¢â‹’âš²‡7j(€€€€€€ƒš²+–ºs’æ/¢¢#–ŞËÚO’â7¦r¢š¢3’âSšb¿’âï–.Wj(€€€€€€ƒ–6Ç–ºÏ’úšêC¾ò3nÓš:—š.ÿš:'((€€€€€€ƒ–"š>o¢«–.Wš"Ã¦²—>û–r£–>«–Z»ÒSšRä(€€€€€€…ÕÑ½	…ÑÑ±”½…ÕÑ½½¹™¥Ÿ¦g’êo.š/š^_š¢g¾ò0(€€€€€€ƒ’â/’âš²…‰•¥¹¡…É…Ñ•ÉQÕÉ¸ §¢«Û–~ß¢†3–"À(€€€€€€ƒjšf–g¾ò3šr¢«–ŞÇ¢º–"ÃšZÃj…ÕÑ½=»–ó(€€€€€€ƒš¶Šë–"“šZß¢š’â7¢š¢«–.W–ëš&/((€€€€€€ƒŠbƒ’ö¾ò#’úwŸ’öÿR£¢–¾›šâ³–n{–‚Ç¾ò3¢s–n{’â–,(€€€€€€ƒ–B#B’ö¢š–k–Â7j¢†3
+ë¾ò'¾òh(€€€€€€ƒ–ššzs–"š>ojVÛ’â/¾ò3–&o––÷–6‡–r£3–º–F+¦j;šº×¾ò0(€€€€€€ƒš¶–r£¶'š~C–/¢K¢&Ëš&/–.W¢òã–—7¾ò#¦
+–/¢K¢&Ëj(€€€€€€€ÈÃK¢¢#šf–f£š¶–r£¢ŞG¾ò'¾ò3:§–ºÛš*+¢«–.Wš&O¦Z/¾ò0(€€€€€€ƒnÓ¢šëšršr–ú3¦g–/š¶–r£¶'š"Gj¢K¢&Ë¾ò0(€€€€€€ƒ>û–r£¦š³’â+¢«–.W–æ¯š"G¦ã7ŠSŠS’â7¢÷’î¦êó¦÷’â7–k¾ò0(€€€€€€ƒ’â7Û¢š–bo–>«¢÷¶$ÈÃK¦ûšf¢š–bo–ú_–#–k–º0(€€€€€€ƒ¦g¢ò«š&/–.W¦ãšN¾ò3¢«–.W¦Z/¦^sr/¢Öß’ú–?šÊK–>7š'((€€€€€€ƒ¦g¢‡¢Şš.ÿš:'j¢"+&#šr–’Ÿ–Ş»–"—¾òh(€€€€€€€Ä¸ƒ–>«š:—š&/3VÛ’â/š¶–r£¶'–ú’âS–&o¢Š¯–"š"@(€€€€€€€€€ƒ¢«–.W7j¦
+’â’ö7¾ò3’â7šr’â7–"¦vKÒjfô(€€€€€€€€€ƒšÂã¦ƒ–Fó–>­Á±…å•ÈÇj…ÕÑ½Ñ¥½¸ §(€€€€€€€È¸ƒ–~ß¢†3–&7R¡±½ÍÕÉ—¢¢c’ö?VÛ’â/j(€€€€€€€€€‰…ÑÑ±•Q½­•»‰…ÑÑ±•A¡…Í—(€€€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•ã¾ò0(€€€€€€€€€Í•ÑQ¥µ•½ÕÓrš¶–~ß¢†3j¦
+’â–"ï¾ò0(€€€€€€€€€ƒ’â'–/šŠw’îÛ¦÷¢š¦7šZÃš‚ã–Â7’âš²‡šÊKšr'¢º+¦8(€€€€€€€€€ƒ¾ò!Ñ½­•»šÊKš>ošZÃš"Ã¦²—¦
+šb¿–º–F+¦j;šº×(€€€€€€€€€ƒ¦
+šb¿–B3’â–/¢K¢&Ë–r£¶'¾ò'ŠSŠS–ššzs:§–ºØ(€€€€€€€€€ƒ–r£¦dĞÀÁµÏ–Ÿ¢«–ŞÇš&/–.W¦ã–º3’ê¾ò0(€€€€€€€€€ƒš"[šÖ¢/šr³’ú–ÂÇ¢«Ûæóê3–ú’â/¢ÖÃ’ê¾ò0(€€€€€€€€€ƒ¦g¢‡jš‚ã–Â7šr–’ÇšV_¾ò3nÓš:—’î¦êó¦÷’â7–k¾ò0(€€€€€€€€€ƒ’â7šrfóR3–ŞËÚOšr'’êë¦ã¦;’ê¾ò3¦g¢„(€€€€€€€€€ƒ–>#†³š>K’âš²‡7j¦7¢’š:£¦Ë(€€€€¨¼((€€€¥˜ (€€€€€€€…ÕÑ½	…ÑÑ±”€˜˜(€€€€€€€‰…ÑÑ±•A¡…Í”ôôô‰‘•±…É”ˆ(€€€€¥ì((€€€€€€€½¹ÍĞ•áÁ•Ñ•‘Q½­•¸ô(€€€€€€€€€€€‰…ÑÑ±•Q½­•¸ì((€€€€€€€½¹ÍĞ•áÁ•Ñ•‘¡…É…Ñ•É%¹‘•àô(€€€€€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•àì((€€€€€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€€€€€€€€€‰…ÑÑ±•Q½­•¸„ôô(€€€€€€€€€€€€€€€•áÁ•Ñ•‘Q½­•¸ñğ(€€€€€€€€€€€€€€€‰…ÑÑ±•A¡…Í”„ôô(€€€€€€€€€€€€€€€€‰‘•±…É”‰ñğ(€€€€€€€€€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à„ôô(€€€€€€€€€€€€€€€•áÁ•Ñ•‘¡…É…Ñ•É%¹‘•à(€€€€€€€€€€€€¥ì(€€€€€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€ô(((€€€€€€€€€€€ÑÉåì((€€€€€€€€€€€€€€€…ÕÑ½Ñ¥½¹½É¡…É…Ñ•È (€€€€€€€€€€€€€€€€€€€•áÁ•Ñ•‘¡…É…Ñ•É%¹‘•à°(€€€€€€€€€€€€€€€€€€€•áÁ•Ñ•‘Q½­•¸(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô(€€€€€€€€€€€…Ñ ¡•ÉÉ½È¥ì((€€€€€€€€€€€€€€€½¹Í½±”¹•ÉÉ½È (€€€€€€€€€€€€€€€€€€€€‹–"š>o¢«–.Wš"Ã¦²—šfš:—š&/–º–F+fóR’ú/–’[¾òhˆ°(€€€€€€€€€€€€€€€€€€€•ÉÉ½È(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô((€€€€€€€ô°ĞÀÀ¤ì((€€€ô()ô(()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•ÕÑ½	ÕÑÑ½¸ ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢š2–ºk&#¦v‹¾ò'¾òh(€€€€€€ƒ–V–.W’æ/–ú3š2'¦"WšZ–¶_šRçš"C3–sš¶‹7(€€€€€€ƒ–*ƒ’â)…Ñ¥Ù—jÒ¢&Ëš¢–ò?¾òl(€€€€€€ƒ–Ş›¦
++jš¢gÆ“šZ–¶_’æ¢š¢Ş¢F_š>oš"C3¢«–.Wš"Ã¦²—’â·7(€€€€¨¼((€€€½¹ÍĞ‰ÕÑÑ½¸ô(€€€€€€€€ ‰…ÕÑ½	…ÑÑ±•	ÕÑÑ½¸ˆ¤ì(((€€€¥˜¡‰ÕÑÑ½¸¥ì((€€€€€€€‰ÕÑÑ½¸¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹Š>äƒ–sš¶ˆˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‹ŠZØƒ–V–.Tˆì(((€€€€€€€‰ÕÑÑ½¸¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€‰…Ñ¥Ù”ˆ°(€€€€€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€€€€€¤ì((€€€ô(((€€€½¹ÍĞ±…‰•°ô(€€€€€€€€ ‰…ÕÑ½	…ÑÑ±•1…‰•°ˆ¤ì(((€€€¥˜¡±…‰•°¥ì((€€€€€€€±…‰•°¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹¢«–.Wš"Ã¦²—’â´ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‹¢«–.Wš"Ã¦²”ˆì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3–Ş‡¦
+?¦‚¦v‹j(€€€€€€ƒ¢«–.Wš"Ã¦²—¦v‹švÿ¾ò'¾òh(€€€€€€ƒ¢Ş’â+¦v‹–B3’â––_¦
+?¢ò¿¾ò3–B3š¶—šnÓšZÃ–Ş‡¦
+?¦‚¦vˆ(€€€€€€ƒ¦
+’î÷¢«–.Wš"Ã¦²—š2'¦"T¿š¢gÆ“¾ò3Šë’şw–§¦
+((€€€€€€ƒ¦†¿’ëj.š/šÂã¦ƒ’â¢Ó¾ò3’â7šr–ë>ûš"Ã¦²”(€€€€€€ƒ¦‚¦v‹¦†¿’ë3–sš¶‹7–Ş‡¦
+?¦‚¦v‹–6ï¦
+¦†¿’è(€€€€€€ƒ3–V–.W7¦g¢»’â7–B3š¶—jššÎ(€€€€¨¼((€€€½¹ÍĞµ…Á	ÕÑÑ½¸ô(€€€€€€€€ ‰µ…ÁÕÑ½	…ÑÑ±•	ÕÑÑ½¸ˆ¤ì(((€€€¥˜¡µ…Á	ÕÑÑ½¸¥ì((€€€€€€€µ…Á	ÕÑÑ½¸¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹Š>äƒ–sš¶ˆˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‹ŠZØƒ–V–.Tˆì(((€€€€€€€µ…Á	ÕÑÑ½¸¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€‰…Ñ¥Ù”ˆ°(€€€€€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€€€€€¤ì((€€€ô(((€€€½¹ÍĞµ…Á1…‰•°ô(€€€€€€€€ ‰µ…ÁÕÑ½	…ÑÑ±•1…‰•°ˆ¤ì(((€€€¥˜¡µ…Á1…‰•°¥ì((€€€€€€€µ…Á1…‰•°¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹¢«–.Wš"Ã¦²—’â´ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‹¢«–.Wš"Ã¦²”ˆì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33–Ş‡š«¦‚¦vˆ(€€€€€€ƒ–Ş›’â+¢KšZÃ–Š{–Â?š2'¦"W¾ò3¢«–.Wš"Ã¦²—–ş¯š6ß¦Z/–V|¼(€€€€€€ƒ–sš¶‹7¾ò'¾òh(€€€€€€ƒ¢Ş’â+¦v‹–§¦†š2'¦"W–B3’â––_¦
+?¢ò¿¾ò3–B3š¶—šnÓšZÀ(€€€€€€ƒ–Ş›’â+¢K¦g¦†–Â?–ş¯š6ß¦"W¾ò3Šë’şw’â'–/–rÃšZä(€€€€€€ƒ¾ò#š"Ã¦²—¦‚¦vˆ¿–rÃ–r[¢š¢N/–Æ¿–Ş›’â+¢K–ş¯š6ß¦"W¾ò$(€€€€€€ƒšÂã¦ƒ¦†¿’ë’â¢Ój.š/¦g¦†>û–r£šRçš"@(€€€€€€ƒÒS–r[’ë¦"W¾ò#¦Z,¿¦^s–B’â–ò×’â+–
+Ïj¥½»–r[¾ò'¾ò0(€€€€€€ƒ’â7–7šRûšZ–¶_¾ò3šRçR¡…Ñ¥Ù—¦g–-±…ÍÌ(€€€€€€ƒ–"š>o¢š¦†¿’ë–N«’â–ò×–r[¾ò#¢š-ML(€€€€€€€¹µ…ÀµÅÕ¥¬µÑ½±”µ‰Ñ¸€¹¥½¸µ½»¾ò<(€€€€€€€¹¥½¸µ½™›¾ò'¾ò3’â›¦f–âÙ…É¥„µ±…‰•³šZç’úü(€€€€€€ƒ‡¦js’g¦ZÇ¢º¾ò3’â7¢÷nÓš:—–¾­Ñ•áÑ½¹Ñ•¹Ğ(€€€€€€ƒ¾ò#¦
+š¢šrš*+¢‡¦v‹jñ¥µœû–¶C–ÒƒšVÓ–,(€€€€€€ƒšÒ_š:'¾ò3–r[’ëšršÚ#–’Ç¾ò'(€€€€¨¼((€€€½¹ÍĞÅÕ¥­	…ÑÑ±•	Ñ¸ô(€€€€€€€€ ‰ÅÕ¥­ÕÑ½	…ÑÑ±•Q½±”ˆ¤ì(((€€€¥˜¡ÅÕ¥­	…ÑÑ±•	Ñ¸¥ì((€€€€€€€ÅÕ¥­	…ÑÑ±•	Ñ¸¹Í•ÑÑÑÉ¥‰ÕÑ” (€€€€€€€€€€€€‰…É¥„µ±…‰•°ˆ°((€€€€€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹¢«–.Wš"Ã¦²—¾ò#¦Z/–V’â·¾ò$ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‹¢«–.Wš"Ã¦²—¾ò#¦^s¦Z'¾ò$ˆ(€€€€€€€€¤ì(((€€€€€€€ÅÕ¥­	…ÑÑ±•	Ñ¸¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€‰…Ñ¥Ù”ˆ°(€€€€€€€€€€€…ÕÑ½	…ÑÑ±”(€€€€€€€€¤ì((€€€ô()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾òk¢«–.Wš"Ã¦²—¢¦ÏÒÃ¢¢·–ºk¦v‹švÿ¾ò#–ÆW¦Z/&#¾ò'((€€½Á•¹ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì §¾òk–ÆW¦Z/¦v‹švÿ¾ò0(€€ƒ¦‚C¢¢·–#¦†¿’ë:§–ºØÇj¢¢·–ºk((€€Íİ¥Ñ¡ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•È §¾òk–"š>o¢K¢&Ëšf¾ò0(€€ƒ¦7šZÃ–†¯–—3¢«–.W¢†3–.W7’â/š.'¦ã–Z¸(€€ƒ¾ò#šf»¦kšRïšN(¿¦bËš˜¿¢¦Ë¢K¢&Ë¢w–
+gjš*¢÷¾ò'¾ò0(€€ƒ’â›¢ò'–—¢¦Ë¢K¢&Ën»–&7j!@”½M@”¿¢«–.W–n{–~;¢¢·–ºk((€€½¹™¥ÉµÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì §¾òkš*+¢†£–Z»’â+j–ğ(€€ƒ–¾¯–n{–Â7š'¢K¢&Ëj…ÕÑ½½¹™¥œ½…ÕÑ½½¹™¥œË¾ò3–¶cšªS¾ò3šRÛ¢Öß¦v‹švÿ((€€±½Í•ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì §¾òk’â7–Ë–¶c¾ò3nÓš:—šRÛ¢Öß¦v‹švÿ(¨¼((¼¨(€€ƒŠbƒšZÃ–Š{¾òk¢¢c’ö?¢«–.Wš"Ã¦²—¢¢·–ºk¦v‹švÿ–:šr°(€€ƒ¾ò#–r¡‰…ÑÑ±•A…—¢‡¾ò'j’ö7ö»¾ò1½Á•¹ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì ¤(€€ƒš*+–ºšj¯šfšB³–"Á‘½Õµ•¹Ğ¹‰½‘ç–êW’â/šf¢¢c¦2¾ò0(€€±½Í•ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì §¦^s¦Z'šf’úwŸ¦g–§–/–ğ(€€ƒšB³–n{–:’ö7(¨¼()±•Ğ…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±A…É•¹Ğô(€€€¹Õ±°ì()±•Ğ…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±9•áÑM¥‰±¥¹œô(€€€¹Õ±°ì(()™Õ¹Ñ¥½¸½Á•¹ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì ¥ì((€€€½¹ÍĞÁ…¹•°ô(€€€€€€€€ ‰…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹ÍA…¹•°ˆ¤ì(((€€€¥˜ …Á…¹•°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¢ºO–rÃ–r[¾ò?–Ş‡¦
+<(€€€€€€ƒ¦‚¦v‹j3¢¢·–ºk7š2'¦"W’æ¢÷R£¾ò'¾òh(€€€€€€ƒ¦g–/¦v‹švÿ–:šr³šb½‰…ÑÑ±•A…—–êW’â/j(€€€€€€ƒ–¶C–Òƒ¾ò3’â7–r£š"Ã¦²—’â·jšf–e‰…ÑÑ±•A…”(€€€€€€ƒšVÓ–-‘¥ÍÁ±…äé¹½¹—¾ò3–ÂÇº_š*+¦v‹švÿ¢«–ŞÇj(€€€€€€‘¥ÍÁ±…çšRçš:'¾ò3’æšr¢Š¯šÊKšr%‘¥ÍÁ±…çj(€€€€€€ƒ–[–#¢N/’ö?r/’â7¢š/ŠSŠS¦gš¶šb¿3¢¢·–ºkš2'¦"T(€€€€€€ƒšÊK–>7š'7jrš¶–:–nƒ((€€€€€€ƒ¦g¢‡–r£3’â7–r£š"Ã¦²—’â·7jššÎ’â/¾ò3š*+¦v‹švü(€€€€€€ƒ¦g–-=7¾¦î{šj¯šfšB³–"Á‘½Õµ•¹Ğ¹‰½‘ç–êW’â,(€€€€€€ƒ¾ò#¦–é‰…ÑÑ±•A…—¦
+–Æ‘‘¥ÍÁ±…äé¹½¹—¾ò'¾ò0(€€€€€€ƒ’â›––_R£’â+¦v‹šZÃ–Š{j™±½…Ñ¥¹œµµ½‘…³š¢–ò<(€€€€€€ƒ¾ò#šRçš"AÁ½Í¥Ñ¥½¸é™¥á•“¢«–ŞÇ–ºk’ö7¾ò'(€€€€€€ƒšB³¢ÖÃ’æ/–&7–#¢¢c’ö?–:šr³j’ö7ö¸(€€€€€€ƒ¾ò!…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±A…É•¹Ó¾ò<(€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±9•áÑM¥‰±¥¹Ÿ¾ò'¾ò0(€€€€€€±½Í•ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì §¢‡šr’úwœ(€€€€€€ƒ¦g–§–/–óš*+–ºšB³–ny‰…ÑÑ±•A…—–:šr³j(€€€€€€ƒ’ö7ö»¾ò3’â7šr¢ºO–º–ú{š¶“šÚ#–’Ç–r¡‰…ÑÑ±•A…—¢‡(€€€€¨¼((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”€˜˜(€€€€€€€Á…¹•°¹Á…É•¹Ñ9½‘”„ôô(€€€€€€€‘½Õµ•¹Ğ¹‰½‘ä(€€€€¥ì((€€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±A…É•¹Ğô(€€€€€€€€€€€Á…¹•°¹Á…É•¹Ñ9½‘”ì((€€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±9•áÑM¥‰±¥¹œô(€€€€€€€€€€€Á…¹•°¹¹•áÑM¥‰±¥¹œì(((€€€€€€€‘½Õµ•¹Ğ¹‰½‘ä¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€Á…¹•°(€€€€€€€€¤ì(((€€€€€€€Á…¹•°¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€€€€€‰™±½…Ñ¥¹œµµ½‘…°ˆ(€€€€€€€€¤ì((€€€ô(((€€€½¹ÍĞ¡…É…Ñ•ÉM•±•Ğô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•ÉM•±•Ğˆ¤ì(((€€€¥˜¡¡…É…Ñ•ÉM•±•Ğ¥ì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢š2š¶¾ò'¾òh(€€€€€€€€€€ƒ’â/š.'¦ã¦‚–:šr³–¾¯š¶ï¦†¿’ë3:§–ºØÇ73:§–ºØË7¾ò0(€€€€€€€€€€ƒ¦
+–>«šb¿š"G¢ª«šb;šf¢"'’ú/R£j’î¢Ç¾ò0(€€€€€€€€€€ƒ’öÿR£¢¢šj–Û–¾›šb¿3¢K¢&Ë¢«–ŞÇj%7¾ò0(€€€€€€€€€€ƒ¦g¢‡šRçš"C–.Wš/–âÛ–•Á±…å•È¹¥½Á±…å•ÈÈ¹¥“(€€€€€€€€¨¼((€€€€€€€½¹ÍĞ½ÁÑ¥½¸Àô(€€€€€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í¡…É=ÁÑ¥½¸Àˆ¤ì(((€€€€€€€¥˜¡½ÁÑ¥½¸À¥ì((€€€€€€€€€€€½ÁÑ¥½¸À¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€€€€€Á±…å•È¹¥‘ñğ(€€€€€€€€€€€€€€€€‹¢K¢&ÈÄˆì((€€€€€€€ô(((€€€€€€€½¹ÍĞ½ÁÑ¥½¸Äô(€€€€€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í¡…É=ÁÑ¥½¸Äˆ¤ì(((€€€€€€€¥˜¡½ÁÑ¥½¸Ä¥ì((€€€€€€€€€€€½ÁÑ¥½¸Ä¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€€€€€Á±…å•ÈÈ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€Á±…å•ÈÈ¹¥(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€‹¢K¢&ÈË¾ò#–Âkšr«–&×–îë¾ò$ˆì((€€€€€€€ô(((€€€€€€€€¼¨(€€€€€€€€€€ƒ:§–ºØË¦
+šÊK–&×–îëj¢¦Ç¾ò0(€€€€€€€€€€ƒ’â/š.'¦ã–Z»¢‡–#’â7Ö›¦ã¾ò0(€€€€€€€€€€ƒ¦ÿ–7¦ã–"Ã’â–/’â7–¶c–r£j¢K¢&Ë(€€€€€€€€¨¼((€€€€€€€¥˜¡½ÁÑ¥½¸Ä¥ì((€€€€€€€€€€€½ÁÑ¥½¸Ä¹‘¥Í…‰±•ô((€€€€€€€€€€€€€€€€…Á±…å•ÈÈì((€€€€€€€ô(((€€€€€€€¡…É…Ñ•ÉM•±•Ğ¹Ù…±Õ”ôˆÀˆì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ–&oš&O¦Z/¦v‹švÿ¾ò3V¯¦v‹š²’ö7šb¿’â+š²‡šºcVgj–Ÿ–ºç¾ò0(€€€€€€ƒ’â7šb¿:§–ºÛš¶–r£Ş£¢ò¿jšvÇ¢–ÿ¾ò3¦g¢‡–
+ÍÑÉÕ”(€€€€€€ƒ¢ŞÏ¦;3–¶c–n{’â+’â–/¢K¢&Ë7¦
+’âš¶—(€€€€¨¼((€€€Íİ¥Ñ¡ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•È¡ÑÉÕ”¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¦7šZÃ¢¢·¢¢#¾ò'¾òh(€€€€€€ƒ¢¢·–ºk¦v‹švÿšRçš"Crš¶j3šr’â+–Æ“¢š¢N/7¾ò0(€€€€€€ƒ¾–r7šb¿3š«&§–6‡&3’â/Ş7–"Ã3’êë&§–6‡&3’â/Ş7¾ò0(€€€€€€ƒ’â7–7’úw¢ÎÑMO–:ï2s¦g–/¾–r7¢¦Ë–’k¦®cŠSŠP(€€€€€€ƒnÓš:—R¡)O¦?–ë¦g–§–/¦
++V3j–¾›¦jo¢z‹–æW–êŸš¢g¾ò0(€€€€€€ƒR¡Á½Í¥Ñ¥½¸é™¥á•“Êûšê[–Â7¦ö+¾ò0(€€€€€€ƒZ+šRû¦‚–ê?š.'–"Ãšr¦®c¾ò3Šë’şw’â–ºkšr¢N/–r (€€€€€€ƒš&šr'švÇ¢–ÿjšr’â+¦v‹(€€€€¨¼((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rš¶š*O–"Ã3¢¢·–ºk¢ŞG–"Ãšr’â+¦v‹7j(€€€€€€ƒ–:–nƒ¾ò'¾òh(€€€€€€ƒ¦gšº×¦?šâ³3š«&§–6‡&3’â/Ş¾ö{’êë&§–6‡&3’â/Ş4(€€€€€€ƒ–7R£¢†3–Ÿš¢–ò?–ºk’ö7j¦
+?¢ò¿¾ò3šb¿
+ë’êš"Ã¦²”(€€€€€€ƒ¦‚¦v‹–Ÿ¢¢·¢¢#j¾ò3–6ïšÊKšr'–"“šZß3>û–r£–"Ã–êWšb¼(€€€€€€ƒ’â7šb¿–r£š"Ã¦²—¦‚¦v‹7ŠSŠS–r£–rÃ–r[¾ò?–Ş‡¦
+?¦‚¦vˆ(€€€€€€ƒš&O¦Z/¢¢·–ºkšf¾ò0¹‰…ÑÑ±”µµ½¹ÍÑ•ÉÏ¾ò<(€€€€€€€¹‰…ÑÑ±”µÁ±…å•ÈµÉ½ß¦g–§–/–Òƒ¦n[Û¦
+–r (€€€€€€=7¢‡¾ò3’ö‰…ÑÑ±•A…—šVÓ–Æ‘‘¥ÍÁ±…äé¹½¹—¾ò0(€€€€€€‘¥ÍÁ±…äé¹½¹—j–Ò•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤(€€€€€€ƒ¦?–ë’ú’â–ú/šb½íÑ½ÀèÀ±‰½ÑÑ½´èÀ°¸¸¹÷¾ò0(€€€€€€ƒ¶'šZó¦g¢‡šrš*)Á…¹•°¹ÍÑå±”¹Ñ½Ã†³¢¢·š"@(€€€€€€€ˆÁÁà‹¡•¥¡Ó¢¢·š"@ˆÁÁà‹ŠSŠS¢3’âS¦gšb¼(€€€€€€ƒ¢†3–Ÿš¢–ò?¾ò3–«–#š²+š¾Q™±½…Ñ¥¹œµµ½‘…³¦
+–,(€€€€€€ML±…ÍÏ¦
+¦®c¾ò3–ÂÇº]±…ÍÏšr'š¶Šë––_R£¾ò0(€€€€€€ƒ’æšr¢Š¯¦g¢‡j¢†3–Ÿš¢–ò?¢N/¦;–:ï¾ò3¦gš&7šb¼(€€€€€€ƒ¢¢·–ºk¦v‹švÿ¢ŞG–"ÃV¯¦v‹šr’â+¦v‹r/¢Öß’ú¦ë¦ëj(€€€€€€ƒrš¶–:–nƒ((€€€€€€ƒšRçš"C–>«šr'3rj–r£š"Ã¦²—’â·7š&7–~ß¢†3¦gšºÔ(€€€€€€ƒ¦?šâ³–ºk’ö7¾òo’â7–r£š"Ã¦²—’â·¾ò#–rÃ–r[¦‚¦v‹š&O¦Z/¾ò$(€€€€€€ƒj¢¦Ç–º3–£¢ŞÏ¦;¾ò3’ê“Ö™™±½…Ñ¥¹œµµ½‘…°(€€€€€€ƒ¦
+–-±…ÍÏ¢«–ŞÇjÁ½Í¥Ñ¥½¸é™¥á•“¾ò<(€€€€€€‰½ÑÑ½´èàÁÁã–:ï–ºk’ö7¾ò3’â7šr–7¢Š¯¦g¢‡j(€€€€€€ƒ¢†3–Ÿš¢–ò?¢N/š:'(€€€€¨¼((€€€¥˜¡‰…ÑÑ±•Ñ¥Ù”¥ì((€€€€€€€½¹ÍĞµ½¹ÍÑ•ÉÉ•„ô(€€€€€€€€€€€‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È (€€€€€€€€€€€€€€€€ˆ¹‰…ÑÑ±”µµ½¹ÍÑ•ÉÌˆ(€€€€€€€€€€€€¤ì(((€€€€€€€½¹ÍĞÁ±…å•ÉI½Üô(€€€€€€€€€€€‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È (€€€€€€€€€€€€€€€€ˆ¹‰…ÑÑ±”µÁ±…å•ÈµÉ½Üˆ(€€€€€€€€€€€€¤ì(((€€€€€€€¥˜ (€€€€€€€€€€€µ½¹ÍÑ•ÉÉ•„€˜˜(€€€€€€€€€€€Á±…å•ÉI½Ü(€€€€€€€€¥ì((€€€€€€€€€€€½¹ÍĞÑ½Á‘”ô(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÉ•„(€€€€€€€€€€€€€€€€¹•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤(€€€€€€€€€€€€€€€€¹‰½ÑÑ½´ì(((€€€€€€€€€€€½¹ÍĞ‰½ÑÑ½µ‘”ô(€€€€€€€€€€€€€€€Á±…å•ÉI½Ü(€€€€€€€€€€€€€€€€¹•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤(€€€€€€€€€€€€€€€€¹‰½ÑÑ½´ì(((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹Á½Í¥Ñ¥½¸ô(€€€€€€€€€€€€€€€€‰™¥á•ˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹Ñ½Àô(€€€€€€€€€€€€€€€Ñ½Á‘”¬‰Áàˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹±•™Ğô(€€€€€€€€€€€€€€€€ˆÙÁàˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹É¥¡Ğô(€€€€€€€€€€€€€€€€ˆÙÁàˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹¡•¥¡Ğô((€€€€€€€€€€€€€€€€¡‰½ÑÑ½µ‘”µÑ½Á‘”¤¬(€€€€€€€€€€€€€€€€‰Áàˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹é%¹‘•àô(€€€€€€€€€€€€€€€€ˆäääääˆì((€€€€€€€ô((€€€ô(€€€•±Í•ì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’â7–r£š"Ã¦²—’â·¾òkšâš:'–>¿¢÷šºcVgj¢†3–œ(€€€€€€€€€€ƒ–ºk’ö7š¢–ò?¾ò#’ú/–š’â+’âš²‡–r£š"Ã¦²—¦‚¦v‹¢„(€€€€€€€€€€ƒš&O¦Z/šf¢¢·¦;jÑ½À½¡•¥¡Ó¾ò'¾ò0(€€€€€€€€€€ƒ¢ºM™±½…Ñ¥¹œµµ½‘…³¦g–-±…ÍÏ¢÷–’€(€€€€€€€€€€ƒš¶–âãRšV#¾ò3’â7¢Š¯šºcVgj¢†3–Ÿš¢–ò?–6‡’ö?(€€€€€€€€¨¼((€€€€€€€Á…¹•°¹ÍÑå±”¹Á½Í¥Ñ¥½¸ô(€€€€€€€€€€€€ˆˆì((€€€€€€€Á…¹•°¹ÍÑå±”¹Ñ½Àô(€€€€€€€€€€€€ˆˆì((€€€€€€€Á…¹•°¹ÍÑå±”¹±•™Ğô(€€€€€€€€€€€€ˆˆì((€€€€€€€Á…¹•°¹ÍÑå±”¹É¥¡Ğô(€€€€€€€€€€€€ˆˆì((€€€€€€€Á…¹•°¹ÍÑå±”¹¡•¥¡Ğô(€€€€€€€€€€€€ˆˆì((€€€€€€€Á…¹•°¹ÍÑå±”¹é%¹‘•àô(€€€€€€€€€€€€ˆˆì((€€€ô(((€€€Á…¹•°¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€‰™±•àˆì()ô(()™Õ¹Ñ¥½¸±½Í•ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì ¥ì((€€€½¹ÍĞÁ…¹•°ô(€€€€€€€€ ‰…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹ÍA…¹•°ˆ¤ì(((€€€¥˜¡Á…¹•°¥ì((€€€€€€€Á…¹•°¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€€€€€‰¹½¹”ˆì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3šRçR (€€€€€€€€€€½Á•¹!½µ••…ÑÕÉ” §–ö#ª_¦†¿’ë¢¢·–ºh(€€€€€€€€€€ƒ¦v‹švÿ’æ/–ú3¾ò'¾òh(€€€€€€€€€€ƒ–ššzs¦v‹švÿn»–&7šb¿¢Š¯–¦Ë–ö#ª\(€€€€€€€€€€ƒ¾ò ¡½µ••…ÑÕÉ•5½‘…±	½‘ç¾ò'¢‡¦†¿’ëj(€€€€€€€€€€ƒŠSŠS’â7šb¿¢"+j‘½Õµ•¹Ğ¹‰½‘çšB³ïšÎT(€€€€€€€€€€ƒŠSŠSš2'’â/3Šë–ºk7šf¢š¦–B3šVÓ–/–ö#ª\(€€€€€€€€€€ƒ’â¢Öß¦^sš:'¾ò3’â7Û–ö#ª_šrVg–r£V¯¦v‹’â+(€€€€€€€€€€ƒ¢‡¦v‹–6ïšb¿¦ëj¾ò#¦v‹švÿ¢Š¯¢¢·š"A‘¥ÍÁ±…äè(€€€€€€€€€€¹½¹—¾ò'¾ò3r/¢Öß’ú–?–6‡’ö?(€€€€€€€€¨¼((€€€€€€€¥˜ (€€€€€€€€€€€Á…¹•°¹Á…É•¹Ñ9½‘”€˜˜(€€€€€€€€€€€Á…¹•°¹Á…É•¹Ñ9½‘”¹¥ôôô(€€€€€€€€€€€€‰¡½µ••…ÑÕÉ•5½‘…±	½‘äˆ(€€€€€€€€¥ì((€€€€€€€€€€€±½Í•!½µ••…ÑÕÉ” ¤ì((€€€€€€€€€€€É•ÑÕÉ¸ì((€€€€€€€ô(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#¢Ş}½Á•¹ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì ¤(€€€€€€€€€€ƒjšB³ï–.W’ös¦7–Â7¾ò'¾òh(€€€€€€€€€€ƒ–ššzs¦v‹švÿn»–&7¢Š¯šB³–"Á‘½Õµ•¹Ğ¹‰½‘ä(€€€€€€€€€€ƒ–êW’â/¾ò#’î¢†£šb¿–ú{–rÃ–r[¾ò?–Ş‡¦
+?¦‚¦v‹š&O¦Z/j¾ò'¾ò0(€€€€€€€€€€ƒ¦^s¦Z'jšf–gšB³–ny‰…ÑÑ±•A…—¢‡–:šr³j(€€€€€€€€€€ƒ’ö7ö»¾ò3’â›š*)™±½…Ñ¥¹œµµ½‘…³¦g–-±…ÍÌ(€€€€€€€€€€ƒš.ÿš:'¾ò3š‹–ú§š"C–:šr³–r£š"Ã¦²—¦‚¦v‹¢„(€€€€€€€€€€ƒj–ºk’ö7šZç–ò?’â7¦gš¢–kj¢¦Ç¾ò3¦v‹švÿšr(€€€€€€€€€€ƒšÂã¦ƒVg–r¡‰½‘ç–êW’â/¾ò3’â/š²‡–r£š"Ã¦²—¦‚¦vˆ(€€€€€€€€€€ƒ¢‡š&O¦Z/šf¾ò3&#¦v‹šr¢ŞGš:'(€€€€€€€€¨¼((€€€€€€€¥˜ (€€€€€€€€€€€Á…¹•°¹Á…É•¹Ñ9½‘”ôôô(€€€€€€€€€€€‘½Õµ•¹Ğ¹‰½‘ä€˜˜(€€€€€€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±A…É•¹Ğ(€€€€€€€€¥ì((€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±9•áÑM¥‰±¥¹œ€˜˜(€€€€€€€€€€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±9•áÑM¥‰±¥¹œ¹Á…É•¹Ñ9½‘”ôôô(€€€€€€€€€€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±A…É•¹Ğ(€€€€€€€€€€€€¥ì((€€€€€€€€€€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±A…É•¹Ğ¹¥¹Í•ÉÑ	•™½É” (€€€€€€€€€€€€€€€€€€€Á…¹•°°(€€€€€€€€€€€€€€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±9•áÑM¥‰±¥¹œ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô(€€€€€€€€€€€•±Í•ì((€€€€€€€€€€€€€€€…ÕÑ½M•ÑÑ¥¹Í=É¥¥¹…±A…É•¹Ğ¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€€€€€€€€€Á…¹•°(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô(((€€€€€€€€€€€Á…¹•°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€€€€€‰™±½…Ñ¥¹œµµ½‘…°ˆ(€€€€€€€€€€€€¤ì((€€€€€€€ô((€€€ô()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾òkš*+n»–&7¢¢·–ºk¦v‹švÿV¯¦v‹’â+¦†¿’ëj–ó¾ò0(€€ƒ–¶c–n{1¡…É…Ñ•É%¹‘•ã7¦g–/¢K¢&Ëj(€€…ÕÑ½½¹™¥œ½…ÕÑ½½¹™¥œË¢ê¯’â+(€€ƒ–r£–"š>o¢K¢&Ë’æ/–&7’î—–>+rš¶š2'’â/Šë–ºkšf(€€ƒ¦÷šr–Fó–>¯¦g¢‡¾ò3Šë’şwšÊKšr'’îï’öW’â¦
++j¢ªÿšVĞ(€€ƒšr–nƒ
+ë–"š>o¢K¢&Ë¢3’â7–Â?–ş¦ë–’Ç(¨¼()™Õ¹Ñ¥½¸Í…Ù•ÕÑ½M•ÑÑ¥¹Í½ÉµQ½¡…É…Ñ•È¡¡…É…Ñ•É%¹‘•à¥ì((€€€½¹ÍĞ…Ñ¥½¹M•±•Ğô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹ÍÑ¥½¹M•±•Ğˆ¤ì(((€€€½¹ÍĞ¡ÁM•±•Ğô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í!@ˆ¤ì(((€€€½¹ÍĞÍÁM•±•Ğô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹ÍM@ˆ¤ì(((€€€½¹ÍĞÉ•ÑÕÉ¹¥Ñå¡•­‰½àô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹ÍI•ÑÕÉ¹¥Ñäˆ¤ì(((€€€½¹ÍĞÑ…É•Ñ½¹™¥œô(€€€€€€€•ÑA…ÉÑåÕÑ½½¹™¥œ¡9Õµ‰•È¡¡…É…Ñ•É%¹‘•à¤¤ì(((€€€¥˜¡…Ñ¥½¹M•±•Ğ¥ì((€€€€€€€Ñ…É•Ñ½¹™¥œ¹Í­¥±°ô(€€€€€€€€€€€…Ñ¥½¹M•±•Ğ¹Ù…±Õ”ì((€€€ô(((€€€¥˜¡¡ÁM•±•Ğ¥ì((€€€€€€€Ñ…É•Ñ½¹™¥œ¹¡Àô(€€€€€€€€€€€9Õµ‰•È¡¡ÁM•±•Ğ¹Ù…±Õ”¤ì((€€€ô(((€€€¥˜¡ÍÁM•±•Ğ¥ì((€€€€€€€Ñ…É•Ñ½¹™¥œ¹ÍÀô(€€€€€€€€€€€9Õµ‰•È¡ÍÁM•±•Ğ¹Ù…±Õ”¤ì((€€€ô(((€€€¥˜¡É•ÑÕÉ¹¥Ñå¡•­‰½à¥ì((€€€€€€€Ñ…É•Ñ½¹™¥œ¹É•ÑÕÉ¹Q½¥Ñå]¡•¹µÁÑäô((€€€€€€€€€€€É•ÑÕÉ¹¥Ñå¡•­‰½à¹¡•­•ì((€€€ô()ô(()™Õ¹Ñ¥½¸Íİ¥Ñ¡ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•È¡Í­¥ÁM…Ù”¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rš¶¢šÆë3–"š>o¢K¢&Ëšr¦ë–’Ä(€€€€€€ƒšr«–Ë–¶c¢º+šnÓ7j‰ÕŸ¾ò'¾òh(€€€€€€ƒ–r£¢º–>[šZÃ¢K¢&Ëj¢ÎšZg¦7šZÃV¯¦v‹’æ/–&7¾ò0(€€€€€€ƒ–#š*+3n»–&7V¯¦v‹’â+¦†¿’ëj–ó4(€€€€€€ƒ–¶c–n{3–"š>o–&77¦
+–/¢K¢&Ë¢ê¯’â+ŠSŠP(€€€€€€ƒ¦gš¢’öÿR£¢’â7º‡–r¡–§–/¢K¢&Ë’æ/¦ZL(€€€€€€ƒ–"š>o–æûš²‡¢ªÿšVÓ–æûš²‡¾ò0(€€€€€€ƒš¾?’âš²‡–"š>o¦÷šr–#–æ¯–şg–¶c¢Öß’ú¾ò0(€€€€€€ƒ’â7R£–"’â–/¢K¢&Ë–ÂÇ¢šš2'’âš²‡Šë–ºk¾ò0(€€€€€€ƒšr–ú3ÖÇ’âš2'’âš²‡Šë–ºk–6Ï–>¿((€€€€€€ƒŠbƒ’öšr'–/’ú/–’[¾òk–&oš&O¦Z/¢¢·–ºk¦v‹švÿj¦
+’â–"ì(€€€€€€ƒ¾ò!½Á•¹ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì §–Fó–>¯¦g¢‡šf¾ò'¾ò0(€€€€€€ƒV¯¦v‹’â+jš²’ö7–Û–¾›šb¿3’â+’âš²‡¦^s¦Z'šf(€€€€€€ƒšºcVgj¢"+–Ÿ–ºç7¾ò3’â7šb¿:§–ºÛš¶–r£Ş£¢ò¿jšvÇ¢–ÿ¾ò0(€€€€€€ƒ¦gšf–g–ššzs¦
+–~ß¢†33–¶c–n{’â+’â–/¢K¢&Ë7¾ò0(€€€€€€ƒ–>7¢3šrR£¦g’êo¦;šfjšºcVg–ó¾ò0(€€€€€€ƒš*+¢K¢&Ërš¶j¢¢·–ºk¢š¢N/š:'(€€€€€€ƒš&’î—–&oš&O¦Z/¦v‹švÿšfR¡Í­¥ÁM…Ù”õÑÉÕ—¢ŞÏ¦;¦g’âš¶—¾ò0(€€€€€€ƒ–>«šr':§–ºÛ–r£¦v‹švÿ3–ŞËÚOš&O¦Z/j.š/’â/4(€€€€€€ƒ’âï–.W–"š>o¢K¢&Ëšf¾ò3š&7¦r¢š–Ë–¶c(€€€€¨¼((€€€¥˜ …Í­¥ÁM…Ù”¥ì((€€€€€€€Í…Ù•ÕÑ½M•ÑÑ¥¹Í½ÉµQ½¡…É…Ñ•È (€€€€€€€€€€€…ÕÑ½M•ÑÑ¥¹ÍÕÉÉ•¹Ñ¡…É…Ñ•È(€€€€€€€€¤ì((€€€ô(((€€€½¹ÍĞ¡…É…Ñ•ÉM•±•Ğô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•ÉM•±•Ğˆ¤ì(((€€€½¹ÍĞ…Ñ¥½¹M•±•Ğô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹ÍÑ¥½¹M•±•Ğˆ¤ì(((€€€½¹ÍĞ¡ÁM•±•Ğô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í!@ˆ¤ì(((€€€½¹ÍĞÍÁM•±•Ğô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹ÍM@ˆ¤ì(((€€€½¹ÍĞÉ•ÑÕÉ¹¥Ñå¡•­‰½àô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹ÍI•ÑÕÉ¹¥Ñäˆ¤ì(((€€€¥˜ …¡…É…Ñ•ÉM•±•Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€±•ĞÉ•ÅÕ•ÍÑ•‘%¹‘•àô(€€€€€€€9Õµ‰•È¡¡…É…Ñ•ÉM•±•Ğ¹Ù…±Õ”¤ì((€€€¥˜ …•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡É•ÅÕ•ÍÑ•‘%¹‘•à¤¥ì((€€€€€€€¡…É…Ñ•ÉM•±•Ğ¹Ù…±Õ”ôˆÀˆì(€€€€€€€É•ÅÕ•ÍÑ•‘%¹‘•àôÀì((€€€ô(((€€€½¹ÍĞÑ…É•Ñ½¹™¥œô(€€€€€€€•ÑA…ÉÑåÕÑ½½¹™¥œ¡É•ÅÕ•ÍÑ•‘%¹‘•à¤ì(((€€€Ñ…É•Ñ½¹™¥œ¹¡Àõ¹½Éµ…±¥é•ÕÑ½	…ÑÑ±•Q¡É•Í¡½±¡Ñ…É•Ñ½¹™¥œ¹¡À°ÔÀ¤ì(€€€Ñ…É•Ñ½¹™¥œ¹ÍÀõ¹½Éµ…±¥é•ÕÑ½	…ÑÑ±•Q¡É•Í¡½±¡Ñ…É•Ñ½¹™¥œ¹ÍÀ°ÈÔ¤ì(((€€€½¹ÍĞ¡…É…Ñ•É%ô(€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É-•ä¡É•ÅÕ•ÍÑ•‘%¹‘•à¤ì(((€€€½¹ÍĞ±½…‘½ÕĞô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÍl(€€€€€€€€€€€¡…É…Ñ•É%(€€€€€€€tì(((€€€€¼¨(€€€€€€ƒŠbƒ¢«–.W¢†3–.W’â/š.'¦ã–Z»¾òh(€€€€€€ƒšf»¦kšRïšN+¦bËš›¾ò3–*ƒ’â+¢¦Ë¢K¢&Ë¢w–
+gj(€€€€€€ƒš¾?’âš‚óš*¢÷¾ò#šr–’hÓ–/¾ò'(€€€€¨¼((€€€¥˜¡…Ñ¥½¹M•±•Ğ¥ì((€€€€€€€±•Ğ½ÁÑ¥½¹Í!Q50ô((€€€€€€€€€€€€œñ½ÁÑ¥½¸Ù…±Õ”ô‰¹½Éµ…°ˆûšf»¦kšRïšN(ğ½½ÁÑ¥½¸øœ¬(€€€€€€€€€€€€œñ½ÁÑ¥½¸Ù…±Õ”ô‰‘•™•¹ˆû¦bËš˜ğ½½ÁÑ¥½¸øœì(((€€€€€€€¥˜¡±½…‘½ÕĞ¥ì((€€€€€€€€€€€±½…‘½ÕĞ¹•ÅÕ¥ÁÁ•‘M­¥±±Ì¹™½É…  (€€€€€€€€€€€€€€€Í­¥±±%ôùì((€€€€€€€€€€€€€€€€€€€½¹ÍĞÍ­¥±°ô(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€€€€€€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€€€€€€€€€€…Í­¥±°ñğ(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜‰ñğ(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰Á…ÍÍ¥Ù”‰ñğ(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰¡•…°‰ñğ(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰É•Ù¥Ù”ˆ(€€€€€€€€€€€€€€€€€€€€¥ì(€€€€€€€€€€€€€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€€€€€€€€€ô(((€€€€€€€€€€€€€€€€€€€½ÁÑ¥½¹Í!Q50¬ô((€€€€€€€€€€€€€€€€€€€€€€€€œñ½ÁÑ¥½¸Ù…±Õ”ôˆœ¬(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±±%¬(€€€€€€€€€€€€€€€€€€€€€€€€œˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±°¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€€€€€œğ½½ÁÑ¥½¸øœì((€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€…Ñ¥½¹M•±•Ğ¹¥¹¹•É!Q50ô(€€€€€€€€€€€½ÁÑ¥½¹Í!Q50ì(((€€€€€€€½¹ÍĞÍÑ¥±±Y…±¥ô((€€€€€€€€€€€ÉÉ…ä¹™É½´ (€€€€€€€€€€€€€€€…Ñ¥½¹M•±•Ğ¹½ÁÑ¥½¹Ì(€€€€€€€€€€€€¤(€€€€€€€€€€€€¹Í½µ” (€€€€€€€€€€€€€€€½ÁĞôø(€€€€€€€€€€€€€€€€€€€½ÁĞ¹Ù…±Õ”ôôô(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ½¹™¥œ¹Í­¥±°(€€€€€€€€€€€€¤ì(((€€€€€€€…Ñ¥½¹M•±•Ğ¹Ù…±Õ”ô((€€€€€€€€€€€ÍÑ¥±±Y…±¥(€€€€€€€€€€€€ü(€€€€€€€€€€€Ñ…É•Ñ½¹™¥œ¹Í­¥±°(€€€€€€€€€€€€è(€€€€€€€€€€€€‰¹½Éµ…°ˆì((€€€ô(((€€€¥˜¡¡ÁM•±•Ğ¥ì((€€€€€€€¡ÁM•±•Ğ¹Ù…±Õ”ô(€€€€€€€€€€€Ñ…É•Ñ½¹™¥œ¹¡Àì((€€€ô(((€€€¥˜¡ÍÁM•±•Ğ¥ì((€€€€€€€ÍÁM•±•Ğ¹Ù…±Õ”ô(€€€€€€€€€€€Ñ…É•Ñ½¹™¥œ¹ÍÀì((€€€ô(((€€€¥˜¡É•ÑÕÉ¹¥Ñå¡•­‰½à¥ì((€€€€€€€É•ÑÕÉ¹¥Ñå¡•­‰½à¹¡•­•ô((€€€€€€€€€€€€„…Ñ…É•Ñ½¹™¥œ¹É•ÑÕÉ¹Q½¥Ñå]¡•¹µÁÑäì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšnÓšZÃ¢ş÷¢æ“¢º+šVã¾ò3¢¢c’ö?¢†£–Z»>û–r£¦†¿’ëj(€€€€€€ƒšb¿–N«–/¢K¢&Ë¾ò3’â/š²‡–"š>ošfš&7~—¦L(€€€€€€ƒ¢šš*+¢ÎšZg–¶c–n{¢ªÃ¢ê¯’â+(€€€€¨¼((€€€…ÕÑ½M•ÑÑ¥¹ÍÕÉÉ•¹Ñ¡…É…Ñ•Èô(€€€€€€€É•ÅÕ•ÍÑ•‘%¹‘•àì()ô(()™Õ¹Ñ¥½¸½¹™¥ÉµÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì ¥ì((€€€½¹ÍĞ¡…É…Ñ•ÉM•±•Ğô(€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•ÉM•±•Ğˆ¤ì(((€€€¥˜ …¡…É…Ñ•ÉM•±•Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òknÓš:—–Fó–>¯–ÇR£j–Ë–¶c–÷–ò?¾ò0(€€€€€€ƒŠë’şw¦g¢‡¢Ş–"š>o¢K¢&ËšfR£jšb¿–B3’â––_¦
+?¢ò¿¾ò0(€€€€€€ƒ’â7šr–ë>û–§¦
++–B–¾¯’â’î÷’î—–ú3šRç’â¦
++–şc¢¢cšRä(€€€€€€ƒ–>›’â¦
++jššÎ(€€€€¨¼((€€€Í…Ù•ÕÑ½M•ÑÑ¥¹Í½ÉµQ½¡…É…Ñ•È (€€€€€€€9Õµ‰•È¡¡…É…Ñ•ÉM•±•Ğ¹Ù…±Õ”¤(€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ¢¢·–ºk–º3–B3š¶—’â’â/’âï–~;¦
+¦
++j¢"+&!U$(€€€€€€ƒ¾ò#–ššzs:§–ºÛ’æ/–ú3¦
+šb¿šr–:ï’âï–~;¢ªÿšVÓ¾ò'¾ò0(€€€€€€ƒ¦ÿ–7–§¦
++¦†¿’ëjšVã–¶_–Â7’â7’â+(€€€€¨¼((€€€¥˜¡¡…É…Ñ•ÉM•±•Ğ¹Ù…±Õ”ôôôˆÄˆ¥ì((€€€€€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹ÌÈ ¤ì((€€€ô(€€€•±Í”¥˜¡¡…É…Ñ•ÉM•±•Ğ¹Ù…±Õ”ôôôˆÀˆ¥ì((€€€€€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹Ì ¤ì((€€€ô(((€€€Í…Ù•…µ” ¤ì(((€€€±½Í•ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì ¤ì(((€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€‹¢«–.Wš"Ã¦²—¢¢·–ºk–ŞËšnÓšZÃˆ(€€€€¤ì()ô(((¼¨ÕÑ½µ…Ñ¥Œ½µ‰…Ğ½¹±ä‘•±…É•Ì½µ‰…Ğ…Ñ¥½¹Ì¸!@½M@É•½Ù•Éä¥Ì¡…¹‘±•(€€½¹”…™Ñ•ÈÙ¥Ñ½Éä‰ä…ÁÁ±åA½ÍÑ	…ÑÑ±•ÕÑ½I•½Ù•Éä ¤¸€¨¼)™Õ¹Ñ¥½¸…ÕÑ½Ñ¥½¹½É¡…É…Ñ•È¡¡…É…Ñ•É%¹‘•à±Ñ½­•¸¥ì((€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¡…É…Ñ•É%¹‘•à¤ì(€€€½¹ÍĞ½¹™¥œõ•ÑA…ÉÑåÕÑ½½¹™¥œ¡¡…É…Ñ•É%¹‘•à¤ì(€€€½¹ÍĞ…ÕÑ½=¸õ¡…É…Ñ•É%¹‘•àôôôÀ€ü…ÕÑ½	…ÑÑ±”€è½¹™¥œ¹•¹…‰±•ì((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€€…¡…É…Ñ•Èñğ(€€€€€€€¡…É…Ñ•È¹¡ÀğôÀñğ(€€€€€€€€……ÕÑ½=¸ñğ(€€€€€€€Ñ½­•¸„ôõ‰…ÑÑ±•Q½­•¸(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜¡½¹™¥œ¹Í­¥±°ôôô‰‘•™•¹ˆ¥ì(€€€€€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹Ím¡…É…Ñ•É%¹‘•átõí…Ñ¥½¸è‰‘•™•¹ˆ±Ñ…É•Ğé¹Õ±±ôì(€€€€€€€ÕÁ‘…Ñ•U$ ¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞ…±¥Ù•%¹	…ÑÑ±”õÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ¹™¥±Ñ•È (€€€€€€€¥¹‘•àôùµ½¹ÍÑ•ÉÍm¥¹‘•át€˜˜µ½¹ÍÑ•ÉÍm¥¹‘•át¹…±¥Ù”(€€€€¤ì((€€€¥˜¡…±¥Ù•%¹	…ÑÑ±”¹±•¹Ñ ôôôÀ¥ì(€€€€€€€¡•­	…ÑÑ±•¹ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÍ­¥±°õÍ­¥±±…Ñ…‰…Í•m½¹™¥œ¹Í­¥±±tì(€€€½¹ÍĞÍÁÉ•…‘ÌõÍ­¥±°€˜˜l‰ÑÉ¤ˆ°‰É½Üˆ°‰½±Õµ¸ˆ°‰…±°‰t¹¥¹±Õ‘•Ì¡Í­¥±°¹Ñ…É•ÑQåÁ”¤ì(€€€±•ĞÑ…É•Ğõ…±¥Ù•%¹	…ÑÑ±•lÁtì((€€€€¼¨(€€€€€€XÄÌß¾òkš«&§šNÓ––"Ãšr–’hÄÃ¦jï’â›–"š"C–§š:K’æ/–ú3¾ò33šVÓ’î÷–¶cšÒïšâ–Z»j(€€€€€€ƒ’â·¦ZO7’â7–7¶'šZó3š*¢÷¢÷š&Ošr–’k’êëj’â·–ş7’ú/–šÛ¦jïš«šf¢"+º_šÎT(€€€€€€ƒšr¦ã²³’âš:Kšr–>Ï¦
++¾ò1ÑÉ§š*¢÷–>«š&O–"ÀË¦jï¦C’âR£rš¶j(€€€€€€•ÑM­¥±±Q…É•ÑÌ §¢¦W’òÃ–g¦ã’â·–ş¾ò3¦ã–F÷’â·šVãšr–’kj¦
+’â–/¾ò1É½ß¾ò<(€€€€€€ÑÉ§š*¢÷š&7šr’úwn»–&7¦f–ö‹¢"š¶ï’ê‡òë–>š¶Šë¦ã’ö7(€€€€¨¼(€€€¥˜¡ÍÁÉ•…‘Ì€˜˜ÑåÁ•½˜•ÑM­¥±±Q…É•ÑÌôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€±•Ğ‰•ÍÑ½Õ¹Ğô´Äì(€€€€€€€…±¥Ù•%¹	…ÑÑ±”¹™½É… ¡…¹‘¥‘…Ñ”ôùì(€€€€€€€€€€€½¹ÍĞ¡¥Ñ½Õ¹Ğõ•ÑM­¥±±Q…É•ÑÌ¡…¹‘¥‘…Ñ”±Í­¥±°¹Ñ…É•ÑQåÁ”¤¹±•¹Ñ ì(€€€€€€€€€€€¥˜¡¡¥Ñ½Õ¹Ğù‰•ÍÑ½Õ¹Ğ¥ì(€€€€€€€€€€€€€€€‰•ÍÑ½Õ¹Ğõ¡¥Ñ½Õ¹Ğì(€€€€€€€€€€€€€€€Ñ…É•Ğõ…¹‘¥‘…Ñ”ì(€€€€€€€€€€€ô(€€€€€€€ô¤ì(€€€ô((€€€±•Ğ…Ñ¥½¸õ½¹™¥œ¹Í­¥±±ñğ‰¹½Éµ…°ˆì(€€€½¹ÍĞÍ­¥±±-•äõ•ÑA…ÉÑå¡…É…Ñ•É-•ä¡¡…É…Ñ•É%¹‘•à¤ì((€€€¥˜ (€€€€€€€…Ñ¥½¸„ôô‰¹½Éµ…°ˆ€˜˜(€€€€€€€€ (€€€€€€€€€€€€…Í­¥±°ñğ(€€€€€€€€€€€•ÑM­¥±±1•Ù•°¡Í­¥±±-•ä±…Ñ¥½¸¤ğôÀñğ(€€€€€€€€€€€¡…É…Ñ•È¹ÍÀğ¡Í­¥±°¹ÍÁ½ÍĞ„ôõÕ¹‘•™¥¹•€üÍ­¥±°¹ÍÁ½ÍĞ€è€¡Í­¥±°¹½ÍÑñğÀ¤¤ñğ(€€€€€€€€€€€l‰‰Õ™˜ˆ°‰Á…ÍÍ¥Ù”ˆ°‰¡•…°ˆ°‰É•Ù¥Ù”‰t¹¥¹±Õ‘•Ì¡Í­¥±°¹…Ñ•½Éä¤(€€€€€€€€¤(€€€€¥ì(€€€€€€€…Ñ¥½¸ô‰¹½Éµ…°ˆì(€€€ô((€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹Ím¡…É…Ñ•É%¹‘•átõì(€€€€€€€…Ñ¥½¸é…Ñ¥½¸°(€€€€€€€Ñ…É•ĞéÑ…É•Ğ(€€€ôì((€€€ÕÁ‘…Ñ•U$ ¤ì(€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì)ô(()™Õ¹Ñ¥½¸…ÕÑ½Ñ¥½¸¡Ñ½­•¸¥ì((€€€É•ÑÕÉ¸…ÕÑ½Ñ¥½¹½É¡…É…Ñ•È À±Ñ½­•¸¤ì((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€€……ÕÑ½	…ÑÑ±”ñğ(€€€€€€€Ñ½­•¸„ôõ‰…ÑÑ±•Q½­•¸(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#¦7¢š¾ò3’úwŸ’öÿR£¢šb;Šëš2š¶¾ò'¾òh(€€€€€€ƒ¢«–.Wš"Ã¦²—’æ/–&7šb¿3¢ò«–"Ã¢«–ŞÇ–ÂÇ®/–"ï–~ß¢†37¾ò0(€€€€€€ƒ–º3–£¢ŞÏ¦;–º–F(¿ÖCº_š¦–"Û¾ò0(€€€€€€ƒ¶'šZó¢«–.W¢K¢&ËšÂã¦ƒ‡¢š[šV?š6ßš:K–ê?(€€€€€€ƒšÂã¦ƒšb¿–º–F+¦j;šº×¦
+’â–"ï–ÂÇ–ëš&/((€€€€€€ƒ>û–r£šRçš"C¾òk¢«–.Wš"Ã¦²—–>«¢Êƒ¢Ê³3šÆë–ºk¢š–k’î¦êó4(€€€€€€ƒ¾ò#¦bËš˜¿¢^—šÂĞ¿š*¢ô¯n»š¢g¾ò'¾ò0(€€€€€€ƒšÆë–ºk––÷’æ/–ú3’âš¢–¶c¦ÉÅÕ•Õ•‘A±…å•ÉÑ¥½¹Ï¾ò0(€€€€€€ƒrš¶j–~ß¢†3Vg–"ÃÖCº_¦j;šº×¾ò0(€€€€€€ƒ¢Şš&/–.WšN7’ösj¢K¢&ËR£–B3’â––_¢š?–&(€€€€€€ƒ–B3š¢¢šr/šV?š6ß¦‚–ê?¾ò3’â7–7šr'&ç’ú/(€€€€¨¼((€€€¥˜¡…ÕÑ½½¹™¥œ¹Í­¥±°ôôô‰‘•™•¹ˆ¥ì((€€€€€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹ÍlÁtõì((€€€€€€€€€€€…Ñ¥½¸è‰‘•™•¹ˆ°((€€€€€€€€€€€Ñ…É•Ğé¹Õ±°((€€€€€€€ôì(((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞÍÑ…ÑÌ€ô(€€€€€€€•Ñ5…¥¹¡…É…Ñ•ÉMÑ…ÑÌ ¤ì(((€€€½¹ÍĞ¡ÁA•É•¹Ğ€ô(€€€€€€€Á±…å•È¹¡À¼(€€€€€€€ÍÑ…ÑÌ¹µ…á!@¨(€€€€€€€€ÄÀÀì(((€€€½¹ÍĞ…ÕÑ½!ÁA½Ñ¥½¹%ô(€€€€€€€•ÑÕÑ½A½Ñ¥½¹% ‰¡Àˆ¤ì(((€€€¥˜ (€€€€€€€¡ÁA•É•¹Ğğõ…ÕÑ½½¹™¥œ¹¡À€˜˜(€€€€€€€…ÕÑ½!ÁA½Ñ¥½¹%(€€€€¥ì((€€€€€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹ÍlÁtõì((€€€€€€€€€€€…Ñ¥½¸è‰Á½Ñ¥½¸ˆ°(€€€€€€€€€€€Á½Ñ¥½¹%é…ÕÑ½!ÁA½Ñ¥½¹%°(€€€€€€€€€€€Ñ…É•Ğé¹Õ±°((€€€€€€€ôì(((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞÍÁA•É•¹Ğ€ô(€€€€€€€Á±…å•È¹ÍÀ¼(€€€€€€€ÍÑ…ÑÌ¹µ…áM@¨(€€€€€€€€ÄÀÀì(((€€€½¹ÍĞ…ÕÑ½MÁA½Ñ¥½¹%ô(€€€€€€€•ÑÕÑ½A½Ñ¥½¹% ‰ÍÀˆ¤ì(((€€€¥˜ (€€€€€€€ÍÁA•É•¹Ğğõ…ÕÑ½½¹™¥œ¹ÍÀ€˜˜(€€€€€€€…ÕÑ½MÁA½Ñ¥½¹%(€€€€¥ì((€€€€€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹ÍlÁtõì((€€€€€€€€€€€…Ñ¥½¸è‰Á½Ñ¥½¸ˆ°(€€€€€€€€€€€Á½Ñ¥½¹%é…ÕÑ½MÁA½Ñ¥½¹%°(€€€€€€€€€€€Ñ…É•Ğé¹Õ±°((€€€€€€€ôì(((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ¦7šZÃ¢¢·¢¢#¢«–.Wš"Ã¦²—¦ãš«¦
+?¢ò¿¾òh((€€€€€€ƒ’æ/–&7’â7º‡R£’î¦êóš*¢÷¾ò3¦÷R£–B3’â––_–në–ºk–«–#¦‚–ê?¦ãn»š¢g¾ò0(€€€€€€ƒ–Â;¢Ó¾–r7š*¢÷¾ò#¯º·¾òk’â·–Ş›–>Ï’â'’êë¾ò$(€€€€€€ƒ–âã–âã¦ã–"Ã–>«¢÷š&O–"ÀÅøË¦jïj’ö7ö»¾ò0(€€€€€€ƒ–º3–£šÊKšr'3n‡¦?
+ã–"Ãšr–’k¦jï7j¦
+?¢ò¿¾ò3¦gšb¿’âï¢šjš«VÃ’æ/¢fW((€€€€€€ƒ>û–r£šRçš"C¾òh(€€€€€€€´ƒ¾–r7š*¢÷¾ò#n»–&7šb¿¯º·¾ò'¾òh(€€€€€€€€ƒ¦ã3n»–&7š"Ã¦²—’â·¦
+šÒï¢F_jš«&§7š¶’â·¦ZO¦
+’â¦jï¾ò0(€€€€€€€€ƒ–nƒ
+ë¯º·šb¿3’î—¦ã–ºkn»š¢g
+ë’â·–ş¾ò3–BG–Ş›–>ÏšNÓšV7¾ò0(€€€€€€€€ƒš&O’â·¦ZOš&7¢÷n‡¦?šÚ×¢N/šr–’k¦jï(€€€€€€€€ƒRÇšZó’â–‚Óš"Ã¦²—šr–’k–>«šr$ÅøÏ¦jïš«¾ò0(€€€€€€€€ƒ¦gš¢–k–ë’újšV#šzs¢«Û–ÂÇšb¿¾òh(€€€€€€€€€Ï¦jï¦÷šÒï¢F\ƒŠHƒ–£¦£š&O–"Ã¾òl(€€€€€€€€ƒ–&¤Ë¦jìƒŠHƒ–§¦jï¦÷š&O–"Ã¾òl(€€€€€€€€ƒ–&¤Ç¦jìƒŠHƒ–Z»¦®S–F÷’â·(€€€€€€€€ƒš¶––÷²›–B#3–«–#’â'¦–Ûš²‡–§¦šr–ú3–Z»¦jï7j¦
+?¢ò¿¾ò0(€€€€€€€€ƒ’â7¦r¢š¦†7–’[–"“šZß3š«&§šb¿–B›¦–r£’â¢Öß7¾ò0(€€€€€€€€ƒ–nƒ
+ë>û–r£šVÓ–‚Óš"Ã¦²—jš«&§šr³’ú–ÂÇ¦÷º_3¦–r£’â¢Öß7(€€€€€€€´ƒ–Z»¦®Sš*¢÷¾ò#šf»¦kšRïšN+šr–ş’âšN+¾ò'¾òh(€€€€€€€€ƒnÓš:—š&On»–&7¦
+šÒï¢F_j²³’â¦jï–ÂÇ––÷¾ò0(€€€€€€€€ƒ–Z»¦®Sš*¢÷šr³’ú–ÂÇ’â7¦r¢š¢š»¢ªÃ–r£’â·¦ZO(€€€€¨¼((€€€½¹ÍĞ…±¥Ù•%¹	…ÑÑ±”€ô(€€€€€€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ(€€€€€€€€¹™¥±Ñ•È (€€€€€€€€€€€¤ôø(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥t€˜˜(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥t¹…±¥Ù”(€€€€€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ–"“šZßn»–&7¦ã–ºkj¢«–.Wš*¢÷šb¿’â7šb¿3¾–r7Îï7¾ò0(€€€€€€ƒ¾–r7Îï¾ò!ÑÉ¤½É½Ü½…±³¾ò'–ÂÇš2G’â·¦ZOjš«¾ò0(€€€€€€ƒn‡¦?
+ã–"Ãšr–’k¦jï¾òl(€€€€€€ƒ–Z»¦®Sš*¢÷š"[šf»¦kšRïšN+¾ò3nÓš:—š&O²³’â¦jïšÒï¢F_j–ÂÇ––÷(€€€€€€ƒ¦g¢‡šRçš"C–úyÍ­¥±±…Ñ…‰…Í—–.Wš/š~—¢¦‹¾ò0(€€€€€€ƒ’æ/–ú3šZÃ–Š{š*¢÷’â7R£–7–n{’úšRç¦gšº×(€€€€¨¼((€€€½¹ÍĞ…ÕÑ½M­¥±±…Ñ„€ô(€€€€€€€Í­¥±±…Ñ…‰…Í•l(€€€€€€€€€€€…ÕÑ½½¹™¥œ¹Í­¥±°(€€€€€€€tì(((€€€½¹ÍĞ¥ÍMÁÉ•…‘M­¥±°€ô(€€€€€€€…ÕÑ½M­¥±±…Ñ„€˜˜(€€€€€€€€ (€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹Ñ…É•ÑQåÁ”ôôô‰ÑÉ¤‰ñğ(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹Ñ…É•ÑQåÁ”ôôô‰É½Ü‰ñğ(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹Ñ…É•ÑQåÁ”ôôô‰½±Õµ¸‰ñğ(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹Ñ…É•ÑQåÁ”ôôô‰…±°ˆ(€€€€€€€€¤ì(((€€€±•ĞÑ…É•Ğì(((€€€¥˜ (€€€€€€€¥ÍMÁÉ•…‘M­¥±°€˜˜(€€€€€€€…±¥Ù•%¹	…ÑÑ±”¹±•¹Ñ øÀ(€€€€¥ì((€€€€€€€½¹ÍĞµ¥‘A½Í¥Ñ¥½¸€ô(€€€€€€€€€€€5…Ñ ¹™±½½È (€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€…±¥Ù•%¹	…ÑÑ±”¹±•¹Ñ ´Ä(€€€€€€€€€€€€€€€€¤¼È(€€€€€€€€€€€€¤ì(((€€€€€€€Ñ…É•Ğ€ô(€€€€€€€€€€€…±¥Ù•%¹	…ÑÑ±•l(€€€€€€€€€€€€€€€µ¥‘A½Í¥Ñ¥½¸(€€€€€€€€€€€tì((€€€ô(€€€•±Í•ì((€€€€€€€Ñ…É•Ğ€ô(€€€€€€€€€€€…±¥Ù•%¹	…ÑÑ±•lÁtì((€€€ô(((€€€¥˜¡Ñ…É•ĞôôõÕ¹‘•™¥¹•¥ì((€€€€€€€¡•­	…ÑÑ±•¹ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠb‰Õ™›¦†{¾ò#šK¯¾ò'’â7¦r¢š¦ãn»š¢g¾ò0(€€€€€€ƒnÓš:—–º–F+3¢šR£šK¯7–ÂÇ––÷(€€€€¨¼((€€€¥˜ (€€€€€€€…ÕÑ½M­¥±±…Ñ„€˜˜(€€€€€€€…ÕÑ½M­¥±±…Ñ„¹…Ñ•½Éäôôô‰‰Õ™˜ˆ(€€€€¥ì((€€€€€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹ÍlÁtõì((€€€€€€€€€€€…Ñ¥½¸è(€€€€€€€€€€€€€€€…ÕÑ½½¹™¥œ¹Í­¥±°°((€€€€€€€€€€€Ñ…É•Ğé¹Õ±°((€€€€€€€ôì(((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€±•Ğ¡½Í•¹Ñ¥½¸ô(€€€€€€€…ÕÑ½½¹™¥œ¹Í­¥±°ì(((€€€¥˜¡…ÕÑ½M­¥±±…Ñ„¥ì((€€€€€€€½¹ÍĞÍÁ½ÍĞ€ô(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹ÍÁ½ÍĞ„ôõÕ¹‘•™¥¹•(€€€€€€€€€€€€ü(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹ÍÁ½ÍĞ(€€€€€€€€€€€€è(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹½ÍĞì(((€€€€€€€¥˜¡Á±…å•È¹ÍÀñÍÁ½ÍĞ¥ì((€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€‰MC’â7¢ÚÏ¾ò3šRçR£šf»¦kšRïšN+ˆ(€€€€€€€€€€€€¤ì(((€€€€€€€€€€€¡½Í•¹Ñ¥½¸ô(€€€€€€€€€€€€€€€€‰¹½Éµ…°ˆì((€€€€€€€ô((€€€ô(((€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹ÍlÁtõì((€€€€€€€…Ñ¥½¸é¡½Í•¹Ñ¥½¸°((€€€€€€€Ñ…É•ĞéÑ…É•Ğ((€€€ôì(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒ²³’ê3¢K¢&Ë¢«–.Wš"Ã¦²—¾ò#šZÃ–Š{¾ò$((€€Á±…å•ÈËšÊKšr'š&/–.WšN7’ös’î/¦v‹¾ò0(€€ƒš¾?–n{–B#:§–ºÛj¢†3–.WÖCšv’æ/–ú3¾ò0(€€ƒšr¢«–.WR£’î[¢«–ŞÇ¢w–
+gjš*¢ô¿¢«–.W¢¢·–ºh(€€ƒ¾ò!…ÕÑ½½¹™¥œË¾ò'š&O’âš²‡¾ò0(€€ƒ¦
+?¢ò¿n‡¦?¢Ş}…ÕÑ½Ñ¥½¸ §–Â7¢Ç¾ò0(€€ƒ’ö–º3–£6£®/¦/’ös¾ò3’â7šr–.W–"Ã²³’â¢K¢&Ëj’îï’öW.š/(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸Á±…å•ÈÉÕÑ½Ñ¥½¸¡Ñ½­•¸¥ì((€€€É•ÑÕÉ¸…ÕÑ½Ñ¥½¹½É¡…É…Ñ•È Ä±Ñ½­•¸¤ì((€€€¥˜ (€€€€€€€€…‰…ÑÑ±•Ñ¥Ù”ñğ(€€€€€€€€…Á±…å•ÈÈñğ(€€€€€€€Á±…å•ÈÈ¹¡ÀğôÀñğ(€€€€€€€Ñ½­•¸„ôõ‰…ÑÑ±•Q½­•¸(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#¦7¢š¾ò3’úwŸ’öÿR£¢šb;Šëš2š¶¾ò'¾òh(€€€€€€ƒ²³’ê3¢K¢&Ëj¢«–.Wš"Ã¦²—’æ/–&7’æšb¿3¢ò«–"Ã¢«–ŞÄ(€€€€€€ƒ–ÂÇ®/–"ï–~ß¢†37¾ò3’âš¢¦W–>7’ê3š&šr'¢†3–.W¦÷¢š(€€€€€€ƒŸšV?š6ß¦‚–ê?ÖCº_7j¢ššÆ(€€€€€€ƒšRçš"C¢Ş}Á±…å•ÈÇj…ÕÑ½Ñ¥½¸ §’âš¢¾ò0(€€€€€€ƒ–>«¢Êƒ¢Ê³3šÆë–ºk¢š–k’î¦êó7’â›–¶c¦È(€€€€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹Ï¾ò3rš¶–~ß¢†3Vg–"À(€€€€€€ƒÖCº_¦j;šº×¾ò3’â›’âS¦g¢‡¢«–ŞÇ¢Êƒ¢Ê³–Fó–>¬(€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ §¾ò#’â7–7’úw¢ÎĞ(€€€€€€‰•¥¹¡…É…Ñ•ÉQÕÉ¸ §¦
+¦
++¦†7–’[–Fó–>¯’âš²‡¾ò0(€€€€€€ƒ¦ÿ–7¦7¢’š:£¦Ë¾ò'(€€€€¨¼((€€€¥˜¡…ÕÑ½½¹™¥œÈ¹Í­¥±°ôôô‰‘•™•¹ˆ¥ì((€€€€€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹ÍlÅtõì((€€€€€€€€€€€…Ñ¥½¸è‰‘•™•¹ˆ°((€€€€€€€€€€€Ñ…É•Ğé¹Õ±°((€€€€€€€ôì(((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞÍÑ…ÑÌÈô(€€€€€€€•ÑA±…å•ÈÉ	…ÑÑ±•MÑ…ÑÌ ¤ì(((€€€½¹ÍĞ¡ÁA•É•¹ĞÈô(€€€€€€€Á±…å•ÈÈ¹¡À¼(€€€€€€€ÍÑ…ÑÌÈ¹µ…á!@¨(€€€€€€€€ÄÀÀì(((€€€½¹ÍĞ…ÕÑ½!ÁA½Ñ¥½¹%Èô(€€€€€€€•ÑÕÑ½A½Ñ¥½¹% ‰¡Àˆ¤ì(((€€€¥˜ (€€€€€€€¡ÁA•É•¹ĞÈğõ…ÕÑ½½¹™¥œÈ¹¡À€˜˜(€€€€€€€…ÕÑ½!ÁA½Ñ¥½¹%È(€€€€¥ì((€€€€€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹ÍlÅtõì((€€€€€€€€€€€…Ñ¥½¸è‰Á½Ñ¥½¸ˆ°(€€€€€€€€€€€Á½Ñ¥½¹%é…ÕÑ½!ÁA½Ñ¥½¹%È°(€€€€€€€€€€€Ñ…É•Ğé¹Õ±°((€€€€€€€ôì(((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞÍÁA•É•¹ĞÈô(€€€€€€€Á±…å•ÈÈ¹ÍÀ¼(€€€€€€€ÍÑ…ÑÌÈ¹µ…áM@¨(€€€€€€€€ÄÀÀì(((€€€½¹ÍĞ…ÕÑ½MÁA½Ñ¥½¹%Èô(€€€€€€€•ÑÕÑ½A½Ñ¥½¹% ‰ÍÀˆ¤ì(((€€€¥˜ (€€€€€€€ÍÁA•É•¹ĞÈğõ…ÕÑ½½¹™¥œÈ¹ÍÀ€˜˜(€€€€€€€…ÕÑ½MÁA½Ñ¥½¹%È(€€€€¥ì((€€€€€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹ÍlÅtõì((€€€€€€€€€€€…Ñ¥½¸è‰Á½Ñ¥½¸ˆ°(€€€€€€€€€€€Á½Ñ¥½¹%é…ÕÑ½MÁA½Ñ¥½¹%È°(€€€€€€€€€€€Ñ…É•Ğé¹Õ±°((€€€€€€€ôì(((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞ…±¥Ù•%¹	…ÑÑ±”ô(€€€€€€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ¹™¥±Ñ•È (€€€€€€€€€€€¤ôø(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥t€˜˜(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥t¹…±¥Ù”(€€€€€€€€¤ì(((€€€¥˜¡…±¥Ù•%¹	…ÑÑ±”¹±•¹Ñ ôôôÀ¥ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞ…ÕÑ½M­¥±±…Ñ„ô(€€€€€€€Í­¥±±…Ñ…‰…Í•l(€€€€€€€€€€€…ÕÑ½½¹™¥œÈ¹Í­¥±°(€€€€€€€tì(((€€€½¹ÍĞ¥ÍMÁÉ•…‘M­¥±°ô(€€€€€€€…ÕÑ½M­¥±±…Ñ„€˜˜(€€€€€€€€ (€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹Ñ…É•ÑQåÁ”ôôô‰ÑÉ¤‰ñğ(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹Ñ…É•ÑQåÁ”ôôô‰É½Ü‰ñğ(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹Ñ…É•ÑQåÁ”ôôô‰½±Õµ¸‰ñğ(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹Ñ…É•ÑQåÁ”ôôô‰…±°ˆ(€€€€€€€€¤ì(((€€€±•ĞÑ…É•Ğì(((€€€¥˜ (€€€€€€€¥ÍMÁÉ•…‘M­¥±°€˜˜(€€€€€€€…±¥Ù•%¹	…ÑÑ±”¹±•¹Ñ øÀ(€€€€¥ì((€€€€€€€½¹ÍĞµ¥‘A½Í¥Ñ¥½¸ô(€€€€€€€€€€€5…Ñ ¹™±½½È (€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€…±¥Ù•%¹	…ÑÑ±”¹±•¹Ñ ´Ä(€€€€€€€€€€€€€€€€¤¼È(€€€€€€€€€€€€¤ì(((€€€€€€€Ñ…É•Ğô(€€€€€€€€€€€…±¥Ù•%¹	…ÑÑ±•l(€€€€€€€€€€€€€€€µ¥‘A½Í¥Ñ¥½¸(€€€€€€€€€€€tì((€€€ô(€€€•±Í•ì((€€€€€€€Ñ…É•Ğô(€€€€€€€€€€€…±¥Ù•%¹	…ÑÑ±•lÁtì((€€€ô(((€€€¥˜¡Ñ…É•ĞôôõÕ¹‘•™¥¹•¥ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€±•Ğ¡½Í•¹Ñ¥½¸ô(€€€€€€€…ÕÑ½½¹™¥œÈ¹Í­¥±°ì(((€€€¥˜ (€€€€€€€…ÕÑ½M­¥±±…Ñ„€˜˜(€€€€€€€…ÕÑ½M­¥±±…Ñ„¹…Ñ•½Éä„ôô‰‰Õ™˜ˆ˜˜(€€€€€€€…ÕÑ½M­¥±±…Ñ„¹…Ñ•½Éä„ôô‰Á…ÍÍ¥Ù”ˆ˜˜(€€€€€€€…ÕÑ½M­¥±±…Ñ„¹…Ñ•½Éä„ôô‰¡•…°ˆ˜˜(€€€€€€€…ÕÑ½M­¥±±…Ñ„¹…Ñ•½Éä„ôô‰É•Ù¥Ù”ˆ(€€€€¥ì((€€€€€€€½¹ÍĞÍÁ½ÍĞô(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹ÍÁ½ÍĞ„ôõÕ¹‘•™¥¹•(€€€€€€€€€€€€ü(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹ÍÁ½ÍĞ(€€€€€€€€€€€€è(€€€€€€€€€€€…ÕÑ½M­¥±±…Ñ„¹½ÍĞì(((€€€€€€€¥˜¡Á±…å•ÈÈ¹ÍÀñÍÁ½ÍĞ¥ì((€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€Á±…å•ÈÈ¹¥¬(€€€€€€€€€€€€€€€€‰MC’â7¢ÚÏ¾ò3šRçR£šf»¦kšRïšN+ˆ(€€€€€€€€€€€€¤ì(((€€€€€€€€€€€¡½Í•¹Ñ¥½¸ô(€€€€€€€€€€€€€€€€‰¹½Éµ…°ˆì((€€€€€€€ô((€€€ô(((€€€ÅÕ•Õ•‘A±…å•ÉÑ¥½¹ÍlÅtõì((€€€€€€€…Ñ¥½¸é¡½Í•¹Ñ¥½¸°((€€€€€€€Ñ…É•ĞéÑ…É•Ğ((€€€ôì(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô(()™Õ¹Ñ¥½¸Á±…å•ÈÍÕÑ½Ñ¥½¸¡Ñ½­•¸¥ì(€€€É•ÑÕÉ¸…ÕÑ½Ñ¥½¹½É¡…É…Ñ•È È±Ñ½­•¸¤ì)ô(()™Õ¹Ñ¥½¸Í•½¹‘…Éå¡…É…Ñ•É9½Éµ…±ÑÑ…¬¡¡…É…Ñ•É%¹‘•à±¥¹‘•à¥ì((€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¡…É…Ñ•É%¹‘•à¤ì(€€€½¹ÍĞÍÑ…ÑÌõ•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ¡¡…É…Ñ•É%¹‘•à¤ì((€€€¥¹‘•àõ™¥¹‘±¥Ù•Q…É•Ñ%¹‘•à¡¥¹‘•à¤ì((€€€¥˜ …¡…É…Ñ•Èñğ€…ÍÑ…ÑÌñğ¥¹‘•àôôõ¹Õ±°¥ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€Í•±•Ñ•‘5½¹ÍÑ•Èõ¥¹‘•àì(€€€½¹ÍĞµ½¹ÍÑ•Èõµ½¹ÍÑ•ÉÍm¥¹‘•átì((€€€±Õ¹•A±…å•É…É¡¡…É…Ñ•É%¹‘•à¤ì(€€€Í¡½İM­¥±±9…µ•	…‘” ‹šf»¦kšRïšN(ˆ°‰¹½Éµ…°ˆ±¡…É…Ñ•É%¹‘•à±¥¹‘•à±m¥¹‘•át¤ì((€€€½¹ÍĞ¡¥ĞõÉ½±±!¥Ñ¡…¹” (€€€€€€€ÍÑ…ÑÌ¹…ÕÉ…ä°(€€€€€€€•Ñ5½¹ÍÑ•ÉÙ…Í¥½¸¡µ½¹ÍÑ•È¤°(€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ”¡¡…É…Ñ•È°‰ÍÑÕ¸ˆ¤(€€€€¤ì((€€€¥˜ …¡¥Ğ¥ì(€€€€€€€Í¡½İ5¥ÍÍ™™•Ğ¡™…±Í”±¥¹‘•à°‰5%MLˆ¤ì(€€€€€€€…‘‘	…ÑÑ±•1½œ ¡¡…É…Ñ•È¹¥‘ñğ‹¦j+–>,ˆ¤¬‹šf»¦kšRïšN(ˆ­µ½¹ÍÑ•È¹¹…µ”¬‹¾ò3šÊKšr'–F÷’â·¾òˆ¤ì(€€€€€€€ÕÁ‘…Ñ•U$ ¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÉ¥ÑI•ÍÕ±ĞõÉ½±±É¥Ñ¥…° (€€€€€€€¡…É…Ñ•È°(€€€€€€€€‰Á¡åÍ¥…°ˆ°(€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•¹Ñ¥É¥Ğ¡µ½¹ÍÑ•È¤°(€€€€€€€µ½¹ÍÑ•È(€€€€¤ì((€€€½¹ÍĞ‘…µ…”õ…±Õ±…Ñ•…µ…” (€€€€€€€ÍÑ…ÑÌ¹…ÑÑ…¬°(€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù••™•¹Í”¡µ½¹ÍÑ•È¤°(€€€€€€€¡…É…Ñ•È¹±•Ù•°°(€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€¡…É…Ñ•È¹•±•µ•¹Ğ°(€€€€€€€µ½¹ÍÑ•È¹•±•µ•¹Ğ°(€€€€€€€ì(€€€€€€€€€€€…ÑÑ…­•Èé¡…É…Ñ•È°(€€€€€€€€€€€Ñ…É•Ğéµ½¹ÍÑ•È°(€€€€€€€€€€€É¥Ñ5Õ±Ñ¥Á±¥•ÈéÉ¥ÑI•ÍÕ±Ğ¹µÕ±Ñ¥Á±¥•È(€€€€€€€ô(€€€€¤ì(€€€µ½¹ÍÑ•È¹¡Àõ5…Ñ ¹µ…à À±µ½¹ÍÑ•È¹¡Àµ‘…µ…”¤ì((€€€Í¡½İ5½¹ÍÑ•É!¥Ğ¡¥¹‘•à±‘…µ…”°‰¡Àˆ±É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ¤ì(€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€¡¡…É…Ñ•È¹¥‘ñğ‹¦j+–>,ˆ¤¬‹šf»¦kšRïšN(ˆ­µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€¡É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ€ü€‹¾ò#"šN+¾ò¾ò$ˆ€è€ˆˆ¤¬(€€€€€€€€‹¾ò3¦ƒš"@ˆ­‘…µ…”¬‹–
+ß–ºÏˆ(€€€€¤ì((€€€¥˜¡µ½¹ÍÑ•È¹¡ÀğôÀ¥ì­¥±±5½¹ÍÑ•È¡¥¹‘•à¤ìô((€€€ÕÁ‘…Ñ•U$ ¤ì(€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì)ô(()™Õ¹Ñ¥½¸…ÍÑM•½¹‘…Éå¡…É…Ñ•ÉM­¥±°¡¡…É…Ñ•É%¹‘•à±Í­¥±±%±•¹Ñ•É%¹‘•à¥ì((€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¡…É…Ñ•É%¹‘•à¤ì(€€€½¹ÍĞ¡…É…Ñ•É-•äõ•ÑA…ÉÑå¡…É…Ñ•É-•ä¡¡…É…Ñ•É%¹‘•à¤ì(€€€½¹ÍĞÍÑ…ÑÌõ•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ¡¡…É…Ñ•É%¹‘•à¤ì(€€€½¹ÍĞÍ­¥±°õÍ­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì((€€€¥˜ …¡…É…Ñ•Èñğ€…ÍÑ…ÑÌñğ€…Í­¥±°¥ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞ±•Ù•°õ•ÑM­¥±±1•Ù•°¡¡…É…Ñ•É-•ä±Í­¥±±%¤ì(€€€½¹ÍĞÍÁ½ÍĞõÍ­¥±°¹ÍÁ½ÍĞ„ôõÕ¹‘•™¥¹•€üÍ­¥±°¹ÍÁ½ÍĞ€è€¡Í­¥±°¹½ÍÑñğÀ¤ì((€€€¥˜¡±•Ù•°ğôÀñğ¡…É…Ñ•È¹ÍÀñÍÁ½ÍĞ¥ì(€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€±•Ù•°ğôÀ(€€€€€€€€€€€€ü€¡¡…É…Ñ•È¹¥¬‹–Âkšr«–¶ãşHˆ­Í­¥±°¹¹…µ”¬‹ˆ¤(€€€€€€€€€€€€è€¡¡…É…Ñ•È¹¥¬‰MC’â7¢ÚÏ¾ò3‡šÎW’öÿR ˆ­Í­¥±°¹¹…µ”¬‹ˆ¤(€€€€€€€€¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€•¹Ñ•É%¹‘•àõ™¥¹‘±¥Ù•Q…É•Ñ%¹‘•à¡•¹Ñ•É%¹‘•à¤ì((€€€¥˜¡•¹Ñ•É%¹‘•àôôõ¹Õ±°¥ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÑ…É•ÑÌõ•ÑM­¥±±Q…É•ÑÌ¡•¹Ñ•É%¹‘•à±Í­¥±°¹Ñ…É•ÑQåÁ”¤ì((€€€¡…É…Ñ•È¹ÍÀ´õÍÁ½ÍĞì(€€€±Õ¹•A±…å•É…É¡¡…É…Ñ•É%¹‘•à¤ì(€€€Í¡½İM­¥±±9…µ•	…‘” (€€€€€€€Í­¥±°¹¹…µ”±Í­¥±°¹•±•µ•¹Ğ±¡…É…Ñ•É%¹‘•à°(€€€€€€€Í­¥±°¹Ñ…É•ÑQåÁ”ôôô‰…±°ˆı¹Õ±°é•¹Ñ•É%¹‘•à±Ñ…É•ÑÌ(€€€€¤ì(€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùÍ¡½İA±…å•ÉMÁA½ÁÕÀ¡ÍÁ½ÍĞ±¡…É…Ñ•É%¹‘•à¤°ÔÀÀ¤ì((€€€½¹ÍĞÍÑ…Ñ	½¹ÕÌõÍ­¥±°¹…Ñ•½Éäôôô‰µ…¥Œˆ€üÍÑ…ÑÌ¹µ…¥ÑÑ…¬€èÍÑ…ÑÌ¹…ÑÑ…¬ì((€€€¥˜ …Í­¥±°¹‰…Í•…µ…”¥ì(€€€€€€€½¹ÍĞÉ•Í½±Ù•‘%¹‘•àõ™¥¹‘±¥Ù•Q…É•Ñ%¹‘•à¡•¹Ñ•É%¹‘•à¤ì((€€€€€€€¥˜¡É•Í½±Ù•‘%¹‘•à„ôõ¹Õ±°€˜˜Í­¥±°¹™É••é•¡…¹”¥ì(€€€€€€€€€€€½¹ÍĞµ½¹ÍÑ•Èõµ½¹ÍÑ•ÉÍmÉ•Í½±Ù•‘%¹‘•átì(€€€€€€€€€€€½¹ÍĞ™É••é•I•ÍÕ±ĞõÉ½±±9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…ÑÕÍ™™•Ğ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€‰™É••é”ˆ°(€€€€€€€€€€€€€€€l(€€€€€€€€€€€€€€€€€€€Í­¥±°¹™É••é•¡…¹”°(€€€€€€€€€€€€€€€€€€€¡…É…Ñ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹¥¹Ñ•±±¥•¹”°(€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•MÁ¥É¥ÑA½¥¹ÑÌ¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€€€€€€€€€ÑÉÕ”°(€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•ÉI…¹¬¡µ½¹ÍÑ•È¤(€€€€€€€€€€€€€€€t°(€€€€€€€€€€€€€€€€‰µ½¹ÍÑ•Èˆ°(€€€€€€€€€€€€€€€É•Í½±Ù•‘%¹‘•à°(€€€€€€€€€€€€€€€Í­¥±°¹¹…µ”(€€€€€€€€€€€€¤ì((€€€€€€€€€€€¥˜¡™É••é•I•ÍÕ±Ğ¹¡¥Ğ¥ì(€€€€€€€€€€€€€€€…ÁÁ±åÉ••é•™™•Ğ¡µ½¹ÍÑ•È±Í­¥±°¹™É••é•ÕÉ…Ñ¥½¸¤ì(€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ¡µ½¹ÍÑ•È¹¹…µ”¬‹¢Š¯–Ã–Â’ê¾òˆ¤ì(€€€€€€€€€€€õ•±Í”¥˜ …™É••é•I•ÍÕ±Ğ¹‘ÕÁ±¥…Ñ”¥ì(€€€€€€€€€€€€€€€Í¡½İ5¥ÍÍ™™•Ğ¡™…±Í”±É•Í½±Ù•‘%¹‘•à°‹š*×š*\ˆ¤ì(€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ¡Í­¥±°¹¹…µ”¬‹–Â4ˆ­µ½¹ÍÑ•È¹¹…µ”¬‹šÊKšr'RšV#¾ò#š*×š*_¾ò'ˆ¤ì(€€€€€€€€€€€ô(€€€€€€€ô((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜¡Í­¥±±%ôôô‰™¥É•I½­•Ğˆ¥ì(€€€€€€€Á±…å¥É•I½­•Ñ¹¥µ…Ñ¥½¸ (€€€€€€€€€€€€‰‰…ÑÑ±•A±…å•É…Éˆ­¡…É…Ñ•É%¹‘•à°(€€€€€€€€€€€Ñ…É•ÑÌ¹µ…À¡¥¹‘•àôø‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­¥¹‘•à¤(€€€€€€€€¤ì(€€€ô((€€€±•ĞÑ½Ñ…±1¥™•ÍÑ•…°ôÀì((€€€Ñ…É•ÑÌ¹™½É… ¡¥¹‘•àôùì(€€€€€€€½¹ÍĞµ½¹ÍÑ•Èõµ½¹ÍÑ•ÉÍm¥¹‘•átì(€€€€€€€¥˜ …µ½¹ÍÑ•Èñğ€…µ½¹ÍÑ•È¹…±¥Ù”¥ìÉ•ÑÕÉ¸ìô((€€€€€€€¥˜¡Í­¥±°¹¥ôôô‰¥•MÁ¥¸ˆ¥ì(€€€€€€€€€€€Á±…å%•MÁ¥¹AÉ½©•Ñ¥±”¡¡…É…Ñ•É%¹‘•à±¥¹‘•à¤ì(€€€€€€€ô((€€€€€€€½¹ÍĞ¡¥ĞõÉ½±±!¥Ñ¡…¹” (€€€€€€€€€€€ÍÑ…ÑÌ¹…ÕÉ…ä°(€€€€€€€€€€€•Ñ5½¹ÍÑ•ÉÙ…Í¥½¸¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ”¡¡…É…Ñ•È°‰ÍÑÕ¸ˆ¤(€€€€€€€€¤ì((€€€€€€€¥˜ …¡¥Ğ¥ì(€€€€€€€€€€€Í¡½İ5¥ÍÍ™™•Ğ¡™…±Í”±¥¹‘•à°‰5%MLˆ¤ì(€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ¡Í­¥±°¹¹…µ”¬‹–Â4ˆ­µ½¹ÍÑ•È¹¹…µ”¬‹¾ò3šÊKšr'–F÷’â·¾òˆ¤ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô((€€€€€€€½¹ÍĞÉ¥ÑI•ÍÕ±ĞõÉ½±±É¥Ñ¥…° (€€€€€€€€€€€¡…É…Ñ•È°(€€€€€€€€€€€Í­¥±°¹…Ñ•½Éä°(€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•¹Ñ¥É¥Ğ¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€¤ì((€€€€€€€½¹ÍĞ‘…µ…”õ…±Õ±…Ñ•M­¥±±…µ…”¡ì(€€€€€€€€€€€Í­¥±°éÍ­¥±°°(€€€€€€€€€€€Í­¥±±1•Ù•°é±•Ù•°°(€€€€€€€€€€€•™™•Ñ¥Ù•ÑÑ…¬éÍÑ…Ñ	½¹ÕÌ°(€€€€€€€€€€€Ñ…É•Ğéµ½¹ÍÑ•È°(€€€€€€€€€€€…ÍÑ•É1•Ù•°é¡…É…Ñ•È¹±•Ù•°°(€€€€€€€€€€€…ÍÑ•É±•µ•¹Ğé¡…É…Ñ•È¹•±•µ•¹Ğ°(€€€€€€€€€€€…ÑÑ…­•Èé¡…É…Ñ•È°(€€€€€€€€€€€É¥Ñ5Õ±Ñ¥Á±¥•ÈéÉ¥ÑI•ÍÕ±Ğ¹µÕ±Ñ¥Á±¥•È(€€€€€€€ô¤ì(€€€€€€€½¹ÍĞ¡Á	•™½É•¥É•Ñ…µ…”õµ½¹ÍÑ•È¹¡Àì(€€€€€€€µ½¹ÍÑ•È¹¡Àõ5…Ñ ¹µ…à À±µ½¹ÍÑ•È¹¡Àµ‘…µ…”¤ì((€€€€€€€Í¡½İ5½¹ÍÑ•É!¥Ğ¡¥¹‘•à±‘…µ…”°‰¡Àˆ±É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ¤ì(€€€€€€€½¹ÍĞ…ÑÕ…±…µ…••…±Ğõ5…Ñ ¹µ…à À±¡Á	•™½É•¥É•Ñ…µ…”µµ½¹ÍÑ•È¹¡À¤ì(€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€¡¡…É…Ñ•È¹¥‘ñğ‹¦j+–>,ˆ¤¬‹šZ÷šRøˆ­Í­¥±°¹¹…µ”¬‹–F÷’â´ˆ­µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€¡É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ€ü€‹¾ò#"šN+¾ò¾ò$ˆ€è€ˆˆ¤¬(€€€€€€€€€€€€‹¾ò3¦ƒš"@ˆ­‘…µ…”¬‹–
+ß–ºÏˆ(€€€€€€€€¤ì((€€€€€€€½¹ÍĞ‰ÕÉ¹I•ÍÕ±ĞõÍ­¥±°¹‰ÕÉ¹¡…¹”(€€€€€€€€€€€€ıÉ½±±9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…ÑÕÍ™™•Ğ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€‰‰ÕÉ¸ˆ°(€€€€€€€€€€€€€€€l(€€€€€€€€€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹¡…¹”±¡…É…Ñ•È¹±•Ù•°±µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹¥¹Ñ•±±¥•¹”±•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•MÁ¥É¥ÑA½¥¹ÑÌ¡µ½¹ÍÑ•È¤(€€€€€€€€€€€€€€€t°(€€€€€€€€€€€€€€€€‰µ½¹ÍÑ•Èˆ°(€€€€€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€€€€€Í­¥±°¹¹…µ”°(€€€€€€€€€€€€€€€Í­¥±°¹Õ…É…¹Ñ••‘	ÕÉ¸ôôõÑÉÕ”(€€€€€€€€€€€€¤(€€€€€€€€€€€€é¹Õ±°ì(€€€€€€€¥˜¡‰ÕÉ¹I•ÍÕ±Ğ˜™‰ÕÉ¹I•ÍÕ±Ğ¹¡¥Ğ¥ì(€€€€€€€€€€€…ÁÁ±å	ÕÉ¹™™•Ğ¡µ½¹ÍÑ•È±Í­¥±°¹‰ÕÉ¹ÕÉ…Ñ¥½¸±Í­¥±°¹‰ÕÉ¹A•É•¹Ñ	å1•Ù•±m±•Ù•°´Åt¤ì(€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ¡µ½¹ÍÑ•È¹¹…µ”¬‹¦fß–—K.š/¾òˆ¤ì(€€€€€€€ô((€€€€€€€½¹ÍĞ™É••é•I•ÍÕ±ĞõÍ­¥±°¹™É••é•¡…¹”(€€€€€€€€€€€€ıÉ½±±9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…ÑÕÍ™™•Ğ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€‰™É••é”ˆ°(€€€€€€€€€€€€€€€l(€€€€€€€€€€€€€€€€€€€Í­¥±°¹™É••é•¡…¹”±¡…É…Ñ•È¹±•Ù•°±µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹¥¹Ñ•±±¥•¹”±•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•MÁ¥É¥ÑA½¥¹ÑÌ¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€€€€€€€€€ÑÉÕ”±•Ñ5½¹ÍÑ•ÉI…¹¬¡µ½¹ÍÑ•È¤(€€€€€€€€€€€€€€€t°(€€€€€€€€€€€€€€€€‰µ½¹ÍÑ•Èˆ°(€€€€€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€€€€€Í­¥±°¹¹…µ”(€€€€€€€€€€€€¤(€€€€€€€€€€€€é¹Õ±°ì(€€€€€€€¥˜¡™É••é•I•ÍÕ±Ğ˜™™É••é•I•ÍÕ±Ğ¹¡¥Ğ¥ì(€€€€€€€€€€€…ÁÁ±åÉ••é•™™•Ğ¡µ½¹ÍÑ•È±Í­¥±°¹™É••é•ÕÉ…Ñ¥½¸¤ì(€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ¡µ½¹ÍÑ•È¹¹…µ”¬‹¢Š¯–Ã–Â’ê¾òˆ¤ì(€€€€€€€ô((€€€€€€€…ÁÁ±åM­¥±±•‰Õ™™™™•ÑÌ (€€€€€€€€€€€Í­¥±°±±•Ù•°±µ½¹ÍÑ•È±¥¹‘•à±¡…É…Ñ•È¹±•Ù•°±ÍÑ…ÑÌ¹¥¹Ñ•±±¥•¹”(€€€€€€€€¤ì((€€€€€€€¥˜¡Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•°¥ìÑ½Ñ…±1¥™•ÍÑ•…°¬õ…ÑÕ…±…µ…••…±Ğìô(€€€€€€€¥˜¡µ½¹ÍÑ•È¹¡ÀğôÀ¥ì­¥±±5½¹ÍÑ•È¡¥¹‘•à¤ìô(€€€ô¤ì((€€€¥˜¡Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•°€˜˜Ñ½Ñ…±1¥™•ÍÑ•…°øÀ¥ì(€€€€€€€½¹ÍĞ…µ½Õ¹Ğõ5…Ñ ¹™±½½È (€€€€€€€€€€€Ñ½Ñ…±1¥™•ÍÑ•…°©Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•±m±•Ù•°´Åt¼ÄÀÀ(€€€€€€€€¤ì(€€€€€€€¡…É…Ñ•È¹¡Àõ5…Ñ ¹µ¥¸¡ÍÑ…ÑÌ¹µ…á!@±¡…É…Ñ•È¹¡À­…µ½Õ¹Ğ¤ì(€€€€€€€¡…É…Ñ•È¹ÍÀõ5…Ñ ¹µ¥¸¡ÍÑ…ÑÌ¹µ…áM@±¡…É…Ñ•È¹ÍÀ­…µ½Õ¹Ğ¤ì(€€€€€€€Í¡½İA±…å•É!¥Ğ¡…µ½Õ¹Ğ°‰¡•…°ˆ±¡…É…Ñ•É%¹‘•à±ÑÉÕ”¤ì(€€€€€€€…‘‘	…ÑÑ±•1½œ ¡¡…É…Ñ•È¹¥‘ñğ‹¦j+–>,ˆ¤¬‹–BãšRÛ–
+ß–ºÏ’â›–n{–ú¥!C¢"MCˆ¤ì(€€€ô((€€€¥˜¡Í­¥±°¹Í•±™M¡¥•±‘	å1•Ù•°˜™…¹ÁÁ±å9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ” (€€€€€€€¡…É…Ñ•È°‰Í¡¥•±ˆ°‰Á±…å•Èˆ±¡…É…Ñ•É%¹‘•à±Í­¥±°¹¹…µ”(€€€€¤¥ì(€€€€€€€¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Ìô¡¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Íññmt¤¹™¥±Ñ•È¡‰Õ™˜ôø(€€€€€€€€€€€€…‰Õ™™ññ‰Õ™˜¹ÑåÁ”„ôô‰Í¡¥•±‰ññ9Õµ‰•È¡‰Õ™˜¹ÑÕÉ¹Í1•™Ğ¤øÀ˜™9Õµ‰•È¡‰Õ™˜¹É•µ…¥¹¥¹œ¤øÀ(€€€€€€€€¤ì(€€€€€€€¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Ì¹ÁÕÍ ¡µ…É­A•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ•9…µ”¡ì(€€€€€€€€€€€ÑåÁ”è‰Í¡¥•±ˆ°(€€€€€€€€€€€ÑÕÉ¹Í1•™ĞéÍ­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ°(€€€€€€€€€€€É•µ…¥¹¥¹œéÍ­¥±°¹Í•±™M¡¥•±‘	å1•Ù•±m±•Ù•°´Åt(€€€€€€€ô°‰Í¡¥•±ˆ¤¤ì(€€€ô((€€€¥˜¡Í­¥±°¹…±±åM¡¥•±‘	å1•Ù•°¥ì(€€€€€€€½¹ÍĞ…µ½Õ¹ĞõÍ­¥±°¹…±±åM¡¥•±‘	å1•Ù•±m±•Ù•°´Åtì(€€€€€€€•ÑÑ¥Ù•A±…å•É¡…É…Ñ•ÉÌ ¤¹™½É…  ¡Ñ…É•Ğ±Ñ…É•Ñ%¹‘•à¤ôùì(€€€€€€€€€€€¥˜ ……¹ÁÁ±å9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ” (€€€€€€€€€€€€€€€Ñ…É•Ğ°‰Í¡¥•±ˆ°‰Á±…å•Èˆ±Ñ…É•Ñ%¹‘•à±Í­¥±°¹¹…µ”(€€€€€€€€€€€€¤¥ìÉ•ÑÕÉ¸ìô(€€€€€€€€€€€Ñ…É•Ğ¹…Ñ¥Ù•	Õ™™Ìô¡Ñ…É•Ğ¹…Ñ¥Ù•	Õ™™Íññmt¤¹™¥±Ñ•È¡‰Õ™˜ôø(€€€€€€€€€€€€€€€€…‰Õ™™ññ‰Õ™˜¹ÑåÁ”„ôô‰Í¡¥•±‰ññ9Õµ‰•È¡‰Õ™˜¹ÑÕÉ¹Í1•™Ğ¤øÀ˜™9Õµ‰•È¡‰Õ™˜¹É•µ…¥¹¥¹œ¤øÀ(€€€€€€€€€€€€¤ì(€€€€€€€€€€€Ñ…É•Ğ¹…Ñ¥Ù•	Õ™™Ì¹ÁÕÍ ¡µ…É­A•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ•9…µ”¡ì(€€€€€€€€€€€€€€€ÑåÁ”è‰Í¡¥•±ˆ°(€€€€€€€€€€€€€€€ÑÕÉ¹Í1•™ĞéÍ­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ°(€€€€€€€€€€€€€€€É•µ…¥¹¥¹œé…µ½Õ¹Ğ(€€€€€€€€€€€ô°‰Í¡¥•±ˆ¤¤ì(€€€€€€€ô¤ì(€€€ô((€€€ÕÁ‘…Ñ•U$ ¤ì(€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì)ô(((¼¨(€€ƒŠbƒ²³’ê3¢K¢&Ëjšf»¦kšRïšN+(€€ƒ¦
+?¢ò¿¢Ş}¹½Éµ…±ÑÑ…¬ §’â¢Ó¾ò0(€€ƒ’ö–º3–£šN7’öqÁ±…å•ÈÈ½ÍÑ…ÑÌË¾ò0(€€ƒ’â7šr–.W–"ÁÁ±…å•Ë(¨¼((¼¨(€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¢s’â+¢Ş}Á±…å•ÈÄ(€€ƒ–B3’â––_3n»š¢gš¶ï’ê‡¢«–.W¢ö'¯7j’şw¢¶ß¾ò'¾òh(€€ƒ¦g–/–÷–ò?–Fó–>¯®¿¾ò!•á•ÕÑ•Ñ¥½¸¼(€€É•Í½±Ù•EÕ•Õ•‘A±…å•ÉÑ¥½»¾ò'šr³’ú–ÂÇšr–r (€€ƒ–Fó–>¯–º3’æ/–ú3‡šŠw’îÛ¢s–Fó–>¯’âš²„(€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ §¾ò3š&’î—–:šr³3n»š¢gš¶ï’ê(€€ƒ–ÂÇnÓš:•É•ÑÕÉ»7’â›’â7šr¢ºOš"Ã¦²—–6‡’ö?¾ò3–>«šb¿šr(€€ƒ¢ºO¦gš²‡šRïšN+¢º+š"Cš&O¦ëšÂ’â7šr¢«–.W¢ö'¯((€€ƒ¦g¢‡šRçR¡™¥¹‘±¥Ù•Q…É•Ñ%¹‘•à §¾ò#ÒSš&ûn»š¢g¾ò0(€€ƒ’â7–Fó–>­™¥¹¥Í¡A±…å•ÉÑ¥½¸ §¾ò'¾ò3š&û–"Ãn»š¢d(€€ƒ¦
+šÒï¢F_–ÂÇšÊÿR£¾ò3š¶ï’ê–ÂÇ¢«–.WšRçš&L(€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÏ¢‡²³’â¦jï¦
+šÒï¢F_jš«&§¾ò0(€€ƒ¢Ş}Á±…å•ÈÇj¢†3
+ë’â¢Órj’â¦jïš«&§¦÷’â7–&¤(€€ƒ¾ò#–£šî¾ò'š&5É•ÑÕÉ»¾ò3’ê“Ö›–Fó–>¯®¿šr³’ú–ÂÇšr¢s’â+j(€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ §šRÛ–Âû¾ò3’â7šr–r£¦g¢„(€€ƒ¦7¢’–Fó–>¯²³’ê3š²‡(¨¼()™Õ¹Ñ¥½¸Á±…å•ÈÉ9½Éµ…±ÑÑ…¬¡¥¹‘•à¥ì((€€€¥¹‘•àô(€€€€€€€™¥¹‘±¥Ù•Q…É•Ñ%¹‘•à (€€€€€€€€€€€¥¹‘•à(€€€€€€€€¤ì(((€€€¥˜¡¥¹‘•àôôõ¹Õ±°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€Í•±•Ñ•‘5½¹ÍÑ•Èô(€€€€€€€¥¹‘•àì(((€€€½¹ÍĞµ½¹ÍÑ•Èô(€€€€€€€µ½¹ÍÑ•ÉÍm¥¹‘•átì(((€€€½¹ÍĞÍÑ…ÑÌÈô(€€€€€€€•ÑA±…å•ÈÉ	…ÑÑ±•MÑ…ÑÌ ¤ì(((€€€±Õ¹•A±…å•É…É Ä¤ì(((€€€Í¡½İM­¥±±9…µ•	…‘” (€€€€€€€€‹šf»¦kšRïšN(ˆ°(€€€€€€€€‰¹½Éµ…°ˆ°(€€€€€€€€Ä°(€€€€€€€¥¹‘•à°(€€€€€€€m¥¹‘•át(€€€€¤ì(((€€€½¹ÍĞ¡¥Ğô(€€€€€€€É½±±!¥Ñ¡…¹” (€€€€€€€€€€€ÍÑ…ÑÌÈ¹…ÕÉ…ä°(€€€€€€€€€€€•Ñ5½¹ÍÑ•ÉÙ…Í¥½¸ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€€€€€¤°(€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ” (€€€€€€€€€€€€€€€Á±…å•ÈÈ°(€€€€€€€€€€€€€€€€‰ÍÑÕ¸ˆ(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€¥˜ …¡¥Ğ¥ì((€€€€€€€Í¡½İ5¥ÍÍ™™•Ğ (€€€€€€€€€€€™…±Í”°(€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€€‰5%MLˆ(€€€€€€€€¤ì(((€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€Á±…å•ÈÈ¹¥¬(€€€€€€€€€€€€‹šf»¦kšRïšN(ˆ¬(€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€‹¾ò3šÊKšr'–F÷’â·¾òˆ(€€€€€€€€¤ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#rjš&û–"Ãšr’âï¢šj–6‡’ö?–:–nƒ’ê¾ò'¾òh(€€€€€€€€€€ƒ¦g–/–÷–ò?šb¿šÂÓ–Š£jšf»¦kšRïšN+¾ò33šÊK–F÷’â·4(€€€€€€€€€€ƒ¢Ş3šRïšN+–º37¦g–§šŠw¢Ş¿–úG¾ò3–:šr³–º3–£šÊKšr$(€€€€€€€€€€ƒ–Fó–>­ÕÁ‘…Ñ•U$ §™¥¹¥Í¡A±…å•ÉÑ¥½¸ §ŠSŠP(€€€€€€€€€€ƒšf»¦kšRïšN+šb¿’öÿR£¦‚ï:šr¦®cj–.W’ös¾ò0(€€€€€€€€€€ƒ¦g’î¢†£šÂÓ–Š£–æû’æ;š¾?š²‡šf»¦kšRïšN+¦÷šr¢ºL(€€€€€€€€€€ƒš"Ã¦²—–6‡’ö?’â7–.W¾ò3¦gš'¢¦Ë–ÂÇšb¿3š"Ã¦²—–"Ã’â–6((€€€€€€€€€€ƒ–6‡’ö?7šr’âï¢ššr–âãfóRj–:–nƒ¾ò0(€€€€€€€€€€ƒ’â7šb¿¢3šf¿–~ß¢†3j–V?¦†3((€€€€€€€€€€ƒ¢s’â+¦g–§¢†3¾ò3šÊK–F÷’â·jšf–g’æ¢šš¶ŠëÖCšv|(€€€€€€€€€€ƒ¦g–/¢K¢&Ëj¢†3–.W–ú’â/’â’ö7š:£¦Ë(€€€€€€€€¨¼((€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞÉ¥ÑI•ÍÕ±Ğô(€€€€€€€É½±±É¥Ñ¥…° (€€€€€€€€€€€Á±…å•ÈÈ°(€€€€€€€€€€€€‰Á¡åÍ¥…°ˆ°(€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•¹Ñ¥É¥Ğ¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€¤ì((€€€½¹ÍĞ‘…µ…”ô(€€€€€€€…±Õ±…Ñ•…µ…” (€€€€€€€€€€€ÍÑ…ÑÌÈ¹…ÑÑ…¬°(€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù••™•¹Í”¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€Á±…å•ÈÈ¹±•Ù•°°(€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€Á±…å•ÈÈ¹•±•µ•¹Ğ°(€€€€€€€€€€€µ½¹ÍÑ•È¹•±•µ•¹Ğ°(€€€€€€€€€€€ì(€€€€€€€€€€€€€€€…ÑÑ…­•ÈéÁ±…å•ÈÈ°(€€€€€€€€€€€€€€€Ñ…É•Ğéµ½¹ÍÑ•È°(€€€€€€€€€€€€€€€É¥Ñ5Õ±Ñ¥Á±¥•ÈéÉ¥ÑI•ÍÕ±Ğ¹µÕ±Ñ¥Á±¥•È(€€€€€€€€€€€ô(€€€€€€€€¤ì(((€€€µ½¹ÍÑ•È¹¡Àô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€À°(€€€€€€€€€€€µ½¹ÍÑ•È¹¡Àµ‘…µ…”(€€€€€€€€¤ì(((€€€Í¡½İ5½¹ÍÑ•É!¥Ğ (€€€€€€€¥¹‘•à°(€€€€€€€‘…µ…”°(€€€€€€€€‰¡Àˆ°(€€€€€€€É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ(€€€€¤ì(((€€€…‘‘	…ÑÑ±•1½œ ((€€€€€€€€ˆˆ¬(€€€€€€€Á±…å•ÈÈ¹¥¬(€€€€€€€€‹šf»¦kšRïšN(ˆ¬(€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€ (€€€€€€€€€€€É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹¾ò#"šN+¾ò¾ò$ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆˆ(€€€€€€€€¤¬(€€€€€€€€‹¾ò3¦ƒš"@ˆ¬(€€€€€€€‘…µ…”¬(€€€€€€€€‹–
+ß–ºÏˆ((€€€€¤ì(((€€€¥˜¡µ½¹ÍÑ•È¹¡ÀğôÀ¥ì(€€€€€€€­¥±±5½¹ÍÑ•È¡¥¹‘•à¤ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#–B3’â–/–÷–ò?j–>›’â–6+¾ò3¦g¢‡’æšò?š:'’ê¾ò'¾òh(€€€€€€ƒšRïšN+–F÷’â·¦ƒš"C–
+ß–ºÏ’æ/–ú3¾ò3’âš¢–º3–£šÊKšr$(€€€€€€ƒ–Fó–>­ÕÁ‘…Ñ•U$ §™¥¹¥Í¡A±…å•ÉÑ¥½¸ §¾ò0(€€€€€€ƒ¢s’â+¾ò3Šë’şwš&O’â·jššÎ’â/š"Ã¦²—’æ¢÷š¶Šè(€€€€€€ƒæóê3¦Ë¢†3(€€€€¨¼((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô(((¼¨(€€ƒŠbƒ²³’ê3¢K¢&Ëjš*¢÷šZ÷šRû(€€ƒ–ÇR¡…ÍÑ…µ…•M­¥±° §¢‡–ŞËÚOš*÷–ë’új(€€ƒ¦kR£–Ş—–ß–÷–ò?¾ò!•ÑM­¥±±Q…É•ÑÏ(€€…±Õ±…Ñ•M­¥±±…µ…—É½±±É¥Ñ¥…³(€€…ÁÁ±å	ÕÉ¹™™•Ó…ÁÁ±åÉ••é•™™•Ó¶'¾ò'¾ò0(€€ƒ¢«–ŞÇÖ’â’î÷3šN7’öqÁ±…å•ÈË7jšZ÷šRûšÖ¢/¾ò0(€€ƒ’â7nÓš:—–Fó–>­…ÍÑ…µ…•M­¥±° ¤(€€ƒ¾ò#¦
+–/–÷–ò?–ú{¦‚·–"Ã–Âû¦÷šb¿šN7’öqÁ±…å•Ë¾ò0(€€ƒ†³¢š–ÇR£¦Š£¦j«š¾S¢«–ŞÇ–¾¯’â’î÷šnÓ¦®c¾ò'(¨¼()™Õ¹Ñ¥½¸…ÍÑA±…å•ÈÉM­¥±°¡Í­¥±±%±•¹Ñ•É%¹‘•à¥ì((€€€½¹ÍĞÍ­¥±°ô(€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#¦bË–F¾ò3¦ÿ–7–B3’â¦†y‰ÕŸj–Û’î[–"šR¿¾ò'¾òh(€€€€€€ƒ¦g–æû–/š>Cš^¥É•ÑÕÉ»j–"šR¿¾ò3–:šr³¦÷šb¿nÓš:”(€€€€€€É•ÑÕÉ»¾ò3–º3–£šÊKšr'–Fó–>­™¥¹¥Í¡A±…å•ÉÑ¥½¸ §ŠSŠP(€€€€€€ƒš¶–âãššÎ’â/¦g–æû–/šŠw’îÛ’â7š'¢¦Ë¢Š¯¢ãfğ(€€€€€€ƒ¾ò!U'š'¢¦Ëšr–#šN/š:'šÊK–¶ãšr½MC’â7¢ÚÏjš*¢÷¾ò'¾ò0(€€€€€€ƒ’ö¢B³’ârj–nƒ
+ëš~C¢»’ú/–’[ššÎ¾ò#’ú/–š¢ÎšZd(€€€€€€ƒšÊK–Â7¦ö+…ÕÑ¼µ‰…ÑÑ±—j–"“šZßšfš¦–Ş»’ê’â¦î{¾ò$(€€€€€€ƒ¢ª“¢ãfó¾ò3’âš¢šr¢ºOš"Ã¦²—–6‡’ö?’â7–.W¾ò3¢Ş¦gš²„(€€€€€€ƒš*O–"Ãj’âï¢š‰ÕŸšb¿–B3’â¢»¦Š£¦j«((€€€€€€ƒ¦g¢‡–æ¯¦g–æû–/–"šR¿¦÷¢s’â+3¢Ï–ÂG¢ºO¢†3–.T(€€€€€€ƒÖCšvš"Ã¦²—æóê3¦Ë¢†37j’şw¢¶ß¾ò3’â7šr–7šr$(€€€€€€ƒ’îï’öW’âšŠw¢Ş¿–úG¢ºO¦+š"Ë–6‡š¶ï(€€€€¨¼((€€€¥˜ …Í­¥±°¥ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞ±•Ù•°ô(€€€€€€€•ÑM­¥±±1•Ù•° (€€€€€€€€€€€€‰Á±…å•ÈÈˆ°(€€€€€€€€€€€Í­¥±±%(€€€€€€€€¤ì(((€€€¥˜¡±•Ù•°ğôÀ¥ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞÍÁ½ÍĞô(€€€€€€€Í­¥±°¹ÍÁ½ÍĞ„ôõÕ¹‘•™¥¹•(€€€€€€€€ü(€€€€€€€Í­¥±°¹ÍÁ½ÍĞ(€€€€€€€€è(€€€€€€€Í­¥±°¹½ÍĞì(((€€€¥˜¡Á±…å•ÈÈ¹ÍÀñÍÁ½ÍĞ¥ì((€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€•¹Ñ•É%¹‘•àõ™¥¹‘±¥Ù•Q…É•Ñ%¹‘•à¡•¹Ñ•É%¹‘•à¤ì((€€€¥˜¡•¹Ñ•É%¹‘•àôôõ¹Õ±°¥ì(€€€€€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÑ…É•ÑÌõ•ÑM­¥±±Q…É•ÑÌ¡•¹Ñ•É%¹‘•à±Í­¥±°¹Ñ…É•ÑQåÁ”¤ì((€€€Á±…å•ÈÈ¹ÍÀ´õÍÁ½ÍĞì(((€€€±Õ¹•A±…å•É…É Ä¤ì(((€€€Í¡½İM­¥±±9…µ•	…‘” (€€€€€€€Í­¥±°¹¹…µ”°(€€€€€€€Í­¥±°¹•±•µ•¹Ğ°(€€€€€€€€Ä°(€€€€€€€Í­¥±°¹Ñ…É•ÑQåÁ”ôôô‰…±°ˆı¹Õ±°é•¹Ñ•É%¹‘•à°(€€€€€€€Ñ…É•ÑÌ(€€€€¤ì(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€Í¡½İA±…å•ÉMÁA½ÁÕÀ (€€€€€€€€€€€ÍÁ½ÍĞ°(€€€€€€€€€€€€Ä(€€€€€€€€¤ì((€€€ô°ÔÀÀ¤ì(((€€€½¹ÍĞÍÑ…ÑÌÈô(€€€€€€€•ÑA±…å•ÈÉ	…ÑÑ±•MÑ…ÑÌ ¤ì(((€€€½¹ÍĞÍÑ…Ñ	½¹ÕÌô(€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰µ…¥Œˆ(€€€€€€€€ü(€€€€€€€ÍÑ…ÑÌÈ¹µ…¥ÑÑ…¬(€€€€€€€€è(€€€€€€€ÍÑ…ÑÌÈ¹…ÑÑ…¬ì((((€€€€¼¨(€€€€€€ƒÒSš:Ÿ–‚Óš*¢÷¾ò#’ú/–š–Ã–Â¾ò3šÊKšr%‰…Í•…µ…—¾ò'¾òh(€€€€€€ƒ’â7¢¢#º_–
+ß–ºÌ¿–F÷’â·¾ò3nÓš:—¢ŞGVÃ–âã.š/–F÷’â·–³–ò?(€€€€¨¼((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33šJË¦ë–ÂÇ’â7¢†37¾ò'¾òh(€€€€€€ƒ–:šr³¦g¢‡šb¿1•¹Ñ•É%¹‘•ãš2–"Ãjš«&§¦
+šÒï¢F\(€€€€€€ƒš&7¢fWB¾ò3š¶ï’ê–ÂÇšVÓšº×¢ŞÏ¦;nÓš:•É•ÑÕÉ»7¾ò0(€€€€€€ƒ¶'šZó¦:[–ºkjn»š¢g¢Š¯¦j+–>/–#š&Oš¶ïšf¾ò3¦g–/š:Ÿ–‚Ğ(€€€€€€ƒš*¢÷šrnÓš:—š&O¦ëšÂ¾ò3:§–ºÛšb;šb;¦ã’êšZ÷šRû¾ò0(€€€€€€ƒV¯¦v‹–6ï’î¦êó’ê/¦÷šÊKfóR¦š"Ã¦²—Ò¦2¦÷’â7šr(€€€€€€ƒ–’k’â¢†3–¶_((€€€€€€ƒšRçš"C¢Şšf»¦kšRïšN(¿–
+ß–ºÏš*¢÷’â¢Ó¾ò3–#R (€€€€€€™¥¹‘±¥Ù•Q…É•Ñ%¹‘•à §Šë¢ª7n»š¢g¾ò3š¶ï’ê(€€€€€€ƒ–ÂÇ¢«–.W¢ö'š&MÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÏ¢‡²³’â¦jì(€€€€€€ƒ¦
+šÒï¢F_jš«&§¾òorj–£šî’êš&5É•ÑÕÉ¸(€€€€€€ƒ¾ò#¦g¢‡’â7¦r¢š–>›–’[–Fó–>­™¥¹¥Í¡A±…å•ÉÑ¥½¸ §¾ò0(€€€€€€ƒ–Fó–>¯®½…ÍÑA±…å•ÈÉM­¥±³j’â+–Æ(€€€€€€•á•ÕÑ•Ñ¥½¸½É•Í½±Ù•EÕ•Õ•‘A±…å•ÉÑ¥½¸(€€€€€€ƒšr³’ú–ÂÇšr‡šŠw’îÛ¢s–Fó–>¯’âš²‡¾ò3–:–n€(€€€€€€ƒ¢Ş}Á±…å•ÈÉ9½Éµ…±ÑÑ…¬ §¦
+š²‡’ş»š¶’âš¢¾ò'(€€€€¨¼((€€€¥˜ …Í­¥±°¹‰…Í•…µ…”¥ì((€€€€€€€½¹ÍĞÉ•Í½±Ù•‘%¹‘•àõ•¹Ñ•É%¹‘•àì(((€€€€€€€¥˜¡É•Í½±Ù•‘%¹‘•àôôõ¹Õ±°¥ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô(((€€€€€€€Í•±•Ñ•‘5½¹ÍÑ•Èô(€€€€€€€€€€€É•Í½±Ù•‘%¹‘•àì(((€€€€€€€½¹ÍĞµ½¹ÍÑ•Èô(€€€€€€€€€€€µ½¹ÍÑ•ÉÍmÉ•Í½±Ù•‘%¹‘•átì(((€€€€€€€¥˜¡Í­¥±°¹™É••é•¡…¹”¥ì((€€€€€€€€€€€½¹ÍĞ™É••é•I•ÍÕ±Ğô(€€€€€€€€€€€€€€€É½±±9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…ÑÕÍ™™•Ğ (€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€€€€€‰™É••é”ˆ°(€€€€€€€€€€€€€€€€€€€l(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±°¹™É••é•¡…¹”°(€€€€€€€€€€€€€€€€€€€€€€€Á±…å•ÈÈ¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€€€€€ÍÑ…ÑÌÈ¹¥¹Ñ•±±¥•¹”°(€€€€€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•MÁ¥É¥ÑA½¥¹ÑÌ¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€€€€€€€€€€€€€ÑÉÕ”°(€€€€€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•ÉI…¹¬¡µ½¹ÍÑ•È¤(€€€€€€€€€€€€€€€€€€€t°(€€€€€€€€€€€€€€€€€€€€‰µ½¹ÍÑ•Èˆ°(€€€€€€€€€€€€€€€€€€€É•Í½±Ù•‘%¹‘•à°(€€€€€€€€€€€€€€€€€€€Í­¥±°¹¹…µ”(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€¥˜¡™É••é•I•ÍÕ±Ğ¹¡¥Ğ¥ì((€€€€€€€€€€€€€€€…ÁÁ±åÉ••é•™™•Ğ (€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€€€€Í­¥±°¹™É••é•ÕÉ…Ñ¥½¸(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€‹¢Š¯–Ã–Â’ê¾òˆ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô(€€€€€€€€€€€•±Í”¥˜ …™É••é•I•ÍÕ±Ğ¹‘ÕÁ±¥…Ñ”¥ì((€€€€€€€€€€€€€€€Í¡½İ5¥ÍÍ™™•Ğ (€€€€€€€€€€€€€€€€€€€™…±Í”°(€€€€€€€€€€€€€€€€€€€É•Í½±Ù•‘%¹‘•à°(€€€€€€€€€€€€€€€€€€€€‹š*×š*\ˆ(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€€€€Í­¥±°¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€‹–Â4ˆ¬(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€‹šÊKšr'RšV#¾ò#š*×š*_¾ò'ˆ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô((€€€€€€€ô(((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¯º·š*¢ô(€€€€€€ƒ¦o¢†3&çšV#¾ò1Á±…å•ÈË&#šr³¾ò3¢Ş}Á±…å•ÈÇj(€€€€€€…ÍÑ…µ…•M­¥±° §–B3’â’î÷¦
+?¢ò¿¾ò3’úšê@(€€€€€€ƒšRçš"A‰…ÑÑ±•A±…å•É…ÉÇ¾ò'¾òh(€€€€¨¼((€€€¥˜¡Í­¥±±%ôôô‰™¥É•I½­•Ğˆ¥ì((€€€€€€€Á±…å¥É•I½­•Ñ¹¥µ…Ñ¥½¸ (€€€€€€€€€€€€‰‰…ÑÑ±•A±…å•É…ÉÄˆ°(€€€€€€€€€€€Ñ…É•ÑÌ¹µ…À (€€€€€€€€€€€€€€€¥¹‘•àôø‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­¥¹‘•à(€€€€€€€€€€€€¤(€€€€€€€€¤ì((€€€ô(((€€€±•ĞÑ½Ñ…±1¥™•ÍÑ•…°ôÀì(((€€€Ñ…É•ÑÌ¹™½É… ¡¥¹‘•àôùì((€€€€€€€½¹ÍĞµ½¹ÍÑ•Èô(€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥¹‘•átì(((€€€€€€€¥˜ (€€€€€€€€€€€€…µ½¹ÍÑ•Èñğ(€€€€€€€€€€€€…µ½¹ÍÑ•È¹…±¥Ù”(€€€€€€€€¥ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€€€€€€€€€ƒ–Ãš^/’â¦Z–Â#–Æ³j¦o¢†3–.WV¯¾ò3²³’ê3¢K¢&È(€€€€€€€€€€ƒšZ÷šRûšf¢Öß¦î{šb½‰…ÑÑ±•A±…å•É…ÉÇ¾ò0(€€€€€€€€€€ƒ¦
+?¢ò¿¢Ş}…ÍÑ…µ…•M­¥±° §¢‡jÁ±…å•ÈÄ(€€€€€€€€€€ƒ&#šr³–º3–£’â¢Ó(€€€€€€€€¨¼((€€€€€€€¥˜¡Í­¥±°¹¥ôôô‰¥•MÁ¥¸ˆ¥ì((€€€€€€€€€€€Á±…å%•MÁ¥¹AÉ½©•Ñ¥±” (€€€€€€€€€€€€€€€€Ä°(€€€€€€€€€€€€€€€¥¹‘•à(€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€½¹ÍĞ¡¥Ğô(€€€€€€€€€€€É½±±!¥Ñ¡…¹” (€€€€€€€€€€€€€€€ÍÑ…ÑÌÈ¹…ÕÉ…ä°(€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•ÉÙ…Í¥½¸ (€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€€€€€€€€€¤°(€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ” (€€€€€€€€€€€€€€€€€€€Á±…å•ÈÈ°(€€€€€€€€€€€€€€€€€€€€‰ÍÑÕ¸ˆ(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€¤ì(((€€€€€€€¥˜ …¡¥Ğ¥ì((€€€€€€€€€€€Í¡½İ5¥ÍÍ™™•Ğ (€€€€€€€€€€€€€€€™…±Í”°(€€€€€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€€€€€€‰5%MLˆ(€€€€€€€€€€€€¤ì(((€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€Í­¥±°¹¹…µ”¬(€€€€€€€€€€€€€€€€‹–Â4ˆ¬(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€€€€€‹¾ò3šÊKšr'–F÷’â·¾òˆ(€€€€€€€€€€€€¤ì((€€€€€€€€€€€É•ÑÕÉ¸ì((€€€€€€€ô(((€€€€€€€½¹ÍĞÉ¥ÑI•ÍÕ±Ğô(€€€€€€€€€€€É½±±É¥Ñ¥…° (€€€€€€€€€€€€€€€Á±…å•ÈÈ°(€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éä°(€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•¹Ñ¥É¥Ğ¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€€€€€¤ì((€€€€€€€½¹ÍĞ‘…µ…”ô(€€€€€€€€€€€…±Õ±…Ñ•M­¥±±…µ…”¡ì(€€€€€€€€€€€€€€€Í­¥±°éÍ­¥±°°(€€€€€€€€€€€€€€€Í­¥±±1•Ù•°é±•Ù•°°(€€€€€€€€€€€€€€€•™™•Ñ¥Ù•ÑÑ…¬éÍÑ…Ñ	½¹ÕÌ°(€€€€€€€€€€€€€€€Ñ…É•Ğéµ½¹ÍÑ•È°(€€€€€€€€€€€€€€€…ÍÑ•É1•Ù•°éÁ±…å•ÈÈ¹±•Ù•°°(€€€€€€€€€€€€€€€…ÍÑ•É±•µ•¹ĞéÁ±…å•ÈÈ¹•±•µ•¹Ğ°(€€€€€€€€€€€€€€€…ÑÑ…­•ÈéÁ±…å•ÈÈ°(€€€€€€€€€€€€€€€É¥Ñ5Õ±Ñ¥Á±¥•ÈéÉ¥ÑI•ÍÕ±Ğ¹µÕ±Ñ¥Á±¥•È(€€€€€€€€€€€ô¤ì((€€€€€€€½¹ÍĞ¡Á	•™½É•¥É•Ñ…µ…”õµ½¹ÍÑ•È¹¡Àì((€€€€€€€µ½¹ÍÑ•È¹¡Àô(€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¡Àµ‘…µ…”(€€€€€€€€€€€€¤ì(((€€€€€€€Í¡½İ5½¹ÍÑ•É!¥Ğ (€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€‘…µ…”°(€€€€€€€€€€€€‰¡Àˆ°(€€€€€€€€€€€É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ(€€€€€€€€¤ì((€€€€€€€½¹ÍĞ…ÑÕ…±…µ…••…±Ğõ5…Ñ ¹µ…à À±¡Á	•™½É•¥É•Ñ…µ…”µµ½¹ÍÑ•È¹¡À¤ì(((€€€€€€€…‘‘	…ÑÑ±•1½œ ((€€€€€€€€€€€Í­¥±°¹¹…µ”¬(€€€€€€€€€€€€‹–F÷’â´ˆ¬(€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€É¥ÑI•ÍÕ±Ğ¹¥ÍÉ¥Ğ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹¾ò#"šN+¾ò¾ò$ˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€‹¾ò3¦ƒš"@ˆ¬(€€€€€€€€€€€‘…µ…”¬(€€€€€€€€€€€€‹–
+ß–ºÏˆ((€€€€€€€€¤ì(((€€€€€€€¥˜¡Í­¥±°¹‰ÕÉ¹¡…¹”¥ì((€€€€€€€€€€€½¹ÍĞ‰ÕÉ¹I•ÍÕ±Ğô(€€€€€€€€€€€€€€€É½±±9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…ÑÕÍ™™•Ğ (€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€€€€€‰‰ÕÉ¸ˆ°(€€€€€€€€€€€€€€€€€€€l(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹¡…¹”°(€€€€€€€€€€€€€€€€€€€€€€€Á±…å•ÈÈ¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€€€€€ÍÑ…ÑÌÈ¹¥¹Ñ•±±¥•¹”°(€€€€€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•MÁ¥É¥ÑA½¥¹ÑÌ¡µ½¹ÍÑ•È¤(€€€€€€€€€€€€€€€€€€€t°(€€€€€€€€€€€€€€€€€€€€‰µ½¹ÍÑ•Èˆ°(€€€€€€€€€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€€€€€€€€€Í­¥±°¹¹…µ”°(€€€€€€€€€€€€€€€€€€€Í­¥±°¹Õ…É…¹Ñ••‘	ÕÉ¸ôôõÑÉÕ”(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€¥˜¡‰ÕÉ¹I•ÍÕ±Ğ¹¡¥Ğ¥ì((€€€€€€€€€€€€€€€…ÁÁ±å	ÕÉ¹™™•Ğ (€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹ÕÉ…Ñ¥½¸°(€€€€€€€€€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹A•É•¹Ñ	å1•Ù•±l(€€€€€€€€€€€€€€€€€€€€€€€±•Ù•°´Ä(€€€€€€€€€€€€€€€€€€€t(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€‹¦fß–—K.š/¾òˆ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô((€€€€€€€ô(((€€€€€€€¥˜¡Í­¥±°¹™É••é•¡…¹”¥ì((€€€€€€€€€€€½¹ÍĞ™É••é•I•ÍÕ±Ğô(€€€€€€€€€€€€€€€É½±±9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…ÑÕÍ™™•Ğ (€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€€€€€‰™É••é”ˆ°(€€€€€€€€€€€€€€€€€€€l(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±°¹™É••é•¡…¹”°(€€€€€€€€€€€€€€€€€€€€€€€Á±…å•ÈÈ¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°°(€€€€€€€€€€€€€€€€€€€€€€€ÍÑ…ÑÌÈ¹¥¹Ñ•±±¥•¹”°(€€€€€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•É™™•Ñ¥Ù•MÁ¥É¥ÑA½¥¹ÑÌ¡µ½¹ÍÑ•È¤°(€€€€€€€€€€€€€€€€€€€€€€€ÑÉÕ”°(€€€€€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•ÉI…¹¬¡µ½¹ÍÑ•È¤(€€€€€€€€€€€€€€€€€€€t°(€€€€€€€€€€€€€€€€€€€€‰µ½¹ÍÑ•Èˆ°(€€€€€€€€€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€€€€€€€€€Í­¥±°¹¹…µ”(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€¥˜¡™É••é•I•ÍÕ±Ğ¹¡¥Ğ¥ì((€€€€€€€€€€€€€€€…ÁÁ±åÉ••é•™™•Ğ (€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€€€€Í­¥±°¹™É••é•ÕÉ…Ñ¥½¸(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€‹¢Š¯–Ã–Â’ê¾òˆ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô((€€€€€€€ô(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3š:—’â+¦Š£Îì¼(€€€€€€€€€€ƒ–rÎïš*¢÷j¦f–*ƒšV#šzs¾ò3¢Ş}Á±…å•ÈÇj(€€€€€€€€€€…ÍÑ…µ…•M­¥±° §šb¿–B3’â’î÷¦
+?¢ò¿¾ò'¾òh(€€€€€€€€¨¼((€€€€€€€…ÁÁ±åM­¥±±•‰Õ™™™™•ÑÌ (€€€€€€€€€€€Í­¥±°°(€€€€€€€€€€€±•Ù•°°(€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€Á±…å•ÈÈ¹±•Ù•°°(€€€€€€€€€€€ÍÑ…ÑÌÈ¹¥¹Ñ•±±¥•¹”(€€€€€€€€¤ì(((€€€€€€€¥˜¡Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•°¥ì((€€€€€€€€€€€Ñ½Ñ…±1¥™•ÍÑ•…°¬ô(€€€€€€€€€€€€€€€…ÑÕ…±…µ…••…±Ğì((€€€€€€€ô(((€€€€€€€¥˜¡µ½¹ÍÑ•È¹¡ÀğôÀ¥ì(€€€€€€€€€€€­¥±±5½¹ÍÑ•È¡¥¹‘•à¤ì(€€€€€€€ô((€€€ô¤ì(((€€€¥˜ (€€€€€€€Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•°€˜˜(€€€€€€€Ñ½Ñ…±1¥™•ÍÑ•…°øÀ(€€€€¥ì((€€€€€€€½¹ÍĞ±¥™•ÍÑ•…±A•É•¹Ğô(€€€€€€€€€€€Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•±l(€€€€€€€€€€€€€€€±•Ù•°´Ä(€€€€€€€€€€€tì(((€€€€€€€½¹ÍĞ±¥™•ÍÑ•…±µ½Õ¹Ğô(€€€€€€€€€€€5…Ñ ¹™±½½È (€€€€€€€€€€€€€€€Ñ½Ñ…±1¥™•ÍÑ•…°¨(€€€€€€€€€€€€€€€±¥™•ÍÑ•…±A•É•¹Ğ¼(€€€€€€€€€€€€€€€€ÄÀÀ(€€€€€€€€€€€€¤ì(((€€€€€€€Á±…å•ÈÈ¹¡Àô(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€ÍÑ…ÑÌÈ¹µ…á!@°(€€€€€€€€€€€€€€€Á±…å•ÈÈ¹¡À¬(€€€€€€€€€€€€€€€±¥™•ÍÑ•…±µ½Õ¹Ğ(€€€€€€€€€€€€¤ì(((€€€€€€€Á±…å•ÈÈ¹ÍÀô(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€ÍÑ…ÑÌÈ¹µ…áM@°(€€€€€€€€€€€€€€€Á±…å•ÈÈ¹ÍÀ¬(€€€€€€€€€€€€€€€±¥™•ÍÑ•…±µ½Õ¹Ğ(€€€€€€€€€€€€¤ì(((€€€€€€€Í¡½İA±…å•É!¥Ğ (€€€€€€€€€€€±¥™•ÍÑ•…±µ½Õ¹Ğ°(€€€€€€€€€€€€‰¡•…°ˆ°(€€€€€€€€€€€€Ä°(€€€€€€€€€€€ÑÉÕ”(€€€€€€€€¤ì(((€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€Á±…å•ÈÈ¹¥¬(€€€€€€€€€€€€‹–BãšRÛ–
+ß–ºÏ–n{–ú§’êˆ¬(€€€€€€€€€€€±¥™•ÍÑ•…±µ½Õ¹Ğ¬(€€€€€€€€€€€€‹¦îy!C¢"MCˆ(€€€€€€€€¤ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3š:—’â+–rÎïj(€€€€€€ƒ¢«¢ê¯¢¶ßnû¾ò?–£¦®S¢¶ßnûš*¢÷¾ò1Á±…å•ÈË&#šr³¾ò0(€€€€€€ƒ¢Ş}Á±…å•ÈÇj…ÍÑ…µ…•M­¥±° §šb¿–B3’â’îô(€€€€€€ƒ¦
+?¢ò¿¾ò'¾òh(€€€€¨¼((€€€¥˜¡Í­¥±°¹Í•±™M¡¥•±‘	å1•Ù•°˜™…¹ÁÁ±å9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ” (€€€€€€€Á±…å•ÈÈ°‰Í¡¥•±ˆ°‰Á±…å•Èˆ°Ä±Í­¥±°¹¹…µ”(€€€€¤¥ì((€€€€€€€½¹ÍĞÍ¡¥•±‘µ½Õ¹Ğô(€€€€€€€€€€€Í­¥±°¹Í•±™M¡¥•±‘	å1•Ù•±l(€€€€€€€€€€€€€€€±•Ù•°´Ä(€€€€€€€€€€€tì(((€€€€€€€Á±…å•ÈÈ¹…Ñ¥Ù•	Õ™™Ìô¡Á±…å•ÈÈ¹…Ñ¥Ù•	Õ™™Íññmt¤¹™¥±Ñ•È¡‰Õ™˜ôø(€€€€€€€€€€€€…‰Õ™™ññ‰Õ™˜¹ÑåÁ”„ôô‰Í¡¥•±‰ññ9Õµ‰•È¡‰Õ™˜¹ÑÕÉ¹Í1•™Ğ¤øÀ˜™9Õµ‰•È¡‰Õ™˜¹É•µ…¥¹¥¹œ¤øÀ(€€€€€€€€¤ì(((€€€€€€€Á±…å•ÈÈ¹…Ñ¥Ù•	Õ™™Ì¹ÁÕÍ ¡µ…É­A•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ•9…µ”¡ì(€€€€€€€€€€€ÑåÁ”è‰Í¡¥•±ˆ°(€€€€€€€€€€€ÑÕÉ¹Í1•™Ğè(€€€€€€€€€€€€€€€Í­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ°(€€€€€€€€€€€É•µ…¥¹¥¹œè(€€€€€€€€€€€€€€€Í¡¥•±‘µ½Õ¹Ğ((€€€€€€€ô°‰Í¡¥•±ˆ¤¤ì(((€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€Á±…å•ÈÈ¹¥¬(€€€€€€€€€€€€‹6Ë–ú\ˆ¬(€€€€€€€€€€€Í¡¥•±‘µ½Õ¹Ğ¬(€€€€€€€€€€€€‹¦î{¢¶ßnû¾ò3š2ê0ˆ¬(€€€€€€€€€€€€¡Í­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ¤¬(€€€€€€€€€€€€‹–n{–B#ˆ(€€€€€€€€¤ì((€€€ô(((€€€¥˜¡Í­¥±°¹…±±åM¡¥•±‘	å1•Ù•°¥ì((€€€€€€€½¹ÍĞÍ¡¥•±‘µ½Õ¹Ğô(€€€€€€€€€€€Í­¥±°¹…±±åM¡¥•±‘	å1•Ù•±l(€€€€€€€€€€€€€€€±•Ù•°´Ä(€€€€€€€€€€€tì(((€€€€€€€•Ñ¡…É…Ñ•ÉÌ ¤¹™½É…  (€€€€€€€€€€€€¡¡…É…Ñ•È±Ñ…É•Ñ%¹‘•à¤ôùì((€€€€€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€€€€€¡…É…Ñ•È¹¡ÀğôÀ(€€€€€€€€€€€€€€€€¥ì(€€€€€€€€€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€€€€€ô((€€€€€€€€€€€€€€€¥˜ ……¹ÁÁ±å9…µ•‘A•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ” (€€€€€€€€€€€€€€€€€€€¡…É…Ñ•È°‰Í¡¥•±ˆ°‰Á±…å•Èˆ±Ñ…É•Ñ%¹‘•à±Í­¥±°¹¹…µ”(€€€€€€€€€€€€€€€€¤¥ìÉ•ÑÕÉ¸ìô((€€€€€€€€€€€€€€€¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Ìô¡¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Íññmt¤¹™¥±Ñ•È¡‰Õ™˜ôø(€€€€€€€€€€€€€€€€€€€€…‰Õ™™ññ‰Õ™˜¹ÑåÁ”„ôô‰Í¡¥•±‰ññ9Õµ‰•È¡‰Õ™˜¹ÑÕÉ¹Í1•™Ğ¤øÀ˜™9Õµ‰•È¡‰Õ™˜¹É•µ…¥¹¥¹œ¤øÀ(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Ì¹ÁÕÍ ¡µ…É­A•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ•9…µ”¡ì(€€€€€€€€€€€€€€€€€€€ÑåÁ”è‰Í¡¥•±ˆ°(€€€€€€€€€€€€€€€€€€€ÑÕÉ¹Í1•™Ğè(€€€€€€€€€€€€€€€€€€€€€€€Í­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ°(€€€€€€€€€€€€€€€€€€€É•µ…¥¹¥¹œè(€€€€€€€€€€€€€€€€€€€€€€€Í¡¥•±‘µ½Õ¹Ğ((€€€€€€€€€€€€€€€ô°‰Í¡¥•±ˆ¤¤ì((€€€€€€€€€€€ô(€€€€€€€€¤ì(((€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€‹š"GšZç–£¦®S6Ë–ú\ˆ¬(€€€€€€€€€€€Í¡¥•±‘µ½Õ¹Ğ¬(€€€€€€€€€€€€‹¦î{¢¶ßnû¾ò3š2ê0ˆ¬(€€€€€€€€€€€€¡Í­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ¤¬(€€€€€€€€€€€€‹–n{–B#ˆ(€€€€€€€€¤ì((€€€ô(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€™¥¹¥Í¡A±…å•ÉÑ¥½¸ ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€XäÈƒŠPƒš«&§¦G–æš:'¢Bô(€€ƒ–~ë’;–ó¢Şš«&§¶'Òkš"C¦Vß¾òoÊû¢.Ä½	=MOš>C¦®c–7:¾ò3’â›’şwVg–ÂG¦?¦j£š¦šÖ»–.W(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸•Ñ5½¹ÍÑ•É½±‘É½À¡µ½¹ÍÑ•È¥ì(€€€¥˜ …µ½¹ÍÑ•È¥ì(€€€€€€€É•ÑÕÉ¸€Àì(€€€ô((€€€½¹ÍĞ±•Ù•°õ5…Ñ ¹µ…à Ä±5…Ñ ¹™±½½È¡9Õµ‰•È¡µ½¹ÍÑ•È¹±•Ù•°¥ñğÄ¤¤ì(€€€½¹ÍĞÉ…¹¬õ•Ñ5½¹ÍÑ•ÉI…¹¬¡µ½¹ÍÑ•È¤ì(€€€½¹ÍĞÉ…¹­5Õ±Ñ¥Á±¥•Èô(€€€€€€€É…¹¬ôôô‰‰½ÍÌˆ(€€€€€€€€ü€à(€€€€€€€€èÉ…¹¬ôôô‰•±¥Ñ”ˆ(€€€€€€€€ü€Ì(€€€€€€€€è€Äì((€€€½¹ÍĞ‰…Í”õ±•Ù•°¨È¬Ìì(€€€½¹ÍĞÙ…É¥…¹”ôÀ¸àÔ­5…Ñ ¹É…¹‘½´ ¤¨À¸ÌÀì((€€€É•ÑÕÉ¸5…Ñ ¹µ…à (€€€€€€€€Ä°(€€€€€€€5…Ñ ¹™±½½È¡‰…Í”©É…¹­5Õ±Ñ¥Á±¥•È©Ù…É¥…¹”¤(€€€€¤ì)ô()™Õ¹Ñ¥½¸…İ…É‘5½¹ÍÑ•É½±‘É½À¡µ½¹ÍÑ•È¥ì(€€€½¹ÍĞ…µ½Õ¹Ğõ•Ñ5½¹ÍÑ•É½±‘É½À¡µ½¹ÍÑ•È¤ì((€€€¥˜¡…µ½Õ¹ĞğôÀ¥ì(€€€€€€€É•ÑÕÉ¸€Àì(€€€ô((€€€½±¬õ…µ½Õ¹Ğì(€€€ÕÁ‘…Ñ•½±‘¥ÍÁ±…ä ¤ì((€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€‹š:'¢Bô€ˆ¬(€€€€€€€…µ½Õ¹Ğ¬(€€€€€€€€ˆƒ¦G–æˆ(€€€€¤ì((€€€É•ÑÕÉ¸…µ½Õ¹Ğì)ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒš«&§š¶ï’ê„(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸­¥±±5½¹ÍÑ•È¡¥¹‘•à¥ì((€€€½¹ÍĞµ½¹ÍÑ•È€ô(€€€€€€€µ½¹ÍÑ•ÉÍm¥¹‘•átì(((€€€¥˜ (€€€€€€€€…µ½¹ÍÑ•Èñğ(€€€€€€€€…µ½¹ÍÑ•È¹…±¥Ù”(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€µ½¹ÍÑ•È¹…±¥Ù”õ™…±Í”ì((€€€µ½¹ÍÑ•È¹¡ÀôÀì((€€€µ½¹ÍÑ•È¹ÍÀôÀì(((€€€½¹ÍĞ…É€ô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­¥¹‘•à¤ì(((€€€¥˜¡…É¥ì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€€€€€ƒ–:šr³’âšN+šºëš¶ïš«&§jVÛ’â/¾ò0(€€€€€€€€€€ƒ®/–"ïš*(¹‘•…“¦g–-±…ÍÏ¾ò!½Á…¥Ñäè¸ÄÛ¾ò$(€€€€€€€€€€ƒ–*ƒ’â+–:ï¾ò3’ö–
+ß–ºÏšÖ»–.WšVã–¶_šb¿¦g–ò×–6‡&(€€€€€€€€€€ƒj3–¶C–Òƒ7¾ò1½Á…¥ÑçšrnÓš:—¦–âØ(€€€€€€€€€€ƒš*+¦
+–r£¦j–
+ß–ºÏšVã–¶_’â¢Öß¢º+šj_¾ò0(€€€€€€€€€€ƒ–&o––÷š&Oš¶ïj¦
+’â’â/–>7¢3šr’â7–ºçšbOr/šâš–k–
+ß–ºÏ((€€€€€€€€€€ƒšRçš"C–#–*€¹‘å¥¹Ÿ¾ò#–>«šN/¦î{šN+¾ò3’â7¢º+šj_¾ò'¾ò0(€€€€€€€€€€ƒ¶'–
+ß–ºÏšVã–¶_–.WV¯¾ò Ä¸ãK¾ò'¢ŞG–º3’æ/–ú0(€€€€€€€€€€ƒš&7rš¶–*ƒ’â(¹‘•…“¢ºO–6‡&¢º+šj_¾ò0(€€€€€€€€€€ƒ–§¢¦‚–ê?–Â7¢ªÿ–ÂÇ’â7šr’êKnã–öÇ¦~ÿ’ê(€€€€€€€€¨¼((€€€€€€€…É¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€€€€€‰‘å¥¹œˆ(€€€€€€€€¤ì(((€€€€€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€€€€€…É¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€€€€€‰‘å¥¹œˆ(€€€€€€€€€€€€¤ì((€€€€€€€€€€€…É¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€€€€€€€€€‰‘•…ˆ(€€€€€€€€€€€€¤ì((€€€€€€€ô°ÄàÔÀ¤ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒš«&§š¶ï’ê‡–ú3’æ¢š–r£–rÃ–r[’â+¦jÇ¢^?¾ò0(€€€€€€ƒ¦ÿ–7–n{–"Ã–rÃ–r[šfr/–"Ã–ŞËš¶ïš«&§j–r[’ë(€€€€¨¼((€€€½¹ÍĞµ…Á%½¸€ô(€€€€€€€€ ‰µ…Á5½¹ÍÑ•Èˆ­¥¹‘•à¤ì(((€€€¥˜¡µ…Á%½¸¥ì((€€€€€€€µ…Á%½¸¹ÍÑå±”¹‘¥ÍÁ±…ä€ô(€€€€€€€€€€€€‰¹½¹”ˆì((€€€ô(((€€€…‘‘	…ÑÑ±•1½œ ((€€€€€€€€ˆˆ¬(€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€‹¢Š¯šN+šV_ˆ((€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3’âï–~;–r[¦FD¼(€€€€€€ƒš¾?š^—’îï–.d¿š"C–ÂÇÎïÖÇ¾ò'¾òh(€€€€€€ƒ¦g¢‡šb¿3š«&§rj¢Š¯š&Oš¶ï7–R¿’âšrÚO¦8(€€€€€€ƒj–rÃšZç¾ò3–r[¦FGjšN+šºëšVãš¾?š^—’îï–.gj(€€€€€€ƒšN+šV_š«&§¦Ë–ê›š"C–ÂÇjÒ¿¢¢#šN+šºëšVã¾ò0(€€€€€€ƒ–£¦£–r£¦g¢‡’âš²‡¢¢c¦2¾ò3’â7R£–r£š"Ã¦²—j(€€€€€€ƒš¾?–/–"šR¿–B¢«¦7¢’–"“šZß’âš²‡(€€€€¨¼((€€€½¹ÍĞ‰½ÍÍ=İ¹•ÈõÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆıİ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	½ÍÍ	…ÑÑ±”é¹Õ±°ì(€€€¥˜¡‰½ÍÍ=İ¹•È˜™ÑåÁ•½˜‰½ÍÍ=İ¹•È¹½¹¹•µå•…Ñ ôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€‰½ÍÍ=İ¹•È¹½¹¹•µå•…Ñ ¡¥¹‘•à±µ½¹ÍÑ•È¤ì(€€€ô((€€€¥˜ …µ½¹ÍÑ•È¹¹½I•İ…É‘Ì¥ì(€€€€€€€É•½É‘5½¹ÍÑ•É-¥±±½É	•ÍÑ¥…Éä¡µ½¹ÍÑ•È¤ì(€€€€€€€…İ…É‘5½¹ÍÑ•É½±‘É½À¡µ½¹ÍÑ•È¤ì(€€€€€€€€¼¨ƒš«&§š:'¢B÷¢"šN+šºë¦Ë–ê›’â¢Öß–6Ïšf–¶cšªS¾ò3¦ÿ–7’â·¦Sš"ÃšV\¿–"¢3šf¿¦ë–’Ç€¨¼(€€€€€€€Í…Ù•…µ” ¤ì(€€€ô(((€€€ÕÁ‘…Ñ•5½¹ÍÑ•ÉU$¡¥¹‘•à¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒš"Ã¦²—V¯¦vˆ(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸É•¹‘•É	…ÑÑ±” ¥ì((€€€½¹ÍĞ…É•„€ô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•ÉÉ•„ˆ¤ì(((€€€…É•„¹¥¹¹•É!Q50ôˆˆì(((€€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ(€€€€¹™½É…  (€€€€€€€¥¹‘•àôùì((€€€€€€€€€€€½¹ÍĞµ½¹ÍÑ•È€ô(€€€€€€€€€€€€€€€µ½¹ÍÑ•ÉÍm¥¹‘•átì(((€€€€€€€€€€€½¹ÍĞ…É€ô(€€€€€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€…É¹¥€ô(€€€€€€€€€€€€€€€€‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­¥¹‘•àì(((€€€€€€€€€€€…É¹±…ÍÍ9…µ”€ô(€€€€€€€€€€€€€€€€‰‰…ÑÑ±”µµ½¹ÍÑ•Èˆì(((€€€€€€€€€€€…É¹½¹±¥¬ô ¤ôùì(€€€€€€€€€€€€€€€Í•±•Ñ	…ÑÑ±•Q…É•Ğ (€€€€€€€€€€€€€€€€€€€¥¹‘•à(€€€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€ôì(((€€€€€€€€€€€½¹ÍĞ¥½¸€ô(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”ôôô‹–>Ë¢B+–ˆ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”ôôô‹šÊgšòƒ¢Æë.ğˆ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”ôôô‹šÊg¢‚4ˆ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆì(((€€€€€€€€€€€…É¹¥¹¹•É!Q50€ô((€€€€€€€€€€€€(€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•5½¹ÍÑ•ÉÉ••é•=Ù•É±…ä‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€±…ÍÌô‰…ÉµÍÑ…ÑÕÌµ½Ù•É±…ä™É••é”µ½Ù•É±…äˆ(€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•5½¹ÍÑ•É	ÕÉ¹=Ù•É±…ä‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€±…ÍÌô‰…ÉµÍÑ…ÑÕÌµ½Ù•É±…ä‰ÕÉ¸µ½Ù•É±…äˆ(€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰‰…ÑÑ±”µµ½¹ÍÑ•Èµ¥½¸ˆø(€€€€€€€€€€€€€€€€‘í¥½¹ô(€€€€€€€€€€€€ğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•5½¹ÍÑ•ÉMÑ…ÑÕÌ‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘•Ìˆ(€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰µ½¹ÍÑ•Èµ¡Àˆø((€€€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•5½¹ÍÑ•É	…È‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€€€€€±…ÍÌô‰µ½¹ÍÑ•Èµ¡Àµ¥¹¹•Èˆ(€€€€€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•5½¹ÍÑ•É!AQ•áĞ‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€€€€€±…ÍÌô‰µ½¹ÍÑ•Èµ‰…ÈµÑ•áĞˆ(€€€€€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€ğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰µ½¹ÍÑ•ÈµÍÀˆø((€€€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•5½¹ÍÑ•ÉMA	…È‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€€€€€±…ÍÌô‰µ½¹ÍÑ•ÈµÍÀµ¥¹¹•Èˆ(€€€€€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•5½¹ÍÑ•ÉMAQ•áĞ‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€€€€€±…ÍÌô‰µ½¹ÍÑ•Èµ‰…ÈµÑ•áĞˆ(€€€€€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€ğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰‰…ÑÑ±”µµ½¹ÍÑ•Èµ¹…µ”ˆø(€€€€€€€€€€€€€€€€‘íµ½¹ÍÑ•È¹¹…µ•ô(€€€€€€€€€€€€ğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰‰…ÑÑ±”µµ½¹ÍÑ•Èµ±•Ù•°ˆø(€€€€€€€€€€€€€€€1Ø¸‘íµ½¹ÍÑ•È¹±•Ù•±ô(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ì(((€€€€€€€€€€€…É•„¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€€€€€…É(€€€€€€€€€€€€¤ì((€€€€€€€€€€€½¹ÍĞÁÉ•Í•¹Ñ…Ñ¥½¸õÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆıİ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	…ÑÑ±•AÉ•Í•¹Ñ…Ñ¥½¸é¹Õ±°ì(€€€€€€€€€€€¥˜¡ÁÉ•Í•¹Ñ…Ñ¥½¸˜™ÑåÁ•½˜ÁÉ•Í•¹Ñ…Ñ¥½¸¹…ÁÁ±åU¹¥Ğôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€€€€€€€€€ÁÉ•Í•¹Ñ…Ñ¥½¸¹…ÁÁ±åU¹¥Ğ¡…É°‰µ½¹ÍÑ•Èˆ¤ì(€€€€€€€€€€€ô((€€€€€€€ô(€€€€¤ì(((€€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ(€€€€¹™½É…  (€€€€€€€¥¹‘•àôùì(€€€€€€€€€€€ÕÁ‘…Ñ•5½¹ÍÑ•ÉU$¡¥¹‘•à¤ì(€€€€€€€ô(€€€€¤ì(((€€€É•¹‘•ÉA±…å•ÉÌ ¤ì((€€€½¹ÍĞ‰½ÍÍAÉ•Í•¹Ñ…Ñ¥½¹=İ¹•ÈõÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆıİ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	½ÍÍ	…ÑÑ±”é¹Õ±°ì(€€€¥˜¡‰½ÍÍAÉ•Í•¹Ñ…Ñ¥½¹=İ¹•È˜™ÑåÁ•½˜‰½ÍÍAÉ•Í•¹Ñ…Ñ¥½¹=İ¹•È¹Íå¹!Õôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€‰½ÍÍAÉ•Í•¹Ñ…Ñ¥½¹=İ¹•È¹Íå¹!Õ ¤ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ¦7šZÃ–*ƒ–n{’ú¾ò#’úwŸ’öÿR£¢š2š¶¾ò3¦gšb¿–Â7j¾ò'¾òh(€€€€€€ƒ’æ/–&7¦g––_1)OnÓš:—¦?šâ³–òß–"ÛšJCšîÿ7j–kšÎT(€€€€€€ƒ–Û–¾›šb¿–ŞËÚO¦¦_¢¶'¦;šê[Šëj¾ò#šnûÚO¦?–"Ã¦8(€€€€€€ƒš¶Šëj–Ş»¢ŞwšVã–¶_¾ò'¾ò3š.ÿš:'šb¿–"“šZß¦2¿¢ª“ŠSŠP(€€€€€€MOj™±•àµÉ½ß–r£’öÿR£¢j–¾›¦jošâ³¢¦›JÃ–Š’â,(€€€€€€ƒ’ânÓ’â7–’ƒ–>¿¦vƒ¾ò3¢"–Ûæóê3’ş‡’îíMO–:ï2s¾ò0(€€€€€€ƒ’â7–š’ş‡’îï¦g–/–ŞËÚO¢¶'–¾›šê[Šëj¦?šâ³šZç–ò?¾ò0(€€€€€€ƒR£–¾›¦jo¦?–"ÃjšVã–¶_nÓš:—–òß–"Û¢¢·–ºk¦®c–ê›¾ò0(€€€€€€ƒŠë’şwš"Ã¦²—Ò¦2’â–ºkšr¢Êóšîÿ–"Ã¢¦Ë–"Ãj–rÃšZç(€€€€¨¼((€€€€¼¨XäÛ¾òkš"Ã¦²—¢Î¢¢+¦®c–ê›RÄ±•àƒšÆë–ºk¾ò3’â7–7š:K¢/’ê3š²„)Lƒ¦?šâ³€¨¼()ô(((¼¨(€€ƒŠbƒ¦7šZÃ–*ƒ–n{’ú¾òk¦?šâ°¹‰…ÑÑ±”µ¥¹™¿n»–&7j’â/Ş¾ò0(€€ƒ¢ŞV¯¦v‹–¾›¦jo–>¿¢š[¾–r7’â/Ş’æ/¦ZO¦
+–Ş»–’k–ÂG¾ò0(€€ƒnÓš:—š*+–Ş»¢Şw–*ƒ–nx¹‰…ÑÑ±”µ¥¹™¿j¦®c–ê›’â+¾ò0(€€ƒ–òß–"Û¢Êóšîÿ¾ò3’â7–7–Z»ÒS’úw¢ÎÑML™±•àµÉ½Ü(€€ƒšb¿–B›šr'Šë–¾›RšV#(¨¼()™Õ¹Ñ¥½¸™¥±±	…ÑÑ±•%¹™½…À ¥ì(€€€€¼¨XäØ½µÁ…Ñ¥‰¥±¥ÑäÍÑÕ‹¾òk¢"+–÷–ò?–B7¢Ç’şwVg¾ò3¦ÿ–7–Û’î[¢"+¢/–ò?–>Ÿšf–‚Ç¦2¿(€€€€€€ƒ–¾›¦jo¦®c–ê›–º3–£’ê“Ö˜ML±•ã¾ò3’â7–7¢º Ù¥ÍÕ…±Y¥•İÁ½ÉÓ’â7–7–¾¬¥¹±¥¹”¡•¥¡Ó€¨¼)ô(((¼¨(€€ƒŠbƒ’ş»š¶¾ò#š.ÿš:'šVÓ––])O–òß–"Û¢s¦®cjš¦–"Û¾ò'¾òh(€€ƒ¦g’âšVÓ––_3¦?šâ³¢s¦®cn¢÷¢š[ª_¢º+–2[(€€ƒ–ºkšf¦7šZÃšª‹š~—7j–kšÎW¾ò3šb¿’æ/–&7
+ë’ê¢šÆè(€€ƒš"Ã¦²—Ò¦2’â/šZç¦ëf÷–>7¢š–b_¢¦›j–Û’â·’â¢»š&/šÎW¾ò0(€€ƒ’ö¦g–æû¢ò«–r£’öÿR£¢–¾›¦jošâ³¢¦›JÃ–Š’â/’ânÓšÊKšr$(€€ƒ¦§–ºkRšV#¾ò3–>7¢3–Š{–*ƒ’ê¢/–ò?Šó¢’¦ns–ê›(€€ƒ’æ¢ºOš¾?š²…ÕÁ‘…Ñ•U$ §¦÷¢š–’k–k’âš²‡¦?šâ³¦/º_((€€ƒ>û–r£šRçR£šnÓš‚çšr³j–kšÎW¾òk¢ºL¹ÑÕÉ¸µÑ…É•ĞµÉ½Ü(€€ƒ¾ò#–n{–B#¢Î¢¢+–6–†+¾ò'šr³¢ê¯–ÂÇšb¿3šr'–’k–ÂG–&§¦’c¦ë¦ZL(€€ƒ–ÂÇ¢«–.W¦Vß–’k–’Ÿ7j–6–†+¾ò3’â7–7¦r¢š–>›–’[R¡)L(€€ƒ–:ï¦?šâ³–:ï¢s¾ò3¦gšVÓšº×¢/–ò?Šó–ŞËÚO’â7¦r¢š’ê(¨¼()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•5½¹ÍÑ•ÉU$¡¥¹‘•à¥ì((€€€½¹ÍĞµ½¹ÍÑ•È€ô(€€€€€€€µ½¹ÍÑ•ÉÍm¥¹‘•átì(((€€€¥˜ …µ½¹ÍÑ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òkK.š/–r[’ë(€€€€€€ƒ’æ/–&7K–>«šr'–r£š&¢†¦
+’â–"ïjš"Ã¦²—Ò¦2¢‡r/–ú_–"Ã¾ò0(€€€€€€ƒš2ê3šr¦ZO–6‡&’â+–º3–£šÊKšr'’îï’öWš>C’ë¾ò0(€€€€€€ƒ:§–ºÛr/’â7–ë3¦g¦jï>û–r£š¶–r£K7(€€€€€€ƒšRçš"C–>«¢šµ½¹ÍÑ•È¹ÍÑ…ÑÕÍ™™•ÑÏ¢‡šr'K¾ò0(€€€€€€ƒ–6‡&’â+–ÂÇšr’ânÓ¦†¿’ë’â–/¦Z"7jÂ~R—–r[’ë¾ò0(€€€€€€ƒnÓ–"ÃKÖCšvš&7šÚ#–’Ç(€€€€¨¼((€€€½¹ÍĞÍÑ…ÑÕÍÉ•„€ô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•ÉMÑ…ÑÕÌˆ­¥¹‘•à¤ì(((€€€¥˜¡ÍÑ…ÑÕÍÉ•„¥ì((€€€€€€€½¹ÍĞ¡…Í	ÕÉ¸€ô(€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÑ…ÑÕÍ™™•ÑÌ€˜˜(€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÑ…ÑÕÍ™™•ÑÌ¹Í½µ” (€€€€€€€€€€€€€€€•™™•Ğôø(€€€€€€€€€€€€€€€€€€€•™™•Ğ¹ÑåÁ”ôôô‰‰ÕÉ¸ˆ(€€€€€€€€€€€€¤ì(((€€€€€€€½¹ÍĞ¡…ÍÉ••é”€ô(€€€€€€€€€€€¥Í5½¹ÍÑ•ÉÉ½é•¸ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€€€€€¤ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€€€€€€€€€ƒ~Ï–2[¢Ş–no¢»Â‡–Z»šâon+šV#šzs¾ò3’æ’â’öÔ(€€€€€€€€€€ƒ¦†¿’ë–Â?–r[’ë¾ò3:§–ºÛš&7r/–ú_–ë¦g¦jïš«&¤(€€€€€€€€€€ƒ¢ê¯’â+>û–r£š:o¢F_–N«’êošV#šzs¾ò3’â7R£–>«¢ô(€€€€€€€€€€ƒ–ú{š"Ã¦²—Ò¦2¢‡–n{¦‚·š&û(€€€€€€€€¨¼((€€€€€€€½¹ÍĞ¡…ÍA•ÑÉ¥™äô((€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÑ…ÑÕÍ™™•ÑÌ€˜˜(€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÑ…ÑÕÍ™™•ÑÌ¹Í½µ” (€€€€€€€€€€€€€€€•™™•Ğôø((€€€€€€€€€€€€€€€€€€€•™™•Ğ¹ÑåÁ”ôôô‰Á•ÑÉ¥™äˆ˜˜(€€€€€€€€€€€€€€€€€€€•™™•Ğ¹ÑÕÉ¹Í1•™ĞøÀ((€€€€€€€€€€€€¤ì(((€€€€€€€½¹ÍĞ¡…Í¥±¥Ñå½İ¸ô((€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ” (€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€‰…¥±¥Ñå½İ¸ˆ(€€€€€€€€€€€€¤øÀì(((€€€€€€€½¹ÍĞ¡…ÍMÑ…Ñ½İ¸ô((€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ” (€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€‰ÍÑ…Ñ½İ¸ˆ(€€€€€€€€€€€€¤øÀì(((€€€€€€€½¹ÍĞ¡…Í•™•¹Í•½İ¸ô((€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ” (€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€‰‘•™•¹Í•½İ¸ˆ(€€€€€€€€€€€€¤øÀì(((€€€€€€€½¹ÍĞ¡…Í…µ…•½İ¸ô((€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ” (€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€‰‘…µ…•½İ¸ˆ(€€€€€€€€€€€€¤øÀì(((€€€€€€€½¹ÍĞ¡…ÍMÑÕ¸ô((€€€€€€€€€€€•Ñ5½¹ÍÑ•É•‰Õ™™Y…±Õ” (€€€€€€€€€€€€€€€µ½¹ÍÑ•È°(€€€€€€€€€€€€€€€€‰ÍÑÕ¸ˆ(€€€€€€€€€€€€¤øÀì(((€€€€€€€ÍÑ…ÑÕÍÉ•„¹¥¹¹•É!Q50€ô((€€€€€€€€€€€€ (€€€€€€€€€€€€€€€¡…Í	ÕÉ¸(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€œñÍÁ…¸±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘”‰ÕÉ¸‰Ñ¥Ñ±”ô‹K’â´ˆøğ½ÍÁ…¸øœ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€¡…ÍÉ••é”(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€œñÍÁ…¸±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘”™É••é”‰Ñ¥Ñ±”ô‹–Ã–Â’â´ˆøğ½ÍÁ…¸øœ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€¡…ÍA•ÑÉ¥™ä(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€œñÍÁ…¸±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘”‰Ñ¥Ñ±”ô‹~Ï–2[’â´ˆøğ½ÍÁ…¸øœ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€¡…Í¥±¥Ñå½İ¸(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€œñÍÁ…¸±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘”‰Ñ¥Ñ±”ô‹¦7–*o’â´ˆøğ½ÍÁ…¸øœ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€¡…ÍMÑ…Ñ½İ¸(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€œñÍÁ…¸±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘”‰Ñ¥Ñ±”ô‹–£–Æ³šŸ¦f7’ö;’â´ˆøğ½ÍÁ…¸øœ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€¡…Í•™•¹Í•½İ¸(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€œñÍÁ…¸±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘”‰Ñ¥Ñ±”ô‹‚Ó¦bË’â´ˆøğ½ÍÁ…¸øœ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€¡…Í…µ…•½İ¸(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€œñÍÁ…¸±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘”‰Ñ¥Ñ±”ô‹šº“¦Š£’â´ˆøğ½ÍÁ…¸øœ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€¡…ÍMÑÕ¸(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€œñÍÁ…¸±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘”‰Ñ¥Ñ±”ô‹šj#r§’â´ˆøğ½ÍÁ…¸øœ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾òkšVÓ–ò×–6‡&j–Ã–Â¿K–2¢ššV#šzs¾ò0(€€€€€€€€€€ƒ¢Ş’â+¦v‹–Â?–r[’ë–B3š¶—¦Z/¦^s(€€€€€€€€¨¼((€€€€€€€½¹ÍĞ™É••é•=Ù•É±…äô(€€€€€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•ÉÉ••é•=Ù•É±…äˆ­¥¹‘•à¤ì(((€€€€€€€½¹ÍĞ‰ÕÉ¹=Ù•É±…äô(€€€€€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•É	ÕÉ¹=Ù•É±…äˆ­¥¹‘•à¤ì(((€€€€€€€¥˜¡™É••é•=Ù•É±…ä¥ì((€€€€€€€€€€€™É••é•=Ù•É±…ä¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€€€€€‰Í¡½Üˆ°(€€€€€€€€€€€€€€€¡…ÍÉ••é”(€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€¥˜¡‰ÕÉ¹=Ù•É±…ä¥ì((€€€€€€€€€€€‰ÕÉ¹=Ù•É±…ä¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€€€€€‰Í¡½Üˆ°(€€€€€€€€€€€€€€€¡…Í	ÕÉ¸(€€€€€€€€€€€€¤ì((€€€€€€€ô((€€€ô(((€€€½¹ÍĞ¡Á	…È€ô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•É	…Èˆ­¥¹‘•à¤ì(((€€€½¹ÍĞÍÁ	…È€ô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•ÉMA	…Èˆ­¥¹‘•à¤ì(((€€€½¹ÍĞ¡ÁQ•áĞ€ô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•É!AQ•áĞˆ­¥¹‘•à¤ì(((€€€½¹ÍĞÍÁQ•áĞ€ô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•ÉMAQ•áĞˆ­¥¹‘•à¤ì(((€€€¥˜¡¡Á	…È¥ì((€€€€€€€¡Á	…È¹ÍÑå±”¹İ¥‘Ñ €ô(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¡À¼(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹µ…á!@¨(€€€€€€€€€€€€€€€€ÄÀÀ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ˆ”ˆì((€€€ô(((€€€¥˜¡ÍÁ	…È¥ì((€€€€€€€ÍÁ	…È¹ÍÑå±”¹İ¥‘Ñ €ô(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÀ¼(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹µ…áM@¨(€€€€€€€€€€€€€€€€ÄÀÀ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ˆ”ˆì((€€€ô(((€€€¥˜¡¡ÁQ•áĞ¥ì((€€€€€€€¡ÁQ•áĞ¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€€€€µ½¹ÍÑ•È¹¡À¬(€€€€€€€€€€€€ˆ¼ˆ¬(€€€€€€€€€€€µ½¹ÍÑ•È¹µ…á!@ì((€€€ô(((€€€¥˜¡ÍÁQ•áĞ¥ì((€€€€€€€ÍÁQ•áĞ¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÀ¬(€€€€€€€€€€€€ˆ¼ˆ¬(€€€€€€€€€€€µ½¹ÍÑ•È¹µ…áM@ì((€€€ô()ô(()™Õ¹Ñ¥½¸É•¹‘•ÉA±…å•ÉÌ ¥ì((€€€½¹ÍĞÉ½Ü€ô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•ÉI½Üˆ¤ì(((€€€É½Ü¹¥¹¹•É!Q50ôˆˆì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦g¢‡–në–ºk–>«V¯²³’â¢K¢&Ë’â–ò×–6‡¾ò0(€€€€€€ƒ>û–r¡Á±…å•ÈË–¶c–r£j¢¦Çšr’â¢ÖßV¯–ë’ú¾ò0(€€€€€€ƒš¾?–ò×–6‡j–Ÿ¦£–’îÙ¥“¦÷–*ƒ’â+Ò‹–òT(€€€€€€ƒ¾ò À÷²³’â¢K¢&ËÄ÷²³’ê3¢K¢&Ë¾ò'¾ò0(€€€€€€ƒ¦ÿ–7–§–ò×–6‡j¢†šŠt¿.š/–r[’é¥“’êKnãš&OšzÛ(€€€€¨¼((€€€½¹ÍĞÁ…ÉÑäõ•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹µ…À¡¡…É…Ñ•É%¹‘•àôùì(€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¡…É…Ñ•É%¹‘•à¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€¡…É…Ñ•Èé¡…É…Ñ•È°(€€€€€€€€€€€¡…É…Ñ•É%¹‘•àé¡…É…Ñ•É%¹‘•à°(€€€€€€€€€€€¥é¡…É…Ñ•È¹¥‘ñğ ‹¢K¢&Èˆ¬¡¡…É…Ñ•É%¹‘•à¬Ä¤¤°(€€€€€€€€€€€¥½¸é•±•µ•¹Ñ…Ñ…‰…Í•m¡…É…Ñ•È¹•±•µ•¹Ñt(€€€€€€€€€€€€€€€€ü•±•µ•¹Ñ…Ñ…‰…Í•m¡…É…Ñ•È¹•±•µ•¹Ñt¹¥½¸(€€€€€€€€€€€€€€€€è€ˆˆ°(€€€€€€€€€€€±•Ù•°é¡…É…Ñ•È¹±•Ù•°(€€€€€€€ôì(€€€ô¤ì(((€€€Á…ÉÑä¹™½É… ¡•¹ÑÉäôùì((€€€€€€€½¹ÍĞ¥¹‘•àõ•¹ÑÉä¹¡…É…Ñ•É%¹‘•àì((€€€€€€€½¹ÍĞ‰½à€ô(€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€€€€€¤ì(((€€€€€€€‰½à¹±…ÍÍ9…µ”€ô(€€€€€€€€€€€€‰‰…ÑÑ±”µÁ±…å•Èˆì(((€€€€€€€‰½à¹¥ô(€€€€€€€€€€€€‰‰…ÑÑ±•A±…å•É…Éˆ¬(€€€€€€€€€€€¥¹‘•àì((€€€€€€€‰½à¹ÍÑå±”¹‰…­É½Õ¹‘%µ…”ô(€€€€€€€€€€€€‰ÕÉ° œˆ­•Ñ¡…É…Ñ•É	…ÑÑ±•ÉÑİ½É­A…Ñ ¡•¹ÑÉä¹¡…É…Ñ•È¤¬ˆœ¤ˆì(((€€€€€€€‰½à¹¥¹¹•É!Q50€ô((€€€€€€€€(€€€€€€€€ñ‘¥Ø±…ÍÌô‰‰…ÑÑ±”µÁ±…å•Èµ¥½¸ˆø(€€€€€€€€€€€€‘í•¹ÑÉä¹¥½¹ô(€€€€€€€€ğ½‘¥Øø((€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€¥ô‰‰…ÑÑ±•A±…å•ÉMÑ…ÑÕÌ‘í¥¹‘•áôˆ(€€€€€€€€€€€±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘•Ìˆ(€€€€€€€€øğ½‘¥Øø((€€€€€€€€ñ‘¥Ø±…ÍÌô‰¡Àµ‰…Èˆø((€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•A±…å•É!A	…È‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€±…ÍÌô‰¡Àµ‰…Èµ¥¹¹•Èˆ(€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•A±…å•ÉM¡¥•±‘	…È‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€±…ÍÌô‰¡Àµ‰…ÈµÍ¡¥•±µ½Ù•É±…äˆ(€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰¡Àµ‰…ÈµÑ•áĞˆøğ½‘¥Øø((€€€€€€€€ğ½‘¥Øø((€€€€€€€€ñ‘¥Ø±…ÍÌô‰ÍÀµ‰…Èˆø((€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€¥ô‰‰…ÑÑ±•A±…å•ÉMA	…È‘í¥¹‘•áôˆ(€€€€€€€€€€€€€€€±…ÍÌô‰ÍÀµ‰…Èµ¥¹¹•Èˆ(€€€€€€€€€€€€øğ½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰ÍÀµ‰…ÈµÑ•áĞˆøğ½‘¥Øø((€€€€€€€€ğ½‘¥Øø((€€€€€€€€ñ‘¥Ø±…ÍÌô‰‰…ÑÑ±”µÁ±…å•Èµ¥ˆøğ½‘¥Øø(€€€€€€€€ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€€€€€€€€€ƒ¶'Òk–:šr³6£®/’â¢†3¦†¿’ë–r£’â+šZç¾ò0(€€€€€€€€€€ƒ>û–r£šRçš"C¢Ş–êW¦£j¥“–B#’ö×š"C’â¢†0(€€€€€€€€€€ƒ3¢K¢&Ë–B41Ø¹c7¾ò0(€€€€€€€€€€ƒr’â/’â¢†3j¦®c–ê›¾ò0(€€€€€€€€€€ƒ¢ºO–6‡&’â/–6+¦£j¢Î¢¢+–"_–>¿’î—šnÓÊûÂ‡(€€€€€€€€¨¼((€€€€€€€‰½à¹ÅÕ•ÉåM•±•Ñ½È (€€€€€€€€€€€€ˆ¹‰…ÑÑ±”µÁ±…å•Èµ¥ˆ(€€€€€€€€¤¹Ñ•áÑ½¹Ñ•¹Ğ€ô((€€€€€€€€€€€•¹ÑÉä¹¥¬(€€€€€€€€€€€€ˆ1Ø¸ˆ¬(€€€€€€€€€€€•¹ÑÉä¹±•Ù•°ì(((€€€€€€€‰½à¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È (€€€€€€€€€€€€‰±¥¬ˆ°(€€€€€€€€€€€€ ¤ôùì(€€€€€€€€€€€€€€€¥˜¡‰½à¹±…ÍÍ1¥ÍĞ¹½¹Ñ…¥¹Ì ‰…±±äµÑ…É•Ñ…‰±”ˆ¤¥ì(€€€€€€€€€€€€€€€€€€€Í•±•Ñ	…ÑÑ±•±±åQ…É•Ğ¡¥¹‘•à¤ì(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€ô(€€€€€€€€¤ì(((€€€€€€€É½Ü¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€‰½à(€€€€€€€€¤ì((€€€ô¤ì(((€€€ÕÁ‘…Ñ•A±…å•ÉMÑ…ÑÕÍ	…‘•Ì ¤ì()ô(((¼¨(€€ƒŠbƒ:§–ºÛ¢«–ŞÇ¢ê¯’â+j‰Õ™›.š/–r[’è(€€ƒ¾ò#n»–&7–>«šr'šK¯¾ò'¾ò0(€€ƒ¢Şš«&§jK–r[’ëšb¿–B3’â––_¦
+?¢ò¿¾ò0(€€ƒšr'RšV#’â·j‰Õ™›–ÂÇ’ânÓ¦†¿’ë¾ò3ÖCšvš&7šÚ#–’Ç(¨¼()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•A±…å•ÉMÑ…ÑÕÍ	…‘•Ì ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦g¢‡–>«šnÓšZÃ’â–ò×–6‡¾ò#–në–ºi¥“¾ò'¾ò0(€€€€€€ƒ>û–r£šRçš"C–B3šfšnÓšZÃ²³’â¢K¢&Ë¢Ş²³’ê3¢K¢&È(€€€€€€ƒ¾ò#–¶c–r£j¢¦Ç¾ò'–B¢«j‰Õ™›–r[’ë(€€€€¨¼((€€€•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹™½É… ¡¥¹‘•àôùì(€€€€€€€ÕÁ‘…Ñ•M¥¹±•¡…É…Ñ•ÉMÑ…ÑÕÍ	…‘” (€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤(€€€€€€€€¤ì(€€€ô¤ì()ô(()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•M¥¹±•¡…É…Ñ•ÉMÑ…ÑÕÍ	…‘” (€€€¥¹‘•à°(€€€¡…É…Ñ•È(¥ì((€€€½¹ÍĞÍÑ…ÑÕÍÉ•„€ô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•ÉMÑ…ÑÕÌˆ­¥¹‘•à¤ì(((€€€¥˜ …ÍÑ…ÑÕÍÉ•„¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÉ…•	Õ™˜€ô(€€€€€€€€¡¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Íññmt¤(€€€€€€€€¹™¥¹ (€€€€€€€€€€€ˆôùˆ¹ÑåÁ”ôôô‰É…”ˆ(€€€€€€€€¤ì(((€€€ÍÑ…ÑÕÍÉ•„¹¥¹¹•É!Q50€ô((€€€€€€€É…•	Õ™˜(€€€€€€€€ü(€€€€€€€€œñÍÁ…¸±…ÍÌô‰µ½¹ÍÑ•ÈµÍÑ…ÑÕÌµ‰…‘”É…”‰Ñ¥Ñ±”ô‹šK¯RšV#’â´ˆøğ½ÍÁ…¸øœ(€€€€€€€€è(€€€€€€€€ˆˆì()ô(()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•	…ÑÑ±•A±…å•É	…ÉÌ ¥ì((€€€ÕÁ‘…Ñ•A±…å•ÉMÑ…ÑÕÍ	…‘•Ì ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦g¢‡–>«šnÓšZÃ²³’â¢K¢&Ëj¢†šŠw¾ò0(€€€€€€ƒ¢3’âQ¡ÁQ•áĞ½ÍÁQ•áÓšb¿R (€€€€€€‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È ˆ¹¡Àµ‰…ÈµÑ•áĞˆ¤(€€€€€€ƒ–:ï–£–~š&û²³’â–/²›–B#j–Òƒ¾ò0(€€€€€€ƒ–ÂÇº_–*ƒ’ê²³’ê3–ò×–6‡’æšÂã¦ƒš*O–"Ã–B3’â–/(€€€€€€ƒšRçš"C–"–"—šnÓšZÃ–§–ò×–6‡–B¢«j¢†šŠw¾ò0(€€€€€€ƒšZ–¶_–Òƒ’æšRçš"C–r£¢¦Ë–ò×–6‡j¾–r7–Ÿš&û¾ò0(€€€€€€ƒ’â7šrš*O¦2¿(€€€€¨¼((€€€•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹™½É… ¡¥¹‘•àôùì(€€€€€€€ÕÁ‘…Ñ•M¥¹±•¡…É…Ñ•É	…ÉÌ (€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤°(€€€€€€€€€€€•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ¡¥¹‘•à¤(€€€€€€€€¤ì(€€€ô¤ì()ô(()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•M¥¹±•¡…É…Ñ•É	…ÉÌ (€€€¥¹‘•à°(€€€¡…É…Ñ•È°(€€€ÍÑ…ÑÌ(¥ì((€€€½¹ÍĞ…Éô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•É…Éˆ­¥¹‘•à¤ì(((€€€¥˜ ……É¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33šÒï¢F_¢š’ê»¾ò0(€€€€€€ƒš¶ï’ê‡š&7šj_7¾ò'¾òh(€€€€€€ƒš¾?š²‡¢†šŠwšnÓšZÃjšf–g¾ò3¦‚’úÿšª‹š~—¢K¢&Ëšb¿–B˜(€€€€€€ƒ–ŞËÚO–K’â/¾ò!¡ÀğôÃ¾ò'¾ò3šb¿j¢¦Ç–*ƒ’â(¹‘½İ¸(€€€€€€ƒ¢ºO–6‡&¢º+šj_¾ò3šÒï¢F_–ÂÇš*(¹‘½İ»š.ÿš:'Ú·š2(€€€€€€ƒ–:šr³’ê»–ê›¦g–/–÷–ò?šr³’ú–ÂÇšb¿–R¿’â¢Êƒ¢Ê°(€€€€€€ƒ–B3š¶—3V¯¦v‹¢†šŠw7¢Ş3¢K¢&Ë–¾›¦jm¡Ã7j(€€€€€€ƒ–rÃšZç¾ò3–6‡&jšb;šj_–Û–¾›’æšb¿–B3’â’îÛ’ê/j(€€€€€€ƒ–îÛ’òã¾ò#¦÷šb¿š*)¡Ã.š/–>7šbƒ–"ÃV¯¦v‹’â+¾ò'¾ò0(€€€€€€ƒšRû–r£¦g¢‡’â¢Öß¢fWB¾ò3’â7R£–>›–’[š&û–rÃšZä(€€€€€€ƒ¦7¢’–"“šZİ¡…É…Ñ•È¹¡ÀğôÃ(€€€€¨¼((€€€…É¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€‰‘½İ¸ˆ°(€€€€€€€¡…É…Ñ•È¹¡ÀğôÀ(€€€€¤ì(((€€€½¹ÍĞ¡Á	…È€ô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•É!A	…Èˆ­¥¹‘•à¤ì(((€€€½¹ÍĞÍÁ	…È€ô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•ÉMA	…Èˆ­¥¹‘•à¤ì(((€€€½¹ÍĞÍ¡¥•±‘	…È€ô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•ÉM¡¥•±‘	…Èˆ­¥¹‘•à¤ì(((€€€½¹ÍĞ¡ÁA•É•¹Ğ€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€À°(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€€ÄÀÀ°(€€€€€€€€€€€€€€€¡…É…Ñ•È¹¡À¼(€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹µ…á!@¨(€€€€€€€€€€€€€€€€ÄÀÀ(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€¥˜¡¡Á	…È¥ì((€€€€€€€¡Á	…È¹ÍÑå±”¹İ¥‘Ñ €ô(€€€€€€€€€€€¡ÁA•É•¹Ğ¬(€€€€€€€€€€€€ˆ”ˆì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33¢¶ßnûšV#šzsRš"Cj¢¦Ç¾ò0(€€€€€€ƒš"GšZç¢†¦?šŠw¢š–Š{–*ƒ¶'–ó¦Vß–ê›jf÷¢&Ë¢†¦?šŠw7¾ò'¾òh(€€€€€€ƒf÷¢&Ë¢&Ë–†+Ş+š:—–r£Ò¢&Ë¢†¦?–>Ï–Ó¦Z/–/¾ò!±•™Ğõ¡ÁA•É•¹Ó¾ò'¾ò0(€€€€€€ƒ–¾³–ê›¾òw¢¶ßnû–&§¦’c¦?’öQµ…á!Cjš¾S’ú/¾ò3¢Ş¢†šŠwšr³¢ê¯R (€€€€€€ƒ–B3’â–-µ…á!C–~ëšê[š>oº_¾ò3¢Ú–ë–ºç–f£j¦£–"–nƒ
+è(€€€€€€€¹¡Àµ‰…Ëšr³¢ê­½Ù•É™±½Üé¡¥‘‘•»šr¢«–.W¢Š¯¢š:'¾ò0(€€€€€€ƒ’â7šrV¯–ëš‚óŞk–’[(€€€€¨¼((€€€¥˜¡Í¡¥•±‘	…È¥ì((€€€€€€€½¹ÍĞÍ¡¥•±‘	Õ™˜ô((€€€€€€€€€€€€¡¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Íññmt¤(€€€€€€€€€€€€¹™¥¹ (€€€€€€€€€€€€€€€ˆôø((€€€€€€€€€€€€€€€€€€€ˆ¹ÑåÁ”ôôô‰Í¡¥•±ˆ˜˜(€€€€€€€€€€€€€€€€€€€ˆ¹ÑÕÉ¹Í1•™ĞøÀ˜˜(€€€€€€€€€€€€€€€€€€€ˆ¹É•µ…¥¹¥¹œøÀ((€€€€€€€€€€€€¤ì(((€€€€€€€½¹ÍĞÍ¡¥•±‘A•É•¹Ğô((€€€€€€€€€€€Í¡¥•±‘	Õ™˜(€€€€€€€€€€€€ü(€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€Í¡¥•±‘	Õ™˜¹É•µ…¥¹¥¹œ¼(€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹µ…á!@¨(€€€€€€€€€€€€€€€€ÄÀÀ(€€€€€€€€€€€€¤(€€€€€€€€€€€€è(€€€€€€€€€€€€Àì(((€€€€€€€Í¡¥•±‘	…È¹ÍÑå±”¹±•™Ğô(€€€€€€€€€€€¡ÁA•É•¹Ğ¬(€€€€€€€€€€€€ˆ”ˆì((€€€€€€€Í¡¥•±‘	…È¹ÍÑå±”¹İ¥‘Ñ ô(€€€€€€€€€€€Í¡¥•±‘A•É•¹Ğ¬(€€€€€€€€€€€€ˆ”ˆì((€€€ô(((€€€¥˜¡ÍÁ	…È¥ì((€€€€€€€ÍÁ	…È¹ÍÑå±”¹İ¥‘Ñ €ô(€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€€€€€€ÄÀÀ°(€€€€€€€€€€€€€€€€€€€¡…É…Ñ•È¹ÍÀ¼(€€€€€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹µ…áM@¨(€€€€€€€€€€€€€€€€€€€€ÄÀÀ(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€ˆ”ˆì((€€€ô(((€€€½¹ÍĞ¡ÁQ•áĞ€ô(€€€€€€€…É¹ÅÕ•ÉåM•±•Ñ½È (€€€€€€€€€€€€ˆ¹¡Àµ‰…ÈµÑ•áĞˆ(€€€€€€€€¤ì(((€€€½¹ÍĞÍÁQ•áĞ€ô(€€€€€€€…É¹ÅÕ•ÉåM•±•Ñ½È (€€€€€€€€€€€€ˆ¹ÍÀµ‰…ÈµÑ•áĞˆ(€€€€€€€€¤ì(((€€€¥˜¡¡ÁQ•áĞ¥ì((€€€€€€€¡ÁQ•áĞ¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€€€€¡…É…Ñ•È¹¡À¬(€€€€€€€€€€€€ˆ¼ˆ¬(€€€€€€€€€€€ÍÑ…ÑÌ¹µ…á!@ì((€€€ô(((€€€¥˜¡ÍÁQ•áĞ¥ì((€€€€€€€ÍÁQ•áĞ¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€€€€¡…É…Ñ•È¹ÍÀ¬(€€€€€€€€€€€€ˆ¼ˆ¬(€€€€€€€€€€€ÍÑ…ÑÌ¹µ…áM@ì((€€€ô()ô(()™Õ¹Ñ¥½¸ÑÉ¥•ÉÉ¥Ñ¥…±%µÁ…Ğ¡•±•µ•¹Ğ¥ì((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” ‰É¥Ñ¥…°µ¥µÁ…Ğˆ¤ì(€€€Ù½¥•±•µ•¹Ğ¹½™™Í•Ñ]¥‘Ñ ì(€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹…‘ ‰É¥Ñ¥…°µ¥µÁ…Ğˆ¤ì((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì(€€€€€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” ‰É¥Ñ¥…°µ¥µÁ…Ğˆ¤ì(€€€ô°ÔÈÀ¤ì)ô(()™Õ¹Ñ¥½¸Í¡½İ…µ…•A½ÁÕÀ¡•±•µ•¹Ğ±Ñ•áĞ±ÑåÁ”±¥ÍÉ¥Ğ¥ì((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÁ½ÁÕÀ€ô(€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€¤ì(((€€€Á½ÁÕÀ¹±…ÍÍ9…µ”€ô(€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò33šB7–’Ä(€€€€€€€€€€ƒ¢†¦?¦†¿’ë¢º+š"C–r£¢†šŠw’â/¦v‹7¾ò'¾òh(€€€€€€€€€€ƒrš¶–:–nƒš&û–"Ã’êŠSŠS¦g¢‡–ÂGš&O’ê(€€€€€€€€€€ƒ¦ëš‚ó¾ò0‰‘…µ…”µÁ½ÁÕÀ‹nÓš:—š:”(€€€€€€€€€€€‰¡ÀµÁ½ÁÕÀ‹¢º+š"@(€€€€€€€€€€€‰‘…µ…”µÁ½ÁÕÁ¡ÀµÁ½ÁÕÀ‹¦g¢¸(€€€€€€€€€€±…ÍÏ–Æ³šŸš‚çšr³’â7–¶c–r£j–¶_’âË¾ò0(€€€€€€€€€€€¹‘…µ…”µÁ½ÁÕÃ¦
+ÖMO¾ò!Á½Í¥Ñ¥½¸è(€€€€€€€€€€…‰Í½±ÕÑ”íÑ½ÀèÈØ—Š›Š›–:šr³¢¢·¢¢ (€€€€€€€€€€ƒš"C¦–r£–6‡&’â·šº×š*¢÷–B7¢Ç¢Ş¢†šŠt(€€€€€€€€€€ƒ’â·¦ZO¾ò'–º3–£šÊK––_R£–"Ã¾ò1Á½ÁÕÃ¢º+š"@(€€€€€€€€€€ƒ’â–/šÊKšr'’îï’öW–ºk’ö7š¢–ò?jšf»¦h(€€€€€€€€€€€ñ‘¥Øû¾ò3–>«¢÷’æ[’æ[š:K–r¡…ÁÁ•¹‘¡¥± ¤(€€€€€€€€€€ƒšRû¦Ë–:ïj–rÃšZç¾ò3’æ–ÂÇšb¿–6‡&šr’â/¦v‹(€€€€€€€€€€ƒ¢†šŠt½MCšŠt¿–B7¢Ç¦÷š:K–º3’æ/–ú3(€€€€€€€€€€ƒš¾?–-±…ÍÏ’æ/¦ZO¦÷¢s’â+¦ëš‚ó¾ò0(€€€€€€€€€€ƒ¢Ş–&7¦v‹3š*¢÷š2'¦"WšVÓ–/’â7¢÷¦î{4(€€€€€€€€€€ƒšb¿–B3’â¢¹ÑåÁ¿¾ò3¦g–ŞËÚOšb¿¦g–,(€€€€€€€€€€ƒšªSš†#¢‡²³’â'š²‡š*O–"Ã–B3š¢jšò?–¶\(€€€€€€€€€€‰ÕŸ’ê(€€€€€€€€¨¼((€€€€€€€€‰‘…µ…”µÁ½ÁÕÀ€ˆ¬(€€€€€€€€ (€€€€€€€€€€€ÑåÁ”ôôô‰ÍÀˆ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰ÍÀµÁ½ÁÕÀˆ(€€€€€€€€€€€€è(€€€€€€€€€€€ÑåÁ”ôôô‰¡•…°ˆ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰¡•…°µÁ½ÁÕÀˆ(€€€€€€€€€€€€è(€€€€€€€€€€€ÑåÁ”ôôô‰µ¥ÍÌˆ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰µ¥ÍÌµÁ½ÁÕÀˆ(€€€€€€€€€€€€è(€€€€€€€€€€€ÑåÁ”ôôô‰Í¡¥•±ˆ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰Í¡¥•±µÁ½ÁÕÀˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‰¡ÀµÁ½ÁÕÀˆ(€€€€€€€€¤¬(€€€€€€€€ (€€€€€€€€€€€¥ÍÉ¥Ğ(€€€€€€€€€€€€ü(€€€€€€€€€€€€ˆÉ¥Ñ¥…°µÁ½ÁÕÀˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆˆ(€€€€€€€€¤ì(((€€€¥˜¡¥ÍÉ¥Ğ¥ì(€€€€€€€€¼¨XÄÀÃ¾òk"šN+šÖ»–¶_–>«’şwVg3"šN(€¬ƒ–
+ß–ºÏšVã–¶_7(€€€€€€€€€€Í¡½İA±…å•É!¥Ğ½Í¡½İ5½¹ÍÑ•É!¥Ğƒ–
+Ï¦Ë’újÑ•áĞƒ–>¿¢÷–B¬€·!@½MC¾ò0(€€€€€€€€€€ƒ¦g¢‡–>«š*÷–ëšVã–¶_–k¦†¿’ë¾òo’â7–öÇ¦~ÿ–¾›¦jo–
+ß–ºÏ–ó€¨¼(€€€€€€€½¹ÍĞÉ¥Ñ¥…±9Õµ‰•É5…Ñ €ô(€€€€€€€€€€€MÑÉ¥¹œ¡Ñ•áĞ¤¹µ…Ñ  ½q¬ üép¹q¬¤ü¼¤ì((€€€€€€€Á½ÁÕÀ¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€€€€€‹"šN(€ˆ¬(€€€€€€€€€€€€¡É¥Ñ¥…±9Õµ‰•É5…Ñ €üÉ¥Ñ¥…±9Õµ‰•É5…Ñ¡lÁt€èMÑÉ¥¹œ¡Ñ•áĞ¤¤ì(€€€õ•±Í•ì(€€€€€€€Á½ÁÕÀ¹Ñ•áÑ½¹Ñ•¹Ğ€ôÑ•áĞì(€€€ô(((€€€¥˜¡¥ÍÉ¥Ğ¥ì(€€€€€€€ÑÉ¥•ÉÉ¥Ñ¥…±%µÁ…Ğ¡•±•µ•¹Ğ¤ì(€€€ô(((€€€•±•µ•¹Ğ¹…ÁÁ•¹‘¡¥± (€€€€€€€Á½ÁÕÀ(€€€€¤ì(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€¥˜ (€€€€€€€€€€€Á½ÁÕÀ€˜˜(€€€€€€€€€€€Á½ÁÕÀ¹Á…É•¹Ñ9½‘”(€€€€€€€€¥ì((€€€€€€€€€€€Á½ÁÕÀ¹Á…É•¹Ñ9½‘”¹É•µ½Ù•¡¥± (€€€€€€€€€€€€€€€Á½ÁÕÀ(€€€€€€€€€€€€¤ì((€€€€€€€ô((€€€ô°ÄàÀÀ¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€ƒ–Ãš^/’â¦Z–Â#–Æ³j¦o¢†3–r[’ë¾ò3’öÿR£¢’â+–
+Ïj(€€ƒ–r[&nÓš:—¢ö'š"A‰…Í”ØÓ–Ÿ–Ö3–r£¦g¢‡¾ò0(€€ƒ¢Ş¢K¢&Ë–r[&¾ò!‰…ÑÑ±•A±…å•É…ÉÀ¼Çj(€€‰…­É½Õ¹µ¥µ…—¾ò'R£–B3’â¢»–kšÎWŠSŠP(€€ƒ–Z»’â!Q53šªSš†#’â7’úw¢ÎÓ–’[¦£–r[&šªSš†#¾ò0(€€ƒ¢’¢÷¦g–/šªSš†#–"Ã–"—j–rÃšZç’æ’â7šršr$(€€ƒ–r[&¢Ş¿–úG–’ÇšV#–r[&šÚ#–’Çj–V?¦†3(¨¼()½¹ÍĞ%}MA%9}AI=)Q%1}%5ô(€€€€‰…ÍÍ•ÑÌ½‰…ÑÑ±”½¥”µÍÁ¥¸µÁÉ½©•Ñ¥±”¹İ•‰Àˆì(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3–Ãš^/’â¦Z–Â#–Æ°(€€ƒšRïšN+–.WV¯¾ò'¾òh(€€ƒ¢ºO’â+¦v‹¦
+–ò×–r[–ú{šZ÷šÎW¢–6‡&¦o–"Ã¢Š¯š&O’â·j(€€ƒš«&§–6‡&¾ò3’â·¦Sš^/¢ö'šRû–’Ÿ¾ò3š*×¦SšfšŞ‡–ë¾ò0(€€ƒVÛš"C¦g–/š*¢÷jšRïšN+&çšV#((€€ƒ¢Ş}Í¡½İM­¥±±9…µ•	…‘” §’âš¢š:o–r (€€‘½Õµ•¹Ğ¹‰½‘ç–êW’â/R¡•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤(€€ƒ¦?–êŸš¢g¾ò3’â7VÛ–6‡&j–¶C–Òƒ¾ò3¦ÿ–7¢Š¯–6‡&(€€ƒ¢«–ŞÇjÑÉ…¹Í™½É·–.WV¯–nÃ’ö?¾ò#–:–nƒ¢š,(€€Í¡½İM­¥±±9…µ•	…‘” §š^¦
++j¢ª«šb;¾ò'((€€…ÍÑ•É¡…É…Ñ•É%¹‘•ã¾òhÀ÷²³’â¢K¢&Ë(€€€Ä÷²³’ê3¢K¢&Ë¾ò3šÆë–ºk¦o¢†3¢Öß¦î{šb¿–N«–ò×:§–ºÛ–6‡(€€Ñ…É•Ñ5½¹ÍÑ•É%¹‘•ã¾òk¦o¢†3Ö¦î{šb¿–N«¦jïš«&§–6‡((€€ƒ–>«¢Êƒ¢Ê³3V¯¦v‹’â+¦o’â’â/7¾ò3’â7–k’îï’öW–
+ß–ºÌ¼(€€ƒ–F÷’â·–"“–ºk¾ò3–Fó–>¯®¿¢¦Ëš&M5%MO¦
+šb¿¢¦Ëš&¢†¾ò0(€€ƒ¢Ş¦g–/–÷–ò?–º3–£‡¦^s¾ò3–§’îÛ’ê/–"¦Z/¢fWB(¨¼()™Õ¹Ñ¥½¸Á±…å%•MÁ¥¹AÉ½©•Ñ¥±” (€€€…ÍÑ•É¡…É…Ñ•É%¹‘•à°(€€€Ñ…É•Ñ5½¹ÍÑ•É%¹‘•à(¥ì((€€€½¹ÍĞ…ÍÑ•É…Éô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•É…Éˆ¬(€€€€€€€€€€€…ÍÑ•É¡…É…Ñ•É%¹‘•à(€€€€€€€€¤ì(((€€€½¹ÍĞÑ…É•Ñ…Éô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•Èˆ¬(€€€€€€€€€€€Ñ…É•Ñ5½¹ÍÑ•É%¹‘•à(€€€€€€€€¤ì(((€€€¥˜ (€€€€€€€€……ÍÑ•É…Éñğ(€€€€€€€€…Ñ…É•Ñ…É(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ…ÍÑ•ÉI•Ğô(€€€€€€€…ÍÑ•É…É¹•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤ì(((€€€½¹ÍĞÑ…É•ÑI•Ğô(€€€€€€€Ñ…É•Ñ…É¹•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤ì(((€€€½¹ÍĞÁÉ½©•Ñ¥±”ô(€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€‰¥µœˆ(€€€€€€€€¤ì(((€€€ÁÉ½©•Ñ¥±”¹ÍÉŒô(€€€€€€€%}MA%9}AI=)Q%1}%5ì((€€€ÁÉ½©•Ñ¥±”¹±…ÍÍ9…µ”ô(€€€€€€€€‰¥”µÍÁ¥¸µÁÉ½©•Ñ¥±”ˆì((€€€½¹ÍĞÍÑ…ÉÑA½¥¹Ğ€ô(€€€€€€€…µ•A½¥¹ÑÉ½µ±¥•¹Ğ (€€€€€€€€€€€…ÍÑ•ÉI•Ğ¹±•™Ğ¬(€€€€€€€€€€€…ÍÑ•ÉI•Ğ¹İ¥‘Ñ ¼È°(€€€€€€€€€€€…ÍÑ•ÉI•Ğ¹Ñ½À¬(€€€€€€€€€€€…ÍÑ•ÉI•Ğ¹¡•¥¡Ğ¼È(€€€€€€€€¤ì((€€€½¹ÍĞ•¹‘A½¥¹Ğ€ô(€€€€€€€…µ•A½¥¹ÑÉ½µ±¥•¹Ğ (€€€€€€€€€€€Ñ…É•ÑI•Ğ¹±•™Ğ¬(€€€€€€€€€€€Ñ…É•ÑI•Ğ¹İ¥‘Ñ ¼È°(€€€€€€€€€€€Ñ…É•ÑI•Ğ¹Ñ½À¬(€€€€€€€€€€€Ñ…É•ÑI•Ğ¹¡•¥¡Ğ¼È(€€€€€€€€¤ì((€€€ÁÉ½©•Ñ¥±”¹ÍÑå±”¹±•™Ğô(€€€€€€€ÍÑ…ÉÑA½¥¹Ğ¹à¬‰Áàˆì((€€€ÁÉ½©•Ñ¥±”¹ÍÑå±”¹Ñ½Àô(€€€€€€€ÍÑ…ÉÑA½¥¹Ğ¹ä¬‰Áàˆì((€€€½¹ÍĞ½Ù•É±…å1…å•È€ô(€€€€€€€€ ‰…µ”µ½Ù•É±…äµ±…å•Èˆ¤ñğ(€€€€€€€‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰…µ”µÍÑ…”ˆ¤ì((€€€½Ù•É±…å1…å•È¹…ÁÁ•¹‘¡¥± (€€€€€€€ÁÉ½©•Ñ¥±”(€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ–òß–"Û¢ãfñÉ•™±½ß¾òh(€€€€€€ƒ¢Öß¦î{j±•™Ğ½Ñ½Ã–&o¢¢·–ºk–º3¾ò3?¢š÷–f£¦
+šÊH(€€€€€€ƒrš¶V¯–ë¦g’â–æ¾ò3–ššzs¦š³’â+–r£–B3’â¢ò¨(€€€€€€ƒ’ê/’îÛ–ú«JÃ¢‡š*)±•™Ğ½Ñ½ÃšRçš"CÖ¦î{–êŸš¢g¾ò0(€€€€€€ÑÉ…¹Í¥Ñ¥½»šrnÓš:—¢ŞÏ¦;–:ïr/’â7–"Ã¦o¢†0(€€€€€€ƒ¦;¢/R¡Ù½¥ÁÉ½©•Ñ¥±”¹½™™Í•Ñ]¥‘Ñ (€€€€€€ƒ–òß¢ş¯?¢š÷–f£–#º_’âš²‡n»–&7j&#¦v‹¾ò0(€€€€€€ƒŠë¢ª73¢Öß¦î{7–ŞËÚORšV#¾ò3š:—’â/’ú(€€€€€€É•ÅÕ•ÍÑ¹¥µ…Ñ¥½¹É…µ—¢‡šRçš"CÖ¦î{–êŸš¢d(€€€€€€ƒš&7šrrj¢ãfñÑÉ…¹Í¥Ñ¥½»–.WV¯(€€€€¨¼((€€€Ù½¥ÁÉ½©•Ñ¥±”¹½™™Í•Ñ]¥‘Ñ ì(((€€€É•ÅÕ•ÍÑ¹¥µ…Ñ¥½¹É…µ”  ¤ôùì((€€€€€€€ÁÉ½©•Ñ¥±”¹ÍÑå±”¹±•™Ğô(€€€€€€€€€€€•¹‘A½¥¹Ğ¹à¬‰Áàˆì((€€€€€€€ÁÉ½©•Ñ¥±”¹ÍÑå±”¹Ñ½Àô(€€€€€€€€€€€•¹‘A½¥¹Ğ¹ä¬‰Áàˆì((€€€€€€€ÁÉ½©•Ñ¥±”¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€€€€€‰…ÉÉ¥Ù•ˆ(€€€€€€€€¤ì((€€€ô¤ì(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€¥˜ (€€€€€€€€€€€ÁÉ½©•Ñ¥±”€˜˜(€€€€€€€€€€€ÁÉ½©•Ñ¥±”¹Á…É•¹Ñ9½‘”(€€€€€€€€¥ì((€€€€€€€€€€€ÁÉ½©•Ñ¥±”¹Á…É•¹Ñ9½‘”¹É•µ½Ù•¡¥± (€€€€€€€€€€€€€€€ÁÉ½©•Ñ¥±”(€€€€€€€€€€€€¤ì((€€€€€€€ô((€€€ô°ÔÀÀ¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¯º·š*¢÷j(€€ƒ’â'fó¦o¢†3&çšV#¾ò3ÒQML½)O–.WV¯¾ò'¾òh(€€Í½ÕÉ•…É‘%“šb¿šZ÷šÎW¢j–6‡&=4¥(€€ƒ¾ò#’ú/–š‰‰…ÑÑ±•A±…å•É…ÉÀ‹¾ò'¾ò0(€€Ñ…É•Ñ%¹‘•á•Ïšb¿¦gš²‡¯º·–¾›¦još&O’â·j(€€ƒš«&§Ò‹–òW¦f–"_¾ò#šr–’hÏ–/¾ò3–Â7š'’â´¿–Ş˜¿–>Ï¾ò'((€€ƒš¾?’âfó¯º·¾òh(€€€Ä¸ƒ–ú{šZ÷šÎW¢–6‡&’â·–ş–ëfó¾ò3R (€€€€€•±•µ•¹Ğ¹…¹¥µ…Ñ” §¾ò!]•ˆ¹¥µ…Ñ¥½¹Ì(€€€€€A'¾ò'¦o–BGn»š¢g–6‡&’â·–ş¾ò3¦o¢†3¦;¢/’â´(€€€€€ƒšr³¦®Sšr’úw¦o¢†3šZç–BG¢«–.Wš^/¢ö'¾ò3r/¢Öß’ú(€€€€€ƒ–?rjšrwn»š¢g¦o¦;–:ï¾ò3’â7šb¿š¶ïšvÿ–rÀ(€€€€€ƒ–æÏï(€€€È¸ƒ–"Ã¦Sjz³¦ZO¾ò3¯º·šr³¦®SšÚ#–’Ç¾ò3–:–rÀ(€€€€€ƒ
+ã¦Z/’â–Â?ú“¯¢*ÇÊK–¶C¾ò ã¦†¾ò3–B¢«–ú (€€€€€ƒ’â7–B3¢K–ê›–fÓ–Â–7šŞ‡–ë¾ò'(€€€Ì¸ƒ’â'fó’æ/¦ZOšVš?–*ƒ’â¦î{¦î{šf¦ZO–Ş¸(€€€€€ƒ¾ò#š¾?fó¦ZO¦jPàÁµÏš&7fó–Â¾ò'¾ò3’â7šr’â'fğ(€€€€€ƒr/¢Öß’ú–?–B3’âfó¢’¢÷¢Êó’â+¾ò3š¾S¢òšr$(€€€€€ƒ3¦ê3fó–Â7j¾––?š((€€ƒš&šr'–.Wš/Rš"Cj=7–Òƒ–.WV¯šJ·–º3¦÷šr(€€ƒ¢«–ŞÇï¦f“¾ò3’â7šrVg–r£V¯¦v‹’â+Ò¿¦7(¨¼((¼¨(€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3š«&§R£¯º´(€€ƒšRïšN+:§–ºÛšf’æ¢ššr'–B3š¢j¦o¢†3&çšV#¾ò'¾òh(€€ƒ–:šr³¦g¢‡–>«š:—–>_3š«&§Ò‹–òW¦f–"_7¾ò0(€€ƒ–¾¯š¶ïÖ–è‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­¥¹‘•ã–:ïš&ø(€€ƒn»š¢g–Òƒ¾ò3–>«¢÷R£–r£3:§–ºÛ–Âš«&§7¦g–,(€€ƒšZç–BGšRçš"CnÓš:—š:—–>_3n»š¢e=4¥“j¦f–"_7¾ò0(€€ƒš&O:§–ºÛ¾ò ‰‰…ÑÑ±•A±…å•É…Éˆ­¥¹‘•ã¾ò$(€€ƒ¢Şš&Oš«&§¾ò ‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­¥¹‘•ã¾ò$(€€ƒ–§¢»šZç–BG¦÷¢÷–ÇR£–B3’â––_–.WV¯¦
+?¢ò¿¾ò3’â7R (€€ƒ–¾¯–§’î÷–æû’æ;’âš¢j¢/–ò?Šó(¨¼()™Õ¹Ñ¥½¸Á±…å¥É•I½­•Ñ¹¥µ…Ñ¥½¸ (€€€Í½ÕÉ•…É‘%°(€€€Ñ…É•Ñ±•µ•¹Ñ%‘Ì(¥ì((€€€½¹ÍĞÍ½ÕÉ•°ô(€€€€€€€€¡Í½ÕÉ•…É‘%¤ì(((€€€¥˜ …Í½ÕÉ•°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÍ½ÕÉ•I•Ğô(€€€€€€€Í½ÕÉ•°¹•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤ì((€€€½¹ÍĞÍ½ÕÉ•A½¥¹Ğ€ô(€€€€€€€…µ•A½¥¹ÑÉ½µ±¥•¹Ğ (€€€€€€€€€€€Í½ÕÉ•I•Ğ¹±•™Ğ¬(€€€€€€€€€€€Í½ÕÉ•I•Ğ¹İ¥‘Ñ ¼È°(€€€€€€€€€€€Í½ÕÉ•I•Ğ¹Ñ½À¬(€€€€€€€€€€€Í½ÕÉ•I•Ğ¹¡•¥¡Ğ¼È(€€€€€€€€¤ì((€€€½¹ÍĞÍÑ…ÉÑ`€ô(€€€€€€€Í½ÕÉ•A½¥¹Ğ¹àì((€€€½¹ÍĞÍÑ…ÉÑd€ô(€€€€€€€Í½ÕÉ•A½¥¹Ğ¹äì(((€€€Ñ…É•Ñ±•µ•¹Ñ%‘Ì¹™½É…  (€€€€€€€€¡Ñ…É•Ñ±•µ•¹Ñ%±¤¤ôùì((€€€€€€€€€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€€€€€€€€€™¥É•=¹•I½­•Ğ (€€€€€€€€€€€€€€€€€€€ÍÑ…ÉÑ`°(€€€€€€€€€€€€€€€€€€€ÍÑ…ÉÑd°(€€€€€€€€€€€€€€€€€€€Ñ…É•Ñ±•µ•¹Ñ%(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€ô±¤¨àÀ¤ì((€€€€€€€ô(€€€€¤ì()ô(()™Õ¹Ñ¥½¸™¥É•=¹•I½­•Ğ (€€€ÍÑ…ÉÑ`°(€€€ÍÑ…ÉÑd°(€€€Ñ…É•Ñ±•µ•¹Ñ%(¥ì((€€€½¹ÍĞÑ…É•Ñ°ô(€€€€€€€€¡Ñ…É•Ñ±•µ•¹Ñ%¤ì(((€€€¥˜ …Ñ…É•Ñ°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÑ…É•ÑI•Ğô(€€€€€€€Ñ…É•Ñ°¹•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤ì((€€€½¹ÍĞÑ…É•ÑA½¥¹Ğ€ô(€€€€€€€…µ•A½¥¹ÑÉ½µ±¥•¹Ğ (€€€€€€€€€€€Ñ…É•ÑI•Ğ¹±•™Ğ¬(€€€€€€€€€€€Ñ…É•ÑI•Ğ¹İ¥‘Ñ ¼È°(€€€€€€€€€€€Ñ…É•ÑI•Ğ¹Ñ½À¬(€€€€€€€€€€€Ñ…É•ÑI•Ğ¹¡•¥¡Ğ¼È(€€€€€€€€¤ì((€€€½¹ÍĞ•¹‘`€ô(€€€€€€€Ñ…É•ÑA½¥¹Ğ¹àì((€€€½¹ÍĞ•¹‘d€ô(€€€€€€€Ñ…É•ÑA½¥¹Ğ¹äì(((€€€½¹ÍĞ…¹±••œô((€€€€€€€5…Ñ ¹…Ñ…¸È (€€€€€€€€€€€•¹‘dµÍÑ…ÉÑd°(€€€€€€€€€€€•¹‘`µÍÑ…ÉÑ`(€€€€€€€€¤¨(€€€€€€€€ÄàÀ½5…Ñ ¹A$ì(((€€€½¹ÍĞÉ½­•Ğô(€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ ‰‘¥Øˆ¤ì((€€€É½­•Ğ¹±…ÍÍ9…µ”ô(€€€€€€€€‰™¥É”µÉ½­•ĞµÁÉ½©•Ñ¥±”ˆì((€€€É½­•Ğ¹ÍÑå±”¹±•™Ğô(€€€€€€€ÍÑ…ÉÑ`¬‰Áàˆì((€€€É½­•Ğ¹ÍÑå±”¹Ñ½Àô(€€€€€€€ÍÑ…ÉÑd¬‰Áàˆì((€€€É½­•Ğ¹ÍÑå±”¹ÑÉ…¹Í™½É´ô((€€€€€€€€‰ÑÉ…¹Í±…Ñ” ´ÔÀ”°´ÔÀ”¤É½Ñ…Ñ” ˆ¬(€€€€€€€…¹±••œ¬(€€€€€€€€‰‘•œ¤ˆì(((€€€½¹ÍĞ½Ù•É±…å1…å•È€ô(€€€€€€€€ ‰…µ”µ½Ù•É±…äµ±…å•Èˆ¤ñğ(€€€€€€€‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰…µ”µÍÑ…”ˆ¤ì((€€€½Ù•É±…å1…å•È¹…ÁÁ•¹‘¡¥± (€€€€€€€É½­•Ğ(€€€€¤ì(((€€€½¹ÍĞ™±¥¡Ñ5Ìô(€€€€€€€€ĞÈÀì(((€€€½¹ÍĞ…¹¥´ô((€€€€€€€É½­•Ğ¹…¹¥µ…Ñ” (€€€€€€€€€€€l(€€€€€€€€€€€€€€€ì(€€€€€€€€€€€€€€€€€€€±•™ĞéÍÑ…ÉÑ`¬‰Áàˆ°(€€€€€€€€€€€€€€€€€€€Ñ½ÀéÍÑ…ÉÑd¬‰Áàˆ°(€€€€€€€€€€€€€€€€€€€½™™Í•ĞèÀ(€€€€€€€€€€€€€€€ô°(€€€€€€€€€€€€€€€ì(€€€€€€€€€€€€€€€€€€€±•™Ğé•¹‘`¬‰Áàˆ°(€€€€€€€€€€€€€€€€€€€Ñ½Àé•¹‘d¬‰Áàˆ°(€€€€€€€€€€€€€€€€€€€½™™Í•ĞèÄ(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€t°(€€€€€€€€€€€ì(€€€€€€€€€€€€€€€‘ÕÉ…Ñ¥½¸é™±¥¡Ñ5Ì°(€€€€€€€€€€€€€€€•…Í¥¹œè‰•…Í”µ¥¸ˆ(€€€€€€€€€€€ô(€€€€€€€€¤ì(((€€€…¹¥´¹½¹™¥¹¥Í ô ¤ôùì((€€€€€€€É½­•Ğ¹É•µ½Ù” ¤ì(((€€€€€€€ÍÁ…İ¹¥É•MÁ…É­	ÕÉÍĞ (€€€€€€€€€€€•¹‘`°(€€€€€€€€€€€•¹‘d(€€€€€€€€¤ì((€€€ôì()ô(()™Õ¹Ñ¥½¸ÍÁ…İ¹¥É•MÁ…É­	ÕÉÍĞ (€€€à°(€€€ä(¥ì((€€€½¹ÍĞÍÁ…É­½Õ¹Ğô(€€€€€€€€àì(((€€€™½È (€€€€€€€±•Ğ¤ôÀì(€€€€€€€¤ñÍÁ…É­½Õ¹Ğì(€€€€€€€¤¬¬(€€€€¥ì((€€€€€€€½¹ÍĞÍÁ…É¬ô(€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ ‰‘¥Øˆ¤ì((€€€€€€€ÍÁ…É¬¹±…ÍÍ9…µ”ô(€€€€€€€€€€€€‰™¥É”µÉ½­•ĞµÍÁ…É¬ˆì((€€€€€€€ÍÁ…É¬¹ÍÑå±”¹±•™Ğô(€€€€€€€€€€€à¬‰Áàˆì((€€€€€€€ÍÁ…É¬¹ÍÑå±”¹Ñ½Àô(€€€€€€€€€€€ä¬‰Áàˆì(((€€€€€€€‘½Õµ•¹Ğ¹‰½‘ä¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€ÍÁ…É¬(€€€€€€€€¤ì(((€€€€€€€½¹ÍĞ…¹±”ô((€€€€€€€€€€€€ (€€€€€€€€€€€€€€€5…Ñ ¹A$¨È©¤¼(€€€€€€€€€€€€€€€ÍÁ…É­½Õ¹Ğ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€¡5…Ñ ¹É…¹‘½´ ¤¨À¸Ô¤ì(((€€€€€€€½¹ÍĞ‘¥ÍÑ…¹”ô((€€€€€€€€€€€€Äà¬(€€€€€€€€€€€5…Ñ ¹É…¹‘½´ ¤¨ÄØì(((€€€€€€€½¹ÍĞÍÁÉ•…ô((€€€€€€€€€€€ÍÁ…É¬¹…¹¥µ…Ñ” (€€€€€€€€€€€€€€€l(€€€€€€€€€€€€€€€€€€€ì(€€€€€€€€€€€€€€€€€€€€€€€±•™Ğéà¬‰Áàˆ°(€€€€€€€€€€€€€€€€€€€€€€€Ñ½Àéä¬‰Áàˆ°(€€€€€€€€€€€€€€€€€€€€€€€½Á…¥ÑäèÄ°(€€€€€€€€€€€€€€€€€€€€€€€½™™Í•ĞèÀ(€€€€€€€€€€€€€€€€€€€ô°(€€€€€€€€€€€€€€€€€€€ì(€€€€€€€€€€€€€€€€€€€€€€€±•™Ğè(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€à¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€5…Ñ ¹½Ì¡…¹±”¤©‘¥ÍÑ…¹”(€€€€€€€€€€€€€€€€€€€€€€€€€€€€¤¬‰Áàˆ°(€€€€€€€€€€€€€€€€€€€€€€€Ñ½Àè(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ä¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€5…Ñ ¹Í¥¸¡…¹±”¤©‘¥ÍÑ…¹”(€€€€€€€€€€€€€€€€€€€€€€€€€€€€¤¬‰Áàˆ°(€€€€€€€€€€€€€€€€€€€€€€€½Á…¥ÑäèÀ°(€€€€€€€€€€€€€€€€€€€€€€€½™™Í•ĞèÄ(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€t°(€€€€€€€€€€€€€€€ì(€€€€€€€€€€€€€€€€€€€‘ÕÉ…Ñ¥½¸èÌàÀ°(€€€€€€€€€€€€€€€€€€€•…Í¥¹œè‰•…Í”µ½ÕĞˆ(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€¤ì(((€€€€€€€ÍÁÉ•…¹½¹™¥¹¥Í ô ¤ôùì((€€€€€€€€€€€ÍÁ…É¬¹É•µ½Ù” ¤ì((€€€€€€€ôì((€€€ô()ô(()™Õ¹Ñ¥½¸™¥¹‘	…ÑÑ±•M­¥±±	åAÉ•Í•¹Ñ…Ñ¥½¸¡Í­¥±±9…µ”±•±•µ•¹ÑQåÁ”¥ì(€€€¥˜¡ÑåÁ•½˜Í­¥±±…Ñ…‰…Í”ôôô‰Õ¹‘•™¥¹•ˆ¥ìÉ•ÑÕÉ¸¹Õ±°ìô(€€€½¹ÍĞ¥‘Ìõ=‰©•Ğ¹­•åÌ¡Í­¥±±…Ñ…‰…Í”¤ì(€€€™½È¡±•Ğ¥¹‘•àôÀí¥¹‘•àñ¥‘Ì¹±•¹Ñ í¥¹‘•à¬¬¥ì(€€€€€€€½¹ÍĞÍ­¥±°õÍ­¥±±…Ñ…‰…Í•m¥‘Ím¥¹‘•áutì(€€€€€€€¥˜ (€€€€€€€€€€€Í­¥±°˜™Í­¥±°¹¹…µ”ôôõÍ­¥±±9…µ”˜˜(€€€€€€€€€€€€ …•±•µ•¹ÑQåÁ•ñğ…Í­¥±°¹•±•µ•¹ÑññÍ­¥±°¹•±•µ•¹Ğôôõ•±•µ•¹ÑQåÁ”¤(€€€€€€€€¥ì(€€€€€€€€€€€É•ÑÕÉ¸Í­¥±°ì(€€€€€€€ô(€€€ô(€€€É•ÑÕÉ¸¹Õ±°ì)ô()™Õ¹Ñ¥½¸…Ñ¥Ù•	…ÑÑ±•Q…É•Ñ%‘Ì¡Í¥‘”±¥¹±Õ‘••™•…Ñ•¥ì(€€€¥˜¡Í¥‘”ôôô‰µ½¹ÍÑ•Èˆ¥ì(€€€€€€€É•ÑÕÉ¸€¡ÉÉ…ä¹¥ÍÉÉ…ä¡ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ¤ıÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌémt¤¹™¥±Ñ•È¡¥¹‘•àôùì(€€€€€€€€€€€½¹ÍĞµ½¹ÍÑ•Èõµ½¹ÍÑ•ÉÍm¥¹‘•átì(€€€€€€€€€€€É•ÑÕÉ¸€„„¡µ½¹ÍÑ•È˜˜¡¥¹±Õ‘••™•…Ñ•‘ññµ½¹ÍÑ•È¹…±¥Ù”„ôõ™…±Í”˜™9Õµ‰•È¡µ½¹ÍÑ•È¹¡À¤øÀ¤¤ì(€€€€€€€ô¤ì(€€€ô(€€€É•ÑÕÉ¸•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹™¥±Ñ•È¡¥¹‘•àôùì(€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤ì(€€€€€€€É•ÑÕÉ¸€„„¡¡…É…Ñ•È˜˜¡¥¹±Õ‘••™•…Ñ•‘ññ9Õµ‰•È¡¡…É…Ñ•È¹¡À¤øÀ¤¤ì(€€€ô¤ì)ô((¼¨½µ‰…Ğ½İ¹ÌÑ…É•ĞÍ•±•Ñ¥½¸¸Q¡¥Ì½¹ÑÉ…Ğ¥ÌÉ•…Ñ•‰•™½É”XÄĞÈ½XÄĞÌÍ•”(€€Ñ¡”…ÍĞ°Í¼Ñ¡”Y`ÉÕ¹Ñ¥µ”¹•Ù•ÈÉ•…‘ÌÑ¡”…Ñ¥½¸ÅÕ•Õ”°¡¥Ğ½É‘•È½È±¥Ù”(€€ÍÕÉÙ¥Ù½È‰½Õ¹‘ÌÑ¼Õ•ÍÌ¥ÑÌÁÉ¥µ…ÉäÑ…É•Ğ½ÈÍ•µ…¹Ñ¥Œ™½½ÑÁÉ¥¹Ğ¸€¨¼)™Õ¹Ñ¥½¸É•…Ñ•	…ÑÑ±•Q…É•Ñ½¹ÑÉ…Ğ¡Í¥‘”±Í­¥±±9…µ”±•±•µ•¹ÑQåÁ”±…Ñ½É%¹‘•à±Ñ…É•Ñ%±Ñ…É•Ñ%‘Ì±Ñ…É•ÑM¥‘•=Ù•ÉÉ¥‘”¥ì(€€€½¹ÍĞÍ­¥±°õÍ­¥±±9…µ”ôôô‹šf»¦kšRïšN(ˆ(€€€€€€€€ıí¥è‰¹½Éµ…°ˆ±Ñ…É•ÑQåÁ”è‰Í¥¹±”ˆ±…Ñ•½Éäè‰Á¡åÍ¥…°‰ô(€€€€€€€€é™¥¹‘	…ÑÑ±•M­¥±±	åAÉ•Í•¹Ñ…Ñ¥½¸¡Í­¥±±9…µ”±•±•µ•¹ÑQåÁ”¤ì(€€€½¹ÍĞÑ…É•ÑQåÁ”õMÑÉ¥¹œ¡Í­¥±°˜™Í­¥±°¹Ñ…É•ÑQåÁ•ñğ‰Í¥¹±”ˆ¤ì(€€€½¹ÍĞÍ…µ•M¥‘”ô½…±±ä½¤¹Ñ•ÍĞ¡Ñ…É•ÑQåÁ”¥ñğ½¡•…±ñÉ•Ù¥Ù•ñ‰Õ™˜¼¹Ñ•ÍĞ¡MÑÉ¥¹œ¡Í­¥±°˜™Í­¥±°¹…Ñ•½Éåñğˆˆ¤¤ì(€€€½¹ÍĞÑ…É•ÑM¥‘”õÑ…É•ÑM¥‘•=Ù•ÉÉ¥‘”ôôô‰Á±…å•È‰ññÑ…É•ÑM¥‘•=Ù•ÉÉ¥‘”ôôô‰µ½¹ÍÑ•Èˆ(€€€€€€€€ıÑ…É•ÑM¥‘•=Ù•ÉÉ¥‘”(€€€€€€€€è¡Í…µ•M¥‘”ıÍ¥‘”è¡Í¥‘”ôôô‰Á±…å•Èˆü‰µ½¹ÍÑ•Èˆè‰Á±…å•Èˆ¤¤ì(€€€½¹ÍĞ•áÁ±¥¥Ñ%‘ÌõÉÉ…ä¹¥ÍÉÉ…ä¡Ñ…É•Ñ%‘Ì¤ıÑ…É•Ñ%‘Ì¹Í±¥” ¤émtì(€€€±•ĞÁÉ¥µ…ÉäõÑ…É•Ñ%„ôõÕ¹‘•™¥¹•˜™Ñ…É•Ñ%„ôõ¹Õ±°ıÑ…É•Ñ%é¹Õ±°ì(€€€±•Ğ¥‘Ìõ•áÁ±¥¥Ñ%‘Ìì((€€€¥˜ …¥‘Ì¹±•¹Ñ ¥ì(€€€€€€€±•ĞÅÕ•Õ•õ¹Õ±°ì(€€€€€€€¥˜¡Í¥‘”ôôô‰Á±…å•Èˆ˜™ÑåÁ•½˜ÅÕ•Õ•‘A±…å•ÉÑ¥½¹Ì„ôô‰Õ¹‘•™¥¹•ˆ¥ì(€€€€€€€€€€€ÅÕ•Õ•õÅÕ•Õ•‘A±…å•ÉÑ¥½¹Ì˜™ÅÕ•Õ•‘A±…å•ÉÑ¥½¹Ím…Ñ½É%¹‘•átì(€€€€€€€ô(€€€€€€€¥˜¡ÁÉ¥µ…Éäôôõ¹Õ±°˜™ÅÕ•Õ•¥ì(€€€€€€€€€€€ÁÉ¥µ…ÉäõÑ…É•ÑM¥‘”ôôô‰µ½¹ÍÑ•ÈˆıÅÕ•Õ•¹Ñ…É•ĞéÅÕ•Õ•¹Ñ…É•Ñ±±äì(€€€€€€€ô(€€€€€€€¥˜¡ÁÉ¥µ…Éäôôõ¹Õ±°˜™Í¥‘”ôôô‰Á±…å•Èˆ˜™Ñ…É•ÑM¥‘”ôôô‰µ½¹ÍÑ•Èˆ˜™ÑåÁ•½˜Í•±•Ñ•‘5½¹ÍÑ•È„ôô‰Õ¹‘•™¥¹•ˆ¥ì(€€€€€€€€€€€ÁÉ¥µ…ÉäõÍ•±•Ñ•‘5½¹ÍÑ•Èì(€€€€€€€ô((€€€€€€€¥˜¡Ñ…É•ÑQåÁ”ôôô‰…±°‰ññÑ…É•ÑQåÁ”ôôô‰…±±å±°ˆ¥ì(€€€€€€€€€€€¥‘Ìõ…Ñ¥Ù•	…ÑÑ±•Q…É•Ñ%‘Ì¡Ñ…É•ÑM¥‘”±™…±Í”¤ì(€€€€€€€õ•±Í”¥˜¡Ñ…É•ÑM¥‘”ôôô‰µ½¹ÍÑ•Èˆ˜™9Õµ‰•È¹¥Í%¹Ñ••È¡ÁÉ¥µ…Éä¤˜˜½x¡ÑÉ¥ñÉ½İñ½±Õµ¹ñ¡½É¥é½¹Ñ…°´Ì¤½¤¹Ñ•ÍĞ¡Ñ…É•ÑQåÁ”¤¥ì(€€€€€€€€€€€¥‘ÌõÑåÁ•½˜•ÑM­¥±±Q…É•ÑÌôôô‰™Õ¹Ñ¥½¸ˆı•ÑM­¥±±Q…É•ÑÌ¡ÁÉ¥µ…Éä±Ñ…É•ÑQåÁ”¤émÁÉ¥µ…Éåtì(€€€€€€€õ•±Í”¥˜¡Ñ…É•ÑM¥‘”ôôô‰Á±…å•Èˆ˜™9Õµ‰•È¹¥Í%¹Ñ••È¡ÁÉ¥µ…Éä¤˜˜½x¡ÑÉ¥ñ…±±åQÉ¥ñÉ½İñ½±Õµ¸¤½¤¹Ñ•ÍĞ¡Ñ…É•ÑQåÁ”¤¥ì(€€€€€€€€€€€½¹ÍĞ½İ¹•ÈõÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆıİ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	…ÑÑ±•™¥•±‘M±½ÑÌé¹Õ±°ì(€€€€€€€€€€€½¹ÍĞ™½Éµ…Ñ¥½¸õ½İ¹•È˜™ÑåÁ•½˜½İ¹•È¹•¹ÍÕÉ•±±å½Éµ…Ñ¥½¸ôôô‰™Õ¹Ñ¥½¸ˆ(€€€€€€€€€€€€€€€€ı½İ¹•È¹•¹ÍÕÉ•±±å½Éµ…Ñ¥½¸¡•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¤é¹Õ±°ì(€€€€€€€€€€€¥‘Ìõ™½Éµ…Ñ¥½¸˜™ÑåÁ•½˜½İ¹•È¹É•Í½±Ù•±±åQ…É•ÑÌôôô‰™Õ¹Ñ¥½¸ˆ(€€€€€€€€€€€€€€€€ı½İ¹•È¹É•Í½±Ù•±±åQ…É•ÑÌ¡™½Éµ…Ñ¥½¸±ÁÉ¥µ…Éä±Ñ…É•ÑQåÁ”±¥¹‘•àôùì(€€€€€€€€€€€€€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤ì(€€€€€€€€€€€€€€€€€€€É•ÑÕÉ¸€„„¡¡…É…Ñ•È˜™9Õµ‰•È¡¡…É…Ñ•È¹¡À¤øÀ¤ì(€€€€€€€€€€€€€€€ô¤émÁÉ¥µ…Éåtì(€€€€€€€õ•±Í”¥˜¡ÁÉ¥µ…Éä„ôõ¹Õ±°˜™ÁÉ¥µ…Éä„ôõÕ¹‘•™¥¹•¥ì(€€€€€€€€€€€¥‘ÌõmÁÉ¥µ…Éåtì(€€€€€€€õ•±Í”¥˜¡Í…µ•M¥‘”¥ì(€€€€€€€€€€€¥‘Ìõ…Ñ¥Ù•	…ÑÑ±•Q…É•Ñ%‘Ì¡Ñ…É•ÑM¥‘”±™…±Í”¤ì(€€€€€€€€€€€ÁÉ¥µ…Éäõ¥‘Ì¹±•¹Ñ ı¥‘ÍlÁté¹Õ±°ì(€€€€€€€ô(€€€ô((€€€¥‘ÌõÉÉ…ä¹™É½´¡¹•ÜM•Ğ¡¥‘Ì¹™¥±Ñ•È¡9Õµ‰•È¹¥Í%¹Ñ••È¤¤¤ì(€€€¥˜¡Ñ…É•ÑQåÁ”ôôô‰…±°‰ññÑ…É•ÑQåÁ”ôôô‰…±±å±°ˆ¥ìÁÉ¥µ…Éäõ¹Õ±°ìô(€€€•±Í”¥˜¡ÁÉ¥µ…Éäôôõ¹Õ±°˜™¥‘Ì¹±•¹Ñ ¥ìÁÉ¥µ…Éäõ¥‘ÍlÁtìô((€€€É•ÑÕÉ¸=‰©•Ğ¹™É••é”¡ì(€€€€€€€Ù•ÉÍ¥½¸è‰‰…ÑÑ±”µÑ…É•Ğµ½¹ÑÉ…ĞµØÄˆ°(€€€€€€€Í¥‘”éÍ¥‘”°(€€€€€€€Ñ…É•ÑM¥‘”éÑ…É•ÑM¥‘”°(€€€€€€€Ñ…É•ÑQåÁ”éÑ…É•ÑQåÁ”°(€€€€€€€…Ñ½É%¹‘•àé9Õµ‰•È¹¥Í%¹Ñ••È¡…Ñ½É%¹‘•à¤ı…Ñ½É%¹‘•àèÀ°(€€€€€€€Ñ…É•Ñ%éÁÉ¥µ…Éä°(€€€€€€€Ñ…É•Ñ%‘Ìé=‰©•Ğ¹™É••é”¡¥‘Ì¹Í±¥” ¤¤(€€€ô¤ì)ô()İ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	…ÑÑ±•Q…É•Ñ½¹ÑÉ…Ğõ=‰©•Ğ¹™É••é”¡ì(€€€Ù•ÉÍ¥½¸è‰‰…ÑÑ±”µÑ…É•Ğµ½¹ÑÉ…ĞµØÄˆ°(€€€É•…Ñ”éÉ•…Ñ•	…ÑÑ±•Q…É•Ñ½¹ÑÉ…Ğ)ô¤ì()™Õ¹Ñ¥½¸•ÑM­¥±±9…µ•	…‘•ÕÉ…Ñ¥½¸¡Í­¥±±9…µ”±•±•µ•¹ÑQåÁ”¥ì((€€€¥˜ (€€€€€€€ÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆ€˜˜(€€€€€€€ÑåÁ•½˜İ¥¹‘½Ü¹ØÄĞÉ•ÑM­¥±±9…µ•¥ÍÁ±…åÕÉ…Ñ¥½¸ôôô‰™Õ¹Ñ¥½¸ˆ(€€€€¥ì(€€€€€€€½¹ÍĞ‘ÕÉ…Ñ¥½¸ô(€€€€€€€€€€€9Õµ‰•È (€€€€€€€€€€€€€€€İ¥¹‘½Ü¹ØÄĞÉ•ÑM­¥±±9…µ•¥ÍÁ±…åÕÉ…Ñ¥½¸ (€€€€€€€€€€€€€€€€€€€Í­¥±±9…µ”°(€€€€€€€€€€€€€€€€€€€•±•µ•¹ÑQåÁ”(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€¤ì((€€€€€€€¥˜¡9Õµ‰•È¹¥Í¥¹¥Ñ”¡‘ÕÉ…Ñ¥½¸¤€˜˜‘ÕÉ…Ñ¥½¸øÀ¥ì(€€€€€€€€€€€É•ÑÕÉ¸5…Ñ ¹É½Õ¹¡‘ÕÉ…Ñ¥½¸¤ì(€€€€€€€ô(€€€ô((€€€É•ÑÕÉ¸5…Ñ ¹É½Õ¹ ÔÈÀ¨È¼Ì¤ì)ô(()™Õ¹Ñ¥½¸Í¡½İM­¥±±9…µ•	…‘”¡Í­¥±±9…µ”±•±•µ•¹ÑQåÁ”±¡…É…Ñ•É%¹‘•à±Ñ…É•Ñ%±Ñ…É•Ñ%‘Ì±Ñ…É•ÑM¥‘”¥ì((€€€½¹ÍĞÑ…É•Ñ½¹ÑÉ…ĞõÉ•…Ñ•	…ÑÑ±•Q…É•Ñ½¹ÑÉ…Ğ (€€€€€€€€‰Á±…å•Èˆ±Í­¥±±9…µ”±•±•µ•¹ÑQåÁ”±9Õµ‰•È¹¥Í%¹Ñ••È¡¡…É…Ñ•É%¹‘•à¤ı¡…É…Ñ•É%¹‘•àèÀ±Ñ…É•Ñ%±Ñ…É•Ñ%‘Ì±Ñ…É•ÑM¥‘”(€€€€¤ì((€€€½¹ÍĞ•±•µ•¹Ğ€ô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•É…Éˆ¬(€€€€€€€€€€€€¡¡…É…Ñ•É%¹‘•áñğÀ¤(€€€€€€€€¤ì(((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rš¶¢šÆë3šZ–¶_šr–#¢Š¯¢N/’ö?(€€€€€€ƒ–>#¢ŞÏ–"Ãšr–&7¦v‹7jš‚çšr³–:–nƒ¾ò'¾òh(€€€€€€ƒ’æ/–&7š*+šZ–¶_–ÒƒnÓš:—–†{¦Ë¢K¢&Ë–6‡&¢‡¦vˆ(€€€€€€ƒVÛ–¶C–Òƒ’ö¢K¢&Ë–6‡&šRïšN+jz³¦ZOšršJ·šRø(€€€€€€ƒ3–&7–
+û7–.WV¯¾ò!ÑÉ…¹Í™½É·’ö7ï¾ò'¾ò0(€€€€€€MO¢š?–&¾òk’îï’öWšr'’ösR£’âµÑÉ…¹Í™½É·j–Òƒ¾ò0(€€€€€€ƒšr–îë®/’â–/šZÃjZ+šRû–Æ“¾ò3š*+–ºš&šr'–¶C–Òƒj(€€€€€€ƒZ+šRû¦‚–ê?¦^s¦Ë¦g–/–Æ¦£¾–r7¢‡ŠSŠS’â7º‡–¶C–Ò€(€€€€€€ƒjèµ¥¹‘•ã¢¢·–’k¦®c¾ò3¦÷¢ŞÏ’â7–ë¦g–/¾–r7–:ï¢Ş|(€€€€€€ƒ–’[¦v‹jšvÇ¢–ÿš¾S¢òš*¢÷–B7¢ÇšZ–¶_–&o––÷šb¿–6‡&j(€€€€€€ƒ–¶C–Òƒ¾ò3–6‡&–&o––÷–r£šRïšN+z³¦ZOšr%ÑÉ…¹Í™½É·–r£¢ŞG¾ò0(€€€€€€ƒ¦g–ÂÇšb¿’â7º…èµ¥¹‘•ã¢¢·–’k¦®c¦÷šÊKR£jrš¶–:–nƒ((€€€€€€ƒšRçš"C’â7–7VÛ–6‡&j–¶C–Òƒ¾ò3nÓš:—š:o–"À(€€€€€€‘½Õµ•¹Ğ¹‰½‘ç–êW’â/¾ò#’â7šr¢Š¯’îï’öW–.WV¬(€€€€€€ƒšÎ‹–>+j–rÃšZç¾ò'¾ò3R¡•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤(€€€€€€ƒ¦?–ë–6‡&n»–&7–r£V¯¦v‹’â+j–¾›¦jo–êŸš¢g¾ò0(€€€€€€ƒ–7R¡Á½Í¥Ñ¥½¸é™¥á•“š*+šZ–¶_Êûšê[Z+–r (€€€€€€ƒ–6‡&š¶’â+šZçŠSŠS¦gš¢šZ–¶_jZ+šRû¦‚–ê<(€€€€€€ƒ–ÂÇšb¿nã–Â7šZóšVÓ–/¦‚¦v‹–r£š¾S¢ò¾ò0(€€€€€€ƒ’â7šr–7¢Š¯–6‡&¢«–ŞÇj–.WV¯–nÃ’ö?(€€€€¨¼((€€€½¹ÍĞÉ•Ğô(€€€€€€€•±•µ•¹Ğ¹•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤ì(((€€€½¹ÍĞ‰…‘”€ô(€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€¤ì(((€€€‰…‘”¹±…ÍÍ9…µ”€ô(€€€€€€€€‰Í­¥±°µ¹…µ”µ‰…‘”‰…‘”´ˆ¬(€€€€€€€•±•µ•¹ÑQåÁ”ì(((€€€‰…‘”¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€Í­¥±±9…µ”ì((€€€½¹ÍĞ‰…‘•ÕÉ…Ñ¥½¸ô(€€€€€€€•ÑM­¥±±9…µ•	…‘•ÕÉ…Ñ¥½¸ (€€€€€€€€€€€Í­¥±±9…µ”°(€€€€€€€€€€€•±•µ•¹ÑQåÁ”(€€€€€€€€¤ì((€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä (€€€€€€€€ˆ´µÍ­¥±°µ¹…µ”µ‘¥ÍÁ±…äµ‘ÕÉ…Ñ¥½¸ˆ°(€€€€€€€‰…‘•ÕÉ…Ñ¥½¸¬‰µÌˆ(€€€€¤ì((((€€€€¼¨XÌàM=UIµ1Y0U$M%i%`è(€€€€€€Q¡”‰…‘”•ÑÌ¥ÑÌ™¥¹…°Ù¥ÍÕ…°Í¥é”…ĞÉ•…Ñ¥½¸Ñ¥µ”¸(€€€€€€Q¡¥Ì¥Ì‘•±¥‰•É…Ñ•±ä¥¹±¥¹”€¬€…¥µÁ½ÉÑ…¹ĞÍ¼±…Ñ•ÈML…¹¹½Ğ(€€€€€€Í¥±•¹Ñ±ä½Ù•ÉÉ¥‘”¥Ğ¸€¨¼(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰™½¹ĞµÍ¥é”ˆ°ˆÜÉÁàˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰±¥¹”µ¡•¥¡Ğˆ°ˆÄ¸ÀÔˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰™½¹Ğµİ•¥¡Ğˆ°ˆäÀÀˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰İ¡¥Ñ”µÍÁ…”ˆ°‰¹½İÉ…Àˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰İ¥‘Ñ ˆ°‰µ…àµ½¹Ñ•¹Ğˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰µ¥¸µİ¥‘Ñ ˆ°‰µ…àµ½¹Ñ•¹Ğˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ˆµİ•‰­¥ĞµÑ•áĞµÍÑÉ½­”ˆ°ˆÄ¸áÁà€˜É•…äˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì)½¹ÍĞ‰…‘•A½¥¹Ğ€ô(€€€€€€€…µ•A½¥¹ÑÉ½µ±¥•¹Ğ (€€€€€€€€€€€É•Ğ¹±•™Ğ­É•Ğ¹İ¥‘Ñ ¼È°(€€€€€€€€€€€É•Ğ¹Ñ½À(€€€€€€€€¤ì((€€€‰…‘”¹ÍÑå±”¹Á½Í¥Ñ¥½¸ô(€€€€€€€€‰…‰Í½±ÕÑ”ˆì((€€€‰…‘”¹ÍÑå±”¹±•™Ğô(€€€€€€€‰…‘•A½¥¹Ğ¹à¬‰Áàˆì((€€€‰…‘”¹ÍÑå±”¹Ñ½Àô(€€€€€€€‰…‘•A½¥¹Ğ¹ä¬‰Áàˆì(((€€€½¹ÍĞ½Ù•É±…å1…å•È€ô(€€€€€€€€ ‰…µ”µ½Ù•É±…äµ±…å•Èˆ¤ñğ(€€€€€€€‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰…µ”µÍÑ…”ˆ¤ì((€€€½Ù•É±…å1…å•È¹…ÁÁ•¹‘¡¥± (€€€€€€€‰…‘”(€€€€¤ì(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€¥˜ (€€€€€€€€€€€‰…‘”€˜˜(€€€€€€€€€€€‰…‘”¹Á…É•¹Ñ9½‘”(€€€€€€€€¥ì((€€€€€€€€€€€‰…‘”¹Á…É•¹Ñ9½‘”¹É•µ½Ù•¡¥± (€€€€€€€€€€€€€€€‰…‘”(€€€€€€€€€€€€¤ì((€€€€€€€ô((€€€ô±‰…‘•ÕÉ…Ñ¥½¸¤ì((€€€¥˜¡ÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆ€˜˜ÑåÁ•½˜İ¥¹‘½Ü¹ØÄĞÉA±…åM­¥±±¹¥µ…Ñ¥½¹É½µ	…‘”ôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€İ¥¹‘½Ü¹ØÄĞÉA±…åM­¥±±¹¥µ…Ñ¥½¹É½µ	…‘” ‰Á±…å•Èˆ±Í­¥±±9…µ”±•±•µ•¹ÑQåÁ”°(€€€€€€€€€€€¡…É…Ñ•É%¹‘•áñğÀ±Ñ…É•Ñ½¹ÑÉ…Ğ¹Ñ…É•Ñ%±Ñ…É•Ñ½¹ÑÉ…Ğ¹Ñ…É•Ñ%‘Ì±Ñ…É•Ñ½¹ÑÉ…Ğ(€€€€€€€€¤ì(€€€ô()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3š«&§šZ÷šRûš*¢÷šf(€€ƒ’æ¢š¢ŞÏš*¢÷–B7¢Ç¾ò'¾òh(€€ƒ¢Ş}Í¡½İM­¥±±9…µ•	…‘” §–æû’æ;’âš¢‡’âš¢¾ò0(€€ƒ–R¿’â–Ş»–"—šb¿n»š¢g–Òƒ–úx(€€‰…ÑÑ±•A±…å•É…É­¡…É…Ñ•É%¹‘•à(€€ƒš>oš"A‰…ÑÑ±•5½¹ÍÑ•È­µ½¹ÍÑ•É%¹‘•ãŠSŠP(€€ƒš«&§šRïšN+šf–B3š¢–>¿¢÷¢ãfó–6‡&–&7–
+û–.WV¬(€€ƒ¾ò!±Õ¹•5½¹ÍÑ•É…É §¾ò'¾ò3š&’î—¦g¢„(€€ƒ’âš¢’â7VÛ–6‡&j–¶C–Òƒš:o–r (€€‘½Õµ•¹Ğ¹‰½‘ç–êW’â/R¡Á½Í¥Ñ¥½¸é™¥á•(€€ƒZ+–r£š«&§–6‡&š¶’â+šZç¾ò3–:–nƒ¢Ş|(€€Í¡½İM­¥±±9…µ•	…‘” §–º3–£nã–B3(¨¼()™Õ¹Ñ¥½¸Í¡½İ5½¹ÍÑ•ÉM­¥±±9…µ•	…‘” (€€€Í­¥±±9…µ”°(€€€•±•µ•¹ÑQåÁ”°(€€€µ½¹ÍÑ•É%¹‘•à°(€€€Ñ…É•Ñ%°(€€€Ñ…É•Ñ%‘Ì°(€€€Ñ…É•ÑM¥‘”(¥ì((€€€½¹ÍĞÑ…É•Ñ½¹ÑÉ…ĞõÉ•…Ñ•	…ÑÑ±•Q…É•Ñ½¹ÑÉ…Ğ (€€€€€€€€‰µ½¹ÍÑ•Èˆ±Í­¥±±9…µ”±•±•µ•¹ÑQåÁ”±9Õµ‰•È¹¥Í%¹Ñ••È¡µ½¹ÍÑ•É%¹‘•à¤ıµ½¹ÍÑ•É%¹‘•àèÀ±Ñ…É•Ñ%±Ñ…É•Ñ%‘Ì±Ñ…É•ÑM¥‘”(€€€€¤ì((€€€½¹ÍĞ•±•µ•¹Ğô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•Èˆ¬(€€€€€€€€€€€µ½¹ÍÑ•É%¹‘•à(€€€€€€€€¤ì(((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÉ•Ğô(€€€€€€€•±•µ•¹Ğ¹•Ñ	½Õ¹‘¥¹±¥•¹ÑI•Ğ ¤ì(((€€€½¹ÍĞ‰…‘”ô(€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€¤ì(((€€€‰…‘”¹±…ÍÍ9…µ”ô(€€€€€€€€‰Í­¥±°µ¹…µ”µ‰…‘”‰…‘”´ˆ¬(€€€€€€€•±•µ•¹ÑQåÁ”ì(((€€€‰…‘”¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€Í­¥±±9…µ”ì((€€€½¹ÍĞ‰…‘•ÕÉ…Ñ¥½¸ô(€€€€€€€•ÑM­¥±±9…µ•	…‘•ÕÉ…Ñ¥½¸ (€€€€€€€€€€€Í­¥±±9…µ”°(€€€€€€€€€€€•±•µ•¹ÑQåÁ”(€€€€€€€€¤ì((€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä (€€€€€€€€ˆ´µÍ­¥±°µ¹…µ”µ‘¥ÍÁ±…äµ‘ÕÉ…Ñ¥½¸ˆ°(€€€€€€€‰…‘•ÕÉ…Ñ¥½¸¬‰µÌˆ(€€€€¤ì((((€€€€¼¨XÌàM=UIµ1Y0U$M%i%`è(€€€€€€Q¡”‰…‘”•ÑÌ¥ÑÌ™¥¹…°Ù¥ÍÕ…°Í¥é”…ĞÉ•…Ñ¥½¸Ñ¥µ”¸(€€€€€€Q¡¥Ì¥Ì‘•±¥‰•É…Ñ•±ä¥¹±¥¹”€¬€…¥µÁ½ÉÑ…¹ĞÍ¼±…Ñ•ÈML…¹¹½Ğ(€€€€€€Í¥±•¹Ñ±ä½Ù•ÉÉ¥‘”¥Ğ¸€¨¼(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰™½¹ĞµÍ¥é”ˆ°ˆÜÉÁàˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰±¥¹”µ¡•¥¡Ğˆ°ˆÄ¸ÀÔˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰™½¹Ğµİ•¥¡Ğˆ°ˆäÀÀˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰İ¡¥Ñ”µÍÁ…”ˆ°‰¹½İÉ…Àˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰İ¥‘Ñ ˆ°‰µ…àµ½¹Ñ•¹Ğˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ‰µ¥¸µİ¥‘Ñ ˆ°‰µ…àµ½¹Ñ•¹Ğˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì(€€€‰…‘”¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ˆµİ•‰­¥ĞµÑ•áĞµÍÑÉ½­”ˆ°ˆÄ¸áÁà€˜É•…äˆ°‰¥µÁ½ÉÑ…¹Ğˆ¤ì)½¹ÍĞ‰…‘•A½¥¹Ğ€ô(€€€€€€€…µ•A½¥¹ÑÉ½µ±¥•¹Ğ (€€€€€€€€€€€É•Ğ¹±•™Ğ­É•Ğ¹İ¥‘Ñ ¼È°(€€€€€€€€€€€É•Ğ¹Ñ½À(€€€€€€€€¤ì((€€€‰…‘”¹ÍÑå±”¹Á½Í¥Ñ¥½¸ô(€€€€€€€€‰…‰Í½±ÕÑ”ˆì((€€€‰…‘”¹ÍÑå±”¹±•™Ğô(€€€€€€€‰…‘•A½¥¹Ğ¹à¬‰Áàˆì((€€€‰…‘”¹ÍÑå±”¹Ñ½Àô(€€€€€€€‰…‘•A½¥¹Ğ¹ä¬‰Áàˆì(((€€€½¹ÍĞ½Ù•É±…å1…å•È€ô(€€€€€€€€ ‰…µ”µ½Ù•É±…äµ±…å•Èˆ¤ñğ(€€€€€€€‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰…µ”µÍÑ…”ˆ¤ì((€€€½Ù•É±…å1…å•È¹…ÁÁ•¹‘¡¥± (€€€€€€€‰…‘”(€€€€¤ì(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€¥˜ (€€€€€€€€€€€‰…‘”€˜˜(€€€€€€€€€€€‰…‘”¹Á…É•¹Ñ9½‘”(€€€€€€€€¥ì((€€€€€€€€€€€‰…‘”¹Á…É•¹Ñ9½‘”¹É•µ½Ù•¡¥± (€€€€€€€€€€€€€€€‰…‘”(€€€€€€€€€€€€¤ì((€€€€€€€ô((€€€ô±‰…‘•ÕÉ…Ñ¥½¸¤ì((€€€¥˜¡ÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆ€˜˜ÑåÁ•½˜İ¥¹‘½Ü¹ØÄĞÉA±…åM­¥±±¹¥µ…Ñ¥½¹É½µ	…‘”ôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€İ¥¹‘½Ü¹ØÄĞÉA±…åM­¥±±¹¥µ…Ñ¥½¹É½µ	…‘” ‰µ½¹ÍÑ•Èˆ±Í­¥±±9…µ”±•±•µ•¹ÑQåÁ”°(€€€€€€€€€€€µ½¹ÍÑ•É%¹‘•áñğÀ±Ñ…É•Ñ½¹ÑÉ…Ğ¹Ñ…É•Ñ%±Ñ…É•Ñ½¹ÑÉ…Ğ¹Ñ…É•Ñ%‘Ì±Ñ…É•Ñ½¹ÑÉ…Ğ(€€€€€€€€¤ì(€€€ô()ô(((¼¨(€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3š.ÿš:'šZ÷šRûš*¢÷šf(€€ƒ¢ŞÏ–éMCšÚ#¢_šVã–¶_j–.WV¯¾ò'¾òh(€€ƒ’æ/–&7š¾?š²‡šZ÷šRûš*¢÷¾ò3¦÷šr–>›–’[¢ŞÏ–ë’â–,(€€ƒ0µaaMC7jšÖ»–.WšZ–¶_¾ò3š>C¦Kš&’ê–’k–ÂEMC(€€ƒ’öÿR£¢¢šë–ú_¦g–/š>C’ë’â7¦r¢š¾ò3nÓš:—š.ÿš:'(€€ƒ’şwVg¦g–/–÷–ò?šr³¢ê¯¾ò#¢ºOš&šr'–Fó–>¯j–rÃšZä(€€ƒ¦
+šb¿¢÷š¶–âã¦/’ös’â7šr–fÓ¦2¿¾ò'¾ò0(€€ƒ’ö–÷–ò?–Ÿ–ºçšâ¦ë¾ò3’â7–7–k’îï’öW¦†¿’ë(¨¼()™Õ¹Ñ¥½¸Í¡½İA±…å•ÉMÁA½ÁÕÀ¡…µ½Õ¹Ğ±¡…É…Ñ•É%¹‘•à¥ì((€€€É•ÑÕÉ¸ì()ô(()™Õ¹Ñ¥½¸±Õ¹•A±…å•É…É¡¡…É…Ñ•É%¹‘•à¥ì((€€€½¹ÍĞ•±•µ•¹Ğ€ô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•É…Éˆ¬(€€€€€€€€€€€€¡¡…É…Ñ•É%¹‘•áñğÀ¤(€€€€€€€€¤ì(((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€‰…ÑÑ…­•Èµ±Õ¹”µÕÀˆ(€€€€¤ì(((€€€Ù½¥•±•µ•¹Ğ¹½™™Í•Ñ]¥‘Ñ ì(((€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€‰…ÑÑ…­•Èµ±Õ¹”µÕÀˆ(€€€€¤ì(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€‰…ÑÑ…­•Èµ±Õ¹”µÕÀˆ(€€€€€€€€¤ì((€€€ô°ĞÔÀ¤ì()ô(()™Õ¹Ñ¥½¸±Õ¹•5½¹ÍÑ•É…É¡¥¹‘•à¥ì((€€€½¹ÍĞ•±•µ•¹Ğ€ô(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­¥¹‘•à¤ì(((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€‰…ÑÑ…­•Èµ±Õ¹”µ‘½İ¸ˆ(€€€€¤ì(((€€€Ù½¥•±•µ•¹Ğ¹½™™Í•Ñ]¥‘Ñ ì(((€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€‰…ÑÑ…­•Èµ±Õ¹”µ‘½İ¸ˆ(€€€€¤ì(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€‰…ÑÑ…­•Èµ±Õ¹”µ‘½İ¸ˆ(€€€€€€€€¤ì((€€€ô°ĞÔÀ¤ì()ô(((¼¨(€€ƒŠbƒ¦Z¦ÿ–.WV¯¾ò#šZÃ–Š{¾ò'¾òh(€€ƒ¢Ş}±Õ¹—šb¿–B3’â¢»–¾¯šÎW¾ò3–>«šb¿š>o’â–-±…ÍÏ¾ò0(€€ƒ––_R£–r£3¢êË¦;šRïšN(¿š*×š*_VÃ–âã.š/7j¦
+–/n»š¢g¢ê¯’â+(¨¼()™Õ¹Ñ¥½¸Í¡½İ½‘•¹¥µ…Ñ¥½¸¡•±•µ•¹Ğ¥ì((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€‰‘½‘”µ‰…¬ˆ(€€€€¤ì(((€€€Ù½¥•±•µ•¹Ğ¹½™™Í•Ñ]¥‘Ñ ì(((€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€‰‘½‘”µ‰…¬ˆ(€€€€¤ì(((€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€‰‘½‘”µ‰…¬ˆ(€€€€€€€€¤ì((€€€ô°ĞÔÀ¤ì()ô(((¼¨(€€ƒ–B3šf¢fWB3šRïšN+šÊK–F÷’â·7¢Ş3VÃ–âã.š/šÊKRšV#4(€€ƒ¦g–§¢¹µ¥ÍÏ.šÎ¾òh(€€ƒn»š¢g–6‡&šJ·šRû¦Z¦ÿ–.WV¯¾ò0(€€ƒ’â›¢ŞÏ–ë’â–/Ãf÷¢&ËjšZ–¶_š>C’ë((€€¥ÍA±…å•ÉQ…É•ĞõÑÉÕ—šf–Â7¢Æ‡šb¿:§–ºÛ¢«–ŞÇj–6‡&¾ò0(€€ƒ–B›–&R¡¥¹‘•ã–:ïš*Oš«&§–6‡&(¨¼()™Õ¹Ñ¥½¸Í¡½İ5¥ÍÍ™™•Ğ¡¥ÍA±…å•ÉQ…É•Ğ±¥¹‘•à±Ñ•áĞ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€¥ÍA±…å•ÉQ…É•ĞõÑÉÕ—šf¾ò0(€€€€€€¥¹‘•ã>û–r£’î¢†£3²³–æû–ò×:§–ºÛ–6‡4(€€€€€€ƒ¾ò À÷²³’â¢K¢&ËÄ÷²³’ê3¢K¢&Ë¾ò'¾ò0(€€€€€€ƒ’â7–7šÂã¦ƒš*M‰…ÑÑ±•A±…å•ÉI½ß¢‡²³’â–ò×–6‡¾ò0(€€€€€€ƒ¦gš¢²³’ê3¢K¢&Ë¢Š¯šRïšN+šÊK–F÷’â·šf¾ò0(€€€€€€ƒ¦Z¦ÿ–.WV¯š&7šr–ë>û–r£š¶Šëj–6‡&’â+(€€€€¨¼((€€€½¹ÍĞ•±•µ•¹Ğ€ô(€€€€€€€¥ÍA±…å•ÉQ…É•Ğ(€€€€€€€€ü(€€€€€€€€ ‰‰…ÑÑ±•A±…å•É…Éˆ¬(€€€€€€€€€€€€¡¥¹‘•áñğÀ¤(€€€€€€€€¤(€€€€€€€€è(€€€€€€€€ ‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­¥¹‘•à¤ì(((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€Í¡½İ½‘•¹¥µ…Ñ¥½¸ (€€€€€€€•±•µ•¹Ğ(€€€€¤ì(((€€€Í¡½İ…µ…•A½ÁÕÀ (€€€€€€€•±•µ•¹Ğ°(€€€€€€€Ñ•áÑñğ‰5%MLˆ°(€€€€€€€€‰µ¥ÍÌˆ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸Í¡½İA±…å•É!¥Ğ¡…µ½Õ¹Ğ±ÑåÁ”±¡…É…Ñ•É%¹‘•à±¥ÍA½Í¥Ñ¥Ù”±¥ÍÉ¥Ğ¥ì((€€€½¹ÍĞ•±•µ•¹Ğ€ô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•É…Éˆ¬(€€€€€€€€€€€€¡¡…É…Ñ•É%¹‘•áñğÀ¤(€€€€€€€€¤ì(((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ–7š²‡’ş»š¶¾ò#rjš*O–"Ã¦ëšò?j–rÃšZç¾ò'¾òh(€€€€€€ƒ’â+š²‡–>«š:K¦f“’êÑåÁ”ôôô‰¡•…°‹¾ò3’öMC¢^—šÂĞ(€€€€€€ƒš‹–ú§R£jšb½ÑåÁ”ôôô‰ÍÀ‹¾ò3’â7šb¼‰¡•…°‹¾ò0(€€€€€€ƒšò?ÚË’æ/¦¶k¾ò3–ZuMC¢^—šÂÓš‹–ú§jšf–g¦
+šb¿šr(€€€€€€ƒ¢ª“¢ãfó¦r–.WŠSŠS–B3’â–/š‚çšr³–V?¦†3¾ò#R£¢Îšê@(€€€€€€ƒ¢»¦†{j–¶_’âË–:ï2sšâ³3¦gšb¿š¶¦v‹¦
+¢Êƒ¦v‹šV#šzs4(€€€€€€ƒšr³’ú–ÂÇ’â7–>¿¦vƒ¾ò0‰ÍÀ‹¦g–/–¶_’âË–B3šf’î¢† (€€€€€€ƒ3¦gšb½MC7¾ò3šÊK¢ú›šÎW–B3šf–"¢ú£3šb¿š‹–ú¤(€€€€€€ƒ¦
+šb¿šÖ–’Ç7¾ò'((€€€€€€ƒ¦g¢‡¦–âÛfó>û’ê–>›’â–/–nƒ
+ë–B3š¢–:–nƒ¦ƒš"Cj(€€€€€€‰ÕŸ¾òk’â/¦v‹¦†¿’ëj¬¼·²›¢f¾ò3’æ–>«¢ª7–ú\(€€€€€€ÑåÁ”ôôô‰¡•…°‹¾ò1MC¢^—šÂÓš‹–ú§jšf–d(€€€€€€ƒšr¦†¿’ëš"C0´ÔÁMC7¦g¢»¢ª“–Â;’êëj¢ÊƒšVã¾ò0(€€€€€€ƒšb;šb;šb¿–r£¢s¢† ¿¢s¦¶S–6ï¦†¿’ë¢Êƒ¢f((€€€€€€ƒšRçš"Cšb;Šë–
+Ï’â–-¥ÍA½Í¥Ñ¥Ù—–>šVã¾ò0(€€€€€€ƒ’â7–7¦vƒ–¶_’âË–:ï2s¾ò3¦g¢‡–Fó–>¯jš¾?–/–rÃšZä(€€€€€€ƒ¦÷¢š¢«–ŞÇšb;Šë¢²ošâš–k3¦gš²‡šb¿š¶¦v‹šV#šzp(€€€€€€ƒ¦
+šb¿¢Êƒ¦v‹šV#šzs7¾ò3–§–-‰ÕŸ’âš²‡’ş»––÷¾ò0(€€€€€€ƒ’î—–ú3’æ’â7šr–7šr'¦†{’òó1ÑåÁ—–¶_’âËšÊKš*((€€€€€€ƒš~C–/ššÎ¢š»¦Ë–:ï7¢3šò?š:'j.šÎ(€€€€¨¼((€€€€¼¨…µ…”Á½ÁÕÀÉ•…Ñ¥½¸¥ÌÑ¡”¡¥Ğµ™••‘‰…¬½İ¹•È¸Q¡”…ÉÉ½½Ğ¹•Ù•È(€€€€€€É••¥Ù•Ì„‰½É‘•È½Í¡…‘½Ü¡¥ĞÍÑ…Ñ”ìÁ½Í¥Ñ¥Ù”!•…°½M@™••‘‰…¬Ñ¡•É•™½É”(€€€€€€…¹¹½Ğ…¥‘•¹Ñ…±±ä¥¹¡•É¥Ğ‘…µ…”Í•µ…¹Ñ¥Ì¸€¨¼((€€€¥˜ (€€€€€€€…µ½Õ¹Ğ„ôõÕ¹‘•™¥¹•€˜˜(€€€€€€€…µ½Õ¹Ğ„ôõ¹Õ±°(€€€€¥ì((€€€€€€€½¹ÍĞÁÉ•™¥à€ô(€€€€€€€€€€€¥ÍA½Í¥Ñ¥Ù”(€€€€€€€€€€€€ü(€€€€€€€€€€€€ˆ¬ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆ´ˆì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3š«&§š&O:§–ºØ(€€€€€€€€€€ƒ"šN+šf’æ¢ššr'šV#šzs¾ò3¢Ş}Í¡½İ5½¹ÍÑ•É!¥Ğ ¤(€€€€€€€€€€ƒ¦
+¦
++:§–ºÛš&Oš«&§"šN+j–F#>ûšZç–ò?’â¢Ó¾ò'¾òh(€€€€€€€€€€¥ÍÉ¥Ó
+éÑÉÕ—šf¾ò3šVã–¶_–&7¦v‹–*ƒÂ~J—¾ò0(€€€€€€€€€€ƒ’â›š*)¥ÍÉ¥Ó–
+ÏÖ™Í¡½İ…µ…•A½ÁÕÀ §¾ò0(€€€€€€€€€€ƒ¢ºO–º––_’â(¹É¥Ñ¥…°µÁ½ÁÕÃš¢–ò<(€€€€€€€€€€ƒ¾ò#–¶_šnÓ–’Ÿ¦†?¢&ËšnÓ¦Kn»¾ò'¾ò3¢Ş:§–ºÛ–Â4(€€€€€€€€€€ƒš«&§"šN+šfr/–"ÃjšV#šzs–B3’â––_(€€€€€€€€¨¼((€€€€€€€Í¡½İ…µ…•A½ÁÕÀ (€€€€€€€€€€€•±•µ•¹Ğ°(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€¥ÍÉ¥Ğ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€ÁÉ•™¥à¬(€€€€€€€€€€€…µ½Õ¹Ğ¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€ÑåÁ”ôôô‰ÍÀˆ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‰M@ˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€‰!@ˆ(€€€€€€€€€€€€¤°(€€€€€€€€€€€ÑåÁ”°(€€€€€€€€€€€¥ÍÉ¥Ğ(€€€€€€€€¤ì((€€€ô()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33¢¶ßnû–
+ß–ºÏš¦–"Ø¸¸»¦†¿’ëf÷¢&È(€€ƒšVã–¶_š&¦f“–.WV¯¾ò3–š¾òil´ÔØİw7¾ò'¾òh(€€ƒ¢Ş}Í¡½İA±…å•É!¥Ğ §–B3š¢š&ù‰…ÑÑ±•A±…å•É…É“–Òƒ¾ò0(€€ƒ’öR£–Â#–Æ³jÍ¡¥•±“¦†{–z/¾ò#f÷¢&ËšZ–¶_¾ò3¢š,¹‘…µ…”µÁ½ÁÕÀ¸(€€Í¡¥•±µÁ½ÁÕÃ¾ò'¾ò3¢Ş’â¢"±!Cš:'¢†jÒ–¶_šb;Šë–6–"¦Z/’ú¾ò0(€€ƒ’î¢†£3¦gšb¿¢¶ßnûš&o’â/’új¦?¾ò3’â7šb¿rjš&¢†7(¨¼)™Õ¹Ñ¥½¸Í¡½İM¡¥•±‘‰Í½Éˆ¡¡…É…Ñ•É%¹‘•à±…‰Í½É‰•¥ì((€€€¥˜ ……‰Í½É‰•ñğ…‰Í½É‰•ğôÀ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞ•±•µ•¹Ğ€ô(€€€€€€€€ ‰‰…ÑÑ±•A±…å•É…Éˆ¬(€€€€€€€€€€€€¡¡…É…Ñ•É%¹‘•áñğÀ¤(€€€€€€€€¤ì((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€Í¡½İ…µ…•A½ÁÕÀ (€€€€€€€•±•µ•¹Ğ°(€€€€€€€€ˆ´ˆ­…‰Í½É‰•°(€€€€€€€€‰Í¡¥•±ˆ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸Í¡½İ5½¹ÍÑ•É!¥Ğ¡¥¹‘•à±…µ½Õ¹Ğ±ÑåÁ”±¥ÍÉ¥Ğ¥ì(€€€½¹ÍĞ•±•µ•¹Ğô ‰‰…ÑÑ±•5½¹ÍÑ•Èˆ­¥¹‘•à¤ì(€€€¥˜ …•±•µ•¹Ñññ…µ½Õ¹ĞôôõÕ¹‘•™¥¹•‘ññ…µ½Õ¹Ğôôõ¹Õ±°¥ìÉ•ÑÕÉ¸ìô((€€€½¹ÍĞ‰½ÍÍ=İ¹•ÈõÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆıİ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	½ÍÍ	…ÑÑ±”é¹Õ±°ì(€€€½¹ÍĞÍ•ÑÑ±•µ•¹ĞõÑåÁ”ôôô‰¡Àˆ˜™‰½ÍÍ=İ¹•È˜™ÑåÁ•½˜‰½ÍÍ=İ¹•È¹½¹ÍÕµ•…µ…•M•ÑÑ±•µ•¹Ğôôô‰™Õ¹Ñ¥½¸ˆ(€€€€€€€€ı‰½ÍÍ=İ¹•È¹½¹ÍÕµ•…µ…•M•ÑÑ±•µ•¹Ğ¡¥¹‘•à¤é¹Õ±°ì((€€€¥˜¡Í•ÑÑ±•µ•¹Ğ¥ì(€€€€€€€¥˜¡Í•ÑÑ±•µ•¹Ğ¹Í¡¥•±‘‰Í½É‰•øÀ¥ì(€€€€€€€€€€€Í¡½İ…µ…•A½ÁÕÀ¡•±•µ•¹Ğ°ˆ´ˆ­Í•ÑÑ±•µ•¹Ğ¹Í¡¥•±‘‰Í½É‰•°‰Í¡¥•±ˆ±™…±Í”¤ì(€€€€€€€ô(€€€€€€€¥˜¡Í•ÑÑ±•µ•¹Ğ¹¡Á…µ…”øÀ¥ì(€€€€€€€€€€€Í¡½İ…µ…•A½ÁÕÀ¡•±•µ•¹Ğ°ˆ´ˆ­Í•ÑÑ±•µ•¹Ğ¹¡Á…µ…”¬‰!@ˆ°‰¡Àˆ±¥ÍÉ¥Ğ¤ì(€€€€€€€ô(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÁÉ•™¥àõÑåÁ”ôôô‰¡•…°ˆüˆ¬ˆèˆ´ˆì(€€€Í¡½İ…µ…•A½ÁÕÀ (€€€€€€€•±•µ•¹Ğ°(€€€€€€€ÁÉ•™¥à­…µ½Õ¹Ğ¬¡ÑåÁ”ôôô‰ÍÀˆü‰M@ˆè‰!@ˆ¤°(€€€€€€€ÑåÁ”°(€€€€€€€¥ÍÉ¥Ğ(€€€€¤ì)ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒš«&§¦7R|(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸É•ÍÁ…İ¹5½¹ÍÑ•ÉÌ ¥ì((€€€¥˜¡‰…ÑÑ±•Ñ¥Ù”¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦g¢‡’â7–"¦vKÒjf÷¾ò0(€€€€€€ƒš¾?š²‡¦÷š*+–£¦ Û¦jïš«&§¦7ö»’ö7ö»¾ò/–n{šîÿ¢†¾ò0(€€€€€€ƒ>û–r£š"Ã¦²—–>«šrš6Ë–”ÅøÏ¦jï¾ò0(€€€€€€ƒ–Û¦’cšÊKš¶ïjš«&§’â7š'¢¦Ë¢Š¯–.W–"À(€€€€€€ƒ¾ò#’â7ÛšÊKš¶ïjš«&§’æšrš¾?š²‡š"Ã¦²—–ú3ªÛ¢ŞÏ’ö7ö»¾ò'(€€€€€€ƒšRçš"C–>«¢fWB3rj–ŞËÚOš¶ï’ê‡7jš«&§(€€€€¨¼((€€€µ½¹ÍÑ•ÉÌ(€€€€¹Í±¥” (€€€€€€€€À°(€€€€€€€5a}QI%9%9}5=9MQIL(€€€€¤(€€€€¹™½É…  (€€€€€€€€¡µ½¹ÍÑ•È±¥¹‘•à¤ôùì((€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€€…µ½¹ÍÑ•Èñğ(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹…±¥Ù”(€€€€€€€€€€€€¥ì(€€€€€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€ô(((€€€€€€€€€€€µ½¹ÍÑ•È¹…±¥Ù”õÑÉÕ”ì((€€€€€€€€€€€µ½¹ÍÑ•È¹¡À€ô(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹µ…á!@ì((€€€€€€€€€€€µ½¹ÍÑ•È¹ÍÀ€ô(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹µ…áM@ì(((€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#šâBšºcVg¢/–ò?Šó¾ò'¾òh(€€€€€€€€€€€€€€ƒ¦g¢‡–:šr³¦
+–r£¦7šZÃ¢¢#º_š«&§jà½ç–êŸš¢g(€€€€€€€€€€€€€€ƒšnÓšZÃ–rÃ–r[–r[’ëj’ö7ö»¾ò3’öš«&§–ŞËÚL(€€€€€€€€€€€€€€ƒ’â7–7–Ş‡¦
+?–r[’ë’æšVÓ–/¦jÇ¢^?’ê¾ò0(€€€€€€€€€€€€€€ƒ¦gšº×–º3–£R£’â7–"Ã’ê¾ò3š.ÿš:'(€€€€€€€€€€€€€€ƒšZÃ–6–~¾ò#–Ã¦rs–ÆÇ¢#’æ/–ú3¾ò'jš«&§¢ÎšZd(€€€€€€€€€€€€€€ƒšr³’ú–ÂÇšÊKšr%à½ç¦g–§–/š²’ö7¾ò0(€€€€€€€€€€€€€€ƒVg¢F_¦gšº×–Â7–º–G’ú¢ª«–>«šrº_–è(€€€€€€€€€€€€€€ƒšÊKšr'š?ú§j9…;¾ò3šâš:'š¾S¢ò’æûšŞ£(€€€€€€€€€€€€¨¼((€€€€€€€ô(€€€€¤ì()ô(((¼¨(€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¦gš²‡rjÖÇ’âš:'’ê¾ò'¾òh(€€ƒ¦g¢‡’æ/–&7–ŞËÚO¢Š¯šRçš"C3¦Ë–—–rÃ–r[–ÂÇ¢«–.Wš¾<ÓH(€€ƒ¢ãfó’âš²‡š"Ã¦²—7¾ò3’ö’öÿR£¢¦gš²‡šb;Šë¢ššÆ¾òh(€€ƒ¦Ë–—–rÃ–r[–ú3–ş¦‚#–#š2'3¢«–.W–Ş‡š«7š2'¦"W¾ò0(€€ƒš&7šr¦Z/–/š¾<ÓK¢«–.Wš"Ã¦²—ŠSŠS¦gš¶šb¿–ú3’ú(€€ƒ–r¡Ñ½±•ÕÑ½A…ÑÉ½° ¤½ÉÕ¹ÕÑ½A…ÑÉ½±¡•¬ ¤(€€ƒ¾ò#–rÃ–r[¦‚¦v‹¢«–.Wš"Ã¦²—¦v‹švÿš^¦
++¦
+¦†šZÃš2'¦"W¾ò$(€€ƒ–kj’ê/¾ò3–§––_¦
+?¢ò¿–kjšb¿–B3’â’îÛ’ê/¾ò3–6ï–B¢¨(€€ƒ6£®/¦/’ös’êK’â7~—¦O–Â7šZç–¶c–r£¾ò3š&7šr–ë>ø(€€ƒ3¢«–.W–Ş‡š«¦÷¦
+šÊKš2'¾ò3–ÂÇ¢«–ŞÇš&O¢Öß’ú4(€€ƒ¦g¢»¢†3
+ëŠSŠS–nƒ
+ërš¶–r£¢3šf¿¦/’ösj–Û–¾›šb¼(€€ƒ¦g¢‡¦g––_3¦Ë–rÃ–r[–ÂÇ¢«–.W¦Z/–/7j¢"+¦
+?¢ò¿¾ò0(€€ƒ¢Ş’öÿR£¢š2'j¦
+¦†š2'¦"W–º3–£‡¦^s((€€ƒ–÷–ò?–B7¢Ç–Fó–>¯j–rÃšZç¾ò!•¹Ñ•Éi½¹” §(€€İ¥¹	…ÑÑ±” §’æ/–ú3¦¢¯š"C–*’æ/–ú3Š›¾ò'¦÷Ú·š2(€€ƒ’â7–.W¾ò3’ö–÷–ò?šr³¦®SšRçš"C¦ëjŠSŠS>û–r (€€ƒ3¢š’â7¢šš¾<ÓK¢«–.Wš"Ã¦²—7–R¿’âj¦Z/¦^sšb¼(€€Ñ½±•ÕÑ½A…ÑÉ½° §¦
+¦†š2'¦"W¾ò3’â7šr–7šr$(€€ƒ¦Ë–rÃ–r[–ÂÇ¢«–.W¢ãfój¢†3
+ë(¨¼()™Õ¹Ñ¥½¸ÍÑ…ÉÑ5½¹ÍÑ•É5½Ù•µ•¹Ğ ¥ì((€€€€¼¨(€€€€€€ƒšVš?Vg¦ë¾òk¢«–.W–Ş‡š«j¦Z/¦^s–>«’ê“Ö˜(€€€€€€Ñ½±•ÕÑ½A…ÑÉ½° §¢fWB¾ò3¦g¢‡’â7–4(€€€€€€ƒ¢«–.W–V–.W’îï’öW¢¢#šf–f£(€€€€¨¼()ô(()™Õ¹Ñ¥½¸ÍÑ½Á5½¹ÍÑ•É5½Ù•µ•¹Ğ ¥ì((€€€€¼¨(€€€€€€ƒšVš?Vg¦ë¾ò3–:–nƒ–B3’â+ŠSŠSrš¶j–sš¶‹¦
+?¢ò¼(€€€€€€ƒ–r¡ÍÑ½ÁÕÑ½A…ÑÉ½° §¾ò3–Fó–>¯¦g¢‡’â7šr(€€€€€€ƒšr'’îï’öW’ösR£¾ò3ÒSÊçšb¿
+ë’ê¢ºO¢"+j–Fó–>¯¦îx(€€€€€€ƒ¾ò!±•…Ù•5…À §ÍÑ…ÉÑ	…ÑÑ±” §Š›¾ò$(€€€€€€ƒ’â7R£’â–/’â–/šRçš:'’â7šr–fÓ¦2¿(€€€€¨¼()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ–6Òh(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸¡•­1•Ù•±UÀ¡Ñ…É•Ñ¡…É…Ñ•È¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦gšVÓ–/–÷–ò?–¾¯š¶ï–>«¢ª5Á±…å•Ë¾ò0(€€€€€€ƒ²³’ê3¢K¢&ËšÊK¢ú›šÎW¦?¦;¦g¢‡–6Òk(€€€€€€ƒšRçš"C–>¿’î—–
+Ï–—¢š–6Òkj¢K¢&Ë&§’îÛ¾ò0(€€€€€€ƒ’â7–
+Ïj¢¦Ç¦‚C¢¢·¦
+šb½Á±…å•È(€€€€€€ƒ¾ò#’şwVg¢"+j–Fó–>¯šZç–ò?nã–ºç¾ò'(€€€€¨¼((€€€½¹ÍĞ¡…É…Ñ•Èô(€€€€€€€Ñ…É•Ñ¡…É…Ñ•Éñğ(€€€€€€€Á±…å•Èì(((€€€±•Ğ±•Ù•±ÌôÀì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¦bË–F¾òh(€€€€€€ƒš¶–âãššÎ’â/¦g–-İ¡¥±—šr–’k¢ŞDÇš²„(€€€€€€ƒ¾ò!‘¥ÍÑÉ¥‰ÕÑ•áÁQ½¡…É…Ñ•Ëš¾?š²‡¦÷–>«Ö˜(€€€€€€ƒ–&o––ôÇÒkj¦?¾ò'¾ò0(€€€€€€ƒ’ö¦
+šb¿–*ƒ’â–/’şw¦j«’â+¦fC¾ò0(€€€€€€ƒ¦ÿ–7’îï’öWš"GšÊK¦‚CšZg–"Ãj¢ÎšZgVÃ–âà(€€€€€€ƒ¾ò#’ú/–š¢"+–¶cšªSj•áÁ9•áÓ–{š:'¾ò$(€€€€€€ƒ–Â;¢Ó¦g¢‡¢ŞG–ë¦n‹¢¶sj¢şÓ–r#š²‡šVã¾ò0(€€€€€€ƒ’âš²‡"–Š{–æûfûÒk3–ë–’§šZšVã–¶_jš*¢÷¦î{(€€€€€€€ÈÀÃÒk–Â7n»–&7¦+š"Ë¦Ë–ê›’ú¢ª«–ŞËÚO¦v{–âã–’k¾ò0(€€€€€€ƒš¶–âã:§šÎW’â7–>¿¢÷’âš²‡¢ãfó–"Ã¦g–/’â+¦fC(€€€€¨¼((€€€İ¡¥±” (€€€€€€€¡…É…Ñ•È¹•áÀøô(€€€€€€€¡…É…Ñ•È¹•áÁ9•áĞ€˜˜(€€€€€€€±•Ù•±ÌğÈÀÀ(€€€€¥ì((€€€€€€€¡…É…Ñ•È¹•áÀ€´ô(€€€€€€€€€€€¡…É…Ñ•È¹•áÁ9•áĞì(((€€€€€€€¡…É…Ñ•È¹±•Ù•°¬¬ì(((€€€€€€€¡…É…Ñ•È¹•áÁ9•áĞ€ô(€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€¡…É…Ñ•È¹•áÁ9•áĞ¬Ä°(€€€€€€€€€€€€€€€5…Ñ ¹™±½½È (€€€€€€€€€€€€€€€€€€€¡…É…Ñ•È¹•áÁ9•áĞ¨Ä¸È(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€¤ì(((€€€€€€€¡…É…Ñ•È¹…ÑÑÉ¥‰ÕÑ•A½¥¹ÑÌ€¬ô€Ôì((€€€€€€€¡…É…Ñ•È¹Í­¥±±A½¥¹ÑÌ€¬ô€Èì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ¢š?š‚ó¢ššÆ¾òh(€€€€€€€€€€ƒ–6Òk–në–ºh€¬ÌÀƒšr–’!C¬ÄÀƒšr–’MC¾ò0(€€€€€€€€€€ƒ¢Ş¦®S¢Î¨¿¢÷¦?¦7¦î{–*ƒš"C–"¦Z/Ò¿–*ƒ(€€€€€€€€¨¼((€€€€€€€¡…É…Ñ•È¹‰½¹ÕÍ!@€¬ô€ÌÀì((€€€€€€€¡…É…Ñ•È¹‰½¹ÕÍM@€¬ô€ÄÀì(((€€€€€€€±•Ù•±Ì¬¬ì((€€€ô(((€€€¥˜¡±•Ù•±ÌøÀ¥ì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€€€€€ƒ¦g¢‡¢Ş’æ/–&7š"Ã¦²—–.w–"§¢s¢†šb¿–B3’â¢»–V?¦†3ŠSŠP(€€€€€€€€€€ƒ–6ÒkVÛ’â/nÓš:—š*)!@½MC–òß–"Û¢sšîÿ¾ò0(€€€€€€€€€€ƒ¢Ş’öƒ¢¢·–ºkj1!C’ö;šZñ`”½MC’ö;šZñ`—4(€€€€€€€€€€ƒ¢«–.W¢s¢^—šÂÓ¦Zšªï–º3–£‡¦^s¾ò0(€€€€€€€€€€ƒ¦nš«’öƒšr¢šë–ú_3šb;šb;¦
+šÊK–"Ã¦Zšªï¾ò0(€€€€€€€€€€ƒ–º¢«–ŞÇ–ÂÇ¢s’ê7((€€€€€€€€€€ƒš.ÿš:'–òß–"Û¢sšîÿ¾ò3–>«¦7šZÃ¢¢#º_’âš²„(€€€€€€€€€€ÕÉÉ•¹Ğ¡À½ÍÃj’â+¦fC–’û’ö?¾ò#¦ÿ–7¢Ú¦;šZÃjµ…á!@½µ…áMC¾ò'¾ò0(€€€€€€€€€€ƒ’â7šr–æÏf÷‡šV¢º+š"C–£šîÿ((€€€€€€€€€€Á±…å•ÈËšÊKšr%•Ñ5…¥¹¡…É…Ñ•ÉMÑ…ÑÌ §–>¿’î—R (€€€€€€€€€€ƒ¾ò#¦
+–/–÷–ò?–¾¯š¶ïº]Á±…å•Ëj¾ò'¾ò0(€€€€€€€€€€ƒšRçR£¢Ş}•Ñ%¹Ù•¹Ñ½Éå¡…É…Ñ•ÉMÑ…ÑÌ ¤(€€€€€€€€€€Á±…å•ÈË–"šR¿–B3’â––_–³–ò?>ûº_’âš²‡(€€€€€€€€¨¼((€€€€€€€±•Ğµ…á!@ì((€€€€€€€±•Ğµ…áM@ì(((€€€€€€€¥˜¡¡…É…Ñ•ÈôôõÁ±…å•È¥ì((€€€€€€€€€€€½¹ÍĞÍÑ…ÑÌ€ô(€€€€€€€€€€€€€€€•Ñ5…¥¹¡…É…Ñ•ÉMÑ…ÑÌ ¤ì(((€€€€€€€€€€€µ…á!@ô(€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹µ…á!@ì((€€€€€€€€€€€µ…áM@ô(€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹µ…áM@ì((€€€€€€€ô(€€€€€€€•±Í•ì((€€€€€€€€€€€½¹ÍĞ¡…É…Ñ•É%¹‘•àô(€€€€€€€€€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É%¹‘•à (€€€€€€€€€€€€€€€€€€€¡…É…Ñ•È(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€½¹ÍĞ‰½¹ÕÌÈ€ô(€€€€€€€€€€€€€€€•ÑÅÕ¥Áµ•¹Ñ	½¹ÕÌ (€€€€€€€€€€€€€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É-•ä (€€€€€€€€€€€€€€€€€€€€€€€¡…É…Ñ•É%¹‘•à(€€€€€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€µ…á!@ô(€€€€€€€€€€€€€€€€ÄÀÀ¬(€€€€€€€€€€€€€€€¡…É…Ñ•È¹Ù¥Ñ…±¥Ñä¨ÔÀ¬(€€€€€€€€€€€€€€€¡…É…Ñ•È¹‰½¹ÕÍ!@¬(€€€€€€€€€€€€€€€‰½¹ÕÌÈ¹µ…á!@¬(€€€€€€€€€€€€€€€‰½¹ÕÌÈ¹Ù¥Ñ…±¥Ñä¨ÔÀì(((€€€€€€€€€€€µ…áM@ô(€€€€€€€€€€€€€€€€ÔÀ¬(€€€€€€€€€€€€€€€¡…É…Ñ•È¹•¹•Éä¨ÄÔ¬(€€€€€€€€€€€€€€€¡…É…Ñ•È¹‰½¹ÕÍM@¬(€€€€€€€€€€€€€€€‰½¹ÕÌÈ¹µ…áM@¬(€€€€€€€€€€€€€€€‰½¹ÕÌÈ¹•¹•Éä¨ÄÔì((€€€€€€€ô(((€€€€€€€¡…É…Ñ•È¹¡À€ô(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€¡…É…Ñ•È¹¡À°(€€€€€€€€€€€€€€€µ…á!@(€€€€€€€€€€€€¤ì(((€€€€€€€¡…É…Ñ•È¹ÍÀ€ô(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€¡…É…Ñ•È¹ÍÀ°(€€€€€€€€€€€€€€€µ…áM@(€€€€€€€€€€€€¤ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33ÚO¦¦_–ğ(€€€€€€€€€€ƒ–"¦7–6Òkjšf–g¾ò3nÓš:—¦î{¦ã–ÂÇ––÷¾ò0(€€€€€€€€€€ƒ’â7¢š–7¢ŞÏ–ë¢š[ª_¦†¿’ë–F+~—7¾ò3–ú3ê0(€€€€€€€€€€ƒ–>#¢s–3–â3šro–6Òkjšf–g–>¿’î—¢ŞÏ–è(€€€€€€€€€€ƒ’â–/¢¢+š¿š†¾ò3¦†¿’éaac–6–"ÁacÒk7¾ò'¾òh(€€€€€€€€€€¡•­1•Ù•±UÀ §n»–&7–>«šr'’â–/–Fó–>¬(€€€€€€€€€€ƒ’úšêCŠSŠQ‘¥ÍÑÉ¥‰ÕÑ•áÁQ½¡…É…Ñ•È ¤(€€€€€€€€€€ƒ¾ò#ÚO¦¦_šÆƒ–"¦7¦‚¦v‹š2'3–"¦7ÚO¦¦_–óÖ˜(€€€€€€€€€€c7¦
+–/š2'¦"W¾ò'¾ò3š&’î—¦g¢‡j’ş»šRä(€€€€€€€€€€ƒ–>«–öÇ¦~ÿ¦g–/šÖ¢/¾ò3’â7šr¢ª“–
+ß–Û’îX(€€€€€€€€€€ƒš–Š((€€€€€€€€€€ƒ–:šr³–6ÒkVÛ’â/šr–òß–"Û¢ŞÏ–ë’â–/¢š(€€€€€€€€€€ƒš&/–.Wš2'3Šë–ºk7š&7¢÷¦^sš:'j(€€€€€€€€€€±•Ù•±5½‘…³–ö#ª_¾ò3:§–ºÛ¢«–ŞÇ’âï–.T(€€€€€€€€€€ƒ¦î{–"¦7šr–új–ÂÇšb¿3¦î{’â/–:ï¦š³’â((€€€€€€€€€€ƒRšV#7¾ò3’â7¦r¢š¦†7–’[–7¢ŞÏ’â–Æ(€€€€€€€€€€ƒŠë¢ª4¿–F+~—¢š[ª_š&7¢÷æóê3šN7’ösŠSŠP(€€€€€€€€€€ƒ¦g¦£–"Ú·š2š.ÿš:'((€€€€€€€€€€ƒ’ö:§–ºÛ–ú3’úšb;Šë¢†£’ë¦
+šb¿šÏ¢š3šr$(€€€€€€€€€€ƒ–F+~—7¾ò3–>«šb¿’â7¢š¦
+¢»¢šš2'Šë–ºkj(€€€€€€€€€€ƒ–ö‹–ò?¾ò3šRçš"C¢Ş6Ë–ú]aC–B3’â¢»¢òW¦<(€€€€€€€€€€Ñ½…ÍÓ¦k~—¾ò#¢š-Í¡½İ1•Ù•±UÁQ½…ÍĞ §¾ò'¾ò0(€€€€€€€€€€ƒ’â7šN/šN7’ösr/¦;–ÂÇ¢«–.WšÚ#–’Ç((€€€€€€€€€€±•Ù•±5½‘…³¦g–/–ö#–ë¢š[ª_šr³¢ê¯(€€€€€€€€€€±½Í•1•Ù•±5½‘…° §¦÷–#’şwVg–r (€€€€€€€€€€ƒ¢/–ò?Šó¢‡šÊK–"«¾ò3–>«šb¿’â7–7–ú{¦g¢„(€€€€€€€€€€ƒ¢ãfó¦†¿’ë(€€€€€€€€¨¼((€€€€€€€Í¡½İ1•Ù•±UÁQ½…ÍĞ (€€€€€€€€€€€¡…É…Ñ•ÈôôõÁ±…å•È(€€€€€€€€€€€€ü(€€€€€€€€€€€€¡Á±…å•È¹¥‘ñğ‹’ö€ˆ¤(€€€€€€€€€€€€è(€€€€€€€€€€€¡…É…Ñ•È¹¥°(€€€€€€€€€€€¡…É…Ñ•È¹±•Ù•°(€€€€€€€€¤ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò33š2'–6Òkj(€€€€€€ƒšf–g¾ò3’â+¦v‹¦‚·–?š†j¶'ÒkšÊKšr'¢Ş¢F\(€€€€€€ƒ–Š{–*ƒ7¾ò'¾òh(€€€€€€ƒ’â7º‡šr'šÊKšr'rj–6Òk¾ò!±•Ù•±ÌøÃ¾ò'¾ò0(€€€€€€ƒ¦÷–Fó–>¯’âš²‡¾ò3¦‚’úÿ–B3š¶—––÷n»–&7j¶'Òh(€€€€€€ƒšVã–¶_¾ò3š"Cšr³–ú#’ö;¾ò#š&û’â7–"Ã–Òƒ–ÂÇnÓš:”(€€€€€€É•ÑÕÉ»¾ò'¾ò3šÊKšr'–&¿’ösR£(€€€€¨¼((€€€É•™É•Í¡¡…É…Ñ•ÉÙ…Ñ…É1•Ù•±Ì ¤ì(((€€€Í…Ù•…µ” ¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì()ô(()™Õ¹Ñ¥½¸±½Í•1•Ù•±5½‘…° ¥ì((€€€€ ‰±•Ù•±5½‘…°ˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹É•µ½Ù” ‰Í¡½Üˆ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒÚO¦¦_šÆƒ–"¦4(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô((€€ƒ¢š?š‚ó’êS–·¾òh(€€aC–#¦Ë–—–ÇR£ÚO¦¦_šÆƒ¾ò0(€€ƒ’â7šrš"Ã¦²—’âÖCšv–ÂÇ¢«–.W–6Òk(€€ƒ:§–ºÛ–n{–"Ã’âï–~;–ú3¾ò3¢«¢†3š2'3–"¦7ÚO¦¦_–ó4(€€ƒš*+ÚO¦¦_šÆƒjaC–"Ö›¢K¢&Ë¾ò0(€€ƒš&7šrrš¶¢ãfó–6Òk–"“–ºk((€€ƒn»–&7¦+š"Ë¢‡–R¿’âšNšr'–º3šVÓ¶'Òh¿–Æ³šŸÎïÖÇj(€€ƒ¢K¢&Ëšb¿’âï¢K¾ò!Á±…å•Ë¾ò3’æ–ÂÇšb¿–&×¢Kšf¦ãj–Òƒ¾ò'(€€ƒšÂÓš"Ã–¯¾ò?¦Š£–òOš&/n»–&7–>«šr'¢w–
+gš²¾ò0(€€ƒ–Âkšr«šr'6£®/¶'ÒkÎïÖÄ(€€ƒ¾ò#¢š?š‚ó’ê3šr'¢¢ïšb;3–’k¢K¢&Ë–B3šfš"Ã¦²—7šb¿šr«’ú–*¢÷¾ò'¾ò0(€€ƒš&’î—–"¦7š2'¦"W–#–>«¦Z/šRûÖ›’âï¢K¾ò0(€€ƒ–Û¦’c¢K¢&Ë¦†¿’ë3–Âkšr«¦Z/šRû7((ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()±•Ğ•áÁQ½…ÍÑQ¥µ•Èõ¹Õ±°ì(()™Õ¹Ñ¥½¸Í¡½İáÁQ½…ÍĞ¡…µ½Õ¹Ğ¥ì((€€€½¹ÍĞÑ½…ÍĞ€ô(€€€€€€€€ ‰•áÁQ½…ÍĞˆ¤ì(((€€€¥˜ …Ñ½…ÍĞ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€Ñ½…ÍĞ¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€‹6Ë–ú\ˆ¬(€€€€€€€…µ½Õ¹Ğ¬(€€€€€€€€‰aC¾ò#–ŞË–¶c–—ÚO¦¦_šÆƒ¾ò$ˆì(((€€€Ñ½…ÍĞ¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€‰Í¡½Üˆ(€€€€¤ì(((€€€±•…ÉQ¥µ•½ÕĞ (€€€€€€€•áÁQ½…ÍÑQ¥µ•È(€€€€¤ì(((€€€•áÁQ½…ÍÑQ¥µ•È€ô(€€€€€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€€€€€Ñ½…ÍĞ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€€€€€‰Í¡½Üˆ(€€€€€€€€€€€€¤ì((€€€€€€€ô°ÈØÀÀ¤ì()ô(()±•Ğ±•Ù•±UÁQ½…ÍÑQ¥µ•Èõ¹Õ±°ì(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33–6Òkjšf–d(€€ƒ–>¿’î—¢ŞÏ–ë’â–/¢¢+š¿š†¾ò3¦†¿’éaac–6–"ÁacÒk7¾ò'¾òh(€€ƒ¢Ş}Í¡½İáÁQ½…ÍĞ §–B3’â––_–¾¯šÎW¾ò3¦v{¦bïšZß(€€ƒ¢«–.WšÚ#–’Ç¾ò3’â7¦r¢š:§–ºÛš2'Šë–ºk(¨¼()™Õ¹Ñ¥½¸Í¡½İ1•Ù•±UÁQ½…ÍĞ¡¡…É…Ñ•É9…µ”±±•Ù•°¥ì((€€€½¹ÍĞÑ½…ÍĞô(€€€€€€€€ ‰±•Ù•±UÁQ½…ÍĞˆ¤ì(((€€€¥˜ …Ñ½…ÍĞ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€Ñ½…ÍĞ¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€¡…É…Ñ•É9…µ”¬(€€€€€€€€‹–6–"Àˆ¬(€€€€€€€±•Ù•°¬(€€€€€€€€‹Òk¾òˆì(((€€€Ñ½…ÍĞ¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€‰Í¡½Üˆ(€€€€¤ì(((€€€±•…ÉQ¥µ•½ÕĞ (€€€€€€€±•Ù•±UÁQ½…ÍÑQ¥µ•È(€€€€¤ì(((€€€±•Ù•±UÁQ½…ÍÑQ¥µ•Èô(€€€€€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€€€€€Ñ½…ÍĞ¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€€€€€‰Í¡½Üˆ(€€€€€€€€€€€€¤ì((€€€€€€€ô°ÈØÀÀ¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò33š2'–6Òkj(€€ƒšf–g¾ò3’â+¦v‹¦‚·–?š†j¶'ÒkšÊKšr'¢Ş¢F_–Š{–*ƒ7¾ò'¾òh(€€ƒ–>«šnÓšZÃ¢K¢&Ë–ö#ª_¦‚·–?¦
+–§–/¶'ÒkšZ–¶_¾ò0(€€ƒ’â7¦7V¯šVÓ–/–ö#ª_–Ÿ–ºç¾ò#¦7V¯šVÓ–/–ö#ª\(€€¥¹¹•É!Q53šrš*+:§–ºÛš¶–r£r/j–"¦‚ŠSŠP(€€ƒ’ú/–šÚO¦¦_šÆƒ–"¦7šr³¢ê¯ŠSŠS’â¢ÖßšÒ_š:'¾ò0(€€ƒ’æ/–&7¢fWB3¢«–.Wš"Ã¦²—¢¢·–ºk¢ŞÏ–ë¦ëfô(€€ƒš*¢÷¦‚7–ÂÇšb¿–B3’â¢¹‰ÕŸ¾ò3¦g¢‡šRçR (€€ƒ¦w–Â7šŸšnÓšZÃ¾ò3–º'–£–ú#–’k¾ò'((€€ƒ¢K¢&Ë–ö#ª_šÊK¦Z/¢F_jšf–g¾ò0 §šrš&û’â7–"À(€€ƒ–Â7š%¥“nÓš:•É•ÑÕÉ»¾ò3–Fó–>¯¦g–/–÷–ò<(€€ƒ’â7šr–ë¦2¿¾ò3–>¿’î—šRû–ş–r¡¡•­1•Ù•±UÀ ¤(€€ƒ¢‡‡šŠw’îÛ–Fó–>¯(¨¼()™Õ¹Ñ¥½¸É•™É•Í¡¡…É…Ñ•ÉÙ…Ñ…É1•Ù•±Ì ¥ì(€€€•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹™½É… ¡¥¹‘•àôùì(€€€€€€€½¹ÍĞ±•Ù•±°ô ‰¡…É…Ñ•ÉÙ…Ñ…É1•Ù•°ˆ­¥¹‘•à¤ì(€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤ì(€€€€€€€¥˜¡±•Ù•±°€˜˜¡…É…Ñ•È¥ì(€€€€€€€€€€€±•Ù•±°¹Ñ•áÑ½¹Ñ•¹Ğô‰1Ø¸ˆ­¡…É…Ñ•È¹±•Ù•°ì(€€€€€€€ô(€€€ô¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒ’âï–~;’òGš¿¾ò#–7¢Êï–n{šîı!@½MC¾ò$((€€ƒ’æ/–&7š*+3š"Ã¦²—–.w–"¤¿–6Òk¢«–.W¢sšîı!CMC7š.ÿš:'’æ/–ú3¾ò0(€€ƒ¢^—šÂÓR£–º3–ÂÇšÊKšr'–Û’î[–n{¢†š&/šº×’ê¾ò0(€€ƒ¦+š"Ë¢‡n»–&7’æ¦
+šÊKšr'rš¶j–V–ê\¿¦G–æÎïÖÄ(€€ƒ–>¿’î—¢ÊßšZÃ¢^—šÂÓ¾ò#3¦G–æ7n»–&7–>«šb¿¢3–2–R»–ëšfj¦†¿’ëšZ–¶_¾ò0(€€ƒšÊKšr'rj¢Š¯¢¢c¦2’æšÊK–rÃšZç¢*Ç¾ò'((€€ƒ–#R£šr–Z»ÒSjšZç–ò?¢s’â+¦g–/òë–>¾òh(€€ƒ–n{’âï–~;–>¿’î—–7¢Êï’òGš¿¾ò3nÓš:—–n{šîı!@½MC¾ò0(€€ƒ’â7¦r¢š¢^—šÂÓ’â7¦r¢š¦G–æ(€€ƒ’æ/–ú3–ššzs¢š–krš¶j–V–ê_ÎïÖÇ¾ò0(€€ƒ¦g–/–÷–ò?–>¿’î—–7šNÓ–š"[šnÿš>oš:'(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒ’âï–~;ÒSšZ–¶_¦ã–Z»ŠSŠS–ÇR£–ö#–ë¢š[ª\(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()±•Ğ¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘±•µ•¹Ğô(€€€¹Õ±°ì()±•Ğ¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘A…É•¹Ğô(€€€¹Õ±°ì()±•Ğ¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘9•áÑM¥‰±¥¹œô(€€€¹Õ±°ì((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¢K¢&Ë¢š[ª_¦jÇ¢^<(€€ƒ–¦Ë’ú¦‚¦v‹¢‡–’k¦’cjº·¦‚·–"š>o–6–†+¾ò'¾òh(€€ƒ¢¢c’ö?¦gš²‡–¦‚¦v‹¦Ë’úšf¾ò3¦‚š&/¦jÇ¢^?’ê–N«’â–,(€€ƒ3Š^¢K¢&Ë–B7ŠZÛ7j–6–†+¾ò1É•ÍÑ½É•	½ÉÉ½İ•‘±•µ•¹Ğ ¤(€€ƒš¶ã’ö7šf¢š¢Êƒ¢Ê³š*+–ºj¦†¿’ë.š/š‹–ú§–n{’ú¾ò0(€€ƒ’â7Û–"¢ÖÃ’æ/–ú3¾ò3¦
+–/¦‚¦v‹–Z»6£¢Š¯’öÿR£šf(€€ƒ¾ò#’ú/–š’æ/–ú3–>¿¢÷¦
+šr'–Û’î[–R£–‚Óšf¿¾ò'šr(€€ƒ’ânÓÚ·š2¦jÇ¢^?š&û’â7–n{’ú(¨¼()±•Ğ¡½µ••…ÑÕÉ•!¥‘‘•¹Mİ¥Ñ¡…Éô(€€€¹Õ±°ì(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3’âï–~;®/æ«¦j£š¦|(€€ƒ–"š>o¾ò'¾òk–§–ò×–rY‰…Í”ØÓ–Ÿ–Ö3¾ò3š¾?š²‡¦Ë–—’âï–~8(€€ƒ¦‚¦v‹šf¾ò!Í¡½İA…” §¢‡–Fó–>¯¾ò3¢š/’â/¦vˆ(€€Í¡½İ!½µ•A½ÉÑÉ…¥Ğ §j–Fó–>¯¦î{¾ò'¦j£š¦š2G’â–òÔ(€€ƒ¦†¿’ë¾ò3’â7šb¿š"Ã¦²—R£j¢K¢&Ë–6‡&–r[¾ò3šb¿¦†7–’X(€€ƒšê[–
+gj®/æ«(¨¼((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€XàäƒŠPƒ’îï–.g’î/¦v‹–Â#R£š&/–.‹š¢‡–ò<(€€ƒ’îï–.g’öÿR €ÅÕ•ÍÑQ…‰	½‘äƒ’ös
+ë–R¿’â–Ÿ–ÆÍÉ½±°½İ¹•Ë(€€ƒ¦+š"Ëšr–’[–Æ“–:šr°Ñ½Õ µ…Ñ¥½¸é¹½¹—¾ò3–nƒš¶“–>«–r£’îï–.g¢š[ª\(€€ƒ¦Z/–Všr¦ZOšRû¢†0Á…¸µç¾òo’â7šZÃ–ŠxÑ½Õ ½Á½¥¹Ñ•È±¥ÍÑ•¹•Ë(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼)™Õ¹Ñ¥½¸Í•ÑEÕ•ÍÑQ½Õ¡5½‘”¡…Ñ¥Ù”¥ì((€€€l(€€€€€€€‘½Õµ•¹Ğ¹‘½Õµ•¹Ñ±•µ•¹Ğ°(€€€€€€€‘½Õµ•¹Ğ¹‰½‘ä°(€€€€€€€‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰…µ”µÙ¥•İÁ½ÉĞˆ¤°(€€€€€€€‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰…µ”µÍÑ…”ˆ¤(€€€t¹™½É… ¡™Õ¹Ñ¥½¸¡•±•µ•¹Ğ¥ì((€€€€€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô((€€€€€€€•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€‰ÅÕ•ÍĞµÍÉ½±°µ…Ñ¥Ù”ˆ°(€€€€€€€€€€€€„……Ñ¥Ù”(€€€€€€€€¤ì((€€€ô¤ì()ô(()™Õ¹Ñ¥½¸½Á•¹!½µ••…ÑÕÉ”¡ÑåÁ”¥ì((€€€½¹ÍĞµ½‘…°ô(€€€€€€€€ ‰¡½µ••…ÑÕÉ•5½‘…°ˆ¤ì((€€€½¹ÍĞÑ¥Ñ±•°ô(€€€€€€€€ ‰¡½µ••…ÑÕÉ•5½‘…±Q¥Ñ±”ˆ¤ì((€€€½¹ÍĞ‰½‘å°ô(€€€€€€€€ ‰¡½µ••…ÑÕÉ•5½‘…±	½‘äˆ¤ì(((€€€¥˜ (€€€€€€€€…µ½‘…°ñğ(€€€€€€€€…Ñ¥Ñ±•°ñğ(€€€€€€€€…‰½‘å°(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€±½Í•!½µ••…ÑÕÉ” ¤ì(((€€€¥˜¡ÑåÁ”ôôô‰É•ÍĞˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹’âï–~;’òGš¼ˆì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò33–Ş‡š¨(€€€€€€€€€€ƒ¦‚¦v‹š2'¢«–.Wš"Ã¦²—¢ŞÏ–ë¦ëf÷š*¢÷¦‚¦v‹7¾ò0(€€€€€€€€€€ƒ¢ş÷š~—–ú3fó>û–B3’â–-‰ÕŸ–Û–¾›–öÇ¦~ÿ’â'–,(€€€€€€€€€€ƒ–rÃšZç¾ò3¦g¢‡¦‚’úÿ’â¢Öß’ş»š:'¾ò'¾òh(€€€€€€€€€€ƒ¦g–/–"šR¿–>«–Fó–>­‰½ÉÉ½İ±•µ•¹Ñ%¹Ñ½5½‘…° ¤(€€€€€€€€€€ƒš*)¡½µ•I•ÍÑ…É“–¦Ë’ú¾ò3–ú{’úšÊKšr$(€€€€€€€€€€ƒšâ¦ë¦9‰½‘å³šr³¢ê¯j¥¹¹•É!Q53(€€€€€€€€€€ƒ–ššzs3’â+’âš²‡7¦Z/jšb¿R¡¥¹¹•É!Q50ô(€€€€€€€€€€ƒšVÓšº×¢N/š:'j¦†{–z/¾ò#’ú/–š3¢K¢&Ë7ŠSŠP(€€€€€€€€€€ƒ¢‡¦v‹šr'¦‚·–?–"š>o–"_–"¦‚š2'¦"W(€€€€€€€€€€¡…É…Ñ•ÉQ…‰½¹Ñ•¹Ó¾ò'¾ò3¦
+’êošºcVd(€€€€€€€€€€!Q53šr’ânÓVg–r¡‰½‘å³¢‡¾ò3¦gš²‡–’ú(€€€€€€€€€€ƒj–Ÿ–ºç–>«šb¿3–*ƒ7–r£–ú3¦v‹¾ò3’â7šb¼(€€€€€€€€€€ƒ3–>[’î7¾ò3:§–ºÛšrr/–"Ã’â+’âš²‡j¢"((€€€€€€€€€€ƒV¯¦v‹–6‡–r£šr’â+¦v‹šZÃ–Ÿ–ºç¢Š¯š:£–"À(€€€€€€€€€€ƒ’â/¦v‹r/’â7–"Ã¾ò#¢ššîû–.W–ú#–’kš&7r/–ú_–"Ã¾ò0(€€€€€€€€€€ƒRk¢Ïr/¢Öß’ú–?šVÓ–/¦ëf÷¾ò3–nƒ
+ë¢K¢&È(€€€€€€€€€€ƒ¦‚¦
+–-¡…É…Ñ•ÉQ…‰½¹Ñ•¹Óšr³¢ê¬(€€€€€€€€€€ƒ–nƒ
+ë3–"¦‚¦®c–ê›¢š’â¢Ó7j¦ršÆ¾ò0(€€€€€€€€€€ƒ’şwVg’ê’â–/–në–ºkjµ¥¸µ¡•¥¡Ó¾ò0(€€€€€€€€€€ƒ¦ë¢F_jšf–gr/¢Öß’ú–ÂÇšb¿’â–’Ÿ–†((€€€€€€€€€€ƒ¦ëf÷š†š†¾ò'((€€€€€€€€€€ƒ’ş»šÎW¾òk¢Ş–Û’î[R¡¥¹¹•É!Q50÷šVÓšº×¢N/š:$(€€€€€€€€€€ƒj–"šR¿’âš¢¾ò3–#šâ¦é‰½‘å³¾ò3’şw¢¶$(€€€€€€€€€€ƒš¾?š²‡¦Z/¢š[ª_¦÷šb¿’æûšŞ£j¢Öß¦î{¾ò3’â7º„(€€€€€€€€€€ƒ’â+’âš²‡¦Z/jšb¿’î¦êó¦†{–z/(€€€€€€€€¨¼((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€€ˆˆì((€€€€€€€‰½ÉÉ½İ±•µ•¹Ñ%¹Ñ½5½‘…° (€€€€€€€€€€€€ ‰¡½µ•I•ÍÑ…Éˆ¤°(€€€€€€€€€€€‰½‘å°(€€€€€€€€¤ì((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰•áÁA½½°ˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹ÚO¦¦_šÆƒ–"¦4ˆì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾òk¢Ş’â+¦v‹3’âï–~;’òGš¿7–B3’â–,(€€€€€€€€€€‰ÕŸ–B3’â–/’ş»šÎW¾ò3–#šâ¦é‰½‘å³(€€€€€€€€¨¼((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€€ˆˆì((€€€€€€€‰½ÉÉ½İ±•µ•¹Ñ%¹Ñ½5½‘…° (€€€€€€€€€€€€ ‰¡½µ•áÁA½½±…Éˆ¤°(€€€€€€€€€€€‰½‘å°(€€€€€€€€¤ì((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰Í¡½Àˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹–V–ê\ˆì((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•ÉM¡½Á½¹Ñ•¹Ğ ¤ì((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰¡…É…Ñ•Èˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹¢K¢&Èˆì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾òk¢K¢&Ë¦‚¦v‹–Ÿ–ºçš¾S¢ò–’h(€€€€€€€€€€ƒ¾ò#–¦Ë’újšVÓ¦‚–Ÿ–ºç¾ò'¾ò3––_R£–*ƒ–¾°(€€€€€€€€€€ƒš¢–ò?¾ò1±½Í•!½µ••…ÑÕÉ” §¦^s¦Z'šf(€€€€€€€€€€ƒšr¢«–.Wš.ÿš:'¾ò3’â7–öÇ¦~ÿ–Û’î[’â¢"³–’Ÿ–Â<(€€€€€€€€€€ƒj¢š[ª_(€€€€€€€€¨¼((€€€€€€€½¹ÍĞ‰½àô((€€€€€€€€€€€µ½‘…°¹ÅÕ•ÉåM•±•Ñ½È (€€€€€€€€€€€€€€€€ˆ¹¡½µ”µ™•…ÑÕÉ”µµ½‘…°µ‰½àˆ(€€€€€€€€€€€€¤ì(((€€€€€€€¥˜¡‰½à¥ì((€€€€€€€€€€€‰½à¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€€€€€€€€€‰İ¥‘”ˆ(€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¢š[ª_¢š(€€€€€€€€€€ƒšRû–’Ÿ–"Ãš:—¢şGšîÿ&#¾ò'¾òk–Ÿ–Æ“¢š[ª_¢º+š"@(€€€€€€€€€€€ÄÀÁÙß’æ/–ú3¾ò3–’[–Æ“¦»ö§¾ò ¹¡½µ”µ™•…ÑÕÉ”´(€€€€€€€€€€µ½‘…³¾ò'šr³¢ê¯¦
+šr$ÈÁÁãjÁ…‘‘¥¹Ÿ¾ò0(€€€€€€€€€€ƒšr¢ºO–Ÿ–Æ“¢š[ª_¢Ú–ë¢z‹–æWR‹RšÂÓ–æÌ(€€€€€€€€€€ƒš6Ë–.W¦g¢‡¦‚’úÿš*+–’[–Æ“¦»ö§jÁ…‘‘¥¹œ(€€€€€€€€€€ƒ’æšRÛš:'¾ò3–§–Æ“’â¢Öß¢fWBš&7šrrj¢Êó¦ö((€€€€€€€€€€ƒ¢z‹–æW¦
++Ş(€€€€€€€€¨¼((€€€€€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€€€€€‰¹¼µÁ…‘‘¥¹œˆ(€€€€€€€€¤ì(((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•É¡…É…Ñ•ÉM¡½İ…Í•½¹Ñ•¹Ğ ¤ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾òk¦‚C¢¢·’âš&O¦Z/–ÂÇ¦ã²³’â¢K¢&Ë(€€€€€€€€€€ƒ¦†¿’ë¢÷–*o–ó–"¦‚ŠSŠSšRç–Fó–>¬(€€€€€€€€€€Í•±•Ñ¡…É…Ñ•É½ÉQ…‰Ì À§¢3’â7šb¼(€€€€€€€€€€ƒnÓš:•Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ ‰ÍÑ…ÑÕÌˆ§¾ò0(€€€€€€€€€€ƒ¦gš¢’â'–/¦‚¦v‹j¢K¢&Ë.š/–ú{’â¦Z/–,(€€€€€€€€€€ƒ–ÂÇšb¿–B3š¶—j¾ò3’â7R£¶':§–ºÛ¢«–ŞÇ¦î{’âš²„(€€€€€€€€€€ƒ¦‚·–?š&7–Â7¦ö+(€€€€€€€€¨¼((€€€€€€€Í•±•Ñ¡…É…Ñ•É½ÉQ…‰Ì (€€€€€€€€€€€€À(€€€€€€€€¤ì((€€€€€€€Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ (€€€€€€€€€€€€‰ÍÑ…ÑÕÌˆ(€€€€€€€€¤ì((€€€€€€€¥˜¡İ¥¹‘½Ü¹Íå¹¡…É…Ñ•ÉQ½Õ¡5½‘”¥ì(€€€€€€€€€€€İ¥¹‘½Ü¹Íå¹¡…É…Ñ•ÉQ½Õ¡5½‘” ¤ì(€€€€€€€ô((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰™½Éµ…Ñ¥½¸ˆ¥ì(€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô‹’ö#¦fŒˆì(€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€ÑåÁ•½˜İ¥¹‘½Ü¹Ù¥á•‘I•¹‘•É±±å½Éµ…Ñ¥½¹½¹Ñ•¹Ğôôô‰™Õ¹Ñ¥½¸ˆ(€€€€€€€€€€€€üİ¥¹‘½Ü¹Ù¥á•‘I•¹‘•É±±å½Éµ…Ñ¥½¹½¹Ñ•¹Ğ ¤(€€€€€€€€€€€€è€ˆˆì(€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰½™™±¥¹•áÀˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹¦n‹ŞkÚO¦¦\ˆì((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•É=™™±¥¹•áÁ½¹Ñ•¹Ğ ¤ì((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰ÅÕ•ÍĞˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹’îï–.dˆì((€€€€€€€€¼¨(€€€€€€€€€€Xàç¾òk’îï–.g’â7–7šÊÿR£–V–ê_j’â¢"°É½Ü½‰ÕÑÑ½¸ƒ&#–z/(€€€€€€€€€€ƒ–>«–r£’îï–.g¦Z/–Všr¦ZO––_R£–Â#R µ½‘…°ƒÖCš/¢"š&/–.‹š¢‡–ò?(€€€€€€€€¨¼(€€€€€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€€€€€‰ÅÕ•ÍĞµµ½‘”ˆ(€€€€€€€€¤ì((€€€€€€€Í•ÑEÕ•ÍÑQ½Õ¡5½‘” (€€€€€€€€€€€ÑÉÕ”(€€€€€€€€¤ì((€€€€€€€•¹ÍÕÉ•…¥±åEÕ•ÍÑÍÕÉÉ•¹Ğ ¤ì((€€€€€€€‘…¥±åEÕ•ÍÑMÑ…Ñ”¹ÁÉ½É•ÍÌ¹¡•­¥¸ô(€€€€€€€€€€€€Äì((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•ÉEÕ•ÍÑQ…‰½¹Ñ•¹Ğ (€€€€€€€€€€€€€€€€‰‘…¥±äˆ(€€€€€€€€€€€€¤ì((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰‰•ÍÑ¥…Éäˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹–r[¦FDˆì((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•É	•ÍÑ¥…Éå½¹Ñ•¹Ğ ¤ì((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰…¡¥•Ù•µ•¹Ğˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹š"C–ÂÄˆì((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•É¡¥•Ù•µ•¹Ñ½¹Ñ•¹Ğ ¤ì((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰…¹¹½Õ¹•µ•¹Ğˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹–³–F(ˆì((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•É¹¹½Õ¹•µ•¹Ñ½¹Ñ•¹Ğ ¤ì((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰ÍåÍÑ•´ˆ¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹ÎïÖÄˆì((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•ÉMåÍÑ•µ½¹Ñ•¹Ğ ¤ì((€€€ô(€€€•±Í”¥˜¡ÑåÁ”ôôô‰…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ìˆ¥ì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33¢«–.T(€€€€€€€€€€ƒš"Ã¦²—šRû¦Ë’â/¦v‹–Â;¢š÷–"_¾ò3š2'’â/–:ï¢ŞÏ–è(€€€€€€€€€€ƒ¢¢·–ºk¢š[ª_7¾ò'¾òh(€€€€€€€€€€ƒ–:šr°…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹ÍA…¹•°(€€€€€€€€€€ƒ¦
+––_šb¿¢«–ŞÇ–ršÎW'¦.óº]Á½Í¥Ñ¥½¸è(€€€€€€€€€€™¥á•“–êŸš¢g–>›–’[šB³–"Á‘½Õµ•¹Ğ¹‰½‘ä(€€€€€€€€€€ƒ–êW’â/¦†¿’ë¾ò3&÷šÚ%‰…ÑÑ±•A…—j(€€€€€€€€€€‘¥ÍÁ±…äé¹½¹—¢†3–Ÿš¢–ò?¢š¢N/¶$(€€€€€€€€€€ƒ––÷–æû–Æ“–V?¦†3¾ò3š~—¢¶'–ú3–ÂÇšb¿¦g’âšVÓ––\(€€€€€€€€€€ƒ¢«¢¢–ºk’ö7¦
+?¢ò¿šr³¢ê¯–ºçšbO–r£3’â7–r (€€€€€€€€€€ƒš"Ã¦²—’â·7jš–Š–ë¦2¿¾ò3š&7šršr$(€€€€€€€€€€ƒ3š2'’â/–:ïšÊK–>7š'7j.šÎ((€€€€€€€€€€ƒ¦g¢‡’â7’ş»¦
+––_¢"+¦
+?¢ò¿¾ò3¢3šb¿nÓš:”(€€€€€€€€€€ƒšRçR£šVÓ–/¦+š"Ë–ÇR£–ŞËÚO¦¦_¢¶'¦8(€€€€€€€€€€ƒ–ú#–’kš²‡¦÷š¶–âã¦/’ösj(€€€€€€€€€€½Á•¹!½µ••…ÑÕÉ” §–ö#ª_ÎïÖÇŠSŠP(€€€€€€€€€€ƒ–R£–B3’â–,…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹ÍA…¹•°(€€€€€€€€€€ƒ¾ò#š²’ö4¿’â/š.'¦ã–Z»–º3–£’â7R£¦7–k¾ò'¾ò0(€€€€€€€€€€ƒ’öR¡‰½ÉÉ½İ±•µ•¹Ñ%¹Ñ½5½‘…° ¤(€€€€€€€€€€ƒ–†{¦Ë¦g–/–ö#ª_j‰½‘ç¾ò3¢Ş3’òGš¿4(€€€€€€€€€€ƒ3ÚO¦¦_šÆƒ–"¦77R£jšb¿–B3’âš.o¾ò0(€€€€€€€€€€ƒ’â7–7¦r¢š¢«–ŞÇº_–êŸš¢g¢«–ŞÇº„(€€€€€€€€€€èµ¥¹‘•ã(€€€€€€€€¨¼((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹¢«–.Wš"Ã¦²—¢¢·–ºhˆì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò33–Ş‡š¨(€€€€€€€€€€ƒ¦‚¦v‹š2'¢«–.Wš"Ã¦²—¢ŞÏ–ë¦ëf÷š*¢÷¦‚¦v‹7¾ò'¾òh(€€€€€€€€€€ƒrš¶–:–nƒš&û–"Ã’êŠSŠS¦g–/–"šR¿–ú{¦‚·–"Ã–Âø(€€€€€€€€€€ƒ–>«R¡‰½ÉÉ½İ±•µ•¹Ñ%¹Ñ½5½‘…° §š*((€€€€€€€€€€…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹ÍA…¹•³–¦Ë’ú¾ò0(€€€€€€€€€€ƒ–ú{’úšÊKšâ¦ë¦9‰½‘å³šr³¢ê¯j¥¹¹•É!Q53(€€€€€€€€€€ƒ–ššzs’â+’âš²‡¦Z/jšb¿3¢K¢&Ë7¾ò#R (€€€€€€€€€€¥¹¹•É!Q50÷šVÓšº×¢N/š:'¾ò3¢‡¦v‹šr'¦‚·–<(€€€€€€€€€€ƒ–"š>o–"_–"¦‚š2'¦"W(€€€€€€€€€€¡…É…Ñ•ÉQ…‰½¹Ñ•¹Ó¾ò'¾ò1±½Í•!½µ••…ÑÕÉ” ¤(€€€€€€€€€€ƒ–>«šrš*+3–¢ÖÃj–¶C¦‚¦v‹7¾ò#’ú/–š(€€€€€€€€€€Í­¥±±A…—¾ò'š¶ã’ö7¾ò3’â›’â7šršâš:$(€€€€€€€€€€‰½‘å°¹¥¹¹•É!Q53šr³¢ê¯¦
+–Æ“ŠSŠS¦
+–Æ(€€€€€€€€€€ƒ¢K¢&Ë¦‚j–’[šºó¾ò#¦‚·–<¯–"¦‚š2'¦"T¬(€€€€€€€€€€ƒ’â–/–nƒ
+ë3–"¦‚¢š¶'¦®c7¢3’şwVd(€€€€€€€€€€ƒ–në–ºk¦®c–ê›j¦é¡…É…Ñ•ÉQ…‰½¹Ñ•¹Ó¾ò$(€€€€€€€€€€ƒšr’ânÓ–6‡–r¡‰½‘å³¢‡¾ò3¦gš²‡–’új(€€€€€€€€€€ƒ¢¢·–ºk¦v‹švÿ–>«šb¿3–*ƒ7–r£–º–ú3¦v‹¾ò0(€€€€€€€€€€ƒ’â7šb¿3–>[’î7–º:§–ºÛr/–"Ãj–ÂÇšb¼(€€€€€€€€€€ƒ’öÿR£¢š"«–r[¦
+š¢¾òk’â+¦v‹¦
+šb¿¢K¢&Ë¦‚j(€€€€€€€€€€ƒ–"¦‚š2'¦"W¾ò3’â/¦v‹’â–’Ÿ–†+¦ëf÷¾ò#¦
+–,(€€€€€€€€€€ƒ¦ëj¡…É…Ñ•ÉQ…‰½¹Ñ•¹Ó¾ò'¾ò0(€€€€€€€€€€ƒ¢¢·–ºk¦v‹švÿšr³¢ê¯–Û–¾›¦
+–r£¾ò3–>«šb¿¢Š¬(€€€€€€€€€€ƒš:£–"ÃšnÓ’â/¦v‹¾ò3V¯¦v‹’â+–º3–£r/’â7–"Ã((€€€€€€€€€€ƒ¢Ş3’âï–~;’òGš¿73ÚO¦¦_šÆƒ–"¦74(€€€€€€€€€€ƒ–B3’â–-‰ÕŸ–B3’â–/’ş»šÎW¾òk–#šâ¦è(€€€€€€€€€€‰½‘å³¾ò3’şw¢¶'š¾?š²‡¦Z/¢š[ª_¦÷šb¿’æûšŞ (€€€€€€€€€€ƒ¢Öß¦î{(€€€€€€€€¨¼((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€€ˆˆì(((€€€€€€€½¹ÍĞÁ…¹•°ô(€€€€€€€€€€€€ ‰…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹ÍA…¹•°ˆ¤ì(((€€€€€€€¥˜¡Á…¹•°¥ì((€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò33¦g’êl(€€€€€€€€€€€€€€ƒš2'¦"W¦÷šÊK–>7š'7¾ò/3¢¢·–ºk¦‚¦v‹¦vƒ’â+¦vˆ(€€€€€€€€€€€€€€ƒ–ú#¦s7¾ò'¾òh(€€€€€€€€€€€€€€ƒrš¶j–:–nƒš&û–"Ã’êŠSŠS’â+¦v‹¦gšº×–>¨(€€€€€€€€€€€€€€ƒšâš:'3¢†3–Ÿ7–ºk’ö7š¢–ò?¾ò3’ö(€€€€€€€€€€€€€€€…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹ÍA…¹•³¦g–,(€€€€€€€€€€€€€€ƒ–Òƒšr³¢ê¯jML±…ÍÌ(€€€€€€€€€€€€€€ƒ¾ò ¹…ÕÑ¼µÍ•ÑÑ¥¹Ìµ•áÁ…¹‘•“¾ò$(€€€€€€€€€€€€€€ƒ–¾¯š¶ï’êÁ½Í¥Ñ¥½¸é…‰Í½±ÕÑ—¾òl(€€€€€€€€€€€€€€Ñ½ÀèÃ¾òm±•™ĞèÃ¾òmÉ¥¡ĞèÃ¾òl(€€€€€€€€€€€€€€¡•¥¡ĞèÌØÁÁã¾òmèµ¥¹‘•àèäà(€€€€€€€€€€€€€€ƒ¾ò#–:šr³šb¿¢¢·¢¢#Ö™‰…ÑÑ±•A…—¢„(€€€€€€€€€€€€€€ƒ3¢N/–r£¢K¢&Ë–6‡&3’â+¦v‹7¦
+¢»R£šÎW¾ò'(€€€€€€€€€€€€€€ƒ¢†3–Ÿš¢–ò?šâš"@ˆ‹’æ/–ú3¾ò3?¢š÷–f£šr(€€€€€€€€€€€€€€™…±±‰…¯–n{¦g–-±…ÍÏšr³¢ê¯j¢¢·–ºk¾ò0(€€€€€€€€€€€€€€ƒ¶'šZó¦v‹švÿ¦
+šb½Á½Í¥Ñ¥½¸é…‰Í½±ÕÑ—¾ò0(€€€€€€€€€€€€€€ƒ¢3’âS–nƒ
+è¹¡½µ”µ™•…ÑÕÉ”µµ½‘…°µ‰½à(€€€€€€€€€€€€€€ƒšÊKšr'¢¢µÁ½Í¥Ñ¥½»¾ò3šr¢şGj3–ŞË–ºk’ö4(€€€€€€€€€€€€€€ƒ–[–#7¢º+š"@¹¡½µ”µ™•…ÑÕÉ”µµ½‘…°(€€€€€€€€€€€€€€ƒšr³¢ê¯¾ò!Á½Í¥Ñ¥½¸é™¥á•í¥¹Í•ĞèÃ¾ò'¾ò0(€€€€€€€€€€€€€€ƒ¦v‹švÿ–ÂÇšršVÓ–/¢Êó¦ö+¦
+–/–£¢z‹–æW¦»ö¤(€€€€€€€€€€€€€€ƒj–Ş›’â+¢KŠSŠS¦g–ÂÇšb¿3¦vƒ’â+¦v‹–ú#¦s4(€€€€€€€€€€€€€€ƒj–:–nƒ¾òo–r¡M…µÍÕ¹œ	É½İÍ•Ë¦g¦†x(€€€€€€€€€€€€€€ƒš&/š¦?¢š÷–f£’â+¾ò3¦g¢»1Á½Í¥Ñ¥½¸è(€€€€€€€€€€€€€€…‰Í½±ÕÑ—¦–ë¦‚Cšrjš:K&#’ö7ö»4(€€€€€€€€€€€€€€ƒ¦
+–âã–âã’òÓ¦j£¦î{šN+–êŸš¢g–Â7’â7šê[¾ò#–Â“–Ø(€€€€€€€€€€€€€€ƒÚË–v–"_šîG–è¿šîG–—¢š[ª_¦®c–ê›šÖ»–.T(€€€€€€€€€€€€€€ƒjšf–g¾ò'¾ò3¦g–ÂÇšb¿3š2'¦"W¦÷šÊK–>7š'4(€€€€€€€€€€€€€€ƒj–:–nƒ((€€€€€€€€€€€€€€ƒ¦g¢‡’â7¢÷–>«šâ¢†3–Ÿš¢–ò?¾ò3¢š3šb;Šè(€€€€€€€€€€€€€€ƒ¢N/š:'5±…ÍÏšr³¢ê¯j¢¢·–ºk¾òkšRçš"@(€€€€€€€€€€€€€€Á½Í¥Ñ¥½¸éÍÑ…Ñ¥¡•¥¡Ğé…ÕÑ¿¾ò0(€€€€€€€€€€€€€€ƒ¢ºO¦v‹švÿrj–n{–"À¡½µ••…ÑÕÉ•5½‘…±	½‘ä(€€€€€€€€€€€€€€ƒjš¶–âãšZ’îÛšÖ¢‡¦v‹¾ò3¢Ş3’òGš¿4(€€€€€€€€€€€€€€ƒ3ÚO¦¦_šÆƒ–"¦77¦
+’êo’âš¢š¶–âã¦†¿’ë(€€€€€€€€€€€€€€ƒš¶–âã–B–ú_–"Ã¦î{šN+’ê/’îÛ(€€€€€€€€€€€€¨¼((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹Á½Í¥Ñ¥½¸ô(€€€€€€€€€€€€€€€€‰ÍÑ…Ñ¥Œˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹Ñ½Àô(€€€€€€€€€€€€€€€€ˆˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹±•™Ğô(€€€€€€€€€€€€€€€€ˆˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹É¥¡Ğô(€€€€€€€€€€€€€€€€ˆˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹‰½ÑÑ½´ô(€€€€€€€€€€€€€€€€ˆˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹¡•¥¡Ğô(€€€€€€€€€€€€€€€€‰…ÕÑ¼ˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹é%¹‘•àô(€€€€€€€€€€€€€€€€ˆˆì((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹µ…á!•¥¡Ğô(€€€€€€€€€€€€€€€€ˆˆì((€€€€€€€€€€€Á…¹•°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€€€€€‰™±½…Ñ¥¹œµµ½‘…°ˆ(€€€€€€€€€€€€¤ì(((€€€€€€€€€€€‰½ÉÉ½İ±•µ•¹Ñ%¹Ñ½5½‘…° (€€€€€€€€€€€€€€€Á…¹•°°(€€€€€€€€€€€€€€€‰½‘å°(€€€€€€€€€€€€¤ì(((€€€€€€€€€€€Á…¹•°¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€€€€€€€€€‰™±•àˆì((€€€€€€€ô(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢šršZÃ¢ššÆ¾ò33
+ë’î¦êóšr'šf–d(€€€€€€€€€€ƒ¢«–.Wš"Ã¦²—¢¢·–ºk¦‚¦v‹–ú#ö»’â·¾ò3šr'šf–g–ú#¦vƒ’â/¦v‹¾ò3¦÷š*((€€€€€€€€€€ƒ–º–në–ºkö»’â·¾òoš*+šVÓ–/¦‚¦v‹šRû–’Ÿ¢ºOšZ–¶_¦÷¢÷–†{¦Ë–:ï¾ò0(€€€€€€€€€€ƒ’â7¢š¢ºO’î[š6Ë–.W7¾ò'¾òh(€€€€€€€€€€ƒ¦g¢‡–:šr³’úwŸšnÓš^§’â¢ò«j¢ššÆ–*ƒ’ê‘½¬µ‰½ÑÑ½·š¢–ò<(€€€€€€€€€€ƒ¾ò#š"Ã¦²—’â·¢ºO¢š[ª_¢Êó¦ö+V¯¦v‹’â/Şjš"Ã¦²—¢Î¢¢+š†¾ò'¾ò3¦gš¶šb¼(€€€€€€€€€€ƒ3šr'šf–gö»’â·šr'šf–g¦vƒ’â/¦v‹7j–:–nƒŠSŠSš"Ã¦²—’â·¢Êó–êW(€€€€€€€€€€ƒ’â7–r£š"Ã¦²—’â·ö»’â·¾ò3–§¢».š/’ê“šnÿ–ë>û’öÿR£¢>û–r (€€€€€€€€€€ƒšb;Šë¢ššÆ3¦÷–në–ºkö»’â·7¾ò3šRçš"C–º3–£’â7–7–*‘½¬µ‰½ÑÑ½´(€€€€€€€€€€ƒ¦g–-±…ÍÏ¾ò3’â7º‡–r£’â7–r£š"Ã¦²—’â·¦÷Ú·š2(€€€€€€€€€€€¹¡½µ”µ™•…ÑÕÉ”µµ½‘…³¦‚C¢¢·jö»’â·¦†¿’ë((€€€€€€€€€€ƒ–B3šfš*+¢š[ª_šr³¢ê¯¾ò ¹¡½µ”µ™•…ÑÕÉ”µµ½‘…°µ‰½ã¾ò'j(€€€€€€€€€€µ…àµ¡•¥¡ÓšRû–¾³–"ÀäÙ‘Ù£¾ò#–:šr³š"Ã¦²—’â·–>«šr$àÁ‘Ù£¾ò0(€€€€€€€€€€ƒ¦v{š"Ã¦²—’â·–ŞËÚOšb¼äÙ‘Ù£¾ò3¦g¢‡ÖÇ’âš"C’â7–"š–Š¦÷R (€€€€€€€€€€€äÙ‘Ù£¾ò'¾ò3n‡¦?¢ºO–Ÿ–ºç’âš²‡–ÂÇ¢÷–º3šVÓ¦†¿’ë’â7R£š6Ë–.W(€€€€€€€€¨¼((€€€€€€€½¹ÍĞÍ•ÑÑ¥¹Í	½àô(€€€€€€€€€€€µ½‘…°¹ÅÕ•ÉåM•±•Ñ½È (€€€€€€€€€€€€€€€€ˆ¹¡½µ”µ™•…ÑÕÉ”µµ½‘…°µ‰½àˆ(€€€€€€€€€€€€¤ì(((€€€€€€€¥˜¡Í•ÑÑ¥¹Í	½à¥ì((€€€€€€€€€€€Í•ÑÑ¥¹Í	½à¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä (€€€€€€€€€€€€€€€€‰µ…àµ¡•¥¡Ğˆ°(€€€€€€€€€€€€€€€€ˆäÙ‘Ù ˆ°(€€€€€€€€€€€€€€€€‰¥µÁ½ÉÑ…¹Ğˆ(€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€½¹ÍĞ¡…É…Ñ•ÉM•±•Ğô(€€€€€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•ÉM•±•Ğˆ¤ì(((€€€€€€€¥˜¡¡…É…Ñ•ÉM•±•Ğ¥ì((€€€€€€€€€€€½¹ÍĞ½ÁÑ¥½¸Àô(€€€€€€€€€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í¡…É=ÁÑ¥½¸Àˆ¤ì(((€€€€€€€€€€€¥˜¡½ÁÑ¥½¸À¥ì((€€€€€€€€€€€€€€€½ÁÑ¥½¸À¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€€€€€€€€€Á±…å•È¹¥‘ñğ(€€€€€€€€€€€€€€€€€€€€‹¢K¢&ÈÄˆì((€€€€€€€€€€€ô(((€€€€€€€€€€€½¹ÍĞ½ÁÑ¥½¸Äô(€€€€€€€€€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í¡…É=ÁÑ¥½¸Äˆ¤ì(((€€€€€€€€€€€¥˜¡½ÁÑ¥½¸Ä¥ì((€€€€€€€€€€€€€€€½ÁÑ¥½¸Ä¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€€€€€€€€€Á±…å•ÈÈ(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€Á±…å•ÈÈ¹¥(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€‹¢K¢&ÈË¾ò#–Âkšr«–&×–îë¾ò$ˆì(((€€€€€€€€€€€€€€€½ÁÑ¥½¸Ä¹‘¥Í…‰±•ô(€€€€€€€€€€€€€€€€€€€€…Á±…å•ÈÈì((€€€€€€€€€€€ô((€€€€€€€€€€€½¹ÍĞ½ÁÑ¥½¸Èô(€€€€€€€€€€€€€€€€ ‰…ÕÑ½M•ÑÑ¥¹Í¡…É=ÁÑ¥½¸Èˆ¤ì((€€€€€€€€€€€¥˜¡½ÁÑ¥½¸È¥ì(€€€€€€€€€€€€€€€½ÁÑ¥½¸È¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€€€€€€€€Á±…å•ÈÌ(€€€€€€€€€€€€€€€€€€€€üÁ±…å•ÈÌ¹¥(€€€€€€€€€€€€€€€€€€€€è€‹¢K¢&ÈÏ¾ò#–Âkšr«–&×–îë¾ò$ˆì(€€€€€€€€€€€€€€€½ÁÑ¥½¸È¹‘¥Í…‰±•ô…Á±…å•ÈÌì(€€€€€€€€€€€ô(((€€€€€€€€€€€¡…É…Ñ•ÉM•±•Ğ¹Ù…±Õ”ôˆÀˆì((€€€€€€€ô(((€€€€€€€Íİ¥Ñ¡ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•È (€€€€€€€€€€€ÑÉÕ”(€€€€€€€€¤ì((€€€ô(((€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€‰Í¡½Üˆ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸‰½ÉÉ½İ±•µ•¹Ñ%¹Ñ½5½‘…° (€€€•±•µ•¹Ğ°(€€€‰½‘å°(¥ì((€€€¥˜ …•±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘±•µ•¹Ğô(€€€€€€€•±•µ•¹Ğì((€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘A…É•¹Ğô(€€€€€€€•±•µ•¹Ğ¹Á…É•¹Ñ9½‘”ì((€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘9•áÑM¥‰±¥¹œô(€€€€€€€•±•µ•¹Ğ¹¹•áÑM¥‰±¥¹œì(((€€€‰½‘å°¹…ÁÁ•¹‘¡¥± (€€€€€€€•±•µ•¹Ğ(€€€€¤ì(((€€€•±•µ•¹Ğ¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€‰‰±½¬ˆì()ô(((¼¨(€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¢K¢&Ë¦‚¦v‹¢š¢ô(€€ƒ–r£–B3’â–/¢š[ª_¢‡–"š>o–"¦‚¾ò'¾òh(€€ƒš*+3–’új–Òƒš¶ã’ö77¦gšº×¦
+?¢ò¿š*÷š"C6£®,(€€ƒ–÷–ò?¾ò1±½Í•!½µ••…ÑÕÉ” §¾ò#šVÓ–/¦^s¢š[ª_¾ò$(€€ƒ¢Ş}Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ §¾ò#–>«šb¿š>o’â–,(€€ƒ–"¦‚¢š[ª_¦
+¦Z/¢F_¾ò'¦÷¢šR£–"Ã–B3’â––_š¶ã’ö4(€€ƒ¦
+?¢ò¿¾ò3’â7¢š¦7¢’–¾¯–§š²‡(¨¼()™Õ¹Ñ¥½¸É•ÍÑ½É•	½ÉÉ½İ•‘±•µ•¹Ğ ¥ì((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òk–#š*+–>¿¢÷¢Š¯¦jÇ¢^?jº·¦‚·–"š>l(€€€€€€ƒ–6–†+š‹–ú§¦†¿’ë¾ò3’â7º‡¦gš²‡–jšb¿–N«–,(€€€€€€ƒ¦‚¦v‹¾ò3¦÷¢š–#¢fWB¾ò3¢Ş}¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘±•µ•¹Ğ(€€€€€€ƒšb¿’â7šb½¹Õ±³‡¦^s¾ò#6£®/j’â’î÷.š/¾ò'(€€€€¨¼((€€€¥˜¡¡½µ••…ÑÕÉ•!¥‘‘•¹Mİ¥Ñ¡…É¥ì((€€€€€€€¡½µ••…ÑÕÉ•!¥‘‘•¹Mİ¥Ñ¡…É¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€€€€€ˆˆì(((€€€€€€€¡½µ••…ÑÕÉ•!¥‘‘•¹Mİ¥Ñ¡…Éô(€€€€€€€€€€€¹Õ±°ì((€€€ô(((€€€¥˜ …¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘±•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘±•µ•¹Ğ¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€‰¹½¹”ˆì(((€€€¥˜ (€€€€€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘9•áÑM¥‰±¥¹œ€˜˜(€€€€€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘9•áÑM¥‰±¥¹œ¹Á…É•¹Ñ9½‘”ôôô(€€€€€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘A…É•¹Ğ(€€€€¥ì((€€€€€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘A…É•¹Ğ¹¥¹Í•ÉÑ	•™½É” (€€€€€€€€€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘±•µ•¹Ğ°(€€€€€€€€€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘9•áÑM¥‰±¥¹œ(€€€€€€€€¤ì((€€€ô(€€€•±Í”¥˜¡¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘A…É•¹Ğ¥ì((€€€€€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘A…É•¹Ğ¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘±•µ•¹Ğ(€€€€€€€€¤ì((€€€ô(((€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘±•µ•¹Ğô(€€€€€€€¹Õ±°ì((€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘A…É•¹Ğô(€€€€€€€¹Õ±°ì((€€€¡½µ••…ÑÕÉ•	½ÉÉ½İ•‘9•áÑM¥‰±¥¹œô(€€€€€€€¹Õ±°ì()ô(()™Õ¹Ñ¥½¸±½Í•!½µ••…ÑÕÉ” ¥ì((€€€½¹ÍĞµ½‘…°ô(€€€€€€€€ ‰¡½µ••…ÑÕÉ•5½‘…°ˆ¤ì((€€€½¹ÍĞÉ•±•…Í•UÁ‘…Ñ”ô(€€€€€€€İ¥¹‘½Ü¹½ÕÉMåµ‰½±ÍI•±•…Í•UÁ‘…Ñ”ì((€€€¥˜ (€€€€€€€É•±•…Í•UÁ‘…Ñ”˜˜(€€€€€€€ÑåÁ•½˜É•±•…Í•UÁ‘…Ñ”¹Í¡½Õ±‘AÉ•Ù•¹ÑM¡…É•‘5½‘…±±½Í”ôôô‰™Õ¹Ñ¥½¸ˆ˜˜(€€€€€€€É•±•…Í•UÁ‘…Ñ”¹Í¡½Õ±‘AÉ•Ù•¹ÑM¡…É•‘5½‘…±±½Í” ¤(€€€€¥ì(€€€€€€€¥˜¡ÑåÁ•½˜É•±•…Í•UÁ‘…Ñ”¹…¹¹½Õ¹•½É•‘1½¬ôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€€€€€É•±•…Í•UÁ‘…Ñ”¹…¹¹½Õ¹•½É•‘1½¬ ¤ì(€€€€€€€ô(€€€€€€€É•ÑÕÉ¸™…±Í”ì(€€€ô((€€€¥˜ (€€€€€€€É•±•…Í•UÁ‘…Ñ”˜˜(€€€€€€€ÑåÁ•½˜É•±•…Í•UÁ‘…Ñ”¹½¹M¡…É•‘5½‘…±±½Í•ôôô‰™Õ¹Ñ¥½¸ˆ(€€€€¥ì(€€€€€€€É•±•…Í•UÁ‘…Ñ”¹½¹M¡…É•‘5½‘…±±½Í• ¤ì(€€€ô(((€€€¥˜¡µ½‘…°¥ì((€€€€€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€‰Í¡½Üˆ(€€€€€€€€¤ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾òk¦^s¦Z'¢š[ª_šf¾ò3–ššzs––_R£¦8(€€€€€€€€€€ƒ3¢K¢&Ë¦‚¦v‹R£j–*ƒ–¾³š¢–ò?7¾ò3’â’öÔ(€€€€€€€€€€ƒš.ÿš:'¾ò3’â7šr–öÇ¦~ÿ’â/š²‡¦Z/–V–ê\¿’îï–.d(€€€€€€€€€€ƒ¦g¢»’â¢"³–’Ÿ–Â?j¢š[ª_(€€€€€€€€¨¼((€€€€€€€½¹ÍĞ‰½àô((€€€€€€€€€€€µ½‘…°¹ÅÕ•ÉåM•±•Ñ½È (€€€€€€€€€€€€€€€€ˆ¹¡½µ”µ™•…ÑÕÉ”µµ½‘…°µ‰½àˆ(€€€€€€€€€€€€¤ì(((€€€€€€€¥˜¡‰½à¥ì((€€€€€€€€€€€‰½à¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€€€€€‰İ¥‘”ˆ(€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾òk¢Ş’â+¦v‹–*İ¥‘—šb¿–B3’âÖ¾ò0(€€€€€€€€€€ƒ¦^s¦Z'¢š[ª_šf–’[–Æ“¦»ö§j¹¼µÁ…‘‘¥¹œ(€€€€€€€€€€ƒ’æ¢š’â’ö×š.ÿš:'(€€€€€€€€¨¼((€€€€€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€‰¹¼µÁ…‘‘¥¹œˆ(€€€€€€€€¤ì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾òk¢Ş}¹¼µÁ…‘‘¥¹Ÿ–B3’âÖšRÛ–ÂûŠSŠP(€€€€€€€€€€ƒ¢«–.Wš"Ã¦²—¢¢·–ºk¢š[ª_R£j‘½¬µ‰½ÑÑ½´(€€€€€€€€€€ƒ¾ò#¢Êó–êW¦†¿’ë¾ò'’æ¢š’â’ö×š.ÿš:'¾ò3’â7šr(€€€€€€€€€€ƒ¢ºO’â/š²‡¦Z/–V–ê\¿’îï–.g¦g¢»’â¢"³ö»’â´(€€€€€€€€€€ƒ¢š[ª_¢Š¯¢ª“––_R£¢Êó–êWš¢–ò?(€€€€€€€€¨¼((€€€€€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€‰‘½¬µ‰½ÑÑ½´ˆ(€€€€€€€€¤ì((€€€€€€€€¼¨Xàç¾òk’îï–.g–Â#R£&#–z/¢"–[–ÆÁ…¸µäƒ–>«–r£’îï–.g¦Z/–Všf–¶c–r£€¨¼(€€€€€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€‰ÅÕ•ÍĞµµ½‘”ˆ(€€€€€€€€¤ì((€€€ô((€€€Í•ÑEÕ•ÍÑQ½Õ¡5½‘” (€€€€€€€™…±Í”(€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òk¢Ş}İ¥‘”½¹¼µÁ…‘‘¥¹Ÿšb¿–B3’âÖ(€€€€€€ƒšRÛ–Âû–.W’ös¾ò3¦^s¦Z'¢š[ª_šfš*+¾òš2'¦"W¦7ö»–nx(€€€€€€ƒ¦jÇ¢^?¾ò3¦ÿ–7’â/š²‡¦Z/–V–ê\¿’îï–.g¦g¢»’â¢"°(€€€€€€ƒ¢š[ª_šfšºcVg¦†¿’ë(€€€€¨¼((€€€½¹ÍĞ¡•±Á	Ñ¸ô(€€€€€€€€ ‰ÍÑ…ÑÕÍ!•±Á	ÕÑÑ½¸ˆ¤ì(((€€€¥˜¡¡•±Á	Ñ¸¥ì((€€€€€€€¡•±Á	Ñ¸¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€€€€€‰¹½¹”ˆì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò33¢«–.Wš"Ã¦²—jš†¸¸»––_R£’â˜(€€€€€€ƒšr–úš2'¦"W–7š"Ã¦²—’â·š‚çšr³šÊKšr'–>7š'7š^¦
++¦
+–ò×š"«–r[¾ò0(€€€€€€ƒ3–£–Æ³šŸš*¢÷¦‚C¢š÷7š2'¦"W–ë>û–r£¢«–.Wš"Ã¦²—¢¢·–ºk¢š[ª_’â+¾ò'¾òh(€€€€€€ƒ¢Ş’â+¦v‰ÍÑ…ÑÕÍ!•±Á	ÕÑÑ½»–B3’â–-‰ÕŸšò?’ê–B3’â–/–rÃšZä(€€€€€€ƒšÊK¦7ö»ŠSŠQÍ­¥±±AÉ•Ù¥•İ!•…‘•É	ÕÑÑ½»–>«šr'–r (€€€€€€Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ §¢‡¢Š¯¢¢·š"C¦†¿’è¿¦jÇ¢^?¾ò3–>«¢š:§–ºØ(€€€€€€ƒ¦Ë¦;’âš²‡¢K¢&Ë¢š[ª_j3š*¢÷7–"¦‚¾ò3¦g¦†š2'¦"Wj(€€€€€€¥¹±¥¹”ÍÑå±”¹‘¥ÍÁ±…çšr–s–r ‰¥¹±¥¹”µ‰±½¬‹¾ò0(€€€€€€ƒ’æ/–ú3’â7º‡¦Z/’î¦êó¢š[ª_¾ò#¢«–.Wš"Ã¦²—¢¢·–ºk–V–ê_’îï–.gŠ›Š›¾ò$(€€€€€€ƒ¦÷šršºcVg¦†¿’ë¾ò3–nƒ
+ë–"–"¦‚¢Ş¦^s¢š[ª_šb¿–§šŠw’â7–B3¢Ş¿–úG¾ò0(€€€€€€ƒ¦^s¢š[ª_¦
+¦
++–:šr³šÊKšr'¦7ö»–"Ã–º¦g¢‡¢s’â+¢Ş|(€€€€€€ÍÑ…ÑÕÍ!•±Á	ÕÑÑ½»’âš¢jšRÛ–Âû¦7ö»(€€€€¨¼((€€€½¹ÍĞÍ­¥±±AÉ•Ù¥•İ	Ñ¸ô(€€€€€€€€ ‰Í­¥±±AÉ•Ù¥•İ!•…‘•É	ÕÑÑ½¸ˆ¤ì(((€€€¥˜¡Í­¥±±AÉ•Ù¥•İ	Ñ¸¥ì((€€€€€€€Í­¥±±AÉ•Ù¥•İ	Ñ¸¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€€€€€‰¹½¹”ˆì((€€€ô(((€€€É•ÍÑ½É•	½ÉÉ½İ•‘±•µ•¹Ğ ¤ì((€€€¥˜¡İ¥¹‘½Ü¹Íå¹¡…É…Ñ•ÉQ½Õ¡5½‘”¥ì(€€€€€€€İ¥¹‘½Ü¹Íå¹¡…É…Ñ•ÉQ½Õ¡5½‘” ¤ì(€€€ô()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3¢K¢&Ë¦‚¦v‹šVÓ–B (€€ƒ¢w–
+d¿¢÷–*o–ğ¿š*¢÷’â'–/–"¦‚¾ò'¾òh(€€ƒ¢Ş}‰½ÉÉ½İ±•µ•¹Ñ%¹Ñ½5½‘…° §šb¿–B3’âš.o¾ò0(€€ƒ–>«šb¿¦gš²‡–jšb¿šVÓ–/¢3–2¿.š,¿š*¢÷¦‚¦vˆ(€€ƒ¾ò#šr³’ú–ÂÇ–¶c–r£–ŞËÚOšâ³¢¦›¦§–ºkj–º3šVÓ¦‚¦v‹¾ò0(€€ƒ’â7šb¿¦7–¾¯’â––_šZÃj¾ò'¾ò3–†{¦Ë¢K¢&Ë¢š[ª_¢‡j(€€€¡…É…Ñ•ÉQ…‰½¹Ñ•¹Ó–ºç–f£–:–rÃ¦†¿’ë((€€ƒ–"š>o–"¦‚šf¾ò3–#š*+3’â+’â–/–"¦‚–¢ÖÃj(€€ƒ¦‚¦v‹7š¶ã’ö7¾ò3–7–šZÃj¦‚¦v‹¦Ë’úŠSŠP(€€ƒ–B3’âšf¦ZO–>«šršr'’â–/¦‚¦v‹¢Š¯–¢ÖÃ¾ò3’â7šr(€€ƒ–§–/–"¦‚j–Ÿ–ºçZ+–r£’â¢Öß(¨¼((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33’â+¦v‹¦‚·–<(€€ƒš‚çšr³šÊK–>7š'7ŠSŠS¦g–/–V?¦†3šb¿rj¾ò3’æ/–&4(€€ƒ¦‚·–?j½¹±¥¯–>«šb¿–"š>o–"¦‚¾ò3–º3–£šÊKšr$(€€ƒrj–"š>o¢K¢&Ë¾ò'¾òh(€€ƒ¦î{¦‚·–?šf¾ò3š*+.š,¿¢3–2¿š*¢÷’â'–/¦‚¦vˆ(€€ƒ–B¢«j3n»–&7š¶–r£r/–N«–/¢K¢&Ë7.š,(€€ƒ’âš²‡–£¦£¢¢·š"C–B3’â–/¢K¢&Ë¾ò3’â›–Fó–>¯’â'–,(€€ƒ¦‚¦v‹–B¢«jV¯¦v‹šnÓšZÃ–÷–ò?ŠSŠS’â7º‡:§–ºØ(€€ƒ>û–r£š¶–r£r/–N«–/–"¦‚¾ò3–"––÷’æ/–ú3V¯¦vˆ(€€ƒ¦÷šb¿–Â7j¾ò3’â7R£¶':§–ºÛ¢«–ŞÇ–7¦î{’âš²„(€€ƒ–"¦‚š&7šnÓšZÃ((€€ƒ’â'–/¦‚¦v‹R£j.š/¢º+šVãš‚ó–ò?’â7’âš¢Œ(€€ƒ¾ò!ÍÑ…ÑÕÍ¡…É…Ñ•É%¹‘•à¼(€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•ãšb¼Ãš"XÇjšVã–¶_¾ò0(€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•Ëšb¼‰™¥É”‹¾ò<(€€€‰Á±…å•ÈÈ‹¦g¢»–¶_’âË¾ò'¾ò3¦g¢‡–B¢«¢ö'š>l(€€ƒš"C–Â7jš‚ó–ò?–7¢Î›–ó¾ò3’â7šb¿’â'–/¦÷¢÷–ÇR (€€ƒ–B3’â–/šVã–¶_(¨¼()™Õ¹Ñ¥½¸Í•±•Ñ¡…É…Ñ•É½ÉQ…‰Ì¡Ñ…É•Ñ%¹‘•à¥ì((€€€½¹ÍĞÑ…É•Ñ¡…É…Ñ•Èô(€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡Ñ…É•Ñ%¹‘•à¤ì((€€€¥˜ …Ñ…É•Ñ¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€ÍÑ…ÑÕÍ¡…É…Ñ•É%¹‘•àô(€€€€€€€Ñ…É•Ñ%¹‘•àì((€€€=‰©•Ğ¹­•åÌ (€€€€€€€Á•¹‘¥¹MÑ…ÑÌ(€€€€¤¹™½É…  (€€€€€€€ÍÑ…Ğôùì((€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÍmÍÑ…Ñtô(€€€€€€€€€€€€€€€€Àì((€€€€€€€ô(€€€€¤ì((€€€ÕÁ‘…Ñ•MÑ…ÑÕÍAÉ•Ù¥•Ü ¤ì(((€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•àô(€€€€€€€Ñ…É•Ñ%¹‘•àì((€€€É•¹‘•É%¹Ù•¹Ñ½Éä ¤ì(((€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•Èô(€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É-•ä¡Ñ…É•Ñ%¹‘•à¤ì((€€€É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ¢ºO¢Š¯¦ã’â·j¦‚·–?šr'¢š[¢šë’â+j–6–"”(€€€€€€ƒ¾ò#’ú/–š–’[–r#¢º+’ê»¾ò'¾ò3:§–ºÛš&7r/–ú_–ë’ú(€€€€€€ƒn»–&7¦ãjšb¿–N«’â–/¢K¢&Ë(€€€€¨¼((€€€lÀ°Ä°Ét¹™½É…  (€€€€€€€¤ôùì((€€€€€€€€€€€½¹ÍĞ…Ù…Ñ…É°ô(€€€€€€€€€€€€€€€€ ‰¡…É…Ñ•ÉÙ…Ñ…Èˆ­¤¤ì(((€€€€€€€€€€€¥˜¡…Ù…Ñ…É°¥ì(€€€€€€€€€€€€€€€½¹ÍĞÍ•±•Ñ•õ¤ôôõÑ…É•Ñ%¹‘•àì(€€€€€€€€€€€€€€€…Ù…Ñ…É°¹ÍÑå±”¹½Á…¥ÑäõÍ•±•Ñ•€ü€ˆÄˆ€è€ˆ¸Ôˆì(€€€€€€€€€€€€€€€…Ù…Ñ…É°¹±…ÍÍ1¥ÍĞ¹Ñ½±” ‰¥ÌµÕÉÉ•¹Ğµ¡…É…Ñ•Èˆ±Í•±•Ñ•¤ì(€€€€€€€€€€€€€€€½¹ÍĞ¡½¥”õ…Ù…Ñ…É°¹±½Í•ÍĞ ˆ¹¡…É…Ñ•ÈµÍ¡½İ…Í”µ¡½¥”ˆ¤ì(€€€€€€€€€€€€€€€¥˜¡¡½¥”¥ì¡½¥”¹±…ÍÍ1¥ÍĞ¹Ñ½±” ‰¥ÌµÕÉÉ•¹Ğµ¡…É…Ñ•Èˆ±Í•±•Ñ•¤ìô(€€€€€€€€€€€ô((€€€€€€€ô(€€€€¤ì()ô(()™Õ¹Ñ¥½¸Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ¡Ñ…‰9…µ”¥ì((€€€É•ÍÑ½É•	½ÉÉ½İ•‘±•µ•¹Ğ ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33¢şS–n{š†š†(€€€€€€ƒš^¦
++–’k’â–/¾òš2'¦"W7¾ò3–>«–r£¢÷–*o–ó–"¦‚(€€€€€€ƒ¦†¿’ë¾ò'¾òh(€€€€€€ƒš¾?š²‡–"–"¦‚¦÷¦7šZÃ–"“šZß’âš²‡¾ò3–"–"À(€€€€€€€‰ÍÑ…ÑÕÌ‹š&7¦†¿’ë¾ò3–"–"Ã–Û’î[–"¦‚(€€€€€€ƒ¾ò#ÚO¦¦_šÆƒ–"¦4¿š*¢ô¿¢3–2¾ò'¢«–.W¦jÇ¢^?¾ò0(€€€€€€ƒ’â7R£–r£š¾?–/–"¦‚–B¢«¢fWB(€€€€¨¼((€€€½¹ÍĞ¡•±Á	Ñ¸ô(€€€€€€€€ ‰ÍÑ…ÑÕÍ!•±Á	ÕÑÑ½¸ˆ¤ì(((€€€¥˜¡¡•±Á	Ñ¸¥ì((€€€€€€€¡•±Á	Ñ¸¹ÍÑå±”¹‘¥ÍÁ±…äô((€€€€€€€€€€€Ñ…‰9…µ”ôôô‰ÍÑ…ÑÕÌˆ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰¥¹±¥¹”µ‰±½¬ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‰¹½¹”ˆì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33–£š*¢÷¦‚C¢šô(€€€€€€ƒšZ–¶_š2'¦"W¾ò3š'¢¦ËšRû–r£š*¢÷¦‚¦v‹j¢şS–nx(€€€€€€ƒ’â/¦v‹7¾ò'¾òh(€€€€€€ƒ¢Ş}ÍÑ…ÑÕÍ!•±Á	ÕÑÑ½»–B3’â––_¦
+?¢ò¿¾ò3–>«šr$(€€€€€€ƒ–"–"Ã3š*¢÷7–"¦‚š&7¦†¿’ë¾ò3–Û’î[–"¦‚(€€€€€€ƒ¢«–.W¦jÇ¢^?(€€€€¨¼((€€€½¹ÍĞÍ­¥±±AÉ•Ù¥•İ	Ñ¸ô(€€€€€€€€ ‰Í­¥±±AÉ•Ù¥•İ!•…‘•É	ÕÑÑ½¸ˆ¤ì(((€€€¥˜¡Í­¥±±AÉ•Ù¥•İ	Ñ¸¥ì((€€€€€€€Í­¥±±AÉ•Ù¥•İ	Ñ¸¹ÍÑå±”¹‘¥ÍÁ±…äô((€€€€€€€€€€€Ñ…‰9…µ”ôôô‰Í­¥±°ˆ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰¥¹±¥¹”µ‰±½¬ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‰¹½¹”ˆì((€€€ô(((€€€½¹ÍĞ½¹Ñ…¥¹•Èô(€€€€€€€€ ‰¡…É…Ñ•ÉQ…‰½¹Ñ•¹Ğˆ¤ì(((€€€¥˜ …½¹Ñ…¥¹•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÁ…•%‘5…Àõì(€€€€€€€ÍÑ…ÑÕÌè‰ÍÑ…ÑÕÍA…”ˆ°(€€€€€€€¥¹Ù•¹Ñ½Éäè‰¥¹Ù•¹Ñ½ÉåA…”ˆ°(€€€€€€€Í­¥±°è‰Í­¥±±A…”ˆ°(€€€€€€€•áÁA½½°è‰¡½µ•áÁA½½±…Éˆ(€€€ôì(((€€€½¹ÍĞÁ…•°ô(€€€€€€€€ (€€€€€€€€€€€Á…•%‘5…ÁmÑ…‰9…µ•t(€€€€€€€€¤ì(((€€€¥˜ …Á…•°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€‰½ÉÉ½İ±•µ•¹Ñ%¹Ñ½5½‘…° (€€€€€€€Á…•°°(€€€€€€€½¹Ñ…¥¹•È(€€€€¤ì((€€€¥˜¡İ¥¹‘½Ü¹ØÜáÁÁ±å¡…É…Ñ•É%¹Ù•¹Ñ½Éå1…å½ÕĞ¥ì(€€€€€€€İ¥¹‘½Ü¹ØÜáÁÁ±å¡…É…Ñ•É%¹Ù•¹Ñ½Éå1…å½ÕĞ ¤ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33’â+¦v‹–ŞËÚL(€€€€€€ƒ–>¿’î—–"š>o¢K¢&Ë’ê¾ò3’â/¦v‹º·¦‚·¦
+š:Kš.ÿš:'7¾ò'¾òh(€€€€€€ƒ¦g’â'–/¦‚¦v‹–B¢«–:šr³–ÂÇšr'j3Š^¢K¢&Ë–B7ŠZÛ4(€€€€€€ƒº·¦‚·–"š>o–6–†+¾ò3–¦Ë¢K¢&Ë¢š[ª_’æ/–ú3¢Ş|(€€€€€€ƒ’â+šZçšZÃ–*ƒj¦‚·–?¦ãšN¦7¢’’ê¾ò3¦g¢‡š*+–º(€€€€€€ƒ¦jÇ¢^?š:'ŠSŠS–>«–r£3–¦Ë¢K¢&Ë¢š[ª_¦†¿’ë4(€€€€€€ƒ¦g–/š–Š¦jÇ¢^?¾ò3¦‚¦v‹šr³¢ê¯–ššzs’æ/–ú3¢Š¬(€€€€€€ƒ–Z»6£–R£–r£–"—j–rÃšZç¾ò3’â7–>_–öÇ¦~ü(€€€€€€ƒ¾ò#–nƒ
+ëšb¿–r£–¦Ë’úŠë–ºk¢š¦†¿’ëj¦g–,(€€€€€€ƒšf¦ZO¦î{š&7¦jÇ¢^?¾ò3’â7šb¿–¾¯š¶ï–r£¦‚¦v‹šr³¢ê¬(€€€€€€ƒjMO’â+¾ò'(€€€€¨¼((€€€½¹ÍĞÍİ¥Ñ¡…É‘%‘5…Àõì(€€€€€€€ÍÑ…ÑÕÌè‰ÍÑ…ÑÕÍ¡…É…Ñ•ÉMİ¥Ñ¡…Éˆ°(€€€€€€€¥¹Ù•¹Ñ½Éäè‰¥¹Ù•¹Ñ½Éå¡…É…Ñ•ÉMİ¥Ñ¡…Éˆ°(€€€€€€€Í­¥±°è‰Í­¥±±¡…É…Ñ•ÉMİ¥Ñ¡…Éˆ(€€€ôì(((€€€½¹ÍĞÍİ¥Ñ¡…Éô(€€€€€€€€ (€€€€€€€€€€€Íİ¥Ñ¡…É‘%‘5…ÁmÑ…‰9…µ•t(€€€€€€€€¤ì(((€€€¥˜¡Íİ¥Ñ¡…É¥ì((€€€€€€€Íİ¥Ñ¡…É¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€€€€€‰¹½¹”ˆì(((€€€€€€€¡½µ••…ÑÕÉ•!¥‘‘•¹Mİ¥Ñ¡…Éô(€€€€€€€€€€€Íİ¥Ñ¡…Éì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ¦‚’úÿ¢ºOn»–&7¦ã’â·j–"¦‚š2'¦"Wšr$(€€€€€€ƒ¢š[¢šë’â+j–6–"—¾ò#’ú/–š–êW¢&Ë–>7f÷¾ò'¾ò0(€€€€€€ƒ:§–ºÛš&7r/–ú_–ë’ún»–&7š¶–r£r/–N«–/–"¦‚(€€€€¨¼((€€€l‰áÁA½½°ˆ°‰MÑ…ÑÕÌˆ°‰M­¥±°‰t¹™½É…  (€€€€€€€¹…µ”ôùì((€€€€€€€€€€€½¹ÍĞ‰Ñ¸ô(€€€€€€€€€€€€€€€€ ‰¡…É…Ñ•ÉQ…‰	Ñ¸ˆ­¹…µ”¤ì(((€€€€€€€€€€€¥˜¡‰Ñ¸¥ì((€€€€€€€€€€€€€€€‰Ñ¸¹ÍÑå±”¹½Á…¥Ñäô((€€€€€€€€€€€€€€€€€€€¹…µ”¹Ñ½1½İ•É…Í” ¤ôôô(€€€€€€€€€€€€€€€€€€€Ñ…‰9…µ”¹Ñ½1½İ•É…Í” ¤(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€ˆÄˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€ˆ¸ÔÔˆì((€€€€€€€€€€€ô((€€€€€€€ô(€€€€¤ì()ô(()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•½±‘¥ÍÁ±…ä ¥ì((€€€½¹ÍĞÙ…±Õ”õ5…Ñ ¹µ…à À±5…Ñ ¹™±½½È¡9Õµ‰•È¡½±¥ñğÀ¤¤ì((€€€l(€€€€€€€€ ‰¡½µ•½±‘Y…±Õ”ˆ¤°(€€€€€€€€ ‰¥¹Ù•¹Ñ½Éå½±‘Y…±Õ”ˆ¤(€€€t¹™½É… ¡•°ôùì(€€€€€€€¥˜¡•°¥ì(€€€€€€€€€€€•°¹Ñ•áÑ½¹Ñ•¹ĞõÙ…±Õ”¹Ñ½1½…±•MÑÉ¥¹œ ‰é µQ\ˆ¤ì(€€€€€€€ô(€€€ô¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒ–V–ê\(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸É•¹‘•ÉM¡½Á½¹Ñ•¹Ğ ¥ì((€€€½¹ÍĞ…É‘ÌõÍ¡½Á%Ñ•µÌ¹µ…À¡Í¡½Á%Ñ•´ôùì(€€€€€€€½¹ÍĞ½Õ¹Ğõ•ÑA½Ñ¥½¹½Õ¹Ğ¡Í¡½Á%Ñ•´¹¥¤ì(€€€€€€€½¹ÍĞÉ•Í½ÕÉ•1…‰•°õÍ¡½Á%Ñ•´¹É•Í½ÕÉ”ôôô‰¡Àˆ€ü€‰!@ˆ€è€‰M@ˆì(€€€€€€€½¹ÍĞ•™™•ÑQ•áĞõÍ¡½Á%Ñ•´¹É•½Ù•ÉåA•É•¹ĞøôÄÀÀ(€€€€€€€€€€€€üƒ–n{–ú§š&šr$‘íÉ•Í½ÕÉ•1…‰•±õ€(€€€€€€€€€€€€èƒ–n{–ú§šr–’œ‘íÉ•Í½ÕÉ•1…‰•±÷j€‘íÍ¡½Á%Ñ•´¹É•½Ù•ÉåA•É•¹Ñô•€ì((€€€€€€€½¹ÍĞ¡…ÍAÉ¥”õ9Õµ‰•È¹¥Í¥¹¥Ñ”¡Í¡½Á%Ñ•´¹ÁÉ¥”¤ì(€€€€€€€½¹ÍĞ‘¥Í…‰±•ô…¡…ÍAÉ¥”ñğ½±ñÍ¡½Á%Ñ•´¹ÁÉ¥”ì(€€€€€€€½¹ÍĞ‰ÕÑÑ½¹Q•áĞô…¡…ÍAÉ¥”(€€€€€€€€€€€€ü€‹–çš‚ó–ú–ºhˆ(€€€€€€€€€€€€è€‘íÍ¡½Á%Ñ•´¹ÁÉ¥•ôƒ¦G–æ€ì((€€€€€€€É•ÑÕÉ¸€(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µ…É€‘íÍ¡½Á%Ñ•´¹É•Í½ÕÉ•ôˆø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µ…Éµ¡•…ˆø(€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µÑåÁ”ˆø‘íÉ•Í½ÕÉ•1…‰•±ôğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µÍÑ½¬ˆûš2šr$€‘í½Õ¹Ñôğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µ¹…µ”ˆø‘íÍ¡½Á%Ñ•´¹¹…µ•ôğ½‘¥Øø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µ•™™•Ğˆø‘í•™™•ÑQ•áÑôğ½‘¥Øø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µÁÕÉ¡…Í”µÉ½Üˆø(€€€€€€€€€€€€€€€€€€€€ñ±…‰•°™½Èô‰Í¡½ÁEÕ…¹Ñ¥Ñä´‘íÍ¡½Á%Ñ•´¹¥‘ôˆûšVã¦<ğ½±…‰•°ø(€€€€€€€€€€€€€€€€€€€€ñ¥¹ÁÕĞ(€€€€€€€€€€€€€€€€€€€€€€€¥ô‰Í¡½ÁEÕ…¹Ñ¥Ñä´‘íÍ¡½Á%Ñ•´¹¥‘ôˆ(€€€€€€€€€€€€€€€€€€€€€€€±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µÅÕ…¹Ñ¥Ñäˆ(€€€€€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰¹Õµ‰•Èˆ(€€€€€€€€€€€€€€€€€€€€€€€¥¹ÁÕÑµ½‘”ô‰¹Õµ•É¥Œˆ(€€€€€€€€€€€€€€€€€€€€€€€µ¥¸ôˆÄˆ(€€€€€€€€€€€€€€€€€€€€€€€µ…àôˆääääˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑ•ÀôˆÄˆ(€€€€€€€€€€€€€€€€€€€€€€€Ù…±Õ”ôˆÄˆ(€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€€€€€±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸Í¡½ÀµÁ½Ñ¥½¸µ‰Õäˆ(€€€€€€€€€€€€€€€€€€€€€€€€‘í‘¥Í…‰±•€ü€‰‘¥Í…‰±•ˆ€è€ˆ‰ô(€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬ô‰‰ÕåM¡½Á%Ñ•´ œ‘íÍ¡½Á%Ñ•´¹¥‘ôœ±‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% Í¡½ÁEÕ…¹Ñ¥Ñä´‘íÍ¡½Á%Ñ•´¹¥‘ôœ¤¹Ù…±Õ”¤ˆ(€€€€€€€€€€€€€€€€€€€€ø‘í‰ÕÑÑ½¹Q•áÑôğ½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€ì(€€€ô¤¹©½¥¸ ˆˆ¤ì((€€€É•ÑÕÉ¸€(€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µ¥¹Ñ•É™…”ˆø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µ¹½Ñ”ˆû–>«¢Ê§–R¸!C¾ò=M@ƒ–n{–ú§¢^—šÂĞğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í¡½ÀµÁ½Ñ¥½¸µ±¥ÍĞˆø‘í…É‘Íôğ½‘¥Øø(€€€€€€€€ğ½‘¥Øø(€€€€ì)ô(()™Õ¹Ñ¥½¸‰ÕåM¡½Á%Ñ•´¡¥Ñ•µ%±É•ÅÕ•ÍÑ•‘EÕ…¹Ñ¥Ñä¥ì((€€€½¹ÍĞÍ¡½Á%Ñ•´õ•ÑA½Ñ¥½¹•™¥¹¥Ñ¥½¸¡¥Ñ•µ%¤ì((€€€¥˜ …Í¡½Á%Ñ•´¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜ …9Õµ‰•È¹¥Í¥¹¥Ñ”¡Í¡½Á%Ñ•´¹ÁÉ¥”¤¥ì(€€€€€€€…±•ÉĞ ‹¦g–/¢^—šÂÓj–çš‚ó–Âkšr«¢¢·–ºkˆ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÅÕ…¹Ñ¥Ñäõ5…Ñ ¹µ…à (€€€€€€€€Ä°(€€€€€€€5…Ñ ¹µ¥¸ ääää±5…Ñ ¹™±½½È¡9Õµ‰•È¡É•ÅÕ•ÍÑ•‘EÕ…¹Ñ¥Ñä¥ñğÄ¤¤(€€€€¤ì((€€€½¹ÍĞÑ½Ñ…±AÉ¥”õÍ¡½Á%Ñ•´¹ÁÉ¥”©ÅÕ…¹Ñ¥Ñäì((€€€¥˜¡½±ñÑ½Ñ…±AÉ¥”¥ì(€€€€€€€…±•ÉĞ ‹¦G–æ’â7–’ƒ¾ò3šr³š²‡¦r¢š€ˆ­Ñ½Ñ…±AÉ¥”¹Ñ½1½…±•MÑÉ¥¹œ ‰é µQ\ˆ¤¬ˆƒ¦G–æˆ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜ ……‘‘A½Ñ¥½¹Q½%¹Ù•¹Ñ½Éä¡¥Ñ•µ%±ÅÕ…¹Ñ¥Ñä¤¥ì(€€€€€€€…±•ÉĞ ‹¢3–2–ŞËšîÿ¾ò3š"[¢¦Ë¢^—šÂÓ–ŞËšÊKšr'–>¿R£j–‚Z+¦ë¦ZOˆ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½±õ½±µÑ½Ñ…±AÉ¥”ì((€€€É•‰Õ¥±‘%¹Ù•¹Ñ½ÉåM±½ÑÌ ¤ì(€€€ÕÁ‘…Ñ•½±‘¥ÍÁ±…ä ¤ì(€€€Í…Ù•…µ” ¤ì((€€€½¹ÍĞ‰½‘å°ô ‰¡½µ••…ÑÕÉ•5½‘…±	½‘äˆ¤ì((€€€¥˜¡‰½‘å°¥ì(€€€€€€€‰½‘å°¹¥¹¹•É!Q50õÉ•¹‘•ÉM¡½Á½¹Ñ•¹Ğ ¤ì(€€€ô)ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒ¢K¢&Ë–ÆW’è(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼((¼¨(€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3–>¢–r[¦
+¢¸(€€ƒ3’â+¦v‹¦†¿’ë–ŞË¦Z/šRø¿šr«¦Z/šRû¢K¢&Ë¾ò3’â/¦v‹–"š>l(€€ƒ¢w–
+d¿¢÷–*o–ğ¿š*¢÷7j¢K¢&Ë¦‚¦v‹¾ò'¾òh((€€ƒ’â+š:K¾òk¢K¢&Ë¦‚·–?š‚ó¾ò3–ŞË–&×–îëj¢K¢&Ë¦†¿’è(€€ƒ–Æ³šŸ–r[’è¯–B7¢Ä¯¶'Òk¾ò3¦
+šÊK–&×–îëj¾ò#n»–&4(€€ƒ–>«šr'²³’ê3¢K¢&Ë¦g–/’ö7ö»¾ò'¦†¿’ë¦:[¦‚´¯¢¦:X(€€ƒšŠw’îÛ¾ò3¦î{’â/–:ï–ššzsšŠw’îÛ–ŞËÚO¦Sš"C–ÂÇnÓš:”(€€ƒ¢ŞÏ–ë–&×–îë¢š[ª_((€€ƒ’â/š:K¾òk’â'–/š2'¦"W¾ò#¢w–
+d¿¢÷–*o–ğ¿š*¢÷¾ò'¾ò0(€€ƒnÓš:—–Â;–:ï>ûš"Cj¢3–2¿.š,¿š*¢÷¦‚¦v‹ŠSŠP(€€ƒ¦g’â'–/¦‚¦v‹šr³¢ê¯–ŞËÚOšr'¢K¢&Ë–"š>oº·¦‚´(€€ƒ¾ò!¡…¹•%¹Ù•¹Ñ½Éå¡…É…Ñ•È¼(€€¡…¹•MÑ…ÑÕÍ¡…É…Ñ•È¼(€€¡…¹•M­¥±±¡…É…Ñ•ÉÉÉ½ß¾ò'¾ò3’â7R£–r (€€ƒ¦g¢‡¦7šZÃ–k’â––_¢K¢&Ë–"š>o¦
+?¢ò¿¾ò3nÓš:—šÊÿR (€€ƒ>ûš"C–ŞËÚOšâ³¢¦›¦;j¦‚¦v‹–ÂÇ––÷(¨¼()™Õ¹Ñ¥½¸É•¹‘•É¡…É…Ñ•ÉM¡½İ…Í•½¹Ñ•¹Ğ ¥ì((€€€½¹ÍĞÍ±½ÑÌõl(€€€€€€€Á±…å•È°(€€€€€€€Á±…å•ÈÈ°(€€€€€€€Á±…å•ÈÌ(€€€tì(((€€€±•Ğ¡Ñµ°ô((€€€€€€€€œñ‘¥ØÍÑå±”ô‰‘¥ÍÁ±…äé™±•àí…ÀèÄÁÁàìœ¬(€€€€€€€€©ÕÍÑ¥™äµ½¹Ñ•¹Ğé•¹Ñ•Èíµ…É¥¸µ‰½ÑÑ½´èáÁàìˆøœì(((€€€Í±½ÑÌ¹™½É…  (€€€€€€€€¡¡…É…Ñ•È±Í±½Ñ%¹‘•à¤ôùì((€€€€€€€€€€€¥˜¡¡…É…Ñ•È¥ì(€€€€€€€€€€€€€€€¡Ñµ°¬ô((€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰¡…É…Ñ•ÈµÍ¡½İ…Í”µ¡½¥”ˆÍÑå±”ô‰İ¥‘Ñ èàÙÁàíÑ•áĞµ…±¥¸é•¹Ñ•Èìœ¬(€€€€€€€€€€€€€€€€€€€€ÕÉÍ½ÈéÁ½¥¹Ñ•Èìˆ½¹±¥¬ô‰Í•±•Ñ¡…É…Ñ•É½ÉQ…‰Ì œ¬(€€€€€€€€€€€€€€€€€€€Í±½Ñ%¹‘•à¬(€€€€€€€€€€€€€€€€€€€€œ¤ìˆøœ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø¥ô‰¡…É…Ñ•ÉÙ…Ñ…Èœ¬(€€€€€€€€€€€€€€€€€€€Í±½Ñ%¹‘•à¬(€€€€€€€€€€€€€€€€€€€€œˆ±…ÍÌô‰¡…É…Ñ•ÈµÍ¡½İ…Í”µ…Ù…Ñ…ÈˆÍÑå±”ô‰İ¥‘Ñ èÔÙÁàí¡•¥¡ĞèÔÙÁàíµ…É¥¸èÀ…ÕÑ¼ìœ¬(€€€€€€€€€€€€€€€€€€€€‰½É‘•ÈµÉ…‘¥ÕÌèÔÀ”í‰…­É½Õ¹µ½±½ÈèŒÄÔÄÀÁ„í‰…­É½Õ¹µ¥µ…”éÕÉ°¡pœœ¬(€€€€€€€€€€€€€€€€€€€•Ñ¡…É…Ñ•ÉÉÑİ½É­A…Ñ ¡¡…É…Ñ•È¤¬(€€€€€€€€€€€€€€€€€€€€pœ¤í‰…­É½Õ¹µÍ¥é”é½Ù•Èí‰…­É½Õ¹µÁ½Í¥Ñ¥½¸é•¹Ñ•È€Äà”ìœ¬(€€€€€€€€€€€€€€€€€€€€‰½É‘•ÈèÉÁàÍ½±¥€˜ÁˆĞÈäí‘¥ÍÁ±…äé™±•àí…±¥¸µ¥Ñ•µÌé•¹Ñ•Èìœ¬(€€€€€€€€€€€€€€€€€€€€©ÕÍÑ¥™äµ½¹Ñ•¹Ğé•¹Ñ•Èí™½¹ĞµÍ¥é”èÄáÁàíÑÉ…¹Í¥Ñ¥½¸é½Á…¥Ñä€¸ÄÕÌìˆøœ¬(€€€€€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÅÁàí™½¹Ğµİ•¥¡Ğé‰½±íµ…É¥¸µÑ½ÀèÉÁàìœ¬(€€€€€€€€€€€€€€€€€€€€İ¡¥Ñ”µÍÁ…”é¹½İÉ…Àí½Ù•É™±½Üé¡¥‘‘•¸íÑ•áĞµ½Ù•É™±½Üé•±±¥ÁÍ¥Ììˆøœ¬(€€€€€€€€€€€€€€€€€€€¡…É…Ñ•È¹¥¬(€€€€€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò33š2'–6Òh(€€€€€€€€€€€€€€€€€€€€€€ƒjšf–g¾ò3’â+¦v‹¦‚·–?š†j¶'ÒkšÊKšr'¢Ş¢F\(€€€€€€€€€€€€€€€€€€€€€€ƒ–Š{–*ƒ7¾ò'¾òh(€€€€€€€€€€€€€€€€€€€€€€ƒ¦g–/¶'ÒkšZ–¶_–:šr³šÊKšr%¥“¾ò3ÒSÊçšb¼(€€€€€€€€€€€€€€€€€€€€€€É•¹‘•É¡…É…Ñ•ÉM¡½İ…Í•½¹Ñ•¹Ğ ¤(€€€€€€€€€€€€€€€€€€€€€€ƒÖ–¶_’âËšfVÛ’â/º_––÷nÓš:—–¾¯š¶ï¦É!Q53¾ò0(€€€€€€€€€€€€€€€€€€€€€€ƒ¦g–/–÷–ò?–>«šr'3š&O¦Z/¢K¢&Ë–ö#ª_¦
+’â–"ï4(€€€€€€€€€€€€€€€€€€€€€€ƒšr¢Š¯–Fó–>¯’âš²‡¾ò3’æ/–ú3’â7º‡¶'Òkš;¦êó¢º((€€€€€€€€€€€€€€€€€€€€€€ƒ¾ò#’ú/–š–:ïÚO¦¦_šÆƒ–"¦7¦‚¦v‹š2'–"¦7(€€€€€€€€€€€€€€€€€€€€€€ƒ¢K¢&Ë–6Òk’ê¾ò'¾ò3¦gšº×–¶_’âËš^§–ÂÇ–ŞËÚL(€€€€€€€€€€€€€€€€€€€€€€ƒ¦cš¶ï–r£V¯¦v‹’â+¾ò3šÊKšr'’êëšr–7–n{’úšnÓšZÀ(€€€€€€€€€€€€€€€€€€€€€€ƒ–ºŠSŠS’â7šb¿¢ÎšZgšÊKº_–Â7¾ò3šb¿V¯¦v‹š‚çšr°(€€€€€€€€€€€€€€€€€€€€€€ƒšÊK¢Š¯¦k~—¢š¦7V¯((€€€€€€€€€€€€€€€€€€€€€€ƒ–*ƒ’â–-¥“¾ò3¢ºM¡•­1•Ù•±UÀ §–6Òh(€€€€€€€€€€€€€€€€€€€€€€ƒfóRjVÛ’â/–>¿’î—nÓš:—š&û–"Ã¦g–/–Òƒ(€€€€€€€€€€€€€€€€€€€€€€ƒ–>«šnÓšZÃ¦g’â–Â?–†+šZ–¶_¾ò3’â7R£¦7V¯šVÓ–,(€€€€€€€€€€€€€€€€€€€€€€ƒ–ö#ª_¾ò#¦7V¯šVÓ–/–ö#ª_šrš*+:§–ºÛš¶–r£r,(€€€€€€€€€€€€€€€€€€€€€€ƒj–"¦‚–Ÿ–ºç’æ’â¢ÖßšÒ_š:'¾ò3’æ/–&7š&7’ş»¦8(€€€€€€€€€€€€€€€€€€€€€€ƒ–B3’â¦†{–z/j‰ÕŸ¾ò'(€€€€€€€€€€€€€€€€€€€€¨¼((€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø¥ô‰¡…É…Ñ•ÉÙ…Ñ…É1•Ù•°œ¬(€€€€€€€€€€€€€€€€€€€Í±½Ñ%¹‘•à¬(€€€€€€€€€€€€€€€€€€€€œˆÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÁÁàí½±½ÈèˆÍ„ÔáŒìˆøœ¬(€€€€€€€€€€€€€€€€€€€€‰1Ø¸ˆ­¡…É…Ñ•È¹±•Ù•°¬(€€€€€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆì((€€€€€€€€€€€ô(€€€€€€€€€€€•±Í•ì((€€€€€€€€€€€€€€€½¹ÍĞ•±¥¥‰±”ô(€€€€€€€€€€€€€€€€€€€Í±½Ñ%¹‘•àôôôÄ(€€€€€€€€€€€€€€€€€€€€üÁ±…å•È¹±•Ù•°øôÄÀ(€€€€€€€€€€€€€€€€€€€€è¥ÍQ¡¥É‘¡…É…Ñ•ÉU¹±½­• ¤ì((€€€€€€€€€€€€€€€½¹ÍĞÕ¹±½­Q•áĞô(€€€€€€€€€€€€€€€€€€€Í±½Ñ%¹‘•àôôôÄ(€€€€€€€€€€€€€€€€€€€€ü€‰1Ø¸ÄÃ¢¦:Xˆ(€€€€€€€€€€€€€€€€€€€€è€‹–&7–§–B7j1Ø¸ÔÀˆì(((€€€€€€€€€€€€€€€¡Ñµ°¬ô((€€€€€€€€€€€€€€€€€€€€œñ‘¥ØÍÑå±”ô‰İ¥‘Ñ èØÙÁàíÑ•áĞµ…±¥¸é•¹Ñ•Èìœ¬(€€€€€€€€€€€€€€€€€€€€ÕÉÍ½ÈéÁ½¥¹Ñ•Èí½Á…¥Ñäèœ¬(€€€€€€€€€€€€€€€€€€€€¡•±¥¥‰±”üˆÄˆèˆ¸ÔÔˆ¤¬(€€€€€€€€€€€€€€€€€€€€œìˆ½¹±¥¬ôˆœ¬(€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€•±¥¥‰±”(€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€‰±½Í•!½µ••…ÑÕÉ” ¤í½Á•¹¡…É…Ñ•ÉÉ•…Ñ¥½¸ ˆ¬¡Í±½Ñ%¹‘•à¬Ä¤¬ˆ¤ìˆ(€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€€€€€œˆøœ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥ØÍÑå±”ô‰İ¥‘Ñ èĞÁÁàí¡•¥¡ĞèĞÁÁàíµ…É¥¸èÀ…ÕÑ¼ìœ¬(€€€€€€€€€€€€€€€€€€€€‰½É‘•ÈµÉ…‘¥ÕÌèÔÀ”í‰…­É½Õ¹é±¥¹•…ÈµÉ…‘¥•¹Ğ ÄØÁ‘•œ°ŒÈĞÅŒÄÈ°ŒÄÔÄÀÁ„¤ìœ¬(€€€€€€€€€€€€€€€€€€€€‰½É‘•ÈèÉÁà‘…Í¡•€Œá„Ù„Í„í‘¥ÍÁ±…äé™±•àí…±¥¸µ¥Ñ•µÌé•¹Ñ•Èìœ¬(€€€€€€€€€€€€€€€€€€€€©ÕÍÑ¥™äµ½¹Ñ•¹Ğé•¹Ñ•Èí™½¹ĞµÍ¥é”èÄÙÁàìˆøœ¬(€€€€€€€€€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÅÁàí™½¹Ğµİ•¥¡Ğé‰½±íµ…É¥¸µÑ½ÀèÉÁàìœ¬(€€€€€€€€€€€€€€€€€€€€½±½ÈèŒá„á„á„ìˆøœ¬(€€€€€€€€€€€€€€€€€€€€‹šr«¢¦:Xˆ¬(€€€€€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÁÁàí½±½ÈèŒİ„Ù˜ÕŒìˆøœ¬(€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€•±¥¥‰±”(€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€‹¦î{šN+–&×–îèˆ(€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€Õ¹±½­Q•áĞ(€€€€€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆì((€€€€€€€€€€€ô((€€€€€€€ô(€€€€¤ì(((€€€¡Ñµ°¬ô(€€€€€€€€ˆğ½‘¥Øøˆì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33’â7šb¿¢šš2'’â/–:ì(€€€€€€ƒ–"š>o–"Ã–:šr³¦‚¦v‹¾ò3šb¿¢ššVÓ–B#–"Ã–B3’â–,(€€€€€€ƒV¯¦v‹¢‡7¾ò'¾òh(€€€€€€ƒ–:šr³¦g¢‡šb¿’â'–/3–Â;¦‚7š2'¦"W¾ò3¦î{’â/–:ïšr(€€€€€€ƒ¦^sš:'¦g–/¢š[ª_¢ŞÏ–:ï¢3–2¿.š,¿š*¢ô(€€€€€€ƒ¦‚¦v‹šRçš"C’â'–/3–"¦‚7š2'¦"W¾ò3¦î{’â/–:ì(€€€€€€ƒ–Fó–>­Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ §ŠSŠS’â7šr¦^sš:$(€€€€€€ƒ¢š[ª_¾ò3šb¿š*+–Â7š'¦‚¦v‹j–Ÿ–ºç3–7¦È(€€€€€€€¡…É…Ñ•ÉQ…‰½¹Ñ•¹Ó¦g–/–ºç–f£¢„(€€€€€€ƒ–:–rÃ¦†¿’ë¾ò3¢Ş’æ/–&7–R£’âï–~;’òGš¼¿ÚO¦¦_šÆ€(€€€€€€ƒ–6‡&šb¿–B3’âš.o¾ò3–>«šb¿¦gš²‡–jšb¿šVÓ¦‚(€€€€¨¼((€€€¡Ñµ°¬ô((€€€€€€€€œñ‘¥ØÍÑå±”ô‰‘¥ÍÁ±…äé™±•àí…ÀèÙÁàíµ…É¥¸µ‰½ÑÑ½´èÙÁàìˆøœ¬((€€€€€€€€œñ‰ÕÑÑ½¸¥ô‰¡…É…Ñ•ÉQ…‰	Ñ¹áÁA½½°ˆ±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸ˆœ¬(€€€€€€€€ÍÑå±”ô‰™±•àèÄíÁ…‘‘¥¹œèÄÁÁà€ÙÁàí™½¹ĞµÍ¥é”èÄáÁàíµ¥¸µ¡•¥¡ĞèÔÉÁàìˆœ¬(€€€€€€€€½¹±¥¬ô‰Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ¡p•áÁA½½±pœ¤ˆøœ¬(€€€€€€€€‹ÚO¦¦_šÆƒ–"¦4ˆ¬(€€€€€€€€ˆğ½‰ÕÑÑ½¸øˆ¬((€€€€€€€€œñ‰ÕÑÑ½¸¥ô‰¡…É…Ñ•ÉQ…‰	Ñ¹MÑ…ÑÕÌˆ±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸ˆœ¬(€€€€€€€€ÍÑå±”ô‰™±•àèÄíÁ…‘‘¥¹œèÄÁÁà€ÙÁàí™½¹ĞµÍ¥é”èÄáÁàíµ¥¸µ¡•¥¡ĞèÔÉÁàìˆœ¬(€€€€€€€€½¹±¥¬ô‰Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ¡pÍÑ…ÑÕÍpœ¤ˆøœ¬(€€€€€€€€‹¢÷–*o–ğˆ¬(€€€€€€€€ˆğ½‰ÕÑÑ½¸øˆ¬((€€€€€€€€œñ‰ÕÑÑ½¸¥ô‰¡…É…Ñ•ÉQ…‰	Ñ¹M­¥±°ˆ±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸ˆœ¬(€€€€€€€€ÍÑå±”ô‰™±•àèÄíÁ…‘‘¥¹œèÄÁÁà€ÙÁàí™½¹ĞµÍ¥é”èÄáÁàíµ¥¸µ¡•¥¡ĞèÔÉÁàìˆœ¬(€€€€€€€€½¹±¥¬ô‰Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ¡pÍ­¥±±pœ¤ˆøœ¬(€€€€€€€€‹š*¢ôˆ¬(€€€€€€€€ˆğ½‰ÕÑÑ½¸øˆ¬((€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò33š*¢ô(€€€€€€€€€€ƒ¦‚¦v‹’â7¢÷š6Ë–.W¾ò3–Â;¢Ó’â/¦v‹š*¢÷r,(€€€€€€€€€€ƒ’â7–"Ã7¾ò'¾òh(€€€€€€€€€€ƒ–:šr±µ¥¸µ¡•¥¡Ó–¾¯š¶ìĞàÁÁã¾ò3–r (€€€€€€€€€€ƒš&/š¦?¢š÷–f£¾ò#–Â“–ÛÚË–v–"_¦
+¦†¿’ë¢F\(€€€€€€€€€€ƒjM…µÍÕ¹œ	É½İÍ•Ë¾ò'–¾›¦jo–>¿¢šX(€€€€€€€€€€ƒ¦®c–ê›š¾S¢ò~»jšf–g¾ò0ĞàÁÁã¦g–,(€€€€€€€€€€ƒ’â/¦fC†³šb¿š¾Qµ…àµ¡•¥¡ĞèØÁ‘Ù£¦
+(€€€€€€€€€€ƒ¦®c¾ò1MO¢š?–&¢…µ¥¸µ¡•¥¡Ó–«–#š²((€€€€€€€€€€ƒš¾Qµ…àµ¡•¥¡Ó¦®c¾ò3¶'šZó¦g–/–ºç–f (€€€€€€€€€€ƒšÂã¦ƒ¢Ï–ÂDĞàÁÁã¦®c¾ò3¢Ş–’[–Æ(€€€€€€€€€€€¹¡½µ”µ™•…ÑÕÉ”µµ½‘…°µ‰½ã¢«–ŞÄ(€€€€€€€€€€ƒj¦®c–ê›’â+¦fC¾ò àÁ‘Ù£¾ò<¹İ¥‘—šf(€€€€€€€€€€€äÙ‘Ù£¾ò'šNƒ–r£’â¢Öß¾ò3–ºçšbO–§–Æ“¦ô(€€€€€€€€€€ƒ¢Ú–ë¢º+š"C3–’[–Æ“–ºç–f ¯–Ÿ–Æ(€€€€€€€€€€ƒ–ºç–f£7–§–/¦÷¢šš6Ë–.Wj–Ş‹.š6Ë–.W¾ò0(€€€€€€€€€€ƒš&/š¦’â+–ú#–ºçšbO–6‡’ö?š¢šë–º3– (€€€€€€€€€€ƒš6Ë’â7–.W((€€€€€€€€€€ƒšRçš"Aµ¥¸ ĞàÁÁà°ÔÁ‘Ù §ŠSŠS–Ÿ–ºä(€€€€€€€€€€ƒ¢ò–’kj–"¦‚¾ò#¢÷–*o–ó¾ò'¦
+šb¿n‡¦<(€€€€€€€€€€ƒš*OšîüĞàÁÁã¦g–/BšÏ–ó¾ò3’ö¢z‹–æT(€€€€€€€€€€ƒrj~»jšf–gšr¢«–.W¢ºOš¶—¾ò0(€€€€€€€€€€ƒ’â7šr†³šJC–ë–§–Æ“¦÷¢šš6Ë–.Wj(€€€€€€€€€€ƒ¢†wª¾ò3–B3šf–nƒ
+ëš¾?š²‡º_–ë’új(€€€€€€€€€€ƒ¦
+šb¿–B3’â–/–në–ºk–ó¾ò#’â7šr–nƒ
+è(€€€€€€€€€€ƒ–"–"¦‚¢3šRç¢º+¾ò'¾ò3–:šr³3–"–"¦‚(€€€€€€€€€€ƒ–’Ÿ–Â?’â7¢ŞÏ–.W7j¦ršÆ¦
+šb¿šr'’şwVg(€€€€€€€€¨¼((€€€€€€€€œñ‘¥Ø¥ô‰¡…É…Ñ•ÉQ…‰½¹Ñ•¹Ğˆœ¬(€€€€€€€€ÍÑå±”ô‰™±•àèÄ€Ä…ÕÑ¼í¡•¥¡Ğé…ÕÑ¼íµ¥¸µ¡•¥¡ĞèÀíµ…àµ¡•¥¡Ğé¹½¹”í½Ù•É™±½Üµäé…ÕÑ¼í½Ù•É™±½Üµàé¡¥‘‘•¸ìµİ•‰­¥Ğµ½Ù•É™±½ÜµÍÉ½±±¥¹œéÑ½Õ í½Ù•ÉÍÉ½±°µ‰•¡…Ù¥½Èµäé½¹Ñ…¥¸íÑ½Õ µ…Ñ¥½¸éÁ…¸µäí‰½àµÍ¥é¥¹œé‰½É‘•Èµ‰½àìˆøğ½‘¥Øøœì(((€€€É•ÑÕÉ¸¡Ñµ°ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒš¾?š^—’îï–.d(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒ¦n‹ŞkÚO¦¦\(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸É•¹‘•É=™™±¥¹•áÁ½¹Ñ•¹Ğ ¥ì((€€€½¹ÍĞ¡½ÕÉÌô((€€€€€€€5…Ñ ¹™±½½È (€€€€€€€€€€€½™™±¥¹•±…ÁÍ•‘5¥¹ÕÑ•Í½É¥ÍÁ±…ä¼ØÀ(€€€€€€€€¤ì((€€€½¹ÍĞµ¥¹ÕÑ•Ìô((€€€€€€€½™™±¥¹•±…ÁÍ•‘5¥¹ÕÑ•Í½É¥ÍÁ±…ä”(€€€€€€€€ØÀì(((€€€½¹ÍĞ…ÁÁ•‘9½Ñ¥”ô((€€€€€€€½™™±¥¹•±…ÁÍ•‘5¥¹ÕÑ•Í½É¥ÍÁ±…äø(€€€€€€€=1%9}aA}5a}5%9UQL(€€€€€€€€ü(€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÅÁàí½±½Èè”ààÌÙˆíµ…É¥¸µÑ½ÀèÑÁàìˆøœ¬(€€€€€€€€‹¾ò#¦n‹ŞkÚO¦¦_šr–’k–>«¢¢#º\ã–Â?šf¾ò3¢Ú¦;j¦£–"’â7šr¦†7–’[Ò¿¦7¾ò$ˆ¬(€€€€€€€€ˆğ½‘¥Øøˆ(€€€€€€€€è(€€€€€€€€ˆˆì(((€€€É•ÑÕÉ¸€ ((€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÍÁàí±¥¹”µ¡•¥¡ĞèÄ¸àìˆøœ¬((€€€€€€€€‹¦n‹Şkšf¦ZO¾òhˆ­¡½ÕÉÌ¬‹–Â?šfˆ­µ¥¹ÕÑ•Ì¬‹–"¦B`ñ‰Èøˆ¬((€€€€€€€€‹–>¿¦‚c–>[¦n‹ŞkÚO¦¦_¾òhˆ¬(€€€€€€€€œñÍÁ…¸ÍÑå±”ô‰½±½Èè˜ÁˆĞÈäí™½¹Ğµİ•¥¡Ğé‰½±ìˆøœ¬(€€€€€€€Á•¹‘¥¹=™™±¥¹•áÀ¬(€€€€€€€€ˆğ½ÍÁ…¸øˆ¬(€€€€€€€€‰a@ˆ¬((€€€€€€€…ÁÁ•‘9½Ñ¥”¬((€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÅÁàí½±½ÈèˆÍ„ÔáŒíµ…É¥¸µÑ½ÀèáÁàìˆøœ¬(€€€€€€€€‹¦n‹ŞkÚO¦¦_šrnÓš:—–*ƒ¦Ë–ÇR£ÚO¦¦_šÆƒ¾ò0ˆ¬(€€€€€€€€‹š¾?–"¦B`ˆ­=1%9}aA}AI}5%9UQ¬‹¦î{¾ò0ˆ¬(€€€€€€€€‹šr–’k¢¢#º\ã–Â?šfˆ¬(€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸‰ÍÑå±”ô‰İ¥‘Ñ èÄÀÀ”íµ…É¥¸µÑ½ÀèÄÉÁàíÁ…‘‘¥¹œèÄÁÁàìˆœ¬((€€€€€€€€ (€€€€€€€€€€€Á•¹‘¥¹=™™±¥¹•áÀğôÀ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰‘¥Í…‰±•ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆˆ(€€€€€€€€¤¬((€€€€€€€€½¹±¥¬ô‰±…¥µ=™™±¥¹•áÀ ¤ˆøœ¬((€€€€€€€€ (€€€€€€€€€€€Á•¹‘¥¹=™™±¥¹•áÀğôÀ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹n»–&7šÊKšr'–>¿¦‚c–>[j¦n‹ŞkÚO¦¦\ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‹¦‚c–>Xˆ­Á•¹‘¥¹=™™±¥¹•áÀ¬‹¦n‹ŞkÚO¦¦\ˆ(€€€€€€€€¤¬((€€€€€€€€ˆğ½‰ÕÑÑ½¸øˆ¬((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33r/–î–F((€€€€€€€€€€ƒ¦ng–7¦‚c–>[7j²³’â–/’ë¾R£šÎW¾ò'¾òh(€€€€€€€€€€ƒ–>«šr'–r£šr'švÇ¢–ÿ–>¿’î—¦‚c–>[jšf–gš&7¦†¿’è(€€€€€€€€€€ƒ¦g¦†š2'¦"W¾ò3–Fó–>­Í¡½İI•İ…É‘•‘ §¾ò0(€€€€€€€€€€ƒš"C–*j…±±‰…¯¢‡–Fó–>¬(€€€€€€€€€€±…¥µ=™™±¥¹•áÀ¡ÑÉÕ”§¾ò#–’k’â–,(€€€€€€€€€€ƒ–>šVã–F+¢¢Ó¦‚c–>[–÷–ò?3¦gš²‡šb¿¦ng–77¾ò'(€€€€€€€€¨¼((€€€€€€€€ ((€€€€€€€€€€€Á•¹‘¥¹=™™±¥¹•áÀøÀ(€€€€€€€€€€€€ü(€€€€€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸ˆœ¬(€€€€€€€€€€€€ÍÑå±”ô‰İ¥‘Ñ èÄÀÀ”íµ…É¥¸µÑ½ÀèáÁàíÁ…‘‘¥¹œèÄÁÁàìœ¬(€€€€€€€€€€€€‰…­É½Õ¹é±¥¹•…ÈµÉ…‘¥•¹Ğ ÄàÁ‘•œ°˜ÁˆĞÈä°ŒäÜäÅ”¤ìœ¬(€€€€€€€€€€€€½±½ÈèŒÉ„ÄÜÀØìˆœ¬(€€€€€€€€€€€€½¹±¥¬ô‰±…¥µ=™™±¥¹•áÁ]¥Ñ¡ ¤ˆøœ¬(€€€€€€€€€€€€‹r/–î–F+¦ng–7¦‚c–>[¾ò ˆ¬(€€€€€€€€€€€€¡Á•¹‘¥¹=™™±¥¹•áÀ¨È¤¬(€€€€€€€€€€€€‰aC¾ò$ˆ¬(€€€€€€€€€€€€ˆğ½‰ÕÑÑ½¸øˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆˆ((€€€€€€€€¤((€€€€¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾òkr/–î–F+¦ng–7¦‚c–>[j–—–>¾ò3–Fó–>¬(€€ƒ¦kR£jÍ¡½İI•İ…É‘•‘ §¾ò3š"C–*š&7rj(€€ƒ¦ng–7fóšRû¾ò3–’ÇšV\¿–>[šÚ#j¢¦Ç’î¦êó¦÷’â7šr(€€ƒfóR¾ò#’â7šrš&’îï’öWšvÇ¢–ÿ¾ò3–>«šb¿šÊKš.ÿ–"À(€€ƒ¦ng–7–*ƒš"C¾ò3–:šr³šÊKr/–î–F+jš¶–âã¦‚c–>X(€€±…¥µ=™™±¥¹•áÀ §¦
+šb¿–>¿’î—Ÿ–âã’öÿR£¾ò'(¨¼()™Õ¹Ñ¥½¸±…¥µ=™™±¥¹•áÁ]¥Ñ¡ ¥ì((€€€¥˜¡Á•¹‘¥¹=™™±¥¹•áÀğôÀ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€Í¡½İI•İ…É‘•‘ (€€€€€€€€ ¤ôùì((€€€€€€€€€€€±…¥µ=™™±¥¹•áÀ (€€€€€€€€€€€€€€€ÑÉÕ”(€€€€€€€€€€€€¤ì((€€€€€€€ô°(€€€€€€€€ ¤ôùì((€€€€€€€€€€€…‘‘	…ÑÑ±•1½œ (€€€€€€€€€€€€€€€€‹–î–F+šr«r/–º3¾ò3‡šÎW¦‚c–>[¦ng–76;–.×ˆ(€€€€€€€€€€€€¤ì((€€€€€€€ô(€€€€¤ì()ô(()™Õ¹Ñ¥½¸±…¥µ=™™±¥¹•áÀ (€€€¥Í½Õ‰±•(¥ì((€€€¥˜¡Á•¹‘¥¹=™™±¥¹•áÀğôÀ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òk–*ƒ’ê¥Í½Õ‰±•“¦g–/–>šVã¾ò0(€€€€€€ƒr/–î–F+š"C–*šf–
+ÍÑÉÕ—¾ò3–¾›¦jo–¶c–—ÚO¦¦_šÆ€(€€€€€€ƒjšVã–¶_’æc’î”Ë¾òo’â¢"³šÊKr/–î–F+j¦‚c–>X(€€€€€€ƒÚ·š2–:šr³šVã–¶_’â7¢º+(€€€€¨¼((€€€½¹ÍĞÉ•İ…É‘µ½Õ¹Ğô((€€€€€€€¥Í½Õ‰±•(€€€€€€€€ü(€€€€€€€Á•¹‘¥¹=™™±¥¹•áÀ¨È(€€€€€€€€è(€€€€€€€Á•¹‘¥¹=™™±¥¹•áÀì(((€€€Í¡…É•‘áÀô(€€€€€€€Í¡…É•‘áÀ¬(€€€€€€€É•İ…É‘µ½Õ¹Ğì(((€€€…‘‘	…ÑÑ±•1½œ ((€€€€€€€€ (€€€€€€€€€€€¥Í½Õ‰±•(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹–î–F+¦ng–7¦‚c–>[¦n‹ŞkÚO¦¦\ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‹¦‚c–>[¦n‹ŞkÚO¦¦\ˆ(€€€€€€€€¤¬(€€€€€€€É•İ…É‘µ½Õ¹Ğ¬(€€€€€€€€‹¦î{¾ò3–ŞË–¶c–—ÚO¦¦_šÆƒˆ((€€€€¤ì(((€€€Á•¹‘¥¹=™™±¥¹•áÀô(€€€€€€€€Àì(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì(((€€€½¹ÍĞ‰½‘å°ô(€€€€€€€€ ‰¡½µ••…ÑÕÉ•5½‘…±	½‘äˆ¤ì(((€€€¥˜¡‰½‘å°¥ì((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•É=™™±¥¹•áÁ½¹Ñ•¹Ğ ¤ì((€€€ô()ô(((¼¨(€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3’îï–.gšRçš"C–§–,(€€ƒ–"¦‚¾òkš¾?š^—’îï–.g¾ò?–S¢¢_’îï–.g¾ò'¾òh(€€ƒ–:šr±É•¹‘•ÉEÕ•ÍÑ½¹Ñ•¹Ğ §šVÓšº×¦
+?¢ò¿š*÷š"@(€€ƒ¦kR£&#šr±É•¹‘•ÉEÕ•ÍÑ1¥ÍÑ•¹•É¥Œ §¾ò0(€€ƒ–B3š*¢÷–ºkú§šâ–Z¸¿.š/&§’îØ¿¦‚c–>[–÷–ò<(€€ƒ–B7¢Ç7’â'–/–>šVã¾ò3š¾?š^—’îï–.g–S¢¢_’îï–.d(€€ƒ–ÇR£–B3’â’î÷šâËš~O¦
+?¢ò¿¾ò3’â7R£–¾¯–§š²‡–æû’æ8(€€ƒ’âš¢j¢/–ò?Šó(¨¼()™Õ¹Ñ¥½¸™½Éµ…ÑEÕ•ÍÑI•İ…É¡É•İ…É¥ì((€€€½¹ÍĞÁ…ÉÑÌõmtì((€€€¥˜¡É•İ…É¹½±¥ì(€€€€€€€Á…ÉÑÌ¹ÁÕÍ  (€€€€€€€€€€€€‹¦G–æŒ€ˆ­É•İ…É¹½±(€€€€€€€€¤ì(€€€ô((€€€¥˜¡É•İ…É¹•áÀ¥ì(€€€€€€€Á…ÉÑÌ¹ÁÕÍ  (€€€€€€€€€€€€‰a@€ˆ­É•İ…É¹•áÀ(€€€€€€€€¤ì(€€€ô((€€€É•ÑÕÉ¸Á…ÉÑÌ¹©½¥¸ ‹ ˆ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€XàäƒŠPƒ’îï–.g–º3š"C–ê›6;–.×¦ª£šzØ(€€€´€ÈÀ€¼€ĞÀ€¼€ØÀ€¼€àÀ€¼€ÄÀÀƒ’êS¦j;šº×(€€€´ƒn»–&7–>«–îë®,U$ƒ¢"–º3š"C–ê›¢¢#º_¾ò3’â7fóšRû’îï’öW6;–.×’â7–¾¯–—–¶cšªS(€€€´ƒ–º3š"C–ê›’úw3š&šr'’îï–.gn»š¢gjÒ¿¦7¦Ë–ê˜€¼ƒš&šr'n»š¢gâ÷¦?7¢¢#º_¾ò0(€€€€ƒ¢ºOš¾?š^”€Ìƒ’îï–.g–S¢¢\€Èƒ’îï–.g’æ¢÷¢«Û¢Ş£¦8€ÈÀ”ƒ¦j;šº×(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼)½¹ÍĞEUMQ}=5A1Q%=9}5%1MQ=9Lõl(€€€€ÈÀ°ĞÀ°ØÀ°àÀ°ÄÀÀ)tì(()™Õ¹Ñ¥½¸•ÑEÕ•ÍÑ½µÁ±•Ñ¥½¹A•É•¹Ğ (€€€‘•™¥¹¥Ñ¥½¹Ì°(€€€ÍÑ…Ñ”(¥ì((€€€±•ĞÑ½Ñ…±½…°ôÀì(€€€±•ĞÑ½Ñ…±AÉ½É•ÍÌôÀì((€€€‘•™¥¹¥Ñ¥½¹Ì¹™½É… ¡™Õ¹Ñ¥½¸¡ÅÕ•ÍĞ¥ì((€€€€€€€½¹ÍĞ½…°ô(€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€9Õµ‰•È¡ÅÕ•ÍĞ¹½…°¥ñğÀ(€€€€€€€€€€€€¤ì((€€€€€€€½¹ÍĞÁÉ½É•ÍÌô(€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€9Õµ‰•È (€€€€€€€€€€€€€€€€€€€ÍÑ…Ñ”¹ÁÉ½É•ÍÍmÅÕ•ÍĞ¹¥‘t(€€€€€€€€€€€€€€€€¥ñğÀ(€€€€€€€€€€€€¤ì((€€€€€€€Ñ½Ñ…±½…°¬õ½…°ì(€€€€€€€Ñ½Ñ…±AÉ½É•ÍÌ¬ô(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€½…°°(€€€€€€€€€€€€€€€ÁÉ½É•ÍÌ(€€€€€€€€€€€€¤ì((€€€ô¤ì((€€€¥˜¡Ñ½Ñ…±½…°ğôÀ¥ì(€€€€€€€É•ÑÕÉ¸€ÄÀÀì(€€€ô((€€€É•ÑÕÉ¸5…Ñ ¹µ¥¸ (€€€€€€€€ÄÀÀ°(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€À°(€€€€€€€€€€€Ñ½Ñ…±AÉ½É•ÍÌ½Ñ½Ñ…±½…°¨ÄÀÀ(€€€€€€€€¤(€€€€¤ì()ô(()™Õ¹Ñ¥½¸É•¹‘•ÉEÕ•ÍÑ½µÁ±•Ñ¥½¹A…¹•±½¹Ñ•¹Ğ (€€€‘•™¥¹¥Ñ¥½¹Ì°(€€€ÍÑ…Ñ”(¥ì((€€€½¹ÍĞÁ•É•¹Ğô(€€€€€€€•ÑEÕ•ÍÑ½µÁ±•Ñ¥½¹A•É•¹Ğ (€€€€€€€€€€€‘•™¥¹¥Ñ¥½¹Ì°(€€€€€€€€€€€ÍÑ…Ñ”(€€€€€€€€¤ì((€€€½¹ÍĞ‘¥ÍÁ±…åA•É•¹Ğô(€€€€€€€5…Ñ ¹™±½½È¡Á•É•¹Ğ¤ì((€€€½¹ÍĞµ¥±•ÍÑ½¹•Ìô(€€€€€€€EUMQ}=5A1Q%=9}5%1MQ=9L(€€€€€€€€¹µ…À¡™Õ¹Ñ¥½¸¡Ñ¡É•Í¡½±¥ì((€€€€€€€€€€€½¹ÍĞÉ•…¡•ô(€€€€€€€€€€€€€€€Á•É•¹ĞøõÑ¡É•Í¡½±ì((€€€€€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµµ¥±•ÍÑ½¹”œ¬(€€€€€€€€€€€€€€€€€€€€¡É•…¡•€ü€ˆÉ•…¡•ˆ€è€ˆˆ¤¬œˆøœ¬(€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµµ¥±•ÍÑ½¹”µÁ•É•¹Ğˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€Ñ¡É•Í¡½±¬œ”œ¬(€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬(€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµµ¥±•ÍÑ½¹”µÍ±½Ğˆ…É¥„µ±…‰•°ô‹6;–.×–ú¢¢·–ºhˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€œñÍÁ…¸û–ú–ºhğ½ÍÁ…¸øœ¬(€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬(€€€€€€€€€€€€€€€€œğ½‘¥Øøœ(€€€€€€€€€€€€¤ì((€€€€€€€ô¤(€€€€€€€€¹©½¥¸ ˆˆ¤ì((€€€É•ÑÕÉ¸€ (€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ½µÁ±•Ñ¥½¸µ¡•…ˆøœ¬(€€€€€€€€€€€€œñÍÁ…¸û–º3š"C–ê›6;–.Ôğ½ÍÁ…¸øœ¬(€€€€€€€€€€€€œñÍÑÉ½¹œøœ­‘¥ÍÁ±…åA•É•¹Ğ¬œ”ğ½ÍÑÉ½¹œøœ¬(€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ½µÁ±•Ñ¥½¸µÑÉ…¬ˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆøœ¬(€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ½µÁ±•Ñ¥½¸µ™¥±°ˆÍÑå±”ô‰İ¥‘Ñ èœ­Á•É•¹Ğ¬œ”ìˆøğ½‘¥Øøœ¬(€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ½µÁ±•Ñ¥½¸µµ¥±•ÍÑ½¹•Ìˆøœ¬(€€€€€€€€€€€µ¥±•ÍÑ½¹•Ì¬(€€€€€€€€œğ½‘¥Øøœ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸É•¹‘•ÉEÕ•ÍÑ1¥ÍÑ•¹•É¥Œ (€€€‘•™¥¹¥Ñ¥½¹Ì°(€€€ÍÑ…Ñ”°(€€€±…¥µ¹9…µ”(¥ì((€€€±•Ğ¡Ñµ°ô(€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ±¥ÍĞˆøœì(((€€€‘•™¥¹¥Ñ¥½¹Ì¹™½É…  (€€€€€€€ÅÕ•ÍĞôùì((€€€€€€€€€€€½¹ÍĞÁÉ½É•ÍÌô(€€€€€€€€€€€€€€€ÍÑ…Ñ”¹ÁÉ½É•ÍÍl(€€€€€€€€€€€€€€€€€€€ÅÕ•ÍĞ¹¥(€€€€€€€€€€€€€€€uñğÀì((€€€€€€€€€€€½¹ÍĞ±…¥µ•ô(€€€€€€€€€€€€€€€€„…ÍÑ…Ñ”¹±…¥µ•‘l(€€€€€€€€€€€€€€€€€€€ÅÕ•ÍĞ¹¥(€€€€€€€€€€€€€€€tì((€€€€€€€€€€€½¹ÍĞ‘½¹”ô(€€€€€€€€€€€€€€€ÁÉ½É•ÍÌøõÅÕ•ÍĞ¹½…°ì((€€€€€€€€€€€½¹ÍĞÍ…™•AÉ½É•ÍÌô(€€€€€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€€€€€ÁÉ½É•ÍÌ°(€€€€€€€€€€€€€€€€€€€ÅÕ•ÍĞ¹½…°(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€½¹ÍĞÁ•É•¹Ğô(€€€€€€€€€€€€€€€ÅÕ•ÍĞ¹½…°øÀ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€€€€€€ÄÀÀ°(€€€€€€€€€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€€€€€€€€€€¡ÁÉ½É•ÍÌ½ÅÕ•ÍĞ¹½…°¤¨ÄÀÀ(€€€€€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ÄÀÀì((€€€€€€€€€€€½¹ÍĞÍÑ…ÑÕÍQ•áĞô(€€€€€€€€€€€€€€€±…¥µ•(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹–ŞË¦‚c–>Xˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€‘½¹”(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹–>¿¦‚c–>Xˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€‹¦Ë¢†3’â´ˆì((€€€€€€€€€€€½¹ÍĞÍÑ…ÑÕÍ±…ÍÌô(€€€€€€€€€€€€€€€±…¥µ•(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‰±…¥µ•ˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€‘½¹”(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‰É•…‘äˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€‰ÁÉ½É•ÍÌˆì((€€€€€€€€€€€½¹ÍĞ‰ÕÑÑ½¹Q•áĞô(€€€€€€€€€€€€€€€±…¥µ•(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹–ŞË¦‚c–>Xˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€‘½¹”(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹¦‚c–>Xˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€‹šr«¦Sš"@ˆì((€€€€€€€€€€€¡Ñµ°¬ô(€€€€€€€€€€€€€€€€œñÍ•Ñ¥½¸±…ÍÌô‰ÅÕ•ÍĞµ…É€œ­ÍÑ…ÑÕÍ±…ÍÌ¬œˆøœ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ…Éµ¡•…ˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ…Éµ¹…µ”ˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€ÅÕ•ÍĞ¹¹…µ”¬(€€€€€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµÍÑ…ÑÕÌ€œ­ÍÑ…ÑÕÍ±…ÍÌ¬œˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€ÍÑ…ÑÕÍQ•áĞ¬(€€€€€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬(€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ…Éµ‘•ÍŒˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€ÅÕ•ÍĞ¹‘•ÍŒ¬(€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµÁÉ½É•ÍÌµ±¥¹”ˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€œñÍÁ…¸û¦Ë–ê˜ğ½ÍÁ…¸øœ¬(€€€€€€€€€€€€€€€€€€€€€€€€œñÍÑÉ½¹œøœ­Í…™•AÉ½É•ÍÌ¬œ€¼€œ­ÅÕ•ÍĞ¹½…°¬œğ½ÍÑÉ½¹œøœ¬(€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµÁÉ½É•ÍÌµÑÉ…¬ˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµÁÉ½É•ÍÌµ™¥±°ˆÍÑå±”ô‰İ¥‘Ñ èœ­Á•É•¹Ğ¬œ”ìˆøğ½‘¥Øøœ¬(€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ…Éµ™½½Ğˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµÉ•İ…Éˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€€œñÍÁ…¸±…ÍÌô‰ÅÕ•ÍĞµÉ•İ…Éµ±…‰•°ˆû6;–.Ôğ½ÍÁ…¸øœ¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€€œñÍÁ…¸øœ­™½Éµ…ÑEÕ•ÍÑI•İ…É¡ÅÕ•ÍĞ¹É•İ…É¤¬œğ½ÍÁ…¸øœ¬(€€€€€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€€€€€€€€€€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰ÅÕ•ÍĞµ±…¥´µ‰Ñ¸ˆœ¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€…‘½¹”ñğ±…¥µ•(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ˆ‘¥Í…‰±•ˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€€œ½¹±¥¬ôˆœ­±…¥µ¹9…µ”¬œ¡pœœ­ÅÕ•ÍĞ¹¥¬pœ¤ˆøœ¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€‰ÕÑÑ½¹Q•áĞ¬(€€€€€€€€€€€€€€€€€€€€€€€€œğ½‰ÕÑÑ½¸øœ¬(€€€€€€€€€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€€€€€€€€€œğ½Í•Ñ¥½¸øœì((€€€€€€€ô(€€€€¤ì(((€€€¡Ñµ°¬ô(€€€€€€€€ˆğ½‘¥Øøˆì((€€€É•ÑÕÉ¸¡Ñµ°ì()ô(()™Õ¹Ñ¥½¸É•¹‘•É…¥±åEÕ•ÍÑ1¥ÍÑ½¹Ñ•¹Ğ ¥ì((€€€É•ÑÕÉ¸É•¹‘•ÉEÕ•ÍÑ1¥ÍÑ•¹•É¥Œ (€€€€€€€‘…¥±åEÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì°(€€€€€€€‘…¥±åEÕ•ÍÑMÑ…Ñ”°(€€€€€€€€‰±…¥µ…¥±åEÕ•ÍĞˆ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸É•¹‘•É½µµ¥ÍÍ¥½¹EÕ•ÍÑ1¥ÍÑ½¹Ñ•¹Ğ ¥ì((€€€É•ÑÕÉ¸É•¹‘•ÉEÕ•ÍÑ1¥ÍÑ•¹•É¥Œ (€€€€€€€½µµ¥ÍÍ¥½¹EÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì°(€€€€€€€½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”°(€€€€€€€€‰±…¥µ½µµ¥ÍÍ¥½¹EÕ•ÍĞˆ(€€€€¤ì()ô()™Õ¹Ñ¥½¸•Ñ±…¥µ…‰±•EÕ•ÍÑ%‘Ì¡‘•™¥¹¥Ñ¥½¹Ì±ÍÑ…Ñ”¥ì(€€€É•ÑÕÉ¸€¡‘•™¥¹¥Ñ¥½¹Íññmt¤¹™¥±Ñ•È¡™Õ¹Ñ¥½¸¡ÅÕ•ÍĞ¥ì(€€€€€€€É•ÑÕÉ¸ÅÕ•ÍĞ€˜˜€…ÍÑ…Ñ”¹±…¥µ•‘mÅÕ•ÍĞ¹¥‘t€˜˜(€€€€€€€€€€€€¡9Õµ‰•È¡ÍÑ…Ñ”¹ÁÉ½É•ÍÍmÅÕ•ÍĞ¹¥‘t¥ñğÀ¤øõ5…Ñ ¹µ…à Ä±9Õµ‰•È¡ÅÕ•ÍĞ¹½…°¥ñğÄ¤ì(€€€ô¤¹µ…À¡™Õ¹Ñ¥½¸¡ÅÕ•ÍĞ¥ìÉ•ÑÕÉ¸ÅÕ•ÍĞ¹¥ìô¤ì)ô()™Õ¹Ñ¥½¸ØÄÜÌØÅMå¹EÕ•ÍÑ±…¥µ±±	ÕÑÑ½¸¡¥Í½µµ¥ÍÍ¥½¸¥ì(€€€½¹ÍĞ‰ÕÑÑ½¸ô ‰ÅÕ•ÍÑ±…¥µ±±	ÕÑÑ½¸ˆ¤ì(€€€¥˜ …‰ÕÑÑ½¸¥ìÉ•ÑÕÉ¸ìô(€€€½¹ÍĞ‘•™¥¹¥Ñ¥½¹Ìõ¥Í½µµ¥ÍÍ¥½¸ı½µµ¥ÍÍ¥½¹EÕ•ÍÑ•™¥¹¥Ñ¥½¹Ìé‘…¥±åEÕ•ÍÑ•™¥¹¥Ñ¥½¹Ìì(€€€½¹ÍĞÍÑ…Ñ”õ¥Í½µµ¥ÍÍ¥½¸ı½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”é‘…¥±åEÕ•ÍÑMÑ…Ñ”ì(€€€½¹ÍĞ½Õ¹Ğõ•Ñ±…¥µ…‰±•EÕ•ÍÑ%‘Ì¡‘•™¥¹¥Ñ¥½¹Ì±ÍÑ…Ñ”¤¹±•¹Ñ ì(€€€‰ÕÑÑ½¸¹‘¥Í…‰±•õ½Õ¹ĞğôÀì(€€€‰ÕÑÑ½¸¹Ñ•áÑ½¹Ñ•¹Ğõ½Õ¹ĞøÀü‹’â¦6×¦‚c–>[¾ò ˆ­½Õ¹Ğ¬‹¾ò$ˆè‹’â¦6×¦‚c–>Xˆì(€€€‰ÕÑÑ½¸¹½¹±¥¬õ¥Í½µµ¥ÍÍ¥½¸ıØÄÜÌØÅ±…¥µ±±½µµ¥ÍÍ¥½¹EÕ•ÍÑÌéØÄÜÌØÅ±…¥µ±±…¥±åEÕ•ÍÑÌì)ô()™Õ¹Ñ¥½¸ØÄÜÌØÅI•™É•Í¡=Á•¹EÕ•ÍÑA…” ¥ì(€€€½¹ÍĞ‰½‘äô ‰ÅÕ•ÍÑQ…‰	½‘äˆ¤ì(€€€¥˜ …‰½‘ä¥ìÉ•ÑÕÉ¸™…±Í”ìô(€€€½¹ÍĞ½µµ¥ÍÍ¥½¹	Ñ¸ô ‰ÅÕ•ÍÑQ…‰	Ñ¹½µµ¥ÍÍ¥½¸ˆ¤ì(€€€½¹ÍĞ¥Í½µµ¥ÍÍ¥½¸ô„„¡½µµ¥ÍÍ¥½¹	Ñ¸˜™½µµ¥ÍÍ¥½¹	Ñ¸¹±…ÍÍ1¥ÍĞ¹½¹Ñ…¥¹Ì ‰…Ñ¥Ù”ˆ¤¤ì(€€€½¹ÍĞÍÉ½±±Q½Àõ‰½‘ä¹ÍÉ½±±Q½Àì(€€€‰½‘ä¹¥¹¹•É!Q50õ¥Í½µµ¥ÍÍ¥½¸ıÉ•¹‘•É½µµ¥ÍÍ¥½¹EÕ•ÍÑ1¥ÍÑ½¹Ñ•¹Ğ ¤éÉ•¹‘•É…¥±åEÕ•ÍÑ1¥ÍÑ½¹Ñ•¹Ğ ¤ì(€€€½¹ÍĞ½µÁ±•Ñ¥½¹A…¹•°ô ‰ÅÕ•ÍÑ½µÁ±•Ñ¥½¹A…¹•°ˆ¤ì(€€€¥˜¡½µÁ±•Ñ¥½¹A…¹•°¥ì(€€€€€€€½µÁ±•Ñ¥½¹A…¹•°¹¥¹¹•É!Q50õÉ•¹‘•ÉEÕ•ÍÑ½µÁ±•Ñ¥½¹A…¹•±½¹Ñ•¹Ğ (€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸ı½µµ¥ÍÍ¥½¹EÕ•ÍÑ•™¥¹¥Ñ¥½¹Ìé‘…¥±åEÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì°(€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸ı½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”é‘…¥±åEÕ•ÍÑMÑ…Ñ”(€€€€€€€€¤ì(€€€ô(€€€‰½‘ä¹ÍÉ½±±Q½ÀõÍÉ½±±Q½Àì(€€€ØÄÜÌØÅMå¹EÕ•ÍÑ±…¥µ±±	ÕÑÑ½¸¡¥Í½µµ¥ÍÍ¥½¸¤ì(€€€É•ÑÕÉ¸ÑÉÕ”ì)ô)İ¥¹‘½Ü¹ØÄÜÌØÅI•™É•Í¡=Á•¹EÕ•ÍÑA…”õØÄÜÌØÅI•™É•Í¡=Á•¹EÕ•ÍÑA…”ì((((¼¨(€€Xàç¾òk’îï–.g¢š[ª_
+ë3–në–ºkš¢gÆ“–"\€¬ƒ–Ÿ–Æ“’îï–.gšâ–Z¸€¬ƒ–në–ºk–º3š"C–ê›6;–.×7šzÛš/(€€€ÅÕ•ÍÑQ…‰	½‘äƒšb¿’îï–.g–R¿’â ÍÉ½±°½İ¹•Ë¾òoš¢g¦†3¢"–§–/š¢gÆ“’â7¢Ş¢F_š6Ë(¨¼)™Õ¹Ñ¥½¸É•¹‘•ÉEÕ•ÍÑQ…‰½¹Ñ•¹Ğ¡…Ñ¥Ù•Q…ˆ¥ì((€€€½¹ÍĞ¥Í½µµ¥ÍÍ¥½¸ô(€€€€€€€…Ñ¥Ù•Q…ˆôôô‰½µµ¥ÍÍ¥½¸ˆì((€€€É•ÑÕÉ¸€ (€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ¥¹Ñ•É™…”ˆøœ¬((€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµÑ…‰ÌˆÉ½±”ô‰Ñ…‰±¥ÍĞˆ…É¥„µ±…‰•°ô‹’îï–.g–"¦†xˆøœ¬((€€€€€€€€€€€€€€€€œñ‰ÕÑÑ½¸¥ô‰ÅÕ•ÍÑQ…‰	Ñ¹…¥±äˆ±…ÍÌô‰ÅÕ•ÍĞµÑ…ˆœ¬(€€€€€€€€€€€€€€€€€€€€ …¥Í½µµ¥ÍÍ¥½¸€ü€ˆ…Ñ¥Ù”ˆ€è€ˆˆ¤¬œˆœ¬(€€€€€€€€€€€€€€€€€€€€œÉ½±”ô‰Ñ…ˆˆ…É¥„µÍ•±•Ñ•ôˆœ¬ …¥Í½µµ¥ÍÍ¥½¸€ü€‰ÑÉÕ”ˆ€è€‰™…±Í”ˆ¤¬œˆœ¬(€€€€€€€€€€€€€€€€€€€€œ½¹±¥¬ô‰Íİ¥Ñ¡EÕ•ÍÑQ…ˆ¡p‘…¥±åpœ¤ˆøœ¬(€€€€€€€€€€€€€€€€€€€€‹š¾?š^—’îï–.dˆ¬(€€€€€€€€€€€€€€€€œğ½‰ÕÑÑ½¸øœ¬((€€€€€€€€€€€€€€€€œñ‰ÕÑÑ½¸¥ô‰ÅÕ•ÍÑQ…‰	Ñ¹½µµ¥ÍÍ¥½¸ˆ±…ÍÌô‰ÅÕ•ÍĞµÑ…ˆœ¬(€€€€€€€€€€€€€€€€€€€€¡¥Í½µµ¥ÍÍ¥½¸€ü€ˆ…Ñ¥Ù”ˆ€è€ˆˆ¤¬œˆœ¬(€€€€€€€€€€€€€€€€€€€€œÉ½±”ô‰Ñ…ˆˆ…É¥„µÍ•±•Ñ•ôˆœ¬¡¥Í½µµ¥ÍÍ¥½¸€ü€‰ÑÉÕ”ˆ€è€‰™…±Í”ˆ¤¬œˆœ¬(€€€€€€€€€€€€€€€€€€€€œ½¹±¥¬ô‰Íİ¥Ñ¡EÕ•ÍÑQ…ˆ¡p½µµ¥ÍÍ¥½¹pœ¤ˆøœ¬(€€€€€€€€€€€€€€€€€€€€‹–S¢¢_’îï–.dˆ¬(€€€€€€€€€€€€€€€€œğ½‰ÕÑÑ½¸øœ¬((€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÅÕ•ÍĞµ‰…Ñ µ…Ñ¥½¹Ìˆøœ¬(€€€€€€€€€€€€€€€€œñ‰ÕÑÑ½¸¥ô‰ÅÕ•ÍÑ±…¥µ±±	ÕÑÑ½¸ˆ±…ÍÌô‰ÅÕ•ÍĞµ±…¥´µ…±°µ‰Ñ¸ˆÑåÁ”ô‰‰ÕÑÑ½¸ˆ€œ¬(€€€€€€€€€€€€€€€€€€€€¡•Ñ±…¥µ…‰±•EÕ•ÍÑ%‘Ì (€€€€€€€€€€€€€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸ı½µµ¥ÍÍ¥½¹EÕ•ÍÑ•™¥¹¥Ñ¥½¹Ìé‘…¥±åEÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì°(€€€€€€€€€€€€€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸ı½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”é‘…¥±åEÕ•ÍÑMÑ…Ñ”(€€€€€€€€€€€€€€€€€€€€¤¹±•¹Ñ üœœè‘¥Í…‰±•€œ¤¬(€€€€€€€€€€€€€€€€€€€€½¹±¥¬ôˆœ¬¡¥Í½µµ¥ÍÍ¥½¸üØÄÜÌØÅ±…¥µ±±½µµ¥ÍÍ¥½¹EÕ•ÍÑÌ ¤œèØÄÜÌØÅ±…¥µ±±…¥±åEÕ•ÍÑÌ ¤œ¤¬œˆû’â¦6×¦‚c–>Xğ½‰ÕÑÑ½¸øœ¬(€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€€€€€œñ‘¥Ø¥ô‰ÅÕ•ÍÑQ…‰	½‘äˆ±…ÍÌô‰ÅÕ•ÍĞµÑ…ˆµ‰½‘äˆÉ½±”ô‰Ñ…‰Á…¹•°ˆøœ¬(€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€É•¹‘•É½µµ¥ÍÍ¥½¹EÕ•ÍÑ1¥ÍÑ½¹Ñ•¹Ğ ¤(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€É•¹‘•É…¥±åEÕ•ÍÑ1¥ÍÑ½¹Ñ•¹Ğ ¤(€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€€€€€œñ‘¥Ø¥ô‰ÅÕ•ÍÑ½µÁ±•Ñ¥½¹A…¹•°ˆ±…ÍÌô‰ÅÕ•ÍĞµ½µÁ±•Ñ¥½¸µÁ…¹•°ˆøœ¬(€€€€€€€€€€€€€€€É•¹‘•ÉEÕ•ÍÑ½µÁ±•Ñ¥½¹A…¹•±½¹Ñ•¹Ğ (€€€€€€€€€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸(€€€€€€€€€€€€€€€€€€€€ü½µµ¥ÍÍ¥½¹EÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì(€€€€€€€€€€€€€€€€€€€€è‘…¥±åEÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì°(€€€€€€€€€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸(€€€€€€€€€€€€€€€€€€€€ü½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”(€€€€€€€€€€€€€€€€€€€€è‘…¥±åEÕ•ÍÑMÑ…Ñ”(€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€œğ½‘¥Øøœ¬((€€€€€€€€œğ½‘¥Øøœ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸Íİ¥Ñ¡EÕ•ÍÑQ…ˆ¡Ñ…‰9…µ”¥ì((€€€½¹ÍĞ½¹Ñ…¥¹•Èô(€€€€€€€€ ‰ÅÕ•ÍÑQ…‰	½‘äˆ¤ì((€€€¥˜ …½¹Ñ…¥¹•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞ¥Í½µµ¥ÍÍ¥½¸ô(€€€€€€€Ñ…‰9…µ”ôôô‰½µµ¥ÍÍ¥½¸ˆì((€€€½¹Ñ…¥¹•È¹¥¹¹•É!Q50ô(€€€€€€€¥Í½µµ¥ÍÍ¥½¸(€€€€€€€€ü(€€€€€€€É•¹‘•É½µµ¥ÍÍ¥½¹EÕ•ÍÑ1¥ÍÑ½¹Ñ•¹Ğ ¤(€€€€€€€€è(€€€€€€€É•¹‘•É…¥±åEÕ•ÍÑ1¥ÍÑ½¹Ñ•¹Ğ ¤ì((€€€½¹Ñ…¥¹•È¹ÍÉ½±±Q½Àô(€€€€€€€€Àì((€€€½¹ÍĞ½µÁ±•Ñ¥½¹A…¹•°ô(€€€€€€€€ ‰ÅÕ•ÍÑ½µÁ±•Ñ¥½¹A…¹•°ˆ¤ì((€€€¥˜¡½µÁ±•Ñ¥½¹A…¹•°¥ì((€€€€€€€½µÁ±•Ñ¥½¹A…¹•°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•ÉEÕ•ÍÑ½µÁ±•Ñ¥½¹A…¹•±½¹Ñ•¹Ğ (€€€€€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸(€€€€€€€€€€€€€€€€ü½µµ¥ÍÍ¥½¹EÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì(€€€€€€€€€€€€€€€€è‘…¥±åEÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì°(€€€€€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸(€€€€€€€€€€€€€€€€ü½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”(€€€€€€€€€€€€€€€€è‘…¥±åEÕ•ÍÑMÑ…Ñ”(€€€€€€€€€€€€¤ì((€€€ô((€€€½¹ÍĞ‘…¥±å	Ñ¸ô(€€€€€€€€ ‰ÅÕ•ÍÑQ…‰	Ñ¹…¥±äˆ¤ì((€€€½¹ÍĞ½µµ¥ÍÍ¥½¹	Ñ¸ô(€€€€€€€€ ‰ÅÕ•ÍÑQ…‰	Ñ¹½µµ¥ÍÍ¥½¸ˆ¤ì((€€€¥˜¡‘…¥±å	Ñ¸¥ì(€€€€€€€‘…¥±å	Ñ¸¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€‰…Ñ¥Ù”ˆ°(€€€€€€€€€€€€…¥Í½µµ¥ÍÍ¥½¸(€€€€€€€€¤ì(€€€€€€€‘…¥±å	Ñ¸¹Í•ÑÑÑÉ¥‰ÕÑ” (€€€€€€€€€€€€‰…É¥„µÍ•±•Ñ•ˆ°(€€€€€€€€€€€€…¥Í½µµ¥ÍÍ¥½¸€ü€‰ÑÉÕ”ˆ€è€‰™…±Í”ˆ(€€€€€€€€¤ì(€€€ô((€€€¥˜¡½µµ¥ÍÍ¥½¹	Ñ¸¥ì(€€€€€€€½µµ¥ÍÍ¥½¹	Ñ¸¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€‰…Ñ¥Ù”ˆ°(€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸(€€€€€€€€¤ì(€€€€€€€½µµ¥ÍÍ¥½¹	Ñ¸¹Í•ÑÑÑÉ¥‰ÕÑ” (€€€€€€€€€€€€‰…É¥„µÍ•±•Ñ•ˆ°(€€€€€€€€€€€¥Í½µµ¥ÍÍ¥½¸€ü€‰ÑÉÕ”ˆ€è€‰™…±Í”ˆ(€€€€€€€€¤ì(€€€ô((€€€ØÄÜÌØÅMå¹EÕ•ÍÑ±…¥µ±±	ÕÑÑ½¸¡¥Í½µµ¥ÍÍ¥½¸¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3šZÃ–Š{–&¿šr°½	=ML(€€ƒ–§–/–Â;¢š÷–"_¦‚n»¾ò3–B¢¨Ë–/–"¦‚¾ò'¾òh(€€ƒn»–&7–>«–#–k–ë3–"¦‚–"š>o7¦g––_¦ª£šzÛ¢Ş|(€€ƒ¢ª«šb;šZ–¶_¾ò3–¾›¦joj–&¿šr°½	=MOš"Ã¦²—¢š?–&(€€ƒ¾ò#š«&§–òß–ê›6;–.×š¾?–’§¢÷š2Gš"Ã–æûš²‡(€€ƒ¢Ş>ûšr'ŞÓ–*–6j–Ş»VÃšb¿’î¦êó¾ò'¦÷¦
+šÊK–ºkš†#¾ò0(€€ƒ¶'’öÿR£¢š>C’úo¢š?–&–ú3–7–¾›¦još:—’â+š"Ã¦²”(€€ƒ¦
+?¢ò¿ŠSŠS¦g¢‡–#Šë’şw–"–"¦‚j’î/¦v‹šb¼(€€ƒ¦kj¾ò3’æ/–ú3¢šš>o–Ÿ–ºç–>«¦r¢ššRä(€€É•¹‘•Ë–÷–ò?¾ò3’â7R£–.U!Q53ÖCš/(¨¼()™Õ¹Ñ¥½¸É•¹‘•ÉÕ¹•½¹Q…‰½¹Ñ•¹Ğ¡Ñ…‰9…µ”¥ì((€€€¥˜¡Ñ…‰9…µ”ôôô‰…‰åÍÌˆ¥ì((€€€€€€€É•ÑÕÉ¸€ ((€€€€€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÍÁàí±¥¹”µ¡•¥¡ĞèÄ¸àí½±½ÈèˆÍ„ÔáŒìˆøœ¬(€€€€€€€€€€€€‹šŞÇšŞ×–&¿šr³–Âkšr«¢¢·¢¢#–º3š"Cˆ¬(€€€€€€€€€€€€ˆğ½‘¥Øøˆ((€€€€€€€€¤ì((€€€ô(((€€€É•ÑÕÉ¸€ ((€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÍÁàí±¥¹”µ¡•¥¡ĞèÄ¸àí½±½ÈèˆÍ„ÔáŒìˆøœ¬(€€€€€€€€‹š^—–âã–&¿šr³–Âkšr«¢¢·¢¢#–º3š"Cˆ¬(€€€€€€€€ˆğ½‘¥Øøˆ((€€€€¤ì()ô(()™Õ¹Ñ¥½¸Íİ¥Ñ¡Õ¹•½¹Q…ˆ¡Ñ…‰9…µ”¥ì((€€€½¹ÍĞ½¹Ñ…¥¹•Èô(€€€€€€€€ ‰‘Õ¹•½¹Q…‰½¹Ñ•¹Ğˆ¤ì(((€€€¥˜ …½¹Ñ…¥¹•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹Ñ…¥¹•È¹¥¹¹•É!Q50ô((€€€€€€€É•¹‘•ÉÕ¹•½¹Q…‰½¹Ñ•¹Ğ (€€€€€€€€€€€Ñ…‰9…µ”(€€€€€€€€¤ì(((€€€l‰…¥±äˆ°‰‰åÍÌ‰t¹™½É…  (€€€€€€€¹…µ”ôùì((€€€€€€€€€€€½¹ÍĞ‰Ñ¸ô(€€€€€€€€€€€€€€€€ ‰‘Õ¹•½¹Q…‰	Ñ¸ˆ­¹…µ”¤ì(((€€€€€€€€€€€¥˜¡‰Ñ¸¥ì((€€€€€€€€€€€€€€€‰Ñ¸¹ÍÑå±”¹½Á…¥Ñäô((€€€€€€€€€€€€€€€€€€€¹…µ”¹Ñ½1½İ•É…Í” ¤ôôô(€€€€€€€€€€€€€€€€€€€Ñ…‰9…µ”(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€ˆÄˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€ˆ¸ÔÔˆì((€€€€€€€€€€€ô((€€€€€€€ô(€€€€¤ì()ô(()™Õ¹Ñ¥½¸É•¹‘•É	½ÍÍQ…‰½¹Ñ•¹Ğ¡Ñ…‰9…µ”¥ì((€€€¥˜¡Ñ…‰9…µ”ôôô‰¡•±°ˆ¥ì((€€€€€€€É•ÑÕÉ¸€ ((€€€€€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÍÁàí±¥¹”µ¡•¥¡ĞèÄ¸àí½±½ÈèˆÍ„ÔáŒìˆøœ¬(€€€€€€€€€€€€‹–rÃ6	=MO–Âkšr«¢¢·¢¢#–º3š"Cˆ¬(€€€€€€€€€€€€ˆğ½‘¥Øøˆ((€€€€€€€€¤ì((€€€ô(((€€€É•ÑÕÉ¸€ ((€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÍÁàí±¥¹”µ¡•¥¡ĞèÄ¸àí½±½ÈèˆÍ„ÔáŒìˆøœ¬(€€€€€€€€‹–/’êé	=MO–Âkšr«¢¢·¢¢#–º3š"Cˆ¬(€€€€€€€€ˆğ½‘¥Øøˆ((€€€€¤ì()ô(()™Õ¹Ñ¥½¸Íİ¥Ñ¡	½ÍÍQ…ˆ¡Ñ…‰9…µ”¥ì((€€€½¹ÍĞ½¹Ñ…¥¹•Èô(€€€€€€€€ ‰‰½ÍÍQ…‰½¹Ñ•¹Ğˆ¤ì(((€€€¥˜ …½¹Ñ…¥¹•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹Ñ…¥¹•È¹¥¹¹•É!Q50ô((€€€€€€€É•¹‘•É	½ÍÍQ…‰½¹Ñ•¹Ğ (€€€€€€€€€€€Ñ…‰9…µ”(€€€€€€€€¤ì(((€€€l‰A•ÉÍ½¹…°ˆ°‰!•±°‰t¹™½É…  (€€€€€€€¹…µ”ôùì((€€€€€€€€€€€½¹ÍĞ‰Ñ¸ô(€€€€€€€€€€€€€€€€ ‰‰½ÍÍQ…‰	Ñ¸ˆ­¹…µ”¤ì(((€€€€€€€€€€€¥˜¡‰Ñ¸¥ì((€€€€€€€€€€€€€€€‰Ñ¸¹ÍÑå±”¹½Á…¥Ñäô((€€€€€€€€€€€€€€€€€€€¹…µ”¹Ñ½1½İ•É…Í” ¤ôôô(€€€€€€€€€€€€€€€€€€€Ñ…‰9…µ”(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€ˆÄˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€ˆ¸ÔÔˆì((€€€€€€€€€€€ô((€€€€€€€ô(€€€€¤ì()ô(((()™Õ¹Ñ¥½¸±…¥µ…¥±åEÕ•ÍĞ¡ÅÕ•ÍÑ%¥ì((€€€½¹ÍĞÅÕ•ÍĞô((€€€€€€€‘…¥±åEÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì¹™¥¹ (€€€€€€€€€€€ÄôùÄ¹¥ôôõÅÕ•ÍÑ%(€€€€€€€€¤ì(((€€€¥˜ …ÅÕ•ÍĞ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÁÉ½É•ÍÌô((€€€€€€€‘…¥±åEÕ•ÍÑMÑ…Ñ”¹ÁÉ½É•ÍÍl(€€€€€€€€€€€ÅÕ•ÍÑ%(€€€€€€€uñğÀì(((€€€¥˜ (€€€€€€€ÁÉ½É•ÍÌñÅÕ•ÍĞ¹½…°ñğ(€€€€€€€‘…¥±åEÕ•ÍÑMÑ…Ñ”¹±…¥µ•‘mÅÕ•ÍÑ%‘t(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€‘…¥±åEÕ•ÍÑMÑ…Ñ”¹±…¥µ•‘mÅÕ•ÍÑ%‘tô(€€€€€€€ÑÉÕ”ì(((€€€¥˜¡ÅÕ•ÍĞ¹É•İ…É¹½±¥ì((€€€€€€€½±ô(€€€€€€€€€€€½±¬(€€€€€€€€€€€ÅÕ•ÍĞ¹É•İ…É¹½±ì((€€€ô(((€€€¥˜¡ÅÕ•ÍĞ¹É•İ…É¹•áÀ¥ì((€€€€€€€Í¡…É•‘áÀô(€€€€€€€€€€€Í¡…É•‘áÀ¬(€€€€€€€€€€€ÅÕ•ÍĞ¹É•İ…É¹•áÀì((€€€ô(((€€€ÕÁ‘…Ñ•½±‘¥ÍÁ±…ä ¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òkšRçš"C–>«¦7æ¨ÅÕ•ÍÑQ…‰	½‘ä(€€€€€€ƒ¦g–/–ºç–f£¾ò#Ú·š2–r£3š¾?š^—’îï–.g7–"¦‚¾ò'¾ò0(€€€€€€ƒ’â7–7šVÓ–/¢š[ª_¦7’úŠSŠQÉ•¹‘•ÉEÕ•ÍÑ½¹Ñ•¹Ğ ¤(€€€€€€ƒ¦g–/¢"+–÷–ò?–ŞËÚOš.š"C–§–/–"¦‚–B¢«j(€€€€€€ƒšâËš~O–÷–ò?¾ò3’â7–¶c–r£’ê(€€€€¨¼(€€€¥˜ …İ¥¹‘½Ü¹}}ØÄÜÌØÅ	Õ±­EÕ•ÍÑ±…¥´¥ìÍİ¥Ñ¡EÕ•ÍÑQ…ˆ ‰‘…¥±äˆ¤ìô()ô(()™Õ¹Ñ¥½¸±…¥µ½µµ¥ÍÍ¥½¹EÕ•ÍĞ¡ÅÕ•ÍÑ%¥ì((€€€½¹ÍĞÅÕ•ÍĞô((€€€€€€€½µµ¥ÍÍ¥½¹EÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì¹™¥¹ (€€€€€€€€€€€ÄôùÄ¹¥ôôõÅÕ•ÍÑ%(€€€€€€€€¤ì(((€€€¥˜ …ÅÕ•ÍĞ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÁÉ½É•ÍÌô((€€€€€€€½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”¹ÁÉ½É•ÍÍl(€€€€€€€€€€€ÅÕ•ÍÑ%(€€€€€€€uñğÀì(((€€€¥˜ (€€€€€€€ÁÉ½É•ÍÌñÅÕ•ÍĞ¹½…°ñğ(€€€€€€€½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”¹±…¥µ•‘mÅÕ•ÍÑ%‘t(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”¹±…¥µ•‘mÅÕ•ÍÑ%‘tô(€€€€€€€ÑÉÕ”ì(((€€€¥˜¡ÅÕ•ÍĞ¹É•İ…É¹½±¥ì((€€€€€€€½±ô(€€€€€€€€€€€½±¬(€€€€€€€€€€€ÅÕ•ÍĞ¹É•İ…É¹½±ì((€€€ô(((€€€¥˜¡ÅÕ•ÍĞ¹É•İ…É¹•áÀ¥ì((€€€€€€€Í¡…É•‘áÀô(€€€€€€€€€€€Í¡…É•‘áÀ¬(€€€€€€€€€€€ÅÕ•ÍĞ¹É•İ…É¹•áÀì((€€€ô(((€€€ÕÁ‘…Ñ•½±‘¥ÍÁ±…ä ¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì(€€€¥˜ …İ¥¹‘½Ü¹}}ØÄÜÌØÅ	Õ±­EÕ•ÍÑ±…¥´¥ìÍİ¥Ñ¡EÕ•ÍÑQ…ˆ ‰½µµ¥ÍÍ¥½¸ˆ¤ìô()ô(()™Õ¹Ñ¥½¸ØÄÜÌØÅ±…¥µ±±EÕ•ÍÑÉ½ÕÀ¡‘•™¥¹¥Ñ¥½¹Ì±ÍÑ…Ñ”±±…¥µ¸±Ñ¥Ñ±”¥ì(€€€½¹ÍĞ¥‘Ìõ•Ñ±…¥µ…‰±•EÕ•ÍÑ%‘Ì¡‘•™¥¹¥Ñ¥½¹Ì±ÍÑ…Ñ”¤ì(€€€¥˜ …¥‘Ì¹±•¹Ñ ¥ìØÄÜÌØÅI•™É•Í¡=Á•¹EÕ•ÍÑA…” ¤ìÉ•ÑÕÉ¸€Àìô(€€€İ¥¹‘½Ü¹}}ØÄÜÌØÅ	Õ±­EÕ•ÍÑ±…¥´õÑÉÕ”ì(€€€ÑÉåì¥‘Ì¹™½É… ¡™Õ¹Ñ¥½¸¡¥¥ì±…¥µ¸¡¥¤ìô¤ìô(€€€™¥¹…±±åìİ¥¹‘½Ü¹}}ØÄÜÌØÅ	Õ±­EÕ•ÍÑ±…¥´õ™…±Í”ìô(€€€ØÄÜÌØÅI•™É•Í¡=Á•¹EÕ•ÍÑA…” ¤ì(€€€¥˜¡ÑåÁ•½˜İ¥¹‘½Ü¹ÉÁ±•ÉĞôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€Ù½¥İ¥¹‘½Ü¹ÉÁ±•ÉĞ ‹–ŞË’â¦6×¦‚c–>X€ˆ­¥‘Ì¹±•¹Ñ ¬ˆƒ–,ˆ­Ñ¥Ñ±”¬‹6;–.×ˆ±íÑ¥Ñ±”éÑ¥Ñ±”¬‹6;–.Ôˆ±½¹™¥ÉµQ•áĞè‹~—¦O’êˆ±Ñ½¹”è‰ÍÕ•ÍÌ‰ô¤ì(€€€ô(€€€É•ÑÕÉ¸¥‘Ì¹±•¹Ñ ì)ô)™Õ¹Ñ¥½¸ØÄÜÌØÅ±…¥µ±±…¥±åEÕ•ÍÑÌ ¥ì(€€€É•ÑÕÉ¸ØÄÜÌØÅ±…¥µ±±EÕ•ÍÑÉ½ÕÀ¡‘…¥±åEÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì±‘…¥±åEÕ•ÍÑMÑ…Ñ”±±…¥µ…¥±åEÕ•ÍĞ°‹š¾?š^—’îï–.dˆ¤ì)ô)™Õ¹Ñ¥½¸ØÄÜÌØÅ±…¥µ±±½µµ¥ÍÍ¥½¹EÕ•ÍÑÌ ¥ì(€€€É•ÑÕÉ¸ØÄÜÌØÅ±…¥µ±±EÕ•ÍÑÉ½ÕÀ¡½µµ¥ÍÍ¥½¹EÕ•ÍÑ•™¥¹¥Ñ¥½¹Ì±½µµ¥ÍÍ¥½¹EÕ•ÍÑMÑ…Ñ”±±…¥µ½µµ¥ÍÍ¥½¹EÕ•ÍĞ°‹–S¢¢_’îï–.dˆ¤ì)ô)İ¥¹‘½Ü¹ØÄÜÌØÅ±…¥µ±±…¥±åEÕ•ÍÑÌõØÄÜÌØÅ±…¥µ±±…¥±åEÕ•ÍÑÌì)İ¥¹‘½Ü¹ØÄÜÌØÅ±…¥µ±±½µµ¥ÍÍ¥½¹EÕ•ÍÑÌõØÄÜÌØÅ±…¥µ±±½µµ¥ÍÍ¥½¹EÕ•ÍÑÌì((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒ–r[¦FD(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸É•¹‘•É	•ÍÑ¥…Éå½¹Ñ•¹Ğ ¥ì((€€€½¹ÍĞ…±±i½¹•ÉÉ…åÌõl(€€€€€€€™½É•ÍÑ5½¹ÍÑ•ÉÌ°(€€€€€€€‘•Í•ÉÑ5½¹ÍÑ•ÉÌ°(€€€€€€€¥•5½Õ¹Ñ…¥¹5½¹ÍÑ•ÉÌ°(€€€€€€€é½¹”Ñ5½¹ÍÑ•ÉÌ°(€€€€€€€é½¹”Õ5½¹ÍÑ•ÉÌ°(€€€€€€€é½¹”Ù5½¹ÍÑ•ÉÌ°(€€€€€€€é½¹”İ5½¹ÍÑ•ÉÌ°(€€€€€€€é½¹”á5½¹ÍÑ•ÉÌ(€€€tì(((€€€½¹ÍĞÍ••¹9…µ•Ìô(€€€€€€€¹•ÜM•Ğ ¤ì(((€€€±•Ğ¡Ñµ°ô(€€€€€€€€ˆˆì(((€€€…±±i½¹•ÉÉ…åÌ¹™½É…  (€€€€€€€é½¹•ÉÉ…äôùì((€€€€€€€€€€€é½¹•ÉÉ…ä¹™½É…  (€€€€€€€€€€€€€€€µ½¹ÍÑ•Èôùì((€€€€€€€€€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€€€€€€€€€Í••¹9…µ•Ì¹¡…Ì (€€€€€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”(€€€€€€€€€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€€€€€¥ì(€€€€€€€€€€€€€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€€€€€€€€€ô(((€€€€€€€€€€€€€€€€€€€Í••¹9…µ•Ì¹…‘ (€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”(€€€€€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€€€€€€€€€½¹ÍĞ•¹ÑÉäô((€€€€€€€€€€€€€€€€€€€€€€€‰•ÍÑ¥…Éå…Ñ…l(€€€€€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”(€€€€€€€€€€€€€€€€€€€€€€€tì(((€€€€€€€€€€€€€€€€€€€½¹ÍĞ•±•µ•¹Ğô((€€€€€€€€€€€€€€€€€€€€€€€•±•µ•¹Ñ…Ñ…‰…Í•l(€€€€€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹•±•µ•¹Ğ(€€€€€€€€€€€€€€€€€€€€€€€t(€€€€€€€€€€€€€€€€€€€€€€€ñğ(€€€€€€€€€€€€€€€€€€€€€€€•±•µ•¹Ñ…Ñ…‰…Í”¹™¥É”ì(((€€€€€€€€€€€€€€€€€€€¡Ñµ°¬ô((€€€€€€€€€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µÉ½Üˆøœ¬((€€€€€€€€€€€€€€€€€€€€€€€€ˆñÍÁ…¸øˆ¬((€€€€€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€€€€€•¹ÑÉä€˜˜•¹ÑÉä¹Í••¸(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€€€€•Ñ±•µ•¹Ñ%½¹!Q50 (€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹•±•µ•¹Ğ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ˆˆ­µ½¹ÍÑ•È¹¹…µ”(€€€€€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€€€€€‹¾ò¾ò¾ò|ˆ(€€€€€€€€€€€€€€€€€€€€€€€€¤¬((€€€€€€€€€€€€€€€€€€€€€€€€ˆğ½ÍÁ…¸øˆ¬((€€€€€€€€€€€€€€€€€€€€€€€€ˆñÍÁ…¸øˆ¬((€€€€€€€€€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€€€€€€€€•¹ÑÉä€˜˜•¹ÑÉä¹Í••¸(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€€€€€‹šN+šºèˆ¬¡•¹ÑÉä¹­¥±±ÍñğÀ¤(€€€€€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€€€€€‹šr«¦¢š,ˆ(€€€€€€€€€€€€€€€€€€€€€€€€¤¬((€€€€€€€€€€€€€€€€€€€€€€€€ˆğ½ÍÁ…¸øˆ¬((€€€€€€€€€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆì((€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€¤ì((€€€€€€€ô(€€€€¤ì(((€€€É•ÑÕÉ¸¡Ñµ°ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒš"C–ÂÄ(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸É•¹‘•É¡¥•Ù•µ•¹Ñ½¹Ñ•¹Ğ ¥ì((€€€±•Ğ¡Ñµ°ô(€€€€€€€€ˆˆì(((€€€…¡¥•Ù•µ•¹Ñ•™¥¹¥Ñ¥½¹Ì¹™½É…  (€€€€€€€…¡¥•Ù•µ•¹Ğôùì((€€€€€€€€€€€½¹ÍĞ‘½¹”ô((€€€€€€€€€€€€€€€…¡¥•Ù•µ•¹Ğ¹¡•¬ ¤ì(((€€€€€€€€€€€½¹ÍĞ±…¥µ•ô((€€€€€€€€€€€€€€€…¡¥•Ù•µ•¹ÑMÑ…Ñ•l(€€€€€€€€€€€€€€€€€€€…¡¥•Ù•µ•¹Ğ¹¥(€€€€€€€€€€€€€€€tì(((€€€€€€€€€€€½¹ÍĞÉ•İ…É‘Q•áĞô((€€€€€€€€€€€€€€€=‰©•Ğ¹­•åÌ (€€€€€€€€€€€€€€€€€€€…¡¥•Ù•µ•¹Ğ¹É•İ…É(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€¹µ…À (€€€€€€€€€€€€€€€€€€€­•äôø(€€€€€€€€€€€€€€€€€€€€€€€…¡¥•Ù•µ•¹Ğ¹É•İ…É‘m­•åt¬ˆˆ(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€¹©½¥¸ ‹ˆ¤ì(((€€€€€€€€€€€¡Ñµ°¬ô((€€€€€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µÉ½Üˆøœ¬((€€€€€€€€€€€€€€€€ˆñÍÁ…¸øˆ¬(€€€€€€€€€€€€€€€…¡¥•Ù•µ•¹Ğ¹¹…µ”¬(€€€€€€€€€€€€€€€€ˆñ‰Èøˆ¬(€€€€€€€€€€€€€€€€œñÍÁ…¸ÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÅÁàí½±½ÈèˆÍ„ÔáŒìˆøœ¬(€€€€€€€€€€€€€€€…¡¥•Ù•µ•¹Ğ¹‘•ÍŒ¬(€€€€€€€€€€€€€€€€‹6;–.×¾òhˆ­É•İ…É‘Q•áĞ¬(€€€€€€€€€€€€€€€€ˆğ½ÍÁ…¸øˆ¬(€€€€€€€€€€€€€€€€ˆğ½ÍÁ…¸øˆ¬((€€€€€€€€€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸ˆœ¬((€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€€…‘½¹”ñğ±…¥µ•(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€‰‘¥Í…‰±•ˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€¤¬((€€€€€€€€€€€€€€€€½¹±¥¬ô‰±…¥µ¡¥•Ù•µ•¹Ğ¡pœœ¬(€€€€€€€€€€€€€€€…¡¥•Ù•µ•¹Ğ¹¥¬(€€€€€€€€€€€€€€€€pœ¤ˆøœ¬((€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€±…¥µ•(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€‹–ŞË¦‚c–>Xˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€‘½¹”(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€‹¦‚c–>Xˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€‹šr«¦Sš"@ˆ(€€€€€€€€€€€€€€€€¤¬((€€€€€€€€€€€€€€€€ˆğ½‰ÕÑÑ½¸øˆ¬((€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆì((€€€€€€€ô(€€€€¤ì(((€€€É•ÑÕÉ¸¡Ñµ°ì()ô(()™Õ¹Ñ¥½¸±…¥µ¡¥•Ù•µ•¹Ğ¡…¡¥•Ù•µ•¹Ñ%¥ì((€€€½¹ÍĞ…¡¥•Ù•µ•¹Ğô((€€€€€€€…¡¥•Ù•µ•¹Ñ•™¥¹¥Ñ¥½¹Ì¹™¥¹ (€€€€€€€€€€€„ôù„¹¥ôôõ…¡¥•Ù•µ•¹Ñ%(€€€€€€€€¤ì(((€€€¥˜ ……¡¥•Ù•µ•¹Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜ (€€€€€€€€……¡¥•Ù•µ•¹Ğ¹¡•¬ ¤ñğ(€€€€€€€…¡¥•Ù•µ•¹ÑMÑ…Ñ•m…¡¥•Ù•µ•¹Ñ%‘t(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€…¡¥•Ù•µ•¹ÑMÑ…Ñ•m…¡¥•Ù•µ•¹Ñ%‘tô(€€€€€€€ÑÉÕ”ì(((€€€¥˜¡…¡¥•Ù•µ•¹Ğ¹É•İ…É¹½±¥ì((€€€€€€€½±ô(€€€€€€€€€€€½±¬(€€€€€€€€€€€…¡¥•Ù•µ•¹Ğ¹É•İ…É¹½±ì((€€€ô(((€€€ÕÁ‘…Ñ•½±‘¥ÍÁ±…ä ¤ì((€€€Í…Ù•…µ” ¤ì(((€€€½¹ÍĞ‰½‘å°ô(€€€€€€€€ ‰¡½µ••…ÑÕÉ•5½‘…±	½‘äˆ¤ì(((€€€¥˜¡‰½‘å°¥ì((€€€€€€€‰½‘å°¹¥¹¹•É!Q50ô(€€€€€€€€€€€É•¹‘•É¡¥•Ù•µ•¹Ñ½¹Ñ•¹Ğ ¤ì((€€€ô()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒ–³–F((ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸É•¹‘•É¹¹½Õ¹•µ•¹Ñ½¹Ñ•¹Ğ ¥ì((€€€½¹ÍĞÉ•±•…Í•UÁ‘…Ñ”ô(€€€€€€€İ¥¹‘½Ü¹½ÕÉMåµ‰½±ÍI•±•…Í•UÁ‘…Ñ”ì((€€€¥˜ (€€€€€€€É•±•…Í•UÁ‘…Ñ”˜˜(€€€€€€€ÑåÁ•½˜É•±•…Í•UÁ‘…Ñ”¹É•¹‘•É¹¹½Õ¹•µ•¹Ñ½¹Ñ•¹Ğôôô‰™Õ¹Ñ¥½¸ˆ(€€€€¥ì(€€€€€€€½¹ÍĞÉ•±•…Í•½¹Ñ•¹Ğô(€€€€€€€€€€€É•±•…Í•UÁ‘…Ñ”¹É•¹‘•É¹¹½Õ¹•µ•¹Ñ½¹Ñ•¹Ğ ¤ì((€€€€€€€¥˜¡É•±•…Í•½¹Ñ•¹Ğ¥ì(€€€€€€€€€€€É•ÑÕÉ¸É•±•…Í•½¹Ñ•¹Ğì(€€€€€€€ô(€€€ô((€€€É•ÑÕÉ¸€ ((€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÍÁàí±¥¹”µ¡•¥¡ĞèÄ¸àìˆøœ¬((€€€€€€€€‹’âï–~;–£šZÃšRç&#¾òñ‰Èøˆ¬(€€€€€€€€‹šZÃ–Š{–V–ê_–r[¦FGš¾?š^—’îï–.gš"C–ÂÇÎïÖÇ¾ò0ˆ¬(€€€€€€€€‹š¶‡¢ş;š‹š‹¦o¦oñ‰Èøñ‰Èøˆ¬((€€€€€€€€‹¦Z/fó’â·–*¢÷¾òhñ‰Èøˆ¬(€€€€€€€€‹šnÓ–’k¢w–
+gšnÓ–’k–rÃ–6šnÓ–’kš*¢÷¾ò0ˆ¬(€€€€€€€€‹¦fãê3šnÓšZÃ’â·ˆ¬((€€€€€€€€ˆğ½‘¥Øøˆ((€€€€¤ì()ô(()™Õ¹Ñ¥½¸É•¹‘•ÉMåÍÑ•µ½¹Ñ•¹Ğ ¥ì((€€€É•ÑÕÉ¸€ (€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÍåÍÑ•´µÁ…¹•°ˆøœ¬(€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÍåÍÑ•´µÁ…¹•°µÉ½Üˆøœ¬(€€€€€€€€€€€€€€€€œñ‘¥ØøñÍÑÉ½¹œû¦+š"Ë–¶cšªPğ½ÍÑÉ½¹œøñÍµ…±°ûn»–&7¦+š"Ëšr¢«–.W–¶cšªS¾ò3’æ–>¿’î—®/–6Ïš&/–.W’şw–¶cğ½Íµ…±°øğ½‘¥Øøœ¬(€€€€€€€€€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸ˆ½¹±¥¬ô‰Í…Ù•…µ” ¤í…±•ÉĞ¡pŸ–ŞË–º3š"Cš&/–.W–¶cšªS	pœ¤ˆû®/–6Ï–¶cšªPğ½‰ÕÑÑ½¸øœ¬(€€€€€€€€€€€€œğ½‘¥Øøœ¬(€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÍåÍÑ•´µÁ…¹•°µÉ½Üˆøœ¬(€€€€€€€€€€€€€€€€œñ‘¥ØøñÍÑÉ½¹œû–âÏ¢fº‡Bğ½ÍÑÉ½¹œøñÍµ…±°ûš~—r/n»–&4¥É•‰…Í”U%fï–ëš"[–"š>o–âÏ¢fğ½Íµ…±°øğ½‘¥Øøœ¬(€€€€€€€€€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸ˆ½¹±¥¬ô‰İ¥¹‘½Ü¹½ÕÉMåµ‰½±ÍMÑ…ÉÑÕÁA½±¥ä˜™İ¥¹‘½Ü¹½ÕÉMåµ‰½±ÍMÑ…ÉÑÕÁA½±¥ä¹½Á•¹½Õ¹Ñ5…¹…•È ¤ˆû–"š>o–âÏ¢f¾ò?Ú–ºk–âÏ¢f|ğ½‰ÕÑÑ½¸øœ¬(€€€€€€€€€€€€œğ½‘¥Øøœ¬(€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÍåÍÑ•´µÁ…¹•°µÉ½Üˆøœ¬(€€€€€€€€€€€€€€€€œñ‘¥ØøñÍÑÉ½¹œû–º‹šr7’ş‡ºÄğ½ÍÑÉ½¹œøñÍµ…±°ûš~—r/+–no¢Æ‡šÆšæ[–
+Ï/–º‹šr7¢¿Ö‡šZç–ò?ğ½Íµ…±°øğ½‘¥Øøœ¬(€€€€€€€€€€€€€€€€œñ‰ÕÑÑ½¸¥ô‰ÍåÍÑ•µMÕÁÁ½ÉÑµ…¥±	ÕÑÑ½¸ˆ±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸ˆ½¹±¥¬ô‰İ¥¹‘½Ü¹½ÕÉMåµ‰½±ÍMÕÁÁ½ÉĞ¹Í¡½Ü ¤ˆûš~—r/’ş‡ºÄğ½‰ÕÑÑ½¸øœ¬(€€€€€€€€€€€€œğ½‘¥Øøœ¬(€€€€€€€€€€€€œñ‘¥Ø±…ÍÌô‰ÍåÍÑ•´µÁ…¹•°µÉ½Ü‘…¹•Èˆøœ¬(€€€€€€€€€€€€€€€€œñ‘¥ØøñÍÑÉ½¹œû–"«¦f“¢K¢&Èğ½ÍÑÉ½¹œøñÍµ…±°û–"«¦f“–£¦£¢K¢&Ë¢"¦+š"Ë¦Ë–ê›¾ò3¢şS–n{–"w–/–&×¢K¦‚¦v‹ğ½Íµ…±°øğ½‘¥Øøœ¬(€€€€€€€€€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸ˆ½¹±¥¬ô‰É•Í•Ñ…µ” ¤ˆû–"«¦f“¢K¢&Èğ½‰ÕÑÑ½¸øœ¬(€€€€€€€€€€€€œğ½‘¥Øøœ¬(€€€€€€€€œğ½‘¥Øøœ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸É•ÍÑÑ!½µ” ¥ì((€€€¥˜¡‰…ÑÑ±•Ñ¥Ù”¥ì((€€€€€€€…±•ÉĞ (€€€€€€€€€€€€‹š"Ã¦²—’â·‡šÎW’òGš¿ˆ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞ¹••‘ÍI•ÍĞõ•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹Í½µ”¡¥¹‘•àôùì(€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤ì(€€€€€€€½¹ÍĞÍÑ…ÑÌõ•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ¡¥¹‘•à¤ì(€€€€€€€É•ÑÕÉ¸¡…É…Ñ•È¹¡ÀñÍÑ…ÑÌ¹µ…á!@ñğ¡…É…Ñ•È¹ÍÀñÍÑ…ÑÌ¹µ…áM@ì(€€€ô¤ì((€€€¥˜ …¹••‘ÍI•ÍĞ¥ì((€€€€€€€…±•ÉĞ (€€€€€€€€€€€€‰!CM@ƒ–ŞËÚOšb¿šîÿj’êˆ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹™½É… ¡¥¹‘•àôùì(€€€€€€€½¹ÍĞ¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤ì(€€€€€€€½¹ÍĞÍÑ…ÑÌõ•ÑA…ÉÑå	…ÑÑ±•MÑ…ÑÌ¡¥¹‘•à¤ì(€€€€€€€¡…É…Ñ•È¹¡ÀõÍÑ…ÑÌ¹µ…á!@ì(€€€€€€€¡…É…Ñ•È¹ÍÀõÍÑ…ÑÌ¹µ…áM@ì(€€€ô¤ì(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì(((€€€…±•ÉĞ (€€€€€€€€‹’òGš¿–º3V‹¾ò1!C¾ò=M@ƒ–ŞËÚO–£¦£¢sšîÿˆ(€€€€¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€XäÈƒŠPƒ’âï–~;¦Z/fóšâ³¢¦›–ş¯š6ß¦6Ô(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸É…¹ÑQ•ÍÑ½±‘5¥±±¥½¸ ¥ì(€€€½±ô(€€€€€€€5…Ñ ¹µ…à À±5…Ñ ¹™±½½È¡9Õµ‰•È¡½±¥ñğÀ¤¤¬(€€€€€€€QMQ}=1}I9Pì((€€€ÕÁ‘…Ñ•½±‘¥ÍÁ±…ä ¤ì(€€€ÕÁ‘…Ñ•U$ ¤ì(€€€Í…Ù•…µ” ¤ì((€€€…±•ÉĞ (€€€€€€€€‹¦G–æŒ€¬Ä°ÀÀÀ°ÀÀÃ¾ò3n»–&7–Çšr$€ˆ¬(€€€€€€€½±¹Ñ½1½…±•MÑÉ¥¹œ ‰é µQ\ˆ¤¬(€€€€€€€€ˆƒ¦G–æˆ(€€€€¤ì)ô()™Õ¹Ñ¥½¸É…¹ÑQ•ÍÑáÁQ•¹5¥±±¥½¸ ¥ì(€€€Í¡…É•‘áÀô(€€€€€€€5…Ñ ¹µ…à À±5…Ñ ¹™±½½È¡9Õµ‰•È¡Í¡…É•‘áÀ¥ñğÀ¤¤¬(€€€€€€€QMQ}aA}A==1}I9Pì((€€€ÕÁ‘…Ñ•U$ ¤ì(€€€Í…Ù•…µ” ¤ì((€€€…±•ÉĞ (€€€€€€€€‹ÚO¦¦_šÆ€€¬Ä°ÀÀÀ°ÀÀÀ°ÀÀÃ¾ò3n»–&7–Çšr$€ˆ¬(€€€€€€€Í¡…É•‘áÀ¹Ñ½1½…±•MÑÉ¥¹œ ‰é µQ\ˆ¤¬(€€€€€€€€ˆaCˆ(€€€€¤ì)ô()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•!½µ•Q•ÍÑQ½½±Ì ¥ì(€€€½¹ÍĞ½±‘	ÕÑÑ½¸ô ‰Ñ•ÍÑ½±‘5¥±±¥½¹	ÕÑÑ½¸ˆ¤ì(€€€½¹ÍĞ•áÁ	ÕÑÑ½¸ô ‰Ñ•ÍÑáÁQ•¹5¥±±¥½¹	ÕÑÑ½¸ˆ¤ì((€€€¥˜¡½±‘	ÕÑÑ½¸¥ì(€€€€€€€½±‘	ÕÑÑ½¸¹¥¹¹•É!Q50ô‹¦G–æŒ€ñˆø¬ÄÀÃ¢B°ğ½ˆøˆì(€€€ô((€€€¥˜¡•áÁ	ÕÑÑ½¸¥ì(€€€€€€€•áÁ	ÕÑÑ½¸¹¥¹¹•É!Q50ô‹ÚO¦¦_šÆ€€ñˆø¬ÄÃ–ğ½ˆøˆì(€€€ô)ô(((¼¨(€€ƒŠbƒšâ³¢¦›R£¾òkš*¢÷¦îx€¬ääç((€€ƒÒSÊçšZç’úÿ’öƒšâ³¢¦›š*¢÷šV#šzs¾ò#–Â“–Ûšb¿K¦g¢¸(€€ƒ¦r¢š’â¢Ş¿–6Òkš&7r/–ú_–ë–Ş»VÃjš*¢÷¾ò'¾ò0(€€ƒ’æ/–ú3š¶–ò?&#’â+Şk–&7¢¢c–ú_š*+¦g–ò×–6‡&(€€ƒ¢Ş¦g–/–÷–ò?’â¢Ößš.ÿš:'(¨¼()™Õ¹Ñ¥½¸É…¹ÑQ•ÍÑM­¥±±A½¥¹ÑÌ ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦g¢‡–¾¯š¶ï–>«–*ƒÖ™Á±…å•Ë¾ò#²³’â¢K¢&Ë¾ò'¾ò0(€€€€€€ƒ²³’ê3¢K¢&ËšÂã¦ƒšâ³¢¦›’â7–"Ã3Ö›¦î{šVã7¦g–/š2'¦"W¾ò0(€€€€€€ƒ–ºçšbO¢ºO’êë¢ª“’î—
+ë²³’ê3¢K¢&Ëjš*¢÷¦î{šb¿–ú{–"—j–rÃšZä(€€€€€€ƒ¾ò#Rk¢Í‰ÕŸ¾ò'–K–ë’új(€€€€€€ƒšRçš"AÁ±…å•ÈË–¶c–r£j¢¦Ç–§¦
++¦÷–B–*€ääç¾ò0(€€€€€€ƒšâ³¢¦›–N«–/¢K¢&Ë¦÷šZç’úÿ(€€€€¨¼((€€€Á±…å•È¹Í­¥±±A½¥¹ÑÌ¬ôäääì(((€€€±•Ğµ•ÍÍ…”ô((€€€€€€€€‹š*¢÷¦îx€¬ääç¾ò30ˆ¬(€€€€€€€€¡Á±…å•È¹¥‘ñğ‹²³’â¢K¢&Èˆ¤¬(€€€€€€€€‹7n»–&7–Çšr$ˆ¬(€€€€€€€Á±…å•È¹Í­¥±±A½¥¹ÑÌ¬(€€€€€€€€‹¦î{ˆì(((€€€¥˜¡Á±…å•ÈÈ¥ì((€€€€€€€Á±…å•ÈÈ¹Í­¥±±A½¥¹ÑÌ¬ôäääì(((€€€€€€€µ•ÍÍ…”¬ô((€€€€€€€€€€€€‰q»0ˆ¬(€€€€€€€€€€€Á±…å•ÈÈ¹¥¬(€€€€€€€€€€€€‹7n»–&7–Çšr$ˆ¬(€€€€€€€€€€€Á±…å•ÈÈ¹Í­¥±±A½¥¹ÑÌ¬(€€€€€€€€€€€€‹¦î{ˆì((€€€ô((€€€¥˜¡Á±…å•ÈÌ¥ì((€€€€€€€Á±…å•ÈÌ¹Í­¥±±A½¥¹ÑÌ¬ôäääì((€€€€€€€µ•ÍÍ…”¬ô(€€€€€€€€€€€€‰q»0ˆ¬(€€€€€€€€€€€Á±…å•ÈÌ¹¥¬(€€€€€€€€€€€€‹7n»–&7–Çšr$ˆ¬(€€€€€€€€€€€Á±…å•ÈÌ¹Í­¥±±A½¥¹ÑÌ¬(€€€€€€€€€€€€‹¦î{ˆì((€€€ô(((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤ì((€€€Í…Ù•…µ” ¤ì(((€€€…±•ÉĞ (€€€€€€€µ•ÍÍ…”(€€€€¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#šâ³¢¦›R£¾ò'¾òkÚO¦¦_šÆ€€¬ÄÀÀÀÀÃ((€€ƒÒSÊçšZç’úÿšâ³¢¦›–6Òkš*¢÷¦Z/šRû¦Zšªï¦g¦†x(€€ƒ¦r¢šŞÓ–*ŞÓ–ú#’æš&7r/–ú_–"ÃšV#šzsjšvÇ¢–ÿ¾ò0(€€ƒnÓš:—š*+ÚO¦¦_–¶c¦Ë–ÇR£ÚO¦¦_šÆƒ¾ò0(€€ƒ’æ/–ú3¢š’â7¢š–"Ö›¢K¢&Ë¦
+šb¿Ÿ–:šr³jšZç–ò<(€€ƒ¢«–ŞÇ–:ï–"¦7’æ/–ú3š¶–ò?&#’â+Şk–&7¢¢c–ú\(€€ƒš*+¦g–/š2'¦"W¢Ş¦g–/–÷–ò?’â¢Ößš.ÿš:'(¨¼()™Õ¹Ñ¥½¸É…¹ÑQ•ÍÑáÀ ¥ì((€€€Í¡…É•‘áÀ¬ôÄÀÀÀÀÀì((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì(((€€€…±•ÉĞ (€€€€€€€€‹ÚO¦¦_šÆ€€¬ÄÀÀÀÀÃ¾ò3n»–&7–Çšr$ˆ¬(€€€€€€€Í¡…É•‘áÀ¬(€€€€€€€€‹¦î{ÚO¦¦_–óˆ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸‘¥ÍÑÉ¥‰ÕÑ•áÁQ½A±…å•È ¥ì((€€€‘¥ÍÑÉ¥‰ÕÑ•áÁQ½¡…É…Ñ•È (€€€€€€€Á±…å•È(€€€€¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾òk–"¦7ÚO¦¦_–óÖ›²³’ê3¢K¢&Ë(€€ƒ¢Ş}‘¥ÍÑÉ¥‰ÕÑ•áÁQ½A±…å•È §šb¿–B3’â––_¦
+?¢ò¿¾ò0(€€ƒnÓš:—–Fó–>¯–ÇR£–÷–ò?¾ò3–>«šb¿š>o’â–/¢K¢&Ë&§’îÛ(¨¼()™Õ¹Ñ¥½¸‘¥ÍÑÉ¥‰ÕÑ•áÁQ½A±…å•ÈÈ ¥ì((€€€¥˜ …Á±…å•ÈÈ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€‘¥ÍÑÉ¥‰ÕÑ•áÁQ½¡…É…Ñ•È (€€€€€€€Á±…å•ÈÈ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸‘¥ÍÑÉ¥‰ÕÑ•áÁQ½A±…å•ÈÌ ¥ì((€€€¥˜ …Á±…å•ÈÌ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€‘¥ÍÑÉ¥‰ÕÑ•áÁQ½¡…É…Ñ•È (€€€€€€€Á±…å•ÈÌ(€€€€¤ì()ô(((¼¨(€€ƒš*)‘¥ÍÑÉ¥‰ÕÑ•áÁQ½A±…å•È §–:šr³j¦
+?¢ò¼(€€ƒš*÷š"C¦kR£–÷–ò?¾ò1Á±…å•È½Á±…å•ÈË–ÇR£–B3’â––_¾ò0(€€ƒ’â7R£Ú·¢¶ß–§’î÷–æû’æ;’âš¢j¢/–ò?Šó(¨¼()™Õ¹Ñ¥½¸‘¥ÍÑÉ¥‰ÕÑ•áÁQ½¡…É…Ñ•È¡¡…É…Ñ•È¥ì((€€€¥˜¡‰…ÑÑ±•Ñ¥Ù”¥ì((€€€€€€€…±•ÉĞ (€€€€€€€€€€€€‹š"Ã¦²—’â·‡šÎW–"¦7ÚO¦¦_–óˆ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€¥˜¡Í¡…É•‘áÀğôÀ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³šb¿š*+ÚO¦¦_šÆƒ3–£¦£7’âš²‡–†{Ö›¢K¢&Ë¾ò0(€€€€€€ƒ–>¿¢÷’âš²‡¦ê3–6––÷–æûÒk¾ò0(€€€€€€ƒ¢3’âSšrš*+ÚO¦¦_šÆƒšâ¦ë¾ò0(€€€€€€ƒ–Â;¢Ó:§–ºÛšÊK¢ú›šÎWš*+–&§’â/jÚO¦¦\(€€€€€€ƒVgÖ›–Û’î[¢K¢&Ë((€€€€€€ƒšRçš"C¾òkš¾?š2'’âš²‡¾ò3–>«¢ö'ï3–&o––÷–6’â+’â/’âÒk4(€€€€€€ƒš&¦r¢šjÚO¦¦_–ó¾ò3’âš²‡–>«–6’âÒk(€€€€€€ƒ–ššzsÚO¦¦_šÆƒ’â7–’ƒ–6’âÒk¾ò0(€€€€€€ƒ–ÂÇ’â7¢ö'ïš>C’ë¦
+–Ş»–’k–ÂG¾ò0(€€€€€€ƒ¦ÿ–7ÚO¦¦_–ó–6‡–r£’â–/’â7’â+’â7’â/j.š/((€€€€€€ƒŠbƒšZÃ–Š{¦bË–F¾òh(€€€€€€ƒ–ššzs¢K¢&Ëj•áÃ’â7~—¦O
+ë’î¦êó–ŞËÚO¢Ú¦9•áÁ9•áĞ(€€€€€€ƒ¾ò#B¢®[’â+’â7¢¦ËfóR¾ò3’ö–¶cšªS–>¿¢÷–nƒ
+ëš~C’êošN7’öp(€€€€€€ƒVg’â/’â7’â¢Ój¢ÎšZg¾ò'¾ò1¹••‘•“šr¢º+š"C¢ÊƒšVãš"XÃ¾ò0(€€€€€€ƒ¦gš¢1Í¡…É•‘áÀñ¹••‘•“7¦g–/–"“šZßšÂã¦ƒšb½™…±Í—¾ò0(€€€€€€ƒ¶'šZóf÷f÷–ú{ÚO¦¦_šÆƒ¦
+¢‡3–ß7–"Á•áÃ¾ò0(€€€€€€ƒ¦
+–>¿¢÷¢ºM¡•­1•Ù•±UÀ §’âš²‡¢ŞG–ú#–’k¢ò«¾ò0(€€€€€€ƒ3–ë¦n‹¢¶sjš*¢÷¦îx¿–Æ³šŸ¦î{šVã–¶_(€€€€€€ƒ¦g¢‡–#š*)¹••‘•“–’û–r£šr–Â<Ç¾ò0(€€€€€€ƒ–úç–êW¦ÿ–7¦g–/šò?šÒ{(€€€€¨¼((€€€½¹ÍĞ¹••‘•€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€Ä°(€€€€€€€€€€€¡…É…Ñ•È¹•áÁ9•áĞ´(€€€€€€€€€€€¡…É…Ñ•È¹•áÀ(€€€€€€€€¤ì(((€€€¥˜¡Í¡…É•‘áÀñ¹••‘•¥ì((€€€€€€€…±•ÉĞ (€€€€€€€€€€€€‹ÚO¦¦_šÆƒ’â7¢ÚÏ’î—–6Òk¾ò3¦
+–Ş¸ˆ¬(€€€€€€€€€€€€¡¹••‘•µÍ¡…É•‘áÀ¤¬(€€€€€€€€€€€€‰aCˆ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€¡…É…Ñ•È¹•áÀ€¬ô(€€€€€€€¹••‘•ì((€€€Í¡…É•‘áÀ€´ô(€€€€€€€¹••‘•ì(((€€€¡•­1•Ù•±UÀ (€€€€€€€¡…É…Ñ•È(€€€€¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì()ô(()™Õ¹Ñ¥½¸É•¹‘•ÉáÁ¥ÍÑÉ¥‰ÕÑ•1¥ÍĞ ¥ì((€€€½¹ÍĞ½¹Ñ…¥¹•È€ô(€€€€€€€€ ‰•áÁ¥ÍÑÉ¥‰ÕÑ•1¥ÍĞˆ¤ì(((€€€¥˜ …½¹Ñ…¥¹•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹Ñ…¥¹•È¹¥¹¹•É!Q50ôˆˆì(((€€€½¹ÍĞ•±•µ•¹Ğ€ô(€€€€€€€•±•µ•¹Ñ…Ñ…‰…Í•l(€€€€€€€€€€€Á±…å•È¹•±•µ•¹Ğ(€€€€€€€uñğ(€€€€€€€•±•µ•¹Ñ…Ñ…‰…Í”¹™¥É”ì(((€€€½¹ÍĞ¹••‘•€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€À°(€€€€€€€€€€€Á±…å•È¹•áÁ9•áĞ´(€€€€€€€€€€€Á±…å•È¹•áÀ(€€€€€€€€¤ì(((€€€½¹ÍĞµ…¥¹I½Ü€ô(€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€¤ì(((€€€µ…¥¹I½Ü¹¥¹¹•É!Q50€ô((€€€€€€€€(€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€¥ô‰‘¥ÍÑÉ¥‰ÕÑ•5…¥¹	ÕÑÑ½¸ˆ(€€€€€€€€€€€±…ÍÌô‰•áÀµ‘¥ÍÑÉ¥‰ÕÑ”µ‰ÕÑÑ½¸ˆ(€€€€€€€€ø(€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰•áÀµ¡…É…Ñ•Èµ¥½¸ˆø‘í•±•µ•¹Ğ¹¥½¹ôğ½ÍÁ…¸ø(€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰•áÀµ¡…É…Ñ•Èµ½Áäˆø(€€€€€€€€€€€€€€€€ñÍÑÉ½¹œø‘íÁ±…å•È¹¥‘ññ•±•µ•¹Ğ¹¡…É…Ñ•Éôğ½ÍÑÉ½¹œø(€€€€€€€€€€€€€€€€ñÍµ…±°ù1Ø¸‘íÁ±…å•È¹±•Ù•±ôƒŠH1Ø¸‘íÁ±…å•È¹±•Ù•°¬Åôğ½Íµ…±°ø(€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰•áÀµ¡…É…Ñ•Èµ½ÍĞˆø(€€€€€€€€€€€€€€€€ñˆø‘í¹••‘•¹Ñ½1½…±•MÑÉ¥¹œ ‰é µQ\ˆ¥ôğ½ˆø(€€€€€€€€€€€€€€€€ñÍµ…±°ùa@ğ½Íµ…±°ø(€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€ì(((€€€½¹Ñ…¥¹•È¹…ÁÁ•¹‘¡¥± (€€€€€€€µ…¥¹I½Ü(€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’âš²‡–>«–6’âÒk¾òh(€€€€€€ƒÚO¦¦_šÆƒ’â7–’ƒ–6’â/’âÒkšfnÓš:—¦:[’ö?š2'¦"W¾ò0(€€€€€€ƒ’â7šr¢ºO:§–ºÛ¢ª“š2'–ú3š*+ÚO¦¦_šÆƒšâ¦è(€€€€€€ƒ–6ï–6’â7’êÒk(€€€€¨¼((€€€€ ‰‘¥ÍÑÉ¥‰ÕÑ•5…¥¹	ÕÑÑ½¸ˆ¤(€€€€€€€€¹‘¥Í…‰±•€ô(€€€€€€€Í¡…É•‘áÀñ¹••‘•ñğ(€€€€€€€‰…ÑÑ±•Ñ¥Ù”ì(((€€€€ ‰‘¥ÍÑÉ¥‰ÕÑ•5…¥¹	ÕÑÑ½¸ˆ¤(€€€€€€€€¹½¹±¥¬€ô(€€€€€€€‘¥ÍÑÉ¥‰ÕÑ•áÁQ½A±…å•Èì(((€€€€¼¨(€€€€€€ƒŠbƒ²³’ê3¢K¢&Ëj–"¦7š2'¦"W¾ò#šZÃ–Š{¾ò'(€€€€€€Á±…å•ÈË–¶c–r£j¢¦Ç¦†¿’ërš¶–>¿’î—š2'jš2'¦"W¾ò0(€€€€€€ƒ¦
+?¢ò¿¢Ş²³’â¢K¢&Ëjš2'¦"W–º3–£–Â7¢Ç(€€€€¨¼((€€€¥˜¡Á±…å•ÈÈ¥ì((€€€€€€€½¹ÍĞÁ±…å•ÈÉI½Üô(€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€€€€€¤ì(((€€€€€€€½¹ÍĞ¹••‘•Èô(€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€Á±…å•ÈÈ¹•áÁ9•áĞ´(€€€€€€€€€€€€€€€Á±…å•ÈÈ¹•áÀ(€€€€€€€€€€€€¤ì(((€€€€€€€Á±…å•ÈÉI½Ü¹¥¹¹•É!Q50ô((€€€€€€€€€€€€(€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€¥ô‰‘¥ÍÑÉ¥‰ÕÑ•A±…å•ÈÉ	ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€±…ÍÌô‰•áÀµ‘¥ÍÑÉ¥‰ÕÑ”µ‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰•áÀµ¡…É…Ñ•Èµ¥½¸ˆûŠ^ğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰•áÀµ¡…É…Ñ•Èµ½Áäˆø(€€€€€€€€€€€€€€€€€€€€ñÍÑÉ½¹œø‘íÁ±…å•ÈÈ¹¥‘ôğ½ÍÑÉ½¹œø(€€€€€€€€€€€€€€€€€€€€ñÍµ…±°ù1Ø¸‘íÁ±…å•ÈÈ¹±•Ù•±ôƒŠH1Ø¸‘íÁ±…å•ÈÈ¹±•Ù•°¬Åôğ½Íµ…±°ø(€€€€€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰•áÀµ¡…É…Ñ•Èµ½ÍĞˆø(€€€€€€€€€€€€€€€€€€€€ñˆø‘í¹••‘•È¹Ñ½1½…±•MÑÉ¥¹œ ‰é µQ\ˆ¥ôğ½ˆø(€€€€€€€€€€€€€€€€€€€€ñÍµ…±°ùa@ğ½Íµ…±°ø(€€€€€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€€€€€ì(((€€€€€€€½¹Ñ…¥¹•È¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€Á±…å•ÈÉI½Ü(€€€€€€€€¤ì(((€€€€€€€€ ‰‘¥ÍÑÉ¥‰ÕÑ•A±…å•ÈÉ	ÕÑÑ½¸ˆ¤(€€€€€€€€€€€€¹‘¥Í…‰±•ô((€€€€€€€€€€€Í¡…É•‘áÀñ¹••‘•Èñğ(€€€€€€€€€€€‰…ÑÑ±•Ñ¥Ù”ì(((€€€€€€€€ ‰‘¥ÍÑÉ¥‰ÕÑ•A±…å•ÈÉ	ÕÑÑ½¸ˆ¤(€€€€€€€€€€€€¹½¹±¥¬ô(€€€€€€€€€€€‘¥ÍÑÉ¥‰ÕÑ•áÁQ½A±…å•ÈÈì((€€€ô(((€€€¥˜¡Á±…å•ÈÌ¥ì((€€€€€€€½¹ÍĞÁ±…å•ÈÍI½Üô(€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€€€€€¤ì((€€€€€€€½¹ÍĞ¹••‘•Ìô(€€€€€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€€€€€À°(€€€€€€€€€€€€€€€Á±…å•ÈÌ¹•áÁ9•áĞ´(€€€€€€€€€€€€€€€Á±…å•ÈÌ¹•áÀ(€€€€€€€€€€€€¤ì((€€€€€€€Á±…å•ÈÍI½Ü¹¥¹¹•É!Q50ô(€€€€€€€€€€€€(€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€¥ô‰‘¥ÍÑÉ¥‰ÕÑ•A±…å•ÈÍ	ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€±…ÍÌô‰•áÀµ‘¥ÍÑÉ¥‰ÕÑ”µ‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰•áÀµ¡…É…Ñ•Èµ¥½¸ˆûŠ^ğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰•áÀµ¡…É…Ñ•Èµ½Áäˆø(€€€€€€€€€€€€€€€€€€€€ñÍÑÉ½¹œø‘íÁ±…å•ÈÌ¹¥‘ôğ½ÍÑÉ½¹œø(€€€€€€€€€€€€€€€€€€€€ñÍµ…±°ù1Ø¸‘íÁ±…å•ÈÌ¹±•Ù•±ôƒŠH1Ø¸‘íÁ±…å•ÈÌ¹±•Ù•°¬Åôğ½Íµ…±°ø(€€€€€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰•áÀµ¡…É…Ñ•Èµ½ÍĞˆø(€€€€€€€€€€€€€€€€€€€€ñˆø‘í¹••‘•Ì¹Ñ½1½…±•MÑÉ¥¹œ ‰é µQ\ˆ¥ôğ½ˆø(€€€€€€€€€€€€€€€€€€€€ñÍµ…±°ùa@ğ½Íµ…±°ø(€€€€€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€€€€€ì((€€€€€€€½¹Ñ…¥¹•È¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€Á±…å•ÈÍI½Ü(€€€€€€€€¤ì((€€€€€€€€ ‰‘¥ÍÑÉ¥‰ÕÑ•A±…å•ÈÍ	ÕÑÑ½¸ˆ¤¹‘¥Í…‰±•ô(€€€€€€€€€€€Í¡…É•‘áÀñ¹••‘•Ìñğ(€€€€€€€€€€€‰…ÑÑ±•Ñ¥Ù”ì((€€€€€€€€ ‰‘¥ÍÑÉ¥‰ÕÑ•A±…å•ÈÍ	ÕÑÑ½¸ˆ¤¹½¹±¥¬ô(€€€€€€€€€€€‘¥ÍÑÉ¥‰ÕÑ•áÁQ½A±…å•ÈÌì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒšÂÓš"Ã–¯¾ò?¦Š£–òOš&/¦g–§–/¦:[–ºk’öS’ö7š2'¦"T(€€€€€€ƒ’úwŸ:§–ºÛ¢ššÆšVÓ–/š.ÿš:'¾ò3’â7–7¦†¿’ë¾ò0(€€€€€€ƒ¦g–§–/n»–&7šr³’ú–ÂÇšÊKšr'rš¶j¢K¢&Ë¢ÎšZd(€€€€€€ƒ¾ò#¦f“¦v{:§–ºÛ–&×–îë²³’ê3¢K¢&Ëšf–&o––÷¦ã’ê–B3š¢–Òƒ¾ò0(€€€€€€ƒ’ö¦
+–/ššÎ’â/–¾›¦još:ojšb½Á±…å•ÈË¾ò0(€€€€€€ƒ’â7šb¿¦g¢‡jšÂĞ¿¦Š£’öS’ö7²›¾ò'¾ò0(€€€€€€ƒVg¢F_–>«šb¿–’k¦’cj¢š[¢šë¦ns¢¢+(€€€€¨¼()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ.š/–*ƒ¦îx(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼((¼¨(€€ƒŠbƒ.š/¦‚–"š>o¢K¢&Ë¾ò#šZÃ–Š{¾ò'(€€ƒ–"š>ojšf–g¢šš*)Á•¹‘¥¹MÑ…ÑÏšâ¦ë¾ò0(€€ƒ’â7Û3¦
+šÊKŠë¢ª7j–*ƒ¦î{7šr¢ª“–âÛ–"Ã–>›’â–/¢K¢&Ë¢ê¯’â+(¨¼()™Õ¹Ñ¥½¸¡…¹•MÑ…ÑÕÍ¡…É…Ñ•È¡‘¥É•Ñ¥½¸¥ì((€€€½¹ÍĞ¥¹‘•á•Ìõ•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤ì((€€€¥˜¡¥¹‘•á•Ì¹±•¹Ñ ğÈ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÕÉÉ•¹ÑA½Í¥Ñ¥½¸õ5…Ñ ¹µ…à (€€€€€€€€À°(€€€€€€€¥¹‘•á•Ì¹¥¹‘•á=˜¡ÍÑ…ÑÕÍ¡…É…Ñ•É%¹‘•à¤(€€€€¤ì((€€€ÍÑ…ÑÕÍ¡…É…Ñ•É%¹‘•àõ¥¹‘•á•Íl(€€€€€€€€¡ÕÉÉ•¹ÑA½Í¥Ñ¥½¸­‘¥É•Ñ¥½¸­¥¹‘•á•Ì¹±•¹Ñ ¤•¥¹‘•á•Ì¹±•¹Ñ (€€€tì(((€€€=‰©•Ğ¹­•åÌ (€€€€€€€Á•¹‘¥¹MÑ…ÑÌ(€€€€¤(€€€€¹™½É… ¡ÍÑ…Ğôùì((€€€€€€€Á•¹‘¥¹MÑ…ÑÍmÍÑ…ÑtôÀì((€€€ô¤ì(((€€€ÕÁ‘…Ñ•MÑ…ÑÕÍAÉ•Ù¥•Ü ¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33–*ƒ¦î{¢ššZÃ–Šx(€€ƒ¦Vßš2'–ş¯¦–*ƒ¦î{š¾S¢òÂ‡–Z»¾ò3¦
+šb¿¦ngº·¦‚·š2'’â’â,(€€€¬ÄÃš¾S¢òÂ‡–Z»¾ò3–šÏnÓš:—¦ã’â–/7ŠSŠS¦ã’ê(€€ƒ¦Vßš2'šZçš†#¾ò'¾òh((€€ƒ–ÇR£j3¦Vßš2'š2ê3¢ãfó7–Â?–Ş—–ßš2'’â,(€€ƒ¾ò!Ñ½Õ¡ÍÑ…ÉĞ½µ½ÕÍ•‘½İ»¾ò'–#¶$ÔÀÃš¾¯H(€€ƒ¾ò#¦ÿ–7š&/šîG¢òW¦î{’æ¢Š¯VÛš"C¦Vßš2'¾ò'¾ò3š:—¢F\(€€ƒš¾<ÄÈÃš¾¯K¢«–.W–Fó–>¯’âš²‡–
+Ï¦Ë’új–÷–ò?¾ò0(€€ƒnÓ–"ÃšRû¦Z,¿š&/š2ï–è¿šîG¢ÖÃ
+ëš¶ˆ(€€ƒ¾ò!Ñ½Õ¡•¹½Ñ½Õ¡…¹•°½µ½ÕÍ•ÕÀ¼(€€µ½ÕÍ•±•…Ù—–£¦£¦÷¢ššâš:'¢¢#šf–f£¾ò0(€€ƒ’îï’öW’â¢»šRû¦Z/š&/š2jšZç–ò?¦÷’â7¢÷šò?š:—¾ò0(€€ƒ’â7Û¢¢#šf–f£šr–6‡’ö?’ânÓ–*ƒ’â/–:ï¾ò'((€€€ÛÖ¬¼·š2'¦"W¾ò#šRïšN(¿¦®S¢Î¨¿¢÷¦<¿šfë–*l¼(€€ƒÊû–x¿šV?š6ß¾ò'–£¦£–Fó–>¯¦g–/–÷–ò?¾ò3’â7R (€€ƒš¾?¦†š2'¦"W–B–¾¯’â’î÷¦Vßš2'¦
+?¢ò¿(¨¼()™Õ¹Ñ¥½¸…ÑÑ…¡1½¹AÉ•ÍÌ¡•°±™¸¥ì((€€€¥˜ …•°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€±•Ğ¡½±‘Q¥µ•½ÕĞõ¹Õ±°ì((€€€±•ĞÉ•Á•…Ñ%¹Ñ•ÉÙ…°õ¹Õ±°ì(((€€€™Õ¹Ñ¥½¸ÍÑ½À ¥ì((€€€€€€€¥˜¡¡½±‘Q¥µ•½ÕĞ¥ì(€€€€€€€€€€€±•…ÉQ¥µ•½ÕĞ¡¡½±‘Q¥µ•½ÕĞ¤ì(€€€€€€€€€€€¡½±‘Q¥µ•½ÕĞõ¹Õ±°ì(€€€€€€€ô(((€€€€€€€¥˜¡É•Á•…Ñ%¹Ñ•ÉÙ…°¥ì(€€€€€€€€€€€±•…É%¹Ñ•ÉÙ…°¡É•Á•…Ñ%¹Ñ•ÉÙ…°¤ì(€€€€€€€€€€€É•Á•…Ñ%¹Ñ•ÉÙ…°õ¹Õ±°ì(€€€€€€€ô((€€€ô(((€€€™Õ¹Ñ¥½¸ÍÑ…ÉĞ¡”¥ì((€€€€€€€”¹ÁÉ•Ù•¹Ñ•™…Õ±Ğ ¤ì((€€€€€€€™¸ ¤ì(((€€€€€€€ÍÑ½À ¤ì(((€€€€€€€¡½±‘Q¥µ•½ÕĞô(€€€€€€€€€€€Í•ÑQ¥µ•½ÕĞ (€€€€€€€€€€€€€€€€ ¤ôùì((€€€€€€€€€€€€€€€€€€€É•Á•…Ñ%¹Ñ•ÉÙ…°ô(€€€€€€€€€€€€€€€€€€€€€€€Í•Ñ%¹Ñ•ÉÙ…° (€€€€€€€€€€€€€€€€€€€€€€€€€€€™¸°(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ÔÔ(€€€€€€€€€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€€€€€ô°(€€€€€€€€€€€€€€€€ÈÔÀ(€€€€€€€€€€€€¤ì((€€€ô(((€€€•°¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È (€€€€€€€€‰Ñ½Õ¡ÍÑ…ÉĞˆ°(€€€€€€€ÍÑ…ÉĞ°(€€€€€€€íÁ…ÍÍ¥Ù”é™…±Í•ô(€€€€¤ì((€€€•°¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È (€€€€€€€€‰µ½ÕÍ•‘½İ¸ˆ°(€€€€€€€ÍÑ…ÉĞ(€€€€¤ì(((€€€l(€€€€€€€€‰Ñ½Õ¡•¹ˆ°(€€€€€€€€‰Ñ½Õ¡…¹•°ˆ°(€€€€€€€€‰µ½ÕÍ•ÕÀˆ°(€€€€€€€€‰µ½ÕÍ•±•…Ù”ˆ(€€€t¹™½É… ¡•ÙÑ9…µ”ôùì((€€€€€€€•°¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È (€€€€€€€€€€€•ÙÑ9…µ”°(€€€€€€€€€€€ÍÑ½À(€€€€€€€€¤ì((€€€ô¤ì()ô(()™Õ¹Ñ¥½¸…‘‘A½¥¹Ğ¡ÍÑ…Ğ¥ì((€€€¥˜ (€€€€€€€€…=‰©•Ğ¹ÁÉ½Ñ½ÑåÁ”¹¡…Í=İ¹AÉ½Á•ÉÑä¹…±° (€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ°(€€€€€€€€€€€ÍÑ…Ğ(€€€€€€€€¤(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÑ…É•Ñ¡…É…Ñ•Èô(€€€€€€€•ÑMÑ…ÑÕÍ¡…É…Ñ•É=‰©•Ğ ¤ì(((€€€½¹ÍĞÕÍ•€ô(€€€€€€€=‰©•Ğ¹Ù…±Õ•Ì (€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ(€€€€€€€€¤(€€€€€€€€¹É•‘Õ” (€€€€€€€€€€€€¡ÍÕ´±Ù…±Õ”¤ôø(€€€€€€€€€€€€€€€ÍÕ´­Ù…±Õ”°(€€€€€€€€€€€€À(€€€€€€€€¤ì(((€€€¥˜ (€€€€€€€ÕÍ•øô(€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹…ÑÑÉ¥‰ÕÑ•A½¥¹ÑÌ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€Á•¹‘¥¹MÑ…ÑÍmÍÑ…Ñt¬¬ì(((€€€ÕÁ‘…Ñ•MÑ…ÑÕÍAÉ•Ù¥•Ü ¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢š2š¶¾ò'¾òh(€€ƒ’æ/–&7¦g¢‡–>«šr%…‘‘A½¥¹Ğ §¾ò3–º3–£šÊKšr'–Â7š'j(€€ƒšâo¢f–÷–ò?¾ò3–Â;¢Ó.š/¦‚¦v‹–"¦7–6Òk¦î{šVãj–rÃšZä(€€ƒ–>«¢÷–*ƒ’â7¢÷š&¾ò3¢Ş–&×¢K¦‚¦v‹¾ò#šr³’ú–ÂÇšr$(€€ƒ–*ƒšâo–§¦†š2'¦"W¾ò'’â7’â¢Ó(€€ƒ¢s’â)É•µ½Ù•A½¥¹Ğ §¾ò3–>«¢÷š&š:'3¦gš²‡¦
+šÊH(€€ƒŠë¢ª7šj¯–¶c’â·7j¦î{šVã¾ò3’â7šr–.W–"Ã¢K¢&È(€€ƒ–ŞËÚORšV#j–Æ³šŸ–ó¾ò3¦
+?¢ò¿’â+¢Ş–&×¢K¦‚¦v‹j(€€É•…Ñ¥½¹‘¡ÍÑ…Ğ°´Ä§šb¿–B3’â¢»–kšÎW(¨¼()™Õ¹Ñ¥½¸É•µ½Ù•A½¥¹Ğ¡ÍÑ…Ğ¥ì((€€€¥˜ (€€€€€€€€…=‰©•Ğ¹ÁÉ½Ñ½ÑåÁ”¹¡…Í=İ¹AÉ½Á•ÉÑä¹…±° (€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ°(€€€€€€€€€€€ÍÑ…Ğ(€€€€€€€€¤(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜ (€€€€€€€Á•¹‘¥¹MÑ…ÑÍmÍÑ…ÑtğôÀ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€Á•¹‘¥¹MÑ…ÑÍmÍÑ…Ñt´´ì(((€€€ÕÁ‘…Ñ•MÑ…ÑÕÍAÉ•Ù¥•Ü ¤ì()ô(()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•MÑ…ÑÕÍAÉ•Ù¥•Ü ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦gšVÓ–/–÷–ò?¦÷–¾¯š¶ï¢ª5Á±…å•Ë¾ò0(€€€€€€ƒ²³’ê3¢K¢&ËšÊK¢ú›šÎWR£.š/¦‚–*ƒ¦î{(€€€€€€ƒšRçš"C–#š*O3n»–&7¦ã’â·j¢K¢&Ë4(€€€€€€ƒ¾ò!Á±…å•Ëš"YÁ±…å•ÈË¾ò'¾ò0(€€€€€€ƒ’â/¦v‹š&šr'¢¢#º_¦÷–Â7¦g–/¢K¢&Ë–k¾ò0(€€€€€€ƒ’â7R£šVÓ–/–÷–ò?¦7–¾¯–§’î÷(€€€€¨¼((€€€½¹ÍĞÑ…É•Ñ¡…É…Ñ•Èô(€€€€€€€•ÑMÑ…ÑÕÍ¡…É…Ñ•É=‰©•Ğ ¤ì(((€€€½¹ÍĞÕÉÉ•¹Ğ€ôì((€€€€€€€…ÑÑ…¬è(€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹…ÑÑ…¬¬(€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ¹…ÑÑ…¬°((€€€€€€€Ù¥Ñ…±¥Ñäè(€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹Ù¥Ñ…±¥Ñä¬(€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ¹Ù¥Ñ…±¥Ñä°((€€€€€€€•¹•Éäè(€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹•¹•Éä¬(€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ¹•¹•Éä°((€€€€€€€¥¹Ñ•±±¥•¹”è(€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹¥¹Ñ•±±¥•¹”¬(€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ¹¥¹Ñ•±±¥•¹”°((€€€€€€€ÍÁ¥É¥Ğè(€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹ÍÁ¥É¥Ğ¬(€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ¹ÍÁ¥É¥Ğ°((€€€€€€€…¥±¥Ñäè(€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹…¥±¥Ñä¬(€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ¹…¥±¥Ñä((€€€ôì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33¦î{šVã–"¦4(€€€€€€ƒ¦†¿’ëVÛ–&7¢K¢&Ëj!CMCšŠw¾ò3–*ƒ¦î{¦®S¢Î¨¼(€€€€€€ƒ¢÷¦?šf–>¿’î—¦‚C¢š÷–Š{–*ƒj–.WV¯¾ò3¢†šŠwšr(€€€€€€ƒ–B#Bâ»~·7¾ò'¾òh(€€€€€€µ…á!@½µ…áMC–³–ò?¢Ş}•Ñ	…Í•MÑ…ÑÌ ¤(€€€€€€ƒ¢‡jº_šÎW–º3–£’â¢Ó¾ò Ç¦®S¢Î¨ô¬ÔÁ!C¾ò0(€€€€€€€Ç¢÷¦<ô¬ÄÕMC¾ò'¾ò3–>«šb¿¦g¢‡šRçš"C–B(€€€€€€Ñ…É•Ñ¡…É…Ñ•Ë¾ò#–>¿¢÷šb½Á±…å•Ëš"X(€€€€€€Á±…å•ÈË¾ò'¾ò3’â7¢÷nÓš:—–Fó–>¬(€€€€€€•Ñ	…Í•MÑ…ÑÌ §¾ò#¦
+–/–÷–ò?–¾¯š¶ïš*L(€€€€€€Á±…å•Ë¾ò'¾ò3¢«–ŞÇ¦7º_’âš²‡((€€€€€€ƒn»–&5!@½MC¾ò!Ñ…É•Ñ¡…É…Ñ•È¹¡Ã¾ò<¹ÍÃ¾ò$(€€€€€€ƒ’â7šr–nƒ
+ë¦‚C¢š÷–*ƒ¦î{¢3šRç¢º+¾ò3–>«šr'3’â+¦fC4(€€€€€€ƒšr¢Ş¢F]Á•¹‘¥¹MÑ…ÑÌ¹Ù¥Ñ…±¥Ñç¾ò<¹•¹•Éä(€€€€€€ƒ–6Ïšf¦‚C¢š÷¢º+–2[ŠSŠS¦gš¢¢†šŠw–¾³–ê˜(€€€€€€ƒ¾ò#>û–r¡!Cß¦‚C¢š÷–ú3’â+¦fC¾ò'–ÂÇšr¢«Ø(€€€€€€ƒ¦j£¢F_’â+¦fC¢º+–’Ÿ¢3â»~·¾ò3’â7R£–>›–’[–¾¬(€€€€€€ƒ3â»~·–.WV¯7j&çšº+¦
+?¢ò¿(€€€€¨¼((€€€½¹ÍĞÁÉ•Ù¥•İ5…á!@ô((€€€€€€€€ÄÀÀ¬(€€€€€€€ÕÉÉ•¹Ğ¹Ù¥Ñ…±¥Ñä¨ÔÀ¬(€€€€€€€€¡Ñ…É•Ñ¡…É…Ñ•È¹‰½¹ÕÍ!AñğÀ¤ì(((€€€½¹ÍĞÁÉ•Ù¥•İ5…áM@ô((€€€€€€€€ÔÀ¬(€€€€€€€ÕÉÉ•¹Ğ¹•¹•Éä¨ÄÔ¬(€€€€€€€€¡Ñ…É•Ñ¡…É…Ñ•È¹‰½¹ÕÍMAñğÀ¤ì(((€€€½¹ÍĞÕÉÉ•¹Ñ!@ô((€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹¡ÁñğÀ°(€€€€€€€€€€€ÁÉ•Ù¥•İ5…á!@(€€€€€€€€¤ì(((€€€½¹ÍĞÕÉÉ•¹ÑM@ô((€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹ÍÁñğÀ°(€€€€€€€€€€€ÁÉ•Ù¥•İ5…áM@(€€€€€€€€¤ì(((€€€€ ‰ÍÑ…ÑÕÍAÉ•Ù¥•İ!ÁQ•áĞˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€ÕÉÉ•¹Ñ!@¬(€€€€€€€€‹¾ò<ˆ¬(€€€€€€€ÁÉ•Ù¥•İ5…á!@ì(((€€€€ ‰ÍÑ…ÑÕÍAÉ•Ù¥•İMÁQ•áĞˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€ÕÉÉ•¹ÑM@¬(€€€€€€€€‹¾ò<ˆ¬(€€€€€€€ÁÉ•Ù¥•İ5…áM@ì(((€€€€ ‰ÍÑ…ÑÕÍAÉ•Ù¥•İ!Á¥±°ˆ¤(€€€€€€€€¹ÍÑå±”¹İ¥‘Ñ ô((€€€€€€€€ (€€€€€€€€€€€ÁÉ•Ù¥•İ5…á!@øÀ(€€€€€€€€€€€€ü(€€€€€€€€€€€€¡ÕÉÉ•¹Ñ!@½ÁÉ•Ù¥•İ5…á!@¨ÄÀÀ¤(€€€€€€€€€€€€è(€€€€€€€€€€€€À(€€€€€€€€¤¬(€€€€€€€€ˆ”ˆì(((€€€€ ‰ÍÑ…ÑÕÍAÉ•Ù¥•İMÁ¥±°ˆ¤(€€€€€€€€¹ÍÑå±”¹İ¥‘Ñ ô((€€€€€€€€ (€€€€€€€€€€€ÁÉ•Ù¥•İ5…áM@øÀ(€€€€€€€€€€€€ü(€€€€€€€€€€€€¡ÕÉÉ•¹ÑM@½ÁÉ•Ù¥•İ5…áM@¨ÄÀÀ¤(€€€€€€€€€€€€è(€€€€€€€€€€€€À(€€€€€€€€¤¬(€€€€€€€€ˆ”ˆì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òh(€€€€€€ƒ.š/¦‚¦v‹>û–r£šr¦†¿’è(€€€€€€ƒ3:§–ºÛ¦î{šVà€¬ƒ¢w–
+g–*ƒš"@€ôƒâ÷–B#7¾ò0(€€€€€€ƒ¢3’â7šb¿–>«¦†¿’ë:§–ºÛ¢«–ŞÇ–*ƒ¦î{jšVã–¶_(€€€€€€ƒ¢w–
+g–*ƒš"Cš*O–Â7š'¢K¢&Ëj¢w–
+gš²(€€€€€€ƒ¾ò!Á±…å•ËŠIÁ±…å•È¹•±•µ•¹Ó(€€€€€€Á±…å•ÈËŠK–në–ºh‰Á±…å•ÈÈ‹¦g–-­•ç¾ò'¾ò0(€€€€€€ƒ¢Ş’âï–~;¢3–2¦‚r/–"Ãj¦
+?¢ò¿’â¢Ó(€€€€¨¼((€€€½¹ÍĞ•ÅÕ¥Áµ•¹Ñ	½¹ÕÌ€ô(€€€€€€€•ÑÅÕ¥Áµ•¹Ñ	½¹ÕÌ (€€€€€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É-•ä (€€€€€€€€€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É%¹‘•à¡Ñ…É•Ñ¡…É…Ñ•È¤(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€™Õ¹Ñ¥½¸™½Éµ…ÑMÑ…Ñ1¥¹” (€€€€€€€‰…Í•Y…±Õ”°(€€€€€€€‰½¹ÕÍY…±Õ”(€€€€¥ì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€€€€€ƒ’æ/–&7¢w–
+g–*ƒš"Cšb¼Ãjšf–g–>«¦†¿’ë–Z»’âšVã–¶_¾ò0(€€€€€€€€€€ƒ:§–ºÛšÊK¢w–
+gšvÇ¢–ÿšf–º3–£r/’â7–è(€€€€€€€€€€ƒ3šr'–r£º_¢w–
+g–*ƒš"C7¦g’îÛ’ê/¾ò0(€€€€€€€€€€ƒ’î—
+ëšÊKRšV#(€€€€€€€€€€ƒšRçš"C’â–ú/¦†¿’ë3–~ë’8¯¢w–
+d÷â÷–B#7¾ò0(€€€€€€€€€€ƒ–ÂÇº_¢w–
+g–*ƒš"Cšb¼Ã’æ’âš¢¦†¿’ë¾ò0(€€€€€€€€€€ƒ’ú/–š€ä¬Àôç(€€€€€€€€¨¼((€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€‰…Í•Y…±Õ”¬(€€€€€€€€€€€€ˆ¬ˆ¬(€€€€€€€€€€€‰½¹ÕÍY…±Õ”¬(€€€€€€€€€€€€ˆôˆ¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€‰…Í•Y…±Õ”¬(€€€€€€€€€€€€€€€‰½¹ÕÍY…±Õ”(€€€€€€€€€€€€¤(€€€€€€€€¤ì((€€€ô(((€€€€ ‰ÍÑ…ÑÕÍÑÑ…¬ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€™½Éµ…ÑMÑ…Ñ1¥¹” (€€€€€€€€€€€ÕÉÉ•¹Ğ¹…ÑÑ…¬°(€€€€€€€€€€€•ÅÕ¥Áµ•¹Ñ	½¹ÕÌ¹…ÑÑ…¬(€€€€€€€€¤ì(((€€€€ ‰ÍÑ…ÑÕÍY¥Ñ…±¥Ñäˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€™½Éµ…ÑMÑ…Ñ1¥¹” (€€€€€€€€€€€ÕÉÉ•¹Ğ¹Ù¥Ñ…±¥Ñä°(€€€€€€€€€€€•ÅÕ¥Áµ•¹Ñ	½¹ÕÌ¹Ù¥Ñ…±¥Ñä(€€€€€€€€¤ì(((€€€€ ‰ÍÑ…ÑÕÍ¹•Éäˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€™½Éµ…ÑMÑ…Ñ1¥¹” (€€€€€€€€€€€ÕÉÉ•¹Ğ¹•¹•Éä°(€€€€€€€€€€€•ÅÕ¥Áµ•¹Ñ	½¹ÕÌ¹•¹•Éä(€€€€€€€€¤ì(((€€€€ ‰ÍÑ…ÑÕÍ%¹Ñ•±±¥•¹”ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€™½Éµ…ÑMÑ…Ñ1¥¹” (€€€€€€€€€€€ÕÉÉ•¹Ğ¹¥¹Ñ•±±¥•¹”°(€€€€€€€€€€€•ÅÕ¥Áµ•¹Ñ	½¹ÕÌ¹¥¹Ñ•±±¥•¹”(€€€€€€€€¤ì(((€€€€ ‰ÍÑ…ÑÕÍMÁ¥É¥Ğˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€™½Éµ…ÑMÑ…Ñ1¥¹” (€€€€€€€€€€€ÕÉÉ•¹Ğ¹ÍÁ¥É¥Ğ°(€€€€€€€€€€€•ÅÕ¥Áµ•¹Ñ	½¹ÕÌ¹ÍÁ¥É¥Ğ(€€€€€€€€¤ì(((€€€€ ‰ÍÑ…ÑÕÍ¥±¥Ñäˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€™½Éµ…ÑMÑ…Ñ1¥¹” (€€€€€€€€€€€ÕÉÉ•¹Ğ¹…¥±¥Ñä°(€€€€€€€€€€€•ÅÕ¥Áµ•¹Ñ	½¹ÕÌ¹…¥±¥Ñä(€€€€€€€€¤ì(((€€€½¹ÍĞÕÍ•€ô(€€€€€€€=‰©•Ğ¹Ù…±Õ•Ì (€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ(€€€€€€€€¤(€€€€€€€€¹É•‘Õ” (€€€€€€€€€€€€¡ÍÕ´±Ù…±Õ”¤ôø(€€€€€€€€€€€€€€€ÍÕ´­Ù…±Õ”°(€€€€€€€€€€€€À(€€€€€€€€¤ì(((€€€€ ‰…ÑÑÉ¥‰ÕÑ•A½¥¹ÑÌˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€À°(€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹…ÑÑÉ¥‰ÕÑ•A½¥¹ÑÌµÕÍ•(€€€€€€€€¤ì(((€€€€ ‰½¹™¥ÉµMÑ…ÑÕÍ	ÕÑÑ½¸ˆ¤(€€€€€€€€¹‘¥Í…‰±•€ô(€€€€€€€ÕÍ•ôôôÀì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rš¶š*O–"Ã3º·¦‚·–6–†+š;¦êó¦^s¦÷¦^p(€€€€€€ƒ’â7š:'7j–:–nƒ¾ò'¾òh(€€€€€€ƒ¦g¢‡–:šr³‡šŠw’îÛ’úwÁ±…å•ÈË–¶c’â7–¶c–r (€€€€€€ƒ¦7šZÃ¢¢·–ºk¦†¿’ë.š/¾ò3–º3–£’â7~—¦O¦g–,(€€€€€€ƒ–6–†+>û–r£šb¿’â7šb¿š¶¢Š¯¢K¢&Ë¢š[ª\(€€€€€€ƒ¾ò!Íİ¥Ñ¡¡…É…Ñ•ÉQ…ˆ §¾ò'šVš?–¢ÖÀ(€€€€€€ƒ¦jÇ¢^?ŠSŠS–>«¢š:§–ºÛ¦î{’âš²„¬¼·š2'¦"W¾ò0(€€€€€€ƒ¦g¢‡–ÂÇšrš*+¦jÇ¢^?jšV#šzs¢N/š:'¦7šZÀ(€€€€€€ƒ¦†¿’ë–ë’ú¾ò3¦gš&7šb¿3š;¦êó¦jÇ¢^?¦÷šÊKR£4(€€€€€€ƒjrš¶–:–nƒ((€€€€€€ƒ–*ƒ’â–/–"“šZß¾òk–ššzs¦g–/–Òƒš¶šb¼(€€€€€€¡½µ••…ÑÕÉ•!¥‘‘•¹Mİ¥Ñ¡…É“¢¢c¦2j(€€€€€€ƒ¦
+’â–/¾ò#’î¢†£n»–&7š¶¢Š¯¢K¢&Ë¢š[ª_–¢ÖÃ¾ò'¾ò0(€€€€€€ƒ–ÂÇ¢ŞÏ¦;¦g¢‡j¦†¿’ë¦
+?¢ò¿¾ò3Ú·š2¦jÇ¢^?¾ò0(€€€€€€ƒ’â7¢š¢N/š:'(€€€€¨¼((€€€½¹ÍĞÍİ¥Ñ¡…Éô(€€€€€€€€ ‰ÍÑ…ÑÕÍ¡…É…Ñ•ÉMİ¥Ñ¡…Éˆ¤ì(((€€€½¹ÍĞ¹…µ•	½àô(€€€€€€€€ ‰ÍÑ…ÑÕÍ¡…É…Ñ•É9…µ”ˆ¤ì(((€€€¥˜ (€€€€€€€Íİ¥Ñ¡…É€˜˜(€€€€€€€Íİ¥Ñ¡…É„ôô(€€€€€€€¡½µ••…ÑÕÉ•!¥‘‘•¹Mİ¥Ñ¡…É(€€€€¥ì((€€€€€€€Íİ¥Ñ¡…É¹ÍÑå±”¹‘¥ÍÁ±…äô((€€€€€€€€€€€•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹±•¹Ñ øÄ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰‰±½¬ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‰¹½¹”ˆì((€€€ô(((€€€¥˜¡¹…µ•	½à¥ì((€€€€€€€¹…µ•	½à¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€¡Ñ…É•Ñ¡…É…Ñ•È¹¥‘ñğ‹–K¦j«¢ˆ¤¬(€€€€€€€€€€€€ˆ1Ø¸ˆ¬(€€€€€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹±•Ù•°ì((€€€ô()ô(()™Õ¹Ñ¥½¸½¹™¥ÉµMÑ…ÑÕÌ ¥ì((€€€½¹ÍĞÑ…É•Ñ¡…É…Ñ•Èô(€€€€€€€•ÑMÑ…ÑÕÍ¡…É…Ñ•É=‰©•Ğ ¤ì(((€€€½¹ÍĞÕÍ•€ô(€€€€€€€=‰©•Ğ¹Ù…±Õ•Ì (€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÌ(€€€€€€€€¤(€€€€€€€€¹É•‘Õ” (€€€€€€€€€€€€¡ÍÕ´±Ù…±Õ”¤ôø(€€€€€€€€€€€€€€€ÍÕ´­Ù…±Õ”°(€€€€€€€€€€€€À(€€€€€€€€¤ì(((€€€¥˜ (€€€€€€€ÕÍ•ğôÀñğ(€€€€€€€ÕÍ•ø(€€€€€€€Ñ…É•Ñ¡…É…Ñ•È¹…ÑÑÉ¥‰ÕÑ•A½¥¹ÑÌ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’âš²‡Šë¢ª7–ú3–£¦£š¶ã¦nÛ¾ò0(€€€€€€ƒ’â7šr–ë>û’æ/–&73Šë¢ª7–ú3¦
+¢÷’êš2'7¦ƒš"CVÛš¦(€€€€¨¼((€€€=‰©•Ğ¹­•åÌ (€€€€€€€Á•¹‘¥¹MÑ…ÑÌ(€€€€¤(€€€€¹™½É… ¡ÍÑ…Ğôùì((€€€€€€€Ñ…É•Ñ¡…É…Ñ•ÉmÍÑ…Ñt€¬ô(€€€€€€€€€€€Á•¹‘¥¹MÑ…ÑÍmÍÑ…Ñtì((€€€€€€€Á•¹‘¥¹MÑ…ÑÍmÍÑ…ÑtôÀì((€€€ô¤ì(((€€€Ñ…É•Ñ¡…É…Ñ•È¹…ÑÑÉ¥‰ÕÑ•A½¥¹ÑÌ€´ô(€€€€€€€ÕÍ•ì(((€€€ÕÁ‘…Ñ•MÑ…ÑÕÍAÉ•Ù¥•Ü ¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒš*¢ô(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()½¹ÍĞM-%11}AIY%]}159QLõl‰™¥É”ˆ°‰İ…Ñ•Èˆ°‰İ¥¹ˆ°‰•…ÉÑ ‰tì()™Õ¹Ñ¥½¸•ÑM­¥±±AÉ•Ù¥•İMÕµµ…Éä¡Í­¥±°¥ì((€€€½¹ÍĞÍ½Á•Ìõì(€€€€€€€Í¥¹±”è‹šRïšN+–Z»’âšV×’êèˆ°(€€€€€€€ÑÉ¤è‹šRïšN+nã¦Ãj’âš:KšV×’êèˆ°(€€€€€€€É½Üè‹šRïšN+’âšVÓš:KšV×’êèˆ°(€€€€€€€½±Õµ¸è‹šRïšN+–B3’ânÓ–"_šV×’êèˆ°(€€€€€€€…±°è‹šRïšN+šV×šZç–£¦®Pˆ°(€€€€€€€…±±äè‹šR¿š>Ó’â–B7–>/šZäˆ°(€€€€€€€…±±å±°è‹šR¿š>Óš"GšZç–£¦®Pˆ°(€€€€€€€‘•…‘±±äè‹–ú§šÒï’â–B7–K’â/j–>/šZäˆ°(€€€€€€€¹½¹”è‹¢Š¯–.WRšV ˆ(€€€ôì((€€€½¹ÍĞ•™™•ÑÌõmtì((€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰Á¡åÍ¥…°ˆ¥ì(€€€€€€€•™™•ÑÌ¹ÁÕÍ  ‹¦ƒš"C&§B–
+ß–ºÌˆ¤ì(€€€ô(€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰µ…¥Œˆ¥ì(€€€€€€€•™™•ÑÌ¹ÁÕÍ  ‹¦ƒš"CšÎW¢†O–
+ß–ºÌˆ¤ì(€€€ô(€€€¥˜¡Í­¥±°¹‰ÕÉ¹¡…¹”¥ì•™™•ÑÌ¹ÁÕÍ  ‹–>¿¢÷¦f–*ƒHˆ¤ìô(€€€¥˜¡Í­¥±°¹™É••é•¡…¹”¥ì•™™•ÑÌ¹ÁÕÍ  ‹–>¿¢÷’öÿn»š¢g–Ã–Âˆ¤ìô(€€€¥˜¡Í­¥±°¹ÍÑÕ¹¡…¹”¥ì•™™•ÑÌ¹ÁÕÍ  ‹–>¿¢÷’öÿn»š¢gšj#r§’â›¦f7’ö;–F÷’â´ˆ¤ìô(€€€¥˜¡Í­¥±°¹…¥±¥Ñå½İ¹¡…¹”¥ì•™™•ÑÌ¹ÁÕÍ  ‹–>¿¢÷¦f7’ö;n»š¢gšV?š6Üˆ¤ìô(€€€¥˜¡Í­¥±°¹‘…µ…•½İ¹¡…¹”¥ì•™™•ÑÌ¹ÁÕÍ  ‹–>¿¢÷¦f7’ö;n»š¢g¦ƒš"Cj–
+ß–ºÌˆ¤ìô(€€€¥˜¡Í­¥±°¹‘•™•¹Í•½İ¹¡…¹”¥ì•™™•ÑÌ¹ÁÕÍ  ‹–>¿¢÷¦f7’ö;n»š¢g¦bËš˜ˆ¤ìô(€€€¥˜¡Í­¥±°¹ÍÑ…Ñ½İ¹¡…¹”¥ì•™™•ÑÌ¹ÁÕÍ  ‹–>¿¢÷¦f7’ö;n»š¢g–’k¦‚¢÷–*lˆ¤ìô(€€€¥˜¡Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•°¥ì•™™•ÑÌ¹ÁÕÍ  ‹–>¿–BãšRÛ–
+ß–ºÏ–n{–ú§¢«¢ê¬ˆ¤ìô(€€€¥˜¡Í­¥±°¹Í•±™M¡¥•±‘	å1•Ù•°¥ì•™™•ÑÌ¹ÁÕÍ  ‹
+ë¢«–ŞÇ–îë®/¢¶ßnøˆ¤ìô(€€€¥˜¡Í­¥±°¹…±±åM¡¥•±‘	å1•Ù•°¥ì•™™•ÑÌ¹ÁÕÍ  ‹
+ëš"GšZç–îë®/¢¶ßnøˆ¤ìô((€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰¡•…°ˆ¥ì(€€€€€€€•™™•ÑÌ¹ÁÕÍ  ‹–n{–ú§–>/šZçR–F÷¢"¢÷¦<ˆ¤ì(€€€ô(€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰É•Ù¥Ù”ˆ¥ì(€€€€€€€•™™•ÑÌ¹ÁÕÍ  ‹¢ºO–K’â/j–>/šZç¦7šZÃ–>š"Àˆ¤ì(€€€ô(€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰Á…ÍÍ¥Ù”ˆ¥ì(€€€€€€€•™™•ÑÌ¹ÁÕÍ  ‹šÂã’æ–òß–2[¢¦Ë–Òƒjš"Ã¦²—&ç¢&Èˆ¤ì(€€€ô((€€€½¹ÍĞ¹…µ•‘™™•ÑÌõì(€€€€€€€É…”è‹š>C–6š"GšZç"šN+¢÷–*lˆ°(€€€€€€€‘½‘•M­¥±°è‹š>C–6š"GšZç¦Z¢êË¢÷–*lˆ°(€€€€€€€ÍÑ•…±Ñ¡M­¥±°è‹¢ºO–>/šZç¦Ë–—¦jÇ¢ê¬ˆ°(€€€€€€€‘¥¹¡…¥Í¡•¹é¡•¸è‹š>C–6š"GšZçVÃ–âã.š/š*_šœˆ°(€€€€€€€É½­]…±°è‹š>C–6š"GšZç¦bËš›¢÷–*lˆ°(€€€€€€€•…ÉÑ¡M¡¥•±è‹¢Î›’ê#–>/šZç–>7–
+ßšV#šzpˆ°(€€€€€€€‰…ÉÉ¥•Èè‹
+ë–>/šZç–îë®/–
+ß–ºÏÖCV0ˆ(€€€ôì((€€€¥˜¡¹…µ•‘™™•ÑÍmÍ­¥±°¹¥‘t¥ì(€€€€€€€•™™•ÑÌ¹ÁÕÍ ¡¹…µ•‘™™•ÑÍmÍ­¥±°¹¥‘t¤ì(€€€ô((€€€É•ÑÕÉ¸l(€€€€€€€Í½Á•ÍmÍ­¥±°¹Ñ…É•ÑQåÁ•uñğ‹&çšº+šV#šzpˆ°(€€€€€€€€¸¸¹•™™•ÑÌ(€€€t¹™¥±Ñ•È¡	½½±•…¸¤¹©½¥¸ ‹¾òlˆ¤¬‹ˆì()ô()™Õ¹Ñ¥½¸É•¹‘•É±±±•µ•¹ÑM­¥±±AÉ•Ù¥•Ü¡•±•µ•¹Ğ¥ì((€€€½¹ÍĞ‰½‘äô ‰Í­¥±±AÉ•Ù¥•İ	½‘äˆ¤ì(€€€½¹ÍĞÑ…‰Ìô ‰Í­¥±±AÉ•Ù¥•İQ…‰Ìˆ¤ì((€€€¥˜ …‰½‘äñğ€…Ñ…‰Ì¥ìÉ•ÑÕÉ¸ìô((€€€½¹ÍĞÍ•±•Ñ•õM-%11}AIY%]}159QL¹¥¹±Õ‘•Ì¡•±•µ•¹Ğ¤(€€€€€€€€ü•±•µ•¹Ğ(€€€€€€€€è€‰™¥É”ˆì((€€€Ñ…‰Ì¹¥¹¹•É!Q50õM-%11}AIY%]}159QL¹µ…À¡­•äôùì(€€€€€€€½¹ÍĞ‘…Ñ„õ•±•µ•¹Ñ…Ñ…‰…Í•m­•åtì(€€€€€€€É•ÑÕÉ¸€œñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ±…ÍÌôˆœ¬(€€€€€€€€€€€€¡­•äôôõÍ•±•Ñ•€ü€‰…Ñ¥Ù”ˆ€è€ˆˆ¤¬(€€€€€€€€€€€€œˆ½¹±¥¬ô‰É•¹‘•É±±±•µ•¹ÑM­¥±±AÉ•Ù¥•Ü¡pœœ­­•ä¬pœ¤ˆøœ¬(€€€€€€€€€€€‘…Ñ„¹¹…µ”¬Ÿ–Æ³šœğ½‰ÕÑÑ½¸øœì(€€€ô¤¹©½¥¸ ˆˆ¤ì((€€€½¹ÍĞ…Ñ•½Éå9…µ•Ìõì(€€€€€€€Á¡åÍ¥…°è‹&§Bˆ°(€€€€€€€µ…¥Œè‹šÎW¢†Lˆ°(€€€€€€€‰Õ™˜è‹–Š{n(ˆ°(€€€€€€€¡•…°è‹–n{–ú¤ˆ°(€€€€€€€É•Ù¥Ù”è‹–ú§šÒìˆ°(€€€€€€€Á…ÍÍ¥Ù”è‹¢Š¯–.Tˆ(€€€ôì((€€€½¹ÍĞÍ­¥±±Ìõ=‰©•Ğ¹Ù…±Õ•Ì¡Í­¥±±…Ñ…‰…Í”¤¹™¥±Ñ•È (€€€€€€€Í­¥±°ôùÍ­¥±°¹•±•µ•¹ĞôôõÍ•±•Ñ•(€€€€¤ì((€€€‰½‘ä¹¥¹¹•É!Q50õÍ­¥±±Ì¹µ…À¡Í­¥±°ôø(€€€€€€€€œñ…ÉÑ¥±”±…ÍÌô‰Í­¥±°µÁÉ•Ù¥•Üµ…Éˆøœ¬(€€€€€€€€€€€€œñ‘¥ØøñÍÑÉ½¹œøœ­Í­¥±°¹¹…µ”¬œğ½ÍÑÉ½¹œøñÍÁ…¸øœ¬(€€€€€€€€€€€€¡…Ñ•½Éå9…µ•ÍmÍ­¥±°¹…Ñ•½Éåuñğ‹&çšº(ˆ¤¬œğ½ÍÁ…¸øğ½‘¥Øøœ¬(€€€€€€€€€€€€œñÀøœ­•ÑM­¥±±AÉ•Ù¥•İMÕµµ…Éä¡Í­¥±°¤¬œğ½Àøœ¬(€€€€€€€€œğ½…ÉÑ¥±”øœ(€€€€¤¹©½¥¸ ˆˆ¤ì((€€€‰½‘ä¹ÍÉ½±±Q½ÀôÀì)ô()™Õ¹Ñ¥½¸½Á•¹±±±•µ•¹ÑM­¥±±AÉ•Ù¥•Ü ¥ì((€€€½¹ÍĞµ½‘…°ô ‰…±±±•µ•¹ÑM­¥±±AÉ•Ù¥•İ5½‘…°ˆ¤ì(€€€¥˜ …µ½‘…°¥ìÉ•ÑÕÉ¸ìô((€€€É•¹‘•É±±±•µ•¹ÑM­¥±±AÉ•Ù¥•Ü ‰™¥É”ˆ¤ì(€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹…‘ ‰Í¡½Üˆ¤ì(€€€µ½‘…°¹Í•ÑÑÑÉ¥‰ÕÑ” ‰…É¥„µ¡¥‘‘•¸ˆ°‰™…±Í”ˆ¤ì)ô()™Õ¹Ñ¥½¸±½Í•±±±•µ•¹ÑM­¥±±AÉ•Ù¥•Ü ¥ì((€€€½¹ÍĞµ½‘…°ô ‰…±±±•µ•¹ÑM­¥±±AÉ•Ù¥•İ5½‘…°ˆ¤ì(€€€¥˜ …µ½‘…°¥ìÉ•ÑÕÉ¸ìô((€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” ‰Í¡½Üˆ¤ì(€€€µ½‘…°¹Í•ÑÑÑÉ¥‰ÕÑ” ‰…É¥„µ¡¥‘‘•¸ˆ°‰ÑÉÕ”ˆ¤ì)ô()™Õ¹Ñ¥½¸¡…¹•M­¥±±¡…É…Ñ•ÉÉÉ½Ü¡‘¥É•Ñ¥½¸¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³šb¼ñÍ•±•Ğû’â/š.'¦ã–Z»¾ò0(€€€€€€ƒšRçš"C¢Ş.š/¦‚’â¢Ój–Ş›–>Ïº·¦‚·–"š>o¾ò0(€€€€€€ƒšÂÓš"Ã–¬¿¦Š£–òOš&/¦g–§–/n»–&7šÊKšr'rš¶¢K¢&Ë¢ÎšZgj(€€€€€€ƒ¦ã¦‚’æ’â’ö×š.ÿš:'¾ò0(€€€€€€ƒ–>«–r¡™¥É—¾ò#²³’â¢K¢&Ë¾ò'¢Ş}Á±…å•ÈË¾ò#²³’ê3¢K¢&Ë¾ò0(€€€€€€ƒ–¶c–r£j¢¦Ç¾ò'’æ/¦ZO–"š>o¾ò3š¾S¢ò’â7šr¢ª“–Â;:§–ºØ(€€€€€€ƒ’î—
+ëšÂĞ¿¦Š£’æ¢÷š¶–âãR£(€€€€¨¼((€€€½¹ÍĞ­•åÌõ•Ñá¥ÍÑ¥¹A…ÉÑå%¹‘•á•Ì ¤¹µ…À (€€€€€€€¥¹‘•àôù•ÑA…ÉÑå¡…É…Ñ•É-•ä¡¥¹‘•à¤(€€€€¤ì((€€€¥˜¡­•åÌ¹±•¹Ñ ğÈ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞÕÉÉ•¹ÑA½Í¥Ñ¥½¸õ5…Ñ ¹µ…à (€€€€€€€€À°(€€€€€€€­•åÌ¹¥¹‘•á=˜¡ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È¤(€€€€¤ì((€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•Èõ­•åÍl(€€€€€€€€¡ÕÉÉ•¹ÑA½Í¥Ñ¥½¸­‘¥É•Ñ¥½¸­­•åÌ¹±•¹Ñ ¤•­•åÌ¹±•¹Ñ (€€€tì(((€€€É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤ì()ô(()™Õ¹Ñ¥½¸•ÑM­¥±±¡…É…Ñ•É=‰©•Ğ¡¡…É…Ñ•É%¥ì((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òh(€€€€€€ƒš*¢÷–¶ãşH¿–6Òk¢š¢*Çjš*¢÷¦î{¾ò0(€€€€€€ƒn»–&7–>«šr%Á±…å•Ë¾ò!™¥É—¾ò'¢Ş}Á±…å•ÈÈ(€€€€€€ƒ¦g–§–/¢K¢&Ëšr'rš¶6£®/jÍ­¥±±A½¥¹ÑÏ¾ò0(€€€€€€İ…Ñ•È½İ¥¹“¦
+–>«šb¿¢w–
+gR£j¦ëšºó¾ò0(€€€€€€ƒšÊKšr'¢3–ú3j¢K¢&Ë¢ÎšZg¾ò3–n{–
+Í¹Õ±³¾ò0(€€€€€€ƒ–Fó–>¯j–rÃšZç¢š¢«–ŞÇ–"“šZİ¹Õ±³jššÎ(€€€€¨¼((€€€¥˜¡¡…É…Ñ•É%ôôô‰™¥É”ˆ¥ì(€€€€€€€É•ÑÕÉ¸Á±…å•Èì(€€€ô(((€€€¥˜ (€€€€€€€¡…É…Ñ•É%ôôô‰Á±…å•ÈÈˆ˜˜(€€€€€€€Á±…å•ÈÈ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸Á±…å•ÈÈì(€€€ô((€€€¥˜ (€€€€€€€¡…É…Ñ•É%ôôô‰Á±…å•ÈÌˆ˜˜(€€€€€€€Á±…å•ÈÌ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸Á±…å•ÈÌì(€€€ô(((€€€É•ÑÕÉ¸¹Õ±°ì()ô(()™Õ¹Ñ¥½¸É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³šb¿šnÓšZÀñÍ•±•Ğû¢‡–§–,ñ½ÁÑ¥½¸ûjšZ–¶_¾ò0(€€€€€€ƒ>û–r¡U'šRçš"C–Ş›–>Ïº·¦‚´¯’â–/–B7–¶_šZç–†+¾ò0(€€€€€€ƒšRçš"CnÓš:—šnÓšZÃ¦
+–/šZç–†+jšZ–¶_¾ò0(€€€€€€ƒ¦†¿’ën»–&7¦ã’â·¢K¢&Ëj–B7–¶\¯¶'Òk¾ò0(€€€€€€ƒ¢Ş.š/¦‚j–"š>o–6‡&¦
+?¢ò¿’â¢Ó(€€€€¨¼((€€€½¹ÍĞ¹…µ•	½àô(€€€€€€€€ ‰Í­¥±±¡…É…Ñ•É9…µ•	½àˆ¤ì(((€€€¥˜¡¹…µ•	½à¥ì((€€€€€€€½¹ÍĞÍ•±•Ñ•‘%¹‘•àô(€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•Èôôô‰Á±…å•ÈÌˆ(€€€€€€€€€€€€ü€È(€€€€€€€€€€€€èÕÉÉ•¹ÑM­¥±±¡…É…Ñ•Èôôô‰Á±…å•ÈÈˆ(€€€€€€€€€€€€ü€Ä(€€€€€€€€€€€€è€Àì((€€€€€€€½¹ÍĞÍ•±•Ñ•‘¡…É…Ñ•Èô(€€€€€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡Í•±•Ñ•‘%¹‘•à¥ññÁ±…å•Èì((€€€€€€€¹…µ•	½à¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€¡Í•±•Ñ•‘¡…É…Ñ•È¹¥‘ñğ‹¢K¢&Èˆ¬¡Í•±•Ñ•‘%¹‘•à¬Ä¤¤¬(€€€€€€€€€€€€ˆ1Ø¸ˆ¬(€€€€€€€€€€€Í•±•Ñ•‘¡…É…Ñ•È¹±•Ù•°ì((€€€ô(((€€€½¹ÍĞ¡…É…Ñ•È€ô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÍl(€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€tì(((€€€¥˜ …¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ±½…‘½ÕĞ€ô(€€€€€€€€ ‰Í­¥±±1½…‘½ÕĞˆ¤ì(((€€€½¹ÍĞ…±±1¥ÍĞ€ô(€€€€€€€€ ‰…±±M­¥±±Í1¥ÍĞˆ¤ì(((€€€±½…‘½ÕĞ¹¥¹¹•É!Q50ôˆˆì((€€€…±±1¥ÍĞ¹¥¹¹•É!Q50ôˆˆì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33š*¢÷¦7¢t(€€€€€€ƒ–>«¦†¿’é¥½»¢Ş–B7¢Ç¾ò3–Û¦’c¦÷rV—¾ò3’âš:H(€€€€€€ƒ–no–/š:K’â¢Öß7¾ò'¾òh(€€€€€€ƒ–:šr³š¾?š‚ó–Ÿ–ºç’â–’Ÿ’âË¾ò#–"¦†x¿¢ª«šb8½M@¼(€€€€€€ƒï¦f“š2'¦"W¾ò'¾ò3šRçš"C–>«šr'–r[’è¯–B7¢Ç–§¢†3¾ò0(€€€€€€ƒ¦î{š‚ó–¶Cšr³¢ê¯nÓš:—¢ãfóï¦f“¾ò#šr'¢w–
+gšf¾ò$(€€€€€€ƒ¾ò3’â7–7¦r¢š¦†7–’[jï¦f“š2'¦"WšZ–¶_’öS’ö7ö»(€€€€¨¼((€€€™½È (€€€€€€€±•Ğ¤ôÀì(€€€€€€€¤ğĞì(€€€€€€€¤¬¬(€€€€¥ì((€€€€€€€½¹ÍĞÍ­¥±±%€ô(€€€€€€€€€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ím¥tì(((€€€€€€€½¹ÍĞ‰½à€ô(€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€€€€€¤ì(((€€€€€€€‰½à¹±…ÍÍ9…µ”€ô(€€€€€€€€€€€€‰Í­¥±°µ±½…‘½ÕĞµÍ±½Ğˆì(((€€€€€€€¥˜¡Í­¥±±%˜™Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘t¥ì((€€€€€€€€€€€½¹ÍĞÍ­¥±°€ô(€€€€€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€€€€€€€€‰½à¹¥¹¹•É!Q50€ô((€€€€€€€€€€€€(€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€¥ô‰±½…‘½ÕÑ%½¹|‘íÍ­¥±±%‘ôˆ(€€€€€€€€€€€€€€€±…ÍÌô‰Í­¥±°µ±½…‘½ÕĞµÍ±½Ğµ¥½¸ˆ(€€€€€€€€€€€€€€€ÍÑå±”ô‰‰…­É½Õ¹µ¥µ…”è‘í•ÑM­¥±±%½¹	…­É½Õ¹‘%µ…”¡Í­¥±±%¥ôìˆ(€€€€€€€€€€€€øğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í­¥±°µ±½…‘½ÕĞµÍ±½Ğµ¹…µ”ˆø(€€€€€€€€€€€€€€€€‘íÍ­¥±°¹¹…µ•ô(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ì(((€€€€€€€€€€€‰½à¹½¹±¥¬ô(€€€€€€€€€€€€€€€€ ¤ôùÉ•µ½Ù•ÅÕ¥ÁÁ•‘M­¥±°¡¤¤ì((€€€€€€€ô(€€€€€€€•±Í•ì((€€€€€€€€€€€‰½à¹¥¹¹•É!Q50€ô((€€€€€€€€€€€€(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í­¥±°µ±½…‘½ÕĞµÍ±½Ğµ¥½¸ˆøğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€±…ÍÌô‰Í­¥±°µ±½…‘½ÕĞµÍ±½Ğµ¹…µ”ˆ(€€€€€€€€€€€€€€€ÍÑå±”ô‰½±½ÈèŒØĞÜĞáˆìˆ(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€ƒ¦è(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ì((€€€€€€€ô(((€€€€€€€±½…‘½ÕĞ¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€‰½à(€€€€€€€€¤ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33’â7R£&ç–"”(€€€€€€ƒ–7–k’â–/–ŞË–¶ãšrš*¢÷jš†’ê¾ò3š.ÿš:'¾ò0(€€€€€€ƒ>û–r£š*¢÷–ÂÇšb¿R£’âš:K’âš:K–F#>û¾ò3šÊK–¶ãşH(€€€€€€ƒj–ÂÇ¦†¿’ëšr«–¶ãşK–ÂÇ––÷7¾ò'¾òh(€€€€€€ƒ–:šr³3–ŞË–¶ãšrš*¢÷73–>¿–¶ãşKš*¢÷7šb¼(€€€€€€ƒ–§–/–B¢«6£®/j™½É…£¢şÓ–r#¾ò3–B¢¨(€€€€€€…ÁÁ•¹‘¡¥±“–"Ã’â7–B3–ºç–f£–B#’ö×š"C’â–,(€€€€€€ƒ¢şÓ–r#¾ò3’âš²‡¢ŞG¦;¦g–/¢K¢&Ë–Òƒ–êW’â/j(€€€€€€ƒ–£¦£š*¢÷¾ò3š¾?’â–"_¢«–ŞÇ–"“šZß3¦
+šÊK–¶ã¾ò<(€€€€€€ƒ–ŞË–¶ãšr«šîÿÒk¾ò?–ŞËšîÿÒk7¢¦Ë¦†¿’ë–N«¢».š/¾ò0(€€€€€€ƒ–£¦¡…ÁÁ•¹“–"Ã–B3’â–-…±±1¥ÍÓ–ºç–f£(€€€€¨¼((€€€½¹ÍĞÍ­¥±±1•Ù•±Ì€ô(€€€€€€€¡…É…Ñ•È¹Í­¥±±1•Ù•±Íñğ(€€€€€€€íôì(((€€€€¼¨(€€€€€€ƒŠbƒ¦g–/¢K¢&Ë¢3–ú3rš¶j¢ÎšZg&§’îØ(€€€€€€ƒ¾ò!Á±…å•Ëš"YÁ±…å•ÈË¾ò'¾ò0(€€€€€€ƒR£’úš~—¢¦ˆ¿¦†¿’ëš*¢÷¦î{šVã¦?(€€€€€€İ…Ñ•È½İ¥¹“n»–&7¦
+šÊKšr'rš¶j¢K¢&Ë¢ÎšZg¾ò0(€€€€€€Í­¥±±=İ¹•Ëšršb½¹Õ±³¾ò0(€€€€€€ƒ’â/¦v‹R£–"Ãj–rÃšZç¦÷¢š¦bË–F¢fWB(€€€€€€ƒ¾ò#¢š[
+èÃ¦î{š*¢÷¦î{¾ò3–£¦£š*¢÷¦÷’â7¢÷–¶à¿–6¾ò'(€€€€¨¼((€€€½¹ÍĞÍ­¥±±=İ¹•Èô(€€€€€€€•ÑM­¥±±¡…É…Ñ•É=‰©•Ğ (€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€€¤ì(((€€€½¹ÍĞ…Ù…¥±…‰±•M­¥±±A½¥¹ÑÌõ5…Ñ ¹µ…à (€€€€€€€€À°(€€€€€€€9Õµ‰•È¡Í­¥±±=İ¹•È€üÍ­¥±±=İ¹•È¹Í­¥±±A½¥¹ÑÌ€è€À¥ñğÀ(€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33š*¢÷š:K& (€€€€€€ƒ–Š{–*ƒ–ŞË–¶ãşH¿šr«–¶ãşKjšZ–¶_–"¦jS–6–†+¾ò0(€€€€€€ƒ’â7R£š†Şk¾ò3–>«¢ššZ–¶_–6¦jS¾òošr«–¶ãşKj(€€€€€€ƒš*¢÷’âš^›–¶ãšr¾ò3¢«–.W¢ŞG–"Ã–ŞË–¶ãşK¦
+¦
++7¾ò'¾òh(€€€€€€ƒ–:šr³šb¿–Z»’â–-™½É…£’úw¢ÎšZg–ê¯–:–,(€€€€€€ƒ¦‚–ê?nÓš:—š*+š¾?’â–"]…ÁÁ•¹“’â+–:ïšRçš"C– (€€€€€€ƒ¾§–ë¦g–/¢K¢&Ë–Òƒ–êW’â/j–£¦£š*¢õ¥“¾ò0(€€€€€€ƒ–"š"C3–ŞË–¶ãşK73šr«–¶ãşK7–§Ö¦f–"_¾ò0(€€€€€€ƒ–/–"—šâËš~O–nƒ
+ëš¾?š²…É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤(€€€€€€ƒ¦÷šb¿¦7šZÃ–"Ö¾ò#’â7šb¿–¶c’â’î÷3–ŞË–¶ãşH(€€€€€€ƒšâ–Z»7–ş¯–>[¾ò'¾ò3–>«¢š–¶ã’êšZÃš*¢÷(€€€€€€Í­¥±±1•Ù•±Ï¢º+’ê¾ò3’â/š²‡¦7æ«–ÂÇšr¢«–.T(€€€€€€ƒ¢Š¯–"–"Ã3–ŞË–¶ãşK7¦
+Ö¾ò3’â7R£¦†7–’[–¾¬(€€€€€€ƒ3šB³ï7j¦
+?¢ò¿(€€€€¨¼((€€€½¹ÍĞµ…Ñ¡¥¹M­¥±±%‘Ìô((€€€€€€€=‰©•Ğ¹­•åÌ¡Í­¥±±…Ñ…‰…Í”¤(€€€€€€€€¹™¥±Ñ•È¡Í­¥±±%ôùì((€€€€€€€€€€€½¹ÍĞÍ­¥±°ô(€€€€€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€€€€€Í­¥±°€˜˜(€€€€€€€€€€€€€€€Í­¥±°¹•±•µ•¹Ğôôô(€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€Í­¥±±=İ¹•È(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€Í­¥±±=İ¹•È¹•±•µ•¹Ğ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€¤ì((€€€€€€€ô¤ì(((€€€½¹ÍĞ±•…É¹•‘%‘Ìô((€€€€€€€µ…Ñ¡¥¹M­¥±±%‘Ì¹™¥±Ñ•È (€€€€€€€€€€€Í­¥±±%ôø(€€€€€€€€€€€€€€€€¡Í­¥±±1•Ù•±ÍmÍ­¥±±%‘uñğÀ¤øÀ(€€€€€€€€¤ì(((€€€½¹ÍĞÕ¹±•…É¹•‘%‘Ìô((€€€€€€€µ…Ñ¡¥¹M­¥±±%‘Ì¹™¥±Ñ•È (€€€€€€€€€€€Í­¥±±%ôø(€€€€€€€€€€€€€€€€„¡Í­¥±±1•Ù•±ÍmÍ­¥±±%‘tøÀ¤(€€€€€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒš*+3Ö–ë’â–"_š*¢õÉ½ß7¦gšº×¦
+?¢ò¿š*÷š"@(€€€€€€ƒ6£®/–÷–ò?¾ò3–ŞË–¶ãşH¿šr«–¶ãşK–§Ö¦÷–Fó–>¬(€€€€€€ƒ–B3’â’î÷¾ò3’â7R£–¾¯–§š²‡’âš¢j!Q53Ö–¶_’âË(€€€€¨¼((€€€™Õ¹Ñ¥½¸‰Õ¥±‘M­¥±±I½İ±•µ•¹Ğ¡Í­¥±±%¥ì((€€€€€€€½¹ÍĞÍ­¥±°€ô(€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€€€€½¹ÍĞ±•Ù•°€ô(€€€€€€€€€€€Í­¥±±1•Ù•±ÍmÍ­¥±±%‘uñğ(€€€€€€€€€€€€Àì(((€€€€€€€½¹ÍĞ¥Í1•…É¹•€ô(€€€€€€€€€€€±•Ù•°øÀì(((€€€€€€€½¹ÍĞ•ÅÕ¥ÁÁ•€ô(€€€€€€€€€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì(€€€€€€€€€€€€¹¥¹±Õ‘•Ì¡Í­¥±±%¤ì(((€€€€€€€½¹ÍĞ¥Í5…á1•Ù•°€ô(€€€€€€€€€€€¥Í1•…É¹•€˜˜(€€€€€€€€€€€±•Ù•°øô(€€€€€€€€€€€€¡Í­¥±°¹µ…á1•Ù•±ñğÄ¤ì(((€€€€€€€½¹ÍĞ…¹™™½É€ô(€€€€€€€€€€€…Ù…¥±…‰±•M­¥±±A½¥¹ÑÌøô(€€€€€€€€€€€€¡Í­¥±°¹±•…É¹½ÍÑñğÀ¤ì(((€€€€€€€½¹ÍĞ‰½à€ô(€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€€€€€¤ì(((€€€€€€€‰½à¹±…ÍÍ9…µ”€ô(€€€€€€€€€€€€‰Í­¥±°µÉ½Üˆì(((€€€€€€€±•Ğ…Ñ¥½¹%½¸ì(€€€€€€€±•Ğ…Ñ¥½¹1…‰•°ì(€€€€€€€±•Ğ…Ñ¥½¹=¹±¥¬ì(€€€€€€€±•Ğ…Ñ¥½¹¥Í…‰±•ì(((€€€€€€€½¹ÍĞÁÉ•É•Å5•Ğ€ô(€€€€€€€€€€€¥ÍM­¥±±AÉ•É•Å5•Ğ (€€€€€€€€€€€€€€€Í­¥±±1•Ù•±Ì°(€€€€€€€€€€€€€€€Í­¥±°(€€€€€€€€€€€€¤ì(((€€€€€€€¥˜ …¥Í1•…É¹•¥ì((€€€€€€€€€€€…Ñ¥½¹%½¸ôˆˆì(((€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33–&7ö¸(€€€€€€€€€€€€€€ƒš*¢÷¢š–¶ãjš¦–"Û7¾ò3’âS¢š3–º3–£’â7¢ô(€€€€€€€€€€€€€€ƒ¦î{7¾ò'¾òh(€€€€€€€€€€€€€€ƒ–&7ö»šÊK¦Sš"Cšf–«–#¦†¿’ë¦:[’ö?.š/¾ò0(€€€€€€€€€€€€€€ƒ¢N/¦;–:šr³j3–¶ãşK¾ò?¦î{šVã’â7¢ÚÏ4(€€€€€€€€€€€€€€ƒ–"“šZß¾ò3š2'¦"W–òß–"Ù‘¥Í…‰±•õÑÉÕ—¾ò0(€€€€€€€€€€€€€€ƒ:§–ºÛ¦¦î{¦÷¦î{’â7’ê¾ò!Í•—’â+¦vˆ(€€€€€€€€€€€€€€€¹Í­¥±°µ…Ñ¥½¸µ…É¹‘¥Í…‰±•“j(€€€€€€€€€€€€€€Á½¥¹Ñ•Èµ•Ù•¹ÑÌé¹½¹—¾ò3’æ/–&7¦g¢„(€€€€€€€€€€€€€€ƒšr'–-±…ÍÏ–¶_’âË–ÂGš&O’â–/¦ëš‚ój(€€€€€€€€€€€€€€‰ÕŸ¾ò3¦‚’úÿ’ş»š:'¾ò3’â7Ù‘¥Í…‰±•(€€€€€€€€€€€€€€ƒš¢–ò?–Û–¾›–ú{’úšÊKrjRšV#¦;¾ò'(€€€€€€€€€€€€¨¼((€€€€€€€€€€€…Ñ¥½¹1…‰•°ô(€€€€€€€€€€€€€€€€…ÁÉ•É•Å5•Ğ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹Â~RH€ˆ­•ÑM­¥±±AÉ•É•Å1…‰•°¡Í­¥±°¤(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€…¹™™½É(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€‹–¶ãşHˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€‹¦î{šVã’â7¢ÚÌˆ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€…Ñ¥½¹=¹±¥¬ô(€€€€€€€€€€€€€€€€‰±•…É¹M­¥±° œˆ­Í­¥±±%¬ˆœ¤ˆì((€€€€€€€€€€€…Ñ¥½¹¥Í…‰±•ô(€€€€€€€€€€€€€€€€…ÁÉ•É•Å5•Ğñğ(€€€€€€€€€€€€€€€€……¹™™½Éì((€€€€€€€ô(€€€€€€€•±Í”¥˜¡¥Í5…á1•Ù•°¥ì((€€€€€€€€€€€…Ñ¥½¹%½¸ôˆˆì(€€€€€€€€€€€…Ñ¥½¹1…‰•°ô‹–ŞËšîÿÒhˆì((€€€€€€€€€€€…Ñ¥½¹=¹±¥¬ô(€€€€€€€€€€€€€€€€‰ÕÁÉ…‘•M­¥±° œˆ­Í­¥±±%¬ˆœ¤ˆì((€€€€€€€€€€€…Ñ¥½¹¥Í…‰±•ô(€€€€€€€€€€€€€€€ÑÉÕ”ì((€€€€€€€ô(€€€€€€€•±Í•ì((€€€€€€€€€€€…Ñ¥½¹%½¸ôˆˆì((€€€€€€€€€€€…Ñ¥½¹1…‰•°ô(€€€€€€€€€€€€€€€…Ù…¥±…‰±•M­¥±±A½¥¹ÑÌğÄ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹¦î{šVã’â7¢ÚÌˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€‹–6Òhˆì((€€€€€€€€€€€…Ñ¥½¹=¹±¥¬ô(€€€€€€€€€€€€€€€€‰ÕÁÉ…‘•M­¥±° œˆ­Í­¥±±%¬ˆœ¤ˆì((€€€€€€€€€€€…Ñ¥½¹¥Í…‰±•ô(€€€€€€€€€€€€€€€…Ù…¥±…‰±•M­¥±±A½¥¹ÑÌğÄì((€€€€€€€ô(((€€€€€€€½¹ÍĞÍ¡½İÅÕ¥Á	ÕÑÑ½¸ô((€€€€€€€€€€€¥Í1•…É¹•€˜˜(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰Á¡åÍ¥…°‰ñğ(€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰µ…¥Œ‰ñğ(€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜‰ñğ(€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰¡•…°‰ñğ(€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰É•Ù¥Ù”ˆ(€€€€€€€€€€€€¤ì(((€€€€€€€‰½à¹¥¹¹•É!Q50€ô((€€€€€€€€(€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€¥ô‰Í­¥±±%½¹|‘íÍ­¥±±%‘ôˆ(€€€€€€€€€€€±…ÍÌô‰Í­¥±°µÉ½Üµ¥½¸ˆ(€€€€€€€€€€€ÍÑå±”ô‰‰…­É½Õ¹µ¥µ…”è‘í•ÑM­¥±±%½¹	…­É½Õ¹‘%µ…”¡Í­¥±±%¥ôìˆ(€€€€€€€€øğ½‘¥Øø((€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í­¥±°µÉ½ÜµÑ•áĞˆø(€€€€€€€€€€€€ñˆø‘íÍ­¥±°¹¹…µ•ôğ½ˆø(€€€€€€€€€€€€‘ì(€€€€€€€€€€€€€€€¥Í1•…É¹•(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‰1Ø¸ˆ­±•Ù•°¬(€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€Í­¥±°¹µ…á1•Ù•°(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€ˆ¼ˆ­Í­¥±°¹µ…á1•Ù•°(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€œñÍÁ…¸ÍÑå±”ô‰½±½ÈèŒØĞÜĞáˆìˆûšr«–¶ãşHğ½ÍÁ…¸øœ(€€€€€€€€€€€ô(€€€€€€€€€€€€ñ‰Èø(€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰Í­¥±°µÉ½Üµ‘•ÍŒˆø(€€€€€€€€€€€€€€€€‘íÍ­¥±°¹‘•ÍÉ¥ÁÑ¥½¹ô(€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€‘ì(€€€€€€€€€€€€€€€€…¥Í1•…É¹•€˜˜(€€€€€€€€€€€€€€€€…ÁÉ•É•Å5•Ğ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€(€€€€€€€€€€€€€€€€ñ‰Èø(€€€€€€€€€€€€€€€€ñÍÁ…¸ÍÑå±”ô‰½±½Èè˜Ôå”Áˆìˆø(€€€€€€€€€€€€€€€€€€€ƒÂ~RH€‘í•ÑM­¥±±AÉ•É•Å1…‰•°¡Í­¥±°¥ô(€€€€€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€ô(€€€€€€€€€€€€ñÍÁ…¸(€€€€€€€€€€€€€€€±…ÍÌô‰Í­¥±°µÉ½Üµ‘•Ñ…¥°µ±¥¹¬ˆ(€€€€€€€€€€€€€€€½¹±¥¬ô‰Í¡½İM­¥±±•Ñ…¥° œ‘íÍ­¥±±%‘ôœ¤ˆ(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€ƒŠ›Š›¢¦ÏÒÃ
+ì(€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€ğ½‘¥Øø((€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€±…ÍÌô‰Í­¥±°µ…Ñ¥½¸µ…É‘ì(€€€€€€€€€€€€€€€…Ñ¥½¹¥Í…‰±•(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€ˆ‘¥Í…‰±•ˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€ôˆ(€€€€€€€€€€€½¹±¥¬ôˆ‘í…Ñ¥½¹=¹±¥­ôˆ(€€€€€€€€ø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í­¥±°µ…Ñ¥½¸µ…ÉµÑ½Àˆø‘í…Ñ¥½¹%½¹ôğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í­¥±°µ…Ñ¥½¸µ…Éµ±…‰•°ˆø(€€€€€€€€€€€€€€€€‘í…Ñ¥½¹1…‰•±ô(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€ğ½‘¥Øø((€€€€€€€€‘ì(€€€€€€€€€€€Í¡½İÅÕ¥Á	ÕÑÑ½¸(€€€€€€€€€€€€ü(€€€€€€€€€€€€(€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€±…ÍÌô‰Í­¥±°µ…Ñ¥½¸µ…É‘ì(€€€€€€€€€€€€€€€€€€€•ÅÕ¥ÁÁ•(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€ˆ‘¥Í…‰±•ˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€ôˆ(€€€€€€€€€€€€€€€½¹±¥¬ô‰•ÅÕ¥ÁM­¥±° œ‘íÍ­¥±±%‘ôœ¤ˆ(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í­¥±°µ…Ñ¥½¸µ…ÉµÑ½Àˆøğ½‘¥Øø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í­¥±°µ…Ñ¥½¸µ…Éµ±…‰•°ˆø(€€€€€€€€€€€€€€€€€€€€‘ì(€€€€€€€€€€€€€€€€€€€€€€€•ÅÕ¥ÁÁ•(€€€€€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€€€€€‹–ŞË¢w–
+dˆ(€€€€€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€€€€€‹¢w–
+dˆ(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆˆ(€€€€€€€ô(€€€€€€€€ì(((€€€€€€€É•ÑÕÉ¸‰½àì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ–"¦jSŞkR£jÒSšZ–¶_š¢gÆ“¾ò3šVš?’â7R (€€€€€€ƒ’îï’öWš†Şh¿–êW¢&Ë¾ò3–>«šb¿’â¢†3ö»’â·j(€€€€€€ƒ¢foŞh¯šZ–¶_¾ò3–Z»ÒS¢š[¢šë’â+–6¦jS–§Ö(€€€€¨¼((€€€™Õ¹Ñ¥½¸‰Õ¥±‘M­¥±±M•Ñ¥½¹¥Ù¥‘•È¡±…‰•°¥ì((€€€€€€€½¹ÍĞ‘¥Ù¥‘•Èô(€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€€€€€¤ì(((€€€€€€€‘¥Ù¥‘•È¹ÍÑå±”¹ÍÍQ•áĞô((€€€€€€€€€€€€‰Ñ•áĞµ…±¥¸é•¹Ñ•Èìˆ¬(€€€€€€€€€€€€‰™½¹ĞµÍ¥é”èÄÅÁàìˆ¬(€€€€€€€€€€€€‰½±½ÈèŒá„İ„ÕŒìˆ¬(€€€€€€€€€€€€‰µ…É¥¸èÄÁÁà€À€ÑÁàìˆì(((€€€€€€€‘¥Ù¥‘•È¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€€‹ŠRŠRŠRŠRŠR ˆ¬(€€€€€€€€€€€±…‰•°¬(€€€€€€€€€€€€‹ŠRŠRŠRŠRŠR ˆì(((€€€€€€€É•ÑÕÉ¸‘¥Ù¥‘•Èì((€€€ô(((€€€¥˜¡±•…É¹•‘%‘Ì¹±•¹Ñ øÀ¥ì((€€€€€€€…±±1¥ÍĞ¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€‰Õ¥±‘M­¥±±M•Ñ¥½¹¥Ù¥‘•È (€€€€€€€€€€€€€€€€‹–ŞË–¶ãşHˆ(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€€€€€±•…É¹•‘%‘Ì¹™½É… ¡Í­¥±±%ôùì((€€€€€€€€€€€…±±1¥ÍĞ¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€€€€€‰Õ¥±‘M­¥±±I½İ±•µ•¹Ğ (€€€€€€€€€€€€€€€€€€€Í­¥±±%(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€¤ì((€€€€€€€ô¤ì((€€€ô(((€€€¥˜¡Õ¹±•…É¹•‘%‘Ì¹±•¹Ñ øÀ¥ì((€€€€€€€…±±1¥ÍĞ¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€‰Õ¥±‘M­¥±±M•Ñ¥½¹¥Ù¥‘•È (€€€€€€€€€€€€€€€€‹šr«–¶ãşHˆ(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€€€€€Õ¹±•…É¹•‘%‘Ì¹™½É… ¡Í­¥±±%ôùì((€€€€€€€€€€€…±±1¥ÍĞ¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€€€€€‰Õ¥±‘M­¥±±I½İ±•µ•¹Ğ (€€€€€€€€€€€€€€€€€€€Í­¥±±%(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€¤ì((€€€€€€€ô¤ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒš¾?š²‡¦7šZÃšâËš~Oš*¢÷¦‚¦v‹šf¾ò0(€€€€€€ƒ¦‚’úÿ–B3š¶—’âš²‡¢«–.Wš"Ã¦²—jš*¢÷’â/š.'¦ã–Z»¾ò0(€€€€€€ƒ¦gš¢¢w–
+g¢º+’ê–¶ãšZÃš*¢÷’ê¾ò0(€€€€€€ƒ¦ã–Z»¦÷šr¢«–.W¢Ş’â+¾ò3’â7R£š¾?–/–Fó–>­É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤(€€€€€€ƒj–rÃšZç¦÷–B¢«¢¢c–ú_–7–Fó–>¯’âš²‡(€€€€¨¼((€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹Ì ¤ì((€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹ÌÈ ¤ì()ô(((¼¨(€€ƒÖ–ëš*¢÷n»–&7¶'ÒkjšV#šzsšZ–¶_¢ª«šb;¾ò0(€€ƒR£–r£š*¢÷¦7¢w¦‚¦v‹Ö›:§–ºÛ–>¢(¨¼((¼¨(€€ƒŠbƒš*¢÷–"¦†{š¢gÆ“¾ò#šZÃ–Š{¾ò'¾òh(€€ƒ&§B’âï–.W¾ò?šÎW¢†O’âï–.W¾ò?–Š{n+’âï–.W¾ò?¢Š¯–.W¾ò0(€€ƒÖÇ’â–ú{¦g¢‡R‹RšZ–¶_¾ò0(€€ƒš*¢÷¦7¢wš²–ŞË–¶ãš*¢÷–>¿–¶ãš*¢÷’â'–/–rÃšZç¦÷–ÇR£¾ò0(€€ƒŠë’şw¦†¿’ëšZç–ò?’â¢Ó(¨¼()™Õ¹Ñ¥½¸•ÑM­¥±±…Ñ•½Éå1…‰•°¡…Ñ•½Éä¥ì((€€€¥˜¡…Ñ•½Éäôôô‰Á¡åÍ¥…°ˆ¥ì(€€€€€€€É•ÑÕÉ¸‹&§B’âï–.Tˆì(€€€ô((€€€¥˜¡…Ñ•½Éäôôô‰µ…¥Œˆ¥ì(€€€€€€€É•ÑÕÉ¸‹šÎW¢†O’âï–.Tˆì(€€€ô((€€€¥˜¡…Ñ•½Éäôôô‰‰Õ™˜ˆ¥ì(€€€€€€€É•ÑÕÉ¸‹–Š{n+’âï–.Tˆì(€€€ô((€€€¥˜¡…Ñ•½Éäôôô‰¡•…°ˆ¥ì(€€€€€€€É•ÑÕÉ¸‹šÊïf’âï–.Tˆì(€€€ô((€€€¥˜¡…Ñ•½Éäôôô‰É•Ù¥Ù”ˆ¥ì(€€€€€€€É•ÑÕÉ¸‹–ú§šÒï’âï–.Tˆì(€€€ô((€€€¥˜¡…Ñ•½Éäôôô‰Á…ÍÍ¥Ù”ˆ¥ì(€€€€€€€É•ÑÕÉ¸‹¢Š¯–.Tˆì(€€€ô((€€€É•ÑÕÉ¸ˆˆì()ô(()™Õ¹Ñ¥½¸•ÑM­¥±±™™•ÑAÉ•Ù¥•İQ•áĞ¡Í­¥±°±±•Ù•°¥ì((€€€€¼¨(€€€€€€ƒŠbƒÒSš:Ÿ–‚Óš*¢÷¾ò#n»–&7šb¿–Ã–Â¾ò3šÊKšr%‰…Í•…µ…—¾ò$(€€€€€€ƒ¢š–r£3šr'–
+ß–ºÏj&§B¿šÎW¢†Oš*¢÷7–"“šZß’æ/–&4(€€€€€€ƒ–#šRSš"«¢fWB¾ò3’â7Ûšr¢Š¯’â/¦v‹¦
+–/–"“šZÜ(€€€€€€ƒ¢ª“–"“š"C3–
+ß–ºÌÃ7jšRïšN+š*¢÷¾ò0(€€€€€€ƒ¦†¿’ë–ë3n»–&7–
+ß–ºÏÒÃ7¦g¢»¢ª“–Â;šZ–¶_(€€€€¨¼((€€€¥˜ (€€€€€€€€ (€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰Á¡åÍ¥…°‰ñğ(€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰µ…¥Œˆ(€€€€€€€€¤€˜˜(€€€€€€€€…Í­¥±°¹‰…Í•…µ…”€˜˜(€€€€€€€Í­¥±°¹™É••é•¡…¹”(€€€€¥ì((€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€Í­¥±°¹™É••é•¡…¹”¬(€€€€€€€€€€€€ˆ—š¦:–Ã–Ân»š¢g¾ò0ˆ¬(€€€€€€€€€€€Í­¥±°¹™É••é•ÕÉ…Ñ¥½¸¬(€€€€€€€€€€€€‹–n{–B#‡šÎW¢†3–.Tˆ(€€€€€€€€¤ì((€€€ô(((€€€¥˜ (€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰Á¡åÍ¥…°‰ñğ(€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰µ…¥Œˆ(€€€€¥ì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€€€€€ƒ¦g¢‡’æ/–&7–>«¦†¿’ëš*¢÷–~ë’;–
+ß–ºÏ¾ò0(€€€€€€€€€€ƒ–º3–£šÊKšr'º_¦Ë¯–Òc¢Š¯–.Wj¬ÄÀ—–*ƒš"C¾ò0(€€€€€€€€€€ƒ–Â;¢Ó:§–ºÛ–¶ã’ê¢Š¯–.W’æ/–ú3¾ò0(€€€€€€€€€€ƒ–r£¦g–/¦‚C¢š÷šVã–¶_’â+–º3–£r/’â7–ë–Ş»VÃ¾ò0(€€€€€€€€€€ƒ’î—
+ë¢Š¯–.WšÊKšr'RšV (€€€€€€€€€€ƒ¾ò#–¾›¦jo’â+š"Ã¦²—šf	…ÍÑ…µ…•M­¥±° §¢„(€€€€€€€€€€ƒšr'š¶Šë––_R£¾ò3–>«šb¿¦g–/¦‚C¢š÷šVã–¶_šÊK¢Ş’â+¾ò'(€€€€€€€€€€ƒ>û–r£¢s’â+¾ò3¢ºO:§–ºÛ¢÷nÓš:—–r£¦g¢„(€€€€€€€€€€ƒr/–"Ã–¶ã¢Š¯–.W–&7–ú3šVã–¶_j¢º+–2[(€€€€€€€€¨¼((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€€€€€ƒ¦g¢‡’æ/–&7–>«¦†¿’ëš*¢÷–~ë’;–
+ß–ºÏ¾ò0(€€€€€€€€€€ƒ–º3–£šÊKšr'º_¦Ë–Òc¢Š¯–.Wj–*ƒš"C¾ò0(€€€€€€€€€€ƒ–Â;¢Ó:§–ºÛ–¶ã’ê¢Š¯–.W’æ/–ú3¾ò0(€€€€€€€€€€ƒ–r£¦g–/¦‚C¢š÷šVã–¶_’â+–º3–£r/’â7–ë–Ş»VÃ¾ò0(€€€€€€€€€€ƒ’î—
+ë¢Š¯–.WšÊKšr'RšV (€€€€€€€€€€ƒ¾ò#–¾›¦jo’â+š"Ã¦²—šf	…ÍÑ…µ…•M­¥±° §¢„(€€€€€€€€€€ƒšr'š¶Šë––_R£¾ò3–>«šb¿¦g–/¦‚C¢š÷šVã–¶_šÊK¢Ş’â+¾ò'(€€€€€€€€€€ƒ>û–r£¢s’â+¾ò3¢ºO:§–ºÛ¢÷nÓš:—–r£¦g¢„(€€€€€€€€€€ƒr/–"Ã–¶ã¢Š¯–.W–&7–ú3šVã–¶_j¢º+–2[(€€€€€€€€€€ƒ¢Ş}…ÍÑ…µ…•M­¥±° §’âš¢¾ò0(€€€€€€€€€€ƒšRçš"C–.Wš/R£3–Ò€­c7š~—¢†£¾ò0(€€€€€€€€€€ƒšÂÓ–Òc’æ¢÷š¶Šë–>7šbƒ–r£¦g¢‡(€€€€€€€€¨¼((€€€€€€€½¹ÍĞ•áM­¥±±%€ô(€€€€€€€€€€€Í­¥±°¹•±•µ•¹Ğ¬(€€€€€€€€€€€€‰`ˆì(((€€€€€€€½¹ÍĞ•áM­¥±°€ô(€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•m•áM­¥±±%‘tì(((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33–Ò€(€€€€€€€€€€ƒ¢Š¯–.W–º3–£šÊKRšV#7¾ò3¦g–/¦‚C¢š÷šVã–¶\(€€€€€€€€€€ƒ¢Ş}…ÍÑ…µ…•M­¥±° §*¿’ê–B3’â–,(€€€€€€€€€€‰ÕŸ¾ò'¾òh(€€€€€€€€€€ƒ’â7¢÷R¡Í­¥±°¹•±•µ•¹ÓVÛ¢K¢&Ëš²’ö4(€€€€€€€€€€­•ç¾ò3¦g¢‡šRçR¡ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€€€€ƒ¾ò#n»–&7V¯¦v‹’â+¦†¿’ëjšb¿–N«–/¢K¢&Ëj(€€€€€€€€€€ƒš*¢÷–"_¢†£¾ò0‰™¥É”‹š"X‰Á±…å•ÈÈ‹¾ò'¾ò0(€€€€€€€€€€ƒ¢Ş:§–ºÛ–¾›¦jo–r£r/¢ªÃjš*¢÷’şwš2’â¢Ó(€€€€€€€€¨¼((€€€€€€€½¹ÍĞ•á1•Ù•°€ô(€€€€€€€€€€€•ÑM­¥±±1•Ù•° (€€€€€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È°(€€€€€€€€€€€€€€€•áM­¥±±%(€€€€€€€€€€€€¤ì((((€€€€€€€½¹ÍĞÁ…ÍÍ¥Ù•5Õ±Ñ¥Á±¥•È€ô(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€•áM­¥±°€˜˜(€€€€€€€€€€€€€€€•á1•Ù•°øÀ€˜˜(€€€€€€€€€€€€€€€•áM­¥±°¹‘…µ…•	½¹ÕÍA•É•¹Ğ(€€€€€€€€€€€€¤(€€€€€€€€€€€€ü(€€€€€€€€€€€€Ä¬(€€€€€€€€€€€•áM­¥±°¹‘…µ…•	½¹ÕÍA•É•¹Ğ¼(€€€€€€€€€€€€ÄÀÀ(€€€€€€€€€€€€è(€€€€€€€€€€€€Äì(((€€€€€€€½¹ÍĞÁÉ•Ù¥•İ…µ…”€ô(€€€€€€€€€€€5…Ñ ¹™±½½È (€€€€€€€€€€€€€€€•ÑM­¥±±…µ…•Ñ1•Ù•° (€€€€€€€€€€€€€€€€€€€Í­¥±°°(€€€€€€€€€€€€€€€€€€€±•Ù•°(€€€€€€€€€€€€€€€€¤¨(€€€€€€€€€€€€€€€Á…ÍÍ¥Ù•5Õ±Ñ¥Á±¥•È(€€€€€€€€€€€€¤ì(((€€€€€€€±•ĞÑ•áĞ€ô(€€€€€€€€€€€€‹n»–&7–
+ß–ºÏÒˆ¬(€€€€€€€€€€€ÁÉ•Ù¥•İ…µ…”¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€Á…ÍÍ¥Ù•5Õ±Ñ¥Á±¥•ÈøÄ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹¾ò#–ŞË–B¬ˆ¬(€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€•áM­¥±°(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€•áM­¥±°¹¹…µ”(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€‹–*ƒš"C¾ò$ˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤ì(((€€€€€€€¥˜¡Í­¥±°¹‰ÕÉ¹¡…¹”¥ì((€€€€€€€€€€€Ñ•áĞ¬ô((€€€€€€€€€€€€€€€€‹¾öpˆ¬(€€€€€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹¡…¹”¬(€€€€€€€€€€€€€€€€ˆ—K¾ò ˆ¬(€€€€€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹A•É•¹Ñ	å1•Ù•±l(€€€€€€€€€€€€€€€€€€€±•Ù•°´Ä(€€€€€€€€€€€€€€€t¬(€€€€€€€€€€€€€€€€ˆ—šr–’!C¾ò?–n{–B#¾ò$ˆì((€€€€€€€ô(((€€€€€€€¥˜¡Í­¥±°¹™É••é•¡…¹”¥ì((€€€€€€€€€€€Ñ•áĞ¬ô((€€€€€€€€€€€€€€€€‹¾öpˆ¬(€€€€€€€€€€€€€€€Í­¥±°¹™É••é•¡…¹”¬(€€€€€€€€€€€€€€€€ˆ—–Ã–Â¾ò ˆ¬(€€€€€€€€€€€€€€€Í­¥±°¹™É••é•ÕÉ…Ñ¥½¸¬(€€€€€€€€€€€€€€€€‹–n{–B#‡šÎW¢†3–.W¾ò$ˆì((€€€€€€€ô(((€€€€€€€¥˜¡Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•°¥ì(€€€€€€€€€€€Ñ•áĞ¬ô‹¾ös–Bã–>Xˆ­Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•±m±•Ù•°´Åt¬ˆ—–
+ß–ºÏ¾ò#–n{–ú¥!@½MC¾ò$ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹…¥±¥Ñå½İ¹	å1•Ù•°¥ì(€€€€€€€€€€€Ñ•áĞ¬ô‹¾öpˆ­Í­¥±°¹…¥±¥Ñå½İ¹¡…¹”¬ˆ—¦f7šV<ˆ­Í­¥±°¹…¥±¥Ñå½İ¹	å1•Ù•±m±•Ù•°´Åt¬ˆ—¾ò ˆ¬¡Í­¥±°¹…¥±¥Ñå½İ¹ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B#¾ò$ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹ÍÑ…Ñ½İ¹	å1•Ù•°¥ì(€€€€€€€€€€€Ñ•áĞ¬ô‹¾öpˆ­Í­¥±°¹ÍÑ…Ñ½İ¹¡…¹”¬ˆ—¦f7¢÷–*lˆ­Í­¥±°¹ÍÑ…Ñ½İ¹	å1•Ù•±m±•Ù•°´Åt¬ˆ—¾ò ˆ¬¡Í­¥±°¹ÍÑ…Ñ½İ¹ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B#¾ò$ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹‘•™•¹Í•½İ¹	å1•Ù•°¥ì(€€€€€€€€€€€Ñ•áĞ¬ô‹¾öpˆ­Í­¥±°¹‘•™•¹Í•½İ¹¡…¹”¬ˆ—¦f7¦bÈˆ­Í­¥±°¹‘•™•¹Í•½İ¹	å1•Ù•±m±•Ù•°´Åt¬ˆ—¾ò ˆ¬¡Í­¥±°¹‘•™•¹Í•½İ¹ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B#¾ò$ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹µ¥ÍÍ	½¹ÕÍ	å1•Ù•°¥ì(€€€€€€€€€€€Ñ•áĞ¬ô‹¾öpˆ­Í­¥±°¹ÍÑÕ¹¡…¹”¬ˆ—šj#r§¾ò15%ML€¬ˆ­Í­¥±°¹µ¥ÍÍ	½¹ÕÍ	å1•Ù•±m±•Ù•°´Åt¬ˆ—¾ò ˆ¬¡Í­¥±°¹ÍÑÕ¹ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B#¾ò$ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹Á•ÑÉ¥™å¡…¹•	å1•Ù•°¥ì(€€€€€€€€€€€Ñ•áĞ¬ô‹¾öpˆ­Í­¥±°¹Á•ÑÉ¥™å¡…¹•	å1•Ù•±m±•Ù•°´Åt¬ˆ—~Ï–2[¾ò ˆ¬¡Í­¥±°¹Á•ÑÉ¥™åÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B#¾ò$ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹Í•±™M¡¥•±‘	å1•Ù•°¥ì(€€€€€€€€€€€Ñ•áĞ¬ô‹¾ös¢«¢ê¯¢¶ßnø€ˆ­Í­¥±°¹Í•±™M¡¥•±‘	å1•Ù•±m±•Ù•°´Åt¬‹¾ò ˆ¬¡Í­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B#¾ò$ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹…±±åM¡¥•±‘	å1•Ù•°¥ì(€€€€€€€€€€€Ñ•áĞ¬ô‹¾ös–£¦®S¢¶ßnø€ˆ­Í­¥±°¹…±±åM¡¥•±‘	å1•Ù•±m±•Ù•°´Åt¬‹¾ò ˆ¬¡Í­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B#¾ò$ˆì(€€€€€€€ô((€€€€€€€É•ÑÕÉ¸Ñ•áĞì((€€€ô(((€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜ˆ¥ì(€€€€€€€¥˜¡Í­¥±°¹É¥Ñ	½¹ÕÍ	å1•Ù•°¥ì(€€€€€€€€€€€É•ÑÕÉ¸€‹"šN+:¾ò?"šN+–
+ß–ºÌ€¬ˆ­Í­¥±°¹É¥Ñ	½¹ÕÍ	å1•Ù•±m±•Ù•°´Åt¬ˆ—¾ò3š2ê0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹•Ù…Í¥½¹	½¹ÕÍA•É•¹Ğ¥ì(€€€€€€€€€€€É•ÑÕÉ¸€‹¦Z¢êË:€¬ˆ­Í­¥±°¹•Ù…Í¥½¹	½¹ÕÍA•É•¹Ğ¬ˆ—¾ò3š2ê0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹‘•™•¹Í•	½¹ÕÍA•É•¹Ğ¥ì(€€€€€€€€€€€É•ÑÕÉ¸€‹¦bËš›–*l€¬ˆ­Í­¥±°¹‘•™•¹Í•	½¹ÕÍA•É•¹Ğ¬ˆ—¾ò3š2ê0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹É•™±•ÑA•É•¹Ğ¥ì(€€€€€€€€€€€É•ÑÕÉ¸€‹–>7–
+Ü€ˆ­Í­¥±°¹É•™±•ÑA•É•¹Ğ¬ˆ—¾ò3š2ê0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹ÍÑ…ÑÕÍI•Í¥ÍÑ	½¹ÕÌ¥ì(€€€€€€€€€€€É•ÑÕÉ¸€‹VÃ–âã.š/š*_šœ€¬ˆ­Í­¥±°¹ÍÑ…ÑÕÍI•Í¥ÍÑ	½¹ÕÌ¬ˆ—¾ò3š2ê0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆì(€€€€€€€ô(€€€€€€€É•ÑÕÉ¸Í­¥±°¹‘•ÍÉ¥ÁÑ¥½¸ì(€€€ô(((€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰¡•…°ˆ¥ì((€€€€€€€½¹ÍĞ¡•…±µ½Õ¹Ğ€ô(€€€€€€€€€€€Í­¥±°¹‰…Í•!•…°¬(€€€€€€€€€€€Í­¥±°¹¡•…±A•É1•Ù•°¨(€€€€€€€€€€€€¡±•Ù•°´Ä¤ì(((€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€€‹–n{–ú¥!C¾òk–~ë’8ˆ¬(€€€€€€€€€€€¡•…±µ½Õ¹Ğ¬(€€€€€€€€€€€€ˆ¯šfë–*o\ˆ¬(€€€€€€€€€€€!1%9}%9Q}=%%9P¬(€€€€€€€€€€€€‹¾òmMC¾òk–~ë’8ˆ¬(€€€€€€€€€€€€¡Í­¥±°¹‰…Í•!•…±M@¬¡Í­¥±°¹¡•…±MAA•É1•Ù•±ñğÀ¤¨¡±•Ù•°´Ä¤¤¬(€€€€€€€€€€€€ˆ¯šfë–*o\ˆ¬(€€€€€€€€€€€MA}!1%9}%9Q}=%%9P¬(€€€€€€€€€€€€‹¾ò#šZ÷šRû¢šr³’êë’â7–n{–ú¥MC¾ò$ˆ(€€€€€€€€¤ì((€€€ô(((€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰É•Ù¥Ù”ˆ¥ì((€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€€‹–ú§šÒï–ú3š‹–ú¤ˆ¬(€€€€€€€€€€€Í­¥±°¹É•Ù¥Ù•!•…±A•É•¹Ñ	å1•Ù•±l(€€€€€€€€€€€€€€€±•Ù•°´Ä(€€€€€€€€€€€t¬(€€€€€€€€€€€€ˆ—¢†¦<ˆ(€€€€€€€€¤ì((€€€ô(((€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰Á…ÍÍ¥Ù”ˆ¥ì((€€€€€€€É•ÑÕÉ¸Í­¥±°¹‘•ÍÉ¥ÁÑ¥½¸ì((€€€ô(((€€€É•ÑÕÉ¸ˆˆì()ô(()™Õ¹Ñ¥½¸±•…É¹M­¥±°¡Í­¥±±%¥ì((€€€½¹ÍĞ¡…É…Ñ•È€ô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÍl(€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€tì(((€€€½¹ÍĞÍ­¥±°€ô(€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾òh(€€€€€€ƒ–:šr³¦g¢‡nÓš:—š&Á±…å•È¹Í­¥±±A½¥¹ÑÏ¾ò0(€€€€€€ƒ’â7º‡n»–&7¦ãjšb¿¢ªÃ¾ò3’â–ú/š&²³’â¢K¢&Ëj¦î{šVã(€€€€€€ƒšRçš"C–#š~—–ë3¦g–/¢K¢&Ërš¶j¢ÎšZg&§’îÛ7¾ò0(€€€€€€İ…Ñ•È½İ¥¹“n»–&7šÊKšr'rš¶¢K¢&Ë¢ÎšZg¾ò0(€€€€€€ƒnÓš:—šN/š:'’â7¢÷–¶ã¾ò#¦†¿’ëš>C’ë¾ò'(€€€€¨¼((€€€½¹ÍĞ½İ¹•Èô(€€€€€€€•ÑM­¥±±¡…É…Ñ•É=‰©•Ğ (€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€€¤ì(((€€€¥˜ (€€€€€€€€…¡…É…Ñ•Èñğ(€€€€€€€€…Í­¥±°(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜ …½İ¹•È¥ì((€€€€€€€…±•ÉĞ (€€€€€€€€€€€€‹¦g–/¢K¢&Ë¦
+šÊKšr'¦Z/šRûš*¢÷–¶ãşK–*¢÷ˆ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€¥˜ …¡…É…Ñ•È¹Í­¥±±1•Ù•±Ì¥ì((€€€€€€€¡…É…Ñ•È¹Í­¥±±1•Ù•±Ìõíôì((€€€ô(((€€€¥˜ (€€€€€€€€¡¡…É…Ñ•È¹Í­¥±±1•Ù•±ÍmÍ­¥±±%‘uñğÀ¤øÀ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33–&7ö»š*¢ô(€€€€€€ƒ¢š–¶ãjš¦–"Û7¾ò'¾òh(€€€€€€U'’â+–ŞËÚOš*+š2'¦"U‘¥Í…‰±•“šN/’ö?¦î{šN+’ê¾ò0(€€€€€€ƒ¦g¢‡šb¿²³’ê3–Æ“¦bË¢¶ßŠSŠS¢B³’âšr'–"—j–rÃšZä(€€€€€€ƒæ{¦;V¯¦v‹nÓš:—–Fó–>­±•…É¹M­¥±° §¾ò0(€€€€€€ƒ–ú3®¿’âš¢¢ššN/’ö?¾ò3’â7¢÷–>«¦vƒ–&7®¿(€€€€¨¼((€€€¥˜ (€€€€€€€€…¥ÍM­¥±±AÉ•É•Å5•Ğ (€€€€€€€€€€€¡…É…Ñ•È¹Í­¥±±1•Ù•±Ì°(€€€€€€€€€€€Í­¥±°(€€€€€€€€¤(€€€€¥ì((€€€€€€€…±•ÉĞ (€€€€€€€€€€€•ÑM­¥±±AÉ•É•Å1…‰•°¡Í­¥±°¤¬(€€€€€€€€€€€€‹¾ò3š&7¢÷–¶ãşK0ˆ¬(€€€€€€€€€€€Í­¥±°¹¹…µ”¬(€€€€€€€€€€€€‹7ˆ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½¹ÍĞ±•…É¹½ÍĞõ5…Ñ ¹µ…à À±9Õµ‰•È¡Í­¥±°¹±•…É¹½ÍĞ¥ñğÀ¤ì(€€€½¹ÍĞ…Ù…¥±…‰±•A½¥¹ÑÌõ5…Ñ ¹µ…à À±9Õµ‰•È¡½İ¹•È¹Í­¥±±A½¥¹ÑÌ¥ñğÀ¤ì((€€€¥˜¡…Ù…¥±…‰±•A½¥¹ÑÌñ±•…É¹½ÍĞ¥ì(€€€€€€€…±•ÉĞ (€€€€€€€€€€€€‹š*¢÷¦î{’â7¢ÚÏ¾ò3¦r¢šˆ¬(€€€€€€€€€€€±•…É¹½ÍĞ¬(€€€€€€€€€€€€‹¦î{ˆ(€€€€€€€€¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½İ¹•È¹Í­¥±±A½¥¹ÑÌõ…Ù…¥±…‰±•A½¥¹ÑÌµ±•…É¹½ÍĞì(((€€€¡…É…Ñ•È¹Í­¥±±1•Ù•±ÍmÍ­¥±±%‘tôÄì(((€€€É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì()ô(()™Õ¹Ñ¥½¸ÕÁÉ…‘•M­¥±°¡Í­¥±±%¥ì((€€€½¹ÍĞ¡…É…Ñ•È€ô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÍl(€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€tì(((€€€½¹ÍĞÍ­¥±°€ô(€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€½¹ÍĞ½İ¹•Èô(€€€€€€€•ÑM­¥±±¡…É…Ñ•É=‰©•Ğ (€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€€¤ì(((€€€¥˜ (€€€€€€€€…¡…É…Ñ•Èñğ(€€€€€€€€…Í­¥±°ñğ(€€€€€€€€…¡…É…Ñ•È¹Í­¥±±1•Ù•±Ìñğ(€€€€€€€€…½İ¹•È(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÕÉÉ•¹Ñ1•Ù•°€ô(€€€€€€€¡…É…Ñ•È¹Í­¥±±1•Ù•±Íl(€€€€€€€€€€€Í­¥±±%(€€€€€€€uñğ(€€€€€€€€Àì(((€€€¥˜¡ÕÉÉ•¹Ñ1•Ù•°ğôÀ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞµ…á1•Ù•°€ô(€€€€€€€Í­¥±°¹µ…á1•Ù•±ñğ(€€€€€€€€Äì(((€€€¥˜¡ÕÉÉ•¹Ñ1•Ù•°øõµ…á1•Ù•°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜¡½İ¹•È¹Í­¥±±A½¥¹ÑÌğÄ¥ì((€€€€€€€…±•ÉĞ (€€€€€€€€€€€€‹š*¢÷¦î{’â7¢ÚÏˆ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€½İ¹•È¹Í­¥±±A½¥¹ÑÌ´ôÄì(((€€€¡…É…Ñ•È¹Í­¥±±1•Ù•±ÍmÍ­¥±±%‘tô(€€€€€€€ÕÉÉ•¹Ñ1•Ù•°¬Äì(((€€€É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì()ô(()™Õ¹Ñ¥½¸•ÅÕ¥ÁM­¥±°¡Í­¥±±%¥ì((€€€½¹ÍĞ¡…É…Ñ•È€ô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÍl(€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€tì(((€€€¥˜ …¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜ (€€€€€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì(€€€€€€€€¹¥¹±Õ‘•Ì¡Í­¥±±%¤(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜ (€€€€€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì¹±•¹Ñ øôĞ(€€€€¥ì((€€€€€€€…±•ÉĞ (€€€€€€€€€€€€‹š¾?–/¢K¢&Ëšr–’k–>«¢÷šRs–âØÓ–/š*¢÷ˆ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì(€€€€€€€€¹ÁÕÍ ¡Í­¥±±%¤ì(((€€€É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤ì((€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹Ì ¤ì((€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹ÌÈ ¤ì((€€€Í…Ù•…µ” ¤ì()ô(()™Õ¹Ñ¥½¸É•µ½Ù•ÅÕ¥ÁÁ•‘M­¥±°¡¥¹‘•à¥ì((€€€½¹ÍĞ¡…É…Ñ•È€ô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÍl(€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€tì(((€€€¥˜ …¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì(€€€€€€€€¹ÍÁ±¥” (€€€€€€€€€€€¥¹‘•à°(€€€€€€€€€€€€Ä(€€€€€€€€¤ì(((€€€É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤ì((€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹Ì ¤ì((€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹ÌÈ ¤ì((€€€Í…Ù•…µ” ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ¢3–2¢K¢&È€¼ƒÚO–àIAƒ¢3–2(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()±•Ğ¥¹Ù•¹Ñ½Éå¥±Ñ•È€ô€‰•ÅÕ¥Áµ•¹Ğˆì)½¹ÍĞ%9Y9Q=Ie}Q=Ie}M1=Q}=U9P€ô€ÄÈÀì()™Õ¹Ñ¥½¸•Ñ	…­Á…­A…ÉÑå¡…É…Ñ•ÉÌ ¥ì(€€€É•ÑÕÉ¸mÁ±…å•È°Á±…å•ÈÈ°Á±…å•ÈÍtì)ô()™Õ¹Ñ¥½¸•Ñ	…­Á…­¡…É…Ñ•È¡¥¹‘•à¥ì(€€€É•ÑÕÉ¸•Ñ	…­Á…­A…ÉÑå¡…É…Ñ•ÉÌ ¥m¥¹‘•átñğ¹Õ±°ì)ô()™Õ¹Ñ¥½¸•Ñ	…­Á…­ÅÕ¥Áµ•¹Ñ-•ä¡¥¹‘•à¥ì(€€€É•ÑÕÉ¸•Ñ	…­Á…­¡…É…Ñ•È¡¥¹‘•à¤(€€€€€€€€ü•ÑA…ÉÑå¡…É…Ñ•É-•ä¡¥¹‘•à¤(€€€€€€€€è¹Õ±°ì)ô()™Õ¹Ñ¥½¸•Ñ%¹Ù•¹Ñ½ÉåÅÕ¥Áµ•¹ÑM±½Ğ¡¥Ñ•µQåÁ”¥ì(€€€½¹ÍĞµ…Àõì(€€€€€€€İ•…Á½¸è‰¡…¹ˆ°(€€€€€€€¡•±µ•Ğè‰¡•…ˆ°(€€€€€€€¡•…è‰¡•…ˆ°(€€€€€€€Í¡½Õ±‘•Èè‰Í¡½Õ±‘•Èˆ°(€€€€€€€…Éµ½Èè‰…Éµ½Èˆ°(€€€€€€€Í¡½•Ìè‰Í¡½•Ìˆ°(€€€€€€€…•ÍÍ½Éäè‰É¥¹œˆ°(€€€€€€€É¥¹œè‰É¥¹œˆ(€€€ôì(€€€É•ÑÕÉ¸µ…Ám¥Ñ•µQåÁ•tñğ¹Õ±°ì)ô()™Õ¹Ñ¥½¸•Ñ	…­Á…­¡…É…Ñ•ÉMÑ…ÑÌ¡¥¹‘•à¥ì(€€€½¹ÍĞ¡…É…Ñ•Èõ•Ñ	…­Á…­¡…É…Ñ•È¡¥¹‘•à¤ì(€€€¥˜ …¡…É…Ñ•È¤É•ÑÕÉ¸¹Õ±°ì((€€€¥˜¡¥¹‘•àôôôÀ¤É•ÑÕÉ¸•Ñ5…¥¹¡…É…Ñ•ÉMÑ…ÑÌ ¤ì((€€€½¹ÍĞ­•äõ•Ñ	…­Á…­ÅÕ¥Áµ•¹Ñ-•ä¡¥¹‘•à¤ì(€€€½¹ÍĞ‰½¹ÕÌõ•ÑÅÕ¥Áµ•¹Ñ	½¹ÕÌ¡­•ä¤ì((€€€É•ÑÕÉ¸ì(€€€€€€€µ…á!@èÄÀÀ¬¡¡…É…Ñ•È¹‰½¹ÕÍ!AñğÀ¤­¡…É…Ñ•È¹Ù¥Ñ…±¥Ñä©!A}AI}Y%Q1%Qe}A=%9P­‰½¹ÕÌ¹µ…á!@­‰½¹ÕÌ¹Ù¥Ñ…±¥Ñä©!A}AI}Y%Q1%Qe}A=%9P°(€€€€€€€µ…áM@èÔÀ¬¡¡…É…Ñ•È¹‰½¹ÕÍMAñğÀ¤­¡…É…Ñ•È¹•¹•Éä¨ÄÔ­‰½¹ÕÌ¹µ…áM@­‰½¹ÕÌ¹•¹•Éä¨ÄÔ°(€€€€€€€…ÑÑ…¬é	M}A!eM%1}QQ,­5…Ñ ¹µ…à Ä±9Õµ‰•È¡¡…É…Ñ•È¹±•Ù•°¥ñğÄ¤©QQ-}AI}1Y0¬¡¡…É…Ñ•È¹…ÑÑ…¬­‰½¹ÕÌ¹…ÑÑ…¬¤©QQ-}AI}A=%9P°(€€€€€€€µ…¥ÑÑ…¬é	M}5%}QQ,­5…Ñ ¹µ…à Ä±9Õµ‰•È¡¡…É…Ñ•È¹±•Ù•°¥ñğÄ¤©5%}QQ-}AI}1Y0¬¡¡…É…Ñ•È¹¥¹Ñ•±±¥•¹”­‰½¹ÕÌ¹¥¹Ñ•±±¥•¹”¤©5%}QQ-}AI}A=%9P°(€€€€€€€‘•™•¹Í”é	M}9M­5…Ñ ¹µ…à Ä±9Õµ‰•È¡¡…É…Ñ•È¹±•Ù•°¥ñğÄ¤©9M}AI}1Y0¬¡¡…É…Ñ•È¹Ù¥Ñ…±¥Ñä­‰½¹ÕÌ¹Ù¥Ñ…±¥Ñä¤©9M}AI}Y%Q1%Qe}A=%9P­‰½¹ÕÌ¹‘•™•¹Í”°(€€€€€€€Ù¥Ñ…±¥Ñäé¡…É…Ñ•È¹Ù¥Ñ…±¥Ñä­‰½¹ÕÌ¹Ù¥Ñ…±¥Ñä°(€€€€€€€•¹•Éäé¡…É…Ñ•È¹•¹•Éä­‰½¹ÕÌ¹•¹•Éä°(€€€€€€€¥¹Ñ•±±¥•¹”é¡…É…Ñ•È¹¥¹Ñ•±±¥•¹”­‰½¹ÕÌ¹¥¹Ñ•±±¥•¹”°(€€€€€€€ÍÁ¥É¥Ğé¡…É…Ñ•È¹ÍÁ¥É¥Ğ­‰½¹ÕÌ¹ÍÁ¥É¥Ğ°(€€€€€€€…¥±¥Ñäé¡…É…Ñ•È¹…¥±¥Ñä­‰½¹ÕÌ¹…¥±¥Ñä°(€€€€€€€…ÕÉ…äé¡…É…Ñ•È¹ÍÁ¥É¥Ğ¨È­‰½¹ÕÌ¹ÍÁ¥É¥Ğ¨È°(€€€€€€€É•Í¥ÍÑ…¹”é…±Õ±…Ñ•MÑ…ÑÕÍI•Í¥ÍÑ…¹•A•É•¹Ğ¡¡…É…Ñ•È¹ÍÁ¥É¥Ğ­‰½¹ÕÌ¹ÍÁ¥É¥Ğ¤°(€€€€€€€…¹Ñ¥É¥Ğé…±Õ±…Ñ•¹Ñ¥É¥ÑA•É•¹Ğ¡¡…É…Ñ•È¹ÍÁ¥É¥Ğ­‰½¹ÕÌ¹ÍÁ¥É¥Ğ¤°(€€€€€€€•Ù…Í¥½¸è¡¡…É…Ñ•È¹…¥±¥Ñä­‰½¹ÕÌ¹…¥±¥Ñä¤¨À¸Ø(€€€ôì)ô()™Õ¹Ñ¥½¸¡…¹•%¹Ù•¹Ñ½Éå¡…É…Ñ•È¡‘¥É•Ñ¥½¸¥ì(€€€½¹ÍĞÁ…ÉÑäõ•Ñ	…­Á…­A…ÉÑå¡…É…Ñ•ÉÌ ¤ì(€€€±•Ğ¹•áĞõ¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à­‘¥É•Ñ¥½¸ì(€€€¥˜¡¹•áĞğÀ¤¹•áĞõÁ…ÉÑä¹±•¹Ñ ´Äì(€€€¥˜¡¹•áĞøõÁ…ÉÑä¹±•¹Ñ ¤¹•áĞôÀì((€€€€¼¼ƒšr«–îë®/j¢K¢&Ë’î7–>¿¦†¿’ë²³’â'š‚ó¾ò3’ö’â7¢÷š*+¦ë¢K¢&ËVÛš"C–>¿¢w–
+g¢K¢&Ë(€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•àõ¹•áĞì(€€€É•¹‘•É%¹Ù•¹Ñ½Éä ¤ì((€€€¥˜¡ÑåÁ•½˜Íå¹¡…É…Ñ•ÉQ…‰ÍÉ½µ%¹Ù•¹Ñ½Éä€ôôô€‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€Íå¹¡…É…Ñ•ÉQ…‰ÍÉ½µ%¹Ù•¹Ñ½Éä¡¹•áĞ¤ì(€€€ô)ô()™Õ¹Ñ¥½¸Í•±•Ñ%¹Ù•¹Ñ½Éå¡…É…Ñ•È¡¥¹‘•à¥ì(€€€½¹ÍĞÁ…ÉÑäõ•Ñ	…­Á…­A…ÉÑå¡…É…Ñ•ÉÌ ¤ì(€€€¥˜¡¥¹‘•àğÀñğ¥¹‘•àøõÁ…ÉÑä¹±•¹Ñ ¤É•ÑÕÉ¸ì(€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•àõ¥¹‘•àì(€€€É•¹‘•É%¹Ù•¹Ñ½Éä ¤ì((€€€¥˜¡Á…ÉÑåm¥¹‘•át€˜˜ÑåÁ•½˜Íå¹¡…É…Ñ•ÉQ…‰ÍÉ½µ%¹Ù•¹Ñ½Éä€ôôô€‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€Íå¹¡…É…Ñ•ÉQ…‰ÍÉ½µ%¹Ù•¹Ñ½Éä¡¥¹‘•à¤ì(€€€ô)ô()™Õ¹Ñ¥½¸Íå¹¡…É…Ñ•ÉQ…‰ÍÉ½µ%¹Ù•¹Ñ½Éä¡¥¹‘•à¥ì(€€€¥˜¡¥¹‘•àôôôÀñğ¥¹‘•àôôôÄñğ¥¹‘•àôôôÈ¥ì(€€€€€€€¥˜¡ÑåÁ•½˜Í•±•Ñ¡…É…Ñ•É½ÉQ…‰Ì€ôôô€‰™Õ¹Ñ¥½¸ˆ€˜˜(€€€€€€€€€€•ÑA…ÉÑå¡…É…Ñ•É	å%¹‘•à¡¥¹‘•à¤¥ì(€€€€€€€€€€€€¼¼ƒ¦ÿ–4Í•±•Ñ¡…É…Ñ•É½ÉQ…‰Ìƒ–7š²‡¢ãfğÉ•¹‘•É%¹Ù•¹Ñ½Éäƒ–ö‹š"C¦{¢şÓ(€€€€€€€€€€€ÍÑ…ÑÕÍ¡…É…Ñ•É%¹‘•àõ¥¹‘•àì(€€€€€€€€€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•àõ¥¹‘•àì(€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•Èõ•ÑA…ÉÑå¡…É…Ñ•É-•ä¡¥¹‘•à¤ì(€€€€€€€ô(€€€ô)ô()™Õ¹Ñ¥½¸É•¹‘•É%¹Ù•¹Ñ½Éå¡…É…Ñ•ÉQ…‰Ì ¥ì(€€€½¹ÍĞİÉ…Àô ‰¥¹Ù•¹Ñ½Éå¡…É…Ñ•ÉQ…‰Ìˆ¤ì(€€€¥˜ …İÉ…À¤É•ÑÕÉ¸ì((€€€½¹ÍĞ¡…É…Ñ•ÉÍ1¥ÍĞõmÁ±…å•È±Á±…å•ÈÈ±Á±…å•ÈÍtì(€€€½¹ÍĞ¡…É…Ñ•Èõ¡…É…Ñ•ÉÍ1¥ÍÑm¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•átì((€€€½¹ÍĞ±•™Ñ¥Í…‰±•õ¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•àğôÀì(€€€½¹ÍĞÉ¥¡Ñ¥Í…‰±•õ¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•àøõ¡…É…Ñ•ÉÍ1¥ÍĞ¹±•¹Ñ ´Äñğ€…¡…É…Ñ•ÉÍ1¥ÍÑm¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¬Åtì((€€€İÉ…À¹¥¹¹•É!Q50õ€(€€€€€€€€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ¡…É…Ñ•Èµ…ÉÉ½Üˆ(€€€€€€€€€€€…É¥„µ±…‰•°ô‹’â+’â–/¢K¢&Èˆ(€€€€€€€€€€€€‘í±•™Ñ¥Í…‰±•€ü€‰‘¥Í…‰±•ˆ€è€ˆ‰ô(€€€€€€€€€€€½¹±¥¬ô‰Í•±•Ñ%¹Ù•¹Ñ½Éå¡…É…Ñ•È ‘í5…Ñ ¹µ…à À±¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à´Ä¥ô¤ˆûŠäğ½‰ÕÑÑ½¸ø((€€€€€€€€ñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ¡…É…Ñ•Èµ¹…µ”ˆø(€€€€€€€€€€€€ñÍÁ…¸ø‘í¡…É…Ñ•È€ü€¡¡…É…Ñ•È¹¥ñğ€‹¢K¢&Èˆ¬¡¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¬Ä¤¤€è€‹¢K¢&Èˆ¬¡¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¬Ä¥ôğ½ÍÁ…¸ø(€€€€€€€€€€€€‘í¡…É…Ñ•È€ü€ñÍµ…±°±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ¡…É…Ñ•Èµ±•Ù•°ˆù1Ø¸‘í¡…É…Ñ•È¹±•Ù•°ñğ€Åôğ½Íµ…±°ù€€è€ñÍµ…±°±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ¡…É…Ñ•Èµ±•Ù•°ˆû–Âkšr«–îë®,ğ½Íµ…±°ùô(€€€€€€€€ğ½‘¥Øø((€€€€€€€€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ¡…É…Ñ•Èµ…ÉÉ½Üˆ(€€€€€€€€€€€…É¥„µ±…‰•°ô‹’â/’â–/¢K¢&Èˆ(€€€€€€€€€€€€‘íÉ¥¡Ñ¥Í…‰±•€ü€‰‘¥Í…‰±•ˆ€è€ˆ‰ô(€€€€€€€€€€€½¹±¥¬ô‰Í•±•Ñ%¹Ù•¹Ñ½Éå¡…É…Ñ•È ‘í5…Ñ ¹µ¥¸¡¡…É…Ñ•ÉÍ1¥ÍĞ¹±•¹Ñ ´Ä±¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¬Ä¥ô¤ˆûŠèğ½‰ÕÑÑ½¸ø(€€€€ì)ô()™Õ¹Ñ¥½¸É•¹‘•É%¹Ù•¹Ñ½ÉåMÑ…ÑÌ ¥ì(€€€½¹ÍĞÍÑ…ÑÌõ•Ñ	…­Á…­¡…É…Ñ•ÉMÑ…ÑÌ¡¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¤ì(€€€½¹ÍĞ•°ô ‰¥¹Ù•¹Ñ½ÉåMÑ…ÑÌˆ¤ì(€€€¥˜ …•°¤É•ÑÕÉ¸ì((€€€¥˜ …ÍÑ…ÑÌ¥ì(€€€€€€€•°¹¥¹¹•É!Q50ôœñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ•µÁÑäµ¡…É…Ñ•Èˆû²³’â'¢K¢&Ë–Âkšr«–îë®,ğ½‘¥Øøœì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€€¼¨(€€€€€€XÜß¾òh(€€€€€€ƒ¢3–2–âã¦C¢Î¢¢+–>«Vd!@€¼MC(€€€€€€ƒ–Û’î[¢÷–*ošRçRÇ®/æ«–>Ï’â+¢KšRû–’Ÿ¦>‡¦Z/–V¢¦ÏÒÃ¢Î¢¢+(€€€€¨¼(€€€•°¹¥¹¹•É!Q50õ€(€€€€€€€€ñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½ÉäµÍÑ…ĞµÉ½Ü¥¹Ù•¹Ñ½ÉäµÍÑ…ĞµÁÉ¥µ…Éäˆø(€€€€€€€€€€€€ñÍÁ…¸ù!@ğ½ÍÁ…¸øñˆø‘íÍÑ…ÑÌ¹µ…á!Aôğ½ˆø(€€€€€€€€ğ½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½ÉäµÍÑ…ĞµÉ½Ü¥¹Ù•¹Ñ½ÉäµÍÑ…ĞµÁÉ¥µ…Éäˆø(€€€€€€€€€€€€ñÍÁ…¸ùM@ğ½ÍÁ…¸øñˆø‘íÍÑ…ÑÌ¹µ…áMAôğ½ˆø(€€€€€€€€ğ½‘¥Øø(€€€€ì)ô()™Õ¹Ñ¥½¸•Ñ%¹Ù•¹Ñ½Éå¡…É…Ñ•ÉÉ¥Ñ¥…±MÑ…ÑÌ¡¥¹‘•à¥ì(€€€½¹ÍĞ¡…É…Ñ•Èõ•Ñ	…­Á…­¡…É…Ñ•È¡¥¹‘•à¤ì((€€€¥˜ …¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸¹Õ±°ì(€€€ô((€€€€¼¨(€€€€€€XÄÄã¾òk¢3–2¢¦ÏÒÃ¢ÎšZg–B3š¶—¦†¿’ë&§B¾ò?šÎW¢†O–§––_"šN+(€€€€€€ƒ–>«–k¦†¿’ë¾ò3–³–ò?¢"É½±±É¥Ñ¥…° ¤ƒ’şwš2’â¢Ó¾òh(€€€€€€ƒ&§Br,…ÑÑ…¯šÎW¢†Or,¥¹Ñ•±±¥•¹—(€€€€¨¼(€€€½¹ÍĞÉ…•	Õ™˜ô(€€€€€€€€ (€€€€€€€€€€€€¡¡…É…Ñ•È˜™¡…É…Ñ•È¹…Ñ¥Ù•	Õ™™Ì¥ñğ(€€€€€€€€€€€mt(€€€€€€€€¤(€€€€€€€€¹™¥¹ (€€€€€€€€€€€‰Õ™˜ôù‰Õ™˜¹ÑåÁ”ôôô‰É…”ˆ(€€€€€€€€¤ì((€€€™Õ¹Ñ¥½¸‰Õ¥±‘É¥Ñ¥…±AÉ½™¥±”¡ÍÑ…ÑA½¥¹ÑÌ±¡…¹•A•ÉA½¥¹Ğ±µÕ±Ñ¥Á±¥•ÉA•ÉA½¥¹Ğ¥ì(€€€€€€€±•ĞÉ¥Ñ¡…¹”ô(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€I%Q}!9}5`°(€€€€€€€€€€€€€€€I%Q}!9}	M¬(€€€€€€€€€€€€€€€ÍÑ…ÑA½¥¹ÑÌ¨(€€€€€€€€€€€€€€€¡…¹•A•ÉA½¥¹Ğ(€€€€€€€€€€€€¤ì((€€€€€€€±•ĞÉ¥Ñ5Õ±Ñ¥Á±¥•Èô(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€I%Q}5U1Q%A1%I}QQI%	UQ}5`°(€€€€€€€€€€€€€€€I%Q}5U1Q%A1%I}	M¬(€€€€€€€€€€€€€€€ÍÑ…ÑA½¥¹ÑÌ¨(€€€€€€€€€€€€€€€µÕ±Ñ¥Á±¥•ÉA•ÉA½¥¹Ğ(€€€€€€€€€€€€¤ì((€€€€€€€¥˜¡É…•	Õ™˜¥ì(€€€€€€€€€€€É¥Ñ¡…¹”¬ô(€€€€€€€€€€€€€€€É…•	Õ™˜¹‰½¹ÕÍA•É•¹Ğì((€€€€€€€€€€€É¥Ñ5Õ±Ñ¥Á±¥•Èô(€€€€€€€€€€€€€€€€Ä¬(€€€€€€€€€€€€€€€É…•	Õ™˜¹‰½¹ÕÍA•É•¹Ğ¼(€€€€€€€€€€€€€€€€ÄÀÀì(€€€€€€€ô((€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€¡…¹”éÉ¥Ñ¡…¹”°(€€€€€€€€€€€µÕ±Ñ¥Á±¥•ÈéÉ¥Ñ5Õ±Ñ¥Á±¥•È(€€€€€€€ôì(€€€ô((€€€É•ÑÕÉ¸ì(€€€€€€€Á¡åÍ¥…°é‰Õ¥±‘É¥Ñ¥…±AÉ½™¥±” (€€€€€€€€€€€€¡¡…É…Ñ•È¹…ÑÑ…­ñğÀ¤°(€€€€€€€€€€€I%Q}!9}AI}QQ-}A=%9P°(€€€€€€€€€€€I%Q}5U1Q%A1%I}AI}QQ-}A=%9P(€€€€€€€€¤°(€€€€€€€µ…¥Œé‰Õ¥±‘É¥Ñ¥…±AÉ½™¥±” (€€€€€€€€€€€€¡•Ñ	…­Á…­¡…É…Ñ•ÉMÑ…ÑÌ¡¥¹‘•à¤¹¥¹Ñ•±±¥•¹•ñğÀ¤°(€€€€€€€€€€€I%Q}!9}AI}%9Q11%9}A=%9P°(€€€€€€€€€€€I%Q}5U1Q%A1%I}AI}%9Q11%9}A=%9P(€€€€€€€€¤(€€€ôì)ô()™Õ¹Ñ¥½¸½Á•¹%¹Ù•¹Ñ½Éå¡…É…Ñ•É•Ñ…¥° ¥ì(€€€½¹ÍĞµ½‘…°ô ‰¥¹Ù•¹Ñ½Éå¡…É…Ñ•É•Ñ…¥±5½‘…°ˆ¤ì(€€€½¹ÍĞÑ¥Ñ±”ô ‰¥¹Ù•¹Ñ½Éå¡…É…Ñ•É•Ñ…¥±9…µ”ˆ¤ì(€€€½¹ÍĞ‰½‘äô ‰¥¹Ù•¹Ñ½Éå¡…É…Ñ•É•Ñ…¥±MÑ…ÑÌˆ¤ì((€€€¥˜ …µ½‘…°ñğ€…Ñ¥Ñ±”ñğ€…‰½‘ä¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€½¹ÍĞ¡…É…Ñ•Èô(€€€€€€€•Ñ	…­Á…­¡…É…Ñ•È (€€€€€€€€€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à(€€€€€€€€¤ì((€€€½¹ÍĞÍÑ…ÑÌô(€€€€€€€•Ñ	…­Á…­¡…É…Ñ•ÉMÑ…ÑÌ (€€€€€€€€€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à(€€€€€€€€¤ì((€€€½¹ÍĞÉ¥Ñ¥…°ô(€€€€€€€•Ñ%¹Ù•¹Ñ½Éå¡…É…Ñ•ÉÉ¥Ñ¥…±MÑ…ÑÌ (€€€€€€€€€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à(€€€€€€€€¤ì((€€€¥˜ …¡…É…Ñ•Èñğ€…ÍÑ…ÑÌñğ€…É¥Ñ¥…°¥ì(€€€€€€€Ñ¥Ñ±”¹Ñ•áÑ½¹Ñ•¹Ğô‹¢K¢&Ë¢¦ÏÒÃ¢Î¢¢(ˆì(€€€€€€€‰½‘ä¹¥¹¹•É!Q50ôœñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ•µÁÑäµ¡…É…Ñ•Èˆû¢K¢&Ë–Âkšr«–îë®,ğ½‘¥Øøœì(€€€€€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹…‘ ‰Í¡½Üˆ¤ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€Ñ¥Ñ±”¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€‘í¡…É…Ñ•È¹¥ñğ€‹¢K¢&Èˆ¬¡¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¬Ä¥÷1Ø¸‘í¡…É…Ñ•È¹±•Ù•±ñğÅõ€ì((€€€½¹ÍĞÉ½İÌõl(€€€€€€€l‰!@ˆ±ÍÑ…ÑÌ¹µ…á!At°(€€€€€€€l‰M@ˆ±ÍÑ…ÑÌ¹µ…áMAt°(€€€€€€€l‹šRïšN(ˆ±ÍÑ…ÑÌ¹…ÑÑ…­t°(€€€€€€€l‹¦bËš˜ˆ±ÍÑ…ÑÌ¹‘•™•¹Í•t°(€€€€€€€l‹šfë–*lˆ±ÍÑ…ÑÌ¹¥¹Ñ•±±¥•¹•t°(€€€€€€€l‹¦®S¢Î¨ˆ±ÍÑ…ÑÌ¹Ù¥Ñ…±¥Ñåt°(€€€€€€€l‹¢÷¦<ˆ±ÍÑ…ÑÌ¹•¹•Éåt°(€€€€€€€l‹Êû–xˆ±ÍÑ…ÑÌ¹ÍÁ¥É¥Ñt°(€€€€€€€l‹šV?š6Üˆ±ÍÑ…ÑÌ¹…¥±¥Ñåt°(€€€€€€€l‹–F÷’â´ˆ±ÍÑ…ÑÌ¹…ÕÉ…åt°(€€€€€€€l‹¦Z¦üˆ±ÍÑ…ÑÌ¹•Ù…Í¥½¹t°(€€€€€€€l‹VÃ–âãš*_šœˆ±ÍÑ…ÑÌ¹É•Í¥ÍÑ…¹”¹Ñ½¥á• Ä¤¬ˆ”‰t°(€€€€€€€l‹š*_šjĞˆ±ÍÑ…ÑÌ¹…¹Ñ¥É¥Ğ¹Ñ½¥á• Ä¤¬ˆ”‰t°(€€€€€€€l‹&§B"šN+:ˆ±É¥Ñ¥…°¹Á¡åÍ¥…°¹¡…¹”¹Ñ½¥á• Ä¤¬ˆ”‰t°(€€€€€€€l‹&§B"šN+–
+ß–ºÌˆ°¡É¥Ñ¥…°¹Á¡åÍ¥…°¹µÕ±Ñ¥Á±¥•È¨ÄÀÀ¤¹Ñ½¥á• Ä¤¬ˆ”‰t°(€€€€€€€l‹šÎW¢†O"šN+:ˆ±É¥Ñ¥…°¹µ…¥Œ¹¡…¹”¹Ñ½¥á• Ä¤¬ˆ”‰t°(€€€€€€€l‹šÎW¢†O"šN+–
+ß–ºÌˆ°¡É¥Ñ¥…°¹µ…¥Œ¹µÕ±Ñ¥Á±¥•È¨ÄÀÀ¤¹Ñ½¥á• Ä¤¬ˆ”‰t(€€€tì((€€€‰½‘ä¹¥¹¹•É!Q50ô(€€€€€€€É½İÌ¹µ…À (€€€€€€€€€€€€¡m¹…µ”±Ù…±Õ•t¤ôù€(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ¡…É…Ñ•Èµ‘•Ñ…¥°µÉ½Üˆø(€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸ø‘í¹…µ•ôğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€ñˆø‘íÙ…±Õ•ôğ½ˆø(€€€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€(€€€€€€€€¤¹©½¥¸ ˆˆ¤¬(€€€€€€€€ñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ¡…É…Ñ•Èµ‘•Ñ…¥°µ¹½Ñ”ˆø(€€€€€€€€€€€ƒ–~ë’;–F÷’â·:¾òu±…µÀ äÔ—¾ò/–F÷’â·\À¸Ï¾ò7nÓš:—–F÷’â·:¦f7’ö8°€ÔÀ”°€ää”§¾ò3–7’æc’â( Ç¾ò7n»š¢gšrÖ¦Z¢êË:§ñ‰Èø(€€€€€€€€€€€ƒ’â¢"³VÃ–âãš¾<ÇÊû–{¦f7’ö8À¸À×–/fû–"¦î{–F÷’â·:¾òoš¾<ÇšV?š6ß¾òt¬Ç¦–ê›¬À¸Û–/fû–"¦î{–~ë’;¦Z¢êË(€€€€€€€€ğ½‘¥Øù€ì((€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹…‘ ‰Í¡½Üˆ¤ì)ô()™Õ¹Ñ¥½¸±½Í•%¹Ù•¹Ñ½Éå¡…É…Ñ•É•Ñ…¥° ¥ì(€€€½¹ÍĞµ½‘…°ô ‰¥¹Ù•¹Ñ½Éå¡…É…Ñ•É•Ñ…¥±5½‘…°ˆ¤ì((€€€¥˜¡µ½‘…°¥ì(€€€€€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” ‰Í¡½Üˆ¤ì(€€€ô)ô()™Õ¹Ñ¥½¸É•¹‘•ÉÅÕ¥Áµ•¹Ğ ¥ì(€€€½¹ÍĞÉ¥ô ‰•ÅÕ¥Áµ•¹ÑÉ¥ˆ¤ì(€€€¥˜ …É¥¤É•ÑÕÉ¸ì(€€€É¥¹¥¹¹•É!Q50ôˆˆì((€€€½¹ÍĞ­•äõ•Ñ	…­Á…­ÅÕ¥Áµ•¹Ñ-•ä¡¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¤ì(€€€½¹ÍĞ•ÅÕ¥Áµ•¹Ğõ­•ä€ü¡…É…Ñ•ÉÅÕ¥Áµ•¹Ñm­•åt€è¹Õ±°ì((€€€½¹ÍĞÍ±½ÑÌõl(€€€€€€€í­•äè‰¡•…ˆ±¹…µ”è‹¦‚´‰ô°(€€€€€€€í­•äè‰¡…¹ˆ±¹…µ”è‹š&,‰ô°(€€€€€€€í­•äè‰Í¡½Õ±‘•Èˆ±¹…µ”è‹¢¶ß¢T‰ô°(€€€€€€€í­•äè‰…Éµ½Èˆ±¹…µ”è‹¢†šr4‰ô°(€€€€€€€í­•äè‰Í¡½•Ìˆ±¹…µ”è‹¦z/–¶@‰ô°(€€€€€€€í­•äè‰É¥¹œˆ±¹…µ”è‹š"Kš2‰ô(€€€tì((€€€Í±½ÑÌ¹™½É… ¡Í±½Ğôùì(€€€€€€€½¹ÍĞ•±°õ‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ ‰‘¥Øˆ¤ì(€€€€€€€•±°¹±…ÍÍ9…µ”ô‰¥¹Ù•¹Ñ½Éäµ•ÅÕ¥Áµ•¹Ğµ•±°ˆì((€€€€€€€½¹ÍĞ±…‰•°õ‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ ‰‘¥Øˆ¤ì(€€€€€€€±…‰•°¹±…ÍÍ9…µ”ô‰¥¹Ù•¹Ñ½Éäµ•ÅÕ¥Áµ•¹ĞµÍ±½Ğµ±…‰•°ˆì(€€€€€€€±…‰•°¹Ñ•áÑ½¹Ñ•¹ĞõÍ±½Ğ¹¹…µ”ì((€€€€€€€½¹ÍĞ‰½àõ‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ ‰‘¥Øˆ¤ì(€€€€€€€‰½à¹±…ÍÍ9…µ”ô‰¥¹Ù•¹Ñ½Éäµ•ÅÕ¥Áµ•¹ĞµÍ±½Ğˆì(€€€€€€€½¹ÍĞ¥Ñ•´õ•ÅÕ¥Áµ•¹Ğ€ü•ÅÕ¥Áµ•¹ÑmÍ±½Ğ¹­•åt€è¹Õ±°ì((€€€€€€€¥˜¡¥Ñ•´¥ì(€€€€€€€€€€€‰½à¹±…ÍÍ1¥ÍĞ¹…‘ ‰¡…Ìµ¥Ñ•´ˆ¤ì(€€€€€€€€€€€‰½à¹¥¹¹•É!Q50õ€ñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ•ÅÕ¥Áµ•¹Ğµ¥½¸ˆø‘í¥Ñ•´¹¥½¸ñğ€‹Š^‰ôğ½‘¥Øù€ì(€€€€€€€€€€€‰½à¹Ñ¥Ñ±”õ¥Ñ•´¹¹…µ”ñğÍ±½Ğ¹¹…µ”ì(€€€€€€€€€€€‰½à¹½¹±¥¬ô ¤ôù½Á•¹ÅÕ¥ÁÁ•‘%Ñ•´¡¥Ñ•´±Í±½Ğ¹­•ä¤ì(€€€€€€€õ•±Í•ì(€€€€€€€€€€€‰½à¹¥¹¹•É!Q50õ€ñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ•ÅÕ¥Áµ•¹Ğµ¥½¸•µÁÑäˆû¾ò,ğ½‘¥Øù€ì(€€€€€€€ô((€€€€€€€•±°¹…ÁÁ•¹‘¡¥±¡±…‰•°¤ì(€€€€€€€•±°¹…ÁÁ•¹‘¡¥±¡‰½à¤ì(€€€€€€€É¥¹…ÁÁ•¹‘¡¥±¡•±°¤ì(€€€ô¤ì)ô()™Õ¹Ñ¥½¸•Ñ¥±Ñ•É•‘%¹Ù•¹Ñ½Éå%Ñ•µÌ ¥ì(€€€½¹ÍĞ•ÅÕ¥Áµ•¹ÑQåÁ•Ìõl(€€€€€€€€‰İ•…Á½¸ˆ°(€€€€€€€€‰¡•±µ•Ğˆ°(€€€€€€€€‰¡•…ˆ°(€€€€€€€€‰Í¡½Õ±‘•Èˆ°(€€€€€€€€‰…Éµ½Èˆ°(€€€€€€€€‰Í¡½•Ìˆ°(€€€€€€€€‰…•ÍÍ½Éäˆ°(€€€€€€€€‰É¥¹œˆ(€€€tì((€€€½¹ÍĞ™Õ¹Ñ¥½¹QåÁ•Ìõl(€€€€€€€€‰™Õ¹Ñ¥½¸ˆ°(€€€€€€€€‰ÕÑ¥±¥Ñäˆ°(€€€€€€€€‰­•äˆ°(€€€€€€€€‰ÅÕ•ÍĞˆ°(€€€€€€€€‰ÍÁ•¥…°ˆ(€€€tì((€€€É•ÑÕÉ¸¥¹Ù•¹Ñ½Éå%Ñ•µÌ¹™¥±Ñ•È¡¥Ñ•´ôùì(€€€€€€€¥˜ …¥Ñ•´¤É•ÑÕÉ¸™…±Í”ì((€€€€€€€¥˜¡¥¹Ù•¹Ñ½Éå¥±Ñ•Èôôô‰•ÅÕ¥Áµ•¹Ğˆ¥ì(€€€€€€€€€€€É•ÑÕÉ¸•ÅÕ¥Áµ•¹ÑQåÁ•Ì¹¥¹±Õ‘•Ì¡¥Ñ•´¹ÑåÁ”¤ì(€€€€€€€ô((€€€€€€€¥˜¡¥¹Ù•¹Ñ½Éå¥±Ñ•Èôôô‰µ…Ñ•É¥…°ˆ¥ì(€€€€€€€€€€€É•ÑÕÉ¸¥Ñ•´¹ÑåÁ”ôôô‰µ…Ñ•É¥…°ˆì(€€€€€€€ô((€€€€€€€¥˜¡¥¹Ù•¹Ñ½Éå¥±Ñ•Èôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€€€€€É•ÑÕÉ¸™Õ¹Ñ¥½¹QåÁ•Ì¹¥¹±Õ‘•Ì¡¥Ñ•´¹ÑåÁ”¤ì(€€€€€€€ô((€€€€€€€€¼¨(€€€€€€€€€€ƒ3&§–N7š&ÿš:—¢^—šÂÓ¢"’â¢"³&§–N(€€€€€€€€€€ƒšr«’ú–ššzsšZÃ–Š{–Âkšr«š¶ã¦†{jšZÀÑåÁ—¾ò3’æ–#Vg–r£&§–N¦‚¾ò0(€€€€€€€€€€ƒ¦ÿ–7–nƒ
+èU$ƒ–"¦†{šnÓšZÃ¦ƒš"Cš^‹šr'&§–NšG¦ër/’â7–"Ã(€€€€€€€€¨¼(€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€€…•ÅÕ¥Áµ•¹ÑQåÁ•Ì¹¥¹±Õ‘•Ì¡¥Ñ•´¹ÑåÁ”¤€˜˜(€€€€€€€€€€€¥Ñ•´¹ÑåÁ”„ôô‰µ…Ñ•É¥…°ˆ€˜˜(€€€€€€€€€€€€…™Õ¹Ñ¥½¹QåÁ•Ì¹¥¹±Õ‘•Ì¡¥Ñ•´¹ÑåÁ”¤(€€€€€€€€¤ì(€€€ô¤ì)ô()™Õ¹Ñ¥½¸Í•Ñ%¹Ù•¹Ñ½Éå¥±Ñ•È¡™¥±Ñ•È¥ì(€€€¥¹Ù•¹Ñ½Éå¥±Ñ•Èõ™¥±Ñ•Èì(€€€É•¹‘•É%¹Ù•¹Ñ½Éå%Ñ•µÌ ¤ì((€€€½¹ÍĞÍÉ½±±•Èô ‰¥¹Ù•¹Ñ½ÉåÉ¥‘MÉ½±°ˆ¤ì(€€€¥˜¡ÍÉ½±±•È¤ÍÉ½±±•È¹ÍÉ½±±Q½ÀôÀì)ô()™Õ¹Ñ¥½¸É•¹‘•É%¹Ù•¹Ñ½Éå%Ñ•µÌ ¥ì(€€€É•‰Õ¥±‘%¹Ù•¹Ñ½ÉåM±½ÑÌ ¤ì(€€€½¹ÍĞÉ¥ô ‰¥¹Ù•¹Ñ½ÉåÉ¥ˆ¤ì(€€€¥˜ …É¥¤É•ÑÕÉ¸ì(€€€É¥¹¥¹¹•É!Q50ôˆˆì((€€€½¹ÍĞ¥Ñ•µÌõ•Ñ¥±Ñ•É•‘%¹Ù•¹Ñ½Éå%Ñ•µÌ ¤¹Í±¥” À±%9Y9Q=Ie}Q=Ie}M1=Q}=U9P¤ì((€€€™½È¡±•Ğ¥¹‘•àôÀí¥¹‘•àñ%9Y9Q=Ie}Q=Ie}M1=Q}=U9Pí¥¹‘•à¬¬¥ì(€€€€€€€½¹ÍĞ¥Ñ•´õ¥Ñ•µÍm¥¹‘•átñğ¹Õ±°ì(€€€€€€€½¹ÍĞ‰½àõ‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ ‰‘¥Øˆ¤ì(€€€€€€€‰½à¹±…ÍÍ9…µ”ô‰¥¹Ù•¹Ñ½Éäµ¥Ñ•´¥¹Ù•¹Ñ½Éäµ¥Ñ•´µ±…ÍÍ¥Œ€ˆ¬¡¥Ñ•´€ü€‰¡…Ìµ¥Ñ•´ˆè‰•µÁÑäˆ¤ì(€€€€€€€‰½à¹¥¹¹•É!Q50õ€ñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½ÉäµÍ±½Ğµ¹Õµ‰•Èˆø‘í¥¹‘•à¬Åôğ½‘¥Øù€ì((€€€€€€€¥˜¡¥Ñ•´¥ì(€€€€€€€€€€€‰½à¹¥¹¹•É!Q50¬õ€ñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ¥½¸ˆø‘í¥Ñ•´¹¥½¸ñğ€‹Š^‰ôğ½‘¥Øøñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ½Õ¹Ğˆø‘í¥Ñ•´¹½Õ¹ĞøÄ€ü€‹\ˆ­¥Ñ•´¹½Õ¹Ğ€è€ˆ‰ôğ½‘¥Øù€ì(€€€€€€€€€€€½¹ÍĞÉ•…±%¹‘•àõ¥¹Ù•¹Ñ½Éå%Ñ•µÌ¹¥¹‘•á=˜¡¥Ñ•´¤ì(€€€€€€€€€€€‰½à¹½¹±¥¬ô ¤ôù½Á•¹%Ñ•µ5½‘…°¡É•…±%¹‘•à¤ì(€€€€€€€õ•±Í•ì(€€€€€€€€€€€‰½à¹¥¹¹•É!Q50¬ôœñ‘¥Ø±…ÍÌô‰¥¹Ù•¹Ñ½Éäµ•µÁÑäµ‘½Ğˆû
+Üğ½‘¥Øøœì(€€€€€€€ô(€€€€€€€É¥¹…ÁÁ•¹‘¡¥±¡‰½à¤ì(€€€ô((€€€‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½É±° ˆ¥¹Ù•¹Ñ½Éå…Ñ•½ÉåQ…‰Ìm‘…Ñ„µ™¥±Ñ•Étˆ¤¹™½É… ¡Ñ…ˆôùì(€€€€€€€½¹ÍĞ…Ñ¥Ù”õÑ…ˆ¹‘…Ñ…Í•Ğ¹™¥±Ñ•Èôôõ¥¹Ù•¹Ñ½Éå¥±Ñ•Èì(€€€€€€€Ñ…ˆ¹±…ÍÍ1¥ÍĞ¹Ñ½±” ‰…Ñ¥Ù”ˆ±…Ñ¥Ù”¤ì(€€€€€€€Ñ…ˆ¹Í•ÑÑÑÉ¥‰ÕÑ” ‰…É¥„µÍ•±•Ñ•ˆ±…Ñ¥Ù”€ü€‰ÑÉÕ”ˆ€è€‰™…±Í”ˆ¤ì(€€€ô¤ì)ô()™Õ¹Ñ¥½¸É•¹‘•É%¹Ù•¹Ñ½Éä ¥ì(€€€½¹ÍĞ¡…É…Ñ•Èõ•Ñ	…­Á…­¡…É…Ñ•È¡¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¤ì(€€€½¹ÍĞ¹…µ•°ô ‰¥¹Ù•¹Ñ½Éå¡…É…Ñ•É9…µ”ˆ¤ì(€€€¥˜¡¹…µ•°¥ì(€€€€€€€¹…µ•°¹Ñ•áÑ½¹Ñ•¹Ğõ¡…É…Ñ•È€ü€‘í¡…É…Ñ•È¹¥ñğ€‹¢K¢&Èˆ¬¡¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¬Ä¥÷1Ø¸‘í¡…É…Ñ•È¹±•Ù•±ñğÅõ€€èƒ¢K¢&È‘í¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à¬Å÷–Âkšr«–îë®-€ì(€€€ô((€€€É•¹‘•É%¹Ù•¹Ñ½Éå¡…É…Ñ•ÉQ…‰Ì ¤ì(€€€É•¹‘•ÉÅÕ¥Áµ•¹Ğ ¤ì(€€€É•¹‘•É%¹Ù•¹Ñ½Éå%Ñ•µÌ ¤ì)ô((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ&§–N¢¦ÏÒÀ(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸•ÑMÑ…ÑQ•áĞ¡ÍÑ…ÑÌ¥ì((€€€¥˜ (€€€€€€€€…ÍÑ…ÑÌñğ(€€€€€€€=‰©•Ğ¹­•åÌ¡ÍÑ…ÑÌ¤¹±•¹Ñ ôôôÀ(€€€€¥ì((€€€€€€€É•ÑÕÉ¸‹šÊKšr'¦†7–’[¢÷–*o–*ƒš"Cˆì((€€€ô(((€€€½¹ÍĞ¹…µ•Ì€ôì((€€€€€€€…ÑÑ…¬è‹šRïšN(ˆ°((€€€€€€€Ù¥Ñ…±¥Ñäè‹¦®S¢Î¨ˆ°((€€€€€€€•¹•Éäè‹¢÷¦<ˆ°((€€€€€€€¥¹Ñ•±±¥•¹”è‹šfë–*lˆ°((€€€€€€€ÍÁ¥É¥Ğè‹Êû–xˆ°((€€€€€€€…¥±¥Ñäè‹šV?š6Üˆ°((€€€€€€€µ…á!@è‹šr–’!@ˆ°((€€€€€€€µ…áM@è‹šr–’M@ˆ°((€€€€€€€‘•™•¹Í”è‹¦bËš˜ˆ((€€€ôì(((€€€±•Ğ¡Ñµ°ôˆˆì(((€€€=‰©•Ğ¹­•åÌ¡ÍÑ…ÑÌ¤(€€€€¹™½É… ¡­•äôùì((€€€€€€€½¹ÍĞÙ…±Õ”€ô(€€€€€€€€€€€ÍÑ…ÑÍm­•åtì(((€€€€€€€¥˜ …Ù…±Õ”¥ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô(((€€€€€€€¡Ñµ°€¬ô((€€€€€€€€(€€€€€€€€ñ‘¥Øø(€€€€€€€€€€€€‘í¹…µ•Ím­•åuññ­•å÷¾òh(€€€€€€€€€€€€ñˆø¬‘íÙ…±Õ•ôğ½ˆø(€€€€€€€€ğ½‘¥Øø(€€€€€€€€ì((€€€ô¤ì(((€€€É•ÑÕÉ¸¡Ñµ°ñğ(€€€€€€€€‹šÊKšr'¦†7–’[¢÷–*o–*ƒš"Cˆì()ô(()™Õ¹Ñ¥½¸½Á•¹%Ñ•µ5½‘…° (€€€Í±½Ñ%¹‘•à(¥ì((€€€½¹ÍĞ¥Ñ•´€ô(€€€€€€€¥¹Ù•¹Ñ½ÉåM±½ÑÍl(€€€€€€€€€€€Í±½Ñ%¹‘•à(€€€€€€€tì(((€€€¥˜ …¥Ñ•´¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€Í•±•Ñ•‘%¹Ù•¹Ñ½ÉåM±½Ğ€ô(€€€€€€€Í±½Ñ%¹‘•àì(((€€€€ ‰¥Ñ•µ5½‘…±%½¸ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€¥Ñ•´¹¥½¸ì(((€€€€ ‰¥Ñ•µ5½‘…±9…µ”ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€¥Ñ•´¹¹…µ”ì(((€€€€ ‰¥Ñ•µ5½‘…±MÑ…ÑÌˆ¤(€€€€€€€€¹¥¹¹•É!Q50€ô((€€€€€€€€(€€€€€€€€‘ì(€€€€€€€€€€€¥Ñ•´¹ÑåÁ”ôôô‰Á½Ñ¥½¸ˆ(€€€€€€€€€€€€ü(€€€€€€€€€€€€ñ‘¥ØûšV#šzs¾òhñˆø‘í•ÑA½Ñ¥½¹™™•Ñ•ÍÉ¥ÁÑ¥½¸¡¥Ñ•´¹¥¥ôğ½ˆøğ½‘¥Øù€(€€€€€€€€€€€€è(€€€€€€€€€€€•ÑMÑ…ÑQ•áĞ¡¥Ñ•´¹ÍÑ…ÑÌ¤(€€€€€€€ô((€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€ÍÑå±”ôˆ(€€€€€€€€€€€€€€€µ…É¥¸µÑ½ÀèİÁàì(€€€€€€€€€€€€€€€½±½ÈèˆÍ„ÔáŒì(€€€€€€€€€€€€ˆ(€€€€€€€€ø(€€€€€€€€€€€ƒ–R»–ç¾òh‘í¥Ñ•´¹ÁÉ¥•ñğÁôƒ¦G–æŒ(€€€€€€€€ğ½‘¥Øø(€€€€€€€€ì(((€€€½¹ÍĞ•ÅÕ¥Á	ÕÑÑ½¸€ô(€€€€€€€€ ‰¥Ñ•µÅÕ¥Á	ÕÑÑ½¸ˆ¤ì(((€€€•ÅÕ¥Á	ÕÑÑ½¸¹É•µ½Ù•ÑÑÉ¥‰ÕÑ” (€€€€€€€€‰‘…Ñ„µÍ±½Ğˆ(€€€€¤ì(((€€€¥˜¡¥Ñ•´¹ÑåÁ”ôôô‰Á½Ñ¥½¸ˆ¥ì((€€€€€€€•ÅÕ¥Á	ÕÑÑ½¸¹‘¥Í…‰±•õÑÉÕ”ì((€€€€€€€•ÅÕ¥Á	ÕÑÑ½¸¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€€€€€‹’â7–>¿¢w–
+dˆì((€€€€€€€•ÅÕ¥Á	ÕÑÑ½¸¹ÍÑå±”¹½Á…¥Ñä€ô(€€€€€€€€€€€€ˆ¸Ğˆì((€€€ô(€€€•±Í•ì((€€€€€€€•ÅÕ¥Á	ÕÑÑ½¸¹‘¥Í…‰±•õ™…±Í”ì((€€€€€€€•ÅÕ¥Á	ÕÑÑ½¸¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€€€€€‹¦ÿš"Ğˆì((€€€€€€€•ÅÕ¥Á	ÕÑÑ½¸¹ÍÑå±”¹½Á…¥Ñä€ô(€€€€€€€€€€€€ˆÄˆì((€€€ô(((€€€€ ‰¥Ñ•µ5½‘…°ˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹…‘ ‰Í¡½Üˆ¤ì()ô(()™Õ¹Ñ¥½¸½Á•¹ÅÕ¥ÁÁ•‘%Ñ•´ (€€€¥Ñ•´°(€€€Í±½Ğ(¥ì((€€€Í•±•Ñ•‘%¹Ù•¹Ñ½ÉåM±½Ğ€ô(€€€€€€€¹Õ±°ì(((€€€€ ‰¥Ñ•µ5½‘…±%½¸ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€¥Ñ•´¹¥½¸ì(((€€€€ ‰¥Ñ•µ5½‘…±9…µ”ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€¥Ñ•´¹¹…µ”¬(€€€€€€€€‹¾ò#–ŞË¢w–
+g¾ò$ˆì(((€€€€ ‰¥Ñ•µ5½‘…±MÑ…ÑÌˆ¤(€€€€€€€€¹¥¹¹•É!Q50€ô(€€€€€€€•ÑMÑ…ÑQ•áĞ (€€€€€€€€€€€¥Ñ•´¹ÍÑ…ÑÌ(€€€€€€€€¤ì(((€€€½¹ÍĞ•ÅÕ¥Á	ÕÑÑ½¸€ô(€€€€€€€€ ‰¥Ñ•µÅÕ¥Á	ÕÑÑ½¸ˆ¤ì(((€€€•ÅÕ¥Á	ÕÑÑ½¸¹‘¥Í…‰±•õ™…±Í”ì((€€€•ÅÕ¥Á	ÕÑÑ½¸¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€€‹¢¯’â,ˆì((€€€•ÅÕ¥Á	ÕÑÑ½¸¹ÍÑå±”¹½Á…¥Ñä€ô(€€€€€€€€ˆÄˆì(((€€€•ÅÕ¥Á	ÕÑÑ½¸¹‘…Ñ…Í•Ğ¹Í±½Ğ€ô(€€€€€€€Í±½Ğì(((€€€€ ‰¥Ñ•µ5½‘…°ˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹…‘ ‰Í¡½Üˆ¤ì()ô(()™Õ¹Ñ¥½¸±½Í•%Ñ•µ5½‘…° ¥ì((€€€Í•±•Ñ•‘%¹Ù•¹Ñ½ÉåM±½Ğ€ô(€€€€€€€¹Õ±°ì(((€€€€ ‰¥Ñ•µÅÕ¥Á	ÕÑÑ½¸ˆ¤(€€€€€€€€¹É•µ½Ù•ÑÑÉ¥‰ÕÑ” (€€€€€€€€€€€€‰‘…Ñ„µÍ±½Ğˆ(€€€€€€€€¤ì(((€€€€ ‰¥Ñ•µ5½‘…°ˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹É•µ½Ù” ‰Í¡½Üˆ¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33šZ–¶_–’«–’h(€€ƒ–†{’â7’â/¾ò3–ÂÇÊûÂ‡¦†¿’ë¾ò3–ú3¦v‹R£Š›Š›¢¦ÏÒÀ(€€ƒ¢ºO:§–ºÛ¦î{šN+¢ŞÏ–ë–º3šVÓ’î/Òç7¾ò'¾òh(€€ƒš*¢÷¢¦ÏÒÃ¢Î¢¢+–ö#ª_¾ò3¢Ş&§–N¢¦ÏÒÃ–ö#ª_–ÇR (€€ƒ–B3’â––\¹¥Ñ•´µµ½‘…³š¢–ò?	Í¡½İM­¥±±•Ñ…¥° ¤(€€ƒ–Bš*¢õ%¾ò3¢«–ŞÇ¦7šZÃš~—’âš²‡n»–&7¢K¢&È¿¶'Òh(€€ƒ.š/¾ò3Ö–ë–º3šVÓ¢ª«šb;šZ–¶_¾ò#’â7š"«šZß¾ò'(¨¼((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33’â7º‡š*¢÷šr'šÊKšr$(€€ƒ–¶ãşK¾ò3¢¦ÏÒÃ¢Î¢¢+¦÷¢šš*+š¾?š²‡–6Òk–Š{–*ƒ–’k–ÂD(€€ƒ¦î{–
+ß–ºÏš¦:—šVãš;¦êóš>C–6¾ò3–º3šVÓ¦†¿’ë7¾ò'¾òh(€€ƒš*+š*¢÷–úy1Ø¸Ç–"ÃšîÿÒkš¾?’âÒkjšVã–ó¦÷šR“¦Z/’ú(€€ƒ–"_–ë’ú¾ò3’â7º‡:§–ºÛn»–&7–¶ã’êšÊK–¶ã–¶ã–"Ã²°(€€ƒ–æûÒk¾ò3¦g¢‡¦÷šb¿–º3šVÓj’â’î÷â÷¢†£ŠSŠS–
+ß–ºÌ(€€ƒš*¢÷¦†7–’[š¢g–ë3š¾?Òh­c7j–në–ºk–Š{¦?¾ò0(€€ƒšZç’úÿ:§–ºÛ’ârór/–ëš"C¦Vß–æ–ê›¾ò3’â7R£¢«–ŞÄ(€€ƒ’âÒk’âÒk–:ï–şº_–Ş»–’k–ÂG(¨¼()™Õ¹Ñ¥½¸‰Õ¥±‘M­¥±±1•Ù•±	É•…­‘½İ¹!Q50¡Í­¥±°¥ì((€€€½¹ÍĞµ…á1•Ù•°ô(€€€€€€€Í­¥±°¹µ…á1•Ù•±ñğ(€€€€€€€€Äì(((€€€±•Ğ±¥¹•Ìô(€€€€€€€mtì(((€€€™½È (€€€€€€€±•Ğ±ØôÄì(€€€€€€€±Øğõµ…á1•Ù•°ì(€€€€€€€±Ø¬¬(€€€€¥ì((€€€€€€€±•ĞÁ…ÉÑÌô(€€€€€€€€€€€mtì(((€€€€€€€¥˜ (€€€€€€€€€€€€ (€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰Á¡åÍ¥…°‰ñğ(€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰µ…¥Œˆ(€€€€€€€€€€€€¤€˜˜(€€€€€€€€€€€Í­¥±°¹‰…Í•…µ…”(€€€€€€€€¥ì((€€€€€€€€€€€½¹ÍĞ‘µœô(€€€€€€€€€€€€€€€•ÑM­¥±±…µ…•Ñ1•Ù•° (€€€€€€€€€€€€€€€€€€€Í­¥±°°(€€€€€€€€€€€€€€€€€€€±Ø(€€€€€€€€€€€€€€€€¤ì(((€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  (€€€€€€€€€€€€€€€€‹–
+ß–ºÌˆ¬(€€€€€€€€€€€€€€€5…Ñ ¹™±½½È¡‘µœ¤¬((€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€Í­¥±°¹‘…µ…•A•É1•Ù•°(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€‹¾ò#š¾?Òh¬ˆ¬(€€€€€€€€€€€€€€€€€€€Í­¥±°¹‘…µ…•A•É1•Ù•°¬(€€€€€€€€€€€€€€€€€€€€‹¾ò$ˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€¤((€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€¥˜ (€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹¡…¹”€˜˜(€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹A•É•¹Ñ	å1•Ù•°(€€€€€€€€¥ì((€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ((€€€€€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹¡…¹”¬(€€€€€€€€€€€€€€€€ˆ—š¦:Hˆ¬(€€€€€€€€€€€€€€€Í­¥±°¹‰ÕÉ¹A•É•¹Ñ	å1•Ù•±m±Ø´Åt¬(€€€€€€€€€€€€€€€€ˆ—šr–’!C¾ò?–n{–B ˆ((€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€¥˜¡Í­¥±°¹™É••é•¡…¹”¥ì((€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ((€€€€€€€€€€€€€€€Í­¥±°¹™É••é•¡…¹”¬(€€€€€€€€€€€€€€€€ˆ—š¦:–Ã–Âˆ¬(€€€€€€€€€€€€€€€Í­¥±°¹™É••é•ÕÉ…Ñ¥½¸¬(€€€€€€€€€€€€€€€€‹–n{–B ˆ((€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€¥˜¡Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•°¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ‹–Bã–>[–
+ß–ºÌˆ­Í­¥±°¹±¥™•ÍÑ•…±A•É•¹Ñ	å1•Ù•±m±Ø´Åt¬ˆ—¾ò#–n{–ú¥!@½MC¾ò$ˆ¤ì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹…¥±¥Ñå½İ¹	å1•Ù•°¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ ¡Í­¥±°¹…¥±¥Ñå½İ¹¡…¹”¬ˆ—¦f7šV<ˆ­Í­¥±°¹…¥±¥Ñå½İ¹	å1•Ù•±m±Ø´Åt¬ˆ—¾ò0ˆ¬¡Í­¥±°¹…¥±¥Ñå½İ¹ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹ÍÑ…Ñ½İ¹	å1•Ù•°¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ ¡Í­¥±°¹ÍÑ…Ñ½İ¹¡…¹”¬ˆ—¦f7¢÷–*lˆ­Í­¥±°¹ÍÑ…Ñ½İ¹	å1•Ù•±m±Ø´Åt¬ˆ—¾ò0ˆ¬¡Í­¥±°¹ÍÑ…Ñ½İ¹ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹‘•™•¹Í•½İ¹	å1•Ù•°¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ ¡Í­¥±°¹‘•™•¹Í•½İ¹¡…¹”¬ˆ—¦f7¦bÈˆ­Í­¥±°¹‘•™•¹Í•½İ¹	å1•Ù•±m±Ø´Åt¬ˆ—¾ò0ˆ¬¡Í­¥±°¹‘•™•¹Í•½İ¹ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹µ¥ÍÍ	½¹ÕÍ	å1•Ù•°¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ ¡Í­¥±°¹ÍÑÕ¹¡…¹”¬ˆ—šj#r§¾ò15%ML€¬ˆ­Í­¥±°¹µ¥ÍÍ	½¹ÕÍ	å1•Ù•±m±Ø´Åt¬ˆ—¾ò0ˆ¬¡Í­¥±°¹ÍÑÕ¹ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹Á•ÑÉ¥™å¡…¹•	å1•Ù•°¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ ¡Í­¥±°¹Á•ÑÉ¥™å¡…¹•	å1•Ù•±m±Ø´Åt¬ˆ—~Ï–2[¾ò0ˆ¬¡Í­¥±°¹Á•ÑÉ¥™åÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹Í•±™M¡¥•±‘	å1•Ù•°¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ‹¢«¢ê¯¢¶ßnøˆ­Í­¥±°¹Í•±™M¡¥•±‘	å1•Ù•±m±Ø´Åt¬‹¦î{¾ò0ˆ¬¡Í­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€¥˜¡Í­¥±°¹…±±åM¡¥•±‘	å1•Ù•°¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ‹š"GšZç–£¦®S¢¶ßnøˆ­Í­¥±°¹…±±åM¡¥•±‘	å1•Ù•±m±Ø´Åt¬‹¦î{¾ò0ˆ¬¡Í­¥±°¹Í¡¥•±‘ÕÉ…Ñ¥½¹ñğÈ¤¬‹–n{–B ˆ¤ì(€€€€€€€ô(((€€€€€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜ˆ˜™Í­¥±°¹É¥Ñ	½¹ÕÍ	å1•Ù•°¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ‹"šN+:¾ò?"šN+–
+ß–ºÌ€¬ˆ­Í­¥±°¹É¥Ñ	½¹ÕÍ	å1•Ù•±m±Ø´Åt¬ˆ—¾ò0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€•±Í”¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜ˆ˜™Í­¥±°¹•Ù…Í¥½¹	½¹ÕÍA•É•¹Ğ¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ‹¦Z¢êË:€¬ˆ­Í­¥±°¹•Ù…Í¥½¹	½¹ÕÍA•É•¹Ğ¬ˆ—¾ò0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€•±Í”¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜ˆ˜™Í­¥±°¹‘•™•¹Í•	½¹ÕÍA•É•¹Ğ¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ‹¦bËš›–*l€¬ˆ­Í­¥±°¹‘•™•¹Í•	½¹ÕÍA•É•¹Ğ¬ˆ—¾ò0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€•±Í”¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜ˆ˜™Í­¥±°¹É•™±•ÑA•É•¹Ğ¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ‹–>7–
+Ü€ˆ­Í­¥±°¹É•™±•ÑA•É•¹Ğ¬ˆ—¾ò0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€•±Í”¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜ˆ˜™Í­¥±°¹ÍÑ…ÑÕÍI•Í¥ÍÑ	½¹ÕÌ¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ‹VÃ–âã.š/š*_šœ€¬ˆ­Í­¥±°¹ÍÑ…ÑÕÍI•Í¥ÍÑ	½¹ÕÌ¬ˆ—¾ò0ˆ­Í­¥±°¹‘ÕÉ…Ñ¥½¸¬‹–n{–B ˆ¤ì(€€€€€€€ô(€€€€€€€•±Í”¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜ˆ¥ì(€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ ¡Í­¥±°¹‘•ÍÉ¥ÁÑ¥½¸¤ì(€€€€€€€ô(((€€€€€€€¥˜¡Í­¥±°¹…Ñ•½Éäôôô‰¡•…°ˆ¥ì((€€€€€€€€€€€½¹ÍĞ¡•…±µ½Õ¹Ğô((€€€€€€€€€€€€€€€Í­¥±°¹‰…Í•!•…°¬(€€€€€€€€€€€€€€€Í­¥±°¹¡•…±A•É1•Ù•°¨(€€€€€€€€€€€€€€€€¡±Ø´Ä¤ì(((€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ((€€€€€€€€€€€€€€€€‹–n{–ú¥!C–~ë’8ˆ¬(€€€€€€€€€€€€€€€¡•…±µ½Õ¹Ğ¬(€€€€€€€€€€€€€€€€ˆ¯šfë–*o\ˆ¬(€€€€€€€€€€€€€€€!1%9}%9Q}=%%9P¬((€€€€€€€€€€€€€€€€ (€€€€€€€€€€€€€€€€€€€Í­¥±°¹¡•…±A•É1•Ù•°(€€€€€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€€€€€‹¾ò#–~ë’;š¾?Òh¬ˆ¬(€€€€€€€€€€€€€€€€€€€Í­¥±°¹¡•…±A•É1•Ù•°¬(€€€€€€€€€€€€€€€€€€€€‹¾ò$ˆ(€€€€€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€€€€€¤¬(€€€€€€€€€€€€€€€€‹¾òmMC–~ë’8ˆ¬(€€€€€€€€€€€€€€€€¡Í­¥±°¹‰…Í•!•…±M@¬¡Í­¥±°¹¡•…±MAA•É1•Ù•±ñğÀ¤¨¡±Ø´Ä¤¤¬(€€€€€€€€€€€€€€€€¡Í­¥±°¹¡•…±MAA•É1•Ù•°€ü€‹¾ò#–~ë’;š¾?Òh¬ˆ­Í­¥±°¹¡•…±MAA•É1•Ù•°¬‹¾ò$ˆ€è€ˆˆ¤¬(€€€€€€€€€€€€€€€€ˆ¯šfë–*o\ˆ¬(€€€€€€€€€€€€€€€MA}!1%9}%9Q}=%%9P¬(€€€€€€€€€€€€€€€€‹¾ò#šZ÷šRû¢šr³’êë’â7–n{–ú¥MC¾ò$ˆ((€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€¥˜ (€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰É•Ù¥Ù”ˆ˜˜(€€€€€€€€€€€Í­¥±°¹É•Ù¥Ù•!•…±A•É•¹Ñ	å1•Ù•°(€€€€€€€€¥ì((€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  ((€€€€€€€€€€€€€€€€‹–ú§šÒïš‹–ú¤ˆ¬(€€€€€€€€€€€€€€€Í­¥±°¹É•Ù¥Ù•!•…±A•É•¹Ñ	å1•Ù•±m±Ø´Åt¬(€€€€€€€€€€€€€€€€ˆ—¢†¦<ˆ((€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€¥˜ (€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰Á…ÍÍ¥Ù”ˆ(€€€€€€€€¥ì((€€€€€€€€€€€Á…ÉÑÌ¹ÁÕÍ  (€€€€€€€€€€€€€€€Í­¥±°¹‘•ÍÉ¥ÁÑ¥½¸(€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€¥˜¡Á…ÉÑÌ¹±•¹Ñ ğÄ¥ì(€€€€€€€€€€€½¹Ñ¥¹Õ”ì(€€€€€€€ô(((€€€€€€€±¥¹•Ì¹ÁÕÍ  ((€€€€€€€€€€€€œñ‘¥ØÍÑå±”ôˆœ¬(€€€€€€€€€€€€‘¥ÍÁ±…äé™±•àí…ÀèÙÁàíÁ…‘‘¥¹œèÍÁà€Àìœ¬(€€€€€€€€€€€€‰½É‘•Èµ‰½ÑÑ½´èÅÁàÍ½±¥É‰„ ÈĞÀ°ÄàÀ°ĞÄ°¸ÄÈ¤ìˆøœ¬((€€€€€€€€€€€€œñÍÁ…¸ÍÑå±”ô‰™±•àèÀ€À€ĞÁÁàí½±½Èè˜ÁˆĞÈäí™½¹Ğµİ•¥¡Ğé‰½±ìˆøœ¬(€€€€€€€€€€€€‰1Ø¸ˆ­±Ø¬(€€€€€€€€€€€€ˆğ½ÍÁ…¸øˆ¬((€€€€€€€€€€€€œñÍÁ…¸ÍÑå±”ô‰™±•àèÄìˆøœ¬(€€€€€€€€€€€Á…ÉÑÌ¹©½¥¸ ‹¾öpˆ¤¬(€€€€€€€€€€€€ˆğ½ÍÁ…¸øˆ¬((€€€€€€€€€€€€ˆğ½‘¥Øøˆ((€€€€€€€€¤ì((€€€ô(((€€€É•ÑÕÉ¸±¥¹•Ì¹©½¥¸ ˆˆ¤ì()ô(()™Õ¹Ñ¥½¸Í¡½İM­¥±±•Ñ…¥°¡Í­¥±±%¥ì((€€€½¹ÍĞÍ­¥±°ô(€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€¥˜ …Í­¥±°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ¡…É…Ñ•Èô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÍl(€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€tì(((€€€½¹ÍĞ±•Ù•°ô((€€€€€€€€ (€€€€€€€€€€€¡…É…Ñ•È˜˜(€€€€€€€€€€€¡…É…Ñ•È¹Í­¥±±1•Ù•±Ì˜˜(€€€€€€€€€€€¡…É…Ñ•È¹Í­¥±±1•Ù•±ÍmÍ­¥±±%‘t(€€€€€€€€¥ñğ(€€€€€€€€Àì(((€€€½¹ÍĞÍÁ½ÍĞô((€€€€€€€Í­¥±°¹ÍÁ½ÍĞ„ôõÕ¹‘•™¥¹•(€€€€€€€€ü(€€€€€€€Í­¥±°¹ÍÁ½ÍĞ(€€€€€€€€è(€€€€€€€Í­¥±°¹½ÍĞì(((€€€½¹ÍĞ¥½¹°ô(€€€€€€€€ ‰Í­¥±±•Ñ…¥±%½¸ˆ¤ì(((€€€¥˜¡¥½¹°¥ì((€€€€€€€¥½¹°¹ÍÑå±”¹‰…­É½Õ¹‘%µ…”ô((€€€€€€€€€€€Í­¥±±%½¹%µ…•Ì˜˜(€€€€€€€€€€€Í­¥±±%½¹%µ…•ÍmÍ­¥±±%‘t(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰ÕÉ° ˆ¬(€€€€€€€€€€€Í­¥±±%½¹%µ…•ÍmÍ­¥±±%‘t¬(€€€€€€€€€€€€ˆ¤ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‰¹½¹”ˆì((€€€€€€€¥½¹°¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€Í­¥±±%½¹%µ…•Ì˜˜(€€€€€€€€€€€Í­¥±±%½¹%µ…•ÍmÍ­¥±±%‘t(€€€€€€€€€€€€ü(€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆˆì((€€€ô(((€€€€ ‰Í­¥±±•Ñ…¥±9…µ”ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€Í­¥±°¹¹…µ”¬((€€€€€€€€ (€€€€€€€€€€€±•Ù•°øÀ(€€€€€€€€€€€€ü(€€€€€€€€€€€€‹¾ò!1Ø¸ˆ­±•Ù•°¬(€€€€€€€€€€€€ (€€€€€€€€€€€€€€€Í­¥±°¹µ…á1•Ù•°(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€ˆ¼ˆ­Í­¥±°¹µ…á1•Ù•°(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤¬(€€€€€€€€€€€€‹¾ò$ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‹¾ò#šr«–¶ãşK¾ò$ˆ(€€€€€€€€¤ì(((€€€€ ‰Í­¥±±•Ñ…¥±MÑ…ÑÌˆ¤(€€€€€€€€¹¥¹¹•É!Q50ô((€€€€€€€€(€€€€€€€€ñ‘¥ØÍÑå±”ô‰µ…É¥¸µ‰½ÑÑ½´èÙÁàìˆø(€€€€€€€€€€€€ñÍÁ…¸ÍÑå±”ôˆ(€€€€€€€€€€€€€€€‘¥ÍÁ±…äé¥¹±¥¹”µ‰±½¬ì(€€€€€€€€€€€€€€€‰…­É½Õ¹èŒÉ”ÈàÈÈì(€€€€€€€€€€€€€€€½±½Èè˜ÁˆĞÈäì(€€€€€€€€€€€€€€€™½¹ĞµÍ¥é”èÄÅÁàì(€€€€€€€€€€€€€€€™½¹Ğµİ•¥¡Ğé‰½±ì(€€€€€€€€€€€€€€€Á…‘‘¥¹œèÉÁà€İÁàì(€€€€€€€€€€€€€€€‰½É‘•ÈµÉ…‘¥ÕÌèÄÁÁàì(€€€€€€€€€€€€ˆø(€€€€€€€€€€€€€€€€‘í•ÑM­¥±±…Ñ•½Éå1…‰•°¡Í­¥±°¹…Ñ•½Éä¥ô(€€€€€€€€€€€€ğ½ÍÁ…¸ø(€€€€€€€€ğ½‘¥Øø((€€€€€€€€ñ‘¥ØÍÑå±”ô‰±¥¹”µ¡•¥¡ĞèÄ¸Üìˆø(€€€€€€€€€€€€‘íÍ­¥±°¹‘•ÍÉ¥ÁÑ¥½¹ô(€€€€€€€€ğ½‘¥Øø((€€€€€€€€ñ‘¥ØÍÑå±”ô‰µ…É¥¸µÑ½ÀèáÁàí½±½ÈèˆÍ„ÔáŒìˆø(€€€€€€€€€€€€‘ì(€€€€€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰Á…ÍÍ¥Ù”ˆ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹¢Š¯–.Wš*¢÷¾ò3’â7R£¢w–
+g¾ò3–¶ã’ê–ÂÇšÂã’æRšV ˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€ÍÁ½ÍĞ¬‰M@ˆ(€€€€€€€€€€€ô(€€€€€€€€€€€€‘ì(€€€€€€€€€€€€€€€Í­¥±°¹±•…É¹½ÍĞ(€€€€€€€€€€€€€€€€ü(€€€€€€€€€€€€€€€€‹¾ös–¶ãşK¦r¢šˆ­Í­¥±°¹±•…É¹½ÍĞ¬‹š*¢÷¦îxˆ(€€€€€€€€€€€€€€€€è(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€ô(€€€€€€€€ğ½‘¥Øø((€€€€€€€€ñ‘¥ØÍÑå±”ô‰µ…É¥¸µÑ½ÀèÄÁÁàí™½¹ĞµÍ¥é”èÄÅÁàí½±½Èè˜ÁˆĞÈäí™½¹Ğµİ•¥¡Ğé‰½±ìˆø(€€€€€€€€€€€€ƒ–B¶'ÒkšVã–ğ(€€€€€€€€ğ½‘¥Øø((€€€€€€€€ñ‘¥ØÍÑå±”ô‰µ…É¥¸µÑ½ÀèÑÁàí™½¹ĞµÍ¥é”èÄÉÁàìˆø(€€€€€€€€€€€€‘ì(€€€€€€€€€€€€€€€‰Õ¥±‘M­¥±±1•Ù•±	É•…­‘½İ¹!Q50 (€€€€€€€€€€€€€€€€€€€Í­¥±°(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€ô(€€€€€€€€ğ½‘¥Øø((€€€€€€€€ì(((€€€½¹ÍĞ‘•Ñ…¥±MÑ…ÑÌô ‰Í­¥±±•Ñ…¥±MÑ…ÑÌˆ¤ì((€€€¥˜¡‘•Ñ…¥±MÑ…ÑÌ¥ì(€€€€€€€‘•Ñ…¥±MÑ…ÑÌ¹ÍÉ½±±Q½ÀôÀì(€€€ô((€€€l(€€€€€€€‘½Õµ•¹Ğ¹‘½Õµ•¹Ñ±•µ•¹Ğ°(€€€€€€€‘½Õµ•¹Ğ¹‰½‘ä°(€€€€€€€€ ‰…µ”µÙ¥•İÁ½ÉĞˆ¤°(€€€€€€€€ ‰…µ”µÍÑ…”ˆ¤(€€€t¹™½É… ¡•°ôùì(€€€€€€€¥˜¡•°¥ì(€€€€€€€€€€€•°¹±…ÍÍ1¥ÍĞ¹…‘ ‰Í­¥±°µ‘•Ñ…¥°µÍÉ½±°µ…Ñ¥Ù”ˆ¤ì(€€€€€€€ô(€€€ô¤ì((€€€€ ‰Í­¥±±•Ñ…¥±5½‘…°ˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹…‘ ‰Í¡½Üˆ¤ì()ô(()™Õ¹Ñ¥½¸±½Í•M­¥±±•Ñ…¥° ¥ì((€€€€ ‰Í­¥±±•Ñ…¥±5½‘…°ˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹É•µ½Ù” ‰Í¡½Üˆ¤ì((€€€l(€€€€€€€‘½Õµ•¹Ğ¹‘½Õµ•¹Ñ±•µ•¹Ğ°(€€€€€€€‘½Õµ•¹Ğ¹‰½‘ä°(€€€€€€€€ ‰…µ”µÙ¥•İÁ½ÉĞˆ¤°(€€€€€€€€ ‰…µ”µÍÑ…”ˆ¤(€€€t¹™½É… ¡•°ôùì(€€€€€€€¥˜¡•°¥ì(€€€€€€€€€€€•°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” ‰Í­¥±°µ‘•Ñ…¥°µÍÉ½±°µ…Ñ¥Ù”ˆ¤ì(€€€€€€€ô(€€€ô¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33¢şS–n{š†š†(€€ƒš^¦
++–’k’â–/¾òš2'¦"W¾ò3¢ŞÏ–ë–Æ³šŸ¢ª«šb;7¾ò'¾òh(€€ƒ–ö#ª_–Ÿ–ºç–në–ºk–¾¯š¶ï–r¡!Q53¢‡¾ò3¦g–§–/–÷–ò<(€€ƒ–>«¢Êƒ¢Ê³¦Z/¦^s¾ò3¢Ş}±½Í•M­¥±±•Ñ…¥° §šb¼(€€ƒ–B3’â¢»Â‡–Z»š¢‡–ò?(¨¼()™Õ¹Ñ¥½¸Í¡½İMÑ…ÑÕÍ!•±À ¥ì((€€€€ ‰ÍÑ…ÑÕÍ!•±Á5½‘…°ˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹…‘ ‰Í¡½Üˆ¤ì()ô(()™Õ¹Ñ¥½¸±½Í•MÑ…ÑÕÍ!•±À ¥ì((€€€€ ‰ÍÑ…ÑÕÍ!•±Á5½‘…°ˆ¤(€€€€€€€€¹±…ÍÍ1¥ÍĞ(€€€€€€€€¹É•µ½Ù” ‰Í¡½Üˆ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ¦ÿš"Ğ(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸•ÅÕ¥ÁM•±•Ñ•‘%Ñ•´ ¥ì((€€€½¹ÍĞ‰ÕÑÑ½¸€ô(€€€€€€€€ ‰¥Ñ•µÅÕ¥Á	ÕÑÑ½¸ˆ¤ì(((€€€¥˜¡‰ÕÑÑ½¸¹‘…Ñ…Í•Ğ¹Í±½Ğ¥ì((€€€€€€€Õ¹•ÅÕ¥Á%Ñ•´ (€€€€€€€€€€€‰ÕÑÑ½¸¹‘…Ñ…Í•Ğ¹Í±½Ğ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€¥˜ (€€€€€€€Í•±•Ñ•‘%¹Ù•¹Ñ½ÉåM±½Ğôôõ¹Õ±°(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ¥Ñ•´€ô(€€€€€€€¥¹Ù•¹Ñ½ÉåM±½ÑÍl(€€€€€€€€€€€Í•±•Ñ•‘%¹Ù•¹Ñ½ÉåM±½Ğ(€€€€€€€tì(((€€€¥˜ (€€€€€€€€…¥Ñ•´ñğ(€€€€€€€¥Ñ•´¹ÑåÁ”ôôô‰Á½Ñ¥½¸ˆ(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ¡…É…Ñ•È€ô(€€€€€€€•Ñ	…­Á…­¡…É…Ñ•È (€€€€€€€€€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à(€€€€€€€€¤ì(((€€€¥˜ …¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ•ÅÕ¥Áµ•¹Ñ-•ä€ô(€€€€€€€•Ñ	…­Á…­ÅÕ¥Áµ•¹Ñ-•ä (€€€€€€€€€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à(€€€€€€€€¤ì(((€€€½¹ÍĞ•ÅÕ¥Áµ•¹Ğ€ô(€€€€€€€¡…É…Ñ•ÉÅÕ¥Áµ•¹Ñm•ÅÕ¥Áµ•¹Ñ-•åtì(((€€€½¹ÍĞ•ÅÕ¥Áµ•¹ÑM±½Ğ€ô(€€€€€€€•Ñ%¹Ù•¹Ñ½ÉåÅÕ¥Áµ•¹ÑM±½Ğ¡¥Ñ•´¹ÑåÁ”¤ì(((€€€¥˜ …•ÅÕ¥Áµ•¹ÑM±½Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ½±‘%Ñ•´€ô(€€€€€€€•ÅÕ¥Áµ•¹Ñm•ÅÕ¥Áµ•¹ÑM±½Ñtì(((€€€¥˜¡½±‘%Ñ•´¥ì((€€€€€€€¥¹Ù•¹Ñ½Éå%Ñ•µÌ¹ÁÕÍ  (€€€€€€€€€€€½±‘%Ñ•´(€€€€€€€€¤ì((€€€ô(((€€€½¹ÍĞ…ÑÕ…±%¹‘•à€ô(€€€€€€€¥¹Ù•¹Ñ½Éå%Ñ•µÌ¹¥¹‘•á=˜ (€€€€€€€€€€€¥Ñ•´(€€€€€€€€¤ì(((€€€¥˜¡…ÑÕ…±%¹‘•àøôÀ¥ì((€€€€€€€¥¹Ù•¹Ñ½Éå%Ñ•µÌ¹ÍÁ±¥” (€€€€€€€€€€€…ÑÕ…±%¹‘•à°(€€€€€€€€€€€€Ä(€€€€€€€€¤ì((€€€ô(((€€€•ÅÕ¥Áµ•¹Ñm•ÅÕ¥Áµ•¹ÑM±½Ñt€ô(€€€€€€€¥Ñ•´ì(((€€€±½Í•%Ñ•µ5½‘…° ¤ì((€€€É•‰Õ¥±‘%¹Ù•¹Ñ½ÉåM±½ÑÌ ¤ì((€€€É•¹‘•É%¹Ù•¹Ñ½Éä ¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ¢¯’â,(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸Õ¹•ÅÕ¥Á%Ñ•´¡Í±½Ğ¥ì((€€€½¹ÍĞ¡…É…Ñ•È€ô(€€€€€€€•Ñ	…­Á…­¡…É…Ñ•È (€€€€€€€€€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à(€€€€€€€€¤ì(((€€€¥˜ …¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ•ÅÕ¥Áµ•¹Ñ-•ä€ô(€€€€€€€•Ñ	…­Á…­ÅÕ¥Áµ•¹Ñ-•ä (€€€€€€€€€€€¥¹Ù•¹Ñ½Éå¡…É…Ñ•É%¹‘•à(€€€€€€€€¤ì(((€€€½¹ÍĞ•ÅÕ¥Áµ•¹Ğ€ô(€€€€€€€¡…É…Ñ•ÉÅÕ¥Áµ•¹Ñm•ÅÕ¥Áµ•¹Ñ-•åtì(((€€€½¹ÍĞ¥Ñ•´€ô(€€€€€€€•ÅÕ¥Áµ•¹ÑmÍ±½Ñtì(((€€€¥˜ …¥Ñ•´¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜ (€€€€€€€¥¹Ù•¹Ñ½Éå%Ñ•µÌ¹±•¹Ñ øôÄÈÀ(€€€€¥ì((€€€€€€€…±•ÉĞ (€€€€€€€€€€€€‹¢3–2–ŞËšîÿ¾ò3‡šÎW¢¯’â/¢w–
+gˆ(€€€€€€€€¤ì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€¥¹Ù•¹Ñ½Éå%Ñ•µÌ¹ÁÕÍ  (€€€€€€€¥Ñ•´(€€€€¤ì(((€€€•ÅÕ¥Áµ•¹ÑmÍ±½Ñtõ¹Õ±°ì(((€€€±½Í•%Ñ•µ5½‘…° ¤ì((€€€É•‰Õ¥±‘%¹Ù•¹Ñ½ÉåM±½ÑÌ ¤ì((€€€É•¹‘•É%¹Ù•¹Ñ½Éä ¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì((€€€Í…Ù•…µ” ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ–R»–è(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()…Íå¹Œ™Õ¹Ñ¥½¸Í•±±M•±•Ñ•‘%Ñ•´ ¥ì((€€€¥˜ (€€€€€€€Í•±•Ñ•‘%¹Ù•¹Ñ½ÉåM±½Ğôôõ¹Õ±°(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ¥Ñ•´€ô(€€€€€€€¥¹Ù•¹Ñ½ÉåM±½ÑÍl(€€€€€€€€€€€Í•±•Ñ•‘%¹Ù•¹Ñ½ÉåM±½Ğ(€€€€€€€tì(((€€€¥˜ …¥Ñ•´¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÁÉ¥”€ô(€€€€€€€¥Ñ•´¹ÁÉ¥•ñğ(€€€€€€€€Àì(((€€€¥˜ (€€€€€€€ÑåÁ•½˜İ¥¹‘½Ü¹ÉÁ½¹™¥É´„ôô‰™Õ¹Ñ¥½¸ˆñğ(€€€€€€€€……İ…¥Ğİ¥¹‘½Ü¹ÉÁ½¹™¥É´ (€€€€€€€€€€€€‹Šë–ºk¢š–ë–R¸ˆ¬(€€€€€€€€€€€¥Ñ•´¹¹…µ”¬(€€€€€€€€€€€€‹¾ò}q¸ˆ¬(€€€€€€€€€€€€‹6Ë–ú\ˆ¬(€€€€€€€€€€€ÁÉ¥”¬(€€€€€€€€€€€€‹¦G–æˆ°(€€€€€€€€€€€ì(€€€€€€€€€€€€€€€Ñ¥Ñ±”è‹–ë–R»¢w–
+dˆ°(€€€€€€€€€€€€€€€½¹™¥ÉµQ•áĞè‹Šë–ºk–ë–R¸ˆ°(€€€€€€€€€€€€€€€…¹•±Q•áĞè‹¢şS–nxˆ(€€€€€€€€€€€ô(€€€€€€€€¤(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô((€€€¥˜ (€€€€€€€Í•±•Ñ•‘%¹Ù•¹Ñ½ÉåM±½Ğôôõ¹Õ±°ñğ(€€€€€€€¥¹Ù•¹Ñ½ÉåM±½ÑÍmÍ•±•Ñ•‘%¹Ù•¹Ñ½ÉåM±½Ñt„ôõ¥Ñ•´(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ…ÑÕ…±%¹‘•à€ô(€€€€€€€¥¹Ù•¹Ñ½Éå%Ñ•µÌ¹¥¹‘•á=˜ (€€€€€€€€€€€¥Ñ•´(€€€€€€€€¤ì(((€€€¥˜¡…ÑÕ…±%¹‘•àøôÀ¥ì((€€€€€€€½¹ÍĞÍÑ½É•‘%Ñ•´õ¥¹Ù•¹Ñ½Éå%Ñ•µÍm…ÑÕ…±%¹‘•átì(€€€€€€€½¹ÍĞÕÉÉ•¹Ñ½Õ¹Ğõ5…Ñ ¹µ…à Ä±9Õµ‰•È¡ÍÑ½É•‘%Ñ•´¹½Õ¹Ğ¥ñğÄ¤ì((€€€€€€€¥˜¡ÕÉÉ•¹Ñ½Õ¹ĞøÄ¥ì(€€€€€€€€€€€ÍÑ½É•‘%Ñ•´¹½Õ¹ĞõÕÉÉ•¹Ñ½Õ¹Ğ´Äì(€€€€€€€õ•±Í•ì(€€€€€€€€€€€¥¹Ù•¹Ñ½Éå%Ñ•µÌ¹ÍÁ±¥” (€€€€€€€€€€€€€€€…ÑÕ…±%¹‘•à°(€€€€€€€€€€€€€€€€Ä(€€€€€€€€€€€€¤ì(€€€€€€€ô((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rš¶š*O–"Ã–V?¦†3š‚çšêC¾ò'¾òh(€€€€€€ƒ’æ/–&7¦g¢‡jŠë¢ª7¢¢+š¿’ânÓ¢ª«36Ë–ú\(€€€€€€ac¦G–æ7¾ò3’ö–ú{¦‚·–"Ã–ÂûšÊKšr'’îï’öW’â¢†0(€€€€€€ƒ¢/–ò?Šórjš*+¦g–/šVã–¶_–*ƒ¦Ë’îï’öW–rÃšZçŠSŠP(€€€€€€ƒ¦G–æÎïÖÇVÛšfš‚çšr³’â7–¶c–r£¾ò3¦g–>—¢¦Ç¶'šZğ(€€€€€€ƒšb¿¦ë¦‚·šR¿–£>û–r£rjšr%½±“¦g–/–ÇR (€€€€€€ƒ¢ÎšêC’ê¾ò3¦g¢‡¢s’â+rš¶j–*ƒ–ó(€€€€¨¼((€€€½±ô(€€€€€€€½±¬(€€€€€€€ÁÉ¥”ì(((€€€±½Í•%Ñ•µ5½‘…° ¤ì((€€€É•‰Õ¥±‘%¹Ù•¹Ñ½ÉåM±½ÑÌ ¤ì((€€€É•¹‘•É%¹Ù•¹Ñ½Éä ¤ì((€€€ÕÁ‘…Ñ•½±‘¥ÍÁ±…ä ¤ì((€€€Í…Ù•…µ” ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ¢«–.Wš"Ã¦²—¢¢·–ºh(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼((¼¨(€€ƒŠbXÄÌß¾ò#šâ¦f“šºcVg¦2¿¢ª“¢¢+š¿¾ò'¾òh(€€…ÕÑ½¹…‰±•“…ÕÑ½M­¥±±!½µ—¡ÁUÍ•AÑ!½µ—ÍÁUÍ•AÑ!½µ”(€€ƒšb¿¢"+&#’âï–~;–Ÿ–Ö3¢«–.W¢¢·–ºkj–Òƒ¾ò3>û¢†3¢¢·–ºk–ŞËšRçRÄ(€€…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹ÍA…¹•³–.Wš/¢†£–Z»¢fWB¢"+&!Í…™•	¥¹“’î7–r£š¾?š²‡¢ò'–”(€€ƒ’âï–.Wš*+¦g–no–/3–ŞË~—’â7–¶c–r£7j–Òƒ¢¢cš"A½¹Í½±”¹•ÉÉ½Ë¾ò3šrš:§¢N/rš¶Œ(€€ƒj¦2¿¢ª“¾òo–nošº×‡šV#Ú–ºk–ŞËï¦f“((€€…ÕÑ½M­¥±±	…ÑÑ±—¡ÁUÍ•AÑ	…ÑÑ±—ÍÁUÍ•AÑ	…ÑÑ±”(€€ƒ¦g’â'–/šb¿–ú#š^§šr&#šr³š"Ã¦²—V¯¦v‹–Ÿ–Ö3’â/š.'¦ã–Z»j(€€ƒ¢"+–Ò%¾ò3–ú3’ú¦7šZÃ¢¢·¢¢#š"C>û–r£¦g¢¸(€€ƒ3š¢gÆ¯–V–.T¿–sš¶ˆ¯¢¢·–ºk7j¢«–.Wš"Ã¦²—¦v‹švÿšf(€€ƒ–ŞËÚOš.ÿš:'’ê¾ò3’ö¦g¢‡Ú–ºk’ê/’îÛj¢/–ò?Šğ(€€ƒšÊKšr'¢Ş¢F_šâ’æûšŞ£¾ò3–Â;¢Óš¾?š²‡¢ò'–—¦÷šr–b_¢¦›š&ø(€€ƒ¦g–æû–/’â7–¶c–r£j–Òƒ–6Ã–ë¦2¿¢ª“¢¢+š¼(€€ƒ¾ò#¦n[Ûšr'¦bË–F’â7šr¢ºO¦+š"ËVÛš¦¾ò3’öÖ¦Ûšb¿¦ns¢¢+¾ò'(€€ƒ¦g¢‡nÓš:—–"«š:'¦g’â'šº×–ŞËÚOšÊKšr'n»š¢g–>¿’î—Új¢/–ò?Šó(¨¼(((¼¨(€€ƒŠbƒ¢«–.Wš"Ã¦²—š*¢÷’â/š.'¦ã–Z»šRçš"C–.Wš/R‹R(€€ƒ’æ/–&7šb¿–¾¯š¶ï–r¡!Q53¢‡j–në–ºk¦ã¦‚¾ò#–>«šr'¯º·šr–ş’âšN+¾ò'¾ò0(€€ƒ>û–r£š*¢÷šb¿:§–ºÛ¢«–ŞÇ–¶ã¢«–ŞÇ¢w–
+gj¾ò0(€€ƒ¦ã–Z»¢š¢Ş¢F_3n»–&7¢w–
+gjš*¢÷7–.Wš/šnÓšZÃ¾ò0(€€ƒ’â7Û:§–ºÛ¢w–
+g’êšZÃš*¢÷¾ò3¦g¢‡–6ï¦ã’â7–"Ã((€€ƒ¢Š¯–.Wš*¢÷¢Ş–Š{n+š*¢÷¾ò#šK¯¾ò'’â7šRû¦Ë¢«–.W¦ã–Z»¾ò0(€€ƒ¢Š¯–.Wš*¢÷šÊKšr'3’âï–.W’öÿR£7¦g–n{’ê/¾òl(€€ƒšK¯–ššzsšRû¦Ë¢«–.W¦ã–Z»¾ò0(€€ƒ¢«–.Wš"Ã¦²—š¾?–n{–B#¦÷šr¦7šZÃšZ÷šRû¾ò0(€€ƒ¦
+?¢ò¿šr¢º+–ú_–ú#––š«¾ò0(€€ƒš&’î—šK¯n»–&7–#–>«¢÷–r£š"Ã¦²—’â·š&/–.W¦î{š*¢÷¦ã–Z»šZ÷šRû(¨¼()™Õ¹Ñ¥½¸Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹Ì ¥ì((€€€½¹ÍĞ¡…É…Ñ•È€ô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÌ¹™¥É”ì(((€€€¥˜ …¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€±•Ğ½ÁÑ¥½¹Í!Q50€ô((€€€€€€€€œñ½ÁÑ¥½¸Ù…±Õ”ô‰¹½Éµ…°ˆûšf»¦kšRïšN(ğ½½ÁÑ¥½¸øœì(((€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì(€€€€¹™½É… ¡Í­¥±±%ôùì((€€€€€€€½¹ÍĞÍ­¥±°€ô(€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€€€€¥˜ (€€€€€€€€€€€€…Í­¥±°ñğ(€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜‰ñğ(€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰Á…ÍÍ¥Ù”ˆ(€€€€€€€€¥ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô(((€€€€€€€½ÁÑ¥½¹Í!Q50¬ô((€€€€€€€€€€€€œñ½ÁÑ¥½¸Ù…±Õ”ôˆœ¬(€€€€€€€€€€€Í­¥±±%¬(€€€€€€€€€€€€œˆøœ¬(€€€€€€€€€€€Í­¥±°¹¹…µ”¬(€€€€€€€€€€€€œğ½½ÁÑ¥½¸øœì((€€€ô¤ì(((€€€½¹ÍĞ¡½µ•M•±•Ğ€ô(€€€€€€€€ ‰…ÕÑ½M­¥±±!½µ”ˆ¤ì(((€€€½¹ÍĞ‰…ÑÑ±•M•±•Ğ€ô(€€€€€€€€ ‰…ÕÑ½M­¥±±	…ÑÑ±”ˆ¤ì(((€€€½¹ÍĞÁÉ•Ù¥½ÕÍY…±Õ”€ô(€€€€€€€…ÕÑ½½¹™¥œ¹Í­¥±°ì(((€€€¥˜¡¡½µ•M•±•Ğ¥ì((€€€€€€€¡½µ•M•±•Ğ¹¥¹¹•É!Q50€ô(€€€€€€€€€€€½ÁÑ¥½¹Í!Q50ì((€€€ô(((€€€¥˜¡‰…ÑÑ±•M•±•Ğ¥ì((€€€€€€€‰…ÑÑ±•M•±•Ğ¹¥¹¹•É!Q50€ô(€€€€€€€€€€€½ÁÑ¥½¹Í!Q50ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒrjš*O–"Ã–V?¦†3š‚çšêC’ê¾òh(€€€€€€ƒ¦g¢‡–:šr³–>«š&ÿ¢ª4‰¹½Éµ…°‹š"[3n»–&7¢w–
+gjš*¢÷4(€€€€€€ƒšb¿–B#šÎW–ó¾ò0‰‘•™•¹‹¾ò#¦bËš›¾ò'’â7–r£¦g–§¢»ššÎ–Ÿ¾ò0(€€€€€€ƒšr¢Š¯¦gšº×¦bË–F¦
+?¢ò¿¢ª“–"“š"C3’â7–B#šÎWjšºcVg–ó7¾ò0(€€€€€€ƒ–òß–"Û¦–n{3šf»¦kšRïšN+7ŠSŠP(€€€€€€ƒ¦gš¶šb¿3šb;šb;¢¢·–ºk¦bËš›¾ò3–6ï¢º+š"Cšf»¦kšRïšN+4(€€€€€€ƒjrš¶–:–nƒ¾òi½¹™¥ÉµÕÑ½	…ÑÑ±•M•ÑÑ¥¹Ì ¤(€€€€€€ƒš&7–&oš*)…ÕÑ½½¹™¥œ¹Í­¥±³š¶Šë¢¢·š"@‰‘•™•¹‹¾ò0(€€€€€€ƒŞ+š:—¢F_–Fó–>¯¦g–/–÷–ò?–k–B3š¶—¾ò0(€€€€€€ƒ¦g¢‡–>#š*+–ºšÒ_–nx‰¹½Éµ…°‹¾ò0(€€€€€€ƒ¶'šZó’öÿR£¢j¦ãšN–r£–Ë–¶cj’â/’â–"ï–ÂÇ¢Š¯¢š¢N/š:'((€€€€€€ƒ’ş»š¶¾òkš*(‰‘•™•¹‹’æ¢š[
+ë–B#šÎW–ó(€€€€¨¼((€€€½¹ÍĞÍÑ¥±±Y…±¥€ô(€€€€€€€ÁÉ•Ù¥½ÕÍY…±Õ”ôôô‰¹½Éµ…°‰ñğ(€€€€€€€ÁÉ•Ù¥½ÕÍY…±Õ”ôôô‰‘•™•¹‰ñğ(€€€€€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì¹¥¹±Õ‘•Ì (€€€€€€€€€€€ÁÉ•Ù¥½ÕÍY…±Õ”(€€€€€€€€¤ì(((€€€¥˜ …ÍÑ¥±±Y…±¥¥ì((€€€€€€€…ÕÑ½½¹™¥œ¹Í­¥±°ô(€€€€€€€€€€€€‰¹½Éµ…°ˆì((€€€ô(((€€€¥˜¡¡½µ•M•±•Ğ¥ì((€€€€€€€¡½µ•M•±•Ğ¹Ù…±Õ”€ô(€€€€€€€€€€€…ÕÑ½½¹™¥œ¹Í­¥±°ì((€€€ô(((€€€¥˜¡‰…ÑÑ±•M•±•Ğ¥ì((€€€€€€€‰…ÑÑ±•M•±•Ğ¹Ù…±Õ”€ô(€€€€€€€€€€€…ÕÑ½½¹™¥œ¹Í­¥±°ì((€€€ô()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾òk²³’ê3¢K¢&Ë&#šr³j¢«–.Wš*¢÷¦ã–Z»–B3š¶—(€€ƒ¢Ş}Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹Ì §¦
+?¢ò¿–º3–£–Â7¢Ç¾ò0(€€ƒ¢º¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÌ¹Á±…å•ÈË¾ò0(€€ƒ–¾­…ÕÑ½½¹™¥œË¾ò3šN7’ösj=7–’îÛ’æšb¼(€€ƒ–Â#–Æ³šZó²³’ê3¢K¢&Ë¦
+Ö¥“(€€ƒ–B3šf¢Êƒ¢Ê³¦†¿’è¿¦jÇ¢^?šVÓ–ò×¢¢·–ºk–6‡&(€€ƒ¾ò!Á±…å•ÈË’â7–¶c–r£–ÂÇ’â7R£¢ºO:§–ºÛr/–"Ã¦g–6–†+¾ò'(¨¼()™Õ¹Ñ¥½¸Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹ÌÈ ¥ì((€€€½¹ÍĞ…Éô(€€€€€€€€ ‰Á±…å•ÈÉÕÑ½M•ÑÑ¥¹Í…Éˆ¤ì(((€€€¥˜ ……É¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€¥˜ …Á±…å•ÈÈ¥ì((€€€€€€€…É¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€€€€€‰¹½¹”ˆì((€€€€€€€É•ÑÕÉ¸ì((€€€ô(((€€€…É¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€‰‰±½¬ˆì(((€€€½¹ÍĞÑ¥Ñ±•°ô(€€€€€€€€ ‰Á±…å•ÈÉÕÑ½M•ÑÑ¥¹ÍQ¥Ñ±”ˆ¤ì(((€€€¥˜¡Ñ¥Ñ±•°¥ì((€€€€€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€€ˆˆ¬(€€€€€€€€€€€Á±…å•ÈÈ¹¥¬(€€€€€€€€€€€€‹¢«–.Wš"Ã¦²—¢¢·–ºhˆì((€€€ô(((€€€½¹ÍĞ¡…É…Ñ•Èô(€€€€€€€¡…É…Ñ•ÉM­¥±±1½…‘½ÕÑÌ¹Á±…å•ÈÈì(((€€€¥˜ …¡…É…Ñ•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€±•Ğ½ÁÑ¥½¹Í!Q50ô((€€€€€€€€œñ½ÁÑ¥½¸Ù…±Õ”ô‰¹½Éµ…°ˆûšf»¦kšRïšN(ğ½½ÁÑ¥½¸øœì(((€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì(€€€€¹™½É… ¡Í­¥±±%ôùì((€€€€€€€½¹ÍĞÍ­¥±°ô(€€€€€€€€€€€Í­¥±±…Ñ…‰…Í•mÍ­¥±±%‘tì(((€€€€€€€¥˜ (€€€€€€€€€€€€…Í­¥±°ñğ(€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰‰Õ™˜‰ñğ(€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰Á…ÍÍ¥Ù”‰ñğ(€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰¡•…°‰ñğ(€€€€€€€€€€€Í­¥±°¹…Ñ•½Éäôôô‰É•Ù¥Ù”ˆ(€€€€€€€€¥ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô(((€€€€€€€½ÁÑ¥½¹Í!Q50¬ô((€€€€€€€€€€€€œñ½ÁÑ¥½¸Ù…±Õ”ôˆœ¬(€€€€€€€€€€€Í­¥±±%¬(€€€€€€€€€€€€œˆøœ¬(€€€€€€€€€€€Í­¥±°¹¹…µ”¬(€€€€€€€€€€€€œğ½½ÁÑ¥½¸øœì((€€€ô¤ì(((€€€½¹ÍĞÍ•±•Ğô(€€€€€€€€ ‰…ÕÑ½M­¥±±A±…å•ÈÈˆ¤ì(((€€€¥˜ …Í•±•Ğ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞÁÉ•Ù¥½ÕÍY…±Õ”ô(€€€€€€€…ÕÑ½½¹™¥œÈ¹Í­¥±°ì(((€€€Í•±•Ğ¹¥¹¹•É!Q50ô(€€€€€€€½ÁÑ¥½¹Í!Q50ì(((€€€½¹ÍĞÍÑ¥±±Y…±¥ô(€€€€€€€ÁÉ•Ù¥½ÕÍY…±Õ”ôôô‰¹½Éµ…°‰ñğ(€€€€€€€ÁÉ•Ù¥½ÕÍY…±Õ”ôôô‰‘•™•¹‰ñğ(€€€€€€€¡…É…Ñ•È¹•ÅÕ¥ÁÁ•‘M­¥±±Ì¹¥¹±Õ‘•Ì (€€€€€€€€€€€ÁÉ•Ù¥½ÕÍY…±Õ”(€€€€€€€€¤ì(((€€€¥˜ …ÍÑ¥±±Y…±¥¥ì((€€€€€€€…ÕÑ½½¹™¥œÈ¹Í­¥±°ô(€€€€€€€€€€€€‰¹½Éµ…°ˆì((€€€ô(((€€€Í•±•Ğ¹Ù…±Õ”ô(€€€€€€€…ÕÑ½½¹™¥œÈ¹Í­¥±°ì(((€€€½¹ÍĞ¡ÁM•±•Ğô(€€€€€€€€ ‰¡ÁUÍ•AÑA±…å•ÈÈˆ¤ì(((€€€½¹ÍĞÍÁM•±•Ğô(€€€€€€€€ ‰ÍÁUÍ•AÑA±…å•ÈÈˆ¤ì(((€€€¥˜¡¡ÁM•±•Ğ¥ì((€€€€€€€¡ÁM•±•Ğ¹Ù…±Õ”ô(€€€€€€€€€€€…ÕÑ½½¹™¥œÈ¹¡Àì((€€€ô(((€€€¥˜¡ÍÁM•±•Ğ¥ì((€€€€€€€ÍÁM•±•Ğ¹Ù…±Õ”ô(€€€€€€€€€€€…ÕÑ½½¹™¥œÈ¹ÍÀì((€€€ô(((€€€½¹ÍĞ•¹…‰±•‘¡•­‰½àô(€€€€€€€€ ‰…ÕÑ½¹…‰±•‘A±…å•ÈÈˆ¤ì(((€€€¥˜¡•¹…‰±•‘¡•­‰½à¥ì((€€€€€€€•¹…‰±•‘¡•­‰½à¹¡•­•ô(€€€€€€€€€€€…ÕÑ½½¹™¥œÈ¹•¹…‰±•ì((€€€ô()ô(((¼¨(€€ƒŠbƒ²³’ê3¢K¢&Ë¢«–.Wš"Ã¦²—¢¢·–ºkj’â/š.'¦ã–Z¸(€€ƒVÃ–.Wšf¾ò3š*+–ó–¾¯–ny…ÕÑ½½¹™¥œË(¨¼()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•ÕÑ½½¹™¥œÉÉ½µU$ ¥ì((€€€½¹ÍĞ•¹…‰±•‘¡•­‰½àô(€€€€€€€€ ‰…ÕÑ½¹…‰±•‘A±…å•ÈÈˆ¤ì(((€€€½¹ÍĞÍ•±•Ğô(€€€€€€€€ ‰…ÕÑ½M­¥±±A±…å•ÈÈˆ¤ì(((€€€½¹ÍĞ¡ÁM•±•Ğô(€€€€€€€€ ‰¡ÁUÍ•AÑA±…å•ÈÈˆ¤ì(((€€€½¹ÍĞÍÁM•±•Ğô(€€€€€€€€ ‰ÍÁUÍ•AÑA±…å•ÈÈˆ¤ì(((€€€¥˜¡•¹…‰±•‘¡•­‰½à¥ì((€€€€€€€…ÕÑ½½¹™¥œÈ¹•¹…‰±•ô(€€€€€€€€€€€•¹…‰±•‘¡•­‰½à¹¡•­•ì((€€€ô(((€€€¥˜¡Í•±•Ğ¥ì((€€€€€€€…ÕÑ½½¹™¥œÈ¹Í­¥±°ô(€€€€€€€€€€€Í•±•Ğ¹Ù…±Õ”ì((€€€ô(((€€€¥˜¡¡ÁM•±•Ğ¥ì((€€€€€€€…ÕÑ½½¹™¥œÈ¹¡Àô(€€€€€€€€€€€9Õµ‰•È (€€€€€€€€€€€€€€€¡ÁM•±•Ğ¹Ù…±Õ”(€€€€€€€€€€€€¤ì((€€€ô(((€€€¥˜¡ÍÁM•±•Ğ¥ì((€€€€€€€…ÕÑ½½¹™¥œÈ¹ÍÀô(€€€€€€€€€€€9Õµ‰•È (€€€€€€€€€€€€€€€ÍÁM•±•Ğ¹Ù…±Õ”(€€€€€€€€€€€€¤ì((€€€ô(((€€€Í…Ù•…µ” ¤ì()ô(()™Õ¹Ñ¥½¸Íå¹	…ÑÑ±•ÕÑ½M•ÑÑ¥¹Ì ¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#rjš*O–"Ã’â–/šrVÛš¦j‰ÕŸ¾ò'¾òh(€€€€€€ƒ¦g¢‡–:šr³šrnÓš:—–Â4(€€€€€€…ÕÑ½M­¥±±	…ÑÑ±”½¡ÁUÍ•AÑ	…ÑÑ±”½ÍÁUÍ•AÑ	…ÑÑ±”(€€€€€€ƒ¦g’â'–/¢"+&#š"Ã¦²—V¯¦v‹–Ÿ–Ö3’â/š.'¦ã–Z»¢¢·–ó¾ò0(€€€€€€ƒ’ö¦gš²‡šRç&#–ú3¾ò3¦g’â'–/’â/š.'¦ã–Z»–ŞËÚOšVÓ–/š.ÿš:$(€€€€€€ƒ¾ò#nã¦^s¢¢·–ºkï–"Ã3¢¢·–ºk7š2'¦"W–ÆW¦Z/j(€€€€€€…ÕÑ½	…ÑÑ±•M•ÑÑ¥¹ÍA…¹•³¢‡’ê¾ò'¾ò0(€€€€€€=7¢‡–ŞËÚOš&û’â7–"Ã¦g’â'–/–Òƒ¾ò0(€€€€€€ƒnÓš:—–Â5¹Õ±°¹Ù…±Õ—¢Î›–óšrnÓš:—’â–ë¦2¿¢ª“¾ò0(€€€€€€ƒ–Â;¢Ó–Fó–>¯¦g–/–÷–ò?j–rÃšZç–£¦£’â·šZß–~ß¢†3ŠSŠP(€€€€€€ƒ–2š.±‰•¥¹¡…É…Ñ•ÉQÕÉ¸ §¾ò0(€€€€€€ƒ¶'šZóš¾?š²‡¢ò«–"Ã:§–ºÛ¢†3–.W¾ò0(€€€€€€ƒV¯¦v‹¦÷šr'–>¿¢÷–nƒ
+ë¦g¢‡–fÓ¦2¿¢3–6‡’ö?((€€€€€€ƒšZÃ&#¢¢·–ºk¦v‹švÿšb¿3¦î{¢¢·–ºkš&7–ÆW¦Z/¾ò0(€€€€€€ƒ–ÆW¦Z/šfš&7RÅÍİ¥Ñ¡ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•È ¤(€€€€€€ƒ¢Êƒ¢Ê³–âÛ–—n»–&7j–ó7¾ò3’â7¦r¢š–r£¦g¢„(€€€€€€ƒš¾?š²‡¦÷’âï–.W–B3š¶—¾ò3š&’î—nÓš:—š*+¦g’â'¢†3š.ÿš:'¾ò0(€€€€€€ƒ–>«’şwVg–B3š¶—3–ŞË–¶ãš*¢÷¦ã¦‚7¦g¦£–"(€€€€€€ƒ¾ò!Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹ÏÎï–"_–÷–ò<(€€€€€€ƒ–¦£¦÷–ŞËÚOšr%¹Õ±³šª‹š~—¾ò3’â7šršr'–B3š¢j–V?¦†3¾ò'(€€€€¨¼((€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹Ì ¤ì((€€€Á½ÁÕ±…Ñ•ÕÑ½M­¥±±=ÁÑ¥½¹ÌÈ ¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒš"Ã¦²—¢Î¢¢((ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸Í•Ñ	…ÑÑ±•%¹™½áÁ…¹‘•¡•áÁ…¹‘•¥ì((€€€½¹ÍĞÉ•¥½¸õ‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È ˆ‰…ÑÑ±•A…”€¹‰…ÑÑ±”µ¥¹™¼µÉ•¥½¸ˆ¤ì(€€€½¹ÍĞÑ½±”ô ‰‰…ÑÑ±•%¹™½Q½±”ˆ¤ì((€€€¥˜ …É•¥½¹ñğ…Ñ½±”¥ìÉ•ÑÕÉ¸™…±Í”ìô((€€€½¹ÍĞ¹•áĞô„…•áÁ…¹‘•ì(€€€É•¥½¸¹±…ÍÍ1¥ÍĞ¹Ñ½±” ‰¥Ìµ•áÁ…¹‘•ˆ±¹•áĞ¤ì(€€€Ñ½±”¹Í•ÑÑÑÉ¥‰ÕÑ” ‰…É¥„µ•áÁ…¹‘•ˆ±¹•áĞü‰ÑÉÕ”ˆè‰™…±Í”ˆ¤ì(€€€Ñ½±”¹Í•ÑÑÑÉ¥‰ÕÑ” ‰…É¥„µ±…‰•°ˆ±¹•áĞü‹šRÛ–B#š"Ã¦²—¢Î¢¢(ˆè‹–ÆW¦Z/š"Ã¦²—¢Î¢¢(ˆ¤ì(€€€É•ÑÕÉ¸ÑÉÕ”ì()ô()™Õ¹Ñ¥½¸Ñ½±•	…ÑÑ±•%¹™½A…¹•° ¥ì((€€€½¹ÍĞÉ•¥½¸õ‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È ˆ‰…ÑÑ±•A…”€¹‰…ÑÑ±”µ¥¹™¼µÉ•¥½¸ˆ¤ì(€€€É•ÑÕÉ¸Í•Ñ	…ÑÑ±•%¹™½áÁ…¹‘• „¡É•¥½¸˜™É•¥½¸¹±…ÍÍ1¥ÍĞ¹½¹Ñ…¥¹Ì ‰¥Ìµ•áÁ…¹‘•ˆ¤¤¤ì()ô()™Õ¹Ñ¥½¸±•…É	…ÑÑ±•1½œ ¥ì((€€€Í•Ñ	…ÑÑ±•%¹™½áÁ…¹‘•¡™…±Í”¤ì((€€€€ ‰‰…ÑÑ±•%¹™¼ˆ¤(€€€€€€€€¹¥¹¹•É!Q50ôˆˆì((€€€€¼¨XÄÜÌ¸ĞÈè±•µ•¹Ğ	½à…¸ÕÍ”Á½Ñ¥½¹Ìİ¡¥±”¹¼‰…ÑÑ±”¥ÌÉÕ¹¹¥¹œ¸(€€€€€€…ÉÉäÑ¡½Í”¹½Ñ¥•Ì¥¹Ñ¼Ñ¡”¹•áĞ‰…ÑÑ±”µ¥¹™¼Á…¹•°•á…Ñ±ä½¹”¸€¨¼(€€€½¹ÍĞÁ•¹‘¥¹±•µ•¹Ñ	½á9½Ñ¥•Ìô(€€€€€€€ÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆ˜™ÉÉ…ä¹¥ÍÉÉ…ä¡İ¥¹‘½Ü¹ØÄÜÌĞÉA•¹‘¥¹	…ÑÑ±•9½Ñ¥•Ì¤(€€€€€€€€€€€€üİ¥¹‘½Ü¹ØÄÜÌĞÉA•¹‘¥¹	…ÑÑ±•9½Ñ¥•Ì¹ÍÁ±¥” À¤(€€€€€€€€€€€€èmtì(€€€Á•¹‘¥¹±•µ•¹Ñ	½á9½Ñ¥•Ì¹™½É… ¡µ•ÍÍ…”ôù…‘‘	…ÑÑ±•1½œ¡µ•ÍÍ…”¤¤ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3–Ş‡¦
+?¦‚¦v‹j(€€€€€€ƒš"Ã¦²—¢Î¢¢+¢š¢N/–Æ“¾ò'¾òh(€€€€€€ƒšZÃš"Ã¦²—¦Z/–/šâ¦ëÒ¦2j–B3šf¾ò0(€€€€€€ƒ–Ş‡¦
+?¦‚¦v‹¦
+’î÷’æ¢š’â¢Ößšâ¦ë¾ò0(€€€€€€ƒ’â7ÛšZÃš"Ã¦²—š&O–"Ã’â–6+¾ò3–Ş‡¦
+?¦‚¦v‹–6ï¦
+(€€€€€€ƒšºcVg¢F_’â+’â+’â–‚Ój¢"+Ò¦2¾ò3–§¦
++šr–Â7’â7¢Öß’ú(€€€€¨¼((€€€½¹ÍĞµ…Á%¹™¼ô(€€€€€€€€ ‰µ…Á	…ÑÑ±•%¹™¼ˆ¤ì(((€€€¥˜¡µ…Á%¹™¼¥ì((€€€€€€€µ…Á%¹™¼¹¥¹¹•É!Q50ô(€€€€€€€€€€€€ˆˆì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€€€€€ƒšZÃš"Ã¦²—¦Z/–/¾ò3–në–ºk¦†¿’ëj–n{–B#šVãš¢gÆ(€€€€€€ƒ’æ¢š¦7ö»–n{²°Ç–n{–B#¾ò3’â7ÛšršºcVd(€€€€€€ƒ’â+’â–‚Óš"Ã¦²—ÖCšvšfj–n{–B#šVã(€€€€¨¼((€€€½¹ÍĞÑÕÉ¹%¹‘¥…Ñ½Èô(€€€€€€€€ ‰‰…ÑÑ±•QÕÉ¹%¹‘¥…Ñ½Èˆ¤ì(((€€€¥˜¡ÑÕÉ¹%¹‘¥…Ñ½È¥ì((€€€€€€€ÑÕÉ¹%¹‘¥…Ñ½È¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹²°€Äƒ–n{–B ˆì((€€€ô(((€€€½¹ÍĞµ…ÁQÕÉ¹%¹‘¥…Ñ½Èô(€€€€€€€€ ‰µ…Á	…ÑÑ±•QÕÉ¹%¹‘¥…Ñ½Èˆ¤ì(((€€€¥˜¡µ…ÁQÕÉ¹%¹‘¥…Ñ½È¥ì((€€€€€€€µ…ÁQÕÉ¹%¹‘¥…Ñ½È¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€€‹²°€Äƒ–n{–B ˆì((€€€ô()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€ƒšÆë–ºk–n{–B#¢Î¢¢+–"_¾ò#²±c–n{–B#¾ò?–KšVã¾ò?n»š¢g¾ò$(€€ƒ¢Şš"Ã¦²—š2’î“š2'¦"W–6¾ò#š*¢ô¿šf»¦kšRïšN(¿¦bËš˜¼(€€ƒ&§–N¿¦¢¯¾ò'>û–r£¢¦Ë¦†¿’ë¦
+šb¿¢¦Ë¢^?¢Öß’ú((€€ƒ¢š?–&¾òh(€€€´…ÕÑ½	…ÑÑ±—
+éÑÉÕ—¾ò#¢«–.Wš"Ã¦²—š2ê3¦Z/¢F_¾ò'¾òh(€€€€ƒ’â7º‡>û–r£šb¿–º–F+¦
+šb¿ÖCº_¦j;šº×¾ò3’â–ú/¢^?¢Öß’ú¾ò0(€€€€ƒ’â7šrš¾?–/¢K¢&Ë¢†3–.W–º3–ÂÇ–"š>o’âš²‡¦‚ïæ¦Z"7(€€€´…ÕÑ½	…ÑÑ±—
+é™…±Í—¾ò#š&/–.W¾ò'¾òh(€€€€ƒÖCº_¦j;šº×¾ò!‰…ÑÑ±•A¡…Í”ôôô‰É•Í½±Ù”‹¾ò0(€€€€ƒ¦ngšZçš¶–r£’úw–ê?rš¶–ëš&/¾ò'¢^?¢Öß’ú¾ò3šâo–ÂGV¯¦vˆ(€€€€ƒ¦ns¢¢+¾òo–º–F+¦j;šº×¾ò!‰…ÑÑ±•A¡…Í”ôôô‰‘•±…É”‹¾ò0(€€€€ƒ¶':§–ºÛ¢«–ŞÇ¦ãšN¢š–k’î¦êó¾ò'¦†¿’ë–ë’ú¾ò0(€€€€ƒ’â7Û:§–ºÛšrr/’â7–"Ãš2'¦"W’â7~—¦O¢š¦î{–N«¢‡((€€ƒ¢^?¢Öß’újšf–g¦‚’úÿ¦^s¦Z'–>¿¢÷¦
+¦Z/¢F_jš*¢ô¼(€€ƒ&§–N–¶C¦ã–Z»¾ò!±½Í•5•¹ÕÌ §¾ò'¾ò3¦ÿ–7š2'¦"W–6 (€€ƒ¢Š¯¢^?¢Öß’ú–¶C¦ã–Z»–6ï¦
+¦–r£V¯¦v‹’â+jš«.šÎ(¨¼()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•Ñ¥½¹!Õ‘Y¥Í¥‰¥±¥Ñä ¥ì((€€€½¹ÍĞ…Ñ¥Ù•ÕÑ¼ô(€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•àôôôÀ(€€€€€€€€ü…ÕÑ½	…ÑÑ±”(€€€€€€€€è•ÑA…ÉÑåÕÑ½½¹™¥œ¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤¹•¹…‰±•ì((€€€½¹ÍĞ‰…ÑÑ±•AÉ•Í•¹Ñ…Ñ¥½¹Ñ¥Ù”ô„„ (€€€€€€€ÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆ˜˜(€€€€€€€İ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	…ÑÑ±•±½Ü˜˜(€€€€€€€ÑåÁ•½˜İ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	…ÑÑ±•±½Ü¹¥ÍAÉ•Í•¹Ñ…Ñ¥½¹Ñ¥Ù”ôôô‰™Õ¹Ñ¥½¸ˆ˜˜(€€€€€€€İ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	…ÑÑ±•±½Ü¹¥ÍAÉ•Í•¹Ñ…Ñ¥½¹Ñ¥Ù” ¤(€€€€¤ì((€€€½¹ÍĞÍ¡½Õ±‘!¥‘”ô(€€€€€€€…Ñ¥Ù•ÕÑ¼ñğ‰…ÑÑ±•A¡…Í”ôôô‰É•Í½±Ù”ˆñğ‰…ÑÑ±•AÉ•Í•¹Ñ…Ñ¥½¹Ñ¥Ù”ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢šúšâ¾ò3–#–&7B¢¦2¿’ê¾ò'¾òh(€€€€€€ƒ–n{–B#¢Î¢¢+–"_¾ò#–B¯–n{–B#šVà¿¢¢#šf–f ¿n»š¢g¾ò$(€€€€€€ƒ¢«–.Wš"Ã¦²—šfŸ¢"+šVÓ–/¦jÇ¢^?¾ò3’â7&ç–"—Vd(€€€€€€ƒ–n{–B#šVã–r£¦g¢‡ŠSŠS’öÿR£¢¢šjšb¿3š"Ã¦²”(€€€€€€ƒ¢Î¢¢(£š"Ã¦²—Ò¦2š†§šr³¢ê¯7¦†¿’ën»–&7–n{–B#šVã¾ò0(€€€€€€ƒ’â7šb¿¦g–/š2'¦"W–"_j’â¦£–"¾ò3šRç–n{–:šr°(€€€€€€ƒjšVÓ¦®S¦jÇ¢^?¦
+?¢ò¿(€€€€¨¼((€€€½¹ÍĞÑÕÉ¹I½Üô(€€€€€€€€ ‰ÑÕÉ¹Q…É•ÑI½Üˆ¤ì(((€€€¥˜¡ÑÕÉ¹I½Ü¥ì((€€€€€€€ÑÕÉ¹I½Ü¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€‰‰…ÑÑ±”µ¡Õµ¡¥‘‘•¸ˆ°(€€€€€€€€€€€Í¡½Õ±‘!¥‘”(€€€€€€€€¤ì((€€€ô(((€€€½¹ÍĞ½µµ…¹‘I½Üô(€€€€€€€€ ‰‰…ÑÑ±•½µµ…¹‘I½Üˆ¤ì(((€€€¥˜¡½µµ…¹‘I½Ü¥ì((€€€€€€€½µµ…¹‘I½Ü¹±…ÍÍ1¥ÍĞ¹Ñ½±” (€€€€€€€€€€€€‰‰…ÑÑ±”µ¡Õµ¡¥‘‘•¸ˆ°(€€€€€€€€€€€Í¡½Õ±‘!¥‘”(€€€€€€€€¤ì(((€€€€€€€¥˜¡Í¡½Õ±‘!¥‘”¥ì((€€€€€€€€€€€±½Í•5•¹ÕÌ ¤ì(€€€€€€€€€€€±•…É	…ÑÑ±•Q…É•ÑM•±•Ñ¥½¹5½‘” ¤ì((€€€€€€€ô((€€€ô()ô(()™Õ¹Ñ¥½¸…‘‘	…ÑÑ±•1½œ¡Ñ•áĞ¥ì((€€€½¹ÍĞ¥¹™¼€ô(€€€€€€€€ ‰‰…ÑÑ±•%¹™¼ˆ¤ì(((€€€¥˜ …¥¹™¼¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€€€€€ƒ’æ/–&7š¾?–*ƒ’â¢†3šZÃ¢¢+š¿¾ò3–ÂÇ–òß–"Ûš*+š6Ë¢îãš.'–"À(€€€€€€ƒšr–êW¦£¾ò3–Â;¢Ó’öÿR£¢–ú’â+šîGšÏr/’æ/–&7j(€€€€€€ƒÒ¦2šf¾ò3’âšr'šZÃ¢¢+š¿¦Ë’ú–ÂÇ¢Š¯–òß–"Ûš.'–n{–:ï¾ò0(€€€€€€ƒ–º3–£r/’â7–"ÃšÏr/j–Ÿ–ºç((€€€€€€ƒšRçš"C–#–"“šZß3’öÿR£¢>û–r£šb¿’â7šb¿–ŞËÚO–r (€€€€€€ƒš:—¢şG–êW¦£7¾ò#–ºç¢¢ÄÈÁÁãj¢ª“–Ş»¾ò'¾ò0(€€€€€€ƒ–>«šr'–r£3–:šr³–ÂÇ–r£–êW¦£¦f¢şG7jššÎ’â/¾ò0(€€€€€€ƒš&7¢«–.Wš6Ë–"ÃšZÃ¢¢+š¿¾òo–ššzs’öÿR£¢–ŞËÚL(€€€€€€ƒ’âï–.W–ú’â+šîG¦Z/’âšº×¢Şw¦n‹¾ò3’î¢†£’î[š¶–r (€€€€€€ƒ–n{¦‚·r/’æ/–&7jÒ¦2¾ò3¦gšf–gšZÃ¢¢+š¿¦Ë’ú(€€€€€€ƒ’â7šrš&OšZß’î[¾ò3š6Ë–.W’ö7ö»Ú·š2’â7¢º+(€€€€¨¼((€€€½¹ÍĞİ…Í9•…É	½ÑÑ½´ô((€€€€€€€¥¹™¼¹ÍÉ½±±!•¥¡Ğ´(€€€€€€€¥¹™¼¹ÍÉ½±±Q½À´(€€€€€€€¥¹™¼¹±¥•¹Ñ!•¥¡Ğ(€€€€€€€€ğÈÀì(((€€€½¹ÍĞ±¥¹”€ô(€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€¤ì(((€€€±¥¹”¹±…ÍÍ9…µ”€ô(€€€€€€€€‰‰…ÑÑ±”µ±¥¹”ˆì(((€€€±¥¹”¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€Ñ•áĞì(((€€€¥¹™¼¹…ÁÁ•¹‘¡¥± (€€€€€€€±¥¹”(€€€€¤ì(((€€€İ¡¥±” (€€€€€€€¥¹™¼¹¡¥±‘É•¸¹±•¹Ñ øàÀ(€€€€¥ì((€€€€€€€¥¹™¼¹É•µ½Ù•¡¥± (€€€€€€€€€€€¥¹™¼¹™¥ÉÍÑ¡¥±(€€€€€€€€¤ì((€€€ô(((€€€¥˜¡İ…Í9•…É	½ÑÑ½´¥ì((€€€€€€€¥¹™¼¹ÍÉ½±±Q½À€ô(€€€€€€€€€€€¥¹™¼¹ÍÉ½±±!•¥¡Ğì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3–Ş‡¦
+?¦‚¦v‹j(€€€€€€ƒš"Ã¦²—¢Î¢¢+¢š¢N/–Æ“¾ò'¾òh(€€€€€€ƒš¾?–*ƒ’â¢†3š"Ã¦²—Ò¦2¾ò3–B3š¶—¢’¢÷’â’î÷–"À(€€€€€€ƒ–Ş‡¦
+?¦‚¦v‹¦
+’î÷š"Ã¦²—¢Î¢¢+š†ŠSŠS¦gšb¿–R¿’â (€€€€€€ƒ¢Êƒ¢Ê³–¾¯–—š"Ã¦²—Ò¦2šZ–¶_j–rÃšZç¾ò0(€€€€€€ƒ–r£¦g¢‡–B3š¶—šr–Z»ÒS¾ò3’â7R£–>›–’[š&ø(€€€€€€ƒš¾?’â–/–Fó–>­…‘‘	…ÑÑ±•1½œ §j–rÃšZä(€€€€€€ƒ–B¢«¢fWB¦g’î÷’â7R£¢fWB3š6Ë–"Ã–êW¦£4(€€€€€€ƒj¦
+?¢ò¿¾ò3:§–ºÛ¦n‹¦Z/š"Ã¦²—–n{–"Ã–rÃ–r[’æ/–ú0(€€€€€€ƒš&7šrr/–"Ã¦g’î÷¾ò3’â7šršr'3šZÃ¢¢+š¿’ânĞ(€€€€€€ƒš&OšZßš¶–r£r/j–Ÿ–ºç7j–V?¦†3(€€€€¨¼((€€€½¹ÍĞµ…Á%¹™¼ô(€€€€€€€€ ‰µ…Á	…ÑÑ±•%¹™¼ˆ¤ì(((€€€¥˜¡µ…Á%¹™¼¥ì((€€€€€€€½¹ÍĞµ…Á1¥¹”ô(€€€€€€€€€€€‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ (€€€€€€€€€€€€€€€€‰‘¥Øˆ(€€€€€€€€€€€€¤ì(((€€€€€€€µ…Á1¥¹”¹±…ÍÍ9…µ”ô(€€€€€€€€€€€€‰‰…ÑÑ±”µ±¥¹”ˆì(((€€€€€€€µ…Á1¥¹”¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€€€€€Ñ•áĞì(((€€€€€€€µ…Á%¹™¼¹…ÁÁ•¹‘¡¥± (€€€€€€€€€€€µ…Á1¥¹”(€€€€€€€€¤ì(((€€€€€€€İ¡¥±” (€€€€€€€€€€€µ…Á%¹™¼¹¡¥±‘É•¸¹±•¹Ñ øàÀ(€€€€€€€€¥ì((€€€€€€€€€€€µ…Á%¹™¼¹É•µ½Ù•¡¥± (€€€€€€€€€€€€€€€µ…Á%¹™¼¹™¥ÉÍÑ¡¥±(€€€€€€€€€€€€¤ì((€€€€€€€ô(((€€€€€€€µ…Á%¹™¼¹ÍÉ½±±Q½Àô(€€€€€€€€€€€µ…Á%¹™¼¹ÍÉ½±±!•¥¡Ğì((€€€ô()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ:§–ºÛ¢Î¢¢((ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•A±…å•É!•…‘•È ¥ì((€€€½¹ÍĞ•±•µ•¹Ğ€ô(€€€€€€€•±•µ•¹Ñ…Ñ…‰…Í•l(€€€€€€€€€€€Á±…å•È¹•±•µ•¹Ğ(€€€€€€€t(€€€€€€€ñğ(€€€€€€€•±•µ•¹Ñ…Ñ…‰…Í”¹™¥É”ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò1•µ½©§š>oš"@(€€€€€€MO–.WV¯–r[’ë¾ò'¾òiÑ•áÑ½¹Ñ•¹ÓšRçš"@(€€€€€€¥¹¹•É!Q53¾ò3š&7¢÷rjš*((€€€€€€€ñÍÁ…¸±…ÍÌô‰•±•µ•¹Ğµ¥½¸¸¸¸ˆø(€€€€€€ƒ¦g¢¹!Q53š¢gÆ“šâËš~O–ë’ú¾ò3’â7Ûšr¢Š¬(€€€€€€ƒVÛš"CÒSšZ–¶_–¶_¦v‹¦†¿’ë(€€€€¨¼((€€€€ ‰Á±…å•É9…µ”ˆ¤(€€€€€€€€¹¥¹¹•É!Q50€ô((€€€€€€€•Ñ±•µ•¹Ñ%½¹!Q50 (€€€€€€€€€€€Á±…å•È¹•±•µ•¹Ğ(€€€€€€€€¤¬(€€€€€€€€ˆˆ¬(€€€€€€€€ (€€€€€€€€€€€Á±…å•È¹¥‘ñğ(€€€€€€€€€€€•±•µ•¹Ğ¹¡…É…Ñ•È(€€€€€€€€¤ì(((€€€€ ‰•±•µ•¹ÑQ•áĞˆ¤(€€€€€€€€¹¥¹¹•É!Q50€ô((€€€€€€€•Ñ±•µ•¹Ñ%½¹!Q50 (€€€€€€€€€€€Á±…å•È¹•±•µ•¹Ğ(€€€€€€€€¤¬(€€€€€€€€ˆˆ¬(€€€€€€€•±•µ•¹Ğ¹¹…µ”ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€ƒ–r£–Ş‡¦
+?¾ò?–rÃ–r[¦‚¦v‹šf¾ò3šr’â+¦v‹¦
+šŠwš¢g¦†3–"\(€€ƒ’â7¦†¿’ë¢K¢&Ëj¶'Òh½!@½MC¾ò3šRç¦†¿’ë3–rÃ–rX(€€ƒ–B7¢Ç7¾ò/3š«&§¢Î¢¢+¾ò#–B7¢Ä¿–Æ³šœ¿¢†¦<¼(€€ƒšV?š6ß¾ò'7((€€ƒš«&§¢Î¢¢+š*Ojšb¿n»–&7–rÃ–r[’â+¾ò!µ½¹ÍÑ•ÉÍlÁuø(€€µ½¹ÍÑ•ÉÍm5a}QI%9%9}5=9MQIL´Åw¾ò$(€€ƒ²³’â¦jï¦
+šÒï¢F_jš«&§ŠSŠS¢Ş}ÉÕ¹ÕÑ½A…ÑÉ½±¡•¬ ¤(€€ƒ¢«–.W–Ş‡š«šf3š&O²³’â¦jï¦
+šÒï¢F_jš«&§7R£j(€€ƒšb¿–B3’â–/¦
+?¢ò¿¾ò3¦g¢‡¦†¿’ëj–ÂÇšb¿3–Ş‡š«š2'’â/–:ì(€€ƒšrš&O–"Ãj¦
+¦jïš«&§7¾ò3’â7šb¿¦j£’úÿš*O’â¦jï((€€ƒ–§Öš¢g¦†3–"_¾ò#–:šr³j¢K¢&Ë¢Î¢¢+¾ò?¦g¢‡šZÃ–Š{j(€€ƒ–rÃ–rX¯š«&§¢Î¢¢+¾ò'–æÏ–âã–>«šr¦†¿’ë’âÖ¾ò0(€€ƒ–r¡Í¡½İA…” §¢‡–"š>o¦‚¦v‹šfšr–Fó–>¯¦g¢„(€€ƒ¦7šZÃ–"“šZß¢š¦†¿’ë–N«’âÖ(¨¼((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3ŞÓ–*–6šRç& (€€ƒ–ÇR£¦
+?¢ò¿¾ò'¾òh(€€ƒš*+3–"_–ëš~C–/–rÃ–6–£¦£š«&§¢»¦†{j–B7¢Ä¼(€€ƒ¶'Òh¿šV?š6ß7¦gšº×¦
+?¢ò¿š*÷š"C6£®/–÷–ò?¾ò0(€€ƒ–rÃ–r[¦‚¦v‹jš«&§šâ–Z»š†ŞÓ–*–6šZÃj(€€ƒ–rÃ–r[¢Î¢¢+–ö#ª_¾ò3–§¦
++¦÷¢šR£–"Ã–B3’â––_¾ò0(€€ƒ’â7¢š–B¢«–¾¯’â’î÷–æû’æ;’âš¢j¢/–ò?Šó((€€ƒ–B3–B7š«&§¾ò#š.ÿš:':,¿j’â7º_¾ò'–>«–"_’âš²‡¾ò0(€€ƒ’â7–"_¢†¦?¾ò3R¡½¹™¥œ¹µ½¹ÍÑ•ÉÌ §š.ÿ–"À(€€ƒšVÓ’î÷–:–/–B7–Z»¾ò#’â7šb½ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ(€€ƒ¦g¢»3¦g–‚Óš"Ã¦²—š*÷–"Ã¢ªÃ7jšâ–Z»¾ò'¾ò0(€€ƒŠë’şw–ÂÇº_š«&§–r£š"Ã¦²—¢‡¢Š¯š&Oš¶ï¾ò3šâ–Z¸(€€ƒ¦
+šb¿–º3šVÓ¦†¿’ë¦g–/–rÃ–63šr'–N«’êo¢»¦†{7(¨¼()™Õ¹Ñ¥½¸•Ñi½¹•5½¹ÍÑ•É1¥ÍÑ!Q50¡é½¹•-•ä¥ì((€€€½¹ÍĞ½¹™¥œô(€€€€€€€é½¹•½¹™¥mé½¹•-•åtì(((€€€¥˜ …½¹™¥œ¥ì(€€€€€€€É•ÑÕÉ¸ˆˆì(€€€ô(((€€€½¹ÍĞé½¹•5½¹ÍÑ•ÉÌô((€€€€€€€ÑåÁ•½˜½¹™¥œ¹µ½¹ÍÑ•ÉÌôôô(€€€€€€€€‰™Õ¹Ñ¥½¸ˆ(€€€€€€€€ü(€€€€€€€½¹™¥œ¹µ½¹ÍÑ•ÉÌ ¤(€€€€€€€€è(€€€€€€€mtì(((€€€½¹ÍĞÍ••¹9…µ•Ìô(€€€€€€€¹•ÜM•Ğ ¤ì(((€€€½¹ÍĞ±¥¹•Ìô(€€€€€€€mtì(((€€€é½¹•5½¹ÍÑ•ÉÌ¹™½É…  (€€€€€€€µ½¹ÍÑ•Èôùì((€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€€…µ½¹ÍÑ•Èñğ(€€€€€€€€€€€€€€€Í••¹9…µ•Ì¹¡…Ì (€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”(€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€¥ì(€€€€€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€€€€€ô(((€€€€€€€€€€€Í••¹9…µ•Ì¹…‘ (€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”(€€€€€€€€€€€€¤ì(((€€€€€€€€€€€±¥¹•Ì¹ÁÕÍ  ((€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹¹…µ”¬(€€€€€€€€€€€€€€€€‰1Ø¸ˆ¬(€€€€€€€€€€€€€€€µ½¹ÍÑ•È¹±•Ù•°¬(€€€€€€€€€€€€€€€€‹šV?š6Üˆ¬(€€€€€€€€€€€€€€€5…Ñ ¹É½Õ¹ (€€€€€€€€€€€€€€€€€€€•Ñ5½¹ÍÑ•É¥±¥Ñä (€€€€€€€€€€€€€€€€€€€€€€€µ½¹ÍÑ•È(€€€€€€€€€€€€€€€€€€€€¤(€€€€€€€€€€€€€€€€¤((€€€€€€€€€€€€¤ì((€€€€€€€ô(€€€€¤ì(((€€€É•ÑÕÉ¸±¥¹•Ì(€€€€€€€€¹µ…À (€€€€€€€€€€€±¥¹”ôø(€€€€€€€€€€€€€€€€ˆñ‘¥Øøˆ¬(€€€€€€€€€€€€€€€±¥¹”¬(€€€€€€€€€€€€€€€€ˆğ½‘¥Øøˆ(€€€€€€€€¤(€€€€€€€€¹©½¥¸ ˆˆ¤ì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3ŞÓ–*–6šRç&#¾ò'¾òh(€€ƒš¾?–/–rÃ–6j¢3šf¿ú;¢†O–r[¾ò3–#Vg¦ë–¶_’âÈ(€€ƒ¾ò#’öÿR£¢’æ/–ú3šr¢s’â)‰…Í”ØÓš"[–r[&ÚË–v¾ò0(€€ƒ–>«¢šš*+–Â7š'š²’ö7–†¯¦Ë–:ï–ÂÇšrRšV#¾ò0(€€…ÁÁ±åQÉ…¥¹¥¹i½¹•	…­É½Õ¹ §¢Ş¦g¢„(€€ƒ–º3–£’â7R£–7šRç¾ò'(¨¼((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3–Ş‡š«¦‚¦vˆ(€€ƒ¾ò µ…ÁA…—¾ò'¢3šf¿šRçš"C’úw–rÃ–6–.Wš/–"š>o¾ò'¾òh(€€ƒ–:šr°µ…ÁA…—j¢3šf¿šb¿–¾¯š¶ï–r¡MO¢‡j(€€ƒ–Z»’â–ò×š»šz_–r[¾ò3’â7º‡¦Ë–N«–/–rÃ–6¦÷¦Vß–ú\(€€ƒ’âš¢¦g¢‡šRçš"C¢ŞŞÓ–*–6–rÃ–r[¦‚C¢š÷–B3’â¢¸(€€ƒ¢¢·¢¢#ŠSŠS’â–/&§’îÛ¢w¢F_š¾?–/–rÃ–6–B¢«j(€€ƒ¢3šf¿–r[¾ò1™½É•ÍĞ½‘•Í•ÉÓ–#šRû’â+’öÿR£¢(€€ƒ¦gš²‡š>C’úoj–r[¾ò3–Û¦’c–rÃ–6Vg¦ë’æ/–ú0(€€ƒ’öÿR£¢¢š¢s–r[&nÓš:—–†¯¦Ë–Â7š'š²’ö7–ÂÇ––÷¾ò0(€€ƒ’â7R£šRç’îï’öW–Û’î[¢/–ò?Šó((€€ƒ¦
+šÊKšr'–Â#–Æ³–r[&j–rÃ–6¾ò3––_R¡…ÁÁ±å5…Ái½¹•	…­É½Õ¹ ¤(€€ƒšfšr¦–n{¦†¿’é™½É•ÍÓ¦g–ò×VÛ¦‚C¢¢·–ó¾ò0(€€ƒ’â7šr–ë>û’â&¦îGjV¯¦v‹(¨¼()½¹ÍĞµ…Ái½¹•	…­É½Õ¹‘%µ…•Ìõì((€€€™½É•ÍĞè‰…ÍÍ•ÑÌ½µ…ÁÌ½™½É•ÍĞ¹©Áœˆ°(€€€‘•Í•ÉĞè‰…ÍÍ•ÑÌ½µ…ÁÌ½‘•Í•ÉĞ¹©Áœˆ°(€€€¥”èˆˆ°(€€€é½¹”Ğèˆˆ°(€€€é½¹”Ôèˆˆ°(€€€é½¹”Øèˆˆ°(€€€é½¹”Üèˆˆ°(€€€é½¹”àèˆˆ°(€€€é½¹”äèˆˆ°(€€€é½¹”ÄÀèˆˆ()ôì(()™Õ¹Ñ¥½¸…ÁÁ±å5…Ái½¹•	…­É½Õ¹¡é½¹•-•ä¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò3šRçš"CšN7’öp(€€€€€€ƒ6£®/jÁ½Í¥Ñ¥½¸é™¥á•“¢3šf¿–r[–Æ“¾ò0(€€€€€€ƒ’â7–7nÓš:—–Â4µ…ÁA…—šr³¢ê¯¢¢·–ºh(€€€€€€‰…­É½Õ¹µ¥µ…—¾ò'(€€€€¨¼((€€€½¹ÍĞ‰1…å•Èô(€€€€€€€€ ‰µ…ÁA…•	1…å•Èˆ¤ì(((€€€¥˜ …‰1…å•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ¥µ…•UÉ°ô((€€€€€€€µ…Ái½¹•	…­É½Õ¹‘%µ…•Ímé½¹•-•åuñğ(€€€€€€€µ…Ái½¹•	…­É½Õ¹‘%µ…•Ì¹™½É•ÍĞì(((€€€‰1…å•È¹ÍÑå±”¹‰…­É½Õ¹‘%µ…”ô((€€€€€€€€‰ÕÉ° ˆ¬(€€€€€€€¥µ…•UÉ°¬(€€€€€€€€ˆ¤ˆì()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33š*¢÷¦7¢t(€€ƒ–>«¦†¿’é¥½»¾ò3n»–&7šÊKšr%¥½»–r[’ë–ÂÇ–#¦ë¢F_7¾ò'¾òh(€€ƒš*¢÷–r[’ëj¦‚CVgš~—š&û¢†£¾ò1­•çšb¿š*¢õ%¾ò0(€€Ù…±Õ—–#–£¦£Vg¦ë–¶_’âË’æ/–ú3¢š–æ¯š*¢÷¢p(€€ƒ–r[’ë¾ò3nÓš:—–Â7¦g–/&§’îÛ–†¯–—–Â7š'j(€€‰…Í”ØÓš"[–r[&ÚË–v–ÂÇšrRšV#¾ò#š*¢÷–"_¢†£(€€ƒ¢w–
+gš²š‚ó–¶Cš*¢÷¢¦ÏÒÃ–ö#ª_’â'–/–rÃšZç¦ô(€€ƒšr¢«–.W––_R£–B3’â–ò×–r[¾ò3’â7R£–"–"—–:ïšRç¾ò'¾ò0(€€ƒ’â7R£šRç’îï’öW–Û’î[¢/–ò?Šó(¨¼()½¹ÍĞÍ­¥±±%½¹%µ…•Ìõ•±•µ•¹ÑM­¥±±%½¹5…Àì(()½¹ÍĞé½¹•	…­É½Õ¹‘%µ…•Ìõì((€€€™½É•ÍĞèˆˆ°(€€€‘•Í•ÉĞèˆˆ°(€€€¥”èˆˆ°(€€€é½¹”Ğèˆˆ°(€€€é½¹”Ôèˆˆ°(€€€é½¹”Øèˆˆ°(€€€é½¹”Üèˆˆ°(€€€é½¹”àèˆˆ°(€€€é½¹”äèˆˆ°(€€€é½¹”ÄÀèˆˆ()ôì(()™Õ¹Ñ¥½¸…ÁÁ±åQÉ…¥¹¥¹i½¹•	…­É½Õ¹¡é½¹•-•ä¥ì((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò3šRçš"CšN7’öp(€€€€€€ƒ6£®/jÁ½Í¥Ñ¥½¸é™¥á•“¢3šf¿–r[–Æ“¾ò'¾òh(€€€€€€ƒ¦g–/–r[–Æ“jML±…ÍÏšr³¢ê¯–ŞËÚO–Ÿ–îë’ê(€€€€€€ƒ3¢ªÿšj_šòã–Æ¯¦‚C¢¢·â÷¢š÷–r[7¦g–/Ö–B (€€€€€€ƒ¾ò#¢š,¹ÑÉ…¥¹¥¹œµ‰œµ™¥á•µ±…å•Ë¾ò'¾ò0(€€€€€€ƒ¦g¢‡–ššzs–>«R£¢†3–Ÿš¢–ò?¢N/’â–/–Z»ÒSj(€€€€€€ÕÉ° ¸¸¸§’â+–:ï¾ò3šrš*+¢ªÿšj_šòã–Æ“’â¢Öß¢N/š:'(€€€€€€ƒ–/–"—–rÃ–6j–r[&šr¢º+š"CšÊKšr'¢ªÿšj_šV#šzs¾ò0(€€€€€€ƒ¢Şâ÷¢š÷–r[’â7’â¢Óš&’î—¦g¢‡¢¢·–ºk¢†3–œ(€€€€€€ƒš¢–ò?šf¾ò3’âš¢¢šR£3šòã–Æ¯–r[&7j(€€€€€€ƒÖ–B#–¾¯šÎW¾ò3’â7¢÷–>«–¾­ÕÉ° §(€€€€¨¼((€€€½¹ÍĞ‰1…å•Èô(€€€€€€€€ ‰ÑÉ…¥¹¥¹A…•	1…å•Èˆ¤ì(((€€€¥˜ …‰1…å•È¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ¥µ…•UÉ°ô(€€€€€€€é½¹•	…­É½Õ¹‘%µ…•Ímé½¹•-•åtì(((€€€¥˜¡¥µ…•UÉ°¥ì((€€€€€€€½¹ÍĞ¹•áÑ	…­É½Õ¹ô(€€€€€€€€€€€€‰±¥¹•…ÈµÉ…‘¥•¹Ğ¡É‰„ À°À°À°¸Ğ¤±É‰„ À°À°À°¸Ğ¤¤°ˆ¬(€€€€€€€€€€€€‰ÕÉ° ˆ¬(€€€€€€€€€€€¥µ…•UÉ°¬(€€€€€€€€€€€€ˆ¤ˆì((€€€€€€€¥˜¡‰1…å•È¹ÍÑå±”¹‰…­É½Õ¹‘%µ…”„ôõ¹•áÑ	…­É½Õ¹¥ì(€€€€€€€€€€€‰1…å•È¹ÍÑå±”¹‰…­É½Õ¹‘%µ…”õ¹•áÑ	…­É½Õ¹ì(€€€€€€€ô((€€€ô(€€€•±Í•ì((€€€€€€€€¼¨(€€€€€€€€€€Xäß¾òkšÊKšr'–Â#–Æ³–r[&šf–>«–r£rj–¶c–r£¢†3–Ÿ¢3šf¿šfš&7šâ¦f“(€€€€€€€€€€ƒ¦;–:ïš¾?š²‡š&O¦Z/–rÃ–6¢Î¢¢+¦÷¦7–¾­‰…­É½Õ¹‘%µ…—¾ò3¦7–B (€€€€€€€€€€M…µÍÕ¹œ	É½İÍ•ËjÑÉ…¹Í™½É·â»šRû¢"™¥á•“¢3šf¿šr¢ãfóšb¢ÊÓ¦7æ«(€€€€€€€€€€ƒ>û–r£¦ÿ–7‡š?ú§jÍÑå±”µÕÑ…Ñ¥½»¾ò3nÓš:—šÊÿR¡MOâ÷¢š÷¢3šf¿(€€€€€€€€¨¼((€€€€€€€¥˜¡‰1…å•È¹ÍÑå±”¹‰…­É½Õ¹‘%µ…”¥ì(€€€€€€€€€€€‰1…å•È¹ÍÑå±”¹É•µ½Ù•AÉ½Á•ÉÑä ‰‰…­É½Õ¹µ¥µ…”ˆ¤ì(€€€€€€€ô((€€€ô()ô(((¼¨(€€ƒŠbƒšZÃ–Š{¾òkŞÓ–*–6–rÃ–6¢Î¢¢+–ö#ª_ŠSŠS¦î{šZ–¶\(€€ƒšf¢ãfó¾ò3¦†¿’ë¦g–/–rÃ–6jš«&§šâ–Z»¾ò0(€€ƒ’â›’úwŸn»–&7¶'ÒkšÆë–ºk3¦Ë–—7š2'¦"W¢÷’â7¢ô(€€ƒš2'¢Ş’âï–~;¦
+š&ç–ö#ª_–ÇR£–B3’â––\(€€€¹¡½µ”µ™•…ÑÕÉ”µµ½‘…³š¢–ò?(¨¼()™Õ¹Ñ¥½¸½Á•¹QÉ…¥¹¥¹i½¹•%¹™¼¡é½¹•-•ä¥ì((€€€½¹ÍĞ½¹™¥œô(€€€€€€€é½¹•½¹™¥mé½¹•-•åtì(((€€€½¹ÍĞµ½‘…°ô(€€€€€€€€ ‰ÑÉ…¥¹¥¹i½¹•5½‘…°ˆ¤ì((€€€½¹ÍĞÑ¥Ñ±•°ô(€€€€€€€€ ‰ÑÉ…¥¹¥¹i½¹•5½‘…±Q¥Ñ±”ˆ¤ì((€€€½¹ÍĞ‰½‘å°ô(€€€€€€€€ ‰ÑÉ…¥¹¥¹i½¹•5½‘…±	½‘äˆ¤ì(((€€€¥˜ (€€€€€€€€…½¹™¥œñğ(€€€€€€€€…µ½‘…°ñğ(€€€€€€€€…Ñ¥Ñ±•°ñğ(€€€€€€€€…‰½‘å°(€€€€¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€…ÁÁ±åQÉ…¥¹¥¹i½¹•	…­É½Õ¹ (€€€€€€€é½¹•-•ä(€€€€¤ì(((€€€Ñ¥Ñ±•°¹Ñ•áÑ½¹Ñ•¹Ğô(€€€€€€€½¹™¥œ¹Ñ¥Ñ±•ñğ‹–rÃ–6¢Î¢¢(ˆì(((€€€½¹ÍĞµ½¹ÍÑ•É1¥ÍÑ!Q50ô(€€€€€€€•Ñi½¹•5½¹ÍÑ•É1¥ÍÑ!Q50 (€€€€€€€€€€€é½¹•-•ä(€€€€€€€€¤ì(((€€€½¹ÍĞÕ¹±½­•ô((€€€€€€€Á±…å•È¹±•Ù•°øô(€€€€€€€½¹™¥œ¹É•ÅÕ¥É•‘1•Ù•°ì(((€€€‰½‘å°¹¥¹¹•É!Q50ô((€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÙÁàí½±½Èè˜ÁˆĞÈäíµ…É¥¸µ‰½ÑÑ½´èáÁàìˆøœ¬(€€€€€€€€¡½¹™¥œ¹±•Ù•±I…¹•ñğˆˆ¤¬(€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€œñ‘¥ØÍÑå±”ô‰™½¹ĞµÍ¥é”èÄÙÁàí±¥¹”µ¡•¥¡ĞèÄ¸äíµ…É¥¸µ‰½ÑÑ½´èÄÙÁàìˆøœ¬(€€€€€€€€ (€€€€€€€€€€€µ½¹ÍÑ•É1¥ÍÑ!Q51ñğ(€€€€€€€€€€€€œñÍÁ…¸ÍÑå±”ô‰½±½ÈèˆÍ„ÔáŒìˆû¾ò#–Âk‡š«&§¢ÎšZg¾ò$ğ½ÍÁ…¸øœ(€€€€€€€€¤¬(€€€€€€€€ˆğ½‘¥Øøˆ¬((€€€€€€€€œñ‘¥ØÍÑå±”ô‰‘¥ÍÁ±…äé™±•àí…ÀèáÁàìˆøœ¬((€€€€€€€€ (€€€€€€€€€€€Õ¹±½­•(€€€€€€€€€€€€ü(€€€€€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸‰ÍÑå±”ô‰™±•àèÄíÁ…‘‘¥¹œèÄÁÁà€ÄÉÁàí™½¹ĞµÍ¥é”èÄÙÁàíµ¥¸µ¡•¥¡ĞèĞÙÁàìˆœ¬(€€€€€€€€€€€€½¹±¥¬ô‰±½Í•QÉ…¥¹¥¹i½¹•%¹™¼ ¤í•¹Ñ•Éi½¹”¡pœœ¬(€€€€€€€€€€€é½¹•-•ä¬(€€€€€€€€€€€€pœ¤ìˆøœ¬(€€€€€€€€€€€€‹¦Ë–”ˆ¬(€€€€€€€€€€€€ˆğ½‰ÕÑÑ½¸øˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸‰ÍÑå±”ô‰™±•àèÄíÁ…‘‘¥¹œèÄÁÁà€ÄÉÁàí™½¹ĞµÍ¥é”èÄÙÁàíµ¥¸µ¡•¥¡ĞèĞÙÁàì‰‘¥Í…‰±•øœ¬(€€€€€€€€€€€€‹¦r¢š1Ø¸ˆ¬(€€€€€€€€€€€½¹™¥œ¹É•ÅÕ¥É•‘1•Ù•°¬(€€€€€€€€€€€€ˆğ½‰ÕÑÑ½¸øˆ(€€€€€€€€¤¬((€€€€€€€€œñ‰ÕÑÑ½¸±…ÍÌô‰¡½µ”µ™•…ÑÕÉ”µ‰Õäµ‰Ñ¸‰ÍÑå±”ô‰™±•àèÄíÁ…‘‘¥¹œèÄÁÁàìˆœ¬(€€€€€€€€½¹±¥¬ô‰±½Í•QÉ…¥¹¥¹i½¹•%¹™¼ ¤ìˆøœ¬(€€€€€€€€‹¢şS–nxˆ¬(€€€€€€€€ˆğ½‰ÕÑÑ½¸øˆ¬((€€€€€€€€ˆğ½‘¥Øøˆì(((€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€‰Í¡½Üˆ(€€€€¤ì()ô(()™Õ¹Ñ¥½¸±½Í•QÉ…¥¹¥¹i½¹•%¹™¼ ¥ì((€€€½¹ÍĞµ½‘…°ô(€€€€€€€€ ‰ÑÉ…¥¹¥¹i½¹•5½‘…°ˆ¤ì(((€€€¥˜¡µ½‘…°¥ì((€€€€€€€µ½‘…°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€‰Í¡½Üˆ(€€€€€€€€¤ì((€€€ô()ô(()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•5…ÁA…•!•…‘•È ¥ì((€€€½¹ÍĞµ…ÁA…•±•µ•¹Ğô(€€€€€€€€ ‰µ…ÁA…”ˆ¤ì(((€€€½¹ÍĞ¥Í5…ÁA…”ô((€€€€€€€µ…ÁA…•±•µ•¹Ğ€˜˜(€€€€€€€µ…ÁA…•±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹½¹Ñ…¥¹Ì (€€€€€€€€€€€€‰…Ñ¥Ù”ˆ(€€€€€€€€¤ì(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33’â7šb¿¦jÇ¢^?¾ò0(€€€€€€ƒšb¿šVÓ–/š.ÿš:'¾ò3’â7¢šVg’â–†+¦îG¢&Ë¦ëf÷7¾ò'¾òh(€€€€€€ƒ¦g¢‡–:šr³¢«–ŞÇ–ršÎW'¦.ó–¾¯’ê’â’î÷3’âï–~;šf(€€€€€€ƒ¦jÇ¢^?š¢g¦†3–"_7j¦
+?¢ò¿¾ò3–>«R¡‘¥ÍÁ±…äé¹½¹”(€€€€€€ƒ¢N/š:'–Ÿ–ºç¾ò3’ö¹½¹Ñ•¹Ó¦
+–†+–6–~–:šr³šb¼(€€€€€€ƒR¡Á½Í¥Ñ¥½¸é…‰Í½±ÕÑ”íÑ½ÀèØÉÁãº_––ô(€€€€€€ƒ3š&š:'š¢g¦†3–"_¦®c–ê›–ú37j’ö7ö»¾ò3š¢g¦†3–"\(€€€€€€ƒšÚ#–’Ç’ê¹½¹Ñ•¹ÓšÊKšr'¢Ş¢F_¢s’â+–:ï¾ò0(€€€€€€ƒš&7šr¦ë–ë’â–†(ØÉÁã¦®cj¦îG¢&Ë–6–~((€€€€€€ƒ–ú3’úfó>ùÍ¡½İA…” §¢‡–Û–¾›–ŞËÚOšr'’â––\(€€€€€€ƒ–º3šVÓš¶Šë¢fWB¦g’îÛ’ê/jš¦–"Ø(€€€€€€ƒ¾ò …ÁÃj¹¼µ¡•…‘•Ë¦g–-±…ÍÏ¾ò3šB·¦4(€€€€€€MOj¹½¹Ñ•¹ÑíÑ½ÀèÁ÷¾ò'¾ò3š.ÿš:'¦g¢„(€€€€€€ƒšVÓšº×¢«–ŞÇ–¾¯j¦
+?¢ò¿¾ò3šRçš"Cš*(‰¡½µ”‹¾ò<(€€€€€€€‰ÑÉ…¥¹¥¹œ‹–*ƒ¦ÉÍ¡½İA…” §¢‡j(€€€€€€¡¥‘•!•…‘•ÉA…•Ïšâ–Z»¾ò3nÓš:—R£>ûš"C(€€€€€€ƒš¶Šëjš¦–"Û¢fWB¾ò3’â7šr–7Vg’â/¦ëf÷–6–†+(€€€€¨¼(((€€€½¹ÍĞ¹…µ•°ô(€€€€€€€€ ‰Á±…å•É9…µ”ˆ¤ì((€€€½¹ÍĞ¥¹™½°ô(€€€€€€€€ ‰Á±…å•É!•…‘•É%¹™¼ˆ¤ì((€€€½¹ÍĞé½¹•°ô(€€€€€€€€ ‰µ…Á!•…‘•Éi½¹•9…µ”ˆ¤ì((€€€½¹ÍĞµ½¹ÍÑ•É%¹™½°ô(€€€€€€€€ ‰µ…Á!•…‘•É5½¹ÍÑ•É%¹™¼ˆ¤ì(((€€€¥˜¡¹…µ•°¥ì((€€€€€€€¹…µ•°¹ÍÑå±”¹‘¥ÍÁ±…äô((€€€€€€€€€€€¥Í5…ÁA…”(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰¹½¹”ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆˆì((€€€ô(((€€€¥˜¡¥¹™½°¥ì((€€€€€€€¥¹™½°¹ÍÑå±”¹‘¥ÍÁ±…äô((€€€€€€€€€€€¥Í5…ÁA…”(€€€€€€€€€€€€ü(€€€€€€€€€€€€‰¹½¹”ˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€ˆˆì((€€€ô(((€€€¥˜¡é½¹•°¥ì((€€€€€€€é½¹•°¹ÍÑå±”¹‘¥ÍÁ±…äô((€€€€€€€€€€€¥Í5…ÁA…”(€€€€€€€€€€€€ü(€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€è(€€€€€€€€€€€€‰¹½¹”ˆì((€€€ô(((€€€¥˜¡µ½¹ÍÑ•É%¹™½°¥ì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33¢^7¢&Ëš†(€€€€€€€€€€ƒ–Û’î[¦÷’â7¢š7¾ò'¾òk¦g–/–ºç–f £¶'Òk¾–r4(€€€€€€€€€€ƒ¦
+¢†0§’â7º‡–r£’â7–r£–rÃ–r[¦‚¦v‹¾ò3’â–ú,(€€€€€€€€€€ƒ¦jÇ¢^?¾ò3–>«Vg–rÃ–r[–B7¢Ç¦
+’â¢†3(€€€€€€€€¨¼((€€€€€€€µ½¹ÍÑ•É%¹™½°¹ÍÑå±”¹‘¥ÍÁ±…äô(€€€€€€€€€€€€‰¹½¹”ˆì((€€€ô(((€€€¥˜ …¥Í5…ÁA…”¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€½¹ÍĞ½¹™¥œô((€€€€€€€é½¹•½¹™¥mÕÉÉ•¹Ñi½¹•t(€€€€€€€ñğ(€€€€€€€é½¹•½¹™¥œ¹™½É•ÍĞì(((€€€¥˜¡é½¹•°¥ì((€€€€€€€€¼¨(€€€€€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33’â+¦vˆ(€€€€€€€€€€ƒ¢^7¢&Ëš†–>«Vg–rÃ–r[–B7–¶_–no–/–¶_¾ò3–Û’îX(€€€€€€€€€€ƒ¦÷’â7¢š7¾ò'¾òh(€€€€€€€€€€½¹™¥œ¹Ñ¥Ñ±—šr³¢ê¯–âÛ¢F]•µ½©§–&7ÚĞ(€€€€€€€€€€ƒ¾ò#’ú/–š‹ŠnÃ¾â<ƒ–Ş£6ã¢6K–:|‹¾ò'¾ò3¦g¢‡R (€€€€€€€€€€ƒš¶¢š?¢†£¦S–ò?–:ïš:'¦Z/¦‚·j•µ½©§¢Ş|(€€€€€€€€€€ƒ¦ëf÷¾ò3–>«Vg’â/ÒS’â·šZ–rÃ–r[–B7¢Ç(€€€€€€€€€€ƒ’æ’â7–7¢«–ŞÇ–*€‹Â~^ë¾â<€‹¦g–/–&7ÚÓ(€€€€€€€€¨¼((€€€€€€€é½¹•°¹Ñ•áÑ½¹Ñ•¹Ğô((€€€€€€€€€€€€¡½¹™¥œ¹Ñ¥Ñ±•ñğˆˆ¤(€€€€€€€€€€€€¹É•Á±…” (€€€€€€€€€€€€€€€€½yqL­qÌ¨¼°(€€€€€€€€€€€€€€€€ˆˆ(€€€€€€€€€€€€¤ì((€€€ô(((€€€€¼¨(€€€€€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33¢^7¢&Ëš†(€€€€€€ƒ–Û’î[¦÷’â7¢š73š¦c¢&Ë¦£–"–>¿’î—š.ÿš:'7¾ò'¾òh(€€€€€€ƒ¶'Òk¾–r7šZ–¶_š«&§šâ–Z»š†¾ò3–§–/¦ô(€€€€€€ƒšVÓ–/’â7–7¦†¿’ëŠSŠQµ…Á!•…‘•É5½¹ÍÑ•É%¹™¼(€€€€€€ƒ¦g–/–’[–Æ“–ºç–f£šr³’ú–ÂÇ–r£’â+¦v‹j¥Í5…ÁA…”(€€€€€€ƒ–"“šZß–ò?¢‡¢Š¯¢¢·š"C’â–ºk¦jÇ¢^<(€€€€€€ƒ¾ò!‘¥ÍÁ±…äé¹½¹—¾ò'¾ò3¦g¢‡’â7R£–7¢fWB¾òl(€€€€€€ƒš«&§šâ–Z»š†¾ò!µ…Á5½¹ÍÑ•É1¥ÍÑ	½ã¾ò$(€€€€€€ƒj–Ÿ–ºç’æ’â7R£–7R‹R¾ò3nÓš:—’â7–¾¯–—(€€€€¨¼()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒšnÓšZÁU$(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•U$ ¥ì((€€€ÕÁ‘…Ñ•!½µ•Q•ÍÑQ½½±Ì ¤ì((€€€€¼¨(€€€€€€ƒŠbƒš¾?š²‡šnÓšZÃV¯¦v‹šf¾ò3¦‚’úÿšª‹š~—’âš²„(€€€€€€ƒ¢6Kšòƒ–rÃ–âÛj¢¦:[.š/¢š’â7¢ššnÓšZÀ(€€€€€€ƒ¾ò#:§–ºÛ–6Òk¢Ş£¦91Ø¸ÄÇ¦
+’â–"ï¾ò0(€€€€€€ƒŞÓ–*–6–"_¢†£¢š®/–"ï–>7šbƒ–ë’ú¾ò0(€€€€€€ƒ’â7R£&ç–rÃ¢ŞÏ¦‚š&7šnÓšZÃ¾ò'(€€€€¨¼((€€€ÕÁ‘…Ñ•QÉ…¥¹¥¹i½¹•1½­Ì ¤ì((€€€ÕÁ‘…Ñ•M•½¹‘¡…É…Ñ•É	…¹¹•È ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3’âï–~;¦G–æŒ(€€€€€€ƒ¦†¿’ë¾ò'¾òk¦G–æšb¿–ÇR£¢ÎšêC¾ò3’îï’öWšf–d(€€€€€€ƒ¦÷–>¿¢÷¢º+–.W¾ò#¢Î¢w–
+g¦‚c’îï–.d¿š"C–ÂÄ(€€€€€€ƒ6;–.×–V–ê_šÚ#¢Êï¾ò'¾ò1ÕÁ‘…Ñ•U$ §šr³’ú(€€€€€€ƒ–ÂÇšr–r£–ú#–’kšfš¦¦î{¢Š¯–Fó–>¯¾ò3’â¢ÖßšnÓšZÀ(€€€€€€ƒšr–Z»ÒS¾ò3’â7R£–>›–’[š&û–rÃšZç¦7¢’–"“šZß(€€€€¨¼((€€€ÕÁ‘…Ñ•½±‘¥ÍÁ±…ä ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òk–rÃ–r[’â+:§–ºÛ–6‡&j–B7–¶\¿¶'Òh(€€€€€€ƒ¾ò#–2–B¯¢Ş¦j£šZç–†+¾ò'¢š¢Ş¢F_–B3š¶—šnÓšZÃ¾ò0(€€€€€€ƒ’â7Û–6Òk’æ/–ú3–rÃ–r[’â+¦†¿’ëj¦
+šb¿¢"+¶'Òk(€€€€¨¼((€€€ÕÁ‘…Ñ•5…ÁA±…å•É…É ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òk–Ş‡¦
+?¦‚¦v‹š¢g¦†3–"_jš«&§¢Î¢¢((€€€€€€ƒ¾ò#–B7¢Ä¿–Æ³šœ¿¢†¦<¿šV?š6ß¾ò'šr¦j£¢F_š"Ã¦²”(€€€€€€ƒ¦Ë¢†3¢º+–2[¾ò#š&Oš¶ï’â¦jïš>o’â/’â¦jï(€€€€€€ƒ¢†¦?šâo–ÂG¾ò'¾ò1ÕÁ‘…Ñ•U$ §šr³’ú–ÂÇšr–r (€€€€€€ƒ–ú#–’kšfš¦¢Š¯–Fó–>¯¾ò3’â¢ÖßšnÓšZÃ¾ò0(€€€€€€ƒ’â7R£–>›–’[š&û–rÃšZç¦7¢’–"“šZß(€€€€¨¼((€€€ÕÁ‘…Ñ•5…ÁA…•!•…‘•È ¤ì(((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾òkš"Ã¦²—’âµMC¢º+–2[¾ò#R£’êš*¢÷–Zw’ê¢^—šÂÓ¾ò$(€€€€€€ƒ¢š–6Ïšf–>7šbƒ–r£š*¢÷–ş¯š6ß–"_j–>¿R£.š/’â+¾ò0(€€€€€€ƒ’â7ÙMCš&–"Ã’â7–’ƒ’ê¾ò3š2'¦"W–6ï¦
+’ê»¢F_¢÷¦î{(€€€€¨¼((€€€¥˜¡‰…ÑÑ±•Ñ¥Ù”¥ì((€€€€€€€Á½ÁÕ±…Ñ•M­¥±±EÕ¥­	…È ¤ì((€€€ô(((€€€½¹ÍĞÍÑ…ÑÌ€ô(€€€€€€€•Ñ5…¥¹¡…É…Ñ•ÉMÑ…ÑÌ ¤ì(((€€€€¼¨(€€€€€€ƒ–ššzs¢w–
+gš"[¢÷–*ošRç¢º+¾ò0(€€€€€€!@½MC’â+¦fC¢º+–2[šf’â7¢š¢Ú–ë’â+¦fC(€€€€¨¼((€€€Á±…å•È¹¡À€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€À°(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€Á±…å•È¹¡À°(€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹µ…á!@(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€Á±…å•È¹ÍÀ€ô(€€€€€€€5…Ñ ¹µ…à (€€€€€€€€€€€€À°(€€€€€€€€€€€5…Ñ ¹µ¥¸ (€€€€€€€€€€€€€€€Á±…å•È¹ÍÀ°(€€€€€€€€€€€€€€€ÍÑ…ÑÌ¹µ…áM@(€€€€€€€€€€€€¤(€€€€€€€€¤ì(((€€€€ ‰Á±…å•É1•Ù•°ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€Á±…å•È¹±•Ù•°ì(((€€€€ ‰¡•…‘•É!@ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€Á±…å•È¹¡Àì(((€€€€ ‰¡•…‘•ÉM@ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€Á±…å•È¹ÍÀì(((€€€€¼¨(€€€€€€ƒŠbƒ’úwŸ:§–ºÛ¢ššÆ¾ò3’âï–~;¦š[¦‚j–º3šVÓ–Æ³šŸ–"_¢† (€€€€€€ƒ¾ò#šr–’!@½MC–·–r7¦bËš›–6Òk¦Ë–ê›¾ò$(€€€€€€ƒšVÓ–/š.ÿš:'’ê¾ò3¦g’êo¢Î¢¢+–r£3.š/7¦‚šr³’ú–ÂÇšr'¾ò0(€€€€€€ƒ¦š[¦‚¦7¢’¦†¿’ëšb¿–’k¦’cj¦ns¢¢+(€€€€€€ƒ¦g¢‡–:šr³–¾¯Ö˜€¡½µ•!@ƒ¶'–Òƒj¦
+’êo¢†3’æ’â’ö×ï¦f“¾ò0(€€€€€€ƒ’â7Û–Òƒ’â7–¶c–r£’ê¾ò3æóê3–¾¯–—šrnÓš:—–fÓ¦2¿¾ò0(€€€€€€ƒ–Â;¢ÑÕÁ‘…Ñ•U$ §–ú3¦v‹jšvÇ¢–ÿ–£¦£’â7šr–~ß¢†3(€€€€¨¼(((€€€¥˜ (€€€€€€€€ ‰¥Ñ•µ5•¹Ôˆ¤€˜˜(€€€€€€€€ ‰¥Ñ•µ5•¹Ôˆ¤¹±…ÍÍ1¥ÍĞ¹½¹Ñ…¥¹Ì ‰Í¡½Üˆ¤(€€€€¥ì(€€€€€€€É•¹‘•É	…ÑÑ±•A½Ñ¥½¹5•¹Ô ¤ì(€€€ô(((€€€€ ‰Í­¥±±A½¥¹ÑÌˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô((€€€€€€€€ (€€€€€€€€€€€•ÑM­¥±±¡…É…Ñ•É=‰©•Ğ (€€€€€€€€€€€€€€€ÕÉÉ•¹ÑM­¥±±¡…É…Ñ•È(€€€€€€€€€€€€¥ñğ(€€€€€€€€€€€Á±…å•È(€€€€€€€€¤¹Í­¥±±A½¥¹ÑÌì(((€€€€¼¨(€€€€€€ƒÚO¦¦_šÆƒ¦†¿’è(€€€€¨¼((€€€€ ‰Í¡…É•‘áÁY…±Õ”ˆ¤(€€€€€€€€¹Ñ•áÑ½¹Ñ•¹Ğ€ô(€€€€€€€5…Ñ ¹µ…à À±5…Ñ ¹™±½½È¡9Õµ‰•È¡Í¡…É•‘áÀ¥ñğÀ¤¤(€€€€€€€€€€€€¹Ñ½1½…±•MÑÉ¥¹œ ‰é µQ\ˆ¤ì(((€€€É•¹‘•ÉáÁ¥ÍÑÉ¥‰ÕÑ•1¥ÍĞ ¤ì(((€€€€¼¨(€€€€€€ƒ.š/¦‚(€€€€¨¼((€€€ÕÁ‘…Ñ•MÑ…ÑÕÍAÉ•Ù¥•Ü ¤ì(((€€€€¼¨(€€€€€€ƒš"Ã¦²—’â·j¢†šŠt(€€€€¨¼((€€€¥˜¡‰…ÑÑ±•Ñ¥Ù”¥ì((€€€€€€€ÕÉÉ•¹Ñ	…ÑÑ±•5½¹ÍÑ•ÉÌ(€€€€€€€€¹™½É…  (€€€€€€€€€€€¥¹‘•àôùì(€€€€€€€€€€€€€€€ÕÁ‘…Ñ•5½¹ÍÑ•ÉU$ (€€€€€€€€€€€€€€€€€€€¥¹‘•à(€€€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€ô(€€€€€€€€¤ì(((€€€€€€€ÕÁ‘…Ñ•	…ÑÑ±•A±…å•É	…ÉÌ ¤ì((€€€€€€€½¹ÍĞ‰½ÍÍAÉ•Í•¹Ñ…Ñ¥½¹=İ¹•ÈõÑåÁ•½˜İ¥¹‘½Ü„ôô‰Õ¹‘•™¥¹•ˆıİ¥¹‘½Ü¹½ÕÉMåµ‰½±Í	½ÍÍ	…ÑÑ±”é¹Õ±°ì(€€€€€€€¥˜¡‰½ÍÍAÉ•Í•¹Ñ…Ñ¥½¹=İ¹•È˜™ÑåÁ•½˜‰½ÍÍAÉ•Í•¹Ñ…Ñ¥½¹=İ¹•È¹Íå¹!Õôôô‰™Õ¹Ñ¥½¸ˆ¥ì(€€€€€€€€€€€‰½ÍÍAÉ•Í•¹Ñ…Ñ¥½¹=İ¹•È¹Íå¹!Õ ¤ì(€€€€€€€ô((€€€ô()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒŠbƒ¢«–.W–¶cšªP((€€ƒ¦f“’ê–:šr³–r£&ç–ºk–.W’ös¦î{¾ò#–6Òk¢w–
+gš"Ã¦²—–.w–"§Š›¾ò$(€€ƒšr–¶cšªS’æ/–’[¾ò3¦g¢‡–7–*ƒ–§–Æ“’şw¦j«¾òh((€€€Ä¸ƒš¾<€ÈÀƒK–ºkšf¢«–.W–¶c’âš²‡¾ò0(€€€€€ƒ’â›–r£V¯¦v‹–>Ï’â/¢K~·šj¯¦†¿’ë3Â~Jøƒ–ŞË¢«–.W–¶cšªS7¾ò0(€€€€€ƒ¢ºO:§–ºÛ~—¦Orjšr'–r£–¶c¾ò3’â7šb¿šG¦ëšRû–ş((€€€È¸ƒ–"–"Ã¢3šf¿¾ò#–"ÁÃ–"–"¦‚¢z‹–æW¦:[–ºk¾ò$(€€€€€ƒjVÛ’â/®/–"ï–¶c’âš²‡¾ò0(€€€€€ƒ¦gšb¿šr–ºçšbOšò?š:'¦Ë–ê›jššÎŠSŠP(€€€€€ƒ:§–ºÛ–ú#–>¿¢÷ªÛ¢Š¯¦nï¢¦Çš&OšZß(€€€€€ƒš"[nÓš:—–"–ë–:ï–ny1%9¾ò0(€€€€€ƒ¦gšf–g’â7¢÷–>«¦v€ÈÃKj–ºkšf–f£((€€ƒ–§¢»ššÎ¦÷–Fó–>¯–B3’â–,…ÕÑ½M…Ù•9½Ü §¾ò0(€€ƒ–Ÿ¦£šr³¢ê¯šr%ÑÉä½…Ñ£¾ò0(€€ƒ–¶cšªS–’ÇšV_’â7šr¢ºO¦+š"ËVÛš:'¾ò0(€€ƒ–>«šr–r¡½¹Í½±—Vg’â/¦2¿¢ª“¢¢+š¿šZç’úÿ’æ/–ú3¦f“¦2¿(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()±•Ğ…ÕÑ½Í…Ù•%¹‘¥…Ñ½ÉQ¥µ•Èõ¹Õ±°ì()±•Ğ…ÕÑ½Í…Ù•%¹Ñ•ÉÙ…±%õ¹Õ±°ì(()™Õ¹Ñ¥½¸¥Í…µ•MÑ…ÉÑ• ¥ì((€€€É•ÑÕÉ¸€„„ (€€€€€€€Á±…å•È€˜˜(€€€€€€€Á±…å•È¹¥(€€€€¤ì()ô(()™Õ¹Ñ¥½¸Í¡½İÕÑ½Í…Ù•%¹‘¥…Ñ½È ¥ì((€€€½¹ÍĞ•°€ô(€€€€€€€€ ‰…ÕÑ½Í…Ù•%¹‘¥…Ñ½Èˆ¤ì(((€€€¥˜ …•°¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€•°¹±…ÍÍ1¥ÍĞ¹…‘ (€€€€€€€€‰Í¡½Üˆ(€€€€¤ì(((€€€±•…ÉQ¥µ•½ÕĞ (€€€€€€€…ÕÑ½Í…Ù•%¹‘¥…Ñ½ÉQ¥µ•È(€€€€¤ì(((€€€…ÕÑ½Í…Ù•%¹‘¥…Ñ½ÉQ¥µ•È€ô(€€€€€€€Í•ÑQ¥µ•½ÕĞ  ¤ôùì((€€€€€€€€€€€•°¹±…ÍÍ1¥ÍĞ¹É•µ½Ù” (€€€€€€€€€€€€€€€€‰Í¡½Üˆ(€€€€€€€€€€€€¤ì((€€€€€€€ô°ÄØÀÀ¤ì()ô(()™Õ¹Ñ¥½¸…ÕÑ½M…Ù•9½Ü¡Í¡½İ%¹‘¥…Ñ½È¥ì((€€€¥˜ …¥Í…µ•MÑ…ÉÑ• ¤¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€ÑÉåì((€€€€€€€Í…Ù•…µ” ¤ì(((€€€€€€€¥˜¡Í¡½İ%¹‘¥…Ñ½È¥ì((€€€€€€€€€€€Í¡½İÕÑ½Í…Ù•%¹‘¥…Ñ½È ¤ì((€€€€€€€ô((€€€ô(€€€…Ñ ¡•ÉÉ½È¥ì((€€€€€€€½¹Í½±”¹•ÉÉ½È (€€€€€€€€€€€€‹¢«–.W–¶cšªS–’ÇšV_¾òhˆ°(€€€€€€€€€€€•ÉÉ½È(€€€€€€€€¤ì((€€€ô()ô(()™Õ¹Ñ¥½¸ÍÑ…ÉÑÕÑ½M…Ù” ¥ì((€€€¥˜¡…ÕÑ½Í…Ù•%¹Ñ•ÉÙ…±%¥ì((€€€€€€€±•…É%¹Ñ•ÉÙ…° (€€€€€€€€€€€…ÕÑ½Í…Ù•%¹Ñ•ÉÙ…±%(€€€€€€€€¤ì((€€€ô(((€€€€¼¨(€€€€€€ƒš¾<ÈÃK–ºkšf–¶cšªS¾ò0(€€€€€€ƒ–>«šr'rš¶¦Z/–/¦+š"Ë¾ò#–ŞË–&×¢K¾ò'š&7šr–¾›¦jo–¾¯–—¾ò0(€€€€€€ƒ¦
+–r£–&×¢KV¯¦v‹šf¦g¢‡šrnÓš:—¢ŞÏ¦;(€€€€¨¼((€€€…ÕÑ½Í…Ù•%¹Ñ•ÉÙ…±%€ô(€€€€€€€Í•Ñ%¹Ñ•ÉÙ…°  ¤ôùì((€€€€€€€€€€€…ÕÑ½M…Ù•9½Ü¡ÑÉÕ”¤ì((€€€€€€€ô°ÈÀÀÀÀ¤ì(((€€€€¼¨(€€€€€€ƒ–"–"Ã¢3šf¿¾ò?–"–"¦‚šf®/–"ï–¶c’âš²‡(€€€€€€ƒ’â7¦†¿’ëš>C’ë¾ò3–nƒ
+ëV¯¦v‹¦gšf–d(€€€€€€ƒ:§–ºÛ¦k–âã–ŞËÚOr/’â7–"Ã’ê(€€€€¨¼((€€€‘½Õµ•¹Ğ¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È (€€€€€€€€‰Ù¥Í¥‰¥±¥Ñå¡…¹”ˆ°(€€€€€€€€ ¤ôùì((€€€€€€€€€€€¥˜¡‘½Õµ•¹Ğ¹¡¥‘‘•¸¥ì((€€€€€€€€€€€€€€€…ÕÑ½M…Ù•9½Ü¡™…±Í”¤ì(((€€€€€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢–n{–‚Ç¾ò0(€€€€€€€€€€€€€€€€€€ƒ3–"–"Ã¢3šf¿–7–"–n{’ú–"Ã–êWšr'šÊKšr$(€€€€€€€€€€€€€€€€€€ƒº_¦n‹ŞkÚO¦¦_7¾ò'¾òk–"–"Ã¢3šf¿j(€€€€€€€€€€€€€€€€€€ƒVÛ’â/¾ò3¢¢c¦2¦g–/šf¦ZO¦î{¾ò3¶$(€€€€€€€€€€€€€€€€€€ƒ–"–n{–&7šf¿šfš&7~—¦O¢š–ú{¦g¢„(€€€€€€€€€€€€€€€€€€ƒ¦Z/–/º_3¦n‹¦Z/’ê–’k’æ7(€€€€€€€€€€€€€€€€¨¼((€€€€€€€€€€€€€€€±…ÍÑ=™™±¥¹•¡•­Q¥µ•ÍÑ…µÀô(€€€€€€€€€€€€€€€€€€€…Ñ”¹¹½Ü ¤ì((€€€€€€€€€€€ô(€€€€€€€€€€€•±Í•ì((€€€€€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€€€€€ƒŠbƒšZÃ–Š{¾òk–"–n{–&7šf¿šf¾ò3R£–&o–&l(€€€€€€€€€€€€€€€€€€ƒ–"–"Ã¢3šf¿¢¢c¦2jšf¦ZO¦î{¾ò3º_–è(€€€€€€€€€€€€€€€€€€ƒ¦gšº×¦n‹Şkšf¦ZO–Â7š'j¦n‹ŞkÚO¦¦_ŠSŠP(€€€€€€€€€€€€€€€€€€ƒ¦gš¢’â7R£šVÓ–/¦7šZÃšVÓB¦‚¦v‹(€€€€€€€€€€€€€€€€€€ƒ–Z»ÒS–"¢3šf¿–7–"–n{’ú–ÂÇšrrj(€€€€€€€€€€€€€€€€€€ƒº_–"Ã¾ò3–n{¶S’ê’öÿR£¢jZG–V?(€€€€€€€€€€€€€€€€¨¼((€€€€€€€€€€€€€€€…±Õ±…Ñ•=™™±¥¹•áÁM¥¹” (€€€€€€€€€€€€€€€€€€€±…ÍÑ=™™±¥¹•¡•­Q¥µ•ÍÑ…µÀ(€€€€€€€€€€€€€€€€¤ì((€€€€€€€€€€€€€€€±…ÍÑ=™™±¥¹•¡•­Q¥µ•ÍÑ…µÀô(€€€€€€€€€€€€€€€€€€€…Ñ”¹¹½Ü ¤ì(((€€€€€€€€€€€€€€€€¼¨(€€€€€€€€€€€€€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò3–b_¢¦›¢fWB(€€€€€€€€€€€€€€€€€€ƒ3â»–Â?¢š[ª\¿–"–"Ã¢3šf¿–7š&O¦Z/šr–6‡’ö?4(€€€€€€€€€€€€€€€€€€ƒj–V?¦†3¾ò'¾òh(€€€€€€€€€€€€€€€€€€ƒ’æ/–&7¦g¢‡–>«¢fWB’ê3–"–ë–:ï7j(€€€€€€€€€€€€€€€€€€ƒ¦
+’â–6+¾ò#–¶cšªS¾ò'¾ò3–º3–£šÊKšr'¢fWB(€€€€€€€€€€€€€€€€€€ƒ3–"–n{’ú7¢¦Ëš;¦êóš‹–ú§ŠSŠSš&/š¦?¢š÷–f (€€€€€€€€€€€€€€€€€€ƒ–r£¢3šf¿šfšr–’Ÿ–æ¦f7’ö;Rk¢Ïšj¯–s¢¢#šf–f (€€€€€€€€€€€€€€€€€€ƒj–~ß¢†3¦–ê›¾ò3–n{–"Ã–&7šf¿jšf–g¾ò0(€€€€€€€€€€€€€€€€€€ƒ¦+š"Ë–Ÿ¦£j–n{–B#¢¢#šf–f£(€€€€€€€€€€€€€€€€€€Í•ÑQ¥µ•½ÕÓš:K¢/–ú#–>¿¢÷–ŞËÚO¢Ş|(€€€€€€€€€€€€€€€€€€ƒ–¾›¦joÚO¦;jšf¦ZO–Â7’â7’â+¾ò3¢º+š"C–6‡’ö<(€€€€€€€€€€€€€€€€€€ƒ’â7–.Wjš¢–¶C((€€€€€€€€€€€€€€€€€€ƒ¦g¢‡šÊK¢ú›šÎW’şw¢¶$ÄÀÀ—’ş»––÷š¾?’â¢¸(€€€€€€€€€€€€€€€€€€ƒ–6‡’ö?jššÎ¾ò#¢3šf¿¦fC–"Ûšb¿?¢š÷–f (€€€€€€€€€€€€€€€€€€ƒ–Æ“Òkj¾ò3šr³’ú–ÂÇšr'’êo.šÎšÊK¢ú›šÎT(€€€€€€€€€€€€€€€€€€ƒ–º3–£¦ÿ–7¾ò'¾ò3’ö¢Ï–ÂG–k’ê’â–,(€€€€€€€€€€€€€€€€€€ƒ–B#Bj¢sšVG¾òk–n{–"Ã–&7šf¿šf¾ò3–ššzp(€€€€€€€€€€€€€€€€€€ƒš"Ã¦²—¦
+–r£¦Ë¢†3¢ò«–"Ã¦r¢š:§–ºÛ¢«–ŞÄ(€€€€€€€€€€€€€€€€€€ƒ¦ãšNj¢K¢&Ë¾ò3¦7šZÃšVÓB’âš²‡–KšVã¢¢#šf(€€€€€€€€€€€€€€€€€€ƒ¾ò#Ö›’â–/–£šZÃjÈÃK¾ò3¢3’â7šb¿–îÛê0(€€€€€€€€€€€€€€€€€€ƒ’â–/–>¿¢÷–ŞËÚO–r£¢3šf¿¢ŞG–º3j¢"+–KšVã¾ò'¾ò0(€€€€€€€€€€€€€€€€€€ƒ’â›’âS¦7šZÃšVÓB’âš²‡V¯¦v‹¦†¿’ë¾ò0(€€€€€€€€€€€€€€€€€€ƒ¦f7’ö;–6‡’ö?jš¦:(€€€€€€€€€€€€€€€€¨¼((€€€€€€€€€€€€€€€¥˜ (€€€€€€€€€€€€€€€€€€€‰…ÑÑ±•Ñ¥Ù”€˜˜(€€€€€€€€€€€€€€€€€€€‰…ÑÑ±•A¡…Í”ôôô(€€€€€€€€€€€€€€€€€€€€‰‘•±…É”ˆ(€€€€€€€€€€€€€€€€¥ì((€€€€€€€€€€€€€€€€€€€½¹ÍĞ…ÕÑ½=¸ô(€€€€€€€€€€€€€€€€€€€€€€€…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•àôôôÀ(€€€€€€€€€€€€€€€€€€€€€€€€ü…ÕÑ½	…ÑÑ±”(€€€€€€€€€€€€€€€€€€€€€€€€è•ÑA…ÉÑåÕÑ½½¹™¥œ¡…Ñ¥Ù•	…ÑÑ±•¡…É…Ñ•É%¹‘•à¤¹•¹…‰±•ì(((€€€€€€€€€€€€€€€€€€€¥˜ ……ÕÑ½=¸¥ì((€€€€€€€€€€€€€€€€€€€€€€€Ñ¥µ•ÈôÈÀì((€€€€€€€€€€€€€€€€€€€€€€€ÕÁ‘…Ñ•Q¥µ•È ¤ì((€€€€€€€€€€€€€€€€€€€ô((€€€€€€€€€€€€€€€ô(((€€€€€€€€€€€€€€€¥˜¡‰…ÑÑ±•Ñ¥Ù”¥ì((€€€€€€€€€€€€€€€€€€€ÕÁ‘…Ñ•U$ ¤ì((€€€€€€€€€€€€€€€ô((€€€€€€€€€€€ô((€€€€€€€ô(€€€€¤ì(((€€€€¼¨(€€€€€€ƒ¦^s¦Z'–"¦‚¾ò?¦7šZÃšVÓB–&7n‡¦?–¶c’âš²‡(€€€€€€ƒš&/š¦?¢š÷–f£’â7’â–ºkšrŠë–¾›¢ãfó¦g–/’ê/’îÛ¾ò0(€€€€€€ƒ’ö–*ƒ’ê–º3–£‡–ºÏ¾ò3–’k’â–Æ“’şw¦j«(€€€€¨¼((€€€İ¥¹‘½Ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È (€€€€€€€€‰‰•™½É•Õ¹±½…ˆ°(€€€€€€€€ ¤ôùì((€€€€€€€€€€€…ÕÑ½M…Ù•9½Ü¡™…±Í”¤ì((€€€€€€€ô(€€€€¤ì()ô(((¼¨€ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô(€€ƒ–"w–/–2X(ôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôôô€¨¼()ÑÉåì((€€€É•‰Õ¥±‘%¹Ù•¹Ñ½ÉåM±½ÑÌ ¤ì((€€€ÕÁ‘…Ñ•É•…Ñ¥½¹U$ ¤ì((€€€É•¹‘•ÉM­¥±±1½…‘½ÕĞ ¤ì((€€€É•¹‘•É%¹Ù•¹Ñ½Éä ¤ì((€€€ÕÁ‘…Ñ•A±…å•É!•…‘•È ¤ì((€€€ÕÁ‘…Ñ•U$ ¤ì()ô)…Ñ ¡•ÉÉ½È¥ì((€€€½¹Í½±”¹•ÉÉ½È (€€€€€€€€‹¦+š"Ë–"w–/–2[fóR¦2¿¢ª“¾òhˆ°(€€€€€€€•ÉÉ½È(€€€€¤ì()ô(((¼¨5½‰¥±”¡…É‘İ…É”½‰É½İÍ•È	…¬Õ…É¸Q¡”™¥ÉÍĞ	…¬ÁÉ•ÍÌ…Í­Ì™½È(€€½¹™¥Éµ…Ñ¥½¸ì½¹™¥Éµ¥¹œÁ•É™½ÉµÌÑ¡”É•…°¹…Ù¥…Ñ¥½¸°…¹•±±¥¹œ­••ÁÌ(€€Ñ¡”Á±…å•È¥¸Ñ¡”…µ”¸€¨¼(¡™Õ¹Ñ¥½¸¥¹ÍÑ…±±5½‰¥±•	…­½¹™¥Éµ…Ñ¥½¸ ¥ì((€€€±•Ğ…±±½İ¥¹á¥Ğõ™…±Í”ì(€€€±•Ğ•á¥ÑAÉ½µÁÑ=Á•¸õ™…±Í”ì((€€€İ¥¹‘½Ü¹…±±½İ…µ•9…Ù¥…Ñ¥½¸ô ¤ôùì(€€€€€€€…±±½İ¥¹á¥ĞõÑÉÕ”ì(€€€ôì((€€€ÑÉåì(€€€€€€€¡¥ÍÑ½Éä¹ÁÕÍ¡MÑ…Ñ”¡íÉÁá¥ÑÕ…ÉéÑÉÕ•ô°ˆˆ±±½…Ñ¥½¸¹¡É•˜¤ì(€€€ô(€€€…Ñ ¡•ÉÉ½È¥ì(€€€€€€€½¹Í½±”¹İ…É¸ ‹‡šÎW–îë®/¢şS–n{¦bË–FÒ¦2¾òhˆ±•ÉÉ½È¤ì(€€€ô((€€€İ¥¹‘½Ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰Á½ÁÍÑ…Ñ”ˆ±…Íå¹Œ ¤ôùì(€€€€€€€¥˜¡…±±½İ¥¹á¥Ğ¥ìÉ•ÑÕÉ¸ìô((€€€€€€€€¼¨9…Ñ¥Ù”½¹™¥É´ÕÍ•Ñ¼‰±½¬‰É½İÍ•È¡¥ÍÑ½Éäİ¡¥±”¥Ğİ…Ì½Á•¸¸(€€€€€€€€€€Q¡”IA‘¥…±½œ¥Ì…Íå¹¡É½¹½ÕÌ°Í¼¥µµ•‘¥…Ñ•±äÉ•ÍÑ½É”„Õ…É(€€€€€€€€€€•¹ÑÉä‰•™½É”…İ…¥Ñ¥¹œÑ¡”Á±…å•ÈÌ¡½¥”¸€¨¼(€€€€€€€±•ĞÕ…É‘I•ÍÑ½É•õ™…±Í”ì(€€€€€€€ÑÉåì(€€€€€€€€€€€¡¥ÍÑ½Éä¹ÁÕÍ¡MÑ…Ñ”¡íÉÁá¥ÑÕ…ÉéÑÉÕ•ô°ˆˆ±±½…Ñ¥½¸¹¡É•˜¤ì(€€€€€€€€€€€Õ…É‘I•ÍÑ½É•õÑÉÕ”ì(€€€€€€€õ…Ñ ¡|¥ìô((€€€€€€€¥˜ (€€€€€€€€€€€İ¥¹‘½Ü¹½ÕÉMåµ‰½±ÍI•±•…Í•UÁ‘…Ñ”˜˜(€€€€€€€€€€€ÑåÁ•½˜İ¥¹‘½Ü¹½ÕÉMåµ‰½±ÍI•±•…Í•UÁ‘…Ñ”¹¥Í½É•‘UÁ‘…Ñ•	±½­¥¹œôôô‰™Õ¹Ñ¥½¸ˆ˜˜(€€€€€€€€€€€İ¥¹‘½Ü¹½ÕÉMåµ‰½±ÍI•±•…Í•UÁ‘…Ñ”¹¥Í½É•‘UÁ‘…Ñ•	±½­¥¹œ ¤(€€€€€€€€¥ì(€€€€€€€€€€€İ¥¹‘½Ü¹½ÕÉMåµ‰½±ÍI•±•…Í•UÁ‘…Ñ”¹…¹¹½Õ¹•½É•‘1½¬ ¤ì(€€€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô((€€€€€€€¥˜¡•á¥ÑAÉ½µÁÑ=Á•¸¥ìÉ•ÑÕÉ¸ìô(€€€€€€€•á¥ÑAÉ½µÁÑ=Á•¸õÑÉÕ”ì((€€€€€€€½¹ÍĞ½¹™¥Éµ•ô(€€€€€€€€€€€ÑåÁ•½˜İ¥¹‘½Ü¹ÉÁ½¹™¥É´ôôô‰™Õ¹Ñ¥½¸ˆ€˜˜(€€€€€€€€€€€…İ…¥Ğİ¥¹‘½Ü¹ÉÁ½¹™¥É´ (€€€€€€€€€€€€€€€€‹Šë–ºk¢š¦n‹¦Z/¦+š"Ë–^;¾òn»–&7¦Ë–ê›šr–#¢«–.W–¶cšªSˆ°(€€€€€€€€€€€€€€€ì(€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”è‹¦n‹¦Z/–K¦j¨ˆ°(€€€€€€€€€€€€€€€€€€€½¹™¥ÉµQ•áĞè‹–Ë–¶c’â›¦n‹¦Z,ˆ°(€€€€€€€€€€€€€€€€€€€…¹•±Q•áĞè‹æóê3–K¦j¨ˆ(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€¤ì((€€€€€€€•á¥ÑAÉ½µÁÑ=Á•¸õ™…±Í”ì((€€€€€€€¥˜¡½¹™¥Éµ•¥ì(€€€€€€€€€€€…±±½İ¥¹á¥ĞõÑÉÕ”ì(€€€€€€€€€€€Í…Ù•…µ” ¤ì(€€€€€€€€€€€¡¥ÍÑ½Éä¹¼¡Õ…É‘I•ÍÑ½É•ü´Èè´Ä¤ì(€€€€€€€ô(€€€ô¤ì()ô¤ ¤ì(((¼¨(€€ƒŠbƒšZÃ–Š{¾òk–£¢z‹–æW–*¢÷((€€ƒ¦7¢šjš*¢†O¦fC–"Û–#¢ª«šâš–k¾òh(€€ƒ?¢š÷–f£–~ëšZó–º'–£¢¦?¾ò33ÖW–Â7’â7–¢¢Ç7ÚË¦‚–r (€€ƒ–º3–£šÊKšr'’öÿR£¢’êK–.WjššÎ’â/¢«–.W¦Ë–—–£¢z‹–æW¾ò0(€€ƒ’â–ºk¢š:§–ºÛ¢«–ŞÇ¦î{’â’â/V¯¦v‹š&7¢÷¢ãfóŠSŠP(€€ƒ¦gšb½¡É½µ—M…™…É§š&šr'?¢š÷–f£–Ç¦kj¦fC–"Û¾ò0(€€ƒ’â7šb¿¦g–/¦+š"Ë–k–ú_–"Ãš"[–k’â7–"Ãj–V?¦†3¾ò0(€€ƒ’îï’öWÚË¦‚¦+š"Ë¦÷æ{’â7¦;¦g’â¦^s((€€ƒ¦g¢‡–kjšb¿3¦¢3šÆ–Ûš²‡7’öšr¦‚š&/j–kšÎW¾òh(€€ƒn¢÷:§–ºÛ–r£V¯¦v‹’â+3²³’âš²‡7j¦î{šN+š"[¢ãš:Ÿ¾ò0(€€ƒ¦
+’â’â/¦‚’úÿ’â¢Öß¢ãfó–£¢z‹–æW¢®/šÆ¾ò0(€€ƒ:§–ºÛ–æû’æ;š¢šë’â7–"Ã–’k’â–/š¶—¦¦|(€€ƒ¾ò#’â7º‡’î[¦î{jšb¿–&×¢KV¯¦v‹jš2'¦"W¾ò0(€€ƒ¦
+šb¿–ŞËšr'–¶cšªSšf’âï–~;V¯¦v‹j’îï’öW–rÃšZç¾ò0(€€ƒ¦÷šr¢ãfó¾ò3’æ/–ú3–ÂÇ’â7šr–7š&OšNû¾ò'((€€ƒ–ššzs:§–ºÛj?¢š÷–f£’â7šR¿š>Ó–£¢z‹–æUA'(€€ƒš"[?¢š÷–f£–~ëšZóš~C’êo–:–nƒš.KÖW¢®/šÆ¾ò0(€€ƒ¦g¢‡R¡ÑÉä½…Ñ£šVÓ–/–2¢Öß’ú¾ò0(€€ƒ–’ÇšV_’ê–ÂÇ¦îc¦îcšRûš¾ò3’â7šr–öÇ¦~ÿ¦+š"Ëšr³¢ê¯š¶–âã¦/’ös(¨¼()™Õ¹Ñ¥½¸É•ÅÕ•ÍÑ…µ•Õ±±ÍÉ••¸ ¥ì((€€€½¹ÍĞ•°ô(€€€€€€€‘½Õµ•¹Ğ¹‘½Õµ•¹Ñ±•µ•¹Ğì(((€€€½¹ÍĞÉ•ÅÕ•ÍĞô((€€€€€€€•°¹É•ÅÕ•ÍÑÕ±±ÍÉ••¹ñğ(€€€€€€€•°¹İ•‰­¥ÑI•ÅÕ•ÍÑÕ±±ÍÉ••¹ñğ(€€€€€€€•°¹µ½éI•ÅÕ•ÍÑÕ±±MÉ••¹ñğ(€€€€€€€•°¹µÍI•ÅÕ•ÍÑÕ±±ÍÉ••¸ì(((€€€¥˜ …É•ÅÕ•ÍĞ¥ì(€€€€€€€É•ÑÕÉ¸ì(€€€ô(((€€€ÑÉåì((€€€€€€€½¹ÍĞÉ•ÍÕ±Ğô(€€€€€€€€€€€É•ÅÕ•ÍĞ¹…±°¡•°¤ì(((€€€€€€€¥˜ (€€€€€€€€€€€É•ÍÕ±Ğ€˜˜(€€€€€€€€€€€É•ÍÕ±Ğ¹…Ñ (€€€€€€€€¥ì((€€€€€€€€€€€É•ÍÕ±Ğ¹…Ñ   ¤ôùíô¤ì((€€€€€€€ô((€€€ô(€€€…Ñ ¡•ÉÉ½È¥íô()ô(()™Õ¹Ñ¥½¸•¹…‰±•Õ±±ÍÉ••¹=¹¥ÉÍÑQ…À ¥ì((€€€½¹ÍĞ¡…¹‘±•Èô ¤ôùì((€€€€€€€É•ÅÕ•ÍÑ…µ•Õ±±ÍÉ••¸ ¤ì((€€€ôì(((€€€‘½Õµ•¹Ğ¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È (€€€€€€€€‰±¥¬ˆ°(€€€€€€€¡…¹‘±•È°(€€€€€€€í½¹”éÑÉÕ•ô(€€€€¤ì(((€€€‘½Õµ•¹Ğ¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È (€€€€€€€€‰Ñ½Õ¡ÍÑ…ÉĞˆ°(€€€€€€€¡…¹‘±•È°(€€€€€€€í½¹”éÑÉÕ•ô(€€€€¤ì()ô(((¼¨(€€ƒŠbƒ’ş»š¶¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€ƒ’â7¢š–7–òß–"Û–£¢z‹–æW¾ò3¦g¢‡’â7–Fó–>¬(€€•¹…‰±•Õ±±ÍÉ••¹=¹¥ÉÍÑQ…À §¾ò0(€€ƒ–÷–ò?šr³¢ê¯’şwVg¢F_¾ò3’æ/–ú3–ššzsšÏ¢š¦7šZÃš&O¦Z,(€€ƒ¦g–/–*¢÷¾ò3nÓš:—š*+’â/¦v‹¦g¢†3–>[šÚ#¢¢ï¢–6Ï–>¿(¨¼((¼¨XÄÈè¼¹½Ğ…ÕÑ¼µ•¹Ñ•È‰É½İÍ•È™Õ±±ÍÉ••¸½¸™¥ÉÍĞÑ…À¸€¨¼(¼¨(€€ƒŠbƒšr–ú3š&7¢º–>[–¶cšªS(€€ƒ¦gš¢²³’âš²‡–V–.W’â–ºkšr¦Ë–&×¢K¾ò0(€€ƒšr'–¶cšªS–&’â–ºk¦Ë¦+š"Ë(€€±½…‘…µ—–Ÿ¦£šr³¢ê¯’æšr%ÑÉä½…Ñ£¾ò0(€€ƒ¦g¢‡–7–2’â–Æ“šb¿¦ng¦7’şw¦j«¾ò0(€€ƒŠë’şw‡¢®[–š’öW¦÷’â7šr–6‡š¶ïšVÓ–/ÚË¦‚(¨¼((¼¨(€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò'¾òh(€€ƒš*(Ó–/¢«–.Wš"Ã¦²—¢¢·–ºk¦v‹švÿ¢‡j–:R|ñÍ•±•Ğø(€€ƒš>oš"C¢«¢¢–¦ã–Z»¦dÓ–/–Òƒ–r¡!Q53¢„(€€ƒšr³’ú–ÂÇ–¶c–r£¾ò#’â7šb¿’æ/–ú3š&7–.Wš/R‹Rj¾ò'¾ò0(€€ƒ¦g¢‡–>¿’î—šRû–ş–r£¦+š"Ë–V–.Wšf–ÂÇ–"w–/–2[’âš²‡¾ò0(€€ƒ’â7R£¶'–"Ã¢¢·–ºk¦v‹švÿrj¢Š¯š&O¦Z/(¨¼()ÑÉåì((€€€l(€€€€€€€€‰…ÕÑ½M•ÑÑ¥¹Í¡…É…Ñ•ÉM•±•Ğˆ°(€€€€€€€€‰…ÕÑ½M•ÑÑ¥¹ÍÑ¥½¹M•±•Ğˆ°(€€€€€€€€‰…ÕÑ½M•ÑÑ¥¹Í!@ˆ°(€€€€€€€€‰…ÕÑ½M•ÑÑ¥¹ÍM@ˆ(€€€t¹™½É…  (€€€€€€€Í•±•Ñ%ôùì((€€€€€€€€€€€¥¹¥ÑÕÍÑ½µÉ½Á‘½İ¸ (€€€€€€€€€€€€€€€Í•±•Ñ%(€€€€€€€€€€€€¤ì((€€€€€€€ô(€€€€¤ì()ô)…Ñ ¡•ÉÉ½È¥ì((€€€½¹Í½±”¹•ÉÉ½È (€€€€€€€€‹¢«¢¢’â/š.'¦ã–Z»–"w–/–2[–’ÇšV_¾òhˆ°(€€€€€€€•ÉÉ½È(€€€€¤ì()ô(()ÑÉåì((€€€€¼¨(€€€€€€ƒŠbƒšZÃ–Š{¾ò#’úwŸ’öÿR£¢¢ššÆ¾ò33–*ƒ¦î{¢š(€€€€€€ƒšZÃ–Š{¦Vßš2'–ş¯¦–*ƒ¦î{7¾ò'¾òh(€€€€€€ƒ¦‚¦v‹¢ò'–—šf¾ò3š*(ÛÖ–Æ³šŸj¬¼·š2'¦"T(€€€€€€ƒ–£¦£Ú’â+¦Vßš2'š2ê3¢ãfó¾ò3’âš²‡šœ(€€€€€€ƒ¢¢·–ºk¾ò3’â7R£–r£š¾?–/š2'¦"Wj!Q53’â((€€€€€€ƒ–B¢«–¾¯’ê/’îÛ(€€€€¨¼((€€€l(€€€€€€€l‰…ÑÑ…¬ˆ°‰ÑÑ…¬‰t°(€€€€€€€l‰Ù¥Ñ…±¥Ñäˆ°‰Y¥Ñ…±¥Ñä‰t°(€€€€€€€l‰•¹•Éäˆ°‰¹•Éä‰t°(€€€€€€€l‰¥¹Ñ•±±¥•¹”ˆ°‰%¹Ñ•±±¥•¹”‰t°(€€€€€€€l‰ÍÁ¥É¥Ğˆ°‰MÁ¥É¥Ğ‰t°(€€€€€€€l‰…¥±¥Ñäˆ°‰¥±¥Ñä‰t(€€€t¹™½É…  ¡mÍÑ…Ñ-•ä±¥‘A…ÉÑt¤ôùì((€€€€€€€…ÑÑ…¡1½¹AÉ•ÍÌ (€€€€€€€€€€€€ ‰ÍÑ…ÑÕÍ	Ñ¸ˆ­¥‘A…ÉĞ¬‰5¥¹ÕÌˆ¤°(€€€€€€€€€€€€ ¤ôùÉ•µ½Ù•A½¥¹Ğ¡ÍÑ…Ñ-•ä¤(€€€€€€€€¤ì(((€€€€€€€…ÑÑ…¡1½¹AÉ•ÍÌ (€€€€€€€€€€€€ ‰ÍÑ…ÑÕÍ	Ñ¸ˆ­¥‘A…ÉĞ¬‰A±ÕÌˆ¤°(€€€€€€€€€€€€ ¤ôù…‘‘A½¥¹Ğ¡ÍÑ…Ñ-•ä¤(€€€€€€€€¤ì((€€€ô¤ì()ô)…Ñ ¡•ÉÉ½È¥ì((€€€½¹Í½±”¹•ÉÉ½È (€€€€€€€€‹–Æ³šŸ–*ƒ¦î{¦Vßš2'Ú–ºk–’ÇšV_¾òhˆ°(€€€€€€€•ÉÉ½È(€€€€¤ì()ô(((¼¨MÑ…ÉÑÕÁMÑ…Ñ•5…¡¥¹”¥ÌÑ¡”½¹±ä½İ¹•È…±±½İ•Ñ¼Í•±•Ğ…¹±½……¸…½Õ¹ĞÍ…Ù”¸€¨¼(((¼¨(€€ƒŠbƒ’â7º‡–&×¢Kš"[¢ºšªS–N«šŠw¢Ş¿–úG¾ò0(€€ƒšr–ú3¦÷–V–.W¢«–.W–¶cšªS(€€ÍÑ…ÉÑÕÑ½M…Ù” ¤ƒ–Ÿ¦£j–ºkšf–f (€€ƒš¾?š²‡¢ãfó¦÷šr¢«–ŞÇšª‹š~—¦+š"Ëšb¿–B›–ŞËÚO¦Z/–/¾ò0(€€ƒš&’î—–ÂÇº_¦gšf–g:§–ºÛ¦
+–r£–&×¢KV¯¦v‹¾ò0(€€ƒ’æ’â7šr–ë¦2¿š"[–¶c¦Ë¦ë¢ÎšZg(¨¼()ÑÉåì((€€€ÍÑ…ÉÑÕÑ½M…Ù” ¤ì()ô)…Ñ ¡•ÉÉ½È¥ì((€€€½¹Í½±”¹•ÉÉ½È (€€€€€€€€‹¢«–.W–¶cšªS–V–.W–’ÇšV_¾òhˆ°(€€€€€€€•ÉÉ½È(€€€€¤ì()ô(
