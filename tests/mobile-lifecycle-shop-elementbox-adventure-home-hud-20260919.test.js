@@ -35,7 +35,7 @@ function emitter(){
 }
 
 test("mobile lifecycle diagnostics distinguish reload/discard metadata while background saving",()=>{
-    const source=sliceThrough(main,"(function installMobileSessionResume(){","})();");
+    const source=sliceThrough(main,'const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";',"})();");
     const documentEvents=emitter(),windowEvents=emitter();
     let saves=0;
     const startup={hidden:false,dataset:{},setAttribute(){}};
