@@ -305,7 +305,7 @@
         finalSnapshot=null;
         syncBattleEntryVisibility();
         syncOpenDrawer();
-        return getSnapshot();
+        return currentSnapshot();
     }
     function registerCombatant(input){
         if(!session||!session.active){ return false; }
