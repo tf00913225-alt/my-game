@@ -43,6 +43,7 @@ const appScripts=[
     "js/13-stage-v49-runtime.js",
     "js/14-stage-v50-runtime.js",
     "js/15-stage-v51-runtime.js",
+    "js/relic-summary-catalog.js",
     "js/16-stage-v54-main-city-runtime.js",
     "js/17-stage-v60-training-render-guard.js",
     "js/18-stage-v64-character-touch-action-runtime.js",

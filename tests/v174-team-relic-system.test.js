@@ -3,6 +3,7 @@ const fs=require("fs");
 const vm=require("vm");
 const assert=require("node:assert/strict");
 
+const summarySource=fs.readFileSync("js/relic-summary-catalog.js","utf8");
 const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
@@ -148,6 +149,7 @@ function createRuntime(options={}){
     context.window=context;
     vm.createContext(context);
     vm.runInContext(repositorySource,context);
+    vm.runInContext(summarySource,context);
     context.FourSymbolsAccountSave.activate(accountUid);
     context.FourSymbolsAccountSave.writeForUid(accountUid,{player:{id:"甲"},gold:100000},{source:"fixture"});
     context.saveGame=function(){

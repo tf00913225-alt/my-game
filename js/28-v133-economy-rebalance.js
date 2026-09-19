@@ -900,6 +900,17 @@
     /* 4. 藥水補品 */
     const SHOP_POTION_BASE_PRICES={hpPotion10:20,hpPotion30:50,hpPotion50:80,spPotion10:25,spPotion30:65,spPotion50:100};
     const SHOP_POTION_IDS=Object.keys(SHOP_POTION_BASE_PRICES);
+    const SHOP_PURCHASE_MAX_QUANTITY=999;
+    function normalizeShopPurchaseQuantity(value){
+        return Math.max(1,Math.min(SHOP_PURCHASE_MAX_QUANTITY,Math.floor(Number(value)||1)));
+    }
+    window.normalizeShopPurchaseQuantity=normalizeShopPurchaseQuantity;
+    window.v133NormalizeShopQuantityInput=function(input){
+        if(!input){ return 1; }
+        const quantity=normalizeShopPurchaseQuantity(input.value);
+        input.value=String(quantity);
+        return quantity;
+    };
     if(typeof potionDefinitions!=="undefined"&&Array.isArray(potionDefinitions)){
         let hpPotion30=potionDefinitions.find(p=>p&&p.id==="hpPotion30");
         if(!hpPotion30){
@@ -938,7 +949,7 @@
                     <div class="shop-potion-card-head"><span class="shop-potion-type">${resourceLabel}</span><span class="shop-potion-stock">持有 ${count}</span></div>
                     <div class="shop-potion-name">${shopItem.name}</div><div class="shop-potion-effect">${effectText}</div>
                     <div class="shop-potion-purchase-row"><label for="shopQuantity-${shopItem.id}">數量</label>
-                    <input id="shopQuantity-${shopItem.id}" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="9999" step="1" value="1">
+                    <input id="shopQuantity-${shopItem.id}" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v133NormalizeShopQuantityInput(this)">
                     <button class="home-feature-buy-btn shop-potion-buy" ${disabled?"disabled":""} onclick="buyShopItem('${shopItem.id}',document.getElementById('shopQuantity-${shopItem.id}').value)">${buttonText}</button></div></div>`;
             }).join("");
             return `<div class="shop-potion-interface"><div class="shop-potion-note">只販售 HP／SP 回復藥水</div>
@@ -951,7 +962,7 @@
             if(!shopItem||!SHOP_POTION_IDS.includes(itemId)){ return; }
             const unitPrice=getShopItemPrice(shopItem);
             if(!Number.isFinite(unitPrice)){ alert("這個藥水的價格尚未設定。"); return; }
-            const quantity=Math.max(1,Math.min(9999,Math.floor(Number(requestedQuantity)||1)));
+            const quantity=normalizeShopPurchaseQuantity(requestedQuantity);
             const totalPrice=unitPrice*quantity;
             if(gold<totalPrice){ alert("金幣不夠，本次需要 "+totalPrice.toLocaleString("zh-TW")+" 金幣。"); return; }
             if(!addPotionToInventory(itemId,quantity)){ alert("背包已滿，或該藥水已沒有可用的堆疊空間。"); return; }

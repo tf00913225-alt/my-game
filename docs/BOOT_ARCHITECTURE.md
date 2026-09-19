@@ -16,6 +16,8 @@
 | 帳號 UI | `js/firebase/firebase-auth-ui.js` |
 | 客服聯絡資料與共用顯示視窗 | `js/startup/support-contact.js` |
 | 可見頁面 Screen Wake Lock 生命週期 | `js/startup/screen-wake-lock-runtime.js` |
+| 手機 background save／resume-discard diagnostics | `js/00-main.js` 的 `FourSymbolsMobileLifecycleDiagnostics` |
+| 主城 First Screen 隊伍／秘寶摘要 shell | `js/16-stage-v54-main-city-runtime.js` + `js/relic-summary-catalog.js` |
 | 雲端 read／trusted callable | `js/firebase/firebase-cloud-save.js` |
 | Firebase lifecycle | `js/firebase/firebase-bootstrap.js` |
 | 功能意圖、局部 loading、idle preload | `js/20-anonymous-20.js` |
@@ -111,6 +113,8 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 - 五個 hashed Firebase lifecycle modules，加上 Firebase 官方 SDK 的必要 ESM dependency。
 - `index.html` 的 shell、account UI host、必要錯誤顯示與 navigation DOM。
 
+取得 UID 後，`app-shell` 與 UID save I/O 並行。主城第一畫面的 `#v146HomeRoster` 必須由 app-shell 先建立固定尺寸 shell；存檔 hydrate 前使用固定佔位，hydrate 後只填入三名角色與 `teamLoadout.relicId` 對應摘要，不得等待 `feature-boss-relic` 才新增整塊區域。秘寶名稱／觸發描述的 First Screen-safe 靜態來源固定為 `js/relic-summary-catalog.js`；完整 Catalog／VFX／Battle Trigger／Boss／Tower／progression 仍維持 lazy feature。
+
 取得 UID 後，`app-shell` 與 UID save I/O 並行。`app-shell` 是創角或已有角色進第一個可操作畫面的必要 legacy core；`gameplay-core` 與其餘 feature 不得阻塞 Auth UI、創角或主城互動。
 
 正式版本通知屬於 `app-shell` 的非阻塞 runtime：只在 `four-symbols:startup-ready` 後開始背景檢查，不能延後 Auth、存檔解析、創角或 READY。它重用既有 `#homeFeatureModal`，在 native `#game-overlay-layer` 放置可點擊但不覆蓋全畫面的通知列；詳見 `SYSTEM_CONTRACTS.md`。首次檢查失敗、離線、timeout 或 manifest 損壞都只能安靜失敗並等待下一次節流檢查。
@@ -159,6 +163,12 @@ Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK�
 - Feature 載入失敗：只發出 `four-symbols:feature-local-error`，不得重新鎖住全域。
 
 ## Performance budgets 與 observability
+
+## Mobile lifecycle 與 Screen Wake Lock
+
+- `js/startup/screen-wake-lock-runtime.js` 是唯一 Wake Lock owner。visible／pageshow 只在未持鎖時取得；hidden／pagehide 會釋放並取消 retry。系統主動 release 且頁面仍 visible 時重新取得；request 失敗只允許有限節流 retry，不能阻塞 Startup。開發診斷由 `FourSymbolsScreenWakeLock.getDiagnostics()` 讀取。
+- Android／Chrome freeze 或 discard 不能由網頁禁止。`js/00-main.js` 在 visibility hidden、pagehide、freeze 做既有正式 save，並用 `document.wasDiscarded`、Navigation Timing type、pageshow persisted、resume/freeze 計數提供 `FourSymbolsMobileLifecycleDiagnostics`。
+- 普通 resume／pageshow 不得重跑 account-first Startup。真正 reload／discard 後重建仍由 Firebase Auth → UID save resolution → hydrate 的既有 StartupStateMachine 恢復；sessionStorage 只可省略同分頁已看過的長啟動呈現，不得成為權威進度來源，也不得覆蓋 Cloud Save。
 
 永久 marks：`four-symbols:boot-core-ready`、`auth-initialized`、`auth-resolved`、`save-resolved`、`critical-ready`、`auth-ui-interactive`、`character-creation-interactive`、`main-city-interactive`。
 

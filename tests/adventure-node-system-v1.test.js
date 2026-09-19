@@ -150,6 +150,26 @@ function baseRuntime(){
     assert.equal(c.FourSymbolsAdventure.returnFromPatrol(),false,"active battle must block hard return to Adventure");
 })();
 
+(function testReturnFromPatrolUsesFormalExitAndKeepsObjective(){
+    const c=baseRuntime();
+    runScript(c,"js/adventure/adventure-content-v1-20260915.js");
+    runScript(c,"js/adventure/adventure-runtime-v1-20260915.js");
+    const state=c.player.adventureProgress.chapters.chapter_v1;
+    state.objective={
+        active:true,turnedIn:false,sourceNodeId:"n05_objective",zoneKey:"ridge",
+        monsterName:"山賊",current:2,target:5
+    };
+    const before=JSON.stringify(state.objective);
+    let exits=0,reason="";
+    c.FourSymbolsPatrolLifecycle={
+        exit(value){ exits++; reason=value; return true; }
+    };
+    assert.equal(c.FourSymbolsAdventure.returnFromPatrol(),true);
+    assert.equal(exits,1,"Adventure must reuse the formal Patrol exit owner exactly once");
+    assert.equal(reason,"adventure-return");
+    assert.equal(JSON.stringify(state.objective),before,"returning from Patrol must not clear objective progress");
+})();
+
 (function testRarePillsManualOnly(){
     const counts={hpPotion10:2,spPotion10:2,nineTurnRestorationPill:1,taichingQiPill:1};
     const context={

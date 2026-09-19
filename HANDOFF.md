@@ -1,5 +1,20 @@
 ## 2026-09-19 — DEV 正式版本公告視覺預覽（VERIFIED／main 未修改）
 
+## 2026-09-19 — Mobile lifecycle／Shop／Element Box／Adventure／Home First Screen 七項根因修復（7/7 VERIFIED）
+
+- Base：`dev@ccf587d0feec8d4790d17834a11b67a6d05bc55f`；工作分支：`fix/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919`；`main` 全程禁止修改。Requirement Batch：`release/requirement-batches/2026-09-19-mobile-lifecycle-shop-elementbox-adventure-home-hud.json`。
+- Screen Wake Lock 唯一 owner 仍為 `js/startup/screen-wake-lock-runtime.js`：system release 可見時重取、request 失敗只有有限節流 retry、hidden/pagehide 取消 retry 並 release；`FourSymbolsScreenWakeLock.getDiagnostics()` 提供 supported／held／failure／acquire／release 診斷，不阻塞 Startup。
+- Mobile resume owner 仍在 `js/00-main.js`：visibility hidden／pagehide／freeze 即時 `saveGame()`；`FourSymbolsMobileLifecycleDiagnostics` 記錄 `document.wasDiscarded`、navigation type、pageshow persisted、freeze/resume。普通 pageshow/resume 不重跑 Startup；reload/discard 後仍由 account-first Auth／UID save resolution／hydrate 恢復，不以本機 resume state 覆蓋 Cloud Save。
+- 商店數量規則收斂到 V133 `normalizeShopPurchaseQuantity()`，最大 999；V141 已移除會被 V144 覆蓋的舊 render／buy wrapper。V144 是最終補品 render／buy owner，V146 即時計價會直接把輸入框 >999 改回 999；V169 成功提示仍只依實際背包差額顯示。
+- 元素匣仍由 `js/45-v154-dev-fixes.js::finishAutoRecovery()`：Element Box active 時 HP=0 可進 HP 補品候選，必須真扣補品；若 HP 未成功恢復，SP path 不執行；一般 Battle heal 規則未改。
+- Patrol 正式離場 hook 為 `js/00-main.js::FourSymbolsPatrolLifecycle.exit()`，重用既有 `stopMonsterMovement()`／`stopAutoPatrol()`。Adventure `returnFromPatrol()` 只呼叫此 owner，不複製 timer/state；Fight Animation callback 以 lifecycle generation + map active + autoPatrolEnabled 三重確認，離場後失效。
+- NT$99 30天免廣告資訊在 `js/16-stage-v54-main-city-runtime.js` 改為 manual-only；已移除 startup／pageshow／MutationObserver auto-show 生命週期，保留 `openAdFreeServiceInfoModal()` 手動能力；ECPay／獎勵廣告未改。
+- Main City First Screen：`js/16-stage-v54-main-city-runtime.js` 在 app-shell 先建立固定 `#v146HomeRoster`、三格角色 placeholder 與 `.team-relic-loadout-slot`；hydrate 後只填內容。新增小型 `js/relic-summary-catalog.js` 作 `id/name/triggerText` 唯一摘要資料橋；完整 `feature-boss-relic` 仍 lazy，`js/60-team-relic-system.js` 不再建立首頁摘要 DOM。
+- 受影響 production build 已重建新 content-hashed Boot/App/Gameplay/Relic/Adventure bundles，`asset-manifest.json`／`build/asset-manifest.json`／`index.html` 已同步；Game／Cache Version 維持 173.65。
+- Targeted tests 已新增／更新：`tests/screen-wake-lock.test.js`、`tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js`、Adventure／ad-free／V146 shop／main-city／team relic save/runtime 既有測試。
+- PR #347 CI run `35450909260` 已 SUCCESS：syntax、Release Update、Adventure、Fixed Slot、battle/VFX、relic lifecycle、deterministic `build:check`、Release Update mobile browser QA、Fixed Slot mobile QA、exact-candidate real battle QA、Adventure mobile QA、static resources、HTML IDs、loader integrity、Release Gate、git-diff 全部通過。Requirement Batch 已 7/7 VERIFIED。
+
+
 - 工作分支：`feature/release-update-dev-preview-20260919`，PR [#345](https://github.com/tf00913225-alt/my-game/pull/345) 已在 CI run `35446496532` 全綠後合併為 `dev@fff36cf702a92638f812698049015537001345b0`；DEV deployment run `35446584392` 也已全綠並核對 exact SHA。main 禁止修改。`js/release-update-notification.js` 是唯一 owner，沒有新建公告、跑馬燈或 Modal。
 - DEV／本機驗收網址使用同一份 `release/release-update.json`：`?releaseUpdatePreview=marquee` 顯示正式跑馬燈，點擊後開正式更新視窗；`?releaseUpdatePreview=modal` 直接開同一視窗。只允許 `dev.four-symbols-dev.pages.dev`、`localhost`、`127.0.0.1`、`::1`，main host 必須忽略 query。
 - Preview 僅供版面、文案與內容驗收：不得改 loaded／正式 release version、不得寫 `last-seen` localStorage、不得 reload。更新視窗維持正式 normal／forced 樣式；preview 中的行動按鈕安全地只關閉視窗。

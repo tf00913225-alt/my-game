@@ -12,7 +12,8 @@
 
 ## 唯一資料真相
 
-- `relicCatalog`：秘寶靜態定義、分類、稀有度、Trigger、Effect、等級成長與 `iconPath`。
+- `js/relic-summary-catalog.js`：主城 First Screen 必要的秘寶 `id / name / triggerText` 唯一靜態來源；必須保持小型、無戰鬥／VFX／Boss 依賴。
+- `relicCatalog`：完整秘寶靜態定義，從上述摘要資料橋取得 `name / triggerText`，再組合分類、稀有度、Trigger、Effect、等級成長與 `iconPath`；完整 Catalog 仍屬 lazy `feature-boss-relic`。
 - `playerRelics`：玩家實際擁有狀態，只保存解鎖、等級、EXP／養成與已查看狀態。
 - `teamLoadout.relicId`：目前隊伍唯一裝備真相。禁止在每件秘寶資料內複製 `equipped=true`。
 - 秘寶持久化必須寫入目前正式 `SAVE_KEY` 的同一份存檔文件；禁止建立秘寶專屬 localStorage save key。
@@ -43,4 +44,5 @@
 - 稀有度沿用正式六階：白階 → 藍階 → 紫階 → 橙階 → 桃紅階 → 四象階。禁止新增 SSR／UR／傳說／神話等第二套制度。
 - 秘寶頁手機優先、滿版、兩欄 Grid、內部垂直捲動；分類列可橫向滑動。
 - 主城左側新增「秘寶」、右側連到既有「元素匣」 owner；不得複製第二套元素匣。
+- 主城隊伍秘寶摘要是 app-shell First Screen UI：固定 shell 先存在，再從正式存檔 `teamLoadout.relicId`／`playerRelics` 填入名稱、Lv、觸發摘要；不得為摘要 execute 完整 `feature-boss-relic`，也不得複製第二份裝備狀態。
 - 正式美術尚未提供時只能使用高質感 placeholder，並保留 `iconPath`／`assets/treasures/` 擴充位置；禁止自行下載網路素材。

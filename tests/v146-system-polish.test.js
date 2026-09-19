@@ -109,6 +109,12 @@ test("shop quantity calculates and disables against the live total",()=>{
     assert.equal(output.textContent,"315 金幣");
     assert.equal(output.dataset.total,"315");
     assert.equal(button.disabled,true);
+
+    context.normalizeShopPurchaseQuantity=value=>Math.max(1,Math.min(999,Math.floor(Number(value)||1)));
+    input.value="1000"; input.dataset.unitPrice="2"; context.gold=5000;
+    assert.equal(context.v146UpdateShopTotal("hpPotion20"),1998);
+    assert.equal(input.value,"999","shop input must visibly clamp values above 999");
+    assert.equal(output.textContent,"1,998 金幣");
 });
 
 test("all forty set pieces receive exact stats, role names and element locks",()=>{

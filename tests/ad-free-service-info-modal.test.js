@@ -66,14 +66,11 @@ test("the shared support email is configured while policy and ECPay fields stay 
     assert.doesNotMatch(runtime,/mailto:|ecpay\.com|paymentUrl:\s*["'][^"']+/i);
 });
 
-test("the display policy is isolated and records only this page-entry session in memory",()=>{
-    assert.match(runtime,/AD_FREE_DISPLAY_POLICY=Object\.freeze\(\{mode:"every-entry"\}\)/);
-    assert.match(runtime,/shownThisEntry:false/);
-    assert.match(runtime,/v173\.20:startup-entered/);
-    assert.match(runtime,/startupLoader/);
-    assert.match(runtime,/gameInterface/);
-    assert.match(runtime,/homePage/);
-    assert.match(runtime,/MutationObserver/);
+test("the paid-service info is manual-only and owns no automatic home lifecycle",()=>{
+    assert.match(runtime,/AD_FREE_DISPLAY_POLICY=Object\.freeze\(\{mode:"manual"\}\)/);
+    assert.doesNotMatch(runtime,/shownThisEntry|scheduleAutoShowAdFreeServiceInfo|tryAutoShowAdFreeServiceInfo|shouldAutoShowAdFreeServiceInfo/);
+    assert.doesNotMatch(runtime,/v173\.20:startup-entered[\s\S]{0,160}AdFree|pageshow[\s\S]{0,160}AdFree|MutationObserver[\s\S]{0,160}AdFree/);
+    assert.match(runtime,/window\.openAdFreeServiceInfoModal=openAdFreeServiceInfoModal/);
     assert.doesNotMatch(runtime,/localStorage|sessionStorage/);
 });
 
@@ -189,6 +186,13 @@ test("the owner runtime opens once on a ready home screen and closes through the
     vm.runInNewContext(runtime,context,{filename:"js/16-stage-v54-main-city-runtime.js"});
 
     assert.equal(home.classList.contains("main-city-lobby-ready"),true);
+    assert.equal(modal.classList.contains("show"),false,"startup must not auto-open the NT$99 service modal");
+    document.dispatchEvent({type:"v173.20:startup-entered"});
+    assert.equal(modal.classList.contains("show"),false,"startup-entered must not auto-open the service modal");
+    (windowListeners.pageshow||[]).forEach(fn=>fn({type:"pageshow"}));
+    assert.equal(modal.classList.contains("show"),false,"pageshow must not auto-open the service modal");
+
+    assert.equal(window.openAdFreeServiceInfoModal(),true,"manual entry remains available for future shop/settings wiring");
     assert.equal(modal.classList.contains("show"),true);
     assert.equal(modal.classList.contains("ad-free-service-info-mode"),true);
     assert.equal(title.textContent,"《四象江湖傳》");
@@ -206,13 +210,6 @@ test("the owner runtime opens once on a ready home screen and closes through the
     assert.equal(closeCalls,1);
     assert.equal(modal.classList.contains("show"),false);
     assert.equal(modal.classList.contains("ad-free-service-info-mode"),false);
-    document.dispatchEvent({type:"v173.20:startup-entered"});
-    assert.equal(modal.classList.contains("show"),false,"auto policy does not reopen during the same page entry");
-
-    assert.equal(window.openAdFreeServiceInfoModal(),true,"manual entry remains available for future shop/settings wiring");
-    assert.equal(modal.classList.contains("show"),true);
-    window.closeAdFreeServiceInfoModal();
-    assert.equal(closeCalls,2);
 });
 
 test("the portrait sizing contract stays inside 420x747 and narrower phone widths",()=>{

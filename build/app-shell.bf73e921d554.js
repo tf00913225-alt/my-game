@@ -317,19 +317,58 @@ const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
         }
     }
 
+    function navigationType(){
+        try{
+            const entries=window.performance&&typeof window.performance.getEntriesByType==="function"
+                ?window.performance.getEntriesByType("navigation")
+                :[];
+            if(entries&&entries[0]&&entries[0].type){ return String(entries[0].type); }
+            if(window.performance&&window.performance.navigation){
+                const legacy=Number(window.performance.navigation.type);
+                return legacy===1?"reload":legacy===2?"back_forward":"navigate";
+            }
+        }catch(_){ }
+        return "unknown";
+    }
+
+    const lifecycleDiagnostics={
+        wasDiscarded:document.wasDiscarded===true,
+        navigationType:navigationType(),
+        sessionPreviouslyEntered:sessionHasEntered(),
+        lastEvent:"install",
+        lastEventAt:Date.now(),
+        lastPageShowPersisted:false,
+        backgroundSaveCount:0,
+        eventCounts:{visibilitychange:0,pagehide:0,pageshow:0,freeze:0,resume:0}
+    };
+
+    function markLifecycleEvent(name,detail){
+        lifecycleDiagnostics.lastEvent=name;
+        lifecycleDiagnostics.lastEventAt=Date.now();
+        if(Object.prototype.hasOwnProperty.call(lifecycleDiagnostics.eventCounts,name)){
+            lifecycleDiagnostics.eventCounts[name]++;
+        }
+        if(name==="pageshow"){
+            lifecycleDiagnostics.lastPageShowPersisted=!!(detail&&detail.persisted);
+        }
+    }
+
     function rememberEnteredSession(){
         try{
             window.sessionStorage.setItem(STARTUP_SESSION_READY_KEY,"1");
         }catch(_){ }
     }
 
-    function persistBeforeSuspend(){
+    function persistBeforeSuspend(reason){
         try{
-            if(typeof saveGame==="function"){ saveGame(); }
+            if(typeof saveGame==="function"){
+                const saved=saveGame({source:"mobile-"+String(reason||"background")});
+                if(saved!==false){ lifecycleDiagnostics.backgroundSaveCount++; }
+            }
         }catch(_){ }
     }
 
-    if(sessionHasEntered()){
+    if(lifecycleDiagnostics.sessionPreviouslyEntered){
         const startupRoot=document.getElementById("startupLoader");
         if(startupRoot){
             startupRoot.hidden=true;
@@ -341,10 +380,44 @@ const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
     document.addEventListener("v173.20:startup-entered",rememberEnteredSession);
 
     document.addEventListener("visibilitychange",function(){
-        if(document.hidden){ persistBeforeSuspend(); }
+        markLifecycleEvent("visibilitychange",{hidden:document.hidden});
+        if(document.hidden){ persistBeforeSuspend("visibility-hidden"); }
     });
 
-    window.addEventListener("pagehide",persistBeforeSuspend);
+    window.addEventListener("pagehide",function(event){
+        markLifecycleEvent("pagehide",{persisted:!!(event&&event.persisted)});
+        persistBeforeSuspend("pagehide");
+    });
+
+    window.addEventListener("pageshow",function(event){
+        markLifecycleEvent("pageshow",{persisted:!!(event&&event.persisted)});
+        /* Normal foreground resume never re-runs Startup. A real reload/discard
+           is reconstructed by the existing account-first Startup owner. */
+    });
+
+    document.addEventListener("freeze",function(){
+        markLifecycleEvent("freeze");
+        persistBeforeSuspend("freeze");
+    });
+
+    document.addEventListener("resume",function(){
+        markLifecycleEvent("resume");
+    });
+
+    window.FourSymbolsMobileLifecycleDiagnostics=Object.freeze({
+        getSnapshot:function(){
+            return Object.freeze({
+                wasDiscarded:lifecycleDiagnostics.wasDiscarded,
+                navigationType:lifecycleDiagnostics.navigationType,
+                sessionPreviouslyEntered:lifecycleDiagnostics.sessionPreviouslyEntered,
+                lastEvent:lifecycleDiagnostics.lastEvent,
+                lastEventAt:lifecycleDiagnostics.lastEventAt,
+                lastPageShowPersisted:lifecycleDiagnostics.lastPageShowPersisted,
+                backgroundSaveCount:lifecycleDiagnostics.backgroundSaveCount,
+                eventCounts:Object.freeze(Object.assign({},lifecycleDiagnostics.eventCounts))
+            });
+        }
+    });
 
 })();
 
@@ -8626,14 +8699,9 @@ function enterMap(){
 
 function leaveMap(){
 
-    if(battleActive){
+    if(!exitPatrolContext("leave-map")){
         return;
     }
-
-
-    stopMonsterMovement();
-
-    stopAutoPatrol();
 
     showPage("training");
 
@@ -8730,6 +8798,17 @@ let patrolFightAnimTimeoutIds=
 
 let patrolBattleTransitionPending=
     false;
+
+let patrolLifecycleGeneration=
+    0;
+
+function isPatrolMapActive(){
+    const mapPageElement=$("mapPage");
+    return !!(
+        mapPageElement &&
+        mapPageElement.classList.contains("active")
+    );
+}
 
 
 /*
@@ -9026,6 +9105,9 @@ function playPatrolFightAnimation(callback){
     const t1=
         setTimeout(()=>{
 
+            patrolFightAnimTimeoutIds=
+                patrolFightAnimTimeoutIds.filter(id=>id!==t1);
+
             if(img){
 
                 img.style.transform=
@@ -9041,6 +9123,9 @@ function playPatrolFightAnimation(callback){
 
     const t2=
         setTimeout(()=>{
+
+            patrolFightAnimTimeoutIds=
+                patrolFightAnimTimeoutIds.filter(id=>id!==t2);
 
             patrolInFightAnimation=
                 false;
@@ -9154,6 +9239,8 @@ function stopAutoPatrol(){
     autoPatrolEnabled=
         false;
 
+    patrolLifecycleGeneration++;
+
 
     if(autoPatrolIntervalId){
 
@@ -9226,6 +9313,32 @@ function stopAutoPatrol(){
 
     stopPatrolCharacterWalking();
 
+}
+
+
+function exitPatrolContext(reason){
+
+    if(battleActive){
+        return false;
+    }
+
+    stopMonsterMovement();
+    stopAutoPatrol();
+
+    if(typeof window!=="undefined"){
+        window.v173PatrolLastExitReason=String(reason||"unknown");
+    }
+
+    return true;
+}
+
+if(typeof window!=="undefined"){
+    window.FourSymbolsPatrolLifecycle=Object.freeze({
+        exit:exitPatrolContext,
+        isActive:function(){
+            return autoPatrolEnabled&&isPatrolMapActive();
+        }
+    });
 }
 
 
@@ -9316,15 +9429,8 @@ function runAutoPatrolCheck(){
     }
 
 
-    const mapPageElement=
-        $("mapPage");
-
-
     if(
-        !mapPageElement ||
-        !mapPageElement.classList.contains(
-            "active"
-        )
+        !isPatrolMapActive()
     ){
 
         stopAutoPatrol();
@@ -9369,12 +9475,23 @@ function runAutoPatrolCheck(){
             patrolBattleTransitionPending=
                 true;
 
+            const transitionGeneration=
+                patrolLifecycleGeneration;
+
 
             playPatrolFightAnimation(
                 ()=>{
 
                     patrolBattleTransitionPending=
                         false;
+
+                    if(
+                        transitionGeneration!==patrolLifecycleGeneration ||
+                        !autoPatrolEnabled ||
+                        !isPatrolMapActive()
+                    ){
+                        return;
+                    }
 
 
                     /*
@@ -35277,6 +35394,41 @@ catch(error){
 })();
 
 
+/* bundled source: js/relic-summary-catalog.js */
+/* First-screen-safe Team Relic summary catalog.
+   Owns only the static fields required by the main-city summary and the full relic catalog. */
+(function installRelicSummaryCatalog(global){
+    "use strict";
+    if(!global||global.FourSymbolsRelicSummaryCatalog){ return; }
+    const entries=[
+        ["relic_qiankun_flask","乾坤玉壺","奇數回合結束時"],
+        ["relic_sun_orb","烈陽神珠","偶數回合開始時"],
+        ["relic_xuanwu_seal","玄武靈印","每第3回合開始時"],
+        ["relic_soul_bell","鎮魂古鐘","每第4回合開始時"],
+        ["relic_tiangang_banner","天罡戰旗","我方累積受到6次敵方有效攻擊後"],
+        ["relic_nine_dragon_fire","九龍神火罩","敵方累積完成7次有效行動後"],
+        ["relic_cold_spring_jade","寒泉玉珮","任一我方角色在傷害結算後低於35%最大HP時"],
+        ["relic_qinglan_feather","青嵐羽符","戰鬥開始時"],
+        ["relic_rock_mountain_seal","岩岳鎮印","開場；另於我方累積受8次有效攻擊時"],
+        ["relic_returning_wheel","回天寶輪","本場第一次有我方角色將受到致命傷害時"],
+        ["relic_origin_talisman","太初聖符","每第4回合結束"],
+        ["relic_broken_army_scroll","破軍殘卷","角色攻擊／技能擊敗敵人後"],
+        ["relic_red_sky_war_mark","赤霄戰紋","戰鬥開始時"],
+        ["relic_ice_mirror_heart","玄冰鏡心","每第3回合結束"],
+        ["relic_wind_chasing_talisman","追風行符","每第3回合開始"],
+        ["relic_mountain_river_cauldron","山河寶鼎","我方累積受7次有效攻擊後"],
+        ["relic_burning_star_mark","焚星殘印","偶數回合結束"],
+        ["relic_spirit_spring_bottle","靈泉法瓶","每第3回合結束"],
+        ["relic_demon_suppressing_seal","伏魔金印","戰鬥開始；首次成功受到一般負面狀態"],
+        ["relic_all_returning_array","萬象歸元盤","每第4回合開始"]
+    ];
+    global.FourSymbolsRelicSummaryCatalog=Object.freeze(Object.fromEntries(entries.map(entry=>[
+        entry[0],
+        Object.freeze({id:entry[0],name:entry[1],triggerText:entry[2]})
+    ])));
+})(typeof window!=="undefined"?window:globalThis);
+
+
 /* bundled source: js/16-stage-v54-main-city-runtime.js */
 (function(){
     "use strict";
@@ -35286,7 +35438,7 @@ catch(error){
 
     const AD_FREE_MODE_CLASS="ad-free-service-info-mode";
     const AD_FREE_CONFIG_KEY="SIXIANG_AD_FREE_SERVICE_CONFIG";
-    const AD_FREE_DISPLAY_POLICY=Object.freeze({mode:"every-entry"});
+    const AD_FREE_DISPLAY_POLICY=Object.freeze({mode:"manual"});
     const DEFAULT_AD_FREE_CONFIG=Object.freeze({
         supportEmail:"",
         refundPolicyUrl:"",
@@ -35295,11 +35447,6 @@ catch(error){
         purchaseUrl:"",
         purchaseEnabled:false
     });
-    const adFreeState={
-        shownThisEntry:false,
-        observer:null,
-        armed:false
-    };
 
     function apply(){
         const home = document.getElementById("homePage");
@@ -35420,16 +35567,7 @@ catch(error){
         // TODO(ECPay): 完成綠界付款與付款結果驗證後，才可設定 purchaseEnabled=true 與 purchaseUrl。
     }
 
-    function disconnectAdFreeObserver(){
-        if(adFreeState.observer){
-            adFreeState.observer.disconnect();
-            adFreeState.observer=null;
-        }
-    }
-
-    function openAdFreeServiceInfoModal(options){
-        const manual=Boolean(options&&options.manual);
-        if(!manual&&adFreeState.shownThisEntry){ return false; }
+    function openAdFreeServiceInfoModal(){
         const parts=getModalParts();
         if(!parts){ return false; }
         if(parts.modal.classList.contains("show")&&!parts.modal.classList.contains(AD_FREE_MODE_CLASS)){
@@ -35444,8 +35582,6 @@ catch(error){
         parts.modal.setAttribute("aria-modal","true");
         parts.modal.setAttribute("aria-labelledby","homeFeatureModalTitle");
         parts.modal.classList.add("show");
-        adFreeState.shownThisEntry=true;
-        disconnectAdFreeObserver();
         return true;
     }
 
@@ -35464,71 +35600,8 @@ catch(error){
         return true;
     }
 
-    function isVisible(element){
-        if(!element||element.hidden){ return false; }
-        if(typeof window.getComputedStyle!=="function"){ return true; }
-        const style=window.getComputedStyle(element);
-        return style.display!=="none"&&style.visibility!=="hidden";
-    }
-
-    function shouldAutoShowAdFreeServiceInfo(){
-        return AD_FREE_DISPLAY_POLICY.mode==="every-entry"&&!adFreeState.shownThisEntry;
-    }
-
-    function isHomeReadyForAdFreeDisclosure(){
-        const startup=document.getElementById("startupLoader");
-        const game=document.getElementById("gameInterface");
-        const home=document.getElementById("homePage");
-        const modal=document.getElementById("homeFeatureModal");
-        if(startup&&isVisible(startup)){ return false; }
-        if(!isVisible(game)){ return false; }
-        if(!home||!home.classList.contains("active")){ return false; }
-        if(modal&&modal.classList.contains("show")){ return false; }
-        return true;
-    }
-
-    function tryAutoShowAdFreeServiceInfo(){
-        if(!shouldAutoShowAdFreeServiceInfo()||!isHomeReadyForAdFreeDisclosure()){
-            return false;
-        }
-        return openAdFreeServiceInfoModal({manual:false});
-    }
-
-    function scheduleAutoShowAdFreeServiceInfo(){
-        if(!shouldAutoShowAdFreeServiceInfo()){ return; }
-        if(typeof window.requestAnimationFrame==="function"){
-            window.requestAnimationFrame(tryAutoShowAdFreeServiceInfo);
-        }else{
-            window.setTimeout(tryAutoShowAdFreeServiceInfo,0);
-        }
-    }
-
-    function armAdFreeServiceInfo(){
-        if(adFreeState.armed){ return; }
-        adFreeState.armed=true;
-        ensureAdFreeConfig();
-
-        document.addEventListener("v173.20:startup-entered",scheduleAutoShowAdFreeServiceInfo);
-        window.addEventListener("pageshow",scheduleAutoShowAdFreeServiceInfo);
-
-        if(typeof MutationObserver==="function"){
-            const observer=new MutationObserver(scheduleAutoShowAdFreeServiceInfo);
-            ["startupLoader","gameInterface","homePage","homeFeatureModal"].forEach(function(id){
-                const element=document.getElementById(id);
-                if(element){
-                    observer.observe(element,{attributes:true,attributeFilter:["class","style","hidden"]});
-                }
-            });
-            adFreeState.observer=observer;
-        }
-
-        scheduleAutoShowAdFreeServiceInfo();
-    }
-
     window.AD_FREE_SERVICE_DISPLAY_POLICY=AD_FREE_DISPLAY_POLICY;
-    window.openAdFreeServiceInfoModal=function(){
-        return openAdFreeServiceInfoModal({manual:true});
-    };
+    window.openAdFreeServiceInfoModal=openAdFreeServiceInfoModal;
     window.closeAdFreeServiceInfoModal=closeAdFreeServiceInfoModal;
 
 
@@ -35557,48 +35630,146 @@ catch(error){
         node.textContent=rosterResourceText(whole);
         node.title=full; node.setAttribute("aria-label",full);
     }
-    function renderHomeRoster(){
+    const HOME_RELIC_SUMMARY_CATALOG=window.FourSymbolsRelicSummaryCatalog||Object.freeze({});
+
+    function homeRosterPlaceholder(index){
+        return '<article class="v146-home-character v146-home-character-placeholder" data-home-roster-slot="'+index+'" aria-busy="true">'+
+            '<div class="v146-home-avatar" aria-hidden="true"></div>'+
+            '<div class="v146-home-character-main"><div><b>隊伍資料載入中</b><span>--</span></div>'+
+            '<div class="v146-home-resource hp"><i style="width:0%"></i><strong>HP --</strong></div>'+
+            '<div class="v146-home-resource sp"><i style="width:0%"></i><strong>SP --</strong></div></div></article>';
+    }
+
+    function ensureHomeRosterShell(){
         const page=document.getElementById("homePage");
         const grid=page&&page.querySelector(".home-card-grid");
-        if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return false; }
+        if(!page||!grid){ return null; }
+        let roster=document.getElementById("v146HomeRoster");
+        if(!roster){
+            roster=document.createElement("section");
+            roster.id="v146HomeRoster";
+            roster.className="v146-home-roster";
+            roster.setAttribute("aria-label","冒險隊伍");
+            grid.insertAdjacentElement("afterend",roster);
+        }
+        if(!roster.querySelector(":scope > header")){
+            const header=document.createElement("header");
+            header.innerHTML='<b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 -- / 6</span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button>';
+            roster.appendChild(header);
+        }
+        if(!roster.querySelector(".v146-home-character")){
+            for(let index=0;index<3;index++){
+                roster.insertAdjacentHTML("beforeend",homeRosterPlaceholder(index));
+            }
+        }
+        let relicSlot=roster.querySelector(".team-relic-loadout-slot");
+        if(!relicSlot){
+            relicSlot=document.createElement("div");
+            relicSlot.className="team-relic-loadout-slot";
+            relicSlot.dataset.ready="false";
+            relicSlot.innerHTML='<span>隊伍秘寶</span><b>秘寶資料載入中</b><small>等待正式存檔完成解析</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')" disabled>選擇</button>';
+            roster.appendChild(relicSlot);
+        }
+        return roster;
+    }
+
+    function readHomeRelicSave(){
+        try{
+            const repository=window.FourSymbolsAccountSave;
+            const uid=repository&&repository.getActiveUid();
+            if(!repository||!uid){ return null; }
+            const result=repository.readForUid(uid);
+            return result&&result.status==="ready"&&result.save&&typeof result.save==="object"
+                ?result.save
+                :null;
+        }catch(_){
+            return null;
+        }
+    }
+
+    function syncHomeRelicSummary(){
+        const roster=ensureHomeRosterShell();
+        const slot=roster&&roster.querySelector(".team-relic-loadout-slot");
+        if(!slot){ return false; }
+        const save=readHomeRelicSave();
+        if(!save){
+            slot.dataset.ready="false";
+            return false;
+        }
+        const relicId=save.teamLoadout&&typeof save.teamLoadout==="object"
+            ?String(save.teamLoadout.relicId||"")
+            :"";
+        const definition=relicId?HOME_RELIC_SUMMARY_CATALOG[relicId]:null;
+        const owned=relicId&&save.playerRelics&&typeof save.playerRelics==="object"
+            ?save.playerRelics[relicId]
+            :null;
+        const level=Math.max(1,Math.min(20,Math.floor(rosterNumber(owned&&owned.level)||1)));
+        slot.innerHTML=definition
+            ?'<span>隊伍秘寶</span><b>'+rosterEscape(definition.name)+' Lv.'+level+'</b><small>'+rosterEscape(definition.triggerText)+'</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')">更換</button>'
+            :'<span>隊伍秘寶</span><b>尚未裝備</b><small>每隊僅能裝備1件秘寶</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')">選擇</button>';
+        slot.dataset.ready="true";
+        return true;
+    }
+
+    function renderHomeRoster(){
+        const roster=ensureHomeRosterShell();
+        if(!roster||typeof getExistingPartyIndexes!=="function"){ return false; }
         const partyIndexes=getExistingPartyIndexes().slice(0,3);
         const availableExp=typeof window.v173GetAvailableExpPool==="function"
             ?window.v173GetAvailableExpPool(Date.now())
             :(typeof sharedExp!=="undefined"?sharedExp:0);
         syncRosterResource(document.getElementById("homeHudGoldValue"),typeof gold!=="undefined"?gold:0);
         syncRosterResource(document.getElementById("homeHudExpValue"),availableExp);
-        let roster=document.getElementById("v146HomeRoster");
-        if(!roster){
-            roster=document.createElement("section");
-            roster.id="v146HomeRoster"; roster.className="v146-home-roster";
-            roster.setAttribute("aria-label","冒險隊伍");
-            grid.insertAdjacentElement("afterend",roster);
-        }
-        const cards=partyIndexes.map(index=>{
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-            const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
-            if(!character||!stats){ return ""; }
+        const count=roster.querySelector(".v146-home-roster-count");
+        if(count){ count.textContent="隊伍 "+partyIndexes.length+" / 6"; }
+
+        const cards=[];
+        for(let slotIndex=0;slotIndex<3;slotIndex++){
+            const index=partyIndexes[slotIndex];
+            const character=typeof index==="number"&&typeof getPartyCharacterByIndex==="function"
+                ?getPartyCharacterByIndex(index)
+                :null;
+            const stats=typeof index==="number"&&typeof getPartyBattleStats==="function"
+                ?getPartyBattleStats(index)
+                :null;
+            if(!character||!stats){
+                cards.push('<article class="v146-home-character v146-home-character-empty" data-home-roster-slot="'+slotIndex+'"><div class="v146-home-avatar" aria-hidden="true"></div><div class="v146-home-character-main"><div><b>隊伍空位</b><span>--</span></div><div class="v146-home-resource hp"><i style="width:0%"></i><strong>HP --</strong></div><div class="v146-home-resource sp"><i style="width:0%"></i><strong>SP --</strong></div></div></article>');
+                continue;
+            }
             const hp=Math.max(0,Math.min(rosterNumber(stats.maxHP),rosterNumber(character.hp)));
             const sp=Math.max(0,Math.min(rosterNumber(stats.maxSP),rosterNumber(character.sp)));
             const hpPercent=rosterNumber(stats.maxHP)>0?hp/rosterNumber(stats.maxHP)*100:0;
             const spPercent=rosterNumber(stats.maxSP)>0?sp/rosterNumber(stats.maxSP)*100:0;
             const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
-            return '<article class="v146-home-character" data-element="'+rosterEscape(character.element||"fire")+'">'+
+            cards.push('<article class="v146-home-character" data-home-roster-slot="'+slotIndex+'" data-element="'+rosterEscape(character.element||"fire")+'">'+
                 '<div class="v146-home-avatar"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id||"角色")+'頭像"></div>'+
                 '<div class="v146-home-character-main"><div><b>'+rosterEscape(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'</span></div>'+
                 '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(rosterNumber(stats.maxHP))+'</strong></div>'+
-                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'</strong></div></div></article>';
-        }).join("");
-        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 6</span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button></header>'+cards;
+                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'</strong></div></div></article>');
+        }
+
+        roster.querySelectorAll(".v146-home-character").forEach(node=>node.remove());
+        const relicSlot=roster.querySelector(".team-relic-loadout-slot");
+        if(relicSlot){ relicSlot.insertAdjacentHTML("beforebegin",cards.join("")); }
+        else{ roster.insertAdjacentHTML("beforeend",cards.join("")); }
         roster.dataset.ready="true";
+        syncHomeRelicSummary();
         return true;
     }
     window.v54RenderHomeRoster=renderHomeRoster;
-    document.addEventListener("four-symbols:startup-ready",renderHomeRoster);
+    window.FourSymbolsHomeRelicSummary=Object.freeze({
+        ensureShell:ensureHomeRosterShell,
+        sync:syncHomeRelicSummary
+    });
+    document.addEventListener("four-symbols:startup-ready",function(){
+        renderHomeRoster();
+        syncHomeRelicSummary();
+    });
 
     function boot(){
         apply();
-        armAdFreeServiceInfo();
+        ensureAdFreeConfig();
+        ensureHomeRosterShell();
     }
 
     if(document.readyState === "loading"){
