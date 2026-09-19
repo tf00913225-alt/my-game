@@ -5,38 +5,38 @@
   "base_sha": "cc1d57eb8b467605463767dd972fd6717f66440a",
   "work_branch": "fix/relic-target-highlight-stacking-20260919",
   "officialVersion": "173.65",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "supersedes": "不取代既有秘寶 cinematic 規格；只修正目標單位被 battle-wrap stacking context 限制而仍遭 75% dim layer 覆蓋的呈現缺陷。",
   "requirements": [
     {
       "id": 1,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "秘寶實際目標必須在 75% 戰場暗幕之上逐漸變亮，包含敵方全體、我方全體、單體敵人、單體我方與 Boss/援軍/技能物件。",
       "implementation": "cinematic DOM 改掛既有 .battle-wrap；relicTargetLayer 將實際 battleMonster/battlePlayer 的 Fixed Slot 或 Boss footprint 作為 stacking carrier，套用 team-relic-battle-target-layer。"
     },
     {
       "id": 2,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "提高目標圖層時不得高過秘寶 VFX。",
       "implementation": "dim=6090、target carrier=6105、identity cut-in=6120；正式 V143 VFX 維持 document-level z-index=16000，因此目標永遠低於 VFX。"
     },
     {
       "id": 3,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "檢查所有秘寶技能是否有相同狀況並共用修正。",
       "implementation": "20/20 RELIC_VFX_PRESENTATION 全部經 queueRelicPresentation → relicVfxTarget → beginRelicCinematic/revealRelicTargets → playRelicVfx 共用路徑；測試覆蓋 enemyAll/allyAll/singleEnemy/singleAlly 四種目標模式。"
     },
     {
       "id": 4,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "不得改秘寶數值、正式目標結算、Fixed Slot 幾何、一般技能/普攻節奏、V143 authored hit frame 或既有 2.2–2.8 秒秘寶 VFX。",
       "implementation": "修改範圍只在 relic presentation JS/CSS、對應 regression test、requirement batch 與 build 同步；戰鬥計算/節奏/V143 renderer 不改。"
     },
     {
       "id": 5,
-      "status": "TODO",
-      "request": "Repository checks 與 DEV 部署必須通過，部署 SHA 必須等於最新 dev HEAD。",
-      "implementation": "待 PR checks、merge dev 與 Cloudflare DEV deployment 完成後補驗證證據。"
+      "status": "VERIFIED",
+      "request": "合併 dev 前 Repository checks 與戰鬥相關 browser QA 必須通過。",
+      "implementation": "PR #328 CI run 35415867964：Repository checks SUCCESS；Fixed Slot 9x16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure browser QA、build synchronization、release gate 全部 PASS。"
     }
   ],
   "layerContract": {
@@ -46,9 +46,23 @@
     "v143Vfx": 16000
   },
   "verification": [
-    "PENDING: focused regression",
-    "PENDING: production build synchronization",
-    "PENDING: PR Repository checks",
-    "PENDING: DEV deploy and deployed SHA verification"
-  ]
+    "PASS: PR #328 CI run 35415867964 Repository checks",
+    "PASS: battle layout/timing/range-VFX regression includes relic stacking + 20/20 target-mode audit",
+    "PASS: production build synchronization",
+    "PASS: Fixed Slot battlefield 9x16 mobile browser QA",
+    "PASS: exact-candidate real battle mobile browser QA",
+    "PASS: Adventure V1 mobile browser QA",
+    "PASS: static resources, duplicate IDs, release/loader integrity, Release Gate and Git checks"
+  ],
+  "preMergeEvidence": {
+    "pullRequest": 328,
+    "officialPrCiRun": 35415867964,
+    "repositoryChecks": "PASS",
+    "fixedSlot9x16MobileQa": "PASS",
+    "exactCandidateRealBattleMobileQa": "PASS",
+    "buildSynchronization": "PASS",
+    "releaseGate": "PASS",
+    "layerOrder": "6090 dim < 6105 target < 6120 identity < 16000 V143 VFX",
+    "auditedRelics": "20/20"
+  }
 }
