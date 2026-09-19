@@ -1,4 +1,13 @@
-## 2026-09-19 — Cloud Account Phase 1：Single Active Session（BLOCKED）
+## 2026-09-19 — Cloud Account Phase 1 正式驗收結案（COMPLETE / 5/5 VERIFIED）
+
+- 本節取代下方歷史「Phase 1 BLOCKED / Firebase 403」作為目前狀態；歷史紀錄保留。長期進度唯一來源仍是 `docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md`，Phase 2–10 全部尚未開始。
+- 結案基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；Firebase run `35438044543`／deploy job `105884400094` 成功，七支 Functions 全部更新，Firestore Rules 編譯與發布成功。部署服務帳號：`github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com`。Rules IAM 403 已解除；Artifact Registry 清理政策警告已不阻擋部署，但未冒稱政策本身已設定成功。
+- 同 UID 真實雙手機：舊手機畫面顯示 `SESSION_REVOKED` 與「這台裝置已被另一台裝置取代」；後登入手機 SUCCESS 由使用者於本次對話明確回報，成功截圖已刪除。使用者後續澄清已完成實測、沒有問題；不把先前簡短回覆誤記成雙手機均失效。不同 UID 隔離由同 SHA 的 HTTP emulator job `105883976742` 實際通過，未冒稱有不同 UID 真機截圖。
+- 同一基準的 Repository checks、DEV deployment 與部署 SHA 核對由 run `35438044719` 成功。收尾 PR 合併後必須另外記錄最新 dev 的檢查、Firebase／DEV 部署及正式 main 發布證據，不能用本段基準成功冒充最後發布 SHA。
+- DEV 測試區仍由 `js/firebase/firebase-auth-ui.js` 的精確 hostname allowlist 控制，只允許 `dev.four-symbols-dev.pages.dev`、`localhost`、`127.0.0.1`。不改正式權限 owner、UI、玩法或存檔；Game／Cache Version 維持 `173.65`。`DATA_SECURITY_CONTRACTS.md` 仍不存在。
+- 使用者已授權本次文件 PR → dev → 受保護 main PR 發布；最終 SHA 與發布結果記錄於[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 的永久發布證據，不預填未執行結果。Phase 1 功能驗收已完成；整次發布仍須完成既有 Release Gate 與正式部署驗證才可回報完成。
+
+## 2026-09-19 — Cloud Account Phase 1：Single Active Session（歷史 BLOCKED 紀錄）
 
 - 基準 `dev@7dd60dcddc9334902e058123a6084a93353e5943`；分支 `feature/cloud-session-authority-phase1-20260919`，只整合 `dev`，`main` 禁止修改。
 - 長期進度唯一來源：[docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md](docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md)。後續每個 Cloud Save Phase 必須更新；內含 14 項稽核、十階段狀態、永久決策、風險與下一步。基準缺少 `DATA_SECURITY_CONTRACTS.md`，已如實記錄。

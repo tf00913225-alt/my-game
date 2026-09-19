@@ -6,7 +6,7 @@
 
 | Phase | 範圍 | 狀態 |
 | --- | --- | --- |
-| 1 | Single Active Session（單一有效工作階段權威） | BLOCKED |
+| 1 | Single Active Session（單一有效工作階段權威） | COMPLETE / 5/5 VERIFIED |
 | 2 | Cloud Save Skeleton（雲端存檔骨架） | NOT STARTED |
 | 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | NOT STARTED |
 | 4 | General Progress Migration（一般進度遷移） | NOT STARTED |
@@ -21,13 +21,27 @@
 
 ## B. Current Phase（目前階段）
 
-- Phase 1 — Single Active Session Authority。
+- Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。Phase 2 尚未開始。
 - 起始基準：GitHub 最新 `dev@7dd60dcddc9334902e058123a6084a93353e5943`，2026-09-19 重新 fetch 核對。
-- 工作分支：`feature/cloud-session-authority-phase1-20260919`；整合目標 `dev`；禁止修改 `main`、rebase、force push。
+- 原實作分支：`feature/cloud-session-authority-phase1-20260919`，當時只整合 `dev`。本次結案分支：`docs/cloud-session-phase1-closeout-20260919`，基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；使用者已授權完成結案後經受保護 PR 發布 main。禁止直接修改 dev／main、rebase、force push。
 - 官方版本／cache version 維持 `173.65`，沒有升版。
 - 實作／測試／部署狀態分開記錄於下方；未取得實際證據不得標記 COMPLETED。
 - 程式 PR [#335](https://github.com/tf00913225-alt/my-game/pull/335) 已在兩組 CI 全綠後合併 `dev`。實作 commits：`3d2434fd1323ea175333868cd8d51871a6f4a69a`、`d413304550f015dc164152d1e0229dd68dcdd95b`；merge commit：`b105f5329d95874820202b6ade78254712200d5e`。未修改 `main`。
-- **BLOCKED / NOT COMPLETE：** 程式與模擬器驗收已完成，DEV 前端已部署；Firebase 部署在 Rules API 測試階段遭 IAM 403 拒絕。七支 Functions／規則尚未完成部署，真正雲端 A/B 驗收未執行。Requirements：**4/5 VERIFIED**。
+- **目前驗收狀態：COMPLETE / 5/5 VERIFIED。** Rules IAM 403 已解除；真實 Firebase 七支 Functions／Rules 部署及同 UID 雙手機 takeover 驗收已有下列證據。Phase 1 完成不等於完整雲端存檔已完成。文件 PR、最後 dev CI／部署、main PR 與正式部署屬本次發布鏈，須各自核對最新 SHA，不能以功能驗收代替發布驗證。
+
+### 2026-09-19 正式驗收結案證據（目前狀態）
+
+- **已部署驗收基準 SHA：** `342ef104fa2897f5ae5c3249e0c75c9efca3e762`，為本次收尾開始時 GitHub 最新 dev，非沿用未核對的舊 SHA。
+- **部署身分與 IAM：** 實際 job 輸出確認 `github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com`；Rules API 403 已解除。本次不新增 IAM 權限、不取得或提交服務帳號金鑰。
+- **Firebase 部署：** [run 35438044543](https://github.com/tf00913225-alt/my-game/actions/runs/35438044543)／[job 105884400094](https://github.com/tf00913225-alt/my-game/actions/runs/35438044543/job/105884400094) SUCCESS。2026-09-19 10:44:55 UTC 規則編譯成功、10:45:03 UTC 發布到 cloud.firestore；10:46:01–10:46:09 UTC 七支函式全部 Successful update operation，最後 Deploy complete!。
+- **七支已部署 Functions：** `createGameSession`、`revokeGameSession`、`protectedTest`、`bootstrapCloudSave`、`submitLegacyMigrationCandidate`、`createNativeAuthHandoff`、`redeemNativeAuthHandoff`，region `us-central1`。
+- **Artifact Registry：** PR #339 在既有精確範圍部署命令加入 `--force`，已解除非互動清理政策造成的部署退出阻塞。上述成功 job 仍含「Failed to set up cleanup policy」警告；只能確認部署完成，不能把清理政策實際設定標成 VERIFIED。此為非阻塞維運追蹤，不擴大本階段功能。
+- **真實同 UID 手機 A/B：** 使用者以相同 Google 帳號／UID 測試。舊裝置提供畫面 `SESSION_REVOKED` 與「❌ 這台裝置已被另一台裝置取代。」；使用者於本次對話補充後登入裝置曾顯示成功，成功截圖已刪除，並明確表示已實測、沒有問題。新裝置持續有效採認為使用者實機回報，未假造截圖、token、完整 UID 或伺服器逐次操作日誌。
+- **澄清紀錄：** 使用者中途簡短回覆「已被取代」，隨後澄清「是成功的畫面我刪掉了」及已完成實測。先前疑似雙裝置均失效的解讀不作為已確認 Bug；沒有據此改動任何權限程式。
+- **不同 UID 隔離／自動驗證：** 同 SHA 的 [emulator job 105883976742](https://github.com/tf00913225-alt/my-game/actions/runs/35438044543/job/105883976742) SUCCESS，實際 HTTP callable 驗證 A SUCCESS → B takeover → A SESSION_REVOKED → B SUCCESS、不同 UID、rules、protected writers、併發與身分撤銷。`scripts/test-session-authority-emulator.mjs` 的 UID Y 在 UID X 撤銷後仍 SUCCESS。這是可執行模擬器證據，沒有冒稱為不同 UID 真實手機驗收。
+- **Repository checks／DEV：** [run 35438044719](https://github.com/tf00913225-alt/my-game/actions/runs/35438044719) 的 Repository checks 與 [DEV deployment job 105884077707](https://github.com/tf00913225-alt/my-game/actions/runs/35438044719/job/105884077707) SUCCESS。部署讀回 exact SHA `342ef104fa2897f5ae5c3249e0c75c9efca3e762`，Game／Cache Version 均 `173.65`。
+- **DEV 測試按鈕：** `firebase-auth-ui.js::render()` 與 `testCurrentDeviceSession()` 共用精確 hostname allowlist。可執行檢查確認三個允許網域顯示／可呼叫，`tf00913225-alt.github.io`、專案 root 及偽裝後綴網域隱藏／不可呼叫；session client 原有 8 tests 全數 PASS。正式網站發布後仍另做實頁確認，不將此檢查冒稱為正式登入實測。
+- **永久發布記錄：** [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 的最終發布證據保存文件 merge SHA、最終 dev SHA、其 Repository checks／DEV／Firebase run 與 job、dev→main PR、main SHA、正式部署及 SHA 核對。文件內的驗收基準 SHA 不冒充合併後 SHA；最終 merge SHA 由合併產生後記入 PR，避免用另一個文件 commit 不斷改變待驗證 SHA。
 
 ## Architecture Audit（修改前實際程式碼稽核）
 
@@ -98,7 +112,7 @@
 - session 失效只丟棄憑證／記錄 tombstone，不刪角色、背包或 legacy save。重新整理只驗證已有憑證；失效後不自動建立新 session。
 - 新模組納入 `scripts/build-production.mjs` 的既有 hashed Firebase graph 與 First Play manifest，沒有新增獨立啟動 owner。
 
-### 驗證紀錄
+### 原實作驗證紀錄（歷史；目前狀態以上方結案證據為準）
 
 - 2026-09-19：7 個精準 test files 共 30 tests PASS（session client 8 cases；既有 Firebase auth、trusted backend、account ownership、auth-before-creation、boot architecture、resolved save hydration）。
 - `node scripts/build-production.mjs --check` PASS。
@@ -111,14 +125,14 @@
 - 併發驗證使用 Firestore document `updateTime` 比較實際提交順序；`serverTimestamp()` 是 server request time，不能把其值誤當 commit ordering。未放寬交易／授權断言。
 - `dev@b105f5329d95874820202b6ade78254712200d5e`：Repository checks [35430858607](https://github.com/tf00913225-alt/my-game/actions/runs/35430858607) **SUCCESS**，同 run 的 DEV deployment gate／Cloudflare 部署及部署 SHA 驗證亦 SUCCESS。Game／Cache version 均 `173.65`。
 - 同一 dev SHA 的 [Session Authority 35430858389](https://github.com/tf00913225-alt/my-game/actions/runs/35430858389)：emulator job `105865040421` **SUCCESS**；Firebase deploy job `105865475494` **FAILURE**。既有 Secret 存在且 Google Cloud authentication 成功，2026-09-19 08:05:04 UTC 在 `firebaserules.googleapis.com/v1/projects/four-symbols-jianghu:test` 回覆 **403, The caller does not have permission**。
-- 失敗發生於 `firestore.rules` compilation test，尚未進入本次 Functions 部署／Rules release。未略過規則、未更換或提升憑證權限。Live Firebase／真正雲端 A/B：**未完成**；沒有為此建立正式環境測試帳號或修改正式玩家資料。
+- 該歷史失敗發生於 `firestore.rules` compilation test，當時尚未進入 Functions 部署／Rules release。當時 Live Firebase／真正雲端 A/B 未完成；此阻塞已由上方結案證據解除。沒有為此建立正式環境測試帳號或修改正式玩家資料。
 
 ## D. Remaining Work（尚未完成）
 
-1. 由 Firebase／Google Cloud 專案管理者檢查既有部署服務帳號在 `four-symbols-jianghu` 的 Rules 權限與 deny policy，解決已證實的 Rules API 403。至少目前缺乏有效的 `firebaserules.rulesets.test` 存取；後續部署亦需 ruleset／release 寫入權限，不能只讓測試通過。
-2. 權限修復後，從**屆時最新 dev** 使用下列既有部署命令部署七支 Functions＋Rules，記錄 exact SHA 與成功證據；不略過規則、不放寬 latest-dev gate。這次文件收尾會推進 dev SHA，舊 `b105f53` job 不能在新 dev 上直接重跑並假稱是最新部署。
-3. 部署成功後，以同 UID 兩個獨立登入實際驗證 A SUCCESS → B takeover → A SESSION_REVOKED → B SUCCESS，另確認 UID Y 不受影響。記錄雲端驗收結果後更新本文件、HANDOFF 與 Requirement Batch，才可標記 Phase 1 COMPLETED。
-4. Phase 2+ 才做正式 game save schema、完整登入載入隔離、一般進度／高價值資料遷移、operationId、帳本、快照、付款。Phase 1 不把 local progress 升格為正式雲端資料。
+1. Phase 1 功能驗收已完成；本次結案文件仍須 PR → Repository checks SUCCESS → merge dev，然後核對最新 dev 的 CI、DEV deployment、Session Authority emulator 與 Firebase deploy，逐一記錄實際 SHA。
+2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久發布記錄，不預填成功。
+3. Artifact Registry 清理政策本身仍有非阻塞警告，保留維運追蹤；不以 Deploy complete 推定政策設定成功。
+4. Phase 2–10 全部 NOT STARTED。本次不做正式 game save schema、一般進度／高價值資料遷移、operationId、帳本、快照或付款，亦不把 local progress 升格為正式雲端資料。
 
 ## E. Architecture Decisions（永久決策）
 
@@ -142,8 +156,9 @@
 
 - **高：** 現有 browser 可改本機金幣／EXP／物品等；舊 A 仍可操作本機遊戲，但無權經新的 protected backend 寫正式雲端。未遷移的 gameplay 不能宣稱已防作弊。
 - **高：** 部分 sidecar key／in-memory singleton 固定於首次 UID，現有 startup 切換帳號未統一 reload/reset 全部 owner；核心 save guard 可降低風險，Phase 3 仍須獨立稽核與實測。
-- **高：** 基準缺 `DATA_SECURITY_CONTRACTS.md`；production Functions／Rules／IAM／enabled providers 需實際部署與查驗。repository CORS 不是授權；不可用它取代 session check。
-- **高／目前阻塞：** Firebase Rules 部署已確認 IAM 403，線上仍不能宣稱具有本次 session authority。新前端缺少 session 時會拒絕受保護呼叫，但既有已部署 callable 的舊權限模型不會因 GitHub merge 自動更新；必須完成七支 Functions 與規則部署，才能對線上 caller 保證失效 session 被拒絕。
+- **高：** `DATA_SECURITY_CONTRACTS.md` 仍不存在；本次七支 Functions／Rules／部署身分已有實際證據，但不等於所有 Firebase 設定或 providers 皆已稽核。repository CORS 不是授權；不可用它取代 session check。
+- **已解除的歷史阻塞：** Firebase Rules IAM 403 與本次七支函式部署阻塞已解除，證據見上方。每次後續部署仍須核對實際 SHA 與結果，不能只凭 GitHub merge 宣稱後端已更新。
+- **低／維運追蹤：** Artifact Registry 清理政策仍有設定警告；部署已 SUCCESS，政策本身未 VERIFIED，後續需另行查驗，不於本次擴充 IAM 權限。
 - **高：** 未實作 App Check／全面 rate limit／經濟後端；session bearer 在同 origin JS 可讀，XSS／被複製 credential 不屬硬體防複製機制。新增裝置不能只靠 local deviceId 判斷。
 - **中：** sessionStorage 不支援／被清除／create response 遺失／tab 關閉後，已存在 authority 的 UID 需明確重新登入；不自動搶回。匿名帳號不得為恢復權威自動建立另一 UID；應先保留原 UID 並規劃綁定／恢復流程。
 - **中：** offline logout 會清除本機憑證並執行 SDK logout，但無法保證遠端 revoke 已提交；回報錯誤。已遺失的 bearer 在新登入取代前仍可能有效，不能把 local signOut 等同 server revoke。
@@ -157,9 +172,9 @@
 
 `.github/workflows/session-authority.yml`：PR→dev 執行專屬 emulator gate；merge 至 dev 後，先等該 SHA 的 Repository checks SUCCESS 並確認仍是最新 dev，才部署。沿用既有 Actions Secret `FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON`；缺少權限／Secret 則 job 失敗，Phase 1 必須保持 BLOCKED。
 
-目前阻塞是服務帳號的 Rules API 權限，不是 Secret 缺失。專案管理者應依最小權限原則核對 `firebaserules.rulesets.test` 與 ruleset／release 部署權限；官方預設角色 `roles/firebaserules.admin` 包含這組權限（[Firebase Rules IAM 角色](https://docs.cloud.google.com/iam/docs/roles-permissions/firebaserules)）。本次沒有授予 IAM 角色，也沒有存取或提交私鑰。修復此 403 不代表後续 Functions 部署權限已驗證，應繼續依實際部署結果處理。
+歷史 Rules API IAM 403 已解除；目前部署服務帳號為 `github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com`，七支 Functions／Rules 已實際成功部署。若未來再次遇到權限錯誤，依實際錯誤核對最小權限；本次沒有授予 IAM 角色，也沒有存取或提交私鑰。
 
-此 workflow 僅在相關程式／規則路徑變更時觸發；純文件合併不會重跑 Firebase 部署。恢復時可由有權限的部署環境 checkout 最新 dev、核對其 CI 綠燈，再執行下面精確範圍的部署命令。不得為重跑而修改 `main`，也不得移除部署 SHA 檢查。
+此 workflow 依既有 path filters 在相關程式／規則／自身檔案變更時觸發，並已有 `workflow_dispatch` 入口；只有 dev 可部署。單改 Markdown 不會重跑 Firebase。本次只在既有 workflow 增加本結案文件的索引註解，使合併後既有 push 流程可驗證最新 dev；未修改 triggers、權限、部署範圍或 SHA gate。不得重跑舊 SHA 並冒稱是最新部署。
 
 Node.js 22、Java 21（emulator）、Firebase CLI 15.30.0；backend project `four-symbols-jianghu`，region `us-central1`。
 
@@ -167,7 +182,7 @@ Node.js 22、Java 21（emulator）、Firebase CLI 15.30.0；backend project `fou
 npm --prefix functions ci
 npx --yes firebase-tools@15.30.0 emulators:exec --project demo-four-symbols-session --config firebase.session-emulators.json --only auth,firestore,functions 'node scripts/test-session-authority-emulator.mjs'
 # 使用有權限的 ADC／正式 Secret，不把服務帳號 JSON 寫入 repo：
-npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'
+npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --force --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'
 ```
 
 Cloudflare 的靜態部署不部署 Firebase。獨立部署明列三支新 session、兩支既有 save、兩支必要的 native handoff guard，共七支函式；禁止 `--force` 刪除其他函式。部署鎖沿用既有 native-auth backend concurrency group，避免兩個部署互相覆蓋。若需回退，不可部署回沒有 session check 的 protected writer 或沒有 source epoch 的 token issuer；應先停止受保護寫入並保留資料，再另修。
@@ -186,13 +201,13 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 
 ## G. Next Safe Step（每次結束必更新）
 
-**先收尾 Phase 1；未驗收前不要開始 Phase 2。**
+**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；本次只完成其發布鏈，Phase 2 尚未開始。**
 
 1. 先讀本文件、`AGENTS.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/BOOT_ARCHITECTURE.md`、本次 Requirement Batch。
 2. 看 `functions/src/session-authority.js`、`functions/index.js`、`js/firebase/session-client.js`、`firebase-session.js`、兩個 Firebase client owners 與 `firestore.rules`。
-3. 先處理 Firebase deploy run `35430858389`／job `105865475494` 的 Rules API 403；前置條件是專案管理者提供具有必要 Rules／Functions 部署權限的既有正式身分。依上方部署節從最新 dev 部署，不修改 `main`、不跳過規則或 SHA gate。
-4. 核對部署 exact SHA、七支 Functions 與規則實際生效，再完成同 UID A/B／不同 UID 驗收並更新本文件。此前 Phase 1 保持 BLOCKED，Phase 2 不開工。
-5. 前置條件滿足後，Phase 2 僅規劃 server-owned save envelope（ownerUid、schemaVersion、revision、server timestamps）、明確 empty/error/conflict 狀態；所有正式寫入接既有 session transaction 入口。
-6. 不碰 `main`、戰鬥／VFX／UI 改版、全經濟／背包／秘寶遷移、支付、整份 local overwrite、無關 refactor；先完成可驗證的小步驟。
+3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
+4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
+5. Phase 2 必須另行開始；後續若獲授權，才處理 server-owned save envelope（ownerUid、schemaVersion、revision、server timestamps）等。本次保持 NOT STARTED。
+6. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或存檔，禁止 local overwrite 與無關 refactor。只透過 PR 發布已驗證 dev，禁止直接修改 main。
 
 官方技術依據：[Callable 身分驗證](https://firebase.google.com/docs/functions/callable)、[Firebase auth_time／撤銷檢查](https://firebase.google.com/docs/auth/admin/manage-sessions)、[Firestore 原子交易與重跑](https://firebase.google.com/docs/firestore/manage-data/transactions)。
