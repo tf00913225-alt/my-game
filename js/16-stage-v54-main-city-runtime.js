@@ -198,28 +198,7 @@
         node.textContent=rosterResourceText(whole);
         node.title=full; node.setAttribute("aria-label",full);
     }
-    const HOME_RELIC_SUMMARY_CATALOG=Object.freeze({
-        relic_qiankun_flask:Object.freeze({name:"乾坤玉壺",triggerText:"奇數回合結束時"}),
-        relic_sun_orb:Object.freeze({name:"烈陽神珠",triggerText:"偶數回合開始時"}),
-        relic_xuanwu_seal:Object.freeze({name:"玄武靈印",triggerText:"每第3回合開始時"}),
-        relic_soul_bell:Object.freeze({name:"鎮魂古鐘",triggerText:"每第4回合開始時"}),
-        relic_tiangang_banner:Object.freeze({name:"天罡戰旗",triggerText:"我方累積受到6次敵方有效攻擊後"}),
-        relic_nine_dragon_fire:Object.freeze({name:"九龍神火罩",triggerText:"敵方累積完成7次有效行動後"}),
-        relic_cold_spring_jade:Object.freeze({name:"寒泉玉珮",triggerText:"任一我方角色在傷害結算後低於35%最大HP時"}),
-        relic_qinglan_feather:Object.freeze({name:"青嵐羽符",triggerText:"戰鬥開始時"}),
-        relic_rock_mountain_seal:Object.freeze({name:"岩岳鎮印",triggerText:"開場；另於我方累積受8次有效攻擊時"}),
-        relic_returning_wheel:Object.freeze({name:"回天寶輪",triggerText:"本場第一次有我方角色將受到致命傷害時"}),
-        relic_origin_talisman:Object.freeze({name:"太初聖符",triggerText:"每第4回合結束"}),
-        relic_broken_army_scroll:Object.freeze({name:"破軍殘卷",triggerText:"角色攻擊／技能擊敗敵人後"}),
-        relic_red_sky_war_mark:Object.freeze({name:"赤霄戰紋",triggerText:"戰鬥開始時"}),
-        relic_ice_mirror_heart:Object.freeze({name:"玄冰鏡心",triggerText:"每第3回合結束"}),
-        relic_wind_chasing_talisman:Object.freeze({name:"追風行符",triggerText:"每第3回合開始"}),
-        relic_mountain_river_cauldron:Object.freeze({name:"山河寶鼎",triggerText:"我方累積受7次有效攻擊後"}),
-        relic_burning_star_mark:Object.freeze({name:"焚星殘印",triggerText:"偶數回合結束"}),
-        relic_spirit_spring_bottle:Object.freeze({name:"靈泉法瓶",triggerText:"每第3回合結束"}),
-        relic_demon_suppressing_seal:Object.freeze({name:"伏魔金印",triggerText:"戰鬥開始；首次成功受到一般負面狀態"}),
-        relic_all_returning_array:Object.freeze({name:"萬象歸元盤",triggerText:"每第4回合開始"})
-    });
+    const HOME_RELIC_SUMMARY_CATALOG=window.FourSymbolsRelicSummaryCatalog||Object.freeze({});
 
     function homeRosterPlaceholder(index){
         return '<article class="v146-home-character v146-home-character-placeholder" data-home-roster-slot="'+index+'" aria-busy="true">'+
