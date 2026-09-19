@@ -5,6 +5,7 @@ const fs=require("fs");
 const vm=require("vm");
 
 const coreSource=fs.readFileSync("js/00-main.js","utf8");
+const relicSummarySource=fs.readFileSync("js/relic-summary-catalog.js","utf8");
 const relicSource=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const saveStart=coreSource.indexOf("function saveGame(options={}){");
@@ -98,6 +99,7 @@ const relicContext={
 relicContext.window=relicContext;
 vm.createContext(relicContext);
 vm.runInContext(repositorySource,relicContext);
+vm.runInContext(relicSummarySource,relicContext);
 relicContext.FourSymbolsAccountSave.activate(accountUid);
 vm.runInContext(relicSource,relicContext);
 
