@@ -160,14 +160,6 @@
 .v169-item-art > img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center;}
 .v169-item-art > img[hidden]{display:none !important;}
 
-/* Synthesis uses a compact 2:3 talisman preview so the controls remain visible. */
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow .v169-talisman-art{
-    width:92px;
-    height:138px;
-    max-width:100%;
-    flex:0 0 auto;
-}
-
 .v169-talisman-art.v169-rarity-white,.v169-blueprint-art.v169-rarity-white,.v169-talisman-art.v169-rarity-low,.v169-blueprint-art.v169-rarity-low{border-color:#D8D8D8;box-shadow:0 0 5px rgba(216,216,216,.7),inset 0 0 6px rgba(216,216,216,.24);}
 .v169-talisman-art.v169-rarity-blue,.v169-blueprint-art.v169-rarity-blue,.v169-talisman-art.v169-rarity-mid,.v169-blueprint-art.v169-rarity-mid{border-color:#42A5FF;box-shadow:0 0 5px #42A5FF,0 0 12px rgba(66,165,255,.72),inset 0 0 7px rgba(66,165,255,.38);}
 .v169-talisman-art.v169-rarity-purple,.v169-blueprint-art.v169-rarity-purple,.v169-talisman-art.v169-rarity-high,.v169-blueprint-art.v169-rarity-high{border-color:#B05CFF;box-shadow:0 0 5px #B05CFF,0 0 13px rgba(176,92,255,.76),inset 0 0 7px rgba(176,92,255,.4);}
