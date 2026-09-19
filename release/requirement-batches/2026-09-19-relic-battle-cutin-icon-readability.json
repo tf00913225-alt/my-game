@@ -44,9 +44,10 @@
       "owner": [
         "js/60-team-relic-system.js::isRelicDevTestingEnvironment()",
         "statusOf()",
+        "equipRelic()",
         "devPreviewRelicId"
       ],
-      "implementation": "僅 dev.four-symbols-dev.pages.dev（另 localhost）將 effective owned state 顯示 unlocked=true/seen=true；未 runtimeReady 的後 10 件只用 transient devPreviewRelicId 做 battle presentation preview，不寫回 playerRelics/teamLoadout 正式存檔，也不開啟未完成機制。"
+      "implementation": "僅 dev.four-symbols-dev.pages.dev（另 localhost）將 effective owned state 顯示 unlocked=true/seen=true；20 件 DEV 選擇一律只寫 transient devPreviewRelicId，不寫 playerRelics/teamLoadout。runtimeReady=true 的秘寶照常執行正式機制供測試；runtimeReady=false 的後 10 件只做 battle presentation preview，不開啟未完成機制。"
     },
     {
       "id": 5,

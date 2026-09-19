@@ -69,6 +69,12 @@ assert.match(relic,/function statusOf\(id\)[\s\S]*isRelicDevTestingEnvironment\(
   "DEV view must expose all relics as unlocked and seen without mutating production save state");
 assert.match(relic,/devPreviewRelicId=id;[\s\S]*syncHomeRelicUi\(\); renderRelicPage\(\); return true;/,
   "unreleased relic presentation selection must stay in transient DEV state");
+assert.match(relic,/function equipRelic\(id\)[\s\S]*const devTesting=isRelicDevTestingEnvironment\(\);[\s\S]*if\(devTesting\)\{[\s\S]*devPreviewRelicId=id;[\s\S]*return true;[\s\S]*teamLoadout\.relicId=id;/,
+  "all DEV relic selections must use transient preview state before the production save path");
+const equipSource=relic.slice(relic.indexOf("function equipRelic(id)"),relic.indexOf("function unequipRelic()"));
+const transientBranch=(equipSource.match(/if\(devTesting\)\{([\s\S]*?)\n        \}/)||[])[1]||"";
+assert.doesNotMatch(transientBranch,/saveRelics\(|teamLoadout\.relicId/,
+  "DEV relic selection must not persist formal ownership or loadout state");
 assert.match(relic,/!def\.runtimeReady&&isRelicDevTestingEnvironment\(\)[\s\S]*queueRelicPresentation/,
   "unreleased relics must be battle-previewable in DEV without enabling their mechanics");
 assert.match(relic,/v174RelicDevUnlockAllForTesting/);

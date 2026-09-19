@@ -1,0 +1,50 @@
+name: TEMP relic transient preview build sync
+
+on:
+  push:
+    branches:
+      - fix/relic-battle-cutin-icon-readability-20260919
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temp-relic-transient-preview-build
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    if: "${{ !contains(github.event.head_commit.message, 'build(relic): sync transient dev preview build') }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/relic-battle-cutin-icon-readability-20260919
+          fetch-depth: 0
+      - name: Synchronize production build
+        run: npm run build
+      - name: Verify relic contract
+        run: node tests/relic-battle-cutin-icon-readability-20260919.test.js
+      - name: Install repository asset-test dependency
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends imagemagick
+          fi
+      - name: Run full Node test suite
+        run: npm test
+      - name: Verify build synchronization
+        run: npm run build:check
+      - name: Commit synchronized build only
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add asset-manifest.json build/asset-manifest.json build/ config/feature-manifest.json
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "build(relic): sync transient dev preview build"
+          git push origin HEAD:fix/relic-battle-cutin-icon-readability-20260919
