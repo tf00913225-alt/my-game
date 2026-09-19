@@ -39,8 +39,8 @@ function run(width,height){
     const fixtureCss=[
         "html,body{margin:0;width:"+width+"px;height:"+height+"px;overflow:hidden;background:#111}",
         "#game-stage{position:relative!important;width:"+width+"px!important;height:"+height+"px!important;transform:none!important;overflow:hidden!important}",
-        "#battlePage{position:relative;width:100%;height:240px;padding-top:60px}",
-        "#mainBattleMenu{width:calc(100% - 20px)!important;margin-left:10px!important}",
+        "#battlePage{display:block!important;position:relative!important;width:100%!important;height:240px!important;padding:0!important;overflow:visible!important;box-sizing:border-box!important}",
+        "#mainBattleMenu{position:absolute!important;left:10px!important;top:60px!important;width:calc(100% - 20px)!important;margin:0!important}",
         "#outside{position:absolute;left:10px;top:210px;width:80px;height:30px}"
     ].join("\n");
     const qaScript=rippleRuntime+"\n"+
