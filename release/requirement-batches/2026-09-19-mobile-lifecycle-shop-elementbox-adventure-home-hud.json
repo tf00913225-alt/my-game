@@ -87,12 +87,13 @@
       ]
     }
   ],
-  "automatedVerification": "PR #347 CI run 35450765238 Repository checks SUCCESS; build:check, Release Update mobile browser QA, Fixed Slot mobile browser QA, exact-candidate real battle QA, Adventure V1 targeted + mobile browser QA, resources, loader, Release Gate and git-diff all SUCCESS. Current-session executable harnesses PASS for Wake Lock lifecycle/retry, Android lifecycle diagnostics/background save, shop 999 normalization/input clamp, Element Box HP=0 potion recovery; architecture checks PASS for Patrol stale callback invalidation, NT$99 manual-only policy, and Main City first-screen lazy relic boundary.",
-  "visualVerification": "Adventure V1 mobile browser QA SUCCESS in PR #347 run 35450765238; exact-candidate real battle and fixed-slot mobile browser QA also SUCCESS. Main City first-screen summary uses fixed shell/placeholder geometry and remains app-shell-only; no separate full-relic eager execution.",
+  "automatedVerification": "PR #347 source CI run 35450765238 SUCCESS on verified source commit c12260db41a388923bca5f2f6bfe55c0a177c645: syntax, targeted regressions, deterministic build:check, Release Update mobile browser QA, Fixed Slot mobile QA, exact-candidate real battle QA, Adventure V1 targeted + mobile browser QA, resources, loader, Release Gate and git-diff all passed. Closeout CI run 35450909260 also SUCCESS after verification documentation updates.",
+  "visualVerification": "PR #347 source CI run 35450765238: Release Update, Fixed Slot / real battle, and Adventure mobile browser QA SUCCESS. Main City first-screen summary is protected by app-shell/lazy-boundary regressions; no unrelated full-site manual regression was added.",
   "verifiedSourceCommit": "c12260db41a388923bca5f2f6bfe55c0a177c645",
   "mergedDevCommit": null,
-  "verificationRunId": 35450909260,
+  "verificationRunId": 35450765238,
   "verifiedAt": "2026-09-19",
   "prNumber": 347,
-  "prCiRun": 35450765238
+  "prCiRun": 35450765238,
+  "closeoutVerificationRunId": 35450909260
 }
