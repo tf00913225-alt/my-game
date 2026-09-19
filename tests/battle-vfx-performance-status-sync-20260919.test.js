@@ -21,30 +21,31 @@ test("timed status snapshot only scans status types relevant to the current cast
     assert.doesNotMatch(vfx,/function snapshotTimedEffects\(\)\{[\s\S]*Object\.keys\(RAW_STATUS_SPRITES\)/);
 });
 
-test("status refreshes can be scoped to one combatant",()=>{
+test("known combatant refreshes use a single-unit status path",()=>{
     assert.match(vfx,/function syncStatusSpritesForUnit\(side,index\)/);
-    assert.match(vfx,/enemyIndexes\.forEach\(index=>syncStatusSpritesForUnit\("monster",index\)\)/);
-    assert.match(vfx,/for\(let index=0;index<6;index\+\+\)\{ syncStatusSpritesForUnit\("player",index\); \}/);
+    assert.match(vfx,/updateMonsterUI=function\(index\)[\s\S]*syncStatusSpritesForUnit\("monster",Number\(index\)\)/);
+    assert.match(vfx,/updateSingleCharacterStatusBadge=function\(index\)[\s\S]*syncStatusSpritesForUnit\("player",Number\(index\)\)/);
+    assert.match(vfx,/function officialCardEffect\(side,index\)[\s\S]*syncStatusSpritesForUnit\(side,unitIndex\)/);
 });
 
-test("global updateUI performs one synchronous battlefield status pass without a zero-delay duplicate",()=>{
+test("global updateUI keeps synchronous lifecycle semantics but performs only one full battlefield status pass",()=>{
     const block=vfx.match(/if\(typeof updateUI==="function"\)\{[\s\S]*?\n    \}/);
     assert.ok(block,"updateUI wrapper missing");
     assert.match(block[0],/syncStatusSpriteEffects\(\)/);
     assert.doesNotMatch(block[0],/setTimer\(syncStatusSpriteEffects,0\)/);
+    const calls=(block[0].match(/syncStatusSpriteEffects\(\)/g)||[]).length;
+    assert.equal(calls,1,"updateUI must do exactly one full status pass");
 });
 
-test("monster and player status badge updates only refresh their affected unit",()=>{
-    assert.match(vfx,/updateMonsterUI=function\(index\)[\s\S]*syncStatusSpritesForUnit\("monster",Number\(index\)\)/);
-    assert.match(vfx,/updateSingleCharacterStatusBadge=function\(index\)[\s\S]*syncStatusSpritesForUnit\("player",Number\(index\)\)/);
+test("the old duplicate zero-delay full battlefield scan stays removed",()=>{
+    assert.doesNotMatch(vfx,/setTimer\(syncStatusSpriteEffects,0\)/);
 });
 
-test("dispose clears rendered status VFX after current animation cleanup",()=>{
+test("dispose contains no queued-sync state and still clears every status loop",()=>{
     const block=vfx.match(/director\.dispose=function\(\)\{[\s\S]*?return originalDispose\(\);\n    \};/);
     assert.ok(block,"dispose wrapper missing");
-    const text=block[0];
-    assert.match(text,/cleanupCurrent\(state\.current,"dispose"\)/);
-    assert.match(text,/removeStatusSpriteEffects\(\)/);
+    assert.doesNotMatch(block[0],/statusSyncTimer|statusFullSyncQueued|statusUnitSyncQueue/);
+    assert.match(block[0],/removeStatusSpriteEffects\(\)/);
 });
 
 console.log("battle VFX performance status sync: "+passed+" checks passed");
