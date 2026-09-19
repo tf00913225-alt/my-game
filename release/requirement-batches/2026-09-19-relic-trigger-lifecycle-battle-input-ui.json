@@ -5,7 +5,7 @@
   "base_sha": "7c1a074c45a2426b78901cad1ec1cbfbe7623649",
   "work_branch": "fix/relic-trigger-lifecycle-battle-input-ui-20260919",
   "officialVersion": "173.65",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": 1,
@@ -37,17 +37,17 @@
     },
     {
       "id": 5,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "五個戰鬥操作 Hitbox 依 battle-command-panel.jpg 視覺中心對齊、互不重疊，移除 Skill 21.5% priority overlap。",
       "owner": ["css/00-main.css", "css/45-v152-dev-fixes.css"],
-      "verification": "待 390×844／412×915 browser geometry QA"
+      "verification": "PASS: CI 390×844／412×915 browser geometry QA；五區互不重疊、中心命中各自指令"
     },
     {
       "id": 6,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "戰鬥區停用全域 Ripple，其他 UI 共用單一 transform＋opacity Ripple node，快速點擊不累積 DOM。",
       "owner": ["js/35-v141-ui-battle.js", "css/38-v141-system-expansion.css"],
-      "verification": "待 20 次 pointerdown browser QA"
+      "verification": "PASS: CI 20 次 pointerdown browser QA；戰鬥區 0 個 ripple、非戰鬥區最多 1 個共用 node、onclick 保持 20 次"
     }
   ],
   "verification": [
@@ -58,8 +58,10 @@
     "PASS: cinematic, VFX target and visual sequencing regressions",
     "PASS: V141/V142/V152 direct regressions",
     "PASS: deterministic production build and build:check",
-    "PENDING CI: 390×844／412×915 hitbox browser geometry",
-    "PENDING CI: 20 pointerdown bounded-ripple browser QA",
-    "PENDING CI: Repository checks"
-  ]
+    "PASS: 390×844／412×915 hitbox browser geometry",
+    "PASS: 20 pointerdown bounded-ripple browser QA",
+    "PASS: PR #332 Repository checks run 35424956704"
+  ],
+  "verificationResult": "6/6 VERIFIED；PR #332 Repository checks run 35424956704 SUCCESS。正式 10 件秘寶 Trigger Lifecycle、Core Round Boundary、Presentation cancellation safety、DEV Preview 隔離、HUD Lock、390×844／412×915 Hitbox geometry、20 次 pointerdown bounded-ripple、production build、static resources、Release Gate 與 git diff check 全數通過。",
+  "releasedAs": null
 }

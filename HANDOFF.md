@@ -3944,7 +3944,7 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - `showMonsterHit()` is now the enemy HP feedback owner: HP damage creates no red popup for any enemy entity. `shakeArtForPopup()` also refuses enemy cards so a legacy/reparented popup cannot reintroduce `v174-hit-shake`. Player-side hit feedback is untouched.
 - The old extra Boss shield HUD is retired. `syncBossShieldHud()` now maintains one white `.boss-hp-shield-overlay` inside `.monster-hp`, using the formal player owner proportion `maxHP + currentShield`; HP text remains `currentHP / maxHP`. Damage settlement remains Shield → HP overflow and heal resyncs the same owner.
 - Focused Boss runtime tests and `build:check` pass locally. The local full Node suite is blocked only because this workspace lacks Chrome required by the existing browser test. Requirement batch: `release/requirement-batches/2026-09-18-boss-hud-world-reinforcement-hit-shield.json` remains IMPLEMENTED until CI, deployed SHA and 412×915 real Runtime QA pass.
-## 2026-09-19 — 秘寶 Trigger Lifecycle、正式回合邊界、HUD Lock、操作 Hitbox 與快速點擊效能（IMPLEMENTED / CI PENDING）
+## 2026-09-19 — 秘寶 Trigger Lifecycle、正式回合邊界、HUD Lock、操作 Hitbox 與快速點擊效能（VERIFIED）
 
 - Base: latest GitHub `dev@7c1a074c45a2426b78901cad1ec1cbfbe7623649`; branch: `fix/relic-trigger-lifecycle-battle-input-ui-20260919`; `main` 不修改。
 - `js/00-main.js` 的 `FourSymbolsBattleFlow` 新增唯一 `round_start`／`round_end` subscriber 與 core-owned presentation lock。`processNextCombatant()` 在 `turn++` 前同步派送 round end；`startTurn()` 派送 round start；boundary key 由 battle token＋round 去重。Feature module 不再由 before-combatant 推測上一回合，也不接管 `turn++`、`finishPlayerAction()` 或 `processNextCombatant()`。
@@ -3953,5 +3953,5 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - `updateActionHudVisibility()` 納入 core presentation lock；演出期間 battle command、skill quick bar、item menu 與 target-selecting UI 全部不可操作，最後一個 presentation lock 釋放後才由 Core 恢復原宣告流程。
 - 戰鬥指令 Hitbox 幾何收斂回 `css/00-main.css`，依 1536×559 `battle-command-panel.jpg` 五顆視覺中心設定百分比邊界；五區互不重疊。`css/45-v152-dev-fixes.css` 的 Skill 21.5% priority overlap 已移除。
 - 全域 tap ripple 在 `#battlePage` 停用；其他頁面共用單一 DOM node，動畫由 width／height／margin 改為 transform＋opacity，快速點擊不再累積 20 個高 z-index animated nodes。
-- Focused Node tests、10 件秘寶 runtime、正式回合路徑、HUD Lock、VFX/cinematic regressions、V141/V142/V152 與 deterministic build 均 PASS。本機沒有 Chrome；新增的 390×844／412×915 hitbox 與 20 次 pointerdown browser QA 待 PR Repository checks 實際執行。
+- Focused Node tests、10 件秘寶 runtime、正式回合路徑、HUD Lock、VFX/cinematic regressions、V141/V142/V152 與 deterministic build 均 PASS。PR #332 Repository checks run 35424956704 SUCCESS；390×844／412×915 hitbox 與 20 次 pointerdown browser QA 均通過。
 - Requirement batch: `release/requirement-batches/2026-09-19-relic-trigger-lifecycle-battle-input-ui.json`。
