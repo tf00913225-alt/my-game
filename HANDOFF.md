@@ -3944,3 +3944,163 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - `showMonsterHit()` is now the enemy HP feedback owner: HP damage creates no red popup for any enemy entity. `shakeArtForPopup()` also refuses enemy cards so a legacy/reparented popup cannot reintroduce `v174-hit-shake`. Player-side hit feedback is untouched.
 - The old extra Boss shield HUD is retired. `syncBossShieldHud()` now maintains one white `.boss-hp-shield-overlay` inside `.monster-hp`, using the formal player owner proportion `maxHP + currentShield`; HP text remains `currentHP / maxHP`. Damage settlement remains Shield → HP overflow and heal resyncs the same owner.
 - Focused Boss runtime tests and `build:check` pass locally. The local full Node suite is blocked only because this workspace lacks Chrome required by the existing browser test. Requirement batch: `release/requirement-batches/2026-09-18-boss-hud-world-reinforcement-hit-shield.json` remains IMPLEMENTED until CI, deployed SHA and 412×915 real Runtime QA pass.
+
+## 2026-09-18 — 雲端帳號／雲端存檔安全規劃定案（PLANNING ONLY／尚未開始搬正式玩家資料）
+
+### 目的與目前狀態
+
+- 使用者已決定開始準備《四象江湖傳》的正式 Cloud Save（雲端存檔）架構，但目前階段仍是「安全規格與施工順序定案」，不是一次把所有本機資料直接搬到雲端。
+- 專案目前不是從零開始：既有 `docs/FIREBASE_AUTH_CLOUD_SAVE.md` 已定義 Firebase Authentication（Firebase 身分驗證）、UID（使用者唯一識別碼）、UID-namespaced local save（依 UID 分區的本機存檔）、雲端讀取與衝突 fail-closed（遇到不確定狀態就停止而不是猜測）；`docs/FIREBASE_TRUSTED_CLOUD_SAVE_BACKEND.md` 已建立 trusted backend（可信任後端）邊界，瀏覽器不得直接把正式進度寫入 Firestore（雲端資料庫），正式寫入必須由 Cloud Functions（雲端函式）等可信任伺服器處理。
+- 本段是後續開發必讀的工作紀錄，整理 2026-09-18 與使用者確認的安全原則、測試方式、單裝置登入規則與分階段實作方向。若未來規格與正式契約衝突，以最新正式契約與使用者最新明確決定為準。
+
+### 使用者已確認的核心產品規則
+
+1. **同一帳號同一時間只允許一個有效裝置／Session（登入工作階段）。**
+   - 新裝置登入同一 UID 後，舊裝置必須失去修改雲端正式資料的權限。
+   - 因此本專案不需要建立 Xbox 類型「兩台裝置長時間同時各自遊玩再合併存檔」的完整多主同步系統。
+   - 但仍要防止「A 裝置的舊請求已在網路途中，B 裝置剛登入」的短暫競態；舊 Session 的後續寫入必須被拒絕，已處理過的操作也不得重複發獎、重複扣款或重複消耗。
+
+2. **對正式進度而言，Cloud（雲端）是權威來源；Local（本機）是 UID 隔離的快取／離線候選，不得無條件反蓋雲端。**
+   - 不得因「本機 timestamp（時間戳）比較新」就直接整包覆蓋雲端。
+   - 帳號切換時，不得沿用前一 UID 的角色、背包、裝備、金幣、進度或任何 sidecar（旁路存檔）資料。
+   - Auth（身分驗證）、Firestore（雲端資料庫）或 migration（資料遷移）發生錯誤時，不得誤判成新玩家、不得顯示創角並清空舊資料。
+
+3. **受保護進度不得由瀏覽器直接權威修改。**
+   - 金幣、經驗、角色等級、裝備、背包、秘寶、碎片、副本次數、Boss（頭目）獎勵、合成、冶煉、商城權益、付費／退款狀態等，最終要逐步移到 trusted backend（可信任後端）驗證後再寫入。
+   - 玩家端可以讀取需要顯示的值，但不得以「客戶端送一個最後結果」的方式直接決定正式經濟數字。
+
+### 正式存檔需要具備的安全資料
+
+後續 Cloud Save V1（第一版雲端存檔）設計至少必須考慮下列欄位／機制；實際欄位名稱以盤點現有 owner（權威來源）後再定案：
+
+- UID：真正帳號主鍵；江湖旗號、角色名稱、Email（電子郵件）都不可取代 UID。
+- revision（修訂版號）：防止過期資料／舊 Session 覆寫新資料。
+- schemaVersion（資料結構版本）：支援未來舊存檔逐版 migration（資料遷移），不得靠猜測舊格式。
+- serverTimestamp（伺服器時間）：重要交易與存檔時間不得信任手機本機時間。
+- operationId / idempotency key（操作唯一識別碼／冪等鍵）：同一個領獎、購買、合成、掉落結算等重送多次，只能成功一次。
+- atomic transaction（原子交易）：一次操作內相關變化要全部成功或全部失敗。例如 Boss 獎勵的金幣、EXP（經驗值）、碎片與挑戰次數不可只寫成功一半。
+- audit / transaction history（稽核／交易歷史）：高價值經濟資料不能只保留「現在是多少」，還要能追查「何時、因何原因、哪個操作 ID 造成多少增減」。
+- protected payment ledger（受保護的付款帳本）：付款、發貨、退款、補發、權益回收與管理員修復紀錄要和一般遊戲存檔分離保護；同一金流訂單只能發貨一次。
+
+### 備份與復原目標
+
+正式上線前，目標不是只存在一份 Firestore（雲端資料庫）目前值，而是分層保護：
+
+1. **Current authoritative state（目前權威狀態）**：正常遊戲讀寫的正式資料。
+2. **Player snapshot（玩家快照）**：重大事件／固定節奏保留可回復的玩家狀態，用於單一帳號救援。
+3. **Point-in-Time Recovery（時間點復原）**：若 Firebase／Firestore 專案方案與功能允許，啟用資料庫層級的時間點復原，處理程式 Bug（錯誤）大範圍寫壞資料的事故。
+4. **Scheduled Backup（排程備份）**：建立週期性備份，避免錯誤超過短期復原視窗才被發現。
+
+復原規則：
+- 不得為了救一名玩家，直接把整個正式資料庫回滾到昨天。
+- 大型備份原則上先還原／讀取到隔離環境或暫存位置，比對指定 UID 的資料，再透過受控修復流程只修正需要的帳號／欄位。
+- 管理員修復本身也必須留下 audit log（稽核紀錄）：誰、何時、把什麼從多少改成多少、原因、來源備份／事件。
+- 角色刪除應考慮 soft delete（軟刪除）／保留期後才實體刪除；整個帳號刪除則必須另外遵守正式隱私政策與適用的個資刪除義務，不可用「方便救援」當理由永久保留。
+
+### 明確禁止的危險做法
+
+1. 禁止「每次存檔都把整份玩家 JSON（資料物件）無條件覆蓋雲端」。
+2. 禁止客戶端直接修改金幣、付費權益、裝備等高價值正式資料。
+3. 禁止重要經濟只存目前值、不留可追查的變動紀錄。
+4. 禁止重送同一請求就再次發獎／扣款／消耗材料。
+5. 禁止重要交易採信裝置本機時間。
+6. 禁止 Email、角色名、江湖旗號取代 Firebase UID 當正式 ownership（所有權）主鍵。
+7. 禁止帳號／角色刪除流程沒有復原與保留期策略。
+8. 禁止把「Firebase 現在那一份資料」當成唯一備份。
+9. 禁止遇到單一玩家問題就整庫還原。
+10. 禁止改 schema（資料結構）卻沒有 schemaVersion（資料結構版本）與 migration（遷移）流程。
+11. 禁止 AI（人工智慧）或人工工程師寫完後，未經測試就直接對正式玩家資料啟用。
+
+### AI 協助範圍與品質原則
+
+- AI 可以協助盤點 Repository（程式庫）、設計資料模型、寫 Firebase／Cloud Functions／Security Rules（安全規則）、寫存檔／讀檔／備份／復原工具、撰寫自動測試、分析失敗、檢查風險與建立修復流程。
+- 但「AI 寫得出來」不等於「程式一定沒有 Bug」。人工工程師也一樣不能靠作者自信證明正確；可靠性來自分層測試、權限隔離、冪等、原子交易、稽核紀錄與可還原備份。
+- 正式目標不是要求作者永不犯錯，而是：**寫錯時測試能擋住；測試漏掉時測試帳號能發現；正式事故仍有備份與紀錄可以復原。**
+
+### 後續測試標準
+
+雲端帳號／存檔屬高風險資料系統，正式導入時至少要分層測：
+
+1. **Unit Test（單元測試）**：驗證個別資料驗證、金額變動、revision、operationId、migration 等小函式。
+2. **Integration Test（整合測試）**：驗證「登入 → 操作 → Cloud Function → Transaction → Firestore → 再讀回」整條流程。
+3. **Failure Injection（故障注入）**：故意測網路中斷、逾時、重送、寫入一半失敗、舊 revision、失效 Session。
+4. **Test Account（測試帳號）**：正式 Firebase 測試環境／隔離帳號驗證真實讀寫，不直接用真玩家帳號試錯。
+5. **Backup Restore Drill（備份還原演練）**：真的建立可辨認的測試資料、故意破壞，再實際從備份／快照還原並逐欄核對；「有設定備份」不等於「確認救得回來」。
+6. **Real Device Acceptance（實機驗收）**：最後由使用者在手機實際測登入、遊玩、關閉重開、換裝置登入、斷線／恢復等玩家流程。
+
+### 「兩台手機」測試的正式修正
+
+先前討論中的「同一帳號兩台手機同時按領獎」不符合本專案正常產品規則，因為本專案已決定同一帳號只能有一個有效裝置／Session。
+
+後續正式測試應改成：
+
+- 手機 A 先登入。
+- 手機 B 登入相同 UID。
+- B 登入成功後，A 必須立即失去受保護寫入權限並被導向重新登入／失效狀態。
+- A 再嘗試領獎、開寶箱、合成、購買、存檔或提交戰鬥獎勵時，伺服器必須拒絕。
+- 如果 A 在被踢下線前已有一個請求在傳輸途中，後端仍必須依 Session／revision／operationId 判定，確保不會和 B 的操作形成重複發獎或重複扣款。
+- 這項測試的目的不是支援多裝置同時遊玩，而是證明「唯一有效登入」真的能封死舊裝置寫入。
+
+### 分階段施工順序（目前定案）
+
+**Phase 0 — 現況盤點，不改正式資料**
+- 從最新 `dev` 調查現有 Firebase Auth、Firestore、Cloud Functions、localStorage、本機 canonical save（主存檔）、sidecar（旁路存檔）、角色、金幣、經驗、技能、背包、裝備、秘寶、副本、冒險、Boss 等資料實際 owner、key、讀寫路徑與 wrapper（包裝／覆寫點）。
+- 列出：已在雲端、只在本機、重複保存、無 UID 隔離、可被客戶端直接改、高風險且缺稽核的資料。
+- 本階段不大量重構、不搬正式玩家資料、不碰 `main`。
+
+**Phase 1 — Cloud Save V1（第一版雲端存檔）最小骨架**
+- 先用測試帳號完成可信任的基本資料「建立／讀取／更新／再讀回」。
+- 導入 revision、schemaVersion、serverTimestamp、基本 validation（驗證）與失敗時 fail-closed（停止而不是猜測）。
+- 驗證關閉遊戲再登入、換裝置登入、舊 Session 失效。
+- 先證明骨架可靠，不一次把所有遊戲系統搬完。
+
+**Phase 2 — 受保護進度逐系統搬到可信任後端**
+優先順序暫定：
+1. currencies / rewards（金幣／獎勵）
+2. progression / EXP（角色進度／經驗）
+3. inventory / equipment（背包／裝備）
+4. relics / fragments（秘寶／碎片）
+5. crafting / reforging（合成／冶煉）
+6. dungeon / Boss counters（副本／Boss 次數）
+7. 其他高價值進度
+
+每一類獨立遷移、獨立測試，不一次全面切換。
+
+**Phase 3 — 救援與營運工具**
+- 玩家快照。
+- 定期備份／時間點復原（依 Firebase 實際方案能力）。
+- 管理員指定 UID 查詢／比對／選擇性修復。
+- 交易／經濟 audit log。
+- 軟刪除與復原流程。
+- 備份還原演練。
+
+**Phase 4 — 金流正式開放前**
+- 訂單唯一識別。
+- 金流回呼重送冪等。
+- 付款成功／發貨成功分離記錄。
+- 補發、退款、權益回收、對帳與管理員稽核。
+- 任何一筆已確認付款都必須可追查，且同一訂單不得重複發貨。
+
+### 後續接續時的第一個實際任務
+
+當使用者下一次說「開始做雲端存檔第一步」時，不要先重寫存檔，也不要要求使用者重新描述本段。
+
+直接從最新 GitHub `dev` 執行 **Phase 0 現況盤點**：
+1. 讀 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/FIREBASE_AUTH_CLOUD_SAVE.md`、`docs/FIREBASE_TRUSTED_CLOUD_SAVE_BACKEND.md`、`docs/BOOT_ARCHITECTURE.md` 與相關 Security Rules（安全規則）／Functions（雲端函式）。
+2. 找出真正的 save/load owner、Firebase owner、localStorage keys、UID sidecars、現有 Cloud Functions、Firestore paths 與測試 owner。
+3. 產出「目前已有什麼／可以沿用什麼／缺什麼／風險在哪裡／Cloud Save V1 最小新增範圍」。
+4. 未完成盤點前禁止直接大規模搬移玩家資料。
+5. 維持專案分支規則：從最新 `dev` 建工作分支，禁止直接修改 `dev`／`main`，禁止 rebase（變基）與 force push（強制推送）。
+
+### 成功標準
+
+正式雲端帳號系統最終應做到：
+- 手機遺失／換機，帳號資料可恢復。
+- 清除瀏覽器資料，不等於失去正式雲端進度。
+- 網路中斷／逾時不造成重複發獎、重複扣款或半套交易。
+- 第二台裝置登入後，舊裝置不能再寫正式進度。
+- 單一玩家資料異常時有紀錄可追、可局部修復。
+- 程式 Bug 大量寫壞資料時，有時間點／備份救援手段。
+- 付費、退款、補發與權益變動能逐筆追查。
+- 任何恢復流程都先證明「真的救得回來」，而不是只確認「備份看起來存在」。
+
