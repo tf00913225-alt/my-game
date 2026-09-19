@@ -16,6 +16,7 @@ const synthesis=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const synthesisCss=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
 const abyssCss=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
 const mainCss=fs.readFileSync("css/00-main.css","utf8");
+const homeRosterCss=fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8");
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 
 assert.match(build,/"js\/battle-statistics-system\.js"/,"Battle Statistics must be part of gameplay-core");
@@ -65,7 +66,7 @@ assert.equal(snapshot.combatants.find(item=>item.id==="player:0").damageDealt,32
 assert.match(battle,/showAutoBattleRoundPrompt\(token\)/);
 assert.match(battle,/battleRoundPromptTimeoutId=setTimeout\([\s\S]*?\},500\)/);
 assert.match(battle,/acquirePresentationLock\("auto-round-prompt"\)/);
-assert.match(battle,/acquirePauseLock\(owner\)/);
+assert.doesNotMatch(statsSource,/acquireDrawerPause|acquirePauseLock|battle-insight-drawer[\s\S]*acquirePresentationLock/,"battle insight drawers must never pause combat");
 assert.match(battle,/battleResolutionResumeToken/);
 assert.match(battle,/battleAutoActionResume/);
 assert.match(battle,/finishBattleStatisticsSession\("win"\)/);
@@ -75,7 +76,13 @@ assert.match(statsCss,/\.battle-mechanism-alert[\s\S]*right:0/);
 assert.match(statsCss,/@keyframes battleMechanismAlertPulse/);
 assert.match(statsCss,/\.battle-stats-drawer\{left:0;transform:translateX\(-102%\)/);
 assert.match(statsCss,/\.battle-boss-mechanism-drawer\{right:0;transform:translateX\(102%\)/);
-assert.match(statsCss,/\.battle-statistics-result-modal/);
+assert.doesNotMatch(statsSource,/battleInsightScrim/,"non-blocking drawers must not install a full-screen scrim");
+assert.match(statsSource,/function installStatsEdgeDrag\(edge,root\)/);
+assert.match(statsCss,/\.battle-stats-edge-button[\s\S]*touch-action:none/);
+assert.match(statsCss,/\.battle-insight-drawer\{[\s\S]*z-index:72/);
+assert.match(statsCss,/#battlePage\.v-fixed-slot-render-v2 \.battle-center-region\{[\s\S]*z-index:80/);
+assert.match(statsCss,/\.battle-statistics-result-panel\{[\s\S]*width:min\(900px,calc\(100% - 24px\)\)/);
+assert.match(statsCss,/\.battle-statistics-result-panel \.battle-stat-grid b\{font-size:22px/);
 
 assert.match(boss,/function bossMechanismInspectorCards\(\)/);
 assert.match(boss,/getActiveMechanisms:function\(\)/);
@@ -108,6 +115,7 @@ assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrad
 assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art > img\{[\s\S]*?object-fit:contain/);
 assert.doesNotMatch(abyssCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art/);
 
-assert.match(mainCss,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow-y:auto;[\s\S]*?padding-bottom:calc\(14px \+ var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\)\)/);
+assert.match(mainCss,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow-y:auto;[\s\S]*?scroll-padding-bottom:calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 14px\)/);
+assert.match(homeRosterCss,/\.v146-home-roster\{[\s\S]*?margin:18px 10px calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 12px\)/,"final team/relic block must reserve exactly the fixed nav and safe area");
 
 console.log("Battle statistics / relic / talisman / Boss / Tower focused contracts passed");
