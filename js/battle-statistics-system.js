@@ -16,6 +16,7 @@
     let bossMechanisms=[];
     let openDrawer=null;
     let releaseDrawerLock=null;
+    let resultCloseCallback=null;
 
     function number(value){
         const result=Number(value);
@@ -194,6 +195,9 @@
     function acquireDrawerPause(){
         const flow=window.FourSymbolsBattleFlow;
         if(!flow||typeof flow.isAutoBattle!=="function"||!flow.isAutoBattle()){ return null; }
+        if(typeof flow.acquirePauseLock==="function"){
+            return flow.acquirePauseLock("battle-insight-drawer");
+        }
         return typeof flow.acquirePresentationLock==="function"
             ?flow.acquirePresentationLock("battle-insight-drawer")
             :null;
@@ -246,7 +250,7 @@
         modal.className="battle-statistics-result-modal";
         modal.hidden=true;
         modal.innerHTML='<div class="battle-statistics-result-panel"><header><div><small>Battle Result Details（戰鬥詳細結算）</small><h2 data-title>戰鬥詳細結算</h2><p data-subtitle></p></div></header><div class="battle-statistics-result-body"></div><footer><button type="button" data-close>關閉</button></footer></div>';
-        modal.querySelector("[data-close]").addEventListener("click",hideResultDetails);
+        modal.querySelector("[data-close]").addEventListener("click",()=>hideResultDetails(true));
         appRoot().appendChild(modal);
         return modal;
     }
@@ -255,6 +259,7 @@
         const modal=ensureResultModal();
         if(!modal){ return false; }
         const config=options&&typeof options==="object"?options:{};
+        resultCloseCallback=typeof config.onClose==="function"?config.onClose:null;
         modal.querySelector("[data-title]").textContent=String(config.title||"戰鬥詳細結算");
         modal.querySelector("[data-subtitle]").textContent=String(config.subtitle||"");
         const body=modal.querySelector(".battle-statistics-result-body");
@@ -275,14 +280,19 @@
         modal.hidden=false;
         return true;
     }
-    function hideResultDetails(){
+    function hideResultDetails(invokeCallback){
         const modal=typeof document!=="undefined"?document.getElementById("battleStatisticsResultModal"):null;
         if(modal){ modal.hidden=true; }
+        const callback=resultCloseCallback;
+        resultCloseCallback=null;
+        if(invokeCallback!==false&&typeof callback==="function"){
+            try{ callback(); }catch(error){ console.error("戰鬥詳細結算關閉回呼失敗：",error); }
+        }
     }
 
     function begin(config){
         closeBattleDrawer();
-        hideResultDetails();
+        hideResultDetails(false);
         bossMechanisms=[];
         const input=config&&typeof config==="object"?config:{};
         session={
