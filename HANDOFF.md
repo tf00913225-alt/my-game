@@ -12,6 +12,7 @@
 - Main City First Screen：`js/16-stage-v54-main-city-runtime.js` 在 app-shell 先建立固定 `#v146HomeRoster`、三格角色 placeholder 與 `.team-relic-loadout-slot`；hydrate 後只填內容。新增小型 `js/relic-summary-catalog.js` 作 `id/name/triggerText` 唯一摘要資料橋；完整 `feature-boss-relic` 仍 lazy，`js/60-team-relic-system.js` 不再建立首頁摘要 DOM。
 - 受影響 production build 已重建新 content-hashed Boot/App/Gameplay/Relic/Adventure bundles，`asset-manifest.json`／`build/asset-manifest.json`／`index.html` 已同步；Game／Cache Version 維持 173.65。
 - Targeted tests 已新增／更新：`tests/screen-wake-lock.test.js`、`tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js`、Adventure／ad-free／V146 shop／main-city／team relic save/runtime 既有測試。尚未宣稱 VERIFIED；需 PR Repository checks、build:check 與可執行 QA 通過後更新本節。
+- PR #347 前兩輪 CI 已證明 syntax、Release Update、Adventure、Fixed Slot、battle/VFX 與 relic lifecycle 測試均可通過；第二輪唯一阻塞為 deterministic `asset-manifest.json` stale。已依該 run 的 `production-build-sync` artifact 對齊兩份 manifest；目前等待最新 head 的完整 Repository checks 重跑，尚未宣稱 VERIFIED。
 
 
 - 工作分支：`feature/release-update-dev-preview-20260919`，PR [#345](https://github.com/tf00913225-alt/my-game/pull/345) 已在 CI run `35446496532` 全綠後合併為 `dev@fff36cf702a92638f812698049015537001345b0`；DEV deployment run `35446584392` 也已全綠並核對 exact SHA。main 禁止修改。`js/release-update-notification.js` 是唯一 owner，沒有新建公告、跑馬燈或 Modal。
