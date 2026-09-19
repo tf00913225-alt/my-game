@@ -5,11 +5,11 @@
   "base_sha": "8f988c06caa31a0704bc727a3b34f5785b4d5fa6",
   "work_branch": "fix/relic-battle-cutin-icon-readability-20260919",
   "officialVersion": "173.65",
-  "status": "IMPLEMENTED_PENDING_GATE",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": 1,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "20 件秘寶使用 assets-library 戰鬥專用 PNG 轉 lossless WebP，正式 runtime 只引用 WebP battle icon。",
       "owner": [
         "assets/relics/battle-icons/*.webp",
@@ -19,7 +19,7 @@
     },
     {
       "id": 2,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "秘寶實際觸發時先顯示黑金 Cut-in：戰場 0.38 壓暗、戰鬥 icon、秘寶發動與秘寶名稱，600-800ms 後才接正式 VFX。",
       "owner": [
         "js/60-team-relic-system.js::showRelicCutin()",
@@ -29,7 +29,7 @@
     },
     {
       "id": 3,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "只保護秘寶當次演出，避免下一般技能提前 supersede；不可修改一般 1.15 秒 pacing owner。",
       "owner": [
         "js/60-team-relic-system.js::queueRelicPresentation()",
@@ -39,7 +39,7 @@
     },
     {
       "id": 4,
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "DEV 可直接測 20 件秘寶，不需收碎片，且不得污染正式資料模型。",
       "owner": [
         "js/60-team-relic-system.js::isRelicDevTestingEnvironment()",
@@ -51,7 +51,7 @@
     },
     {
       "id": 5,
-      "status": "IMPLEMENTED_PENDING_GATE",
+      "status": "VERIFIED",
       "request": "保留 2.2-2.8 秒 VFX、V143 authored hit frame、目標幾何、秘寶數值與一般技能規則，並跑完整 Repository checks。",
       "owner": [
         "tests/relic-battle-cutin-icon-readability-20260919.test.js",
@@ -68,12 +68,31 @@
   "devBaseUrl": "https://dev.four-symbols-dev.pages.dev",
   "unmappedAssets": [],
   "verification": [
-    "pending: npm test",
-    "pending: npm run build:check",
-    "pending: Repository checks",
-    "pending: Fixed Slot 9:16 mobile browser QA",
-    "pending: exact-candidate real battle mobile browser QA",
-    "pending: Adventure mobile QA",
-    "pending: Release Gate"
-  ]
+    "PASS: 20/20 dedicated battle PNG -> lossless WebP with source dimensions and alpha preserved",
+    "PASS: relic cut-in identity contract (720ms cut-in, 0.38 battlefield dim, dedicated icon, relic name)",
+    "PASS: 1200ms relic-only visual protection through existing FourSymbolsBattleFlow interceptor",
+    "PASS: DEV all-20 effective unlock/seen and transient devPreviewRelicId selection without playerRelics/teamLoadout writes",
+    "PASS: full npm test on run 35412310261",
+    "PASS: npm run build:check",
+    "PASS: Repository checks on PR #326 run 35412431131",
+    "PASS: Fixed Slot 9:16 mobile browser QA",
+    "PASS: exact-candidate real battle mobile browser QA",
+    "PASS: Adventure mobile QA",
+    "PASS: Release Gate",
+    "PENDING_POST_MERGE: Cloudflare DEV deployment gate runs only after push to dev"
+  ],
+  "pullRequest": 326,
+  "preMergeEvidence": {
+    "fullNodeSuiteRun": 35412310261,
+    "fullNodeSuite": "PASS",
+    "relicCutinContract": "PASS",
+    "buildCheck": "PASS",
+    "officialPrCiRun": 35412431131,
+    "repositoryChecks": "PASS",
+    "fixedSlot9x16MobileQa": "PASS",
+    "exactCandidateRealBattleMobileQa": "PASS",
+    "adventureMobileQa": "PASS",
+    "releaseGate": "PASS",
+    "cleanFinalDiff": "28 formal files; no temporary workflow; no browser-QA artifacts"
+  }
 }
