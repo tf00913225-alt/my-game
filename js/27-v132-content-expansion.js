@@ -2004,6 +2004,11 @@
 
         battleActive=true;
         battleToken++;
+        battleRoundBoundaryKeys=new Set();
+        battlePresentationLocks.clear();
+        battleInputResumeToken=null;
+        battleResolutionResumeToken=null;
+        clearBattleRoundPrompt();
         stopMonsterMovement();
         clearInterval(timerId);
         if(battleAdvanceTimeoutId){
@@ -2056,6 +2061,7 @@
         }
         syncBattleAutoSettings();
         updateAutoButton();
+        beginBattleStatisticsSession();
 
         selectBattleTarget(0);
         clearBattleLog();
@@ -2091,6 +2097,8 @@
             }
 
             battleActive=false;
+            clearBattleRoundPrompt();
+            finishBattleStatisticsSession("win");
             autoBattle=false;
             actionReady=false;
             pendingAction=null;
@@ -2134,6 +2142,8 @@
                callback回到日常副本頁。
             */
             battleActive=false;
+            clearBattleRoundPrompt();
+            finishBattleStatisticsSession("lose");
             autoBattle=false;
             actionReady=false;
             pendingAction=null;
