@@ -36,12 +36,12 @@
 - **Firebase 部署：** [run 35438044543](https://github.com/tf00913225-alt/my-game/actions/runs/35438044543)／[job 105884400094](https://github.com/tf00913225-alt/my-game/actions/runs/35438044543/job/105884400094) SUCCESS。2026-09-19 10:44:55 UTC 規則編譯成功、10:45:03 UTC 發布到 cloud.firestore；10:46:01–10:46:09 UTC 七支函式全部 Successful update operation，最後 Deploy complete!。
 - **七支已部署 Functions：** `createGameSession`、`revokeGameSession`、`protectedTest`、`bootstrapCloudSave`、`submitLegacyMigrationCandidate`、`createNativeAuthHandoff`、`redeemNativeAuthHandoff`，region `us-central1`。
 - **Artifact Registry：** PR #339 在既有精確範圍部署命令加入 `--force`，已解除非互動清理政策造成的部署退出阻塞。上述成功 job 仍含「Failed to set up cleanup policy」警告；只能確認部署完成，不能把清理政策實際設定標成 VERIFIED。此為非阻塞維運追蹤，不擴大本階段功能。
-- **真實同 UID 手機 A/B：** 使用者以相同 Google 帳號／UID 測試。舊裝置提供畫面 `SESSION_REVOKED` 與「❌ 這台裝置已被另一台裝置取代。」；使用者於本次對話補充後登入装置曾顯示成功，成功截圖已刪除，並明確表示已實測、沒有問題。新裝置持續有效採認為使用者實機回報，未假造截圖、token、完整 UID 或伺服器逐次操作日誌。
+- **真實同 UID 手機 A/B：** 使用者以相同 Google 帳號／UID 測試。舊裝置提供畫面 `SESSION_REVOKED` 與「❌ 這台裝置已被另一台裝置取代。」；使用者於本次對話補充後登入裝置曾顯示成功，成功截圖已刪除，並明確表示已實測、沒有問題。新裝置持續有效採認為使用者實機回報，未假造截圖、token、完整 UID 或伺服器逐次操作日誌。
 - **澄清紀錄：** 使用者中途簡短回覆「已被取代」，隨後澄清「是成功的畫面我刪掉了」及已完成實測。先前疑似雙裝置均失效的解讀不作為已確認 Bug；沒有據此改動任何權限程式。
 - **不同 UID 隔離／自動驗證：** 同 SHA 的 [emulator job 105883976742](https://github.com/tf00913225-alt/my-game/actions/runs/35438044543/job/105883976742) SUCCESS，實際 HTTP callable 驗證 A SUCCESS → B takeover → A SESSION_REVOKED → B SUCCESS、不同 UID、rules、protected writers、併發與身分撤銷。`scripts/test-session-authority-emulator.mjs` 的 UID Y 在 UID X 撤銷後仍 SUCCESS。這是可執行模擬器證據，沒有冒稱為不同 UID 真實手機驗收。
 - **Repository checks／DEV：** [run 35438044719](https://github.com/tf00913225-alt/my-game/actions/runs/35438044719) 的 Repository checks 與 [DEV deployment job 105884077707](https://github.com/tf00913225-alt/my-game/actions/runs/35438044719/job/105884077707) SUCCESS。部署讀回 exact SHA `342ef104fa2897f5ae5c3249e0c75c9efca3e762`，Game／Cache Version 均 `173.65`。
 - **DEV 測試按鈕：** `firebase-auth-ui.js::render()` 與 `testCurrentDeviceSession()` 共用精確 hostname allowlist。可執行檢查確認三個允許網域顯示／可呼叫，`tf00913225-alt.github.io`、專案 root 及偽裝後綴網域隱藏／不可呼叫；session client 原有 8 tests 全數 PASS。正式網站發布後仍另做實頁確認，不將此檢查冒稱為正式登入實測。
-- **永久发布記錄：** 本次結案 PR 的最終發布證據保存文件 merge SHA、最終 dev SHA、其 Repository checks／DEV／Firebase run 與 job、dev→main PR、main SHA、正式部署及 SHA 核對。文件內的驗收基準 SHA 不冒充合併後 SHA；最終 merge SHA 由合併產生後記入 PR，避免用另一個文件 commit 不斷改變待驗證 SHA。
+- **永久發布記錄：** [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 的最終發布證據保存文件 merge SHA、最終 dev SHA、其 Repository checks／DEV／Firebase run 與 job、dev→main PR、main SHA、正式部署及 SHA 核對。文件內的驗收基準 SHA 不冒充合併後 SHA；最終 merge SHA 由合併產生後記入 PR，避免用另一個文件 commit 不斷改變待驗證 SHA。
 
 ## Architecture Audit（修改前實際程式碼稽核）
 
@@ -130,7 +130,7 @@
 ## D. Remaining Work（尚未完成）
 
 1. Phase 1 功能驗收已完成；本次結案文件仍須 PR → Repository checks SUCCESS → merge dev，然後核對最新 dev 的 CI、DEV deployment、Session Authority emulator 與 Firebase deploy，逐一記錄實際 SHA。
-2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入本次結案 PR 永久發布記錄，不預填成功。
+2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久發布記錄，不預填成功。
 3. Artifact Registry 清理政策本身仍有非阻塞警告，保留維運追蹤；不以 Deploy complete 推定政策設定成功。
 4. Phase 2–10 全部 NOT STARTED。本次不做正式 game save schema、一般進度／高價值資料遷移、operationId、帳本、快照或付款，亦不把 local progress 升格為正式雲端資料。
 
@@ -205,7 +205,7 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 
 1. 先讀本文件、`AGENTS.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/BOOT_ARCHITECTURE.md`、本次 Requirement Batch。
 2. 看 `functions/src/session-authority.js`、`functions/index.js`、`js/firebase/session-client.js`、`firebase-session.js`、兩個 Firebase client owners 與 `firestore.rules`。
-3. 本次結案 PR 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
+3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
 4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
 5. Phase 2 必須另行開始；後續若獲授權，才處理 server-owned save envelope（ownerUid、schemaVersion、revision、server timestamps）等。本次保持 NOT STARTED。
 6. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或存檔，禁止 local overwrite 與無關 refactor。只透過 PR 發布已驗證 dev，禁止直接修改 main。

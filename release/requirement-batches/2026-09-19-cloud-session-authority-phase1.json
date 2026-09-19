@@ -81,6 +81,6 @@
     "evidenceBoundary": "不將使用者回報寫成伺服器日誌，不將 emulator 寫成真實裝置，不提交完整 UID、credential 或 ID Token。"
   },
   "verifiedDevCommitScope": "已成功部署並完成實機驗收的結案基準；文件合併後最終 dev SHA 另由結案 PR 記錄，不以本欄冒充。",
-  "publicationEvidence": "本次文件結案 PR 的永久發布證據：最後 dev SHA、CI/DEV/Firebase run/job、main PR/SHA/production。未執行結果不得預填。",
+  "publicationEvidence": "https://github.com/tf00913225-alt/my-game/pull/341 的永久發布證據：最後 dev SHA、CI/DEV/Firebase run/job、main PR/SHA/production。未執行結果不得預填。",
   "phase2Status": "NOT_STARTED"
 }
