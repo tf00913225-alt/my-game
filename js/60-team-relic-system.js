@@ -1346,13 +1346,8 @@
         let dot=entry&&entry.querySelector(".v141-notice-dot.team-relic-notice-dot");
         if(needsAttention&&!dot&&entry){ dot=document.createElement("span"); dot.className="v141-notice-dot team-relic-notice-dot"; dot.setAttribute("aria-hidden","true"); entry.appendChild(dot); }
         if(!needsAttention&&dot){ dot.remove(); }
-        const roster=document.getElementById("v146HomeRoster");
-        if(roster){
-            let slot=roster.querySelector(".team-relic-loadout-slot"); if(!slot){ slot=document.createElement("div"); slot.className="team-relic-loadout-slot"; roster.appendChild(slot); }
-            const def=teamLoadout.relicId&&relicCatalog[teamLoadout.relicId];
-            slot.innerHTML=def?'<span>隊伍秘寶</span><b>'+esc(def.name)+' Lv.'+relicLevel(def.id)+'</b><small>'+esc(def.triggerText)+'</small><button onclick="openHomeFeature(\'relic\')">更換</button>':
-                '<span>隊伍秘寶</span><b>尚未裝備</b><small>每隊僅能裝備1件秘寶</small><button onclick="openHomeFeature(\'relic\')">選擇</button>';
-        }
+        const summary=window.FourSymbolsHomeRelicSummary;
+        if(summary&&typeof summary.sync==="function"){ summary.sync(); }
     }
 
     if(typeof openHomeFeature==="function"){
