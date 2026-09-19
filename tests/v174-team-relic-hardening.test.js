@@ -1,5 +1,6 @@
 "use strict";
 const fs=require("fs"),vm=require("vm"),assert=require("node:assert/strict");
+const summarySource=fs.readFileSync("js/relic-summary-catalog.js","utf8");
 const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
 
 function make(){
@@ -14,7 +15,7 @@ function make(){
  getExistingPartyIndexes:()=>[0,1,2],getPartyCharacterByIndex:i=>party[i],getPartyBattleStats:()=>({maxHP:1000,maxSP:200,attack:100,magicAttack:100,defense:100,evasion:0,resistance:0}),getMainCharacterStats:()=>({maxHP:1000,maxSP:200,defense:100}),getPlayer2BattleStats:()=>({maxHP:1000,maxSP:200,defense:100}),getPlayer3BattleStats:()=>({maxHP:1000,maxSP:200,defense:100}),getMonsterRank:m=>m.rank,isMonsterFrozen:m=>!!m.frozen,isMonsterPetrified:m=>!!m.petrified,
  showPlayerHit(){},showMonsterHit(){},addBattleLog(){},updateUI(){},updateGoldDisplay(){},showPage(){},openHomeFeature(){},closeHomeFeature(){},saveGame(){},killMonster(i){monsters[i].alive=false;},applyBurnEffect(e,d,p){if(e.statusEffects.some(x=>x.type==="burn"&&x.turnsLeft>0))return false;e.statusEffects.push({type:"burn",turnsLeft:d,percent:p});return true;},applyFreezeEffect(e,d=2){if(e.statusEffects.some(x=>x.type==="freeze"&&x.turnsLeft>0))return false;e.statusEffects.push({type:"freeze",turnsLeft:d});return true;},
  startTurn(){roundStartObservers.forEach(fn=>fn({token:this.battleToken,turn:this.turn,type:"round_start"}));startSeen.push(this.v174RelicDebugState&&this.v174RelicDebugState()?.relicId||null);},startBattle(){this.battleActive=true;this.battleToken++;this.turn=1;this.startTurn(this.battleToken);},processNextCombatant(){},processSingleMonsterAttack(){const p=party[0];if(mode==="shield"){const s=p.activeBuffs.find(b=>b.type==="shield");s.remaining=Math.max(0,s.remaining-damage);}else{p.hp=Math.max(0,p.hp-damage);this.showPlayerHit(damage,"hp",0,false);}},tickStatusEffects(){},winBattle(){this.battleActive=false;},loseBattle(){this.battleActive=false;}};
- c.saveGame=function(){store.set("save",JSON.stringify({player:{id:"甲"},gold:c.gold}));}; c.window=c;vm.createContext(c);vm.runInContext(source,c);return {c,party,monsters,startSeen,setMode:v=>mode=v,setDamage:v=>damage=v};
+ c.saveGame=function(){store.set("save",JSON.stringify({player:{id:"甲"},gold:c.gold}));}; c.window=c;vm.createContext(c);vm.runInContext(summarySource,c);vm.runInContext(source,c);return {c,party,monsters,startSeen,setMode:v=>mode=v,setDamage:v=>damage=v};
 }
 {
  const r=make(); r.c.v174EquipRelic("relic_qinglan_feather");r.c.startBattle();assert.equal(r.startSeen[0],"relic_qinglan_feather","battle state exists before original startTurn runs");r.c.startTurn(r.c.battleToken);r.c.turn=2;r.c.startTurn(r.c.battleToken);assert.equal(r.c.v174RelicDebugState().triggerCounts["relic_qinglan_feather:battle_start"],1,"battle_start relic triggers exactly once");r.c.loseBattle();
