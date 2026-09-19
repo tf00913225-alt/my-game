@@ -90,8 +90,14 @@ for(const id of ids){
 assert.match(relic,/RELIC_DEV_HOST="dev\.four-symbols-dev\.pages\.dev"/);
 assert.match(relic,/function statusOf\(id\)[\s\S]*unlocked:true,seen:true/,
   "DEV must expose all relics without requiring fragments");
-assert.match(relic,/team-relic-card[\\s\\S]*team-relic-equip[\\s\\S]*\(equipped\?'已裝備':'裝備'\)/,
+const relicCardSource=relic.slice(
+  relic.indexOf("function cardMarkup(def)"),
+  relic.indexOf("function renderRelicList()")
+);
+assert.match(relicCardSource,/class="team-relic-equip"/,
   "DEV test ownership must use the same formal player-facing equip control");
+assert.match(relicCardSource,/equipped\?'已裝備':'裝備'/,
+  "formal equip control must expose 裝備／已裝備 without DEV labels");
 assert.doesNotMatch(relic,/team-relic-card-dev|team-relic-dev-equip|DEV 正式功能配裝|DEV 僅演出配裝|Runtime Ready（正式功能已完成）|Presentation Only（僅演出預覽/,
   "player-facing relic markup must not expose DEV or capability classification");
 assert.match(relic,/v174RelicDevPreviewPresentation=function\(id\)/,
