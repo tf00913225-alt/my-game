@@ -5,16 +5,18 @@
   "baseCommit": "7dd60dcddc9334902e058123a6084a93353e5943",
   "officialVersion": "173.65",
   "officialVersionBumpAllowed": false,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "BLOCKED",
   "requirements": [
     {"id": "SESSION-01", "status": "VERIFIED", "requirement": "先稽核實際 Auth、UID、storage、rules 與後端，建立永久十階段進度", "evidence": ["docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md", "HANDOFF.md", "DATA_SECURITY_CONTRACTS.md 在 exact base SHA 缺失，未假設其內容"]},
-    {"id": "SESSION-02", "status": "IMPLEMENTED", "requirement": "可信 Backend 原子建立／取代／撤銷單一 session，拒絕舊登入重取權威", "evidence": ["functions/src/session-authority.js", "functions/index.js", "scripts/test-session-authority-emulator.mjs"]},
-    {"id": "SESSION-03", "status": "IMPLEMENTED", "requirement": "protectedTest 與既有 protected writers 共用交易內驗證；不同 UID 互相隔離", "evidence": ["functions/index.js", "firestore.rules", "scripts/test-session-authority-emulator.mjs"]},
+    {"id": "SESSION-02", "status": "VERIFIED", "requirement": "可信 Backend 原子建立／取代／撤銷單一 session，拒絕舊登入重取權威", "evidence": ["functions/src/session-authority.js", "functions/index.js", "Session Authority CI 35430681815 SUCCESS：HTTP A/B、concurrency、native handoff source epoch replay"]},
+    {"id": "SESSION-03", "status": "VERIFIED", "requirement": "protectedTest 與既有 protected writers 共用交易內驗證；不同 UID 互相隔離", "evidence": ["functions/index.js", "firestore.rules", "Session Authority CI 35430681815 SUCCESS：rules／UID／protected writer 拒絕及原子交易先後"]},
     {"id": "SESSION-04", "status": "VERIFIED", "requirement": "Client 有明確失效錯誤，無自動 takeover／寫入重試，不搬 local data", "evidence": ["tests/session-client.test.mjs：8 cases PASS", "原有 Auth／boot／UID／hydration 精準測試 PASS"]},
-    {"id": "SESSION-05", "status": "IMPLEMENTED", "requirement": "Functions 與規則部署、實際 A/B takeover 驗收；CI 全綠才 merge dev", "evidence": [".github/workflows/session-authority.yml", "實際 CI／部署／live A/B 結果待取得；不可宣稱完整完成"]}
+    {"id": "SESSION-05", "status": "BLOCKED", "requirement": "Functions 與規則部署、實際 A/B takeover 驗收；CI 全綠才 merge dev", "evidence": ["PR #335 在 CI 35430681904／35430681815 SUCCESS 後合併 dev", "dev CI 35430858607 SUCCESS，Cloudflare 部署與 SHA 驗證 SUCCESS", "Session Authority run 35430858389 emulator SUCCESS；deploy job 105865475494 在 Firebase Rules API test 回覆 403 The caller does not have permission", "既有 Secret／Google Cloud authentication 成功；Functions／Rules 部署與真正雲端 A/B 尚未完成，不略過規則或權限檢查"]}
   ],
-  "automatedVerification": "TARGETED_PASS_EMULATOR_AND_CI_PENDING",
-  "visualVerification": "BOOT_QA_PENDING_NO_UI_REDESIGN",
+  "automatedVerification": "TARGETED_AND_HTTP_EMULATOR_AND_PR_CI_PASS",
+  "visualVerification": "ACCOUNT_BOOT_BROWSER_QA_PASS_NO_UI_REDESIGN",
+  "verifiedSourceCommit": "d413304550f015dc164152d1e0229dd68dcdd95b",
+  "mergedDevCommit": "b105f5329d95874820202b6ade78254712200d5e",
   "verifiedDevCommit": null,
   "releasedAs": null
 }
