@@ -32,6 +32,14 @@ import {
 let firebaseApp = null;
 let firebaseAuth = null;
 let initializePromise = null;
+let sessionHooks = Object.freeze({});
+
+export function installFirebaseSessionHooks(hooks){ sessionHooks=Object.freeze({...hooks}); }
+function completedSignIn(credential){
+    const user=publicUser(credential.user);
+    if(sessionHooks.signedIn){ sessionHooks.signedIn(user); }
+    return user;
+}
 
 function findExistingApp(){
     return getApps().find((app)=>app && app.name === FIREBASE_APP_NAME) || null;
@@ -98,7 +106,7 @@ export async function signInWithGoogle(){
     const { auth } = await initializeFirebaseAuth();
     const provider = new GoogleAuthProvider();
     const credential = await signInWithPopup(auth, provider);
-    return publicUser(credential.user);
+    return completedSignIn(credential);
 }
 
 export async function signInWithFacebook(){
@@ -110,30 +118,31 @@ export async function signInWithFacebook(){
        OAuth result could return to Firebase. */
     provider.setCustomParameters({ display:"popup" });
     const credential = await signInWithPopup(auth, provider);
-    return publicUser(credential.user);
+    return completedSignIn(credential);
 }
 
 export async function signInWithEmail(email, password){
     const { auth } = await initializeFirebaseAuth();
     const credential = await signInWithEmailAndPassword(auth, String(email || "").trim(), String(password || ""));
-    return publicUser(credential.user);
+    return completedSignIn(credential);
 }
 
 export async function createAccountWithEmail(email, password){
     const { auth } = await initializeFirebaseAuth();
     const credential = await createUserWithEmailAndPassword(auth, String(email || "").trim(), String(password || ""));
-    return publicUser(credential.user);
+    return completedSignIn(credential);
 }
 
 export async function signInAsAnonymous(){
     const { auth } = await initializeFirebaseAuth();
     const credential = await signInAnonymously(auth);
-    return publicUser(credential.user);
+    return completedSignIn(credential);
 }
 
 export async function signOutFirebase(){
     const { auth } = await initializeFirebaseAuth();
-    await signOut(auth);
+    try{ if(sessionHooks.beforeSignOut){ await sessionHooks.beforeSignOut(); } }
+    finally{ await signOut(auth); }
 }
 
 export async function observeFirebaseAuthState(listener){

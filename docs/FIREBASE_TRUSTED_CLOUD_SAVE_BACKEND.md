@@ -1,5 +1,10 @@
 # Firebase Trusted Cloud Save Backend
 
+> 2026-09-19 Phase 1 update: both save-writing callables below now also require
+> the current game Session Credential. Firebase Auth alone is insufficient.
+> The permanent roadmap, transaction boundary, deployment and acceptance status
+> are maintained in [CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md](CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md).
+
 ## Scope
 
 This phase introduces the trusted server boundary for cloud-save migration without changing the existing local-save owner.

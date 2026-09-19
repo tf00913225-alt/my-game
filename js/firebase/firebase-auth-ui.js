@@ -6,6 +6,8 @@ import {
 
 const OVERLAY_ID="firebaseAuthOverlay";
 const RESUME_GRACE_MS=5000;
+const SESSION_TEST_HOSTS=new Set(["dev.four-symbols-dev.pages.dev","localhost","127.0.0.1"]);
+const DEV_SESSION_TEST_ENABLED=SESSION_TEST_HOSTS.has(window.location.hostname);
 let installed=false;
 let busy=false;
 let interactiveAuthThisPage=false;
@@ -13,7 +15,7 @@ let resumeGraceUsed=false;
 let resumeActive=false;
 let resumeDeadline=0;
 let resumeInterval=0;
-let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null};
+let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:""};
 
 const byId=id=>document.getElementById(id);
 function errorText(error){
@@ -86,6 +88,13 @@ function markup(){
             <code id="firebaseAccountUid" class="firebase-auth-uid"></code>
             <div id="firebaseCloudState" class="firebase-auth-cloud-state"></div>
           </div>
+          <div id="firebaseSessionTestPanel" class="firebase-auth-account-card" hidden>
+            <div class="firebase-auth-account-name">開發版登入權限測試</div>
+            <div id="firebaseSessionTestResult" class="firebase-auth-cloud-state" role="status" aria-live="polite">按下按鈕即可確認這台裝置是否仍擁有雲端操作權限。</div>
+            <div class="firebase-auth-actions">
+              <button id="firebaseSessionTestButton" class="firebase-auth-button secondary" type="button">測試目前裝置權限</button>
+            </div>
+          </div>
           <div id="firebaseMigrationPanel" hidden>
             <p id="firebaseMigrationMessage" class="firebase-auth-subtitle"></p>
             <div class="firebase-auth-actions">
@@ -103,7 +112,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseFacebookButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseFacebookButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
     if(!resumeActive){ return; }
@@ -116,7 +125,8 @@ function renderResumeCountdown(){
 function render(){
     if(!installed){ return; }
     const status=byId("firebaseAuthStatus");
-    status.textContent=state.message||""; status.classList.toggle("is-error",state.error===true);
+    status.textContent=state.sessionError||state.message||"";
+    status.classList.toggle("is-error",!!state.sessionError||state.error===true);
     const signedOut=byId("firebaseSignedOutPanel"); const signedIn=byId("firebaseSignedInPanel");
     const resume=byId("firebaseAuthResumePanel");
     if(resume){ resume.hidden=!resumeActive; }
@@ -129,6 +139,12 @@ function render(){
         byId("firebaseAccountMeta").textContent=state.user.isAnonymous?"Firebase 匿名登入":"已驗證帳號";
         byId("firebaseAccountUid").textContent="UID："+state.user.uid;
         byId("firebaseCloudState").textContent=state.mode==="SAVE_LOADING"?"正在讀取 UID 對應的雲端與本機資料…":"角色資料以此 UID 為 owner。";
+    }
+    const sessionTestPanel=byId("firebaseSessionTestPanel");
+    if(sessionTestPanel){ sessionTestPanel.hidden=!DEV_SESSION_TEST_ENABLED||!state.user||resumeActive; }
+    const sessionTestResult=byId("firebaseSessionTestResult");
+    if(sessionTestResult){
+        sessionTestResult.textContent=state.sessionTest||"按下按鈕即可確認這台裝置是否仍擁有雲端操作權限。";
     }
     const migration=byId("firebaseMigrationPanel");
     migration.hidden=state.mode!=="MIGRATION_REQUIRED";
@@ -157,6 +173,34 @@ function performInteractive(message,action){
     return perform(message,action);
 }
 function dispatchAction(action){ window.dispatchEvent(new CustomEvent("four-symbols:account-ui-action",{detail:{action}})); }
+function sessionTestFailureText(error){
+    const raw=[error&&error.details&&error.details.code,error&&error.code,error&&error.message].filter(Boolean).join(" ");
+    if(raw.includes("SESSION_REVOKED")){ return "❌ 這台裝置已被另一台裝置取代。"; }
+    if(raw.includes("SESSION_INVALID")){ return "❌ 這台裝置的登入權限已失效，請重新登入原帳號。"; }
+    if(raw.includes("SESSION_REAUTH_REQUIRED")){ return "⚠️ 請重新登入原帳號後再測試。"; }
+    if(raw.includes("AUTH_REQUIRED")){ return "⚠️ 目前尚未完成登入，請先登入原帳號。"; }
+    return "⚠️ 無法確認目前權限，請稍後再試。";
+}
+async function testCurrentDeviceSession(){
+    if(busy||!DEV_SESSION_TEST_ENABLED){ return; }
+    setBusy(true);
+    state={...state,sessionTest:"正在確認這台裝置的雲端操作權限…"};
+    render();
+    try{
+        const api=window.FourSymbolsFirebase;
+        if(!api||typeof api.protectedTest!=="function"){ throw new Error("SESSION_TEST_UNAVAILABLE"); }
+        const result=await api.protectedTest();
+        state={...state,sessionTest:result&&result.result==="SUCCESS"
+            ?"✅ 這台裝置目前擁有雲端操作權限。"
+            :"⚠️ 雲端沒有回傳可辨識的權限結果。"};
+    }catch(error){
+        console.error("Firebase session authority test failed:",error);
+        state={...state,sessionTest:sessionTestFailureText(error)};
+    }finally{
+        setBusy(false);
+        render();
+    }
+}
 function clearResumeTimer(){
     if(resumeInterval){ window.clearInterval(resumeInterval); resumeInterval=0; }
 }
@@ -201,6 +245,8 @@ function bind(){
     byId("firebaseMigrationConfirmButton").addEventListener("click",()=>dispatchAction("confirm-migration"));
     byId("firebaseMigrationCancelButton").addEventListener("click",()=>dispatchAction("cancel-migration"));
     byId("firebaseRetryButton").addEventListener("click",()=>dispatchAction("retry"));
+    const sessionTestButton=byId("firebaseSessionTestButton");
+    if(sessionTestButton){ sessionTestButton.addEventListener("click",()=>{ void testCurrentDeviceSession(); }); }
     byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
     byId("firebaseAuthBackButton").addEventListener("click",()=>{
         if(!state.user||(state.mode!=="READY"&&state.mode!=="OFFLINE_READY")){ return; }

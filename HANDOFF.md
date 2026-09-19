@@ -1,3 +1,28 @@
+## 2026-09-19 — Phase 1 main 發布檢查：Firebase 模組數過期測試修正
+
+- 發布 PR #342 的 CI run `35441331170` 實際發現 `tests/critical-feature-budget.test.js` 仍要求 5 個 Firebase 模組；Phase 1 正式建置 owner 已明確包含 `session-client.js` 與 `firebase-session.js`，共 7 個。分類為 stale test contract，非正式程式錯誤；自主失敗額度 1/4、修正 1 次。
+- 從最新 `dev@10a2decd213cc061e8820fbfd5b01e4ad4d386f4` 建 `fix/cloud-session-phase1-release-gate-20260919`；只將既有模組數斷言對齊 7，不放寬 bytes、hash 或 feature boundary 檢查。本機同一測試先重現 7 !== 5，再修正為 PASS。
+- 結案文件與既有 Session Authority workflow 的文件連結註解同步；workflow 所有執行定義、後端／客戶端程式、遊戲與 Cache Version 均不變。修復必須 PR 回 dev、CI 通過後合併，再驗證最新 dev／Firebase／DEV 與 main PR；最新發布狀態和 SHA 以 [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久記錄為準。Phase 1 仍為 5/5 VERIFIED，Phase 2 未開始。
+
+## 2026-09-19 — Cloud Account Phase 1 正式驗收結案（COMPLETE / 5/5 VERIFIED）
+
+- 本節取代下方歷史「Phase 1 BLOCKED / Firebase 403」作為目前狀態；歷史紀錄保留。長期進度唯一來源仍是 `docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md`，Phase 2–10 全部尚未開始。
+- 結案基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；Firebase run `35438044543`／deploy job `105884400094` 成功，七支 Functions 全部更新，Firestore Rules 編譯與發布成功。部署服務帳號：`github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com`。Rules IAM 403 已解除；Artifact Registry 清理政策警告已不阻擋部署，但未冒稱政策本身已設定成功。
+- 同 UID 真實雙手機：舊手機畫面顯示 `SESSION_REVOKED` 與「這台裝置已被另一台裝置取代」；後登入手機 SUCCESS 由使用者於本次對話明確回報，成功截圖已刪除。使用者後續澄清已完成實測、沒有問題；不把先前簡短回覆誤記成雙手機均失效。不同 UID 隔離由同 SHA 的 HTTP emulator job `105883976742` 實際通過，未冒稱有不同 UID 真機截圖。
+- 同一基準的 Repository checks、DEV deployment 與部署 SHA 核對由 run `35438044719` 成功。收尾 PR 合併後必須另外記錄最新 dev 的檢查、Firebase／DEV 部署及正式 main 發布證據，不能用本段基準成功冒充最後發布 SHA。
+- DEV 測試區仍由 `js/firebase/firebase-auth-ui.js` 的精確 hostname allowlist 控制，只允許 `dev.four-symbols-dev.pages.dev`、`localhost`、`127.0.0.1`。不改正式權限 owner、UI、玩法或存檔；Game／Cache Version 維持 `173.65`。`DATA_SECURITY_CONTRACTS.md` 仍不存在。
+- 使用者已授權本次文件 PR → dev → 受保護 main PR 發布；最終 SHA 與發布結果記錄於[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 的永久發布證據，不預填未執行結果。Phase 1 功能驗收已完成；整次發布仍須完成既有 Release Gate 與正式部署驗證才可回報完成。
+
+## 2026-09-19 — Cloud Account Phase 1：Single Active Session（歷史 BLOCKED 紀錄）
+
+- 基準 `dev@7dd60dcddc9334902e058123a6084a93353e5943`；分支 `feature/cloud-session-authority-phase1-20260919`，只整合 `dev`，`main` 禁止修改。
+- 長期進度唯一來源：[docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md](docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md)。後續每個 Cloud Save Phase 必須更新；內含 14 項稽核、十階段狀態、永久決策、風險與下一步。基準缺少 `DATA_SECURITY_CONTRACTS.md`，已如實記錄。
+- 新 owner：`functions/src/session-authority.js`；新增 `createGameSession`／`revokeGameSession`／`protectedTest`。兩支既有存檔 callable 在同一 Firestore transaction 內驗證 active session 與寫入；native auth handoff 加 source authTime 防繞過，仍只做身分交換。
+- Client owner：`js/firebase/session-client.js`＋`firebase-session.js`；auth/bootstrap／readonly cloud-save 接入，不包裝 gameplay save、不搬玩家資料、不改 UI 版面；所有 error 明確且不自動重試寫入／搶回 session。
+- 程式 PR #335 已於 CI 全綠後合併 `dev@b105f5329d95874820202b6ade78254712200d5e`；精準測試、HTTP emulator A/B／UID／rules／併發驗收、account boot browser QA 與 DEV 前端部署／SHA 驗證均通過。Game／Cache version 維持 `173.65`。
+- **NOT COMPLETE，Requirements 4/5 VERIFIED：** Firebase deploy run `35430858389`／job `105865475494` 於 Rules API test 回覆 403；Secret 與登入成功，部署權限不足。七支 Functions／Rules 尚未完成部署，真正雲端雙裝置驗收未做；線上不能宣稱已具本次 authority。
+- 下一步：專案管理者處理既有部署身分的 Rules IAM 權限，再從最新 dev 部署七支 Functions＋Rules、完成 A→B takeover／UID 隔離驗收並更新長期進度。純文件合併不觸發 Firebase 部署，不能重跑舊 SHA 冒充最新部署；詳細命令與證據見長期文件。Phase 1 驗收前不開始 Phase 2。
+
 ## 2026-09-18 — 20 件秘寶 4×3 VFX WebP 與戰鬥演出整合
 
 - 工作分支：`feature/relic-vfx-animation-20260918`；基準為 `dev@d91687cb09d04519766d8303c331945508bde3a5`，`main` 不修改。

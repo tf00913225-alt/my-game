@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-19-cloud-session-authority-phase1",
+  "baseBranch": "dev",
+  "baseCommit": "7dd60dcddc9334902e058123a6084a93353e5943",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "COMPLETE",
+  "requirements": [
+    {
+      "id": "SESSION-01",
+      "status": "VERIFIED",
+      "requirement": "先稽核實際 Auth、UID、storage、rules 與後端，建立永久十階段進度",
+      "evidence": [
+        "docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md",
+        "HANDOFF.md",
+        "DATA_SECURITY_CONTRACTS.md 在 exact base SHA 缺失，未假設其內容"
+      ]
+    },
+    {
+      "id": "SESSION-02",
+      "status": "VERIFIED",
+      "requirement": "可信 Backend 原子建立／取代／撤銷單一 session，拒絕舊登入重取權威",
+      "evidence": [
+        "functions/src/session-authority.js",
+        "functions/index.js",
+        "Session Authority CI 35430681815 SUCCESS：HTTP A/B、concurrency、native handoff source epoch replay",
+        "同 SHA Session Authority run 35438044543 / emulator job 105883976742 SUCCESS：HTTP A SUCCESS → B takeover → A SESSION_REVOKED → B SUCCESS、併發、native source epoch replay"
+      ]
+    },
+    {
+      "id": "SESSION-03",
+      "status": "VERIFIED",
+      "requirement": "protectedTest 與既有 protected writers 共用交易內驗證；不同 UID 互相隔離",
+      "evidence": [
+        "functions/index.js",
+        "firestore.rules",
+        "Session Authority CI 35430681815 SUCCESS：rules／UID／protected writer 拒絕及原子交易先後",
+        "同 SHA emulator job 105883976742 SUCCESS；UID X 撤銷後 UID Y protectedTest 仍 SUCCESS。可執行模擬器證據，非不同 UID 真機截圖。"
+      ]
+    },
+    {
+      "id": "SESSION-04",
+      "status": "VERIFIED",
+      "requirement": "Client 有明確失效錯誤，無自動 takeover／寫入重試，不搬 local data",
+      "evidence": [
+        "tests/session-client.test.mjs：8 cases PASS",
+        "原有 Auth／boot／UID／hydration 精準測試 PASS",
+        "本次本機重跑既有 session-client 8 tests PASS；無權限程式變更",
+        "DEV 測試區 render 與操作入口的 exact hostname gate 可執行檢查 PASS：僅三個指定 host 顯示／允許呼叫，正式 host 隱藏／拒絕操作"
+      ]
+    },
+    {
+      "id": "SESSION-05",
+      "status": "VERIFIED",
+      "requirement": "Functions 與規則部署、實際 A/B takeover 驗收；CI 全綠才 merge dev",
+      "evidence": [
+        "PR #335 在 CI 35430681904／35430681815 SUCCESS 後合併 dev；歷史 Firebase Rules 403 run 35430858389 已由後續成功部署解除",
+        "驗收基準 dev 342ef104fa2897f5ae5c3249e0c75c9efca3e762：Repository checks run 35438044719 SUCCESS；DEV job 105884077707 SUCCESS 且 deployed SHA verified YES",
+        "Firebase run 35438044543 / deploy job 105884400094 SUCCESS：Firestore Rules 編譯並發布，七支 Functions 全部 Successful update operation，Deploy complete!",
+        "部署服務帳號：github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com；本次未接觸／提交私鑰",
+        "真實同 UID 雙手機：舊裝置畫面 SESSION_REVOKED／這台裝置已被另一台裝置取代；後登入裝置 SUCCESS 由使用者於 2026-09-19 明確實機回報，成功截圖已刪除。使用者隨後澄清已完成實測沒有問題，未虛構新裝置截圖或雲端逐次日誌",
+        "不同 UID 隔離已由同 SHA HTTP emulator job 105883976742 實際通過；未冒稱有不同 UID 真機截圖",
+        "Artifact Registry 清理政策已不阻擋部署，但成功 job 仍有 policy 設定警告；政策本身未宣稱 VERIFIED",
+        "docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md：功能驗收與後續文件 PR／最終 dev／main 發布證據分開；最後發布 SHA 及各 run/job 在結案 PR 永久記錄"
+      ]
+    }
+  ],
+  "automatedVerification": "TARGETED_AND_HTTP_EMULATOR_AND_EXACT_DEV_CI_PASS",
+  "visualVerification": "ACCOUNT_BOOT_BROWSER_QA_PASS_NO_UI_REDESIGN",
+  "verifiedSourceCommit": "342ef104fa2897f5ae5c3249e0c75c9efca3e762",
+  "mergedDevCommit": "b105f5329d95874820202b6ade78254712200d5e",
+  "verifiedDevCommit": "342ef104fa2897f5ae5c3249e0c75c9efca3e762",
+  "closeoutBaseCommit": "342ef104fa2897f5ae5c3249e0c75c9efca3e762",
+  "liveVerification": {
+    "date": "2026-09-19",
+    "sameUidTakeover": "VERIFIED_USER_DEVICE_REPORT",
+    "oldSessionRejected": "VERIFIED_USER_SCREENSHOT_SESSION_REVOKED",
+    "newSessionRemainsValid": "VERIFIED_USER_ATTESTATION_SUCCESS_SCREENSHOT_DELETED",
+    "differentUidIsolation": "VERIFIED_EXECUTED_HTTP_EMULATOR",
+    "evidenceBoundary": "不將使用者回報寫成伺服器日誌，不將 emulator 寫成真實裝置，不提交完整 UID、credential 或 ID Token。"
+  },
+  "verifiedDevCommitScope": "已成功部署並完成實機驗收的結案基準；文件合併後最終 dev SHA 另由結案 PR 記錄，不以本欄冒充。",
+  "publicationEvidence": "https://github.com/tf00913225-alt/my-game/pull/341 的永久發布證據：最後 dev SHA、CI/DEV/Firebase run/job、main PR/SHA/production。未執行結果不得預填。",
+  "phase2Status": "NOT_STARTED"
+}
