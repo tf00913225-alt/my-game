@@ -4049,7 +4049,12 @@ const POST_ACTION_DELAY_MS=1150;
 const BATTLE_DECLARE_ADVANCE_MS=MANUAL_RESOLUTION_START_MS;
 const battleActionFinishObservers=new Set();
 const battleBeforeCombatantObservers=new Set();
+const battleRoundStartObservers=new Set();
+const battleRoundEndObservers=new Set();
 const battleActionFinishInterceptors=[];
+let battleRoundBoundaryKeys=new Set();
+const battlePresentationLocks=new Set();
+let battleInputResumeToken=null;
 if(typeof window!=="undefined"){
     window.FourSymbolsBattleFlow=Object.freeze({
         subscribeActionFinished(observer){
@@ -4062,6 +4067,37 @@ if(typeof window!=="undefined"){
             battleBeforeCombatantObservers.add(observer);
             return function(){ battleBeforeCombatantObservers.delete(observer); };
         },
+        subscribeRoundStart(observer){
+            if(typeof observer!=="function"){ return function(){}; }
+            battleRoundStartObservers.add(observer);
+            return function(){ battleRoundStartObservers.delete(observer); };
+        },
+        subscribeRoundEnd(observer){
+            if(typeof observer!=="function"){ return function(){}; }
+            battleRoundEndObservers.add(observer);
+            return function(){ battleRoundEndObservers.delete(observer); };
+        },
+        acquirePresentationLock(owner){
+            const lock={owner:String(owner||"battle-presentation")};
+            battlePresentationLocks.add(lock);
+            if(typeof updateActionHudVisibility==="function"){ updateActionHudVisibility(); }
+            let active=true;
+            return function(){
+                if(!active){ return; }
+                active=false;
+                battlePresentationLocks.delete(lock);
+                if(typeof updateActionHudVisibility==="function"){ updateActionHudVisibility(); }
+                if(
+                    battlePresentationLocks.size===0&&battleInputResumeToken!==null&&
+                    battleActive&&battlePhase==="declare"&&battleInputResumeToken===battleToken
+                ){
+                    const resumeToken=battleInputResumeToken;
+                    battleInputResumeToken=null;
+                    beginCharacterTurn(resumeToken);
+                }
+            };
+        },
+        isPresentationActive(){ return battlePresentationLocks.size>0; },
         interceptActionFinish(interceptor){
             if(typeof interceptor!=="function"){ return function(){}; }
             battleActionFinishInterceptors.push(interceptor);
@@ -4096,6 +4132,18 @@ function notifyBeforeCombatant(token){
         try{ observer({token:token,turn:turn,index:initiativeIndex,queue:initiativeQueue}); }
         catch(error){ console.error("戰鬥佇列觀察器失敗：",error); }
     });
+}
+function notifyBattleRoundBoundary(type,token){
+    const roundNumber=Math.max(1,Math.floor(Number(turn)||1));
+    const key=String(token)+":"+type+":"+String(roundNumber);
+    if(battleRoundBoundaryKeys.has(key)){ return false; }
+    battleRoundBoundaryKeys.add(key);
+    const observers=type==="round_start"?battleRoundStartObservers:battleRoundEndObservers;
+    observers.forEach(observer=>{
+        try{ observer({token:token,turn:roundNumber,type:type}); }
+        catch(error){ console.error("戰鬥回合邊界觀察器失敗：",error); }
+    });
+    return true;
 }
 function getBattleAdvanceDelay(phase){
     if(phase==="declare"){
@@ -10181,6 +10229,9 @@ function startBattle(triggerIndex){
     mapCooldown=true;
 
     battleToken++;
+    battleRoundBoundaryKeys=new Set();
+    battlePresentationLocks.clear();
+    battleInputResumeToken=null;
 
 
     stopMonsterMovement();
@@ -10523,6 +10574,8 @@ function startTurn(token){
         return;
     }
 
+    notifyBattleRoundBoundary("round_start",token);
+
     const bossRoundOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     if(bossRoundOwner&&typeof bossRoundOwner.processRound==="function"&&
        bossRoundOwner.processRound()===true){
@@ -10684,6 +10737,12 @@ function beginCharacterTurn(token){
         !battleActive ||
         token!==battleToken
     ){
+        return;
+    }
+
+    if(battlePresentationLocks.size>0){
+        battleInputResumeToken=token;
+        updateActionHudVisibility();
         return;
     }
 
@@ -12668,6 +12727,13 @@ function processNextCombatant(token){
 
         turnAdvancePending=
             true;
+
+
+        notifyBattleRoundBoundary("round_end",token);
+
+        if(checkBattleEnd()){
+            return;
+        }
 
 
         turn++;
@@ -32538,8 +32604,15 @@ function updateActionHudVisibility(){
         ? autoBattle
         : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
+    const battlePresentationActive=!!(
+        typeof window!=="undefined"&&
+        window.FourSymbolsBattleFlow&&
+        typeof window.FourSymbolsBattleFlow.isPresentationActive==="function"&&
+        window.FourSymbolsBattleFlow.isPresentationActive()
+    );
+
     const shouldHide=
-        activeAuto || battlePhase==="resolve";
+        activeAuto || battlePhase==="resolve" || battlePresentationActive;
 
 
     /*
@@ -32581,6 +32654,7 @@ function updateActionHudVisibility(){
         if(shouldHide){
 
             closeMenus();
+            clearBattleTargetSelectionMode();
 
         }
 

@@ -79,6 +79,15 @@ jobs:
           node tests/v150-ice-arrow-rain-vfx.test.js
           node tests/v173.23-wind-vfx.test.js
 
+      - name: Run relic lifecycle and battle input regressions
+        run: |
+          node tests/relic-trigger-lifecycle-battle-input-ui-20260919.test.js
+          node tests/v174-team-relic-system.test.js
+          node tests/v174-team-relic-hardening.test.js
+          node tests/v174-battle-presentation-sequencing.test.js
+          node tests/relic-battle-cutin-icon-readability-20260919.test.js
+          node tests/battle-input-hitbox-browser-20260919.test.js
+
       - name: Ensure existing asset-test dependency
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
         run: |
