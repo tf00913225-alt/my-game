@@ -33,10 +33,6 @@ assert.match(relic,/interceptActionFinish\(\(\)=>[\s\S]*relicPresentationHandoff
 assert.match(relic,/releaseRelicPresentationHandoff\(withProtection\)[\s\S]*RELIC_MIN_VISUAL_PROTECTION_MS/,
   "the first 1.2s of active relic VFX must be protected before action handoff is released");
 assert.match(relic,/function shouldHoldMonsterActionFinishForRelic\(hardControlled\)[\s\S]*enemy_action_count[\s\S]*ally_hit_count/,
-  "monster post-action relic thresholds must be predicted before the wrapped monster action can finish");
-assert.match(relic,/const finishProbe=shouldHoldMonsterActionFinishForRelic\(hardControlled\);[\s\S]*relicPresentationHandoffsPending\+\+[\s\S]*previous\.apply\(this,arguments\)[\s\S]*releaseRelicPresentationHandoff\(false\)/,
-  "post-action monster triggers must enter the same presentation handoff before legacy finishPlayerAction can schedule the next combatant");
-assert.match(relic,/function shouldHoldMonsterActionFinishForRelic\(hardControlled\)[\s\S]*enemy_action_count[\s\S]*ally_hit_count/,
   "post-finish monster counters must pre-arm the existing action-finish interceptor when the next hit/action can trigger a relic");
 assert.match(relic,/const finishProbe=shouldHoldMonsterActionFinishForRelic\(hardControlled\);[\s\S]*relicPresentationHandoffsPending\+\+[\s\S]*previous\.apply\(this,arguments\)[\s\S]*releaseRelicPresentationHandoff\(false\)/,
   "monster-action finish must be held before the legacy owner schedules the next combatant and released after trigger dispatch");
