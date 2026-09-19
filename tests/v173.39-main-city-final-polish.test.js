@@ -29,7 +29,9 @@ test("roster keeps three cells while growing enough for the permanent typography
  assert.match(roster,/\.v146-home-character-main span\{[\s\S]*?font-size:13px;[\s\S]*?line-height:17px/);
  assert.match(roster,/\.v146-home-resource\{[\s\S]*?height:17px/);
  assert.match(roster,/\.v146-home-resource strong\{[\s\S]*?font-size:13px;[\s\S]*?line-height:15px/);
- assert.match(runtime,/function renderHomeRoster\(\)[\s\S]*?grid\.insertAdjacentElement\("afterend",roster\)/);
+ assert.match(runtime,/function ensureHomeRosterShell\(\)[\s\S]*?grid\.insertAdjacentElement\("afterend",roster\)/);
+ assert.match(runtime,/function renderHomeRoster\(\)[\s\S]*?ensureHomeRosterShell\(\)/);
+ assert.match(runtime,/team-relic-loadout-slot/);
 });
 test("forbidden entry sizes and navigation remain untouched",()=>{
  assert.match(base,/\.home-card-primary\{[\s\S]*?height:90px;/);
