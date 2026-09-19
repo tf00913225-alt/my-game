@@ -17,8 +17,8 @@ const confirmSources=[
     "js/00-main.js",
     "js/25-v131-fix-batch.js",
     "js/27-v132-content-expansion.js",
-    "js/35-v141-ui-battle.js",
-    "js/36-v141-content-systems.js"
+    "js/36-v141-content-systems.js",
+    "js/40-v144-rules-and-abyss.js"
 ].map(file=>[file,fs.readFileSync(file,"utf8")]);
 
 let passed=0;
