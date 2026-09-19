@@ -288,7 +288,7 @@ assert.equal(context.v174RelicSystem.getOwnedState().relic_qiankun_flask.level,b
 saved=JSON.parse(store.get(accountSaveKey));
 assert.equal(saved.playerRelics.relic_qiankun_flask.level,beforeLevel+1,"upgrade persists in the existing SAVE_KEY document");
 
-assert.equal(context.v174EquipRelic("relic_origin_talisman"),false,"locked/non-runtime relic can never become a fake usable relic");
+assert.equal(context.v174EquipRelic("relic_origin_talisman"),false,"a relic the player does not own remains unavailable outside the DEV test fixture");
 context.v174UnequipRelic();
 saved=JSON.parse(store.get(accountSaveKey));assert.equal(saved.teamLoadout.relicId,null,"unequip persists relicId=null");
 
@@ -305,7 +305,9 @@ cancelled.context.loseBattle();
 assert.equal(cancelled.getPresentationLockCount(),0,"presentation cancellation releases the core HUD/input lock without reverting gameplay");
 
 const devPreview=createRuntime({dev:true,livePresentation:true});
-assert.equal(devPreview.context.v174EquipRelic("relic_origin_talisman"),true,"DEV may select a presentation-only relic explicitly");
+assert.equal(devPreview.context.v174EquipRelic("relic_origin_talisman"),true,"DEV test ownership still uses the same formal equip path");
+const devSaved=JSON.parse(devPreview.store.get(devPreview.accountSaveKey));
+assert.equal(devSaved.teamLoadout.relicId,"relic_origin_talisman","DEV equip writes the canonical teamLoadout.relicId instead of a preview-only mirror");
 devPreview.context.startBattle();
 assert.equal(devPreview.context.v174RelicPresentationState().pending,0,"presentation-only relics never auto-play on battle entry");
 assert.equal(devPreview.context.v174RelicDebugState().totalTriggers,0,"presentation-only relics never create formal trigger state");
