@@ -56,6 +56,7 @@ const appScripts=[
 ];
 const gameplayScripts=[
     "js/battlefield-slot-owner.js",
+    "js/battle-statistics-system.js",
     "js/25-v131-fix-batch.js",
     "js/27-v132-content-expansion.js",
     "js/28-v133-economy-rebalance.js",
@@ -121,6 +122,7 @@ const appStyles=[
     "css/release-update-notification.css"
 ];
 const gameplayStyles=[
+    "css/battle-statistics-system.css",
     "css/05-stage-v10-battle-log-scroll-fix.css",
     "css/10-stage-v40-root-battle-background-and-cast-size.css",
     "css/11-stage-v41-cast-text-and-player-alpha.css",
