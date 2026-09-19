@@ -5,12 +5,15 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
-const itemCss=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
+const synthesisCss=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
+const abyssCss=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
 
 assert.match(touchLock,/\.v143-item-picker/);
 assert.match(touchLock,/\.v141-synthesis-body/);
 assert.match(touchLock,/const canScrollX =[\s\S]*?overflowX==="auto"[\s\S]*?node\.scrollWidth >[\s\S]*?node\.clientWidth \+ 1/);
-assert.match(itemCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art\{[\s\S]*?width:92px;[\s\S]*?height:138px;/);
+assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art\{[\s\S]*?width:92px;[\s\S]*?height:138px;[\s\S]*?overflow:hidden;/);
+assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art > img\{[\s\S]*?object-fit:contain;/);
+assert.doesNotMatch(abyssCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art/,"Abyss feature CSS must not own the synthesis preview size");
 
 const listeners=new Map();
 const documentElement={};
