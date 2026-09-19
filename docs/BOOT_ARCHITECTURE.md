@@ -142,6 +142,7 @@ Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK�
 
 - `/`、`index.html` 與 `asset-manifest.json`：要求每次重新驗證（設定為 `no-cache, no-store, must-revalidate`；Cloudflare 若正規化為語意等價的 `max-age=0, must-revalidate` 亦可接受，但絕不可為 `immutable`）。
 - `release/release-update.json`：玩家正式版本資料，必須 `no-cache, no-store, must-revalidate`；runtime 同時加 timestamp query 與 `cache: no-store`。GitHub Pages 即使無法套用 `_headers`，也不得讓此檔走長期快取。
+- 正式版本通知的 DEV 視覺驗收不另建 mock UI：只在 `dev.four-symbols-dev.pages.dev` 或本機精確 host 使用 `?releaseUpdatePreview=marquee`／`?releaseUpdatePreview=modal`，仍由同一 app-shell runtime 非阻塞讀取正式 manifest。該 preview 不寫已讀資料、不 reload，正式 main host 必須忽略。
 - `build/*`、hashed patrol WebP、hashed startup logo：`max-age=31536000, immutable`。
 - Cache invalidation 只靠內容 hash；`V_ASSET_VERSION` 不再讓未變更 bundle 全部失效。
 - 不使用 Service Worker。若未來導入，必須另有 versioned cache、activation、cleanup、rollback 與跨版本測試。

@@ -1,3 +1,10 @@
+## 2026-09-19 — DEV 正式版本公告視覺預覽（待 DEV CI）
+
+- 工作分支：`feature/release-update-dev-preview-20260919`，必須 PR 回 `dev`；main 禁止修改。`js/release-update-notification.js` 是唯一 owner，沒有新建公告、跑馬燈或 Modal。
+- DEV／本機驗收網址使用同一份 `release/release-update.json`：`?releaseUpdatePreview=marquee` 顯示正式跑馬燈，點擊後開正式更新視窗；`?releaseUpdatePreview=modal` 直接開同一視窗。只允許 `dev.four-symbols-dev.pages.dev`、`localhost`、`127.0.0.1`、`::1`，main host 必須忽略 query。
+- Preview 僅供版面、文案與內容驗收：不得改 loaded／正式 release version、不得寫 `last-seen` localStorage、不得 reload。更新視窗維持正式 normal／forced 樣式；preview 中的行動按鈕安全地只關閉視窗。
+- 直接測試必須覆蓋：DEV 現行版本仍可顯示跑馬燈與內容、按立即更新不 reload／不寫已讀、main 帶相同 query 不顯示 preview。
+
 ## 2026-09-19 — Release Update Notification System（VERIFIED／main 未修改）
 
 - 工作分支：`feature/release-update-notification-system-20260919`，基準為最新 `origin/dev@af7d0f6b132ebbaeb5f594133db1338d2545861c`；本輪只會 PR 回 `dev`，不得直接修改或發布 `main`。
