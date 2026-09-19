@@ -2298,10 +2298,10 @@
     function equipmentAllowed(){ return !(typeof battleActive!=="undefined"&&battleActive); }
     function equipRelic(id){
         const def=relicCatalog[id],owned=statusOf(id);
-        const devPresentation=!!(def&&!def.runtimeReady&&isRelicDevTestingEnvironment());
-        if(!def||(!def.runtimeReady&&!devPresentation)||!owned.unlocked||!equipmentAllowed()){ return false; }
+        const devTesting=isRelicDevTestingEnvironment();
+        if(!def||(!def.runtimeReady&&!devTesting)||!owned.unlocked||!equipmentAllowed()){ return false; }
         preloadRelicVfx(id);
-        if(devPresentation){
+        if(devTesting){
             devPreviewRelicId=id;
             syncHomeRelicUi(); renderRelicPage(); return true;
         }
@@ -2329,11 +2329,11 @@
     }
     function cardMarkup(def){
         const owned=statusOf(def.id),equipped=effectiveLoadoutRelicId()===def.id;
-        const devPresentation=isRelicDevTestingEnvironment()&&!def.runtimeReady;
+        const devTesting=isRelicDevTestingEnvironment();
         return '<button type="button" class="team-relic-card '+rarityClass(def)+(owned.unlocked?' unlocked':' locked')+(equipped?' equipped':'')+'" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')">'+
             '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span><span class="team-relic-card-name">'+esc(def.name)+'</span>'+
-            '<span class="team-relic-card-meta">'+(devPresentation?'DEV 演出測試':owned.unlocked?'Lv.'+owned.level:'尚未獲得')+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
-            (equipped?'<em>'+(devPresentation?'DEV演出':'已裝備')+'</em>':'')+'</button>';
+            '<span class="team-relic-card-meta">'+(devTesting?'DEV 測試':owned.unlocked?'Lv.'+owned.level:'尚未獲得')+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
+            (equipped?'<em>'+(devTesting?'DEV測試':'已裝備')+'</em>':'')+'</button>';
     }
     function renderRelicList(){
         const equippedId=effectiveLoadoutRelicId();
@@ -2347,7 +2347,8 @@
     }
     function detailMarkup(def){
         const owned=statusOf(def.id),level=owned.level,next=nextMilestone(def,level),cost=RELIC_BALANCE_CONFIG.upgradeGoldBase+RELIC_BALANCE_CONFIG.upgradeGoldPerLevel*level;
-        const devPresentation=isRelicDevTestingEnvironment()&&!def.runtimeReady;
+        const devTesting=isRelicDevTestingEnvironment();
+        const devPresentation=devTesting&&!def.runtimeReady;
         const equipped=effectiveLoadoutRelicId()===def.id;
         return '<div class="team-relic-detail"><button class="team-relic-detail-back" onclick="v174OpenRelicPage()">‹ 返回秘寶列表</button><div class="team-relic-detail-hero '+rarityClass(def)+'">'+
             '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+'・Lv.'+level+' / 20</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+(def.tags&&def.tags.length?' / '+esc(def.tags.join('・')):'')+'</strong></div>'+
@@ -2356,7 +2357,7 @@
             '<section class="team-relic-upgrade"><h3>強化</h3><p>目前 Lv.'+level+' → '+(level>=20?'MAX':'Lv.'+(level+1))+'</p><p>素材：第一版尚未啟用正式素材來源；目前只消耗金幣。</p><b>金幣 '+cost.toLocaleString("zh-TW")+'</b></section>'+
             '<div class="team-relic-detail-actions">'+
             (owned.unlocked&&def.runtimeReady&&level<20?'<button onclick="v174UpgradeRelic(\''+esc(def.id)+'\')">強化</button>':'')+
-            (owned.unlocked&&(def.runtimeReady||devPresentation)?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(devPresentation?(equipped?'DEV演出已選':'DEV演出測試'):(equipped?'已裝備':'裝備'))+'</button>':'<button disabled>'+(def.runtimeReady?'尚未獲得':'第一版未開放')+'</button>')+
+            (owned.unlocked&&(def.runtimeReady||devPresentation)?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(devTesting?(equipped?'DEV測試已選':'DEV測試'):(equipped?'已裝備':'裝備'))+'</button>':'<button disabled>'+(def.runtimeReady?'尚未獲得':'第一版未開放')+'</button>')+
             '</div></div>';
     }
 
