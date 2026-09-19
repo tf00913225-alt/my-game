@@ -2008,6 +2008,7 @@
         battlePresentationLocks.clear();
         battleInputResumeToken=null;
         battleResolutionResumeToken=null;
+        battleAutoActionResume=null;
         clearBattleRoundPrompt();
         stopMonsterMovement();
         clearInterval(timerId);
