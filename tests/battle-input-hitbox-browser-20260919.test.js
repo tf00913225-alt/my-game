@@ -22,10 +22,22 @@ if(!chrome){
     process.exit(0);
 }
 
+const mainCss=fs.readFileSync("css/00-main.css","utf8");
+function cssRule(selector){
+    const start=mainCss.indexOf(selector+"{");
+    assert.ok(start>=0,"missing formal geometry owner: "+selector);
+    const end=mainCss.indexOf("}",start);
+    assert.ok(end>start,"unterminated geometry owner: "+selector);
+    return mainCss.slice(start,end+1);
+}
 const css=[
-    fs.readFileSync("css/00-main.css","utf8"),
-    fs.readFileSync("css/45-v152-dev-fixes.css","utf8"),
-    fs.readFileSync("css/38-v141-system-expansion.css","utf8")
+    cssRule("#mainBattleMenu"),
+    cssRule("#mainBattleMenu > .menu-button"),
+    cssRule("#mainBattleMenu > .menu-button.skill"),
+    cssRule("#mainBattleMenu > .menu-button:nth-of-type(2)"),
+    cssRule("#mainBattleMenu > .menu-button.item"),
+    cssRule("#mainBattleMenu > .menu-button.defend"),
+    cssRule("#mainBattleMenu > .menu-button.run")
 ].join("\n");
 const ui=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const rippleStart=ui.indexOf("let globalTapRippleNode=null;");
