@@ -1046,10 +1046,10 @@
 
     director.dispose=function(){
         clearTimers();
+        if(state.current&&!state.current.done){ cleanupCurrent(state.current,"dispose"); }
         if(statusSyncTimer){ clearTimeout(statusSyncTimer); statusSyncTimer=0; }
         statusFullSyncQueued=false;
         statusUnitSyncQueue.clear();
-        if(state.current&&!state.current.done){ cleanupCurrent(state.current,"dispose"); }
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
             document.querySelectorAll("#v143-skill-stage").forEach(node=>node.remove());
         }
