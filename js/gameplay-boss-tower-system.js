@@ -1248,7 +1248,9 @@
     if(typeof showPage==="function"){
         const previous=showPage;
         showPage=function(page){
-            if(page!=="tower"&&towerAutoAdvanceTimeoutId){
+            const continuingTowerBattle=
+                page==="battle"&&activeBattleContext&&activeBattleContext.mode==="tower";
+            if(page!=="tower"&&!continuingTowerBattle&&(towerAutoAdvanceEnabled||towerAutoAdvanceTimeoutId)){
                 cancelTowerAutoAdvance(true);
             }
             const result=previous.apply(this,arguments);
