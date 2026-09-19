@@ -1,0 +1,65 @@
+{
+  "date": "2026-09-19",
+  "title": "20 件秘寶正式觸發稽核、10 件 Trigger Lifecycle、DEV Preview 隔離、HUD Lock、Hitbox 與快速點擊效能",
+  "base_branch": "dev",
+  "base_sha": "7c1a074c45a2426b78901cad1ec1cbfbe7623649",
+  "work_branch": "fix/relic-trigger-lifecycle-battle-input-ui-20260919",
+  "officialVersion": "173.65",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "稽核 20 件秘寶，保持前 10 件 runtimeReady:true、後 10 件 runtimeReady:false，且後 10 件進戰鬥不再自動播放。",
+      "owner": ["js/60-team-relic-system.js"],
+      "verification": "PASS: 20 件 catalog 稽核、DEV 後 10 件進戰鬥 pending=0、手動 Preview pending=1、正式 trigger state=0"
+    },
+    {
+      "id": 2,
+      "status": "VERIFIED",
+      "request": "正式 10 件秘寶 Gameplay Effect 與 Presentation 解耦，效果在 trigger boundary 同步可靠結算。",
+      "owner": ["js/60-team-relic-system.js::dispatchRelicEvent()", "js/60-team-relic-system.js::performRelicPresentation()"],
+      "verification": "PASS: 10 件 runtime-ready triggerCounts／Gameplay Effect／限制與 presentation cancellation 測試"
+    },
+    {
+      "id": 3,
+      "status": "VERIFIED",
+      "request": "Round End / Round Start 由 00-main.js Core Battle Flow 明確管理，不再從 before-combatant 猜測。",
+      "owner": ["js/00-main.js::FourSymbolsBattleFlow", "js/00-main.js::startTurn()", "js/00-main.js::processNextCombatant()"],
+      "verification": "PASS: startBattle → startTurn → declare → startResolutionPhase → processNextCombatant → round_end → turn++ → next startTurn"
+    },
+    {
+      "id": 4,
+      "status": "VERIFIED",
+      "request": "秘寶演出期間鎖定手動 HUD、技能列、背包與目標選擇，演出結束後才恢復。",
+      "owner": ["js/00-main.js::FourSymbolsBattleFlow.acquirePresentationLock()", "js/00-main.js::updateActionHudVisibility()", "js/60-team-relic-system.js::queueRelicPresentation()"],
+      "verification": "PASS: presentation lock 期間 command／skill／item／target selection 隱藏，release 後恢復"
+    },
+    {
+      "id": 5,
+      "status": "IMPLEMENTED",
+      "request": "五個戰鬥操作 Hitbox 依 battle-command-panel.jpg 視覺中心對齊、互不重疊，移除 Skill 21.5% priority overlap。",
+      "owner": ["css/00-main.css", "css/45-v152-dev-fixes.css"],
+      "verification": "待 390×844／412×915 browser geometry QA"
+    },
+    {
+      "id": 6,
+      "status": "IMPLEMENTED",
+      "request": "戰鬥區停用全域 Ripple，其他 UI 共用單一 transform＋opacity Ripple node，快速點擊不累積 DOM。",
+      "owner": ["js/35-v141-ui-battle.js", "css/38-v141-system-expansion.css"],
+      "verification": "待 20 次 pointerdown browser QA"
+    }
+  ],
+  "verification": [
+    "PASS: JavaScript syntax for modified runtime owners",
+    "PASS: relic trigger lifecycle and core round-boundary contract",
+    "PASS: 10 runtime-ready relic gameplay integration",
+    "PASS: relic hardening limits and effective-action counters",
+    "PASS: cinematic, VFX target and visual sequencing regressions",
+    "PASS: V141/V142/V152 direct regressions",
+    "PASS: deterministic production build and build:check",
+    "PENDING CI: 390×844／412×915 hitbox browser geometry",
+    "PENDING CI: 20 pointerdown bounded-ripple browser QA",
+    "PENDING CI: Repository checks"
+  ]
+}

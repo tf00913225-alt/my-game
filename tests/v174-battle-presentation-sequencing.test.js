@@ -20,8 +20,8 @@ assert.doesNotMatch(relic,/waitForRelicPresentation|deferredCombatants|deferredS
     "presentation promises must never own round or initiative continuation");
 assert.doesNotMatch(relic,/relicPresentationPending>0&&hasLiveBattlePresentationHost\(\)/,
     "visual duration and combat advancement remain independent");
-assert.match(relic,/triggerDef\.type==="before_lethal_damage"&&hasLiveBattlePresentationHost\(\)[\s\S]*?relicVisualCollector=visuals[\s\S]*?resolveEffects/,
-    "lethal prevention must settle mechanically immediately while deferring its popup presentation");
+assert.match(relic,/markTriggered\(triggerDef,key\);[\s\S]*?relicVisualCollector=visuals[\s\S]*?resolveEffects\(triggerDef,def,payload\|\|\{\}\)[\s\S]*?performRelicPresentation/,
+    "every runtime-ready relic must settle mechanically before its deferred popup presentation");
 assert.match(relic,/function showRelicSpFloat\(index,amount\)\{[\s\S]*?emitRelicPlayerHit\(amount,"sp",index,true\)/,
     "relic SP recovery must use the shared player-hit popup owner instead of a separate DOM float");
 assert.doesNotMatch(relic,/function showRelicSpFloat[\s\S]{0,450}createElement\(/,
