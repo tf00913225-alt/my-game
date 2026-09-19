@@ -556,34 +556,6 @@
         for(let index=0;index<6;index++){ syncStatusSpritesForUnit("player",index); }
     }
 
-    let statusSyncTimer=0;
-    let statusFullSyncQueued=false;
-    const statusUnitSyncQueue=new Map();
-
-    function flushStatusSpriteSyncQueue(){
-        statusSyncTimer=0;
-        if(statusFullSyncQueued){
-            statusFullSyncQueued=false;
-            statusUnitSyncQueue.clear();
-            syncStatusSpriteEffects();
-            return;
-        }
-        const pending=Array.from(statusUnitSyncQueue.values());
-        statusUnitSyncQueue.clear();
-        pending.forEach(entry=>syncStatusSpritesForUnit(entry.side,entry.index));
-    }
-
-    function queueStatusSpriteEffects(side,index){
-        if((side==="player"||side==="monster")&&Number.isInteger(index)){
-            if(!statusFullSyncQueued){ statusUnitSyncQueue.set(side+":"+index,{side:side,index:index}); }
-        }else{
-            statusFullSyncQueued=true;
-            statusUnitSyncQueue.clear();
-        }
-        if(statusSyncTimer){ return; }
-        statusSyncTimer=setTimeout(flushStatusSpriteSyncQueue,0);
-    }
-
     function removeStatusSpriteEffects(){
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
         document.querySelectorAll(".v153-status-vfx").forEach(node=>node.remove());
@@ -887,7 +859,7 @@
         const card=cardFor(current.targetSide,index);
         if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
         current.hitReached=true;
-        queueStatusSpriteEffects(current.targetSide,index);
+        syncStatusSpritesForUnit(current.targetSide,index);
     }
 
     function emitSprite(current,index,allowDefeated){
@@ -924,7 +896,7 @@
             state.stage.remove();
         }
         if(state.current===current){ state.current=null; state.stage=null; }
-        queueStatusSpriteEffects();
+        syncStatusSpriteEffects();
         state.metrics.completed++;
         if(current.gate&&!current.gate.done){ current.gate.complete(reason||"v143-raster-complete"); }
     }
@@ -1047,9 +1019,6 @@
     director.dispose=function(){
         clearTimers();
         if(state.current&&!state.current.done){ cleanupCurrent(state.current,"dispose"); }
-        if(statusSyncTimer){ clearTimeout(statusSyncTimer); statusSyncTimer=0; }
-        statusFullSyncQueued=false;
-        statusUnitSyncQueue.clear();
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
             document.querySelectorAll("#v143-skill-stage").forEach(node=>node.remove());
         }
@@ -1158,7 +1127,12 @@
         }
         const wait=delayFor(side,index,false);
         const invoke=function(){
-            queueStatusSpriteEffects(side,Number(index));
+            const unitIndex=Number(index);
+            if((side==="player"||side==="monster")&&Number.isInteger(unitIndex)){
+                syncStatusSpritesForUnit(side,unitIndex);
+            }else{
+                syncStatusSpriteEffects();
+            }
         };
         if(wait>8){ setTimer(invoke,wait); }else{ invoke(); }
     }
@@ -1205,13 +1179,13 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previous.apply(this,args);
-                        queueStatusSpriteEffects("monster",Number(index));
+                        syncStatusSpritesForUnit("monster",Number(index));
                     },wait);
                 }
                 return;
             }
             const result=previous.apply(this,arguments);
-            queueStatusSpriteEffects("monster",Number(index));
+            syncStatusSpritesForUnit("monster",Number(index));
             return result;
         };
     }
@@ -1220,10 +1194,10 @@
         const previous=updateUI;
         updateUI=function(){
             const result=previous.apply(this,arguments);
-            /* Coalesce the complete wrapper stack into one status pass.
-               This preserves legacy-layer cleanup without scanning the whole
-               battlefield twice for every UI refresh. */
-            queueStatusSpriteEffects();
+            /* Preserve synchronous lifecycle semantics, but perform only one
+               complete status pass. The old zero-delay duplicate pass made
+               every battle UI refresh scan the battlefield twice. */
+            syncStatusSpriteEffects();
             return result;
         };
     }
@@ -1240,13 +1214,13 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previous.apply(this,args);
-                        queueStatusSpriteEffects("player",Number(index));
+                        syncStatusSpritesForUnit("player",Number(index));
                     },wait);
                 }
                 return;
             }
             const result=previous.apply(this,arguments);
-            queueStatusSpriteEffects("player",Number(index));
+            syncStatusSpritesForUnit("player",Number(index));
             return result;
         };
     }
