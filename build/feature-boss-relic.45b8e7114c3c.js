@@ -1195,9 +1195,11 @@
     const RELIC_VFX_FLOOR_MS=2000;
     const RELIC_DIM_IN_MS=360;
     const RELIC_IDENTITY_REVEAL_MS=360;
+    const RELIC_IDENTITY_HOLD_MS=1150;
+    const RELIC_IDENTITY_EXIT_MS=420;
     const RELIC_TARGET_REVEAL_MS=420;
     const RELIC_DIM_OUT_MS=420;
-    const RELIC_CUTIN_DURATION_MS=RELIC_DIM_IN_MS+RELIC_IDENTITY_REVEAL_MS+RELIC_TARGET_REVEAL_MS;
+    const RELIC_CUTIN_DURATION_MS=RELIC_DIM_IN_MS+RELIC_IDENTITY_REVEAL_MS+RELIC_IDENTITY_HOLD_MS+Math.max(RELIC_IDENTITY_EXIT_MS,RELIC_TARGET_REVEAL_MS);
     const RELIC_MIN_VISUAL_PROTECTION_MS=1200;
     const RELIC_DEV_HOST="dev.four-symbols-dev.pages.dev";
     const RELIC_BALANCE_CONFIG=Object.freeze({
@@ -1548,7 +1550,15 @@
             })
             .then(()=>{
                 if(node!==relicCutinNode){ return null; }
-                return revealRelicTargets(target).then(()=>node);
+                return waitMs(RELIC_IDENTITY_HOLD_MS);
+            })
+            .then(()=>{
+                if(node!==relicCutinNode){ return null; }
+                node.classList.add("identity-exiting");
+                return Promise.all([
+                    waitMs(RELIC_IDENTITY_EXIT_MS),
+                    revealRelicTargets(target)
+                ]).then(()=>node);
             });
     }
     function enterRelicVfxPhase(node){

@@ -125,6 +125,12 @@ assert.match(legacyBattleCss,/#battlePage > \.battle-wrap\{[\s\S]*z-index:1 !imp
     "the historical battle-wrap stacking context is the regression root");
 assert.match(relicRuntime,/battlePage\.querySelector\("\.battle-wrap"\)[\s\S]*host\.appendChild\(node\)/,
     "relic cinematic must render inside the existing battle-wrap stacking context");
+assert.match(relicCss,/\.team-relic-battle-presentation\{[^}]*position:fixed[^}]*inset:0/,
+    "relic dim layer must cover the complete transformed battle surface, not only battle-wrap content box");
+assert.match(relicRuntime,/RELIC_IDENTITY_HOLD_MS=1150/);
+assert.match(relicRuntime,/RELIC_IDENTITY_EXIT_MS=420/);
+assert.match(relicRuntime,/waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*Promise\.all\(\[[\s\S]*waitMs\(RELIC_IDENTITY_EXIT_MS\)[\s\S]*revealRelicTargets\(target\)/,
+    "relic sequence must hold identity for 1.15s, then fade identity out while targets brighten, before VFX");
 assert.match(relicRuntime,/function relicTargetLayer\(card\)[\s\S]*\.v-fixed-enemy-slot,\.v-fixed-ally-slot,\.v-fixed-boss-footprint/,
     "enemy, ally and Boss target entities must elevate their real Fixed Slot carrier");
 assert.match(relicRuntime,/relicFocusedTargetLayers=Array\.from\(new Set\(relicFocusedTargetCards\.map\(relicTargetLayer\)\.filter\(Boolean\)\)\)/);
