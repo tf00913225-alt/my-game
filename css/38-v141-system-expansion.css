@@ -656,16 +656,22 @@
 .v141-tap-ripple{
     position:fixed;
     z-index:20000;
-    width:16px;
-    height:16px;
-    margin:-8px 0 0 -8px;
+    width:54px;
+    height:54px;
+    margin:-27px 0 0 -27px;
     border:2px solid rgba(255,224,143,.95);
     border-radius:50%;
     box-shadow:0 0 9px rgba(255,181,56,.8);
-    animation:v141TapRipple .5s ease-out both;
+    opacity:0;
+    transform:scale(.3);
+    will-change:transform,opacity;
     pointer-events:none;
 }
-@keyframes v141TapRipple{to{width:54px;height:54px;margin:-27px 0 0 -27px;opacity:0;border-width:1px}}
+.v141-tap-ripple.is-active{animation:v141TapRipple .5s ease-out both;}
+@keyframes v141TapRipple{
+    from{opacity:1;transform:scale(.3)}
+    to{opacity:0;transform:scale(1)}
+}
 
 /* ----- Quest typography and milestone chests ----- */
 #game-stage #homeFeatureModal.quest-mode .home-feature-modal-box{

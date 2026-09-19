@@ -1342,14 +1342,31 @@
     /* =====================================================
        Global tap feedback
     ===================================================== */
+    let globalTapRippleNode=null;
+    let globalTapRippleRemovalTimer=0;
     document.addEventListener("pointerdown",function(event){
         if(event.pointerType==="mouse"&&event.button!==0){ return; }
-        const ripple=document.createElement("span");
-        ripple.className="v141-tap-ripple";
+        if(event.target&&typeof event.target.closest==="function"&&event.target.closest("#battlePage")){ return; }
+        let ripple=globalTapRippleNode;
+        if(!ripple||!ripple.isConnected){
+            ripple=document.createElement("span");
+            ripple.className="v141-tap-ripple";
+            globalTapRippleNode=ripple;
+            document.body.appendChild(ripple);
+        }
         ripple.style.left=event.clientX+"px";
         ripple.style.top=event.clientY+"px";
-        document.body.appendChild(ripple);
-        setTimeout(()=>ripple.remove(),520);
+        ripple.classList.remove("is-active");
+        void ripple.offsetWidth;
+        ripple.classList.add("is-active");
+        if(globalTapRippleRemovalTimer){ clearTimeout(globalTapRippleRemovalTimer); }
+        globalTapRippleRemovalTimer=setTimeout(()=>{
+            globalTapRippleRemovalTimer=0;
+            if(ripple===globalTapRippleNode){
+                ripple.remove();
+                globalTapRippleNode=null;
+            }
+        },520);
     },{passive:true});
 
     function boot(){

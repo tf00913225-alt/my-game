@@ -70,7 +70,7 @@ assert.match(source,/document\.getElementById\("battlePage"\)\|\|document\.getEl
 assert.match(source,/battleLog\(def\.name\+"｜"\+currentEffectText/,
     "battle log must describe the actual relic effect instead of only saying it activated");
 
-function createRuntime(){
+function createRuntime(options={}){
     const store=new Map();
     const accountUid="relic-system-uid";
     const accountSaveKey="four_symbols_save:"+accountUid;
@@ -85,9 +85,14 @@ function createRuntime(){
         attack:100,magicAttack:100,accuracy:100,statusEffects:[],activeBuffs:[]
     }));
     let enemyDamage=10;
+    const roundStartObservers=new Set();
+    const roundEndObservers=new Set();
+    const battleFlowTrace=[];
+    let presentationLockCount=0;
+    const battlePage={querySelector(){return null;}};
     const document={
         readyState:"complete",body:{appendChild(){}},head:{appendChild(){}},documentElement:{dataset:{}},
-        getElementById(){return null;},querySelector(){return null;},
+        getElementById(id){return options.livePresentation&&id==="battlePage"?battlePage:null;},querySelector(){return null;},
         createElement(){return {className:"",id:"",style:{},classList:{add(){},remove(){},contains(){return false;}},setAttribute(){},appendChild(){},querySelector(){return null;}};},
         addEventListener(){}
     };
@@ -96,6 +101,14 @@ function createRuntime(){
         localStorage:{getItem:k=>store.has(k)?store.get(k):null,setItem:(k,v)=>store.set(k,String(v)),removeItem:k=>store.delete(k)},
         SAVE_KEY:"game-save",gold:100000,player:party[0],player2:party[1],player3:party[2],monsters,currentBattleMonsters:[0,1,2,3,4,5,6,7,8,9],
         battleActive:false,battleToken:0,turn:1,battlePhase:"resolve",initiativeIndex:0,initiativeQueue:[],
+        location:{hostname:options.dev?"dev.four-symbols-dev.pages.dev":"example.invalid"},
+        FourSymbolsBattleFlow:{
+            subscribeRoundStart(observer){roundStartObservers.add(observer);return()=>roundStartObservers.delete(observer);},
+            subscribeRoundEnd(observer){roundEndObservers.add(observer);return()=>roundEndObservers.delete(observer);},
+            interceptActionFinish(){return()=>{};},
+            acquirePresentationLock(){presentationLockCount++;let active=true;return()=>{if(active){active=false;presentationLockCount--;}};},
+            isPresentationActive(){return presentationLockCount>0;}
+        },
         getExistingPartyIndexes:()=>[0,1,2],getPartyCharacterByIndex:i=>party[i]||null,
         getPartyBattleStats:()=>({maxHP:1000,maxSP:200,attack:100,magicAttack:100,defense:100,evasion:0,resistance:0}),
         getMainCharacterStats:()=>({maxHP:1000,maxSP:200,attack:100,magicAttack:100,defense:100,evasion:0,resistance:0}),
@@ -105,9 +118,29 @@ function createRuntime(){
         applyBurnEffect(m,d,p){if(m.statusEffects.some(s=>s.type==="burn"&&s.turnsLeft>0))return false;m.statusEffects.push({type:"burn",turnsLeft:d,percent:p});return true;},
         showPlayerHit(){},showMonsterHit(){},addBattleLog(message){battleLogs.push(message);},updateUI(){},updateGoldDisplay(){},showPage(){},openHomeFeature(){},closeHomeFeature(){},
         killMonster(i){if(monsters[i])monsters[i].alive=false;},
-        startTurn(){},
+        startTurn(){
+            battleFlowTrace.push("startTurn:"+this.turn);
+            roundStartObservers.forEach(observer=>observer({token:this.battleToken,turn:this.turn,type:"round_start"}));
+            this.battlePhase="declare";
+            this.beginCharacterTurn(this.battleToken);
+        },
+        beginCharacterTurn(){battleFlowTrace.push("declare:"+this.turn);},
+        startResolutionPhase(){
+            battleFlowTrace.push("startResolutionPhase:"+this.turn);
+            this.battlePhase="resolve";
+            this.initiativeQueue=[{type:"player",characterIndex:0}];
+            this.initiativeIndex=0;
+            this.processNextCombatant(this.battleToken);
+        },
         startBattle(){this.battleActive=true;this.battleToken++;this.turn=1;this.startTurn(this.battleToken);},
-        processNextCombatant(){},
+        processNextCombatant(){
+            battleFlowTrace.push("processNextCombatant:"+this.turn+":"+this.initiativeIndex);
+            if(this.initiativeIndex<this.initiativeQueue.length){this.initiativeIndex++;return;}
+            battleFlowTrace.push("round_end:"+this.turn);
+            roundEndObservers.forEach(observer=>observer({token:this.battleToken,turn:this.turn,type:"round_end"}));
+            this.turn++;
+            this.startTurn(this.battleToken);
+        },
         processSingleMonsterAttack(){const c=party[0];c.hp=Math.max(0,c.hp-enemyDamage);this.showPlayerHit(enemyDamage,"hp",0,false);},
         tickStatusEffects(){},
         winBattle(){this.battleActive=false;},loseBattle(){this.battleActive=false;}
@@ -123,7 +156,12 @@ function createRuntime(){
         context.FourSymbolsAccountSave.writeForUid(accountUid,data,{source:"test-core"});
     };
     vm.runInContext(source,context);
-    return {context,store,accountSaveKey,party,monsters,battleLogs,setEnemyDamage:value=>{enemyDamage=value;}};
+    return {
+        context,store,accountSaveKey,party,monsters,battleLogs,battleFlowTrace,
+        advanceRound(){context.startResolutionPhase(context.battleToken);context.processNextCombatant(context.battleToken);},
+        getPresentationLockCount:()=>presentationLockCount,
+        setEnemyDamage:value=>{enemyDamage=value;}
+    };
 }
 
 const runtime=createRuntime();
@@ -161,15 +199,15 @@ assert.equal(Object.keys(saved.teamLoadout).filter(key=>/relic/i.test(key)).leng
 party.forEach(c=>c.hp=400);
 context.startBattle();
 assert.equal(context.v174EquipRelic("relic_sun_orb"),false,"hot swap is blocked during battle");
-for(const round of [1,3,5,7,9,11]){
-    context.turn=round;
-    if(round!==1){ context.startTurn(context.battleToken); }
-    context.v174RelicDebugDispatch("round_end",{sourceType:"system"});
-}
+for(let round=1;round<=11;round++){ runtime.advanceRound(); }
 const qiankunState=context.v174RelicDebugState();
 assert.equal(qiankunState.triggerCounts["relic_qiankun_flask:odd_end"],6,
     "Qiankun Flask keeps triggering beyond three activations on later odd rounds");
 assert.ok(party.every(c=>c.hp>400),"Qiankun Flask heals on each eligible odd round end");
+assert.deepEqual(runtime.battleFlowTrace.slice(0,8),[
+    "startTurn:1","declare:1","startResolutionPhase:1","processNextCombatant:1:0",
+    "processNextCombatant:1:1","round_end:1","startTurn:2","declare:2"
+],"Qiankun Flask is verified through the formal start/declare/resolve/initiative/round boundary path");
 assert.ok(battleLogs.some(line=>/【秘寶】乾坤玉壺｜恢復全隊/.test(line)),"relic battle log reports the concrete recovery effect");
 context.loseBattle();
 
@@ -230,6 +268,15 @@ assert.ok(monsters[1].attack<100,"Soul Bell applies actual live monster attack r
 context.v174EquipRelic("relic_rock_mountain_seal");party[0].hp=1000;context.startBattle();
 assert.ok(context.getPartyBattleStats(0).defense>100,"Rock Mountain Seal opening defense uses the real shared stat owner");context.loseBattle();
 
+context.v174EquipRelic("relic_rock_mountain_seal");
+party.forEach(c=>{c.hp=1000;c.activeBuffs=[];});runtime.setEnemyDamage(10);context.startBattle();
+for(let i=0;i<8;i++)context.processSingleMonsterAttack(1,context.battleToken);
+const rockState=context.v174RelicDebugState();
+assert.equal(rockState.triggerCounts["relic_rock_mountain_seal:battle_start_defense"],1,"Rock Mountain opening trigger owns an independent count");
+assert.equal(rockState.triggerCounts["relic_rock_mountain_seal:ally_hits_8"],1,"Rock Mountain hit trigger owns an independent count");
+assert.ok(party.every(c=>c.activeBuffs.some(b=>b.type==="shield")),"Rock Mountain hit trigger applies its real team shield");
+context.loseBattle();
+
 context.v174EquipRelic("relic_qiankun_flask");context.startBattle();monsters[0].alive=true;context.killMonster(0);
 assert.equal(context.v174RelicDebugState().lastEvent.event,"enemy_defeated","character-source kill reaches enemy_defeated event boundary");context.loseBattle();
 
@@ -242,5 +289,26 @@ assert.equal(saved.playerRelics.relic_qiankun_flask.level,beforeLevel+1,"upgrade
 assert.equal(context.v174EquipRelic("relic_origin_talisman"),false,"locked/non-runtime relic can never become a fake usable relic");
 context.v174UnequipRelic();
 saved=JSON.parse(store.get(accountSaveKey));assert.equal(saved.teamLoadout.relicId,null,"unequip persists relicId=null");
+
+const cancelled=createRuntime({livePresentation:true});
+cancelled.context.v142SkillAnimationDirector={getActive:()=>({done:false,promise:new Promise(()=>{}),deadline:Date.now()+60000})};
+cancelled.context.v174EquipRelic("relic_qiankun_flask");
+cancelled.party.forEach(c=>c.hp=400);
+cancelled.context.startBattle();
+cancelled.advanceRound();
+assert.ok(cancelled.party.every(c=>c.hp>400),"gameplay healing settles before a blocked presentation gate");
+assert.equal(cancelled.context.v174RelicDebugState().triggerCounts["relic_qiankun_flask:odd_end"],1,"the trigger is marked exactly once at the formal boundary");
+assert.equal(cancelled.getPresentationLockCount(),1,"cinematic owns one core presentation lock while queued");
+cancelled.context.loseBattle();
+assert.equal(cancelled.getPresentationLockCount(),0,"presentation cancellation releases the core HUD/input lock without reverting gameplay");
+
+const devPreview=createRuntime({dev:true,livePresentation:true});
+assert.equal(devPreview.context.v174EquipRelic("relic_origin_talisman"),true,"DEV may select a presentation-only relic explicitly");
+devPreview.context.startBattle();
+assert.equal(devPreview.context.v174RelicPresentationState().pending,0,"presentation-only relics never auto-play on battle entry");
+assert.equal(devPreview.context.v174RelicDebugState().totalTriggers,0,"presentation-only relics never create formal trigger state");
+assert.equal(devPreview.context.v174RelicDevPreviewPresentation("relic_origin_talisman"),true,"manual DEV presentation remains available");
+assert.equal(devPreview.context.v174RelicPresentationState().pending,1,"manual DEV preview is the only presentation queue entry");
+devPreview.context.loseBattle();
 
 console.log("✓ V174 team relic system integration tests passed.");

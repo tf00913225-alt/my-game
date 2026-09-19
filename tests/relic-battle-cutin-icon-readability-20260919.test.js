@@ -90,10 +90,12 @@ for(const id of ids){
 assert.match(relic,/RELIC_DEV_HOST="dev\.four-symbols-dev\.pages\.dev"/);
 assert.match(relic,/function statusOf\(id\)[\s\S]*unlocked:true,seen:true/,
   "DEV must expose all relics without requiring fragments");
-assert.match(relic,/team-relic-card-dev[\s\S]*team-relic-dev-equip[\s\S]*測試配裝/,
+assert.match(relic,/team-relic-card-dev[\s\S]*team-relic-dev-equip[\s\S]*DEV 正式功能配裝[\s\S]*DEV 僅演出配裝/,
   "DEV relic cards must expose a directly clickable testing equip control");
-assert.match(relic,/DEV 測試配裝/,
-  "relic detail view must also expose an explicit testing equip button");
+assert.match(relic,/Runtime Ready（正式功能已完成）/);
+assert.match(relic,/Presentation Only（僅演出預覽/);
+assert.match(relic,/DEV 演出預覽/,
+  "presentation-only relic detail must expose an explicit manual preview control during battle");
 assert.match(css,/\.team-relic-card-dev \.team-relic-dev-equip\{[^}]*min-height:34px/,
   "DEV testing equip control must be visibly actionable");
 assert.match(relic,/function equipRelic\(id\)[\s\S]*if\(devTesting\)\{[\s\S]*devPreviewRelicId=id;[\s\S]*return true;[\s\S]*teamLoadout\.relicId=id;/,

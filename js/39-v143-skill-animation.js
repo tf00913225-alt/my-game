@@ -446,8 +446,14 @@
         );
     }
 
-    function snapshotTimedEffects(){
+    function snapshotTimedEffects(model){
         const snapshot=new Set();
+        const relevantTypes=Array.from(new Set(
+            []
+                .concat(Array.isArray(model&&model.deferredStatusTypes)?model.deferredStatusTypes:[])
+                .concat(Array.isArray(model&&model.deferredActorStatusTypes)?model.deferredActorStatusTypes:[])
+        )).filter(type=>!!STATUS_SPRITES[type]);
+        if(!relevantTypes.length){ return snapshot; }
         const groups=[
             ["monster",typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[]],
             ["player",[0,1,2,3,4,5]]
@@ -455,7 +461,7 @@
         groups.forEach(entry=>{
             entry[1].forEach(index=>{
                 const entity=entityFor(entry[0],index);
-                Object.keys(RAW_STATUS_SPRITES).forEach(type=>{
+                relevantTypes.forEach(type=>{
                     if(hasTimedEffect(entity,type)){ snapshot.add(entry[0]+":"+index+":"+type); }
                 });
             });
@@ -539,12 +545,15 @@
         }
     }
 
+    function syncStatusSpritesForUnit(side,index){
+        Object.keys(RAW_STATUS_SPRITES).forEach(type=>syncStatusSprite(side,index,type));
+    }
+
     function syncStatusSpriteEffects(){
         purgeLegacyCardVfx();
-        const types=Object.keys(RAW_STATUS_SPRITES);
         const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
-        enemyIndexes.forEach(index=>types.forEach(type=>syncStatusSprite("monster",index,type)));
-        for(let index=0;index<6;index++){ types.forEach(type=>syncStatusSprite("player",index,type)); }
+        enemyIndexes.forEach(index=>syncStatusSpritesForUnit("monster",index));
+        for(let index=0;index<6;index++){ syncStatusSpritesForUnit("player",index); }
     }
 
     function removeStatusSpriteEffects(){
@@ -850,7 +859,7 @@
         const card=cardFor(current.targetSide,index);
         if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
         current.hitReached=true;
-        syncStatusSpriteEffects();
+        syncStatusSpritesForUnit(current.targetSide,index);
     }
 
     function emitSprite(current,index,allowDefeated){
@@ -931,7 +940,7 @@
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
             targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
-            spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(),
+            spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(model),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,
             duration:duration,hitReached:false,done:false,cleanupTimer:0
@@ -1118,8 +1127,12 @@
         }
         const wait=delayFor(side,index,false);
         const invoke=function(){
-            syncStatusSpriteEffects();
-            setTimer(syncStatusSpriteEffects,0);
+            const unitIndex=Number(index);
+            if((side==="player"||side==="monster")&&Number.isInteger(unitIndex)){
+                syncStatusSpritesForUnit(side,unitIndex);
+            }else{
+                syncStatusSpriteEffects();
+            }
         };
         if(wait>8){ setTimer(invoke,wait); }else{ invoke(); }
     }
@@ -1166,15 +1179,13 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previous.apply(this,args);
-                        syncStatusSpriteEffects();
-                        setTimer(syncStatusSpriteEffects,0);
+                        syncStatusSpritesForUnit("monster",Number(index));
                     },wait);
                 }
                 return;
             }
             const result=previous.apply(this,arguments);
-            syncStatusSpriteEffects();
-            setTimer(syncStatusSpriteEffects,0);
+            syncStatusSpritesForUnit("monster",Number(index));
             return result;
         };
     }
@@ -1183,10 +1194,10 @@
         const previous=updateUI;
         updateUI=function(){
             const result=previous.apply(this,arguments);
+            /* Preserve synchronous lifecycle semantics, but perform only one
+               complete status pass. The old zero-delay duplicate pass made
+               every battle UI refresh scan the battlefield twice. */
             syncStatusSpriteEffects();
-            /* Later wrappers can synchronously recreate V141 legacy layers.
-               Purge once more after the complete wrapper stack unwinds. */
-            setTimer(syncStatusSpriteEffects,0);
             return result;
         };
     }
@@ -1203,15 +1214,13 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previous.apply(this,args);
-                        syncStatusSpriteEffects();
-                        setTimer(syncStatusSpriteEffects,0);
+                        syncStatusSpritesForUnit("player",Number(index));
                     },wait);
                 }
                 return;
             }
             const result=previous.apply(this,arguments);
-            syncStatusSpriteEffects();
-            setTimer(syncStatusSpriteEffects,0);
+            syncStatusSpritesForUnit("player",Number(index));
             return result;
         };
     }

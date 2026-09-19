@@ -1,0 +1,31 @@
+{
+  "date": "2026-09-19",
+  "title": "戰鬥 VFX 狀態同步效能根因優化",
+  "base_branch": "dev",
+  "base_sha": "9d5852cc960bfc31f1426ae1efb7d254c4ec7dd0",
+  "work_branch": "fix/battle-vfx-performance-status-sync-20260919",
+  "officialVersion": "173.65",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "降低技能 VFX 多時手動操作卡頓；不得改技能數值、動畫秒數、命中規則或畫質。",
+      "owner": [
+        "js/39-v143-skill-animation.js::snapshotTimedEffects()",
+        "js/39-v143-skill-animation.js::syncStatusSpriteEffects()",
+        "js/39-v143-skill-animation.js::queueStatusSpriteEffects()"
+      ],
+      "implementation": "普通與純傷害技能不再掃描所有狀態；只有具 deferred status 的技能建立相關狀態快照。updateUI 保留同步生命週期但移除原本 0ms 的第二次重複全場掃描；updateMonsterUI 與角色狀態 badge 改成只同步受影響單位；技能命中與卡牌效果的已知目標亦只刷新該單位。"
+    }
+  ],
+  "verification": [
+    "node tests/battle-vfx-performance-status-sync-20260919.test.js",
+    "tests/v174-raster-only-combat-vfx-owner.test.js",
+    "tests/battle-layout-vfx-runtime-20260917.test.js",
+    "npm run build:check",
+    "PR Repository checks / mobile browser QA"
+  ],
+  "verificationResult": "1/1 VERIFIED；PR #331 Repository checks run 35419283199 SUCCESS。戰鬥 layout/timing/range-VFX regressions、V173.39 wind status lifecycle、production build sync、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、Release Gate 與 git diff check 全數通過。技能數值、動畫秒數、命中規則與 VFX 美術未修改。",
+  "releasedAs": null
+}

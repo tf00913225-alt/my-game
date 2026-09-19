@@ -7,6 +7,7 @@ const {execFileSync}=require("child_process");
 
 const source=fs.readFileSync("js/44-v152-dev-fixes.js","utf8");
 const css=fs.readFileSync("css/45-v152-dev-fixes.css","utf8");
+const mainCss=fs.readFileSync("css/00-main.css","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const v140=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
@@ -268,7 +269,9 @@ test("dungeon art, scrolling, five-slot nav and Abyss combat info are all wired"
     assert.match(css,/\.v141-task-tracker[\s\S]*display:none !important/);
     assert.match(css,/\.v141-reward-toast[\s\S]*pointer-events:auto !important/);
     assert.match(css,/battlePage\.v152-abyss-battle #battleInfo/);
-    assert.match(css,/menu-button\.skill[\s\S]*width:21\.5%/);
+    assert.doesNotMatch(css,/menu-button\.skill[\s\S]*width:21\.5%/);
+    assert.match(mainCss,/--battle-command-skill-left:6\.8%/);
+    assert.match(mainCss,/--battle-command-run-width:17\.75%/);
 });
 
 console.log(`\nV152 dev-fixes suite: ${passed} tests passed.`);

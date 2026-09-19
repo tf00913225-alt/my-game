@@ -6959,6 +6959,16 @@ html, body{
     min-height:66px !important;
     background:none !important;
     border:0 !important;
+    --battle-command-skill-left:6.8%;
+    --battle-command-skill-width:17.6%;
+    --battle-command-normal-left:24.4%;
+    --battle-command-normal-width:17.45%;
+    --battle-command-item-left:41.85%;
+    --battle-command-item-width:16.95%;
+    --battle-command-defend-left:58.8%;
+    --battle-command-defend-width:17.05%;
+    --battle-command-run-left:75.85%;
+    --battle-command-run-width:17.75%;
 }
 
 #mainBattleMenu::before{
@@ -7000,23 +7010,28 @@ html, body{
 }
 
 #mainBattleMenu > .menu-button.skill{
-    left:0 !important;
+    left:var(--battle-command-skill-left) !important;
+    width:var(--battle-command-skill-width) !important;
 }
 
 #mainBattleMenu > .menu-button:nth-of-type(2){
-    left:20% !important;
+    left:var(--battle-command-normal-left) !important;
+    width:var(--battle-command-normal-width) !important;
 }
 
 #mainBattleMenu > .menu-button.item{
-    left:40% !important;
+    left:var(--battle-command-item-left) !important;
+    width:var(--battle-command-item-width) !important;
 }
 
 #mainBattleMenu > .menu-button.defend{
-    left:60% !important;
+    left:var(--battle-command-defend-left) !important;
+    width:var(--battle-command-defend-width) !important;
 }
 
 #mainBattleMenu > .menu-button.run{
-    left:80% !important;
+    left:var(--battle-command-run-left) !important;
+    width:var(--battle-command-run-width) !important;
 }
 
 #mainBattleMenu > .menu-button::after{
