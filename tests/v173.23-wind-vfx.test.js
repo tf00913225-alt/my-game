@@ -535,8 +535,8 @@ test("wind sheets replace procedural wind effects and keep noninteractive status
 });
 
 test("the development cache release is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
-    assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
+    assert.match(index,/<title>四象江湖傳 V173\.66<\/title>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
