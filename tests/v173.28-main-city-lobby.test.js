@@ -97,7 +97,8 @@ test("the roster renderer keeps all character details in the six-position advent
     assert.doesNotMatch(rosterRuntime,/primaryCharacter=partyIndexes/);
     assert.match(rosterRuntime,/homeHudGoldValue/);
     assert.match(rosterRuntime,/homeHudExpValue/);
-    assert.match(rosterRuntime,/隊伍 '\+partyIndexes\.length\+' \/ 6/);
+    assert.match(rosterRuntime,/v146-home-roster-count[^\n]*隊伍 -- \/ 6/);
+    assert.match(rosterRuntime,/count\.textContent="隊伍 "\+partyIndexes\.length\+" \/ 6"/);
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:4px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
     assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1;[\s\S]*min-height:23px;[\s\S]*font-size:15px/);
