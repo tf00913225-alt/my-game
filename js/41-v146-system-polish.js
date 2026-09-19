@@ -46,7 +46,10 @@
         const input=document.getElementById("shopQuantity-"+itemId);
         const output=document.getElementById("shopTotal-"+itemId);
         if(!input||!output){ return 0; }
-        const quantity=Math.max(1,Math.min(9999,Math.floor(numeric(input.value)||1)));
+        const quantity=typeof window.normalizeShopPurchaseQuantity==="function"
+            ?window.normalizeShopPurchaseQuantity(input.value)
+            :Math.max(1,Math.min(999,Math.floor(numeric(input.value)||1)));
+        input.value=String(quantity);
         const unitPrice=Math.max(0,Math.floor(numeric(input.dataset.unitPrice)));
         const total=quantity*unitPrice;
         output.textContent=total.toLocaleString("zh-TW")+" 金幣";
