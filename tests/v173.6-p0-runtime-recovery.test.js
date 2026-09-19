@@ -15,7 +15,7 @@ assert.doesNotMatch(v142,/const previous=showSkillNameBadge/);
 assert.match(main,/v142PlaySkillAnimationFromBadge\("player",skillName,elementType,[\s\S]*?characterIndex\|\|0,targetContract\.targetId,targetContract\.targetIds,targetContract/);
 assert.match(main,/v142PlaySkillAnimationFromBadge\("monster",skillName,elementType,[\s\S]*?monsterIndex\|\|0,targetContract\.targetId,targetContract\.targetIds,targetContract/);
 assert.match(animation,/water-orb-vfx\.png\?v=173\.19/);
-assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
-assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
+assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
+assert.match(index,/<title>四象江湖傳 V173\.66<\/title>/);
 
 console.log("V173.62 P0 direct animation runtime recovery: 8 tests passed.");
