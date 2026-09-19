@@ -1,6 +1,6 @@
 ## 2026-09-19 — DEV 正式版本公告視覺預覽（VERIFIED／main 未修改）
 
-## 2026-09-19 — Mobile lifecycle／Shop／Element Box／Adventure／Home First Screen 七項根因修復（IMPLEMENTED / CI PENDING）
+## 2026-09-19 — Mobile lifecycle／Shop／Element Box／Adventure／Home First Screen 七項根因修復（7/7 VERIFIED）
 
 - Base：`dev@ccf587d0feec8d4790d17834a11b67a6d05bc55f`；工作分支：`fix/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919`；`main` 全程禁止修改。Requirement Batch：`release/requirement-batches/2026-09-19-mobile-lifecycle-shop-elementbox-adventure-home-hud.json`。
 - Screen Wake Lock 唯一 owner 仍為 `js/startup/screen-wake-lock-runtime.js`：system release 可見時重取、request 失敗只有有限節流 retry、hidden/pagehide 取消 retry 並 release；`FourSymbolsScreenWakeLock.getDiagnostics()` 提供 supported／held／failure／acquire／release 診斷，不阻塞 Startup。
@@ -11,8 +11,8 @@
 - NT$99 30天免廣告資訊在 `js/16-stage-v54-main-city-runtime.js` 改為 manual-only；已移除 startup／pageshow／MutationObserver auto-show 生命週期，保留 `openAdFreeServiceInfoModal()` 手動能力；ECPay／獎勵廣告未改。
 - Main City First Screen：`js/16-stage-v54-main-city-runtime.js` 在 app-shell 先建立固定 `#v146HomeRoster`、三格角色 placeholder 與 `.team-relic-loadout-slot`；hydrate 後只填內容。新增小型 `js/relic-summary-catalog.js` 作 `id/name/triggerText` 唯一摘要資料橋；完整 `feature-boss-relic` 仍 lazy，`js/60-team-relic-system.js` 不再建立首頁摘要 DOM。
 - 受影響 production build 已重建新 content-hashed Boot/App/Gameplay/Relic/Adventure bundles，`asset-manifest.json`／`build/asset-manifest.json`／`index.html` 已同步；Game／Cache Version 維持 173.65。
-- Targeted tests 已新增／更新：`tests/screen-wake-lock.test.js`、`tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js`、Adventure／ad-free／V146 shop／main-city／team relic save/runtime 既有測試。尚未宣稱 VERIFIED；需 PR Repository checks、build:check 與可執行 QA 通過後更新本節。
-- PR #347 前兩輪 CI 已證明 syntax、Release Update、Adventure、Fixed Slot、battle/VFX 與 relic lifecycle 測試均可通過；第二輪唯一阻塞為 deterministic `asset-manifest.json` stale。已依該 run 的 `production-build-sync` artifact 對齊兩份 manifest；目前等待最新 head 的完整 Repository checks 重跑，尚未宣稱 VERIFIED。
+- Targeted tests 已新增／更新：`tests/screen-wake-lock.test.js`、`tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js`、Adventure／ad-free／V146 shop／main-city／team relic save/runtime 既有測試。
+- PR #347 CI run `35450909260` 已 SUCCESS：syntax、Release Update、Adventure、Fixed Slot、battle/VFX、relic lifecycle、deterministic `build:check`、Release Update mobile browser QA、Fixed Slot mobile QA、exact-candidate real battle QA、Adventure mobile QA、static resources、HTML IDs、loader integrity、Release Gate、git-diff 全部通過。Requirement Batch 已 7/7 VERIFIED。
 
 
 - 工作分支：`feature/release-update-dev-preview-20260919`，PR [#345](https://github.com/tf00913225-alt/my-game/pull/345) 已在 CI run `35446496532` 全綠後合併為 `dev@fff36cf702a92638f812698049015537001345b0`；DEV deployment run `35446584392` 也已全綠並核對 exact SHA。main 禁止修改。`js/release-update-notification.js` 是唯一 owner，沒有新建公告、跑馬燈或 Modal。
