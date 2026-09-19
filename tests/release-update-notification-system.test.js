@@ -37,14 +37,30 @@ class FakeElement{
         this._innerHTML="";
         this.style={};
         this.type="";
+        this.checked=false;
         this.ownerDocument=null;
     }
     set innerHTML(value){
         this._innerHTML=String(value);
         this._selectorChildren={};
-        [".release-update-marquee-tag",".release-update-marquee-text",".release-update-marquee-action",".release-update-primary"].forEach(selector=>{
+        this._actionChildren=[];
+        [".release-update-marquee-tag",".release-update-marquee-text",".release-update-marquee-action"].forEach(selector=>{
             this._selectorChildren[selector]=new FakeElement();
         });
+        if(this._innerHTML.includes("release-update-suppress-today-input")){
+            this._selectorChildren[".release-update-suppress-today-input"]=new FakeElement();
+            this._selectorChildren[".release-update-suppress-today-input"].type="checkbox";
+        }
+        for(const action of ["acknowledge","later","reload"]){
+            if(this._innerHTML.includes('data-release-update-action="'+action+'"')){
+                const button=new FakeElement();
+                button.setAttribute("data-release-update-action",action);
+                this._actionChildren.push(button);
+                if(!this._selectorChildren[".release-update-primary"]&&this._innerHTML.includes('class="release-update-primary"')){
+                    this._selectorChildren[".release-update-primary"]=button;
+                }
+            }
+        }
     }
     get innerHTML(){ return this._innerHTML; }
     appendChild(child){
@@ -67,7 +83,10 @@ class FakeElement{
         if(selector===".home-feature-modal-box"){ return this.box||null; }
         return this._selectorChildren&&this._selectorChildren[selector]||null;
     }
-    querySelectorAll(){ return []; }
+    querySelectorAll(selector){
+        if(selector==="[data-release-update-action]"){ return this._actionChildren||[]; }
+        return [];
+    }
     focus(){}
 }
 
@@ -92,6 +111,8 @@ function createHarness({
     loadedVersion="173.41",
     responses=[],
     seen=null,
+    suppressToday=null,
+    nowValue=Date.now(),
     locationHref="https://example.test/my-game/"
 }={}){
     const elements=new Map();
@@ -125,9 +146,18 @@ function createHarness({
         storage.set("four_symbols_account:test:release-update-last-seen-version",seen.releaseVersion);
         storage.set("four_symbols_account:test:release-update-last-seen-notice",seen.noticeId);
     }
+    if(suppressToday){
+        storage.set("four_symbols_account:test:release-update-suppress-today",JSON.stringify(suppressToday));
+    }
     const localStorage={
         getItem:key=>storage.has(key)?storage.get(key):null,
-        setItem:(key,value)=>storage.set(key,String(value))
+        setItem:(key,value)=>storage.set(key,String(value)),
+        removeItem:key=>storage.delete(key)
+    };
+    const NativeDate=Date;
+    const HarnessDate=class extends NativeDate{
+        constructor(...args){ super(...(args.length?args:[nowValue])); }
+        static now(){ return nowValue; }
     };
     const fetchCalls=[];
     const timers=new Map();
@@ -139,7 +169,7 @@ function createHarness({
         localStorage,
         URL,
         AbortController,
-        Date,
+        Date:HarnessDate,
         Promise,
         Map,
         Set,
@@ -216,15 +246,22 @@ async function test(name,callback){
         assert.match(css,/left:42px;[\s\S]*top:30px;[\s\S]*width:996px;[\s\S]*min-height:132px;/);
         assert.match(css,/pointer-events:auto;/);
         assert.match(css,/release-update-modal #homeFeatureModalBody[\s\S]*overflow-y:auto;/);
+        assert.match(css,/release-update-suppress-today[\s\S]*font-size:13px/);
+        assert.match(runtimeSource,/release-update-suppress-today-input/);
+        assert.match(runtimeSource,/release-update-suppress-today/);
         assert.doesNotMatch(css,/!important/);
     });
 
-    await test("Case A: same loaded and server release stays quiet after the notice was read",async()=>{
+    await test("Case A: current release auto-opens once per login even when it was already read before",async()=>{
         const current=releaseManifest("V173.41");
         const harness=createHarness({responses:[current],seen:current});
         await harness.api.checkForUpdate("case-a",{force:true});
-        assert.equal(harness.overlay.children.length,0);
-        assert.equal(harness.modal.classList.contains("show"),false);
+        assert.equal(harness.modal.classList.contains("show"),true);
+        assert.match(harness.body.innerHTML,/今日不再跳出提醒/);
+        assert.equal(harness.api.getState().loginAnnouncementShown,true);
+        harness.window.closeHomeFeature();
+        await harness.api.checkForUpdate("case-a-repeat",{force:true});
+        assert.equal(harness.modal.classList.contains("show"),false,"same page login session must not auto-open twice");
     });
 
     await test("DEV-only preview: the same manifest can show the marquee and detail modal without reading or reloading",async()=>{
@@ -301,18 +338,30 @@ async function test(name,callback){
         assert.equal(inBattle.reloads,1);
     });
 
-    await test("Case F/G: a read notice does not repeat, but a later release is still recognized",async()=>{
+    await test("Case F/G: daily suppression skips the same notice today, but never blocks a new notice",async()=>{
         const v42=releaseManifest("V173.42");
         const v43=releaseManifest("V173.43");
-        const readCurrent=createHarness({loadedVersion:"173.42",responses:[v42],seen:v42});
-        await readCurrent.api.checkForUpdate("case-f",{force:true});
-        assert.equal(readCurrent.modal.classList.contains("show"),false);
+        const nowValue=Date.parse("2026-09-19T12:00:00+08:00");
+        const suppressedCurrent=createHarness({
+            loadedVersion:"173.42",
+            responses:[v42],
+            seen:v42,
+            nowValue,
+            suppressToday:{noticeId:v42.noticeId,dateKey:"2026-09-19"}
+        });
+        await suppressedCurrent.api.checkForUpdate("case-f",{force:true});
+        assert.equal(suppressedCurrent.modal.classList.contains("show"),false);
+        assert.equal(suppressedCurrent.api.getState().suppressedToday,true);
 
-        const olderClient=createHarness({responses:[v42,v43],seen:v42});
-        await olderClient.api.checkForUpdate("case-g-first",{force:true});
-        await olderClient.api.checkForUpdate("case-g-second",{force:true});
-        assert.equal(olderClient.api.getState().availableReleaseVersion,"V173.43");
-        assert.match(olderClient.overlay.children[0].querySelector(".release-update-marquee-text").textContent,/V173\.43/);
+        const newNoticeSameDay=createHarness({
+            loadedVersion:"173.43",
+            responses:[v43],
+            seen:v42,
+            nowValue,
+            suppressToday:{noticeId:v42.noticeId,dateKey:"2026-09-19"}
+        });
+        await newNoticeSameDay.api.checkForUpdate("case-g",{force:true});
+        assert.equal(newNoticeSameDay.modal.classList.contains("show"),true,"a new noticeId must ignore suppression for the older notice");
     });
 
     await test("Case H: forced update waits for battle, then opens a non-dismissible shared modal",async()=>{
@@ -337,6 +386,45 @@ async function test(name,callback){
         assert.equal(result,null);
         assert.equal(harness.overlay.children.length,0);
         assert.equal(harness.modal.classList.contains("show"),false);
+    });
+
+    await test("Case H2: checking 今日不再跳出提醒 suppresses only the same notice for the current local day",async()=>{
+        const current=releaseManifest("V173.41");
+        const nowValue=Date.parse("2026-09-19T12:00:00+08:00");
+        const first=createHarness({loadedVersion:"173.41",responses:[current],nowValue});
+        await first.api.checkForUpdate("case-h2-first",{force:true});
+        const checkbox=first.body.querySelector(".release-update-suppress-today-input");
+        assert.ok(checkbox);
+        checkbox.checked=true;
+        const acknowledge=first.body.querySelectorAll("[data-release-update-action]")
+            .find(button=>button.getAttribute("data-release-update-action")==="acknowledge");
+        assert.ok(acknowledge);
+        acknowledge.dispatch("click");
+        const stored=JSON.parse(first.storage.get("four_symbols_account:test:release-update-suppress-today"));
+        assert.deepEqual(stored,{noticeId:current.noticeId,dateKey:"2026-09-19"});
+
+        const second=createHarness({
+            loadedVersion:"173.41",
+            responses:[current],
+            nowValue,
+            suppressToday:stored
+        });
+        await second.api.checkForUpdate("case-h2-second",{force:true});
+        assert.equal(second.modal.classList.contains("show"),false,"same notice must stay suppressed for the rest of today");
+    });
+
+    await test("Case H3: the same notice auto-opens again on the next local day",async()=>{
+        const current=releaseManifest("V173.41");
+        const previous={noticeId:current.noticeId,dateKey:"2026-09-19"};
+        const nextDay=createHarness({
+            loadedVersion:"173.41",
+            responses:[current],
+            nowValue:Date.parse("2026-09-20T08:00:00+08:00"),
+            suppressToday:previous
+        });
+        await nextDay.api.checkForUpdate("case-h3",{force:true});
+        assert.equal(nextDay.modal.classList.contains("show"),true);
+        assert.equal(nextDay.api.getState().suppressedToday,false);
     });
 
     await test("Case J: startup, visible and online checks are throttled instead of request-spamming",async()=>{
