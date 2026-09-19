@@ -32,9 +32,15 @@ assert.match(relic,/interceptActionFinish\(\(\)=>[\s\S]*relicPresentationHandoff
   "relic presentation must use the existing battle-flow interceptor instead of a second combat runtime");
 assert.match(relic,/releaseRelicPresentationHandoff\(withProtection\)[\s\S]*RELIC_MIN_VISUAL_PROTECTION_MS/,
   "the first 1.2s of active relic VFX must be protected before action handoff is released");
+assert.match(relic,/function shouldHoldMonsterActionFinishForRelic\(hardControlled\)[\s\S]*enemy_action_count[\s\S]*ally_hit_count/,
+  "post-finish monster counters must pre-arm the existing action-finish interceptor when the next hit/action can trigger a relic");
+assert.match(relic,/const finishProbe=shouldHoldMonsterActionFinishForRelic\(hardControlled\);[\s\S]*relicPresentationHandoffsPending\+\+[\s\S]*previous\.apply\(this,arguments\)[\s\S]*releaseRelicPresentationHandoff\(false\)/,
+  "monster-action finish must be held before the legacy owner schedules the next combatant and released after trigger dispatch");
 
-assert.match(relic,/team-relic-battle-icon"><img src=/,
-  "the auxiliary banner must render an image instead of the legacy glyph");
+assert.ok(
+  relic.includes('team-relic-battle-icon"><img src="'+esc(def.battleIconPath||def.iconPath||"")'),
+  "the auxiliary banner must use the battle icon instead of the legacy glyph"
+);
 assert.match(relic,/def\.battleIconPath\|\|def\.iconPath\|\|""/,
   "the auxiliary banner must source the dedicated battle icon with only the catalog icon as fallback");
 assert.doesNotMatch(relic,/team-relic-battle-icon">寶</,"the legacy circular 寶 glyph cannot remain the relic identity");
