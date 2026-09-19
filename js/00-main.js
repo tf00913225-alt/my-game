@@ -4129,6 +4129,7 @@ let battleRoundBoundaryKeys=new Set();
 const battlePresentationLocks=new Set();
 let battleInputResumeToken=null;
 let battleResolutionResumeToken=null;
+let battleAutoActionResume=null;
 let battleRoundPromptTimeoutId=null;
 let battleRoundPromptRelease=null;
 let activeBattleStatisticsAction=null;
@@ -4170,6 +4171,10 @@ if(typeof window!=="undefined"){
             };
         },
         isPresentationActive(){ return battlePresentationLocks.size>0; },
+        acquirePauseLock(owner){
+            return window.FourSymbolsBattleFlow.acquirePresentationLock("pause:"+String(owner||"battle-flow"));
+        },
+        isPaused(){ return battlePresentationLocks.size>0; },
         isAutoBattle(){ return !!autoBattle; },
         isBattleActive(){ return !!battleActive; },
         interceptActionFinish(interceptor){
@@ -4188,6 +4193,17 @@ if(typeof window!=="undefined"){
 
 function resumeBattleAfterPresentationLocks(){
     if(battlePresentationLocks.size>0||!battleActive){ return; }
+
+    if(
+        battleAutoActionResume&&
+        battleAutoActionResume.token===battleToken&&
+        battlePhase==="declare"
+    ){
+        const pending=battleAutoActionResume;
+        battleAutoActionResume=null;
+        autoActionForCharacter(pending.characterIndex,pending.token);
+        return;
+    }
 
     if(
         battleInputResumeToken!==null&&
@@ -10578,6 +10594,8 @@ function startBattle(triggerIndex){
     battlePresentationLocks.clear();
     battleInputResumeToken=null;
     battleResolutionResumeToken=null;
+    battleAutoActionResume=null;
+    battleResolutionResumeToken=null;
     clearBattleRoundPrompt();
 
 
@@ -11298,6 +11316,8 @@ function beginCharacterTurn(token){
 
     if(autoOn){
 
+        const scheduledAutoCharacterIndex=activeBattleCharacterIndex;
+
         /*
            ★ 修正（依照使用者要求，加快節奏）：
            原本1000ms才會真正出手，這是專門
@@ -11314,6 +11334,14 @@ function beginCharacterTurn(token){
                 !battleActive ||
                 token!==battleToken
             ){
+                return;
+            }
+
+            if(battlePresentationLocks.size>0){
+                battleAutoActionResume={
+                    token:token,
+                    characterIndex:scheduledAutoCharacterIndex
+                };
                 return;
             }
 
@@ -11338,11 +11366,11 @@ function beginCharacterTurn(token){
 
                 battleStatisticsBeginAction({
                     type:"player",
-                    characterIndex:activeBattleCharacterIndex
+                    characterIndex:scheduledAutoCharacterIndex
                 });
 
                 autoActionForCharacter(
-                    activeBattleCharacterIndex,
+                    scheduledAutoCharacterIndex,
                     token
                 );
 
