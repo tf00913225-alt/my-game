@@ -21,7 +21,11 @@
     const RARITY_LABELS={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
 
     const RELIC_VFX_FLOOR_MS=2000;
-    const RELIC_CUTIN_DURATION_MS=720;
+    const RELIC_DIM_IN_MS=360;
+    const RELIC_IDENTITY_REVEAL_MS=360;
+    const RELIC_TARGET_REVEAL_MS=420;
+    const RELIC_DIM_OUT_MS=420;
+    const RELIC_CUTIN_DURATION_MS=RELIC_DIM_IN_MS+RELIC_IDENTITY_REVEAL_MS+RELIC_TARGET_REVEAL_MS;
     const RELIC_MIN_VISUAL_PROTECTION_MS=1200;
     const RELIC_DEV_HOST="dev.four-symbols-dev.pages.dev";
     const RELIC_BALANCE_CONFIG=Object.freeze({
@@ -263,7 +267,7 @@
     let relicFinishHeld=false;
     let relicFinishRetryTimer=0;
     let relicCutinNode=null;
-    let relicCutinTimer=0;
+    let relicFocusedTargetCards=[];
     let devPreviewRelicId=null;
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
@@ -293,17 +297,46 @@
     function hasLiveBattlePresentationHost(){
         return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
     }
+    function clearRelicTargetFocus(){
+        const cards=relicFocusedTargetCards.slice();
+        relicFocusedTargetCards=[];
+        cards.forEach(card=>{
+            if(card&&card.classList){
+                card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
+            }
+        });
+        if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
+            document.querySelectorAll(".team-relic-battle-target-focus,.team-relic-battle-target-focus-visible").forEach(card=>{
+                card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
+            });
+        }
+    }
     function cleanupRelicCutin(){
-        if(relicCutinTimer){ clearTimeout(relicCutinTimer); relicCutinTimer=0; }
+        clearRelicTargetFocus();
         const node=relicCutinNode||(typeof document!=="undefined"&&document.getElementById?document.getElementById("teamRelicBattlePresentation"):null);
         if(node&&typeof node.remove==="function"){ node.remove(); }
         relicCutinNode=null;
     }
-    function showRelicCutin(def){
-        if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(false); }
+    function relicTargetCard(side,index){
+        if(typeof document==="undefined"||!Number.isInteger(index)){ return null; }
+        return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
+    }
+    function revealRelicTargets(target){
+        clearRelicTargetFocus();
+        const cards=target&&Array.isArray(target.targetIds)
+            ?target.targetIds.map(index=>relicTargetCard(target.targetSide,index)).filter(Boolean)
+            :[];
+        relicFocusedTargetCards=Array.from(new Set(cards));
+        relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus"));
+        const show=()=>relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus-visible"));
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(show); }else{ show(); }
+        return waitMs(RELIC_TARGET_REVEAL_MS);
+    }
+    function beginRelicCinematic(def,target){
+        if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
         cleanupRelicCutin();
         const host=document.getElementById("battlePage");
-        if(!host){ return Promise.resolve(false); }
+        if(!host){ return Promise.resolve(null); }
         const node=document.createElement("div");
         node.id="teamRelicBattlePresentation";
         node.className="team-relic-battle-presentation";
@@ -311,17 +344,30 @@
         node.innerHTML='<span class="team-relic-battle-dim" aria-hidden="true"></span>'+
             '<div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon">'+
             '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
-            '<span class="team-relic-battle-cutin-copy"><small>秘寶發動</small><strong>'+esc(def.name)+'</strong></span></div>';
+            '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
         host.appendChild(node);
         relicCutinNode=node;
-        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(()=>{ if(node===relicCutinNode){ node.classList.add("show"); } }); }
-        else{ node.classList.add("show"); }
-        return new Promise(resolve=>{
-            relicCutinTimer=setTimeout(()=>{
-                relicCutinTimer=0;
-                if(node===relicCutinNode){ node.classList.remove("show"); node.remove(); relicCutinNode=null; }
-                resolve(true);
-            },RELIC_CUTIN_DURATION_MS);
+        const dim=()=>{ if(node===relicCutinNode){ node.classList.add("dim-visible"); } };
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(dim); }else{ dim(); }
+        return waitMs(RELIC_DIM_IN_MS)
+            .then(()=>{
+                if(node!==relicCutinNode){ return null; }
+                node.classList.add("identity-visible");
+                return waitMs(RELIC_IDENTITY_REVEAL_MS);
+            })
+            .then(()=>{
+                if(node!==relicCutinNode){ return null; }
+                return revealRelicTargets(target).then(()=>node);
+            });
+    }
+    function enterRelicVfxPhase(node){
+        if(node&&node===relicCutinNode){ node.classList.add("vfx-running"); }
+    }
+    function endRelicCinematic(node){
+        if(!node||node!==relicCutinNode){ cleanupRelicCutin(); return Promise.resolve(); }
+        node.classList.add("releasing");
+        return waitMs(RELIC_DIM_OUT_MS).then(()=>{
+            if(node===relicCutinNode){ cleanupRelicCutin(); }
         });
     }
     function clearRelicFinishProtection(){
@@ -430,11 +476,11 @@
     function relicPresentationDuration(def){
         return Math.max(520,numeric(def&&def.vfx&&def.vfx.durationMs)||RELIC_BALANCE_CONFIG.presentationDurationMs);
     }
-    function playRelicVfx(def,triggerDef,payload,override){
+    function playRelicVfx(def,triggerDef,payload,override,resolvedTarget){
         if(!def||!def.vfx||!hasLiveBattlePresentationHost()){ return null; }
         const director=window.v142SkillAnimationDirector;
         if(!director||typeof director.play!=="function"){ return null; }
-        const target=relicVfxTarget(def,triggerDef,payload||{},override);
+        const target=resolvedTarget||relicVfxTarget(def,triggerDef,payload||{},override);
         if(!target||!target.targetIds.length){ return null; }
         const duration=relicPresentationDuration(def);
         const contract=Object.freeze({
@@ -491,33 +537,54 @@
         };
         relicPresentationPending++;
         relicPresentationHandoffsPending++;
+        let cinematicNode=null;
+        let resolvedTarget=null;
         const job=Promise.resolve(previousTail).catch(()=>{}).then(()=>waitForAnimationRelease(gate)).then(()=>{
             if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){
                 releaseHandoff(false);
-                return false;
+                return null;
             }
-            return showRelicCutin(def).then(()=>true);
-        }).then(ready=>{
-            if(!ready){ return; }
+            resolvedTarget=relicVfxTarget(
+                def,
+                visualContext&&visualContext.triggerDef,
+                visualContext&&visualContext.payload||{},
+                visualContext&&visualContext.override
+            );
+            if(!resolvedTarget||!resolvedTarget.targetIds.length){
+                releaseHandoff(false);
+                return null;
+            }
+            return beginRelicCinematic(def,resolvedTarget);
+        }).then(node=>{
+            if(!node){ return null; }
+            cinematicNode=node;
             if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){
                 releaseHandoff(false);
-                return;
+                cleanupRelicCutin();
+                return null;
             }
-            showBanner(def);
-            playRelicVfx(
+            enterRelicVfxPhase(node);
+            const relicGate=playRelicVfx(
                 def,
                 visualContext&&visualContext.triggerDef,
                 visualContext&&visualContext.payload,
-                visualContext&&visualContext.override
+                visualContext&&visualContext.override,
+                resolvedTarget
             );
             releaseHandoff(true);
             if(typeof onStart==="function"){ onStart(); }
-            return waitMs(relicPresentationDuration(def));
+            if(relicGate&&relicGate.promise){ return Promise.resolve(relicGate.promise).then(()=>node); }
+            return waitMs(relicPresentationDuration(def)).then(()=>node);
+        }).then(node=>{
+            if(!node){ return; }
+            return endRelicCinematic(node);
         }).catch(error=>{
             releaseHandoff(false);
+            cleanupRelicCutin();
             console.error("秘寶演出序列失敗：",error);
         }).then(()=>{
             releaseHandoff(false);
+            if(cinematicNode&&cinematicNode===relicCutinNode){ cleanupRelicCutin(); }
             if(generation===relicPresentationGeneration){ relicPresentationPending=Math.max(0,relicPresentationPending-1); }
         });
         relicPresentationTail=job;
@@ -1158,10 +1225,18 @@
     function cardMarkup(def){
         const owned=statusOf(def.id),equipped=effectiveLoadoutRelicId()===def.id;
         const devTesting=isRelicDevTestingEnvironment();
+        if(devTesting){
+            return '<div class="team-relic-card team-relic-card-dev '+rarityClass(def)+(equipped?' equipped':'')+'">'+
+                '<button type="button" class="team-relic-card-open-overlay" aria-label="查看'+esc(def.name)+'詳情" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')"></button>'+
+                '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span><span class="team-relic-card-name">'+esc(def.name)+'</span>'+
+                '<span class="team-relic-card-meta">DEV 測試・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
+                '<button type="button" class="team-relic-dev-equip" onclick="event.stopPropagation();v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已測試配裝':'測試配裝')+'</button>'+
+                (equipped?'<em>DEV已配裝</em>':'')+'</div>';
+        }
         return '<button type="button" class="team-relic-card '+rarityClass(def)+(owned.unlocked?' unlocked':' locked')+(equipped?' equipped':'')+'" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')">'+
             '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span><span class="team-relic-card-name">'+esc(def.name)+'</span>'+
-            '<span class="team-relic-card-meta">'+(devTesting?'DEV 測試':owned.unlocked?'Lv.'+owned.level:'尚未獲得')+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
-            (equipped?'<em>'+(devTesting?'DEV測試':'已裝備')+'</em>':'')+'</button>';
+            '<span class="team-relic-card-meta">'+(owned.unlocked?'Lv.'+owned.level:'尚未獲得')+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
+            (equipped?'<em>已裝備</em>':'')+'</button>';
     }
     function renderRelicList(){
         const equippedId=effectiveLoadoutRelicId();
@@ -1185,7 +1260,7 @@
             '<section class="team-relic-upgrade"><h3>強化</h3><p>目前 Lv.'+level+' → '+(level>=20?'MAX':'Lv.'+(level+1))+'</p><p>素材：第一版尚未啟用正式素材來源；目前只消耗金幣。</p><b>金幣 '+cost.toLocaleString("zh-TW")+'</b></section>'+
             '<div class="team-relic-detail-actions">'+
             (owned.unlocked&&def.runtimeReady&&level<20?'<button onclick="v174UpgradeRelic(\''+esc(def.id)+'\')">強化</button>':'')+
-            (owned.unlocked&&(def.runtimeReady||devPresentation)?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(devTesting?(equipped?'DEV測試已選':'DEV測試'):(equipped?'已裝備':'裝備'))+'</button>':'<button disabled>'+(def.runtimeReady?'尚未獲得':'第一版未開放')+'</button>')+
+            (owned.unlocked&&(def.runtimeReady||devPresentation)?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(devTesting?(equipped?'DEV 已測試配裝':'DEV 測試配裝'):(equipped?'已裝備':'裝備'))+'</button>':'<button disabled>'+(def.runtimeReady?'尚未獲得':'第一版未開放')+'</button>')+
             '</div></div>';
     }
 
